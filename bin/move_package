@@ -1,0 +1,13 @@
+#! /bin/bash -xe
+
+#TODO add support for package name differences and use go refactor
+prefix=github.com/friedenberg/zit
+original="$1"
+renamed="$2"
+
+mkdir -p "$(dirname "$renamed")"
+
+git mv "$original" "$renamed" || mv "$original" "$renamed"
+
+ag "$prefix/$original" -l0 \
+  | xargs -0 sed -i '' "s|$prefix/$original|$prefix/$renamed|g"

@@ -1,0 +1,92 @@
+package organize_text
+
+import (
+	"bufio"
+	"io"
+	"strings"
+)
+
+type metadateiReader struct {
+	hasSetBaseEtikett bool
+	within            bool
+}
+
+func (ot *organizeText) ReadFrom(r1 io.Reader) (n int64, err error) {
+	r := bufio.NewReader(r1)
+
+	ot.etiketten = _EtikettNewSet()
+
+	within := false
+	line := 0
+
+	for {
+		var s string
+		s, err = r.ReadString('\n')
+
+		if err == io.EOF {
+			err = nil
+			break
+		}
+
+		if err != nil {
+			err = _Error(err)
+			return
+		}
+
+		n += int64(len(s))
+
+		s = strings.TrimSuffix(s, "\n")
+
+		if !within && s == _MetadateiBoundary {
+			within = true
+		} else if within && s != _MetadateiBoundary {
+			slen := len(s)
+
+			if slen < 1 {
+				continue
+			}
+
+			p := s[0]
+			v := ""
+
+			if slen > 1 {
+				v = strings.TrimSpace(s[1:])
+			}
+
+			switch p {
+
+			case '*':
+
+				if v == "" {
+					continue
+				}
+
+				if err = ot.etiketten.AddString(v); err != nil {
+					err = _Error(err)
+					return
+				}
+
+			default:
+				err = _Errorf("unsupported verb '%q', '%q'", p, s)
+				return
+			}
+
+			line += 1
+
+		} else if within && s == _MetadateiBoundary {
+			within = false
+
+		} else {
+			var n1 int64
+
+			if n1, err = ot.zettels.ReadFrom(r); err != nil {
+				err = _Error(err)
+				return
+			}
+
+			n += n1
+		}
+	}
+
+	return
+}

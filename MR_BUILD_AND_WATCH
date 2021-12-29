@@ -1,0 +1,14 @@
+-e
+zit$
+-e
+\.git/
+-e
+zit-go-tmp-umask$
+-e
+\.zit/
+-e
+\.DS_Store
+-e
+build/
+--
+go build -o build/zit ./.; and go test ./...; and go install ./.

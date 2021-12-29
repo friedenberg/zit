@@ -1,0 +1,115 @@
+package commands
+
+import (
+	"bytes"
+	"encoding/json"
+	"flag"
+	"log"
+	"os"
+	"os/exec"
+)
+
+type Push struct {
+}
+
+func init() {
+	registerCommand(
+		"push",
+		func(f *flag.FlagSet) Command {
+			c := &Push{}
+
+			return commandWithZettels{c}
+		},
+	)
+}
+
+func (c Push) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) {
+	if len(args) == 0 {
+		err = _Errorf("no remote specified")
+		return
+	}
+
+	var remote _RemoteScript
+
+	if remote, err = c.remoteScriptFromArg(u, args[0]); err != nil {
+		err = _Error(err)
+		return
+	}
+
+	if len(args) > 1 {
+		args = args[1:]
+	} else {
+		args = []string{}
+	}
+
+	var hins []_Hinweis
+
+	if _, hins, err = zs.Hinweisen().All(); err != nil {
+		err = _Error(err)
+		return
+	}
+
+	chains := make([]_ZettelsChain, len(hins))
+
+	for i, h := range hins {
+		if chains[i], err = zs.AllInChain(h); err != nil {
+			err = _Error(err)
+			return
+		}
+	}
+
+	b, err := json.Marshal(chains)
+
+	if err != nil {
+		log.Print(err)
+		return
+	}
+
+	if err = c.runRemoteScript(u, remote, args, b); err != nil {
+		err = _Error(err)
+		return
+	}
+
+	return
+}
+
+func (c Push) remoteScriptFromArg(u _Umwelt, arg string) (remote _RemoteScript, err error) {
+	ok := false
+
+	if remote, ok = u.Konfig.RemoteScripts[arg]; !ok {
+		p := u.DirZit("bin", arg)
+
+		if !_FilesExist(p) {
+			err = _Errorf("remote not defined: '%s'", arg)
+			return
+		}
+
+		remote = _RemoteScriptFile{
+			Path: p,
+		}
+	}
+
+	return
+}
+
+func (c Push) runRemoteScript(u _Umwelt, remote _RemoteScript, args []string, b []byte) (err error) {
+	var script *exec.Cmd
+
+	if script, err = remote.Cmd(append([]string{"push"}, args...)); err != nil {
+		err = _Error(err)
+		return
+	}
+
+	script.Stdout = os.Stdout
+	script.Stderr = os.Stderr
+
+	r := bytes.NewBuffer(b)
+	script.Stdin = r
+
+	if err = script.Run(); err != nil {
+		err = _Error(err)
+		return
+	}
+
+	return
+}

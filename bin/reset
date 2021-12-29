@@ -1,0 +1,12 @@
+#! /bin/bash -xe
+
+find .zit -print0 | xargs -0 chflags nouchg
+
+dir="$(dirname "$0")/.."
+lines="${1:-0}"
+zit="$dir/build/zit"
+
+"$zit" deinit
+"$zit" init
+cat "$dir"/bin/{hades,elements} > .zit/Kennung/Yin
+cat "$dir"/bin/pokemon > .zit/Kennung/Yang
