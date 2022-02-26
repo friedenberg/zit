@@ -28,20 +28,6 @@ func init() {
 func (c Init) Run(u _Umwelt, args ...string) (err error) {
 	base := u.DirZit()
 
-	defer func() {
-		r := recover()
-
-		if r == nil {
-			return
-		}
-
-		if e, ok := r.(error); ok {
-			err = e
-		}
-
-		panic(r)
-	}()
-
 	c.mkdirAll(base, "bin")
 
 	c.mkdirAll(u.DirAkte())
