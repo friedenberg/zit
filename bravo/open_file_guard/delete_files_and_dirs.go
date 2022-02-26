@@ -2,7 +2,7 @@ package open_file_guard
 
 import (
 	"os"
-	"path"
+	"path/filepath"
 )
 
 func DeleteFilesAndDirs(args ...string) (err error) {
@@ -14,12 +14,25 @@ func DeleteFilesAndDirs(args ...string) (err error) {
 			return
 		}
 
-		dirs[path.Dir(f)] = true
+		// It's possible that the paths come in absolute or relative form. So we
+		// convert each path into absolute to deduplicate and prevent trying to
+		// remove the same directory more than once. That said, filepath.Abs does
+		// not guarantee uniqueness, so it's still possible to experience an error.
+
+		var abs string
+
+		if abs, err = filepath.Abs(f); err != nil {
+			err = _Error(err)
+			return
+		}
+
+		dirs[filepath.Dir(abs)] = true
 	}
 
 	for d, _ := range dirs {
 		var contents []string
 
+		//TODO handle case of missing directory
 		if contents, err = ReadDirNames(d); err != nil {
 			err = _Error(err)
 			return
