@@ -67,16 +67,21 @@ func (c CatObjekte) akten(u _Umwelt, zs _Zettels, args ...string) (err error) {
 
 func (c CatObjekte) zettelen(u _Umwelt, zs _Zettels, args ...string) (err error) {
 	for _, arg := range args {
+		var id _Id
 		var sha _Sha
 
 		if err = sha.Set(arg); err != nil {
-			err = _Error(err)
-			return
+			if id, err = _MakeBlindHinweis(arg); err != nil {
+				err = _Error(err)
+				return
+			}
+		} else {
+			id = sha
 		}
 
 		var z _NamedZettel
 
-		if z, err = zs.Read(sha); err != nil {
+		if z, err = zs.Read(id); err != nil {
 			err = _Error(err)
 			return
 		}
