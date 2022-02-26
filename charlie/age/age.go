@@ -19,7 +19,7 @@ type age struct {
 func Make(basePath string) (a *age, err error) {
 	var contents string
 
-	if contents, err = _ReadStringAll(basePath, FileName); err != nil {
+	if contents, err = _ReadStringAll(basePath); err != nil {
 		return
 	}
 

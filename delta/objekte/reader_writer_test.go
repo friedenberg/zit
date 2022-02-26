@@ -2,6 +2,7 @@ package objekte
 
 import (
 	"io"
+	"path"
 	"strings"
 	"testing"
 
@@ -12,7 +13,7 @@ func makeAge(t *testing.T) age.Age {
 	t.Helper()
 
 	d := t.TempDir()
-	age, err := age.Generate(d)
+	age, err := age.Generate(path.Join(d, "AgeIdentity"))
 
 	if err != nil {
 		t.Fatalf("%s", err)

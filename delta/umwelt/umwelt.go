@@ -3,7 +3,6 @@ package umwelt
 import (
 	"io"
 	"os"
-	"path"
 )
 
 type Umwelt struct {
@@ -35,24 +34,15 @@ func MakeUmwelt(c _Konfig) (u *Umwelt, err error) {
 	return
 }
 
-func (u Umwelt) Dir() string {
-	return u.BasePath
-}
-
-func (u Umwelt) DirZit(p ...string) string {
-	return path.Join(
-		append(
-			[]string{u.Dir(), ".zit"},
-			p...,
-		)...,
-	)
-}
-
 func (u Umwelt) Age() (a _Age, err error) {
-	p := u.DirZit()
+	fa := u.FileAge()
 
-	if a, err = _AgeMake(p); err != nil {
-		return
+	if _FilesExist(fa) {
+		if a, err = _AgeMake(fa); err != nil {
+			return
+		}
+	} else {
+		a = _AgeMakeEmpty()
 	}
 
 	return

@@ -6,10 +6,6 @@ import (
 	"github.com/friedenberg/zit/bravo/open_file_guard"
 )
 
-const (
-	FileName = "AgeIdentity"
-)
-
 type (
 	_AgeIdentity       = _age.Identity
 	_AgeRecipient      = _age.Recipient

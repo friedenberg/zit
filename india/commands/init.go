@@ -8,6 +8,7 @@ import (
 )
 
 type Init struct {
+	DisableAge bool
 }
 
 func init() {
@@ -16,11 +17,14 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &Init{}
 
+			f.BoolVar(&c.DisableAge, "disable-age", false, "")
+
 			return c
 		},
 	)
 }
 
+//TODO use args for kennung files
 func (c Init) Run(u _Umwelt, args ...string) (err error) {
 	base := u.DirZit()
 
@@ -40,21 +44,22 @@ func (c Init) Run(u _Umwelt, args ...string) (err error) {
 
 	c.mkdirAll(base, "bin")
 
-	c.mkdirAll(base, "Objekte", "Akte")
-	c.mkdirAll(base, "Objekte", "Zettel")
+	c.mkdirAll(u.DirAkte())
+	c.mkdirAll(u.DirZettel())
 
 	// c.mkdirAll(base, "Etikett-Zettel")
-	c.mkdirAll(base, "Hinweis")
-	c.mkdirAll(base, "Zettel-Hinweis")
-	c.mkdirAll(base, "Akte-Zettel")
-	c.mkdirAll(base, "Verloren+Gefunden")
+	c.mkdirAll(u.DirHinweis())
+	c.mkdirAll(u.DirZettelHinweis())
+	c.mkdirAll(u.DirVerlorenUndGefunden())
 
-	c.mkdirAll(base, "Kennung")
+	c.mkdirAll(u.DirKennung())
 	c.writeFile(u.DirZit("Kennung", "Counter"), "0")
 
-	if _, err = _AgeGenerate(base); err != nil {
-		err = _Error(err)
-		return
+	if !c.DisableAge {
+		if _, err = _AgeGenerate(u.FileAge()); err != nil {
+			err = _Error(err)
+			return
+		}
 	}
 
 	c.writeFile(u.DirZit("Konfig"), "")

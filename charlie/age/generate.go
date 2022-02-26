@@ -13,7 +13,7 @@ func Generate(basePath string) (a *age, err error) {
 		return
 	}
 
-	if err = ioutil.WriteFile(path.Join(basePath, FileName), []byte(i.String()), 0755); err != nil {
+	if err = ioutil.WriteFile(path.Join(basePath), []byte(i.String()), 0755); err != nil {
 		err = _Error(err)
 		return
 	}
