@@ -18,19 +18,19 @@ func init() {
 
 			f.Var(&c.Type, "type", "ObjekteType")
 
-			return commandWithZettels{c}
+			return commandWithZettels{commandWithId{c}}
 		},
 	)
 }
 
-func (c CatObjekte) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) {
+func (c CatObjekte) RunWithId(u _Umwelt, zs _Zettels, ids ..._Id) (err error) {
 	switch c.Type {
 
 	case _TypeAkte:
-		return c.akten(u, zs, args...)
+		return c.akten(u, zs, ids...)
 
 	case _TypeZettel:
-		return c.zettelen(u, zs, args...)
+		return c.zettelen(u, zs, ids...)
 
 	default:
 		err = _Errorf("unsupported objekte type: %s", c.Type)
@@ -40,16 +40,30 @@ func (c CatObjekte) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err 
 	return
 }
 
-func (c CatObjekte) akten(u _Umwelt, zs _Zettels, args ...string) (err error) {
-	for _, arg := range args {
+func (c CatObjekte) akten(u _Umwelt, zs _Zettels, ids ..._Id) (err error) {
+	for _, id := range ids {
 		var sb _Sha
 
-		if err = sb.Set(arg); err != nil {
-			err = _Error(err)
+		switch i := id.(type) {
+		case _Sha:
+			sb = i
+
+		case _Hinweis:
+			var named _NamedZettel
+
+			if named, err = zs.Read(i); err != nil {
+				err = _Error(err)
+				return
+			}
+
+			sb = named.Zettel.Akte
+
+		default:
+			err = _Errorf("unsupported id type: %q", i)
 			return
 		}
 
-		p := u.DirZit("Objekte", "Akte")
+		p := u.DirAkte()
 
 		if sb, err = sb.Glob(p); err != nil {
 			err = _Error(err)
@@ -65,20 +79,8 @@ func (c CatObjekte) akten(u _Umwelt, zs _Zettels, args ...string) (err error) {
 	return
 }
 
-func (c CatObjekte) zettelen(u _Umwelt, zs _Zettels, args ...string) (err error) {
-	for _, arg := range args {
-		var id _Id
-		var sha _Sha
-
-		if err = sha.Set(arg); err != nil {
-			if id, err = _MakeBlindHinweis(arg); err != nil {
-				err = _Error(err)
-				return
-			}
-		} else {
-			id = sha
-		}
-
+func (c CatObjekte) zettelen(u _Umwelt, zs _Zettels, ids ..._Id) (err error) {
+	for _, id := range ids {
 		var z _NamedZettel
 
 		if z, err = zs.Read(id); err != nil {

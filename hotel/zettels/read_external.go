@@ -1,32 +1,64 @@
 package zettels
 
-import "os"
+import (
+	"os"
+)
 
-type ExternalZettel struct {
-	Path     string
-	AktePath string
-	Hinweis  _Hinweis
-	Zettel   _Zettel
-}
+func (zs *zettels) ReadCheckedOut(options CheckinOptions, paths ...string) (out map[_Hinweis]_ZettelCheckedOut, err error) {
+	out = make(map[_Hinweis]_ZettelCheckedOut)
+	var external map[_Hinweis]_ZettelExternal
 
-func (zs *zettels) ReadExternal(options CheckinOptions, paths ...string) (out map[_Hinweis]ExternalZettel, err error) {
-	out = make(map[_Hinweis]ExternalZettel)
+	if external, err = zs.ReadExternal(options, paths...); err != nil {
+		err = _Error(err)
+		return
+	}
 
-	for _, p := range paths {
-		var ez ExternalZettel
+	for h, ez := range external {
+		var named _NamedZettel
 
-		if ez, err = zs.readExternalOne(options, p); err != nil {
+		if named, err = zs.Read(h); err != nil {
 			err = _Error(err)
 			return
 		}
 
+		out[h] = _ZettelCheckedOut{
+			External: ez,
+			Internal: named,
+		}
+	}
+
+	return
+}
+
+func (zs *zettels) ReadExternal(options CheckinOptions, paths ...string) (out map[_Hinweis]_ZettelExternal, err error) {
+	out = make(map[_Hinweis]_ZettelExternal)
+
+	for _, p := range paths {
+		if options.AddMdExtension {
+			p = p + ".md"
+		}
+
+		var ez _ZettelExternal
+
+		ez, err = zs.readExternalOne(options, p)
+
+		if options.IgnoreMissingHinweis && _ErrorsIs(os.ErrNotExist, err) {
+			err = nil
+			out[ez.Hinweis] = _ZettelExternal{}
+			continue
+		} else if err != nil {
+			err = _Error(err)
+			return
+		}
+
+		_Errf("[%s] (read external)\n", ez.Hinweis)
 		out[ez.Hinweis] = ez
 	}
 
 	return
 }
 
-func (zs zettels) readExternalOne(options CheckinOptions, p string) (ez ExternalZettel, err error) {
+func (zs zettels) readExternalOne(options CheckinOptions, p string) (ez _ZettelExternal, err error) {
 	ez.Path = p
 
 	head, tail := _IdHeadTailFromFileName(p)
@@ -42,7 +74,12 @@ func (zs zettels) readExternalOne(options CheckinOptions, p string) (ez External
 
 	var f *os.File
 
-	if f, err = _Open(p); err != nil {
+	if !_FilesExist(p) {
+		err = os.ErrNotExist
+		return
+	}
+
+	if f, err = os.Open(p); err != nil {
 		err = _Error(err)
 		return
 	}

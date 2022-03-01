@@ -22,7 +22,7 @@ func init() {
 }
 
 func (c Edit) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) {
-	var czs []_CheckedOutZettel
+	var czs []_ZettelCheckedOut
 
 	options := _ZettelsCheckinOptions{
 		IncludeAkte: c.IncludeAkte,
@@ -38,10 +38,10 @@ func (c Edit) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error)
 	akten := make([]string, 0)
 
 	for _, z := range czs {
-		files = append(files, z.Path)
+		files = append(files, z.External.Path)
 
-		if z.AktePath != "" {
-			akten = append(akten, z.AktePath)
+		if z.External.AktePath != "" {
+			akten = append(akten, z.External.AktePath)
 		}
 	}
 

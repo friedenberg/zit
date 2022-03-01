@@ -276,6 +276,8 @@ func (f Text) readAkteDesc(state *textStateRead, desc string) (err error) {
 		return
 	}
 
+	//TODO handl akte descs that are invalid files
+
 	shaError := state.metadataiAkteSha.Set(head)
 
 	log.Print(head)

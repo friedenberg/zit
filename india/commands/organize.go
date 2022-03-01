@@ -7,6 +7,7 @@ import (
 )
 
 type Organize struct {
+	Hinweisen     bool //TODO support
 	rootEtiketten _EtikettSet
 	GroupBy       _EtikettSet
 	GroupByUnique bool
@@ -29,16 +30,37 @@ func init() {
 }
 
 func (c *Organize) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) {
-	if c.rootEtiketten, err = c.getEtikettenFromArgs(args); err != nil {
-		err = _Error(err)
-		return
-	}
-
 	var zettels map[string]_NamedZettel
 
-	if zettels, err = zs.Query(_NamedZettelFilterEtikettSet(c.rootEtiketten)); err != nil {
-		err = _Error(err)
-		return
+	if c.Hinweisen {
+		zettels = make(map[string]_NamedZettel)
+
+		for _, arg := range args {
+			var h _Hinweis
+			if h, err = _MakeBlindHinweis(arg); err != nil {
+				err = _Error(err)
+				return
+			}
+
+			var named _NamedZettel
+
+			if named, err = zs.Read(h); err != nil {
+				err = _Error(err)
+				return
+			}
+
+			zettels[h.String()] = named
+		}
+	} else {
+		if c.rootEtiketten, err = c.getEtikettenFromArgs(args); err != nil {
+			err = _Error(err)
+			return
+		}
+
+		if zettels, err = zs.Query(_NamedZettelFilterEtikettSet(c.rootEtiketten)); err != nil {
+			err = _Error(err)
+			return
+		}
 	}
 
 	var ot _OrganizeText

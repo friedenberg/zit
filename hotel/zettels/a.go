@@ -4,6 +4,7 @@ import (
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/node_type"
 	"github.com/friedenberg/zit/alfa/stdprinter"
+	"github.com/friedenberg/zit/bravo/files"
 	"github.com/friedenberg/zit/bravo/id"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
 	"github.com/friedenberg/zit/bravo/sha"
@@ -55,6 +56,8 @@ type (
 
 	_StoredZettel              = stored_zettel.Stored
 	_NamedZettel               = stored_zettel.Named
+	_ZettelExternal            = stored_zettel.External
+	_ZettelCheckedOut          = stored_zettel.CheckedOut
 	_NamedZettelFilter         = stored_zettel.NamedFilter
 	_StoredZettelFormatObjekte = stored_zettel_formats.Objekte
 
@@ -78,6 +81,8 @@ var (
 	_Outf                   = stdprinter.Outf
 	_Error                  = errors.Error
 	_ErrorAs                = errors.As
+	_FilesExist             = files.Exists
+	_ErrorsIs               = errors.Is
 	_Errorf                 = errors.Errorf
 	_ErrorNormal            = errors.Normal
 	_EtikettNewSet          = etikett.NewSet

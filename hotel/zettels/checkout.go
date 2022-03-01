@@ -9,7 +9,7 @@ type CheckedOutZettel struct {
 	AktePath string
 }
 
-func (zs *zettels) Checkout(options CheckinOptions, args ...string) (czs []CheckedOutZettel, err error) {
+func (zs *zettels) Checkout(options CheckinOptions, args ...string) (czs []_ZettelCheckedOut, err error) {
 	var hins []_Hinweis
 	var shas []_Sha
 
@@ -18,7 +18,7 @@ func (zs *zettels) Checkout(options CheckinOptions, args ...string) (czs []Check
 		return
 	}
 
-	czs = make([]CheckedOutZettel, len(shas))
+	czs = make([]_ZettelCheckedOut, len(shas))
 
 	var dir string
 
@@ -48,8 +48,10 @@ func (zs *zettels) Checkout(options CheckinOptions, args ...string) (czs []Check
 
 		inlineAkte := sz.Stored.Zettel.AkteExt.String() == "md"
 
-		czs[i] = CheckedOutZettel{
-			Path: filename,
+		czs[i] = _ZettelCheckedOut{
+			External: _ZettelExternal{
+				Path: filename,
+			},
 		}
 
 		c := _ZettelFormatContextWrite{
@@ -59,8 +61,8 @@ func (zs *zettels) Checkout(options CheckinOptions, args ...string) (czs []Check
 		}
 
 		if !inlineAkte && options.IncludeAkte {
-			czs[i].AktePath = originalFilename + "." + originalExt
-			c.ExternalAktePath = czs[i].AktePath
+			czs[i].External.AktePath = originalFilename + "." + originalExt
+			c.ExternalAktePath = czs[i].External.AktePath
 			c.IncludeAkte = true
 		}
 

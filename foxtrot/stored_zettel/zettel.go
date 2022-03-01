@@ -11,3 +11,16 @@ type Named struct {
 	Stored
 	Hinweis _Hinweis
 }
+
+type External struct {
+	Path     string
+	AktePath string
+	Hinweis  _Hinweis
+	Sha      _Sha
+	Zettel   _Zettel
+}
+
+type CheckedOut struct {
+	Internal Named
+	External External
+}

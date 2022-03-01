@@ -11,15 +11,16 @@ type Zettels interface {
 	Query(_NamedZettelFilter) (map[string]_NamedZettel, error)
 
 	GetPossibleZettels(wd string) (hins []string, err error)
-	ReadExternal(CheckinOptions, ...string) (map[_Hinweis]ExternalZettel, error)
+	ReadExternal(CheckinOptions, ...string) (map[_Hinweis]_ZettelExternal, error)
+	ReadCheckedOut(CheckinOptions, ...string) (map[_Hinweis]_ZettelCheckedOut, error)
 
 	Read(id _Id) (z _NamedZettel, err error)
 	Create(_Zettel) (z _NamedZettel, err error)
 	Update(z _NamedZettel) (stored _NamedZettel, err error)
 	Revert(h _Hinweis) (named _NamedZettel, err error)
 
-	Checkout(options CheckinOptions, args ...string) (czs []CheckedOutZettel, err error)
-	Checkin(options CheckinOptions, paths ...string) (daZees map[_Hinweis]ExternalZettel, err error)
+	Checkout(options CheckinOptions, args ...string) (czs []_ZettelCheckedOut, err error)
+	Checkin(options CheckinOptions, paths ...string) (daZees map[_Hinweis]_ZettelCheckedOut, err error)
 
 	Flush() error
 

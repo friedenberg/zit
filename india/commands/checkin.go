@@ -53,7 +53,7 @@ func (c Checkin) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err err
 		Format:      _ZettelFormatsText{},
 	}
 
-	var daZees map[_Hinweis]_ExternalZettel
+	var daZees map[_Hinweis]_ZettelCheckedOut
 
 	if daZees, err = zs.Checkin(options, args...); err != nil {
 		err = _Error(err)
@@ -71,27 +71,20 @@ func (c Checkin) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err err
 }
 
 //TODO combine with clean command in zettel store
-func (c Checkin) deleteCheckouts(zs _Zettels, daZees map[_Hinweis]_ExternalZettel) (err error) {
+func (c Checkin) deleteCheckouts(zs _Zettels, daZees map[_Hinweis]_ZettelCheckedOut) (err error) {
 	toDelete := make([]_ExternalZettel, 0, len(daZees))
 	filesToDelete := make([]string, 0, len(daZees))
 
-	for h, z := range daZees {
-		var named _NamedZettel
-
-		if named, err = zs.Read(h); err != nil {
-			err = _Error(err)
-			return
-		}
-
-		if !named.Zettel.Equals(z.Zettel) {
+	for _, z := range daZees {
+		if !z.Internal.Zettel.Equals(z.External.Zettel) {
 			continue
 		}
 
-		toDelete = append(toDelete, z)
-		filesToDelete = append(filesToDelete, z.Path)
+		toDelete = append(toDelete, z.External)
+		filesToDelete = append(filesToDelete, z.External.Path)
 
-		if z.AktePath != "" {
-			filesToDelete = append(filesToDelete, z.AktePath)
+		if z.External.AktePath != "" {
+			filesToDelete = append(filesToDelete, z.External.AktePath)
 		}
 	}
 

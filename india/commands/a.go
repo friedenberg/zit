@@ -71,8 +71,8 @@ type (
 
 	_AlfredZettelsWriter = alfred_zettels.Writer
 
-	_CheckedOutZettel         = zettels.CheckedOutZettel
-	_ExternalZettel           = zettels.ExternalZettel
+	_ZettelCheckedOut         = stored_zettel.CheckedOut
+	_ExternalZettel           = stored_zettel.External
 	_ZettelsCheckinOptions    = zettels.CheckinOptions
 	_Zettels                  = zettels.Zettels
 	_ZettelsChain             = zettels.Chain
