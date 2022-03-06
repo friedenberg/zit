@@ -2,9 +2,7 @@ package commands
 
 import (
 	"bytes"
-	"encoding/json"
 	"flag"
-	"log"
 	"os"
 	"os/exec"
 )
@@ -42,28 +40,29 @@ func (c Push) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error)
 		args = []string{}
 	}
 
-	var hins []_Hinweis
+	// var hins []_Hinweis
 
-	if _, hins, err = zs.Hinweisen().All(); err != nil {
-		err = _Error(err)
-		return
-	}
+	// if _, hins, err = zs.Hinweisen().All(); err != nil {
+	// 	err = _Error(err)
+	// 	return
+	// }
 
-	chains := make([]_ZettelsChain, len(hins))
+	// chains := make([]_ZettelsChain, len(hins))
 
-	for i, h := range hins {
-		if chains[i], err = zs.AllInChain(h); err != nil {
-			err = _Error(err)
-			return
-		}
-	}
+	// for i, h := range hins {
+	// 	if chains[i], err = zs.AllInChain(h); err != nil {
+	// 		err = _Error(err)
+	// 		return
+	// 	}
+	// }
 
-	b, err := json.Marshal(chains)
+	// b, err := json.Marshal(chains)
 
-	if err != nil {
-		log.Print(err)
-		return
-	}
+	// if err != nil {
+	// 	log.Print(err)
+	// 	return
+	// }
+	b := []byte{}
 
 	if err = c.runRemoteScript(u, remote, args, b); err != nil {
 		err = _Error(err)

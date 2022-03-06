@@ -21,6 +21,9 @@ func init() {
 }
 
 func (c Deinit) Run(u _Umwelt, args ...string) (err error) {
+	u.Lock.Lock()
+	defer _PanicIfError(u.Lock.Unlock())
+
 	base := path.Join(u.Dir(), ".zit")
 	err = os.RemoveAll(base)
 

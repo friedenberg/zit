@@ -22,6 +22,9 @@ func init() {
 }
 
 func (c Edit) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) {
+	u.Lock.Lock()
+	defer _PanicIfError(u.Lock.Unlock())
+
 	var czs []_ZettelCheckedOut
 
 	options := _ZettelsCheckinOptions{

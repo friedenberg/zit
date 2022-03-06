@@ -278,6 +278,7 @@ OUTER:
 		var named _NamedZettel
 
 		if named, err = zs.Read(sha); err != nil {
+			_Errf("%s/n", e)
 			err = _Error(err)
 			return
 		}

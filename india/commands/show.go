@@ -2,16 +2,22 @@ package commands
 
 import (
 	"flag"
+	"io"
 )
 
 type Show struct {
+	Type _Type
 }
 
 func init() {
 	registerCommand(
 		"show",
 		func(f *flag.FlagSet) Command {
-			c := &Show{}
+			c := &Show{
+				Type: _TypeZettel,
+			}
+
+			f.Var(&c.Type, "type", "ObjekteType")
 
 			return commandWithZettels{c}
 		},
@@ -19,14 +25,9 @@ func init() {
 }
 
 func (c Show) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) {
-	f := _ZettelFormatsText{}
+	zettels := make([]_NamedZettel, len(args))
 
-	ctx := _ZettelFormatContextWrite{
-		Out:               u.Out,
-		AkteReaderFactory: zs,
-	}
-
-	for _, a := range args {
+	for i, a := range args {
 		var h _Hinweis
 
 		if h, err = _MakeBlindHinweis(a); err != nil {
@@ -41,24 +42,64 @@ func (c Show) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error)
 			return
 		}
 
+		zettels[i] = named
+	}
+
+	switch c.Type {
+
+	case _TypeAkte:
+		return c.showAkten(u, zs, zettels)
+
+	case _TypeZettel:
+		return c.showZettels(u, zs, zettels)
+
+	default:
+		err = _Errorf("unsupported objekte type: %s", c.Type)
+		return
+	}
+
+	return
+}
+
+func (c Show) showZettels(u _Umwelt, zs _Zettels, zettels []_NamedZettel) (err error) {
+	f := _ZettelFormatsText{}
+
+	ctx := _ZettelFormatContextWrite{
+		Out:               u.Out,
+		AkteReaderFactory: zs,
+	}
+
+	for _, named := range zettels {
 		ctx.IncludeAkte = named.Zettel.AkteExt.String() == "md"
-
-		// 		if !ctx.IncludeAkte {
-		// 			v := fmt.Sprintf(
-		// 				"%s.%s",
-		// 				named.Zettel.Akte.String(),
-		// 				named.Zettel.AkteExt.String(),
-		// 			)
-
-		// 			if err = named.Zettel.AkteExt.Set(v); err != nil {
-		// 				err = _Error(err)
-		// 				return
-		// 			}
-		// 		}
 
 		ctx.Zettel = named.Zettel
 
 		if _, err = f.WriteTo(ctx); err != nil {
+			err = _Error(err)
+			return
+		}
+	}
+
+	return
+}
+
+func (c Show) showAkten(u _Umwelt, zs _Zettels, zettels []_NamedZettel) (err error) {
+	var ar io.ReadCloser
+
+	for _, named := range zettels {
+		if ar, err = zs.AkteReader(named.Zettel.Akte); err != nil {
+			err = _Error(err)
+			return
+		}
+
+		if ar == nil {
+			err = _Errorf("akte reader is nil")
+			return
+		}
+
+		defer _PanicIfError(ar.Close())
+
+		if _, err = io.Copy(u.Out, ar); err != nil {
 			err = _Error(err)
 			return
 		}

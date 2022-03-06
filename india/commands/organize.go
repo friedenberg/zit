@@ -30,6 +30,9 @@ func init() {
 }
 
 func (c *Organize) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) {
+	u.Lock.Lock()
+	defer _PanicIfError(u.Lock.Unlock())
+
 	var zettels map[string]_NamedZettel
 
 	if c.Hinweisen {

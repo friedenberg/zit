@@ -26,6 +26,9 @@ func init() {
 }
 
 func (c Checkout) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) {
+	u.Lock.Lock()
+	defer _PanicIfError(u.Lock.Unlock())
+
 	if len(args) == 0 {
 		if c.All {
 			var hins []_Hinweis
