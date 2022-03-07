@@ -34,9 +34,6 @@ func init() {
 }
 
 func (c Add) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) {
-	u.Lock.Lock()
-	defer _PanicIfError(u.Lock.Unlock())
-
 	added := make([]_NamedZettel, len(args))
 	hinweisen := make([]string, len(args))
 

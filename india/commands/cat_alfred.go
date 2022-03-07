@@ -7,6 +7,7 @@ import (
 
 type CatAlfred struct {
 	Type _Type
+	Command
 }
 
 func init() {
@@ -17,25 +18,53 @@ func init() {
 				Type: _TypeUnknown,
 			}
 
+			c.Command = commandWithZettels{c}
+
 			f.Var(&c.Type, "type", "ObjekteType")
 
-			return commandWithZettels{c}
+			return c
 		},
 	)
 }
 
-func (c CatAlfred) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) {
+func (c CatAlfred) HandleError(u _Umwelt, in error) {
 	wo := bufio.NewWriter(u.Out)
 	defer wo.Flush()
 
-	var wa _AlfredZettelsWriter
+	var aw _AlfredWriter
 
-	if wa, err = _AlfredZettelsNewWriter(u.Out); err != nil {
+	var err error
+
+	if aw, err = _AlfredNewWriter(u.Out); err != nil {
+		_PanicIfError(err)
+		return
+	}
+
+	aw.WriteError(in)
+	_PanicIfError(aw.Close())
+}
+
+func (c CatAlfred) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) {
+	//this command does its own error handling
+	defer func() {
+		err = nil
+	}()
+
+	wo := bufio.NewWriter(u.Out)
+	defer wo.Flush()
+
+	var aw _AlfredWriter
+
+	if aw, err = _AlfredNewWriter(u.Out); err != nil {
 		err = _Error(err)
 		return
 	}
 
-	defer _PanicIfError(wa.Close)
+	defer _PanicIfError(aw.Close)
+
+	defer func() {
+		aw.WriteError(err)
+	}()
 
 	switch c.Type {
 	case _TypeEtikett:
@@ -47,7 +76,7 @@ func (c CatAlfred) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err e
 		}
 
 		for _, e := range ea {
-			wa.WriteEtikett(e)
+			aw.WriteEtikett(e)
 		}
 
 	case _TypeZettel:
@@ -60,7 +89,7 @@ func (c CatAlfred) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err e
 		}
 
 		for _, z := range all {
-			wa.WriteZettel(z)
+			aw.WriteZettel(z)
 		}
 
 	case _TypeAkte:
@@ -75,7 +104,7 @@ func (c CatAlfred) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err e
 		}
 
 		for _, z := range all {
-			wa.WriteZettel(z)
+			aw.WriteZettel(z)
 		}
 
 	default:

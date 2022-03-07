@@ -27,9 +27,6 @@ func init() {
 }
 
 func (c Checkin) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) {
-	u.Lock.Lock()
-	defer _PanicIfError(u.Lock.Unlock())
-
 	if c.All {
 		if len(args) > 0 {
 			_Errf("Ignoring args because -all is set\n")

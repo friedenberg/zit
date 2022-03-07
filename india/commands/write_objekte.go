@@ -24,9 +24,6 @@ func init() {
 }
 
 func (c WriteObjekte) RunWithAge(u _Umwelt, age _Age, args ...string) (err error) {
-	u.Lock.Lock()
-	defer _PanicIfError(u.Lock.Unlock())
-
 	objektePath, err := _ObjekteWriteAndMove(u.In, age, u.DirZit(), c.Type)
 
 	_Out(objektePath)

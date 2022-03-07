@@ -20,9 +20,6 @@ func init() {
 }
 
 func (c Clean) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) {
-	u.Lock.Lock()
-	defer _PanicIfError(u.Lock.Unlock())
-
 	if len(args) > 0 {
 		_Errf("args provided will be ignored")
 	}

@@ -24,9 +24,6 @@ func init() {
 }
 
 func (c Revert) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) {
-	u.Lock.Lock()
-	defer _PanicIfError(u.Lock.Unlock())
-
 	switch c.Type {
 	case _TypeZettel:
 		hins := make([]_Hinweis, len(args))

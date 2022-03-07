@@ -1,4 +1,4 @@
-package alfred_zettels
+package alfred
 
 import (
 	"fmt"
@@ -58,6 +58,12 @@ func EtikettToItem(e _Etikett) (a _AlfredItem) {
 
 	a.Text.Copy = e.String()
 	a.Uid = "zit://" + e.String()
+
+	return
+}
+
+func ErrorToItem(err error) (a _AlfredItem) {
+	a.Title = err.Error()
 
 	return
 }

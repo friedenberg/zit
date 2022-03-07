@@ -18,6 +18,10 @@ type Command interface {
 	Run(_Umwelt, ...string) error
 }
 
+type CommandSupportingErrors interface {
+	HandleError(_Umwelt, error)
+}
+
 type command struct {
 	Command
 	*flag.FlagSet
@@ -122,6 +126,19 @@ func Run(args []string) (err error) {
 		err = _Error(err)
 		return
 	}
+
+	if err = u.Lock.Lock(); err != nil {
+		if ce, ok := cmd.Command.(CommandSupportingErrors); ok {
+			ce.HandleError(u, err)
+			err = nil
+			return
+		} else {
+			err = _Error(err)
+			return
+		}
+	}
+
+	defer _PanicIfError(u.Lock.Unlock)
 
 	if err = cmd.Command.Run(u, cmd.FlagSet.Args()...); err != nil {
 		err = _Error(err)

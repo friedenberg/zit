@@ -22,7 +22,7 @@ import (
 	"github.com/friedenberg/zit/foxtrot/hinweisen"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/foxtrot/zettel_formats"
-	"github.com/friedenberg/zit/golf/alfred_zettels"
+	"github.com/friedenberg/zit/golf/alfred"
 	"github.com/friedenberg/zit/golf/organize_text"
 	"github.com/friedenberg/zit/golf/stored_zettel_formats"
 	"github.com/friedenberg/zit/hotel/zettels"
@@ -69,7 +69,7 @@ type (
 
 	_ScriptValue = script_value.ScriptValue
 
-	_AlfredZettelsWriter = alfred_zettels.Writer
+	_AlfredWriter = alfred.Writer
 
 	_ZettelCheckedOut         = stored_zettel.CheckedOut
 	_ExternalZettel           = stored_zettel.External
@@ -100,7 +100,7 @@ type (
 
 var (
 	_AgeGenerate            = age.Generate
-	_AlfredZettelsNewWriter = alfred_zettels.NewWriter
+	_AlfredNewWriter        = alfred.NewWriter
 	_Close                  = open_file_guard.Close
 	_Create                 = open_file_guard.Create
 	_DeleteFilesAndDirs     = open_file_guard.DeleteFilesAndDirs

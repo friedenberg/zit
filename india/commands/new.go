@@ -63,9 +63,6 @@ func (c New) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) 
 		args = append(args, toCreate)
 	}
 
-	u.Lock.Lock()
-	defer _PanicIfError(u.Lock.Unlock())
-
 	for _, arg := range args {
 		var toCreate []_Zettel
 

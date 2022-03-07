@@ -15,6 +15,7 @@ type Item struct {
 	ItemType     string   `json:"type,omitempty"`
 	QuicklookUrl string   `json:"quicklookurl,omitempty"`
 	Text         ItemText `json:"text,omitempty"`
+	// Valid        bool     `json:"valid,omitempty"`
 }
 
 type ItemText struct {

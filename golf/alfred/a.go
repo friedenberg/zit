@@ -1,4 +1,4 @@
-package alfred_zettels
+package alfred
 
 import (
 	"github.com/friedenberg/zit/alfa/errors"
