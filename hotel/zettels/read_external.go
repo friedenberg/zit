@@ -51,7 +51,7 @@ func (zs *zettels) ReadExternal(options CheckinOptions, paths ...string) (out ma
 			return
 		}
 
-		_Errf("[%s] (read external)\n", ez.Hinweis)
+		// _Errf("[%s] (read external)\n", ez.Hinweis)
 		out[ez.Hinweis] = ez
 	}
 

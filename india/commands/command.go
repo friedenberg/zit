@@ -127,6 +127,7 @@ func Run(args []string) (err error) {
 		return
 	}
 
+	//TODO move lock to store
 	if err = u.Lock.Lock(); err != nil {
 		if ce, ok := cmd.Command.(CommandSupportingErrors); ok {
 			ce.HandleError(u, err)

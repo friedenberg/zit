@@ -2,6 +2,8 @@ package commands
 
 import (
 	"flag"
+
+	"github.com/friedenberg/zit/india/user_ops"
 )
 
 type Edit struct {
@@ -22,34 +24,25 @@ func init() {
 }
 
 func (c Edit) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) {
-	var czs []_ZettelCheckedOut
-
-	options := _ZettelsCheckinOptions{
-		IncludeAkte: c.IncludeAkte,
-		Format:      _ZettelFormatsText{},
+	checkoutOp := user_ops.Checkout{
+		Umwelt: u,
+		Store:  zs,
+		Options: _ZettelsCheckinOptions{
+			IncludeAkte: c.IncludeAkte,
+			Format:      _ZettelFormatsText{},
+		},
 	}
 
-	if czs, err = zs.Checkout(options, args...); err != nil {
+	var checkoutResults user_ops.CheckoutResults
+
+	if checkoutResults, err = checkoutOp.Run(args...); err != nil {
 		err = _Error(err)
 		return
 	}
 
-	files := make([]string, 0, len(czs))
-	akten := make([]string, 0)
-
-	for _, z := range czs {
-		files = append(files, z.External.Path)
-
-		if z.External.AktePath != "" {
-			akten = append(akten, z.External.AktePath)
-		}
-	}
-
-	if len(akten) > 0 {
-		if err = _OpenFiles(akten...); err != nil {
-			err = _Errorf("%q: %w", akten, err)
-			return
-		}
+	if err = (user_ops.OpenFiles{}).Run(checkoutResults.FilesAkten...); err != nil {
+		err = _Error(err)
+		return
 	}
 
 	vimArgs := []string{
@@ -59,12 +52,12 @@ func (c Edit) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error)
 		"source ~/.vim/syntax/zit.zettel.vim",
 	}
 
-	if err = _OpenVimWithArgs(vimArgs, files...); err != nil {
+	if err = _OpenVimWithArgs(vimArgs, checkoutResults.FilesZettelen...); err != nil {
 		err = _Error(err)
 		return
 	}
 
-	if _, err = zs.Checkin(options, files...); err != nil {
+	if _, err = zs.Checkin(checkoutOp.Options, checkoutResults.FilesZettelen...); err != nil {
 		err = _Error(err)
 		return
 	}

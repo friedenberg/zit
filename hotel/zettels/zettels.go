@@ -16,6 +16,7 @@ type Zettels interface {
 
 	Read(id _Id) (z _NamedZettel, err error)
 	Create(_Zettel) (z _NamedZettel, err error)
+	CreateWithHinweis(_Zettel, _Hinweis) (z _NamedZettel, err error)
 	Update(z _NamedZettel) (stored _NamedZettel, err error)
 	Revert(h _Hinweis) (named _NamedZettel, err error)
 
@@ -131,6 +132,49 @@ func (zs zettels) NewShard(p string, id string) (s _Shard, err error) {
 	return
 }
 
+func (zs zettels) CreateWithHinweis(in _Zettel, h _Hinweis) (z _NamedZettel, err error) {
+	if in.IsEmpty() {
+		err = _ErrorNormal(_Errorf("zettel is empty"))
+		return
+	}
+
+	z.Stored.Zettel = in
+
+	if z.Sha, err = zs.storeBaseZettel(z.Stored); err != nil {
+		err = _Error(err)
+		return
+	}
+
+	if err = zs.hinweisen.StoreExisting(h, z.Sha); err != nil {
+		err = _Error(err)
+		return
+	}
+
+	z.Hinweis = h
+
+	var named _NamedZettel
+
+	if named, err = zs.Read(z.Sha); err != nil {
+		err = _Error(err)
+		return
+	}
+
+	log.Print(z)
+	log.Print(named)
+
+	if !z.Equals(named) {
+		err = _Errorf(
+			"stored zettel doesn't equal stored zettel:\n%s\n%s",
+			z,
+			named,
+		)
+
+		return
+	}
+
+	return
+}
+
 func (zs zettels) Create(in _Zettel) (z _NamedZettel, err error) {
 	if in.IsEmpty() {
 		err = _ErrorNormal(_Errorf("zettel is empty"))
@@ -144,7 +188,7 @@ func (zs zettels) Create(in _Zettel) (z _NamedZettel, err error) {
 		return
 	}
 
-	if z.Hinweis, err = zs.hinweisen.Store(z.Sha); err != nil {
+	if z.Hinweis, err = zs.hinweisen.StoreNew(z.Sha); err != nil {
 		err = _Error(err)
 		return
 	}

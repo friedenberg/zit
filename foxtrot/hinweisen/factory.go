@@ -42,13 +42,31 @@ func newFactory(basePath string) (f *factory, err error) {
 		return
 	}
 
-	var old string
-
-	if old, err = _ReadAllString(f.pathLastId); err != nil {
+	if err = f.Refresh(); err != nil {
+		err = _Error(err)
 		return
 	}
 
-	if f.counter, err = strconv.ParseUint(old, 10, 64); err != nil {
+	return
+}
+
+func (hf *factory) Refresh() (err error) {
+	hf.Lock()
+	defer hf.Unlock()
+
+	err = hf.refresh()
+
+	return
+}
+
+func (hf *factory) refresh() (err error) {
+	var old string
+
+	if old, err = _ReadAllString(hf.pathLastId); err != nil {
+		return
+	}
+
+	if hf.counter, err = strconv.ParseUint(old, 10, 64); err != nil {
 		return
 	}
 
@@ -58,6 +76,16 @@ func newFactory(basePath string) (f *factory, err error) {
 func (hf *factory) Make() (h _Hinweis, err error) {
 	hf.Lock()
 	defer hf.Unlock()
+	defer func() {
+		if err != nil {
+			err = hf.flush()
+		}
+	}()
+
+	if err = hf.refresh(); err != nil {
+		err = _Error(err)
+		return
+	}
 
 	newInt := hf.counter + 1
 
@@ -75,6 +103,10 @@ func (hf factory) Flush() (err error) {
 	hf.Lock()
 	defer hf.Unlock()
 
+	return hf.flush()
+}
+
+func (hf factory) flush() (err error) {
 	var f *os.File
 
 	if f, err = _TempFile(); err != nil {

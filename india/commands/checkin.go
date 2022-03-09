@@ -3,6 +3,8 @@ package commands
 import (
 	"flag"
 	"os"
+
+	"github.com/friedenberg/zit/india/user_ops"
 )
 
 type Checkin struct {
@@ -45,56 +47,30 @@ func (c Checkin) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err err
 		}
 	}
 
-	options := _ZettelsCheckinOptions{
-		IncludeAkte: !c.IgnoreAkte,
-		Format:      _ZettelFormatsText{},
+	checkinOp := user_ops.Checkin{
+		Umwelt: u,
+		Store:  zs,
+		Options: _ZettelsCheckinOptions{
+			IncludeAkte: !c.IgnoreAkte,
+			Format:      _ZettelFormatsText{},
+		},
 	}
 
-	var daZees map[_Hinweis]_ZettelCheckedOut
+	var results user_ops.CheckinResults
 
-	if daZees, err = zs.Checkin(options, args...); err != nil {
+	if results, err = checkinOp.Run(args...); err != nil {
 		err = _Error(err)
 		return
 	}
 
 	if c.Delete {
-		if err = c.deleteCheckouts(zs, daZees); err != nil {
+		deleteOp := user_ops.DeleteCheckout{}
+
+		if err = deleteOp.Run(results.Zettelen); err != nil {
 			err = _Error(err)
 			return
 		}
 	}
-
-	return
-}
-
-//TODO combine with clean command in zettel store
-func (c Checkin) deleteCheckouts(zs _Zettels, daZees map[_Hinweis]_ZettelCheckedOut) (err error) {
-	toDelete := make([]_ExternalZettel, 0, len(daZees))
-	filesToDelete := make([]string, 0, len(daZees))
-
-	for _, z := range daZees {
-		if !z.Internal.Zettel.Equals(z.External.Zettel) {
-			continue
-		}
-
-		toDelete = append(toDelete, z.External)
-		filesToDelete = append(filesToDelete, z.External.Path)
-
-		if z.External.AktePath != "" {
-			filesToDelete = append(filesToDelete, z.External.AktePath)
-		}
-	}
-
-	if err = _DeleteFilesAndDirs(filesToDelete...); err != nil {
-		err = _Error(err)
-		return
-	}
-
-	for _, z := range toDelete {
-		_Outf("[%s] (checkout deleted)\n", z.Hinweis)
-	}
-
-	return
 
 	return
 }

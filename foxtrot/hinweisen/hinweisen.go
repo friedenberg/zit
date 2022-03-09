@@ -9,9 +9,11 @@ type Hinweisen interface {
 	ReadSha(s _Sha) (h _Hinweis, err error)
 	ReadManyStrings(args ...string) (shas []_Sha, hins []_Hinweis, err error)
 	All() (shas []_Sha, hins []_Hinweis, err error)
-	Store(s _Sha) (h _Hinweis, err error)
+	StoreNew(sha _Sha) (h _Hinweis, err error)
+	StoreExisting(h _Hinweis, sha _Sha) (err error)
 	Update(h _Hinweis, s _Sha) (err error)
 	Flush() error
+	Factory() *factory
 }
 
 type hinweisen struct {
@@ -44,6 +46,10 @@ func New(age _Age, basePath string) (s *hinweisen, err error) {
 	return
 }
 
+func (hn hinweisen) Factory() *factory {
+	return hn.factory
+}
+
 func (hn hinweisen) NewShard(p string, id string) (s _Shard, err error) {
 	if s, err = _NewShard(path.Join(p, id), nil, &_ShardGeneric{}); err != nil {
 		err = _Error(err)
@@ -72,7 +78,18 @@ func (zs *hinweisen) Flush() (err error) {
 	return
 }
 
-func (hn *hinweisen) Store(sha _Sha) (h _Hinweis, err error) {
+func (hn *hinweisen) StoreNew(sha _Sha) (h _Hinweis, err error) {
+	if h, err = hn.factory.Make(); err != nil {
+		err = _Error(err)
+		return
+	}
+
+	err = hn.StoreExisting(h, sha)
+
+	return
+}
+
+func (hn *hinweisen) StoreExisting(h _Hinweis, sha _Sha) (err error) {
 	var ss _Shard
 
 	if ss, err = hn.storeS.Shard(sha.Head()); err != nil {
@@ -91,11 +108,6 @@ func (hn *hinweisen) Store(sha _Sha) (h _Hinweis, err error) {
 			return
 		}
 
-		return
-	}
-
-	if h, err = hn.factory.Make(); err != nil {
-		err = _Error(err)
 		return
 	}
 
