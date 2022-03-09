@@ -25,7 +25,7 @@ func (t organizeText) Zettels() etikettToZettels {
 	return t.zettels
 }
 
-func New(options OrganizeOptions, zettels map[string]_NamedZettel) (ot *organizeText, err error) {
+func New(options Options, zettels map[string]_NamedZettel) (ot *organizeText, err error) {
 	ot = NewEmpty()
 
 	ot.etiketten = options.RootEtiketten

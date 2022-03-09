@@ -1,0 +1,120 @@
+package user_ops
+
+import (
+	"github.com/friedenberg/zit/alfa/stdprinter"
+	"github.com/friedenberg/zit/charlie/etikett"
+	"github.com/friedenberg/zit/charlie/hinweis"
+	"github.com/friedenberg/zit/golf/organize_text"
+)
+
+type CommitOrganizeFile struct {
+	Umwelt _Umwelt
+	Store  _Store
+}
+
+type CommitOrganizeFileResults struct {
+}
+
+func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganizeFileResults, err error) {
+	changes := a.ChangesFrom(b)
+
+	if len(changes.Added) == 0 && len(changes.Removed) == 0 {
+		stdprinter.Out("no changes")
+		return
+	}
+
+	toUpdate := make(map[string]_NamedZettel)
+
+	addOrGetToZettelToUpdate := func(hString string) (z _NamedZettel, err error) {
+		var h hinweis.Hinweis
+
+		if h, err = hinweis.MakeBlindHinweis(hString); err != nil {
+			err = _Error(err)
+			return
+		}
+
+		var ok bool
+
+		if z, ok = toUpdate[h.String()]; !ok {
+			if z, err = c.Store.Read(h); err != nil {
+				err = _Error(err)
+				return
+			}
+		}
+
+		return
+	}
+
+	addEtikettToZettel := func(hString string, e etikett.Etikett) (err error) {
+		var z _NamedZettel
+
+		if z, err = addOrGetToZettelToUpdate(hString); err != nil {
+			err = _Error(err)
+			return
+		}
+
+		z.Zettel.Etiketten.Add(e)
+		toUpdate[z.Hinweis.String()] = z
+
+		_Outf("Added etikett '%s' to zettel '%s'\n", e, z.Hinweis)
+
+		return
+	}
+
+	removeEtikettFromZettel := func(hString string, e etikett.Etikett) (err error) {
+		var z _NamedZettel
+
+		if z, err = addOrGetToZettelToUpdate(hString); err != nil {
+			err = _Error(err)
+			return
+		}
+
+		z.Zettel.Etiketten.Remove(e)
+		toUpdate[z.Hinweis.String()] = z
+
+		_Outf("Removed etikett '%s' from zettel '%s'\n", e, z.Hinweis)
+
+		return
+	}
+
+	for _, c := range changes.Added {
+		var e etikett.Etikett
+
+		if err = e.Set(c.Etikett); err != nil {
+			err = _Error(err)
+			return
+		}
+
+		if err = addEtikettToZettel(c.Hinweis, e); err != nil {
+			err = _Error(err)
+			return
+		}
+	}
+
+	for _, c := range changes.Removed {
+		var e etikett.Etikett
+
+		if err = e.Set(c.Etikett); err != nil {
+			err = _Error(err)
+			return
+		}
+
+		if err = removeEtikettFromZettel(c.Hinweis, e); err != nil {
+			err = _Error(err)
+			return
+		}
+	}
+
+	for _, z := range toUpdate {
+		if c.Umwelt.Konfig.DryRun {
+			_Outf("[%s] (would update)\n", z.Hinweis)
+			continue
+		}
+
+		if _, err = c.Store.Update(z); err != nil {
+			stdprinter.Errf("failed to update zettel: %s", err)
+		}
+	}
+
+	return
+}

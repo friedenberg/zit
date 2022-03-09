@@ -9,7 +9,7 @@ type Sorter interface {
 	SortZettels(_NamedZettel, _NamedZettel) bool
 }
 
-type OrganizeOptions struct {
+type Options struct {
 	RootEtiketten _EtikettSet
 	Grouper
 	Sorter
