@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/friedenberg/zit/india/commands"
+	"github.com/friedenberg/zit/juliett/commands"
 )
 
 func main() {
