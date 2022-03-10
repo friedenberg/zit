@@ -5,6 +5,8 @@ import (
 	"io"
 	"os"
 	"path"
+
+	"github.com/friedenberg/zit/india/user_ops"
 )
 
 type Add struct {
@@ -34,10 +36,9 @@ func init() {
 }
 
 func (c Add) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) {
-	added := make([]_NamedZettel, len(args))
-	hinweisen := make([]string, len(args))
+	zettels := make(map[string]_NamedZettel, len(args))
 
-	for i, arg := range args {
+	for _, arg := range args {
 		var z _Zettel
 
 		if z, err = c.zettelForAkte(u, zs, arg); err != nil {
@@ -52,8 +53,7 @@ func (c Add) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) 
 			return
 		}
 
-		added[i] = named
-		hinweisen[i] = named.Hinweis.String()
+		zettels[named.Hinweis.String()] = named
 
 		if c.Delete {
 			if err = os.Remove(arg); err != nil {
@@ -68,17 +68,54 @@ func (c Add) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) 
 	}
 
 	//TODO move to user ops
-	if c.Organize {
-		c1 := &Organize{
-			Hinweisen:     true,
-			GroupBy:       _EtikettNewSet(),
-			GroupByUnique: true,
-		}
+	if !c.Organize {
+		return
+	}
 
-		if err = c1.RunWithZettels(u, zs, hinweisen...); err != nil {
-			err = _Error(err)
-			return
-		}
+	createOrganizeFileOp := user_ops.CreateOrganizeFile{
+		Umwelt:        u,
+		Store:         zs,
+		GroupBy:       _EtikettNewSet(),
+		GroupByUnique: true,
+	}
+
+	var createOrganizeFileResults user_ops.CreateOrgaanizeFileResults
+
+	if createOrganizeFileResults, err = createOrganizeFileOp.Run(zettels); err != nil {
+		err = _Error(err)
+		return
+	}
+
+	openVimOp := user_ops.OpenVim{
+		Options: []string{
+			"set ft=zit.organize",
+			//TODO find a better solution for this
+			"source ~/.vim/syntax/zit.organize.vim",
+		},
+	}
+
+	if _, err = openVimOp.Run(createOrganizeFileResults.Path); err != nil {
+		err = _Error(err)
+		return
+	}
+
+	var ot2 _OrganizeText
+
+	readOrganizeTextOp := user_ops.ReadOrganizeFile{}
+
+	if ot2, err = readOrganizeTextOp.Run(createOrganizeFileResults.Path); err != nil {
+		err = _Error(err)
+		return
+	}
+
+	commitOrganizeTextOp := user_ops.CommitOrganizeFile{
+		Umwelt: u,
+		Store:  zs,
+	}
+
+	if _, err = commitOrganizeTextOp.Run(createOrganizeFileResults.Text, ot2); err != nil {
+		err = _Error(err)
+		return
 	}
 
 	return

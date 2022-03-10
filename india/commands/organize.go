@@ -40,6 +40,7 @@ func (c *Organize) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err e
 	}
 
 	if c.Hinweisen {
+		//TODO add RootEtiketten
 		zettels = make(map[string]_NamedZettel)
 
 		for _, arg := range args {
@@ -58,7 +59,6 @@ func (c *Organize) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err e
 
 			zettels[h.String()] = named
 		}
-		//TODO add RootEtiketten
 	} else {
 		if createOrganizeFileOp.RootEtiketten, err = c.getEtikettenFromArgs(args); err != nil {
 			err = _Error(err)
