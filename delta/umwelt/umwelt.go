@@ -7,7 +7,6 @@ import (
 
 type Umwelt struct {
 	BasePath string
-	Lock     *_FileLock
 	Konfig   _Konfig
 	Logger   _Logger
 	In       io.Reader
@@ -28,8 +27,6 @@ func MakeUmwelt(c _Konfig) (u *Umwelt, err error) {
 		err = _Error(err)
 		return
 	}
-
-	u.Lock = _FileLockNew(u.DirZit("Lock"))
 
 	return
 }

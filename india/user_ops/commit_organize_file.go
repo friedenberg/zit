@@ -1,21 +1,39 @@
 package user_ops
 
 import (
+	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/stdprinter"
+	"github.com/friedenberg/zit/charlie/age"
 	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/charlie/hinweis"
+	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/golf/organize_text"
+	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
 type CommitOrganizeFile struct {
-	Umwelt _Umwelt
-	Store  _Store
+	Umwelt *umwelt.Umwelt
 }
 
 type CommitOrganizeFileResults struct {
 }
 
 func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganizeFileResults, err error) {
+	var age age.Age
+
+	if age, err = c.Umwelt.Age(); err != nil {
+		err = _Error(err)
+		return
+	}
+
+	var store store_with_lock.Store
+
+	if store, err = store_with_lock.New(age, c.Umwelt); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	defer errors.PanicIfError(store.Flush)
 	changes := a.ChangesFrom(b)
 
 	if len(changes.Added) == 0 && len(changes.Removed) == 0 {
@@ -36,7 +54,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 		var ok bool
 
 		if z, ok = toUpdate[h.String()]; !ok {
-			if z, err = c.Store.Read(h); err != nil {
+			if z, err = store.Zettels().Read(h); err != nil {
 				err = _Error(err)
 				return
 			}
@@ -111,7 +129,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 			continue
 		}
 
-		if _, err = c.Store.Update(z); err != nil {
+		if _, err = store.Zettels().Update(z); err != nil {
 			stdprinter.Errf("failed to update zettel: %s", err)
 		}
 	}

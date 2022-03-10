@@ -34,7 +34,6 @@ func (c *Organize) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err e
 
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
 		Umwelt:        u,
-		Store:         zs,
 		GroupBy:       c.GroupBy,
 		GroupByUnique: c.GroupByUnique,
 	}
@@ -102,7 +101,6 @@ func (c *Organize) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err e
 
 	commitOrganizeTextOp := user_ops.CommitOrganizeFile{
 		Umwelt: u,
-		Store:  zs,
 	}
 
 	if _, err = commitOrganizeTextOp.Run(createOrganizeFileResults.Text, ot2); err != nil {

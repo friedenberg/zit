@@ -27,7 +27,6 @@ type Zettels interface {
 
 	Etiketten() _Etiketten
 	Hinweisen() _Hinweisen
-	Akten() _Akten
 	Age() _Age
 
 	Konfig() _Konfig
@@ -43,32 +42,26 @@ type zettels struct {
 	age       _Age
 	etiketten _Etiketten
 	hinweisen _Hinweisen
-	akten     _Akten
 }
 
-func New(basePath string, age _Age, umwelt *_Umwelt) (s *zettels, err error) {
+func New(u *_Umwelt, age _Age) (s *zettels, err error) {
 	s = &zettels{
-		umwelt:   umwelt,
-		basePath: basePath,
+		umwelt:   u,
+		basePath: u.DirZit(),
 		age:      age,
 	}
 
-	if s.hinweisen, err = _NewHinweisen(age, basePath); err != nil {
+	if s.hinweisen, err = _NewHinweisen(age, s.basePath); err != nil {
 		err = _Error(err)
 		return
 	}
 
-	if s.etiketten, err = _NewEtiketten(umwelt.Konfig, age, basePath); err != nil {
+	if s.etiketten, err = _NewEtiketten(u.Konfig, age, s.basePath); err != nil {
 		err = _Error(err)
 		return
 	}
 
-	if s.akten, err = _NewAkten(basePath); err != nil {
-		err = _Error(err)
-		return
-	}
-
-	zp := path.Join(basePath, "Objekte", "Zettel")
+	zp := path.Join(s.basePath, "Objekte", "Zettel")
 
 	if s.store, err = _NewStore(zp, s); err != nil {
 		err = _Error(err)
@@ -88,10 +81,6 @@ func (zs *zettels) Hinweisen() _Hinweisen {
 
 func (zs *zettels) Etiketten() _Etiketten {
 	return zs.etiketten
-}
-
-func (zs *zettels) Akten() _Akten {
-	return zs.akten
 }
 
 func (zs *zettels) Konfig() _Konfig {
@@ -132,6 +121,7 @@ func (zs zettels) NewShard(p string, id string) (s _Shard, err error) {
 	return
 }
 
+//TODO move to store_with_lock
 func (zs zettels) CreateWithHinweis(in _Zettel, h _Hinweis) (z _NamedZettel, err error) {
 	if in.IsEmpty() {
 		err = _ErrorNormal(_Errorf("zettel is empty"))
@@ -175,6 +165,7 @@ func (zs zettels) CreateWithHinweis(in _Zettel, h _Hinweis) (z _NamedZettel, err
 	return
 }
 
+//TODO move to store_with_lock
 func (zs zettels) Create(in _Zettel) (z _NamedZettel, err error) {
 	if in.IsEmpty() {
 		err = _ErrorNormal(_Errorf("zettel is empty"))
@@ -213,6 +204,7 @@ func (zs zettels) Create(in _Zettel) (z _NamedZettel, err error) {
 	return
 }
 
+//TODO move to store_with_lock
 func (zs zettels) Update(in _NamedZettel) (z _NamedZettel, err error) {
 	if in.Zettel.IsEmpty() {
 		err = _ErrorNormal(_Errorf("zettel is empty"))
@@ -263,6 +255,7 @@ func (zs zettels) Update(in _NamedZettel) (z _NamedZettel, err error) {
 	return
 }
 
+//TODO move to store_with_lock
 func (zs zettels) Revert(h _Hinweis) (named _NamedZettel, err error) {
 	if named, err = zs.Read(h); err != nil {
 		err = _Error(err)
@@ -300,6 +293,7 @@ func (zs zettels) Read(id _Id) (sz _NamedZettel, err error) {
 	return
 }
 
+//TODO move to store_with_lock
 func (zs zettels) All() (ns map[string]_NamedZettel, err error) {
 	ns = make(map[string]_NamedZettel)
 

@@ -3,15 +3,18 @@ package user_ops
 import (
 	"os"
 
+	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
+	"github.com/friedenberg/zit/charlie/age"
 	"github.com/friedenberg/zit/charlie/etikett"
+	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/golf/organize_text"
+	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
 type CreateOrganizeFile struct {
-	Umwelt        _Umwelt
-	Store         _Store
+	Umwelt        *umwelt.Umwelt
 	RootEtiketten etikett.Set
 	GroupBy       etikett.Set
 	GroupByUnique bool
@@ -23,6 +26,22 @@ type CreateOrgaanizeFileResults struct {
 }
 
 func (c CreateOrganizeFile) Run(zettels map[string]stored_zettel.Named) (results CreateOrgaanizeFileResults, err error) {
+	var age age.Age
+
+	if age, err = c.Umwelt.Age(); err != nil {
+		err = _Error(err)
+		return
+	}
+
+	var store store_with_lock.Store
+
+	if store, err = store_with_lock.New(age, c.Umwelt); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	defer errors.PanicIfError(store.Flush)
+
 	options := organize_text.Options{
 		Grouper:       c,
 		Sorter:        c,

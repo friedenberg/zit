@@ -18,7 +18,7 @@ func (c commandWithZettels) Run(u _Umwelt, args ...string) (err error) {
 
 	var zs _Zettels
 
-	if zs, err = _NewZettels(u.DirZit(), age, u); err != nil {
+	if zs, err = _NewZettels(u, age); err != nil {
 		err = _Error(err)
 		return
 	}

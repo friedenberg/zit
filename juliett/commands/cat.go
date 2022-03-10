@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"flag"
 	"log"
+
+	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
 type Cat struct {
@@ -22,36 +24,36 @@ func init() {
 			f.Var(&c.Type, "type", "ObjekteType")
 			f.StringVar(&c.Format, "format", "", "ObjekteType")
 
-			return commandWithZettels{c}
+			return commandWithLockedStore{c}
 		},
 	)
 }
 
-func (c Cat) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) {
+func (c Cat) RunWithLockedStore(store store_with_lock.Store, args ...string) (err error) {
 	switch c.Type {
 	case _TypeEtikett:
-		err = c.etiketten(u, zs)
+		err = c.etiketten(store)
 
 	case _TypeZettel:
-		err = c.zettelen(u, zs)
+		err = c.zettelen(store)
 
 	case _TypeAkte:
-		err = c.akten(u, zs)
+		err = c.akten(store)
 
 	case _TypeHinweis:
-		err = c.hinweisen(u, zs)
+		err = c.hinweisen(store)
 
 	default:
-		err = c.all(u, zs)
+		err = c.all(store)
 	}
 
 	return
 }
 
-func (c Cat) etiketten(u _Umwelt, zs _Zettels) (err error) {
+func (c Cat) etiketten(store store_with_lock.Store) (err error) {
 	var ea []_Etikett
 
-	if ea, err = zs.Etiketten().All(); err != nil {
+	if ea, err = store.Etiketten().All(); err != nil {
 		err = _Error(err)
 		return
 	}
@@ -61,7 +63,7 @@ OUTER:
 		prefixes := e.Expanded(_EtikettExpanderRight{})
 
 	INNER:
-		for tn, tv := range u.Konfig.Tags {
+		for tn, tv := range store.Konfig.Tags {
 			if !tv.Hide {
 				continue INNER
 			}
@@ -77,10 +79,10 @@ OUTER:
 	return
 }
 
-func (c Cat) zettelen(u _Umwelt, zs _Zettels) (err error) {
+func (c Cat) zettelen(store store_with_lock.Store) (err error) {
 	var all map[string]_NamedZettel
 
-	if all, err = zs.All(); err != nil {
+	if all, err = store.Zettels().All(); err != nil {
 		err = _Error(err)
 		return
 	}
@@ -101,7 +103,7 @@ func (c Cat) zettelen(u _Umwelt, zs _Zettels) (err error) {
 		f := _ZettelFormatsText{}
 
 		c := _ZettelFormatContextWrite{
-			Out: u.Out,
+			Out: store.Out,
 		}
 
 		// not a bottleneck
@@ -118,10 +120,10 @@ func (c Cat) zettelen(u _Umwelt, zs _Zettels) (err error) {
 	return
 }
 
-func (c Cat) akten(u _Umwelt, zs _Zettels) (err error) {
+func (c Cat) akten(store store_with_lock.Store) (err error) {
 	var shas []_Sha
 
-	if shas, err = zs.Akten().All(); err != nil {
+	if shas, err = store.Akten().All(); err != nil {
 		err = _Error(err)
 		return
 	}
@@ -133,11 +135,11 @@ func (c Cat) akten(u _Umwelt, zs _Zettels) (err error) {
 	return
 }
 
-func (c Cat) hinweisen(u _Umwelt, zs _Zettels) (err error) {
+func (c Cat) hinweisen(store store_with_lock.Store) (err error) {
 	var hins []_Hinweis
 	var shas []_Sha
 
-	if shas, hins, err = zs.Hinweisen().All(); err != nil {
+	if shas, hins, err = store.Hinweisen().All(); err != nil {
 		err = _Error(err)
 		return
 	}
@@ -149,10 +151,10 @@ func (c Cat) hinweisen(u _Umwelt, zs _Zettels) (err error) {
 	return
 }
 
-func (c Cat) all(u _Umwelt, zs _Zettels) (err error) {
+func (c Cat) all(store store_with_lock.Store) (err error) {
 	var hins []_Hinweis
 
-	if _, hins, err = zs.Hinweisen().All(); err != nil {
+	if _, hins, err = store.Hinweisen().All(); err != nil {
 		err = _Error(err)
 		return
 	}
@@ -160,7 +162,7 @@ func (c Cat) all(u _Umwelt, zs _Zettels) (err error) {
 	chains := make([]_ZettelsChain, len(hins))
 
 	for i, h := range hins {
-		if chains[i], err = zs.AllInChain(h); err != nil {
+		if chains[i], err = store.Zettels().AllInChain(h); err != nil {
 			err = _Error(err)
 			return
 		}

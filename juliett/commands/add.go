@@ -74,7 +74,6 @@ func (c Add) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) 
 
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
 		Umwelt:        u,
-		Store:         zs,
 		GroupBy:       _EtikettNewSet(),
 		GroupByUnique: true,
 	}
@@ -110,7 +109,6 @@ func (c Add) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) 
 
 	commitOrganizeTextOp := user_ops.CommitOrganizeFile{
 		Umwelt: u,
-		Store:  zs,
 	}
 
 	if _, err = commitOrganizeTextOp.Run(createOrganizeFileResults.Text, ot2); err != nil {
