@@ -2,6 +2,8 @@ package commands
 
 import (
 	"flag"
+
+	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
 type Revert struct {
@@ -18,12 +20,12 @@ func init() {
 
 			f.Var(&c.Type, "type", "ObjekteType")
 
-			return commandWithZettels{c}
+			return commandWithLockedStore{c}
 		},
 	)
 }
 
-func (c Revert) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) {
+func (c Revert) RunWithLockedStore(store store_with_lock.Store, args ...string) (err error) {
 	switch c.Type {
 	case _TypeZettel:
 		hins := make([]_Hinweis, len(args))
@@ -34,7 +36,7 @@ func (c Revert) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err erro
 				return
 			}
 
-			if _, err = zs.Revert(hins[i]); err != nil {
+			if _, err = store.Zettels().Revert(hins[i]); err != nil {
 				err = _Error(err)
 				return
 			}

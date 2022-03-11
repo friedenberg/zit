@@ -2,6 +2,8 @@ package commands
 
 import (
 	"flag"
+
+	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
 type Checkout struct {
@@ -20,17 +22,17 @@ func init() {
 			f.BoolVar(&c.IncludeAkte, "include-akte", false, "check out akte as well")
 			f.BoolVar(&c.Force, "force", false, "force update checked out zettels, even if they will overwrite existing checkouts")
 
-			return commandWithZettels{c}
+			return commandWithLockedStore{c}
 		},
 	)
 }
 
-func (c Checkout) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) {
+func (c Checkout) RunWithLockedStore(store store_with_lock.Store, args ...string) (err error) {
 	if len(args) == 0 {
 		if c.All {
 			var hins []_Hinweis
 
-			if _, hins, err = zs.Hinweisen().All(); err != nil {
+			if _, hins, err = store.Hinweisen().All(); err != nil {
 				err = _Error(err)
 				return
 			}
@@ -53,7 +55,7 @@ func (c Checkout) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err er
 		Format:               _ZettelFormatsText{},
 	}
 
-	if checkedOut, err = zs.ReadCheckedOut(checkinOptions, args...); err != nil {
+	if checkedOut, err = store.Zettels().ReadCheckedOut(checkinOptions, args...); err != nil {
 		err = _Error(err)
 		return
 	}
@@ -84,7 +86,8 @@ func (c Checkout) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err er
 		Format:      _ZettelFormatsText{},
 	}
 
-	if _, err = zs.Checkout(options, args...); err != nil {
+	//TODO use user_op
+	if _, err = store.Zettels().Checkout(options, args...); err != nil {
 		err = _Error(err)
 		return
 	}

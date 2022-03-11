@@ -3,6 +3,8 @@ package commands
 import (
 	"flag"
 
+	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/india/store_with_lock"
 	"github.com/friedenberg/zit/juliett/user_ops"
 )
 
@@ -24,50 +26,28 @@ func init() {
 			f.BoolVar(&c.GroupByUnique, "group-by-unique", false, "group by all unique combinations of etiketten")
 			f.Var(&c.GroupBy, "group-by", "etikett prefixes to group zettels")
 
-			return commandWithZettels{c}
+			return c
 		},
 	)
 }
 
-func (c *Organize) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) {
-	var zettels map[string]_NamedZettel
-
+func (c *Organize) Run(u _Umwelt, args ...string) (err error) {
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
 		Umwelt:        u,
 		GroupBy:       c.GroupBy,
 		GroupByUnique: c.GroupByUnique,
 	}
 
-	if c.Hinweisen {
-		//TODO add RootEtiketten
-		zettels = make(map[string]_NamedZettel)
+	if createOrganizeFileOp.RootEtiketten, err = c.getEtikettenFromArgs(args); err != nil {
+		err = _Error(err)
+		return
+	}
 
-		for _, arg := range args {
-			var h _Hinweis
-			if h, err = _MakeBlindHinweis(arg); err != nil {
-				err = _Error(err)
-				return
-			}
+	var zettels map[string]_NamedZettel
 
-			var named _NamedZettel
-
-			if named, err = zs.Read(h); err != nil {
-				err = _Error(err)
-				return
-			}
-
-			zettels[h.String()] = named
-		}
-	} else {
-		if createOrganizeFileOp.RootEtiketten, err = c.getEtikettenFromArgs(args); err != nil {
-			err = _Error(err)
-			return
-		}
-
-		if zettels, err = zs.Query(_NamedZettelFilterEtikettSet(c.rootEtiketten)); err != nil {
-			err = _Error(err)
-			return
-		}
+	if zettels, err = c.getZettels(u); err != nil {
+		err = _Error(err)
+		return
 	}
 
 	var createOrganizeFileResults user_ops.CreateOrgaanizeFileResults
@@ -119,6 +99,24 @@ func (c Organize) getEtikettenFromArgs(args []string) (es _EtikettSet, err error
 			err = _Error(err)
 			return
 		}
+	}
+
+	return
+}
+
+func (c Organize) getZettels(u _Umwelt) (zettels map[string]_NamedZettel, err error) {
+	var store store_with_lock.Store
+
+	if store, err = store_with_lock.New(u); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	defer errors.PanicIfError(store.Flush)
+
+	if zettels, err = store.Zettels().Query(_NamedZettelFilterEtikettSet(c.rootEtiketten)); err != nil {
+		err = _Error(err)
+		return
 	}
 
 	return

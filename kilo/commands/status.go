@@ -3,6 +3,8 @@ package commands
 import (
 	"flag"
 	"os"
+
+	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
 type Status struct {
@@ -14,12 +16,12 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &Status{}
 
-			return commandWithZettels{c}
+			return commandWithLockedStore{c}
 		},
 	)
 }
 
-func (c Status) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) {
+func (c Status) RunWithLockedStore(store store_with_lock.Store, args ...string) (err error) {
 	if len(args) > 0 {
 		_Errf("args provided will be ignored")
 	}
@@ -33,7 +35,7 @@ func (c Status) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err erro
 
 	var hins []string
 
-	if hins, err = zs.GetPossibleZettels(cwd); err != nil {
+	if hins, err = store.Zettels().GetPossibleZettels(cwd); err != nil {
 		err = _Error(err)
 		return
 	}
@@ -45,7 +47,7 @@ func (c Status) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err erro
 		Format:      _ZettelFormatsText{},
 	}
 
-	if daZees, err = zs.ReadExternal(options, hins...); err != nil {
+	if daZees, err = store.Zettels().ReadExternal(options, hins...); err != nil {
 		err = _Error(err)
 		return
 	}
@@ -53,7 +55,7 @@ func (c Status) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err erro
 	for h, z := range daZees {
 		var named _NamedZettel
 
-		if named, err = zs.Read(h); err != nil {
+		if named, err = store.Zettels().Read(h); err != nil {
 			err = _Error(err)
 			return
 		}

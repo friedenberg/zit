@@ -18,7 +18,7 @@ func init() {
 
 			f.Var(&c.Type, "type", "ObjekteType")
 
-			return commandWithZettels{commandWithId{c}}
+			return commandWithLockedStore{commandWithId{c}}
 		},
 	)
 }

@@ -3,6 +3,8 @@ package commands
 import (
 	"flag"
 	"io"
+
+	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
 type Show struct {
@@ -19,12 +21,12 @@ func init() {
 
 			f.Var(&c.Type, "type", "ObjekteType")
 
-			return commandWithZettels{c}
+			return commandWithLockedStore{c}
 		},
 	)
 }
 
-func (c Show) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) {
+func (c Show) RunWithLockedStore(store store_with_lock.Store, args ...string) (err error) {
 	zettels := make([]_NamedZettel, len(args))
 
 	for i, a := range args {
@@ -37,7 +39,7 @@ func (c Show) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error)
 
 		var named _NamedZettel
 
-		if named, err = zs.Read(h); err != nil {
+		if named, err = store.Zettels().Read(h); err != nil {
 			err = _Error(err)
 			return
 		}
@@ -48,10 +50,10 @@ func (c Show) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error)
 	switch c.Type {
 
 	case _TypeAkte:
-		return c.showAkten(u, zs, zettels)
+		return c.showAkten(store, zettels)
 
 	case _TypeZettel:
-		return c.showZettels(u, zs, zettels)
+		return c.showZettels(store, zettels)
 
 	default:
 		err = _Errorf("unsupported objekte type: %s", c.Type)
@@ -61,12 +63,12 @@ func (c Show) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error)
 	return
 }
 
-func (c Show) showZettels(u _Umwelt, zs _Zettels, zettels []_NamedZettel) (err error) {
+func (c Show) showZettels(store store_with_lock.Store, zettels []_NamedZettel) (err error) {
 	f := _ZettelFormatsText{}
 
 	ctx := _ZettelFormatContextWrite{
-		Out:               u.Out,
-		AkteReaderFactory: zs,
+		Out:               store.Out,
+		AkteReaderFactory: store.Zettels(),
 	}
 
 	for _, named := range zettels {
@@ -83,11 +85,11 @@ func (c Show) showZettels(u _Umwelt, zs _Zettels, zettels []_NamedZettel) (err e
 	return
 }
 
-func (c Show) showAkten(u _Umwelt, zs _Zettels, zettels []_NamedZettel) (err error) {
+func (c Show) showAkten(store store_with_lock.Store, zettels []_NamedZettel) (err error) {
 	var ar io.ReadCloser
 
 	for _, named := range zettels {
-		if ar, err = zs.AkteReader(named.Zettel.Akte); err != nil {
+		if ar, err = store.Zettels().AkteReader(named.Zettel.Akte); err != nil {
 			err = _Error(err)
 			return
 		}
@@ -99,7 +101,7 @@ func (c Show) showAkten(u _Umwelt, zs _Zettels, zettels []_NamedZettel) (err err
 
 		defer _PanicIfError(ar.Close())
 
-		if _, err = io.Copy(u.Out, ar); err != nil {
+		if _, err = io.Copy(store.Out, ar); err != nil {
 			err = _Error(err)
 			return
 		}

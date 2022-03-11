@@ -4,6 +4,8 @@ import (
 	"flag"
 	"os"
 
+	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/india/store_with_lock"
 	"github.com/friedenberg/zit/juliett/user_ops"
 )
 
@@ -23,25 +25,18 @@ func init() {
 			f.BoolVar(&c.IgnoreAkte, "ignore-akte", false, "do not change the akte")
 			f.BoolVar(&c.All, "all", false, "")
 
-			return commandWithZettels{c}
+			return c
 		},
 	)
 }
 
-func (c Checkin) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) {
+func (c Checkin) Run(u _Umwelt, args ...string) (err error) {
 	if c.All {
 		if len(args) > 0 {
 			_Errf("Ignoring args because -all is set\n")
 		}
 
-		var cwd string
-
-		if cwd, err = os.Getwd(); err != nil {
-			err = _Error(err)
-			return
-		}
-
-		if args, err = zs.GetPossibleZettels(cwd); err != nil {
+		if args, err = c.all(u); err != nil {
 			err = _Error(err)
 			return
 		}
@@ -49,7 +44,6 @@ func (c Checkin) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err err
 
 	checkinOp := user_ops.Checkin{
 		Umwelt: u,
-		Store:  zs,
 		Options: _ZettelsCheckinOptions{
 			IncludeAkte: !c.IgnoreAkte,
 			Format:      _ZettelFormatsText{},
@@ -70,6 +64,31 @@ func (c Checkin) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err err
 			err = _Error(err)
 			return
 		}
+	}
+
+	return
+}
+
+func (c Checkin) all(u _Umwelt) (args []string, err error) {
+	var store store_with_lock.Store
+
+	if store, err = store_with_lock.New(u); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	defer errors.PanicIfError(store.Flush)
+
+	var cwd string
+
+	if cwd, err = os.Getwd(); err != nil {
+		err = _Error(err)
+		return
+	}
+
+	if args, err = store.Zettels().GetPossibleZettels(cwd); err != nil {
+		err = _Error(err)
+		return
 	}
 
 	return

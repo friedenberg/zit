@@ -1,5 +1,7 @@
 package commands
 
+import "github.com/friedenberg/zit/india/store_with_lock"
+
 type CommandWithId interface {
 	RunWithId(_Umwelt, _Zettels, ..._Id) error
 }
@@ -8,7 +10,7 @@ type commandWithId struct {
 	CommandWithId
 }
 
-func (c commandWithId) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) {
+func (c commandWithId) RunWithLockedStore(store store_with_lock.Store, args ...string) (err error) {
 	ids := make([]_Id, len(args))
 
 	for i, arg := range args {
@@ -27,7 +29,7 @@ func (c commandWithId) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (e
 		ids[i] = id
 	}
 
-	c.RunWithId(u, zs, ids...)
+	c.RunWithId(store.Umwelt, store.Zettels(), ids...)
 
 	return
 }

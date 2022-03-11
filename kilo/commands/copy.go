@@ -14,7 +14,7 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &Copy{}
 
-			return commandWithZettels{commandWithHinweisen{c}}
+			return commandWithLockedStore{commandWithHinweisen{c}}
 		},
 	)
 }

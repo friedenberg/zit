@@ -16,12 +16,12 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &Push{}
 
-			return commandWithZettels{c}
+			return c
 		},
 	)
 }
 
-func (c Push) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) {
+func (c Push) Run(u _Umwelt, args ...string) (err error) {
 	if len(args) == 0 {
 		err = _Errorf("no remote specified")
 		return

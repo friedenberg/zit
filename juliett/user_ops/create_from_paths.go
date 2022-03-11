@@ -6,17 +6,22 @@ import (
 
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/stdprinter"
+	"github.com/friedenberg/zit/bravo/id"
+	"github.com/friedenberg/zit/charlie/hinweis"
+	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/echo/zettel"
+	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/foxtrot/zettel_formats"
 	"github.com/friedenberg/zit/hotel/zettels"
+	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
 type CreateFromPaths struct {
 	// Options _ZettelsCheckinOptions
-	Umwelt _Umwelt
-	Store  _Store
-	Format _ZettelFormatsText
-	Filter _ScriptValue
+	Umwelt              *umwelt.Umwelt
+	Format              _ZettelFormatsText
+	Filter              _ScriptValue
+	ReadHinweisFromPath bool
 }
 
 type CreateFromPathsResults struct {
@@ -24,12 +29,21 @@ type CreateFromPathsResults struct {
 }
 
 func (c CreateFromPaths) Run(args ...string) (results CreateFromPathsResults, err error) {
-	toCreate := make([]_Zettel, 0, len(args))
+	var store store_with_lock.Store
+
+	if store, err = store_with_lock.New(c.Umwelt); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	defer errors.PanicIfError(store.Flush)
+
+	toCreate := make([]stored_zettel.External, 0, len(args))
 
 	for _, arg := range args {
-		var toAdd []_Zettel
+		var toAdd []stored_zettel.External
 
-		if toAdd, err = c.zettelsFromPath(arg); err != nil {
+		if toAdd, err = c.zettelsFromPath(store, arg); err != nil {
 			err = _Errorf("zettel text format error for path: %s: %w", arg, err)
 			return
 		}
@@ -39,12 +53,29 @@ func (c CreateFromPaths) Run(args ...string) (results CreateFromPathsResults, er
 
 	for _, z := range toCreate {
 		var named _NamedZettel
+		if c.ReadHinweisFromPath {
+			head, tail := id.HeadTailFromFileName(z.Path)
 
-		if named, err = c.Store.Create(z); err != nil {
-			//TODO add file for error handling
-			c.handleStoreError(named, "", err)
-			err = nil
-			return
+			var h hinweis.Hinweis
+
+			if h, err = hinweis.MakeBlindHinweis(head + "/" + tail); err != nil {
+				err = _Error(err)
+				return
+			}
+
+			if named, err = store.Zettels().CreateWithHinweis(z.Zettel, h); err != nil {
+				//TODO add file for error handling
+				c.handleStoreError(named, "", err)
+				err = nil
+				return
+			}
+		} else {
+			if named, err = store.Zettels().Create(z.Zettel); err != nil {
+				//TODO add file for error handling
+				c.handleStoreError(named, "", err)
+				err = nil
+				return
+			}
 		}
 
 		_Outf("[%s %s]\n", named.Hinweis, named.Sha)
@@ -53,7 +84,7 @@ func (c CreateFromPaths) Run(args ...string) (results CreateFromPathsResults, er
 	return
 }
 
-func (c CreateFromPaths) zettelsFromPath(p string) (out []_Zettel, err error) {
+func (c CreateFromPaths) zettelsFromPath(store store_with_lock.Store, p string) (out []stored_zettel.External, err error) {
 	var r io.Reader
 
 	log.Print("running")
@@ -67,7 +98,7 @@ func (c CreateFromPaths) zettelsFromPath(p string) (out []_Zettel, err error) {
 
 	ctx := zettel.FormatContextRead{
 		In:                r,
-		AkteWriterFactory: c.Store,
+		AkteWriterFactory: store.Zettels(),
 	}
 
 	if _, err = c.Format.ReadFrom(&ctx); err != nil {
@@ -86,14 +117,26 @@ func (c CreateFromPaths) zettelsFromPath(p string) (out []_Zettel, err error) {
 				return
 			}
 
-			out = append(out, z1)
+			out = append(
+				out,
+				stored_zettel.External{
+					Path:   p,
+					Zettel: z1,
+				},
+			)
 		} else {
 			err = _Errorf("unsupported recoverable error: %w", ctx.RecoverableError)
 			return
 		}
 	}
 
-	out = append(out, ctx.Zettel)
+	out = append(
+		out,
+		stored_zettel.External{
+			Path:   p,
+			Zettel: ctx.Zettel,
+		},
+	)
 
 	return
 }

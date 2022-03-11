@@ -14,16 +14,9 @@ type commandWithLockedStore struct {
 }
 
 func (c commandWithLockedStore) Run(u _Umwelt, args ...string) (err error) {
-	var age _Age
-
-	if age, err = u.Age(); err != nil {
-		err = _Error(err)
-		return
-	}
-
 	var store store_with_lock.Store
 
-	if store, err = store_with_lock.New(age, u); err != nil {
+	if store, err = store_with_lock.New(u); err != nil {
 		err = errors.Error(err)
 		return
 	}

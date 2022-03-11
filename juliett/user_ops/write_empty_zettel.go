@@ -9,14 +9,15 @@ import (
 	"github.com/friedenberg/zit/bravo/open_file_guard"
 	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/charlie/hinweis"
+	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/echo/zettel"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
+	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
 type WriteEmptyZettel struct {
 	// Options _ZettelsCheckinOptions
-	Umwelt _Umwelt
-	Store  _Store
+	Umwelt *umwelt.Umwelt
 	Format zettel.Format
 	Filter _ScriptValue
 }
@@ -26,9 +27,18 @@ type WriteEmptyZettelResults struct {
 }
 
 func (c WriteEmptyZettel) Run() (results WriteEmptyZettelResults, err error) {
+	var store store_with_lock.Store
+
+	if store, err = store_with_lock.New(c.Umwelt); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	defer errors.PanicIfError(store.Flush)
+
 	var hinweis hinweis.Hinweis
 
-	if hinweis, err = c.Store.Hinweisen().Factory().Make(); err != nil {
+	if hinweis, err = store.Hinweisen().Factory().Make(); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -80,7 +90,7 @@ func (c WriteEmptyZettel) Run() (results WriteEmptyZettelResults, err error) {
 
 	ctx := zettel.FormatContextWrite{
 		Out:               f,
-		AkteReaderFactory: c.Store,
+		AkteReaderFactory: store.Zettels(),
 		Zettel:            results.Zettel.Zettel,
 	}
 

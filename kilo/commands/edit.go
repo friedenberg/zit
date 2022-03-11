@@ -18,15 +18,14 @@ func init() {
 
 			f.BoolVar(&c.IncludeAkte, "include-akte", true, "check out and open the akte")
 
-			return commandWithZettels{c}
+			return c
 		},
 	)
 }
 
-func (c Edit) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) {
+func (c Edit) Run(u _Umwelt, args ...string) (err error) {
 	checkoutOp := user_ops.Checkout{
 		Umwelt: u,
-		Store:  zs,
 		Options: _ZettelsCheckinOptions{
 			IncludeAkte: c.IncludeAkte,
 			Format:      _ZettelFormatsText{},
@@ -57,7 +56,11 @@ func (c Edit) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error)
 		return
 	}
 
-	if _, err = zs.Checkin(checkoutOp.Options, checkoutResults.FilesZettelen...); err != nil {
+	checkinOp := user_ops.Checkin{
+		Umwelt: u,
+	}
+
+	if _, err = checkinOp.Run(checkoutResults.FilesZettelen...); err != nil {
 		err = _Error(err)
 		return
 	}

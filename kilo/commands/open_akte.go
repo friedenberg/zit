@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/alfa/exec"
+	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
 type OpenAkte struct {
@@ -17,16 +18,16 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &OpenAkte{}
 
-			return commandWithZettels{c}
+			return commandWithLockedStore{c}
 		},
 	)
 }
 
-func (c OpenAkte) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) {
+func (c OpenAkte) RunWithLockedStore(store store_with_lock.Store, args ...string) (err error) {
 	var hins []_Hinweis
 	var shas []_Sha
 
-	if shas, hins, err = zs.Hinweisen().ReadManyStrings(args...); err != nil {
+	if shas, hins, err = store.Hinweisen().ReadManyStrings(args...); err != nil {
 		err = _Error(err)
 		return
 	}
@@ -44,13 +45,13 @@ func (c OpenAkte) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err er
 		func(sha _Sha) {
 			var z _NamedZettel
 
-			if z, err = zs.Read(sha); err != nil {
+			if z, err = store.Zettels().Read(sha); err != nil {
 				err = _Error(err)
 				return
 			}
 
 			shaAkte := z.Zettel.Akte
-			p := u.DirZit("Objekte", "Akte")
+			p := store.DirZit("Objekte", "Akte")
 
 			var f *os.File
 
@@ -72,7 +73,7 @@ func (c OpenAkte) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err er
 
 			files[i] = f.Name()
 
-			if err = _ObjekteRead(f, zs.Age(), _IdPath(shaAkte, p)); err != nil {
+			if err = _ObjekteRead(f, store.Age(), _IdPath(shaAkte, p)); err != nil {
 				err = _Error(err)
 				return
 			}

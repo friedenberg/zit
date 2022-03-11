@@ -16,9 +16,10 @@ type Store struct {
 	lock    *file_lock.Lock
 	zettels zettels.Zettels
 	akten   akten.Akten
+	age     age.Age
 }
 
-func New(age age.Age, u *umwelt.Umwelt) (s Store, err error) {
+func New(u *umwelt.Umwelt) (s Store, err error) {
 	s.Umwelt = u
 	s.lock = file_lock.New(u.DirZit("Lock"))
 
@@ -27,7 +28,12 @@ func New(age age.Age, u *umwelt.Umwelt) (s Store, err error) {
 		return
 	}
 
-	if s.zettels, err = zettels.New(u, age); err != nil {
+	if s.age, err = u.Age(); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	if s.zettels, err = zettels.New(u, s.age); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -38,6 +44,10 @@ func New(age age.Age, u *umwelt.Umwelt) (s Store, err error) {
 	}
 
 	return
+}
+
+func (s Store) Age() age.Age {
+	return s.age
 }
 
 func (s Store) Zettels() zettels.Zettels {

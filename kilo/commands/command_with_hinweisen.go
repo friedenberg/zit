@@ -1,5 +1,7 @@
 package commands
 
+import "github.com/friedenberg/zit/india/store_with_lock"
+
 type CommandWithHinweisen interface {
 	RunWithHinweisen(_Umwelt, _Zettels, ..._Hinweis) error
 }
@@ -8,7 +10,7 @@ type commandWithHinweisen struct {
 	CommandWithHinweisen
 }
 
-func (c commandWithHinweisen) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) {
+func (c commandWithHinweisen) RunWithLockedStore(store store_with_lock.Store, args ...string) (err error) {
 	ids := make([]_Hinweis, len(args))
 
 	for i, arg := range args {
@@ -22,7 +24,7 @@ func (c commandWithHinweisen) RunWithZettels(u _Umwelt, zs _Zettels, args ...str
 		ids[i] = h
 	}
 
-	c.RunWithHinweisen(u, zs, ids...)
+	c.RunWithHinweisen(store.Umwelt, store.Zettels(), ids...)
 
 	return
 }

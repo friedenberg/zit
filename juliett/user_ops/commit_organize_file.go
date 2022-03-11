@@ -3,7 +3,6 @@ package user_ops
 import (
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/stdprinter"
-	"github.com/friedenberg/zit/charlie/age"
 	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/delta/umwelt"
@@ -19,21 +18,15 @@ type CommitOrganizeFileResults struct {
 }
 
 func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganizeFileResults, err error) {
-	var age age.Age
-
-	if age, err = c.Umwelt.Age(); err != nil {
-		err = _Error(err)
-		return
-	}
-
 	var store store_with_lock.Store
 
-	if store, err = store_with_lock.New(age, c.Umwelt); err != nil {
+	if store, err = store_with_lock.New(c.Umwelt); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
 	defer errors.PanicIfError(store.Flush)
+
 	changes := a.ChangesFrom(b)
 
 	if len(changes.Added) == 0 && len(changes.Removed) == 0 {

@@ -36,6 +36,4 @@ func (c DeleteCheckout) Run(zettels map[hinweis.Hinweis]stored_zettel.CheckedOut
 	}
 
 	return
-
-	return
 }

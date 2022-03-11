@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"flag"
 	"log"
+
+	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
 type Log struct {
@@ -15,12 +17,12 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &Log{}
 
-			return commandWithZettels{c}
+			return commandWithLockedStore{c}
 		},
 	)
 }
 
-func (c Log) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) {
+func (c Log) RunWithLockedStore(store store_with_lock.Store, args ...string) (err error) {
 	var rawId string
 
 	switch len(args) {
@@ -48,7 +50,7 @@ func (c Log) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) 
 
 	var chain _ZettelsChain
 
-	if chain, err = zs.AllInChain(id); err != nil {
+	if chain, err = store.Zettels().AllInChain(id); err != nil {
 		err = _Error(err)
 		return
 	}

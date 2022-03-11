@@ -5,7 +5,6 @@ import (
 
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
-	"github.com/friedenberg/zit/charlie/age"
 	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
@@ -26,16 +25,9 @@ type CreateOrgaanizeFileResults struct {
 }
 
 func (c CreateOrganizeFile) Run(zettels map[string]stored_zettel.Named) (results CreateOrgaanizeFileResults, err error) {
-	var age age.Age
-
-	if age, err = c.Umwelt.Age(); err != nil {
-		err = _Error(err)
-		return
-	}
-
 	var store store_with_lock.Store
 
-	if store, err = store_with_lock.New(age, c.Umwelt); err != nil {
+	if store, err = store_with_lock.New(c.Umwelt); err != nil {
 		err = errors.Error(err)
 		return
 	}

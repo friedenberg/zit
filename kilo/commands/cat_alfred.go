@@ -3,6 +3,8 @@ package commands
 import (
 	"bufio"
 	"flag"
+
+	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
 type CatAlfred struct {
@@ -18,7 +20,7 @@ func init() {
 				Type: _TypeUnknown,
 			}
 
-			c.Command = commandWithZettels{c}
+			c.Command = commandWithLockedStore{c}
 
 			f.Var(&c.Type, "type", "ObjekteType")
 
@@ -44,18 +46,18 @@ func (c CatAlfred) HandleError(u _Umwelt, in error) {
 	_PanicIfError(aw.Close())
 }
 
-func (c CatAlfred) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) {
+func (c CatAlfred) RunWithLockedStore(store store_with_lock.Store, args ...string) (err error) {
 	//this command does its own error handling
 	defer func() {
 		err = nil
 	}()
 
-	wo := bufio.NewWriter(u.Out)
+	wo := bufio.NewWriter(store.Out)
 	defer wo.Flush()
 
 	var aw _AlfredWriter
 
-	if aw, err = _AlfredNewWriter(u.Out); err != nil {
+	if aw, err = _AlfredNewWriter(store.Out); err != nil {
 		err = _Error(err)
 		return
 	}
@@ -70,7 +72,7 @@ func (c CatAlfred) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err e
 	case _TypeEtikett:
 		var ea []_Etikett
 
-		if ea, err = zs.Etiketten().All(); err != nil {
+		if ea, err = store.Etiketten().All(); err != nil {
 			err = _Error(err)
 			return
 		}
@@ -83,7 +85,7 @@ func (c CatAlfred) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err e
 
 		var all map[string]_NamedZettel
 
-		if all, err = zs.All(); err != nil {
+		if all, err = store.Zettels().All(); err != nil {
 			err = _Error(err)
 			return
 		}
@@ -98,7 +100,7 @@ func (c CatAlfred) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err e
 
 		var all map[string]_NamedZettel
 
-		if all, err = zs.All(); err != nil {
+		if all, err = store.Zettels().All(); err != nil {
 			err = _Error(err)
 			return
 		}

@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 
+	"github.com/friedenberg/zit/india/store_with_lock"
 	"github.com/friedenberg/zit/juliett/user_ops"
 )
 
@@ -30,25 +31,25 @@ func init() {
 			f.BoolVar(&c.Organize, "organize", false, "")
 			// f.BoolVar(&c.Edit, "edit", false, "")
 
-			return commandWithZettels{c}
+			return commandWithLockedStore{c}
 		},
 	)
 }
 
-func (c Add) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) {
+func (c Add) RunWithLockedStore(store store_with_lock.Store, args ...string) (err error) {
 	zettels := make(map[string]_NamedZettel, len(args))
 
 	for _, arg := range args {
 		var z _Zettel
 
-		if z, err = c.zettelForAkte(u, zs, arg); err != nil {
+		if z, err = c.zettelForAkte(store.Umwelt, store.Zettels(), arg); err != nil {
 			err = _Error(err)
 			return
 		}
 
 		var named _NamedZettel
 
-		if named, err = zs.Create(z); err != nil {
+		if named, err = store.Zettels().Create(z); err != nil {
 			err = _Error(err)
 			return
 		}
@@ -73,7 +74,7 @@ func (c Add) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) 
 	}
 
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
-		Umwelt:        u,
+		Umwelt:        store.Umwelt,
 		GroupBy:       _EtikettNewSet(),
 		GroupByUnique: true,
 	}
@@ -108,7 +109,7 @@ func (c Add) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) 
 	}
 
 	commitOrganizeTextOp := user_ops.CommitOrganizeFile{
-		Umwelt: u,
+		Umwelt: store.Umwelt,
 	}
 
 	if _, err = commitOrganizeTextOp.Run(createOrganizeFileResults.Text, ot2); err != nil {

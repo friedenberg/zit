@@ -3,6 +3,8 @@ package commands
 import (
 	"flag"
 	"os"
+
+	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
 type Clean struct {
@@ -14,12 +16,12 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &Clean{}
 
-			return commandWithZettels{c}
+			return commandWithLockedStore{c}
 		},
 	)
 }
 
-func (c Clean) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error) {
+func (c Clean) RunWithLockedStore(store store_with_lock.Store, args ...string) (err error) {
 	if len(args) > 0 {
 		_Errf("args provided will be ignored")
 	}
@@ -33,7 +35,8 @@ func (c Clean) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error
 
 	var hins []string
 
-	if hins, err = zs.GetPossibleZettels(cwd); err != nil {
+	//TODO move to user_ops
+	if hins, err = store.Zettels().GetPossibleZettels(cwd); err != nil {
 		err = _Error(err)
 		return
 	}
@@ -45,7 +48,8 @@ func (c Clean) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error
 		Format:      _ZettelFormatsText{},
 	}
 
-	if daZees, err = zs.ReadExternal(options, hins...); err != nil {
+	//TODO move to user_ops
+	if daZees, err = store.Zettels().ReadExternal(options, hins...); err != nil {
 		err = _Error(err)
 		return
 	}
@@ -56,7 +60,7 @@ func (c Clean) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error
 	for h, z := range daZees {
 		var named _NamedZettel
 
-		if named, err = zs.Read(h); err != nil {
+		if named, err = store.Zettels().Read(h); err != nil {
 			err = _Error(err)
 			return
 		}
@@ -73,7 +77,7 @@ func (c Clean) RunWithZettels(u _Umwelt, zs _Zettels, args ...string) (err error
 		}
 	}
 
-	if u.Konfig.DryRun {
+	if store.Konfig.DryRun {
 		for _, z := range toDelete {
 			_Outf("[%s] (would delete)\n", z.Hinweis)
 		}
