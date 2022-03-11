@@ -3,7 +3,7 @@ package commands
 import (
 	"flag"
 
-	"github.com/friedenberg/zit/india/user_ops"
+	"github.com/friedenberg/zit/juliett/user_ops"
 )
 
 type Edit struct {

@@ -2,7 +2,7 @@ package commands
 
 import (
 	"github.com/friedenberg/zit/alfa/errors"
-	"github.com/friedenberg/zit/golf/store_with_lock"
+	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
 type CommandWithLockedStore interface {

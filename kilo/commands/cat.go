@@ -5,7 +5,7 @@ import (
 	"flag"
 	"log"
 
-	"github.com/friedenberg/zit/golf/store_with_lock"
+	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
 type Cat struct {

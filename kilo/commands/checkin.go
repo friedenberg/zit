@@ -4,7 +4,7 @@ import (
 	"flag"
 	"os"
 
-	"github.com/friedenberg/zit/india/user_ops"
+	"github.com/friedenberg/zit/juliett/user_ops"
 )
 
 type Checkin struct {

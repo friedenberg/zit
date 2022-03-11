@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/golf/organize_text"
-	"github.com/friedenberg/zit/golf/store_with_lock"
+	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
 type CreateOrganizeFile struct {

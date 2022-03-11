@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/echo/zettel"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
-	"github.com/friedenberg/zit/india/user_ops"
+	"github.com/friedenberg/zit/juliett/user_ops"
 )
 
 type New struct {
