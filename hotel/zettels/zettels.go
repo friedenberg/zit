@@ -14,14 +14,18 @@ type Zettels interface {
 	ReadExternal(CheckinOptions, ...string) (map[_Hinweis]_ZettelExternal, error)
 	ReadCheckedOut(CheckinOptions, ...string) (map[_Hinweis]_ZettelCheckedOut, error)
 
+	ReadZettel(sha _Sha) (z _StoredZettel, err error)
 	Read(id _Id) (z _NamedZettel, err error)
 	Create(_Zettel) (z _NamedZettel, err error)
 	CreateWithHinweis(_Zettel, _Hinweis) (z _NamedZettel, err error)
 	Update(z _NamedZettel) (stored _NamedZettel, err error)
 	Revert(h _Hinweis) (named _NamedZettel, err error)
+	UpdateNoKinder(z _NamedZettel) (err error)
 
 	Checkout(options CheckinOptions, args ...string) (czs []_ZettelCheckedOut, err error)
 	Checkin(options CheckinOptions, paths ...string) (daZees map[_Hinweis]_ZettelCheckedOut, err error)
+
+	Delete(id _Id) (zettel _NamedZettel, err error)
 
 	Flush() error
 
@@ -179,6 +183,13 @@ func (zs zettels) Create(in _Zettel) (z _NamedZettel, err error) {
 		return
 	}
 
+	var existing _NamedZettel
+
+	if existing, err = zs.Read(z.Sha); err == nil {
+		z = existing
+		return
+	}
+
 	if z.Hinweis, err = zs.hinweisen.StoreNew(z.Sha); err != nil {
 		err = _Error(err)
 		return
@@ -284,8 +295,44 @@ func (zs zettels) Revert(h _Hinweis) (named _NamedZettel, err error) {
 	return
 }
 
+func (zs zettels) UpdateNoKinder(zettel _NamedZettel) (err error) {
+	if err = zs.update(zettel.Stored); err != nil {
+		err = _Error(err)
+		return
+	}
+
+	return
+}
+
+func (zs zettels) Delete(id _Id) (zettel _NamedZettel, err error) {
+	if zettel, err = zs.readNamedZettel(id); err != nil {
+		err = _Error(err)
+		return
+	}
+
+	var s _Shard
+
+	if s, err = zs.store.Shard(zettel.Sha.Head()); err != nil {
+		err = _Error(err)
+		return
+	}
+
+	s.Remove(zettel.Sha.Head())
+
+	return
+}
+
+func (zs zettels) ReadZettel(sha _Sha) (z _StoredZettel, err error) {
+	if z, err = zs.readStoredZettel(sha); err != nil {
+		err = _Error(err)
+		return
+	}
+
+	return
+}
+
 func (zs zettels) Read(id _Id) (sz _NamedZettel, err error) {
-	if sz, err = zs.readStoredZettel(id); err != nil {
+	if sz, err = zs.readNamedZettel(id); err != nil {
 		err = _Error(err)
 		return
 	}
@@ -316,7 +363,6 @@ OUTER:
 		var named _NamedZettel
 
 		if named, err = zs.Read(sha); err != nil {
-			_Errf("%s/n", e)
 			err = _Error(err)
 			return
 		}

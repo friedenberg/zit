@@ -29,23 +29,6 @@ func init() {
 	)
 }
 
-func (c CatAlfred) HandleError(u _Umwelt, in error) {
-	wo := bufio.NewWriter(u.Out)
-	defer wo.Flush()
-
-	var aw _AlfredWriter
-
-	var err error
-
-	if aw, err = _AlfredNewWriter(u.Out); err != nil {
-		_PanicIfError(err)
-		return
-	}
-
-	aw.WriteError(in)
-	_PanicIfError(aw.Close())
-}
-
 func (c CatAlfred) RunWithLockedStore(store store_with_lock.Store, args ...string) (err error) {
 	//this command does its own error handling
 	defer func() {

@@ -10,6 +10,11 @@ import (
 	"sync"
 )
 
+type Sharder interface {
+	LineToEntry(line string) (entry Entry, err error)
+	EntryToLine(entry Entry) (line string, err error)
+}
+
 type Shard interface {
 	Sharder
 	Path() string

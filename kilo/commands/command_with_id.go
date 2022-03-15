@@ -3,7 +3,7 @@ package commands
 import "github.com/friedenberg/zit/india/store_with_lock"
 
 type CommandWithId interface {
-	RunWithId(_Umwelt, _Zettels, ..._Id) error
+	RunWithId(store store_with_lock.Store, ids ..._Id) error
 }
 
 type commandWithId struct {
@@ -29,7 +29,10 @@ func (c commandWithId) RunWithLockedStore(store store_with_lock.Store, args ...s
 		ids[i] = id
 	}
 
-	c.RunWithId(store.Umwelt, store.Zettels(), ids...)
+	if err = c.RunWithId(store, ids...); err != nil {
+		err = _Error(err)
+		return
+	}
 
 	return
 }

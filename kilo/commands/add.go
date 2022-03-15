@@ -2,11 +2,7 @@ package commands
 
 import (
 	"flag"
-	"io"
-	"os"
-	"path"
 
-	"github.com/friedenberg/zit/india/store_with_lock"
 	"github.com/friedenberg/zit/juliett/user_ops"
 )
 
@@ -31,57 +27,39 @@ func init() {
 			f.BoolVar(&c.Organize, "organize", false, "")
 			// f.BoolVar(&c.Edit, "edit", false, "")
 
-			return commandWithLockedStore{c}
+			return c
 		},
 	)
 }
 
-func (c Add) RunWithLockedStore(store store_with_lock.Store, args ...string) (err error) {
-	zettels := make(map[string]_NamedZettel, len(args))
-
-	for _, arg := range args {
-		var z _Zettel
-
-		if z, err = c.zettelForAkte(store.Umwelt, store.Zettels(), arg); err != nil {
-			err = _Error(err)
-			return
-		}
-
-		var named _NamedZettel
-
-		if named, err = store.Zettels().Create(z); err != nil {
-			err = _Error(err)
-			return
-		}
-
-		zettels[named.Hinweis.String()] = named
-
-		if c.Delete {
-			if err = os.Remove(arg); err != nil {
-				err = _Error(err)
-				return
-			}
-
-			_Errf("[%s] (deleted)\n", arg)
-		}
-
-		_Outf("[%s %s] (created)\n", named.Hinweis, named.Sha)
+func (c Add) Run(u _Umwelt, args ...string) (err error) {
+	zettelsFromAkteOp := user_ops.ZettelFromExternalAkte{
+		Umwelt:    u,
+		Etiketten: c.Etiketten,
+		Delete:    c.Delete,
 	}
 
-	//TODO move to user ops
+	var zettelsFromAkteResults user_ops.ZettelFromExternalAkteResults
+
+	if zettelsFromAkteResults, err = zettelsFromAkteOp.Run(args...); err != nil {
+		err = _Error(err)
+		return
+	}
+
 	if !c.Organize {
 		return
 	}
 
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
-		Umwelt:        store.Umwelt,
+		Umwelt:        u,
 		GroupBy:       _EtikettNewSet(),
+		RootEtiketten: c.Etiketten,
 		GroupByUnique: true,
 	}
 
 	var createOrganizeFileResults user_ops.CreateOrgaanizeFileResults
 
-	if createOrganizeFileResults, err = createOrganizeFileOp.Run(zettels); err != nil {
+	if createOrganizeFileResults, err = createOrganizeFileOp.Run(zettelsFromAkteResults.Zettelen); err != nil {
 		err = _Error(err)
 		return
 	}
@@ -109,54 +87,10 @@ func (c Add) RunWithLockedStore(store store_with_lock.Store, args ...string) (er
 	}
 
 	commitOrganizeTextOp := user_ops.CommitOrganizeFile{
-		Umwelt: store.Umwelt,
+		Umwelt: u,
 	}
 
 	if _, err = commitOrganizeTextOp.Run(createOrganizeFileResults.Text, ot2); err != nil {
-		err = _Error(err)
-		return
-	}
-
-	return
-}
-
-func (c Add) zettelForAkte(u _Umwelt, zs _Zettels, aktePath string) (z _Zettel, err error) {
-	z.Etiketten = c.Etiketten
-
-	var akteWriter _ObjekteWriter
-
-	if akteWriter, err = zs.AkteWriter(); err != nil {
-		err = _Error(err)
-		return
-	}
-
-	var f *os.File
-
-	if f, err = _Open(aktePath); err != nil {
-		err = _Error(err)
-		return
-	}
-
-	defer _Close(f)
-
-	if _, err = io.Copy(akteWriter, f); err != nil {
-		err = _Error(err)
-		return
-	}
-
-	if err = akteWriter.Close(); err != nil {
-		err = _Error(err)
-		return
-	}
-
-	if err = z.Bezeichnung.Set(path.Base(aktePath)); err != nil {
-		err = _Error(err)
-		return
-	}
-
-	z.Akte = akteWriter.Sha()
-
-	if err = z.AkteExt.Set(path.Ext(aktePath)); err != nil {
 		err = _Error(err)
 		return
 	}

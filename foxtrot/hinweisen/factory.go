@@ -82,10 +82,10 @@ func (hf *factory) Make() (h _Hinweis, err error) {
 		}
 	}()
 
-	if err = hf.refresh(); err != nil {
-		err = _Error(err)
-		return
-	}
+	// if err = hf.refresh(); err != nil {
+	// 	err = _Error(err)
+	// 	return
+	// }
 
 	newInt := hf.counter + 1
 

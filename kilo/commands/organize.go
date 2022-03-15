@@ -45,7 +45,7 @@ func (c *Organize) Run(u _Umwelt, args ...string) (err error) {
 
 	var zettels map[string]_NamedZettel
 
-	if zettels, err = c.getZettels(u); err != nil {
+	if zettels, err = c.getZettels(u, createOrganizeFileOp.RootEtiketten); err != nil {
 		err = _Error(err)
 		return
 	}
@@ -104,7 +104,7 @@ func (c Organize) getEtikettenFromArgs(args []string) (es _EtikettSet, err error
 	return
 }
 
-func (c Organize) getZettels(u _Umwelt) (zettels map[string]_NamedZettel, err error) {
+func (c Organize) getZettels(u _Umwelt, rootEtiketten _EtikettSet) (zettels map[string]_NamedZettel, err error) {
 	var store store_with_lock.Store
 
 	if store, err = store_with_lock.New(u); err != nil {
@@ -114,7 +114,7 @@ func (c Organize) getZettels(u _Umwelt) (zettels map[string]_NamedZettel, err er
 
 	defer errors.PanicIfError(store.Flush)
 
-	if zettels, err = store.Zettels().Query(_NamedZettelFilterEtikettSet(c.rootEtiketten)); err != nil {
+	if zettels, err = store.Zettels().Query(_NamedZettelFilterEtikettSet(rootEtiketten)); err != nil {
 		err = _Error(err)
 		return
 	}

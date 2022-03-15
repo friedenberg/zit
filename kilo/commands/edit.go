@@ -57,7 +57,8 @@ func (c Edit) Run(u _Umwelt, args ...string) (err error) {
 	}
 
 	checkinOp := user_ops.Checkin{
-		Umwelt: u,
+		Umwelt:  u,
+		Options: checkoutOp.Options,
 	}
 
 	if _, err = checkinOp.Run(checkoutResults.FilesZettelen...); err != nil {

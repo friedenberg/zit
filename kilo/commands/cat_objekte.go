@@ -2,6 +2,8 @@ package commands
 
 import (
 	"flag"
+
+	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
 type CatObjekte struct {
@@ -23,14 +25,14 @@ func init() {
 	)
 }
 
-func (c CatObjekte) RunWithId(u _Umwelt, zs _Zettels, ids ..._Id) (err error) {
+func (c CatObjekte) RunWithId(store store_with_lock.Store, ids ..._Id) (err error) {
 	switch c.Type {
 
 	case _TypeAkte:
-		return c.akten(u, zs, ids...)
+		return c.akten(store, ids...)
 
 	case _TypeZettel:
-		return c.zettelen(u, zs, ids...)
+		return c.zettelen(store, ids...)
 
 	default:
 		err = _Errorf("unsupported objekte type: %s", c.Type)
@@ -40,7 +42,7 @@ func (c CatObjekte) RunWithId(u _Umwelt, zs _Zettels, ids ..._Id) (err error) {
 	return
 }
 
-func (c CatObjekte) akten(u _Umwelt, zs _Zettels, ids ..._Id) (err error) {
+func (c CatObjekte) akten(store store_with_lock.Store, ids ..._Id) (err error) {
 	for _, id := range ids {
 		var sb _Sha
 
@@ -51,7 +53,7 @@ func (c CatObjekte) akten(u _Umwelt, zs _Zettels, ids ..._Id) (err error) {
 		case _Hinweis:
 			var named _NamedZettel
 
-			if named, err = zs.Read(i); err != nil {
+			if named, err = store.Zettels().Read(i); err != nil {
 				err = _Error(err)
 				return
 			}
@@ -63,14 +65,14 @@ func (c CatObjekte) akten(u _Umwelt, zs _Zettels, ids ..._Id) (err error) {
 			return
 		}
 
-		p := u.DirAkte()
+		p := store.DirAkte()
 
 		if sb, err = sb.Glob(p); err != nil {
 			err = _Error(err)
 			return
 		}
 
-		if err = _ObjekteRead(u.Out, zs.Age(), _IdPath(sb, p)); err != nil {
+		if err = _ObjekteRead(store.Out, store.Age(), _IdPath(sb, p)); err != nil {
 			err = _Error(err)
 			return
 		}
@@ -79,18 +81,18 @@ func (c CatObjekte) akten(u _Umwelt, zs _Zettels, ids ..._Id) (err error) {
 	return
 }
 
-func (c CatObjekte) zettelen(u _Umwelt, zs _Zettels, ids ..._Id) (err error) {
+func (c CatObjekte) zettelen(store store_with_lock.Store, ids ..._Id) (err error) {
 	for _, id := range ids {
 		var z _NamedZettel
 
-		if z, err = zs.Read(id); err != nil {
+		if z, err = store.Zettels().Read(id); err != nil {
 			err = _Error(err)
 			return
 		}
 
 		f := _StoredZettelFormatsObjekte{}
 
-		if _, err = f.WriteTo(z.Stored, u.Out); err != nil {
+		if _, err = f.WriteTo(z.Stored, store.Out); err != nil {
 			err = _Error(err)
 			return
 		}
