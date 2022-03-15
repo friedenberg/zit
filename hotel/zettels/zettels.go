@@ -317,7 +317,7 @@ func (zs zettels) Delete(id _Id) (zettel _NamedZettel, err error) {
 		return
 	}
 
-	s.Remove(zettel.Sha.Head())
+	s.Remove(zettel.Sha.String())
 
 	return
 }
