@@ -38,7 +38,6 @@ func (c New) Run(u _Umwelt, args ...string) (err error) {
 	}
 
 	if len(args) == 0 {
-		//TODO move to user_ops
 		emptyOp := user_ops.WriteEmptyZettel{
 			Umwelt: u,
 			Format: f,
@@ -60,8 +59,6 @@ func (c New) Run(u _Umwelt, args ...string) (err error) {
 				"source ~/.vim/syntax/zit.zettel.vim",
 			},
 		}
-
-		// var openVimResults user_ops.OpenVimResults
 
 		if _, err = openVimOp.Run(results.Zettel.Path); err != nil {
 			err = _Error(err)

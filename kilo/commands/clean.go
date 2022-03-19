@@ -2,9 +2,8 @@ package commands
 
 import (
 	"flag"
-	"os"
 
-	"github.com/friedenberg/zit/india/store_with_lock"
+	"github.com/friedenberg/zit/juliett/user_ops"
 )
 
 type Clean struct {
@@ -16,68 +15,64 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &Clean{}
 
-			return commandWithLockedStore{c}
+			return c
 		},
 	)
 }
 
-func (c Clean) RunWithLockedStore(store store_with_lock.Store, args ...string) (err error) {
+func (c Clean) Run(u _Umwelt, args ...string) (err error) {
 	if len(args) > 0 {
 		_Errf("args provided will be ignored")
 	}
 
-	var cwd string
+	getPossibleOp := user_ops.GetPossibleZettels{
+		Umwelt: u,
+	}
 
-	if cwd, err = os.Getwd(); err != nil {
+	var getPossibleResults user_ops.GetPossibleZettelsResults
+
+	if getPossibleResults, err = getPossibleOp.Run(); err != nil {
 		err = _Error(err)
 		return
 	}
 
-	var hins []string
+	args = getPossibleResults.Hinweisen
 
-	//TODO move to user_ops
-	if hins, err = store.Zettels().GetPossibleZettels(cwd); err != nil {
-		err = _Error(err)
-		return
-	}
-
-	var daZees map[_Hinweis]_ExternalZettel
-
-	options := _ZettelsCheckinOptions{
+	checkinOptions := _ZettelsCheckinOptions{
 		IncludeAkte: true,
 		Format:      _ZettelFormatsText{},
 	}
 
-	//TODO move to user_ops
-	if daZees, err = store.Zettels().ReadExternal(options, hins...); err != nil {
+	var readResults user_ops.ReadCheckedOutResults
+
+	readOp := user_ops.ReadCheckedOut{
+		Umwelt:        u,
+		Options:       checkinOptions,
+		IncludeStored: true,
+	}
+
+	if readResults, err = readOp.Run(args...); err != nil {
 		err = _Error(err)
 		return
 	}
 
-	toDelete := make([]_ExternalZettel, 0, len(daZees))
-	filesToDelete := make([]string, 0, len(daZees))
+	toDelete := make([]_ExternalZettel, 0, len(readResults.Zettelen))
+	filesToDelete := make([]string, 0, len(readResults.Zettelen))
 
-	for h, z := range daZees {
-		var named _NamedZettel
-
-		if named, err = store.Zettels().Read(h); err != nil {
-			err = _Error(err)
-			return
-		}
-
-		if !named.Zettel.Equals(z.Zettel) {
+	for _, z := range readResults.Zettelen {
+		if !z.Internal.Zettel.Equals(z.External.Zettel) {
 			continue
 		}
 
-		toDelete = append(toDelete, z)
-		filesToDelete = append(filesToDelete, z.Path)
+		toDelete = append(toDelete, z.External)
+		filesToDelete = append(filesToDelete, z.External.Path)
 
-		if z.AktePath != "" {
-			filesToDelete = append(filesToDelete, z.AktePath)
+		if z.External.AktePath != "" {
+			filesToDelete = append(filesToDelete, z.External.AktePath)
 		}
 	}
 
-	if store.Konfig.DryRun {
+	if u.Konfig.DryRun {
 		for _, z := range toDelete {
 			_Outf("[%s] (would delete)\n", z.Hinweis)
 		}

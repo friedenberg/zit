@@ -3,7 +3,7 @@ package commands
 import (
 	"flag"
 
-	"github.com/friedenberg/zit/india/store_with_lock"
+	"github.com/friedenberg/zit/juliett/user_ops"
 )
 
 type Checkout struct {
@@ -22,31 +22,31 @@ func init() {
 			f.BoolVar(&c.IncludeAkte, "include-akte", false, "check out akte as well")
 			f.BoolVar(&c.Force, "force", false, "force update checked out zettels, even if they will overwrite existing checkouts")
 
-			return commandWithLockedStore{c}
+			return c
 		},
 	)
 }
 
-func (c Checkout) RunWithLockedStore(store store_with_lock.Store, args ...string) (err error) {
+func (c Checkout) Run(u _Umwelt, args ...string) (err error) {
 	if len(args) == 0 {
 		if c.All {
-			var hins []_Hinweis
+			getHinweisenOp := user_ops.GetAllHinweisen{
+				Umwelt: u,
+			}
 
-			if _, hins, err = store.Hinweisen().All(); err != nil {
+			var getHinweisenResults user_ops.GetAllHinweisenResults
+
+			if getHinweisenResults, err = getHinweisenOp.Run(); err != nil {
 				err = _Error(err)
 				return
 			}
 
-			for _, h := range hins {
-				args = append(args, h.String())
-			}
+			args = getHinweisenResults.HinweisenStrings
 		} else {
 			_Errf("nothing to checkout\n")
 			return
 		}
 	}
-
-	var checkedOut map[_Hinweis]_ZettelCheckedOut
 
 	checkinOptions := _ZettelsCheckinOptions{
 		IgnoreMissingHinweis: true,
@@ -55,14 +55,21 @@ func (c Checkout) RunWithLockedStore(store store_with_lock.Store, args ...string
 		Format:               _ZettelFormatsText{},
 	}
 
-	if checkedOut, err = store.Zettels().ReadCheckedOut(checkinOptions, args...); err != nil {
+	var readResults user_ops.ReadCheckedOutResults
+
+	readOp := user_ops.ReadCheckedOut{
+		Umwelt:  u,
+		Options: checkinOptions,
+	}
+
+	if readResults, err = readOp.Run(args...); err != nil {
 		err = _Error(err)
 		return
 	}
 
 	toCheckOut := make([]string, 0, len(args))
 
-	for h, cz := range checkedOut {
+	for h, cz := range readResults.Zettelen {
 		if cz.External.Path == "" {
 			toCheckOut = append(toCheckOut, h.String())
 			continue
@@ -86,8 +93,12 @@ func (c Checkout) RunWithLockedStore(store store_with_lock.Store, args ...string
 		Format:      _ZettelFormatsText{},
 	}
 
-	//TODO use user_op
-	if _, err = store.Zettels().Checkout(options, args...); err != nil {
+	checkoutOp := user_ops.Checkout{
+		Umwelt:  u,
+		Options: options,
+	}
+
+	if _, err = checkoutOp.Run(args...); err != nil {
 		err = _Error(err)
 		return
 	}

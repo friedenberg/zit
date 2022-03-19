@@ -5,12 +5,13 @@ import (
 )
 
 type Change struct {
-	Etikett, Hinweis string
+	Etikett, Key string
 }
 
 type Changes struct {
 	Added   []Change
 	Removed []Change
+	New     map[string]_EtikettSet
 }
 
 func (a1 *organizeText) ChangesFrom(b1 Text) (c Changes) {
@@ -23,7 +24,7 @@ func (a1 *organizeText) ChangesFrom(b1 Text) (c Changes) {
 	makeCompareMap := func(in Text) (out compareMap) {
 		out = make(compareMap)
 
-		for e, zs := range in.Zettels() {
+		for e, zs := range in.ZettelsExisting() {
 			for z, _ := range zs {
 				// individual etiketten
 				for _, e1 := range strings.Split(e, ", ") {
@@ -58,7 +59,7 @@ func (a1 *organizeText) ChangesFrom(b1 Text) (c Changes) {
 				c.Added,
 				Change{
 					Etikett: bez.etikett,
-					Hinweis: bez.hinweis,
+					Key:     bez.hinweis,
 				},
 			)
 		}
@@ -71,9 +72,39 @@ func (a1 *organizeText) ChangesFrom(b1 Text) (c Changes) {
 			c.Removed,
 			Change{
 				Etikett: aez.etikett,
-				Hinweis: aez.hinweis,
+				Key:     aez.hinweis,
 			},
 		)
+	}
+
+	c.New = make(map[string]_EtikettSet)
+
+	addNew := func(bez, ett string) {
+		existing, ok := c.New[bez]
+
+		if !ok {
+			existing = _EtikettNewSet()
+		}
+
+		existing.AddString(ett)
+		c.New[bez] = existing
+	}
+
+	for e, zs := range b1.ZettelsNew() {
+		for z, _ := range zs {
+			// individual etiketten
+			for _, e1 := range strings.Split(e, ", ") {
+				// root etiketten have an empty string representation
+				if e1 != "" {
+					addNew(z.bezeichnung, e1)
+				}
+			}
+
+			// root etiketten
+			for _, e2 := range b1.Etiketten() {
+				addNew(z.bezeichnung, e2.String())
+			}
+		}
 	}
 
 	return

@@ -10,10 +10,6 @@ type Zettels interface {
 	All() (map[string]_NamedZettel, error)
 	Query(_NamedZettelFilter) (map[string]_NamedZettel, error)
 
-	GetPossibleZettels(wd string) (hins []string, err error)
-	ReadExternal(CheckinOptions, ...string) (map[_Hinweis]_ZettelExternal, error)
-	ReadCheckedOut(CheckinOptions, ...string) (map[_Hinweis]_ZettelCheckedOut, error)
-
 	ReadZettel(sha _Sha) (z _StoredZettel, err error)
 	Read(id _Id) (z _NamedZettel, err error)
 	Create(_Zettel) (z _NamedZettel, err error)
@@ -22,8 +18,8 @@ type Zettels interface {
 	Revert(h _Hinweis) (named _NamedZettel, err error)
 	UpdateNoKinder(z _NamedZettel) (err error)
 
+	//TODO move to user_ops
 	Checkout(options CheckinOptions, args ...string) (czs []_ZettelCheckedOut, err error)
-	Checkin(options CheckinOptions, paths ...string) (daZees map[_Hinweis]_ZettelCheckedOut, err error)
 
 	Delete(id _Id) (zettel _NamedZettel, err error)
 

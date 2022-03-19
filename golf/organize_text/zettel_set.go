@@ -4,7 +4,7 @@ import "sort"
 
 type zettelSet map[zettel]bool
 
-func newZettelSet() zettelSet {
+func makeZettelSet() zettelSet {
 	return make(map[zettel]bool)
 }
 
@@ -38,7 +38,7 @@ func (zs zettelSet) Contains(z zettel) bool {
 }
 
 func (a zettelSet) Copy() (b zettelSet) {
-	b = newZettelSet()
+	b = makeZettelSet()
 
 	for z, _ := range a {
 		b[z] = true

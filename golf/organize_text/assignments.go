@@ -8,19 +8,25 @@ import (
 	"strings"
 )
 
-type etikettToZettels map[string]zettelSet
-
-func newEtikettToZettels() etikettToZettels {
-	return make(etikettToZettels)
+type assignments struct {
+	etikettenToExisting map[string]zettelSet
+	etikettenToNew      map[string]newZettelSet
 }
 
-func (zs etikettToZettels) AddStored(e string, z _NamedZettel) {
+func newEtikettToZettels() assignments {
+	return assignments{
+		etikettenToExisting: make(map[string]zettelSet),
+		etikettenToNew:      make(map[string]newZettelSet),
+	}
+}
+
+func (zs assignments) AddStored(e string, z _NamedZettel) {
 	d := z.Zettel.Description()
 	// d = fmt.Sprintf("%s %s", z.Sha.String()[:7], d)
 	zs.Add(e, z.Hinweis.String(), d)
 }
 
-func (zs etikettToZettels) Add(e string, h, b string) {
+func (zs assignments) Add(e string, h, b string) {
 	zs.add(
 		e,
 		zettel{
@@ -30,19 +36,27 @@ func (zs etikettToZettels) Add(e string, h, b string) {
 	)
 }
 
-func (zs etikettToZettels) add(e string, z zettel) {
-	if _, ok := zs[e]; !ok {
-		zs[e] = newZettelSet()
+func (zs assignments) add(e string, z zettel) {
+	if _, ok := zs.etikettenToExisting[e]; !ok {
+		zs.etikettenToExisting[e] = makeZettelSet()
 	}
 
-	zs[e].Add(z)
+	zs.etikettenToExisting[e].Add(z)
 }
 
-func (zs etikettToZettels) sorted() (sorted []string) {
-	sorted = make([]string, len(zs))
+func (zs assignments) addNew(e string, z newZettel) {
+	if _, ok := zs.etikettenToNew[e]; !ok {
+		zs.etikettenToNew[e] = makeNewZettelSet()
+	}
+
+	zs.etikettenToNew[e].Add(z)
+}
+
+func (zs assignments) sorted() (sorted []string) {
+	sorted = make([]string, len(zs.etikettenToExisting))
 	i := 0
 
-	for e, _ := range zs {
+	for e, _ := range zs.etikettenToExisting {
 		sorted[i] = e
 		i++
 	}
@@ -54,11 +68,11 @@ func (zs etikettToZettels) sorted() (sorted []string) {
 	return
 }
 
-func (zs etikettToZettels) WriteTo(out io.Writer) (n int64, err error) {
+func (zs assignments) WriteTo(out io.Writer) (n int64, err error) {
 	w := _LineFormatNewWriter()
 
 	for _, e := range zs.sorted() {
-		ezs := zs[e]
+		ezs := zs.etikettenToExisting[e]
 
 		if e != "" {
 			w.WriteLines(fmt.Sprintf("# %s", e))
@@ -77,7 +91,7 @@ func (zs etikettToZettels) WriteTo(out io.Writer) (n int64, err error) {
 	return
 }
 
-func (zs *etikettToZettels) ReadFrom(r1 io.Reader) (n int64, err error) {
+func (zs *assignments) ReadFrom(r1 io.Reader) (n int64, err error) {
 	r := bufio.NewReader(r1)
 
 	var currentEtikettString string
@@ -138,17 +152,26 @@ func (zs *etikettToZettels) ReadFrom(r1 io.Reader) (n int64, err error) {
 		case '-':
 			var z zettel
 
-			if err = z.Set(s); err != nil {
-				err = ErrorRead{
-					error:  err,
-					line:   lineNo,
-					column: 2,
+			err = z.Set(s)
+
+			if err == nil {
+				zs.Add(currentEtikettString, z.hinweis, z.bezeichnung)
+			} else {
+				var nz newZettel
+				var errNz error
+
+				if errNz = nz.Set(s); errNz != nil {
+					err = ErrorRead{
+						error:  err,
+						line:   lineNo,
+						column: 2,
+					}
+
+					return
+				} else {
+					zs.addNew(currentEtikettString, nz)
 				}
-
-				return
 			}
-
-			zs.Add(currentEtikettString, z.hinweis, z.bezeichnung)
 
 		default:
 			err = ErrorRead{
@@ -166,10 +189,10 @@ func (zs *etikettToZettels) ReadFrom(r1 io.Reader) (n int64, err error) {
 	return
 }
 
-func (a etikettToZettels) Copy() (b etikettToZettels) {
+func (a assignments) Copy() (b assignments) {
 	b = newEtikettToZettels()
 
-	for k, v := range a {
+	for k, v := range a.etikettenToExisting {
 		for z, _ := range v {
 			b.Add(k, z.hinweis, z.bezeichnung)
 		}

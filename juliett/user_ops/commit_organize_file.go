@@ -29,7 +29,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 
 	changes := a.ChangesFrom(b)
 
-	if len(changes.Added) == 0 && len(changes.Removed) == 0 {
+	if len(changes.Added) == 0 && len(changes.Removed) == 0 && len(changes.New) == 0 {
 		stdprinter.Out("no changes")
 		return
 	}
@@ -96,7 +96,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 			return
 		}
 
-		if err = addEtikettToZettel(c.Hinweis, e); err != nil {
+		if err = addEtikettToZettel(c.Key, e); err != nil {
 			err = _Error(err)
 			return
 		}
@@ -110,10 +110,39 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 			return
 		}
 
-		if err = removeEtikettFromZettel(c.Hinweis, e); err != nil {
+		if err = removeEtikettFromZettel(c.Key, e); err != nil {
 			err = _Error(err)
 			return
 		}
+	}
+
+	for bez, etts := range changes.New {
+		z := _Zettel{
+			Etiketten: etts,
+		}
+
+		if err = z.Bezeichnung.Set(bez); err != nil {
+			err = _Error(err)
+			return
+		}
+
+		if err = z.AkteExt.Set("md"); err != nil {
+			err = _Error(err)
+			return
+		}
+
+		if c.Umwelt.Konfig.DryRun {
+			_Outf("[%s] (would create)\n", z.Bezeichnung)
+			continue
+		}
+
+		var named _NamedZettel
+
+		if named, err = store.Zettels().Create(z); err != nil {
+			stdprinter.Errf("failed to create zettel: %s", err)
+		}
+
+		stdprinter.Outf("[%s %s] (created)\n", named.Hinweis, named.Sha)
 	}
 
 	for _, z := range toUpdate {

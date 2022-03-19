@@ -3,6 +3,7 @@ package commands
 import (
 	"flag"
 
+	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/juliett/user_ops"
 )
 
@@ -61,7 +62,25 @@ func (c Edit) Run(u _Umwelt, args ...string) (err error) {
 		Options: checkoutOp.Options,
 	}
 
-	if _, err = checkinOp.Run(checkoutResults.FilesZettelen...); err != nil {
+	var readResults user_ops.ReadCheckedOutResults
+
+	readOp := user_ops.ReadCheckedOut{
+		Umwelt:  u,
+		Options: checkoutOp.Options,
+	}
+
+	if readResults, err = readOp.Run(args...); err != nil {
+		err = _Error(err)
+		return
+	}
+
+	zettels := make([]stored_zettel.External, 0, len(readResults.Zettelen))
+
+	for _, z := range readResults.Zettelen {
+		zettels = append(zettels, z.External)
+	}
+
+	if _, err = checkinOp.Run(zettels...); err != nil {
 		err = _Error(err)
 		return
 	}

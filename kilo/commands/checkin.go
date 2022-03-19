@@ -2,10 +2,8 @@ package commands
 
 import (
 	"flag"
-	"os"
 
-	"github.com/friedenberg/zit/alfa/errors"
-	"github.com/friedenberg/zit/india/store_with_lock"
+	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/juliett/user_ops"
 )
 
@@ -36,23 +34,49 @@ func (c Checkin) Run(u _Umwelt, args ...string) (err error) {
 			_Errf("Ignoring args because -all is set\n")
 		}
 
-		if args, err = c.all(u); err != nil {
+		getPossibleOp := user_ops.GetPossibleZettels{
+			Umwelt: u,
+		}
+
+		var getPossibleResults user_ops.GetPossibleZettelsResults
+
+		if getPossibleResults, err = getPossibleOp.Run(); err != nil {
 			err = _Error(err)
 			return
 		}
+
+		args = getPossibleResults.Hinweisen
+	}
+
+	checkinOptions := _ZettelsCheckinOptions{
+		IncludeAkte: !c.IgnoreAkte,
+		Format:      _ZettelFormatsText{},
+	}
+
+	var readResults user_ops.ReadCheckedOutResults
+
+	readOp := user_ops.ReadCheckedOut{
+		Umwelt:  u,
+		Options: checkinOptions,
+	}
+
+	if readResults, err = readOp.Run(args...); err != nil {
+		err = _Error(err)
+		return
 	}
 
 	checkinOp := user_ops.Checkin{
-		Umwelt: u,
-		Options: _ZettelsCheckinOptions{
-			IncludeAkte: !c.IgnoreAkte,
-			Format:      _ZettelFormatsText{},
-		},
+		Umwelt:  u,
+		Options: checkinOptions,
 	}
 
-	var results user_ops.CheckinResults
+	zettels := make([]stored_zettel.External, 0, len(readResults.Zettelen))
 
-	if results, err = checkinOp.Run(args...); err != nil {
+	for _, z := range readResults.Zettelen {
+		zettels = append(zettels, z.External)
+	}
+
+	if _, err = checkinOp.Run(zettels...); err != nil {
 		err = _Error(err)
 		return
 	}
@@ -60,35 +84,10 @@ func (c Checkin) Run(u _Umwelt, args ...string) (err error) {
 	if c.Delete {
 		deleteOp := user_ops.DeleteCheckout{}
 
-		if err = deleteOp.Run(results.Zettelen); err != nil {
+		if err = deleteOp.Run(readResults.Zettelen); err != nil {
 			err = _Error(err)
 			return
 		}
-	}
-
-	return
-}
-
-func (c Checkin) all(u _Umwelt) (args []string, err error) {
-	var store store_with_lock.Store
-
-	if store, err = store_with_lock.New(u); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
-	defer errors.PanicIfError(store.Flush)
-
-	var cwd string
-
-	if cwd, err = os.Getwd(); err != nil {
-		err = _Error(err)
-		return
-	}
-
-	if args, err = store.Zettels().GetPossibleZettels(cwd); err != nil {
-		err = _Error(err)
-		return
 	}
 
 	return

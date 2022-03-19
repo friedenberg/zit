@@ -8,21 +8,26 @@ type Text interface {
 	io.ReaderFrom
 	io.WriterTo
 	Etiketten() _EtikettSet
-	Zettels() etikettToZettels
+	ZettelsExisting() map[string]zettelSet
+	ZettelsNew() map[string]newZettelSet
 	ChangesFrom(Text) Changes
 }
 
 type organizeText struct {
 	etiketten _EtikettSet
-	zettels   etikettToZettels
+	zettels   assignments
 }
 
 func (t organizeText) Etiketten() _EtikettSet {
 	return t.etiketten
 }
 
-func (t organizeText) Zettels() etikettToZettels {
-	return t.zettels
+func (t organizeText) ZettelsExisting() map[string]zettelSet {
+	return t.zettels.etikettenToExisting
+}
+
+func (t organizeText) ZettelsNew() map[string]newZettelSet {
+	return t.zettels.etikettenToNew
 }
 
 func New(options Options, zettels map[string]_NamedZettel) (ot *organizeText, err error) {

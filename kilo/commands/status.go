@@ -2,9 +2,8 @@ package commands
 
 import (
 	"flag"
-	"os"
 
-	"github.com/friedenberg/zit/india/store_with_lock"
+	"github.com/friedenberg/zit/juliett/user_ops"
 )
 
 type Status struct {
@@ -16,51 +15,49 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &Status{}
 
-			return commandWithLockedStore{c}
+			return c
 		},
 	)
 }
 
-func (c Status) RunWithLockedStore(store store_with_lock.Store, args ...string) (err error) {
+func (c Status) Run(u _Umwelt, args ...string) (err error) {
 	if len(args) > 0 {
 		_Errf("args provided will be ignored")
 	}
 
-	var cwd string
+	getPossibleOp := user_ops.GetPossibleZettels{
+		Umwelt: u,
+	}
 
-	if cwd, err = os.Getwd(); err != nil {
+	var getPossibleResults user_ops.GetPossibleZettelsResults
+
+	if getPossibleResults, err = getPossibleOp.Run(); err != nil {
 		err = _Error(err)
 		return
 	}
 
-	var hins []string
-
-	if hins, err = store.Zettels().GetPossibleZettels(cwd); err != nil {
-		err = _Error(err)
-		return
-	}
-
-	var daZees map[_Hinweis]_ExternalZettel
+	args = getPossibleResults.Hinweisen
 
 	options := _ZettelsCheckinOptions{
 		IncludeAkte: true,
 		Format:      _ZettelFormatsText{},
 	}
 
-	if daZees, err = store.Zettels().ReadExternal(options, hins...); err != nil {
+	var readResults user_ops.ReadCheckedOutResults
+
+	readOp := user_ops.ReadCheckedOut{
+		Umwelt:        u,
+		Options:       options,
+		IncludeStored: true,
+	}
+
+	if readResults, err = readOp.Run(args...); err != nil {
 		err = _Error(err)
 		return
 	}
 
-	for h, z := range daZees {
-		var named _NamedZettel
-
-		if named, err = store.Zettels().Read(h); err != nil {
-			err = _Error(err)
-			return
-		}
-
-		if named.Zettel.Equals(z.Zettel) {
+	for h, z := range readResults.Zettelen {
+		if z.Internal.Zettel.Equals(z.External.Zettel) {
 			continue
 		}
 
