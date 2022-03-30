@@ -3,6 +3,7 @@ package commands
 import (
 	"flag"
 
+	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/juliett/user_ops"
 )
@@ -82,9 +83,17 @@ func (c Checkin) Run(u _Umwelt, args ...string) (err error) {
 	}
 
 	if c.Delete {
-		deleteOp := user_ops.DeleteCheckout{}
+		deleteOp := user_ops.DeleteCheckout{
+			Umwelt: u,
+		}
 
-		if err = deleteOp.Run(readResults.Zettelen); err != nil {
+		external := make(map[hinweis.Hinweis]stored_zettel.External)
+
+		for h, z := range readResults.Zettelen {
+			external[h] = z.External
+		}
+
+		if err = deleteOp.Run(external); err != nil {
 			err = _Error(err)
 			return
 		}

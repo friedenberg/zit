@@ -1,33 +1,50 @@
 package user_ops
 
 import (
-	"fmt"
-
+	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
 	"github.com/friedenberg/zit/charlie/hinweis"
+	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
+	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
 type DeleteCheckout struct {
+	Umwelt *umwelt.Umwelt
 }
 
-func (c DeleteCheckout) Run(zettels map[hinweis.Hinweis]stored_zettel.CheckedOut) (err error) {
+func (c DeleteCheckout) Run(zettels map[hinweis.Hinweis]stored_zettel.External) (err error) {
+	var store store_with_lock.Store
+
+	if store, err = store_with_lock.New(c.Umwelt); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	defer errors.PanicIfError(store.Flush)
+
 	toDelete := make([]stored_zettel.External, 0, len(zettels))
 	filesToDelete := make([]string, 0, len(zettels))
 
-	for h, z := range zettels {
-		if !z.Internal.Zettel.Equals(z.External.Zettel) {
-			fmt.Printf("%#v\n", z.Internal.Zettel)
-			fmt.Printf("%#v\n", z.External.Zettel)
+	for h, external := range zettels {
+		var internal stored_zettel.Named
+
+		if internal, err = store.Zettels().Read(h); err != nil {
+			err = _Error(err)
+			return
+		}
+
+		//TODO add a safety check?
+		if !internal.Zettel.Equals(external.Zettel) {
 			_Outf("[%s] (checkout different!)\n", h)
 			continue
 		}
 
-		toDelete = append(toDelete, z.External)
-		filesToDelete = append(filesToDelete, z.External.Path)
+		toDelete = append(toDelete, external)
+		filesToDelete = append(filesToDelete, external.Path)
 
-		if z.External.AktePath != "" {
-			filesToDelete = append(filesToDelete, z.External.AktePath)
+		if external.AktePath != "" {
+			filesToDelete = append(filesToDelete, external.AktePath)
 		}
 	}
 

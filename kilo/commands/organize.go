@@ -6,6 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/stdprinter"
+	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/golf/organize_text"
 	"github.com/friedenberg/zit/india/store_with_lock"
 	"github.com/friedenberg/zit/juliett/user_ops"
@@ -123,7 +124,7 @@ func (c Organize) getZettels(u _Umwelt, rootEtiketten _EtikettSet) (zettels map[
 
 	defer errors.PanicIfError(store.Flush)
 
-	if zettels, err = store.Zettels().Query(_NamedZettelFilterEtikettSet(rootEtiketten)); err != nil {
+	if zettels, err = store.Zettels().Query(stored_zettel.FilterEtikettSet(rootEtiketten)); err != nil {
 		err = _Error(err)
 		return
 	}

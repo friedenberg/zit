@@ -87,10 +87,9 @@ type (
 	_ZettelFormat             = zettel.Format
 	_ZettelFormatContextRead  = zettel.FormatContextRead
 
-	_StoredZettel                = stored_zettel.Stored
-	_NamedZettel                 = stored_zettel.Named
-	_StoredZettelFormatsObjekte  = stored_zettel_formats.Objekte
-	_NamedZettelFilterEtikettSet = stored_zettel.FilterEtikettSet
+	_StoredZettel               = stored_zettel.Stored
+	_NamedZettel                = stored_zettel.Named
+	_StoredZettelFormatsObjekte = stored_zettel_formats.Objekte
 
 	_ZettelFormatsText                        = zettel_formats.Text
 	_ZettelFormatTextErrAkteInlineAndFilePath = zettel_formats.ErrHasInlineAkteAndFilePath
