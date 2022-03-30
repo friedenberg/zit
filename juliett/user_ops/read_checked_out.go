@@ -15,9 +15,8 @@ import (
 )
 
 type ReadCheckedOut struct {
-	Umwelt        *umwelt.Umwelt
-	IncludeStored bool
-	Options       _ZettelsCheckinOptions
+	Umwelt  *umwelt.Umwelt
+	Options _ZettelsCheckinOptions
 }
 
 type ReadCheckedOutResults struct {
@@ -54,11 +53,9 @@ func (op ReadCheckedOut) Run(paths ...string) (results ReadCheckedOutResults, er
 			return
 		}
 
-		if op.IncludeStored {
-			if checked_out.Internal, err = store.Zettels().Read(checked_out.External.Hinweis); err != nil {
-				err = errors.Error(err)
-				return
-			}
+		if checked_out.Internal, err = store.Zettels().Read(checked_out.External.Hinweis); err != nil {
+			err = errors.Error(err)
+			return
 		}
 
 		results.Zettelen[checked_out.External.Hinweis] = checked_out

@@ -46,9 +46,8 @@ func (c Status) Run(u _Umwelt, args ...string) (err error) {
 	var readResults user_ops.ReadCheckedOutResults
 
 	readOp := user_ops.ReadCheckedOut{
-		Umwelt:        u,
-		Options:       options,
-		IncludeStored: true,
+		Umwelt:  u,
+		Options: options,
 	}
 
 	if readResults, err = readOp.Run(args...); err != nil {

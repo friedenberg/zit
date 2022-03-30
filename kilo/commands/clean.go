@@ -46,9 +46,8 @@ func (c Clean) Run(u _Umwelt, args ...string) (err error) {
 	var readResults user_ops.ReadCheckedOutResults
 
 	readOp := user_ops.ReadCheckedOut{
-		Umwelt:        u,
-		Options:       checkinOptions,
-		IncludeStored: true,
+		Umwelt:  u,
+		Options: checkinOptions,
 	}
 
 	if readResults, err = readOp.Run(args...); err != nil {

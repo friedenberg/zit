@@ -1,6 +1,8 @@
 package user_ops
 
 import (
+	"fmt"
+
 	"github.com/friedenberg/zit/bravo/open_file_guard"
 	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
@@ -13,8 +15,11 @@ func (c DeleteCheckout) Run(zettels map[hinweis.Hinweis]stored_zettel.CheckedOut
 	toDelete := make([]stored_zettel.External, 0, len(zettels))
 	filesToDelete := make([]string, 0, len(zettels))
 
-	for _, z := range zettels {
+	for h, z := range zettels {
 		if !z.Internal.Zettel.Equals(z.External.Zettel) {
+			fmt.Printf("%#v\n", z.Internal.Zettel)
+			fmt.Printf("%#v\n", z.External.Zettel)
+			_Outf("[%s] (checkout different!)\n", h)
 			continue
 		}
 
