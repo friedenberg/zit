@@ -2,8 +2,11 @@ package commands
 
 import (
 	"flag"
+	"fmt"
 
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/stdprinter"
+	"github.com/friedenberg/zit/golf/organize_text"
 	"github.com/friedenberg/zit/india/store_with_lock"
 	"github.com/friedenberg/zit/juliett/user_ops"
 )
@@ -57,6 +60,7 @@ func (c *Organize) Run(u _Umwelt, args ...string) (err error) {
 		return
 	}
 
+OPEN_VIM:
 	openVimOp := user_ops.OpenVim{
 		Options: []string{
 			"set ft=zit.organize",
@@ -75,8 +79,13 @@ func (c *Organize) Run(u _Umwelt, args ...string) (err error) {
 	readOrganizeTextOp := user_ops.ReadOrganizeFile{}
 
 	if ot2, err = readOrganizeTextOp.Run(createOrganizeFileResults.Path); err != nil {
-		err = _Error(err)
-		return
+		if c.handleReadChangesError(err) {
+			err = nil
+			goto OPEN_VIM
+		} else {
+			stdprinter.Errf("aborting organize\n")
+			return
+		}
 	}
 
 	commitOrganizeTextOp := user_ops.CommitOrganizeFile{
@@ -117,6 +126,40 @@ func (c Organize) getZettels(u _Umwelt, rootEtiketten _EtikettSet) (zettels map[
 	if zettels, err = store.Zettels().Query(_NamedZettelFilterEtikettSet(rootEtiketten)); err != nil {
 		err = _Error(err)
 		return
+	}
+
+	return
+}
+
+func (c Organize) handleReadChangesError(err error) (tryAgain bool) {
+	var errorRead organize_text.ErrorRead
+
+	if err != nil && !errors.As(err, &errorRead) {
+		stdprinter.Errf("unrecoverable organize read failure: %s", err)
+		tryAgain = false
+		return
+	}
+
+	stdprinter.Errf("reading changes failed: %q\n", err)
+	stdprinter.Errf("would you like to edit and try again? (y/*)\n")
+
+	var answer rune
+	var n int
+
+	if n, err = fmt.Scanf("%c", &answer); err != nil {
+		tryAgain = false
+		stdprinter.Errf("failed to read answer: %s", err)
+		return
+	}
+
+	if n != 1 {
+		tryAgain = false
+		stdprinter.Errf("failed to read at exactly 1 answer: %s", err)
+		return
+	}
+
+	if answer == 'y' || answer == 'Y' {
+		tryAgain = true
 	}
 
 	return
