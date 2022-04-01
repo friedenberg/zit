@@ -3,6 +3,7 @@ package commands
 import (
 	"flag"
 
+	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/juliett/user_ops"
 )
 
@@ -25,18 +26,14 @@ func (c Status) Run(u _Umwelt, args ...string) (err error) {
 		_Errf("args provided will be ignored")
 	}
 
-	getPossibleOp := user_ops.GetPossibleZettels{
-		Umwelt: u,
-	}
+	var possibleHinweisen []string
 
-	var getPossibleResults user_ops.GetPossibleZettelsResults
-
-	if getPossibleResults, err = getPossibleOp.Run(); err != nil {
-		err = _Error(err)
+	if possibleHinweisen, err = user_ops.NewGetPossibleZettels(u).Run(); err != nil {
+		err = errors.Error(err)
 		return
 	}
 
-	args = getPossibleResults.Hinweisen
+	args = possibleHinweisen
 
 	options := _ZettelsCheckinOptions{
 		IncludeAkte: true,

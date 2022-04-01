@@ -4,6 +4,7 @@ import (
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/charlie/age"
 	"github.com/friedenberg/zit/charlie/file_lock"
+	"github.com/friedenberg/zit/checkout_store"
 	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/foxtrot/akten"
 	"github.com/friedenberg/zit/foxtrot/etiketten"
@@ -13,10 +14,11 @@ import (
 
 type Store struct {
 	*umwelt.Umwelt
-	lock    *file_lock.Lock
-	zettels zettels.Zettels
-	akten   akten.Akten
-	age     age.Age
+	lock           *file_lock.Lock
+	zettels        zettels.Zettels
+	akten          akten.Akten
+	age            age.Age
+	checkout_store checkout_store.Store
 }
 
 func New(u *umwelt.Umwelt) (s Store, err error) {
@@ -43,6 +45,11 @@ func New(u *umwelt.Umwelt) (s Store, err error) {
 		return
 	}
 
+	if s.checkout_store, err = checkout_store.New(u.Cwd(), s.zettels); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
 	return
 }
 
@@ -64,6 +71,10 @@ func (s Store) Etiketten() etiketten.Etiketten {
 
 func (s Store) Akten() akten.Akten {
 	return s.akten
+}
+
+func (s Store) CheckoutStore() checkout_store.Store {
+	return s.checkout_store
 }
 
 func (s Store) Flush() (err error) {

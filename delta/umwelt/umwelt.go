@@ -7,6 +7,7 @@ import (
 
 type Umwelt struct {
 	BasePath string
+	cwd      string
 	Konfig   _Konfig
 	Logger   _Logger
 	In       io.Reader
@@ -24,6 +25,11 @@ func MakeUmwelt(c _Konfig) (u *Umwelt, err error) {
 	}
 
 	if u.BasePath, err = c.DirZit(); err != nil {
+		err = _Error(err)
+		return
+	}
+
+	if u.cwd, err = os.Getwd(); err != nil {
 		err = _Error(err)
 		return
 	}

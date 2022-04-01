@@ -3,6 +3,7 @@ package commands
 import (
 	"flag"
 
+	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/juliett/user_ops"
@@ -35,18 +36,14 @@ func (c Checkin) Run(u _Umwelt, args ...string) (err error) {
 			_Errf("Ignoring args because -all is set\n")
 		}
 
-		getPossibleOp := user_ops.GetPossibleZettels{
-			Umwelt: u,
-		}
+		var possibleHinweisen []string
 
-		var getPossibleResults user_ops.GetPossibleZettelsResults
-
-		if getPossibleResults, err = getPossibleOp.Run(); err != nil {
-			err = _Error(err)
+		if possibleHinweisen, err = user_ops.NewGetPossibleZettels(u).Run(); err != nil {
+			err = errors.Error(err)
 			return
 		}
 
-		args = getPossibleResults.Hinweisen
+		args = possibleHinweisen
 	}
 
 	checkinOptions := _ZettelsCheckinOptions{
@@ -62,7 +59,7 @@ func (c Checkin) Run(u _Umwelt, args ...string) (err error) {
 	}
 
 	if readResults, err = readOp.Run(args...); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -78,7 +75,7 @@ func (c Checkin) Run(u _Umwelt, args ...string) (err error) {
 	}
 
 	if _, err = checkinOp.Run(zettels...); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -94,7 +91,7 @@ func (c Checkin) Run(u _Umwelt, args ...string) (err error) {
 		}
 
 		if err = deleteOp.Run(external); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 	}

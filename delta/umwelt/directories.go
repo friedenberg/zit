@@ -2,6 +2,10 @@ package umwelt
 
 import "path"
 
+func (u Umwelt) Cwd() string {
+	return u.cwd
+}
+
 func (u Umwelt) Dir() string {
 	return u.BasePath
 }
