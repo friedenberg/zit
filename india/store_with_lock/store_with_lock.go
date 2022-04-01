@@ -4,7 +4,7 @@ import (
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/charlie/age"
 	"github.com/friedenberg/zit/charlie/file_lock"
-	"github.com/friedenberg/zit/checkout_store"
+	"github.com/friedenberg/zit/golf/checkout_store"
 	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/foxtrot/akten"
 	"github.com/friedenberg/zit/foxtrot/etiketten"
