@@ -4,11 +4,11 @@ import (
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/charlie/age"
 	"github.com/friedenberg/zit/charlie/file_lock"
-	"github.com/friedenberg/zit/golf/checkout_store"
 	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/foxtrot/akten"
 	"github.com/friedenberg/zit/foxtrot/etiketten"
 	"github.com/friedenberg/zit/foxtrot/hinweisen"
+	"github.com/friedenberg/zit/golf/checkout_store"
 	"github.com/friedenberg/zit/hotel/zettels"
 )
 
@@ -78,7 +78,12 @@ func (s Store) CheckoutStore() checkout_store.Store {
 }
 
 func (s Store) Flush() (err error) {
-	if err = s.zettels.Flush(); err != nil {
+	if err = s.Zettels().Flush(); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	if err = s.CheckoutStore().Flush(); err != nil {
 		err = errors.Error(err)
 		return
 	}

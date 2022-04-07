@@ -69,7 +69,7 @@ func (c Edit) Run(u _Umwelt, args ...string) (err error) {
 		Options: checkoutOp.Options,
 	}
 
-	if readResults, err = readOp.Run(args...); err != nil {
+	if readResults, err = readOp.Run(checkoutResults.FilesZettelen...); err != nil {
 		err = _Error(err)
 		return
 	}

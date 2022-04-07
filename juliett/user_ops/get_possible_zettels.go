@@ -24,6 +24,8 @@ func (uo GetPossibleZettels) Run() (hinweisen []string, err error) {
 		return
 	}
 
+	defer errors.PanicIfError(store.Flush)
+
 	hinweisen, err = store.CheckoutStore().GetPossibleZettels()
 
 	return

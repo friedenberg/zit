@@ -21,6 +21,7 @@ type Store struct {
 	akteWriterFactory zettel.AkteWriterFactory
 	path              string
 	entries           map[string]Entry
+	indexWasRead      bool
 }
 
 func New(p string, akteWriterFactory zettel.AkteWriterFactory) (s Store, err error) {
@@ -41,11 +42,37 @@ func New(p string, akteWriterFactory zettel.AkteWriterFactory) (s Store, err err
 	return
 }
 
+func (s Store) Flush() (err error) {
+	//TODO flush index
+	if err = s.lock.Unlock(); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	return
+}
+
 func (s Store) ReadAll() (err error) {
 	return
 }
 
-func (s Store) ReadOne(p string) (ez stored_zettel.External, err error) {
+func (s Store) readFromIndex(p string) (ez stored_zettel.External, err error) {
+	// var fi os.FileInfo
+
+	// if fi, err = os.Stat(p); err != nil {
+	// 	if os.IsNotExist(err) {
+	// 		err = ErrNotInIndex(err)
+	// 	} else {
+	// 		err = errors.Error(err)
+	// 	}
+
+	// 	return
+	// }
+
+	return
+}
+
+func (s Store) Read(p string) (ez stored_zettel.External, err error) {
 	ez.Path = p
 
 	head, tail := id.HeadTailFromFileName(p)
