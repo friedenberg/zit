@@ -69,6 +69,8 @@ func (s Store) readFromIndex(p string) (ez stored_zettel.External, err error) {
 	// 	return
 	// }
 
+	// if fi.ModTime()
+
 	return
 }
 

@@ -3,6 +3,8 @@ package file_lock
 import (
 	"os"
 	"sync"
+
+	"github.com/friedenberg/zit/alfa/errors"
 )
 
 type Lock struct {
@@ -36,7 +38,12 @@ func (l *Lock) Lock() (err error) {
 	defer l.mutex.Unlock()
 
 	if l.f, err = _OpenFile(l.Path(), os.O_RDONLY|os.O_EXCL|os.O_CREATE, 755); err != nil {
-		err = _Errorf("lockfile already exists, unable to acquire lock: %w", err)
+		if os.IsNotExist(err) {
+			err = errors.Error(err)
+		} else {
+			err = errors.Errorf("lockfile already exists, unable to acquire lock: %w", err)
+		}
+
 		return
 	}
 
