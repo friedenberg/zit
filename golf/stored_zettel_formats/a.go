@@ -3,9 +3,8 @@ package stored_zettel_formats
 import (
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/node_type"
-	"github.com/friedenberg/zit/bezeichnung"
+	"github.com/friedenberg/zit/alfa/bezeichnung"
 	"github.com/friedenberg/zit/bravo/akte_ext"
-	"github.com/friedenberg/zit/bravo/line_format"
 	"github.com/friedenberg/zit/bravo/sha"
 	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/echo/zettel"
@@ -33,8 +32,7 @@ type (
 )
 
 var (
-	_Errorf              = errors.Errorf
-	_Error               = errors.Error
-	_LineFormatNewWriter = line_format.NewWriter
-	_EtikettNewSet       = etikett.NewSet
+	_Errorf        = errors.Errorf
+	_Error         = errors.Error
+	_EtikettNewSet = etikett.NewSet
 )

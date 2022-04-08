@@ -1,13 +1,12 @@
 package checkout_store
 
 import (
-	"strconv"
+	"encoding/json"
 	"strings"
 	"time"
 
 	"github.com/friedenberg/zit/alfa/errors"
-	"github.com/friedenberg/zit/bravo/sha"
-	"github.com/friedenberg/zit/charlie/hinweis"
+	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 )
 
 // type EntryType int
@@ -19,47 +18,29 @@ import (
 // )
 
 type Entry struct {
-	Time    time.Time
-	Hinweis hinweis.Hinweis
-	Sha     sha.Sha
+	ZettelTime time.Time
+	AkteTime   time.Time
+	External   stored_zettel.External
 }
 
 func (e Entry) String() string {
 	sb := &strings.Builder{}
-	sb.WriteString(e.Sha.String())
-	sb.WriteString(" ")
-	sb.WriteString(e.Hinweis.String())
-	sb.WriteString(" ")
-	sb.WriteString(strconv.FormatInt(e.Time.Unix(), 10))
+	var b []byte
+	var err error
+
+	if b, err = json.Marshal(e); err != nil {
+		panic(errors.Error(err))
+	}
+
+	sb.Write(b)
+
 	return sb.String()
 }
 
 func (e *Entry) Set(s string) (err error) {
-	elements := strings.Split(s, " ")
-
-	if len(elements) != 2 {
-		err = errors.Errorf("expected 2 elements, but got %d: %q", len(elements), elements)
-		return
-	}
-
-	if err = e.Sha.Set(elements[0]); err != nil {
+	if err = json.Unmarshal([]byte(s), &e); err != nil {
 		err = errors.Error(err)
-		return
 	}
-
-	if err = e.Hinweis.Set(elements[1]); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
-	var i int64
-
-	if i, err = strconv.ParseInt(elements[2], 10, 64); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
-	e.Time = time.Unix(i, 0)
 
 	return
 }

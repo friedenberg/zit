@@ -1,23 +1,29 @@
 package stored_zettel
 
+import (
+	"github.com/friedenberg/zit/bravo/sha"
+	"github.com/friedenberg/zit/charlie/hinweis"
+	"github.com/friedenberg/zit/echo/zettel"
+)
+
 type Stored struct {
-	Mutter _Sha
-	Kinder _Sha
-	Sha    _Sha
-	Zettel _Zettel
+	Mutter sha.Sha
+	Kinder sha.Sha
+	Sha    sha.Sha
+	Zettel zettel.Zettel
 }
 
 type Named struct {
 	Stored
-	Hinweis _Hinweis
+	Hinweis hinweis.Hinweis
 }
 
 type External struct {
 	Path     string
 	AktePath string
-	Hinweis  _Hinweis
-	Sha      _Sha
-	Zettel   _Zettel
+	Hinweis  hinweis.Hinweis
+	Sha      sha.Sha
+	Zettel   zettel.Zettel
 }
 
 type CheckedOut struct {

@@ -51,7 +51,7 @@ func (s Store) GetPossibleZettels() (hinweisen []string, err error) {
 				continue
 			}
 
-			//TODO hinweis validation?
+			//TODO-decision: should there be hinweis validation?
 			hinweisen = append(hinweisen, path.Join(d, a))
 		}
 	}

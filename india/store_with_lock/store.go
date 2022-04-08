@@ -18,7 +18,7 @@ type Store struct {
 	zettels        zettels.Zettels
 	akten          akten.Akten
 	age            age.Age
-	checkout_store checkout_store.Store
+	checkout_store *checkout_store.Store
 }
 
 func New(u *umwelt.Umwelt) (s Store, err error) {
@@ -73,7 +73,7 @@ func (s Store) Akten() akten.Akten {
 	return s.akten
 }
 
-func (s Store) CheckoutStore() checkout_store.Store {
+func (s Store) CheckoutStore() *checkout_store.Store {
 	return s.checkout_store
 }
 
@@ -88,7 +88,8 @@ func (s Store) Flush() (err error) {
 		return
 	}
 
-	//TODO always do this?
+	//explicitly do not unlock if there was an error to encourage user interaction
+	//and manual recovery
 	if err = s.lock.Unlock(); err != nil {
 		err = errors.Error(err)
 		return

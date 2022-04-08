@@ -1,7 +1,6 @@
 package umwelt
 
 import (
-	"fmt"
 	"io"
 	"os"
 
@@ -32,8 +31,6 @@ func MakeUmwelt(c konfig.Konfig) (u *Umwelt, err error) {
 		err = errors.Error(err)
 		return
 	}
-
-	fmt.Println(u.DirZit())
 
 	if u.cwd, err = os.Getwd(); err != nil {
 		err = errors.Error(err)

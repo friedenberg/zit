@@ -3,6 +3,7 @@ package commands
 import (
 	"flag"
 
+	"github.com/friedenberg/zit/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/juliett/user_ops"
 )
 
@@ -10,8 +11,6 @@ type Add struct {
 	Etiketten _EtikettSet
 	Delete    bool
 	Organize  bool
-	//TODO
-	// Edit      bool
 }
 
 func init() {
@@ -25,7 +24,6 @@ func init() {
 			f.Var(&c.Etiketten, "etiketten", "to add to the created zettels")
 			f.BoolVar(&c.Delete, "delete", false, "delete the zettel and akte after successful checkin")
 			f.BoolVar(&c.Organize, "organize", false, "")
-			// f.BoolVar(&c.Edit, "edit", false, "")
 
 			return c
 		},
@@ -65,11 +63,10 @@ func (c Add) Run(u _Umwelt, args ...string) (err error) {
 	}
 
 	openVimOp := user_ops.OpenVim{
-		Options: []string{
-			"set ft=zit.organize",
-			//TODO find a better solution for this
-			"source ~/.vim/syntax/zit.organize.vim",
-		},
+		Options: vim_cli_options_builder.New().
+			WithFileType("zit.organize").
+			WithSourcedFile("~/.vim/syntax/zit.organize.vim").
+			Build(),
 	}
 
 	if _, err = openVimOp.Run(createOrganizeFileResults.Path); err != nil {

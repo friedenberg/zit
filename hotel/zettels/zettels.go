@@ -87,7 +87,7 @@ func (zs *zettels) Konfig() _Konfig {
 	return zs.umwelt.Konfig
 }
 
-//TODO make flushing atomic
+//TODO-P0,D4 make flushing atomic
 func (zs *zettels) Flush() (err error) {
 	log.Print("flushing zettels")
 	if err = zs.store.Flush(); err != nil {
@@ -121,7 +121,7 @@ func (zs zettels) NewShard(p string, id string) (s _Shard, err error) {
 	return
 }
 
-//TODO move to store_with_lock
+//TODO-P2,D2 move to store_with_lock
 func (zs zettels) CreateWithHinweis(in _Zettel, h _Hinweis) (z _NamedZettel, err error) {
 	if in.IsEmpty() {
 		err = _ErrorNormal(_Errorf("zettel is empty"))
@@ -165,7 +165,7 @@ func (zs zettels) CreateWithHinweis(in _Zettel, h _Hinweis) (z _NamedZettel, err
 	return
 }
 
-//TODO move to store_with_lock
+//TODO-P1,D2 move to store_with_lock
 func (zs zettels) Create(in _Zettel) (z _NamedZettel, err error) {
 	if in.IsEmpty() {
 		err = _ErrorNormal(_Errorf("zettel is empty"))
@@ -211,7 +211,7 @@ func (zs zettels) Create(in _Zettel) (z _NamedZettel, err error) {
 	return
 }
 
-//TODO move to store_with_lock
+//TODO-P1,D3 move to store_with_lock
 func (zs zettels) Update(in _NamedZettel) (z _NamedZettel, err error) {
 	if in.Zettel.IsEmpty() {
 		err = _ErrorNormal(_Errorf("zettel is empty"))
@@ -262,7 +262,7 @@ func (zs zettels) Update(in _NamedZettel) (z _NamedZettel, err error) {
 	return
 }
 
-//TODO move to store_with_lock
+//TODO-P1,D3 move to store_with_lock
 func (zs zettels) Revert(h _Hinweis) (named _NamedZettel, err error) {
 	if named, err = zs.Read(h); err != nil {
 		err = _Error(err)

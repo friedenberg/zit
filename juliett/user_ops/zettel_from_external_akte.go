@@ -62,7 +62,7 @@ func (c ZettelFromExternalAkte) Run(args ...string) (results ZettelFromExternalA
 			stdprinter.Errf("[%s] (deleted)\n", arg)
 		}
 
-		//TODO only emit if created rather than refound
+		//TODO-P3,D3 only emit if created rather than refound
 		stdprinter.Outf("[%s %s] (created)\n", named.Hinweis, named.Sha)
 	}
 

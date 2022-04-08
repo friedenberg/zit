@@ -1,13 +1,21 @@
 package zettel
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/friedenberg/zit/alfa/bezeichnung"
+	"github.com/friedenberg/zit/bravo/akte_ext"
+	"github.com/friedenberg/zit/bravo/sha"
+	"github.com/friedenberg/zit/charlie/etikett"
+)
 
 type Zettel struct {
-	Akte    _Sha
-	AkteExt _AkteExt
-	//TODO make this a special etikett with different validation rules
-	Bezeichnung _Bezeichnung
-	Etiketten   _EtikettSet
+	Akte    sha.Sha
+	AkteExt akte_ext.AkteExt
+	//TODO-decision should this be a special etikett with different validation
+	//rules?
+	Bezeichnung bezeichnung.Bezeichnung
+	Etiketten   etikett.Set
 }
 
 func (z Zettel) Description() (d string) {

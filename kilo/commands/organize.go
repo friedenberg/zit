@@ -6,6 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/stdprinter"
+	"github.com/friedenberg/zit/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/golf/organize_text"
 	"github.com/friedenberg/zit/india/store_with_lock"
@@ -13,7 +14,6 @@ import (
 )
 
 type Organize struct {
-	Hinweisen     bool //TODO support
 	rootEtiketten _EtikettSet
 	GroupBy       _EtikettSet
 	GroupByUnique bool
@@ -63,11 +63,10 @@ func (c *Organize) Run(u _Umwelt, args ...string) (err error) {
 
 OPEN_VIM:
 	openVimOp := user_ops.OpenVim{
-		Options: []string{
-			"set ft=zit.organize",
-			//TODO find a better solution for this
-			"source ~/.vim/syntax/zit.organize.vim",
-		},
+		Options: vim_cli_options_builder.New().
+			WithFileType("zit.organize").
+			WithSourcedFile("~/.vim/syntax/zit.organize.vim").
+			Build(),
 	}
 
 	if _, err = openVimOp.Run(createOrganizeFileResults.Path); err != nil {

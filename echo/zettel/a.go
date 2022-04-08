@@ -1,7 +1,7 @@
 package zettel
 
 import (
-	"github.com/friedenberg/zit/bezeichnung"
+	"github.com/friedenberg/zit/alfa/bezeichnung"
 	"github.com/friedenberg/zit/bravo/akte_ext"
 	"github.com/friedenberg/zit/bravo/sha"
 	"github.com/friedenberg/zit/charlie/etikett"

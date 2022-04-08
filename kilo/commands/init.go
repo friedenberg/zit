@@ -31,7 +31,6 @@ func init() {
 	)
 }
 
-//TODO use args for kennung files
 func (c Init) Run(u _Umwelt, args ...string) (err error) {
 	base := u.DirZit()
 

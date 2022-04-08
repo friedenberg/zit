@@ -17,7 +17,6 @@ import (
 )
 
 type CreateFromPaths struct {
-	// Options _ZettelsCheckinOptions
 	Umwelt              *umwelt.Umwelt
 	Format              _ZettelFormatsText
 	Filter              _ScriptValue

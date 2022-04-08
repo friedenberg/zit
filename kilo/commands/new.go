@@ -3,6 +3,7 @@ package commands
 import (
 	"flag"
 
+	"github.com/friedenberg/zit/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/juliett/user_ops"
 )
 
@@ -51,13 +52,12 @@ func (c New) Run(u _Umwelt, args ...string) (err error) {
 		}
 
 		openVimOp := user_ops.OpenVim{
-			Options: []string{
-				//TODO move to builder
-				`call cursor(2, 3)`,
-				`startinsert!`,
-				"set ft=zit.zettel",
-				"source ~/.vim/syntax/zit.zettel.vim",
-			},
+			Options: vim_cli_options_builder.New().
+				WithCursorLocation(2, 3).
+				WithInsertMode().
+				WithFileType("zit.zettel").
+				WithSourcedFile("~/.vim/syntax/zit.zettel.vim").
+				Build(),
 		}
 
 		if _, err = openVimOp.Run(results.Zettel.Path); err != nil {

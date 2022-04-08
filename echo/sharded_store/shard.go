@@ -217,6 +217,7 @@ func (s shard) Flush() (err error) {
 		}
 	}
 
+	//TODO-research should the file be closed before being renamed???
 	log.Printf("renaming %s to %s", file.Name(), s.path)
 	if err = os.Rename(file.Name(), s.path); err != nil {
 		err = _Error(err)

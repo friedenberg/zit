@@ -9,7 +9,6 @@ import (
 )
 
 func (zs zettels) storeBaseZettel(z _StoredZettel) (sha _Sha, err error) {
-	//TODO confirm akte sha exists
 	sb := &strings.Builder{}
 	enc := base64.NewEncoder(base64.StdEncoding, sb)
 	hash := sha256.New()
