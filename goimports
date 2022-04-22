@@ -19,29 +19,24 @@ import (
 	"github.com/friedenberg/zit/foxtrot/zettel_formats"
 )
 
-type StoreZettel interface {
-	Read(id id.Id) (z stored_zettel.Named, err error)
-	zettel.AkteWriterFactory
-}
-
 type Store struct {
-	lock *file_lock.Lock
 	Konfig
-	format       zettel.Format
-	storeZettel  StoreZettel
-	path         string
-	entries      map[string]Entry
-	indexWasRead bool
-	hasChanges   bool
+	lock              *file_lock.Lock
+	format            zettel.Format
+	akteWriterFactory zettel.AkteWriterFactory
+	path              string
+	zettelen          map[string]Entry
+	indexWasRead      bool
+	hasChanges        bool
 }
 
-func New(k Konfig, p string, storeZettel StoreZettel) (s *Store, err error) {
+func New(k Konfig, p string, akteWriterFactory zettel.AkteWriterFactory) (s *Store, err error) {
 	s = &Store{
-		Konfig:      k,
-		format:      zettel_formats.Text{},
-		storeZettel: storeZettel,
-		path:        p,
-		entries:     make(map[string]Entry),
+		Konfig:            k,
+		format:            zettel_formats.Text{},
+		akteWriterFactory: akteWriterFactory,
+		path:              p,
+		zettelen:          make(map[string]Entry),
 	}
 
 	s.lock = file_lock.New(path.Join(p, ".ZitCheckoutStoreLock"))
@@ -61,7 +56,7 @@ func (s Store) IndexFilePath() string {
 func (s Store) flushToTemp() (tfp string, err error) {
 	var f *os.File
 
-	if f, err = open_file_guard.TempFile(); err != nil {
+	if f, err = open_file_guard.TempFileInDir(s.path); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -73,9 +68,8 @@ func (s Store) flushToTemp() (tfp string, err error) {
 	w := bufio.NewWriter(f)
 	defer w.Flush()
 
-	for p, e := range s.entries {
+	for p, e := range s.zettelen {
 		out := fmt.Sprintf("%s %s\n", p, e)
-		log.Printf("flushing zettel: %q", out)
 		w.WriteString(fmt.Sprint(out))
 	}
 
@@ -111,14 +105,14 @@ func (s *Store) ReadAll() (err error) {
 		return
 	}
 
-	var possible CwdFiles
+	var possible []string
 
 	if possible, err = s.GetPossibleZettels(); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	for _, p := range possible.Zettelen {
+	for _, p := range possible {
 		if err = s.syncOne(p); err != nil {
 			err = errors.Error(err)
 			return
@@ -147,17 +141,24 @@ func (s *Store) syncOne(p string) (err error) {
 
 	var cached Entry
 
-	cached, hasCache = s.entries[p]
+	cached, hasCache = s.zettelen[p]
 
 	if !hasCache && !hasFs {
 		log.Print(p, ": no cache, no fs")
 		return
 	} else if hasCache {
 		log.Print(p, ": cache, no fs: deleting")
-		delete(s.entries, p)
+		delete(s.zettelen, p)
 	} else {
 		log.Print(p, ": cache, fs")
-		if !hasCache || fi.ModTime().After(cached.Time) {
+
+		zettelNewerThanCache := fi.ModTime().After(cached.ZettelTime)
+		akteNewerThanCache := fi.ModTime().After(cached.AkteTime)
+
+		log.Print("zettelNewerThanCache: ", zettelNewerThanCache)
+		log.Print("akteNewerThanCache: ", akteNewerThanCache)
+
+		if !hasCache || zettelNewerThanCache || akteNewerThanCache {
 			var ez stored_zettel.External
 
 			if ez, err = s.readZettelFromFile(p); err != nil {
@@ -165,9 +166,9 @@ func (s *Store) syncOne(p string) (err error) {
 				return
 			}
 
-			s.entries[p] = Entry{
-				Time: fi.ModTime(),
-				Sha:  ez.Sha,
+			s.zettelen[p] = Entry{
+				ZettelTime: fi.ModTime(),
+				External:   ez,
 			}
 
 			s.hasChanges = true
@@ -189,7 +190,7 @@ func (s Store) readZettelFromFile(p string) (ez stored_zettel.External, err erro
 	}
 
 	c := zettel.FormatContextRead{
-		AkteWriterFactory: s.storeZettel,
+		AkteWriterFactory: s.akteWriterFactory,
 	}
 
 	var f *os.File
@@ -239,27 +240,16 @@ func (s *Store) Read(p string) (ez stored_zettel.External, err error) {
 		var cached Entry
 		var hasEntry bool
 
-		if cached, hasEntry = s.entries[p]; !hasEntry {
+		if cached, hasEntry = s.zettelen[p]; !hasEntry {
 			log.Printf("cached not found: %s\n", p)
-			log.Printf("%#v", s.entries)
+			log.Printf("%#v", s.zettelen)
 			err = ErrNotInIndex(nil)
 			return
 		}
 
-		var named stored_zettel.Named
-
-		if named, err = s.storeZettel.Read(cached.Sha); err != nil {
-			err = errors.Error(err)
-			return
-		}
-
-		ez = stored_zettel.External{
-			Path:    p,
-			Hinweis: named.Hinweis,
-			Sha:     named.Sha,
-			Zettel:  named.Zettel,
-		}
+		ez = cached.External
 	} else {
+		ez, err = s.readZettelFromFile(p)
 	}
 
 	return

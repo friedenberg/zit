@@ -25,8 +25,13 @@ func (f Text) writeToOmitAkte(c _ZettelFormatContextWrite) (n int64, err error) 
 
 	w.WriteLines(
 		MetadateiBoundary,
-		fmt.Sprintf("# %s", c.Zettel.Bezeichnung),
 	)
+
+	if c.Zettel.Bezeichnung.String() != "" || !f.DoNotWriteEmptyBezeichnung {
+		w.WriteLines(
+			fmt.Sprintf("# %s", c.Zettel.Bezeichnung),
+		)
+	}
 
 	for _, e := range c.Zettel.Etiketten.Sorted() {
 		w.WriteFormat("- %s", e)
@@ -58,7 +63,6 @@ func (f Text) writeToOmitAkte(c _ZettelFormatContextWrite) (n int64, err error) 
 }
 
 func (f Text) writeToInlineAkte(c _ZettelFormatContextWrite) (n int64, err error) {
-	log.Print()
 	w := _LineFormatNewWriter()
 
 	w.WriteLines(

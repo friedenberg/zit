@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/bravo/open_file_guard"
 )
 
 type Lock struct {
@@ -37,7 +38,7 @@ func (l *Lock) Lock() (err error) {
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
 
-	if l.f, err = _OpenFile(l.Path(), os.O_RDONLY|os.O_EXCL|os.O_CREATE, 755); err != nil {
+	if l.f, err = open_file_guard.OpenFile(l.Path(), os.O_RDONLY|os.O_EXCL|os.O_CREATE, 755); err != nil {
 		if os.IsNotExist(err) {
 			err = errors.Error(err)
 		} else {
@@ -54,15 +55,15 @@ func (l *Lock) Unlock() (err error) {
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
 
-	if err = _Close(l.f); err != nil {
-		err = _Error(err)
+	if err = open_file_guard.Close(l.f); err != nil {
+		err = errors.Error(err)
 		return
 	}
 
 	l.f = nil
 
 	if err = os.Remove(l.Path()); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 

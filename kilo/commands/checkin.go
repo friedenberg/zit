@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
+	"github.com/friedenberg/zit/golf/checkout_store"
 	"github.com/friedenberg/zit/juliett/user_ops"
 )
 
@@ -36,14 +37,14 @@ func (c Checkin) Run(u _Umwelt, args ...string) (err error) {
 			_Errf("Ignoring args because -all is set\n")
 		}
 
-		var possibleHinweisen []string
+		var possible checkout_store.CwdFiles
 
-		if possibleHinweisen, err = user_ops.NewGetPossibleZettels(u).Run(); err != nil {
+		if possible, err = user_ops.NewGetPossibleZettels(u).Run(); err != nil {
 			err = errors.Error(err)
 			return
 		}
 
-		args = possibleHinweisen
+		args = possible.Zettelen
 	}
 
 	checkinOptions := _ZettelsCheckinOptions{

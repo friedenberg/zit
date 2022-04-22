@@ -15,6 +15,16 @@ func TempFile() (f *os.File, err error) {
 	return
 }
 
+func TempFileInDir(dir string) (f *os.File, err error) {
+	openFilesGuardInstance.Lock()
+
+	if f, err = ioutil.TempFile(dir, ""); err != nil {
+		openFilesGuardInstance.Unlock()
+	}
+
+	return
+}
+
 func TempFileWithPattern(pattern string) (f *os.File, err error) {
 	openFilesGuardInstance.Lock()
 

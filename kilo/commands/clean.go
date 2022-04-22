@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/golf/checkout_store"
 	"github.com/friedenberg/zit/juliett/user_ops"
 )
 
@@ -26,14 +27,14 @@ func (c Clean) Run(u _Umwelt, args ...string) (err error) {
 		_Errf("args provided will be ignored")
 	}
 
-	var possibleHinweisen []string
+	var possible checkout_store.CwdFiles
 
-	if possibleHinweisen, err = user_ops.NewGetPossibleZettels(u).Run(); err != nil {
+	if possible, err = user_ops.NewGetPossibleZettels(u).Run(); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	args = possibleHinweisen
+	args = possible.Zettelen
 
 	checkinOptions := _ZettelsCheckinOptions{
 		IncludeAkte: true,

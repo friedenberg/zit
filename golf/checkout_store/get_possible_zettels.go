@@ -8,8 +8,14 @@ import (
 	"github.com/friedenberg/zit/bravo/open_file_guard"
 )
 
-func (s Store) GetPossibleZettels() (hinweisen []string, err error) {
-	hinweisen = make([]string, 0)
+type CwdFiles struct {
+	Zettelen []string
+	Akten    []string
+}
+
+func (s Store) GetPossibleZettels() (result CwdFiles, err error) {
+	result.Zettelen = make([]string, 0)
+	result.Akten = make([]string, 0)
 
 	var dirs []string
 
@@ -47,12 +53,14 @@ func (s Store) GetPossibleZettels() (hinweisen []string, err error) {
 				continue
 			}
 
-			if path.Ext(a) != ".md" {
-				continue
-			}
-
 			//TODO-decision: should there be hinweis validation?
-			hinweisen = append(hinweisen, path.Join(d, a))
+
+			//TODO-refactor: akten vs zettel file extensions
+			if path.Ext(a) == ".md" {
+				result.Zettelen = append(result.Zettelen, path.Join(d, a))
+			} else {
+				result.Akten = append(result.Akten, path.Join(d, a))
+			}
 		}
 	}
 

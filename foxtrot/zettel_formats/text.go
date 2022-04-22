@@ -9,13 +9,18 @@ import (
 	"path"
 	"reflect"
 	"strings"
+
+	"github.com/friedenberg/zit/bravo/sha"
+	"github.com/friedenberg/zit/echo/zettel"
 )
 
 const (
 	MetadateiBoundary = "---"
 )
 
-type Text struct{}
+type Text struct {
+	DoNotWriteEmptyBezeichnung bool
+}
 
 type textStateReadField int
 
@@ -44,8 +49,8 @@ type textStateRead struct {
 	field                   textStateReadField
 	lastFieldWasBezeichnung bool
 	didReadAkte             bool
-	metadataiAkteSha        _Sha
-	readAkteSha             _Sha
+	metadataiAkteSha        sha.Sha
+	readAkteSha             sha.Sha
 	akteWriter              _ObjekteWriter
 }
 
@@ -63,7 +68,7 @@ func (s *textStateRead) Close() (err error) {
 }
 
 type textStateWrite struct {
-	_Zettel
+	zettel.Zettel
 }
 
 func (f Text) ReadFrom(c *_ZettelFormatContextRead) (n int64, err error) {
@@ -159,9 +164,9 @@ func (f Text) ReadFrom(c *_ZettelFormatContextRead) (n int64, err error) {
 
 			if c.AktePath != "" {
 				c.RecoverableError = ErrHasInlineAkteAndFilePath{
-					_Zettel:            c.Zettel,
+					Zettel:             c.Zettel,
 					_AkteWriterFactory: c,
-					_Sha:               state.readAkteSha,
+					Sha:                state.readAkteSha,
 					FilePath:           c.AktePath,
 				}
 
@@ -187,6 +192,7 @@ func (f Text) ReadFrom(c *_ZettelFormatContextRead) (n int64, err error) {
 		}
 	}
 
+	//TODO outsource this to a context method to allow for injection
 	if c.AktePath != "" {
 		var f *os.File
 
@@ -207,13 +213,16 @@ func (f Text) ReadFrom(c *_ZettelFormatContextRead) (n int64, err error) {
 }
 
 func (f Text) readMetadateiLine(state *textStateRead, line string) (err error) {
-	if len(line) < 2 {
+	if len(line) < 1 {
 		err = _Errorf("line isn't long enough: %q", line)
 		return
 	}
 
 	head := line[:2]
 	tail := line[2:]
+
+	log.Print(head)
+	log.Print(tail)
 
 	switch head {
 	case "# ":

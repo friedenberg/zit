@@ -86,7 +86,7 @@ func Run(args []string) (err error) {
 	}
 
 	if len(os.Args) == 1 {
-		return cmd.PrintUsage(errors.Errorf("No subcommand profided."))
+		return cmd.PrintUsage(errors.Errorf("No subcommand provided."))
 	}
 
 	cmds := Commands()

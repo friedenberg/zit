@@ -1,14 +1,12 @@
--e
-zit$
--e
-\.git/
--e
-zit-go-tmp-umask$
--e
-\.zit/
--e
+
+EXCLUDES:
 \.DS_Store
--e
+zit/.git/
+zit/\.zit/
 build/
---
-go build -o build/zit ./.; and go test ./...; and go install ./.
+zit/zit$
+
+COMMAND:
+go build -o build/zit ./.
+go test ./...
+go install ./.

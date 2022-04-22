@@ -40,6 +40,14 @@ func (es Set) AddString(v string) (err error) {
 }
 
 func (es Set) Add(e Etikett) {
+	expanded := e.Expanded(ExpanderRight{})
+	intersection := es.Intersect(expanded)
+	es.Remove(intersection.Etiketten()...)
+
+	es.addOnlyExact(e)
+}
+
+func (es Set) addOnlyExact(e Etikett) {
 	es[e.String()] = e
 }
 
@@ -56,8 +64,10 @@ func (s *Set) Set(v string) (err error) {
 	return
 }
 
-func (es Set) Remove(e Etikett) {
-	delete(es, e.String())
+func (es Set) Remove(es1 ...Etikett) {
+	for _, e := range es1 {
+		delete(es, e.String())
+	}
 }
 
 func (a Set) Equals(b Set) bool {
@@ -106,7 +116,7 @@ func (s Set) Strings() (out []string) {
 	return
 }
 
-func (es Set) Sorted() (out []Etikett) {
+func (es Set) Etiketten() (out []Etikett) {
 	out = make([]Etikett, len(es))
 
 	i := 0
@@ -115,6 +125,12 @@ func (es Set) Sorted() (out []Etikett) {
 		out[i] = e
 		i++
 	}
+
+	return
+}
+
+func (es Set) Sorted() (out []Etikett) {
+	out = es.Etiketten()
 
 	sort.Slice(
 		out,

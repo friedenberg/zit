@@ -1,8 +1,8 @@
 package organize_text
 
 import (
-	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/bezeichnung"
+	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/bravo/line_format"
 	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/charlie/hinweis"

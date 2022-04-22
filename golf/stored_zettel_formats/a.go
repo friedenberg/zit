@@ -1,9 +1,9 @@
 package stored_zettel_formats
 
 import (
+	"github.com/friedenberg/zit/alfa/bezeichnung"
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/node_type"
-	"github.com/friedenberg/zit/alfa/bezeichnung"
 	"github.com/friedenberg/zit/bravo/akte_ext"
 	"github.com/friedenberg/zit/bravo/sha"
 	"github.com/friedenberg/zit/charlie/etikett"

@@ -56,3 +56,19 @@ func (e *Etikett) Set(v string) (err error) {
 func (a Etikett) Equals(b Etikett) bool {
 	return a.Value == b.Value
 }
+
+func (e Etikett) Expanded(exes ...Expander) (expanded Set) {
+	expanded = NewSet()
+
+	if len(exes) == 0 {
+		exes = []Expander{ExpanderAll{}}
+	}
+
+	for _, ex := range exes {
+		for _, e := range ex.Expand(e) {
+			expanded.addOnlyExact(e)
+		}
+	}
+
+	return
+}

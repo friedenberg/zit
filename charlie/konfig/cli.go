@@ -9,11 +9,12 @@ import (
 )
 
 type Cli struct {
-	BasePath            string
-	Debug               bool
-	Verbose             bool
-	DryRun              bool
-	AllowMissingHinweis bool
+	BasePath             string
+	Debug                bool
+	Verbose              bool
+	DryRun               bool
+	AllowMissingHinweis  bool
+	CheckoutCacheEnabled bool
 }
 
 func (c *Cli) AddToFlags(f *flag.FlagSet) {
@@ -21,6 +22,7 @@ func (c *Cli) AddToFlags(f *flag.FlagSet) {
 	f.BoolVar(&c.Debug, "debug", false, "")
 	f.BoolVar(&c.Verbose, "verbose", false, "")
 	f.BoolVar(&c.DryRun, "dry-run", false, "")
+	f.BoolVar(&c.CheckoutCacheEnabled, "checkout-cache-enabled", false, "")
 	f.BoolVar(&c.AllowMissingHinweis, "allow-missing-hinweis", false, "")
 }
 

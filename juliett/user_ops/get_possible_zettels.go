@@ -3,6 +3,7 @@ package user_ops
 import (
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/delta/umwelt"
+	"github.com/friedenberg/zit/golf/checkout_store"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
@@ -16,7 +17,7 @@ func NewGetPossibleZettels(u *umwelt.Umwelt) GetPossibleZettels {
 	}
 }
 
-func (uo GetPossibleZettels) Run() (hinweisen []string, err error) {
+func (uo GetPossibleZettels) Run() (result checkout_store.CwdFiles, err error) {
 	var store store_with_lock.Store
 
 	if store, err = store_with_lock.New(uo.umwelt); err != nil {
@@ -26,7 +27,7 @@ func (uo GetPossibleZettels) Run() (hinweisen []string, err error) {
 
 	defer errors.PanicIfError(store.Flush)
 
-	hinweisen, err = store.CheckoutStore().GetPossibleZettels()
+	result, err = store.CheckoutStore().GetPossibleZettels()
 
 	return
 }

@@ -45,7 +45,11 @@ func New(u *umwelt.Umwelt) (s Store, err error) {
 		return
 	}
 
-	if s.checkout_store, err = checkout_store.New(u.Cwd(), s.zettels); err != nil {
+	csk := checkout_store.Konfig{
+		CacheEnabled: u.Konfig.CheckoutCacheEnabled,
+	}
+
+	if s.checkout_store, err = checkout_store.New(csk, u.Cwd(), s.zettels); err != nil {
 		err = errors.Error(err)
 		return
 	}

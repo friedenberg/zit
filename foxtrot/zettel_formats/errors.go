@@ -4,12 +4,15 @@ import (
 	"fmt"
 	"io"
 	"os"
+
+	"github.com/friedenberg/zit/bravo/sha"
+	"github.com/friedenberg/zit/echo/zettel"
 )
 
 type ErrHasInlineAkteAndFilePath struct {
 	FilePath string
-	_Zettel
-	_Sha
+	zettel.Zettel
+	sha.Sha
 	_AkteWriterFactory
 }
 
@@ -20,7 +23,7 @@ func (e ErrHasInlineAkteAndFilePath) Error() string {
 	)
 }
 
-func (e ErrHasInlineAkteAndFilePath) Recover() (z _Zettel, err error) {
+func (e ErrHasInlineAkteAndFilePath) Recover() (z zettel.Zettel, err error) {
 	if e._AkteWriterFactory == nil {
 		err = _Errorf("akte writer factory is nil")
 		return
@@ -47,7 +50,7 @@ func (e ErrHasInlineAkteAndFilePath) Recover() (z _Zettel, err error) {
 		return
 	}
 
-	z = e._Zettel
+	z = e.Zettel
 	z.Akte = akteWriter.Sha()
 
 	return
