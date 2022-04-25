@@ -1,6 +1,10 @@
 package errors
 
-import "golang.org/x/xerrors"
+import (
+	"log"
+
+	"golang.org/x/xerrors"
+)
 
 func As(err error, target interface{}) bool {
 	return xerrors.As(err, target)
@@ -19,6 +23,7 @@ func PanicIfError(err interface{}) {
 	case func() error:
 		PanicIfError(t())
 	case error:
-		panic(err)
+		log.Output(2, t.Error())
+		panic(t)
 	}
 }

@@ -27,7 +27,10 @@ func (uo GetPossibleZettels) Run() (result checkout_store.CwdFiles, err error) {
 
 	defer errors.PanicIfError(store.Flush)
 
-	result, err = store.CheckoutStore().GetPossibleZettels()
+	if result, err = store.CheckoutStore().GetPossibleZettels(); err != nil {
+		err = errors.Error(err)
+		return
+	}
 
 	return
 }

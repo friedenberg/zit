@@ -1,6 +1,8 @@
 package store_with_lock
 
 import (
+	"log"
+
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/charlie/age"
 	"github.com/friedenberg/zit/charlie/file_lock"
@@ -49,7 +51,9 @@ func New(u *umwelt.Umwelt) (s Store, err error) {
 		CacheEnabled: u.Konfig.CheckoutCacheEnabled,
 	}
 
+  log.Print("initing checkout store")
 	if s.checkout_store, err = checkout_store.New(csk, u.Cwd(), s.zettels); err != nil {
+		log.Print(err)
 		err = errors.Error(err)
 		return
 	}

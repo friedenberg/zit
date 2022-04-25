@@ -40,7 +40,7 @@ func (op ReadCheckedOut) Run(paths ...string) (results ReadCheckedOutResults, er
 
 		checked_out.External, err = store.CheckoutStore().Read(p)
 
-		if op.Options.IgnoreMissingHinweis && errors.Is(os.ErrNotExist, err) {
+		if op.Options.IgnoreMissingHinweis && errors.Is(err, os.ErrNotExist) {
 			err = nil
 			//results.Zettelen[ez.Hinweis] = stored_zettel.External{}
 			continue

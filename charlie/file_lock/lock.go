@@ -1,6 +1,8 @@
 package file_lock
 
 import (
+	"io/fs"
+	"log"
 	"os"
 	"sync"
 
@@ -38,11 +40,12 @@ func (l *Lock) Lock() (err error) {
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
 
+	log.Output(2, "locking "+l.Path())
 	if l.f, err = open_file_guard.OpenFile(l.Path(), os.O_RDONLY|os.O_EXCL|os.O_CREATE, 755); err != nil {
-		if os.IsNotExist(err) {
-			err = errors.Error(err)
+		if errors.Is(err, fs.ErrExist) {
+			err = errors.Errorf("lockfile already exists, unable to acquire lock: %s", l.Path())
 		} else {
-			err = errors.Errorf("lockfile already exists, unable to acquire lock: %w", err)
+			err = errors.Error(err)
 		}
 
 		return
@@ -55,6 +58,7 @@ func (l *Lock) Unlock() (err error) {
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
 
+	log.Output(2, "unlocking "+l.Path())
 	if err = open_file_guard.Close(l.f); err != nil {
 		err = errors.Error(err)
 		return

@@ -178,6 +178,18 @@ func (s *Store) syncOne(p string) (err error) {
 }
 
 func (s Store) readZettelFromFile(p string) (ez stored_zettel.External, err error) {
+	if !files.Exists(p) {
+    //if the path does not have an extension, try looking for a file with that
+    //extension
+    //TODO modify this to use globs
+		if filepath.Ext(p) == "" {
+			return s.readZettelFromFile(p + ".md")
+		}
+
+		err = os.ErrNotExist
+		return
+	}
+
 	log.Print(p, ": reading from fs")
 	ez.Path = p
 
@@ -193,11 +205,6 @@ func (s Store) readZettelFromFile(p string) (ez stored_zettel.External, err erro
 	}
 
 	var f *os.File
-
-	if !files.Exists(p) {
-		err = os.ErrNotExist
-		return
-	}
 
 	if f, err = os.Open(p); err != nil {
 		err = errors.Error(err)
@@ -260,6 +267,10 @@ func (s *Store) Read(p string) (ez stored_zettel.External, err error) {
 			Zettel:  named.Zettel,
 		}
 	} else {
+		if ez, err = s.readZettelFromFile(p); err != nil {
+			err = errors.Errorf("%s: %w", p, err)
+			return
+		}
 	}
 
 	return
