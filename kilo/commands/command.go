@@ -18,8 +18,16 @@ type Command interface {
 	Run(_Umwelt, ...string) error
 }
 
+type CommandWithValidation interface {
+	ValidateArgs(...string) error
+}
+
 type CommandSupportingErrors interface {
 	HandleError(_Umwelt, error)
+}
+
+type CommandWithArgPreprocessor interface {
+	PreprocessArgs(_Umwelt) ([]string, error)
 }
 
 type command struct {
@@ -76,7 +84,7 @@ func Run(args []string) (err error) {
 	var cmd command
 
 	if err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -104,7 +112,7 @@ func Run(args []string) (err error) {
 	konfigCli.AddToFlags(cmd.FlagSet)
 
 	if err = cmd.FlagSet.Parse(args); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -116,19 +124,26 @@ func Run(args []string) (err error) {
 	var k _Konfig
 
 	if k, err = konfigCli.Konfig(); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
 	var u _Umwelt
 
 	if u, err = umwelt.MakeUmwelt(k); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
+	if t, ok := cmd.Command.(CommandWithValidation); ok {
+		if err = t.ValidateArgs(cmd.FlagSet.Args()...); err != nil {
+			err = errors.Error(err)
+			return
+		}
+	}
+
 	if err = cmd.Command.Run(u, cmd.FlagSet.Args()...); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 

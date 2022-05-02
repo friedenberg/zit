@@ -12,12 +12,8 @@ func (s Set) Len() int {
 	return len(s)
 }
 
-func NewSet() Set {
-	return make(Set)
-}
-
-func NewSetFromSlice(es []Etikett) (s Set) {
-	s = NewSet()
+func NewSet(es ...Etikett) (s Set) {
+	s = make(Set)
 
 	for _, e := range es {
 		s.Add(e)
@@ -68,6 +64,11 @@ func (es Set) Remove(es1 ...Etikett) {
 	for _, e := range es1 {
 		delete(es, e.String())
 	}
+}
+
+func (es Set) RemovePrefixes(e Etikett) {
+	prefixes := es.IntersectPrefixes(NewSet(e))
+	es.Remove(prefixes.Etiketten()...)
 }
 
 func (a Set) Equals(b Set) bool {

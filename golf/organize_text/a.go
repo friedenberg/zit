@@ -26,10 +26,9 @@ type (
 )
 
 var (
-	_Error                  = errors.Error
-	_HinweisNewEmpty        = hinweis.NewEmpty
-	_Errorf                 = errors.Errorf
-	_LineFormatNewWriter    = line_format.NewWriter
-	_EtikettNewSetFromSlice = etikett.NewSetFromSlice
-	_EtikettNewSet          = etikett.NewSet
+	_Error               = errors.Error
+	_HinweisNewEmpty     = hinweis.NewEmpty
+	_Errorf              = errors.Errorf
+	_LineFormatNewWriter = line_format.NewWriter
+	_EtikettNewSet       = etikett.NewSet
 )

@@ -4,11 +4,6 @@ import (
 	"os"
 )
 
-type CheckedOutZettel struct {
-	Path     string
-	AktePath string
-}
-
 //TODO move to user_ops
 func (zs *zettels) Checkout(options CheckinOptions, args ...string) (czs []_ZettelCheckedOut, err error) {
 	var hins []_Hinweis

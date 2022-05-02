@@ -1,22 +1,20 @@
 package stored_zettel
 
-type FilterEtikettSet _EtikettSet
+import "github.com/friedenberg/zit/charlie/etikett"
 
-func (f FilterEtikettSet) IncludeNamedZettel(z Named) bool {
-	ft := _EtikettSet(f)
-	set := z.Zettel.Etiketten.IntersectPrefixes(ft)
-	//by checking equal or greater than, we include zettels that have multiple
-	//matches to the original set
-	return set.Len() >= ft.Len()
+type FilterEtikettSet struct {
+	Or bool
+	etikett.Set
 }
 
-// func (f FilterEtikettSet) Set(v string) (err error) {
-// 	ft := _EtikettSet(f)
+func (f FilterEtikettSet) IncludeNamedZettel(z Named) bool {
+	set := z.Zettel.Etiketten.IntersectPrefixes(f.Set)
 
-// 	if err = ft.Set(v); err != nil {
-// 		err = _Error(err)
-// 		return
-// 	}
-
-// 	return
-// }
+	if f.Or {
+		return set.Len() > 0
+	} else {
+		//by checking equal or greater than, we include zettels that have multiple
+		//matches to the original set
+		return set.Len() >= f.Set.Len()
+	}
+}

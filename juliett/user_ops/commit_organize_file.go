@@ -80,7 +80,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 			return
 		}
 
-		z.Zettel.Etiketten.Remove(e)
+		z.Zettel.Etiketten.RemovePrefixes(e)
 		toUpdate[z.Hinweis.String()] = z
 
 		_Outf("Removed etikett '%s' from zettel '%s'\n", e, z.Hinweis)

@@ -7,15 +7,15 @@ import (
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/alfa/vim_cli_options_builder"
+	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/golf/organize_text"
-	"github.com/friedenberg/zit/india/store_with_lock"
 	"github.com/friedenberg/zit/juliett/user_ops"
 )
 
 type Organize struct {
-	rootEtiketten _EtikettSet
-	GroupBy       _EtikettSet
+	rootEtiketten etikett.Set
+	GroupBy       etikett.Set
 	GroupByUnique bool
 }
 
@@ -47,16 +47,18 @@ func (c *Organize) Run(u _Umwelt, args ...string) (err error) {
 		return
 	}
 
-	var zettels map[string]_NamedZettel
+	var getResults user_ops.GetZettelsFromQueryResults
 
-	if zettels, err = c.getZettels(u, createOrganizeFileOp.RootEtiketten); err != nil {
+	getOp := user_ops.GetZettelsFromQuery{Umwelt: u}
+
+	if getResults, err = getOp.Run(stored_zettel.FilterEtikettSet{Set: createOrganizeFileOp.RootEtiketten}); err != nil {
 		err = _Error(err)
 		return
 	}
 
 	var createOrganizeFileResults user_ops.CreateOrgaanizeFileResults
 
-	if createOrganizeFileResults, err = createOrganizeFileOp.Run(zettels); err != nil {
+	if createOrganizeFileResults, err = createOrganizeFileOp.Run(getResults.Zettelen); err != nil {
 		err = _Error(err)
 		return
 	}
@@ -100,7 +102,7 @@ OPEN_VIM:
 	return
 }
 
-func (c Organize) getEtikettenFromArgs(args []string) (es _EtikettSet, err error) {
+func (c Organize) getEtikettenFromArgs(args []string) (es etikett.Set, err error) {
 	es = _EtikettNewSet()
 
 	for _, s := range args {
@@ -108,24 +110,6 @@ func (c Organize) getEtikettenFromArgs(args []string) (es _EtikettSet, err error
 			err = _Error(err)
 			return
 		}
-	}
-
-	return
-}
-
-func (c Organize) getZettels(u _Umwelt, rootEtiketten _EtikettSet) (zettels map[string]_NamedZettel, err error) {
-	var store store_with_lock.Store
-
-	if store, err = store_with_lock.New(u); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
-	defer errors.PanicIfError(store.Flush)
-
-	if zettels, err = store.Zettels().Query(stored_zettel.FilterEtikettSet(rootEtiketten)); err != nil {
-		err = _Error(err)
-		return
 	}
 
 	return
