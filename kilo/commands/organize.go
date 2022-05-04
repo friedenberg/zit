@@ -47,7 +47,7 @@ func (c *Organize) Run(u _Umwelt, args ...string) (err error) {
 		return
 	}
 
-	var getResults user_ops.GetZettelsFromQueryResults
+	var getResults user_ops.ZettelResults
 
 	getOp := user_ops.GetZettelsFromQuery{Umwelt: u}
 

@@ -11,11 +11,7 @@ type GetZettelsFromQuery struct {
 	Umwelt *umwelt.Umwelt
 }
 
-type GetZettelsFromQueryResults struct {
-	Zettelen map[string]stored_zettel.Named
-}
-
-func (c GetZettelsFromQuery) Run(query stored_zettel.NamedFilter) (result GetZettelsFromQueryResults, err error) {
+func (c GetZettelsFromQuery) Run(query stored_zettel.NamedFilter) (result ZettelResults, err error) {
 	var store store_with_lock.Store
 
 	if store, err = store_with_lock.New(c.Umwelt); err != nil {

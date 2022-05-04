@@ -17,6 +17,18 @@ setup() {
 	export output
 }
 
+cat_yin() (
+	echo "one"
+	echo "two"
+	echo "three"
+)
+
+cat_yang() (
+	echo "uno"
+	echo "dos"
+	echo "tres"
+)
+
 function can_run_zit { # @test
 	run zit
 }
@@ -27,47 +39,28 @@ function provides_help_with_no_params { # @test
 }
 
 function can_initialize_without_age { # @test
-	yin="$(mktemp)"
-	{
-		echo "one"
-		echo "two"
-		echo "three"
-	} >>"$yin"
-
-	yang="$(mktemp)"
-	{
-		echo "uno"
-		echo "dos"
-		echo "tres"
-	} >>"$yang"
-
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run zit init -disable-age -yin "$yin" -yang "$yang"
+	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
 	[ -d .zit/ ]
 	[ ! -f .zit/AgeIdentity ]
 }
 
-function can_new_zettel { # @test
-	yin="$(mktemp)"
-	{
-		echo "one"
-		echo "two"
-		echo "three"
-	} >>"$yin"
-
-	yang="$(mktemp)"
-	{
-		echo "uno"
-		echo "dos"
-		echo "tres"
-	} >>"$yang"
-
+function can_initialize_with_age { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run zit init -disable-age -yin "$yin" -yang "$yang"
+	run zit init -yin <(cat_yin) -yang <(cat_yang)
+	[ -d .zit/ ]
+	[ -f .zit/AgeIdentity ]
+}
+
+function can_new_zettel { # @test
+	wd="$(mktemp -d)"
+	cd "$wd" || exit 1
+
+	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
 
 	to_add="$(mktemp)"
 	{
@@ -85,24 +78,10 @@ function can_new_zettel { # @test
 }
 
 function can_checkout_and_checkin { # @test
-	yin="$(mktemp)"
-	{
-		echo "one"
-		echo "two"
-		echo "three"
-	} >>"$yin"
-
-	yang="$(mktemp)"
-	{
-		echo "uno"
-		echo "dos"
-		echo "tres"
-	} >>"$yang"
-
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run zit init -disable-age -yin "$yin" -yang "$yang"
+	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
 
 	to_add="$(mktemp)"
 	{
@@ -131,4 +110,26 @@ function can_checkout_and_checkin { # @test
 	run zit checkin one/uno
 	assert_output --partial '[one/uno '
 	assert_output --partial '(updated)'
+}
+
+function can_checkout_via_etiketten { # @test
+	wd="$(mktemp -d)"
+	cd "$wd" || exit 1
+
+	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+
+	to_add="$(mktemp)"
+	{
+		echo "---"
+		echo "# wow"
+		echo "- ok"
+		echo "---"
+	} >>"$to_add"
+
+	run zit new "$to_add"
+	assert_output --partial '[one/uno '
+
+	run zit checkout -etiketten ok
+	assert_output --partial '[one/uno '
+	assert_output --partial '(checked out)'
 }
