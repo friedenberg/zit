@@ -1,4 +1,4 @@
 #! /bin/bash -e
 
- git add .
- git commit -m update --no-gpg-sign
+git add .
+git commit -m update
