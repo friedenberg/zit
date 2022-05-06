@@ -2,12 +2,14 @@ package organize_text
 
 import (
 	"io"
+
+	"github.com/friedenberg/zit/foxtrot/zettel_formats"
 )
 
 func (ot organizeText) WriteTo(out io.Writer) (n int64, err error) {
 	w := _LineFormatNewWriter()
 
-	w.WriteLines(_MetadateiBoundary)
+	w.WriteLines(zettel_formats.MetadateiBoundary)
 
 	if len(ot.etiketten) > 0 {
 		for _, e := range ot.etiketten {
@@ -17,7 +19,7 @@ func (ot organizeText) WriteTo(out io.Writer) (n int64, err error) {
 		w.WriteLines("*")
 	}
 
-	w.WriteLines(_MetadateiBoundary)
+	w.WriteLines(zettel_formats.MetadateiBoundary)
 	w.WriteEmpty()
 
 	n, err = w.WriteTo(out)

@@ -2,8 +2,11 @@ package commands
 
 import (
 	"flag"
+	"os"
 
+	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/vim_cli_options_builder"
+	"github.com/friedenberg/zit/bravo/open_file_guard"
 	"github.com/friedenberg/zit/juliett/user_ops"
 )
 
@@ -37,10 +40,10 @@ func (c Add) Run(u _Umwelt, args ...string) (err error) {
 		Delete:    c.Delete,
 	}
 
-	var zettelsFromAkteResults user_ops.ZettelFromExternalAkteResults
+	var zettelsFromAkteResults user_ops.ZettelResults
 
 	if zettelsFromAkteResults, err = zettelsFromAkteOp.Run(args...); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -55,10 +58,17 @@ func (c Add) Run(u _Umwelt, args ...string) (err error) {
 		GroupByUnique: true,
 	}
 
-	var createOrganizeFileResults user_ops.CreateOrgaanizeFileResults
+	var createOrganizeFileResults user_ops.CreateOrganizeFileResults
 
-	if createOrganizeFileResults, err = createOrganizeFileOp.Run(zettelsFromAkteResults.Zettelen); err != nil {
-		err = _Error(err)
+	var f *os.File
+
+	if f, err = open_file_guard.TempFileWithPattern("*.md"); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	if createOrganizeFileResults, err = createOrganizeFileOp.RunAndWrite(zettelsFromAkteResults, f); err != nil {
+		err = errors.Error(err)
 		return
 	}
 
@@ -69,8 +79,8 @@ func (c Add) Run(u _Umwelt, args ...string) (err error) {
 			Build(),
 	}
 
-	if _, err = openVimOp.Run(createOrganizeFileResults.Path); err != nil {
-		err = _Error(err)
+	if _, err = openVimOp.Run(f.Name()); err != nil {
+		err = errors.Error(err)
 		return
 	}
 
@@ -78,8 +88,8 @@ func (c Add) Run(u _Umwelt, args ...string) (err error) {
 
 	readOrganizeTextOp := user_ops.ReadOrganizeFile{}
 
-	if ot2, err = readOrganizeTextOp.Run(createOrganizeFileResults.Path); err != nil {
-		err = _Error(err)
+	if ot2, err = readOrganizeTextOp.RunWithFile(f.Name()); err != nil {
+		err = errors.Error(err)
 		return
 	}
 
@@ -88,7 +98,7 @@ func (c Add) Run(u _Umwelt, args ...string) (err error) {
 	}
 
 	if _, err = commitOrganizeTextOp.Run(createOrganizeFileResults.Text, ot2); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 

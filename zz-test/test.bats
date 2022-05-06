@@ -133,3 +133,54 @@ function can_checkout_via_etiketten { # @test
 	assert_output --partial '[one/uno '
 	assert_output --partial '(checked out)'
 }
+
+function can_output_organize { # @test
+	wd="$(mktemp -d)"
+	cd "$wd" || exit 1
+
+	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+
+	to_add="$(mktemp)"
+	{
+		echo "---"
+		echo "# wow"
+		echo "- ok"
+		echo "---"
+	} >>"$to_add"
+
+	run zit new "$to_add"
+	assert_output --partial '[one/uno '
+
+	expected_organize="$(mktemp)"
+	{
+		echo "---"
+		echo "* ok"
+		echo "---"
+		echo ""
+		echo "- [one/uno] wow"
+	} >>"$expected_organize"
+
+	run zit organize -group-by-unique ok
+	assert_output "$(cat "$expected_organize")"
+
+	{
+		echo "---"
+		echo "* wow"
+		echo "---"
+		echo ""
+		echo "- [one/uno] wow"
+	} >"$expected_organize"
+
+	run zit organize -group-by-unique ok <"$expected_organize"
+
+	expected_zettel="$(mktemp)"
+	{
+		echo "---"
+		echo "# wow"
+		echo "- wow"
+		echo "---"
+	} >>"$expected_zettel"
+
+	run zit show one/uno
+	assert_output "$(cat "$expected_zettel")"
+}

@@ -8,11 +8,6 @@ import (
 	"github.com/friedenberg/zit/charlie/hinweis"
 	zettel1 "github.com/friedenberg/zit/echo/zettel"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
-	"github.com/friedenberg/zit/foxtrot/zettel_formats"
-)
-
-const (
-	_MetadateiBoundary = zettel_formats.MetadateiBoundary
 )
 
 type (

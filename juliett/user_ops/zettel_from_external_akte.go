@@ -20,11 +20,7 @@ type ZettelFromExternalAkte struct {
 	Delete    bool
 }
 
-type ZettelFromExternalAkteResults struct {
-	Zettelen map[string]_NamedZettel
-}
-
-func (c ZettelFromExternalAkte) Run(args ...string) (results ZettelFromExternalAkteResults, err error) {
+func (c ZettelFromExternalAkte) Run(args ...string) (results ZettelResults, err error) {
 	var store store_with_lock.Store
 
 	if store, err = store_with_lock.New(c.Umwelt); err != nil {
@@ -34,7 +30,7 @@ func (c ZettelFromExternalAkte) Run(args ...string) (results ZettelFromExternalA
 
 	defer errors.PanicIfError(store.Flush)
 
-	results.Zettelen = make(map[string]_NamedZettel, len(args))
+	results.SetNamed = make(map[string]_NamedZettel, len(args))
 
 	for _, arg := range args {
 		var z _Zettel
@@ -51,7 +47,7 @@ func (c ZettelFromExternalAkte) Run(args ...string) (results ZettelFromExternalA
 			return
 		}
 
-		results.Zettelen[named.Hinweis.String()] = named
+		results.SetNamed[named.Hinweis.String()] = named
 
 		if c.Delete {
 			if err = os.Remove(arg); err != nil {

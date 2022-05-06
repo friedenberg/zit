@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"io"
 	"strings"
+
+	"github.com/friedenberg/zit/foxtrot/zettel_formats"
 )
 
 type metadateiReader struct {
@@ -37,9 +39,9 @@ func (ot *organizeText) ReadFrom(r1 io.Reader) (n int64, err error) {
 
 		s = strings.TrimSuffix(s, "\n")
 
-		if !within && s == _MetadateiBoundary {
+		if !within && s == zettel_formats.MetadateiBoundary {
 			within = true
-		} else if within && s != _MetadateiBoundary {
+		} else if within && s != zettel_formats.MetadateiBoundary {
 			slen := len(s)
 
 			if slen < 1 {
@@ -73,7 +75,7 @@ func (ot *organizeText) ReadFrom(r1 io.Reader) (n int64, err error) {
 
 			line += 1
 
-		} else if within && s == _MetadateiBoundary {
+		} else if within && s == zettel_formats.MetadateiBoundary {
 			within = false
 
 		} else {

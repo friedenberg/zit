@@ -3,15 +3,13 @@ package open_file_guard
 import (
 	"os"
 	"os/exec"
+
+	"golang.org/x/sys/unix"
 )
 
-func IsTty() (ok bool) {
-	cmd := exec.Command("tty", "-s")
-	cmd.Stdin = os.Stdin
-
-	if err := cmd.Run(); err == nil {
-		ok = true
-	}
+func IsTty(f *os.File) (ok bool) {
+	_, err := unix.IoctlGetTermios(int(f.Fd()), unix.TIOCGETA)
+	ok = err == nil
 
 	return
 }
@@ -21,7 +19,7 @@ func OpenVimWithArgs(args []string, files ...string) (err error) {
 
 	args = append(args, "-p")
 
-	if IsTty() {
+	if IsTty(os.Stdin) {
 		cmd = exec.Command(
 			"vim",
 			append(args, files...)...,

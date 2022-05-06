@@ -3,10 +3,12 @@ package commands
 import (
 	"flag"
 	"fmt"
+	"os"
 
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/alfa/vim_cli_options_builder"
+	"github.com/friedenberg/zit/bravo/open_file_guard"
 	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/golf/organize_text"
@@ -24,7 +26,7 @@ func init() {
 		"organize",
 		func(f *flag.FlagSet) Command {
 			c := &Organize{
-				GroupBy: _EtikettNewSet(),
+				GroupBy: etikett.NewSet(),
 			}
 
 			f.BoolVar(&c.GroupByUnique, "group-by-unique", false, "group by all unique combinations of etiketten")
@@ -43,7 +45,7 @@ func (c *Organize) Run(u _Umwelt, args ...string) (err error) {
 	}
 
 	if createOrganizeFileOp.RootEtiketten, err = c.getEtikettenFromArgs(args); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -51,19 +53,95 @@ func (c *Organize) Run(u _Umwelt, args ...string) (err error) {
 
 	getOp := user_ops.GetZettelsFromQuery{Umwelt: u}
 
-	if getResults, err = getOp.Run(stored_zettel.FilterEtikettSet{Set: createOrganizeFileOp.RootEtiketten}); err != nil {
-		err = _Error(err)
+	query := stored_zettel.FilterEtikettSet{Set: createOrganizeFileOp.RootEtiketten}
+
+	if getResults, err = getOp.Run(query); err != nil {
+		err = errors.Error(err)
 		return
 	}
 
-	var createOrganizeFileResults user_ops.CreateOrgaanizeFileResults
+	stdoutIsTty := open_file_guard.IsTty(os.Stdout)
+	stdinIsTty := open_file_guard.IsTty(os.Stdin)
 
-	if createOrganizeFileResults, err = createOrganizeFileOp.Run(getResults.Zettelen); err != nil {
-		err = _Error(err)
-		return
+	if !stdinIsTty && !stdoutIsTty {
+		//generate organize, read from stdin,  commit
+
+		createOrganizeFileResults := user_ops.CreateOrganizeFileResults{}
+
+		var f *os.File
+
+		if f, err = open_file_guard.TempFileWithPattern("*.md"); err != nil {
+			err = _Error(err)
+			return
+		}
+
+		if createOrganizeFileResults, err = createOrganizeFileOp.RunAndWrite(getResults, f); err != nil {
+			err = errors.Error(err)
+			return
+		}
+
+		var ot2 organize_text.Text
+
+		readOrganizeTextOp := user_ops.ReadOrganizeFile{
+			Reader: os.Stdin,
+		}
+
+		if ot2, err = readOrganizeTextOp.Run(); err != nil {
+			err = errors.Error(err)
+			return
+		}
+
+		commitOrganizeTextOp := user_ops.CommitOrganizeFile{
+			Umwelt: u,
+		}
+
+		if _, err = commitOrganizeTextOp.Run(createOrganizeFileResults.Text, ot2); err != nil {
+			err = errors.Error(err)
+			return
+		}
+	} else if !stdoutIsTty {
+		//generate organize file and write to stdout
+		if _, err = createOrganizeFileOp.RunAndWrite(getResults, os.Stdout); err != nil {
+			err = errors.Error(err)
+			return
+		}
+	} else {
+		//generate temp file, write organize, open vim to edit, commit results
+		createOrganizeFileResults := user_ops.CreateOrganizeFileResults{}
+
+		var f *os.File
+
+		if f, err = open_file_guard.TempFileWithPattern("*.md"); err != nil {
+			err = _Error(err)
+			return
+		}
+
+		if createOrganizeFileResults, err = createOrganizeFileOp.RunAndWrite(getResults, f); err != nil {
+			err = errors.Error(err)
+			return
+		}
+
+		var ot2 organize_text.Text
+
+		if ot2, err = c.readFromVim(f.Name(), createOrganizeFileResults); err != nil {
+			err = errors.Error(err)
+			return
+		}
+
+		commitOrganizeTextOp := user_ops.CommitOrganizeFile{
+			Umwelt: u,
+		}
+
+		if _, err = commitOrganizeTextOp.Run(createOrganizeFileResults.Text, ot2); err != nil {
+			err = errors.Error(err)
+			return
+		}
 	}
 
-OPEN_VIM:
+	return
+}
+
+func (c Organize) readFromVim(f string, results user_ops.CreateOrganizeFileResults) (ot organize_text.Text, err error) {
 	openVimOp := user_ops.OpenVim{
 		Options: vim_cli_options_builder.New().
 			WithFileType("zit.organize").
@@ -71,43 +149,32 @@ OPEN_VIM:
 			Build(),
 	}
 
-	if _, err = openVimOp.Run(createOrganizeFileResults.Path); err != nil {
-		err = _Error(err)
+	if _, err = openVimOp.Run(f); err != nil {
+		err = errors.Error(err)
 		return
 	}
 
-	var ot2 _OrganizeText
-
 	readOrganizeTextOp := user_ops.ReadOrganizeFile{}
 
-	if ot2, err = readOrganizeTextOp.Run(createOrganizeFileResults.Path); err != nil {
+	if ot, err = readOrganizeTextOp.RunWithFile(f); err != nil {
 		if c.handleReadChangesError(err) {
 			err = nil
-			goto OPEN_VIM
+			ot, err = c.readFromVim(f, results)
 		} else {
 			stdprinter.Errf("aborting organize\n")
 			return
 		}
 	}
 
-	commitOrganizeTextOp := user_ops.CommitOrganizeFile{
-		Umwelt: u,
-	}
-
-	if _, err = commitOrganizeTextOp.Run(createOrganizeFileResults.Text, ot2); err != nil {
-		err = _Error(err)
-		return
-	}
-
 	return
 }
 
 func (c Organize) getEtikettenFromArgs(args []string) (es etikett.Set, err error) {
-	es = _EtikettNewSet()
+	es = etikett.NewSet()
 
 	for _, s := range args {
 		if err = es.AddString(s); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 	}

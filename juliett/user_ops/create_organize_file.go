@@ -1,13 +1,11 @@
 package user_ops
 
 import (
-	"os"
+	"io"
 
 	"github.com/friedenberg/zit/alfa/errors"
-	"github.com/friedenberg/zit/bravo/open_file_guard"
 	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/delta/umwelt"
-	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/golf/organize_text"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
@@ -19,12 +17,24 @@ type CreateOrganizeFile struct {
 	GroupByUnique bool
 }
 
-type CreateOrgaanizeFileResults struct {
-	Path string
+type CreateOrganizeFileResults struct {
 	Text organize_text.Text
 }
 
-func (c CreateOrganizeFile) Run(zettels map[string]stored_zettel.Named) (results CreateOrgaanizeFileResults, err error) {
+func (c CreateOrganizeFile) RunAndWrite(zettels ZettelResults, w io.WriteCloser) (results CreateOrganizeFileResults, err error) {
+	results, err = c.Run(zettels)
+
+	defer errors.PanicIfError(w.Close)
+
+	if _, err = results.Text.WriteTo(w); err != nil {
+		err = _Error(err)
+		return
+	}
+
+	return
+}
+
+func (c CreateOrganizeFile) Run(zettels ZettelResults) (results CreateOrganizeFileResults, err error) {
 	var store store_with_lock.Store
 
 	if store, err = store_with_lock.New(c.Umwelt); err != nil {
@@ -40,33 +50,7 @@ func (c CreateOrganizeFile) Run(zettels map[string]stored_zettel.Named) (results
 		RootEtiketten: c.RootEtiketten,
 	}
 
-	if results.Text, err = organize_text.New(options, zettels); err != nil {
-		err = _Error(err)
-		return
-	}
-
-	err = func() (err error) {
-		var f *os.File
-
-		if f, err = open_file_guard.TempFileWithPattern("*.md"); err != nil {
-			err = _Error(err)
-			return
-		}
-
-		defer open_file_guard.Close(f)
-
-		if _, err = results.Text.WriteTo(f); err != nil {
-			err = _Error(err)
-			return
-		}
-
-		results.Path = f.Name()
-
-		return
-	}()
-	//TODO remove temp
-
-	if err != nil {
+	if results.Text, err = organize_text.New(options, zettels.SetNamed); err != nil {
 		err = _Error(err)
 		return
 	}

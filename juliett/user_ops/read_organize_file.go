@@ -1,6 +1,7 @@
 package user_ops
 
 import (
+	"io"
 	"os"
 
 	"github.com/friedenberg/zit/bravo/open_file_guard"
@@ -8,9 +9,10 @@ import (
 )
 
 type ReadOrganizeFile struct {
+	io.Reader
 }
 
-func (c ReadOrganizeFile) Run(p string) (ot organize_text.Text, err error) {
+func (c ReadOrganizeFile) RunWithFile(p string) (ot organize_text.Text, err error) {
 	var f *os.File
 
 	if f, err = open_file_guard.Open(p); err != nil {
@@ -20,9 +22,17 @@ func (c ReadOrganizeFile) Run(p string) (ot organize_text.Text, err error) {
 
 	defer open_file_guard.Close(f)
 
+	c.Reader = f
+	ot, err = c.Run()
+	c.Reader = nil
+
+	return
+}
+
+func (c ReadOrganizeFile) Run() (ot organize_text.Text, err error) {
 	ot = organize_text.NewEmpty()
 
-	_, err = ot.ReadFrom(f)
+	_, err = ot.ReadFrom(c.Reader)
 
 	return
 }
