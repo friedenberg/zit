@@ -5,6 +5,8 @@ import (
 	"io"
 	"strings"
 
+	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/foxtrot/zettel_formats"
 )
 
@@ -16,7 +18,7 @@ type metadateiReader struct {
 func (ot *organizeText) ReadFrom(r1 io.Reader) (n int64, err error) {
 	r := bufio.NewReader(r1)
 
-	ot.etiketten = _EtikettNewSet()
+	ot.etiketten = etikett.NewSet()
 
 	within := false
 	line := 0
@@ -31,7 +33,7 @@ func (ot *organizeText) ReadFrom(r1 io.Reader) (n int64, err error) {
 		}
 
 		if err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 
@@ -64,12 +66,12 @@ func (ot *organizeText) ReadFrom(r1 io.Reader) (n int64, err error) {
 				}
 
 				if err = ot.etiketten.AddString(v); err != nil {
-					err = _Error(err)
+					err = errors.Error(err)
 					return
 				}
 
 			default:
-				err = _Errorf("unsupported verb '%q', '%q'", p, s)
+				err = errors.Errorf("unsupported verb '%q', '%q'", p, s)
 				return
 			}
 
@@ -82,7 +84,7 @@ func (ot *organizeText) ReadFrom(r1 io.Reader) (n int64, err error) {
 			var n1 int64
 
 			if n1, err = ot.zettels.ReadFrom(r); err != nil {
-				err = _Error(err)
+				err = errors.Error(err)
 				return
 			}
 

@@ -3,11 +3,13 @@ package organize_text
 import (
 	"io"
 
+	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/bravo/line_format"
 	"github.com/friedenberg/zit/foxtrot/zettel_formats"
 )
 
 func (ot organizeText) WriteTo(out io.Writer) (n int64, err error) {
-	w := _LineFormatNewWriter()
+	w := line_format.NewWriter()
 
 	w.WriteLines(zettel_formats.MetadateiBoundary)
 
@@ -27,7 +29,7 @@ func (ot organizeText) WriteTo(out io.Writer) (n int64, err error) {
 	var n1 int64
 
 	if n1, err = ot.zettels.WriteTo(out); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 

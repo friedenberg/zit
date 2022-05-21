@@ -2,6 +2,8 @@ package organize_text
 
 import (
 	"strings"
+
+	"github.com/friedenberg/zit/charlie/etikett"
 )
 
 type Change struct {
@@ -11,7 +13,7 @@ type Change struct {
 type Changes struct {
 	Added   []Change
 	Removed []Change
-	New     map[string]_EtikettSet
+	New     map[string]etikett.Set
 }
 
 func (a1 *organizeText) ChangesFrom(b1 Text) (c Changes) {
@@ -77,13 +79,13 @@ func (a1 *organizeText) ChangesFrom(b1 Text) (c Changes) {
 		)
 	}
 
-	c.New = make(map[string]_EtikettSet)
+	c.New = make(map[string]etikett.Set)
 
 	addNew := func(bez, ett string) {
 		existing, ok := c.New[bez]
 
 		if !ok {
-			existing = _EtikettNewSet()
+			existing = etikett.NewSet()
 		}
 
 		existing.AddString(ett)

@@ -1,16 +1,21 @@
 package organize_text
 
+import (
+	"github.com/friedenberg/zit/charlie/etikett"
+	"github.com/friedenberg/zit/foxtrot/stored_zettel"
+)
+
 type Grouper interface {
-	GroupZettel(_NamedZettel) []_EtikettSet
+	GroupZettel(stored_zettel.Named) []etikett.Set
 }
 
 type Sorter interface {
-	SortGroups(_EtikettSet, _EtikettSet) bool
-	SortZettels(_NamedZettel, _NamedZettel) bool
+	SortGroups(etikett.Set, etikett.Set) bool
+	SortZettels(stored_zettel.Named, stored_zettel.Named) bool
 }
 
 type Options struct {
-	RootEtiketten _EtikettSet
+	RootEtiketten etikett.Set
 	Grouper
 	Sorter
 }

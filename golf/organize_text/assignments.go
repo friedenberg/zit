@@ -6,6 +6,11 @@ import (
 	"io"
 	"sort"
 	"strings"
+
+	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/bravo/line_format"
+	"github.com/friedenberg/zit/charlie/etikett"
+	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 )
 
 type assignments struct {
@@ -20,7 +25,7 @@ func newEtikettToZettels() assignments {
 	}
 }
 
-func (zs assignments) AddStored(e string, z _NamedZettel) {
+func (zs assignments) AddStored(e string, z stored_zettel.Named) {
 	d := z.Zettel.Description()
 	// d = fmt.Sprintf("%s %s", z.Sha.String()[:7], d)
 	zs.Add(e, z.Hinweis.String(), d)
@@ -69,7 +74,7 @@ func (zs assignments) sorted() (sorted []string) {
 }
 
 func (zs assignments) WriteTo(out io.Writer) (n int64, err error) {
-	w := _LineFormatNewWriter()
+	w := line_format.NewWriter()
 
 	for _, e := range zs.sorted() {
 		ezs := zs.etikettenToExisting[e]
@@ -108,7 +113,7 @@ func (zs *assignments) ReadFrom(r1 io.Reader) (n int64, err error) {
 		}
 
 		if err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 
@@ -131,7 +136,7 @@ func (zs *assignments) ReadFrom(r1 io.Reader) (n int64, err error) {
 		switch p {
 
 		case '#':
-			currentEtikett := _EtikettNewSet()
+			currentEtikett := etikett.NewSet()
 
 			if v == "" {
 				currentEtikettString = ""
@@ -175,7 +180,7 @@ func (zs *assignments) ReadFrom(r1 io.Reader) (n int64, err error) {
 
 		default:
 			err = ErrorRead{
-				error:  _Errorf("unsupported verb %q, %q", p, s),
+				error:  errors.Errorf("unsupported verb %q, %q", p, s),
 				line:   lineNo,
 				column: 0,
 			}

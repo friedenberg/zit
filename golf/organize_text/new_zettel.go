@@ -1,5 +1,7 @@
 package organize_text
 
+import "github.com/friedenberg/zit/alfa/errors"
+
 type newZettel struct {
 	bezeichnung string
 }
@@ -12,7 +14,7 @@ func (z *newZettel) Set(v string) (err error) {
 	remaining := v
 
 	if remaining[:2] != "- " {
-		err = _Errorf("expected '- ', but got '%s'", remaining[:2])
+		err = errors.Errorf("expected '- ', but got '%s'", remaining[:2])
 		return
 	}
 

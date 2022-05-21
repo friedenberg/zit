@@ -3,6 +3,8 @@ package organize_text
 import (
 	"fmt"
 	"strings"
+
+	"github.com/friedenberg/zit/alfa/errors"
 )
 
 type zettel struct {
@@ -18,7 +20,7 @@ func (z *zettel) Set(v string) (err error) {
 	remaining := v
 
 	if remaining[:3] != "- [" {
-		err = _Errorf("expected '- [', but got '%s'", remaining[:2])
+		err = errors.Errorf("expected '- [', but got '%s'", remaining[:2])
 		return
 	}
 
@@ -27,7 +29,7 @@ func (z *zettel) Set(v string) (err error) {
 	idx := -1
 
 	if idx = strings.Index(remaining, "]"); idx == -1 {
-		err = _Errorf("expected ']' after hinweis, but not found")
+		err = errors.Errorf("expected ']' after hinweis, but not found")
 		return
 	}
 
