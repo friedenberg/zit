@@ -371,14 +371,24 @@ OUTER:
 
 		prefixes := named.Zettel.Etiketten.Expanded(_EtikettExpanderRight{})
 
+		log.Print(zs.umwelt.Konfig.Tags)
+		log.Print(prefixes)
+		log.Print(named.Zettel.Etiketten)
+
 	INNER:
 		for tn, tv := range zs.umwelt.Konfig.Tags {
 			if !tv.Hide {
-				log.Printf("hiding %s due to %s", named.Hinweis, tn)
+        log.Print("not hidden, checking next tag")
 				continue INNER
 			}
 
+      log.Print("checking for hide matches")
+      log.Print(tn)
+      log.Print(prefixes)
+      log.Print(prefixes.ContainsString(tn))
+
 			if prefixes.ContainsString(tn) {
+				log.Printf("hiding %s due to %s", named.Hinweis, tn)
 				continue OUTER
 			}
 		}

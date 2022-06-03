@@ -74,7 +74,7 @@ function can_new_zettel { # @test
 	assert_output --partial '[one/uno '
 
 	run zit show one/uno
-	[ "$(cat "$to_add")" = "$output" ]
+	assert_output "$(cat "$to_add")"
 }
 
 function can_checkout_and_checkin { # @test
@@ -183,4 +183,62 @@ function can_output_organize { # @test
 
 	run zit show one/uno
 	assert_output "$(cat "$expected_zettel")"
+}
+
+function hides_hidden_etiketten_from_organize { # @test
+	wd="$(mktemp -d)"
+	cd "$wd" || exit 1
+
+	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+
+	{
+		echo "[tags.zz-archive]"
+		echo "hide = true"
+	} >>.zit/Konfig
+
+	to_add="$(mktemp)"
+	{
+		echo ---
+		echo "# split hinweis for usability"
+		echo - project-2021-zit
+		echo - zz-archive-task-done
+		echo ! md
+		echo ---
+	} >>"$to_add"
+
+	run zit new "$to_add"
+	assert_output --partial '[one/uno '
+
+	expected_organize="$(mktemp)"
+	{
+		echo "---"
+		echo "* project-2021-zit"
+		echo "---"
+		echo ""
+	} >>"$expected_organize"
+
+	run zit organize -group-by-unique project-2021-zit
+	assert_output "$(cat "$expected_organize")"
+}
+
+function can_new_zettel_with_metadatei { # @test
+	wd="$(mktemp -d)"
+	cd "$wd" || exit 1
+
+	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+
+	expected="$(mktemp)"
+	{
+		echo ---
+		echo "# bez"
+		echo - et1
+		echo - et2
+		echo ! md
+		echo ---
+	} >>"$expected"
+
+	run zit new -bezeichnung bez -etiketten et1,et2
+	assert_output --partial '[one/uno '
+
+	[ "$(cat "$expected")" = "$(cat one/uno.md)" ]
 }

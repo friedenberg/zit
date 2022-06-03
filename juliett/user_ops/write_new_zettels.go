@@ -4,29 +4,21 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/alfa/errors"
-	"github.com/friedenberg/zit/bravo/akte_ext"
 	"github.com/friedenberg/zit/bravo/id"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
-	"github.com/friedenberg/zit/charlie/etikett"
-	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/echo/zettel"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
-type WriteEmptyZettel struct {
-	// Options _ZettelsCheckinOptions
+type WriteNewZettels struct {
 	Umwelt *umwelt.Umwelt
 	Format zettel.Format
 	Filter _ScriptValue
 }
 
-type WriteEmptyZettelResults struct {
-	Zettel stored_zettel.External
-}
-
-func (c WriteEmptyZettel) Run() (results WriteEmptyZettelResults, err error) {
+func (c WriteNewZettels) Run(zettelen ...zettel.Zettel) (results stored_zettel.SetExternal, err error) {
 	var store store_with_lock.Store
 
 	if store, err = store_with_lock.New(c.Umwelt); err != nil {
@@ -36,13 +28,6 @@ func (c WriteEmptyZettel) Run() (results WriteEmptyZettelResults, err error) {
 
 	defer errors.PanicIfError(store.Flush)
 
-	var hinweis hinweis.Hinweis
-
-	if hinweis, err = store.Hinweisen().Factory().Make(); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
 	var dir string
 
 	if dir, err = os.Getwd(); err != nil {
@@ -50,9 +35,31 @@ func (c WriteEmptyZettel) Run() (results WriteEmptyZettelResults, err error) {
 		return
 	}
 
+	results = stored_zettel.MakeSetExternal()
+
+	for _, z := range zettelen {
+		var external stored_zettel.External
+
+		if external, err = c.runOne(store, dir, z); err != nil {
+			err = errors.Error(err)
+			return
+		}
+
+		results[external.Hinweis.String()] = external
+	}
+
+	return
+}
+
+func (c WriteNewZettels) runOne(store store_with_lock.Store, dir string, z zettel.Zettel) (result stored_zettel.External, err error) {
+	if result.Hinweis, err = store.Hinweisen().Factory().Make(); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
 	var filename string
 
-	if filename, err = id.MakeDirIfNecessary(hinweis, dir); err != nil {
+	if filename, err = id.MakeDirIfNecessary(result.Hinweis, dir); err != nil {
 		err = _Error(err)
 		return
 	}
@@ -68,30 +75,13 @@ func (c WriteEmptyZettel) Run() (results WriteEmptyZettelResults, err error) {
 
 	defer open_file_guard.Close(f)
 
-	results.Zettel.Path = f.Name()
-
-	etiketten := etikett.NewSet()
-
-	for e, t := range c.Umwelt.Konfig.Tags {
-		if !t.AddToNewZettels {
-			continue
-		}
-
-		if err = etiketten.AddString(e); err != nil {
-			err = _Error(err)
-			return
-		}
-	}
-
-	results.Zettel.Zettel = zettel.Zettel{
-		Etiketten: etiketten,
-		AkteExt:   akte_ext.AkteExt{Value: "md"},
-	}
+	result.Path = f.Name()
+	result.Zettel = z
 
 	ctx := zettel.FormatContextWrite{
 		Out:               f,
 		AkteReaderFactory: store.Zettels(),
-		Zettel:            results.Zettel.Zettel,
+		Zettel:            result.Zettel,
 	}
 
 	if _, err = c.Format.WriteTo(ctx); err != nil {

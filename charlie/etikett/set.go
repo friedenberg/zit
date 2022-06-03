@@ -2,6 +2,7 @@ package etikett
 
 import (
 	"encoding/json"
+	"log"
 	"sort"
 	"strings"
 )
@@ -96,9 +97,12 @@ func (s Set) Expanded(exes ...Expander) (s1 Set) {
 
 	for _, e := range s {
 		for _, e1 := range e.Expanded(exes...) {
-			s1.Add(e1)
+			log.Print(e1)
+			s1.addOnlyExact(e1)
 		}
 	}
+
+	log.Print(s1)
 
 	return
 }

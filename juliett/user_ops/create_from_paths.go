@@ -18,7 +18,7 @@ import (
 
 type CreateFromPaths struct {
 	Umwelt              *umwelt.Umwelt
-	Format              _ZettelFormatsText
+	Format              zettel.Format
 	Filter              _ScriptValue
 	ReadHinweisFromPath bool
 }
