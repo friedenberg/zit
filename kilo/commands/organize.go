@@ -71,7 +71,7 @@ func (c *Organize) Run(u _Umwelt, args ...string) (err error) {
 		var f *os.File
 
 		if f, err = open_file_guard.TempFileWithPattern("*.md"); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 
@@ -112,7 +112,7 @@ func (c *Organize) Run(u _Umwelt, args ...string) (err error) {
 		var f *os.File
 
 		if f, err = open_file_guard.TempFileWithPattern("*.md"); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 

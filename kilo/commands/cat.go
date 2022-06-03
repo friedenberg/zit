@@ -5,6 +5,7 @@ import (
 	"flag"
 	"log"
 
+	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
@@ -54,7 +55,7 @@ func (c Cat) etiketten(store store_with_lock.Store) (err error) {
 	var ea []_Etikett
 
 	if ea, err = store.Etiketten().All(); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -83,7 +84,7 @@ func (c Cat) zettelen(store store_with_lock.Store) (err error) {
 	var all map[string]_NamedZettel
 
 	if all, err = store.Zettels().All(); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -124,7 +125,7 @@ func (c Cat) akten(store store_with_lock.Store) (err error) {
 	var shas []_Sha
 
 	if shas, err = store.Akten().All(); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -140,7 +141,7 @@ func (c Cat) hinweisen(store store_with_lock.Store) (err error) {
 	var shas []_Sha
 
 	if shas, hins, err = store.Hinweisen().All(); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -155,7 +156,7 @@ func (c Cat) all(store store_with_lock.Store) (err error) {
 	var hins []_Hinweis
 
 	if _, hins, err = store.Hinweisen().All(); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -163,7 +164,7 @@ func (c Cat) all(store store_with_lock.Store) (err error) {
 
 	for i, h := range hins {
 		if chains[i], err = store.Zettels().AllInChain(h); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 	}

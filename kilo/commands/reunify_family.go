@@ -3,6 +3,7 @@ package commands
 import (
 	"flag"
 
+	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
@@ -28,12 +29,12 @@ func (c ReunifyFamily) RunWithZettel(store store_with_lock.Store, zettel ..._Nam
 	kinder.Mutter = mutter.Sha
 
 	if err = store.Zettels().UpdateNoKinder(mutter); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
 	if err = store.Zettels().UpdateNoKinder(kinder); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 

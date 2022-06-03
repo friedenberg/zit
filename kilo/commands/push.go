@@ -5,6 +5,8 @@ import (
 	"flag"
 	"os"
 	"os/exec"
+
+	"github.com/friedenberg/zit/alfa/errors"
 )
 
 type Push struct {
@@ -23,14 +25,14 @@ func init() {
 
 func (c Push) Run(u _Umwelt, args ...string) (err error) {
 	if len(args) == 0 {
-		err = _Errorf("no remote specified")
+		err = errors.Errorf("no remote specified")
 		return
 	}
 
 	var remote _RemoteScript
 
 	if remote, err = c.remoteScriptFromArg(u, args[0]); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -43,7 +45,7 @@ func (c Push) Run(u _Umwelt, args ...string) (err error) {
 	// var hins []_Hinweis
 
 	// if _, hins, err = zs.Hinweisen().All(); err != nil {
-	// 	err = _Error(err)
+	// 	err = errors.Error(err)
 	// 	return
 	// }
 
@@ -51,7 +53,7 @@ func (c Push) Run(u _Umwelt, args ...string) (err error) {
 
 	// for i, h := range hins {
 	// 	if chains[i], err = zs.AllInChain(h); err != nil {
-	// 		err = _Error(err)
+	// 		err = errors.Error(err)
 	// 		return
 	// 	}
 	// }
@@ -65,7 +67,7 @@ func (c Push) Run(u _Umwelt, args ...string) (err error) {
 	b := []byte{}
 
 	if err = c.runRemoteScript(u, remote, args, b); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -79,7 +81,7 @@ func (c Push) remoteScriptFromArg(u _Umwelt, arg string) (remote _RemoteScript, 
 		p := u.DirZit("bin", arg)
 
 		if !_FilesExist(p) {
-			err = _Errorf("remote not defined: '%s'", arg)
+			err = errors.Errorf("remote not defined: '%s'", arg)
 			return
 		}
 
@@ -95,7 +97,7 @@ func (c Push) runRemoteScript(u _Umwelt, remote _RemoteScript, args []string, b 
 	var script *exec.Cmd
 
 	if script, err = remote.Cmd(append([]string{"push"}, args...)); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -106,7 +108,7 @@ func (c Push) runRemoteScript(u _Umwelt, remote _RemoteScript, args []string, b 
 	script.Stdin = r
 
 	if err = script.Run(); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 

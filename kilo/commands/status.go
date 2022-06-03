@@ -49,7 +49,7 @@ func (c Status) Run(u _Umwelt, args ...string) (err error) {
 	}
 
 	if readResults, err = readOp.Run(args...); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 

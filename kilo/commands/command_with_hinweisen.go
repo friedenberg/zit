@@ -1,6 +1,9 @@
 package commands
 
-import "github.com/friedenberg/zit/india/store_with_lock"
+import (
+	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/india/store_with_lock"
+)
 
 type CommandWithHinweisen interface {
 	RunWithHinweisen(_Umwelt, _Zettels, ..._Hinweis) error
@@ -17,7 +20,7 @@ func (c commandWithHinweisen) RunWithLockedStore(store store_with_lock.Store, ar
 		var h _Hinweis
 
 		if h, err = _MakeBlindHinweis(arg); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 

@@ -105,9 +105,7 @@ var (
 	_DeleteFilesAndDirs     = open_file_guard.DeleteFilesAndDirs
 	_Err                    = stdprinter.Err
 	_Errf                   = stdprinter.Errf
-	_Error                  = errors.Error
 	_ErrorAs                = errors.As
-	_Errorf                 = errors.Errorf
 	_EtikettNewSet          = etikett.NewSet
 	_FilesExist             = files.Exists
 	_HinweisNewEmpty        = hinweis.NewEmpty

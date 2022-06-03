@@ -2,6 +2,8 @@ package commands
 
 import (
 	"flag"
+
+	"github.com/friedenberg/zit/alfa/errors"
 )
 
 type Copy struct {
@@ -26,7 +28,7 @@ func (c Copy) RunWithHinweisen(u _Umwelt, zs _Zettels, hins ..._Hinweis) (err er
 		var named _NamedZettel
 
 		if named, err = zs.Read(h); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 

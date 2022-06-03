@@ -3,6 +3,7 @@ package commands
 import (
 	"flag"
 
+	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/juliett/user_ops"
 )
@@ -36,12 +37,12 @@ func (c Edit) Run(u _Umwelt, args ...string) (err error) {
 	var checkoutResults user_ops.CheckoutResults
 
 	if checkoutResults, err = checkoutOp.Run(args...); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
 	if err = (user_ops.OpenFiles{}).Run(checkoutResults.FilesAkten...); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -53,7 +54,7 @@ func (c Edit) Run(u _Umwelt, args ...string) (err error) {
 	}
 
 	if err = _OpenVimWithArgs(vimArgs, checkoutResults.FilesZettelen...); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -70,7 +71,7 @@ func (c Edit) Run(u _Umwelt, args ...string) (err error) {
 	}
 
 	if readResults, err = readOp.Run(checkoutResults.FilesZettelen...); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -81,7 +82,7 @@ func (c Edit) Run(u _Umwelt, args ...string) (err error) {
 	}
 
 	if _, err = checkinOp.Run(zettels...); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 

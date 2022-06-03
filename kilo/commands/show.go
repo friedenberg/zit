@@ -4,6 +4,7 @@ import (
 	"flag"
 	"io"
 
+	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
@@ -33,14 +34,14 @@ func (c Show) RunWithLockedStore(store store_with_lock.Store, args ...string) (e
 		var h _Hinweis
 
 		if h, err = _MakeBlindHinweis(a); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 
 		var named _NamedZettel
 
 		if named, err = store.Zettels().Read(h); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 
@@ -56,7 +57,7 @@ func (c Show) RunWithLockedStore(store store_with_lock.Store, args ...string) (e
 		return c.showZettels(store, zettels)
 
 	default:
-		err = _Errorf("unsupported objekte type: %s", c.Type)
+		err = errors.Errorf("unsupported objekte type: %s", c.Type)
 		return
 	}
 
@@ -77,7 +78,7 @@ func (c Show) showZettels(store store_with_lock.Store, zettels []_NamedZettel) (
 		ctx.Zettel = named.Zettel
 
 		if _, err = f.WriteTo(ctx); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 	}
@@ -90,19 +91,19 @@ func (c Show) showAkten(store store_with_lock.Store, zettels []_NamedZettel) (er
 
 	for _, named := range zettels {
 		if ar, err = store.Zettels().AkteReader(named.Zettel.Akte); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 
 		if ar == nil {
-			err = _Errorf("akte reader is nil")
+			err = errors.Errorf("akte reader is nil")
 			return
 		}
 
 		defer _PanicIfError(ar.Close())
 
 		if _, err = io.Copy(store.Out, ar); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 	}

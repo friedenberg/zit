@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"flag"
 	"io"
+
+	"github.com/friedenberg/zit/alfa/errors"
 )
 
 type Test struct {
@@ -24,14 +26,14 @@ func (c Test) Run(u _Umwelt, args ...string) (err error) {
 	var a _Age
 
 	if a, err = u.Age(); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
 	var e _Etiketten
 
 	if e, err = _NewEtiketten(_Konfig{}, a, u.DirZit("Etiketten")); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -48,7 +50,7 @@ func (c Test) Run(u _Umwelt, args ...string) (err error) {
 		}
 
 		if err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 
@@ -56,7 +58,7 @@ func (c Test) Run(u _Umwelt, args ...string) (err error) {
 	}
 
 	if err = e.Flush(); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 

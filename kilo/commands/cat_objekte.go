@@ -3,6 +3,7 @@ package commands
 import (
 	"flag"
 
+	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
@@ -35,7 +36,7 @@ func (c CatObjekte) RunWithId(store store_with_lock.Store, ids ..._Id) (err erro
 		return c.zettelen(store, ids...)
 
 	default:
-		err = _Errorf("unsupported objekte type: %s", c.Type)
+		err = errors.Errorf("unsupported objekte type: %s", c.Type)
 		return
 	}
 
@@ -54,26 +55,26 @@ func (c CatObjekte) akten(store store_with_lock.Store, ids ..._Id) (err error) {
 			var named _NamedZettel
 
 			if named, err = store.Zettels().Read(i); err != nil {
-				err = _Error(err)
+				err = errors.Error(err)
 				return
 			}
 
 			sb = named.Zettel.Akte
 
 		default:
-			err = _Errorf("unsupported id type: %q", i)
+			err = errors.Errorf("unsupported id type: %q", i)
 			return
 		}
 
 		p := store.DirAkte()
 
 		if sb, err = sb.Glob(p); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 
 		if err = _ObjekteRead(store.Out, store.Age(), _IdPath(sb, p)); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 	}
@@ -86,14 +87,14 @@ func (c CatObjekte) zettelen(store store_with_lock.Store, ids ..._Id) (err error
 		var z _NamedZettel
 
 		if z, err = store.Zettels().Read(id); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 
 		f := _StoredZettelFormatsObjekte{}
 
 		if _, err = f.WriteTo(z.Stored, store.Out); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 	}

@@ -55,6 +55,11 @@ func (c New) ValidateFlagsAndArgs(u *umwelt.Umwelt, args ...string) (err error) 
 		return
 	}
 
+	if len(args) > 0 && c.Edit {
+		err = errors.Errorf("editing not supported when importing existing zettels")
+		return
+	}
+
 	return
 }
 
@@ -78,22 +83,6 @@ func (c New) Run(u _Umwelt, args ...string) (err error) {
 		}
 	}
 
-	if c.Edit {
-		openVimOp := user_ops.OpenVim{
-			Options: vim_cli_options_builder.New().
-				WithCursorLocation(2, 3).
-				WithInsertMode().
-				WithFileType("zit.zettel").
-				WithSourcedFile("~/.vim/syntax/zit.zettel.vim").
-				Build(),
-		}
-
-		if _, err = openVimOp.Run(args...); err != nil {
-			err = _Error(err)
-			return
-		}
-	}
-
 	return
 }
 
@@ -110,6 +99,8 @@ func (c New) readExistingFilesAsZettels(u *umwelt.Umwelt, f zettel.Format, args 
 		return
 	}
 
+	//TODO if edit, checkout zettels and made editable
+
 	return
 }
 
@@ -125,6 +116,15 @@ func (c New) writeNewZettel(u *umwelt.Umwelt, f zettel.Format) (err error) {
 		Format: f,
 	}
 
+	var defaultEtiketten etikett.Set
+
+	if defaultEtiketten, err = u.DefaultEtiketten(); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	c.Etiketten.Merge(defaultEtiketten)
+
 	z := zettel.Zettel{
 		Bezeichnung: c.Bezeichnung.Bezeichnung,
 		Etiketten:   c.Etiketten,
@@ -134,11 +134,27 @@ func (c New) writeNewZettel(u *umwelt.Umwelt, f zettel.Format) (err error) {
 	var results stored_zettel.SetExternal
 
 	if results, err = emptyOp.Run(z); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
 	opCreateFromPath.ReadHinweisFromPath = true
+
+	if c.Edit {
+		openVimOp := user_ops.OpenVim{
+			Options: vim_cli_options_builder.New().
+				WithCursorLocation(2, 3).
+				WithInsertMode().
+				WithFileType("zit.zettel").
+				WithSourcedFile("~/.vim/syntax/zit.zettel.vim").
+				Build(),
+		}
+
+		if _, err = openVimOp.Run(results.Paths()...); err != nil {
+			err = errors.Error(err)
+			return
+		}
+	}
 
 	if _, err = opCreateFromPath.Run(results.Paths()...); err != nil {
 		err = errors.Error(err)

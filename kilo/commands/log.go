@@ -5,6 +5,7 @@ import (
 	"flag"
 	"log"
 
+	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
@@ -28,7 +29,7 @@ func (c Log) RunWithLockedStore(store store_with_lock.Store, args ...string) (er
 	switch len(args) {
 
 	case 0:
-		err = _Errorf("hinweis or zettel sha required")
+		err = errors.Errorf("hinweis or zettel sha required")
 		return
 
 	default:
@@ -44,14 +45,14 @@ func (c Log) RunWithLockedStore(store store_with_lock.Store, args ...string) (er
 	var id _Id
 
 	if id, err = c.getIdFromArg(rawId); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
 	var chain _ZettelsChain
 
 	if chain, err = store.Zettels().AllInChain(id); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -81,7 +82,7 @@ func (c Log) getIdFromArg(arg string) (id _Id, err error) {
 		return
 	}
 
-	err = _Errorf("incorrect format for id: '%s'", arg)
+	err = errors.Errorf("incorrect format for id: '%s'", arg)
 
 	return
 }

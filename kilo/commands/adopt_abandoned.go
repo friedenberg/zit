@@ -3,6 +3,7 @@ package commands
 import (
 	"flag"
 
+	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
@@ -27,21 +28,21 @@ func (c AdoptAbandoned) RunWithLockedStore(store store_with_lock.Store, args ...
 		var sha _Sha
 
 		if err = sha.Set(a); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 
 		var stored _StoredZettel
 
 		if stored, err = store.Zettels().ReadZettel(sha); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 
 		var named _NamedZettel
 
 		if named, err = store.Zettels().Create(stored.Zettel); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 

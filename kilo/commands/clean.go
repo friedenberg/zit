@@ -49,7 +49,7 @@ func (c Clean) Run(u _Umwelt, args ...string) (err error) {
 	}
 
 	if readResults, err = readOp.Run(args...); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -78,7 +78,7 @@ func (c Clean) Run(u _Umwelt, args ...string) (err error) {
 	}
 
 	if err = _DeleteFilesAndDirs(filesToDelete...); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 

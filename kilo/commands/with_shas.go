@@ -1,6 +1,9 @@
 package commands
 
-import "github.com/friedenberg/zit/india/store_with_lock"
+import (
+	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/india/store_with_lock"
+)
 
 type WithShas interface {
 	RunWithShas(store store_with_lock.Store, shas ..._Sha) error
@@ -17,7 +20,7 @@ func (c withShas) RunWithLockedStore(store store_with_lock.Store, args ...string
 		var sha _Sha
 
 		if err = sha.Set(arg); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 
@@ -25,7 +28,7 @@ func (c withShas) RunWithLockedStore(store store_with_lock.Store, args ...string
 	}
 
 	if err = c.RunWithShas(store, shas...); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 

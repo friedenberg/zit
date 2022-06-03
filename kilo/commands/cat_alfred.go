@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"flag"
 
+	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
@@ -41,7 +42,7 @@ func (c CatAlfred) RunWithLockedStore(store store_with_lock.Store, args ...strin
 	var aw _AlfredWriter
 
 	if aw, err = _AlfredNewWriter(store.Out); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -56,7 +57,7 @@ func (c CatAlfred) RunWithLockedStore(store store_with_lock.Store, args ...strin
 		var ea []_Etikett
 
 		if ea, err = store.Etiketten().All(); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 
@@ -69,7 +70,7 @@ func (c CatAlfred) RunWithLockedStore(store store_with_lock.Store, args ...strin
 		var all map[string]_NamedZettel
 
 		if all, err = store.Zettels().All(); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 
@@ -84,7 +85,7 @@ func (c CatAlfred) RunWithLockedStore(store store_with_lock.Store, args ...strin
 		var all map[string]_NamedZettel
 
 		if all, err = store.Zettels().All(); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 
@@ -93,7 +94,7 @@ func (c CatAlfred) RunWithLockedStore(store store_with_lock.Store, args ...strin
 		}
 
 	default:
-		err = _Errorf("unsupported objekte type: %s", c.Type)
+		err = errors.Errorf("unsupported objekte type: %s", c.Type)
 		return
 	}
 

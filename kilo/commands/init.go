@@ -2,12 +2,13 @@ package commands
 
 import (
 	"bufio"
-	"errors"
 	"flag"
 	"io"
 	"io/ioutil"
 	"os"
 	"path"
+
+	"github.com/friedenberg/zit/alfa/errors"
 )
 
 type Init struct {
@@ -49,7 +50,7 @@ func (c Init) Run(u _Umwelt, args ...string) (err error) {
 
 	if !c.DisableAge {
 		if _, err = _AgeGenerate(u.FileAge()); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 	}
@@ -57,12 +58,12 @@ func (c Init) Run(u _Umwelt, args ...string) (err error) {
 	c.writeFile(u.DirZit("Konfig"), "")
 
 	if err = c.populateYinIfNecessary(u); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
 	if err = c.populateYangIfNecessary(u); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -94,14 +95,14 @@ func (c Init) readAndTransferLines(in, out string) (err error) {
 	var fi, fo *os.File
 
 	if fi, err = _Open(in); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
 	defer _PanicIfError(fi.Close)
 
 	if fo, err = _Create(out); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -122,7 +123,7 @@ func (c Init) readAndTransferLines(in, out string) (err error) {
 		}
 
 		if err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 

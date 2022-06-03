@@ -1,6 +1,8 @@
 package stored_zettel
 
-import "github.com/friedenberg/zit/charlie/hinweis"
+import (
+	"github.com/friedenberg/zit/charlie/hinweis"
+)
 
 type SetExternal map[string]External
 

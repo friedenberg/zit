@@ -3,6 +3,7 @@ package commands
 import (
 	"flag"
 
+	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
@@ -32,12 +33,12 @@ func (c Revert) RunWithLockedStore(store store_with_lock.Store, args ...string) 
 
 		for i, arg := range args {
 			if hins[i], err = _MakeBlindHinweis(arg); err != nil {
-				err = _Error(err)
+				err = errors.Error(err)
 				return
 			}
 
 			if _, err = store.Zettels().Revert(hins[i]); err != nil {
-				err = _Error(err)
+				err = errors.Error(err)
 				return
 			}
 		}

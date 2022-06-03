@@ -1,6 +1,9 @@
 package commands
 
-import "github.com/friedenberg/zit/india/store_with_lock"
+import (
+	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/india/store_with_lock"
+)
 
 type WithOneZettelSha interface {
 	RunWithZettel(store store_with_lock.Store, zettel ..._NamedZettel) error
@@ -13,7 +16,7 @@ type withOneZettelSha struct {
 
 func (c withOneZettelSha) RunWithLockedStore(store store_with_lock.Store, args ...string) (err error) {
 	if len(args) != c.Count {
-		err = _Errorf("exactly %d argument expected, but got %s\n", c.Count, len(args))
+		err = errors.Errorf("exactly %d argument expected, but got %s\n", c.Count, len(args))
 		return
 	}
 
@@ -23,12 +26,12 @@ func (c withOneZettelSha) RunWithLockedStore(store store_with_lock.Store, args .
 		var sha _Sha
 
 		if err = sha.Set(arg); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 
 		if zettels[i], err = store.Zettels().Read(sha); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 	}

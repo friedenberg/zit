@@ -5,6 +5,9 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/stdprinter"
+	"github.com/friedenberg/zit/charlie/age"
+	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/charlie/konfig"
 )
 
@@ -12,7 +15,7 @@ type Umwelt struct {
 	BasePath string
 	cwd      string
 	Konfig   konfig.Konfig
-	Logger   _Logger
+	Logger   stdprinter.Logger
 	In       io.Reader
 	Out      io.Writer
 	Err      io.Writer
@@ -40,7 +43,7 @@ func MakeUmwelt(c konfig.Konfig) (u *Umwelt, err error) {
 	return
 }
 
-func (u Umwelt) Age() (a _Age, err error) {
+func (u Umwelt) Age() (a age.Age, err error) {
 	fa := u.FileAge()
 
 	if _FilesExist(fa) {
@@ -49,6 +52,23 @@ func (u Umwelt) Age() (a _Age, err error) {
 		}
 	} else {
 		a = _AgeMakeEmpty()
+	}
+
+	return
+}
+
+func (u Umwelt) DefaultEtiketten() (etiketten etikett.Set, err error) {
+	etiketten = etikett.NewSet()
+
+	for e, t := range u.Konfig.Tags {
+		if !t.AddToNewZettels {
+			continue
+		}
+
+		if err = etiketten.AddString(e); err != nil {
+			err = errors.Error(err)
+			return
+		}
 	}
 
 	return

@@ -1,6 +1,9 @@
 package commands
 
-import "github.com/friedenberg/zit/india/store_with_lock"
+import (
+	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/india/store_with_lock"
+)
 
 type CommandWithId interface {
 	RunWithId(store store_with_lock.Store, ids ..._Id) error
@@ -19,7 +22,7 @@ func (c commandWithId) RunWithLockedStore(store store_with_lock.Store, args ...s
 
 		if err = sha.Set(arg); err != nil {
 			if id, err = _MakeBlindHinweis(arg); err != nil {
-				err = _Error(err)
+				err = errors.Error(err)
 				return
 			}
 		} else {
@@ -30,7 +33,7 @@ func (c commandWithId) RunWithLockedStore(store store_with_lock.Store, args ...s
 	}
 
 	if err = c.RunWithId(store, ids...); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
