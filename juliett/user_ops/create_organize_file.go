@@ -71,13 +71,16 @@ func (c CreateOrganizeFile) GroupZettel(z _NamedZettel) (ess []etikett.Set) {
 
 	if c.GroupByUnique {
 		ess = append(ess, set)
-	} else {
+	} else if set.Len() > 0 {
 		for _, e := range set {
 			ns := etikett.NewSet()
 			ns.Add(e)
 			ess = append(ess, ns)
 		}
-	}
+	} else {
+    // if the zettel has no etiketten, add an empty set
+    ess = append(ess, etikett.NewSet())
+  }
 
 	return ess
 }
