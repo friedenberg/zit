@@ -42,6 +42,12 @@ func (c command) PrintSubcommandUsage(flags flag.FlagSet) {
 	flags.SetOutput(&b)
 
 	printTabbed(flags.Name())
+
+  //TODO determine why the interface doesn't actually work
+	if cwd, ok := c.Command.(CommandWithDescription); ok {
+		printTabbed(cwd.Description())
+	}
+
 	flags.PrintDefaults()
 
 	scanner := bufio.NewScanner(&b)

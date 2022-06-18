@@ -21,6 +21,10 @@ func init() {
 	)
 }
 
+func (c AdoptAbandoned) Description() string {
+	return "creates a new hinweis for a zettel that has somehow gotten detached"
+}
+
 func (c AdoptAbandoned) RunWithLockedStore(store store_with_lock.Store, args ...string) (err error) {
 	zettels := make([]_NamedZettel, len(args))
 

@@ -18,16 +18,16 @@ type Command interface {
 	Run(_Umwelt, ...string) error
 }
 
-type CommandWithValidation interface {
-	ValidateArgs(...string) error
-}
-
 type CommandSupportingErrors interface {
 	HandleError(_Umwelt, error)
 }
 
 type CommandWithArgPreprocessor interface {
-	PreprocessArgs(_Umwelt) ([]string, error)
+	PreprocessArgs(_Umwelt, []string) ([]string, error)
+}
+
+type CommandWithDescription interface {
+	Description() string
 }
 
 type command struct {
@@ -135,14 +135,16 @@ func Run(args []string) (err error) {
 		return
 	}
 
-	if t, ok := cmd.Command.(CommandWithValidation); ok {
-		if err = t.ValidateArgs(cmd.FlagSet.Args()...); err != nil {
+	cmdArgs := cmd.FlagSet.Args()
+
+	if t, ok := cmd.Command.(CommandWithArgPreprocessor); ok {
+		if cmdArgs, err = t.PreprocessArgs(u, cmdArgs); err != nil {
 			err = errors.Error(err)
 			return
 		}
 	}
 
-	if err = cmd.Command.Run(u, cmd.FlagSet.Args()...); err != nil {
+	if err = cmd.Command.Run(u, cmdArgs...); err != nil {
 		err = errors.Error(err)
 		return
 	}
