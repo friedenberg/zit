@@ -7,6 +7,7 @@ import (
 type Hinweisen interface {
 	Read(h _Hinweis) (sha _Sha, err error)
 	ReadSha(s _Sha) (h _Hinweis, err error)
+	ReadString(s string) (sha _Sha, hin _Hinweis, err error)
 	ReadManyStrings(args ...string) (shas []_Sha, hins []_Hinweis, err error)
 	All() (shas []_Sha, hins []_Hinweis, err error)
 	StoreNew(sha _Sha) (h _Hinweis, err error)
@@ -196,6 +197,20 @@ func (hn hinweisen) ReadSha(s _Sha) (h _Hinweis, err error) {
 	}
 
 	if h, err = _MakeBlindHinweis(hString); err != nil {
+		err = _Error(err)
+		return
+	}
+
+	return
+}
+
+func (zs *hinweisen) ReadString(s string) (sha _Sha, hin _Hinweis, err error) {
+	if hin, err = _MakeBlindHinweis(s); err != nil {
+		err = _Error(err)
+		return
+	}
+
+	if sha, err = zs.Read(hin); err != nil {
 		err = _Error(err)
 		return
 	}

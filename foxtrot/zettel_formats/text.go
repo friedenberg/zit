@@ -213,22 +213,20 @@ func (f Text) ReadFrom(c *_ZettelFormatContextRead) (n int64, err error) {
 }
 
 func (f Text) readMetadateiLine(state *textStateRead, line string) (err error) {
-	if len(line) < 1 {
-		err = _Errorf("line isn't long enough: %q", line)
-		return
+	var head, tail string
+
+	switch len(line) {
+	case 0:
+	case 1:
+		head = line[:1] + " "
+	case 2:
+		head = line[:2]
+	default:
+		head = line[:2]
+		tail = line[2:]
 	}
 
-	head := line[:2]
-	tail := line[2:]
-
-	log.Print(head)
-	log.Print(tail)
-
 	switch head {
-	case "# ":
-		err = state.context.Zettel.Bezeichnung.Set(tail)
-		state.lastFieldWasBezeichnung = true
-
 	case "- ":
 		err = state.context.Zettel.Etiketten.AddString(tail)
 		state.lastFieldWasBezeichnung = false
@@ -237,22 +235,26 @@ func (f Text) readMetadateiLine(state *textStateRead, line string) (err error) {
 		err = f.readAkteDesc(state, tail)
 		state.lastFieldWasBezeichnung = false
 
-	case "  ":
-		// Bezeichnung continued
-		if state.lastFieldWasBezeichnung {
-			err = state.context.Zettel.Bezeichnung.Set(tail)
-			state.lastFieldWasBezeichnung = true
-			break
-		}
+	case "# ":
+		err = state.context.Zettel.Bezeichnung.Set(tail)
+		state.lastFieldWasBezeichnung = true
 
-		fallthrough
+		// 		if state.lastFieldWasBezeichnung {
+		// 			err = state.context.Zettel.Bezeichnung.Set(tail)
+		// 			state.lastFieldWasBezeichnung = true
+		// 			break
+		// 		}
+
+		// fallthrough
 
 	default:
-		err = _Errorf(
-			"unsupported metadatei prefix for format (%q): %q",
-			reflect.TypeOf(f).Name(),
-			head,
-		)
+		if strings.TrimSpace(head) != "" || strings.TrimSpace(tail) != "" {
+			err = _Errorf(
+				"unsupported metadatei prefix for format (%q): %q",
+				reflect.TypeOf(f).Name(),
+				head,
+			)
+		}
 	}
 
 	if err != nil {

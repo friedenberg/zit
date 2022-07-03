@@ -43,7 +43,7 @@ func TestReadWithoutAkteWithMultilineBezeichnung(t *testing.T) {
 		Text{},
 		`---
 # the title
-  continues
+# continues
 - tag1
 - tag2
 - tag3

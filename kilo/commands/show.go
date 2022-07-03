@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/bravo/id"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
@@ -22,25 +23,18 @@ func init() {
 
 			f.Var(&c.Type, "type", "ObjekteType")
 
-			return commandWithLockedStore{c}
+			return commandWithLockedStore{commandWithId{c}}
 		},
 	)
 }
 
-func (c Show) RunWithLockedStore(store store_with_lock.Store, args ...string) (err error) {
-	zettels := make([]_NamedZettel, len(args))
+func (c Show) RunWithId(store store_with_lock.Store, ids ...id.Id) (err error) {
+	zettels := make([]_NamedZettel, len(ids))
 
-	for i, a := range args {
-		var h _Hinweis
-
-		if h, err = _MakeBlindHinweis(a); err != nil {
-			err = errors.Error(err)
-			return
-		}
-
+	for i, a := range ids {
 		var named _NamedZettel
 
-		if named, err = store.Zettels().Read(h); err != nil {
+		if named, err = store.Zettels().Read(a); err != nil {
 			err = errors.Error(err)
 			return
 		}

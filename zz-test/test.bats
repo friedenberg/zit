@@ -240,5 +240,89 @@ function can_new_zettel_with_metadatei { # @test
 	run zit new -bezeichnung bez -etiketten et1,et2
 	assert_output --partial '[one/uno '
 
-	[ "$(cat "$expected")" = "$(cat one/uno.md)" ]
+	run cat one/uno.md
+	assert_output "$(cat "$expected")"
+}
+
+function can_update_akte { # @test
+	# setup
+	wd="$(mktemp -d)"
+	cd "$wd" || exit 1
+
+	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+
+	expected="$(mktemp)"
+	{
+		echo ---
+		echo "# bez"
+		echo - et1
+		echo - et2
+		echo ! md
+		echo ---
+		echo
+		echo the body
+	} >>"$expected"
+
+	run zit new "$expected"
+	assert_output --partial '[one/uno '
+
+	run zit show one/uno
+	assert_output "$(cat "$expected")"
+
+	# when
+	new_akte="$(mktemp)"
+	{
+		echo the body but new
+	} >>"$new_akte"
+
+	run zit checkin-akte -new-etiketten et3 one/uno "$new_akte"
+	assert_output --partial '[one/uno '
+
+	# then
+	{
+		echo ---
+		echo "# bez"
+		echo - et3
+		echo ! md
+		echo ---
+		echo
+		echo the body but new
+	} >"$expected"
+
+	run zit show one/uno
+	assert_output "$(cat "$expected")"
+}
+
+function can_duplicate_zettel_content { # @test
+  skip #TODO:
+
+	# setup
+	wd="$(mktemp -d)"
+	cd "$wd" || exit 1
+
+	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+
+	expected="$(mktemp)"
+	{
+		echo ---
+		echo "# bez"
+		echo - et1
+		echo - et2
+		echo ! md
+		echo ---
+		echo
+		echo the body
+	} >>"$expected"
+
+	run zit new "$expected"
+	assert_output --partial '[one/uno '
+
+	run zit new "$expected"
+	assert_output --partial '[two/dos '
+
+	# when
+	run zit show one/uno
+	assert_output --partial "$(cat "$expected")"
+	run zit show two/dos
+	assert_output --partial "$(cat "$expected")"
 }
