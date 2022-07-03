@@ -26,7 +26,7 @@ func (zs zettelSet) sorted() (sorted []zettel) {
 	}
 
 	sort.Slice(sorted, func(i, j int) bool {
-		return sorted[i].hinweis < sorted[j].hinweis
+		return sorted[i].Hinweis < sorted[j].Hinweis
 	})
 
 	return

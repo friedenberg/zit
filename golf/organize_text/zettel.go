@@ -8,12 +8,12 @@ import (
 )
 
 type zettel struct {
-	hinweis     string
-	bezeichnung string
+	Hinweis     string
+	Bezeichnung string
 }
 
 func (z zettel) String() string {
-	return fmt.Sprintf("- [%s] %s", z.hinweis, z.bezeichnung)
+	return fmt.Sprintf("- [%s] %s", z.Hinweis, z.Bezeichnung)
 }
 
 func (z *zettel) Set(v string) (err error) {
@@ -33,11 +33,11 @@ func (z *zettel) Set(v string) (err error) {
 		return
 	}
 
-	z.hinweis = remaining[:idx]
+	z.Hinweis = remaining[:idx]
 
 	remaining = remaining[idx+1:]
 
-	z.bezeichnung = remaining
+	z.Bezeichnung = remaining
 
 	return
 }

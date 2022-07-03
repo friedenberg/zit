@@ -13,6 +13,7 @@ type Text interface {
 	Etiketten() etikett.Set
 	ZettelsExisting() map[string]zettelSet
 	ZettelsNew() map[string]newZettelSet
+	ToCompareMap() (out compareMap)
 	ChangesFrom(Text) Changes
 }
 

@@ -35,8 +35,8 @@ func (zs assignments) Add(e string, h, b string) {
 	zs.add(
 		e,
 		zettel{
-			hinweis:     h,
-			bezeichnung: b,
+			Hinweis:     h,
+			Bezeichnung: b,
 		},
 	)
 }
@@ -160,7 +160,7 @@ func (zs *assignments) ReadFrom(r1 io.Reader) (n int64, err error) {
 			err = z.Set(s)
 
 			if err == nil {
-				zs.Add(currentEtikettString, z.hinweis, z.bezeichnung)
+				zs.Add(currentEtikettString, z.Hinweis, z.Bezeichnung)
 			} else {
 				var nz newZettel
 				var errNz error
@@ -199,7 +199,7 @@ func (a assignments) Copy() (b assignments) {
 
 	for k, v := range a.etikettenToExisting {
 		for z, _ := range v {
-			b.Add(k, z.hinweis, z.bezeichnung)
+			b.Add(k, z.Hinweis, z.Bezeichnung)
 		}
 	}
 

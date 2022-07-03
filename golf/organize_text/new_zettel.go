@@ -3,7 +3,7 @@ package organize_text
 import "github.com/friedenberg/zit/alfa/errors"
 
 type newZettel struct {
-	bezeichnung string
+	Bezeichnung string
 }
 
 // func (z newZettel) String() string {
@@ -20,7 +20,7 @@ func (z *newZettel) Set(v string) (err error) {
 
 	remaining = remaining[2:]
 
-	z.bezeichnung = remaining
+	z.Bezeichnung = remaining
 
 	return
 }
