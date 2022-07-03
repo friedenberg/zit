@@ -41,7 +41,6 @@ type (
 
 	_ObjekteWriter = objekte.Writer
 
-	_OrganizeChanges       = organize_text.Changes
 	_OrganizeText          = organize_text.Text
 	_OrganizeTextErrorRead = organize_text.ErrorRead
 	_OrganizeTextOptions   = organize_text.Options

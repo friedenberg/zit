@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/golf/organize_text"
+	"github.com/friedenberg/zit/india/changes"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
@@ -27,7 +28,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 
 	defer errors.PanicIfError(store.Flush)
 
-	changes := a.ChangesFrom(b)
+	changes := changes.ChangesFrom(a, b)
 
 	if len(changes.Added) == 0 && len(changes.Removed) == 0 && len(changes.New) == 0 {
 		stdprinter.Out("no changes")

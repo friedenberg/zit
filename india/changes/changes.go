@@ -1,9 +1,10 @@
-package organize_text
+package changes
 
 import (
 	"strings"
 
 	"github.com/friedenberg/zit/charlie/etikett"
+	"github.com/friedenberg/zit/golf/organize_text"
 )
 
 type Change struct {
@@ -16,7 +17,7 @@ type Changes struct {
 	New     map[string]etikett.Set
 }
 
-func (a1 *organizeText) ChangesFrom(b1 Text) (c Changes) {
+func ChangesFrom(a1, b1 organize_text.Text) (c Changes) {
 	a := a1.ToCompareMap()
 	b := b1.ToCompareMap()
 
@@ -31,7 +32,7 @@ func (a1 *organizeText) ChangesFrom(b1 Text) (c Changes) {
 			c.Added = append(
 				c.Added,
 				Change{
-					Etikett: bez.etikett,
+					Etikett: bez.Etikett,
 					Key:     bez.Hinweis,
 				},
 			)
@@ -44,7 +45,7 @@ func (a1 *organizeText) ChangesFrom(b1 Text) (c Changes) {
 		c.Removed = append(
 			c.Removed,
 			Change{
-				Etikett: aez.etikett,
+				Etikett: aez.Etikett,
 				Key:     aez.Hinweis,
 			},
 		)
