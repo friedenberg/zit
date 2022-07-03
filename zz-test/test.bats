@@ -160,7 +160,7 @@ function can_output_organize { # @test
 		echo "- [one/uno] wow"
 	} >>"$expected_organize"
 
-	run zit organize -group-by-unique ok
+	run zit organize -group-by-unique ok <"$(tty)"
 	assert_output "$(cat "$expected_organize")"
 
 	{

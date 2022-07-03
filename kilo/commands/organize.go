@@ -3,6 +3,7 @@ package commands
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/friedenberg/zit/alfa/errors"
@@ -64,7 +65,8 @@ func (c *Organize) Run(u _Umwelt, args ...string) (err error) {
 	stdinIsTty := open_file_guard.IsTty(os.Stdin)
 
 	if !stdinIsTty && !stdoutIsTty {
-		//generate organize, read from stdin,  commit
+		log.Print("neither stdin or stdout is a tty")
+		log.Print("generate organize, read from stdin, commit")
 
 		createOrganizeFileResults := user_ops.CreateOrganizeFileResults{}
 
@@ -100,13 +102,15 @@ func (c *Organize) Run(u _Umwelt, args ...string) (err error) {
 			return
 		}
 	} else if !stdoutIsTty {
-		//generate organize file and write to stdout
+		log.Print("just stdout is not a tty")
+		log.Print("generate organize file and write to stdout")
 		if _, err = createOrganizeFileOp.RunAndWrite(getResults, os.Stdout); err != nil {
 			err = errors.Error(err)
 			return
 		}
 	} else {
-		//generate temp file, write organize, open vim to edit, commit results
+		log.Print("both stdout and stdin are a tty")
+		log.Print("generate temp file, write organize, open vim to edit, commit results")
 		createOrganizeFileResults := user_ops.CreateOrganizeFileResults{}
 
 		var f *os.File

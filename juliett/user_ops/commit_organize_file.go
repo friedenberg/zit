@@ -31,7 +31,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 	changes := changes.ChangesFrom(a, b)
 
 	if len(changes.Added) == 0 && len(changes.Removed) == 0 && len(changes.New) == 0 {
-		stdprinter.Out("no changes")
+		stdprinter.Err("no changes")
 		return
 	}
 
@@ -68,7 +68,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 		z.Zettel.Etiketten.Add(e)
 		toUpdate[z.Hinweis.String()] = z
 
-		_Outf("Added etikett '%s' to zettel '%s'\n", e, z.Hinweis)
+		stdprinter.Errf("Added etikett '%s' to zettel '%s'\n", e, z.Hinweis)
 
 		return
 	}
@@ -84,7 +84,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 		z.Zettel.Etiketten.RemovePrefixes(e)
 		toUpdate[z.Hinweis.String()] = z
 
-		_Outf("Removed etikett '%s' from zettel '%s'\n", e, z.Hinweis)
+		stdprinter.Errf("Removed etikett '%s' from zettel '%s'\n", e, z.Hinweis)
 
 		return
 	}
@@ -133,7 +133,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 		}
 
 		if c.Umwelt.Konfig.DryRun {
-			_Outf("[%s] (would create)\n", z.Bezeichnung)
+			stdprinter.Outf("[%s] (would create)\n", z.Bezeichnung)
 			continue
 		}
 
