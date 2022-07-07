@@ -1,7 +1,7 @@
 package changes
 
 import (
-	"strings"
+	"log"
 
 	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/golf/organize_text"
@@ -21,32 +21,35 @@ func ChangesFrom(a1, b1 organize_text.Text) (c Changes) {
 	a := a1.ToCompareMap()
 	b := b1.ToCompareMap()
 
+	log.Printf("%#v", a)
+	log.Printf("%#v", b)
+
 	c.Added = make([]Change, 0)
 	c.Removed = make([]Change, 0)
 
-	for bez, _ := range b {
-		if _, ok := a[bez]; ok {
+	for tuple, _ := range b.Named {
+		if _, ok := a.Named[tuple]; ok {
 			//zettel had etikett previously
 		} else {
 			//zettel did not have etikett previously
 			c.Added = append(
 				c.Added,
 				Change{
-					Etikett: bez.Etikett,
-					Key:     bez.Hinweis,
+					Etikett: tuple.Etikett,
+					Key:     tuple.Key,
 				},
 			)
 		}
 
-		delete(a, bez)
+		delete(a.Named, tuple)
 	}
 
-	for aez, _ := range a {
+	for tuple, _ := range a.Named {
 		c.Removed = append(
 			c.Removed,
 			Change{
-				Etikett: aez.Etikett,
-				Key:     aez.Hinweis,
+				Etikett: tuple.Etikett,
+				Key:     tuple.Key,
 			},
 		)
 	}
@@ -64,21 +67,8 @@ func ChangesFrom(a1, b1 organize_text.Text) (c Changes) {
 		c.New[bez] = existing
 	}
 
-	for e, zs := range b1.ZettelsNew() {
-		for z, _ := range zs {
-			// individual etiketten
-			for _, e1 := range strings.Split(e, ", ") {
-				// root etiketten have an empty string representation
-				if e1 != "" {
-					addNew(z.Bezeichnung, e1)
-				}
-			}
-
-			// root etiketten
-			for _, e2 := range b1.Etiketten() {
-				addNew(z.Bezeichnung, e2.String())
-			}
-		}
+	for tuple, _ := range b.Unnamed {
+		addNew(tuple.Key, tuple.Etikett)
 	}
 
 	return

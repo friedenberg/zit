@@ -2,7 +2,11 @@ package organize_text
 
 import (
 	"io"
+	"sort"
 
+	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/log"
+	"github.com/friedenberg/zit/bravo/line_format"
 	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 )
@@ -10,40 +14,78 @@ import (
 type Text interface {
 	io.ReaderFrom
 	io.WriterTo
-	Etiketten() etikett.Set
-	ZettelsExisting() map[string]zettelSet
-	ZettelsNew() map[string]newZettelSet
 	ToCompareMap() (out CompareMap)
 }
 
 type organizeText struct {
-	etiketten etikett.Set
-	zettels   assignments
-}
-
-func (t organizeText) Etiketten() etikett.Set {
-	return t.etiketten
-}
-
-func (t organizeText) ZettelsExisting() map[string]zettelSet {
-	return t.zettels.etikettenToExisting
-}
-
-func (t organizeText) ZettelsNew() map[string]newZettelSet {
-	return t.zettels.etikettenToNew
+	*assignment
 }
 
 func New(options Options, named stored_zettel.SetNamed) (ot *organizeText, err error) {
 	ot = NewEmpty()
 
-	ot.etiketten = options.RootEtiketten
+	root := newAssignment(1)
+	root.etiketten = options.RootEtiketten
+	// root.named = makeZettelZetFromSetNamed(named)
 
-	for _, z := range named {
-		groups := options.GroupZettel(z)
+	prefixSet := named.ToSetPrefixNamed()
+	makeChildren(root, *prefixSet, options.GroupingEtiketten)
 
-		for _, g := range groups {
-			ot.zettels.AddStored(g.String(), z)
+	ot.assignment.addChild(root)
+
+	return
+}
+
+func makeChildren(
+	parent *assignment,
+	prefixSet stored_zettel.SetPrefixNamed,
+	remainingEtiketten etikett.Slice) (assigned *stored_zettel.SetNamed) {
+
+	assigned = stored_zettel.NewSetNamed()
+
+	log.Print("making children")
+	if remainingEtiketten.Len() == 0 {
+		for _, zs := range prefixSet {
+			// assigned.Merge(zs)
+			for _, z := range zs {
+				log.Printf("%s adding named %s", parent.etiketten, z.Hinweis)
+				parent.named.Add(zettel{Hinweis: z.Hinweis.String(), Bezeichnung: z.Zettel.Bezeichnung.String()})
+			}
 		}
+
+		return
+	}
+
+	segments := prefixSet.Subset(remainingEtiketten[0])
+	log.Printf("head: %s ungrouped: %s", remainingEtiketten[0], segments.Ungrouped.HinweisStrings())
+	log.Printf("head: %s grouped: %s", remainingEtiketten[0], segments.Grouped.ToSetNamed().HinweisStrings())
+
+	for _, z := range *segments.Ungrouped {
+		parent.named.Add(zettel{Hinweis: z.Hinweis.String(), Bezeichnung: z.Zettel.Bezeichnung.String()})
+	}
+
+	for e, zs := range *segments.Grouped {
+		// assigned.Merge(zs)
+		log.Print("iterating through grouped: ", e)
+		child := newAssignment(parent.depth + 1)
+		child.etiketten = etikett.NewSet(e)
+		// child.named = makeZettelZetFromSetNamed(zs)
+
+		nextEtiketten := etikett.NewSlice()
+
+		if remainingEtiketten.Len() > 1 {
+			nextEtiketten = remainingEtiketten[1:]
+		}
+
+		_ = makeChildren(child, *zs.ToSetPrefixNamed(), nextEtiketten)
+		// childAssigned.Merge(c)
+		// assigned.Merge(*c)
+
+		parent.addChild(child)
+
+		sort.Slice(parent.children, func(i, j int) bool {
+			return parent.children[i].etiketten.String() < parent.children[j].etiketten.String()
+		})
 	}
 
 	return
@@ -51,7 +93,31 @@ func New(options Options, named stored_zettel.SetNamed) (ot *organizeText, err e
 
 func NewEmpty() (ot *organizeText) {
 	ot = &organizeText{
-		zettels: newEtikettToZettels(),
+		assignment: newAssignment(0),
+	}
+
+	return
+}
+
+func (t *organizeText) ReadFrom(r io.Reader) (n int64, err error) {
+	r1 := assignmentLineReader{}
+
+	n, err = r1.ReadFrom(r)
+
+	t.assignment = r1.root
+
+	return
+}
+
+func (ot organizeText) WriteTo(out io.Writer) (n int64, err error) {
+	lw := line_format.NewWriter()
+
+	aw := assignmentLineWriter{Writer: lw}
+	aw.write(ot.assignment)
+
+	if n, err = lw.WriteTo(out); err != nil {
+		err = errors.Error(err)
+		return
 	}
 
 	return

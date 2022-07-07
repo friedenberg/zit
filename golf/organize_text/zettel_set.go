@@ -1,8 +1,22 @@
 package organize_text
 
-import "sort"
+import (
+	"sort"
+
+	"github.com/friedenberg/zit/foxtrot/stored_zettel"
+)
 
 type zettelSet map[zettel]bool
+
+func makeZettelZetFromSetNamed(set stored_zettel.SetNamed) (zs zettelSet) {
+	zs = makeZettelSet()
+
+	for _, z := range set {
+		zs.Add(zettel{Hinweis: z.Hinweis.String(), Bezeichnung: z.Zettel.Bezeichnung.String()})
+	}
+
+	return
+}
 
 func makeZettelSet() zettelSet {
 	return make(map[zettel]bool)

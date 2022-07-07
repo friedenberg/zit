@@ -96,7 +96,7 @@ func (c Checkout) Run(u _Umwelt, args ...string) (err error) {
 
 		var slice etikett.Slice
 
-		if slice, err = etikett.NewSlice(args...); err != nil {
+		if slice, err = etikett.NewSliceFromStrings(args...); err != nil {
 			err = errors.Error(err)
 			return
 		}

@@ -31,6 +31,29 @@ func TestExpandedRight(t *testing.T) {
 	}
 }
 
+func TestPrefixIntersection(t *testing.T) {
+	s := NewSet(
+		Etikett{Value: "project-2021-zit"},
+		Etikett{Value: "zz-archive-task-done"},
+	)
+
+  ex := s.IntersectPrefixes(NewSet(Etikett{Value: "project"}))
+
+	expected := []string{
+		"project-2021-zit",
+	}
+
+	actual := ex.SortedString()
+
+	if !stringSliceEquals(actual, expected) {
+		t.Errorf(
+			"expanded tags don't match:\nexpected: %q\n  actual: %q",
+			expected,
+			actual,
+		)
+	}
+}
+
 // func TestExpansionRight(t *testing.T) {
 // 	e := Etikett{Value: "this-is-a-tag"}
 // 	ex := e.Expanded(ExpanderRight{})

@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
+	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/juliett/user_ops"
 )
 
@@ -53,9 +54,9 @@ func (c Add) Run(u _Umwelt, args ...string) (err error) {
 
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
 		Umwelt:        u,
-		GroupBy:       _EtikettNewSet(),
+		GroupBy:       etikett.NewSlice(),
 		RootEtiketten: c.Etiketten,
-		GroupByUnique: true,
+		// GroupByUnique: true,
 	}
 
 	var createOrganizeFileResults user_ops.CreateOrganizeFileResults

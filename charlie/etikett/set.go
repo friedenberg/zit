@@ -92,6 +92,16 @@ func (s1 Set) Merge(s2 Set) {
 	}
 }
 
+func (s1 Set) Copy() (s2 Set) {
+	s2 = NewSet()
+
+	for _, e := range s1 {
+		s2.Add(e)
+	}
+
+	return
+}
+
 func (s Set) Expanded(exes ...Expander) (s1 Set) {
 	s1 = NewSet()
 

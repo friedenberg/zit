@@ -35,7 +35,7 @@ func (z *zettel) Set(v string) (err error) {
 
 	z.Hinweis = remaining[:idx]
 
-	remaining = remaining[idx+1:]
+	remaining = remaining[idx+2:]
 
 	z.Bezeichnung = remaining
 

@@ -1,6 +1,8 @@
 package user_ops
 
 import (
+	"log"
+
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/charlie/etikett"
@@ -29,6 +31,8 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 	defer errors.PanicIfError(store.Flush)
 
 	changes := changes.ChangesFrom(a, b)
+
+	log.Printf("%#v", changes)
 
 	if len(changes.Added) == 0 && len(changes.Removed) == 0 && len(changes.New) == 0 {
 		stdprinter.Err("no changes")

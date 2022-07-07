@@ -13,8 +13,7 @@ import (
 type CreateOrganizeFile struct {
 	Umwelt        *umwelt.Umwelt
 	RootEtiketten etikett.Set
-	GroupBy       etikett.Set
-	GroupByUnique bool
+	GroupBy       etikett.Slice
 }
 
 type CreateOrganizeFileResults struct {
@@ -45,9 +44,10 @@ func (c CreateOrganizeFile) Run(zettels ZettelResults) (results CreateOrganizeFi
 	defer errors.PanicIfError(store.Flush)
 
 	options := organize_text.Options{
-		Grouper:       c,
-		Sorter:        c,
-		RootEtiketten: c.RootEtiketten,
+		// Grouper:       c,
+		// Sorter:        c,
+		RootEtiketten:     c.RootEtiketten,
+		GroupingEtiketten: c.GroupBy,
 	}
 
 	if results.Text, err = organize_text.New(options, zettels.SetNamed); err != nil {
@@ -62,14 +62,14 @@ func (c CreateOrganizeFile) GroupZettel(z _NamedZettel) (ess []etikett.Set) {
 	var set etikett.Set
 
 	if c.GroupBy.Len() > 0 {
-		set = z.Zettel.Etiketten.IntersectPrefixes(c.GroupBy)
+		set = z.Zettel.Etiketten.IntersectPrefixes(c.GroupBy.ToSet())
 	} else {
 		set = z.Zettel.Etiketten
 	}
 
 	set = set.Subtract(c.RootEtiketten)
 
-	if c.GroupByUnique {
+	if false /*c.GroupByUnique*/ {
 		ess = append(ess, set)
 	} else if set.Len() > 0 {
 		for _, e := range set {
@@ -78,9 +78,9 @@ func (c CreateOrganizeFile) GroupZettel(z _NamedZettel) (ess []etikett.Set) {
 			ess = append(ess, ns)
 		}
 	} else {
-    // if the zettel has no etiketten, add an empty set
-    ess = append(ess, etikett.NewSet())
-  }
+		// if the zettel has no etiketten, add an empty set
+		ess = append(ess, etikett.NewSet())
+	}
 
 	return ess
 }

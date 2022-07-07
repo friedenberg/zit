@@ -4,8 +4,33 @@ import "github.com/friedenberg/zit/charlie/hinweis"
 
 type SetNamed map[string]Named
 
+func NewSetNamed() *SetNamed {
+	s := MakeSetNamed()
+	return &s
+}
+
 func MakeSetNamed() SetNamed {
 	return make(SetNamed)
+}
+
+func (s *SetNamed) Add(z Named) {
+	(*s)[z.Hinweis.String()] = z
+}
+
+func (s SetNamed) Get(h hinweis.Hinweis) (z Named, ok bool) {
+	z, ok = s[h.String()]
+	return
+}
+
+func (a SetNamed) Merge(b SetNamed) {
+  for _, z := range b {
+    a.Add(z)
+  }
+}
+
+func (a SetNamed) Contains(z Named) bool {
+  _, ok := a[z.Hinweis.String()]
+  return ok
 }
 
 func (s SetNamed) Hinweisen() (h []hinweis.Hinweis) {
@@ -23,6 +48,16 @@ func (s SetNamed) HinweisStrings() (h []string) {
 
 	for i, _ := range s {
 		h = append(h, i)
+	}
+
+	return
+}
+
+func (s SetNamed) ToSetPrefixNamed() (b *SetPrefixNamed) {
+	b = NewSetPrefixNamed()
+
+	for _, z := range s {
+		b.Add(z)
 	}
 
 	return

@@ -8,11 +8,14 @@ import (
 
 type Writer []string
 
-func NewWriter() Writer {
-	return Writer(make([]string, 0))
+//TODO convert to struct and add option for combining empties
+
+func NewWriter() *Writer {
+	w := Writer(make([]string, 0))
+	return &w
 }
 
-func (w Writer) WriteTo(out io.Writer) (n int64, err error) {
+func (w *Writer) WriteTo(out io.Writer) (n int64, err error) {
 	w1 := bufio.NewWriter(out)
 	defer func() {
 		if err == nil {
@@ -22,7 +25,7 @@ func (w Writer) WriteTo(out io.Writer) (n int64, err error) {
 
 	var n1 int
 
-	for _, l := range w {
+	for _, l := range *w {
 		n1, err = w1.WriteString(fmt.Sprintln(l))
 		n += int64(n1)
 
@@ -30,6 +33,20 @@ func (w Writer) WriteTo(out io.Writer) (n int64, err error) {
 			err = _Error(err)
 			return
 		}
+	}
+
+	return
+}
+
+func (w *Writer) WriteExactlyOneEmpty() {
+	if len(*w) == 0 {
+		w.WriteEmpty()
+		return
+	}
+
+	if (*w)[len(*w)-1] != "\n" {
+		w.WriteEmpty()
+		return
 	}
 
 	return

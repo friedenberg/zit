@@ -18,8 +18,7 @@ import (
 
 type Organize struct {
 	rootEtiketten etikett.Set
-	GroupBy       etikett.Set
-	GroupByUnique bool
+	GroupBy       etikett.Slice
 }
 
 func init() {
@@ -27,10 +26,9 @@ func init() {
 		"organize",
 		func(f *flag.FlagSet) Command {
 			c := &Organize{
-				GroupBy: etikett.NewSet(),
+				GroupBy: etikett.NewSlice(),
 			}
 
-			f.BoolVar(&c.GroupByUnique, "group-by-unique", false, "group by all unique combinations of etiketten")
 			f.Var(&c.GroupBy, "group-by", "etikett prefixes to group zettels")
 
 			return c
@@ -40,9 +38,9 @@ func init() {
 
 func (c *Organize) Run(u _Umwelt, args ...string) (err error) {
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
-		Umwelt:        u,
-		GroupBy:       c.GroupBy,
-		GroupByUnique: c.GroupByUnique,
+		Umwelt:  u,
+		GroupBy: c.GroupBy,
+		// GroupByUnique: c.GroupByUnique,
 	}
 
 	if createOrganizeFileOp.RootEtiketten, err = c.getEtikettenFromArgs(args); err != nil {

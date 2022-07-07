@@ -1,96 +1,86 @@
 package organize_text
 
-import (
-	"bufio"
-	"io"
-	"strings"
+// type metadateiReader struct {
+// 	hasSetBaseEtikett bool
+// 	within            bool
+// }
 
-	"github.com/friedenberg/zit/alfa/errors"
-	"github.com/friedenberg/zit/charlie/etikett"
-	"github.com/friedenberg/zit/foxtrot/zettel_formats"
-)
+// func (ot *organizeText) ReadFrom(r1 io.Reader) (n int64, err error) {
+// 	r := bufio.NewReader(r1)
 
-type metadateiReader struct {
-	hasSetBaseEtikett bool
-	within            bool
-}
+// 	ot.etiketten = etikett.NewSet()
 
-func (ot *organizeText) ReadFrom(r1 io.Reader) (n int64, err error) {
-	r := bufio.NewReader(r1)
+// 	within := false
+// 	line := 0
 
-	ot.etiketten = etikett.NewSet()
+// 	for {
+// 		var s string
+// 		s, err = r.ReadString('\n')
 
-	within := false
-	line := 0
+// 		if err == io.EOF {
+// 			err = nil
+// 			break
+// 		}
 
-	for {
-		var s string
-		s, err = r.ReadString('\n')
+// 		if err != nil {
+// 			err = errors.Error(err)
+// 			return
+// 		}
 
-		if err == io.EOF {
-			err = nil
-			break
-		}
+// 		n += int64(len(s))
 
-		if err != nil {
-			err = errors.Error(err)
-			return
-		}
+// 		s = strings.TrimSuffix(s, "\n")
 
-		n += int64(len(s))
+// 		if !within && s == zettel_formats.MetadateiBoundary {
+// 			within = true
+// 		} else if within && s != zettel_formats.MetadateiBoundary {
+// 			slen := len(s)
 
-		s = strings.TrimSuffix(s, "\n")
+// 			if slen < 1 {
+// 				continue
+// 			}
 
-		if !within && s == zettel_formats.MetadateiBoundary {
-			within = true
-		} else if within && s != zettel_formats.MetadateiBoundary {
-			slen := len(s)
+// 			p := s[0]
+// 			v := ""
 
-			if slen < 1 {
-				continue
-			}
+// 			if slen > 1 {
+// 				v = strings.TrimSpace(s[1:])
+// 			}
 
-			p := s[0]
-			v := ""
+// 			switch p {
 
-			if slen > 1 {
-				v = strings.TrimSpace(s[1:])
-			}
+// 			case '*':
 
-			switch p {
+// 				if v == "" {
+// 					continue
+// 				}
 
-			case '*':
+// 				if err = ot.etiketten.AddString(v); err != nil {
+// 					err = errors.Error(err)
+// 					return
+// 				}
 
-				if v == "" {
-					continue
-				}
+// 			default:
+// 				err = errors.Errorf("unsupported verb '%q', '%q'", p, s)
+// 				return
+// 			}
 
-				if err = ot.etiketten.AddString(v); err != nil {
-					err = errors.Error(err)
-					return
-				}
+// 			line += 1
 
-			default:
-				err = errors.Errorf("unsupported verb '%q', '%q'", p, s)
-				return
-			}
+// 		} else if within && s == zettel_formats.MetadateiBoundary {
+// 			within = false
 
-			line += 1
+// 		} else {
+// 			var n1 int64
 
-		} else if within && s == zettel_formats.MetadateiBoundary {
-			within = false
+// 			if n1, err = ot.zettels.ReadFrom(r); err != nil {
+// 				err = errors.Error(err)
+// 				return
+// 			}
 
-		} else {
-			var n1 int64
+// 			n += n1
+// 		}
+// 	}
 
-			if n1, err = ot.zettels.ReadFrom(r); err != nil {
-				err = errors.Error(err)
-				return
-			}
-
-			n += n1
-		}
-	}
-
-	return
-}
+// 	return
+// }
