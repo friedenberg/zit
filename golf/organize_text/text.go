@@ -68,7 +68,7 @@ func makeChildren(
 		// assigned.Merge(zs)
 		log.Print("iterating through grouped: ", e)
 		child := newAssignment(parent.depth + 1)
-		child.etiketten = etikett.NewSet(e)
+		child.etiketten = etikett.MakeSet(e)
 		// child.named = makeZettelZetFromSetNamed(zs)
 
 		nextEtiketten := etikett.NewSlice()

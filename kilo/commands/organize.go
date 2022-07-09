@@ -172,7 +172,7 @@ func (c Organize) readFromVim(f string, results user_ops.CreateOrganizeFileResul
 }
 
 func (c Organize) getEtikettenFromArgs(args []string) (es etikett.Set, err error) {
-	es = etikett.NewSet()
+	es = etikett.MakeSet()
 
 	for _, s := range args {
 		if err = es.AddString(s); err != nil {

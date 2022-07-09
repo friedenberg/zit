@@ -22,11 +22,11 @@ func (av assignmentLineWriter) write(a *assignment) (err error) {
 	}
 
 	if len(a.named) > 0 {
-		// av.WriteExactlyOneEmpty()
+		av.WriteExactlyOneEmpty()
 	}
 
 	for _, c := range a.children {
-		av.write(&c)
+		av.write(c)
 	}
 
 	av.WriteExactlyOneEmpty()

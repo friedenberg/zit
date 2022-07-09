@@ -60,7 +60,7 @@ func ChangesFrom(a1, b1 organize_text.Text) (c Changes) {
 		existing, ok := c.New[bez]
 
 		if !ok {
-			existing = etikett.NewSet()
+			existing = etikett.MakeSet()
 		}
 
 		existing.AddString(ett)

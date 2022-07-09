@@ -40,18 +40,18 @@ func (in *organizeText) ToCompareMap() (out CompareMap) {
 	return
 }
 
-func (a *assignment) addToCompareMap(es etikett.Set, out *CompareMap) {
+func (a *assignment) addToCompareMap(es *etikett.Set, out *CompareMap) {
 	es = es.Copy()
 	es.Merge(a.etiketten)
 
 	for z, _ := range a.named {
-		for e, _ := range es {
+		for e, _ := range *es {
 			out.Named.Add(e, z.Hinweis)
 		}
 	}
 
 	for z, _ := range a.unnamed {
-		for e, _ := range es {
+		for e, _ := range *es {
 			out.Unnamed.Add(e, z.Bezeichnung)
 		}
 	}

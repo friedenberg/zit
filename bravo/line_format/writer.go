@@ -44,7 +44,7 @@ func (w *Writer) WriteExactlyOneEmpty() {
 		return
 	}
 
-	if (*w)[len(*w)-1] != "\n" {
+	if (*w)[len(*w)-1] != "" {
 		w.WriteEmpty()
 		return
 	}

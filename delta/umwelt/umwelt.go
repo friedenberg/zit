@@ -58,7 +58,7 @@ func (u Umwelt) Age() (a age.Age, err error) {
 }
 
 func (u Umwelt) DefaultEtiketten() (etiketten etikett.Set, err error) {
-	etiketten = etikett.NewSet()
+	etiketten = etikett.MakeSet()
 
 	for e, t := range u.Konfig.Tags {
 		if !t.AddToNewZettels {

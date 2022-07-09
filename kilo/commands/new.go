@@ -36,7 +36,7 @@ func init() {
 		"new",
 		func(f *flag.FlagSet) Command {
 			c := &New{
-				Etiketten: etikett.NewSet(),
+				Etiketten: etikett.MakeSet(),
 			}
 
 			f.Var(&c.Filter, "filter", "a script to run for each file to transform it the standard zettel format")

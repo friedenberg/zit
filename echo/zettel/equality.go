@@ -1,6 +1,8 @@
 package zettel
 
-import "log"
+import (
+	"github.com/friedenberg/zit/alfa/log"
+)
 
 func (z Zettel) Equals(z1 Zettel) bool {
 	if !z.Akte.Equals(z1.Akte) {

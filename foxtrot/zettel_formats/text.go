@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/bravo/sha"
+	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/echo/zettel"
 )
 
@@ -74,7 +75,7 @@ type textStateWrite struct {
 func (f Text) ReadFrom(c *_ZettelFormatContextRead) (n int64, err error) {
 	r := bufio.NewReader(c.In)
 
-	c.Zettel.Etiketten = _EtikettNewSet()
+	c.Zettel.Etiketten = etikett.MakeSet()
 
 	state := &textStateRead{
 		context: c,

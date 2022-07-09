@@ -91,5 +91,5 @@ func (s Slice) String() string {
 }
 
 func (s Slice) ToSet() Set {
-	return NewSet([]Etikett(s)...)
+	return MakeSet([]Etikett(s)...)
 }

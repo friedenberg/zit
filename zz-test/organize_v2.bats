@@ -237,3 +237,95 @@ function outputs_organize_one_etiketten_group_by_two { # @test
 	run zit organize -group-by priority,w task
 	assert_output "$(cat "$expected_organize")"
 }
+
+function commits_organize_one_etiketten_group_by_two { # @test
+	wd="$(mktemp -d)"
+	cd "$wd" || exit 1
+
+	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+
+	to_add="$(mktemp)"
+	{
+		echo "---"
+		echo "# one/uno"
+		echo "- task"
+		echo "- priority-1"
+		echo "- w-2022-07-07"
+		echo "---"
+	} >>"$to_add"
+
+	run zit new "$to_add"
+
+	to_add="$(mktemp)"
+	{
+		echo "---"
+		echo "# two/dos"
+		echo "- task"
+		echo "- priority-1"
+		echo "- w-2022-07-06"
+		echo "---"
+	} >>"$to_add"
+
+	run zit new "$to_add"
+
+	to_add="$(mktemp)"
+	{
+		echo "---"
+		echo "# 3"
+		echo "- task"
+		echo "- priority-1"
+		echo "- w-2022-07-06"
+		echo "---"
+	} >>"$to_add"
+
+	run zit new "$to_add"
+
+	expected_organize="$(mktemp)"
+	{
+		echo "# task"
+		echo
+		echo "## priority-1"
+		echo
+		echo "### w-2022-07-06"
+		echo
+		echo "- [one/dos] two/dos"
+		echo
+		echo "## priority-2"
+		echo
+		echo "### w-2022-07-07"
+		echo
+		echo "- [one/uno] one/uno"
+    echo
+    echo "###"
+    echo
+    echo "- [two/uno] 3"
+	} >>"$expected_organize"
+
+	run zit organize -group-by priority,w task <"$expected_organize"
+  echo "$output"
+
+	to_add="$(mktemp)"
+	{
+		echo "---"
+		echo "# one/uno"
+		echo "- priority-2"
+		echo "- task"
+		echo "- w-2022-07-07"
+		echo "---"
+	} >>"$to_add"
+
+  run zit show one/uno
+  assert_output "$(cat "$to_add")"
+
+	to_add="$(mktemp)"
+	{
+		echo "---"
+		echo "# 3"
+		echo "- priority-2"
+		echo "- task"
+		echo "---"
+	} >>"$to_add"
+
+  run zit show two/uno
+  assert_output "$(cat "$to_add")"
+}

@@ -57,7 +57,7 @@ func (a Etikett) Equals(b Etikett) bool {
 	return a.Value == b.Value
 }
 
-func (e Etikett) Expanded(exes ...Expander) (expanded Set) {
+func (e Etikett) Expanded(exes ...Expander) (expanded *Set) {
 	expanded = NewSet()
 
 	if len(exes) == 0 {

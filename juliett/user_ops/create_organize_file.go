@@ -73,13 +73,13 @@ func (c CreateOrganizeFile) GroupZettel(z _NamedZettel) (ess []etikett.Set) {
 		ess = append(ess, set)
 	} else if set.Len() > 0 {
 		for _, e := range set {
-			ns := etikett.NewSet()
+			ns := etikett.MakeSet()
 			ns.Add(e)
 			ess = append(ess, ns)
 		}
 	} else {
 		// if the zettel has no etiketten, add an empty set
-		ess = append(ess, etikett.NewSet())
+		ess = append(ess, etikett.MakeSet())
 	}
 
 	return ess
@@ -94,7 +94,7 @@ func (c CreateOrganizeFile) SortZettels(a, b _NamedZettel) bool {
 }
 
 func (c CreateOrganizeFile) getEtikettenFromArgs(args []string) (es etikett.Set, err error) {
-	es = etikett.NewSet()
+	es = etikett.MakeSet()
 
 	for _, s := range args {
 		if err = es.AddString(s); err != nil {

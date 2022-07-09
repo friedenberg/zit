@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/bravo/line_format"
+	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 )
 
@@ -35,7 +36,7 @@ func (z Objekte) WriteTo(sz stored_zettel.Stored, out1 io.Writer) (n int64, err 
 }
 
 func (f *Objekte) ReadFrom(sz *stored_zettel.Stored, in io.Reader) (n int64, err error) {
-	sz.Zettel.Etiketten = _EtikettNewSet()
+	sz.Zettel.Etiketten = etikett.MakeSet()
 
 	r := bufio.NewReader(in)
 

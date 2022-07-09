@@ -3,7 +3,7 @@ package etikett
 import "testing"
 
 func TestExpandedRight(t *testing.T) {
-	s := NewSet(
+	s := MakeSet(
 		Etikett{Value: "project-2021-zit"},
 		Etikett{Value: "zz-archive-task-done"},
 	)
@@ -32,12 +32,12 @@ func TestExpandedRight(t *testing.T) {
 }
 
 func TestPrefixIntersection(t *testing.T) {
-	s := NewSet(
+	s := MakeSet(
 		Etikett{Value: "project-2021-zit"},
 		Etikett{Value: "zz-archive-task-done"},
 	)
 
-  ex := s.IntersectPrefixes(NewSet(Etikett{Value: "project"}))
+  ex := s.IntersectPrefixes(MakeSet(Etikett{Value: "project"}))
 
 	expected := []string{
 		"project-2021-zit",

@@ -13,12 +13,19 @@ func (s Set) Len() int {
 	return len(s)
 }
 
-func NewSet(es ...Etikett) (s Set) {
-	s = make(Set)
+func MakeSet(es ...Etikett) (s Set) {
+  s = make(Set)
 
 	for _, e := range es {
 		s.Add(e)
 	}
+
+  return
+}
+
+func NewSet(es ...Etikett) (s *Set) {
+  s1 := MakeSet(es...)
+	s = &s1
 
 	return
 }
@@ -38,7 +45,7 @@ func (es Set) AddString(v string) (err error) {
 
 func (es Set) Add(e Etikett) {
 	expanded := e.Expanded(ExpanderRight{})
-	intersection := es.Intersect(expanded)
+	intersection := es.Intersect(*expanded)
 	es.Remove(intersection.Etiketten()...)
 
 	es.addOnlyExact(e)
@@ -68,7 +75,7 @@ func (es Set) Remove(es1 ...Etikett) {
 }
 
 func (es Set) RemovePrefixes(e Etikett) {
-	prefixes := es.IntersectPrefixes(NewSet(e))
+	prefixes := es.IntersectPrefixes(MakeSet(e))
 	es.Remove(prefixes.Etiketten()...)
 }
 
@@ -92,7 +99,7 @@ func (s1 Set) Merge(s2 Set) {
 	}
 }
 
-func (s1 Set) Copy() (s2 Set) {
+func (s1 Set) Copy() (s2 *Set) {
 	s2 = NewSet()
 
 	for _, e := range s1 {
@@ -103,10 +110,10 @@ func (s1 Set) Copy() (s2 Set) {
 }
 
 func (s Set) Expanded(exes ...Expander) (s1 Set) {
-	s1 = NewSet()
+	s1 = MakeSet()
 
 	for _, e := range s {
-		for _, e1 := range e.Expanded(exes...) {
+		for _, e1 := range *e.Expanded(exes...) {
 			log.Print(e1)
 			s1.addOnlyExact(e1)
 		}
@@ -197,7 +204,7 @@ func (a Set) ContainsSet(b Set) bool {
 }
 
 func (s1 Set) Subtract(s2 Set) (s3 Set) {
-	s3 = NewSet()
+	s3 = MakeSet()
 
 	for _, e1 := range s1 {
 		if s2.Contains(e1) {
@@ -211,7 +218,7 @@ func (s1 Set) Subtract(s2 Set) (s3 Set) {
 }
 
 func (s1 Set) IntersectPrefixes(s2 Set) (s3 Set) {
-	s3 = NewSet()
+	s3 = MakeSet()
 
 	for _, e1 := range s2 {
 		didAdd := false
@@ -224,7 +231,7 @@ func (s1 Set) IntersectPrefixes(s2 Set) (s3 Set) {
 		}
 
 		if !didAdd {
-			s3 = NewSet()
+			s3 = MakeSet()
 			return
 		}
 	}
@@ -233,7 +240,7 @@ func (s1 Set) IntersectPrefixes(s2 Set) (s3 Set) {
 }
 
 func (s1 Set) Intersect(s2 Set) (s3 Set) {
-	s3 = NewSet()
+	s3 = MakeSet()
 
 	for _, e := range s1 {
 		if s2.Contains(e) {
@@ -249,7 +256,7 @@ func (es Set) MarshalJSON() ([]byte, error) {
 }
 
 func (es *Set) UnmarshalJSON(b []byte) (err error) {
-	*es = NewSet()
+	es = NewSet()
 	var vs []string
 
 	if err = json.Unmarshal(b, &vs); err != nil {

@@ -1,9 +1,13 @@
 package stored_zettel_formats
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/friedenberg/zit/charlie/etikett"
+)
 
 func makeEtiketten(t *testing.T, vs ...string) (es _EtikettSet) {
-	es = _EtikettNewSet()
+	es = etikett.MakeSet()
 
 	for _, v := range vs {
 		if err := es.AddString(v); err != nil {

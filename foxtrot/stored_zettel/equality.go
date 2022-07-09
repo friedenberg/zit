@@ -1,6 +1,8 @@
 package stored_zettel
 
-import "log"
+import (
+	"github.com/friedenberg/zit/alfa/log"
+)
 
 func (a Stored) Equals(b Stored) bool {
 	if !a.Zettel.Equals(b.Zettel) {

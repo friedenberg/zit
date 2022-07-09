@@ -22,7 +22,7 @@ func init() {
 		"add",
 		func(f *flag.FlagSet) Command {
 			c := &Add{
-				Etiketten: _EtikettNewSet(),
+				Etiketten: etikett.MakeSet(),
 			}
 
 			f.Var(&c.Etiketten, "etiketten", "to add to the created zettels")
