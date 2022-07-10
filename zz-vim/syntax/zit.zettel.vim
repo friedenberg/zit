@@ -1,0 +1,1 @@
+/Users/sasha/.dotfiles/vim/syntax/zit.zettel.vim

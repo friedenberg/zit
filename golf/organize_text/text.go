@@ -113,7 +113,11 @@ func (ot organizeText) WriteTo(out io.Writer) (n int64, err error) {
 	lw := line_format.NewWriter()
 
 	aw := assignmentLineWriter{Writer: lw}
-	aw.write(ot.assignment)
+
+	if err = aw.write(ot.assignment); err != nil {
+		err = errors.Error(err)
+		return
+	}
 
 	if n, err = lw.WriteTo(out); err != nil {
 		err = errors.Error(err)

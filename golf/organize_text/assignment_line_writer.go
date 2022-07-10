@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/bravo/line_format"
 )
 
@@ -12,13 +13,35 @@ type assignmentLineWriter struct {
 }
 
 func (av assignmentLineWriter) write(a *assignment) (err error) {
+	if a.depth < 0 {
+		err = errors.Errorf("negative depth: %d", a.depth)
+		return
+	}
+
+	var tab_prefix string
+
+	tab_prefix = ""
+
+	if a.depth > 1 {
+		tab_prefix = strings.Repeat("\t", a.depth-1)
+	}
+
 	if a.etiketten.Len() > 0 {
-		av.WriteLines(fmt.Sprintf("%s %s", strings.Repeat("#", a.depth), a.etiketten))
+		av.WriteLines(
+			fmt.Sprintf(
+				"%s%s %s",
+				tab_prefix,
+				strings.Repeat("#", a.depth),
+				a.etiketten,
+			),
+		)
 		av.WriteExactlyOneEmpty()
 	}
 
 	for z, _ := range a.named {
-		av.WriteLines(fmt.Sprintf("- [%s] %s", z.Hinweis, z.Bezeichnung))
+		av.WriteLines(
+			fmt.Sprintf("%s- [%s] %s", tab_prefix,
+				z.Hinweis, z.Bezeichnung))
 	}
 
 	if len(a.named) > 0 {

@@ -308,6 +308,14 @@ func (ar *assignmentLineReader) readOneZettel(l line) (err error) {
 		return
 	}
 
+	err = ErrorRead{
+		error:  err,
+		line:   ar.lineNo,
+		column: 2,
+	}
+
+	return
+
 	var nz newZettel
 
 	if err = nz.Set(l.String()); err == nil {
