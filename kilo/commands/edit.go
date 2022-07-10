@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/juliett/user_ops"
 )
@@ -46,14 +47,15 @@ func (c Edit) Run(u _Umwelt, args ...string) (err error) {
 		return
 	}
 
-	vimArgs := []string{
-		"-c",
-		"set ft=zit.zettel",
-		"-c",
-		"source ~/.vim/syntax/zit.zettel.vim",
+	openVimOp := user_ops.OpenVim{
+		Options: vim_cli_options_builder.New().
+			WithCursorLocation(2, 3).
+			WithFileType("zit.zettel").
+			WithInsertMode().
+			Build(),
 	}
 
-	if err = _OpenVimWithArgs(vimArgs, checkoutResults.FilesZettelen...); err != nil {
+	if _, err = openVimOp.Run(checkoutResults.FilesZettelen...); err != nil {
 		err = errors.Error(err)
 		return
 	}

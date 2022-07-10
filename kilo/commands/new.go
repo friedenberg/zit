@@ -145,8 +145,6 @@ func (c New) writeNewZettel(u *umwelt.Umwelt, f zettel.Format) (err error) {
 			Options: vim_cli_options_builder.New().
 				WithCursorLocation(2, 3).
 				WithInsertMode().
-				WithFileType("zit.zettel").
-				WithSourcedFile("~/.vim/syntax/zit.zettel.vim").
 				Build(),
 		}
 
