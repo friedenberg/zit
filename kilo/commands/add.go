@@ -75,8 +75,7 @@ func (c Add) Run(u _Umwelt, args ...string) (err error) {
 
 	openVimOp := user_ops.OpenVim{
 		Options: vim_cli_options_builder.New().
-			WithFileType("zit.organize").
-			WithSourcedFile("~/.vim/syntax/zit.organize.vim").
+			WithFileType("zit-organize").
 			Build(),
 	}
 

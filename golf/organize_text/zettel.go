@@ -19,8 +19,13 @@ func (z zettel) String() string {
 func (z *zettel) Set(v string) (err error) {
 	remaining := v
 
+	if len(remaining) < 3 {
+		err = errors.Errorf("expected at least 3 characters")
+		return
+	}
+
 	if remaining[:3] != "- [" {
-		err = errors.Errorf("expected '- [', but got '%s'", remaining[:2])
+		err = errors.Errorf("expected '- [', but got '%s'", remaining[:3])
 		return
 	}
 
@@ -35,7 +40,7 @@ func (z *zettel) Set(v string) (err error) {
 
 	z.Hinweis = remaining[:idx]
 
-  //no bezeichnung
+	//no bezeichnung
 	if idx+2 > len(remaining)-1 {
 		return
 	}

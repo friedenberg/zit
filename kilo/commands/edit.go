@@ -50,7 +50,7 @@ func (c Edit) Run(u _Umwelt, args ...string) (err error) {
 	openVimOp := user_ops.OpenVim{
 		Options: vim_cli_options_builder.New().
 			WithCursorLocation(2, 3).
-			WithFileType("zit.zettel").
+			WithFileType("zit-zettel").
 			WithInsertMode().
 			Build(),
 	}
