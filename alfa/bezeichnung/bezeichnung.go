@@ -8,10 +8,6 @@ func (b Bezeichnung) String() string {
 	return string(b)
 }
 
-func (b Bezeichnung) CouldBe(r rune) bool {
-	return true
-}
-
 func (b *Bezeichnung) Set(v string) (err error) {
 	v1 := strings.TrimSpace(v)
 

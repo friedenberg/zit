@@ -21,7 +21,7 @@ type Zettel struct {
 func (z Zettel) Description() (d string) {
 	d = z.Bezeichnung.String()
 
-	if d == "" {
+	if strings.TrimSpace(d) == "" {
 		sb := &strings.Builder{}
 		first := true
 

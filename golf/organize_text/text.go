@@ -49,7 +49,7 @@ func makeChildren(
 			// assigned.Merge(zs)
 			for _, z := range zs {
 				log.Printf("%s adding named %s", parent.etiketten, z.Hinweis)
-				parent.named.Add(zettel{Hinweis: z.Hinweis.String(), Bezeichnung: z.Zettel.Bezeichnung.String()})
+				parent.named.Add(makeZettel(z))
 			}
 		}
 
@@ -61,7 +61,7 @@ func makeChildren(
 	log.Printf("head: %s grouped: %s", remainingEtiketten[0], segments.Grouped.ToSetNamed().HinweisStrings())
 
 	for _, z := range *segments.Ungrouped {
-		parent.named.Add(zettel{Hinweis: z.Hinweis.String(), Bezeichnung: z.Zettel.Bezeichnung.String()})
+		parent.named.Add(makeZettel(z))
 	}
 
 	for e, zs := range *segments.Grouped {

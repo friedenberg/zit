@@ -5,11 +5,19 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 )
 
 type zettel struct {
 	Hinweis     string
 	Bezeichnung string
+}
+
+func makeZettel(named stored_zettel.Named) zettel {
+	return zettel{
+		Hinweis:     named.Hinweis.String(),
+		Bezeichnung: named.Zettel.Description(),
+	}
 }
 
 func (z zettel) String() string {

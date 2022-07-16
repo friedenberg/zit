@@ -144,7 +144,8 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 		var named _NamedZettel
 
 		if named, err = store.Zettels().Create(z); err != nil {
-			stdprinter.Errf("failed to create zettel: %s", err)
+			err = errors.Errorf("failed to create zettel: %s", err)
+			return
 		}
 
 		stdprinter.Outf("[%s %s] (created)\n", named.Hinweis, named.Sha)
