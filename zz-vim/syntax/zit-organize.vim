@@ -1,24 +1,25 @@
 
-if exists("b:current_syntax")
-  finish
-endif
+" if exists("b:current_syntax")
+"   finish
+" endif
 
-syn match zitEtikett /\v[^#\n,]+/ contained contains=@NoSpell
+syn match zitEtikett /\v[^#,]+/ contained contains=@NoSpell
 syn match zitEtikettPrefix /\v#+/ contained
 syn region zitEtikettRegion start=/\v^\s*#+ / end=/$/ oneline
       \ contains=zitEtikett,zitEtikettPrefix
 
-syn match zitZettelBezeichnung /\v [^[\n][^\n]*$/ contained contains=@NoSpell
 syn match zitZettelHinweis /\v\w+/ contained contains=@NoSpell
 syn match zitZettelSeparator /\v\// contained
 syn match zitZettelPrefix /\v^\s*- / contained
+" don't include the newline because this is within a region
+syn match zitZettelBezeichnung /\v.*/ contained contains=@NoSpell
 
 syn region zitZettelHinweisRegion start=/\v\[/ end=/]/ oneline contained
       \ contains=zitZettelHinweis,zitZettelHinweisSeparator
       \ nextgroup=zitZettelBezeichnung
 
 syn region zitZettelRegion start=/\v^\s*- / end=/$/ oneline
-      \ contains=zitZettelHinweisRegion,zitZettelBezeichnung
+      \ contains=zitZettelHinweisRegion ",zitZettelBezeichnung
 
 highlight default link zitEtikett Title
 highlight default link zitZettelHinweis Identifier
