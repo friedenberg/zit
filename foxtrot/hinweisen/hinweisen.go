@@ -2,6 +2,8 @@ package hinweisen
 
 import (
 	"path"
+
+	"github.com/friedenberg/zit/alfa/log"
 )
 
 type Hinweisen interface {
@@ -80,10 +82,14 @@ func (zs *hinweisen) Flush() (err error) {
 }
 
 func (hn *hinweisen) StoreNew(sha _Sha) (h _Hinweis, err error) {
+	log.Print("storing new")
+	log.PrintDebug(hn.factory)
 	if h, err = hn.factory.Make(); err != nil {
+		log.Print("failed")
 		err = _Error(err)
 		return
 	}
+	log.Print("succeeded")
 
 	err = hn.StoreExisting(h, sha)
 
@@ -114,6 +120,9 @@ func (hn *hinweisen) StoreExisting(h _Hinweis, sha _Sha) (err error) {
 
 	var sh _Shard
 
+	log.PrintDebug(h)
+	log.PrintDebug(h.Head())
+	log.PrintDebug("wow")
 	if sh, err = hn.storeH.Shard(h.Head()); err != nil {
 		err = _Error(err)
 		return

@@ -2,10 +2,10 @@ package konfig
 
 import (
 	"flag"
-	"io/ioutil"
-	"log"
 	"os"
 	"path"
+
+	"github.com/friedenberg/zit/alfa/log"
 )
 
 type Cli struct {
@@ -66,10 +66,9 @@ func (c Cli) KonfigPath() (p string, err error) {
 
 func (c Cli) Konfig() (k Konfig, err error) {
 	if c.Verbose {
-		log.SetFlags(log.LstdFlags | log.Lshortfile | log.Lmicroseconds)
-		log.Print("verbose")
+		log.SetVerbose()
 	} else {
-		log.SetOutput(ioutil.Discard)
+		// log.SetOutput(ioutil.Discard)
 	}
 
 	var p string

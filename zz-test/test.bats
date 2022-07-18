@@ -153,25 +153,23 @@ function can_output_organize { # @test
 
 	expected_organize="$(mktemp)"
 	{
-		echo "---"
-		echo "* ok"
-		echo "---"
-		echo ""
+		echo
+		echo "# ok"
+		echo
 		echo "- [one/uno] wow"
 	} >>"$expected_organize"
 
-	run zit organize -group-by-unique ok <"$(tty)"
+	run zit organize ok <"$(tty)"
 	assert_output "$(cat "$expected_organize")"
 
 	{
-		echo "---"
-		echo "* wow"
-		echo "---"
-		echo ""
+		echo "# wow"
+		echo
+		echo
 		echo "- [one/uno] wow"
 	} >"$expected_organize"
 
-	run zit organize -group-by-unique ok <"$expected_organize"
+	run zit organize ok <"$expected_organize"
 
 	expected_zettel="$(mktemp)"
 	{
@@ -211,13 +209,12 @@ function hides_hidden_etiketten_from_organize { # @test
 
 	expected_organize="$(mktemp)"
 	{
-		echo "---"
-		echo "* project-2021-zit"
-		echo "---"
-		echo ""
+		echo
+		echo "# project-2021-zit"
+		echo
 	} >>"$expected_organize"
 
-	run zit organize -group-by-unique project-2021-zit
+	run zit organize project-2021-zit
 	assert_output "$(cat "$expected_organize")"
 }
 
@@ -238,7 +235,7 @@ function can_new_zettel_with_metadatei { # @test
 	} >>"$expected"
 
 	run zit new -bezeichnung bez -etiketten et1,et2
-	assert_output --partial '[one/uno '
+	assert_output --partial '[one/dos '
 
 	run cat one/uno.md
 	assert_output "$(cat "$expected")"

@@ -138,7 +138,7 @@ func (c New) writeNewZettel(u *umwelt.Umwelt, f zettel.Format) (err error) {
 		return
 	}
 
-	opCreateFromPath.ReadHinweisFromPath = true
+	// opCreateFromPath.ReadHinweisFromPath = true
 
 	if c.Edit {
 		openVimOp := user_ops.OpenVim{

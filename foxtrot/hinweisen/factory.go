@@ -6,6 +6,10 @@ import (
 	"path"
 	"strconv"
 	"sync"
+
+	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/log"
+	"github.com/friedenberg/zit/charlie/hinweis"
 )
 
 const (
@@ -74,10 +78,11 @@ func (hf *factory) refresh() (err error) {
 }
 
 func (hf *factory) Make() (h _Hinweis, err error) {
+	log.Print("making")
 	hf.Lock()
 	defer hf.Unlock()
 	defer func() {
-		if err != nil {
+		if err == nil {
 			err = hf.flush()
 		}
 	}()
@@ -89,8 +94,9 @@ func (hf *factory) Make() (h _Hinweis, err error) {
 
 	newInt := hf.counter + 1
 
-	if h, err = _NewHinweis(newInt, hf.yin, hf.yang); err != nil {
-		err = _Error(err)
+	log.Printf("next kennung: %d", newInt)
+	if h, err = hinweis.New(newInt, hf.yin, hf.yang); err != nil {
+		err = errors.Error(err)
 		return
 	}
 

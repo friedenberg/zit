@@ -20,7 +20,7 @@ type CreateFromPaths struct {
 	Umwelt              *umwelt.Umwelt
 	Format              zettel.Format
 	Filter              _ScriptValue
-	ReadHinweisFromPath bool
+	// ReadHinweisFromPath bool
 }
 
 type CreateFromPathsResults struct {
@@ -52,7 +52,8 @@ func (c CreateFromPaths) Run(args ...string) (results CreateFromPathsResults, er
 
 	for _, z := range toCreate {
 		var named _NamedZettel
-		if c.ReadHinweisFromPath {
+    //TODO
+		if false/*c.ReadHinweisFromPath*/ {
 			head, tail := id.HeadTailFromFileName(z.Path)
 
 			var h hinweis.Hinweis

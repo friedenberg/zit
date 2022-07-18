@@ -40,7 +40,6 @@ var (
 	_Err                 = stdprinter.Err
 	_MakeBlindHinweis    = hinweis.MakeBlindHinweis
 	_ReadAllString       = open_file_guard.ReadAllString
-	_NewHinweis          = hinweis.New
 	_TempFile            = open_file_guard.TempFile
 	_NewStore            = sharded_store.NewStore
 	_NewShard            = sharded_store.NewShard

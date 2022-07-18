@@ -2,6 +2,7 @@ package log
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -18,14 +19,18 @@ func init() {
 	if cwd, err = os.Getwd(); err != nil {
 		log.Panic(err)
 	}
+
+	log.SetOutput(ioutil.Discard)
 }
 
 func SetVerbose() {
-  verbose = true
+	verbose = true
+	log.SetFlags(log.LstdFlags | log.Lshortfile | log.Lmicroseconds)
+	log.Print("verbose")
 }
 
 func SetTesting() {
-  SetVerbose()
+	SetVerbose()
 	isTest = true
 	//TODO use base directory for project
 	cwd = filepath.Dir(filepath.Dir(cwd))
@@ -57,9 +62,9 @@ func LogPrefix() string {
 }
 
 func Print(vs ...interface{}) {
-  if !verbose {
-    return 
-  }
+	if !verbose {
+		return
+	}
 
 	for _, v := range vs {
 		os.Stderr.WriteString(fmt.Sprintln(LogPrefix(), v))
@@ -67,18 +72,18 @@ func Print(vs ...interface{}) {
 }
 
 func Printf(f string, vs ...interface{}) {
-  if !verbose {
-    return 
-  }
+	if !verbose {
+		return
+	}
 
 	vs = append([]interface{}{LogPrefix()}, vs...)
 	os.Stderr.WriteString(fmt.Sprintf("%s"+f, vs...))
 }
 
 func PrintDebug(vs ...interface{}) {
-  if !verbose {
-    return 
-  }
+	if !verbose {
+		return
+	}
 
 	for _, v := range vs {
 		os.Stderr.WriteString(fmt.Sprintf("%s%#v\n", LogPrefix(), v))
