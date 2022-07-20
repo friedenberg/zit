@@ -101,6 +101,7 @@ func (c Push) runRemoteScript(u _Umwelt, remote _RemoteScript, args []string, b 
 		return
 	}
 
+	script.Stdin = os.Stdin
 	script.Stdout = os.Stdout
 	script.Stderr = os.Stderr
 

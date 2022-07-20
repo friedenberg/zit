@@ -28,6 +28,7 @@ func (l line) String() string {
 
 func (l *line) Set(v string) (err error) {
 	v = strings.TrimSpace(v)
+
 	if len(v) == 0 {
 		err = errors.Errorf("line not long enough")
 		return
@@ -47,6 +48,10 @@ func (l *line) Set(v string) (err error) {
 }
 
 func (l line) PrefixRune() rune {
+	if len(l.prefix) == 0 {
+		panic(errors.Errorf("cannot find prefix in line: %q", l.value))
+	}
+
 	return rune(l.prefix[0])
 }
 
