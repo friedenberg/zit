@@ -9,8 +9,9 @@ import (
 	"github.com/friedenberg/zit/alfa/stdprinter"
 )
 
-func (c command) PrintUsage(in error) (out error) {
+func (c command) PrintUsage(in error) (exitStatus int) {
 	if in != nil {
+    exitStatus = 1
 		stdprinter.Err(in)
 	}
 

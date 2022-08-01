@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
@@ -91,7 +92,7 @@ func (c RmObjekte) zettelen(store store_with_lock.Store, ids ..._Id) (err error)
 			return
 		}
 
-		_Outf("[%s %s] (deleted)\n", z.Hinweis, z.Sha)
+		stdprinter.Outf("[%s %s] (deleted)\n", z.Hinweis, z.Sha)
 	}
 
 	return

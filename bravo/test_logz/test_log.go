@@ -1,18 +1,18 @@
-package test_log
+package test_logz
 
 import (
 	"fmt"
 	"os"
 	"testing"
 
-	"github.com/friedenberg/zit/alfa/log"
+	"github.com/friedenberg/zit/alfa/logz"
 )
 
 var (
-	Print      = log.Print
-	Printf     = log.Printf
-	PrintDebug = log.PrintDebug
-	LogPrefix  = log.LogPrefix
+	Print      = logz.Print
+	Printf     = logz.Printf
+	PrintDebug = logz.PrintDebug
+	LogPrefix  = logz.LogPrefix
 )
 
 func Errorf(t *testing.T, format string, args ...interface{}) {

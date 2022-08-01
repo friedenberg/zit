@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
@@ -44,7 +45,7 @@ func (c Revert) RunWithLockedStore(store store_with_lock.Store, args ...string) 
 		}
 
 	default:
-		_Errf("objekte type %s does not support reverts currently\n", c.Type)
+		stdprinter.Errf("objekte type %s does not support reverts currently\n", c.Type)
 	}
 
 	return

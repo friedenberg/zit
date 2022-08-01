@@ -3,7 +3,8 @@ package hinweisen
 import (
 	"path"
 
-	"github.com/friedenberg/zit/alfa/log"
+	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/logz"
 )
 
 type Hinweisen interface {
@@ -32,17 +33,17 @@ func New(age _Age, basePath string) (s *hinweisen, err error) {
 	}
 
 	if s.factory, err = newFactory(basePath); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
 	if s.storeS, err = _NewStore(path.Join(basePath, "Zettel-Hinweis"), s); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
 	if s.storeH, err = _NewStore(path.Join(basePath, "Hinweis"), s); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -55,7 +56,7 @@ func (hn hinweisen) Factory() *factory {
 
 func (hn hinweisen) NewShard(p string, id string) (s _Shard, err error) {
 	if s, err = _NewShard(path.Join(p, id), nil, &_ShardGeneric{}); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -64,17 +65,17 @@ func (hn hinweisen) NewShard(p string, id string) (s _Shard, err error) {
 
 func (zs *hinweisen) Flush() (err error) {
 	if err = zs.storeH.Flush(); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
 	if err = zs.storeS.Flush(); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
 	if err = zs.factory.Flush(); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -82,14 +83,14 @@ func (zs *hinweisen) Flush() (err error) {
 }
 
 func (hn *hinweisen) StoreNew(sha _Sha) (h _Hinweis, err error) {
-	log.Print("storing new")
-	log.PrintDebug(hn.factory)
+	logz.Print("storing new")
+	logz.PrintDebug(hn.factory)
 	if h, err = hn.factory.Make(); err != nil {
-		log.Print("failed")
-		err = _Error(err)
+		logz.Print("failed")
+		err = errors.Error(err)
 		return
 	}
-	log.Print("succeeded")
+	logz.Print("succeeded")
 
 	err = hn.StoreExisting(h, sha)
 
@@ -100,7 +101,7 @@ func (hn *hinweisen) StoreExisting(h _Hinweis, sha _Sha) (err error) {
 	var ss _Shard
 
 	if ss, err = hn.storeS.Shard(sha.Head()); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -111,7 +112,7 @@ func (hn *hinweisen) StoreExisting(h _Hinweis, sha _Sha) (err error) {
 	// so just short circuit and return that
 	if stringH, ok = ss.Read(sha.String()); ok {
 		if h, err = _MakeBlindHinweis(stringH); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 
@@ -120,16 +121,16 @@ func (hn *hinweisen) StoreExisting(h _Hinweis, sha _Sha) (err error) {
 
 	var sh _Shard
 
-	log.PrintDebug(h)
-	log.PrintDebug(h.Head())
-	log.PrintDebug("wow")
+	logz.PrintDebug(h)
+	logz.PrintDebug(h.Head())
+	logz.PrintDebug("wow")
 	if sh, err = hn.storeH.Shard(h.Head()); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
 	if _, ok = sh.Read(h.String()); ok {
-		err = _Errorf("hinweis already stored: %s", h)
+		err = errors.Errorf("hinweis already stored: %s", h)
 		return
 	}
 
@@ -143,19 +144,19 @@ func (hn *hinweisen) Update(h _Hinweis, s _Sha) (err error) {
 	var sh _Shard
 
 	if sh, err = hn.storeH.Shard(h.Head()); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
 	if _, err = hn.Read(h); err != nil {
-		err = _Errorf("hinweis '%s' does not yet exist: %w", h, err)
+		err = errors.Errorf("hinweis '%s' does not yet exist: %s", h, err)
 		return
 	}
 
 	var ss _Shard
 
 	if ss, err = hn.storeS.Shard(s.Head()); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -169,7 +170,7 @@ func (hn hinweisen) Read(h _Hinweis) (s _Sha, err error) {
 	var sh _Shard
 
 	if sh, err = hn.storeH.Shard(h.Head()); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -177,12 +178,12 @@ func (hn hinweisen) Read(h _Hinweis) (s _Sha, err error) {
 	var shaString string
 
 	if shaString, ok = sh.Read(h.String()); !ok {
-		err = _Errorf("hinweis '%s' does not exist", h)
+		err = errors.Normalf("hinweis '%s' does not exist", h)
 		return
 	}
 
 	if err = s.Set(shaString); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -193,7 +194,7 @@ func (hn hinweisen) ReadSha(s _Sha) (h _Hinweis, err error) {
 	var ss _Shard
 
 	if ss, err = hn.storeS.Shard(s.Head()); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -201,12 +202,12 @@ func (hn hinweisen) ReadSha(s _Sha) (h _Hinweis, err error) {
 	var hString string
 
 	if hString, ok = ss.Read(s.String()); !ok {
-		err = _Errorf("hinweis for sha '%s' does not exist", s)
+		err = errors.Errorf("hinweis for sha '%s' does not exist", s)
 		return
 	}
 
 	if h, err = _MakeBlindHinweis(hString); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -215,12 +216,12 @@ func (hn hinweisen) ReadSha(s _Sha) (h _Hinweis, err error) {
 
 func (zs *hinweisen) ReadString(s string) (sha _Sha, hin _Hinweis, err error) {
 	if hin, err = _MakeBlindHinweis(s); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
 	if sha, err = zs.Read(hin); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -235,14 +236,14 @@ func (zs *hinweisen) ReadManyStrings(args ...string) (shas []_Sha, hins []_Hinwe
 		var h _Hinweis
 
 		if h, err = _MakeBlindHinweis(a); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 
 		var sha _Sha
 
 		if sha, err = zs.Read(h); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 
@@ -260,7 +261,7 @@ func (hn *hinweisen) All() (shas []_Sha, hins []_Hinweis, err error) {
 	var es []_Entry
 
 	if es, err = hn.storeH.All(); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -268,14 +269,14 @@ func (hn *hinweisen) All() (shas []_Sha, hins []_Hinweis, err error) {
 		var h _Hinweis
 
 		if h, err = _MakeBlindHinweis(e.Key); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 
 		var sha _Sha
 
 		if err = sha.Set(e.Value); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 

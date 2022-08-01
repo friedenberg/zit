@@ -3,9 +3,10 @@ package commands
 import (
 	"encoding/json"
 	"flag"
-	"log"
 
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/logz"
+	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
@@ -74,7 +75,7 @@ OUTER:
 			}
 		}
 
-		_Out(e)
+		stdprinter.Out(e)
 	}
 
 	return
@@ -95,9 +96,9 @@ func (c Cat) zettelen(store store_with_lock.Store) (err error) {
 			b, err := json.Marshal(z.Stored)
 
 			if err != nil {
-				log.Print(err)
+				logz.Print(err)
 			} else {
-				_Out(string(b))
+				stdprinter.Out(string(b))
 			}
 		}
 	} else {
@@ -113,7 +114,7 @@ func (c Cat) zettelen(store store_with_lock.Store) (err error) {
 			c.Zettel = z.Zettel
 
 			if _, err = f.WriteTo(c); err != nil {
-				log.Print(err)
+				logz.Print(err)
 			}
 		}
 	}
@@ -130,7 +131,7 @@ func (c Cat) akten(store store_with_lock.Store) (err error) {
 	}
 
 	for _, s := range shas {
-		_Out(s)
+		stdprinter.Out(s)
 	}
 
 	return
@@ -146,7 +147,7 @@ func (c Cat) hinweisen(store store_with_lock.Store) (err error) {
 	}
 
 	for i, h := range hins {
-		_Outf("%s: %s\n", h, shas[i])
+		stdprinter.Outf("%s: %s\n", h, shas[i])
 	}
 
 	return
@@ -172,9 +173,9 @@ func (c Cat) all(store store_with_lock.Store) (err error) {
 	b, err := json.Marshal(chains)
 
 	if err != nil {
-		log.Print(err)
+		logz.Print(err)
 	} else {
-		_Out(string(b))
+		stdprinter.Out(string(b))
 	}
 
 	return

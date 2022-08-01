@@ -28,7 +28,7 @@ func (c Checkout) Run(args ...string) (results CheckoutResults, err error) {
 	defer errors.PanicIfError(store.Flush)
 
 	if results.Zettelen, err = store.Zettels().Checkout(c.Options, args...); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 

@@ -3,8 +3,10 @@ package zettel_formats
 import (
 	"fmt"
 	"io"
-	"log"
 	"os"
+
+	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/logz"
 )
 
 func (f Text) WriteTo(c _ZettelFormatContextWrite) (n int64, err error) {
@@ -20,7 +22,7 @@ func (f Text) WriteTo(c _ZettelFormatContextWrite) (n int64, err error) {
 }
 
 func (f Text) writeToOmitAkte(c _ZettelFormatContextWrite) (n int64, err error) {
-	log.Print()
+	logz.Print()
 	w := _LineFormatNewWriter()
 
 	w.WriteLines(
@@ -63,6 +65,11 @@ func (f Text) writeToOmitAkte(c _ZettelFormatContextWrite) (n int64, err error) 
 }
 
 func (f Text) writeToInlineAkte(c _ZettelFormatContextWrite) (n int64, err error) {
+	if c.Out == nil {
+		err = errors.Errorf("context.Out is empty")
+		return
+	}
+
 	w := _LineFormatNewWriter()
 
 	w.WriteLines(
@@ -126,7 +133,7 @@ func (f Text) writeToInlineAkte(c _ZettelFormatContextWrite) (n int64, err error
 }
 
 func (f Text) writeToExternalAkte(c _ZettelFormatContextWrite) (n int64, err error) {
-	log.Print()
+	logz.Print()
 	w := _LineFormatNewWriter()
 
 	w.WriteLines(

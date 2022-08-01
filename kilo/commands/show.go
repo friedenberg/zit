@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/bravo/id"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
@@ -94,7 +95,7 @@ func (c Show) showAkten(store store_with_lock.Store, zettels []_NamedZettel) (er
 			return
 		}
 
-		defer _PanicIfError(ar.Close())
+		defer stdprinter.PanicIfError(ar.Close())
 
 		if _, err = io.Copy(store.Out, ar); err != nil {
 			err = errors.Error(err)

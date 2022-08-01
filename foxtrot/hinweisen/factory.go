@@ -8,7 +8,7 @@ import (
 	"sync"
 
 	"github.com/friedenberg/zit/alfa/errors"
-	"github.com/friedenberg/zit/alfa/log"
+	"github.com/friedenberg/zit/alfa/logz"
 	"github.com/friedenberg/zit/charlie/hinweis"
 )
 
@@ -37,17 +37,17 @@ func newFactory(basePath string) (f *factory, err error) {
 	}
 
 	if f.yin, err = newProvider(providerPathYin); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
 	if f.yang, err = newProvider(providerPathYang); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
 	if err = f.Refresh(); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -78,7 +78,7 @@ func (hf *factory) refresh() (err error) {
 }
 
 func (hf *factory) Make() (h _Hinweis, err error) {
-	log.Print("making")
+	logz.Print("making")
 	hf.Lock()
 	defer hf.Unlock()
 	defer func() {
@@ -88,13 +88,13 @@ func (hf *factory) Make() (h _Hinweis, err error) {
 	}()
 
 	// if err = hf.refresh(); err != nil {
-	// 	err = _Error(err)
+	// 	err = errors.Error(err)
 	// 	return
 	// }
 
 	newInt := hf.counter + 1
 
-	log.Printf("next kennung: %d", newInt)
+	logz.Printf("next kennung: %d", newInt)
 	if h, err = hinweis.New(newInt, hf.yin, hf.yang); err != nil {
 		err = errors.Error(err)
 		return

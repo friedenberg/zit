@@ -4,8 +4,11 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
+	"github.com/friedenberg/zit/foxtrot/zettel_formats"
+	"github.com/friedenberg/zit/hotel/zettels"
 	"github.com/friedenberg/zit/juliett/user_ops"
 )
 
@@ -117,11 +120,11 @@ func (c Checkout) Run(u _Umwelt, args ...string) (err error) {
 		break
 	}
 
-	checkinOptions := _ZettelsCheckinOptions{
+	checkinOptions := zettels.CheckinOptions{
 		IgnoreMissingHinweis: true,
 		AddMdExtension:       true,
 		IncludeAkte:          c.IncludeAkte,
-		Format:               _ZettelFormatsText{},
+		Format:               zettel_formats.Text{},
 	}
 
 	var readResults user_ops.ReadCheckedOutResults
@@ -145,14 +148,14 @@ func (c Checkout) Run(u _Umwelt, args ...string) (err error) {
 		}
 
 		if cz.Internal.Zettel.Equals(cz.External.Zettel) {
-			_Outf("[%s %s] (already checked out)\n", cz.Internal.Hinweis, cz.Internal.Sha)
+			stdprinter.Outf("[%s %s] (already checked out)\n", cz.Internal.Hinweis, cz.Internal.Sha)
 			continue
 		}
 
 		if c.Force {
 			toCheckOut = append(toCheckOut, h.String())
 		} else {
-			_Errf("[%s] (external has changes)\n", h)
+			stdprinter.Errf("[%s] (external has changes)\n", h)
 			continue
 		}
 	}

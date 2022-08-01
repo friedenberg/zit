@@ -2,9 +2,10 @@ package script_value
 
 import (
 	"io"
-	"log"
 	"os"
 	"os/exec"
+
+	"github.com/friedenberg/zit/alfa/logz"
 )
 
 type ScriptValue struct {
@@ -51,18 +52,18 @@ func (s *ScriptValue) Run(input string) (r io.Reader, err error) {
 	}
 
 	if r, err = s.cmd.StdoutPipe(); err != nil {
-		log.Fatal(err)
+		logz.Fatal(err)
 		return
 	}
 
-	log.Print("starting")
+	logz.Print("starting")
 	s.cmd.Start()
 
 	return
 }
 
 func (s *ScriptValue) Close() (err error) {
-	log.Print()
+	logz.Print()
 
 	if s.file != nil {
 		err = _Close(s.file)

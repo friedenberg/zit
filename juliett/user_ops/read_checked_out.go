@@ -4,19 +4,39 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/logz"
 	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
+	"github.com/friedenberg/zit/hotel/zettels"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
 type ReadCheckedOut struct {
 	Umwelt  *umwelt.Umwelt
-	Options _ZettelsCheckinOptions
+	Options zettels.CheckinOptions
 }
 
 type ReadCheckedOutResults struct {
 	Zettelen map[hinweis.Hinweis]stored_zettel.CheckedOut
+}
+
+func (op ReadCheckedOut) RunOne(path string) (zettel stored_zettel.CheckedOut, err error) {
+	var store store_with_lock.Store
+
+	if store, err = store_with_lock.New(op.Umwelt); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	defer errors.PanicIfError(store.Flush)
+
+	if zettel, err = op.runOne(store, path); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	return
 }
 
 func (op ReadCheckedOut) Run(paths ...string) (results ReadCheckedOutResults, err error) {
@@ -32,29 +52,41 @@ func (op ReadCheckedOut) Run(paths ...string) (results ReadCheckedOutResults, er
 	defer errors.PanicIfError(store.Flush)
 
 	for _, p := range paths {
-		if op.Options.AddMdExtension {
-			p = p + ".md"
-		}
+		var checked_out stored_zettel.CheckedOut
 
-		checked_out := stored_zettel.CheckedOut{}
-
-		checked_out.External, err = store.CheckoutStore().Read(p)
-
-		if op.Options.IgnoreMissingHinweis && errors.Is(err, os.ErrNotExist) {
-			err = nil
-			//results.Zettelen[ez.Hinweis] = stored_zettel.External{}
-			continue
-		} else if err != nil {
+		if checked_out, err = op.runOne(store, p); err != nil {
 			err = errors.Error(err)
 			return
 		}
 
-		if checked_out.Internal, err = store.Zettels().Read(checked_out.External.Hinweis); err != nil {
-			err = errors.Error(err)
-			return
-		}
-
+		logz.Print(checked_out.External.Hinweis)
 		results.Zettelen[checked_out.External.Hinweis] = checked_out
+	}
+
+	return
+}
+
+func (op ReadCheckedOut) runOne(store store_with_lock.Store, p string) (zettel stored_zettel.CheckedOut, err error) {
+	if op.Options.AddMdExtension {
+		p = p + ".md"
+	}
+
+	zettel.External, err = store.CheckoutStore().Read(p)
+
+	if op.Options.IgnoreMissingHinweis && errors.Is(err, os.ErrNotExist) {
+		err = nil
+		//results.Zettelen[ez.Hinweis] = stored_zettel.External{}
+		// continue
+	} else if err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	logz.Print(zettel.External.Hinweis)
+
+	if zettel.Internal, err = store.Zettels().Read(zettel.External.Hinweis); err != nil {
+		err = errors.Error(err)
+		return
 	}
 
 	return

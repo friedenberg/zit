@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/golf/checkout_store"
 	"github.com/friedenberg/zit/juliett/user_ops"
 )
@@ -24,7 +25,7 @@ func init() {
 
 func (c Status) Run(u _Umwelt, args ...string) (err error) {
 	if len(args) > 0 {
-		_Errf("args provided will be ignored")
+		stdprinter.Errf("args provided will be ignored")
 	}
 
 	var possible checkout_store.CwdFiles
@@ -58,7 +59,7 @@ func (c Status) Run(u _Umwelt, args ...string) (err error) {
 			continue
 		}
 
-		_Outf("[%s] (different)\n", h)
+		stdprinter.Outf("[%s] (different)\n", h)
 	}
 
 	return

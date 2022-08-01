@@ -3,10 +3,10 @@ package commands
 import (
 	"flag"
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/logz"
 	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
@@ -63,8 +63,8 @@ func (c *Organize) Run(u _Umwelt, args ...string) (err error) {
 	stdinIsTty := open_file_guard.IsTty(os.Stdin)
 
 	if !stdinIsTty && !stdoutIsTty {
-		log.Print("neither stdin or stdout is a tty")
-		log.Print("generate organize, read from stdin, commit")
+		logz.Print("neither stdin or stdout is a tty")
+		logz.Print("generate organize, read from stdin, commit")
 
 		createOrganizeFileResults := user_ops.CreateOrganizeFileResults{}
 
@@ -100,15 +100,15 @@ func (c *Organize) Run(u _Umwelt, args ...string) (err error) {
 			return
 		}
 	} else if !stdoutIsTty {
-		log.Print("just stdout is not a tty")
-		log.Print("generate organize file and write to stdout")
+		logz.Print("just stdout is not a tty")
+		logz.Print("generate organize file and write to stdout")
 		if _, err = createOrganizeFileOp.RunAndWrite(getResults, os.Stdout); err != nil {
 			err = errors.Error(err)
 			return
 		}
 	} else {
-		log.Print("both stdout and stdin are a tty")
-		log.Print("generate temp file, write organize, open vim to edit, commit results")
+		logz.Print("both stdout and stdin are a tty")
+		logz.Print("generate temp file, write organize, open vim to edit, commit results")
 		createOrganizeFileResults := user_ops.CreateOrganizeFileResults{}
 
 		var f *os.File

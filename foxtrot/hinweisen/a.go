@@ -1,7 +1,6 @@
 package hinweisen
 
 import (
-	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/kennung"
 	"github.com/friedenberg/zit/alfa/node_type"
 	"github.com/friedenberg/zit/alfa/stdprinter"
@@ -35,8 +34,6 @@ var (
 	_Open                = open_file_guard.Open
 	_OpenFile            = open_file_guard.OpenFile
 	_Close               = open_file_guard.Close
-	_Errorf              = errors.Errorf
-	_Error               = errors.Error
 	_Err                 = stdprinter.Err
 	_MakeBlindHinweis    = hinweis.MakeBlindHinweis
 	_ReadAllString       = open_file_guard.ReadAllString

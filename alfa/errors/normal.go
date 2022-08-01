@@ -1,5 +1,7 @@
 package errors
 
+import "golang.org/x/xerrors"
+
 type StackTracer interface {
 	error
 	ShouldShowStackTrace() bool
@@ -19,4 +21,8 @@ func (e normalError) Error() string {
 
 func Normal(err error) *normalError {
 	return &normalError{err}
+}
+
+func Normalf(fmt string, args ...interface{}) *normalError {
+	return &normalError{xerrors.Errorf(fmt, args...)}
 }

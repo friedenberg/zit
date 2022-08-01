@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
@@ -36,7 +37,7 @@ func (c RejoinAbandonedZettel) RunWithShas(store store_with_lock.Store, shas ...
 			return
 		}
 
-		_Outf("[%s %s] (adopted)\n", named.Hinweis, named.Sha)
+		stdprinter.Outf("[%s %s] (adopted)\n", named.Hinweis, named.Sha)
 	}
 
 	return

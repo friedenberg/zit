@@ -3,12 +3,12 @@ package checkout_store
 import (
 	"bufio"
 	"fmt"
-	"log"
 	"os"
 	"path"
 	"path/filepath"
 
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/logz"
 	"github.com/friedenberg/zit/bravo/files"
 	"github.com/friedenberg/zit/bravo/id"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
@@ -75,7 +75,7 @@ func (s Store) flushToTemp() (tfp string, err error) {
 
 	for p, e := range s.entries {
 		out := fmt.Sprintf("%s %s\n", p, e)
-		log.Printf("flushing zettel: %q", out)
+		logz.Printf("flushing zettel: %q", out)
 		w.WriteString(fmt.Sprint(out))
 	}
 
@@ -91,7 +91,7 @@ func (s Store) Flush() (err error) {
 			return
 		}
 
-		log.Printf("renaming %s to %s", tfp, s.IndexFilePath())
+		logz.Printf("renaming %s to %s", tfp, s.IndexFilePath())
 		if err = os.Rename(tfp, s.IndexFilePath()); err != nil {
 			err = errors.Error(err)
 			return
@@ -131,7 +131,7 @@ func (s *Store) ReadAll() (err error) {
 }
 
 func (s *Store) syncOne(p string) (err error) {
-	log.Output(2, fmt.Sprintln("will sync one: ", p))
+	logz.Output(2, fmt.Sprintln("will sync one: ", p))
 	var hasCache, hasFs bool
 
 	var fi os.FileInfo
@@ -150,17 +150,22 @@ func (s *Store) syncOne(p string) (err error) {
 	cached, hasCache = s.entries[p]
 
 	if !hasCache && !hasFs {
-		log.Print(p, ": no cache, no fs")
+		logz.Print(p, ": no cache, no fs")
 		return
 	} else if hasCache {
-		log.Print(p, ": cache, no fs: deleting")
+		logz.Print(p, ": cache, no fs: deleting")
 		delete(s.entries, p)
 	} else {
-		log.Print(p, ": cache, fs")
+		logz.Print(p, ": cache, fs")
 		if !hasCache || fi.ModTime().After(cached.Time) {
 			var ez stored_zettel.External
 
-			if ez, err = s.readZettelFromFile(p); err != nil {
+			if ez, err = s.makeExternalZettelFromFile(p); err != nil {
+				err = errors.Error(err)
+				return
+			}
+
+			if err = s.readZettelFromFile(&ez); err != nil {
 				err = errors.Error(err)
 				return
 			}
@@ -177,56 +182,7 @@ func (s *Store) syncOne(p string) (err error) {
 	return
 }
 
-func (s Store) readZettelFromFile(p string) (ez stored_zettel.External, err error) {
-	if !files.Exists(p) {
-    //if the path does not have an extension, try looking for a file with that
-    //extension
-    //TODO modify this to use globs
-		if filepath.Ext(p) == "" {
-			return s.readZettelFromFile(p + ".md")
-		}
-
-		err = os.ErrNotExist
-		return
-	}
-
-	log.Print(p, ": reading from fs")
-	ez.Path = p
-
-	head, tail := id.HeadTailFromFileName(p)
-
-	if ez.Hinweis, err = hinweis.MakeBlindHinweis(head + "/" + tail); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
-	c := zettel.FormatContextRead{
-		AkteWriterFactory: s.storeZettel,
-	}
-
-	var f *os.File
-
-	if f, err = os.Open(p); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
-	defer open_file_guard.Close(f)
-
-	c.In = f
-
-	if _, err = s.format.ReadFrom(&c); err != nil {
-		err = errors.Errorf("%s: %w", f.Name(), err)
-		return
-	}
-
-	ez.Zettel = c.Zettel
-	ez.AktePath = c.AktePath
-
-	return
-}
-
-func (s *Store) Read(p string) (ez stored_zettel.External, err error) {
+func (s Store) makeExternalZettelFromFile(p string) (ez stored_zettel.External, err error) {
 	if p, err = filepath.Abs(p); err != nil {
 		err = errors.Error(err)
 		return
@@ -237,9 +193,70 @@ func (s *Store) Read(p string) (ez stored_zettel.External, err error) {
 		return
 	}
 
+	ez.Path = p
+
+	head, tail := id.HeadTailFromFileName(p)
+
+	if ez.Hinweis, err = hinweis.MakeBlindHinweis(head + "/" + tail); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	return
+}
+
+func (s Store) readZettelFromFile(ez *stored_zettel.External) (err error) {
+	if !files.Exists(ez.Path) {
+		//if the path does not have an extension, try looking for a file with that
+		//extension
+		//TODO modify this to use globs
+		if filepath.Ext(ez.Path) == "" {
+			ez.Path = ez.Path + ".md"
+			return s.readZettelFromFile(ez)
+		}
+
+		err = os.ErrNotExist
+
+		return
+	}
+
+	c := zettel.FormatContextRead{
+		AkteWriterFactory: s.storeZettel,
+	}
+
+	var f *os.File
+
+	if f, err = os.Open(ez.Path); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	defer open_file_guard.Close(f)
+
+	c.In = f
+
+	if _, err = s.format.ReadFrom(&c); err != nil {
+		err = errors.Errorf("%s: %s", f.Name(), err)
+		return
+	}
+
+	ez.Zettel = c.Zettel
+	ez.AktePath = c.AktePath
+
+	return
+}
+
+func (s *Store) Read(p string) (ez stored_zettel.External, err error) {
+	if ez, err = s.makeExternalZettelFromFile(p); err != nil {
+		err = errors.Wrapped(err, "%s", p)
+		return
+	}
+
+	logz.Print(ez.Hinweis)
+
 	if s.CacheEnabled {
 		if err = s.ReadAll(); err != nil {
-			err = errors.Errorf("%w: %s", err, p)
+			err = errors.Wrapped(err, "%s", p)
 			return
 		}
 
@@ -247,8 +264,8 @@ func (s *Store) Read(p string) (ez stored_zettel.External, err error) {
 		var hasEntry bool
 
 		if cached, hasEntry = s.entries[p]; !hasEntry {
-			log.Printf("cached not found: %s\n", p)
-			log.Printf("%#v", s.entries)
+			logz.Printf("cached not found: %s\n", p)
+			logz.Printf("%#v", s.entries)
 			err = ErrNotInIndex(nil)
 			return
 		}
@@ -260,15 +277,11 @@ func (s *Store) Read(p string) (ez stored_zettel.External, err error) {
 			return
 		}
 
-		ez = stored_zettel.External{
-			Path:    p,
-			Hinweis: named.Hinweis,
-			Sha:     named.Sha,
-			Zettel:  named.Zettel,
-		}
+		ez.Sha = named.Sha
+		ez.Zettel = named.Zettel
 	} else {
-		if ez, err = s.readZettelFromFile(p); err != nil {
-			err = errors.Errorf("%s: %w", p, err)
+		if err = s.readZettelFromFile(&ez); err != nil {
+			err = errors.Wrapped(err, "%s", p)
 			return
 		}
 	}

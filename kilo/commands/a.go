@@ -3,7 +3,6 @@ package commands
 import (
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/node_type"
-	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/bravo/akte_ext"
 	"github.com/friedenberg/zit/bravo/files"
 	"github.com/friedenberg/zit/bravo/id"
@@ -102,8 +101,6 @@ var (
 	_Close                  = open_file_guard.Close
 	_Create                 = open_file_guard.Create
 	_DeleteFilesAndDirs     = open_file_guard.DeleteFilesAndDirs
-	_Err                    = stdprinter.Err
-	_Errf                   = stdprinter.Errf
 	_ErrorAs                = errors.As
 	_EtikettNewSet          = etikett.NewSet
 	_FilesExist             = files.Exists
@@ -128,9 +125,6 @@ var (
 	_OpenFiles              = open_file_guard.OpenFiles
 	_OrganizeTextNew        = organize_text.New
 	_OrganizeTextNewEmpty   = organize_text.NewEmpty
-	_Out                    = stdprinter.Out
-	_Outf                   = stdprinter.Outf
-	_PanicIfError           = stdprinter.PanicIfError
 	_TempFile               = open_file_guard.TempFile
 	_TempFileWithPattern    = open_file_guard.TempFileWithPattern
 )

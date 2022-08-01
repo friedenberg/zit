@@ -48,7 +48,7 @@ func LoadKonfig(p string) (c Konfig, err error) {
 	c.Toml = tc
 
 	if err != nil {
-		err = _Errorf("failed to parse config: %w", err)
+		err = _Errorf("failed to parse config: %s", err)
 		return
 	}
 

@@ -67,7 +67,7 @@ func (f *Objekte) ReadFrom(sz *stored_zettel.Stored, in io.Reader) (n int64, err
 		var t _Type
 
 		if err = t.Set(line[:loc]); err != nil {
-			err = _Errorf("%w: %s", err, line[:loc])
+			err = _Errorf("%s: %s", err, line[:loc])
 			return
 		}
 
@@ -81,7 +81,7 @@ func (f *Objekte) ReadFrom(sz *stored_zettel.Stored, in io.Reader) (n int64, err
 			}
 
 			if err = sz.Mutter.Set(v); err != nil {
-				err = _Errorf("%w: %s", err, line)
+				err = _Errorf("%s: %s", err, line)
 				return
 			}
 

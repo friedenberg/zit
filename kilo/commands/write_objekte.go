@@ -2,6 +2,8 @@ package commands
 
 import (
 	"flag"
+
+	"github.com/friedenberg/zit/alfa/stdprinter"
 )
 
 type WriteObjekte struct {
@@ -26,7 +28,7 @@ func init() {
 func (c WriteObjekte) RunWithAge(u _Umwelt, age _Age, args ...string) (err error) {
 	objektePath, err := _ObjekteWriteAndMove(u.In, age, u.DirZit(), c.Type)
 
-	_Out(objektePath)
+	stdprinter.Out(objektePath)
 
 	return
 }

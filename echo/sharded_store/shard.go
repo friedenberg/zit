@@ -5,9 +5,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"sync"
+
+	"github.com/friedenberg/zit/alfa/logz"
 )
 
 type Sharder interface {
@@ -179,12 +180,12 @@ func (s shard) Flush() (err error) {
 		return
 	}
 
-	log.Printf("flushing: %s", s.path)
+	logz.Printf("flushing: %s", s.path)
 
 	var file *os.File
 
 	if file, err = _TempFile(); err != nil {
-		log.Print(err)
+		logz.Print(err)
 		err = _Error(err)
 		return
 	}
@@ -194,7 +195,7 @@ func (s shard) Flush() (err error) {
 	var w io.WriteCloser
 
 	if w, err = s.Writer(file); err != nil {
-		log.Print(err)
+		logz.Print(err)
 		err = _Error(err)
 		return
 	}
@@ -205,26 +206,26 @@ func (s shard) Flush() (err error) {
 		var line string
 
 		if line, err = s.EntryToLine(Entry{k, v}); err != nil {
-			log.Print(err)
+			logz.Print(err)
 			err = _Error(err)
 			return
 		}
 
 		if _, err = io.WriteString(w, fmt.Sprintln(line)); err != nil {
-			log.Print(err)
+			logz.Print(err)
 			err = _Error(err)
 			return
 		}
 	}
 
 	//TODO-research should the file be closed before being renamed???
-	log.Printf("renaming %s to %s", file.Name(), s.path)
+	logz.Printf("renaming %s to %s", file.Name(), s.path)
 	if err = os.Rename(file.Name(), s.path); err != nil {
 		err = _Error(err)
 		return
 	}
 
-	log.Print("done renaming")
+	logz.Print("done renaming")
 
 	return
 }

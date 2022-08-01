@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/golf/checkout_store"
@@ -34,7 +35,7 @@ func init() {
 func (c Checkin) Run(u _Umwelt, args ...string) (err error) {
 	if c.All {
 		if len(args) > 0 {
-			_Errf("Ignoring args because -all is set\n")
+			stdprinter.Errf("Ignoring args because -all is set\n")
 		}
 
 		var possible checkout_store.CwdFiles

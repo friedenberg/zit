@@ -1,29 +1,29 @@
 package zettel
 
 import (
-	"github.com/friedenberg/zit/alfa/log"
+	"github.com/friedenberg/zit/alfa/logz"
 )
 
 func (z Zettel) Equals(z1 Zettel) bool {
 	if !z.Akte.Equals(z1.Akte) {
-		log.Print("akte")
-		log.Print(z.Akte)
-		log.Print(z1.Akte)
+		logz.Print("akte")
+		logz.Print(z.Akte)
+		logz.Print(z1.Akte)
 		return false
 	}
 
 	if !z.AkteExt.Equals(z1.AkteExt) {
-		log.Print("akteext")
+		logz.Print("akteext")
 		return false
 	}
 
 	if z.Bezeichnung != z1.Bezeichnung {
-		log.Print("bezeichnung")
+		logz.Print("bezeichnung")
 		return false
 	}
 
 	if !z.Etiketten.Equals(z1.Etiketten) {
-		log.Print("etiketten")
+		logz.Print("etiketten")
 		return false
 	}
 

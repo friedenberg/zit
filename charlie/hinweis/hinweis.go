@@ -2,10 +2,10 @@ package hinweis
 
 import (
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/logz"
 )
 
 type Hinweis interface {
@@ -33,28 +33,28 @@ func New(i _Int, pl Provider, pr Provider) (h *hinweis, err error) {
 
 	h = &hinweis{}
 
-	log.Print("making kennung")
+	logz.Print("making kennung")
 
-	log.Print("making left")
+	logz.Print("making left")
 	if h.left, err = pl.Hinweis(k.Left); err != nil {
-		log.Printf("left failed: %s", err)
+		logz.Printf("left failed: %s", err)
 		err = errors.Errorf("failed to make left kennung: %s", err)
 		return
 	}
 
-	log.Print("making right")
+	logz.Print("making right")
 	if h.right, err = pr.Hinweis(k.Right); err != nil {
 		err = errors.Errorf("failed to make right kennung: %s", err)
 		return
 	}
 
-	log.Print("making setting")
+	logz.Print("making setting")
 	if err = h.Set(h.String()); err != nil {
 		err = errors.Errorf("failed to set hinweis: %s", err)
 		return
 	}
 
-	log.Print("done")
+	logz.Print("done")
 
 	return
 }
@@ -105,7 +105,7 @@ func (h *hinweis) Set(v string) (err error) {
 	count := len(parts)
 
 	if count != 2 {
-		err = _ErrorNormal(_Errorf("hinweis needs exactly 2 components, but got %d: %q", count, v))
+		err = errors.Normal(errors.Errorf("hinweis needs exactly 2 components, but got %d: %q", count, v))
 		return
 	}
 

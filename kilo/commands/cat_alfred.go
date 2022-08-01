@@ -5,6 +5,7 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
@@ -46,7 +47,7 @@ func (c CatAlfred) RunWithLockedStore(store store_with_lock.Store, args ...strin
 		return
 	}
 
-	defer _PanicIfError(aw.Close)
+	defer stdprinter.PanicIfError(aw.Close)
 
 	defer func() {
 		aw.WriteError(err)

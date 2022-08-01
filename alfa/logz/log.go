@@ -1,4 +1,4 @@
-package log
+package logz
 
 import (
 	"fmt"
@@ -61,9 +61,19 @@ func LogPrefix() string {
 	return fmt.Sprintf("%s%s:%d: ", testPrefix, p, line)
 }
 
+var (
+	Panic  = log.Panic
+	Output = log.Output
+	Fatal  = log.Fatal
+)
+
 func Print(vs ...interface{}) {
 	if !verbose {
 		return
+	}
+
+	if len(vs) == 0 {
+		os.Stderr.WriteString(fmt.Sprintln(LogPrefix()))
 	}
 
 	for _, v := range vs {

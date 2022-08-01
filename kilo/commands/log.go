@@ -3,9 +3,10 @@ package commands
 import (
 	"encoding/json"
 	"flag"
-	"log"
 
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/logz"
+	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
@@ -33,7 +34,7 @@ func (c Log) RunWithLockedStore(store store_with_lock.Store, args ...string) (er
 		return
 
 	default:
-		_Errf("ignoring extra arguments: %q\n", args[1:])
+		stdprinter.Errf("ignoring extra arguments: %q\n", args[1:])
 
 		fallthrough
 
@@ -59,9 +60,9 @@ func (c Log) RunWithLockedStore(store store_with_lock.Store, args ...string) (er
 	b, err := json.Marshal(chain)
 
 	if err != nil {
-		log.Print(err)
+		logz.Print(err)
 	} else {
-		_Out(string(b))
+		stdprinter.Out(string(b))
 	}
 
 	return

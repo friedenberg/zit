@@ -4,12 +4,12 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"path"
 	"reflect"
 	"strings"
 
+	"github.com/friedenberg/zit/alfa/logz"
 	"github.com/friedenberg/zit/bravo/sha"
 	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/echo/zettel"
@@ -276,7 +276,7 @@ func (f Text) readAkteDesc(state *textStateRead, desc string) (err error) {
 
 	// path
 	if _FilesExists(desc) {
-		log.Print("valid path", desc)
+		logz.Print("valid path", desc)
 
 		if err = state.context.Zettel.AkteExt.Set(tail); err != nil {
 			err = _Error(err)
@@ -292,8 +292,8 @@ func (f Text) readAkteDesc(state *textStateRead, desc string) (err error) {
 
 	shaError := state.metadataiAkteSha.Set(head)
 
-	log.Print(head)
-	log.Print(tail)
+	logz.Print(head)
+	logz.Print(tail)
 
 	if tail == "" {
 		//sha or ext

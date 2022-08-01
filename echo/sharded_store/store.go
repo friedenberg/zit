@@ -1,8 +1,9 @@
 package sharded_store
 
 import (
-	"log"
 	"sync"
+
+	"github.com/friedenberg/zit/alfa/logz"
 )
 
 type Store interface {
@@ -61,7 +62,7 @@ func (ss store) Shard(id string) (s Shard, err error) {
 func (ss store) Flush() (err error) {
 	for fn, s := range ss.shards {
 		if err = s.Flush(); err != nil {
-			err = _Errorf("failed to flush shard: %s: %w", fn, err)
+			err = _Errorf("failed to flush shard: %s: %s", fn, err)
 			return
 		}
 	}
@@ -81,7 +82,7 @@ func (ss store) All() (es []Entry, err error) {
 		var s Shard
 
 		if s, err = ss.Shard(fn); err != nil {
-			log.Print(s)
+			logz.Print(s)
 			err = _Error(err)
 			return
 		}

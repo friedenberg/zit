@@ -59,7 +59,7 @@ func (s *Sha) Set(v string) (err error) {
 	v1 := strings.TrimSpace(v)
 
 	if _, err = hex.DecodeString(v1); err != nil {
-		err = _Errorf("%q: %w", v1, err)
+		err = _Errorf("%q: %s", v1, err)
 		return
 	}
 

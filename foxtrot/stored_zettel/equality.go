@@ -1,27 +1,27 @@
 package stored_zettel
 
 import (
-	"github.com/friedenberg/zit/alfa/log"
+	"github.com/friedenberg/zit/alfa/logz"
 )
 
 func (a Stored) Equals(b Stored) bool {
 	if !a.Zettel.Equals(b.Zettel) {
-		log.Print("zettel")
+		logz.Print("zettel")
 		return false
 	}
 
 	if !a.Mutter.Equals(b.Mutter) {
-		log.Print("mutter")
+		logz.Print("mutter")
 		return false
 	}
 
 	if !a.Kinder.Equals(b.Kinder) {
-		log.Print("sha")
+		logz.Print("sha")
 		return false
 	}
 
 	if !a.Sha.Equals(b.Sha) {
-		log.Print("sha")
+		logz.Print("sha")
 		return false
 	}
 
@@ -30,12 +30,12 @@ func (a Stored) Equals(b Stored) bool {
 
 func (a Named) Equals(b Named) bool {
 	if !a.Stored.Equals(b.Stored) {
-		log.Print("stored")
+		logz.Print("stored")
 		return false
 	}
 
 	if !a.Hinweis.Equals(b.Hinweis) {
-		log.Print("hinweis")
+		logz.Print("hinweis")
 		return false
 	}
 

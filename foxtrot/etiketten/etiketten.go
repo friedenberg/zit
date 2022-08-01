@@ -1,9 +1,10 @@
 package etiketten
 
 import (
-	"log"
 	"path"
 	"strings"
+
+	"github.com/friedenberg/zit/alfa/logz"
 )
 
 type Etiketten interface {
@@ -88,7 +89,7 @@ OUTER:
 	INNER:
 		for tn, tv := range en.konfig.Tags {
 			if !tv.Hide {
-				log.Printf("hiding %s", tn)
+				logz.Printf("hiding %s", tn)
 				continue INNER
 			}
 

@@ -2,9 +2,9 @@ package user_ops
 
 import (
 	"io"
-	"log"
 
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/logz"
 	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/bravo/id"
 	"github.com/friedenberg/zit/charlie/hinweis"
@@ -17,9 +17,9 @@ import (
 )
 
 type CreateFromPaths struct {
-	Umwelt              *umwelt.Umwelt
-	Format              zettel.Format
-	Filter              _ScriptValue
+	Umwelt *umwelt.Umwelt
+	Format zettel.Format
+	Filter _ScriptValue
 	// ReadHinweisFromPath bool
 }
 
@@ -43,7 +43,7 @@ func (c CreateFromPaths) Run(args ...string) (results CreateFromPathsResults, er
 		var toAdd []stored_zettel.External
 
 		if toAdd, err = c.zettelsFromPath(store, arg); err != nil {
-			err = _Errorf("zettel text format error for path: %s: %w", arg, err)
+			err = errors.Errorf("zettel text format error for path: %s: %s", arg, err)
 			return
 		}
 
@@ -52,14 +52,14 @@ func (c CreateFromPaths) Run(args ...string) (results CreateFromPathsResults, er
 
 	for _, z := range toCreate {
 		var named _NamedZettel
-    //TODO
-		if false/*c.ReadHinweisFromPath*/ {
+		//TODO
+		if false /*c.ReadHinweisFromPath*/ {
 			head, tail := id.HeadTailFromFileName(z.Path)
 
 			var h hinweis.Hinweis
 
 			if h, err = hinweis.MakeBlindHinweis(head + "/" + tail); err != nil {
-				err = _Error(err)
+				err = errors.Error(err)
 				return
 			}
 
@@ -87,10 +87,10 @@ func (c CreateFromPaths) Run(args ...string) (results CreateFromPathsResults, er
 func (c CreateFromPaths) zettelsFromPath(store store_with_lock.Store, p string) (out []stored_zettel.External, err error) {
 	var r io.Reader
 
-	log.Print("running")
+	logz.Print("running")
 
 	if r, err = c.Filter.Run(p); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -102,7 +102,7 @@ func (c CreateFromPaths) zettelsFromPath(store store_with_lock.Store, p string) 
 	}
 
 	if _, err = c.Format.ReadFrom(&ctx); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -113,7 +113,7 @@ func (c CreateFromPaths) zettelsFromPath(store store_with_lock.Store, p string) 
 			var z1 _Zettel
 
 			if z1, err = errAkteInlineAndFilePath.Recover(); err != nil {
-				err = _Error(err)
+				err = errors.Error(err)
 				return
 			}
 
@@ -125,7 +125,7 @@ func (c CreateFromPaths) zettelsFromPath(store store_with_lock.Store, p string) 
 				},
 			)
 		} else {
-			err = _Errorf("unsupported recoverable error: %w", ctx.RecoverableError)
+			err = errors.Errorf("unsupported recoverable error: %s", ctx.RecoverableError)
 			return
 		}
 	}
@@ -160,7 +160,7 @@ func (c CreateFromPaths) handleStoreError(z _NamedZettel, f string, in error) {
 	} else if errors.As(in, &normalError) {
 		stdprinter.Errf("%s\n", normalError.Error())
 	} else {
-		err = _Errorf("writing zettel failed: %s: %w", f, in)
+		err = errors.Errorf("writing zettel failed: %s: %s", f, in)
 		stdprinter.Error(err)
 	}
 }

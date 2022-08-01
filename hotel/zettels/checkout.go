@@ -63,7 +63,7 @@ func (zs *zettels) Checkout(options CheckinOptions, args ...string) (czs []_Zett
 		}
 
 		if err = zs.writeFormat(options, filename, c); err != nil {
-			err = _Errorf("%s: %w", sz.Hinweis, err)
+			err = _Errorf("%s: %s", sz.Hinweis, err)
 			_Errf("[%s %s] (check out failed)\n", hins[i], shas[i], err)
 			continue
 		}

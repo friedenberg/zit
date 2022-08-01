@@ -9,7 +9,7 @@ func (c OpenFiles) Run(args ...string) (err error) {
 	}
 
 	if err = _OpenFiles(args...); err != nil {
-		err = _Errorf("%q: %w", args, err)
+		err = _Errorf("%q: %s", args, err)
 		return
 	}
 

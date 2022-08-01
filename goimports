@@ -85,7 +85,7 @@ func (s Store) Flush() (err error) {
 			return
 		}
 
-		log.Printf("renaming %s to %s", tfp, s.IndexFilePath())
+		logz.Printf("renaming %s to %s", tfp, s.IndexFilePath())
 		if err = os.Rename(tfp, s.IndexFilePath()); err != nil {
 			err = errors.Error(err)
 			return
@@ -125,7 +125,7 @@ func (s *Store) ReadAll() (err error) {
 }
 
 func (s *Store) syncOne(p string) (err error) {
-	log.Output(2, fmt.Sprintln("will sync one: ", p))
+	logz.Output(2, fmt.Sprintln("will sync one: ", p))
 	var hasCache, hasFs bool
 
 	var fi os.FileInfo
@@ -144,19 +144,19 @@ func (s *Store) syncOne(p string) (err error) {
 	cached, hasCache = s.zettelen[p]
 
 	if !hasCache && !hasFs {
-		log.Print(p, ": no cache, no fs")
+		logz.Print(p, ": no cache, no fs")
 		return
 	} else if hasCache {
-		log.Print(p, ": cache, no fs: deleting")
+		logz.Print(p, ": cache, no fs: deleting")
 		delete(s.zettelen, p)
 	} else {
-		log.Print(p, ": cache, fs")
+		logz.Print(p, ": cache, fs")
 
 		zettelNewerThanCache := fi.ModTime().After(cached.ZettelTime)
 		akteNewerThanCache := fi.ModTime().After(cached.AkteTime)
 
-		log.Print("zettelNewerThanCache: ", zettelNewerThanCache)
-		log.Print("akteNewerThanCache: ", akteNewerThanCache)
+		logz.Print("zettelNewerThanCache: ", zettelNewerThanCache)
+		logz.Print("akteNewerThanCache: ", akteNewerThanCache)
 
 		if !hasCache || zettelNewerThanCache || akteNewerThanCache {
 			var ez stored_zettel.External
@@ -179,7 +179,7 @@ func (s *Store) syncOne(p string) (err error) {
 }
 
 func (s Store) readZettelFromFile(p string) (ez stored_zettel.External, err error) {
-	log.Print(p, ": reading from fs")
+	logz.Print(p, ": reading from fs")
 	ez.Path = p
 
 	head, tail := id.HeadTailFromFileName(p)
@@ -210,7 +210,7 @@ func (s Store) readZettelFromFile(p string) (ez stored_zettel.External, err erro
 	c.In = f
 
 	if _, err = s.format.ReadFrom(&c); err != nil {
-		err = errors.Errorf("%s: %w", f.Name(), err)
+		err = errors.Errorf("%s: %s", f.Name(), err)
 		return
 	}
 
@@ -233,7 +233,7 @@ func (s *Store) Read(p string) (ez stored_zettel.External, err error) {
 
 	if s.CacheEnabled {
 		if err = s.ReadAll(); err != nil {
-			err = errors.Errorf("%w: %s", err, p)
+			err = errors.Errorf("%s: %s", err, p)
 			return
 		}
 
@@ -241,8 +241,8 @@ func (s *Store) Read(p string) (ez stored_zettel.External, err error) {
 		var hasEntry bool
 
 		if cached, hasEntry = s.zettelen[p]; !hasEntry {
-			log.Printf("cached not found: %s\n", p)
-			log.Printf("%#v", s.zettelen)
+			logz.Printf("cached not found: %s\n", p)
+			logz.Printf("%#v", s.zettelen)
 			err = ErrNotInIndex(nil)
 			return
 		}

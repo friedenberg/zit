@@ -1,9 +1,8 @@
 package user_ops
 
 import (
-	"log"
-
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/logz"
 	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/charlie/hinweis"
@@ -32,7 +31,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 
 	changes := changes.ChangesFrom(a, b)
 
-	log.Printf("%#v", changes)
+	logz.Printf("%#v", changes)
 
 	if len(changes.Added) == 0 && len(changes.Removed) == 0 && len(changes.New) == 0 {
 		stdprinter.Err("no changes")
@@ -45,7 +44,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 		var h hinweis.Hinweis
 
 		if h, err = hinweis.MakeBlindHinweis(hString); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 
@@ -53,7 +52,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 
 		if z, ok = toUpdate[h.String()]; !ok {
 			if z, err = store.Zettels().Read(h); err != nil {
-				err = _Error(err)
+				err = errors.Error(err)
 				return
 			}
 		}
@@ -65,7 +64,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 		var z _NamedZettel
 
 		if z, err = addOrGetToZettelToUpdate(hString); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 
@@ -81,7 +80,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 		var z _NamedZettel
 
 		if z, err = addOrGetToZettelToUpdate(hString); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 
@@ -97,12 +96,12 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 		var e etikett.Etikett
 
 		if err = e.Set(c.Etikett); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 
 		if err = addEtikettToZettel(c.Key, e); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 	}
@@ -111,12 +110,12 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 		var e etikett.Etikett
 
 		if err = e.Set(c.Etikett); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 
 		if err = removeEtikettFromZettel(c.Key, e); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 	}
@@ -127,12 +126,12 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 		}
 
 		if err = z.Bezeichnung.Set(bez); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 
 		if err = z.AkteExt.Set("md"); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 

@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+
+	"github.com/friedenberg/zit/alfa/errors"
 )
 
 type Writer []string
@@ -30,7 +32,7 @@ func (w *Writer) WriteTo(out io.Writer) (n int64, err error) {
 		n += int64(n1)
 
 		if err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 	}

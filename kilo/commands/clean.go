@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/golf/checkout_store"
 	"github.com/friedenberg/zit/juliett/user_ops"
 )
@@ -24,7 +25,7 @@ func init() {
 
 func (c Clean) Run(u _Umwelt, args ...string) (err error) {
 	if len(args) > 0 {
-		_Errf("args provided will be ignored")
+		stdprinter.Errf("args provided will be ignored")
 	}
 
 	var possible checkout_store.CwdFiles
@@ -71,7 +72,7 @@ func (c Clean) Run(u _Umwelt, args ...string) (err error) {
 
 	if u.Konfig.DryRun {
 		for _, z := range toDelete {
-			_Outf("[%s] (would delete)\n", z.Hinweis)
+			stdprinter.Outf("[%s] (would delete)\n", z.Hinweis)
 		}
 
 		return
@@ -83,7 +84,7 @@ func (c Clean) Run(u _Umwelt, args ...string) (err error) {
 	}
 
 	for _, z := range toDelete {
-		_Outf("[%s] (checkout deleted)\n", z.Hinweis)
+		stdprinter.Outf("[%s] (checkout deleted)\n", z.Hinweis)
 	}
 
 	return

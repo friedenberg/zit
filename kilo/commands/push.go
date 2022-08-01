@@ -61,7 +61,7 @@ func (c Push) Run(u _Umwelt, args ...string) (err error) {
 	// b, err := json.Marshal(chains)
 
 	// if err != nil {
-	// 	log.Print(err)
+	// 	logz.Print(err)
 	// 	return
 	// }
 	b := []byte{}

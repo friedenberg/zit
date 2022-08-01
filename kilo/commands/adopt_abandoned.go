@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
@@ -51,7 +52,7 @@ func (c AdoptAbandoned) RunWithLockedStore(store store_with_lock.Store, args ...
 		}
 
 		zettels[i] = named
-		_Outf("[%s %s] (adopted)\n", named.Hinweis, named.Sha)
+		stdprinter.Outf("[%s %s] (adopted)\n", named.Hinweis, named.Sha)
 	}
 
 	return

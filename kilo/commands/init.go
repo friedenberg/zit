@@ -9,6 +9,7 @@ import (
 	"path"
 
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/stdprinter"
 )
 
 type Init struct {
@@ -99,19 +100,19 @@ func (c Init) readAndTransferLines(in, out string) (err error) {
 		return
 	}
 
-	defer _PanicIfError(fi.Close)
+	defer stdprinter.PanicIfError(fi.Close)
 
 	if fo, err = _Create(out); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	defer _PanicIfError(fo.Close)
+	defer stdprinter.PanicIfError(fo.Close)
 
 	r := bufio.NewReader(fi)
 	w := bufio.NewWriter(fo)
 
-	defer _PanicIfError(w.Flush)
+	defer stdprinter.PanicIfError(w.Flush)
 
 	for {
 		var l string
@@ -136,10 +137,10 @@ func (c Init) readAndTransferLines(in, out string) (err error) {
 
 func (c Init) mkdirAll(elements ...string) {
 	err := os.MkdirAll(path.Join(elements...), os.ModeDir|0755)
-	_PanicIfError(err)
+	stdprinter.PanicIfError(err)
 }
 
 func (c Init) writeFile(path, contents string) {
 	err := ioutil.WriteFile(path, []byte(contents), 0755)
-	_PanicIfError(err)
+	stdprinter.PanicIfError(err)
 }

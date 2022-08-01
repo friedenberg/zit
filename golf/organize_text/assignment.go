@@ -2,7 +2,7 @@ package organize_text
 
 import (
 	"github.com/friedenberg/zit/alfa/errors"
-	"github.com/friedenberg/zit/alfa/log"
+	"github.com/friedenberg/zit/alfa/logz"
 	"github.com/friedenberg/zit/charlie/etikett"
 )
 
@@ -27,7 +27,7 @@ func newAssignment(depth int) *assignment {
 
 func (a assignment) String() (s string) {
 	if a.parent != nil {
-		log.PrintDebug(a)
+		logz.PrintDebug(a)
 		s = a.parent.String() + "."
 	}
 

@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
@@ -38,8 +39,8 @@ func (c ReunifyFamily) RunWithZettel(store store_with_lock.Store, zettel ..._Nam
 		return
 	}
 
-	_Outf("%#v\n", mutter)
-	_Outf("%#v\n", kinder)
+	stdprinter.Outf("%#v\n", mutter)
+	stdprinter.Outf("%#v\n", kinder)
 
 	return
 }

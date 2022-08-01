@@ -1,8 +1,7 @@
 package changes
 
 import (
-	"log"
-
+	"github.com/friedenberg/zit/alfa/logz"
 	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/golf/organize_text"
 )
@@ -21,8 +20,8 @@ func ChangesFrom(a1, b1 organize_text.Text) (c Changes) {
 	a := a1.ToCompareMap()
 	b := b1.ToCompareMap()
 
-	log.Printf("%#v", a)
-	log.Printf("%#v", b)
+	logz.Printf("%#v", a)
+	logz.Printf("%#v", b)
 
 	c.Added = make([]Change, 0)
 	c.Removed = make([]Change, 0)

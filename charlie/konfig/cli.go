@@ -5,7 +5,8 @@ import (
 	"os"
 	"path"
 
-	"github.com/friedenberg/zit/alfa/log"
+	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/logz"
 )
 
 type Cli struct {
@@ -29,7 +30,7 @@ func (c *Cli) AddToFlags(f *flag.FlagSet) {
 func (c Cli) DirZit() (p string, err error) {
 	if c.BasePath == "" {
 		if p, err = os.Getwd(); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 	} else {
@@ -43,7 +44,7 @@ func (c Cli) KonfigPath() (p string, err error) {
 	// var usr *user.User
 
 	// if usr, err = user.Current(); err != nil {
-	// 	err = _Error(err)
+	// 	err = errors.Error(err)
 	// 	return
 	// }
 
@@ -55,7 +56,7 @@ func (c Cli) KonfigPath() (p string, err error) {
 	// )
 
 	if p, err = c.DirZit(); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -66,20 +67,20 @@ func (c Cli) KonfigPath() (p string, err error) {
 
 func (c Cli) Konfig() (k Konfig, err error) {
 	if c.Verbose {
-		log.SetVerbose()
+		logz.SetVerbose()
 	} else {
-		// log.SetOutput(ioutil.Discard)
+		// logz.SetOutput(ioutil.Discard)
 	}
 
 	var p string
 
 	if p, err = c.KonfigPath(); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
 	if k, err = LoadKonfig(p); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 

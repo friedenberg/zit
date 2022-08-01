@@ -5,6 +5,8 @@ import (
 	"io"
 	"os"
 	"strings"
+
+	"github.com/friedenberg/zit/alfa/errors"
 )
 
 type provider []string
@@ -13,7 +15,7 @@ func newProvider(path string) (p provider, err error) {
 	var f *os.File
 
 	if f, err = _Open(path); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -31,7 +33,7 @@ func newProvider(path string) (p provider, err error) {
 		}
 
 		if err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 
@@ -43,7 +45,7 @@ func newProvider(path string) (p provider, err error) {
 
 func (p provider) Hinweis(i _Int) (s string, err error) {
 	if len(p)-1 < int(i) {
-		err = _Errorf("insuffient ids")
+		err = errors.Errorf("insuffient ids")
 		return
 	}
 

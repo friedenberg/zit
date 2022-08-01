@@ -2,13 +2,13 @@ package commands
 
 import (
 	"flag"
-	"log"
 	"os"
 	"runtime/debug"
 	"runtime/pprof"
 	"runtime/trace"
 
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/logz"
 	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
 	"github.com/friedenberg/zit/delta/umwelt"
@@ -61,19 +61,26 @@ func registerCommand(n string, makeFunc func(*flag.FlagSet) Command) {
 	return
 }
 
-func Run(args []string) (err error) {
+func Run(args []string) (exitStatus int) {
+	var err error
+
 	defer stdprinter.WaitForPrinter()
 	defer func() {
 		l := open_file_guard.Len()
 
 		if l > 0 {
-			_Errf("file guard channel: %d\n", l)
+			stdprinter.Errf("file guard channel: %d\n", l)
 		}
 
-		var normalError _ErrorsStackTracer
+		var normalError errors.StackTracer
 
-		if _ErrorAs(err, &normalError) {
-			_Errf("%s\n", normalError.Error())
+		if err != nil {
+			//TODO use error to generate more specific exit status
+			exitStatus = 1
+		}
+
+		if errors.As(err, &normalError) {
+			stdprinter.Errf("%s\n", normalError.Error())
 		} else {
 			if err != nil {
 				stdprinter.Error(err)
@@ -89,7 +96,7 @@ func Run(args []string) (err error) {
 	}
 
 	if len(os.Args) < 1 {
-		log.Print("printing usage")
+		logz.Print("printing usage")
 		return cmd.PrintUsage(nil)
 	}
 

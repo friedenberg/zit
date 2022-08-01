@@ -2,9 +2,10 @@ package etikett
 
 import (
 	"encoding/json"
-	"log"
 	"sort"
 	"strings"
+
+	"github.com/friedenberg/zit/alfa/logz"
 )
 
 type Set map[string]Etikett
@@ -14,17 +15,17 @@ func (s Set) Len() int {
 }
 
 func MakeSet(es ...Etikett) (s Set) {
-  s = make(Set)
+	s = make(Set)
 
 	for _, e := range es {
 		s.Add(e)
 	}
 
-  return
+	return
 }
 
 func NewSet(es ...Etikett) (s *Set) {
-  s1 := MakeSet(es...)
+	s1 := MakeSet(es...)
 	s = &s1
 
 	return
@@ -114,12 +115,12 @@ func (s Set) Expanded(exes ...Expander) (s1 Set) {
 
 	for _, e := range s {
 		for _, e1 := range *e.Expanded(exes...) {
-			log.Print(e1)
+			logz.Print(e1)
 			s1.addOnlyExact(e1)
 		}
 	}
 
-	log.Print(s1)
+	logz.Print(s1)
 
 	return
 }
