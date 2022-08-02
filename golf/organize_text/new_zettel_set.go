@@ -1,5 +1,7 @@
 package organize_text
 
+import "sort"
+
 type newZettelSet map[newZettel]bool
 
 func makeNewZettelSet() newZettelSet {
@@ -17,4 +19,20 @@ func (zs *newZettelSet) Del(z newZettel) {
 func (zs newZettelSet) Contains(z newZettel) bool {
 	_, ok := zs[z]
 	return ok
+}
+
+func (zs newZettelSet) sorted() (sorted []newZettel) {
+	sorted = make([]newZettel, len(zs))
+	i := 0
+
+	for z, _ := range zs {
+		sorted[i] = z
+		i++
+	}
+
+	sort.Slice(sorted, func(i, j int) bool {
+		return sorted[i].Bezeichnung < sorted[j].Bezeichnung
+	})
+
+	return
 }

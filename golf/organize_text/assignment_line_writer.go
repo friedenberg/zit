@@ -37,10 +37,13 @@ func (av assignmentLineWriter) write(a *assignment) (err error) {
 		av.WriteExactlyOneEmpty()
 	}
 
-	for z, _ := range a.named {
+	for _, z := range a.unnamed.sorted() {
 		av.WriteLines(
-			fmt.Sprintf("%s- [%s] %s", tab_prefix,
-				z.Hinweis, z.Bezeichnung))
+			fmt.Sprintf("%s- %s", tab_prefix, z.Bezeichnung))
+	}
+
+	for _, z := range a.named.sorted() {
+		av.WriteLines(fmt.Sprintf("%s- [%s] %s", tab_prefix, z.Hinweis, z.Bezeichnung))
 	}
 
 	if len(a.named) > 0 {
