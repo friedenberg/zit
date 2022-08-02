@@ -178,7 +178,7 @@ func (hn hinweisen) Read(h _Hinweis) (s _Sha, err error) {
 	var shaString string
 
 	if shaString, ok = sh.Read(h.String()); !ok {
-		err = errors.Normalf("hinweis '%s' does not exist", h)
+		err = errors.Wrapped(ErrDoesNotExist, "%s", h)
 		return
 	}
 

@@ -7,14 +7,16 @@ import (
 	"github.com/friedenberg/zit/alfa/logz"
 	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/delta/umwelt"
+	"github.com/friedenberg/zit/foxtrot/hinweisen"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/hotel/zettels"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
 type ReadCheckedOut struct {
-	Umwelt  *umwelt.Umwelt
-	Options zettels.CheckinOptions
+	Umwelt       *umwelt.Umwelt
+	Options      zettels.CheckinOptions
+	AllowMissing bool
 }
 
 type ReadCheckedOutResults struct {
@@ -55,8 +57,14 @@ func (op ReadCheckedOut) Run(paths ...string) (results ReadCheckedOutResults, er
 		var checked_out stored_zettel.CheckedOut
 
 		if checked_out, err = op.runOne(store, p); err != nil {
-			err = errors.Error(err)
-			return
+			if errors.Is(err, hinweisen.ErrDoesNotExist) {
+				//TODO log
+				err = nil
+			} else {
+				err = errors.Error(err)
+				return
+			}
+
 		}
 
 		logz.Print(checked_out.External.Hinweis)
@@ -85,7 +93,7 @@ func (op ReadCheckedOut) runOne(store store_with_lock.Store, p string) (zettel s
 	logz.Print(zettel.External.Hinweis)
 
 	if zettel.Internal, err = store.Zettels().Read(zettel.External.Hinweis); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrapped(err, "%s", zettel.External.Path)
 		return
 	}
 

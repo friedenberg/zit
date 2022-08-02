@@ -5,7 +5,9 @@ import (
 
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/stdprinter"
+	"github.com/friedenberg/zit/foxtrot/zettel_formats"
 	"github.com/friedenberg/zit/golf/checkout_store"
+	"github.com/friedenberg/zit/hotel/zettels"
 	"github.com/friedenberg/zit/juliett/user_ops"
 )
 
@@ -37,9 +39,9 @@ func (c Status) Run(u _Umwelt, args ...string) (err error) {
 
 	args = possible.Zettelen
 
-	options := _ZettelsCheckinOptions{
+	options := zettels.CheckinOptions{
 		IncludeAkte: true,
-		Format:      _ZettelFormatsText{},
+		Format:      zettel_formats.Text{},
 	}
 
 	var readResults user_ops.ReadCheckedOutResults
