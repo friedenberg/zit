@@ -22,7 +22,7 @@ func (c GetZettelsFromQuery) Run(query stored_zettel.NamedFilter) (result Zettel
 	defer errors.PanicIfError(store.Flush)
 
 	if result.SetNamed, err = store.Zettels().Query(query); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 

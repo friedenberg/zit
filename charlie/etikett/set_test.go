@@ -37,7 +37,7 @@ func TestPrefixIntersection(t *testing.T) {
 		Etikett{Value: "zz-archive-task-done"},
 	)
 
-  ex := s.IntersectPrefixes(MakeSet(Etikett{Value: "project"}))
+	ex := s.IntersectPrefixes(MakeSet(Etikett{Value: "project"}))
 
 	expected := []string{
 		"project-2021-zit",

@@ -27,7 +27,7 @@ func (op GetAllHinweisen) Run() (results GetAllHinweisenResults, err error) {
 	defer errors.PanicIfError(store.Flush)
 
 	if _, results.Hinweisen, err = store.Hinweisen().All(); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 

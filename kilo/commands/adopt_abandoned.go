@@ -5,6 +5,8 @@ import (
 
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/stdprinter"
+	"github.com/friedenberg/zit/bravo/sha"
+	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
@@ -27,24 +29,24 @@ func (c AdoptAbandoned) Description() string {
 }
 
 func (c AdoptAbandoned) RunWithLockedStore(store store_with_lock.Store, args ...string) (err error) {
-	zettels := make([]_NamedZettel, len(args))
+	zettels := make([]stored_zettel.Named, len(args))
 
 	for i, a := range args {
-		var sha _Sha
+		var sha sha.Sha
 
 		if err = sha.Set(a); err != nil {
 			err = errors.Error(err)
 			return
 		}
 
-		var stored _StoredZettel
+		var stored stored_zettel.Stored
 
 		if stored, err = store.Zettels().ReadZettel(sha); err != nil {
 			err = errors.Error(err)
 			return
 		}
 
-		var named _NamedZettel
+		var named stored_zettel.Named
 
 		if named, err = store.Zettels().Create(stored.Zettel); err != nil {
 			err = errors.Error(err)

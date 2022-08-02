@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"encoding/json"
 	"io"
+
+	"github.com/friedenberg/zit/alfa/errors"
 )
 
 type Writer interface {
@@ -22,7 +24,7 @@ func NewWriter(out io.Writer) (w *writer, err error) {
 	}
 
 	if err = w.open(); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -43,12 +45,12 @@ func (w *writer) WriteItem(i Item) (n int, err error) {
 	var b []byte
 
 	if b, err = json.Marshal(i); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
 	if n, err = w.Write(b); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -75,12 +77,12 @@ func (w *writer) Write(p []byte) (n int, err error) {
 
 func (w writer) Close() (err error) {
 	if _, err = w.wBuf.WriteString("]}\n"); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
 	if err = w.wBuf.Flush(); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 

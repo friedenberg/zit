@@ -2,34 +2,37 @@ package age
 
 import (
 	"io"
+
+	"filippo.io/age"
+	"github.com/friedenberg/zit/bravo/open_file_guard"
 )
 
 type Age interface {
-	Recipient() _AgeRecipient
-	Identity() _AgeIdentity
+	Recipient() Recipient
+	Identity() Identity
 	Decrypt(src io.Reader) (io.Reader, error)
 	Encrypt(dst io.Writer) (io.WriteCloser, error)
 }
 
-type age struct {
-	recipient _AgeRecipient
-	identity  _AgeIdentity
+type ages struct {
+	recipient Recipient
+	identity  Identity
 }
 
-func Make(basePath string) (a *age, err error) {
+func Make(basePath string) (a *ages, err error) {
 	var contents string
 
-	if contents, err = _ReadStringAll(basePath); err != nil {
+	if contents, err = open_file_guard.ReadAllString(basePath); err != nil {
 		return
 	}
 
-	var i *_AgeX25519Identity
+	var i *X25519Identity
 
-	if i, err = _ParseX25519Identity(contents); err != nil {
+	if i, err = age.ParseX25519Identity(contents); err != nil {
 		return
 	}
 
-	a = &age{
+	a = &ages{
 		recipient: i.Recipient(),
 		identity:  i,
 	}
@@ -37,18 +40,18 @@ func Make(basePath string) (a *age, err error) {
 	return
 }
 
-func (a age) Recipient() _AgeRecipient {
+func (a ages) Recipient() Recipient {
 	return a.recipient
 }
 
-func (a age) Identity() _AgeIdentity {
+func (a ages) Identity() Identity {
 	return a.identity
 }
 
-func (a age) Decrypt(src io.Reader) (io.Reader, error) {
-	return _AgeDecrypt(src, a.Identity())
+func (a ages) Decrypt(src io.Reader) (io.Reader, error) {
+	return age.Decrypt(src, a.Identity())
 }
 
-func (a age) Encrypt(dst io.Writer) (io.WriteCloser, error) {
-	return _AgeEncrypt(dst, a.Recipient())
+func (a ages) Encrypt(dst io.Writer) (io.WriteCloser, error) {
+	return age.Encrypt(dst, a.Recipient())
 }

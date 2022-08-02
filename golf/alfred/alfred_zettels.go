@@ -3,9 +3,14 @@ package alfred
 import (
 	"fmt"
 	"strings"
+
+	"github.com/friedenberg/zit/bravo/alfred"
+	"github.com/friedenberg/zit/charlie/etikett"
+	"github.com/friedenberg/zit/charlie/hinweis"
+	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 )
 
-func ZettelToItem(z _NamedZettel) (a _AlfredItem) {
+func ZettelToItem(z stored_zettel.Named) (a alfred.Item) {
 	a.Title = z.Zettel.Bezeichnung.String()
 
 	if a.Title == "" {
@@ -24,7 +29,7 @@ func ZettelToItem(z _NamedZettel) (a _AlfredItem) {
 
 	a.Arg = z.Hinweis.String()
 
-	mb := _AlfredNewMatchBuilder()
+	mb := alfred.NewMatchBuilder()
 
 	mb.AddMatches(z.Hinweis.String())
 	mb.AddMatches(z.Hinweis.Head())
@@ -44,13 +49,13 @@ func ZettelToItem(z _NamedZettel) (a _AlfredItem) {
 	return
 }
 
-func EtikettToItem(e _Etikett) (a _AlfredItem) {
+func EtikettToItem(e etikett.Etikett) (a alfred.Item) {
 	a.Title = e.String()
 	// a.Subtitle = fmt.Sprintf("%s: %s", z.Hinweis.String(), strings.Join(EtikettenStringsFromZettel(z, false), ", "))
 
 	a.Arg = e.String()
 
-	mb := _AlfredNewMatchBuilder()
+	mb := alfred.NewMatchBuilder()
 
 	mb.AddMatches(e.Expanded().Strings()...)
 
@@ -62,19 +67,19 @@ func EtikettToItem(e _Etikett) (a _AlfredItem) {
 	return
 }
 
-func ErrorToItem(err error) (a _AlfredItem) {
+func ErrorToItem(err error) (a alfred.Item) {
 	a.Title = err.Error()
 
 	return
 }
 
-func HinweisToItem(e _Hinweis) (a _AlfredItem) {
+func HinweisToItem(e hinweis.Hinweis) (a alfred.Item) {
 	a.Title = e.String()
 	// a.Subtitle = fmt.Sprintf("%s: %s", z.Hinweis.String(), strings.Join(EtikettenStringsFromZettel(z, false), ", "))
 
 	a.Arg = e.String()
 
-	mb := _AlfredNewMatchBuilder()
+	mb := alfred.NewMatchBuilder()
 
 	mb.AddMatch(e.String())
 	mb.AddMatch(e.Head())
@@ -88,7 +93,7 @@ func HinweisToItem(e _Hinweis) (a _AlfredItem) {
 	return
 }
 
-func EtikettenStringsFromZettel(es _EtikettSet, shouldExpand bool) (out []string) {
+func EtikettenStringsFromZettel(es etikett.Set, shouldExpand bool) (out []string) {
 	out = make([]string, 0, es.Len())
 
 	for _, e := range es {

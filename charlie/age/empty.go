@@ -1,6 +1,8 @@
 package age
 
-import "io"
+import (
+	"io"
+)
 
 type ageEmpty struct {
 }
@@ -9,11 +11,11 @@ func MakeEmpty() (a *ageEmpty) {
 	return &ageEmpty{}
 }
 
-func (a ageEmpty) Recipient() _AgeRecipient {
+func (a ageEmpty) Recipient() Recipient {
 	return nil
 }
 
-func (a ageEmpty) Identity() _AgeIdentity {
+func (a ageEmpty) Identity() Identity {
 	return nil
 }
 

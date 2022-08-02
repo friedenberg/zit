@@ -7,6 +7,10 @@ import (
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/logz"
 	"github.com/friedenberg/zit/alfa/stdprinter"
+	"github.com/friedenberg/zit/bravo/id"
+	"github.com/friedenberg/zit/bravo/sha"
+	"github.com/friedenberg/zit/charlie/hinweis"
+	"github.com/friedenberg/zit/hotel/zettels"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
@@ -43,14 +47,14 @@ func (c Log) RunWithLockedStore(store store_with_lock.Store, args ...string) (er
 
 	}
 
-	var id _Id
+	var id id.Id
 
 	if id, err = c.getIdFromArg(rawId); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	var chain _ZettelsChain
+	var chain zettels.Chain
 
 	if chain, err = store.Zettels().AllInChain(id); err != nil {
 		err = errors.Error(err)
@@ -68,15 +72,15 @@ func (c Log) RunWithLockedStore(store store_with_lock.Store, args ...string) (er
 	return
 }
 
-func (c Log) getIdFromArg(arg string) (id _Id, err error) {
-	var sha _Sha
+func (c Log) getIdFromArg(arg string) (id id.Id, err error) {
+	var sha sha.Sha
 
 	if err = sha.Set(arg); err == nil {
 		id = sha
 		return
 	}
 
-	hinweis := _HinweisNewEmpty()
+	hinweis := hinweis.NewEmpty()
 
 	if err = hinweis.Set(arg); err == nil {
 		id = hinweis

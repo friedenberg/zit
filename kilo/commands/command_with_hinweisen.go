@@ -2,11 +2,14 @@ package commands
 
 import (
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/charlie/hinweis"
+	"github.com/friedenberg/zit/delta/umwelt"
+	"github.com/friedenberg/zit/hotel/zettels"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
 type CommandWithHinweisen interface {
-	RunWithHinweisen(_Umwelt, _Zettels, ..._Hinweis) error
+	RunWithHinweisen(*umwelt.Umwelt, zettels.Zettels, ...hinweis.Hinweis) error
 }
 
 type commandWithHinweisen struct {
@@ -14,12 +17,12 @@ type commandWithHinweisen struct {
 }
 
 func (c commandWithHinweisen) RunWithLockedStore(store store_with_lock.Store, args ...string) (err error) {
-	ids := make([]_Hinweis, len(args))
+	ids := make([]hinweis.Hinweis, len(args))
 
 	for i, arg := range args {
-		var h _Hinweis
+		var h hinweis.Hinweis
 
-		if h, err = _MakeBlindHinweis(arg); err != nil {
+		if h, err = hinweis.MakeBlindHinweis(arg); err != nil {
 			err = errors.Error(err)
 			return
 		}

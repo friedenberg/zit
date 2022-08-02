@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/delta/objekte"
+	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
@@ -35,7 +36,7 @@ func init() {
 	)
 }
 
-func (c CheckinAkte) Run(u _Umwelt, args ...string) (err error) {
+func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	if len(args)%2 != 0 {
 		err = errors.Errorf("arguments must come in pairs of hinweis and akte path")
 		return

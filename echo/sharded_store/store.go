@@ -3,7 +3,9 @@ package sharded_store
 import (
 	"sync"
 
+	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/logz"
+	"github.com/friedenberg/zit/bravo/open_file_guard"
 )
 
 type Store interface {
@@ -48,7 +50,7 @@ func (ss store) Shard(id string) (s Shard, err error) {
 	ss.rwLock.RUnlock()
 
 	if s, err = ss.NewShard(ss.path, id); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -62,7 +64,7 @@ func (ss store) Shard(id string) (s Shard, err error) {
 func (ss store) Flush() (err error) {
 	for fn, s := range ss.shards {
 		if err = s.Flush(); err != nil {
-			err = _Errorf("failed to flush shard: %s: %s", fn, err)
+			err = errors.Errorf("failed to flush shard: %s: %s", fn, err)
 			return
 		}
 	}
@@ -73,8 +75,8 @@ func (ss store) Flush() (err error) {
 func (ss store) All() (es []Entry, err error) {
 	var files []string
 
-	if files, err = _ReadDirNames(ss.path); err != nil {
-		err = _Error(err)
+	if files, err = open_file_guard.ReadDirNames(ss.path); err != nil {
+		err = errors.Error(err)
 		return
 	}
 
@@ -83,7 +85,7 @@ func (ss store) All() (es []Entry, err error) {
 
 		if s, err = ss.Shard(fn); err != nil {
 			logz.Print(s)
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 

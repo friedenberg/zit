@@ -1,9 +1,15 @@
 package akten
 
-import "path"
+import (
+	"path"
+
+	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/bravo/open_file_guard"
+	"github.com/friedenberg/zit/bravo/sha"
+)
 
 type Akten interface {
-	All() ([]_Sha, error)
+	All() ([]sha.Sha, error)
 }
 
 type akten struct {
@@ -18,29 +24,29 @@ func New(basePath string) (s *akten, err error) {
 	return
 }
 
-func (an *akten) All() (akte []_Sha, err error) {
-	akte = make([]_Sha, 0)
+func (an *akten) All() (akte []sha.Sha, err error) {
+	akte = make([]sha.Sha, 0)
 
 	var dirs []string
 
-	if dirs, err = _ReadDirNames(an.basePath); err != nil {
-		err = _Error(err)
+	if dirs, err = open_file_guard.ReadDirNames(an.basePath); err != nil {
+		err = errors.Error(err)
 		return
 	}
 
 	for _, d := range dirs {
 		var dirs2 []string
 
-		if dirs2, err = _ReadDirNames(path.Join(an.basePath, d)); err != nil {
-			err = _Error(err)
+		if dirs2, err = open_file_guard.ReadDirNames(path.Join(an.basePath, d)); err != nil {
+			err = errors.Error(err)
 			return
 		}
 
 		for _, a := range dirs2 {
-			var s _Sha
+			var s sha.Sha
 
 			if err = s.SetParts(d, a); err != nil {
-				err = _Error(err)
+				err = errors.Error(err)
 				return
 			}
 

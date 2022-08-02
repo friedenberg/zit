@@ -4,10 +4,14 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/friedenberg/zit/bravo/akte_ext"
+	"github.com/friedenberg/zit/bravo/sha"
 	"github.com/friedenberg/zit/charlie/etikett"
+	"github.com/friedenberg/zit/delta/objekte"
+	"github.com/friedenberg/zit/echo/zettel"
 )
 
-func makeEtiketten(t *testing.T, vs ...string) (es _EtikettSet) {
+func makeEtiketten(t *testing.T, vs ...string) (es etikett.Set) {
 	es = etikett.MakeSet()
 
 	for _, v := range vs {
@@ -19,7 +23,7 @@ func makeEtiketten(t *testing.T, vs ...string) (es _EtikettSet) {
 	return
 }
 
-func makeAkteExt(t *testing.T, v string) (es _AkteExt) {
+func makeAkteExt(t *testing.T, v string) (es akte_ext.AkteExt) {
 	if err := es.Set(v); err != nil {
 		t.Fatalf("%s", err)
 	}
@@ -35,26 +39,26 @@ func (b stringBuilderCloser) Close() error {
 	return nil
 }
 
-func (b stringBuilderCloser) Sha() _Sha {
-	return _Sha{}
+func (b stringBuilderCloser) Sha() sha.Sha {
+	return sha.Sha{}
 }
 
 type akteWriterFactory struct {
 	stringBuilderCloser
 }
 
-func (aw akteWriterFactory) AkteWriter() (_ObjekteWriter, error) {
+func (aw akteWriterFactory) AkteWriter() (objekte.Writer, error) {
 	return aw, nil
 }
 
-func readFormat(t *testing.T, f _ZettelFormat, contents string) (z _Zettel, a string) {
+func readFormat(t *testing.T, f zettel.Format, contents string) (z zettel.Zettel, a string) {
 	t.Helper()
 
 	awf := akteWriterFactory{
 		stringBuilderCloser{Builder: &strings.Builder{}},
 	}
 
-	c := _ZettelFormatContextRead{
+	c := zettel.FormatContextRead{
 		In:                strings.NewReader(contents),
 		AkteWriterFactory: awf,
 	}

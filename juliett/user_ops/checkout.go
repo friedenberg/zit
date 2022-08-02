@@ -3,16 +3,18 @@ package user_ops
 import (
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/delta/umwelt"
+	"github.com/friedenberg/zit/foxtrot/stored_zettel"
+	"github.com/friedenberg/zit/hotel/zettels"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
 type Checkout struct {
-	Options _ZettelsCheckinOptions
+	Options zettels.CheckinOptions
 	Umwelt  *umwelt.Umwelt
 }
 
 type CheckoutResults struct {
-	Zettelen      []_ZettelCheckedOut
+	Zettelen      []stored_zettel.CheckedOut
 	FilesZettelen []string
 	FilesAkten    []string
 }

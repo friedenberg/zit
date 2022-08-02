@@ -4,6 +4,8 @@ import (
 	"flag"
 	"os"
 	"path"
+
+	"github.com/friedenberg/zit/delta/umwelt"
 )
 
 type Deinit struct {
@@ -20,7 +22,7 @@ func init() {
 	)
 }
 
-func (c Deinit) Run(u _Umwelt, args ...string) (err error) {
+func (c Deinit) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	base := path.Join(u.Dir(), ".zit")
 	err = os.RemoveAll(base)
 

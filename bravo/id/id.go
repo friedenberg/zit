@@ -5,6 +5,8 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+
+	"github.com/friedenberg/zit/alfa/errors"
 )
 
 type Id interface {
@@ -29,7 +31,7 @@ func MakeDirIfNecessary(i Id, pc ...string) (p string, err error) {
 
 	//TODO open_file_guard
 	if err = os.MkdirAll(dir, os.ModeDir|0755); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 

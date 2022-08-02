@@ -7,6 +7,8 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/kennung"
+	"github.com/friedenberg/zit/bravo/open_file_guard"
 )
 
 type provider []string
@@ -14,12 +16,12 @@ type provider []string
 func newProvider(path string) (p provider, err error) {
 	var f *os.File
 
-	if f, err = _Open(path); err != nil {
+	if f, err = open_file_guard.Open(path); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	defer _Close(f)
+	defer open_file_guard.Close(f)
 
 	r := bufio.NewReader(f)
 
@@ -43,7 +45,7 @@ func newProvider(path string) (p provider, err error) {
 	return
 }
 
-func (p provider) Hinweis(i _Int) (s string, err error) {
+func (p provider) Hinweis(i kennung.Int) (s string, err error) {
 	if len(p)-1 < int(i) {
 		err = errors.Errorf("insuffient ids")
 		return

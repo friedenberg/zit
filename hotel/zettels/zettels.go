@@ -5,67 +5,80 @@ import (
 
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/logz"
+	"github.com/friedenberg/zit/alfa/stdprinter"
+	"github.com/friedenberg/zit/bravo/id"
+	"github.com/friedenberg/zit/bravo/sha"
+	"github.com/friedenberg/zit/charlie/age"
+	"github.com/friedenberg/zit/charlie/etikett"
+	"github.com/friedenberg/zit/charlie/hinweis"
+	"github.com/friedenberg/zit/charlie/konfig"
+	"github.com/friedenberg/zit/delta/umwelt"
+	"github.com/friedenberg/zit/echo/sharded_store"
+	"github.com/friedenberg/zit/echo/zettel"
+	"github.com/friedenberg/zit/foxtrot/etiketten"
+	"github.com/friedenberg/zit/foxtrot/hinweisen"
+	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 )
 
 type Zettels interface {
-	AllInChain(id _Id) (c Chain, err error)
-	All() (map[string]_NamedZettel, error)
-	Query(_NamedZettelFilter) (map[string]_NamedZettel, error)
+	AllInChain(id id.Id) (c Chain, err error)
+	All() (map[string]stored_zettel.Named, error)
+	Query(stored_zettel.NamedFilter) (map[string]stored_zettel.Named, error)
 
-	ReadZettel(sha _Sha) (z _StoredZettel, err error)
-	Read(id _Id) (z _NamedZettel, err error)
-	Create(_Zettel) (z _NamedZettel, err error)
-	CreateWithHinweis(_Zettel, _Hinweis) (z _NamedZettel, err error)
-	Update(z _NamedZettel) (stored _NamedZettel, err error)
-	Revert(h _Hinweis) (named _NamedZettel, err error)
-	UpdateNoKinder(z _NamedZettel) (err error)
+	ReadZettel(sha sha.Sha) (z stored_zettel.Stored, err error)
+	Read(id id.Id) (z stored_zettel.Named, err error)
+	Create(zettel.Zettel) (z stored_zettel.Named, err error)
+	CreateWithHinweis(zettel.Zettel, hinweis.Hinweis) (z stored_zettel.Named, err error)
+	Update(z stored_zettel.Named) (stored stored_zettel.Named, err error)
+	Revert(h hinweis.Hinweis) (named stored_zettel.Named, err error)
+	UpdateNoKinder(z stored_zettel.Named) (err error)
 
 	//TODO move to user_ops
-	Checkout(options CheckinOptions, args ...string) (czs []_ZettelCheckedOut, err error)
+	Checkout(options CheckinOptions, args ...string) (czs []stored_zettel.CheckedOut, err error)
 
-	Delete(id _Id) (zettel _NamedZettel, err error)
+	Delete(id id.Id) (zettel stored_zettel.Named, err error)
 
 	Flush() error
 
-	Etiketten() _Etiketten
-	Hinweisen() _Hinweisen
-	Age() _Age
+	Etiketten() etiketten.Etiketten
+	Hinweisen() hinweisen.Hinweisen
+	Age() age.Age
 
-	Konfig() _Konfig
+	Konfig() konfig.Konfig
 
-	_AkteReaderFactory
-	_AkteWriterFactory
+	zettel.AkteReaderFactory
+	zettel.AkteWriterFactory
 }
 
 type zettels struct {
-	umwelt    *_Umwelt
-	store     _Store
+	umwelt    *umwelt.Umwelt
+	store     sharded_store.Store
 	basePath  string
-	age       _Age
-	etiketten _Etiketten
-	hinweisen _Hinweisen
+	age       age.Age
+	etiketten etiketten.Etiketten
+	hinweisen hinweisen.Hinweisen
 }
 
-func New(u *_Umwelt, age _Age) (s *zettels, err error) {
+func New(u *umwelt.Umwelt, age age.Age) (s *zettels, err error) {
 	s = &zettels{
 		umwelt:   u,
 		basePath: u.DirZit(),
 		age:      age,
 	}
 
-	if s.hinweisen, err = _NewHinweisen(age, s.basePath); err != nil {
+	if s.hinweisen, err = hinweisen.New(age, s.basePath); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	if s.etiketten, err = _NewEtiketten(u.Konfig, age, s.basePath); err != nil {
+	if s.etiketten, err = etiketten.New(u.Konfig, age, s.basePath); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
 	zp := path.Join(s.basePath, "Objekte", "Zettel")
 
-	if s.store, err = _NewStore(zp, s); err != nil {
+	if s.store, err = sharded_store.NewStore(zp, s); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -73,19 +86,19 @@ func New(u *_Umwelt, age _Age) (s *zettels, err error) {
 	return
 }
 
-func (zs *zettels) Age() _Age {
+func (zs *zettels) Age() age.Age {
 	return zs.age
 }
 
-func (zs *zettels) Hinweisen() _Hinweisen {
+func (zs *zettels) Hinweisen() hinweisen.Hinweisen {
 	return zs.hinweisen
 }
 
-func (zs *zettels) Etiketten() _Etiketten {
+func (zs *zettels) Etiketten() etiketten.Etiketten {
 	return zs.etiketten
 }
 
-func (zs *zettels) Konfig() _Konfig {
+func (zs *zettels) Konfig() konfig.Konfig {
 	return zs.umwelt.Konfig
 }
 
@@ -114,8 +127,8 @@ func (zs *zettels) Flush() (err error) {
 	return
 }
 
-func (zs zettels) NewShard(p string, id string) (s _Shard, err error) {
-	if s, err = _NewShard(path.Join(p, id), zs.age, _ShardGeneric{}); err != nil {
+func (zs zettels) NewShard(p string, id string) (s sharded_store.Shard, err error) {
+	if s, err = sharded_store.NewShard(path.Join(p, id), zs.age, sharded_store.ShardGeneric{}); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -124,7 +137,7 @@ func (zs zettels) NewShard(p string, id string) (s _Shard, err error) {
 }
 
 //TODO-P2,D2 move to store_with_lock
-func (zs zettels) CreateWithHinweis(in _Zettel, h _Hinweis) (z _NamedZettel, err error) {
+func (zs zettels) CreateWithHinweis(in zettel.Zettel, h hinweis.Hinweis) (z stored_zettel.Named, err error) {
 	if in.IsEmpty() {
 		err = errors.Normal(errors.Errorf("zettel is empty"))
 		return
@@ -144,7 +157,7 @@ func (zs zettels) CreateWithHinweis(in _Zettel, h _Hinweis) (z _NamedZettel, err
 
 	z.Hinweis = h
 
-	var named _NamedZettel
+	var named stored_zettel.Named
 
 	if named, err = zs.Read(z.Sha); err != nil {
 		err = errors.Error(err)
@@ -168,7 +181,7 @@ func (zs zettels) CreateWithHinweis(in _Zettel, h _Hinweis) (z _NamedZettel, err
 }
 
 //TODO-P1,D2 move to store_with_lock
-func (zs zettels) Create(in _Zettel) (z _NamedZettel, err error) {
+func (zs zettels) Create(in zettel.Zettel) (z stored_zettel.Named, err error) {
 	if in.IsEmpty() {
 		err = errors.Normal(errors.Errorf("zettel is empty"))
 		return
@@ -181,7 +194,7 @@ func (zs zettels) Create(in _Zettel) (z _NamedZettel, err error) {
 		return
 	}
 
-	var existing _NamedZettel
+	var existing stored_zettel.Named
 
 	if existing, err = zs.Read(z.Sha); err == nil {
 		z = existing
@@ -193,7 +206,7 @@ func (zs zettels) Create(in _Zettel) (z _NamedZettel, err error) {
 		return
 	}
 
-	var named _NamedZettel
+	var named stored_zettel.Named
 
 	if named, err = zs.Read(z.Sha); err != nil {
 		err = errors.Error(err)
@@ -214,13 +227,13 @@ func (zs zettels) Create(in _Zettel) (z _NamedZettel, err error) {
 }
 
 //TODO-P1,D3 move to store_with_lock
-func (zs zettels) Update(in _NamedZettel) (z _NamedZettel, err error) {
+func (zs zettels) Update(in stored_zettel.Named) (z stored_zettel.Named, err error) {
 	if in.Zettel.IsEmpty() {
 		err = errors.Normal(errors.Errorf("zettel is empty"))
 		return
 	}
 
-	var mutter _NamedZettel
+	var mutter stored_zettel.Named
 
 	if mutter, err = zs.Read(in.Hinweis); err != nil {
 		err = errors.Error(err)
@@ -230,7 +243,7 @@ func (zs zettels) Update(in _NamedZettel) (z _NamedZettel, err error) {
 	z = in
 
 	if z.Zettel.Equals(mutter.Zettel) {
-		_Errf("[%s %s] (unchanged)\n", z.Hinweis, z.Sha)
+		stdprinter.Errf("[%s %s] (unchanged)\n", z.Hinweis, z.Sha)
 		return
 	}
 
@@ -259,13 +272,13 @@ func (zs zettels) Update(in _NamedZettel) (z _NamedZettel, err error) {
 		return
 	}
 
-	_Errf("[%s %s] (updated)\n", z.Hinweis, z.Sha)
+	stdprinter.Errf("[%s %s] (updated)\n", z.Hinweis, z.Sha)
 
 	return
 }
 
 //TODO-P1,D3 move to store_with_lock
-func (zs zettels) Revert(h _Hinweis) (named _NamedZettel, err error) {
+func (zs zettels) Revert(h hinweis.Hinweis) (named stored_zettel.Named, err error) {
 	if named, err = zs.Read(h); err != nil {
 		err = errors.Error(err)
 		return
@@ -276,7 +289,7 @@ func (zs zettels) Revert(h _Hinweis) (named _NamedZettel, err error) {
 		return
 	}
 
-	var mutter _NamedZettel
+	var mutter stored_zettel.Named
 
 	if mutter, err = zs.Read(named.Mutter); err != nil {
 		err = errors.Error(err)
@@ -293,7 +306,7 @@ func (zs zettels) Revert(h _Hinweis) (named _NamedZettel, err error) {
 	return
 }
 
-func (zs zettels) UpdateNoKinder(zettel _NamedZettel) (err error) {
+func (zs zettels) UpdateNoKinder(zettel stored_zettel.Named) (err error) {
 	if err = zs.update(zettel.Stored); err != nil {
 		err = errors.Error(err)
 		return
@@ -302,13 +315,13 @@ func (zs zettels) UpdateNoKinder(zettel _NamedZettel) (err error) {
 	return
 }
 
-func (zs zettels) Delete(id _Id) (zettel _NamedZettel, err error) {
+func (zs zettels) Delete(id id.Id) (zettel stored_zettel.Named, err error) {
 	if zettel, err = zs.readNamedZettel(id); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	var s _Shard
+	var s sharded_store.Shard
 
 	if s, err = zs.store.Shard(zettel.Sha.Head()); err != nil {
 		err = errors.Error(err)
@@ -320,7 +333,7 @@ func (zs zettels) Delete(id _Id) (zettel _NamedZettel, err error) {
 	return
 }
 
-func (zs zettels) ReadZettel(sha _Sha) (z _StoredZettel, err error) {
+func (zs zettels) ReadZettel(sha sha.Sha) (z stored_zettel.Stored, err error) {
 	if z, err = zs.readStoredZettel(sha); err != nil {
 		err = errors.Error(err)
 		return
@@ -329,7 +342,7 @@ func (zs zettels) ReadZettel(sha _Sha) (z _StoredZettel, err error) {
 	return
 }
 
-func (zs zettels) Read(id _Id) (sz _NamedZettel, err error) {
+func (zs zettels) Read(id id.Id) (sz stored_zettel.Named, err error) {
 	if sz, err = zs.readNamedZettel(id); err != nil {
 		err = errors.Error(err)
 		return
@@ -339,10 +352,10 @@ func (zs zettels) Read(id _Id) (sz _NamedZettel, err error) {
 }
 
 //TODO move to store_with_lock
-func (zs zettels) All() (ns map[string]_NamedZettel, err error) {
-	ns = make(map[string]_NamedZettel)
+func (zs zettels) All() (ns map[string]stored_zettel.Named, err error) {
+	ns = make(map[string]stored_zettel.Named)
 
-	var es []_Entry
+	var es []sharded_store.Entry
 
 	if es, err = zs.store.All(); err != nil {
 		err = errors.Error(err)
@@ -351,14 +364,14 @@ func (zs zettels) All() (ns map[string]_NamedZettel, err error) {
 
 OUTER:
 	for _, e := range es {
-		var sha _Sha
+		var sha sha.Sha
 
 		if err = sha.Set(e.Key); err != nil {
 			err = errors.Error(err)
 			return
 		}
 
-		var named _NamedZettel
+		var named stored_zettel.Named
 
 		if named, err = zs.Read(sha); err != nil {
 			err = errors.Error(err)
@@ -371,7 +384,7 @@ OUTER:
 			continue OUTER
 		}
 
-		prefixes := named.Zettel.Etiketten.Expanded(_EtikettExpanderRight{})
+		prefixes := named.Zettel.Etiketten.Expanded(etikett.ExpanderRight{})
 
 		logz.Print(zs.umwelt.Konfig.Tags)
 		logz.Print(prefixes)
@@ -412,8 +425,8 @@ OUTER:
 }
 
 //TODO swap query and all methods for performance reasons
-func (zs zettels) Query(filter _NamedZettelFilter) (ns map[string]_NamedZettel, err error) {
-	var ns1 map[string]_NamedZettel
+func (zs zettels) Query(filter stored_zettel.NamedFilter) (ns map[string]stored_zettel.Named, err error) {
+	var ns1 map[string]stored_zettel.Named
 
 	if ns1, err = zs.All(); err != nil {
 		err = errors.Error(err)
@@ -425,7 +438,7 @@ func (zs zettels) Query(filter _NamedZettelFilter) (ns map[string]_NamedZettel, 
 		return
 	}
 
-	ns = make(map[string]_NamedZettel)
+	ns = make(map[string]stored_zettel.Named)
 
 	for n, z := range ns1 {
 		if filter.IncludeNamedZettel(z) {

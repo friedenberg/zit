@@ -8,7 +8,9 @@ import (
 	"sync"
 
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/kennung"
 	"github.com/friedenberg/zit/alfa/logz"
+	"github.com/friedenberg/zit/bravo/open_file_guard"
 	"github.com/friedenberg/zit/charlie/hinweis"
 )
 
@@ -23,7 +25,7 @@ type factory struct {
 	pathLastId string
 	yin        provider
 	yang       provider
-	counter    _Int
+	counter    kennung.Int
 }
 
 func newFactory(basePath string) (f *factory, err error) {
@@ -66,7 +68,7 @@ func (hf *factory) Refresh() (err error) {
 func (hf *factory) refresh() (err error) {
 	var old string
 
-	if old, err = _ReadAllString(hf.pathLastId); err != nil {
+	if old, err = open_file_guard.ReadAllString(hf.pathLastId); err != nil {
 		return
 	}
 
@@ -77,7 +79,7 @@ func (hf *factory) refresh() (err error) {
 	return
 }
 
-func (hf *factory) Make() (h _Hinweis, err error) {
+func (hf *factory) Make() (h hinweis.Hinweis, err error) {
 	logz.Print("making")
 	hf.Lock()
 	defer hf.Unlock()
@@ -115,11 +117,11 @@ func (hf factory) Flush() (err error) {
 func (hf factory) flush() (err error) {
 	var f *os.File
 
-	if f, err = _TempFile(); err != nil {
+	if f, err = open_file_guard.TempFile(); err != nil {
 		return
 	}
 
-	defer _Close(f)
+	defer open_file_guard.Close(f)
 
 	io.WriteString(f, strconv.FormatInt(int64(hf.counter), 10))
 

@@ -6,6 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
+	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/golf/organize_text"
 	"github.com/friedenberg/zit/juliett/user_ops"
 )
@@ -24,7 +25,7 @@ func init() {
 	)
 }
 
-func (c *FormatOrganize) Run(u _Umwelt, args ...string) (err error) {
+func (c *FormatOrganize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	if len(args) != 1 {
 		err = errors.Errorf("expected exactly one input argument")
 		return

@@ -3,6 +3,8 @@ package sha
 import (
 	"path"
 	"path/filepath"
+
+	"github.com/friedenberg/zit/alfa/errors"
 )
 
 func (s Sha) Glob(pc ...string) (globbed Sha, err error) {
@@ -12,17 +14,17 @@ func (s Sha) Glob(pc ...string) (globbed Sha, err error) {
 
 	//TODO move to open_file_guard
 	if matches, err = filepath.Glob(p + "*"); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
 	if len(matches) == 0 {
-		err = _Errorf("sha provided matches no objects: %s", p)
+		err = errors.Errorf("sha provided matches no objects: %s", p)
 		return
 	}
 
 	if len(matches) > 1 {
-		err = _Errorf(
+		err = errors.Errorf(
 			"ambiguous sha provided matches multiple objects: %q",
 			matches,
 		)
@@ -35,7 +37,7 @@ func (s Sha) Glob(pc ...string) (globbed Sha, err error) {
 	tail := path.Base(p)
 
 	if err = globbed.Set(head + tail); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 

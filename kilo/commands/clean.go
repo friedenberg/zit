@@ -5,7 +5,12 @@ import (
 
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/stdprinter"
+	"github.com/friedenberg/zit/bravo/open_file_guard"
+	"github.com/friedenberg/zit/delta/umwelt"
+	"github.com/friedenberg/zit/foxtrot/stored_zettel"
+	"github.com/friedenberg/zit/foxtrot/zettel_formats"
 	"github.com/friedenberg/zit/golf/checkout_store"
+	"github.com/friedenberg/zit/hotel/zettels"
 	"github.com/friedenberg/zit/juliett/user_ops"
 )
 
@@ -23,7 +28,7 @@ func init() {
 	)
 }
 
-func (c Clean) Run(u _Umwelt, args ...string) (err error) {
+func (c Clean) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	if len(args) > 0 {
 		stdprinter.Errf("args provided will be ignored")
 	}
@@ -37,9 +42,9 @@ func (c Clean) Run(u _Umwelt, args ...string) (err error) {
 
 	args = possible.Zettelen
 
-	checkinOptions := _ZettelsCheckinOptions{
+	checkinOptions := zettels.CheckinOptions{
 		IncludeAkte: true,
-		Format:      _ZettelFormatsText{},
+		Format:      zettel_formats.Text{},
 	}
 
 	var readResults user_ops.ReadCheckedOutResults
@@ -54,7 +59,7 @@ func (c Clean) Run(u _Umwelt, args ...string) (err error) {
 		return
 	}
 
-	toDelete := make([]_ExternalZettel, 0, len(readResults.Zettelen))
+	toDelete := make([]stored_zettel.External, 0, len(readResults.Zettelen))
 	filesToDelete := make([]string, 0, len(readResults.Zettelen))
 
 	for _, z := range readResults.Zettelen {
@@ -78,7 +83,7 @@ func (c Clean) Run(u _Umwelt, args ...string) (err error) {
 		return
 	}
 
-	if err = _DeleteFilesAndDirs(filesToDelete...); err != nil {
+	if err = open_file_guard.DeleteFilesAndDirs(filesToDelete...); err != nil {
 		err = errors.Error(err)
 		return
 	}

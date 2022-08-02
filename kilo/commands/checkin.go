@@ -6,8 +6,11 @@ import (
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/charlie/hinweis"
+	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
+	"github.com/friedenberg/zit/foxtrot/zettel_formats"
 	"github.com/friedenberg/zit/golf/checkout_store"
+	"github.com/friedenberg/zit/hotel/zettels"
 	"github.com/friedenberg/zit/juliett/user_ops"
 )
 
@@ -32,7 +35,7 @@ func init() {
 	)
 }
 
-func (c Checkin) Run(u _Umwelt, args ...string) (err error) {
+func (c Checkin) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	if c.All {
 		if len(args) > 0 {
 			stdprinter.Errf("Ignoring args because -all is set\n")
@@ -48,9 +51,9 @@ func (c Checkin) Run(u _Umwelt, args ...string) (err error) {
 		args = possible.Zettelen
 	}
 
-	checkinOptions := _ZettelsCheckinOptions{
+	checkinOptions := zettels.CheckinOptions{
 		IncludeAkte: !c.IgnoreAkte,
-		Format:      _ZettelFormatsText{},
+		Format:      zettel_formats.Text{},
 	}
 
 	var readResults user_ops.ReadCheckedOutResults

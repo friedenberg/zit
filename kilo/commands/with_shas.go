@@ -2,11 +2,12 @@ package commands
 
 import (
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/bravo/sha"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
 type WithShas interface {
-	RunWithShas(store store_with_lock.Store, shas ..._Sha) error
+	RunWithShas(store store_with_lock.Store, shas ...sha.Sha) error
 }
 
 type withShas struct {
@@ -14,10 +15,10 @@ type withShas struct {
 }
 
 func (c withShas) RunWithLockedStore(store store_with_lock.Store, args ...string) (err error) {
-	shas := make([]_Sha, len(args))
+	shas := make([]sha.Sha, len(args))
 
 	for i, arg := range args {
-		var sha _Sha
+		var sha sha.Sha
 
 		if err = sha.Set(arg); err != nil {
 			err = errors.Error(err)

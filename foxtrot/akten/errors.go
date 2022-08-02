@@ -1,9 +1,13 @@
 package akten
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/friedenberg/zit/bravo/sha"
+)
 
 type DuplicateAkteError struct {
-	ShaOldAkte, ShaNewZettel, ShaOldZettel _Sha
+	ShaOldAkte, ShaNewZettel, ShaOldZettel sha.Sha
 }
 
 func (e DuplicateAkteError) Error() string {

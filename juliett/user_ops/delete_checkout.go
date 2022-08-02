@@ -2,6 +2,7 @@ package user_ops
 
 import (
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
 	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/delta/umwelt"
@@ -30,13 +31,13 @@ func (c DeleteCheckout) Run(zettels map[hinweis.Hinweis]stored_zettel.External) 
 		var internal stored_zettel.Named
 
 		if internal, err = store.Zettels().Read(h); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 
 		//TODO add a safety check?
 		if !internal.Zettel.Equals(external.Zettel) {
-			_Outf("[%s] (checkout different!)\n", h)
+			stdprinter.Outf("[%s] (checkout different!)\n", h)
 			continue
 		}
 
@@ -49,12 +50,12 @@ func (c DeleteCheckout) Run(zettels map[hinweis.Hinweis]stored_zettel.External) 
 	}
 
 	if err = open_file_guard.DeleteFilesAndDirs(filesToDelete...); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
 	for _, z := range toDelete {
-		_Outf("[%s] (checkout deleted)\n", z.Hinweis)
+		stdprinter.Outf("[%s] (checkout deleted)\n", z.Hinweis)
 	}
 
 	return

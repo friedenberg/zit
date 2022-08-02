@@ -1,17 +1,21 @@
 package commands
 
-import "github.com/friedenberg/zit/alfa/errors"
+import (
+	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/charlie/age"
+	"github.com/friedenberg/zit/delta/umwelt"
+)
 
 type CommandWithAge interface {
-	RunWithAge(_Umwelt, _Age, ...string) error
+	RunWithAge(*umwelt.Umwelt, age.Age, ...string) error
 }
 
 type commandWithAge struct {
 	CommandWithAge
 }
 
-func (c commandWithAge) Run(u _Umwelt, args ...string) (err error) {
-	var age _Age
+func (c commandWithAge) Run(u *umwelt.Umwelt, args ...string) (err error) {
+	var age age.Age
 
 	if age, err = u.Age(); err != nil {
 		err = errors.Error(err)

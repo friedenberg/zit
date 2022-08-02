@@ -6,6 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
+	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/echo/zettel"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/foxtrot/zettel_formats"
@@ -26,7 +27,7 @@ func init() {
 	)
 }
 
-func (c *FormatZettel) Run(u _Umwelt, args ...string) (err error) {
+func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	if len(args) != 1 {
 		err = errors.Errorf("expected exactly one input argument")
 		return

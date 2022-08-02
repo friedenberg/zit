@@ -1,13 +1,17 @@
 package konfig
 
-import "os/exec"
+import (
+	"os/exec"
+
+	"github.com/friedenberg/zit/alfa/node_type"
+)
 
 type RemoteScript interface {
 	Cmd(args []string) (*exec.Cmd, error)
 }
 
 type RemoteScriptConfig struct {
-	SupportedTypes    []_Type
+	SupportedTypes    []node_type.Type
 	SupportedCommands []string
 	Shell             string
 	Script            string

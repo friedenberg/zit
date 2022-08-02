@@ -7,6 +7,12 @@ import (
 
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/exec"
+	"github.com/friedenberg/zit/bravo/id"
+	"github.com/friedenberg/zit/bravo/open_file_guard"
+	"github.com/friedenberg/zit/bravo/sha"
+	"github.com/friedenberg/zit/charlie/hinweis"
+	"github.com/friedenberg/zit/delta/objekte"
+	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
@@ -25,8 +31,8 @@ func init() {
 }
 
 func (c OpenAkte) RunWithLockedStore(store store_with_lock.Store, args ...string) (err error) {
-	var hins []_Hinweis
-	var shas []_Sha
+	var hins []hinweis.Hinweis
+	var shas []sha.Sha
 
 	if shas, hins, err = store.Hinweisen().ReadManyStrings(args...); err != nil {
 		err = errors.Error(err)
@@ -42,11 +48,11 @@ func (c OpenAkte) RunWithLockedStore(store store_with_lock.Store, args ...string
 		return
 	}
 
-	for i, sha := range shas {
-		func(sha _Sha) {
-			var z _NamedZettel
+	for i, s := range shas {
+		func(s sha.Sha) {
+			var z stored_zettel.Named
 
-			if z, err = store.Zettels().Read(sha); err != nil {
+			if z, err = store.Zettels().Read(s); err != nil {
 				err = errors.Error(err)
 				return
 			}
@@ -58,27 +64,27 @@ func (c OpenAkte) RunWithLockedStore(store store_with_lock.Store, args ...string
 
 			var filename string
 
-			if filename, err = _IdMakeDirNecessary(hins[i], dir); err != nil {
+			if filename, err = id.MakeDirIfNecessary(hins[i], dir); err != nil {
 				err = errors.Error(err)
 				return
 			}
 
 			filename = filename + "." + z.Zettel.AkteExt.String()
 
-			if f, err = _Create(filename); err != nil {
+			if f, err = open_file_guard.Create(filename); err != nil {
 				err = errors.Error(err)
 				return
 			}
 
-			defer _Close(f)
+			defer open_file_guard.Close(f)
 
 			files[i] = f.Name()
 
-			if err = _ObjekteRead(f, store.Age(), _IdPath(shaAkte, p)); err != nil {
+			if err = objekte.Read(f, store.Age(), id.Path(shaAkte, p)); err != nil {
 				err = errors.Error(err)
 				return
 			}
-		}(sha)
+		}(s)
 	}
 
 	cmd := exec.ExecCommand(

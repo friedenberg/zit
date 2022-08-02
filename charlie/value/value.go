@@ -5,14 +5,17 @@ import (
 	"crypto/sha256"
 	"io"
 	"strings"
+
+	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/bravo/sha"
 )
 
 type Value struct {
 	value string
-	sha   _Sha
+	sha   sha.Sha
 }
 
-func (v Value) Sha() _Sha {
+func (v Value) Sha() sha.Sha {
 	return v.sha
 }
 
@@ -27,11 +30,11 @@ func (v *Value) SetString(s string) (err error) {
 	sr := strings.NewReader(s)
 
 	if _, err = io.Copy(hash, sr); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
-	v.sha = _MakeShaFromHash(hash)
+	v.sha = sha.FromHash(hash)
 	v.value = s
 
 	return

@@ -5,7 +5,10 @@ import (
 
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/vim_cli_options_builder"
+	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
+	"github.com/friedenberg/zit/foxtrot/zettel_formats"
+	"github.com/friedenberg/zit/hotel/zettels"
 	"github.com/friedenberg/zit/juliett/user_ops"
 )
 
@@ -26,12 +29,12 @@ func init() {
 	)
 }
 
-func (c Edit) Run(u _Umwelt, args ...string) (err error) {
+func (c Edit) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	checkoutOp := user_ops.Checkout{
 		Umwelt: u,
-		Options: _ZettelsCheckinOptions{
+		Options: zettels.CheckinOptions{
 			IncludeAkte: c.IncludeAkte,
-			Format:      _ZettelFormatsText{},
+			Format:      zettel_formats.Text{},
 		},
 	}
 

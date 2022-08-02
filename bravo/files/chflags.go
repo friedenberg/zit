@@ -4,6 +4,8 @@ import (
 	"io/fs"
 	"os/exec"
 	"strings"
+
+	"github.com/friedenberg/zit/alfa/errors"
 )
 
 func isNotExists(err error, msg []byte) bool {
@@ -25,7 +27,7 @@ func setUserChanges(paths []string, allow bool) (err error) {
 		if isNotExists(err, msg) {
 			err = fs.ErrNotExist
 		} else {
-			err = _Errorf("failed to run chflags: %s", msg)
+			err = errors.Errorf("failed to run chflags: %s", msg)
 		}
 
 		return

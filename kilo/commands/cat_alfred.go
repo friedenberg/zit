@@ -5,12 +5,16 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/node_type"
 	"github.com/friedenberg/zit/alfa/stdprinter"
+	"github.com/friedenberg/zit/charlie/etikett"
+	"github.com/friedenberg/zit/foxtrot/stored_zettel"
+	"github.com/friedenberg/zit/golf/alfred"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
 type CatAlfred struct {
-	Type _Type
+	Type node_type.Type
 	Command
 }
 
@@ -19,7 +23,7 @@ func init() {
 		"cat-alfred",
 		func(f *flag.FlagSet) Command {
 			c := &CatAlfred{
-				Type: _TypeUnknown,
+				Type: node_type.TypeUnknown,
 			}
 
 			c.Command = commandWithLockedStore{c}
@@ -40,9 +44,9 @@ func (c CatAlfred) RunWithLockedStore(store store_with_lock.Store, args ...strin
 	wo := bufio.NewWriter(store.Out)
 	defer wo.Flush()
 
-	var aw _AlfredWriter
+	var aw alfred.Writer
 
-	if aw, err = _AlfredNewWriter(store.Out); err != nil {
+	if aw, err = alfred.NewWriter(store.Out); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -54,8 +58,8 @@ func (c CatAlfred) RunWithLockedStore(store store_with_lock.Store, args ...strin
 	}()
 
 	switch c.Type {
-	case _TypeEtikett:
-		var ea []_Etikett
+	case node_type.TypeEtikett:
+		var ea []etikett.Etikett
 
 		if ea, err = store.Etiketten().All(); err != nil {
 			err = errors.Error(err)
@@ -66,9 +70,9 @@ func (c CatAlfred) RunWithLockedStore(store store_with_lock.Store, args ...strin
 			aw.WriteEtikett(e)
 		}
 
-	case _TypeZettel:
+	case node_type.TypeZettel:
 
-		var all map[string]_NamedZettel
+		var all map[string]stored_zettel.Named
 
 		if all, err = store.Zettels().All(); err != nil {
 			err = errors.Error(err)
@@ -79,11 +83,11 @@ func (c CatAlfred) RunWithLockedStore(store store_with_lock.Store, args ...strin
 			aw.WriteZettel(z)
 		}
 
-	case _TypeAkte:
+	case node_type.TypeAkte:
 
-	case _TypeHinweis:
+	case node_type.TypeHinweis:
 
-		var all map[string]_NamedZettel
+		var all map[string]stored_zettel.Named
 
 		if all, err = store.Zettels().All(); err != nil {
 			err = errors.Error(err)

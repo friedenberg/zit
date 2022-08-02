@@ -6,6 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/stdprinter"
+	"github.com/friedenberg/zit/bravo/files"
 	"github.com/friedenberg/zit/charlie/age"
 	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/charlie/konfig"
@@ -46,12 +47,12 @@ func MakeUmwelt(c konfig.Konfig) (u *Umwelt, err error) {
 func (u Umwelt) Age() (a age.Age, err error) {
 	fa := u.FileAge()
 
-	if _FilesExist(fa) {
-		if a, err = _AgeMake(fa); err != nil {
+	if files.Exists(fa) {
+		if a, err = age.Make(fa); err != nil {
 			return
 		}
 	} else {
-		a = _AgeMakeEmpty()
+		a = age.MakeEmpty()
 	}
 
 	return

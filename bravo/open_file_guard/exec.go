@@ -4,6 +4,7 @@ import (
 	"os"
 	"os/exec"
 
+	"github.com/friedenberg/zit/alfa/errors"
 	"golang.org/x/sys/unix"
 )
 
@@ -36,7 +37,7 @@ func OpenVimWithArgs(args []string, files ...string) (err error) {
 	}
 
 	if err = cmd.Run(); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -54,7 +55,7 @@ func OpenFiles(p ...string) (err error) {
 	cmd := exec.Command("open", p...)
 
 	if err = cmd.Run(); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 

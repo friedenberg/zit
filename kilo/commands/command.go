@@ -11,19 +11,20 @@ import (
 	"github.com/friedenberg/zit/alfa/logz"
 	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
+	"github.com/friedenberg/zit/charlie/konfig"
 	"github.com/friedenberg/zit/delta/umwelt"
 )
 
 type Command interface {
-	Run(_Umwelt, ...string) error
+	Run(*umwelt.Umwelt, ...string) error
 }
 
 type CommandSupportingErrors interface {
-	HandleError(_Umwelt, error)
+	HandleError(*umwelt.Umwelt, error)
 }
 
 type CommandWithArgPreprocessor interface {
-	PreprocessArgs(_Umwelt, []string) ([]string, error)
+	PreprocessArgs(*umwelt.Umwelt, []string) ([]string, error)
 }
 
 type CommandWithDescription interface {
@@ -115,7 +116,7 @@ func Run(args []string) (exitStatus int) {
 
 	args = os.Args[2:]
 
-	konfigCli := _KonfigDefaultCli()
+	konfigCli := konfig.DefaultCli()
 	konfigCli.AddToFlags(cmd.FlagSet)
 
 	if err = cmd.FlagSet.Parse(args); err != nil {
@@ -128,14 +129,14 @@ func Run(args []string) (exitStatus int) {
 		defer df()
 	}
 
-	var k _Konfig
+	var k konfig.Konfig
 
 	if k, err = konfigCli.Konfig(); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	var u _Umwelt
+	var u *umwelt.Umwelt
 
 	if u, err = umwelt.MakeUmwelt(k); err != nil {
 		err = errors.Error(err)
@@ -169,11 +170,11 @@ func (c command) SetDebug() (d func()) {
 
 	debug.SetGCPercent(-1)
 
-	f, _ := _Create("build/cpu1.pprof")
-	df = append(df, func() { _Close(f) })
+	f, _ := open_file_guard.Create("build/cpu1.pprof")
+	df = append(df, func() { open_file_guard.Close(f) })
 
-	f1, _ := _Create("build/trace")
-	df = append(df, func() { _Close(f1) })
+	f1, _ := open_file_guard.Create("build/trace")
+	df = append(df, func() { open_file_guard.Close(f1) })
 
 	pprof.StartCPUProfile(f)
 	df = append(df, func() { pprof.StopCPUProfile() })

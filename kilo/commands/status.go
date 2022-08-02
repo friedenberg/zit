@@ -5,6 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/stdprinter"
+	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/foxtrot/zettel_formats"
 	"github.com/friedenberg/zit/golf/checkout_store"
 	"github.com/friedenberg/zit/hotel/zettels"
@@ -25,7 +26,7 @@ func init() {
 	)
 }
 
-func (c Status) Run(u _Umwelt, args ...string) (err error) {
+func (c Status) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	if len(args) > 0 {
 		stdprinter.Errf("args provided will be ignored")
 	}

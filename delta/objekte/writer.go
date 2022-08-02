@@ -6,11 +6,15 @@ import (
 	"crypto/sha256"
 	"hash"
 	"io"
+
+	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/bravo/sha"
+	"github.com/friedenberg/zit/charlie/age"
 )
 
 type Writer interface {
 	io.WriteCloser
-	Sha() _Sha
+	Sha() sha.Sha
 }
 
 type writer struct {
@@ -20,9 +24,9 @@ type writer struct {
 	wBuf       *bufio.Writer
 }
 
-func NewZippedWriter(age _Age, out io.Writer) (w *writer, err error) {
+func NewZippedWriter(age age.Age, out io.Writer) (w *writer, err error) {
 	if w, err = NewWriter(age, out); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -32,13 +36,13 @@ func NewZippedWriter(age _Age, out io.Writer) (w *writer, err error) {
 	return
 }
 
-func NewWriter(age _Age, out io.Writer) (w *writer, err error) {
+func NewWriter(age age.Age, out io.Writer) (w *writer, err error) {
 	w = &writer{}
 
 	w.wBuf = bufio.NewWriter(out)
 
 	if w.wAge, err = age.Encrypt(out); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -56,26 +60,26 @@ func (w *writer) Write(p []byte) (n int, err error) {
 func (w *writer) Close() (err error) {
 	if w.wZip != nil {
 		if err = w.wZip.Close(); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 	}
 
 	if err = w.wAge.Close(); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
 	if err = w.wBuf.Flush(); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
 	return
 }
 
-func (w *writer) Sha() (s _Sha) {
-	s = _MakeShaFromHash(w.hash)
+func (w *writer) Sha() (s sha.Sha) {
+	s = sha.FromHash(w.hash)
 
 	return
 }

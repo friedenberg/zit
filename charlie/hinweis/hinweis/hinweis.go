@@ -3,10 +3,14 @@ package hinweis
 import (
 	"fmt"
 	"strings"
+
+	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/kennung"
+	"github.com/friedenberg/zit/bravo/id"
 )
 
 type Hinweis interface {
-	_Id
+	id.Id
 }
 
 type hinweis struct {
@@ -14,11 +18,11 @@ type hinweis struct {
 }
 
 type Provider interface {
-	Hinweis(i _Int) (string, error)
+	Hinweis(i kennung.Int) (string, error)
 }
 
-func New(i _Int, pl Provider, pr Provider) (h *hinweis, err error) {
-	k := _Kennung{}
+func New(i kennung.Int, pl Provider, pr Provider) (h *hinweis, err error) {
+	k := kennung.Kennung{}
 	k.SetInt(i)
 
 	h = &hinweis{}
@@ -84,7 +88,7 @@ func (h *hinweis) Set(v string) (err error) {
 	count := len(parts)
 
 	if count != 2 {
-		err = _Errorf("expected 2 components, but got %d: %s", count, v)
+		err = errors.Errorf("expected 2 components, but got %d: %s", count, v)
 	}
 
 	h.left = parts[0]

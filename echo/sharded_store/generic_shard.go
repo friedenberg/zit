@@ -3,6 +3,8 @@ package sharded_store
 import (
 	"fmt"
 	"strings"
+
+	"github.com/friedenberg/zit/alfa/errors"
 )
 
 type ShardGeneric struct{}
@@ -12,7 +14,7 @@ func (s ShardGeneric) LineToEntry(line string) (entry Entry, err error) {
 	partCount := len(parts)
 
 	if partCount != 2 {
-		err = _Errorf("expected 2 parts, but got %d.", partCount)
+		err = errors.Errorf("expected 2 parts, but got %d.", partCount)
 		return
 	}
 

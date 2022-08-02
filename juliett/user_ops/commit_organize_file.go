@@ -7,6 +7,8 @@ import (
 	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/delta/umwelt"
+	"github.com/friedenberg/zit/echo/zettel"
+	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/golf/organize_text"
 	"github.com/friedenberg/zit/india/changes"
 	"github.com/friedenberg/zit/india/store_with_lock"
@@ -38,9 +40,9 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 		return
 	}
 
-	toUpdate := make(map[string]_NamedZettel)
+	toUpdate := make(map[string]stored_zettel.Named)
 
-	addOrGetToZettelToUpdate := func(hString string) (z _NamedZettel, err error) {
+	addOrGetToZettelToUpdate := func(hString string) (z stored_zettel.Named, err error) {
 		var h hinweis.Hinweis
 
 		if h, err = hinweis.MakeBlindHinweis(hString); err != nil {
@@ -61,7 +63,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 	}
 
 	addEtikettToZettel := func(hString string, e etikett.Etikett) (err error) {
-		var z _NamedZettel
+		var z stored_zettel.Named
 
 		if z, err = addOrGetToZettelToUpdate(hString); err != nil {
 			err = errors.Error(err)
@@ -77,7 +79,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 	}
 
 	removeEtikettFromZettel := func(hString string, e etikett.Etikett) (err error) {
-		var z _NamedZettel
+		var z stored_zettel.Named
 
 		if z, err = addOrGetToZettelToUpdate(hString); err != nil {
 			err = errors.Error(err)
@@ -121,7 +123,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 	}
 
 	for bez, etts := range changes.New {
-		z := _Zettel{
+		z := zettel.Zettel{
 			Etiketten: etts,
 		}
 
@@ -140,7 +142,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 			continue
 		}
 
-		var named _NamedZettel
+		var named stored_zettel.Named
 
 		if named, err = store.Zettels().Create(z); err != nil {
 			err = errors.Errorf("failed to create zettel: %s", err)
@@ -152,7 +154,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 
 	for _, z := range toUpdate {
 		if c.Umwelt.Konfig.DryRun {
-			_Outf("[%s] (would update)\n", z.Hinweis)
+			stdprinter.Outf("[%s] (would update)\n", z.Hinweis)
 			continue
 		}
 

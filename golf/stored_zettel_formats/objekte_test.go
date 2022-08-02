@@ -3,6 +3,13 @@ package stored_zettel_formats
 import (
 	"strings"
 	"testing"
+
+	"github.com/friedenberg/zit/alfa/bezeichnung"
+	"github.com/friedenberg/zit/bravo/akte_ext"
+	"github.com/friedenberg/zit/bravo/sha"
+	"github.com/friedenberg/zit/charlie/etikett"
+	"github.com/friedenberg/zit/echo/zettel"
+	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 )
 
 // func toBase64(t *testing.T, in string) (out string) {
@@ -51,7 +58,7 @@ Bezeichnung the title
 Etikett a-tag
 `
 
-	var z _StoredZettel
+	var z stored_zettel.Stored
 
 	var err error
 
@@ -61,15 +68,15 @@ Etikett a-tag
 		t.Fatalf("%q", err)
 	}
 
-	expected := _StoredZettel{
-		Mutter: _Sha{"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"},
-		Kinder: _Sha{"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"},
-		Zettel: _Zettel{
-			Akte:        _Sha{"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"},
-			AkteExt:     _AkteExt{Value: "md"},
-			Bezeichnung: _Bezeichnung("the title"),
-			Etiketten: map[string]_Etikett{
-				"a-tag": _Etikett{Value: "a-tag"},
+	expected := stored_zettel.Stored{
+		Mutter: sha.Sha{Value: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"},
+		Kinder: sha.Sha{Value: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"},
+		Zettel: zettel.Zettel{
+			Akte:        sha.Sha{Value: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"},
+			AkteExt:     akte_ext.AkteExt{Value: "md"},
+			Bezeichnung: bezeichnung.Bezeichnung("the title"),
+			Etiketten: map[string]etikett.Etikett{
+				"a-tag": etikett.Etikett{Value: "a-tag"},
 			},
 		},
 	}
@@ -80,15 +87,15 @@ Etikett a-tag
 }
 
 func TestWrite(t *testing.T) {
-	z := _StoredZettel{
-		Mutter: _Sha{"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"},
-		Kinder: _Sha{"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"},
-		Zettel: _Zettel{
-			Akte:        _Sha{"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"},
-			AkteExt:     _AkteExt{Value: "md"},
-			Bezeichnung: _Bezeichnung("the title"),
-			Etiketten: map[string]_Etikett{
-				"a-tag": _Etikett{Value: "a-tag"},
+	z := stored_zettel.Stored{
+		Mutter: sha.Sha{Value: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"},
+		Kinder: sha.Sha{Value: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"},
+		Zettel: zettel.Zettel{
+			Akte:        sha.Sha{Value: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"},
+			AkteExt:     akte_ext.AkteExt{Value: "md"},
+			Bezeichnung: bezeichnung.Bezeichnung("the title"),
+			Etiketten: map[string]etikett.Etikett{
+				"a-tag": etikett.Etikett{Value: "a-tag"},
 			},
 		},
 	}

@@ -2,6 +2,8 @@ package zettel_formats
 
 import (
 	"testing"
+
+	"github.com/friedenberg/zit/echo/zettel"
 )
 
 func TestReadWithoutAkte(t *testing.T) {
@@ -18,7 +20,7 @@ func TestReadWithoutAkte(t *testing.T) {
 `,
 	)
 
-	expected := _Zettel{
+	expected := zettel.Zettel{
 		Bezeichnung: "the title",
 		Etiketten: makeEtiketten(t,
 			"tag1",
@@ -52,7 +54,7 @@ func TestReadWithoutAkteWithMultilineBezeichnung(t *testing.T) {
 `,
 	)
 
-	expected := _Zettel{
+	expected := zettel.Zettel{
 		Bezeichnung: "the title continues",
 		Etiketten: makeEtiketten(t,
 			"tag1",
@@ -87,7 +89,7 @@ the body
 `,
 	)
 
-	expected := _Zettel{
+	expected := zettel.Zettel{
 		Bezeichnung: "the title",
 		Etiketten: makeEtiketten(t,
 			"tag1",
@@ -126,10 +128,10 @@ the body
 // 	expected := Text{
 // 		Metadatei: Metadatei{
 // 			Bezeichnung: "the title continues here",
-// 			Etiketten: []_Etikett{
-// 				_Etikett{Value: "tag1"},
-// 				_Etikett{Value: "tag2"},
-// 				_Etikett{Value: "tag3"},
+// 			Etiketten: []etikett.Etikett{
+// 				etikett.Etikett{Value: "tag1"},
+// 				etikett.Etikett{Value: "tag2"},
+// 				etikett.Etikett{Value: "tag3"},
 // 			},
 // 			AkteExt: "text/plain",
 // 		},
@@ -155,15 +157,15 @@ the body
 // ---`,
 // 	)
 
-// 	panic(_Errorf("%#v", zt))
+// 	panic(errors.Errorf("%#v", zt))
 
 // 	expected := Text{
 // 		Metadatei: Metadatei{
 // 			Bezeichnung: "the title",
-// 			Etiketten: []_Etikett{
-// 				_Etikett{Value: "tag1"},
-// 				_Etikett{Value: "tag2"},
-// 				_Etikett{Value: "tag3"},
+// 			Etiketten: []etikett.Etikett{
+// 				etikett.Etikett{Value: "tag1"},
+// 				etikett.Etikett{Value: "tag2"},
+// 				etikett.Etikett{Value: "tag3"},
 // 			},
 // 			AkteExt: "the_file.png",
 // 		},
@@ -178,10 +180,10 @@ the body
 // 	zt := &Text{
 // 		Metadatei: Metadatei{
 // 			Bezeichnung: "the title",
-// 			Etiketten: []_Etikett{
-// 				_Etikett{Value: "tag1"},
-// 				_Etikett{Value: "tag2"},
-// 				_Etikett{Value: "tag3"},
+// 			Etiketten: []etikett.Etikett{
+// 				etikett.Etikett{Value: "tag1"},
+// 				etikett.Etikett{Value: "tag2"},
+// 				etikett.Etikett{Value: "tag3"},
 // 			},
 // 			AkteExt: "text/plain",
 // 		},

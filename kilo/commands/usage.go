@@ -11,7 +11,7 @@ import (
 
 func (c command) PrintUsage(in error) (exitStatus int) {
 	if in != nil {
-    exitStatus = 1
+		exitStatus = 1
 		stdprinter.Err(in)
 	}
 
@@ -44,7 +44,7 @@ func (c command) PrintSubcommandUsage(flags flag.FlagSet) {
 
 	printTabbed(flags.Name())
 
-  //TODO determine why the interface doesn't actually work
+	//TODO determine why the interface doesn't actually work
 	if cwd, ok := c.Command.(CommandWithDescription); ok {
 		printTabbed(cwd.Description())
 	}

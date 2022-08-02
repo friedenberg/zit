@@ -5,6 +5,9 @@ import (
 	"io"
 	"regexp"
 	"strings"
+
+	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/bravo/sha"
 )
 
 const EtikettRegexString = `^[-a-z0-9_/]+$`
@@ -17,10 +20,10 @@ func init() {
 
 type Etikett struct {
 	Value string
-	sha   _Sha
+	sha   sha.Sha
 }
 
-func (e Etikett) Sha() _Sha {
+func (e Etikett) Sha() sha.Sha {
 	return e.sha
 }
 
@@ -34,7 +37,7 @@ func (e *Etikett) Set(v string) (err error) {
 	v3 := strings.TrimSpace(v2)
 
 	if !EtikettRegex.Match([]byte(v3)) {
-		err = _Errorf("not a valid tag: '%s'", v)
+		err = errors.Errorf("not a valid tag: '%s'", v)
 		return
 	}
 
@@ -42,11 +45,11 @@ func (e *Etikett) Set(v string) (err error) {
 	sr := strings.NewReader(v3)
 
 	if _, err = io.Copy(hash, sr); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
-	e.sha = _MakeShaFromHash(hash)
+	e.sha = sha.FromHash(hash)
 
 	e.Value = v3
 

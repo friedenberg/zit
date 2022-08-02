@@ -10,6 +10,9 @@ import (
 
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/stdprinter"
+	"github.com/friedenberg/zit/bravo/open_file_guard"
+	"github.com/friedenberg/zit/charlie/age"
+	"github.com/friedenberg/zit/delta/umwelt"
 )
 
 type Init struct {
@@ -33,7 +36,7 @@ func init() {
 	)
 }
 
-func (c Init) Run(u _Umwelt, args ...string) (err error) {
+func (c Init) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	base := u.DirZit()
 
 	c.mkdirAll(base, "bin")
@@ -50,7 +53,7 @@ func (c Init) Run(u _Umwelt, args ...string) (err error) {
 	c.writeFile(u.DirZit("Kennung", "Counter"), "0")
 
 	if !c.DisableAge {
-		if _, err = _AgeGenerate(u.FileAge()); err != nil {
+		if _, err = age.Generate(u.FileAge()); err != nil {
 			err = errors.Error(err)
 			return
 		}
@@ -71,7 +74,7 @@ func (c Init) Run(u _Umwelt, args ...string) (err error) {
 	return
 }
 
-func (c Init) populateYinIfNecessary(u _Umwelt) (err error) {
+func (c Init) populateYinIfNecessary(u *umwelt.Umwelt) (err error) {
 	if c.Yin == "" {
 		return
 	}
@@ -81,7 +84,7 @@ func (c Init) populateYinIfNecessary(u _Umwelt) (err error) {
 	return
 }
 
-func (c Init) populateYangIfNecessary(u _Umwelt) (err error) {
+func (c Init) populateYangIfNecessary(u *umwelt.Umwelt) (err error) {
 	if c.Yang == "" {
 		return
 	}
@@ -95,14 +98,14 @@ func (c Init) populateYangIfNecessary(u _Umwelt) (err error) {
 func (c Init) readAndTransferLines(in, out string) (err error) {
 	var fi, fo *os.File
 
-	if fi, err = _Open(in); err != nil {
+	if fi, err = open_file_guard.Open(in); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
 	defer stdprinter.PanicIfError(fi.Close)
 
-	if fo, err = _Create(out); err != nil {
+	if fo, err = open_file_guard.Create(out); err != nil {
 		err = errors.Error(err)
 		return
 	}

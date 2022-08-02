@@ -3,10 +3,14 @@ package objekte
 import (
 	"fmt"
 	"strings"
+
+	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/node_type"
+	"github.com/friedenberg/zit/bravo/sha"
 )
 
 type Ref struct {
-	Type  _Type
+	Type  node_type.Type
 	Value string
 }
 
@@ -18,13 +22,13 @@ func (o *Ref) Set(v string) (err error) {
 	idxSpace := strings.Index(v, " ")
 
 	if idxSpace == -1 {
-		err = _Errorf("expected at least one space character, but got none")
+		err = errors.Errorf("expected at least one space character, but got none")
 
 		return
 	}
 
 	if err = o.Type.Set(strings.TrimSpace(v[:idxSpace])); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -33,9 +37,9 @@ func (o *Ref) Set(v string) (err error) {
 	return
 }
 
-func (o Ref) Sha() (s _Sha, err error) {
+func (o Ref) Sha() (s sha.Sha, err error) {
 	if err = s.Set(o.Value); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 

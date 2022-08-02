@@ -5,11 +5,15 @@ import (
 	"crypto/sha256"
 	"hash"
 	"io"
+
+	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/bravo/sha"
+	"github.com/friedenberg/zit/charlie/age"
 )
 
 type Reader interface {
 	io.ReadCloser
-	Sha() _Sha
+	Sha() sha.Sha
 }
 
 type reader struct {
@@ -19,14 +23,14 @@ type reader struct {
 	tee  io.Reader
 }
 
-func NewZippedReader(age _Age, in io.Reader) (r *reader, err error) {
+func NewZippedReader(age age.Age, in io.Reader) (r *reader, err error) {
 	if r, err = NewReader(age, in); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
 	if r.rZip, err = gzip.NewReader(r.rAge); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -35,11 +39,11 @@ func NewZippedReader(age _Age, in io.Reader) (r *reader, err error) {
 	return
 }
 
-func NewReader(age _Age, in io.Reader) (r *reader, err error) {
+func NewReader(age age.Age, in io.Reader) (r *reader, err error) {
 	r = &reader{}
 
 	if r.rAge, err = age.Decrypt(in); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -60,15 +64,15 @@ func (r *reader) Close() (err error) {
 	}
 
 	if err = r.rZip.Close(); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
 	return
 }
 
-func (r *reader) Sha() (s _Sha) {
-	s = _MakeShaFromHash(r.hash)
+func (r *reader) Sha() (s sha.Sha) {
+	s = sha.FromHash(r.hash)
 
 	return
 }

@@ -4,11 +4,18 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/node_type"
+	"github.com/friedenberg/zit/bravo/id"
+	"github.com/friedenberg/zit/bravo/sha"
+	"github.com/friedenberg/zit/charlie/hinweis"
+	"github.com/friedenberg/zit/delta/objekte"
+	"github.com/friedenberg/zit/foxtrot/stored_zettel"
+	"github.com/friedenberg/zit/golf/stored_zettel_formats"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
 type CatObjekte struct {
-	Type _Type
+	Type node_type.Type
 }
 
 func init() {
@@ -16,7 +23,7 @@ func init() {
 		"cat-objekte",
 		func(f *flag.FlagSet) Command {
 			c := &CatObjekte{
-				Type: _TypeUnknown,
+				Type: node_type.TypeUnknown,
 			}
 
 			f.Var(&c.Type, "type", "ObjekteType")
@@ -26,33 +33,31 @@ func init() {
 	)
 }
 
-func (c CatObjekte) RunWithId(store store_with_lock.Store, ids ..._Id) (err error) {
+func (c CatObjekte) RunWithId(store store_with_lock.Store, ids ...id.Id) (err error) {
 	switch c.Type {
 
-	case _TypeAkte:
+	case node_type.TypeAkte:
 		return c.akten(store, ids...)
 
-	case _TypeZettel:
+	case node_type.TypeZettel:
 		return c.zettelen(store, ids...)
 
 	default:
 		err = errors.Errorf("unsupported objekte type: %s", c.Type)
 		return
 	}
-
-	return
 }
 
-func (c CatObjekte) akten(store store_with_lock.Store, ids ..._Id) (err error) {
-	for _, id := range ids {
-		var sb _Sha
+func (c CatObjekte) akten(store store_with_lock.Store, ids ...id.Id) (err error) {
+	for _, idt := range ids {
+		var sb sha.Sha
 
-		switch i := id.(type) {
-		case _Sha:
+		switch i := idt.(type) {
+		case sha.Sha:
 			sb = i
 
-		case _Hinweis:
-			var named _NamedZettel
+		case hinweis.Hinweis:
+			var named stored_zettel.Named
 
 			if named, err = store.Zettels().Read(i); err != nil {
 				err = errors.Error(err)
@@ -73,7 +78,7 @@ func (c CatObjekte) akten(store store_with_lock.Store, ids ..._Id) (err error) {
 			return
 		}
 
-		if err = _ObjekteRead(store.Out, store.Age(), _IdPath(sb, p)); err != nil {
+		if err = objekte.Read(store.Out, store.Age(), id.Path(sb, p)); err != nil {
 			err = errors.Error(err)
 			return
 		}
@@ -82,16 +87,16 @@ func (c CatObjekte) akten(store store_with_lock.Store, ids ..._Id) (err error) {
 	return
 }
 
-func (c CatObjekte) zettelen(store store_with_lock.Store, ids ..._Id) (err error) {
+func (c CatObjekte) zettelen(store store_with_lock.Store, ids ...id.Id) (err error) {
 	for _, id := range ids {
-		var z _NamedZettel
+		var z stored_zettel.Named
 
 		if z, err = store.Zettels().Read(id); err != nil {
 			err = errors.Error(err)
 			return
 		}
 
-		f := _StoredZettelFormatsObjekte{}
+		f := stored_zettel_formats.Objekte{}
 
 		if _, err = f.WriteTo(z.Stored, store.Out); err != nil {
 			err = errors.Error(err)

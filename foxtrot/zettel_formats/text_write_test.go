@@ -6,6 +6,9 @@ import (
 	"io"
 	"strings"
 	"testing"
+
+	"github.com/friedenberg/zit/bravo/sha"
+	"github.com/friedenberg/zit/echo/zettel"
 )
 
 type noopCloser struct {
@@ -21,7 +24,7 @@ type akteReaderFactory struct {
 	akten map[string]string
 }
 
-func (arf akteReaderFactory) AkteReader(s _Sha) (r io.ReadCloser, err error) {
+func (arf akteReaderFactory) AkteReader(s sha.Sha) (r io.ReadCloser, err error) {
 	var v string
 	var ok bool
 
@@ -34,7 +37,7 @@ func (arf akteReaderFactory) AkteReader(s _Sha) (r io.ReadCloser, err error) {
 	return
 }
 
-func writeFormat(t *testing.T, z _Zettel, f _ZettelFormat, includeAkte bool, akteBody string) (out string) {
+func writeFormat(t *testing.T, z zettel.Zettel, f zettel.Format, includeAkte bool, akteBody string) (out string) {
 	hash := sha256.New()
 	_, err := io.Copy(hash, strings.NewReader(akteBody))
 
@@ -43,7 +46,7 @@ func writeFormat(t *testing.T, z _Zettel, f _ZettelFormat, includeAkte bool, akt
 	}
 
 	akteShaRaw := fmt.Sprintf("%x", hash.Sum(nil))
-	var akteSha _Sha
+	var akteSha sha.Sha
 
 	if err := akteSha.Set(akteShaRaw); err != nil {
 		t.Fatalf("%s", err)
@@ -53,7 +56,7 @@ func writeFormat(t *testing.T, z _Zettel, f _ZettelFormat, includeAkte bool, akt
 
 	sb := &strings.Builder{}
 
-	c := _ZettelFormatContextWrite{
+	c := zettel.FormatContextWrite{
 		Zettel:      z,
 		Out:         sb,
 		IncludeAkte: includeAkte,
@@ -75,7 +78,7 @@ func writeFormat(t *testing.T, z _Zettel, f _ZettelFormat, includeAkte bool, akt
 }
 
 func TestWriteWithoutAkte(t *testing.T) {
-	z := _Zettel{
+	z := zettel.Zettel{
 		Bezeichnung: "the title",
 		Etiketten: makeEtiketten(t,
 			"tag1",
@@ -102,7 +105,7 @@ func TestWriteWithoutAkte(t *testing.T) {
 }
 
 func TestWriteWithInlineAkte(t *testing.T) {
-	z := _Zettel{
+	z := zettel.Zettel{
 		Bezeichnung: "the title",
 		Etiketten: makeEtiketten(t,
 			"tag1",

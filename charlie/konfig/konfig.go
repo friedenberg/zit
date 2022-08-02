@@ -3,6 +3,11 @@ package konfig
 import (
 	"io/ioutil"
 	"os"
+
+	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/stdprinter"
+	"github.com/friedenberg/zit/alfa/toml"
+	"github.com/friedenberg/zit/bravo/open_file_guard"
 )
 
 type KonfigTag struct {
@@ -13,7 +18,7 @@ type KonfigTag struct {
 type Konfig struct {
 	Cli
 	Toml
-	Logger _Logger
+	Logger stdprinter.Logger
 }
 
 func LoadKonfig(p string) (c Konfig, err error) {
@@ -21,34 +26,34 @@ func LoadKonfig(p string) (c Konfig, err error) {
 
 	var f *os.File
 
-	if f, err = _Open(p); err != nil {
+	if f, err = open_file_guard.Open(p); err != nil {
 		if os.IsNotExist(err) {
 			err = nil
 			return
 		}
 
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
-	defer _Close(f)
+	defer open_file_guard.Close(f)
 
 	doc, err := ioutil.ReadAll(f)
 
 	defer func() {
 		if r := recover(); r != nil {
 			c = Konfig{}
-			err = _Errorf("toml unmarshalling panicked: %q", r)
+			err = errors.Errorf("toml unmarshalling panicked: %q", r)
 		}
 	}()
 
 	var tc Toml
-	err = _TomlUnmarshal([]byte(doc), &tc)
+	err = toml.Unmarshal([]byte(doc), &tc)
 
 	c.Toml = tc
 
 	if err != nil {
-		err = _Errorf("failed to parse config: %s", err)
+		err = errors.Errorf("failed to parse config: %s", err)
 		return
 	}
 

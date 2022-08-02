@@ -5,12 +5,13 @@ import (
 	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
+	"github.com/friedenberg/zit/hotel/zettels"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
 type Checkin struct {
 	Umwelt  *umwelt.Umwelt
-	Options _ZettelsCheckinOptions
+	Options zettels.CheckinOptions
 }
 
 type CheckinResults struct {
@@ -38,7 +39,7 @@ func (c Checkin) Run(zettelen ...stored_zettel.External) (results CheckinResults
 		}
 
 		if named, err = store.Zettels().Update(named); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 

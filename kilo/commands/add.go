@@ -8,11 +8,13 @@ import (
 	"github.com/friedenberg/zit/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
 	"github.com/friedenberg/zit/charlie/etikett"
+	"github.com/friedenberg/zit/delta/umwelt"
+	"github.com/friedenberg/zit/golf/organize_text"
 	"github.com/friedenberg/zit/juliett/user_ops"
 )
 
 type Add struct {
-	Etiketten _EtikettSet
+	Etiketten etikett.Set
 	Delete    bool
 	Organize  bool
 }
@@ -34,7 +36,7 @@ func init() {
 	)
 }
 
-func (c Add) Run(u _Umwelt, args ...string) (err error) {
+func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	zettelsFromAkteOp := user_ops.ZettelFromExternalAkte{
 		Umwelt:    u,
 		Etiketten: c.Etiketten,
@@ -84,7 +86,7 @@ func (c Add) Run(u _Umwelt, args ...string) (err error) {
 		return
 	}
 
-	var ot2 _OrganizeText
+	var ot2 organize_text.Text
 
 	readOrganizeTextOp := user_ops.ReadOrganizeFile{}
 

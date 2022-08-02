@@ -2,39 +2,48 @@ package zettels
 
 import (
 	"os"
+
+	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/stdprinter"
+	"github.com/friedenberg/zit/bravo/id"
+	"github.com/friedenberg/zit/bravo/open_file_guard"
+	"github.com/friedenberg/zit/bravo/sha"
+	"github.com/friedenberg/zit/charlie/hinweis"
+	"github.com/friedenberg/zit/echo/zettel"
+	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 )
 
 //TODO move to user_ops
-func (zs *zettels) Checkout(options CheckinOptions, args ...string) (czs []_ZettelCheckedOut, err error) {
-	var hins []_Hinweis
-	var shas []_Sha
+func (zs *zettels) Checkout(options CheckinOptions, args ...string) (czs []stored_zettel.CheckedOut, err error) {
+	var hins []hinweis.Hinweis
+	var shas []sha.Sha
 
 	if shas, hins, err = zs.hinweisen.ReadManyStrings(args...); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
-	czs = make([]_ZettelCheckedOut, len(shas))
+	czs = make([]stored_zettel.CheckedOut, len(shas))
 
 	var dir string
 
 	if dir, err = os.Getwd(); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
 	for i, sha := range shas {
-		var sz _NamedZettel
+		var sz stored_zettel.Named
 
 		if sz, err = zs.Read(sha); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 
 		var filename string
 
-		if filename, err = _IdMakeDirNecessary(hins[i], dir); err != nil {
-			err = _Error(err)
+		if filename, err = id.MakeDirIfNecessary(hins[i], dir); err != nil {
+			err = errors.Error(err)
 			return
 		}
 
@@ -44,13 +53,13 @@ func (zs *zettels) Checkout(options CheckinOptions, args ...string) (czs []_Zett
 
 		inlineAkte := sz.Stored.Zettel.AkteExt.String() == "md"
 
-		czs[i] = _ZettelCheckedOut{
-			External: _ZettelExternal{
+		czs[i] = stored_zettel.CheckedOut{
+			External: stored_zettel.External{
 				Path: filename,
 			},
 		}
 
-		c := _ZettelFormatContextWrite{
+		c := zettel.FormatContextWrite{
 			Zettel:            sz.Stored.Zettel,
 			IncludeAkte:       inlineAkte,
 			AkteReaderFactory: zs,
@@ -63,31 +72,32 @@ func (zs *zettels) Checkout(options CheckinOptions, args ...string) (czs []_Zett
 		}
 
 		if err = zs.writeFormat(options, filename, c); err != nil {
-			err = _Errorf("%s: %s", sz.Hinweis, err)
-			_Errf("[%s %s] (check out failed)\n", hins[i], shas[i], err)
+			err = errors.Errorf("%s: %s", sz.Hinweis, err)
+      stdprinter.Errf("[%s %s] (check out failed):\n", hins[i], shas[i])
+			stdprinter.Error(err)
 			continue
 		}
 
-		_Outf("[%s %s] (checked out)\n", hins[i], shas[i])
+		stdprinter.Outf("[%s %s] (checked out)\n", hins[i], shas[i])
 	}
 
 	return
 }
 
-func (zs zettels) writeFormat(o CheckinOptions, p string, fc _ZettelFormatContextWrite) (err error) {
+func (zs zettels) writeFormat(o CheckinOptions, p string, fc zettel.FormatContextWrite) (err error) {
 	var f *os.File
 
-	if f, err = _Create(p); err != nil {
-		err = _Error(err)
+	if f, err = open_file_guard.Create(p); err != nil {
+		err = errors.Error(err)
 		return
 	}
 
 	fc.Out = f
 
-	defer _Close(f)
+	defer open_file_guard.Close(f)
 
 	if _, err = o.Format.WriteTo(fc); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 

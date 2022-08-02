@@ -5,7 +5,9 @@ import (
 	"os"
 	"os/exec"
 
+	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/logz"
+	"github.com/friedenberg/zit/bravo/open_file_guard"
 )
 
 type ScriptValue struct {
@@ -33,8 +35,8 @@ func (s *ScriptValue) Run(input string) (r io.Reader, err error) {
 		if input == "" || input == "-" {
 			r = os.Stdin
 		} else {
-			if s.file, err = _Open(input); err != nil {
-				err = _Error(err)
+			if s.file, err = open_file_guard.Open(input); err != nil {
+				err = errors.Error(err)
 				return
 			}
 
@@ -66,7 +68,7 @@ func (s *ScriptValue) Close() (err error) {
 	logz.Print()
 
 	if s.file != nil {
-		err = _Close(s.file)
+		err = open_file_guard.Close(s.file)
 	}
 
 	if s.cmd != nil {

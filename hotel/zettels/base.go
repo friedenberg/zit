@@ -8,28 +8,33 @@ import (
 
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/logz"
+	"github.com/friedenberg/zit/bravo/id"
+	"github.com/friedenberg/zit/bravo/sha"
 	"github.com/friedenberg/zit/charlie/hinweis"
+	"github.com/friedenberg/zit/echo/sharded_store"
+	"github.com/friedenberg/zit/foxtrot/stored_zettel"
+	"github.com/friedenberg/zit/golf/stored_zettel_formats"
 )
 
-func (zs zettels) storeBaseZettel(z _StoredZettel) (sha _Sha, err error) {
+func (zs zettels) storeBaseZettel(z stored_zettel.Stored) (shaz sha.Sha, err error) {
 	sb := &strings.Builder{}
 	enc := base64.NewEncoder(base64.StdEncoding, sb)
 	hash := sha256.New()
 
 	w := io.MultiWriter(enc, hash)
 
-	f := _StoredZettelFormatObjekte{}
+	f := stored_zettel_formats.Objekte{}
 
 	if _, err = f.WriteTo(z, w); err != nil {
 		err = errors.Errorf("%s: %s", zs.basePath, err)
 		return
 	}
 
-	sha = _ShaFromHash(hash)
+	shaz = sha.FromHash(hash)
 
-	var s _Shard
+	var s sharded_store.Shard
 
-	if s, err = zs.store.Shard(sha.Head()); err != nil {
+	if s, err = zs.store.Shard(shaz.Head()); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -39,7 +44,7 @@ func (zs zettels) storeBaseZettel(z _StoredZettel) (sha _Sha, err error) {
 		return
 	}
 
-	s.Set(sha.String(), sb.String())
+	s.Set(shaz.String(), sb.String())
 
 	for _, e := range z.Zettel.Etiketten {
 		zs.etiketten.Add(e)
@@ -48,18 +53,18 @@ func (zs zettels) storeBaseZettel(z _StoredZettel) (sha _Sha, err error) {
 	return
 }
 
-func (zs zettels) update(zettel _StoredZettel) (err error) {
+func (zs zettels) update(zettel stored_zettel.Stored) (err error) {
 	sb := &strings.Builder{}
 	w := base64.NewEncoder(base64.StdEncoding, sb)
 
-	f := _StoredZettelFormatObjekte{}
+	f := stored_zettel_formats.Objekte{}
 
 	if _, err = f.WriteTo(zettel, w); err != nil {
 		err = errors.Errorf("%s: %s", zs.basePath, err)
 		return
 	}
 
-	var s _Shard
+	var s sharded_store.Shard
 
 	if s, err = zs.store.Shard(zettel.Sha.Head()); err != nil {
 		err = errors.Error(err)
@@ -76,7 +81,7 @@ func (zs zettels) update(zettel _StoredZettel) (err error) {
 	return
 }
 
-func (zs zettels) updateMutterIfNecessary(mutter, kinder _Sha) (err error) {
+func (zs zettels) updateMutterIfNecessary(mutter, kinder sha.Sha) (err error) {
 	if mutter.Equals(kinder) {
 		err = errors.Errorf("updating mutter and kinder to same sha: %s", mutter)
 		return
@@ -87,7 +92,7 @@ func (zs zettels) updateMutterIfNecessary(mutter, kinder _Sha) (err error) {
 		return
 	}
 
-	var named _NamedZettel
+	var named stored_zettel.Named
 
 	if named, err = zs.Read(mutter); err != nil {
 		err = errors.Error(err)
@@ -104,10 +109,10 @@ func (zs zettels) updateMutterIfNecessary(mutter, kinder _Sha) (err error) {
 	return
 }
 
-func (zs zettels) readStoredZettel(sha _Sha) (stored _StoredZettel, err error) {
+func (zs zettels) readStoredZettel(sha sha.Sha) (stored stored_zettel.Stored, err error) {
 	stored.Sha = sha
 
-	var s _Shard
+	var s sharded_store.Shard
 
 	if s, err = zs.store.Shard(stored.Sha.Head()); err != nil {
 		err = errors.Error(err)
@@ -125,7 +130,7 @@ func (zs zettels) readStoredZettel(sha _Sha) (stored _StoredZettel, err error) {
 	sr := strings.NewReader(cr)
 	dec := base64.NewDecoder(base64.StdEncoding, sr)
 
-	f := _StoredZettelFormatObjekte{}
+	f := stored_zettel_formats.Objekte{}
 
 	if _, err = f.ReadFrom(&stored, dec); err != nil {
 		err = errors.Errorf("%s: %s", zs.basePath, err)
@@ -135,10 +140,10 @@ func (zs zettels) readStoredZettel(sha _Sha) (stored _StoredZettel, err error) {
 	return
 }
 
-func (zs zettels) readNamedZettel(id _Id) (named _NamedZettel, err error) {
+func (zs zettels) readNamedZettel(id id.Id) (named stored_zettel.Named, err error) {
 	var ok bool
 
-	if named.Sha, ok = id.(_Sha); ok {
+	if named.Sha, ok = id.(sha.Sha); ok {
 		named.Hinweis, err = zs.hinweisen.ReadSha(named.Sha)
 
 		if zs.Konfig().AllowMissingHinweis {

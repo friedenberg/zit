@@ -2,6 +2,11 @@ package objekte
 
 import (
 	"os"
+
+	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/bravo/id"
+	"github.com/friedenberg/zit/bravo/open_file_guard"
+	"github.com/friedenberg/zit/charlie/age"
 )
 
 type Mover struct {
@@ -10,18 +15,18 @@ type Mover struct {
 	*writer
 }
 
-func NewWriterMover(age _Age, basePath string) (m Mover, err error) {
+func NewWriterMover(age age.Age, basePath string) (m Mover, err error) {
 	m = Mover{
 		basePath: basePath,
 	}
 
-	if m.file, err = _TempFile(); err != nil {
-		err = _Error(err)
+	if m.file, err = open_file_guard.TempFile(); err != nil {
+		err = errors.Error(err)
 		return
 	}
 
 	if m.writer, err = NewWriter(age, m.file); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -30,27 +35,27 @@ func NewWriterMover(age _Age, basePath string) (m Mover, err error) {
 
 func (m Mover) Close() (err error) {
 	if err = m.writer.Close(); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
 	sha := m.writer.Sha()
 	p := m.file.Name()
 
-	if err = _Close(m.file); err != nil {
-		err = _Error(err)
+	if err = open_file_guard.Close(m.file); err != nil {
+		err = errors.Error(err)
 		return
 	}
 
 	var objektePath string
 
-	if objektePath, err = _IdMakeDirIfNecessary(sha, m.basePath); err != nil {
-		err = _Error(err)
+	if objektePath, err = id.MakeDirIfNecessary(sha, m.basePath); err != nil {
+		err = errors.Error(err)
 		return
 	}
 
 	if err = os.Rename(p, objektePath); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 

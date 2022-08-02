@@ -3,6 +3,7 @@ package zettel
 import (
 	"testing"
 
+	"github.com/friedenberg/zit/bravo/akte_ext"
 	"github.com/friedenberg/zit/charlie/etikett"
 )
 
@@ -18,7 +19,7 @@ func makeEtiketten(t *testing.T, vs ...string) (es etikett.Set) {
 	return
 }
 
-func makeAkteExt(t *testing.T, v string) (es _AkteExt) {
+func makeAkteExt(t *testing.T, v string) (es akte_ext.AkteExt) {
 	if err := es.Set(v); err != nil {
 		t.Fatalf("%s", err)
 	}

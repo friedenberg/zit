@@ -5,13 +5,17 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/node_type"
 	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/bravo/id"
+	"github.com/friedenberg/zit/echo/zettel"
+	"github.com/friedenberg/zit/foxtrot/stored_zettel"
+	"github.com/friedenberg/zit/foxtrot/zettel_formats"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
 type Show struct {
-	Type _Type
+	Type node_type.Type
 }
 
 func init() {
@@ -19,7 +23,7 @@ func init() {
 		"show",
 		func(f *flag.FlagSet) Command {
 			c := &Show{
-				Type: _TypeZettel,
+				Type: node_type.TypeZettel,
 			}
 
 			f.Var(&c.Type, "type", "ObjekteType")
@@ -30,10 +34,10 @@ func init() {
 }
 
 func (c Show) RunWithId(store store_with_lock.Store, ids ...id.Id) (err error) {
-	zettels := make([]_NamedZettel, len(ids))
+	zettels := make([]stored_zettel.Named, len(ids))
 
 	for i, a := range ids {
-		var named _NamedZettel
+		var named stored_zettel.Named
 
 		if named, err = store.Zettels().Read(a); err != nil {
 			err = errors.Error(err)
@@ -45,24 +49,22 @@ func (c Show) RunWithId(store store_with_lock.Store, ids ...id.Id) (err error) {
 
 	switch c.Type {
 
-	case _TypeAkte:
+	case node_type.TypeAkte:
 		return c.showAkten(store, zettels)
 
-	case _TypeZettel:
+	case node_type.TypeZettel:
 		return c.showZettels(store, zettels)
 
 	default:
 		err = errors.Errorf("unsupported objekte type: %s", c.Type)
 		return
 	}
-
-	return
 }
 
-func (c Show) showZettels(store store_with_lock.Store, zettels []_NamedZettel) (err error) {
-	f := _ZettelFormatsText{}
+func (c Show) showZettels(store store_with_lock.Store, zettels []stored_zettel.Named) (err error) {
+	f := zettel_formats.Text{}
 
-	ctx := _ZettelFormatContextWrite{
+	ctx := zettel.FormatContextWrite{
 		Out:               store.Out,
 		AkteReaderFactory: store.Zettels(),
 	}
@@ -81,7 +83,7 @@ func (c Show) showZettels(store store_with_lock.Store, zettels []_NamedZettel) (
 	return
 }
 
-func (c Show) showAkten(store store_with_lock.Store, zettels []_NamedZettel) (err error) {
+func (c Show) showAkten(store store_with_lock.Store, zettels []stored_zettel.Named) (err error) {
 	var ar io.ReadCloser
 
 	for _, named := range zettels {

@@ -3,6 +3,8 @@ package open_file_guard
 import (
 	"os"
 	"path/filepath"
+
+	"github.com/friedenberg/zit/alfa/errors"
 )
 
 func DeleteFilesAndDirs(args ...string) (err error) {
@@ -10,7 +12,7 @@ func DeleteFilesAndDirs(args ...string) (err error) {
 
 	for _, f := range args {
 		if err = os.Remove(f); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 
@@ -22,7 +24,7 @@ func DeleteFilesAndDirs(args ...string) (err error) {
 		var abs string
 
 		if abs, err = filepath.Abs(f); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 
@@ -34,13 +36,13 @@ func DeleteFilesAndDirs(args ...string) (err error) {
 
 		//TODO handle case of missing directory
 		if contents, err = ReadDirNames(d); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 
 		if len(contents) == 0 {
 			if err = os.Remove(d); err != nil {
-				err = _Error(err)
+				err = errors.Error(err)
 				return
 			}
 		}

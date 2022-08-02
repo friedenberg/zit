@@ -5,6 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/stdprinter"
+	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
@@ -22,7 +23,7 @@ func init() {
 	)
 }
 
-func (c ReunifyFamily) RunWithZettel(store store_with_lock.Store, zettel ..._NamedZettel) (err error) {
+func (c ReunifyFamily) RunWithZettel(store store_with_lock.Store, zettel ...stored_zettel.Named) (err error) {
 	mutter := zettel[0]
 	kinder := zettel[1]
 

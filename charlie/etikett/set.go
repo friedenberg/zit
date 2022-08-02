@@ -5,6 +5,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/logz"
 )
 
@@ -35,7 +36,7 @@ func (es Set) AddString(v string) (err error) {
 	var e Etikett
 
 	if err = e.Set(v); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -61,7 +62,7 @@ func (s *Set) Set(v string) (err error) {
 
 	for _, e := range es {
 		if err = s.AddString(e); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 	}
@@ -261,13 +262,13 @@ func (es *Set) UnmarshalJSON(b []byte) (err error) {
 	var vs []string
 
 	if err = json.Unmarshal(b, &vs); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
 	for _, v := range vs {
 		if err = es.AddString(v); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 	}

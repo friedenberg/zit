@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/bravo/id"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
+	"github.com/friedenberg/zit/charlie/script_value"
 	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/echo/zettel"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
@@ -15,7 +16,7 @@ import (
 type WriteNewZettels struct {
 	Umwelt *umwelt.Umwelt
 	Format zettel.Format
-	Filter _ScriptValue
+	Filter script_value.ScriptValue
 }
 
 func (c WriteNewZettels) Run(zettelen ...zettel.Zettel) (results stored_zettel.SetExternal, err error) {
@@ -31,7 +32,7 @@ func (c WriteNewZettels) Run(zettelen ...zettel.Zettel) (results stored_zettel.S
 	var dir string
 
 	if dir, err = os.Getwd(); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -60,7 +61,7 @@ func (c WriteNewZettels) runOne(store store_with_lock.Store, dir string, z zette
 	var filename string
 
 	if filename, err = id.MakeDirIfNecessary(result.Hinweis, dir); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -69,7 +70,7 @@ func (c WriteNewZettels) runOne(store store_with_lock.Store, dir string, z zette
 	var f *os.File
 
 	if f, err = open_file_guard.Create(filename); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -85,7 +86,7 @@ func (c WriteNewZettels) runOne(store store_with_lock.Store, dir string, z zette
 	}
 
 	if _, err = c.Format.WriteTo(ctx); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 

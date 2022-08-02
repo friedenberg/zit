@@ -1,13 +1,18 @@
 package zettel
 
-import "io"
+import (
+	"io"
+
+	"github.com/friedenberg/zit/bravo/sha"
+	"github.com/friedenberg/zit/delta/objekte"
+)
 
 type AkteWriterFactory interface {
-	AkteWriter() (_ObjekteWriter, error)
+	AkteWriter() (objekte.Writer, error)
 }
 
 type AkteReaderFactory interface {
-	AkteReader(_Sha) (io.ReadCloser, error)
+	AkteReader(sha.Sha) (io.ReadCloser, error)
 }
 
 type FormatContextRead struct {

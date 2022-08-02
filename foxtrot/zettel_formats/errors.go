@@ -5,7 +5,10 @@ import (
 	"io"
 	"os"
 
+	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/bravo/open_file_guard"
 	"github.com/friedenberg/zit/bravo/sha"
+	"github.com/friedenberg/zit/delta/objekte"
 	"github.com/friedenberg/zit/echo/zettel"
 )
 
@@ -13,7 +16,7 @@ type ErrHasInlineAkteAndFilePath struct {
 	FilePath string
 	zettel.Zettel
 	sha.Sha
-	_AkteWriterFactory
+	zettel.AkteWriterFactory
 }
 
 func (e ErrHasInlineAkteAndFilePath) Error() string {
@@ -24,29 +27,29 @@ func (e ErrHasInlineAkteAndFilePath) Error() string {
 }
 
 func (e ErrHasInlineAkteAndFilePath) Recover() (z zettel.Zettel, err error) {
-	if e._AkteWriterFactory == nil {
-		err = _Errorf("akte writer factory is nil")
+	if e.AkteWriterFactory == nil {
+		err = errors.Errorf("akte writer factory is nil")
 		return
 	}
 
-	var akteWriter _ObjekteWriter
+	var akteWriter objekte.Writer
 
 	if akteWriter, err = e.AkteWriter(); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
 	var f *os.File
 
-	if f, err = _Open(e.FilePath); err != nil {
-		err = _Error(err)
+	if f, err = open_file_guard.Open(e.FilePath); err != nil {
+		err = errors.Error(err)
 		return
 	}
 
-	defer _Close(f)
+	defer open_file_guard.Close(f)
 
 	if _, err = io.Copy(akteWriter, f); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 

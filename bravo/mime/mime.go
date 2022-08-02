@@ -16,7 +16,7 @@ package mime
 
 // func MakeMime(v string) (m Mime, err error) {
 // 	if err = m.Set(v); err != nil {
-// 		err = _Error(err)
+// 		err = errors.Error(err)
 // 		return
 // 	}
 
@@ -39,7 +39,7 @@ package mime
 // 	mt = mime.TypeByExtension(path.Ext(s1))
 
 // 	if mt == "" {
-// 		err = _Errorf("unknown mime type: %s", v)
+// 		err = errors.Errorf("unknown mime type: %s", v)
 // 		return
 // 	}
 
@@ -73,9 +73,9 @@ package mime
 // 	}
 
 // 	if err != nil {
-// 		panic(_Error(err))
+// 		panic(errors.Error(err))
 // 	} else if es == nil || len(es) < 1 {
-// 		panic(_Errorf("expected at least one mime type, but go none"))
+// 		panic(errors.Errorf("expected at least one mime type, but go none"))
 // 	}
 
 // 	return es[0]

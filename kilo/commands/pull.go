@@ -7,6 +7,9 @@ import (
 	"os/exec"
 
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/bravo/files"
+	"github.com/friedenberg/zit/charlie/konfig"
+	"github.com/friedenberg/zit/delta/umwelt"
 )
 
 type Pull struct {
@@ -23,13 +26,13 @@ func init() {
 	)
 }
 
-func (c Pull) Run(u _Umwelt, args ...string) (err error) {
+func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	if len(args) == 0 {
 		err = errors.Errorf("no remote specified")
 		return
 	}
 
-	var remote _RemoteScript
+	var remote konfig.RemoteScript
 
 	if remote, err = c.remoteScriptFromArg(u, args[0]); err != nil {
 		err = errors.Error(err)
@@ -42,14 +45,14 @@ func (c Pull) Run(u _Umwelt, args ...string) (err error) {
 		args = []string{}
 	}
 
-	// var hins []_Hinweis
+	// var hins []hinweis.Hinweis
 
 	// if _, hins, err = zs.Hinweisen().All(); err != nil {
 	// 	err = errors.Error(err)
 	// 	return
 	// }
 
-	// chains := make([]_ZettelsChain, len(hins))
+	// chains := make([]zettels.Chain, len(hins))
 
 	// for i, h := range hins {
 	// 	if chains[i], err = zs.AllInChain(h); err != nil {
@@ -74,18 +77,18 @@ func (c Pull) Run(u _Umwelt, args ...string) (err error) {
 	return
 }
 
-func (c Pull) remoteScriptFromArg(u _Umwelt, arg string) (remote _RemoteScript, err error) {
+func (c Pull) remoteScriptFromArg(u *umwelt.Umwelt, arg string) (remote konfig.RemoteScript, err error) {
 	ok := false
 
 	if remote, ok = u.Konfig.RemoteScripts[arg]; !ok {
 		p := u.DirZit("bin", arg)
 
-		if !_FilesExist(p) {
+		if !files.Exists(p) {
 			err = errors.Errorf("remote not defined: '%s'", arg)
 			return
 		}
 
-		remote = _RemoteScriptFile{
+		remote = konfig.RemoteScriptFile{
 			Path: p,
 		}
 	}
@@ -93,7 +96,7 @@ func (c Pull) remoteScriptFromArg(u _Umwelt, arg string) (remote _RemoteScript, 
 	return
 }
 
-func (c Pull) runRemoteScript(u _Umwelt, remote _RemoteScript, args []string, b []byte) (err error) {
+func (c Pull) runRemoteScript(u *umwelt.Umwelt, remote konfig.RemoteScript, args []string, b []byte) (err error) {
 	var script *exec.Cmd
 
 	if script, err = remote.Cmd(append([]string{"pull"}, args...)); err != nil {

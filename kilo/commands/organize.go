@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
 	"github.com/friedenberg/zit/charlie/etikett"
+	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/golf/organize_text"
 	"github.com/friedenberg/zit/juliett/user_ops"
@@ -36,7 +37,7 @@ func init() {
 	)
 }
 
-func (c *Organize) Run(u _Umwelt, args ...string) (err error) {
+func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
 		Umwelt:  u,
 		GroupBy: c.GroupBy,

@@ -7,9 +7,13 @@ import (
 
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/logz"
+	"github.com/friedenberg/zit/alfa/stdprinter"
+	"github.com/friedenberg/zit/bravo/line_format"
+	"github.com/friedenberg/zit/bravo/open_file_guard"
+	"github.com/friedenberg/zit/echo/zettel"
 )
 
-func (f Text) WriteTo(c _ZettelFormatContextWrite) (n int64, err error) {
+func (f Text) WriteTo(c zettel.FormatContextWrite) (n int64, err error) {
 	if c.IncludeAkte {
 		if c.ExternalAktePath == "" {
 			return f.writeToInlineAkte(c)
@@ -21,9 +25,9 @@ func (f Text) WriteTo(c _ZettelFormatContextWrite) (n int64, err error) {
 	}
 }
 
-func (f Text) writeToOmitAkte(c _ZettelFormatContextWrite) (n int64, err error) {
+func (f Text) writeToOmitAkte(c zettel.FormatContextWrite) (n int64, err error) {
 	logz.Print()
-	w := _LineFormatNewWriter()
+	w := line_format.NewWriter()
 
 	w.WriteLines(
 		MetadateiBoundary,
@@ -64,13 +68,13 @@ func (f Text) writeToOmitAkte(c _ZettelFormatContextWrite) (n int64, err error) 
 	return
 }
 
-func (f Text) writeToInlineAkte(c _ZettelFormatContextWrite) (n int64, err error) {
+func (f Text) writeToInlineAkte(c zettel.FormatContextWrite) (n int64, err error) {
 	if c.Out == nil {
 		err = errors.Errorf("context.Out is empty")
 		return
 	}
 
-	w := _LineFormatNewWriter()
+	w := line_format.NewWriter()
 
 	w.WriteLines(
 		MetadateiBoundary,
@@ -94,30 +98,30 @@ func (f Text) writeToInlineAkte(c _ZettelFormatContextWrite) (n int64, err error
 	n, err = w.WriteTo(c.Out)
 
 	if err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
 	var ar io.ReadCloser
 
 	if c.AkteReaderFactory == nil {
-		err = _Errorf("akte reader factory is nil")
+		err = errors.Errorf("akte reader factory is nil")
 		return
 	}
 
 	ar, err = c.AkteReader(c.Zettel.Akte)
 
 	if err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
 	if ar == nil {
-		err = _Errorf("akte reader is nil")
+		err = errors.Errorf("akte reader is nil")
 		return
 	}
 
-	defer _PanicIfError(ar.Close())
+	defer stdprinter.PanicIfError(ar.Close())
 
 	var n1 int64
 
@@ -125,16 +129,16 @@ func (f Text) writeToInlineAkte(c _ZettelFormatContextWrite) (n int64, err error
 	n += n1
 
 	if err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
 	return
 }
 
-func (f Text) writeToExternalAkte(c _ZettelFormatContextWrite) (n int64, err error) {
+func (f Text) writeToExternalAkte(c zettel.FormatContextWrite) (n int64, err error) {
 	logz.Print()
-	w := _LineFormatNewWriter()
+	w := line_format.NewWriter()
 
 	w.WriteLines(
 		MetadateiBoundary,
@@ -156,39 +160,39 @@ func (f Text) writeToExternalAkte(c _ZettelFormatContextWrite) (n int64, err err
 	n, err = w.WriteTo(c.Out)
 
 	if err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
 	var ar io.ReadCloser
 
 	if c.AkteReaderFactory == nil {
-		err = _Errorf("akte reader factory is nil")
+		err = errors.Errorf("akte reader factory is nil")
 		return
 	}
 
 	ar, err = c.AkteReader(c.Zettel.Akte)
 
 	if err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
 	if ar == nil {
-		err = _Errorf("akte reader is nil")
+		err = errors.Errorf("akte reader is nil")
 		return
 	}
 
-	defer _PanicIfError(ar.Close())
+	defer stdprinter.PanicIfError(ar.Close())
 
 	var file *os.File
 
-	if file, err = _Create(c.ExternalAktePath); err != nil {
-		err = _Error(err)
+	if file, err = open_file_guard.Create(c.ExternalAktePath); err != nil {
+		err = errors.Error(err)
 		return
 	}
 
-	defer _Close(file)
+	defer open_file_guard.Close(file)
 
 	var n1 int64
 
@@ -196,7 +200,7 @@ func (f Text) writeToExternalAkte(c _ZettelFormatContextWrite) (n int64, err err
 	n += n1
 
 	if err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 

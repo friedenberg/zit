@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/charlie/etikett"
+	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/foxtrot/zettel_formats"
 	"github.com/friedenberg/zit/hotel/zettels"
@@ -67,7 +68,7 @@ func init() {
 	)
 }
 
-func (c Checkout) Run(u _Umwelt, args ...string) (err error) {
+func (c Checkout) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	var t checkoutArgType
 
 	if t, err = c.argOptions.validateArgs(args...); err != nil {
@@ -160,9 +161,9 @@ func (c Checkout) Run(u _Umwelt, args ...string) (err error) {
 		}
 	}
 
-	options := _ZettelsCheckinOptions{
+	options := zettels.CheckinOptions{
 		IncludeAkte: c.IncludeAkte,
-		Format:      _ZettelFormatsText{},
+		Format:      zettel_formats.Text{},
 	}
 
 	checkoutOp := user_ops.Checkout{

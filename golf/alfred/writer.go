@@ -1,24 +1,32 @@
 package alfred
 
-import "io"
+import (
+	"io"
+
+	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/bravo/alfred"
+	"github.com/friedenberg/zit/charlie/etikett"
+	"github.com/friedenberg/zit/charlie/hinweis"
+	"github.com/friedenberg/zit/foxtrot/stored_zettel"
+)
 
 type Writer interface {
-	WriteZettel(_NamedZettel) (n int, err error)
-	WriteEtikett(e _Etikett) (n int, err error)
-	WriteHinweis(e _Hinweis) (n int, err error)
+	WriteZettel(stored_zettel.Named) (n int, err error)
+	WriteEtikett(e etikett.Etikett) (n int, err error)
+	WriteHinweis(e hinweis.Hinweis) (n int, err error)
 	WriteError(in error) (n int, out error)
 	Close() error
 }
 
 type writer struct {
-	alfredWriter _AlfredWriter
+	alfredWriter alfred.Writer
 }
 
 func NewWriter(out io.Writer) (w *writer, err error) {
-	var aw _AlfredWriter
+	var aw alfred.Writer
 
-	if aw, err = _AlfredNewWriter(out); err != nil {
-		err = _Error(err)
+	if aw, err = alfred.NewWriter(out); err != nil {
+		err = errors.Error(err)
 		return
 	}
 
@@ -29,17 +37,17 @@ func NewWriter(out io.Writer) (w *writer, err error) {
 	return
 }
 
-func (w *writer) WriteZettel(z _NamedZettel) (n int, err error) {
+func (w *writer) WriteZettel(z stored_zettel.Named) (n int, err error) {
 	item := ZettelToItem(z)
 	return w.alfredWriter.WriteItem(item)
 }
 
-func (w *writer) WriteEtikett(e _Etikett) (n int, err error) {
+func (w *writer) WriteEtikett(e etikett.Etikett) (n int, err error) {
 	item := EtikettToItem(e)
 	return w.alfredWriter.WriteItem(item)
 }
 
-func (w *writer) WriteHinweis(e _Hinweis) (n int, err error) {
+func (w *writer) WriteHinweis(e hinweis.Hinweis) (n int, err error) {
 	item := HinweisToItem(e)
 	return w.alfredWriter.WriteItem(item)
 }

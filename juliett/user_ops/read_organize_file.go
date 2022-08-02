@@ -4,6 +4,7 @@ import (
 	"io"
 	"os"
 
+	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
 	"github.com/friedenberg/zit/golf/organize_text"
 )
@@ -16,7 +17,7 @@ func (c ReadOrganizeFile) RunWithFile(p string) (ot organize_text.Text, err erro
 	var f *os.File
 
 	if f, err = open_file_guard.Open(p); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 

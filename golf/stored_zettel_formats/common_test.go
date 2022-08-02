@@ -3,10 +3,11 @@ package stored_zettel_formats
 import (
 	"testing"
 
+	"github.com/friedenberg/zit/bravo/akte_ext"
 	"github.com/friedenberg/zit/charlie/etikett"
 )
 
-func makeEtiketten(t *testing.T, vs ...string) (es _EtikettSet) {
+func makeEtiketten(t *testing.T, vs ...string) (es etikett.Set) {
 	es = etikett.MakeSet()
 
 	for _, v := range vs {
@@ -18,7 +19,7 @@ func makeEtiketten(t *testing.T, vs ...string) (es _EtikettSet) {
 	return
 }
 
-func makeExt(t *testing.T, v string) (es _AkteExt) {
+func makeExt(t *testing.T, v string) (es akte_ext.AkteExt) {
 	if err := es.Set(v); err != nil {
 		t.Fatalf("%s", err)
 	}

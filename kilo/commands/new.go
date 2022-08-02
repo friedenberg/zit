@@ -8,9 +8,11 @@ import (
 	"github.com/friedenberg/zit/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/bravo/akte_ext"
 	"github.com/friedenberg/zit/charlie/etikett"
+	"github.com/friedenberg/zit/charlie/script_value"
 	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/echo/zettel"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
+	"github.com/friedenberg/zit/foxtrot/zettel_formats"
 	"github.com/friedenberg/zit/juliett/user_ops"
 )
 
@@ -23,7 +25,7 @@ type New struct {
 	Bezeichnung bez
 	Edit        bool
 	Etiketten   etikett.Set
-	Filter      _ScriptValue
+	Filter      script_value.ScriptValue
 }
 
 func (b *bez) Set(v string) (err error) {
@@ -63,13 +65,13 @@ func (c New) ValidateFlagsAndArgs(u *umwelt.Umwelt, args ...string) (err error) 
 	return
 }
 
-func (c New) Run(u _Umwelt, args ...string) (err error) {
+func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	if err = c.ValidateFlagsAndArgs(u, args...); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	f := _ZettelFormatsText{}
+	f := zettel_formats.Text{}
 
 	if len(args) == 0 {
 		if err = c.writeNewZettel(u, f); err != nil {

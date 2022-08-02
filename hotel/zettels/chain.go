@@ -1,16 +1,24 @@
 package zettels
 
+import (
+	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/bravo/id"
+	"github.com/friedenberg/zit/bravo/sha"
+	"github.com/friedenberg/zit/charlie/hinweis"
+	"github.com/friedenberg/zit/foxtrot/stored_zettel"
+)
+
 type Chain struct {
-	Hinweis _Hinweis
+	Hinweis hinweis.Hinweis
 	//stored in reverse (latest is at 0)
-	Zettels []_StoredZettel
+	Zettels []stored_zettel.Stored
 }
 
-func (zs zettels) AllInChain(id _Id) (c Chain, err error) {
-	var s _Sha
+func (zs zettels) AllInChain(id id.Id) (c Chain, err error) {
+	var s sha.Sha
 
 	if s, c.Hinweis, err = zs.TailFromId(id); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -22,16 +30,16 @@ func (zs zettels) AllInChain(id _Id) (c Chain, err error) {
 		}
 
 		if _, ok := shas[s.String()]; ok {
-			err = _Errorf("loop detected in history for sha '%s'", s)
+			err = errors.Errorf("loop detected in history for sha '%s'", s)
 			return
 		}
 
 		shas[s.String()] = true
 
-		var sz _NamedZettel
+		var sz stored_zettel.Named
 
 		if sz, err = zs.Read(s); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 
@@ -46,22 +54,22 @@ func (zs zettels) AllInChain(id _Id) (c Chain, err error) {
 	return
 }
 
-func (zs zettels) TailFromId(id _Id) (s _Sha, h _Hinweis, err error) {
+func (zs zettels) TailFromId(id id.Id) (s sha.Sha, h hinweis.Hinweis, err error) {
 	ok := false
 
-	if s, ok = id.(_Sha); ok {
+	if s, ok = id.(sha.Sha); ok {
 		if h, err = zs.hinweisen.ReadSha(s); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 	} else {
-		if h, ok = id.(_Hinweis); !ok {
-			err = _Errorf("unsupported id: '%q'", id)
+		if h, ok = id.(hinweis.Hinweis); !ok {
+			err = errors.Errorf("unsupported id: '%q'", id)
 			return
 		}
 
 		if s, err = zs.hinweisen.Read(h); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 	}

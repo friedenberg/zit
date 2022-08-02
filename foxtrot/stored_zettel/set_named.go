@@ -23,14 +23,14 @@ func (s SetNamed) Get(h hinweis.Hinweis) (z Named, ok bool) {
 }
 
 func (a SetNamed) Merge(b SetNamed) {
-  for _, z := range b {
-    a.Add(z)
-  }
+	for _, z := range b {
+		a.Add(z)
+	}
 }
 
 func (a SetNamed) Contains(z Named) bool {
-  _, ok := a[z.Hinweis.String()]
-  return ok
+	_, ok := a[z.Hinweis.String()]
+	return ok
 }
 
 func (s SetNamed) Hinweisen() (h []hinweis.Hinweis) {

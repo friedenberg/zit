@@ -1,8 +1,10 @@
 package zettels
 
+import "github.com/friedenberg/zit/echo/zettel"
+
 type CheckinOptions struct {
 	IgnoreMissingHinweis bool
 	AddMdExtension       bool
 	IncludeAkte          bool
-	Format               _ZettelFormat
+	Format               zettel.Format
 }

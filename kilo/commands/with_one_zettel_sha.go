@@ -2,11 +2,13 @@ package commands
 
 import (
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/bravo/sha"
+	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
 type WithOneZettelSha interface {
-	RunWithZettel(store store_with_lock.Store, zettel ..._NamedZettel) error
+	RunWithZettel(store store_with_lock.Store, zettel ...stored_zettel.Named) error
 }
 
 type withOneZettelSha struct {
@@ -20,10 +22,10 @@ func (c withOneZettelSha) RunWithLockedStore(store store_with_lock.Store, args .
 		return
 	}
 
-	zettels := make([]_NamedZettel, len(args))
+	zettels := make([]stored_zettel.Named, len(args))
 
 	for i, arg := range args {
-		var sha _Sha
+		var sha sha.Sha
 
 		if err = sha.Set(arg); err != nil {
 			err = errors.Error(err)

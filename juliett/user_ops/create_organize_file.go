@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/delta/umwelt"
+	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/golf/organize_text"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
@@ -26,7 +27,7 @@ func (c CreateOrganizeFile) RunAndWrite(zettels ZettelResults, w io.WriteCloser)
 	defer errors.PanicIfError(w.Close)
 
 	if _, err = results.Text.WriteTo(w); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -51,14 +52,14 @@ func (c CreateOrganizeFile) Run(zettels ZettelResults) (results CreateOrganizeFi
 	}
 
 	if results.Text, err = organize_text.New(options, zettels.SetNamed); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
 	return
 }
 
-func (c CreateOrganizeFile) GroupZettel(z _NamedZettel) (ess []etikett.Set) {
+func (c CreateOrganizeFile) GroupZettel(z stored_zettel.Named) (ess []etikett.Set) {
 	var set etikett.Set
 
 	if c.GroupBy.Len() > 0 {
@@ -89,7 +90,7 @@ func (c CreateOrganizeFile) SortGroups(a, b etikett.Set) bool {
 	return a.String() < b.String()
 }
 
-func (c CreateOrganizeFile) SortZettels(a, b _NamedZettel) bool {
+func (c CreateOrganizeFile) SortZettels(a, b stored_zettel.Named) bool {
 	return a.Hinweis.String() < b.Hinweis.String()
 }
 
@@ -98,7 +99,7 @@ func (c CreateOrganizeFile) getEtikettenFromArgs(args []string) (es etikett.Set,
 
 	for _, s := range args {
 		if err = es.AddString(s); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 	}

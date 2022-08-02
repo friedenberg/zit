@@ -5,11 +5,17 @@ import (
 	"os"
 	"path"
 
+	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/bravo/open_file_guard"
+	"github.com/friedenberg/zit/echo/zettel"
+	"github.com/friedenberg/zit/foxtrot/akten"
+	"github.com/friedenberg/zit/foxtrot/stored_zettel"
+	"github.com/friedenberg/zit/foxtrot/zettel_formats"
 	"github.com/google/uuid"
 )
 
 type ErrZettelDidNotChangeSinceUpdate struct {
-	NamedZettel _NamedZettel
+	NamedZettel stored_zettel.Named
 }
 
 func (e ErrZettelDidNotChangeSinceUpdate) Error() string {
@@ -26,15 +32,15 @@ type VerlorenAndGefundenError interface {
 }
 
 type duplicateAkteError struct {
-	_ErrorDuplicateAtke
-	_ZettelFormatContextWrite
+	akten.DuplicateAkteError
+	zettel.FormatContextWrite
 }
 
 func (e duplicateAkteError) AddToLostAndFound(p string) (p1 string, err error) {
 	newEtikett := "zz-akte-" + e.ShaOldAkte.String()
 
 	if err = e.Zettel.Etiketten.AddString(newEtikett); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -42,18 +48,18 @@ func (e duplicateAkteError) AddToLostAndFound(p string) (p1 string, err error) {
 
 	p1 = path.Join(p, uuid.NewString())
 
-	if f, err = _Create(p1); err != nil {
-		err = _Error(err)
+	if f, err = open_file_guard.Create(p1); err != nil {
+		err = errors.Error(err)
 		return
 	}
 
-	defer _Close(f)
+	defer open_file_guard.Close(f)
 
 	e.Out = f
-	format := _ZettelFormatText{}
+	format := zettel_formats.Text{}
 
-	if _, err = format.WriteTo(e._ZettelFormatContextWrite); err != nil {
-		err = _Error(err)
+	if _, err = format.WriteTo(e.FormatContextWrite); err != nil {
+		err = errors.Error(err)
 		return
 	}
 

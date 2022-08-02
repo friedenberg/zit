@@ -5,11 +5,13 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/kennung"
 	"github.com/friedenberg/zit/alfa/logz"
+	"github.com/friedenberg/zit/bravo/id"
 )
 
 type Hinweis interface {
-	_Id
+	id.Id
 	Set(string) error
 	Equals(Hinweis) bool
 }
@@ -19,7 +21,7 @@ type hinweis struct {
 }
 
 type Provider interface {
-	Hinweis(i _Int) (string, error)
+	Hinweis(i kennung.Int) (string, error)
 }
 
 func NewEmpty() (h *hinweis) {
@@ -27,8 +29,8 @@ func NewEmpty() (h *hinweis) {
 	return
 }
 
-func New(i _Int, pl Provider, pr Provider) (h *hinweis, err error) {
-	k := _Kennung{}
+func New(i kennung.Int, pl Provider, pr Provider) (h *hinweis, err error) {
+	k := kennung.Kennung{}
 	k.SetInt(i)
 
 	h = &hinweis{}

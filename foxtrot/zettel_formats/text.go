@@ -9,9 +9,13 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/logz"
+	"github.com/friedenberg/zit/bravo/files"
+	"github.com/friedenberg/zit/bravo/open_file_guard"
 	"github.com/friedenberg/zit/bravo/sha"
 	"github.com/friedenberg/zit/charlie/etikett"
+	"github.com/friedenberg/zit/delta/objekte"
 	"github.com/friedenberg/zit/echo/zettel"
 )
 
@@ -46,19 +50,19 @@ const (
 )
 
 type textStateRead struct {
-	context                 *_ZettelFormatContextRead
+	context                 *zettel.FormatContextRead
 	field                   textStateReadField
 	lastFieldWasBezeichnung bool
 	didReadAkte             bool
 	metadataiAkteSha        sha.Sha
 	readAkteSha             sha.Sha
-	akteWriter              _ObjekteWriter
+	akteWriter              objekte.Writer
 }
 
 func (s *textStateRead) Close() (err error) {
 	if s.akteWriter != nil {
 		if err = s.akteWriter.Close(); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 
@@ -72,7 +76,7 @@ type textStateWrite struct {
 	zettel.Zettel
 }
 
-func (f Text) ReadFrom(c *_ZettelFormatContextRead) (n int64, err error) {
+func (f Text) ReadFrom(c *zettel.FormatContextRead) (n int64, err error) {
 	r := bufio.NewReader(c.In)
 
 	c.Zettel.Etiketten = etikett.MakeSet()
@@ -105,17 +109,17 @@ func (f Text) ReadFrom(c *_ZettelFormatContextRead) (n int64, err error) {
 	}()
 
 	if c.AkteWriterFactory == nil {
-		err = _Errorf("akte writer factory is nil")
+		err = errors.Errorf("akte writer factory is nil")
 		return
 	}
 
 	if state.akteWriter, err = c.AkteWriter(); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
 	if state.akteWriter == nil {
-		err = _Errorf("akte writer is nil")
+		err = errors.Errorf("akte writer is nil")
 		return
 	}
 
@@ -126,7 +130,7 @@ func (f Text) ReadFrom(c *_ZettelFormatContextRead) (n int64, err error) {
 		n += int64(len(line))
 
 		if err != nil && err != io.EOF {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 
@@ -140,7 +144,7 @@ func (f Text) ReadFrom(c *_ZettelFormatContextRead) (n int64, err error) {
 		switch state.field {
 		case textStateReadFieldEmpty:
 			if line != MetadateiBoundary {
-				err = _Errorf("expected %q but got %q", MetadateiBoundary, line)
+				err = errors.Errorf("expected %q but got %q", MetadateiBoundary, line)
 			}
 
 			state.field += 1
@@ -149,13 +153,13 @@ func (f Text) ReadFrom(c *_ZettelFormatContextRead) (n int64, err error) {
 			if line == MetadateiBoundary {
 				state.field += 1
 			} else if err = f.readMetadateiLine(state, line); err != nil {
-				err = _Error(err)
+				err = errors.Error(err)
 				return
 			}
 
 		case textStateReadFieldSecondBoundary:
 			if line != "" {
-				err = _Errorf("expected empty line after metadatei boundary, but got %q", line)
+				err = errors.Errorf("expected empty line after metadatei boundary, but got %q", line)
 				return
 			}
 
@@ -165,10 +169,10 @@ func (f Text) ReadFrom(c *_ZettelFormatContextRead) (n int64, err error) {
 
 			if c.AktePath != "" {
 				c.RecoverableError = ErrHasInlineAkteAndFilePath{
-					Zettel:             c.Zettel,
-					_AkteWriterFactory: c,
-					Sha:                state.readAkteSha,
-					FilePath:           c.AktePath,
+					Zettel:                   c.Zettel,
+					AkteWriterFactory: c,
+					Sha:                      state.readAkteSha,
+					FilePath:                 c.AktePath,
 				}
 
 				c.AktePath = ""
@@ -178,17 +182,17 @@ func (f Text) ReadFrom(c *_ZettelFormatContextRead) (n int64, err error) {
 			n1, err = io.WriteString(state.akteWriter, fmt.Sprintln(line))
 
 			if err != nil {
-				err = _Error(err)
+				err = errors.Error(err)
 				break
 			}
 
 			if n1 != len(line)+1 {
-				err = _Errorf("wanted to write %d but only wrote %d", len(line), n1)
+				err = errors.Errorf("wanted to write %d but only wrote %d", len(line), n1)
 				return
 			}
 
 		default:
-			err = _Errorf("impossible state for field %d", state.field)
+			err = errors.Errorf("impossible state for field %d", state.field)
 			return
 		}
 	}
@@ -197,15 +201,15 @@ func (f Text) ReadFrom(c *_ZettelFormatContextRead) (n int64, err error) {
 	if c.AktePath != "" {
 		var f *os.File
 
-		if f, err = _Open(c.AktePath); err != nil {
-			err = _Error(err)
+		if f, err = open_file_guard.Open(c.AktePath); err != nil {
+			err = errors.Error(err)
 			return
 		}
 
-		defer _Close(f)
+		defer open_file_guard.Close(f)
 
 		if _, err = io.Copy(state.akteWriter, f); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 	}
@@ -250,7 +254,7 @@ func (f Text) readMetadateiLine(state *textStateRead, line string) (err error) {
 
 	default:
 		if strings.TrimSpace(head) != "" || strings.TrimSpace(tail) != "" {
-			err = _Errorf(
+			err = errors.Errorf(
 				"unsupported metadatei prefix for format (%q): %q",
 				reflect.TypeOf(f).Name(),
 				head,
@@ -259,7 +263,7 @@ func (f Text) readMetadateiLine(state *textStateRead, line string) (err error) {
 	}
 
 	if err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -275,11 +279,11 @@ func (f Text) readAkteDesc(state *textStateRead, desc string) (err error) {
 	head := desc[:len(desc)-len(tail)]
 
 	// path
-	if _FilesExists(desc) {
+	if files.Exists(desc) {
 		logz.Print("valid path", desc)
 
 		if err = state.context.Zettel.AkteExt.Set(tail); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 
@@ -299,19 +303,19 @@ func (f Text) readAkteDesc(state *textStateRead, desc string) (err error) {
 		//sha or ext
 		if shaError != nil {
 			if err = state.context.Zettel.AkteExt.Set(head); err != nil {
-				err = _Error(err)
+				err = errors.Error(err)
 				return
 			}
 		}
 	} else {
 		//sha.ext or error
 		if shaError != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 
 		if err = state.context.Zettel.AkteExt.Set(tail); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 	}

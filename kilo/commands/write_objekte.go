@@ -3,11 +3,15 @@ package commands
 import (
 	"flag"
 
+	"github.com/friedenberg/zit/alfa/node_type"
 	"github.com/friedenberg/zit/alfa/stdprinter"
+	"github.com/friedenberg/zit/charlie/age"
+	"github.com/friedenberg/zit/delta/objekte"
+	"github.com/friedenberg/zit/delta/umwelt"
 )
 
 type WriteObjekte struct {
-	Type _Type
+	Type node_type.Type
 }
 
 func init() {
@@ -15,7 +19,7 @@ func init() {
 		"write-objekte",
 		func(f *flag.FlagSet) Command {
 			c := &WriteObjekte{
-				Type: _TypeUnknown,
+				Type: node_type.TypeUnknown,
 			}
 
 			f.Var(&c.Type, "type", "ObjekteType")
@@ -25,8 +29,8 @@ func init() {
 	)
 }
 
-func (c WriteObjekte) RunWithAge(u _Umwelt, age _Age, args ...string) (err error) {
-	objektePath, err := _ObjekteWriteAndMove(u.In, age, u.DirZit(), c.Type)
+func (c WriteObjekte) RunWithAge(u *umwelt.Umwelt, age age.Age, args ...string) (err error) {
+	objektePath, err := objekte.WriteAndMove(u.In, age, u.DirZit(), c.Type)
 
 	stdprinter.Out(objektePath)
 

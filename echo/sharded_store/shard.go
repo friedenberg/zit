@@ -2,13 +2,16 @@ package sharded_store
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"io"
 	"os"
 	"sync"
 
+	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/logz"
+	"github.com/friedenberg/zit/bravo/open_file_guard"
+	"github.com/friedenberg/zit/charlie/age"
+	"github.com/friedenberg/zit/delta/objekte"
 )
 
 type Sharder interface {
@@ -29,7 +32,7 @@ type Shard interface {
 
 type shard struct {
 	path       string
-	age        _Age
+	age        age.Age
 	rwLock     *sync.RWMutex
 	lines      []string
 	entries    EntryMap
@@ -37,7 +40,7 @@ type shard struct {
 	Sharder
 }
 
-func NewShard(path string, age _Age, sh Sharder) (s *shard, err error) {
+func NewShard(path string, age age.Age, sh Sharder) (s *shard, err error) {
 	s = &shard{
 		path:    path,
 		age:     age,
@@ -48,29 +51,29 @@ func NewShard(path string, age _Age, sh Sharder) (s *shard, err error) {
 
 	var file *os.File
 
-	if file, err = _OpenFile(s.Path(), os.O_RDONLY, 0644); err != nil {
+	if file, err = open_file_guard.OpenFile(s.Path(), os.O_RDONLY, 0644); err != nil {
 		if os.IsNotExist(err) {
 			err = nil
 			return
 		}
 
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
-	defer _Close(file)
+	defer open_file_guard.Close(file)
 
 	var r io.ReadCloser
 
 	if r, err = s.Reader(file); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
 	defer r.Close()
 
 	if err = s.ReadAll(bufio.NewReader(r)); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -83,8 +86,8 @@ func (s shard) Reader(r io.ReadCloser) (ro io.ReadCloser, err error) {
 		return
 	}
 
-	if ro, err = _NewObjekteReader(s.age, r); err != nil {
-		err = _Error(err)
+	if ro, err = objekte.NewReader(s.age, r); err != nil {
+		err = errors.Error(err)
 		return
 	}
 
@@ -97,8 +100,8 @@ func (s shard) Writer(w io.WriteCloser) (wo io.WriteCloser, err error) {
 		return
 	}
 
-	if wo, err = _NewObjekteWriter(s.age, w); err != nil {
-		err = _Error(err)
+	if wo, err = objekte.NewWriter(s.age, w); err != nil {
+		err = errors.Error(err)
 		return
 	}
 
@@ -120,7 +123,7 @@ func (s shard) ReadAll(r *bufio.Reader) (err error) {
 		}
 
 		if err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 
@@ -135,7 +138,7 @@ func (s shard) processLine(line string) (err error) {
 	var entry Entry
 
 	if entry, err = s.LineToEntry(line); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -184,19 +187,19 @@ func (s shard) Flush() (err error) {
 
 	var file *os.File
 
-	if file, err = _TempFile(); err != nil {
+	if file, err = open_file_guard.TempFile(); err != nil {
 		logz.Print(err)
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
-	defer _Close(file)
+	defer open_file_guard.Close(file)
 
 	var w io.WriteCloser
 
 	if w, err = s.Writer(file); err != nil {
 		logz.Print(err)
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -207,13 +210,13 @@ func (s shard) Flush() (err error) {
 
 		if line, err = s.EntryToLine(Entry{k, v}); err != nil {
 			logz.Print(err)
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 
 		if _, err = io.WriteString(w, fmt.Sprintln(line)); err != nil {
 			logz.Print(err)
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 	}
@@ -221,7 +224,7 @@ func (s shard) Flush() (err error) {
 	//TODO-research should the file be closed before being renamed???
 	logz.Printf("renaming %s to %s", file.Name(), s.path)
 	if err = os.Rename(file.Name(), s.path); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 

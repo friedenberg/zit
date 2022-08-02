@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/bravo/id"
 	"github.com/friedenberg/zit/charlie/hinweis"
+	"github.com/friedenberg/zit/charlie/script_value"
 	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/echo/zettel"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
@@ -19,12 +20,12 @@ import (
 type CreateFromPaths struct {
 	Umwelt *umwelt.Umwelt
 	Format zettel.Format
-	Filter _ScriptValue
+	Filter script_value.ScriptValue
 	// ReadHinweisFromPath bool
 }
 
 type CreateFromPathsResults struct {
-	Zettelen []_Zettel
+	Zettelen []zettel.Zettel
 }
 
 func (c CreateFromPaths) Run(args ...string) (results CreateFromPathsResults, err error) {
@@ -51,7 +52,7 @@ func (c CreateFromPaths) Run(args ...string) (results CreateFromPathsResults, er
 	}
 
 	for _, z := range toCreate {
-		var named _NamedZettel
+		var named stored_zettel.Named
 		//TODO
 		if false /*c.ReadHinweisFromPath*/ {
 			head, tail := id.HeadTailFromFileName(z.Path)
@@ -78,7 +79,7 @@ func (c CreateFromPaths) Run(args ...string) (results CreateFromPathsResults, er
 			}
 		}
 
-		_Outf("[%s %s]\n", named.Hinweis, named.Sha)
+		stdprinter.Outf("[%s %s]\n", named.Hinweis, named.Sha)
 	}
 
 	return
@@ -110,7 +111,7 @@ func (c CreateFromPaths) zettelsFromPath(store store_with_lock.Store, p string) 
 		var errAkteInlineAndFilePath zettel_formats.ErrHasInlineAkteAndFilePath
 
 		if errors.As(ctx.RecoverableError, &errAkteInlineAndFilePath) {
-			var z1 _Zettel
+			var z1 zettel.Zettel
 
 			if z1, err = errAkteInlineAndFilePath.Recover(); err != nil {
 				err = errors.Error(err)
@@ -141,7 +142,7 @@ func (c CreateFromPaths) zettelsFromPath(store store_with_lock.Store, p string) 
 	return
 }
 
-func (c CreateFromPaths) handleStoreError(z _NamedZettel, f string, in error) {
+func (c CreateFromPaths) handleStoreError(z stored_zettel.Named, f string, in error) {
 	var err error
 
 	var lostError zettels.VerlorenAndGefundenError
@@ -155,7 +156,7 @@ func (c CreateFromPaths) handleStoreError(z _NamedZettel, f string, in error) {
 			return
 		}
 
-		_Outf("lost+found: %s: %s\n", lostError.Error(), p)
+		stdprinter.Outf("lost+found: %s: %s\n", lostError.Error(), p)
 
 	} else if errors.As(in, &normalError) {
 		stdprinter.Errf("%s\n", normalError.Error())

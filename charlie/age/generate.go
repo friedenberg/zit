@@ -3,22 +3,25 @@ package age
 import (
 	"io/ioutil"
 	"path"
+
+	"filippo.io/age"
+	"github.com/friedenberg/zit/alfa/errors"
 )
 
-func Generate(basePath string) (a *age, err error) {
-	var i *_AgeX25519Identity
+func Generate(basePath string) (a *ages, err error) {
+	var i *X25519Identity
 
-	if i, err = _GenerateX25519Identity(); err != nil {
-		err = _Error(err)
+	if i, err = age.GenerateX25519Identity(); err != nil {
+		err = errors.Error(err)
 		return
 	}
 
 	if err = ioutil.WriteFile(path.Join(basePath), []byte(i.String()), 0755); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
-	a = &age{
+	a = &ages{
 		recipient: i.Recipient(),
 		identity:  i,
 	}

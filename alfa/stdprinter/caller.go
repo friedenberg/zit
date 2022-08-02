@@ -3,6 +3,8 @@ package stdprinter
 import (
 	"fmt"
 	"strings"
+
+	"golang.org/x/xerrors"
 )
 
 type callerFormatter struct {
@@ -25,7 +27,7 @@ func Caller(i int, msg ...interface{}) {
 	cf := callerFormatter{&strings.Builder{}}
 
 	cf.Print(msg...)
-	_Caller(i + 1).Format(cf)
+	xerrors.Caller(i + 1).Format(cf)
 
 	Err(cf.String())
 }

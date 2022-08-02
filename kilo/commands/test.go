@@ -6,6 +6,10 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/charlie/age"
+	"github.com/friedenberg/zit/charlie/konfig"
+	"github.com/friedenberg/zit/delta/umwelt"
+	"github.com/friedenberg/zit/foxtrot/etiketten"
 )
 
 type Test struct {
@@ -22,17 +26,17 @@ func init() {
 	)
 }
 
-func (c Test) Run(u _Umwelt, args ...string) (err error) {
-	var a _Age
+func (c Test) Run(u *umwelt.Umwelt, args ...string) (err error) {
+	var a age.Age
 
 	if a, err = u.Age(); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	var e _Etiketten
+	var e etiketten.Etiketten
 
-	if e, err = _NewEtiketten(_Konfig{}, a, u.DirZit("Etiketten")); err != nil {
+	if e, err = etiketten.New(konfig.Konfig{}, a, u.DirZit("Etiketten")); err != nil {
 		err = errors.Error(err)
 		return
 	}

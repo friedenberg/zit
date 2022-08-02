@@ -6,6 +6,8 @@ import (
 	"hash"
 	"path"
 	"strings"
+
+	"github.com/friedenberg/zit/alfa/errors"
 )
 
 const (
@@ -48,7 +50,7 @@ func (s *Sha) SetFromHash(h hash.Hash) {
 
 func (s *Sha) SetParts(a, b string) (err error) {
 	if err = s.Set(a + b); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -59,7 +61,7 @@ func (s *Sha) Set(v string) (err error) {
 	v1 := strings.TrimSpace(v)
 
 	if _, err = hex.DecodeString(v1); err != nil {
-		err = _Errorf("%q: %s", v1, err)
+		err = errors.Errorf("%q: %s", v1, err)
 		return
 	}
 

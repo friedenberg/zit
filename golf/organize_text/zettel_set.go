@@ -52,17 +52,17 @@ func (zs zettelSet) Contains(z zettel) bool {
 }
 
 func (a zettelSet) Equals(b zettelSet) bool {
-  if len(a) != len(b) {
-    return false
-  }
+	if len(a) != len(b) {
+		return false
+	}
 
-  for z, _ := range a {
-    if !b.Contains(z) {
-      return false
-    }
-  }
+	for z, _ := range a {
+		if !b.Contains(z) {
+			return false
+		}
+	}
 
-  return true
+	return true
 }
 
 func (a zettelSet) Copy() (b zettelSet) {

@@ -1,6 +1,10 @@
 package hinweis
 
-import "io"
+import (
+	"io"
+
+	"github.com/friedenberg/zit/bravo/sha"
+)
 
 type writer struct {
 	basePath string
@@ -12,6 +16,6 @@ func MakeWriter(basePath string) writer {
 	}
 }
 
-func (w writer) WriteObjekte(s _Sha, out io.Writer) (err error) {
+func (w writer) WriteObjekte(s sha.Sha, out io.Writer) (err error) {
 	return
 }

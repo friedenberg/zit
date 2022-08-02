@@ -2,6 +2,7 @@ package commands
 
 import (
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
@@ -13,7 +14,7 @@ type commandWithLockedStore struct {
 	CommandWithLockedStore
 }
 
-func (c commandWithLockedStore) Run(u _Umwelt, args ...string) (err error) {
+func (c commandWithLockedStore) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	var store store_with_lock.Store
 
 	if store, err = store_with_lock.New(u); err != nil {

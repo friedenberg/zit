@@ -3,9 +3,10 @@
 
 build:
 	go build -o build/zit ./.
+	go vet ./...
 	go test ./...
 	go install ./.
-	# bats zz-test/test.bats
+	bats zz-test/test.bats
 
 watch:
 	echo .

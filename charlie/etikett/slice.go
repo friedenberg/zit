@@ -40,7 +40,7 @@ func (es *Slice) AddString(v string) (err error) {
 	var e Etikett
 
 	if err = e.Set(v); err != nil {
-		err = _Error(err)
+		err = errors.Error(err)
 		return
 	}
 
@@ -58,7 +58,7 @@ func (s *Slice) Set(v string) (err error) {
 
 	for _, e := range es {
 		if err = s.AddString(e); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 	}

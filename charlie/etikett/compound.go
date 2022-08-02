@@ -1,6 +1,10 @@
 package etikett
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/friedenberg/zit/alfa/errors"
+)
 
 type Compound []Etikett
 
@@ -24,7 +28,7 @@ func (c *Compound) Set(v string) (err error) {
 
 	for i, e := range *c {
 		if err = e.Set(es[i]); err != nil {
-			err = _Error(err)
+			err = errors.Error(err)
 			return
 		}
 	}
