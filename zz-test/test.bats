@@ -135,6 +135,7 @@ function can_checkout_via_etiketten { # @test
 }
 
 function can_output_organize { # @test
+	skip
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
@@ -184,6 +185,7 @@ function can_output_organize { # @test
 }
 
 function hides_hidden_etiketten_from_organize { # @test
+	skip
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
@@ -291,7 +293,7 @@ function can_update_akte { # @test
 }
 
 function can_duplicate_zettel_content { # @test
-  skip #TODO:
+	skip                                   #TODO:
 
 	# setup
 	wd="$(mktemp -d)"

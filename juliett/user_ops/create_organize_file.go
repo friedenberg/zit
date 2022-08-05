@@ -12,9 +12,10 @@ import (
 )
 
 type CreateOrganizeFile struct {
-	Umwelt        *umwelt.Umwelt
-	RootEtiketten etikett.Set
-	GroupBy       etikett.Slice
+	Umwelt         *umwelt.Umwelt
+	RootEtiketten  etikett.Set
+	ExtraEtiketten etikett.Set
+	GroupBy        etikett.Slice
 }
 
 type CreateOrganizeFileResults struct {
@@ -48,6 +49,7 @@ func (c CreateOrganizeFile) Run(zettels ZettelResults) (results CreateOrganizeFi
 		// Grouper:       c,
 		// Sorter:        c,
 		RootEtiketten:     c.RootEtiketten,
+		ExtraEtiketten:    c.ExtraEtiketten,
 		GroupingEtiketten: c.GroupBy,
 	}
 

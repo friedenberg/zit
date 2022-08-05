@@ -18,8 +18,8 @@ import (
 )
 
 type Organize struct {
-	rootEtiketten etikett.Set
-	GroupBy       etikett.Slice
+	GroupBy        etikett.Slice
+	ExtraEtiketten etikett.Set
 }
 
 func init() {
@@ -27,10 +27,12 @@ func init() {
 		"organize",
 		func(f *flag.FlagSet) Command {
 			c := &Organize{
-				GroupBy: etikett.NewSlice(),
+				GroupBy:        etikett.NewSlice(),
+				ExtraEtiketten: etikett.MakeSet(),
 			}
 
 			f.Var(&c.GroupBy, "group-by", "etikett prefixes to group zettels")
+			f.Var(&c.ExtraEtiketten, "extras", "etiketten to always add to the organize text")
 
 			return c
 		},
@@ -39,8 +41,9 @@ func init() {
 
 func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
-		Umwelt:  u,
-		GroupBy: c.GroupBy,
+		Umwelt:         u,
+		GroupBy:        c.GroupBy,
+		ExtraEtiketten: c.ExtraEtiketten,
 		// GroupByUnique: c.GroupByUnique,
 	}
 

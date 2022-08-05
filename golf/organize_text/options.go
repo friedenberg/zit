@@ -17,6 +17,7 @@ type Sorter interface {
 type Options struct {
 	RootEtiketten     etikett.Set
 	GroupingEtiketten etikett.Slice
+	ExtraEtiketten    etikett.Set
 	// TODO option for combining or separating roots
 	// Grouper
 	// Sorter

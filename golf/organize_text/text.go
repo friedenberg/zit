@@ -31,6 +31,12 @@ func New(options Options, named stored_zettel.SetNamed) (ot *organizeText, err e
 	prefixSet := named.ToSetPrefixNamed()
 	makeChildren(root, *prefixSet, options.GroupingEtiketten)
 
+	for _, e := range options.ExtraEtiketten {
+		child := newAssignment(root.depth + 1)
+		child.etiketten = etikett.MakeSet(e)
+		root.addChild(child)
+	}
+
 	ot.assignment.addChild(root)
 
 	return
