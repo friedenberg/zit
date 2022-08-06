@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/bravo/open_file_guard"
 	"github.com/friedenberg/zit/bravo/sha"
 	"github.com/friedenberg/zit/delta/objekte"
-	// "github.com/friedenberg/zit/alfa/stdprinter"
 )
 
 func (zs zettels) AkteWriter() (w objekte.Writer, err error) {

@@ -3,7 +3,7 @@ package commands
 import (
 	"flag"
 
-	"github.com/friedenberg/zit/alfa/node_type"
+	"github.com/friedenberg/zit/bravo/node_type"
 	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/charlie/age"
 	"github.com/friedenberg/zit/delta/objekte"

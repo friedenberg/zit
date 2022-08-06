@@ -5,7 +5,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/alfa/errors"
-	"github.com/friedenberg/zit/alfa/node_type"
+	"github.com/friedenberg/zit/bravo/node_type"
 	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/bravo/id"
 	"github.com/friedenberg/zit/echo/zettel"

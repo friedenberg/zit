@@ -10,8 +10,6 @@ import (
 
 type Writer []string
 
-//TODO convert to struct and add option for combining empties
-
 func NewWriter() *Writer {
 	w := Writer(make([]string, 0))
 	return &w
@@ -69,6 +67,10 @@ func (w *Writer) WriteStringers(ss ...fmt.Stringer) {
 }
 
 func (w *Writer) WriteFormat(f string, values ...interface{}) {
+	w.WriteLines(fmt.Sprintf(f, values...))
+}
+
+func (w *Writer) WriteFormats(f string, values ...interface{}) {
 	for _, v := range values {
 		w.WriteLines(fmt.Sprintf(f, v))
 	}

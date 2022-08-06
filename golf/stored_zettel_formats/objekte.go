@@ -6,13 +6,14 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/alfa/errors"
-	"github.com/friedenberg/zit/alfa/node_type"
+	"github.com/friedenberg/zit/bravo/node_type"
 	"github.com/friedenberg/zit/bravo/line_format"
 	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 )
 
-type Objekte struct{}
+type Objekte struct{
+}
 
 func (z Objekte) WriteTo(sz stored_zettel.Stored, out1 io.Writer) (n int64, err error) {
 	w := line_format.NewWriter()

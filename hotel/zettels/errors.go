@@ -7,6 +7,8 @@ import (
 
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
+	"github.com/friedenberg/zit/bravo/sha"
+	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/echo/zettel"
 	"github.com/friedenberg/zit/foxtrot/akten"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
@@ -29,6 +31,20 @@ func (e ErrZettelDidNotChangeSinceUpdate) Error() string {
 type VerlorenAndGefundenError interface {
 	error
 	AddToLostAndFound(string) (string, error)
+}
+
+type ErrZettelSplitHistory struct {
+	hinweis.Hinweis
+	ShaA, ShaB sha.Sha
+}
+
+func (e ErrZettelSplitHistory) Error() string {
+	return fmt.Sprintf(
+		"two separate zettels with hinweis:\n%s:\n%s\n%s",
+		e.Hinweis,
+		e.ShaA,
+		e.ShaB,
+	)
 }
 
 type duplicateAkteError struct {

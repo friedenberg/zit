@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/foxtrot/etiketten"
 	"github.com/friedenberg/zit/foxtrot/hinweisen"
 	"github.com/friedenberg/zit/golf/checkout_store"
+	"github.com/friedenberg/zit/golf/zettel_store"
 	"github.com/friedenberg/zit/hotel/zettels"
 )
 
@@ -40,6 +41,8 @@ func New(u *umwelt.Umwelt) (s Store, err error) {
 		err = errors.Error(err)
 		return
 	}
+
+	s.zettels = zettel_store.ZettelStore{Zettels: s.zettels}
 
 	if s.akten, err = akten.New(u.DirZit()); err != nil {
 		err = errors.Error(err)

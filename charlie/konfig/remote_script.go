@@ -3,7 +3,7 @@ package konfig
 import (
 	"os/exec"
 
-	"github.com/friedenberg/zit/alfa/node_type"
+	"github.com/friedenberg/zit/bravo/node_type"
 )
 
 type RemoteScript interface {

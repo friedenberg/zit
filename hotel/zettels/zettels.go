@@ -43,6 +43,7 @@ type Zettels interface {
 	Etiketten() etiketten.Etiketten
 	Hinweisen() hinweisen.Hinweisen
 	Age() age.Age
+	Umwelt() *umwelt.Umwelt
 
 	Konfig() konfig.Konfig
 
@@ -84,6 +85,10 @@ func New(u *umwelt.Umwelt, age age.Age) (s *zettels, err error) {
 	}
 
 	return
+}
+
+func (zs *zettels) Umwelt() *umwelt.Umwelt {
+	return zs.umwelt
 }
 
 func (zs *zettels) Age() age.Age {
@@ -409,12 +414,14 @@ OUTER:
 		}
 
 		if otherZettel, ok := ns[named.Hinweis.String()]; ok {
-			err = errors.Errorf(
-				"two separate zettels with hinweis: %s:\n%s\n%s",
-				named.Hinweis,
-				otherZettel.Sha,
-				named.Sha,
+			err = errors.Normal(
+				ErrZettelSplitHistory{
+					Hinweis: named.Hinweis,
+					ShaA:    otherZettel.Sha,
+					ShaB:    named.Sha,
+				},
 			)
+
 			return
 		}
 

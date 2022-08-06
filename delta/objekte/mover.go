@@ -11,12 +11,13 @@ import (
 
 type Mover struct {
 	basePath string
-	file     *os.File
-	*writer
+	file *os.File
+	Writer
+  objektePath string
 }
 
-func NewWriterMover(age age.Age, basePath string) (m Mover, err error) {
-	m = Mover{
+func NewWriterMover(age age.Age, basePath string) (m *Mover, err error) {
+	m = &Mover{
 		basePath: basePath,
 	}
 
@@ -25,7 +26,7 @@ func NewWriterMover(age age.Age, basePath string) (m Mover, err error) {
 		return
 	}
 
-	if m.writer, err = NewWriter(age, m.file); err != nil {
+	if m.Writer, err = NewWriter(age, m.file); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -33,13 +34,13 @@ func NewWriterMover(age age.Age, basePath string) (m Mover, err error) {
 	return
 }
 
-func (m Mover) Close() (err error) {
-	if err = m.writer.Close(); err != nil {
+func (m *Mover) Close() (err error) {
+	if err = m.Writer.Close(); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	sha := m.writer.Sha()
+	sha := m.Writer.Sha()
 	p := m.file.Name()
 
 	if err = open_file_guard.Close(m.file); err != nil {
@@ -47,14 +48,12 @@ func (m Mover) Close() (err error) {
 		return
 	}
 
-	var objektePath string
-
-	if objektePath, err = id.MakeDirIfNecessary(sha, m.basePath); err != nil {
+	if m.objektePath, err = id.MakeDirIfNecessary(sha, m.basePath); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	if err = os.Rename(p, objektePath); err != nil {
+	if err = os.Rename(p, m.objektePath); err != nil {
 		err = errors.Error(err)
 		return
 	}
