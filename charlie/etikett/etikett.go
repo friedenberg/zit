@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/bravo/sha"
 )
 
@@ -20,11 +21,17 @@ func init() {
 
 type Etikett struct {
 	Value string
-	sha   sha.Sha
 }
 
 func (e Etikett) Sha() sha.Sha {
-	return e.sha
+	hash := sha256.New()
+	sr := strings.NewReader(e.String())
+
+	if _, err := io.Copy(hash, sr); err != nil {
+		stdprinter.PanicIfError(err)
+	}
+
+	return sha.FromHash(hash)
 }
 
 func (e Etikett) String() string {
@@ -40,16 +47,6 @@ func (e *Etikett) Set(v string) (err error) {
 		err = errors.Errorf("not a valid tag: '%s'", v)
 		return
 	}
-
-	hash := sha256.New()
-	sr := strings.NewReader(v3)
-
-	if _, err = io.Copy(hash, sr); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
-	e.sha = sha.FromHash(hash)
 
 	e.Value = v3
 

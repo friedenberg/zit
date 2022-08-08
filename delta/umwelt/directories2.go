@@ -1,13 +1,25 @@
 package umwelt
 
+func (u Umwelt) DirVerzeichnisse(p ...string) string {
+	return u.DirZit(append([]string{"Verzeichnisse"}, p...)...)
+}
+
 func (u Umwelt) DirObjekten(p ...string) string {
 	return u.DirZit(append([]string{"Objekten"}, p...)...)
 }
 
-func (u Umwelt) DirZettelen() string {
+func (u Umwelt) DirObjektenZettelen() string {
 	return u.DirObjekten("Zettelen")
 }
 
-func (u Umwelt) DirAkten() string {
+func (u Umwelt) DirObjektenAkten() string {
 	return u.DirObjekten("Akten")
+}
+
+func (u Umwelt) DirVerzeichnisseZettelen() string {
+	return u.DirVerzeichnisse("Zettelen")
+}
+
+func (u Umwelt) DirVerzeichnisseAkten() string {
+	return u.DirVerzeichnisse("Akten")
 }

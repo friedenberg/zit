@@ -4,8 +4,8 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/alfa/errors"
-	"github.com/friedenberg/zit/bravo/node_type"
 	"github.com/friedenberg/zit/bravo/id"
+	"github.com/friedenberg/zit/bravo/node_type"
 	"github.com/friedenberg/zit/bravo/sha"
 	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/delta/objekte"

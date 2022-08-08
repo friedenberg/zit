@@ -123,7 +123,7 @@ func (zs zettels) readStoredZettel(sha sha.Sha) (stored stored_zettel.Stored, er
 	var ok bool
 
 	if cr, ok = s.Read(stored.Sha.String()); !ok {
-		err = errors.Errorf("sha not found: %s", stored.Sha)
+		err = ErrShaNotFound{Sha: stored.Sha}
 		return
 	}
 

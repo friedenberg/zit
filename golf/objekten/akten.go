@@ -1,4 +1,4 @@
-package zettel_store
+package objekten
 
 import (
 	"io"
@@ -6,7 +6,6 @@ import (
 
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/bravo/id"
-	"github.com/friedenberg/zit/bravo/open_file_guard"
 	"github.com/friedenberg/zit/bravo/sha"
 	"github.com/friedenberg/zit/delta/objekte"
 )
@@ -46,7 +45,7 @@ func (w akteMultiWriter) Sha() (s sha.Sha) {
 	return
 }
 
-func (s ZettelStore) AkteWriter() (w objekte.Writer, err error) {
+func (s Store) AkteWriter() (w objekte.Writer, err error) {
 	var inner, outer objekte.Writer
 
 	if inner, err = s.Zettels.AkteWriter(); err != nil {
@@ -54,7 +53,7 @@ func (s ZettelStore) AkteWriter() (w objekte.Writer, err error) {
 		return
 	}
 
-	if outer, err = objekte.NewWriterMover(s.Age(), s.Umwelt().DirAkten()); err != nil {
+	if outer, err = objekte.NewWriterMover(s.Age(), s.Umwelt().DirObjektenAkten()); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -67,41 +66,10 @@ func (s ZettelStore) AkteWriter() (w objekte.Writer, err error) {
 	return
 }
 
-type akteReader struct {
-	file *os.File
-	objekte.Reader
-}
+func (s Store) AkteReader(sha sha.Sha) (r io.ReadCloser, err error) {
+	p := id.Path(sha, s.Umwelt().DirObjektenAkten())
 
-func (ar akteReader) Close() (err error) {
-	if ar.file == nil {
-		err = errors.Errorf("nil file")
-		return
-	}
-
-	if ar.Reader == nil {
-		err = errors.Errorf("nil objekte reader")
-		return
-	}
-
-	if err = ar.Reader.Close(); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
-	// if err = open_file_guard.Close(ar.file); err != nil {
-	// 	err = errors.Error(err)
-	// 	return
-	// }
-
-	return
-}
-
-func (s ZettelStore) AkteReader(sha sha.Sha) (r io.ReadCloser, err error) {
-	ar := akteReader{}
-
-	p := id.Path(sha, s.Umwelt().DirAkten())
-
-	if ar.file, err = open_file_guard.Open(p); err != nil {
+	if r, err = objekte.NewFileReader(s.Age(), p); err != nil {
 		if os.IsNotExist(err) {
 			return s.Zettels.AkteReader(sha)
 		} else {
@@ -109,13 +77,6 @@ func (s ZettelStore) AkteReader(sha sha.Sha) (r io.ReadCloser, err error) {
 			return
 		}
 	}
-
-	if ar.Reader, err = objekte.NewReader(s.Age(), ar.file); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
-	r = ar
 
 	return
 }

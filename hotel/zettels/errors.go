@@ -16,6 +16,32 @@ import (
 	"github.com/google/uuid"
 )
 
+type ErrShaNotFound struct {
+	sha.Sha
+}
+
+func (e ErrShaNotFound) Is(target error) (ok bool) {
+	_, ok = target.(ErrShaNotFound)
+	return
+}
+
+func (e ErrShaNotFound) Error() string {
+	return fmt.Sprintf("%s: not found", e.Sha.String())
+}
+
+type ErrHistoryLoopDetected struct {
+	sha.Sha
+}
+
+func (e ErrHistoryLoopDetected) Is(target error) (ok bool) {
+	_, ok = target.(ErrHistoryLoopDetected)
+	return
+}
+
+func (e ErrHistoryLoopDetected) Error() string {
+	return fmt.Sprintf("%s: loop detected", e.Sha.String())
+}
+
 type ErrZettelDidNotChangeSinceUpdate struct {
 	NamedZettel stored_zettel.Named
 }

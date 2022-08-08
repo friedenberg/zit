@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/alfa/errors"
-	"github.com/friedenberg/zit/alfa/logz"
 )
 
 type Set map[string]Etikett
@@ -116,12 +115,9 @@ func (s Set) Expanded(exes ...Expander) (s1 Set) {
 
 	for _, e := range s {
 		for _, e1 := range *e.Expanded(exes...) {
-			logz.Print(e1)
 			s1.addOnlyExact(e1)
 		}
 	}
-
-	logz.Print(s1)
 
 	return
 }

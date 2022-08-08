@@ -1,7 +1,7 @@
 package sha
 
 func (s Sha) MarshalText() (text []byte, err error) {
-	text = []byte(s.Value)
+	text = []byte(s.String())
 
 	return
 }

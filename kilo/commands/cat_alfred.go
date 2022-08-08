@@ -5,8 +5,8 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/alfa/errors"
-	"github.com/friedenberg/zit/bravo/node_type"
 	"github.com/friedenberg/zit/alfa/stdprinter"
+	"github.com/friedenberg/zit/bravo/node_type"
 	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/golf/alfred"

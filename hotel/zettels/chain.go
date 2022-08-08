@@ -30,7 +30,7 @@ func (zs zettels) AllInChain(id id.Id) (c Chain, err error) {
 		}
 
 		if _, ok := shas[s.String()]; ok {
-			err = errors.Errorf("loop detected in history for sha '%s'", s)
+			err = ErrHistoryLoopDetected{Sha: s}
 			return
 		}
 

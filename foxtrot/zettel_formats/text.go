@@ -169,10 +169,10 @@ func (f Text) ReadFrom(c *zettel.FormatContextRead) (n int64, err error) {
 
 			if c.AktePath != "" {
 				c.RecoverableError = ErrHasInlineAkteAndFilePath{
-					Zettel:                   c.Zettel,
+					Zettel:            c.Zettel,
 					AkteWriterFactory: c,
-					Sha:                      state.readAkteSha,
-					FilePath:                 c.AktePath,
+					Sha:               state.readAkteSha,
+					FilePath:          c.AktePath,
 				}
 
 				c.AktePath = ""

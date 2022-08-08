@@ -10,14 +10,14 @@ import (
 	"github.com/friedenberg/zit/foxtrot/etiketten"
 	"github.com/friedenberg/zit/foxtrot/hinweisen"
 	"github.com/friedenberg/zit/golf/checkout_store"
-	"github.com/friedenberg/zit/golf/zettel_store"
+	"github.com/friedenberg/zit/golf/objekten"
 	"github.com/friedenberg/zit/hotel/zettels"
 )
 
 type Store struct {
 	*umwelt.Umwelt
 	lock           *file_lock.Lock
-	zettels        zettels.Zettels
+	zettels        objekten.Store
 	akten          akten.Akten
 	age            age.Age
 	checkout_store *checkout_store.Store
@@ -37,12 +37,19 @@ func New(u *umwelt.Umwelt) (s Store, err error) {
 		return
 	}
 
-	if s.zettels, err = zettels.New(u, s.age); err != nil {
+	var zettelStore zettels.Zettels
+
+	if zettelStore, err = zettels.New(u, s.age); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	s.zettels = zettel_store.ZettelStore{Zettels: s.zettels}
+	s.zettels = objekten.Store{Zettels: zettelStore}
+
+	if err = s.zettels.Initialize(u); err != nil {
+		err = errors.Wrapped(err, "failed to initialize zettel meta store")
+		return
+	}
 
 	if s.akten, err = akten.New(u.DirZit()); err != nil {
 		err = errors.Error(err)
@@ -67,7 +74,7 @@ func (s Store) Age() age.Age {
 	return s.age
 }
 
-func (s Store) Zettels() zettels.Zettels {
+func (s Store) Zettels() objekten.Store {
 	return s.zettels
 }
 

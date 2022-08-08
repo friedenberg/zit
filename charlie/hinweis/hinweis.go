@@ -1,19 +1,24 @@
 package hinweis
 
 import (
+	"crypto/sha256"
 	"fmt"
+	"io"
 	"strings"
 
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/kennung"
 	"github.com/friedenberg/zit/alfa/logz"
+	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/bravo/id"
+	"github.com/friedenberg/zit/bravo/sha"
 )
 
 type Hinweis interface {
 	id.Id
 	Set(string) error
 	Equals(Hinweis) bool
+	Sha() sha.Sha
 }
 
 type hinweis struct {
@@ -26,8 +31,11 @@ type Provider interface {
 
 func NewEmpty() (h *hinweis) {
 	h = &hinweis{}
+
 	return
 }
+
+//TODO is this really necessary?;w
 
 func New(i kennung.Int, pl Provider, pr Provider) (h *hinweis, err error) {
 	k := kennung.Kennung{}
@@ -115,4 +123,15 @@ func (h *hinweis) Set(v string) (err error) {
 	h.right = parts[1]
 
 	return
+}
+
+func (h hinweis) Sha() sha.Sha {
+	hash := sha256.New()
+	sr := strings.NewReader(h.String())
+
+	if _, err := io.Copy(hash, sr); err != nil {
+		stdprinter.PanicIfError(err)
+	}
+
+	return sha.FromHash(hash)
 }
