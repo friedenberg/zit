@@ -187,6 +187,11 @@ func (s Store) Reindex() (err error) {
 				Stored:  sz,
 			}
 
+			if err = s.writeZettelObjekte(sz.Zettel); err != nil {
+				err = errors.Error(err)
+				return
+			}
+
 			if err = s.writeNamedZettelToIndex(nz); err != nil {
 				err = errors.Error(err)
 				return
