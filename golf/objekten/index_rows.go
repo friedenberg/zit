@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/bravo/zk_types"
 	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
-	"github.com/friedenberg/zit/verzeichnisse"
+	"github.com/friedenberg/zit/charlie/verzeichnisse"
 )
 
 func (s Store) indexRowsForZettel(nz stored_zettel.Named) (rs []verzeichnisse.Row, err error) {

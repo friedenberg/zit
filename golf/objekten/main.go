@@ -20,8 +20,8 @@ import (
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/foxtrot/zettel_formats"
 	"github.com/friedenberg/zit/hotel/zettels"
-	"github.com/friedenberg/zit/ts"
-	"github.com/friedenberg/zit/verzeichnisse"
+	"github.com/friedenberg/zit/charlie/ts"
+	"github.com/friedenberg/zit/charlie/verzeichnisse"
 )
 
 type Store struct {
@@ -198,6 +198,19 @@ func (s *Store) CreateWithHinweis(in zettel.Zettel, h hinweis.Hinweis) (z stored
 	return
 }
 
+func (s Store) AllTails() (tails map[hinweis.Hinweis]stored_zettel.Named, err error) {
+	rr := indexReaderManyTail{}
+
+	if err = s.zettelIndex.ReadAll(&rr); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	tails = rr.zettels
+
+	return
+}
+
 func (s *Store) Update(z stored_zettel.Named) (stored stored_zettel.Named, err error) {
 	if stored, err = s.Zettels.Update(z); err != nil {
 		err = errors.Error(err)
@@ -257,7 +270,10 @@ func (s Store) AllInChain(h hinweis.Hinweis) (c zettels.Chain, err error) {
 	}
 
 	c.Hinweis = rr.Hinweis
-	c.Zettels = rr.zettels
+
+	for _, z := range rr.zettels {
+		c.Zettels = append(c.Zettels, z.Stored)
+	}
 
 	return
 

@@ -8,12 +8,16 @@ import (
 	"github.com/friedenberg/zit/bravo/zk_types"
 	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
-	"github.com/friedenberg/zit/verzeichnisse"
+	"github.com/friedenberg/zit/charlie/verzeichnisse"
 )
 
 type indexReaderChain struct {
 	hinweis.Hinweis
-	zettels []stored_zettel.Stored
+	zettels []stored_zettel.Named
+}
+
+func (r *indexReaderChain) Begin() (err error) {
+	return
 }
 
 func (r *indexReaderChain) ReadRow(id string, row verzeichnisse.Row) (err error) {
@@ -35,12 +39,12 @@ func (r *indexReaderChain) ReadRow(id string, row verzeichnisse.Row) (err error)
 		return
 	}
 
-	r.zettels = append(r.zettels, nz.Stored)
+	r.zettels = append(r.zettels, nz)
 
 	return
 }
 
-func (r *indexReaderChain) Done() (err error) {
+func (r *indexReaderChain) End() (err error) {
 	if len(r.zettels) == 0 {
 		err = ErrNotFound{Id: r.Hinweis}
 		return

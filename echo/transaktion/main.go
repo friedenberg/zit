@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/bravo/zk_types"
 	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/charlie/hinweis"
-	"github.com/friedenberg/zit/ts"
+	"github.com/friedenberg/zit/charlie/ts"
 )
 
 type Transaktion struct {

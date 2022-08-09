@@ -8,6 +8,7 @@ import (
 
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/bravo/sha"
+	"github.com/friedenberg/zit/bravo/zk_types"
 )
 
 type Id interface {
@@ -17,9 +18,9 @@ type Id interface {
 	Sha() sha.Sha
 }
 
-type MutableId interface {
-	Id
-	// SetParts(string, string)
+type TypedId interface {
+  Id
+	Type() zk_types.Type
 }
 
 func Path(i Id, pc ...string) string {

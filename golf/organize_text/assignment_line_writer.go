@@ -50,7 +50,7 @@ func (av assignmentLineWriter) write(a *assignment) (err error) {
 		av.WriteExactlyOneEmpty()
 	}
 
-	for _, c := range a.children {
+	for _, c := range a.childrenSorted() {
 		av.write(c)
 	}
 

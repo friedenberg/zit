@@ -58,7 +58,6 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		Umwelt:        u,
 		GroupBy:       etikett.NewSlice(),
 		RootEtiketten: c.Etiketten,
-		// GroupByUnique: true,
 	}
 
 	var createOrganizeFileResults user_ops.CreateOrganizeFileResults

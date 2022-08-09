@@ -67,7 +67,10 @@ func (i *Index) ReadPages(r Reader, ids ...string) (err error) {
 	wg := &sync.WaitGroup{}
 	wg.Add(len(ids))
 
-	logz.Print()
+	if err = r.Begin(); err != nil {
+		err = errors.Wrapped(err, "closing index reader failed")
+		return
+	}
 
 	for _, id := range ids {
 		logz.PrintDebug(id)
@@ -90,7 +93,7 @@ func (i *Index) ReadPages(r Reader, ids ...string) (err error) {
 
 	wg.Wait()
 
-	if err = r.Done(); err != nil {
+	if err = r.End(); err != nil {
 		err = errors.Wrapped(err, "closing index reader failed")
 		return
 	}

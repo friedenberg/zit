@@ -9,8 +9,9 @@ import (
 type IdTransformer func(sha.Sha) string
 
 type Reader interface {
+	Begin() (err error)
 	ReadRow(string, Row) (err error)
-	Done() (err error)
+	End() (err error)
 }
 
 type ReadCloserFactory interface {

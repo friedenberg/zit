@@ -1,6 +1,8 @@
 package organize_text
 
 import (
+	"sort"
+
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/logz"
 	"github.com/friedenberg/zit/charlie/etikett"
@@ -67,4 +69,12 @@ func (a *assignment) nthParent(n int) (p *assignment, err error) {
 	}
 
 	return a.parent.nthParent(n - 1)
+}
+
+func (a *assignment) childrenSorted() []*assignment {
+	sort.Slice(a.children, func(i, j int) bool {
+		return a.children[i].etiketten.String() < a.children[j].etiketten.String()
+	})
+
+	return a.children
 }

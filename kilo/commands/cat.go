@@ -7,8 +7,8 @@ import (
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/logz"
 	"github.com/friedenberg/zit/alfa/stdprinter"
-	"github.com/friedenberg/zit/bravo/node_type"
 	"github.com/friedenberg/zit/bravo/sha"
+	"github.com/friedenberg/zit/bravo/zk_types"
 	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/echo/zettel"
@@ -19,7 +19,7 @@ import (
 )
 
 type Cat struct {
-	Type   node_type.Type
+	zk_types.Type
 	Format string
 }
 
@@ -28,7 +28,7 @@ func init() {
 		"cat",
 		func(f *flag.FlagSet) Command {
 			c := &Cat{
-				Type: node_type.TypeUnknown,
+				Type: zk_types.TypeUnknown,
 			}
 
 			f.Var(&c.Type, "type", "ObjekteType")
@@ -41,16 +41,16 @@ func init() {
 
 func (c Cat) RunWithLockedStore(store store_with_lock.Store, args ...string) (err error) {
 	switch c.Type {
-	case node_type.TypeEtikett:
+	case zk_types.TypeEtikett:
 		err = c.etiketten(store)
 
-	case node_type.TypeZettel:
+	case zk_types.TypeZettel:
 		err = c.zettelen(store)
 
-	case node_type.TypeAkte:
+	case zk_types.TypeAkte:
 		err = c.akten(store)
 
-	case node_type.TypeHinweis:
+	case zk_types.TypeHinweis:
 		err = c.hinweisen(store)
 
 	default:
@@ -90,9 +90,9 @@ OUTER:
 }
 
 func (c Cat) zettelen(store store_with_lock.Store) (err error) {
-	var all map[string]stored_zettel.Named
+	var all map[hinweis.Hinweis]stored_zettel.Named
 
-	if all, err = store.Zettels().All(); err != nil {
+	if all, err = store.Zettels().AllTails(); err != nil {
 		err = errors.Error(err)
 		return
 	}

@@ -4,7 +4,7 @@ import (
 	"github.com/friedenberg/zit/bravo/sha"
 	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/echo/zettel"
-	"github.com/friedenberg/zit/ts"
+	"github.com/friedenberg/zit/charlie/ts"
 )
 
 type Stored struct {
