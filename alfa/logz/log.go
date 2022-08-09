@@ -87,7 +87,8 @@ func Printf(f string, vs ...interface{}) {
 	}
 
 	vs = append([]interface{}{LogPrefix()}, vs...)
-	os.Stderr.WriteString(fmt.Sprintf("%s"+f, vs...))
+  //TODO strip trailing newline and add back
+	os.Stderr.WriteString(fmt.Sprintf("%s"+f+"\n", vs...))
 }
 
 func PrintDebug(vs ...interface{}) {

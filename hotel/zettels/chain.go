@@ -14,10 +14,10 @@ type Chain struct {
 	Zettels []stored_zettel.Stored
 }
 
-func (zs zettels) AllInChain(id id.Id) (c Chain, err error) {
+func (zs zettels) AllInChain(h hinweis.Hinweis) (c Chain, err error) {
 	var s sha.Sha
 
-	if s, c.Hinweis, err = zs.TailFromId(id); err != nil {
+	if s, c.Hinweis, err = zs.TailFromId(h); err != nil {
 		err = errors.Error(err)
 		return
 	}

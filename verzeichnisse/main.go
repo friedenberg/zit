@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/logz"
 	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
 )
@@ -34,6 +35,7 @@ func NewIndex(
 	w WriteCloserFactory,
 	idTransformer IdTransformer,
 ) (i *Index, err error) {
+	logz.Print("initing verzeichnisse")
 	i = &Index{
 		path:               path,
 		pages:              make(map[string]*page),
@@ -62,17 +64,24 @@ func (i *Index) Flush() (err error) {
 }
 
 func (i *Index) ReadPages(r Reader, ids ...string) (err error) {
-	i.rwLock.RLock()
-	defer i.rwLock.RUnlock()
-
 	wg := &sync.WaitGroup{}
 	wg.Add(len(ids))
 
+	logz.Print()
+
 	for _, id := range ids {
-		func(id string) {
+		logz.PrintDebug(id)
+		go func(id string) {
 			defer wg.Done()
 
-			if _, err = i.readPage(id, r); err != nil {
+			var p *page
+
+			if p, err = i.readPage(id); err != nil {
+				err = errors.Error(err)
+				return
+			}
+
+			if err = i.readPageRows(id, p, r); err != nil {
 				err = errors.Error(err)
 				return
 			}
@@ -121,45 +130,49 @@ func (i *Index) WriteRows(rowMaker RowMaker) (err error) {
 }
 
 func (i *Index) Write(rs ...Row) (err error) {
-	i.rwLock.Lock()
-	defer i.rwLock.Unlock()
-
 	for _, r := range rs {
 		id := i.idTransformer(r.Sha)
 
-		var p *page
-
-		if p, err = i.readPage(id, nil); err != nil {
+		if err = i.writeRow(id, r); err != nil {
 			err = errors.Error(err)
 			return
 		}
-
-		if p == nil {
-			err = errors.Errorf("read page returned nil for page: %s", id)
-			return
-		}
-
-		//TODO should this be deduped?
-		p.rows = append(p.rows, r)
-		p.hasChanges = true
 	}
 
 	return
 }
 
-//   _               _      ____                  _              _
-//  | |    ___   ___| | __ |  _ \ ___  __ _ _   _(_)_ __ ___  __| |
-//  | |   / _ \ / __| |/ / | |_) / _ \/ _` | | | | | '__/ _ \/ _` |
-//  | |__| (_) | (__|   <  |  _ <  __/ (_| | |_| | | | |  __/ (_| |
-//  |_____\___/ \___|_|\_\ |_| \_\___|\__, |\__,_|_|_|  \___|\__,_|
-//                                       |_|
+func (i *Index) writeRow(id string, row Row) (err error) {
+	var p *page
 
-func (i *Index) readPage(id string, rowReader Reader) (p *page, err error) {
-	ok := false
-
-	if p, ok = i.pages[id]; ok {
+	if p, err = i.readPage(id); err != nil {
+		err = errors.Error(err)
 		return
 	}
+
+	if p == nil {
+		err = errors.Errorf("read page returned nil for page: %s", id)
+		return
+	}
+
+	//TODO should this be deduped?
+	p.rows = append(p.rows, row)
+	p.hasChanges = true
+
+	return
+}
+
+func (i *Index) readPage(id string) (p *page, err error) {
+	ok := false
+
+	i.rwLock.RLock()
+
+	if p, ok = i.pages[id]; ok {
+		i.rwLock.RUnlock()
+		return
+	}
+
+	i.rwLock.RUnlock()
 
 	p = &page{
 		rows: make([]Row, 0),
@@ -199,24 +212,32 @@ func (i *Index) readPage(id string, rowReader Reader) (p *page, err error) {
 		}
 	}
 
+	i.rwLock.Lock()
+	defer i.rwLock.Unlock()
+
 	i.pages[id] = p
 
-	if rowReader == nil {
+	return
+}
+
+//   _               _      ____                  _              _
+//  | |    ___   ___| | __ |  _ \ ___  __ _ _   _(_)_ __ ___  __| |
+//  | |   / _ \ / __| |/ / | |_) / _ \/ _` | | | | | '__/ _ \/ _` |
+//  | |__| (_) | (__|   <  |  _ <  __/ (_| | |_| | | | |  __/ (_| |
+//  |_____\___/ \___|_|\_\ |_| \_\___|\__, |\__,_|_|_|  \___|\__,_|
+//                                       |_|
+
+func (i *Index) readPageRows(id string, p *page, rr Reader) (err error) {
+	if rr == nil {
 		return
 	}
 
-	wg := &sync.WaitGroup{}
-	wg.Add(len(p.rows))
-
 	for _, row := range p.rows {
-		go func(row Row) {
-			defer wg.Done()
-			//TODO errors???
-			rowReader.ReadRow(row)
-		}(row)
+		if err = rr.ReadRow(id, row); err != nil {
+			err = errors.Wrapped(err, "row reader failed to read row")
+			return
+		}
 	}
-
-	wg.Wait()
 
 	return
 }

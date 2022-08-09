@@ -4,6 +4,7 @@ import (
 	"github.com/friedenberg/zit/bravo/sha"
 	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/echo/zettel"
+	"github.com/friedenberg/zit/ts"
 )
 
 type Stored struct {
@@ -18,6 +19,11 @@ type Named struct {
 	Hinweis hinweis.Hinweis
 }
 
+type Transacted struct {
+	Named
+	ts.Time
+}
+
 type External struct {
 	Path     string
 	AktePath string
@@ -27,6 +33,7 @@ type External struct {
 }
 
 type CheckedOut struct {
+	//TODO change to Transacted
 	Internal Named
 	External External
 }

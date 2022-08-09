@@ -17,7 +17,7 @@ import (
 type Store struct {
 	*umwelt.Umwelt
 	lock           *file_lock.Lock
-	zettels        objekten.Store
+	zettels        *objekten.Store
 	akten          akten.Akten
 	age            age.Age
 	checkout_store *checkout_store.Store
@@ -44,7 +44,7 @@ func New(u *umwelt.Umwelt) (s Store, err error) {
 		return
 	}
 
-	s.zettels = objekten.Store{Zettels: zettelStore}
+	s.zettels = &objekten.Store{Zettels: zettelStore}
 
 	if err = s.zettels.Initialize(u); err != nil {
 		err = errors.Wrapped(err, "failed to initialize zettel meta store")
@@ -74,7 +74,7 @@ func (s Store) Age() age.Age {
 	return s.age
 }
 
-func (s Store) Zettels() objekten.Store {
+func (s Store) Zettels() *objekten.Store {
 	return s.zettels
 }
 

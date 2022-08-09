@@ -12,6 +12,10 @@ func (u Umwelt) DirObjektenZettelen() string {
 	return u.DirObjekten("Zettelen")
 }
 
+func (u Umwelt) DirObjektenTransaktion() string {
+	return u.DirObjekten("Transaktion")
+}
+
 func (u Umwelt) DirObjektenAkten() string {
 	return u.DirObjekten("Akten")
 }

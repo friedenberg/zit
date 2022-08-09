@@ -1,9 +1,13 @@
 package open_file_guard
 
-import "github.com/friedenberg/zit/alfa/errors"
+import (
+	"path"
 
-func ReadDirNames(p string) (names []string, err error) {
-	d, err := Open(p)
+	"github.com/friedenberg/zit/alfa/errors"
+)
+
+func ReadDirNames(ps ...string) (names []string, err error) {
+	d, err := Open(path.Join(ps...))
 
 	if err != nil {
 		err = errors.Error(err)

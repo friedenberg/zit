@@ -44,6 +44,10 @@ func (s Sha) String() string {
 	}
 }
 
+func (s Sha) Sha() Sha {
+	return s
+}
+
 func (s *Sha) SetFromHash(h hash.Hash) {
 	s.Value = fmt.Sprintf("%x", h.Sum(nil))
 }

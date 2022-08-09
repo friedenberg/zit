@@ -9,7 +9,7 @@ import (
 type IdTransformer func(sha.Sha) string
 
 type Reader interface {
-	ReadRow(Row) (err error)
+	ReadRow(string, Row) (err error)
 	Done() (err error)
 }
 

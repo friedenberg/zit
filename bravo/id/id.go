@@ -7,17 +7,19 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/bravo/sha"
 )
 
 type Id interface {
 	Head() string
 	Tail() string
 	String() string
+	Sha() sha.Sha
 }
 
 type MutableId interface {
 	Id
-	SetParts(string, string)
+	// SetParts(string, string)
 }
 
 func Path(i Id, pc ...string) string {

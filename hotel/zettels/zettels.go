@@ -21,7 +21,7 @@ import (
 )
 
 type Zettels interface {
-	AllInChain(id id.Id) (c Chain, err error)
+	AllInChain(h hinweis.Hinweis) (c Chain, err error)
 	All() (map[string]stored_zettel.Named, error)
 	Query(stored_zettel.NamedFilter) (map[string]stored_zettel.Named, error)
 
@@ -403,9 +403,6 @@ OUTER:
 			}
 
 			logz.Print("checking for hide matches")
-			logz.Print(tn)
-			logz.Print(prefixes)
-			logz.Print(prefixes.ContainsString(tn))
 
 			if prefixes.ContainsString(tn) {
 				logz.Printf("hiding %s due to %s", named.Hinweis, tn)
@@ -413,16 +410,17 @@ OUTER:
 			}
 		}
 
-		if otherZettel, ok := ns[named.Hinweis.String()]; ok {
-			err = errors.Normal(
-				ErrZettelSplitHistory{
-					Hinweis: named.Hinweis,
-					ShaA:    otherZettel.Sha,
-					ShaB:    named.Sha,
-				},
-			)
+		if _, ok := ns[named.Hinweis.String()]; ok {
+			continue
+			// err = errors.Normal(
+			// 	ErrZettelSplitHistory{
+			// 		Hinweis: named.Hinweis,
+			// 		ShaA:    otherZettel.Sha,
+			// 		ShaB:    named.Sha,
+			// 	},
+			// )
 
-			return
+			// return
 		}
 
 		ns[named.Hinweis.String()] = named

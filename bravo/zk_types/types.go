@@ -53,7 +53,7 @@ func (t *Type) Set(v string) (err error) {
 	case "akte":
 		*t = TypeAkte
 
-	case "akte_typ":
+	case "aktetyp":
 		*t = TypeAkteTyp
 
 	case "etikett":

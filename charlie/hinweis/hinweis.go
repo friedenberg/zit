@@ -2,6 +2,7 @@ package hinweis
 
 import (
 	"crypto/sha256"
+	"encoding/gob"
 	"fmt"
 	"io"
 	"strings"
@@ -10,50 +11,46 @@ import (
 	"github.com/friedenberg/zit/alfa/kennung"
 	"github.com/friedenberg/zit/alfa/logz"
 	"github.com/friedenberg/zit/alfa/stdprinter"
-	"github.com/friedenberg/zit/bravo/id"
 	"github.com/friedenberg/zit/bravo/sha"
 )
 
-type Hinweis interface {
-	id.Id
-	Set(string) error
-	Equals(Hinweis) bool
-	Sha() sha.Sha
+func init() {
+	gob.RegisterName("Hinweis", Hinweis{})
 }
 
-type hinweis struct {
-	left, right string
+type Hinweis struct {
+	Left, Right string
 }
 
 type Provider interface {
 	Hinweis(i kennung.Int) (string, error)
 }
 
-func NewEmpty() (h *hinweis) {
-	h = &hinweis{}
+func NewEmpty() (h Hinweis) {
+	h = Hinweis{}
 
 	return
 }
 
 //TODO is this really necessary?;w
 
-func New(i kennung.Int, pl Provider, pr Provider) (h *hinweis, err error) {
+func New(i kennung.Int, pl Provider, pr Provider) (h Hinweis, err error) {
 	k := kennung.Kennung{}
 	k.SetInt(i)
 
-	h = &hinweis{}
+	h = Hinweis{}
 
 	logz.Print("making kennung")
 
 	logz.Print("making left")
-	if h.left, err = pl.Hinweis(k.Left); err != nil {
+	if h.Left, err = pl.Hinweis(k.Left); err != nil {
 		logz.Printf("left failed: %s", err)
 		err = errors.Errorf("failed to make left kennung: %s", err)
 		return
 	}
 
 	logz.Print("making right")
-	if h.right, err = pr.Hinweis(k.Right); err != nil {
+	if h.Right, err = pr.Hinweis(k.Right); err != nil {
 		err = errors.Errorf("failed to make right kennung: %s", err)
 		return
 	}
@@ -69,8 +66,8 @@ func New(i kennung.Int, pl Provider, pr Provider) (h *hinweis, err error) {
 	return
 }
 
-func MakeBlindHinweis(v string) (h *hinweis, err error) {
-	h = &hinweis{}
+func MakeBlindHinweis(v string) (h Hinweis, err error) {
+	h = Hinweis{}
 
 	if err = h.Set(v); err != nil {
 		return
@@ -79,26 +76,26 @@ func MakeBlindHinweis(v string) (h *hinweis, err error) {
 	return
 }
 
-func MakeBlindHinweisParts(left, right string) (h hinweis) {
-	h.left = left
-	h.right = right
+func MakeBlindHinweisParts(left, right string) (h Hinweis) {
+	h.Left = left
+	h.Right = right
 
 	return
 }
 
-func (h hinweis) Head() string {
-	return h.left
+func (h Hinweis) Head() string {
+	return h.Left
 }
 
-func (h hinweis) Tail() string {
-	return h.right
+func (h Hinweis) Tail() string {
+	return h.Right
 }
 
-func (h hinweis) String() string {
-	return fmt.Sprintf("%s/%s", h.left, h.right)
+func (h Hinweis) String() string {
+	return fmt.Sprintf("%s/%s", h.Left, h.Right)
 }
 
-func (h *hinweis) Set(v string) (err error) {
+func (h *Hinweis) Set(v string) (err error) {
 	v = strings.ToLower(v)
 	v = strings.Map(
 		func(r rune) rune {
@@ -119,13 +116,13 @@ func (h *hinweis) Set(v string) (err error) {
 		return
 	}
 
-	h.left = parts[0]
-	h.right = parts[1]
+	h.Left = parts[0]
+	h.Right = parts[1]
 
 	return
 }
 
-func (h hinweis) Sha() sha.Sha {
+func (h Hinweis) Sha() sha.Sha {
 	hash := sha256.New()
 	sr := strings.NewReader(h.String())
 
