@@ -20,8 +20,6 @@ import (
 )
 
 type Zettels interface {
-	AllInChain(h hinweis.Hinweis) (c Chain, err error)
-
 	ReadZettel(sha sha.Sha) (z stored_zettel.Stored, err error)
 	Read(id id.Id) (z stored_zettel.Named, err error)
 	Create(zettel.Zettel) (z stored_zettel.Named, err error)
