@@ -72,7 +72,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		pairs[i] = p
 	}
 
-	zettels := make([]stored_zettel.Named, len(pairs))
+	zettels := make([]stored_zettel.Transacted, len(pairs))
 
 	// iterate through pairs and read current zettel
 	for i, p := range pairs {
@@ -123,7 +123,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	for _, z := range zettels {
-		if z, err = store.Zettels().Update(z); err != nil {
+		if z, err = store.Zettels().Update(z.Named); err != nil {
 			err = errors.Error(err)
 			return
 		}

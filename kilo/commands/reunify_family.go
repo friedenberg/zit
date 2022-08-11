@@ -23,19 +23,22 @@ func init() {
 	)
 }
 
-func (c ReunifyFamily) RunWithZettel(store store_with_lock.Store, zettel ...stored_zettel.Named) (err error) {
+func (c ReunifyFamily) RunWithZettel(
+	store store_with_lock.Store,
+	zettel ...stored_zettel.Transacted,
+) (err error) {
 	mutter := zettel[0]
 	kinder := zettel[1]
 
 	mutter.Kinder = kinder.Sha
 	kinder.Mutter = mutter.Sha
 
-	if err = store.Zettels().UpdateNoKinder(mutter); err != nil {
+	if err = store.Zettels().UpdateNoKinder(mutter.Named); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	if err = store.Zettels().UpdateNoKinder(kinder); err != nil {
+	if err = store.Zettels().UpdateNoKinder(kinder.Named); err != nil {
 		err = errors.Error(err)
 		return
 	}

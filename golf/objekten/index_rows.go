@@ -7,8 +7,8 @@ import (
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/bravo/zk_types"
 	"github.com/friedenberg/zit/charlie/etikett"
-	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/charlie/verzeichnisse"
+	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 )
 
 func (s Store) indexRowsForZettel(nz stored_zettel.Named) (rs []verzeichnisse.Row, err error) {
@@ -22,13 +22,25 @@ func (s Store) indexRowsForZettel(nz stored_zettel.Named) (rs []verzeichnisse.Ro
 		return
 	}
 
-	for _, e := range nz.Zettel.Etiketten.Expanded(etikett.ExpanderAll{}) {
+	for _, e := range nz.Zettel.Etiketten {
 		rs = append(
 			rs,
 			verzeichnisse.Row{
 				Sha:     e.Sha(),
 				Key:     e.String(),
 				Type:    zk_types.TypeEtikett.String(),
+				Objekte: b.Bytes(),
+			},
+		)
+	}
+
+	for _, e := range nz.Zettel.Etiketten.Expanded(etikett.ExpanderAll{}) {
+		rs = append(
+			rs,
+			verzeichnisse.Row{
+				Sha:     e.Sha(),
+				Key:     e.String(),
+				Type:    zk_types.TypeEtikett.String() + "Expanded",
 				Objekte: b.Bytes(),
 			},
 		)

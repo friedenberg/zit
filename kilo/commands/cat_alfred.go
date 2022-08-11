@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/bravo/node_type"
 	"github.com/friedenberg/zit/charlie/etikett"
+	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/golf/alfred"
 	"github.com/friedenberg/zit/india/store_with_lock"
@@ -61,7 +62,7 @@ func (c CatAlfred) RunWithLockedStore(store store_with_lock.Store, args ...strin
 	case node_type.TypeEtikett:
 		var ea []etikett.Etikett
 
-		if ea, err = store.Etiketten().All(); err != nil {
+		if ea, err = store.Zettels().Etiketten(); err != nil {
 			err = errors.Error(err)
 			return
 		}
@@ -72,15 +73,15 @@ func (c CatAlfred) RunWithLockedStore(store store_with_lock.Store, args ...strin
 
 	case node_type.TypeZettel:
 
-		var all map[string]stored_zettel.Named
+		var all map[hinweis.Hinweis]stored_zettel.Transacted
 
-		if all, err = store.Zettels().All(); err != nil {
+		if all, err = store.Zettels().ZettelTails(); err != nil {
 			err = errors.Error(err)
 			return
 		}
 
 		for _, z := range all {
-			aw.WriteZettel(z)
+			aw.WriteZettel(z.Named)
 		}
 
 	case node_type.TypeAkte:

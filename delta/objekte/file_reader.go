@@ -48,10 +48,10 @@ func (ar objekteReader) Close() (err error) {
 		return
 	}
 
-	// if err = open_file_guard.Close(ar.file); err != nil {
-	// 	err = errors.Error(err)
-	// 	return
-	// }
+	if err = open_file_guard.Close(ar.file); err != nil {
+		err = errors.Error(err)
+		return
+	}
 
 	return
 }

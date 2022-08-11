@@ -61,3 +61,17 @@ func (t Time) Sha() sha.Sha {
 
 	return sha.FromHash(hash)
 }
+
+func (t Time) MarshalText() (text []byte, err error) {
+	text = []byte(t.String())
+
+	return
+}
+
+func (t *Time) UnmarshalText(text []byte) (err error) {
+	if err = t.Set(string(text)); err != nil {
+		return
+	}
+
+	return
+}

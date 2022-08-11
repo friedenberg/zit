@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"runtime"
 	"strings"
+
+	"github.com/friedenberg/zit/alfa/logz"
 )
 
 type errer struct {
@@ -32,6 +34,8 @@ func (e wrapped) Unwrap() error {
 }
 
 func Wrapped(in error, f string, values ...interface{}) (err errer) {
+	defer logz.CallerNonEmpty(1, err)
+
 	err = errer{
 		errers: []error{
 			wrapped{
@@ -49,6 +53,8 @@ func Wrapped(in error, f string, values ...interface{}) (err errer) {
 }
 
 func Errorf(f string, values ...interface{}) (err errer) {
+	defer logz.CallerNonEmpty(1, err)
+
 	err = errer{
 		errers: []error{
 			errors.New(fmt.Sprintf(f, values...)),
@@ -102,6 +108,8 @@ func (se stackWrapError) Error() string {
 }
 
 func Error(in error) (err error) {
+	defer logz.CallerNonEmpty(1, err)
+
 	var normal normalError
 
 	if As(in, &normal) {

@@ -2,7 +2,7 @@ package verzeichnisse
 
 import (
 	"bufio"
-	"encoding/json"
+	"encoding/gob"
 	"io"
 	"path"
 	"sync"
@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/alfa/logz"
 	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
+	"github.com/friedenberg/zit/delta/objekte"
 )
 
 type RowMaker func() ([]Row, error)
@@ -20,8 +21,8 @@ type Index struct {
 	idTransformer IdTransformer
 	rwLock        *sync.RWMutex
 	pages         map[string]*page
-	ReadCloserFactory
-	WriteCloserFactory
+	objekte.ReadCloserFactory
+	objekte.WriteCloserFactory
 }
 
 type page struct {
@@ -31,8 +32,8 @@ type page struct {
 
 func NewIndex(
 	path string,
-	r ReadCloserFactory,
-	w WriteCloserFactory,
+	r objekte.ReadCloserFactory,
+	w objekte.WriteCloserFactory,
 	idTransformer IdTransformer,
 ) (i *Index, err error) {
 	logz.Print("initing verzeichnisse")
@@ -64,6 +65,7 @@ func (i *Index) Flush() (err error) {
 }
 
 func (i *Index) ReadPages(r Reader, ids ...string) (err error) {
+	logz.Printf("reading pages: %s", ids)
 	wg := &sync.WaitGroup{}
 	wg.Add(len(ids))
 
@@ -158,6 +160,7 @@ func (i *Index) writeRow(id string, row Row) (err error) {
 		return
 	}
 
+	logz.Print("writing row")
 	//TODO should this be deduped?
 	p.rows = append(p.rows, row)
 	p.hasChanges = true
@@ -171,9 +174,12 @@ func (i *Index) readPage(id string) (p *page, err error) {
 	i.rwLock.RLock()
 
 	if p, ok = i.pages[id]; ok {
+		logz.Printf("page was cached: %s", id)
 		i.rwLock.RUnlock()
 		return
 	}
+
+	logz.Printf("page needs to be read: %s", id)
 
 	i.rwLock.RUnlock()
 
@@ -190,7 +196,7 @@ func (i *Index) readPage(id string) (p *page, err error) {
 
 		r := bufio.NewReader(r1)
 
-		dec := json.NewDecoder(r)
+		dec := gob.NewDecoder(r)
 
 		var rows []Row
 
@@ -263,7 +269,7 @@ func (i *Index) writePage(id string, p *page) (err error) {
 
 	defer stdprinter.PanicIfError(w.Flush)
 
-	enc := json.NewEncoder(w)
+	enc := gob.NewEncoder(w)
 
 	if err = enc.Encode(p.rows); err != nil {
 		err = errors.Wrapped(err, "failed to write encoded page: %s", id)

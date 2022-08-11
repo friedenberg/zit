@@ -28,7 +28,7 @@ func (c DeleteCheckout) Run(zettels map[hinweis.Hinweis]stored_zettel.External) 
 	filesToDelete := make([]string, 0, len(zettels))
 
 	for h, external := range zettels {
-		var internal stored_zettel.Named
+		var internal stored_zettel.Transacted
 
 		if internal, err = store.Zettels().Read(h); err != nil {
 			err = errors.Error(err)

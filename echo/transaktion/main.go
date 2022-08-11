@@ -17,8 +17,11 @@ type Transaktion struct {
 	Objekten []Objekte
 }
 
+type Mutter [2]ts.Time
+
 type Objekte struct {
 	zk_types.Type
+	Mutter
 	Id flag.Value
 	sha.Sha
 }
@@ -26,8 +29,8 @@ type Objekte struct {
 func (o *Objekte) Set(v string) (err error) {
 	vs := strings.Split(v, " ")
 
-	if len(vs) != 3 {
-		err = errors.Errorf("expected 3 elements but got %d", len(vs))
+	if len(vs) != 5 {
+		err = errors.Errorf("expected 5 elements but got %d", len(vs))
 		return
 	}
 
@@ -35,6 +38,22 @@ func (o *Objekte) Set(v string) (err error) {
 		err = errors.Wrapped(err, "failed to set type: %s", vs[0])
 		return
 	}
+
+	vs = vs[1:]
+
+	if err = o.Mutter[0].Set(vs[0]); err != nil {
+		err = errors.Wrapped(err, "failed to set mutter 0: %s", vs[0])
+		return
+	}
+
+	vs = vs[1:]
+
+	if err = o.Mutter[1].Set(vs[0]); err != nil {
+		err = errors.Wrapped(err, "failed to set mutter 1: %s", vs[0])
+		return
+	}
+
+	vs = vs[1:]
 
 	switch o.Type {
 	case zk_types.TypeZettel:
@@ -49,12 +68,14 @@ func (o *Objekte) Set(v string) (err error) {
 		return
 	}
 
-	if err = o.Id.Set(vs[1]); err != nil {
+	if err = o.Id.Set(vs[0]); err != nil {
 		err = errors.Wrapped(err, "failed to set id: %s", vs[1])
 		return
 	}
 
-	if err = o.Sha.Set(vs[2]); err != nil {
+	vs = vs[1:]
+
+	if err = o.Sha.Set(vs[0]); err != nil {
 		err = errors.Wrapped(err, "failed to set sha: %s", vs[2])
 		return
 	}

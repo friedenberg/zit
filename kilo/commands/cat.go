@@ -63,7 +63,7 @@ func (c Cat) RunWithLockedStore(store store_with_lock.Store, args ...string) (er
 func (c Cat) etiketten(store store_with_lock.Store) (err error) {
 	var ea []etikett.Etikett
 
-	if ea, err = store.Etiketten().All(); err != nil {
+	if ea, err = store.Zettels().Etiketten(); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -90,9 +90,12 @@ OUTER:
 }
 
 func (c Cat) zettelen(store store_with_lock.Store) (err error) {
-	var all map[hinweis.Hinweis]stored_zettel.Named
+	var all map[hinweis.Hinweis]stored_zettel.Transacted
 
-	if all, err = store.Zettels().AllTails(); err != nil {
+	logz.Print()
+	defer logz.Print()
+
+	if all, err = store.Zettels().ZettelTails(); err != nil {
 		err = errors.Error(err)
 		return
 	}

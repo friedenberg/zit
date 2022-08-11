@@ -12,7 +12,9 @@ import (
 	"github.com/friedenberg/zit/bravo/open_file_guard"
 	"github.com/friedenberg/zit/bravo/sha"
 	"github.com/friedenberg/zit/bravo/zk_types"
+	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/charlie/hinweis"
+	"github.com/friedenberg/zit/charlie/ts"
 	"github.com/friedenberg/zit/delta/objekte"
 	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/echo/transaktion"
@@ -20,25 +22,29 @@ import (
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/foxtrot/zettel_formats"
 	"github.com/friedenberg/zit/hotel/zettels"
-	"github.com/friedenberg/zit/charlie/ts"
-	"github.com/friedenberg/zit/charlie/verzeichnisse"
 )
 
 type Store struct {
 	umwelt *umwelt.Umwelt
 	zettels.Zettels
-	zettelIndex *verzeichnisse.Index
+	*indexZettelen
+	*indexEtiketten
 	transaktion.Transaktion
 }
 
 func (s *Store) Initialize(u *umwelt.Umwelt) (err error) {
 	s.umwelt = u
 
-	s.zettelIndex, err = verzeichnisse.NewIndex(
-		u.DirVerzeichnisseZettelen(),
+	s.indexZettelen, err = newIndexZettelen(
+		u.FileVerzeichnisseZettelen(),
 		s,
 		s,
-		sha.Head,
+	)
+
+	s.indexEtiketten, err = newIndexEtiketten(
+		u.FileVerzeichnisseEtiketten(),
+		s,
+		s,
 	)
 
 	if err != nil {
@@ -107,90 +113,100 @@ func (s Store) writeZettelObjekte(z zettel.Zettel) (sh sha.Sha, err error) {
 	return
 }
 
-func (s *Store) addZettelToTransaktion(z stored_zettel.Named) (err error) {
+func (s *Store) addZettelToTransaktion(z stored_zettel.Named) (tz stored_zettel.Transacted, err error) {
 	logz.Printf("adding zettel to transaktion: %s", z.Hinweis)
+
+	var previous stored_zettel.Transacted
+	var mutter [2]ts.Time
+
+	previous, err = s.indexZettelen.Read(z.Hinweis)
+
+	if err == nil {
+		mutter[0] = previous.Tail
+		tz.Head = previous.Head
+	} else if errors.Is(err, ErrNotFound{}) {
+		err = nil
+		tz.Head = s.Transaktion.Time
+	} else {
+		err = errors.Error(err)
+		return
+	}
+
+	tz.Tail = s.Transaktion.Time
+	tz.Named = z
 
 	s.Transaktion.Objekten = append(
 		s.Transaktion.Objekten,
 		transaktion.Objekte{
-			Type: zk_types.TypeZettel,
-			Id:   &z.Hinweis,
-			Sha:  z.Sha,
+			Type:   zk_types.TypeZettel,
+			Mutter: mutter,
+			Id:     &z.Hinweis,
+			Sha:    z.Sha,
 		},
 	)
 
 	return
 }
 
-func (s Store) writeNamedZettelToIndex(nz stored_zettel.Named) (err error) {
-	rowMaker := func() ([]verzeichnisse.Row, error) {
-		return s.indexRowsForZettel(nz)
-	}
+func (s Store) writeNamedZettelToIndex(tz stored_zettel.Transacted) (err error) {
+	logz.Printf("writing zettel to index: %s", tz.Named)
 
-	if err = s.zettelIndex.WriteRows(rowMaker); err != nil {
-		err = errors.Wrapped(err, "failed to write index rows for zettel %s", nz)
+	if err = s.indexZettelen.Add(tz); err != nil {
+		err = errors.Wrapped(err, "failed to write zettel to index: %s", tz.Named)
 		return
 	}
 
 	return
 }
 
-func (s Store) Read(id id.Id) (sz stored_zettel.Named, err error) {
-	rr := indexReaderOneZettel{
-		Id: id,
-	}
+func (s Store) Read(id id.Id) (tz stored_zettel.Transacted, err error) {
+	switch tid := id.(type) {
+	case sha.Sha:
+		//TODO read from fs
 
-	if err = s.zettelIndex.ReadPages(&rr, id.Sha().Head()); err != nil {
-		err = errors.Error(err)
-		return
-	}
+	case hinweis.Hinweis:
+		if tz, err = s.indexZettelen.Read(tid); err != nil {
+			err = errors.Error(err)
+			return
+		}
 
-	sz = rr.Named
-
-	return
-}
-
-func (s *Store) Create(in zettel.Zettel) (z stored_zettel.Named, err error) {
-	if z, err = s.Zettels.Create(in); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
-	if z.Stored.Sha, err = s.writeZettelObjekte(in); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
-	if err = s.addZettelToTransaktion(z); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
-	if err = s.writeNamedZettelToIndex(z); err != nil {
-		err = errors.Error(err)
-		return
+	default:
+		err = errors.Errorf("unsupported identifier: %s", id)
 	}
 
 	return
 }
 
-func (s *Store) CreateWithHinweis(in zettel.Zettel, h hinweis.Hinweis) (z stored_zettel.Named, err error) {
-	if z, err = s.Zettels.CreateWithHinweis(in, h); err != nil {
+func (s *Store) Create(in zettel.Zettel) (tz stored_zettel.Transacted, err error) {
+	if tz.Named, err = s.Zettels.Create(in); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	if z.Stored.Sha, err = s.writeZettelObjekte(in); err != nil {
+	logz.PrintDebug(tz)
+
+	if tz.Stored.Sha, err = s.writeZettelObjekte(tz.Zettel); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	if err = s.addZettelToTransaktion(z); err != nil {
+	logz.PrintDebug(tz)
+
+	if tz, err = s.addZettelToTransaktion(tz.Named); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	if err = s.writeNamedZettelToIndex(z); err != nil {
+	logz.PrintDebug(tz)
+
+	if err = s.writeNamedZettelToIndex(tz); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	logz.PrintDebug(tz)
+
+	if err = s.indexEtiketten.Add(tz.Zettel.Etiketten); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -198,36 +214,87 @@ func (s *Store) CreateWithHinweis(in zettel.Zettel, h hinweis.Hinweis) (z stored
 	return
 }
 
-func (s Store) AllTails() (tails map[hinweis.Hinweis]stored_zettel.Named, err error) {
-	rr := indexReaderManyTail{}
-
-	if err = s.zettelIndex.ReadAll(&rr); err != nil {
+func (s *Store) CreateWithHinweis(
+	in zettel.Zettel,
+	h hinweis.Hinweis,
+) (tz stored_zettel.Transacted, err error) {
+	if tz.Named, err = s.Zettels.CreateWithHinweis(in, h); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	tails = rr.zettels
+	if tz.Stored.Sha, err = s.writeZettelObjekte(tz.Zettel); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	if tz, err = s.addZettelToTransaktion(tz.Named); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	if err = s.writeNamedZettelToIndex(tz); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	if err = s.indexEtiketten.Add(tz.Zettel.Etiketten); err != nil {
+		err = errors.Error(err)
+		return
+	}
 
 	return
 }
 
-func (s *Store) Update(z stored_zettel.Named) (stored stored_zettel.Named, err error) {
-	if stored, err = s.Zettels.Update(z); err != nil {
+func (s Store) Etiketten() (es []etikett.Etikett, err error) {
+	return s.indexEtiketten.allEtiketten()
+}
+
+func (s Store) ZettelTails() (tails map[hinweis.Hinweis]stored_zettel.Transacted, err error) {
+	if tails, err = s.indexZettelen.allTransacted(); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	if stored.Sha, err = s.writeZettelObjekte(stored.Zettel); err != nil {
+	return
+}
+
+func (s *Store) Update(z stored_zettel.Named) (tz stored_zettel.Transacted, err error) {
+	if tz.Named, err = s.Zettels.Update(z); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	if err = s.addZettelToTransaktion(stored); err != nil {
+	var mutter stored_zettel.Transacted
+
+	if mutter, err = s.Read(z.Hinweis); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	if err = s.writeNamedZettelToIndex(stored); err != nil {
+	if tz.Sha, err = s.writeZettelObjekte(tz.Zettel); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	if tz, err = s.addZettelToTransaktion(tz.Named); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	if err = s.writeNamedZettelToIndex(tz); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	added, removed := mutter.Zettel.Etiketten.Delta(tz.Zettel.Etiketten)
+
+	if err = s.indexEtiketten.Add(added); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	if err = s.indexEtiketten.Del(removed); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -246,12 +313,12 @@ func (s Store) Flush() (err error) {
 		return
 	}
 
-	if s.zettelIndex == nil {
-		err = errors.Errorf("index was not initialized")
+	if err = s.indexZettelen.Flush(); err != nil {
+		err = errors.Wrapped(err, "failed to flush new zettel index")
 		return
 	}
 
-	if err = s.zettelIndex.Flush(); err != nil {
+	if err = s.indexEtiketten.Flush(); err != nil {
 		err = errors.Wrapped(err, "failed to flush new zettel index")
 		return
 	}
@@ -260,23 +327,23 @@ func (s Store) Flush() (err error) {
 }
 
 func (s Store) AllInChain(h hinweis.Hinweis) (c zettels.Chain, err error) {
-	rr := indexReaderChain{
-		Hinweis: h,
-	}
+	//TODO
+	// rr := indexReaderChain{
+	// 	Hinweis: h,
+	// }
 
-	if err = s.zettelIndex.ReadPages(&rr, h.Sha().Head()); err != nil {
-		err = errors.Error(err)
-		return
-	}
+	// if err = s.indexZettelen.ReadPages(&rr, h.Sha().Head()); err != nil {
+	// 	err = errors.Error(err)
+	// 	return
+	// }
 
-	c.Hinweis = rr.Hinweis
+	// c.Hinweis = rr.Hinweis
 
-	for _, z := range rr.zettels {
-		c.Zettels = append(c.Zettels, z.Stored)
-	}
+	// for _, z := range rr.zettels {
+	// 	c.Zettels = append(c.Zettels, z.Stored)
+	// }
 
 	return
-
 }
 
 func (s Store) ReadAllTransaktions() (out []transaktion.Transaktion, err error) {
@@ -325,13 +392,8 @@ func (s Store) ReadAllTransaktions() (out []transaktion.Transaktion, err error) 
 }
 
 func (s *Store) Reindex() (err error) {
-	if err = os.RemoveAll(s.Umwelt().DirVerzeichnisseZettelen()); err != nil {
+	if err = os.RemoveAll(s.Umwelt().FileVerzeichnisseZettelen()); err != nil {
 		err = errors.Wrapped(err, "failed to remove zettel index")
-		return
-	}
-
-	if err = os.MkdirAll(s.umwelt.DirVerzeichnisseZettelen(), os.ModeDir|0755); err != nil {
-		err = errors.Wrapped(err, "failed to make zettel index dir")
 		return
 	}
 
@@ -360,7 +422,7 @@ func (s *Store) Reindex() (err error) {
 					}
 				}
 
-				if err = s.writeNamedZettelToIndex(tz.Named); err != nil {
+				if err = s.writeNamedZettelToIndex(tz); err != nil {
 					err = errors.Error(err)
 					return
 				}
@@ -369,6 +431,24 @@ func (s *Store) Reindex() (err error) {
 				continue
 			}
 		}
+	}
+
+	if err = s.indexZettelen.Flush(); err != nil {
+		err = errors.Wrapped(err, "failed to flush new zettel index")
+		return
+	}
+
+	var tails map[hinweis.Hinweis]stored_zettel.Transacted
+
+	if tails, err = s.ZettelTails(); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	logz.Printf("tail count: %d", len(tails))
+
+	for _, zn := range tails {
+		s.indexEtiketten.Add(zn.Zettel.Etiketten)
 	}
 
 	return
@@ -382,16 +462,6 @@ func (s *Store) Rewrite() (err error) {
 
 	if err = os.MkdirAll(s.umwelt.DirObjektenTransaktion(), os.ModeDir|0755); err != nil {
 		err = errors.Wrapped(err, "failed to make transaktion dir")
-		return
-	}
-
-	if err = os.RemoveAll(s.Umwelt().DirObjektenZettelen()); err != nil {
-		err = errors.Wrapped(err, "failed to remove zettelen dir")
-		return
-	}
-
-	if err = os.MkdirAll(s.umwelt.DirObjektenZettelen(), os.ModeDir|0755); err != nil {
-		err = errors.Wrapped(err, "failed to make zettelen dir")
 		return
 	}
 
@@ -419,22 +489,24 @@ func (s *Store) Rewrite() (err error) {
 		for i := len(chain.Zettels) - 1; i >= 0; i-- {
 			sz := chain.Zettels[i]
 
-			nz := stored_zettel.Named{
-				Hinweis: h,
-				Stored:  sz,
+			tz := stored_zettel.Transacted{
+				Named: stored_zettel.Named{
+					Hinweis: h,
+					Stored:  sz,
+				},
 			}
 
-			if nz.Stored.Sha, err = s.writeZettelObjekte(sz.Zettel); err != nil {
+			if tz.Stored.Sha, err = s.writeZettelObjekte(sz.Zettel); err != nil {
 				err = errors.Error(err)
 				return
 			}
 
-			if err = s.addZettelToTransaktion(nz); err != nil {
+			if tz, err = s.addZettelToTransaktion(tz.Named); err != nil {
 				err = errors.Error(err)
 				return
 			}
 
-			if err = s.writeNamedZettelToIndex(nz); err != nil {
+			if err = s.writeNamedZettelToIndex(tz); err != nil {
 				err = errors.Error(err)
 				return
 			}

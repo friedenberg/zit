@@ -52,7 +52,7 @@ func (c CreateFromPaths) Run(args ...string) (results CreateFromPathsResults, er
 	}
 
 	for _, z := range toCreate {
-		var named stored_zettel.Named
+		var tz stored_zettel.Transacted
 		//TODO
 		if false /*c.ReadHinweisFromPath*/ {
 			head, tail := id.HeadTailFromFileName(z.Path)
@@ -64,22 +64,22 @@ func (c CreateFromPaths) Run(args ...string) (results CreateFromPathsResults, er
 				return
 			}
 
-			if named, err = store.Zettels().CreateWithHinweis(z.Zettel, h); err != nil {
+			if tz, err = store.Zettels().CreateWithHinweis(z.Zettel, h); err != nil {
 				//TODO add file for error handling
-				c.handleStoreError(named, "", err)
+				c.handleStoreError(tz, "", err)
 				err = nil
 				return
 			}
 		} else {
-			if named, err = store.Zettels().Create(z.Zettel); err != nil {
+			if tz, err = store.Zettels().Create(z.Zettel); err != nil {
 				//TODO add file for error handling
-				c.handleStoreError(named, "", err)
+				c.handleStoreError(tz, "", err)
 				err = nil
 				return
 			}
 		}
 
-		stdprinter.Outf("[%s %s]\n", named.Hinweis, named.Sha)
+		stdprinter.Outf("%s\n", tz.Named)
 	}
 
 	return
@@ -142,7 +142,7 @@ func (c CreateFromPaths) zettelsFromPath(store store_with_lock.Store, p string) 
 	return
 }
 
-func (c CreateFromPaths) handleStoreError(z stored_zettel.Named, f string, in error) {
+func (c CreateFromPaths) handleStoreError(z stored_zettel.Transacted, f string, in error) {
 	var err error
 
 	var lostError zettels.VerlorenAndGefundenError

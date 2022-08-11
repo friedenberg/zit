@@ -20,7 +20,7 @@ import (
 )
 
 type StoreZettel interface {
-	Read(id id.Id) (z stored_zettel.Named, err error)
+	Read(id id.Id) (z stored_zettel.Transacted, err error)
 	zettel.AkteWriterFactory
 }
 
@@ -226,7 +226,7 @@ func (s Store) readZettelFromFile(ez *stored_zettel.External) (err error) {
 
 	var f *os.File
 
-	if f, err = os.Open(ez.Path); err != nil {
+	if f, err = open_file_guard.Open(ez.Path); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -270,7 +270,7 @@ func (s *Store) Read(p string) (ez stored_zettel.External, err error) {
 			return
 		}
 
-		var named stored_zettel.Named
+		var named stored_zettel.Transacted
 
 		if named, err = s.storeZettel.Read(cached.Sha); err != nil {
 			err = errors.Error(err)

@@ -2,7 +2,6 @@ package atomic_flush
 
 import "github.com/friedenberg/zit/alfa/errors"
 
-
 //TODO WriteCloser factory for directories and files
 
 type Bowl struct {

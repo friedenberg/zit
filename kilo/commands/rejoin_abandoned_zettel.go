@@ -32,14 +32,14 @@ func (c RejoinAbandonedZettel) RunWithShas(store store_with_lock.Store, shas ...
 			return
 		}
 
-		var named stored_zettel.Named
+		var tz stored_zettel.Transacted
 
-		if named, err = store.Zettels().Create(stored.Zettel); err != nil {
+		if tz, err = store.Zettels().Create(stored.Zettel); err != nil {
 			err = errors.Error(err)
 			return
 		}
 
-		stdprinter.Outf("[%s %s] (adopted)\n", named.Hinweis, named.Sha)
+		stdprinter.Outf("%s (adopted)\n", tz.Named)
 	}
 
 	return

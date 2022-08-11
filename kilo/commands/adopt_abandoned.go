@@ -46,15 +46,15 @@ func (c AdoptAbandoned) RunWithLockedStore(store store_with_lock.Store, args ...
 			return
 		}
 
-		var named stored_zettel.Named
+		var tz stored_zettel.Transacted
 
-		if named, err = store.Zettels().Create(stored.Zettel); err != nil {
+		if tz, err = store.Zettels().Create(stored.Zettel); err != nil {
 			err = errors.Error(err)
 			return
 		}
 
-		zettels[i] = named
-		stdprinter.Outf("[%s %s] (adopted)\n", named.Hinweis, named.Sha)
+		zettels[i] = tz.Named
+		stdprinter.Outf("%s (adopted)\n", tz.Named)
 	}
 
 	return

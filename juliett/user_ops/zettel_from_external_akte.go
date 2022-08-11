@@ -42,14 +42,14 @@ func (c ZettelFromExternalAkte) Run(args ...string) (results ZettelResults, err 
 			return
 		}
 
-		var named stored_zettel.Named
+		var tz stored_zettel.Transacted
 
-		if named, err = store.Zettels().Create(z); err != nil {
+		if tz, err = store.Zettels().Create(z); err != nil {
 			err = errors.Error(err)
 			return
 		}
 
-		results.SetNamed[named.Hinweis.String()] = named
+		results.SetNamed[tz.Hinweis.String()] = tz.Named
 
 		if c.Delete {
 			if err = os.Remove(arg); err != nil {
@@ -61,7 +61,7 @@ func (c ZettelFromExternalAkte) Run(args ...string) (results ZettelResults, err 
 		}
 
 		//TODO-P3,D3 only emit if created rather than refound
-		stdprinter.Outf("[%s %s] (created)\n", named.Hinweis, named.Sha)
+		stdprinter.Outf("%s (created)\n", tz.Named)
 	}
 
 	return

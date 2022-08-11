@@ -8,8 +8,8 @@ import (
 	"github.com/friedenberg/zit/alfa/logz"
 	"github.com/friedenberg/zit/bravo/zk_types"
 	"github.com/friedenberg/zit/charlie/hinweis"
-	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/charlie/verzeichnisse"
+	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 )
 
 type indexReaderManyTail struct {

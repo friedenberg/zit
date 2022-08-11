@@ -34,7 +34,10 @@ func (s Store) storedZettelFromSha(sh sha.Sha) (sz stored_zettel.Stored, err err
 	return
 }
 
-func (s Store) transactedZettelFromTransaktionObjekte(t transaktion.Transaktion, o transaktion.Objekte) (tz stored_zettel.Transacted, err error) {
+func (s Store) transactedZettelFromTransaktionObjekte(
+	t transaktion.Transaktion,
+	o transaktion.Objekte,
+) (tz stored_zettel.Transacted, err error) {
 	ok := false
 
 	var h *hinweis.Hinweis
@@ -51,7 +54,7 @@ func (s Store) transactedZettelFromTransaktionObjekte(t transaktion.Transaktion,
 		return
 	}
 
-	tz.Time = t.Time
+	tz.Tail = t.Time
 
 	return
 }

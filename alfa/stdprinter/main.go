@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"sync"
+
+	"github.com/friedenberg/zit/alfa/logz"
 )
 
 type printerLine struct {
@@ -31,6 +33,9 @@ func init() {
 }
 
 func WaitForPrinter() {
+	logz.Print("waiting")
+	defer logz.Print("done")
+
 	close(printerChannel)
 	waitGroup.Wait()
 }

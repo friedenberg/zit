@@ -8,7 +8,7 @@ import (
 )
 
 type WithOneZettelSha interface {
-	RunWithZettel(store store_with_lock.Store, zettel ...stored_zettel.Named) error
+	RunWithZettel(store store_with_lock.Store, zettel ...stored_zettel.Transacted) error
 }
 
 type withOneZettelSha struct {
@@ -22,7 +22,7 @@ func (c withOneZettelSha) RunWithLockedStore(store store_with_lock.Store, args .
 		return
 	}
 
-	zettels := make([]stored_zettel.Named, len(args))
+	zettels := make([]stored_zettel.Transacted, len(args))
 
 	for i, arg := range args {
 		var sha sha.Sha

@@ -249,6 +249,24 @@ func (s1 Set) Intersect(s2 Set) (s3 Set) {
 	return
 }
 
+func (s1 Set) Delta(s2 Set) (added Set, removed Set) {
+	added = MakeSet()
+	removed = *s1.Copy()
+
+	for _, e := range s2 {
+		if s1.Contains(e) {
+			//zettel had etikett previously
+		} else {
+			//zettel did not have etikett previously
+			added.Add(e)
+		}
+
+		removed.Remove(e)
+	}
+
+	return
+}
+
 func (es Set) MarshalJSON() ([]byte, error) {
 	return json.Marshal(es.SortedString())
 }

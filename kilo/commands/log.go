@@ -9,6 +9,7 @@ import (
 	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/delta/umwelt"
+	"github.com/friedenberg/zit/golf/objekten"
 	"github.com/friedenberg/zit/hotel/zettels"
 )
 
@@ -26,7 +27,7 @@ func init() {
 	)
 }
 
-func (c Log) RunWithHinweisen(u *umwelt.Umwelt, zs zettels.Zettels, hs ...hinweis.Hinweis) (err error) {
+func (c Log) RunWithHinweisen(u *umwelt.Umwelt, os *objekten.Store, hs ...hinweis.Hinweis) (err error) {
 	var h hinweis.Hinweis
 
 	switch len(hs) {
@@ -47,18 +48,19 @@ func (c Log) RunWithHinweisen(u *umwelt.Umwelt, zs zettels.Zettels, hs ...hinwei
 	var chain zettels.Chain
 	logz.Print()
 
-	if chain, err = zs.AllInChain(h); err != nil {
+	if chain, err = os.AllInChain(h); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	b, err := json.Marshal(chain)
+	var b []byte
 
-	if err != nil {
-		logz.Print(err)
-	} else {
-		stdprinter.Out(string(b))
+	if b, err = json.Marshal(chain); err != nil {
+		err = errors.Wrapped(err, "failed to marshal json")
+		return
 	}
+
+	stdprinter.Out(string(b))
 
 	return
 }

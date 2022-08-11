@@ -26,7 +26,6 @@ func (f Text) WriteTo(c zettel.FormatContextWrite) (n int64, err error) {
 }
 
 func (f Text) writeToOmitAkte(c zettel.FormatContextWrite) (n int64, err error) {
-	logz.Print()
 	w := line_format.NewWriter()
 
 	w.WriteLines(
@@ -121,7 +120,7 @@ func (f Text) writeToInlineAkte(c zettel.FormatContextWrite) (n int64, err error
 		return
 	}
 
-	defer stdprinter.PanicIfError(ar.Close())
+	defer stdprinter.PanicIfError(ar.Close)
 
 	var n1 int64
 

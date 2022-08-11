@@ -4,12 +4,12 @@ import (
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/delta/umwelt"
-	"github.com/friedenberg/zit/hotel/zettels"
+	"github.com/friedenberg/zit/golf/objekten"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
 type CommandWithHinweisen interface {
-	RunWithHinweisen(*umwelt.Umwelt, zettels.Zettels, ...hinweis.Hinweis) error
+	RunWithHinweisen(*umwelt.Umwelt, *objekten.Store, ...hinweis.Hinweis) error
 }
 
 type commandWithHinweisen struct {

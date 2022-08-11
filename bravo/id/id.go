@@ -19,7 +19,7 @@ type Id interface {
 }
 
 type TypedId interface {
-  Id
+	Id
 	Type() zk_types.Type
 }
 

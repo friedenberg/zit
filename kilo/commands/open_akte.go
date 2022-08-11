@@ -50,14 +50,14 @@ func (c OpenAkte) RunWithLockedStore(store store_with_lock.Store, args ...string
 
 	for i, s := range shas {
 		func(s sha.Sha) {
-			var z stored_zettel.Named
+			var tz stored_zettel.Transacted
 
-			if z, err = store.Zettels().Read(s); err != nil {
+			if tz, err = store.Zettels().Read(s); err != nil {
 				err = errors.Error(err)
 				return
 			}
 
-			shaAkte := z.Zettel.Akte
+			shaAkte := tz.Zettel.Akte
 			p := store.DirZit("Objekte", "Akte")
 
 			var f *os.File
@@ -69,7 +69,7 @@ func (c OpenAkte) RunWithLockedStore(store store_with_lock.Store, args ...string
 				return
 			}
 
-			filename = filename + "." + z.Zettel.AkteExt.String()
+			filename = filename + "." + tz.Zettel.AkteExt.String()
 
 			if f, err = open_file_guard.Create(filename); err != nil {
 				err = errors.Error(err)

@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
-	"github.com/friedenberg/zit/hotel/zettels"
+	"github.com/friedenberg/zit/golf/objekten"
 )
 
 type Copy struct {
@@ -25,18 +25,18 @@ func init() {
 	)
 }
 
-func (c Copy) RunWithHinweisen(u *umwelt.Umwelt, zs zettels.Zettels, hins ...hinweis.Hinweis) (err error) {
-	zettels := make([]stored_zettel.Named, len(hins))
+func (c Copy) RunWithHinweisen(u *umwelt.Umwelt, os *objekten.Store, hins ...hinweis.Hinweis) (err error) {
+	zettels := make([]stored_zettel.Transacted, len(hins))
 
 	for i, h := range hins {
-		var named stored_zettel.Named
+		var tz stored_zettel.Transacted
 
-		if named, err = zs.Read(h); err != nil {
+		if tz, err = os.Read(h); err != nil {
 			err = errors.Error(err)
 			return
 		}
 
-		zettels[i] = named
+		zettels[i] = tz
 	}
 
 	return

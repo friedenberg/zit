@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/charlie/file_lock"
 	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/foxtrot/akten"
-	"github.com/friedenberg/zit/foxtrot/etiketten"
 	"github.com/friedenberg/zit/foxtrot/hinweisen"
 	"github.com/friedenberg/zit/golf/checkout_store"
 	"github.com/friedenberg/zit/golf/objekten"
@@ -80,10 +79,6 @@ func (s Store) Zettels() *objekten.Store {
 
 func (s Store) Hinweisen() hinweisen.Hinweisen {
 	return s.zettels.Hinweisen()
-}
-
-func (s Store) Etiketten() etiketten.Etiketten {
-	return s.zettels.Etiketten()
 }
 
 func (s Store) Akten() akten.Akten {

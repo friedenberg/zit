@@ -53,10 +53,14 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 		var ok bool
 
 		if z, ok = toUpdate[h.String()]; !ok {
-			if z, err = store.Zettels().Read(h); err != nil {
+			var tz stored_zettel.Transacted
+
+			if tz, err = store.Zettels().Read(h); err != nil {
 				err = errors.Error(err)
 				return
 			}
+
+			z = tz.Named
 		}
 
 		return
@@ -94,20 +98,6 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 		return
 	}
 
-	for _, c := range changes.Added {
-		var e etikett.Etikett
-
-		if err = e.Set(c.Etikett); err != nil {
-			err = errors.Error(err)
-			return
-		}
-
-		if err = addEtikettToZettel(c.Key, e); err != nil {
-			err = errors.Error(err)
-			return
-		}
-	}
-
 	for _, c := range changes.Removed {
 		var e etikett.Etikett
 
@@ -117,6 +107,19 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 		}
 
 		if err = removeEtikettFromZettel(c.Key, e); err != nil {
+			err = errors.Error(err)
+			return
+		}
+	}
+	for _, c := range changes.Added {
+		var e etikett.Etikett
+
+		if err = e.Set(c.Etikett); err != nil {
+			err = errors.Error(err)
+			return
+		}
+
+		if err = addEtikettToZettel(c.Key, e); err != nil {
 			err = errors.Error(err)
 			return
 		}
@@ -142,14 +145,14 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 			continue
 		}
 
-		var named stored_zettel.Named
+		var tz stored_zettel.Transacted
 
-		if named, err = store.Zettels().Create(z); err != nil {
+		if tz, err = store.Zettels().Create(z); err != nil {
 			err = errors.Errorf("failed to create zettel: %s", err)
 			return
 		}
 
-		stdprinter.Outf("[%s %s] (created)\n", named.Hinweis, named.Sha)
+		stdprinter.Outf("%s (created)\n", tz.Named)
 	}
 
 	for _, z := range toUpdate {

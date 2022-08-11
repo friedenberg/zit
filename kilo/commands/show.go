@@ -34,17 +34,17 @@ func init() {
 }
 
 func (c Show) RunWithId(store store_with_lock.Store, ids ...id.Id) (err error) {
-	zettels := make([]stored_zettel.Named, len(ids))
+	zettels := make([]stored_zettel.Transacted, len(ids))
 
 	for i, a := range ids {
-		var named stored_zettel.Named
+		var tz stored_zettel.Transacted
 
-		if named, err = store.Zettels().Read(a); err != nil {
+		if tz, err = store.Zettels().Read(a); err != nil {
 			err = errors.Error(err)
 			return
 		}
 
-		zettels[i] = named
+		zettels[i] = tz
 	}
 
 	switch c.Type {
@@ -61,7 +61,7 @@ func (c Show) RunWithId(store store_with_lock.Store, ids ...id.Id) (err error) {
 	}
 }
 
-func (c Show) showZettels(store store_with_lock.Store, zettels []stored_zettel.Named) (err error) {
+func (c Show) showZettels(store store_with_lock.Store, zettels []stored_zettel.Transacted) (err error) {
 	f := zettel_formats.Text{}
 
 	ctx := zettel.FormatContextWrite{
@@ -83,7 +83,7 @@ func (c Show) showZettels(store store_with_lock.Store, zettels []stored_zettel.N
 	return
 }
 
-func (c Show) showAkten(store store_with_lock.Store, zettels []stored_zettel.Named) (err error) {
+func (c Show) showAkten(store store_with_lock.Store, zettels []stored_zettel.Transacted) (err error) {
 	var ar io.ReadCloser
 
 	for _, named := range zettels {

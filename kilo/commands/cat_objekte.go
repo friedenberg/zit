@@ -57,14 +57,14 @@ func (c CatObjekte) akten(store store_with_lock.Store, ids ...id.Id) (err error)
 			sb = i
 
 		case hinweis.Hinweis:
-			var named stored_zettel.Named
+			var tz stored_zettel.Transacted
 
-			if named, err = store.Zettels().Read(i); err != nil {
+			if tz, err = store.Zettels().Read(i); err != nil {
 				err = errors.Error(err)
 				return
 			}
 
-			sb = named.Zettel.Akte
+			sb = tz.Zettel.Akte
 
 		default:
 			err = errors.Errorf("unsupported id type: %q", i)
@@ -89,16 +89,16 @@ func (c CatObjekte) akten(store store_with_lock.Store, ids ...id.Id) (err error)
 
 func (c CatObjekte) zettelen(store store_with_lock.Store, ids ...id.Id) (err error) {
 	for _, id := range ids {
-		var z stored_zettel.Named
+		var tz stored_zettel.Transacted
 
-		if z, err = store.Zettels().Read(id); err != nil {
+		if tz, err = store.Zettels().Read(id); err != nil {
 			err = errors.Error(err)
 			return
 		}
 
 		f := stored_zettel_formats.Objekte{}
 
-		if _, err = f.WriteTo(z.Stored, store.Out); err != nil {
+		if _, err = f.WriteTo(tz.Stored, store.Out); err != nil {
 			err = errors.Error(err)
 			return
 		}

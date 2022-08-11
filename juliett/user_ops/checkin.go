@@ -31,20 +31,22 @@ func (c Checkin) Run(zettelen ...stored_zettel.External) (results CheckinResults
 	defer errors.PanicIfError(store.Flush)
 
 	for _, z := range zettelen {
-		named := stored_zettel.Named{
-			Hinweis: z.Hinweis,
-			Stored: stored_zettel.Stored{
-				Zettel: z.Zettel,
+		tz := stored_zettel.Transacted{
+			Named: stored_zettel.Named{
+				Hinweis: z.Hinweis,
+				Stored: stored_zettel.Stored{
+					Zettel: z.Zettel,
+				},
 			},
 		}
 
-		if named, err = store.Zettels().Update(named); err != nil {
+		if tz, err = store.Zettels().Update(tz.Named); err != nil {
 			err = errors.Error(err)
 			return
 		}
 
-		results.Zettelen[named.Hinweis] = stored_zettel.CheckedOut{
-			Internal: named,
+		results.Zettelen[tz.Hinweis] = stored_zettel.CheckedOut{
+			Internal: tz,
 			External: z,
 		}
 	}

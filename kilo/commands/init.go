@@ -48,7 +48,6 @@ func (c Init) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	c.mkdirAll(u.DirObjektenZettelen())
 
 	c.mkdirAll(u.DirVerzeichnisseAkten())
-	c.mkdirAll(u.DirVerzeichnisseZettelen())
 
 	// c.mkdirAll(base, "Etikett-Zettel")
 	c.mkdirAll(u.DirHinweis())

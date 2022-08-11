@@ -36,8 +36,8 @@ func SetTesting() {
 	cwd = filepath.Dir(filepath.Dir(cwd))
 }
 
-func LogPrefix() string {
-	_, filename, line, ok := runtime.Caller(2)
+func LogPrefixWithCallerDepth(d int) string {
+	_, filename, line, ok := runtime.Caller(d)
 
 	if !ok {
 		return ""
@@ -59,6 +59,26 @@ func LogPrefix() string {
 	}
 
 	return fmt.Sprintf("%s%s:%d: ", testPrefix, p, line)
+}
+
+func LogPrefix() string {
+	return LogPrefixWithCallerDepth(3)
+}
+
+func CallerNonEmpty(i int, v interface{}) {
+	if v != nil {
+		Caller(i+1, "%s", v)
+	}
+}
+
+func Caller(i int, f string, vs ...interface{}) {
+	if !verbose {
+		return
+	}
+
+	vs = append([]interface{}{LogPrefixWithCallerDepth(i + 2)}, vs...)
+	//TODO strip trailing newline and add back
+	os.Stderr.WriteString(fmt.Sprintf("%s"+f+"\n", vs...))
 }
 
 var (
@@ -87,7 +107,7 @@ func Printf(f string, vs ...interface{}) {
 	}
 
 	vs = append([]interface{}{LogPrefix()}, vs...)
-  //TODO strip trailing newline and add back
+	//TODO strip trailing newline and add back
 	os.Stderr.WriteString(fmt.Sprintf("%s"+f+"\n", vs...))
 }
 

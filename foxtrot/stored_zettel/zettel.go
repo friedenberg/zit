@@ -3,8 +3,8 @@ package stored_zettel
 import (
 	"github.com/friedenberg/zit/bravo/sha"
 	"github.com/friedenberg/zit/charlie/hinweis"
-	"github.com/friedenberg/zit/echo/zettel"
 	"github.com/friedenberg/zit/charlie/ts"
+	"github.com/friedenberg/zit/echo/zettel"
 )
 
 type Stored struct {
@@ -21,7 +21,7 @@ type Named struct {
 
 type Transacted struct {
 	Named
-	ts.Time
+	Head, Tail ts.Time
 }
 
 type External struct {
@@ -34,6 +34,6 @@ type External struct {
 
 type CheckedOut struct {
 	//TODO change to Transacted
-	Internal Named
+	Internal Transacted
 	External External
 }

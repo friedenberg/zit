@@ -46,8 +46,8 @@ func Len() int {
 }
 
 func (g *openFilesGuard) Lock() {
-	// g.channel <- struct{}{}
-	// stdprinter.Caller(2, "locked", len(g.channel))
+	g.channel <- struct{}{}
+	// logz.Caller(3, "locked: %d", len(g.channel))
 }
 
 func (g *openFilesGuard) LockN(n int) {
@@ -57,8 +57,8 @@ func (g *openFilesGuard) LockN(n int) {
 }
 
 func (g *openFilesGuard) Unlock() {
-	// <-g.channel
-	// stdprinter.Caller(2, "unlocked", len(g.channel))
+	<-g.channel
+	// logz.Caller(3, "unlocked %d", len(g.channel))
 }
 
 func (g *openFilesGuard) UnlockN(n int) {
