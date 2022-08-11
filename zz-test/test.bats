@@ -325,3 +325,69 @@ function can_duplicate_zettel_content { # @test
 	run zit show two/dos
 	assert_output --partial "$(cat "$expected")"
 }
+
+function indexes_are_implicitly_correct { # @test
+	# setup
+	wd="$(mktemp -d)"
+	cd "$wd" || exit 1
+
+	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+
+	expected="$(mktemp)"
+	{
+		echo ---
+		echo "# bez"
+		echo - et1
+		echo - et2
+		echo ! md
+		echo ---
+		echo
+		echo the body
+	} >>"$expected"
+
+	run zit new "$expected"
+	assert_output --partial '[one/uno '
+
+	{
+		echo et1
+		echo et2
+	} >"$expected"
+
+	run zit cat -type etikett
+	assert_output "$(cat "$expected")"
+
+	{
+		echo one/uno
+	} >"$expected"
+
+	run zit cat -type hinweis
+	assert_output --partial "$(cat "$expected")"
+
+	{
+		echo ---
+		echo "# bez"
+		echo - et1
+		echo ! md
+		echo ---
+		echo
+		echo the body
+	} >"$expected"
+
+	mkdir -p one
+	cp "$expected" "one/uno.md"
+	run zit checkin -delete "one/uno.md"
+
+	{
+		echo et1
+	} >"$expected"
+
+	run zit cat -type etikett
+	assert_output "$(cat "$expected")"
+
+	{
+		echo one/uno
+	} >"$expected"
+
+	run zit cat -type hinweis
+	assert_output --partial "$(cat "$expected")"
+}

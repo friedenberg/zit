@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/alfa/errors"
-	"github.com/friedenberg/zit/alfa/logz"
 	"github.com/friedenberg/zit/charlie/etikett"
 )
 
@@ -127,7 +126,7 @@ func (ar *assignmentLineReader) readOne(l line) (err error) {
 
 	case '-':
 		err = ar.readOneZettel(l)
-		logz.Print(len(ar.currentAssignment.named))
+		// logz.Print(len(ar.currentAssignment.named))
 		return err
 
 	default:
@@ -144,7 +143,7 @@ func (ar *assignmentLineReader) readOne(l line) (err error) {
 func (ar *assignmentLineReader) readOneHeading(l line) (err error) {
 	var depth int
 
-	logz.Print("getting depth count")
+	// logz.Print("getting depth count")
 
 	if depth, err = l.Depth('#'); err != nil {
 		err = errors.Error(err)
@@ -167,8 +166,8 @@ func (ar *assignmentLineReader) readOneHeading(l line) (err error) {
 
 	var newAssignment *assignment
 
-	logz.Printf("line: %q\n", l)
-	logz.Printf("previous: %d, current: %d\n", ar.currentAssignment.depth, depth)
+	// logz.Printf("line: %q\n", l)
+	// logz.Printf("previous: %d, current: %d\n", ar.currentAssignment.depth, depth)
 	if depth < ar.currentAssignment.depth {
 		newAssignment, err = ar.readOneHeadingLesserDepth(depth, currentEtiketten)
 	} else if depth == ar.currentAssignment.depth {
@@ -199,7 +198,7 @@ func (ar *assignmentLineReader) readOneHeading(l line) (err error) {
 }
 
 func (ar *assignmentLineReader) readOneHeadingLesserDepth(d int, e *etikett.Set) (newCurrent *assignment, err error) {
-	logz.Print("depth count is <")
+	// logz.Print("depth count is <")
 
 	depthDiff := d - ar.currentAssignment.depth
 
@@ -215,7 +214,7 @@ func (ar *assignmentLineReader) readOneHeadingLesserDepth(d int, e *etikett.Set)
 		// - wow
 		// #
 		// `
-		logz.Print("new set is empty")
+		// logz.Print("new set is empty")
 	} else {
 		// `
 		// # task-todo
@@ -226,9 +225,9 @@ func (ar *assignmentLineReader) readOneHeadingLesserDepth(d int, e *etikett.Set)
 		assignment := newAssignment(d)
 		assignment.etiketten = *e
 		newCurrent.addChild(assignment)
-		logz.Print("adding to parent")
-		logz.Print("child", assignment.etiketten)
-		logz.Print("parent", newCurrent.etiketten)
+		// logz.Print("adding to parent")
+		// logz.Print("child", assignment.etiketten)
+		// logz.Print("parent", newCurrent.etiketten)
 		newCurrent = assignment
 	}
 
@@ -236,7 +235,7 @@ func (ar *assignmentLineReader) readOneHeadingLesserDepth(d int, e *etikett.Set)
 }
 
 func (ar *assignmentLineReader) readOneHeadingEqualDepth(d int, e *etikett.Set) (newCurrent *assignment, err error) {
-	logz.Print("depth count is ==")
+	// logz.Print("depth count is ==")
 
 	if newCurrent, err = ar.currentAssignment.nthParent(1); err != nil {
 		err = errors.Error(err)
@@ -250,7 +249,7 @@ func (ar *assignmentLineReader) readOneHeadingEqualDepth(d int, e *etikett.Set) 
 		// - wow
 		// ##
 		// `
-		logz.Print("new set is empty")
+		// logz.Print("new set is empty")
 	} else {
 		// `
 		// # task-todo
@@ -268,8 +267,8 @@ func (ar *assignmentLineReader) readOneHeadingEqualDepth(d int, e *etikett.Set) 
 }
 
 func (ar *assignmentLineReader) readOneHeadingGreaterDepth(d int, e *etikett.Set) (newCurrent *assignment, err error) {
-	logz.Print("depth count is >")
-	logz.Print(e)
+	// logz.Print("depth count is >")
+	// logz.Print(e)
 
 	newCurrent = ar.currentAssignment
 
@@ -280,7 +279,7 @@ func (ar *assignmentLineReader) readOneHeadingGreaterDepth(d int, e *etikett.Set
 		// - wow
 		// ###
 		// `
-		logz.Print("new set is empty")
+		// logz.Print("new set is empty")
 	} else {
 		// `
 		// # task-todo
@@ -291,9 +290,9 @@ func (ar *assignmentLineReader) readOneHeadingGreaterDepth(d int, e *etikett.Set
 		assignment := newAssignment(d)
 		assignment.etiketten = *e
 		newCurrent.addChild(assignment)
-		logz.Print("adding to parent")
-		logz.Print("child", assignment)
-		logz.Print("parent", newCurrent)
+		// logz.Print("adding to parent")
+		// logz.Print("child", assignment)
+		// logz.Print("parent", newCurrent)
 		newCurrent = assignment
 	}
 
@@ -301,14 +300,14 @@ func (ar *assignmentLineReader) readOneHeadingGreaterDepth(d int, e *etikett.Set
 }
 
 func (ar *assignmentLineReader) readOneZettel(l line) (err error) {
-	logz.Print("reading one zettel", l)
+	// logz.Print("reading one zettel", l)
 
 	var z zettel
 
 	if err = z.Set(l.String()); err == nil {
-		logz.Print("added to named zettels")
+		// logz.Print("added to named zettels")
 		ar.currentAssignment.named.Add(z)
-		logz.Print(len(ar.currentAssignment.named))
+		// logz.Print(len(ar.currentAssignment.named))
 		return
 	}
 
@@ -325,12 +324,12 @@ func (ar *assignmentLineReader) readOneZettel(l line) (err error) {
 	var nz newZettel
 
 	if err = nz.Set(l.String()); err == nil {
-		logz.Print("added to unnamed zettels")
+		// logz.Print("added to unnamed zettels")
 		ar.currentAssignment.unnamed.Add(nz)
 		return
 	}
 
-	logz.Print("failed to read zettel")
+	// logz.Print("failed to read zettel")
 
 	err = ErrorRead{
 		error:  err,

@@ -1,7 +1,6 @@
 package organize_text
 
 import (
-	"github.com/friedenberg/zit/alfa/logz"
 	"github.com/friedenberg/zit/charlie/etikett"
 )
 
@@ -28,7 +27,6 @@ type CompareMap struct {
 }
 
 func (in *organizeText) ToCompareMap() (out CompareMap) {
-	logz.Printf("%#v", in.assignment)
 	out = CompareMap{
 		Named:   make(SetEtikettenKeys),
 		Unnamed: make(SetEtikettenKeys),

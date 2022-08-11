@@ -5,7 +5,6 @@ import (
 	"sort"
 
 	"github.com/friedenberg/zit/alfa/errors"
-	"github.com/friedenberg/zit/alfa/logz"
 	"github.com/friedenberg/zit/bravo/line_format"
 	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
@@ -49,12 +48,12 @@ func makeChildren(
 
 	assigned = stored_zettel.NewSetNamed()
 
-	logz.Print("making children")
+	// logz.Print("making children")
 	if remainingEtiketten.Len() == 0 {
 		for _, zs := range prefixSet {
 			// assigned.Merge(zs)
 			for _, z := range zs {
-				logz.Printf("%s adding named %s", parent.etiketten, z.Hinweis)
+				// logz.Printf("%s adding named %s", parent.etiketten, z.Hinweis)
 				parent.named.Add(makeZettel(z))
 			}
 		}
@@ -63,8 +62,8 @@ func makeChildren(
 	}
 
 	segments := prefixSet.Subset(remainingEtiketten[0])
-	logz.Printf("head: %s ungrouped: %s", remainingEtiketten[0], segments.Ungrouped.HinweisStrings())
-	logz.Printf("head: %s grouped: %s", remainingEtiketten[0], segments.Grouped.ToSetNamed().HinweisStrings())
+	// logz.Printf("head: %s ungrouped: %s", remainingEtiketten[0], segments.Ungrouped.HinweisStrings())
+	// logz.Printf("head: %s grouped: %s", remainingEtiketten[0], segments.Grouped.ToSetNamed().HinweisStrings())
 
 	for _, z := range *segments.Ungrouped {
 		parent.named.Add(makeZettel(z))
@@ -72,7 +71,7 @@ func makeChildren(
 
 	for e, zs := range *segments.Grouped {
 		// assigned.Merge(zs)
-		logz.Print("iterating through grouped: ", e)
+		// logz.Print("iterating through grouped: ", e)
 		child := newAssignment(parent.depth + 1)
 		child.etiketten = etikett.MakeSet(e)
 		// child.named = makeZettelZetFromSetNamed(zs)

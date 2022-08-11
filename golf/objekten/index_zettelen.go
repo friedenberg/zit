@@ -8,13 +8,16 @@ import (
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/logz"
 	"github.com/friedenberg/zit/alfa/stdprinter"
+	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/delta/objekte"
+	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 )
 
 type indexZettelen struct {
-	path string
+	umwelt *umwelt.Umwelt
+	path   string
 	objekte.ReadCloserFactory
 	objekte.WriteCloserFactory
 	zettelen   map[hinweis.Hinweis]stored_zettel.Transacted
@@ -23,11 +26,13 @@ type indexZettelen struct {
 }
 
 func newIndexZettelen(
+	u *umwelt.Umwelt,
 	p string,
 	r objekte.ReadCloserFactory,
 	w objekte.WriteCloserFactory,
 ) (i *indexZettelen, err error) {
 	i = &indexZettelen{
+		umwelt:             u,
 		path:               p,
 		ReadCloserFactory:  r,
 		WriteCloserFactory: w,
@@ -142,7 +147,9 @@ func (i *indexZettelen) Read(h hinweis.Hinweis) (tz stored_zettel.Transacted, er
 	return
 }
 
-func (i *indexZettelen) allTransacted() (tz map[hinweis.Hinweis]stored_zettel.Transacted, err error) {
+func (i *indexZettelen) allTransacted(
+	qs ...stored_zettel.NamedFilter,
+) (tz map[hinweis.Hinweis]stored_zettel.Transacted, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Error(err)
 		return
@@ -150,9 +157,43 @@ func (i *indexZettelen) allTransacted() (tz map[hinweis.Hinweis]stored_zettel.Tr
 
 	tz = make(map[hinweis.Hinweis]stored_zettel.Transacted)
 
+OUTER:
 	for h, z := range i.zettelen {
+		for _, q := range qs {
+			if !q.IncludeNamedZettel(z.Named) {
+				logz.Printf("skipping zettel due to filter %s", z.Named)
+				continue OUTER
+			}
+		}
+
+		if !i.shouldIncludeTransacted(z) {
+			logz.Printf("skipping zettel due to hidden %s", z.Named)
+			continue
+		}
+
+		logz.Printf("including zettel %s", z.Named)
 		tz[h] = z
 	}
 
 	return
+}
+
+func (i *indexZettelen) shouldIncludeTransacted(tz stored_zettel.Transacted) bool {
+	if i.umwelt.Konfig.IncludeHidden {
+		return true
+	}
+
+	prefixes := tz.Zettel.Etiketten.Expanded(etikett.ExpanderRight{})
+
+	for tn, tv := range i.umwelt.Konfig.Tags {
+		if !tv.Hide {
+			continue
+		}
+
+		if prefixes.ContainsString(tn) {
+			return false
+		}
+	}
+
+	return true
 }

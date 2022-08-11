@@ -354,6 +354,23 @@ function commits_organize_one_etiketten_group_by_two_new_zettels { # @test
 
 	run zit new "$to_add"
 
+	expected="$(mktemp)"
+	{
+		echo priority-1
+		echo task
+		echo w-2022-07-07
+	} >"$expected"
+
+	run zit cat -type etikett
+	assert_output "$(cat "$expected")"
+
+	{
+		echo one/uno
+	} >"$expected"
+
+	run zit cat -type hinweis
+	assert_output --partial "$(cat "$expected")"
+
 	to_add="$(mktemp)"
 	{
 		echo "---"
@@ -366,6 +383,16 @@ function commits_organize_one_etiketten_group_by_two_new_zettels { # @test
 
 	run zit new "$to_add"
 
+	{
+		echo priority-1
+		echo task
+		echo w-2022-07-06
+		echo w-2022-07-07
+	} >"$expected"
+
+	run zit cat -type etikett
+	assert_output "$(cat "$expected")"
+
 	to_add="$(mktemp)"
 	{
 		echo "---"
@@ -377,6 +404,16 @@ function commits_organize_one_etiketten_group_by_two_new_zettels { # @test
 	} >>"$to_add"
 
 	run zit new "$to_add"
+
+	{
+		echo priority-1
+		echo task
+		echo w-2022-07-06
+		echo w-2022-07-07
+	} >"$expected"
+
+	run zit cat -type etikett
+	assert_output "$(cat "$expected")"
 
 	expected_organize="$(mktemp)"
 	{
@@ -424,4 +461,15 @@ function commits_organize_one_etiketten_group_by_two_new_zettels { # @test
 	run zit show one/tres
 	run zit show two/dos
 	run zit show three/uno
+
+	{
+		echo priority-1
+		echo priority-2
+		echo task
+		echo w-2022-07-06
+		echo w-2022-07-07
+	} >"$expected"
+
+	run zit cat -type etikett
+	assert_output "$(cat "$expected")"
 }

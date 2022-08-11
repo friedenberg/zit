@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/gob"
 	"io"
+	"sort"
 
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/logz"
@@ -196,6 +197,13 @@ func (i *indexEtiketten) allEtiketten() (es []etikett.Etikett, err error) {
 		es[n] = e
 		n++
 	}
+
+	sort.Slice(
+		es,
+		func(i, j int) bool {
+			return es[i].String() < es[j].String()
+		},
+	)
 
 	return
 }

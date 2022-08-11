@@ -6,7 +6,7 @@ build:
 	go vet ./...
 	go test ./...
 	go install ./.
-	bats zz-test/test.bats
+	bats zz-test/*.bats
 
 watch:
 	echo .

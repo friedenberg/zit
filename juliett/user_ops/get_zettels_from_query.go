@@ -2,6 +2,7 @@ package user_ops
 
 import (
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/india/store_with_lock"
@@ -21,9 +22,17 @@ func (c GetZettelsFromQuery) Run(query stored_zettel.NamedFilter) (result Zettel
 
 	defer errors.PanicIfError(store.Flush)
 
-	if result.SetNamed, err = store.Zettels().Query(query); err != nil {
+	var set map[hinweis.Hinweis]stored_zettel.Transacted
+
+	if set, err = store.Zettels().ZettelTails(query); err != nil {
 		err = errors.Error(err)
 		return
+	}
+
+	result.SetNamed = stored_zettel.MakeSetNamed()
+
+	for h, tz := range set {
+		result.SetNamed[h.String()] = tz.Named
 	}
 
 	return

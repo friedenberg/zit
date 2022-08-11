@@ -1,6 +1,9 @@
 package stored_zettel
 
-import "github.com/friedenberg/zit/charlie/etikett"
+import (
+	"github.com/friedenberg/zit/alfa/logz"
+	"github.com/friedenberg/zit/charlie/etikett"
+)
 
 type FilterEtikettSet struct {
 	Or bool
@@ -8,7 +11,10 @@ type FilterEtikettSet struct {
 }
 
 func (f FilterEtikettSet) IncludeNamedZettel(z Named) bool {
+	logz.PrintDebug(z.Zettel.Etiketten)
 	set := z.Zettel.Etiketten.IntersectPrefixes(f.Set)
+	logz.PrintDebug(set)
+	logz.PrintDebug(f)
 
 	if f.Or {
 		//at least one of the etiketten matches, resolving to a true or

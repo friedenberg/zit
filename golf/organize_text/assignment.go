@@ -4,7 +4,6 @@ import (
 	"sort"
 
 	"github.com/friedenberg/zit/alfa/errors"
-	"github.com/friedenberg/zit/alfa/logz"
 	"github.com/friedenberg/zit/charlie/etikett"
 )
 
@@ -29,7 +28,6 @@ func newAssignment(depth int) *assignment {
 
 func (a assignment) String() (s string) {
 	if a.parent != nil {
-		logz.PrintDebug(a)
 		s = a.parent.String() + "."
 	}
 

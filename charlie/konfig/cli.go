@@ -16,6 +16,7 @@ type Cli struct {
 	DryRun               bool
 	AllowMissingHinweis  bool
 	CheckoutCacheEnabled bool
+	IncludeHidden        bool
 }
 
 func (c *Cli) AddToFlags(f *flag.FlagSet) {
@@ -25,6 +26,7 @@ func (c *Cli) AddToFlags(f *flag.FlagSet) {
 	f.BoolVar(&c.DryRun, "dry-run", false, "")
 	f.BoolVar(&c.CheckoutCacheEnabled, "checkout-cache-enabled", false, "")
 	f.BoolVar(&c.AllowMissingHinweis, "allow-missing-hinweis", false, "")
+	f.BoolVar(&c.IncludeHidden, "include-hidden", false, "include zettels that have hidden etiketten")
 }
 
 func (c Cli) DirZit() (p string, err error) {

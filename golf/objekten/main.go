@@ -36,6 +36,7 @@ func (s *Store) Initialize(u *umwelt.Umwelt) (err error) {
 	s.umwelt = u
 
 	s.indexZettelen, err = newIndexZettelen(
+		u,
 		u.FileVerzeichnisseZettelen(),
 		s,
 		s,
@@ -250,8 +251,10 @@ func (s Store) Etiketten() (es []etikett.Etikett, err error) {
 	return s.indexEtiketten.allEtiketten()
 }
 
-func (s Store) ZettelTails() (tails map[hinweis.Hinweis]stored_zettel.Transacted, err error) {
-	if tails, err = s.indexZettelen.allTransacted(); err != nil {
+func (s Store) ZettelTails(
+	qs ...stored_zettel.NamedFilter,
+) (tails map[hinweis.Hinweis]stored_zettel.Transacted, err error) {
+	if tails, err = s.indexZettelen.allTransacted(qs...); err != nil {
 		err = errors.Error(err)
 		return
 	}
