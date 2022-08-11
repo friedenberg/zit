@@ -46,10 +46,6 @@ func (zs zettels) storeBaseZettel(z stored_zettel.Stored) (shaz sha.Sha, err err
 
 	s.Set(shaz.String(), sb.String())
 
-	for _, e := range z.Zettel.Etiketten {
-		zs.etiketten.Add(e)
-	}
-
 	return
 }
 

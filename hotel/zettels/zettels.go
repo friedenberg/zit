@@ -14,7 +14,6 @@ import (
 	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/echo/sharded_store"
 	"github.com/friedenberg/zit/echo/zettel"
-	"github.com/friedenberg/zit/foxtrot/etiketten"
 	"github.com/friedenberg/zit/foxtrot/hinweisen"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 )
@@ -50,7 +49,6 @@ type zettels struct {
 	store     sharded_store.Store
 	basePath  string
 	age       age.Age
-	etiketten etiketten.Etiketten
 	hinweisen hinweisen.Hinweisen
 }
 
@@ -62,11 +60,6 @@ func New(u *umwelt.Umwelt, age age.Age) (s *zettels, err error) {
 	}
 
 	if s.hinweisen, err = hinweisen.New(age, s.basePath); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
-	if s.etiketten, err = etiketten.New(u.Konfig, age, s.basePath); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -93,10 +86,6 @@ func (zs *zettels) Hinweisen() hinweisen.Hinweisen {
 	return zs.hinweisen
 }
 
-func (zs *zettels) Etiketten() etiketten.Etiketten {
-	return zs.etiketten
-}
-
 func (zs *zettels) Konfig() konfig.Konfig {
 	return zs.umwelt.Konfig
 }
@@ -111,12 +100,6 @@ func (zs *zettels) Flush() (err error) {
 
 	logz.Print("flushing hinweisen")
 	if err = zs.Hinweisen().Flush(); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
-	logz.Print("flushing etiketten")
-	if err = zs.Etiketten().Flush(); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -181,11 +164,6 @@ func (zs zettels) CreateWithHinweis(in zettel.Zettel, h hinweis.Hinweis) (z stor
 
 //TODO-P1,D2 move to store_with_lock
 func (zs zettels) Create(in zettel.Zettel) (z stored_zettel.Named, err error) {
-	if in.IsEmpty() {
-		err = errors.Normal(errors.Errorf("zettel is empty"))
-		return
-	}
-
 	z.Stored.Zettel = in
 
 	if z.Sha, err = zs.storeBaseZettel(z.Stored); err != nil {

@@ -179,6 +179,11 @@ func (s Store) Read(id id.Id) (tz stored_zettel.Transacted, err error) {
 }
 
 func (s *Store) Create(in zettel.Zettel) (tz stored_zettel.Transacted, err error) {
+	if in.IsEmpty() {
+		err = errors.Normal(errors.Errorf("zettel is empty"))
+		return
+	}
+
 	if tz.Named, err = s.Zettels.Create(in); err != nil {
 		err = errors.Error(err)
 		return
