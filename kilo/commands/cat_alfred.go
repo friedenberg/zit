@@ -88,15 +88,15 @@ func (c CatAlfred) RunWithLockedStore(store store_with_lock.Store, args ...strin
 
 	case node_type.TypeHinweis:
 
-		var all map[string]stored_zettel.Named
+		var all map[hinweis.Hinweis]stored_zettel.Transacted
 
-		if all, err = store.Zettels().All(); err != nil {
+		if all, err = store.Zettels().ZettelTails(); err != nil {
 			err = errors.Error(err)
 			return
 		}
 
 		for _, z := range all {
-			aw.WriteZettel(z)
+			aw.WriteZettel(z.Named)
 		}
 
 	default:

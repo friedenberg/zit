@@ -69,8 +69,6 @@ func (i *indexEtiketten) Flush() (err error) {
 			count:   c,
 		}
 
-		logz.Print(row)
-
 		if err = enc.Encode(row); err != nil {
 			err = errors.Wrapped(err, "failed to write row: %s", row)
 			return

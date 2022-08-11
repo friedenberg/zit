@@ -263,14 +263,14 @@ func (s Store) ZettelTails(
 }
 
 func (s *Store) Update(z stored_zettel.Named) (tz stored_zettel.Transacted, err error) {
-	if tz.Named, err = s.Zettels.Update(z); err != nil {
+	var mutter stored_zettel.Transacted
+
+	if mutter, err = s.Read(z.Hinweis); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	var mutter stored_zettel.Transacted
-
-	if mutter, err = s.Read(z.Hinweis); err != nil {
+	if tz.Named, err = s.Zettels.Update(z); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -291,6 +291,8 @@ func (s *Store) Update(z stored_zettel.Named) (tz stored_zettel.Transacted, err 
 	}
 
 	added, removed := mutter.Zettel.Etiketten.Delta(tz.Zettel.Etiketten)
+	logz.Print(mutter.Zettel.Etiketten)
+	logz.Print(tz.Zettel.Etiketten)
 
 	if err = s.indexEtiketten.Add(added); err != nil {
 		err = errors.Error(err)
@@ -395,8 +397,13 @@ func (s Store) ReadAllTransaktions() (out []transaktion.Transaktion, err error) 
 }
 
 func (s *Store) Reindex() (err error) {
-	if err = os.RemoveAll(s.Umwelt().FileVerzeichnisseZettelen()); err != nil {
-		err = errors.Wrapped(err, "failed to remove zettel index")
+	if err = os.RemoveAll(s.Umwelt().DirVerzeichnisse()); err != nil {
+		err = errors.Wrapped(err, "failed to remove verzeichnisse dir")
+		return
+	}
+
+	if err = os.MkdirAll(s.umwelt.DirVerzeichnisse(), os.ModeDir|0755); err != nil {
+		err = errors.Wrapped(err, "failed to make verzeichnisse dir")
 		return
 	}
 

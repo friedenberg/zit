@@ -27,10 +27,10 @@ type Organize struct {
 type organizeMode int
 
 const (
-	organizeModeUnknown     = -1
 	organizeModeInteractive = organizeMode(iota)
 	organizeModeCommitDirectly
 	organizeModeOutputOnly
+	organizeModeUnknown = -1
 )
 
 func (m *organizeMode) Set(v string) (err error) {
@@ -142,12 +142,14 @@ func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			err = errors.Error(err)
 			return
 		}
+
 	case organizeModeOutputOnly:
 		logz.Print("generate organize file and write to stdout")
 		if _, err = createOrganizeFileOp.RunAndWrite(getResults, os.Stdout); err != nil {
 			err = errors.Error(err)
 			return
 		}
+
 	case organizeModeInteractive:
 		logz.Print("generate temp file, write organize, open vim to edit, commit results")
 		createOrganizeFileResults := user_ops.CreateOrganizeFileResults{}
@@ -179,6 +181,10 @@ func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			err = errors.Error(err)
 			return
 		}
+
+	default:
+		err = errors.Errorf("unknown mode")
+		return
 	}
 
 	return

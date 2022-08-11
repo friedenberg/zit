@@ -64,8 +64,6 @@ func (i *indexZettelenTails) Flush() (err error) {
 	enc := gob.NewEncoder(w)
 
 	for h, tz := range i.zettelen {
-		logz.Print(h)
-
 		if err = enc.Encode(tz); err != nil {
 			err = errors.Wrapped(err, "failed to write zettel: [%s %s]", h, tz.Sha)
 			return
@@ -161,17 +159,14 @@ OUTER:
 	for h, z := range i.zettelen {
 		for _, q := range qs {
 			if !q.IncludeNamedZettel(z.Named) {
-				logz.Printf("skipping zettel due to filter %s", z.Named)
 				continue OUTER
 			}
 		}
 
 		if !i.shouldIncludeTransacted(z) {
-			logz.Printf("skipping zettel due to hidden %s", z.Named)
 			continue
 		}
 
-		logz.Printf("including zettel %s", z.Named)
 		tz[h] = z
 	}
 

@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/bravo/id"
 	"github.com/friedenberg/zit/bravo/sha"
 	"github.com/friedenberg/zit/charlie/age"
-	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/charlie/konfig"
 	"github.com/friedenberg/zit/delta/umwelt"
@@ -22,8 +21,6 @@ import (
 
 type Zettels interface {
 	AllInChain(h hinweis.Hinweis) (c Chain, err error)
-	All() (map[string]stored_zettel.Named, error)
-	Query(stored_zettel.NamedFilter) (map[string]stored_zettel.Named, error)
 
 	ReadZettel(sha sha.Sha) (z stored_zettel.Stored, err error)
 	Read(id id.Id) (z stored_zettel.Named, err error)
@@ -351,104 +348,6 @@ func (zs zettels) Read(id id.Id) (sz stored_zettel.Named, err error) {
 	if sz, err = zs.readNamedZettel(id); err != nil {
 		err = errors.Error(err)
 		return
-	}
-
-	return
-}
-
-//TODO move to store_with_lock
-func (zs zettels) All() (ns map[string]stored_zettel.Named, err error) {
-	ns = make(map[string]stored_zettel.Named)
-
-	var es []sharded_store.Entry
-
-	if es, err = zs.store.All(); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
-OUTER:
-	for _, e := range es {
-		var sha sha.Sha
-
-		if err = sha.Set(e.Key); err != nil {
-			err = errors.Error(err)
-			return
-		}
-
-		var named stored_zettel.Named
-
-		if named, err = zs.Read(sha); err != nil {
-			err = errors.Error(err)
-			return
-		}
-
-		logz.Print(named)
-
-		if !named.Kinder.IsNull() {
-			continue OUTER
-		}
-
-		prefixes := named.Zettel.Etiketten.Expanded(etikett.ExpanderRight{})
-
-		logz.Print(zs.umwelt.Konfig.Tags)
-		logz.Print(prefixes)
-		logz.Print(named.Zettel.Etiketten)
-
-	INNER:
-		for tn, tv := range zs.umwelt.Konfig.Tags {
-			if !tv.Hide {
-				logz.Print("not hidden, checking next tag")
-				continue INNER
-			}
-
-			logz.Print("checking for hide matches")
-
-			if prefixes.ContainsString(tn) {
-				logz.Printf("hiding %s due to %s", named.Hinweis, tn)
-				continue OUTER
-			}
-		}
-
-		if _, ok := ns[named.Hinweis.String()]; ok {
-			continue
-			// err = errors.Normal(
-			// 	ErrZettelSplitHistory{
-			// 		Hinweis: named.Hinweis,
-			// 		ShaA:    otherZettel.Sha,
-			// 		ShaB:    named.Sha,
-			// 	},
-			// )
-
-			// return
-		}
-
-		ns[named.Hinweis.String()] = named
-	}
-
-	return
-}
-
-//TODO swap query and all methods for performance reasons
-func (zs zettels) Query(filter stored_zettel.NamedFilter) (ns map[string]stored_zettel.Named, err error) {
-	var ns1 map[string]stored_zettel.Named
-
-	if ns1, err = zs.All(); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
-	if filter == nil {
-		ns = ns1
-		return
-	}
-
-	ns = make(map[string]stored_zettel.Named)
-
-	for n, z := range ns1 {
-		if filter.IncludeNamedZettel(z) {
-			ns[n] = z
-		}
 	}
 
 	return
