@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/logz"
@@ -20,6 +21,45 @@ import (
 type Organize struct {
 	GroupBy        etikett.Slice
 	ExtraEtiketten etikett.Set
+	Mode           organizeMode
+}
+
+type organizeMode int
+
+const (
+	organizeModeUnknown     = -1
+	organizeModeInteractive = organizeMode(iota)
+	organizeModeCommitDirectly
+	organizeModeOutputOnly
+)
+
+func (m *organizeMode) Set(v string) (err error) {
+	switch strings.ToLower(v) {
+	case "interactive":
+		*m = organizeModeInteractive
+	case "commit-directly":
+		*m = organizeModeCommitDirectly
+	case "output-only":
+		*m = organizeModeOutputOnly
+	default:
+		*m = organizeModeUnknown
+		err = errors.Errorf("unsupported mode: %s", v)
+	}
+
+	return
+}
+
+func (m organizeMode) String() string {
+	switch m {
+	case organizeModeInteractive:
+		return "interactive"
+	case organizeModeCommitDirectly:
+		return "commit-directly"
+	case organizeModeOutputOnly:
+		return "output-only"
+	default:
+		return "unknown"
+	}
 }
 
 func init() {
@@ -33,6 +73,7 @@ func init() {
 
 			f.Var(&c.GroupBy, "group-by", "etikett prefixes to group zettels")
 			f.Var(&c.ExtraEtiketten, "extras", "etiketten to always add to the organize text")
+			f.Var(&c.Mode, "mode", "mode used for handling stdin and stdout")
 
 			return c
 		},
@@ -63,10 +104,8 @@ func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	stdoutIsTty := open_file_guard.IsTty(os.Stdout)
-	stdinIsTty := open_file_guard.IsTty(os.Stdin)
-
-	if !stdinIsTty && !stdoutIsTty {
+	switch c.Mode {
+	case organizeModeCommitDirectly:
 		logz.Print("neither stdin or stdout is a tty")
 		logz.Print("generate organize, read from stdin, commit")
 
@@ -103,15 +142,13 @@ func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			err = errors.Error(err)
 			return
 		}
-	} else if !stdoutIsTty {
-		logz.Print("just stdout is not a tty")
+	case organizeModeOutputOnly:
 		logz.Print("generate organize file and write to stdout")
 		if _, err = createOrganizeFileOp.RunAndWrite(getResults, os.Stdout); err != nil {
 			err = errors.Error(err)
 			return
 		}
-	} else {
-		logz.Print("both stdout and stdin are a tty")
+	case organizeModeInteractive:
 		logz.Print("generate temp file, write organize, open vim to edit, commit results")
 		createOrganizeFileResults := user_ops.CreateOrganizeFileResults{}
 

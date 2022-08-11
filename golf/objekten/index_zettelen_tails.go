@@ -8,7 +8,6 @@ import (
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/logz"
 	"github.com/friedenberg/zit/alfa/stdprinter"
-	"github.com/friedenberg/zit/bravo/sha"
 	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/delta/objekte"
@@ -16,7 +15,7 @@ import (
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 )
 
-type indexZettelen struct {
+type indexZettelenTails struct {
 	umwelt *umwelt.Umwelt
 	path   string
 	objekte.ReadCloserFactory
@@ -26,13 +25,13 @@ type indexZettelen struct {
 	hasChanges bool
 }
 
-func newIndexZettelen(
+func newIndexZettelenTails(
 	u *umwelt.Umwelt,
 	p string,
 	r objekte.ReadCloserFactory,
 	w objekte.WriteCloserFactory,
-) (i *indexZettelen, err error) {
-	i = &indexZettelen{
+) (i *indexZettelenTails, err error) {
+	i = &indexZettelenTails{
 		umwelt:             u,
 		path:               p,
 		ReadCloserFactory:  r,
@@ -43,12 +42,7 @@ func newIndexZettelen(
 	return
 }
 
-type indexZettelenRow struct {
-	hinweis.Hinweis
-	sha.Sha
-}
-
-func (i *indexZettelen) Flush() (err error) {
+func (i *indexZettelenTails) Flush() (err error) {
 	if !i.hasChanges {
 		logz.Print("no changes")
 		return
@@ -81,7 +75,7 @@ func (i *indexZettelen) Flush() (err error) {
 	return
 }
 
-func (i *indexZettelen) readIfNecessary() (err error) {
+func (i *indexZettelenTails) readIfNecessary() (err error) {
 	if i.didRead {
 		return
 	}
@@ -124,7 +118,7 @@ func (i *indexZettelen) readIfNecessary() (err error) {
 	return
 }
 
-func (i *indexZettelen) Add(tz stored_zettel.Transacted) (err error) {
+func (i *indexZettelenTails) Add(tz stored_zettel.Transacted) (err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Error(err)
 		return
@@ -137,7 +131,7 @@ func (i *indexZettelen) Add(tz stored_zettel.Transacted) (err error) {
 	return
 }
 
-func (i *indexZettelen) Read(h hinweis.Hinweis) (tz stored_zettel.Transacted, err error) {
+func (i *indexZettelenTails) Read(h hinweis.Hinweis) (tz stored_zettel.Transacted, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Error(err)
 		return
@@ -153,7 +147,7 @@ func (i *indexZettelen) Read(h hinweis.Hinweis) (tz stored_zettel.Transacted, er
 	return
 }
 
-func (i *indexZettelen) allTransacted(
+func (i *indexZettelenTails) allTransacted(
 	qs ...stored_zettel.NamedFilter,
 ) (tz map[hinweis.Hinweis]stored_zettel.Transacted, err error) {
 	if err = i.readIfNecessary(); err != nil {
@@ -184,7 +178,7 @@ OUTER:
 	return
 }
 
-func (i *indexZettelen) shouldIncludeTransacted(tz stored_zettel.Transacted) bool {
+func (i *indexZettelenTails) shouldIncludeTransacted(tz stored_zettel.Transacted) bool {
 	if i.umwelt.Konfig.IncludeHidden {
 		return true
 	}

@@ -19,8 +19,8 @@ func (w Writer) WriteTo(w1 io.Writer) (n int64, err error) {
 		lw.WriteFormat(
 			"%s %s %s %s %s",
 			o.Type,
-      o.Mutter[0],
-      o.Mutter[1],
+			o.Mutter[0],
+			o.Mutter[1],
 			o.Id,
 			o.Sha,
 		)

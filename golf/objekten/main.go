@@ -27,7 +27,7 @@ import (
 type Store struct {
 	umwelt *umwelt.Umwelt
 	zettels.Zettels
-	*indexZettelen
+	*indexZettelenTails
 	*indexEtiketten
 	transaktion.Transaktion
 }
@@ -35,7 +35,7 @@ type Store struct {
 func (s *Store) Initialize(u *umwelt.Umwelt) (err error) {
 	s.umwelt = u
 
-	s.indexZettelen, err = newIndexZettelen(
+	s.indexZettelenTails, err = newIndexZettelenTails(
 		u,
 		u.FileVerzeichnisseZettelen(),
 		s,
@@ -120,7 +120,7 @@ func (s *Store) addZettelToTransaktion(z stored_zettel.Named) (tz stored_zettel.
 	var previous stored_zettel.Transacted
 	var mutter [2]ts.Time
 
-	previous, err = s.indexZettelen.Read(z.Hinweis)
+	previous, err = s.indexZettelenTails.Read(z.Hinweis)
 
 	if err == nil {
 		mutter[0] = previous.Tail
@@ -152,7 +152,7 @@ func (s *Store) addZettelToTransaktion(z stored_zettel.Named) (tz stored_zettel.
 func (s Store) writeNamedZettelToIndex(tz stored_zettel.Transacted) (err error) {
 	logz.Printf("writing zettel to index: %s", tz.Named)
 
-	if err = s.indexZettelen.Add(tz); err != nil {
+	if err = s.indexZettelenTails.Add(tz); err != nil {
 		err = errors.Wrapped(err, "failed to write zettel to index: %s", tz.Named)
 		return
 	}
@@ -166,7 +166,7 @@ func (s Store) Read(id id.Id) (tz stored_zettel.Transacted, err error) {
 		//TODO read from fs
 
 	case hinweis.Hinweis:
-		if tz, err = s.indexZettelen.Read(tid); err != nil {
+		if tz, err = s.indexZettelenTails.Read(tid); err != nil {
 			err = errors.Error(err)
 			return
 		}
@@ -254,7 +254,7 @@ func (s Store) Etiketten() (es []etikett.Etikett, err error) {
 func (s Store) ZettelTails(
 	qs ...stored_zettel.NamedFilter,
 ) (tails map[hinweis.Hinweis]stored_zettel.Transacted, err error) {
-	if tails, err = s.indexZettelen.allTransacted(qs...); err != nil {
+	if tails, err = s.indexZettelenTails.allTransacted(qs...); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -316,7 +316,7 @@ func (s Store) Flush() (err error) {
 		return
 	}
 
-	if err = s.indexZettelen.Flush(); err != nil {
+	if err = s.indexZettelenTails.Flush(); err != nil {
 		err = errors.Wrapped(err, "failed to flush new zettel index")
 		return
 	}
@@ -335,7 +335,7 @@ func (s Store) AllInChain(h hinweis.Hinweis) (c zettels.Chain, err error) {
 	// 	Hinweis: h,
 	// }
 
-	// if err = s.indexZettelen.ReadPages(&rr, h.Sha().Head()); err != nil {
+	// if err = s.indexZettelenTails.ReadPages(&rr, h.Sha().Head()); err != nil {
 	// 	err = errors.Error(err)
 	// 	return
 	// }
@@ -436,7 +436,7 @@ func (s *Store) Reindex() (err error) {
 		}
 	}
 
-	if err = s.indexZettelen.Flush(); err != nil {
+	if err = s.indexZettelenTails.Flush(); err != nil {
 		err = errors.Wrapped(err, "failed to flush new zettel index")
 		return
 	}

@@ -54,7 +54,7 @@ function outputs_organize_one_etikett { # @test
 		echo "- [one/uno] wow"
 	} >>"$expected_organize"
 
-	run zit organize ok
+	run zit organize -mode output-only ok
 	assert_output "$(cat "$expected_organize")"
 }
 
@@ -84,7 +84,7 @@ function outputs_organize_two_etiketten { # @test
 		echo "- [one/uno] wow"
 	} >>"$expected_organize"
 
-	run zit organize ok brown
+	run zit organize -mode output-only ok brown
 	assert_output "$(cat "$expected_organize")"
 
 	{
@@ -95,7 +95,7 @@ function outputs_organize_two_etiketten { # @test
 		echo
 	} >"$expected_organize"
 
-	run zit organize ok brown <"$expected_organize"
+	run zit organize -mode commit-directly ok brown <"$expected_organize"
 
 	expected_zettel="$(mktemp)"
 	{
@@ -142,10 +142,8 @@ function outputs_organize_one_etiketten_group_by_one { # @test
 		printf "\t- [one/uno] wow\n"
 	} >>"$expected_organize"
 
-	run zit organize -group-by priority task
+	run zit organize -mode output-only -group-by priority task
 	assert_output "$(cat "$expected_organize")"
-	echo
-	echo "## priority-2"
 }
 
 function outputs_organize_two_zettels_one_etiketten_group_by_one { # @test
@@ -190,7 +188,7 @@ function outputs_organize_two_zettels_one_etiketten_group_by_one { # @test
 		printf "\t- [one/dos] two/dos\n"
 	} >>"$expected_organize"
 
-	run zit organize -group-by priority task
+	run zit organize -mode output-only -group-by priority task
 	assert_output "$(cat "$expected_organize")"
 }
 
@@ -240,7 +238,7 @@ function outputs_organize_one_etiketten_group_by_two { # @test
 		printf "\t\t- [one/uno] one/uno\n"
 	} >>"$expected_organize"
 
-	run zit organize -group-by priority,w task
+	run zit organize -mode output-only -group-by priority,w task
 	assert_output "$(cat "$expected_organize")"
 }
 
@@ -307,7 +305,7 @@ function commits_organize_one_etiketten_group_by_two { # @test
 		echo "- [two/uno] 3"
 	} >>"$expected_organize"
 
-	run zit organize -group-by priority,w task <"$expected_organize"
+	run zit organize -mode commit-directly -group-by priority,w task <"$expected_organize"
 	echo "$output"
 
 	to_add="$(mktemp)"
@@ -431,7 +429,7 @@ function commits_organize_one_etiketten_group_by_two_new_zettels { # @test
 		echo "- [two/uno] 3"
 	} >>"$expected_organize"
 
-	run zit organize -group-by priority,w task <"$expected_organize"
+	run zit organize -mode commit-directly -group-by priority,w task <"$expected_organize"
 
 	to_add="$(mktemp)"
 	{
