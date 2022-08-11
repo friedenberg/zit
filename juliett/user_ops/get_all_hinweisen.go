@@ -4,6 +4,7 @@ import (
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/delta/umwelt"
+	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
@@ -26,15 +27,22 @@ func (op GetAllHinweisen) Run() (results GetAllHinweisenResults, err error) {
 
 	defer errors.PanicIfError(store.Flush)
 
-	if _, results.Hinweisen, err = store.Hinweisen().All(); err != nil {
+	var zs map[hinweis.Hinweis]stored_zettel.Transacted
+
+	if zs, err = store.Zettels().ZettelTails(); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	results.HinweisenStrings = make([]string, len(results.Hinweisen))
+	results.Hinweisen = make([]hinweis.Hinweis, len(zs))
+	results.HinweisenStrings = make([]string, len(zs))
 
-	for i, h := range results.Hinweisen {
+	i := 0
+
+	for h, _ := range zs {
+		results.Hinweisen[i] = h
 		results.HinweisenStrings[i] = h.String()
+		i++
 	}
 
 	return

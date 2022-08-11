@@ -35,7 +35,6 @@ type Zettels interface {
 
 	Flush() error
 
-	Etiketten() etiketten.Etiketten
 	Hinweisen() hinweisen.Hinweisen
 	Age() age.Age
 	Umwelt() *umwelt.Umwelt
