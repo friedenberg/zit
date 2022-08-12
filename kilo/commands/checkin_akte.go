@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/logz"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
 	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/charlie/hinweis"
@@ -63,7 +64,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		hs := args[i*2]
 		ap := args[(i*2)+1]
 
-		if _, p.Hinweis, err = store.Hinweisen().ReadString(hs); err != nil {
+		if p.Hinweis, err = hinweis.MakeBlindHinweis(hs); err != nil {
 			err = errors.Error(err)
 			return
 		}
@@ -73,6 +74,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	zettels := make([]stored_zettel.Transacted, len(pairs))
+	logz.PrintDebug(pairs)
 
 	// iterate through pairs and read current zettel
 	for i, p := range pairs {
@@ -123,7 +125,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	for _, z := range zettels {
-		if z, err = store.Zettels().Update(z.Named); err != nil {
+		if z, err = store.Zettels().Update(z.Hinweis, z.Zettel); err != nil {
 			err = errors.Error(err)
 			return
 		}

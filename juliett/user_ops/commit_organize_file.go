@@ -161,7 +161,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 			continue
 		}
 
-		if _, err = store.Zettels().Update(z); err != nil {
+		if _, err = store.Zettels().Update(z.Hinweis, z.Zettel); err != nil {
 			stdprinter.Errf("failed to update zettel: %s", err)
 		}
 	}

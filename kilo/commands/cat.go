@@ -14,7 +14,6 @@ import (
 	"github.com/friedenberg/zit/echo/zettel"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/foxtrot/zettel_formats"
-	"github.com/friedenberg/zit/hotel/zettels"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
@@ -149,45 +148,45 @@ func (c Cat) akten(store store_with_lock.Store) (err error) {
 }
 
 func (c Cat) hinweisen(store store_with_lock.Store) (err error) {
-	var hins []hinweis.Hinweis
-	var shas []sha.Sha
+	// var hins []hinweis.Hinweis
+	// var shas []sha.Sha
 
-	if shas, hins, err = store.Hinweisen().All(); err != nil {
-		err = errors.Error(err)
-		return
-	}
+	// if shas, hins, err = store.Hinweisen().All(); err != nil {
+	// 	err = errors.Error(err)
+	// 	return
+	// }
 
-	for i, h := range hins {
-		stdprinter.Outf("%s: %s\n", h, shas[i])
-	}
+	// for i, h := range hins {
+	// 	stdprinter.Outf("%s: %s\n", h, shas[i])
+	// }
 
 	return
 }
 
 func (c Cat) all(store store_with_lock.Store) (err error) {
-	var hins []hinweis.Hinweis
+	// var hins []hinweis.Hinweis
 
-	if _, hins, err = store.Hinweisen().All(); err != nil {
-		err = errors.Error(err)
-		return
-	}
+	// if _, hins, err = store.Hinweisen().All(); err != nil {
+	// 	err = errors.Error(err)
+	// 	return
+	// }
 
-	chains := make([]zettels.Chain, len(hins))
+	// chains := make([]zettels.Chain, len(hins))
 
-	for i, h := range hins {
-		if chains[i], err = store.Zettels().AllInChain(h); err != nil {
-			err = errors.Error(err)
-			return
-		}
-	}
+	// for i, h := range hins {
+	// 	if chains[i], err = store.Zettels().AllInChain(h); err != nil {
+	// 		err = errors.Error(err)
+	// 		return
+	// 	}
+	// }
 
-	b, err := json.Marshal(chains)
+	// b, err := json.Marshal(chains)
 
-	if err != nil {
-		logz.Print(err)
-	} else {
-		stdprinter.Out(string(b))
-	}
+	// if err != nil {
+	// 	logz.Print(err)
+	// } else {
+	// 	stdprinter.Out(string(b))
+	// }
 
 	return
 }

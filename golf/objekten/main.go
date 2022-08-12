@@ -8,10 +8,12 @@ import (
 
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/logz"
+	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/bravo/id"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
 	"github.com/friedenberg/zit/bravo/sha"
 	"github.com/friedenberg/zit/bravo/zk_types"
+	"github.com/friedenberg/zit/charlie/age"
 	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/charlie/ts"
@@ -19,6 +21,7 @@ import (
 	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/echo/transaktion"
 	"github.com/friedenberg/zit/echo/zettel"
+	"github.com/friedenberg/zit/foxtrot/hinweisen"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/foxtrot/zettel_formats"
 	"github.com/friedenberg/zit/hotel/zettels"
@@ -27,6 +30,7 @@ import (
 type Store struct {
 	umwelt *umwelt.Umwelt
 	zettels.Zettels
+	hinweisen hinweisen.Hinweisen
 	*indexZettelenTails
 	*indexEtiketten
 	transaktion.Transaktion
@@ -35,12 +39,29 @@ type Store struct {
 func (s *Store) Initialize(u *umwelt.Umwelt) (err error) {
 	s.umwelt = u
 
+	var a age.Age
+
+	if a, err = u.Age(); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	if s.hinweisen, err = hinweisen.New(a, u.DirZit()); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
 	s.indexZettelenTails, err = newIndexZettelenTails(
 		u,
 		u.FileVerzeichnisseZettelen(),
 		s,
 		s,
 	)
+
+	if err != nil {
+		err = errors.Wrapped(err, "failed to init zettel index")
+		return
+	}
 
 	s.indexEtiketten, err = newIndexEtiketten(
 		u.FileVerzeichnisseEtiketten(),
@@ -56,6 +77,10 @@ func (s *Store) Initialize(u *umwelt.Umwelt) (err error) {
 	s.Transaktion.Time = ts.Now()
 
 	return
+}
+
+func (s Store) Hinweisen() hinweisen.Hinweisen {
+	return s.hinweisen
 }
 
 func (s Store) writeTransaktion() (err error) {
@@ -184,26 +209,22 @@ func (s *Store) Create(in zettel.Zettel) (tz stored_zettel.Transacted, err error
 		return
 	}
 
-	if tz.Named, err = s.Zettels.Create(in); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
-	logz.PrintDebug(tz)
+	tz.Zettel = in
 
 	if tz.Stored.Sha, err = s.WriteZettelObjekte(tz.Zettel); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	logz.PrintDebug(tz)
+	if tz.Hinweis, err = s.hinweisen.StoreNew(tz.Stored.Sha); err != nil {
+		err = errors.Error(err)
+		return
+	}
 
 	if tz, err = s.addZettelToTransaktion(tz.Named); err != nil {
 		err = errors.Error(err)
 		return
 	}
-
-	logz.PrintDebug(tz)
 
 	if err = s.writeNamedZettelToIndex(tz); err != nil {
 		err = errors.Error(err)
@@ -224,10 +245,12 @@ func (s *Store) CreateWithHinweis(
 	in zettel.Zettel,
 	h hinweis.Hinweis,
 ) (tz stored_zettel.Transacted, err error) {
-	if tz.Named, err = s.Zettels.CreateWithHinweis(in, h); err != nil {
-		err = errors.Error(err)
+	if in.IsEmpty() {
+		err = errors.Normal(errors.Errorf("zettel is empty"))
 		return
 	}
+
+	tz.Zettel = in
 
 	if tz.Stored.Sha, err = s.WriteZettelObjekte(tz.Zettel); err != nil {
 		err = errors.Error(err)
@@ -267,20 +290,21 @@ func (s Store) ZettelTails(
 	return
 }
 
-func (s *Store) Update(z stored_zettel.Named) (tz stored_zettel.Transacted, err error) {
+func (s *Store) Update(
+	h hinweis.Hinweis,
+	z zettel.Zettel,
+) (tz stored_zettel.Transacted, err error) {
 	var mutter stored_zettel.Transacted
 
-	if mutter, err = s.Read(z.Hinweis); err != nil {
+	if mutter, err = s.Read(h); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	if tz.Named, err = s.Zettels.Update(z); err != nil {
-		err = errors.Error(err)
-		return
-	}
+	tz.Hinweis = h
+	tz.Zettel = z
 
-	if tz.Sha, err = s.WriteZettelObjekte(tz.Zettel); err != nil {
+	if tz.Sha, err = s.WriteZettelObjekte(z); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -309,12 +333,20 @@ func (s *Store) Update(z stored_zettel.Named) (tz stored_zettel.Transacted, err 
 		return
 	}
 
+	stdprinter.Outf("%s (updated)\n", tz.Named)
+
 	return
 }
 
 func (s Store) Flush() (err error) {
 	if err = s.writeTransaktion(); err != nil {
 		err = errors.Wrapped(err, "failed to write transaction")
+		return
+	}
+
+	if err = s.hinweisen.Flush(); err != nil {
+		stdprinter.Out(err)
+		err = errors.Error(err)
 		return
 	}
 

@@ -162,6 +162,7 @@ function outputs_organize_two_zettels_one_etiketten_group_by_one { # @test
 	} >>"$to_add"
 
 	run zit new "$to_add"
+	assert_output --partial '[one/uno '
 
 	to_add="$(mktemp)"
 	{
@@ -173,6 +174,7 @@ function outputs_organize_two_zettels_one_etiketten_group_by_one { # @test
 	} >>"$to_add"
 
 	run zit new "$to_add"
+	assert_output --partial '[one/dos '
 
 	expected_organize="$(mktemp)"
 	{
@@ -366,8 +368,8 @@ function commits_organize_one_etiketten_group_by_two_new_zettels { # @test
 		echo one/uno
 	} >"$expected"
 
-	run zit cat -type hinweis
-	assert_output --partial "$(cat "$expected")"
+	# run zit cat -type hinweis
+	# assert_output --partial "$(cat "$expected")"
 
 	to_add="$(mktemp)"
 	{

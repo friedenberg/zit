@@ -56,10 +56,10 @@ func New(u *umwelt.Umwelt, age age.Age) (s *zettels, err error) {
 		age:      age,
 	}
 
-	if s.hinweisen, err = hinweisen.New(age, s.basePath); err != nil {
-		err = errors.Error(err)
-		return
-	}
+	// if s.hinweisen, err = hinweisen.New(age, s.basePath); err != nil {
+	// 	err = errors.Error(err)
+	// 	return
+	// }
 
 	zp := path.Join(s.basePath, "Objekte", "Zettel")
 
@@ -89,19 +89,19 @@ func (zs *zettels) Konfig() konfig.Konfig {
 
 //TODO-P0,D4 make flushing atomic
 func (zs *zettels) Flush() (err error) {
-	logz.Print("flushing zettels")
-	if err = zs.store.Flush(); err != nil {
-		err = errors.Error(err)
-		return
-	}
+	// logz.Print("flushing zettels")
+	// if err = zs.store.Flush(); err != nil {
+	// 	err = errors.Error(err)
+	// 	return
+	// }
 
-	logz.Print("flushing hinweisen")
-	if err = zs.Hinweisen().Flush(); err != nil {
-		err = errors.Error(err)
-		return
-	}
+	// logz.Print("flushing hinweisen")
+	// if err = zs.Hinweisen().Flush(); err != nil {
+	// 	err = errors.Error(err)
+	// 	return
+	// }
 
-	logz.Print("done flushing")
+	// logz.Print("done flushing")
 
 	return
 }

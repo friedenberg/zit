@@ -25,16 +25,9 @@ func (c Checkin) Run(
 	results.Zettelen = make(map[hinweis.Hinweis]stored_zettel.CheckedOut)
 
 	for _, z := range zettelen {
-		tz := stored_zettel.Transacted{
-			Named: stored_zettel.Named{
-				Hinweis: z.Hinweis,
-				Stored: stored_zettel.Stored{
-					Zettel: z.Zettel,
-				},
-			},
-		}
+		var tz stored_zettel.Transacted
 
-		if tz, err = store.Zettels().Update(tz.Named); err != nil {
+		if tz, err = store.Zettels().Update(z.Hinweis, z.Zettel); err != nil {
 			err = errors.Error(err)
 			return
 		}
