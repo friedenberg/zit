@@ -8,9 +8,8 @@ import (
 	"github.com/friedenberg/zit/alfa/logz"
 	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/charlie/hinweis"
-	"github.com/friedenberg/zit/delta/umwelt"
-	"github.com/friedenberg/zit/golf/objekten"
 	"github.com/friedenberg/zit/hotel/zettels"
+	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
 type Log struct {
@@ -27,7 +26,7 @@ func init() {
 	)
 }
 
-func (c Log) RunWithHinweisen(u *umwelt.Umwelt, os *objekten.Store, hs ...hinweis.Hinweis) (err error) {
+func (c Log) RunWithHinweisen(os store_with_lock.Store, hs ...hinweis.Hinweis) (err error) {
 	var h hinweis.Hinweis
 
 	switch len(hs) {
@@ -48,7 +47,7 @@ func (c Log) RunWithHinweisen(u *umwelt.Umwelt, os *objekten.Store, hs ...hinwei
 	var chain zettels.Chain
 	logz.Print()
 
-	if chain, err = os.AllInChain(h); err != nil {
+	if chain, err = os.Zettels().AllInChain(h); err != nil {
 		err = errors.Error(err)
 		return
 	}

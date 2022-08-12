@@ -12,6 +12,7 @@ import (
 	"github.com/friedenberg/zit/bravo/files"
 	"github.com/friedenberg/zit/bravo/id"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
+	"github.com/friedenberg/zit/bravo/sha"
 	"github.com/friedenberg/zit/charlie/file_lock"
 	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/echo/zettel"
@@ -21,7 +22,9 @@ import (
 
 type StoreZettel interface {
 	Read(id id.Id) (z stored_zettel.Transacted, err error)
+	WriteZettelObjekte(z zettel.Zettel) (sh sha.Sha, err error)
 	zettel.AkteWriterFactory
+	zettel.AkteReaderFactory
 }
 
 type Store struct {
@@ -206,6 +209,7 @@ func (s Store) makeExternalZettelFromFile(p string) (ez stored_zettel.External, 
 }
 
 func (s Store) readZettelFromFile(ez *stored_zettel.External) (err error) {
+	logz.PrintDebug(ez)
 	if !files.Exists(ez.Path) {
 		//if the path does not have an extension, try looking for a file with that
 		//extension
@@ -236,7 +240,12 @@ func (s Store) readZettelFromFile(ez *stored_zettel.External) (err error) {
 	c.In = f
 
 	if _, err = s.format.ReadFrom(&c); err != nil {
-		err = errors.Errorf("%s: %s", f.Name(), err)
+		err = errors.Wrapped(err, "%s", f.Name())
+		return
+	}
+
+	if ez.Sha, err = s.storeZettel.WriteZettelObjekte(c.Zettel); err != nil {
+		err = errors.Wrapped(err, "%s", f.Name())
 		return
 	}
 

@@ -92,7 +92,7 @@ func (s Store) writeTransaktion() (err error) {
 	return
 }
 
-func (s Store) writeZettelObjekte(z zettel.Zettel) (sh sha.Sha, err error) {
+func (s Store) WriteZettelObjekte(z zettel.Zettel) (sh sha.Sha, err error) {
 	var w *objekte.Mover
 
 	if w, err = objekte.NewWriterMover(s.Age(), s.Umwelt().DirObjektenZettelen()); err != nil {
@@ -191,7 +191,7 @@ func (s *Store) Create(in zettel.Zettel) (tz stored_zettel.Transacted, err error
 
 	logz.PrintDebug(tz)
 
-	if tz.Stored.Sha, err = s.writeZettelObjekte(tz.Zettel); err != nil {
+	if tz.Stored.Sha, err = s.WriteZettelObjekte(tz.Zettel); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -229,7 +229,7 @@ func (s *Store) CreateWithHinweis(
 		return
 	}
 
-	if tz.Stored.Sha, err = s.writeZettelObjekte(tz.Zettel); err != nil {
+	if tz.Stored.Sha, err = s.WriteZettelObjekte(tz.Zettel); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -280,7 +280,7 @@ func (s *Store) Update(z stored_zettel.Named) (tz stored_zettel.Transacted, err 
 		return
 	}
 
-	if tz.Sha, err = s.writeZettelObjekte(tz.Zettel); err != nil {
+	if tz.Sha, err = s.WriteZettelObjekte(tz.Zettel); err != nil {
 		err = errors.Error(err)
 		return
 	}

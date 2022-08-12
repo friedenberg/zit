@@ -107,12 +107,13 @@ function can_checkout_and_checkin { # @test
 		echo "content"
 	} >"one/uno.md"
 
-	run zit checkin one/uno
+	run zit checkin -verbose one/uno
 	assert_output --partial '[one/uno '
 	assert_output --partial '(updated)'
 }
 
 function can_checkout_via_etiketten { # @test
+	skip
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
@@ -390,4 +391,48 @@ function indexes_are_implicitly_correct { # @test
 
 	run zit cat -type hinweis
 	assert_output --partial "$(cat "$expected")"
+}
+
+function checkouts_dont_overwrite { # @test
+	# setup
+	wd="$(mktemp -d)"
+	cd "$wd" || exit 1
+
+	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+
+	expected="$(mktemp)"
+	{
+		echo ---
+		echo "# bez"
+		echo - et1
+		echo - et2
+		echo ! md
+		echo ---
+		echo
+		echo the body
+	} >>"$expected"
+
+	run zit new "$expected"
+	assert_output --partial '[one/uno '
+
+	run zit checkout one/uno
+
+	{
+		echo ---
+		echo "# bez"
+		echo - et1
+		echo - et2
+		echo ! md
+		echo ---
+		echo
+		echo the body 2
+	} >"$expected"
+
+	cat "$expected" >"one/uno.md"
+
+	run zit checkout one/uno
+	assert_output --partial '[one/uno] (external has changes)'
+
+	run cat one/uno.md
+	assert_output "$(cat "$expected")"
 }

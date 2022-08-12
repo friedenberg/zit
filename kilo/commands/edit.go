@@ -5,10 +5,11 @@ import (
 
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/vim_cli_options_builder"
-	"github.com/friedenberg/zit/delta/umwelt"
+	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/foxtrot/zettel_formats"
-	"github.com/friedenberg/zit/hotel/zettels"
+	"github.com/friedenberg/zit/golf/checkout_store"
+	"github.com/friedenberg/zit/india/store_with_lock"
 	"github.com/friedenberg/zit/juliett/user_ops"
 )
 
@@ -24,15 +25,18 @@ func init() {
 
 			f.BoolVar(&c.IncludeAkte, "include-akte", true, "check out and open the akte")
 
-			return c
+			return commandWithLockedStore{commandWithHinweisen{c}}
 		},
 	)
 }
 
-func (c Edit) Run(u *umwelt.Umwelt, args ...string) (err error) {
+func (c Edit) RunWithHinweisen(
+	s store_with_lock.Store,
+	hins ...hinweis.Hinweis,
+) (err error) {
 	checkoutOp := user_ops.Checkout{
-		Umwelt: u,
-		Options: zettels.CheckinOptions{
+		Umwelt: s.Umwelt,
+		Options: checkout_store.CheckinOptions{
 			IncludeAkte: c.IncludeAkte,
 			Format:      zettel_formats.Text{},
 		},
@@ -40,7 +44,7 @@ func (c Edit) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	var checkoutResults user_ops.CheckoutResults
 
-	if checkoutResults, err = checkoutOp.Run(args...); err != nil {
+  if checkoutResults, err = checkoutOp.RunManyHinweisen(s, hins...); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -64,18 +68,18 @@ func (c Edit) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	checkinOp := user_ops.Checkin{
-		Umwelt:  u,
+		Umwelt:  s.Umwelt,
 		Options: checkoutOp.Options,
 	}
 
 	var readResults user_ops.ReadCheckedOutResults
 
 	readOp := user_ops.ReadCheckedOut{
-		Umwelt:  u,
+		Umwelt:  s.Umwelt,
 		Options: checkoutOp.Options,
 	}
 
-	if readResults, err = readOp.Run(checkoutResults.FilesZettelen...); err != nil {
+	if readResults, err = readOp.RunManyStrings(s, checkoutResults.FilesZettelen...); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -86,7 +90,7 @@ func (c Edit) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		zettels = append(zettels, z.External)
 	}
 
-	if _, err = checkinOp.Run(zettels...); err != nil {
+	if _, err = checkinOp.Run(s, zettels...); err != nil {
 		err = errors.Error(err)
 		return
 	}

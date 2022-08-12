@@ -6,11 +6,10 @@ import (
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
-	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/foxtrot/zettel_formats"
 	"github.com/friedenberg/zit/golf/checkout_store"
-	"github.com/friedenberg/zit/hotel/zettels"
+	"github.com/friedenberg/zit/india/store_with_lock"
 	"github.com/friedenberg/zit/juliett/user_ops"
 )
 
@@ -23,26 +22,29 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &Clean{}
 
-			return c
+			return commandWithLockedStore{c}
 		},
 	)
 }
 
-func (c Clean) Run(u *umwelt.Umwelt, args ...string) (err error) {
+func (c Clean) RunWithLockedStore(
+	s store_with_lock.Store,
+	args ...string,
+) (err error) {
 	if len(args) > 0 {
 		stdprinter.Errf("args provided will be ignored")
 	}
 
 	var possible checkout_store.CwdFiles
 
-	if possible, err = user_ops.NewGetPossibleZettels(u).Run(); err != nil {
+	if possible, err = user_ops.NewGetPossibleZettels(s.Umwelt).Run(s); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
 	args = possible.Zettelen
 
-	checkinOptions := zettels.CheckinOptions{
+	checkinOptions := checkout_store.CheckinOptions{
 		IncludeAkte: true,
 		Format:      zettel_formats.Text{},
 	}
@@ -50,11 +52,11 @@ func (c Clean) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	var readResults user_ops.ReadCheckedOutResults
 
 	readOp := user_ops.ReadCheckedOut{
-		Umwelt:  u,
+		Umwelt:  s.Umwelt,
 		Options: checkinOptions,
 	}
 
-	if readResults, err = readOp.Run(args...); err != nil {
+	if readResults, err = readOp.RunManyStrings(s, args...); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -75,7 +77,7 @@ func (c Clean) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		}
 	}
 
-	if u.Konfig.DryRun {
+	if s.Umwelt.Konfig.DryRun {
 		for _, z := range toDelete {
 			stdprinter.Outf("[%s] (would delete)\n", z.Hinweis)
 		}

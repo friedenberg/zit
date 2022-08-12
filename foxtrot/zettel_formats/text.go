@@ -66,6 +66,7 @@ func (s *textStateRead) Close() (err error) {
 			return
 		}
 
+		s.didReadAkte = true
 		s.readAkteSha = s.akteWriter.Sha()
 	}
 
@@ -92,6 +93,7 @@ func (f Text) ReadFrom(c *zettel.FormatContextRead) (n int64, err error) {
 			err = err1
 		}
 
+		logz.PrintDebug(state)
 		if !state.context.Zettel.Akte.IsNull() {
 			return
 		}

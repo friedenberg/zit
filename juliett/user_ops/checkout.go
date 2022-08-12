@@ -2,14 +2,15 @@ package user_ops
 
 import (
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
-	"github.com/friedenberg/zit/hotel/zettels"
+	"github.com/friedenberg/zit/golf/checkout_store"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
 type Checkout struct {
-	Options zettels.CheckinOptions
+	Options checkout_store.CheckinOptions
 	Umwelt  *umwelt.Umwelt
 }
 
@@ -19,17 +20,22 @@ type CheckoutResults struct {
 	FilesAkten    []string
 }
 
-func (c Checkout) Run(args ...string) (results CheckoutResults, err error) {
-	var store store_with_lock.Store
+func (c Checkout) RunManyHinweisen(
+  s store_with_lock.Store,
+  hins ...hinweis.Hinweis,
+) (results CheckoutResults, err error) {
+	zs := make([]stored_zettel.Transacted, len(hins))
 
-	if store, err = store_with_lock.New(c.Umwelt); err != nil {
-		err = errors.Error(err)
-		return
+	for i, _ := range zs {
+		h := hins[i]
+
+		if zs[i], err = s.Zettels().Read(h); err != nil {
+			err = errors.Error(err)
+			return
+		}
 	}
 
-	defer errors.PanicIfError(store.Flush)
-
-	if results.Zettelen, err = store.Zettels().Checkout(c.Options, args...); err != nil {
+	if results.Zettelen, err = s.CheckoutStore().Checkout(c.Options, zs...); err != nil {
 		err = errors.Error(err)
 		return
 	}

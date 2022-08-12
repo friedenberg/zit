@@ -3,13 +3,11 @@ package commands
 import (
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/charlie/hinweis"
-	"github.com/friedenberg/zit/delta/umwelt"
-	"github.com/friedenberg/zit/golf/objekten"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
 type CommandWithHinweisen interface {
-	RunWithHinweisen(*umwelt.Umwelt, *objekten.Store, ...hinweis.Hinweis) error
+	RunWithHinweisen(store_with_lock.Store, ...hinweis.Hinweis) error
 }
 
 type commandWithHinweisen struct {
@@ -30,7 +28,7 @@ func (c commandWithHinweisen) RunWithLockedStore(store store_with_lock.Store, ar
 		ids[i] = h
 	}
 
-	c.RunWithHinweisen(store.Umwelt, store.Zettels(), ids...)
+	c.RunWithHinweisen(store, ids...)
 
 	return
 }

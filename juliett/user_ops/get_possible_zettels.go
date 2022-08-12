@@ -17,16 +17,9 @@ func NewGetPossibleZettels(u *umwelt.Umwelt) GetPossibleZettels {
 	}
 }
 
-func (uo GetPossibleZettels) Run() (result checkout_store.CwdFiles, err error) {
-	var store store_with_lock.Store
-
-	if store, err = store_with_lock.New(uo.umwelt); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
-	defer errors.PanicIfError(store.Flush)
-
+func (uo GetPossibleZettels) Run(
+	store store_with_lock.Store,
+) (result checkout_store.CwdFiles, err error) {
 	if result, err = store.CheckoutStore().GetPossibleZettels(); err != nil {
 		err = errors.Error(err)
 		return

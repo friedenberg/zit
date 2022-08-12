@@ -1,21 +1,19 @@
 package user_ops
 
 import (
-	"os"
-
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/logz"
 	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/foxtrot/hinweisen"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
-	"github.com/friedenberg/zit/hotel/zettels"
+	"github.com/friedenberg/zit/golf/checkout_store"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
 type ReadCheckedOut struct {
 	Umwelt       *umwelt.Umwelt
-	Options      zettels.CheckinOptions
+	Options      checkout_store.CheckinOptions
 	AllowMissing bool
 }
 
@@ -23,7 +21,17 @@ type ReadCheckedOutResults struct {
 	Zettelen map[hinweis.Hinweis]stored_zettel.CheckedOut
 }
 
-func (op ReadCheckedOut) RunOne(path string) (zettel stored_zettel.CheckedOut, err error) {
+func (op ReadCheckedOut) RunOneHinweis(
+	s store_with_lock.Store,
+	h hinweis.Hinweis,
+) (zettel stored_zettel.CheckedOut, err error) {
+	return op.RunOneString(s, h.String())
+}
+
+func (op ReadCheckedOut) RunOneString(
+	s store_with_lock.Store,
+	path string,
+) (zettel stored_zettel.CheckedOut, err error) {
 	var store store_with_lock.Store
 
 	if store, err = store_with_lock.New(op.Umwelt); err != nil {
@@ -41,22 +49,28 @@ func (op ReadCheckedOut) RunOne(path string) (zettel stored_zettel.CheckedOut, e
 	return
 }
 
-func (op ReadCheckedOut) Run(paths ...string) (results ReadCheckedOutResults, err error) {
-	results.Zettelen = make(map[hinweis.Hinweis]stored_zettel.CheckedOut)
+func (op ReadCheckedOut) RunManyHinweisen(
+	s store_with_lock.Store,
+	hins ...hinweis.Hinweis,
+) (results ReadCheckedOutResults, err error) {
+	ss := make([]string, len(hins))
 
-	var store store_with_lock.Store
-
-	if store, err = store_with_lock.New(op.Umwelt); err != nil {
-		err = errors.Error(err)
-		return
+	for i, _ := range ss {
+		ss[i] = hins[i].String()
 	}
 
-	defer errors.PanicIfError(store.Flush)
+	return op.RunManyStrings(s, ss...)
+}
 
+func (op ReadCheckedOut) RunManyStrings(
+	s store_with_lock.Store,
+	paths ...string,
+) (results ReadCheckedOutResults, err error) {
+	results.Zettelen = make(map[hinweis.Hinweis]stored_zettel.CheckedOut)
 	for _, p := range paths {
 		var checked_out stored_zettel.CheckedOut
 
-		if checked_out, err = op.runOne(store, p); err != nil {
+		if checked_out, err = op.runOne(s, p); err != nil {
 			if errors.Is(err, hinweisen.ErrDoesNotExist) {
 				//TODO log
 				err = nil
@@ -74,14 +88,17 @@ func (op ReadCheckedOut) Run(paths ...string) (results ReadCheckedOutResults, er
 	return
 }
 
-func (op ReadCheckedOut) runOne(store store_with_lock.Store, p string) (zettel stored_zettel.CheckedOut, err error) {
+func (op ReadCheckedOut) runOne(
+	store store_with_lock.Store,
+	p string,
+) (zettel stored_zettel.CheckedOut, err error) {
 	if op.Options.AddMdExtension {
 		p = p + ".md"
 	}
 
 	zettel.External, err = store.CheckoutStore().Read(p)
 
-	if op.Options.IgnoreMissingHinweis && errors.Is(err, os.ErrNotExist) {
+	if op.Options.IgnoreMissingHinweis && errors.IsNotExist(err) {
 		err = nil
 		//results.Zettelen[ez.Hinweis] = stored_zettel.External{}
 		// continue
@@ -89,8 +106,6 @@ func (op ReadCheckedOut) runOne(store store_with_lock.Store, p string) (zettel s
 		err = errors.Error(err)
 		return
 	}
-
-	logz.Print(zettel.External.Hinweis)
 
 	if zettel.Internal, err = store.Zettels().Read(zettel.External.Hinweis); err != nil {
 		err = errors.Wrapped(err, "%s", zettel.External.Path)

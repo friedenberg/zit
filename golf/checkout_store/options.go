@@ -1,4 +1,4 @@
-package zettels
+package checkout_store
 
 import "github.com/friedenberg/zit/echo/zettel"
 

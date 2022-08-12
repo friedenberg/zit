@@ -6,11 +6,10 @@ import (
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/charlie/hinweis"
-	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/foxtrot/zettel_formats"
 	"github.com/friedenberg/zit/golf/checkout_store"
-	"github.com/friedenberg/zit/hotel/zettels"
+	"github.com/friedenberg/zit/india/store_with_lock"
 	"github.com/friedenberg/zit/juliett/user_ops"
 )
 
@@ -30,12 +29,12 @@ func init() {
 			f.BoolVar(&c.IgnoreAkte, "ignore-akte", false, "do not change the akte")
 			f.BoolVar(&c.All, "all", false, "")
 
-			return c
+			return commandWithLockedStore{c}
 		},
 	)
 }
 
-func (c Checkin) Run(u *umwelt.Umwelt, args ...string) (err error) {
+func (c Checkin) RunWithLockedStore(s store_with_lock.Store, args ...string) (err error) {
 	if c.All {
 		if len(args) > 0 {
 			stdprinter.Errf("Ignoring args because -all is set\n")
@@ -43,7 +42,7 @@ func (c Checkin) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 		var possible checkout_store.CwdFiles
 
-		if possible, err = user_ops.NewGetPossibleZettels(u).Run(); err != nil {
+		if possible, err = user_ops.NewGetPossibleZettels(s.Umwelt).Run(s); err != nil {
 			err = errors.Error(err)
 			return
 		}
@@ -51,7 +50,7 @@ func (c Checkin) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		args = possible.Zettelen
 	}
 
-	checkinOptions := zettels.CheckinOptions{
+	checkinOptions := checkout_store.CheckinOptions{
 		IncludeAkte: !c.IgnoreAkte,
 		Format:      zettel_formats.Text{},
 	}
@@ -59,17 +58,17 @@ func (c Checkin) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	var readResults user_ops.ReadCheckedOutResults
 
 	readOp := user_ops.ReadCheckedOut{
-		Umwelt:  u,
+		Umwelt:  s.Umwelt,
 		Options: checkinOptions,
 	}
 
-	if readResults, err = readOp.Run(args...); err != nil {
+	if readResults, err = readOp.RunManyStrings(s, args...); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
 	checkinOp := user_ops.Checkin{
-		Umwelt:  u,
+		Umwelt:  s.Umwelt,
 		Options: checkinOptions,
 	}
 
@@ -79,14 +78,14 @@ func (c Checkin) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		zettels = append(zettels, z.External)
 	}
 
-	if _, err = checkinOp.Run(zettels...); err != nil {
+	if _, err = checkinOp.Run(s, zettels...); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
 	if c.Delete {
 		deleteOp := user_ops.DeleteCheckout{
-			Umwelt: u,
+			Umwelt: s.Umwelt,
 		}
 
 		external := make(map[hinweis.Hinweis]stored_zettel.External)

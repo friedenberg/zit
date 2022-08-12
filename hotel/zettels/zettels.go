@@ -27,9 +27,6 @@ type Zettels interface {
 	Revert(h hinweis.Hinweis) (named stored_zettel.Named, err error)
 	UpdateNoKinder(z stored_zettel.Named) (err error)
 
-	//TODO move to user_ops
-	Checkout(options CheckinOptions, args ...string) (czs []stored_zettel.CheckedOut, err error)
-
 	Delete(id id.Id) (zettel stored_zettel.Named, err error)
 
 	Flush() error

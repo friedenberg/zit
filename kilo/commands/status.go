@@ -5,10 +5,9 @@ import (
 
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/stdprinter"
-	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/foxtrot/zettel_formats"
 	"github.com/friedenberg/zit/golf/checkout_store"
-	"github.com/friedenberg/zit/hotel/zettels"
+	"github.com/friedenberg/zit/india/store_with_lock"
 	"github.com/friedenberg/zit/juliett/user_ops"
 )
 
@@ -21,26 +20,26 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &Status{}
 
-			return c
+			return commandWithLockedStore{c}
 		},
 	)
 }
 
-func (c Status) Run(u *umwelt.Umwelt, args ...string) (err error) {
+func (c Status) RunWithLockedStore(s store_with_lock.Store, args ...string) (err error) {
 	if len(args) > 0 {
 		stdprinter.Errf("args provided will be ignored")
 	}
 
 	var possible checkout_store.CwdFiles
 
-	if possible, err = user_ops.NewGetPossibleZettels(u).Run(); err != nil {
+	if possible, err = user_ops.NewGetPossibleZettels(s.Umwelt).Run(s); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
 	args = possible.Zettelen
 
-	options := zettels.CheckinOptions{
+	options := checkout_store.CheckinOptions{
 		IncludeAkte: true,
 		Format:      zettel_formats.Text{},
 	}
@@ -48,11 +47,11 @@ func (c Status) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	var readResults user_ops.ReadCheckedOutResults
 
 	readOp := user_ops.ReadCheckedOut{
-		Umwelt:  u,
+		Umwelt:  s.Umwelt,
 		Options: options,
 	}
 
-	if readResults, err = readOp.Run(args...); err != nil {
+	if readResults, err = readOp.RunManyStrings(s, args...); err != nil {
 		err = errors.Error(err)
 		return
 	}

@@ -5,30 +5,24 @@ import (
 	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
-	"github.com/friedenberg/zit/hotel/zettels"
+	"github.com/friedenberg/zit/golf/checkout_store"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
 type Checkin struct {
 	Umwelt  *umwelt.Umwelt
-	Options zettels.CheckinOptions
+	Options checkout_store.CheckinOptions
 }
 
 type CheckinResults struct {
 	Zettelen map[hinweis.Hinweis]stored_zettel.CheckedOut
 }
 
-func (c Checkin) Run(zettelen ...stored_zettel.External) (results CheckinResults, err error) {
+func (c Checkin) Run(
+	store store_with_lock.Store,
+	zettelen ...stored_zettel.External,
+) (results CheckinResults, err error) {
 	results.Zettelen = make(map[hinweis.Hinweis]stored_zettel.CheckedOut)
-
-	var store store_with_lock.Store
-
-	if store, err = store_with_lock.New(c.Umwelt); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
-	defer errors.PanicIfError(store.Flush)
 
 	for _, z := range zettelen {
 		tz := stored_zettel.Transacted{
