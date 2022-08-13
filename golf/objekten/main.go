@@ -333,7 +333,6 @@ func (s *Store) Update(
 		return
 	}
 
-	stdprinter.Outf("%s (updated)\n", tz.Named)
 
 	return
 }

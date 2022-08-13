@@ -170,9 +170,7 @@ func (f Text) writeToExternalAkte(c zettel.FormatContextWrite) (n int64, err err
 		return
 	}
 
-	ar, err = c.AkteReader(c.Zettel.Akte)
-
-	if err != nil {
+	if ar, err = c.AkteReader(c.Zettel.Akte); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -182,7 +180,7 @@ func (f Text) writeToExternalAkte(c zettel.FormatContextWrite) (n int64, err err
 		return
 	}
 
-	defer stdprinter.PanicIfError(ar.Close())
+	defer stdprinter.PanicIfError(ar.Close)
 
 	var file *os.File
 

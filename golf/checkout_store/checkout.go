@@ -57,7 +57,7 @@ func (s *Store) Checkout(
 		}
 
 		if err = s.writeFormat(options, filename, c); err != nil {
-			err = errors.Errorf("%s: %s", sz.Hinweis, err)
+			err = errors.Wrapped(err, "%s", sz.Named)
 			stdprinter.Errf("%s (check out failed):\n", sz.Named)
 			stdprinter.Error(err)
 			continue
@@ -69,7 +69,11 @@ func (s *Store) Checkout(
 	return
 }
 
-func (s *Store) writeFormat(o CheckinOptions, p string, fc zettel.FormatContextWrite) (err error) {
+func (s *Store) writeFormat(
+	o CheckinOptions,
+	p string,
+	fc zettel.FormatContextWrite,
+) (err error) {
 	var f *os.File
 
 	if f, err = open_file_guard.Create(p); err != nil {

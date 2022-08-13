@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/charlie/hinweis"
+	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/foxtrot/zettel_formats"
 	"github.com/friedenberg/zit/golf/checkout_store"
@@ -25,26 +26,42 @@ func init() {
 
 			f.BoolVar(&c.IncludeAkte, "include-akte", true, "check out and open the akte")
 
-			return commandWithLockedStore{commandWithHinweisen{c}}
+			return c
 		},
 	)
 }
 
-func (c Edit) RunWithHinweisen(
-	s store_with_lock.Store,
-	hins ...hinweis.Hinweis,
-) (err error) {
+func (c Edit) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	checkoutOp := user_ops.Checkout{
-		Umwelt: s.Umwelt,
+		Umwelt: u,
 		Options: checkout_store.CheckinOptions{
 			IncludeAkte: c.IncludeAkte,
 			Format:      zettel_formats.Text{},
 		},
 	}
 
+	var hins []hinweis.Hinweis
+
+	if hins, err = (user_ops.GetHinweisenFromArgs{}).RunMany(args...); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
 	var checkoutResults user_ops.CheckoutResults
 
-  if checkoutResults, err = checkoutOp.RunManyHinweisen(s, hins...); err != nil {
+	var s store_with_lock.Store
+
+	if s, err = store_with_lock.New(u); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	if checkoutResults, err = checkoutOp.RunManyHinweisen(s, hins...); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	if err = s.Flush(); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -79,6 +96,11 @@ func (c Edit) RunWithHinweisen(
 		Options: checkoutOp.Options,
 	}
 
+	if s, err = store_with_lock.New(u); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
 	if readResults, err = readOp.RunManyStrings(s, checkoutResults.FilesZettelen...); err != nil {
 		err = errors.Error(err)
 		return
@@ -91,6 +113,11 @@ func (c Edit) RunWithHinweisen(
 	}
 
 	if _, err = checkinOp.Run(s, zettels...); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	if err = s.Flush(); err != nil {
 		err = errors.Error(err)
 		return
 	}

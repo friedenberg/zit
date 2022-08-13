@@ -103,11 +103,11 @@ function can_checkout_and_checkin { # @test
 		echo "# wow"
 		echo "- ok"
 		echo "---"
-		echo ""
+		echo
 		echo "content"
 	} >"one/uno.md"
 
-	run zit checkin one/uno
+	run zit checkin one/uno.md
 	assert_output --partial '[one/uno '
 	assert_output --partial '(updated)'
 }
@@ -277,6 +277,7 @@ function can_update_akte { # @test
 
 	run zit checkin-akte -new-etiketten et3 one/uno "$new_akte"
 	assert_output --partial '[one/uno '
+	assert_output --partial '(akte updated)'
 
 	# then
 	{

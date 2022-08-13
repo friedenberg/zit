@@ -7,6 +7,7 @@ import (
 
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/logz"
+	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
 	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/charlie/hinweis"
@@ -130,7 +131,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			return
 		}
 
-		// stdprinter.Outf("[%s %s] (akte updated)", z.Hinweis, z.Sha)
+		stdprinter.Outf("%s (akte updated)", z.Named)
 	}
 
 	return

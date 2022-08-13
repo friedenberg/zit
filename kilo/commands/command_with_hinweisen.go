@@ -4,6 +4,7 @@ import (
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/india/store_with_lock"
+	"github.com/friedenberg/zit/juliett/user_ops"
 )
 
 type CommandWithHinweisen interface {
@@ -14,21 +15,18 @@ type commandWithHinweisen struct {
 	CommandWithHinweisen
 }
 
-func (c commandWithHinweisen) RunWithLockedStore(store store_with_lock.Store, args ...string) (err error) {
-	ids := make([]hinweis.Hinweis, len(args))
+func (c commandWithHinweisen) RunWithLockedStore(
+	store store_with_lock.Store,
+	args ...string,
+) (err error) {
+	var hins []hinweis.Hinweis
 
-	for i, arg := range args {
-		var h hinweis.Hinweis
-
-		if h, err = hinweis.MakeBlindHinweis(arg); err != nil {
-			err = errors.Error(err)
-			return
-		}
-
-		ids[i] = h
+	if hins, err = (user_ops.GetHinweisenFromArgs{}).RunMany(args...); err != nil {
+		err = errors.Error(err)
+		return
 	}
 
-	c.RunWithHinweisen(store, ids...)
+	c.RunWithHinweisen(store, hins...)
 
 	return
 }

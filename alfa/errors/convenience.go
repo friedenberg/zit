@@ -9,6 +9,7 @@ import (
 )
 
 type unwrappable interface {
+	error
 	Unwrap() error
 }
 
@@ -41,6 +42,14 @@ func IsEOF(err error) bool {
 func IsNotExist(err error) bool {
 	e := Unwrap(err)
 	return os.IsNotExist(e)
+}
+
+func unwrapOnce(err error) error {
+	if e, ok := err.(unwrappable); ok {
+		return e
+	}
+
+	return err
 }
 
 func Unwrap(err error) error {

@@ -2,6 +2,7 @@ package user_ops
 
 import (
 	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
@@ -31,6 +32,10 @@ func (c Checkin) Run(
 			err = errors.Error(err)
 			return
 		}
+
+		//TODO: add states to checkin process to indicate results of update call
+		// stdprinter.Outf("%s (unchanged)\n", tz.Named)
+		stdprinter.Outf("%s (updated)\n", tz.Named)
 
 		results.Zettelen[tz.Hinweis] = stored_zettel.CheckedOut{
 			Internal: tz,
