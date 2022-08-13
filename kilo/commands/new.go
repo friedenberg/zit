@@ -4,7 +4,7 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/alfa/bezeichnung"
-	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/bravo/akte_ext"
 	"github.com/friedenberg/zit/charlie/etikett"

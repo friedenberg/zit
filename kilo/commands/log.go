@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"flag"
 
-	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/alfa/logz"
-	"github.com/friedenberg/zit/alfa/stdprinter"
+	"github.com/friedenberg/zit/bravo/stdprinter"
 	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/india/store_with_lock"

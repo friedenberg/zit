@@ -4,7 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/bravo/errors"
 )
 
 func DeleteFilesAndDirs(args ...string) (err error) {

@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/bravo/sha"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )

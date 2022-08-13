@@ -5,7 +5,7 @@ import (
 	"path"
 
 	"filippo.io/age"
-	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/bravo/errors"
 )
 
 func Generate(basePath string) (a *ages, err error) {

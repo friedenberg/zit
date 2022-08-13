@@ -4,8 +4,8 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/friedenberg/zit/alfa/errors"
-	"github.com/friedenberg/zit/alfa/stdprinter"
+	"github.com/friedenberg/zit/bravo/errors"
+	"github.com/friedenberg/zit/bravo/stdprinter"
 	"github.com/friedenberg/zit/alfa/toml"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
 )

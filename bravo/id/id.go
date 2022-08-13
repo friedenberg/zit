@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/bravo/sha"
-	"github.com/friedenberg/zit/bravo/zk_types"
+	"github.com/friedenberg/zit/charlie/zk_types"
 )
 
 type Id interface {

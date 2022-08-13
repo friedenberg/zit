@@ -4,8 +4,8 @@ import (
 	"io"
 	"sort"
 
-	"github.com/friedenberg/zit/alfa/errors"
-	"github.com/friedenberg/zit/bravo/line_format"
+	"github.com/friedenberg/zit/bravo/errors"
+	"github.com/friedenberg/zit/charlie/line_format"
 	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 )

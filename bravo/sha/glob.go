@@ -4,7 +4,7 @@ import (
 	"path"
 	"path/filepath"
 
-	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/bravo/errors"
 )
 
 func (s Sha) Glob(pc ...string) (globbed Sha, err error) {

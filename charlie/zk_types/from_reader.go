@@ -3,7 +3,7 @@ package zk_types
 import (
 	"bufio"
 
-	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/bravo/errors"
 )
 
 func ConfirmTypeFromReader(t Type, r *bufio.Reader) (err error) {

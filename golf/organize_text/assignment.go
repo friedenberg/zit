@@ -3,7 +3,7 @@ package organize_text
 import (
 	"sort"
 
-	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/charlie/etikett"
 )
 

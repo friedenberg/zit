@@ -6,7 +6,7 @@ import (
 	"flag"
 	"sort"
 
-	"github.com/friedenberg/zit/alfa/stdprinter"
+	"github.com/friedenberg/zit/bravo/stdprinter"
 )
 
 func (c command) PrintUsage(in error) (exitStatus int) {

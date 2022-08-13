@@ -3,7 +3,7 @@ package transaktion
 import (
 	"io"
 
-	"github.com/friedenberg/zit/bravo/line_format"
+	"github.com/friedenberg/zit/charlie/line_format"
 )
 
 type Writer struct {

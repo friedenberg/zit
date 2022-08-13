@@ -1,6 +1,6 @@
 package atomic_flush
 
-import "github.com/friedenberg/zit/alfa/errors"
+import "github.com/friedenberg/zit/bravo/errors"
 
 //TODO WriteCloser factory for directories and files
 

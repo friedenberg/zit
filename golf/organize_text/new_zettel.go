@@ -1,6 +1,6 @@
 package organize_text
 
-import "github.com/friedenberg/zit/alfa/errors"
+import "github.com/friedenberg/zit/bravo/errors"
 
 type newZettel struct {
 	Bezeichnung string

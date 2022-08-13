@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/alfa/exec"
 	"github.com/friedenberg/zit/bravo/id"
 	"github.com/friedenberg/zit/bravo/open_file_guard"

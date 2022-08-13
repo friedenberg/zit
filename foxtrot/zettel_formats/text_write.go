@@ -5,10 +5,10 @@ import (
 	"io"
 	"os"
 
-	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/alfa/logz"
-	"github.com/friedenberg/zit/alfa/stdprinter"
-	"github.com/friedenberg/zit/bravo/line_format"
+	"github.com/friedenberg/zit/bravo/stdprinter"
+	"github.com/friedenberg/zit/charlie/line_format"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
 	"github.com/friedenberg/zit/echo/zettel"
 )

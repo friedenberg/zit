@@ -4,7 +4,7 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/bravo/errors"
 	"golang.org/x/sys/unix"
 )
 

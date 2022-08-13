@@ -5,9 +5,9 @@ import (
 	"io"
 	"strings"
 
-	"github.com/friedenberg/zit/alfa/errors"
-	"github.com/friedenberg/zit/bravo/line_format"
-	"github.com/friedenberg/zit/bravo/zk_types"
+	"github.com/friedenberg/zit/bravo/errors"
+	"github.com/friedenberg/zit/charlie/line_format"
+	"github.com/friedenberg/zit/charlie/zk_types"
 	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/echo/zettel"
 )

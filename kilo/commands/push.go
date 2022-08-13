@@ -6,7 +6,7 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/bravo/files"
 	"github.com/friedenberg/zit/charlie/konfig"
 	"github.com/friedenberg/zit/delta/umwelt"

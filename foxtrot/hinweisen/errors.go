@@ -1,6 +1,6 @@
 package hinweisen
 
-import "github.com/friedenberg/zit/alfa/errors"
+import "github.com/friedenberg/zit/bravo/errors"
 
 var (
 	ErrDoesNotExist error

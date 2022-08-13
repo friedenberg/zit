@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/bravo/errors"
 )
 
 type Writer []string

@@ -3,7 +3,7 @@ package node_type
 import (
 	"strings"
 
-	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/bravo/errors"
 )
 
 type Type int

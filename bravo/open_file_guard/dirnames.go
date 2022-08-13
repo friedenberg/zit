@@ -3,7 +3,7 @@ package open_file_guard
 import (
 	"path"
 
-	"github.com/friedenberg/zit/alfa/errors"
+	"github.com/friedenberg/zit/bravo/errors"
 )
 
 func ReadDirNames(ps ...string) (names []string, err error) {
