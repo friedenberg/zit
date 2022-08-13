@@ -24,7 +24,6 @@ import (
 	"github.com/friedenberg/zit/foxtrot/hinweisen"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/foxtrot/zettel_formats"
-	"github.com/friedenberg/zit/hotel/zettels"
 )
 
 type Store struct {
@@ -363,7 +362,7 @@ func (s Store) Flush() (err error) {
 	return
 }
 
-func (s Store) AllInChain(h hinweis.Hinweis) (c zettels.Chain, err error) {
+func (s Store) AllInChain(h hinweis.Hinweis) (c []stored_zettel.Transacted, err error) {
 	//TODO
 	// rr := indexReaderChain{
 	// 	Hinweis: h,

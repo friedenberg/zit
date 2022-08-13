@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/alfa/logz"
 	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/charlie/hinweis"
-	"github.com/friedenberg/zit/hotel/zettels"
+	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
@@ -44,7 +44,7 @@ func (c Log) RunWithHinweisen(os store_with_lock.Store, hs ...hinweis.Hinweis) (
 		h = hs[0]
 	}
 
-	var chain zettels.Chain
+	var chain []stored_zettel.Transacted
 	logz.Print()
 
 	if chain, err = os.Zettels().AllInChain(h); err != nil {
