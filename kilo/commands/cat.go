@@ -3,6 +3,7 @@ package commands
 import (
 	"encoding/json"
 	"flag"
+	"syscall"
 
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/logz"
@@ -120,11 +121,16 @@ func (c Cat) zettelen(store store_with_lock.Store) (err error) {
 
 		// not a bottleneck
 		for _, z := range all {
-
 			c.Zettel = z.Zettel
 
 			if _, err = f.WriteTo(c); err != nil {
-				logz.Print(err)
+				if errors.Is(err, syscall.EPIPE) {
+					logz.Print("closed pipe")
+					err = nil
+					break
+				} else {
+					logz.Print(err)
+				}
 			}
 		}
 	}

@@ -17,7 +17,8 @@ func As(err error, target interface{}) bool {
 }
 
 func Is(err, target error) bool {
-	return errors.Is(err, target)
+	e := Unwrap(err)
+	return errors.Is(e, target)
 	// ok := err.(target)
 	// // ok := xerrors.Is(err, target)
 

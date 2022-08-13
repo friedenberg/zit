@@ -68,9 +68,6 @@ func Errorf(f string, values ...interface{}) (err errer) {
 	return
 }
 
-// func WithInfo(in error, info string) (out error) {
-
-// }
 func newStackWrapError(skip int) (err stackWrapError, ok bool) {
 	var (
 		pc   uintptr

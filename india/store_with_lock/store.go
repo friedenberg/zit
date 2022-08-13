@@ -3,6 +3,7 @@ package store_with_lock
 import (
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/alfa/logz"
+	"github.com/friedenberg/zit/alfa/stdprinter"
 	"github.com/friedenberg/zit/charlie/age"
 	"github.com/friedenberg/zit/charlie/file_lock"
 	"github.com/friedenberg/zit/delta/umwelt"
@@ -91,11 +92,13 @@ func (s Store) CheckoutStore() *checkout_store.Store {
 
 func (s Store) Flush() (err error) {
 	if err = s.Zettels().Flush(); err != nil {
+		stdprinter.Err(err)
 		err = errors.Error(err)
 		return
 	}
 
 	if err = s.CheckoutStore().Flush(); err != nil {
+		stdprinter.Err(err)
 		err = errors.Error(err)
 		return
 	}
