@@ -14,16 +14,10 @@ type DeleteCheckout struct {
 	Umwelt *umwelt.Umwelt
 }
 
-func (c DeleteCheckout) Run(zettels map[hinweis.Hinweis]stored_zettel.External) (err error) {
-	var store store_with_lock.Store
-
-	if store, err = store_with_lock.New(c.Umwelt); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
-	defer errors.PanicIfError(store.Flush)
-
+func (c DeleteCheckout) Run(
+	store store_with_lock.Store,
+	zettels map[hinweis.Hinweis]stored_zettel.External,
+) (err error) {
 	toDelete := make([]stored_zettel.External, 0, len(zettels))
 	filesToDelete := make([]string, 0, len(zettels))
 
@@ -54,8 +48,8 @@ func (c DeleteCheckout) Run(zettels map[hinweis.Hinweis]stored_zettel.External) 
 		return
 	}
 
-	for _, z := range toDelete {
-		stdprinter.Outf("[%s] (checkout deleted)\n", z.Hinweis)
+	for _, f := range filesToDelete {
+		stdprinter.Outf("%s (checkout deleted)\n", f)
 	}
 
 	return

@@ -11,7 +11,6 @@ import (
 	"github.com/friedenberg/zit/foxtrot/hinweisen"
 	"github.com/friedenberg/zit/golf/checkout_store"
 	"github.com/friedenberg/zit/golf/objekten"
-	"github.com/friedenberg/zit/hotel/zettels"
 )
 
 type Store struct {
@@ -37,14 +36,7 @@ func New(u *umwelt.Umwelt) (s Store, err error) {
 		return
 	}
 
-	var zettelStore zettels.Zettels
-
-	if zettelStore, err = zettels.New(u, s.age); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
-	s.zettels = &objekten.Store{Zettels: zettelStore}
+	s.zettels = &objekten.Store{}
 
 	if err = s.zettels.Initialize(u); err != nil {
 		err = errors.Wrapped(err, "failed to initialize zettel meta store")

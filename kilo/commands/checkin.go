@@ -34,7 +34,10 @@ func init() {
 	)
 }
 
-func (c Checkin) RunWithLockedStore(s store_with_lock.Store, args ...string) (err error) {
+func (c Checkin) RunWithLockedStore(
+	s store_with_lock.Store,
+	args ...string,
+) (err error) {
 	if c.All {
 		if len(args) > 0 {
 			stdprinter.Errf("Ignoring args because -all is set\n")
@@ -94,7 +97,7 @@ func (c Checkin) RunWithLockedStore(s store_with_lock.Store, args ...string) (er
 			external[h] = z.External
 		}
 
-		if err = deleteOp.Run(external); err != nil {
+		if err = deleteOp.Run(s, external); err != nil {
 			err = errors.Error(err)
 			return
 		}

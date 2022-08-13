@@ -2,7 +2,6 @@ package objekten
 
 import (
 	"io"
-	"os"
 
 	"github.com/friedenberg/zit/alfa/errors"
 	"github.com/friedenberg/zit/bravo/id"
@@ -46,36 +45,24 @@ func (w akteMultiWriter) Sha() (s sha.Sha) {
 }
 
 func (s Store) AkteWriter() (w objekte.Writer, err error) {
-	var inner, outer objekte.Writer
+	var outer objekte.Writer
 
-	if inner, err = s.Zettels.AkteWriter(); err != nil {
+	if outer, err = objekte.NewWriterMover(s.Age, s.Umwelt.DirObjektenAkten()); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	if outer, err = objekte.NewWriterMover(s.Age(), s.Umwelt().DirObjektenAkten()); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
-	w = akteMultiWriter{
-		Writer:  io.MultiWriter(inner, outer),
-		writers: []objekte.Writer{inner, outer},
-	}
+	w = outer
 
 	return
 }
 
 func (s Store) AkteReader(sha sha.Sha) (r io.ReadCloser, err error) {
-	p := id.Path(sha, s.Umwelt().DirObjektenAkten())
+	p := id.Path(sha, s.Umwelt.DirObjektenAkten())
 
-	if r, err = objekte.NewFileReader(s.Age(), p); err != nil {
-		if os.IsNotExist(err) {
-			return s.Zettels.AkteReader(sha)
-		} else {
-			err = errors.Error(err)
-			return
-		}
+	if r, err = objekte.NewFileReader(s.Age, p); err != nil {
+		err = errors.Error(err)
+		return
 	}
 
 	return

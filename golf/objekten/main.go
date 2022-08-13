@@ -28,8 +28,8 @@ import (
 )
 
 type Store struct {
-	umwelt *umwelt.Umwelt
-	zettels.Zettels
+	*umwelt.Umwelt
+	age.Age
 	hinweisen hinweisen.Hinweisen
 	*indexZettelenTails
 	*indexEtiketten
@@ -37,16 +37,14 @@ type Store struct {
 }
 
 func (s *Store) Initialize(u *umwelt.Umwelt) (err error) {
-	s.umwelt = u
+	s.Umwelt = u
 
-	var a age.Age
-
-	if a, err = u.Age(); err != nil {
+	if s.Age, err = u.Age(); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	if s.hinweisen, err = hinweisen.New(a, u.DirZit()); err != nil {
+	if s.hinweisen, err = hinweisen.New(s.Age, u.DirZit()); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -93,7 +91,7 @@ func (s Store) writeTransaktion() (err error) {
 
 	var p string
 
-	if p, err = id.MakeDirIfNecessary(s.Transaktion.Time, s.Umwelt().DirObjektenTransaktion()); err != nil {
+	if p, err = id.MakeDirIfNecessary(s.Transaktion.Time, s.Umwelt.DirObjektenTransaktion()); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -120,7 +118,7 @@ func (s Store) writeTransaktion() (err error) {
 func (s Store) WriteZettelObjekte(z zettel.Zettel) (sh sha.Sha, err error) {
 	var w *objekte.Mover
 
-	if w, err = objekte.NewWriterMover(s.Age(), s.Umwelt().DirObjektenZettelen()); err != nil {
+	if w, err = objekte.NewWriterMover(s.Age, s.Umwelt.DirObjektenZettelen()); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -333,7 +331,10 @@ func (s *Store) Update(
 		return
 	}
 
+	return
+}
 
+func (s Store) Revert(h hinweis.Hinweis) (named stored_zettel.Transacted, err error) {
 	return
 }
 
@@ -346,11 +347,6 @@ func (s Store) Flush() (err error) {
 	if err = s.hinweisen.Flush(); err != nil {
 		stdprinter.Out(err)
 		err = errors.Error(err)
-		return
-	}
-
-	if err = s.Zettels.Flush(); err != nil {
-		err = errors.Wrapped(err, "failed to flush old zettel store")
 		return
 	}
 
@@ -390,7 +386,7 @@ func (s Store) AllInChain(h hinweis.Hinweis) (c zettels.Chain, err error) {
 func (s Store) ReadAllTransaktions() (out []transaktion.Transaktion, err error) {
 	var headNames []string
 
-	d := s.Umwelt().DirObjektenTransaktion()
+	d := s.Umwelt.DirObjektenTransaktion()
 
 	if headNames, err = open_file_guard.ReadDirNames(d); err != nil {
 		err = errors.Error(err)
@@ -433,7 +429,7 @@ func (s Store) ReadAllTransaktions() (out []transaktion.Transaktion, err error) 
 }
 
 func (s *Store) Reindex() (err error) {
-	if err = os.RemoveAll(s.Umwelt().DirVerzeichnisse()); err != nil {
+	if err = os.RemoveAll(s.Umwelt.DirVerzeichnisse()); err != nil {
 		err = errors.Wrapped(err, "failed to remove verzeichnisse dir")
 		return
 	}

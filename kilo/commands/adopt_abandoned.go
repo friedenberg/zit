@@ -39,9 +39,9 @@ func (c AdoptAbandoned) RunWithLockedStore(store store_with_lock.Store, args ...
 			return
 		}
 
-		var stored stored_zettel.Stored
+		var stored stored_zettel.Transacted
 
-		if stored, err = store.Zettels().ReadZettel(sha); err != nil {
+		if stored, err = store.Zettels().Read(sha); err != nil {
 			err = errors.Error(err)
 			return
 		}
