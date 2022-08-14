@@ -8,8 +8,8 @@ import (
 	"github.com/friedenberg/zit/alfa/logz"
 	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/bravo/stdprinter"
-	age_io "github.com/friedenberg/zit/echo/age_io"
 	"github.com/friedenberg/zit/delta/etikett"
+	age_io "github.com/friedenberg/zit/echo/age_io"
 )
 
 type Index struct {

@@ -14,9 +14,9 @@ import (
 	"github.com/friedenberg/zit/charlie/files"
 	"github.com/friedenberg/zit/charlie/open_file_guard"
 	"github.com/friedenberg/zit/charlie/sha"
-	age_io "github.com/friedenberg/zit/echo/age_io"
 	"github.com/friedenberg/zit/delta/etikett"
-	"github.com/friedenberg/zit/echo/zettel"
+	age_io "github.com/friedenberg/zit/echo/age_io"
+	"github.com/friedenberg/zit/foxtrot/zettel"
 )
 
 const (

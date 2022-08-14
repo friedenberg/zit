@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/charlie/open_file_guard"
 	"github.com/friedenberg/zit/charlie/sha"
 	age_io "github.com/friedenberg/zit/echo/age_io"
-	"github.com/friedenberg/zit/echo/zettel"
+	"github.com/friedenberg/zit/foxtrot/zettel"
 )
 
 type ErrHasInlineAkteAndFilePath struct {

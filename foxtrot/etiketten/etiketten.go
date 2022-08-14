@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/delta/age"
 	"github.com/friedenberg/zit/delta/etikett"
 	"github.com/friedenberg/zit/delta/konfig"
-	"github.com/friedenberg/zit/echo/sharded_store"
+	"github.com/friedenberg/zit/foxtrot/sharded_store"
 )
 
 type Etiketten interface {

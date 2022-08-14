@@ -3,7 +3,7 @@ package zettel_formats
 import (
 	"testing"
 
-	"github.com/friedenberg/zit/echo/zettel"
+	"github.com/friedenberg/zit/foxtrot/zettel"
 )
 
 func TestReadWithoutAkte(t *testing.T) {

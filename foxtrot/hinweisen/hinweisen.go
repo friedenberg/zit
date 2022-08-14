@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/charlie/sha"
 	"github.com/friedenberg/zit/delta/age"
 	"github.com/friedenberg/zit/delta/hinweis"
-	"github.com/friedenberg/zit/echo/sharded_store"
+	"github.com/friedenberg/zit/foxtrot/sharded_store"
 )
 
 type Hinweisen interface {

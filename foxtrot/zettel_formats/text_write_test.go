@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/friedenberg/zit/charlie/sha"
-	"github.com/friedenberg/zit/echo/zettel"
+	"github.com/friedenberg/zit/foxtrot/zettel"
 )
 
 type noopCloser struct {

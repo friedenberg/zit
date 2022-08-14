@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/charlie/zk_types"
 	"github.com/friedenberg/zit/delta/hinweis"
-	"github.com/friedenberg/zit/echo/verzeichnisse"
+	"github.com/friedenberg/zit/foxtrot/verzeichnisse"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 )
 
