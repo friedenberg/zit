@@ -17,16 +17,6 @@ type Mover struct {
 	lockFile    bool
 }
 
-func NewWriterMoverPrenamed(age age.Age, objektePath string) (m *Mover, err error) {
-	return NewMoverOptions(
-		MoveOptions{
-			Age:                      age,
-			FinalPath:                objektePath,
-			GenerateFinalPathFromSha: false,
-		},
-	)
-}
-
 func NewWriterMover(age age.Age, basePath string) (m *Mover, err error) {
 	return NewMoverOptions(
 		MoveOptions{

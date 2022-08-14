@@ -11,5 +11,10 @@ func (s Store) ReadCloser(p string) (r io.ReadCloser, err error) {
 }
 
 func (s Store) WriteCloser(p string) (w io.WriteCloser, err error) {
-	return age_io.NewWriterMoverPrenamed(s.Age, p)
+	return age_io.NewMoverOptions(
+		age_io.MoveOptions{
+			Age:       s.Age,
+			FinalPath: p,
+		},
+	)
 }
