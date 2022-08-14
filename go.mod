@@ -12,4 +12,4 @@ require (
 )
 
 // replace filippo.io/age v1.0.0 => ../age
-// replace log => github.com/friedenberg/zit/alfa/logz
+// replace log => github.com/friedenberg/zit/src/alfa/logz
