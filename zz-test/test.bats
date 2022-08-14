@@ -275,7 +275,7 @@ function can_update_akte { # @test
 		echo the body but new
 	} >>"$new_akte"
 
-	run zit checkin-akte -new-etiketten et3 one/uno "$new_akte"
+	run zit checkin-akte -verbose -new-etiketten et3 one/uno "$new_akte"
 	assert_output --partial '[one/uno '
 	assert_output --partial '(akte updated)'
 

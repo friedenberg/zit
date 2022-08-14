@@ -51,6 +51,7 @@ func (s Store) AkteWriter() (w age_io.Writer, err error) {
 		Age:                      s.Age,
 		FinalPath:                s.Umwelt.DirObjektenAkten(),
 		GenerateFinalPathFromSha: true,
+		LockFile:                 true,
 	}
 
 	if outer, err = age_io.NewMover(mo); err != nil {

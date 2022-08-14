@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/src/bravo/errors"
+	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/files"
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
 	"github.com/friedenberg/zit/src/delta/id"
@@ -70,6 +71,7 @@ func (m *Mover) Close() (err error) {
 	}
 
 	if m.objektePath == "" {
+    //TODO move this validation to options
 		if m.basePath == "" {
 			err = errors.Errorf("basepath is nil")
 			return
@@ -81,6 +83,11 @@ func (m *Mover) Close() (err error) {
 			err = errors.Error(err)
 			return
 		}
+	}
+
+	if m.lockFile && files.Exists(m.objektePath) {
+		stdprinter.Outf("File already exists: %s", m.objektePath)
+		return
 	}
 
 	p := m.file.Name()
