@@ -8,7 +8,6 @@ import (
 
 	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/bravo/sha"
-	"github.com/friedenberg/zit/charlie/age"
 )
 
 type Reader interface {
@@ -21,15 +20,6 @@ type reader struct {
 	rAge io.Reader
 	rZip io.ReadCloser
 	tee  io.Reader
-}
-
-func NewReader(age age.Age, in io.Reader) (r *reader, err error) {
-	return NewReaderOptions(
-		ReadOptions{
-			Age:    age,
-			Reader: in,
-		},
-	)
 }
 
 func NewReaderOptions(o ReadOptions) (r *reader, err error) {

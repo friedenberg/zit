@@ -86,7 +86,12 @@ func (s shard) Reader(r io.ReadCloser) (ro io.ReadCloser, err error) {
 		return
 	}
 
-	if ro, err = age_io.NewReader(s.age, r); err != nil {
+	o := age_io.ReadOptions{
+		Age:    s.age,
+		Reader: r,
+	}
+
+	if ro, err = age_io.NewReaderOptions(o); err != nil {
 		err = errors.Error(err)
 		return
 	}

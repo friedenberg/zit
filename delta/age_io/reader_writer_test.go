@@ -47,7 +47,12 @@ func Test1(t *testing.T) {
 
 	var r *reader
 
-	if r, err = NewReader(age, in); err != nil {
+	ro := ReadOptions{
+		Age:    age,
+		Reader: in,
+	}
+
+	if r, err = NewReaderOptions(ro); err != nil {
 		t.Fatalf("%s", err)
 	}
 
