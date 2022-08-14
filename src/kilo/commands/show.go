@@ -97,7 +97,7 @@ func (c Show) showAkten(store store_with_lock.Store, zettels []stored_zettel.Tra
 			return
 		}
 
-		defer stdprinter.PanicIfError(ar.Close())
+		defer stdprinter.PanicIfError(ar.Close)
 
 		if _, err = io.Copy(store.Out, ar); err != nil {
 			err = errors.Error(err)
