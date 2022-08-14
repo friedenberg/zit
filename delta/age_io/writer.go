@@ -37,20 +37,12 @@ func NewZippedWriter(age age.Age, out io.Writer) (w *writer, err error) {
 }
 
 func NewWriter(age age.Age, out io.Writer) (w *writer, err error) {
-	w = &writer{}
-
-	w.wBuf = bufio.NewWriter(out)
-
-	if w.wAge, err = age.Encrypt(out); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
-	w.hash = sha256.New()
-
-	w.tee = io.MultiWriter(w.hash, w.wAge)
-
-	return
+	return NewWriterOptions(
+		WriteOptions{
+			Age:    age,
+			Writer: out,
+		},
+	)
 }
 
 func NewWriterOptions(o WriteOptions) (w *writer, err error) {
