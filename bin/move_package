@@ -1,6 +1,5 @@
 #! /bin/bash -e
 
-#TODO add support for package name differences and use go refactor
 prefix=github.com/friedenberg/zit
 original="${1%/}"
 renamed="${2%/}"
