@@ -8,7 +8,7 @@ import (
 
 	"github.com/friedenberg/zit/alfa/kennung"
 	"github.com/friedenberg/zit/bravo/errors"
-	"github.com/friedenberg/zit/bravo/open_file_guard"
+	"github.com/friedenberg/zit/charlie/open_file_guard"
 )
 
 type provider []string

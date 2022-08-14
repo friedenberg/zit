@@ -1,6 +1,6 @@
 package verzeichnisse
 
-import "github.com/friedenberg/zit/bravo/sha"
+import "github.com/friedenberg/zit/charlie/sha"
 
 type Row struct {
 	Sha     sha.Sha `json:"Sha"`

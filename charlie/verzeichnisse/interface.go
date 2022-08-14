@@ -1,7 +1,7 @@
 package verzeichnisse
 
 import (
-	"github.com/friedenberg/zit/bravo/sha"
+	"github.com/friedenberg/zit/charlie/sha"
 )
 
 type IdTransformer func(sha.Sha) string

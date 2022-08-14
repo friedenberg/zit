@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/alfa/bezeichnung"
 	"github.com/friedenberg/zit/bravo/akte_ext"
-	"github.com/friedenberg/zit/bravo/sha"
+	"github.com/friedenberg/zit/charlie/sha"
 	"github.com/friedenberg/zit/charlie/etikett"
 )
 

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/friedenberg/zit/bravo/sha"
+	"github.com/friedenberg/zit/charlie/sha"
 	"github.com/friedenberg/zit/echo/zettel"
 )
 

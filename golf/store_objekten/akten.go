@@ -4,8 +4,8 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/bravo/errors"
-	"github.com/friedenberg/zit/bravo/id"
-	"github.com/friedenberg/zit/bravo/sha"
+	"github.com/friedenberg/zit/charlie/sha"
+	"github.com/friedenberg/zit/charlie/id"
 	age_io "github.com/friedenberg/zit/delta/age_io"
 )
 

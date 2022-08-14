@@ -5,9 +5,9 @@ import (
 
 	"github.com/friedenberg/zit/alfa/logz"
 	"github.com/friedenberg/zit/bravo/errors"
-	"github.com/friedenberg/zit/bravo/id"
 	"github.com/friedenberg/zit/bravo/stdprinter"
 	"github.com/friedenberg/zit/charlie/hinweis"
+	"github.com/friedenberg/zit/charlie/id"
 	"github.com/friedenberg/zit/charlie/script_value"
 	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/echo/zettel"

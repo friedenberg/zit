@@ -6,8 +6,8 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/bravo/errors"
-	"github.com/friedenberg/zit/bravo/open_file_guard"
-	"github.com/friedenberg/zit/bravo/sha"
+	"github.com/friedenberg/zit/charlie/sha"
+	"github.com/friedenberg/zit/charlie/open_file_guard"
 	age_io "github.com/friedenberg/zit/delta/age_io"
 	"github.com/friedenberg/zit/echo/zettel"
 )

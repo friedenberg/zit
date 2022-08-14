@@ -3,7 +3,7 @@ package checkout_store
 import (
 	"time"
 
-	"github.com/friedenberg/zit/bravo/sha"
+	"github.com/friedenberg/zit/charlie/sha"
 )
 
 type Entry struct {

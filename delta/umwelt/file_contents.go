@@ -5,7 +5,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/friedenberg/zit/bravo/open_file_guard"
+	"github.com/friedenberg/zit/charlie/open_file_guard"
 )
 
 func (u Umwelt) ContentsOfZitFile(p ...string) (contents string, err error) {

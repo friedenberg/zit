@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/bravo/errors"
-	"github.com/friedenberg/zit/bravo/open_file_guard"
+	"github.com/friedenberg/zit/charlie/open_file_guard"
 	"github.com/friedenberg/zit/golf/organize_text"
 )
 

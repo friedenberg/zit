@@ -3,7 +3,7 @@ package zettel
 import (
 	"io"
 
-	"github.com/friedenberg/zit/bravo/sha"
+	"github.com/friedenberg/zit/charlie/sha"
 	age_io "github.com/friedenberg/zit/delta/age_io"
 )
 

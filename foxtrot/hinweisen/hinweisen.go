@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/alfa/logz"
 	"github.com/friedenberg/zit/bravo/errors"
-	"github.com/friedenberg/zit/bravo/sha"
+	"github.com/friedenberg/zit/charlie/sha"
 	"github.com/friedenberg/zit/charlie/age"
 	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/echo/sharded_store"

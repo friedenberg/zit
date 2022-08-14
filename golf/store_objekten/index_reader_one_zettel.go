@@ -5,7 +5,7 @@ import (
 	"encoding/gob"
 
 	"github.com/friedenberg/zit/bravo/errors"
-	"github.com/friedenberg/zit/bravo/id"
+	"github.com/friedenberg/zit/charlie/id"
 	"github.com/friedenberg/zit/charlie/verzeichnisse"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 )

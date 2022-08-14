@@ -5,10 +5,10 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/bravo/errors"
-	"github.com/friedenberg/zit/charlie/files"
 	"github.com/friedenberg/zit/bravo/stdprinter"
 	"github.com/friedenberg/zit/charlie/age"
 	"github.com/friedenberg/zit/charlie/etikett"
+	"github.com/friedenberg/zit/charlie/files"
 	"github.com/friedenberg/zit/charlie/konfig"
 )
 

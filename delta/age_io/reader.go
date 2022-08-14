@@ -7,7 +7,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/bravo/errors"
-	"github.com/friedenberg/zit/bravo/sha"
+	"github.com/friedenberg/zit/charlie/sha"
 )
 
 type Reader interface {
