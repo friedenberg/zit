@@ -3,7 +3,7 @@ package age_io
 import (
 	"io"
 
-	"github.com/friedenberg/zit/charlie/age"
+	"github.com/friedenberg/zit/delta/age"
 )
 
 type ReadOptions struct {

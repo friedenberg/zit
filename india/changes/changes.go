@@ -2,7 +2,7 @@ package changes
 
 import (
 	"github.com/friedenberg/zit/alfa/logz"
-	"github.com/friedenberg/zit/charlie/etikett"
+	"github.com/friedenberg/zit/delta/etikett"
 	"github.com/friedenberg/zit/golf/organize_text"
 )
 

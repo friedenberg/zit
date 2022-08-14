@@ -6,8 +6,8 @@ import (
 
 	"github.com/friedenberg/zit/bravo/akte_ext"
 	"github.com/friedenberg/zit/charlie/sha"
-	"github.com/friedenberg/zit/charlie/etikett"
 	age_io "github.com/friedenberg/zit/delta/age_io"
+	"github.com/friedenberg/zit/delta/etikett"
 	"github.com/friedenberg/zit/echo/zettel"
 )
 

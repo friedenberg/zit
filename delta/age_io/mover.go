@@ -5,8 +5,8 @@ import (
 
 	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/charlie/files"
-	"github.com/friedenberg/zit/charlie/id"
 	"github.com/friedenberg/zit/charlie/open_file_guard"
+	"github.com/friedenberg/zit/delta/id"
 )
 
 type Mover struct {

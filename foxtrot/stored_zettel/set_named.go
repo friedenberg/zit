@@ -1,6 +1,6 @@
 package stored_zettel
 
-import "github.com/friedenberg/zit/charlie/hinweis"
+import "github.com/friedenberg/zit/delta/hinweis"
 
 type SetNamed map[string]Named
 

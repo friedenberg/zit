@@ -6,9 +6,9 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/bravo/errors"
-	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/charlie/line_format"
 	"github.com/friedenberg/zit/charlie/zk_types"
+	"github.com/friedenberg/zit/delta/etikett"
 	"github.com/friedenberg/zit/echo/zettel"
 )
 

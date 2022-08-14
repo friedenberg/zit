@@ -11,11 +11,11 @@ import (
 
 	"github.com/friedenberg/zit/alfa/logz"
 	"github.com/friedenberg/zit/bravo/errors"
-	"github.com/friedenberg/zit/charlie/sha"
-	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/charlie/files"
 	"github.com/friedenberg/zit/charlie/open_file_guard"
+	"github.com/friedenberg/zit/charlie/sha"
 	age_io "github.com/friedenberg/zit/delta/age_io"
+	"github.com/friedenberg/zit/delta/etikett"
 	"github.com/friedenberg/zit/echo/zettel"
 )
 

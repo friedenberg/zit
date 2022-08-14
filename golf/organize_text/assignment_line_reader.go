@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/bravo/errors"
-	"github.com/friedenberg/zit/charlie/etikett"
+	"github.com/friedenberg/zit/delta/etikett"
 )
 
 type assignmentLineReader struct {

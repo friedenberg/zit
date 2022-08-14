@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/alfa/logz"
 	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/bravo/stdprinter"
-	"github.com/friedenberg/zit/charlie/hinweis"
+	"github.com/friedenberg/zit/delta/hinweis"
 	"github.com/friedenberg/zit/foxtrot/zettel_formats"
 	checkout_store "github.com/friedenberg/zit/golf/store_checkout"
 	"github.com/friedenberg/zit/india/store_with_lock"

@@ -1,7 +1,7 @@
 package stored_zettel
 
 import (
-	"github.com/friedenberg/zit/charlie/etikett"
+	"github.com/friedenberg/zit/delta/etikett"
 )
 
 type FilterEtikettSet struct {

@@ -6,7 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/alfa/kennung"
 	"github.com/friedenberg/zit/bravo/errors"
-	"github.com/friedenberg/zit/charlie/id"
+	"github.com/friedenberg/zit/delta/id"
 )
 
 type Hinweis interface {

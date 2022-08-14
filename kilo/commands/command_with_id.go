@@ -3,8 +3,8 @@ package commands
 import (
 	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/charlie/sha"
-	"github.com/friedenberg/zit/charlie/hinweis"
-	"github.com/friedenberg/zit/charlie/id"
+	"github.com/friedenberg/zit/delta/hinweis"
+	"github.com/friedenberg/zit/delta/id"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 

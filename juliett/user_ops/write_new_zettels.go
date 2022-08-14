@@ -4,9 +4,9 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/bravo/errors"
-	"github.com/friedenberg/zit/charlie/id"
 	"github.com/friedenberg/zit/charlie/open_file_guard"
-	"github.com/friedenberg/zit/charlie/script_value"
+	"github.com/friedenberg/zit/delta/id"
+	"github.com/friedenberg/zit/delta/script_value"
 	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/echo/zettel"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"

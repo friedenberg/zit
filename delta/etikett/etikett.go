@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/bravo/errors"
-	"github.com/friedenberg/zit/charlie/sha"
 	"github.com/friedenberg/zit/bravo/stdprinter"
+	"github.com/friedenberg/zit/charlie/sha"
 )
 
 const EtikettRegexString = `^[-a-z0-9_/]+$`

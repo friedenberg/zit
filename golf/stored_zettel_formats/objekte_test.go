@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/alfa/bezeichnung"
 	"github.com/friedenberg/zit/bravo/akte_ext"
 	"github.com/friedenberg/zit/charlie/sha"
-	"github.com/friedenberg/zit/charlie/etikett"
+	"github.com/friedenberg/zit/delta/etikett"
 	"github.com/friedenberg/zit/echo/zettel"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 )

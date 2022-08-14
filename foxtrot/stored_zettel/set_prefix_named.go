@@ -2,7 +2,7 @@ package stored_zettel
 
 import (
 	"github.com/friedenberg/zit/alfa/logz"
-	"github.com/friedenberg/zit/charlie/etikett"
+	"github.com/friedenberg/zit/delta/etikett"
 )
 
 type SetPrefixNamed map[etikett.Etikett]SetNamed

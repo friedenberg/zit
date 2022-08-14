@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/friedenberg/zit/bravo/akte_ext"
-	"github.com/friedenberg/zit/charlie/etikett"
+	"github.com/friedenberg/zit/delta/etikett"
 )
 
 func makeEtiketten(t *testing.T, vs ...string) (es etikett.Set) {
