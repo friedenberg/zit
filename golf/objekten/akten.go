@@ -47,7 +47,13 @@ func (w akteMultiWriter) Sha() (s sha.Sha) {
 func (s Store) AkteWriter() (w age_io.Writer, err error) {
 	var outer age_io.Writer
 
-	if outer, err = age_io.NewWriterMover(s.Age, s.Umwelt.DirObjektenAkten()); err != nil {
+	mo := age_io.MoveOptions{
+		Age:                      s.Age,
+		FinalPath:                s.Umwelt.DirObjektenAkten(),
+		GenerateFinalPathFromSha: true,
+	}
+
+	if outer, err = age_io.NewMover(mo); err != nil {
 		err = errors.Error(err)
 		return
 	}

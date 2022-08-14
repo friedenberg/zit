@@ -117,7 +117,13 @@ func (s Store) writeTransaktion() (err error) {
 func (s Store) WriteZettelObjekte(z zettel.Zettel) (sh sha.Sha, err error) {
 	var w *age_io.Mover
 
-	if w, err = age_io.NewWriterMover(s.Age, s.Umwelt.DirObjektenZettelen()); err != nil {
+	mo := age_io.MoveOptions{
+		Age:                      s.Age,
+		FinalPath:                s.Umwelt.DirObjektenZettelen(),
+		GenerateFinalPathFromSha: true,
+	}
+
+	if w, err = age_io.NewMover(mo); err != nil {
 		err = errors.Error(err)
 		return
 	}

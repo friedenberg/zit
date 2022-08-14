@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/bravo/files"
 	"github.com/friedenberg/zit/bravo/id"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
-	"github.com/friedenberg/zit/charlie/age"
 )
 
 type Mover struct {
@@ -17,17 +16,7 @@ type Mover struct {
 	lockFile    bool
 }
 
-func NewWriterMover(age age.Age, basePath string) (m *Mover, err error) {
-	return NewMoverOptions(
-		MoveOptions{
-			Age:                      age,
-			FinalPath:                basePath,
-			GenerateFinalPathFromSha: true,
-		},
-	)
-}
-
-func NewMoverOptions(o MoveOptions) (m *Mover, err error) {
+func NewMover(o MoveOptions) (m *Mover, err error) {
 	m = &Mover{
 		lockFile: o.LockFile,
 	}
