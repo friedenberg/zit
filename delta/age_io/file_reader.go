@@ -6,18 +6,17 @@ import (
 
 	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
-	"github.com/friedenberg/zit/charlie/age"
 )
 
-func NewFileReader(a age.Age, p string) (r io.ReadCloser, err error) {
+func NewFileReader(o FileReadOptions) (r io.ReadCloser, err error) {
 	ar := objekteReader{}
 
-	if ar.file, err = open_file_guard.Open(p); err != nil {
+	if ar.file, err = open_file_guard.Open(o.Path); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	if ar.Reader, err = NewReader(ReadOptions{Age: a, Reader: ar.file}); err != nil {
+	if ar.Reader, err = NewReader(ReadOptions{Age: o.Age, Reader: ar.file}); err != nil {
 		err = errors.Error(err)
 		return
 	}

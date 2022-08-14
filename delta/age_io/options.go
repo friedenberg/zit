@@ -13,6 +13,12 @@ type ReadOptions struct {
 	io.Reader
 }
 
+type FileReadOptions struct {
+	age.Age
+	UseZip bool
+	Path   string
+}
+
 type WriteOptions struct {
 	age.Age
 	UseZip bool

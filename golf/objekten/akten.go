@@ -66,7 +66,12 @@ func (s Store) AkteWriter() (w age_io.Writer, err error) {
 func (s Store) AkteReader(sha sha.Sha) (r io.ReadCloser, err error) {
 	p := id.Path(sha, s.Umwelt.DirObjektenAkten())
 
-	if r, err = age_io.NewFileReader(s.Age, p); err != nil {
+	o := age_io.FileReadOptions{
+		Age:  s.Age,
+		Path: p,
+	}
+
+	if r, err = age_io.NewFileReader(o); err != nil {
 		err = errors.Error(err)
 		return
 	}
