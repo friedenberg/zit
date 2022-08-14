@@ -34,7 +34,6 @@ func DeleteFilesAndDirs(args ...string) (err error) {
 	for d, _ := range dirs {
 		var contents []string
 
-		//TODO handle case of missing directory
 		if contents, err = ReadDirNames(d); err != nil {
 			err = errors.Error(err)
 			return

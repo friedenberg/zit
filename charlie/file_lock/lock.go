@@ -5,8 +5,8 @@ import (
 	"os"
 	"sync"
 
-	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/alfa/logz"
+	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
 )
 
@@ -43,7 +43,7 @@ func (l *Lock) Lock() (err error) {
 	logz.Output(2, "locking "+l.Path())
 	if l.f, err = open_file_guard.OpenFile(l.Path(), os.O_RDONLY|os.O_EXCL|os.O_CREATE, 755); err != nil {
 		if errors.Is(err, fs.ErrExist) {
-			err = errors.Errorf("lockfile already exists, unable to acquire lock: %s", l.Path())
+			err = errors.Wrapped(err, "lockfile already exists, unable to acquire lock: %s", l.Path())
 		} else {
 			err = errors.Error(err)
 		}

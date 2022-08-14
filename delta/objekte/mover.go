@@ -78,5 +78,10 @@ func (m *Mover) Close() (err error) {
 		return
 	}
 
+	// if err = files.SetDisallowUserChanges(m.objektePath); err != nil {
+	// 	err = errors.Error(err)
+	// 	return
+	// }
+
 	return
 }

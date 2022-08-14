@@ -4,10 +4,10 @@ import (
 	"flag"
 	"os"
 
-	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/alfa/logz"
-	"github.com/friedenberg/zit/bravo/stdprinter"
+	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
+	"github.com/friedenberg/zit/bravo/stdprinter"
 	"github.com/friedenberg/zit/charlie/konfig"
 	"github.com/friedenberg/zit/delta/umwelt"
 )
@@ -71,7 +71,6 @@ func Run(args []string) (exitStatus int) {
 		var normalError errors.StackTracer
 
 		if err != nil {
-			//TODO use error to generate more specific exit status
 			exitStatus = 1
 		}
 

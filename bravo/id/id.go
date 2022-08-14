@@ -32,7 +32,6 @@ func MakeDirIfNecessary(i Id, pc ...string) (p string, err error) {
 	p = Path(i, pc...)
 	dir := path.Dir(p)
 
-	//TODO open_file_guard
 	if err = os.MkdirAll(dir, os.ModeDir|0755); err != nil {
 		err = errors.Error(err)
 		return
