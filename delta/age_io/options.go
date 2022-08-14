@@ -1,16 +1,22 @@
 package age_io
 
-import "github.com/friedenberg/zit/charlie/age"
+import (
+	"io"
 
-type CommonOptions struct {
-	age.Age
-	UseZip bool
-}
+	"github.com/friedenberg/zit/charlie/age"
+)
 
 type ReadOptions struct {
-	CommonOptions
+	age.Age
+	UseZip bool
+
+	io.Reader
 }
 
 type WriteOptions struct {
-	CommonOptions
+	age.Age
+	UseZip bool
+
+	io.Writer
+	LockFile bool
 }

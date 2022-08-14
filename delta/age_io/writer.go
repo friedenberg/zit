@@ -53,6 +53,23 @@ func NewWriter(age age.Age, out io.Writer) (w *writer, err error) {
 	return
 }
 
+func NewWriterOptions(o WriteOptions) (w *writer, err error) {
+	w = &writer{}
+
+	w.wBuf = bufio.NewWriter(o.Writer)
+
+	if w.wAge, err = o.Age.Encrypt(o.Writer); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	w.hash = sha256.New()
+
+	w.tee = io.MultiWriter(w.hash, w.wAge)
+
+	return
+}
+
 func (w *writer) Write(p []byte) (n int, err error) {
 	return w.tee.Write(p)
 }

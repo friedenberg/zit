@@ -40,16 +40,34 @@ func NewZippedReader(age age.Age, in io.Reader) (r *reader, err error) {
 }
 
 func NewReader(age age.Age, in io.Reader) (r *reader, err error) {
+	return NewReaderOptions(
+		ReadOptions{
+			Age:    age,
+			Reader: in,
+		},
+	)
+}
+
+func NewReaderOptions(o ReadOptions) (r *reader, err error) {
 	r = &reader{}
 
-	if r.rAge, err = age.Decrypt(in); err != nil {
+	if r.rAge, err = o.Age.Decrypt(o.Reader); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
 	r.hash = sha256.New()
 
-	r.tee = io.TeeReader(r.rAge, r.hash)
+	if o.UseZip {
+		if r.rZip, err = gzip.NewReader(r.rAge); err != nil {
+			err = errors.Error(err)
+			return
+		}
+
+		r.tee = io.TeeReader(r.rZip, r.hash)
+	} else {
+		r.tee = io.TeeReader(r.rAge, r.hash)
+	}
 
 	return
 }
