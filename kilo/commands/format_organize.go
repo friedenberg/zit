@@ -6,7 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/charlie/open_file_guard"
-	"github.com/friedenberg/zit/delta/umwelt"
+	"github.com/friedenberg/zit/echo/umwelt"
 	"github.com/friedenberg/zit/golf/organize_text"
 	"github.com/friedenberg/zit/juliett/user_ops"
 )

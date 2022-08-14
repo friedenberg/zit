@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/delta/age"
 	"github.com/friedenberg/zit/delta/konfig"
-	"github.com/friedenberg/zit/delta/umwelt"
+	"github.com/friedenberg/zit/echo/umwelt"
 	"github.com/friedenberg/zit/foxtrot/etiketten"
 )
 

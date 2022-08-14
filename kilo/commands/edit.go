@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/delta/hinweis"
-	"github.com/friedenberg/zit/delta/umwelt"
+	"github.com/friedenberg/zit/echo/umwelt"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/foxtrot/zettel_formats"
 	checkout_store "github.com/friedenberg/zit/golf/store_checkout"

@@ -12,7 +12,7 @@ import (
 	"github.com/friedenberg/zit/bravo/stdprinter"
 	"github.com/friedenberg/zit/charlie/open_file_guard"
 	"github.com/friedenberg/zit/delta/etikett"
-	"github.com/friedenberg/zit/delta/umwelt"
+	"github.com/friedenberg/zit/echo/umwelt"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/golf/organize_text"
 	"github.com/friedenberg/zit/juliett/user_ops"

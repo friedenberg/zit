@@ -6,7 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/bravo/akte_ext"
 	"github.com/friedenberg/zit/charlie/sha"
-	age_io "github.com/friedenberg/zit/delta/age_io"
+	age_io "github.com/friedenberg/zit/echo/age_io"
 	"github.com/friedenberg/zit/delta/etikett"
 	"github.com/friedenberg/zit/echo/zettel"
 )

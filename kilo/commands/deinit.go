@@ -5,7 +5,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/friedenberg/zit/delta/umwelt"
+	"github.com/friedenberg/zit/echo/umwelt"
 )
 
 type Deinit struct {

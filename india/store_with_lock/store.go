@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/bravo/stdprinter"
 	"github.com/friedenberg/zit/delta/age"
 	"github.com/friedenberg/zit/delta/file_lock"
-	"github.com/friedenberg/zit/delta/umwelt"
+	"github.com/friedenberg/zit/echo/umwelt"
 	"github.com/friedenberg/zit/foxtrot/akten"
 	"github.com/friedenberg/zit/foxtrot/hinweisen"
 	checkout_store "github.com/friedenberg/zit/golf/store_checkout"

@@ -4,7 +4,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/charlie/sha"
-	age_io "github.com/friedenberg/zit/delta/age_io"
+	age_io "github.com/friedenberg/zit/echo/age_io"
 )
 
 type AkteWriterFactory interface {

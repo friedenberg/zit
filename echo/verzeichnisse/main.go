@@ -11,7 +11,7 @@ import (
 	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/bravo/stdprinter"
 	"github.com/friedenberg/zit/charlie/open_file_guard"
-	age_io "github.com/friedenberg/zit/delta/age_io"
+	age_io "github.com/friedenberg/zit/echo/age_io"
 )
 
 type RowMaker func() ([]Row, error)
