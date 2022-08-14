@@ -13,7 +13,7 @@ import (
 	"github.com/friedenberg/zit/echo/zettel"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/foxtrot/zettel_formats"
-	"github.com/friedenberg/zit/golf/store_objekten"
+	objekten "github.com/friedenberg/zit/golf/store_objekten"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
