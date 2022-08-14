@@ -6,10 +6,10 @@ import (
 
 	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/bravo/sha"
-	"github.com/friedenberg/zit/charlie/zk_types"
 	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/charlie/ts"
+	"github.com/friedenberg/zit/charlie/zk_types"
 )
 
 type Transaktion struct {

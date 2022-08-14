@@ -11,7 +11,7 @@ import (
 	"github.com/friedenberg/zit/bravo/open_file_guard"
 	"github.com/friedenberg/zit/bravo/sha"
 	"github.com/friedenberg/zit/charlie/hinweis"
-	"github.com/friedenberg/zit/delta/age_io"
+	age_io "github.com/friedenberg/zit/delta/age_io"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )

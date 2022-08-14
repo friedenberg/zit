@@ -7,11 +7,11 @@ import (
 	"io"
 	"strings"
 
-	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/alfa/kennung"
 	"github.com/friedenberg/zit/alfa/logz"
-	"github.com/friedenberg/zit/bravo/stdprinter"
+	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/bravo/sha"
+	"github.com/friedenberg/zit/bravo/stdprinter"
 )
 
 func init() {

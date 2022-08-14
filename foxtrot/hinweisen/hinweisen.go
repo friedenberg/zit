@@ -3,8 +3,8 @@ package hinweisen
 import (
 	"path"
 
-	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/alfa/logz"
+	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/bravo/sha"
 	"github.com/friedenberg/zit/charlie/age"
 	"github.com/friedenberg/zit/charlie/hinweis"

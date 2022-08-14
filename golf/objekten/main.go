@@ -17,7 +17,7 @@ import (
 	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/charlie/ts"
 	"github.com/friedenberg/zit/charlie/zk_types"
-	"github.com/friedenberg/zit/delta/age_io"
+	age_io "github.com/friedenberg/zit/delta/age_io"
 	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/echo/transaktion"
 	"github.com/friedenberg/zit/echo/zettel"

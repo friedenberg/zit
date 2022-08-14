@@ -5,7 +5,8 @@ prefix=github.com/friedenberg/zit
 original="${1%/}"
 renamed="${2%/}"
 
-go-refactor "$original" "$renamed" ./
+gofmt -r "$original.E -> $renamed.E" ./
+goimports -w ./
 
 mkdir -p "$(dirname "$renamed")"
 

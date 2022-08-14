@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/bravo/stdprinter"
 	"github.com/friedenberg/zit/charlie/etikett"
-	"github.com/friedenberg/zit/delta/age_io"
+	age_io "github.com/friedenberg/zit/delta/age_io"
 )
 
 type Index struct {

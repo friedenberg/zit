@@ -3,8 +3,8 @@ package sharded_store
 import (
 	"sync"
 
-	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/alfa/logz"
+	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
 )
 

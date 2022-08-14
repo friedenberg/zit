@@ -21,8 +21,8 @@ type CheckoutResults struct {
 }
 
 func (c Checkout) RunManyHinweisen(
-  s store_with_lock.Store,
-  hins ...hinweis.Hinweis,
+	s store_with_lock.Store,
+	hins ...hinweis.Hinweis,
 ) (results CheckoutResults, err error) {
 	zs := make([]stored_zettel.Transacted, len(hins))
 

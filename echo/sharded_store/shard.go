@@ -11,7 +11,7 @@ import (
 	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
 	"github.com/friedenberg/zit/charlie/age"
-	"github.com/friedenberg/zit/delta/age_io"
+	age_io "github.com/friedenberg/zit/delta/age_io"
 )
 
 type Sharder interface {

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/alfa/kennung"
+	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/bravo/id"
 )
 

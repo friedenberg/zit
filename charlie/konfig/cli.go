@@ -5,8 +5,8 @@ import (
 	"os"
 	"path"
 
-	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/alfa/logz"
+	"github.com/friedenberg/zit/bravo/errors"
 )
 
 type Cli struct {
