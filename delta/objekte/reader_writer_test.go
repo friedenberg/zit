@@ -59,25 +59,3 @@ func Test1(t *testing.T) {
 		t.Fatalf("expected '%s', but got '%s'", text, out.String())
 	}
 }
-
-func TestReadWrite(t *testing.T) {
-	age := makeAge(t)
-
-	text := `the text`
-
-	eText, _, err := EncodeBase64(age, text)
-
-	if err != nil {
-		t.Fatalf("%s", err)
-	}
-
-	dText, _, err := DecodeBase64(age, eText)
-
-	if err != nil {
-		t.Fatalf("%s", err)
-	}
-
-	if text != dText {
-		t.Fatalf("expected '%s' but got '%s'", text, dText)
-	}
-}
