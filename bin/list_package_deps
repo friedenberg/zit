@@ -1,8 +1,8 @@
 #! /bin/bash -e
 
 print_matches() (
-	path="$1"
-	ag 'github.com/friedenberg/zit/\w+' \
+	path="src/$1"
+	ag 'github.com/friedenberg/zit/src/\w+' \
 		--only-matching \
 		--no-file \
 		--no-color \
@@ -18,10 +18,10 @@ print_basenames() (
 )
 
 print_packge_locations() (
-  loc="$1"
+  loc="src/$1"
 	while IFS= read -r; do
     echo "$REPLY"
-		ag "github.com/friedenberg/zit/$REPLY" "$loc" -l0 </dev/null \
+		ag "github.com/friedenberg/zit/src/$REPLY" "$loc" -l0 </dev/null \
       | xargs -0 dirname \
       | sort -u
 	done
