@@ -24,19 +24,13 @@ type reader struct {
 }
 
 func NewZippedReader(age age.Age, in io.Reader) (r *reader, err error) {
-	if r, err = NewReader(age, in); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
-	if r.rZip, err = gzip.NewReader(r.rAge); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
-	r.tee = io.TeeReader(r.rZip, r.hash)
-
-	return
+	return NewReaderOptions(
+		ReadOptions{
+			Age:    age,
+			Reader: in,
+			UseZip: true,
+		},
+	)
 }
 
 func NewReader(age age.Age, in io.Reader) (r *reader, err error) {

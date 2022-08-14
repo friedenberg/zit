@@ -25,15 +25,13 @@ type writer struct {
 }
 
 func NewZippedWriter(age age.Age, out io.Writer) (w *writer, err error) {
-	if w, err = NewWriter(age, out); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
-	w.wZip = gzip.NewWriter(w.wAge)
-	w.tee = io.MultiWriter(w.hash, w.wZip)
-
-	return
+	return NewWriterOptions(
+		WriteOptions{
+			Age:    age,
+			Writer: out,
+			UseZip: true,
+		},
+	)
 }
 
 func NewWriter(age age.Age, out io.Writer) (w *writer, err error) {
@@ -58,6 +56,11 @@ func NewWriterOptions(o WriteOptions) (w *writer, err error) {
 	w.hash = sha256.New()
 
 	w.tee = io.MultiWriter(w.hash, w.wAge)
+
+	if o.UseZip {
+		w.wZip = gzip.NewWriter(w.wAge)
+		w.tee = io.MultiWriter(w.hash, w.wZip)
+	}
 
 	return
 }

@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/bravo/errors"
+	"github.com/friedenberg/zit/bravo/files"
 	"github.com/friedenberg/zit/bravo/id"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
 	"github.com/friedenberg/zit/charlie/age"
@@ -13,29 +14,38 @@ type Mover struct {
 	fileWriter
 	basePath    string
 	objektePath string
+	lockFile    bool
 }
 
 func NewWriterMoverPrenamed(age age.Age, objektePath string) (m *Mover, err error) {
-	m = &Mover{
-		objektePath: objektePath,
-	}
-
-	if m.file, err = open_file_guard.TempFile(); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
-	if m.Writer, err = NewWriter(age, m.file); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
-	return
+	return NewMoverOptions(
+		MoveOptions{
+			Age:                      age,
+			FinalPath:                objektePath,
+			GenerateFinalPathFromSha: false,
+		},
+	)
 }
 
 func NewWriterMover(age age.Age, basePath string) (m *Mover, err error) {
+	return NewMoverOptions(
+		MoveOptions{
+			Age:                      age,
+			FinalPath:                basePath,
+			GenerateFinalPathFromSha: true,
+		},
+	)
+}
+
+func NewMoverOptions(o MoveOptions) (m *Mover, err error) {
 	m = &Mover{
-		basePath: basePath,
+		lockFile: o.LockFile,
+	}
+
+	if o.GenerateFinalPathFromSha {
+		m.basePath = o.FinalPath
+	} else {
+		m.objektePath = o.FinalPath
 	}
 
 	if m.file, err = open_file_guard.TempFile(); err != nil {
@@ -43,7 +53,13 @@ func NewWriterMover(age age.Age, basePath string) (m *Mover, err error) {
 		return
 	}
 
-	if m.Writer, err = NewWriter(age, m.file); err != nil {
+	wo := WriteOptions{
+		Age:    o.Age,
+		UseZip: o.UseZip,
+		Writer: m.file,
+	}
+
+	if m.Writer, err = NewWriterOptions(wo); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -78,10 +94,12 @@ func (m *Mover) Close() (err error) {
 		return
 	}
 
-	// if err = files.SetDisallowUserChanges(m.objektePath); err != nil {
-	// 	err = errors.Error(err)
-	// 	return
-	// }
+	if m.lockFile {
+		if err = files.SetDisallowUserChanges(m.objektePath); err != nil {
+			err = errors.Error(err)
+			return
+		}
+	}
 
 	return
 }
