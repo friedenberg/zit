@@ -3,8 +3,8 @@ package age_io
 import (
 	"os"
 
+	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
-	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/files"
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
 	"github.com/friedenberg/zit/src/delta/id"
@@ -70,14 +70,14 @@ func (m *Mover) Close() (err error) {
 		return
 	}
 
+	sha := m.Writer.Sha()
+
 	if m.objektePath == "" {
-    //TODO move this validation to options
+		//TODO move this validation to options
 		if m.basePath == "" {
 			err = errors.Errorf("basepath is nil")
 			return
 		}
-
-		sha := m.Writer.Sha()
 
 		if m.objektePath, err = id.MakeDirIfNecessary(sha, m.basePath); err != nil {
 			err = errors.Error(err)
@@ -85,8 +85,16 @@ func (m *Mover) Close() (err error) {
 		}
 	}
 
+  //TODO create options for handling already exists as an error
 	if m.lockFile && files.Exists(m.objektePath) {
-		stdprinter.Outf("File already exists: %s", m.objektePath)
+		err = ErrAlreadyExists{
+			Sha:  sha,
+			Path: m.objektePath,
+		}
+
+		logz.Print(err)
+		err = nil
+
 		return
 	}
 
