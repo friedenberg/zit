@@ -10,7 +10,9 @@ import (
 )
 
 type Mover struct {
-	fileWriter
+	file *os.File
+	Writer
+
 	basePath    string
 	objektePath string
 	lockFile    bool
@@ -47,7 +49,22 @@ func NewMover(o MoveOptions) (m *Mover, err error) {
 }
 
 func (m *Mover) Close() (err error) {
-	if err = m.fileWriter.Close(); err != nil {
+	if m.file == nil {
+		err = errors.Errorf("nil file")
+		return
+	}
+
+	if m.Writer == nil {
+		err = errors.Errorf("nil objekte reader")
+		return
+	}
+
+	if err = m.Writer.Close(); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	if err = open_file_guard.Close(m.file); err != nil {
 		err = errors.Error(err)
 		return
 	}
