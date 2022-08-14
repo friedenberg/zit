@@ -52,7 +52,6 @@ func (s *Store) Initialize(u *umwelt.Umwelt) (err error) {
 		u,
 		u.FileVerzeichnisseZettelen(),
 		s,
-		s,
 	)
 
 	if err != nil {
@@ -62,7 +61,6 @@ func (s *Store) Initialize(u *umwelt.Umwelt) (err error) {
 
 	s.indexEtiketten, err = newIndexEtiketten(
 		u.FileVerzeichnisseEtiketten(),
-		s,
 		s,
 	)
 
@@ -97,7 +95,7 @@ func (s Store) writeTransaktion() (err error) {
 
 	var w io.WriteCloser
 
-	if w, err = s.WriteCloser(p); err != nil {
+	if w, err = s.WriteCloserObjekten(p); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -414,7 +412,7 @@ func (s Store) ReadAllTransaktions() (out []transaktion.Transaktion, err error) 
 			tr := &transaktion.Reader{}
 			var or io.ReadCloser
 
-			if or, err = s.ReadCloser(path.Join(d, hn, tn)); err != nil {
+			if or, err = s.ReadCloserObjekten(path.Join(d, hn, tn)); err != nil {
 				err = errors.Error(err)
 				return
 			}

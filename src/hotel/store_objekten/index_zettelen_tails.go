@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/delta/hinweis"
-	age_io "github.com/friedenberg/zit/src/echo/age_io"
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/golf/stored_zettel"
 )
@@ -18,8 +17,7 @@ import (
 type indexZettelenTails struct {
 	umwelt *umwelt.Umwelt
 	path   string
-	age_io.ReadCloserFactory
-	age_io.WriteCloserFactory
+	ioFactory
 	zettelen   map[hinweis.Hinweis]stored_zettel.Transacted
 	didRead    bool
 	hasChanges bool
@@ -28,15 +26,13 @@ type indexZettelenTails struct {
 func newIndexZettelenTails(
 	u *umwelt.Umwelt,
 	p string,
-	r age_io.ReadCloserFactory,
-	w age_io.WriteCloserFactory,
+	f ioFactory,
 ) (i *indexZettelenTails, err error) {
 	i = &indexZettelenTails{
-		umwelt:             u,
-		path:               p,
-		ReadCloserFactory:  r,
-		WriteCloserFactory: w,
-		zettelen:           make(map[hinweis.Hinweis]stored_zettel.Transacted),
+		umwelt:    u,
+		path:      p,
+		ioFactory: f,
+		zettelen:  make(map[hinweis.Hinweis]stored_zettel.Transacted),
 	}
 
 	return
@@ -50,7 +46,7 @@ func (i *indexZettelenTails) Flush() (err error) {
 
 	var w1 io.WriteCloser
 
-	if w1, err = i.WriteCloser(i.path); err != nil {
+	if w1, err = i.WriteCloserVerzeichnisse(i.path); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -82,7 +78,7 @@ func (i *indexZettelenTails) readIfNecessary() (err error) {
 
 	var r1 io.ReadCloser
 
-	if r1, err = i.ReadCloser(i.path); err != nil {
+	if r1, err = i.ReadCloserVerzeichnisse(i.path); err != nil {
 		if errors.IsNotExist(err) {
 			err = nil
 		} else {

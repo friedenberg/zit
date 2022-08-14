@@ -15,7 +15,7 @@ import (
 func (s Store) storedZettelFromSha(sh sha.Sha) (sz stored_zettel.Stored, err error) {
 	var or io.ReadCloser
 
-	if or, err = s.ReadCloser(id.Path(sh, s.Umwelt.DirObjektenZettelen())); err != nil {
+	if or, err = s.ReadCloserObjekten(id.Path(sh, s.Umwelt.DirObjektenZettelen())); err != nil {
 		err = ErrNotFound{Id: sh}
 		return
 	}

@@ -10,13 +10,11 @@ import (
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/delta/etikett"
-	age_io "github.com/friedenberg/zit/src/echo/age_io"
 )
 
 type indexEtiketten struct {
 	path string
-	age_io.ReadCloserFactory
-	age_io.WriteCloserFactory
+	ioFactory
 	etiketten  map[etikett.Etikett]int64
 	didRead    bool
 	hasChanges bool
@@ -29,14 +27,12 @@ type row struct {
 
 func newIndexEtiketten(
 	p string,
-	r age_io.ReadCloserFactory,
-	w age_io.WriteCloserFactory,
+	f ioFactory,
 ) (i *indexEtiketten, err error) {
 	i = &indexEtiketten{
-		path:               p,
-		ReadCloserFactory:  r,
-		WriteCloserFactory: w,
-		etiketten:          make(map[etikett.Etikett]int64),
+		path:      p,
+		ioFactory: f,
+		etiketten: make(map[etikett.Etikett]int64),
 	}
 
 	return
@@ -50,7 +46,7 @@ func (i *indexEtiketten) Flush() (err error) {
 
 	var w1 io.WriteCloser
 
-	if w1, err = i.WriteCloser(i.path); err != nil {
+	if w1, err = i.WriteCloserVerzeichnisse(i.path); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -87,7 +83,7 @@ func (i *indexEtiketten) readIfNecessary() (err error) {
 
 	var r1 io.ReadCloser
 
-	if r1, err = i.ReadCloser(i.path); err != nil {
+	if r1, err = i.ReadCloserVerzeichnisse(i.path); err != nil {
 		if errors.IsNotExist(err) {
 			err = nil
 		} else {
