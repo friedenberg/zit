@@ -110,7 +110,7 @@ func (s shard) Writer(w io.WriteCloser) (wo io.WriteCloser, err error) {
 		Writer: w,
 	}
 
-	if wo, err = age_io.NewWriterOptions(o); err != nil {
+	if wo, err = age_io.NewWriter(o); err != nil {
 		err = errors.Error(err)
 		return
 	}

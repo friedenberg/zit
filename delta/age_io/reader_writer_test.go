@@ -37,7 +37,7 @@ func Test1(t *testing.T) {
 		Writer: out,
 	}
 
-	if w, err = NewWriterOptions(o); err != nil {
+	if w, err = NewWriter(o); err != nil {
 		t.Fatalf("%s", err)
 	}
 

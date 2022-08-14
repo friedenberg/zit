@@ -23,7 +23,7 @@ type writer struct {
 	wBuf       *bufio.Writer
 }
 
-func NewWriterOptions(o WriteOptions) (w *writer, err error) {
+func NewWriter(o WriteOptions) (w *writer, err error) {
 	w = &writer{}
 
 	w.wBuf = bufio.NewWriter(o.Writer)

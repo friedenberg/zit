@@ -38,7 +38,7 @@ func NewMover(o MoveOptions) (m *Mover, err error) {
 		Writer: m.file,
 	}
 
-	if m.Writer, err = NewWriterOptions(wo); err != nil {
+	if m.Writer, err = NewWriter(wo); err != nil {
 		err = errors.Error(err)
 		return
 	}
