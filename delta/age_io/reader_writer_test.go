@@ -32,7 +32,12 @@ func Test1(t *testing.T) {
 
 	var w *writer
 
-	if w, err = NewWriter(age, out); err != nil {
+	o := WriteOptions{
+		Age:    age,
+		Writer: out,
+	}
+
+	if w, err = NewWriterOptions(o); err != nil {
 		t.Fatalf("%s", err)
 	}
 
@@ -52,7 +57,7 @@ func Test1(t *testing.T) {
 		Reader: in,
 	}
 
-	if r, err = NewReaderOptions(ro); err != nil {
+	if r, err = NewReader(ro); err != nil {
 		t.Fatalf("%s", err)
 	}
 

@@ -26,7 +26,7 @@ func Read(out io.Writer, age age.Age, p string) (err error) {
 		Reader: f,
 	}
 
-	if r, err = NewReaderOptions(ro); err != nil {
+	if r, err = NewReader(ro); err != nil {
 		err = errors.Error(err)
 		return
 	}

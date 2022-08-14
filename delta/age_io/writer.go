@@ -9,7 +9,6 @@ import (
 
 	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/bravo/sha"
-	"github.com/friedenberg/zit/charlie/age"
 )
 
 type Writer interface {
@@ -22,25 +21,6 @@ type writer struct {
 	tee        io.Writer
 	wZip, wAge io.WriteCloser
 	wBuf       *bufio.Writer
-}
-
-func NewZippedWriter(age age.Age, out io.Writer) (w *writer, err error) {
-	return NewWriterOptions(
-		WriteOptions{
-			Age:    age,
-			Writer: out,
-			UseZip: true,
-		},
-	)
-}
-
-func NewWriter(age age.Age, out io.Writer) (w *writer, err error) {
-	return NewWriterOptions(
-		WriteOptions{
-			Age:    age,
-			Writer: out,
-		},
-	)
 }
 
 func NewWriterOptions(o WriteOptions) (w *writer, err error) {

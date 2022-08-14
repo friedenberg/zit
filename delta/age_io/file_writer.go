@@ -18,7 +18,12 @@ func NewFileWriter(a age.Age, p string) (w Writer, err error) {
 
 	var ow Writer
 
-	if ow, err = NewWriter(a, w); err != nil {
+	wo := WriteOptions{
+		Age:    a,
+		Writer: w,
+	}
+
+	if ow, err = NewWriterOptions(wo); err != nil {
 		err = errors.Error(err)
 		return
 	}

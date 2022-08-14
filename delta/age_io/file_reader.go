@@ -17,7 +17,7 @@ func NewFileReader(a age.Age, p string) (r io.ReadCloser, err error) {
 		return
 	}
 
-	if ar.Reader, err = NewReaderOptions(ReadOptions{Age: a, Reader: ar.file}); err != nil {
+	if ar.Reader, err = NewReader(ReadOptions{Age: a, Reader: ar.file}); err != nil {
 		err = errors.Error(err)
 		return
 	}

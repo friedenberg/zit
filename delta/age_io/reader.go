@@ -22,7 +22,7 @@ type reader struct {
 	tee  io.Reader
 }
 
-func NewReaderOptions(o ReadOptions) (r *reader, err error) {
+func NewReader(o ReadOptions) (r *reader, err error) {
 	r = &reader{}
 
 	if r.rAge, err = o.Age.Decrypt(o.Reader); err != nil {

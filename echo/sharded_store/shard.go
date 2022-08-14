@@ -91,7 +91,7 @@ func (s shard) Reader(r io.ReadCloser) (ro io.ReadCloser, err error) {
 		Reader: r,
 	}
 
-	if ro, err = age_io.NewReaderOptions(o); err != nil {
+	if ro, err = age_io.NewReader(o); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -105,7 +105,12 @@ func (s shard) Writer(w io.WriteCloser) (wo io.WriteCloser, err error) {
 		return
 	}
 
-	if wo, err = age_io.NewWriter(s.age, w); err != nil {
+	o := age_io.WriteOptions{
+		Age:    s.age,
+		Writer: w,
+	}
+
+	if wo, err = age_io.NewWriterOptions(o); err != nil {
 		err = errors.Error(err)
 		return
 	}
