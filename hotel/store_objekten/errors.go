@@ -12,8 +12,8 @@ import (
 	"github.com/friedenberg/zit/delta/id"
 	"github.com/friedenberg/zit/foxtrot/akten"
 	"github.com/friedenberg/zit/foxtrot/zettel"
-	"github.com/friedenberg/zit/golf/zettel_formats"
 	"github.com/friedenberg/zit/golf/stored_zettel"
+	"github.com/friedenberg/zit/golf/zettel_formats"
 	"github.com/google/uuid"
 )
 

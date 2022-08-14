@@ -21,9 +21,9 @@ import (
 	"github.com/friedenberg/zit/echo/transaktion"
 	"github.com/friedenberg/zit/echo/umwelt"
 	"github.com/friedenberg/zit/foxtrot/zettel"
-	"github.com/friedenberg/zit/golf/zettel_formats"
 	"github.com/friedenberg/zit/golf/hinweisen"
 	"github.com/friedenberg/zit/golf/stored_zettel"
+	"github.com/friedenberg/zit/golf/zettel_formats"
 )
 
 type Store struct {

@@ -6,7 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/charlie/open_file_guard"
-	"github.com/friedenberg/zit/golf/organize_text"
+	"github.com/friedenberg/zit/hotel/organize_text"
 )
 
 type ReadOrganizeFile struct {

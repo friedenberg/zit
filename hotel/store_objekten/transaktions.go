@@ -8,8 +8,8 @@ import (
 	"github.com/friedenberg/zit/delta/hinweis"
 	"github.com/friedenberg/zit/delta/id"
 	"github.com/friedenberg/zit/echo/transaktion"
-	"github.com/friedenberg/zit/golf/zettel_formats"
 	"github.com/friedenberg/zit/golf/stored_zettel"
+	"github.com/friedenberg/zit/golf/zettel_formats"
 )
 
 func (s Store) storedZettelFromSha(sh sha.Sha) (sz stored_zettel.Stored, err error) {

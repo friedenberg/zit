@@ -11,7 +11,7 @@ import (
 	"github.com/friedenberg/zit/delta/hinweis"
 	"github.com/friedenberg/zit/delta/id"
 	"github.com/friedenberg/zit/golf/stored_zettel"
-	"github.com/friedenberg/zit/golf/stored_zettel_formats"
+	"github.com/friedenberg/zit/hotel/stored_zettel_formats"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 

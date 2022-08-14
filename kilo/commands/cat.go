@@ -13,8 +13,8 @@ import (
 	"github.com/friedenberg/zit/delta/etikett"
 	"github.com/friedenberg/zit/delta/hinweis"
 	"github.com/friedenberg/zit/foxtrot/zettel"
-	"github.com/friedenberg/zit/golf/zettel_formats"
 	"github.com/friedenberg/zit/golf/stored_zettel"
+	"github.com/friedenberg/zit/golf/zettel_formats"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 

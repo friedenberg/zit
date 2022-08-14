@@ -6,9 +6,9 @@ import (
 	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/bravo/stdprinter"
 	"github.com/friedenberg/zit/charlie/open_file_guard"
-	"github.com/friedenberg/zit/golf/zettel_formats"
-	checkout_store "github.com/friedenberg/zit/golf/store_checkout"
 	"github.com/friedenberg/zit/golf/stored_zettel"
+	"github.com/friedenberg/zit/golf/zettel_formats"
+	checkout_store "github.com/friedenberg/zit/hotel/store_checkout"
 	"github.com/friedenberg/zit/india/store_with_lock"
 	"github.com/friedenberg/zit/juliett/user_ops"
 )
