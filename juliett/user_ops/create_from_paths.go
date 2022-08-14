@@ -10,10 +10,10 @@ import (
 	"github.com/friedenberg/zit/delta/id"
 	"github.com/friedenberg/zit/delta/script_value"
 	"github.com/friedenberg/zit/echo/umwelt"
-	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/foxtrot/zettel"
-	"github.com/friedenberg/zit/foxtrot/zettel_formats"
+	"github.com/friedenberg/zit/golf/zettel_formats"
 	objekten "github.com/friedenberg/zit/golf/store_objekten"
+	"github.com/friedenberg/zit/golf/stored_zettel"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 

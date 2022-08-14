@@ -11,8 +11,8 @@ import (
 	"github.com/friedenberg/zit/delta/etikett"
 	age_io "github.com/friedenberg/zit/echo/age_io"
 	"github.com/friedenberg/zit/echo/umwelt"
-	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/foxtrot/zettel"
+	"github.com/friedenberg/zit/golf/stored_zettel"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 

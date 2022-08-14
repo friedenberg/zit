@@ -7,9 +7,9 @@ import (
 	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/charlie/open_file_guard"
 	"github.com/friedenberg/zit/echo/umwelt"
-	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/foxtrot/zettel"
-	"github.com/friedenberg/zit/foxtrot/zettel_formats"
+	"github.com/friedenberg/zit/golf/zettel_formats"
+	"github.com/friedenberg/zit/golf/stored_zettel"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 

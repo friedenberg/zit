@@ -7,8 +7,8 @@ import (
 	"github.com/friedenberg/zit/bravo/stdprinter"
 	"github.com/friedenberg/zit/charlie/open_file_guard"
 	"github.com/friedenberg/zit/delta/id"
-	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/foxtrot/zettel"
+	"github.com/friedenberg/zit/golf/stored_zettel"
 )
 
 func (s *Store) Checkout(

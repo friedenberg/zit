@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/delta/age"
 	"github.com/friedenberg/zit/delta/konfig"
 	"github.com/friedenberg/zit/echo/umwelt"
-	"github.com/friedenberg/zit/foxtrot/etiketten"
+	"github.com/friedenberg/zit/golf/etiketten"
 )
 
 type Test struct {

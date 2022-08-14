@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/charlie/line_format"
 	"github.com/friedenberg/zit/delta/etikett"
-	"github.com/friedenberg/zit/foxtrot/stored_zettel"
+	"github.com/friedenberg/zit/golf/stored_zettel"
 )
 
 type Text interface {

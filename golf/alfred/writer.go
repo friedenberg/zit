@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/charlie/alfred"
 	"github.com/friedenberg/zit/delta/etikett"
 	"github.com/friedenberg/zit/delta/hinweis"
-	"github.com/friedenberg/zit/foxtrot/stored_zettel"
+	"github.com/friedenberg/zit/golf/stored_zettel"
 )
 
 type Writer interface {

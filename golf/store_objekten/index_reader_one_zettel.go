@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/delta/id"
 	"github.com/friedenberg/zit/foxtrot/verzeichnisse"
-	"github.com/friedenberg/zit/foxtrot/stored_zettel"
+	"github.com/friedenberg/zit/golf/stored_zettel"
 )
 
 type indexReaderOneZettel struct {
