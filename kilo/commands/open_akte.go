@@ -2,6 +2,7 @@ package commands
 
 import (
 	"flag"
+	"io"
 	"io/ioutil"
 	"os"
 
@@ -11,7 +12,6 @@ import (
 	"github.com/friedenberg/zit/bravo/open_file_guard"
 	"github.com/friedenberg/zit/bravo/sha"
 	"github.com/friedenberg/zit/charlie/hinweis"
-	age_io "github.com/friedenberg/zit/delta/age_io"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
@@ -58,7 +58,6 @@ func (c OpenAkte) RunWithLockedStore(store store_with_lock.Store, args ...string
 			}
 
 			shaAkte := tz.Zettel.Akte
-			p := store.DirObjektenAkten()
 
 			var f *os.File
 
@@ -80,7 +79,16 @@ func (c OpenAkte) RunWithLockedStore(store store_with_lock.Store, args ...string
 
 			files[i] = f.Name()
 
-			if err = age_io.Read(f, store.Age(), id.Path(shaAkte, p)); err != nil {
+			var r io.ReadCloser
+
+			if r, err = store.Zettels().AkteReader(shaAkte); err != nil {
+				err = errors.Error(err)
+				return
+			}
+
+			defer r.Close()
+
+			if _, err = io.Copy(f, r); err != nil {
 				err = errors.Error(err)
 				return
 			}

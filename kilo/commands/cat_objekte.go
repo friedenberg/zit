@@ -2,13 +2,14 @@ package commands
 
 import (
 	"flag"
+	"io"
 
 	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/bravo/id"
 	"github.com/friedenberg/zit/bravo/node_type"
 	"github.com/friedenberg/zit/bravo/sha"
+	"github.com/friedenberg/zit/bravo/stdprinter"
 	"github.com/friedenberg/zit/charlie/hinweis"
-	age_io "github.com/friedenberg/zit/delta/age_io"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
 	"github.com/friedenberg/zit/golf/stored_zettel_formats"
 	"github.com/friedenberg/zit/india/store_with_lock"
@@ -71,17 +72,21 @@ func (c CatObjekte) akten(store store_with_lock.Store, ids ...id.Id) (err error)
 			return
 		}
 
-		p := store.DirAkte()
+		func(sb sha.Sha) {
+			var r io.ReadCloser
 
-		if sb, err = sb.Glob(p); err != nil {
-			err = errors.Error(err)
-			return
-		}
+			if r, err = store.Zettels().AkteReader(sb); err != nil {
+				err = errors.Error(err)
+				return
+			}
 
-		if err = age_io.Read(store.Out, store.Age(), id.Path(sb, p)); err != nil {
-			err = errors.Error(err)
-			return
-		}
+			defer stdprinter.PanicIfError(r.Close)
+
+			if io.Copy(store.Out, r); err != nil {
+				err = errors.Error(err)
+				return
+			}
+		}(sb)
 	}
 
 	return
