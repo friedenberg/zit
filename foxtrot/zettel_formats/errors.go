@@ -32,7 +32,7 @@ func (e ErrHasInlineAkteAndFilePath) Recover() (z zettel.Zettel, err error) {
 		return
 	}
 
-	var akteWriter objekte.Writer
+	var akteWriter age_io.Writer
 
 	if akteWriter, err = e.AkteWriter(); err != nil {
 		err = errors.Error(err)

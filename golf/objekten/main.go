@@ -6,17 +6,17 @@ import (
 	"path"
 	"sort"
 
-	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/alfa/logz"
-	"github.com/friedenberg/zit/bravo/stdprinter"
+	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/bravo/id"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
 	"github.com/friedenberg/zit/bravo/sha"
-	"github.com/friedenberg/zit/charlie/zk_types"
+	"github.com/friedenberg/zit/bravo/stdprinter"
 	"github.com/friedenberg/zit/charlie/age"
 	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/charlie/ts"
+	"github.com/friedenberg/zit/charlie/zk_types"
 	"github.com/friedenberg/zit/delta/age_io"
 	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/echo/transaktion"
@@ -115,9 +115,9 @@ func (s Store) writeTransaktion() (err error) {
 }
 
 func (s Store) WriteZettelObjekte(z zettel.Zettel) (sh sha.Sha, err error) {
-	var w *objekte.Mover
+	var w *age_io.Mover
 
-	if w, err = objekte.NewWriterMover(s.Age, s.Umwelt.DirObjektenZettelen()); err != nil {
+	if w, err = age_io.NewWriterMover(s.Age, s.Umwelt.DirObjektenZettelen()); err != nil {
 		err = errors.Error(err)
 		return
 	}

@@ -9,8 +9,8 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/alfa/logz"
+	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/bravo/files"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
 	"github.com/friedenberg/zit/bravo/sha"
@@ -56,7 +56,7 @@ type textStateRead struct {
 	didReadAkte             bool
 	metadataiAkteSha        sha.Sha
 	readAkteSha             sha.Sha
-	akteWriter              objekte.Writer
+	akteWriter              age_io.Writer
 }
 
 func (s *textStateRead) Close() (err error) {

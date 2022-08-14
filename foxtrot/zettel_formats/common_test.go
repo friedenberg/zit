@@ -47,7 +47,7 @@ type akteWriterFactory struct {
 	stringBuilderCloser
 }
 
-func (aw akteWriterFactory) AkteWriter() (objekte.Writer, error) {
+func (aw akteWriterFactory) AkteWriter() (age_io.Writer, error) {
 	return aw, nil
 }
 

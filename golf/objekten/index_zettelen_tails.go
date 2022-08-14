@@ -5,8 +5,8 @@ import (
 	"encoding/gob"
 	"io"
 
-	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/alfa/logz"
+	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/bravo/stdprinter"
 	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/charlie/hinweis"
@@ -18,8 +18,8 @@ import (
 type indexZettelenTails struct {
 	umwelt *umwelt.Umwelt
 	path   string
-	objekte.ReadCloserFactory
-	objekte.WriteCloserFactory
+	age_io.ReadCloserFactory
+	age_io.WriteCloserFactory
 	zettelen   map[hinweis.Hinweis]stored_zettel.Transacted
 	didRead    bool
 	hasChanges bool
@@ -28,8 +28,8 @@ type indexZettelenTails struct {
 func newIndexZettelenTails(
 	u *umwelt.Umwelt,
 	p string,
-	r objekte.ReadCloserFactory,
-	w objekte.WriteCloserFactory,
+	r age_io.ReadCloserFactory,
+	w age_io.WriteCloserFactory,
 ) (i *indexZettelenTails, err error) {
 	i = &indexZettelenTails{
 		umwelt:             u,

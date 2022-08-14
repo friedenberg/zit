@@ -7,8 +7,8 @@ import (
 	"os"
 	"sync"
 
-	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/alfa/logz"
+	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
 	"github.com/friedenberg/zit/charlie/age"
 	"github.com/friedenberg/zit/delta/age_io"
@@ -86,7 +86,7 @@ func (s shard) Reader(r io.ReadCloser) (ro io.ReadCloser, err error) {
 		return
 	}
 
-	if ro, err = objekte.NewReader(s.age, r); err != nil {
+	if ro, err = age_io.NewReader(s.age, r); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -100,7 +100,7 @@ func (s shard) Writer(w io.WriteCloser) (wo io.WriteCloser, err error) {
 		return
 	}
 
-	if wo, err = objekte.NewWriter(s.age, w); err != nil {
+	if wo, err = age_io.NewWriter(s.age, w); err != nil {
 		err = errors.Error(err)
 		return
 	}

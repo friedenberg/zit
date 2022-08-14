@@ -6,8 +6,8 @@ import (
 	"path"
 
 	"github.com/friedenberg/zit/bravo/errors"
-	"github.com/friedenberg/zit/bravo/stdprinter"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
+	"github.com/friedenberg/zit/bravo/stdprinter"
 	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/delta/age_io"
 	"github.com/friedenberg/zit/delta/umwelt"
@@ -70,7 +70,7 @@ func (c ZettelFromExternalAkte) Run(args ...string) (results ZettelResults, err 
 func (c ZettelFromExternalAkte) zettelForAkte(store store_with_lock.Store, aktePath string) (z zettel.Zettel, err error) {
 	z.Etiketten = c.Etiketten
 
-	var akteWriter objekte.Writer
+	var akteWriter age_io.Writer
 
 	if akteWriter, err = store.Zettels().AkteWriter(); err != nil {
 		err = errors.Error(err)

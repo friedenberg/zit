@@ -5,10 +5,10 @@ import (
 	"encoding/gob"
 	"io"
 
-	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/alfa/logz"
-	"github.com/friedenberg/zit/bravo/stdprinter"
+	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/bravo/sha"
+	"github.com/friedenberg/zit/bravo/stdprinter"
 	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/delta/age_io"
@@ -19,8 +19,8 @@ import (
 type indexZettelen struct {
 	umwelt *umwelt.Umwelt
 	path   string
-	objekte.ReadCloserFactory
-	objekte.WriteCloserFactory
+	age_io.ReadCloserFactory
+	age_io.WriteCloserFactory
 	zettelen   map[hinweis.Hinweis]stored_zettel.Transacted
 	didRead    bool
 	hasChanges bool
@@ -29,8 +29,8 @@ type indexZettelen struct {
 func newIndexZettelen(
 	u *umwelt.Umwelt,
 	p string,
-	r objekte.ReadCloserFactory,
-	w objekte.WriteCloserFactory,
+	r age_io.ReadCloserFactory,
+	w age_io.WriteCloserFactory,
 ) (i *indexZettelen, err error) {
 	i = &indexZettelen{
 		umwelt:             u,

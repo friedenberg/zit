@@ -87,7 +87,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	//TODO write new akte object for each and update sha
 	for i, p := range pairs {
-		var ow objekte.Writer
+		var ow age_io.Writer
 
 		if ow, err = store.Zettels().AkteWriter(); err != nil {
 			err = errors.Error(err)

@@ -8,7 +8,7 @@ import (
 )
 
 type AkteWriterFactory interface {
-	AkteWriter() (objekte.Writer, error)
+	AkteWriter() (age_io.Writer, error)
 }
 
 type AkteReaderFactory interface {

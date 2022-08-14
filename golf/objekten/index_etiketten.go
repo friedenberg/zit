@@ -6,8 +6,8 @@ import (
 	"io"
 	"sort"
 
-	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/alfa/logz"
+	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/bravo/stdprinter"
 	"github.com/friedenberg/zit/charlie/etikett"
 	"github.com/friedenberg/zit/delta/age_io"
@@ -15,8 +15,8 @@ import (
 
 type indexEtiketten struct {
 	path string
-	objekte.ReadCloserFactory
-	objekte.WriteCloserFactory
+	age_io.ReadCloserFactory
+	age_io.WriteCloserFactory
 	etiketten  map[etikett.Etikett]int64
 	didRead    bool
 	hasChanges bool
@@ -29,8 +29,8 @@ type row struct {
 
 func newIndexEtiketten(
 	p string,
-	r objekte.ReadCloserFactory,
-	w objekte.WriteCloserFactory,
+	r age_io.ReadCloserFactory,
+	w age_io.WriteCloserFactory,
 ) (i *indexEtiketten, err error) {
 	i = &indexEtiketten{
 		path:               p,

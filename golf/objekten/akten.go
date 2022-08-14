@@ -11,7 +11,7 @@ import (
 
 type akteMultiWriter struct {
 	io.Writer
-	writers []objekte.Writer
+	writers []age_io.Writer
 }
 
 func (w akteMultiWriter) Close() (err error) {
@@ -44,10 +44,10 @@ func (w akteMultiWriter) Sha() (s sha.Sha) {
 	return
 }
 
-func (s Store) AkteWriter() (w objekte.Writer, err error) {
-	var outer objekte.Writer
+func (s Store) AkteWriter() (w age_io.Writer, err error) {
+	var outer age_io.Writer
 
-	if outer, err = objekte.NewWriterMover(s.Age, s.Umwelt.DirObjektenAkten()); err != nil {
+	if outer, err = age_io.NewWriterMover(s.Age, s.Umwelt.DirObjektenAkten()); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -60,7 +60,7 @@ func (s Store) AkteWriter() (w objekte.Writer, err error) {
 func (s Store) AkteReader(sha sha.Sha) (r io.ReadCloser, err error) {
 	p := id.Path(sha, s.Umwelt.DirObjektenAkten())
 
-	if r, err = objekte.NewFileReader(s.Age, p); err != nil {
+	if r, err = age_io.NewFileReader(s.Age, p); err != nil {
 		err = errors.Error(err)
 		return
 	}

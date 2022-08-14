@@ -7,10 +7,10 @@ import (
 	"path"
 	"sync"
 
-	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/alfa/logz"
-	"github.com/friedenberg/zit/bravo/stdprinter"
+	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
+	"github.com/friedenberg/zit/bravo/stdprinter"
 	"github.com/friedenberg/zit/delta/age_io"
 )
 
@@ -21,8 +21,8 @@ type Index struct {
 	idTransformer IdTransformer
 	rwLock        *sync.RWMutex
 	pages         map[string]*page
-	objekte.ReadCloserFactory
-	objekte.WriteCloserFactory
+	age_io.ReadCloserFactory
+	age_io.WriteCloserFactory
 }
 
 type page struct {
@@ -32,8 +32,8 @@ type page struct {
 
 func NewIndex(
 	path string,
-	r objekte.ReadCloserFactory,
-	w objekte.WriteCloserFactory,
+	r age_io.ReadCloserFactory,
+	w age_io.WriteCloserFactory,
 	idTransformer IdTransformer,
 ) (i *Index, err error) {
 	logz.Print("initing verzeichnisse")

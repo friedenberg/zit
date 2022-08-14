@@ -78,7 +78,7 @@ func (c CatObjekte) akten(store store_with_lock.Store, ids ...id.Id) (err error)
 			return
 		}
 
-		if err = objekte.Read(store.Out, store.Age(), id.Path(sb, p)); err != nil {
+		if err = age_io.Read(store.Out, store.Age(), id.Path(sb, p)); err != nil {
 			err = errors.Error(err)
 			return
 		}

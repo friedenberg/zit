@@ -5,6 +5,8 @@ prefix=github.com/friedenberg/zit
 original="${1%/}"
 renamed="${2%/}"
 
+go-refactor "$original" "$renamed" ./
+
 mkdir -p "$(dirname "$renamed")"
 
 git mv "$original" "$renamed" || mv "$original" "$renamed"

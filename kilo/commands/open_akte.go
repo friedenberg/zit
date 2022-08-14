@@ -5,8 +5,8 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/alfa/exec"
+	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/bravo/id"
 	"github.com/friedenberg/zit/bravo/open_file_guard"
 	"github.com/friedenberg/zit/bravo/sha"
@@ -58,7 +58,7 @@ func (c OpenAkte) RunWithLockedStore(store store_with_lock.Store, args ...string
 			}
 
 			shaAkte := tz.Zettel.Akte
-			p := store.DirZit("Objekte", "Akte")
+			p := store.DirObjektenAkten()
 
 			var f *os.File
 
@@ -80,7 +80,7 @@ func (c OpenAkte) RunWithLockedStore(store store_with_lock.Store, args ...string
 
 			files[i] = f.Name()
 
-			if err = objekte.Read(f, store.Age(), id.Path(shaAkte, p)); err != nil {
+			if err = age_io.Read(f, store.Age(), id.Path(shaAkte, p)); err != nil {
 				err = errors.Error(err)
 				return
 			}
