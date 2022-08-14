@@ -23,16 +23,6 @@ type reader struct {
 	tee  io.Reader
 }
 
-func NewZippedReader(age age.Age, in io.Reader) (r *reader, err error) {
-	return NewReaderOptions(
-		ReadOptions{
-			Age:    age,
-			Reader: in,
-			UseZip: true,
-		},
-	)
-}
-
 func NewReader(age age.Age, in io.Reader) (r *reader, err error) {
 	return NewReaderOptions(
 		ReadOptions{
