@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/alfa/logz"
 	"github.com/friedenberg/zit/bravo/stdprinter"
 	"github.com/friedenberg/zit/charlie/etikett"
-	"github.com/friedenberg/zit/delta/objekte"
+	"github.com/friedenberg/zit/delta/age_io"
 )
 
 type indexEtiketten struct {
