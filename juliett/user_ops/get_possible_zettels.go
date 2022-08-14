@@ -3,7 +3,7 @@ package user_ops
 import (
 	"github.com/friedenberg/zit/bravo/errors"
 	"github.com/friedenberg/zit/delta/umwelt"
-	"github.com/friedenberg/zit/golf/store_checkout"
+	checkout_store "github.com/friedenberg/zit/golf/store_checkout"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 

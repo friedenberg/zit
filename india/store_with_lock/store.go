@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/foxtrot/akten"
 	"github.com/friedenberg/zit/foxtrot/hinweisen"
-	"github.com/friedenberg/zit/golf/store_checkout"
+	checkout_store "github.com/friedenberg/zit/golf/store_checkout"
 	objekten "github.com/friedenberg/zit/golf/store_objekten"
 )
 

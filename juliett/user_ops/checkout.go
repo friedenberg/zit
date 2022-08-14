@@ -5,7 +5,7 @@ import (
 	"github.com/friedenberg/zit/charlie/hinweis"
 	"github.com/friedenberg/zit/delta/umwelt"
 	"github.com/friedenberg/zit/foxtrot/stored_zettel"
-	"github.com/friedenberg/zit/golf/store_checkout"
+	checkout_store "github.com/friedenberg/zit/golf/store_checkout"
 	"github.com/friedenberg/zit/india/store_with_lock"
 )
 
