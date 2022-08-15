@@ -157,7 +157,7 @@ func Run(args []string) (exitStatus int) {
 }
 
 func (c command) SetDebug() (d func()) {
-	//TODO this is currently broken entirely
+	//TODO-P2 this is currently broken entirely
 	return nil
 	// df := make([]func(), 0)
 	// d = func() {
