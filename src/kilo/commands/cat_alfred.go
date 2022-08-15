@@ -6,7 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
-	"github.com/friedenberg/zit/src/charlie/node_type"
+	"github.com/friedenberg/zit/src/charlie/zk_types"
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/golf/stored_zettel"
@@ -15,7 +15,7 @@ import (
 )
 
 type CatAlfred struct {
-	Type node_type.Type
+	Type zk_types.Type
 	Command
 }
 
@@ -24,7 +24,7 @@ func init() {
 		"cat-alfred",
 		func(f *flag.FlagSet) Command {
 			c := &CatAlfred{
-				Type: node_type.TypeUnknown,
+				Type: zk_types.TypeUnknown,
 			}
 
 			c.Command = commandWithLockedStore{c}
@@ -59,7 +59,7 @@ func (c CatAlfred) RunWithLockedStore(store store_with_lock.Store, args ...strin
 	}()
 
 	switch c.Type {
-	case node_type.TypeEtikett:
+	case zk_types.TypeEtikett:
 		var ea []etikett.Etikett
 
 		if ea, err = store.Zettels().Etiketten(); err != nil {
@@ -71,7 +71,7 @@ func (c CatAlfred) RunWithLockedStore(store store_with_lock.Store, args ...strin
 			aw.WriteEtikett(e)
 		}
 
-	case node_type.TypeZettel:
+	case zk_types.TypeZettel:
 
 		var all map[hinweis.Hinweis]stored_zettel.Transacted
 
@@ -84,9 +84,9 @@ func (c CatAlfred) RunWithLockedStore(store store_with_lock.Store, args ...strin
 			aw.WriteZettel(z.Named)
 		}
 
-	case node_type.TypeAkte:
+	case zk_types.TypeAkte:
 
-	case node_type.TypeHinweis:
+	case zk_types.TypeHinweis:
 
 		var all map[hinweis.Hinweis]stored_zettel.Transacted
 

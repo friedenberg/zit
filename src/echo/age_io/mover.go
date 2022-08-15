@@ -85,7 +85,7 @@ func (m *Mover) Close() (err error) {
 		}
 	}
 
-  //TODO create options for handling already exists as an error
+	//TODO create options for handling already exists as an error
 	if m.lockFile && files.Exists(m.objektePath) {
 		err = ErrAlreadyExists{
 			Sha:  sha,

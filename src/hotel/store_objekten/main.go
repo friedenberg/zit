@@ -186,10 +186,26 @@ func (s Store) writeNamedZettelToIndex(tz stored_zettel.Transacted) (err error) 
 	return
 }
 
-func (s Store) Read(id id.Id) (tz stored_zettel.Transacted, err error) {
-	switch tid := id.(type) {
+func (s Store) Read(i id.Id) (tz stored_zettel.Transacted, err error) {
+	switch tid := i.(type) {
 	case sha.Sha:
-		//TODO read from fs
+		f := zettel_formats.Objekte{}
+
+		var r io.ReadCloser
+
+		p := id.Path(tid, s.Umwelt.DirObjektenZettelen())
+
+		if r, err = s.ReadCloserObjekten(p); err != nil {
+			err = errors.Error(err)
+			return
+		}
+
+		defer stdprinter.PanicIfError(r.Close)
+
+		if _, err = f.ReadFrom(&tz.Zettel, r); err != nil {
+			err = errors.Error(err)
+			return
+		}
 
 	case hinweis.Hinweis:
 		if tz, err = s.indexZettelenTails.Read(tid); err != nil {
@@ -198,7 +214,7 @@ func (s Store) Read(id id.Id) (tz stored_zettel.Transacted, err error) {
 		}
 
 	default:
-		err = errors.Errorf("unsupported identifier: %s", id)
+		err = errors.Errorf("unsupported identifier: %s", i)
 	}
 
 	return

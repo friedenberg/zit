@@ -4,19 +4,20 @@ import (
 	"flag"
 	"io"
 
+	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
-	"github.com/friedenberg/zit/src/charlie/node_type"
 	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/charlie/zk_types"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/id"
 	"github.com/friedenberg/zit/src/golf/stored_zettel"
-	"github.com/friedenberg/zit/src/hotel/stored_zettel_formats"
+	"github.com/friedenberg/zit/src/golf/zettel_formats"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
 )
 
 type CatObjekte struct {
-	Type node_type.Type
+	Type zk_types.Type
 }
 
 func init() {
@@ -24,7 +25,7 @@ func init() {
 		"cat-objekte",
 		func(f *flag.FlagSet) Command {
 			c := &CatObjekte{
-				Type: node_type.TypeUnknown,
+				Type: zk_types.TypeUnknown,
 			}
 
 			f.Var(&c.Type, "type", "ObjekteType")
@@ -37,10 +38,10 @@ func init() {
 func (c CatObjekte) RunWithId(store store_with_lock.Store, ids ...id.Id) (err error) {
 	switch c.Type {
 
-	case node_type.TypeAkte:
+	case zk_types.TypeAkte:
 		return c.akten(store, ids...)
 
-	case node_type.TypeZettel:
+	case zk_types.TypeZettel:
 		return c.zettelen(store, ids...)
 
 	default:
@@ -101,9 +102,11 @@ func (c CatObjekte) zettelen(store store_with_lock.Store, ids ...id.Id) (err err
 			return
 		}
 
-		f := stored_zettel_formats.Objekte{}
+		f := zettel_formats.Objekte{}
 
-		if _, err = f.WriteTo(tz.Stored, store.Out); err != nil {
+		logz.PrintDebug(tz)
+
+		if _, err = f.WriteTo(tz.Zettel, store.Out); err != nil {
 			err = errors.Error(err)
 			return
 		}

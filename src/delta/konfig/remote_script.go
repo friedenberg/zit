@@ -3,7 +3,7 @@ package konfig
 import (
 	"os/exec"
 
-	"github.com/friedenberg/zit/src/charlie/node_type"
+	"github.com/friedenberg/zit/src/charlie/zk_types"
 )
 
 type RemoteScript interface {
@@ -11,7 +11,7 @@ type RemoteScript interface {
 }
 
 type RemoteScriptConfig struct {
-	SupportedTypes    []node_type.Type
+	SupportedTypes    []zk_types.Type
 	SupportedCommands []string
 	Shell             string
 	Script            string

@@ -6,7 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
-	"github.com/friedenberg/zit/src/charlie/node_type"
+	"github.com/friedenberg/zit/src/charlie/zk_types"
 	"github.com/friedenberg/zit/src/delta/id"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/golf/stored_zettel"
@@ -15,7 +15,7 @@ import (
 )
 
 type Show struct {
-	Type node_type.Type
+	Type zk_types.Type
 }
 
 func init() {
@@ -23,7 +23,7 @@ func init() {
 		"show",
 		func(f *flag.FlagSet) Command {
 			c := &Show{
-				Type: node_type.TypeZettel,
+				Type: zk_types.TypeZettel,
 			}
 
 			f.Var(&c.Type, "type", "ObjekteType")
@@ -49,10 +49,10 @@ func (c Show) RunWithId(store store_with_lock.Store, ids ...id.Id) (err error) {
 
 	switch c.Type {
 
-	case node_type.TypeAkte:
+	case zk_types.TypeAkte:
 		return c.showAkten(store, zettels)
 
-	case node_type.TypeZettel:
+	case zk_types.TypeZettel:
 		return c.showZettels(store, zettels)
 
 	default:

@@ -4,8 +4,8 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/friedenberg/zit/src/kilo/commands"
 	"github.com/friedenberg/zit/src/alfa/logz"
+	"github.com/friedenberg/zit/src/kilo/commands"
 )
 
 func main() {
