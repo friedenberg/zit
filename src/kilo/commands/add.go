@@ -55,9 +55,13 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
-		Umwelt:        u,
-		GroupBy:       etikett.NewSlice(),
-		RootEtiketten: c.Etiketten,
+		Umwelt: u,
+		Options: organize_text.Options{
+			AssignmentTreeConstructor: organize_text.AssignmentTreeConstructor{
+				GroupingEtiketten: etikett.NewSlice(),
+				RootEtiketten:     c.Etiketten,
+			},
+		},
 	}
 
 	var createOrganizeFileResults user_ops.CreateOrganizeFileResults

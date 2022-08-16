@@ -19,9 +19,8 @@ import (
 )
 
 type Organize struct {
-	GroupBy        etikett.Slice
-	ExtraEtiketten etikett.Set
-	Mode           organizeMode
+	organize_text.Options
+	Mode organizeMode
 }
 
 type organizeMode int
@@ -67,11 +66,15 @@ func init() {
 		"organize",
 		func(f *flag.FlagSet) Command {
 			c := &Organize{
-				GroupBy:        etikett.NewSlice(),
-				ExtraEtiketten: etikett.MakeSet(),
+				Options: organize_text.Options{
+					AssignmentTreeConstructor: organize_text.AssignmentTreeConstructor{
+						GroupingEtiketten: etikett.NewSlice(),
+						ExtraEtiketten:    etikett.MakeSet(),
+					},
+				},
 			}
 
-			f.Var(&c.GroupBy, "group-by", "etikett prefixes to group zettels")
+			f.Var(&c.GroupingEtiketten, "group-by", "etikett prefixes to group zettels")
 			f.Var(&c.ExtraEtiketten, "extras", "etiketten to always add to the organize text")
 			f.Var(&c.Mode, "mode", "mode used for handling stdin and stdout")
 
@@ -82,10 +85,8 @@ func init() {
 
 func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
-		Umwelt:         u,
-		GroupBy:        c.GroupBy,
-		ExtraEtiketten: c.ExtraEtiketten,
-		// GroupByUnique: c.GroupByUnique,
+		Umwelt:  u,
+		Options: c.Options,
 	}
 
 	if createOrganizeFileOp.RootEtiketten, err = c.getEtikettenFromArgs(args); err != nil {
@@ -103,6 +104,8 @@ func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		err = errors.Error(err)
 		return
 	}
+
+	createOrganizeFileOp.Named = getResults.SetNamed
 
 	switch c.Mode {
 	case organizeModeCommitDirectly:

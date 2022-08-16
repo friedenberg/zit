@@ -31,7 +31,10 @@ func (c ReadOrganizeFile) RunWithFile(p string) (ot organize_text.Text, err erro
 }
 
 func (c ReadOrganizeFile) Run() (ot organize_text.Text, err error) {
-	ot = organize_text.NewEmpty()
+	if ot, err = organize_text.New(organize_text.Options{}); err != nil {
+		err = errors.Error(err)
+		return
+	}
 
 	_, err = ot.ReadFrom(c.Reader)
 

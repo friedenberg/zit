@@ -6,16 +6,13 @@ import (
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/echo/umwelt"
-	"github.com/friedenberg/zit/src/golf/stored_zettel"
 	"github.com/friedenberg/zit/src/hotel/organize_text"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
 )
 
 type CreateOrganizeFile struct {
-	Umwelt         *umwelt.Umwelt
-	RootEtiketten  etikett.Set
-	ExtraEtiketten etikett.Set
-	GroupBy        etikett.Slice
+	Umwelt *umwelt.Umwelt
+	organize_text.Options
 }
 
 type CreateOrganizeFileResults struct {
@@ -45,15 +42,7 @@ func (c CreateOrganizeFile) Run(zettels ZettelResults) (results CreateOrganizeFi
 
 	defer errors.PanicIfError(store.Flush)
 
-	options := organize_text.Options{
-		// Grouper:       c,
-		// Sorter:        c,
-		RootEtiketten:     c.RootEtiketten,
-		ExtraEtiketten:    c.ExtraEtiketten,
-		GroupingEtiketten: c.GroupBy,
-	}
-
-	if results.Text, err = organize_text.New(options, zettels.SetNamed); err != nil {
+	if results.Text, err = organize_text.New(c.Options); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -61,40 +50,40 @@ func (c CreateOrganizeFile) Run(zettels ZettelResults) (results CreateOrganizeFi
 	return
 }
 
-func (c CreateOrganizeFile) GroupZettel(z stored_zettel.Named) (ess []etikett.Set) {
-	var set etikett.Set
+// func (c CreateOrganizeFile) GroupZettel(z stored_zettel.Named) (ess []etikett.Set) {
+// 	var set etikett.Set
 
-	if c.GroupBy.Len() > 0 {
-		set = z.Zettel.Etiketten.IntersectPrefixes(c.GroupBy.ToSet())
-	} else {
-		set = z.Zettel.Etiketten
-	}
+// 	if c.GroupBy.Len() > 0 {
+// 		set = z.Zettel.Etiketten.IntersectPrefixes(c.GroupBy.ToSet())
+// 	} else {
+// 		set = z.Zettel.Etiketten
+// 	}
 
-	set = set.Subtract(c.RootEtiketten)
+// 	set = set.Subtract(c.RootEtiketten)
 
-	if false /*c.GroupByUnique*/ {
-		ess = append(ess, set)
-	} else if set.Len() > 0 {
-		for _, e := range set {
-			ns := etikett.MakeSet()
-			ns.Add(e)
-			ess = append(ess, ns)
-		}
-	} else {
-		// if the zettel has no etiketten, add an empty set
-		ess = append(ess, etikett.MakeSet())
-	}
+// 	if false /*c.GroupByUnique*/ {
+// 		ess = append(ess, set)
+// 	} else if set.Len() > 0 {
+// 		for _, e := range set {
+// 			ns := etikett.MakeSet()
+// 			ns.Add(e)
+// 			ess = append(ess, ns)
+// 		}
+// 	} else {
+// 		// if the zettel has no etiketten, add an empty set
+// 		ess = append(ess, etikett.MakeSet())
+// 	}
 
-	return ess
-}
+// 	return ess
+// }
 
-func (c CreateOrganizeFile) SortGroups(a, b etikett.Set) bool {
-	return a.String() < b.String()
-}
+// func (c CreateOrganizeFile) SortGroups(a, b etikett.Set) bool {
+// 	return a.String() < b.String()
+// }
 
-func (c CreateOrganizeFile) SortZettels(a, b stored_zettel.Named) bool {
-	return a.Hinweis.String() < b.Hinweis.String()
-}
+// func (c CreateOrganizeFile) SortZettels(a, b stored_zettel.Named) bool {
+// 	return a.Hinweis.String() < b.Hinweis.String()
+// }
 
 func (c CreateOrganizeFile) getEtikettenFromArgs(args []string) (es etikett.Set, err error) {
 	es = etikett.MakeSet()
