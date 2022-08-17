@@ -99,7 +99,7 @@ func (c Push) remoteScriptFromArg(u *umwelt.Umwelt, arg string) (remote konfig.R
 func (c Push) runRemoteScript(u *umwelt.Umwelt, remote konfig.RemoteScript, args []string, b []byte) (err error) {
 	var script *exec.Cmd
 
-	if script, err = remote.Cmd(append([]string{"push"}, args...)); err != nil {
+	if script, err = remote.Cmd(append([]string{"push"}, args...)...); err != nil {
 		err = errors.Error(err)
 		return
 	}

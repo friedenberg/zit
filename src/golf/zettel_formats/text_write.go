@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 
 	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
@@ -122,9 +123,32 @@ func (f Text) writeToInlineAkte(c zettel.FormatContextWrite) (n int64, err error
 
 	defer stdprinter.PanicIfError(ar.Close)
 
+	in := ar
+
+	if c.FormatScript != nil {
+		var cmd *exec.Cmd
+
+		if cmd, err = c.FormatScript.Cmd(); err != nil {
+			err = errors.Error(err)
+			return
+		}
+
+		cmd.Stdin = ar
+
+		if in, err = cmd.StdoutPipe(); err != nil {
+			err = errors.Error(err)
+			return
+		}
+
+		if err = cmd.Start(); err != nil {
+			err = errors.Error(err)
+			return
+		}
+	}
+
 	var n1 int64
 
-	n1, err = io.Copy(c.Out, ar)
+	n1, err = io.Copy(c.Out, in)
 	n += n1
 
 	if err != nil {

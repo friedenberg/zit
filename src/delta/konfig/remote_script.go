@@ -7,7 +7,7 @@ import (
 )
 
 type RemoteScript interface {
-	Cmd(args []string) (*exec.Cmd, error)
+	Cmd(args ...string) (*exec.Cmd, error)
 }
 
 type RemoteScriptConfig struct {
@@ -21,13 +21,13 @@ type RemoteScriptFile struct {
 	Path string
 }
 
-func (s RemoteScriptFile) Cmd(args []string) (c *exec.Cmd, err error) {
+func (s RemoteScriptFile) Cmd(args ...string) (c *exec.Cmd, err error) {
 	c = exec.Command(s.Path, args...)
 
 	return
 }
 
-func (s RemoteScriptConfig) Cmd(args []string) (c *exec.Cmd, err error) {
+func (s RemoteScriptConfig) Cmd(args ...string) (c *exec.Cmd, err error) {
 	shell := s.Shell
 
 	if shell == "" {

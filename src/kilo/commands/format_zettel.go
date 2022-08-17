@@ -6,6 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
+	"github.com/friedenberg/zit/src/delta/konfig"
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/golf/stored_zettel"
@@ -33,13 +34,6 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	// stdoutIsTty := open_file_guard.IsTty(os.Stdout)
-	// stdinIsTty := open_file_guard.IsTty(os.Stdin)
-
-	// if !stdinIsTty && !stdoutIsTty {
-	// 	logz.Print("neither stdin or stdout is a tty")
-	// 	logz.Print("generate organize, read from stdin, commit")
-
 	var f *os.File
 
 	if f, err = open_file_guard.Open(args[0]); err != nil {
@@ -50,24 +44,6 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	defer open_file_guard.Close(f)
 
 	format := zettel_formats.Text{}
-
-	// checkinOptions := zettels.CheckinOptions{
-	// 	IgnoreMissingHinweis: true,
-	// 	IncludeAkte:          true,
-	// 	Format:               format,
-	// }
-
-	// readOp := user_ops.ReadCheckedOut{
-	// 	Umwelt:  u,
-	// 	Options: checkinOptions,
-	// }
-
-	// var z stored_zettel.CheckedOut
-
-	// if z, err = readOp.RunOne(args[0]); err != nil {
-	// 	err = errors.Error(err)
-	// 	return
-	// }
 
 	var store store_with_lock.Store
 
@@ -85,10 +61,17 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
+	var formatter konfig.RemoteScript
+
+	if typKonfig, ok := u.Konfig.Typen[external.Zettel.AkteExt.String()]; ok {
+		formatter = typKonfig.FormatScript
+	}
+
 	ctx := zettel.FormatContextWrite{
 		Zettel:            external.Zettel,
-		IncludeAkte:       false,
+		IncludeAkte:       true,
 		AkteReaderFactory: store.Zettels(),
+		FormatScript:      formatter,
 		Out:               os.Stdout,
 	}
 

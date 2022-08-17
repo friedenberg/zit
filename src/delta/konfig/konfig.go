@@ -15,6 +15,11 @@ type KonfigTag struct {
 	Hide            bool `toml:"hide"`
 }
 
+type KonfigTyp struct {
+	FormatScript RemoteScriptConfig `toml:"format-script"`
+	InlineAkte   bool               `toml:"inline-akte" default:"true"`
+}
+
 type Konfig struct {
 	Cli
 	Toml
