@@ -2,6 +2,7 @@ package user_ops
 
 import (
 	"io"
+	"os"
 
 	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
@@ -21,6 +22,7 @@ type CreateFromPaths struct {
 	Umwelt *umwelt.Umwelt
 	Format zettel.Format
 	Filter script_value.ScriptValue
+	Delete bool
 	// ReadHinweisFromPath bool
 }
 
@@ -77,9 +79,19 @@ func (c CreateFromPaths) Run(args ...string) (results CreateFromPathsResults, er
 				err = nil
 				return
 			}
+
+			if c.Delete {
+				//TODO move to checkout store
+				if err = os.Remove(z.Path); err != nil {
+					err = errors.Error(err)
+					return
+				}
+
+				stdprinter.Outf("[%s] (deleted)\n", z.Path)
+			}
 		}
 
-		stdprinter.Outf("%s\n", tz.Named)
+		stdprinter.Outf("%s (created)", tz.Named)
 	}
 
 	return

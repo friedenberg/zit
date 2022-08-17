@@ -24,6 +24,7 @@ type bez struct {
 type New struct {
 	Bezeichnung bez
 	Edit        bool
+	Delete      bool
 	Etiketten   etikett.Set
 	Filter      script_value.ScriptValue
 }
@@ -43,6 +44,7 @@ func init() {
 
 			f.Var(&c.Filter, "filter", "a script to run for each file to transform it the standard zettel format")
 			f.BoolVar(&c.Edit, "edit", false, "create a new empty zettel and open EDITOR or VISUAL for editing and then commit the resulting changes")
+			f.BoolVar(&c.Delete, "delete", false, "delete the zettel and akte after successful checkin")
 			f.Var(&c.Bezeichnung, "bezeichnung", "zettel description (will overwrite existing Bezecihnung")
 			f.Var(&c.Etiketten, "etiketten", "comma-separated etiketten (will add to existing Etiketten)")
 
@@ -93,6 +95,7 @@ func (c New) readExistingFilesAsZettels(u *umwelt.Umwelt, f zettel.Format, args 
 		Umwelt: u,
 		Format: f,
 		Filter: c.Filter,
+		Delete: c.Delete,
 	}
 
 	//TODO add bezeichnung and etiketten
