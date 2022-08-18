@@ -16,6 +16,7 @@ import (
 type Add struct {
 	Etiketten etikett.Set
 	Delete    bool
+	OpenAkten bool
 	Organize  bool
 }
 
@@ -30,6 +31,7 @@ func init() {
 			f.Var(&c.Etiketten, "etiketten", "to add to the created zettels")
 			f.BoolVar(&c.Delete, "delete", false, "delete the zettel and akte after successful checkin")
 			f.BoolVar(&c.Organize, "organize", false, "")
+			f.BoolVar(&c.OpenAkten, "open-akte", false, "also open the Akten")
 
 			return c
 		},
@@ -48,6 +50,9 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	if zettelsFromAkteResults, err = zettelsFromAkteOp.Run(args...); err != nil {
 		err = errors.Error(err)
 		return
+	}
+
+	if c.OpenAkten {
 	}
 
 	if !c.Organize {

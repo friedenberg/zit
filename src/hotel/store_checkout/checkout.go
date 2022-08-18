@@ -36,7 +36,7 @@ func (s *Store) Checkout(
 		originalFilename := filename
 		filename = filename + ".md"
 
-		inlineAkte := true
+		inlineAkte := sz.Stored.Zettel.AkteExt.String() == "md"
 
 		if typKonfig, ok := s.Konfig.Typen[sz.Zettel.AkteExt.String()]; ok {
 			inlineAkte = typKonfig.InlineAkte

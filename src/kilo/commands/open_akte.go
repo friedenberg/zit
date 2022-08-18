@@ -88,7 +88,6 @@ func (c OpenAkte) RunWithHinweisen(store store_with_lock.Store, hins ...hinweis.
 
 	cmd := exec.ExecCommand(
 		"open",
-		[]string{"-W"},
 		files,
 	)
 
