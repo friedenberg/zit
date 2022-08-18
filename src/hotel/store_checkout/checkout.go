@@ -1,11 +1,13 @@
 package checkout_store
 
 import (
+	"io"
 	"os"
 
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
+	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/id"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/golf/stored_zettel"
@@ -55,31 +57,38 @@ func (s *Store) Checkout(
 		}
 
 		switch options.CheckoutMode {
-		case CheckoutModeZettelOnly:
 		case CheckoutModeAkteOnly:
+			p := originalFilename + "." + originalExt
+
+			if err = s.writeAkte(sz.Stored.Zettel.Akte, p); err != nil {
+				err = errors.Error(err)
+				return
+			}
+
+		case CheckoutModeZettelOnly:
+			c.IncludeAkte = false
+
+			fallthrough
+
+		case CheckoutModeZettelAndAkte:
+			c.IncludeAkte = true
+
 			if !inlineAkte {
 				czs[i].External.AktePath = originalFilename + "." + originalExt
 				c.ExternalAktePath = czs[i].External.AktePath
 				c.IncludeAkte = true
 			}
 
-		case CheckoutModeZettelAndAkte:
-			if !inlineAkte {
-				czs[i].External.AktePath = originalFilename + "." + originalExt
-				c.ExternalAktePath = czs[i].External.AktePath
-				c.IncludeAkte = true
+			if err = s.writeFormat(options, filename, c); err != nil {
+				err = errors.Wrapped(err, "%s", sz.Named)
+				stdprinter.Errf("%s (check out failed):\n", sz.Named)
+				stdprinter.Error(err)
+				continue
 			}
 
 		default:
 			err = errors.Errorf("unsupported checkout mode: %s", options.CheckoutMode)
 			return
-		}
-
-		if err = s.writeFormat(options, filename, c); err != nil {
-			err = errors.Wrapped(err, "%s", sz.Named)
-			stdprinter.Errf("%s (check out failed):\n", sz.Named)
-			stdprinter.Error(err)
-			continue
 		}
 
 		stdprinter.Outf("%s (checked out)\n", sz.Named)
@@ -105,6 +114,36 @@ func (s *Store) writeFormat(
 	defer open_file_guard.Close(f)
 
 	if _, err = o.Format.WriteTo(fc); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	return
+}
+
+func (s *Store) writeAkte(
+	sh sha.Sha,
+	p string,
+) (err error) {
+	var f *os.File
+
+	if f, err = open_file_guard.Create(p); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	defer open_file_guard.Close(f)
+
+	var r io.ReadCloser
+
+	if r, err = s.storeZettel.AkteReader(sh); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	defer open_file_guard.Close(f)
+
+	if _, err = io.Copy(f, r); err != nil {
 		err = errors.Error(err)
 		return
 	}
