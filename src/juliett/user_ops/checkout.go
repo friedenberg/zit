@@ -10,8 +10,8 @@ import (
 )
 
 type Checkout struct {
-	Options checkout_store.CheckinOptions
-	Umwelt  *umwelt.Umwelt
+	checkout_store.CheckoutOptions
+	*umwelt.Umwelt
 }
 
 type CheckoutResults struct {
@@ -35,7 +35,7 @@ func (c Checkout) RunManyHinweisen(
 		}
 	}
 
-	if results.Zettelen, err = s.CheckoutStore().Checkout(c.Options, zs...); err != nil {
+	if results.Zettelen, err = s.CheckoutStore().Checkout(c.CheckoutOptions, zs...); err != nil {
 		err = errors.Error(err)
 		return
 	}

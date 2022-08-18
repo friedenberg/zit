@@ -11,8 +11,8 @@ import (
 )
 
 type Checkin struct {
-	Umwelt  *umwelt.Umwelt
-	Options checkout_store.CheckinOptions
+	*umwelt.Umwelt
+	checkout_store.OptionsReadExternal
 }
 
 type CheckinResults struct {

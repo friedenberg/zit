@@ -14,8 +14,8 @@ import (
 )
 
 type Checkout struct {
-	IncludeAkte bool
-	Force       bool
+	checkout_store.CheckoutMode
+	Force bool
 }
 
 func init() {
@@ -24,7 +24,7 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &Checkout{}
 
-			f.BoolVar(&c.IncludeAkte, "include-akte", false, "check out akte as well")
+			f.Var(&c.CheckoutMode, "mode", "mode for checking out the zettel")
 			f.BoolVar(&c.Force, "force", false, "force update checked out zettels, even if they will overwrite existing checkouts")
 
 			return commandWithLockedStore{commandWithHinweisen{c}}
@@ -33,31 +33,13 @@ func init() {
 }
 
 func (c Checkout) RunWithHinweisen(s store_with_lock.Store, hins ...hinweis.Hinweis) (err error) {
-	// getHinweisenOp := user_ops.GetAllHinweisen{
-	// 	Umwelt: u,
-	// }
-
-	// var getHinweisenResults user_ops.GetAllHinweisenResults
-
-	// if getHinweisenResults, err = getHinweisenOp.Run(); err != nil {
-	// 	err = errors.Error(err)
-	// 	return
-	// }
-
-	// hins = getHinweisenResults.Hinweisen
-
-	checkinOptions := checkout_store.CheckinOptions{
-		IgnoreMissingHinweis: true,
-		AddMdExtension:       true,
-		IncludeAkte:          c.IncludeAkte,
-		Format:               zettel_formats.Text{},
-	}
-
 	var readResults user_ops.ReadCheckedOutResults
 
 	readOp := user_ops.ReadCheckedOut{
-		Umwelt:  s.Umwelt,
-		Options: checkinOptions,
+		Umwelt: s.Umwelt,
+		OptionsReadExternal: checkout_store.OptionsReadExternal{
+			Format: zettel_formats.Text{},
+		},
 	}
 
 	if readResults, err = readOp.RunManyHinweisen(s, hins...); err != nil {
@@ -88,14 +70,12 @@ func (c Checkout) RunWithHinweisen(s store_with_lock.Store, hins ...hinweis.Hinw
 		}
 	}
 
-	options := checkout_store.CheckinOptions{
-		IncludeAkte: c.IncludeAkte,
-		Format:      zettel_formats.Text{},
-	}
-
 	checkoutOp := user_ops.Checkout{
-		Umwelt:  s.Umwelt,
-		Options: options,
+		Umwelt: s.Umwelt,
+		CheckoutOptions: checkout_store.CheckoutOptions{
+			CheckoutMode: c.CheckoutMode,
+			Format:       zettel_formats.Text{},
+		},
 	}
 
 	if _, err = checkoutOp.RunManyHinweisen(s, toCheckOut...); err != nil {

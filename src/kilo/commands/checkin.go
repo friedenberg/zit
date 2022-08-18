@@ -53,16 +53,13 @@ func (c Checkin) RunWithLockedStore(
 		args = possible.Zettelen
 	}
 
-	checkinOptions := checkout_store.CheckinOptions{
-		IncludeAkte: !c.IgnoreAkte,
-		Format:      zettel_formats.Text{},
-	}
-
 	var readResults user_ops.ReadCheckedOutResults
 
 	readOp := user_ops.ReadCheckedOut{
-		Umwelt:  s.Umwelt,
-		Options: checkinOptions,
+		Umwelt: s.Umwelt,
+		OptionsReadExternal: checkout_store.OptionsReadExternal{
+			Format: zettel_formats.Text{},
+		},
 	}
 
 	if readResults, err = readOp.RunManyStrings(s, args...); err != nil {
@@ -71,8 +68,8 @@ func (c Checkin) RunWithLockedStore(
 	}
 
 	checkinOp := user_ops.Checkin{
-		Umwelt:  s.Umwelt,
-		Options: checkinOptions,
+		Umwelt:         s.Umwelt,
+		OptionsReadExternal: readOp.OptionsReadExternal,
 	}
 
 	zettels := make([]stored_zettel.External, 0, len(readResults.Zettelen))

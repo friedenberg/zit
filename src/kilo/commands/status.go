@@ -39,16 +39,15 @@ func (c Status) RunWithLockedStore(s store_with_lock.Store, args ...string) (err
 
 	args = possible.Zettelen
 
-	options := checkout_store.CheckinOptions{
-		IncludeAkte: true,
-		Format:      zettel_formats.Text{},
+	options := checkout_store.OptionsReadExternal{
+		Format: zettel_formats.Text{},
 	}
 
 	var readResults user_ops.ReadCheckedOutResults
 
 	readOp := user_ops.ReadCheckedOut{
-		Umwelt:  s.Umwelt,
-		Options: options,
+		Umwelt:              s.Umwelt,
+		OptionsReadExternal: options,
 	}
 
 	if readResults, err = readOp.RunManyStrings(s, args...); err != nil {

@@ -15,7 +15,7 @@ import (
 )
 
 type Edit struct {
-	IncludeAkte bool
+	checkout_store.CheckoutMode
 }
 
 func init() {
@@ -24,7 +24,7 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &Edit{}
 
-			f.BoolVar(&c.IncludeAkte, "include-akte", true, "check out and open the akte")
+			f.Var(&c.CheckoutMode, "mode", "mode for checking out the zettel")
 
 			return c
 		},
@@ -32,12 +32,14 @@ func init() {
 }
 
 func (c Edit) Run(u *umwelt.Umwelt, args ...string) (err error) {
+	checkoutOptions := checkout_store.CheckoutOptions{
+		CheckoutMode: c.CheckoutMode,
+		Format:       zettel_formats.Text{},
+	}
+
 	checkoutOp := user_ops.Checkout{
-		Umwelt: u,
-		Options: checkout_store.CheckinOptions{
-			IncludeAkte: c.IncludeAkte,
-			Format:      zettel_formats.Text{},
-		},
+		Umwelt:          u,
+		CheckoutOptions: checkoutOptions,
 	}
 
 	var hins []hinweis.Hinweis
@@ -84,16 +86,13 @@ func (c Edit) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	checkinOp := user_ops.Checkin{
-		Umwelt:  s.Umwelt,
-		Options: checkoutOp.Options,
-	}
-
 	var readResults user_ops.ReadCheckedOutResults
 
 	readOp := user_ops.ReadCheckedOut{
-		Umwelt:  s.Umwelt,
-		Options: checkoutOp.Options,
+		Umwelt: s.Umwelt,
+		OptionsReadExternal: checkout_store.OptionsReadExternal{
+			Format: zettel_formats.Text{},
+		},
 	}
 
 	if s, err = store_with_lock.New(u); err != nil {
@@ -110,6 +109,13 @@ func (c Edit) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	for _, z := range readResults.Zettelen {
 		zettels = append(zettels, z.External)
+	}
+
+	checkinOp := user_ops.Checkin{
+		Umwelt: s.Umwelt,
+		OptionsReadExternal: checkout_store.OptionsReadExternal{
+			Format: zettel_formats.Text{},
+		},
 	}
 
 	if _, err = checkinOp.Run(s, zettels...); err != nil {

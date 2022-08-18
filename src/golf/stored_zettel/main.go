@@ -33,7 +33,6 @@ type External struct {
 }
 
 type CheckedOut struct {
-	//TODO change to Transacted
 	Internal Transacted
 	External External
 }

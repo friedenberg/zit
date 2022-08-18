@@ -12,7 +12,7 @@ import (
 )
 
 func (s *Store) Checkout(
-	options CheckinOptions,
+	options CheckoutOptions,
 	zs ...stored_zettel.Transacted,
 ) (czs []stored_zettel.CheckedOut, err error) {
 	czs = make([]stored_zettel.CheckedOut, len(zs))
@@ -54,10 +54,25 @@ func (s *Store) Checkout(
 			AkteReaderFactory: s.storeZettel,
 		}
 
-		if !inlineAkte && options.IncludeAkte {
-			czs[i].External.AktePath = originalFilename + "." + originalExt
-			c.ExternalAktePath = czs[i].External.AktePath
-			c.IncludeAkte = true
+		switch options.CheckoutMode {
+		case CheckoutModeZettelOnly:
+		case CheckoutModeAkteOnly:
+			if !inlineAkte {
+				czs[i].External.AktePath = originalFilename + "." + originalExt
+				c.ExternalAktePath = czs[i].External.AktePath
+				c.IncludeAkte = true
+			}
+
+		case CheckoutModeZettelAndAkte:
+			if !inlineAkte {
+				czs[i].External.AktePath = originalFilename + "." + originalExt
+				c.ExternalAktePath = czs[i].External.AktePath
+				c.IncludeAkte = true
+			}
+
+		default:
+			err = errors.Errorf("unsupported checkout mode: %s", options.CheckoutMode)
+			return
 		}
 
 		if err = s.writeFormat(options, filename, c); err != nil {
@@ -74,7 +89,7 @@ func (s *Store) Checkout(
 }
 
 func (s *Store) writeFormat(
-	o CheckinOptions,
+	o CheckoutOptions,
 	p string,
 	fc zettel.FormatContextWrite,
 ) (err error) {

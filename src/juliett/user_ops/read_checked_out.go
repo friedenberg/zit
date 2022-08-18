@@ -12,8 +12,8 @@ import (
 )
 
 type ReadCheckedOut struct {
-	Umwelt       *umwelt.Umwelt
-	Options      checkout_store.CheckinOptions
+	*umwelt.Umwelt
+	checkout_store.OptionsReadExternal
 	AllowMissing bool
 }
 
@@ -92,19 +92,13 @@ func (op ReadCheckedOut) runOne(
 	store store_with_lock.Store,
 	p string,
 ) (zettel stored_zettel.CheckedOut, err error) {
-	if op.Options.AddMdExtension {
-		p = p + ".md"
-	}
-
-	zettel.External, err = store.CheckoutStore().Read(p)
-
-	if op.Options.IgnoreMissingHinweis && errors.IsNotExist(err) {
-		err = nil
-		//results.Zettelen[ez.Hinweis] = stored_zettel.External{}
-		// continue
-	} else if err != nil {
-		err = errors.Error(err)
-		return
+	if zettel.External, err = store.CheckoutStore().Read(p); err != nil {
+		if errors.IsNotExist(err) {
+			err = nil
+		} else {
+			err = errors.Error(err)
+			return
+		}
 	}
 
 	if zettel.Internal, err = store.Zettels().Read(zettel.External.Hinweis); err != nil {
