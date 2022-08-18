@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/exec"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
-	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/id"
 	"github.com/friedenberg/zit/src/golf/stored_zettel"
@@ -25,21 +24,13 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &OpenAkte{}
 
-			return commandWithLockedStore{c}
+			return commandWithLockedStore{commandWithHinweisen{c}}
 		},
 	)
 }
 
-func (c OpenAkte) RunWithLockedStore(store store_with_lock.Store, args ...string) (err error) {
-	var hins []hinweis.Hinweis
-	var shas []sha.Sha
-
-	if shas, hins, err = store.Hinweisen().ReadManyStrings(args...); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
-	files := make([]string, len(shas))
+func (c OpenAkte) RunWithHinweisen(store store_with_lock.Store, hins ...hinweis.Hinweis) (err error) {
+	files := make([]string, len(hins))
 
 	dir, err := ioutil.TempDir("", "")
 
@@ -48,11 +39,11 @@ func (c OpenAkte) RunWithLockedStore(store store_with_lock.Store, args ...string
 		return
 	}
 
-	for i, s := range shas {
-		func(s sha.Sha) {
+	for i, h := range hins {
+		func(h hinweis.Hinweis) {
 			var tz stored_zettel.Transacted
 
-			if tz, err = store.Zettels().Read(s); err != nil {
+			if tz, err = store.Zettels().Read(h); err != nil {
 				err = errors.Error(err)
 				return
 			}
@@ -92,7 +83,7 @@ func (c OpenAkte) RunWithLockedStore(store store_with_lock.Store, args ...string
 				err = errors.Error(err)
 				return
 			}
-		}(s)
+		}(h)
 	}
 
 	cmd := exec.ExecCommand(

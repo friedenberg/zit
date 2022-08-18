@@ -49,6 +49,7 @@ func New(u *umwelt.Umwelt) (s Store, err error) {
 	}
 
 	csk := checkout_store.Konfig{
+		Konfig:       u.Konfig,
 		CacheEnabled: u.Konfig.CheckoutCacheEnabled,
 	}
 

@@ -36,7 +36,11 @@ func (s *Store) Checkout(
 		originalFilename := filename
 		filename = filename + ".md"
 
-		inlineAkte := sz.Stored.Zettel.AkteExt.String() == "md"
+		inlineAkte := true
+
+		if typKonfig, ok := s.Konfig.Typen[sz.Zettel.AkteExt.String()]; ok {
+			inlineAkte = typKonfig.InlineAkte
+		}
 
 		czs[i] = stored_zettel.CheckedOut{
 			External: stored_zettel.External{

@@ -1,6 +1,8 @@
 package checkout_store
 
-import "github.com/friedenberg/zit/src/foxtrot/zettel"
+import (
+	"github.com/friedenberg/zit/src/foxtrot/zettel"
+)
 
 type CheckinOptions struct {
 	IgnoreMissingHinweis bool
