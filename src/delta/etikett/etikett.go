@@ -57,6 +57,10 @@ func (a Etikett) Equals(b Etikett) bool {
 	return a.Value == b.Value
 }
 
+func (a Etikett) LeftSubtract(b Etikett) (c Etikett) {
+	return Etikett{Value: strings.TrimPrefix(a.String(), b.String())}
+}
+
 func (e Etikett) Expanded(exes ...Expander) (expanded *Set) {
 	expanded = NewSet()
 

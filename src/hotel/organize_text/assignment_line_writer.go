@@ -21,8 +21,7 @@ func (av assignmentLineWriter) write(a *assignment) (err error) {
 		err = errors.Errorf("negative depth: %d", a.depth)
 		return
 	} else {
-		//a.depty > 1
-		tab_prefix = strings.Repeat("\t", a.depth-1)
+		tab_prefix = strings.Repeat(" ", a.depth*2-(a.depth)-1)
 	}
 
 	if a.etiketten.Len() > 0 {

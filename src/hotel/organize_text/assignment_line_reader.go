@@ -166,8 +166,6 @@ func (ar *assignmentLineReader) readOneHeading(l line) (err error) {
 
 	var newAssignment *assignment
 
-	// logz.Printf("line: %q\n", l)
-	// logz.Printf("previous: %d, current: %d\n", ar.currentAssignment.depth, depth)
 	if depth < ar.currentAssignment.depth {
 		newAssignment, err = ar.readOneHeadingLesserDepth(depth, currentEtiketten)
 	} else if depth == ar.currentAssignment.depth {
@@ -197,9 +195,10 @@ func (ar *assignmentLineReader) readOneHeading(l line) (err error) {
 	return
 }
 
-func (ar *assignmentLineReader) readOneHeadingLesserDepth(d int, e *etikett.Set) (newCurrent *assignment, err error) {
-	// logz.Print("depth count is <")
-
+func (ar *assignmentLineReader) readOneHeadingLesserDepth(
+  d int,
+  e *etikett.Set,
+) (newCurrent *assignment, err error) {
 	depthDiff := d - ar.currentAssignment.depth
 
 	if newCurrent, err = ar.currentAssignment.nthParent(depthDiff - 1); err != nil {
@@ -234,7 +233,10 @@ func (ar *assignmentLineReader) readOneHeadingLesserDepth(d int, e *etikett.Set)
 	return
 }
 
-func (ar *assignmentLineReader) readOneHeadingEqualDepth(d int, e *etikett.Set) (newCurrent *assignment, err error) {
+func (ar *assignmentLineReader) readOneHeadingEqualDepth(
+  d int,
+  e *etikett.Set,
+) (newCurrent *assignment, err error) {
 	// logz.Print("depth count is ==")
 
 	if newCurrent, err = ar.currentAssignment.nthParent(1); err != nil {
@@ -266,7 +268,10 @@ func (ar *assignmentLineReader) readOneHeadingEqualDepth(d int, e *etikett.Set) 
 	return
 }
 
-func (ar *assignmentLineReader) readOneHeadingGreaterDepth(d int, e *etikett.Set) (newCurrent *assignment, err error) {
+func (ar *assignmentLineReader) readOneHeadingGreaterDepth(
+  d int,
+  e *etikett.Set,
+) (newCurrent *assignment, err error) {
 	// logz.Print("depth count is >")
 	// logz.Print(e)
 

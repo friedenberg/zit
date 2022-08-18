@@ -12,9 +12,11 @@ type AssignmentTreeConstructor struct {
 	GroupingEtiketten etikett.Slice
 	ExtraEtiketten    etikett.Set
 	Named             stored_zettel.SetNamed
+	UsePrefixJoints   bool
 }
 
-func (atc AssignmentTreeConstructor) RootAssignment() (root *assignment) {
+func (atc *AssignmentTreeConstructor) RootAssignment() (root *assignment) {
+	// atc.UsePrefixJoints = true
 	root = newAssignment(1)
 	root.etiketten = atc.RootEtiketten
 
@@ -33,16 +35,11 @@ func (atc AssignmentTreeConstructor) RootAssignment() (root *assignment) {
 func (atc AssignmentTreeConstructor) makeChildren(
 	parent *assignment,
 	prefixSet stored_zettel.SetPrefixNamed,
-	remainingEtiketten etikett.Slice,
-) (assigned *stored_zettel.SetNamed) {
-	assigned = stored_zettel.NewSetNamed()
-
-	// logz.Print("making children")
-	if remainingEtiketten.Len() == 0 {
+	groupingEtiketten etikett.Slice,
+) {
+	if groupingEtiketten.Len() == 0 {
 		for _, zs := range prefixSet {
-			// assigned.Merge(zs)
 			for _, z := range zs {
-				// logz.Printf("%s adding named %s", parent.etiketten, z.Hinweis)
 				parent.named.Add(makeZettel(z))
 			}
 		}
@@ -50,37 +47,64 @@ func (atc AssignmentTreeConstructor) makeChildren(
 		return
 	}
 
-	segments := prefixSet.Subset(remainingEtiketten[0])
-	// logz.Printf("head: %s ungrouped: %s", remainingEtiketten[0], segments.Ungrouped.HinweisStrings())
-	// logz.Printf("head: %s grouped: %s", remainingEtiketten[0], segments.Grouped.ToSetNamed().HinweisStrings())
+	segments := prefixSet.Subset(groupingEtiketten[0])
 
 	for _, z := range *segments.Ungrouped {
 		parent.named.Add(makeZettel(z))
 	}
 
 	for e, zs := range *segments.Grouped {
-		// assigned.Merge(zs)
-		// logz.Print("iterating through grouped: ", e)
-		child := newAssignment(parent.depth + 1)
-		child.etiketten = etikett.MakeSet(e)
-		// child.named = makeZettelZetFromSetNamed(zs)
+		if atc.UsePrefixJoints {
+			if parent.etiketten.Len() > 1 {
+			} else {
+				prefixJoint := etikett.MakeSet(groupingEtiketten[0])
 
-		nextEtiketten := etikett.NewSlice()
+				var intermediate, lastChild *assignment
 
-		if remainingEtiketten.Len() > 1 {
-			nextEtiketten = remainingEtiketten[1:]
+				if len(parent.children) > 0 {
+					lastChild = parent.children[len(parent.children)-1]
+				}
+
+				if lastChild != nil && lastChild.etiketten.Equals(prefixJoint) {
+					intermediate = lastChild
+				} else {
+					intermediate = newAssignment(parent.depth + 1)
+					intermediate.etiketten = prefixJoint
+					parent.addChild(intermediate)
+				}
+
+				child := newAssignment(intermediate.depth + 1)
+				child.etiketten = etikett.MakeSet(e.LeftSubtract(groupingEtiketten[0]))
+
+				nextGroupingEtiketten := etikett.NewSlice()
+
+				if groupingEtiketten.Len() > 1 {
+					nextGroupingEtiketten = groupingEtiketten[1:]
+				}
+
+				atc.makeChildren(child, *zs.ToSetPrefixNamed(), nextGroupingEtiketten)
+
+				intermediate.addChild(child)
+			}
+		} else {
+			child := newAssignment(parent.depth + 1)
+			child.etiketten = etikett.MakeSet(e)
+
+			nextGroupingEtiketten := etikett.NewSlice()
+
+			if groupingEtiketten.Len() > 1 {
+				nextGroupingEtiketten = groupingEtiketten[1:]
+			}
+
+			atc.makeChildren(child, *zs.ToSetPrefixNamed(), nextGroupingEtiketten)
+
+			parent.addChild(child)
 		}
-
-		_ = atc.makeChildren(child, *zs.ToSetPrefixNamed(), nextEtiketten)
-		// childAssigned.Merge(c)
-		// assigned.Merge(*c)
-
-		parent.addChild(child)
-
-		sort.Slice(parent.children, func(i, j int) bool {
-			return parent.children[i].etiketten.String() < parent.children[j].etiketten.String()
-		})
 	}
+
+	sort.Slice(parent.children, func(i, j int) bool {
+		return parent.children[i].etiketten.String() < parent.children[j].etiketten.String()
+	})
 
 	return
 }

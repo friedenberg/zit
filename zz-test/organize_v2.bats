@@ -133,13 +133,13 @@ function outputs_organize_one_etiketten_group_by_one { # @test
 		echo
 		echo "# task"
 		echo
-		printf "\t## priority-1\n"
+		echo " ## priority-1"
 		echo
-		printf "\t- [one/uno] wow\n"
+		echo " - [one/uno] wow"
 		echo
-		printf "\t## priority-2\n"
+		echo " ## priority-2"
 		echo
-		printf "\t- [one/uno] wow\n"
+		echo " - [one/uno] wow"
 	} >>"$expected_organize"
 
 	run zit organize -mode output-only -group-by priority task
@@ -181,13 +181,13 @@ function outputs_organize_two_zettels_one_etiketten_group_by_one { # @test
 		echo
 		echo "# task"
 		echo
-		printf "\t## priority-1\n"
+		echo " ## priority-1"
 		echo
-		printf "\t- [one/uno] one/uno\n"
+		echo " - [one/uno] one/uno"
 		echo
-		printf "\t## priority-2\n"
+		echo " ## priority-2"
 		echo
-		printf "\t- [one/dos] two/dos\n"
+		echo " - [one/dos] two/dos"
 	} >>"$expected_organize"
 
 	run zit organize -mode output-only -group-by priority task
@@ -229,15 +229,15 @@ function outputs_organize_one_etiketten_group_by_two { # @test
 		echo
 		echo "# task"
 		echo
-		printf "\t## priority-1\n"
+		echo " ## priority-1"
 		echo
-		printf "\t\t### w-2022-07-06\n"
+		echo "  ### w-2022-07-06"
 		echo
-		printf "\t\t- [one/dos] two/dos\n"
+		echo "  - [one/dos] two/dos"
 		echo
-		printf "\t\t### w-2022-07-07\n"
+		echo "  ### w-2022-07-07"
 		echo
-		printf "\t\t- [one/uno] one/uno\n"
+		echo "  - [one/uno] one/uno"
 	} >>"$expected_organize"
 
 	run zit organize -mode output-only -group-by priority,w task
