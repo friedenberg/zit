@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"os/signal"
+	"syscall"
 
 	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/kilo/commands"
@@ -16,7 +17,7 @@ func main() {
 
 	// Passing no signals to Notify means that
 	// all signals will be sent to the channel.
-	signal.Notify(c)
+	signal.Notify(c, syscall.SIGURG)
 
 	go func() {
 		for s := range c {

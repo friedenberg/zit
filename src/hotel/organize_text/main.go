@@ -24,6 +24,15 @@ func New(options Options) (ot *organizeText, err error) {
 
 	ot.assignment.addChild(options.AssignmentTreeConstructor.RootAssignment())
 
+	refiner := AssignmentTreeRefiner{
+		// UsePrefixJoints: true,
+	}
+
+	if err = refiner.Refine(ot.assignment); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
 	return
 }
 

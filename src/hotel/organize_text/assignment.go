@@ -1,8 +1,6 @@
 package organize_text
 
 import (
-	"sort"
-
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/delta/etikett"
 )
@@ -69,10 +67,48 @@ func (a *assignment) nthParent(n int) (p *assignment, err error) {
 	return a.parent.nthParent(n - 1)
 }
 
-func (a *assignment) childrenSorted() []*assignment {
-	sort.Slice(a.children, func(i, j int) bool {
-		return a.children[i].etiketten.String() < a.children[j].etiketten.String()
-	})
-
-	return a.children
+func (a *assignment) removeFromParent() (err error) {
+	return a.parent.removeChild(a)
 }
+
+func (a *assignment) removeChild(c *assignment) (err error) {
+	if c.parent != a {
+		err = errors.Errorf("attempting to remove child from wrong parent")
+		return
+	}
+
+	if len(a.children) == 0 {
+		err = errors.Errorf("attempting to remove child when there are no children")
+		return
+	}
+
+	cap1 := 0
+	cap2 := len(c.children) - 1
+
+	if cap2 > 0 {
+		cap1 = cap2
+	}
+
+	nc := make([]*assignment, 0, cap1)
+
+	for _, c1 := range a.children {
+		if c1 == c {
+			continue
+		}
+
+		nc = append(nc, c1)
+	}
+
+	c.parent = nil
+	a.children = nc
+
+	return
+}
+
+// func (a *assignment) childrenSorted() []*assignment {
+// 	sort.Slice(a.children, func(i, j int) bool {
+// 		return a.children[i].etiketten.String() < a.children[j].etiketten.String()
+// 	})
+
+// 	return a.children
+// }
