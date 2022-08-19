@@ -45,7 +45,7 @@ func (av assignmentLineWriter) write(a *assignment) (err error) {
 		av.WriteLines(fmt.Sprintf("%s- [%s] %s", tab_prefix, z.Hinweis, z.Bezeichnung))
 	}
 
-	if len(a.named) > 0 {
+	if len(a.named) > 0 || len(a.unnamed) > 0 {
 		av.WriteExactlyOneEmpty()
 	}
 
