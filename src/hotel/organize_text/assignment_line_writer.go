@@ -15,13 +15,13 @@ type assignmentLineWriter struct {
 func (av assignmentLineWriter) write(a *assignment) (err error) {
 	tab_prefix := ""
 
-	if a.depth == 0 {
+	if a.Depth() == 0 {
 		av.WriteExactlyOneEmpty()
-	} else if a.depth < 0 {
-		err = errors.Errorf("negative depth: %d", a.depth)
+	} else if a.Depth() < 0 {
+		err = errors.Errorf("negative depth: %d", a.Depth())
 		return
 	} else {
-		tab_prefix = strings.Repeat(" ", a.depth*2-(a.depth)-1)
+		tab_prefix = strings.Repeat(" ", a.Depth()*2-(a.Depth())-1)
 	}
 
 	if a.etiketten.Len() > 0 {
@@ -29,7 +29,7 @@ func (av assignmentLineWriter) write(a *assignment) (err error) {
 			fmt.Sprintf(
 				"%s%s %s",
 				tab_prefix,
-				strings.Repeat("#", a.depth),
+				strings.Repeat("#", a.Depth()),
 				a.etiketten,
 			),
 		)

@@ -18,6 +18,17 @@ func (atc *AssignmentTreeRefiner) Refine(a *assignment) (err error) {
 		return a.children[i].etiketten.String() < a.children[j].etiketten.String()
 	})
 
+	if a.parent != nil && a.etiketten.Equals(a.parent.etiketten) {
+    p := a.parent
+
+		if err = p.consume(a); err != nil {
+			err = errors.Error(err)
+			return
+		}
+
+    return atc.Refine(p)
+	}
+
 	if atc.UsePrefixJoints {
 		if err = atc.applyPrefixJoints(a); err != nil {
 			err = errors.Error(err)
@@ -62,7 +73,7 @@ func (atc AssignmentTreeRefiner) applyPrefixJoints(a *assignment) (err error) {
 	if len(childPrefixes) > 0 {
 		groupingPrefix := childPrefixes[0]
 
-		na := newAssignment(a.depth + 1)
+		na := newAssignment()
 		na.etiketten = etikett.MakeSet(groupingPrefix.Etikett)
 		a.addChild(na)
 
@@ -73,7 +84,6 @@ func (atc AssignmentTreeRefiner) applyPrefixJoints(a *assignment) (err error) {
 			}
 
 			c.etiketten = c.etiketten.SubtractPrefix(groupingPrefix.Etikett)
-			c.depth += 1
 			na.addChild(c)
 		}
 	}

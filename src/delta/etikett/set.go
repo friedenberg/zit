@@ -250,13 +250,19 @@ func (s1 Set) Intersect(s2 Set) (s3 Set) {
 }
 
 func (s1 Set) SubtractPrefix(e Etikett) (s2 Set) {
-  s2 = MakeSet()
+	s2 = MakeSet()
 
-  for _, e1 := range s1 {
-    s2.Add(e1.LeftSubtract(e))
-  }
+	for _, e1 := range s1 {
+		e2 := e1.LeftSubtract(e)
 
-  return
+		if e2.String() == "" {
+			continue
+		}
+
+		s2.Add(e2)
+	}
+
+	return
 }
 
 func (s1 Set) Delta(s2 Set) (added Set, removed Set) {

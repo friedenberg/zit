@@ -17,14 +17,14 @@ type AssignmentTreeConstructor struct {
 
 func (atc *AssignmentTreeConstructor) RootAssignment() (root *assignment) {
 	// atc.UsePrefixJoints = true
-	root = newAssignment(1)
+	root = newAssignment()
 	root.etiketten = atc.RootEtiketten
 
 	prefixSet := atc.Named.ToSetPrefixNamed()
 	atc.makeChildren(root, *prefixSet, atc.GroupingEtiketten)
 
 	for _, e := range atc.ExtraEtiketten {
-		child := newAssignment(root.depth + 1)
+		child := newAssignment()
 		child.etiketten = etikett.MakeSet(e)
 		root.addChild(child)
 	}
@@ -68,12 +68,12 @@ func (atc AssignmentTreeConstructor) makeChildren(
 				if lastChild != nil && lastChild.etiketten.Equals(prefixJoint) {
 					intermediate = lastChild
 				} else {
-					intermediate = newAssignment(parent.depth + 1)
+					intermediate = newAssignment()
 					intermediate.etiketten = prefixJoint
 					parent.addChild(intermediate)
 				}
 
-				child := newAssignment(intermediate.depth + 1)
+				child := newAssignment()
 				child.etiketten = etikett.MakeSet(e.LeftSubtract(groupingEtiketten[0]))
 
 				nextGroupingEtiketten := etikett.NewSlice()
@@ -87,7 +87,7 @@ func (atc AssignmentTreeConstructor) makeChildren(
 				intermediate.addChild(child)
 			}
 		} else {
-			child := newAssignment(parent.depth + 1)
+			child := newAssignment()
 			child.etiketten = etikett.MakeSet(e)
 
 			nextGroupingEtiketten := etikett.NewSlice()

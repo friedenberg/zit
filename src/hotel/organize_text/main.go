@@ -19,13 +19,13 @@ type organizeText struct {
 
 func New(options Options) (ot *organizeText, err error) {
 	ot = &organizeText{
-		assignment: newAssignment(0),
+		assignment: newAssignment(),
 	}
 
 	ot.assignment.addChild(options.AssignmentTreeConstructor.RootAssignment())
 
 	refiner := AssignmentTreeRefiner{
-		// UsePrefixJoints: true,
+		UsePrefixJoints: true,
 	}
 
 	if err = refiner.Refine(ot.assignment); err != nil {

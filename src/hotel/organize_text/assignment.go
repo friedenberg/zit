@@ -9,18 +9,24 @@ type assignment struct {
 	etiketten etikett.Set
 	named     zettelSet
 	unnamed   newZettelSet
-	depth     int
 	children  []*assignment
 	parent    *assignment
 }
 
-func newAssignment(depth int) *assignment {
+func newAssignment() *assignment {
 	return &assignment{
 		etiketten: etikett.MakeSet(),
 		named:     makeZettelSet(),
 		unnamed:   makeNewZettelSet(),
-		depth:     depth,
 		children:  make([]*assignment, 0),
+	}
+}
+
+func (a assignment) Depth() int {
+	if a.parent == nil {
+		return 0
+	} else {
+		return a.parent.Depth() + 1
 	}
 }
 
@@ -101,6 +107,32 @@ func (a *assignment) removeChild(c *assignment) (err error) {
 
 	c.parent = nil
 	a.children = nc
+
+	return
+}
+
+func (a *assignment) consume(b *assignment) (err error) {
+	for _, c := range b.children {
+		if err = c.removeFromParent(); err != nil {
+			err = errors.Error(err)
+			return
+		}
+
+		a.parent.addChild(c)
+	}
+
+	for k, v := range b.named {
+		a.parent.named[k] = v
+	}
+
+	for k, v := range b.unnamed {
+		a.parent.unnamed[k] = v
+	}
+
+	if err = b.removeFromParent(); err != nil {
+		err = errors.Error(err)
+		return
+	}
 
 	return
 }
