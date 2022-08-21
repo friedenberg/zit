@@ -222,7 +222,7 @@ func (s Store) Read(i id.Id) (tz stored_zettel.Transacted, err error) {
 
 func (s *Store) Create(in zettel.Zettel) (tz stored_zettel.Transacted, err error) {
 	if in.IsEmpty() {
-		err = errors.Normal(errors.Errorf("zettel is empty"))
+		err = errors.Normalf("zettel is empty")
 		return
 	}
 
@@ -263,7 +263,7 @@ func (s *Store) CreateWithHinweis(
 	h hinweis.Hinweis,
 ) (tz stored_zettel.Transacted, err error) {
 	if in.IsEmpty() {
-		err = errors.Normal(errors.Errorf("zettel is empty"))
+		err = errors.Normalf("zettel is empty")
 		return
 	}
 

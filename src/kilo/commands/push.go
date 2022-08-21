@@ -28,7 +28,7 @@ func init() {
 
 func (c Push) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	if len(args) == 0 {
-		err = errors.Errorf("no remote specified")
+		err = errors.Normalf("no remote specified")
 		return
 	}
 
