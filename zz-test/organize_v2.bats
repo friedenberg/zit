@@ -95,7 +95,7 @@ function outputs_organize_two_etiketten { # @test
 		echo
 	} >"$expected_organize"
 
-	run zit organize -mode commit-directly ok brown <"$expected_organize"
+	run zit organize -verbose -mode commit-directly ok brown <"$expected_organize"
 
 	expected_zettel="$(mktemp)"
 	{
@@ -133,13 +133,15 @@ function outputs_organize_one_etiketten_group_by_one { # @test
 		echo
 		echo "# task"
 		echo
-		echo " ## priority-1"
+		echo " ## priority"
 		echo
-		echo " - [one/uno] wow"
+		echo "  ### -1"
 		echo
-		echo " ## priority-2"
+		echo "  - [one/uno] wow"
 		echo
-		echo " - [one/uno] wow"
+		echo "  ### -2"
+		echo
+		echo "  - [one/uno] wow"
 	} >>"$expected_organize"
 
 	run zit organize -mode output-only -group-by priority task
@@ -181,13 +183,15 @@ function outputs_organize_two_zettels_one_etiketten_group_by_one { # @test
 		echo
 		echo "# task"
 		echo
-		echo " ## priority-1"
+		echo " ## priority"
 		echo
-		echo " - [one/uno] one/uno"
+		echo "  ### -1"
 		echo
-		echo " ## priority-2"
+		echo "  - [one/uno] one/uno"
 		echo
-		echo " - [one/dos] two/dos"
+		echo "  ### -2"
+		echo
+		echo "  - [one/dos] two/dos"
 	} >>"$expected_organize"
 
 	run zit organize -mode output-only -group-by priority task
@@ -231,13 +235,15 @@ function outputs_organize_one_etiketten_group_by_two { # @test
 		echo
 		echo " ## priority-1"
 		echo
-		echo "  ### w-2022-07-06"
+		echo "  ### w-2022-07"
 		echo
-		echo "  - [one/dos] two/dos"
+		echo "   #### -06"
 		echo
-		echo "  ### w-2022-07-07"
+		echo "   - [one/dos] two/dos"
 		echo
-		echo "  - [one/uno] one/uno"
+		echo "   #### -07"
+		echo
+		echo "   - [one/uno] one/uno"
 	} >>"$expected_organize"
 
 	run zit organize -mode output-only -group-by priority,w task
@@ -472,4 +478,175 @@ function commits_organize_one_etiketten_group_by_two_new_zettels { # @test
 
 	run zit cat -type etikett
 	assert_output "$(cat "$expected")"
+}
+
+function commits_no_changes { # @test
+	wd="$(mktemp -d)"
+	cd "$wd" || exit 1
+
+	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+
+	one="$(mktemp)"
+	{
+		echo "---"
+		echo "# one/uno"
+		echo "- priority-1"
+		echo "- task"
+		echo "- w-2022-07-07"
+		echo "---"
+	} >"$one"
+
+	run zit new "$one"
+
+	two="$(mktemp)"
+	{
+		echo "---"
+		echo "# two/dos"
+		echo "- priority-1"
+		echo "- task"
+		echo "- w-2022-07-06"
+		echo "---"
+	} >"$two"
+
+	run zit new "$two"
+
+	three="$(mktemp)"
+	{
+		echo "---"
+		echo "# 3"
+		echo "- priority-1"
+		echo "- task"
+		echo "- w-2022-07-06"
+		echo "---"
+	} >"$three"
+
+	run zit new "$three"
+
+	expected_organize="$(mktemp)"
+	{
+		echo "# task"
+		echo
+		echo "## priority-1"
+		echo
+		echo "### w-2022-07-06"
+		echo
+		echo "- [one/dos] two/dos"
+		echo "- [two/uno] 3"
+		echo
+		echo "### w-2022-07-07"
+		echo
+		echo "- [one/uno] one/uno"
+		echo
+		echo "###"
+		echo
+	} >>"$expected_organize"
+
+	run zit organize -mode commit-directly -group-by priority,w task <"$expected_organize"
+	assert_output "no changes"
+
+	run zit show one/uno
+	assert_output "$(cat "$one")"
+
+	run zit show one/dos
+	assert_output "$(cat "$two")"
+
+	run zit show two/uno
+	assert_output "$(cat "$three")"
+}
+
+function commits_dependent_leaf { # @test
+	wd="$(mktemp -d)"
+	cd "$wd" || exit 1
+
+	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+
+	one="$(mktemp)"
+	{
+		echo "---"
+		echo "# one/uno"
+		echo "- priority-1"
+		echo "- task"
+		echo "- w-2022-07-07"
+		echo "---"
+	} >"$one"
+
+	run zit new "$one"
+
+	two="$(mktemp)"
+	{
+		echo "---"
+		echo "# two/dos"
+		echo "- priority-1"
+		echo "- task"
+		echo "- w-2022-07-06"
+		echo "---"
+	} >"$two"
+
+	run zit new "$two"
+
+	three="$(mktemp)"
+	{
+		echo "---"
+		echo "# 3"
+		echo "- priority-1"
+		echo "- task"
+		echo "- w-2022-07-06"
+		echo "---"
+	} >"$three"
+
+	run zit new "$three"
+
+	expected_organize="$(mktemp)"
+	{
+		echo "# task"
+		echo "## priority-2"
+		echo "### w-2022-07"
+		echo "#### -07"
+		echo "- [one/dos] two/dos"
+		echo "- [two/uno] 3"
+		echo "#### -08"
+		echo "- [one/uno] one/uno"
+		echo "###"
+	} >>"$expected_organize"
+
+	run zit organize -verbose -mode commit-directly -group-by priority,w task <"$expected_organize"
+
+	one="$(mktemp)"
+	{
+		echo "---"
+		echo "# one/uno"
+		echo "- priority-2"
+		echo "- task"
+		echo "- w-2022-07-08"
+		echo "---"
+	} >"$one"
+
+	run zit show one/uno
+	assert_output "$(cat "$one")"
+
+	two="$(mktemp)"
+	{
+		echo "---"
+		echo "# two/dos"
+		echo "- priority-2"
+		echo "- task"
+		echo "- w-2022-07-07"
+		echo "---"
+	} >"$two"
+
+	run zit show one/dos
+	assert_output "$(cat "$two")"
+
+	three="$(mktemp)"
+	{
+		echo "---"
+		echo "# 3"
+		echo "- priority-2"
+		echo "- task"
+		echo "- w-2022-07-07"
+		echo "---"
+	} >"$three"
+
+	run zit show two/uno
+	assert_output "$(cat "$three")"
 }

@@ -1,6 +1,9 @@
 package organize_text
 
 import (
+	"fmt"
+
+	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/delta/etikett"
 )
@@ -137,10 +140,46 @@ func (a *assignment) consume(b *assignment) (err error) {
 	return
 }
 
-// func (a *assignment) childrenSorted() []*assignment {
-// 	sort.Slice(a.children, func(i, j int) bool {
-// 		return a.children[i].etiketten.String() < a.children[j].etiketten.String()
-// 	})
+func (a *assignment) expandedEtiketten() (es etikett.Set, err error) {
+	logz.Print(a.etiketten)
+	if a.etiketten.Len() != 1 || a.parent == nil {
+		es = *(a.etiketten.Copy())
+		return
+	} else {
+		e := a.etiketten.Any()
 
-// 	return a.children
-// }
+		if e.IsDependentLeaf() {
+			var pe etikett.Set
+
+			if pe, err = a.parent.expandedEtiketten(); err != nil {
+				err = errors.Error(err)
+				return
+			}
+
+			if pe.Len() > 1 {
+				err = errors.Errorf(
+					"cannot infer full etikett for assignment because parent assignment has more than one etiketten: %s",
+					a.parent.etiketten,
+				)
+
+				return
+			}
+
+			e1 := pe.Any()
+
+			if e1.IsEmpty() {
+				err = errors.Errorf("parent etikett is empty")
+				return
+			}
+
+			logz.Print(e1, e)
+			e = etikett.Etikett{Value: fmt.Sprintf("%s%s", e1, e)}
+			logz.Print(e)
+		}
+
+		es = etikett.MakeSet(e)
+		logz.Print(es)
+	}
+
+	return
+}

@@ -10,7 +10,8 @@ import (
 type Text interface {
 	io.ReaderFrom
 	io.WriterTo
-	ToCompareMap() (out CompareMap)
+	ToCompareMap() (out CompareMap, err error)
+	Refine(AssignmentTreeRefiner) error
 }
 
 type organizeText struct {
@@ -25,10 +26,20 @@ func New(options Options) (ot *organizeText, err error) {
 	ot.assignment.addChild(options.AssignmentTreeConstructor.RootAssignment())
 
 	refiner := AssignmentTreeRefiner{
+		Enabled:         true,
 		UsePrefixJoints: true,
 	}
 
-	if err = refiner.Refine(ot.assignment); err != nil {
+	if err = ot.Refine(refiner); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	return
+}
+
+func (t *organizeText) Refine(refiner AssignmentTreeRefiner) (err error) {
+	if err = refiner.Refine(t.assignment); err != nil {
 		err = errors.Error(err)
 		return
 	}

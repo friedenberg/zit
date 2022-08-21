@@ -283,6 +283,15 @@ func (s1 Set) Delta(s2 Set) (added Set, removed Set) {
 	return
 }
 
+func (s Set) Any() (e Etikett) {
+	for _, e1 := range s {
+		e = e1
+		break
+	}
+
+	return e
+}
+
 func (es Set) MarshalJSON() ([]byte, error) {
 	return json.Marshal(es.SortedString())
 }

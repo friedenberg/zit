@@ -31,13 +31,6 @@ func (c *FormatOrganize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	// stdoutIsTty := open_file_guard.IsTty(os.Stdout)
-	// stdinIsTty := open_file_guard.IsTty(os.Stdin)
-
-	// if !stdinIsTty && !stdoutIsTty {
-	// 	logz.Print("neither stdin or stdout is a tty")
-	// 	logz.Print("generate organize, read from stdin, commit")
-
 	var f *os.File
 
 	if f, err = open_file_guard.Open(args[0]); err != nil {
@@ -54,6 +47,16 @@ func (c *FormatOrganize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	if ot, err = readOrganizeTextOp.Run(); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	refiner := organize_text.AssignmentTreeRefiner{
+		Enabled:         true,
+		UsePrefixJoints: true,
+	}
+
+	if err = ot.Refine(refiner); err != nil {
 		err = errors.Error(err)
 		return
 	}

@@ -2,6 +2,7 @@ package changes
 
 import (
 	"github.com/friedenberg/zit/src/alfa/logz"
+	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/hotel/organize_text"
 )
@@ -16,12 +17,21 @@ type Changes struct {
 	New     map[string]etikett.Set
 }
 
-func ChangesFrom(a1, b1 organize_text.Text) (c Changes) {
-	a := a1.ToCompareMap()
-	b := b1.ToCompareMap()
+func ChangesFrom(a1, b1 organize_text.Text) (c Changes, err error) {
+	var a, b organize_text.CompareMap
 
-	logz.Printf("%#v", a)
-	logz.Printf("%#v", b)
+	if a, err = a1.ToCompareMap(); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	if b, err = b1.ToCompareMap(); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	logz.PrintDebug(a)
+	logz.PrintDebug(b)
 
 	c.Added = make([]Change, 0)
 	c.Removed = make([]Change, 0)

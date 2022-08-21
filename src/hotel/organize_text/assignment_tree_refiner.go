@@ -3,30 +3,29 @@ package organize_text
 import (
 	"sort"
 
-	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/delta/etikett"
 )
 
 type AssignmentTreeRefiner struct {
+	Enabled         bool
 	UsePrefixJoints bool
 }
 
 func (atc *AssignmentTreeRefiner) Refine(a *assignment) (err error) {
-	logz.Print(a)
-	sort.Slice(a.children, func(i, j int) bool {
-		return a.children[i].etiketten.String() < a.children[j].etiketten.String()
-	})
+	if !atc.Enabled {
+		return
+	}
 
 	if a.parent != nil && a.etiketten.Equals(a.parent.etiketten) {
-    p := a.parent
+		p := a.parent
 
 		if err = p.consume(a); err != nil {
 			err = errors.Error(err)
 			return
 		}
 
-    return atc.Refine(p)
+		return atc.Refine(p)
 	}
 
 	if atc.UsePrefixJoints {
@@ -37,27 +36,22 @@ func (atc *AssignmentTreeRefiner) Refine(a *assignment) (err error) {
 	}
 
 	for _, child := range a.children {
-		// if i > 0 {
-		// 	if child.etiketten.String() == a.children[i-1].etiketten.String() {
-		// 		sib := a.children[i-1]
-
-		// 		for _, c := range child.children {
-		// 			c.parent = nil
-		// 			sib.addChild(c)
-		// 		}
-
-		// 		child.parent = nil
-		// 		child = sib
-
-		// 		continue
-		// 	}
-		// }
-
 		if err = atc.Refine(child); err != nil {
 			err = errors.Error(err)
 			return
 		}
 	}
+
+	if atc.UsePrefixJoints {
+		if err = atc.applyPrefixJoints(a); err != nil {
+			err = errors.Error(err)
+			return
+		}
+	}
+
+	sort.Slice(a.children, func(i, j int) bool {
+		return a.children[i].etiketten.String() < a.children[j].etiketten.String()
+	})
 
 	return
 }
@@ -70,30 +64,39 @@ type etikettBag struct {
 func (atc AssignmentTreeRefiner) applyPrefixJoints(a *assignment) (err error) {
 	childPrefixes := atc.childPrefixes(a)
 
-	if len(childPrefixes) > 0 {
-		groupingPrefix := childPrefixes[0]
+	if len(childPrefixes) == 0 {
+		return
+	}
 
-		na := newAssignment()
+	groupingPrefix := childPrefixes[0]
+
+	var na *assignment
+
+	if a.etiketten.Len() == 1 && a.etiketten.Any().Equals(groupingPrefix.Etikett) {
+		na = a
+	} else {
+		na = newAssignment()
 		na.etiketten = etikett.MakeSet(groupingPrefix.Etikett)
 		a.addChild(na)
+	}
 
-		for _, c := range groupingPrefix.assignments {
+	for _, c := range groupingPrefix.assignments {
+		if c.parent != na {
 			if err = c.removeFromParent(); err != nil {
 				err = errors.Error(err)
 				return
 			}
 
-			c.etiketten = c.etiketten.SubtractPrefix(groupingPrefix.Etikett)
 			na.addChild(c)
 		}
+
+		c.etiketten = c.etiketten.SubtractPrefix(groupingPrefix.Etikett)
 	}
 
 	return
 }
 
 func (a AssignmentTreeRefiner) childPrefixes(node *assignment) (out []etikettBag) {
-	logz.Print(node)
-
 	m := make(map[etikett.Etikett][]*assignment)
 	out = make([]etikettBag, 0, len(node.children))
 

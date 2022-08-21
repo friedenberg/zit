@@ -31,11 +31,16 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 
 	defer errors.PanicIfError(store.Flush)
 
-	changes := changes.ChangesFrom(a, b)
+	var cs changes.Changes
 
-	logz.Printf("%#v", changes)
+	if cs, err = changes.ChangesFrom(a, b); err != nil {
+		err = errors.Error(err)
+		return
+	}
 
-	if len(changes.Added) == 0 && len(changes.Removed) == 0 && len(changes.New) == 0 {
+	logz.Printf("%#v", cs)
+
+	if len(cs.Added) == 0 && len(cs.Removed) == 0 && len(cs.New) == 0 {
 		stdprinter.Err("no changes")
 		return
 	}
@@ -98,7 +103,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 		return
 	}
 
-	for _, c := range changes.Removed {
+	for _, c := range cs.Removed {
 		var e etikett.Etikett
 
 		if err = e.Set(c.Etikett); err != nil {
@@ -111,7 +116,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 			return
 		}
 	}
-	for _, c := range changes.Added {
+	for _, c := range cs.Added {
 		var e etikett.Etikett
 
 		if err = e.Set(c.Etikett); err != nil {
@@ -125,7 +130,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 		}
 	}
 
-	for bez, etts := range changes.New {
+	for bez, etts := range cs.New {
 		z := zettel.Zettel{
 			Etiketten: etts,
 		}

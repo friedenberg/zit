@@ -40,8 +40,7 @@ func (e Etikett) String() string {
 
 func (e *Etikett) Set(v string) (err error) {
 	v1 := strings.ToLower(v)
-	v2 := strings.TrimPrefix(v1, "-")
-	v3 := strings.TrimSpace(v2)
+	v3 := strings.TrimSpace(v1)
 
 	if !EtikettRegex.Match([]byte(v3)) {
 		err = errors.Errorf("not a valid tag: '%s'", v)
@@ -59,6 +58,15 @@ func (a Etikett) Equals(b Etikett) bool {
 
 func (a Etikett) LeftSubtract(b Etikett) (c Etikett) {
 	return Etikett{Value: strings.TrimPrefix(a.String(), b.String())}
+}
+
+func (a Etikett) IsEmpty() bool {
+	return a.Value == ""
+}
+
+func (a Etikett) IsDependentLeaf() (has bool) {
+	has = strings.HasPrefix(strings.TrimSpace(a.Value), "-")
+	return
 }
 
 func (e Etikett) Expanded(exes ...Expander) (expanded *Set) {

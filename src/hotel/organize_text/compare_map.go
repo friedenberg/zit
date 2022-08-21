@@ -1,6 +1,8 @@
 package organize_text
 
 import (
+	"github.com/friedenberg/zit/src/alfa/logz"
+	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/delta/etikett"
 )
 
@@ -26,20 +28,32 @@ type CompareMap struct {
 	Unnamed SetEtikettenKeys
 }
 
-func (in *organizeText) ToCompareMap() (out CompareMap) {
+func (in *organizeText) ToCompareMap() (out CompareMap, err error) {
 	out = CompareMap{
 		Named:   make(SetEtikettenKeys),
 		Unnamed: make(SetEtikettenKeys),
 	}
 
-	in.assignment.addToCompareMap(etikett.NewSet(), &out)
+	if err = in.assignment.addToCompareMap(etikett.NewSet(), &out); err != nil {
+		err = errors.Error(err)
+		return
+	}
 
 	return
 }
 
-func (a *assignment) addToCompareMap(es *etikett.Set, out *CompareMap) {
+func (a *assignment) addToCompareMap(es *etikett.Set, out *CompareMap) (err error) {
 	es = es.Copy()
-	es.Merge(a.etiketten)
+
+	var es1 etikett.Set
+
+	if es1, err = a.expandedEtiketten(); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	es.Merge(es1)
+	logz.Print(es)
 
 	for z, _ := range a.named {
 		for e, _ := range *es {
@@ -54,7 +68,10 @@ func (a *assignment) addToCompareMap(es *etikett.Set, out *CompareMap) {
 	}
 
 	for _, c := range a.children {
-		c.addToCompareMap(es, out)
+		if err = c.addToCompareMap(es, out); err != nil {
+			err = errors.Error(err)
+			return
+		}
 	}
 
 	return
