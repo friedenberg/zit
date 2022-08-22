@@ -9,6 +9,7 @@ import (
 )
 
 type assignment struct {
+	isRoot    bool
 	etiketten etikett.Set
 	named     zettelSet
 	unnamed   newZettelSet
@@ -46,7 +47,7 @@ func (a *assignment) addChild(c *assignment) {
 		panic("child and parent are the same")
 	}
 
-	if c.parent == a {
+	if c.parent != nil && c.parent == a {
 		panic("child already has self as parent")
 	}
 
@@ -115,21 +116,31 @@ func (a *assignment) removeChild(c *assignment) (err error) {
 }
 
 func (a *assignment) consume(b *assignment) (err error) {
+	logz.Print(a.etiketten)
+	logz.Print(a.named)
+	logz.Print(b.etiketten)
+	logz.Print(b.named)
+	logz.Caller(1, "test")
+
 	for _, c := range b.children {
+		logz.Print(c)
 		if err = c.removeFromParent(); err != nil {
 			err = errors.Error(err)
 			return
 		}
 
-		a.parent.addChild(c)
+		logz.Print(a)
+		a.addChild(c)
 	}
 
 	for k, v := range b.named {
-		a.parent.named[k] = v
+		a.named[k] = v
+		delete(b.named, k)
 	}
 
 	for k, v := range b.unnamed {
-		a.parent.unnamed[k] = v
+		a.unnamed[k] = v
+		delete(b.unnamed, k)
 	}
 
 	if err = b.removeFromParent(); err != nil {
@@ -141,7 +152,6 @@ func (a *assignment) consume(b *assignment) (err error) {
 }
 
 func (a *assignment) expandedEtiketten() (es etikett.Set, err error) {
-	logz.Print(a.etiketten)
 	if a.etiketten.Len() != 1 || a.parent == nil {
 		es = *(a.etiketten.Copy())
 		return

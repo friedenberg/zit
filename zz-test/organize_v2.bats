@@ -650,3 +650,33 @@ function commits_dependent_leaf { # @test
 	run zit show two/uno
 	assert_output "$(cat "$three")"
 }
+
+function zettels_in_correct_places { # @test
+	wd="$(mktemp -d)"
+	cd "$wd" || exit 1
+
+	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+
+	one="$(mktemp)"
+	{
+		echo "---"
+		echo "# jabra coral usb_a-to-usb_c cable"
+		echo "- inventory-pipe_shelves-atheist_shoes_box-jabra_yellow_box_2"
+		echo "---"
+	} >"$one"
+
+	run zit new "$one"
+
+	expected_organize="$(mktemp)"
+	{
+		echo
+		echo "# inventory-pipe_shelves-atheist_shoes_box-jabra_yellow_box_2"
+		echo
+		echo "- [one/uno] jabra coral usb_a-to-usb_c cable"
+	} >"$expected_organize"
+
+	run zit organize -mode output-only -group-by inventory \
+		inventory-pipe_shelves-atheist_shoes_box-jabra_yellow_box_2
+
+	assert_output "$(cat "$expected_organize")"
+}

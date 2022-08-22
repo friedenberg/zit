@@ -15,10 +15,12 @@ type AssignmentTreeConstructor struct {
 	UsePrefixJoints   bool
 }
 
-func (atc *AssignmentTreeConstructor) RootAssignment() (root *assignment) {
-	// atc.UsePrefixJoints = true
-	root = newAssignment()
+func (atc *AssignmentTreeConstructor) Assignments() (roots []*assignment) {
+	roots = make([]*assignment, 0, 1+len(atc.ExtraEtiketten))
+
+	root := newAssignment()
 	root.etiketten = atc.RootEtiketten
+  roots = append(roots, root)
 
 	prefixSet := atc.Named.ToSetPrefixNamed()
 	atc.makeChildren(root, *prefixSet, atc.GroupingEtiketten)
@@ -26,7 +28,7 @@ func (atc *AssignmentTreeConstructor) RootAssignment() (root *assignment) {
 	for _, e := range atc.ExtraEtiketten {
 		child := newAssignment()
 		child.etiketten = etikett.MakeSet(e)
-		root.addChild(child)
+		roots = append(roots, child)
 	}
 
 	return

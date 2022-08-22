@@ -3,6 +3,7 @@ package organize_text
 import (
 	"sort"
 
+	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/delta/etikett"
 )
@@ -12,12 +13,48 @@ type AssignmentTreeRefiner struct {
 	UsePrefixJoints bool
 }
 
+func (atc *AssignmentTreeRefiner) shouldMergeIntoParent(a *assignment) bool {
+	logz.Printf("checking node should merge: %s", a)
+
+	if a.parent == nil {
+		logz.Print("parent is nil")
+		return false
+	}
+
+	if a.parent.isRoot {
+		logz.Print("parent is root")
+		return false
+	}
+
+	if a.etiketten.Len() == 0 {
+		logz.Print("etiketten length is 0")
+		return false
+	}
+
+	if !a.etiketten.Equals(a.parent.etiketten) {
+		logz.Print("parent etiketten not equal")
+		return false
+	}
+
+	return true
+}
+
 func (atc *AssignmentTreeRefiner) Refine(a *assignment) (err error) {
 	if !atc.Enabled {
 		return
 	}
 
-	if a.parent != nil && a.etiketten.Equals(a.parent.etiketten) {
+	if a.isRoot {
+		for _, c := range a.children {
+			if err = atc.Refine(c); err != nil {
+				err = errors.Error(err)
+				return
+			}
+		}
+	}
+
+	if atc.shouldMergeIntoParent(a) {
+		logz.Print("merging into parent")
 		p := a.parent
 
 		if err = p.consume(a); err != nil {
@@ -28,11 +65,9 @@ func (atc *AssignmentTreeRefiner) Refine(a *assignment) (err error) {
 		return atc.Refine(p)
 	}
 
-	if atc.UsePrefixJoints {
-		if err = atc.applyPrefixJoints(a); err != nil {
-			err = errors.Error(err)
-			return
-		}
+	if err = atc.applyPrefixJoints(a); err != nil {
+		err = errors.Error(err)
+		return
 	}
 
 	for _, child := range a.children {
@@ -42,16 +77,18 @@ func (atc *AssignmentTreeRefiner) Refine(a *assignment) (err error) {
 		}
 	}
 
-	if atc.UsePrefixJoints {
-		if err = atc.applyPrefixJoints(a); err != nil {
-			err = errors.Error(err)
-			return
-		}
+	if err = atc.applyPrefixJoints(a); err != nil {
+		err = errors.Error(err)
+		return
 	}
 
 	sort.Slice(a.children, func(i, j int) bool {
 		return a.children[i].etiketten.String() < a.children[j].etiketten.String()
 	})
+
+	logz.Print(a)
+	logz.Print(a.children)
+	logz.Print(a.named)
 
 	return
 }
@@ -62,6 +99,14 @@ type etikettBag struct {
 }
 
 func (atc AssignmentTreeRefiner) applyPrefixJoints(a *assignment) (err error) {
+	if !atc.UsePrefixJoints {
+		return
+	}
+
+	if a.etiketten.Len() == 0 {
+		return
+	}
+
 	childPrefixes := atc.childPrefixes(a)
 
 	if len(childPrefixes) == 0 {

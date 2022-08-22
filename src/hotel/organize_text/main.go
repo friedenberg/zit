@@ -3,6 +3,7 @@ package organize_text
 import (
 	"io"
 
+	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/charlie/line_format"
 )
@@ -23,7 +24,11 @@ func New(options Options) (ot *organizeText, err error) {
 		assignment: newAssignment(),
 	}
 
-	ot.assignment.addChild(options.AssignmentTreeConstructor.RootAssignment())
+	ot.assignment.isRoot = true
+
+	for _, a := range options.AssignmentTreeConstructor.Assignments() {
+		ot.assignment.addChild(a)
+	}
 
 	refiner := AssignmentTreeRefiner{
 		Enabled:         true,
@@ -34,6 +39,9 @@ func New(options Options) (ot *organizeText, err error) {
 		err = errors.Error(err)
 		return
 	}
+
+	logz.Print(ot.assignment.etiketten)
+	logz.Print(ot.assignment.named)
 
 	return
 }
