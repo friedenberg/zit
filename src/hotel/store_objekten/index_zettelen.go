@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/golf/stored_zettel"
 )
@@ -19,6 +20,7 @@ type indexZettelen struct {
 	path   string
 	ioFactory
 	zettelen      map[sha.Sha]stored_zettel.Transacted
+	hinweisen     map[hinweis.Hinweis]stored_zettel.SetTransacted
 	akten         map[sha.Sha]stored_zettel.SetTransacted
 	bezeichnungen map[string]stored_zettel.SetTransacted
 	didRead       bool
@@ -35,6 +37,7 @@ func newIndexZettelen(
 		path:          p,
 		ioFactory:     f,
 		zettelen:      make(map[sha.Sha]stored_zettel.Transacted),
+		hinweisen:     make(map[hinweis.Hinweis]stored_zettel.SetTransacted),
 		akten:         make(map[sha.Sha]stored_zettel.SetTransacted),
 		bezeichnungen: make(map[string]stored_zettel.SetTransacted),
 	}
@@ -119,28 +122,32 @@ func (i *indexZettelen) readIfNecessary() (err error) {
 func (i *indexZettelen) addNoRead(tz stored_zettel.Transacted) {
 	i.zettelen[tz.Sha] = tz
 
-	var set_akten stored_zettel.SetTransacted
+	var set stored_zettel.SetTransacted
 	var ok bool
 
-	if set_akten, ok = i.akten[tz.Zettel.Akte]; !ok {
-		set_akten = stored_zettel.MakeSetTransacted()
+	if set, ok = i.hinweisen[tz.Hinweis]; !ok {
+		set = stored_zettel.MakeSetTransacted()
 	}
 
-	set_akten.Add(tz)
-	i.akten[tz.Zettel.Akte] = set_akten
+	set.Add(tz)
+	i.hinweisen[tz.Hinweis] = set
 
-	var set_bezeichnungen stored_zettel.SetTransacted
+	if set, ok = i.akten[tz.Zettel.Akte]; !ok {
+		set = stored_zettel.MakeSetTransacted()
+	}
+
+	set.Add(tz)
+	i.akten[tz.Zettel.Akte] = set
 
 	key := strings.ToLower(tz.Zettel.Bezeichnung.String())
 
-	if set_bezeichnungen, ok = i.bezeichnungen[key]; !ok {
-		set_bezeichnungen = stored_zettel.MakeSetTransacted()
+	if set, ok = i.bezeichnungen[key]; !ok {
+		set = stored_zettel.MakeSetTransacted()
 	}
 
-	set_bezeichnungen.Add(tz)
+	set.Add(tz)
 
-	i.bezeichnungen[key] = set_bezeichnungen
-
+	i.bezeichnungen[key] = set
 }
 
 func (i *indexZettelen) Add(tz stored_zettel.Transacted) (err error) {
