@@ -56,7 +56,7 @@ function can_initialize_with_age { # @test
 	[ -f .zit/AgeIdentity ]
 }
 
-function can_new_zettel { # @test
+function can_new_zettel_file { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
@@ -75,6 +75,28 @@ function can_new_zettel { # @test
 
 	run zit show one/uno
 	assert_output "$(cat "$to_add")"
+}
+
+function can_new_zettel { # @test
+	wd="$(mktemp -d)"
+	cd "$wd" || exit 1
+
+	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+
+	expected="$(mktemp)"
+	{
+		echo "---"
+		echo "# wow"
+		echo "- ok"
+    echo "! md"
+		echo "---"
+	} >"$expected"
+
+	run zit new -bezeichnung wow -etiketten ok
+	assert_output --partial '[one/uno '
+
+	run zit show one/uno
+	assert_output "$(cat "$expected")"
 }
 
 function can_checkout_and_checkin { # @test
