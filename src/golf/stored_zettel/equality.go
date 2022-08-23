@@ -10,16 +10,6 @@ func (a Stored) Equals(b Stored) bool {
 		return false
 	}
 
-	if !a.Mutter.Equals(b.Mutter) {
-		logz.Print("mutter")
-		return false
-	}
-
-	if !a.Kinder.Equals(b.Kinder) {
-		logz.Print("sha")
-		return false
-	}
-
 	if !a.Sha.Equals(b.Sha) {
 		logz.Print("sha")
 		return false

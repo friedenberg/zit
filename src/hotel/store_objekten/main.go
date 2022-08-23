@@ -401,7 +401,7 @@ func (s Store) Flush() (err error) {
 
 func (s Store) AllInChain(h hinweis.Hinweis) (c []stored_zettel.Transacted, err error) {
 	// return s.indexZettelen.ReadHinweis(h)
-  return
+	return
 }
 
 func (s Store) ReadAllTransaktions() (out []transaktion.Transaktion, err error) {

@@ -21,7 +21,7 @@ func (f Objekte) WriteTo(z zettel.Zettel, out1 io.Writer) (n int64, err error) {
 	w.WriteFormat("%s %s", zk_types.TypeAkteTyp, z.AkteExt)
 	w.WriteFormat("%s %s", zk_types.TypeBezeichnung, z.Bezeichnung)
 
-	for _, e := range z.Etiketten {
+	for _, e := range z.Etiketten.Sorted() {
 		w.WriteFormat("%s %s", zk_types.TypeEtikett, e)
 	}
 

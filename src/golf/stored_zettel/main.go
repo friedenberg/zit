@@ -8,8 +8,6 @@ import (
 )
 
 type Stored struct {
-	Mutter sha.Sha
-	Kinder sha.Sha
 	Sha    sha.Sha
 	Zettel zettel.Zettel
 }
