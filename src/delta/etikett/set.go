@@ -265,19 +265,23 @@ func (s1 Set) SubtractPrefix(e Etikett) (s2 Set) {
 	return
 }
 
-func (s1 Set) Delta(s2 Set) (added Set, removed Set) {
-	added = MakeSet()
-	removed = *s1.Copy()
+type Delta struct {
+	Added, Removed Set
+}
+
+func (s1 Set) Delta(s2 Set) (d Delta) {
+	d.Added = MakeSet()
+	d.Removed = *s1.Copy()
 
 	for _, e := range s2 {
 		if s1.Contains(e) {
 			//zettel had etikett previously
 		} else {
 			//zettel did not have etikett previously
-			added.Add(e)
+			d.Added.Add(e)
 		}
 
-		removed.Remove(e)
+		d.Removed.Remove(e)
 	}
 
 	return

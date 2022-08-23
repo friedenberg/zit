@@ -680,3 +680,69 @@ function zettels_in_correct_places { # @test
 
 	assert_output "$(cat "$expected_organize")"
 }
+
+function etiketten_correct { # @test
+	wd="$(mktemp -d)"
+	cd "$wd" || exit 1
+
+	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+
+	first_organize="$(mktemp)"
+	{
+		echo
+		echo "# test1"
+		echo "## -wow"
+		echo
+		echo "- zettel bez"
+	} >"$first_organize"
+
+	run zit organize -mode commit-directly <"$first_organize"
+
+	expected_etiketten="$(mktemp)"
+	{
+    echo test1-wow
+	} >"$expected_etiketten"
+
+  run zit cat -type etikett
+  assert_output "$(cat "$expected_etiketten")"
+
+  mkdir -p one
+	{
+		echo "---"
+		echo "- test4"
+		echo "---"
+	} >"one/uno.md"
+
+	run zit checkin one/uno.md
+  assert_output --partial "[one/uno "
+  assert_output --partial "(updated)"
+
+	expected_etiketten="$(mktemp)"
+	{
+    echo test4
+	} >"$expected_etiketten"
+
+  run zit cat -type etikett
+  assert_output "$(cat "$expected_etiketten")"
+
+  mkdir -p one
+	{
+		echo "---"
+		echo "- test4"
+    echo "- test1-ok"
+		echo "---"
+	} >"one/uno.md"
+
+	run zit checkin one/uno.md
+  assert_output --partial "[one/uno "
+  assert_output --partial "(updated)"
+
+	expected_etiketten="$(mktemp)"
+	{
+    echo test1-ok
+    echo test4
+	} >"$expected_etiketten"
+
+  run zit cat -type etikett
+  assert_output "$(cat "$expected_etiketten")"
+}

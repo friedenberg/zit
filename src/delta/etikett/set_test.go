@@ -74,3 +74,33 @@ func TestPrefixIntersection(t *testing.T) {
 // 		)
 // 	}
 // }
+
+func TestDelta1(t *testing.T) {
+	a := MakeSet(
+		Etikett{Value: "project-2021-zit"},
+		Etikett{Value: "task-todo"},
+	)
+
+	b := MakeSet(
+		Etikett{Value: "project-2021-zit"},
+		Etikett{Value: "zz-archive-task-done"},
+	)
+
+	d := a.Delta(b)
+
+	c_expected := MakeSet(
+		Etikett{Value: "zz-archive-task-done"},
+	)
+
+	if !c_expected.Equals(d.Added) {
+		t.Errorf("expected\n%s\nactual:\n%s", c_expected, d.Added)
+	}
+
+	d_expected := MakeSet(
+		Etikett{Value: "task-todo"},
+	)
+
+	if !d_expected.Equals(d.Removed) {
+		t.Errorf("expected\n%s\nactual:\n%s", d_expected, d.Removed)
+	}
+}

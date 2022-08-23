@@ -30,6 +30,7 @@ type Store struct {
 	*umwelt.Umwelt
 	age.Age
 	hinweisen hinweisen.Hinweisen
+	*indexZettelen
 	*indexZettelenTails
 	*indexEtiketten
 	transaktion.Transaktion
@@ -49,6 +50,12 @@ func (s *Store) Initialize(u *umwelt.Umwelt) (err error) {
 	}
 
 	s.indexZettelenTails, err = newIndexZettelenTails(
+		u,
+		u.FileVerzeichnisseZettelenSchwanzen(),
+		s,
+	)
+
+	s.indexZettelen, err = newIndexZettelen(
 		u,
 		u.FileVerzeichnisseZettelen(),
 		s,
@@ -179,6 +186,11 @@ func (s Store) writeNamedZettelToIndex(tz stored_zettel.Transacted) (err error) 
 	logz.Printf("writing zettel to index: %s", tz.Named)
 
 	if err = s.indexZettelenTails.Add(tz); err != nil {
+		err = errors.Wrapped(err, "failed to write zettel to index: %s", tz.Named)
+		return
+	}
+
+	if err = s.indexZettelen.Add(tz); err != nil {
 		err = errors.Wrapped(err, "failed to write zettel to index: %s", tz.Named)
 		return
 	}
@@ -336,16 +348,16 @@ func (s *Store) Update(
 		return
 	}
 
-	added, removed := mutter.Zettel.Etiketten.Delta(tz.Zettel.Etiketten)
+	d := mutter.Zettel.Etiketten.Delta(tz.Zettel.Etiketten)
 	logz.Print(mutter.Zettel.Etiketten)
 	logz.Print(tz.Zettel.Etiketten)
 
-	if err = s.indexEtiketten.Add(added); err != nil {
+	if err = s.indexEtiketten.Add(d.Added); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	if err = s.indexEtiketten.Del(removed); err != nil {
+	if err = s.indexEtiketten.Del(d.Removed); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -370,6 +382,11 @@ func (s Store) Flush() (err error) {
 	}
 
 	if err = s.indexZettelenTails.Flush(); err != nil {
+		err = errors.Wrapped(err, "failed to flush new zettel index")
+		return
+	}
+
+	if err = s.indexZettelen.Flush(); err != nil {
 		err = errors.Wrapped(err, "failed to flush new zettel index")
 		return
 	}
@@ -453,7 +470,7 @@ func (s *Store) Reindex() (err error) {
 		return
 	}
 
-	if err = os.MkdirAll(s.umwelt.DirVerzeichnisse(), os.ModeDir|0755); err != nil {
+	if err = os.MkdirAll(s.Umwelt.DirVerzeichnisse(), os.ModeDir|0755); err != nil {
 		err = errors.Wrapped(err, "failed to make verzeichnisse dir")
 		return
 	}

@@ -4,13 +4,12 @@ import (
 	"bufio"
 	"encoding/gob"
 	"io"
+	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/delta/etikett"
-	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/golf/stored_zettel"
 )
@@ -19,9 +18,11 @@ type indexZettelen struct {
 	umwelt *umwelt.Umwelt
 	path   string
 	ioFactory
-	zettelen   map[hinweis.Hinweis]stored_zettel.Transacted
-	didRead    bool
-	hasChanges bool
+	zettelen      map[sha.Sha]stored_zettel.Transacted
+	akten         map[sha.Sha]stored_zettel.SetTransacted
+	bezeichnungen map[string]stored_zettel.SetTransacted
+	didRead       bool
+	hasChanges    bool
 }
 
 func newIndexZettelen(
@@ -30,18 +31,15 @@ func newIndexZettelen(
 	f ioFactory,
 ) (i *indexZettelen, err error) {
 	i = &indexZettelen{
-		umwelt:    u,
-		path:      p,
-		ioFactory: f,
-		zettelen:  make(map[hinweis.Hinweis]stored_zettel.Transacted),
+		umwelt:        u,
+		path:          p,
+		ioFactory:     f,
+		zettelen:      make(map[sha.Sha]stored_zettel.Transacted),
+		akten:         make(map[sha.Sha]stored_zettel.SetTransacted),
+		bezeichnungen: make(map[string]stored_zettel.SetTransacted),
 	}
 
 	return
-}
-
-type indexZettelenRow struct {
-	hinweis.Hinweis
-	sha.Sha
 }
 
 func (i *indexZettelen) Flush() (err error) {
@@ -66,8 +64,6 @@ func (i *indexZettelen) Flush() (err error) {
 	enc := gob.NewEncoder(w)
 
 	for h, tz := range i.zettelen {
-		logz.Print(h)
-
 		if err = enc.Encode(tz); err != nil {
 			err = errors.Wrapped(err, "failed to write zettel: [%s %s]", h, tz.Sha)
 			return
@@ -114,10 +110,37 @@ func (i *indexZettelen) readIfNecessary() (err error) {
 			}
 		}
 
-		i.zettelen[tz.Hinweis] = tz
+		i.addNoRead(tz)
 	}
 
 	return
+}
+
+func (i *indexZettelen) addNoRead(tz stored_zettel.Transacted) {
+	i.zettelen[tz.Sha] = tz
+
+	var set_akten stored_zettel.SetTransacted
+	var ok bool
+
+	if set_akten, ok = i.akten[tz.Zettel.Akte]; !ok {
+		set_akten = stored_zettel.MakeSetTransacted()
+	}
+
+	set_akten.Add(tz)
+	i.akten[tz.Zettel.Akte] = set_akten
+
+	var set_bezeichnungen stored_zettel.SetTransacted
+
+	key := strings.ToLower(tz.Zettel.Bezeichnung.String())
+
+	if set_bezeichnungen, ok = i.bezeichnungen[key]; !ok {
+		set_bezeichnungen = stored_zettel.MakeSetTransacted()
+	}
+
+	set_bezeichnungen.Add(tz)
+
+	i.bezeichnungen[key] = set_bezeichnungen
+
 }
 
 func (i *indexZettelen) Add(tz stored_zettel.Transacted) (err error) {
@@ -128,12 +151,20 @@ func (i *indexZettelen) Add(tz stored_zettel.Transacted) (err error) {
 
 	i.hasChanges = true
 
-	i.zettelen[tz.Hinweis] = tz
+	i.addNoRead(tz)
 
 	return
 }
 
-func (i *indexZettelen) Read(h hinweis.Hinweis) (tz stored_zettel.Transacted, err error) {
+func (i *indexZettelen) ReadBezeichnungSha(s sha.Sha) (tzs []stored_zettel.Transacted, err error) {
+	return
+}
+
+func (i *indexZettelen) ReadAkteSha(s sha.Sha) (tzs []stored_zettel.Transacted, err error) {
+	return
+}
+
+func (i *indexZettelen) ReadZettelSha(s sha.Sha) (tz stored_zettel.Transacted, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Error(err)
 		return
@@ -141,61 +172,10 @@ func (i *indexZettelen) Read(h hinweis.Hinweis) (tz stored_zettel.Transacted, er
 
 	ok := false
 
-	if tz, ok = i.zettelen[h]; !ok {
-		err = ErrNotFound{Id: h}
+	if tz, ok = i.zettelen[s]; !ok {
+		err = ErrNotFound{Id: s}
 		return
 	}
 
 	return
-}
-
-func (i *indexZettelen) allTransacted(
-	qs ...stored_zettel.NamedFilter,
-) (tz map[hinweis.Hinweis]stored_zettel.Transacted, err error) {
-	if err = i.readIfNecessary(); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
-	tz = make(map[hinweis.Hinweis]stored_zettel.Transacted)
-
-OUTER:
-	for h, z := range i.zettelen {
-		for _, q := range qs {
-			if !q.IncludeNamedZettel(z.Named) {
-				logz.Printf("skipping zettel due to filter %s", z.Named)
-				continue OUTER
-			}
-		}
-
-		if !i.shouldIncludeTransacted(z) {
-			logz.Printf("skipping zettel due to hidden %s", z.Named)
-			continue
-		}
-
-		logz.Printf("including zettel %s", z.Named)
-		tz[h] = z
-	}
-
-	return
-}
-
-func (i *indexZettelen) shouldIncludeTransacted(tz stored_zettel.Transacted) bool {
-	if i.umwelt.Konfig.IncludeHidden {
-		return true
-	}
-
-	prefixes := tz.Zettel.Etiketten.Expanded(etikett.ExpanderRight{})
-
-	for tn, tv := range i.umwelt.Konfig.Tags {
-		if !tv.Hide {
-			continue
-		}
-
-		if prefixes.ContainsString(tn) {
-			return false
-		}
-	}
-
-	return true
 }

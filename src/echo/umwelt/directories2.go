@@ -20,6 +20,10 @@ func (u Umwelt) DirObjektenAkten() string {
 	return u.DirObjekten("Akten")
 }
 
+func (u Umwelt) FileVerzeichnisseZettelenSchwanzen() string {
+	return u.DirVerzeichnisse("ZettelenSchwanzen")
+}
+
 func (u Umwelt) FileVerzeichnisseZettelen() string {
 	return u.DirVerzeichnisse("Zettelen")
 }
