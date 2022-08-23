@@ -238,7 +238,8 @@ function can_new_zettel_with_metadatei { # @test
 	} >>"$expected"
 
 	run zit new -bezeichnung bez -etiketten et1,et2
-	assert_output --partial '[one/dos '
+	assert_output --partial '[one/uno '
+	assert_output --partial '(checked out)'
 
 	run cat one/uno.md
 	assert_output "$(cat "$expected")"

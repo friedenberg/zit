@@ -10,8 +10,8 @@ import (
 )
 
 type Checkout struct {
-	checkout_store.CheckoutOptions
 	*umwelt.Umwelt
+	checkout_store.CheckoutOptions
 }
 
 type CheckoutResults struct {

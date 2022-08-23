@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/hinweis"
-	"github.com/friedenberg/zit/src/delta/id"
 	"github.com/friedenberg/zit/src/foxtrot/akten"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/golf/stored_zettel"
@@ -17,8 +16,14 @@ import (
 	"github.com/google/uuid"
 )
 
+type stringId string
+
+func (s stringId) String() string {
+  return string(s)
+}
+
 type ErrNotFound struct {
-	id.Id
+	Id fmt.Stringer
 }
 
 func (e ErrNotFound) Is(target error) bool {

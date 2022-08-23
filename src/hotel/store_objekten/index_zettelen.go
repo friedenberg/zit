@@ -163,11 +163,51 @@ func (i *indexZettelen) Add(tz stored_zettel.Transacted) (err error) {
 	return
 }
 
-func (i *indexZettelen) ReadBezeichnungSha(s sha.Sha) (tzs []stored_zettel.Transacted, err error) {
+func (i *indexZettelen) ReadHinweis(h hinweis.Hinweis) (tzs stored_zettel.SetTransacted, err error) {
+	if err = i.readIfNecessary(); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	ok := false
+
+	if tzs, ok = i.hinweisen[h]; !ok {
+		err = ErrNotFound{Id: h}
+		return
+	}
+
 	return
 }
 
-func (i *indexZettelen) ReadAkteSha(s sha.Sha) (tzs []stored_zettel.Transacted, err error) {
+func (i *indexZettelen) ReadBezeichnung(s string) (tzs stored_zettel.SetTransacted, err error) {
+	if err = i.readIfNecessary(); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	ok := false
+
+	if tzs, ok = i.bezeichnungen[s]; !ok {
+		err = ErrNotFound{Id: stringId(s)}
+		return
+	}
+
+	return
+}
+
+func (i *indexZettelen) ReadAkteSha(s sha.Sha) (tzs stored_zettel.SetTransacted, err error) {
+	if err = i.readIfNecessary(); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	ok := false
+
+	if tzs, ok = i.akten[s]; !ok {
+		err = ErrNotFound{Id: s}
+		return
+	}
+
 	return
 }
 

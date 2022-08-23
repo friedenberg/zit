@@ -33,6 +33,7 @@ type Store struct {
 	format       zettel.Format
 	storeZettel  StoreZettel
 	path         string
+	cwd          string
 	entries      map[string]Entry
 	indexWasRead bool
 	hasChanges   bool
@@ -50,6 +51,11 @@ func New(k Konfig, p string, storeZettel StoreZettel) (s *Store, err error) {
 	s.lock = file_lock.New(path.Join(p, ".ZitCheckoutStoreLock"))
 
 	if err = s.lock.Lock(); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	if s.cwd, err = os.Getwd(); err != nil {
 		err = errors.Error(err)
 		return
 	}

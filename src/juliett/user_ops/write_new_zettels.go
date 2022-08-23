@@ -1,91 +1,51 @@
 package user_ops
 
 import (
-	"os"
-
 	"github.com/friedenberg/zit/src/bravo/errors"
-	"github.com/friedenberg/zit/src/charlie/open_file_guard"
-	"github.com/friedenberg/zit/src/delta/id"
-	"github.com/friedenberg/zit/src/delta/script_value"
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/golf/stored_zettel"
+	checkout_store "github.com/friedenberg/zit/src/hotel/store_checkout"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
 )
 
 type WriteNewZettels struct {
-	Umwelt *umwelt.Umwelt
-	Format zettel.Format
-	Filter script_value.ScriptValue
+	*umwelt.Umwelt
+	checkout_store.CheckoutOptions
 }
 
-func (c WriteNewZettels) Run(zettelen ...zettel.Zettel) (results stored_zettel.SetExternal, err error) {
-	var store store_with_lock.Store
-
-	if store, err = store_with_lock.New(c.Umwelt); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
-	defer errors.PanicIfError(store.Flush)
-
-	var dir string
-
-	if dir, err = os.Getwd(); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
-	results = stored_zettel.MakeSetExternal()
+func (c WriteNewZettels) RunMany(
+	store store_with_lock.Store,
+	zettelen ...zettel.Zettel,
+) (results []stored_zettel.CheckedOut, err error) {
+	results = make([]stored_zettel.CheckedOut, 0, len(zettelen))
 
 	for _, z := range zettelen {
-		var external stored_zettel.External
+		var cz stored_zettel.CheckedOut
 
-		if external, err = c.runOne(store, dir, z); err != nil {
+		if cz, err = c.RunOne(store, z); err != nil {
 			err = errors.Error(err)
 			return
 		}
 
-		results[external.Hinweis.String()] = external
+		results = append(results, cz)
 	}
 
 	return
 }
 
-func (c WriteNewZettels) runOne(store store_with_lock.Store, dir string, z zettel.Zettel) (result stored_zettel.External, err error) {
-	if result.Hinweis, err = store.Hinweisen().Factory().Make(); err != nil {
+func (c WriteNewZettels) RunOne(
+	store store_with_lock.Store,
+	z zettel.Zettel,
+) (result stored_zettel.CheckedOut, err error) {
+	var tz stored_zettel.Transacted
+
+	if tz, err = store.Zettels().Create(z); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	var filename string
-
-	if filename, err = id.MakeDirIfNecessary(result.Hinweis, dir); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
-	filename = filename + ".md"
-
-	var f *os.File
-
-	if f, err = open_file_guard.Create(filename); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
-	defer open_file_guard.Close(f)
-
-	result.Path = f.Name()
-	result.Zettel = z
-
-	ctx := zettel.FormatContextWrite{
-		Out:               f,
-		AkteReaderFactory: store.Zettels(),
-		Zettel:            result.Zettel,
-	}
-
-	if _, err = c.Format.WriteTo(ctx); err != nil {
+	if result, err = store.CheckoutStore().CheckoutOne(c.CheckoutOptions, tz); err != nil {
 		err = errors.Error(err)
 		return
 	}

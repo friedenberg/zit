@@ -68,21 +68,7 @@ func (c Cat) etiketten(store store_with_lock.Store) (err error) {
 		return
 	}
 
-OUTER:
 	for _, e := range ea {
-		prefixes := e.Expanded(etikett.ExpanderRight{})
-
-	INNER:
-		for tn, tv := range store.Konfig.Tags {
-			if !tv.Hide {
-				continue INNER
-			}
-
-			if prefixes.ContainsString(tn) {
-				continue OUTER
-			}
-		}
-
 		stdprinter.Out(e)
 	}
 

@@ -400,23 +400,8 @@ func (s Store) Flush() (err error) {
 }
 
 func (s Store) AllInChain(h hinweis.Hinweis) (c []stored_zettel.Transacted, err error) {
-	//TODO
-	// rr := indexReaderChain{
-	// 	Hinweis: h,
-	// }
-
-	// if err = s.indexZettelenTails.ReadPages(&rr, h.Sha().Head()); err != nil {
-	// 	err = errors.Error(err)
-	// 	return
-	// }
-
-	// c.Hinweis = rr.Hinweis
-
-	// for _, z := range rr.zettels {
-	// 	c.Zettels = append(c.Zettels, z.Stored)
-	// }
-
-	return
+	// return s.indexZettelen.ReadHinweis(h)
+  return
 }
 
 func (s Store) ReadAllTransaktions() (out []transaktion.Transaktion, err error) {

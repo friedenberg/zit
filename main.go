@@ -20,8 +20,8 @@ func main() {
 	signal.Notify(c, syscall.SIGURG)
 
 	go func() {
-		for s := range c {
-			logz.Printf("signal: %s", s)
+		for _ = range c {
+			// logz.Printf("signal: %s", s)
 		}
 	}()
 

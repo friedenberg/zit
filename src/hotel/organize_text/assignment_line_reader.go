@@ -89,7 +89,7 @@ func (ar *assignmentLineReader) ReadFrom(r1 io.Reader) (n int64, err error) {
 
 		n += int64(len(s))
 
-		s = strings.TrimSuffix(s, "\n")
+		s = strings.TrimSpace(s)
 		slen := len(s)
 
 		if slen < 1 {

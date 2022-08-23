@@ -13,6 +13,8 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/golf/stored_zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
+	checkout_store "github.com/friedenberg/zit/src/hotel/store_checkout"
+	"github.com/friedenberg/zit/src/india/store_with_lock"
 	"github.com/friedenberg/zit/src/juliett/user_ops"
 )
 
@@ -76,7 +78,14 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	f := zettel_formats.Text{}
 
 	if len(args) == 0 {
-		if err = c.writeNewZettel(u, f); err != nil {
+		var cz stored_zettel.CheckedOut
+
+		if cz, err = c.writeNewZettel(u, f); err != nil {
+			err = errors.Error(err)
+			return
+		}
+
+		if err = c.editZettelIfRequested(u, cz); err != nil {
 			err = errors.Error(err)
 			return
 		}
@@ -109,16 +118,15 @@ func (c New) readExistingFilesAsZettels(u *umwelt.Umwelt, f zettel.Format, args 
 	return
 }
 
-func (c New) writeNewZettel(u *umwelt.Umwelt, f zettel.Format) (err error) {
-	opCreateFromPath := user_ops.CreateFromPaths{
-		Umwelt: u,
-		Format: f,
-		Filter: c.Filter,
-	}
-
+func (c New) writeNewZettel(
+	u *umwelt.Umwelt,
+	f zettel.Format,
+) (cz stored_zettel.CheckedOut, err error) {
 	emptyOp := user_ops.WriteNewZettels{
 		Umwelt: u,
-		Format: f,
+		CheckoutOptions: checkout_store.CheckoutOptions{
+			Format: f,
+		},
 	}
 
 	var defaultEtiketten etikett.Set
@@ -136,30 +144,70 @@ func (c New) writeNewZettel(u *umwelt.Umwelt, f zettel.Format) (err error) {
 		AkteExt:     akte_ext.AkteExt{Value: "md"},
 	}
 
-	var results stored_zettel.SetExternal
+	var s store_with_lock.Store
 
-	if results, err = emptyOp.Run(z); err != nil {
+	if s, err = store_with_lock.New(u); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	// opCreateFromPath.ReadHinweisFromPath = true
+	defer s.Flush()
 
-	if c.Edit {
-		openVimOp := user_ops.OpenVim{
-			Options: vim_cli_options_builder.New().
-				WithCursorLocation(2, 3).
-				WithInsertMode().
-				Build(),
-		}
-
-		if _, err = openVimOp.Run(results.Paths()...); err != nil {
-			err = errors.Error(err)
-			return
-		}
+	if cz, err = emptyOp.RunOne(s, z); err != nil {
+		err = errors.Error(err)
+		return
 	}
 
-	if _, err = opCreateFromPath.Run(results.Paths()...); err != nil {
+	return
+}
+
+func (c New) editZettelIfRequested(
+	u *umwelt.Umwelt,
+	cz stored_zettel.CheckedOut,
+) (err error) {
+	if !c.Edit {
+		return
+	}
+
+	openVimOp := user_ops.OpenVim{
+		Options: vim_cli_options_builder.New().
+			WithCursorLocation(2, 3).
+			WithInsertMode().
+			Build(),
+	}
+
+	if _, err = openVimOp.Run(cz.External.Path); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	readOp := user_ops.ReadCheckedOut{
+		Umwelt: u,
+		OptionsReadExternal: checkout_store.OptionsReadExternal{
+			Format: zettel_formats.Text{},
+		},
+	}
+
+	var s store_with_lock.Store
+
+	if s, err = store_with_lock.New(u); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	defer s.Flush()
+
+	if cz, err = readOp.RunOneString(s, cz.External.Path); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	checkinOp := user_ops.Checkin{
+		Umwelt:              s.Umwelt,
+		OptionsReadExternal: readOp.OptionsReadExternal,
+	}
+
+	if _, err = checkinOp.Run(s, cz.External); err != nil {
 		err = errors.Error(err)
 		return
 	}

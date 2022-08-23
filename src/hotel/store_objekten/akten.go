@@ -64,7 +64,23 @@ func (s Store) AkteWriter() (w age_io.Writer, err error) {
 	return
 }
 
+type nullReadCloser struct{}
+
+func (r nullReadCloser) Read(p []byte) (n int, err error) {
+	err = io.EOF
+	return
+}
+
+func (r nullReadCloser) Close() (err error) {
+	return
+}
+
 func (s Store) AkteReader(sha sha.Sha) (r io.ReadCloser, err error) {
+	if sha.IsNull() {
+		r = nullReadCloser{}
+		return
+	}
+
 	p := id.Path(sha, s.Umwelt.DirObjektenAkten())
 
 	o := age_io.FileReadOptions{

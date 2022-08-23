@@ -3,11 +3,13 @@ package user_ops
 import (
 	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
+	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/golf/hinweisen"
 	"github.com/friedenberg/zit/src/golf/stored_zettel"
 	checkout_store "github.com/friedenberg/zit/src/hotel/store_checkout"
+	objekten "github.com/friedenberg/zit/src/hotel/store_objekten"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
 )
 
@@ -102,8 +104,13 @@ func (op ReadCheckedOut) runOne(
 	}
 
 	if zettel.Internal, err = store.Zettels().Read(zettel.External.Hinweis); err != nil {
-		err = errors.Wrapped(err, "%s", zettel.External.Path)
-		return
+		if errors.Is(err, objekten.ErrNotFound{}) {
+			stdprinter.Errf("[%s] (untracked)\n", zettel.External.Path)
+			err = nil
+		} else {
+			err = errors.Error(err)
+			return
+		}
 	}
 
 	return
