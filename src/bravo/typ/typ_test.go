@@ -1,9 +1,9 @@
-package akte_ext
+package typ
 
 import "testing"
 
 func TestAkteExt(t *testing.T) {
-	var e AkteExt
+	var e Typ
 	var err error
 
 	if err = e.Set(".md"); err != nil {
@@ -19,7 +19,7 @@ func TestAkteExt(t *testing.T) {
 }
 
 func TestAkteExt1(t *testing.T) {
-	var e AkteExt
+	var e Typ
 	var err error
 
 	if err = e.Set("md"); err != nil {

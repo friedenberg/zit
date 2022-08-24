@@ -19,7 +19,7 @@ func makeEtiketten(t *testing.T, vs ...string) (es etikett.Set) {
 	return
 }
 
-func makeAkteExt(t *testing.T, v string) (es akte_ext.AkteExt) {
+func makeAkteExt(t *testing.T, v string) (es typ.Typ) {
 	if err := es.Set(v); err != nil {
 		t.Fatalf("%s", err)
 	}

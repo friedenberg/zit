@@ -5,6 +5,7 @@ original="${1%/}"
 renamed="${2%/}"
 
 gofmt -w -r "$original.E -> $renamed.E" ./
+gofmt -w -r "$original -> $renamed" ./
 goimports -w ./
 
 mkdir -p "$(dirname "$renamed")"

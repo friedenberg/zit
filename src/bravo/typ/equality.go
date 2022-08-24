@@ -1,6 +1,6 @@
-package akte_ext
+package typ
 
-func (a AkteExt) Equals(b AkteExt) bool {
+func (a Typ) Equals(b Typ) bool {
 	if a.String() != b.String() {
 		return false
 	}

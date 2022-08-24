@@ -9,6 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
+	"github.com/friedenberg/zit/src/bravo/typ"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/echo/umwelt"
@@ -23,6 +24,7 @@ type indexZettelen struct {
 	hinweisen     map[hinweis.Hinweis]stored_zettel.SetTransacted
 	akten         map[sha.Sha]stored_zettel.SetTransacted
 	bezeichnungen map[string]stored_zettel.SetTransacted
+	typen         map[typ.Typ]stored_zettel.SetTransacted
 	didRead       bool
 	hasChanges    bool
 }
@@ -40,6 +42,7 @@ func newIndexZettelen(
 		hinweisen:     make(map[hinweis.Hinweis]stored_zettel.SetTransacted),
 		akten:         make(map[sha.Sha]stored_zettel.SetTransacted),
 		bezeichnungen: make(map[string]stored_zettel.SetTransacted),
+		typen:         make(map[typ.Typ]stored_zettel.SetTransacted),
 	}
 
 	return
@@ -148,6 +151,14 @@ func (i *indexZettelen) addNoRead(tz stored_zettel.Transacted) {
 	set.Add(tz)
 
 	i.bezeichnungen[key] = set
+
+	if set, ok = i.typen[tz.Zettel.AkteExt]; !ok {
+		set = stored_zettel.MakeSetTransacted()
+	}
+
+	set.Add(tz)
+
+	i.typen[tz.Zettel.AkteExt] = set
 }
 
 func (i *indexZettelen) Add(tz stored_zettel.Transacted) (err error) {
@@ -221,6 +232,22 @@ func (i *indexZettelen) ReadZettelSha(s sha.Sha) (tz stored_zettel.Transacted, e
 
 	if tz, ok = i.zettelen[s]; !ok {
 		err = ErrNotFound{Id: s}
+		return
+	}
+
+	return
+}
+
+func (i *indexZettelen) ReadTyp(t typ.Typ) (tzs stored_zettel.SetTransacted, err error) {
+	if err = i.readIfNecessary(); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	ok := false
+
+	if tzs, ok = i.typen[t]; !ok {
+		err = ErrNotFound{Id: t}
 		return
 	}
 

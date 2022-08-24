@@ -1,4 +1,4 @@
-package akte_ext
+package typ
 
 import "strings"
 
@@ -10,21 +10,21 @@ func init() {
 	}
 }
 
-type AkteExt struct {
+type Typ struct {
 	Value string
 }
 
-func (v AkteExt) String() string {
+func (v Typ) String() string {
 	return v.Value
 }
 
-func (v *AkteExt) Set(v1 string) (err error) {
+func (v *Typ) Set(v1 string) (err error) {
 	v.Value = strings.TrimSpace(strings.TrimPrefix(v1, "."))
 
 	return
 }
 
-func (v AkteExt) IsTextType() (is bool) {
+func (v Typ) IsTextType() (is bool) {
 	is, _ = TextTypes[v.String()]
 
 	return

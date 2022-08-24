@@ -5,8 +5,8 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/bezeichnung"
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
-	"github.com/friedenberg/zit/src/bravo/typ"
 	"github.com/friedenberg/zit/src/bravo/errors"
+	"github.com/friedenberg/zit/src/bravo/typ"
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/delta/script_value"
 	"github.com/friedenberg/zit/src/echo/umwelt"
@@ -141,7 +141,7 @@ func (c New) writeNewZettel(
 	z := zettel.Zettel{
 		Bezeichnung: c.Bezeichnung.Bezeichnung,
 		Etiketten:   c.Etiketten,
-		AkteExt:     akte_ext.AkteExt{Value: "md"},
+		AkteExt:     typ.Typ{Value: "md"},
 	}
 
 	var s store_with_lock.Store
