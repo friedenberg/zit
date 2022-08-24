@@ -12,13 +12,14 @@ import (
 	"github.com/friedenberg/zit/src/delta/id"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/golf/stored_zettel"
+	"github.com/friedenberg/zit/zettel_checked_out"
 )
 
 func (s *Store) Checkout(
 	options CheckoutOptions,
 	zs ...stored_zettel.Transacted,
-) (czs []stored_zettel.CheckedOut, err error) {
-	czs = make([]stored_zettel.CheckedOut, len(zs))
+) (czs []zettel_checked_out.CheckedOut, err error) {
+	czs = make([]zettel_checked_out.CheckedOut, len(zs))
 
 	for i, sz := range zs {
 		if czs[i], err = s.CheckoutOne(options, sz); err != nil {
@@ -43,7 +44,7 @@ func (s *Store) isInlineAkte(sz stored_zettel.Transacted) (isInline bool) {
 func (s *Store) CheckoutOne(
 	options CheckoutOptions,
 	sz stored_zettel.Transacted,
-) (cz stored_zettel.CheckedOut, err error) {
+) (cz zettel_checked_out.CheckedOut, err error) {
 	var filename string
 
 	if filename, err = id.MakeDirIfNecessary(sz.Hinweis, s.cwd); err != nil {
@@ -57,7 +58,7 @@ func (s *Store) CheckoutOne(
 
 	inlineAkte := s.isInlineAkte(sz)
 
-	cz = stored_zettel.CheckedOut{
+	cz = zettel_checked_out.CheckedOut{
 		External: stored_zettel.External{
 			Path: filename,
 		},

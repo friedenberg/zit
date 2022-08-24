@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/golf/stored_zettel"
 	store_checkout "github.com/friedenberg/zit/src/hotel/store_checkout"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
+	"github.com/friedenberg/zit/zettel_checked_out"
 )
 
 type WriteNewZettels struct {
@@ -17,11 +18,11 @@ type WriteNewZettels struct {
 func (c WriteNewZettels) RunMany(
 	store store_with_lock.Store,
 	zettelen ...zettel.Zettel,
-) (results []stored_zettel.CheckedOut, err error) {
-	results = make([]stored_zettel.CheckedOut, 0, len(zettelen))
+) (results []zettel_checked_out.CheckedOut, err error) {
+	results = make([]zettel_checked_out.CheckedOut, 0, len(zettelen))
 
 	for _, z := range zettelen {
-		var cz stored_zettel.CheckedOut
+		var cz zettel_checked_out.CheckedOut
 
 		if cz, err = c.RunOne(store, z); err != nil {
 			err = errors.Error(err)
@@ -37,7 +38,7 @@ func (c WriteNewZettels) RunMany(
 func (c WriteNewZettels) RunOne(
 	store store_with_lock.Store,
 	z zettel.Zettel,
-) (result stored_zettel.CheckedOut, err error) {
+) (result zettel_checked_out.CheckedOut, err error) {
 	var tz stored_zettel.Transacted
 
 	if tz, err = store.Zettels().Create(z); err != nil {

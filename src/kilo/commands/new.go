@@ -11,11 +11,11 @@ import (
 	"github.com/friedenberg/zit/src/delta/script_value"
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
-	"github.com/friedenberg/zit/src/golf/stored_zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
 	store_checkout "github.com/friedenberg/zit/src/hotel/store_checkout"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
 	"github.com/friedenberg/zit/src/juliett/user_ops"
+	"github.com/friedenberg/zit/zettel_checked_out"
 )
 
 type bez struct {
@@ -78,7 +78,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	f := zettel_formats.Text{}
 
 	if len(args) == 0 {
-		var cz stored_zettel.CheckedOut
+		var cz zettel_checked_out.CheckedOut
 
 		if cz, err = c.writeNewZettel(u, f); err != nil {
 			err = errors.Error(err)
@@ -121,7 +121,7 @@ func (c New) readExistingFilesAsZettels(u *umwelt.Umwelt, f zettel.Format, args 
 func (c New) writeNewZettel(
 	u *umwelt.Umwelt,
 	f zettel.Format,
-) (cz stored_zettel.CheckedOut, err error) {
+) (cz zettel_checked_out.CheckedOut, err error) {
 	emptyOp := user_ops.WriteNewZettels{
 		Umwelt: u,
 		CheckoutOptions: store_checkout.CheckoutOptions{
@@ -163,7 +163,7 @@ func (c New) writeNewZettel(
 
 func (c New) editZettelIfRequested(
 	u *umwelt.Umwelt,
-	cz stored_zettel.CheckedOut,
+	cz zettel_checked_out.CheckedOut,
 ) (err error) {
 	if !c.Edit {
 		return

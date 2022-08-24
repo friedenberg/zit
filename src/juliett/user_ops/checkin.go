@@ -9,6 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/golf/stored_zettel"
 	store_checkout "github.com/friedenberg/zit/src/hotel/store_checkout"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
+	"github.com/friedenberg/zit/zettel_checked_out"
 )
 
 type Checkin struct {
@@ -17,14 +18,14 @@ type Checkin struct {
 }
 
 type CheckinResults struct {
-	Zettelen map[hinweis.Hinweis]stored_zettel.CheckedOut
+	Zettelen map[hinweis.Hinweis]zettel_checked_out.CheckedOut
 }
 
 func (c Checkin) Run(
 	store store_with_lock.Store,
 	zettelen ...stored_zettel.External,
 ) (results CheckinResults, err error) {
-	results.Zettelen = make(map[hinweis.Hinweis]stored_zettel.CheckedOut)
+	results.Zettelen = make(map[hinweis.Hinweis]zettel_checked_out.CheckedOut)
 
 	for _, z := range zettelen {
 		var tz stored_zettel.Transacted
@@ -39,7 +40,7 @@ func (c Checkin) Run(
 		logz.PrintDebug(tz)
 		stdprinter.Outf("%s (updated)\n", tz.Named)
 
-		results.Zettelen[tz.Hinweis] = stored_zettel.CheckedOut{
+		results.Zettelen[tz.Hinweis] = zettel_checked_out.CheckedOut{
 			Internal: tz,
 			External: z,
 		}

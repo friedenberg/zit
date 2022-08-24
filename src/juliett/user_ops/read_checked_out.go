@@ -7,10 +7,10 @@ import (
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/golf/hinweisen"
-	"github.com/friedenberg/zit/src/golf/stored_zettel"
 	"github.com/friedenberg/zit/src/hotel/store_checkout"
 	"github.com/friedenberg/zit/src/hotel/store_objekten"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
+	"github.com/friedenberg/zit/zettel_checked_out"
 )
 
 type ReadCheckedOut struct {
@@ -20,20 +20,20 @@ type ReadCheckedOut struct {
 }
 
 type ReadCheckedOutResults struct {
-	Zettelen map[hinweis.Hinweis]stored_zettel.CheckedOut
+	Zettelen map[hinweis.Hinweis]zettel_checked_out.CheckedOut
 }
 
 func (op ReadCheckedOut) RunOneHinweis(
 	s store_with_lock.Store,
 	h hinweis.Hinweis,
-) (zettel stored_zettel.CheckedOut, err error) {
+) (zettel zettel_checked_out.CheckedOut, err error) {
 	return op.RunOneString(s, h.String())
 }
 
 func (op ReadCheckedOut) RunOneString(
 	s store_with_lock.Store,
 	path string,
-) (zettel stored_zettel.CheckedOut, err error) {
+) (zettel zettel_checked_out.CheckedOut, err error) {
 	var store store_with_lock.Store
 
 	if store, err = store_with_lock.New(op.Umwelt); err != nil {
@@ -68,9 +68,9 @@ func (op ReadCheckedOut) RunManyStrings(
 	s store_with_lock.Store,
 	paths ...string,
 ) (results ReadCheckedOutResults, err error) {
-	results.Zettelen = make(map[hinweis.Hinweis]stored_zettel.CheckedOut)
+	results.Zettelen = make(map[hinweis.Hinweis]zettel_checked_out.CheckedOut)
 	for _, p := range paths {
-		var checked_out stored_zettel.CheckedOut
+		var checked_out zettel_checked_out.CheckedOut
 
 		if checked_out, err = op.runOne(s, p); err != nil {
 			if errors.Is(err, hinweisen.ErrDoesNotExist) {
@@ -93,7 +93,7 @@ func (op ReadCheckedOut) RunManyStrings(
 func (op ReadCheckedOut) runOne(
 	store store_with_lock.Store,
 	p string,
-) (zettel stored_zettel.CheckedOut, err error) {
+) (zettel zettel_checked_out.CheckedOut, err error) {
 	if zettel.External, err = store.CheckoutStore().Read(p); err != nil {
 		if errors.IsNotExist(err) {
 			err = nil

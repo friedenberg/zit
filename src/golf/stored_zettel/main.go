@@ -27,8 +27,3 @@ type External struct {
 	Path     string
 	AktePath string
 }
-
-type CheckedOut struct {
-	Internal Transacted
-	External External
-}

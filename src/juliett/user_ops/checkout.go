@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/golf/stored_zettel"
 	store_checkout "github.com/friedenberg/zit/src/hotel/store_checkout"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
+	"github.com/friedenberg/zit/zettel_checked_out"
 )
 
 type Checkout struct {
@@ -15,7 +16,7 @@ type Checkout struct {
 }
 
 type CheckoutResults struct {
-	Zettelen      []stored_zettel.CheckedOut
+	Zettelen      []zettel_checked_out.CheckedOut
 	FilesZettelen []string
 	FilesAkten    []string
 }
