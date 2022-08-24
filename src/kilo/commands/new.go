@@ -13,7 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/golf/stored_zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
-	checkout_store "github.com/friedenberg/zit/src/hotel/store_checkout"
+	store_checkout "github.com/friedenberg/zit/src/hotel/store_checkout"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
 	"github.com/friedenberg/zit/src/juliett/user_ops"
 )
@@ -124,7 +124,7 @@ func (c New) writeNewZettel(
 ) (cz stored_zettel.CheckedOut, err error) {
 	emptyOp := user_ops.WriteNewZettels{
 		Umwelt: u,
-		CheckoutOptions: checkout_store.CheckoutOptions{
+		CheckoutOptions: store_checkout.CheckoutOptions{
 			Format: f,
 		},
 	}
@@ -183,7 +183,7 @@ func (c New) editZettelIfRequested(
 
 	readOp := user_ops.ReadCheckedOut{
 		Umwelt: u,
-		OptionsReadExternal: checkout_store.OptionsReadExternal{
+		OptionsReadExternal: store_checkout.OptionsReadExternal{
 			Format: zettel_formats.Text{},
 		},
 	}

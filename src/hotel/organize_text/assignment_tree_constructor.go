@@ -20,7 +20,7 @@ func (atc *AssignmentTreeConstructor) Assignments() (roots []*assignment) {
 
 	root := newAssignment()
 	root.etiketten = atc.RootEtiketten
-  roots = append(roots, root)
+	roots = append(roots, root)
 
 	prefixSet := atc.Named.ToSetPrefixNamed()
 	atc.makeChildren(root, *prefixSet, atc.GroupingEtiketten)

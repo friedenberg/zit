@@ -5,13 +5,13 @@ import (
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/golf/stored_zettel"
-	checkout_store "github.com/friedenberg/zit/src/hotel/store_checkout"
+	store_checkout "github.com/friedenberg/zit/src/hotel/store_checkout"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
 )
 
 type Checkout struct {
 	*umwelt.Umwelt
-	checkout_store.CheckoutOptions
+	store_checkout.CheckoutOptions
 }
 
 type CheckoutResults struct {

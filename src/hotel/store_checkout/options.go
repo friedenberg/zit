@@ -1,4 +1,4 @@
-package checkout_store
+package store_checkout
 
 import (
 	"github.com/friedenberg/zit/src/delta/hinweis"

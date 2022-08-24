@@ -9,13 +9,13 @@ import (
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/golf/stored_zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
-	checkout_store "github.com/friedenberg/zit/src/hotel/store_checkout"
+	store_checkout "github.com/friedenberg/zit/src/hotel/store_checkout"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
 	"github.com/friedenberg/zit/src/juliett/user_ops"
 )
 
 type Edit struct {
-	checkout_store.CheckoutMode
+	store_checkout.CheckoutMode
 }
 
 func init() {
@@ -32,7 +32,7 @@ func init() {
 }
 
 func (c Edit) Run(u *umwelt.Umwelt, args ...string) (err error) {
-	checkoutOptions := checkout_store.CheckoutOptions{
+	checkoutOptions := store_checkout.CheckoutOptions{
 		CheckoutMode: c.CheckoutMode,
 		Format:       zettel_formats.Text{},
 	}
@@ -90,7 +90,7 @@ func (c Edit) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	readOp := user_ops.ReadCheckedOut{
 		Umwelt: s.Umwelt,
-		OptionsReadExternal: checkout_store.OptionsReadExternal{
+		OptionsReadExternal: store_checkout.OptionsReadExternal{
 			Format: zettel_formats.Text{},
 		},
 	}
@@ -113,7 +113,7 @@ func (c Edit) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	checkinOp := user_ops.Checkin{
 		Umwelt: s.Umwelt,
-		OptionsReadExternal: checkout_store.OptionsReadExternal{
+		OptionsReadExternal: store_checkout.OptionsReadExternal{
 			Format: zettel_formats.Text{},
 		},
 	}

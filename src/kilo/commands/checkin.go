@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/golf/stored_zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
-	checkout_store "github.com/friedenberg/zit/src/hotel/store_checkout"
+	store_checkout "github.com/friedenberg/zit/src/hotel/store_checkout"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
 	"github.com/friedenberg/zit/src/juliett/user_ops"
 )
@@ -43,7 +43,7 @@ func (c Checkin) RunWithLockedStore(
 			stdprinter.Errf("Ignoring args because -all is set\n")
 		}
 
-		var possible checkout_store.CwdFiles
+		var possible store_checkout.CwdFiles
 
 		if possible, err = user_ops.NewGetPossibleZettels(s.Umwelt).Run(s); err != nil {
 			err = errors.Error(err)
@@ -57,7 +57,7 @@ func (c Checkin) RunWithLockedStore(
 
 	readOp := user_ops.ReadCheckedOut{
 		Umwelt: s.Umwelt,
-		OptionsReadExternal: checkout_store.OptionsReadExternal{
+		OptionsReadExternal: store_checkout.OptionsReadExternal{
 			Format: zettel_formats.Text{},
 		},
 	}
@@ -68,7 +68,7 @@ func (c Checkin) RunWithLockedStore(
 	}
 
 	checkinOp := user_ops.Checkin{
-		Umwelt:         s.Umwelt,
+		Umwelt:              s.Umwelt,
 		OptionsReadExternal: readOp.OptionsReadExternal,
 	}
 

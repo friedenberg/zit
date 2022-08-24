@@ -9,17 +9,17 @@ import (
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/foxtrot/akten"
 	"github.com/friedenberg/zit/src/golf/hinweisen"
-	checkout_store "github.com/friedenberg/zit/src/hotel/store_checkout"
-	objekten "github.com/friedenberg/zit/src/hotel/store_objekten"
+	store_checkout "github.com/friedenberg/zit/src/hotel/store_checkout"
+	store_objekten "github.com/friedenberg/zit/src/hotel/store_objekten"
 )
 
 type Store struct {
 	*umwelt.Umwelt
 	lock           *file_lock.Lock
-	zettels        *objekten.Store
+	zettels        *store_objekten.Store
 	akten          akten.Akten
 	age            age.Age
-	checkout_store *checkout_store.Store
+	store_checkout *store_checkout.Store
 }
 
 func New(u *umwelt.Umwelt) (s Store, err error) {
@@ -36,7 +36,7 @@ func New(u *umwelt.Umwelt) (s Store, err error) {
 		return
 	}
 
-	s.zettels = &objekten.Store{}
+	s.zettels = &store_objekten.Store{}
 
 	if err = s.zettels.Initialize(u); err != nil {
 		err = errors.Wrapped(err, "failed to initialize zettel meta store")
@@ -48,13 +48,13 @@ func New(u *umwelt.Umwelt) (s Store, err error) {
 		return
 	}
 
-	csk := checkout_store.Konfig{
+	csk := store_checkout.Konfig{
 		Konfig:       u.Konfig,
 		CacheEnabled: u.Konfig.CheckoutCacheEnabled,
 	}
 
 	logz.Print("initing checkout store")
-	if s.checkout_store, err = checkout_store.New(csk, u.Cwd(), s.zettels); err != nil {
+	if s.store_checkout, err = store_checkout.New(csk, u.Cwd(), s.zettels); err != nil {
 		logz.Print(err)
 		err = errors.Error(err)
 		return
@@ -67,7 +67,7 @@ func (s Store) Age() age.Age {
 	return s.age
 }
 
-func (s Store) Zettels() *objekten.Store {
+func (s Store) Zettels() *store_objekten.Store {
 	return s.zettels
 }
 
@@ -79,8 +79,8 @@ func (s Store) Akten() akten.Akten {
 	return s.akten
 }
 
-func (s Store) CheckoutStore() *checkout_store.Store {
-	return s.checkout_store
+func (s Store) CheckoutStore() *store_checkout.Store {
+	return s.store_checkout
 }
 
 func (s Store) Flush() (err error) {

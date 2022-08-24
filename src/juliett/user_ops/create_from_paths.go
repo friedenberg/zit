@@ -14,7 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/golf/stored_zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
-	objekten "github.com/friedenberg/zit/src/hotel/store_objekten"
+	store_objekten "github.com/friedenberg/zit/src/hotel/store_objekten"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
 )
 
@@ -157,7 +157,7 @@ func (c CreateFromPaths) zettelsFromPath(store store_with_lock.Store, p string) 
 func (c CreateFromPaths) handleStoreError(z stored_zettel.Transacted, f string, in error) {
 	var err error
 
-	var lostError objekten.VerlorenAndGefundenError
+	var lostError store_objekten.VerlorenAndGefundenError
 	var normalError errors.StackTracer
 
 	if errors.As(in, &lostError) {

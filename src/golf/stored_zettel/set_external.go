@@ -11,13 +11,13 @@ func MakeSetExternal() SetExternal {
 }
 
 func (s SetExternal) External() (es []External) {
-  es = make([]External, 0, len(s))
+	es = make([]External, 0, len(s))
 
-  for _, e := range s {
-    es = append(es, e)
-  }
+	for _, e := range s {
+		es = append(es, e)
+	}
 
-  return
+	return
 }
 
 func (s SetExternal) Hinweisen() (h []hinweis.Hinweis) {

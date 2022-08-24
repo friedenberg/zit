@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
 	"github.com/friedenberg/zit/src/golf/stored_zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
-	checkout_store "github.com/friedenberg/zit/src/hotel/store_checkout"
+	store_checkout "github.com/friedenberg/zit/src/hotel/store_checkout"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
 	"github.com/friedenberg/zit/src/juliett/user_ops"
 )
@@ -35,7 +35,7 @@ func (c Clean) RunWithLockedStore(
 		stdprinter.Errf("args provided will be ignored")
 	}
 
-	var possible checkout_store.CwdFiles
+	var possible store_checkout.CwdFiles
 
 	if possible, err = user_ops.NewGetPossibleZettels(s.Umwelt).Run(s); err != nil {
 		err = errors.Error(err)
@@ -44,7 +44,7 @@ func (c Clean) RunWithLockedStore(
 
 	args = possible.Zettelen
 
-	optionsReadExternal := checkout_store.OptionsReadExternal{
+	optionsReadExternal := store_checkout.OptionsReadExternal{
 		Format: zettel_formats.Text{},
 	}
 

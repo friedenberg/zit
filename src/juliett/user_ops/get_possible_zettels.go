@@ -3,7 +3,7 @@ package user_ops
 import (
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/echo/umwelt"
-	checkout_store "github.com/friedenberg/zit/src/hotel/store_checkout"
+	store_checkout "github.com/friedenberg/zit/src/hotel/store_checkout"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
 )
 
@@ -19,7 +19,7 @@ func NewGetPossibleZettels(u *umwelt.Umwelt) GetPossibleZettels {
 
 func (uo GetPossibleZettels) Run(
 	store store_with_lock.Store,
-) (result checkout_store.CwdFiles, err error) {
+) (result store_checkout.CwdFiles, err error) {
 	if result, err = store.CheckoutStore().GetPossibleZettels(); err != nil {
 		err = errors.Error(err)
 		return

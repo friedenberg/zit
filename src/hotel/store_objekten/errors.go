@@ -1,4 +1,4 @@
-package objekten
+package store_objekten
 
 import (
 	"fmt"
@@ -19,7 +19,7 @@ import (
 type stringId string
 
 func (s stringId) String() string {
-  return string(s)
+	return string(s)
 }
 
 type ErrNotFound struct {

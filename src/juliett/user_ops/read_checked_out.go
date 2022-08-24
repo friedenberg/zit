@@ -8,14 +8,14 @@ import (
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/golf/hinweisen"
 	"github.com/friedenberg/zit/src/golf/stored_zettel"
-	checkout_store "github.com/friedenberg/zit/src/hotel/store_checkout"
-	objekten "github.com/friedenberg/zit/src/hotel/store_objekten"
+	store_checkout "github.com/friedenberg/zit/src/hotel/store_checkout"
+	store_objekten "github.com/friedenberg/zit/src/hotel/store_objekten"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
 )
 
 type ReadCheckedOut struct {
 	*umwelt.Umwelt
-	checkout_store.OptionsReadExternal
+	store_checkout.OptionsReadExternal
 	AllowMissing bool
 }
 
@@ -104,7 +104,7 @@ func (op ReadCheckedOut) runOne(
 	}
 
 	if zettel.Internal, err = store.Zettels().Read(zettel.External.Hinweis); err != nil {
-		if errors.Is(err, objekten.ErrNotFound{}) {
+		if errors.Is(err, store_objekten.ErrNotFound{}) {
 			stdprinter.Errf("[%s] (untracked)\n", zettel.External.Path)
 			err = nil
 		} else {
