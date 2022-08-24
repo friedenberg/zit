@@ -86,7 +86,7 @@ func (f Text) writeToInlineAkte(c zettel.FormatContextWrite) (n int64, err error
 	}
 
 	w.WriteLines(
-		fmt.Sprintf("! %s", c.Zettel.Typ),
+		fmt.Sprintf("! %s", c.Zettel.TypOrDefault()),
 	)
 
 	w.WriteLines(
