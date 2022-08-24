@@ -113,5 +113,7 @@ func (op ReadCheckedOut) runOne(
 		}
 	}
 
+	zettel.DetermineState()
+
 	return
 }

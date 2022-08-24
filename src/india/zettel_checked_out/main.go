@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/golf/stored_zettel"
 	"github.com/friedenberg/zit/src/hotel/collections"
 )
@@ -12,15 +13,38 @@ type CheckedOut struct {
 	Internal stored_zettel.Transacted
 	Matches  collections.SetTransacted
 	External stored_zettel.External
+	State
+}
+
+func (c *CheckedOut) DetermineState() {
+	if c.Internal.Schwanz.Time.IsZero() {
+		c.State = StateDoesNotExist
+	} else if c.Internal.Zettel.Equals(c.External.Zettel) {
+		c.State = StateExistsAndSame
+	} else {
+		c.State = StateExistsAndDifferent
+	}
 }
 
 func (c CheckedOut) String() string {
+	logz.PrintDebug(c)
 	sb := &strings.Builder{}
 
-	if c.Internal.Zettel.Equals(c.External.Zettel) {
+	switch c.State {
+	default:
+		sb.WriteString(fmt.Sprintf("%s (unknown)", c.Internal.Named))
+
+	case StateExistsAndSame:
 		sb.WriteString(fmt.Sprintf("%s (same)", c.Internal.Named))
-	} else {
+
+	case StateExistsAndDifferent:
 		sb.WriteString(fmt.Sprintf("%s (different)", c.External.Named))
+		fallthrough
+
+	case StateDoesNotExist:
+		if c.State == StateDoesNotExist {
+			sb.WriteString(fmt.Sprintf("%s (Hinweis not recognized)", c.External.Named))
+		}
 
 		if c.Matches.Len() == 1 && c.Matches.Any().Zettel.Equals(c.External.Zettel) {
 		} else if c.Matches.Len() > 1 {
