@@ -10,9 +10,10 @@ import (
 )
 
 type CheckedOut struct {
-	Internal stored_zettel.Transacted
-	Matches  collections.SetTransacted
-	External stored_zettel.External
+	Internal      stored_zettel.Transacted
+	ZettelMatches collections.SetTransacted
+	AkteMatches   collections.SetTransacted
+	External      stored_zettel.External
 	State
 }
 
@@ -43,14 +44,14 @@ func (c CheckedOut) String() string {
 
 	case StateDoesNotExist:
 		if c.State == StateDoesNotExist {
-			sb.WriteString(fmt.Sprintf("%s (Hinweis not recognized)", c.External.Named))
+			sb.WriteString(fmt.Sprintf("[%s %s] (Hinweis not recognized)", c.External.Path, c.External.Stored.Sha))
 		}
 
-		if c.Matches.Len() == 1 && c.Matches.Any().Zettel.Equals(c.External.Zettel) {
-		} else if c.Matches.Len() > 1 {
-			c.Matches.Each(
+		if c.ZettelMatches.Len() == 1 && c.ZettelMatches.Any().Zettel.Equals(c.External.Zettel) {
+		} else if c.ZettelMatches.Len() > 1 {
+			c.ZettelMatches.Each(
 				func(tz stored_zettel.Transacted) (err error) {
-					sb.WriteString(fmt.Sprintf("\n\t%s (match)", c.External.Hinweis))
+					sb.WriteString(fmt.Sprintf("\n\t%s (Zettel match)", tz.Hinweis))
 					return
 				},
 			)

@@ -2,12 +2,14 @@ package commands
 
 import (
 	"flag"
+	"sort"
 
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
 	store_checkout "github.com/friedenberg/zit/src/hotel/store_checkout"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
+	"github.com/friedenberg/zit/src/india/zettel_checked_out"
 	"github.com/friedenberg/zit/src/juliett/user_ops"
 )
 
@@ -55,8 +57,21 @@ func (c Status) RunWithLockedStore(s store_with_lock.Store, args ...string) (err
 		return
 	}
 
+	sl := make([]zettel_checked_out.CheckedOut, 0, len(readResults.Zettelen))
+
 	for _, z := range readResults.Zettelen {
-    stdprinter.Out(z)
+		sl = append(sl, z)
+	}
+
+	sort.Slice(
+		sl,
+		func(i, j int) bool {
+			return sl[i].External.Path < sl[j].External.Path
+		},
+	)
+
+	for _, z := range sl {
+		stdprinter.Out(z)
 	}
 
 	return
