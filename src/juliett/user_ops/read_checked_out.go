@@ -8,8 +8,8 @@ import (
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/golf/hinweisen"
 	"github.com/friedenberg/zit/src/golf/stored_zettel"
-	store_checkout "github.com/friedenberg/zit/src/hotel/store_checkout"
-	store_objekten "github.com/friedenberg/zit/src/hotel/store_objekten"
+	"github.com/friedenberg/zit/src/hotel/store_checkout"
+	"github.com/friedenberg/zit/src/hotel/store_objekten"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
 )
 

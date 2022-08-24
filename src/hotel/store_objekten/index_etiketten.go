@@ -117,7 +117,7 @@ func (i *indexEtiketten) readIfNecessary() (err error) {
 	return
 }
 
-func (i *indexEtiketten) Add(s etikett.Set) (err error) {
+func (i *indexEtiketten) add(s etikett.Set) (err error) {
 	if s.Len() == 0 {
 		logz.Print("no etiketten to add")
 		return
@@ -142,7 +142,7 @@ func (i *indexEtiketten) Add(s etikett.Set) (err error) {
 	return
 }
 
-func (i *indexEtiketten) Del(s etikett.Set) (err error) {
+func (i *indexEtiketten) del(s etikett.Set) (err error) {
 	if s.Len() == 0 {
 		logz.Print("no etiketten to delete")
 		return

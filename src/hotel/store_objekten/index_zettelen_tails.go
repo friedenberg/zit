@@ -122,7 +122,7 @@ func (i *indexZettelenTails) readIfNecessary() (err error) {
 	return
 }
 
-func (i *indexZettelenTails) Add(tz stored_zettel.Transacted) (err error) {
+func (i *indexZettelenTails) add(tz stored_zettel.Transacted) (err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Error(err)
 		return
@@ -151,7 +151,7 @@ func (i *indexZettelenTails) Read(h hinweis.Hinweis) (tz stored_zettel.Transacte
 	return
 }
 
-func (i *indexZettelenTails) allTransacted(
+func (i *indexZettelenTails) ZettelenSchwanzen(
 	qs ...stored_zettel.NamedFilter,
 ) (tzs map[hinweis.Hinweis]stored_zettel.Transacted, err error) {
 	if err = i.readIfNecessary(); err != nil {

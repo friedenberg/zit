@@ -65,8 +65,8 @@ func (z Zettel) TypOrDefault() (t typ.Typ) {
 }
 
 func (z Zettel) AkteExt() (ext string) {
-  t := z.TypOrDefault()
-  ext = t.String()
+	t := z.TypOrDefault()
+	ext = t.String()
 
 	return
 }

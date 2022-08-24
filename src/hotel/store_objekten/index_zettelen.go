@@ -199,7 +199,7 @@ func (i *indexZettelen) addNoRead(tz stored_zettel.Transacted) {
 	return
 }
 
-func (i *indexZettelen) Add(tz stored_zettel.Transacted) (err error) {
+func (i *indexZettelen) add(tz stored_zettel.Transacted) (err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Error(err)
 		return

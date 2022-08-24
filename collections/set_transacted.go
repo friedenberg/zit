@@ -32,9 +32,9 @@ func MakeSetUniqueTransacted() SetTransacted {
 	return SetTransacted{
 		keyFunc: func(sz stored_zettel.Transacted) string {
 			return makeKey(
-				sz.Head,
+				sz.Kopf,
 				sz.Mutter,
-				sz.Tail,
+				sz.Schwanz,
 				sz.Hinweis,
 				sz.Stored.Sha,
 			)

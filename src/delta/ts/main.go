@@ -43,11 +43,11 @@ func (t *Time) Set(v string) (err error) {
 	return
 }
 
-func (t Time) Head() string {
+func (t Time) Kopf() string {
 	return strconv.FormatInt((t.Unix()-Epoch)/(60*60*24*30), 10)
 }
 
-func (t Time) Tail() string {
+func (t Time) Schwanz() string {
 	return strconv.FormatInt(t.Unix()-Epoch, 10)
 }
 
@@ -77,5 +77,5 @@ func (t *Time) UnmarshalText(text []byte) (err error) {
 }
 
 func (t Time) Less(t1 Time) bool {
-  return t.Unix() < t1.Unix()
+	return t.Unix() < t1.Unix()
 }

@@ -117,12 +117,12 @@ func (s Store) WriteZettelObjekte(z zettel.Zettel) (sh sha.Sha, err error) {
 func (s Store) writeNamedZettelToIndex(tz stored_zettel.Transacted) (err error) {
 	logz.Printf("writing zettel to index: %s", tz.Named)
 
-	if err = s.indexZettelenTails.Add(tz); err != nil {
+	if err = s.indexZettelenTails.add(tz); err != nil {
 		err = errors.Wrapped(err, "failed to write zettel to index: %s", tz.Named)
 		return
 	}
 
-	if err = s.indexZettelen.Add(tz); err != nil {
+	if err = s.indexZettelen.add(tz); err != nil {
 		err = errors.Wrapped(err, "failed to write zettel to index: %s", tz.Named)
 		return
 	}
@@ -194,7 +194,7 @@ func (s *Store) Create(in zettel.Zettel) (tz stored_zettel.Transacted, err error
 
 	logz.PrintDebug(tz)
 
-	if err = s.indexEtiketten.Add(tz.Zettel.Etiketten); err != nil {
+	if err = s.indexEtiketten.add(tz.Zettel.Etiketten); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -228,7 +228,7 @@ func (s *Store) CreateWithHinweis(
 		return
 	}
 
-	if err = s.indexEtiketten.Add(tz.Zettel.Etiketten); err != nil {
+	if err = s.indexEtiketten.add(tz.Zettel.Etiketten); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -238,17 +238,6 @@ func (s *Store) CreateWithHinweis(
 
 func (s Store) Etiketten() (es []etikett.Etikett, err error) {
 	return s.indexEtiketten.allEtiketten()
-}
-
-func (s Store) ZettelTails(
-	qs ...stored_zettel.NamedFilter,
-) (tails map[hinweis.Hinweis]stored_zettel.Transacted, err error) {
-	if tails, err = s.indexZettelenTails.allTransacted(qs...); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
-	return
 }
 
 func (s *Store) Update(
@@ -284,12 +273,12 @@ func (s *Store) Update(
 	logz.Print(mutter.Zettel.Etiketten)
 	logz.Print(tz.Zettel.Etiketten)
 
-	if err = s.indexEtiketten.Add(d.Added); err != nil {
+	if err = s.indexEtiketten.add(d.Added); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	if err = s.indexEtiketten.Del(d.Removed); err != nil {
+	if err = s.indexEtiketten.del(d.Removed); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -343,7 +332,7 @@ func (s Store) AllInChain(h hinweis.Hinweis) (c collections.SliceTransacted, err
 
 	sort.Slice(
 		c,
-		func(i, j int) bool { return c[i].Tail.Less(c[j].Tail) },
+		func(i, j int) bool { return c[i].Schwanz.Less(c[j].Schwanz) },
 	)
 
 	return
@@ -446,7 +435,7 @@ func (s *Store) Reindex() (err error) {
 
 	var tails map[hinweis.Hinweis]stored_zettel.Transacted
 
-	if tails, err = s.ZettelTails(); err != nil {
+	if tails, err = s.ZettelenSchwanzen(); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -454,7 +443,7 @@ func (s *Store) Reindex() (err error) {
 	logz.Printf("tail count: %d", len(tails))
 
 	for _, zn := range tails {
-		s.indexEtiketten.Add(zn.Zettel.Etiketten)
+		s.indexEtiketten.add(zn.Zettel.Etiketten)
 	}
 
 	return

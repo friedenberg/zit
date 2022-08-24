@@ -86,11 +86,11 @@ func (s Sha) IsNull() bool {
 	return false
 }
 
-func (s Sha) Head() string {
+func (s Sha) Kopf() string {
 	return s.String()[0:2]
 }
 
-func (s Sha) Tail() string {
+func (s Sha) Schwanz() string {
 	return s.String()[2:]
 }
 
@@ -99,8 +99,8 @@ func (a Sha) Equals(b Sha) bool {
 }
 
 func (s Sha) Path(pc ...string) string {
-	pc = append(pc, s.Head())
-	pc = append(pc, s.Tail())
+	pc = append(pc, s.Kopf())
+	pc = append(pc, s.Schwanz())
 
 	return path.Join(pc...)
 }

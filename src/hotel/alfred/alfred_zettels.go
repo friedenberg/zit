@@ -32,8 +32,8 @@ func ZettelToItem(z stored_zettel.Named) (a alfred.Item) {
 	mb := alfred.NewMatchBuilder()
 
 	mb.AddMatches(z.Hinweis.String())
-	mb.AddMatches(z.Hinweis.Head())
-	mb.AddMatches(z.Hinweis.Tail())
+	mb.AddMatches(z.Hinweis.Kopf())
+	mb.AddMatches(z.Hinweis.Schwanz())
 	mb.AddMatches(z.Zettel.Bezeichnung.String())
 	mb.AddMatches(EtikettenStringsFromZettel(z.Zettel.Etiketten, true)...)
 
@@ -82,8 +82,8 @@ func HinweisToItem(e hinweis.Hinweis) (a alfred.Item) {
 	mb := alfred.NewMatchBuilder()
 
 	mb.AddMatch(e.String())
-	mb.AddMatch(e.Head())
-	mb.AddMatch(e.Tail())
+	mb.AddMatch(e.Kopf())
+	mb.AddMatch(e.Schwanz())
 
 	a.Match = mb.String()
 

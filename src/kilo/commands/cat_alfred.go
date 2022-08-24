@@ -75,7 +75,7 @@ func (c CatAlfred) RunWithLockedStore(store store_with_lock.Store, args ...strin
 
 		var all map[hinweis.Hinweis]stored_zettel.Transacted
 
-		if all, err = store.Zettels().ZettelTails(); err != nil {
+		if all, err = store.Zettels().ZettelenSchwanzen(); err != nil {
 			err = errors.Error(err)
 			return
 		}
@@ -90,7 +90,7 @@ func (c CatAlfred) RunWithLockedStore(store store_with_lock.Store, args ...strin
 
 		var all map[hinweis.Hinweis]stored_zettel.Transacted
 
-		if all, err = store.Zettels().ZettelTails(); err != nil {
+		if all, err = store.Zettels().ZettelenSchwanzen(); err != nil {
 			err = errors.Error(err)
 			return
 		}

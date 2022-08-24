@@ -45,14 +45,14 @@ func (s *Store) transactedWithHead(
 	t transaktion.Transaktion,
 ) (tz stored_zettel.Transacted, err error) {
 	tz.Named = z
-	tz.Head = t.Time
-	tz.Tail = t.Time
+	tz.Kopf = t.Time
+	tz.Schwanz = t.Time
 
 	var previous stored_zettel.Transacted
 
 	if previous, err = s.indexZettelenTails.Read(z.Hinweis); err == nil {
-		tz.Mutter = previous.Tail
-		tz.Head = previous.Head
+		tz.Mutter = previous.Schwanz
+		tz.Kopf = previous.Kopf
 	} else {
 		if errors.Is(err, ErrNotFound{}) {
 			err = nil

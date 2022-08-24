@@ -29,7 +29,7 @@ func (op GetAllHinweisen) Run() (results GetAllHinweisenResults, err error) {
 
 	var zs map[hinweis.Hinweis]stored_zettel.Transacted
 
-	if zs, err = store.Zettels().ZettelTails(); err != nil {
+	if zs, err = store.Zettels().ZettelenSchwanzen(); err != nil {
 		err = errors.Error(err)
 		return
 	}

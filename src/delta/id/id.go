@@ -12,8 +12,8 @@ import (
 )
 
 type Id interface {
-	Head() string
-	Tail() string
+	Kopf() string
+	Schwanz() string
 	String() string
 	Sha() sha.Sha
 }
@@ -24,7 +24,7 @@ type TypedId interface {
 }
 
 func Path(i Id, pc ...string) string {
-	pc = append(pc, i.Head(), i.Tail())
+	pc = append(pc, i.Kopf(), i.Schwanz())
 	return path.Join(pc...)
 }
 

@@ -83,11 +83,11 @@ func MakeBlindHinweisParts(left, right string) (h Hinweis) {
 	return
 }
 
-func (h Hinweis) Head() string {
+func (h Hinweis) Kopf() string {
 	return h.Left
 }
 
-func (h Hinweis) Tail() string {
+func (h Hinweis) Schwanz() string {
 	return h.Right
 }
 

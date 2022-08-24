@@ -81,7 +81,7 @@ func (c Cat) zettelen(store store_with_lock.Store) (err error) {
 	logz.Print()
 	defer logz.Print()
 
-	if all, err = store.Zettels().ZettelTails(); err != nil {
+	if all, err = store.Zettels().ZettelenSchwanzen(); err != nil {
 		err = errors.Error(err)
 		return
 	}
