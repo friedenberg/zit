@@ -239,7 +239,7 @@ func (f Text) readMetadateiLine(state *textStateRead, line string) (err error) {
 		state.lastFieldWasBezeichnung = false
 
 	case "! ":
-		err = f.readAkteDesc(state, tail)
+		err = f.readTyp(state, tail)
 		state.lastFieldWasBezeichnung = false
 
 	case "# ":
@@ -272,7 +272,7 @@ func (f Text) readMetadateiLine(state *textStateRead, line string) (err error) {
 	return
 }
 
-func (f Text) readAkteDesc(state *textStateRead, desc string) (err error) {
+func (f Text) readTyp(state *textStateRead, desc string) (err error) {
 	if desc == "" {
 		return
 	}

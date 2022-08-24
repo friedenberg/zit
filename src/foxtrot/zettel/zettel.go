@@ -53,3 +53,20 @@ func (z Zettel) DescriptionAndTags() (d string) {
 
 	return
 }
+
+func (z Zettel) TypOrDefault() (t typ.Typ) {
+	t = z.Typ
+
+	if t.String() == "" {
+		t = typ.Typ{Value: "md"}
+	}
+
+	return
+}
+
+func (z Zettel) AkteExt() (ext string) {
+  t := z.TypOrDefault()
+  ext = t.String()
+
+	return
+}

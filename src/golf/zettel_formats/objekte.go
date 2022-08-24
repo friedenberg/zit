@@ -5,6 +5,7 @@ import (
 	"io"
 	"strings"
 
+	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/charlie/line_format"
 	"github.com/friedenberg/zit/src/charlie/zk_types"
@@ -86,12 +87,12 @@ func (f *Objekte) ReadFrom(z *zettel.Zettel, in io.Reader) (n int64, err error) 
 			}
 
 		case 1:
+			logz.PrintDebug(v)
 			if t != zk_types.TypeAkteTyp {
 				err = errors.Errorf("expected type %s, but got %s: %s", zk_types.TypeAkteTyp, t, line)
 				return
 			}
 
-			//TODO: switch to AkteTyp
 			if err = z.Typ.Set(v); err != nil {
 				err = errors.Error(err)
 				return
