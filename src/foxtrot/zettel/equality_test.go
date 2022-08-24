@@ -3,7 +3,7 @@ package zettel
 import (
 	"testing"
 
-	"github.com/friedenberg/zit/src/bravo/akte_ext"
+	"github.com/friedenberg/zit/src/bravo/typ"
 	"github.com/friedenberg/zit/src/delta/etikett"
 )
 

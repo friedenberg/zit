@@ -4,16 +4,14 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/bezeichnung"
-	"github.com/friedenberg/zit/src/bravo/akte_ext"
+	"github.com/friedenberg/zit/src/bravo/typ"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/etikett"
 )
 
 type Zettel struct {
-	Akte    sha.Sha
-	AkteExt akte_ext.AkteExt
-	//TODO-decision should this be a special etikett with different validation
-	//rules?
+	Akte        sha.Sha
+	AkteExt     akte_ext.AkteExt
 	Bezeichnung bezeichnung.Bezeichnung
 	Etiketten   etikett.Set
 }

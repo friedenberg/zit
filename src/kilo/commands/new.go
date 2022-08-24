@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/bezeichnung"
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
-	"github.com/friedenberg/zit/src/bravo/akte_ext"
+	"github.com/friedenberg/zit/src/bravo/typ"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/delta/script_value"
