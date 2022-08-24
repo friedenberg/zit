@@ -12,7 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/id"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/golf/stored_zettel"
-	"github.com/friedenberg/zit/zettel_checked_out"
+	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
 )
 
 func (s *Store) Checkout(
