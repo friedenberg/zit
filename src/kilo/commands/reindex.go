@@ -3,6 +3,7 @@ package commands
 import (
 	"flag"
 
+	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
 )
@@ -26,6 +27,8 @@ func (c Reindex) RunWithLockedStore(store store_with_lock.Store, args ...string)
 		err = errors.Errorf("reindex does not support arguments")
 		return
 	}
+
+	logz.Print()
 
 	if err = store.Zettels().Reindex(); err != nil {
 		err = errors.Error(err)

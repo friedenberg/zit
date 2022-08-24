@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
@@ -22,7 +23,11 @@ func (c commandWithLockedStore) Run(u *umwelt.Umwelt, args ...string) (err error
 		return
 	}
 
+	logz.Print()
+
 	defer errors.PanicIfError(store.Flush)
+
+	logz.Print()
 
 	if err = c.RunWithLockedStore(store, args...); err != nil {
 		err = errors.Error(err)

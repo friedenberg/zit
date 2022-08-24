@@ -60,6 +60,8 @@ func New(k Konfig, p string, storeZettel StoreZettel) (s *Store, err error) {
 		return
 	}
 
+	logz.Print()
+
 	return
 }
 

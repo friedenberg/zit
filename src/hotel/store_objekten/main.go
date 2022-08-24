@@ -355,6 +355,8 @@ func (s Store) ReadAllTransaktions() (out []transaktion.Transaktion, err error) 
 	}
 
 	for _, hn := range headNames {
+		logz.Print(hn)
+
 		var tailNames []string
 
 		if tailNames, err = open_file_guard.ReadDirNames(d, hn); err != nil {
@@ -363,26 +365,24 @@ func (s Store) ReadAllTransaktions() (out []transaktion.Transaktion, err error) 
 		}
 
 		for _, tn := range tailNames {
-			tr := &transaktion.Reader{}
-			var or io.ReadCloser
+			logz.Print(tn)
 
-			if or, err = s.ReadCloserObjekten(path.Join(d, hn, tn)); err != nil {
+			p := path.Join(d, hn, tn)
+
+			var t transaktion.Transaktion
+
+			if t, err = s.readTransaktion(p); err != nil {
 				err = errors.Error(err)
 				return
 			}
 
-			defer or.Close()
-
-			if _, err = tr.ReadFrom(or); err != nil {
-				err = errors.Error(err)
-				return
-			}
-
-			out = append(out, tr.Transaktion)
+			out = append(out, t)
 		}
 	}
 
+	logz.Print("sorting")
 	sort.Slice(out, func(i, j int) bool { return out[i].Time.Less(out[j].Time) })
+	logz.Print("done")
 
 	return
 }
@@ -438,7 +438,11 @@ func (s *Store) Reindex() (err error) {
 	}
 
 	for _, t := range ts {
+		logz.Print(t)
+
 		for _, o := range t.Objekten {
+			logz.Print(o)
+
 			switch o.Type {
 
 			case zk_types.TypeZettel:

@@ -15,6 +15,28 @@ import (
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
 )
 
+func (s Store) readTransaktion(p string) (t transaktion.Transaktion, err error) {
+	tr := &transaktion.Reader{}
+
+	var or io.ReadCloser
+
+	if or, err = s.ReadCloserObjekten(p); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	defer or.Close()
+
+	if _, err = tr.ReadFrom(or); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+  t = tr.Transaktion
+
+	return
+}
+
 func (s Store) storedZettelFromSha(sh sha.Sha) (sz stored_zettel.Stored, err error) {
 	var or io.ReadCloser
 

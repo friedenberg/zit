@@ -60,6 +60,8 @@ func New(u *umwelt.Umwelt) (s Store, err error) {
 		return
 	}
 
+	logz.Print("done initing checkout store")
+
 	return
 }
 
