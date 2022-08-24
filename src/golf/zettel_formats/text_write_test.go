@@ -85,7 +85,7 @@ func TestWriteWithoutAkte(t *testing.T) {
 			"tag2",
 			"tag3",
 		),
-		AkteExt: makeAkteExt(t, "md"),
+		Typ: makeAkteExt(t, "md"),
 	}
 
 	actual := writeFormat(t, z, Text{}, false, `the body`)
@@ -112,7 +112,7 @@ func TestWriteWithInlineAkte(t *testing.T) {
 			"tag2",
 			"tag3",
 		),
-		AkteExt: makeAkteExt(t, "md"),
+		Typ: makeAkteExt(t, "md"),
 	}
 
 	actual := writeFormat(t, z, Text{}, true, `the body`)

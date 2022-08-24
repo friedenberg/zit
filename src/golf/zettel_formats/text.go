@@ -284,7 +284,7 @@ func (f Text) readAkteDesc(state *textStateRead, desc string) (err error) {
 	if files.Exists(desc) {
 		logz.Print("valid path", desc)
 
-		if err = state.context.Zettel.AkteExt.Set(tail); err != nil {
+		if err = state.context.Zettel.Typ.Set(tail); err != nil {
 			err = errors.Error(err)
 			return
 		}
@@ -304,7 +304,7 @@ func (f Text) readAkteDesc(state *textStateRead, desc string) (err error) {
 	if tail == "" {
 		//sha or ext
 		if shaError != nil {
-			if err = state.context.Zettel.AkteExt.Set(head); err != nil {
+			if err = state.context.Zettel.Typ.Set(head); err != nil {
 				err = errors.Error(err)
 				return
 			}
@@ -316,7 +316,7 @@ func (f Text) readAkteDesc(state *textStateRead, desc string) (err error) {
 			return
 		}
 
-		if err = state.context.Zettel.AkteExt.Set(tail); err != nil {
+		if err = state.context.Zettel.Typ.Set(tail); err != nil {
 			err = errors.Error(err)
 			return
 		}

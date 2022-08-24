@@ -43,19 +43,19 @@ func (f Text) writeToOmitAkte(c zettel.FormatContextWrite) (n int64, err error) 
 		w.WriteFormat("- %s", e)
 	}
 
-	if c.Zettel.Akte.IsNull() && c.Zettel.AkteExt.String() == "" {
+	if c.Zettel.Akte.IsNull() && c.Zettel.Typ.String() == "" {
 		//no-op
 	} else if c.Zettel.Akte.IsNull() {
 		w.WriteLines(
-			fmt.Sprintf("! %s", c.Zettel.AkteExt),
+			fmt.Sprintf("! %s", c.Zettel.Typ),
 		)
-	} else if c.Zettel.AkteExt.String() == "" {
+	} else if c.Zettel.Typ.String() == "" {
 		w.WriteLines(
 			fmt.Sprintf("! %s", c.Zettel.Akte),
 		)
 	} else {
 		w.WriteLines(
-			fmt.Sprintf("! %s.%s", c.Zettel.Akte, c.Zettel.AkteExt),
+			fmt.Sprintf("! %s.%s", c.Zettel.Akte, c.Zettel.Typ),
 		)
 	}
 
@@ -86,7 +86,7 @@ func (f Text) writeToInlineAkte(c zettel.FormatContextWrite) (n int64, err error
 	}
 
 	w.WriteLines(
-		fmt.Sprintf("! %s", c.Zettel.AkteExt),
+		fmt.Sprintf("! %s", c.Zettel.Typ),
 	)
 
 	w.WriteLines(

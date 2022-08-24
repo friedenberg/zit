@@ -152,13 +152,13 @@ func (i *indexZettelen) addNoRead(tz stored_zettel.Transacted) {
 
 	i.bezeichnungen[key] = set
 
-	if set, ok = i.typen[tz.Zettel.AkteExt]; !ok {
+	if set, ok = i.typen[tz.Zettel.Typ]; !ok {
 		set = stored_zettel.MakeSetTransacted()
 	}
 
 	set.Add(tz)
 
-	i.typen[tz.Zettel.AkteExt] = set
+	i.typen[tz.Zettel.Typ] = set
 }
 
 func (i *indexZettelen) Add(tz stored_zettel.Transacted) (err error) {

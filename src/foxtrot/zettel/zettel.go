@@ -11,7 +11,7 @@ import (
 
 type Zettel struct {
 	Akte        sha.Sha
-	AkteExt     typ.Typ
+	Typ         typ.Typ
 	Bezeichnung bezeichnung.Bezeichnung
 	Etiketten   etikett.Set
 }

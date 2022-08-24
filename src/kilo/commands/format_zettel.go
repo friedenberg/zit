@@ -63,7 +63,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	var formatter konfig.RemoteScript
 
-	if typKonfig, ok := u.Konfig.Typen[external.Zettel.AkteExt.String()]; ok {
+	if typKonfig, ok := u.Konfig.Typen[external.Zettel.Typ.String()]; ok {
 		formatter = typKonfig.FormatScript
 	}
 

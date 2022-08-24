@@ -18,7 +18,7 @@ func (f Objekte) WriteTo(z zettel.Zettel, out1 io.Writer) (n int64, err error) {
 	w := line_format.NewWriter()
 
 	w.WriteFormat("%s %s", zk_types.TypeAkte, z.Akte)
-	w.WriteFormat("%s %s", zk_types.TypeAkteTyp, z.AkteExt)
+	w.WriteFormat("%s %s", zk_types.TypeAkteTyp, z.Typ)
 	w.WriteFormat("%s %s", zk_types.TypeBezeichnung, z.Bezeichnung)
 
 	for _, e := range z.Etiketten.Sorted() {
@@ -92,7 +92,7 @@ func (f *Objekte) ReadFrom(z *zettel.Zettel, in io.Reader) (n int64, err error) 
 			}
 
 			//TODO: switch to AkteTyp
-			if err = z.AkteExt.Set(v); err != nil {
+			if err = z.Typ.Set(v); err != nil {
 				err = errors.Error(err)
 				return
 			}

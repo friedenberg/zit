@@ -140,7 +140,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 			return
 		}
 
-		if err = z.AkteExt.Set("md"); err != nil {
+		if err = z.Typ.Set("md"); err != nil {
 			err = errors.Error(err)
 			return
 		}

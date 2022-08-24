@@ -70,10 +70,10 @@ func (c Show) showZettels(store store_with_lock.Store, zettels []stored_zettel.T
 	}
 
 	for _, named := range zettels {
-		if typKonfig, ok := store.Konfig.Typen[named.Zettel.AkteExt.String()]; ok {
+		if typKonfig, ok := store.Konfig.Typen[named.Zettel.Typ.String()]; ok {
 			ctx.IncludeAkte = typKonfig.InlineAkte
 		} else {
-			ctx.IncludeAkte = named.Zettel.AkteExt.String() == "md"
+			ctx.IncludeAkte = named.Zettel.Typ.String() == "md"
 		}
 
 		ctx.Zettel = named.Zettel

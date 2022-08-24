@@ -35,7 +35,7 @@ func TestEqualitySelf(t *testing.T) {
 			"tag2",
 			"tag3",
 		),
-		AkteExt: makeAkteExt(t, "text/plain"),
+		Typ: makeAkteExt(t, "text/plain"),
 	}
 
 	if !text.Equals(text) {
@@ -51,7 +51,7 @@ func TestEqualityNotSelf(t *testing.T) {
 			"tag2",
 			"tag3",
 		),
-		AkteExt: makeAkteExt(t, "text/plain"),
+		Typ: makeAkteExt(t, "text/plain"),
 	}
 
 	text1 := Zettel{
@@ -61,7 +61,7 @@ func TestEqualityNotSelf(t *testing.T) {
 			"tag2",
 			"tag3",
 		),
-		AkteExt: makeAkteExt(t, "text/plain"),
+		Typ: makeAkteExt(t, "text/plain"),
 	}
 
 	if !text.Equals(text1) {

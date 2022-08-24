@@ -41,13 +41,13 @@ func (s *Store) CheckoutOne(
 		return
 	}
 
-	originalExt := sz.Stored.Zettel.AkteExt.String()
+	originalExt := sz.Stored.Zettel.Typ.String()
 	originalFilename := filename
 	filename = filename + ".md"
 
-	inlineAkte := sz.Stored.Zettel.AkteExt.String() == "md"
+	inlineAkte := sz.Stored.Zettel.Typ.String() == "md"
 
-	if typKonfig, ok := s.Konfig.Typen[sz.Zettel.AkteExt.String()]; ok {
+	if typKonfig, ok := s.Konfig.Typen[sz.Zettel.Typ.String()]; ok {
 		inlineAkte = typKonfig.InlineAkte
 	}
 

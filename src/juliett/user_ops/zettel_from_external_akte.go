@@ -103,7 +103,7 @@ func (c ZettelFromExternalAkte) zettelForAkte(store store_with_lock.Store, akteP
 
 	z.Akte = akteWriter.Sha()
 
-	if err = z.AkteExt.Set(path.Ext(aktePath)); err != nil {
+	if err = z.Typ.Set(path.Ext(aktePath)); err != nil {
 		err = errors.Error(err)
 		return
 	}

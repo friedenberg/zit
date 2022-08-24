@@ -141,7 +141,7 @@ func (c New) writeNewZettel(
 	z := zettel.Zettel{
 		Bezeichnung: c.Bezeichnung.Bezeichnung,
 		Etiketten:   c.Etiketten,
-		AkteExt:     typ.Typ{Value: "md"},
+		Typ:         typ.Typ{Value: "md"},
 	}
 
 	var s store_with_lock.Store

@@ -12,7 +12,7 @@ func (z Zettel) Equals(z1 Zettel) bool {
 		return false
 	}
 
-	if !z.AkteExt.Equals(z1.AkteExt) {
+	if !z.Typ.Equals(z1.Typ) {
 		logz.Print("akteext")
 		return false
 	}
