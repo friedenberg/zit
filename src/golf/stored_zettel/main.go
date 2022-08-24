@@ -19,7 +19,7 @@ type Named struct {
 
 type Transacted struct {
 	Named
-	Head, Tail ts.Time
+	Head, Mutter, Tail ts.Time
 }
 
 type External struct {

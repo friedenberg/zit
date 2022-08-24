@@ -11,8 +11,8 @@ func MakeMapShaTransacted() MapShaTransacted {
 	return make(MapShaTransacted)
 }
 
-func (m *MapShaTransacted) Add(z stored_zettel.Transacted) {
-	(*m)[z.Stored.Sha] = z
+func (m MapShaTransacted) Add(z stored_zettel.Transacted) {
+	m[z.Stored.Sha] = z
 }
 
 func (m MapShaTransacted) Get(s sha.Sha) (z stored_zettel.Transacted, ok bool) {

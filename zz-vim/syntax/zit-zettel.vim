@@ -4,6 +4,7 @@ if exists("b:current_syntax")
 endif
 
 " TODO dynamically source syntax based on extension of akte
+let g:markdown_syntax_conceal = 0
 source $VIMRUNTIME/syntax/markdown.vim
 
 " syn case match

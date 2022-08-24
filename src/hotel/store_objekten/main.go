@@ -86,40 +86,6 @@ func (s Store) Hinweisen() hinweisen.Hinweisen {
 	return s.hinweisen
 }
 
-func (s Store) writeTransaktion() (err error) {
-	if len(s.Transaktion.Objekten) == 0 {
-		logz.Print("not writing Transaktion as there aren't any Objekten")
-		return
-	}
-
-	logz.Printf("writing Transaktion with %d Objekten", len(s.Transaktion.Objekten))
-
-	var p string
-
-	if p, err = id.MakeDirIfNecessary(s.Transaktion.Time, s.Umwelt.DirObjektenTransaktion()); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
-	var w io.WriteCloser
-
-	if w, err = s.WriteCloserObjekten(p); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
-	defer w.Close()
-
-	f := transaktion.Writer{Transaktion: s.Transaktion}
-
-	if _, err = f.WriteTo(w); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
-	return
-}
-
 func (s Store) WriteZettelObjekte(z zettel.Zettel) (sh sha.Sha, err error) {
 	var w *age_io.Mover
 
@@ -144,41 +110,6 @@ func (s Store) WriteZettelObjekte(z zettel.Zettel) (sh sha.Sha, err error) {
 	}
 
 	sh = w.Sha()
-
-	return
-}
-
-func (s *Store) addZettelToTransaktion(z stored_zettel.Named) (tz stored_zettel.Transacted, err error) {
-	logz.Printf("adding zettel to transaktion: %s", z.Hinweis)
-
-	var previous stored_zettel.Transacted
-	var mutter [2]ts.Time
-
-	previous, err = s.indexZettelenTails.Read(z.Hinweis)
-
-	if err == nil {
-		mutter[0] = previous.Tail
-		tz.Head = previous.Head
-	} else if errors.Is(err, ErrNotFound{}) {
-		err = nil
-		tz.Head = s.Transaktion.Time
-	} else {
-		err = errors.Error(err)
-		return
-	}
-
-	tz.Tail = s.Transaktion.Time
-	tz.Named = z
-
-	s.Transaktion.Objekten = append(
-		s.Transaktion.Objekten,
-		transaktion.Objekte{
-			Type:   zk_types.TypeZettel,
-			Mutter: mutter,
-			Id:     &z.Hinweis,
-			Sha:    z.Sha,
-		},
-	)
 
 	return
 }
@@ -401,7 +332,7 @@ func (s Store) Flush() (err error) {
 }
 
 func (s Store) AllInChain(h hinweis.Hinweis) (c collections.SliceTransacted, err error) {
-	var mst collections.MapShaTransacted
+	var mst collections.SetTransacted
 
 	if mst, err = s.indexZettelen.ReadHinweis(h); err != nil {
 		err = errors.Error(err)
@@ -428,8 +359,6 @@ func (s Store) ReadAllTransaktions() (out []transaktion.Transaktion, err error) 
 		return
 	}
 
-	sort.Slice(headNames, func(i, j int) bool { return headNames[i] < headNames[j] })
-
 	for _, hn := range headNames {
 		var tailNames []string
 
@@ -437,8 +366,6 @@ func (s Store) ReadAllTransaktions() (out []transaktion.Transaktion, err error) 
 			err = errors.Error(err)
 			return
 		}
-
-		sort.Slice(tailNames, func(i, j int) bool { return tailNames[i] < tailNames[j] })
 
 		for _, tn := range tailNames {
 			tr := &transaktion.Reader{}
@@ -459,6 +386,8 @@ func (s Store) ReadAllTransaktions() (out []transaktion.Transaktion, err error) 
 			out = append(out, tr.Transaktion)
 		}
 	}
+
+	sort.Slice(out, func(i, j int) bool { return out[i].Time.Less(out[j].Time) })
 
 	return
 }
