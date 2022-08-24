@@ -133,8 +133,13 @@ func (c CreateFromPaths) zettelsFromPath(store store_with_lock.Store, p string) 
 			out = append(
 				out,
 				stored_zettel.External{
-					Path:   p,
-					Zettel: z1,
+					Path: p,
+					Named: stored_zettel.Named{
+						Stored: stored_zettel.Stored{
+							//TODO sha?
+							Zettel: z1,
+						},
+					},
 				},
 			)
 		} else {
@@ -146,8 +151,13 @@ func (c CreateFromPaths) zettelsFromPath(store store_with_lock.Store, p string) 
 	out = append(
 		out,
 		stored_zettel.External{
-			Path:   p,
-			Zettel: ctx.Zettel,
+			Path: p,
+			Named: stored_zettel.Named{
+				Stored: stored_zettel.Stored{
+					//TODO sha?
+					Zettel: ctx.Zettel,
+				},
+			},
 		},
 	)
 

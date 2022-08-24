@@ -181,7 +181,7 @@ func (s *Store) syncOne(p string) (err error) {
 
 			s.entries[p] = Entry{
 				Time: fi.ModTime(),
-				Sha:  ez.Sha,
+				Sha:  ez.Stored.Sha,
 			}
 
 			s.hasChanges = true
@@ -250,7 +250,7 @@ func (s Store) readZettelFromFile(ez *stored_zettel.External) (err error) {
 		return
 	}
 
-	if ez.Sha, err = s.storeZettel.WriteZettelObjekte(c.Zettel); err != nil {
+	if ez.Stored.Sha, err = s.storeZettel.WriteZettelObjekte(c.Zettel); err != nil {
 		err = errors.Wrapped(err, "%s", f.Name())
 		return
 	}
@@ -292,7 +292,7 @@ func (s *Store) Read(p string) (ez stored_zettel.External, err error) {
 			return
 		}
 
-		ez.Sha = named.Sha
+		ez.Stored.Sha = named.Stored.Sha
 		ez.Zettel = named.Zettel
 	} else {
 		if err = s.readZettelFromFile(&ez); err != nil {

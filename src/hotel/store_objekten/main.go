@@ -265,7 +265,7 @@ func (s *Store) Update(
 	tz.Hinweis = h
 	tz.Zettel = z
 
-	if tz.Sha, err = s.WriteZettelObjekte(z); err != nil {
+	if tz.Stored.Sha, err = s.WriteZettelObjekte(z); err != nil {
 		err = errors.Error(err)
 		return
 	}

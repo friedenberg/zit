@@ -62,7 +62,7 @@ func (c Checkout) RunWithHinweisen(s store_with_lock.Store, hins ...hinweis.Hinw
 			continue
 		}
 
-		if c.Force || cz.External.Sha.IsNull() {
+		if c.Force || cz.External.Stored.Sha.IsNull() {
 			toCheckOut = append(toCheckOut, h)
 		} else {
 			stdprinter.Errf("[%s] (external has changes)\n", h)

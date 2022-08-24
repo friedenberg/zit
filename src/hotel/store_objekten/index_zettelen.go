@@ -74,7 +74,7 @@ func (i *indexZettelen) Flush() (err error) {
 		err = st.Each(
 			func(tz stored_zettel.Transacted) (err error) {
 				if err = enc.Encode(tz); err != nil {
-					err = errors.Wrapped(err, "failed to write zettel: [%s %s]", tz.Hinweis, tz.Sha)
+					err = errors.Wrapped(err, "failed to write zettel: [%s %s]", tz.Hinweis, tz.Stored.Sha)
 					return
 				}
 

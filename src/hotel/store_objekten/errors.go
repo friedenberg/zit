@@ -43,7 +43,7 @@ func (e ErrZettelDidNotChangeSinceUpdate) Error() string {
 	return fmt.Sprintf(
 		"zettel has not changed: [%s %s]",
 		e.NamedZettel.Hinweis,
-		e.NamedZettel.Sha,
+		e.NamedZettel.Stored.Sha,
 	)
 }
 

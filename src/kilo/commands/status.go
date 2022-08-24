@@ -55,12 +55,12 @@ func (c Status) RunWithLockedStore(s store_with_lock.Store, args ...string) (err
 		return
 	}
 
-	for h, z := range readResults.Zettelen {
+	for _, z := range readResults.Zettelen {
 		if z.Internal.Zettel.Equals(z.External.Zettel) {
 			continue
 		}
 
-		stdprinter.Outf("[%s] (different)\n", h)
+		stdprinter.Outf("%s (different)\n", z.External)
 	}
 
 	return

@@ -14,7 +14,7 @@ type Stored struct {
 
 type Named struct {
 	Stored
-	Hinweis hinweis.Hinweis
+	hinweis.Hinweis
 }
 
 type Transacted struct {
@@ -23,11 +23,9 @@ type Transacted struct {
 }
 
 type External struct {
+	Named
 	Path     string
 	AktePath string
-	Hinweis  hinweis.Hinweis
-	Sha      sha.Sha
-	Zettel   zettel.Zettel
 }
 
 type CheckedOut struct {

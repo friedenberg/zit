@@ -145,7 +145,7 @@ func (s *Store) addZettelToTransaktion(z stored_zettel.Named) (tz stored_zettel.
 			Type:   zk_types.TypeZettel,
 			Mutter: mutter,
 			Id:     &z.Hinweis,
-			Sha:    z.Sha,
+			Sha:    z.Stored.Sha,
 		},
 	)
 
