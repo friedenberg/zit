@@ -75,3 +75,7 @@ func (t *Time) UnmarshalText(text []byte) (err error) {
 
 	return
 }
+
+func (t Time) Less(t1 Time) bool {
+  return t.Unix() < t1.Unix()
+}

@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"flag"
 
+	"github.com/friedenberg/zit/collections"
 	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/delta/hinweis"
-	"github.com/friedenberg/zit/src/golf/stored_zettel"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
 )
 
@@ -44,7 +44,7 @@ func (c Log) RunWithHinweisen(os store_with_lock.Store, hs ...hinweis.Hinweis) (
 		h = hs[0]
 	}
 
-	var chain []stored_zettel.Transacted
+	var chain collections.SliceTransacted
 	logz.Print()
 
 	if chain, err = os.Zettels().AllInChain(h); err != nil {

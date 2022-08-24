@@ -6,6 +6,7 @@ import (
 	"path"
 	"sort"
 
+	"github.com/friedenberg/zit/collections"
 	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
@@ -399,8 +400,21 @@ func (s Store) Flush() (err error) {
 	return
 }
 
-func (s Store) AllInChain(h hinweis.Hinweis) (c []stored_zettel.Transacted, err error) {
-	// return s.indexZettelen.ReadHinweis(h)
+func (s Store) AllInChain(h hinweis.Hinweis) (c collections.SliceTransacted, err error) {
+	var mst collections.MapShaTransacted
+
+	if mst, err = s.indexZettelen.ReadHinweis(h); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	c = mst.ToSlice()
+
+	sort.Slice(
+		c,
+		func(i, j int) bool { return c[i].Tail.Less(c[j].Tail) },
+	)
+
 	return
 }
 

@@ -29,3 +29,17 @@ func (v Typ) IsTextType() (is bool) {
 
 	return
 }
+
+func (t Typ) MarshalText() (text []byte, err error) {
+	text = []byte(t.String())
+
+	return
+}
+
+func (t *Typ) UnmarshalText(text []byte) (err error) {
+	if err = t.Set(string(text)); err != nil {
+		return
+	}
+
+	return
+}

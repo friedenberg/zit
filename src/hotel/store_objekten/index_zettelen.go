@@ -6,6 +6,7 @@ import (
 	"io"
 	"strings"
 
+	"github.com/friedenberg/zit/collections"
 	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
@@ -21,7 +22,7 @@ type indexZettelen struct {
 	path   string
 	ioFactory
 	zettelen      map[sha.Sha]stored_zettel.Transacted
-	hinweisen     map[hinweis.Hinweis]stored_zettel.SetTransacted
+	hinweisen     map[hinweis.Hinweis]collections.MapShaTransacted
 	akten         map[sha.Sha]stored_zettel.SetTransacted
 	bezeichnungen map[string]stored_zettel.SetTransacted
 	typen         map[typ.Typ]stored_zettel.SetTransacted
@@ -39,7 +40,7 @@ func newIndexZettelen(
 		path:          p,
 		ioFactory:     f,
 		zettelen:      make(map[sha.Sha]stored_zettel.Transacted),
-		hinweisen:     make(map[hinweis.Hinweis]stored_zettel.SetTransacted),
+		hinweisen:     make(map[hinweis.Hinweis]collections.MapShaTransacted),
 		akten:         make(map[sha.Sha]stored_zettel.SetTransacted),
 		bezeichnungen: make(map[string]stored_zettel.SetTransacted),
 		typen:         make(map[typ.Typ]stored_zettel.SetTransacted),
@@ -125,15 +126,20 @@ func (i *indexZettelen) readIfNecessary() (err error) {
 func (i *indexZettelen) addNoRead(tz stored_zettel.Transacted) {
 	i.zettelen[tz.Sha] = tz
 
-	var set stored_zettel.SetTransacted
-	var ok bool
+	{
+		var set collections.MapShaTransacted
+		var ok bool
 
-	if set, ok = i.hinweisen[tz.Hinweis]; !ok {
-		set = stored_zettel.MakeSetTransacted()
+		if set, ok = i.hinweisen[tz.Hinweis]; !ok {
+			set = collections.MakeMapShaTransacted()
+		}
+
+		set.Add(tz)
+		i.hinweisen[tz.Hinweis] = set
 	}
 
-	set.Add(tz)
-	i.hinweisen[tz.Hinweis] = set
+	var set stored_zettel.SetTransacted
+	var ok bool
 
 	if set, ok = i.akten[tz.Zettel.Akte]; !ok {
 		set = stored_zettel.MakeSetTransacted()
@@ -174,7 +180,7 @@ func (i *indexZettelen) Add(tz stored_zettel.Transacted) (err error) {
 	return
 }
 
-func (i *indexZettelen) ReadHinweis(h hinweis.Hinweis) (tzs stored_zettel.SetTransacted, err error) {
+func (i *indexZettelen) ReadHinweis(h hinweis.Hinweis) (mst collections.MapShaTransacted, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Error(err)
 		return
@@ -182,7 +188,7 @@ func (i *indexZettelen) ReadHinweis(h hinweis.Hinweis) (tzs stored_zettel.SetTra
 
 	ok := false
 
-	if tzs, ok = i.hinweisen[h]; !ok {
+	if mst, ok = i.hinweisen[h]; !ok {
 		err = ErrNotFound{Id: h}
 		return
 	}
