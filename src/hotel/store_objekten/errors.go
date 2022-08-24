@@ -22,6 +22,25 @@ func (s stringId) String() string {
 	return string(s)
 }
 
+type ErrChainIndexOutOfBounds struct {
+	hinweis.HinweisWithIndex
+	ChainLength    int
+}
+
+func (e ErrChainIndexOutOfBounds) Is(target error) bool {
+	_, ok := target.(ErrChainIndexOutOfBounds)
+	return ok
+}
+
+func (e ErrChainIndexOutOfBounds) Error() string {
+	return fmt.Sprintf(
+		"chain for %s is %d long, but requested index %d",
+		e.HinweisWithIndex.Hinweis,
+		e.ChainLength,
+		e.HinweisWithIndex.Index,
+	)
+}
+
 type ErrNotFound struct {
 	Id fmt.Stringer
 }

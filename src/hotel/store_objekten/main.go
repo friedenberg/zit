@@ -6,7 +6,6 @@ import (
 	"path"
 	"sort"
 
-	"github.com/friedenberg/zit/src/hotel/collections"
 	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
@@ -18,13 +17,14 @@ import (
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/id"
 	"github.com/friedenberg/zit/src/delta/ts"
-	age_io "github.com/friedenberg/zit/src/echo/age_io"
+	"github.com/friedenberg/zit/src/echo/age_io"
 	"github.com/friedenberg/zit/src/echo/transaktion"
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/golf/hinweisen"
 	"github.com/friedenberg/zit/src/golf/stored_zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
+	"github.com/friedenberg/zit/src/hotel/collections"
 )
 
 type Store struct {
@@ -153,6 +153,12 @@ func (s Store) Read(i id.Id) (tz stored_zettel.Transacted, err error) {
 
 	case hinweis.Hinweis:
 		if tz, err = s.indexZettelenTails.Read(tid); err != nil {
+			err = errors.Error(err)
+			return
+		}
+
+	case hinweis.HinweisWithIndex:
+		if tz, err = s.ReadHinweisAt(tid); err != nil {
 			err = errors.Error(err)
 			return
 		}
@@ -377,6 +383,38 @@ func (s Store) ReadAllTransaktions() (out []transaktion.Transaktion, err error) 
 	}
 
 	sort.Slice(out, func(i, j int) bool { return out[i].Time.Less(out[j].Time) })
+
+	return
+}
+
+func (s *Store) ReadHinweisAt(
+	h hinweis.HinweisWithIndex,
+) (tz stored_zettel.Transacted, err error) {
+	if h.Index < 0 {
+		logz.PrintDebug(h)
+		return s.indexZettelenTails.Read(h.Hinweis)
+	}
+
+	var chain collections.SliceTransacted
+
+	if chain, err = s.AllInChain(h.Hinweis); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	if chain.Len() == 0 {
+		err = ErrNotFound{Id: h}
+		return
+	} else if int64(chain.Len()-1) < h.Index {
+		err = ErrChainIndexOutOfBounds{
+			HinweisWithIndex: h,
+			ChainLength:      chain.Len(),
+		}
+
+		return
+	}
+
+	tz = chain[h.Index]
 
 	return
 }

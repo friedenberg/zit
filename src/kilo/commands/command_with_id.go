@@ -24,10 +24,14 @@ func (c commandWithId) RunWithLockedStore(store store_with_lock.Store, args ...s
 		var sha sha.Sha
 
 		if err = sha.Set(arg); err != nil {
-			if id, err = hinweis.MakeBlindHinweis(arg); err != nil {
+			var hwi hinweis.HinweisWithIndex
+
+			if err = hwi.Set(arg); err != nil {
 				err = errors.Error(err)
 				return
 			}
+
+			id = hwi
 		} else {
 			id = sha
 		}

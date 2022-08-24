@@ -13,7 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
 	store_checkout "github.com/friedenberg/zit/src/hotel/store_checkout"
-	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
+	"github.com/friedenberg/zit/src/india/zettel_checked_out"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
 	"github.com/friedenberg/zit/src/juliett/user_ops"
 )

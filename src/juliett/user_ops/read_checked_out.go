@@ -3,14 +3,13 @@ package user_ops
 import (
 	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
-	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/golf/hinweisen"
 	"github.com/friedenberg/zit/src/hotel/store_checkout"
 	"github.com/friedenberg/zit/src/hotel/store_objekten"
-	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
+	"github.com/friedenberg/zit/src/india/zettel_checked_out"
 )
 
 type ReadCheckedOut struct {
@@ -105,7 +104,8 @@ func (op ReadCheckedOut) runOne(
 
 	if zettel.Internal, err = store.Zettels().Read(zettel.External.Hinweis); err != nil {
 		if errors.Is(err, store_objekten.ErrNotFound{}) {
-			stdprinter.Errf("[%s] (untracked)\n", zettel.External.Path)
+			exSha := zettel.External.Stored.Sha
+			zettel.Matches, _ = store.Zettels().ReadZettelSha(exSha)
 			err = nil
 		} else {
 			err = errors.Error(err)

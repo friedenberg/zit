@@ -82,6 +82,15 @@ func (a SetTransacted) Contains(z stored_zettel.Transacted) bool {
 	return ok
 }
 
+func (a SetTransacted) Any() (tz stored_zettel.Transacted) {
+	for _, sz := range a.innerMap {
+		tz = sz
+		break
+	}
+
+	return
+}
+
 func (a SetTransacted) Each(f func(stored_zettel.Transacted) error) (err error) {
 	for _, sz := range a.innerMap {
 		if err = f(sz); err != nil {

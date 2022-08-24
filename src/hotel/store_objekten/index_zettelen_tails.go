@@ -5,7 +5,6 @@ import (
 	"encoding/gob"
 	"io"
 
-	"github.com/friedenberg/zit/src/hotel/collections"
 	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
@@ -13,6 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/golf/stored_zettel"
+	"github.com/friedenberg/zit/src/hotel/collections"
 )
 
 type indexZettelenTails struct {
