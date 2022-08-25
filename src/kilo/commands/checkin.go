@@ -5,11 +5,11 @@ import (
 
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
-	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/golf/stored_zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
 	store_checkout "github.com/friedenberg/zit/src/hotel/store_checkout"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
+	"github.com/friedenberg/zit/src/india/zettel_checked_out"
 	"github.com/friedenberg/zit/src/juliett/user_ops"
 )
 
@@ -38,22 +38,23 @@ func (c Checkin) RunWithLockedStore(
 	s store_with_lock.Store,
 	args ...string,
 ) (err error) {
+	var pz store_checkout.CwdFiles
+
 	if c.All {
 		if len(args) > 0 {
 			stdprinter.Errf("Ignoring args because -all is set\n")
 		}
 
-		var possible store_checkout.CwdFiles
-
-		if possible, err = user_ops.NewGetPossibleZettels(s.Umwelt).Run(s); err != nil {
+		if pz, err = user_ops.NewGetPossibleZettels(s.Umwelt).Run(s); err != nil {
 			err = errors.Error(err)
 			return
 		}
+	} else {
 
-		args = possible.Zettelen
+		pz.Zettelen = args
 	}
 
-	var readResults user_ops.ReadCheckedOutResults
+	var readResults []zettel_checked_out.CheckedOut
 
 	readOp := user_ops.ReadCheckedOut{
 		Umwelt: s.Umwelt,
@@ -62,7 +63,7 @@ func (c Checkin) RunWithLockedStore(
 		},
 	}
 
-	if readResults, err = readOp.RunManyStrings(s, args...); err != nil {
+	if readResults, err = readOp.RunMany(s, pz); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -72,9 +73,9 @@ func (c Checkin) RunWithLockedStore(
 		OptionsReadExternal: readOp.OptionsReadExternal,
 	}
 
-	zettels := make([]stored_zettel.External, 0, len(readResults.Zettelen))
+	zettels := make([]stored_zettel.External, 0, len(readResults))
 
-	for _, z := range readResults.Zettelen {
+	for _, z := range readResults {
 		zettels = append(zettels, z.External)
 	}
 
@@ -88,10 +89,10 @@ func (c Checkin) RunWithLockedStore(
 			Umwelt: s.Umwelt,
 		}
 
-		external := make(map[hinweis.Hinweis]stored_zettel.External)
+		external := make([]stored_zettel.External, 0, len(readResults))
 
-		for h, z := range readResults.Zettelen {
-			external[h] = z.External
+		for _, z := range readResults {
+			external = append(external, z.External)
 		}
 
 		if err = deleteOp.Run(s, external); err != nil {

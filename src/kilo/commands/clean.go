@@ -2,6 +2,7 @@ package commands
 
 import (
 	"flag"
+	"path/filepath"
 
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
@@ -10,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
 	store_checkout "github.com/friedenberg/zit/src/hotel/store_checkout"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
+	"github.com/friedenberg/zit/src/india/zettel_checked_out"
 	"github.com/friedenberg/zit/src/juliett/user_ops"
 )
 
@@ -42,29 +44,31 @@ func (c Clean) RunWithLockedStore(
 		return
 	}
 
-	args = possible.Zettelen
-
 	optionsReadExternal := store_checkout.OptionsReadExternal{
 		Format: zettel_formats.Text{},
 	}
 
-	var readResults user_ops.ReadCheckedOutResults
+	var readResults []zettel_checked_out.CheckedOut
 
 	readOp := user_ops.ReadCheckedOut{
 		Umwelt:              s.Umwelt,
 		OptionsReadExternal: optionsReadExternal,
 	}
 
-	if readResults, err = readOp.RunManyStrings(s, args...); err != nil {
+	if readResults, err = readOp.RunMany(s, possible); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	toDelete := make([]stored_zettel.External, 0, len(readResults.Zettelen))
-	filesToDelete := make([]string, 0, len(readResults.Zettelen))
+	toDelete := make([]stored_zettel.External, 0, len(readResults))
+	filesToDelete := make([]string, 0, len(readResults)+len(possible.EmptyDirectories))
 
-	for _, z := range readResults.Zettelen {
-		if !z.Internal.Named.Stored.Zettel.Equals(z.External.Named.Stored.Zettel) {
+	for _, d := range possible.EmptyDirectories {
+		filesToDelete = append(filesToDelete, d)
+	}
+
+	for _, z := range readResults {
+		if z.State != zettel_checked_out.StateExistsAndSame {
 			continue
 		}
 
@@ -77,8 +81,12 @@ func (c Clean) RunWithLockedStore(
 	}
 
 	if s.Umwelt.Konfig.DryRun {
-		for _, z := range toDelete {
-			stdprinter.Outf("[%s] (would delete)\n", z.Hinweis)
+		for _, fOrD := range filesToDelete {
+			if pRel, pErr := filepath.Rel(s.Umwelt.Cwd(), fOrD); pErr == nil {
+				fOrD = pRel
+			}
+
+			stdprinter.Outf("[%s] (would delete)\n", fOrD)
 		}
 
 		return
@@ -89,8 +97,12 @@ func (c Clean) RunWithLockedStore(
 		return
 	}
 
-	for _, z := range toDelete {
-		stdprinter.Outf("[%s] (checkout deleted)\n", z.Hinweis)
+	for _, fOrD := range filesToDelete {
+		if pRel, pErr := filepath.Rel(s.Umwelt.Cwd(), fOrD); pErr == nil {
+			fOrD = pRel
+		}
+
+		stdprinter.Outf("[%s] (deleted)\n", fOrD)
 	}
 
 	return

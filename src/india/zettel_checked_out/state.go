@@ -7,4 +7,5 @@ const (
 	StateExistsAndSame
 	StateExistsAndDifferent
 	StateDoesNotExist
+  StateAkte
 )

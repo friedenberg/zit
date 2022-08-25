@@ -1,8 +1,9 @@
 package user_ops
 
 import (
-	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
+	"github.com/friedenberg/zit/src/bravo/stdprinter"
+	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/golf/hinweisen"
@@ -50,25 +51,13 @@ func (op ReadCheckedOut) RunOneString(
 	return
 }
 
-func (op ReadCheckedOut) RunManyHinweisen(
+func (op ReadCheckedOut) RunMany(
 	s store_with_lock.Store,
-	hins ...hinweis.Hinweis,
-) (results ReadCheckedOutResults, err error) {
-	ss := make([]string, len(hins))
+	possible store_checkout.CwdFiles,
+) (results []zettel_checked_out.CheckedOut, err error) {
+	results = make([]zettel_checked_out.CheckedOut, 0, possible.Len())
 
-	for i, _ := range ss {
-		ss[i] = hins[i].String()
-	}
-
-	return op.RunManyStrings(s, ss...)
-}
-
-func (op ReadCheckedOut) RunManyStrings(
-	s store_with_lock.Store,
-	paths ...string,
-) (results ReadCheckedOutResults, err error) {
-	results.Zettelen = make(map[hinweis.Hinweis]zettel_checked_out.CheckedOut)
-	for _, p := range paths {
+	for _, p := range possible.Zettelen {
 		var checked_out zettel_checked_out.CheckedOut
 
 		if checked_out, err = op.runOne(s, p); err != nil {
@@ -82,8 +71,24 @@ func (op ReadCheckedOut) RunManyStrings(
 
 		}
 
-		logz.Print(checked_out.External.Hinweis)
-		results.Zettelen[checked_out.External.Hinweis] = checked_out
+		results = append(results, checked_out)
+	}
+
+	for _, p := range possible.Akten {
+		var checked_out zettel_checked_out.CheckedOut
+
+		if checked_out, err = op.runOneAkte(s, p); err != nil {
+			if errors.Is(err, hinweisen.ErrDoesNotExist) {
+				//TODO log
+				err = nil
+			} else {
+				err = errors.Error(err)
+				return
+			}
+
+		}
+
+		results = append(results, checked_out)
 	}
 
 	return
@@ -115,11 +120,34 @@ func (op ReadCheckedOut) runOne(
 
 	if zettel.State > zettel_checked_out.StateExistsAndSame {
 		exSha := zettel.External.Stored.Sha
-		zettel.ZettelMatches, _ = store.Zettels().ReadZettelSha(exSha)
+		zettel.Matches.Zettelen, _ = store.Zettels().ReadZettelSha(exSha)
 
 		exAkteSha := zettel.External.Stored.Zettel.Akte
-		zettel.AkteMatches, _ = store.Zettels().ReadAkteSha(exAkteSha)
+		zettel.Matches.Akten, _ = store.Zettels().ReadAkteSha(exAkteSha)
+
+		bez := zettel.External.Stored.Zettel.Bezeichnung.String()
+		zettel.Matches.Bezeichnungen, _ = store.Zettels().ReadBezeichnung(bez)
 	}
+
+	return
+}
+
+func (op ReadCheckedOut) runOneAkte(
+	store store_with_lock.Store,
+	p string,
+) (zettel zettel_checked_out.CheckedOut, err error) {
+	stdprinter.Out(p)
+	var akteSha sha.Sha
+
+	if akteSha, err = store.CheckoutStore().AkteShaFromPath(p); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	zettel.External.AktePath = p
+	zettel.External.Named.Stored.Zettel.Akte = akteSha
+	zettel.State = zettel_checked_out.StateAkte
+	zettel.Matches.Akten, _ = store.Zettels().ReadAkteSha(akteSha)
 
 	return
 }

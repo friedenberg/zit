@@ -6,14 +6,12 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/golf/stored_zettel"
-	"github.com/friedenberg/zit/src/hotel/collections"
 )
 
 type CheckedOut struct {
-	Internal      stored_zettel.Transacted
-	ZettelMatches collections.SetTransacted
-	AkteMatches   collections.SetTransacted
-	External      stored_zettel.External
+	Internal stored_zettel.Transacted
+	Matches  Matches
+	External stored_zettel.External
 	State
 }
 
@@ -40,22 +38,15 @@ func (c CheckedOut) String() string {
 
 	case StateExistsAndDifferent:
 		sb.WriteString(fmt.Sprintf("%s (different)", c.External.Named))
-		fallthrough
+		c.Matches.appendToStringBuilder(sb, c.External)
+
+	case StateAkte:
+		sb.WriteString(fmt.Sprintf("[%s %s] (Hinweis not recognized)", c.External.AktePath, c.External.Stored.Zettel.Akte))
+		c.Matches.appendToStringBuilder(sb, c.External)
 
 	case StateDoesNotExist:
-		if c.State == StateDoesNotExist {
-			sb.WriteString(fmt.Sprintf("[%s %s] (Hinweis not recognized)", c.External.Path, c.External.Stored.Sha))
-		}
-
-		if c.ZettelMatches.Len() == 1 && c.ZettelMatches.Any().Named.Stored.Zettel.Equals(c.External.Named.Stored.Zettel) {
-		} else if c.ZettelMatches.Len() > 1 {
-			c.ZettelMatches.Each(
-				func(tz stored_zettel.Transacted) (err error) {
-					sb.WriteString(fmt.Sprintf("\n\t%s (Zettel match)", tz.Named.Hinweis))
-					return
-				},
-			)
-		}
+		sb.WriteString(fmt.Sprintf("[%s %s] (Hinweis not recognized)", c.External.Path, c.External.Stored.Sha))
+		c.Matches.appendToStringBuilder(sb, c.External)
 	}
 
 	return sb.String()

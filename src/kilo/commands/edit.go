@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
 	store_checkout "github.com/friedenberg/zit/src/hotel/store_checkout"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
+	"github.com/friedenberg/zit/src/india/zettel_checked_out"
 	"github.com/friedenberg/zit/src/juliett/user_ops"
 )
 
@@ -86,7 +87,7 @@ func (c Edit) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	var readResults user_ops.ReadCheckedOutResults
+	var readResults []zettel_checked_out.CheckedOut
 
 	readOp := user_ops.ReadCheckedOut{
 		Umwelt: s.Umwelt,
@@ -100,14 +101,20 @@ func (c Edit) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	if readResults, err = readOp.RunManyStrings(s, checkoutResults.FilesZettelen...); err != nil {
+	var possible store_checkout.CwdFiles
+
+	for _, f := range checkoutResults.FilesZettelen {
+		possible.Zettelen = append(possible.Zettelen, f)
+	}
+
+	if readResults, err = readOp.RunMany(s, possible); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	zettels := make([]stored_zettel.External, 0, len(readResults.Zettelen))
+	zettels := make([]stored_zettel.External, 0, len(readResults))
 
-	for _, z := range readResults.Zettelen {
+	for _, z := range readResults {
 		zettels = append(zettels, z.External)
 	}
 

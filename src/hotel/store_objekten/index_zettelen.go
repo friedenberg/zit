@@ -159,7 +159,8 @@ func (i *indexZettelen) addNoRead(tz stored_zettel.Transacted) {
 		i.hinweisen[tz.Named.Hinweis] = set
 	}
 
-	{
+	akteSha := tz.Named.Stored.Zettel.Akte
+	if !akteSha.IsNull() {
 		var set collections.SetTransacted
 		var ok bool
 
@@ -171,17 +172,18 @@ func (i *indexZettelen) addNoRead(tz stored_zettel.Transacted) {
 		i.akten[tz.Named.Stored.Zettel.Akte] = set
 	}
 
-	{
-		key := strings.ToLower(tz.Named.Stored.Zettel.Bezeichnung.String())
+	bezKey := strings.ToLower(tz.Named.Stored.Zettel.Bezeichnung.String())
+	if bezKey != "" {
+
 		var set collections.SetTransacted
 		var ok bool
 
-		if set, ok = i.bezeichnungen[key]; !ok {
+		if set, ok = i.bezeichnungen[bezKey]; !ok {
 			set = collections.MakeSetUniqueTransacted()
 		}
 
 		set.Add(tz)
-		i.bezeichnungen[key] = set
+		i.bezeichnungen[bezKey] = set
 	}
 
 	{

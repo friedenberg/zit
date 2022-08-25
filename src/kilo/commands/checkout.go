@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
 	store_checkout "github.com/friedenberg/zit/src/hotel/store_checkout"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
+	"github.com/friedenberg/zit/src/india/zettel_checked_out"
 	"github.com/friedenberg/zit/src/juliett/user_ops"
 )
 
@@ -33,7 +34,7 @@ func init() {
 }
 
 func (c Checkout) RunWithHinweisen(s store_with_lock.Store, hins ...hinweis.Hinweis) (err error) {
-	var readResults user_ops.ReadCheckedOutResults
+	var readResults []zettel_checked_out.CheckedOut
 
 	readOp := user_ops.ReadCheckedOut{
 		Umwelt: s.Umwelt,
@@ -42,7 +43,13 @@ func (c Checkout) RunWithHinweisen(s store_with_lock.Store, hins ...hinweis.Hinw
 		},
 	}
 
-	if readResults, err = readOp.RunManyHinweisen(s, hins...); err != nil {
+	var pz store_checkout.CwdFiles
+
+	for _, h := range hins {
+		pz.Zettelen = append(pz.Zettelen, h.String())
+	}
+
+	if readResults, err = readOp.RunMany(s, pz); err != nil {
 		logz.Print(err)
 		err = errors.Error(err)
 		return
@@ -50,9 +57,9 @@ func (c Checkout) RunWithHinweisen(s store_with_lock.Store, hins ...hinweis.Hinw
 
 	toCheckOut := make([]hinweis.Hinweis, 0, len(hins))
 
-	for h, cz := range readResults.Zettelen {
+	for _, cz := range readResults {
 		if cz.External.Path == "" {
-			toCheckOut = append(toCheckOut, h)
+			toCheckOut = append(toCheckOut, cz.Internal.Named.Hinweis)
 			continue
 		}
 
@@ -63,9 +70,9 @@ func (c Checkout) RunWithHinweisen(s store_with_lock.Store, hins ...hinweis.Hinw
 		}
 
 		if c.Force || cz.External.Stored.Sha.IsNull() {
-			toCheckOut = append(toCheckOut, h)
+			toCheckOut = append(toCheckOut, cz.Internal.Named.Hinweis)
 		} else {
-			stdprinter.Errf("[%s] (external has changes)\n", h)
+			stdprinter.Errf("[%s] (external has changes)\n", cz.Internal.Named.Hinweis)
 			continue
 		}
 	}

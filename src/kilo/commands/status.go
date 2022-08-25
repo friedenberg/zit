@@ -39,38 +39,30 @@ func (c Status) RunWithLockedStore(s store_with_lock.Store, args ...string) (err
 		return
 	}
 
-	args = possible.Zettelen
-
 	options := store_checkout.OptionsReadExternal{
 		Format: zettel_formats.Text{},
 	}
 
-	var readResults user_ops.ReadCheckedOutResults
+	var readResults []zettel_checked_out.CheckedOut
 
 	readOp := user_ops.ReadCheckedOut{
 		Umwelt:              s.Umwelt,
 		OptionsReadExternal: options,
 	}
 
-	if readResults, err = readOp.RunManyStrings(s, args...); err != nil {
+	if readResults, err = readOp.RunMany(s, possible); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	sl := make([]zettel_checked_out.CheckedOut, 0, len(readResults.Zettelen))
-
-	for _, z := range readResults.Zettelen {
-		sl = append(sl, z)
-	}
-
 	sort.Slice(
-		sl,
+		readResults,
 		func(i, j int) bool {
-			return sl[i].External.Path < sl[j].External.Path
+			return readResults[i].External.Path < readResults[j].External.Path
 		},
 	)
 
-	for _, z := range sl {
+	for _, z := range readResults {
 		stdprinter.Out(z)
 	}
 
