@@ -91,7 +91,7 @@ func (c CreateFromPaths) Run(args ...string) (results CreateFromPathsResults, er
 			}
 		}
 
-		stdprinter.Outf("%s (created)", tz.Named)
+		stdprinter.Outf("%s (created)\n", tz.Named)
 	}
 
 	return

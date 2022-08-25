@@ -16,7 +16,7 @@ type CheckedOut struct {
 }
 
 func (c *CheckedOut) DetermineState() {
-	if c.Internal.Schwanz.Time.IsZero() {
+	if c.Internal.Named.Stored.Sha.IsNull() {
 		if c.External.ExternalPathAndSha() == "" {
 			c.State = StateEmpty
 		} else {
