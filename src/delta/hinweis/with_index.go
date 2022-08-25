@@ -10,7 +10,7 @@ import (
 
 type HinweisWithIndex struct {
 	Hinweis
-	Index int64
+	Index int
 }
 
 func (h HinweisWithIndex) String() string {
@@ -44,7 +44,7 @@ func (h *HinweisWithIndex) Set(v string) (err error) {
 		return
 	}
 
-	if h.Index, err = strconv.ParseInt(vs[1], 10, 64); err != nil {
+	if h.Index, err = strconv.Atoi(vs[1]); err != nil {
 		err = errors.Error(err)
 		return
 	}

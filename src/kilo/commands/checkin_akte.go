@@ -118,15 +118,15 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			return
 		}
 
-		zettels[i].Zettel.Akte = ow.Sha()
+		zettels[i].Named.Stored.Zettel.Akte = ow.Sha()
 
 		if c.NewEtiketten.Len() > 0 {
-			zettels[i].Zettel.Etiketten = c.NewEtiketten
+			zettels[i].Named.Stored.Zettel.Etiketten = c.NewEtiketten
 		}
 	}
 
 	for _, z := range zettels {
-		if z, err = store.Zettels().Update(z.Hinweis, z.Zettel); err != nil {
+		if z, err = store.Zettels().Update(z.Named.Hinweis, z.Named.Stored.Zettel); err != nil {
 			err = errors.Error(err)
 			return
 		}

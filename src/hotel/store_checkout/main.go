@@ -257,7 +257,7 @@ func (s Store) readZettelFromFile(ez *stored_zettel.External) (err error) {
 		return
 	}
 
-	ez.Zettel = c.Zettel
+	ez.Named.Stored.Zettel = c.Zettel
 	ez.AktePath = c.AktePath
 
 	return
@@ -294,8 +294,8 @@ func (s *Store) Read(p string) (ez stored_zettel.External, err error) {
 			return
 		}
 
-		ez.Stored.Sha = named.Stored.Sha
-		ez.Zettel = named.Zettel
+		ez.Stored.Sha = named.Named.Stored.Sha
+		ez.Stored.Zettel = named.Named.Stored.Zettel
 	} else {
 		if err = s.readZettelFromFile(&ez); err != nil {
 			err = errors.Wrapped(err, "%s", p)

@@ -66,7 +66,7 @@ func (c CatObjekte) akten(store store_with_lock.Store, ids ...id.Id) (err error)
 				return
 			}
 
-			sb = tz.Zettel.Akte
+			sb = tz.Named.Stored.Zettel.Akte
 
 		default:
 			err = errors.Errorf("unsupported id type: %q", i)
@@ -106,7 +106,7 @@ func (c CatObjekte) zettelen(store store_with_lock.Store, ids ...id.Id) (err err
 
 		logz.PrintDebug(tz)
 
-		if _, err = f.WriteTo(tz.Zettel, store.Out); err != nil {
+		if _, err = f.WriteTo(tz.Named.Stored.Zettel, store.Out); err != nil {
 			err = errors.Error(err)
 			return
 		}

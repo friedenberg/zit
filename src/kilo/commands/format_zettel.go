@@ -63,12 +63,12 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	var formatter konfig.RemoteScript
 
-	if typKonfig, ok := u.Konfig.Typen[external.Zettel.Typ.String()]; ok {
+	if typKonfig, ok := u.Konfig.Typen[external.Named.Stored.Zettel.Typ.String()]; ok {
 		formatter = typKonfig.FormatScript
 	}
 
 	ctx := zettel.FormatContextWrite{
-		Zettel:            external.Zettel,
+		Zettel:            external.Named.Stored.Zettel,
 		IncludeAkte:       true,
 		AkteReaderFactory: store.Zettels(),
 		FormatScript:      formatter,

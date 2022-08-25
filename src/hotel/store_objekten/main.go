@@ -146,7 +146,7 @@ func (s Store) Read(i id.Id) (tz stored_zettel.Transacted, err error) {
 
 		defer stdprinter.PanicIfError(r.Close)
 
-		if _, err = f.ReadFrom(&tz.Zettel, r); err != nil {
+		if _, err = f.ReadFrom(&tz.Named.Stored.Zettel, r); err != nil {
 			err = errors.Error(err)
 			return
 		}
@@ -176,14 +176,14 @@ func (s *Store) Create(in zettel.Zettel) (tz stored_zettel.Transacted, err error
 		return
 	}
 
-	tz.Zettel = in
+	tz.Named.Stored.Zettel = in
 
-	if tz.Stored.Sha, err = s.WriteZettelObjekte(tz.Zettel); err != nil {
+	if tz.Named.Stored.Sha, err = s.WriteZettelObjekte(tz.Named.Stored.Zettel); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	if tz.Hinweis, err = s.hinweisen.StoreNew(tz.Stored.Sha); err != nil {
+	if tz.Named.Hinweis, err = s.hinweisen.StoreNew(tz.Named.Stored.Sha); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -200,7 +200,7 @@ func (s *Store) Create(in zettel.Zettel) (tz stored_zettel.Transacted, err error
 
 	logz.PrintDebug(tz)
 
-	if err = s.indexEtiketten.add(tz.Zettel.Etiketten); err != nil {
+	if err = s.indexEtiketten.add(tz.Named.Stored.Zettel.Etiketten); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -217,9 +217,9 @@ func (s *Store) CreateWithHinweis(
 		return
 	}
 
-	tz.Zettel = in
+	tz.Named.Stored.Zettel = in
 
-	if tz.Stored.Sha, err = s.WriteZettelObjekte(tz.Zettel); err != nil {
+	if tz.Named.Stored.Sha, err = s.WriteZettelObjekte(tz.Named.Stored.Zettel); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -234,7 +234,7 @@ func (s *Store) CreateWithHinweis(
 		return
 	}
 
-	if err = s.indexEtiketten.add(tz.Zettel.Etiketten); err != nil {
+	if err = s.indexEtiketten.add(tz.Named.Stored.Zettel.Etiketten); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -257,10 +257,10 @@ func (s *Store) Update(
 		return
 	}
 
-	tz.Hinweis = h
-	tz.Zettel = z
+	tz.Named.Hinweis = h
+	tz.Named.Stored.Zettel = z
 
-	if tz.Stored.Sha, err = s.WriteZettelObjekte(z); err != nil {
+	if tz.Named.Stored.Sha, err = s.WriteZettelObjekte(z); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -275,9 +275,9 @@ func (s *Store) Update(
 		return
 	}
 
-	d := mutter.Zettel.Etiketten.Delta(tz.Zettel.Etiketten)
-	logz.Print(mutter.Zettel.Etiketten)
-	logz.Print(tz.Zettel.Etiketten)
+	d := mutter.Named.Stored.Zettel.Etiketten.Delta(tz.Named.Stored.Zettel.Etiketten)
+	logz.Print(mutter.Named.Stored.Zettel.Etiketten)
+	logz.Print(tz.Named.Stored.Zettel.Etiketten)
 
 	if err = s.indexEtiketten.add(d.Added); err != nil {
 		err = errors.Error(err)
@@ -336,9 +336,8 @@ func (s Store) AllInChain(h hinweis.Hinweis) (c collections.SliceTransacted, err
 
 	c = mst.ToSlice()
 
-	sort.Slice(
-		c,
-		func(i, j int) bool { return c[i].Schwanz.Less(c[j].Schwanz) },
+	c.Sort(
+		func(i, j int) bool { return c.Get(i).Schwanz.Less(c.Get(j).Schwanz) },
 	)
 
 	return
@@ -405,7 +404,7 @@ func (s *Store) ReadHinweisAt(
 	if chain.Len() == 0 {
 		err = ErrNotFound{Id: h}
 		return
-	} else if int64(chain.Len()-1) < h.Index {
+	} else if chain.Len()-1 < h.Index {
 		err = ErrChainIndexOutOfBounds{
 			HinweisWithIndex: h,
 			ChainLength:      chain.Len(),
@@ -414,7 +413,7 @@ func (s *Store) ReadHinweisAt(
 		return
 	}
 
-	tz = chain[h.Index]
+	tz = chain.Get(h.Index)
 
 	return
 }
@@ -485,7 +484,7 @@ func (s *Store) Reindex() (err error) {
 	logz.Printf("tail count: %d", len(tails))
 
 	for _, zn := range tails {
-		s.indexEtiketten.add(zn.Zettel.Etiketten)
+		s.indexEtiketten.add(zn.Named.Stored.Zettel.Etiketten)
 	}
 
 	return

@@ -10,7 +10,7 @@ type FilterEtikettSet struct {
 }
 
 func (f FilterEtikettSet) IncludeNamedZettel(z Named) bool {
-	set := z.Zettel.Etiketten.IntersectPrefixes(f.Set)
+	set := z.Stored.Zettel.Etiketten.IntersectPrefixes(f.Set)
 
 	if f.Or {
 		//at least one of the etiketten matches, resolving to a true or

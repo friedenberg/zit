@@ -64,7 +64,7 @@ func (c Clean) RunWithLockedStore(
 	filesToDelete := make([]string, 0, len(readResults.Zettelen))
 
 	for _, z := range readResults.Zettelen {
-		if !z.Internal.Zettel.Equals(z.External.Zettel) {
+		if !z.Internal.Named.Stored.Zettel.Equals(z.External.Named.Stored.Zettel) {
 			continue
 		}
 

@@ -11,19 +11,19 @@ import (
 )
 
 func ZettelToItem(z stored_zettel.Named) (a alfred.Item) {
-	a.Title = z.Zettel.Bezeichnung.String()
+	a.Title = z.Stored.Zettel.Bezeichnung.String()
 
 	if a.Title == "" {
 		a.Title = z.Hinweis.String()
 		a.Subtitle = fmt.Sprintf(
 			"%s",
-			strings.Join(z.Zettel.Etiketten.SortedString(), ", "),
+			strings.Join(z.Stored.Zettel.Etiketten.SortedString(), ", "),
 		)
 	} else {
 		a.Subtitle = fmt.Sprintf(
 			"%s: %s",
 			z.Hinweis.String(),
-			strings.Join(z.Zettel.Etiketten.SortedString(), ", "),
+			strings.Join(z.Stored.Zettel.Etiketten.SortedString(), ", "),
 		)
 	}
 
@@ -34,8 +34,8 @@ func ZettelToItem(z stored_zettel.Named) (a alfred.Item) {
 	mb.AddMatches(z.Hinweis.String())
 	mb.AddMatches(z.Hinweis.Kopf())
 	mb.AddMatches(z.Hinweis.Schwanz())
-	mb.AddMatches(z.Zettel.Bezeichnung.String())
-	mb.AddMatches(EtikettenStringsFromZettel(z.Zettel.Etiketten, true)...)
+	mb.AddMatches(z.Stored.Zettel.Bezeichnung.String())
+	mb.AddMatches(EtikettenStringsFromZettel(z.Stored.Zettel.Etiketten, true)...)
 
 	a.Match = mb.String()
 

@@ -56,8 +56,8 @@ func (c Checkout) RunWithHinweisen(s store_with_lock.Store, hins ...hinweis.Hinw
 			continue
 		}
 
-		if cz.Internal.Zettel.Equals(cz.External.Zettel) {
-			logz.Print(cz.Internal.Zettel)
+		if cz.Internal.Named.Stored.Zettel.Equals(cz.External.Named.Stored.Zettel) {
+			logz.Print(cz.Internal.Named.Stored.Zettel)
 			stdprinter.Outf("%s (already checked out)\n", cz.Internal.Named)
 			continue
 		}

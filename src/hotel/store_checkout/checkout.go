@@ -32,9 +32,9 @@ func (s *Store) Checkout(
 }
 
 func (s *Store) isInlineAkte(sz stored_zettel.Transacted) (isInline bool) {
-	isInline = sz.Zettel.TypOrDefault().String() == "md"
+	isInline = sz.Named.Stored.Zettel.TypOrDefault().String() == "md"
 
-	if typKonfig, ok := s.Konfig.Typen[sz.Zettel.Typ.String()]; ok {
+	if typKonfig, ok := s.Konfig.Typen[sz.Named.Stored.Zettel.Typ.String()]; ok {
 		isInline = typKonfig.InlineAkte
 	}
 
@@ -47,7 +47,7 @@ func (s *Store) CheckoutOne(
 ) (cz zettel_checked_out.CheckedOut, err error) {
 	var filename string
 
-	if filename, err = id.MakeDirIfNecessary(sz.Hinweis, s.cwd); err != nil {
+	if filename, err = id.MakeDirIfNecessary(sz.Named.Hinweis, s.cwd); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -65,16 +65,16 @@ func (s *Store) CheckoutOne(
 	}
 
 	c := zettel.FormatContextWrite{
-		Zettel:            sz.Stored.Zettel,
+		Zettel:            sz.Named.Stored.Zettel,
 		IncludeAkte:       inlineAkte,
 		AkteReaderFactory: s.storeZettel,
 	}
 
 	switch options.CheckoutMode {
 	case CheckoutModeAkteOnly:
-		p := originalFilename + "." + sz.Zettel.AkteExt()
+		p := originalFilename + "." + sz.Named.Stored.Zettel.AkteExt()
 
-		if err = s.writeAkte(sz.Stored.Zettel.Akte, p); err != nil {
+		if err = s.writeAkte(sz.Named.Stored.Zettel.Akte, p); err != nil {
 			err = errors.Error(err)
 			return
 		}
@@ -88,7 +88,7 @@ func (s *Store) CheckoutOne(
 		c.IncludeAkte = true
 
 		if !inlineAkte {
-			cz.External.AktePath = originalFilename + "." + sz.Zettel.AkteExt()
+			cz.External.AktePath = originalFilename + "." + sz.Named.Stored.Zettel.AkteExt()
 			c.ExternalAktePath = cz.External.AktePath
 			c.IncludeAkte = true
 		}

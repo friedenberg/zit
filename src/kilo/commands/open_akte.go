@@ -48,7 +48,7 @@ func (c OpenAkte) RunWithHinweisen(store store_with_lock.Store, hins ...hinweis.
 				return
 			}
 
-			shaAkte := tz.Zettel.Akte
+			shaAkte := tz.Named.Stored.Zettel.Akte
 
 			var f *os.File
 
@@ -59,7 +59,7 @@ func (c OpenAkte) RunWithHinweisen(store store_with_lock.Store, hins ...hinweis.
 				return
 			}
 
-			filename = filename + "." + tz.Zettel.Typ.String()
+			filename = filename + "." + tz.Named.Stored.Zettel.Typ.String()
 
 			if f, err = open_file_guard.Create(filename); err != nil {
 				err = errors.Error(err)

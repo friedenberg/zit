@@ -20,7 +20,7 @@ type CheckedOut struct {
 func (c *CheckedOut) DetermineState() {
 	if c.Internal.Schwanz.Time.IsZero() {
 		c.State = StateDoesNotExist
-	} else if c.Internal.Zettel.Equals(c.External.Zettel) {
+	} else if c.Internal.Named.Stored.Zettel.Equals(c.External.Named.Stored.Zettel) {
 		c.State = StateExistsAndSame
 	} else {
 		c.State = StateExistsAndDifferent
@@ -47,11 +47,11 @@ func (c CheckedOut) String() string {
 			sb.WriteString(fmt.Sprintf("[%s %s] (Hinweis not recognized)", c.External.Path, c.External.Stored.Sha))
 		}
 
-		if c.ZettelMatches.Len() == 1 && c.ZettelMatches.Any().Zettel.Equals(c.External.Zettel) {
+		if c.ZettelMatches.Len() == 1 && c.ZettelMatches.Any().Named.Stored.Zettel.Equals(c.External.Named.Stored.Zettel) {
 		} else if c.ZettelMatches.Len() > 1 {
 			c.ZettelMatches.Each(
 				func(tz stored_zettel.Transacted) (err error) {
-					sb.WriteString(fmt.Sprintf("\n\t%s (Zettel match)", tz.Hinweis))
+					sb.WriteString(fmt.Sprintf("\n\t%s (Zettel match)", tz.Named.Hinweis))
 					return
 				},
 			)

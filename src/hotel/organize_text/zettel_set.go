@@ -12,7 +12,7 @@ func makeZettelZetFromSetNamed(set stored_zettel.SetNamed) (zs zettelSet) {
 	zs = makeZettelSet()
 
 	for _, z := range set {
-		zs.Add(zettel{Hinweis: z.Hinweis.String(), Bezeichnung: z.Zettel.Bezeichnung.String()})
+		zs.Add(zettel{Hinweis: z.Hinweis.String(), Bezeichnung: z.Stored.Zettel.Bezeichnung.String()})
 	}
 
 	return

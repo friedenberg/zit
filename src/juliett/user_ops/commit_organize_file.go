@@ -79,7 +79,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 			return
 		}
 
-		z.Zettel.Etiketten.Add(e)
+		z.Stored.Zettel.Etiketten.Add(e)
 		toUpdate[z.Hinweis.String()] = z
 
 		stdprinter.Errf("Added etikett '%s' to zettel '%s'\n", e, z.Hinweis)
@@ -95,7 +95,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 			return
 		}
 
-		z.Zettel.Etiketten.RemovePrefixes(e)
+		z.Stored.Zettel.Etiketten.RemovePrefixes(e)
 		toUpdate[z.Hinweis.String()] = z
 
 		stdprinter.Errf("Removed etikett '%s' from zettel '%s'\n", e, z.Hinweis)
@@ -166,7 +166,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 			continue
 		}
 
-		if _, err = store.Zettels().Update(z.Hinweis, z.Zettel); err != nil {
+		if _, err = store.Zettels().Update(z.Hinweis, z.Stored.Zettel); err != nil {
 			stdprinter.Errf("failed to update zettel: %s", err)
 		}
 	}

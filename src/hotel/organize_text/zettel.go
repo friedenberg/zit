@@ -16,7 +16,7 @@ type zettel struct {
 func makeZettel(named stored_zettel.Named) zettel {
 	return zettel{
 		Hinweis:     named.Hinweis.String(),
-		Bezeichnung: named.Zettel.Description(),
+		Bezeichnung: named.Stored.Zettel.Description(),
 	}
 }
 

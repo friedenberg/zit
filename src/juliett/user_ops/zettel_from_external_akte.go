@@ -49,7 +49,7 @@ func (c ZettelFromExternalAkte) Run(args ...string) (results ZettelResults, err 
 			return
 		}
 
-		results.SetNamed[tz.Hinweis.String()] = tz.Named
+		results.SetNamed[tz.Named.Hinweis.String()] = tz.Named
 
 		if c.Delete {
 			if err = os.Remove(arg); err != nil {

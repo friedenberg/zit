@@ -32,7 +32,7 @@ func (s Store) readTransaktion(p string) (t transaktion.Transaktion, err error) 
 		return
 	}
 
-  t = tr.Transaktion
+	t = tr.Transaktion
 
 	return
 }
@@ -100,10 +100,10 @@ func (s Store) transactedZettelFromTransaktionObjekte(
 		return
 	}
 
-	tz.Hinweis = *h
+	tz.Named.Hinweis = *h
 
-	if tz.Stored, err = s.storedZettelFromSha(o.Sha); err != nil {
-		err = errors.Wrapped(err, "failed to find zettel objekte for hinweis: %s", tz.Hinweis)
+	if tz.Named.Stored, err = s.storedZettelFromSha(o.Sha); err != nil {
+		err = errors.Wrapped(err, "failed to find zettel objekte for hinweis: %s", tz.Named.Hinweis)
 		return
 	}
 

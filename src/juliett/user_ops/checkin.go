@@ -8,8 +8,8 @@ import (
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/golf/stored_zettel"
 	store_checkout "github.com/friedenberg/zit/src/hotel/store_checkout"
-	"github.com/friedenberg/zit/src/india/zettel_checked_out"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
+	"github.com/friedenberg/zit/src/india/zettel_checked_out"
 )
 
 type Checkin struct {
@@ -30,7 +30,7 @@ func (c Checkin) Run(
 	for _, z := range zettelen {
 		var tz stored_zettel.Transacted
 
-		if tz, err = store.Zettels().Update(z.Hinweis, z.Zettel); err != nil {
+		if tz, err = store.Zettels().Update(z.Hinweis, z.Named.Stored.Zettel); err != nil {
 			err = errors.Error(err)
 			return
 		}
@@ -40,7 +40,7 @@ func (c Checkin) Run(
 		logz.PrintDebug(tz)
 		stdprinter.Outf("%s (updated)\n", tz.Named)
 
-		results.Zettelen[tz.Hinweis] = zettel_checked_out.CheckedOut{
+		results.Zettelen[tz.Named.Hinweis] = zettel_checked_out.CheckedOut{
 			Internal: tz,
 			External: z,
 		}

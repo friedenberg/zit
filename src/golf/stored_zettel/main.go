@@ -13,12 +13,12 @@ type Stored struct {
 }
 
 type Named struct {
-	Stored
-	hinweis.Hinweis
+	Stored  Stored
+	Hinweis hinweis.Hinweis
 }
 
 type Transacted struct {
-	Named
+	Named                 Named
 	Kopf, Mutter, Schwanz ts.Time
 }
 
@@ -27,5 +27,3 @@ type External struct {
 	Path     string
 	AktePath string
 }
-
-

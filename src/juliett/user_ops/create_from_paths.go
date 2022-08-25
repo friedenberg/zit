@@ -66,14 +66,14 @@ func (c CreateFromPaths) Run(args ...string) (results CreateFromPathsResults, er
 				return
 			}
 
-			if tz, err = store.Zettels().CreateWithHinweis(z.Zettel, h); err != nil {
+			if tz, err = store.Zettels().CreateWithHinweis(z.Stored.Zettel, h); err != nil {
 				//TODO add file for error handling
 				c.handleStoreError(tz, "", err)
 				err = nil
 				return
 			}
 		} else {
-			if tz, err = store.Zettels().Create(z.Zettel); err != nil {
+			if tz, err = store.Zettels().Create(z.Stored.Zettel); err != nil {
 				//TODO add file for error handling
 				c.handleStoreError(tz, "", err)
 				err = nil

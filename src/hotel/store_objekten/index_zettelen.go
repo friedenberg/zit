@@ -74,7 +74,7 @@ func (i *indexZettelen) Flush() (err error) {
 		err = st.Each(
 			func(tz stored_zettel.Transacted) (err error) {
 				if err = enc.Encode(tz); err != nil {
-					err = errors.Wrapped(err, "failed to write zettel: [%s %s]", tz.Hinweis, tz.Stored.Sha)
+					err = errors.Wrapped(err, "failed to write zettel: [%s %s]", tz.Named.Hinweis, tz.Named.Stored.Sha)
 					return
 				}
 
@@ -139,40 +139,40 @@ func (i *indexZettelen) addNoRead(tz stored_zettel.Transacted) {
 		var set collections.SetTransacted
 		var ok bool
 
-		if set, ok = i.zettelen[tz.Stored.Sha]; !ok {
+		if set, ok = i.zettelen[tz.Named.Stored.Sha]; !ok {
 			set = collections.MakeSetUniqueTransacted()
 		}
 
 		set.Add(tz)
-		i.zettelen[tz.Stored.Sha] = set
+		i.zettelen[tz.Named.Stored.Sha] = set
 	}
 
 	{
 		var set collections.SetTransacted
 		var ok bool
 
-		if set, ok = i.hinweisen[tz.Hinweis]; !ok {
+		if set, ok = i.hinweisen[tz.Named.Hinweis]; !ok {
 			set = collections.MakeSetUniqueTransacted()
 		}
 
 		set.Add(tz)
-		i.hinweisen[tz.Hinweis] = set
+		i.hinweisen[tz.Named.Hinweis] = set
 	}
 
 	{
 		var set collections.SetTransacted
 		var ok bool
 
-		if set, ok = i.akten[tz.Zettel.Akte]; !ok {
+		if set, ok = i.akten[tz.Named.Stored.Zettel.Akte]; !ok {
 			set = collections.MakeSetUniqueTransacted()
 		}
 
 		set.Add(tz)
-		i.akten[tz.Zettel.Akte] = set
+		i.akten[tz.Named.Stored.Zettel.Akte] = set
 	}
 
 	{
-		key := strings.ToLower(tz.Zettel.Bezeichnung.String())
+		key := strings.ToLower(tz.Named.Stored.Zettel.Bezeichnung.String())
 		var set collections.SetTransacted
 		var ok bool
 
@@ -188,12 +188,12 @@ func (i *indexZettelen) addNoRead(tz stored_zettel.Transacted) {
 		var set collections.SetTransacted
 		var ok bool
 
-		if set, ok = i.typen[tz.Zettel.Typ]; !ok {
+		if set, ok = i.typen[tz.Named.Stored.Zettel.Typ]; !ok {
 			set = collections.MakeSetUniqueTransacted()
 		}
 
 		set.Add(tz)
-		i.typen[tz.Zettel.Typ] = set
+		i.typen[tz.Named.Stored.Zettel.Typ] = set
 	}
 
 	return

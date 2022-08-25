@@ -35,8 +35,8 @@ func MakeSetUniqueTransacted() SetTransacted {
 				sz.Kopf,
 				sz.Mutter,
 				sz.Schwanz,
-				sz.Hinweis,
-				sz.Stored.Sha,
+				sz.Named.Hinweis,
+				sz.Named.Stored.Sha,
 			)
 		},
 		innerMap: make(map[string]stored_zettel.Transacted),
@@ -46,7 +46,7 @@ func MakeSetUniqueTransacted() SetTransacted {
 func MakeSetHinweisTransacted() SetTransacted {
 	return SetTransacted{
 		keyFunc: func(sz stored_zettel.Transacted) string {
-			return makeKey(sz.Hinweis)
+			return makeKey(sz.Named.Hinweis)
 		},
 		innerMap: make(map[string]stored_zettel.Transacted),
 	}
@@ -108,10 +108,10 @@ func (a SetTransacted) Each(f func(stored_zettel.Transacted) error) (err error) 
 }
 
 func (m SetTransacted) ToSlice() (s SliceTransacted) {
-	s = make(SliceTransacted, 0, len(m.innerMap))
+	s = MakeSliceTransacted()
 
 	for _, sz := range m.innerMap {
-		s = append(s, sz)
+		s.Append(sz)
 	}
 
 	return

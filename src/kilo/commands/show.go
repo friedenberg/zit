@@ -70,13 +70,13 @@ func (c Show) showZettels(store store_with_lock.Store, zettels []stored_zettel.T
 	}
 
 	for _, named := range zettels {
-		if typKonfig, ok := store.Konfig.Typen[named.Zettel.Typ.String()]; ok {
+		if typKonfig, ok := store.Konfig.Typen[named.Named.Stored.Zettel.Typ.String()]; ok {
 			ctx.IncludeAkte = typKonfig.InlineAkte
 		} else {
-			ctx.IncludeAkte = named.Zettel.Typ.String() == "md"
+			ctx.IncludeAkte = named.Named.Stored.Zettel.Typ.String() == "md"
 		}
 
-		ctx.Zettel = named.Zettel
+		ctx.Zettel = named.Named.Stored.Zettel
 
 		if _, err = f.WriteTo(ctx); err != nil {
 			err = errors.Error(err)
@@ -91,7 +91,7 @@ func (c Show) showAkten(store store_with_lock.Store, zettels []stored_zettel.Tra
 	var ar io.ReadCloser
 
 	for _, named := range zettels {
-		if ar, err = store.Zettels().AkteReader(named.Zettel.Akte); err != nil {
+		if ar, err = store.Zettels().AkteReader(named.Named.Stored.Zettel.Akte); err != nil {
 			err = errors.Error(err)
 			return
 		}

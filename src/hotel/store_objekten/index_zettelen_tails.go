@@ -173,7 +173,7 @@ func (i *indexZettelenTails) ZettelenSchwanzen(
 				return
 			}
 
-			tzs[tz.Hinweis] = tz
+			tzs[tz.Named.Hinweis] = tz
 
 			return
 		},
@@ -192,7 +192,7 @@ func (i *indexZettelenTails) shouldIncludeTransacted(tz stored_zettel.Transacted
 		return true
 	}
 
-	prefixes := tz.Zettel.Etiketten.Expanded(etikett.ExpanderRight{})
+	prefixes := tz.Named.Stored.Zettel.Etiketten.Expanded(etikett.ExpanderRight{})
 
 	for tn, tv := range i.umwelt.Konfig.Tags {
 		if !tv.Hide {

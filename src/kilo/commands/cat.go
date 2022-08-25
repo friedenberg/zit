@@ -90,7 +90,7 @@ func (c Cat) zettelen(store store_with_lock.Store) (err error) {
 
 		// not a bottleneck
 		for _, z := range all {
-			b, err := json.Marshal(z.Stored)
+			b, err := json.Marshal(z.Named.Stored)
 
 			if err != nil {
 				logz.Print(err)
@@ -107,7 +107,7 @@ func (c Cat) zettelen(store store_with_lock.Store) (err error) {
 
 		// not a bottleneck
 		for _, z := range all {
-			c.Zettel = z.Zettel
+			c.Zettel = z.Named.Stored.Zettel
 
 			if _, err = f.WriteTo(c); err != nil {
 				if errors.Is(err, syscall.EPIPE) {
