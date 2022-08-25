@@ -17,9 +17,15 @@ type CheckedOut struct {
 
 func (c *CheckedOut) DetermineState() {
 	if c.Internal.Schwanz.Time.IsZero() {
-		c.State = StateDoesNotExist
+		if c.External.ExternalPathAndSha() == "" {
+			c.State = StateEmpty
+		} else {
+			c.State = StateUntracked
+		}
 	} else if c.Internal.Named.Stored.Zettel.Equals(c.External.Named.Stored.Zettel) {
 		c.State = StateExistsAndSame
+	} else if c.External.Named.Stored.Sha.IsNull() {
+		c.State = StateEmpty
 	} else {
 		c.State = StateExistsAndDifferent
 	}
@@ -31,21 +37,27 @@ func (c CheckedOut) String() string {
 
 	switch c.State {
 	default:
-		sb.WriteString(fmt.Sprintf("%s (unknown)", c.Internal.Named))
+		sb.WriteString(fmt.Sprintf("%v (unknown)", c.External))
 
 	case StateExistsAndSame:
-		sb.WriteString(fmt.Sprintf("%s (same)", c.Internal.Named))
+		sb.WriteString(fmt.Sprintf("%s (same)", c.External))
 
 	case StateExistsAndDifferent:
-		sb.WriteString(fmt.Sprintf("%s (different)", c.External.Named))
-		c.Matches.appendToStringBuilder(sb, c.External)
+		if c.External.Path != "" {
+			sb.WriteString(fmt.Sprintf("%s (different)", c.External))
+		} else if c.External.AktePath != "" {
+			sb.WriteString(fmt.Sprintf("%s (akte different)", c.External))
+		} else {
+			sb.WriteString(fmt.Sprintf("Error! No Path or AktePath: %v", c.External))
+		}
 
-	case StateAkte:
-		sb.WriteString(fmt.Sprintf("[%s %s] (Hinweis not recognized)", c.External.AktePath, c.External.Stored.Zettel.Akte))
-		c.Matches.appendToStringBuilder(sb, c.External)
+		fallthrough
 
-	case StateDoesNotExist:
-		sb.WriteString(fmt.Sprintf("[%s %s] (Hinweis not recognized)", c.External.Path, c.External.Stored.Sha))
+	case StateUntracked:
+		if c.State == StateUntracked {
+			sb.WriteString(fmt.Sprintf("%s (untracked)", c.External))
+		}
+
 		c.Matches.appendToStringBuilder(sb, c.External)
 	}
 

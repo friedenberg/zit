@@ -88,7 +88,7 @@ function can_new_zettel { # @test
 		echo "---"
 		echo "# wow"
 		echo "- ok"
-    echo "! md"
+		echo "! md"
 		echo "---"
 	} >"$expected"
 
@@ -442,6 +442,11 @@ function checkouts_dont_overwrite { # @test
 	assert_output --partial '[one/uno '
 
 	run zit checkout one/uno
+	assert_output --partial '[one/uno '
+	assert_output --partial '(checked out)'
+
+	run cat one/uno.md
+	assert_output "$(cat "$expected")"
 
 	{
 		echo ---
@@ -457,7 +462,8 @@ function checkouts_dont_overwrite { # @test
 	cat "$expected" >"one/uno.md"
 
 	run zit checkout one/uno
-	assert_output --partial '[one/uno] (external has changes)'
+	assert_output --partial '[one/uno '
+	assert_output --partial '(external has changes)'
 
 	run cat one/uno.md
 	assert_output "$(cat "$expected")"

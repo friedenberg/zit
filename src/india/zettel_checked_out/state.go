@@ -4,8 +4,8 @@ type State int
 
 const (
 	StateUnknown = State(iota)
+  StateEmpty
 	StateExistsAndSame
 	StateExistsAndDifferent
-	StateDoesNotExist
-  StateAkte
+	StateUntracked
 )

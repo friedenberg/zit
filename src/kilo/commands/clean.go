@@ -73,7 +73,10 @@ func (c Clean) RunWithLockedStore(
 		}
 
 		toDelete = append(toDelete, z.External)
-		filesToDelete = append(filesToDelete, z.External.Path)
+
+		if z.External.Path != "" {
+			filesToDelete = append(filesToDelete, z.External.Path)
+		}
 
 		if z.External.AktePath != "" {
 			filesToDelete = append(filesToDelete, z.External.AktePath)

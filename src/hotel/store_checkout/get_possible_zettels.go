@@ -60,6 +60,10 @@ func (s Store) GetPossibleZettels() (result CwdFiles, err error) {
 		}
 
 		for _, a := range dirs2 {
+			if strings.HasPrefix(a, ".") {
+				continue
+			}
+
 			if fi, err = os.Stat(path.Join(s.path, d, a)); err != nil {
 				err = errors.Error(err)
 				return
@@ -69,13 +73,14 @@ func (s Store) GetPossibleZettels() (result CwdFiles, err error) {
 				continue
 			}
 
+			p := path.Join(d, a)
 			//TODO-decision: should there be hinweis validation?
 
 			//TODO-refactor: akten vs zettel file extensions
 			if path.Ext(a) == ".md" {
-				result.Zettelen = append(result.Zettelen, path.Join(d, a))
+				result.Zettelen = append(result.Zettelen, p)
 			} else {
-				result.Akten = append(result.Akten, path.Join(d, a))
+				result.Akten = append(result.Akten, p)
 			}
 		}
 	}

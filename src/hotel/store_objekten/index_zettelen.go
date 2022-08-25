@@ -160,6 +160,7 @@ func (i *indexZettelen) addNoRead(tz stored_zettel.Transacted) {
 	}
 
 	akteSha := tz.Named.Stored.Zettel.Akte
+
 	if !akteSha.IsNull() {
 		var set collections.SetTransacted
 		var ok bool

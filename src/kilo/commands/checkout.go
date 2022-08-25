@@ -69,10 +69,16 @@ func (c Checkout) RunWithHinweisen(s store_with_lock.Store, hins ...hinweis.Hinw
 			continue
 		}
 
-		if c.Force || cz.External.Stored.Sha.IsNull() {
+		if c.Force || cz.State == zettel_checked_out.StateEmpty {
 			toCheckOut = append(toCheckOut, cz.Internal.Named.Hinweis)
+		} else if cz.State == zettel_checked_out.StateExistsAndSame {
+			stdprinter.Errf("%s (already checked out)\n", cz.Internal.Named)
+			continue
+		} else if cz.State == zettel_checked_out.StateExistsAndDifferent {
+			stdprinter.Errf("%s (external has changes)\n", cz.Internal.Named)
+			continue
 		} else {
-			stdprinter.Errf("[%s] (external has changes)\n", cz.Internal.Named.Hinweis)
+			stdprinter.Errf("%s (unknown state)\n", cz.Internal.Named)
 			continue
 		}
 	}

@@ -18,10 +18,12 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/golf/stored_zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
+	"github.com/friedenberg/zit/src/hotel/collections"
 )
 
 type StoreZettel interface {
 	Read(id id.Id) (z stored_zettel.Transacted, err error)
+	ReadAkteSha(sha.Sha) (collections.SetTransacted, error)
 	WriteZettelObjekte(z zettel.Zettel) (sh sha.Sha, err error)
 	zettel.AkteWriterFactory
 	zettel.AkteReaderFactory
@@ -171,7 +173,7 @@ func (s *Store) syncOne(p string) (err error) {
 		if !hasCache || fi.ModTime().After(cached.Time) {
 			var ez stored_zettel.External
 
-			if ez, err = s.makeExternalZettelFromFile(p); err != nil {
+			if ez, err = s.MakeExternalZettelFromZettel(p); err != nil {
 				err = errors.Error(err)
 				return
 			}
@@ -193,7 +195,7 @@ func (s *Store) syncOne(p string) (err error) {
 	return
 }
 
-func (s Store) makeExternalZettelFromFile(p string) (ez stored_zettel.External, err error) {
+func (s Store) MakeExternalZettelFromZettel(p string) (ez stored_zettel.External, err error) {
 	if p, err = filepath.Abs(p); err != nil {
 		err = errors.Error(err)
 		return
@@ -264,7 +266,7 @@ func (s Store) readZettelFromFile(ez *stored_zettel.External) (err error) {
 }
 
 func (s *Store) Read(p string) (ez stored_zettel.External, err error) {
-	if ez, err = s.makeExternalZettelFromFile(p); err != nil {
+	if ez, err = s.MakeExternalZettelFromZettel(p); err != nil {
 		err = errors.Wrapped(err, "%s", p)
 		return
 	}

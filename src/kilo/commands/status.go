@@ -63,7 +63,11 @@ func (c Status) RunWithLockedStore(s store_with_lock.Store, args ...string) (err
 	)
 
 	for _, z := range readResults {
-		stdprinter.Out(z)
+		if z.State == zettel_checked_out.StateEmpty {
+			stdprinter.Outf("%#v\n", z.External)
+		} else {
+			stdprinter.Out(z)
+		}
 	}
 
 	return
