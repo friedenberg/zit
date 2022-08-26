@@ -24,7 +24,7 @@ func (s stringId) String() string {
 
 type ErrChainIndexOutOfBounds struct {
 	hinweis.HinweisWithIndex
-	ChainLength    int
+	ChainLength int
 }
 
 func (e ErrChainIndexOutOfBounds) Is(target error) bool {

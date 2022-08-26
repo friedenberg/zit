@@ -6,8 +6,8 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/golf/stored_zettel"
 	store_checkout "github.com/friedenberg/zit/src/hotel/store_checkout"
-	"github.com/friedenberg/zit/src/india/zettel_checked_out"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
+	"github.com/friedenberg/zit/src/india/zettel_checked_out"
 )
 
 type WriteNewZettels struct {
@@ -41,7 +41,7 @@ func (c WriteNewZettels) RunOne(
 ) (result zettel_checked_out.CheckedOut, err error) {
 	var tz stored_zettel.Transacted
 
-	if tz, err = store.Zettels().Create(z); err != nil {
+	if tz, err = store.StoreObjekten().Create(z); err != nil {
 		err = errors.Error(err)
 		return
 	}

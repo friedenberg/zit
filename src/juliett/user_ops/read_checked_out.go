@@ -104,7 +104,7 @@ func (op ReadCheckedOut) runOne(
 		}
 	}
 
-	if zettel.Internal, err = store.Zettels().Read(zettel.External.Hinweis); err != nil {
+	if zettel.Internal, err = store.StoreObjekten().Read(zettel.External.Hinweis); err != nil {
 		if errors.Is(err, store_objekten.ErrNotFound{}) {
 			err = nil
 		} else {
@@ -117,13 +117,13 @@ func (op ReadCheckedOut) runOne(
 
 	if zettel.State > zettel_checked_out.StateExistsAndSame {
 		exSha := zettel.External.Stored.Sha
-		zettel.Matches.Zettelen, _ = store.Zettels().ReadZettelSha(exSha)
+		zettel.Matches.Zettelen, _ = store.StoreObjekten().ReadZettelSha(exSha)
 
 		exAkteSha := zettel.External.Stored.Zettel.Akte
-		zettel.Matches.Akten, _ = store.Zettels().ReadAkteSha(exAkteSha)
+		zettel.Matches.Akten, _ = store.StoreObjekten().ReadAkteSha(exAkteSha)
 
 		bez := zettel.External.Stored.Zettel.Bezeichnung.String()
-		zettel.Matches.Bezeichnungen, _ = store.Zettels().ReadBezeichnung(bez)
+		zettel.Matches.Bezeichnungen, _ = store.StoreObjekten().ReadBezeichnung(bez)
 	}
 
 	return

@@ -44,7 +44,7 @@ func (c ZettelFromExternalAkte) Run(args ...string) (results ZettelResults, err 
 
 		var tz stored_zettel.Transacted
 
-		if tz, err = store.Zettels().Create(z); err != nil {
+		if tz, err = store.StoreObjekten().Create(z); err != nil {
 			err = errors.Error(err)
 			return
 		}
@@ -72,7 +72,7 @@ func (c ZettelFromExternalAkte) zettelForAkte(store store_with_lock.Store, akteP
 
 	var akteWriter age_io.Writer
 
-	if akteWriter, err = store.Zettels().AkteWriter(); err != nil {
+	if akteWriter, err = store.StoreObjekten().AkteWriter(); err != nil {
 		err = errors.Error(err)
 		return
 	}

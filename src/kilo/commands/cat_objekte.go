@@ -61,7 +61,7 @@ func (c CatObjekte) akten(store store_with_lock.Store, ids ...id.Id) (err error)
 		case hinweis.Hinweis:
 			var tz stored_zettel.Transacted
 
-			if tz, err = store.Zettels().Read(i); err != nil {
+			if tz, err = store.StoreObjekten().Read(i); err != nil {
 				err = errors.Error(err)
 				return
 			}
@@ -76,7 +76,7 @@ func (c CatObjekte) akten(store store_with_lock.Store, ids ...id.Id) (err error)
 		func(sb sha.Sha) {
 			var r io.ReadCloser
 
-			if r, err = store.Zettels().AkteReader(sb); err != nil {
+			if r, err = store.StoreObjekten().AkteReader(sb); err != nil {
 				err = errors.Error(err)
 				return
 			}
@@ -97,7 +97,7 @@ func (c CatObjekte) zettelen(store store_with_lock.Store, ids ...id.Id) (err err
 	for _, id := range ids {
 		var tz stored_zettel.Transacted
 
-		if tz, err = store.Zettels().Read(id); err != nil {
+		if tz, err = store.StoreObjekten().Read(id); err != nil {
 			err = errors.Error(err)
 			return
 		}

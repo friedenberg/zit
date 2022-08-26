@@ -15,11 +15,11 @@ import (
 
 type Store struct {
 	*umwelt.Umwelt
-	lock           *file_lock.Lock
-	zettels        *store_objekten.Store
-	akten          akten.Akten
-	age            age.Age
-	store_checkout *store_checkout.Store
+	lock                  *file_lock.Lock
+	storeObjekten         *store_objekten.Store
+	akten                 akten.Akten
+	age                   age.Age
+	storeWorkingDirectory *store_checkout.Store
 }
 
 func New(u *umwelt.Umwelt) (s Store, err error) {
@@ -36,9 +36,9 @@ func New(u *umwelt.Umwelt) (s Store, err error) {
 		return
 	}
 
-	s.zettels = &store_objekten.Store{}
+	s.storeObjekten = &store_objekten.Store{}
 
-	if err = s.zettels.Initialize(u); err != nil {
+	if err = s.storeObjekten.Initialize(u); err != nil {
 		err = errors.Wrapped(err, "failed to initialize zettel meta store")
 		return
 	}
@@ -54,7 +54,7 @@ func New(u *umwelt.Umwelt) (s Store, err error) {
 	}
 
 	logz.Print("initing checkout store")
-	if s.store_checkout, err = store_checkout.New(csk, u.Cwd(), s.zettels); err != nil {
+	if s.storeWorkingDirectory, err = store_checkout.New(csk, u.Cwd(), s.storeObjekten); err != nil {
 		logz.Print(err)
 		err = errors.Error(err)
 		return
@@ -69,12 +69,12 @@ func (s Store) Age() age.Age {
 	return s.age
 }
 
-func (s Store) Zettels() *store_objekten.Store {
-	return s.zettels
+func (s Store) StoreObjekten() *store_objekten.Store {
+	return s.storeObjekten
 }
 
 func (s Store) Hinweisen() hinweisen.Hinweisen {
-	return s.zettels.Hinweisen()
+	return s.storeObjekten.Hinweisen()
 }
 
 func (s Store) Akten() akten.Akten {
@@ -82,11 +82,11 @@ func (s Store) Akten() akten.Akten {
 }
 
 func (s Store) CheckoutStore() *store_checkout.Store {
-	return s.store_checkout
+	return s.storeWorkingDirectory
 }
 
 func (s Store) Flush() (err error) {
-	if err = s.Zettels().Flush(); err != nil {
+	if err = s.StoreObjekten().Flush(); err != nil {
 		stdprinter.Err(err)
 		err = errors.Error(err)
 		return

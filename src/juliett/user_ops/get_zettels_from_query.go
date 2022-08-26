@@ -24,7 +24,7 @@ func (c GetZettelsFromQuery) Run(query stored_zettel.NamedFilter) (result Zettel
 
 	var set map[hinweis.Hinweis]stored_zettel.Transacted
 
-	if set, err = store.Zettels().ZettelenSchwanzen(query); err != nil {
+	if set, err = store.StoreObjekten().ZettelenSchwanzen(query); err != nil {
 		err = errors.Error(err)
 		return
 	}

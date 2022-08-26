@@ -32,7 +32,7 @@ func (c withOneZettelSha) RunWithLockedStore(store store_with_lock.Store, args .
 			return
 		}
 
-		if zettels[i], err = store.Zettels().Read(sha); err != nil {
+		if zettels[i], err = store.StoreObjekten().Read(sha); err != nil {
 			err = errors.Error(err)
 			return
 		}

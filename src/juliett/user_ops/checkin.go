@@ -30,7 +30,7 @@ func (c Checkin) Run(
 	for _, z := range zettelen {
 		var tz stored_zettel.Transacted
 
-		if tz, err = store.Zettels().Update(z.Hinweis, z.Named.Stored.Zettel); err != nil {
+		if tz, err = store.StoreObjekten().Update(z.Hinweis, z.Named.Stored.Zettel); err != nil {
 			err = errors.Error(err)
 			return
 		}

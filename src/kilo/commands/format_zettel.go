@@ -70,7 +70,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	ctx := zettel.FormatContextWrite{
 		Zettel:            external.Named.Stored.Zettel,
 		IncludeAkte:       true,
-		AkteReaderFactory: store.Zettels(),
+		AkteReaderFactory: store.StoreObjekten(),
 		FormatScript:      formatter,
 		Out:               os.Stdout,
 	}

@@ -30,7 +30,7 @@ func (c Reindex) RunWithLockedStore(store store_with_lock.Store, args ...string)
 
 	logz.Print()
 
-	if err = store.Zettels().Reindex(); err != nil {
+	if err = store.StoreObjekten().Reindex(); err != nil {
 		err = errors.Error(err)
 		return
 	}

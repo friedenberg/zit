@@ -66,14 +66,14 @@ func (c CreateFromPaths) Run(args ...string) (results CreateFromPathsResults, er
 				return
 			}
 
-			if tz, err = store.Zettels().CreateWithHinweis(z.Stored.Zettel, h); err != nil {
+			if tz, err = store.StoreObjekten().CreateWithHinweis(z.Stored.Zettel, h); err != nil {
 				//TODO add file for error handling
 				c.handleStoreError(tz, "", err)
 				err = nil
 				return
 			}
 		} else {
-			if tz, err = store.Zettels().Create(z.Stored.Zettel); err != nil {
+			if tz, err = store.StoreObjekten().Create(z.Stored.Zettel); err != nil {
 				//TODO add file for error handling
 				c.handleStoreError(tz, "", err)
 				err = nil
@@ -111,7 +111,7 @@ func (c CreateFromPaths) zettelsFromPath(store store_with_lock.Store, p string) 
 
 	ctx := zettel.FormatContextRead{
 		In:                r,
-		AkteWriterFactory: store.Zettels(),
+		AkteWriterFactory: store.StoreObjekten(),
 	}
 
 	if _, err = c.Format.ReadFrom(&ctx); err != nil {

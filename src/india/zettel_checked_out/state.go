@@ -4,7 +4,7 @@ type State int
 
 const (
 	StateUnknown = State(iota)
-  StateEmpty
+	StateEmpty
 	StateExistsAndSame
 	StateExistsAndDifferent
 	StateUntracked

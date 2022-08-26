@@ -40,7 +40,7 @@ func (c Revert) RunWithLockedStore(store store_with_lock.Store, args ...string) 
 				return
 			}
 
-			if _, err = store.Zettels().Revert(hins[i]); err != nil {
+			if _, err = store.StoreObjekten().Revert(hins[i]); err != nil {
 				err = errors.Error(err)
 				return
 			}

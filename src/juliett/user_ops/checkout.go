@@ -6,8 +6,8 @@ import (
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/golf/stored_zettel"
 	store_checkout "github.com/friedenberg/zit/src/hotel/store_checkout"
-	"github.com/friedenberg/zit/src/india/zettel_checked_out"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
+	"github.com/friedenberg/zit/src/india/zettel_checked_out"
 )
 
 type Checkout struct {
@@ -30,7 +30,7 @@ func (c Checkout) RunManyHinweisen(
 	for i, _ := range zs {
 		h := hins[i]
 
-		if zs[i], err = s.Zettels().Read(h); err != nil {
+		if zs[i], err = s.StoreObjekten().Read(h); err != nil {
 			err = errors.Error(err)
 			return
 		}

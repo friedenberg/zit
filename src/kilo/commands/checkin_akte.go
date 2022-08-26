@@ -79,7 +79,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	// iterate through pairs and read current zettel
 	for i, p := range pairs {
-		if zettels[i], err = store.Zettels().Read(p.Hinweis); err != nil {
+		if zettels[i], err = store.StoreObjekten().Read(p.Hinweis); err != nil {
 			err = errors.Error(err)
 			return
 		}
@@ -89,7 +89,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	for i, p := range pairs {
 		var ow age_io.Writer
 
-		if ow, err = store.Zettels().AkteWriter(); err != nil {
+		if ow, err = store.StoreObjekten().AkteWriter(); err != nil {
 			err = errors.Error(err)
 			return
 		}
@@ -113,7 +113,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			return
 		}
 
-		if zettels[i], err = store.Zettels().Read(p.Hinweis); err != nil {
+		if zettels[i], err = store.StoreObjekten().Read(p.Hinweis); err != nil {
 			err = errors.Error(err)
 			return
 		}
@@ -126,7 +126,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	for _, z := range zettels {
-		if z, err = store.Zettels().Update(z.Named.Hinweis, z.Named.Stored.Zettel); err != nil {
+		if z, err = store.StoreObjekten().Update(z.Named.Hinweis, z.Named.Stored.Zettel); err != nil {
 			err = errors.Error(err)
 			return
 		}

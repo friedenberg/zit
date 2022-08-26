@@ -60,7 +60,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 		if z, ok = toUpdate[h.String()]; !ok {
 			var tz stored_zettel.Transacted
 
-			if tz, err = store.Zettels().Read(h); err != nil {
+			if tz, err = store.StoreObjekten().Read(h); err != nil {
 				err = errors.Error(err)
 				return
 			}
@@ -152,7 +152,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 
 		var tz stored_zettel.Transacted
 
-		if tz, err = store.Zettels().Create(z); err != nil {
+		if tz, err = store.StoreObjekten().Create(z); err != nil {
 			err = errors.Errorf("failed to create zettel: %s", err)
 			return
 		}
@@ -166,7 +166,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 			continue
 		}
 
-		if _, err = store.Zettels().Update(z.Hinweis, z.Stored.Zettel); err != nil {
+		if _, err = store.StoreObjekten().Update(z.Hinweis, z.Stored.Zettel); err != nil {
 			stdprinter.Errf("failed to update zettel: %s", err)
 		}
 	}

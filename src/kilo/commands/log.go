@@ -47,7 +47,7 @@ func (c Log) RunWithHinweisen(os store_with_lock.Store, hs ...hinweis.Hinweis) (
 	var chain collections.SliceTransacted
 	logz.Print()
 
-	if chain, err = os.Zettels().AllInChain(h); err != nil {
+	if chain, err = os.StoreObjekten().AllInChain(h); err != nil {
 		err = errors.Error(err)
 		return
 	}

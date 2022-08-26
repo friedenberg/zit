@@ -41,14 +41,14 @@ func (c AdoptAbandoned) RunWithLockedStore(store store_with_lock.Store, args ...
 
 		var stored stored_zettel.Transacted
 
-		if stored, err = store.Zettels().Read(sha); err != nil {
+		if stored, err = store.StoreObjekten().Read(sha); err != nil {
 			err = errors.Error(err)
 			return
 		}
 
 		var tz stored_zettel.Transacted
 
-		if tz, err = store.Zettels().Create(stored.Named.Stored.Zettel); err != nil {
+		if tz, err = store.StoreObjekten().Create(stored.Named.Stored.Zettel); err != nil {
 			err = errors.Error(err)
 			return
 		}

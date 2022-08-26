@@ -39,7 +39,7 @@ func (c Show) RunWithId(store store_with_lock.Store, ids ...id.Id) (err error) {
 	for i, a := range ids {
 		var tz stored_zettel.Transacted
 
-		if tz, err = store.Zettels().Read(a); err != nil {
+		if tz, err = store.StoreObjekten().Read(a); err != nil {
 			err = errors.Error(err)
 			return
 		}
@@ -66,7 +66,7 @@ func (c Show) showZettels(store store_with_lock.Store, zettels []stored_zettel.T
 
 	ctx := zettel.FormatContextWrite{
 		Out:               store.Out,
-		AkteReaderFactory: store.Zettels(),
+		AkteReaderFactory: store.StoreObjekten(),
 	}
 
 	for _, named := range zettels {
@@ -91,7 +91,7 @@ func (c Show) showAkten(store store_with_lock.Store, zettels []stored_zettel.Tra
 	var ar io.ReadCloser
 
 	for _, named := range zettels {
-		if ar, err = store.Zettels().AkteReader(named.Named.Stored.Zettel.Akte); err != nil {
+		if ar, err = store.StoreObjekten().AkteReader(named.Named.Stored.Zettel.Akte); err != nil {
 			err = errors.Error(err)
 			return
 		}

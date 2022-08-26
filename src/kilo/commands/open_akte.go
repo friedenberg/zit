@@ -43,7 +43,7 @@ func (c OpenAkte) RunWithHinweisen(store store_with_lock.Store, hins ...hinweis.
 		func(h hinweis.Hinweis) {
 			var tz stored_zettel.Transacted
 
-			if tz, err = store.Zettels().Read(h); err != nil {
+			if tz, err = store.StoreObjekten().Read(h); err != nil {
 				err = errors.Error(err)
 				return
 			}
@@ -72,7 +72,7 @@ func (c OpenAkte) RunWithHinweisen(store store_with_lock.Store, hins ...hinweis.
 
 			var r io.ReadCloser
 
-			if r, err = store.Zettels().AkteReader(shaAkte); err != nil {
+			if r, err = store.StoreObjekten().AkteReader(shaAkte); err != nil {
 				err = errors.Error(err)
 				return
 			}

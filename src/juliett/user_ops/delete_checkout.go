@@ -23,7 +23,7 @@ func (c DeleteCheckout) Run(
 	for _, external := range zettels {
 		var internal stored_zettel.Transacted
 
-		if internal, err = store.Zettels().Read(external.Hinweis); err != nil {
+		if internal, err = store.StoreObjekten().Read(external.Hinweis); err != nil {
 			err = errors.Error(err)
 			return
 		}
