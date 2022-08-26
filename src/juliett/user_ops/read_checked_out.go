@@ -5,7 +5,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/golf/hinweisen"
-	"github.com/friedenberg/zit/src/hotel/store_checkout"
+	store_working_directory "github.com/friedenberg/zit/src/hotel/store_working_directory"
 	"github.com/friedenberg/zit/src/hotel/store_objekten"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
 	"github.com/friedenberg/zit/src/india/zettel_checked_out"
@@ -13,7 +13,7 @@ import (
 
 type ReadCheckedOut struct {
 	*umwelt.Umwelt
-	store_checkout.OptionsReadExternal
+	store_working_directory.OptionsReadExternal
 	AllowMissing bool
 }
 
@@ -51,7 +51,7 @@ func (op ReadCheckedOut) RunOneString(
 
 func (op ReadCheckedOut) RunMany(
 	s store_with_lock.Store,
-	possible store_checkout.CwdFiles,
+	possible store_working_directory.CwdFiles,
 ) (results []zettel_checked_out.CheckedOut, err error) {
 	results = make([]zettel_checked_out.CheckedOut, 0, possible.Len())
 

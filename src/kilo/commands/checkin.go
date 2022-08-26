@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/golf/stored_zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
-	store_checkout "github.com/friedenberg/zit/src/hotel/store_checkout"
+	store_working_directory "github.com/friedenberg/zit/src/hotel/store_working_directory"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
 	"github.com/friedenberg/zit/src/india/zettel_checked_out"
 	"github.com/friedenberg/zit/src/juliett/user_ops"
@@ -38,7 +38,7 @@ func (c Checkin) RunWithLockedStore(
 	s store_with_lock.Store,
 	args ...string,
 ) (err error) {
-	var pz store_checkout.CwdFiles
+	var pz store_working_directory.CwdFiles
 
 	if c.All {
 		if len(args) > 0 {
@@ -58,7 +58,7 @@ func (c Checkin) RunWithLockedStore(
 
 	readOp := user_ops.ReadCheckedOut{
 		Umwelt: s.Umwelt,
-		OptionsReadExternal: store_checkout.OptionsReadExternal{
+		OptionsReadExternal: store_working_directory.OptionsReadExternal{
 			Format: zettel_formats.Text{},
 		},
 	}

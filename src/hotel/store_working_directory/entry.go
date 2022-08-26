@@ -1,4 +1,4 @@
-package store_checkout
+package store_working_directory
 
 import (
 	"time"

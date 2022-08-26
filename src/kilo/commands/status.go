@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
-	store_checkout "github.com/friedenberg/zit/src/hotel/store_checkout"
+	store_working_directory "github.com/friedenberg/zit/src/hotel/store_working_directory"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
 	"github.com/friedenberg/zit/src/india/zettel_checked_out"
 	"github.com/friedenberg/zit/src/juliett/user_ops"
@@ -32,14 +32,14 @@ func (c Status) RunWithLockedStore(s store_with_lock.Store, args ...string) (err
 		stdprinter.Errf("args provided will be ignored")
 	}
 
-	var possible store_checkout.CwdFiles
+	var possible store_working_directory.CwdFiles
 
 	if possible, err = user_ops.NewGetPossibleZettels(s.Umwelt).Run(s); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	options := store_checkout.OptionsReadExternal{
+	options := store_working_directory.OptionsReadExternal{
 		Format: zettel_formats.Text{},
 	}
 

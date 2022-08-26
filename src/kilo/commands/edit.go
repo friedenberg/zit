@@ -9,14 +9,14 @@ import (
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/golf/stored_zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
-	store_checkout "github.com/friedenberg/zit/src/hotel/store_checkout"
+	store_working_directory "github.com/friedenberg/zit/src/hotel/store_working_directory"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
 	"github.com/friedenberg/zit/src/india/zettel_checked_out"
 	"github.com/friedenberg/zit/src/juliett/user_ops"
 )
 
 type Edit struct {
-	store_checkout.CheckoutMode
+	store_working_directory.CheckoutMode
 }
 
 func init() {
@@ -33,7 +33,7 @@ func init() {
 }
 
 func (c Edit) Run(u *umwelt.Umwelt, args ...string) (err error) {
-	checkoutOptions := store_checkout.CheckoutOptions{
+	checkoutOptions := store_working_directory.CheckoutOptions{
 		CheckoutMode: c.CheckoutMode,
 		Format:       zettel_formats.Text{},
 	}
@@ -91,7 +91,7 @@ func (c Edit) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	readOp := user_ops.ReadCheckedOut{
 		Umwelt: s.Umwelt,
-		OptionsReadExternal: store_checkout.OptionsReadExternal{
+		OptionsReadExternal: store_working_directory.OptionsReadExternal{
 			Format: zettel_formats.Text{},
 		},
 	}
@@ -101,7 +101,7 @@ func (c Edit) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	var possible store_checkout.CwdFiles
+	var possible store_working_directory.CwdFiles
 
 	for _, f := range checkoutResults.FilesZettelen {
 		possible.Zettelen = append(possible.Zettelen, f)
@@ -120,7 +120,7 @@ func (c Edit) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	checkinOp := user_ops.Checkin{
 		Umwelt: s.Umwelt,
-		OptionsReadExternal: store_checkout.OptionsReadExternal{
+		OptionsReadExternal: store_working_directory.OptionsReadExternal{
 			Format: zettel_formats.Text{},
 		},
 	}

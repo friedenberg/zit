@@ -5,14 +5,14 @@ import (
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/golf/stored_zettel"
-	store_checkout "github.com/friedenberg/zit/src/hotel/store_checkout"
+	store_working_directory "github.com/friedenberg/zit/src/hotel/store_working_directory"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
 	"github.com/friedenberg/zit/src/india/zettel_checked_out"
 )
 
 type WriteNewZettels struct {
 	*umwelt.Umwelt
-	store_checkout.CheckoutOptions
+	store_working_directory.CheckoutOptions
 }
 
 func (c WriteNewZettels) RunMany(

@@ -8,7 +8,7 @@ original_pkg="$(basename "$original")"
 renamed_pkg="$(basename "$renamed")"
 
 gofmt -w -r "$original_pkg.E -> $renamed_pkg.E" ./
-gofmt -w -r "$original -> $renamed_pkg" ./
+gofmt -w -r "$original_pkg -> $renamed_pkg" ./
 goimports -w ./
 
 mkdir -p "$(dirname "$renamed")"

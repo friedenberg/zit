@@ -9,8 +9,8 @@ import (
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/foxtrot/akten"
 	"github.com/friedenberg/zit/src/golf/hinweisen"
-	store_checkout "github.com/friedenberg/zit/src/hotel/store_checkout"
-	store_objekten "github.com/friedenberg/zit/src/hotel/store_objekten"
+	"github.com/friedenberg/zit/src/hotel/store_objekten"
+	"github.com/friedenberg/zit/src/hotel/store_working_directory"
 )
 
 type Store struct {
@@ -19,7 +19,7 @@ type Store struct {
 	storeObjekten         *store_objekten.Store
 	akten                 akten.Akten
 	age                   age.Age
-	storeWorkingDirectory *store_checkout.Store
+	storeWorkingDirectory *store_working_directory.Store
 }
 
 func New(u *umwelt.Umwelt) (s Store, err error) {
@@ -48,13 +48,13 @@ func New(u *umwelt.Umwelt) (s Store, err error) {
 		return
 	}
 
-	csk := store_checkout.Konfig{
+	csk := store_working_directory.Konfig{
 		Konfig:       u.Konfig,
 		CacheEnabled: u.Konfig.CheckoutCacheEnabled,
 	}
 
 	logz.Print("initing checkout store")
-	if s.storeWorkingDirectory, err = store_checkout.New(csk, u.Cwd(), s.storeObjekten); err != nil {
+	if s.storeWorkingDirectory, err = store_working_directory.New(csk, u.Cwd(), s.storeObjekten); err != nil {
 		logz.Print(err)
 		err = errors.Error(err)
 		return
@@ -81,7 +81,7 @@ func (s Store) Akten() akten.Akten {
 	return s.akten
 }
 
-func (s Store) CheckoutStore() *store_checkout.Store {
+func (s Store) CheckoutStore() *store_working_directory.Store {
 	return s.storeWorkingDirectory
 }
 

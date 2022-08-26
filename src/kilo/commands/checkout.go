@@ -8,14 +8,14 @@ import (
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
-	store_checkout "github.com/friedenberg/zit/src/hotel/store_checkout"
+	store_working_directory "github.com/friedenberg/zit/src/hotel/store_working_directory"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
 	"github.com/friedenberg/zit/src/india/zettel_checked_out"
 	"github.com/friedenberg/zit/src/juliett/user_ops"
 )
 
 type Checkout struct {
-	store_checkout.CheckoutMode
+	store_working_directory.CheckoutMode
 	Force bool
 }
 
@@ -38,12 +38,12 @@ func (c Checkout) RunWithHinweisen(s store_with_lock.Store, hins ...hinweis.Hinw
 
 	readOp := user_ops.ReadCheckedOut{
 		Umwelt: s.Umwelt,
-		OptionsReadExternal: store_checkout.OptionsReadExternal{
+		OptionsReadExternal: store_working_directory.OptionsReadExternal{
 			Format: zettel_formats.Text{},
 		},
 	}
 
-	var pz store_checkout.CwdFiles
+	var pz store_working_directory.CwdFiles
 
 	for _, h := range hins {
 		pz.Zettelen = append(pz.Zettelen, h.String())
@@ -85,7 +85,7 @@ func (c Checkout) RunWithHinweisen(s store_with_lock.Store, hins ...hinweis.Hinw
 
 	checkoutOp := user_ops.Checkout{
 		Umwelt: s.Umwelt,
-		CheckoutOptions: store_checkout.CheckoutOptions{
+		CheckoutOptions: store_working_directory.CheckoutOptions{
 			CheckoutMode: c.CheckoutMode,
 			Format:       zettel_formats.Text{},
 		},
