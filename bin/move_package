@@ -3,9 +3,11 @@
 prefix=github.com/friedenberg/zit
 original="${1%/}"
 renamed="${2%/}"
+
+original_pkg="$(basename "$original")"
 renamed_pkg="$(basename "$renamed")"
 
-gofmt -w -r "$original.E -> $renamed_pkg.E" ./
+gofmt -w -r "$original_pkg.E -> $renamed_pkg.E" ./
 gofmt -w -r "$original -> $renamed_pkg" ./
 goimports -w ./
 
@@ -13,5 +15,10 @@ mkdir -p "$(dirname "$renamed")"
 
 git mv "$original" "$renamed" || mv "$original" "$renamed"
 
-ag "$prefix/$original" -l0 \
-  | xargs -0 sed -i '' "s|$prefix/$original|$prefix/$renamed|g"
+declare -r sed_script="
+  s|$prefix/$original|$prefix/$renamed|g;
+  s|^package $original_pkg\$|package $renamed_pkg|g;
+"
+
+ag "$prefix/$original" -l0 |
+	xargs -0 sed -i '' "$sed_script"
