@@ -5,8 +5,8 @@ import (
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/golf/hinweisen"
-	store_working_directory "github.com/friedenberg/zit/src/hotel/store_working_directory"
 	"github.com/friedenberg/zit/src/hotel/store_objekten"
+	store_working_directory "github.com/friedenberg/zit/src/hotel/store_working_directory"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
 	"github.com/friedenberg/zit/src/india/zettel_checked_out"
 )
@@ -75,7 +75,7 @@ func (op ReadCheckedOut) RunMany(
 	for _, p := range possible.Akten {
 		var checked_out zettel_checked_out.CheckedOut
 
-		if checked_out, err = s.CheckoutStore().ReadExternalZettelFromAktePath(p); err != nil {
+		if checked_out, err = s.StoreWorkingDirectory().ReadExternalZettelFromAktePath(p); err != nil {
 			if errors.Is(err, hinweisen.ErrDoesNotExist) {
 				//TODO log
 				err = nil
@@ -95,7 +95,7 @@ func (op ReadCheckedOut) runOne(
 	store store_with_lock.Store,
 	p string,
 ) (zettel zettel_checked_out.CheckedOut, err error) {
-	if zettel.External, err = store.CheckoutStore().Read(p); err != nil {
+	if zettel.External, err = store.StoreWorkingDirectory().Read(p); err != nil {
 		if errors.IsNotExist(err) {
 			err = nil
 		} else {

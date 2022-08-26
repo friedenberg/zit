@@ -36,7 +36,7 @@ func (c Checkout) RunManyHinweisen(
 		}
 	}
 
-	if results.Zettelen, err = s.CheckoutStore().Checkout(c.CheckoutOptions, zs...); err != nil {
+	if results.Zettelen, err = s.StoreWorkingDirectory().Checkout(c.CheckoutOptions, zs...); err != nil {
 		err = errors.Error(err)
 		return
 	}

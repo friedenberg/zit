@@ -46,7 +46,7 @@ func (c WriteNewZettels) RunOne(
 		return
 	}
 
-	if result, err = store.CheckoutStore().CheckoutOne(c.CheckoutOptions, tz); err != nil {
+	if result, err = store.StoreWorkingDirectory().CheckoutOne(c.CheckoutOptions, tz); err != nil {
 		err = errors.Error(err)
 		return
 	}

@@ -81,7 +81,7 @@ func (s Store) Akten() akten.Akten {
 	return s.akten
 }
 
-func (s Store) CheckoutStore() *store_working_directory.Store {
+func (s Store) StoreWorkingDirectory() *store_working_directory.Store {
 	return s.storeWorkingDirectory
 }
 
@@ -92,7 +92,7 @@ func (s Store) Flush() (err error) {
 		return
 	}
 
-	if err = s.CheckoutStore().Flush(); err != nil {
+	if err = s.StoreWorkingDirectory().Flush(); err != nil {
 		stdprinter.Err(err)
 		err = errors.Error(err)
 		return

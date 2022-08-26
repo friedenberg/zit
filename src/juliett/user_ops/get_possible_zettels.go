@@ -20,7 +20,7 @@ func NewGetPossibleZettels(u *umwelt.Umwelt) GetPossibleZettels {
 func (uo GetPossibleZettels) Run(
 	store store_with_lock.Store,
 ) (result store_working_directory.CwdFiles, err error) {
-	if result, err = store.CheckoutStore().GetPossibleZettels(); err != nil {
+	if result, err = store.StoreWorkingDirectory().GetPossibleZettels(); err != nil {
 		err = errors.Error(err)
 		return
 	}

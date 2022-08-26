@@ -56,7 +56,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	var external stored_zettel.External
 
-	if external, err = store.CheckoutStore().Read(args[0]); err != nil {
+	if external, err = store.StoreWorkingDirectory().Read(args[0]); err != nil {
 		err = errors.Error(err)
 		return
 	}
