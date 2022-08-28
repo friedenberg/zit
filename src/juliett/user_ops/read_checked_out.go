@@ -29,7 +29,7 @@ func (op ReadCheckedOut) RunOneHinweis(
 
 func (op ReadCheckedOut) RunOneString(
 	s store_with_lock.Store,
-	path string,
+	p string,
 ) (zettel zettel_checked_out.CheckedOut, err error) {
 	var store store_with_lock.Store
 
@@ -40,7 +40,7 @@ func (op ReadCheckedOut) RunOneString(
 
 	defer errors.PanicIfError(store.Flush)
 
-	if zettel, err = op.runOne(store, path); err != nil {
+	if zettel, err = store.StoreWorkingDirectory().Read(p); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -57,7 +57,7 @@ func (op ReadCheckedOut) RunMany(
 	for _, p := range possible.Zettelen {
 		var checked_out zettel_checked_out.CheckedOut
 
-		if checked_out, err = op.runOne(s, p); err != nil {
+		if checked_out, err = s.StoreWorkingDirectory().Read(p); err != nil {
 			if errors.Is(err, hinweisen.ErrDoesNotExist) {
 				//TODO log
 				err = nil
@@ -88,11 +88,4 @@ func (op ReadCheckedOut) RunMany(
 	}
 
 	return
-}
-
-func (op ReadCheckedOut) runOne(
-	store store_with_lock.Store,
-	p string,
-) (zettel zettel_checked_out.CheckedOut, err error) {
-	return store.StoreWorkingDirectory().Read(p)
 }
