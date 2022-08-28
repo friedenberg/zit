@@ -26,7 +26,8 @@ func (s Store) ReadExternalZettelFromAktePath(p string) (cz zettel_checked_out.C
 		return
 	}
 
-	cz.External.AktePath = p
+	//TODO add mod time
+	cz.External.AkteFD.Path = p
 
 	head, tail := id.HeadTailFromFileName(p)
 
@@ -53,7 +54,7 @@ func (s Store) ReadExternalZettelFromAktePath(p string) (cz zettel_checked_out.C
 		return
 	}
 
-	cz.External.AktePath = p
+	cz.External.AkteFD.Path = p
 	cz.External.Named.Stored.Zettel.Akte = akteSha
 	cz.Matches.Akten, _ = s.storeObjekten.ReadAkteSha(akteSha)
 

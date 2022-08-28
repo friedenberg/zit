@@ -35,10 +35,10 @@ func (c DeleteCheckout) Run(
 		}
 
 		toDelete = append(toDelete, external)
-		filesToDelete = append(filesToDelete, external.Path)
+		filesToDelete = append(filesToDelete, external.ZettelFD.Path)
 
-		if external.AktePath != "" {
-			filesToDelete = append(filesToDelete, external.AktePath)
+		if external.AkteFD.Path != "" {
+			filesToDelete = append(filesToDelete, external.AkteFD.Path)
 		}
 	}
 

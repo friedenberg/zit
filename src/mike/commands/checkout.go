@@ -58,7 +58,7 @@ func (c Checkout) RunWithHinweisen(s store_with_lock.Store, hins ...hinweis.Hinw
 	toCheckOut := make([]hinweis.Hinweis, 0, len(hins))
 
 	for _, cz := range readResults {
-		if cz.External.Path == "" {
+		if cz.External.ZettelFD.Path == "" {
 			toCheckOut = append(toCheckOut, cz.Internal.Named.Hinweis)
 			continue
 		}

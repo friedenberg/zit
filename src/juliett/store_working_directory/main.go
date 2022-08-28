@@ -210,7 +210,7 @@ func (s Store) MakeExternalZettelFromZettel(p string) (ez zettel_stored.External
 		return
 	}
 
-	ez.Path = p
+	ez.ZettelFD.Path = p
 
 	head, tail := id.HeadTailFromFileName(p)
 
@@ -224,12 +224,12 @@ func (s Store) MakeExternalZettelFromZettel(p string) (ez zettel_stored.External
 
 func (s Store) readZettelFromFile(ez *zettel_stored.External) (err error) {
 	logz.PrintDebug(ez)
-	if !files.Exists(ez.Path) {
+	if !files.Exists(ez.ZettelFD.Path) {
 		//if the path does not have an extension, try looking for a file with that
 		//extension
 		//TODO modify this to use globs
-		if filepath.Ext(ez.Path) == "" {
-			ez.Path = ez.Path + ".md"
+		if filepath.Ext(ez.ZettelFD.Path) == "" {
+			ez.ZettelFD.Path = ez.ZettelFD.Path + ".md"
 			return s.readZettelFromFile(ez)
 		}
 
@@ -244,7 +244,7 @@ func (s Store) readZettelFromFile(ez *zettel_stored.External) (err error) {
 
 	var f *os.File
 
-	if f, err = open_file_guard.Open(ez.Path); err != nil {
+	if f, err = open_file_guard.Open(ez.ZettelFD.Path); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -264,7 +264,7 @@ func (s Store) readZettelFromFile(ez *zettel_stored.External) (err error) {
 	}
 
 	ez.Named.Stored.Zettel = c.Zettel
-	ez.AktePath = c.AktePath
+	ez.AkteFD.Path = c.AktePath
 
 	return
 }

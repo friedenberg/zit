@@ -176,7 +176,7 @@ func (c New) editZettelIfRequested(
 			Build(),
 	}
 
-	if _, err = openVimOp.Run(cz.External.Path); err != nil {
+	if _, err = openVimOp.Run(cz.External.ZettelFD.Path); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -197,7 +197,7 @@ func (c New) editZettelIfRequested(
 
 	defer s.Flush()
 
-	if cz, err = readOp.RunOneString(s, cz.External.Path); err != nil {
+	if cz, err = readOp.RunOneString(s, cz.External.ZettelFD.Path); err != nil {
 		err = errors.Error(err)
 		return
 	}

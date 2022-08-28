@@ -24,6 +24,6 @@ type Transacted struct {
 
 type External struct {
 	Named
-	Path     string
-	AktePath string
+	ZettelFD FD
+	AkteFD   FD
 }

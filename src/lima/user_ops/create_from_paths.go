@@ -57,7 +57,7 @@ func (c CreateFromPaths) Run(args ...string) (results CreateFromPathsResults, er
 		var tz zettel_stored.Transacted
 		//TODO
 		if false /*c.ReadHinweisFromPath*/ {
-			head, tail := id.HeadTailFromFileName(z.Path)
+			head, tail := id.HeadTailFromFileName(z.ZettelFD.Path)
 
 			var h hinweis.Hinweis
 
@@ -82,12 +82,12 @@ func (c CreateFromPaths) Run(args ...string) (results CreateFromPathsResults, er
 
 			if c.Delete {
 				//TODO move to checkout store
-				if err = os.Remove(z.Path); err != nil {
+				if err = os.Remove(z.ZettelFD.Path); err != nil {
 					err = errors.Error(err)
 					return
 				}
 
-				stdprinter.Outf("[%s] (deleted)\n", z.Path)
+				stdprinter.Outf("[%s] (deleted)\n", z.ZettelFD.Path)
 			}
 		}
 
@@ -133,7 +133,9 @@ func (c CreateFromPaths) zettelsFromPath(store store_with_lock.Store, p string) 
 			out = append(
 				out,
 				zettel_stored.External{
-					Path: p,
+					ZettelFD: zettel_stored.FD{
+						Path: p,
+					},
 					Named: zettel_stored.Named{
 						Stored: zettel_stored.Stored{
 							//TODO sha?
@@ -151,7 +153,9 @@ func (c CreateFromPaths) zettelsFromPath(store store_with_lock.Store, p string) 
 	out = append(
 		out,
 		zettel_stored.External{
-			Path: p,
+			ZettelFD: zettel_stored.FD{
+				Path: p,
+			},
 			Named: zettel_stored.Named{
 				Stored: zettel_stored.Stored{
 					//TODO sha?

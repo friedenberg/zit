@@ -58,7 +58,7 @@ func (c Status) RunWithLockedStore(s store_with_lock.Store, args ...string) (err
 	sort.Slice(
 		readResults,
 		func(i, j int) bool {
-			return readResults[i].External.Path < readResults[j].External.Path
+			return readResults[i].External.ZettelFD.Path < readResults[j].External.ZettelFD.Path
 		},
 	)
 

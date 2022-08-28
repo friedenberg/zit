@@ -60,7 +60,9 @@ func (s *Store) CheckoutOne(
 
 	cz = zettel_checked_out.CheckedOut{
 		External: zettel_stored.External{
-			Path: filename,
+			ZettelFD: zettel_stored.FD{
+				Path: filename,
+			},
 		},
 	}
 
@@ -88,8 +90,8 @@ func (s *Store) CheckoutOne(
 		c.IncludeAkte = true
 
 		if !inlineAkte {
-			cz.External.AktePath = originalFilename + "." + sz.Named.Stored.Zettel.AkteExt()
-			c.ExternalAktePath = cz.External.AktePath
+			cz.External.AkteFD.Path = originalFilename + "." + sz.Named.Stored.Zettel.AkteExt()
+			c.ExternalAktePath = cz.External.AkteFD.Path
 			c.IncludeAkte = true
 		}
 

@@ -43,9 +43,9 @@ func (c CheckedOut) String() string {
 		sb.WriteString(fmt.Sprintf("%s (same)", c.External))
 
 	case StateExistsAndDifferent:
-		if c.External.Path != "" {
+		if !c.External.ZettelFD.IsEmpty() {
 			sb.WriteString(fmt.Sprintf("%s (different)", c.External))
-		} else if c.External.AktePath != "" {
+		} else if !c.External.AkteFD.IsEmpty() {
 			sb.WriteString(fmt.Sprintf("%s (akte different)", c.External))
 		} else {
 			sb.WriteString(fmt.Sprintf("Error! No Path or AktePath: %v", c.External))

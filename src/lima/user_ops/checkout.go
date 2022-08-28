@@ -45,10 +45,10 @@ func (c Checkout) RunManyHinweisen(
 	results.FilesAkten = make([]string, 0)
 
 	for _, z := range results.Zettelen {
-		results.FilesZettelen = append(results.FilesZettelen, z.External.Path)
+		results.FilesZettelen = append(results.FilesZettelen, z.External.ZettelFD.Path)
 
-		if z.External.AktePath != "" {
-			results.FilesAkten = append(results.FilesAkten, z.External.AktePath)
+		if z.External.AkteFD.Path != "" {
+			results.FilesAkten = append(results.FilesAkten, z.External.AkteFD.Path)
 		}
 	}
 
