@@ -11,8 +11,8 @@ import (
 	"github.com/friedenberg/zit/src/delta/id"
 	"github.com/friedenberg/zit/src/delta/ts"
 	"github.com/friedenberg/zit/src/echo/transaktion"
-	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
+	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
 )
 
 func (s Store) readTransaktion(p string) (t transaktion.Transaktion, err error) {

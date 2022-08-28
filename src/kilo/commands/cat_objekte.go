@@ -11,8 +11,8 @@ import (
 	"github.com/friedenberg/zit/src/charlie/zk_types"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/id"
-	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
+	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
 )
 

@@ -65,7 +65,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		hs := args[i*2]
 		ap := args[(i*2)+1]
 
-		if p.Hinweis, err = hinweis.MakeBlindHinweis(hs); err != nil {
+		if p.Hinweis, err = hinweis.Make(hs); err != nil {
 			err = errors.Error(err)
 			return
 		}

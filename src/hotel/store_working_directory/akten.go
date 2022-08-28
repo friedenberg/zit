@@ -30,7 +30,7 @@ func (s Store) ReadExternalZettelFromAktePath(p string) (cz zettel_checked_out.C
 
 	head, tail := id.HeadTailFromFileName(p)
 
-	if cz.External.Named.Hinweis, err = hinweis.MakeBlindHinweis(head + "/" + tail); err != nil {
+	if cz.External.Named.Hinweis, err = hinweis.Make(head + "/" + tail); err != nil {
 		err = errors.Error(err)
 		return
 	}

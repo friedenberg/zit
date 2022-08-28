@@ -16,8 +16,8 @@ import (
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/id"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
-	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
+	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/hotel/collections"
 	"github.com/friedenberg/zit/src/hotel/store_objekten"
 	"github.com/friedenberg/zit/src/india/zettel_checked_out"
@@ -214,7 +214,7 @@ func (s Store) MakeExternalZettelFromZettel(p string) (ez zettel_stored.External
 
 	head, tail := id.HeadTailFromFileName(p)
 
-	if ez.Hinweis, err = hinweis.MakeBlindHinweis(head + "/" + tail); err != nil {
+	if ez.Hinweis, err = hinweis.Make(head + "/" + tail); err != nil {
 		err = errors.Error(err)
 		return
 	}

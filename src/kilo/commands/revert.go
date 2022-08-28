@@ -35,7 +35,7 @@ func (c Revert) RunWithLockedStore(store store_with_lock.Store, args ...string) 
 		hins := make([]hinweis.Hinweis, len(args))
 
 		for i, arg := range args {
-			if hins[i], err = hinweis.MakeBlindHinweis(arg); err != nil {
+			if hins[i], err = hinweis.Make(arg); err != nil {
 				err = errors.Error(err)
 				return
 			}

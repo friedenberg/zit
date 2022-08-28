@@ -66,19 +66,12 @@ func New(i kennung.Int, pl Provider, pr Provider) (h Hinweis, err error) {
 	return
 }
 
-func MakeBlindHinweis(v string) (h Hinweis, err error) {
+func Make(v string) (h Hinweis, err error) {
 	h = Hinweis{}
 
 	if err = h.Set(v); err != nil {
 		return
 	}
-
-	return
-}
-
-func MakeBlindHinweisParts(left, right string) (h Hinweis) {
-	h.Left = left
-	h.Right = right
 
 	return
 }

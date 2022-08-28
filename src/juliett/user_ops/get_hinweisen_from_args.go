@@ -9,7 +9,7 @@ type GetHinweisenFromArgs struct {
 }
 
 func (u GetHinweisenFromArgs) RunOne(v string) (h hinweis.Hinweis, err error) {
-	if h, err = hinweis.MakeBlindHinweis(v); err != nil {
+	if h, err = hinweis.Make(v); err != nil {
 		err = errors.Error(err)
 		return
 	}
