@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
-	"github.com/friedenberg/zit/src/golf/stored_zettel"
+	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
 	store_working_directory "github.com/friedenberg/zit/src/hotel/store_working_directory"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
@@ -60,7 +60,7 @@ func (c Clean) RunWithLockedStore(
 		return
 	}
 
-	toDelete := make([]stored_zettel.External, 0, len(readResults))
+	toDelete := make([]zettel_stored.External, 0, len(readResults))
 	filesToDelete := make([]string, 0, len(readResults)+len(possible.EmptyDirectories))
 
 	for _, d := range possible.EmptyDirectories {

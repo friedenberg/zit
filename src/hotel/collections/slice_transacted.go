@@ -4,16 +4,16 @@ import (
 	"encoding/json"
 	"sort"
 
-	"github.com/friedenberg/zit/src/golf/stored_zettel"
+	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
 )
 
 type SliceTransacted struct {
-	innerSlice []stored_zettel.Transacted
+	innerSlice []zettel_stored.Transacted
 }
 
 func MakeSliceTransacted() SliceTransacted {
 	return SliceTransacted{
-		innerSlice: make([]stored_zettel.Transacted, 0),
+		innerSlice: make([]zettel_stored.Transacted, 0),
 	}
 }
 
@@ -21,11 +21,11 @@ func (s SliceTransacted) Len() int {
 	return len(s.innerSlice)
 }
 
-func (s *SliceTransacted) Append(tz stored_zettel.Transacted) {
+func (s *SliceTransacted) Append(tz zettel_stored.Transacted) {
 	s.innerSlice = append(s.innerSlice, tz)
 }
 
-func (s SliceTransacted) Get(i int) stored_zettel.Transacted {
+func (s SliceTransacted) Get(i int) zettel_stored.Transacted {
 	return s.innerSlice[i]
 }
 

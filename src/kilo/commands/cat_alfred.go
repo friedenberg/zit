@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/zk_types"
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/delta/hinweis"
-	"github.com/friedenberg/zit/src/golf/stored_zettel"
+	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/hotel/alfred"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
 )
@@ -73,7 +73,7 @@ func (c CatAlfred) RunWithLockedStore(store store_with_lock.Store, args ...strin
 
 	case zk_types.TypeZettel:
 
-		var all map[hinweis.Hinweis]stored_zettel.Transacted
+		var all map[hinweis.Hinweis]zettel_stored.Transacted
 
 		if all, err = store.StoreObjekten().ZettelenSchwanzen(); err != nil {
 			err = errors.Error(err)
@@ -88,7 +88,7 @@ func (c CatAlfred) RunWithLockedStore(store store_with_lock.Store, args ...strin
 
 	case zk_types.TypeHinweis:
 
-		var all map[hinweis.Hinweis]stored_zettel.Transacted
+		var all map[hinweis.Hinweis]zettel_stored.Transacted
 
 		if all, err = store.StoreObjekten().ZettelenSchwanzen(); err != nil {
 			err = errors.Error(err)

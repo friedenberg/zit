@@ -11,7 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/zk_types"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/id"
-	"github.com/friedenberg/zit/src/golf/stored_zettel"
+	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
 )
@@ -59,7 +59,7 @@ func (c CatObjekte) akten(store store_with_lock.Store, ids ...id.Id) (err error)
 			sb = i
 
 		case hinweis.Hinweis:
-			var tz stored_zettel.Transacted
+			var tz zettel_stored.Transacted
 
 			if tz, err = store.StoreObjekten().Read(i); err != nil {
 				err = errors.Error(err)
@@ -95,7 +95,7 @@ func (c CatObjekte) akten(store store_with_lock.Store, ids ...id.Id) (err error)
 
 func (c CatObjekte) zettelen(store store_with_lock.Store, ids ...id.Id) (err error) {
 	for _, id := range ids {
-		var tz stored_zettel.Transacted
+		var tz zettel_stored.Transacted
 
 		if tz, err = store.StoreObjekten().Read(id); err != nil {
 			err = errors.Error(err)

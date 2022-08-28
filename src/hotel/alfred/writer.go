@@ -7,11 +7,11 @@ import (
 	"github.com/friedenberg/zit/src/charlie/alfred"
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/delta/hinweis"
-	"github.com/friedenberg/zit/src/golf/stored_zettel"
+	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
 )
 
 type Writer interface {
-	WriteZettel(stored_zettel.Named) (n int, err error)
+	WriteZettel(zettel_stored.Named) (n int, err error)
 	WriteEtikett(e etikett.Etikett) (n int, err error)
 	WriteHinweis(e hinweis.Hinweis) (n int, err error)
 	WriteError(in error) (n int, out error)
@@ -37,7 +37,7 @@ func NewWriter(out io.Writer) (w *writer, err error) {
 	return
 }
 
-func (w *writer) WriteZettel(z stored_zettel.Named) (n int, err error) {
+func (w *writer) WriteZettel(z zettel_stored.Named) (n int, err error) {
 	item := ZettelToItem(z)
 	return w.alfredWriter.WriteItem(item)
 }

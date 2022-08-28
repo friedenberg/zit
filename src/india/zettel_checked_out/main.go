@@ -5,13 +5,13 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/logz"
-	"github.com/friedenberg/zit/src/golf/stored_zettel"
+	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
 )
 
 type CheckedOut struct {
-	Internal stored_zettel.Transacted
+	Internal zettel_stored.Transacted
 	Matches  Matches
-	External stored_zettel.External
+	External zettel_stored.External
 	State
 }
 

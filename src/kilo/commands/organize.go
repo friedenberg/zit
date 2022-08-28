@@ -13,7 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/echo/umwelt"
-	"github.com/friedenberg/zit/src/golf/stored_zettel"
+	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/hotel/organize_text"
 	"github.com/friedenberg/zit/src/juliett/user_ops"
 )
@@ -98,7 +98,7 @@ func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	getOp := user_ops.GetZettelsFromQuery{Umwelt: u}
 
-	query := stored_zettel.FilterEtikettSet{Set: createOrganizeFileOp.RootEtiketten}
+	query := zettel_stored.FilterEtikettSet{Set: createOrganizeFileOp.RootEtiketten}
 
 	if getResults, err = getOp.Run(query); err != nil {
 		err = errors.Error(err)

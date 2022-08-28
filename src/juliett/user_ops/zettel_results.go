@@ -1,9 +1,9 @@
 package user_ops
 
 import (
-	"github.com/friedenberg/zit/src/golf/stored_zettel"
+	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
 )
 
 type ZettelResults struct {
-	stored_zettel.SetNamed
+	zettel_stored.SetNamed
 }

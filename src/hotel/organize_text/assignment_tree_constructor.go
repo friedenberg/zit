@@ -4,14 +4,14 @@ import (
 	"sort"
 
 	"github.com/friedenberg/zit/src/delta/etikett"
-	"github.com/friedenberg/zit/src/golf/stored_zettel"
+	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
 )
 
 type AssignmentTreeConstructor struct {
 	RootEtiketten     etikett.Set
 	GroupingEtiketten etikett.Slice
 	ExtraEtiketten    etikett.Set
-	Named             stored_zettel.SetNamed
+	Named             zettel_stored.SetNamed
 	UsePrefixJoints   bool
 }
 
@@ -36,7 +36,7 @@ func (atc *AssignmentTreeConstructor) Assignments() (roots []*assignment) {
 
 func (atc AssignmentTreeConstructor) makeChildren(
 	parent *assignment,
-	prefixSet stored_zettel.SetPrefixNamed,
+	prefixSet zettel_stored.SetPrefixNamed,
 	groupingEtiketten etikett.Slice,
 ) {
 	if groupingEtiketten.Len() == 0 {

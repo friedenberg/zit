@@ -4,7 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/echo/umwelt"
-	"github.com/friedenberg/zit/src/golf/stored_zettel"
+	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
 )
 
@@ -12,7 +12,7 @@ type GetZettelsFromQuery struct {
 	Umwelt *umwelt.Umwelt
 }
 
-func (c GetZettelsFromQuery) Run(query stored_zettel.NamedFilter) (result ZettelResults, err error) {
+func (c GetZettelsFromQuery) Run(query zettel_stored.NamedFilter) (result ZettelResults, err error) {
 	var store store_with_lock.Store
 
 	if store, err = store_with_lock.New(c.Umwelt); err != nil {
@@ -22,14 +22,14 @@ func (c GetZettelsFromQuery) Run(query stored_zettel.NamedFilter) (result Zettel
 
 	defer errors.PanicIfError(store.Flush)
 
-	var set map[hinweis.Hinweis]stored_zettel.Transacted
+	var set map[hinweis.Hinweis]zettel_stored.Transacted
 
 	if set, err = store.StoreObjekten().ZettelenSchwanzen(query); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	result.SetNamed = stored_zettel.MakeSetNamed()
+	result.SetNamed = zettel_stored.MakeSetNamed()
 
 	for h, tz := range set {
 		result.SetNamed[h.String()] = tz.Named

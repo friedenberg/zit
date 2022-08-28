@@ -13,7 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
-	"github.com/friedenberg/zit/src/golf/stored_zettel"
+	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
 )
@@ -76,7 +76,7 @@ func (c Cat) etiketten(store store_with_lock.Store) (err error) {
 }
 
 func (c Cat) zettelen(store store_with_lock.Store) (err error) {
-	var all map[hinweis.Hinweis]stored_zettel.Transacted
+	var all map[hinweis.Hinweis]zettel_stored.Transacted
 
 	logz.Print()
 	defer logz.Print()

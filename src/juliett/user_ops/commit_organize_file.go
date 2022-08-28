@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
-	"github.com/friedenberg/zit/src/golf/stored_zettel"
+	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/hotel/organize_text"
 	"github.com/friedenberg/zit/src/india/changes"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
@@ -45,9 +45,9 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 		return
 	}
 
-	toUpdate := make(map[string]stored_zettel.Named)
+	toUpdate := make(map[string]zettel_stored.Named)
 
-	addOrGetToZettelToUpdate := func(hString string) (z stored_zettel.Named, err error) {
+	addOrGetToZettelToUpdate := func(hString string) (z zettel_stored.Named, err error) {
 		var h hinweis.Hinweis
 
 		if h, err = hinweis.MakeBlindHinweis(hString); err != nil {
@@ -58,7 +58,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 		var ok bool
 
 		if z, ok = toUpdate[h.String()]; !ok {
-			var tz stored_zettel.Transacted
+			var tz zettel_stored.Transacted
 
 			if tz, err = store.StoreObjekten().Read(h); err != nil {
 				err = errors.Error(err)
@@ -72,7 +72,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 	}
 
 	addEtikettToZettel := func(hString string, e etikett.Etikett) (err error) {
-		var z stored_zettel.Named
+		var z zettel_stored.Named
 
 		if z, err = addOrGetToZettelToUpdate(hString); err != nil {
 			err = errors.Error(err)
@@ -88,7 +88,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 	}
 
 	removeEtikettFromZettel := func(hString string, e etikett.Etikett) (err error) {
-		var z stored_zettel.Named
+		var z zettel_stored.Named
 
 		if z, err = addOrGetToZettelToUpdate(hString); err != nil {
 			err = errors.Error(err)
@@ -150,7 +150,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 			continue
 		}
 
-		var tz stored_zettel.Transacted
+		var tz zettel_stored.Transacted
 
 		if tz, err = store.StoreObjekten().Create(z); err != nil {
 			err = errors.Errorf("failed to create zettel: %s", err)

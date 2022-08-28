@@ -11,7 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/akten"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
-	"github.com/friedenberg/zit/src/golf/stored_zettel"
+	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
 	"github.com/google/uuid"
 )
@@ -55,7 +55,7 @@ func (e ErrNotFound) Error() string {
 }
 
 type ErrZettelDidNotChangeSinceUpdate struct {
-	NamedZettel stored_zettel.Named
+	NamedZettel zettel_stored.Named
 }
 
 func (e ErrZettelDidNotChangeSinceUpdate) Error() string {

@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/zk_types"
 	"github.com/friedenberg/zit/src/delta/id"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
-	"github.com/friedenberg/zit/src/golf/stored_zettel"
+	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
 )
@@ -34,10 +34,10 @@ func init() {
 }
 
 func (c Show) RunWithId(store store_with_lock.Store, ids ...id.Id) (err error) {
-	zettels := make([]stored_zettel.Transacted, len(ids))
+	zettels := make([]zettel_stored.Transacted, len(ids))
 
 	for i, a := range ids {
-		var tz stored_zettel.Transacted
+		var tz zettel_stored.Transacted
 
 		if tz, err = store.StoreObjekten().Read(a); err != nil {
 			err = errors.Error(err)
@@ -61,7 +61,7 @@ func (c Show) RunWithId(store store_with_lock.Store, ids ...id.Id) (err error) {
 	}
 }
 
-func (c Show) showZettels(store store_with_lock.Store, zettels []stored_zettel.Transacted) (err error) {
+func (c Show) showZettels(store store_with_lock.Store, zettels []zettel_stored.Transacted) (err error) {
 	f := zettel_formats.Text{}
 
 	ctx := zettel.FormatContextWrite{
@@ -87,7 +87,7 @@ func (c Show) showZettels(store store_with_lock.Store, zettels []stored_zettel.T
 	return
 }
 
-func (c Show) showAkten(store store_with_lock.Store, zettels []stored_zettel.Transacted) (err error) {
+func (c Show) showAkten(store store_with_lock.Store, zettels []zettel_stored.Transacted) (err error) {
 	var ar io.ReadCloser
 
 	for _, named := range zettels {

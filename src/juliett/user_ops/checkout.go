@@ -4,7 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/echo/umwelt"
-	"github.com/friedenberg/zit/src/golf/stored_zettel"
+	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
 	store_working_directory "github.com/friedenberg/zit/src/hotel/store_working_directory"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
 	"github.com/friedenberg/zit/src/india/zettel_checked_out"
@@ -25,7 +25,7 @@ func (c Checkout) RunManyHinweisen(
 	s store_with_lock.Store,
 	hins ...hinweis.Hinweis,
 ) (results CheckoutResults, err error) {
-	zs := make([]stored_zettel.Transacted, len(hins))
+	zs := make([]zettel_stored.Transacted, len(hins))
 
 	for i, _ := range zs {
 		h := hins[i]

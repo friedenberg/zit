@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/bravo/errors"
-	"github.com/friedenberg/zit/src/golf/stored_zettel"
+	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
 )
 
 type zettel struct {
@@ -13,7 +13,7 @@ type zettel struct {
 	Bezeichnung string
 }
 
-func makeZettel(named stored_zettel.Named) zettel {
+func makeZettel(named zettel_stored.Named) zettel {
 	return zettel{
 		Hinweis:     named.Hinweis.String(),
 		Bezeichnung: named.Stored.Zettel.Description(),

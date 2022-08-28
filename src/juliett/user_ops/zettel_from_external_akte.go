@@ -12,7 +12,7 @@ import (
 	age_io "github.com/friedenberg/zit/src/echo/age_io"
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
-	"github.com/friedenberg/zit/src/golf/stored_zettel"
+	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
 )
 
@@ -32,7 +32,7 @@ func (c ZettelFromExternalAkte) Run(args ...string) (results ZettelResults, err 
 
 	defer errors.PanicIfError(store.Flush)
 
-	results.SetNamed = make(map[string]stored_zettel.Named, len(args))
+	results.SetNamed = make(map[string]zettel_stored.Named, len(args))
 
 	for _, arg := range args {
 		var z zettel.Zettel
@@ -42,7 +42,7 @@ func (c ZettelFromExternalAkte) Run(args ...string) (results ZettelResults, err 
 			return
 		}
 
-		var tz stored_zettel.Transacted
+		var tz zettel_stored.Transacted
 
 		if tz, err = store.StoreObjekten().Create(z); err != nil {
 			err = errors.Error(err)

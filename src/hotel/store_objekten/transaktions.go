@@ -11,7 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/id"
 	"github.com/friedenberg/zit/src/delta/ts"
 	"github.com/friedenberg/zit/src/echo/transaktion"
-	"github.com/friedenberg/zit/src/golf/stored_zettel"
+	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
 )
 
@@ -37,7 +37,7 @@ func (s Store) readTransaktion(p string) (t transaktion.Transaktion, err error) 
 	return
 }
 
-func (s Store) storedZettelFromSha(sh sha.Sha) (sz stored_zettel.Stored, err error) {
+func (s Store) storedZettelFromSha(sh sha.Sha) (sz zettel_stored.Stored, err error) {
 	var or io.ReadCloser
 
 	if or, err = s.ReadCloserObjekten(id.Path(sh, s.Umwelt.DirObjektenZettelen())); err != nil {
@@ -63,14 +63,14 @@ func (s Store) storedZettelFromSha(sh sha.Sha) (sz stored_zettel.Stored, err err
 // dependency on the index being accurate for the immediate mutter of the zettel
 // in the arguments
 func (s *Store) transactedWithHead(
-	z stored_zettel.Named,
+	z zettel_stored.Named,
 	t transaktion.Transaktion,
-) (tz stored_zettel.Transacted, err error) {
+) (tz zettel_stored.Transacted, err error) {
 	tz.Named = z
 	tz.Kopf = t.Time
 	tz.Schwanz = t.Time
 
-	var previous stored_zettel.Transacted
+	var previous zettel_stored.Transacted
 
 	if previous, err = s.indexZettelenTails.Read(z.Hinweis); err == nil {
 		tz.Mutter = previous.Schwanz
@@ -90,7 +90,7 @@ func (s *Store) transactedWithHead(
 func (s Store) transactedZettelFromTransaktionObjekte(
 	t transaktion.Transaktion,
 	o transaktion.Objekte,
-) (tz stored_zettel.Transacted, err error) {
+) (tz zettel_stored.Transacted, err error) {
 	ok := false
 
 	var h *hinweis.Hinweis
@@ -149,7 +149,7 @@ func (s Store) writeTransaktion() (err error) {
 	return
 }
 
-func (s *Store) addZettelToTransaktion(z stored_zettel.Named) (tz stored_zettel.Transacted, err error) {
+func (s *Store) addZettelToTransaktion(z zettel_stored.Named) (tz zettel_stored.Transacted, err error) {
 	logz.Printf("adding zettel to transaktion: %s", z.Hinweis)
 
 	if tz, err = s.transactedWithHead(z, s.Transaktion); err != nil {

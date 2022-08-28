@@ -7,10 +7,10 @@ import (
 	"github.com/friedenberg/zit/src/charlie/alfred"
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/delta/hinweis"
-	"github.com/friedenberg/zit/src/golf/stored_zettel"
+	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
 )
 
-func ZettelToItem(z stored_zettel.Named) (a alfred.Item) {
+func ZettelToItem(z zettel_stored.Named) (a alfred.Item) {
 	a.Title = z.Stored.Zettel.Bezeichnung.String()
 
 	if a.Title == "" {

@@ -4,7 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
-	"github.com/friedenberg/zit/src/golf/stored_zettel"
+	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
 	store_working_directory "github.com/friedenberg/zit/src/hotel/store_working_directory"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
 	"github.com/friedenberg/zit/src/india/zettel_checked_out"
@@ -39,7 +39,7 @@ func (c WriteNewZettels) RunOne(
 	store store_with_lock.Store,
 	z zettel.Zettel,
 ) (result zettel_checked_out.CheckedOut, err error) {
-	var tz stored_zettel.Transacted
+	var tz zettel_stored.Transacted
 
 	if tz, err = store.StoreObjekten().Create(z); err != nil {
 		err = errors.Error(err)

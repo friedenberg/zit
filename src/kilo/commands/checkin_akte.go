@@ -13,7 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	age_io "github.com/friedenberg/zit/src/echo/age_io"
 	"github.com/friedenberg/zit/src/echo/umwelt"
-	"github.com/friedenberg/zit/src/golf/stored_zettel"
+	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
 )
 
@@ -74,7 +74,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		pairs[i] = p
 	}
 
-	zettels := make([]stored_zettel.Transacted, len(pairs))
+	zettels := make([]zettel_stored.Transacted, len(pairs))
 	logz.PrintDebug(pairs)
 
 	// iterate through pairs and read current zettel

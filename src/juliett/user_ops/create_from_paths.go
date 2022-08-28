@@ -12,7 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/script_value"
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
-	"github.com/friedenberg/zit/src/golf/stored_zettel"
+	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
 	store_objekten "github.com/friedenberg/zit/src/hotel/store_objekten"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
@@ -40,10 +40,10 @@ func (c CreateFromPaths) Run(args ...string) (results CreateFromPathsResults, er
 
 	defer errors.PanicIfError(store.Flush)
 
-	toCreate := make([]stored_zettel.External, 0, len(args))
+	toCreate := make([]zettel_stored.External, 0, len(args))
 
 	for _, arg := range args {
-		var toAdd []stored_zettel.External
+		var toAdd []zettel_stored.External
 
 		if toAdd, err = c.zettelsFromPath(store, arg); err != nil {
 			err = errors.Errorf("zettel text format error for path: %s: %s", arg, err)
@@ -54,7 +54,7 @@ func (c CreateFromPaths) Run(args ...string) (results CreateFromPathsResults, er
 	}
 
 	for _, z := range toCreate {
-		var tz stored_zettel.Transacted
+		var tz zettel_stored.Transacted
 		//TODO
 		if false /*c.ReadHinweisFromPath*/ {
 			head, tail := id.HeadTailFromFileName(z.Path)
@@ -97,7 +97,7 @@ func (c CreateFromPaths) Run(args ...string) (results CreateFromPathsResults, er
 	return
 }
 
-func (c CreateFromPaths) zettelsFromPath(store store_with_lock.Store, p string) (out []stored_zettel.External, err error) {
+func (c CreateFromPaths) zettelsFromPath(store store_with_lock.Store, p string) (out []zettel_stored.External, err error) {
 	var r io.Reader
 
 	logz.Print("running")
@@ -132,10 +132,10 @@ func (c CreateFromPaths) zettelsFromPath(store store_with_lock.Store, p string) 
 
 			out = append(
 				out,
-				stored_zettel.External{
+				zettel_stored.External{
 					Path: p,
-					Named: stored_zettel.Named{
-						Stored: stored_zettel.Stored{
+					Named: zettel_stored.Named{
+						Stored: zettel_stored.Stored{
 							//TODO sha?
 							Zettel: z1,
 						},
@@ -150,10 +150,10 @@ func (c CreateFromPaths) zettelsFromPath(store store_with_lock.Store, p string) 
 
 	out = append(
 		out,
-		stored_zettel.External{
+		zettel_stored.External{
 			Path: p,
-			Named: stored_zettel.Named{
-				Stored: stored_zettel.Stored{
+			Named: zettel_stored.Named{
+				Stored: zettel_stored.Stored{
 					//TODO sha?
 					Zettel: ctx.Zettel,
 				},
@@ -164,7 +164,7 @@ func (c CreateFromPaths) zettelsFromPath(store store_with_lock.Store, p string) 
 	return
 }
 
-func (c CreateFromPaths) handleStoreError(z stored_zettel.Transacted, f string, in error) {
+func (c CreateFromPaths) handleStoreError(z zettel_stored.Transacted, f string, in error) {
 	var err error
 
 	var lostError store_objekten.VerlorenAndGefundenError

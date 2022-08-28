@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/echo/umwelt"
-	"github.com/friedenberg/zit/src/golf/stored_zettel"
+	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
 	store_working_directory "github.com/friedenberg/zit/src/hotel/store_working_directory"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
 	"github.com/friedenberg/zit/src/india/zettel_checked_out"
@@ -23,12 +23,12 @@ type CheckinResults struct {
 
 func (c Checkin) Run(
 	store store_with_lock.Store,
-	zettelen ...stored_zettel.External,
+	zettelen ...zettel_stored.External,
 ) (results CheckinResults, err error) {
 	results.Zettelen = make(map[hinweis.Hinweis]zettel_checked_out.CheckedOut)
 
 	for _, z := range zettelen {
-		var tz stored_zettel.Transacted
+		var tz zettel_stored.Transacted
 
 		if tz, err = store.StoreObjekten().Update(z.Hinweis, z.Named.Stored.Zettel); err != nil {
 			err = errors.Error(err)

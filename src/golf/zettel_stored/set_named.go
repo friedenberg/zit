@@ -1,4 +1,4 @@
-package stored_zettel
+package zettel_stored
 
 import "github.com/friedenberg/zit/src/delta/hinweis"
 

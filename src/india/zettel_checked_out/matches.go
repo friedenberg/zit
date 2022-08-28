@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/charlie/zk_types"
-	"github.com/friedenberg/zit/src/golf/stored_zettel"
+	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/hotel/collections"
 )
 
@@ -13,7 +13,7 @@ type Matches struct {
 	Akten, Bezeichnungen, Zettelen collections.SetTransacted
 }
 
-func (m Matches) appendToStringBuilder(sb *strings.Builder, ex stored_zettel.External) {
+func (m Matches) appendToStringBuilder(sb *strings.Builder, ex zettel_stored.External) {
 	typToCollection := map[zk_types.Type]*collections.SetTransacted{
 		zk_types.TypeAkte:        &m.Akten,
 		zk_types.TypeBezeichnung: &m.Bezeichnungen,
@@ -24,7 +24,7 @@ func (m Matches) appendToStringBuilder(sb *strings.Builder, ex stored_zettel.Ext
 		if c.Len() == 1 && c.Any().Named.Stored.Zettel.Equals(ex.Named.Stored.Zettel) {
 		} else if c.Len() > 1 {
 			c.Each(
-				func(tz stored_zettel.Transacted) (err error) {
+				func(tz zettel_stored.Transacted) (err error) {
 					sb.WriteString(fmt.Sprintf("\n\t%s (%s match)", tz.Named.Hinweis, t))
 					return
 				},
