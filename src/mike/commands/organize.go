@@ -15,7 +15,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/hotel/organize_text"
-	"github.com/friedenberg/zit/src/kilo/user_ops"
+	"github.com/friedenberg/zit/src/lima/user_ops"
 )
 
 type Organize struct {
