@@ -9,10 +9,10 @@ import (
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
 	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
-	store_working_directory "github.com/friedenberg/zit/src/hotel/store_working_directory"
-	"github.com/friedenberg/zit/src/india/store_with_lock"
 	"github.com/friedenberg/zit/src/india/zettel_checked_out"
-	"github.com/friedenberg/zit/src/juliett/user_ops"
+	store_working_directory "github.com/friedenberg/zit/src/juliett/store_working_directory"
+	"github.com/friedenberg/zit/src/kilo/user_ops"
+	"github.com/friedenberg/zit/src/kilo/store_with_lock"
 )
 
 type Clean struct {

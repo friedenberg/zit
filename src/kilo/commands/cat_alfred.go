@@ -11,7 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/hotel/alfred"
-	"github.com/friedenberg/zit/src/india/store_with_lock"
+	"github.com/friedenberg/zit/src/kilo/store_with_lock"
 )
 
 type CatAlfred struct {

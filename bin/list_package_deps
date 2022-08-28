@@ -1,14 +1,33 @@
 #! /bin/bash -e
 
-print_matches() (
-	path="$1"
-	ag 'github.com/friedenberg/zit/src/\w+' \
+ag_print_matching() (
+	query="$1"
+	shift
+
+	ag "$query" \
 		--only-matching \
 		--no-file \
 		--no-color \
 		--no-group \
 		--no-break \
-		"$path"
+		"$@"
+)
+
+ag_print_matching_with_file() (
+	query="$1"
+	shift
+
+	ag "$query" \
+		--no-number \
+		--no-color \
+		--no-group \
+		--no-break \
+		"$@"
+)
+
+print_matches() (
+	path="$1"
+	ag_print_matching 'github.com/friedenberg/zit/src/\w+' "$path"
 )
 
 print_basenames() (
@@ -17,17 +36,31 @@ print_basenames() (
 	done
 )
 
-print_packge_locations() (
-  loc="$1"
+print_final() (
+	dir="$(dirname "$1")"
+	dep="$2"
+
+	w="50"
+	printf "%${w}s %${w}s\n" "$dir" "$dep"
+)
+
+export -f print_final
+
+print_package_locations() (
+	loc="$1"
 	while IFS= read -r; do
-    echo "$REPLY"
-		ag "github.com/friedenberg/zit/$REPLY" "$loc" -l0 </dev/null \
-      | xargs -0 dirname \
-      | sort -u
+		ag_print_matching_with_file \
+			"\\bgithub.com/friedenberg/zit/src/$REPLY/\\w+\\b" \
+			"$loc" </dev/null |
+			tr -d ' ' |
+			sed -e 's#github.com/friedenberg/zit/##g; s/"//g' |
+			xargs -L2 bash -c 'print_final "$@"' "$REPLY" |
+			sort -u
 	done
 )
 
 print_matches "$1" |
 	print_basenames |
 	sort -u |
-	print_packge_locations "$1"
+	print_package_locations "$1" |
+  tail

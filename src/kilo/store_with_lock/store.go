@@ -9,8 +9,8 @@ import (
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/foxtrot/akten"
 	"github.com/friedenberg/zit/src/golf/hinweisen"
-	"github.com/friedenberg/zit/src/hotel/store_objekten"
-	"github.com/friedenberg/zit/src/hotel/store_working_directory"
+	"github.com/friedenberg/zit/src/india/store_objekten"
+	"github.com/friedenberg/zit/src/juliett/store_working_directory"
 )
 
 type Store struct {

@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/hotel/organize_text"
-	"github.com/friedenberg/zit/src/juliett/user_ops"
+	"github.com/friedenberg/zit/src/kilo/user_ops"
 )
 
 type FormatOrganize struct {

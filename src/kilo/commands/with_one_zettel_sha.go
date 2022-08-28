@@ -4,7 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
-	"github.com/friedenberg/zit/src/india/store_with_lock"
+	"github.com/friedenberg/zit/src/kilo/store_with_lock"
 )
 
 type WithOneZettelSha interface {

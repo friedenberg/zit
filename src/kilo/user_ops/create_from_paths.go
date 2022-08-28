@@ -14,8 +14,8 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
 	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
-	store_objekten "github.com/friedenberg/zit/src/hotel/store_objekten"
-	"github.com/friedenberg/zit/src/india/store_with_lock"
+	store_objekten "github.com/friedenberg/zit/src/india/store_objekten"
+	"github.com/friedenberg/zit/src/kilo/store_with_lock"
 )
 
 type CreateFromPaths struct {
