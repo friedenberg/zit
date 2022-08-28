@@ -26,8 +26,13 @@ func (atc *AssignmentTreeRefiner) shouldMergeIntoParent(a *assignment) bool {
 		return false
 	}
 
-	if a.etiketten.Len() == 0 {
-		logz.Print("etiketten length is 0")
+	if a.parent.etiketten.Len() != 1 {
+		logz.Print("parent etiketten length is not 1")
+		return false
+	}
+
+	if a.etiketten.Len() != 1 {
+		logz.Print("etiketten length is not 1")
 		return false
 	}
 
@@ -37,6 +42,35 @@ func (atc *AssignmentTreeRefiner) shouldMergeIntoParent(a *assignment) bool {
 	}
 
 	return true
+}
+
+func (atc *AssignmentTreeRefiner) renameForPrefixJoint(a *assignment) (err error) {
+	if a == nil {
+		logz.Printf("assignment is nil")
+		return
+	}
+
+	if a.parent == nil {
+		logz.Printf("parent is nil: %#v", a)
+		return
+	}
+
+	if a.parent.etiketten.Len() == 0 {
+		return
+	}
+
+	if a.parent.etiketten.Len() != 1 {
+		return
+	}
+
+	if !a.etiketten.Any().HasParentPrefix(a.parent.etiketten.Any()) {
+		logz.Print("parent is not prefix joint")
+		return
+	}
+
+	a.etiketten = etikett.MakeSet(a.etiketten.Any().LeftSubtract(a.parent.etiketten.Any()))
+
+	return
 }
 
 func (atc *AssignmentTreeRefiner) Refine(a *assignment) (err error) {
@@ -51,6 +85,8 @@ func (atc *AssignmentTreeRefiner) Refine(a *assignment) (err error) {
 				return
 			}
 		}
+
+		return
 	}
 
 	if atc.shouldMergeIntoParent(a) {
@@ -66,6 +102,11 @@ func (atc *AssignmentTreeRefiner) Refine(a *assignment) (err error) {
 	}
 
 	if err = atc.applyPrefixJoints(a); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	if err = atc.renameForPrefixJoint(a); err != nil {
 		err = errors.Error(err)
 		return
 	}

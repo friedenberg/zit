@@ -69,6 +69,11 @@ func (a Etikett) IsDependentLeaf() (has bool) {
 	return
 }
 
+func (a Etikett) HasParentPrefix(b Etikett) (has bool) {
+	has = strings.HasPrefix(strings.TrimSpace(a.Value), b.Value)
+	return
+}
+
 func (e Etikett) Expanded(exes ...Expander) (expanded *Set) {
 	expanded = NewSet()
 
