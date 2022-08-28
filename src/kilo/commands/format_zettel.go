@@ -9,9 +9,9 @@ import (
 	"github.com/friedenberg/zit/src/delta/konfig"
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
-	"github.com/friedenberg/zit/src/golf/stored_zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
+	"github.com/friedenberg/zit/src/india/zettel_checked_out"
 )
 
 type FormatZettel struct {
@@ -54,21 +54,21 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	defer errors.PanicIfError(store.Flush)
 
-	var external stored_zettel.External
+	var cz zettel_checked_out.CheckedOut
 
-	if external, err = store.StoreWorkingDirectory().Read(args[0]); err != nil {
+	if cz, err = store.StoreWorkingDirectory().Read(args[0]); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
 	var formatter konfig.RemoteScript
 
-	if typKonfig, ok := u.Konfig.Typen[external.Named.Stored.Zettel.Typ.String()]; ok {
+	if typKonfig, ok := u.Konfig.Typen[cz.External.Named.Stored.Zettel.Typ.String()]; ok {
 		formatter = typKonfig.FormatScript
 	}
 
 	ctx := zettel.FormatContextWrite{
-		Zettel:            external.Named.Stored.Zettel,
+		Zettel:            cz.External.Named.Stored.Zettel,
 		IncludeAkte:       true,
 		AkteReaderFactory: store.StoreObjekten(),
 		FormatScript:      formatter,

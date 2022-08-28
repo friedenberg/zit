@@ -67,7 +67,7 @@ func (s *Store) CheckoutOne(
 	c := zettel.FormatContextWrite{
 		Zettel:            sz.Named.Stored.Zettel,
 		IncludeAkte:       inlineAkte,
-		AkteReaderFactory: s.storeZettel,
+		AkteReaderFactory: s.storeObjekten,
 	}
 
 	switch options.CheckoutMode {
@@ -149,7 +149,7 @@ func (s *Store) writeAkte(
 
 	var r io.ReadCloser
 
-	if r, err = s.storeZettel.AkteReader(sh); err != nil {
+	if r, err = s.storeObjekten.AkteReader(sh); err != nil {
 		err = errors.Error(err)
 		return
 	}

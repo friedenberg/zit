@@ -19,11 +19,15 @@ import (
 	"github.com/friedenberg/zit/src/golf/stored_zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
 	"github.com/friedenberg/zit/src/hotel/collections"
+	"github.com/friedenberg/zit/src/hotel/store_objekten"
+	"github.com/friedenberg/zit/src/india/zettel_checked_out"
 )
 
 type StoreZettel interface {
 	Read(id id.Id) (z stored_zettel.Transacted, err error)
 	ReadAkteSha(sha.Sha) (collections.SetTransacted, error)
+	ReadZettelSha(sha.Sha) (collections.SetTransacted, error)
+	ReadBezeichnung(string) (collections.SetTransacted, error)
 	WriteZettelObjekte(z zettel.Zettel) (sh sha.Sha, err error)
 	zettel.AkteWriterFactory
 	zettel.AkteReaderFactory
@@ -32,22 +36,22 @@ type StoreZettel interface {
 type Store struct {
 	lock *file_lock.Lock
 	Konfig
-	format       zettel.Format
-	storeZettel  StoreZettel
-	path         string
-	cwd          string
-	entries      map[string]Entry
-	indexWasRead bool
-	hasChanges   bool
+	format        zettel.Format
+	storeObjekten StoreZettel
+	path          string
+	cwd           string
+	entries       map[string]Entry
+	indexWasRead  bool
+	hasChanges    bool
 }
 
-func New(k Konfig, p string, storeZettel StoreZettel) (s *Store, err error) {
+func New(k Konfig, p string, storeObjekten StoreZettel) (s *Store, err error) {
 	s = &Store{
-		Konfig:      k,
-		format:      zettel_formats.Text{},
-		storeZettel: storeZettel,
-		path:        p,
-		entries:     make(map[string]Entry),
+		Konfig:        k,
+		format:        zettel_formats.Text{},
+		storeObjekten: storeObjekten,
+		path:          p,
+		entries:       make(map[string]Entry),
 	}
 
 	s.lock = file_lock.New(path.Join(p, ".ZitCheckoutStoreLock"))
@@ -235,7 +239,7 @@ func (s Store) readZettelFromFile(ez *stored_zettel.External) (err error) {
 	}
 
 	c := zettel.FormatContextRead{
-		AkteWriterFactory: s.storeZettel,
+		AkteWriterFactory: s.storeObjekten,
 	}
 
 	var f *os.File
@@ -254,7 +258,7 @@ func (s Store) readZettelFromFile(ez *stored_zettel.External) (err error) {
 		return
 	}
 
-	if ez.Stored.Sha, err = s.storeZettel.WriteZettelObjekte(c.Zettel); err != nil {
+	if ez.Stored.Sha, err = s.storeObjekten.WriteZettelObjekte(c.Zettel); err != nil {
 		err = errors.Wrapped(err, "%s", f.Name())
 		return
 	}
@@ -265,13 +269,11 @@ func (s Store) readZettelFromFile(ez *stored_zettel.External) (err error) {
 	return
 }
 
-func (s *Store) Read(p string) (ez stored_zettel.External, err error) {
-	if ez, err = s.MakeExternalZettelFromZettel(p); err != nil {
+func (s *Store) Read(p string) (cz zettel_checked_out.CheckedOut, err error) {
+	if cz.External, err = s.MakeExternalZettelFromZettel(p); err != nil {
 		err = errors.Wrapped(err, "%s", p)
 		return
 	}
-
-	logz.Print(ez.Hinweis)
 
 	if s.CacheEnabled {
 		if err = s.ReadAll(); err != nil {
@@ -291,18 +293,46 @@ func (s *Store) Read(p string) (ez stored_zettel.External, err error) {
 
 		var named stored_zettel.Transacted
 
-		if named, err = s.storeZettel.Read(cached.Sha); err != nil {
+		if named, err = s.storeObjekten.Read(cached.Sha); err != nil {
 			err = errors.Error(err)
 			return
 		}
 
-		ez.Stored.Sha = named.Named.Stored.Sha
-		ez.Stored.Zettel = named.Named.Stored.Zettel
+		cz.External.Named.Stored.Sha = named.Named.Stored.Sha
+		cz.External.Named.Stored.Zettel = named.Named.Stored.Zettel
 	} else {
-		if err = s.readZettelFromFile(&ez); err != nil {
-			err = errors.Wrapped(err, "%s", p)
-			return
+		if err = s.readZettelFromFile(&cz.External); err != nil {
+			if errors.IsNotExist(err) {
+				err = nil
+			} else {
+				err = errors.Wrapped(err, "%s", p)
+				return
+			}
 		}
+
+		if cz.Internal, err = s.storeObjekten.Read(cz.External.Hinweis); err != nil {
+			if errors.Is(err, store_objekten.ErrNotFound{}) {
+				err = nil
+			} else {
+				err = errors.Error(err)
+				return
+			}
+		}
+
+		cz.DetermineState()
+
+		if cz.State > zettel_checked_out.StateExistsAndSame {
+			exSha := cz.External.Stored.Sha
+			cz.Matches.Zettelen, _ = s.storeObjekten.ReadZettelSha(exSha)
+
+			exAkteSha := cz.External.Stored.Zettel.Akte
+			cz.Matches.Akten, _ = s.storeObjekten.ReadAkteSha(exAkteSha)
+
+			bez := cz.External.Stored.Zettel.Bezeichnung.String()
+			cz.Matches.Bezeichnungen, _ = s.storeObjekten.ReadBezeichnung(bez)
+		}
+
+		return
 	}
 
 	return

@@ -5,7 +5,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/golf/hinweisen"
-	"github.com/friedenberg/zit/src/hotel/store_objekten"
 	store_working_directory "github.com/friedenberg/zit/src/hotel/store_working_directory"
 	"github.com/friedenberg/zit/src/india/store_with_lock"
 	"github.com/friedenberg/zit/src/india/zettel_checked_out"
@@ -95,36 +94,5 @@ func (op ReadCheckedOut) runOne(
 	store store_with_lock.Store,
 	p string,
 ) (zettel zettel_checked_out.CheckedOut, err error) {
-	if zettel.External, err = store.StoreWorkingDirectory().Read(p); err != nil {
-		if errors.IsNotExist(err) {
-			err = nil
-		} else {
-			err = errors.Error(err)
-			return
-		}
-	}
-
-	if zettel.Internal, err = store.StoreObjekten().Read(zettel.External.Hinweis); err != nil {
-		if errors.Is(err, store_objekten.ErrNotFound{}) {
-			err = nil
-		} else {
-			err = errors.Error(err)
-			return
-		}
-	}
-
-	zettel.DetermineState()
-
-	if zettel.State > zettel_checked_out.StateExistsAndSame {
-		exSha := zettel.External.Stored.Sha
-		zettel.Matches.Zettelen, _ = store.StoreObjekten().ReadZettelSha(exSha)
-
-		exAkteSha := zettel.External.Stored.Zettel.Akte
-		zettel.Matches.Akten, _ = store.StoreObjekten().ReadAkteSha(exAkteSha)
-
-		bez := zettel.External.Stored.Zettel.Bezeichnung.String()
-		zettel.Matches.Bezeichnungen, _ = store.StoreObjekten().ReadBezeichnung(bez)
-	}
-
-	return
+	return store.StoreWorkingDirectory().Read(p)
 }

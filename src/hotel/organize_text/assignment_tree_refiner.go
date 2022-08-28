@@ -73,6 +73,7 @@ func (atc *AssignmentTreeRefiner) renameForPrefixJoint(a *assignment) (err error
 	return
 }
 
+// passed-in assignment may be nil?
 func (atc *AssignmentTreeRefiner) Refine(a *assignment) (err error) {
 	if !atc.Enabled {
 		return

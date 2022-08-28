@@ -35,7 +35,7 @@ func (s Store) ReadExternalZettelFromAktePath(p string) (cz zettel_checked_out.C
 		return
 	}
 
-	if cz.Internal, err = s.storeZettel.Read(cz.External.Named.Hinweis); err != nil {
+	if cz.Internal, err = s.storeObjekten.Read(cz.External.Named.Hinweis); err != nil {
 		if errors.Is(err, store_objekten.ErrNotFound{}) {
 			err = nil
 		} else {
@@ -55,7 +55,7 @@ func (s Store) ReadExternalZettelFromAktePath(p string) (cz zettel_checked_out.C
 
 	cz.External.AktePath = p
 	cz.External.Named.Stored.Zettel.Akte = akteSha
-	cz.Matches.Akten, _ = s.storeZettel.ReadAkteSha(akteSha)
+	cz.Matches.Akten, _ = s.storeObjekten.ReadAkteSha(akteSha)
 
 	cz.DetermineState()
 
@@ -65,7 +65,7 @@ func (s Store) ReadExternalZettelFromAktePath(p string) (cz zettel_checked_out.C
 func (s Store) AkteShaFromPath(p string) (sh sha.Sha, err error) {
 	var aw age_io.Writer
 
-	if aw, err = s.storeZettel.AkteWriter(); err != nil {
+	if aw, err = s.storeObjekten.AkteWriter(); err != nil {
 		err = errors.Error(err)
 		return
 	}
