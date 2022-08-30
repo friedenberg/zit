@@ -1,6 +1,7 @@
 package id
 
 import (
+	"flag"
 	"os"
 	"path"
 	"path/filepath"
@@ -16,6 +17,11 @@ type Id interface {
 	Schwanz() string
 	String() string
 	Sha() sha.Sha
+}
+
+type MutableId interface {
+	Id
+	flag.Value
 }
 
 type TypedId interface {

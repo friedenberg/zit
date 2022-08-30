@@ -4,6 +4,7 @@ import (
 	"flag"
 	"io"
 
+	"github.com/friedenberg/zit/src/echo/id_set"
 	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
@@ -35,7 +36,7 @@ func init() {
 	)
 }
 
-func (c CatObjekte) RunWithId(store store_with_lock.Store, ids ...id.Id) (err error) {
+func (c CatObjekte) RunWithId(store store_with_lock.Store, ids ...id_set.Set) (err error) {
 	switch c.Type {
 
 	case zk_types.TypeAkte:
@@ -50,26 +51,23 @@ func (c CatObjekte) RunWithId(store store_with_lock.Store, ids ...id.Id) (err er
 	}
 }
 
-func (c CatObjekte) akten(store store_with_lock.Store, ids ...id.Id) (err error) {
-	for _, idt := range ids {
+func (c CatObjekte) akten(store store_with_lock.Store, ids ...id_set.Set) (err error) {
+	for _, is := range ids {
 		var sb sha.Sha
 
-		switch i := idt.(type) {
-		case sha.Sha:
-			sb = i
-
-		case hinweis.Hinweis:
+		if shaId, ok := is.Any(sha.Sha{}); ok {
+			sb = shaId.(sha.Sha)
+		} else if hinId, ok := is.Any(hinweis.Hinweis{}); ok {
 			var tz zettel_stored.Transacted
 
-			if tz, err = store.StoreObjekten().Read(i); err != nil {
+			if tz, err = store.StoreObjekten().Read(hinId); err != nil {
 				err = errors.Error(err)
 				return
 			}
 
 			sb = tz.Named.Stored.Zettel.Akte
-
-		default:
-			err = errors.Errorf("unsupported id type: %q", i)
+		} else {
+			err = errors.Errorf("unsupported id type: %q", is)
 			return
 		}
 
@@ -93,11 +91,20 @@ func (c CatObjekte) akten(store store_with_lock.Store, ids ...id.Id) (err error)
 	return
 }
 
-func (c CatObjekte) zettelen(store store_with_lock.Store, ids ...id.Id) (err error) {
-	for _, id := range ids {
+func (c CatObjekte) zettelen(store store_with_lock.Store, ids ...id_set.Set) (err error) {
+	for _, is := range ids {
+		var i id.Id
+		ok := false
+
+		if i, ok = is.AnyShaOrHinweis(); !ok {
+			stdprinter.Errf("unsupported id type: %s\n", is)
+			err = nil
+			continue
+		}
+
 		var tz zettel_stored.Transacted
 
-		if tz, err = store.StoreObjekten().Read(id); err != nil {
+		if tz, err = store.StoreObjekten().Read(i); err != nil {
 			err = errors.Error(err)
 			return
 		}

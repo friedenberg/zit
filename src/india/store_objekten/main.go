@@ -4,6 +4,7 @@ import (
 	"io"
 	"os"
 	"path"
+	"reflect"
 	"sort"
 
 	"github.com/friedenberg/zit/src/alfa/logz"
@@ -164,7 +165,7 @@ func (s Store) Read(i id.Id) (tz zettel_stored.Transacted, err error) {
 		}
 
 	default:
-		err = errors.Errorf("unsupported identifier: %s", i)
+		err = errors.Errorf("unsupported identifier: %s, %#v", i, reflect.ValueOf(i))
 	}
 
 	return

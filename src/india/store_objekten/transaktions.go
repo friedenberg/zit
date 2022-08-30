@@ -12,8 +12,12 @@ import (
 	"github.com/friedenberg/zit/src/delta/ts"
 	"github.com/friedenberg/zit/src/echo/transaktion"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
-	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
+	"github.com/friedenberg/zit/src/golf/zettel_stored"
 )
+
+func (s Store) ReadTransaktion(t ts.Time) (tr transaktion.Transaktion, err error) {
+	return s.readTransaktion(id.Path(t, s.Umwelt.DirObjektenTransaktion()))
+}
 
 func (s Store) readTransaktion(p string) (t transaktion.Transaktion, err error) {
 	tr := &transaktion.Reader{}

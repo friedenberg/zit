@@ -4,10 +4,15 @@ import (
 	"flag"
 	"io"
 
+	"github.com/friedenberg/zit/src/echo/id_set"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
+	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/charlie/zk_types"
+	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/id"
+	"github.com/friedenberg/zit/src/delta/ts"
+	"github.com/friedenberg/zit/src/echo/transaktion"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
 	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
@@ -33,27 +38,17 @@ func init() {
 	)
 }
 
-func (c Show) RunWithId(store store_with_lock.Store, ids ...id.Id) (err error) {
-	zettels := make([]zettel_stored.Transacted, len(ids))
-
-	for i, a := range ids {
-		var tz zettel_stored.Transacted
-
-		if tz, err = store.StoreObjekten().Read(a); err != nil {
-			err = errors.Error(err)
-			return
-		}
-
-		zettels[i] = tz
-	}
-
+func (c Show) RunWithId(store store_with_lock.Store, ids ...id_set.Set) (err error) {
 	switch c.Type {
 
 	case zk_types.TypeAkte:
-		return c.showAkten(store, zettels)
+		return c.showAkten(store, ids)
 
 	case zk_types.TypeZettel:
-		return c.showZettels(store, zettels)
+		return c.showZettels(store, ids)
+
+	case zk_types.TypeTransaktion:
+		return c.showTransaktions(store, ids)
 
 	default:
 		err = errors.Errorf("unsupported objekte type: %s", c.Type)
@@ -61,7 +56,29 @@ func (c Show) RunWithId(store store_with_lock.Store, ids ...id.Id) (err error) {
 	}
 }
 
-func (c Show) showZettels(store store_with_lock.Store, zettels []zettel_stored.Transacted) (err error) {
+func (c Show) showZettels(store store_with_lock.Store, ids []id_set.Set) (err error) {
+	zettels := make([]zettel_stored.Transacted, len(ids))
+
+	for i, is := range ids {
+		var idd id.Id
+		ok := false
+
+		if idd, ok = is.Any(&sha.Sha{}, &hinweis.Hinweis{}); !ok {
+			stdprinter.Errf("unsupported id: %s", is)
+			err = nil
+			continue
+		}
+
+		var tz zettel_stored.Transacted
+
+		if tz, err = store.StoreObjekten().Read(idd); err != nil {
+			err = errors.Error(err)
+			return
+		}
+
+		zettels[i] = tz
+	}
+
 	f := zettel_formats.Text{}
 
 	ctx := zettel.FormatContextWrite{
@@ -87,7 +104,29 @@ func (c Show) showZettels(store store_with_lock.Store, zettels []zettel_stored.T
 	return
 }
 
-func (c Show) showAkten(store store_with_lock.Store, zettels []zettel_stored.Transacted) (err error) {
+func (c Show) showAkten(store store_with_lock.Store, ids []id_set.Set) (err error) {
+	zettels := make([]zettel_stored.Transacted, len(ids))
+
+	for i, is := range ids {
+		var idd id.Id
+		ok := false
+
+		if idd, ok = is.AnyShaOrHinweis(); !ok {
+			stdprinter.Errf("unsupported id: %s", is)
+			err = nil
+			continue
+		}
+
+		var tz zettel_stored.Transacted
+
+		if tz, err = store.StoreObjekten().Read(idd); err != nil {
+			err = errors.Error(err)
+			return
+		}
+
+		zettels[i] = tz
+	}
+
 	var ar io.ReadCloser
 
 	for _, named := range zettels {
@@ -107,6 +146,32 @@ func (c Show) showAkten(store store_with_lock.Store, zettels []zettel_stored.Tra
 			err = errors.Error(err)
 			return
 		}
+	}
+
+	return
+}
+
+func (c Show) showTransaktions(store store_with_lock.Store, ids []id_set.Set) (err error) {
+	for _, is := range ids {
+		var idd id.Id
+		ok := false
+
+		if idd, ok = is.Any(&ts.Time{}); !ok {
+			stdprinter.Errf("unsupported id: %s", is)
+			err = nil
+			continue
+		}
+
+		tid := idd.(ts.Time)
+
+		var t transaktion.Transaktion
+
+		if t, err = store.StoreObjekten().ReadTransaktion(tid); err != nil {
+			stdprinter.Errf("%s\n", err)
+			continue
+		}
+
+		stdprinter.Outf("%#v\n", t)
 	}
 
 	return
