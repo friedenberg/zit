@@ -7,15 +7,15 @@ import (
 )
 
 type ProtoSet struct {
-	types map[string]reflect.Type
+	types map[reflect.Type]bool
 }
 
 func MakeProtoSet(types ...id.MutableId) (ps ProtoSet) {
-	ps.types = make(map[string]reflect.Type, len(types))
+	ps.types = make(map[reflect.Type]bool, len(types))
 
 	for _, t := range types {
 		idType := reflect.TypeOf(t) // this type of this variable is reflect.Type
-		ps.types[idType.Name()] = idType
+		ps.types[idType] = true
 	}
 
 	return
@@ -32,7 +32,7 @@ func (ps ProtoSet) MakeMany(vs ...string) (ss []Set) {
 }
 
 func (ps ProtoSet) MakeOne(v string) (s Set) {
-	for _, t := range ps.types {
+	for t, _ := range ps.types {
 		idPointer := reflect.New(t.Elem())   // this type of this variable is reflect.Value.
 		idInterface := idPointer.Interface() // this type of this variable is interface{}
 		id2 := idInterface.(id.MutableId)

@@ -4,6 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/hinweis"
+	"github.com/friedenberg/zit/src/delta/ts"
 	"github.com/friedenberg/zit/src/echo/id_set"
 	"github.com/friedenberg/zit/src/kilo/store_with_lock"
 )
@@ -21,6 +22,7 @@ func (c commandWithId) RunWithLockedStore(store store_with_lock.Store, args ...s
 		&sha.Sha{},
 		&hinweis.Hinweis{},
 		&hinweis.HinweisWithIndex{},
+		&ts.Time{},
 	)
 
 	ids := ps.MakeMany(args...)
