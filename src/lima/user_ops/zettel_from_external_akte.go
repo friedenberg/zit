@@ -13,6 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
+	"github.com/friedenberg/zit/src/hotel/collections"
 	"github.com/friedenberg/zit/src/kilo/store_with_lock"
 )
 
@@ -22,7 +23,7 @@ type ZettelFromExternalAkte struct {
 	Delete    bool
 }
 
-func (c ZettelFromExternalAkte) Run(args ...string) (results ZettelResults, err error) {
+func (c ZettelFromExternalAkte) Run(args ...string) (results collections.SetTransacted, err error) {
 	var store store_with_lock.Store
 
 	if store, err = store_with_lock.New(c.Umwelt); err != nil {
@@ -32,7 +33,7 @@ func (c ZettelFromExternalAkte) Run(args ...string) (results ZettelResults, err 
 
 	defer errors.PanicIfError(store.Flush)
 
-	results.SetNamed = make(map[string]zettel_stored.Named, len(args))
+	results = collections.MakeSetUniqueTransacted(len(args))
 
 	for _, arg := range args {
 		var z zettel.Zettel
@@ -49,7 +50,7 @@ func (c ZettelFromExternalAkte) Run(args ...string) (results ZettelResults, err 
 			return
 		}
 
-		results.SetNamed[tz.Named.Hinweis.String()] = tz.Named
+		results.Add(tz)
 
 		if c.Delete {
 			if err = os.Remove(arg); err != nil {

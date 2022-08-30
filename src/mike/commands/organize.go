@@ -14,6 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
+	"github.com/friedenberg/zit/src/hotel/collections"
 	"github.com/friedenberg/zit/src/hotel/organize_text"
 	"github.com/friedenberg/zit/src/lima/user_ops"
 )
@@ -94,7 +95,7 @@ func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	var getResults user_ops.ZettelResults
+	var getResults collections.SetTransacted
 
 	getOp := user_ops.GetZettelsFromQuery{Umwelt: u}
 
@@ -105,7 +106,7 @@ func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	createOrganizeFileOp.Named = getResults.SetNamed
+	createOrganizeFileOp.Transacted = getResults
 
 	switch c.Mode {
 	case organizeModeCommitDirectly:

@@ -5,6 +5,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
+	"github.com/friedenberg/zit/src/hotel/collections"
 	"github.com/friedenberg/zit/src/kilo/store_with_lock"
 )
 
@@ -12,7 +13,7 @@ type GetZettelsFromQuery struct {
 	Umwelt *umwelt.Umwelt
 }
 
-func (c GetZettelsFromQuery) Run(query zettel_stored.NamedFilter) (result ZettelResults, err error) {
+func (c GetZettelsFromQuery) Run(query zettel_stored.NamedFilter) (result collections.SetTransacted, err error) {
 	var store store_with_lock.Store
 
 	if store, err = store_with_lock.New(c.Umwelt); err != nil {
@@ -29,10 +30,10 @@ func (c GetZettelsFromQuery) Run(query zettel_stored.NamedFilter) (result Zettel
 		return
 	}
 
-	result.SetNamed = zettel_stored.MakeSetNamed()
+	result = collections.MakeSetUniqueTransacted(len(set))
 
-	for h, tz := range set {
-		result.SetNamed[h.String()] = tz.Named
+	for _, tz := range set {
+		result.Add(tz)
 	}
 
 	return

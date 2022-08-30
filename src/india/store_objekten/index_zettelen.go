@@ -140,7 +140,7 @@ func (i *indexZettelen) addNoRead(tz zettel_stored.Transacted) {
 		var ok bool
 
 		if set, ok = i.zettelen[tz.Named.Stored.Sha]; !ok {
-			set = collections.MakeSetUniqueTransacted()
+			set = collections.MakeSetUniqueTransacted(1)
 		}
 
 		set.Add(tz)
@@ -152,7 +152,7 @@ func (i *indexZettelen) addNoRead(tz zettel_stored.Transacted) {
 		var ok bool
 
 		if set, ok = i.hinweisen[tz.Named.Hinweis]; !ok {
-			set = collections.MakeSetUniqueTransacted()
+			set = collections.MakeSetUniqueTransacted(1)
 		}
 
 		set.Add(tz)
@@ -166,7 +166,7 @@ func (i *indexZettelen) addNoRead(tz zettel_stored.Transacted) {
 		var ok bool
 
 		if set, ok = i.akten[tz.Named.Stored.Zettel.Akte]; !ok {
-			set = collections.MakeSetUniqueTransacted()
+			set = collections.MakeSetUniqueTransacted(1)
 		}
 
 		set.Add(tz)
@@ -180,7 +180,7 @@ func (i *indexZettelen) addNoRead(tz zettel_stored.Transacted) {
 		var ok bool
 
 		if set, ok = i.bezeichnungen[bezKey]; !ok {
-			set = collections.MakeSetUniqueTransacted()
+			set = collections.MakeSetUniqueTransacted(1)
 		}
 
 		set.Add(tz)
@@ -192,7 +192,7 @@ func (i *indexZettelen) addNoRead(tz zettel_stored.Transacted) {
 		var ok bool
 
 		if set, ok = i.typen[tz.Named.Stored.Zettel.Typ]; !ok {
-			set = collections.MakeSetUniqueTransacted()
+			set = collections.MakeSetUniqueTransacted(1)
 		}
 
 		set.Add(tz)

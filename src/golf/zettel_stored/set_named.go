@@ -53,15 +53,6 @@ func (s SetNamed) HinweisStrings() (h []string) {
 	return
 }
 
-func (s SetNamed) ToSetPrefixNamed() (b *SetPrefixNamed) {
-	b = NewSetPrefixNamed()
-
-	for _, z := range s {
-		b.Add(z)
-	}
-
-	return
-}
 
 // func (s SetNamed) Slice() (slice []string) {
 // 	slice = make([]string, len(zs.etikettenToExisting))

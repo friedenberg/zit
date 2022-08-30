@@ -28,7 +28,7 @@ func makeKey(ss ...fmt.Stringer) string {
 	return sb.String()
 }
 
-func MakeSetUniqueTransacted() SetTransacted {
+func MakeSetUniqueTransacted(c int) SetTransacted {
 	return SetTransacted{
 		keyFunc: func(sz zettel_stored.Transacted) string {
 			return makeKey(
@@ -112,6 +112,16 @@ func (m SetTransacted) ToSlice() (s SliceTransacted) {
 
 	for _, sz := range m.innerMap {
 		s.Append(sz)
+	}
+
+	return
+}
+
+func (s SetTransacted) ToSetPrefixTransacted() (b SetPrefixTransacted) {
+	b = MakeSetPrefixTransacted(len(s.innerMap))
+
+	for _, z := range s.innerMap {
+		b.Add(z)
 	}
 
 	return

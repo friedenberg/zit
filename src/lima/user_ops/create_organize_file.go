@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/echo/umwelt"
+	"github.com/friedenberg/zit/src/hotel/collections"
 	"github.com/friedenberg/zit/src/hotel/organize_text"
 	"github.com/friedenberg/zit/src/kilo/store_with_lock"
 )
@@ -19,7 +20,7 @@ type CreateOrganizeFileResults struct {
 	Text organize_text.Text
 }
 
-func (c CreateOrganizeFile) RunAndWrite(zettels ZettelResults, w io.WriteCloser) (results CreateOrganizeFileResults, err error) {
+func (c CreateOrganizeFile) RunAndWrite(zettels collections.SetTransacted, w io.WriteCloser) (results CreateOrganizeFileResults, err error) {
 	results, err = c.Run(zettels)
 
 	defer errors.PanicIfError(w.Close)
@@ -32,7 +33,7 @@ func (c CreateOrganizeFile) RunAndWrite(zettels ZettelResults, w io.WriteCloser)
 	return
 }
 
-func (c CreateOrganizeFile) Run(zettels ZettelResults) (results CreateOrganizeFileResults, err error) {
+func (c CreateOrganizeFile) Run(zettels collections.SetTransacted) (results CreateOrganizeFileResults, err error) {
 	var store store_with_lock.Store
 
 	if store, err = store_with_lock.New(c.Umwelt); err != nil {
