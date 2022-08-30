@@ -27,6 +27,10 @@ func MakeSetPrefixTransacted(c int) (s SetPrefixTransacted) {
 func (s *SetPrefixTransacted) Add(z zettel_stored.Transacted) {
 	es := z.Named.Stored.Zettel.Etiketten.Expanded(etikett.ExpanderRight{})
 
+	if es.Len() == 0 {
+		es = etikett.MakeSet(etikett.Etikett{})
+	}
+
 	for _, e := range es {
 		s.addPair(e, z)
 	}

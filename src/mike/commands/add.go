@@ -54,6 +54,7 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	if c.OpenAkten {
+		//TODO
 	}
 
 	if !c.Organize {
@@ -66,6 +67,7 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			AssignmentTreeConstructor: organize_text.AssignmentTreeConstructor{
 				GroupingEtiketten: etikett.NewSlice(),
 				RootEtiketten:     c.Etiketten,
+				Transacted:        zettelsFromAkteResults,
 			},
 		},
 	}

@@ -184,6 +184,12 @@ func (s *Store) Create(in zettel.Zettel) (tz zettel_stored.Transacted, err error
 		return
 	}
 
+	//If the zettel exists, short circuit and return that
+	// if tz2, err2 := s.Read(tz.Named.Stored.Sha); err2 == nil {
+	// 	tz = tz2
+	// 	return
+	// }
+
 	if tz.Named.Hinweis, err = s.hinweisen.StoreNew(tz.Named.Stored.Sha); err != nil {
 		err = errors.Error(err)
 		return
