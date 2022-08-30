@@ -20,7 +20,7 @@ func (c commandWithId) RunWithLockedStore(store store_with_lock.Store, args ...s
 	ps := id_set.MakeProtoSet(
 		&sha.Sha{},
 		&hinweis.Hinweis{},
-    //TODO add hinweis with index
+		&hinweis.HinweisWithIndex{},
 	)
 
 	ids := ps.MakeMany(args...)

@@ -4,14 +4,12 @@ import (
 	"flag"
 	"io"
 
-	"github.com/friedenberg/zit/src/echo/id_set"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
-	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/charlie/zk_types"
-	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/id"
 	"github.com/friedenberg/zit/src/delta/ts"
+	"github.com/friedenberg/zit/src/echo/id_set"
 	"github.com/friedenberg/zit/src/echo/transaktion"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
@@ -63,7 +61,7 @@ func (c Show) showZettels(store store_with_lock.Store, ids []id_set.Set) (err er
 		var idd id.Id
 		ok := false
 
-		if idd, ok = is.Any(&sha.Sha{}, &hinweis.Hinweis{}); !ok {
+		if idd, ok = is.AnyShaOrHinweis(); !ok {
 			stdprinter.Errf("unsupported id: %s", is)
 			err = nil
 			continue
