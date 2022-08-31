@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/logz"
-	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
+	"github.com/friedenberg/zit/src/golf/zettel_stored"
 )
 
 type CheckedOut struct {

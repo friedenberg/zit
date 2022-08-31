@@ -11,7 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/echo/umwelt"
-	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
+	"github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/hotel/collections"
 )
 

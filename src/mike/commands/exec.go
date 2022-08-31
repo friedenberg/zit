@@ -17,7 +17,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/konfig"
 	"github.com/friedenberg/zit/src/echo/id_set"
 	"github.com/friedenberg/zit/src/echo/umwelt"
-	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
+	"github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/kilo/store_with_lock"
 )
 

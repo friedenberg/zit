@@ -5,7 +5,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
 	"github.com/friedenberg/zit/src/echo/umwelt"
-	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
+	"github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/kilo/store_with_lock"
 )
 

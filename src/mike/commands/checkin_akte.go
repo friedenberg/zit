@@ -5,15 +5,15 @@ import (
 	"io"
 	"os"
 
+	"github.com/friedenberg/zit/src/echo/age_io"
+	"github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/delta/hinweis"
-	age_io "github.com/friedenberg/zit/src/echo/age_io"
 	"github.com/friedenberg/zit/src/echo/umwelt"
-	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/kilo/store_with_lock"
 )
 

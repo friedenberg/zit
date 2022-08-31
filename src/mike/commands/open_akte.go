@@ -11,7 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/id"
-	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
+	"github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/kilo/store_with_lock"
 )
 

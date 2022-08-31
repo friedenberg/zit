@@ -3,7 +3,7 @@ package organize_text
 import (
 	"sort"
 
-	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
+	"github.com/friedenberg/zit/src/golf/zettel_stored"
 )
 
 type zettelSet map[zettel]bool

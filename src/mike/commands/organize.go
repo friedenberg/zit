@@ -13,7 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/echo/umwelt"
-	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
+	"github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/hotel/collections"
 	"github.com/friedenberg/zit/src/hotel/organize_text"
 	"github.com/friedenberg/zit/src/lima/user_ops"

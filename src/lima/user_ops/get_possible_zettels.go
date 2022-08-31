@@ -3,7 +3,7 @@ package user_ops
 import (
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/echo/umwelt"
-	store_working_directory "github.com/friedenberg/zit/src/juliett/store_working_directory"
+	"github.com/friedenberg/zit/src/juliett/store_working_directory"
 	"github.com/friedenberg/zit/src/kilo/store_with_lock"
 )
 

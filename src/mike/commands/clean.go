@@ -8,9 +8,9 @@ import (
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
-	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
+	"github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/india/zettel_checked_out"
-	store_working_directory "github.com/friedenberg/zit/src/juliett/store_working_directory"
+	"github.com/friedenberg/zit/src/juliett/store_working_directory"
 	"github.com/friedenberg/zit/src/kilo/store_with_lock"
 	"github.com/friedenberg/zit/src/lima/user_ops"
 )

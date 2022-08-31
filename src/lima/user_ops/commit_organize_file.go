@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
-	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
+	"github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/hotel/organize_text"
 	"github.com/friedenberg/zit/src/india/changes"
 	"github.com/friedenberg/zit/src/kilo/store_with_lock"

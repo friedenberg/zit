@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
 	"github.com/friedenberg/zit/src/charlie/sha"
-	age_io "github.com/friedenberg/zit/src/echo/age_io"
+	"github.com/friedenberg/zit/src/echo/age_io"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 )
 

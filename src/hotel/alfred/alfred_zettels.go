@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/alfred"
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/delta/hinweis"
-	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
+	"github.com/friedenberg/zit/src/golf/zettel_stored"
 )
 
 func ZettelToItem(z zettel_stored.Named) (a alfred.Item) {

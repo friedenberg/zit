@@ -11,7 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/id"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
-	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
+	"github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/india/zettel_checked_out"
 )
 

@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/zk_types"
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/delta/hinweis"
-	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
+	"github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/hotel/alfred"
 	"github.com/friedenberg/zit/src/kilo/store_with_lock"
 )

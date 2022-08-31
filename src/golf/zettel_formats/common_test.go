@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/typ"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/etikett"
-	age_io "github.com/friedenberg/zit/src/echo/age_io"
+	"github.com/friedenberg/zit/src/echo/age_io"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 )
 

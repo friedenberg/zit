@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/golf/hinweisen"
 	"github.com/friedenberg/zit/src/india/zettel_checked_out"
-	store_working_directory "github.com/friedenberg/zit/src/juliett/store_working_directory"
+	"github.com/friedenberg/zit/src/juliett/store_working_directory"
 	"github.com/friedenberg/zit/src/kilo/store_with_lock"
 )
 

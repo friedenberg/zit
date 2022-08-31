@@ -4,7 +4,7 @@ import (
 	"sort"
 
 	"github.com/friedenberg/zit/src/delta/etikett"
-	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
+	"github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/hotel/collections"
 )
 

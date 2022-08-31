@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"sort"
 
-	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
+	"github.com/friedenberg/zit/src/golf/zettel_stored"
 )
 
 type SliceTransacted struct {

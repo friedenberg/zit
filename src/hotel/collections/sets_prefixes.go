@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/delta/etikett"
-	zettel_stored "github.com/friedenberg/zit/src/golf/zettel_stored"
+	"github.com/friedenberg/zit/src/golf/zettel_stored"
 )
 
 type SetPrefixTransacted struct {
