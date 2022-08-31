@@ -1,7 +1,11 @@
 package hinweis
 
-func (a Hinweis) Equals(b Hinweis) bool {
-	if a.String() != b.String() {
+func (a inner) Equals(b Hinweis) bool {
+	if a.Left != b.Left {
+		return false
+	}
+
+	if a.Right != b.Right {
 		return false
 	}
 

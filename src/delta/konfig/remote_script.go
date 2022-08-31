@@ -7,4 +7,3 @@ import (
 type RemoteScript interface {
 	Cmd(args ...string) (*exec.Cmd, error)
 }
-

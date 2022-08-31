@@ -35,6 +35,7 @@ func ZettelToItem(z zettel_stored.Named) (a alfred.Item) {
 	mb.AddMatches(z.Hinweis.Kopf())
 	mb.AddMatches(z.Hinweis.Schwanz())
 	mb.AddMatches(z.Stored.Zettel.Bezeichnung.String())
+	mb.AddMatches(z.Stored.Zettel.Typ.String())
 	mb.AddMatches(EtikettenStringsFromZettel(z.Stored.Zettel.Etiketten, true)...)
 
 	a.Match = mb.String()

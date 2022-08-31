@@ -4,7 +4,6 @@ import (
 	"flag"
 	"io"
 
-	"github.com/friedenberg/zit/src/echo/id_set"
 	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
@@ -12,8 +11,10 @@ import (
 	"github.com/friedenberg/zit/src/charlie/zk_types"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/id"
+	"github.com/friedenberg/zit/src/echo/id_set"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
 	"github.com/friedenberg/zit/src/golf/zettel_stored"
+	"github.com/friedenberg/zit/src/india/zettel_checked_out"
 	"github.com/friedenberg/zit/src/kilo/store_with_lock"
 )
 
@@ -58,14 +59,18 @@ func (c CatObjekte) akten(store store_with_lock.Store, ids ...id_set.Set) (err e
 		if shaId, ok := is.Any(&sha.Sha{}); ok {
 			sb = shaId.(sha.Sha)
 		} else if hinId, ok := is.Any(&hinweis.Hinweis{}); ok {
-			var tz zettel_stored.Transacted
+			var zc zettel_checked_out.CheckedOut
 
-			if tz, err = store.StoreObjekten().Read(hinId); err != nil {
+			if zc, err = store.StoreWorkingDirectory().Read(hinId.String() + ".md"); err != nil {
 				err = errors.Error(err)
 				return
 			}
 
-			sb = tz.Named.Stored.Zettel.Akte
+			if zc.State == zettel_checked_out.StateExistsAndDifferent {
+				sb = zc.External.Named.Stored.Zettel.Akte
+			} else {
+				sb = zc.Internal.Named.Stored.Zettel.Akte
+			}
 		} else {
 			err = errors.Errorf("unsupported id type: %q", is)
 			return

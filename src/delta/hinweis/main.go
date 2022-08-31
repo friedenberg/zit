@@ -19,7 +19,8 @@ func init() {
 }
 
 type Hinweis struct {
-	Left, Right string
+	inner
+	Bez string
 }
 
 type Provider interface {
@@ -40,28 +41,25 @@ func New(i kennung.Int, pl Provider, pr Provider) (h Hinweis, err error) {
 
 	h = Hinweis{}
 
-	logz.Print("making kennung")
+	var l, r string
 
-	logz.Print("making left")
-	if h.Left, err = pl.Hinweis(k.Left); err != nil {
-		logz.Printf("left failed: %s", err)
-		err = errors.Errorf("failed to make left kennung: %s", err)
+	if l, err = pl.Hinweis(k.Left); err != nil {
+		logz.Printf("Left failed: %s", err)
+		err = errors.Errorf("failed to make Left kennung: %s", err)
 		return
 	}
 
-	logz.Print("making right")
-	if h.Right, err = pr.Hinweis(k.Right); err != nil {
+	if r, err = pr.Hinweis(k.Right); err != nil {
 		err = errors.Errorf("failed to make right kennung: %s", err)
 		return
 	}
 
-	logz.Print("making setting")
-	if err = h.Set(h.String()); err != nil {
+	hs := fmt.Sprintf("%s/%s", l, r)
+
+	if err = h.Set(hs); err != nil {
 		err = errors.Errorf("failed to set hinweis: %s", err)
 		return
 	}
-
-	logz.Print("done")
 
 	return
 }
@@ -76,16 +74,12 @@ func Make(v string) (h Hinweis, err error) {
 	return
 }
 
-func (h Hinweis) Kopf() string {
-	return h.Left
-}
-
-func (h Hinweis) Schwanz() string {
-	return h.Right
-}
-
 func (h Hinweis) String() string {
-	return fmt.Sprintf("%s/%s", h.Left, h.Right)
+	if h.Bez == "" {
+		return h.inner.String()
+	} else {
+		return fmt.Sprintf("%s/%s", h.inner.String(), h.Bez)
+	}
 }
 
 func (h *Hinweis) Set(v string) (err error) {
@@ -100,24 +94,33 @@ func (h *Hinweis) Set(v string) (err error) {
 		},
 		v,
 	)
+
 	parts := strings.Split(strings.ToLower(v), "/")
 
 	count := len(parts)
 
-	if count != 2 {
+	switch count {
+
+	default:
 		err = errors.Normal(errors.Errorf("hinweis needs exactly 2 components, but got %d: %q", count, v))
 		return
-	}
 
-	h.Left = parts[0]
-	h.Right = parts[1]
+	case 3:
+		//Left/right/bez
+		h.Bez = parts[2]
+		fallthrough
+
+	case 2:
+		h.Left = parts[0]
+		h.Right = parts[1]
+	}
 
 	return
 }
 
 func (h Hinweis) Sha() sha.Sha {
 	hash := sha256.New()
-	sr := strings.NewReader(h.String())
+	sr := strings.NewReader(h.inner.String())
 
 	if _, err := io.Copy(hash, sr); err != nil {
 		stdprinter.PanicIfError(err)
