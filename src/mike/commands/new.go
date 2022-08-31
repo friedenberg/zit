@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/bezeichnung"
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/src/bravo/errors"
+	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/bravo/typ"
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/delta/script_value"
@@ -151,7 +152,7 @@ func (c New) writeNewZettel(
 		return
 	}
 
-	defer s.Flush()
+	defer stdprinter.PanicIfError(s.Flush)
 
 	if cz, err = emptyOp.RunOne(s, z); err != nil {
 		err = errors.Error(err)
@@ -195,7 +196,7 @@ func (c New) editZettelIfRequested(
 		return
 	}
 
-	defer s.Flush()
+	defer stdprinter.PanicIfError(s.Flush)
 
 	if cz, err = readOp.RunOneString(s, cz.External.ZettelFD.Path); err != nil {
 		err = errors.Error(err)

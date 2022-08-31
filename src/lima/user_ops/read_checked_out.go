@@ -31,16 +31,7 @@ func (op ReadCheckedOut) RunOneString(
 	s store_with_lock.Store,
 	p string,
 ) (zettel zettel_checked_out.CheckedOut, err error) {
-	var store store_with_lock.Store
-
-	if store, err = store_with_lock.New(op.Umwelt); err != nil {
-		err = errors.Error(err)
-		return
-	}
-
-	defer errors.PanicIfError(store.Flush)
-
-	if zettel, err = store.StoreWorkingDirectory().Read(p); err != nil {
+	if zettel, err = s.StoreWorkingDirectory().Read(p); err != nil {
 		err = errors.Error(err)
 		return
 	}
