@@ -16,8 +16,9 @@ type KonfigTag struct {
 }
 
 type KonfigTyp struct {
-	FormatScript RemoteScriptConfig `toml:"format-script"`
-	InlineAkte   bool               `toml:"inline-akte" default:"true"`
+	FormatScript ScriptConfig `toml:"format-script"`
+	InlineAkte   bool         `toml:"inline-akte" default:"true"`
+	ExecCommand  ScriptConfig `toml:"exec-command"`
 }
 
 type Konfig struct {

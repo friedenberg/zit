@@ -55,9 +55,9 @@ func (c CatObjekte) akten(store store_with_lock.Store, ids ...id_set.Set) (err e
 	for _, is := range ids {
 		var sb sha.Sha
 
-		if shaId, ok := is.Any(sha.Sha{}); ok {
+		if shaId, ok := is.Any(&sha.Sha{}); ok {
 			sb = shaId.(sha.Sha)
-		} else if hinId, ok := is.Any(hinweis.Hinweis{}); ok {
+		} else if hinId, ok := is.Any(&hinweis.Hinweis{}); ok {
 			var tz zettel_stored.Transacted
 
 			if tz, err = store.StoreObjekten().Read(hinId); err != nil {

@@ -125,15 +125,16 @@ func (f Text) writeToInlineAkte(c zettel.FormatContextWrite) (n int64, err error
 
 	in := ar
 
-	if c.FormatScript != nil {
-		var cmd *exec.Cmd
+	var cmd *exec.Cmd
 
+	if c.FormatScript != nil {
 		if cmd, err = c.FormatScript.Cmd(); err != nil {
 			err = errors.Error(err)
 			return
 		}
 
 		cmd.Stdin = ar
+		cmd.Stderr = os.Stderr
 
 		if in, err = cmd.StdoutPipe(); err != nil {
 			err = errors.Error(err)
@@ -154,6 +155,13 @@ func (f Text) writeToInlineAkte(c zettel.FormatContextWrite) (n int64, err error
 	if err != nil {
 		err = errors.Error(err)
 		return
+	}
+
+	if cmd != nil {
+		if err = cmd.Wait(); err != nil {
+			err = errors.Error(err)
+			return
+		}
 	}
 
 	return
