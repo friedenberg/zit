@@ -142,8 +142,13 @@ func (s Store) writeNamedZettelToIndex(tz zettel_stored.Transacted) (err error) 
 	}
 
 	if err = s.indexKennung.addHinweis(tz.Named.Hinweis); err != nil {
-		err = errors.Wrapped(err, "failed to write zettel to index: %s", tz.Named)
-		return
+		if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
+			stdprinter.Errf("kennung does not contain value: %s\n", err)
+			err = nil
+		} else {
+			err = errors.Wrapped(err, "failed to write zettel to index: %s", tz.Named)
+			return
+		}
 	}
 
 	return

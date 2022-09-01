@@ -1,11 +1,16 @@
 package hinweisen
 
-import "github.com/friedenberg/zit/src/bravo/errors"
+import "fmt"
 
-var (
-	ErrDoesNotExist error
-)
+type ErrDoesNotExist struct {
+	Value string
+}
 
-func init() {
-	ErrDoesNotExist = errors.Normalf("hinweis does not exist")
+func (e ErrDoesNotExist) Error() string {
+	return fmt.Sprintf("kennung does not exist: %s", e.Value)
+}
+
+func (e ErrDoesNotExist) Is(target error) bool {
+	_, ok := target.(ErrDoesNotExist)
+	return ok
 }

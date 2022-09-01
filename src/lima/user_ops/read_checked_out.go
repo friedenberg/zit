@@ -49,7 +49,7 @@ func (op ReadCheckedOut) RunMany(
 		var checked_out zettel_checked_out.CheckedOut
 
 		if checked_out, err = s.StoreWorkingDirectory().Read(p); err != nil {
-			if errors.Is(err, hinweisen.ErrDoesNotExist) {
+			if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
 				//TODO log
 				err = nil
 			} else {
@@ -66,7 +66,7 @@ func (op ReadCheckedOut) RunMany(
 		var checked_out zettel_checked_out.CheckedOut
 
 		if checked_out, err = s.StoreWorkingDirectory().ReadExternalZettelFromAktePath(p); err != nil {
-			if errors.Is(err, hinweisen.ErrDoesNotExist) {
+			if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
 				//TODO log
 				err = nil
 			} else {

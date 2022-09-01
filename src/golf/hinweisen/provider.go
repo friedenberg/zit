@@ -48,11 +48,11 @@ func newProvider(path string) (p provider, err error) {
 func (p provider) Hinweis(i kennung.Int) (s string, err error) {
 	if len(p)-1 < int(i) {
 		err = errors.Errorf(
-      "insuffient ids. requested %d, have %d, last %s",
-      int(i),
-      len(p)-1,
-      p[len(p)-1],
-    )
+			"insuffient ids. requested %d, have %d, last %s",
+			int(i),
+			len(p)-1,
+			p[len(p)-1],
+		)
 
 		return
 	}
@@ -67,15 +67,42 @@ func (p provider) Len() int {
 }
 
 func (p provider) Kennung(v string) (i int, err error) {
+	v = strings.ToLower(v)
+	v = strings.Map(
+		func(r rune) rune {
+			if r > 'z' {
+				return -1
+			}
+
+			return r
+		},
+		v,
+	)
+
 	var s string
 
 	for i, s = range p {
+		//TODO move to init and make common
+		s = strings.ToLower(s)
+		s = strings.Map(
+			func(r rune) rune {
+				if r > 'z' {
+					return -1
+				}
+
+				return r
+			},
+			s,
+		)
+
 		if s == v {
 			return
 		}
 	}
 
-	err = errors.Errorf("kennung not found: %s", v)
+	err = ErrDoesNotExist{
+		Value: v,
+	}
 
 	return
 }
