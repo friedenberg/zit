@@ -35,6 +35,7 @@ type Store struct {
 	*indexZettelen
 	*indexZettelenTails
 	*indexEtiketten
+	*indexKennung
 	transaktion.Transaktion
 }
 
@@ -75,6 +76,18 @@ func (s *Store) Initialize(u *umwelt.Umwelt) (err error) {
 
 	if err != nil {
 		err = errors.Wrapped(err, "failed to init zettel index")
+		return
+	}
+
+	s.indexKennung, err = newIndexKennung(
+		u,
+		s,
+		s.hinweisen,
+		u.DirVerzeichnisse("Kennung"),
+	)
+
+	if err != nil {
+		err = errors.Wrapped(err, "failed to init kennung index")
 		return
 	}
 
@@ -124,6 +137,11 @@ func (s Store) writeNamedZettelToIndex(tz zettel_stored.Transacted) (err error) 
 	}
 
 	if err = s.indexZettelen.add(tz); err != nil {
+		err = errors.Wrapped(err, "failed to write zettel to index: %s", tz.Named)
+		return
+	}
+
+	if err = s.indexKennung.addHinweis(tz.Named.Hinweis); err != nil {
 		err = errors.Wrapped(err, "failed to write zettel to index: %s", tz.Named)
 		return
 	}

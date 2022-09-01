@@ -55,3 +55,17 @@ func (p provider) Hinweis(i kennung.Int) (s string, err error) {
 
 	return
 }
+
+func (p provider) Kennung(v string) (i int, err error) {
+	var s string
+
+	for i, s = range p {
+		if s == v {
+			return
+		}
+	}
+
+	err = errors.Errorf("kennung not found: %s", v)
+
+	return
+}

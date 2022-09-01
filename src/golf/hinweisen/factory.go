@@ -56,6 +56,14 @@ func newFactory(basePath string) (f *factory, err error) {
 	return
 }
 
+func (hf factory) Left() provider {
+  return hf.yin
+}
+
+func (hf factory) Right() provider {
+  return hf.yang
+}
+
 func (hf *factory) Refresh() (err error) {
 	hf.Lock()
 	defer hf.Unlock()
