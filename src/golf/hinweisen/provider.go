@@ -47,13 +47,23 @@ func newProvider(path string) (p provider, err error) {
 
 func (p provider) Hinweis(i kennung.Int) (s string, err error) {
 	if len(p)-1 < int(i) {
-		err = errors.Errorf("insuffient ids")
+		err = errors.Errorf(
+      "insuffient ids. requested %d, have %d, last %s",
+      int(i),
+      len(p)-1,
+      p[len(p)-1],
+    )
+
 		return
 	}
 
 	s = p[i]
 
 	return
+}
+
+func (p provider) Len() int {
+	return len(p)
 }
 
 func (p provider) Kennung(v string) (i int, err error) {

@@ -1,6 +1,7 @@
 package kennung
 
 import (
+	"fmt"
 	"math"
 	"strconv"
 )
@@ -67,4 +68,8 @@ func (p Kennung) Id() Int {
 	n := p.Left + p.Right + 1
 	ext := Extrema(n)
 	return ext.Left + p.Left
+}
+
+func (p Kennung) String() string {
+	return fmt.Sprintf("%d/%d: %d", p.Left, p.Right, p.Id())
 }

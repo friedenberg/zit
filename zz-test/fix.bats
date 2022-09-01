@@ -29,32 +29,25 @@ cat_yang() (
 	echo "tres"
 )
 
-function zettels_in_correct_places { # @test
+function can_peek_hinweisen_after_init { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	run zit init -verbose -disable-age -yin <(cat_yin) -yang <(cat_yang)
 
-	one="$(mktemp)"
+	expected="$(mktemp)"
 	{
-		echo "---"
-		echo "# jabra coral usb_a-to-usb_c cable"
-		echo "- inventory-pipe_shelves-atheist_shoes_box-jabra_yellow_box_2"
-		echo "---"
-	} >"$one"
+		echo 0: one/dos
+		echo 1: one/tres
+		echo 2: one/uno
+		echo 3: three/dos
+		echo 4: three/tres
+		echo 5: three/uno
+		echo 6: two/dos
+		echo 7: two/tres
+    echo 8: two/uno
+	} >"$expected"
 
-	run zit new "$one"
-
-	expected_organize="$(mktemp)"
-	{
-		echo
-		echo "# inventory-pipe_shelves-atheist_shoes_box-jabra_yellow_box_2"
-		echo
-		echo "- [one/uno] jabra coral usb_a-to-usb_c cable"
-	} >"$expected_organize"
-
-	run zit organize -mode output-only -group-by inventory \
-		inventory-pipe_shelves-atheist_shoes_box-jabra_yellow_box_2
-
-	assert_output "$(cat "$expected_organize")"
+	run zit peek-hinweisen
+	assert_output "$(cat "$expected")"
 }

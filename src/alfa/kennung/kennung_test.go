@@ -48,6 +48,14 @@ func TestFromId5(t *testing.T) {
 	assertFromId(t, "5", Kennung{Left: 1, Right: 1})
 }
 
+func TestFromId745(t *testing.T) {
+	assertFromId(t, "745", Kennung{Left: 3, Right: 35})
+}
+
+func TestFromId10469(t *testing.T) {
+	assertFromId(t, "10469", Kennung{Left: 28, Right: 116})
+}
+
 func TestFromId1(t *testing.T) {
 	assertFromId(t, "1", Kennung{Left: 0, Right: 0})
 }

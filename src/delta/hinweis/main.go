@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/kennung"
-	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/sha"
@@ -44,7 +43,6 @@ func New(i kennung.Int, pl Provider, pr Provider) (h Hinweis, err error) {
 	var l, r string
 
 	if l, err = pl.Hinweis(k.Left); err != nil {
-		logz.Printf("Left failed: %s", err)
 		err = errors.Errorf("failed to make Left kennung: %s", err)
 		return
 	}

@@ -13,6 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
 	"github.com/friedenberg/zit/src/delta/age"
 	"github.com/friedenberg/zit/src/echo/umwelt"
+	"github.com/friedenberg/zit/src/kilo/store_with_lock"
 )
 
 type Init struct {
@@ -46,8 +47,7 @@ func (c Init) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	c.mkdirAll(u.DirObjektenAkten())
 	c.mkdirAll(u.DirObjektenZettelen())
-
-	c.mkdirAll(u.DirVerzeichnisseAkten())
+	c.mkdirAll(u.DirObjektenTransaktion())
 
 	// c.mkdirAll(base, "Etikett-Zettel")
 	c.mkdirAll(u.DirHinweis())
@@ -72,6 +72,20 @@ func (c Init) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	if err = c.populateYangIfNecessary(u); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	var store store_with_lock.Store
+
+	if store, err = store_with_lock.New(u); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	defer errors.PanicIfError(store.Flush)
+
+	if err = store.StoreObjekten().Reindex(); err != nil {
 		err = errors.Error(err)
 		return
 	}

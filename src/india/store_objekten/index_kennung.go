@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"encoding/gob"
 	"io"
+	"math/rand"
+	"time"
 
 	"github.com/friedenberg/zit/src/alfa/kennung"
 	"github.com/friedenberg/zit/src/alfa/logz"
@@ -16,7 +18,6 @@ import (
 
 type encodedKennung struct {
 	AvailableKennung map[int]bool
-	Yin, Yang        []string
 }
 
 type indexKennung struct {
@@ -31,6 +32,8 @@ type indexKennung struct {
 
 	didRead    bool
 	hasChanges bool
+
+	nonRandomSelection bool
 }
 
 func newIndexKennung(
@@ -40,14 +43,13 @@ func newIndexKennung(
 	p string,
 ) (i *indexKennung, err error) {
 	i = &indexKennung{
-		Umwelt:            u,
-		path:              p,
-		oldHinweisenStore: oldHinweisenStore,
-		ioFactory:         ioFactory,
+		Umwelt:             u,
+		path:               p,
+		nonRandomSelection: u.Konfig.PredictableHinweisen,
+		oldHinweisenStore:  oldHinweisenStore,
+		ioFactory:          ioFactory,
 		encodedKennung: encodedKennung{
 			AvailableKennung: make(map[int]bool),
-			Yin:              make([]string, 0),
-			Yang:             make([]string, 0),
 		},
 	}
 
@@ -80,13 +82,18 @@ func (i *indexKennung) Flush() (err error) {
 		return
 	}
 
+	logz.PrintDebug(i.encodedKennung)
+
 	return
 }
 
 func (i *indexKennung) readIfNecessary() (err error) {
 	if i.didRead {
+		logz.Print("already read")
 		return
 	}
+
+	logz.Print("reading")
 
 	i.didRead = true
 
@@ -112,6 +119,43 @@ func (i *indexKennung) readIfNecessary() (err error) {
 		err = errors.Error(err)
 		return
 	}
+
+	logz.PrintDebug(i.encodedKennung)
+
+	return
+}
+
+func (i *indexKennung) reset() (err error) {
+	lMax := i.oldHinweisenStore.Factory().Left().Len() - 1
+	rMax := i.oldHinweisenStore.Factory().Right().Len() - 1
+
+	if lMax == 0 {
+		err = errors.Errorf("left kennung are empty")
+		return
+	}
+
+	if rMax == 0 {
+		err = errors.Errorf("right kennung are empty")
+		return
+	}
+
+	i.AvailableKennung = make(map[int]bool, lMax*rMax)
+
+	for l := 0; l <= lMax; l++ {
+		for r := 0; r <= rMax; r++ {
+			k := &kennung.Kennung{
+				Left:  kennung.Int(l),
+				Right: kennung.Int(r),
+			}
+
+			logz.Print(k)
+
+			n := int(k.Id())
+			i.AvailableKennung[n] = true
+		}
+	}
+
+	i.hasChanges = true
 
 	return
 }
@@ -157,24 +201,98 @@ func (i *indexKennung) createHinweis() (h hinweis.Hinweis, err error) {
 		return
 	}
 
-	var n int
-
-	for n, _ = range i.AvailableKennung {
-		break
+	if len(i.AvailableKennung) == 0 {
+		err = errors.Errorf("no available kennung")
+		return
 	}
 
-	if _, ok := i.AvailableKennung[int(n)]; ok {
-		delete(i.AvailableKennung, int(n))
+	rand.Seed(time.Now().UnixNano())
+	ri := rand.Intn(len(i.AvailableKennung) - 1)
+
+	m := 0
+	j := 0
+
+	for n, _ := range i.AvailableKennung {
+		if i.nonRandomSelection {
+			if m == 0 {
+				m = n
+				continue
+			}
+
+			if n > m {
+				continue
+			}
+
+			m = n
+		} else {
+			j++
+			m = n
+
+			if j == ri {
+				break
+			}
+		}
+	}
+
+	if _, ok := i.AvailableKennung[int(m)]; ok {
+		delete(i.AvailableKennung, int(m))
 	}
 
 	i.hasChanges = true
 
-	k := &kennung.Kennung{}
-	k.SetInt(kennung.Int(n))
+	return i.makeHinweisButDontStore(m)
+}
 
-	return hinweis.New(
+func (i *indexKennung) makeHinweisButDontStore(j int) (h hinweis.Hinweis, err error) {
+	k := &kennung.Kennung{}
+	k.SetInt(kennung.Int(j))
+
+	h, err = hinweis.New(
 		k.Id(),
 		i.oldHinweisenStore.Factory().Left(),
 		i.oldHinweisenStore.Factory().Right(),
 	)
+
+	if err != nil {
+		err = errors.Wrapped(err, "trying to make hinweis for %s", k)
+		return
+	}
+
+	return
+}
+
+func (i *indexKennung) PeekHinweisen(m int) (hs []hinweis.Hinweis, err error) {
+	if err = i.readIfNecessary(); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
+	if m > len(i.AvailableKennung) || m == 0 {
+		m = len(i.AvailableKennung)
+	}
+
+	hs = make([]hinweis.Hinweis, 0, m)
+	j := 0
+
+	for n, _ := range i.AvailableKennung {
+		k := &kennung.Kennung{}
+		k.SetInt(kennung.Int(n))
+
+		var h hinweis.Hinweis
+
+		if h, err = i.makeHinweisButDontStore(n); err != nil {
+			err = errors.Error(err)
+			return
+		}
+
+		hs = append(hs, h)
+
+		j++
+
+		if j == m {
+			break
+		}
+	}
+
+	return
 }

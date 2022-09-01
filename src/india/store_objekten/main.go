@@ -208,7 +208,7 @@ func (s *Store) Create(in zettel.Zettel) (tz zettel_stored.Transacted, err error
 	// 	return
 	// }
 
-	if tz.Named.Hinweis, err = s.hinweisen.StoreNew(tz.Named.Stored.Sha); err != nil {
+	if tz.Named.Hinweis, err = s.indexKennung.createHinweis(); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -348,6 +348,11 @@ func (s Store) Flush() (err error) {
 		return
 	}
 
+	if err = s.indexKennung.Flush(); err != nil {
+		err = errors.Wrapped(err, "failed to flush new kennung index")
+		return
+	}
+
 	return
 }
 
@@ -451,6 +456,11 @@ func (s *Store) Reindex() (err error) {
 
 	if err = os.MkdirAll(s.Umwelt.DirVerzeichnisse(), os.ModeDir|0755); err != nil {
 		err = errors.Wrapped(err, "failed to make verzeichnisse dir")
+		return
+	}
+
+	if err = s.indexKennung.reset(); err != nil {
+		err = errors.Wrapped(err, "failed to reset index kennung")
 		return
 	}
 
