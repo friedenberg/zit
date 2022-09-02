@@ -2,14 +2,16 @@
 .PHONY: build watch exclude;
 
 build:
-	go build -o build/zit ./.
-	go vet ./...
-	go test ./...
-	go install ./.
-	bats zz-test/*.bats
+	./bin/graph_dependencies src/bravo
+	# go build -o build/zit ./.
+	# go vet ./...
+	# go test ./...
+	# go install ./.
+	# bats zz-test/*.bats
 
 watch:
-	echo .
+	echo dot
+	echo ./bin/graph_dependencies
 
 exclude:
 	echo .DS_Store

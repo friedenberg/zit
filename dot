@@ -1,0 +1,413 @@
+digraph {
+  node [ fontname = "Input Sans"; shape = rect ];
+  newrank = true;
+  ranksep = "6.0";
+
+  subgraph "cluster_alfa" {
+    color = "#76ba30";
+    node [ color = "#76ba30" ];
+    edge [ color = "#76ba30" ];
+    label = "alfa";
+    rank = same;
+    "alfa/toml"
+    "alfa/bezeichnung"
+    "alfa/url"
+    "alfa/kennung"
+    "alfa/logz"
+    "alfa/exec"
+    "alfa/vim_cli_options_builder"
+  }
+
+  "delta/konfig" -> "alfa/toml" [ color = "#76ba30" ];
+  "foxtrot/zettel" -> "alfa/bezeichnung" [ color = "#76ba30" ];
+  "november/commands" -> "alfa/bezeichnung" [ color = "#76ba30" ];
+  "delta/hinweis" -> "alfa/kennung" [ color = "#76ba30" ];
+  "golf/hinweisen" -> "alfa/kennung" [ color = "#76ba30" ];
+  "juliett/store_objekten" -> "alfa/kennung" [ color = "#76ba30" ];
+  "go.mod" -> "alfa/logz" [ color = "#76ba30" ];
+  "main.go" -> "alfa/logz" [ color = "#76ba30" ];
+  "bravo/errors" -> "alfa/logz" [ color = "#76ba30" ];
+  "bravo/stdprinter" -> "alfa/logz" [ color = "#76ba30" ];
+  "bravo/test_logz" -> "alfa/logz" [ color = "#76ba30" ];
+  "delta/file_lock" -> "alfa/logz" [ color = "#76ba30" ];
+  "delta/konfig" -> "alfa/logz" [ color = "#76ba30" ];
+  "delta/script_value" -> "alfa/logz" [ color = "#76ba30" ];
+  "echo/age_io" -> "alfa/logz" [ color = "#76ba30" ];
+  "foxtrot/zettel" -> "alfa/logz" [ color = "#76ba30" ];
+  "golf/hinweisen" -> "alfa/logz" [ color = "#76ba30" ];
+  "golf/zettel_formats" -> "alfa/logz" [ color = "#76ba30" ];
+  "golf/zettel_stored" -> "alfa/logz" [ color = "#76ba30" ];
+  "hotel/zettel_named" -> "alfa/logz" [ color = "#76ba30" ];
+  "india/zettel_transacted" -> "alfa/logz" [ color = "#76ba30" ];
+  "juliett/organize_text" -> "alfa/logz" [ color = "#76ba30" ];
+  "juliett/store_objekten" -> "alfa/logz" [ color = "#76ba30" ];
+  "juliett/zettel_checked_out" -> "alfa/logz" [ color = "#76ba30" ];
+  "kilo/changes" -> "alfa/logz" [ color = "#76ba30" ];
+  "kilo/store_working_directory" -> "alfa/logz" [ color = "#76ba30" ];
+  "lima/store_with_lock" -> "alfa/logz" [ color = "#76ba30" ];
+  "mike/user_ops" -> "alfa/logz" [ color = "#76ba30" ];
+  "november/commands" -> "alfa/logz" [ color = "#76ba30" ];
+  "november/commands" -> "alfa/exec" [ color = "#76ba30" ];
+  "november/commands" -> "alfa/vim_cli_options_builder" [ color = "#76ba30" ];
+
+  subgraph "cluster_bravo" {
+    color = "#d506d7";
+    node [ color = "#d506d7" ];
+    edge [ color = "#d506d7" ];
+    label = "bravo";
+    rank = same;
+    "bravo/test_logz"
+    "bravo/stdprinter"
+    "bravo/typ"
+    "bravo/mime"
+    "bravo/errors"
+  }
+
+  "juliett/organize_text" -> "bravo/test_logz" [ color = "#d506d7" ];
+  "delta/etikett" -> "bravo/stdprinter" [ color = "#d506d7" ];
+  "delta/hinweis" -> "bravo/stdprinter" [ color = "#d506d7" ];
+  "delta/konfig" -> "bravo/stdprinter" [ color = "#d506d7" ];
+  "delta/ts" -> "bravo/stdprinter" [ color = "#d506d7" ];
+  "echo/umwelt" -> "bravo/stdprinter" [ color = "#d506d7" ];
+  "golf/zettel_formats" -> "bravo/stdprinter" [ color = "#d506d7" ];
+  "juliett/store_objekten" -> "bravo/stdprinter" [ color = "#d506d7" ];
+  "kilo/store_working_directory" -> "bravo/stdprinter" [ color = "#d506d7" ];
+  "lima/store_with_lock" -> "bravo/stdprinter" [ color = "#d506d7" ];
+  "mike/user_ops" -> "bravo/stdprinter" [ color = "#d506d7" ];
+  "november/commands" -> "bravo/stdprinter" [ color = "#d506d7" ];
+  "foxtrot/zettel" -> "bravo/typ" [ color = "#d506d7" ];
+  "golf/zettel_formats" -> "bravo/typ" [ color = "#d506d7" ];
+  "juliett/store_objekten" -> "bravo/typ" [ color = "#d506d7" ];
+  "november/commands" -> "bravo/typ" [ color = "#d506d7" ];
+  "charlie/alfred" -> "bravo/errors" [ color = "#d506d7" ];
+  "charlie/files" -> "bravo/errors" [ color = "#d506d7" ];
+  "charlie/line_format" -> "bravo/errors" [ color = "#d506d7" ];
+  "charlie/open_file_guard" -> "bravo/errors" [ color = "#d506d7" ];
+  "charlie/sha" -> "bravo/errors" [ color = "#d506d7" ];
+  "charlie/zk_types" -> "bravo/errors" [ color = "#d506d7" ];
+  "delta/age" -> "bravo/errors" [ color = "#d506d7" ];
+  "delta/etikett" -> "bravo/errors" [ color = "#d506d7" ];
+  "delta/file_lock" -> "bravo/errors" [ color = "#d506d7" ];
+  "delta/hinweis" -> "bravo/errors" [ color = "#d506d7" ];
+  "delta/id" -> "bravo/errors" [ color = "#d506d7" ];
+  "delta/konfig" -> "bravo/errors" [ color = "#d506d7" ];
+  "delta/script_value" -> "bravo/errors" [ color = "#d506d7" ];
+  "delta/ts" -> "bravo/errors" [ color = "#d506d7" ];
+  "delta/value" -> "bravo/errors" [ color = "#d506d7" ];
+  "echo/age_io" -> "bravo/errors" [ color = "#d506d7" ];
+  "echo/transaktion" -> "bravo/errors" [ color = "#d506d7" ];
+  "echo/umwelt" -> "bravo/errors" [ color = "#d506d7" ];
+  "foxtrot/akten" -> "bravo/errors" [ color = "#d506d7" ];
+  "golf/hinweisen" -> "bravo/errors" [ color = "#d506d7" ];
+  "golf/zettel_formats" -> "bravo/errors" [ color = "#d506d7" ];
+  "india/alfred" -> "bravo/errors" [ color = "#d506d7" ];
+  "india/zettel_transacted" -> "bravo/errors" [ color = "#d506d7" ];
+  "juliett/organize_text" -> "bravo/errors" [ color = "#d506d7" ];
+  "juliett/store_objekten" -> "bravo/errors" [ color = "#d506d7" ];
+  "juliett/zettel_checked_out" -> "bravo/errors" [ color = "#d506d7" ];
+  "kilo/changes" -> "bravo/errors" [ color = "#d506d7" ];
+  "kilo/store_working_directory" -> "bravo/errors" [ color = "#d506d7" ];
+  "lima/store_with_lock" -> "bravo/errors" [ color = "#d506d7" ];
+  "mike/user_ops" -> "bravo/errors" [ color = "#d506d7" ];
+  "november/commands" -> "bravo/errors" [ color = "#d506d7" ];
+
+  subgraph "cluster_charlie" {
+    color = "#3cfe4f";
+    node [ color = "#3cfe4f" ];
+    edge [ color = "#3cfe4f" ];
+    label = "charlie";
+    rank = same;
+    "charlie/line_format"
+    "charlie/zk_types"
+    "charlie/sha"
+    "charlie/files"
+    "charlie/alfred"
+    "charlie/open_file_guard"
+  }
+
+  "echo/transaktion" -> "charlie/line_format" [ color = "#3cfe4f" ];
+  "golf/zettel_formats" -> "charlie/line_format" [ color = "#3cfe4f" ];
+  "juliett/organize_text" -> "charlie/line_format" [ color = "#3cfe4f" ];
+  "delta/id" -> "charlie/zk_types" [ color = "#3cfe4f" ];
+  "echo/transaktion" -> "charlie/zk_types" [ color = "#3cfe4f" ];
+  "golf/zettel_formats" -> "charlie/zk_types" [ color = "#3cfe4f" ];
+  "juliett/store_objekten" -> "charlie/zk_types" [ color = "#3cfe4f" ];
+  "juliett/zettel_checked_out" -> "charlie/zk_types" [ color = "#3cfe4f" ];
+  "november/commands" -> "charlie/zk_types" [ color = "#3cfe4f" ];
+  "delta/etikett" -> "charlie/sha" [ color = "#3cfe4f" ];
+  "delta/hinweis" -> "charlie/sha" [ color = "#3cfe4f" ];
+  "delta/id" -> "charlie/sha" [ color = "#3cfe4f" ];
+  "delta/ts" -> "charlie/sha" [ color = "#3cfe4f" ];
+  "delta/value" -> "charlie/sha" [ color = "#3cfe4f" ];
+  "echo/age_io" -> "charlie/sha" [ color = "#3cfe4f" ];
+  "echo/id_set" -> "charlie/sha" [ color = "#3cfe4f" ];
+  "echo/transaktion" -> "charlie/sha" [ color = "#3cfe4f" ];
+  "foxtrot/akten" -> "charlie/sha" [ color = "#3cfe4f" ];
+  "foxtrot/zettel" -> "charlie/sha" [ color = "#3cfe4f" ];
+  "golf/hinweisen" -> "charlie/sha" [ color = "#3cfe4f" ];
+  "golf/zettel_formats" -> "charlie/sha" [ color = "#3cfe4f" ];
+  "golf/zettel_stored" -> "charlie/sha" [ color = "#3cfe4f" ];
+  "juliett/store_objekten" -> "charlie/sha" [ color = "#3cfe4f" ];
+  "kilo/store_working_directory" -> "charlie/sha" [ color = "#3cfe4f" ];
+  "november/commands" -> "charlie/sha" [ color = "#3cfe4f" ];
+  "echo/age_io" -> "charlie/files" [ color = "#3cfe4f" ];
+  "echo/umwelt" -> "charlie/files" [ color = "#3cfe4f" ];
+  "golf/zettel_formats" -> "charlie/files" [ color = "#3cfe4f" ];
+  "kilo/store_working_directory" -> "charlie/files" [ color = "#3cfe4f" ];
+  "november/commands" -> "charlie/files" [ color = "#3cfe4f" ];
+  "india/alfred" -> "charlie/alfred" [ color = "#3cfe4f" ];
+  "delta/age" -> "charlie/open_file_guard" [ color = "#3cfe4f" ];
+  "delta/file_lock" -> "charlie/open_file_guard" [ color = "#3cfe4f" ];
+  "delta/konfig" -> "charlie/open_file_guard" [ color = "#3cfe4f" ];
+  "delta/script_value" -> "charlie/open_file_guard" [ color = "#3cfe4f" ];
+  "echo/age_io" -> "charlie/open_file_guard" [ color = "#3cfe4f" ];
+  "echo/umwelt" -> "charlie/open_file_guard" [ color = "#3cfe4f" ];
+  "foxtrot/akten" -> "charlie/open_file_guard" [ color = "#3cfe4f" ];
+  "golf/hinweisen" -> "charlie/open_file_guard" [ color = "#3cfe4f" ];
+  "golf/zettel_formats" -> "charlie/open_file_guard" [ color = "#3cfe4f" ];
+  "juliett/store_objekten" -> "charlie/open_file_guard" [ color = "#3cfe4f" ];
+  "kilo/store_working_directory" -> "charlie/open_file_guard" [ color = "#3cfe4f" ];
+  "mike/user_ops" -> "charlie/open_file_guard" [ color = "#3cfe4f" ];
+  "november/commands" -> "charlie/open_file_guard" [ color = "#3cfe4f" ];
+
+  subgraph "cluster_delta" {
+    color = "#94b502";
+    node [ color = "#94b502" ];
+    edge [ color = "#94b502" ];
+    label = "delta";
+    rank = same;
+    "delta/hinweis"
+    "delta/value"
+    "delta/etikett"
+    "delta/age"
+    "delta/konfig"
+    "delta/id"
+    "delta/file_lock"
+    "delta/ts"
+    "delta/script_value"
+  }
+
+  "echo/id_set" -> "delta/hinweis" [ color = "#94b502" ];
+  "echo/transaktion" -> "delta/hinweis" [ color = "#94b502" ];
+  "golf/hinweisen" -> "delta/hinweis" [ color = "#94b502" ];
+  "hotel/zettel_named" -> "delta/hinweis" [ color = "#94b502" ];
+  "india/alfred" -> "delta/hinweis" [ color = "#94b502" ];
+  "juliett/store_objekten" -> "delta/hinweis" [ color = "#94b502" ];
+  "kilo/store_working_directory" -> "delta/hinweis" [ color = "#94b502" ];
+  "mike/user_ops" -> "delta/hinweis" [ color = "#94b502" ];
+  "november/commands" -> "delta/hinweis" [ color = "#94b502" ];
+  "echo/transaktion" -> "delta/etikett" [ color = "#94b502" ];
+  "echo/umwelt" -> "delta/etikett" [ color = "#94b502" ];
+  "foxtrot/zettel" -> "delta/etikett" [ color = "#94b502" ];
+  "golf/zettel_formats" -> "delta/etikett" [ color = "#94b502" ];
+  "hotel/zettel_named" -> "delta/etikett" [ color = "#94b502" ];
+  "india/alfred" -> "delta/etikett" [ color = "#94b502" ];
+  "india/zettel_transacted" -> "delta/etikett" [ color = "#94b502" ];
+  "juliett/organize_text" -> "delta/etikett" [ color = "#94b502" ];
+  "juliett/store_objekten" -> "delta/etikett" [ color = "#94b502" ];
+  "kilo/changes" -> "delta/etikett" [ color = "#94b502" ];
+  "mike/user_ops" -> "delta/etikett" [ color = "#94b502" ];
+  "november/commands" -> "delta/etikett" [ color = "#94b502" ];
+  "echo/age_io" -> "delta/age" [ color = "#94b502" ];
+  "echo/umwelt" -> "delta/age" [ color = "#94b502" ];
+  "golf/hinweisen" -> "delta/age" [ color = "#94b502" ];
+  "juliett/store_objekten" -> "delta/age" [ color = "#94b502" ];
+  "lima/store_with_lock" -> "delta/age" [ color = "#94b502" ];
+  "november/commands" -> "delta/age" [ color = "#94b502" ];
+  "echo/umwelt" -> "delta/konfig" [ color = "#94b502" ];
+  "foxtrot/zettel" -> "delta/konfig" [ color = "#94b502" ];
+  "kilo/store_working_directory" -> "delta/konfig" [ color = "#94b502" ];
+  "november/commands" -> "delta/konfig" [ color = "#94b502" ];
+  "echo/age_io" -> "delta/id" [ color = "#94b502" ];
+  "echo/id_set" -> "delta/id" [ color = "#94b502" ];
+  "juliett/store_objekten" -> "delta/id" [ color = "#94b502" ];
+  "kilo/store_working_directory" -> "delta/id" [ color = "#94b502" ];
+  "november/commands" -> "delta/id" [ color = "#94b502" ];
+  "kilo/store_working_directory" -> "delta/file_lock" [ color = "#94b502" ];
+  "lima/store_with_lock" -> "delta/file_lock" [ color = "#94b502" ];
+  "echo/transaktion" -> "delta/ts" [ color = "#94b502" ];
+  "india/zettel_external" -> "delta/ts" [ color = "#94b502" ];
+  "india/zettel_transacted" -> "delta/ts" [ color = "#94b502" ];
+  "juliett/store_objekten" -> "delta/ts" [ color = "#94b502" ];
+  "november/commands" -> "delta/ts" [ color = "#94b502" ];
+  "mike/user_ops" -> "delta/script_value" [ color = "#94b502" ];
+  "november/commands" -> "delta/script_value" [ color = "#94b502" ];
+
+  subgraph "cluster_echo" {
+    color = "#942216";
+    node [ color = "#942216" ];
+    edge [ color = "#942216" ];
+    label = "echo";
+    rank = same;
+    "echo/umwelt"
+    "echo/transaktion"
+    "echo/id_set"
+    "echo/age_io"
+  }
+
+  "juliett/store_objekten" -> "echo/umwelt" [ color = "#942216" ];
+  "lima/store_with_lock" -> "echo/umwelt" [ color = "#942216" ];
+  "mike/user_ops" -> "echo/umwelt" [ color = "#942216" ];
+  "november/commands" -> "echo/umwelt" [ color = "#942216" ];
+  "juliett/store_objekten" -> "echo/transaktion" [ color = "#942216" ];
+  "november/commands" -> "echo/transaktion" [ color = "#942216" ];
+  "november/commands" -> "echo/id_set" [ color = "#942216" ];
+  "foxtrot/zettel" -> "echo/age_io" [ color = "#942216" ];
+  "golf/zettel_formats" -> "echo/age_io" [ color = "#942216" ];
+  "juliett/store_objekten" -> "echo/age_io" [ color = "#942216" ];
+  "kilo/store_working_directory" -> "echo/age_io" [ color = "#942216" ];
+  "mike/user_ops" -> "echo/age_io" [ color = "#942216" ];
+  "november/commands" -> "echo/age_io" [ color = "#942216" ];
+
+  subgraph "cluster_foxtrot" {
+    color = "#104a3a";
+    node [ color = "#104a3a" ];
+    edge [ color = "#104a3a" ];
+    label = "foxtrot";
+    rank = same;
+    "foxtrot/zettel"
+    "foxtrot/akten"
+  }
+
+  "golf/zettel_formats" -> "foxtrot/zettel" [ color = "#104a3a" ];
+  "golf/zettel_stored" -> "foxtrot/zettel" [ color = "#104a3a" ];
+  "juliett/store_objekten" -> "foxtrot/zettel" [ color = "#104a3a" ];
+  "kilo/store_working_directory" -> "foxtrot/zettel" [ color = "#104a3a" ];
+  "mike/user_ops" -> "foxtrot/zettel" [ color = "#104a3a" ];
+  "november/commands" -> "foxtrot/zettel" [ color = "#104a3a" ];
+  "juliett/store_objekten" -> "foxtrot/akten" [ color = "#104a3a" ];
+  "lima/store_with_lock" -> "foxtrot/akten" [ color = "#104a3a" ];
+
+  subgraph "cluster_golf" {
+    color = "#6956cf";
+    node [ color = "#6956cf" ];
+    edge [ color = "#6956cf" ];
+    label = "golf";
+    rank = same;
+    "golf/zettel_formats"
+    "golf/zettel_stored"
+    "golf/hinweisen"
+  }
+
+  "juliett/store_objekten" -> "golf/zettel_formats" [ color = "#6956cf" ];
+  "kilo/store_working_directory" -> "golf/zettel_formats" [ color = "#6956cf" ];
+  "mike/user_ops" -> "golf/zettel_formats" [ color = "#6956cf" ];
+  "november/commands" -> "golf/zettel_formats" [ color = "#6956cf" ];
+  "hotel/zettel_named" -> "golf/zettel_stored" [ color = "#6956cf" ];
+  "juliett/store_objekten" -> "golf/zettel_stored" [ color = "#6956cf" ];
+  "mike/user_ops" -> "golf/zettel_stored" [ color = "#6956cf" ];
+  "juliett/store_objekten" -> "golf/hinweisen" [ color = "#6956cf" ];
+  "lima/store_with_lock" -> "golf/hinweisen" [ color = "#6956cf" ];
+  "mike/user_ops" -> "golf/hinweisen" [ color = "#6956cf" ];
+
+  subgraph "cluster_hotel" {
+    color = "#7b1f2e";
+    node [ color = "#7b1f2e" ];
+    edge [ color = "#7b1f2e" ];
+    label = "hotel";
+    rank = same;
+    "hotel/zettel_named"
+  }
+
+  "india/alfred" -> "hotel/zettel_named" [ color = "#7b1f2e" ];
+  "india/zettel_external" -> "hotel/zettel_named" [ color = "#7b1f2e" ];
+  "india/zettel_transacted" -> "hotel/zettel_named" [ color = "#7b1f2e" ];
+  "juliett/organize_text" -> "hotel/zettel_named" [ color = "#7b1f2e" ];
+  "juliett/store_objekten" -> "hotel/zettel_named" [ color = "#7b1f2e" ];
+  "mike/user_ops" -> "hotel/zettel_named" [ color = "#7b1f2e" ];
+  "november/commands" -> "hotel/zettel_named" [ color = "#7b1f2e" ];
+
+  subgraph "cluster_india" {
+    color = "#7cc70e";
+    node [ color = "#7cc70e" ];
+    edge [ color = "#7cc70e" ];
+    label = "india";
+    rank = same;
+    "india/zettel_external"
+    "india/zettel_transacted"
+    "india/alfred"
+  }
+
+  "juliett/zettel_checked_out" -> "india/zettel_external" [ color = "#7cc70e" ];
+  "kilo/store_working_directory" -> "india/zettel_external" [ color = "#7cc70e" ];
+  "mike/user_ops" -> "india/zettel_external" [ color = "#7cc70e" ];
+  "november/commands" -> "india/zettel_external" [ color = "#7cc70e" ];
+  "juliett/organize_text" -> "india/zettel_transacted" [ color = "#7cc70e" ];
+  "juliett/store_objekten" -> "india/zettel_transacted" [ color = "#7cc70e" ];
+  "juliett/zettel_checked_out" -> "india/zettel_transacted" [ color = "#7cc70e" ];
+  "kilo/store_working_directory" -> "india/zettel_transacted" [ color = "#7cc70e" ];
+  "mike/user_ops" -> "india/zettel_transacted" [ color = "#7cc70e" ];
+  "november/commands" -> "india/zettel_transacted" [ color = "#7cc70e" ];
+  "november/commands" -> "india/alfred" [ color = "#7cc70e" ];
+
+  subgraph "cluster_juliett" {
+    color = "#5bd4a8";
+    node [ color = "#5bd4a8" ];
+    edge [ color = "#5bd4a8" ];
+    label = "juliett";
+    rank = same;
+    "juliett/store_objekten"
+    "juliett/organize_text"
+    "juliett/zettel_checked_out"
+  }
+
+  "kilo/store_working_directory" -> "juliett/store_objekten" [ color = "#5bd4a8" ];
+  "lima/store_with_lock" -> "juliett/store_objekten" [ color = "#5bd4a8" ];
+  "mike/user_ops" -> "juliett/store_objekten" [ color = "#5bd4a8" ];
+  "november/commands" -> "juliett/store_objekten" [ color = "#5bd4a8" ];
+  "kilo/changes" -> "juliett/organize_text" [ color = "#5bd4a8" ];
+  "mike/user_ops" -> "juliett/organize_text" [ color = "#5bd4a8" ];
+  "november/commands" -> "juliett/organize_text" [ color = "#5bd4a8" ];
+  "kilo/store_working_directory" -> "juliett/zettel_checked_out" [ color = "#5bd4a8" ];
+  "mike/user_ops" -> "juliett/zettel_checked_out" [ color = "#5bd4a8" ];
+  "november/commands" -> "juliett/zettel_checked_out" [ color = "#5bd4a8" ];
+
+  subgraph "cluster_kilo" {
+    color = "#a05319";
+    node [ color = "#a05319" ];
+    edge [ color = "#a05319" ];
+    label = "kilo";
+    rank = same;
+    "kilo/changes"
+    "kilo/store_working_directory"
+  }
+
+  "mike/user_ops" -> "kilo/changes" [ color = "#a05319" ];
+  "lima/store_with_lock" -> "kilo/store_working_directory" [ color = "#a05319" ];
+  "mike/user_ops" -> "kilo/store_working_directory" [ color = "#a05319" ];
+  "november/commands" -> "kilo/store_working_directory" [ color = "#a05319" ];
+
+  subgraph "cluster_lima" {
+    color = "#f172b2";
+    node [ color = "#f172b2" ];
+    edge [ color = "#f172b2" ];
+    label = "lima";
+    rank = same;
+    "lima/store_with_lock"
+  }
+
+  "mike/user_ops" -> "lima/store_with_lock" [ color = "#f172b2" ];
+  "november/commands" -> "lima/store_with_lock" [ color = "#f172b2" ];
+
+  subgraph "cluster_mike" {
+    color = "#845289";
+    node [ color = "#845289" ];
+    edge [ color = "#845289" ];
+    label = "mike";
+    rank = same;
+    "mike/user_ops"
+  }
+
+  "november/commands" -> "mike/user_ops" [ color = "#845289" ];
+
+  subgraph "cluster_november" {
+    color = "#15e5d9";
+    node [ color = "#15e5d9" ];
+    edge [ color = "#15e5d9" ];
+    label = "november";
+    rank = same;
+    "november/commands"
+  }
+
+  "main.go" -> "november/commands" [ color = "#15e5d9" ];
+}
