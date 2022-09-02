@@ -5,7 +5,6 @@ import (
 	"path/filepath"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_external"
@@ -89,7 +88,7 @@ func (c Clean) RunWithLockedStore(
 				fOrD = pRel
 			}
 
-			stdprinter.Outf("[%s] (would delete)\n", fOrD)
+			errors.PrintOutf("[%s] (would delete)", fOrD)
 		}
 
 		return
@@ -105,7 +104,7 @@ func (c Clean) RunWithLockedStore(
 			fOrD = pRel
 		}
 
-		stdprinter.Outf("[%s] (deleted)\n", fOrD)
+		errors.PrintOutf("[%s] (deleted)", fOrD)
 	}
 
 	return

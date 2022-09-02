@@ -5,7 +5,6 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/lima/store_with_lock"
@@ -35,7 +34,7 @@ func (c Log) RunWithHinweisen(os store_with_lock.Store, hs ...hinweis.Hinweis) (
 		return
 
 	default:
-		errors.PrintErrf("ignoring extra arguments: %q\n", hs[1:])
+		errors.PrintErrf("ignoring extra arguments: %q", hs[1:])
 
 		fallthrough
 
@@ -58,7 +57,7 @@ func (c Log) RunWithHinweisen(os store_with_lock.Store, hs ...hinweis.Hinweis) (
 		return
 	}
 
-	stdprinter.Out(string(b))
+	errors.PrintOut(string(b))
 
 	return
 }

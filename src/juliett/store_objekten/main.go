@@ -8,7 +8,6 @@ import (
 	"sort"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/charlie/zk_types"
@@ -140,7 +139,7 @@ func (s Store) writeNamedZettelToIndex(tz zettel_transacted.Zettel) (err error) 
 
 	if err = s.indexKennung.addHinweis(tz.Named.Hinweis); err != nil {
 		if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
-			errors.PrintErrf("kennung does not contain value: %s\n", err)
+			errors.PrintErrf("kennung does not contain value: %s", err)
 			err = nil
 		} else {
 			err = errors.Wrapf(err, "failed to write zettel to index: %s", tz.Named)
@@ -330,7 +329,7 @@ func (s Store) Flush() (err error) {
 	}
 
 	if err = s.hinweisen.Flush(); err != nil {
-		stdprinter.Out(err)
+		errors.PrintOut(err)
 		err = errors.Wrap(err)
 		return
 	}

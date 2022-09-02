@@ -44,7 +44,7 @@ func (w akteMultiWriter) Sha() (s sha.Sha) {
 	return
 }
 
-func (s Store) AkteWriter() (w age_io.Writer, err error) {
+func (s Store) AkteWriter() (w sha.WriteCloser, err error) {
 	var outer age_io.Writer
 
 	mo := age_io.MoveOptions{

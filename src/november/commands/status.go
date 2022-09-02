@@ -5,7 +5,6 @@ import (
 	"sort"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
 	"github.com/friedenberg/zit/src/kilo/store_working_directory"
@@ -64,9 +63,9 @@ func (c Status) RunWithLockedStore(s store_with_lock.Store, args ...string) (err
 
 	for _, z := range readResults {
 		if z.State == zettel_checked_out.StateEmpty {
-			stdprinter.Outf("%#v\n", z.External)
+			errors.PrintOutf("%#v", z.External)
 		} else {
-			stdprinter.Out(z)
+			errors.PrintOut(z)
 		}
 	}
 

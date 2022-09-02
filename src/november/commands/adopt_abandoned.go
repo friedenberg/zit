@@ -4,7 +4,6 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/hotel/zettel_named"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
@@ -55,7 +54,7 @@ func (c AdoptAbandoned) RunWithLockedStore(store store_with_lock.Store, args ...
 		}
 
 		zettels[i] = tz.Named
-		stdprinter.Outf("%s (adopted)\n", tz.Named)
+		errors.PrintOutf("%s (adopted)", tz.Named)
 	}
 
 	return

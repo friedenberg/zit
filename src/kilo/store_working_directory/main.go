@@ -283,7 +283,7 @@ func (s *Store) Read(p string) (cz zettel_checked_out.Zettel, err error) {
 		var hasEntry bool
 
 		if cached, hasEntry = s.entries[p]; !hasEntry {
-			errors.Printf("cached not found: %s\n", p)
+			errors.Printf("cached not found: %s", p)
 			errors.Printf("%#v", s.entries)
 			err = ErrNotInIndex(nil)
 			return

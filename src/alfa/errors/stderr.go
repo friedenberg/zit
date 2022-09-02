@@ -15,6 +15,6 @@ func PrintErr(a ...interface{}) {
 func PrintErrf(f string, a ...interface{}) {
 	fmt.Fprintln(
 		os.Stderr,
-		fmt.Sprintf(f, a...),
+		a...,
 	)
 }

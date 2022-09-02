@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/typ"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/etikett"
-	"github.com/friedenberg/zit/src/echo/age_io"
 )
 
 func makeEtiketten(t *testing.T, vs ...string) (es etikett.Set) {
@@ -46,7 +45,7 @@ type akteWriterFactory struct {
 	stringBuilderCloser
 }
 
-func (aw akteWriterFactory) AkteWriter() (age_io.Writer, error) {
+func (aw akteWriterFactory) AkteWriter() (sha.WriteCloser, error) {
 	return aw, nil
 }
 

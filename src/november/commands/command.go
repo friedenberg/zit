@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
 	"github.com/friedenberg/zit/src/delta/konfig"
 	"github.com/friedenberg/zit/src/echo/umwelt"
@@ -61,11 +60,10 @@ func registerCommand(n string, makeFunc func(*flag.FlagSet) Command) {
 func Run(args []string) (exitStatus int) {
 	var err error
 
-	defer stdprinter.WaitForPrinter()
 	defer func() {
 		errors.Print("checking for open files")
 		l := open_file_guard.Len()
-		errors.Printf("open files: %d\n", l)
+		errors.Printf("open files: %d", l)
 
 		var normalError errors.StackTracer
 
@@ -74,7 +72,7 @@ func Run(args []string) (exitStatus int) {
 		}
 
 		if errors.As(err, &normalError) {
-			errors.PrintErrf("%s\n", normalError.Error())
+			errors.PrintErrf("%s", normalError.Error())
 		} else {
 			if err != nil {
 				errors.PrintErr(err)

@@ -8,7 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
 	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/echo/age_io"
 )
 
 type ErrHasInlineAkteAndFilePath struct {
@@ -31,7 +30,7 @@ func (e ErrHasInlineAkteAndFilePath) Recover() (z Zettel, err error) {
 		return
 	}
 
-	var akteWriter age_io.Writer
+	var akteWriter sha.WriteCloser
 
 	if akteWriter, err = e.AkteWriter(); err != nil {
 		err = errors.Wrap(err)

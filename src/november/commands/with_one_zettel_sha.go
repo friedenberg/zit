@@ -18,7 +18,7 @@ type withOneZettelSha struct {
 
 func (c withOneZettelSha) RunWithLockedStore(store store_with_lock.Store, args ...string) (err error) {
 	if len(args) != c.Count {
-		err = errors.Errorf("exactly %d argument expected, but got %d\n", c.Count, len(args))
+		err = errors.Errorf("exactly %d argument expected, but got %d", c.Count, len(args))
 		return
 	}
 

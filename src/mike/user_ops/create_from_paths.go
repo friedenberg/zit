@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/delta/script_value"
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
@@ -92,11 +91,11 @@ func (c CreateFromPaths) Run(args ...string) (results zettel_checked_out.Set, er
 					return
 				}
 
-				stdprinter.Outf("[%s] (deleted)\n", cz.External.ZettelFD.Path)
+				errors.PrintOutf("[%s] (deleted)", cz.External.ZettelFD.Path)
 			}
 		}
 
-		stdprinter.Outf("%s (created)\n", cz.Internal.Named)
+		errors.PrintOutf("%s (created)", cz.Internal.Named)
 	}
 
 	return
@@ -187,10 +186,10 @@ func (c CreateFromPaths) handleStoreError(z zettel_checked_out.Zettel, f string,
 			return
 		}
 
-		stdprinter.Outf("lost+found: %s: %s\n", lostError.Error(), p)
+		errors.PrintOutf("lost+found: %s: %s", lostError.Error(), p)
 
 	} else if errors.As(in, &normalError) {
-		errors.PrintErrf("%s\n", normalError.Error())
+		errors.PrintErrf("%s", normalError.Error())
 	} else {
 		err = errors.Errorf("writing zettel failed: %s: %s", f, in)
 		errors.PrintErr(err)

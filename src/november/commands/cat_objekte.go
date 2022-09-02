@@ -100,7 +100,7 @@ func (c CatObjekte) zettelen(store store_with_lock.Store, ids ...id_set.Set) (er
 		ok := false
 
 		if i, ok = is.AnyShaOrHinweis(); !ok {
-			errors.PrintErrf("unsupported id type: %s\n", is)
+			errors.PrintErrf("unsupported id type: %s", is)
 			err = nil
 			continue
 		}

@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/lima/store_with_lock"
 )
@@ -50,7 +49,7 @@ func (c PeekHinweisen) RunWithLockedStore(store store_with_lock.Store, args ...s
 	)
 
 	for i, h := range hs {
-		stdprinter.Outf("%d: %s\n", i, h)
+		errors.PrintOutf("%d: %s", i, h)
 	}
 
 	return

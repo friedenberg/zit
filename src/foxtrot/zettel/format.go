@@ -5,11 +5,10 @@ import (
 
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/konfig"
-	"github.com/friedenberg/zit/src/echo/age_io"
 )
 
 type AkteWriterFactory interface {
-	AkteWriter() (age_io.Writer, error)
+	AkteWriter() (sha.WriteCloser, error)
 }
 
 type AkteReaderFactory interface {

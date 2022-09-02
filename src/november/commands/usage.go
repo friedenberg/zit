@@ -36,7 +36,7 @@ func (c command) PrintUsage(in error) (exitStatus int) {
 
 func (c command) PrintSubcommandUsage(flags flag.FlagSet) {
 	printTabbed := func(s string) {
-		errors.PrintErrf("  %s\n", s)
+		errors.PrintErrf("  %s", s)
 	}
 
 	var b bytes.Buffer

@@ -46,7 +46,7 @@ func (c Revert) RunWithLockedStore(store store_with_lock.Store, args ...string) 
 		}
 
 	default:
-		errors.PrintErrf("objekte type %s does not support reverts currently\n", c.Type)
+		errors.PrintErrf("objekte type %s does not support reverts currently", c.Type)
 	}
 
 	return

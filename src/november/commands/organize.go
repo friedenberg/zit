@@ -211,7 +211,7 @@ func (c Organize) readFromVim(f string, results user_ops.CreateOrganizeFileResul
 			err = nil
 			ot, err = c.readFromVim(f, results)
 		} else {
-			errors.PrintErrf("aborting organize\n")
+			errors.PrintErrf("aborting organize")
 			return
 		}
 	}
@@ -241,8 +241,8 @@ func (c Organize) handleReadChangesError(err error) (tryAgain bool) {
 		return
 	}
 
-	errors.PrintErrf("reading changes failed: %q\n", err)
-	errors.PrintErrf("would you like to edit and try again? (y/*)\n")
+	errors.PrintErrf("reading changes failed: %q", err)
+	errors.PrintErrf("would you like to edit and try again? (y/*)")
 
 	var answer rune
 	var n int

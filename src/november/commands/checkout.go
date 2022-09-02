@@ -4,7 +4,6 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
@@ -64,20 +63,20 @@ func (c Checkout) RunWithHinweisen(s store_with_lock.Store, hins ...hinweis.Hinw
 
 		if cz.Internal.Named.Stored.Zettel.Equals(cz.External.Named.Stored.Zettel) {
 			errors.Print(cz.Internal.Named.Stored.Zettel)
-			stdprinter.Outf("%s (already checked out)\n", cz.Internal.Named)
+			errors.PrintOutf("%s (already checked out)", cz.Internal.Named)
 			continue
 		}
 
 		if c.Force || cz.State == zettel_checked_out.StateEmpty {
 			toCheckOut = append(toCheckOut, cz.Internal.Named.Hinweis)
 		} else if cz.State == zettel_checked_out.StateExistsAndSame {
-			errors.PrintErrf("%s (already checked out)\n", cz.Internal.Named)
+			errors.PrintOutf("%s (already checked out)", cz.Internal.Named)
 			continue
 		} else if cz.State == zettel_checked_out.StateExistsAndDifferent {
-			errors.PrintErrf("%s (external has changes)\n", cz.Internal.Named)
+			errors.PrintOutf("%s (external has changes)", cz.Internal.Named)
 			continue
 		} else {
-			errors.PrintErrf("%s (unknown state)\n", cz.Internal.Named)
+			errors.PrintOutf("%s (unknown state)", cz.Internal.Named)
 			continue
 		}
 	}

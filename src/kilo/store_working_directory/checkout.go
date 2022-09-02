@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/id"
@@ -97,7 +96,7 @@ func (s *Store) CheckoutOne(
 
 		if err = s.writeFormat(options, filename, c); err != nil {
 			err = errors.Wrapf(err, "%s", sz.Named)
-			errors.PrintErrf("%s (check out failed):\n", sz.Named)
+			errors.PrintErrf("%s (check out failed):", sz.Named)
 			errors.PrintErr(err)
 			return
 		}
@@ -107,7 +106,7 @@ func (s *Store) CheckoutOne(
 		return
 	}
 
-	stdprinter.Outf("%s (checked out)\n", sz.Named)
+	errors.PrintOutf("%s (checked out)", sz.Named)
 
 	return
 }

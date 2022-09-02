@@ -41,7 +41,7 @@ func (c Checkin) RunWithLockedStore(
 
 	if c.All {
 		if len(args) > 0 {
-			errors.PrintErrf("Ignoring args because -all is set\n")
+			errors.PrintErrf("Ignoring args because -all is set")
 		}
 
 		if pz, err = user_ops.NewGetPossibleZettels(s.Umwelt).Run(s); err != nil {

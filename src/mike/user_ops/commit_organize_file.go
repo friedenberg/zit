@@ -2,7 +2,6 @@ package user_ops
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/echo/umwelt"
@@ -82,7 +81,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 		z.Stored.Zettel.Etiketten.Add(e)
 		toUpdate[z.Hinweis.String()] = z
 
-		errors.PrintErrf("Added etikett '%s' to zettel '%s'\n", e, z.Hinweis)
+		errors.PrintErrf("Added etikett '%s' to zettel '%s'", e, z.Hinweis)
 
 		return
 	}
@@ -98,7 +97,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 		z.Stored.Zettel.Etiketten.RemovePrefixes(e)
 		toUpdate[z.Hinweis.String()] = z
 
-		errors.PrintErrf("Removed etikett '%s' from zettel '%s'\n", e, z.Hinweis)
+		errors.PrintErrf("Removed etikett '%s' from zettel '%s'", e, z.Hinweis)
 
 		return
 	}
@@ -146,7 +145,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 		}
 
 		if c.Umwelt.Konfig.DryRun {
-			stdprinter.Outf("[%s] (would create)\n", z.Bezeichnung)
+			errors.PrintOutf("[%s] (would create)", z.Bezeichnung)
 			continue
 		}
 
@@ -157,12 +156,12 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 			return
 		}
 
-		stdprinter.Outf("%s (created)\n", tz.Named)
+		errors.PrintOutf("%s (created)", tz.Named)
 	}
 
 	for _, z := range toUpdate {
 		if c.Umwelt.Konfig.DryRun {
-			stdprinter.Outf("[%s] (would update)\n", z.Hinweis)
+			errors.PrintOutf("[%s] (would update)", z.Hinweis)
 			continue
 		}
 

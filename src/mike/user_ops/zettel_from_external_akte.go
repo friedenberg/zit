@@ -6,7 +6,6 @@ import (
 	"path"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/echo/age_io"
@@ -57,11 +56,11 @@ func (c ZettelFromExternalAkte) Run(args ...string) (results zettel_transacted.S
 				return
 			}
 
-			errors.PrintErrf("[%s] (deleted)\n", arg)
+			errors.PrintErrf("[%s] (deleted)", arg)
 		}
 
 		//TODO-P3,D3 only emit if created rather than refound
-		stdprinter.Outf("%s (created)\n", tz.Named)
+		errors.PrintOutf("%s (created)", tz.Named)
 	}
 
 	return

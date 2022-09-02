@@ -6,7 +6,6 @@ import (
 	"syscall"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/charlie/zk_types"
 	"github.com/friedenberg/zit/src/delta/etikett"
@@ -67,7 +66,8 @@ func (c Cat) etiketten(store store_with_lock.Store) (err error) {
 	}
 
 	for _, e := range ea {
-		stdprinter.Out(e)
+    errors.PrintDebug(e)
+		errors.PrintOut(e.String())
 	}
 
 	return
@@ -93,7 +93,7 @@ func (c Cat) zettelen(store store_with_lock.Store) (err error) {
 			if err != nil {
 				errors.Print(err)
 			} else {
-				stdprinter.Out(string(b))
+				errors.PrintOut(string(b))
 			}
 		}
 	} else {
@@ -131,7 +131,7 @@ func (c Cat) akten(store store_with_lock.Store) (err error) {
 	}
 
 	for _, s := range shas {
-		stdprinter.Out(s)
+		errors.PrintOut(s)
 	}
 
 	return

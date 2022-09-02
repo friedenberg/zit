@@ -14,7 +14,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/etikett"
-	"github.com/friedenberg/zit/src/echo/age_io"
 )
 
 const (
@@ -54,7 +53,7 @@ type textStateRead struct {
 	didReadAkte             bool
 	metadataiAkteSha        sha.Sha
 	readAkteSha             sha.Sha
-	akteWriter              age_io.Writer
+	akteWriter              sha.WriteCloser
 }
 
 func (s *textStateRead) Close() (err error) {

@@ -5,7 +5,6 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/zk_types"
 	"github.com/friedenberg/zit/src/delta/id"
 	"github.com/friedenberg/zit/src/delta/ts"
@@ -170,11 +169,11 @@ func (c Show) showTransaktions(store store_with_lock.Store, ids []id_set.Set) (e
 		var t transaktion.Transaktion
 
 		if t, err = store.StoreObjekten().ReadTransaktion(tid); err != nil {
-			errors.PrintErrf("%s\n", err)
+			errors.PrintErrf("%s", err)
 			continue
 		}
 
-		stdprinter.Outf("%#v\n", t)
+		errors.PrintOutf("%#v", t)
 	}
 
 	return
