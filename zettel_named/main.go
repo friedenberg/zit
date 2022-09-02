@@ -8,12 +8,12 @@ import (
 	"github.com/friedenberg/zit/src/golf/zettel_stored"
 )
 
-type Named struct {
+type Zettel struct {
 	Stored  zettel_stored.Stored
 	Hinweis hinweis.Hinweis
 }
 
-func (a Named) Equals(b Named) bool {
+func (a Zettel) Equals(b Zettel) bool {
 	if !a.Stored.Equals(b.Stored) {
 		logz.Print("stored")
 		return false
@@ -27,6 +27,6 @@ func (a Named) Equals(b Named) bool {
 	return true
 }
 
-func (z Named) String() string {
+func (z Zettel) String() string {
 	return fmt.Sprintf("[%s %s]", z.Hinweis, z.Stored.Sha)
 }

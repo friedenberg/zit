@@ -2,7 +2,7 @@ package zettel_named
 
 import "github.com/friedenberg/zit/src/delta/hinweis"
 
-type SetNamed map[string]Named
+type SetNamed map[string]Zettel
 
 func NewSetNamed() *SetNamed {
 	s := MakeSetNamed()
@@ -13,11 +13,11 @@ func MakeSetNamed() SetNamed {
 	return make(SetNamed)
 }
 
-func (s *SetNamed) Add(z Named) {
+func (s *SetNamed) Add(z Zettel) {
 	(*s)[z.Hinweis.String()] = z
 }
 
-func (s SetNamed) Get(h hinweis.Hinweis) (z Named, ok bool) {
+func (s SetNamed) Get(h hinweis.Hinweis) (z Zettel, ok bool) {
 	z, ok = s[h.String()]
 	return
 }
@@ -28,7 +28,7 @@ func (a SetNamed) Merge(b SetNamed) {
 	}
 }
 
-func (a SetNamed) Contains(z Named) bool {
+func (a SetNamed) Contains(z Zettel) bool {
 	_, ok := a[z.Hinweis.String()]
 	return ok
 }

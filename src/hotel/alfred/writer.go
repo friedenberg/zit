@@ -11,7 +11,7 @@ import (
 )
 
 type Writer interface {
-	WriteZettel(zettel_named.Named) (n int, err error)
+	WriteZettel(zettel_named.Zettel) (n int, err error)
 	WriteEtikett(e etikett.Etikett) (n int, err error)
 	WriteHinweis(e hinweis.Hinweis) (n int, err error)
 	WriteError(in error) (n int, out error)
@@ -37,7 +37,7 @@ func NewWriter(out io.Writer) (w *writer, err error) {
 	return
 }
 
-func (w *writer) WriteZettel(z zettel_named.Named) (n int, err error) {
+func (w *writer) WriteZettel(z zettel_named.Zettel) (n int, err error) {
 	item := ZettelToItem(z)
 	return w.alfredWriter.WriteItem(item)
 }

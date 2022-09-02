@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/zettel_named"
 )
 
-func ZettelToItem(z zettel_named.Named) (a alfred.Item) {
+func ZettelToItem(z zettel_named.Zettel) (a alfred.Item) {
 	a.Title = z.Stored.Zettel.Bezeichnung.String()
 
 	if a.Title == "" {

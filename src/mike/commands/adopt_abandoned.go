@@ -30,7 +30,7 @@ func (c AdoptAbandoned) Description() string {
 }
 
 func (c AdoptAbandoned) RunWithLockedStore(store store_with_lock.Store, args ...string) (err error) {
-	zettels := make([]zettel_named.Named, len(args))
+	zettels := make([]zettel_named.Zettel, len(args))
 
 	for i, a := range args {
 		var sha sha.Sha

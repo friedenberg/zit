@@ -8,7 +8,7 @@ import (
 )
 
 type Zettel struct {
-	zettel_named.Named
+	Named    zettel_named.Zettel
 	ZettelFD FD
 	AkteFD   FD
 }
@@ -24,9 +24,9 @@ func (e Zettel) String() string {
 
 func (e Zettel) ExternalPathAndSha() string {
 	if !e.ZettelFD.IsEmpty() {
-		return fmt.Sprintf("[%s %s]", e.ZettelFD.Path, e.Stored.Sha)
+		return fmt.Sprintf("[%s %s]", e.ZettelFD.Path, e.Named.Stored.Sha)
 	} else if !e.AkteFD.IsEmpty() {
-		return fmt.Sprintf("[%s %s]", e.AkteFD.Path, e.Stored.Zettel.Akte)
+		return fmt.Sprintf("[%s %s]", e.AkteFD.Path, e.Named.Stored.Zettel.Akte)
 	} else {
 		return ""
 	}

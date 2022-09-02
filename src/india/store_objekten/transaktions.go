@@ -69,7 +69,7 @@ func (s Store) storedZettelFromSha(sh sha.Sha) (sz zettel_stored.Stored, err err
 // dependency on the index being accurate for the immediate mutter of the zettel
 // in the arguments
 func (s *Store) transactedWithHead(
-	z zettel_named.Named,
+	z zettel_named.Zettel,
 	t transaktion.Transaktion,
 ) (tz zettel_transacted.Transacted, err error) {
 	tz.Named = z
@@ -155,7 +155,7 @@ func (s Store) writeTransaktion() (err error) {
 	return
 }
 
-func (s *Store) addZettelToTransaktion(z zettel_named.Named) (tz zettel_transacted.Transacted, err error) {
+func (s *Store) addZettelToTransaktion(z zettel_named.Zettel) (tz zettel_transacted.Transacted, err error) {
 	logz.Printf("adding zettel to transaktion: %s", z.Hinweis)
 
 	if tz, err = s.transactedWithHead(z, s.Transaktion); err != nil {

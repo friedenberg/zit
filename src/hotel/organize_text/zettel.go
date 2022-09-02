@@ -13,7 +13,7 @@ type zettel struct {
 	Bezeichnung string
 }
 
-func makeZettel(named zettel_named.Named) zettel {
+func makeZettel(named zettel_named.Zettel) zettel {
 	return zettel{
 		Hinweis:     named.Hinweis.String(),
 		Bezeichnung: named.Stored.Zettel.Description(),

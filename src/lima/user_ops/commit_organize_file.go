@@ -46,9 +46,9 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 		return
 	}
 
-	toUpdate := make(map[string]zettel_named.Named)
+	toUpdate := make(map[string]zettel_named.Zettel)
 
-	addOrGetToZettelToUpdate := func(hString string) (z zettel_named.Named, err error) {
+	addOrGetToZettelToUpdate := func(hString string) (z zettel_named.Zettel, err error) {
 		var h hinweis.Hinweis
 
 		if h, err = hinweis.Make(hString); err != nil {
@@ -73,7 +73,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 	}
 
 	addEtikettToZettel := func(hString string, e etikett.Etikett) (err error) {
-		var z zettel_named.Named
+		var z zettel_named.Zettel
 
 		if z, err = addOrGetToZettelToUpdate(hString); err != nil {
 			err = errors.Error(err)
@@ -89,7 +89,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 	}
 
 	removeEtikettFromZettel := func(hString string, e etikett.Etikett) (err error) {
-		var z zettel_named.Named
+		var z zettel_named.Zettel
 
 		if z, err = addOrGetToZettelToUpdate(hString); err != nil {
 			err = errors.Error(err)

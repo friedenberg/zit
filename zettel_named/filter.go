@@ -1,11 +1,11 @@
 package zettel_named
 
 type NamedFilter interface {
-	IncludeNamedZettel(Named) bool
+	IncludeNamedZettel(Zettel) bool
 }
 
 type FilterAll struct{}
 
-func (f FilterAll) IncludeNamedZettel(_ Named) bool {
+func (f FilterAll) IncludeNamedZettel(_ Zettel) bool {
 	return true
 }

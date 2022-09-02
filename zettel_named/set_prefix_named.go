@@ -18,7 +18,7 @@ func NewSetPrefixNamed() *SetPrefixNamed {
 }
 
 //TODO mark that this splits on right-expanded
-func (s *SetPrefixNamed) Add(z Named) {
+func (s *SetPrefixNamed) Add(z Zettel) {
 	es := z.Stored.Zettel.Etiketten.Expanded(etikett.ExpanderRight{})
 
 	for _, e := range es {
@@ -26,7 +26,7 @@ func (s *SetPrefixNamed) Add(z Named) {
 	}
 }
 
-func (s *SetPrefixNamed) addPair(e etikett.Etikett, z Named) {
+func (s *SetPrefixNamed) addPair(e etikett.Etikett, z Zettel) {
 	existing, ok := (*s)[e]
 
 	if !ok {

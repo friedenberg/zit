@@ -6,6 +6,6 @@ import (
 )
 
 type Transacted struct {
-	Named                 zettel_named.Named
+	Named                 zettel_named.Zettel
 	Kopf, Mutter, Schwanz ts.Time
 }

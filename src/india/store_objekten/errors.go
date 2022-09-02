@@ -55,7 +55,7 @@ func (e ErrNotFound) Error() string {
 }
 
 type ErrZettelDidNotChangeSinceUpdate struct {
-	NamedZettel zettel_named.Named
+	NamedZettel zettel_named.Zettel
 }
 
 func (e ErrZettelDidNotChangeSinceUpdate) Error() string {

@@ -75,7 +75,7 @@ func (c CreateFromPaths) Run(args ...string) (results zettel_checked_out.Set, er
 			//	return
 			//}
 		} else {
-			if cz.Internal, err = store.StoreObjekten().Create(z.Stored.Zettel); err != nil {
+			if cz.Internal, err = store.StoreObjekten().Create(z.Named.Stored.Zettel); err != nil {
 				//TODO add file for error handling
 				c.handleStoreError(cz, "", err)
 				err = nil
@@ -143,7 +143,7 @@ func (c CreateFromPaths) zettelsFromPath(store store_with_lock.Store, p string) 
 					ZettelFD: zettel_external.FD{
 						Path: p,
 					},
-					Named: zettel_named.Named{
+					Named: zettel_named.Zettel{
 						Stored: zettel_stored.Stored{
 							//TODO sha?
 							Zettel: z1,
@@ -163,7 +163,7 @@ func (c CreateFromPaths) zettelsFromPath(store store_with_lock.Store, p string) 
 			ZettelFD: zettel_external.FD{
 				Path: p,
 			},
-			Named: zettel_named.Named{
+			Named: zettel_named.Zettel{
 				Stored: zettel_stored.Stored{
 					//TODO sha?
 					Zettel: ctx.Zettel,

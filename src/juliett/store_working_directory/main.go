@@ -190,7 +190,7 @@ func (s *Store) syncOne(p string) (err error) {
 
 			s.entries[p] = Entry{
 				Time: fi.ModTime(),
-				Sha:  ez.Stored.Sha,
+				Sha:  ez.Named.Stored.Sha,
 			}
 
 			s.hasChanges = true
@@ -215,7 +215,7 @@ func (s Store) MakeExternalZettelFromZettel(p string) (ez zettel_external.Zettel
 
 	head, tail := id.HeadTailFromFileName(p)
 
-	if ez.Hinweis, err = hinweis.Make(head + "/" + tail); err != nil {
+	if ez.Named.Hinweis, err = hinweis.Make(head + "/" + tail); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -259,7 +259,7 @@ func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 		return
 	}
 
-	if ez.Stored.Sha, err = s.storeObjekten.WriteZettelObjekte(c.Zettel); err != nil {
+	if ez.Named.Stored.Sha, err = s.storeObjekten.WriteZettelObjekte(c.Zettel); err != nil {
 		err = errors.Wrapped(err, "%s", f.Name())
 		return
 	}
@@ -311,7 +311,7 @@ func (s *Store) Read(p string) (cz zettel_checked_out.Zettel, err error) {
 			}
 		}
 
-		if cz.Internal, err = s.storeObjekten.Read(cz.External.Hinweis); err != nil {
+		if cz.Internal, err = s.storeObjekten.Read(cz.External.Named.Hinweis); err != nil {
 			if errors.Is(err, store_objekten.ErrNotFound{}) {
 				err = nil
 			} else {
@@ -323,13 +323,13 @@ func (s *Store) Read(p string) (cz zettel_checked_out.Zettel, err error) {
 		cz.DetermineState()
 
 		if cz.State > zettel_checked_out.StateExistsAndSame {
-			exSha := cz.External.Stored.Sha
+			exSha := cz.External.Named.Stored.Sha
 			cz.Matches.Zettelen, _ = s.storeObjekten.ReadZettelSha(exSha)
 
-			exAkteSha := cz.External.Stored.Zettel.Akte
+			exAkteSha := cz.External.Named.Stored.Zettel.Akte
 			cz.Matches.Akten, _ = s.storeObjekten.ReadAkteSha(exAkteSha)
 
-			bez := cz.External.Stored.Zettel.Bezeichnung.String()
+			bez := cz.External.Named.Stored.Zettel.Bezeichnung.String()
 			cz.Matches.Bezeichnungen, _ = s.storeObjekten.ReadBezeichnung(bez)
 		}
 
