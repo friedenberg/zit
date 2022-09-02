@@ -6,7 +6,7 @@ import (
 	"syscall"
 
 	"github.com/friedenberg/zit/src/alfa/logz"
-	"github.com/friedenberg/zit/src/mike/commands"
+	"github.com/friedenberg/zit/src/november/commands"
 )
 
 func main() {
