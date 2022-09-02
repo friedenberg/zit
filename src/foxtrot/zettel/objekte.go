@@ -1,4 +1,4 @@
-package zettel_formats
+package zettel
 
 import (
 	"bufio"
@@ -9,12 +9,11 @@ import (
 	"github.com/friedenberg/zit/src/charlie/line_format"
 	"github.com/friedenberg/zit/src/charlie/zk_types"
 	"github.com/friedenberg/zit/src/delta/etikett"
-	"github.com/friedenberg/zit/src/foxtrot/zettel"
 )
 
 type Objekte struct{}
 
-func (f Objekte) WriteTo(z zettel.Zettel, out1 io.Writer) (n int64, err error) {
+func (f Objekte) WriteTo(z Zettel, out1 io.Writer) (n int64, err error) {
 	w := line_format.NewWriter()
 
 	w.WriteFormat("%s %s", zk_types.TypeAkte, z.Akte)
@@ -35,7 +34,7 @@ func (f Objekte) WriteTo(z zettel.Zettel, out1 io.Writer) (n int64, err error) {
 	return
 }
 
-func (f *Objekte) ReadFrom(z *zettel.Zettel, in io.Reader) (n int64, err error) {
+func (f *Objekte) ReadFrom(z *Zettel, in io.Reader) (n int64, err error) {
 	z.Etiketten = etikett.MakeSet()
 
 	r := bufio.NewReader(in)

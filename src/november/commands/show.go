@@ -12,7 +12,6 @@ import (
 	"github.com/friedenberg/zit/src/echo/id_set"
 	"github.com/friedenberg/zit/src/echo/transaktion"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
-	"github.com/friedenberg/zit/src/golf/zettel_formats"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/store_objekten"
 	"github.com/friedenberg/zit/src/lima/store_with_lock"
@@ -83,7 +82,7 @@ func (c Show) showZettels(store store_with_lock.Store, ids []id_set.Set) (err er
 		zettels[i] = tz
 	}
 
-	f := zettel_formats.Text{}
+	f := zettel.Text{}
 
 	ctx := zettel.FormatContextWrite{
 		Out:               store.Out,

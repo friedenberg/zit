@@ -1,4 +1,4 @@
-package zettel_formats
+package zettel
 
 import (
 	"fmt"
@@ -9,14 +9,13 @@ import (
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/age_io"
-	"github.com/friedenberg/zit/src/foxtrot/zettel"
 )
 
 type ErrHasInlineAkteAndFilePath struct {
 	FilePath string
-	zettel.Zettel
+	Zettel
 	sha.Sha
-	zettel.AkteWriterFactory
+	AkteWriterFactory
 }
 
 func (e ErrHasInlineAkteAndFilePath) Error() string {
@@ -26,7 +25,7 @@ func (e ErrHasInlineAkteAndFilePath) Error() string {
 	)
 }
 
-func (e ErrHasInlineAkteAndFilePath) Recover() (z zettel.Zettel, err error) {
+func (e ErrHasInlineAkteAndFilePath) Recover() (z Zettel, err error) {
 	if e.AkteWriterFactory == nil {
 		err = errors.Errorf("akte writer factory is nil")
 		return

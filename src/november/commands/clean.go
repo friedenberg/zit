@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
-	"github.com/friedenberg/zit/src/golf/zettel_formats"
+	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_external"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
 	"github.com/friedenberg/zit/src/kilo/store_working_directory"
@@ -45,7 +45,7 @@ func (c Clean) RunWithLockedStore(
 	}
 
 	optionsReadExternal := store_working_directory.OptionsReadExternal{
-		Format: zettel_formats.Text{},
+		Format: zettel.Text{},
 	}
 
 	var readResults []zettel_checked_out.Zettel

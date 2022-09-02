@@ -1,4 +1,4 @@
-package zettel_formats
+package zettel
 
 import (
 	"fmt"
@@ -10,10 +10,9 @@ import (
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/line_format"
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
-	"github.com/friedenberg/zit/src/foxtrot/zettel"
 )
 
-func (f Text) WriteTo(c zettel.FormatContextWrite) (n int64, err error) {
+func (f Text) WriteTo(c FormatContextWrite) (n int64, err error) {
 	if c.IncludeAkte {
 		if c.ExternalAktePath == "" {
 			return f.writeToInlineAkte(c)
@@ -25,7 +24,7 @@ func (f Text) WriteTo(c zettel.FormatContextWrite) (n int64, err error) {
 	}
 }
 
-func (f Text) writeToOmitAkte(c zettel.FormatContextWrite) (n int64, err error) {
+func (f Text) writeToOmitAkte(c FormatContextWrite) (n int64, err error) {
 	w := line_format.NewWriter()
 
 	w.WriteLines(
@@ -67,7 +66,7 @@ func (f Text) writeToOmitAkte(c zettel.FormatContextWrite) (n int64, err error) 
 	return
 }
 
-func (f Text) writeToInlineAkte(c zettel.FormatContextWrite) (n int64, err error) {
+func (f Text) writeToInlineAkte(c FormatContextWrite) (n int64, err error) {
 	if c.Out == nil {
 		err = errors.Errorf("context.Out is empty")
 		return
@@ -166,7 +165,7 @@ func (f Text) writeToInlineAkte(c zettel.FormatContextWrite) (n int64, err error
 	return
 }
 
-func (f Text) writeToExternalAkte(c zettel.FormatContextWrite) (n int64, err error) {
+func (f Text) writeToExternalAkte(c FormatContextWrite) (n int64, err error) {
 	errors.Print()
 	w := line_format.NewWriter()
 

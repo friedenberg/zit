@@ -12,7 +12,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
-	"github.com/friedenberg/zit/src/golf/zettel_formats"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/lima/store_with_lock"
 )
@@ -98,7 +97,7 @@ func (c Cat) zettelen(store store_with_lock.Store) (err error) {
 			}
 		}
 	} else {
-		f := zettel_formats.Text{}
+		f := zettel.Text{}
 
 		c := zettel.FormatContextWrite{
 			Out: store.Out,

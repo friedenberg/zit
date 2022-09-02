@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/id"
 	"github.com/friedenberg/zit/src/delta/ts"
 	"github.com/friedenberg/zit/src/echo/transaktion"
-	"github.com/friedenberg/zit/src/golf/zettel_formats"
+	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/hotel/zettel_named"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
@@ -52,7 +52,7 @@ func (s Store) storedZettelFromSha(sh sha.Sha) (sz zettel_stored.Stored, err err
 
 	defer or.Close()
 
-	f := zettel_formats.Objekte{}
+	f := zettel.Objekte{}
 
 	if _, err = f.ReadFrom(&sz.Zettel, or); err != nil {
 		err = errors.Error(err)

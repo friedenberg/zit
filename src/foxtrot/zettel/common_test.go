@@ -1,4 +1,4 @@
-package zettel_formats
+package zettel
 
 import (
 	"strings"
@@ -8,7 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/echo/age_io"
-	"github.com/friedenberg/zit/src/foxtrot/zettel"
 )
 
 func makeEtiketten(t *testing.T, vs ...string) (es etikett.Set) {
@@ -51,14 +50,14 @@ func (aw akteWriterFactory) AkteWriter() (age_io.Writer, error) {
 	return aw, nil
 }
 
-func readFormat(t *testing.T, f zettel.Format, contents string) (z zettel.Zettel, a string) {
+func readFormat(t *testing.T, f Format, contents string) (z Zettel, a string) {
 	t.Helper()
 
 	awf := akteWriterFactory{
 		stringBuilderCloser{Builder: &strings.Builder{}},
 	}
 
-	c := zettel.FormatContextRead{
+	c := FormatContextRead{
 		In:                strings.NewReader(contents),
 		AkteWriterFactory: awf,
 	}

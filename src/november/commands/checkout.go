@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/delta/hinweis"
-	"github.com/friedenberg/zit/src/golf/zettel_formats"
+	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
 	"github.com/friedenberg/zit/src/kilo/store_working_directory"
 	"github.com/friedenberg/zit/src/lima/store_with_lock"
@@ -38,7 +38,7 @@ func (c Checkout) RunWithHinweisen(s store_with_lock.Store, hins ...hinweis.Hinw
 	readOp := user_ops.ReadCheckedOut{
 		Umwelt: s.Umwelt,
 		OptionsReadExternal: store_working_directory.OptionsReadExternal{
-			Format: zettel_formats.Text{},
+			Format: zettel.Text{},
 		},
 	}
 
@@ -86,7 +86,7 @@ func (c Checkout) RunWithHinweisen(s store_with_lock.Store, hins ...hinweis.Hinw
 		Umwelt: s.Umwelt,
 		CheckoutOptions: store_working_directory.CheckoutOptions{
 			CheckoutMode: c.CheckoutMode,
-			Format:       zettel_formats.Text{},
+			Format:       zettel.Text{},
 		},
 	}
 

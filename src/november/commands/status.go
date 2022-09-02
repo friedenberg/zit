@@ -6,7 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
-	"github.com/friedenberg/zit/src/golf/zettel_formats"
+	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
 	"github.com/friedenberg/zit/src/kilo/store_working_directory"
 	"github.com/friedenberg/zit/src/lima/store_with_lock"
@@ -40,7 +40,7 @@ func (c Status) RunWithLockedStore(s store_with_lock.Store, args ...string) (err
 	}
 
 	options := store_working_directory.OptionsReadExternal{
-		Format: zettel_formats.Text{},
+		Format: zettel.Text{},
 	}
 
 	var readResults []zettel_checked_out.Zettel

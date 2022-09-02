@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/konfig"
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
-	"github.com/friedenberg/zit/src/golf/zettel_formats"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
 	"github.com/friedenberg/zit/src/lima/store_with_lock"
 )
@@ -43,7 +42,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	defer open_file_guard.Close(f)
 
-	format := zettel_formats.Text{}
+	format := zettel.Text{}
 
 	var store store_with_lock.Store
 

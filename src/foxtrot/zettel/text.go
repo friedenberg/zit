@@ -1,4 +1,4 @@
-package zettel_formats
+package zettel
 
 import (
 	"bufio"
@@ -15,7 +15,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/echo/age_io"
-	"github.com/friedenberg/zit/src/foxtrot/zettel"
 )
 
 const (
@@ -49,7 +48,7 @@ const (
 )
 
 type textStateRead struct {
-	context                 *zettel.FormatContextRead
+	context                 *FormatContextRead
 	field                   textStateReadField
 	lastFieldWasBezeichnung bool
 	didReadAkte             bool
@@ -73,10 +72,10 @@ func (s *textStateRead) Close() (err error) {
 }
 
 type textStateWrite struct {
-	zettel.Zettel
+	Zettel
 }
 
-func (f Text) ReadFrom(c *zettel.FormatContextRead) (n int64, err error) {
+func (f Text) ReadFrom(c *FormatContextRead) (n int64, err error) {
 	r := bufio.NewReader(c.In)
 
 	c.Zettel.Etiketten = etikett.MakeSet()

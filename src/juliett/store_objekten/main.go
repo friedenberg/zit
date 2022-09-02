@@ -22,7 +22,6 @@ import (
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/golf/hinweisen"
-	"github.com/friedenberg/zit/src/golf/zettel_formats"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 )
 
@@ -114,7 +113,7 @@ func (s Store) WriteZettelObjekte(z zettel.Zettel) (sh sha.Sha, err error) {
 
 	defer w.Close()
 
-	f := zettel_formats.Objekte{}
+	f := zettel.Objekte{}
 
 	if _, err = f.WriteTo(z, w); err != nil {
 		err = errors.Error(err)
@@ -155,7 +154,7 @@ func (s Store) writeNamedZettelToIndex(tz zettel_transacted.Zettel) (err error) 
 func (s Store) Read(i id.Id) (tz zettel_transacted.Zettel, err error) {
 	switch tid := i.(type) {
 	case sha.Sha:
-		f := zettel_formats.Objekte{}
+		f := zettel.Objekte{}
 
 		var r io.ReadCloser
 

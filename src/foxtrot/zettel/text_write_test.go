@@ -1,4 +1,4 @@
-package zettel_formats
+package zettel
 
 import (
 	"crypto/sha256"
@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/foxtrot/zettel"
 )
 
 type noopCloser struct {
@@ -37,7 +36,7 @@ func (arf akteReaderFactory) AkteReader(s sha.Sha) (r io.ReadCloser, err error) 
 	return
 }
 
-func writeFormat(t *testing.T, z zettel.Zettel, f zettel.Format, includeAkte bool, akteBody string) (out string) {
+func writeFormat(t *testing.T, z Zettel, f Format, includeAkte bool, akteBody string) (out string) {
 	hash := sha256.New()
 	_, err := io.Copy(hash, strings.NewReader(akteBody))
 
@@ -56,7 +55,7 @@ func writeFormat(t *testing.T, z zettel.Zettel, f zettel.Format, includeAkte boo
 
 	sb := &strings.Builder{}
 
-	c := zettel.FormatContextWrite{
+	c := FormatContextWrite{
 		Zettel:      z,
 		Out:         sb,
 		IncludeAkte: includeAkte,
@@ -78,7 +77,7 @@ func writeFormat(t *testing.T, z zettel.Zettel, f zettel.Format, includeAkte boo
 }
 
 func TestWriteWithoutAkte(t *testing.T) {
-	z := zettel.Zettel{
+	z := Zettel{
 		Bezeichnung: "the title",
 		Etiketten: makeEtiketten(t,
 			"tag1",
@@ -105,7 +104,7 @@ func TestWriteWithoutAkte(t *testing.T) {
 }
 
 func TestWriteWithInlineAkte(t *testing.T) {
-	z := zettel.Zettel{
+	z := Zettel{
 		Bezeichnung: "the title",
 		Etiketten: makeEtiketten(t,
 			"tag1",

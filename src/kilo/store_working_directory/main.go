@@ -15,7 +15,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/id"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
-	"github.com/friedenberg/zit/src/golf/zettel_formats"
 	"github.com/friedenberg/zit/src/india/zettel_external"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/store_objekten"
@@ -47,7 +46,7 @@ type Store struct {
 func New(k Konfig, p string, storeObjekten StoreZettel) (s *Store, err error) {
 	s = &Store{
 		Konfig:        k,
-		format:        zettel_formats.Text{},
+		format:        zettel.Text{},
 		storeObjekten: storeObjekten,
 		path:          p,
 		entries:       make(map[string]Entry),

@@ -1,9 +1,7 @@
-package zettel_formats
+package zettel
 
 import (
 	"testing"
-
-	"github.com/friedenberg/zit/src/foxtrot/zettel"
 )
 
 func TestReadWithoutAkte(t *testing.T) {
@@ -20,7 +18,7 @@ func TestReadWithoutAkte(t *testing.T) {
 `,
 	)
 
-	expected := zettel.Zettel{
+	expected := Zettel{
 		Bezeichnung: "the title",
 		Etiketten: makeEtiketten(t,
 			"tag1",
@@ -54,7 +52,7 @@ func TestReadWithoutAkteWithMultilineBezeichnung(t *testing.T) {
 `,
 	)
 
-	expected := zettel.Zettel{
+	expected := Zettel{
 		Bezeichnung: "the title continues",
 		Etiketten: makeEtiketten(t,
 			"tag1",
@@ -89,7 +87,7 @@ the body
 `,
 	)
 
-	expected := zettel.Zettel{
+	expected := Zettel{
 		Bezeichnung: "the title",
 		Etiketten: makeEtiketten(t,
 			"tag1",

@@ -11,7 +11,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/akten"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
-	"github.com/friedenberg/zit/src/golf/zettel_formats"
 	"github.com/friedenberg/zit/src/hotel/zettel_named"
 	"github.com/google/uuid"
 )
@@ -110,7 +109,7 @@ func (e duplicateAkteError) AddToLostAndFound(p string) (p1 string, err error) {
 	defer open_file_guard.Close(f)
 
 	e.Out = f
-	format := zettel_formats.Text{}
+	format := zettel.Text{}
 
 	if _, err = format.WriteTo(e.FormatContextWrite); err != nil {
 		err = errors.Error(err)
