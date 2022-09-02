@@ -7,8 +7,8 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/open_file_guard"
+	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/etikett"
-	"github.com/friedenberg/zit/src/delta/age_io"
 	"github.com/friedenberg/zit/src/delta/umwelt"
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
@@ -69,7 +69,7 @@ func (c ZettelFromExternalAkte) Run(args ...string) (results zettel_transacted.S
 func (c ZettelFromExternalAkte) zettelForAkte(store store_with_lock.Store, aktePath string) (z zettel.Zettel, err error) {
 	z.Etiketten = c.Etiketten
 
-	var akteWriter age_io.Writer
+	var akteWriter sha.WriteCloser
 
 	if akteWriter, err = store.StoreObjekten().AkteWriter(); err != nil {
 		err = errors.Wrap(err)

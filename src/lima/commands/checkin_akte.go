@@ -7,9 +7,9 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/open_file_guard"
+	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
-	"github.com/friedenberg/zit/src/delta/age_io"
 	"github.com/friedenberg/zit/src/delta/umwelt"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/store_with_lock"
@@ -85,7 +85,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	//TODO write new akte object for each and update sha
 	for i, p := range pairs {
-		var ow age_io.Writer
+		var ow sha.WriteCloser
 
 		if ow, err = store.StoreObjekten().AkteWriter(); err != nil {
 			err = errors.Wrap(err)
