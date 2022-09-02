@@ -4,7 +4,6 @@ import (
 	"io"
 	"os"
 
-	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
@@ -159,13 +158,13 @@ func (s *Store) writeAkte(
 
 	defer open_file_guard.Close(f)
 
-	logz.Print("starting io copy")
+	errors.Print("starting io copy")
 	if _, err = io.Copy(f, r); err != nil {
-		logz.Print(" io copy faile")
+		errors.Print(" io copy faile")
 		err = errors.Error(err)
 		return
 	}
-	logz.Print(" io copy succeed")
+	errors.Print(" io copy succeed")
 
 	return
 }

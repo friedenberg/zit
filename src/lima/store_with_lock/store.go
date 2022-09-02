@@ -1,7 +1,6 @@
 package store_with_lock
 
 import (
-	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/delta/age"
@@ -53,14 +52,14 @@ func New(u *umwelt.Umwelt) (s Store, err error) {
 		CacheEnabled: u.Konfig.CheckoutCacheEnabled,
 	}
 
-	logz.Print("initing checkout store")
+	errors.Print("initing checkout store")
 	if s.storeWorkingDirectory, err = store_working_directory.New(csk, u.Cwd(), s.storeObjekten); err != nil {
-		logz.Print(err)
+		errors.Print(err)
 		err = errors.Error(err)
 		return
 	}
 
-	logz.Print("done initing checkout store")
+	errors.Print("done initing checkout store")
 
 	return
 }

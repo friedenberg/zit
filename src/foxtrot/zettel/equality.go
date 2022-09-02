@@ -1,29 +1,27 @@
 package zettel
 
-import (
-	"github.com/friedenberg/zit/src/alfa/logz"
-)
+import "github.com/friedenberg/zit/src/bravo/errors"
 
 func (z Zettel) Equals(z1 Zettel) bool {
 	if !z.Akte.Equals(z1.Akte) {
-		logz.Print("akte")
-		logz.Print(z.Akte)
-		logz.Print(z1.Akte)
+		errors.Print("akte")
+		errors.Print(z.Akte)
+		errors.Print(z1.Akte)
 		return false
 	}
 
 	if !z.Typ.Equals(z1.Typ) {
-		logz.Print("akteext")
+		errors.Print("akteext")
 		return false
 	}
 
 	if z.Bezeichnung != z1.Bezeichnung {
-		logz.Print("bezeichnung")
+		errors.Print("bezeichnung")
 		return false
 	}
 
 	if !z.Etiketten.Equals(z1.Etiketten) {
-		logz.Print("etiketten")
+		errors.Print("etiketten")
 		return false
 	}
 

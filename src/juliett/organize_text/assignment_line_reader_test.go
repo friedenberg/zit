@@ -5,13 +5,13 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/friedenberg/zit/src/alfa/logz"
+	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/test_logz"
 	"github.com/friedenberg/zit/src/delta/etikett"
 )
 
 func TestMain(m *testing.M) {
-	logz.SetTesting()
+	errors.SetTesting()
 	code := m.Run()
 	os.Exit(code)
 }

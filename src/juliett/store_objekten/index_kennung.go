@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/friedenberg/zit/src/alfa/kennung"
-	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/delta/hinweis"
@@ -58,7 +57,7 @@ func newIndexKennung(
 
 func (i *indexKennung) Flush() (err error) {
 	if !i.hasChanges {
-		logz.Print("no changes")
+		errors.Print("no changes")
 		return
 	}
 
@@ -82,18 +81,18 @@ func (i *indexKennung) Flush() (err error) {
 		return
 	}
 
-	logz.PrintDebug(i.encodedKennung)
+	errors.PrintDebug(i.encodedKennung)
 
 	return
 }
 
 func (i *indexKennung) readIfNecessary() (err error) {
 	if i.didRead {
-		logz.Print("already read")
+		errors.Print("already read")
 		return
 	}
 
-	logz.Print("reading")
+	errors.Print("reading")
 
 	i.didRead = true
 
@@ -120,7 +119,7 @@ func (i *indexKennung) readIfNecessary() (err error) {
 		return
 	}
 
-	logz.PrintDebug(i.encodedKennung)
+	errors.PrintDebug(i.encodedKennung)
 
 	return
 }
@@ -148,7 +147,7 @@ func (i *indexKennung) reset() (err error) {
 				Right: kennung.Int(r),
 			}
 
-			logz.Print(k)
+			errors.Print(k)
 
 			n := int(k.Id())
 			i.AvailableKennung[n] = true
@@ -184,7 +183,7 @@ func (i *indexKennung) addHinweis(h hinweis.Hinweis) (err error) {
 	}
 
 	n := k.Id()
-	logz.Printf("deleting %d, %s", n, h)
+	errors.Printf("deleting %d, %s", n, h)
 
 	if _, ok := i.AvailableKennung[int(n)]; ok {
 		delete(i.AvailableKennung, int(n))

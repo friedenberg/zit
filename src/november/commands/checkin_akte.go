@@ -5,7 +5,6 @@ import (
 	"io"
 	"os"
 
-	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
@@ -75,7 +74,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	zettels := make([]zettel_transacted.Zettel, len(pairs))
-	logz.PrintDebug(pairs)
+	errors.PrintDebug(pairs)
 
 	// iterate through pairs and read current zettel
 	for i, p := range pairs {

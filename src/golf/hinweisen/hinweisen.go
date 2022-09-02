@@ -1,7 +1,6 @@
 package hinweisen
 
 import (
-	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/age"
@@ -37,7 +36,7 @@ func (hn hinweisen) Factory() *factory {
 }
 
 func (zs *hinweisen) Flush() (err error) {
-	logz.Print()
+	errors.Print()
 
 	if err = zs.factory.Flush(); err != nil {
 		err = errors.Error(err)

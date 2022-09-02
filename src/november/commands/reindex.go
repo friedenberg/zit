@@ -3,7 +3,6 @@ package commands
 import (
 	"flag"
 
-	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/lima/store_with_lock"
 )
@@ -28,7 +27,7 @@ func (c Reindex) RunWithLockedStore(store store_with_lock.Store, args ...string)
 		return
 	}
 
-	logz.Print()
+	errors.Print()
 
 	if err = store.StoreObjekten().Reindex(); err != nil {
 		err = errors.Error(err)

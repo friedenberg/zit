@@ -5,7 +5,6 @@ import (
 	"encoding/gob"
 	"io"
 
-	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/delta/etikett"
@@ -41,7 +40,7 @@ func newIndexZettelenTails(
 
 func (i *indexZettelenTails) Flush() (err error) {
 	if !i.hasChanges {
-		logz.Print("no changes")
+		errors.Print("no changes")
 		return
 	}
 

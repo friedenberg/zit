@@ -3,7 +3,6 @@ package zettel_transacted
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/delta/etikett"
 )
@@ -86,7 +85,7 @@ func (a SetPrefixTransacted) Subset(e etikett.Etikett) (out SetPrefixTransactedS
 	for e1, zSet := range a.innerMap {
 		for _, z := range zSet.innerMap {
 			intersection := z.Named.Stored.Zettel.Etiketten.IntersectPrefixes(etikett.MakeSet(e))
-			logz.Printf("%s yields %s", e1, intersection)
+			errors.Printf("%s yields %s", e1, intersection)
 
 			if intersection.Len() > 0 {
 				for _, e2 := range intersection {

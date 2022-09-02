@@ -9,7 +9,6 @@ import (
 	"sync"
 	"syscall"
 
-	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/hinweis"
@@ -66,7 +65,7 @@ func (c Exec) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	go c.exec(wg, pipePath, cmd)
 
 	wg.Wait()
-	logz.Print("done waiting")
+	errors.Print("done waiting")
 
 	return
 }
@@ -197,7 +196,7 @@ func (c Exec) feedPipe(
 		return
 	}
 
-	logz.Print("done copying")
+	errors.Print("done copying")
 
 	return
 }
@@ -219,14 +218,14 @@ func (c Exec) exec(
 
 	// cmd.ExtraFiles = append(cmd.ExtraFiles, pipeFileReader)
 
-	logz.Print("start running")
+	errors.Print("start running")
 
 	if err = cmd.Run(); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	logz.Print("done running")
+	errors.Print("done running")
 
 	return
 }

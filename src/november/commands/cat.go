@@ -5,7 +5,6 @@ import (
 	"flag"
 	"syscall"
 
-	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/sha"
@@ -78,8 +77,8 @@ func (c Cat) etiketten(store store_with_lock.Store) (err error) {
 func (c Cat) zettelen(store store_with_lock.Store) (err error) {
 	var all map[hinweis.Hinweis]zettel_transacted.Zettel
 
-	logz.Print()
-	defer logz.Print()
+	errors.Print()
+	defer errors.Print()
 
 	if all, err = store.StoreObjekten().ZettelenSchwanzen(); err != nil {
 		err = errors.Error(err)
@@ -93,7 +92,7 @@ func (c Cat) zettelen(store store_with_lock.Store) (err error) {
 			b, err := json.Marshal(z.Named.Stored)
 
 			if err != nil {
-				logz.Print(err)
+				errors.Print(err)
 			} else {
 				stdprinter.Out(string(b))
 			}
@@ -111,11 +110,11 @@ func (c Cat) zettelen(store store_with_lock.Store) (err error) {
 
 			if _, err = f.WriteTo(c); err != nil {
 				if errors.Is(err, syscall.EPIPE) {
-					logz.Print("closed pipe")
+					errors.Print("closed pipe")
 					err = nil
 					break
 				} else {
-					logz.Print(err)
+					errors.Print(err)
 				}
 			}
 		}

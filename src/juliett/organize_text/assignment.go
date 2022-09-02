@@ -3,7 +3,6 @@ package organize_text
 import (
 	"fmt"
 
-	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/delta/etikett"
 )
@@ -116,20 +115,20 @@ func (a *assignment) removeChild(c *assignment) (err error) {
 }
 
 func (a *assignment) consume(b *assignment) (err error) {
-	logz.Print(a.etiketten)
-	logz.Print(a.named)
-	logz.Print(b.etiketten)
-	logz.Print(b.named)
-	logz.Caller(1, "test")
+	errors.Print(a.etiketten)
+	errors.Print(a.named)
+	errors.Print(b.etiketten)
+	errors.Print(b.named)
+	errors.Caller(1, "test")
 
 	for _, c := range b.children {
-		logz.Print(c)
+		errors.Print(c)
 		if err = c.removeFromParent(); err != nil {
 			err = errors.Error(err)
 			return
 		}
 
-		logz.Print(a)
+		errors.Print(a)
 		a.addChild(c)
 	}
 
@@ -182,13 +181,13 @@ func (a *assignment) expandedEtiketten() (es etikett.Set, err error) {
 				return
 			}
 
-			logz.Print(e1, e)
+			errors.Print(e1, e)
 			e = etikett.Etikett{Value: fmt.Sprintf("%s%s", e1, e)}
-			logz.Print(e)
+			errors.Print(e)
 		}
 
 		es = etikett.MakeSet(e)
-		logz.Print(es)
+		errors.Print(es)
 	}
 
 	return

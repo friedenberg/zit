@@ -13,8 +13,6 @@ watch:
 	echo .
 
 exclude:
-	echo dot
-	echo dot.svg
 	echo .DS_Store
 	echo zit/.git/
 	echo zit/\.zit/

@@ -7,7 +7,6 @@ import (
 	"path"
 	"path/filepath"
 
-	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/charlie/files"
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
@@ -66,7 +65,7 @@ func New(k Konfig, p string, storeObjekten StoreZettel) (s *Store, err error) {
 		return
 	}
 
-	logz.Print()
+	errors.Print()
 
 	return
 }
@@ -92,7 +91,7 @@ func (s Store) flushToTemp() (tfp string, err error) {
 
 	for p, e := range s.entries {
 		out := fmt.Sprintf("%s %s\n", p, e)
-		logz.Printf("flushing zettel: %q", out)
+		errors.Printf("flushing zettel: %q", out)
 		w.WriteString(fmt.Sprint(out))
 	}
 
@@ -108,7 +107,7 @@ func (s Store) Flush() (err error) {
 			return
 		}
 
-		logz.Printf("renaming %s to %s", tfp, s.IndexFilePath())
+		errors.Printf("renaming %s to %s", tfp, s.IndexFilePath())
 		if err = os.Rename(tfp, s.IndexFilePath()); err != nil {
 			err = errors.Error(err)
 			return
@@ -148,7 +147,7 @@ func (s *Store) ReadAll() (err error) {
 }
 
 func (s *Store) syncOne(p string) (err error) {
-	logz.Output(2, fmt.Sprintln("will sync one: ", p))
+	errors.Output(2, fmt.Sprintln("will sync one: ", p))
 	var hasCache, hasFs bool
 
 	var fi os.FileInfo
@@ -167,13 +166,13 @@ func (s *Store) syncOne(p string) (err error) {
 	cached, hasCache = s.entries[p]
 
 	if !hasCache && !hasFs {
-		logz.Print(p, ": no cache, no fs")
+		errors.Print(p, ": no cache, no fs")
 		return
 	} else if hasCache {
-		logz.Print(p, ": cache, no fs: deleting")
+		errors.Print(p, ": cache, no fs: deleting")
 		delete(s.entries, p)
 	} else {
-		logz.Print(p, ": cache, fs")
+		errors.Print(p, ": cache, fs")
 		if !hasCache || fi.ModTime().After(cached.Time) {
 			var ez zettel_external.Zettel
 
@@ -223,7 +222,7 @@ func (s Store) MakeExternalZettelFromZettel(p string) (ez zettel_external.Zettel
 }
 
 func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
-	logz.PrintDebug(ez)
+	errors.PrintDebug(ez)
 	if !files.Exists(ez.ZettelFD.Path) {
 		//if the path does not have an extension, try looking for a file with that
 		//extension
@@ -285,8 +284,8 @@ func (s *Store) Read(p string) (cz zettel_checked_out.Zettel, err error) {
 		var hasEntry bool
 
 		if cached, hasEntry = s.entries[p]; !hasEntry {
-			logz.Printf("cached not found: %s\n", p)
-			logz.Printf("%#v", s.entries)
+			errors.Printf("cached not found: %s\n", p)
+			errors.Printf("%#v", s.entries)
 			err = ErrNotInIndex(nil)
 			return
 		}

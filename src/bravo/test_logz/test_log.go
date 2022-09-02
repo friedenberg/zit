@@ -5,14 +5,14 @@ import (
 	"os"
 	"testing"
 
-	"github.com/friedenberg/zit/src/alfa/logz"
+	"github.com/friedenberg/zit/src/bravo/errors"
 )
 
 var (
-	Print      = logz.Print
-	Printf     = logz.Printf
-	PrintDebug = logz.PrintDebug
-	LogPrefix  = logz.LogPrefix
+	Print      = errors.Print
+	Printf     = errors.Printf
+	PrintDebug = errors.PrintDebug
+	LogPrefix  = errors.LogPrefix
 )
 
 func Errorf(t *testing.T, format string, args ...interface{}) {

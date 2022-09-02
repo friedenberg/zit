@@ -3,7 +3,6 @@ package organize_text
 import (
 	"sort"
 
-	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/delta/etikett"
 )
@@ -14,30 +13,30 @@ type AssignmentTreeRefiner struct {
 }
 
 func (atc *AssignmentTreeRefiner) shouldMergeIntoParent(a *assignment) bool {
-	logz.Printf("checking node should merge: %s", a)
+	errors.Printf("checking node should merge: %s", a)
 
 	if a.parent == nil {
-		logz.Print("parent is nil")
+		errors.Print("parent is nil")
 		return false
 	}
 
 	if a.parent.isRoot {
-		logz.Print("parent is root")
+		errors.Print("parent is root")
 		return false
 	}
 
 	if a.parent.etiketten.Len() != 1 {
-		logz.Print("parent etiketten length is not 1")
+		errors.Print("parent etiketten length is not 1")
 		return false
 	}
 
 	if a.etiketten.Len() != 1 {
-		logz.Print("etiketten length is not 1")
+		errors.Print("etiketten length is not 1")
 		return false
 	}
 
 	if !a.etiketten.Equals(a.parent.etiketten) {
-		logz.Print("parent etiketten not equal")
+		errors.Print("parent etiketten not equal")
 		return false
 	}
 
@@ -46,12 +45,12 @@ func (atc *AssignmentTreeRefiner) shouldMergeIntoParent(a *assignment) bool {
 
 func (atc *AssignmentTreeRefiner) renameForPrefixJoint(a *assignment) (err error) {
 	if a == nil {
-		logz.Printf("assignment is nil")
+		errors.Printf("assignment is nil")
 		return
 	}
 
 	if a.parent == nil {
-		logz.Printf("parent is nil: %#v", a)
+		errors.Printf("parent is nil: %#v", a)
 		return
 	}
 
@@ -64,7 +63,7 @@ func (atc *AssignmentTreeRefiner) renameForPrefixJoint(a *assignment) (err error
 	}
 
 	if !a.etiketten.Any().HasParentPrefix(a.parent.etiketten.Any()) {
-		logz.Print("parent is not prefix joint")
+		errors.Print("parent is not prefix joint")
 		return
 	}
 
@@ -91,7 +90,7 @@ func (atc *AssignmentTreeRefiner) Refine(a *assignment) (err error) {
 	}
 
 	if atc.shouldMergeIntoParent(a) {
-		logz.Print("merging into parent")
+		errors.Print("merging into parent")
 		p := a.parent
 
 		if err = p.consume(a); err != nil {
@@ -128,9 +127,9 @@ func (atc *AssignmentTreeRefiner) Refine(a *assignment) (err error) {
 		return a.children[i].etiketten.String() < a.children[j].etiketten.String()
 	})
 
-	logz.Print(a)
-	logz.Print(a.children)
-	logz.Print(a.named)
+	errors.Print(a)
+	errors.Print(a.children)
+	errors.Print(a.named)
 
 	return
 }

@@ -4,7 +4,6 @@ import (
 	"io"
 	"os"
 
-	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/delta/script_value"
@@ -107,7 +106,7 @@ func (c CreateFromPaths) Run(args ...string) (results zettel_checked_out.Set, er
 func (c CreateFromPaths) zettelsFromPath(store store_with_lock.Store, p string) (out []zettel_external.Zettel, err error) {
 	var r io.Reader
 
-	logz.Print("running")
+	errors.Print("running")
 
 	if r, err = c.Filter.Run(p); err != nil {
 		err = errors.Error(err)

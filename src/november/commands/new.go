@@ -4,7 +4,6 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/bezeichnung"
-	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
@@ -167,7 +166,7 @@ func (c New) editZettelsIfRequested(
 	zsc zettel_checked_out.Set,
 ) (err error) {
 	if !c.Edit {
-		logz.Print("edit set to false, not editing")
+		errors.Print("edit set to false, not editing")
 		return
 	}
 

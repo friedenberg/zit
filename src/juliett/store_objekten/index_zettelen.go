@@ -6,7 +6,6 @@ import (
 	"io"
 	"strings"
 
-	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/bravo/typ"
@@ -50,7 +49,7 @@ func newIndexZettelen(
 
 func (i *indexZettelen) Flush() (err error) {
 	if !i.hasChanges {
-		logz.Print("no changes")
+		errors.Print("no changes")
 		return
 	}
 

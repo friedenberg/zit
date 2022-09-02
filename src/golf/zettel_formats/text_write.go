@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/line_format"
@@ -168,7 +167,7 @@ func (f Text) writeToInlineAkte(c zettel.FormatContextWrite) (n int64, err error
 }
 
 func (f Text) writeToExternalAkte(c zettel.FormatContextWrite) (n int64, err error) {
-	logz.Print()
+	errors.Print()
 	w := line_format.NewWriter()
 
 	w.WriteLines(

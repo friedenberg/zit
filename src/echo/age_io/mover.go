@@ -3,7 +3,6 @@ package age_io
 import (
 	"os"
 
-	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/charlie/files"
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
@@ -92,7 +91,7 @@ func (m *Mover) Close() (err error) {
 			Path: m.objektePath,
 		}
 
-		logz.Print(err)
+		errors.Print(err)
 		err = nil
 
 		return

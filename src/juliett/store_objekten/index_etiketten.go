@@ -6,7 +6,6 @@ import (
 	"io"
 	"sort"
 
-	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/delta/etikett"
@@ -40,7 +39,7 @@ func newIndexEtiketten(
 
 func (i *indexEtiketten) Flush() (err error) {
 	if !i.hasChanges {
-		logz.Print("no changes")
+		errors.Print("no changes")
 		return
 	}
 
@@ -119,7 +118,7 @@ func (i *indexEtiketten) readIfNecessary() (err error) {
 
 func (i *indexEtiketten) add(s etikett.Set) (err error) {
 	if s.Len() == 0 {
-		logz.Print("no etiketten to add")
+		errors.Print("no etiketten to add")
 		return
 	}
 
@@ -131,7 +130,7 @@ func (i *indexEtiketten) add(s etikett.Set) (err error) {
 	i.hasChanges = true
 
 	for _, e := range s {
-		logz.Printf("adding etiketten: %s", e)
+		errors.Printf("adding etiketten: %s", e)
 		var c int64
 
 		c, _ = i.etiketten[e]
@@ -144,7 +143,7 @@ func (i *indexEtiketten) add(s etikett.Set) (err error) {
 
 func (i *indexEtiketten) del(s etikett.Set) (err error) {
 	if s.Len() == 0 {
-		logz.Print("no etiketten to delete")
+		errors.Print("no etiketten to delete")
 		return
 	}
 
@@ -156,12 +155,12 @@ func (i *indexEtiketten) del(s etikett.Set) (err error) {
 	i.hasChanges = true
 
 	for _, e := range s {
-		logz.Printf("removing etikett: %s", e)
+		errors.Printf("removing etikett: %s", e)
 		var c int64
 		ok := false
 
 		if c, ok = i.etiketten[e]; !ok {
-			logz.Print(errors.Errorf("attempting to delete etikett that is already at 0"))
+			errors.Print(errors.Errorf("attempting to delete etikett that is already at 0"))
 			return
 		}
 

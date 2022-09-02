@@ -3,7 +3,6 @@ package organize_text
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/charlie/line_format"
 )
@@ -40,8 +39,8 @@ func New(options Options) (ot *organizeText, err error) {
 		return
 	}
 
-	logz.Print(ot.assignment.etiketten)
-	logz.Print(ot.assignment.named)
+	errors.Print(ot.assignment.etiketten)
+	errors.Print(ot.assignment.named)
 
 	return
 }

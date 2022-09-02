@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"flag"
 
-	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/delta/hinweis"
@@ -45,7 +44,7 @@ func (c Log) RunWithHinweisen(os store_with_lock.Store, hs ...hinweis.Hinweis) (
 	}
 
 	var chain zettel_transacted.Slice
-	logz.Print()
+	errors.Print()
 
 	if chain, err = os.StoreObjekten().AllInChain(h); err != nil {
 		err = errors.Error(err)

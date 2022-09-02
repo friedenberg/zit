@@ -1,7 +1,6 @@
 package organize_text
 
 import (
-	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/delta/etikett"
 )
@@ -53,7 +52,7 @@ func (a *assignment) addToCompareMap(es *etikett.Set, out *CompareMap) (err erro
 	}
 
 	es.Merge(es1)
-	logz.Print(es)
+	errors.Print(es)
 
 	for z, _ := range a.named {
 		for e, _ := range *es {

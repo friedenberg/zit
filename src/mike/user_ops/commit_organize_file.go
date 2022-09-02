@@ -1,7 +1,6 @@
 package user_ops
 
 import (
-	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/delta/etikett"
@@ -39,7 +38,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 		return
 	}
 
-	logz.Printf("%#v", cs)
+	errors.Printf("%#v", cs)
 
 	if len(cs.Added) == 0 && len(cs.Removed) == 0 && len(cs.New) == 0 {
 		stdprinter.Err("no changes")

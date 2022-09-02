@@ -6,7 +6,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
@@ -110,8 +109,8 @@ func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	switch c.Mode {
 	case organizeModeCommitDirectly:
-		logz.Print("neither stdin or stdout is a tty")
-		logz.Print("generate organize, read from stdin, commit")
+		errors.Print("neither stdin or stdout is a tty")
+		errors.Print("generate organize, read from stdin, commit")
 
 		createOrganizeFileResults := user_ops.CreateOrganizeFileResults{}
 
@@ -148,14 +147,14 @@ func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		}
 
 	case organizeModeOutputOnly:
-		logz.Print("generate organize file and write to stdout")
+		errors.Print("generate organize file and write to stdout")
 		if _, err = createOrganizeFileOp.RunAndWrite(getResults, os.Stdout); err != nil {
 			err = errors.Error(err)
 			return
 		}
 
 	case organizeModeInteractive:
-		logz.Print("generate temp file, write organize, open vim to edit, commit results")
+		errors.Print("generate temp file, write organize, open vim to edit, commit results")
 		createOrganizeFileResults := user_ops.CreateOrganizeFileResults{}
 
 		var f *os.File

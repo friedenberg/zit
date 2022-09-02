@@ -1,17 +1,15 @@
 package zettel_stored
 
-import (
-	"github.com/friedenberg/zit/src/alfa/logz"
-)
+import "github.com/friedenberg/zit/src/bravo/errors"
 
 func (a Stored) Equals(b Stored) bool {
 	if !a.Zettel.Equals(b.Zettel) {
-		logz.Print("zettel")
+		errors.Print("zettel")
 		return false
 	}
 
 	if !a.Sha.Equals(b.Sha) {
-		logz.Print("sha")
+		errors.Print("sha")
 		return false
 	}
 

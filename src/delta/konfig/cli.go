@@ -5,7 +5,6 @@ import (
 	"os"
 	"path"
 
-	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 )
 
@@ -71,7 +70,7 @@ func (c Cli) KonfigPath() (p string, err error) {
 
 func (c Cli) Konfig() (k Konfig, err error) {
 	if c.Verbose {
-		logz.SetVerbose()
+		errors.SetVerbose()
 	} else {
 		// logz.SetOutput(ioutil.Discard)
 	}

@@ -5,7 +5,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/friedenberg/zit/src/alfa/logz"
+	"github.com/friedenberg/zit/src/bravo/errors"
 )
 
 type printerLine struct {
@@ -33,8 +33,8 @@ func init() {
 }
 
 func WaitForPrinter() {
-	logz.Print("waiting")
-	defer logz.Print("done")
+	errors.Print("waiting")
+	defer errors.Print("done")
 
 	close(printerChannel)
 	waitGroup.Wait()

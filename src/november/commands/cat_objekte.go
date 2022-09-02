@@ -4,7 +4,6 @@ import (
 	"flag"
 	"io"
 
-	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/sha"
@@ -116,7 +115,7 @@ func (c CatObjekte) zettelen(store store_with_lock.Store, ids ...id_set.Set) (er
 
 		f := zettel_formats.Objekte{}
 
-		logz.PrintDebug(tz)
+		errors.PrintDebug(tz)
 
 		if _, err = f.WriteTo(tz.Named.Stored.Zettel, store.Out); err != nil {
 			err = errors.Error(err)

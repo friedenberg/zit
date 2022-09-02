@@ -3,7 +3,6 @@ package store_objekten
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/charlie/zk_types"
@@ -123,11 +122,11 @@ func (s Store) transactedZettelFromTransaktionObjekte(
 
 func (s Store) writeTransaktion() (err error) {
 	if len(s.Transaktion.Objekten) == 0 {
-		logz.Print("not writing Transaktion as there aren't any Objekten")
+		errors.Print("not writing Transaktion as there aren't any Objekten")
 		return
 	}
 
-	logz.Printf("writing Transaktion with %d Objekten", len(s.Transaktion.Objekten))
+	errors.Printf("writing Transaktion with %d Objekten", len(s.Transaktion.Objekten))
 
 	var p string
 
@@ -156,7 +155,7 @@ func (s Store) writeTransaktion() (err error) {
 }
 
 func (s *Store) addZettelToTransaktion(z zettel_named.Zettel) (tz zettel_transacted.Zettel, err error) {
-	logz.Printf("adding zettel to transaktion: %s", z.Hinweis)
+	errors.Printf("adding zettel to transaktion: %s", z.Hinweis)
 
 	if tz, err = s.transactedWithHead(z, s.Transaktion); err != nil {
 		err = errors.Error(err)

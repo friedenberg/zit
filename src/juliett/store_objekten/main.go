@@ -7,7 +7,6 @@ import (
 	"reflect"
 	"sort"
 
-	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
@@ -128,7 +127,7 @@ func (s Store) WriteZettelObjekte(z zettel.Zettel) (sh sha.Sha, err error) {
 }
 
 func (s Store) writeNamedZettelToIndex(tz zettel_transacted.Zettel) (err error) {
-	logz.Printf("writing zettel to index: %s", tz.Named)
+	errors.Printf("writing zettel to index: %s", tz.Named)
 
 	if err = s.indexZettelenTails.add(tz); err != nil {
 		err = errors.Wrapped(err, "failed to write zettel to index: %s", tz.Named)
@@ -227,7 +226,7 @@ func (s *Store) Create(in zettel.Zettel) (tz zettel_transacted.Zettel, err error
 		return
 	}
 
-	logz.PrintDebug(tz)
+	errors.PrintDebug(tz)
 
 	if err = s.indexEtiketten.add(tz.Named.Stored.Zettel.Etiketten); err != nil {
 		err = errors.Error(err)
@@ -305,8 +304,8 @@ func (s *Store) Update(
 	}
 
 	d := mutter.Named.Stored.Zettel.Etiketten.Delta(tz.Named.Stored.Zettel.Etiketten)
-	logz.Print(mutter.Named.Stored.Zettel.Etiketten)
-	logz.Print(tz.Named.Stored.Zettel.Etiketten)
+	errors.Print(mutter.Named.Stored.Zettel.Etiketten)
+	errors.Print(tz.Named.Stored.Zettel.Etiketten)
 
 	if err = s.indexEtiketten.add(d.Added); err != nil {
 		err = errors.Error(err)
@@ -388,7 +387,7 @@ func (s Store) ReadAllTransaktions() (out []transaktion.Transaktion, err error) 
 	}
 
 	for _, hn := range headNames {
-		logz.Print(hn)
+		errors.Print(hn)
 
 		var tailNames []string
 
@@ -398,7 +397,7 @@ func (s Store) ReadAllTransaktions() (out []transaktion.Transaktion, err error) 
 		}
 
 		for _, tn := range tailNames {
-			logz.Print(tn)
+			errors.Print(tn)
 
 			p := path.Join(d, hn, tn)
 
@@ -413,9 +412,9 @@ func (s Store) ReadAllTransaktions() (out []transaktion.Transaktion, err error) 
 		}
 	}
 
-	logz.Print("sorting")
+	errors.Print("sorting")
 	sort.Slice(out, func(i, j int) bool { return out[i].Time.Less(out[j].Time) })
-	logz.Print("done")
+	errors.Print("done")
 
 	return
 }
@@ -424,7 +423,7 @@ func (s *Store) ReadHinweisAt(
 	h hinweis.HinweisWithIndex,
 ) (tz zettel_transacted.Zettel, err error) {
 	if h.Index < 0 {
-		logz.PrintDebug(h)
+		errors.PrintDebug(h)
 		return s.indexZettelenTails.Read(h.Hinweis)
 	}
 
@@ -476,10 +475,10 @@ func (s *Store) Reindex() (err error) {
 	}
 
 	for _, t := range ts {
-		logz.Print(t)
+		errors.Print(t)
 
 		for _, o := range t.Objekten {
-			logz.Print(o)
+			errors.Print(o)
 
 			switch o.Type {
 
@@ -488,7 +487,7 @@ func (s *Store) Reindex() (err error) {
 
 				if tz, err = s.transactedZettelFromTransaktionObjekte(t, o); err != nil {
 					if errors.Is(err, ErrNotFound{}) {
-						logz.Print(err)
+						errors.Print(err)
 						err = nil
 						continue
 					} else {
@@ -520,7 +519,7 @@ func (s *Store) Reindex() (err error) {
 		return
 	}
 
-	logz.Printf("tail count: %d", len(tails))
+	errors.Printf("tail count: %d", len(tails))
 
 	for _, zn := range tails {
 		s.indexEtiketten.add(zn.Named.Stored.Zettel.Etiketten)

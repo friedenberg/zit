@@ -1,7 +1,6 @@
 package changes
 
 import (
-	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/juliett/organize_text"
@@ -30,8 +29,8 @@ func ChangesFrom(a1, b1 organize_text.Text) (c Changes, err error) {
 		return
 	}
 
-	logz.PrintDebug(a)
-	logz.PrintDebug(b)
+	errors.PrintDebug(a)
+	errors.PrintDebug(b)
 
 	c.Added = make([]Change, 0)
 	c.Removed = make([]Change, 0)

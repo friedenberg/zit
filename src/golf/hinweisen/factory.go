@@ -8,7 +8,6 @@ import (
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/kennung"
-	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
 	"github.com/friedenberg/zit/src/delta/hinweis"
@@ -88,7 +87,7 @@ func (hf *factory) refresh() (err error) {
 }
 
 func (hf *factory) Make() (h hinweis.Hinweis, err error) {
-	logz.Print("making")
+	errors.Print("making")
 	hf.Lock()
 	defer hf.Unlock()
 	defer func() {
@@ -104,7 +103,7 @@ func (hf *factory) Make() (h hinweis.Hinweis, err error) {
 
 	newInt := hf.counter + 1
 
-	logz.Printf("next kennung: %d", newInt)
+	errors.Printf("next kennung: %d", newInt)
 	if h, err = hinweis.New(newInt, hf.yin, hf.yang); err != nil {
 		err = errors.Error(err)
 		return

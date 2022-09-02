@@ -9,7 +9,6 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/charlie/files"
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
@@ -93,7 +92,7 @@ func (f Text) ReadFrom(c *zettel.FormatContextRead) (n int64, err error) {
 			err = err1
 		}
 
-		logz.PrintDebug(state)
+		errors.PrintDebug(state)
 		if !state.context.Zettel.Akte.IsNull() {
 			return
 		}
@@ -282,7 +281,7 @@ func (f Text) readTyp(state *textStateRead, desc string) (err error) {
 
 	// path
 	if files.Exists(desc) {
-		logz.Print("valid path", desc)
+		errors.Print("valid path", desc)
 
 		if err = state.context.Zettel.Typ.Set(tail); err != nil {
 			err = errors.Error(err)
@@ -298,8 +297,8 @@ func (f Text) readTyp(state *textStateRead, desc string) (err error) {
 
 	shaError := state.metadataiAkteSha.Set(head)
 
-	logz.Print(head)
-	logz.Print(tail)
+	errors.Print(head)
+	errors.Print(tail)
 
 	if tail == "" {
 		//sha or ext

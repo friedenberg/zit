@@ -5,7 +5,6 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
 )
@@ -54,18 +53,18 @@ func (s *ScriptValue) Run(input string) (r io.Reader, err error) {
 	}
 
 	if r, err = s.cmd.StdoutPipe(); err != nil {
-		logz.Fatal(err)
+		errors.Fatal(err)
 		return
 	}
 
-	logz.Print("starting")
+	errors.Print("starting")
 	s.cmd.Start()
 
 	return
 }
 
 func (s *ScriptValue) Close() (err error) {
-	logz.Print()
+	errors.Print()
 
 	if s.file != nil {
 		err = open_file_guard.Close(s.file)

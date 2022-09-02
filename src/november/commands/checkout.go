@@ -3,7 +3,6 @@ package commands
 import (
 	"flag"
 
-	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/delta/hinweis"
@@ -50,7 +49,7 @@ func (c Checkout) RunWithHinweisen(s store_with_lock.Store, hins ...hinweis.Hinw
 	}
 
 	if readResults, err = readOp.RunMany(s, pz); err != nil {
-		logz.Print(err)
+		errors.Print(err)
 		err = errors.Error(err)
 		return
 	}
@@ -64,7 +63,7 @@ func (c Checkout) RunWithHinweisen(s store_with_lock.Store, hins ...hinweis.Hinw
 		}
 
 		if cz.Internal.Named.Stored.Zettel.Equals(cz.External.Named.Stored.Zettel) {
-			logz.Print(cz.Internal.Named.Stored.Zettel)
+			errors.Print(cz.Internal.Named.Stored.Zettel)
 			stdprinter.Outf("%s (already checked out)\n", cz.Internal.Named)
 			continue
 		}

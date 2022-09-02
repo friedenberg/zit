@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/friedenberg/zit/src/alfa/logz"
+	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/india/zettel_external"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 )
@@ -33,7 +33,7 @@ func (c *Zettel) DetermineState() {
 }
 
 func (c Zettel) String() string {
-	logz.PrintDebug(c)
+	errors.PrintDebug(c)
 	sb := &strings.Builder{}
 
 	switch c.State {

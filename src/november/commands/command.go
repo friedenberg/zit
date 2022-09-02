@@ -4,7 +4,6 @@ import (
 	"flag"
 	"os"
 
-	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
@@ -64,9 +63,9 @@ func Run(args []string) (exitStatus int) {
 
 	defer stdprinter.WaitForPrinter()
 	defer func() {
-		logz.Print("checking for open files")
+		errors.Print("checking for open files")
 		l := open_file_guard.Len()
-		logz.Printf("open files: %d\n", l)
+		errors.Printf("open files: %d\n", l)
 
 		var normalError errors.StackTracer
 
@@ -91,7 +90,7 @@ func Run(args []string) (exitStatus int) {
 	}
 
 	if len(os.Args) < 1 {
-		logz.Print("printing usage")
+		errors.Print("printing usage")
 		return cmd.PrintUsage(nil)
 	}
 
@@ -151,7 +150,7 @@ func Run(args []string) (exitStatus int) {
 		return
 	}
 
-	logz.Print()
+	errors.Print()
 
 	return
 }
