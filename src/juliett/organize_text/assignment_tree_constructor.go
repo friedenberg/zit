@@ -4,7 +4,7 @@ import (
 	"sort"
 
 	"github.com/friedenberg/zit/src/charlie/etikett"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
+	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
 )
 
 type AssignmentTreeConstructor struct {

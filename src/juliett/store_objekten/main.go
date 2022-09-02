@@ -16,12 +16,12 @@ import (
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/charlie/id"
 	"github.com/friedenberg/zit/src/charlie/ts"
-	"github.com/friedenberg/zit/src/delta/hinweisen"
 	"github.com/friedenberg/zit/src/delta/age_io"
+	"github.com/friedenberg/zit/src/delta/hinweisen"
 	"github.com/friedenberg/zit/src/delta/transaktion"
 	"github.com/friedenberg/zit/src/delta/umwelt"
 	"github.com/friedenberg/zit/src/delta/zettel"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
+	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
 )
 
 type Store struct {

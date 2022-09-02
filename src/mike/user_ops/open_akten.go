@@ -1,7 +1,7 @@
 package user_ops
 
 import (
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
+	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
 	"github.com/friedenberg/zit/src/lima/store_with_lock"
 )
 

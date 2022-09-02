@@ -11,7 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/id_set"
 	"github.com/friedenberg/zit/src/delta/transaktion"
 	"github.com/friedenberg/zit/src/delta/zettel"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
+	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/store_objekten"
 	"github.com/friedenberg/zit/src/lima/store_with_lock"
 )

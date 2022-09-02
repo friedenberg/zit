@@ -12,8 +12,8 @@ import (
 	"github.com/friedenberg/zit/src/delta/transaktion"
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_stored"
-	"github.com/friedenberg/zit/src/hotel/zettel_named"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
+	"github.com/friedenberg/zit/src/golf/zettel_named"
+	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
 )
 
 func (s Store) ReadTransaktion(t ts.Time) (tr transaktion.Transaktion, err error) {

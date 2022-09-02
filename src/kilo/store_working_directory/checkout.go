@@ -9,8 +9,8 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/id"
 	"github.com/friedenberg/zit/src/delta/zettel"
-	"github.com/friedenberg/zit/src/india/zettel_external"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
+	"github.com/friedenberg/zit/src/hotel/zettel_external"
+	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
 )
 

@@ -4,8 +4,8 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/open_file_guard"
 	"github.com/friedenberg/zit/src/delta/umwelt"
-	"github.com/friedenberg/zit/src/india/zettel_external"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
+	"github.com/friedenberg/zit/src/hotel/zettel_external"
+	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
 	"github.com/friedenberg/zit/src/lima/store_with_lock"
 )
 

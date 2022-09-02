@@ -2,7 +2,7 @@ package zettel_transacted
 
 import (
 	"github.com/friedenberg/zit/src/charlie/ts"
-	"github.com/friedenberg/zit/src/hotel/zettel_named"
+	"github.com/friedenberg/zit/src/golf/zettel_named"
 )
 
 type Zettel struct {

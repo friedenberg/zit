@@ -9,8 +9,8 @@ import (
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/delta/umwelt"
-	"github.com/friedenberg/zit/src/hotel/zettel_named"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
+	"github.com/friedenberg/zit/src/golf/zettel_named"
+	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
 )
 
 type indexZettelenTails struct {

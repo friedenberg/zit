@@ -11,7 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/foxtrot/akten"
-	"github.com/friedenberg/zit/src/hotel/zettel_named"
+	"github.com/friedenberg/zit/src/golf/zettel_named"
 	"github.com/google/uuid"
 )
 

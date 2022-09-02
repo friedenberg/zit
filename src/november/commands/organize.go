@@ -11,8 +11,8 @@ import (
 	"github.com/friedenberg/zit/src/bravo/open_file_guard"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/delta/umwelt"
-	"github.com/friedenberg/zit/src/hotel/zettel_named"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
+	"github.com/friedenberg/zit/src/golf/zettel_named"
+	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/organize_text"
 	"github.com/friedenberg/zit/src/mike/user_ops"
 )

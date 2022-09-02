@@ -11,7 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/delta/age_io"
 	"github.com/friedenberg/zit/src/delta/umwelt"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
+	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
 	"github.com/friedenberg/zit/src/lima/store_with_lock"
 )
 
