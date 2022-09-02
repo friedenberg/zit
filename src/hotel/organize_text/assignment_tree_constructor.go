@@ -42,7 +42,7 @@ func (atc AssignmentTreeConstructor) makeChildren(
 ) {
 	if groupingEtiketten.Len() == 0 {
 		prefixSet.EachZettel(
-			func(e etikett.Etikett, tz zettel_transacted.Transacted) (err error) {
+			func(e etikett.Etikett, tz zettel_transacted.Zettel) (err error) {
 				parent.named.Add(makeZettel(tz.Named))
 
 				return
@@ -55,7 +55,7 @@ func (atc AssignmentTreeConstructor) makeChildren(
 	segments := prefixSet.Subset(groupingEtiketten[0])
 
 	segments.Ungrouped.Each(
-		func(tz zettel_transacted.Transacted) (err error) {
+		func(tz zettel_transacted.Zettel) (err error) {
 			parent.named.Add(makeZettel(tz.Named))
 			return
 		},

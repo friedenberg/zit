@@ -5,12 +5,12 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/logz"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/india/zettel_external"
+	"github.com/friedenberg/zit/src/india/zettel_transacted"
 )
 
 type Zettel struct {
-	Internal zettel_transacted.Transacted
+	Internal zettel_transacted.Zettel
 	Matches  Matches
 	External zettel_external.Zettel
 	State

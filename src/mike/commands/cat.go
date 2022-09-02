@@ -76,7 +76,7 @@ func (c Cat) etiketten(store store_with_lock.Store) (err error) {
 }
 
 func (c Cat) zettelen(store store_with_lock.Store) (err error) {
-	var all map[hinweis.Hinweis]zettel_transacted.Transacted
+	var all map[hinweis.Hinweis]zettel_transacted.Zettel
 
 	logz.Print()
 	defer logz.Print()

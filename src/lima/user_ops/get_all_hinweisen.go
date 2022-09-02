@@ -27,7 +27,7 @@ func (op GetAllHinweisen) Run() (results GetAllHinweisenResults, err error) {
 
 	defer errors.PanicIfError(store.Flush)
 
-	var zs map[hinweis.Hinweis]zettel_transacted.Transacted
+	var zs map[hinweis.Hinweis]zettel_transacted.Zettel
 
 	if zs, err = store.StoreObjekten().ZettelenSchwanzen(); err != nil {
 		err = errors.Error(err)

@@ -24,7 +24,7 @@ func MakeSetPrefixTransacted(c int) (s SetPrefixTransacted) {
 }
 
 //TODO mark that this splits on right-expanded
-func (s *SetPrefixTransacted) Add(z zettel_transacted.Transacted) {
+func (s *SetPrefixTransacted) Add(z zettel_transacted.Zettel) {
 	es := z.Named.Stored.Zettel.Etiketten.Expanded(etikett.ExpanderRight{})
 
 	if es.Len() == 0 {
@@ -36,7 +36,7 @@ func (s *SetPrefixTransacted) Add(z zettel_transacted.Transacted) {
 	}
 }
 
-func (s SetPrefixTransacted) addPair(e etikett.Etikett, z zettel_transacted.Transacted) {
+func (s SetPrefixTransacted) addPair(e etikett.Etikett, z zettel_transacted.Zettel) {
 	existing, ok := s.innerMap[e]
 
 	if !ok {
@@ -63,7 +63,7 @@ func (a SetPrefixTransacted) Each(f func(etikett.Etikett, SetTransacted) error) 
 	return
 }
 
-func (a SetPrefixTransacted) EachZettel(f func(etikett.Etikett, zettel_transacted.Transacted) error) (err error) {
+func (a SetPrefixTransacted) EachZettel(f func(etikett.Etikett, zettel_transacted.Zettel) error) (err error) {
 	return a.Each(
 		func(e etikett.Etikett, st SetTransacted) (err error) {
 			for _, sz := range st.innerMap {

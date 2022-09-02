@@ -26,14 +26,14 @@ func init() {
 
 func (c RejoinAbandonedZettel) RunWithShas(store store_with_lock.Store, shas ...sha.Sha) (err error) {
 	for _, sha := range shas {
-		var stored zettel_transacted.Transacted
+		var stored zettel_transacted.Zettel
 
 		if stored, err = store.StoreObjekten().Read(sha); err != nil {
 			err = errors.Error(err)
 			return
 		}
 
-		var tz zettel_transacted.Transacted
+		var tz zettel_transacted.Zettel
 
 		if tz, err = store.StoreObjekten().Create(stored.Named.Stored.Zettel); err != nil {
 			err = errors.Error(err)

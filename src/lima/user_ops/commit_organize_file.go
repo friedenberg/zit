@@ -59,7 +59,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 		var ok bool
 
 		if z, ok = toUpdate[h.String()]; !ok {
-			var tz zettel_transacted.Transacted
+			var tz zettel_transacted.Zettel
 
 			if tz, err = store.StoreObjekten().Read(h); err != nil {
 				err = errors.Error(err)
@@ -151,7 +151,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 			continue
 		}
 
-		var tz zettel_transacted.Transacted
+		var tz zettel_transacted.Zettel
 
 		if tz, err = store.StoreObjekten().Create(z); err != nil {
 			err = errors.Errorf("failed to create zettel: %s", err)

@@ -6,8 +6,8 @@ import (
 
 	"github.com/friedenberg/zit/src/charlie/zk_types"
 	"github.com/friedenberg/zit/src/hotel/collections"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/india/zettel_external"
+	"github.com/friedenberg/zit/src/india/zettel_transacted"
 )
 
 type Matches struct {
@@ -25,7 +25,7 @@ func (m Matches) appendToStringBuilder(sb *strings.Builder, ex zettel_external.Z
 		if c.Len() == 1 && c.Any().Named.Stored.Zettel.Equals(ex.Named.Stored.Zettel) {
 		} else if c.Len() > 1 {
 			c.Each(
-				func(tz zettel_transacted.Transacted) (err error) {
+				func(tz zettel_transacted.Zettel) (err error) {
 					sb.WriteString(fmt.Sprintf("\n\t%s (%s match)", tz.Named.Hinweis, t))
 					return
 				},

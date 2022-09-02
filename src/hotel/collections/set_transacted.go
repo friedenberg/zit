@@ -10,8 +10,8 @@ import (
 )
 
 type SetTransacted struct {
-	keyFunc  func(zettel_transacted.Transacted) string
-	innerMap map[string]zettel_transacted.Transacted
+	keyFunc  func(zettel_transacted.Zettel) string
+	innerMap map[string]zettel_transacted.Zettel
 }
 
 func makeKey(ss ...fmt.Stringer) string {
@@ -30,7 +30,7 @@ func makeKey(ss ...fmt.Stringer) string {
 
 func MakeSetUniqueTransacted(c int) SetTransacted {
 	return SetTransacted{
-		keyFunc: func(sz zettel_transacted.Transacted) string {
+		keyFunc: func(sz zettel_transacted.Zettel) string {
 			return makeKey(
 				sz.Kopf,
 				sz.Mutter,
@@ -39,31 +39,31 @@ func MakeSetUniqueTransacted(c int) SetTransacted {
 				sz.Named.Stored.Sha,
 			)
 		},
-		innerMap: make(map[string]zettel_transacted.Transacted),
+		innerMap: make(map[string]zettel_transacted.Zettel),
 	}
 }
 
 func MakeSetHinweisTransacted() SetTransacted {
 	return SetTransacted{
-		keyFunc: func(sz zettel_transacted.Transacted) string {
+		keyFunc: func(sz zettel_transacted.Zettel) string {
 			return makeKey(sz.Named.Hinweis)
 		},
-		innerMap: make(map[string]zettel_transacted.Transacted),
+		innerMap: make(map[string]zettel_transacted.Zettel),
 	}
 }
 
 func (m SetTransacted) Get(
 	s fmt.Stringer,
-) (tz zettel_transacted.Transacted, ok bool) {
+) (tz zettel_transacted.Zettel, ok bool) {
 	tz, ok = m.innerMap[s.String()]
 	return
 }
 
-func (m SetTransacted) Add(z zettel_transacted.Transacted) {
+func (m SetTransacted) Add(z zettel_transacted.Zettel) {
 	m.innerMap[m.keyFunc(z)] = z
 }
 
-func (m SetTransacted) Del(z zettel_transacted.Transacted) {
+func (m SetTransacted) Del(z zettel_transacted.Zettel) {
 	delete(m.innerMap, m.keyFunc(z))
 }
 
@@ -77,12 +77,12 @@ func (a SetTransacted) Merge(b SetTransacted) {
 	}
 }
 
-func (a SetTransacted) Contains(z zettel_transacted.Transacted) bool {
+func (a SetTransacted) Contains(z zettel_transacted.Zettel) bool {
 	_, ok := a.innerMap[a.keyFunc(z)]
 	return ok
 }
 
-func (a SetTransacted) Any() (tz zettel_transacted.Transacted) {
+func (a SetTransacted) Any() (tz zettel_transacted.Zettel) {
 	for _, sz := range a.innerMap {
 		tz = sz
 		break
@@ -91,7 +91,7 @@ func (a SetTransacted) Any() (tz zettel_transacted.Transacted) {
 	return
 }
 
-func (a SetTransacted) Each(f func(zettel_transacted.Transacted) error) (err error) {
+func (a SetTransacted) Each(f func(zettel_transacted.Zettel) error) (err error) {
 	for _, sz := range a.innerMap {
 		if err = f(sz); err != nil {
 			if errors.Is(err, io.EOF) {

@@ -7,10 +7,10 @@ import (
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
 	"github.com/friedenberg/zit/src/india/zettel_checked_out"
+	"github.com/friedenberg/zit/src/india/zettel_external"
 	"github.com/friedenberg/zit/src/juliett/store_working_directory"
 	"github.com/friedenberg/zit/src/kilo/store_with_lock"
 	"github.com/friedenberg/zit/src/lima/user_ops"
-	"github.com/friedenberg/zit/src/india/zettel_external"
 )
 
 type Checkin struct {

@@ -41,7 +41,7 @@ func (c OpenAkte) RunWithHinweisen(store store_with_lock.Store, hins ...hinweis.
 
 	for i, h := range hins {
 		func(h hinweis.Hinweis) {
-			var tz zettel_transacted.Transacted
+			var tz zettel_transacted.Zettel
 
 			if tz, err = store.StoreObjekten().Read(h); err != nil {
 				err = errors.Error(err)

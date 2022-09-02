@@ -41,7 +41,7 @@ func (c WriteNewZettels) RunOne(
 	store store_with_lock.Store,
 	z zettel.Zettel,
 ) (result zettel_checked_out.Zettel, err error) {
-	var tz zettel_transacted.Transacted
+	var tz zettel_transacted.Zettel
 
 	if tz, err = store.StoreObjekten().Create(z); err != nil {
 		err = errors.Error(err)

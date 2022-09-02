@@ -25,10 +25,10 @@ func init() {
 }
 
 func (c Copy) RunWithHinweisen(s store_with_lock.Store, hins ...hinweis.Hinweis) (err error) {
-	zettels := make([]zettel_transacted.Transacted, len(hins))
+	zettels := make([]zettel_transacted.Zettel, len(hins))
 
 	for i, h := range hins {
-		var tz zettel_transacted.Transacted
+		var tz zettel_transacted.Zettel
 
 		if tz, err = s.StoreObjekten().Read(h); err != nil {
 			err = errors.Error(err)

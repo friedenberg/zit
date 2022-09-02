@@ -20,12 +20,12 @@ import (
 	"github.com/friedenberg/zit/src/hotel/collections"
 	"github.com/friedenberg/zit/src/india/store_objekten"
 	"github.com/friedenberg/zit/src/india/zettel_checked_out"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/india/zettel_external"
+	"github.com/friedenberg/zit/src/india/zettel_transacted"
 )
 
 type StoreZettel interface {
-	Read(id id.Id) (z zettel_transacted.Transacted, err error)
+	Read(id id.Id) (z zettel_transacted.Zettel, err error)
 	ReadAkteSha(sha.Sha) (collections.SetTransacted, error)
 	ReadZettelSha(sha.Sha) (collections.SetTransacted, error)
 	ReadBezeichnung(string) (collections.SetTransacted, error)
@@ -292,7 +292,7 @@ func (s *Store) Read(p string) (cz zettel_checked_out.Zettel, err error) {
 			return
 		}
 
-		var named zettel_transacted.Transacted
+		var named zettel_transacted.Zettel
 
 		if named, err = s.storeObjekten.Read(cached.Sha); err != nil {
 			err = errors.Error(err)

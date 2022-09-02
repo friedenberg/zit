@@ -5,7 +5,7 @@ import (
 	"github.com/friedenberg/zit/src/hotel/zettel_named"
 )
 
-type Transacted struct {
+type Zettel struct {
 	Named                 zettel_named.Zettel
 	Kopf, Mutter, Schwanz ts.Time
 }

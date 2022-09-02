@@ -43,7 +43,7 @@ func (c ZettelFromExternalAkte) Run(args ...string) (results collections.SetTran
 			return
 		}
 
-		var tz zettel_transacted.Transacted
+		var tz zettel_transacted.Zettel
 
 		if tz, err = store.StoreObjekten().Create(z); err != nil {
 			err = errors.Error(err)

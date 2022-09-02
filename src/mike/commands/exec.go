@@ -36,7 +36,7 @@ func init() {
 }
 
 func (c Exec) Run(u *umwelt.Umwelt, args ...string) (err error) {
-	var tz zettel_transacted.Transacted
+	var tz zettel_transacted.Zettel
 	var executor konfig.RemoteScript
 	var ar io.ReadCloser
 
@@ -75,7 +75,7 @@ func (c Exec) getZettel(
 	u *umwelt.Umwelt,
 	hString string,
 ) (
-	tz zettel_transacted.Transacted,
+	tz zettel_transacted.Zettel,
 	ar io.ReadCloser,
 	executor konfig.RemoteScript,
 	err error,
@@ -127,7 +127,7 @@ func (c Exec) getZettel(
 	return
 }
 
-func (c Exec) makeFifoPipe(tz zettel_transacted.Transacted) (p string, err error) {
+func (c Exec) makeFifoPipe(tz zettel_transacted.Zettel) (p string, err error) {
 	h := tz.Named.Hinweis
 	var d string
 
@@ -178,7 +178,7 @@ func (c Exec) feedPipe(
 	ar io.ReadCloser,
 	wg *sync.WaitGroup,
 	p string,
-	tz zettel_transacted.Transacted,
+	tz zettel_transacted.Zettel,
 ) (err error) {
 	defer wg.Done()
 	var pipeFileWriter *os.File

@@ -5,9 +5,9 @@ import (
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
 	"github.com/friedenberg/zit/src/echo/umwelt"
+	"github.com/friedenberg/zit/src/india/zettel_external"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/kilo/store_with_lock"
-	"github.com/friedenberg/zit/src/india/zettel_external"
 )
 
 type DeleteCheckout struct {
@@ -22,7 +22,7 @@ func (c DeleteCheckout) Run(
 	filesToDelete := make([]string, 0, len(zettels))
 
 	for _, external := range zettels {
-		var internal zettel_transacted.Transacted
+		var internal zettel_transacted.Zettel
 
 		if internal, err = store.StoreObjekten().Read(external.Named.Hinweis); err != nil {
 			err = errors.Error(err)

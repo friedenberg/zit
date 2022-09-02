@@ -107,7 +107,7 @@ func (c CatObjekte) zettelen(store store_with_lock.Store, ids ...id_set.Set) (er
 			continue
 		}
 
-		var tz zettel_transacted.Transacted
+		var tz zettel_transacted.Zettel
 
 		if tz, err = store.StoreObjekten().Read(i); err != nil {
 			err = errors.Error(err)

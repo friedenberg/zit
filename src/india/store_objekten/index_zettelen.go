@@ -72,7 +72,7 @@ func (i *indexZettelen) Flush() (err error) {
 
 	for _, st := range i.zettelen {
 		err = st.Each(
-			func(tz zettel_transacted.Transacted) (err error) {
+			func(tz zettel_transacted.Zettel) (err error) {
 				if err = enc.Encode(tz); err != nil {
 					err = errors.Wrapped(err, "failed to write zettel: [%s %s]", tz.Named.Hinweis, tz.Named.Stored.Sha)
 					return
@@ -116,7 +116,7 @@ func (i *indexZettelen) readIfNecessary() (err error) {
 	dec := gob.NewDecoder(r)
 
 	for {
-		var tz zettel_transacted.Transacted
+		var tz zettel_transacted.Zettel
 
 		if err = dec.Decode(&tz); err != nil {
 			if errors.IsEOF(err) {
@@ -134,7 +134,7 @@ func (i *indexZettelen) readIfNecessary() (err error) {
 	return
 }
 
-func (i *indexZettelen) addNoRead(tz zettel_transacted.Transacted) {
+func (i *indexZettelen) addNoRead(tz zettel_transacted.Zettel) {
 	{
 		var set collections.SetTransacted
 		var ok bool
@@ -202,7 +202,7 @@ func (i *indexZettelen) addNoRead(tz zettel_transacted.Transacted) {
 	return
 }
 
-func (i *indexZettelen) add(tz zettel_transacted.Transacted) (err error) {
+func (i *indexZettelen) add(tz zettel_transacted.Zettel) (err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Error(err)
 		return

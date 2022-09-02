@@ -12,13 +12,13 @@ import (
 	"github.com/friedenberg/zit/src/delta/id"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_checked_out"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/india/zettel_external"
+	"github.com/friedenberg/zit/src/india/zettel_transacted"
 )
 
 func (s *Store) Checkout(
 	options CheckoutOptions,
-	zs ...zettel_transacted.Transacted,
+	zs ...zettel_transacted.Zettel,
 ) (czs []zettel_checked_out.Zettel, err error) {
 	czs = make([]zettel_checked_out.Zettel, len(zs))
 
@@ -32,7 +32,7 @@ func (s *Store) Checkout(
 	return
 }
 
-func (s *Store) isInlineAkte(sz zettel_transacted.Transacted) (isInline bool) {
+func (s *Store) isInlineAkte(sz zettel_transacted.Zettel) (isInline bool) {
 	isInline = sz.Named.Stored.Zettel.TypOrDefault().String() == "md"
 
 	if typKonfig, ok := s.Konfig.Typen[sz.Named.Stored.Zettel.Typ.String()]; ok {
@@ -44,7 +44,7 @@ func (s *Store) isInlineAkte(sz zettel_transacted.Transacted) (isInline bool) {
 
 func (s *Store) CheckoutOne(
 	options CheckoutOptions,
-	sz zettel_transacted.Transacted,
+	sz zettel_transacted.Zettel,
 ) (cz zettel_checked_out.Zettel, err error) {
 	var filename string
 

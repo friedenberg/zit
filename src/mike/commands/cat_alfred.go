@@ -73,7 +73,7 @@ func (c CatAlfred) RunWithLockedStore(store store_with_lock.Store, args ...strin
 
 	case zk_types.TypeZettel:
 
-		var all map[hinweis.Hinweis]zettel_transacted.Transacted
+		var all map[hinweis.Hinweis]zettel_transacted.Zettel
 
 		if all, err = store.StoreObjekten().ZettelenSchwanzen(); err != nil {
 			err = errors.Error(err)
@@ -88,7 +88,7 @@ func (c CatAlfred) RunWithLockedStore(store store_with_lock.Store, args ...strin
 
 	case zk_types.TypeHinweis:
 
-		var all map[hinweis.Hinweis]zettel_transacted.Transacted
+		var all map[hinweis.Hinweis]zettel_transacted.Zettel
 
 		if all, err = store.StoreObjekten().ZettelenSchwanzen(); err != nil {
 			err = errors.Error(err)

@@ -71,12 +71,12 @@ func (s Store) storedZettelFromSha(sh sha.Sha) (sz zettel_stored.Stored, err err
 func (s *Store) transactedWithHead(
 	z zettel_named.Zettel,
 	t transaktion.Transaktion,
-) (tz zettel_transacted.Transacted, err error) {
+) (tz zettel_transacted.Zettel, err error) {
 	tz.Named = z
 	tz.Kopf = t.Time
 	tz.Schwanz = t.Time
 
-	var previous zettel_transacted.Transacted
+	var previous zettel_transacted.Zettel
 
 	if previous, err = s.indexZettelenTails.Read(z.Hinweis); err == nil {
 		tz.Mutter = previous.Schwanz
@@ -96,7 +96,7 @@ func (s *Store) transactedWithHead(
 func (s Store) transactedZettelFromTransaktionObjekte(
 	t transaktion.Transaktion,
 	o transaktion.Objekte,
-) (tz zettel_transacted.Transacted, err error) {
+) (tz zettel_transacted.Zettel, err error) {
 	ok := false
 
 	var h *hinweis.Hinweis
@@ -155,7 +155,7 @@ func (s Store) writeTransaktion() (err error) {
 	return
 }
 
-func (s *Store) addZettelToTransaktion(z zettel_named.Zettel) (tz zettel_transacted.Transacted, err error) {
+func (s *Store) addZettelToTransaktion(z zettel_named.Zettel) (tz zettel_transacted.Zettel, err error) {
 	logz.Printf("adding zettel to transaktion: %s", z.Hinweis)
 
 	if tz, err = s.transactedWithHead(z, s.Transaktion); err != nil {

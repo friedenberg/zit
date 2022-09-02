@@ -9,8 +9,8 @@ import (
 )
 
 type Set struct {
-	keyFunc  func(Transacted) string
-	innerMap map[string]Transacted
+	keyFunc  func(Zettel) string
+	innerMap map[string]Zettel
 }
 
 func makeKey(ss ...fmt.Stringer) string {
@@ -29,7 +29,7 @@ func makeKey(ss ...fmt.Stringer) string {
 
 func MakeSetUniqueTransacted(c int) Set {
 	return Set{
-		keyFunc: func(sz Transacted) string {
+		keyFunc: func(sz Zettel) string {
 			return makeKey(
 				sz.Kopf,
 				sz.Mutter,
@@ -38,31 +38,31 @@ func MakeSetUniqueTransacted(c int) Set {
 				sz.Named.Stored.Sha,
 			)
 		},
-		innerMap: make(map[string]Transacted),
+		innerMap: make(map[string]Zettel),
 	}
 }
 
 func MakeSetHinweisTransacted() Set {
 	return Set{
-		keyFunc: func(sz Transacted) string {
+		keyFunc: func(sz Zettel) string {
 			return makeKey(sz.Named.Hinweis)
 		},
-		innerMap: make(map[string]Transacted),
+		innerMap: make(map[string]Zettel),
 	}
 }
 
 func (m Set) Get(
 	s fmt.Stringer,
-) (tz Transacted, ok bool) {
+) (tz Zettel, ok bool) {
 	tz, ok = m.innerMap[s.String()]
 	return
 }
 
-func (m Set) Add(z Transacted) {
+func (m Set) Add(z Zettel) {
 	m.innerMap[m.keyFunc(z)] = z
 }
 
-func (m Set) Del(z Transacted) {
+func (m Set) Del(z Zettel) {
 	delete(m.innerMap, m.keyFunc(z))
 }
 
@@ -76,12 +76,12 @@ func (a Set) Merge(b Set) {
 	}
 }
 
-func (a Set) Contains(z Transacted) bool {
+func (a Set) Contains(z Zettel) bool {
 	_, ok := a.innerMap[a.keyFunc(z)]
 	return ok
 }
 
-func (a Set) Any() (tz Transacted) {
+func (a Set) Any() (tz Zettel) {
 	for _, sz := range a.innerMap {
 		tz = sz
 		break
@@ -90,7 +90,7 @@ func (a Set) Any() (tz Transacted) {
 	return
 }
 
-func (a Set) Each(f func(Transacted) error) (err error) {
+func (a Set) Each(f func(Zettel) error) (err error) {
 	for _, sz := range a.innerMap {
 		if err = f(sz); err != nil {
 			if errors.Is(err, io.EOF) {

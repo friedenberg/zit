@@ -25,7 +25,7 @@ func (c Checkout) RunManyHinweisen(
 	s store_with_lock.Store,
 	hins ...hinweis.Hinweis,
 ) (results CheckoutResults, err error) {
-	zs := make([]zettel_transacted.Transacted, len(hins))
+	zs := make([]zettel_transacted.Zettel, len(hins))
 
 	for i, _ := range zs {
 		h := hins[i]

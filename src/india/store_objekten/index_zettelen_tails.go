@@ -62,7 +62,7 @@ func (i *indexZettelenTails) Flush() (err error) {
 	enc := gob.NewEncoder(w)
 
 	err = i.zettelen.Each(
-		func(tz zettel_transacted.Transacted) (err error) {
+		func(tz zettel_transacted.Zettel) (err error) {
 			if err = enc.Encode(tz); err != nil {
 				err = errors.Wrapped(err, "failed to write zettel: %s", tz.Named)
 				return
@@ -105,7 +105,7 @@ func (i *indexZettelenTails) readIfNecessary() (err error) {
 	dec := gob.NewDecoder(r)
 
 	for {
-		var tz zettel_transacted.Transacted
+		var tz zettel_transacted.Zettel
 
 		if err = dec.Decode(&tz); err != nil {
 			if errors.IsEOF(err) {
@@ -123,7 +123,7 @@ func (i *indexZettelenTails) readIfNecessary() (err error) {
 	return
 }
 
-func (i *indexZettelenTails) add(tz zettel_transacted.Transacted) (err error) {
+func (i *indexZettelenTails) add(tz zettel_transacted.Zettel) (err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Error(err)
 		return
@@ -136,7 +136,7 @@ func (i *indexZettelenTails) add(tz zettel_transacted.Transacted) (err error) {
 	return
 }
 
-func (i *indexZettelenTails) Read(h hinweis.Hinweis) (tz zettel_transacted.Transacted, err error) {
+func (i *indexZettelenTails) Read(h hinweis.Hinweis) (tz zettel_transacted.Zettel, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Error(err)
 		return
@@ -154,16 +154,16 @@ func (i *indexZettelenTails) Read(h hinweis.Hinweis) (tz zettel_transacted.Trans
 
 func (i *indexZettelenTails) ZettelenSchwanzen(
 	qs ...zettel_named.NamedFilter,
-) (tzs map[hinweis.Hinweis]zettel_transacted.Transacted, err error) {
+) (tzs map[hinweis.Hinweis]zettel_transacted.Zettel, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	tzs = make(map[hinweis.Hinweis]zettel_transacted.Transacted)
+	tzs = make(map[hinweis.Hinweis]zettel_transacted.Zettel)
 
 	err = i.zettelen.Each(
-		func(tz zettel_transacted.Transacted) (err error) {
+		func(tz zettel_transacted.Zettel) (err error) {
 			for _, q := range qs {
 				if !q.IncludeNamedZettel(tz.Named) {
 					return
@@ -188,7 +188,7 @@ func (i *indexZettelenTails) ZettelenSchwanzen(
 	return
 }
 
-func (i *indexZettelenTails) shouldIncludeTransacted(tz zettel_transacted.Transacted) bool {
+func (i *indexZettelenTails) shouldIncludeTransacted(tz zettel_transacted.Zettel) bool {
 	if i.umwelt.Konfig.IncludeHidden {
 		return true
 	}

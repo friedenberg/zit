@@ -8,12 +8,12 @@ import (
 )
 
 type SliceTransacted struct {
-	innerSlice []zettel_transacted.Transacted
+	innerSlice []zettel_transacted.Zettel
 }
 
 func MakeSliceTransacted() SliceTransacted {
 	return SliceTransacted{
-		innerSlice: make([]zettel_transacted.Transacted, 0),
+		innerSlice: make([]zettel_transacted.Zettel, 0),
 	}
 }
 
@@ -21,11 +21,11 @@ func (s SliceTransacted) Len() int {
 	return len(s.innerSlice)
 }
 
-func (s *SliceTransacted) Append(tz zettel_transacted.Transacted) {
+func (s *SliceTransacted) Append(tz zettel_transacted.Zettel) {
 	s.innerSlice = append(s.innerSlice, tz)
 }
 
-func (s SliceTransacted) Get(i int) zettel_transacted.Transacted {
+func (s SliceTransacted) Get(i int) zettel_transacted.Zettel {
 	return s.innerSlice[i]
 }
 
