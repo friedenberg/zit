@@ -2,7 +2,7 @@ package user_ops
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/open_file_guard"
+	"github.com/friedenberg/zit/src/bravo/files"
 )
 
 type OpenVim struct {
@@ -19,7 +19,7 @@ func (c OpenVim) Run(args ...string) (results OpenVimResults, err error) {
 		vimArgs = append(vimArgs, "-c", o)
 	}
 
-	if err = open_file_guard.OpenVimWithArgs(vimArgs, args...); err != nil {
+	if err = files.OpenVimWithArgs(vimArgs, args...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -8,7 +8,7 @@ import (
 	"sort"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/open_file_guard"
+	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/zk_types"
 	"github.com/friedenberg/zit/src/charlie/age"
@@ -379,7 +379,7 @@ func (s Store) ReadAllTransaktions() (out []transaktion.Transaktion, err error) 
 
 	d := s.Umwelt.DirObjektenTransaktion()
 
-	if headNames, err = open_file_guard.ReadDirNames(d); err != nil {
+	if headNames, err = files.ReadDirNames(d); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -389,7 +389,7 @@ func (s Store) ReadAllTransaktions() (out []transaktion.Transaktion, err error) 
 
 		var tailNames []string
 
-		if tailNames, err = open_file_guard.ReadDirNames(d, hn); err != nil {
+		if tailNames, err = files.ReadDirNames(d, hn); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

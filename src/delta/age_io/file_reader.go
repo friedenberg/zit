@@ -5,13 +5,13 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/open_file_guard"
+	"github.com/friedenberg/zit/src/bravo/files"
 )
 
 func NewFileReader(o FileReadOptions) (r io.ReadCloser, err error) {
 	ar := objekteReader{}
 
-	if ar.file, err = open_file_guard.Open(o.Path); err != nil {
+	if ar.file, err = files.Open(o.Path); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -47,7 +47,7 @@ func (ar objekteReader) Close() (err error) {
 		return
 	}
 
-	if err = open_file_guard.Close(ar.file); err != nil {
+	if err = files.Close(ar.file); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

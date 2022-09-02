@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/open_file_guard"
+	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_external"
 	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
@@ -94,7 +94,7 @@ func (c Clean) RunWithLockedStore(
 		return
 	}
 
-	if err = open_file_guard.DeleteFilesAndDirs(filesToDelete...); err != nil {
+	if err = files.DeleteFilesAndDirs(filesToDelete...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

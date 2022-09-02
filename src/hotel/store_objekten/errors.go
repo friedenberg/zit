@@ -6,7 +6,7 @@ import (
 	"path"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/open_file_guard"
+	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/delta/zettel"
@@ -101,12 +101,12 @@ func (e duplicateAkteError) AddToLostAndFound(p string) (p1 string, err error) {
 
 	p1 = path.Join(p, uuid.NewString())
 
-	if f, err = open_file_guard.Create(p1); err != nil {
+	if f, err = files.Create(p1); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer open_file_guard.Close(f)
+	defer files.Close(f)
 
 	e.Out = f
 	format := zettel.Text{}

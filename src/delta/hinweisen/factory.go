@@ -9,7 +9,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/kennung"
-	"github.com/friedenberg/zit/src/bravo/open_file_guard"
+	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 )
 
@@ -75,7 +75,7 @@ func (hf *factory) Refresh() (err error) {
 func (hf *factory) refresh() (err error) {
 	var old string
 
-	if old, err = open_file_guard.ReadAllString(hf.pathLastId); err != nil {
+	if old, err = files.ReadAllString(hf.pathLastId); err != nil {
 		return
 	}
 
@@ -124,11 +124,11 @@ func (hf factory) Flush() (err error) {
 func (hf factory) flush() (err error) {
 	var f *os.File
 
-	if f, err = open_file_guard.TempFile(); err != nil {
+	if f, err = files.TempFile(); err != nil {
 		return
 	}
 
-	defer open_file_guard.Close(f)
+	defer files.Close(f)
 
 	io.WriteString(f, strconv.FormatInt(int64(hf.counter), 10))
 

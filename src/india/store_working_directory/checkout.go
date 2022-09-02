@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/open_file_guard"
+	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/id"
 	"github.com/friedenberg/zit/src/delta/zettel"
@@ -118,14 +118,14 @@ func (s *Store) writeFormat(
 ) (err error) {
 	var f *os.File
 
-	if f, err = open_file_guard.Create(p); err != nil {
+	if f, err = files.Create(p); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	fc.Out = f
 
-	defer open_file_guard.Close(f)
+	defer files.Close(f)
 
 	if _, err = o.Format.WriteTo(fc); err != nil {
 		err = errors.Wrap(err)
@@ -141,12 +141,12 @@ func (s *Store) writeAkte(
 ) (err error) {
 	var f *os.File
 
-	if f, err = open_file_guard.Create(p); err != nil {
+	if f, err = files.Create(p); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer open_file_guard.Close(f)
+	defer files.Close(f)
 
 	var r io.ReadCloser
 
@@ -155,7 +155,7 @@ func (s *Store) writeAkte(
 		return
 	}
 
-	defer open_file_guard.Close(f)
+	defer files.Close(f)
 
 	errors.Print("starting io copy")
 	if _, err = io.Copy(f, r); err != nil {

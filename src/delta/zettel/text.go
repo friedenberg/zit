@@ -11,7 +11,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/bravo/open_file_guard"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 )
@@ -200,12 +199,12 @@ func (f Text) ReadFrom(c *FormatContextRead) (n int64, err error) {
 	if c.AktePath != "" {
 		var f *os.File
 
-		if f, err = open_file_guard.Open(c.AktePath); err != nil {
+		if f, err = files.Open(c.AktePath); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		defer open_file_guard.Close(f)
+		defer files.Close(f)
 
 		if _, err = io.Copy(state.akteWriter, f); err != nil {
 			err = errors.Wrap(err)

@@ -2,7 +2,7 @@ package user_ops
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/open_file_guard"
+	"github.com/friedenberg/zit/src/bravo/files"
 )
 
 type OpenFiles struct {
@@ -13,7 +13,7 @@ func (c OpenFiles) Run(args ...string) (err error) {
 		return
 	}
 
-	if err = open_file_guard.OpenFiles(args...); err != nil {
+	if err = files.OpenFiles(args...); err != nil {
 		err = errors.Errorf("%q: %s", args, err)
 		return
 	}

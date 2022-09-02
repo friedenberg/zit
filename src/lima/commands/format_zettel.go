@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/open_file_guard"
+	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/konfig"
 	"github.com/friedenberg/zit/src/delta/umwelt"
 	"github.com/friedenberg/zit/src/delta/zettel"
@@ -35,12 +35,12 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	var f *os.File
 
-	if f, err = open_file_guard.Open(args[0]); err != nil {
+	if f, err = files.Open(args[0]); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer open_file_guard.Close(f)
+	defer files.Close(f)
 
 	format := zettel.Text{}
 

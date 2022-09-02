@@ -4,7 +4,7 @@ import (
 	"path"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/open_file_guard"
+	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/sha"
 )
 
@@ -29,7 +29,7 @@ func (an *akten) All() (akte []sha.Sha, err error) {
 
 	var dirs []string
 
-	if dirs, err = open_file_guard.ReadDirNames(an.basePath); err != nil {
+	if dirs, err = files.ReadDirNames(an.basePath); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -37,7 +37,7 @@ func (an *akten) All() (akte []sha.Sha, err error) {
 	for _, d := range dirs {
 		var dirs2 []string
 
-		if dirs2, err = open_file_guard.ReadDirNames(path.Join(an.basePath, d)); err != nil {
+		if dirs2, err = files.ReadDirNames(path.Join(an.basePath, d)); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

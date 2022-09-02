@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/open_file_guard"
+	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/charlie/id"
@@ -73,12 +73,12 @@ func (s Store) AkteShaFromPath(p string) (sh sha.Sha, err error) {
 
 	var f *os.File
 
-	if f, err = open_file_guard.Open(p); err != nil {
+	if f, err = files.Open(p); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer open_file_guard.Close(f)
+	defer files.Close(f)
 
 	if _, err = io.Copy(aw, f); err != nil {
 		err = errors.Wrap(err)

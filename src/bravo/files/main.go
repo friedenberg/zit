@@ -1,4 +1,4 @@
-package open_file_guard
+package files
 
 import (
 	"io"

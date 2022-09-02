@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/open_file_guard"
+	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/sha"
 )
 
@@ -39,12 +39,12 @@ func (e ErrHasInlineAkteAndFilePath) Recover() (z Zettel, err error) {
 
 	var f *os.File
 
-	if f, err = open_file_guard.Open(e.FilePath); err != nil {
+	if f, err = files.Open(e.FilePath); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer open_file_guard.Close(f)
+	defer files.Close(f)
 
 	if _, err = io.Copy(akteWriter, f); err != nil {
 		err = errors.Wrap(err)

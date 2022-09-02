@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/open_file_guard"
+	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
@@ -94,12 +94,12 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 		var f *os.File
 
-		if f, err = open_file_guard.Open(p.path); err != nil {
+		if f, err = files.Open(p.path); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		defer open_file_guard.Close(f)
+		defer files.Close(f)
 
 		if _, err = io.Copy(ow, f); err != nil {
 			err = errors.Wrap(err)

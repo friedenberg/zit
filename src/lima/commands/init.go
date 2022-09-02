@@ -9,7 +9,7 @@ import (
 	"path"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/open_file_guard"
+	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/delta/umwelt"
 	"github.com/friedenberg/zit/src/juliett/store_with_lock"
@@ -116,14 +116,14 @@ func (c Init) populateYangIfNecessary(u *umwelt.Umwelt) (err error) {
 func (c Init) readAndTransferLines(in, out string) (err error) {
 	var fi, fo *os.File
 
-	if fi, err = open_file_guard.Open(in); err != nil {
+	if fi, err = files.Open(in); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	defer errors.PanicIfError(fi.Close)
 
-	if fo, err = open_file_guard.Create(out); err != nil {
+	if fo, err = files.Create(out); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

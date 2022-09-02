@@ -5,7 +5,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/bravo/open_file_guard"
 	"github.com/friedenberg/zit/src/charlie/id"
 )
 
@@ -29,7 +28,7 @@ func NewMover(o MoveOptions) (m *Mover, err error) {
 		m.objektePath = o.FinalPath
 	}
 
-	if m.file, err = open_file_guard.TempFile(); err != nil {
+	if m.file, err = files.TempFile(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -64,7 +63,7 @@ func (m *Mover) Close() (err error) {
 		return
 	}
 
-	if err = open_file_guard.Close(m.file); err != nil {
+	if err = files.Close(m.file); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

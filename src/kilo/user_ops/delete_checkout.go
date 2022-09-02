@@ -2,7 +2,7 @@ package user_ops
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/open_file_guard"
+	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/delta/umwelt"
 	"github.com/friedenberg/zit/src/golf/zettel_external"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
@@ -42,7 +42,7 @@ func (c DeleteCheckout) Run(
 		}
 	}
 
-	if err = open_file_guard.DeleteFilesAndDirs(filesToDelete...); err != nil {
+	if err = files.DeleteFilesAndDirs(filesToDelete...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

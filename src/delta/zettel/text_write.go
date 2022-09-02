@@ -7,8 +7,8 @@ import (
 	"os/exec"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/line_format"
-	"github.com/friedenberg/zit/src/bravo/open_file_guard"
 )
 
 func (f Text) WriteTo(c FormatContextWrite) (n int64, err error) {
@@ -213,12 +213,12 @@ func (f Text) writeToExternalAkte(c FormatContextWrite) (n int64, err error) {
 
 	var file *os.File
 
-	if file, err = open_file_guard.Create(c.ExternalAktePath); err != nil {
+	if file, err = files.Create(c.ExternalAktePath); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer open_file_guard.Close(file)
+	defer files.Close(file)
 
 	var n1 int64
 

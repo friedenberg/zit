@@ -6,7 +6,7 @@ import (
 	"path"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/open_file_guard"
+	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/delta/umwelt"
@@ -78,12 +78,12 @@ func (c ZettelFromExternalAkte) zettelForAkte(store store_with_lock.Store, akteP
 
 	var f *os.File
 
-	if f, err = open_file_guard.Open(aktePath); err != nil {
+	if f, err = files.Open(aktePath); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer open_file_guard.Close(f)
+	defer files.Close(f)
 
 	if _, err = io.Copy(akteWriter, f); err != nil {
 		err = errors.Wrap(err)

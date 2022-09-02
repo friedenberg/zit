@@ -5,7 +5,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/friedenberg/zit/src/bravo/open_file_guard"
+	"github.com/friedenberg/zit/src/bravo/files"
 )
 
 func (u Umwelt) ContentsOfZitFile(p ...string) (contents string, err error) {
@@ -15,11 +15,11 @@ func (u Umwelt) ContentsOfZitFile(p ...string) (contents string, err error) {
 
 	p = append([]string{basePath}, p...)
 
-	if f, err = open_file_guard.Open(path.Join(p...)); err != nil {
+	if f, err = files.Open(path.Join(p...)); err != nil {
 		return
 	}
 
-	defer open_file_guard.Close(f)
+	defer files.Close(f)
 
 	var b []byte
 

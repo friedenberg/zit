@@ -9,7 +9,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/bravo/open_file_guard"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/file_lock"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
@@ -76,14 +75,14 @@ func (s Store) IndexFilePath() string {
 func (s Store) flushToTemp() (tfp string, err error) {
 	var f *os.File
 
-	if f, err = open_file_guard.TempFile(); err != nil {
+	if f, err = files.TempFile(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	tfp = f.Name()
 
-	defer open_file_guard.Close(f)
+	defer files.Close(f)
 
 	w := bufio.NewWriter(f)
 	defer w.Flush()
@@ -242,12 +241,12 @@ func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 
 	var f *os.File
 
-	if f, err = open_file_guard.Open(ez.ZettelFD.Path); err != nil {
+	if f, err = files.Open(ez.ZettelFD.Path); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer open_file_guard.Close(f)
+	defer files.Close(f)
 
 	c.In = f
 

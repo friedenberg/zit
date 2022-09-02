@@ -8,7 +8,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/exec"
-	"github.com/friedenberg/zit/src/bravo/open_file_guard"
+	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/charlie/id"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
@@ -30,7 +30,7 @@ func init() {
 }
 
 func (c OpenAkte) RunWithHinweisen(store store_with_lock.Store, hins ...hinweis.Hinweis) (err error) {
-	files := make([]string, len(hins))
+	paths := make([]string, len(hins))
 
 	dir, err := ioutil.TempDir("", "")
 
@@ -61,14 +61,14 @@ func (c OpenAkte) RunWithHinweisen(store store_with_lock.Store, hins ...hinweis.
 
 			filename = filename + "." + tz.Named.Stored.Zettel.Typ.String()
 
-			if f, err = open_file_guard.Create(filename); err != nil {
+			if f, err = files.Create(filename); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			defer open_file_guard.Close(f)
+			defer files.Close(f)
 
-			files[i] = f.Name()
+			paths[i] = f.Name()
 
 			var r io.ReadCloser
 
@@ -88,13 +88,13 @@ func (c OpenAkte) RunWithHinweisen(store store_with_lock.Store, hins ...hinweis.
 
 	cmd := exec.ExecCommand(
 		"open",
-		files,
+		paths,
 	)
 
 	output, err := cmd.CombinedOutput()
 
 	if err != nil {
-		err = errors.Errorf("opening files ('%q'): %s", files, output)
+		err = errors.Errorf("opening files ('%q'): %s", paths, output)
 		return
 	}
 

@@ -6,7 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
-	"github.com/friedenberg/zit/src/bravo/open_file_guard"
+	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/delta/umwelt"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
@@ -76,7 +76,7 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	var f *os.File
 
-	if f, err = open_file_guard.TempFileWithPattern("*.md"); err != nil {
+	if f, err = files.TempFileWithPattern("*.md"); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

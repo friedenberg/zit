@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/open_file_guard"
+	"github.com/friedenberg/zit/src/bravo/files"
 )
 
 type CwdFiles struct {
@@ -25,7 +25,7 @@ func (s Store) GetPossibleZettels() (result CwdFiles, err error) {
 
 	var dirs []string
 
-	if dirs, err = open_file_guard.ReadDirNames(s.path); err != nil {
+	if dirs, err = files.ReadDirNames(s.path); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -50,7 +50,7 @@ func (s Store) GetPossibleZettels() (result CwdFiles, err error) {
 
 		var dirs2 []string
 
-		if dirs2, err = open_file_guard.ReadDirNames(d2); err != nil {
+		if dirs2, err = files.ReadDirNames(d2); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

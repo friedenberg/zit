@@ -4,7 +4,7 @@ import (
 	"io"
 
 	"filippo.io/age"
-	"github.com/friedenberg/zit/src/bravo/open_file_guard"
+	"github.com/friedenberg/zit/src/bravo/files"
 )
 
 type Age interface {
@@ -22,7 +22,7 @@ type ages struct {
 func Make(basePath string) (a *ages, err error) {
 	var contents string
 
-	if contents, err = open_file_guard.ReadAllString(basePath); err != nil {
+	if contents, err = files.ReadAllString(basePath); err != nil {
 		return
 	}
 

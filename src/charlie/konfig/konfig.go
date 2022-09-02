@@ -6,7 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/toml"
-	"github.com/friedenberg/zit/src/bravo/open_file_guard"
+	"github.com/friedenberg/zit/src/bravo/files"
 )
 
 type KonfigTag struct {
@@ -31,7 +31,7 @@ func LoadKonfig(p string) (c Konfig, err error) {
 
 	var f *os.File
 
-	if f, err = open_file_guard.Open(p); err != nil {
+	if f, err = files.Open(p); err != nil {
 		if os.IsNotExist(err) {
 			err = nil
 			return
@@ -41,7 +41,7 @@ func LoadKonfig(p string) (c Konfig, err error) {
 		return
 	}
 
-	defer open_file_guard.Close(f)
+	defer files.Close(f)
 
 	doc, err := ioutil.ReadAll(f)
 

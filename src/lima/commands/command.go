@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/open_file_guard"
+	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/konfig"
 	"github.com/friedenberg/zit/src/delta/umwelt"
 )
@@ -62,7 +62,7 @@ func Run(args []string) (exitStatus int) {
 
 	defer func() {
 		errors.Print("checking for open files")
-		l := open_file_guard.Len()
+		l := files.Len()
 		errors.Printf("open files: %d", l)
 
 		var normalError errors.StackTracer
