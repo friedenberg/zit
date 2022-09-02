@@ -3,7 +3,7 @@ package store_working_directory
 import (
 	"time"
 
-	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/bravo/sha"
 )
 
 type Entry struct {

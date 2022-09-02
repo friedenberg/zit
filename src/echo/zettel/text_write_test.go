@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/bravo/sha"
 )
 
 type noopCloser struct {

@@ -3,7 +3,7 @@ package akten
 import (
 	"fmt"
 
-	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/bravo/sha"
 )
 
 type DuplicateAkteError struct {

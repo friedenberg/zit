@@ -4,7 +4,7 @@ import (
 	"io"
 
 	"filippo.io/age"
-	"github.com/friedenberg/zit/src/charlie/open_file_guard"
+	"github.com/friedenberg/zit/src/bravo/open_file_guard"
 )
 
 type Age interface {

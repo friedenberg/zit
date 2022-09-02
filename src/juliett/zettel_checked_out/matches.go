@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/friedenberg/zit/src/charlie/zk_types"
+	"github.com/friedenberg/zit/src/bravo/zk_types"
 	"github.com/friedenberg/zit/src/india/zettel_external"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 )

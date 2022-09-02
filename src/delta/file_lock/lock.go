@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/open_file_guard"
+	"github.com/friedenberg/zit/src/bravo/open_file_guard"
 )
 
 type Lock struct {

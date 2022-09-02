@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/line_format"
+	"github.com/friedenberg/zit/src/bravo/line_format"
 )
 
 type assignmentLineWriter struct {
