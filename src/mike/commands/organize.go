@@ -16,7 +16,7 @@ import (
 	"github.com/friedenberg/zit/src/hotel/collections"
 	"github.com/friedenberg/zit/src/hotel/organize_text"
 	"github.com/friedenberg/zit/src/lima/user_ops"
-	"github.com/friedenberg/zit/src/lima/zettel_named"
+	"github.com/friedenberg/zit/src/hotel/zettel_named"
 )
 
 type Organize struct {

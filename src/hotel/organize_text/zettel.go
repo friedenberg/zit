@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/bravo/errors"
-	"github.com/friedenberg/zit/src/lima/zettel_named"
+	"github.com/friedenberg/zit/src/hotel/zettel_named"
 )
 
 type zettel struct {

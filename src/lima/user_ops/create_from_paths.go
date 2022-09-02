@@ -15,8 +15,8 @@ import (
 	"github.com/friedenberg/zit/src/india/store_objekten"
 	"github.com/friedenberg/zit/src/india/zettel_checked_out"
 	"github.com/friedenberg/zit/src/kilo/store_with_lock"
+	"github.com/friedenberg/zit/src/hotel/zettel_named"
 	"github.com/friedenberg/zit/zettel_external"
-	"github.com/friedenberg/zit/src/lima/zettel_named"
 )
 
 type CreateFromPaths struct {
