@@ -42,6 +42,7 @@ func (op ReadCheckedOut) RunOneString(
 func (op ReadCheckedOut) RunMany(
 	s store_with_lock.Store,
 	possible store_working_directory.CwdFiles,
+  //TODO switch to zettel_checked_out.Set
 ) (results []zettel_checked_out.CheckedOut, err error) {
 	results = make([]zettel_checked_out.CheckedOut, 0, possible.Len())
 

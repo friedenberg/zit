@@ -7,14 +7,13 @@ import (
 	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
-	"github.com/friedenberg/zit/src/delta/hinweis"
-	"github.com/friedenberg/zit/src/delta/id"
 	"github.com/friedenberg/zit/src/delta/script_value"
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
 	"github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/india/store_objekten"
+	"github.com/friedenberg/zit/src/india/zettel_checked_out"
 	"github.com/friedenberg/zit/src/kilo/store_with_lock"
 )
 
@@ -26,11 +25,7 @@ type CreateFromPaths struct {
 	// ReadHinweisFromPath bool
 }
 
-type CreateFromPathsResults struct {
-	Zettelen []zettel.Zettel
-}
-
-func (c CreateFromPaths) Run(args ...string) (results CreateFromPathsResults, err error) {
+func (c CreateFromPaths) Run(args ...string) (results zettel_checked_out.Set, err error) {
 	var store store_with_lock.Store
 
 	if store, err = store_with_lock.New(c.Umwelt); err != nil {
@@ -53,45 +48,55 @@ func (c CreateFromPaths) Run(args ...string) (results CreateFromPathsResults, er
 		toCreate = append(toCreate, toAdd...)
 	}
 
+	results = zettel_checked_out.MakeSetUniqueCheckedOut(len(toCreate))
+
 	for _, z := range toCreate {
-		var tz zettel_stored.Transacted
+		cz := zettel_checked_out.CheckedOut{
+			External: z,
+		}
+
 		//TODO
 		if false /*c.ReadHinweisFromPath*/ {
-			head, tail := id.HeadTailFromFileName(z.ZettelFD.Path)
+			//head, tail := id.HeadTailFromFileName(z.ZettelFD.Path)
 
-			var h hinweis.Hinweis
+			//var h hinweis.Hinweis
 
-			if h, err = hinweis.Make(head + "/" + tail); err != nil {
-				err = errors.Error(err)
-				return
-			}
+			//if h, err = hinweis.Make(head + "/" + tail); err != nil {
+			//	err = errors.Error(err)
+			//	return
+			//}
 
-			if tz, err = store.StoreObjekten().CreateWithHinweis(z.Stored.Zettel, h); err != nil {
-				//TODO add file for error handling
-				c.handleStoreError(tz, "", err)
-				err = nil
-				return
-			}
+			//if tz, err = store.StoreObjekten().CreateWithHinweis(z.Stored.Zettel, h); err != nil {
+			//	//TODO add file for error handling
+			//	c.handleStoreError(tz, "", err)
+			//	err = nil
+			//	return
+			//}
 		} else {
-			if tz, err = store.StoreObjekten().Create(z.Stored.Zettel); err != nil {
+			if cz.Internal, err = store.StoreObjekten().Create(z.Stored.Zettel); err != nil {
 				//TODO add file for error handling
-				c.handleStoreError(tz, "", err)
+				c.handleStoreError(cz, "", err)
 				err = nil
 				return
 			}
+
+			//TODO get matches
+			cz.DetermineState()
+
+			results.Add(cz)
 
 			if c.Delete {
 				//TODO move to checkout store
-				if err = os.Remove(z.ZettelFD.Path); err != nil {
+				if err = os.Remove(cz.External.ZettelFD.Path); err != nil {
 					err = errors.Error(err)
 					return
 				}
 
-				stdprinter.Outf("[%s] (deleted)\n", z.ZettelFD.Path)
+				stdprinter.Outf("[%s] (deleted)\n", cz.External.ZettelFD.Path)
 			}
 		}
 
-		stdprinter.Outf("%s (created)\n", tz.Named)
+		stdprinter.Outf("%s (created)\n", cz.Internal.Named)
 	}
 
 	return
@@ -168,7 +173,7 @@ func (c CreateFromPaths) zettelsFromPath(store store_with_lock.Store, p string) 
 	return
 }
 
-func (c CreateFromPaths) handleStoreError(z zettel_stored.Transacted, f string, in error) {
+func (c CreateFromPaths) handleStoreError(z zettel_checked_out.CheckedOut, f string, in error) {
 	var err error
 
 	var lostError store_objekten.VerlorenAndGefundenError

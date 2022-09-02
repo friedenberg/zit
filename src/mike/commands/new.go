@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/bezeichnung"
+	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
@@ -13,6 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
+	"github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/india/zettel_checked_out"
 	"github.com/friedenberg/zit/src/juliett/store_working_directory"
 	"github.com/friedenberg/zit/src/kilo/store_with_lock"
@@ -28,6 +30,7 @@ type New struct {
 	Bezeichnung bez
 	Edit        bool
 	Delete      bool
+	Count       int
 	Etiketten   etikett.Set
 	Filter      script_value.ScriptValue
 }
@@ -46,7 +49,8 @@ func init() {
 			}
 
 			f.Var(&c.Filter, "filter", "a script to run for each file to transform it the standard zettel format")
-			f.BoolVar(&c.Edit, "edit", false, "create a new empty zettel and open EDITOR or VISUAL for editing and then commit the resulting changes")
+			f.IntVar(&c.Count, "count", 1, "when creating new empty zettels, how many to create. otherwise ignored")
+			f.BoolVar(&c.Edit, "edit", true, "create a new empty zettel and open EDITOR or VISUAL for editing and then commit the resulting changes")
 			f.BoolVar(&c.Delete, "delete", false, "delete the zettel and akte after successful checkin")
 			f.Var(&c.Bezeichnung, "bezeichnung", "zettel description (will overwrite existing Bezecihnung")
 			f.Var(&c.Etiketten, "etiketten", "comma-separated etiketten (will add to existing Etiketten)")
@@ -77,30 +81,33 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	f := zettel_formats.Text{}
+	var zsc zettel_checked_out.Set
 
 	if len(args) == 0 {
-		var cz zettel_checked_out.CheckedOut
-
-		if cz, err = c.writeNewZettel(u, f); err != nil {
-			err = errors.Error(err)
-			return
-		}
-
-		if err = c.editZettelIfRequested(u, cz); err != nil {
+		if zsc, err = c.writeNewZettels(u, f); err != nil {
 			err = errors.Error(err)
 			return
 		}
 	} else {
-		if err = c.readExistingFilesAsZettels(u, f, args...); err != nil {
+		if zsc, err = c.readExistingFilesAsZettels(u, f, args...); err != nil {
 			err = errors.Error(err)
 			return
 		}
 	}
 
+	if err = c.editZettelsIfRequested(u, zsc); err != nil {
+		err = errors.Error(err)
+		return
+	}
+
 	return
 }
 
-func (c New) readExistingFilesAsZettels(u *umwelt.Umwelt, f zettel.Format, args ...string) (err error) {
+func (c New) readExistingFilesAsZettels(
+	u *umwelt.Umwelt,
+	f zettel.Format,
+	args ...string,
+) (zsc zettel_checked_out.Set, err error) {
 	opCreateFromPath := user_ops.CreateFromPaths{
 		Umwelt: u,
 		Format: f,
@@ -114,15 +121,13 @@ func (c New) readExistingFilesAsZettels(u *umwelt.Umwelt, f zettel.Format, args 
 		return
 	}
 
-	//TODO if edit, checkout zettels and made editable
-
 	return
 }
 
-func (c New) writeNewZettel(
+func (c New) writeNewZettels(
 	u *umwelt.Umwelt,
 	f zettel.Format,
-) (cz zettel_checked_out.CheckedOut, err error) {
+) (zsc zettel_checked_out.Set, err error) {
 	emptyOp := user_ops.WriteNewZettels{
 		Umwelt: u,
 		CheckoutOptions: store_working_directory.CheckoutOptions{
@@ -154,7 +159,7 @@ func (c New) writeNewZettel(
 
 	defer stdprinter.PanicIfError(s.Flush)
 
-	if cz, err = emptyOp.RunOne(s, z); err != nil {
+	if zsc, err = emptyOp.RunMany(s, z, c.Count); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -162,11 +167,12 @@ func (c New) writeNewZettel(
 	return
 }
 
-func (c New) editZettelIfRequested(
+func (c New) editZettelsIfRequested(
 	u *umwelt.Umwelt,
-	cz zettel_checked_out.CheckedOut,
+	zsc zettel_checked_out.Set,
 ) (err error) {
 	if !c.Edit {
+		logz.Print("edit set to false, not editing")
 		return
 	}
 
@@ -177,7 +183,18 @@ func (c New) editZettelIfRequested(
 			Build(),
 	}
 
-	if _, err = openVimOp.Run(cz.External.ZettelFD.Path); err != nil {
+	cwdFiles := store_working_directory.CwdFiles{
+		Zettelen: make([]string, 0, zsc.Len()),
+	}
+
+	zsc.Each(
+		func(zc zettel_checked_out.CheckedOut) (err error) {
+			cwdFiles.Zettelen = append(cwdFiles.Zettelen, zc.External.ZettelFD.Path)
+			return nil
+		},
+	)
+
+	if _, err = openVimOp.Run(cwdFiles.Zettelen...); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -198,7 +215,9 @@ func (c New) editZettelIfRequested(
 
 	defer stdprinter.PanicIfError(s.Flush)
 
-	if cz, err = readOp.RunOneString(s, cz.External.ZettelFD.Path); err != nil {
+	var zslc []zettel_checked_out.CheckedOut
+
+	if zslc, err = readOp.RunMany(s, cwdFiles); err != nil {
 		err = errors.Error(err)
 		return
 	}
@@ -208,7 +227,13 @@ func (c New) editZettelIfRequested(
 		OptionsReadExternal: readOp.OptionsReadExternal,
 	}
 
-	if _, err = checkinOp.Run(s, cz.External); err != nil {
+	zsle := make([]zettel_stored.External, len(zslc))
+
+	for i, zc := range zslc {
+		zsle[i] = zc.External
+	}
+
+	if _, err = checkinOp.Run(s, zsle...); err != nil {
 		err = errors.Error(err)
 		return
 	}

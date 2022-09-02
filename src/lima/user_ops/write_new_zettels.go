@@ -17,11 +17,13 @@ type WriteNewZettels struct {
 
 func (c WriteNewZettels) RunMany(
 	store store_with_lock.Store,
-	zettelen ...zettel.Zettel,
-) (results []zettel_checked_out.CheckedOut, err error) {
-	results = make([]zettel_checked_out.CheckedOut, 0, len(zettelen))
+	z zettel.Zettel,
+	count int,
+) (results zettel_checked_out.Set, err error) {
+	results = zettel_checked_out.MakeSetUniqueCheckedOut(count)
 
-	for _, z := range zettelen {
+	//TODO modify this to be run once
+	for i := 0; i < count; i++ {
 		var cz zettel_checked_out.CheckedOut
 
 		if cz, err = c.RunOne(store, z); err != nil {
@@ -29,7 +31,7 @@ func (c WriteNewZettels) RunMany(
 			return
 		}
 
-		results = append(results, cz)
+		results.Add(cz)
 	}
 
 	return
