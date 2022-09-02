@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/friedenberg/zit/src/bravo/errors"
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/test_logz"
 	"github.com/friedenberg/zit/src/delta/etikett"
 )

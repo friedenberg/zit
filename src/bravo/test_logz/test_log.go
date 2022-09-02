@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/friedenberg/zit/src/bravo/errors"
+	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
 var (

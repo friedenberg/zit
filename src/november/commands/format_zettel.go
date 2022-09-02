@@ -4,7 +4,7 @@ import (
 	"flag"
 	"os"
 
-	"github.com/friedenberg/zit/src/bravo/errors"
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
 	"github.com/friedenberg/zit/src/delta/konfig"
 	"github.com/friedenberg/zit/src/echo/umwelt"

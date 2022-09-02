@@ -5,7 +5,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/friedenberg/zit/src/bravo/errors"
+	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
 type Reader struct {

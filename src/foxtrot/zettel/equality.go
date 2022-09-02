@@ -1,6 +1,6 @@
 package zettel
 
-import "github.com/friedenberg/zit/src/bravo/errors"
+import "github.com/friedenberg/zit/src/alfa/errors"
 
 func (z Zettel) Equals(z1 Zettel) bool {
 	if !z.Akte.Equals(z1.Akte) {

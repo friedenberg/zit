@@ -3,7 +3,7 @@ package zettel_transacted
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/bravo/errors"
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/etikett"
 )
 

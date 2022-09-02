@@ -1,6 +1,6 @@
 package zettel_stored
 
-import "github.com/friedenberg/zit/src/bravo/errors"
+import "github.com/friedenberg/zit/src/alfa/errors"
 
 func (a Stored) Equals(b Stored) bool {
 	if !a.Zettel.Equals(b.Zettel) {

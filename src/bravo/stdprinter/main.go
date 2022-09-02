@@ -5,7 +5,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/friedenberg/zit/src/bravo/errors"
+	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
 type printerLine struct {

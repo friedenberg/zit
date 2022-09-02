@@ -6,7 +6,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/friedenberg/zit/src/bravo/errors"
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/etikett"
 )
 

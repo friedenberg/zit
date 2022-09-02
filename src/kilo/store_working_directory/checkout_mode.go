@@ -3,7 +3,7 @@ package store_working_directory
 import (
 	"strings"
 
-	"github.com/friedenberg/zit/src/bravo/errors"
+	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
 type CheckoutMode int
