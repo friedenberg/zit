@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/zk_types"
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/delta/hinweis"
-	"github.com/friedenberg/zit/src/foxtrot/zettel"
+	"github.com/friedenberg/zit/src/echo/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/lima/store_with_lock"
 )
@@ -66,7 +66,7 @@ func (c Cat) etiketten(store store_with_lock.Store) (err error) {
 	}
 
 	for _, e := range ea {
-    errors.PrintDebug(e)
+		errors.PrintDebug(e)
 		errors.PrintOut(e.String())
 	}
 
