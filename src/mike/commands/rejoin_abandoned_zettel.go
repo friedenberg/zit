@@ -6,8 +6,8 @@ import (
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/kilo/store_with_lock"
-	"github.com/friedenberg/zit/zettel_transacted"
 )
 
 type RejoinAbandonedZettel struct {

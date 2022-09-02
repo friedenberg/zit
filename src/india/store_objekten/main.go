@@ -25,7 +25,7 @@ import (
 	"github.com/friedenberg/zit/src/golf/hinweisen"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
 	"github.com/friedenberg/zit/src/hotel/collections"
-	"github.com/friedenberg/zit/zettel_transacted"
+	"github.com/friedenberg/zit/src/india/zettel_transacted"
 )
 
 type Store struct {

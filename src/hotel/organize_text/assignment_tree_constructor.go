@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/hotel/collections"
-	"github.com/friedenberg/zit/zettel_transacted"
+	"github.com/friedenberg/zit/src/india/zettel_transacted"
 )
 
 type AssignmentTreeConstructor struct {

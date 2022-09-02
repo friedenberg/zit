@@ -3,7 +3,7 @@ package store_working_directory
 import (
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
-	"github.com/friedenberg/zit/zettel_transacted"
+	"github.com/friedenberg/zit/src/india/zettel_transacted"
 )
 
 type OptionsReadExternal struct {

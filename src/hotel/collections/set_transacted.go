@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/bravo/errors"
-	"github.com/friedenberg/zit/zettel_transacted"
+	"github.com/friedenberg/zit/src/india/zettel_transacted"
 )
 
 type SetTransacted struct {

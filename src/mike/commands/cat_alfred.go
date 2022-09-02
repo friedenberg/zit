@@ -10,8 +10,8 @@ import (
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/hotel/alfred"
+	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/kilo/store_with_lock"
-	"github.com/friedenberg/zit/zettel_transacted"
 )
 
 type CatAlfred struct {

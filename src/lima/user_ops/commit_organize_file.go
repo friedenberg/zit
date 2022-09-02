@@ -9,10 +9,10 @@ import (
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/hotel/organize_text"
-	"github.com/friedenberg/zit/src/india/changes"
-	"github.com/friedenberg/zit/src/kilo/store_with_lock"
 	"github.com/friedenberg/zit/src/hotel/zettel_named"
-	"github.com/friedenberg/zit/zettel_transacted"
+	"github.com/friedenberg/zit/src/india/changes"
+	"github.com/friedenberg/zit/src/india/zettel_transacted"
+	"github.com/friedenberg/zit/src/kilo/store_with_lock"
 )
 
 type CommitOrganizeFile struct {
