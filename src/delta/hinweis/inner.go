@@ -6,7 +6,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/friedenberg/zit/src/bravo/stdprinter"
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/sha"
 )
 
@@ -31,7 +31,7 @@ func (h inner) Sha() sha.Sha {
 	sr := strings.NewReader(h.String())
 
 	if _, err := io.Copy(hash, sr); err != nil {
-		stdprinter.PanicIfError(err)
+		errors.PanicIfError(err)
 	}
 
 	return sha.FromHash(hash)

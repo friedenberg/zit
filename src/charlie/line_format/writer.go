@@ -30,7 +30,7 @@ func (w *Writer) WriteTo(out io.Writer) (n int64, err error) {
 		n += int64(n1)
 
 		if err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	}

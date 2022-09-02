@@ -31,7 +31,7 @@ func (e wrapped) Unwrap() error {
 	return e.inner
 }
 
-func Wrapped(in error, f string, values ...interface{}) (err errer) {
+func Wrapf(in error, f string, values ...interface{}) (err errer) {
 	defer CallerNonEmpty(1, err)
 
 	err = errer{
@@ -102,7 +102,7 @@ func (se stackWrapError) Error() string {
 	return fmt.Sprintf("- %s\n  %s:%d", se.Frame.Function, se.file, se.line)
 }
 
-func Error(in error) (err error) {
+func Wrap(in error) (err error) {
 	defer CallerNonEmpty(1, err)
 
 	var normal normalError

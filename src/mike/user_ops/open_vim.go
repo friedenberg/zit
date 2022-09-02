@@ -20,7 +20,7 @@ func (c OpenVim) Run(args ...string) (results OpenVimResults, err error) {
 	}
 
 	if err = open_file_guard.OpenVimWithArgs(vimArgs, args...); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

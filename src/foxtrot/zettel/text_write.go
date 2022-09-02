@@ -7,7 +7,6 @@ import (
 	"os/exec"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/line_format"
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
 )
@@ -96,7 +95,7 @@ func (f Text) writeToInlineAkte(c FormatContextWrite) (n int64, err error) {
 	n, err = w.WriteTo(c.Out)
 
 	if err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -110,7 +109,7 @@ func (f Text) writeToInlineAkte(c FormatContextWrite) (n int64, err error) {
 	ar, err = c.AkteReader(c.Zettel.Akte)
 
 	if err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -119,7 +118,7 @@ func (f Text) writeToInlineAkte(c FormatContextWrite) (n int64, err error) {
 		return
 	}
 
-	defer stdprinter.PanicIfError(ar.Close)
+	defer errors.PanicIfError(ar.Close)
 
 	in := ar
 
@@ -127,7 +126,7 @@ func (f Text) writeToInlineAkte(c FormatContextWrite) (n int64, err error) {
 
 	if c.FormatScript != nil {
 		if cmd, err = c.FormatScript.Cmd(); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -135,12 +134,12 @@ func (f Text) writeToInlineAkte(c FormatContextWrite) (n int64, err error) {
 		cmd.Stderr = os.Stderr
 
 		if in, err = cmd.StdoutPipe(); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
 		if err = cmd.Start(); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	}
@@ -151,13 +150,13 @@ func (f Text) writeToInlineAkte(c FormatContextWrite) (n int64, err error) {
 	n += n1
 
 	if err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if cmd != nil {
 		if err = cmd.Wait(); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	}
@@ -189,7 +188,7 @@ func (f Text) writeToExternalAkte(c FormatContextWrite) (n int64, err error) {
 	n, err = w.WriteTo(c.Out)
 
 	if err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -201,7 +200,7 @@ func (f Text) writeToExternalAkte(c FormatContextWrite) (n int64, err error) {
 	}
 
 	if ar, err = c.AkteReader(c.Zettel.Akte); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -210,12 +209,12 @@ func (f Text) writeToExternalAkte(c FormatContextWrite) (n int64, err error) {
 		return
 	}
 
-	defer stdprinter.PanicIfError(ar.Close)
+	defer errors.PanicIfError(ar.Close)
 
 	var file *os.File
 
 	if file, err = open_file_guard.Create(c.ExternalAktePath); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -227,7 +226,7 @@ func (f Text) writeToExternalAkte(c FormatContextWrite) (n int64, err error) {
 	n += n1
 
 	if err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

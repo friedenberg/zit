@@ -31,12 +31,12 @@ func MakeUmwelt(c konfig.Konfig) (u *Umwelt, err error) {
 	}
 
 	if u.BasePath, err = c.DirZit(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if u.cwd, err = os.Getwd(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -66,7 +66,7 @@ func (u Umwelt) DefaultEtiketten() (etiketten etikett.Set, err error) {
 		}
 
 		if err = etiketten.AddString(e); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	}

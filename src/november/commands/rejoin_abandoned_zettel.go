@@ -29,14 +29,14 @@ func (c RejoinAbandonedZettel) RunWithShas(store store_with_lock.Store, shas ...
 		var stored zettel_transacted.Zettel
 
 		if stored, err = store.StoreObjekten().Read(sha); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
 		var tz zettel_transacted.Zettel
 
 		if tz, err = store.StoreObjekten().Create(stored.Named.Stored.Zettel); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 

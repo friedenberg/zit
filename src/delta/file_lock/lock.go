@@ -42,9 +42,9 @@ func (l *Lock) Lock() (err error) {
 	errors.Output(2, "locking "+l.Path())
 	if l.f, err = open_file_guard.OpenFile(l.Path(), os.O_RDONLY|os.O_EXCL|os.O_CREATE, 755); err != nil {
 		if errors.Is(err, fs.ErrExist) {
-			err = errors.Wrapped(err, "lockfile already exists, unable to acquire lock: %s", l.Path())
+			err = errors.Wrapf(err, "lockfile already exists, unable to acquire lock: %s", l.Path())
 		} else {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 		}
 
 		return
@@ -59,14 +59,14 @@ func (l *Lock) Unlock() (err error) {
 
 	errors.Output(2, "unlocking "+l.Path())
 	if err = open_file_guard.Close(l.f); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	l.f = nil
 
 	if err = os.Remove(l.Path()); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

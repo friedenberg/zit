@@ -21,7 +21,7 @@ func (op GetAllHinweisen) Run() (results GetAllHinweisenResults, err error) {
 	var store store_with_lock.Store
 
 	if store, err = store_with_lock.New(op.Umwelt); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -30,7 +30,7 @@ func (op GetAllHinweisen) Run() (results GetAllHinweisenResults, err error) {
 	var zs map[hinweis.Hinweis]zettel_transacted.Zettel
 
 	if zs, err = store.StoreObjekten().ZettelenSchwanzen(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

@@ -26,14 +26,14 @@ func (s Store) readTransaktion(p string) (t transaktion.Transaktion, err error) 
 	var or io.ReadCloser
 
 	if or, err = s.ReadCloserObjekten(p); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	defer or.Close()
 
 	if _, err = tr.ReadFrom(or); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -55,7 +55,7 @@ func (s Store) storedZettelFromSha(sh sha.Sha) (sz zettel_stored.Stored, err err
 	f := zettel.Objekte{}
 
 	if _, err = f.ReadFrom(&sz.Zettel, or); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -84,7 +84,7 @@ func (s *Store) transactedWithHead(
 		if errors.Is(err, ErrNotFound{}) {
 			err = nil
 		} else {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	}
@@ -101,19 +101,19 @@ func (s Store) transactedZettelFromTransaktionObjekte(
 	var h *hinweis.Hinweis
 
 	if h, ok = o.Id.(*hinweis.Hinweis); !ok {
-		err = errors.Wrapped(err, "transacktion.Objekte Id was not hinweis but was %s", o.Id)
+		err = errors.Wrapf(err, "transacktion.Objekte Id was not hinweis but was %s", o.Id)
 		return
 	}
 
 	tz.Named.Hinweis = *h
 
 	if tz.Named.Stored, err = s.storedZettelFromSha(o.Sha); err != nil {
-		err = errors.Wrapped(err, "failed to find zettel objekte for hinweis: %s", tz.Named.Hinweis)
+		err = errors.Wrapf(err, "failed to find zettel objekte for hinweis: %s", tz.Named.Hinweis)
 		return
 	}
 
 	if tz, err = s.transactedWithHead(tz.Named, t); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -131,14 +131,14 @@ func (s Store) writeTransaktion() (err error) {
 	var p string
 
 	if p, err = id.MakeDirIfNecessary(s.Transaktion.Time, s.Umwelt.DirObjektenTransaktion()); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	var w io.WriteCloser
 
 	if w, err = s.WriteCloserObjekten(p); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -147,7 +147,7 @@ func (s Store) writeTransaktion() (err error) {
 	f := transaktion.Writer{Transaktion: s.Transaktion}
 
 	if _, err = f.WriteTo(w); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -158,7 +158,7 @@ func (s *Store) addZettelToTransaktion(z zettel_named.Zettel) (tz zettel_transac
 	errors.Printf("adding zettel to transaktion: %s", z.Hinweis)
 
 	if tz, err = s.transactedWithHead(z, s.Transaktion); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

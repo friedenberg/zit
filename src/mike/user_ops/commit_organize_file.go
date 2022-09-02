@@ -25,7 +25,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 	var store store_with_lock.Store
 
 	if store, err = store_with_lock.New(c.Umwelt); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -34,14 +34,14 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 	var cs changes.Changes
 
 	if cs, err = changes.ChangesFrom(a, b); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	errors.Printf("%#v", cs)
 
 	if len(cs.Added) == 0 && len(cs.Removed) == 0 && len(cs.New) == 0 {
-		stdprinter.Err("no changes")
+		errors.PrintErr("no changes")
 		return
 	}
 
@@ -51,7 +51,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 		var h hinweis.Hinweis
 
 		if h, err = hinweis.Make(hString); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -61,7 +61,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 			var tz zettel_transacted.Zettel
 
 			if tz, err = store.StoreObjekten().Read(h); err != nil {
-				err = errors.Error(err)
+				err = errors.Wrap(err)
 				return
 			}
 
@@ -75,14 +75,14 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 		var z zettel_named.Zettel
 
 		if z, err = addOrGetToZettelToUpdate(hString); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
 		z.Stored.Zettel.Etiketten.Add(e)
 		toUpdate[z.Hinweis.String()] = z
 
-		stdprinter.Errf("Added etikett '%s' to zettel '%s'\n", e, z.Hinweis)
+		errors.PrintErrf("Added etikett '%s' to zettel '%s'\n", e, z.Hinweis)
 
 		return
 	}
@@ -91,14 +91,14 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 		var z zettel_named.Zettel
 
 		if z, err = addOrGetToZettelToUpdate(hString); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
 		z.Stored.Zettel.Etiketten.RemovePrefixes(e)
 		toUpdate[z.Hinweis.String()] = z
 
-		stdprinter.Errf("Removed etikett '%s' from zettel '%s'\n", e, z.Hinweis)
+		errors.PrintErrf("Removed etikett '%s' from zettel '%s'\n", e, z.Hinweis)
 
 		return
 	}
@@ -107,12 +107,12 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 		var e etikett.Etikett
 
 		if err = e.Set(c.Etikett); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
 		if err = removeEtikettFromZettel(c.Key, e); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	}
@@ -120,12 +120,12 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 		var e etikett.Etikett
 
 		if err = e.Set(c.Etikett); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
 		if err = addEtikettToZettel(c.Key, e); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	}
@@ -136,12 +136,12 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 		}
 
 		if err = z.Bezeichnung.Set(bez); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
 		if err = z.Typ.Set("md"); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -167,7 +167,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 		}
 
 		if _, err = store.StoreObjekten().Update(z.Hinweis, z.Stored.Zettel); err != nil {
-			stdprinter.Errf("failed to update zettel: %s", err)
+			errors.PrintErrf("failed to update zettel: %s", err)
 		}
 	}
 

@@ -35,7 +35,7 @@ func (es Set) AddString(v string) (err error) {
 	var e Etikett
 
 	if err = e.Set(v); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -61,7 +61,7 @@ func (s *Set) Set(v string) (err error) {
 
 	for _, e := range es {
 		if err = s.AddString(e); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	}
@@ -305,13 +305,13 @@ func (es *Set) UnmarshalJSON(b []byte) (err error) {
 	var vs []string
 
 	if err = json.Unmarshal(b, &vs); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	for _, v := range vs {
 		if err = es.AddString(v); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	}

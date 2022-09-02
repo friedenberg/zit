@@ -38,7 +38,7 @@ func (c PeekHinweisen) RunWithLockedStore(store store_with_lock.Store, args ...s
 	var hs []hinweis.Hinweis
 
 	if hs, err = store.StoreObjekten().PeekHinweisen(n); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

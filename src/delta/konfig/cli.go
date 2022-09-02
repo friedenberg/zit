@@ -33,7 +33,7 @@ func (c *Cli) AddToFlags(f *flag.FlagSet) {
 func (c Cli) DirZit() (p string, err error) {
 	if c.BasePath == "" {
 		if p, err = os.Getwd(); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	} else {
@@ -59,7 +59,7 @@ func (c Cli) KonfigPath() (p string, err error) {
 	// )
 
 	if p, err = c.DirZit(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -78,12 +78,12 @@ func (c Cli) Konfig() (k Konfig, err error) {
 	var p string
 
 	if p, err = c.KonfigPath(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if k, err = LoadKonfig(p); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

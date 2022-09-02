@@ -2,7 +2,6 @@ package store_with_lock
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/delta/age"
 	"github.com/friedenberg/zit/src/delta/file_lock"
 	"github.com/friedenberg/zit/src/echo/umwelt"
@@ -26,24 +25,24 @@ func New(u *umwelt.Umwelt) (s Store, err error) {
 	s.lock = file_lock.New(u.DirZit("Lock"))
 
 	if err = s.lock.Lock(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if s.age, err = u.Age(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	s.storeObjekten = &store_objekten.Store{}
 
 	if err = s.storeObjekten.Initialize(u); err != nil {
-		err = errors.Wrapped(err, "failed to initialize zettel meta store")
+		err = errors.Wrapf(err, "failed to initialize zettel meta store")
 		return
 	}
 
 	if s.akten, err = akten.New(u.DirZit()); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -55,7 +54,7 @@ func New(u *umwelt.Umwelt) (s Store, err error) {
 	errors.Print("initing checkout store")
 	if s.storeWorkingDirectory, err = store_working_directory.New(csk, u.Cwd(), s.storeObjekten); err != nil {
 		errors.Print(err)
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -86,21 +85,21 @@ func (s Store) StoreWorkingDirectory() *store_working_directory.Store {
 
 func (s Store) Flush() (err error) {
 	if err = s.StoreObjekten().Flush(); err != nil {
-		stdprinter.Err(err)
-		err = errors.Error(err)
+		errors.PrintErr(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if err = s.StoreWorkingDirectory().Flush(); err != nil {
-		stdprinter.Err(err)
-		err = errors.Error(err)
+		errors.PrintErr(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	//explicitly do not unlock if there was an error to encourage user interaction
 	//and manual recovery
 	if err = s.lock.Unlock(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

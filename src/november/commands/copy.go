@@ -31,7 +31,7 @@ func (c Copy) RunWithHinweisen(s store_with_lock.Store, hins ...hinweis.Hinweis)
 		var tz zettel_transacted.Zettel
 
 		if tz, err = s.StoreObjekten().Read(h); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 

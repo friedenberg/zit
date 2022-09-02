@@ -35,7 +35,7 @@ func (c Push) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	var remote konfig.RemoteScript
 
 	if remote, err = c.remoteScriptFromArg(u, args[0]); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -70,7 +70,7 @@ func (c Push) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	b := []byte{}
 
 	if err = c.runRemoteScript(u, remote, args, b); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -100,7 +100,7 @@ func (c Push) runRemoteScript(u *umwelt.Umwelt, remote konfig.RemoteScript, args
 	var script *exec.Cmd
 
 	if script, err = remote.Cmd(append([]string{"push"}, args...)...); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -112,7 +112,7 @@ func (c Push) runRemoteScript(u *umwelt.Umwelt, remote konfig.RemoteScript, args
 	script.Stdin = r
 
 	if err = script.Run(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

@@ -24,7 +24,7 @@ func New(age age.Age, basePath string) (s *hinweisen, err error) {
 	}
 
 	if s.factory, err = newFactory(basePath); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -39,7 +39,7 @@ func (zs *hinweisen) Flush() (err error) {
 	errors.Print()
 
 	if err = zs.factory.Flush(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -48,7 +48,7 @@ func (zs *hinweisen) Flush() (err error) {
 
 func (hn *hinweisen) StoreNew(sha sha.Sha) (h hinweis.Hinweis, err error) {
 	if h, err = hn.factory.Make(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

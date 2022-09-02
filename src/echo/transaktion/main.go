@@ -35,21 +35,21 @@ func (o *Objekte) Set(v string) (err error) {
 	}
 
 	if err = o.Type.Set(vs[0]); err != nil {
-		err = errors.Wrapped(err, "failed to set type: %s", vs[0])
+		err = errors.Wrapf(err, "failed to set type: %s", vs[0])
 		return
 	}
 
 	vs = vs[1:]
 
 	if err = o.Mutter[0].Set(vs[0]); err != nil {
-		err = errors.Wrapped(err, "failed to set mutter 0: %s", vs[0])
+		err = errors.Wrapf(err, "failed to set mutter 0: %s", vs[0])
 		return
 	}
 
 	vs = vs[1:]
 
 	if err = o.Mutter[1].Set(vs[0]); err != nil {
-		err = errors.Wrapped(err, "failed to set mutter 1: %s", vs[0])
+		err = errors.Wrapf(err, "failed to set mutter 1: %s", vs[0])
 		return
 	}
 
@@ -69,14 +69,14 @@ func (o *Objekte) Set(v string) (err error) {
 	}
 
 	if err = o.Id.Set(vs[0]); err != nil {
-		err = errors.Wrapped(err, "failed to set id: %s", vs[1])
+		err = errors.Wrapf(err, "failed to set id: %s", vs[1])
 		return
 	}
 
 	vs = vs[1:]
 
 	if err = o.Sha.Set(vs[0]); err != nil {
-		err = errors.Wrapped(err, "failed to set sha: %s", vs[2])
+		err = errors.Wrapf(err, "failed to set sha: %s", vs[2])
 		return
 	}
 

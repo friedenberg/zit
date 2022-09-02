@@ -17,12 +17,12 @@ import (
 
 func (s Store) ReadExternalZettelFromAktePath(p string) (cz zettel_checked_out.Zettel, err error) {
 	if p, err = filepath.Abs(p); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if p, err = filepath.Rel(s.path, p); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -32,7 +32,7 @@ func (s Store) ReadExternalZettelFromAktePath(p string) (cz zettel_checked_out.Z
 	head, tail := id.HeadTailFromFileName(p)
 
 	if cz.External.Named.Hinweis, err = hinweis.Make(head + "/" + tail); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -40,7 +40,7 @@ func (s Store) ReadExternalZettelFromAktePath(p string) (cz zettel_checked_out.Z
 		if errors.Is(err, store_objekten.ErrNotFound{}) {
 			err = nil
 		} else {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	}
@@ -50,7 +50,7 @@ func (s Store) ReadExternalZettelFromAktePath(p string) (cz zettel_checked_out.Z
 	var akteSha sha.Sha
 
 	if akteSha, err = s.AkteShaFromPath(p); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -67,21 +67,21 @@ func (s Store) AkteShaFromPath(p string) (sh sha.Sha, err error) {
 	var aw age_io.Writer
 
 	if aw, err = s.storeObjekten.AkteWriter(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	var f *os.File
 
 	if f, err = open_file_guard.Open(p); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	defer open_file_guard.Close(f)
 
 	if _, err = io.Copy(aw, f); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

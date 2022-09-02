@@ -93,7 +93,7 @@ func (e duplicateAkteError) AddToLostAndFound(p string) (p1 string, err error) {
 	newEtikett := "zz-akte-" + e.ShaOldAkte.String()
 
 	if err = e.Zettel.Etiketten.AddString(newEtikett); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -102,7 +102,7 @@ func (e duplicateAkteError) AddToLostAndFound(p string) (p1 string, err error) {
 	p1 = path.Join(p, uuid.NewString())
 
 	if f, err = open_file_guard.Create(p1); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -112,7 +112,7 @@ func (e duplicateAkteError) AddToLostAndFound(p string) (p1 string, err error) {
 	format := zettel.Text{}
 
 	if _, err = format.WriteTo(e.FormatContextWrite); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

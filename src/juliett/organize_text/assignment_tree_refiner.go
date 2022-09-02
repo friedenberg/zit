@@ -81,7 +81,7 @@ func (atc *AssignmentTreeRefiner) Refine(a *assignment) (err error) {
 	if a.isRoot {
 		for _, c := range a.children {
 			if err = atc.Refine(c); err != nil {
-				err = errors.Error(err)
+				err = errors.Wrap(err)
 				return
 			}
 		}
@@ -94,7 +94,7 @@ func (atc *AssignmentTreeRefiner) Refine(a *assignment) (err error) {
 		p := a.parent
 
 		if err = p.consume(a); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -102,24 +102,24 @@ func (atc *AssignmentTreeRefiner) Refine(a *assignment) (err error) {
 	}
 
 	if err = atc.applyPrefixJoints(a); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if err = atc.renameForPrefixJoint(a); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	for _, child := range a.children {
 		if err = atc.Refine(child); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	}
 
 	if err = atc.applyPrefixJoints(a); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -169,7 +169,7 @@ func (atc AssignmentTreeRefiner) applyPrefixJoints(a *assignment) (err error) {
 	for _, c := range groupingPrefix.assignments {
 		if c.parent != na {
 			if err = c.removeFromParent(); err != nil {
-				err = errors.Error(err)
+				err = errors.Wrap(err)
 				return
 			}
 

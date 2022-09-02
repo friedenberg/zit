@@ -21,7 +21,7 @@ func (c withShas) RunWithLockedStore(store store_with_lock.Store, args ...string
 		var sha sha.Sha
 
 		if err = sha.Set(arg); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -29,7 +29,7 @@ func (c withShas) RunWithLockedStore(store store_with_lock.Store, args ...string
 	}
 
 	if err = c.RunWithShas(store, shas...); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

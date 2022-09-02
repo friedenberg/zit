@@ -35,7 +35,7 @@ func New(options Options) (ot *organizeText, err error) {
 	}
 
 	if err = ot.Refine(refiner); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -47,7 +47,7 @@ func New(options Options) (ot *organizeText, err error) {
 
 func (t *organizeText) Refine(refiner AssignmentTreeRefiner) (err error) {
 	if err = refiner.Refine(t.assignment); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -70,12 +70,12 @@ func (ot organizeText) WriteTo(out io.Writer) (n int64, err error) {
 	aw := assignmentLineWriter{Writer: lw}
 
 	if err = aw.write(ot.assignment); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if n, err = lw.WriteTo(out); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

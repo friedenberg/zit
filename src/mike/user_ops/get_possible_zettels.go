@@ -21,7 +21,7 @@ func (uo GetPossibleZettels) Run(
 	store store_with_lock.Store,
 ) (result store_working_directory.CwdFiles, err error) {
 	if result, err = store.StoreWorkingDirectory().GetPossibleZettels(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

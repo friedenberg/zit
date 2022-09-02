@@ -32,7 +32,7 @@ func (op ReadCheckedOut) RunOneString(
 	p string,
 ) (zettel zettel_checked_out.Zettel, err error) {
 	if zettel, err = s.StoreWorkingDirectory().Read(p); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -54,7 +54,7 @@ func (op ReadCheckedOut) RunMany(
 				//TODO log
 				err = nil
 			} else {
-				err = errors.Error(err)
+				err = errors.Wrap(err)
 				return
 			}
 
@@ -71,7 +71,7 @@ func (op ReadCheckedOut) RunMany(
 				//TODO log
 				err = nil
 			} else {
-				err = errors.Error(err)
+				err = errors.Wrap(err)
 				return
 			}
 		}

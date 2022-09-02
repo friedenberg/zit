@@ -6,16 +6,16 @@ import (
 	"flag"
 	"sort"
 
-	"github.com/friedenberg/zit/src/bravo/stdprinter"
+	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
 func (c command) PrintUsage(in error) (exitStatus int) {
 	if in != nil {
 		exitStatus = 1
-		stdprinter.Err(in)
+		errors.PrintErr(in)
 	}
 
-	stdprinter.Err("Usage for z:")
+	errors.PrintErr("Usage for z:")
 
 	fs := make([]flag.FlagSet, 0, len(Commands()))
 
@@ -36,7 +36,7 @@ func (c command) PrintUsage(in error) (exitStatus int) {
 
 func (c command) PrintSubcommandUsage(flags flag.FlagSet) {
 	printTabbed := func(s string) {
-		stdprinter.Errf("  %s\n", s)
+		errors.PrintErrf("  %s\n", s)
 	}
 
 	var b bytes.Buffer
@@ -58,6 +58,6 @@ func (c command) PrintSubcommandUsage(flags flag.FlagSet) {
 	}
 
 	if err := scanner.Err(); err != nil {
-		stdprinter.Err(err)
+		errors.PrintErr(err)
 	}
 }

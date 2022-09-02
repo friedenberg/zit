@@ -17,7 +17,7 @@ func (c ReadOrganizeFile) RunWithFile(p string) (ot organize_text.Text, err erro
 	var f *os.File
 
 	if f, err = open_file_guard.Open(p); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -32,7 +32,7 @@ func (c ReadOrganizeFile) RunWithFile(p string) (ot organize_text.Text, err erro
 
 func (c ReadOrganizeFile) Run() (ot organize_text.Text, err error) {
 	if ot, err = organize_text.New(organize_text.Options{}); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

@@ -4,7 +4,6 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_external"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
@@ -42,11 +41,11 @@ func (c Checkin) RunWithLockedStore(
 
 	if c.All {
 		if len(args) > 0 {
-			stdprinter.Errf("Ignoring args because -all is set\n")
+			errors.PrintErrf("Ignoring args because -all is set\n")
 		}
 
 		if pz, err = user_ops.NewGetPossibleZettels(s.Umwelt).Run(s); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	} else {
@@ -64,7 +63,7 @@ func (c Checkin) RunWithLockedStore(
 	}
 
 	if readResults, err = readOp.RunMany(s, pz); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -80,7 +79,7 @@ func (c Checkin) RunWithLockedStore(
 	}
 
 	if _, err = checkinOp.Run(s, zettels...); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -96,7 +95,7 @@ func (c Checkin) RunWithLockedStore(
 		}
 
 		if err = deleteOp.Run(s, external); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	}

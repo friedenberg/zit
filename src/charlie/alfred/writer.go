@@ -24,7 +24,7 @@ func NewWriter(out io.Writer) (w *writer, err error) {
 	}
 
 	if err = w.open(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -45,12 +45,12 @@ func (w *writer) WriteItem(i Item) (n int, err error) {
 	var b []byte
 
 	if b, err = json.Marshal(i); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if n, err = w.Write(b); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -77,12 +77,12 @@ func (w *writer) Write(p []byte) (n int, err error) {
 
 func (w writer) Close() (err error) {
 	if _, err = w.wBuf.WriteString("]}\n"); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if err = w.wBuf.Flush(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

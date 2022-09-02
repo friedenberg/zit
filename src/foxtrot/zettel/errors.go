@@ -34,21 +34,21 @@ func (e ErrHasInlineAkteAndFilePath) Recover() (z Zettel, err error) {
 	var akteWriter age_io.Writer
 
 	if akteWriter, err = e.AkteWriter(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	var f *os.File
 
 	if f, err = open_file_guard.Open(e.FilePath); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	defer open_file_guard.Close(f)
 
 	if _, err = io.Copy(akteWriter, f); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

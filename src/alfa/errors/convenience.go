@@ -2,6 +2,7 @@ package errors
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"os"
 
@@ -71,4 +72,29 @@ func PanicIfError(err interface{}) {
 	case error:
 		panic(t)
 	}
+}
+
+func Error(err error) {
+	if err == nil {
+		return
+	}
+
+	fmt.Fprintln(
+		os.Stderr,
+		fmt.Sprintf("%+v", err),
+	)
+}
+
+func Errf(f string, a ...interface{}) {
+	fmt.Fprintln(
+		os.Stderr,
+		fmt.Sprintf(f, a...),
+	)
+}
+
+func Err(a ...interface{}) {
+	fmt.Fprintln(
+		os.Stderr,
+		a...,
+	)
 }

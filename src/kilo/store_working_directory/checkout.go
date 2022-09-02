@@ -23,7 +23,7 @@ func (s *Store) Checkout(
 
 	for i, sz := range zs {
 		if czs[i], err = s.CheckoutOne(options, sz); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	}
@@ -48,7 +48,7 @@ func (s *Store) CheckoutOne(
 	var filename string
 
 	if filename, err = id.MakeDirIfNecessary(sz.Named.Hinweis, s.cwd); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -77,7 +77,7 @@ func (s *Store) CheckoutOne(
 		p := originalFilename + "." + sz.Named.Stored.Zettel.AkteExt()
 
 		if err = s.writeAkte(sz.Named.Stored.Zettel.Akte, p); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -96,9 +96,9 @@ func (s *Store) CheckoutOne(
 		}
 
 		if err = s.writeFormat(options, filename, c); err != nil {
-			err = errors.Wrapped(err, "%s", sz.Named)
-			stdprinter.Errf("%s (check out failed):\n", sz.Named)
-			stdprinter.Error(err)
+			err = errors.Wrapf(err, "%s", sz.Named)
+			errors.PrintErrf("%s (check out failed):\n", sz.Named)
+			errors.PrintErr(err)
 			return
 		}
 
@@ -120,7 +120,7 @@ func (s *Store) writeFormat(
 	var f *os.File
 
 	if f, err = open_file_guard.Create(p); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -129,7 +129,7 @@ func (s *Store) writeFormat(
 	defer open_file_guard.Close(f)
 
 	if _, err = o.Format.WriteTo(fc); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -143,7 +143,7 @@ func (s *Store) writeAkte(
 	var f *os.File
 
 	if f, err = open_file_guard.Create(p); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -152,7 +152,7 @@ func (s *Store) writeAkte(
 	var r io.ReadCloser
 
 	if r, err = s.storeObjekten.AkteReader(sh); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -161,7 +161,7 @@ func (s *Store) writeAkte(
 	errors.Print("starting io copy")
 	if _, err = io.Copy(f, r); err != nil {
 		errors.Print(" io copy faile")
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 	errors.Print(" io copy succeed")

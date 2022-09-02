@@ -40,12 +40,12 @@ func (s *Store) Initialize(u *umwelt.Umwelt) (err error) {
 	s.Umwelt = u
 
 	if s.Age, err = u.Age(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if s.hinweisen, err = hinweisen.New(s.Age, u.DirZit()); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -62,7 +62,7 @@ func (s *Store) Initialize(u *umwelt.Umwelt) (err error) {
 	)
 
 	if err != nil {
-		err = errors.Wrapped(err, "failed to init zettel index")
+		err = errors.Wrapf(err, "failed to init zettel index")
 		return
 	}
 
@@ -72,7 +72,7 @@ func (s *Store) Initialize(u *umwelt.Umwelt) (err error) {
 	)
 
 	if err != nil {
-		err = errors.Wrapped(err, "failed to init zettel index")
+		err = errors.Wrapf(err, "failed to init zettel index")
 		return
 	}
 
@@ -84,7 +84,7 @@ func (s *Store) Initialize(u *umwelt.Umwelt) (err error) {
 	)
 
 	if err != nil {
-		err = errors.Wrapped(err, "failed to init kennung index")
+		err = errors.Wrapf(err, "failed to init kennung index")
 		return
 	}
 
@@ -107,7 +107,7 @@ func (s Store) WriteZettelObjekte(z zettel.Zettel) (sh sha.Sha, err error) {
 	}
 
 	if w, err = age_io.NewMover(mo); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -116,7 +116,7 @@ func (s Store) WriteZettelObjekte(z zettel.Zettel) (sh sha.Sha, err error) {
 	f := zettel.Objekte{}
 
 	if _, err = f.WriteTo(z, w); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -129,21 +129,21 @@ func (s Store) writeNamedZettelToIndex(tz zettel_transacted.Zettel) (err error) 
 	errors.Printf("writing zettel to index: %s", tz.Named)
 
 	if err = s.indexZettelenTails.add(tz); err != nil {
-		err = errors.Wrapped(err, "failed to write zettel to index: %s", tz.Named)
+		err = errors.Wrapf(err, "failed to write zettel to index: %s", tz.Named)
 		return
 	}
 
 	if err = s.indexZettelen.add(tz); err != nil {
-		err = errors.Wrapped(err, "failed to write zettel to index: %s", tz.Named)
+		err = errors.Wrapf(err, "failed to write zettel to index: %s", tz.Named)
 		return
 	}
 
 	if err = s.indexKennung.addHinweis(tz.Named.Hinweis); err != nil {
 		if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
-			stdprinter.Errf("kennung does not contain value: %s\n", err)
+			errors.PrintErrf("kennung does not contain value: %s\n", err)
 			err = nil
 		} else {
-			err = errors.Wrapped(err, "failed to write zettel to index: %s", tz.Named)
+			err = errors.Wrapf(err, "failed to write zettel to index: %s", tz.Named)
 			return
 		}
 	}
@@ -161,26 +161,26 @@ func (s Store) Read(i id.Id) (tz zettel_transacted.Zettel, err error) {
 		p := id.Path(tid, s.Umwelt.DirObjektenZettelen())
 
 		if r, err = s.ReadCloserObjekten(p); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
-		defer stdprinter.PanicIfError(r.Close)
+		defer errors.PanicIfError(r.Close)
 
 		if _, err = f.ReadFrom(&tz.Named.Stored.Zettel, r); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
 	case hinweis.Hinweis:
 		if tz, err = s.indexZettelenTails.Read(tid); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
 	case hinweis.HinweisWithIndex:
 		if tz, err = s.ReadHinweisAt(tid); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -200,7 +200,7 @@ func (s *Store) Create(in zettel.Zettel) (tz zettel_transacted.Zettel, err error
 	tz.Named.Stored.Zettel = in
 
 	if tz.Named.Stored.Sha, err = s.WriteZettelObjekte(tz.Named.Stored.Zettel); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -211,24 +211,24 @@ func (s *Store) Create(in zettel.Zettel) (tz zettel_transacted.Zettel, err error
 	// }
 
 	if tz.Named.Hinweis, err = s.indexKennung.createHinweis(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if tz, err = s.addZettelToTransaktion(tz.Named); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if err = s.writeNamedZettelToIndex(tz); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	errors.PrintDebug(tz)
 
 	if err = s.indexEtiketten.add(tz.Named.Stored.Zettel.Etiketten); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -247,22 +247,22 @@ func (s *Store) CreateWithHinweis(
 	tz.Named.Stored.Zettel = in
 
 	if tz.Named.Stored.Sha, err = s.WriteZettelObjekte(tz.Named.Stored.Zettel); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if tz, err = s.addZettelToTransaktion(tz.Named); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if err = s.writeNamedZettelToIndex(tz); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if err = s.indexEtiketten.add(tz.Named.Stored.Zettel.Etiketten); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -280,7 +280,7 @@ func (s *Store) Update(
 	var mutter zettel_transacted.Zettel
 
 	if mutter, err = s.Read(h); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -288,17 +288,17 @@ func (s *Store) Update(
 	tz.Named.Stored.Zettel = z
 
 	if tz.Named.Stored.Sha, err = s.WriteZettelObjekte(z); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if tz, err = s.addZettelToTransaktion(tz.Named); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if err = s.writeNamedZettelToIndex(tz); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -307,12 +307,12 @@ func (s *Store) Update(
 	errors.Print(tz.Named.Stored.Zettel.Etiketten)
 
 	if err = s.indexEtiketten.add(d.Added); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if err = s.indexEtiketten.del(d.Removed); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -325,33 +325,33 @@ func (s Store) Revert(h hinweis.Hinweis) (named zettel_transacted.Zettel, err er
 
 func (s Store) Flush() (err error) {
 	if err = s.writeTransaktion(); err != nil {
-		err = errors.Wrapped(err, "failed to write transaction")
+		err = errors.Wrapf(err, "failed to write transaction")
 		return
 	}
 
 	if err = s.hinweisen.Flush(); err != nil {
 		stdprinter.Out(err)
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if err = s.indexZettelenTails.Flush(); err != nil {
-		err = errors.Wrapped(err, "failed to flush new zettel index")
+		err = errors.Wrapf(err, "failed to flush new zettel index")
 		return
 	}
 
 	if err = s.indexZettelen.Flush(); err != nil {
-		err = errors.Wrapped(err, "failed to flush new zettel index")
+		err = errors.Wrapf(err, "failed to flush new zettel index")
 		return
 	}
 
 	if err = s.indexEtiketten.Flush(); err != nil {
-		err = errors.Wrapped(err, "failed to flush new zettel index")
+		err = errors.Wrapf(err, "failed to flush new zettel index")
 		return
 	}
 
 	if err = s.indexKennung.Flush(); err != nil {
-		err = errors.Wrapped(err, "failed to flush new kennung index")
+		err = errors.Wrapf(err, "failed to flush new kennung index")
 		return
 	}
 
@@ -362,7 +362,7 @@ func (s Store) AllInChain(h hinweis.Hinweis) (c zettel_transacted.Slice, err err
 	var mst zettel_transacted.Set
 
 	if mst, err = s.indexZettelen.ReadHinweis(h); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -381,7 +381,7 @@ func (s Store) ReadAllTransaktions() (out []transaktion.Transaktion, err error) 
 	d := s.Umwelt.DirObjektenTransaktion()
 
 	if headNames, err = open_file_guard.ReadDirNames(d); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -391,7 +391,7 @@ func (s Store) ReadAllTransaktions() (out []transaktion.Transaktion, err error) 
 		var tailNames []string
 
 		if tailNames, err = open_file_guard.ReadDirNames(d, hn); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -403,7 +403,7 @@ func (s Store) ReadAllTransaktions() (out []transaktion.Transaktion, err error) 
 			var t transaktion.Transaktion
 
 			if t, err = s.readTransaktion(p); err != nil {
-				err = errors.Error(err)
+				err = errors.Wrap(err)
 				return
 			}
 
@@ -429,7 +429,7 @@ func (s *Store) ReadHinweisAt(
 	var chain zettel_transacted.Slice
 
 	if chain, err = s.AllInChain(h.Hinweis); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -452,24 +452,24 @@ func (s *Store) ReadHinweisAt(
 
 func (s *Store) Reindex() (err error) {
 	if err = os.RemoveAll(s.Umwelt.DirVerzeichnisse()); err != nil {
-		err = errors.Wrapped(err, "failed to remove verzeichnisse dir")
+		err = errors.Wrapf(err, "failed to remove verzeichnisse dir")
 		return
 	}
 
 	if err = os.MkdirAll(s.Umwelt.DirVerzeichnisse(), os.ModeDir|0755); err != nil {
-		err = errors.Wrapped(err, "failed to make verzeichnisse dir")
+		err = errors.Wrapf(err, "failed to make verzeichnisse dir")
 		return
 	}
 
 	if err = s.indexKennung.reset(); err != nil {
-		err = errors.Wrapped(err, "failed to reset index kennung")
+		err = errors.Wrapf(err, "failed to reset index kennung")
 		return
 	}
 
 	var ts []transaktion.Transaktion
 
 	if ts, err = s.ReadAllTransaktions(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -490,13 +490,13 @@ func (s *Store) Reindex() (err error) {
 						err = nil
 						continue
 					} else {
-						err = errors.Error(err)
+						err = errors.Wrap(err)
 						return
 					}
 				}
 
 				if err = s.writeNamedZettelToIndex(tz); err != nil {
-					err = errors.Error(err)
+					err = errors.Wrap(err)
 					return
 				}
 
@@ -507,14 +507,14 @@ func (s *Store) Reindex() (err error) {
 	}
 
 	if err = s.indexZettelenTails.Flush(); err != nil {
-		err = errors.Wrapped(err, "failed to flush new zettel index")
+		err = errors.Wrapf(err, "failed to flush new zettel index")
 		return
 	}
 
 	var tails map[hinweis.Hinweis]zettel_transacted.Zettel
 
 	if tails, err = s.ZettelenSchwanzen(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

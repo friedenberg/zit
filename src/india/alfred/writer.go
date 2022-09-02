@@ -26,7 +26,7 @@ func NewWriter(out io.Writer) (w *writer, err error) {
 	var aw alfred.Writer
 
 	if aw, err = alfred.NewWriter(out); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

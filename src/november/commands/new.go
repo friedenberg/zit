@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/typ"
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
-	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/delta/script_value"
 	"github.com/friedenberg/zit/src/echo/umwelt"
@@ -69,7 +68,7 @@ func (c New) ValidateFlagsAndArgs(u *umwelt.Umwelt, args ...string) (err error) 
 
 func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	if err = c.ValidateFlagsAndArgs(u, args...); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -78,18 +77,18 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	if len(args) == 0 {
 		if zsc, err = c.writeNewZettels(u, f); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	} else {
 		if zsc, err = c.readExistingFilesAsZettels(u, f, args...); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	}
 
 	if err = c.editZettelsIfRequested(u, zsc); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -110,7 +109,7 @@ func (c New) readExistingFilesAsZettels(
 
 	//TODO add bezeichnung and etiketten
 	if _, err = opCreateFromPath.Run(args...); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -131,7 +130,7 @@ func (c New) writeNewZettels(
 	var defaultEtiketten etikett.Set
 
 	if defaultEtiketten, err = u.DefaultEtiketten(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -146,14 +145,14 @@ func (c New) writeNewZettels(
 	var s store_with_lock.Store
 
 	if s, err = store_with_lock.New(u); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
-	defer stdprinter.PanicIfError(s.Flush)
+	defer errors.PanicIfError(s.Flush)
 
 	if zsc, err = emptyOp.RunMany(s, z, c.Count); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -188,7 +187,7 @@ func (c New) editZettelsIfRequested(
 	)
 
 	if _, err = openVimOp.Run(cwdFiles.Zettelen...); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -202,16 +201,16 @@ func (c New) editZettelsIfRequested(
 	var s store_with_lock.Store
 
 	if s, err = store_with_lock.New(u); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
-	defer stdprinter.PanicIfError(s.Flush)
+	defer errors.PanicIfError(s.Flush)
 
 	var zslc []zettel_checked_out.Zettel
 
 	if zslc, err = readOp.RunMany(s, cwdFiles); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -227,7 +226,7 @@ func (c New) editZettelsIfRequested(
 	}
 
 	if _, err = checkinOp.Run(s, zsle...); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

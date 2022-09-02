@@ -31,7 +31,7 @@ func (c Checkin) Run(
 		var tz zettel_transacted.Zettel
 
 		if tz, err = store.StoreObjekten().Update(z.Named.Hinweis, z.Named.Stored.Zettel); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 

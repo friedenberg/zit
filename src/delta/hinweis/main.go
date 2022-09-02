@@ -9,7 +9,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/kennung"
-	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/sha"
 )
 
@@ -121,7 +120,7 @@ func (h Hinweis) Sha() sha.Sha {
 	sr := strings.NewReader(h.inner.String())
 
 	if _, err := io.Copy(hash, sr); err != nil {
-		stdprinter.PanicIfError(err)
+		errors.PanicIfError(err)
 	}
 
 	return sha.FromHash(hash)

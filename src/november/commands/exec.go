@@ -40,21 +40,21 @@ func (c Exec) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	var ar io.ReadCloser
 
 	if tz, ar, executor, err = c.getZettel(u, args[0]); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	var pipePath string
 
 	if pipePath, err = c.makeFifoPipe(tz); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	var cmd *exec.Cmd
 
 	if cmd, err = c.makeCmd(executor, pipePath, args...); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -82,7 +82,7 @@ func (c Exec) getZettel(
 	var store store_with_lock.Store
 
 	if store, err = store_with_lock.New(u); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -105,7 +105,7 @@ func (c Exec) getZettel(
 	}
 
 	if tz, err = store.StoreObjekten().Read(idd); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -119,7 +119,7 @@ func (c Exec) getZettel(
 	}
 
 	if ar, err = store.StoreObjekten().AkteReader(tz.Named.Stored.Zettel.Akte); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -131,19 +131,19 @@ func (c Exec) makeFifoPipe(tz zettel_transacted.Zettel) (p string, err error) {
 	var d string
 
 	if d, err = os.MkdirTemp("", h.Kopf()); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	p = path.Join(d, h.Schwanz()+"."+tz.Named.Stored.Zettel.Typ.String())
 
 	if err = syscall.Mknod(p, syscall.S_IFIFO|0666, 0); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if err = os.Remove(p); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -162,7 +162,7 @@ func (c Exec) makeCmd(
 	}
 
 	if cmd, err = executor.Cmd(cmdArgs...); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -183,7 +183,7 @@ func (c Exec) feedPipe(
 	var pipeFileWriter *os.File
 
 	if pipeFileWriter, err = os.OpenFile(p, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0777); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -192,7 +192,7 @@ func (c Exec) feedPipe(
 	defer ar.Close()
 
 	if _, err = io.Copy(pipeFileWriter, ar); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -221,7 +221,7 @@ func (c Exec) exec(
 	errors.Print("start running")
 
 	if err = cmd.Run(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

@@ -25,7 +25,7 @@ func (c DeleteCheckout) Run(
 		var internal zettel_transacted.Zettel
 
 		if internal, err = store.StoreObjekten().Read(external.Named.Hinweis); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -44,7 +44,7 @@ func (c DeleteCheckout) Run(
 	}
 
 	if err = open_file_guard.DeleteFilesAndDirs(filesToDelete...); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

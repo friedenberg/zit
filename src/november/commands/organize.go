@@ -8,7 +8,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
-	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/echo/umwelt"
@@ -90,7 +89,7 @@ func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	if createOrganizeFileOp.RootEtiketten, err = c.getEtikettenFromArgs(args); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -101,7 +100,7 @@ func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	query := zettel_named.FilterEtikettSet{Set: createOrganizeFileOp.RootEtiketten}
 
 	if getResults, err = getOp.Run(query); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -117,12 +116,12 @@ func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		var f *os.File
 
 		if f, err = open_file_guard.TempFileWithPattern("*.md"); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
 		if createOrganizeFileResults, err = createOrganizeFileOp.RunAndWrite(getResults, f); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -133,7 +132,7 @@ func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		}
 
 		if ot2, err = readOrganizeTextOp.Run(); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -142,14 +141,14 @@ func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		}
 
 		if _, err = commitOrganizeTextOp.Run(createOrganizeFileResults.Text, ot2); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
 	case organizeModeOutputOnly:
 		errors.Print("generate organize file and write to stdout")
 		if _, err = createOrganizeFileOp.RunAndWrite(getResults, os.Stdout); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -160,19 +159,19 @@ func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		var f *os.File
 
 		if f, err = open_file_guard.TempFileWithPattern("*.md"); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
 		if createOrganizeFileResults, err = createOrganizeFileOp.RunAndWrite(getResults, f); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
 		var ot2 organize_text.Text
 
 		if ot2, err = c.readFromVim(f.Name(), createOrganizeFileResults); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -181,7 +180,7 @@ func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		}
 
 		if _, err = commitOrganizeTextOp.Run(createOrganizeFileResults.Text, ot2); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -201,7 +200,7 @@ func (c Organize) readFromVim(f string, results user_ops.CreateOrganizeFileResul
 	}
 
 	if _, err = openVimOp.Run(f); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -212,7 +211,7 @@ func (c Organize) readFromVim(f string, results user_ops.CreateOrganizeFileResul
 			err = nil
 			ot, err = c.readFromVim(f, results)
 		} else {
-			stdprinter.Errf("aborting organize\n")
+			errors.PrintErrf("aborting organize\n")
 			return
 		}
 	}
@@ -225,7 +224,7 @@ func (c Organize) getEtikettenFromArgs(args []string) (es etikett.Set, err error
 
 	for _, s := range args {
 		if err = es.AddString(s); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	}
@@ -237,26 +236,26 @@ func (c Organize) handleReadChangesError(err error) (tryAgain bool) {
 	var errorRead organize_text.ErrorRead
 
 	if err != nil && !errors.As(err, &errorRead) {
-		stdprinter.Errf("unrecoverable organize read failure: %s", err)
+		errors.PrintErrf("unrecoverable organize read failure: %s", err)
 		tryAgain = false
 		return
 	}
 
-	stdprinter.Errf("reading changes failed: %q\n", err)
-	stdprinter.Errf("would you like to edit and try again? (y/*)\n")
+	errors.PrintErrf("reading changes failed: %q\n", err)
+	errors.PrintErrf("would you like to edit and try again? (y/*)\n")
 
 	var answer rune
 	var n int
 
 	if n, err = fmt.Scanf("%c", &answer); err != nil {
 		tryAgain = false
-		stdprinter.Errf("failed to read answer: %s", err)
+		errors.PrintErrf("failed to read answer: %s", err)
 		return
 	}
 
 	if n != 1 {
 		tryAgain = false
-		stdprinter.Errf("failed to read at exactly 1 answer: %s", err)
+		errors.PrintErrf("failed to read at exactly 1 answer: %s", err)
 		return
 	}
 

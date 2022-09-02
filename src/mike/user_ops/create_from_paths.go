@@ -29,7 +29,7 @@ func (c CreateFromPaths) Run(args ...string) (results zettel_checked_out.Set, er
 	var store store_with_lock.Store
 
 	if store, err = store_with_lock.New(c.Umwelt); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -88,7 +88,7 @@ func (c CreateFromPaths) Run(args ...string) (results zettel_checked_out.Set, er
 			if c.Delete {
 				//TODO move to checkout store
 				if err = os.Remove(cz.External.ZettelFD.Path); err != nil {
-					err = errors.Error(err)
+					err = errors.Wrap(err)
 					return
 				}
 
@@ -108,7 +108,7 @@ func (c CreateFromPaths) zettelsFromPath(store store_with_lock.Store, p string) 
 	errors.Print("running")
 
 	if r, err = c.Filter.Run(p); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -120,7 +120,7 @@ func (c CreateFromPaths) zettelsFromPath(store store_with_lock.Store, p string) 
 	}
 
 	if _, err = c.Format.ReadFrom(&ctx); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -131,7 +131,7 @@ func (c CreateFromPaths) zettelsFromPath(store store_with_lock.Store, p string) 
 			var z1 zettel.Zettel
 
 			if z1, err = errAkteInlineAndFilePath.Recover(); err != nil {
-				err = errors.Error(err)
+				err = errors.Wrap(err)
 				return
 			}
 
@@ -183,16 +183,16 @@ func (c CreateFromPaths) handleStoreError(z zettel_checked_out.Zettel, f string,
 		var p string
 
 		if p, err = lostError.AddToLostAndFound(c.Umwelt.DirZit("Verloren+Gefunden")); err != nil {
-			stdprinter.Error(err)
+			errors.PrintErr(err)
 			return
 		}
 
 		stdprinter.Outf("lost+found: %s: %s\n", lostError.Error(), p)
 
 	} else if errors.As(in, &normalError) {
-		stdprinter.Errf("%s\n", normalError.Error())
+		errors.PrintErrf("%s\n", normalError.Error())
 	} else {
 		err = errors.Errorf("writing zettel failed: %s: %s", f, in)
-		stdprinter.Error(err)
+		errors.PrintErr(err)
 	}
 }

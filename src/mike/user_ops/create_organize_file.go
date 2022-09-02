@@ -26,7 +26,7 @@ func (c CreateOrganizeFile) RunAndWrite(zettels zettel_transacted.Set, w io.Writ
 	defer errors.PanicIfError(w.Close)
 
 	if _, err = results.Text.WriteTo(w); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -37,14 +37,14 @@ func (c CreateOrganizeFile) Run(zettels zettel_transacted.Set) (results CreateOr
 	var store store_with_lock.Store
 
 	if store, err = store_with_lock.New(c.Umwelt); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	defer errors.PanicIfError(store.Flush)
 
 	if results.Text, err = organize_text.New(c.Options); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -91,7 +91,7 @@ func (c CreateOrganizeFile) getEtikettenFromArgs(args []string) (es etikett.Set,
 
 	for _, s := range args {
 		if err = es.AddString(s); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	}

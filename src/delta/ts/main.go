@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/sha"
 )
 
@@ -34,7 +33,7 @@ func (t *Time) Set(v string) (err error) {
 	var n int64
 
 	if n, err = strconv.ParseInt(v, 10, 64); err != nil {
-		err = errors.Wrapped(err, "failed to parse time: %s", v)
+		err = errors.Wrapf(err, "failed to parse time: %s", v)
 		return
 	}
 
@@ -56,7 +55,7 @@ func (t Time) Sha() sha.Sha {
 	sr := strings.NewReader(t.String())
 
 	if _, err := io.Copy(hash, sr); err != nil {
-		stdprinter.PanicIfError(err)
+		errors.PanicIfError(err)
 	}
 
 	return sha.FromHash(hash)

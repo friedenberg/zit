@@ -5,7 +5,6 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/zk_types"
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/delta/hinweis"
@@ -48,11 +47,11 @@ func (c CatAlfred) RunWithLockedStore(store store_with_lock.Store, args ...strin
 	var aw alfred.Writer
 
 	if aw, err = alfred.NewWriter(store.Out); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
-	defer stdprinter.PanicIfError(aw.Close)
+	defer errors.PanicIfError(aw.Close)
 
 	defer func() {
 		aw.WriteError(err)
@@ -63,7 +62,7 @@ func (c CatAlfred) RunWithLockedStore(store store_with_lock.Store, args ...strin
 		var ea []etikett.Etikett
 
 		if ea, err = store.StoreObjekten().Etiketten(); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -76,7 +75,7 @@ func (c CatAlfred) RunWithLockedStore(store store_with_lock.Store, args ...strin
 		var all map[hinweis.Hinweis]zettel_transacted.Zettel
 
 		if all, err = store.StoreObjekten().ZettelenSchwanzen(); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -91,7 +90,7 @@ func (c CatAlfred) RunWithLockedStore(store store_with_lock.Store, args ...strin
 		var all map[hinweis.Hinweis]zettel_transacted.Zettel
 
 		if all, err = store.StoreObjekten().ZettelenSchwanzen(); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 

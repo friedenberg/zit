@@ -96,7 +96,7 @@ func (a Set) Each(f func(Zettel) error) (err error) {
 			if errors.Is(err, io.EOF) {
 				err = nil
 			} else {
-				err = errors.Error(err)
+				err = errors.Wrap(err)
 			}
 
 			return

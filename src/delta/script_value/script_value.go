@@ -35,7 +35,7 @@ func (s *ScriptValue) Run(input string) (r io.Reader, err error) {
 			r = os.Stdin
 		} else {
 			if s.file, err = open_file_guard.Open(input); err != nil {
-				err = errors.Error(err)
+				err = errors.Wrap(err)
 				return
 			}
 

@@ -60,7 +60,7 @@ type textStateRead struct {
 func (s *textStateRead) Close() (err error) {
 	if s.akteWriter != nil {
 		if err = s.akteWriter.Close(); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -114,7 +114,7 @@ func (f Text) ReadFrom(c *FormatContextRead) (n int64, err error) {
 	}
 
 	if state.akteWriter, err = c.AkteWriter(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -130,7 +130,7 @@ func (f Text) ReadFrom(c *FormatContextRead) (n int64, err error) {
 		n += int64(len(line))
 
 		if err != nil && err != io.EOF {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -153,7 +153,7 @@ func (f Text) ReadFrom(c *FormatContextRead) (n int64, err error) {
 			if line == MetadateiBoundary {
 				state.field += 1
 			} else if err = f.readMetadateiLine(state, line); err != nil {
-				err = errors.Error(err)
+				err = errors.Wrap(err)
 				return
 			}
 
@@ -182,7 +182,7 @@ func (f Text) ReadFrom(c *FormatContextRead) (n int64, err error) {
 			n1, err = io.WriteString(state.akteWriter, fmt.Sprintln(line))
 
 			if err != nil {
-				err = errors.Error(err)
+				err = errors.Wrap(err)
 				break
 			}
 
@@ -202,14 +202,14 @@ func (f Text) ReadFrom(c *FormatContextRead) (n int64, err error) {
 		var f *os.File
 
 		if f, err = open_file_guard.Open(c.AktePath); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
 		defer open_file_guard.Close(f)
 
 		if _, err = io.Copy(state.akteWriter, f); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	}
@@ -263,7 +263,7 @@ func (f Text) readMetadateiLine(state *textStateRead, line string) (err error) {
 	}
 
 	if err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -283,7 +283,7 @@ func (f Text) readTyp(state *textStateRead, desc string) (err error) {
 		errors.Print("valid path", desc)
 
 		if err = state.context.Zettel.Typ.Set(tail); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -303,19 +303,19 @@ func (f Text) readTyp(state *textStateRead, desc string) (err error) {
 		//sha or ext
 		if shaError != nil {
 			if err = state.context.Zettel.Typ.Set(head); err != nil {
-				err = errors.Error(err)
+				err = errors.Wrap(err)
 				return
 			}
 		}
 	} else {
 		//sha.ext or error
 		if shaError != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
 		if err = state.context.Zettel.Typ.Set(tail); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	}

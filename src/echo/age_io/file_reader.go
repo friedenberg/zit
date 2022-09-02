@@ -12,12 +12,12 @@ func NewFileReader(o FileReadOptions) (r io.ReadCloser, err error) {
 	ar := objekteReader{}
 
 	if ar.file, err = open_file_guard.Open(o.Path); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if ar.Reader, err = NewReader(ReadOptions{Age: o.Age, Reader: ar.file}); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -43,12 +43,12 @@ func (ar objekteReader) Close() (err error) {
 	}
 
 	if err = ar.Reader.Close(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if err = open_file_guard.Close(ar.file); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

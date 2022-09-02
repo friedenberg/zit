@@ -40,12 +40,12 @@ func (h *HinweisWithIndex) Set(v string) (err error) {
 	}
 
 	if err = h.Hinweis.Set(vs[0]); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if h.Index, err = strconv.Atoi(vs[1]); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

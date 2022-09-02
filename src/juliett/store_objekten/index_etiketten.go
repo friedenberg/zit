@@ -7,7 +7,6 @@ import (
 	"sort"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/delta/etikett"
 )
 
@@ -46,15 +45,15 @@ func (i *indexEtiketten) Flush() (err error) {
 	var w1 io.WriteCloser
 
 	if w1, err = i.WriteCloserVerzeichnisse(i.path); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
-	defer stdprinter.PanicIfError(w1.Close)
+	defer errors.PanicIfError(w1.Close)
 
 	w := bufio.NewWriter(w1)
 
-	defer stdprinter.PanicIfError(w.Flush)
+	defer errors.PanicIfError(w.Flush)
 
 	enc := gob.NewEncoder(w)
 
@@ -65,7 +64,7 @@ func (i *indexEtiketten) Flush() (err error) {
 		}
 
 		if err = enc.Encode(row); err != nil {
-			err = errors.Wrapped(err, "failed to write row: %s", row)
+			err = errors.Wrapf(err, "failed to write row: %s", row)
 			return
 		}
 	}
@@ -86,7 +85,7 @@ func (i *indexEtiketten) readIfNecessary() (err error) {
 		if errors.IsNotExist(err) {
 			err = nil
 		} else {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 		}
 		return
 	}
@@ -105,7 +104,7 @@ func (i *indexEtiketten) readIfNecessary() (err error) {
 				err = nil
 				break
 			} else {
-				err = errors.Error(err)
+				err = errors.Wrap(err)
 				return
 			}
 		}
@@ -123,7 +122,7 @@ func (i *indexEtiketten) add(s etikett.Set) (err error) {
 	}
 
 	if err = i.readIfNecessary(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -148,7 +147,7 @@ func (i *indexEtiketten) del(s etikett.Set) (err error) {
 	}
 
 	if err = i.readIfNecessary(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -178,7 +177,7 @@ func (i *indexEtiketten) del(s etikett.Set) (err error) {
 
 func (i *indexEtiketten) allEtiketten() (es []etikett.Etikett, err error) {
 	if err = i.readIfNecessary(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

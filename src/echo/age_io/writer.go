@@ -29,7 +29,7 @@ func NewWriter(o WriteOptions) (w *writer, err error) {
 	w.wBuf = bufio.NewWriter(o.Writer)
 
 	if w.wAge, err = o.Age.Encrypt(o.Writer); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -52,18 +52,18 @@ func (w *writer) Write(p []byte) (n int, err error) {
 func (w *writer) Close() (err error) {
 	if w.wZip != nil {
 		if err = w.wZip.Close(); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	}
 
 	if err = w.wAge.Close(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if err = w.wBuf.Flush(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

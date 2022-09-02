@@ -34,7 +34,7 @@ func (c *FormatOrganize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	var f *os.File
 
 	if f, err = open_file_guard.Open(args[0]); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -47,7 +47,7 @@ func (c *FormatOrganize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	if ot, err = readOrganizeTextOp.Run(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -57,12 +57,12 @@ func (c *FormatOrganize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	if err = ot.Refine(refiner); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if _, err = ot.WriteTo(os.Stdout); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

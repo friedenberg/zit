@@ -30,7 +30,7 @@ func NewMover(o MoveOptions) (m *Mover, err error) {
 	}
 
 	if m.file, err = open_file_guard.TempFile(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -41,7 +41,7 @@ func NewMover(o MoveOptions) (m *Mover, err error) {
 	}
 
 	if m.Writer, err = NewWriter(wo); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -60,12 +60,12 @@ func (m *Mover) Close() (err error) {
 	}
 
 	if err = m.Writer.Close(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if err = open_file_guard.Close(m.file); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -79,7 +79,7 @@ func (m *Mover) Close() (err error) {
 		}
 
 		if m.objektePath, err = id.MakeDirIfNecessary(sha, m.basePath); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	}
@@ -100,13 +100,13 @@ func (m *Mover) Close() (err error) {
 	p := m.file.Name()
 
 	if err = os.Rename(p, m.objektePath); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if m.lockFile {
 		if err = files.SetDisallowUserChanges(m.objektePath); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	}

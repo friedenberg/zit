@@ -37,7 +37,7 @@ func OpenVimWithArgs(args []string, files ...string) (err error) {
 	}
 
 	if err = cmd.Run(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -55,7 +55,7 @@ func OpenFiles(p ...string) (err error) {
 	cmd := exec.Command("open", p...)
 
 	if err = cmd.Run(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

@@ -17,7 +17,7 @@ type akteMultiWriter struct {
 func (w akteMultiWriter) Close() (err error) {
 	for _, w1 := range w.writers {
 		if err = w1.Close(); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	}
@@ -55,7 +55,7 @@ func (s Store) AkteWriter() (w age_io.Writer, err error) {
 	}
 
 	if outer, err = age_io.NewMover(mo); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -89,7 +89,7 @@ func (s Store) AkteReader(sha sha.Sha) (r io.ReadCloser, err error) {
 	}
 
 	if r, err = age_io.NewFileReader(o); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

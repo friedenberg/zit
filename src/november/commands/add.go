@@ -49,7 +49,7 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	var zettelsFromAkteResults zettel_transacted.Set
 
 	if zettelsFromAkteResults, err = zettelsFromAkteOp.Run(args...); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -77,12 +77,12 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	var f *os.File
 
 	if f, err = open_file_guard.TempFileWithPattern("*.md"); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if createOrganizeFileResults, err = createOrganizeFileOp.RunAndWrite(zettelsFromAkteResults, f); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -93,7 +93,7 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	if _, err = openVimOp.Run(f.Name()); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -102,7 +102,7 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	readOrganizeTextOp := user_ops.ReadOrganizeFile{}
 
 	if ot2, err = readOrganizeTextOp.RunWithFile(f.Name()); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -111,7 +111,7 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	if _, err = commitOrganizeTextOp.Run(createOrganizeFileResults.Text, ot2); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

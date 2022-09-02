@@ -26,7 +26,7 @@ func (c ZettelFromExternalAkte) Run(args ...string) (results zettel_transacted.S
 	var store store_with_lock.Store
 
 	if store, err = store_with_lock.New(c.Umwelt); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -38,14 +38,14 @@ func (c ZettelFromExternalAkte) Run(args ...string) (results zettel_transacted.S
 		var z zettel.Zettel
 
 		if z, err = c.zettelForAkte(store, arg); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
 		var tz zettel_transacted.Zettel
 
 		if tz, err = store.StoreObjekten().Create(z); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -53,11 +53,11 @@ func (c ZettelFromExternalAkte) Run(args ...string) (results zettel_transacted.S
 
 		if c.Delete {
 			if err = os.Remove(arg); err != nil {
-				err = errors.Error(err)
+				err = errors.Wrap(err)
 				return
 			}
 
-			stdprinter.Errf("[%s] (deleted)\n", arg)
+			errors.PrintErrf("[%s] (deleted)\n", arg)
 		}
 
 		//TODO-P3,D3 only emit if created rather than refound
@@ -73,38 +73,38 @@ func (c ZettelFromExternalAkte) zettelForAkte(store store_with_lock.Store, akteP
 	var akteWriter age_io.Writer
 
 	if akteWriter, err = store.StoreObjekten().AkteWriter(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	var f *os.File
 
 	if f, err = open_file_guard.Open(aktePath); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	defer open_file_guard.Close(f)
 
 	if _, err = io.Copy(akteWriter, f); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if err = akteWriter.Close(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if err = z.Bezeichnung.Set(path.Base(aktePath)); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	z.Akte = akteWriter.Sha()
 
 	if err = z.Typ.Set(path.Ext(aktePath)); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

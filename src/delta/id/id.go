@@ -39,7 +39,7 @@ func MakeDirIfNecessary(i Id, pc ...string) (p string, err error) {
 	dir := path.Dir(p)
 
 	if err = os.MkdirAll(dir, os.ModeDir|0755); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

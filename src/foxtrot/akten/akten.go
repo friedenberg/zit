@@ -30,7 +30,7 @@ func (an *akten) All() (akte []sha.Sha, err error) {
 	var dirs []string
 
 	if dirs, err = open_file_guard.ReadDirNames(an.basePath); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -38,7 +38,7 @@ func (an *akten) All() (akte []sha.Sha, err error) {
 		var dirs2 []string
 
 		if dirs2, err = open_file_guard.ReadDirNames(path.Join(an.basePath, d)); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -46,7 +46,7 @@ func (an *akten) All() (akte []sha.Sha, err error) {
 			var s sha.Sha
 
 			if err = s.SetParts(d, a); err != nil {
-				err = errors.Error(err)
+				err = errors.Wrap(err)
 				return
 			}
 

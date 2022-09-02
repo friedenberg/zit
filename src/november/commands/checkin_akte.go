@@ -46,7 +46,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	var store store_with_lock.Store
 
 	if store, err = store_with_lock.New(u); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -65,7 +65,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		ap := args[(i*2)+1]
 
 		if p.Hinweis, err = hinweis.Make(hs); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -79,7 +79,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	// iterate through pairs and read current zettel
 	for i, p := range pairs {
 		if zettels[i], err = store.StoreObjekten().Read(p.Hinweis); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	}
@@ -89,31 +89,31 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		var ow age_io.Writer
 
 		if ow, err = store.StoreObjekten().AkteWriter(); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
 		var f *os.File
 
 		if f, err = open_file_guard.Open(p.path); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
 		defer open_file_guard.Close(f)
 
 		if _, err = io.Copy(ow, f); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
 		if err = ow.Close(); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
 		if zettels[i], err = store.StoreObjekten().Read(p.Hinweis); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -126,7 +126,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	for _, z := range zettels {
 		if z, err = store.StoreObjekten().Update(z.Named.Hinweis, z.Named.Stored.Zettel); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 

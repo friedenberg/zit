@@ -30,7 +30,7 @@ func (c Reindex) RunWithLockedStore(store store_with_lock.Store, args ...string)
 	errors.Print()
 
 	if err = store.StoreObjekten().Reindex(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

@@ -31,13 +31,13 @@ func (c Checkout) RunManyHinweisen(
 		h := hins[i]
 
 		if zs[i], err = s.StoreObjekten().Read(h); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	}
 
 	if results.Zettelen, err = s.StoreWorkingDirectory().Checkout(c.CheckoutOptions, zs...); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

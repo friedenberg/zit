@@ -27,7 +27,7 @@ func (r *Reader) ReadFrom(r1 io.Reader) (n int64, err error) {
 		n += int64(len(line))
 
 		if err != nil && err != io.EOF {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -41,7 +41,7 @@ func (r *Reader) ReadFrom(r1 io.Reader) (n int64, err error) {
 		switch r.readState.lineNo {
 		case 0:
 			if err = r.Transaktion.Time.Set(line); err != nil {
-				err = errors.Wrapped(err, "failed to read time: %s", line)
+				err = errors.Wrapf(err, "failed to read time: %s", line)
 				return
 			}
 
@@ -49,7 +49,7 @@ func (r *Reader) ReadFrom(r1 io.Reader) (n int64, err error) {
 			var o Objekte
 
 			if err = o.Set(line); err != nil {
-				err = errors.Wrapped(err, "failed to read line: %s", line)
+				err = errors.Wrapf(err, "failed to read line: %s", line)
 				return
 			}
 

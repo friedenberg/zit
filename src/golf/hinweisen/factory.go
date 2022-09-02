@@ -38,17 +38,17 @@ func newFactory(basePath string) (f *factory, err error) {
 	}
 
 	if f.yin, err = newProvider(providerPathYin); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if f.yang, err = newProvider(providerPathYang); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if err = f.Refresh(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -105,7 +105,7 @@ func (hf *factory) Make() (h hinweis.Hinweis, err error) {
 
 	errors.Printf("next kennung: %d", newInt)
 	if h, err = hinweis.New(newInt, hf.yin, hf.yang); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

@@ -17,7 +17,7 @@ func (c GetZettelsFromQuery) Run(query zettel_named.NamedFilter) (result zettel_
 	var store store_with_lock.Store
 
 	if store, err = store_with_lock.New(c.Umwelt); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -26,7 +26,7 @@ func (c GetZettelsFromQuery) Run(query zettel_named.NamedFilter) (result zettel_
 	var set map[hinweis.Hinweis]zettel_transacted.Zettel
 
 	if set, err = store.StoreObjekten().ZettelenSchwanzen(query); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

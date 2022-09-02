@@ -124,7 +124,7 @@ func (a *assignment) consume(b *assignment) (err error) {
 	for _, c := range b.children {
 		errors.Print(c)
 		if err = c.removeFromParent(); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -143,7 +143,7 @@ func (a *assignment) consume(b *assignment) (err error) {
 	}
 
 	if err = b.removeFromParent(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -161,7 +161,7 @@ func (a *assignment) expandedEtiketten() (es etikett.Set, err error) {
 			var pe etikett.Set
 
 			if pe, err = a.parent.expandedEtiketten(); err != nil {
-				err = errors.Error(err)
+				err = errors.Wrap(err)
 				return
 			}
 

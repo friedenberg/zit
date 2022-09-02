@@ -20,12 +20,12 @@ func ChangesFrom(a1, b1 organize_text.Text) (c Changes, err error) {
 	var a, b organize_text.CompareMap
 
 	if a, err = a1.ToCompareMap(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if b, err = b1.ToCompareMap(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

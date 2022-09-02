@@ -18,14 +18,14 @@ func (c commandWithLockedStore) Run(u *umwelt.Umwelt, args ...string) (err error
 	var store store_with_lock.Store
 
 	if store, err = store_with_lock.New(u); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	defer errors.PanicIfError(store.Flush)
 
 	if err = c.RunWithLockedStore(store, args...); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

@@ -37,7 +37,7 @@ func LoadKonfig(p string) (c Konfig, err error) {
 			return
 		}
 
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

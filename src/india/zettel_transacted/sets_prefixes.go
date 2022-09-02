@@ -51,7 +51,7 @@ func (a SetPrefixTransacted) Each(f func(etikett.Etikett, Set) error) (err error
 			if errors.Is(err, io.EOF) {
 				err = nil
 			} else {
-				err = errors.Error(err)
+				err = errors.Wrap(err)
 			}
 
 			return

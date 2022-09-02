@@ -35,7 +35,7 @@ func (c Log) RunWithHinweisen(os store_with_lock.Store, hs ...hinweis.Hinweis) (
 		return
 
 	default:
-		stdprinter.Errf("ignoring extra arguments: %q\n", hs[1:])
+		errors.PrintErrf("ignoring extra arguments: %q\n", hs[1:])
 
 		fallthrough
 
@@ -47,14 +47,14 @@ func (c Log) RunWithHinweisen(os store_with_lock.Store, hs ...hinweis.Hinweis) (
 	errors.Print()
 
 	if chain, err = os.StoreObjekten().AllInChain(h); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	var b []byte
 
 	if b, err = json.Marshal(chain); err != nil {
-		err = errors.Wrapped(err, "failed to marshal json")
+		err = errors.Wrapf(err, "failed to marshal json")
 		return
 	}
 

@@ -62,7 +62,7 @@ func (c Show) showZettels(store store_with_lock.Store, ids []id_set.Set) (err er
 		ok := false
 
 		if idd, ok = is.AnyShaOrHinweis(); !ok {
-			stdprinter.Errf("unsupported id: %s", is)
+			errors.PrintErrf("unsupported id: %s", is)
 			err = nil
 			continue
 		}
@@ -73,7 +73,7 @@ func (c Show) showZettels(store store_with_lock.Store, ids []id_set.Set) (err er
 			if errors.Is(err, store_objekten.ErrNotFound{}) {
 				err = errors.Normal(err)
 			} else {
-				err = errors.Error(err)
+				err = errors.Wrap(err)
 			}
 
 			return
@@ -99,7 +99,7 @@ func (c Show) showZettels(store store_with_lock.Store, ids []id_set.Set) (err er
 		ctx.Zettel = named.Named.Stored.Zettel
 
 		if _, err = f.WriteTo(ctx); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	}
@@ -115,7 +115,7 @@ func (c Show) showAkten(store store_with_lock.Store, ids []id_set.Set) (err erro
 		ok := false
 
 		if idd, ok = is.AnyShaOrHinweis(); !ok {
-			stdprinter.Errf("unsupported id: %s", is)
+			errors.PrintErrf("unsupported id: %s", is)
 			err = nil
 			continue
 		}
@@ -123,7 +123,7 @@ func (c Show) showAkten(store store_with_lock.Store, ids []id_set.Set) (err erro
 		var tz zettel_transacted.Zettel
 
 		if tz, err = store.StoreObjekten().Read(idd); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -134,7 +134,7 @@ func (c Show) showAkten(store store_with_lock.Store, ids []id_set.Set) (err erro
 
 	for _, named := range zettels {
 		if ar, err = store.StoreObjekten().AkteReader(named.Named.Stored.Zettel.Akte); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -143,10 +143,10 @@ func (c Show) showAkten(store store_with_lock.Store, ids []id_set.Set) (err erro
 			return
 		}
 
-		defer stdprinter.PanicIfError(ar.Close)
+		defer errors.PanicIfError(ar.Close)
 
 		if _, err = io.Copy(store.Out, ar); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	}
@@ -160,7 +160,7 @@ func (c Show) showTransaktions(store store_with_lock.Store, ids []id_set.Set) (e
 		ok := false
 
 		if idd, ok = is.Any(&ts.Time{}); !ok {
-			stdprinter.Errf("unsupported id: %s", is)
+			errors.PrintErrf("unsupported id: %s", is)
 			err = nil
 			continue
 		}
@@ -170,7 +170,7 @@ func (c Show) showTransaktions(store store_with_lock.Store, ids []id_set.Set) (e
 		var t transaktion.Transaktion
 
 		if t, err = store.StoreObjekten().ReadTransaktion(tid); err != nil {
-			stdprinter.Errf("%s\n", err)
+			errors.PrintErrf("%s\n", err)
 			continue
 		}
 

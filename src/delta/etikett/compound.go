@@ -28,7 +28,7 @@ func (c *Compound) Set(v string) (err error) {
 
 	for i, e := range *c {
 		if err = e.Set(es[i]); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	}

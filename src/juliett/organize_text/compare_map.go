@@ -34,7 +34,7 @@ func (in *organizeText) ToCompareMap() (out CompareMap, err error) {
 	}
 
 	if err = in.assignment.addToCompareMap(etikett.NewSet(), &out); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -47,7 +47,7 @@ func (a *assignment) addToCompareMap(es *etikett.Set, out *CompareMap) (err erro
 	var es1 etikett.Set
 
 	if es1, err = a.expandedEtiketten(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -68,7 +68,7 @@ func (a *assignment) addToCompareMap(es *etikett.Set, out *CompareMap) (err erro
 
 	for _, c := range a.children {
 		if err = c.addToCompareMap(es, out); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	}

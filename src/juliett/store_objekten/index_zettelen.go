@@ -8,7 +8,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/typ"
-	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/echo/umwelt"
@@ -56,15 +55,15 @@ func (i *indexZettelen) Flush() (err error) {
 	var w1 io.WriteCloser
 
 	if w1, err = i.WriteCloserVerzeichnisse(i.path); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
-	defer stdprinter.PanicIfError(w1.Close)
+	defer errors.PanicIfError(w1.Close)
 
 	w := bufio.NewWriter(w1)
 
-	defer stdprinter.PanicIfError(w.Flush)
+	defer errors.PanicIfError(w.Flush)
 
 	enc := gob.NewEncoder(w)
 
@@ -72,7 +71,7 @@ func (i *indexZettelen) Flush() (err error) {
 		err = st.Each(
 			func(tz zettel_transacted.Zettel) (err error) {
 				if err = enc.Encode(tz); err != nil {
-					err = errors.Wrapped(err, "failed to write zettel: [%s %s]", tz.Named.Hinweis, tz.Named.Stored.Sha)
+					err = errors.Wrapf(err, "failed to write zettel: [%s %s]", tz.Named.Hinweis, tz.Named.Stored.Sha)
 					return
 				}
 
@@ -81,7 +80,7 @@ func (i *indexZettelen) Flush() (err error) {
 		)
 
 		if err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	}
@@ -102,7 +101,7 @@ func (i *indexZettelen) readIfNecessary() (err error) {
 		if errors.IsNotExist(err) {
 			err = nil
 		} else {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 		}
 		return
 	}
@@ -121,7 +120,7 @@ func (i *indexZettelen) readIfNecessary() (err error) {
 				err = nil
 				break
 			} else {
-				err = errors.Error(err)
+				err = errors.Wrap(err)
 				return
 			}
 		}
@@ -202,7 +201,7 @@ func (i *indexZettelen) addNoRead(tz zettel_transacted.Zettel) {
 
 func (i *indexZettelen) add(tz zettel_transacted.Zettel) (err error) {
 	if err = i.readIfNecessary(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -215,7 +214,7 @@ func (i *indexZettelen) add(tz zettel_transacted.Zettel) (err error) {
 
 func (i *indexZettelen) ReadHinweis(h hinweis.Hinweis) (mst zettel_transacted.Set, err error) {
 	if err = i.readIfNecessary(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -231,7 +230,7 @@ func (i *indexZettelen) ReadHinweis(h hinweis.Hinweis) (mst zettel_transacted.Se
 
 func (i *indexZettelen) ReadBezeichnung(s string) (tzs zettel_transacted.Set, err error) {
 	if err = i.readIfNecessary(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -247,7 +246,7 @@ func (i *indexZettelen) ReadBezeichnung(s string) (tzs zettel_transacted.Set, er
 
 func (i *indexZettelen) ReadAkteSha(s sha.Sha) (tzs zettel_transacted.Set, err error) {
 	if err = i.readIfNecessary(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -263,7 +262,7 @@ func (i *indexZettelen) ReadAkteSha(s sha.Sha) (tzs zettel_transacted.Set, err e
 
 func (i *indexZettelen) ReadZettelSha(s sha.Sha) (tz zettel_transacted.Set, err error) {
 	if err = i.readIfNecessary(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -279,7 +278,7 @@ func (i *indexZettelen) ReadZettelSha(s sha.Sha) (tz zettel_transacted.Set, err 
 
 func (i *indexZettelen) ReadTyp(t typ.Typ) (tzs zettel_transacted.Set, err error) {
 	if err = i.readIfNecessary(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

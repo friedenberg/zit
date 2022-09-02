@@ -34,13 +34,13 @@ func (c Clean) RunWithLockedStore(
 	args ...string,
 ) (err error) {
 	if len(args) > 0 {
-		stdprinter.Errf("args provided will be ignored")
+		errors.PrintErrf("args provided will be ignored")
 	}
 
 	var possible store_working_directory.CwdFiles
 
 	if possible, err = user_ops.NewGetPossibleZettels(s.Umwelt).Run(s); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -56,7 +56,7 @@ func (c Clean) RunWithLockedStore(
 	}
 
 	if readResults, err = readOp.RunMany(s, possible); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -96,7 +96,7 @@ func (c Clean) RunWithLockedStore(
 	}
 
 	if err = open_file_guard.DeleteFilesAndDirs(filesToDelete...); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

@@ -26,7 +26,7 @@ func NewReader(o ReadOptions) (r *reader, err error) {
 	r = &reader{}
 
 	if r.rAge, err = o.Age.Decrypt(o.Reader); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -34,7 +34,7 @@ func NewReader(o ReadOptions) (r *reader, err error) {
 
 	if o.UseZip {
 		if r.rZip, err = gzip.NewReader(r.rAge); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -56,7 +56,7 @@ func (r *reader) Close() (err error) {
 	}
 
 	if err = r.rZip.Close(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

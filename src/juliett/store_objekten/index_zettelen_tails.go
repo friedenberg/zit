@@ -6,7 +6,6 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/echo/umwelt"
@@ -47,22 +46,22 @@ func (i *indexZettelenTails) Flush() (err error) {
 	var w1 io.WriteCloser
 
 	if w1, err = i.WriteCloserVerzeichnisse(i.path); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
-	defer stdprinter.PanicIfError(w1.Close)
+	defer errors.PanicIfError(w1.Close)
 
 	w := bufio.NewWriter(w1)
 
-	defer stdprinter.PanicIfError(w.Flush)
+	defer errors.PanicIfError(w.Flush)
 
 	enc := gob.NewEncoder(w)
 
 	err = i.zettelen.Each(
 		func(tz zettel_transacted.Zettel) (err error) {
 			if err = enc.Encode(tz); err != nil {
-				err = errors.Wrapped(err, "failed to write zettel: %s", tz.Named)
+				err = errors.Wrapf(err, "failed to write zettel: %s", tz.Named)
 				return
 			}
 
@@ -71,7 +70,7 @@ func (i *indexZettelenTails) Flush() (err error) {
 	)
 
 	if err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -91,7 +90,7 @@ func (i *indexZettelenTails) readIfNecessary() (err error) {
 		if errors.IsNotExist(err) {
 			err = nil
 		} else {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 		}
 		return
 	}
@@ -110,7 +109,7 @@ func (i *indexZettelenTails) readIfNecessary() (err error) {
 				err = nil
 				break
 			} else {
-				err = errors.Error(err)
+				err = errors.Wrap(err)
 				return
 			}
 		}
@@ -123,7 +122,7 @@ func (i *indexZettelenTails) readIfNecessary() (err error) {
 
 func (i *indexZettelenTails) add(tz zettel_transacted.Zettel) (err error) {
 	if err = i.readIfNecessary(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -136,7 +135,7 @@ func (i *indexZettelenTails) add(tz zettel_transacted.Zettel) (err error) {
 
 func (i *indexZettelenTails) Read(h hinweis.Hinweis) (tz zettel_transacted.Zettel, err error) {
 	if err = i.readIfNecessary(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -154,7 +153,7 @@ func (i *indexZettelenTails) ZettelenSchwanzen(
 	qs ...zettel_named.NamedFilter,
 ) (tzs map[hinweis.Hinweis]zettel_transacted.Zettel, err error) {
 	if err = i.readIfNecessary(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -179,7 +178,7 @@ func (i *indexZettelenTails) ZettelenSchwanzen(
 	)
 
 	if err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

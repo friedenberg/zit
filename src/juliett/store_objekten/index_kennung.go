@@ -9,7 +9,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/kennung"
-	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/golf/hinweisen"
@@ -64,20 +63,20 @@ func (i *indexKennung) Flush() (err error) {
 	var w1 io.WriteCloser
 
 	if w1, err = i.WriteCloserVerzeichnisse(i.path); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
-	defer stdprinter.PanicIfError(w1.Close)
+	defer errors.PanicIfError(w1.Close)
 
 	w := bufio.NewWriter(w1)
 
-	defer stdprinter.PanicIfError(w.Flush)
+	defer errors.PanicIfError(w.Flush)
 
 	enc := gob.NewEncoder(w)
 
 	if err = enc.Encode(i.encodedKennung); err != nil {
-		err = errors.Wrapped(err, "failed to write encoded kennung")
+		err = errors.Wrapf(err, "failed to write encoded kennung")
 		return
 	}
 
@@ -102,7 +101,7 @@ func (i *indexKennung) readIfNecessary() (err error) {
 		if errors.IsNotExist(err) {
 			err = nil
 		} else {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 		}
 
 		return
@@ -115,7 +114,7 @@ func (i *indexKennung) readIfNecessary() (err error) {
 	dec := gob.NewDecoder(r)
 
 	if err = dec.Decode(&i.encodedKennung); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -161,19 +160,19 @@ func (i *indexKennung) reset() (err error) {
 
 func (i *indexKennung) addHinweis(h hinweis.Hinweis) (err error) {
 	if err = i.readIfNecessary(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	var left, right int
 
 	if left, err = i.oldHinweisenStore.Factory().Left().Kennung(h.Kopf()); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if right, err = i.oldHinweisenStore.Factory().Right().Kennung(h.Schwanz()); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -196,7 +195,7 @@ func (i *indexKennung) addHinweis(h hinweis.Hinweis) (err error) {
 
 func (i *indexKennung) createHinweis() (h hinweis.Hinweis, err error) {
 	if err = i.readIfNecessary(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -253,7 +252,7 @@ func (i *indexKennung) makeHinweisButDontStore(j int) (h hinweis.Hinweis, err er
 	)
 
 	if err != nil {
-		err = errors.Wrapped(err, "trying to make hinweis for %s", k)
+		err = errors.Wrapf(err, "trying to make hinweis for %s", k)
 		return
 	}
 
@@ -262,7 +261,7 @@ func (i *indexKennung) makeHinweisButDontStore(j int) (h hinweis.Hinweis, err er
 
 func (i *indexKennung) PeekHinweisen(m int) (hs []hinweis.Hinweis, err error) {
 	if err = i.readIfNecessary(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -280,7 +279,7 @@ func (i *indexKennung) PeekHinweisen(m int) (hs []hinweis.Hinweis, err error) {
 		var h hinweis.Hinweis
 
 		if h, err = i.makeHinweisButDontStore(n); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 

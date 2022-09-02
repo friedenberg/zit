@@ -46,7 +46,7 @@ func (c Edit) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	var hins []hinweis.Hinweis
 
 	if hins, err = (user_ops.GetHinweisenFromArgs{}).RunMany(args...); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -55,22 +55,22 @@ func (c Edit) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	var s store_with_lock.Store
 
 	if s, err = store_with_lock.New(u); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if checkoutResults, err = checkoutOp.RunManyHinweisen(s, hins...); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if err = s.Flush(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if err = (user_ops.OpenFiles{}).Run(checkoutResults.FilesAkten...); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -83,7 +83,7 @@ func (c Edit) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	if _, err = openVimOp.Run(checkoutResults.FilesZettelen...); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -97,7 +97,7 @@ func (c Edit) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	if s, err = store_with_lock.New(u); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -108,7 +108,7 @@ func (c Edit) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	if readResults, err = readOp.RunMany(s, possible); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -126,12 +126,12 @@ func (c Edit) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	if _, err = checkinOp.Run(s, zettels...); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if err = s.Flush(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

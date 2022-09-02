@@ -26,7 +26,7 @@ func (s Store) GetPossibleZettels() (result CwdFiles, err error) {
 	var dirs []string
 
 	if dirs, err = open_file_guard.ReadDirNames(s.path); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -40,7 +40,7 @@ func (s Store) GetPossibleZettels() (result CwdFiles, err error) {
 		var fi os.FileInfo
 
 		if fi, err = os.Stat(d); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -51,7 +51,7 @@ func (s Store) GetPossibleZettels() (result CwdFiles, err error) {
 		var dirs2 []string
 
 		if dirs2, err = open_file_guard.ReadDirNames(d2); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -65,7 +65,7 @@ func (s Store) GetPossibleZettels() (result CwdFiles, err error) {
 			}
 
 			if fi, err = os.Stat(path.Join(s.path, d, a)); err != nil {
-				err = errors.Error(err)
+				err = errors.Wrap(err)
 				return
 			}
 

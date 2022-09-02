@@ -74,10 +74,10 @@ func Run(args []string) (exitStatus int) {
 		}
 
 		if errors.As(err, &normalError) {
-			stdprinter.Errf("%s\n", normalError.Error())
+			errors.PrintErrf("%s\n", normalError.Error())
 		} else {
 			if err != nil {
-				stdprinter.Error(err)
+				errors.PrintErr(err)
 			}
 		}
 	}()
@@ -85,7 +85,7 @@ func Run(args []string) (exitStatus int) {
 	var cmd command
 
 	if err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -113,7 +113,7 @@ func Run(args []string) (exitStatus int) {
 	konfigCli.AddToFlags(cmd.FlagSet)
 
 	if err = cmd.FlagSet.Parse(args); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -125,14 +125,14 @@ func Run(args []string) (exitStatus int) {
 	var k konfig.Konfig
 
 	if k, err = konfigCli.Konfig(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	var u *umwelt.Umwelt
 
 	if u, err = umwelt.MakeUmwelt(k); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -140,13 +140,13 @@ func Run(args []string) (exitStatus int) {
 
 	if t, ok := cmd.Command.(CommandWithArgPreprocessor); ok {
 		if cmdArgs, err = t.PreprocessArgs(u, cmdArgs); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	}
 
 	if err = cmd.Command.Run(u, cmdArgs...); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

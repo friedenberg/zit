@@ -30,7 +30,7 @@ func (v *Value) SetString(s string) (err error) {
 	sr := strings.NewReader(s)
 
 	if _, err = io.Copy(hash, sr); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

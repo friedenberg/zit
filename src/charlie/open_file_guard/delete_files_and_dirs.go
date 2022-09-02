@@ -12,7 +12,7 @@ func DeleteFilesAndDirs(args ...string) (err error) {
 
 	for _, f := range args {
 		if err = os.Remove(f); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -24,7 +24,7 @@ func DeleteFilesAndDirs(args ...string) (err error) {
 		var abs string
 
 		if abs, err = filepath.Abs(f); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -35,13 +35,13 @@ func DeleteFilesAndDirs(args ...string) (err error) {
 		var contents []string
 
 		if contents, err = ReadDirNames(d); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
 		if len(contents) == 0 {
 			if err = os.Remove(d); err != nil {
-				err = errors.Error(err)
+				err = errors.Wrap(err)
 				return
 			}
 		}

@@ -9,7 +9,6 @@ import (
 	"path"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
 	"github.com/friedenberg/zit/src/delta/age"
 	"github.com/friedenberg/zit/src/echo/umwelt"
@@ -59,7 +58,7 @@ func (c Init) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	if !c.DisableAge {
 		if _, err = age.Generate(u.FileAge()); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	}
@@ -67,26 +66,26 @@ func (c Init) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	c.writeFile(u.DirZit("Konfig"), "")
 
 	if err = c.populateYinIfNecessary(u); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if err = c.populateYangIfNecessary(u); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	var store store_with_lock.Store
 
 	if store, err = store_with_lock.New(u); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	defer errors.PanicIfError(store.Flush)
 
 	if err = store.StoreObjekten().Reindex(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -118,23 +117,23 @@ func (c Init) readAndTransferLines(in, out string) (err error) {
 	var fi, fo *os.File
 
 	if fi, err = open_file_guard.Open(in); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
-	defer stdprinter.PanicIfError(fi.Close)
+	defer errors.PanicIfError(fi.Close)
 
 	if fo, err = open_file_guard.Create(out); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
-	defer stdprinter.PanicIfError(fo.Close)
+	defer errors.PanicIfError(fo.Close)
 
 	r := bufio.NewReader(fi)
 	w := bufio.NewWriter(fo)
 
-	defer stdprinter.PanicIfError(w.Flush)
+	defer errors.PanicIfError(w.Flush)
 
 	for {
 		var l string
@@ -146,7 +145,7 @@ func (c Init) readAndTransferLines(in, out string) (err error) {
 		}
 
 		if err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -159,10 +158,10 @@ func (c Init) readAndTransferLines(in, out string) (err error) {
 
 func (c Init) mkdirAll(elements ...string) {
 	err := os.MkdirAll(path.Join(elements...), os.ModeDir|0755)
-	stdprinter.PanicIfError(err)
+	errors.PanicIfError(err)
 }
 
 func (c Init) writeFile(path, contents string) {
 	err := ioutil.WriteFile(path, []byte(contents), 0755)
-	stdprinter.PanicIfError(err)
+	errors.PanicIfError(err)
 }

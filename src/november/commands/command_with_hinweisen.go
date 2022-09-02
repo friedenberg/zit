@@ -22,7 +22,7 @@ func (c commandWithHinweisen) RunWithLockedStore(
 	var hins []hinweis.Hinweis
 
 	if hins, err = (user_ops.GetHinweisenFromArgs{}).RunMany(args...); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

@@ -83,7 +83,7 @@ func (ar *assignmentLineReader) ReadFrom(r1 io.Reader) (n int64, err error) {
 		}
 
 		if err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -146,7 +146,7 @@ func (ar *assignmentLineReader) readOneHeading(l line) (err error) {
 	// logz.Print("getting depth count")
 
 	if depth, err = l.Depth('#'); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -202,7 +202,7 @@ func (ar *assignmentLineReader) readOneHeadingLesserDepth(
 	depthDiff := d - ar.currentAssignment.Depth()
 
 	if newCurrent, err = ar.currentAssignment.nthParent(depthDiff - 1); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -240,7 +240,7 @@ func (ar *assignmentLineReader) readOneHeadingEqualDepth(
 	// logz.Print("depth count is ==")
 
 	if newCurrent, err = ar.currentAssignment.nthParent(1); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

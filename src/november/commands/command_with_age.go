@@ -18,12 +18,12 @@ func (c commandWithAge) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	var age age.Age
 
 	if age, err = u.Age(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if err = c.RunWithAge(u, age, args...); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

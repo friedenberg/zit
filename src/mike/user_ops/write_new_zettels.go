@@ -27,7 +27,7 @@ func (c WriteNewZettels) RunMany(
 		var cz zettel_checked_out.Zettel
 
 		if cz, err = c.RunOne(store, z); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -44,12 +44,12 @@ func (c WriteNewZettels) RunOne(
 	var tz zettel_transacted.Zettel
 
 	if tz, err = store.StoreObjekten().Create(z); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if result, err = store.StoreWorkingDirectory().CheckoutOne(c.CheckoutOptions, tz); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

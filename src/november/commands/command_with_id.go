@@ -28,7 +28,7 @@ func (c commandWithId) RunWithLockedStore(store store_with_lock.Store, args ...s
 	ids := ps.MakeMany(args...)
 
 	if err = c.RunWithId(store, ids...); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

@@ -29,13 +29,13 @@ func init() {
 
 func (c Status) RunWithLockedStore(s store_with_lock.Store, args ...string) (err error) {
 	if len(args) > 0 {
-		stdprinter.Errf("args provided will be ignored")
+		errors.PrintErrf("args provided will be ignored")
 	}
 
 	var possible store_working_directory.CwdFiles
 
 	if possible, err = user_ops.NewGetPossibleZettels(s.Umwelt).Run(s); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -51,7 +51,7 @@ func (c Status) RunWithLockedStore(s store_with_lock.Store, args ...string) (err
 	}
 
 	if readResults, err = readOp.RunMany(s, possible); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

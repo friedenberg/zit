@@ -50,7 +50,7 @@ func (c Checkout) RunWithHinweisen(s store_with_lock.Store, hins ...hinweis.Hinw
 
 	if readResults, err = readOp.RunMany(s, pz); err != nil {
 		errors.Print(err)
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -71,13 +71,13 @@ func (c Checkout) RunWithHinweisen(s store_with_lock.Store, hins ...hinweis.Hinw
 		if c.Force || cz.State == zettel_checked_out.StateEmpty {
 			toCheckOut = append(toCheckOut, cz.Internal.Named.Hinweis)
 		} else if cz.State == zettel_checked_out.StateExistsAndSame {
-			stdprinter.Errf("%s (already checked out)\n", cz.Internal.Named)
+			errors.PrintErrf("%s (already checked out)\n", cz.Internal.Named)
 			continue
 		} else if cz.State == zettel_checked_out.StateExistsAndDifferent {
-			stdprinter.Errf("%s (external has changes)\n", cz.Internal.Named)
+			errors.PrintErrf("%s (external has changes)\n", cz.Internal.Named)
 			continue
 		} else {
-			stdprinter.Errf("%s (unknown state)\n", cz.Internal.Named)
+			errors.PrintErrf("%s (unknown state)\n", cz.Internal.Named)
 			continue
 		}
 	}
@@ -91,7 +91,7 @@ func (c Checkout) RunWithHinweisen(s store_with_lock.Store, hins ...hinweis.Hinw
 	}
 
 	if _, err = checkoutOp.RunManyHinweisen(s, toCheckOut...); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

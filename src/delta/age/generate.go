@@ -12,12 +12,12 @@ func Generate(basePath string) (a *ages, err error) {
 	var i *X25519Identity
 
 	if i, err = age.GenerateX25519Identity(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if err = ioutil.WriteFile(path.Join(basePath), []byte(i.String()), 0755); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

@@ -4,7 +4,6 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/zk_types"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/lima/store_with_lock"
@@ -36,18 +35,18 @@ func (c Revert) RunWithLockedStore(store store_with_lock.Store, args ...string) 
 
 		for i, arg := range args {
 			if hins[i], err = hinweis.Make(arg); err != nil {
-				err = errors.Error(err)
+				err = errors.Wrap(err)
 				return
 			}
 
 			if _, err = store.StoreObjekten().Revert(hins[i]); err != nil {
-				err = errors.Error(err)
+				err = errors.Wrap(err)
 				return
 			}
 		}
 
 	default:
-		stdprinter.Errf("objekte type %s does not support reverts currently\n", c.Type)
+		errors.PrintErrf("objekte type %s does not support reverts currently\n", c.Type)
 	}
 
 	return

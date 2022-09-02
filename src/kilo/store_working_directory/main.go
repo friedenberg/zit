@@ -55,12 +55,12 @@ func New(k Konfig, p string, storeObjekten StoreZettel) (s *Store, err error) {
 	s.lock = file_lock.New(path.Join(p, ".ZitCheckoutStoreLock"))
 
 	if err = s.lock.Lock(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if s.cwd, err = os.Getwd(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -77,7 +77,7 @@ func (s Store) flushToTemp() (tfp string, err error) {
 	var f *os.File
 
 	if f, err = open_file_guard.TempFile(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -102,19 +102,19 @@ func (s Store) Flush() (err error) {
 		var tfp string
 
 		if tfp, err = s.flushToTemp(); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
 		errors.Printf("renaming %s to %s", tfp, s.IndexFilePath())
 		if err = os.Rename(tfp, s.IndexFilePath()); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	}
 
 	if err = s.lock.Unlock(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -129,13 +129,13 @@ func (s *Store) ReadAll() (err error) {
 	var possible CwdFiles
 
 	if possible, err = s.GetPossibleZettels(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	for _, p := range possible.Zettelen {
 		if err = s.syncOne(p); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	}
@@ -153,7 +153,7 @@ func (s *Store) syncOne(p string) (err error) {
 
 	if fi, err = os.Stat(p); err != nil {
 		if !os.IsNotExist(err) {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	} else {
@@ -176,12 +176,12 @@ func (s *Store) syncOne(p string) (err error) {
 			var ez zettel_external.Zettel
 
 			if ez, err = s.MakeExternalZettelFromZettel(p); err != nil {
-				err = errors.Error(err)
+				err = errors.Wrap(err)
 				return
 			}
 
 			if err = s.readZettelFromFile(&ez); err != nil {
-				err = errors.Error(err)
+				err = errors.Wrap(err)
 				return
 			}
 
@@ -199,12 +199,12 @@ func (s *Store) syncOne(p string) (err error) {
 
 func (s Store) MakeExternalZettelFromZettel(p string) (ez zettel_external.Zettel, err error) {
 	if p, err = filepath.Abs(p); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
 	if p, err = filepath.Rel(s.path, p); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -213,7 +213,7 @@ func (s Store) MakeExternalZettelFromZettel(p string) (ez zettel_external.Zettel
 	head, tail := id.HeadTailFromFileName(p)
 
 	if ez.Named.Hinweis, err = hinweis.Make(head + "/" + tail); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -243,7 +243,7 @@ func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 	var f *os.File
 
 	if f, err = open_file_guard.Open(ez.ZettelFD.Path); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -252,12 +252,12 @@ func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 	c.In = f
 
 	if _, err = s.format.ReadFrom(&c); err != nil {
-		err = errors.Wrapped(err, "%s", f.Name())
+		err = errors.Wrapf(err, "%s", f.Name())
 		return
 	}
 
 	if ez.Named.Stored.Sha, err = s.storeObjekten.WriteZettelObjekte(c.Zettel); err != nil {
-		err = errors.Wrapped(err, "%s", f.Name())
+		err = errors.Wrapf(err, "%s", f.Name())
 		return
 	}
 
@@ -269,13 +269,13 @@ func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 
 func (s *Store) Read(p string) (cz zettel_checked_out.Zettel, err error) {
 	if cz.External, err = s.MakeExternalZettelFromZettel(p); err != nil {
-		err = errors.Wrapped(err, "%s", p)
+		err = errors.Wrapf(err, "%s", p)
 		return
 	}
 
 	if s.CacheEnabled {
 		if err = s.ReadAll(); err != nil {
-			err = errors.Wrapped(err, "%s", p)
+			err = errors.Wrapf(err, "%s", p)
 			return
 		}
 
@@ -292,7 +292,7 @@ func (s *Store) Read(p string) (cz zettel_checked_out.Zettel, err error) {
 		var named zettel_transacted.Zettel
 
 		if named, err = s.storeObjekten.Read(cached.Sha); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -303,7 +303,7 @@ func (s *Store) Read(p string) (cz zettel_checked_out.Zettel, err error) {
 			if errors.IsNotExist(err) {
 				err = nil
 			} else {
-				err = errors.Wrapped(err, "%s", p)
+				err = errors.Wrapf(err, "%s", p)
 				return
 			}
 		}
@@ -312,7 +312,7 @@ func (s *Store) Read(p string) (cz zettel_checked_out.Zettel, err error) {
 			if errors.Is(err, store_objekten.ErrNotFound{}) {
 				err = nil
 			} else {
-				err = errors.Error(err)
+				err = errors.Wrap(err)
 				return
 			}
 		}

@@ -14,7 +14,7 @@ func NewSliceFromStrings(es ...string) (s Slice, err error) {
 
 	for i, e := range es {
 		if err = s[i].Set(e); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	}
@@ -40,7 +40,7 @@ func (es *Slice) AddString(v string) (err error) {
 	var e Etikett
 
 	if err = e.Set(v); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -58,7 +58,7 @@ func (s *Slice) Set(v string) (err error) {
 
 	for _, e := range es {
 		if err = s.AddString(e); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	}

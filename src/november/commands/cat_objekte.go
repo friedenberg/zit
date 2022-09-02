@@ -5,7 +5,6 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/charlie/zk_types"
 	"github.com/friedenberg/zit/src/delta/hinweis"
@@ -61,7 +60,7 @@ func (c CatObjekte) akten(store store_with_lock.Store, ids ...id_set.Set) (err e
 			var zc zettel_checked_out.Zettel
 
 			if zc, err = store.StoreWorkingDirectory().Read(hinId.String() + ".md"); err != nil {
-				err = errors.Error(err)
+				err = errors.Wrap(err)
 				return
 			}
 
@@ -79,14 +78,14 @@ func (c CatObjekte) akten(store store_with_lock.Store, ids ...id_set.Set) (err e
 			var r io.ReadCloser
 
 			if r, err = store.StoreObjekten().AkteReader(sb); err != nil {
-				err = errors.Error(err)
+				err = errors.Wrap(err)
 				return
 			}
 
-			defer stdprinter.PanicIfError(r.Close)
+			defer errors.PanicIfError(r.Close)
 
 			if io.Copy(store.Out, r); err != nil {
-				err = errors.Error(err)
+				err = errors.Wrap(err)
 				return
 			}
 		}(sb)
@@ -101,7 +100,7 @@ func (c CatObjekte) zettelen(store store_with_lock.Store, ids ...id_set.Set) (er
 		ok := false
 
 		if i, ok = is.AnyShaOrHinweis(); !ok {
-			stdprinter.Errf("unsupported id type: %s\n", is)
+			errors.PrintErrf("unsupported id type: %s\n", is)
 			err = nil
 			continue
 		}
@@ -109,7 +108,7 @@ func (c CatObjekte) zettelen(store store_with_lock.Store, ids ...id_set.Set) (er
 		var tz zettel_transacted.Zettel
 
 		if tz, err = store.StoreObjekten().Read(i); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -118,7 +117,7 @@ func (c CatObjekte) zettelen(store store_with_lock.Store, ids ...id_set.Set) (er
 		errors.PrintDebug(tz)
 
 		if _, err = f.WriteTo(tz.Named.Stored.Zettel, store.Out); err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 	}

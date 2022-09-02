@@ -62,7 +62,7 @@ func (c Cat) etiketten(store store_with_lock.Store) (err error) {
 	var ea []etikett.Etikett
 
 	if ea, err = store.StoreObjekten().Etiketten(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -80,7 +80,7 @@ func (c Cat) zettelen(store store_with_lock.Store) (err error) {
 	defer errors.Print()
 
 	if all, err = store.StoreObjekten().ZettelenSchwanzen(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -126,7 +126,7 @@ func (c Cat) akten(store store_with_lock.Store) (err error) {
 	var shas []sha.Sha
 
 	if shas, err = store.Akten().All(); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

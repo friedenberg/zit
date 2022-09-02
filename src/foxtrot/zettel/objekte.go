@@ -27,7 +27,7 @@ func (f Objekte) WriteTo(z Zettel, out1 io.Writer) (n int64, err error) {
 	n, err = w.WriteTo(out1)
 
 	if err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -80,7 +80,7 @@ func (f *Objekte) ReadFrom(z *Zettel, in io.Reader) (n int64, err error) {
 			}
 
 			if err = z.Akte.Set(v); err != nil {
-				err = errors.Error(err)
+				err = errors.Wrap(err)
 				return
 			}
 
@@ -92,7 +92,7 @@ func (f *Objekte) ReadFrom(z *Zettel, in io.Reader) (n int64, err error) {
 			}
 
 			if err = z.Typ.Set(v); err != nil {
-				err = errors.Error(err)
+				err = errors.Wrap(err)
 				return
 			}
 
@@ -103,7 +103,7 @@ func (f *Objekte) ReadFrom(z *Zettel, in io.Reader) (n int64, err error) {
 			}
 
 			if err = z.Bezeichnung.Set(v); err != nil {
-				err = errors.Error(err)
+				err = errors.Wrap(err)
 				return
 			}
 
@@ -114,7 +114,7 @@ func (f *Objekte) ReadFrom(z *Zettel, in io.Reader) (n int64, err error) {
 			}
 
 			if err = z.Etiketten.AddString(v); err != nil {
-				err = errors.Error(err)
+				err = errors.Wrap(err)
 				return
 			}
 

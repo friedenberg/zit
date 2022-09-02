@@ -14,7 +14,7 @@ func (s Sha) Glob(pc ...string) (globbed Sha, err error) {
 
 	//TODO move to open_file_guard
 	if matches, err = filepath.Glob(p + "*"); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -37,7 +37,7 @@ func (s Sha) Glob(pc ...string) (globbed Sha, err error) {
 	tail := path.Base(p)
 
 	if err = globbed.Set(head + tail); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

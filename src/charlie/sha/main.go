@@ -54,7 +54,7 @@ func (s *Sha) SetFromHash(h hash.Hash) {
 
 func (s *Sha) SetParts(a, b string) (err error) {
 	if err = s.Set(a + b); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 

@@ -17,7 +17,7 @@ func newProvider(path string) (p provider, err error) {
 	var f *os.File
 
 	if f, err = open_file_guard.Open(path); err != nil {
-		err = errors.Error(err)
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -35,7 +35,7 @@ func newProvider(path string) (p provider, err error) {
 		}
 
 		if err != nil {
-			err = errors.Error(err)
+			err = errors.Wrap(err)
 			return
 		}
 
