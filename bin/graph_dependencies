@@ -14,7 +14,7 @@ print_edges_for_pkg() (
 	while read -r; do
 		pkg="$(echo -n "$REPLY" | cut -d'/' -f1-3)"
 		while read -r -a c; do
-			echo "  \"$(drop_src "$c")\" -> \"$(drop_src "$pkg")\" [ color = \"$color\" ];"
+			echo "  \"$(drop_src "$c")\" -> \"$(drop_src "$pkg")\" [ color = \"$color\"; penwidth = 2 ];"
 		done < <(print_matches "$pkg")
 	done < <($cmd_find)
 )
@@ -24,13 +24,14 @@ print_subgraph() (
 	color="$2"
 	echo
 	echo "  subgraph \"cluster_$dir\" {"
-  echo "    color = \"$color\";"
-  echo "    node [ color = \"$color\" ];"
-  echo "    edge [ color = \"$color\" ];"
+	echo "    rankdir = TB;"
+	echo "    color = \"$color\";"
+	echo "    node [ color = \"$color\" ];"
+	echo "    edge [ color = \"$color\" ];"
 	echo "    label = \"$dir\";"
-	echo "    rank = same;"
+	echo "    rank = min;"
 	while IFS= read -r -d ''; do
-		echo "    \"$(drop_src "$REPLY")\""
+		echo "    \"$(drop_src "$REPLY")\" [ label = \"$(drop_src "$(drop_src "$REPLY")")\" ];"
 	done < <(find "src/$dir" -type d -mindepth 1 -print0)
 	echo "  }"
 	echo
@@ -42,7 +43,7 @@ drop_src() (
 
 print_all_subgraphs() (
 	while read -r; do
-    color="#$(openssl rand -hex 3)"
+		color="#$(openssl rand -hex 3)"
 		print_subgraph "$REPLY" "$color"
 		print_edges_for_pkg "$REPLY" "$color"
 	done < <(find src -type d -mindepth 1 -maxdepth 1 | sort)
@@ -53,10 +54,12 @@ print_dot() (
 	echo 'digraph {'
 	echo '  node [ fontname = "Input Sans"; shape = rect ];'
 	echo '  newrank = true;'
-	echo '  ranksep = "6.0";'
+	echo '  splines = ortho;'
+	echo '  concentrate = true;'
+	# echo '  ranksep = "6.0";'
 	print_all_subgraphs
 	echo '}'
 )
 
-print_dot "$1" >"dot"
-dot -Tsvg -Ktwopi <"dot" >"dot.svg"
+print_dot >"build/dot"
+dot -Tsvg <"build/dot" >"build/dot.svg"

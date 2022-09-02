@@ -5,7 +5,6 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/november/commands"
 )
 
@@ -27,5 +26,4 @@ func main() {
 
 	exitStatus := commands.Run(os.Args)
 	os.Exit(exitStatus)
-	logz.Print()
 }
