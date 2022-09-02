@@ -7,8 +7,8 @@ import (
 	"io"
 	"strings"
 
-	"github.com/friedenberg/zit/src/alfa/kennung"
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/kennung"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/sha"
 )
