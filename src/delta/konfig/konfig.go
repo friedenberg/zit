@@ -6,7 +6,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/toml"
-	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
 )
 
@@ -24,7 +23,7 @@ type KonfigTyp struct {
 type Konfig struct {
 	Cli
 	Toml
-	Logger stdprinter.Logger
+	Logger errors.Logger
 }
 
 func LoadKonfig(p string) (c Konfig, err error) {

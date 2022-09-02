@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/files"
 	"github.com/friedenberg/zit/src/delta/age"
 	"github.com/friedenberg/zit/src/delta/etikett"
@@ -16,7 +15,7 @@ type Umwelt struct {
 	BasePath string
 	cwd      string
 	Konfig   konfig.Konfig
-	Logger   stdprinter.Logger
+	Logger   errors.Logger
 	In       io.Reader
 	Out      io.Writer
 	Err      io.Writer
