@@ -11,7 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/hotel/organize_text"
 	"github.com/friedenberg/zit/src/india/changes"
 	"github.com/friedenberg/zit/src/kilo/store_with_lock"
-	"github.com/friedenberg/zit/zettel_named"
+	"github.com/friedenberg/zit/src/lima/zettel_named"
 	"github.com/friedenberg/zit/zettel_transacted"
 )
 

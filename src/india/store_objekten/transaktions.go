@@ -13,7 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/transaktion"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
 	"github.com/friedenberg/zit/src/golf/zettel_stored"
-	"github.com/friedenberg/zit/zettel_named"
+	"github.com/friedenberg/zit/src/lima/zettel_named"
 	"github.com/friedenberg/zit/zettel_transacted"
 )
 

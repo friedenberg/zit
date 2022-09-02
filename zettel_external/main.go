@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/friedenberg/zit/zettel_named"
+	"github.com/friedenberg/zit/src/lima/zettel_named"
 )
 
 type Zettel struct {

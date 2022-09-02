@@ -2,7 +2,7 @@ package zettel_transacted
 
 import (
 	"github.com/friedenberg/zit/src/delta/ts"
-	"github.com/friedenberg/zit/zettel_named"
+	"github.com/friedenberg/zit/src/lima/zettel_named"
 )
 
 type Transacted struct {
