@@ -2,8 +2,8 @@ package commands
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/delta/age"
-	"github.com/friedenberg/zit/src/echo/umwelt"
+	"github.com/friedenberg/zit/src/charlie/age"
+	"github.com/friedenberg/zit/src/delta/umwelt"
 )
 
 type CommandWithAge interface {

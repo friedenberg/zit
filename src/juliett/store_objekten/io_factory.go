@@ -3,7 +3,7 @@ package store_objekten
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/echo/age_io"
+	"github.com/friedenberg/zit/src/delta/age_io"
 )
 
 func (s Store) ReadCloserObjekten(p string) (io.ReadCloser, error) {

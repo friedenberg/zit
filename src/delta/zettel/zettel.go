@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/bezeichnung"
 	"github.com/friedenberg/zit/src/alfa/typ"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/delta/etikett"
+	"github.com/friedenberg/zit/src/charlie/etikett"
 )
 
 type Zettel struct {

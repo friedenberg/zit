@@ -5,9 +5,9 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/delta/script_value"
-	"github.com/friedenberg/zit/src/echo/umwelt"
-	"github.com/friedenberg/zit/src/echo/zettel"
+	"github.com/friedenberg/zit/src/charlie/script_value"
+	"github.com/friedenberg/zit/src/delta/umwelt"
+	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_stored"
 	"github.com/friedenberg/zit/src/hotel/zettel_named"
 	"github.com/friedenberg/zit/src/india/zettel_external"

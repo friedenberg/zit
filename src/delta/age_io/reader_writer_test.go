@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/friedenberg/zit/src/delta/age"
+	"github.com/friedenberg/zit/src/charlie/age"
 )
 
 func makeAge(t *testing.T) age.Age {

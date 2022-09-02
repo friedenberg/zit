@@ -4,8 +4,8 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/delta/etikett"
-	"github.com/friedenberg/zit/src/echo/umwelt"
+	"github.com/friedenberg/zit/src/charlie/etikett"
+	"github.com/friedenberg/zit/src/delta/umwelt"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/organize_text"
 	"github.com/friedenberg/zit/src/lima/store_with_lock"

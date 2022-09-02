@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/open_file_guard"
-	"github.com/friedenberg/zit/src/delta/id"
+	"github.com/friedenberg/zit/src/charlie/id"
 )
 
 type Mover struct {

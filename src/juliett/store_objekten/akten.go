@@ -5,8 +5,8 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/delta/id"
-	"github.com/friedenberg/zit/src/echo/age_io"
+	"github.com/friedenberg/zit/src/charlie/id"
+	"github.com/friedenberg/zit/src/delta/age_io"
 )
 
 type akteMultiWriter struct {

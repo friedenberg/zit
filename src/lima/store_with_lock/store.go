@@ -2,11 +2,11 @@ package store_with_lock
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/delta/age"
-	"github.com/friedenberg/zit/src/delta/file_lock"
-	"github.com/friedenberg/zit/src/echo/umwelt"
+	"github.com/friedenberg/zit/src/charlie/age"
+	"github.com/friedenberg/zit/src/charlie/file_lock"
+	"github.com/friedenberg/zit/src/delta/hinweisen"
+	"github.com/friedenberg/zit/src/delta/umwelt"
 	"github.com/friedenberg/zit/src/foxtrot/akten"
-	"github.com/friedenberg/zit/src/golf/hinweisen"
 	"github.com/friedenberg/zit/src/juliett/store_objekten"
 	"github.com/friedenberg/zit/src/kilo/store_working_directory"
 )

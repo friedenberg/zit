@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/delta/hinweis"
+	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_stored"
 )
 

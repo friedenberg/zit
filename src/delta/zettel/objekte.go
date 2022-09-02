@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/line_format"
 	"github.com/friedenberg/zit/src/bravo/zk_types"
-	"github.com/friedenberg/zit/src/delta/etikett"
+	"github.com/friedenberg/zit/src/charlie/etikett"
 )
 
 type Objekte struct{}

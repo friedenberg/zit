@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/bravo/alfred"
-	"github.com/friedenberg/zit/src/delta/etikett"
-	"github.com/friedenberg/zit/src/delta/hinweis"
+	"github.com/friedenberg/zit/src/charlie/etikett"
+	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/hotel/zettel_named"
 )
 

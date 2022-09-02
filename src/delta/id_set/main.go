@@ -5,8 +5,8 @@ import (
 	"reflect"
 
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/delta/hinweis"
-	"github.com/friedenberg/zit/src/delta/id"
+	"github.com/friedenberg/zit/src/charlie/hinweis"
+	"github.com/friedenberg/zit/src/charlie/id"
 )
 
 var anyShaOrHinweisTypes []id.Id

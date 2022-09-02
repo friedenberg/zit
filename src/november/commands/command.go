@@ -6,8 +6,8 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/open_file_guard"
-	"github.com/friedenberg/zit/src/delta/konfig"
-	"github.com/friedenberg/zit/src/echo/umwelt"
+	"github.com/friedenberg/zit/src/charlie/konfig"
+	"github.com/friedenberg/zit/src/delta/umwelt"
 )
 
 type Command interface {

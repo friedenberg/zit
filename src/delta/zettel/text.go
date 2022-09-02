@@ -13,7 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/open_file_guard"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/delta/etikett"
+	"github.com/friedenberg/zit/src/charlie/etikett"
 )
 
 const (

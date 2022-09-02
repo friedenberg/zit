@@ -1,7 +1,7 @@
 package zettel_transacted
 
 import (
-	"github.com/friedenberg/zit/src/delta/ts"
+	"github.com/friedenberg/zit/src/charlie/ts"
 	"github.com/friedenberg/zit/src/hotel/zettel_named"
 )
 

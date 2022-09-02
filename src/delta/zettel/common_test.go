@@ -6,7 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/typ"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/delta/etikett"
+	"github.com/friedenberg/zit/src/charlie/etikett"
 )
 
 func makeEtiketten(t *testing.T, vs ...string) (es etikett.Set) {

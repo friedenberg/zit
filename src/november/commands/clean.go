@@ -6,7 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/open_file_guard"
-	"github.com/friedenberg/zit/src/echo/zettel"
+	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_external"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
 	"github.com/friedenberg/zit/src/kilo/store_working_directory"

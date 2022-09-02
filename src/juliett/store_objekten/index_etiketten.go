@@ -7,7 +7,7 @@ import (
 	"sort"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/delta/etikett"
+	"github.com/friedenberg/zit/src/charlie/etikett"
 )
 
 type indexEtiketten struct {

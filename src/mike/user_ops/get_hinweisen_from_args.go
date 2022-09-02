@@ -2,7 +2,7 @@ package user_ops
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/delta/hinweis"
+	"github.com/friedenberg/zit/src/charlie/hinweis"
 )
 
 type GetHinweisenFromArgs struct {

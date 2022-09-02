@@ -2,7 +2,7 @@ package commands
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/delta/hinweis"
+	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/lima/store_with_lock"
 	"github.com/friedenberg/zit/src/mike/user_ops"
 )

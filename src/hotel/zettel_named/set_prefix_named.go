@@ -2,7 +2,7 @@ package zettel_named
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/delta/etikett"
+	"github.com/friedenberg/zit/src/charlie/etikett"
 )
 
 type SetPrefixNamed map[etikett.Etikett]SetNamed

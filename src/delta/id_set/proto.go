@@ -3,7 +3,7 @@ package id_set
 import (
 	"reflect"
 
-	"github.com/friedenberg/zit/src/delta/id"
+	"github.com/friedenberg/zit/src/charlie/id"
 )
 
 type ProtoSet struct {

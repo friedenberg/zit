@@ -1,6 +1,6 @@
 package zettel_named
 
-import "github.com/friedenberg/zit/src/delta/hinweis"
+import "github.com/friedenberg/zit/src/charlie/hinweis"
 
 type SetNamed map[string]Zettel
 

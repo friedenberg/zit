@@ -2,7 +2,7 @@ package commands
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/echo/umwelt"
+	"github.com/friedenberg/zit/src/delta/umwelt"
 	"github.com/friedenberg/zit/src/lima/store_with_lock"
 )
 
