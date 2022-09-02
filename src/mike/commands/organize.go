@@ -13,9 +13,9 @@ import (
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/echo/umwelt"
-	"github.com/friedenberg/zit/src/hotel/collections"
 	"github.com/friedenberg/zit/src/hotel/organize_text"
 	"github.com/friedenberg/zit/src/hotel/zettel_named"
+	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/lima/user_ops"
 )
 
@@ -95,7 +95,7 @@ func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	var getResults collections.SetTransacted
+	var getResults zettel_transacted.Set
 
 	getOp := user_ops.GetZettelsFromQuery{Umwelt: u}
 

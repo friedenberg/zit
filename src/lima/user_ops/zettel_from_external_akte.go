@@ -12,7 +12,6 @@ import (
 	"github.com/friedenberg/zit/src/echo/age_io"
 	"github.com/friedenberg/zit/src/echo/umwelt"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
-	"github.com/friedenberg/zit/src/hotel/collections"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/kilo/store_with_lock"
 )
@@ -23,7 +22,7 @@ type ZettelFromExternalAkte struct {
 	Delete    bool
 }
 
-func (c ZettelFromExternalAkte) Run(args ...string) (results collections.SetTransacted, err error) {
+func (c ZettelFromExternalAkte) Run(args ...string) (results zettel_transacted.Set, err error) {
 	var store store_with_lock.Store
 
 	if store, err = store_with_lock.New(c.Umwelt); err != nil {
@@ -33,7 +32,7 @@ func (c ZettelFromExternalAkte) Run(args ...string) (results collections.SetTran
 
 	defer errors.PanicIfError(store.Flush)
 
-	results = collections.MakeSetUniqueTransacted(len(args))
+	results = zettel_transacted.MakeSetUnique(len(args))
 
 	for _, arg := range args {
 		var z zettel.Zettel

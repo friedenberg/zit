@@ -4,7 +4,6 @@ import (
 	"sort"
 
 	"github.com/friedenberg/zit/src/delta/etikett"
-	"github.com/friedenberg/zit/src/hotel/collections"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 )
 
@@ -12,7 +11,7 @@ type AssignmentTreeConstructor struct {
 	RootEtiketten     etikett.Set
 	GroupingEtiketten etikett.Slice
 	ExtraEtiketten    etikett.Set
-	Transacted        collections.SetTransacted
+	Transacted        zettel_transacted.Set
 	UsePrefixJoints   bool
 }
 
@@ -37,7 +36,7 @@ func (atc *AssignmentTreeConstructor) Assignments() (roots []*assignment) {
 
 func (atc AssignmentTreeConstructor) makeChildren(
 	parent *assignment,
-	prefixSet collections.SetPrefixTransacted,
+	prefixSet zettel_transacted.SetPrefixTransacted,
 	groupingEtiketten etikett.Slice,
 ) {
 	if groupingEtiketten.Len() == 0 {
@@ -62,7 +61,7 @@ func (atc AssignmentTreeConstructor) makeChildren(
 	)
 
 	segments.Grouped.Each(
-		func(e etikett.Etikett, zs collections.SetTransacted) (err error) {
+		func(e etikett.Etikett, zs zettel_transacted.Set) (err error) {
 			if atc.UsePrefixJoints {
 				if parent.etiketten.Len() > 1 {
 				} else {

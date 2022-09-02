@@ -39,7 +39,7 @@ func (s SetPrefixTransacted) addPair(e etikett.Etikett, z Zettel) {
 	existing, ok := s.innerMap[e]
 
 	if !ok {
-		existing = MakeSetUniqueTransacted(1)
+		existing = MakeSetUnique(1)
 	}
 
 	existing.Add(z)
@@ -80,7 +80,7 @@ func (a SetPrefixTransacted) EachZettel(f func(etikett.Etikett, Zettel) error) (
 // etikett, and if there is a prefix match, group it out the output set segments
 // appropriately
 func (a SetPrefixTransacted) Subset(e etikett.Etikett) (out SetPrefixTransactedSegments) {
-	out.Ungrouped = MakeSetUniqueTransacted(len(a.innerMap))
+	out.Ungrouped = MakeSetUnique(len(a.innerMap))
 	out.Grouped = MakeSetPrefixTransacted(len(a.innerMap))
 
 	for e1, zSet := range a.innerMap {
@@ -102,7 +102,7 @@ func (a SetPrefixTransacted) Subset(e etikett.Etikett) (out SetPrefixTransactedS
 }
 
 func (s SetPrefixTransacted) ToSet() (out Set) {
-	out = MakeSetUniqueTransacted(len(s.innerMap))
+	out = MakeSetUnique(len(s.innerMap))
 
 	for _, zs := range s.innerMap {
 		for _, z := range zs.innerMap {

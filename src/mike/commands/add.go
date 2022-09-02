@@ -9,8 +9,8 @@ import (
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/echo/umwelt"
-	"github.com/friedenberg/zit/src/hotel/collections"
 	"github.com/friedenberg/zit/src/hotel/organize_text"
+	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/lima/user_ops"
 )
 
@@ -46,7 +46,7 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		Delete:    c.Delete,
 	}
 
-	var zettelsFromAkteResults collections.SetTransacted
+	var zettelsFromAkteResults zettel_transacted.Set
 
 	if zettelsFromAkteResults, err = zettelsFromAkteOp.Run(args...); err != nil {
 		err = errors.Error(err)

@@ -13,7 +13,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/echo/umwelt"
-	"github.com/friedenberg/zit/src/hotel/collections"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 )
 
@@ -21,11 +20,11 @@ type indexZettelen struct {
 	umwelt *umwelt.Umwelt
 	path   string
 	ioFactory
-	zettelen      map[sha.Sha]collections.SetTransacted
-	hinweisen     map[hinweis.Hinweis]collections.SetTransacted
-	akten         map[sha.Sha]collections.SetTransacted
-	bezeichnungen map[string]collections.SetTransacted
-	typen         map[typ.Typ]collections.SetTransacted
+	zettelen      map[sha.Sha]zettel_transacted.Set
+	hinweisen     map[hinweis.Hinweis]zettel_transacted.Set
+	akten         map[sha.Sha]zettel_transacted.Set
+	bezeichnungen map[string]zettel_transacted.Set
+	typen         map[typ.Typ]zettel_transacted.Set
 	didRead       bool
 	hasChanges    bool
 }
@@ -39,11 +38,11 @@ func newIndexZettelen(
 		umwelt:        u,
 		path:          p,
 		ioFactory:     f,
-		zettelen:      make(map[sha.Sha]collections.SetTransacted),
-		hinweisen:     make(map[hinweis.Hinweis]collections.SetTransacted),
-		akten:         make(map[sha.Sha]collections.SetTransacted),
-		bezeichnungen: make(map[string]collections.SetTransacted),
-		typen:         make(map[typ.Typ]collections.SetTransacted),
+		zettelen:      make(map[sha.Sha]zettel_transacted.Set),
+		hinweisen:     make(map[hinweis.Hinweis]zettel_transacted.Set),
+		akten:         make(map[sha.Sha]zettel_transacted.Set),
+		bezeichnungen: make(map[string]zettel_transacted.Set),
+		typen:         make(map[typ.Typ]zettel_transacted.Set),
 	}
 
 	return
@@ -136,11 +135,11 @@ func (i *indexZettelen) readIfNecessary() (err error) {
 
 func (i *indexZettelen) addNoRead(tz zettel_transacted.Zettel) {
 	{
-		var set collections.SetTransacted
+		var set zettel_transacted.Set
 		var ok bool
 
 		if set, ok = i.zettelen[tz.Named.Stored.Sha]; !ok {
-			set = collections.MakeSetUniqueTransacted(1)
+			set = zettel_transacted.MakeSetUnique(1)
 		}
 
 		set.Add(tz)
@@ -148,11 +147,11 @@ func (i *indexZettelen) addNoRead(tz zettel_transacted.Zettel) {
 	}
 
 	{
-		var set collections.SetTransacted
+		var set zettel_transacted.Set
 		var ok bool
 
 		if set, ok = i.hinweisen[tz.Named.Hinweis]; !ok {
-			set = collections.MakeSetUniqueTransacted(1)
+			set = zettel_transacted.MakeSetUnique(1)
 		}
 
 		set.Add(tz)
@@ -162,11 +161,11 @@ func (i *indexZettelen) addNoRead(tz zettel_transacted.Zettel) {
 	akteSha := tz.Named.Stored.Zettel.Akte
 
 	if !akteSha.IsNull() {
-		var set collections.SetTransacted
+		var set zettel_transacted.Set
 		var ok bool
 
 		if set, ok = i.akten[tz.Named.Stored.Zettel.Akte]; !ok {
-			set = collections.MakeSetUniqueTransacted(1)
+			set = zettel_transacted.MakeSetUnique(1)
 		}
 
 		set.Add(tz)
@@ -176,11 +175,11 @@ func (i *indexZettelen) addNoRead(tz zettel_transacted.Zettel) {
 	bezKey := strings.ToLower(tz.Named.Stored.Zettel.Bezeichnung.String())
 	if bezKey != "" {
 
-		var set collections.SetTransacted
+		var set zettel_transacted.Set
 		var ok bool
 
 		if set, ok = i.bezeichnungen[bezKey]; !ok {
-			set = collections.MakeSetUniqueTransacted(1)
+			set = zettel_transacted.MakeSetUnique(1)
 		}
 
 		set.Add(tz)
@@ -188,11 +187,11 @@ func (i *indexZettelen) addNoRead(tz zettel_transacted.Zettel) {
 	}
 
 	{
-		var set collections.SetTransacted
+		var set zettel_transacted.Set
 		var ok bool
 
 		if set, ok = i.typen[tz.Named.Stored.Zettel.Typ]; !ok {
-			set = collections.MakeSetUniqueTransacted(1)
+			set = zettel_transacted.MakeSetUnique(1)
 		}
 
 		set.Add(tz)
@@ -215,7 +214,7 @@ func (i *indexZettelen) add(tz zettel_transacted.Zettel) (err error) {
 	return
 }
 
-func (i *indexZettelen) ReadHinweis(h hinweis.Hinweis) (mst collections.SetTransacted, err error) {
+func (i *indexZettelen) ReadHinweis(h hinweis.Hinweis) (mst zettel_transacted.Set, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Error(err)
 		return
@@ -231,7 +230,7 @@ func (i *indexZettelen) ReadHinweis(h hinweis.Hinweis) (mst collections.SetTrans
 	return
 }
 
-func (i *indexZettelen) ReadBezeichnung(s string) (tzs collections.SetTransacted, err error) {
+func (i *indexZettelen) ReadBezeichnung(s string) (tzs zettel_transacted.Set, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Error(err)
 		return
@@ -247,7 +246,7 @@ func (i *indexZettelen) ReadBezeichnung(s string) (tzs collections.SetTransacted
 	return
 }
 
-func (i *indexZettelen) ReadAkteSha(s sha.Sha) (tzs collections.SetTransacted, err error) {
+func (i *indexZettelen) ReadAkteSha(s sha.Sha) (tzs zettel_transacted.Set, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Error(err)
 		return
@@ -263,7 +262,7 @@ func (i *indexZettelen) ReadAkteSha(s sha.Sha) (tzs collections.SetTransacted, e
 	return
 }
 
-func (i *indexZettelen) ReadZettelSha(s sha.Sha) (tz collections.SetTransacted, err error) {
+func (i *indexZettelen) ReadZettelSha(s sha.Sha) (tz zettel_transacted.Set, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Error(err)
 		return
@@ -279,7 +278,7 @@ func (i *indexZettelen) ReadZettelSha(s sha.Sha) (tz collections.SetTransacted, 
 	return
 }
 
-func (i *indexZettelen) ReadTyp(t typ.Typ) (tzs collections.SetTransacted, err error) {
+func (i *indexZettelen) ReadTyp(t typ.Typ) (tzs zettel_transacted.Set, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Error(err)
 		return

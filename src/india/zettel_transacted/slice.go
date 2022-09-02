@@ -5,36 +5,36 @@ import (
 	"sort"
 )
 
-type SliceTransacted struct {
+type Slice struct {
 	innerSlice []Zettel
 }
 
-func MakeSliceTransacted() SliceTransacted {
-	return SliceTransacted{
+func MakeSliceTransacted() Slice {
+	return Slice{
 		innerSlice: make([]Zettel, 0),
 	}
 }
 
-func (s SliceTransacted) Len() int {
+func (s Slice) Len() int {
 	return len(s.innerSlice)
 }
 
-func (s *SliceTransacted) Append(tz Zettel) {
+func (s *Slice) Append(tz Zettel) {
 	s.innerSlice = append(s.innerSlice, tz)
 }
 
-func (s SliceTransacted) Get(i int) Zettel {
+func (s Slice) Get(i int) Zettel {
 	return s.innerSlice[i]
 }
 
-func (s *SliceTransacted) Sort(f func(int, int) bool) {
+func (s *Slice) Sort(f func(int, int) bool) {
 	sort.Slice(s.innerSlice, f)
 }
 
-func (s SliceTransacted) MarshalJSON() ([]byte, error) {
+func (s Slice) MarshalJSON() ([]byte, error) {
 	return json.Marshal(s.innerSlice)
 }
 
-func (s *SliceTransacted) UnmarshalJSON(b []byte) error {
+func (s *Slice) UnmarshalJSON(b []byte) error {
 	return json.Unmarshal(b, &s.innerSlice)
 }

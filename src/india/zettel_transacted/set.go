@@ -27,7 +27,7 @@ func makeKey(ss ...fmt.Stringer) string {
 	return sb.String()
 }
 
-func MakeSetUniqueTransacted(c int) Set {
+func MakeSetUnique(c int) Set {
 	return Set{
 		keyFunc: func(sz Zettel) string {
 			return makeKey(
@@ -106,7 +106,7 @@ func (a Set) Each(f func(Zettel) error) (err error) {
 	return
 }
 
-func (m Set) ToSlice() (s SliceTransacted) {
+func (m Set) ToSlice() (s Slice) {
 	s = MakeSliceTransacted()
 
 	for _, sz := range m.innerMap {

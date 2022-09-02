@@ -5,17 +5,16 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/charlie/zk_types"
-	"github.com/friedenberg/zit/src/hotel/collections"
 	"github.com/friedenberg/zit/src/india/zettel_external"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 )
 
 type Matches struct {
-	Akten, Bezeichnungen, Zettelen collections.SetTransacted
+	Akten, Bezeichnungen, Zettelen zettel_transacted.Set
 }
 
 func (m Matches) appendToStringBuilder(sb *strings.Builder, ex zettel_external.Zettel) {
-	typToCollection := map[zk_types.Type]*collections.SetTransacted{
+	typToCollection := map[zk_types.Type]*zettel_transacted.Set{
 		zk_types.TypeAkte:        &m.Akten,
 		zk_types.TypeBezeichnung: &m.Bezeichnungen,
 		zk_types.TypeZettel:      &m.Zettelen,

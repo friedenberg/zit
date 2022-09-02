@@ -11,7 +11,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/echo/umwelt"
-	"github.com/friedenberg/zit/src/hotel/collections"
 	"github.com/friedenberg/zit/src/hotel/zettel_named"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 )
@@ -20,7 +19,7 @@ type indexZettelenTails struct {
 	umwelt *umwelt.Umwelt
 	path   string
 	ioFactory
-	zettelen   collections.SetTransacted
+	zettelen   zettel_transacted.Set
 	didRead    bool
 	hasChanges bool
 }
@@ -34,7 +33,7 @@ func newIndexZettelenTails(
 		umwelt:    u,
 		path:      p,
 		ioFactory: f,
-		zettelen:  collections.MakeSetHinweisTransacted(),
+		zettelen:  zettel_transacted.MakeSetHinweisTransacted(),
 	}
 
 	return

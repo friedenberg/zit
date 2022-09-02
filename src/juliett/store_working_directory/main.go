@@ -17,7 +17,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/id"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
-	"github.com/friedenberg/zit/src/hotel/collections"
 	"github.com/friedenberg/zit/src/india/store_objekten"
 	"github.com/friedenberg/zit/src/india/zettel_checked_out"
 	"github.com/friedenberg/zit/src/india/zettel_external"
@@ -26,9 +25,9 @@ import (
 
 type StoreZettel interface {
 	Read(id id.Id) (z zettel_transacted.Zettel, err error)
-	ReadAkteSha(sha.Sha) (collections.SetTransacted, error)
-	ReadZettelSha(sha.Sha) (collections.SetTransacted, error)
-	ReadBezeichnung(string) (collections.SetTransacted, error)
+	ReadAkteSha(sha.Sha) (zettel_transacted.Set, error)
+	ReadZettelSha(sha.Sha) (zettel_transacted.Set, error)
+	ReadBezeichnung(string) (zettel_transacted.Set, error)
 	WriteZettelObjekte(z zettel.Zettel) (sh sha.Sha, err error)
 	zettel.AkteWriterFactory
 	zettel.AkteReaderFactory

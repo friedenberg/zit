@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/delta/hinweis"
-	"github.com/friedenberg/zit/src/hotel/collections"
+	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/kilo/store_with_lock"
 )
 
@@ -44,7 +44,7 @@ func (c Log) RunWithHinweisen(os store_with_lock.Store, hs ...hinweis.Hinweis) (
 		h = hs[0]
 	}
 
-	var chain collections.SliceTransacted
+	var chain zettel_transacted.Slice
 	logz.Print()
 
 	if chain, err = os.StoreObjekten().AllInChain(h); err != nil {

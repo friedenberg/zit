@@ -24,7 +24,6 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/golf/hinweisen"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
-	"github.com/friedenberg/zit/src/hotel/collections"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 )
 
@@ -361,8 +360,8 @@ func (s Store) Flush() (err error) {
 	return
 }
 
-func (s Store) AllInChain(h hinweis.Hinweis) (c collections.SliceTransacted, err error) {
-	var mst collections.SetTransacted
+func (s Store) AllInChain(h hinweis.Hinweis) (c zettel_transacted.Slice, err error) {
+	var mst zettel_transacted.Set
 
 	if mst, err = s.indexZettelen.ReadHinweis(h); err != nil {
 		err = errors.Error(err)
@@ -429,7 +428,7 @@ func (s *Store) ReadHinweisAt(
 		return s.indexZettelenTails.Read(h.Hinweis)
 	}
 
-	var chain collections.SliceTransacted
+	var chain zettel_transacted.Slice
 
 	if chain, err = s.AllInChain(h.Hinweis); err != nil {
 		err = errors.Error(err)
