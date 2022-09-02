@@ -17,14 +17,15 @@ import (
 	"github.com/friedenberg/zit/src/delta/id"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
-	"github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/hotel/collections"
 	"github.com/friedenberg/zit/src/india/store_objekten"
 	"github.com/friedenberg/zit/src/india/zettel_checked_out"
+	"github.com/friedenberg/zit/zettel_external"
+	"github.com/friedenberg/zit/zettel_transacted"
 )
 
 type StoreZettel interface {
-	Read(id id.Id) (z zettel_stored.Transacted, err error)
+	Read(id id.Id) (z zettel_transacted.Transacted, err error)
 	ReadAkteSha(sha.Sha) (collections.SetTransacted, error)
 	ReadZettelSha(sha.Sha) (collections.SetTransacted, error)
 	ReadBezeichnung(string) (collections.SetTransacted, error)
@@ -175,7 +176,7 @@ func (s *Store) syncOne(p string) (err error) {
 	} else {
 		logz.Print(p, ": cache, fs")
 		if !hasCache || fi.ModTime().After(cached.Time) {
-			var ez zettel_stored.External
+			var ez zettel_external.Zettel
 
 			if ez, err = s.MakeExternalZettelFromZettel(p); err != nil {
 				err = errors.Error(err)
@@ -199,7 +200,7 @@ func (s *Store) syncOne(p string) (err error) {
 	return
 }
 
-func (s Store) MakeExternalZettelFromZettel(p string) (ez zettel_stored.External, err error) {
+func (s Store) MakeExternalZettelFromZettel(p string) (ez zettel_external.Zettel, err error) {
 	if p, err = filepath.Abs(p); err != nil {
 		err = errors.Error(err)
 		return
@@ -222,7 +223,7 @@ func (s Store) MakeExternalZettelFromZettel(p string) (ez zettel_stored.External
 	return
 }
 
-func (s Store) readZettelFromFile(ez *zettel_stored.External) (err error) {
+func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 	logz.PrintDebug(ez)
 	if !files.Exists(ez.ZettelFD.Path) {
 		//if the path does not have an extension, try looking for a file with that
@@ -291,7 +292,7 @@ func (s *Store) Read(p string) (cz zettel_checked_out.Zettel, err error) {
 			return
 		}
 
-		var named zettel_stored.Transacted
+		var named zettel_transacted.Transacted
 
 		if named, err = s.storeObjekten.Read(cached.Sha); err != nil {
 			err = errors.Error(err)

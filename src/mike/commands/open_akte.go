@@ -11,8 +11,8 @@ import (
 	"github.com/friedenberg/zit/src/charlie/open_file_guard"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/id"
-	"github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/kilo/store_with_lock"
+	"github.com/friedenberg/zit/zettel_transacted"
 )
 
 type OpenAkte struct {
@@ -41,7 +41,7 @@ func (c OpenAkte) RunWithHinweisen(store store_with_lock.Store, hins ...hinweis.
 
 	for i, h := range hins {
 		func(h hinweis.Hinweis) {
-			var tz zettel_stored.Transacted
+			var tz zettel_transacted.Transacted
 
 			if tz, err = store.StoreObjekten().Read(h); err != nil {
 				err = errors.Error(err)

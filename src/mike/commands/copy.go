@@ -5,8 +5,8 @@ import (
 
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/delta/hinweis"
-	"github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/kilo/store_with_lock"
+	"github.com/friedenberg/zit/zettel_transacted"
 )
 
 type Copy struct {
@@ -25,10 +25,10 @@ func init() {
 }
 
 func (c Copy) RunWithHinweisen(s store_with_lock.Store, hins ...hinweis.Hinweis) (err error) {
-	zettels := make([]zettel_stored.Transacted, len(hins))
+	zettels := make([]zettel_transacted.Transacted, len(hins))
 
 	for i, h := range hins {
-		var tz zettel_stored.Transacted
+		var tz zettel_transacted.Transacted
 
 		if tz, err = s.StoreObjekten().Read(h); err != nil {
 			err = errors.Error(err)

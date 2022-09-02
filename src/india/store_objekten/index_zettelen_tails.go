@@ -11,8 +11,9 @@ import (
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/echo/umwelt"
-	"github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/hotel/collections"
+	"github.com/friedenberg/zit/zettel_named"
+	"github.com/friedenberg/zit/zettel_transacted"
 )
 
 type indexZettelenTails struct {
@@ -61,7 +62,7 @@ func (i *indexZettelenTails) Flush() (err error) {
 	enc := gob.NewEncoder(w)
 
 	err = i.zettelen.Each(
-		func(tz zettel_stored.Transacted) (err error) {
+		func(tz zettel_transacted.Transacted) (err error) {
 			if err = enc.Encode(tz); err != nil {
 				err = errors.Wrapped(err, "failed to write zettel: %s", tz.Named)
 				return
@@ -104,7 +105,7 @@ func (i *indexZettelenTails) readIfNecessary() (err error) {
 	dec := gob.NewDecoder(r)
 
 	for {
-		var tz zettel_stored.Transacted
+		var tz zettel_transacted.Transacted
 
 		if err = dec.Decode(&tz); err != nil {
 			if errors.IsEOF(err) {
@@ -122,7 +123,7 @@ func (i *indexZettelenTails) readIfNecessary() (err error) {
 	return
 }
 
-func (i *indexZettelenTails) add(tz zettel_stored.Transacted) (err error) {
+func (i *indexZettelenTails) add(tz zettel_transacted.Transacted) (err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Error(err)
 		return
@@ -135,7 +136,7 @@ func (i *indexZettelenTails) add(tz zettel_stored.Transacted) (err error) {
 	return
 }
 
-func (i *indexZettelenTails) Read(h hinweis.Hinweis) (tz zettel_stored.Transacted, err error) {
+func (i *indexZettelenTails) Read(h hinweis.Hinweis) (tz zettel_transacted.Transacted, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Error(err)
 		return
@@ -152,17 +153,17 @@ func (i *indexZettelenTails) Read(h hinweis.Hinweis) (tz zettel_stored.Transacte
 }
 
 func (i *indexZettelenTails) ZettelenSchwanzen(
-	qs ...zettel_stored.NamedFilter,
-) (tzs map[hinweis.Hinweis]zettel_stored.Transacted, err error) {
+	qs ...zettel_named.NamedFilter,
+) (tzs map[hinweis.Hinweis]zettel_transacted.Transacted, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Error(err)
 		return
 	}
 
-	tzs = make(map[hinweis.Hinweis]zettel_stored.Transacted)
+	tzs = make(map[hinweis.Hinweis]zettel_transacted.Transacted)
 
 	err = i.zettelen.Each(
-		func(tz zettel_stored.Transacted) (err error) {
+		func(tz zettel_transacted.Transacted) (err error) {
 			for _, q := range qs {
 				if !q.IncludeNamedZettel(tz.Named) {
 					return
@@ -187,7 +188,7 @@ func (i *indexZettelenTails) ZettelenSchwanzen(
 	return
 }
 
-func (i *indexZettelenTails) shouldIncludeTransacted(tz zettel_stored.Transacted) bool {
+func (i *indexZettelenTails) shouldIncludeTransacted(tz zettel_transacted.Transacted) bool {
 	if i.umwelt.Konfig.IncludeHidden {
 		return true
 	}

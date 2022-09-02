@@ -6,8 +6,8 @@ import (
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/kilo/store_with_lock"
+	"github.com/friedenberg/zit/zettel_transacted"
 )
 
 type RejoinAbandonedZettel struct {
@@ -26,14 +26,14 @@ func init() {
 
 func (c RejoinAbandonedZettel) RunWithShas(store store_with_lock.Store, shas ...sha.Sha) (err error) {
 	for _, sha := range shas {
-		var stored zettel_stored.Transacted
+		var stored zettel_transacted.Transacted
 
 		if stored, err = store.StoreObjekten().Read(sha); err != nil {
 			err = errors.Error(err)
 			return
 		}
 
-		var tz zettel_stored.Transacted
+		var tz zettel_transacted.Transacted
 
 		if tz, err = store.StoreObjekten().Create(stored.Named.Stored.Zettel); err != nil {
 			err = errors.Error(err)

@@ -13,8 +13,8 @@ import (
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/echo/umwelt"
-	"github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/hotel/collections"
+	"github.com/friedenberg/zit/zettel_transacted"
 )
 
 type indexZettelen struct {
@@ -72,7 +72,7 @@ func (i *indexZettelen) Flush() (err error) {
 
 	for _, st := range i.zettelen {
 		err = st.Each(
-			func(tz zettel_stored.Transacted) (err error) {
+			func(tz zettel_transacted.Transacted) (err error) {
 				if err = enc.Encode(tz); err != nil {
 					err = errors.Wrapped(err, "failed to write zettel: [%s %s]", tz.Named.Hinweis, tz.Named.Stored.Sha)
 					return
@@ -116,7 +116,7 @@ func (i *indexZettelen) readIfNecessary() (err error) {
 	dec := gob.NewDecoder(r)
 
 	for {
-		var tz zettel_stored.Transacted
+		var tz zettel_transacted.Transacted
 
 		if err = dec.Decode(&tz); err != nil {
 			if errors.IsEOF(err) {
@@ -134,7 +134,7 @@ func (i *indexZettelen) readIfNecessary() (err error) {
 	return
 }
 
-func (i *indexZettelen) addNoRead(tz zettel_stored.Transacted) {
+func (i *indexZettelen) addNoRead(tz zettel_transacted.Transacted) {
 	{
 		var set collections.SetTransacted
 		var ok bool
@@ -202,7 +202,7 @@ func (i *indexZettelen) addNoRead(tz zettel_stored.Transacted) {
 	return
 }
 
-func (i *indexZettelen) add(tz zettel_stored.Transacted) (err error) {
+func (i *indexZettelen) add(tz zettel_transacted.Transacted) (err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Error(err)
 		return

@@ -3,12 +3,12 @@ package organize_text
 import (
 	"sort"
 
-	"github.com/friedenberg/zit/src/golf/zettel_stored"
+	"github.com/friedenberg/zit/zettel_named"
 )
 
 type zettelSet map[zettel]bool
 
-func makeZettelZetFromSetNamed(set zettel_stored.SetNamed) (zs zettelSet) {
+func makeZettelZetFromSetNamed(set zettel_named.SetNamed) (zs zettelSet) {
 	zs = makeZettelSet()
 
 	for _, z := range set {

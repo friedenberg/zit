@@ -15,6 +15,8 @@ import (
 	"github.com/friedenberg/zit/src/india/store_objekten"
 	"github.com/friedenberg/zit/src/india/zettel_checked_out"
 	"github.com/friedenberg/zit/src/kilo/store_with_lock"
+	"github.com/friedenberg/zit/zettel_external"
+	"github.com/friedenberg/zit/zettel_named"
 )
 
 type CreateFromPaths struct {
@@ -35,10 +37,10 @@ func (c CreateFromPaths) Run(args ...string) (results zettel_checked_out.Set, er
 
 	defer errors.PanicIfError(store.Flush)
 
-	toCreate := make([]zettel_stored.External, 0, len(args))
+	toCreate := make([]zettel_external.Zettel, 0, len(args))
 
 	for _, arg := range args {
-		var toAdd []zettel_stored.External
+		var toAdd []zettel_external.Zettel
 
 		if toAdd, err = c.zettelsFromPath(store, arg); err != nil {
 			err = errors.Errorf("zettel text format error for path: %s: %s", arg, err)
@@ -102,7 +104,7 @@ func (c CreateFromPaths) Run(args ...string) (results zettel_checked_out.Set, er
 	return
 }
 
-func (c CreateFromPaths) zettelsFromPath(store store_with_lock.Store, p string) (out []zettel_stored.External, err error) {
+func (c CreateFromPaths) zettelsFromPath(store store_with_lock.Store, p string) (out []zettel_external.Zettel, err error) {
 	var r io.Reader
 
 	logz.Print("running")
@@ -137,11 +139,11 @@ func (c CreateFromPaths) zettelsFromPath(store store_with_lock.Store, p string) 
 
 			out = append(
 				out,
-				zettel_stored.External{
-					ZettelFD: zettel_stored.FD{
+				zettel_external.Zettel{
+					ZettelFD: zettel_external.FD{
 						Path: p,
 					},
-					Named: zettel_stored.Named{
+					Named: zettel_named.Named{
 						Stored: zettel_stored.Stored{
 							//TODO sha?
 							Zettel: z1,
@@ -157,11 +159,11 @@ func (c CreateFromPaths) zettelsFromPath(store store_with_lock.Store, p string) 
 
 	out = append(
 		out,
-		zettel_stored.External{
-			ZettelFD: zettel_stored.FD{
+		zettel_external.Zettel{
+			ZettelFD: zettel_external.FD{
 				Path: p,
 			},
-			Named: zettel_stored.Named{
+			Named: zettel_named.Named{
 				Stored: zettel_stored.Stored{
 					//TODO sha?
 					Zettel: ctx.Zettel,

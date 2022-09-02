@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/logz"
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/delta/etikett"
-	"github.com/friedenberg/zit/src/golf/zettel_stored"
+	"github.com/friedenberg/zit/zettel_transacted"
 )
 
 type SetPrefixTransacted struct {
@@ -24,7 +24,7 @@ func MakeSetPrefixTransacted(c int) (s SetPrefixTransacted) {
 }
 
 //TODO mark that this splits on right-expanded
-func (s *SetPrefixTransacted) Add(z zettel_stored.Transacted) {
+func (s *SetPrefixTransacted) Add(z zettel_transacted.Transacted) {
 	es := z.Named.Stored.Zettel.Etiketten.Expanded(etikett.ExpanderRight{})
 
 	if es.Len() == 0 {
@@ -36,7 +36,7 @@ func (s *SetPrefixTransacted) Add(z zettel_stored.Transacted) {
 	}
 }
 
-func (s SetPrefixTransacted) addPair(e etikett.Etikett, z zettel_stored.Transacted) {
+func (s SetPrefixTransacted) addPair(e etikett.Etikett, z zettel_transacted.Transacted) {
 	existing, ok := s.innerMap[e]
 
 	if !ok {
@@ -63,7 +63,7 @@ func (a SetPrefixTransacted) Each(f func(etikett.Etikett, SetTransacted) error) 
 	return
 }
 
-func (a SetPrefixTransacted) EachZettel(f func(etikett.Etikett, zettel_stored.Transacted) error) (err error) {
+func (a SetPrefixTransacted) EachZettel(f func(etikett.Etikett, zettel_transacted.Transacted) error) (err error) {
 	return a.Each(
 		func(e etikett.Etikett, st SetTransacted) (err error) {
 			for _, sz := range st.innerMap {

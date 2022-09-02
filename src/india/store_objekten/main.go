@@ -24,8 +24,8 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/golf/hinweisen"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
-	"github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/hotel/collections"
+	"github.com/friedenberg/zit/zettel_transacted"
 )
 
 type Store struct {
@@ -128,7 +128,7 @@ func (s Store) WriteZettelObjekte(z zettel.Zettel) (sh sha.Sha, err error) {
 	return
 }
 
-func (s Store) writeNamedZettelToIndex(tz zettel_stored.Transacted) (err error) {
+func (s Store) writeNamedZettelToIndex(tz zettel_transacted.Transacted) (err error) {
 	logz.Printf("writing zettel to index: %s", tz.Named)
 
 	if err = s.indexZettelenTails.add(tz); err != nil {
@@ -154,7 +154,7 @@ func (s Store) writeNamedZettelToIndex(tz zettel_stored.Transacted) (err error) 
 	return
 }
 
-func (s Store) Read(i id.Id) (tz zettel_stored.Transacted, err error) {
+func (s Store) Read(i id.Id) (tz zettel_transacted.Transacted, err error) {
 	switch tid := i.(type) {
 	case sha.Sha:
 		f := zettel_formats.Objekte{}
@@ -194,7 +194,7 @@ func (s Store) Read(i id.Id) (tz zettel_stored.Transacted, err error) {
 	return
 }
 
-func (s *Store) Create(in zettel.Zettel) (tz zettel_stored.Transacted, err error) {
+func (s *Store) Create(in zettel.Zettel) (tz zettel_transacted.Transacted, err error) {
 	if in.IsEmpty() {
 		err = errors.Normalf("zettel is empty")
 		return
@@ -241,7 +241,7 @@ func (s *Store) Create(in zettel.Zettel) (tz zettel_stored.Transacted, err error
 func (s *Store) CreateWithHinweis(
 	in zettel.Zettel,
 	h hinweis.Hinweis,
-) (tz zettel_stored.Transacted, err error) {
+) (tz zettel_transacted.Transacted, err error) {
 	if in.IsEmpty() {
 		err = errors.Normalf("zettel is empty")
 		return
@@ -279,8 +279,8 @@ func (s Store) Etiketten() (es []etikett.Etikett, err error) {
 func (s *Store) Update(
 	h hinweis.Hinweis,
 	z zettel.Zettel,
-) (tz zettel_stored.Transacted, err error) {
-	var mutter zettel_stored.Transacted
+) (tz zettel_transacted.Transacted, err error) {
+	var mutter zettel_transacted.Transacted
 
 	if mutter, err = s.Read(h); err != nil {
 		err = errors.Error(err)
@@ -322,7 +322,7 @@ func (s *Store) Update(
 	return
 }
 
-func (s Store) Revert(h hinweis.Hinweis) (named zettel_stored.Transacted, err error) {
+func (s Store) Revert(h hinweis.Hinweis) (named zettel_transacted.Transacted, err error) {
 	return
 }
 
@@ -423,7 +423,7 @@ func (s Store) ReadAllTransaktions() (out []transaktion.Transaktion, err error) 
 
 func (s *Store) ReadHinweisAt(
 	h hinweis.HinweisWithIndex,
-) (tz zettel_stored.Transacted, err error) {
+) (tz zettel_transacted.Transacted, err error) {
 	if h.Index < 0 {
 		logz.PrintDebug(h)
 		return s.indexZettelenTails.Read(h.Hinweis)
@@ -485,7 +485,7 @@ func (s *Store) Reindex() (err error) {
 			switch o.Type {
 
 			case zk_types.TypeZettel:
-				var tz zettel_stored.Transacted
+				var tz zettel_transacted.Transacted
 
 				if tz, err = s.transactedZettelFromTransaktionObjekte(t, o); err != nil {
 					if errors.Is(err, ErrNotFound{}) {
@@ -514,7 +514,7 @@ func (s *Store) Reindex() (err error) {
 		return
 	}
 
-	var tails map[hinweis.Hinweis]zettel_stored.Transacted
+	var tails map[hinweis.Hinweis]zettel_transacted.Transacted
 
 	if tails, err = s.ZettelenSchwanzen(); err != nil {
 		err = errors.Error(err)

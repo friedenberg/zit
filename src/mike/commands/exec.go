@@ -17,8 +17,8 @@ import (
 	"github.com/friedenberg/zit/src/delta/konfig"
 	"github.com/friedenberg/zit/src/echo/id_set"
 	"github.com/friedenberg/zit/src/echo/umwelt"
-	"github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/kilo/store_with_lock"
+	"github.com/friedenberg/zit/zettel_transacted"
 )
 
 type Exec struct {
@@ -36,7 +36,7 @@ func init() {
 }
 
 func (c Exec) Run(u *umwelt.Umwelt, args ...string) (err error) {
-	var tz zettel_stored.Transacted
+	var tz zettel_transacted.Transacted
 	var executor konfig.RemoteScript
 	var ar io.ReadCloser
 
@@ -75,7 +75,7 @@ func (c Exec) getZettel(
 	u *umwelt.Umwelt,
 	hString string,
 ) (
-	tz zettel_stored.Transacted,
+	tz zettel_transacted.Transacted,
 	ar io.ReadCloser,
 	executor konfig.RemoteScript,
 	err error,
@@ -127,7 +127,7 @@ func (c Exec) getZettel(
 	return
 }
 
-func (c Exec) makeFifoPipe(tz zettel_stored.Transacted) (p string, err error) {
+func (c Exec) makeFifoPipe(tz zettel_transacted.Transacted) (p string, err error) {
 	h := tz.Named.Hinweis
 	var d string
 
@@ -178,7 +178,7 @@ func (c Exec) feedPipe(
 	ar io.ReadCloser,
 	wg *sync.WaitGroup,
 	p string,
-	tz zettel_stored.Transacted,
+	tz zettel_transacted.Transacted,
 ) (err error) {
 	defer wg.Done()
 	var pipeFileWriter *os.File

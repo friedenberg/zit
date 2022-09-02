@@ -13,9 +13,9 @@ import (
 	"github.com/friedenberg/zit/src/delta/id"
 	"github.com/friedenberg/zit/src/echo/id_set"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
-	"github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/india/zettel_checked_out"
 	"github.com/friedenberg/zit/src/kilo/store_with_lock"
+	"github.com/friedenberg/zit/zettel_transacted"
 )
 
 type CatObjekte struct {
@@ -107,7 +107,7 @@ func (c CatObjekte) zettelen(store store_with_lock.Store, ids ...id_set.Set) (er
 			continue
 		}
 
-		var tz zettel_stored.Transacted
+		var tz zettel_transacted.Transacted
 
 		if tz, err = store.StoreObjekten().Read(i); err != nil {
 			err = errors.Error(err)

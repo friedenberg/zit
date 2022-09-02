@@ -6,11 +6,11 @@ import (
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
-	"github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/india/zettel_checked_out"
 	"github.com/friedenberg/zit/src/juliett/store_working_directory"
 	"github.com/friedenberg/zit/src/kilo/store_with_lock"
 	"github.com/friedenberg/zit/src/lima/user_ops"
+	"github.com/friedenberg/zit/zettel_external"
 )
 
 type Checkin struct {
@@ -73,7 +73,7 @@ func (c Checkin) RunWithLockedStore(
 		OptionsReadExternal: readOp.OptionsReadExternal,
 	}
 
-	zettels := make([]zettel_stored.External, 0, len(readResults))
+	zettels := make([]zettel_external.Zettel, 0, len(readResults))
 
 	for _, z := range readResults {
 		zettels = append(zettels, z.External)
@@ -89,7 +89,7 @@ func (c Checkin) RunWithLockedStore(
 			Umwelt: s.Umwelt,
 		}
 
-		external := make([]zettel_stored.External, 0, len(readResults))
+		external := make([]zettel_external.Zettel, 0, len(readResults))
 
 		for _, z := range readResults {
 			external = append(external, z.External)

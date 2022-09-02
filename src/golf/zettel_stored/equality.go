@@ -17,17 +17,3 @@ func (a Stored) Equals(b Stored) bool {
 
 	return true
 }
-
-func (a Named) Equals(b Named) bool {
-	if !a.Stored.Equals(b.Stored) {
-		logz.Print("stored")
-		return false
-	}
-
-	if !a.Hinweis.Equals(b.Hinweis) {
-		logz.Print("hinweis")
-		return false
-	}
-
-	return true
-}

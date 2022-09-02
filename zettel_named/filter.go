@@ -1,4 +1,4 @@
-package zettel_stored
+package zettel_named
 
 type NamedFilter interface {
 	IncludeNamedZettel(Named) bool

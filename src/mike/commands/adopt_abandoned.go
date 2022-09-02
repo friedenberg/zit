@@ -6,8 +6,9 @@ import (
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/bravo/stdprinter"
 	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/kilo/store_with_lock"
+	"github.com/friedenberg/zit/zettel_named"
+	"github.com/friedenberg/zit/zettel_transacted"
 )
 
 type AdoptAbandoned struct {
@@ -29,7 +30,7 @@ func (c AdoptAbandoned) Description() string {
 }
 
 func (c AdoptAbandoned) RunWithLockedStore(store store_with_lock.Store, args ...string) (err error) {
-	zettels := make([]zettel_stored.Named, len(args))
+	zettels := make([]zettel_named.Named, len(args))
 
 	for i, a := range args {
 		var sha sha.Sha
@@ -39,14 +40,14 @@ func (c AdoptAbandoned) RunWithLockedStore(store store_with_lock.Store, args ...
 			return
 		}
 
-		var stored zettel_stored.Transacted
+		var stored zettel_transacted.Transacted
 
 		if stored, err = store.StoreObjekten().Read(sha); err != nil {
 			err = errors.Error(err)
 			return
 		}
 
-		var tz zettel_stored.Transacted
+		var tz zettel_transacted.Transacted
 
 		if tz, err = store.StoreObjekten().Create(stored.Named.Stored.Zettel); err != nil {
 			err = errors.Error(err)

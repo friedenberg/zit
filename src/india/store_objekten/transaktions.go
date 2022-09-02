@@ -13,6 +13,8 @@ import (
 	"github.com/friedenberg/zit/src/echo/transaktion"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
 	"github.com/friedenberg/zit/src/golf/zettel_stored"
+	"github.com/friedenberg/zit/zettel_named"
+	"github.com/friedenberg/zit/zettel_transacted"
 )
 
 func (s Store) ReadTransaktion(t ts.Time) (tr transaktion.Transaktion, err error) {
@@ -67,14 +69,14 @@ func (s Store) storedZettelFromSha(sh sha.Sha) (sz zettel_stored.Stored, err err
 // dependency on the index being accurate for the immediate mutter of the zettel
 // in the arguments
 func (s *Store) transactedWithHead(
-	z zettel_stored.Named,
+	z zettel_named.Named,
 	t transaktion.Transaktion,
-) (tz zettel_stored.Transacted, err error) {
+) (tz zettel_transacted.Transacted, err error) {
 	tz.Named = z
 	tz.Kopf = t.Time
 	tz.Schwanz = t.Time
 
-	var previous zettel_stored.Transacted
+	var previous zettel_transacted.Transacted
 
 	if previous, err = s.indexZettelenTails.Read(z.Hinweis); err == nil {
 		tz.Mutter = previous.Schwanz
@@ -94,7 +96,7 @@ func (s *Store) transactedWithHead(
 func (s Store) transactedZettelFromTransaktionObjekte(
 	t transaktion.Transaktion,
 	o transaktion.Objekte,
-) (tz zettel_stored.Transacted, err error) {
+) (tz zettel_transacted.Transacted, err error) {
 	ok := false
 
 	var h *hinweis.Hinweis
@@ -153,7 +155,7 @@ func (s Store) writeTransaktion() (err error) {
 	return
 }
 
-func (s *Store) addZettelToTransaktion(z zettel_stored.Named) (tz zettel_stored.Transacted, err error) {
+func (s *Store) addZettelToTransaktion(z zettel_named.Named) (tz zettel_transacted.Transacted, err error) {
 	logz.Printf("adding zettel to transaktion: %s", z.Hinweis)
 
 	if tz, err = s.transactedWithHead(z, s.Transaktion); err != nil {

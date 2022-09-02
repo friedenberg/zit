@@ -13,9 +13,9 @@ import (
 	"github.com/friedenberg/zit/src/echo/transaktion"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
-	"github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/india/store_objekten"
 	"github.com/friedenberg/zit/src/kilo/store_with_lock"
+	"github.com/friedenberg/zit/zettel_transacted"
 )
 
 type Show struct {
@@ -56,7 +56,7 @@ func (c Show) RunWithId(store store_with_lock.Store, ids ...id_set.Set) (err err
 }
 
 func (c Show) showZettels(store store_with_lock.Store, ids []id_set.Set) (err error) {
-	zettels := make([]zettel_stored.Transacted, len(ids))
+	zettels := make([]zettel_transacted.Transacted, len(ids))
 
 	for i, is := range ids {
 		var idd id.Id
@@ -68,7 +68,7 @@ func (c Show) showZettels(store store_with_lock.Store, ids []id_set.Set) (err er
 			continue
 		}
 
-		var tz zettel_stored.Transacted
+		var tz zettel_transacted.Transacted
 
 		if tz, err = store.StoreObjekten().Read(idd); err != nil {
 			if errors.Is(err, store_objekten.ErrNotFound{}) {
@@ -109,7 +109,7 @@ func (c Show) showZettels(store store_with_lock.Store, ids []id_set.Set) (err er
 }
 
 func (c Show) showAkten(store store_with_lock.Store, ids []id_set.Set) (err error) {
-	zettels := make([]zettel_stored.Transacted, len(ids))
+	zettels := make([]zettel_transacted.Transacted, len(ids))
 
 	for i, is := range ids {
 		var idd id.Id
@@ -121,7 +121,7 @@ func (c Show) showAkten(store store_with_lock.Store, ids []id_set.Set) (err erro
 			continue
 		}
 
-		var tz zettel_stored.Transacted
+		var tz zettel_transacted.Transacted
 
 		if tz, err = store.StoreObjekten().Read(idd); err != nil {
 			err = errors.Error(err)

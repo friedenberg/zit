@@ -14,8 +14,8 @@ import (
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_formats"
-	"github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/kilo/store_with_lock"
+	"github.com/friedenberg/zit/zettel_transacted"
 )
 
 type Cat struct {
@@ -76,7 +76,7 @@ func (c Cat) etiketten(store store_with_lock.Store) (err error) {
 }
 
 func (c Cat) zettelen(store store_with_lock.Store) (err error) {
-	var all map[hinweis.Hinweis]zettel_stored.Transacted
+	var all map[hinweis.Hinweis]zettel_transacted.Transacted
 
 	logz.Print()
 	defer logz.Print()

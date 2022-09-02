@@ -4,8 +4,8 @@ import (
 	"github.com/friedenberg/zit/src/bravo/errors"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/echo/umwelt"
-	"github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/kilo/store_with_lock"
+	"github.com/friedenberg/zit/zettel_transacted"
 )
 
 type GetAllHinweisen struct {
@@ -27,7 +27,7 @@ func (op GetAllHinweisen) Run() (results GetAllHinweisenResults, err error) {
 
 	defer errors.PanicIfError(store.Flush)
 
-	var zs map[hinweis.Hinweis]zettel_stored.Transacted
+	var zs map[hinweis.Hinweis]zettel_transacted.Transacted
 
 	if zs, err = store.StoreObjekten().ZettelenSchwanzen(); err != nil {
 		err = errors.Error(err)

@@ -1,4 +1,4 @@
-package zettel_stored
+package zettel_named
 
 import (
 	"github.com/friedenberg/zit/src/alfa/logz"

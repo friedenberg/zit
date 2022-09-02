@@ -6,12 +6,12 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/bravo/errors"
-	"github.com/friedenberg/zit/src/golf/zettel_stored"
+	"github.com/friedenberg/zit/zettel_transacted"
 )
 
 type SetTransacted struct {
-	keyFunc  func(zettel_stored.Transacted) string
-	innerMap map[string]zettel_stored.Transacted
+	keyFunc  func(zettel_transacted.Transacted) string
+	innerMap map[string]zettel_transacted.Transacted
 }
 
 func makeKey(ss ...fmt.Stringer) string {
@@ -30,7 +30,7 @@ func makeKey(ss ...fmt.Stringer) string {
 
 func MakeSetUniqueTransacted(c int) SetTransacted {
 	return SetTransacted{
-		keyFunc: func(sz zettel_stored.Transacted) string {
+		keyFunc: func(sz zettel_transacted.Transacted) string {
 			return makeKey(
 				sz.Kopf,
 				sz.Mutter,
@@ -39,31 +39,31 @@ func MakeSetUniqueTransacted(c int) SetTransacted {
 				sz.Named.Stored.Sha,
 			)
 		},
-		innerMap: make(map[string]zettel_stored.Transacted),
+		innerMap: make(map[string]zettel_transacted.Transacted),
 	}
 }
 
 func MakeSetHinweisTransacted() SetTransacted {
 	return SetTransacted{
-		keyFunc: func(sz zettel_stored.Transacted) string {
+		keyFunc: func(sz zettel_transacted.Transacted) string {
 			return makeKey(sz.Named.Hinweis)
 		},
-		innerMap: make(map[string]zettel_stored.Transacted),
+		innerMap: make(map[string]zettel_transacted.Transacted),
 	}
 }
 
 func (m SetTransacted) Get(
 	s fmt.Stringer,
-) (tz zettel_stored.Transacted, ok bool) {
+) (tz zettel_transacted.Transacted, ok bool) {
 	tz, ok = m.innerMap[s.String()]
 	return
 }
 
-func (m SetTransacted) Add(z zettel_stored.Transacted) {
+func (m SetTransacted) Add(z zettel_transacted.Transacted) {
 	m.innerMap[m.keyFunc(z)] = z
 }
 
-func (m SetTransacted) Del(z zettel_stored.Transacted) {
+func (m SetTransacted) Del(z zettel_transacted.Transacted) {
 	delete(m.innerMap, m.keyFunc(z))
 }
 
@@ -77,12 +77,12 @@ func (a SetTransacted) Merge(b SetTransacted) {
 	}
 }
 
-func (a SetTransacted) Contains(z zettel_stored.Transacted) bool {
+func (a SetTransacted) Contains(z zettel_transacted.Transacted) bool {
 	_, ok := a.innerMap[a.keyFunc(z)]
 	return ok
 }
 
-func (a SetTransacted) Any() (tz zettel_stored.Transacted) {
+func (a SetTransacted) Any() (tz zettel_transacted.Transacted) {
 	for _, sz := range a.innerMap {
 		tz = sz
 		break
@@ -91,7 +91,7 @@ func (a SetTransacted) Any() (tz zettel_stored.Transacted) {
 	return
 }
 
-func (a SetTransacted) Each(f func(zettel_stored.Transacted) error) (err error) {
+func (a SetTransacted) Each(f func(zettel_transacted.Transacted) error) (err error) {
 	for _, sz := range a.innerMap {
 		if err = f(sz); err != nil {
 			if errors.Is(err, io.EOF) {

@@ -3,16 +3,16 @@ package store_working_directory
 import (
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
-	"github.com/friedenberg/zit/src/golf/zettel_stored"
+	"github.com/friedenberg/zit/zettel_transacted"
 )
 
 type OptionsReadExternal struct {
 	zettel.Format
-	Zettelen map[hinweis.Hinweis]zettel_stored.Transacted
+	Zettelen map[hinweis.Hinweis]zettel_transacted.Transacted
 }
 
 type CheckoutOptions struct {
 	CheckoutMode
 	zettel.Format
-	Zettelen map[hinweis.Hinweis]zettel_stored.Transacted
+	Zettelen map[hinweis.Hinweis]zettel_transacted.Transacted
 }

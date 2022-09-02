@@ -4,8 +4,8 @@ import (
 	"sort"
 
 	"github.com/friedenberg/zit/src/delta/etikett"
-	"github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/hotel/collections"
+	"github.com/friedenberg/zit/zettel_transacted"
 )
 
 type AssignmentTreeConstructor struct {
@@ -42,7 +42,7 @@ func (atc AssignmentTreeConstructor) makeChildren(
 ) {
 	if groupingEtiketten.Len() == 0 {
 		prefixSet.EachZettel(
-			func(e etikett.Etikett, tz zettel_stored.Transacted) (err error) {
+			func(e etikett.Etikett, tz zettel_transacted.Transacted) (err error) {
 				parent.named.Add(makeZettel(tz.Named))
 
 				return
@@ -55,7 +55,7 @@ func (atc AssignmentTreeConstructor) makeChildren(
 	segments := prefixSet.Subset(groupingEtiketten[0])
 
 	segments.Ungrouped.Each(
-		func(tz zettel_stored.Transacted) (err error) {
+		func(tz zettel_transacted.Transacted) (err error) {
 			parent.named.Add(makeZettel(tz.Named))
 			return
 		},

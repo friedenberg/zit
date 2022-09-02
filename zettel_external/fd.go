@@ -1,4 +1,4 @@
-package zettel_stored
+package zettel_external
 
 import "github.com/friedenberg/zit/src/delta/ts"
 

@@ -11,13 +11,14 @@ import (
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/id"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
-	"github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/india/zettel_checked_out"
+	"github.com/friedenberg/zit/zettel_external"
+	"github.com/friedenberg/zit/zettel_transacted"
 )
 
 func (s *Store) Checkout(
 	options CheckoutOptions,
-	zs ...zettel_stored.Transacted,
+	zs ...zettel_transacted.Transacted,
 ) (czs []zettel_checked_out.Zettel, err error) {
 	czs = make([]zettel_checked_out.Zettel, len(zs))
 
@@ -31,7 +32,7 @@ func (s *Store) Checkout(
 	return
 }
 
-func (s *Store) isInlineAkte(sz zettel_stored.Transacted) (isInline bool) {
+func (s *Store) isInlineAkte(sz zettel_transacted.Transacted) (isInline bool) {
 	isInline = sz.Named.Stored.Zettel.TypOrDefault().String() == "md"
 
 	if typKonfig, ok := s.Konfig.Typen[sz.Named.Stored.Zettel.Typ.String()]; ok {
@@ -43,7 +44,7 @@ func (s *Store) isInlineAkte(sz zettel_stored.Transacted) (isInline bool) {
 
 func (s *Store) CheckoutOne(
 	options CheckoutOptions,
-	sz zettel_stored.Transacted,
+	sz zettel_transacted.Transacted,
 ) (cz zettel_checked_out.Zettel, err error) {
 	var filename string
 
@@ -59,8 +60,8 @@ func (s *Store) CheckoutOne(
 	inlineAkte := s.isInlineAkte(sz)
 
 	cz = zettel_checked_out.Zettel{
-		External: zettel_stored.External{
-			ZettelFD: zettel_stored.FD{
+		External: zettel_external.Zettel{
+			ZettelFD: zettel_external.FD{
 				Path: filename,
 			},
 		},
