@@ -34,7 +34,7 @@ func init() {
 }
 
 func (c Checkout) RunWithHinweisen(s store_with_lock.Store, hins ...hinweis.Hinweis) (err error) {
-	var readResults []zettel_checked_out.CheckedOut
+	var readResults []zettel_checked_out.Zettel
 
 	readOp := user_ops.ReadCheckedOut{
 		Umwelt: s.Umwelt,

@@ -8,14 +8,14 @@ import (
 	"github.com/friedenberg/zit/src/golf/zettel_stored"
 )
 
-type CheckedOut struct {
+type Zettel struct {
 	Internal zettel_stored.Transacted
 	Matches  Matches
 	External zettel_stored.External
 	State
 }
 
-func (c *CheckedOut) DetermineState() {
+func (c *Zettel) DetermineState() {
 	if c.Internal.Named.Stored.Sha.IsNull() {
 		if c.External.ExternalPathAndSha() == "" {
 			c.State = StateEmpty
@@ -31,7 +31,7 @@ func (c *CheckedOut) DetermineState() {
 	}
 }
 
-func (c CheckedOut) String() string {
+func (c Zettel) String() string {
 	logz.PrintDebug(c)
 	sb := &strings.Builder{}
 

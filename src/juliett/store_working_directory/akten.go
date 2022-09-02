@@ -15,7 +15,7 @@ import (
 	"github.com/friedenberg/zit/src/india/zettel_checked_out"
 )
 
-func (s Store) ReadExternalZettelFromAktePath(p string) (cz zettel_checked_out.CheckedOut, err error) {
+func (s Store) ReadExternalZettelFromAktePath(p string) (cz zettel_checked_out.Zettel, err error) {
 	if p, err = filepath.Abs(p); err != nil {
 		err = errors.Error(err)
 		return

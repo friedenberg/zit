@@ -43,7 +43,7 @@ func (c Status) RunWithLockedStore(s store_with_lock.Store, args ...string) (err
 		Format: zettel_formats.Text{},
 	}
 
-	var readResults []zettel_checked_out.CheckedOut
+	var readResults []zettel_checked_out.Zettel
 
 	readOp := user_ops.ReadCheckedOut{
 		Umwelt:              s.Umwelt,

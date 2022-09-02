@@ -54,7 +54,7 @@ func (c Checkin) RunWithLockedStore(
 		pz.Zettelen = args
 	}
 
-	var readResults []zettel_checked_out.CheckedOut
+	var readResults []zettel_checked_out.Zettel
 
 	readOp := user_ops.ReadCheckedOut{
 		Umwelt: s.Umwelt,

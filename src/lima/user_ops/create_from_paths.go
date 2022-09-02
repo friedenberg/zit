@@ -48,10 +48,10 @@ func (c CreateFromPaths) Run(args ...string) (results zettel_checked_out.Set, er
 		toCreate = append(toCreate, toAdd...)
 	}
 
-	results = zettel_checked_out.MakeSetUniqueCheckedOut(len(toCreate))
+	results = zettel_checked_out.MakeSetUnique(len(toCreate))
 
 	for _, z := range toCreate {
-		cz := zettel_checked_out.CheckedOut{
+		cz := zettel_checked_out.Zettel{
 			External: z,
 		}
 
@@ -173,7 +173,7 @@ func (c CreateFromPaths) zettelsFromPath(store store_with_lock.Store, p string) 
 	return
 }
 
-func (c CreateFromPaths) handleStoreError(z zettel_checked_out.CheckedOut, f string, in error) {
+func (c CreateFromPaths) handleStoreError(z zettel_checked_out.Zettel, f string, in error) {
 	var err error
 
 	var lostError store_objekten.VerlorenAndGefundenError

@@ -9,8 +9,8 @@ import (
 )
 
 type Set struct {
-	keyFunc  func(CheckedOut) string
-	innerMap map[string]CheckedOut
+	keyFunc  func(Zettel) string
+	innerMap map[string]Zettel
 }
 
 func makeKey(ss ...fmt.Stringer) string {
@@ -27,9 +27,9 @@ func makeKey(ss ...fmt.Stringer) string {
 	return sb.String()
 }
 
-func MakeSetUniqueCheckedOut(c int) Set {
+func MakeSetUnique(c int) Set {
 	return Set{
-		keyFunc: func(sz CheckedOut) string {
+		keyFunc: func(sz Zettel) string {
 			return makeKey(
 				sz.Internal.Kopf,
 				sz.Internal.Mutter,
@@ -38,31 +38,31 @@ func MakeSetUniqueCheckedOut(c int) Set {
 				sz.Internal.Named.Stored.Sha,
 			)
 		},
-		innerMap: make(map[string]CheckedOut),
+		innerMap: make(map[string]Zettel),
 	}
 }
 
-func MakeSetHinweisCheckedOut() Set {
+func MakeSetHinweisZettel() Set {
 	return Set{
-		keyFunc: func(sz CheckedOut) string {
+		keyFunc: func(sz Zettel) string {
 			return makeKey(sz.Internal.Named.Hinweis)
 		},
-		innerMap: make(map[string]CheckedOut),
+		innerMap: make(map[string]Zettel),
 	}
 }
 
 func (m Set) Get(
 	s fmt.Stringer,
-) (tz CheckedOut, ok bool) {
+) (tz Zettel, ok bool) {
 	tz, ok = m.innerMap[s.String()]
 	return
 }
 
-func (m Set) Add(z CheckedOut) {
+func (m Set) Add(z Zettel) {
 	m.innerMap[m.keyFunc(z)] = z
 }
 
-func (m Set) Del(z CheckedOut) {
+func (m Set) Del(z Zettel) {
 	delete(m.innerMap, m.keyFunc(z))
 }
 
@@ -76,12 +76,12 @@ func (a Set) Merge(b Set) {
 	}
 }
 
-func (a Set) Contains(z CheckedOut) bool {
+func (a Set) Contains(z Zettel) bool {
 	_, ok := a.innerMap[a.keyFunc(z)]
 	return ok
 }
 
-func (a Set) Any() (tz CheckedOut) {
+func (a Set) Any() (tz Zettel) {
 	for _, sz := range a.innerMap {
 		tz = sz
 		break
@@ -90,7 +90,7 @@ func (a Set) Any() (tz CheckedOut) {
 	return
 }
 
-func (a Set) Each(f func(CheckedOut) error) (err error) {
+func (a Set) Each(f func(Zettel) error) (err error) {
 	for _, sz := range a.innerMap {
 		if err = f(sz); err != nil {
 			if errors.Is(err, io.EOF) {
@@ -108,13 +108,12 @@ func (a Set) Each(f func(CheckedOut) error) (err error) {
 
 // type MapToKeyFunc struct {
 //   Results []string
-//   KeyFunc func(CheckedOut) string
+//   KeyFunc func(Zettel) string
 // }
 
-// func MakeMapToKeyFunc(f func(CheckedOut) string) MapToKeyFunc {
+// func MakeMapToKeyFunc(f func(Zettel) string) MapToKeyFunc {
 //   return MapToKeyFunc{
 //     Results: make([]string, 0),
 //     KeyFunc: f,
 //   }
 // }
-

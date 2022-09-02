@@ -16,7 +16,7 @@ type Checkout struct {
 }
 
 type CheckoutResults struct {
-	Zettelen      []zettel_checked_out.CheckedOut
+	Zettelen      []zettel_checked_out.Zettel
 	FilesZettelen []string
 	FilesAkten    []string
 }

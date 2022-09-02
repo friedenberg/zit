@@ -17,20 +17,20 @@ type ReadCheckedOut struct {
 }
 
 type ReadCheckedOutResults struct {
-	Zettelen map[hinweis.Hinweis]zettel_checked_out.CheckedOut
+	Zettelen map[hinweis.Hinweis]zettel_checked_out.Zettel
 }
 
 func (op ReadCheckedOut) RunOneHinweis(
 	s store_with_lock.Store,
 	h hinweis.Hinweis,
-) (zettel zettel_checked_out.CheckedOut, err error) {
+) (zettel zettel_checked_out.Zettel, err error) {
 	return op.RunOneString(s, h.String())
 }
 
 func (op ReadCheckedOut) RunOneString(
 	s store_with_lock.Store,
 	p string,
-) (zettel zettel_checked_out.CheckedOut, err error) {
+) (zettel zettel_checked_out.Zettel, err error) {
 	if zettel, err = s.StoreWorkingDirectory().Read(p); err != nil {
 		err = errors.Error(err)
 		return
@@ -42,12 +42,12 @@ func (op ReadCheckedOut) RunOneString(
 func (op ReadCheckedOut) RunMany(
 	s store_with_lock.Store,
 	possible store_working_directory.CwdFiles,
-  //TODO switch to zettel_checked_out.Set
-) (results []zettel_checked_out.CheckedOut, err error) {
-	results = make([]zettel_checked_out.CheckedOut, 0, possible.Len())
+	//TODO switch to zettel_checked_out.Set
+) (results []zettel_checked_out.Zettel, err error) {
+	results = make([]zettel_checked_out.Zettel, 0, possible.Len())
 
 	for _, p := range possible.Zettelen {
-		var checked_out zettel_checked_out.CheckedOut
+		var checked_out zettel_checked_out.Zettel
 
 		if checked_out, err = s.StoreWorkingDirectory().Read(p); err != nil {
 			if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
@@ -64,7 +64,7 @@ func (op ReadCheckedOut) RunMany(
 	}
 
 	for _, p := range possible.Akten {
-		var checked_out zettel_checked_out.CheckedOut
+		var checked_out zettel_checked_out.Zettel
 
 		if checked_out, err = s.StoreWorkingDirectory().ReadExternalZettelFromAktePath(p); err != nil {
 			if errors.Is(err, hinweisen.ErrDoesNotExist{}) {

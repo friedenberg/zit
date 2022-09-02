@@ -18,14 +18,14 @@ type Checkin struct {
 }
 
 type CheckinResults struct {
-	Zettelen map[hinweis.Hinweis]zettel_checked_out.CheckedOut
+	Zettelen map[hinweis.Hinweis]zettel_checked_out.Zettel
 }
 
 func (c Checkin) Run(
 	store store_with_lock.Store,
 	zettelen ...zettel_stored.External,
 ) (results CheckinResults, err error) {
-	results.Zettelen = make(map[hinweis.Hinweis]zettel_checked_out.CheckedOut)
+	results.Zettelen = make(map[hinweis.Hinweis]zettel_checked_out.Zettel)
 
 	for _, z := range zettelen {
 		var tz zettel_stored.Transacted
@@ -40,7 +40,7 @@ func (c Checkin) Run(
 		logz.PrintDebug(tz)
 		stdprinter.Outf("%s (updated)\n", tz.Named)
 
-		results.Zettelen[tz.Named.Hinweis] = zettel_checked_out.CheckedOut{
+		results.Zettelen[tz.Named.Hinweis] = zettel_checked_out.Zettel{
 			Internal: tz,
 			External: z,
 		}

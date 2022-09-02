@@ -20,11 +20,11 @@ func (c WriteNewZettels) RunMany(
 	z zettel.Zettel,
 	count int,
 ) (results zettel_checked_out.Set, err error) {
-	results = zettel_checked_out.MakeSetUniqueCheckedOut(count)
+	results = zettel_checked_out.MakeSetUnique(count)
 
 	//TODO modify this to be run once
 	for i := 0; i < count; i++ {
-		var cz zettel_checked_out.CheckedOut
+		var cz zettel_checked_out.Zettel
 
 		if cz, err = c.RunOne(store, z); err != nil {
 			err = errors.Error(err)
@@ -40,7 +40,7 @@ func (c WriteNewZettels) RunMany(
 func (c WriteNewZettels) RunOne(
 	store store_with_lock.Store,
 	z zettel.Zettel,
-) (result zettel_checked_out.CheckedOut, err error) {
+) (result zettel_checked_out.Zettel, err error) {
 	var tz zettel_stored.Transacted
 
 	if tz, err = store.StoreObjekten().Create(z); err != nil {

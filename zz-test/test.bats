@@ -70,7 +70,7 @@ function can_new_zettel_file { # @test
 		echo "---"
 	} >>"$to_add"
 
-	run zit new -predictable-hinweisen "$to_add"
+	run zit new -edit=false -predictable-hinweisen "$to_add"
 	assert_output --partial '[one/uno '
 
 	run zit show one/uno
@@ -92,7 +92,7 @@ function can_new_zettel { # @test
 		echo "---"
 	} >"$expected"
 
-	run zit new -predictable-hinweisen -bezeichnung wow -etiketten ok
+	run zit new -edit=false -predictable-hinweisen -bezeichnung wow -etiketten ok
 	assert_output --partial '[one/uno '
 
 	run zit show one/uno
@@ -113,7 +113,7 @@ function can_checkout_and_checkin { # @test
 		echo "---"
 	} >>"$to_add"
 
-	run zit new -predictable-hinweisen "$to_add"
+	run zit new -edit=false -predictable-hinweisen "$to_add"
 	assert_output --partial '[one/uno '
 
 	run zit checkout one/uno
@@ -149,7 +149,7 @@ function can_checkout_via_etiketten { # @test
 		echo "---"
 	} >>"$to_add"
 
-	run zit new "$to_add"
+	run zit new -edit=false "$to_add"
 	assert_output --partial '[one/uno '
 
 	run zit checkout -etiketten ok
@@ -172,7 +172,7 @@ function can_output_organize { # @test
 		echo "---"
 	} >>"$to_add"
 
-	run zit new "$to_add"
+	run zit new -edit=false "$to_add"
 	assert_output --partial '[one/uno '
 
 	expected_organize="$(mktemp)"
@@ -229,7 +229,7 @@ function hides_hidden_etiketten_from_organize { # @test
 		echo ---
 	} >>"$to_add"
 
-	run zit new "$to_add"
+	run zit new -edit=false "$to_add"
 	assert_output --partial '[one/uno '
 
 	expected_organize="$(mktemp)"
@@ -259,7 +259,7 @@ function can_new_zettel_with_metadatei { # @test
 		echo ---
 	} >>"$expected"
 
-	run zit new -predictable-hinweisen -bezeichnung bez -etiketten et1,et2
+	run zit new -edit=false -predictable-hinweisen -bezeichnung bez -etiketten et1,et2
 	assert_output --partial '[one/uno '
 	assert_output --partial '(checked out)'
 
@@ -286,7 +286,7 @@ function can_update_akte { # @test
 		echo the body
 	} >>"$expected"
 
-	run zit new -predictable-hinweisen "$expected"
+	run zit new -edit=false -predictable-hinweisen "$expected"
 	assert_output --partial '[one/uno '
 
 	run zit show one/uno
@@ -338,10 +338,10 @@ function can_duplicate_zettel_content { # @test
 		echo the body
 	} >>"$expected"
 
-	run zit new "$expected"
+	run zit new -edit=false "$expected"
 	assert_output --partial '[one/uno '
 
-	run zit new "$expected"
+	run zit new -edit=false "$expected"
 	assert_output --partial '[two/dos '
 
 	# when
@@ -370,7 +370,7 @@ function indexes_are_implicitly_correct { # @test
 		echo the body
 	} >>"$expected"
 
-	run zit new -predictable-hinweisen "$expected"
+	run zit new -edit=false -predictable-hinweisen "$expected"
 	assert_output --partial '[one/uno '
 
 	{
@@ -438,7 +438,7 @@ function checkouts_dont_overwrite { # @test
 		echo the body
 	} >>"$expected"
 
-	run zit new -predictable-hinweisen "$expected"
+	run zit new -edit=false -predictable-hinweisen "$expected"
 	assert_output --partial '[one/uno '
 
 	run zit checkout one/uno

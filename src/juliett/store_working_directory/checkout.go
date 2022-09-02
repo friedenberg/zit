@@ -18,8 +18,8 @@ import (
 func (s *Store) Checkout(
 	options CheckoutOptions,
 	zs ...zettel_stored.Transacted,
-) (czs []zettel_checked_out.CheckedOut, err error) {
-	czs = make([]zettel_checked_out.CheckedOut, len(zs))
+) (czs []zettel_checked_out.Zettel, err error) {
+	czs = make([]zettel_checked_out.Zettel, len(zs))
 
 	for i, sz := range zs {
 		if czs[i], err = s.CheckoutOne(options, sz); err != nil {
@@ -44,7 +44,7 @@ func (s *Store) isInlineAkte(sz zettel_stored.Transacted) (isInline bool) {
 func (s *Store) CheckoutOne(
 	options CheckoutOptions,
 	sz zettel_stored.Transacted,
-) (cz zettel_checked_out.CheckedOut, err error) {
+) (cz zettel_checked_out.Zettel, err error) {
 	var filename string
 
 	if filename, err = id.MakeDirIfNecessary(sz.Named.Hinweis, s.cwd); err != nil {
@@ -58,7 +58,7 @@ func (s *Store) CheckoutOne(
 
 	inlineAkte := s.isInlineAkte(sz)
 
-	cz = zettel_checked_out.CheckedOut{
+	cz = zettel_checked_out.Zettel{
 		External: zettel_stored.External{
 			ZettelFD: zettel_stored.FD{
 				Path: filename,

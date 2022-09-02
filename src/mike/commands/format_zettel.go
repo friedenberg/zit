@@ -54,7 +54,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	defer errors.PanicIfError(store.Flush)
 
-	var cz zettel_checked_out.CheckedOut
+	var cz zettel_checked_out.Zettel
 
 	if cz, err = store.StoreWorkingDirectory().Read(args[0]); err != nil {
 		err = errors.Error(err)

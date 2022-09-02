@@ -53,7 +53,6 @@ func (s SetNamed) HinweisStrings() (h []string) {
 	return
 }
 
-
 // func (s SetNamed) Slice() (slice []string) {
 // 	slice = make([]string, len(zs.etikettenToExisting))
 // 	i := 0

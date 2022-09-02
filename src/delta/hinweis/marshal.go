@@ -6,10 +6,10 @@ import (
 )
 
 func (s Hinweis) GobEncode() (b1 []byte, err error) {
-  b := &bytes.Buffer{}
+	b := &bytes.Buffer{}
 	e := gob.NewEncoder(b)
-  err = e.Encode(s.inner)
-  b1 = b.Bytes()
+	err = e.Encode(s.inner)
+	b1 = b.Bytes()
 	return
 }
 

@@ -59,7 +59,7 @@ func (c CatObjekte) akten(store store_with_lock.Store, ids ...id_set.Set) (err e
 		if shaId, ok := is.Any(&sha.Sha{}); ok {
 			sb = shaId.(sha.Sha)
 		} else if hinId, ok := is.Any(&hinweis.Hinweis{}); ok {
-			var zc zettel_checked_out.CheckedOut
+			var zc zettel_checked_out.Zettel
 
 			if zc, err = store.StoreWorkingDirectory().Read(hinId.String() + ".md"); err != nil {
 				err = errors.Error(err)

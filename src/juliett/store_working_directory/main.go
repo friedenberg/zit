@@ -269,7 +269,7 @@ func (s Store) readZettelFromFile(ez *zettel_stored.External) (err error) {
 	return
 }
 
-func (s *Store) Read(p string) (cz zettel_checked_out.CheckedOut, err error) {
+func (s *Store) Read(p string) (cz zettel_checked_out.Zettel, err error) {
 	if cz.External, err = s.MakeExternalZettelFromZettel(p); err != nil {
 		err = errors.Wrapped(err, "%s", p)
 		return

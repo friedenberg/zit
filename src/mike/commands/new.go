@@ -66,11 +66,6 @@ func (c New) ValidateFlagsAndArgs(u *umwelt.Umwelt, args ...string) (err error) 
 		return
 	}
 
-	if len(args) > 0 && c.Edit {
-		err = errors.Errorf("editing not supported when importing existing zettels")
-		return
-	}
-
 	return
 }
 
@@ -188,7 +183,7 @@ func (c New) editZettelsIfRequested(
 	}
 
 	zsc.Each(
-		func(zc zettel_checked_out.CheckedOut) (err error) {
+		func(zc zettel_checked_out.Zettel) (err error) {
 			cwdFiles.Zettelen = append(cwdFiles.Zettelen, zc.External.ZettelFD.Path)
 			return nil
 		},
@@ -215,7 +210,7 @@ func (c New) editZettelsIfRequested(
 
 	defer stdprinter.PanicIfError(s.Flush)
 
-	var zslc []zettel_checked_out.CheckedOut
+	var zslc []zettel_checked_out.Zettel
 
 	if zslc, err = readOp.RunMany(s, cwdFiles); err != nil {
 		err = errors.Error(err)

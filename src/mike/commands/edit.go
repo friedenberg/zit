@@ -87,7 +87,7 @@ func (c Edit) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	var readResults []zettel_checked_out.CheckedOut
+	var readResults []zettel_checked_out.Zettel
 
 	readOp := user_ops.ReadCheckedOut{
 		Umwelt: s.Umwelt,

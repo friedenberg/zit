@@ -43,7 +43,7 @@ function outputs_organize_one_etikett { # @test
 		echo "---"
 	} >>"$to_add"
 
-	run zit new -predictable-hinweisen "$to_add"
+	run zit new -edit=false -predictable-hinweisen "$to_add"
 	assert_output --partial '[one/uno '
 
 	expected_organize="$(mktemp)"
@@ -73,7 +73,7 @@ function outputs_organize_two_etiketten { # @test
 		echo "---"
 	} >>"$to_add"
 
-	run zit new -predictable-hinweisen "$to_add"
+	run zit new -edit=false -predictable-hinweisen "$to_add"
 	assert_output --partial '[one/uno '
 
 	expected_organize="$(mktemp)"
@@ -125,7 +125,7 @@ function outputs_organize_one_etiketten_group_by_one { # @test
 		echo "---"
 	} >>"$to_add"
 
-	run zit new -predictable-hinweisen "$to_add"
+	run zit new -edit=false -predictable-hinweisen "$to_add"
 	assert_output --partial '[one/uno '
 
 	expected_organize="$(mktemp)"
@@ -163,7 +163,7 @@ function outputs_organize_two_zettels_one_etiketten_group_by_one { # @test
 		echo "---"
 	} >>"$to_add"
 
-	run zit new -predictable-hinweisen "$to_add"
+	run zit new -edit=false -predictable-hinweisen "$to_add"
 	assert_output --partial '[one/uno '
 
 	to_add="$(mktemp)"
@@ -175,7 +175,7 @@ function outputs_organize_two_zettels_one_etiketten_group_by_one { # @test
 		echo "---"
 	} >>"$to_add"
 
-	run zit new -predictable-hinweisen "$to_add"
+	run zit new -edit=false -predictable-hinweisen "$to_add"
 	assert_output --partial '[one/dos '
 
 	expected_organize="$(mktemp)"
@@ -214,7 +214,7 @@ function outputs_organize_one_etiketten_group_by_two { # @test
 		echo "---"
 	} >>"$to_add"
 
-	run zit new -predictable-hinweisen "$to_add"
+	run zit new -edit=false -predictable-hinweisen "$to_add"
 
 	to_add="$(mktemp)"
 	{
@@ -226,7 +226,7 @@ function outputs_organize_one_etiketten_group_by_two { # @test
 		echo "---"
 	} >>"$to_add"
 
-	run zit new -predictable-hinweisen "$to_add"
+	run zit new -edit=false -predictable-hinweisen "$to_add"
 
 	expected_organize="$(mktemp)"
 	{
@@ -266,7 +266,7 @@ function commits_organize_one_etiketten_group_by_two { # @test
 		echo "---"
 	} >>"$to_add"
 
-	run zit new -predictable-hinweisen "$to_add"
+	run zit new -edit=false -predictable-hinweisen "$to_add"
 
 	to_add="$(mktemp)"
 	{
@@ -278,7 +278,7 @@ function commits_organize_one_etiketten_group_by_two { # @test
 		echo "---"
 	} >>"$to_add"
 
-	run zit new -predictable-hinweisen "$to_add"
+	run zit new -edit=false -predictable-hinweisen "$to_add"
 
 	to_add="$(mktemp)"
 	{
@@ -290,7 +290,7 @@ function commits_organize_one_etiketten_group_by_two { # @test
 		echo "---"
 	} >>"$to_add"
 
-	run zit new -predictable-hinweisen "$to_add"
+	run zit new -edit=false -predictable-hinweisen "$to_add"
 
 	expected_organize="$(mktemp)"
 	{
@@ -358,7 +358,7 @@ function commits_organize_one_etiketten_group_by_two_new_zettels { # @test
 		echo "---"
 	} >>"$to_add"
 
-	run zit new -predictable-hinweisen "$to_add"
+	run zit new -edit=false -predictable-hinweisen "$to_add"
 
 	expected="$(mktemp)"
 	{
@@ -387,7 +387,7 @@ function commits_organize_one_etiketten_group_by_two_new_zettels { # @test
 		echo "---"
 	} >>"$to_add"
 
-	run zit new -predictable-hinweisen "$to_add"
+	run zit new -edit=false -predictable-hinweisen "$to_add"
 
 	{
 		echo priority-1
@@ -409,7 +409,7 @@ function commits_organize_one_etiketten_group_by_two_new_zettels { # @test
 		echo "---"
 	} >>"$to_add"
 
-	run zit new -predictable-hinweisen "$to_add"
+	run zit new -edit=false -predictable-hinweisen "$to_add"
 
 	{
 		echo priority-1
@@ -496,7 +496,7 @@ function commits_no_changes { # @test
 		echo "---"
 	} >"$one"
 
-	run zit new -predictable-hinweisen "$one"
+	run zit new -edit=false -predictable-hinweisen "$one"
 
 	two="$(mktemp)"
 	{
@@ -508,7 +508,7 @@ function commits_no_changes { # @test
 		echo "---"
 	} >"$two"
 
-	run zit new -predictable-hinweisen "$two"
+	run zit new -edit=false -predictable-hinweisen "$two"
 
 	three="$(mktemp)"
 	{
@@ -520,7 +520,7 @@ function commits_no_changes { # @test
 		echo "---"
 	} >"$three"
 
-	run zit new -predictable-hinweisen "$three"
+	run zit new -edit=false -predictable-hinweisen "$three"
 
 	expected_organize="$(mktemp)"
 	{
@@ -570,7 +570,7 @@ function commits_dependent_leaf { # @test
 		echo "---"
 	} >"$one"
 
-	run zit new -predictable-hinweisen "$one"
+	run zit new -edit=false -predictable-hinweisen "$one"
 
 	two="$(mktemp)"
 	{
@@ -582,7 +582,7 @@ function commits_dependent_leaf { # @test
 		echo "---"
 	} >"$two"
 
-	run zit new -predictable-hinweisen "$two"
+	run zit new -edit=false -predictable-hinweisen "$two"
 
 	three="$(mktemp)"
 	{
@@ -594,7 +594,7 @@ function commits_dependent_leaf { # @test
 		echo "---"
 	} >"$three"
 
-	run zit new -predictable-hinweisen "$three"
+	run zit new -edit=false -predictable-hinweisen "$three"
 
 	expected_organize="$(mktemp)"
 	{
@@ -665,7 +665,7 @@ function zettels_in_correct_places { # @test
 		echo "---"
 	} >"$one"
 
-	run zit new -predictable-hinweisen "$one"
+	run zit new -edit=false -predictable-hinweisen "$one"
 
 	expected_organize="$(mktemp)"
 	{
