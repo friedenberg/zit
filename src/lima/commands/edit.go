@@ -69,7 +69,7 @@ func (c Edit) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	if err = (user_ops.OpenFiles{}).Run(checkoutResults.ToSliceFilesZettelen()...); err != nil {
+	if err = (user_ops.OpenFiles{}).Run(checkoutResults.ToSliceFilesAkten()...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

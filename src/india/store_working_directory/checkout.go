@@ -62,6 +62,7 @@ func (s *Store) CheckoutOne(
 	inlineAkte := s.isInlineAkte(sz)
 
 	cz = zettel_checked_out.Zettel{
+		Internal: sz,
 		External: zettel_external.Zettel{
 			ZettelFD: zettel_external.FD{
 				Path: filename,
@@ -79,6 +80,7 @@ func (s *Store) CheckoutOne(
 	case CheckoutModeAkteOnly:
 		p := originalFilename + "." + sz.Named.Stored.Zettel.AkteExt()
 		cz.External.AkteFD.Path = p
+		cz.External.ZettelFD.Path = ""
 
 		if err = s.writeAkte(sz.Named.Stored.Zettel.Akte, p); err != nil {
 			err = errors.Wrap(err)
