@@ -27,7 +27,7 @@ import (
 type Store struct {
 	*umwelt.Umwelt
 	age.Age
-	hinweisen hinweisen.Hinweisen
+	hinweisen *hinweisen.Hinweisen
 	*indexZettelen
 	*indexZettelenTails
 	*indexEtiketten
@@ -43,7 +43,7 @@ func (s *Store) Initialize(u *umwelt.Umwelt) (err error) {
 		return
 	}
 
-	if s.hinweisen, err = hinweisen.New(s.Age, u.DirZit()); err != nil {
+	if s.hinweisen, err = hinweisen.New(u.DirZit()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -92,7 +92,7 @@ func (s *Store) Initialize(u *umwelt.Umwelt) (err error) {
 	return
 }
 
-func (s Store) Hinweisen() hinweisen.Hinweisen {
+func (s Store) Hinweisen() *hinweisen.Hinweisen {
 	return s.hinweisen
 }
 
@@ -325,12 +325,6 @@ func (s Store) Revert(h hinweis.Hinweis) (named zettel_transacted.Zettel, err er
 func (s Store) Flush() (err error) {
 	if err = s.writeTransaktion(); err != nil {
 		err = errors.Wrapf(err, "failed to write transaction")
-		return
-	}
-
-	if err = s.hinweisen.Flush(); err != nil {
-		errors.PrintOut(err)
-		err = errors.Wrap(err)
 		return
 	}
 

@@ -26,7 +26,7 @@ type indexKennung struct {
 
 	encodedKennung
 
-	oldHinweisenStore hinweisen.Hinweisen
+	oldHinweisenStore *hinweisen.Hinweisen
 
 	didRead    bool
 	hasChanges bool
@@ -37,7 +37,7 @@ type indexKennung struct {
 func newIndexKennung(
 	u *umwelt.Umwelt,
 	ioFactory ioFactory,
-	oldHinweisenStore hinweisen.Hinweisen,
+	oldHinweisenStore *hinweisen.Hinweisen,
 	p string,
 ) (i *indexKennung, err error) {
 	i = &indexKennung{
@@ -124,8 +124,8 @@ func (i *indexKennung) readIfNecessary() (err error) {
 }
 
 func (i *indexKennung) reset() (err error) {
-	lMax := i.oldHinweisenStore.Factory().Left().Len() - 1
-	rMax := i.oldHinweisenStore.Factory().Right().Len() - 1
+	lMax := i.oldHinweisenStore.Left().Len() - 1
+	rMax := i.oldHinweisenStore.Right().Len() - 1
 
 	if lMax == 0 {
 		err = errors.Errorf("left kennung are empty")
@@ -166,12 +166,12 @@ func (i *indexKennung) addHinweis(h hinweis.Hinweis) (err error) {
 
 	var left, right int
 
-	if left, err = i.oldHinweisenStore.Factory().Left().Kennung(h.Kopf()); err != nil {
+	if left, err = i.oldHinweisenStore.Left().Kennung(h.Kopf()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if right, err = i.oldHinweisenStore.Factory().Right().Kennung(h.Schwanz()); err != nil {
+	if right, err = i.oldHinweisenStore.Right().Kennung(h.Schwanz()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -247,8 +247,8 @@ func (i *indexKennung) makeHinweisButDontStore(j int) (h hinweis.Hinweis, err er
 
 	h, err = hinweis.New(
 		k.Id(),
-		i.oldHinweisenStore.Factory().Left(),
-		i.oldHinweisenStore.Factory().Right(),
+		i.oldHinweisenStore.Left(),
+		i.oldHinweisenStore.Right(),
 	)
 
 	if err != nil {

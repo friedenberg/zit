@@ -4,7 +4,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/charlie/file_lock"
-	"github.com/friedenberg/zit/src/delta/hinweisen"
 	"github.com/friedenberg/zit/src/delta/umwelt"
 	"github.com/friedenberg/zit/src/echo/akten"
 	"github.com/friedenberg/zit/src/hotel/store_objekten"
@@ -69,10 +68,6 @@ func (s Store) Age() age.Age {
 
 func (s Store) StoreObjekten() *store_objekten.Store {
 	return s.storeObjekten
-}
-
-func (s Store) Hinweisen() hinweisen.Hinweisen {
-	return s.storeObjekten.Hinweisen()
 }
 
 func (s Store) Akten() akten.Akten {
