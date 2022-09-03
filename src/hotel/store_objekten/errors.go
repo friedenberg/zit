@@ -12,6 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/echo/akten"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
+	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/google/uuid"
 )
 
@@ -117,4 +118,22 @@ func (e duplicateAkteError) AddToLostAndFound(p string) (p1 string, err error) {
 	}
 
 	return
+}
+
+type ErrAkteExists struct {
+	Akte sha.Sha
+	zettel_transacted.Set
+}
+
+func (e ErrAkteExists) Is(target error) bool {
+	_, ok := target.(ErrAkteExists)
+	return ok
+}
+
+func (e ErrAkteExists) Error() string {
+	return fmt.Sprintf(
+		"zettelen already exist with akte:\n%s\n%v",
+		e.Akte,
+		e.Set,
+	)
 }

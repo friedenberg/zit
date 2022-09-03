@@ -12,6 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/umwelt"
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
+	"github.com/friedenberg/zit/src/hotel/store_objekten"
 	"github.com/friedenberg/zit/src/juliett/store_with_lock"
 )
 
@@ -21,7 +22,9 @@ type ZettelFromExternalAkte struct {
 	Delete    bool
 }
 
-func (c ZettelFromExternalAkte) Run(args ...string) (results zettel_transacted.Set, err error) {
+func (c ZettelFromExternalAkte) Run(
+	args ...string,
+) (results zettel_transacted.Set, err error) {
 	var store store_with_lock.Store
 
 	if store, err = store_with_lock.New(c.Umwelt); err != nil {
@@ -35,17 +38,39 @@ func (c ZettelFromExternalAkte) Run(args ...string) (results zettel_transacted.S
 
 	for _, arg := range args {
 		var z zettel.Zettel
+		var tz zettel_transacted.Zettel
 
 		if z, err = c.zettelForAkte(store, arg); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		var tz zettel_transacted.Zettel
-
 		if tz, err = store.StoreObjekten().Create(z); err != nil {
 			err = errors.Wrap(err)
 			return
+		}
+
+		akteSha := tz.Named.Stored.Zettel.Akte
+
+		if err = store.StoreObjekten().AkteExists(akteSha); err != nil {
+			if errors.Is(err, store_objekten.ErrAkteExists{}) {
+				err1 := err.(store_objekten.ErrAkteExists)
+				errors.PrintOutf("[%s %s] (has Akte matches)", arg, akteSha)
+				err1.Set.Each(
+					func(tz1 zettel_transacted.Zettel) (err error) {
+						if tz1.Named.Hinweis.Equals(tz.Named.Hinweis) {
+							return
+						}
+						//TODO eliminate zettels marked as duplicates / hidden
+						errors.PrintOutf("\t%s", tz1.Named)
+						return
+					},
+				)
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+				return
+			}
 		}
 
 		results.Add(tz)
@@ -66,7 +91,10 @@ func (c ZettelFromExternalAkte) Run(args ...string) (results zettel_transacted.S
 	return
 }
 
-func (c ZettelFromExternalAkte) zettelForAkte(store store_with_lock.Store, aktePath string) (z zettel.Zettel, err error) {
+func (c ZettelFromExternalAkte) zettelForAkte(
+	store store_with_lock.Store,
+	aktePath string,
+) (z zettel.Zettel, err error) {
 	z.Etiketten = c.Etiketten
 
 	var akteWriter sha.WriteCloser
@@ -95,12 +123,12 @@ func (c ZettelFromExternalAkte) zettelForAkte(store store_with_lock.Store, akteP
 		return
 	}
 
+	z.Akte = akteWriter.Sha()
+
 	if err = z.Bezeichnung.Set(path.Base(aktePath)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	z.Akte = akteWriter.Sha()
 
 	if err = z.Typ.Set(path.Ext(aktePath)); err != nil {
 		err = errors.Wrap(err)

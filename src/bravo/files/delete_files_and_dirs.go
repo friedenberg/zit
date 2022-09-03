@@ -12,8 +12,12 @@ func DeleteFilesAndDirs(args ...string) (err error) {
 
 	for _, f := range args {
 		if err = os.Remove(f); err != nil {
-			err = errors.Wrap(err)
-			return
+			if errors.IsNotExist(err) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+				return
+			}
 		}
 
 		// It's possible that the paths come in absolute or relative form. So we
@@ -41,8 +45,12 @@ func DeleteFilesAndDirs(args ...string) (err error) {
 
 		if len(contents) == 0 {
 			if err = os.Remove(d); err != nil {
-				err = errors.Wrap(err)
-				return
+				if errors.IsNotExist(err) {
+					err = nil
+				} else {
+					err = errors.Wrap(err)
+					return
+				}
 			}
 		}
 	}

@@ -4,10 +4,35 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/id"
 	"github.com/friedenberg/zit/src/delta/age_io"
+	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 )
+
+func (s Store) AkteExists(sh sha.Sha) (err error) {
+	p := id.Path(sh, s.Umwelt.DirObjektenAkten())
+	ok := files.Exists(p)
+
+	if !ok {
+		return
+	}
+
+	var set zettel_transacted.Set
+
+	if set, err = s.indexZettelen.ReadAkteSha(sh); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	err = ErrAkteExists{
+		Akte: sh,
+		Set:  set,
+	}
+
+	return
+}
 
 type akteMultiWriter struct {
 	io.Writer
