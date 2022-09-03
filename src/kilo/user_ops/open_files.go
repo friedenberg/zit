@@ -14,7 +14,7 @@ func (c OpenFiles) Run(args ...string) (err error) {
 	}
 
 	if err = files.OpenFiles(args...); err != nil {
-		err = errors.Errorf("%q: %s", args, err)
+		err = errors.Wrapf(err, "%q", args)
 		return
 	}
 

@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/charlie/hinweis"
 )
 
 type Set struct {
@@ -107,7 +108,7 @@ func (a Set) Each(f func(Zettel) error) (err error) {
 }
 
 func (m Set) ToSlice() (s Slice) {
-	s = MakeSliceTransacted()
+	s = MakeSlice(m.Len())
 
 	for _, sz := range m.innerMap {
 		s.Append(sz)
@@ -121,6 +122,16 @@ func (s Set) ToSetPrefixTransacted() (b SetPrefixTransacted) {
 
 	for _, z := range s.innerMap {
 		b.Add(z)
+	}
+
+	return
+}
+
+func (s Set) ToSliceHinweisen() (b []hinweis.Hinweis) {
+	b = make([]hinweis.Hinweis, 0, s.Len())
+
+	for _, z := range s.innerMap {
+		b = append(b, z.Named.Hinweis)
 	}
 
 	return

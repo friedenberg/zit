@@ -9,8 +9,12 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/delta/umwelt"
+	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/hotel/organize_text"
+	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
+	"github.com/friedenberg/zit/src/india/store_working_directory"
+	"github.com/friedenberg/zit/src/juliett/store_with_lock"
 	"github.com/friedenberg/zit/src/kilo/user_ops"
 )
 
@@ -32,7 +36,7 @@ func init() {
 			f.Var(&c.Etiketten, "etiketten", "to add to the created zettels")
 			f.BoolVar(&c.Delete, "delete", false, "delete the zettel and akte after successful checkin")
 			f.BoolVar(&c.Organize, "organize", false, "")
-			f.BoolVar(&c.OpenAkten, "open-akte", false, "also open the Akten")
+			f.BoolVar(&c.OpenAkten, "open-akten", false, "also open the Akten")
 
 			return c
 		},
@@ -53,8 +57,9 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	if c.OpenAkten {
-		//TODO
+	if err = c.openAktenIfNecessary(u, zettelsFromAkteResults); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	if !c.Organize {
@@ -111,6 +116,49 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	if _, err = commitOrganizeTextOp.Run(createOrganizeFileResults.Text, ot2); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (c Add) openAktenIfNecessary(
+	u *umwelt.Umwelt,
+	zettels zettel_transacted.Set,
+) (err error) {
+	if !c.OpenAkten {
+		return
+	}
+
+	checkoutOp := user_ops.Checkout{
+		Umwelt: u,
+		CheckoutOptions: store_working_directory.CheckoutOptions{
+			CheckoutMode: store_working_directory.CheckoutModeAkteOnly,
+			Format:       zettel.Text{},
+		},
+	}
+
+	hs := zettels.ToSliceHinweisen()
+
+	var checkoutResults zettel_checked_out.Set
+
+	var store store_with_lock.Store
+
+	if store, err = store_with_lock.New(u); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.PanicIfError(store.Flush)
+
+	if checkoutResults, err = checkoutOp.RunManyHinweisen(store, hs...); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	openOp := user_ops.OpenFiles{}
+	if err = openOp.Run(checkoutResults.ToSliceFilesAkten()...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

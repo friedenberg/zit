@@ -106,14 +106,30 @@ func (a Set) Each(f func(Zettel) error) (err error) {
 	return
 }
 
-// type MapToKeyFunc struct {
-//   Results []string
-//   KeyFunc func(Zettel) string
-// }
+func (s Set) ToSliceFilesZettelen() (out []string) {
+	out = make([]string, 0, s.Len())
 
-// func MakeMapToKeyFunc(f func(Zettel) string) MapToKeyFunc {
-//   return MapToKeyFunc{
-//     Results: make([]string, 0),
-//     KeyFunc: f,
-//   }
-// }
+	for _, z := range s.innerMap {
+		p := z.External.ZettelFD.Path
+
+		if p != "" {
+			out = append(out, p)
+		}
+	}
+
+	return
+}
+
+func (s Set) ToSliceFilesAkten() (out []string) {
+	out = make([]string, 0, s.Len())
+
+	for _, z := range s.innerMap {
+		p := z.External.AkteFD.Path
+
+		if p != "" {
+			out = append(out, p)
+		}
+	}
+
+	return
+}

@@ -50,7 +50,7 @@ func (c Edit) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	var checkoutResults user_ops.CheckoutResults
+	var checkoutResults zettel_checked_out.Set
 
 	var s store_with_lock.Store
 
@@ -69,7 +69,7 @@ func (c Edit) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	if err = (user_ops.OpenFiles{}).Run(checkoutResults.FilesAkten...); err != nil {
+	if err = (user_ops.OpenFiles{}).Run(checkoutResults.ToSliceFilesZettelen()...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -82,7 +82,7 @@ func (c Edit) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			Build(),
 	}
 
-	if _, err = openVimOp.Run(checkoutResults.FilesZettelen...); err != nil {
+	if _, err = openVimOp.Run(checkoutResults.ToSliceFilesZettelen()...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -103,7 +103,7 @@ func (c Edit) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	var possible store_working_directory.CwdFiles
 
-	for _, f := range checkoutResults.FilesZettelen {
+	for _, f := range checkoutResults.ToSliceFilesZettelen() {
 		possible.Zettelen = append(possible.Zettelen, f)
 	}
 

@@ -17,14 +17,18 @@ import (
 func (s *Store) Checkout(
 	options CheckoutOptions,
 	zs ...zettel_transacted.Zettel,
-) (czs []zettel_checked_out.Zettel, err error) {
-	czs = make([]zettel_checked_out.Zettel, len(zs))
+) (zcs zettel_checked_out.Set, err error) {
+	zcs = zettel_checked_out.MakeSetUnique(len(zs))
 
-	for i, sz := range zs {
-		if czs[i], err = s.CheckoutOne(options, sz); err != nil {
+	for _, sz := range zs {
+		var zc zettel_checked_out.Zettel
+
+		if zc, err = s.CheckoutOne(options, sz); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
+
+		zcs.Add(zc)
 	}
 
 	return
@@ -74,6 +78,7 @@ func (s *Store) CheckoutOne(
 	switch options.CheckoutMode {
 	case CheckoutModeAkteOnly:
 		p := originalFilename + "." + sz.Named.Stored.Zettel.AkteExt()
+		cz.External.AkteFD.Path = p
 
 		if err = s.writeAkte(sz.Named.Stored.Zettel.Akte, p); err != nil {
 			err = errors.Wrap(err)

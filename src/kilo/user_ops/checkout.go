@@ -15,41 +15,29 @@ type Checkout struct {
 	store_working_directory.CheckoutOptions
 }
 
-type CheckoutResults struct {
-	Zettelen      []zettel_checked_out.Zettel
-	FilesZettelen []string
-	FilesAkten    []string
-}
-
 func (c Checkout) RunManyHinweisen(
 	s store_with_lock.Store,
 	hins ...hinweis.Hinweis,
-) (results CheckoutResults, err error) {
-	zs := make([]zettel_transacted.Zettel, len(hins))
+) (results zettel_checked_out.Set, err error) {
+	zts := zettel_transacted.MakeSetUnique(len(hins))
 
-	for i, _ := range zs {
-		h := hins[i]
+	for _, h := range hins {
+		var zt zettel_transacted.Zettel
 
-		if zs[i], err = s.StoreObjekten().Read(h); err != nil {
+		if zt, err = s.StoreObjekten().Read(h); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
+
+		zts.Add(zt)
 	}
 
-	if results.Zettelen, err = s.StoreWorkingDirectory().Checkout(c.CheckoutOptions, zs...); err != nil {
+	results = zettel_checked_out.MakeSetUnique(zts.Len())
+	ztsl := zts.ToSlice()
+
+	if results, err = s.StoreWorkingDirectory().Checkout(c.CheckoutOptions, ztsl...); err != nil {
 		err = errors.Wrap(err)
 		return
-	}
-
-	results.FilesZettelen = make([]string, 0, len(results.Zettelen))
-	results.FilesAkten = make([]string, 0)
-
-	for _, z := range results.Zettelen {
-		results.FilesZettelen = append(results.FilesZettelen, z.External.ZettelFD.Path)
-
-		if z.External.AkteFD.Path != "" {
-			results.FilesAkten = append(results.FilesAkten, z.External.AkteFD.Path)
-		}
 	}
 
 	return
