@@ -23,5 +23,5 @@ func (s Slice) Get(i int) Zettel {
 }
 
 func (s *Slice) Sort(f func(int, int) bool) {
-	sort.Slice(s, f)
+	sort.Slice(*s, f)
 }

@@ -3,30 +3,10 @@ package zettel_transacted
 import (
 	"fmt"
 	"io"
-	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 )
-
-type Set struct {
-	keyFunc  func(Zettel) string
-	innerMap map[string]Zettel
-}
-
-func makeKey(ss ...fmt.Stringer) string {
-	sb := &strings.Builder{}
-
-	for i, s := range ss {
-		if i > 0 {
-			sb.WriteString(".")
-		}
-
-		sb.WriteString(s.String())
-	}
-
-	return sb.String()
-}
 
 func MakeSetUnique(c int) Set {
 	return Set{
@@ -101,6 +81,34 @@ func (a Set) Each(f func(Zettel) error) (err error) {
 			}
 
 			return
+		}
+	}
+
+	return
+}
+
+func (a Set) Filter(keyFunc SetKeyFunc, f func(Zettel) (bool, error)) (b Set, err error) {
+	if keyFunc == nil {
+		keyFunc = a.keyFunc
+	}
+
+	b = Set{
+		keyFunc:  keyFunc,
+		innerMap: make(map[string]Zettel, a.Len()),
+	}
+
+	for _, sz := range a.innerMap {
+		var ok bool
+
+		ok, err = f(sz)
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if ok {
+			b.Add(sz)
 		}
 	}
 

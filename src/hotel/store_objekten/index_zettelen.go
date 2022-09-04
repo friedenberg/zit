@@ -244,6 +244,23 @@ func (i *indexZettelen) ReadBezeichnung(s string) (tzs zettel_transacted.Set, er
 	return
 }
 
+func (i *indexZettelen) ReadAktenDuplicates() (tzs map[sha.Sha]zettel_transacted.Set, err error) {
+	if err = i.readIfNecessary(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	tzs = make(map[sha.Sha]zettel_transacted.Set, len(i.akten))
+
+	for s, tzsa := range i.akten {
+		if tzsa.Len() > 1 {
+			tzs[s] = tzsa
+		}
+	}
+
+	return
+}
+
 func (i *indexZettelen) ReadAkteSha(s sha.Sha) (tzs zettel_transacted.Set, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)

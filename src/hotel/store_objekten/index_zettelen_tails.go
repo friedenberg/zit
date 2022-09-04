@@ -133,6 +133,24 @@ func (i *indexZettelenTails) add(tz zettel_transacted.Zettel) (err error) {
 	return
 }
 
+func (i *indexZettelenTails) IsSchwanz(zt zettel_transacted.Zettel) (ok bool, err error) {
+	var zta zettel_transacted.Zettel
+
+	if zta, err = i.Read(zt.Named.Hinweis); err != nil {
+		if errors.Is(err, ErrNotFound{}) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+		}
+
+		return
+	}
+
+	ok = zta.Named.Equals(zt.Named)
+
+	return
+}
+
 func (i *indexZettelenTails) Read(h hinweis.Hinweis) (tz zettel_transacted.Zettel, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
