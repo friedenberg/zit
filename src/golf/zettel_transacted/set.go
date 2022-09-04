@@ -23,7 +23,7 @@ func MakeSetUnique(c int) Set {
 	}
 }
 
-func MakeSetHinweisTransacted() Set {
+func MakeSetHinweis() Set {
 	return Set{
 		keyFunc: func(sz Zettel) string {
 			return makeKey(sz.Named.Hinweis)

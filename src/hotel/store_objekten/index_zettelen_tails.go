@@ -31,7 +31,7 @@ func newIndexZettelenTails(
 		umwelt:    u,
 		path:      p,
 		ioFactory: f,
-		zettelen:  zettel_transacted.MakeSetHinweisTransacted(),
+		zettelen:  zettel_transacted.MakeSetHinweis(),
 	}
 
 	return
