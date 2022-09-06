@@ -23,7 +23,9 @@ func init() {
 	registerCommand(
 		"edit",
 		func(f *flag.FlagSet) Command {
-			c := &Edit{}
+			c := &Edit{
+				CheckoutMode: store_working_directory.CheckoutModeZettelOnly,
+			}
 
 			f.Var(&c.CheckoutMode, "mode", "mode for checking out the zettel")
 
@@ -69,9 +71,15 @@ func (c Edit) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	if err = (user_ops.OpenFiles{}).Run(checkoutResults.ToSliceFilesAkten()...); err != nil {
-		err = errors.Wrap(err)
-		return
+	switch c.CheckoutMode {
+	case store_working_directory.CheckoutModeAkteOnly:
+	case store_working_directory.CheckoutModeZettelAndAkte:
+		if err = (user_ops.OpenFiles{}).Run(checkoutResults.ToSliceFilesAkten()...); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+	default:
 	}
 
 	openVimOp := user_ops.OpenVim{

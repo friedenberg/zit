@@ -269,6 +269,7 @@ func (i *indexZettelen) ReadAkteSha(s sha.Sha) (tzs zettel_transacted.Set, err e
 
 	ok := false
 
+  //TODO prevent the currently added zettels from appearing
 	if tzs, ok = i.akten[s]; !ok {
 		err = ErrNotFound{Id: s}
 		return

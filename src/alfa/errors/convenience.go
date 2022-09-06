@@ -9,6 +9,17 @@ import (
 	"golang.org/x/xerrors"
 )
 
+type errorWithIsMethod interface {
+	error
+	Is(error) bool
+}
+
+func ErrorHasIsMethod(err error) bool {
+	_, ok := err.(errorWithIsMethod)
+
+	return ok
+}
+
 type unwrappable interface {
 	error
 	Unwrap() error
@@ -59,6 +70,21 @@ func Unwrap(err error) error {
 	}
 
 	return err
+}
+
+func IsAsNilOrWrapf(
+	err error,
+	target error,
+	format string,
+	values ...interface{},
+) (out error) {
+	if Is(err, target) {
+		out = nil
+	} else {
+		out = Wrapf(err, format, values...)
+	}
+
+	return
 }
 
 func PanicIfError(err interface{}) {

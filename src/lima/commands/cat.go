@@ -66,8 +66,16 @@ func (c Cat) etiketten(store store_with_lock.Store) (err error) {
 	}
 
 	for _, e := range ea {
-		errors.PrintDebug(e)
-		errors.PrintOut(e.String())
+		if err = errors.PrintOut(e.String()); err != nil {
+			err = errors.IsAsNilOrWrapf(
+				err,
+				syscall.EPIPE,
+				"Etikett: %s",
+				e,
+			)
+
+			return
+		}
 	}
 
 	return
@@ -75,9 +83,6 @@ func (c Cat) etiketten(store store_with_lock.Store) (err error) {
 
 func (c Cat) zettelen(store store_with_lock.Store) (err error) {
 	var all map[hinweis.Hinweis]zettel_transacted.Zettel
-
-	errors.Print()
-	defer errors.Print()
 
 	if all, err = store.StoreObjekten().ZettelenSchwanzen(); err != nil {
 		err = errors.Wrap(err)
@@ -88,12 +93,26 @@ func (c Cat) zettelen(store store_with_lock.Store) (err error) {
 
 		// not a bottleneck
 		for _, z := range all {
-			b, err := json.Marshal(z.Named.Stored)
+			var b []byte
+
+			b, err = json.Marshal(z.Named.Stored)
 
 			if err != nil {
-				errors.Print(err)
+				err = errors.PrintErr(err)
 			} else {
-				errors.PrintOut(string(b))
+				err = errors.PrintOut(string(b))
+			}
+
+			if err != nil {
+				//TODO combined error
+				err = errors.IsAsNilOrWrapf(
+					err,
+					syscall.EPIPE,
+					"Zettel: %s",
+					z.Named.Hinweis,
+				)
+
+				return
 			}
 		}
 	} else {
@@ -108,13 +127,14 @@ func (c Cat) zettelen(store store_with_lock.Store) (err error) {
 			c.Zettel = z.Named.Stored.Zettel
 
 			if _, err = f.WriteTo(c); err != nil {
-				if errors.Is(err, syscall.EPIPE) {
-					errors.Print("closed pipe")
-					err = nil
-					break
-				} else {
-					errors.Print(err)
-				}
+				err = errors.IsAsNilOrWrapf(
+					err,
+					syscall.EPIPE,
+					"Zettel: %s",
+					z.Named.Hinweis,
+				)
+
+				return
 			}
 		}
 	}
@@ -131,7 +151,14 @@ func (c Cat) akten(store store_with_lock.Store) (err error) {
 	}
 
 	for _, s := range shas {
-		errors.PrintOut(s)
+		if err = errors.PrintOut(s); err != nil {
+			if errors.Is(err, syscall.EPIPE) {
+				err = nil
+				break
+			} else {
+				errors.Print(err)
+			}
+		}
 	}
 
 	return

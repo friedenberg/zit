@@ -25,34 +25,29 @@ func init() {
 }
 
 func (c Log) RunWithHinweisen(os store_with_lock.Store, hs ...hinweis.Hinweis) (err error) {
-	var h hinweis.Hinweis
-
 	switch len(hs) {
 
 	case 0:
 		err = errors.Errorf("hinweis or zettel sha required")
 		return
-
-	default:
-		errors.PrintErrf("ignoring extra arguments: %q", hs[1:])
-
-		fallthrough
-
-	case 1:
-		h = hs[0]
 	}
 
-	var chain zettel_transacted.Slice
-	errors.Print()
+	chains := make([]zettel_transacted.Slice, 0, len(hs))
 
-	if chain, err = os.StoreObjekten().AllInChain(h); err != nil {
-		err = errors.Wrap(err)
-		return
+	for _, h := range hs {
+		var chain zettel_transacted.Slice
+
+		if chain, err = os.StoreObjekten().AllInChain(h); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		chains = append(chains, chain)
 	}
 
 	var b []byte
 
-	if b, err = json.Marshal(chain); err != nil {
+	if b, err = json.Marshal(chains); err != nil {
 		err = errors.Wrapf(err, "failed to marshal json")
 		return
 	}

@@ -15,6 +15,7 @@ func (s ScriptConfig) Cmd(args ...string) (c *exec.Cmd, err error) {
 			"bash",
 			"--noprofile",
 			"--norc",
+      "-c",
 		}
 	}
 

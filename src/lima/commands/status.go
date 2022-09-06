@@ -3,9 +3,12 @@ package commands
 import (
 	"flag"
 	"sort"
+	"syscall"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/zettel"
+	"github.com/friedenberg/zit/src/golf/zettel_transacted"
+	"github.com/friedenberg/zit/src/hotel/store_objekten"
 	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
 	"github.com/friedenberg/zit/src/india/store_working_directory"
 	"github.com/friedenberg/zit/src/juliett/store_with_lock"
@@ -66,6 +69,54 @@ func (c Status) RunWithLockedStore(s store_with_lock.Store, args ...string) (err
 			errors.PrintOutf("%#v", z.External)
 		} else {
 			errors.PrintOut(z)
+		}
+	}
+
+	for _, ua := range possible.UnsureAkten {
+		if err = s.StoreObjekten().AkteExists(ua.Sha); err == nil {
+			if err = errors.PrintOutf("%s (not recognized)", ua); err != nil {
+				err = errors.IsAsNilOrWrapf(
+					err,
+					syscall.EPIPE,
+					"%s",
+					ua,
+				)
+			}
+		} else if errors.Is(err, store_objekten.ErrNotFound{}) {
+			if err = errors.PrintOutf("%s (not recognized)", ua); err != nil {
+				err = errors.IsAsNilOrWrapf(
+					err,
+					syscall.EPIPE,
+					"%s",
+					ua,
+				)
+			}
+		} else if errors.Is(err, store_objekten.ErrAkteExists{}) {
+			err1 := err.(store_objekten.ErrAkteExists)
+			errors.PrintOutf("%s (Akte recognized)", ua)
+			err1.Set.Each(
+				func(tz1 zettel_transacted.Zettel) (err error) {
+					//TODO eliminate zettels marked as duplicates / hidden
+					if err = errors.PrintOutf("\t%s", tz1.Named); err != nil {
+						err = errors.IsAsNilOrWrapf(
+							err,
+							syscall.EPIPE,
+							"%s",
+							tz1.Named,
+						)
+
+						return
+					}
+
+					return
+				},
+			)
+
+			err = nil
+
+		} else {
+			err = errors.Wrapf(err, "%s", ua)
+			return
 		}
 	}
 

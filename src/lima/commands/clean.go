@@ -8,6 +8,8 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_external"
+	"github.com/friedenberg/zit/src/golf/zettel_transacted"
+	"github.com/friedenberg/zit/src/hotel/store_objekten"
 	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
 	"github.com/friedenberg/zit/src/india/store_working_directory"
 	"github.com/friedenberg/zit/src/juliett/store_with_lock"
@@ -79,6 +81,23 @@ func (c Clean) RunWithLockedStore(
 
 		if z.External.AkteFD.Path != "" {
 			filesToDelete = append(filesToDelete, z.External.AkteFD.Path)
+		}
+	}
+
+	for _, ua := range possible.UnsureAkten {
+		var szt zettel_transacted.Set
+
+		if szt, err = s.StoreObjekten().ReadAkteSha(ua.Sha); err != nil {
+			if errors.Is(err, store_objekten.ErrNotFound{}) {
+				continue
+			} else {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+
+		if szt.Len() > 0 {
+			filesToDelete = append(filesToDelete, ua.Path)
 		}
 	}
 
