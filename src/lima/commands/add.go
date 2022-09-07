@@ -58,13 +58,11 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	var zettelsFromAkteResults zettel_transacted.Set
 
-	errors.PrintErr("getting zettels from akten")
 	if zettelsFromAkteResults = zettelsFromAkteOp.Run(ctx, args...); !ctx.IsEmpty() {
 		ctx.Wrap()
 		return
 	}
 
-	errors.PrintErr("opening if necessary")
 	if ctx.Err = c.openAktenIfNecessary(u, zettelsFromAkteResults); !ctx.IsEmpty() {
 		ctx.Wrap()
 		return
