@@ -23,16 +23,17 @@ type ZettelFromExternalAkte struct {
 }
 
 func (c ZettelFromExternalAkte) Run(
+	ctx *errors.Ctx,
 	args ...string,
-) (results zettel_transacted.Set, err error) {
+) (results zettel_transacted.Set) {
 	var store store_with_lock.Store
 
-	if store, err = store_with_lock.New(c.Umwelt); err != nil {
-		err = errors.Wrap(err)
+	if store, ctx.Err = store_with_lock.New(c.Umwelt); !ctx.IsEmpty() {
+		ctx.Wrap()
 		return
 	}
 
-	defer errors.PanicIfError(store.Flush)
+	defer ctx.Defer(store.Flush)
 
 	results = zettel_transacted.MakeSetUnique(len(args))
 
@@ -40,21 +41,25 @@ func (c ZettelFromExternalAkte) Run(
 		var z zettel.Zettel
 		var tz zettel_transacted.Zettel
 
-		if z, err = c.zettelForAkte(store, arg); err != nil {
-			err = errors.Wrap(err)
+		errors.PrintErr("creating zettel for akte")
+		if z = c.zettelForAkte(ctx, store, arg); !ctx.IsEmpty() {
+			errors.PrintErr("ctx error", ctx.IsEmpty())
+			errors.PrintErr(ctx.Err)
+			ctx.Wrap()
 			return
 		}
 
-		if tz, err = store.StoreObjekten().Create(z); err != nil {
-			err = errors.Wrap(err)
+		errors.PrintErr("creating zettel")
+		if tz, ctx.Err = store.StoreObjekten().Create(z); !ctx.IsEmpty() {
+			ctx.Wrap()
 			return
 		}
 
 		akteSha := tz.Named.Stored.Zettel.Akte
 
-		if err = store.StoreObjekten().AkteExists(akteSha); err != nil {
-			if errors.Is(err, store_objekten.ErrAkteExists{}) {
-				err1 := err.(store_objekten.ErrAkteExists)
+		if ctx.Err = store.StoreObjekten().AkteExists(akteSha); !ctx.IsEmpty() {
+			if errors.Is(ctx.Err, store_objekten.ErrAkteExists{}) {
+				err1 := ctx.Err.(store_objekten.ErrAkteExists)
 				errors.PrintOutf("[%s %s] (has Akte matches)", arg, akteSha)
 				err1.Set.Each(
 					func(tz1 zettel_transacted.Zettel) (err error) {
@@ -66,18 +71,20 @@ func (c ZettelFromExternalAkte) Run(
 						return
 					},
 				)
-				err = nil
+				ctx.Err = nil
 			} else {
-				err = errors.Wrap(err)
+				ctx.Wrapf("%s", arg)
 				return
 			}
 		}
 
+		errors.PrintErr("adding result")
 		results.Add(tz)
 
 		if c.Delete {
-			if err = os.Remove(arg); err != nil {
-				err = errors.Wrap(err)
+			errors.PrintErr("deleting old akte file")
+			if ctx.Err = os.Remove(arg); !ctx.IsEmpty() {
+				ctx.Wrap()
 				return
 			}
 
@@ -92,46 +99,47 @@ func (c ZettelFromExternalAkte) Run(
 }
 
 func (c ZettelFromExternalAkte) zettelForAkte(
+	ctx *errors.Ctx,
 	store store_with_lock.Store,
 	aktePath string,
-) (z zettel.Zettel, err error) {
+) (z zettel.Zettel) {
 	z.Etiketten = c.Etiketten
 
 	var akteWriter sha.WriteCloser
 
-	if akteWriter, err = store.StoreObjekten().AkteWriter(); err != nil {
-		err = errors.Wrap(err)
+	if akteWriter, ctx.Err = store.StoreObjekten().AkteWriter(); !ctx.IsEmpty() {
+		ctx.Wrap()
 		return
 	}
 
 	var f *os.File
 
-	if f, err = files.Open(aktePath); err != nil {
-		err = errors.Wrap(err)
+	if f, ctx.Err = files.Open(aktePath); !ctx.IsEmpty() {
+		ctx.Wrap()
 		return
 	}
 
-	defer files.Close(f)
+	defer ctx.Defer(func() error { return files.Close(f) })
 
-	if _, err = io.Copy(akteWriter, f); err != nil {
-		err = errors.Wrap(err)
+	if _, ctx.Err = io.Copy(akteWriter, f); !ctx.IsEmpty() {
+		ctx.Wrap()
 		return
 	}
 
-	if err = akteWriter.Close(); err != nil {
-		err = errors.Wrap(err)
+	if ctx.Err = akteWriter.Close(); !ctx.IsEmpty() {
+		ctx.Wrap()
 		return
 	}
 
 	z.Akte = akteWriter.Sha()
 
-	if err = z.Bezeichnung.Set(path.Base(aktePath)); err != nil {
-		err = errors.Wrap(err)
+	if ctx.Err = z.Bezeichnung.Set(path.Base(aktePath)); !ctx.IsEmpty() {
+		ctx.Wrap()
 		return
 	}
 
-	if err = z.Typ.Set(path.Ext(aktePath)); err != nil {
-		err = errors.Wrap(err)
+	if ctx.Err = z.Typ.Set(path.Ext(aktePath)); !ctx.IsEmpty() {
+		ctx.Wrap()
 		return
 	}
 
