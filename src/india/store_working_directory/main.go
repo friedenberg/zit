@@ -297,7 +297,13 @@ func (s *Store) Read(p string) (cz zettel_checked_out.Zettel, err error) {
 		}
 
 		sh := cz.External.Named.Stored.Sha
-		ss := s.storeObjekten.ReadZettelShaShortestUnique(sh)
+		var ss string
+
+		if ss, err = s.storeObjekten.ReadZettelShaShortestUnique(sh); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 		cz.External.Named.Stored.Sha.Short = ss
 
 		if cz.Internal, err = s.storeObjekten.Read(cz.External.Named.Hinweis); err != nil {

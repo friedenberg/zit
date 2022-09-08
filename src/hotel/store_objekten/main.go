@@ -188,7 +188,13 @@ func (s Store) Read(i id.Id) (tz zettel_transacted.Zettel, err error) {
 	}
 
 	sh := tz.Named.Stored.Sha
-	ss := s.ReadZettelShaShortestUnique(sh)
+  var ss string
+
+	if ss, err = s.ReadZettelShaShortestUnique(sh); err != nil {
+    err = errors.Wrap(err)
+    return
+  }
+
 	tz.Named.Stored.Sha.Short = ss
 
 	return

@@ -11,11 +11,15 @@ type Trie struct {
 type node struct {
 	Count    int
 	Children map[byte]node
+	IsRoot   bool
 }
 
 func Make(vs ...fmt.Stringer) (t *Trie) {
 	t = &Trie{
-		root: node{Children: make(map[byte]node)},
+		root: node{
+			Children: make(map[byte]node),
+			IsRoot:   true,
+		},
 	}
 
 	for _, v := range vs {
@@ -80,11 +84,15 @@ func (n node) Contains(v string) bool {
 }
 
 func (n node) Expand(v string) string {
-  //TODO
+	//TODO
 	return ""
 }
 
 func (n node) Abbreviate(v string, loc int) string {
+	if n.IsRoot && len(n.Children) == 0 {
+		return ""
+	}
+
 	if len(v)-1 < loc {
 		return v
 	}
