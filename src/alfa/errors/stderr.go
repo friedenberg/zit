@@ -11,7 +11,7 @@ func PrintErr(a ...interface{}) (err error) {
 		a...,
 	)
 
-  return
+	return
 }
 
 func PrintErrf(f string, a ...interface{}) (err error) {
@@ -20,5 +20,5 @@ func PrintErrf(f string, a ...interface{}) (err error) {
 		fmt.Sprintf(f, a...),
 	)
 
-  return
+	return
 }

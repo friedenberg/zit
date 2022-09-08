@@ -12,7 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/delta/umwelt"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
-	"github.com/friedenberg/zit/src/trie"
+	"github.com/friedenberg/zit/src/alfa/trie"
 )
 
 type indexZettelen struct {
