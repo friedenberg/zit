@@ -9,7 +9,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/file_lock"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/charlie/id"
@@ -20,21 +19,11 @@ import (
 	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
 )
 
-type StoreZettel interface {
-	Read(id id.Id) (z zettel_transacted.Zettel, err error)
-	ReadAkteSha(sha.Sha) (zettel_transacted.Set, error)
-	ReadZettelSha(sha.Sha) (zettel_transacted.Set, error)
-	ReadBezeichnung(string) (zettel_transacted.Set, error)
-	WriteZettelObjekte(z zettel.Zettel) (sh sha.Sha, err error)
-	zettel.AkteWriterFactory
-	zettel.AkteReaderFactory
-}
-
 type Store struct {
 	lock *file_lock.Lock
 	Konfig
 	format        zettel.Format
-	storeObjekten StoreZettel
+	storeObjekten *store_objekten.Store
 	path          string
 	cwd           string
 	entries       map[string]Entry
@@ -42,7 +31,7 @@ type Store struct {
 	hasChanges    bool
 }
 
-func New(k Konfig, p string, storeObjekten StoreZettel) (s *Store, err error) {
+func New(k Konfig, p string, storeObjekten *store_objekten.Store) (s *Store, err error) {
 	s = &Store{
 		Konfig:        k,
 		format:        zettel.Text{},
@@ -306,6 +295,10 @@ func (s *Store) Read(p string) (cz zettel_checked_out.Zettel, err error) {
 				return
 			}
 		}
+
+		sh := cz.External.Named.Stored.Sha
+		ss := s.storeObjekten.ReadZettelShaShortestUnique(sh)
+		cz.External.Named.Stored.Sha.Short = ss
 
 		if cz.Internal, err = s.storeObjekten.Read(cz.External.Named.Hinweis); err != nil {
 			if errors.Is(err, store_objekten.ErrNotFound{}) {

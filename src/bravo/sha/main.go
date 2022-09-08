@@ -20,6 +20,7 @@ type PathComponents interface {
 
 type Sha struct {
 	Value string
+	Short string
 }
 
 func MakeSha(v string) (s Sha, err error) {
@@ -36,7 +37,19 @@ func FromHash(h hash.Hash) (s Sha) {
 	return
 }
 
+func (s Sha) ShortString() string {
+	if s.Short != "" {
+		return s.Short
+	} else {
+		return s.String()
+	}
+}
+
 func (s Sha) String() string {
+	if s.Short != "" {
+		return s.Short
+	}
+
 	if s.Value == "" {
 		return ShaNull
 	} else {

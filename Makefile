@@ -4,6 +4,9 @@
 #build: install unit_tests go_vet graph_dependencies;
 build: install unit_tests go_vet;
 
+go_build:
+	go build -o build/zit ./.
+
 go_vet: go_build
 	go vet ./...
 
@@ -12,9 +15,6 @@ unit_tests:
 
 install: bats_tests
 	go install ./.
-
-go_build:
-	go build -o build/zit ./.
 
 bats_tests: go_build
 	bats --jobs 8 zz-test/*.bats

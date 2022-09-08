@@ -187,6 +187,10 @@ func (s Store) Read(i id.Id) (tz zettel_transacted.Zettel, err error) {
 		err = errors.Errorf("unsupported identifier: %s, %#v", i, reflect.ValueOf(i))
 	}
 
+	sh := tz.Named.Stored.Sha
+	ss := s.ReadZettelShaShortestUnique(sh)
+	tz.Named.Stored.Sha.Short = ss
+
 	return
 }
 

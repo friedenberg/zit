@@ -28,5 +28,5 @@ func (a Zettel) Equals(b Zettel) bool {
 }
 
 func (z Zettel) String() string {
-	return fmt.Sprintf("[%s %s]", z.Hinweis, z.Stored.Sha)
+	return fmt.Sprintf("[%s %s]", z.Hinweis, z.Stored.Sha.ShortString())
 }
