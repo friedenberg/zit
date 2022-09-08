@@ -29,8 +29,8 @@ func (t *Trie) Contains(v fmt.Stringer) bool {
 	return t.root.Contains(v.String())
 }
 
-func (t *Trie) ShortestUnique(v fmt.Stringer) string {
-	return t.root.ShortestUnique(v.String(), 0)
+func (t *Trie) Abbreviate(v fmt.Stringer) string {
+	return t.root.Abbreviate(v.String(), 0)
 }
 
 func (t *Trie) Add(v fmt.Stringer) {
@@ -79,7 +79,12 @@ func (n node) Contains(v string) bool {
 	}
 }
 
-func (n node) ShortestUnique(v string, loc int) string {
+func (n node) Expand(v string) string {
+  //TODO
+	return ""
+}
+
+func (n node) Abbreviate(v string, loc int) string {
 	if len(v)-1 < loc {
 		return v
 	}
@@ -93,7 +98,7 @@ func (n node) ShortestUnique(v string, loc int) string {
 	child, ok := n.Children[c]
 
 	if ok {
-		return child.ShortestUnique(v, loc+1)
+		return child.Abbreviate(v, loc+1)
 	} else {
 		if len(v)-1 < loc {
 			return v

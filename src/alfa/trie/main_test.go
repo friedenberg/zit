@@ -74,7 +74,7 @@ func TestShortestUnique(t *testing.T) {
 	for e, c := range expectedContains {
 		es := testStringer(e)
 
-		if ca := sut.ShortestUnique(es); ca != c {
+		if ca := sut.Abbreviate(es); ca != c {
 			t.Errorf("%q: expected shorted length %q but got %q", es, c, ca)
 		}
 	}

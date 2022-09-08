@@ -283,7 +283,7 @@ func (i *indexZettelen) ReadAkteSha(s sha.Sha) (tzs zettel_transacted.Set, err e
 }
 
 func (i *indexZettelen) ReadZettelShaShortestUnique(s sha.Sha) string {
-	return i.zettelenShas.ShortestUnique(s)
+	return i.zettelenShas.Abbreviate(s)
 }
 
 func (i *indexZettelen) ReadZettelSha(s sha.Sha) (tz zettel_transacted.Set, err error) {
