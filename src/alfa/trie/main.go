@@ -1,7 +1,11 @@
 package trie
 
 import (
-	"fmt"
+	"bytes"
+	"encoding/gob"
+	"strings"
+
+	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
 type Trie struct {
@@ -14,7 +18,7 @@ type node struct {
 	IsRoot   bool
 }
 
-func Make(vs ...fmt.Stringer) (t *Trie) {
+func Make(vs ...string) (t *Trie) {
 	t = &Trie{
 		root: node{
 			Children: make(map[byte]node),
@@ -29,20 +33,31 @@ func Make(vs ...fmt.Stringer) (t *Trie) {
 	return
 }
 
-func (t *Trie) Contains(v fmt.Stringer) bool {
-	return t.root.Contains(v.String())
+func (t *Trie) Contains(v string) bool {
+	return t.root.Contains(v)
 }
 
-func (t *Trie) Abbreviate(v fmt.Stringer) string {
-	return t.root.Abbreviate(v.String(), 0)
+func (t *Trie) Abbreviate(v string) string {
+	return t.root.Abbreviate(v, 0)
 }
 
-func (t *Trie) Add(v fmt.Stringer) {
+func (t *Trie) Expand(v string) string {
+	sb := &strings.Builder{}
+	ok := t.root.Expand(v, sb)
+
+	if ok {
+		return sb.String()
+	} else {
+		return ""
+	}
+}
+
+func (t *Trie) Add(v string) {
 	if t.Contains(v) {
 		return
 	}
 
-	t.root.Add(v.String())
+	t.root.Add(v)
 }
 
 func (n *node) Add(v string) {
@@ -83,9 +98,41 @@ func (n node) Contains(v string) bool {
 	}
 }
 
-func (n node) Expand(v string) string {
-	//TODO
-	return ""
+func (n node) Any() byte {
+	for c, _ := range n.Children {
+		return c
+	}
+
+	return 0
+}
+
+func (n node) Expand(v string, sb *strings.Builder) (ok bool) {
+	errors.PrintErrf("v: %q, sb %q", v, sb.String())
+	var c byte
+	var rem string
+
+	if len(v) == 0 {
+		switch n.Count {
+
+		case 0:
+			return true
+
+		case 1:
+			c = n.Any()
+		}
+	} else {
+		rem = v[1:]
+		c = v[0]
+	}
+
+	var child node
+
+	if child, ok = n.Children[c]; ok {
+		sb.WriteByte(c)
+		return child.Expand(rem, sb)
+	}
+
+	return
 }
 
 func (n node) Abbreviate(v string, loc int) string {
@@ -114,4 +161,18 @@ func (n node) Abbreviate(v string, loc int) string {
 			return v[0 : loc+1]
 		}
 	}
+}
+
+func (t Trie) GobEncode() (by []byte, err error) {
+	bu := &bytes.Buffer{}
+	enc := gob.NewEncoder(bu)
+	err = enc.Encode(t.root)
+	by = bu.Bytes()
+	return
+}
+
+func (t *Trie) GobDecode(b []byte) error {
+	bu := bytes.NewBuffer(b)
+	dec := gob.NewDecoder(bu)
+	return dec.Decode(&t.root)
 }

@@ -32,6 +32,7 @@ type Store struct {
 	*indexZettelenTails
 	*indexEtiketten
 	*indexKennung
+	*indexAbbr
 	transaktion.Transaktion
 }
 
@@ -84,6 +85,17 @@ func (s *Store) Initialize(u *umwelt.Umwelt) (err error) {
 
 	if err != nil {
 		err = errors.Wrapf(err, "failed to init kennung index")
+		return
+	}
+
+	s.indexAbbr, err = newIndexAbbr(
+		u,
+		s,
+		u.DirVerzeichnisse("Abbr"),
+	)
+
+	if err != nil {
+		err = errors.Wrapf(err, "failed to init abbr index")
 		return
 	}
 
@@ -147,6 +159,11 @@ func (s Store) writeNamedZettelToIndex(tz zettel_transacted.Zettel) (err error) 
 		}
 	}
 
+	if err = s.indexAbbr.addZettelTransacted(tz); err != nil {
+		err = errors.Wrapf(err, "failed to write zettel to index: %s", tz.Named)
+		return
+	}
+
 	return
 }
 
@@ -188,12 +205,12 @@ func (s Store) Read(i id.Id) (tz zettel_transacted.Zettel, err error) {
 	}
 
 	sh := tz.Named.Stored.Sha
-  var ss string
+	var ss string
 
-	if ss, err = s.ReadZettelShaShortestUnique(sh); err != nil {
-    err = errors.Wrap(err)
-    return
-  }
+	if ss, err = s.AbbreviateSha(sh); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	tz.Named.Stored.Sha.Short = ss
 
@@ -311,9 +328,8 @@ func (s *Store) Update(
 		return
 	}
 
+	//TODO fix etiketten deltas
 	d := mutter.Named.Stored.Zettel.Etiketten.Delta(tz.Named.Stored.Zettel.Etiketten)
-	errors.Print(mutter.Named.Stored.Zettel.Etiketten)
-	errors.Print(tz.Named.Stored.Zettel.Etiketten)
 
 	if err = s.indexEtiketten.add(d.Added); err != nil {
 		err = errors.Wrap(err)
@@ -324,6 +340,16 @@ func (s *Store) Update(
 		err = errors.Wrap(err)
 		return
 	}
+
+	sh := tz.Named.Stored.Sha
+	var ss string
+
+	if ss, err = s.AbbreviateSha(sh); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	tz.Named.Stored.Sha.Short = ss
 
 	return
 }
@@ -354,6 +380,11 @@ func (s Store) Flush() (err error) {
 	}
 
 	if err = s.indexKennung.Flush(); err != nil {
+		err = errors.Wrapf(err, "failed to flush new kennung index")
+		return
+	}
+
+	if err = s.indexAbbr.Flush(); err != nil {
 		err = errors.Wrapf(err, "failed to flush new kennung index")
 		return
 	}

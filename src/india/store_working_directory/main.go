@@ -299,7 +299,7 @@ func (s *Store) Read(p string) (cz zettel_checked_out.Zettel, err error) {
 		sh := cz.External.Named.Stored.Sha
 		var ss string
 
-		if ss, err = s.storeObjekten.ReadZettelShaShortestUnique(sh); err != nil {
+		if ss, err = s.storeObjekten.AbbreviateSha(sh); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

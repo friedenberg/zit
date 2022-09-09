@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/trie"
 	"github.com/friedenberg/zit/src/alfa/typ"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
@@ -19,7 +18,6 @@ type indexZettelen struct {
 	umwelt *umwelt.Umwelt
 	path   string
 	ioFactory
-	zettelenShas  *trie.Trie
 	zettelen      map[sha.Sha]zettel_transacted.Set
 	hinweisen     map[hinweis.Hinweis]zettel_transacted.Set
 	akten         map[sha.Sha]zettel_transacted.Set
@@ -38,7 +36,6 @@ func newIndexZettelen(
 		umwelt:        u,
 		path:          p,
 		ioFactory:     f,
-		zettelenShas:  trie.Make(),
 		zettelen:      make(map[sha.Sha]zettel_transacted.Set),
 		hinweisen:     make(map[hinweis.Hinweis]zettel_transacted.Set),
 		akten:         make(map[sha.Sha]zettel_transacted.Set),
@@ -145,7 +142,6 @@ func (i *indexZettelen) addNoRead(tz zettel_transacted.Zettel) {
 
 		set.Add(tz)
 		i.zettelen[tz.Named.Stored.Sha] = set
-		i.zettelenShas.Add(tz.Named.Stored.Sha)
 	}
 
 	{
@@ -278,17 +274,6 @@ func (i *indexZettelen) ReadAkteSha(s sha.Sha) (tzs zettel_transacted.Set, err e
 		err = ErrNotFound{Id: s}
 		return
 	}
-
-	return
-}
-
-func (i *indexZettelen) ReadZettelShaShortestUnique(s sha.Sha) (abbr string, err error) {
-	if err = i.readIfNecessary(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	abbr = i.zettelenShas.Abbreviate(s)
 
 	return
 }

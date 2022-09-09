@@ -47,8 +47,7 @@ func Is(err, target error) bool {
 }
 
 func IsEOF(err error) bool {
-	e := Unwrap(err)
-	return Is(e, io.EOF)
+	return Is(err, io.EOF)
 }
 
 func IsNotExist(err error) bool {

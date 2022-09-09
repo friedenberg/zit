@@ -10,13 +10,20 @@ type Ctx struct {
 	deferred []error
 }
 
+func (e *Ctx) ClearErr() {
+  e.Err = nil
+  // e.deferred = make([]error, 0)
+}
+
 func (e Ctx) IsEmpty() bool {
 	return e.Err == nil && len(e.deferred) == 0
 }
 
-func (d *Ctx) Defer(f func() error) {
-	if err := f(); err != nil {
-		d.deferred = append(d.deferred, err)
+func (d *Ctx) Defer(fs ...func() error) {
+	for _, f := range fs {
+		if err := f(); err != nil {
+			d.deferred = append(d.deferred, err)
+		}
 	}
 }
 

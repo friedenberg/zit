@@ -4,14 +4,10 @@ import "testing"
 
 type testStringer string
 
-func (ts testStringer) String() string {
-	return string(ts)
-}
-
 func TestContains(t *testing.T) {
 	sut := Make(
-		testStringer("123456"),
-		testStringer("654321"),
+		"123456",
+		"654321",
 	)
 
 	expectedContains := []string{
@@ -30,10 +26,8 @@ func TestContains(t *testing.T) {
 	}
 
 	for _, e := range expectedContains {
-		es := testStringer(e)
-
-		if !sut.Contains(es) {
-			t.Errorf("expected %v to contain %s", sut, es)
+		if !sut.Contains(e) {
+			t.Errorf("expected %v to contain %s", sut, e)
 		}
 	}
 
@@ -44,22 +38,20 @@ func TestContains(t *testing.T) {
 	}
 
 	for _, e := range expectedNotContains {
-		es := testStringer(e)
-
-		if sut.Contains(es) {
-			t.Errorf("expected %v to not contain %s", sut, es)
+		if sut.Contains(e) {
+			t.Errorf("expected %v to not contain %s", sut, e)
 		}
 	}
 }
 
 func TestShortestUnique(t *testing.T) {
 	sut := Make(
-		testStringer("12"),
-		testStringer("121"),
-		testStringer("127"),
-		testStringer("128"),
-		testStringer("123456"),
-		testStringer("654321"),
+		"12",
+		"121",
+		"127",
+		"128",
+		"123456",
+		"654321",
 	)
 
 	expectedContains := map[string]string{
@@ -72,10 +64,32 @@ func TestShortestUnique(t *testing.T) {
 	}
 
 	for e, c := range expectedContains {
-		es := testStringer(e)
+		if ca := sut.Abbreviate(e); ca != c {
+			t.Errorf("%q: expected shorted length %q but got %q", e, c, ca)
+		}
+	}
+}
 
-		if ca := sut.Abbreviate(es); ca != c {
-			t.Errorf("%q: expected shorted length %q but got %q", es, c, ca)
+func TestExpand(t *testing.T) {
+	sut := Make(
+		"12",
+		"121",
+		"127",
+		"128",
+		"123456",
+		"654321",
+	)
+
+	expectedContains := map[string]string{
+		"6":    "654321",
+		"128":  "128",
+		"123":  "123456",
+		"1232": "",
+	}
+
+	for a, e := range expectedContains {
+		if ca := sut.Expand(a); ca != e {
+			t.Errorf("%q: expected expanded %q but got %q", e, e, ca)
 		}
 	}
 }

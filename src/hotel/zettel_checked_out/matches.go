@@ -25,7 +25,7 @@ func (m Matches) appendToStringBuilder(sb *strings.Builder, ex zettel_external.Z
 		} else if c.Len() > 1 {
 			c.Each(
 				func(tz zettel_transacted.Zettel) (err error) {
-					sb.WriteString(fmt.Sprintf("\n\t%s (%s match)", tz.Named.Hinweis, t))
+					sb.WriteString(fmt.Sprintf("\n\t%s (%s match)", tz.Named, t))
 					return
 				},
 			)
