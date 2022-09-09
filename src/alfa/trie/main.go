@@ -21,7 +21,7 @@ type node struct {
 func Make(vs ...string) (t *Trie) {
 	t = &Trie{
 		root: node{
-			Children: make(map[byte]node),
+			Children: make(map[byte]node, 255),
 			IsRoot:   true,
 		},
 	}

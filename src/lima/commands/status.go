@@ -2,17 +2,17 @@ package commands
 
 import (
 	"flag"
+	"os"
 	"sort"
-	"syscall"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/zettel"
-	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/hotel/store_objekten"
 	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
 	"github.com/friedenberg/zit/src/india/store_working_directory"
 	"github.com/friedenberg/zit/src/juliett/store_with_lock"
 	"github.com/friedenberg/zit/src/kilo/user_ops"
+	"github.com/friedenberg/zit/src/zettel_printer"
 )
 
 type Status struct {
@@ -64,57 +64,54 @@ func (c Status) RunWithLockedStore(s store_with_lock.Store, args ...string) (err
 		},
 	)
 
+	zp := zettel_printer.Make(s.StoreObjekten(), os.Stdout)
+	zp.ShouldAbbreviateHinweisen = true
+
+	if !zp.IsEmpty() {
+		err = zp.Error()
+		return
+	}
+
 	for _, z := range readResults {
-		if z.State == zettel_checked_out.StateEmpty {
-			errors.PrintOutf("%#v", z.External)
-		} else {
-			errors.PrintOut(z)
+		//TODO move to printer
+		zp.ZettelCheckedOut(z).Print()
+
+		switch {
+		case zp.IsEPIPE():
+			zp.ClearErr()
+			return
+
+		case !zp.IsEmpty():
+			err = zp.Error()
+			return
 		}
 	}
 
 	for _, ua := range possible.UnsureAkten {
-		if err = s.StoreObjekten().AkteExists(ua.Sha); err == nil {
-			if err = errors.PrintOutf("%s (not recognized)", ua); err != nil {
-				err = errors.IsAsNilOrWrapf(
-					err,
-					syscall.EPIPE,
-					"%s",
-					ua,
-				)
+		err = s.StoreObjekten().AkteExists(ua.Sha)
+
+		switch {
+		case err == nil:
+			fallthrough
+		case errors.Is(err, store_objekten.ErrNotFound{}):
+			zp.FileUnrecognized(ua).Print()
+
+			switch {
+			case zp.IsEPIPE():
+				zp.ClearErr()
+				return
+
+			case !zp.IsEmpty():
+				err = zp.Error()
+				return
 			}
-		} else if errors.Is(err, store_objekten.ErrNotFound{}) {
-			if err = errors.PrintOutf("%s (not recognized)", ua); err != nil {
-				err = errors.IsAsNilOrWrapf(
-					err,
-					syscall.EPIPE,
-					"%s",
-					ua,
-				)
-			}
-		} else if errors.Is(err, store_objekten.ErrAkteExists{}) {
+
+		case errors.Is(err, store_objekten.ErrAkteExists{}):
 			err1 := err.(store_objekten.ErrAkteExists)
-			errors.PrintOutf("%s (Akte recognized)", ua)
-			err1.Set.Each(
-				func(tz1 zettel_transacted.Zettel) (err error) {
-					//TODO eliminate zettels marked as duplicates / hidden
-					if err = errors.PrintOutf("\t%s", tz1.Named); err != nil {
-						err = errors.IsAsNilOrWrapf(
-							err,
-							syscall.EPIPE,
-							"%s",
-							tz1.Named,
-						)
+			zp.FileRecognized(ua, err1.Set).Print()
+			err = zp.Error()
 
-						return
-					}
-
-					return
-				},
-			)
-
-			err = nil
-
-		} else {
+		default:
 			err = errors.Wrapf(err, "%s", ua)
 			return
 		}

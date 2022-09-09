@@ -3,6 +3,7 @@ package errors
 import (
 	"errors"
 	"fmt"
+	"syscall"
 )
 
 type Ctx struct {
@@ -11,12 +12,16 @@ type Ctx struct {
 }
 
 func (e *Ctx) ClearErr() {
-  e.Err = nil
-  // e.deferred = make([]error, 0)
+	e.Err = nil
+	// e.deferred = make([]error, 0)
 }
 
 func (e Ctx) IsEmpty() bool {
 	return e.Err == nil && len(e.deferred) == 0
+}
+
+func (e Ctx) IsEPIPE() bool {
+	return Is(e.Error(), syscall.EPIPE)
 }
 
 func (d *Ctx) Defer(fs ...func() error) {

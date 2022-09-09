@@ -32,18 +32,6 @@ func As(err error, target interface{}) bool {
 func Is(err, target error) bool {
 	e := Unwrap(err)
 	return errors.Is(e, target)
-	// ok := err.(target)
-	// // ok := xerrors.Is(err, target)
-
-	// if ok {
-	// 	return true
-	// }
-
-	// if e, ok := err.(unwrappable); ok {
-	// 	return Is(e.Unwrap(), target)
-	// }
-
-	// return false
 }
 
 func IsEOF(err error) bool {

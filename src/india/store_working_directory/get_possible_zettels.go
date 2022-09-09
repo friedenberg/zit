@@ -1,64 +1,19 @@
 package store_working_directory
 
 import (
-	"crypto/sha256"
-	"fmt"
-	"io"
 	"os"
 	"path"
-	"path/filepath"
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/bravo/sha"
 )
-
-type UntrackedFile struct {
-	Path string
-	sha.Sha
-}
-
-func (ut UntrackedFile) String() string {
-	return fmt.Sprintf("[%s %s]", ut.Path, ut.Sha)
-}
-
-func MakeUntrackedFile(dir string, p string) (ut UntrackedFile, err error) {
-	ut = UntrackedFile{
-		Path: path.Join(dir, p),
-	}
-
-	hash := sha256.New()
-
-	var f *os.File
-
-	if f, err = files.Open(ut.Path); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer files.Close(f)
-
-	if _, err = io.Copy(hash, f); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	ut.Sha = sha.FromHash(hash)
-
-	if ut.Path, err = filepath.Rel(dir, ut.Path); err != nil {
-		err = errors.Wrapf(err, "%s", ut.Path)
-		return
-	}
-
-	return
-}
 
 type CwdFiles struct {
 	dir              string
 	Zettelen         []string
 	Akten            []string
-	UnsureAkten      []UntrackedFile
+	UnsureAkten      []File
 	EmptyDirectories []string
 }
 
@@ -67,7 +22,7 @@ func MakeCwdFiles(dir string) (fs CwdFiles, err error) {
 		dir:              dir,
 		Zettelen:         make([]string, 0),
 		Akten:            make([]string, 0),
-		UnsureAkten:      make([]UntrackedFile, 0),
+		UnsureAkten:      make([]File, 0),
 		EmptyDirectories: make([]string, 0),
 	}
 
@@ -146,9 +101,9 @@ func (fs *CwdFiles) readFirstLevelFile(a string) (err error) {
 		return
 	}
 
-	var ut UntrackedFile
+	var ut File
 
-	if ut, err = MakeUntrackedFile(fs.dir, a); err != nil {
+	if ut, err = MakeFile(fs.dir, a); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -3,11 +3,13 @@ package store_objekten
 import (
 	"bufio"
 	"encoding/gob"
+	"fmt"
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/trie"
 	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/delta/umwelt"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 )
@@ -183,6 +185,49 @@ func (i *indexAbbr) ExpandShaString(st string) (s sha.Sha, err error) {
 		ctx.Wrap()
 		return
 	}
+
+	return
+}
+
+func (i *indexAbbr) AbbreviateHinweis(h hinweis.Hinweis) (abbr string, err error) {
+	ctx := errors.Ctx{}
+
+	defer func() {
+		err = ctx.Error()
+	}()
+
+	if ctx.Err = i.readIfNecessary(); !ctx.IsEmpty() {
+		ctx.Wrap()
+		return
+	}
+
+	var kopf, schwanz string
+
+	kopf = i.indexAbbrEncodableTries.HinweisKopfen.Abbreviate(h.Kopf())
+	schwanz = i.indexAbbrEncodableTries.HinweisSchwanzen.Abbreviate(h.Schwanz())
+	abbr = fmt.Sprintf("%s/%s", kopf, schwanz)
+
+	return
+}
+
+func (i *indexAbbr) ExpandHinweisString(st string) (h hinweis.Hinweis, err error) {
+	ctx := errors.Ctx{}
+
+	defer func() {
+		err = ctx.Error()
+	}()
+
+	if ctx.Err = i.readIfNecessary(); !ctx.IsEmpty() {
+		ctx.Wrap()
+		return
+	}
+
+	// expanded := i.indexAbbrEncodableTries.Shas.Expand(st)
+
+	// if ctx.Err = s.Set(expanded); !ctx.IsEmpty() {
+	// 	ctx.Wrap()
+	// 	return
+	// }
 
 	return
 }
