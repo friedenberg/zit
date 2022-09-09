@@ -40,6 +40,16 @@ func (atc *AssignmentTreeRefiner) shouldMergeIntoParent(a *assignment) bool {
 		return false
 	}
 
+	if a.parent.etiketten.Any().IsDependentLeaf() {
+		errors.Print("is prefix joint")
+		return false
+	}
+
+	if a.etiketten.Any().IsDependentLeaf() {
+		errors.Print("is prefix joint")
+		return false
+	}
+
 	return true
 }
 
@@ -59,6 +69,14 @@ func (atc *AssignmentTreeRefiner) renameForPrefixJoint(a *assignment) (err error
 	}
 
 	if a.parent.etiketten.Len() != 1 {
+		return
+	}
+
+	if a.parent.etiketten.Any().IsDependentLeaf() {
+		return
+	}
+
+	if a.etiketten.Any().IsDependentLeaf() {
 		return
 	}
 
