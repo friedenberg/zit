@@ -29,6 +29,7 @@ type Logger interface {
 var cwd string
 var isTest bool
 var verbose bool
+var maxCallDepth int
 
 func init() {
 	var err error
@@ -44,6 +45,12 @@ func SetVerbose() {
 	verbose = true
 	log.SetFlags(log.LstdFlags | log.Lshortfile | log.Lmicroseconds)
 	log.Print("verbose")
+}
+
+//TODO experiment with callerframe looping
+func SetCallDepth(d int) {
+	maxCallDepth = d
+	log.Printf("maxCallDepth: %d", maxCallDepth)
 }
 
 func SetTesting() {
@@ -99,6 +106,7 @@ func Caller(i int, f string, vs ...interface{}) {
 }
 
 var (
+	//TODO add native methods
 	Panic  = log.Panic
 	Output = log.Output
 	Fatal  = log.Fatal
