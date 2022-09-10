@@ -1,0 +1,220 @@
+package tridex
+
+import (
+	"bytes"
+	"encoding/gob"
+	"encoding/json"
+	"strings"
+)
+
+type Tridex struct {
+	root node
+}
+
+type node struct {
+	Count    int
+	Children map[byte]node
+	Value    string
+	IsRoot   bool
+}
+
+func Make(vs ...string) (t *Tridex) {
+	t = &Tridex{
+		root: node{
+			Children: make(map[byte]node),
+			IsRoot:   true,
+		},
+	}
+
+	for _, v := range vs {
+		t.Add(v)
+	}
+
+	return
+}
+
+func (t *Tridex) Contains(v string) bool {
+	return t.root.Contains(v)
+}
+
+func (t *Tridex) Abbreviate(v string) string {
+	return t.root.Abbreviate(v, 0)
+}
+
+func (t *Tridex) Expand(v string) string {
+	sb := &strings.Builder{}
+	ok := t.root.Expand(v, sb)
+
+	if ok {
+		return sb.String()
+	} else {
+		return ""
+	}
+}
+
+func (t *Tridex) Add(v string) {
+	if t.Contains(v) {
+		return
+	}
+
+	t.root.Add(v)
+}
+
+func (n *node) Add(v string) {
+	if len(v) == 0 {
+		return
+	}
+
+	if v != n.Value {
+		n.Count += 1
+	}
+
+	if n.Count == 1 {
+		n.Value = v
+		return
+	} else if n.Value != "" && n.Value != v {
+		n.Add(n.Value)
+	}
+
+	c := v[0]
+
+	var child node
+	ok := false
+	child, ok = n.Children[c]
+
+	if !ok {
+		child = node{Children: make(map[byte]node)}
+	}
+
+	child.Add(v[1:])
+
+	n.Children[c] = child
+}
+
+func (n node) Contains(v string) (ok bool) {
+	if len(v) == 0 {
+		return true
+	}
+
+	if n.Count == 1 && n.Value != "" {
+		ok = strings.HasPrefix(n.Value, v)
+		return
+	}
+
+	c := v[0]
+
+	var child node
+
+	child, ok = n.Children[c]
+
+	if ok {
+		ok = child.Contains(v[1:])
+	}
+
+	return
+}
+
+func (n node) Any() byte {
+	for c, _ := range n.Children {
+		return c
+	}
+
+	return 0
+}
+
+func (n node) Expand(v string, sb *strings.Builder) (ok bool) {
+	var c byte
+	var rem string
+
+	if len(v) == 0 {
+		switch n.Count {
+
+		case 0:
+			return true
+
+		case 1:
+			sb.WriteString(n.Value)
+			return true
+		}
+	} else {
+		switch n.Count {
+		case 1:
+			ok = strings.HasPrefix(n.Value, v)
+
+			if ok {
+				sb.WriteString(n.Value)
+			}
+
+			return
+
+		default:
+			rem = v[1:]
+			c = v[0]
+		}
+	}
+
+	var child node
+
+	if child, ok = n.Children[c]; ok {
+		sb.WriteByte(c)
+		return child.Expand(rem, sb)
+	}
+
+	return
+}
+
+func (n node) Abbreviate(v string, loc int) string {
+	if n.IsRoot && len(n.Children) == 0 {
+		return ""
+	}
+
+	if len(v)-1 < loc {
+		return v
+	}
+
+	if n.Count == 1 && n.Contains(v[loc:]) {
+		return v[0:loc]
+	}
+
+	c := v[loc]
+
+	child, ok := n.Children[c]
+
+	if ok {
+		return child.Abbreviate(v, loc+1)
+	} else {
+		if len(v)-1 < loc {
+			return v
+		} else {
+			return v[0 : loc+1]
+		}
+	}
+}
+
+func (t Tridex) GobEncode() (by []byte, err error) {
+	bu := &bytes.Buffer{}
+	enc := gob.NewEncoder(bu)
+	err = enc.Encode(t.root)
+	by = bu.Bytes()
+	return
+}
+
+func (t *Tridex) UnmarshalJSON(b []byte) error {
+	bu := bytes.NewBuffer(b)
+	dec := json.NewDecoder(bu)
+	return dec.Decode(&t.root)
+}
+
+func (t Tridex) MarshalJSON() (by []byte, err error) {
+	bu := &bytes.Buffer{}
+	enc := json.NewEncoder(bu)
+	err = enc.Encode(t.root)
+	by = bu.Bytes()
+	return
+}
+
+func (t *Tridex) GobDecode(b []byte) error {
+	bu := bytes.NewBuffer(b)
+	dec := gob.NewDecoder(bu)
+	return dec.Decode(&t.root)
+}

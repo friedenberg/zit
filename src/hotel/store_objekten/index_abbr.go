@@ -7,17 +7,17 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/trie"
+	"github.com/friedenberg/zit/src/alfa/tridex"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/delta/umwelt"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 )
 
-type indexAbbrEncodableTries struct {
-	Shas             *trie.Trie
-	HinweisKopfen    *trie.Trie
-	HinweisSchwanzen *trie.Trie
+type indexAbbrEncodableTridexes struct {
+	Shas             *tridex.Tridex
+	HinweisKopfen    *tridex.Tridex
+	HinweisSchwanzen *tridex.Tridex
 }
 
 type indexAbbr struct {
@@ -26,7 +26,7 @@ type indexAbbr struct {
 
 	path string
 
-	indexAbbrEncodableTries
+	indexAbbrEncodableTridexes
 
 	didRead    bool
 	hasChanges bool
@@ -41,10 +41,10 @@ func newIndexAbbr(
 		Umwelt:    u,
 		path:      p,
 		ioFactory: ioFactory,
-		indexAbbrEncodableTries: indexAbbrEncodableTries{
-			Shas:             trie.Make(),
-			HinweisKopfen:    trie.Make(),
-			HinweisSchwanzen: trie.Make(),
+		indexAbbrEncodableTridexes: indexAbbrEncodableTridexes{
+			Shas:             tridex.Make(),
+			HinweisKopfen:    tridex.Make(),
+			HinweisSchwanzen: tridex.Make(),
 		},
 	}
 
@@ -78,7 +78,7 @@ func (i *indexAbbr) Flush() (err error) {
 
 	enc := gob.NewEncoder(w)
 
-	if errCtx.Err = enc.Encode(i.indexAbbrEncodableTries); !errCtx.IsEmpty() {
+	if errCtx.Err = enc.Encode(i.indexAbbrEncodableTridexes); !errCtx.IsEmpty() {
 		errCtx.Wrapf("failed to write encoded kennung")
 		return
 	}
@@ -87,6 +87,7 @@ func (i *indexAbbr) Flush() (err error) {
 }
 
 func (i *indexAbbr) readIfNecessary() (err error) {
+	errors.Caller(1, "")
 	errCtx := errors.Ctx{}
 
 	defer func() {
@@ -120,10 +121,15 @@ func (i *indexAbbr) readIfNecessary() (err error) {
 
 	dec := gob.NewDecoder(r)
 
-	if errCtx.Err = dec.Decode(&i.indexAbbrEncodableTries); !errCtx.IsEmpty() {
+	errors.Print("starting decode")
+
+	if errCtx.Err = dec.Decode(&i.indexAbbrEncodableTridexes); !errCtx.IsEmpty() {
+		errors.Print("finished decode unsuccessfully")
 		errCtx.Wrap()
 		return
 	}
+
+	errors.Print("finished decode successfully")
 
 	return
 }
@@ -142,10 +148,10 @@ func (i *indexAbbr) addZettelTransacted(zt zettel_transacted.Zettel) (err error)
 		return
 	}
 
-	i.indexAbbrEncodableTries.Shas.Add(zt.Named.Stored.Sha.String())
-	i.indexAbbrEncodableTries.Shas.Add(zt.Named.Stored.Zettel.Akte.String())
-	i.indexAbbrEncodableTries.HinweisKopfen.Add(zt.Named.Hinweis.Kopf())
-	i.indexAbbrEncodableTries.HinweisSchwanzen.Add(zt.Named.Hinweis.Schwanz())
+	i.indexAbbrEncodableTridexes.Shas.Add(zt.Named.Stored.Sha.String())
+	i.indexAbbrEncodableTridexes.Shas.Add(zt.Named.Stored.Zettel.Akte.String())
+	i.indexAbbrEncodableTridexes.HinweisKopfen.Add(zt.Named.Hinweis.Kopf())
+	i.indexAbbrEncodableTridexes.HinweisSchwanzen.Add(zt.Named.Hinweis.Schwanz())
 
 	return
 }
@@ -162,7 +168,7 @@ func (i *indexAbbr) AbbreviateSha(s sha.Sha) (abbr string, err error) {
 		return
 	}
 
-	abbr = i.indexAbbrEncodableTries.Shas.Abbreviate(s.String())
+	abbr = i.indexAbbrEncodableTridexes.Shas.Abbreviate(s.String())
 
 	return
 }
@@ -179,7 +185,7 @@ func (i *indexAbbr) ExpandShaString(st string) (s sha.Sha, err error) {
 		return
 	}
 
-	expanded := i.indexAbbrEncodableTries.Shas.Expand(st)
+	expanded := i.indexAbbrEncodableTridexes.Shas.Expand(st)
 
 	if ctx.Err = s.Set(expanded); !ctx.IsEmpty() {
 		ctx.Wrap()
@@ -203,8 +209,10 @@ func (i *indexAbbr) AbbreviateHinweis(h hinweis.Hinweis) (abbr string, err error
 
 	var kopf, schwanz string
 
-	kopf = i.indexAbbrEncodableTries.HinweisKopfen.Abbreviate(h.Kopf())
-	schwanz = i.indexAbbrEncodableTries.HinweisSchwanzen.Abbreviate(h.Schwanz())
+	kopf = i.indexAbbrEncodableTridexes.HinweisKopfen.Abbreviate(h.Kopf())
+	schwanz = i.indexAbbrEncodableTridexes.HinweisSchwanzen.Abbreviate(h.Schwanz())
+	// kopf = h.Kopf()
+	// schwanz = h.Schwanz()
 	abbr = fmt.Sprintf("%s/%s", kopf, schwanz)
 
 	return
@@ -222,7 +230,7 @@ func (i *indexAbbr) ExpandHinweisString(st string) (h hinweis.Hinweis, err error
 		return
 	}
 
-	// expanded := i.indexAbbrEncodableTries.Shas.Expand(st)
+	// expanded := i.indexAbbrEncodableTridexes.Hinweis.Expand(st)
 
 	// if ctx.Err = s.Set(expanded); !ctx.IsEmpty() {
 	// 	ctx.Wrap()
