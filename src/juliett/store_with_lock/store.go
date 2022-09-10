@@ -33,9 +33,7 @@ func New(u *umwelt.Umwelt) (s Store, err error) {
 		return
 	}
 
-	s.storeObjekten = &store_objekten.Store{}
-
-	if err = s.storeObjekten.Initialize(u); err != nil {
+	if s.storeObjekten, err = store_objekten.Make(s.age, u.Konfig, u.Standort); err != nil {
 		err = errors.Wrapf(err, "failed to initialize zettel meta store")
 		return
 	}

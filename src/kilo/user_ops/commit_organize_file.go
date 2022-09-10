@@ -136,7 +136,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 			return
 		}
 
-		if c.Umwelt.Konfig.DryRun {
+		if c.Konfig.DryRun {
 			errors.PrintOutf("[%s] (would create)", z.Bezeichnung)
 			continue
 		}
@@ -157,7 +157,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 	}
 
 	for _, z := range toUpdate {
-		if c.Umwelt.Konfig.DryRun {
+		if c.Konfig.DryRun {
 			errors.PrintOutf("[%s] (would update)", z.Hinweis)
 			continue
 		}

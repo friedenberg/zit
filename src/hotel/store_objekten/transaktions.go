@@ -17,7 +17,7 @@ import (
 )
 
 func (s Store) ReadTransaktion(t ts.Time) (tr transaktion.Transaktion, err error) {
-	return s.readTransaktion(id.Path(t, s.Umwelt.DirObjektenTransaktion()))
+	return s.readTransaktion(id.Path(t, s.standort.DirObjektenTransaktion()))
 }
 
 func (s Store) readTransaktion(p string) (t transaktion.Transaktion, err error) {
@@ -45,7 +45,7 @@ func (s Store) readTransaktion(p string) (t transaktion.Transaktion, err error) 
 func (s Store) storedZettelFromSha(sh sha.Sha) (sz zettel_stored.Stored, err error) {
 	var or io.ReadCloser
 
-	if or, err = s.ReadCloserObjekten(id.Path(sh, s.Umwelt.DirObjektenZettelen())); err != nil {
+	if or, err = s.ReadCloserObjekten(id.Path(sh, s.standort.DirObjektenZettelen())); err != nil {
 		err = ErrNotFound{Id: sh}
 		return
 	}
@@ -130,7 +130,7 @@ func (s Store) writeTransaktion() (err error) {
 
 	var p string
 
-	if p, err = id.MakeDirIfNecessary(s.Transaktion.Time, s.Umwelt.DirObjektenTransaktion()); err != nil {
+	if p, err = id.MakeDirIfNecessary(s.Transaktion.Time, s.standort.DirObjektenTransaktion()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

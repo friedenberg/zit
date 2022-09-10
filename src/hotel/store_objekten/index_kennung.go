@@ -10,8 +10,8 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/kennung"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
+	"github.com/friedenberg/zit/src/charlie/konfig"
 	"github.com/friedenberg/zit/src/delta/hinweisen"
-	"github.com/friedenberg/zit/src/delta/umwelt"
 )
 
 type encodedKennung struct {
@@ -19,7 +19,6 @@ type encodedKennung struct {
 }
 
 type indexKennung struct {
-	*umwelt.Umwelt
 	ioFactory
 
 	path string
@@ -35,15 +34,14 @@ type indexKennung struct {
 }
 
 func newIndexKennung(
-	u *umwelt.Umwelt,
+	k konfig.Konfig,
 	ioFactory ioFactory,
 	oldHinweisenStore *hinweisen.Hinweisen,
 	p string,
 ) (i *indexKennung, err error) {
 	i = &indexKennung{
-		Umwelt:             u,
 		path:               p,
-		nonRandomSelection: u.Konfig.PredictableHinweisen,
+		nonRandomSelection: k.PredictableHinweisen,
 		oldHinweisenStore:  oldHinweisenStore,
 		ioFactory:          ioFactory,
 		encodedKennung: encodedKennung{

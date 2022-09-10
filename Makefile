@@ -1,8 +1,8 @@
 
 .PHONY: build watch exclude bats_tests unit_tests go_vet graph_dependencies install;
 
-build: install unit_tests go_vet graph_dependencies;
-# build: install unit_tests go_vet;
+# build: install unit_tests go_vet graph_dependencies;
+build: install unit_tests go_vet;
 
 go_build:
 	go build -o build/zit ./.

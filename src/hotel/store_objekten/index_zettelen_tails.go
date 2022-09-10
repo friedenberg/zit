@@ -8,14 +8,14 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
-	"github.com/friedenberg/zit/src/delta/umwelt"
+	"github.com/friedenberg/zit/src/charlie/konfig"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 )
 
 type indexZettelenTails struct {
-	umwelt *umwelt.Umwelt
-	path   string
+	konfig.Konfig
+	path string
 	ioFactory
 	zettelen   zettel_transacted.Set
 	didRead    bool
@@ -23,12 +23,12 @@ type indexZettelenTails struct {
 }
 
 func newIndexZettelenTails(
-	u *umwelt.Umwelt,
+	k konfig.Konfig,
 	p string,
 	f ioFactory,
 ) (i *indexZettelenTails, err error) {
 	i = &indexZettelenTails{
-		umwelt:    u,
+		Konfig:    k,
 		path:      p,
 		ioFactory: f,
 		zettelen:  zettel_transacted.MakeSetHinweis(),
@@ -204,13 +204,13 @@ func (i *indexZettelenTails) ZettelenSchwanzen(
 }
 
 func (i *indexZettelenTails) shouldIncludeTransacted(tz zettel_transacted.Zettel) bool {
-	if i.umwelt.Konfig.IncludeHidden {
+	if i.IncludeHidden {
 		return true
 	}
 
 	prefixes := tz.Named.Stored.Zettel.Etiketten.Expanded(etikett.ExpanderRight{})
 
-	for tn, tv := range i.umwelt.Konfig.Tags {
+	for tn, tv := range i.Tags {
 		if !tv.Hide {
 			continue
 		}

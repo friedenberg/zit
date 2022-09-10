@@ -15,18 +15,21 @@ import (
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/charlie/id"
+	"github.com/friedenberg/zit/src/charlie/konfig"
 	"github.com/friedenberg/zit/src/charlie/ts"
 	"github.com/friedenberg/zit/src/delta/age_io"
 	"github.com/friedenberg/zit/src/delta/hinweisen"
+	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/delta/transaktion"
-	"github.com/friedenberg/zit/src/delta/umwelt"
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 )
 
 type Store struct {
-	*umwelt.Umwelt
-	age.Age
+	konfig   konfig.Konfig
+	standort standort.Standort
+	age      age.Age
+
 	hinweisen *hinweisen.Hinweisen
 	*indexZettelen
 	*indexZettelenTails
@@ -36,28 +39,30 @@ type Store struct {
 	transaktion.Transaktion
 }
 
-func (s *Store) Initialize(u *umwelt.Umwelt) (err error) {
-	s.Umwelt = u
-
-	if s.Age, err = u.Age(); err != nil {
-		err = errors.Wrap(err)
-		return
+func Make(
+	a age.Age,
+	k konfig.Konfig,
+	st standort.Standort,
+) (s *Store, err error) {
+	s = &Store{
+		age:      a,
+		konfig:   k,
+		standort: st,
 	}
 
-	if s.hinweisen, err = hinweisen.New(u.DirZit()); err != nil {
+	if s.hinweisen, err = hinweisen.New(st.DirZit()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	s.indexZettelenTails, err = newIndexZettelenTails(
-		u,
-		u.FileVerzeichnisseZettelenSchwanzen(),
+		k,
+		st.FileVerzeichnisseZettelenSchwanzen(),
 		s,
 	)
 
 	s.indexZettelen, err = newIndexZettelen(
-		u,
-		u.FileVerzeichnisseZettelen(),
+		st.FileVerzeichnisseZettelen(),
 		s,
 	)
 
@@ -67,7 +72,7 @@ func (s *Store) Initialize(u *umwelt.Umwelt) (err error) {
 	}
 
 	s.indexEtiketten, err = newIndexEtiketten(
-		u.FileVerzeichnisseEtiketten(),
+		st.FileVerzeichnisseEtiketten(),
 		s,
 	)
 
@@ -77,10 +82,10 @@ func (s *Store) Initialize(u *umwelt.Umwelt) (err error) {
 	}
 
 	s.indexKennung, err = newIndexKennung(
-		u,
+		k,
 		s,
 		s.hinweisen,
-		u.DirVerzeichnisse("Kennung"),
+		st.DirVerzeichnisse("Kennung"),
 	)
 
 	if err != nil {
@@ -89,9 +94,8 @@ func (s *Store) Initialize(u *umwelt.Umwelt) (err error) {
 	}
 
 	s.indexAbbr, err = newIndexAbbr(
-		u,
 		s,
-		u.DirVerzeichnisse("Abbr"),
+		st.DirVerzeichnisse("Abbr"),
 	)
 
 	if err != nil {
@@ -112,8 +116,8 @@ func (s Store) WriteZettelObjekte(z zettel.Zettel) (sh sha.Sha, err error) {
 	var w *age_io.Mover
 
 	mo := age_io.MoveOptions{
-		Age:                      s.Age,
-		FinalPath:                s.Umwelt.DirObjektenZettelen(),
+		Age:                      s.age,
+		FinalPath:                s.standort.DirObjektenZettelen(),
 		GenerateFinalPathFromSha: true,
 	}
 
@@ -174,7 +178,7 @@ func (s Store) Read(i id.Id) (tz zettel_transacted.Zettel, err error) {
 
 		var r io.ReadCloser
 
-		p := id.Path(tid, s.Umwelt.DirObjektenZettelen())
+		p := id.Path(tid, s.standort.DirObjektenZettelen())
 
 		if r, err = s.ReadCloserObjekten(p); err != nil {
 			err = errors.Wrap(err)
@@ -412,7 +416,7 @@ func (s Store) AllInChain(h hinweis.Hinweis) (c zettel_transacted.Slice, err err
 func (s Store) ReadAllTransaktions() (out []transaktion.Transaktion, err error) {
 	var headNames []string
 
-	d := s.Umwelt.DirObjektenTransaktion()
+	d := s.standort.DirObjektenTransaktion()
 
 	if headNames, err = files.ReadDirNames(d); err != nil {
 		err = errors.Wrap(err)
@@ -485,12 +489,12 @@ func (s *Store) ReadHinweisAt(
 }
 
 func (s *Store) Reindex() (err error) {
-	if err = os.RemoveAll(s.Umwelt.DirVerzeichnisse()); err != nil {
+	if err = os.RemoveAll(s.standort.DirVerzeichnisse()); err != nil {
 		err = errors.Wrapf(err, "failed to remove verzeichnisse dir")
 		return
 	}
 
-	if err = os.MkdirAll(s.Umwelt.DirVerzeichnisse(), os.ModeDir|0755); err != nil {
+	if err = os.MkdirAll(s.standort.DirVerzeichnisse(), os.ModeDir|0755); err != nil {
 		err = errors.Wrapf(err, "failed to make verzeichnisse dir")
 		return
 	}

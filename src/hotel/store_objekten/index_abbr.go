@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/tridex"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
-	"github.com/friedenberg/zit/src/delta/umwelt"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 )
 
@@ -21,7 +20,6 @@ type indexAbbrEncodableTridexes struct {
 }
 
 type indexAbbr struct {
-	*umwelt.Umwelt
 	ioFactory
 
 	path string
@@ -33,12 +31,10 @@ type indexAbbr struct {
 }
 
 func newIndexAbbr(
-	u *umwelt.Umwelt,
 	ioFactory ioFactory,
 	p string,
 ) (i *indexAbbr, err error) {
 	i = &indexAbbr{
-		Umwelt:    u,
 		path:      p,
 		ioFactory: ioFactory,
 		indexAbbrEncodableTridexes: indexAbbrEncodableTridexes{

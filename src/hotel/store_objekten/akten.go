@@ -12,7 +12,7 @@ import (
 )
 
 func (s Store) AkteExists(sh sha.Sha) (err error) {
-	p := id.Path(sh, s.Umwelt.DirObjektenAkten())
+	p := id.Path(sh, s.standort.DirObjektenAkten())
 	ok := files.Exists(p)
 
 	if !ok {
@@ -73,8 +73,8 @@ func (s Store) AkteWriter() (w sha.WriteCloser, err error) {
 	var outer age_io.Writer
 
 	mo := age_io.MoveOptions{
-		Age:                      s.Age,
-		FinalPath:                s.Umwelt.DirObjektenAkten(),
+		Age:                      s.age,
+		FinalPath:                s.standort.DirObjektenAkten(),
 		GenerateFinalPathFromSha: true,
 		LockFile:                 true,
 	}
@@ -106,10 +106,10 @@ func (s Store) AkteReader(sha sha.Sha) (r io.ReadCloser, err error) {
 		return
 	}
 
-	p := id.Path(sha, s.Umwelt.DirObjektenAkten())
+	p := id.Path(sha, s.standort.DirObjektenAkten())
 
 	o := age_io.FileReadOptions{
-		Age:  s.Age,
+		Age:  s.age,
 		Path: p,
 	}
 

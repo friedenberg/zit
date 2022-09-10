@@ -10,13 +10,11 @@ import (
 	"github.com/friedenberg/zit/src/alfa/typ"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
-	"github.com/friedenberg/zit/src/delta/umwelt"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 )
 
 type indexZettelen struct {
-	umwelt *umwelt.Umwelt
-	path   string
+	path string
 	ioFactory
 	zettelen      map[sha.Sha]zettel_transacted.Set
 	hinweisen     map[hinweis.Hinweis]zettel_transacted.Set
@@ -28,12 +26,10 @@ type indexZettelen struct {
 }
 
 func newIndexZettelen(
-	u *umwelt.Umwelt,
 	p string,
 	f ioFactory,
 ) (i *indexZettelen, err error) {
 	i = &indexZettelen{
-		umwelt:        u,
 		path:          p,
 		ioFactory:     f,
 		zettelen:      make(map[sha.Sha]zettel_transacted.Set),
