@@ -9,16 +9,18 @@ import (
 	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/charlie/konfig"
+	"github.com/friedenberg/zit/src/delta/standort"
 )
 
 type Umwelt struct {
 	BasePath string
 	cwd      string
-	Konfig   konfig.Konfig
-	Logger   errors.Logger
-	In       io.Reader
-	Out      io.Writer
-	Err      io.Writer
+	standort.Standort
+	Konfig konfig.Konfig
+	Logger errors.Logger
+	In     io.Reader
+	Out    io.Writer
+	Err    io.Writer
 }
 
 func MakeUmwelt(c konfig.Konfig) (u *Umwelt, err error) {
@@ -30,12 +32,7 @@ func MakeUmwelt(c konfig.Konfig) (u *Umwelt, err error) {
 		Err:    os.Stderr,
 	}
 
-	if u.BasePath, err = c.DirZit(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if u.cwd, err = os.Getwd(); err != nil {
+	if u.Standort, err = standort.Make(c); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

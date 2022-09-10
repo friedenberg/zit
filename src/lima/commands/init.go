@@ -41,16 +41,10 @@ func (c Init) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	c.mkdirAll(base, "bin")
 
-	c.mkdirAll(u.DirAkte())
-	c.mkdirAll(u.DirZettel())
-
 	c.mkdirAll(u.DirObjektenAkten())
 	c.mkdirAll(u.DirObjektenZettelen())
 	c.mkdirAll(u.DirObjektenTransaktion())
 
-	// c.mkdirAll(base, "Etikett-Zettel")
-	c.mkdirAll(u.DirHinweis())
-	c.mkdirAll(u.DirZettelHinweis())
 	c.mkdirAll(u.DirVerlorenUndGefunden())
 
 	c.mkdirAll(u.DirKennung())
