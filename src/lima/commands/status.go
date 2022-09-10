@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/hotel/store_objekten"
 	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
 	"github.com/friedenberg/zit/src/india/store_working_directory"
-	"github.com/friedenberg/zit/src/juliett/store_with_lock"
+	"github.com/friedenberg/zit/src/juliett/umwelt"
 	"github.com/friedenberg/zit/src/juliett/zettel_printer"
 	"github.com/friedenberg/zit/src/kilo/user_ops"
 )
@@ -24,19 +24,19 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &Status{}
 
-			return commandWithLockedStore{c}
+			return c
 		},
 	)
 }
 
-func (c Status) RunWithLockedStore(s store_with_lock.Store, args ...string) (err error) {
+func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
 	if len(args) > 0 {
 		errors.PrintErrf("args provided will be ignored")
 	}
 
 	var possible store_working_directory.CwdFiles
 
-	if possible, err = user_ops.NewGetPossibleZettels(s.Umwelt).Run(s); err != nil {
+	if possible, err = user_ops.NewGetPossibleZettels(s).Run(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -48,11 +48,11 @@ func (c Status) RunWithLockedStore(s store_with_lock.Store, args ...string) (err
 	var readResults []zettel_checked_out.Zettel
 
 	readOp := user_ops.ReadCheckedOut{
-		Umwelt:              s.Umwelt,
+		Umwelt:              s,
 		OptionsReadExternal: options,
 	}
 
-	if readResults, err = readOp.RunMany(s, possible); err != nil {
+	if readResults, err = readOp.RunMany(possible); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

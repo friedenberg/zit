@@ -13,7 +13,6 @@ import (
 	"github.com/friedenberg/zit/src/hotel/organize_text"
 	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
 	"github.com/friedenberg/zit/src/india/store_working_directory"
-	"github.com/friedenberg/zit/src/juliett/store_with_lock"
 	"github.com/friedenberg/zit/src/juliett/umwelt"
 	"github.com/friedenberg/zit/src/juliett/zettel_printer"
 	"github.com/friedenberg/zit/src/kilo/user_ops"
@@ -118,16 +117,7 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	var store store_with_lock.Store
-
-	if store, err = store_with_lock.New(u); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.PanicIfError(store.Flush)
-
-	zp := zettel_printer.Make(store.StoreObjekten(), os.Stdout)
+	zp := zettel_printer.Make(u.StoreObjekten(), os.Stdout)
 	zp.ShouldAbbreviateHinweisen = true
 
 	commitOrganizeTextOp := user_ops.CommitOrganizeFile{
@@ -162,16 +152,7 @@ func (c Add) openAktenIfNecessary(
 
 	var checkoutResults zettel_checked_out.Set
 
-	var store store_with_lock.Store
-
-	if store, err = store_with_lock.New(u); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.PanicIfError(store.Flush)
-
-	if checkoutResults, err = checkoutOp.RunManyHinweisen(store, hs...); err != nil {
+	if checkoutResults, err = checkoutOp.RunManyHinweisen(hs...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

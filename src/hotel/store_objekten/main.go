@@ -25,10 +25,15 @@ import (
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 )
 
+type LockSmith interface {
+	IsAcquired() bool
+}
+
 type Store struct {
-	konfig   konfig.Konfig
-	standort standort.Standort
-	age      age.Age
+	lockSmith LockSmith
+	konfig    konfig.Konfig
+	standort  standort.Standort
+	age       age.Age
 
 	hinweisen *hinweisen.Hinweisen
 	*indexZettelen
@@ -40,14 +45,16 @@ type Store struct {
 }
 
 func Make(
+	lockSmith LockSmith,
 	a age.Age,
 	k konfig.Konfig,
 	st standort.Standort,
 ) (s *Store, err error) {
 	s = &Store{
-		age:      a,
-		konfig:   k,
-		standort: st,
+		lockSmith: lockSmith,
+		age:       a,
+		konfig:    k,
+		standort:  st,
 	}
 
 	if s.hinweisen, err = hinweisen.New(st.DirZit()); err != nil {
@@ -113,6 +120,8 @@ func (s Store) Hinweisen() *hinweisen.Hinweisen {
 }
 
 func (s Store) WriteZettelObjekte(z zettel.Zettel) (sh sha.Sha, err error) {
+	//no lock required
+
 	var w *age_io.Mover
 
 	mo := age_io.MoveOptions{
@@ -141,6 +150,14 @@ func (s Store) WriteZettelObjekte(z zettel.Zettel) (sh sha.Sha, err error) {
 }
 
 func (s Store) writeNamedZettelToIndex(tz zettel_transacted.Zettel) (err error) {
+	if !s.lockSmith.IsAcquired() {
+		err = ErrLockRequired{
+			Operation: "write named zettel to index",
+		}
+
+		return
+	}
+
 	errors.Printf("writing zettel to index: %s", tz.Named)
 
 	if err = s.indexZettelenTails.add(tz); err != nil {
@@ -222,6 +239,14 @@ func (s Store) Read(i id.Id) (tz zettel_transacted.Zettel, err error) {
 }
 
 func (s *Store) Create(in zettel.Zettel) (tz zettel_transacted.Zettel, err error) {
+	if !s.lockSmith.IsAcquired() {
+		err = ErrLockRequired{
+			Operation: "create",
+		}
+
+		return
+	}
+
 	if in.IsEmpty() {
 		err = errors.Normalf("zettel is empty")
 		return
@@ -269,6 +294,14 @@ func (s *Store) CreateWithHinweis(
 	in zettel.Zettel,
 	h hinweis.Hinweis,
 ) (tz zettel_transacted.Zettel, err error) {
+	if !s.lockSmith.IsAcquired() {
+		err = ErrLockRequired{
+			Operation: "create with hinweis",
+		}
+
+		return
+	}
+
 	if in.IsEmpty() {
 		err = errors.Normalf("zettel is empty")
 		return
@@ -307,6 +340,14 @@ func (s *Store) Update(
 	h hinweis.Hinweis,
 	z zettel.Zettel,
 ) (tz zettel_transacted.Zettel, err error) {
+	if !s.lockSmith.IsAcquired() {
+		err = ErrLockRequired{
+			Operation: "update",
+		}
+
+		return
+	}
+
 	var mutter zettel_transacted.Zettel
 
 	if mutter, err = s.Read(h); err != nil {
@@ -359,10 +400,26 @@ func (s *Store) Update(
 }
 
 func (s Store) Revert(h hinweis.Hinweis) (named zettel_transacted.Zettel, err error) {
+	if !s.lockSmith.IsAcquired() {
+		err = ErrLockRequired{
+			Operation: "revert",
+		}
+
+		return
+	}
+
 	return
 }
 
 func (s Store) Flush() (err error) {
+	if !s.lockSmith.IsAcquired() {
+		err = ErrLockRequired{
+			Operation: "flush",
+		}
+
+		return
+	}
+
 	if err = s.writeTransaktion(); err != nil {
 		err = errors.Wrapf(err, "failed to write transaction")
 		return
@@ -489,6 +546,14 @@ func (s *Store) ReadHinweisAt(
 }
 
 func (s *Store) Reindex() (err error) {
+	if !s.lockSmith.IsAcquired() {
+		err = ErrLockRequired{
+			Operation: "reindex",
+		}
+
+		return
+	}
+
 	if err = os.RemoveAll(s.standort.DirVerzeichnisse()); err != nil {
 		err = errors.Wrapf(err, "failed to remove verzeichnisse dir")
 		return

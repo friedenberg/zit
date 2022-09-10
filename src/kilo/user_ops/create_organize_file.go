@@ -7,12 +7,11 @@ import (
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/hotel/organize_text"
-	"github.com/friedenberg/zit/src/juliett/store_with_lock"
 	"github.com/friedenberg/zit/src/juliett/umwelt"
 )
 
 type CreateOrganizeFile struct {
-	Umwelt *umwelt.Umwelt
+	*umwelt.Umwelt
 	organize_text.Options
 }
 
@@ -34,15 +33,6 @@ func (c CreateOrganizeFile) RunAndWrite(zettels zettel_transacted.Set, w io.Writ
 }
 
 func (c CreateOrganizeFile) Run(zettels zettel_transacted.Set) (results CreateOrganizeFileResults, err error) {
-	var store store_with_lock.Store
-
-	if store, err = store_with_lock.New(c.Umwelt); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.PanicIfError(store.Flush)
-
 	if results.Text, err = organize_text.New(c.Options); err != nil {
 		err = errors.Wrap(err)
 		return

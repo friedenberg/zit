@@ -12,7 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/hotel/store_objekten"
 	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
 	"github.com/friedenberg/zit/src/india/store_working_directory"
-	"github.com/friedenberg/zit/src/juliett/store_with_lock"
+	"github.com/friedenberg/zit/src/juliett/umwelt"
 	"github.com/friedenberg/zit/src/kilo/user_ops"
 )
 
@@ -25,13 +25,13 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &Clean{}
 
-			return commandWithLockedStore{c}
+			return c
 		},
 	)
 }
 
-func (c Clean) RunWithLockedStore(
-	s store_with_lock.Store,
+func (c Clean) Run(
+	s *umwelt.Umwelt,
 	args ...string,
 ) (err error) {
 	if len(args) > 0 {
@@ -40,7 +40,7 @@ func (c Clean) RunWithLockedStore(
 
 	var possible store_working_directory.CwdFiles
 
-	if possible, err = user_ops.NewGetPossibleZettels(s.Umwelt).Run(s); err != nil {
+	if possible, err = user_ops.NewGetPossibleZettels(s).Run(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -52,11 +52,11 @@ func (c Clean) RunWithLockedStore(
 	var readResults []zettel_checked_out.Zettel
 
 	readOp := user_ops.ReadCheckedOut{
-		Umwelt:              s.Umwelt,
+		Umwelt:              s,
 		OptionsReadExternal: optionsReadExternal,
 	}
 
-	if readResults, err = readOp.RunMany(s, possible); err != nil {
+	if readResults, err = readOp.RunMany(possible); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -101,9 +101,9 @@ func (c Clean) RunWithLockedStore(
 		}
 	}
 
-	if s.Umwelt.Konfig.DryRun {
+	if s.Konfig().DryRun {
 		for _, fOrD := range filesToDelete {
-			if pRel, pErr := filepath.Rel(s.Umwelt.Cwd(), fOrD); pErr == nil {
+			if pRel, pErr := filepath.Rel(s.Standort().Cwd(), fOrD); pErr == nil {
 				fOrD = pRel
 			}
 
@@ -119,7 +119,7 @@ func (c Clean) RunWithLockedStore(
 	}
 
 	for _, fOrD := range filesToDelete {
-		if pRel, pErr := filepath.Rel(s.Umwelt.Cwd(), fOrD); pErr == nil {
+		if pRel, pErr := filepath.Rel(s.Standort().Cwd(), fOrD); pErr == nil {
 			fOrD = pRel
 		}
 

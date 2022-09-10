@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/golf/zettel_external"
 	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
 	"github.com/friedenberg/zit/src/india/store_working_directory"
-	"github.com/friedenberg/zit/src/juliett/store_with_lock"
 	"github.com/friedenberg/zit/src/juliett/umwelt"
 	"github.com/friedenberg/zit/src/kilo/user_ops"
 )
@@ -54,19 +53,7 @@ func (c Edit) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	var checkoutResults zettel_checked_out.Set
 
-	var s store_with_lock.Store
-
-	if s, err = store_with_lock.New(u); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if checkoutResults, err = checkoutOp.RunManyHinweisen(s, hins...); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.Flush(); err != nil {
+	if checkoutResults, err = checkoutOp.RunManyHinweisen(hins...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -98,15 +85,10 @@ func (c Edit) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	var readResults []zettel_checked_out.Zettel
 
 	readOp := user_ops.ReadCheckedOut{
-		Umwelt: s.Umwelt,
+		Umwelt: u,
 		OptionsReadExternal: store_working_directory.OptionsReadExternal{
 			Format: zettel.Text{},
 		},
-	}
-
-	if s, err = store_with_lock.New(u); err != nil {
-		err = errors.Wrap(err)
-		return
 	}
 
 	var possible store_working_directory.CwdFiles
@@ -115,7 +97,7 @@ func (c Edit) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		possible.Zettelen = append(possible.Zettelen, f)
 	}
 
-	if readResults, err = readOp.RunMany(s, possible); err != nil {
+	if readResults, err = readOp.RunMany(possible); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -127,18 +109,13 @@ func (c Edit) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	checkinOp := user_ops.Checkin{
-		Umwelt: s.Umwelt,
+		Umwelt: u,
 		OptionsReadExternal: store_working_directory.OptionsReadExternal{
 			Format: zettel.Text{},
 		},
 	}
 
-	if _, err = checkinOp.Run(s, zettels...); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.Flush(); err != nil {
+	if _, err = checkinOp.Run(zettels...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

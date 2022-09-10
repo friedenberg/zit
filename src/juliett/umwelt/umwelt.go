@@ -8,48 +8,91 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/charlie/etikett"
+	"github.com/friedenberg/zit/src/charlie/file_lock"
 	"github.com/friedenberg/zit/src/charlie/konfig"
 	"github.com/friedenberg/zit/src/delta/standort"
+	"github.com/friedenberg/zit/src/echo/akten"
+	"github.com/friedenberg/zit/src/hotel/store_objekten"
+	"github.com/friedenberg/zit/src/india/store_working_directory"
 )
 
 type Umwelt struct {
-	BasePath string
-	cwd      string
-	standort.Standort
-	Konfig konfig.Konfig
-	Logger errors.Logger
-	In     io.Reader
-	Out    io.Writer
-	Err    io.Writer
+	standort standort.Standort
+	konfig   konfig.Konfig
+
+	logger errors.Logger
+
+	in  io.Reader
+	out io.Writer
+	err io.Writer
+
+	storesInitialized     bool
+	lock                  *file_lock.Lock
+	storeObjekten         *store_objekten.Store
+	akten                 akten.Akten
+	age                   age.Age
+	storeWorkingDirectory *store_working_directory.Store
 }
 
-func MakeUmwelt(c konfig.Konfig) (u *Umwelt, err error) {
+func Make(c konfig.Konfig) (u *Umwelt, err error) {
 	u = &Umwelt{
-		Konfig: c,
-		Logger: c.Logger,
-		In:     os.Stdin,
-		Out:    os.Stdout,
-		Err:    os.Stderr,
+		konfig: c,
+		logger: c.Logger,
+		in:     os.Stdin,
+		out:    os.Stdout,
+		err:    os.Stderr,
 	}
 
-	if u.Standort, err = standort.Make(c); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	err = u.Initialize()
 
 	return
 }
 
-func (u Umwelt) Age() (a age.Age, err error) {
-	fa := u.FileAge()
+func (u *Umwelt) Initialize() (err error) {
+	if u.standort, err = standort.Make(u.konfig); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	u.lock = file_lock.New(u.standort.DirZit("Lock"))
+
+	fa := u.standort.FileAge()
 
 	if files.Exists(fa) {
-		if a, err = age.Make(fa); err != nil {
+		if u.age, err = age.Make(fa); err != nil {
+			errors.Wrap(err)
 			return
 		}
 	} else {
-		a = age.MakeEmpty()
+		u.age = age.MakeEmpty()
 	}
+
+	if u.storeObjekten, err = store_objekten.Make(u.lock, u.age, u.konfig, u.standort); err != nil {
+		err = errors.Wrapf(err, "failed to initialize zettel meta store")
+		return
+	}
+
+	if u.akten, err = akten.New(u.standort.DirZit()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	csk := store_working_directory.Konfig{
+		Konfig:       u.konfig,
+		CacheEnabled: u.konfig.CheckoutCacheEnabled,
+	}
+
+	errors.Print("initing checkout store")
+
+	if u.storeWorkingDirectory, err = store_working_directory.New(csk, u.standort.Cwd(), u.storeObjekten); err != nil {
+		errors.Print(err)
+		err = errors.Wrap(err)
+		return
+	}
+
+	errors.Print("done initing checkout store")
+
+	u.storesInitialized = true
 
 	return
 }
@@ -57,7 +100,7 @@ func (u Umwelt) Age() (a age.Age, err error) {
 func (u Umwelt) DefaultEtiketten() (etiketten etikett.Set, err error) {
 	etiketten = etikett.MakeSet()
 
-	for e, t := range u.Konfig.Tags {
+	for e, t := range u.konfig.Tags {
 		if !t.AddToNewZettels {
 			continue
 		}

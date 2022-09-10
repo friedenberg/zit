@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/zk_types"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
-	"github.com/friedenberg/zit/src/juliett/store_with_lock"
+	"github.com/friedenberg/zit/src/juliett/umwelt"
 )
 
 type Revert struct {
@@ -23,12 +23,12 @@ func init() {
 
 			f.Var(&c.Type, "type", "ObjekteType")
 
-			return commandWithLockedStore{c}
+			return c
 		},
 	)
 }
 
-func (c Revert) RunWithLockedStore(store store_with_lock.Store, args ...string) (err error) {
+func (c Revert) Run(store *umwelt.Umwelt, args ...string) (err error) {
 	switch c.Type {
 	case zk_types.TypeZettel:
 		hins := make([]hinweis.Hinweis, len(args))

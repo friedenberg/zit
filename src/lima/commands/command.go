@@ -129,9 +129,14 @@ func Run(args []string) (exitStatus int) {
 
 	var u *umwelt.Umwelt
 
-	if u, err = umwelt.MakeUmwelt(k); err != nil {
-		err = errors.Wrap(err)
-		return
+	if u, err = umwelt.Make(k); err != nil {
+		//the store doesn't exist yet
+		if errors.IsNotExist(err) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	cmdArgs := cmd.FlagSet.Args()

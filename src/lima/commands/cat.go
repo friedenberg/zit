@@ -12,7 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
-	"github.com/friedenberg/zit/src/juliett/store_with_lock"
+	"github.com/friedenberg/zit/src/juliett/umwelt"
 )
 
 type Cat struct {
@@ -31,36 +31,36 @@ func init() {
 			f.Var(&c.Type, "type", "ObjekteType")
 			f.StringVar(&c.Format, "format", "", "ObjekteType")
 
-			return commandWithLockedStore{c}
+			return c
 		},
 	)
 }
 
-func (c Cat) RunWithLockedStore(store store_with_lock.Store, args ...string) (err error) {
+func (c Cat) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	switch c.Type {
 	case zk_types.TypeEtikett:
-		err = c.etiketten(store)
+		err = c.etiketten(u)
 
 	case zk_types.TypeZettel:
-		err = c.zettelen(store)
+		err = c.zettelen(u)
 
 	case zk_types.TypeAkte:
-		err = c.akten(store)
+		err = c.akten(u)
 
 	case zk_types.TypeHinweis:
-		err = c.hinweisen(store)
+		err = c.hinweisen(u)
 
 	default:
-		err = c.all(store)
+		err = c.all(u)
 	}
 
 	return
 }
 
-func (c Cat) etiketten(store store_with_lock.Store) (err error) {
+func (c Cat) etiketten(u *umwelt.Umwelt) (err error) {
 	var ea []etikett.Etikett
 
-	if ea, err = store.StoreObjekten().Etiketten(); err != nil {
+	if ea, err = u.StoreObjekten().Etiketten(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -81,10 +81,10 @@ func (c Cat) etiketten(store store_with_lock.Store) (err error) {
 	return
 }
 
-func (c Cat) zettelen(store store_with_lock.Store) (err error) {
+func (c Cat) zettelen(u *umwelt.Umwelt) (err error) {
 	var all map[hinweis.Hinweis]zettel_transacted.Zettel
 
-	if all, err = store.StoreObjekten().ZettelenSchwanzen(); err != nil {
+	if all, err = u.StoreObjekten().ZettelenSchwanzen(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -119,7 +119,7 @@ func (c Cat) zettelen(store store_with_lock.Store) (err error) {
 		f := zettel.Text{}
 
 		c := zettel.FormatContextWrite{
-			Out: store.Out,
+			Out: u.Out(),
 		}
 
 		// not a bottleneck
@@ -142,10 +142,10 @@ func (c Cat) zettelen(store store_with_lock.Store) (err error) {
 	return
 }
 
-func (c Cat) akten(store store_with_lock.Store) (err error) {
+func (c Cat) akten(u *umwelt.Umwelt) (err error) {
 	var shas []sha.Sha
 
-	if shas, err = store.Akten().All(); err != nil {
+	if shas, err = u.StoreAkten().All(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -164,7 +164,7 @@ func (c Cat) akten(store store_with_lock.Store) (err error) {
 	return
 }
 
-func (c Cat) hinweisen(store store_with_lock.Store) (err error) {
+func (c Cat) hinweisen(u *umwelt.Umwelt) (err error) {
 	// var hins []hinweis.Hinweis
 	// var shas []sha.Sha
 
@@ -180,7 +180,7 @@ func (c Cat) hinweisen(store store_with_lock.Store) (err error) {
 	return
 }
 
-func (c Cat) all(store store_with_lock.Store) (err error) {
+func (c Cat) all(u *umwelt.Umwelt) (err error) {
 	// var hins []hinweis.Hinweis
 
 	// if _, hins, err = store.Hinweisen().All(); err != nil {

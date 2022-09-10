@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
-	"github.com/friedenberg/zit/src/juliett/store_with_lock"
+	"github.com/friedenberg/zit/src/juliett/umwelt"
 )
 
 type Log struct {
@@ -19,12 +19,12 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &Log{}
 
-			return commandWithLockedStore{commandWithHinweisen{c}}
+			return commandWithHinweisen{c}
 		},
 	)
 }
 
-func (c Log) RunWithHinweisen(os store_with_lock.Store, hs ...hinweis.Hinweis) (err error) {
+func (c Log) RunWithHinweisen(os *umwelt.Umwelt, hs ...hinweis.Hinweis) (err error) {
 	switch len(hs) {
 
 	case 0:

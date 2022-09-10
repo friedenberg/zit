@@ -12,12 +12,11 @@ import (
 	"github.com/friedenberg/zit/src/golf/zettel_external"
 	"github.com/friedenberg/zit/src/hotel/store_objekten"
 	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
-	"github.com/friedenberg/zit/src/juliett/store_with_lock"
 	"github.com/friedenberg/zit/src/juliett/umwelt"
 )
 
 type CreateFromPaths struct {
-	Umwelt *umwelt.Umwelt
+	*umwelt.Umwelt
 	Format zettel.Format
 	Filter script_value.ScriptValue
 	Delete bool
@@ -25,21 +24,12 @@ type CreateFromPaths struct {
 }
 
 func (c CreateFromPaths) Run(args ...string) (results zettel_checked_out.Set, err error) {
-	var store store_with_lock.Store
-
-	if store, err = store_with_lock.New(c.Umwelt); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.PanicIfError(store.Flush)
-
 	toCreate := make([]zettel_external.Zettel, 0, len(args))
 
 	for _, arg := range args {
 		var toAdd []zettel_external.Zettel
 
-		if toAdd, err = c.zettelsFromPath(store, arg); err != nil {
+		if toAdd, err = c.zettelsFromPath(arg); err != nil {
 			err = errors.Errorf("zettel text format error for path: %s: %s", arg, err)
 			return
 		}
@@ -48,6 +38,13 @@ func (c CreateFromPaths) Run(args ...string) (results zettel_checked_out.Set, er
 	}
 
 	results = zettel_checked_out.MakeSetUnique(len(toCreate))
+
+	if err = c.Lock(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer c.Unlock()
 
 	for _, z := range toCreate {
 		cz := zettel_checked_out.Zettel{
@@ -72,7 +69,7 @@ func (c CreateFromPaths) Run(args ...string) (results zettel_checked_out.Set, er
 			//	return
 			//}
 		} else {
-			if cz.Internal, err = store.StoreObjekten().Create(z.Named.Stored.Zettel); err != nil {
+			if cz.Internal, err = c.StoreObjekten().Create(z.Named.Stored.Zettel); err != nil {
 				//TODO add file for error handling
 				c.handleStoreError(cz, "", err)
 				err = nil
@@ -101,7 +98,7 @@ func (c CreateFromPaths) Run(args ...string) (results zettel_checked_out.Set, er
 	return
 }
 
-func (c CreateFromPaths) zettelsFromPath(store store_with_lock.Store, p string) (out []zettel_external.Zettel, err error) {
+func (c CreateFromPaths) zettelsFromPath(p string) (out []zettel_external.Zettel, err error) {
 	var r io.Reader
 
 	errors.Print("running")
@@ -115,7 +112,7 @@ func (c CreateFromPaths) zettelsFromPath(store store_with_lock.Store, p string) 
 
 	ctx := zettel.FormatContextRead{
 		In:                r,
-		AkteWriterFactory: store.StoreObjekten(),
+		AkteWriterFactory: c.StoreObjekten(),
 	}
 
 	if _, err = c.Format.ReadFrom(&ctx); err != nil {
@@ -181,7 +178,7 @@ func (c CreateFromPaths) handleStoreError(z zettel_checked_out.Zettel, f string,
 	if errors.As(in, &lostError) {
 		var p string
 
-		if p, err = lostError.AddToLostAndFound(c.Umwelt.DirZit("Verloren+Gefunden")); err != nil {
+		if p, err = lostError.AddToLostAndFound(c.Standort().DirZit("Verloren+Gefunden")); err != nil {
 			errors.PrintErr(err)
 			return
 		}

@@ -9,7 +9,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/charlie/file_lock"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/charlie/id"
 	"github.com/friedenberg/zit/src/delta/zettel"
@@ -20,7 +19,6 @@ import (
 )
 
 type Store struct {
-	lock *file_lock.Lock
 	Konfig
 	format        zettel.Format
 	storeObjekten *store_objekten.Store
@@ -38,13 +36,6 @@ func New(k Konfig, p string, storeObjekten *store_objekten.Store) (s *Store, err
 		storeObjekten: storeObjekten,
 		path:          p,
 		entries:       make(map[string]Entry),
-	}
-
-	s.lock = file_lock.New(path.Join(p, ".ZitCheckoutStoreLock"))
-
-	if err = s.lock.Lock(); err != nil {
-		err = errors.Wrap(err)
-		return
 	}
 
 	if s.cwd, err = os.Getwd(); err != nil {
@@ -99,11 +90,6 @@ func (s Store) Flush() (err error) {
 			err = errors.Wrap(err)
 			return
 		}
-	}
-
-	if err = s.lock.Unlock(); err != nil {
-		err = errors.Wrap(err)
-		return
 	}
 
 	return

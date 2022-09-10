@@ -23,7 +23,7 @@ func init() {
 }
 
 func (c Deinit) Run(u *umwelt.Umwelt, args ...string) (err error) {
-	base := path.Join(u.Dir(), ".zit")
+	base := path.Join(u.Standort().Dir(), ".zit")
 	err = os.RemoveAll(base)
 
 	if err != nil {

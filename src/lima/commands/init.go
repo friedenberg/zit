@@ -11,7 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/age"
-	"github.com/friedenberg/zit/src/juliett/store_with_lock"
+	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/juliett/umwelt"
 )
 
@@ -37,48 +37,52 @@ func init() {
 }
 
 func (c Init) Run(u *umwelt.Umwelt, args ...string) (err error) {
-	base := u.DirZit()
+	s := u.Standort()
+	base := s.DirZit()
 
 	c.mkdirAll(base, "bin")
 
-	c.mkdirAll(u.DirObjektenAkten())
-	c.mkdirAll(u.DirObjektenZettelen())
-	c.mkdirAll(u.DirObjektenTransaktion())
+	c.mkdirAll(s.DirObjektenAkten())
+	c.mkdirAll(s.DirObjektenZettelen())
+	c.mkdirAll(s.DirObjektenTransaktion())
 
-	c.mkdirAll(u.DirVerlorenUndGefunden())
+	c.mkdirAll(s.DirVerlorenUndGefunden())
 
-	c.mkdirAll(u.DirKennung())
-	c.writeFile(u.DirZit("Kennung", "Counter"), "0")
+	c.mkdirAll(s.DirKennung())
+	c.writeFile(s.DirZit("Kennung", "Counter"), "0")
 
 	if !c.DisableAge {
-		if _, err = age.Generate(u.FileAge()); err != nil {
+		if _, err = age.Generate(s.FileAge()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	c.writeFile(u.DirZit("Konfig"), "")
+	c.writeFile(s.DirZit("Konfig"), "")
 
-	if err = c.populateYinIfNecessary(u); err != nil {
+	if err = c.populateYinIfNecessary(s); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = c.populateYangIfNecessary(u); err != nil {
+	if err = c.populateYangIfNecessary(s); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	var store store_with_lock.Store
-
-	if store, err = store_with_lock.New(u); err != nil {
+	if err = u.Initialize(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.PanicIfError(store.Flush)
+	if err = u.Lock(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-	if err = store.StoreObjekten().Reindex(); err != nil {
+	defer u.Unlock()
+
+	if err = u.StoreObjekten().Reindex(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -86,22 +90,22 @@ func (c Init) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	return
 }
 
-func (c Init) populateYinIfNecessary(u *umwelt.Umwelt) (err error) {
+func (c Init) populateYinIfNecessary(s standort.Standort) (err error) {
 	if c.Yin == "" {
 		return
 	}
 
-	err = c.readAndTransferLines(c.Yin, u.DirZit("Kennung", "Yin"))
+	err = c.readAndTransferLines(c.Yin, s.DirZit("Kennung", "Yin"))
 
 	return
 }
 
-func (c Init) populateYangIfNecessary(u *umwelt.Umwelt) (err error) {
+func (c Init) populateYangIfNecessary(s standort.Standort) (err error) {
 	if c.Yang == "" {
 		return
 	}
 
-	err = c.readAndTransferLines(c.Yang, u.DirZit("Kennung", "Yang"))
+	err = c.readAndTransferLines(c.Yang, s.DirZit("Kennung", "Yang"))
 
 	return
 }

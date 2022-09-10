@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
-	"github.com/friedenberg/zit/src/juliett/store_with_lock"
+	"github.com/friedenberg/zit/src/juliett/umwelt"
 )
 
 type AdoptAbandoned struct {
@@ -19,7 +19,7 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &AdoptAbandoned{}
 
-			return commandWithLockedStore{c}
+			return c
 		},
 	)
 }
@@ -28,7 +28,7 @@ func (c AdoptAbandoned) Description() string {
 	return "creates a new hinweis for a zettel that has somehow gotten detached"
 }
 
-func (c AdoptAbandoned) RunWithLockedStore(store store_with_lock.Store, args ...string) (err error) {
+func (c AdoptAbandoned) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	zettels := make([]zettel_named.Zettel, len(args))
 
 	for i, a := range args {
@@ -41,14 +41,14 @@ func (c AdoptAbandoned) RunWithLockedStore(store store_with_lock.Store, args ...
 
 		var stored zettel_transacted.Zettel
 
-		if stored, err = store.StoreObjekten().Read(sha); err != nil {
+		if stored, err = u.StoreObjekten().Read(sha); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 		var tz zettel_transacted.Zettel
 
-		if tz, err = store.StoreObjekten().Create(stored.Named.Stored.Zettel); err != nil {
+		if tz, err = u.StoreObjekten().Create(stored.Named.Stored.Zettel); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

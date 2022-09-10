@@ -8,8 +8,8 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/bravo/tridex"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
+	"github.com/friedenberg/zit/src/charlie/tridex"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 )
 

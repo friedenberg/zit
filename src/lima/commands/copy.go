@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
-	"github.com/friedenberg/zit/src/juliett/store_with_lock"
+	"github.com/friedenberg/zit/src/juliett/umwelt"
 )
 
 type Copy struct {
@@ -19,12 +19,12 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &Copy{}
 
-			return commandWithLockedStore{commandWithHinweisen{c}}
+			return commandWithHinweisen{c}
 		},
 	)
 }
 
-func (c Copy) RunWithHinweisen(s store_with_lock.Store, hins ...hinweis.Hinweis) (err error) {
+func (c Copy) RunWithHinweisen(s *umwelt.Umwelt, hins ...hinweis.Hinweis) (err error) {
 	zettels := make([]zettel_transacted.Zettel, len(hins))
 
 	for i, h := range hins {

@@ -13,7 +13,6 @@ import (
 	"github.com/friedenberg/zit/src/golf/zettel_external"
 	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
 	"github.com/friedenberg/zit/src/india/store_working_directory"
-	"github.com/friedenberg/zit/src/juliett/store_with_lock"
 	"github.com/friedenberg/zit/src/juliett/umwelt"
 	"github.com/friedenberg/zit/src/kilo/user_ops"
 )
@@ -58,7 +57,7 @@ func init() {
 }
 
 func (c New) ValidateFlagsAndArgs(u *umwelt.Umwelt, args ...string) (err error) {
-	if u.Konfig.DryRun && len(args) == 0 {
+	if u.Konfig().DryRun && len(args) == 0 {
 		err = errors.Errorf("when -dry-run is set, paths to existing zettels must be provided")
 		return
 	}
@@ -142,16 +141,7 @@ func (c New) writeNewZettels(
 		Typ:         typ.Typ{Value: "md"},
 	}
 
-	var s store_with_lock.Store
-
-	if s, err = store_with_lock.New(u); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.PanicIfError(s.Flush)
-
-	if zsc, err = emptyOp.RunMany(s, z, c.Count); err != nil {
+	if zsc, err = emptyOp.RunMany(z, c.Count); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -198,24 +188,15 @@ func (c New) editZettelsIfRequested(
 		},
 	}
 
-	var s store_with_lock.Store
-
-	if s, err = store_with_lock.New(u); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.PanicIfError(s.Flush)
-
 	var zslc []zettel_checked_out.Zettel
 
-	if zslc, err = readOp.RunMany(s, cwdFiles); err != nil {
+	if zslc, err = readOp.RunMany(cwdFiles); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	checkinOp := user_ops.Checkin{
-		Umwelt:              s.Umwelt,
+		Umwelt:              u,
 		OptionsReadExternal: readOp.OptionsReadExternal,
 	}
 
@@ -225,7 +206,7 @@ func (c New) editZettelsIfRequested(
 		zsle[i] = zc.External
 	}
 
-	if _, err = checkinOp.Run(s, zsle...); err != nil {
+	if _, err = checkinOp.Run(zsle...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

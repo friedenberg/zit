@@ -12,7 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/charlie/id"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
-	"github.com/friedenberg/zit/src/juliett/store_with_lock"
+	"github.com/friedenberg/zit/src/juliett/umwelt"
 )
 
 type OpenAkte struct {
@@ -24,12 +24,12 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &OpenAkte{}
 
-			return commandWithLockedStore{commandWithHinweisen{c}}
+			return commandWithHinweisen{c}
 		},
 	)
 }
 
-func (c OpenAkte) RunWithHinweisen(store store_with_lock.Store, hins ...hinweis.Hinweis) (err error) {
+func (c OpenAkte) RunWithHinweisen(store *umwelt.Umwelt, hins ...hinweis.Hinweis) (err error) {
 	paths := make([]string, len(hins))
 
 	dir, err := ioutil.TempDir("", "")

@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
 	"github.com/friedenberg/zit/src/india/store_working_directory"
-	"github.com/friedenberg/zit/src/juliett/store_with_lock"
+	"github.com/friedenberg/zit/src/juliett/umwelt"
 	"github.com/friedenberg/zit/src/kilo/user_ops"
 )
 
@@ -26,16 +26,16 @@ func init() {
 			f.Var(&c.CheckoutMode, "mode", "mode for checking out the zettel")
 			f.BoolVar(&c.Force, "force", false, "force update checked out zettels, even if they will overwrite existing checkouts")
 
-			return commandWithLockedStore{commandWithHinweisen{c}}
+			return commandWithHinweisen{c}
 		},
 	)
 }
 
-func (c Checkout) RunWithHinweisen(s store_with_lock.Store, hins ...hinweis.Hinweis) (err error) {
+func (c Checkout) RunWithHinweisen(s *umwelt.Umwelt, hins ...hinweis.Hinweis) (err error) {
 	var readResults []zettel_checked_out.Zettel
 
 	readOp := user_ops.ReadCheckedOut{
-		Umwelt: s.Umwelt,
+		Umwelt: s,
 		OptionsReadExternal: store_working_directory.OptionsReadExternal{
 			Format: zettel.Text{},
 		},
@@ -47,7 +47,7 @@ func (c Checkout) RunWithHinweisen(s store_with_lock.Store, hins ...hinweis.Hinw
 		pz.Zettelen = append(pz.Zettelen, h.String())
 	}
 
-	if readResults, err = readOp.RunMany(s, pz); err != nil {
+	if readResults, err = readOp.RunMany(pz); err != nil {
 		errors.Print(err)
 		err = errors.Wrap(err)
 		return
@@ -82,14 +82,14 @@ func (c Checkout) RunWithHinweisen(s store_with_lock.Store, hins ...hinweis.Hinw
 	}
 
 	checkoutOp := user_ops.Checkout{
-		Umwelt: s.Umwelt,
+		Umwelt: s,
 		CheckoutOptions: store_working_directory.CheckoutOptions{
 			CheckoutMode: c.CheckoutMode,
 			Format:       zettel.Text{},
 		},
 	}
 
-	if _, err = checkoutOp.RunManyHinweisen(s, toCheckOut...); err != nil {
+	if _, err = checkoutOp.RunManyHinweisen(toCheckOut...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/hinweisen"
 	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
 	"github.com/friedenberg/zit/src/india/store_working_directory"
-	"github.com/friedenberg/zit/src/juliett/store_with_lock"
 	"github.com/friedenberg/zit/src/juliett/umwelt"
 )
 
@@ -21,17 +20,15 @@ type ReadCheckedOutResults struct {
 }
 
 func (op ReadCheckedOut) RunOneHinweis(
-	s store_with_lock.Store,
 	h hinweis.Hinweis,
 ) (zettel zettel_checked_out.Zettel, err error) {
-	return op.RunOneString(s, h.String())
+	return op.RunOneString(h.String())
 }
 
 func (op ReadCheckedOut) RunOneString(
-	s store_with_lock.Store,
 	p string,
 ) (zettel zettel_checked_out.Zettel, err error) {
-	if zettel, err = s.StoreWorkingDirectory().Read(p); err != nil {
+	if zettel, err = op.StoreWorkingDirectory().Read(p); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -40,7 +37,6 @@ func (op ReadCheckedOut) RunOneString(
 }
 
 func (op ReadCheckedOut) RunMany(
-	s store_with_lock.Store,
 	possible store_working_directory.CwdFiles,
 	//TODO switch to zettel_checked_out.Set
 ) (results []zettel_checked_out.Zettel, err error) {
@@ -49,7 +45,7 @@ func (op ReadCheckedOut) RunMany(
 	for _, p := range possible.Zettelen {
 		var checked_out zettel_checked_out.Zettel
 
-		if checked_out, err = s.StoreWorkingDirectory().Read(p); err != nil {
+		if checked_out, err = op.StoreWorkingDirectory().Read(p); err != nil {
 			if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
 				//TODO log
 				err = nil
@@ -66,7 +62,7 @@ func (op ReadCheckedOut) RunMany(
 	for _, p := range possible.Akten {
 		var checked_out zettel_checked_out.Zettel
 
-		if checked_out, err = s.StoreWorkingDirectory().ReadExternalZettelFromAktePath(p); err != nil {
+		if checked_out, err = op.StoreWorkingDirectory().ReadExternalZettelFromAktePath(p); err != nil {
 			if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
 				//TODO log
 				err = nil

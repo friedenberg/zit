@@ -13,7 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/hotel/store_objekten"
-	"github.com/friedenberg/zit/src/juliett/store_with_lock"
+	"github.com/friedenberg/zit/src/juliett/umwelt"
 )
 
 type Show struct {
@@ -30,12 +30,12 @@ func init() {
 
 			f.Var(&c.Type, "type", "ObjekteType")
 
-			return commandWithLockedStore{commandWithId{c}}
+			return commandWithId{c}
 		},
 	)
 }
 
-func (c Show) RunWithId(store store_with_lock.Store, ids ...id_set.Set) (err error) {
+func (c Show) RunWithId(store *umwelt.Umwelt, ids ...id_set.Set) (err error) {
 	switch c.Type {
 
 	case zk_types.TypeAkte:
@@ -53,7 +53,7 @@ func (c Show) RunWithId(store store_with_lock.Store, ids ...id_set.Set) (err err
 	}
 }
 
-func (c Show) showZettels(store store_with_lock.Store, ids []id_set.Set) (err error) {
+func (c Show) showZettels(store *umwelt.Umwelt, ids []id_set.Set) (err error) {
 	zettels := make([]zettel_transacted.Zettel, len(ids))
 
 	for i, is := range ids {
@@ -84,12 +84,12 @@ func (c Show) showZettels(store store_with_lock.Store, ids []id_set.Set) (err er
 	f := zettel.Text{}
 
 	ctx := zettel.FormatContextWrite{
-		Out:               store.Out,
+		Out:               store.Out(),
 		AkteReaderFactory: store.StoreObjekten(),
 	}
 
 	for _, named := range zettels {
-		if typKonfig, ok := store.Konfig.Typen[named.Named.Stored.Zettel.Typ.String()]; ok {
+		if typKonfig, ok := store.Konfig().Typen[named.Named.Stored.Zettel.Typ.String()]; ok {
 			ctx.IncludeAkte = typKonfig.InlineAkte
 		} else {
 			ctx.IncludeAkte = named.Named.Stored.Zettel.Typ.String() == "md"
@@ -106,7 +106,7 @@ func (c Show) showZettels(store store_with_lock.Store, ids []id_set.Set) (err er
 	return
 }
 
-func (c Show) showAkten(store store_with_lock.Store, ids []id_set.Set) (err error) {
+func (c Show) showAkten(store *umwelt.Umwelt, ids []id_set.Set) (err error) {
 	zettels := make([]zettel_transacted.Zettel, len(ids))
 
 	for i, is := range ids {
@@ -144,7 +144,7 @@ func (c Show) showAkten(store store_with_lock.Store, ids []id_set.Set) (err erro
 
 		defer errors.PanicIfError(ar.Close)
 
-		if _, err = io.Copy(store.Out, ar); err != nil {
+		if _, err = io.Copy(store.Out(), ar); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -153,7 +153,7 @@ func (c Show) showAkten(store store_with_lock.Store, ids []id_set.Set) (err erro
 	return
 }
 
-func (c Show) showTransaktions(store store_with_lock.Store, ids []id_set.Set) (err error) {
+func (c Show) showTransaktions(store *umwelt.Umwelt, ids []id_set.Set) (err error) {
 	for _, is := range ids {
 		var idd id.Id
 		ok := false

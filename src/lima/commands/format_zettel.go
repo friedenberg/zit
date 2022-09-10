@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/konfig"
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
-	"github.com/friedenberg/zit/src/juliett/store_with_lock"
 	"github.com/friedenberg/zit/src/juliett/umwelt"
 )
 
@@ -44,32 +43,23 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	format := zettel.Text{}
 
-	var store store_with_lock.Store
-
-	if store, err = store_with_lock.New(u); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.PanicIfError(store.Flush)
-
 	var cz zettel_checked_out.Zettel
 
-	if cz, err = store.StoreWorkingDirectory().Read(args[0]); err != nil {
+	if cz, err = u.StoreWorkingDirectory().Read(args[0]); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	var formatter konfig.RemoteScript
 
-	if typKonfig, ok := u.Konfig.Typen[cz.External.Named.Stored.Zettel.Typ.String()]; ok {
+	if typKonfig, ok := u.Konfig().Typen[cz.External.Named.Stored.Zettel.Typ.String()]; ok {
 		formatter = typKonfig.FormatScript
 	}
 
 	ctx := zettel.FormatContextWrite{
 		Zettel:            cz.External.Named.Stored.Zettel,
 		IncludeAkte:       true,
-		AkteReaderFactory: store.StoreObjekten(),
+		AkteReaderFactory: u.StoreObjekten(),
 		FormatScript:      formatter,
 		Out:               os.Stdout,
 	}

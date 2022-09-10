@@ -7,7 +7,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
-	"github.com/friedenberg/zit/src/juliett/store_with_lock"
+	"github.com/friedenberg/zit/src/juliett/umwelt"
 )
 
 type PeekHinweisen struct {
@@ -19,12 +19,12 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &PeekHinweisen{}
 
-			return commandWithLockedStore{c}
+			return c
 		},
 	)
 }
 
-func (c PeekHinweisen) RunWithLockedStore(store store_with_lock.Store, args ...string) (err error) {
+func (c PeekHinweisen) Run(store *umwelt.Umwelt, args ...string) (err error) {
 	n := 0
 
 	if len(args) > 0 {

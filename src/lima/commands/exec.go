@@ -16,7 +16,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/konfig"
 	"github.com/friedenberg/zit/src/delta/id_set"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
-	"github.com/friedenberg/zit/src/juliett/store_with_lock"
 	"github.com/friedenberg/zit/src/juliett/umwelt"
 )
 
@@ -79,15 +78,6 @@ func (c Exec) getZettel(
 	executor konfig.RemoteScript,
 	err error,
 ) {
-	var store store_with_lock.Store
-
-	if store, err = store_with_lock.New(u); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.PanicIfError(store.Flush)
-
 	ps := id_set.MakeProtoSet(
 		&sha.Sha{},
 		&hinweis.Hinweis{},
@@ -104,21 +94,21 @@ func (c Exec) getZettel(
 		return
 	}
 
-	if tz, err = store.StoreObjekten().Read(idd); err != nil {
+	if tz, err = u.StoreObjekten().Read(idd); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	typ := tz.Named.Stored.Zettel.Typ.String()
 
-	if typKonfig, ok := store.Umwelt.Konfig.Typen[typ]; ok {
+	if typKonfig, ok := u.Konfig().Typen[typ]; ok {
 		executor = typKonfig.ExecCommand
 	} else {
 		err = errors.Normal(errors.Errorf("Typ does not have an exec-command set: %s", typ))
 		return
 	}
 
-	if ar, err = store.StoreObjekten().AkteReader(tz.Named.Stored.Zettel.Akte); err != nil {
+	if ar, err = u.StoreObjekten().AkteReader(tz.Named.Stored.Zettel.Akte); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

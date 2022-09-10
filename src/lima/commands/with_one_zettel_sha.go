@@ -4,11 +4,11 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
-	"github.com/friedenberg/zit/src/juliett/store_with_lock"
+	"github.com/friedenberg/zit/src/juliett/umwelt"
 )
 
 type WithOneZettelSha interface {
-	RunWithZettel(store store_with_lock.Store, zettel ...zettel_transacted.Zettel) error
+	RunWithZettel(store *umwelt.Umwelt, zettel ...zettel_transacted.Zettel) error
 }
 
 type withOneZettelSha struct {
@@ -16,7 +16,7 @@ type withOneZettelSha struct {
 	Count int
 }
 
-func (c withOneZettelSha) RunWithLockedStore(store store_with_lock.Store, args ...string) (err error) {
+func (c withOneZettelSha) Run(store *umwelt.Umwelt, args ...string) (err error) {
 	if len(args) != c.Count {
 		err = errors.Errorf("exactly %d argument expected, but got %d", c.Count, len(args))
 		return

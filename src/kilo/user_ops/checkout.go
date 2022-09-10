@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
 	"github.com/friedenberg/zit/src/india/store_working_directory"
-	"github.com/friedenberg/zit/src/juliett/store_with_lock"
 	"github.com/friedenberg/zit/src/juliett/umwelt"
 )
 
@@ -16,7 +15,6 @@ type Checkout struct {
 }
 
 func (c Checkout) RunManyHinweisen(
-	s store_with_lock.Store,
 	hins ...hinweis.Hinweis,
 ) (results zettel_checked_out.Set, err error) {
 	zts := zettel_transacted.MakeSetUnique(len(hins))
@@ -24,7 +22,7 @@ func (c Checkout) RunManyHinweisen(
 	for _, h := range hins {
 		var zt zettel_transacted.Zettel
 
-		if zt, err = s.StoreObjekten().Read(h); err != nil {
+		if zt, err = c.StoreObjekten().Read(h); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -35,7 +33,7 @@ func (c Checkout) RunManyHinweisen(
 	results = zettel_checked_out.MakeSetUnique(zts.Len())
 	ztsl := zts.ToSlice()
 
-	if results, err = s.StoreWorkingDirectory().Checkout(c.CheckoutOptions, ztsl...); err != nil {
+	if results, err = c.StoreWorkingDirectory().Checkout(c.CheckoutOptions, ztsl...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

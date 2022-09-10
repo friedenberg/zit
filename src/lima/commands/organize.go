@@ -13,7 +13,6 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/hotel/organize_text"
-	"github.com/friedenberg/zit/src/juliett/store_with_lock"
 	"github.com/friedenberg/zit/src/juliett/umwelt"
 	"github.com/friedenberg/zit/src/juliett/zettel_printer"
 	"github.com/friedenberg/zit/src/kilo/user_ops"
@@ -138,16 +137,15 @@ func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			return
 		}
 
-		var store store_with_lock.Store
-
-		if store, err = store_with_lock.New(u); err != nil {
+		if err = u.Lock(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		defer errors.PanicIfError(store.Flush)
+		defer u.Unlock()
 
-		zp := zettel_printer.Make(store.StoreObjekten(), os.Stdout)
+		//TODO move to Umwelt
+		zp := zettel_printer.Make(u.StoreObjekten(), os.Stdout)
 
 		commitOrganizeTextOp := user_ops.CommitOrganizeFile{
 			Printer: zp,
@@ -188,16 +186,14 @@ func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			return
 		}
 
-		var store store_with_lock.Store
-
-		if store, err = store_with_lock.New(u); err != nil {
+		if err = u.Lock(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		defer errors.PanicIfError(store.Flush)
+		defer u.Unlock()
 
-		zp := zettel_printer.Make(store.StoreObjekten(), os.Stdout)
+		zp := zettel_printer.Make(u.StoreObjekten(), os.Stdout)
 
 		commitOrganizeTextOp := user_ops.CommitOrganizeFile{
 			Printer: zp,

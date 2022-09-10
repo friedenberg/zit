@@ -29,7 +29,8 @@ cat_yang() (
 	echo "tres"
 )
 
-function can_peek_hinweisen_after_init { # @test
+function can_peek_hinweisen_after_init_fix { # @test
+	# setup
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
@@ -37,17 +38,43 @@ function can_peek_hinweisen_after_init { # @test
 
 	expected="$(mktemp)"
 	{
-		echo 0: one/dos
-		echo 1: one/tres
-		echo 2: one/uno
-		echo 3: three/dos
-		echo 4: three/tres
-		echo 5: three/uno
-		echo 6: two/dos
-		echo 7: two/tres
-    echo 8: two/uno
+		echo ---
+		echo "# bez"
+		echo - et1
+		echo - et2
+		echo ! md
+		echo ---
+		echo
+		echo the body
+	} >>"$expected"
+
+	run zit new -verbose -edit=false -predictable-hinweisen "$expected"
+	assert_output --partial '[one/uno '
+
+	run zit checkout one/uno
+	assert_output --partial '[one/uno '
+	assert_output --partial '(checked out)'
+
+	run cat one/uno.md
+	assert_output "$(cat "$expected")"
+
+	{
+		echo ---
+		echo "# bez"
+		echo - et1
+		echo - et2
+		echo ! md
+		echo ---
+		echo
+		echo the body 2
 	} >"$expected"
 
-	run zit peek-hinweisen
+	cat "$expected" >"one/uno.md"
+
+	run zit checkout -verbose one/uno
+	assert_output --partial '[one/uno '
+	assert_output --partial '(external has changes)'
+
+	run cat one/uno.md
 	assert_output "$(cat "$expected")"
 }

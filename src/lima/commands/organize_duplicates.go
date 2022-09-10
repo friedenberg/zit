@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/hotel/organize_text"
-	"github.com/friedenberg/zit/src/juliett/store_with_lock"
 	"github.com/friedenberg/zit/src/juliett/umwelt"
 	"github.com/friedenberg/zit/src/kilo/user_ops"
 )
@@ -50,16 +49,7 @@ func (c *OrganizeDuplicates) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	var getResults map[sha.Sha]zettel_transacted.Set
 
-	var store store_with_lock.Store
-
-	if store, err = store_with_lock.New(u); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.PanicIfError(store.Flush)
-
-	if getResults, err = store.StoreObjekten().ReadAktenDuplicates(); err != nil {
+	if getResults, err = u.StoreObjekten().ReadAktenDuplicates(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -70,7 +60,7 @@ func (c *OrganizeDuplicates) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		zst, err = zs.Filter(
 			zettel_transacted.MakeSetKeyFuncHinweis(),
 			func(zt zettel_transacted.Zettel) (ok bool, err1 error) {
-				ok, err1 = store.StoreObjekten().IsSchwanz(zt)
+				ok, err1 = u.StoreObjekten().IsSchwanz(zt)
 				return
 			},
 		)

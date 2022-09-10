@@ -5,27 +5,17 @@ import (
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
-	"github.com/friedenberg/zit/src/juliett/store_with_lock"
 	"github.com/friedenberg/zit/src/juliett/umwelt"
 )
 
 type GetZettelsFromQuery struct {
-	Umwelt *umwelt.Umwelt
+	*umwelt.Umwelt
 }
 
 func (c GetZettelsFromQuery) Run(query zettel_named.NamedFilter) (result zettel_transacted.Set, err error) {
-	var store store_with_lock.Store
-
-	if store, err = store_with_lock.New(c.Umwelt); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.PanicIfError(store.Flush)
-
 	var set map[hinweis.Hinweis]zettel_transacted.Zettel
 
-	if set, err = store.StoreObjekten().ZettelenSchwanzen(query); err != nil {
+	if set, err = c.StoreObjekten().ZettelenSchwanzen(query); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

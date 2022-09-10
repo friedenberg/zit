@@ -6,18 +6,18 @@ import (
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/charlie/ts"
 	"github.com/friedenberg/zit/src/delta/id_set"
-	"github.com/friedenberg/zit/src/juliett/store_with_lock"
+	"github.com/friedenberg/zit/src/juliett/umwelt"
 )
 
 type CommandWithId interface {
-	RunWithId(store store_with_lock.Store, ids ...id_set.Set) error
+	RunWithId(store *umwelt.Umwelt, ids ...id_set.Set) error
 }
 
 type commandWithId struct {
 	CommandWithId
 }
 
-func (c commandWithId) RunWithLockedStore(store store_with_lock.Store, args ...string) (err error) {
+func (c commandWithId) Run(store *umwelt.Umwelt, args ...string) (err error) {
 	ps := id_set.MakeProtoSet(
 		&sha.Sha{},
 		&hinweis.Hinweis{},

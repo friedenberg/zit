@@ -12,12 +12,11 @@ import (
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/hotel/store_objekten"
-	"github.com/friedenberg/zit/src/juliett/store_with_lock"
 	"github.com/friedenberg/zit/src/juliett/umwelt"
 )
 
 type ZettelFromExternalAkte struct {
-	Umwelt    *umwelt.Umwelt
+	*umwelt.Umwelt
 	Etiketten etikett.Set
 	Delete    bool
 }
@@ -26,14 +25,12 @@ func (c ZettelFromExternalAkte) Run(
 	ctx *errors.Ctx,
 	args ...string,
 ) (results zettel_transacted.Set) {
-	var store store_with_lock.Store
-
-	if store, ctx.Err = store_with_lock.New(c.Umwelt); !ctx.IsEmpty() {
+	if ctx.Err = c.Lock(); !ctx.IsEmpty() {
 		ctx.Wrap()
 		return
 	}
 
-	defer ctx.Defer(store.Flush)
+	defer ctx.Defer(c.Unlock)
 
 	results = zettel_transacted.MakeSetUnique(len(args))
 
@@ -42,7 +39,7 @@ func (c ZettelFromExternalAkte) Run(
 		var tz zettel_transacted.Zettel
 
 		errors.PrintErr("creating zettel for akte")
-		if z = c.zettelForAkte(ctx, store, arg); !ctx.IsEmpty() {
+		if z = c.zettelForAkte(ctx, arg); !ctx.IsEmpty() {
 			errors.PrintErr("ctx error", ctx.IsEmpty())
 			errors.PrintErr(ctx.Err)
 			ctx.Wrap()
@@ -50,14 +47,14 @@ func (c ZettelFromExternalAkte) Run(
 		}
 
 		errors.PrintErr("creating zettel")
-		if tz, ctx.Err = store.StoreObjekten().Create(z); !ctx.IsEmpty() {
+		if tz, ctx.Err = c.StoreObjekten().Create(z); !ctx.IsEmpty() {
 			ctx.Wrap()
 			return
 		}
 
 		akteSha := tz.Named.Stored.Zettel.Akte
 
-		if ctx.Err = store.StoreObjekten().AkteExists(akteSha); !ctx.IsEmpty() {
+		if ctx.Err = c.StoreObjekten().AkteExists(akteSha); !ctx.IsEmpty() {
 			if errors.Is(ctx.Err, store_objekten.ErrAkteExists{}) {
 				err1 := ctx.Err.(store_objekten.ErrAkteExists)
 				errors.PrintOutf("[%s %s] (has Akte matches)", arg, akteSha)
@@ -100,14 +97,13 @@ func (c ZettelFromExternalAkte) Run(
 
 func (c ZettelFromExternalAkte) zettelForAkte(
 	ctx *errors.Ctx,
-	store store_with_lock.Store,
 	aktePath string,
 ) (z zettel.Zettel) {
 	z.Etiketten = c.Etiketten
 
 	var akteWriter sha.WriteCloser
 
-	if akteWriter, ctx.Err = store.StoreObjekten().AkteWriter(); !ctx.IsEmpty() {
+	if akteWriter, ctx.Err = c.StoreObjekten().AkteWriter(); !ctx.IsEmpty() {
 		ctx.Wrap()
 		return
 	}

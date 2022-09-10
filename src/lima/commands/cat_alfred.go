@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/golf/alfred"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
-	"github.com/friedenberg/zit/src/juliett/store_with_lock"
+	"github.com/friedenberg/zit/src/juliett/umwelt"
 )
 
 type CatAlfred struct {
@@ -26,7 +26,7 @@ func init() {
 				Type: zk_types.TypeUnknown,
 			}
 
-			c.Command = commandWithLockedStore{c}
+			c.Command = c
 
 			f.Var(&c.Type, "type", "ObjekteType")
 
@@ -35,18 +35,18 @@ func init() {
 	)
 }
 
-func (c CatAlfred) RunWithLockedStore(store store_with_lock.Store, args ...string) (err error) {
+func (c CatAlfred) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	//this command does its own error handling
 	defer func() {
 		err = nil
 	}()
 
-	wo := bufio.NewWriter(store.Out)
+	wo := bufio.NewWriter(u.Out())
 	defer wo.Flush()
 
 	var aw alfred.Writer
 
-	if aw, err = alfred.NewWriter(store.Out); err != nil {
+	if aw, err = alfred.NewWriter(wo); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -61,7 +61,7 @@ func (c CatAlfred) RunWithLockedStore(store store_with_lock.Store, args ...strin
 	case zk_types.TypeEtikett:
 		var ea []etikett.Etikett
 
-		if ea, err = store.StoreObjekten().Etiketten(); err != nil {
+		if ea, err = u.StoreObjekten().Etiketten(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -74,7 +74,7 @@ func (c CatAlfred) RunWithLockedStore(store store_with_lock.Store, args ...strin
 
 		var all map[hinweis.Hinweis]zettel_transacted.Zettel
 
-		if all, err = store.StoreObjekten().ZettelenSchwanzen(); err != nil {
+		if all, err = u.StoreObjekten().ZettelenSchwanzen(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -89,7 +89,7 @@ func (c CatAlfred) RunWithLockedStore(store store_with_lock.Store, args ...strin
 
 		var all map[hinweis.Hinweis]zettel_transacted.Zettel
 
-		if all, err = store.StoreObjekten().ZettelenSchwanzen(); err != nil {
+		if all, err = u.StoreObjekten().ZettelenSchwanzen(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

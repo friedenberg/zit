@@ -13,7 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
-	"github.com/friedenberg/zit/src/juliett/store_with_lock"
+	"github.com/friedenberg/zit/src/juliett/umwelt"
 )
 
 type CatObjekte struct {
@@ -30,12 +30,12 @@ func init() {
 
 			f.Var(&c.Type, "type", "ObjekteType")
 
-			return commandWithLockedStore{commandWithId{c}}
+			return commandWithId{c}
 		},
 	)
 }
 
-func (c CatObjekte) RunWithId(store store_with_lock.Store, ids ...id_set.Set) (err error) {
+func (c CatObjekte) RunWithId(store *umwelt.Umwelt, ids ...id_set.Set) (err error) {
 	switch c.Type {
 
 	case zk_types.TypeAkte:
@@ -50,7 +50,7 @@ func (c CatObjekte) RunWithId(store store_with_lock.Store, ids ...id_set.Set) (e
 	}
 }
 
-func (c CatObjekte) akten(store store_with_lock.Store, ids ...id_set.Set) (err error) {
+func (c CatObjekte) akten(store *umwelt.Umwelt, ids ...id_set.Set) (err error) {
 	for _, is := range ids {
 		var sb sha.Sha
 
@@ -84,7 +84,7 @@ func (c CatObjekte) akten(store store_with_lock.Store, ids ...id_set.Set) (err e
 
 			defer errors.PanicIfError(r.Close)
 
-			if io.Copy(store.Out, r); err != nil {
+			if io.Copy(store.Out(), r); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -94,7 +94,7 @@ func (c CatObjekte) akten(store store_with_lock.Store, ids ...id_set.Set) (err e
 	return
 }
 
-func (c CatObjekte) zettelen(store store_with_lock.Store, ids ...id_set.Set) (err error) {
+func (c CatObjekte) zettelen(store *umwelt.Umwelt, ids ...id_set.Set) (err error) {
 	for _, is := range ids {
 		var i id.Id
 		ok := false
@@ -116,7 +116,7 @@ func (c CatObjekte) zettelen(store store_with_lock.Store, ids ...id_set.Set) (er
 
 		errors.PrintDebug(tz)
 
-		if _, err = f.WriteTo(tz.Named.Stored.Zettel, store.Out); err != nil {
+		if _, err = f.WriteTo(tz.Named.Stored.Zettel, store.Out()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

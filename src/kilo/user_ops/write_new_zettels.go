@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
 	"github.com/friedenberg/zit/src/india/store_working_directory"
-	"github.com/friedenberg/zit/src/juliett/store_with_lock"
 	"github.com/friedenberg/zit/src/juliett/umwelt"
 )
 
@@ -16,17 +15,23 @@ type WriteNewZettels struct {
 }
 
 func (c WriteNewZettels) RunMany(
-	store store_with_lock.Store,
 	z zettel.Zettel,
 	count int,
 ) (results zettel_checked_out.Set, err error) {
+	if err = c.Lock(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer c.Unlock()
+
 	results = zettel_checked_out.MakeSetUnique(count)
 
 	//TODO modify this to be run once
 	for i := 0; i < count; i++ {
 		var cz zettel_checked_out.Zettel
 
-		if cz, err = c.RunOne(store, z); err != nil {
+		if cz, err = c.runOneAlreadyLocked(z); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -38,17 +43,31 @@ func (c WriteNewZettels) RunMany(
 }
 
 func (c WriteNewZettels) RunOne(
-	store store_with_lock.Store,
 	z zettel.Zettel,
 ) (result zettel_checked_out.Zettel, err error) {
-	var tz zettel_transacted.Zettel
-
-	if tz, err = store.StoreObjekten().Create(z); err != nil {
+	if err = c.Lock(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if result, err = store.StoreWorkingDirectory().CheckoutOne(c.CheckoutOptions, tz); err != nil {
+	defer c.Unlock()
+
+	return c.runOneAlreadyLocked(z)
+}
+
+func (c WriteNewZettels) runOneAlreadyLocked(
+	z zettel.Zettel,
+) (result zettel_checked_out.Zettel, err error) {
+	var tz zettel_transacted.Zettel
+
+	if tz, err = c.StoreObjekten().Create(z); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+  //TODO separate creation and checkout into two ops to allow for optimistic
+  //unlocking
+	if result, err = c.StoreWorkingDirectory().CheckoutOne(c.CheckoutOptions, tz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
