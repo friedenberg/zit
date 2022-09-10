@@ -9,3 +9,7 @@ type Zettel struct {
 	Named                 zettel_named.Zettel
 	Kopf, Mutter, Schwanz ts.Time
 }
+
+func (zt Zettel) IsNew() bool {
+	return zt.Kopf == zt.Schwanz
+}

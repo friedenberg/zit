@@ -14,7 +14,9 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/hotel/organize_text"
+	"github.com/friedenberg/zit/src/juliett/store_with_lock"
 	"github.com/friedenberg/zit/src/kilo/user_ops"
+	"github.com/friedenberg/zit/src/zettel_printer"
 )
 
 type Organize struct {
@@ -136,8 +138,19 @@ func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			return
 		}
 
+		var store store_with_lock.Store
+
+		if store, err = store_with_lock.New(u); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		defer errors.PanicIfError(store.Flush)
+
+		zp := zettel_printer.Make(store.StoreObjekten(), os.Stdout)
+
 		commitOrganizeTextOp := user_ops.CommitOrganizeFile{
-			Umwelt: u,
+			Printer: zp,
 		}
 
 		if _, err = commitOrganizeTextOp.Run(createOrganizeFileResults.Text, ot2); err != nil {
@@ -175,8 +188,19 @@ func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			return
 		}
 
+		var store store_with_lock.Store
+
+		if store, err = store_with_lock.New(u); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		defer errors.PanicIfError(store.Flush)
+
+		zp := zettel_printer.Make(store.StoreObjekten(), os.Stdout)
+
 		commitOrganizeTextOp := user_ops.CommitOrganizeFile{
-			Umwelt: u,
+			Printer: zp,
 		}
 
 		if _, err = commitOrganizeTextOp.Run(createOrganizeFileResults.Text, ot2); err != nil {

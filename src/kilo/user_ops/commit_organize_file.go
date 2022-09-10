@@ -4,31 +4,23 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
-	"github.com/friedenberg/zit/src/delta/umwelt"
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/hotel/organize_text"
 	"github.com/friedenberg/zit/src/india/changes"
-	"github.com/friedenberg/zit/src/juliett/store_with_lock"
+	"github.com/friedenberg/zit/src/zettel_printer"
 )
 
 type CommitOrganizeFile struct {
-	Umwelt *umwelt.Umwelt
+	*zettel_printer.Printer
 }
 
 type CommitOrganizeFileResults struct {
 }
 
 func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganizeFileResults, err error) {
-	var store store_with_lock.Store
-
-	if store, err = store_with_lock.New(c.Umwelt); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.PanicIfError(store.Flush)
+	store := c.Store
 
 	var cs changes.Changes
 
@@ -59,7 +51,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 		if z, ok = toUpdate[h.String()]; !ok {
 			var tz zettel_transacted.Zettel
 
-			if tz, err = store.StoreObjekten().Read(h); err != nil {
+			if tz, err = store.Read(h); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -151,12 +143,17 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 
 		var tz zettel_transacted.Zettel
 
-		if tz, err = store.StoreObjekten().Create(z); err != nil {
+		if tz, err = store.Create(z); err != nil {
 			err = errors.Errorf("failed to create zettel: %s", err)
 			return
 		}
 
-		errors.PrintOutf("%s (created)", tz.Named)
+		c.ZettelTransacted(tz).Print()
+
+		if !c.IsEmpty() {
+			err = c.Error()
+			return
+		}
 	}
 
 	for _, z := range toUpdate {
@@ -165,7 +162,7 @@ func (c CommitOrganizeFile) Run(a, b organize_text.Text) (results CommitOrganize
 			continue
 		}
 
-		if _, err = store.StoreObjekten().Update(z.Hinweis, z.Stored.Zettel); err != nil {
+		if _, err = store.Update(z.Hinweis, z.Stored.Zettel); err != nil {
 			errors.PrintErrf("failed to update zettel: %s", err)
 		}
 	}
