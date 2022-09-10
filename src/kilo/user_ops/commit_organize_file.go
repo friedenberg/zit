@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/hotel/organize_text"
 	"github.com/friedenberg/zit/src/india/changes"
-	"github.com/friedenberg/zit/src/zettel_printer"
+	"github.com/friedenberg/zit/src/juliett/zettel_printer"
 )
 
 type CommitOrganizeFile struct {

@@ -12,7 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/india/store_working_directory"
 	"github.com/friedenberg/zit/src/juliett/store_with_lock"
 	"github.com/friedenberg/zit/src/kilo/user_ops"
-	"github.com/friedenberg/zit/src/zettel_printer"
+	"github.com/friedenberg/zit/src/juliett/zettel_printer"
 )
 
 type Status struct {
