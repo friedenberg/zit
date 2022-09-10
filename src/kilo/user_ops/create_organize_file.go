@@ -5,10 +5,10 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/etikett"
-	"github.com/friedenberg/zit/src/juliett/umwelt"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/hotel/organize_text"
 	"github.com/friedenberg/zit/src/juliett/store_with_lock"
+	"github.com/friedenberg/zit/src/juliett/umwelt"
 )
 
 type CreateOrganizeFile struct {

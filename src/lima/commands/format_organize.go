@@ -6,8 +6,8 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/juliett/umwelt"
 	"github.com/friedenberg/zit/src/hotel/organize_text"
+	"github.com/friedenberg/zit/src/juliett/umwelt"
 	"github.com/friedenberg/zit/src/kilo/user_ops"
 )
 
