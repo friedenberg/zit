@@ -15,7 +15,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/id"
 	"github.com/friedenberg/zit/src/charlie/konfig"
 	"github.com/friedenberg/zit/src/delta/id_set"
-	"github.com/friedenberg/zit/src/delta/umwelt"
+	"github.com/friedenberg/zit/src/juliett/umwelt"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/store_with_lock"
 )

@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/konfig"
-	"github.com/friedenberg/zit/src/delta/umwelt"
+	"github.com/friedenberg/zit/src/juliett/umwelt"
 )
 
 type Command interface {
