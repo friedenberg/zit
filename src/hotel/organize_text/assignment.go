@@ -2,6 +2,7 @@ package organize_text
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/etikett"
@@ -31,6 +32,58 @@ func (a assignment) Depth() int {
 	} else {
 		return a.parent.Depth() + 1
 	}
+}
+
+func (a assignment) MaxDepth() (d int) {
+	d = a.Depth()
+
+	for _, c := range a.children {
+		cd := c.MaxDepth()
+
+		if d < cd {
+			d = cd
+		}
+	}
+
+	return
+}
+
+func (a assignment) AlignmentSpacing() int {
+	if a.etiketten.Len() == 1 && a.etiketten.Any().IsDependentLeaf() {
+		return a.parent.AlignmentSpacing() + len(a.parent.etiketten.Any().String())
+	}
+
+	return 0
+}
+
+func (a assignment) MaxKopfUndSchwanz() (kopf, schwanz int) {
+	for z, _ := range a.named {
+		parts := strings.Split(z.Hinweis, "/")
+		zKopf := len(parts[0])
+		zSchwanz := len(parts[1])
+
+		if zKopf > kopf {
+			kopf = zKopf
+		}
+
+		if zSchwanz > schwanz {
+			schwanz = zSchwanz
+		}
+	}
+
+	for _, c := range a.children {
+		zKopf, zSchwanz := c.MaxKopfUndSchwanz()
+
+		if zKopf > kopf {
+			kopf = zKopf
+		}
+
+		if zSchwanz > schwanz {
+			schwanz = zSchwanz
+		}
+	}
+
+	return
 }
 
 func (a assignment) String() (s string) {

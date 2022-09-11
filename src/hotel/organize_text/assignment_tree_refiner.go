@@ -54,6 +54,10 @@ func (atc *AssignmentTreeRefiner) shouldMergeIntoParent(a *assignment) bool {
 }
 
 func (atc *AssignmentTreeRefiner) renameForPrefixJoint(a *assignment) (err error) {
+	if !atc.UsePrefixJoints {
+		return
+	}
+
 	if a == nil {
 		errors.Printf("assignment is nil")
 		return

@@ -3,13 +3,15 @@ package user_ops
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
+	"github.com/friedenberg/zit/src/juliett/umwelt"
 )
 
 type GetHinweisenFromArgs struct {
+	*umwelt.Umwelt
 }
 
 func (u GetHinweisenFromArgs) RunOne(v string) (h hinweis.Hinweis, err error) {
-	if h, err = hinweis.Make(v); err != nil {
+	if h, err = u.StoreObjekten().ExpandHinweisString(v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -16,17 +16,21 @@ type commandWithHinweisen struct {
 }
 
 func (c commandWithHinweisen) Run(
-	store *umwelt.Umwelt,
+	u *umwelt.Umwelt,
 	args ...string,
 ) (err error) {
+	op := user_ops.GetHinweisenFromArgs{
+		Umwelt: u,
+	}
+
 	var hins []hinweis.Hinweis
 
-	if hins, err = (user_ops.GetHinweisenFromArgs{}).RunMany(args...); err != nil {
+	if hins, err = op.RunMany(args...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	c.RunWithHinweisen(store, hins...)
+	c.RunWithHinweisen(u, hins...)
 
 	return
 }

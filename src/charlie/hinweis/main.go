@@ -51,7 +51,11 @@ func New(i kennung.Int, pl Provider, pr Provider) (h Hinweis, err error) {
 		return
 	}
 
-	hs := fmt.Sprintf("%s/%s", l, r)
+  return MakeKopfUndSchwanz(l, r)
+}
+
+func MakeKopfUndSchwanz(kopf, schwanz string) (h Hinweis, err error) {
+	hs := fmt.Sprintf("%s/%s", strings.TrimSpace(kopf), strings.TrimSpace(schwanz))
 
 	if err = h.Set(hs); err != nil {
 		err = errors.Errorf("failed to set hinweis: %s", err)

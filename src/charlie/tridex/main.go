@@ -165,7 +165,11 @@ func (n node) Expand(v string, sb *strings.Builder) (ok bool) {
 
 func (n node) Abbreviate(v string, loc int) string {
 	if n.IsRoot && len(n.Children) == 0 {
-		return ""
+		if n.Value != "" {
+      return n.Value[0:1]
+		} else {
+			return ""
+		}
 	}
 
 	if len(v)-1 < loc {

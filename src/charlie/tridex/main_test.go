@@ -20,6 +20,7 @@ func TestContains(t *testing.T) {
 	sut := Make(
 		"123456",
 		"654321",
+		"5",
 	)
 
 	expectedContains := []string{
@@ -35,6 +36,7 @@ func TestContains(t *testing.T) {
 		"654",
 		"65",
 		"6",
+		"5",
 	}
 
 	for _, e := range expectedContains {
@@ -56,7 +58,22 @@ func TestContains(t *testing.T) {
 	}
 }
 
-func TestShortestUnique(t *testing.T) {
+func TestAbbreviateOrphan(t *testing.T) {
+	sut := Make(
+		"one",
+	)
+
+	expectedContains := map[string]string{
+		"one": "o",
+	}
+
+	for e, c := range expectedContains {
+		if ca := sut.Abbreviate(e); ca != c {
+			test_logz.Errorf(t, "%q: expected shorted length %q but got %q", e, c, ca)
+		}
+	}
+}
+func TestAbbreviate(t *testing.T) {
 	sut := Make(
 		"12",
 		"121",
@@ -82,6 +99,23 @@ func TestShortestUnique(t *testing.T) {
 	}
 }
 
+func TestExpandOrphan(t *testing.T) {
+	sut := Make(
+		"654321",
+	)
+
+	expectedContains := map[string]string{
+		"6":      "654321",
+		"654321": "654321",
+	}
+
+	for a, e := range expectedContains {
+		if ca := sut.Expand(a); ca != e {
+			test_logz.Errorf(t, "%q: expected expanded %q but got %q", e, e, ca)
+		}
+	}
+}
+
 func TestExpand(t *testing.T) {
 	sut := Make(
 		"12",
@@ -93,10 +127,11 @@ func TestExpand(t *testing.T) {
 	)
 
 	expectedContains := map[string]string{
-		"6":    "654321",
-		"128":  "128",
-		"123":  "123456",
-		"1232": "",
+		"6":      "654321",
+		"654321": "654321",
+		"128":    "128",
+		"123":    "123456",
+		"1232":   "",
 	}
 
 	for a, e := range expectedContains {

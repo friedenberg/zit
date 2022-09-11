@@ -29,52 +29,34 @@ cat_yang() (
 	echo "tres"
 )
 
-function can_peek_hinweisen_after_init_fix { # @test
-	# setup
+function fix { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run zit init -verbose -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
 
-	expected="$(mktemp)"
+	to_add="$(mktemp)"
 	{
-		echo ---
-		echo "# bez"
-		echo - et1
-		echo - et2
-		echo ! md
-		echo ---
-		echo
-		echo the body
-	} >>"$expected"
+		echo "---"
+		echo "# wow"
+		echo "- ok"
+		echo "---"
+	} >>"$to_add"
 
-	run zit new -verbose -edit=false -predictable-hinweisen "$expected"
+	run zit new -verbose -edit=false -predictable-hinweisen "$to_add"
 	assert_output --partial '[one/uno '
 
-	run zit checkout one/uno
-	assert_output --partial '[one/uno '
-	assert_output --partial '(checked out)'
+	run zit expand-hinweis o/u
+	assert_output 'one/uno'
 
-	run cat one/uno.md
-	assert_output "$(cat "$expected")"
-
+	expected_organize="$(mktemp)"
 	{
-		echo ---
-		echo "# bez"
-		echo - et1
-		echo - et2
-		echo ! md
-		echo ---
 		echo
-		echo the body 2
-	} >"$expected"
+		echo "      # ok"
+		echo
+		echo "- [o/u] wow"
+	} >>"$expected_organize"
 
-	cat "$expected" >"one/uno.md"
-
-	run zit checkout -verbose one/uno
-	assert_output --partial '[one/uno '
-	assert_output --partial '(external has changes)'
-
-	run cat one/uno.md
-	assert_output "$(cat "$expected")"
+	run zit organize -mode output-only ok
+	assert_output "$(cat "$expected_organize")"
 }

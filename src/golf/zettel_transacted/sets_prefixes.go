@@ -61,11 +61,12 @@ func (a SetPrefixTransacted) Each(f func(etikett.Etikett, Set) error) (err error
 	return
 }
 
-func (a SetPrefixTransacted) EachZettel(f func(etikett.Etikett, Zettel) error) (err error) {
+func (a SetPrefixTransacted) EachZettel(f func(etikett.Etikett, Zettel) error) error {
 	return a.Each(
 		func(e etikett.Etikett, st Set) (err error) {
 			for _, sz := range st.innerMap {
 				if err = f(e, sz); err != nil {
+					err = errors.Wrap(err)
 					return
 				}
 			}

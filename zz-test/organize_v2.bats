@@ -43,8 +43,11 @@ function outputs_organize_one_etikett { # @test
 		echo "---"
 	} >>"$to_add"
 
-	run zit new -edit=false -predictable-hinweisen "$to_add"
+	run zit new -verbose -edit=false -predictable-hinweisen "$to_add"
 	assert_output --partial '[one/uno '
+
+	run zit expand-hinweis o/u
+	assert_output 'one/uno'
 
 	expected_organize="$(mktemp)"
 	{

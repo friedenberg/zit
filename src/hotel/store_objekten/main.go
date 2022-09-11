@@ -446,7 +446,7 @@ func (s Store) Flush() (err error) {
 	}
 
 	if err = s.indexAbbr.Flush(); err != nil {
-		err = errors.Wrapf(err, "failed to flush new kennung index")
+		err = errors.Wrapf(err, "failed to flush abbr index")
 		return
 	}
 

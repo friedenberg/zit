@@ -19,10 +19,16 @@ type CreateOrganizeFileResults struct {
 	Text organize_text.Text
 }
 
-func (c CreateOrganizeFile) RunAndWrite(zettels zettel_transacted.Set, w io.WriteCloser) (results CreateOrganizeFileResults, err error) {
-	results, err = c.Run(zettels)
-
+func (c CreateOrganizeFile) RunAndWrite(
+	zettels zettel_transacted.Set,
+	w io.WriteCloser,
+) (results CreateOrganizeFileResults, err error) {
 	defer errors.PanicIfError(w.Close)
+
+	if results, err = c.Run(zettels); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if _, err = results.Text.WriteTo(w); err != nil {
 		err = errors.Wrap(err)

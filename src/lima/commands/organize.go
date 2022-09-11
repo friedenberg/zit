@@ -89,6 +89,8 @@ func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		Options: c.Options,
 	}
 
+	createOrganizeFileOp.Options.AssignmentTreeConstructor.HinweisAbbr = u.StoreObjekten()
+
 	if createOrganizeFileOp.RootEtiketten, err = c.getEtikettenFromArgs(args); err != nil {
 		err = errors.Wrap(err)
 		return

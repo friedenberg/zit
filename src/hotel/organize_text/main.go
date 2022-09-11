@@ -25,7 +25,15 @@ func New(options Options) (ot *organizeText, err error) {
 
 	ot.assignment.isRoot = true
 
-	for _, a := range options.AssignmentTreeConstructor.Assignments() {
+	var as []*assignment
+	as, err = options.AssignmentTreeConstructor.Assignments()
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	for _, a := range as {
 		ot.assignment.addChild(a)
 	}
 
@@ -67,7 +75,15 @@ func (t *organizeText) ReadFrom(r io.Reader) (n int64, err error) {
 func (ot organizeText) WriteTo(out io.Writer) (n int64, err error) {
 	lw := line_format.NewWriter()
 
-	aw := assignmentLineWriter{Writer: lw}
+	kopf, scwhanz := ot.assignment.MaxKopfUndSchwanz()
+
+	aw := assignmentLineWriter{
+		Writer:              lw,
+		maxDepth:            ot.assignment.MaxDepth(),
+		maxKopf:             kopf,
+		maxScwhanz:          scwhanz,
+		experimentalIndents: true,
+	}
 
 	if err = aw.write(ot.assignment); err != nil {
 		err = errors.Wrap(err)

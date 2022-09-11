@@ -21,15 +21,20 @@ func init() {
 	)
 }
 
-func (c Reindex) Run(store *umwelt.Umwelt, args ...string) (err error) {
+func (c Reindex) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	if len(args) > 0 {
 		err = errors.Errorf("reindex does not support arguments")
 		return
 	}
 
-	errors.Print()
+	if err = u.Lock(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-	if err = store.StoreObjekten().Reindex(); err != nil {
+	defer u.Unlock()
+
+	if err = u.StoreObjekten().Reindex(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

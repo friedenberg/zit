@@ -3,7 +3,6 @@ package store_objekten
 import (
 	"bufio"
 	"encoding/gob"
-	"fmt"
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -137,12 +136,12 @@ func (i *indexAbbr) addZettelTransacted(zt zettel_transacted.Zettel) (err error)
 		err = ctx.Error()
 	}()
 
-	i.hasChanges = true
-
 	if ctx.Err = i.readIfNecessary(); !ctx.IsEmpty() {
 		ctx.Wrap()
 		return
 	}
+
+	i.hasChanges = true
 
 	i.indexAbbrEncodableTridexes.Shas.Add(zt.Named.Stored.Sha.String())
 	i.indexAbbrEncodableTridexes.Shas.Add(zt.Named.Stored.Zettel.Akte.String())
@@ -191,7 +190,8 @@ func (i *indexAbbr) ExpandShaString(st string) (s sha.Sha, err error) {
 	return
 }
 
-func (i *indexAbbr) AbbreviateHinweis(h hinweis.Hinweis) (abbr string, err error) {
+func (i *indexAbbr) AbbreviateHinweis(h hinweis.Hinweis) (ha hinweis.Hinweis, err error) {
+	errors.Print(h)
 	ctx := errors.Ctx{}
 
 	defer func() {
@@ -207,14 +207,41 @@ func (i *indexAbbr) AbbreviateHinweis(h hinweis.Hinweis) (abbr string, err error
 
 	kopf = i.indexAbbrEncodableTridexes.HinweisKopfen.Abbreviate(h.Kopf())
 	schwanz = i.indexAbbrEncodableTridexes.HinweisSchwanzen.Abbreviate(h.Schwanz())
-	// kopf = h.Kopf()
-	// schwanz = h.Schwanz()
-	abbr = fmt.Sprintf("%s/%s", kopf, schwanz)
+
+	if kopf == "" || schwanz == "" {
+		ctx.Err = errors.Errorf("abbreviated kopf would be empty for %s", h)
+    errors.PrintDebug(i.indexAbbrEncodableTridexes.HinweisKopfen)
+		return
+	}
+
+	if schwanz == "" {
+		ctx.Err = errors.Errorf("abbreviated schwanz would be empty for %s", h)
+		return
+	}
+
+	if ha, ctx.Err = hinweis.MakeKopfUndSchwanz(kopf, schwanz); !ctx.IsEmpty() {
+		ctx.Wrap()
+		return
+	}
 
 	return
 }
 
-func (i *indexAbbr) ExpandHinweisString(st string) (h hinweis.Hinweis, err error) {
+func (i *indexAbbr) ExpandHinweisString(s string) (h hinweis.Hinweis, err error) {
+	errors.Print(s)
+
+	var ha hinweis.Hinweis
+
+	if ha, err = hinweis.Make(s); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return i.ExpandHinweis(ha)
+}
+
+func (i *indexAbbr) ExpandHinweis(hAbbr hinweis.Hinweis) (h hinweis.Hinweis, err error) {
+	errors.Print(hAbbr)
 	ctx := errors.Ctx{}
 
 	defer func() {
@@ -226,12 +253,15 @@ func (i *indexAbbr) ExpandHinweisString(st string) (h hinweis.Hinweis, err error
 		return
 	}
 
-	// expanded := i.indexAbbrEncodableTridexes.Hinweis.Expand(st)
+	kopf := i.indexAbbrEncodableTridexes.HinweisKopfen.Expand(hAbbr.Kopf())
+	schwanz := i.indexAbbrEncodableTridexes.HinweisSchwanzen.Expand(hAbbr.Schwanz())
 
-	// if ctx.Err = s.Set(expanded); !ctx.IsEmpty() {
-	// 	ctx.Wrap()
-	// 	return
-	// }
+	if h, ctx.Err = hinweis.MakeKopfUndSchwanz(kopf, schwanz); !ctx.IsEmpty() {
+		ctx.Wrap()
+		return
+	}
+
+	errors.Print(h)
 
 	return
 }

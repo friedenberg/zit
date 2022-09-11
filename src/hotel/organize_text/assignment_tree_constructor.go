@@ -3,19 +3,26 @@ package organize_text
 import (
 	"sort"
 
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/etikett"
+	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 )
+
+type HinweisAbbr interface {
+	AbbreviateHinweis(h hinweis.Hinweis) (ha hinweis.Hinweis, err error)
+}
 
 type AssignmentTreeConstructor struct {
 	RootEtiketten     etikett.Set
 	GroupingEtiketten etikett.Slice
 	ExtraEtiketten    etikett.Set
 	Transacted        zettel_transacted.Set
+	HinweisAbbr       HinweisAbbr
 	UsePrefixJoints   bool
 }
 
-func (atc *AssignmentTreeConstructor) Assignments() (roots []*assignment) {
+func (atc *AssignmentTreeConstructor) Assignments() (roots []*assignment, err error) {
 	roots = make([]*assignment, 0, 1+len(atc.ExtraEtiketten))
 
 	root := newAssignment()
@@ -23,7 +30,11 @@ func (atc *AssignmentTreeConstructor) Assignments() (roots []*assignment) {
 	roots = append(roots, root)
 
 	prefixSet := atc.Transacted.ToSetPrefixTransacted()
-	atc.makeChildren(root, prefixSet, atc.GroupingEtiketten)
+
+	if err = atc.makeChildren(root, prefixSet, atc.GroupingEtiketten); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	for _, e := range atc.ExtraEtiketten {
 		child := newAssignment()
@@ -38,27 +49,51 @@ func (atc AssignmentTreeConstructor) makeChildren(
 	parent *assignment,
 	prefixSet zettel_transacted.SetPrefixTransacted,
 	groupingEtiketten etikett.Slice,
-) {
+) (err error) {
 	if groupingEtiketten.Len() == 0 {
-		prefixSet.EachZettel(
+		err = prefixSet.EachZettel(
 			func(e etikett.Etikett, tz zettel_transacted.Zettel) (err error) {
-				parent.named.Add(makeZettel(tz.Named))
+				var z zettel
+
+				if z, err = makeZettel(tz.Named, atc.HinweisAbbr); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				parent.named.Add(z)
 
 				return
 			},
 		)
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
 		return
 	}
 
 	segments := prefixSet.Subset(groupingEtiketten[0])
 
-	segments.Ungrouped.Each(
+	err = segments.Ungrouped.Each(
 		func(tz zettel_transacted.Zettel) (err error) {
-			parent.named.Add(makeZettel(tz.Named))
+			var z zettel
+
+			if z, err = makeZettel(tz.Named, atc.HinweisAbbr); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			parent.named.Add(z)
 			return
 		},
 	)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	segments.Grouped.Each(
 		func(e etikett.Etikett, zs zettel_transacted.Set) (err error) {
@@ -90,7 +125,12 @@ func (atc AssignmentTreeConstructor) makeChildren(
 						nextGroupingEtiketten = groupingEtiketten[1:]
 					}
 
-					atc.makeChildren(child, zs.ToSetPrefixTransacted(), nextGroupingEtiketten)
+					err = atc.makeChildren(child, zs.ToSetPrefixTransacted(), nextGroupingEtiketten)
+
+					if err != nil {
+						err = errors.Wrap(err)
+						return
+					}
 
 					intermediate.addChild(child)
 				}
@@ -104,7 +144,12 @@ func (atc AssignmentTreeConstructor) makeChildren(
 					nextGroupingEtiketten = groupingEtiketten[1:]
 				}
 
-				atc.makeChildren(child, zs.ToSetPrefixTransacted(), nextGroupingEtiketten)
+				err = atc.makeChildren(child, zs.ToSetPrefixTransacted(), nextGroupingEtiketten)
+
+				if err != nil {
+					err = errors.Wrap(err)
+					return
+				}
 
 				parent.addChild(child)
 			}
