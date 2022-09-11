@@ -38,15 +38,11 @@ func (c ZettelFromExternalAkte) Run(
 		var z zettel.Zettel
 		var tz zettel_transacted.Zettel
 
-		errors.PrintErr("creating zettel for akte")
 		if z = c.zettelForAkte(ctx, arg); !ctx.IsEmpty() {
-			errors.PrintErr("ctx error", ctx.IsEmpty())
-			errors.PrintErr(ctx.Err)
 			ctx.Wrap()
 			return
 		}
 
-		errors.PrintErr("creating zettel")
 		if tz, ctx.Err = c.StoreObjekten().Create(z); !ctx.IsEmpty() {
 			ctx.Wrap()
 			return
@@ -75,11 +71,9 @@ func (c ZettelFromExternalAkte) Run(
 			}
 		}
 
-		errors.PrintErr("adding result")
 		results.Add(tz)
 
 		if c.Delete {
-			errors.PrintErr("deleting old akte file")
 			if ctx.Err = os.Remove(arg); !ctx.IsEmpty() {
 				ctx.Wrap()
 				return

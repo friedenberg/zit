@@ -46,7 +46,11 @@ func (c Edit) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	var hins []hinweis.Hinweis
 
-	if hins, err = (user_ops.GetHinweisenFromArgs{}).RunMany(args...); err != nil {
+	op := user_ops.GetHinweisenFromArgs{
+		Umwelt: u,
+	}
+
+	if hins, err = op.RunMany(args...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

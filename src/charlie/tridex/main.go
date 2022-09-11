@@ -12,10 +12,11 @@ type Tridex struct {
 }
 
 type node struct {
-	Count    int
-	Children map[byte]node
-	Value    string
-	IsRoot   bool
+	Count            int
+	Children         map[byte]node
+	Value            string
+	IsRoot           bool
+	IncludesTerminus bool
 }
 
 func Make(vs ...string) (t *Tridex) {
@@ -62,6 +63,7 @@ func (t *Tridex) Add(v string) {
 
 func (n *node) Add(v string) {
 	if len(v) == 0 {
+		n.IncludesTerminus = true
 		return
 	}
 
@@ -74,6 +76,7 @@ func (n *node) Add(v string) {
 		return
 	} else if n.Value != "" && n.Value != v {
 		n.Add(n.Value)
+		n.Value = ""
 	}
 
 	c := v[0]
@@ -93,11 +96,15 @@ func (n *node) Add(v string) {
 
 func (n node) Contains(v string) (ok bool) {
 	if len(v) == 0 {
-		return true
+		if !n.IncludesTerminus {
+			return false
+		}
+
+		return len(n.Children) == 0
 	}
 
 	if n.Count == 1 && n.Value != "" {
-		ok = strings.HasPrefix(n.Value, v)
+		ok = n.Value == v
 		return
 	}
 
@@ -133,7 +140,10 @@ func (n node) Expand(v string, sb *strings.Builder) (ok bool) {
 			return true
 
 		case 1:
-			sb.WriteString(n.Value)
+			if !n.IncludesTerminus {
+				sb.WriteString(n.Value)
+			}
+
 			return true
 		}
 	} else {
@@ -166,7 +176,7 @@ func (n node) Expand(v string, sb *strings.Builder) (ok bool) {
 func (n node) Abbreviate(v string, loc int) string {
 	if n.IsRoot && len(n.Children) == 0 {
 		if n.Value != "" {
-      return n.Value[0:1]
+			return n.Value[0:1]
 		} else {
 			return ""
 		}
@@ -176,7 +186,7 @@ func (n node) Abbreviate(v string, loc int) string {
 		return v
 	}
 
-	if n.Count == 1 && n.Contains(v[loc:]) {
+	if n.Count == 1 && n.Contains(v[loc:]) && !n.IncludesTerminus {
 		return v[0:loc]
 	}
 

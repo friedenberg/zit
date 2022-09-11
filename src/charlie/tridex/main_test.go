@@ -24,20 +24,10 @@ func TestContains(t *testing.T) {
 	)
 
 	expectedContains := []string{
-		"1",
-		"12",
-		"123",
-		"1234",
-		"12345",
 		"123456",
 		"654321",
-		"65432",
-		"6543",
-		"654",
-		"65",
-		"6",
 		"5",
-	}
+  }
 
 	for _, e := range expectedContains {
 		if !sut.Contains(e) {
@@ -46,9 +36,19 @@ func TestContains(t *testing.T) {
 	}
 
 	expectedNotContains := []string{
-		"3",
-		"12X45",
+		"1",
+		"12",
+		"123",
+		"1234",
+		"12345",
 		"1234567",
+		"12X45",
+		"3",
+		"6",
+		"65",
+		"654",
+		"6543",
+		"65432",
 	}
 
 	for _, e := range expectedNotContains {
@@ -73,6 +73,45 @@ func TestAbbreviateOrphan(t *testing.T) {
 		}
 	}
 }
+
+func TestAbbreviateDegenerate(t *testing.T) {
+	sut := Make(
+		"mewtwo",
+		"mew",
+	)
+
+	expectedContains := map[string]string{
+		"mewtwo": "mewt",
+		"mew":    "mew",
+	}
+
+	for e, c := range expectedContains {
+		if ca := sut.Abbreviate(e); ca != c {
+			test_logz.Printf("%#v", sut)
+			test_logz.Errorf(t, "%q: expected shorted length %q but got %q", e, c, ca)
+		}
+	}
+}
+
+func TestExpandDegenerate(t *testing.T) {
+	sut := Make(
+		"mewtwo",
+		"mew",
+	)
+
+	expectedContains := map[string]string{
+		"mewt": "mewtwo",
+		"mew":    "mew",
+	}
+
+	for e, c := range expectedContains {
+		if ca := sut.Expand(e); ca != c {
+			test_logz.Printf("%#v", sut)
+			test_logz.Errorf(t, "%q: expected expanded %q but got %q", e, c, ca)
+		}
+	}
+}
+
 func TestAbbreviate(t *testing.T) {
 	sut := Make(
 		"12",
@@ -81,9 +120,15 @@ func TestAbbreviate(t *testing.T) {
 		"128",
 		"123456",
 		"654321",
+		"mewtwo",
+		"mew",
 	)
 
 	expectedContains := map[string]string{
+		"mewtwo":   "mewt",
+		"mew":      "mew",
+		"121":      "121",
+		"12":       "12",
 		"123":      "123",
 		"123456":   "123",
 		"1234567":  "1234",
@@ -94,6 +139,7 @@ func TestAbbreviate(t *testing.T) {
 
 	for e, c := range expectedContains {
 		if ca := sut.Abbreviate(e); ca != c {
+			test_logz.Print(t, "%#v", sut)
 			test_logz.Errorf(t, "%q: expected shorted length %q but got %q", e, c, ca)
 		}
 	}
