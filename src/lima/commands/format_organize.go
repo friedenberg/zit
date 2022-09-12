@@ -12,13 +12,18 @@ import (
 )
 
 type FormatOrganize struct {
+	organize_text.Options
 }
 
 func init() {
 	registerCommand(
 		"format-organize",
 		func(f *flag.FlagSet) Command {
-			c := &FormatOrganize{}
+			c := &FormatOrganize{
+				Options: organize_text.MakeOptions(),
+			}
+
+			c.Options.AddToFlagSet(f)
 
 			return c
 		},
@@ -40,9 +45,10 @@ func (c *FormatOrganize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	defer files.Close(f)
 
-	var ot organize_text.Text
+	var ot *organize_text.Text
 
 	readOrganizeTextOp := user_ops.ReadOrganizeFile{
+		Umwelt: u,
 		Reader: f,
 	}
 
@@ -51,12 +57,9 @@ func (c *FormatOrganize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	refiner := organize_text.AssignmentTreeRefiner{
-		Enabled:         true,
-		UsePrefixJoints: true,
-	}
+	ot.Options = c.Options
 
-	if err = ot.Refine(refiner); err != nil {
+	if err = ot.Refine(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

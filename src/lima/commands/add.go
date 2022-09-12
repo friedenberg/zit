@@ -75,15 +75,14 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
 		Umwelt: u,
 		Options: organize_text.Options{
-			AssignmentTreeConstructor: organize_text.AssignmentTreeConstructor{
-				GroupingEtiketten: etikett.NewSlice(),
-				RootEtiketten:     c.Etiketten,
-				Transacted:        zettelsFromAkteResults,
-			},
+			Abbr:              u.StoreObjekten(),
+			GroupingEtiketten: etikett.NewSlice(),
+			RootEtiketten:     c.Etiketten,
+			Transacted:        zettelsFromAkteResults,
 		},
 	}
 
-	var createOrganizeFileResults user_ops.CreateOrganizeFileResults
+	var createOrganizeFileResults *organize_text.Text
 
 	var f *os.File
 
@@ -92,7 +91,9 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	if createOrganizeFileResults, ctx.Err = createOrganizeFileOp.RunAndWrite(zettelsFromAkteResults, f); !ctx.IsEmpty() {
+	createOrganizeFileResults, ctx.Err = createOrganizeFileOp.RunAndWrite(zettelsFromAkteResults, f)
+
+	if !ctx.IsEmpty() {
 		ctx.Wrap()
 		return
 	}
@@ -108,7 +109,7 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	var ot2 organize_text.Text
+	var ot2 *organize_text.Text
 
 	readOrganizeTextOp := user_ops.ReadOrganizeFile{}
 
@@ -124,7 +125,7 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		Printer: zp,
 	}
 
-	if _, ctx.Err = commitOrganizeTextOp.Run(createOrganizeFileResults.Text, ot2); !ctx.IsEmpty() {
+	if _, ctx.Err = commitOrganizeTextOp.Run(createOrganizeFileResults, ot2); !ctx.IsEmpty() {
 		ctx.Wrap()
 		return
 	}

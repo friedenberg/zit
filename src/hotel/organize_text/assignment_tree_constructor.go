@@ -5,21 +5,11 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/etikett"
-	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 )
 
-type HinweisAbbr interface {
-	AbbreviateHinweis(h hinweis.Hinweis) (ha hinweis.Hinweis, err error)
-}
-
 type AssignmentTreeConstructor struct {
-	RootEtiketten     etikett.Set
-	GroupingEtiketten etikett.Slice
-	ExtraEtiketten    etikett.Set
-	Transacted        zettel_transacted.Set
-	HinweisAbbr       HinweisAbbr
-	UsePrefixJoints   bool
+	Options
 }
 
 func (atc *AssignmentTreeConstructor) Assignments() (roots []*assignment, err error) {
@@ -55,7 +45,7 @@ func (atc AssignmentTreeConstructor) makeChildren(
 			func(e etikett.Etikett, tz zettel_transacted.Zettel) (err error) {
 				var z zettel
 
-				if z, err = makeZettel(tz.Named, atc.HinweisAbbr); err != nil {
+				if z, err = makeZettel(tz.Named, atc.Abbr); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -80,7 +70,7 @@ func (atc AssignmentTreeConstructor) makeChildren(
 		func(tz zettel_transacted.Zettel) (err error) {
 			var z zettel
 
-			if z, err = makeZettel(tz.Named, atc.HinweisAbbr); err != nil {
+			if z, err = makeZettel(tz.Named, atc.Abbr); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

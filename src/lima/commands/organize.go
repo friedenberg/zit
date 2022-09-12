@@ -66,17 +66,11 @@ func init() {
 		"organize",
 		func(f *flag.FlagSet) Command {
 			c := &Organize{
-				Options: organize_text.Options{
-					AssignmentTreeConstructor: organize_text.AssignmentTreeConstructor{
-						GroupingEtiketten: etikett.NewSlice(),
-						ExtraEtiketten:    etikett.MakeSet(),
-					},
-				},
+				Options: organize_text.MakeOptions(),
 			}
 
-			f.Var(&c.GroupingEtiketten, "group-by", "etikett prefixes to group zettels")
-			f.Var(&c.ExtraEtiketten, "extras", "etiketten to always add to the organize text")
 			f.Var(&c.Mode, "mode", "mode used for handling stdin and stdout")
+			c.Options.AddToFlagSet(f)
 
 			return c
 		},
@@ -84,12 +78,12 @@ func init() {
 }
 
 func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
+	c.Options.Abbr = u.StoreObjekten()
+
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
 		Umwelt:  u,
 		Options: c.Options,
 	}
-
-	createOrganizeFileOp.Options.AssignmentTreeConstructor.HinweisAbbr = u.StoreObjekten()
 
 	if createOrganizeFileOp.RootEtiketten, err = c.getEtikettenFromArgs(args); err != nil {
 		err = errors.Wrap(err)
@@ -114,7 +108,7 @@ func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		errors.Print("neither stdin or stdout is a tty")
 		errors.Print("generate organize, read from stdin, commit")
 
-		createOrganizeFileResults := user_ops.CreateOrganizeFileResults{}
+		var createOrganizeFileResults *organize_text.Text
 
 		var f *os.File
 
@@ -128,9 +122,10 @@ func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			return
 		}
 
-		var ot2 organize_text.Text
+		var ot2 *organize_text.Text
 
 		readOrganizeTextOp := user_ops.ReadOrganizeFile{
+			Umwelt: u,
 			Reader: os.Stdin,
 		}
 
@@ -153,7 +148,7 @@ func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			Printer: zp,
 		}
 
-		if _, err = commitOrganizeTextOp.Run(createOrganizeFileResults.Text, ot2); err != nil {
+		if _, err = commitOrganizeTextOp.Run(createOrganizeFileResults, ot2); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -167,7 +162,7 @@ func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	case organizeModeInteractive:
 		errors.Print("generate temp file, write organize, open vim to edit, commit results")
-		createOrganizeFileResults := user_ops.CreateOrganizeFileResults{}
+		var createOrganizeFileResults *organize_text.Text
 
 		var f *os.File
 
@@ -181,9 +176,9 @@ func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			return
 		}
 
-		var ot2 organize_text.Text
+		var ot2 *organize_text.Text
 
-		if ot2, err = c.readFromVim(f.Name(), createOrganizeFileResults); err != nil {
+		if ot2, err = c.readFromVim(u, f.Name(), createOrganizeFileResults); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -201,7 +196,7 @@ func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			Printer: zp,
 		}
 
-		if _, err = commitOrganizeTextOp.Run(createOrganizeFileResults.Text, ot2); err != nil {
+		if _, err = commitOrganizeTextOp.Run(createOrganizeFileResults, ot2); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -214,7 +209,11 @@ func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	return
 }
 
-func (c Organize) readFromVim(f string, results user_ops.CreateOrganizeFileResults) (ot organize_text.Text, err error) {
+func (c Organize) readFromVim(
+	u *umwelt.Umwelt,
+	f string,
+	results *organize_text.Text,
+) (ot *organize_text.Text, err error) {
 	openVimOp := user_ops.OpenVim{
 		Options: vim_cli_options_builder.New().
 			WithFileType("zit-organize").
@@ -226,12 +225,14 @@ func (c Organize) readFromVim(f string, results user_ops.CreateOrganizeFileResul
 		return
 	}
 
-	readOrganizeTextOp := user_ops.ReadOrganizeFile{}
+	readOrganizeTextOp := user_ops.ReadOrganizeFile{
+		Umwelt: u,
+	}
 
 	if ot, err = readOrganizeTextOp.RunWithFile(f); err != nil {
 		if c.handleReadChangesError(err) {
 			err = nil
-			ot, err = c.readFromVim(f, results)
+			ot, err = c.readFromVim(u, f, results)
 		} else {
 			errors.PrintErrf("aborting organize")
 			return

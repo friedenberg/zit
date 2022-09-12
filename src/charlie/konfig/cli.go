@@ -9,14 +9,15 @@ import (
 )
 
 type Cli struct {
-	BasePath             string
-	Debug                bool
-	Verbose              bool
-	DryRun               bool
-	AllowMissingHinweis  bool
-	CheckoutCacheEnabled bool
-	IncludeHidden        bool
-	PredictableHinweisen bool
+	BasePath                         string
+	Debug                            bool
+	Verbose                          bool
+	DryRun                           bool
+	AllowMissingHinweis              bool
+	CheckoutCacheEnabled             bool
+	IncludeHidden                    bool
+	PredictableHinweisen             bool
+	UseRightAlignedIndentsInOrganize bool
 }
 
 func (c *Cli) AddToFlags(f *flag.FlagSet) {

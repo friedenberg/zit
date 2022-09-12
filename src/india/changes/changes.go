@@ -16,7 +16,7 @@ type Changes struct {
 	New     map[string]etikett.Set
 }
 
-func ChangesFrom(a1, b1 organize_text.Text) (c Changes, err error) {
+func ChangesFrom(a1, b1 *organize_text.Text) (c Changes, err error) {
 	var a, b organize_text.CompareMap
 
 	if a, err = a1.ToCompareMap(); err != nil {

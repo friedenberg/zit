@@ -27,7 +27,7 @@ type CompareMap struct {
 	Unnamed SetEtikettenKeys
 }
 
-func (in *organizeText) ToCompareMap() (out CompareMap, err error) {
+func (in *Text) ToCompareMap() (out CompareMap, err error) {
 	out = CompareMap{
 		Named:   make(SetEtikettenKeys),
 		Unnamed: make(SetEtikettenKeys),

@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 )
 
@@ -13,7 +14,7 @@ type zettel struct {
 	Bezeichnung string
 }
 
-func makeZettel(named zettel_named.Zettel, ha HinweisAbbr) (z zettel, err error) {
+func makeZettel(named zettel_named.Zettel, ha hinweis.Abbr) (z zettel, err error) {
 	h := named.Hinweis
 
 	if ha != nil {

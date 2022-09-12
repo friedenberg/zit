@@ -29,7 +29,33 @@ cat_yang() (
 	echo "tres"
 )
 
-function group_by_merges_child_into_matching_parent { # @test
+function format_organize_right_align { # @test
+	to_add="$(mktemp)"
+	{
+		echo "# task"
+		echo "## urgency"
+		echo "### urgency-1"
+		echo "### -2"
+	} >"$to_add"
+
+	expected="$(mktemp)"
+	{
+		echo
+		echo "    # task"
+		echo
+		echo "   ## urgency"
+		echo
+		echo "  ###        -1"
+		echo
+		echo "  ###        -2"
+		echo
+	} >"$expected"
+
+	run zit format-organize "$to_add"
+	assert_output "$(cat "$expected")"
+}
+
+function format_organize_left_align { # @test
 	to_add="$(mktemp)"
 	{
 		echo "# task"
@@ -51,6 +77,6 @@ function group_by_merges_child_into_matching_parent { # @test
 		echo
 	} >"$expected"
 
-	run zit format-organize "$to_add"
+	run zit format-organize -right-align=false "$to_add"
 	assert_output "$(cat "$expected")"
 }

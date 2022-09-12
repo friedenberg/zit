@@ -10,19 +10,12 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 )
 
-type Writer interface {
-	WriteZettel(zettel_named.Zettel) (n int, err error)
-	WriteEtikett(e etikett.Etikett) (n int, err error)
-	WriteHinweis(e hinweis.Hinweis) (n int, err error)
-	WriteError(in error) (n int, out error)
-	Close() error
-}
-
-type writer struct {
+type Writer struct {
 	alfredWriter alfred.Writer
+	hinweis.Abbr
 }
 
-func NewWriter(out io.Writer) (w *writer, err error) {
+func New(out io.Writer, ha hinweis.Abbr) (w *Writer, err error) {
 	var aw alfred.Writer
 
 	if aw, err = alfred.NewWriter(out); err != nil {
@@ -30,29 +23,30 @@ func NewWriter(out io.Writer) (w *writer, err error) {
 		return
 	}
 
-	w = &writer{
+	w = &Writer{
+		Abbr:         ha,
 		alfredWriter: aw,
 	}
 
 	return
 }
 
-func (w *writer) WriteZettel(z zettel_named.Zettel) (n int, err error) {
-	item := ZettelToItem(z)
+func (w *Writer) WriteZettel(z zettel_named.Zettel) (n int, err error) {
+	item := ZettelToItem(z, w.Abbr)
 	return w.alfredWriter.WriteItem(item)
 }
 
-func (w *writer) WriteEtikett(e etikett.Etikett) (n int, err error) {
+func (w *Writer) WriteEtikett(e etikett.Etikett) (n int, err error) {
 	item := EtikettToItem(e)
 	return w.alfredWriter.WriteItem(item)
 }
 
-func (w *writer) WriteHinweis(e hinweis.Hinweis) (n int, err error) {
+func (w *Writer) WriteHinweis(e hinweis.Hinweis) (n int, err error) {
 	item := HinweisToItem(e)
 	return w.alfredWriter.WriteItem(item)
 }
 
-func (w *writer) WriteError(in error) (n int, out error) {
+func (w *Writer) WriteError(in error) (n int, out error) {
 	if in == nil {
 		return 0, nil
 	}
@@ -61,6 +55,6 @@ func (w *writer) WriteError(in error) (n int, out error) {
 	return w.alfredWriter.WriteItem(item)
 }
 
-func (w writer) Close() (err error) {
+func (w Writer) Close() (err error) {
 	return w.alfredWriter.Close()
 }

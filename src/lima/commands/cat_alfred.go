@@ -44,9 +44,9 @@ func (c CatAlfred) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	wo := bufio.NewWriter(u.Out())
 	defer wo.Flush()
 
-	var aw alfred.Writer
+	var aw *alfred.Writer
 
-	if aw, err = alfred.NewWriter(wo); err != nil {
+	if aw, err = alfred.New(wo, u.StoreObjekten()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

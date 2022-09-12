@@ -24,17 +24,11 @@ func init() {
 		"organize-duplicates",
 		func(f *flag.FlagSet) Command {
 			c := &OrganizeDuplicates{
-				Options: organize_text.Options{
-					AssignmentTreeConstructor: organize_text.AssignmentTreeConstructor{
-						GroupingEtiketten: etikett.NewSlice(),
-						ExtraEtiketten:    etikett.MakeSet(),
-					},
-				},
+				Options: organize_text.MakeOptions(),
 			}
 
-			f.Var(&c.GroupingEtiketten, "group-by", "etikett prefixes to group zettels")
-			f.Var(&c.ExtraEtiketten, "extras", "etiketten to always add to the organize text")
 			f.Var(&c.Mode, "mode", "mode used for handling stdin and stdout")
+			c.Options.AddToFlagSet(f)
 
 			return c
 		},
@@ -42,6 +36,7 @@ func init() {
 }
 
 func (c *OrganizeDuplicates) Run(u *umwelt.Umwelt, args ...string) (err error) {
+	c.Options.Abbr = u.StoreObjekten()
 	// createOrganizeFileOp := user_ops.CreateOrganizeFile{
 	// 	Umwelt:  u,
 	// 	Options: c.Options,
@@ -171,7 +166,10 @@ func (c *OrganizeDuplicates) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	return
 }
 
-func (c OrganizeDuplicates) readFromVim(f string, results user_ops.CreateOrganizeFileResults) (ot organize_text.Text, err error) {
+func (c OrganizeDuplicates) readFromVim(
+	f string,
+	results *organize_text.Text,
+) (ot *organize_text.Text, err error) {
 	openVimOp := user_ops.OpenVim{
 		Options: vim_cli_options_builder.New().
 			WithFileType("zit-organize").

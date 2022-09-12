@@ -15,14 +15,10 @@ type CreateOrganizeFile struct {
 	organize_text.Options
 }
 
-type CreateOrganizeFileResults struct {
-	Text organize_text.Text
-}
-
 func (c CreateOrganizeFile) RunAndWrite(
 	zettels zettel_transacted.Set,
 	w io.WriteCloser,
-) (results CreateOrganizeFileResults, err error) {
+) (results *organize_text.Text, err error) {
 	defer errors.PanicIfError(w.Close)
 
 	if results, err = c.Run(zettels); err != nil {
@@ -30,7 +26,7 @@ func (c CreateOrganizeFile) RunAndWrite(
 		return
 	}
 
-	if _, err = results.Text.WriteTo(w); err != nil {
+	if _, err = results.WriteTo(w); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -38,8 +34,8 @@ func (c CreateOrganizeFile) RunAndWrite(
 	return
 }
 
-func (c CreateOrganizeFile) Run(zettels zettel_transacted.Set) (results CreateOrganizeFileResults, err error) {
-	if results.Text, err = organize_text.New(c.Options); err != nil {
+func (c CreateOrganizeFile) Run(zettels zettel_transacted.Set) (results *organize_text.Text, err error) {
+	if results, err = organize_text.New(c.Options); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

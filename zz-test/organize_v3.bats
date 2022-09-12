@@ -43,6 +43,12 @@ cmd_zit_organize=(
 	-predictable-hinweisen
 )
 
+cmd_zit_organize_v3=(
+	zit
+	organize
+	-predictable-hinweisen
+)
+
 function outputs_organize_one_etikett { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
@@ -66,12 +72,12 @@ function outputs_organize_one_etikett { # @test
 	expected_organize="$(mktemp)"
 	{
 		echo
-		echo "# ok"
+		echo "      # ok"
 		echo
-		echo "- [one/uno] wow"
+		echo "- [o/u] wow"
 	} >>"$expected_organize"
 
-	run "${cmd_zit_organize[@]}" -mode output-only ok
+	run "${cmd_zit_organize_v3[@]}" -mode output-only ok
 	assert_output "$(cat "$expected_organize")"
 }
 
@@ -96,23 +102,23 @@ function outputs_organize_two_etiketten { # @test
 	expected_organize="$(mktemp)"
 	{
 		echo
-		echo "# brown, ok"
+		echo "      # brown, ok"
 		echo
-		echo "- [one/uno] wow"
+		echo "- [o/u] wow"
 	} >>"$expected_organize"
 
-	run "${cmd_zit_organize[@]}" -mode output-only ok brown
+	run "${cmd_zit_organize_v3[@]}" -mode output-only ok brown
 	assert_output "$(cat "$expected_organize")"
 
 	{
 		echo
-		echo "# ok"
+		echo "      # ok"
 		echo
-		echo "- [one/uno] wow"
+		echo "- [o/u] wow"
 		echo
 	} >"$expected_organize"
 
-	run "${cmd_zit_organize[@]}" -verbose -mode commit-directly ok brown <"$expected_organize"
+	run "${cmd_zit_organize_v3[@]}" -verbose -mode commit-directly ok brown <"$expected_organize"
 
 	expected_zettel="$(mktemp)"
 	{
@@ -148,20 +154,20 @@ function outputs_organize_one_etiketten_group_by_one { # @test
 	expected_organize="$(mktemp)"
 	{
 		echo
-		echo "# task"
+		echo "      # task"
 		echo
-		echo " ## priority"
+		echo "     ## priority"
 		echo
-		echo "  ### -1"
+		echo "    ###         -1"
 		echo
-		echo "  - [one/uno] wow"
+		echo "- [o/u] wow"
 		echo
-		echo "  ### -2"
+		echo "    ###         -2"
 		echo
-		echo "  - [one/uno] wow"
+		echo "- [o/u] wow"
 	} >>"$expected_organize"
 
-	run "${cmd_zit_organize[@]}" -mode output-only -group-by priority task
+	run "${cmd_zit_organize_v3[@]}" -mode output-only -group-by priority task
 	assert_output "$(cat "$expected_organize")"
 }
 
@@ -198,20 +204,20 @@ function outputs_organize_two_zettels_one_etiketten_group_by_one { # @test
 	expected_organize="$(mktemp)"
 	{
 		echo
-		echo "# task"
+		echo "      # task"
 		echo
-		echo " ## priority"
+		echo "     ## priority"
 		echo
-		echo "  ### -1"
+		echo "    ###         -1"
 		echo
-		echo "  - [one/uno] one/uno"
+		echo "- [o/u] one/uno"
 		echo
-		echo "  ### -2"
+		echo "    ###         -2"
 		echo
-		echo "  - [one/dos] two/dos"
+		echo "- [o/d] two/dos"
 	} >>"$expected_organize"
 
-	run "${cmd_zit_organize[@]}" -mode output-only -group-by priority task
+	run "${cmd_zit_organize_v3[@]}" -mode output-only -group-by priority task
 	assert_output "$(cat "$expected_organize")"
 }
 
@@ -249,22 +255,22 @@ function outputs_organize_one_etiketten_group_by_two { # @test
 	expected_organize="$(mktemp)"
 	{
 		echo
-		echo "# task"
+		echo "      # task"
 		echo
-		echo " ## priority-1"
+		echo "     ## priority-1"
 		echo
-		echo "  ### w-2022-07"
+		echo "    ### w-2022-07"
 		echo
-		echo "   #### -06"
+		echo "   ####          -06"
 		echo
-		echo "   - [one/dos] two/dos"
+		echo "- [o/d] two/dos"
 		echo
-		echo "   #### -07"
+		echo "   ####          -07"
 		echo
-		echo "   - [one/uno] one/uno"
+		echo "- [o/u] one/uno"
 	} >>"$expected_organize"
 
-	run "${cmd_zit_organize[@]}" -mode output-only -group-by priority,w task
+	run "${cmd_zit_organize_v3[@]}" -mode output-only -group-by priority,w task
 	assert_output "$(cat "$expected_organize")"
 }
 

@@ -9,15 +9,15 @@ import (
 )
 
 type assignmentLineWriter struct {
+	RightAlignedIndents bool
 	*line_format.Writer
-	experimentalIndents bool
 	maxDepth            int
 	maxKopf, maxScwhanz int
 }
 
 func (av assignmentLineWriter) write(a *assignment) (err error) {
-	if av.experimentalIndents {
-		return av.writeExperimental(a)
+	if av.RightAlignedIndents {
+		return av.writeRightAligned(a)
 	} else {
 		return av.writeNormal(a)
 	}
@@ -69,7 +69,7 @@ func (av assignmentLineWriter) writeNormal(a *assignment) (err error) {
 	return
 }
 
-func (av assignmentLineWriter) writeExperimental(a *assignment) (err error) {
+func (av assignmentLineWriter) writeRightAligned(a *assignment) (err error) {
 	spaceCount := av.maxDepth
 
 	hinMaxWidth := av.maxKopf + av.maxScwhanz + 4

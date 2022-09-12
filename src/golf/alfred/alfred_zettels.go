@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 )
 
-func ZettelToItem(z zettel_named.Zettel) (a alfred.Item) {
+func ZettelToItem(z zettel_named.Zettel, ha hinweis.Abbr) (a alfred.Item) {
 	a.Title = z.Stored.Zettel.Bezeichnung.String()
 
 	if a.Title == "" {
@@ -37,6 +37,19 @@ func ZettelToItem(z zettel_named.Zettel) (a alfred.Item) {
 	mb.AddMatches(z.Stored.Zettel.Bezeichnung.String())
 	mb.AddMatches(z.Stored.Zettel.Typ.String())
 	mb.AddMatches(EtikettenStringsFromZettel(z.Stored.Zettel.Etiketten, true)...)
+
+	if ha != nil {
+		var h hinweis.Hinweis
+		var err error
+
+		if h, err = ha.AbbreviateHinweis(z.Hinweis); err != nil {
+			return ErrorToItem(err)
+		}
+
+		mb.AddMatches(h.String())
+		mb.AddMatches(h.Kopf())
+		mb.AddMatches(h.Schwanz())
+	}
 
 	a.Match = mb.String()
 
