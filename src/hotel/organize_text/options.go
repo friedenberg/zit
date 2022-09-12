@@ -17,6 +17,7 @@ type Options struct {
 	UsePrefixJoints        bool
 	UseRightAlignedIndents bool
 	UseAbbr                bool
+	UseRefiner             bool
 }
 
 func MakeOptions() Options {
@@ -32,6 +33,7 @@ func (o *Options) AddToFlagSet(f *flag.FlagSet) {
 	f.BoolVar(&o.UsePrefixJoints, "prefix-joints", true, "split etiketten around hyphens")
 	f.BoolVar(&o.UseRightAlignedIndents, "right-align", true, "right-align etiketten")
 	f.BoolVar(&o.UseAbbr, "abbreviate-hinweisen", true, "abbreviate hinweisen")
+	f.BoolVar(&o.UseRefiner, "refine", true, "refine the organize tree")
 }
 
 func (o Options) assignmentTreeConstructor() *AssignmentTreeConstructor {
@@ -47,7 +49,7 @@ func (o Options) assignmentTreeConstructor() *AssignmentTreeConstructor {
 func (o Options) refiner() *AssignmentTreeRefiner {
 	return &AssignmentTreeRefiner{
 		//TODO add to config
-		Enabled:         true,
+		Enabled:         o.UseRefiner,
 		UsePrefixJoints: o.UsePrefixJoints,
 	}
 }

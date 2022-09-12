@@ -107,6 +107,7 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 			return
 		}
 	}
+
 	for _, c := range cs.Added {
 		var e etikett.Etikett
 

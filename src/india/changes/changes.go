@@ -53,6 +53,11 @@ func ChangesFrom(a1, b1 *organize_text.Text) (c Changes, err error) {
 	}
 
 	for tuple, _ := range a.Named {
+		if tuple.Etikett == "" {
+			err = errors.Errorf("empty etikett for %s", tuple.Key)
+			return
+		}
+
 		c.Removed = append(
 			c.Removed,
 			Change{

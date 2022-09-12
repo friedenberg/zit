@@ -41,12 +41,14 @@ cmd_zit_organize=(
 	-right-align=false
 	-abbreviate-hinweisen=false
 	-predictable-hinweisen
+	-refine=true
 )
 
 cmd_zit_organize_v3=(
 	zit
 	organize
 	-predictable-hinweisen
+	-refine=true
 )
 
 function outputs_organize_one_etikett { # @test
