@@ -303,15 +303,23 @@ func (s *Store) Read(p string) (cz zettel_checked_out.Zettel, err error) {
 
 		cz.DetermineState()
 
+		filter := func(tz zettel_transacted.Zettel) (ok bool, err error) {
+			ok = !tz.Named.Hinweis.Equals(cz.External.Named.Hinweis)
+			return
+		}
+
 		if cz.State > zettel_checked_out.StateExistsAndSame {
 			exSha := cz.External.Named.Stored.Sha
 			cz.Matches.Zettelen, _ = s.storeObjekten.ReadZettelSha(exSha)
+			cz.Matches.Zettelen, _ = cz.Matches.Zettelen.Filter(nil, filter)
 
 			exAkteSha := cz.External.Named.Stored.Zettel.Akte
 			cz.Matches.Akten, _ = s.storeObjekten.ReadAkteSha(exAkteSha)
+			cz.Matches.Akten, _ = cz.Matches.Akten.Filter(nil, filter)
 
 			bez := cz.External.Named.Stored.Zettel.Bezeichnung.String()
 			cz.Matches.Bezeichnungen, _ = s.storeObjekten.ReadBezeichnung(bez)
+			cz.Matches.Bezeichnungen, _ = cz.Matches.Bezeichnungen.Filter(nil, filter)
 		}
 
 		return

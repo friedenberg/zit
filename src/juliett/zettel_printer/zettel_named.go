@@ -7,7 +7,12 @@ import (
 func (p *Printer) ZettelNamed(zn zettel_named.Zettel) (pa *Paper) {
 	pa = p.MakePaper()
 
-	pa.WriteFormat("[%s %s]", p.Hinweis(zn.Hinweis), p.Sha(zn.Stored.Sha))
+	pa.WriteFormat(
+		"[%s %s %s]",
+		p.Hinweis(zn.Hinweis),
+		p.Sha(zn.Stored.Sha),
+		p.Bezeichnung(zn.Stored.Zettel),
+	)
 
 	return
 }
