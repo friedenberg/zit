@@ -31,6 +31,8 @@ func init() {
 }
 
 func (c *FormatOrganize) Run(u *umwelt.Umwelt, args ...string) (err error) {
+  c.Options.Konfig = u.Konfig()
+
 	if len(args) != 1 {
 		err = errors.Errorf("expected exactly one input argument")
 		return

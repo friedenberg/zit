@@ -29,18 +29,22 @@ cat_yang() (
 	echo "tres"
 )
 
+cmd_zit_def=(
+	-abbreviate-hinweisen=false
+	-predictable-hinweisen
+)
+
 cmd_zit_new=(
 	zit
 	new
-	-predictable-hinweisen
+	"${cmd_zit_def[@]}"
 )
 
 cmd_zit_organize=(
 	zit
 	organize
+	"${cmd_zit_def[@]}"
 	-right-align=false
-	-abbreviate-hinweisen=false
-	-predictable-hinweisen
 	-refine=true
 )
 
@@ -733,9 +737,8 @@ function etiketten_correct { # @test
 		echo "---"
 	} >"one/uno.md"
 
-	run zit checkin one/uno.md
-	assert_output --partial "[one/uno "
-	assert_output --partial "(updated)"
+	run zit checkin "${cmd_zit_def[@]}" one/uno.md
+	assert_output "[one/uno@4 \"\"] (updated)"
 
 	expected_etiketten="$(mktemp)"
 	{
@@ -753,9 +756,8 @@ function etiketten_correct { # @test
 		echo "---"
 	} >"one/uno.md"
 
-	run zit checkin one/uno.md
-	assert_output --partial "[one/uno "
-	assert_output --partial "(updated)"
+	run zit checkin "${cmd_zit_def[@]}" one/uno.md
+	assert_output "[one/uno@7 \"\"] (updated)"
 
 	expected_etiketten="$(mktemp)"
 	{

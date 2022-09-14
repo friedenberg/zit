@@ -18,6 +18,10 @@ type Cli struct {
 	IncludeHidden                    bool
 	PredictableHinweisen             bool
 	UseRightAlignedIndentsInOrganize bool
+	PrintAbbreviatedHinweisen        bool
+	PrintAbbreviatedShas             bool
+	PrintNewShaSyntax                bool
+	PrintIncludeBezeichnungen        bool
 }
 
 func (c *Cli) AddToFlags(f *flag.FlagSet) {
@@ -29,6 +33,11 @@ func (c *Cli) AddToFlags(f *flag.FlagSet) {
 	f.BoolVar(&c.AllowMissingHinweis, "allow-missing-hinweis", false, "")
 	f.BoolVar(&c.IncludeHidden, "include-hidden", false, "include zettels that have hidden etiketten")
 	f.BoolVar(&c.PredictableHinweisen, "predictable-hinweisen", false, "don't randomly select new hinweisen")
+
+	f.BoolVar(&c.PrintAbbreviatedShas, "abbreviate-shas", true, "")
+	f.BoolVar(&c.PrintAbbreviatedHinweisen, "abbreviate-hinweisen", true, "")
+	f.BoolVar(&c.PrintNewShaSyntax, "new-zettel-sha-syntax", true, "")
+	f.BoolVar(&c.PrintIncludeBezeichnungen, "print-bezeichnungen", true, "")
 }
 
 func (c Cli) DirZit() (p string, err error) {

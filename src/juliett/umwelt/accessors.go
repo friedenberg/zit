@@ -8,10 +8,15 @@ import (
 	"github.com/friedenberg/zit/src/echo/akten"
 	"github.com/friedenberg/zit/src/hotel/store_objekten"
 	"github.com/friedenberg/zit/src/india/store_working_directory"
+	"github.com/friedenberg/zit/src/juliett/zettel_printer"
 )
 
 func (u *Umwelt) Konfig() konfig.Konfig {
 	return u.konfig
+}
+
+func (u *Umwelt) PrinterOut() *zettel_printer.Printer {
+	return u.printerOut
 }
 
 func (u *Umwelt) Out() io.Writer {

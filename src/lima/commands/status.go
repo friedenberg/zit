@@ -2,7 +2,6 @@ package commands
 
 import (
 	"flag"
-	"os"
 	"sort"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -11,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
 	"github.com/friedenberg/zit/src/india/store_working_directory"
 	"github.com/friedenberg/zit/src/juliett/umwelt"
-	"github.com/friedenberg/zit/src/juliett/zettel_printer"
 	"github.com/friedenberg/zit/src/kilo/user_ops"
 )
 
@@ -64,8 +62,7 @@ func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
 		},
 	)
 
-	zp := zettel_printer.Make(s.StoreObjekten(), os.Stdout)
-	zp.ShouldAbbreviateHinweisen = true
+	zp := s.PrinterOut()
 
 	if !zp.IsEmpty() {
 		err = zp.Error()

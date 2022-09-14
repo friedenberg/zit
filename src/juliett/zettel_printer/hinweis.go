@@ -5,7 +5,7 @@ import "github.com/friedenberg/zit/src/charlie/hinweis"
 func (p *Printer) Hinweis(h hinweis.Hinweis) (pa *Paper) {
 	pa = p.MakePaper()
 
-	if p.ShouldAbbreviateHinweisen {
+	if p.abbreviateHinweisen {
 		if h, pa.Err = p.AbbreviateHinweis(h); !pa.IsEmpty() {
 			pa.Wrap()
 			return

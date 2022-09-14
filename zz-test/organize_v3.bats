@@ -741,8 +741,7 @@ function etiketten_correct { # @test
 	} >"one/uno.md"
 
 	run zit checkin one/uno.md
-	assert_output --partial "[one/uno "
-	assert_output --partial "(updated)"
+	assert_output '[o/u@4 ""] (updated)'
 
 	expected_etiketten="$(mktemp)"
 	{
@@ -761,8 +760,7 @@ function etiketten_correct { # @test
 	} >"one/uno.md"
 
 	run zit checkin one/uno.md
-	assert_output --partial "[one/uno "
-	assert_output --partial "(updated)"
+	assert_output '[o/u@7 ""] (updated)'
 
 	expected_etiketten="$(mktemp)"
 	{

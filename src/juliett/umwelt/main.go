@@ -1,7 +1,6 @@
 package umwelt
 
 import (
-	"io"
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -14,6 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/akten"
 	"github.com/friedenberg/zit/src/hotel/store_objekten"
 	"github.com/friedenberg/zit/src/india/store_working_directory"
+	"github.com/friedenberg/zit/src/juliett/zettel_printer"
 )
 
 type Umwelt struct {
@@ -22,9 +22,9 @@ type Umwelt struct {
 
 	logger errors.Logger
 
-	in  io.Reader
-	out io.Writer
-	err io.Writer
+	in  *os.File
+	out *os.File
+	err *os.File
 
 	storesInitialized     bool
 	lock                  *file_lock.Lock
@@ -32,6 +32,7 @@ type Umwelt struct {
 	akten                 akten.Akten
 	age                   age.Age
 	storeWorkingDirectory *store_working_directory.Store
+	printerOut            *zettel_printer.Printer
 }
 
 func Make(c konfig.Konfig) (u *Umwelt, err error) {
@@ -91,6 +92,10 @@ func (u *Umwelt) Initialize() (err error) {
 	}
 
 	errors.Print("done initing checkout store")
+
+	u.printerOut = zettel_printer.Make(u.konfig, u.storeObjekten, u.out)
+	//TODO move to konfig
+	// u.printerOut.ShouldAbbreviateHinweisen = true
 
 	u.storesInitialized = true
 

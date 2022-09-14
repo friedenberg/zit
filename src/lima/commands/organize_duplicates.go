@@ -37,6 +37,8 @@ func init() {
 
 func (c *OrganizeDuplicates) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	c.Options.Abbr = u.StoreObjekten()
+	c.Options.Konfig = u.Konfig()
+
 	// createOrganizeFileOp := user_ops.CreateOrganizeFile{
 	// 	Umwelt:  u,
 	// 	Options: c.Options,

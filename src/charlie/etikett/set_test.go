@@ -86,7 +86,7 @@ func TestDelta1(t *testing.T) {
 		Etikett{Value: "zz-archive-task-done"},
 	)
 
-	d := a.Delta(b)
+	d := MakeSetDelta(a, b)
 
 	c_expected := MakeSet(
 		Etikett{Value: "zz-archive-task-done"},

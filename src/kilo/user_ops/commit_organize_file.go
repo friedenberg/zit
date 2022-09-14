@@ -9,18 +9,18 @@ import (
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/hotel/organize_text"
 	"github.com/friedenberg/zit/src/india/changes"
-	"github.com/friedenberg/zit/src/juliett/zettel_printer"
+	"github.com/friedenberg/zit/src/juliett/umwelt"
 )
 
 type CommitOrganizeFile struct {
-	*zettel_printer.Printer
+	*umwelt.Umwelt
 }
 
 type CommitOrganizeFileResults struct {
 }
 
 func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganizeFileResults, err error) {
-	store := c.Store
+	store := c.StoreObjekten()
 
 	var cs changes.Changes
 
@@ -137,7 +137,7 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 			return
 		}
 
-		if c.Konfig.DryRun {
+		if c.Konfig().DryRun {
 			errors.PrintOutf("[%s] (would create)", z.Bezeichnung)
 			continue
 		}
@@ -149,16 +149,16 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 			return
 		}
 
-		c.ZettelTransacted(tz).Print()
+		c.PrinterOut().ZettelTransacted(tz).Print()
 
-		if !c.IsEmpty() {
-			err = c.Error()
+		if !c.PrinterOut().IsEmpty() {
+			err = c.PrinterOut().Error()
 			return
 		}
 	}
 
 	for _, z := range toUpdate {
-		if c.Konfig.DryRun {
+		if c.Konfig().DryRun {
 			errors.PrintOutf("[%s] (would update)", z.Hinweis)
 			continue
 		}

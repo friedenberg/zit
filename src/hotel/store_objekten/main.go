@@ -374,7 +374,10 @@ func (s *Store) Update(
 	}
 
 	//TODO fix etiketten deltas
-	d := mutter.Named.Stored.Zettel.Etiketten.Delta(tz.Named.Stored.Zettel.Etiketten)
+	d := etikett.MakeSetDelta(
+		mutter.Named.Stored.Zettel.Etiketten,
+		tz.Named.Stored.Zettel.Etiketten,
+	)
 
 	if err = s.indexEtiketten.add(d.Added); err != nil {
 		err = errors.Wrap(err)

@@ -14,7 +14,6 @@ import (
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/hotel/organize_text"
 	"github.com/friedenberg/zit/src/juliett/umwelt"
-	"github.com/friedenberg/zit/src/juliett/zettel_printer"
 	"github.com/friedenberg/zit/src/kilo/user_ops"
 )
 
@@ -78,6 +77,7 @@ func init() {
 }
 
 func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
+  c.Options.Konfig = u.Konfig()
 	c.Options.Abbr = u.StoreObjekten()
 
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
@@ -141,11 +141,8 @@ func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 		defer u.Unlock()
 
-		//TODO move to Umwelt
-		zp := zettel_printer.Make(u.StoreObjekten(), os.Stdout)
-
 		commitOrganizeTextOp := user_ops.CommitOrganizeFile{
-			Printer: zp,
+			Umwelt: u,
 		}
 
 		if _, err = commitOrganizeTextOp.Run(createOrganizeFileResults, ot2); err != nil {
@@ -190,10 +187,8 @@ func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 		defer u.Unlock()
 
-		zp := zettel_printer.Make(u.StoreObjekten(), os.Stdout)
-
 		commitOrganizeTextOp := user_ops.CommitOrganizeFile{
-			Printer: zp,
+			Umwelt: u,
 		}
 
 		if _, err = commitOrganizeTextOp.Run(createOrganizeFileResults, ot2); err != nil {

@@ -130,8 +130,7 @@ function can_checkout_and_checkin { # @test
 	} >"one/uno.md"
 
 	run zit checkin one/uno.md
-	assert_output --partial '[one/uno '
-	assert_output --partial '(updated)'
+	assert_output '[o/u@eb "wow"] (updated)'
 }
 
 function can_checkout_via_etiketten { # @test

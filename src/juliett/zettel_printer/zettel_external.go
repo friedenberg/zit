@@ -10,10 +10,22 @@ func (p *Printer) ZettelExternal(ze zettel_external.Zettel) (pa *Paper) {
 
 	switch {
 	case !ze.ZettelFD.IsEmpty():
-		pa.WriteFormat("[%s@%s %s]", ze.ZettelFD.Path, p.Sha(ze.Named.Stored.Sha), p.Bezeichnung(ze.Named.Stored.Zettel))
+		pa.WriteString(
+			p.zettelBracketed(
+				ze.ZettelFD.Path,
+				p.Sha(ze.Named.Stored.Sha).String(),
+				p.Bezeichnung(ze.Named.Stored.Zettel).String(),
+			),
+		)
 
 	case !ze.AkteFD.IsEmpty():
-		pa.WriteFormat("[%s@%s %s]", ze.AkteFD.Path, p.Sha(ze.Named.Stored.Zettel.Akte), p.Bezeichnung(ze.Named.Stored.Zettel))
+		pa.WriteString(
+			p.zettelBracketed(
+				ze.AkteFD.Path,
+				p.Sha(ze.Named.Stored.Zettel.Akte).String(),
+				p.Bezeichnung(ze.Named.Stored.Zettel).String(),
+			),
+		)
 
 	default:
 		pa.Err = errors.Errorf("zettel external in unknown state: %q", ze)

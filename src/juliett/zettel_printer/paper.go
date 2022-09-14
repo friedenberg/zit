@@ -24,7 +24,7 @@ func (p *Printer) MakePaper() (pa *Paper) {
 		paper: paper{
 			Builder: &strings.Builder{},
 		},
-		file: p.File,
+		file: p.file,
 		Ctx:  p.Ctx,
 	}
 
