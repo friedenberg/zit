@@ -89,20 +89,10 @@ func (c Checkout) RunWithHinweisen(s *umwelt.Umwelt, hins ...hinweis.Hinweis) (e
 		},
 	}
 
-	var checkoutResults zettel_checked_out.Set
-
-	if checkoutResults, err = checkoutOp.RunManyHinweisen(toCheckOut...); err != nil {
+	if _, err = checkoutOp.RunManyHinweisen(toCheckOut...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	err = checkoutResults.Each(
-		func(zco zettel_checked_out.Zettel) (err error) {
-			s.PrinterOut().ZettelCheckedOut(zco).Print()
-			err = s.PrinterOut().Error()
-			return
-		},
-	)
 
 	if err != nil {
 		err = errors.Wrap(err)

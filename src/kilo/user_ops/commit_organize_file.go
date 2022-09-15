@@ -142,17 +142,8 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 			continue
 		}
 
-		var tz zettel_transacted.Zettel
-
-		if tz, err = store.Create(z); err != nil {
+		if _, err = store.Create(z); err != nil {
 			err = errors.Errorf("failed to create zettel: %s", err)
-			return
-		}
-
-		c.PrinterOut().ZettelTransacted(tz).Print()
-
-		if !c.PrinterOut().IsEmpty() {
-			err = c.PrinterOut().Error()
 			return
 		}
 	}

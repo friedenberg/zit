@@ -3,7 +3,6 @@ package user_ops
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/zettel"
-	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
 	"github.com/friedenberg/zit/src/india/store_working_directory"
 	"github.com/friedenberg/zit/src/juliett/umwelt"
@@ -11,6 +10,7 @@ import (
 
 type WriteNewZettels struct {
 	*umwelt.Umwelt
+	CheckOut bool
 	store_working_directory.CheckoutOptions
 }
 
@@ -58,23 +58,19 @@ func (c WriteNewZettels) RunOne(
 func (c WriteNewZettels) runOneAlreadyLocked(
 	z zettel.Zettel,
 ) (result zettel_checked_out.Zettel, err error) {
-	var tz zettel_transacted.Zettel
-
-	if tz, err = c.StoreObjekten().Create(z); err != nil {
+	if result.Internal, err = c.StoreObjekten().Create(z); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	c.PrinterOut().ZettelTransacted(tz).Print()
-
-	//TODO separate creation and checkout into two ops to allow for optimistic
-	//unlocking
-	if result, err = c.StoreWorkingDirectory().CheckoutOne(c.CheckoutOptions, tz); err != nil {
-		err = errors.Wrap(err)
-		return
+	if c.CheckOut {
+		//TODO separate creation and checkout into two ops to allow for optimistic
+		//unlocking
+		if result, err = c.StoreWorkingDirectory().CheckoutOne(c.CheckoutOptions, result.Internal); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
-
-	c.PrinterOut().ZettelCheckedOut(result).Print()
 
 	return
 }

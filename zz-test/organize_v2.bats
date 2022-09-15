@@ -96,7 +96,7 @@ function outputs_organize_two_etiketten { # @test
 	} >>"$to_add"
 
 	run "${cmd_zit_new[@]}" -edit=false "$to_add"
-	assert_output --partial '[one/uno '
+	assert_output '[one/uno@b "wow"] (created)'
 
 	expected_organize="$(mktemp)"
 	{
@@ -148,7 +148,7 @@ function outputs_organize_one_etiketten_group_by_one { # @test
 	} >>"$to_add"
 
 	run "${cmd_zit_new[@]}" -edit=false "$to_add"
-	assert_output --partial '[one/uno '
+	assert_output '[one/uno@f "wow"] (created)'
 
 	expected_organize="$(mktemp)"
 	{
@@ -186,7 +186,7 @@ function outputs_organize_two_zettels_one_etiketten_group_by_one { # @test
 	} >>"$to_add"
 
 	run "${cmd_zit_new[@]}" -edit=false "$to_add"
-	assert_output --partial '[one/uno '
+	assert_output '[one/uno@5 "one/uno"] (created)'
 
 	to_add="$(mktemp)"
 	{
@@ -198,7 +198,7 @@ function outputs_organize_two_zettels_one_etiketten_group_by_one { # @test
 	} >>"$to_add"
 
 	run "${cmd_zit_new[@]}" -edit=false "$to_add"
-	assert_output --partial '[one/dos '
+	assert_output '[one/dos@3 "two/dos"] (created)'
 
 	expected_organize="$(mktemp)"
 	{

@@ -68,6 +68,10 @@ func (u *Umwelt) Initialize() (err error) {
 		u.age = age.MakeEmpty()
 	}
 
+	u.printerOut = zettel_printer.Make(u.standort, u.konfig, u.out)
+	//TODO move to konfig
+	// u.printerOut.ShouldAbbreviateHinweisen = true
+
 	if u.storeObjekten, err = store_objekten.Make(u.lock, u.age, u.konfig, u.standort); err != nil {
 		err = errors.Wrapf(err, "failed to initialize zettel meta store")
 		return
@@ -83,6 +87,7 @@ func (u *Umwelt) Initialize() (err error) {
 		CacheEnabled: u.konfig.CheckoutCacheEnabled,
 	}
 
+
 	errors.Print("initing checkout store")
 
 	if u.storeWorkingDirectory, err = store_working_directory.New(csk, u.standort.Cwd(), u.storeObjekten); err != nil {
@@ -93,9 +98,9 @@ func (u *Umwelt) Initialize() (err error) {
 
 	errors.Print("done initing checkout store")
 
-	u.printerOut = zettel_printer.Make(u.standort, u.konfig, u.storeObjekten, u.out)
-	//TODO move to konfig
-	// u.printerOut.ShouldAbbreviateHinweisen = true
+	u.printerOut.SetObjektenStore(u.storeObjekten)
+	u.storeObjekten.SetZettelTransactedPrinter(u.printerOut)
+	u.storeWorkingDirectory.SetZettelCheckedOutPrinter(u.printerOut)
 
 	u.storesInitialized = true
 

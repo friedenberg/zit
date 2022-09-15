@@ -71,7 +71,7 @@ function can_new_zettel_file { # @test
 	} >>"$to_add"
 
 	run zit new -edit=false -predictable-hinweisen "$to_add"
-	assert_output '[one/uno '
+	assert_output '[o/u@7 "wow"] (created)'
 
 	run zit show one/uno
 	assert_output "$(cat "$to_add")"
@@ -93,7 +93,7 @@ function can_new_zettel { # @test
 	} >"$expected"
 
 	run zit new -edit=false -predictable-hinweisen -bezeichnung wow -etiketten ok
-	assert_output '[one/uno '
+	assert_output '[o/u@5 "wow"] (created)'
 
 	run zit show one/uno
 	assert_output "$(cat "$expected")"
@@ -114,7 +114,7 @@ function can_checkout_and_checkin { # @test
 	} >>"$to_add"
 
 	run zit new -edit=false -predictable-hinweisen "$to_add"
-	assert_output --partial '[one/uno '
+	assert_output '[o/u@7 "wow"] (created)'
 
 	run zit checkout one/uno
 	assert_output '[one/uno.md@e ""] (checked out)'
@@ -258,11 +258,7 @@ function can_new_zettel_with_metadatei { # @test
 	} >>"$expected"
 
 	run zit new -edit=false -predictable-hinweisen -bezeichnung bez -etiketten et1,et2
-	assert_output --partial '[one/uno '
-	assert_output --partial '(checked out)'
-
-	run cat one/uno.md
-	assert_output "$(cat "$expected")"
+	assert_output '[o/u@a "bez"] (created)'
 }
 
 function can_update_akte { # @test
@@ -285,7 +281,7 @@ function can_update_akte { # @test
 	} >>"$expected"
 
 	run zit new -edit=false -predictable-hinweisen "$expected"
-	assert_output --partial '[one/uno '
+	assert_output '[o/u@d "bez"] (created)'
 
 	run zit show one/uno
 	assert_output "$(cat "$expected")"
@@ -369,7 +365,7 @@ function indexes_are_implicitly_correct { # @test
 	} >>"$expected"
 
 	run zit new -edit=false -predictable-hinweisen "$expected"
-	assert_output --partial '[one/uno '
+	assert_output '[o/u@d "bez"] (created)'
 
 	{
 		echo et1
@@ -437,7 +433,7 @@ function checkouts_dont_overwrite { # @test
 	} >>"$expected"
 
 	run zit new -edit=false -predictable-hinweisen "$expected"
-	assert_output --partial '[one/uno '
+	assert_output '[o/u@d "bez"] (created)'
 
 	run zit checkout one/uno
 	assert_output '[one/uno.md@e ""] (checked out)'

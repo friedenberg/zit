@@ -4,8 +4,8 @@ import (
 	"path/filepath"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/golf/zettel_external"
 	"github.com/friedenberg/zit/src/bravo/paper"
+	"github.com/friedenberg/zit/src/golf/zettel_external"
 )
 
 func (p *Printer) ZettelExternal(ze zettel_external.Zettel) (pa *paper.Paper) {
@@ -28,7 +28,7 @@ func (p *Printer) ZettelExternal(ze zettel_external.Zettel) (pa *paper.Paper) {
 		pa.Err = errors.Errorf("zettel external in unknown state: %q", ze)
 	}
 
-	if path, p.Err = filepath.Rel(path, p.Cwd()); !p.IsEmpty() {
+	if path, p.Err = filepath.Rel(p.Cwd(), path); !p.IsEmpty() {
 		p.Wrap()
 		return
 	}

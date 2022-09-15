@@ -92,8 +92,6 @@ func (c CreateFromPaths) Run(args ...string) (results zettel_checked_out.Set, er
 				errors.PrintOutf("[%s] (deleted)", cz.External.ZettelFD.Path)
 			}
 		}
-
-		c.PrinterOut().ZettelCheckedOut(cz).Print()
 	}
 
 	return

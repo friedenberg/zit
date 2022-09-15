@@ -9,6 +9,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/bravo/paper"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/zk_types"
 	"github.com/friedenberg/zit/src/charlie/age"
@@ -29,13 +30,18 @@ type LockSmith interface {
 	IsAcquired() bool
 }
 
+type ZettelTransactedPrinter interface {
+	ZettelTransacted(zettel_transacted.Zettel) *paper.Paper
+}
+
 type Store struct {
 	lockSmith LockSmith
 	konfig    konfig.Konfig
 	standort  standort.Standort
 	age       age.Age
 
-	hinweisen *hinweisen.Hinweisen
+	zettelTransactedPrinter ZettelTransactedPrinter
+	hinweisen               *hinweisen.Hinweisen
 	*indexZettelen
 	*indexZettelenTails
 	*indexEtiketten
@@ -113,6 +119,10 @@ func Make(
 	s.Transaktion.Time = ts.Now()
 
 	return
+}
+
+func (s *Store) SetZettelTransactedPrinter(ztp ZettelTransactedPrinter) {
+	s.zettelTransactedPrinter = ztp
 }
 
 func (s Store) Hinweisen() *hinweisen.Hinweisen {
@@ -280,12 +290,12 @@ func (s *Store) Create(in zettel.Zettel) (tz zettel_transacted.Zettel, err error
 		return
 	}
 
-	errors.PrintDebug(tz)
-
 	if err = s.indexEtiketten.add(tz.Named.Stored.Zettel.Etiketten); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	s.zettelTransactedPrinter.ZettelTransacted(tz).Print()
 
 	return
 }
@@ -328,6 +338,8 @@ func (s *Store) CreateWithHinweis(
 		err = errors.Wrap(err)
 		return
 	}
+
+	s.zettelTransactedPrinter.ZettelTransacted(tz).Print()
 
 	return
 }
@@ -398,6 +410,8 @@ func (s *Store) Update(
 	}
 
 	tz.Named.Stored.Sha.Short = ss
+
+	s.zettelTransactedPrinter.ZettelTransacted(tz).Print()
 
 	return
 }

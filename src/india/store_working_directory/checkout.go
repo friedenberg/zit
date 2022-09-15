@@ -115,6 +115,8 @@ func (s *Store) CheckoutOne(
 		return
 	}
 
+	s.zettelCheckedOutPrinter.ZettelCheckedOut(cz).Print()
+
 	return
 }
 

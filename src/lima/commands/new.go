@@ -120,7 +120,8 @@ func (c New) writeNewZettels(
 	f zettel.Format,
 ) (zsc zettel_checked_out.Set, err error) {
 	emptyOp := user_ops.WriteNewZettels{
-		Umwelt: u,
+		Umwelt:   u,
+		CheckOut: c.Edit,
 		CheckoutOptions: store_working_directory.CheckoutOptions{
 			Format: f,
 		},
