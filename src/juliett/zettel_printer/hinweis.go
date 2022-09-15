@@ -1,8 +1,11 @@
 package zettel_printer
 
-import "github.com/friedenberg/zit/src/charlie/hinweis"
+import (
+	"github.com/friedenberg/zit/src/charlie/hinweis"
+	"github.com/friedenberg/zit/src/paper"
+)
 
-func (p *Printer) Hinweis(h hinweis.Hinweis) (pa *Paper) {
+func (p *Printer) Hinweis(h hinweis.Hinweis) (pa *paper.Paper) {
 	pa = p.MakePaper()
 
 	if p.abbreviateHinweisen {

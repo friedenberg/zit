@@ -3,9 +3,10 @@ package zettel_printer
 import (
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/india/store_working_directory"
+	"github.com/friedenberg/zit/src/paper"
 )
 
-func (p *Printer) FileUnrecognized(fu store_working_directory.File) (pa *Paper) {
+func (p *Printer) FileUnrecognized(fu store_working_directory.File) (pa *paper.Paper) {
 	pa = p.MakePaper()
 
 	pa.WriteFormat("[%s %s] (not recognized)", fu.Path, p.Sha(fu.Sha))
@@ -16,7 +17,7 @@ func (p *Printer) FileUnrecognized(fu store_working_directory.File) (pa *Paper) 
 func (p *Printer) FileRecognized(
 	fu store_working_directory.File,
 	szt zettel_transacted.Set,
-) (pa *Paper) {
+) (pa *paper.Paper) {
 	pa = p.MakePaper()
 
 	pa.WriteFormat("[%s %s] (Akte recognized)", fu.Path, p.Sha(fu.Sha))

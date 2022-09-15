@@ -93,7 +93,7 @@ func (u *Umwelt) Initialize() (err error) {
 
 	errors.Print("done initing checkout store")
 
-	u.printerOut = zettel_printer.Make(u.konfig, u.storeObjekten, u.out)
+	u.printerOut = zettel_printer.Make(u.standort, u.konfig, u.storeObjekten, u.out)
 	//TODO move to konfig
 	// u.printerOut.ShouldAbbreviateHinweisen = true
 

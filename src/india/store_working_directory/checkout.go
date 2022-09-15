@@ -48,6 +48,7 @@ func (s *Store) CheckoutOne(
 	options CheckoutOptions,
 	sz zettel_transacted.Zettel,
 ) (cz zettel_checked_out.Zettel, err error) {
+
 	var filename string
 
 	if filename, err = id.MakeDirIfNecessary(sz.Named.Hinweis, s.cwd); err != nil {
@@ -62,6 +63,8 @@ func (s *Store) CheckoutOne(
 	inlineAkte := s.isInlineAkte(sz)
 
 	cz = zettel_checked_out.Zettel{
+    //TODO check diff with fs if already exists
+    State: zettel_checked_out.StateJustCheckedOut,
 		Internal: sz,
 		External: zettel_external.Zettel{
 			ZettelFD: zettel_external.FD{
@@ -104,7 +107,6 @@ func (s *Store) CheckoutOne(
 		if err = s.writeFormat(options, filename, c); err != nil {
 			err = errors.Wrapf(err, "%s", sz.Named)
 			errors.PrintErrf("%s (check out failed):", sz.Named)
-			errors.PrintErr(err)
 			return
 		}
 
@@ -113,7 +115,6 @@ func (s *Store) CheckoutOne(
 		return
 	}
 
-	errors.PrintOutf("%s (checked out)", sz.Named)
 
 	return
 }

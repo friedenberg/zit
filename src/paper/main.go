@@ -1,4 +1,4 @@
-package zettel_printer
+package paper
 
 import (
 	"fmt"
@@ -19,13 +19,13 @@ type paper struct {
 	*strings.Builder
 }
 
-func (p *Printer) MakePaper() (pa *Paper) {
+func Make(f *os.File, ctx *errors.Ctx) (pa *Paper) {
 	pa = &Paper{
 		paper: paper{
 			Builder: &strings.Builder{},
 		},
-		file: p.file,
-		Ctx:  p.Ctx,
+		file: f,
+		Ctx:  ctx,
 	}
 
 	return

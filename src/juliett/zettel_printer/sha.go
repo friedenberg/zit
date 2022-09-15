@@ -1,8 +1,11 @@
 package zettel_printer
 
-import "github.com/friedenberg/zit/src/bravo/sha"
+import (
+	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/paper"
+)
 
-func (p *Printer) Sha(sh sha.Sha) (pa *Paper) {
+func (p *Printer) Sha(sh sha.Sha) (pa *paper.Paper) {
 	pa = p.MakePaper()
 
 	var sha string

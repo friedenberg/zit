@@ -65,12 +65,16 @@ func (c WriteNewZettels) runOneAlreadyLocked(
 		return
 	}
 
-  //TODO separate creation and checkout into two ops to allow for optimistic
-  //unlocking
+	c.PrinterOut().ZettelTransacted(tz).Print()
+
+	//TODO separate creation and checkout into two ops to allow for optimistic
+	//unlocking
 	if result, err = c.StoreWorkingDirectory().CheckoutOne(c.CheckoutOptions, tz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	c.PrinterOut().ZettelCheckedOut(result).Print()
 
 	return
 }

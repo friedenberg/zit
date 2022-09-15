@@ -7,14 +7,21 @@ import (
 	"github.com/friedenberg/zit/src/golf/zettel_external"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
+	"github.com/friedenberg/zit/src/paper"
 )
 
-func (p *Printer) ZettelCheckedOut(zco zettel_checked_out.Zettel) (pa *Paper) {
+func (p *Printer) ZettelCheckedOut(zco zettel_checked_out.Zettel) (pa *paper.Paper) {
 	pa = p.MakePaper()
 
 	switch zco.State {
 	default:
 		pa.WriteFormat("%s (unknown)", p.ZettelExternal(zco.External))
+
+	case zettel_checked_out.StateJustCheckedOut:
+		pa.WriteFormat("%s (checked out)", p.ZettelExternal(zco.External))
+
+	case zettel_checked_out.StateJustCheckedOutButSame:
+		pa.WriteFormat("%s (already checked out)", p.ZettelExternal(zco.External))
 
 	case zettel_checked_out.StateExistsAndSame:
 		pa.WriteFormat("%s (same)", p.ZettelExternal(zco.External))
@@ -43,7 +50,7 @@ func (p *Printer) ZettelCheckedOut(zco zettel_checked_out.Zettel) (pa *Paper) {
 
 func (p *Printer) appendZettelCheckedOutMatches(
 	m zettel_checked_out.Matches,
-	pa *Paper,
+	pa *paper.Paper,
 	ex zettel_external.Zettel,
 ) {
 	typToCollection := map[zk_types.Type]zettel_transacted.Set{

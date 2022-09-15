@@ -71,7 +71,7 @@ function can_new_zettel_file { # @test
 	} >>"$to_add"
 
 	run zit new -edit=false -predictable-hinweisen "$to_add"
-	assert_output --partial '[one/uno '
+	assert_output '[one/uno '
 
 	run zit show one/uno
 	assert_output "$(cat "$to_add")"
@@ -93,7 +93,7 @@ function can_new_zettel { # @test
 	} >"$expected"
 
 	run zit new -edit=false -predictable-hinweisen -bezeichnung wow -etiketten ok
-	assert_output --partial '[one/uno '
+	assert_output '[one/uno '
 
 	run zit show one/uno
 	assert_output "$(cat "$expected")"
@@ -117,8 +117,7 @@ function can_checkout_and_checkin { # @test
 	assert_output --partial '[one/uno '
 
 	run zit checkout one/uno
-	assert_output --partial '[one/uno '
-	assert_output --partial '(checked out)'
+	assert_output '[one/uno.md@e ""] (checked out)'
 
 	{
 		echo "---"
@@ -441,8 +440,7 @@ function checkouts_dont_overwrite { # @test
 	assert_output --partial '[one/uno '
 
 	run zit checkout one/uno
-	assert_output --partial '[one/uno '
-	assert_output --partial '(checked out)'
+	assert_output '[one/uno.md@e ""] (checked out)'
 
 	run cat one/uno.md
 	assert_output "$(cat "$expected")"

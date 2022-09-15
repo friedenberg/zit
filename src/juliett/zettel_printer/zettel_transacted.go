@@ -1,8 +1,11 @@
 package zettel_printer
 
-import "github.com/friedenberg/zit/src/golf/zettel_transacted"
+import (
+	"github.com/friedenberg/zit/src/golf/zettel_transacted"
+	"github.com/friedenberg/zit/src/paper"
+)
 
-func (p *Printer) ZettelTransacted(zt zettel_transacted.Zettel) (pa *Paper) {
+func (p *Printer) ZettelTransacted(zt zettel_transacted.Zettel) (pa *paper.Paper) {
 	pa = p.MakePaper()
 
 	verb := ""

@@ -1,35 +1,39 @@
 package zettel_printer
 
 import (
+	"path/filepath"
+
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/golf/zettel_external"
+	"github.com/friedenberg/zit/src/paper"
 )
 
-func (p *Printer) ZettelExternal(ze zettel_external.Zettel) (pa *Paper) {
+func (p *Printer) ZettelExternal(ze zettel_external.Zettel) (pa *paper.Paper) {
 	pa = p.MakePaper()
+
+	bez := p.Bezeichnung(ze.Named.Stored.Zettel).String()
+
+	var path, ref string
 
 	switch {
 	case !ze.ZettelFD.IsEmpty():
-		pa.WriteString(
-			p.zettelBracketed(
-				ze.ZettelFD.Path,
-				p.Sha(ze.Named.Stored.Sha).String(),
-				p.Bezeichnung(ze.Named.Stored.Zettel).String(),
-			),
-		)
+		path = ze.ZettelFD.Path
+		ref = p.Sha(ze.Named.Stored.Sha).String()
 
 	case !ze.AkteFD.IsEmpty():
-		pa.WriteString(
-			p.zettelBracketed(
-				ze.AkteFD.Path,
-				p.Sha(ze.Named.Stored.Zettel.Akte).String(),
-				p.Bezeichnung(ze.Named.Stored.Zettel).String(),
-			),
-		)
+		path = ze.AkteFD.Path
+		ref = p.Sha(ze.Named.Stored.Zettel.Akte).String()
 
 	default:
 		pa.Err = errors.Errorf("zettel external in unknown state: %q", ze)
 	}
+
+	if path, p.Err = filepath.Rel(path, p.Cwd()); !p.IsEmpty() {
+		p.Wrap()
+		return
+	}
+
+	pa.WriteString(p.zettelBracketed(path, ref, bez))
 
 	return
 }
