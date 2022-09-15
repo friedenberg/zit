@@ -2,7 +2,7 @@ package zettel_printer
 
 import (
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
-	"github.com/friedenberg/zit/src/paper"
+	"github.com/friedenberg/zit/src/bravo/paper"
 )
 
 func (p *Printer) ZettelTransacted(zt zettel_transacted.Zettel) (pa *paper.Paper) {

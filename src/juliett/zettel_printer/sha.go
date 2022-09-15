@@ -2,7 +2,7 @@ package zettel_printer
 
 import (
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/paper"
+	"github.com/friedenberg/zit/src/bravo/paper"
 )
 
 func (p *Printer) Sha(sh sha.Sha) (pa *paper.Paper) {

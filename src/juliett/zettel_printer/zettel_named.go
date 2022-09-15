@@ -2,7 +2,7 @@ package zettel_printer
 
 import (
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
-	"github.com/friedenberg/zit/src/paper"
+	"github.com/friedenberg/zit/src/bravo/paper"
 )
 
 func (p *Printer) ZettelNamed(zn zettel_named.Zettel) (pa *paper.Paper) {

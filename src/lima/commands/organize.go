@@ -77,7 +77,7 @@ func init() {
 }
 
 func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
-  c.Options.Konfig = u.Konfig()
+	c.Options.Konfig = u.Konfig()
 	c.Options.Abbr = u.StoreObjekten()
 
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{

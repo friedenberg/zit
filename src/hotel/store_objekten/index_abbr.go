@@ -210,7 +210,7 @@ func (i *indexAbbr) AbbreviateHinweis(h hinweis.Hinweis) (ha hinweis.Hinweis, er
 
 	if kopf == "" || schwanz == "" {
 		ctx.Err = errors.Errorf("abbreviated kopf would be empty for %s", h)
-    errors.PrintDebug(i.indexAbbrEncodableTridexes.HinweisKopfen)
+		errors.PrintDebug(i.indexAbbrEncodableTridexes.HinweisKopfen)
 		return
 	}
 

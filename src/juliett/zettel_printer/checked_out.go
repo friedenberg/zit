@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/golf/zettel_external"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
-	"github.com/friedenberg/zit/src/paper"
+	"github.com/friedenberg/zit/src/bravo/paper"
 )
 
 func (p *Printer) ZettelCheckedOut(zco zettel_checked_out.Zettel) (pa *paper.Paper) {

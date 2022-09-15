@@ -51,7 +51,7 @@ func New(i kennung.Int, pl Provider, pr Provider) (h Hinweis, err error) {
 		return
 	}
 
-  return MakeKopfUndSchwanz(l, r)
+	return MakeKopfUndSchwanz(l, r)
 }
 
 func MakeKopfUndSchwanz(kopf, schwanz string) (h Hinweis, err error) {

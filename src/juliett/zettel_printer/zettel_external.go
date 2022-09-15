@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/golf/zettel_external"
-	"github.com/friedenberg/zit/src/paper"
+	"github.com/friedenberg/zit/src/bravo/paper"
 )
 
 func (p *Printer) ZettelExternal(ze zettel_external.Zettel) (pa *paper.Paper) {

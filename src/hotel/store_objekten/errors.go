@@ -23,7 +23,7 @@ func (s stringId) String() string {
 }
 
 type ErrLockRequired struct {
-  Operation string
+	Operation string
 }
 
 func (e ErrLockRequired) Is(target error) bool {
@@ -33,8 +33,8 @@ func (e ErrLockRequired) Is(target error) bool {
 
 func (e ErrLockRequired) Error() string {
 	return fmt.Sprintf(
-    "lock required for operation: %q",
-    e.Operation,
+		"lock required for operation: %q",
+		e.Operation,
 	)
 }
 

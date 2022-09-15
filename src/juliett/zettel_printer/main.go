@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/konfig"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/hotel/store_objekten"
-	"github.com/friedenberg/zit/src/paper"
+	"github.com/friedenberg/zit/src/bravo/paper"
 )
 
 type Printer struct {

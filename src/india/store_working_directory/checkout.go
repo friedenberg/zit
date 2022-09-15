@@ -63,8 +63,8 @@ func (s *Store) CheckoutOne(
 	inlineAkte := s.isInlineAkte(sz)
 
 	cz = zettel_checked_out.Zettel{
-    //TODO check diff with fs if already exists
-    State: zettel_checked_out.StateJustCheckedOut,
+		//TODO check diff with fs if already exists
+		State:    zettel_checked_out.StateJustCheckedOut,
 		Internal: sz,
 		External: zettel_external.Zettel{
 			ZettelFD: zettel_external.FD{
@@ -114,7 +114,6 @@ func (s *Store) CheckoutOne(
 		err = errors.Errorf("unsupported checkout mode: %s", options.CheckoutMode)
 		return
 	}
-
 
 	return
 }

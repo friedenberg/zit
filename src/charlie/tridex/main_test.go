@@ -27,7 +27,7 @@ func TestContains(t *testing.T) {
 		"123456",
 		"654321",
 		"5",
-  }
+	}
 
 	for _, e := range expectedContains {
 		if !sut.Contains(e) {
@@ -101,7 +101,7 @@ func TestExpandDegenerate(t *testing.T) {
 
 	expectedContains := map[string]string{
 		"mewt": "mewtwo",
-		"mew":    "mew",
+		"mew":  "mew",
 	}
 
 	for e, c := range expectedContains {

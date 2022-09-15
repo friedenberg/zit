@@ -2,7 +2,7 @@ package zettel_printer
 
 import (
 	"github.com/friedenberg/zit/src/charlie/hinweis"
-	"github.com/friedenberg/zit/src/paper"
+	"github.com/friedenberg/zit/src/bravo/paper"
 )
 
 func (p *Printer) Hinweis(h hinweis.Hinweis) (pa *paper.Paper) {
