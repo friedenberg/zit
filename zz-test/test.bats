@@ -117,7 +117,7 @@ function can_checkout_and_checkin { # @test
 	assert_output '[o/u@7 "wow"] (created)'
 
 	run zit checkout one/uno
-	assert_output '[one/uno.md@e ""] (checked out)'
+	assert_output '[one/uno.md@7 "wow"] (checked out)'
 
 	{
 		echo "---"
@@ -436,7 +436,7 @@ function checkouts_dont_overwrite { # @test
 	assert_output '[o/u@d "bez"] (created)'
 
 	run zit checkout one/uno
-	assert_output '[one/uno.md@e ""] (checked out)'
+	assert_output '[one/uno.md@d "bez"] (checked out)'
 
 	run cat one/uno.md
 	assert_output "$(cat "$expected")"

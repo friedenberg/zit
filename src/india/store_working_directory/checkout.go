@@ -79,6 +79,8 @@ func (s *Store) CheckoutOne(
 		AkteReaderFactory: s.storeObjekten,
 	}
 
+	cz.External.Named = sz.Named
+
 	switch options.CheckoutMode {
 	case CheckoutModeAkteOnly:
 		p := originalFilename + "." + sz.Named.Stored.Zettel.AkteExt()

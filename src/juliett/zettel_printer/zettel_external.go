@@ -28,9 +28,8 @@ func (p *Printer) ZettelExternal(ze zettel_external.Zettel) (pa *paper.Paper) {
 		pa.Err = errors.Errorf("zettel external in unknown state: %q", ze)
 	}
 
-	if path, p.Err = filepath.Rel(p.Cwd(), path); !p.IsEmpty() {
-		p.Wrap()
-		return
+	if pathRel, err := filepath.Rel(p.Cwd(), path); err == nil {
+		path = pathRel
 	}
 
 	pa.WriteString(p.zettelBracketed(path, ref, bez))

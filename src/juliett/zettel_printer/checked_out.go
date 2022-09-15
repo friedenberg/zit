@@ -3,34 +3,44 @@ package zettel_printer
 import (
 	"fmt"
 
+	"github.com/friedenberg/zit/src/bravo/paper"
 	"github.com/friedenberg/zit/src/bravo/zk_types"
 	"github.com/friedenberg/zit/src/golf/zettel_external"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
-	"github.com/friedenberg/zit/src/bravo/paper"
 )
 
 func (p *Printer) ZettelCheckedOut(zco zettel_checked_out.Zettel) (pa *paper.Paper) {
 	pa = p.MakePaper()
 
+	var zPaper *paper.Paper
+
+	switch {
+	case zco.External.ZettelFD.Path != "" || zco.External.AkteFD.Path != "":
+		zPaper = p.ZettelExternal(zco.External)
+
+	default:
+		zPaper = p.ZettelNamed(zco.Internal.Named)
+	}
+
 	switch zco.State {
 	default:
-		pa.WriteFormat("%s (unknown)", p.ZettelExternal(zco.External))
+		pa.WriteFormat("%s (unknown)", zPaper)
 
 	case zettel_checked_out.StateJustCheckedOut:
-		pa.WriteFormat("%s (checked out)", p.ZettelExternal(zco.External))
+		pa.WriteFormat("%s (checked out)", zPaper)
 
 	case zettel_checked_out.StateJustCheckedOutButSame:
-		pa.WriteFormat("%s (already checked out)", p.ZettelExternal(zco.External))
+		pa.WriteFormat("%s (already checked out)", zPaper)
 
 	case zettel_checked_out.StateExistsAndSame:
-		pa.WriteFormat("%s (same)", p.ZettelExternal(zco.External))
+		pa.WriteFormat("%s (same)", zPaper)
 
 	case zettel_checked_out.StateExistsAndDifferent:
 		if !zco.External.ZettelFD.IsEmpty() {
-			pa.WriteFormat("%s (different)", p.ZettelExternal(zco.External))
+			pa.WriteFormat("%s (different)", zPaper)
 		} else if !zco.External.AkteFD.IsEmpty() {
-			pa.WriteFormat("%s (Akte different)", p.ZettelExternal(zco.External))
+			pa.WriteFormat("%s (Akte different)", zPaper)
 		} else {
 			pa.WriteString(fmt.Sprintf("Error! No Path or AktePath: %v", zco.External))
 		}
