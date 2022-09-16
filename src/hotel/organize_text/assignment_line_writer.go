@@ -109,7 +109,7 @@ func (av assignmentLineWriter) writeRightAligned(a *assignment) (err error) {
 	}
 
 	for _, z := range a.named.sorted() {
-		h := z.HinweisAligned(av.maxKopf, av.maxScwhanz)
+		h := z.Hinweis.Aligned(av.maxKopf, av.maxScwhanz)
 		av.WriteLines(fmt.Sprintf("- [%s] %s", h, z.Bezeichnung))
 	}
 

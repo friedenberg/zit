@@ -5,15 +5,37 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/friedenberg/zit/src/alfa/bezeichnung"
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/test_logz"
 	"github.com/friedenberg/zit/src/charlie/etikett"
+	"github.com/friedenberg/zit/src/charlie/hinweis"
 )
 
 func TestMain(m *testing.M) {
 	errors.SetTesting()
 	code := m.Run()
 	os.Exit(code)
+}
+
+func makeHinweis(t *testing.T, v string) (h hinweis.Hinweis) {
+	var err error
+
+	if err = h.Set(v); err != nil {
+		t.Fatalf("%s", err)
+	}
+
+	return
+}
+
+func makeBez(t *testing.T, v string) (b bezeichnung.Bezeichnung) {
+	var err error
+
+	if err = b.Set(v); err != nil {
+		t.Fatalf("%s", err)
+	}
+
+	return
 }
 
 func TestAssignmentLineReaderOneHeadingNoZettels(t *testing.T) {
@@ -48,8 +70,8 @@ func TestAssignmentLineReader2Heading2Zettels(t *testing.T) {
 	input :=
 		`# wow
 
-    - [one] uno
-    - [dos] two
+    - [one/wow] uno
+    - [dos/wow] two/wow
     `
 
 	sr := strings.NewReader(input)
@@ -77,13 +99,13 @@ func TestAssignmentLineReader2Heading2Zettels(t *testing.T) {
 	{
 		expected := makeZettelSet()
 		expected.Add(zettel{
-			Hinweis:     "one",
-			Bezeichnung: "uno",
+			Hinweis:     makeHinweis(t, "one/wow"),
+			Bezeichnung: makeBez(t, "uno"),
 		})
 
 		expected.Add(zettel{
-			Hinweis:     "dos",
-			Bezeichnung: "two",
+			Hinweis:     makeHinweis(t, "dos/wow"),
+			Bezeichnung: makeBez(t, "two/wow"),
 		})
 
 		actual := sub.root.children[0].named
@@ -100,8 +122,8 @@ func TestAssignmentLineReader1_1Heading2_2Zettels(t *testing.T) {
 
     ## sub-wow
 
-    - [one] uno
-    - [dos] two
+    - [one/wow] uno
+    - [dos/wow] two/wow
     `
 
 	sr := strings.NewReader(input)
@@ -149,13 +171,13 @@ func TestAssignmentLineReader1_1Heading2_2Zettels(t *testing.T) {
 	{
 		expected := makeZettelSet()
 		expected.Add(zettel{
-			Hinweis:     "one",
-			Bezeichnung: "uno",
+			Hinweis:     makeHinweis(t, "one/wow"),
+			Bezeichnung: makeBez(t, "uno"),
 		})
 
 		expected.Add(zettel{
-			Hinweis:     "dos",
-			Bezeichnung: "two",
+			Hinweis:     makeHinweis(t, "dos/wow"),
+			Bezeichnung: makeBez(t, "two/wow"),
 		})
 
 		actual := sub.root.children[0].children[0].named
@@ -170,18 +192,18 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 	input :=
 		`# wow
 
-    - [one] uno
-    - [dos] two
+    - [one/wow] uno
+    - [dos/wow] two/wow
 
     ## sub-wow
 
-    - [three] tres
-    - [four] quatro
+    - [three/wow] tres
+    - [four/wow] quatro
 
     # cow
 
-    - [one] uno
-    - [dos] two
+    - [one/wow] uno
+    - [dos/wow] two/wow
     `
 
 	sr := strings.NewReader(input)
@@ -233,13 +255,13 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 	{
 		expected := makeZettelSet()
 		expected.Add(zettel{
-			Hinweis:     "one",
-			Bezeichnung: "uno",
+			Hinweis:     makeHinweis(t, "one/wow"),
+			Bezeichnung: makeBez(t, "uno"),
 		})
 
 		expected.Add(zettel{
-			Hinweis:     "dos",
-			Bezeichnung: "two",
+			Hinweis:     makeHinweis(t, "dos/wow"),
+			Bezeichnung: makeBez(t, "two/wow"),
 		})
 
 		actual := sub.root.children[0].named
@@ -252,13 +274,13 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 	{
 		expected := makeZettelSet()
 		expected.Add(zettel{
-			Hinweis:     "one",
-			Bezeichnung: "uno",
+			Hinweis:     makeHinweis(t, "one/wow"),
+			Bezeichnung: makeBez(t, "uno"),
 		})
 
 		expected.Add(zettel{
-			Hinweis:     "dos",
-			Bezeichnung: "two",
+			Hinweis:     makeHinweis(t, "dos/wow"),
+			Bezeichnung: makeBez(t, "two/wow"),
 		})
 
 		actual := sub.root.children[1].named
@@ -272,16 +294,16 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 func TestAssignmentLineReaderBigCheese(t *testing.T) {
 	input :=
 		`# task
-    - [one] uno
-    - [two] dos
+    - [one/wow] uno
+    - [two/wow] dos/wow
     ## priority-1
     ### w-2022-07-09
-    - [three] tres
+    - [three/wow] tres
     ###
-    - [four] quatro
+    - [four/wow] quatro
     ## priority-2
-    - [five] cinco
-    - [six] seis
+    - [five/wow] cinco
+    - [six/wow] seis
     `
 
 	sr := strings.NewReader(input)
@@ -307,18 +329,18 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 		}
 	}
 
-	// - [one] uno
-	// - [two] dos
+	// - [one/wow] uno
+	// - [two/wow] dos/wow
 	{
 		expected := makeZettelSet()
 		expected.Add(zettel{
-			Hinweis:     "one",
-			Bezeichnung: "uno",
+			Hinweis:     makeHinweis(t, "one/wow"),
+			Bezeichnung: makeBez(t, "uno"),
 		})
 
 		expected.Add(zettel{
-			Hinweis:     "two",
-			Bezeichnung: "dos",
+			Hinweis:     makeHinweis(t, "two/wow"),
+			Bezeichnung: makeBez(t, "dos/wow"),
 		})
 
 		actual := sub.root.children[0].named
@@ -355,12 +377,12 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 		}
 	}
 
-	// - [three] tres
+	// - [three/wow] tres
 	{
 		expected := makeZettelSet()
 		expected.Add(zettel{
-			Hinweis:     "three",
-			Bezeichnung: "tres",
+			Hinweis:     makeHinweis(t, "three/wow"),
+			Bezeichnung: makeBez(t, "tres"),
 		})
 		actual := sub.root.children[0].children[0].children[0].named
 
@@ -370,12 +392,12 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 	}
 
 	// ##
-	// - [four] quatro
+	// - [four/wow] quatro
 	{
 		expected := makeZettelSet()
 		expected.Add(zettel{
-			Hinweis:     "four",
-			Bezeichnung: "quatro",
+			Hinweis:     makeHinweis(t, "four/wow"),
+			Bezeichnung: makeBez(t, "quatro"),
 		})
 		actual := sub.root.children[0].children[0].named
 
@@ -385,18 +407,18 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 	}
 
 	// ## priority-2
-	// - [five] cinco
-	// - [six] seis
+	// - [five/wow] cinco
+	// - [six/wow] seis
 	// `
 	{
 		expected := makeZettelSet()
 		expected.Add(zettel{
-			Hinweis:     "five",
-			Bezeichnung: "cinco",
+			Hinweis:     makeHinweis(t, "five/wow"),
+			Bezeichnung: makeBez(t, "cinco"),
 		})
 		expected.Add(zettel{
-			Hinweis:     "six",
-			Bezeichnung: "seis",
+			Hinweis:     makeHinweis(t, "six/wow"),
+			Bezeichnung: makeBez(t, "seis"),
 		})
 		actual := sub.root.children[0].children[1].named
 

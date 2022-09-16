@@ -12,7 +12,7 @@ func makeZettelZetFromSetNamed(set zettel_named.SetNamed) (zs zettelSet) {
 	zs = makeZettelSet()
 
 	for _, z := range set {
-		zs.Add(zettel{Hinweis: z.Hinweis.String(), Bezeichnung: z.Stored.Zettel.Bezeichnung.String()})
+		zs.Add(zettel{Hinweis: z.Hinweis, Bezeichnung: z.Stored.Zettel.Bezeichnung})
 	}
 
 	return
@@ -41,7 +41,7 @@ func (zs zettelSet) sorted() (sorted []zettel) {
 
 	sort.Slice(sorted, func(i, j int) bool {
 		if sorted[i].Bezeichnung == sorted[j].Bezeichnung {
-			return sorted[i].Hinweis < sorted[j].Hinweis
+			return sorted[i].Hinweis.Less(sorted[j].Hinweis)
 		} else {
 			return sorted[i].Bezeichnung < sorted[j].Bezeichnung
 		}

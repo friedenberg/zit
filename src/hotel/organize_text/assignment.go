@@ -2,7 +2,6 @@ package organize_text
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/etikett"
@@ -58,7 +57,7 @@ func (a assignment) AlignmentSpacing() int {
 
 func (a assignment) MaxKopfUndSchwanz() (kopf, schwanz int) {
 	for z, _ := range a.named {
-		parts := strings.Split(z.Hinweis, "/")
+		parts := [2]string{z.Hinweis.Kopf(), z.Hinweis.Schwanz()}
 		zKopf := len(parts[0])
 		zSchwanz := len(parts[1])
 

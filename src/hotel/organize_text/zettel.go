@@ -4,14 +4,15 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/friedenberg/zit/src/alfa/bezeichnung"
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 )
 
 type zettel struct {
-	Hinweis     string
-	Bezeichnung string
+	hinweis.Hinweis
+	bezeichnung.Bezeichnung
 }
 
 func makeZettel(named zettel_named.Zettel, ha hinweis.Abbr) (z zettel, err error) {
@@ -25,8 +26,8 @@ func makeZettel(named zettel_named.Zettel, ha hinweis.Abbr) (z zettel, err error
 	}
 
 	z = zettel{
-		Hinweis:     h.String(),
-		Bezeichnung: named.Stored.Zettel.Description(),
+		Hinweis:     h,
+		Bezeichnung: named.Stored.Zettel.Bezeichnung,
 	}
 
 	return
@@ -34,22 +35,6 @@ func makeZettel(named zettel_named.Zettel, ha hinweis.Abbr) (z zettel, err error
 
 func (z zettel) String() string {
 	return fmt.Sprintf("- [%s] %s", z.Hinweis, z.Bezeichnung)
-}
-
-func (z zettel) HinweisAligned(kopf, schwanz int) string {
-	parts := strings.Split(z.Hinweis, "/")
-
-	diffKopf := kopf - len(parts[0])
-	if diffKopf > 0 {
-		parts[0] = strings.Repeat(" ", diffKopf) + parts[0]
-	}
-
-	diffSchwanz := schwanz - len(parts[1])
-	if diffSchwanz > 0 {
-		parts[1] = parts[1] + strings.Repeat(" ", diffSchwanz)
-	}
-
-	return fmt.Sprintf("%s/%s", parts[0], parts[1])
 }
 
 func (z *zettel) Set(v string) (err error) {
@@ -74,7 +59,10 @@ func (z *zettel) Set(v string) (err error) {
 		return
 	}
 
-	z.Hinweis = strings.TrimSpace(remaining[:idx])
+	if err = z.Hinweis.Set(strings.TrimSpace(remaining[:idx])); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	//no bezeichnung
 	if idx+2 > len(remaining)-1 {
@@ -83,7 +71,10 @@ func (z *zettel) Set(v string) (err error) {
 
 	remaining = remaining[idx+2:]
 
-	z.Bezeichnung = remaining
+	if err = z.Bezeichnung.Set(remaining); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }

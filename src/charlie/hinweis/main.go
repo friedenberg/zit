@@ -18,7 +18,6 @@ func init() {
 
 type Hinweis struct {
 	inner
-	Bez string
 }
 
 type Provider interface {
@@ -76,15 +75,11 @@ func Make(v string) (h Hinweis, err error) {
 }
 
 func (h Hinweis) String() string {
-	if h.Bez == "" {
-		return h.inner.String()
-	} else {
-		return fmt.Sprintf("%s/%s", h.inner.String(), h.Bez)
-	}
+	return h.inner.String()
 }
 
 func (h Hinweis) Aligned(kopf, schwanz int) string {
-	parts := [2]string{h.Left, h.Right}
+	parts := h.Parts()
 
 	diffKopf := kopf - len(parts[0])
 	if diffKopf > 0 {
@@ -97,6 +92,14 @@ func (h Hinweis) Aligned(kopf, schwanz int) string {
 	}
 
 	return fmt.Sprintf("%s/%s", parts[0], parts[1])
+}
+
+func (h Hinweis) Parts() [2]string {
+	return [2]string{h.Kopf(), h.Schwanz()}
+}
+
+func (i Hinweis) Less(j Hinweis) bool {
+	return i.String() < j.String()
 }
 
 func (h *Hinweis) Set(v string) (err error) {
@@ -121,11 +124,6 @@ func (h *Hinweis) Set(v string) (err error) {
 	default:
 		err = errors.Normal(errors.Errorf("hinweis needs exactly 2 components, but got %d: %q", count, v))
 		return
-
-	case 3:
-		//Left/right/bez
-		h.Bez = parts[2]
-		fallthrough
 
 	case 2:
 		h.Left = parts[0]
