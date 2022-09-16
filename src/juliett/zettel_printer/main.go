@@ -1,6 +1,7 @@
 package zettel_printer
 
 import (
+	"io"
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -24,6 +25,8 @@ type printer struct {
 	standort.Standort
 	*os.File
 	*store_objekten.Store
+
+	printerSha io.WriterTo
 }
 
 func Make(s standort.Standort, k konfig.Konfig, f *os.File) (p *Printer) {

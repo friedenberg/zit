@@ -31,6 +31,19 @@ func Make(f *os.File, ctx *errors.Ctx) (pa *Paper) {
 	return
 }
 
+func (p *Paper) WriteTo(w io.Writer) (n int64, err error) {
+	return io.Copy(w, strings.NewReader(p.String()))
+}
+
+func (p *Paper) WriteFrom(ws ...io.WriterTo) {
+	for _, w := range ws {
+		if _, p.Err = w.WriteTo(p.Builder); !p.IsEmpty() {
+			p.Wrap()
+			return
+		}
+	}
+}
+
 func (p *Paper) WriteFormat(f string, vs ...interface{}) {
 	s := fmt.Sprintf(f, vs...)
 	p.WriteString(s)

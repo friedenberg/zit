@@ -83,6 +83,22 @@ func (h Hinweis) String() string {
 	}
 }
 
+func (h Hinweis) Aligned(kopf, schwanz int) string {
+	parts := [2]string{h.Left, h.Right}
+
+	diffKopf := kopf - len(parts[0])
+	if diffKopf > 0 {
+		parts[0] = strings.Repeat(" ", diffKopf) + parts[0]
+	}
+
+	diffSchwanz := schwanz - len(parts[1])
+	if diffSchwanz > 0 {
+		parts[1] = parts[1] + strings.Repeat(" ", diffSchwanz)
+	}
+
+	return fmt.Sprintf("%s/%s", parts[0], parts[1])
+}
+
 func (h *Hinweis) Set(v string) (err error) {
 	v = strings.ToLower(v)
 	v = strings.Map(

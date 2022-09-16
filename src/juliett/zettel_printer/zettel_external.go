@@ -32,7 +32,7 @@ func (p *Printer) ZettelExternal(ze zettel_external.Zettel) (pa *paper.Paper) {
 		path = pathRel
 	}
 
-	pa.WriteString(p.zettelBracketed(path, ref, bez))
+	pa.WriteString(p.zettelBracketed(stringWriterTo(path), stringWriterTo(ref), stringWriterTo(bez)))
 
 	return
 }
