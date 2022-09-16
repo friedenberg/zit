@@ -2,6 +2,76 @@ package etikett
 
 import "testing"
 
+func TestRemovePrefixes(t *testing.T) {
+	type testEntry struct {
+		ac     Set
+		ex     Set
+		prefix string
+	}
+
+	testEntries := map[string]testEntry{
+		"removes all": testEntry{
+			ac: MakeSet(
+				Etikett{Value: "project-2021-zit"},
+				Etikett{Value: "project-2021-zit-test"},
+				Etikett{Value: "project-2021-zit-ewwwwww"},
+				Etikett{Value: "project-archive-task-done"},
+			),
+			ex: MakeSet(
+			),
+			prefix: "project",
+		},
+		"removes non": testEntry{
+			ac: MakeSet(
+				Etikett{Value: "project-2021-zit"},
+				Etikett{Value: "project-2021-zit-test"},
+				Etikett{Value: "project-2021-zit-ewwwwww"},
+				Etikett{Value: "zz-archive-task-done"},
+			),
+			ex: MakeSet(
+				Etikett{Value: "project-2021-zit-test"},
+				Etikett{Value: "project-2021-zit-ewwwwww"},
+				Etikett{Value: "zz-archive-task-done"},
+			),
+			prefix: "xx",
+		},
+		"removes one": testEntry{
+			ac: MakeSet(
+				Etikett{Value: "project-2021-zit"},
+				Etikett{Value: "project-2021-zit-test"},
+				Etikett{Value: "project-2021-zit-ewwwwww"},
+				Etikett{Value: "zz-archive-task-done"},
+			),
+			ex: MakeSet(
+				Etikett{Value: "project-2021-zit-test"},
+				Etikett{Value: "project-2021-zit-ewwwwww"},
+			),
+			prefix: "zz",
+		},
+		"removes most": testEntry{
+			ac: MakeSet(
+				Etikett{Value: "project-2021-zit"},
+				Etikett{Value: "project-2021-zit-test"},
+				Etikett{Value: "project-2021-zit-ewwwwww"},
+				Etikett{Value: "zz-archive-task-done"},
+			),
+			ex: MakeSet(
+				Etikett{Value: "zz-archive-task-done"},
+			),
+			prefix: "project",
+		},
+	}
+
+	for d, te := range testEntries {
+		t.Run(
+			d,
+			func(t *testing.T) {
+				assertSetRemovesPrefixes(t, te.ac, te.ex, te.prefix)
+			},
+		)
+	}
+}
+
 func TestExpandedRight(t *testing.T) {
 	s := MakeSet(
 		Etikett{Value: "project-2021-zit"},

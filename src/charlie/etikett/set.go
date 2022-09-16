@@ -75,9 +75,12 @@ func (es Set) Remove(es1 ...Etikett) {
 	}
 }
 
-func (es Set) RemovePrefixes(e Etikett) {
-	prefixes := es.IntersectPrefixes(MakeSet(e))
-	es.Remove(prefixes.Etiketten()...)
+func (es Set) RemovePrefixes(needle Etikett) {
+	for haystack, _ := range es {
+		if strings.HasPrefix(haystack, needle.String()) {
+			delete(es, haystack)
+		}
+	}
 }
 
 func (a Set) Equals(b Set) bool {
