@@ -7,15 +7,19 @@ import (
 )
 
 type ProtoSet struct {
-	types map[reflect.Type]bool
+	types []protoId
 }
 
-func MakeProtoSet(types ...id.MutableId) (ps ProtoSet) {
-	ps.types = make(map[reflect.Type]bool, len(types))
+func MakeProtoSet(types ...ProtoId) (ps ProtoSet) {
+	ps.types = make([]protoId, len(types))
 
-	for _, t := range types {
-		idType := reflect.TypeOf(t) // this type of this variable is reflect.Type
-		ps.types[idType] = true
+	for i, t := range types {
+		pid := protoId{
+			ProtoId: t,
+			Type:    reflect.TypeOf(t.MutableId), // this type of this variable is reflect.Type
+		}
+
+		ps.types[i] = pid
 	}
 
 	return
@@ -32,14 +36,13 @@ func (ps ProtoSet) MakeMany(vs ...string) (ss []Set) {
 }
 
 func (ps ProtoSet) MakeOne(v string) (s Set) {
-	for t, _ := range ps.types {
-		idPointer := reflect.New(t.Elem())   // this type of this variable is reflect.Value.
-		idInterface := idPointer.Interface() // this type of this variable is interface{}
-		id2 := idInterface.(id.MutableId)
+	for _, t := range ps.types {
+		var i id.Id
+		var err error
 
-		if err := id2.Set(v); err == nil {
-			id := reflect.ValueOf(id2).Elem().Interface().(id.Id)
-			s.ids = append(s.ids, id)
+		if i, err = t.Make(v); err == nil {
+			s.ids = append(s.ids, i)
+			break
 		}
 	}
 

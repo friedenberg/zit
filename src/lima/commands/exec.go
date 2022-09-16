@@ -79,9 +79,18 @@ func (c Exec) getZettel(
 	err error,
 ) {
 	ps := id_set.MakeProtoSet(
-		&sha.Sha{},
-		&hinweis.Hinweis{},
-		&hinweis.HinweisWithIndex{},
+		id_set.ProtoId{
+			MutableId: &sha.Sha{},
+		},
+		id_set.ProtoId{
+			MutableId: &hinweis.Hinweis{},
+			Expand: func(v string) (out string, err error) {
+				var h hinweis.Hinweis
+				h, err = u.StoreObjekten().ExpandHinweisString(v)
+				out = h.String()
+				return
+			},
+		},
 	)
 
 	is := ps.MakeOne(hString)

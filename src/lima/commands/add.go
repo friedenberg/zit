@@ -110,7 +110,9 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	var ot2 *organize_text.Text
 
-	readOrganizeTextOp := user_ops.ReadOrganizeFile{}
+	readOrganizeTextOp := user_ops.ReadOrganizeFile{
+		Umwelt: u,
+	}
 
 	if ot2, ctx.Err = readOrganizeTextOp.RunWithFile(f.Name()); !ctx.IsEmpty() {
 		ctx.Wrap()

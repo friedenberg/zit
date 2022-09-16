@@ -19,10 +19,21 @@ type commandWithId struct {
 
 func (c commandWithId) Run(store *umwelt.Umwelt, args ...string) (err error) {
 	ps := id_set.MakeProtoSet(
-		&sha.Sha{},
-		&hinweis.Hinweis{},
-		&hinweis.HinweisWithIndex{},
-		&ts.Time{},
+		id_set.ProtoId{
+			MutableId: &sha.Sha{},
+		},
+		id_set.ProtoId{
+			MutableId: &hinweis.Hinweis{},
+			Expand: func(v string) (out string, err error) {
+				var h hinweis.Hinweis
+				h, err = store.StoreObjekten().ExpandHinweisString(v)
+				out = h.String()
+				return
+			},
+		},
+		id_set.ProtoId{
+			MutableId: &ts.Time{},
+		},
 	)
 
 	ids := ps.MakeMany(args...)
