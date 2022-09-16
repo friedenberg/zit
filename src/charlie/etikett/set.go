@@ -277,6 +277,23 @@ func (s Set) Any() (e Etikett) {
 	return e
 }
 
+func (es Set) Description() string {
+	sb := &strings.Builder{}
+	first := true
+
+	for _, e1 := range es.Sorted() {
+		if !first {
+			sb.WriteString(", ")
+		}
+
+		sb.WriteString(e1.String())
+
+		first = false
+	}
+
+	return sb.String()
+}
+
 func (es Set) MarshalJSON() ([]byte, error) {
 	return json.Marshal(es.SortedString())
 }

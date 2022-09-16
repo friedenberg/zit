@@ -20,20 +20,7 @@ func (z Zettel) Description() (d string) {
 	d = z.Bezeichnung.String()
 
 	if strings.TrimSpace(d) == "" {
-		sb := &strings.Builder{}
-		first := true
-
-		for _, e1 := range z.Etiketten.Sorted() {
-			if !first {
-				sb.WriteString(", ")
-			}
-
-			sb.WriteString(e1.String())
-
-			first = false
-		}
-
-		d = sb.String()
+		d = z.Etiketten.Description()
 	}
 
 	return

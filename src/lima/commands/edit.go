@@ -86,6 +86,11 @@ func (c Edit) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
+	if err = u.Initialize(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	var readResults []zettel_checked_out.Zettel
 
 	readOp := user_ops.ReadCheckedOut{

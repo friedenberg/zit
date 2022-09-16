@@ -33,6 +33,13 @@ func (c Revert) Run(store *umwelt.Umwelt, args ...string) (err error) {
 	case zk_types.TypeZettel:
 		hins := make([]hinweis.Hinweis, len(args))
 
+		if err = store.Lock(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		defer store.Unlock()
+
 		for i, arg := range args {
 			if hins[i], err = hinweis.Make(arg); err != nil {
 				err = errors.Wrap(err)

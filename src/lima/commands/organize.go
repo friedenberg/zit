@@ -180,6 +180,11 @@ func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			return
 		}
 
+		if err = u.Initialize(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 		if err = u.Lock(); err != nil {
 			err = errors.Wrap(err)
 			return

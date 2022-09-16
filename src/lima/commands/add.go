@@ -108,6 +108,11 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
+	if ctx.Err = u.Initialize(); !ctx.IsEmpty() {
+		ctx.Wrap()
+		return
+	}
+
 	var ot2 *organize_text.Text
 
 	readOrganizeTextOp := user_ops.ReadOrganizeFile{

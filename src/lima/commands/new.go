@@ -182,6 +182,11 @@ func (c New) editZettelsIfRequested(
 		return
 	}
 
+	if err = u.Initialize(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	readOp := user_ops.ReadCheckedOut{
 		Umwelt: u,
 		OptionsReadExternal: store_working_directory.OptionsReadExternal{

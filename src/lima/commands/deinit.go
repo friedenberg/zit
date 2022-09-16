@@ -9,6 +9,7 @@ import (
 )
 
 type Deinit struct {
+  Force bool
 }
 
 func init() {
@@ -23,6 +24,10 @@ func init() {
 }
 
 func (c Deinit) Run(u *umwelt.Umwelt, args ...string) (err error) {
+  if !c.Force {
+    return
+  }
+
 	base := path.Join(u.Standort().Dir(), ".zit")
 	err = os.RemoveAll(base)
 
