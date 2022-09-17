@@ -6,8 +6,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/zk_types"
-	"github.com/friedenberg/zit/src/charlie/id"
-	"github.com/friedenberg/zit/src/charlie/ts"
 	"github.com/friedenberg/zit/src/delta/id_set"
 	"github.com/friedenberg/zit/src/delta/transaktion"
 	"github.com/friedenberg/zit/src/delta/zettel"
@@ -30,12 +28,12 @@ func init() {
 
 			f.Var(&c.Type, "type", "ObjekteType")
 
-			return commandWithId{c}
+			return commandWithIds{c}
 		},
 	)
 }
 
-func (c Show) RunWithId(store *umwelt.Umwelt, ids ...id_set.Set) (err error) {
+func (c Show) RunWithIds(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 	switch c.Type {
 
 	case zk_types.TypeAkte:
@@ -53,22 +51,13 @@ func (c Show) RunWithId(store *umwelt.Umwelt, ids ...id_set.Set) (err error) {
 	}
 }
 
-func (c Show) showZettels(store *umwelt.Umwelt, ids []id_set.Set) (err error) {
-	zettels := make([]zettel_transacted.Zettel, len(ids))
+func (c Show) showZettels(store *umwelt.Umwelt, ids id_set.Set) (err error) {
+	zettels := make([]zettel_transacted.Zettel, ids.Len())
 
-	for i, is := range ids {
-		var idd id.Id
-		ok := false
-
-		if idd, ok = is.AnyShaOrHinweis(); !ok {
-			errors.PrintErrf("unsupported id: %s", is)
-			err = nil
-			continue
-		}
-
+	for i, is := range ids.AnyShasOrHinweisen() {
 		var tz zettel_transacted.Zettel
 
-		if tz, err = store.StoreObjekten().Read(idd); err != nil {
+		if tz, err = store.StoreObjekten().Read(is); err != nil {
 			if errors.Is(err, store_objekten.ErrNotFound{}) {
 				err = errors.Normal(err)
 			} else {
@@ -106,22 +95,13 @@ func (c Show) showZettels(store *umwelt.Umwelt, ids []id_set.Set) (err error) {
 	return
 }
 
-func (c Show) showAkten(store *umwelt.Umwelt, ids []id_set.Set) (err error) {
-	zettels := make([]zettel_transacted.Zettel, len(ids))
+func (c Show) showAkten(store *umwelt.Umwelt, ids id_set.Set) (err error) {
+	zettels := make([]zettel_transacted.Zettel, ids.Len())
 
-	for i, is := range ids {
-		var idd id.Id
-		ok := false
-
-		if idd, ok = is.AnyShaOrHinweis(); !ok {
-			errors.PrintErrf("unsupported id: %s", is)
-			err = nil
-			continue
-		}
-
+	for i, is := range ids.AnyShasOrHinweisen() {
 		var tz zettel_transacted.Zettel
 
-		if tz, err = store.StoreObjekten().Read(idd); err != nil {
+		if tz, err = store.StoreObjekten().Read(is); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -153,22 +133,11 @@ func (c Show) showAkten(store *umwelt.Umwelt, ids []id_set.Set) (err error) {
 	return
 }
 
-func (c Show) showTransaktions(store *umwelt.Umwelt, ids []id_set.Set) (err error) {
-	for _, is := range ids {
-		var idd id.Id
-		ok := false
-
-		if idd, ok = is.Any(&ts.Time{}); !ok {
-			errors.PrintErrf("unsupported id: %s", is)
-			err = nil
-			continue
-		}
-
-		tid := idd.(ts.Time)
-
+func (c Show) showTransaktions(store *umwelt.Umwelt, ids id_set.Set) (err error) {
+	for _, is := range ids.Timestamps() {
 		var t transaktion.Transaktion
 
-		if t, err = store.StoreObjekten().ReadTransaktion(tid); err != nil {
+		if t, err = store.StoreObjekten().ReadTransaktion(is); err != nil {
 			errors.PrintErrf("%s", err)
 			continue
 		}

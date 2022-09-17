@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/zk_types"
-	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/charlie/id"
 	"github.com/friedenberg/zit/src/delta/id_set"
 	"github.com/friedenberg/zit/src/delta/zettel"
@@ -30,19 +29,19 @@ func init() {
 
 			f.Var(&c.Type, "type", "ObjekteType")
 
-			return commandWithId{c}
+			return commandWithIds{c}
 		},
 	)
 }
 
-func (c CatObjekte) RunWithId(store *umwelt.Umwelt, ids ...id_set.Set) (err error) {
+func (c CatObjekte) RunWithIds(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 	switch c.Type {
 
 	case zk_types.TypeAkte:
-		return c.akten(store, ids...)
+		return c.akten(store, ids)
 
 	case zk_types.TypeZettel:
-		return c.zettelen(store, ids...)
+		return c.zettelen(store, ids)
 
 	default:
 		err = errors.Errorf("unsupported objekte type: %s", c.Type)
@@ -50,30 +49,39 @@ func (c CatObjekte) RunWithId(store *umwelt.Umwelt, ids ...id_set.Set) (err erro
 	}
 }
 
-func (c CatObjekte) akten(store *umwelt.Umwelt, ids ...id_set.Set) (err error) {
-	for _, is := range ids {
-		var sb sha.Sha
+func (c CatObjekte) akteShasFromIds(
+	u *umwelt.Umwelt,
+	ids id_set.Set,
+) (shas []sha.Sha, err error) {
+	shas = ids.Shas()
 
-		if shaId, ok := is.Any(&sha.Sha{}); ok {
-			sb = shaId.(sha.Sha)
-		} else if hinId, ok := is.Any(&hinweis.Hinweis{}); ok {
-			var zc zettel_checked_out.Zettel
+	for _, h := range ids.Hinweisen() {
+		var zc zettel_checked_out.Zettel
 
-			if zc, err = store.StoreWorkingDirectory().Read(hinId.String() + ".md"); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			if zc.State == zettel_checked_out.StateExistsAndDifferent {
-				sb = zc.External.Named.Stored.Zettel.Akte
-			} else {
-				sb = zc.Internal.Named.Stored.Zettel.Akte
-			}
-		} else {
-			err = errors.Errorf("unsupported id type: %q", is)
+		if zc, err = u.StoreWorkingDirectory().Read(h.String() + ".md"); err != nil {
+			err = errors.Wrap(err)
 			return
 		}
 
+		if zc.State == zettel_checked_out.StateExistsAndDifferent {
+			shas = append(shas, zc.External.Named.Stored.Zettel.Akte)
+		} else {
+			shas = append(shas, zc.Internal.Named.Stored.Zettel.Akte)
+		}
+	}
+
+	return
+}
+
+func (c CatObjekte) akten(store *umwelt.Umwelt, ids id_set.Set) (err error) {
+	var shas []sha.Sha
+
+	if shas, err = c.akteShasFromIds(store, ids); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	for _, sb := range shas {
 		func(sb sha.Sha) {
 			var r io.ReadCloser
 
@@ -96,7 +104,7 @@ func (c CatObjekte) akten(store *umwelt.Umwelt, ids ...id_set.Set) (err error) {
 
 func (c CatObjekte) zettelen(store *umwelt.Umwelt, ids ...id_set.Set) (err error) {
 	for _, is := range ids {
-		var i id.Id
+		var i id.IdMitKorper
 		ok := false
 
 		if i, ok = is.AnyShaOrHinweis(); !ok {

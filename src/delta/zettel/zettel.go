@@ -45,7 +45,7 @@ func (z Zettel) TypOrDefault() (t typ.Typ) {
 	t = z.Typ
 
 	if t.String() == "" {
-		t = typ.Typ{Value: "md"}
+		t = typ.Make("md")
 	}
 
 	return

@@ -139,7 +139,7 @@ func (c New) writeNewZettels(
 	z := zettel.Zettel{
 		Bezeichnung: c.Bezeichnung.Bezeichnung,
 		Etiketten:   c.Etiketten,
-		Typ:         typ.Typ{Value: "md"},
+		Typ:         typ.Make("md"),
 	}
 
 	if zsc, err = emptyOp.RunMany(z, c.Count); err != nil {

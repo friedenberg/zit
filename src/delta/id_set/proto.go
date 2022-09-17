@@ -25,24 +25,20 @@ func MakeProtoSet(types ...ProtoId) (ps ProtoSet) {
 	return
 }
 
-func (ps ProtoSet) MakeMany(vs ...string) (ss []Set) {
-	ss = make([]Set, len(vs))
-
-	for i, v := range vs {
-		ss[i] = ps.MakeOne(v)
+func (ps ProtoSet) Make(vs ...string) (s Set) {
+	s = Set{
+		ids: make([]id.Id, 0, len(vs)),
 	}
 
-	return
-}
+	for _, v := range vs {
+		for _, t := range ps.types {
+			var i id.Id
+			var err error
 
-func (ps ProtoSet) MakeOne(v string) (s Set) {
-	for _, t := range ps.types {
-		var i id.Id
-		var err error
-
-		if i, err = t.Make(v); err == nil {
-			s.ids = append(s.ids, i)
-			break
+			if i, err = t.Make(v); err == nil {
+				s.ids = append(s.ids, i)
+				break
+			}
 		}
 	}
 

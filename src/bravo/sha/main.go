@@ -1,9 +1,11 @@
 package sha
 
 import (
+	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
 	"hash"
+	"io"
 	"path"
 	"strings"
 
@@ -30,9 +32,20 @@ func MakeSha(v string) (s Sha, err error) {
 	return
 }
 
+func FromString(s string) Sha {
+	hash := sha256.New()
+	sr := strings.NewReader(s)
+
+	if _, err := io.Copy(hash, sr); err != nil {
+		errors.PanicIfError(err)
+	}
+
+	return FromHash(hash)
+}
+
 func FromHash(h hash.Hash) (s Sha) {
 	s = Sha{}
-	s.SetFromHash(h)
+	s.Value = fmt.Sprintf("%x", h.Sum(nil))
 
 	return
 }
@@ -59,10 +72,6 @@ func (s Sha) String() string {
 
 func (s Sha) Sha() Sha {
 	return s
-}
-
-func (s *Sha) SetFromHash(h hash.Hash) {
-	s.Value = fmt.Sprintf("%x", h.Sum(nil))
 }
 
 func (s *Sha) SetParts(a, b string) (err error) {

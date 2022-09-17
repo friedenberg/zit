@@ -13,10 +13,14 @@ import (
 )
 
 type Id interface {
-	Kopf() string
-	Schwanz() string
 	String() string
 	Sha() sha.Sha
+}
+
+type IdMitKorper interface {
+	Id
+	Kopf() string
+	Schwanz() string
 }
 
 type MutableId interface {
@@ -29,12 +33,12 @@ type TypedId interface {
 	Type() zk_types.Type
 }
 
-func Path(i Id, pc ...string) string {
+func Path(i IdMitKorper, pc ...string) string {
 	pc = append(pc, i.Kopf(), i.Schwanz())
 	return path.Join(pc...)
 }
 
-func MakeDirIfNecessary(i Id, pc ...string) (p string, err error) {
+func MakeDirIfNecessary(i IdMitKorper, pc ...string) (p string, err error) {
 	p = Path(i, pc...)
 	dir := path.Dir(p)
 

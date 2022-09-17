@@ -9,15 +9,15 @@ import (
 	"github.com/friedenberg/zit/src/kilo/umwelt"
 )
 
-type CommandWithId interface {
-	RunWithId(store *umwelt.Umwelt, ids ...id_set.Set) error
+type CommandWithIds interface {
+	RunWithIds(store *umwelt.Umwelt, ids id_set.Set) error
 }
 
-type commandWithId struct {
-	CommandWithId
+type commandWithIds struct {
+	CommandWithIds
 }
 
-func (c commandWithId) Run(store *umwelt.Umwelt, args ...string) (err error) {
+func (c commandWithIds) Run(store *umwelt.Umwelt, args ...string) (err error) {
 	ps := id_set.MakeProtoSet(
 		id_set.ProtoId{
 			MutableId: &sha.Sha{},
@@ -36,9 +36,9 @@ func (c commandWithId) Run(store *umwelt.Umwelt, args ...string) (err error) {
 		},
 	)
 
-	ids := ps.MakeMany(args...)
+	ids := ps.Make(args...)
 
-	if err = c.RunWithId(store, ids...); err != nil {
+	if err = c.RunWithIds(store, ids); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

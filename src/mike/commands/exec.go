@@ -93,9 +93,9 @@ func (c Exec) getZettel(
 		},
 	)
 
-	is := ps.MakeOne(hString)
+	is := ps.Make(hString)
 
-	var idd id.Id
+	var idd id.IdMitKorper
 	ok := false
 
 	if idd, ok = is.AnyShaOrHinweis(); !ok {
