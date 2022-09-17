@@ -14,10 +14,15 @@ type KonfigTag struct {
 	Hide            bool `toml:"hide"`
 }
 
+type EtikettRule struct {
+	GoldenChild EtikettRuleGoldenChild `toml:"golden-child"`
+}
+
 type KonfigTyp struct {
-	FormatScript ScriptConfig `toml:"format-script"`
-	InlineAkte   bool         `toml:"inline-akte" default:"true"`
-	ExecCommand  ScriptConfig `toml:"exec-command"`
+	FormatScript   ScriptConfig           `toml:"format-script"`
+	InlineAkte     bool                   `toml:"inline-akte" default:"true"`
+	ExecCommand    ScriptConfig           `toml:"exec-command"`
+	EtikettenRules map[string]EtikettRule `toml:"etiketten-rules"`
 }
 
 type Konfig struct {

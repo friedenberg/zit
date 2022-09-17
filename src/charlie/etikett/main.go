@@ -22,6 +22,10 @@ type Etikett struct {
 	Value string
 }
 
+func Make(v string) Etikett {
+  return Etikett{Value: v}
+}
+
 func (e Etikett) Sha() sha.Sha {
 	hash := sha256.New()
 	sr := strings.NewReader(e.String())
@@ -51,8 +55,16 @@ func (e *Etikett) Set(v string) (err error) {
 	return
 }
 
+func (a Etikett) Contains(b Etikett) bool {
+	return strings.HasPrefix(a.Value, b.Value)
+}
+
 func (a Etikett) Equals(b Etikett) bool {
 	return a.Value == b.Value
+}
+
+func (a Etikett) Less(b Etikett) bool {
+	return a.Value < b.Value
 }
 
 func (a Etikett) LeftSubtract(b Etikett) (c Etikett) {

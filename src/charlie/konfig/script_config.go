@@ -8,6 +8,10 @@ type ScriptConfig struct {
 }
 
 func (s ScriptConfig) Cmd(args ...string) (c *exec.Cmd, err error) {
+	if s.Script == "" {
+		return
+	}
+
 	shell := s.Shell
 
 	if len(shell) == 0 {
@@ -28,10 +32,7 @@ func (s ScriptConfig) Cmd(args ...string) (c *exec.Cmd, err error) {
 	}
 
 	all := append(shell, args...)
-
-	if s.Script != "" {
-		all = append(all, s.Script)
-	}
+	all = append(all, s.Script)
 
 	c = exec.Command(first, all...)
 

@@ -252,6 +252,20 @@ func (s1 Set) Intersect(s2 Set) (s3 Set) {
 	return
 }
 
+func (s1 Set) Withdraw(e Etikett) (s2 Set) {
+	s2 = MakeSet()
+
+	for _, e1 := range s1 {
+		if e1.Contains(e) {
+			s2.Add(e1)
+		}
+	}
+
+	s1.Remove(s2.Etiketten()...)
+
+	return
+}
+
 func (s1 Set) SubtractPrefix(e Etikett) (s2 Set) {
 	s2 = MakeSet()
 

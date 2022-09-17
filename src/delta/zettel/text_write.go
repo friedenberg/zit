@@ -129,7 +129,9 @@ func (f Text) writeToInlineAkte(c FormatContextWrite) (n int64, err error) {
 			err = errors.Wrap(err)
 			return
 		}
+	}
 
+	if cmd != nil {
 		cmd.Stdin = ar
 		cmd.Stderr = os.Stderr
 

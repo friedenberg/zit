@@ -262,6 +262,13 @@ func (s *Store) Create(in zettel.Zettel) (tz zettel_transacted.Zettel, err error
 		return
 	}
 
+	if typKonfig, ok := s.konfig.Typen[in.Typ.String()]; ok {
+		if err = in.ApplyTypKonfig(typKonfig); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
 	tz.Named.Stored.Zettel = in
 
 	if tz.Named.Stored.Sha, err = s.WriteZettelObjekte(tz.Named.Stored.Zettel); err != nil {
@@ -317,6 +324,13 @@ func (s *Store) CreateWithHinweis(
 		return
 	}
 
+	if typKonfig, ok := s.konfig.Typen[in.Typ.String()]; ok {
+		if err = in.ApplyTypKonfig(typKonfig); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
 	tz.Named.Stored.Zettel = in
 
 	if tz.Named.Stored.Sha, err = s.WriteZettelObjekte(tz.Named.Stored.Zettel); err != nil {
@@ -358,6 +372,13 @@ func (s *Store) Update(
 		}
 
 		return
+	}
+
+	if typKonfig, ok := s.konfig.Typen[z.Typ.String()]; ok {
+		if err = z.ApplyTypKonfig(typKonfig); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	var mutter zettel_transacted.Zettel
