@@ -128,6 +128,13 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		Umwelt: u,
 	}
 
+	if ctx.Err = u.Lock(); !ctx.IsEmpty() {
+		ctx.Wrap()
+		return
+	}
+
+	defer u.Unlock()
+
 	if _, ctx.Err = commitOrganizeTextOp.Run(createOrganizeFileResults, ot2); !ctx.IsEmpty() {
 		ctx.Wrap()
 		return
