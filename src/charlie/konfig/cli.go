@@ -21,6 +21,7 @@ type Cli struct {
 	PrintAbbreviatedHinweisen        bool
 	PrintAbbreviatedShas             bool
 	PrintNewShaSyntax                bool
+	PrintIncludeTypen                bool
 	PrintIncludeBezeichnungen        bool
 }
 
@@ -37,6 +38,7 @@ func (c *Cli) AddToFlags(f *flag.FlagSet) {
 	f.BoolVar(&c.PrintAbbreviatedShas, "abbreviate-shas", true, "")
 	f.BoolVar(&c.PrintAbbreviatedHinweisen, "abbreviate-hinweisen", true, "")
 	f.BoolVar(&c.PrintNewShaSyntax, "new-zettel-sha-syntax", true, "")
+	f.BoolVar(&c.PrintIncludeTypen, "print-typen", true, "")
 	f.BoolVar(&c.PrintIncludeBezeichnungen, "print-bezeichnungen", true, "")
 }
 

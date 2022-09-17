@@ -29,25 +29,30 @@ cat_yang() (
 	echo "tres"
 )
 
+cmd_zit_def=(
+	# -abbreviate-hinweisen=false
+	-predictable-hinweisen
+	-print-typen=false
+)
+
 cmd_zit_new=(
 	zit
 	new
-	-predictable-hinweisen
+	"${cmd_zit_def[@]}"
 )
 
 cmd_zit_organize=(
 	zit
 	organize
 	-right-align=false
-	-abbreviate-hinweisen=false
-	-predictable-hinweisen
 	-refine=true
+	"${cmd_zit_def[@]}"
 )
 
 cmd_zit_organize_v3=(
 	zit
 	organize
-	-predictable-hinweisen
+	"${cmd_zit_def[@]}"
 	-refine=true
 )
 
@@ -523,6 +528,7 @@ function commits_no_changes { # @test
 	} >"$one"
 
 	run "${cmd_zit_new[@]}" -edit=false "$one"
+	assert_output '[o/u@f "one/uno"] (created)'
 
 	two="$(mktemp)"
 	{
@@ -535,6 +541,7 @@ function commits_no_changes { # @test
 	} >"$two"
 
 	run "${cmd_zit_new[@]}" -edit=false "$two"
+	assert_output '[o/d@6 "two/dos"] (created)'
 
 	three="$(mktemp)"
 	{
@@ -547,27 +554,29 @@ function commits_no_changes { # @test
 	} >"$three"
 
 	run "${cmd_zit_new[@]}" -edit=false "$three"
+	assert_output '[t/u@1 "3"] (created)'
 
 	expected_organize="$(mktemp)"
 	{
+		echo
 		echo "# task"
 		echo
-		echo "## priority-1"
+		echo " ## priority-1"
 		echo
-		echo "### w-2022-07-06"
+		echo "  ### w-2022-07-06"
 		echo
-		echo "- [one/dos] two/dos"
-		echo "- [two/uno] 3"
+		echo "  - [t/u] 3"
+		echo "  - [o/d] two/dos"
 		echo
-		echo "### w-2022-07-07"
+		echo "  ### w-2022-07-07"
 		echo
-		echo "- [one/uno] one/uno"
+		echo "  - [o/u] one/uno"
 		echo
-		echo "###"
-		echo
-	} >>"$expected_organize"
+	} >"$expected_organize"
 
+	# run "${cmd_zit_organize[@]}" -prefix-joints=false -mode output-only -group-by priority,w task
 	run "${cmd_zit_organize[@]}" -mode commit-directly -group-by priority,w task <"$expected_organize"
+	# assert_output "$(cat "$expected_organize")"
 	assert_output "no changes"
 
 	run zit show one/uno
@@ -740,7 +749,7 @@ function etiketten_correct { # @test
 		echo "---"
 	} >"one/uno.md"
 
-	run zit checkin one/uno.md
+	run zit checkin "${cmd_zit_def[@]}" one/uno.md
 	assert_output '[o/u@4 "test4"] (updated)'
 
 	expected_etiketten="$(mktemp)"
@@ -759,7 +768,7 @@ function etiketten_correct { # @test
 		echo "---"
 	} >"one/uno.md"
 
-	run zit checkin one/uno.md
+	run zit checkin "${cmd_zit_def[@]}" one/uno.md
 	assert_output '[o/u@7 "test1-ok, test4"] (updated)'
 
 	expected_etiketten="$(mktemp)"

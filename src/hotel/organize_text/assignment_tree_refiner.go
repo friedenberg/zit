@@ -149,10 +149,6 @@ func (atc *AssignmentTreeRefiner) Refine(a *assignment) (err error) {
 		return a.children[i].etiketten.String() < a.children[j].etiketten.String()
 	})
 
-	errors.Print(a)
-	errors.Print(a.children)
-	errors.Print(a.named)
-
 	return
 }
 

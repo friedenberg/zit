@@ -5,41 +5,100 @@ import (
 	"strings"
 )
 
-type stringWriterTo string
-
-func (s stringWriterTo) WriteTo(w io.Writer) (n int64, err error) {
-	var n1 int
-	n1, err = io.WriteString(w, string(s))
-	n = int64(n1)
-	return
+type Zettelish struct {
+	zettelish
 }
 
-func (zp Printer) zettelBracketed(id, rev, bez io.WriterTo) string {
+type zettelish struct {
+	newZettelShaSyntax   bool
+	includeBezeichnungen bool
+	includeTyp           bool
+	Id, Rev, Typ, Bez    io.WriterTo
+}
+
+func (zp *Printer) MakeZettelish() Zettelish {
+	return Zettelish{
+		zettelish{
+			includeTyp:           zp.includeTyp,
+			newZettelShaSyntax:   zp.newZettelShaSyntax,
+			includeBezeichnungen: zp.includeBezeichnungen,
+		},
+	}
+}
+
+func (zi Zettelish) IdString(v string) Zettelish {
+	zi.zettelish.Id = stringWriterTo(v)
+	return zi
+}
+
+func (zi Zettelish) Id(v io.WriterTo) Zettelish {
+	zi.zettelish.Id = v
+	return zi
+}
+
+func (zi Zettelish) RevString(v string) Zettelish {
+	zi.zettelish.Rev = stringWriterTo(v)
+	return zi
+}
+
+func (zi Zettelish) Rev(v io.WriterTo) Zettelish {
+	zi.zettelish.Rev = v
+	return zi
+}
+
+func (zi Zettelish) TypString(v string) Zettelish {
+	zi.zettelish.Typ = stringWriterTo(v)
+	return zi
+}
+
+func (zi Zettelish) Typ(v io.WriterTo) Zettelish {
+	zi.zettelish.Typ = v
+	return zi
+}
+
+func (zi Zettelish) BezString(v string) Zettelish {
+	zi.zettelish.Bez = stringWriterTo(v)
+	return zi
+}
+
+func (zi Zettelish) Bez(v io.WriterTo) Zettelish {
+	zi.zettelish.Bez = v
+	return zi
+}
+
+func (zi zettelish) String() string {
 	sb := &strings.Builder{}
 
 	sb.WriteString("[")
 
-	if _, zp.Err = id.WriteTo(sb); !zp.IsEmpty() {
-		zp.Wrap()
-		return ""
+	var err error
+
+	if _, err = zi.Id.WriteTo(sb); err != nil {
+		return err.Error()
 	}
 
-	if zp.newZettelShaSyntax {
+	if zi.newZettelShaSyntax && zi.Rev != nil {
 		sb.WriteString("@")
 
-		if _, zp.Err = rev.WriteTo(sb); !zp.IsEmpty() {
-			zp.Wrap()
-			return ""
+		if _, err = zi.Rev.WriteTo(sb); err != nil {
+			return err.Error()
 		}
 	}
 
-	if zp.includeBezeichnungen {
+	if zi.includeTyp && zi.Typ != nil {
+		sb.WriteString(" !")
+
+		if _, err = zi.Typ.WriteTo(sb); err != nil {
+			return err.Error()
+		}
+	}
+
+	if zi.includeBezeichnungen && zi.Bez != nil {
 		//TODO use bez descriptors instead
 		sb.WriteString(" ")
 
-		if _, zp.Err = bez.WriteTo(sb); !zp.IsEmpty() {
-			zp.Wrap()
-			return ""
+		if _, err = zi.Bez.WriteTo(sb); err != nil {
+			return err.Error()
 		}
 	}
 

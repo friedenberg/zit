@@ -8,13 +8,13 @@ import (
 func (p *Printer) ZettelNamed(zn zettel_named.Zettel) (pa *paper.Paper) {
 	pa = p.MakePaper()
 
-	pa.WriteString(
-		p.zettelBracketed(
-			p.Hinweis(zn.Hinweis),
-			p.Sha(zn.Stored.Sha),
-			p.Bezeichnung(zn.Stored.Zettel),
-		),
-	)
+	zi := p.MakeZettelish().
+		Id(p.Hinweis(zn.Hinweis)).
+		Rev(p.Sha(zn.Stored.Sha)).
+		TypString(zn.Stored.Zettel.Typ.String()).
+		Bez(p.Bezeichnung(zn.Stored.Zettel))
+
+	pa.WriteString(zi.String())
 
 	return
 }

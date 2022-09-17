@@ -15,6 +15,7 @@ type Printer struct {
 	abbreviateHinweisen  bool
 	abbreviateShas       bool
 	newZettelShaSyntax   bool
+	includeTyp           bool
 	includeBezeichnungen bool
 
 	printer
@@ -34,6 +35,7 @@ func Make(s standort.Standort, k konfig.Konfig, f *os.File) (p *Printer) {
 		abbreviateHinweisen:  k.PrintAbbreviatedHinweisen,
 		abbreviateShas:       k.PrintAbbreviatedShas,
 		newZettelShaSyntax:   k.PrintNewShaSyntax,
+		includeTyp:           k.PrintIncludeTypen,
 		includeBezeichnungen: k.PrintIncludeBezeichnungen,
 		printer: printer{
 			Standort: s,

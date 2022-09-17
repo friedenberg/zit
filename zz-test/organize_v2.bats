@@ -32,6 +32,7 @@ cat_yang() (
 cmd_zit_def=(
 	-abbreviate-hinweisen=false
 	-predictable-hinweisen
+	-print-typen=false
 )
 
 cmd_zit_new=(

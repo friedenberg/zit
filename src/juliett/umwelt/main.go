@@ -87,10 +87,14 @@ func (u *Umwelt) Initialize() (err error) {
 		CacheEnabled: u.konfig.CheckoutCacheEnabled,
 	}
 
-
 	errors.Print("initing checkout store")
+	u.storeWorkingDirectory, err = store_working_directory.New(
+		csk,
+		u.standort.Cwd(),
+		u.storeObjekten,
+	)
 
-	if u.storeWorkingDirectory, err = store_working_directory.New(csk, u.standort.Cwd(), u.storeObjekten); err != nil {
+	if err != nil {
 		errors.Print(err)
 		err = errors.Wrap(err)
 		return
