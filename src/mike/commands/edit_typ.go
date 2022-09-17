@@ -4,7 +4,7 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/typ"
+	"github.com/friedenberg/zit/src/charlie/typ"
 	"github.com/friedenberg/zit/src/kilo/umwelt"
 )
 
