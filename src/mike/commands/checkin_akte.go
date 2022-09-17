@@ -125,8 +125,6 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			err = errors.Wrap(err)
 			return
 		}
-
-		errors.PrintOutf("%s (akte updated)", z.Named)
 	}
 
 	return
