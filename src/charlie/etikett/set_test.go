@@ -17,8 +17,7 @@ func TestRemovePrefixes(t *testing.T) {
 				Etikett{Value: "project-2021-zit-ewwwwww"},
 				Etikett{Value: "project-archive-task-done"},
 			),
-			ex: MakeSet(
-			),
+			ex:     MakeSet(),
 			prefix: "project",
 		},
 		"removes non": testEntry{
