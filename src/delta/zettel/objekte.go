@@ -11,7 +11,9 @@ import (
 	"github.com/friedenberg/zit/src/charlie/etikett"
 )
 
-type Objekte struct{}
+type Objekte struct {
+	IgnoreTypErrors bool
+}
 
 func (f Objekte) WriteTo(z Zettel, out1 io.Writer) (n int64, err error) {
 	w := line_format.NewWriter()
@@ -91,9 +93,13 @@ func (f *Objekte) ReadFrom(z *Zettel, in io.Reader) (n int64, err error) {
 				return
 			}
 
-			if err = z.Typ.Set(v); err != nil {
-				err = errors.Wrap(err)
-				return
+			if f.IgnoreTypErrors {
+				z.Typ.Etikett.Value = v
+			} else {
+				if err = z.Typ.Set(v); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
 			}
 
 		case 2:

@@ -117,7 +117,9 @@ func (s Store) storedZettelFromSha(sh sha.Sha) (sz zettel_stored.Stored, err err
 
 	defer or.Close()
 
-	f := zettel.Objekte{}
+	f := zettel.Objekte{
+		IgnoreTypErrors: true,
+	}
 
 	if _, err = f.ReadFrom(&sz.Zettel, or); err != nil {
 		err = errors.Wrap(err)
