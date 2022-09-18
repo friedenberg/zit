@@ -42,7 +42,15 @@ func (c ReadOrganizeFile) Run() (ot *organize_text.Text, err error) {
 		return
 	}
 
-	_, err = ot.ReadFrom(c.Reader)
+	if _, err = ot.ReadFrom(c.Reader); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = ot.Refine(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }

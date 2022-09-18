@@ -19,15 +19,20 @@ type (
 	StackInfo = errors.StackInfo
 )
 
-func Errorf(t *testing.T, format string, args ...interface{}) {
-	si, _ := MakeStackInfo(1)
+type T struct {
+	*testing.T
+	Skip int
+}
+
+func Errorf(t T, format string, args ...interface{}) {
+	si, _ := MakeStackInfo(t.Skip + 1)
 	args = append([]interface{}{si}, args...)
 	os.Stderr.WriteString(fmt.Sprintf("%s"+format+"\n", args...))
 	t.Fail()
 }
 
-func Fatalf(t *testing.T, format string, args ...interface{}) {
-	si, _ := MakeStackInfo(1)
+func Fatalf(t T, format string, args ...interface{}) {
+	si, _ := MakeStackInfo(t.Skip + 1)
 	args = append([]interface{}{si}, args...)
 	os.Stderr.WriteString(fmt.Sprintf("%s"+format+"\n", args...))
 	t.FailNow()

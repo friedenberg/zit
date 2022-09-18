@@ -23,7 +23,7 @@ type Etikett struct {
 }
 
 func Make(v string) Etikett {
-  return Etikett{Value: v}
+	return Etikett{Value: v}
 }
 
 func (e Etikett) Sha() sha.Sha {
@@ -55,7 +55,15 @@ func (e *Etikett) Set(v string) (err error) {
 	return
 }
 
+func (e Etikett) Len() int {
+	return len(e.Value)
+}
+
 func (a Etikett) Contains(b Etikett) bool {
+	if b.Len() > a.Len() {
+		return false
+	}
+
 	return strings.HasPrefix(a.Value, b.Value)
 }
 
@@ -85,8 +93,8 @@ func (a Etikett) HasParentPrefix(b Etikett) (has bool) {
 	return
 }
 
-func (e Etikett) Expanded(exes ...Expander) (expanded *Set) {
-	expanded = NewSet()
+func (e Etikett) Expanded(exes ...Expander) (expanded Set) {
+	expanded = MakeSet()
 
 	if len(exes) == 0 {
 		exes = []Expander{ExpanderAll{}}

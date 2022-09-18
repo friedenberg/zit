@@ -122,7 +122,10 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 		}
 	}
 
-	for bez, etts := range cs.New {
+	for _, n := range cs.New {
+    bez := n.Key
+    etts := n.Etiketten
+
 		z := zettel.Zettel{
 			Etiketten: etts,
 		}

@@ -1,6 +1,8 @@
 package changes
 
 import (
+	"sort"
+
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/hotel/organize_text"
@@ -10,13 +12,25 @@ type Change struct {
 	Etikett, Key string
 }
 
+type New struct {
+	Key       string
+	Etiketten etikett.Set
+}
+
 type Changes struct {
+	Added   []Change
+	Removed []Change
+	New     []New
+}
+
+type changes struct {
 	Added   []Change
 	Removed []Change
 	New     map[string]etikett.Set
 }
 
-func ChangesFrom(a1, b1 *organize_text.Text) (c Changes, err error) {
+func ChangesFrom(a1, b1 *organize_text.Text) (c1 Changes, err error) {
+	var c changes
 	var a, b organize_text.CompareMap
 
 	if a, err = a1.ToCompareMap(); err != nil {
@@ -29,42 +43,45 @@ func ChangesFrom(a1, b1 *organize_text.Text) (c Changes, err error) {
 		return
 	}
 
-	errors.PrintDebug(a)
-	errors.PrintDebug(b)
-
 	c.Added = make([]Change, 0)
 	c.Removed = make([]Change, 0)
 
-	for tuple, _ := range b.Named {
-		if _, ok := a.Named[tuple]; ok {
-			//zettel had etikett previously
-		} else {
-			//zettel did not have etikett previously
-			c.Added = append(
-				c.Added,
+	for h, es1 := range b.Named {
+		for _, e1 := range es1 {
+			if a.Named.Contains(h, e1) {
+				//zettel had etikett previously
+			} else {
+				c.Added = append(
+					c.Added,
+					Change{
+						Etikett: e1.String(),
+						Key:     h,
+					},
+				)
+			}
+
+			if es2, ok := a.Named[h]; ok {
+				es2.Remove(e1)
+				a.Named[h] = es2
+			}
+		}
+	}
+
+	for h, es := range a.Named {
+		for _, e1 := range es {
+			if e1.String() == "" {
+				err = errors.Errorf("empty etikett for %s", h)
+				return
+			}
+
+			c.Removed = append(
+				c.Removed,
 				Change{
-					Etikett: tuple.Etikett,
-					Key:     tuple.Key,
+					Etikett: e1.String(),
+					Key:     h,
 				},
 			)
 		}
-
-		delete(a.Named, tuple)
-	}
-
-	for tuple, _ := range a.Named {
-		if tuple.Etikett == "" {
-			err = errors.Errorf("empty etikett for %s", tuple.Key)
-			return
-		}
-
-		c.Removed = append(
-			c.Removed,
-			Change{
-				Etikett: tuple.Etikett,
-				Key:     tuple.Key,
-			},
-		)
 	}
 
 	c.New = make(map[string]etikett.Set)
@@ -80,9 +97,40 @@ func ChangesFrom(a1, b1 *organize_text.Text) (c Changes, err error) {
 		c.New[bez] = existing
 	}
 
-	for tuple, _ := range b.Unnamed {
-		addNew(tuple.Key, tuple.Etikett)
+	for h, es := range b.Unnamed {
+		for _, e := range es {
+			addNew(h, e.String())
+		}
 	}
+
+	c1 = c.toChanges()
+
+	return
+}
+
+func (c changes) toChanges() (c1 Changes) {
+	c1.Added = c.Added
+	c1.Removed = c.Removed
+	c1.New = make([]New, 0, len(c1.New))
+
+	for h, e := range c.New {
+		c1.New = append(c1.New, New{Key: h, Etiketten: e})
+	}
+
+	sort.Slice(
+		c1.Added,
+		func(i, j int) bool { return c1.Added[i].Key < c1.Added[j].Key },
+	)
+
+	sort.Slice(
+		c1.Removed,
+		func(i, j int) bool { return c1.Removed[i].Key < c1.Removed[j].Key },
+	)
+
+	sort.Slice(
+		c1.New,
+		func(i, j int) bool { return c1.New[i].Key < c1.New[j].Key },
+	)
 
 	return
 }

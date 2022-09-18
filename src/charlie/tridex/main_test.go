@@ -31,7 +31,10 @@ func TestContains(t *testing.T) {
 
 	for _, e := range expectedContains {
 		if !sut.Contains(e) {
-			test_logz.Errorf(t, "expected %v to contain %s", sut, e)
+			test_logz.Errorf(
+				test_logz.T{T: t},
+				"expected %v to contain %s", sut, e,
+			)
 		}
 	}
 
@@ -53,7 +56,7 @@ func TestContains(t *testing.T) {
 
 	for _, e := range expectedNotContains {
 		if sut.Contains(e) {
-			test_logz.Errorf(t, "expected %v to not contain %s", sut, e)
+			test_logz.Errorf(test_logz.T{T: t}, "expected %v to not contain %s", sut, e)
 		}
 	}
 }
@@ -69,7 +72,7 @@ func TestAbbreviateOrphan(t *testing.T) {
 
 	for e, c := range expectedContains {
 		if ca := sut.Abbreviate(e); ca != c {
-			test_logz.Errorf(t, "%q: expected shorted length %q but got %q", e, c, ca)
+			test_logz.Errorf(test_logz.T{T: t}, "%q: expected shorted length %q but got %q", e, c, ca)
 		}
 	}
 }
@@ -88,7 +91,7 @@ func TestAbbreviateDegenerate(t *testing.T) {
 	for e, c := range expectedContains {
 		if ca := sut.Abbreviate(e); ca != c {
 			test_logz.Printf("%#v", sut)
-			test_logz.Errorf(t, "%q: expected shorted length %q but got %q", e, c, ca)
+			test_logz.Errorf(test_logz.T{T: t}, "%q: expected shorted length %q but got %q", e, c, ca)
 		}
 	}
 }
@@ -107,7 +110,7 @@ func TestExpandDegenerate(t *testing.T) {
 	for e, c := range expectedContains {
 		if ca := sut.Expand(e); ca != c {
 			test_logz.Printf("%#v", sut)
-			test_logz.Errorf(t, "%q: expected expanded %q but got %q", e, c, ca)
+			test_logz.Errorf(test_logz.T{T: t}, "%q: expected expanded %q but got %q", e, c, ca)
 		}
 	}
 }
@@ -140,7 +143,7 @@ func TestAbbreviate(t *testing.T) {
 	for e, c := range expectedContains {
 		if ca := sut.Abbreviate(e); ca != c {
 			test_logz.Print(t, "%#v", sut)
-			test_logz.Errorf(t, "%q: expected shorted length %q but got %q", e, c, ca)
+			test_logz.Errorf(test_logz.T{T: t}, "%q: expected shorted length %q but got %q", e, c, ca)
 		}
 	}
 }
@@ -157,7 +160,7 @@ func TestExpandOrphan(t *testing.T) {
 
 	for a, e := range expectedContains {
 		if ca := sut.Expand(a); ca != e {
-			test_logz.Errorf(t, "%q: expected expanded %q but got %q", e, e, ca)
+			test_logz.Errorf(test_logz.T{T: t}, "%q: expected expanded %q but got %q", e, e, ca)
 		}
 	}
 }
@@ -182,7 +185,7 @@ func TestExpand(t *testing.T) {
 
 	for a, e := range expectedContains {
 		if ca := sut.Expand(a); ca != e {
-			test_logz.Errorf(t, "%q: expected expanded %q but got %q", e, e, ca)
+			test_logz.Errorf(test_logz.T{T: t}, "%q: expected expanded %q but got %q", e, e, ca)
 		}
 	}
 }

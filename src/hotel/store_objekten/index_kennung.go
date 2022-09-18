@@ -203,7 +203,17 @@ func (i *indexKennung) createHinweis() (h hinweis.Hinweis, err error) {
 	}
 
 	rand.Seed(time.Now().UnixNano())
-	ri := rand.Intn(len(i.AvailableKennung) - 1)
+
+	if len(i.AvailableKennung) == 0 {
+		err = errors.Wrap(hinweisen.ErrHinweisenExhausted{})
+		return
+	}
+
+	ri := 0
+
+	if len(i.AvailableKennung) > 1 {
+		ri = rand.Intn(len(i.AvailableKennung) - 1)
+	}
 
 	m := 0
 	j := 0

@@ -44,10 +44,26 @@ func (es Set) AddString(v string) (err error) {
 	return
 }
 
-func (es Set) Add(e Etikett) {
+func (es Set) AddNormalized(e Etikett) {
 	expanded := e.Expanded(ExpanderRight{})
-	intersection := es.Intersect(*expanded)
-	es.Remove(intersection.Etiketten()...)
+	i := MakeSet(e)
+
+	for _, e := range expanded {
+		if es.Contains(e) {
+			es.Remove(e)
+			i.Add(e)
+		}
+	}
+
+	for _, e1 := range i.WithRemovedCommonPrefixes() {
+		es.Add(e1)
+	}
+}
+
+func (es Set) Add(e Etikett) {
+	// expanded := e.Expanded(ExpanderRight{})
+	// intersection := es.Intersect(*expanded)
+	// es.Remove(intersection.Etiketten()...)
 
 	es.addOnlyExact(e)
 }
@@ -65,6 +81,36 @@ func (s *Set) Set(v string) (err error) {
 			return
 		}
 	}
+
+	return
+}
+
+func (s Set) WithRemovedCommonPrefixes() (s2 Set) {
+	es1 := s.Sorted()
+	es := make([]Etikett, 0, len(es1))
+
+	for _, e := range es1 {
+		if len(es) == 0 {
+			es = append(es, e)
+			continue
+		}
+
+		idxLast := len(es) - 1
+		last := es[idxLast]
+
+		switch {
+		case last.Contains(e):
+			continue
+
+		case e.Contains(last):
+			es[idxLast] = e
+
+		default:
+			es = append(es, e)
+		}
+	}
+
+	s2 = MakeSet(es...)
 
 	return
 }
@@ -117,7 +163,7 @@ func (s Set) Expanded(exes ...Expander) (s1 Set) {
 	s1 = MakeSet()
 
 	for _, e := range s {
-		for _, e1 := range *e.Expanded(exes...) {
+		for _, e1 := range e.Expanded(exes...) {
 			s1.addOnlyExact(e1)
 		}
 	}

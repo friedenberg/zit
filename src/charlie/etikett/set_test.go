@@ -1,6 +1,64 @@
 package etikett
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/friedenberg/zit/src/bravo/test_logz"
+)
+
+func TestNormalize(t *testing.T) {
+	type testEntry struct {
+		ac Set
+		ex Set
+	}
+
+	testEntries := map[string]testEntry{
+		"removes all": testEntry{
+			ac: MakeSet(
+				Etikett{Value: "project-2021-zit"},
+				Etikett{Value: "project-2021-zit-test"},
+				Etikett{Value: "project-2021-zit-ewwwwww"},
+				Etikett{Value: "project-archive-task-done"},
+			),
+			ex: MakeSet(
+				Etikett{Value: "project-2021-zit-test"},
+				Etikett{Value: "project-2021-zit-ewwwwww"},
+				Etikett{Value: "project-archive-task-done"},
+			),
+		},
+		"removes non": testEntry{
+			ac: MakeSet(
+				Etikett{Value: "project-2021-zit"},
+				Etikett{Value: "project-2021-zit-test"},
+				Etikett{Value: "project-2021-zit-ewwwwww"},
+				Etikett{Value: "zz-archive-task-done"},
+			),
+			ex: MakeSet(
+				Etikett{Value: "project-2021-zit-test"},
+				Etikett{Value: "project-2021-zit-ewwwwww"},
+				Etikett{Value: "zz-archive-task-done"},
+			),
+		},
+	}
+
+	for d, te := range testEntries {
+		t.Run(
+			d,
+			func(t *testing.T) {
+				ac := te.ac.WithRemovedCommonPrefixes()
+
+				if !ac.Equals(te.ex) {
+					test_logz.Errorf(
+						test_logz.T{T: t},
+						"removing prefixes doesn't match:\nexpected: %q\n  actual: %q",
+						te.ex,
+						ac,
+					)
+				}
+			},
+		)
+	}
+}
 
 func TestRemovePrefixes(t *testing.T) {
 	type testEntry struct {
@@ -28,6 +86,7 @@ func TestRemovePrefixes(t *testing.T) {
 				Etikett{Value: "zz-archive-task-done"},
 			),
 			ex: MakeSet(
+				Etikett{Value: "project-2021-zit"},
 				Etikett{Value: "project-2021-zit-test"},
 				Etikett{Value: "project-2021-zit-ewwwwww"},
 				Etikett{Value: "zz-archive-task-done"},
@@ -42,6 +101,7 @@ func TestRemovePrefixes(t *testing.T) {
 				Etikett{Value: "zz-archive-task-done"},
 			),
 			ex: MakeSet(
+				Etikett{Value: "project-2021-zit"},
 				Etikett{Value: "project-2021-zit-test"},
 				Etikett{Value: "project-2021-zit-ewwwwww"},
 			),

@@ -259,11 +259,9 @@ func (s *Store) Create(in zettel.Zettel) (tz zettel_transacted.Zettel, err error
 		return
 	}
 
-	if typKonfig, ok := s.konfig.Typen[in.Typ.String()]; ok {
-		if err = in.ApplyTypKonfig(typKonfig); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if err = in.ApplyKonfig(s.konfig); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	tz.Named.Stored.Zettel = in
@@ -321,11 +319,9 @@ func (s *Store) CreateWithHinweis(
 		return
 	}
 
-	if typKonfig, ok := s.konfig.Typen[in.Typ.String()]; ok {
-		if err = in.ApplyTypKonfig(typKonfig); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if err = in.ApplyKonfig(s.konfig); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	tz.Named.Stored.Zettel = in
@@ -371,11 +367,9 @@ func (s *Store) Update(
 		return
 	}
 
-	if typKonfig, ok := s.konfig.Typen[z.Typ.String()]; ok {
-		if err = z.ApplyTypKonfig(typKonfig); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if err = z.ApplyKonfig(s.konfig); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	var mutter zettel_transacted.Zettel

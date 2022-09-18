@@ -1,36 +1,60 @@
 package organize_text
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 )
 
-type TupleEtikettKey struct {
-	Etikett, Key string
-}
+type SetKeyToEtiketten map[string]etikett.Set
 
-type SetEtikettenKeys map[TupleEtikettKey]bool
+func (m SetKeyToEtiketten) String() string {
+	sb := &strings.Builder{}
 
-func (m SetEtikettenKeys) Add(e, k string) {
-	t := TupleEtikettKey{
-		Etikett: e,
-		Key:     k,
+	for h, es := range m {
+		sb.WriteString(fmt.Sprintf("%s: %s\n", h, es))
 	}
 
-	m[t] = true
+	return sb.String()
+}
+
+func (m SetKeyToEtiketten) Add(h string, e etikett.Etikett) {
+	var es etikett.Set
+	ok := false
+
+	if es, ok = m[h]; !ok {
+		es = etikett.MakeSet()
+	}
+
+	es.AddNormalized(e)
+	m[h] = es
+}
+
+func (m SetKeyToEtiketten) Contains(h string, e etikett.Etikett) (ok bool) {
+	var es etikett.Set
+
+	if es, ok = m[h]; !ok {
+		return
+	}
+
+	ok = es.Contains(e)
+
+	return
 }
 
 type CompareMap struct {
 	// etikett to hinweis
-	Named SetEtikettenKeys
+	Named SetKeyToEtiketten
 	// etikett to bezeichnung
-	Unnamed SetEtikettenKeys
+	Unnamed SetKeyToEtiketten
 }
 
 func (in *Text) ToCompareMap() (out CompareMap, err error) {
 	out = CompareMap{
-		Named:   make(SetEtikettenKeys),
-		Unnamed: make(SetEtikettenKeys),
+		Named:   make(SetKeyToEtiketten),
+		Unnamed: make(SetKeyToEtiketten),
 	}
 
 	if err = in.assignment.addToCompareMap(etikett.NewSet(), &out); err != nil {
@@ -55,14 +79,14 @@ func (a *assignment) addToCompareMap(es *etikett.Set, out *CompareMap) (err erro
 	errors.Print(es)
 
 	for z, _ := range a.named {
-		for e, _ := range *es {
-			out.Named.Add(e, z.Hinweis.String())
+		for _, e := range es.Sorted() {
+			out.Named.Add(z.Hinweis.String(), e)
 		}
 	}
 
 	for z, _ := range a.unnamed {
-		for e, _ := range *es {
-			out.Unnamed.Add(e, z.Bezeichnung)
+		for _, e := range es.Sorted() {
+			out.Unnamed.Add(z.Bezeichnung, e)
 		}
 	}
 

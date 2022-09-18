@@ -8,7 +8,17 @@ import (
 	"github.com/friedenberg/zit/src/charlie/konfig"
 )
 
-func (z *Zettel) ApplyTypKonfig(tk konfig.KonfigTyp) (err error) {
+func (z *Zettel) ApplyKonfig(k konfig.Konfig) (err error) {
+	normalized := z.Etiketten.WithRemovedCommonPrefixes()
+	z.Etiketten = normalized
+
+	var tk konfig.KonfigTyp
+	ok := false
+
+	if tk, ok = k.Typen[z.Typ.String()]; !ok {
+		return
+	}
+
 	for e, r := range tk.EtikettenRules {
 		e1 := etikett.Make(e)
 
