@@ -21,7 +21,9 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &Revert{}
 
-			return commandWithIds{c}
+			return commandWithIds{
+				CommandWithIds: c,
+			}
 		},
 	)
 }

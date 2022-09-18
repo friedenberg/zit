@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/friedenberg/zit/src/charlie/typ"
 	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/charlie/id"
 	"github.com/friedenberg/zit/src/charlie/ts"
+	"github.com/friedenberg/zit/src/charlie/typ"
 )
 
 type Set struct {
@@ -102,6 +103,23 @@ func (s Set) AnyShasOrHinweisen() (ids []id.IdMitKorper) {
 
 	for _, h := range hinweisen {
 		ids = append(ids, h)
+	}
+
+	return
+}
+
+func (s Set) Etiketten() (etiketten etikett.Set) {
+	etiketten = etikett.MakeSet()
+
+	val := reflect.ValueOf(&etikett.Etikett{})
+	t := val.Type()
+
+	targetType := t.Elem()
+
+	for _, i1 := range s.ids {
+		if reflect.TypeOf(i1).AssignableTo(targetType) {
+			etiketten.Add(i1.(etikett.Etikett))
+		}
 	}
 
 	return

@@ -10,6 +10,8 @@ import (
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/etikett"
+	"github.com/friedenberg/zit/src/charlie/typ"
+	"github.com/friedenberg/zit/src/delta/id_set"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/hotel/organize_text"
@@ -19,6 +21,7 @@ import (
 
 type Organize struct {
 	organize_text.Options
+	typ.Typ
 	Mode organizeMode
 }
 
@@ -69,14 +72,25 @@ func init() {
 			}
 
 			f.Var(&c.Mode, "mode", "mode used for handling stdin and stdout")
+			f.Var(&c.Typ, "typ", "typ to filter")
 			c.Options.AddToFlagSet(f)
 
-			return c
+			return commandWithIds{
+				CommandWithIds: c,
+				ProtoSet: id_set.MakeProtoSet(
+					id_set.ProtoId{
+						MutableId: &etikett.Etikett{},
+					},
+					id_set.ProtoId{
+						MutableId: &typ.Typ{},
+					},
+				),
+			}
 		},
 	)
 }
 
-func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
+func (c *Organize) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	c.Options.Konfig = u.Konfig()
 	c.Options.Abbr = u.StoreObjekten()
 
@@ -85,7 +99,7 @@ func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		Options: c.Options,
 	}
 
-	if createOrganizeFileOp.RootEtiketten, err = c.getEtikettenFromArgs(args); err != nil {
+	if createOrganizeFileOp.RootEtiketten, err = c.getEtikettenFromArgs(ids); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -94,7 +108,10 @@ func (c *Organize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	getOp := user_ops.GetZettelsFromQuery{Umwelt: u}
 
-	query := zettel_named.FilterEtikettSet{Set: createOrganizeFileOp.RootEtiketten}
+	query := zettel_named.FilterAnd{
+		zettel_named.FilterEtikettSet{Set: createOrganizeFileOp.RootEtiketten},
+		zettel_named.FilterTyp(c.Typ),
+	}
 
 	if getResults, err = getOp.Run(query); err != nil {
 		err = errors.Wrap(err)
@@ -242,15 +259,8 @@ func (c Organize) readFromVim(
 	return
 }
 
-func (c Organize) getEtikettenFromArgs(args []string) (es etikett.Set, err error) {
-	es = etikett.MakeSet()
-
-	for _, s := range args {
-		if err = es.AddString(s); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
+func (c Organize) getEtikettenFromArgs(ids id_set.Set) (es etikett.Set, err error) {
+	es = ids.Etiketten()
 
 	return
 }

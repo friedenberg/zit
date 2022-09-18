@@ -28,7 +28,9 @@ func init() {
 
 			f.Var(&c.Type, "type", "ObjekteType")
 
-			return commandWithIds{c}
+			return commandWithIds{
+				CommandWithIds: c,
+			}
 		},
 	)
 }

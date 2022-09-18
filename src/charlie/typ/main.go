@@ -2,13 +2,10 @@ package typ
 
 import (
 	"bytes"
-	"crypto/sha256"
 	"encoding/gob"
-	"io"
 	"strings"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/charlie/etikett"
 )
 
 var TextTypes map[string]bool
@@ -20,40 +17,25 @@ func init() {
 }
 
 type Typ struct {
-	typ string
-}
-
-func (v Typ) String() string {
-	return v.typ
+	etikett.Etikett
 }
 
 func Make(v string) Typ {
 	return Typ{
-		typ: v,
+		Etikett: etikett.Etikett{
+			Value: v,
+		},
 	}
 }
 
 func (v *Typ) Set(v1 string) (err error) {
-	v.typ = strings.TrimSpace(strings.TrimPrefix(v1, "."))
-
-	return
+	return v.Etikett.Set(strings.TrimSpace(strings.Trim(v1, ".! ")))
 }
 
 func (v Typ) IsTextType() (is bool) {
 	is, _ = TextTypes[v.String()]
 
 	return
-}
-
-func (t Typ) Sha() sha.Sha {
-	hash := sha256.New()
-	sr := strings.NewReader(t.typ)
-
-	if _, err := io.Copy(hash, sr); err != nil {
-		errors.PanicIfError(err)
-	}
-
-	return sha.FromHash(hash)
 }
 
 func (t Typ) MarshalText() (text []byte, err error) {
@@ -73,7 +55,7 @@ func (t *Typ) UnmarshalText(text []byte) (err error) {
 func (s Typ) GobEncode() (b1 []byte, err error) {
 	b := &bytes.Buffer{}
 	e := gob.NewEncoder(b)
-	err = e.Encode(s.typ)
+	err = e.Encode(s.String())
 	b1 = b.Bytes()
 	return
 }
@@ -81,5 +63,5 @@ func (s Typ) GobEncode() (b1 []byte, err error) {
 func (s *Typ) GobDecode(b []byte) error {
 	b1 := bytes.NewBuffer(b)
 	d := gob.NewDecoder(b1)
-	return d.Decode(&s.typ)
+	return d.Decode(&s.Etikett.Value)
 }

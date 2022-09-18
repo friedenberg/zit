@@ -25,6 +25,10 @@ func MakeProtoSet(types ...ProtoId) (ps ProtoSet) {
 	return
 }
 
+func (ps ProtoSet) Len() int {
+  return len(ps.types)
+}
+
 func (ps ProtoSet) Make(vs ...string) (s Set) {
 	s = Set{
 		ids: make([]id.Id, 0, len(vs)),
