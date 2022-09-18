@@ -2,8 +2,11 @@ package store_objekten
 
 import (
 	"io"
+	"path"
+	"sort"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/zk_types"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
@@ -15,6 +18,68 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 )
+
+func (s Store) ReadLastTransaktion() (t transaktion.Transaktion, err error) {
+	var all []transaktion.Transaktion
+
+	if all, err = s.ReadAllTransaktions(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if len(all) == 0 {
+		err = ErrNotFound{}
+	}
+
+	sort.Slice(all, func(i, j int) bool { return all[j].Time.Less(all[i].Time) })
+
+	t = all[0]
+
+	return
+}
+
+func (s Store) ReadAllTransaktions() (out []transaktion.Transaktion, err error) {
+	var headNames []string
+
+	d := s.standort.DirObjektenTransaktion()
+
+	if headNames, err = files.ReadDirNames(d); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	for _, hn := range headNames {
+		errors.Print(hn)
+
+		var tailNames []string
+
+		if tailNames, err = files.ReadDirNames(d, hn); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		for _, tn := range tailNames {
+			errors.Print(tn)
+
+			p := path.Join(d, hn, tn)
+
+			var t transaktion.Transaktion
+
+			if t, err = s.readTransaktion(p); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			out = append(out, t)
+		}
+	}
+
+	errors.Print("sorting")
+	sort.Slice(out, func(i, j int) bool { return out[i].Time.Less(out[j].Time) })
+	errors.Print("done")
+
+	return
+}
 
 func (s Store) ReadTransaktion(t ts.Time) (tr transaktion.Transaktion, err error) {
 	return s.readTransaktion(id.Path(t, s.standort.DirObjektenTransaktion()))

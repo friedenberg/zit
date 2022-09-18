@@ -5,7 +5,9 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/zk_types"
-	"github.com/friedenberg/zit/src/charlie/hinweis"
+	"github.com/friedenberg/zit/src/delta/id_set"
+	"github.com/friedenberg/zit/src/delta/transaktion"
+	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/kilo/umwelt"
 )
 
@@ -17,44 +19,56 @@ func init() {
 	registerCommand(
 		"revert",
 		func(f *flag.FlagSet) Command {
-			c := &Revert{
-				Type: zk_types.TypeUnknown,
-			}
+			c := &Revert{}
 
-			f.Var(&c.Type, "type", "ObjekteType")
-
-			return c
+			return commandWithIds{c}
 		},
 	)
 }
 
-func (c Revert) Run(store *umwelt.Umwelt, args ...string) (err error) {
-	switch c.Type {
-	case zk_types.TypeZettel:
-		hins := make([]hinweis.Hinweis, len(args))
+func (c Revert) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
+	timestamps := ids.Timestamps()
+	var transaktion transaktion.Transaktion
 
-		if err = store.Lock(); err != nil {
+	s := u.StoreObjekten()
+
+	if len(timestamps) == 1 {
+		if transaktion, err = s.ReadTransaktion(timestamps[0]); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		if transaktion, err = s.ReadLastTransaktion(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		defer store.Unlock()
-
-		for i, arg := range args {
-			if hins[i], err = hinweis.Make(arg); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			if _, err = store.StoreObjekten().Revert(hins[i]); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-		}
-
-	default:
-		errors.PrintErrf("objekte type %s does not support reverts currently", c.Type)
+		errors.PrintOutf(
+			"ignoring arguments and using last transkation: %s",
+			transaktion,
+		)
 	}
+
+	if err = u.Lock(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer u.Unlock()
+
+	var zts zettel_transacted.Set
+
+	if zts, err = s.RevertTransaktion(transaktion); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	zts.Each(
+		func(zt zettel_transacted.Zettel) (err error) {
+			u.PrinterOut().ZettelTransacted(zt).Print()
+			return
+		},
+	)
 
 	return
 }
