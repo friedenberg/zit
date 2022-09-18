@@ -34,16 +34,6 @@ func (s *Store) Checkout(
 	return
 }
 
-func (s *Store) isInlineAkte(sz zettel_transacted.Zettel) (isInline bool) {
-	isInline = sz.Named.Stored.Zettel.TypOrDefault().String() == "md"
-
-	if typKonfig, ok := s.Konfig.Typen[sz.Named.Stored.Zettel.Typ.String()]; ok {
-		isInline = typKonfig.InlineAkte
-	}
-
-	return
-}
-
 func (s *Store) CheckoutOne(
 	options CheckoutOptions,
 	sz zettel_transacted.Zettel,
@@ -60,7 +50,7 @@ func (s *Store) CheckoutOne(
 	//TODO move user-fs-representation of zettel path to own function
 	filename = filename + ".md"
 
-	inlineAkte := s.isInlineAkte(sz)
+	inlineAkte := sz.Named.Stored.Zettel.IsInlineAkte(s.Konfig.Konfig)
 
 	cz = zettel_checked_out.Zettel{
 		//TODO check diff with fs if already exists
@@ -103,7 +93,7 @@ func (s *Store) CheckoutOne(
 		if !inlineAkte {
 			cz.External.AkteFD.Path = originalFilename + "." + sz.Named.Stored.Zettel.AkteExt()
 			c.ExternalAktePath = cz.External.AkteFD.Path
-			c.IncludeAkte = true
+      panic(errors.Errorf("%#v", cz))
 		}
 
 		if err = s.writeFormat(options, filename, c); err != nil {

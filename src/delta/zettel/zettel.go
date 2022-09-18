@@ -4,9 +4,10 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/bezeichnung"
-	"github.com/friedenberg/zit/src/charlie/typ"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/etikett"
+	"github.com/friedenberg/zit/src/charlie/konfig"
+	"github.com/friedenberg/zit/src/charlie/typ"
 )
 
 type Zettel struct {
@@ -54,6 +55,16 @@ func (z Zettel) TypOrDefault() (t typ.Typ) {
 func (z Zettel) AkteExt() (ext string) {
 	t := z.TypOrDefault()
 	ext = t.String()
+
+	return
+}
+
+func (z Zettel) IsInlineAkte(k konfig.Konfig) (isInline bool) {
+	isInline = z.TypOrDefault().String() == "md"
+
+	if typKonfig, ok := k.Typen[z.Typ.String()]; ok {
+		isInline = typKonfig.InlineAkte
+	}
 
 	return
 }

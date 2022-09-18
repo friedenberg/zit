@@ -94,7 +94,7 @@ func (f *Objekte) ReadFrom(z *Zettel, in io.Reader) (n int64, err error) {
 			}
 
 			if f.IgnoreTypErrors {
-				z.Typ.Etikett.Value = v
+				z.Typ.Etikett.Value = strings.TrimSpace(v)
 			} else {
 				if err = z.Typ.Set(v); err != nil {
 					err = errors.Wrap(err)

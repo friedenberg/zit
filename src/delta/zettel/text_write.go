@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
@@ -40,17 +41,21 @@ func (f Text) writeToOmitAkte(c FormatContextWrite) (n int64, err error) {
 		w.WriteFormat("- %s", e)
 	}
 
-	if c.Zettel.Akte.IsNull() && c.Zettel.Typ.String() == "" {
-		//no-op
-	} else if c.Zettel.Akte.IsNull() {
+	switch {
+	case c.Zettel.Akte.IsNull() && c.Zettel.Typ.String() == "":
+		break
+
+	case c.Zettel.Akte.IsNull():
 		w.WriteLines(
 			fmt.Sprintf("! %s", c.Zettel.Typ),
 		)
-	} else if c.Zettel.Typ.String() == "" {
+
+	case c.Zettel.Typ.String() == "":
 		w.WriteLines(
 			fmt.Sprintf("! %s", c.Zettel.Akte),
 		)
-	} else {
+
+	default:
 		w.WriteLines(
 			fmt.Sprintf("! %s.%s", c.Zettel.Akte, c.Zettel.Typ),
 		)
@@ -167,7 +172,6 @@ func (f Text) writeToInlineAkte(c FormatContextWrite) (n int64, err error) {
 }
 
 func (f Text) writeToExternalAkte(c FormatContextWrite) (n int64, err error) {
-	errors.Print()
 	w := line_format.NewWriter()
 
 	w.WriteLines(
@@ -177,6 +181,10 @@ func (f Text) writeToExternalAkte(c FormatContextWrite) (n int64, err error) {
 
 	for _, e := range c.Zettel.Etiketten.Sorted() {
 		w.WriteFormat("- %s", e)
+	}
+
+	if strings.Index(c.ExternalAktePath, "\n") != -1 {
+		panic(errors.Errorf("ExternalAktePath contains newline: %q", c.ExternalAktePath))
 	}
 
 	w.WriteLines(
