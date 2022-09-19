@@ -41,11 +41,9 @@ func (f *Objekte) ReadFrom(z *Zettel, in io.Reader) (n int64, err error) {
 
 	r := bufio.NewReader(in)
 
-	l := 0
-
 	for {
-		var line string
-		line, err = r.ReadString('\n')
+		var lineOriginal string
+		lineOriginal, err = r.ReadString('\n')
 
 		if err == io.EOF {
 			err = nil
@@ -56,12 +54,25 @@ func (f *Objekte) ReadFrom(z *Zettel, in io.Reader) (n int64, err error) {
 			return
 		}
 
-		n += int64(len(line))
+		// line := strings.TrimSpace(lineOriginal)
+		line := lineOriginal
+
+		n += int64(len(lineOriginal))
 
 		loc := strings.Index(line, " ")
 
+		if line == "" {
+			//TODO this should be cleaned up
+			err = errors.Errorf("found empty line: %q", lineOriginal)
+			return
+		}
+
 		if loc == -1 {
-			err = errors.Errorf("expected at least one space, but found none: %s", line)
+			if lineOriginal == "\n" {
+				continue
+			}
+
+			err = errors.Errorf("expected at least one space, but found none: %q", lineOriginal)
 			return
 		}
 
@@ -74,25 +85,14 @@ func (f *Objekte) ReadFrom(z *Zettel, in io.Reader) (n int64, err error) {
 
 		v := line[loc+1:]
 
-		switch l {
-		case 0:
-			if t != zk_types.TypeAkte {
-				err = errors.Errorf("expected type %s, but got %s", zk_types.TypeAkte, t)
-				return
-			}
-
+		switch t {
+		case zk_types.TypeAkte:
 			if err = z.Akte.Set(v); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-		case 1:
-			errors.PrintDebug(v)
-			if t != zk_types.TypeAkteTyp {
-				err = errors.Errorf("expected type %s, but got %s: %s", zk_types.TypeAkteTyp, t, line)
-				return
-			}
-
+		case zk_types.TypeAkteTyp:
 			if f.IgnoreTypErrors {
 				z.Typ.Etikett.Value = strings.TrimSpace(v)
 			} else {
@@ -102,36 +102,18 @@ func (f *Objekte) ReadFrom(z *Zettel, in io.Reader) (n int64, err error) {
 				}
 			}
 
-		case 2:
-			if t != zk_types.TypeBezeichnung {
-				err = errors.Errorf("expected type %s, but got %s", zk_types.TypeBezeichnung, t)
-				return
-			}
-
+		case zk_types.TypeBezeichnung:
 			if err = z.Bezeichnung.Set(v); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-		default:
-			if t != zk_types.TypeEtikett {
-				err = errors.Errorf("expected type %s, but got %s", zk_types.TypeEtikett, t)
-				return
-			}
-
+		case zk_types.TypeEtikett:
 			if err = z.Etiketten.AddString(v); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
-
 		}
-
-		l += 1
-	}
-
-	if l < 3 {
-		err = errors.Errorf("expected at least 3 objekte refs, but got %d", l)
-		return
 	}
 
 	return

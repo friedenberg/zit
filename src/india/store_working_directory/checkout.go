@@ -93,7 +93,6 @@ func (s *Store) CheckoutOne(
 		if !inlineAkte {
 			cz.External.AkteFD.Path = originalFilename + "." + sz.Named.Stored.Zettel.AkteExt()
 			c.ExternalAktePath = cz.External.AkteFD.Path
-      panic(errors.Errorf("%#v", cz))
 		}
 
 		if err = s.writeFormat(options, filename, c); err != nil {

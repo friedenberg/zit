@@ -122,7 +122,7 @@ func (s Store) storedZettelFromSha(sh sha.Sha) (sz zettel_stored.Stored, err err
 	}
 
 	if _, err = f.ReadFrom(&sz.Zettel, or); err != nil {
-		err = errors.Wrap(err)
+    err = errors.Wrapf(err, "%s", sh)
 		return
 	}
 
@@ -175,7 +175,7 @@ func (s Store) transactedZettelFromTransaktionObjekte(
 	tz.Named.Hinweis = *h
 
 	if tz.Named.Stored, err = s.storedZettelFromSha(o.Sha); err != nil {
-		err = errors.Wrapf(err, "failed to find zettel objekte for hinweis: %s", tz.Named.Hinweis)
+		err = errors.Wrapf(err, "failed to read zettel objekte: %s", tz.Named.Hinweis)
 		return
 	}
 

@@ -46,6 +46,7 @@ cmd_zit_organize=(
 	organize
 	"${cmd_zit_def[@]}"
 	-right-align=false
+	-prefix-joints=true
 	-refine=true
 )
 

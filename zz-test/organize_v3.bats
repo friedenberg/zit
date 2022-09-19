@@ -53,6 +53,7 @@ cmd_zit_organize_v3=(
 	zit
 	organize
 	"${cmd_zit_def[@]}"
+	-prefix-joints=true
 	-refine=true
 )
 

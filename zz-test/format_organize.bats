@@ -51,7 +51,7 @@ function format_organize_right_align { # @test
 		echo
 	} >"$expected"
 
-	run zit format-organize -refine "$to_add"
+	run zit format-organize -prefix-joints=true -refine "$to_add"
 	assert_output "$(cat "$expected")"
 }
 
@@ -77,6 +77,6 @@ function format_organize_left_align { # @test
 		echo
 	} >"$expected"
 
-	run zit format-organize -refine -right-align=false "$to_add"
+	run zit format-organize -prefix-joints=true -refine -right-align=false "$to_add"
 	assert_output "$(cat "$expected")"
 }
