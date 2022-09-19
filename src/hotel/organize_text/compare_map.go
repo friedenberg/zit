@@ -86,7 +86,7 @@ func (a *assignment) addToCompareMap(es *etikett.Set, out *CompareMap) (err erro
 
 	for z, _ := range a.unnamed {
 		for _, e := range es.Sorted() {
-			out.Unnamed.Add(z.Bezeichnung, e)
+			out.Unnamed.Add(z.Bezeichnung.String(), e)
 		}
 	}
 

@@ -3,6 +3,7 @@ package commands
 import (
 	"encoding/json"
 	"flag"
+	"sort"
 	"syscall"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -10,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/zk_types"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
+	"github.com/friedenberg/zit/src/charlie/typ"
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/kilo/umwelt"
@@ -49,6 +51,9 @@ func (c Cat) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	case zk_types.TypeHinweis:
 		err = c.hinweisen(u)
+
+	case zk_types.TypeTyp:
+		err = c.typen(u)
 
 	default:
 		err = c.all(u)
@@ -165,17 +170,34 @@ func (c Cat) akten(u *umwelt.Umwelt) (err error) {
 }
 
 func (c Cat) hinweisen(u *umwelt.Umwelt) (err error) {
-	// var hins []hinweis.Hinweis
-	// var shas []sha.Sha
+	return
+}
 
-	// if shas, hins, err = store.Hinweisen().All(); err != nil {
-	// 	err = errors.Error(err)
-	// 	return
-	// }
+func (c Cat) typen(u *umwelt.Umwelt) (err error) {
+	var all map[hinweis.Hinweis]zettel_transacted.Zettel
 
-	// for i, h := range hins {
-	// 	stdprinter.Outf("%s: %s\n", h, shas[i])
-	// }
+	if all, err = u.StoreObjekten().ZettelenSchwanzen(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	typen := make(map[typ.Typ]bool)
+
+	for _, z := range all {
+		typen[z.Named.Stored.Zettel.Typ] = true
+	}
+
+	sortedTypen := make([]typ.Typ, 0, len(typen))
+
+	for t, _ := range typen {
+		sortedTypen = append(sortedTypen, t)
+	}
+
+	sort.Slice(sortedTypen, func(i, j int) bool { return sortedTypen[i].Less(sortedTypen[j].Etikett) })
+
+	for _, t := range sortedTypen {
+		errors.PrintOut(t)
+	}
 
 	return
 }

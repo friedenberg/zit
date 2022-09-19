@@ -1,14 +1,13 @@
 package organize_text
 
-import "github.com/friedenberg/zit/src/alfa/errors"
+import (
+	"github.com/friedenberg/zit/src/alfa/bezeichnung"
+	"github.com/friedenberg/zit/src/alfa/errors"
+)
 
 type newZettel struct {
-	Bezeichnung string
+	bezeichnung.Bezeichnung
 }
-
-// func (z newZettel) String() string {
-// 	return fmt.Sprintf("- %s", z.bezeichnung)
-// }
 
 func (z *newZettel) Set(v string) (err error) {
 	remaining := v
@@ -20,7 +19,10 @@ func (z *newZettel) Set(v string) (err error) {
 
 	remaining = remaining[2:]
 
-	z.Bezeichnung = remaining
+	if err = z.Bezeichnung.Set(remaining); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }

@@ -17,6 +17,8 @@ const (
 	TypeHinweis
 	TypeTransaktion
 	TypeZettel
+
+	TypeTyp = TypeAkteTyp
 )
 
 func (t Type) String() string {
@@ -52,6 +54,9 @@ func (t *Type) Set(v string) (err error) {
 	switch v1 {
 	case "akte":
 		*t = TypeAkte
+
+	case "typ":
+		*t = TypeTyp
 
 	case "aktetyp":
 		*t = TypeAkteTyp

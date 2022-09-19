@@ -4,7 +4,6 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/hotel/organize_text"
 	"github.com/friedenberg/zit/src/kilo/umwelt"
@@ -77,16 +76,3 @@ func (c CreateOrganizeFile) Run(zettels zettel_transacted.Set) (results *organiz
 // func (c CreateOrganizeFile) SortZettels(a, b stored_zettel.Named) bool {
 // 	return a.Hinweis.String() < b.Hinweis.String()
 // }
-
-func (c CreateOrganizeFile) getEtikettenFromArgs(args []string) (es etikett.Set, err error) {
-	es = etikett.MakeSet()
-
-	for _, s := range args {
-		if err = es.AddString(s); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	return
-}

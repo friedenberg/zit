@@ -1,6 +1,10 @@
 package konfig
 
-import "os/exec"
+import (
+	"os/exec"
+
+	"github.com/friedenberg/zit/src/alfa/errors"
+)
 
 type ScriptConfig struct {
 	Shell  []string
@@ -8,33 +12,33 @@ type ScriptConfig struct {
 }
 
 func (s ScriptConfig) Cmd(args ...string) (c *exec.Cmd, err error) {
-	if s.Script == "" {
+	switch {
+	case len(args) == 0:
+		err = errors.Errorf("no args passed in")
 		return
-	}
 
-	shell := s.Shell
+	case s.Script == "" && len(s.Shell) == 0:
+		err = errors.Errorf("no script or shell set")
+		return
 
-	if len(shell) == 0 {
-		shell = []string{
-			"bash",
+	case s.Script != "":
+		all := []string{
 			"--noprofile",
 			"--norc",
 			"-c",
 		}
+
+		all = append(all, args...)
+		c = exec.Command("bash", all...)
+
+	case len(s.Shell) > 0:
+		all := append(s.Shell, args...)
+		if len(all) > 1 {
+			c = exec.Command(all[0], all[1:]...)
+		} else {
+			c = exec.Command(all[0])
+		}
 	}
-
-	first := shell[0]
-
-	if len(shell) > 1 {
-		shell = shell[1:]
-	} else {
-		shell = []string{}
-	}
-
-	all := append(shell, args...)
-	all = append(all, s.Script)
-
-	c = exec.Command(first, all...)
 
 	return
 }

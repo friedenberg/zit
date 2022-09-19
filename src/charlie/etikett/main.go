@@ -59,6 +59,10 @@ func (e Etikett) Len() int {
 	return len(e.Value)
 }
 
+func (a Etikett) Includes(b Etikett) bool {
+  return b.Contains(a)
+}
+
 func (a Etikett) Contains(b Etikett) bool {
 	if b.Len() > a.Len() {
 		return false
