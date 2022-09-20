@@ -1,7 +1,6 @@
 package store_objekten
 
 import (
-	"io"
 	"os"
 	"reflect"
 
@@ -195,35 +194,10 @@ func (s Store) writeNamedZettelToIndex(tz zettel_transacted.Zettel) (err error) 
 	return
 }
 
-func (s Store) ReadOne(i id.IdMitKorper) (tz zettel_transacted.Zettel, err error) {
+func (s Store) ReadOne(i id.Id) (tz zettel_transacted.Zettel, err error) {
 	switch tid := i.(type) {
-	case sha.Sha:
-		f := zettel.Objekte{}
-
-		var r io.ReadCloser
-
-		p := id.Path(tid, s.standort.DirObjektenZettelen())
-
-		if r, err = s.ReadCloserObjekten(p); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		defer errors.PanicIfError(r.Close)
-
-		if _, err = f.ReadFrom(&tz.Named.Stored.Zettel, r); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
 	case hinweis.Hinweis:
 		if tz, err = s.indexZettelenTails.Read(tid); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	case hinweis.HinweisWithIndex:
-		if tz, err = s.ReadHinweisAt(tid); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
