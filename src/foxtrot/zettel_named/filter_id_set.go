@@ -6,47 +6,52 @@ import (
 
 type FilterIdSet struct {
 	id_set.Set
-	And bool
+	Or bool
 }
 
 func (f FilterIdSet) IncludeNamedZettel(z Zettel) (ok bool) {
-	for _, t := range f.Set.Typen() {
-		ok = t.Includes(z.Stored.Zettel.Typ.Etikett)
-
-		switch {
-		case ok && f.And:
-			continue
-
-		case f.And:
-		case ok:
-			return
-		}
-	}
-
-	for _, h := range f.Set.Hinweisen() {
-		ok = h.Equals(z.Hinweis)
-
-		switch {
-		case ok && f.And:
-			continue
-
-		case f.And:
-		case ok:
-			return
-		}
-	}
+	needsEt := f.Set.Etiketten().Len() > 0
+	okEt := false
 
 	for _, e := range f.Set.Etiketten().Sorted() {
-		ok = z.Stored.Zettel.Etiketten.Contains(e)
+		okEt = z.Stored.Zettel.Etiketten.Contains(e)
 
 		switch {
-		case ok && f.And:
+		case okEt && !f.Or:
 			continue
 
-		case f.And:
-		case ok:
-			return
+		case !f.Or:
+			fallthrough
+
+		case okEt:
+			break
 		}
+	}
+
+	needsTyp := len(f.Set.Typen()) > 0
+	okTyp := false
+
+	for _, t := range f.Set.Typen() {
+		if okTyp = t.Includes(z.Stored.Zettel.Typ.Etikett); okTyp {
+			break
+		}
+	}
+
+	needsHin := len(f.Set.Hinweisen()) > 0
+	okHin := false || len(f.Set.Hinweisen()) == 0
+
+	for _, h := range f.Set.Hinweisen() {
+		if okHin = h.Equals(z.Hinweis); okHin {
+			break
+		}
+	}
+
+	switch {
+	case f.Or:
+		ok = (okHin && needsHin) || (okTyp && needsTyp) || (okEt && needsEt)
+
+	default:
+		ok = (okHin || !needsHin) && (okTyp || !needsTyp) && (okEt || !needsEt)
 	}
 
 	return

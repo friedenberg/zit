@@ -8,8 +8,8 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/id"
-	"github.com/friedenberg/zit/src/delta/id_set"
 	"github.com/friedenberg/zit/src/delta/zettel"
+	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 	"github.com/friedenberg/zit/src/golf/zettel_external"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
@@ -17,12 +17,12 @@ import (
 
 func (s *Store) Checkout(
 	options CheckoutOptions,
-	ids id_set.Set,
+	query zettel_named.NamedFilter,
 ) (zcs zettel_checked_out.Set, err error) {
-	zcs = zettel_checked_out.MakeSetUnique(ids.Len())
+	zcs = zettel_checked_out.MakeSetUnique(0)
 	var zts zettel_transacted.Set
 
-	if zts, err = s.storeObjekten.ReadMany(ids); err != nil {
+	if zts, err = s.storeObjekten.ZettelenSchwanzen(query); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -141,7 +141,6 @@ func (s *Store) CheckoutOne(
 			err = errors.Wrap(err)
 			return
 		}
-
 
 	case CheckoutModeZettelAndAkte:
 		c.IncludeAkte = true

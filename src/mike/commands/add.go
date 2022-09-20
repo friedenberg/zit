@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/delta/id_set"
 	"github.com/friedenberg/zit/src/delta/zettel"
+	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/hotel/organize_text"
 	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
@@ -166,7 +167,11 @@ func (c Add) openAktenIfNecessary(
 
 	var checkoutResults zettel_checked_out.Set
 
-	if checkoutResults, err = u.StoreWorkingDirectory().Checkout(options, ids); err != nil {
+	query := zettel_named.FilterIdSet{
+		Set: ids,
+	}
+
+	if checkoutResults, err = u.StoreWorkingDirectory().Checkout(options, query); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

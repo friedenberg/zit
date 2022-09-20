@@ -125,14 +125,12 @@ func (c *Organize) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 	var getResults zettel_transacted.Set
 
-	getOp := user_ops.GetZettelsFromQuery{Umwelt: u}
-
 	query := zettel_named.FilterIdSet{
 		Set: ids,
-		And: !c.Or,
+		Or:  c.Or,
 	}
 
-	if getResults, err = getOp.Run(query); err != nil {
+	if getResults, err = u.StoreObjekten().ZettelenSchwanzen(query); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

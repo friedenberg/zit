@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/src/delta/id_set"
 	"github.com/friedenberg/zit/src/delta/zettel"
+	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 	"github.com/friedenberg/zit/src/golf/zettel_external"
 	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
 	"github.com/friedenberg/zit/src/india/store_working_directory"
@@ -15,7 +16,8 @@ import (
 )
 
 type Edit struct {
-	And bool
+	Or bool
+	//TODO add force
 	store_working_directory.CheckoutMode
 }
 
@@ -27,6 +29,7 @@ func init() {
 				CheckoutMode: store_working_directory.CheckoutModeZettelOnly,
 			}
 
+			f.BoolVar(&c.Or, "or", false, "allow optional criteria instead of required")
 			f.Var(&c.CheckoutMode, "mode", "mode for checking out the zettel")
 
 			return commandWithIds{
@@ -44,7 +47,12 @@ func (c Edit) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 	var checkoutResults zettel_checked_out.Set
 
-	if checkoutResults, err = u.StoreWorkingDirectory().Checkout(checkoutOptions, ids); err != nil {
+	query := zettel_named.FilterIdSet{
+		Set: ids,
+		Or:  c.Or,
+	}
+
+	if checkoutResults, err = u.StoreWorkingDirectory().Checkout(checkoutOptions, query); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

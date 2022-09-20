@@ -10,12 +10,14 @@ import (
 	"github.com/friedenberg/zit/src/charlie/typ"
 	"github.com/friedenberg/zit/src/delta/id_set"
 	"github.com/friedenberg/zit/src/delta/zettel"
+	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 	"github.com/friedenberg/zit/src/india/store_working_directory"
 	"github.com/friedenberg/zit/src/kilo/umwelt"
 )
 
 type Checkout struct {
 	store_working_directory.CheckoutMode
+	Or    bool
 	Force bool
 }
 
@@ -25,6 +27,7 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &Checkout{}
 
+			f.BoolVar(&c.Or, "or", false, "allow optional criteria instead of required")
 			f.Var(&c.CheckoutMode, "mode", "mode for checking out the zettel")
 			f.BoolVar(&c.Force, "force", false, "force update checked out zettels, even if they will overwrite existing checkouts")
 
@@ -69,7 +72,12 @@ func (c Checkout) RunWithIds(s *umwelt.Umwelt, ids id_set.Set) (err error) {
 		Format:       zettel.Text{},
 	}
 
-	if _, err = s.StoreWorkingDirectory().Checkout(options, ids); err != nil {
+	query := zettel_named.FilterIdSet{
+		Set: ids,
+		Or: c.Or,
+	}
+
+	if _, err = s.StoreWorkingDirectory().Checkout(options, query); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
