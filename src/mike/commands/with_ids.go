@@ -13,15 +13,27 @@ type CommandWithIds interface {
 	RunWithIds(store *umwelt.Umwelt, ids id_set.Set) error
 }
 
+type CommandWithIdsAndProtoSet interface {
+	CommandWithIds
+	ProtoSet(*umwelt.Umwelt) id_set.ProtoSet
+}
+
 type commandWithIds struct {
 	CommandWithIds
 	id_set.ProtoSet
 }
 
 func (c commandWithIds) getIdProtoSet(u *umwelt.Umwelt) (is id_set.ProtoSet) {
-	is = c.ProtoSet
+	tid, hasCustomProtoSet := c.CommandWithIds.(CommandWithIdsAndProtoSet)
 
-	if is.Len() == 0 {
+	switch {
+	case c.ProtoSet.Len() != 0:
+		is = c.ProtoSet
+
+	case hasCustomProtoSet:
+		is = tid.ProtoSet(u)
+
+	default:
 		is = id_set.MakeProtoSet(
 			id_set.ProtoId{
 				MutableId: &sha.Sha{},

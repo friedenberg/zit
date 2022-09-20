@@ -4,7 +4,10 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
+	"github.com/friedenberg/zit/src/charlie/ts"
+	"github.com/friedenberg/zit/src/charlie/typ"
 	"github.com/friedenberg/zit/src/delta/id_set"
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
@@ -32,6 +35,34 @@ func init() {
 			}
 		},
 	)
+}
+
+func (c Checkout) ProtoSet(u *umwelt.Umwelt) (is id_set.ProtoSet) {
+	is = id_set.MakeProtoSet(
+		id_set.ProtoId{
+			MutableId: &hinweis.Hinweis{},
+			Expand: func(v string) (out string, err error) {
+				var h hinweis.Hinweis
+				h, err = u.StoreObjekten().ExpandHinweisString(v)
+				out = h.String()
+				return
+			},
+		},
+		// id_set.ProtoId{
+		// 	MutableId: &sha.Sha{},
+		// },
+		id_set.ProtoId{
+			MutableId: &etikett.Etikett{},
+		},
+		id_set.ProtoId{
+			MutableId: &typ.Typ{},
+		},
+		id_set.ProtoId{
+			MutableId: &ts.Time{},
+		},
+	)
+
+	return
 }
 
 func (c Checkout) RunWithIds(s *umwelt.Umwelt, ids id_set.Set) (err error) {
