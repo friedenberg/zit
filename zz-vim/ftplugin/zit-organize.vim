@@ -20,3 +20,18 @@ function! GetZitOrganizeFold(lnum)
     return this_indent + 1
   endif
 endfunction
+
+function! Gf()
+  let l:h = trim(system("zit expand-hinweis " . expand("<cfile>")))
+
+  if !filereadable(l:h)
+    echo system("zit checkout -mode both " . l:h)
+  endif
+
+  let l:f = l:h . ".md"
+
+  execute 'tabedit' l:f
+endfunction
+
+noremap gf :call Gf()<CR>
+

@@ -5,6 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
+	"github.com/friedenberg/zit/src/delta/id_set"
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
 	"github.com/friedenberg/zit/src/india/store_working_directory"
@@ -26,12 +27,14 @@ func init() {
 			f.Var(&c.CheckoutMode, "mode", "mode for checking out the zettel")
 			f.BoolVar(&c.Force, "force", false, "force update checked out zettels, even if they will overwrite existing checkouts")
 
-			return commandWithHinweisen{c}
+			return commandWithIds{
+				CommandWithIds: c,
+			}
 		},
 	)
 }
 
-func (c Checkout) RunWithHinweisen(s *umwelt.Umwelt, hins ...hinweis.Hinweis) (err error) {
+func (c Checkout) RunWithIds(s *umwelt.Umwelt, ids id_set.Set) (err error) {
 	var readResults []zettel_checked_out.Zettel
 
 	readOp := user_ops.ReadCheckedOut{
@@ -42,6 +45,8 @@ func (c Checkout) RunWithHinweisen(s *umwelt.Umwelt, hins ...hinweis.Hinweis) (e
 	}
 
 	var pz store_working_directory.CwdFiles
+
+	hins := ids.Hinweisen()
 
 	for _, h := range hins {
 		pz.Zettelen = append(pz.Zettelen, h.String())
