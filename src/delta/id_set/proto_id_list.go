@@ -44,7 +44,7 @@ func (ps ProtoIdList) Make(vs ...string) (s Set, err error) {
 		}
 
 		if err != nil {
-			err = errors.Wrap(err)
+			err = errors.Errorf("no proto id was able to parse: %s", v)
 			return
 		}
 	}

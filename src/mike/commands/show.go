@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/transaktion"
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
-	"github.com/friedenberg/zit/src/hotel/store_objekten"
 	"github.com/friedenberg/zit/src/kilo/umwelt"
 )
 
@@ -54,22 +53,11 @@ func (c Show) RunWithIds(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 }
 
 func (c Show) showZettels(store *umwelt.Umwelt, ids id_set.Set) (err error) {
-	zettels := make([]zettel_transacted.Zettel, ids.Len())
+	var zts zettel_transacted.Set
 
-	for i, is := range ids.AnyShasOrHinweisen() {
-		var tz zettel_transacted.Zettel
-
-		if tz, err = store.StoreObjekten().ReadOne(is); err != nil {
-			if errors.Is(err, store_objekten.ErrNotFound{}) {
-				err = errors.Normal(err)
-			} else {
-				err = errors.Wrap(err)
-			}
-
-			return
-		}
-
-		zettels[i] = tz
+	if zts, err = store.StoreObjekten().ReadMany(ids); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	f := zettel.Text{}
@@ -79,20 +67,24 @@ func (c Show) showZettels(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 		AkteReaderFactory: store.StoreObjekten(),
 	}
 
-	for _, named := range zettels {
-		if typKonfig, ok := store.Konfig().Typen[named.Named.Stored.Zettel.Typ.String()]; ok {
-			ctx.IncludeAkte = typKonfig.InlineAkte
-		} else {
-			ctx.IncludeAkte = named.Named.Stored.Zettel.Typ.String() == "md"
-		}
+	zts.Each(
+		func(zt zettel_transacted.Zettel) (err error) {
+			if typKonfig, ok := store.Konfig().Typen[zt.Named.Stored.Zettel.Typ.String()]; ok {
+				ctx.IncludeAkte = typKonfig.InlineAkte
+			} else {
+				ctx.IncludeAkte = zt.Named.Stored.Zettel.Typ.String() == "md"
+			}
 
-		ctx.Zettel = named.Named.Stored.Zettel
+			ctx.Zettel = zt.Named.Stored.Zettel
 
-		if _, err = f.WriteTo(ctx); err != nil {
-			err = errors.Wrap(err)
+			if _, err = f.WriteTo(ctx); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
 			return
-		}
-	}
+		},
+	)
 
 	return
 }

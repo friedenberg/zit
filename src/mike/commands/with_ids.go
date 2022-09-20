@@ -5,6 +5,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/charlie/ts"
+	"github.com/friedenberg/zit/src/charlie/typ"
 	"github.com/friedenberg/zit/src/delta/id_set"
 	"github.com/friedenberg/zit/src/kilo/umwelt"
 )
@@ -46,6 +47,9 @@ func (c commandWithIds) getIdProtoSet(u *umwelt.Umwelt) (is id_set.ProtoIdList) 
 					out = h.String()
 					return
 				},
+			},
+			id_set.ProtoId{
+				MutableId: &typ.Typ{},
 			},
 			id_set.ProtoId{
 				MutableId: &ts.Time{},

@@ -10,6 +10,8 @@ import (
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/etikett"
+	"github.com/friedenberg/zit/src/charlie/hinweis"
+	"github.com/friedenberg/zit/src/charlie/ts"
 	"github.com/friedenberg/zit/src/charlie/typ"
 	"github.com/friedenberg/zit/src/delta/id_set"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
@@ -20,8 +22,8 @@ import (
 )
 
 type Organize struct {
+	Or bool
 	organize_text.Options
-	typ.Typ
 	Mode organizeMode
 }
 
@@ -72,22 +74,39 @@ func init() {
 			}
 
 			f.Var(&c.Mode, "mode", "mode used for handling stdin and stdout")
-			f.Var(&c.Typ, "typ", "typ to filter")
+			f.BoolVar(&c.Or, "or", false, "allow optional criteria instead of required")
 			c.Options.AddToFlagSet(f)
 
 			return commandWithIds{
 				CommandWithIds: c,
-				ProtoIdList: id_set.MakeProtoIdList(
-					id_set.ProtoId{
-						MutableId: &etikett.Etikett{},
-					},
-					id_set.ProtoId{
-						MutableId: &typ.Typ{},
-					},
-				),
 			}
 		},
 	)
+}
+
+func (c Organize) ProtoIdList(u *umwelt.Umwelt) (is id_set.ProtoIdList) {
+	is = id_set.MakeProtoIdList(
+		id_set.ProtoId{
+			MutableId: &etikett.Etikett{},
+		},
+		id_set.ProtoId{
+			MutableId: &hinweis.Hinweis{},
+			Expand: func(v string) (out string, err error) {
+				var h hinweis.Hinweis
+				h, err = u.StoreObjekten().ExpandHinweisString(v)
+				out = h.String()
+				return
+			},
+		},
+		id_set.ProtoId{
+			MutableId: &typ.Typ{},
+		},
+		id_set.ProtoId{
+			MutableId: &ts.Time{},
+		},
+	)
+
+	return
 }
 
 func (c *Organize) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
@@ -108,9 +127,9 @@ func (c *Organize) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 	getOp := user_ops.GetZettelsFromQuery{Umwelt: u}
 
-	query := zettel_named.FilterAnd{
-		zettel_named.FilterEtikettSet{Set: createOrganizeFileOp.RootEtiketten},
-		zettel_named.FilterTyp(c.Typ),
+	query := zettel_named.FilterIdSet{
+		Set: ids,
+		And: !c.Or,
 	}
 
 	if getResults, err = getOp.Run(query); err != nil {
