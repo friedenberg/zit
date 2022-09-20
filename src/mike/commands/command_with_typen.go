@@ -22,7 +22,12 @@ func (c commandWithTypen) Run(store *umwelt.Umwelt, args ...string) (err error) 
 		},
 	)
 
-	ids := ps.Make(args...)
+	var ids id_set.Set
+
+	if ids, err = ps.Make(args...); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if err = c.RunWithTypen(store, ids.Typen()...); err != nil {
 		err = errors.Wrap(err)

@@ -59,7 +59,12 @@ func (c commandWithIds) getIdProtoSet(u *umwelt.Umwelt) (is id_set.ProtoIdList) 
 func (c commandWithIds) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	ps := c.getIdProtoSet(u)
 
-	ids := ps.Make(args...)
+	var ids id_set.Set
+
+	if ids, err = ps.Make(args...); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if err = c.RunWithIds(u, ids); err != nil {
 		err = errors.Wrap(err)

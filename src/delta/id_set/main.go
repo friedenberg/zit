@@ -17,7 +17,7 @@ type Set struct {
 	ids  []id.Id
 }
 
-func MakeSet(c int) Set {
+func Make(c int) Set {
 	return Set{
 		shas: sha.MakeSet(c),
 		ids:  make([]id.Id, 0, c),

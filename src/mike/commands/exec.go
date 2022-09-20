@@ -93,7 +93,12 @@ func (c Exec) getZettel(
 		},
 	)
 
-	is := ps.Make(hString)
+	var is id_set.Set
+
+	if is, err = ps.Make(hString); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	var idd id.IdMitKorper
 	ok := false

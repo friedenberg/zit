@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/etikett"
+	"github.com/friedenberg/zit/src/delta/id_set"
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/hotel/organize_text"
@@ -160,10 +161,15 @@ func (c Add) openAktenIfNecessary(
 	}
 
 	hs := zettels.ToSliceHinweisen()
+	ids := id_set.Make(len(hs))
+
+	for _, h := range hs {
+		ids.Add(h)
+	}
 
 	var checkoutResults zettel_checked_out.Set
 
-	if checkoutResults, err = checkoutOp.RunManyHinweisen(hs...); err != nil {
+	if checkoutResults, err = checkoutOp.RunMany(ids); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

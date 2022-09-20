@@ -12,6 +12,7 @@ type OptionsReadExternal struct {
 }
 
 type CheckoutOptions struct {
+	Force bool
 	CheckoutMode
 	zettel.Format
 	Zettelen map[hinweis.Hinweis]zettel_transacted.Zettel

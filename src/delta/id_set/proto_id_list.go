@@ -3,6 +3,7 @@ package id_set
 import (
 	"reflect"
 
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/id"
 )
 
@@ -29,20 +30,22 @@ func (ps ProtoIdList) Len() int {
 	return len(ps.types)
 }
 
-func (ps ProtoIdList) Make(vs ...string) (s Set) {
-	s = Set{
-		ids: make([]id.Id, 0, len(vs)),
-	}
+func (ps ProtoIdList) Make(vs ...string) (s Set, err error) {
+	s = Make(len(vs))
 
 	for _, v := range vs {
 		for _, t := range ps.types {
 			var i id.Id
-			var err error
 
 			if i, err = t.Make(v); err == nil {
-				s.ids = append(s.ids, i)
+				s.Add(i)
 				break
 			}
+		}
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
 		}
 	}
 

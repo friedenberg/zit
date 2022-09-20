@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
-	"github.com/friedenberg/zit/src/charlie/hinweis"
+	"github.com/friedenberg/zit/src/delta/id_set"
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_external"
 	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
@@ -28,12 +28,14 @@ func init() {
 
 			f.Var(&c.CheckoutMode, "mode", "mode for checking out the zettel")
 
-			return c
+			return commandWithIds{
+				CommandWithIds: c,
+			}
 		},
 	)
 }
 
-func (c Edit) Run(u *umwelt.Umwelt, args ...string) (err error) {
+func (c Edit) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	checkoutOptions := store_working_directory.CheckoutOptions{
 		CheckoutMode: c.CheckoutMode,
 		Format:       zettel.Text{},
@@ -44,20 +46,9 @@ func (c Edit) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		CheckoutOptions: checkoutOptions,
 	}
 
-	var hins []hinweis.Hinweis
-
-	op := user_ops.GetHinweisenFromArgs{
-		Umwelt: u,
-	}
-
-	if hins, err = op.RunMany(args...); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	var checkoutResults zettel_checked_out.Set
 
-	if checkoutResults, err = checkoutOp.RunManyHinweisen(hins...); err != nil {
+	if checkoutResults, err = checkoutOp.RunMany(ids); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

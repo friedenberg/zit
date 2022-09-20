@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/id"
+	"github.com/friedenberg/zit/src/delta/id_set"
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_external"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
@@ -16,20 +17,73 @@ import (
 
 func (s *Store) Checkout(
 	options CheckoutOptions,
-	zs ...zettel_transacted.Zettel,
+	ids id_set.Set,
 ) (zcs zettel_checked_out.Set, err error) {
-	zcs = zettel_checked_out.MakeSetUnique(len(zs))
+	zcs = zettel_checked_out.MakeSetUnique(ids.Len())
+	var zts zettel_transacted.Set
 
-	for _, sz := range zs {
-		var zc zettel_checked_out.Zettel
-
-		if zc, err = s.CheckoutOne(options, sz); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		zcs.Add(zc)
+	if zts, err = s.storeObjekten.ReadMany(ids); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
+
+	zts.Each(
+		func(zt zettel_transacted.Zettel) (err error) {
+			var zc zettel_checked_out.Zettel
+
+			if zc, err = s.CheckoutOne(options, zt); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			zcs.Add(zc)
+			return
+		},
+	)
+
+	return
+}
+
+func (s Store) shouldCheckOut(
+	options CheckoutOptions,
+	cz zettel_checked_out.Zettel,
+) (ok bool) {
+	if cz.External.ZettelFD.Path == "" {
+		ok = true
+		return
+	}
+
+	if cz.Internal.Named.Stored.Zettel.Equals(cz.External.Named.Stored.Zettel) {
+		errors.Print(cz.Internal.Named.Stored.Zettel)
+		errors.PrintOutf("%s (already checked out)", cz.Internal.Named)
+		return
+	}
+
+	if options.Force || cz.State == zettel_checked_out.StateEmpty {
+		ok = true
+		return
+	} else if cz.State == zettel_checked_out.StateExistsAndSame {
+		errors.PrintOutf("%s (already checked out)", cz.Internal.Named)
+	} else if cz.State == zettel_checked_out.StateExistsAndDifferent {
+		errors.PrintOutf("%s (external has changes)", cz.Internal.Named)
+	} else {
+		errors.PrintOutf("%s (unknown state)", cz.Internal.Named)
+	}
+
+	return
+}
+
+func (s Store) filenameForZettelTransacted(
+	options CheckoutOptions,
+	sz zettel_transacted.Zettel,
+) (originalFilename string, filename string, err error) {
+	if originalFilename, err = id.MakeDirIfNecessary(sz.Named.Hinweis, s.cwd); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	//TODO move user-fs-representation of zettel path to own function
+	filename = originalFilename + ".md"
 
 	return
 }
@@ -38,17 +92,23 @@ func (s *Store) CheckoutOne(
 	options CheckoutOptions,
 	sz zettel_transacted.Zettel,
 ) (cz zettel_checked_out.Zettel, err error) {
+	var originalFilename, filename string
 
-	var filename string
-
-	if filename, err = id.MakeDirIfNecessary(sz.Named.Hinweis, s.cwd); err != nil {
+	if originalFilename, filename, err = s.filenameForZettelTransacted(options, sz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	originalFilename := filename
-	//TODO move user-fs-representation of zettel path to own function
-	filename = filename + ".md"
+	if files.Exists(filename) {
+		if cz, err = s.Read(filename); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if !s.shouldCheckOut(options, cz) {
+			return
+		}
+	}
 
 	inlineAkte := sz.Named.Stored.Zettel.IsInlineAkte(s.Konfig.Konfig)
 

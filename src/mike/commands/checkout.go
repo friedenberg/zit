@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/typ"
 	"github.com/friedenberg/zit/src/delta/id_set"
 	"github.com/friedenberg/zit/src/delta/zettel"
-	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
 	"github.com/friedenberg/zit/src/india/store_working_directory"
 	"github.com/friedenberg/zit/src/kilo/umwelt"
 	"github.com/friedenberg/zit/src/lima/user_ops"
@@ -66,57 +65,6 @@ func (c Checkout) ProtoIdList(u *umwelt.Umwelt) (is id_set.ProtoIdList) {
 }
 
 func (c Checkout) RunWithIds(s *umwelt.Umwelt, ids id_set.Set) (err error) {
-	var readResults []zettel_checked_out.Zettel
-
-	readOp := user_ops.ReadCheckedOut{
-		Umwelt: s,
-		OptionsReadExternal: store_working_directory.OptionsReadExternal{
-			Format: zettel.Text{},
-		},
-	}
-
-	var pz store_working_directory.CwdFiles
-
-	hins := ids.Hinweisen()
-
-	for _, h := range hins {
-		pz.Zettelen = append(pz.Zettelen, h.String())
-	}
-
-	if readResults, err = readOp.RunMany(pz); err != nil {
-		errors.Print(err)
-		err = errors.Wrap(err)
-		return
-	}
-
-	toCheckOut := make([]hinweis.Hinweis, 0, len(hins))
-
-	for _, cz := range readResults {
-		if cz.External.ZettelFD.Path == "" {
-			toCheckOut = append(toCheckOut, cz.Internal.Named.Hinweis)
-			continue
-		}
-
-		if cz.Internal.Named.Stored.Zettel.Equals(cz.External.Named.Stored.Zettel) {
-			errors.Print(cz.Internal.Named.Stored.Zettel)
-			errors.PrintOutf("%s (already checked out)", cz.Internal.Named)
-			continue
-		}
-
-		if c.Force || cz.State == zettel_checked_out.StateEmpty {
-			toCheckOut = append(toCheckOut, cz.Internal.Named.Hinweis)
-		} else if cz.State == zettel_checked_out.StateExistsAndSame {
-			errors.PrintOutf("%s (already checked out)", cz.Internal.Named)
-			continue
-		} else if cz.State == zettel_checked_out.StateExistsAndDifferent {
-			errors.PrintOutf("%s (external has changes)", cz.Internal.Named)
-			continue
-		} else {
-			errors.PrintOutf("%s (unknown state)", cz.Internal.Named)
-			continue
-		}
-	}
-
 	checkoutOp := user_ops.Checkout{
 		Umwelt: s,
 		CheckoutOptions: store_working_directory.CheckoutOptions{
@@ -125,7 +73,7 @@ func (c Checkout) RunWithIds(s *umwelt.Umwelt, ids id_set.Set) (err error) {
 		},
 	}
 
-	if _, err = checkoutOp.RunManyHinweisen(toCheckOut...); err != nil {
+	if _, err = checkoutOp.RunMany(ids); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

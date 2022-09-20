@@ -7,7 +7,13 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/charlie/hinweis"
 )
+
+type CwdZettel struct {
+	hinweis.Hinweis
+	Zettel, Akte File
+}
 
 type CwdFiles struct {
 	dir              string
