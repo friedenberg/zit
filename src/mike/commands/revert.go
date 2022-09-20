@@ -4,7 +4,7 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/zk_types"
+	gattung "github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/delta/id_set"
 	"github.com/friedenberg/zit/src/delta/transaktion"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
@@ -12,7 +12,7 @@ import (
 )
 
 type Revert struct {
-	Type zk_types.Type
+	Type gattung.Gattung
 }
 
 func init() {

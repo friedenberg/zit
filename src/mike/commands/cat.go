@@ -7,8 +7,8 @@ import (
 	"syscall"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/bravo/zk_types"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/charlie/typ"
 	"github.com/friedenberg/zit/src/delta/zettel"
@@ -17,7 +17,7 @@ import (
 )
 
 type Cat struct {
-	zk_types.Type
+	gattung.Gattung
 	Format string
 }
 
@@ -26,10 +26,10 @@ func init() {
 		"cat",
 		func(f *flag.FlagSet) Command {
 			c := &Cat{
-				Type: zk_types.TypeUnknown,
+				Gattung: gattung.Unknown,
 			}
 
-			f.Var(&c.Type, "type", "ObjekteType")
+			f.Var(&c.Gattung, "gattung", "ObjekteType")
 			f.StringVar(&c.Format, "format", "", "ObjekteType")
 
 			return c
@@ -37,21 +37,22 @@ func init() {
 	)
 }
 
+//TODO move to types as args
 func (c Cat) Run(u *umwelt.Umwelt, args ...string) (err error) {
-	switch c.Type {
-	case zk_types.TypeEtikett:
+	switch c.Gattung {
+	case gattung.Etikett:
 		err = c.etiketten(u)
 
-	case zk_types.TypeZettel:
+	case gattung.Zettel:
 		err = c.zettelen(u)
 
-	case zk_types.TypeAkte:
+	case gattung.Akte:
 		err = c.akten(u)
 
-	case zk_types.TypeHinweis:
+	case gattung.Hinweis:
 		err = c.hinweisen(u)
 
-	case zk_types.TypeTyp:
+	case gattung.Typ:
 		err = c.typen(u)
 
 	default:

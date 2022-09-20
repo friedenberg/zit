@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	gattung "github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/bravo/zk_types"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/charlie/ts"
@@ -20,7 +20,7 @@ type Transaktion struct {
 type Mutter [2]ts.Time
 
 type Objekte struct {
-	zk_types.Type
+	gattung.Gattung
 	Mutter
 	Id flag.Value
 	sha.Sha
@@ -34,7 +34,7 @@ func (o *Objekte) Set(v string) (err error) {
 		return
 	}
 
-	if err = o.Type.Set(vs[0]); err != nil {
+	if err = o.Gattung.Set(vs[0]); err != nil {
 		err = errors.Wrapf(err, "failed to set type: %s", vs[0])
 		return
 	}
@@ -55,16 +55,19 @@ func (o *Objekte) Set(v string) (err error) {
 
 	vs = vs[1:]
 
-	switch o.Type {
-	case zk_types.TypeZettel:
+	switch o.Gattung {
+	case gattung.Zettel:
 		o.Id = &hinweis.Hinweis{}
-	case zk_types.TypeEtikett:
+
+	case gattung.Etikett:
 		o.Id = &etikett.Etikett{}
-	case zk_types.TypeAkteTyp:
+
+	case gattung.Typ:
 		//TODO
 		fallthrough
+
 	default:
-		err = errors.Errorf("unsupported type: %s", o.Type)
+		err = errors.Errorf("unsupported gattung: %s", o.Gattung)
 		return
 	}
 

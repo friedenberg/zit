@@ -3,8 +3,8 @@ package zettel_printer
 import (
 	"fmt"
 
+	gattung "github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/paper"
-	"github.com/friedenberg/zit/src/bravo/zk_types"
 	"github.com/friedenberg/zit/src/golf/zettel_external"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
@@ -63,10 +63,10 @@ func (p *Printer) appendZettelCheckedOutMatches(
 	pa *paper.Paper,
 	ex zettel_external.Zettel,
 ) {
-	typToCollection := map[zk_types.Type]zettel_transacted.Set{
-		zk_types.TypeAkte:        m.Akten,
-		zk_types.TypeBezeichnung: m.Bezeichnungen,
-		zk_types.TypeZettel:      m.Zettelen,
+	typToCollection := map[gattung.Gattung]zettel_transacted.Set{
+		gattung.Akte:        m.Akten,
+		gattung.Bezeichnung: m.Bezeichnungen,
+		gattung.Zettel:      m.Zettelen,
 	}
 
 	for t, c := range typToCollection {

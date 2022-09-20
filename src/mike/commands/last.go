@@ -5,13 +5,13 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/zk_types"
+	gattung "github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/delta/transaktion"
 	"github.com/friedenberg/zit/src/kilo/umwelt"
 )
 
 type Last struct {
-	Type zk_types.Type
+	Type gattung.Gattung
 }
 
 func init() {

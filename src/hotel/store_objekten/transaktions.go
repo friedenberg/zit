@@ -7,8 +7,8 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
+	gattung "github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/bravo/zk_types"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/charlie/id"
 	"github.com/friedenberg/zit/src/charlie/ts"
@@ -236,10 +236,10 @@ func (s *Store) addZettelToTransaktion(z zettel_named.Zettel) (tz zettel_transac
 	s.Transaktion.Objekten = append(
 		s.Transaktion.Objekten,
 		transaktion.Objekte{
-			Type:   zk_types.TypeZettel,
-			Mutter: mutter,
-			Id:     &z.Hinweis,
-			Sha:    z.Stored.Sha,
+			Gattung: gattung.Zettel,
+			Mutter:  mutter,
+			Id:      &z.Hinweis,
+			Sha:     z.Stored.Sha,
 		},
 	)
 

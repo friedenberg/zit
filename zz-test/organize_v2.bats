@@ -395,14 +395,14 @@ function commits_organize_one_etiketten_group_by_two_new_zettels { # @test
 		echo w-2022-07-07
 	} >"$expected"
 
-	run zit cat -type etikett
+	run zit cat -gattung etikett
 	assert_output "$(cat "$expected")"
 
 	{
 		echo one/uno
 	} >"$expected"
 
-	# run zit cat -type hinweis
+	# run zit cat -gattung hinweis
 	# assert_output --partial "$(cat "$expected")"
 
 	to_add="$(mktemp)"
@@ -424,7 +424,7 @@ function commits_organize_one_etiketten_group_by_two_new_zettels { # @test
 		echo w-2022-07-07
 	} >"$expected"
 
-	run zit cat -type etikett
+	run zit cat -gattung etikett
 	assert_output "$(cat "$expected")"
 
 	to_add="$(mktemp)"
@@ -446,7 +446,7 @@ function commits_organize_one_etiketten_group_by_two_new_zettels { # @test
 		echo w-2022-07-07
 	} >"$expected"
 
-	run zit cat -type etikett
+	run zit cat -gattung etikett
 	assert_output "$(cat "$expected")"
 
 	expected_organize="$(mktemp)"
@@ -504,7 +504,7 @@ function commits_organize_one_etiketten_group_by_two_new_zettels { # @test
 		echo w-2022-07-07
 	} >"$expected"
 
-	run zit cat -type etikett
+	run zit cat -gattung etikett
 	assert_output "$(cat "$expected")"
 }
 
@@ -732,7 +732,7 @@ function etiketten_correct { # @test
 		echo test1-wow
 	} >"$expected_etiketten"
 
-	run zit cat -type etikett
+	run zit cat -gattung etikett
 	assert_output "$(cat "$expected_etiketten")"
 
 	mkdir -p one
@@ -750,7 +750,7 @@ function etiketten_correct { # @test
 		echo test4
 	} >"$expected_etiketten"
 
-	run zit cat -type etikett
+	run zit cat -gattung etikett
 	assert_output "$(cat "$expected_etiketten")"
 
 	mkdir -p one
@@ -770,6 +770,6 @@ function etiketten_correct { # @test
 		echo test4
 	} >"$expected_etiketten"
 
-	run zit cat -type etikett
+	run zit cat -gattung etikett
 	assert_output "$(cat "$expected_etiketten")"
 }

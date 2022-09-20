@@ -5,8 +5,8 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	gattung "github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/bravo/zk_types"
 	"github.com/friedenberg/zit/src/charlie/id"
 	"github.com/friedenberg/zit/src/delta/id_set"
 	"github.com/friedenberg/zit/src/delta/zettel"
@@ -16,7 +16,7 @@ import (
 )
 
 type CatObjekte struct {
-	Type zk_types.Type
+	Type gattung.Gattung
 }
 
 func init() {
@@ -24,7 +24,7 @@ func init() {
 		"cat-objekte",
 		func(f *flag.FlagSet) Command {
 			c := &CatObjekte{
-				Type: zk_types.TypeUnknown,
+				Type: gattung.Unknown,
 			}
 
 			f.Var(&c.Type, "type", "ObjekteType")
@@ -40,10 +40,10 @@ func init() {
 func (c CatObjekte) RunWithIds(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 	switch c.Type {
 
-	case zk_types.TypeAkte:
+	case gattung.Akte:
 		return c.akten(store, ids)
 
-	case zk_types.TypeZettel:
+	case gattung.Zettel:
 		return c.zettelen(store, ids)
 
 	default:

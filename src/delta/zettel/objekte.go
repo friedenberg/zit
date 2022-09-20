@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	gattung "github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/line_format"
-	"github.com/friedenberg/zit/src/bravo/zk_types"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 )
 
@@ -18,12 +18,12 @@ type Objekte struct {
 func (f Objekte) WriteTo(z Zettel, out1 io.Writer) (n int64, err error) {
 	w := line_format.NewWriter()
 
-	w.WriteFormat("%s %s", zk_types.TypeAkte, z.Akte)
-	w.WriteFormat("%s %s", zk_types.TypeAkteTyp, z.Typ)
-	w.WriteFormat("%s %s", zk_types.TypeBezeichnung, z.Bezeichnung)
+	w.WriteFormat("%s %s", gattung.Akte, z.Akte)
+	w.WriteFormat("%s %s", gattung.Typ, z.Typ)
+	w.WriteFormat("%s %s", gattung.Bezeichnung, z.Bezeichnung)
 
 	for _, e := range z.Etiketten.Sorted() {
-		w.WriteFormat("%s %s", zk_types.TypeEtikett, e)
+		w.WriteFormat("%s %s", gattung.Etikett, e)
 	}
 
 	n, err = w.WriteTo(out1)
@@ -76,7 +76,7 @@ func (f *Objekte) ReadFrom(z *Zettel, in io.Reader) (n int64, err error) {
 			return
 		}
 
-		var t zk_types.Type
+		var t gattung.Gattung
 
 		if err = t.Set(line[:loc]); err != nil {
 			err = errors.Errorf("%s: %s", err, line[:loc])
@@ -86,13 +86,13 @@ func (f *Objekte) ReadFrom(z *Zettel, in io.Reader) (n int64, err error) {
 		v := line[loc+1:]
 
 		switch t {
-		case zk_types.TypeAkte:
+		case gattung.Akte:
 			if err = z.Akte.Set(v); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-		case zk_types.TypeAkteTyp:
+		case gattung.Typ:
 			if f.IgnoreTypErrors {
 				z.Typ.Etikett.Value = strings.TrimSpace(v)
 			} else {
@@ -102,13 +102,13 @@ func (f *Objekte) ReadFrom(z *Zettel, in io.Reader) (n int64, err error) {
 				}
 			}
 
-		case zk_types.TypeBezeichnung:
+		case gattung.Bezeichnung:
 			if err = z.Bezeichnung.Set(v); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-		case zk_types.TypeEtikett:
+		case gattung.Etikett:
 			if err = z.Etiketten.AddString(v); err != nil {
 				err = errors.Wrap(err)
 				return

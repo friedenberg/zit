@@ -5,7 +5,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/zk_types"
+	gattung "github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/delta/id_set"
 	"github.com/friedenberg/zit/src/delta/transaktion"
 	"github.com/friedenberg/zit/src/delta/zettel"
@@ -14,7 +14,7 @@ import (
 )
 
 type Show struct {
-	Type zk_types.Type
+	Type gattung.Gattung
 }
 
 func init() {
@@ -22,7 +22,7 @@ func init() {
 		"show",
 		func(f *flag.FlagSet) Command {
 			c := &Show{
-				Type: zk_types.TypeZettel,
+				Type: gattung.Zettel,
 			}
 
 			f.Var(&c.Type, "type", "ObjekteType")
@@ -37,13 +37,13 @@ func init() {
 func (c Show) RunWithIds(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 	switch c.Type {
 
-	case zk_types.TypeAkte:
+	case gattung.Akte:
 		return c.showAkten(store, ids)
 
-	case zk_types.TypeZettel:
+	case gattung.Zettel:
 		return c.showZettels(store, ids)
 
-	case zk_types.TypeTransaktion:
+	case gattung.Transaktion:
 		return c.showTransaktions(store, ids)
 
 	default:

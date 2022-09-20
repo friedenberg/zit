@@ -5,7 +5,7 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/zk_types"
+	gattung "github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/golf/alfred"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
@@ -13,7 +13,7 @@ import (
 )
 
 type CatAlfred struct {
-	Type zk_types.Type
+	Type gattung.Gattung
 	Command
 }
 
@@ -22,7 +22,7 @@ func init() {
 		"cat-alfred",
 		func(f *flag.FlagSet) Command {
 			c := &CatAlfred{
-				Type: zk_types.TypeUnknown,
+				Type: gattung.Unknown,
 			}
 
 			c.Command = c
@@ -57,7 +57,7 @@ func (c CatAlfred) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}()
 
 	switch c.Type {
-	case zk_types.TypeEtikett:
+	case gattung.Etikett:
 		var ea []etikett.Etikett
 
 		if ea, err = u.StoreObjekten().Etiketten(); err != nil {
@@ -69,12 +69,13 @@ func (c CatAlfred) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			aw.WriteEtikett(e)
 		}
 
-
-	case zk_types.TypeAkte:
-
-	case zk_types.TypeZettel:
+	case gattung.Akte:
     fallthrough
-	case zk_types.TypeHinweis:
+
+	case gattung.Zettel:
+		fallthrough
+
+	case gattung.Hinweis:
 		var all zettel_transacted.Set
 
 		if all, err = u.StoreObjekten().ZettelenSchwanzen(); err != nil {

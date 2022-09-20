@@ -377,7 +377,7 @@ function indexes_are_implicitly_correct { # @test
 		echo et2
 	} >"$expected"
 
-	run zit cat "${cmd_zit_def[@]}" -type etikett
+	run zit cat "${cmd_zit_def[@]}" -gattung etikett
 	assert_output "$(cat "$expected")"
 
 	{
@@ -385,7 +385,7 @@ function indexes_are_implicitly_correct { # @test
 	} >"$expected"
 
 	#TODO
-	# run zit cat "${cmd_zit_def[@]}" -type hinweis
+	# run zit cat "${cmd_zit_def[@]}" -gattung hinweis
 	# assert_output --partial "$(cat "$expected")"
 
 	{
@@ -406,7 +406,7 @@ function indexes_are_implicitly_correct { # @test
 		echo et1
 	} >"$expected"
 
-	run zit cat "${cmd_zit_def[@]}" -type etikett
+	run zit cat "${cmd_zit_def[@]}" -gattung etikett
 	assert_output "$(cat "$expected")"
 
 	{
@@ -414,7 +414,7 @@ function indexes_are_implicitly_correct { # @test
 	} >"$expected"
 
 	#TODO
-	# run zit cat "${cmd_zit_def[@]}" -type hinweis
+	# run zit cat "${cmd_zit_def[@]}" -gattung hinweis
 	# assert_output --partial "$(cat "$expected")"
 }
 

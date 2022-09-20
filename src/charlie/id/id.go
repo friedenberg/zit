@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	gattung "github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/bravo/zk_types"
 )
 
 type Id interface {
@@ -30,7 +30,7 @@ type MutableId interface {
 
 type TypedId interface {
 	Id
-	Type() zk_types.Type
+	Type() gattung.Gattung
 }
 
 func Path(i IdMitKorper, pc ...string) string {

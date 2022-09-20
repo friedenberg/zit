@@ -1,9 +1,9 @@
-package zk_types
+package gattung
 
 import "fmt"
 
 type ErrWrongType struct {
-	ExpectedType, ActualType Type
+	ExpectedType, ActualType Gattung
 }
 
 func (e ErrWrongType) Error() string {

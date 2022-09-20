@@ -5,9 +5,9 @@ import (
 	"reflect"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	gattung "github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/paper"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/bravo/zk_types"
 	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
@@ -608,9 +608,9 @@ func (s *Store) Reindex() (err error) {
 		for _, o := range t.Objekten {
 			errors.Print(o)
 
-			switch o.Type {
+			switch o.Gattung {
 
-			case zk_types.TypeZettel:
+			case gattung.Zettel:
 				var tz zettel_transacted.Zettel
 
 				if tz, err = s.transactedZettelFromTransaktionObjekte(t, o); err != nil {

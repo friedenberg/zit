@@ -1,4 +1,4 @@
-package zk_types
+package gattung
 
 import (
 	"bufio"
@@ -6,8 +6,8 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
-func ConfirmTypeFromReader(t Type, r *bufio.Reader) (err error) {
-	var t1 Type
+func ConfirmTypeFromReader(t Gattung, r *bufio.Reader) (err error) {
+	var t1 Gattung
 
 	if t1, err = FromReader(r); err != nil {
 		err = errors.Wrap(err)
@@ -26,7 +26,7 @@ func ConfirmTypeFromReader(t Type, r *bufio.Reader) (err error) {
 	return
 }
 
-func FromReader(r *bufio.Reader) (t Type, err error) {
+func FromReader(r *bufio.Reader) (t Gattung, err error) {
 	var line string
 
 	if line, err = r.ReadString('\n'); err != nil {
