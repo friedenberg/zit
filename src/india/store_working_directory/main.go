@@ -117,7 +117,7 @@ func (s *Store) ReadAll() (err error) {
 
 	var possible CwdFiles
 
-	if possible, err = s.GetPossibleZettels(); err != nil {
+	if possible, err = MakeCwdFiles(s.cwd); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -134,7 +134,8 @@ func (s *Store) ReadAll() (err error) {
 	return
 }
 
-func (s *Store) syncOne(p string) (err error) {
+func (s *Store) syncOne(z CwdZettel) (err error) {
+	p := z.Zettel.Path
 	errors.Output(2, fmt.Sprintln("will sync one: ", p))
 	var hasCache, hasFs bool
 

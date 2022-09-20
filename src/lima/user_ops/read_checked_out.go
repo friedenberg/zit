@@ -45,7 +45,11 @@ func (op ReadCheckedOut) RunMany(
 	for _, p := range possible.Zettelen {
 		var checked_out zettel_checked_out.Zettel
 
-		if checked_out, err = op.StoreWorkingDirectory().Read(p); err != nil {
+    if p.Zettel.Path == "" {
+      continue
+    }
+
+		if checked_out, err = op.StoreWorkingDirectory().Read(p.Zettel.Path); err != nil {
 			if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
 				//TODO log
 				err = nil
@@ -59,15 +63,19 @@ func (op ReadCheckedOut) RunMany(
 		results = append(results, checked_out)
 	}
 
-	for _, p := range possible.Akten {
+	for _, p := range possible.Zettelen {
 		var checked_out zettel_checked_out.Zettel
 
-		if checked_out, err = op.StoreWorkingDirectory().ReadExternalZettelFromAktePath(p); err != nil {
+    if p.Akte.Path == "" {
+      continue
+    }
+
+		if checked_out, err = op.StoreWorkingDirectory().ReadExternalZettelFromAktePath(p.Akte.Path); err != nil {
 			if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
 				//TODO log
 				err = nil
 			} else {
-				err = errors.Wrap(err)
+        err = errors.Wrapf(err, "akte path: %s", p.Akte.Path)
 				return
 			}
 		}

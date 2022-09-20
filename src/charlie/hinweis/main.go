@@ -122,7 +122,7 @@ func (h *Hinweis) Set(v string) (err error) {
 	switch count {
 
 	default:
-		err = errors.Normal(errors.Errorf("hinweis needs exactly 2 components, but got %d: %q", count, v))
+		err = errors.Errorf("hinweis needs exactly 2 components, but got %d: %q", count, v)
 		return
 
 	case 2:

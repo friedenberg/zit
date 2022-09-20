@@ -50,7 +50,7 @@ func (s Store) ReadExternalZettelFromAktePath(p string) (cz zettel_checked_out.Z
 	var akteSha sha.Sha
 
 	if akteSha, err = s.AkteShaFromPath(p); err != nil {
-		err = errors.Wrap(err)
+    err = errors.Wrapf(err, "path: %s", p)
 		return
 	}
 

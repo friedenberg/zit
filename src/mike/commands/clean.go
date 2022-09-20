@@ -34,15 +34,18 @@ func (c Clean) Run(
 	s *umwelt.Umwelt,
 	args ...string,
 ) (err error) {
-	if len(args) > 0 {
-		errors.PrintErrf("args provided will be ignored")
-	}
-
 	var possible store_working_directory.CwdFiles
 
-	if possible, err = user_ops.NewGetPossibleZettels(s).Run(); err != nil {
-		err = errors.Wrap(err)
-		return
+	switch {
+	case len(args) > 0:
+		errors.PrintErrf("Ignoring args")
+		fallthrough
+
+	default:
+		if possible, err = store_working_directory.MakeCwdFiles(s.Standort().Cwd(), args...); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	optionsReadExternal := store_working_directory.OptionsReadExternal{

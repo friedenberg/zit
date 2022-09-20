@@ -91,10 +91,13 @@ func (c Edit) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 		},
 	}
 
+	fs := checkoutResults.ToSliceFilesZettelen()
+
 	var possible store_working_directory.CwdFiles
 
-	for _, f := range checkoutResults.ToSliceFilesZettelen() {
-		possible.Zettelen = append(possible.Zettelen, f)
+	if possible, err = store_working_directory.MakeCwdFiles(u.Standort().Cwd(), fs...); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	if readResults, err = readOp.RunMany(possible); err != nil {

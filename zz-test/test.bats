@@ -401,6 +401,8 @@ function indexes_are_implicitly_correct { # @test
 	mkdir -p one
 	cp "$expected" "one/uno.md"
 	run zit checkin "${cmd_zit_def[@]}" -delete "one/uno.md"
+	assert_output --partial '[o/u@6 "bez"] (updated)'
+	assert_output --partial 'one/uno.md (checkout deleted)'
 
 	{
 		echo et1

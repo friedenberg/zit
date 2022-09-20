@@ -166,18 +166,16 @@ func (c New) editZettelsIfRequested(
 			Build(),
 	}
 
-	cwdFiles := store_working_directory.CwdFiles{
-		Zettelen: make([]string, 0, zsc.Len()),
+	fs := zsc.ToSliceFilesZettelen()
+
+	var cwdFiles store_working_directory.CwdFiles
+
+	if cwdFiles, err = store_working_directory.MakeCwdFiles(u.Standort().Cwd(), fs...); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
-	zsc.Each(
-		func(zc zettel_checked_out.Zettel) (err error) {
-			cwdFiles.Zettelen = append(cwdFiles.Zettelen, zc.External.ZettelFD.Path)
-			return nil
-		},
-	)
-
-	if _, err = openVimOp.Run(cwdFiles.Zettelen...); err != nil {
+	if _, err = openVimOp.Run(cwdFiles.ZettelFiles()...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

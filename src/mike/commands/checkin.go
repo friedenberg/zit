@@ -39,18 +39,16 @@ func (c Checkin) Run(
 ) (err error) {
 	var pz store_working_directory.CwdFiles
 
-	if c.All {
-		if len(args) > 0 {
-			errors.PrintErrf("Ignoring args because -all is set")
-		}
+	switch {
+	case c.All && len(args) > 0:
+		errors.PrintErrf("Ignoring args because -all is set")
+		fallthrough
 
-		if pz, err = user_ops.NewGetPossibleZettels(s).Run(); err != nil {
+	default:
+		if pz, err = store_working_directory.MakeCwdFiles(s.Standort().Cwd(), args...); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
-	} else {
-
-		pz.Zettelen = args
 	}
 
 	var readResults []zettel_checked_out.Zettel
