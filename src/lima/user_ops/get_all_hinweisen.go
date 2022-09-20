@@ -17,23 +17,28 @@ type GetAllHinweisenResults struct {
 }
 
 func (op GetAllHinweisen) Run() (results GetAllHinweisenResults, err error) {
-	var zs map[hinweis.Hinweis]zettel_transacted.Zettel
+	var zts zettel_transacted.Set
 
-	if zs, err = op.StoreObjekten().ZettelenSchwanzen(); err != nil {
+	if zts, err = op.StoreObjekten().ZettelenSchwanzen(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	results.Hinweisen = make([]hinweis.Hinweis, len(zs))
-	results.HinweisenStrings = make([]string, len(zs))
+	results.Hinweisen = make([]hinweis.Hinweis, zts.Len())
+	results.HinweisenStrings = make([]string, zts.Len())
 
 	i := 0
 
-	for h, _ := range zs {
-		results.Hinweisen[i] = h
-		results.HinweisenStrings[i] = h.String()
-		i++
-	}
+	zts.Each(
+		func(zt zettel_transacted.Zettel) (err error) {
+			h := zt.Named.Hinweis
+			results.Hinweisen[i] = h
+			results.HinweisenStrings[i] = h.String()
+			i++
+
+			return
+		},
+	)
 
 	return
 }

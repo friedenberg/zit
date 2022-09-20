@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/zk_types"
 	"github.com/friedenberg/zit/src/charlie/etikett"
-	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/golf/alfred"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/kilo/umwelt"
@@ -70,33 +69,25 @@ func (c CatAlfred) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			aw.WriteEtikett(e)
 		}
 
-	case zk_types.TypeZettel:
-
-		var all map[hinweis.Hinweis]zettel_transacted.Zettel
-
-		if all, err = u.StoreObjekten().ZettelenSchwanzen(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		for _, z := range all {
-			aw.WriteZettel(z.Named)
-		}
 
 	case zk_types.TypeAkte:
 
+	case zk_types.TypeZettel:
+    fallthrough
 	case zk_types.TypeHinweis:
-
-		var all map[hinweis.Hinweis]zettel_transacted.Zettel
+		var all zettel_transacted.Set
 
 		if all, err = u.StoreObjekten().ZettelenSchwanzen(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		for _, z := range all {
-			aw.WriteZettel(z.Named)
-		}
+		all.Each(
+			func(z zettel_transacted.Zettel) (err error) {
+				aw.WriteZettel(z.Named)
+				return
+			},
+		)
 
 	default:
 		err = errors.Errorf("unsupported objekte type: %s", c.Type)

@@ -16,9 +16,11 @@ import (
 	"github.com/friedenberg/zit/src/charlie/ts"
 	"github.com/friedenberg/zit/src/delta/age_io"
 	"github.com/friedenberg/zit/src/delta/hinweisen"
+	"github.com/friedenberg/zit/src/delta/id_set"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/delta/transaktion"
 	"github.com/friedenberg/zit/src/delta/zettel"
+	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 )
 
@@ -192,6 +194,18 @@ func (s Store) writeNamedZettelToIndex(tz zettel_transacted.Zettel) (err error) 
 	}
 
 	return
+}
+
+func (s Store) ReadMany(is id_set.Set) (zts zettel_transacted.Set, err error) {
+	zts = zettel_transacted.MakeSetUnique(is.Len())
+
+	//TODO make this more performant?
+	return s.indexZettelenTails.ZettelenSchwanzen(
+		zettel_named.FilterIdSet{
+			//TODO add support for and
+			Set: is,
+		},
+	)
 }
 
 func (s Store) ReadOne(i id.Id) (tz zettel_transacted.Zettel, err error) {
@@ -626,18 +640,21 @@ func (s *Store) Reindex() (err error) {
 		return
 	}
 
-	var tails map[hinweis.Hinweis]zettel_transacted.Zettel
+	var tails zettel_transacted.Set
 
 	if tails, err = s.ZettelenSchwanzen(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	errors.Printf("tail count: %d", len(tails))
+	errors.Printf("tail count: %d", tails.Len())
 
-	for _, zn := range tails {
-		s.indexEtiketten.add(zn.Named.Stored.Zettel.Etiketten)
-	}
+	tails.Each(
+		func(zt zettel_transacted.Zettel) (err error) {
+			s.indexEtiketten.add(zt.Named.Stored.Zettel.Etiketten)
+			return
+		},
+	)
 
 	return
 }

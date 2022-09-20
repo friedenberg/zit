@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/zk_types"
 	"github.com/friedenberg/zit/src/charlie/etikett"
-	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/charlie/typ"
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
@@ -87,7 +86,7 @@ func (c Cat) etiketten(u *umwelt.Umwelt) (err error) {
 }
 
 func (c Cat) zettelen(u *umwelt.Umwelt) (err error) {
-	var all map[hinweis.Hinweis]zettel_transacted.Zettel
+	var all zettel_transacted.Set
 
 	if all, err = u.StoreObjekten().ZettelenSchwanzen(); err != nil {
 		err = errors.Wrap(err)
@@ -97,29 +96,33 @@ func (c Cat) zettelen(u *umwelt.Umwelt) (err error) {
 	if c.Format == "json" {
 
 		// not a bottleneck
-		for _, z := range all {
-			var b []byte
+		all.Each(
+			func(z zettel_transacted.Zettel) (err error) {
+				var b []byte
 
-			b, err = json.Marshal(z.Named.Stored)
+				b, err = json.Marshal(z.Named.Stored)
 
-			if err != nil {
-				err = errors.PrintErr(err)
-			} else {
-				err = errors.PrintOut(string(b))
-			}
+				if err != nil {
+					err = errors.PrintErr(err)
+				} else {
+					err = errors.PrintOut(string(b))
+				}
 
-			if err != nil {
-				//TODO combined error
-				err = errors.IsAsNilOrWrapf(
-					err,
-					syscall.EPIPE,
-					"Zettel: %s",
-					z.Named.Hinweis,
-				)
+				if err != nil {
+					//TODO combined error
+					err = errors.IsAsNilOrWrapf(
+						err,
+						syscall.EPIPE,
+						"Zettel: %s",
+						z.Named.Hinweis,
+					)
+
+					return
+				}
 
 				return
-			}
-		}
+			},
+		)
 	} else {
 		f := zettel.Text{}
 
@@ -128,20 +131,24 @@ func (c Cat) zettelen(u *umwelt.Umwelt) (err error) {
 		}
 
 		// not a bottleneck
-		for _, z := range all {
-			c.Zettel = z.Named.Stored.Zettel
+		all.Each(
+			func(z zettel_transacted.Zettel) (err error) {
+				c.Zettel = z.Named.Stored.Zettel
 
-			if _, err = f.WriteTo(c); err != nil {
-				err = errors.IsAsNilOrWrapf(
-					err,
-					syscall.EPIPE,
-					"Zettel: %s",
-					z.Named.Hinweis,
-				)
+				if _, err = f.WriteTo(c); err != nil {
+					err = errors.IsAsNilOrWrapf(
+						err,
+						syscall.EPIPE,
+						"Zettel: %s",
+						z.Named.Hinweis,
+					)
+
+					return
+				}
 
 				return
-			}
-		}
+			},
+		)
 	}
 
 	return
@@ -174,7 +181,7 @@ func (c Cat) hinweisen(u *umwelt.Umwelt) (err error) {
 }
 
 func (c Cat) typen(u *umwelt.Umwelt) (err error) {
-	var all map[hinweis.Hinweis]zettel_transacted.Zettel
+	var all zettel_transacted.Set
 
 	if all, err = u.StoreObjekten().ZettelenSchwanzen(); err != nil {
 		err = errors.Wrap(err)
@@ -183,9 +190,13 @@ func (c Cat) typen(u *umwelt.Umwelt) (err error) {
 
 	typen := make(map[typ.Typ]bool)
 
-	for _, z := range all {
-		typen[z.Named.Stored.Zettel.Typ] = true
-	}
+	all.Each(
+		func(z zettel_transacted.Zettel) (err error) {
+			typen[z.Named.Stored.Zettel.Typ] = true
+
+			return
+		},
+	)
 
 	sortedTypen := make([]typ.Typ, 0, len(typen))
 

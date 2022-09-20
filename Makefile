@@ -27,6 +27,7 @@ watch:
 
 exclude:
 	echo .DS_Store
+	echo .git/
 	echo zit/.git/
 	echo zit/\.zit/
 	echo build/

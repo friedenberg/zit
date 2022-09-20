@@ -55,7 +55,7 @@ func (c CatObjekte) akteShasFromIds(
 	u *umwelt.Umwelt,
 	ids id_set.Set,
 ) (shas []sha.Sha, err error) {
-	shas = ids.Shas()
+	shas = ids.Shas().ToSlice()
 
 	for _, h := range ids.Hinweisen() {
 		var zc zettel_checked_out.Zettel

@@ -13,7 +13,32 @@ import (
 )
 
 type Set struct {
-	ids []id.Id
+	shas sha.Set
+	ids  []id.Id
+}
+
+func MakeSet(c int) Set {
+	return Set{
+		shas: sha.MakeSet(c),
+		ids:  make([]id.Id, 0, c),
+	}
+}
+
+func (s *Set) Add(ids ...id.Id) {
+	for _, i := range ids {
+		switch it := i.(type) {
+		case *sha.Sha:
+		case sha.Sha:
+			s.shas.Add(it)
+
+		default:
+			s.ids = append(s.ids, it)
+		}
+	}
+}
+
+func (s *Set) Shas() sha.Set {
+	return s.shas
 }
 
 func (s Set) String() string {
@@ -21,24 +46,7 @@ func (s Set) String() string {
 }
 
 func (s Set) Len() int {
-	return len(s.ids)
-}
-
-func (s Set) Shas() (shas []sha.Sha) {
-	shas = make([]sha.Sha, 0, len(s.ids))
-
-	val := reflect.ValueOf(&sha.Sha{})
-	t := val.Type()
-
-	targetType := t.Elem()
-
-	for _, i1 := range s.ids {
-		if reflect.TypeOf(i1).AssignableTo(targetType) {
-			shas = append(shas, i1.(sha.Sha))
-		}
-	}
-
-	return
+	return len(s.ids) + s.shas.Len()
 }
 
 func (s Set) Hinweisen() (hinweisen []hinweis.Hinweis) {
@@ -93,13 +101,15 @@ func (s Set) Typen() (typen []typ.Typ) {
 }
 
 func (s Set) AnyShasOrHinweisen() (ids []id.IdMitKorper) {
-	shas := s.Shas()
 	hinweisen := s.Hinweisen()
-	ids = make([]id.IdMitKorper, 0, len(shas)+len(hinweisen))
+	ids = make([]id.IdMitKorper, 0, s.shas.Len()+len(hinweisen))
 
-	for _, sh := range shas {
-		ids = append(ids, sh)
-	}
+	s.shas.Each(
+		func(sh sha.Sha) (err error) {
+			ids = append(ids, sh)
+			return
+		},
+	)
 
 	for _, h := range hinweisen {
 		ids = append(ids, h)
