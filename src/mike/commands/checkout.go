@@ -12,7 +12,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/india/store_working_directory"
 	"github.com/friedenberg/zit/src/kilo/umwelt"
-	"github.com/friedenberg/zit/src/lima/user_ops"
 )
 
 type Checkout struct {
@@ -65,20 +64,12 @@ func (c Checkout) ProtoIdList(u *umwelt.Umwelt) (is id_set.ProtoIdList) {
 }
 
 func (c Checkout) RunWithIds(s *umwelt.Umwelt, ids id_set.Set) (err error) {
-	checkoutOp := user_ops.Checkout{
-		Umwelt: s,
-		CheckoutOptions: store_working_directory.CheckoutOptions{
-			CheckoutMode: c.CheckoutMode,
-			Format:       zettel.Text{},
-		},
+	options := store_working_directory.CheckoutOptions{
+		CheckoutMode: c.CheckoutMode,
+		Format:       zettel.Text{},
 	}
 
-	if _, err = checkoutOp.RunMany(ids); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err != nil {
+	if _, err = s.StoreWorkingDirectory().Checkout(options, ids); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -13,13 +13,14 @@ import (
 )
 
 func (f Text) WriteTo(c FormatContextWrite) (n int64, err error) {
-	if c.IncludeAkte {
-		if c.ExternalAktePath == "" {
-			return f.writeToInlineAkte(c)
-		} else {
-			return f.writeToExternalAkte(c)
-		}
-	} else {
+	switch {
+	case c.IncludeAkte && c.ExternalAktePath == "":
+		return f.writeToInlineAkte(c)
+
+	case c.IncludeAkte:
+		return f.writeToExternalAkte(c)
+
+	default:
 		return f.writeToOmitAkte(c)
 	}
 }

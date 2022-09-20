@@ -15,6 +15,7 @@ import (
 )
 
 type Edit struct {
+	And bool
 	store_working_directory.CheckoutMode
 }
 
@@ -41,27 +42,16 @@ func (c Edit) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 		Format:       zettel.Text{},
 	}
 
-	checkoutOp := user_ops.Checkout{
-		Umwelt:          u,
-		CheckoutOptions: checkoutOptions,
-	}
-
 	var checkoutResults zettel_checked_out.Set
 
-	if checkoutResults, err = checkoutOp.RunMany(ids); err != nil {
+	if checkoutResults, err = u.StoreWorkingDirectory().Checkout(checkoutOptions, ids); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	switch c.CheckoutMode {
-	case store_working_directory.CheckoutModeAkteOnly:
-	case store_working_directory.CheckoutModeZettelAndAkte:
-		if err = (user_ops.OpenFiles{}).Run(checkoutResults.ToSliceFilesAkten()...); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	default:
+	if err = (user_ops.OpenFiles{}).Run(checkoutResults.ToSliceFilesAkten()...); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	openVimOp := user_ops.OpenVim{

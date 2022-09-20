@@ -152,14 +152,6 @@ func (c Add) openAktenIfNecessary(
 		return
 	}
 
-	checkoutOp := user_ops.Checkout{
-		Umwelt: u,
-		CheckoutOptions: store_working_directory.CheckoutOptions{
-			CheckoutMode: store_working_directory.CheckoutModeAkteOnly,
-			Format:       zettel.Text{},
-		},
-	}
-
 	hs := zettels.ToSliceHinweisen()
 	ids := id_set.Make(len(hs))
 
@@ -167,9 +159,14 @@ func (c Add) openAktenIfNecessary(
 		ids.Add(h)
 	}
 
+	options := store_working_directory.CheckoutOptions{
+		CheckoutMode: store_working_directory.CheckoutModeAkteOnly,
+		Format:       zettel.Text{},
+	}
+
 	var checkoutResults zettel_checked_out.Set
 
-	if checkoutResults, err = checkoutOp.RunMany(ids); err != nil {
+	if checkoutResults, err = u.StoreWorkingDirectory().Checkout(options, ids); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

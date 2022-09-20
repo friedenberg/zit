@@ -142,10 +142,6 @@ func (s *Store) CheckoutOne(
 			return
 		}
 
-	case CheckoutModeZettelOnly:
-		c.IncludeAkte = false
-
-		fallthrough
 
 	case CheckoutModeZettelAndAkte:
 		c.IncludeAkte = true
@@ -155,6 +151,9 @@ func (s *Store) CheckoutOne(
 			c.ExternalAktePath = cz.External.AkteFD.Path
 		}
 
+		fallthrough
+
+	case CheckoutModeZettelOnly:
 		if err = s.writeFormat(options, filename, c); err != nil {
 			err = errors.Wrapf(err, "%s", sz.Named)
 			errors.PrintErrf("%s (check out failed):", sz.Named)
