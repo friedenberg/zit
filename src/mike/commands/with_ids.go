@@ -9,11 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/kilo/umwelt"
 )
 
-var defaultProtoSet id_set.ProtoSet
-
-func init() {
-}
-
 type CommandWithIds interface {
 	RunWithIds(store *umwelt.Umwelt, ids id_set.Set) error
 }
@@ -23,11 +18,11 @@ type commandWithIds struct {
 	id_set.ProtoSet
 }
 
-func (c commandWithIds) Run(store *umwelt.Umwelt, args ...string) (err error) {
-	ps := c.ProtoSet
+func (c commandWithIds) getIdProtoSet(u *umwelt.Umwelt) (is id_set.ProtoSet) {
+	is = c.ProtoSet
 
-	if ps.Len() == 0 {
-		ps = id_set.MakeProtoSet(
+	if is.Len() == 0 {
+		is = id_set.MakeProtoSet(
 			id_set.ProtoId{
 				MutableId: &sha.Sha{},
 			},
@@ -35,7 +30,7 @@ func (c commandWithIds) Run(store *umwelt.Umwelt, args ...string) (err error) {
 				MutableId: &hinweis.Hinweis{},
 				Expand: func(v string) (out string, err error) {
 					var h hinweis.Hinweis
-					h, err = store.StoreObjekten().ExpandHinweisString(v)
+					h, err = u.StoreObjekten().ExpandHinweisString(v)
 					out = h.String()
 					return
 				},
@@ -46,9 +41,15 @@ func (c commandWithIds) Run(store *umwelt.Umwelt, args ...string) (err error) {
 		)
 	}
 
+	return
+}
+
+func (c commandWithIds) Run(u *umwelt.Umwelt, args ...string) (err error) {
+	ps := c.getIdProtoSet(u)
+
 	ids := ps.Make(args...)
 
-	if err = c.RunWithIds(store, ids); err != nil {
+	if err = c.RunWithIds(u, ids); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
