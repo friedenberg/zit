@@ -15,26 +15,26 @@ type CommandWithIds interface {
 
 type CommandWithIdsAndProtoSet interface {
 	CommandWithIds
-	ProtoSet(*umwelt.Umwelt) id_set.ProtoSet
+	ProtoIdList(*umwelt.Umwelt) id_set.ProtoIdList
 }
 
 type commandWithIds struct {
 	CommandWithIds
-	id_set.ProtoSet
+	id_set.ProtoIdList
 }
 
-func (c commandWithIds) getIdProtoSet(u *umwelt.Umwelt) (is id_set.ProtoSet) {
+func (c commandWithIds) getIdProtoSet(u *umwelt.Umwelt) (is id_set.ProtoIdList) {
 	tid, hasCustomProtoSet := c.CommandWithIds.(CommandWithIdsAndProtoSet)
 
 	switch {
-	case c.ProtoSet.Len() != 0:
-		is = c.ProtoSet
+	case c.ProtoIdList.Len() != 0:
+		is = c.ProtoIdList
 
 	case hasCustomProtoSet:
-		is = tid.ProtoSet(u)
+		is = tid.ProtoIdList(u)
 
 	default:
-		is = id_set.MakeProtoSet(
+		is = id_set.MakeProtoIdList(
 			id_set.ProtoId{
 				MutableId: &sha.Sha{},
 			},

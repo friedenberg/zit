@@ -77,7 +77,7 @@ func init() {
 
 			return commandWithIds{
 				CommandWithIds: c,
-				ProtoSet: id_set.MakeProtoSet(
+				ProtoIdList: id_set.MakeProtoIdList(
 					id_set.ProtoId{
 						MutableId: &etikett.Etikett{},
 					},

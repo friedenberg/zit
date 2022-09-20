@@ -60,7 +60,7 @@ func (e Etikett) Len() int {
 }
 
 func (a Etikett) Includes(b Etikett) bool {
-  return b.Contains(a)
+	return b.Contains(a)
 }
 
 func (a Etikett) Contains(b Etikett) bool {

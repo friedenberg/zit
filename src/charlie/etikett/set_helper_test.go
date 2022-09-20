@@ -13,7 +13,7 @@ func assertSetRemovesPrefixes(t *testing.T, ac Set, ex Set, prefix string) {
 
 	if !ac.Equals(ex) {
 		test_logz.Errorf(
-      test_logz.T{T: t, Skip: 1},
+			test_logz.T{T: t, Skip: 1},
 			"removing prefixes doesn't match:\nexpected: %q\n  actual: %q",
 			ex,
 			ac,

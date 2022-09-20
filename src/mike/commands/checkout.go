@@ -37,8 +37,8 @@ func init() {
 	)
 }
 
-func (c Checkout) ProtoSet(u *umwelt.Umwelt) (is id_set.ProtoSet) {
-	is = id_set.MakeProtoSet(
+func (c Checkout) ProtoIdList(u *umwelt.Umwelt) (is id_set.ProtoIdList) {
+	is = id_set.MakeProtoIdList(
 		id_set.ProtoId{
 			MutableId: &hinweis.Hinweis{},
 			Expand: func(v string) (out string, err error) {

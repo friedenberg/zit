@@ -16,7 +16,7 @@ type commandWithTypen struct {
 }
 
 func (c commandWithTypen) Run(store *umwelt.Umwelt, args ...string) (err error) {
-	ps := id_set.MakeProtoSet(
+	ps := id_set.MakeProtoIdList(
 		id_set.ProtoId{
 			MutableId: &typ.Typ{},
 		},

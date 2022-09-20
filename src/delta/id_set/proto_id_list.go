@@ -6,11 +6,11 @@ import (
 	"github.com/friedenberg/zit/src/charlie/id"
 )
 
-type ProtoSet struct {
+type ProtoIdList struct {
 	types []protoId
 }
 
-func MakeProtoSet(types ...ProtoId) (ps ProtoSet) {
+func MakeProtoIdList(types ...ProtoId) (ps ProtoIdList) {
 	ps.types = make([]protoId, len(types))
 
 	for i, t := range types {
@@ -25,11 +25,11 @@ func MakeProtoSet(types ...ProtoId) (ps ProtoSet) {
 	return
 }
 
-func (ps ProtoSet) Len() int {
-  return len(ps.types)
+func (ps ProtoIdList) Len() int {
+	return len(ps.types)
 }
 
-func (ps ProtoSet) Make(vs ...string) (s Set) {
+func (ps ProtoIdList) Make(vs ...string) (s Set) {
 	s = Set{
 		ids: make([]id.Id, 0, len(vs)),
 	}

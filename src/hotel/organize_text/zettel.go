@@ -26,8 +26,8 @@ func makeZettel(named zettel_named.Zettel, ha hinweis.Abbr) (z zettel, err error
 	}
 
 	z = zettel{
-		Hinweis:     h,
-    //TODO do this smart
+		Hinweis: h,
+		//TODO do this smart
 		Bezeichnung: bezeichnung.Bezeichnung(named.Stored.Zettel.Description()),
 	}
 

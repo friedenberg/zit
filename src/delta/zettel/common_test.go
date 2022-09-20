@@ -4,9 +4,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/friedenberg/zit/src/charlie/typ"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/etikett"
+	"github.com/friedenberg/zit/src/charlie/typ"
 )
 
 func makeEtiketten(t *testing.T, vs ...string) (es etikett.Set) {
