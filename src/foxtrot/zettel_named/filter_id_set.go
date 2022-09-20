@@ -1,6 +1,7 @@
 package zettel_named
 
 import (
+	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/delta/id_set"
 )
 
@@ -13,8 +14,10 @@ func (f FilterIdSet) IncludeNamedZettel(z Zettel) (ok bool) {
 	needsEt := f.Set.Etiketten().Len() > 0
 	okEt := false
 
+	expanded := z.Stored.Zettel.Etiketten.Expanded(etikett.ExpanderRight{})
+
 	for _, e := range f.Set.Etiketten().Sorted() {
-		okEt = z.Stored.Zettel.Etiketten.Contains(e)
+		okEt = expanded.Contains(e)
 
 		switch {
 		case okEt && !f.Or:
