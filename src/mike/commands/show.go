@@ -59,7 +59,7 @@ func (c Show) showZettels(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 	for i, is := range ids.AnyShasOrHinweisen() {
 		var tz zettel_transacted.Zettel
 
-		if tz, err = store.StoreObjekten().Read(is); err != nil {
+		if tz, err = store.StoreObjekten().ReadOne(is); err != nil {
 			if errors.Is(err, store_objekten.ErrNotFound{}) {
 				err = errors.Normal(err)
 			} else {
@@ -103,7 +103,7 @@ func (c Show) showAkten(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 	for i, is := range ids.AnyShasOrHinweisen() {
 		var tz zettel_transacted.Zettel
 
-		if tz, err = store.StoreObjekten().Read(is); err != nil {
+		if tz, err = store.StoreObjekten().ReadOne(is); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

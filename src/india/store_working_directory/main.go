@@ -280,7 +280,7 @@ func (s *Store) Read(p string) (cz zettel_checked_out.Zettel, err error) {
 
 		var named zettel_transacted.Zettel
 
-		if named, err = s.storeObjekten.Read(cached.Sha); err != nil {
+		if named, err = s.storeObjekten.ReadOne(cached.Sha); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

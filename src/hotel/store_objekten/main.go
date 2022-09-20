@@ -195,7 +195,7 @@ func (s Store) writeNamedZettelToIndex(tz zettel_transacted.Zettel) (err error) 
 	return
 }
 
-func (s Store) Read(i id.IdMitKorper) (tz zettel_transacted.Zettel, err error) {
+func (s Store) ReadOne(i id.IdMitKorper) (tz zettel_transacted.Zettel, err error) {
 	switch tid := i.(type) {
 	case sha.Sha:
 		f := zettel.Objekte{}

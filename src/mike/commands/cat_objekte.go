@@ -117,7 +117,7 @@ func (c CatObjekte) zettelen(store *umwelt.Umwelt, ids ...id_set.Set) (err error
 
 		var tz zettel_transacted.Zettel
 
-		if tz, err = store.StoreObjekten().Read(i); err != nil {
+		if tz, err = store.StoreObjekten().ReadOne(i); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
