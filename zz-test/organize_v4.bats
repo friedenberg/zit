@@ -30,45 +30,46 @@ cat_yang() (
 )
 
 cat_organize() (
-	echo
-	echo '- [   ach/vil     ] blah'
 	echo ''
-	echo '                 ## project'
+	echo '- [ ach/vil    ] blah'
 	echo ''
-	echo '                ###        -2021-zit'
+	echo '               # project'
 	echo ''
-	echo '               ####                 -init'
+	echo '              ##        -2021-zit'
 	echo ''
-	echo '- [    ph/hitmonc ] Add bats test for initing more than once.md'
-	echo '- [   rub/rap     ] add .exrc to init'
+	echo '             ###                 -22q1-uws-140'
 	echo ''
-	echo '               ####                 -etiketten_and_organize'
+	echo '            ####                              -moving'
 	echo ''
-	echo '- [    pe/mo      ] add etikett rule type for removing etiketts based on conditions'
-	echo '- [  yttr/gole    ] use default etiketten with add'
+	echo '- [  io/poliwr ] update billing addresses'
 	echo ''
-	echo '               ####                 -commands'
+	echo '            ####                              -mvp-main_room'
 	echo ''
-	echo '- [   tec/slowp   ] update output of commands to use new store'
-	echo '- [   mer/golb    ] use error types to generate specific exit status codes'
+	echo '- [prot/nidora ] Brainstorm where to place toolbox.md'
 	echo ''
-	echo '                ###        -22q1-uws-140'
+	echo '             ###                 -commands'
 	echo ''
-	echo '               ####                     -moving'
+	echo '- [ tec/slowp  ] update output of commands to use new store'
+	echo '- [ mer/golb   ] use error types to generate specific exit status codes'
 	echo ''
-	echo '- [    io/poliwr  ] update billing addresses'
+	echo '             ###                 -etiketten_and_organize'
 	echo ''
-	echo '               ####                     -mvp-main_room'
+	echo '- [  pe/mo     ] add etikett rule type for removing etiketts based on conditions'
+	echo '- [yttr/gole   ] use default etiketten with add'
 	echo ''
-	echo '- [  prot/nidora  ] Brainstorm where to place toolbox.md'
+	echo '             ###                 -init'
+	echo ''
+	echo '- [  ph/hitmonc] Add bats test for initing more than once.md'
+	echo '- [ rub/rap    ] add .exrc to init'
+	echo ''
 )
 
 function outputs_organize_one_etikett { # @test
-	skip
+	# skip
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
 	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
-	run zit format-organize <(cat_organize)
+	run zit format-organize -prefix-joints=true -refine=true <(cat_organize)
 	assert_output "$(cat_organize)"
 }
