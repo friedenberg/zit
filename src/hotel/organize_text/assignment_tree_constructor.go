@@ -15,7 +15,7 @@ type AssignmentTreeConstructor struct {
 func (atc *AssignmentTreeConstructor) Assignments() (roots []*assignment, err error) {
 	roots = make([]*assignment, 0, 1+len(atc.ExtraEtiketten))
 
-	root := newAssignment()
+	root := newAssignment(0)
 	root.etiketten = atc.RootEtiketten
 	roots = append(roots, root)
 
@@ -27,7 +27,7 @@ func (atc *AssignmentTreeConstructor) Assignments() (roots []*assignment, err er
 	}
 
 	for _, e := range atc.ExtraEtiketten {
-		child := newAssignment()
+		child := newAssignment(1)
 		child.etiketten = etikett.MakeSet(e)
 		roots = append(roots, child)
 	}
@@ -101,12 +101,12 @@ func (atc AssignmentTreeConstructor) makeChildren(
 					if lastChild != nil && lastChild.etiketten.Equals(prefixJoint) {
 						intermediate = lastChild
 					} else {
-						intermediate = newAssignment()
+						intermediate = newAssignment(parent.Depth() + 1)
 						intermediate.etiketten = prefixJoint
 						parent.addChild(intermediate)
 					}
 
-					child := newAssignment()
+					child := newAssignment(intermediate.Depth() + 1)
 					child.etiketten = etikett.MakeSet(e.LeftSubtract(groupingEtiketten[0]))
 
 					nextGroupingEtiketten := etikett.NewSlice()
@@ -125,7 +125,7 @@ func (atc AssignmentTreeConstructor) makeChildren(
 					intermediate.addChild(child)
 				}
 			} else {
-				child := newAssignment()
+				child := newAssignment(parent.Depth() + 1)
 				child.etiketten = etikett.MakeSet(e)
 
 				nextGroupingEtiketten := etikett.NewSlice()

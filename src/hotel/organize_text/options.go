@@ -34,7 +34,7 @@ func (o *Options) AddToFlagSet(f *flag.FlagSet) {
 	f.Var(&o.ExtraEtiketten, "extras", "etiketten to always add to the organize text")
 	f.BoolVar(&o.UsePrefixJoints, "prefix-joints", false, "split etiketten around hyphens")
 	f.BoolVar(&o.UseRightAlignedIndents, "right-align", true, "right-align etiketten")
-	f.BoolVar(&o.UseRefiner, "refine", true, "refine the organize tree")
+	f.BoolVar(&o.UseRefiner, "refine", false, "refine the organize tree")
 }
 
 func (o Options) assignmentTreeConstructor() *AssignmentTreeConstructor {

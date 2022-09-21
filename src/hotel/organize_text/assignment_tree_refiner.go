@@ -12,6 +12,18 @@ type AssignmentTreeRefiner struct {
 	UsePrefixJoints bool
 }
 
+func (atc *AssignmentTreeRefiner) shouldMergeAllChildrenIntoParent(a *assignment) (ok bool) {
+	switch {
+	case a.parent.isRoot:
+		fallthrough
+
+	default:
+		ok = false
+	}
+
+  return
+}
+
 func (atc *AssignmentTreeRefiner) shouldMergeIntoParent(a *assignment) bool {
 	errors.Printf("checking node should merge: %s", a)
 
@@ -179,7 +191,7 @@ func (atc AssignmentTreeRefiner) applyPrefixJoints(a *assignment) (err error) {
 	if a.etiketten.Len() == 1 && a.etiketten.Any().Equals(groupingPrefix.Etikett) {
 		na = a
 	} else {
-		na = newAssignment()
+		na = newAssignment(a.Depth() + 1)
 		na.etiketten = etikett.MakeSet(groupingPrefix.Etikett)
 		a.addChild(na)
 	}

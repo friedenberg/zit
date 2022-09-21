@@ -291,6 +291,100 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 	}
 }
 
+func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
+	input :=
+		`
+    - [one/wow] uno
+    - [dos/wow] two/wow
+
+    ## sub-wow
+
+    - [three/wow] tres
+    - [four/wow] quatro
+
+    ## sub-cow
+
+    - [one/wow] uno
+    - [dos/wow] two/wow
+    `
+
+	sr := strings.NewReader(input)
+	sub := assignmentLineReader{}
+
+	n, err := sub.ReadFrom(sr)
+
+	if n == 0 {
+		test_logz.Errorf(test_logz.T{T: t}, "expected read amount to be greater than 0")
+	}
+
+	if err != nil {
+		test_logz.Errorf(test_logz.T{T: t}, "expected no error but got %q", err)
+	}
+
+	{
+		expected := etikett.NewSet(etikett.Etikett{Value: "sub-wow"})
+		actual := sub.root.children[0].etiketten
+
+		if !actual.Equals(*expected) {
+			test_logz.Errorf(test_logz.T{T: t}, "\nexpected: %s\n  actual: %s", expected, actual)
+		}
+	}
+
+	{
+		expected := etikett.NewSet(etikett.Etikett{Value: "sub-cow"})
+
+		l := len(sub.root.children)
+    expLen := 2
+		if l != expLen {
+			test_logz.Fatalf(test_logz.T{T: t}, "\nexpected: %d\n  actual: %d", expLen, l)
+		}
+
+		actual := sub.root.children[1].etiketten
+
+		if !actual.Equals(*expected) {
+			test_logz.Errorf(test_logz.T{T: t}, "\nexpected: %s\n  actual: %s", expected, actual)
+		}
+	}
+
+	{
+		expected := makeZettelSet()
+		expected.Add(zettel{
+			Hinweis:     makeHinweis(t, "four/wow"),
+			Bezeichnung: makeBez(t, "quatro"),
+		})
+
+		expected.Add(zettel{
+			Hinweis:     makeHinweis(t, "three/wow"),
+			Bezeichnung: makeBez(t, "tres"),
+		})
+
+		actual := sub.root.children[0].named
+
+		if !actual.Equals(expected) {
+			test_logz.Errorf(test_logz.T{T: t}, "\nexpected: %s\n  actual: %s", expected, actual)
+		}
+	}
+
+	{
+		expected := makeZettelSet()
+		expected.Add(zettel{
+			Hinweis:     makeHinweis(t, "one/wow"),
+			Bezeichnung: makeBez(t, "uno"),
+		})
+
+		expected.Add(zettel{
+			Hinweis:     makeHinweis(t, "dos/wow"),
+			Bezeichnung: makeBez(t, "two/wow"),
+		})
+
+		actual := sub.root.children[1].named
+
+		if !actual.Equals(expected) {
+			test_logz.Errorf(test_logz.T{T: t}, "\nexpected: %s\n  actual: %s", expected, actual)
+		}
+	}
+}
+
 func TestAssignmentLineReaderBigCheese(t *testing.T) {
 	input :=
 		`# task

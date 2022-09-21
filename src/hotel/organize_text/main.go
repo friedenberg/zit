@@ -15,7 +15,7 @@ type Text struct {
 func New(options Options) (ot *Text, err error) {
 	ot = &Text{
 		Options:    options,
-		assignment: newAssignment(),
+		assignment: newAssignment(0),
 	}
 
 	ot.assignment.isRoot = true

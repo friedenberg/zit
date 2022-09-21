@@ -9,6 +9,7 @@ import (
 
 type assignment struct {
 	isRoot    bool
+	depth     int
 	etiketten etikett.Set
 	named     zettelSet
 	unnamed   newZettelSet
@@ -16,8 +17,9 @@ type assignment struct {
 	parent    *assignment
 }
 
-func newAssignment() *assignment {
+func newAssignment(d int) *assignment {
 	return &assignment{
+		depth:     d,
 		etiketten: etikett.MakeSet(),
 		named:     makeZettelSet(),
 		unnamed:   makeNewZettelSet(),
@@ -108,6 +110,16 @@ func (a *assignment) addChild(c *assignment) {
 
 	a.children = append(a.children, c)
 	c.parent = a
+}
+
+func (a *assignment) parentOrRoot() (p *assignment) {
+  switch {
+  case a.parent == nil:
+    return a
+
+  default:
+    return a.parent
+  }
 }
 
 func (a *assignment) nthParent(n int) (p *assignment, err error) {

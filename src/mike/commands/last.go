@@ -1,11 +1,10 @@
 package commands
 
 import (
-	"encoding/json"
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	gattung "github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/delta/transaktion"
 	"github.com/friedenberg/zit/src/kilo/umwelt"
 )
@@ -39,13 +38,14 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	errors.PrintDebug(transaktion.Objekten)
+	for _, o := range transaktion.Objekten {
+		switch o.Gattung {
+		case gattung.Zettel:
+			errors.PrintOut(o)
 
-	enc := json.NewEncoder(u.Out())
-
-	if err = enc.Encode(transaktion); err != nil {
-		err = errors.Wrap(err)
-		return
+		default:
+			continue
+		}
 	}
 
 	return
