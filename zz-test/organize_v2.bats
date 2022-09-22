@@ -64,8 +64,8 @@ function outputs_organize_one_etikett { # @test
 		echo "---"
 	} >"$to_add"
 
-	run "${cmd_zit_new[@]}" -verbose -edit=false "$to_add"
-	assert_output --partial '[one/uno '
+	run "${cmd_zit_new[@]}" -edit=false "$to_add"
+	assert_output '[one/uno@7 "wow"] (created)'
 
 	run zit expand-hinweis o/u
 	assert_output 'one/uno'

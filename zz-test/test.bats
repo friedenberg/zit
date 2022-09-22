@@ -461,9 +461,8 @@ function checkouts_dont_overwrite { # @test
 
 	cat "$expected" >"one/uno.md"
 
-	run zit checkout "${cmd_zit_def[@]}" -verbose one/uno
-	assert_output --partial '[one/uno '
-	assert_output --partial '(external has changes)'
+	run zit checkout "${cmd_zit_def[@]}" one/uno
+	assert_output '[one/uno.md@4 "bez"] (different)'
 
 	run cat one/uno.md
 	assert_output "$(cat "$expected")"

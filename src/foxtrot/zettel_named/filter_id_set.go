@@ -16,18 +16,19 @@ func (f FilterIdSet) IncludeNamedZettel(z Zettel) (ok bool) {
 
 	expanded := z.Stored.Zettel.Etiketten.Expanded(etikett.ExpanderRight{})
 
+LOOP:
 	for _, e := range f.Set.Etiketten().Sorted() {
 		okEt = expanded.Contains(e)
 
 		switch {
-		case okEt && !f.Or:
+		case !okEt && !f.Or:
+			break LOOP
+
+		case okEt && f.Or:
+			break LOOP
+
+		default:
 			continue
-
-		case !f.Or:
-			fallthrough
-
-		case okEt:
-			break
 		}
 	}
 

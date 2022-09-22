@@ -1,8 +1,6 @@
 package zettel_named
 
 import (
-	"fmt"
-
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/echo/zettel_stored"
@@ -25,8 +23,4 @@ func (a Zettel) Equals(b Zettel) bool {
 	}
 
 	return true
-}
-
-func (z Zettel) String() string {
-	return fmt.Sprintf("[%s %s]", z.Hinweis, z.Stored.Sha.ShortString())
 }

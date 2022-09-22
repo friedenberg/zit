@@ -48,26 +48,17 @@ func (s Store) shouldCheckOut(
 	options CheckoutOptions,
 	cz zettel_checked_out.Zettel,
 ) (ok bool) {
-	if cz.External.ZettelFD.Path == "" {
-		ok = true
-		return
-	}
 
-	if cz.Internal.Named.Stored.Zettel.Equals(cz.External.Named.Stored.Zettel) {
-		errors.Print(cz.Internal.Named.Stored.Zettel)
-		errors.PrintOutf("%s (already checked out)", cz.Internal.Named)
-		return
-	}
+  switch {
+  case cz.Internal.Named.Stored.Zettel.Equals(cz.External.Named.Stored.Zettel):
+		cz.State = zettel_checked_out.StateJustCheckedOutButSame
 
-	if options.Force || cz.State == zettel_checked_out.StateEmpty {
+  //TODO wait why?
+  case cz.External.ZettelFD.Path == "":
 		ok = true
-		return
-	} else if cz.State == zettel_checked_out.StateExistsAndSame {
-		errors.PrintOutf("%s (already checked out)", cz.Internal.Named)
-	} else if cz.State == zettel_checked_out.StateExistsAndDifferent {
-		errors.PrintOutf("%s (external has changes)", cz.Internal.Named)
-	} else {
-		errors.PrintOutf("%s (unknown state)", cz.Internal.Named)
+
+  case options.Force || cz.State == zettel_checked_out.StateEmpty:
+		ok = true
 	}
 
 	return
@@ -106,6 +97,7 @@ func (s *Store) CheckoutOne(
 		}
 
 		if !s.shouldCheckOut(options, cz) {
+      s.zettelCheckedOutPrinter.ZettelCheckedOut(cz).Print()
 			return
 		}
 	}
