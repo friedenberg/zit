@@ -46,9 +46,6 @@ func init() {
 func (c Edit) ProtoIdList(u *umwelt.Umwelt) (is id_set.ProtoIdList) {
 	is = id_set.MakeProtoIdList(
 		id_set.ProtoId{
-			MutableId: &etikett.Etikett{},
-		},
-		id_set.ProtoId{
 			MutableId: &hinweis.Hinweis{},
 			Expand: func(v string) (out string, err error) {
 				var h hinweis.Hinweis
@@ -56,6 +53,9 @@ func (c Edit) ProtoIdList(u *umwelt.Umwelt) (is id_set.ProtoIdList) {
 				out = h.String()
 				return
 			},
+		},
+		id_set.ProtoId{
+			MutableId: &etikett.Etikett{},
 		},
 		id_set.ProtoId{
 			MutableId: &typ.Typ{},

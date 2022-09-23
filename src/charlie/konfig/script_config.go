@@ -13,10 +13,6 @@ type ScriptConfig struct {
 
 func (s ScriptConfig) Cmd(args ...string) (c *exec.Cmd, err error) {
 	switch {
-	case len(args) == 0:
-		err = errors.Errorf("no args passed in")
-		return
-
 	case s.Script == "" && len(s.Shell) == 0:
 		err = errors.Errorf("no script or shell set")
 		return
