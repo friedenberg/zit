@@ -334,7 +334,7 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 		expected := etikett.NewSet(etikett.Etikett{Value: "sub-cow"})
 
 		l := len(sub.root.children)
-    expLen := 2
+		expLen := 2
 		if l != expLen {
 			test_logz.Fatalf(test_logz.T{T: t}, "\nexpected: %d\n  actual: %d", expLen, l)
 		}

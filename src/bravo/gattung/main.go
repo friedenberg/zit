@@ -17,7 +17,7 @@ const (
 	Hinweis
 	Transaktion
 	Zettel
-  Konfig
+	Konfig
 )
 
 func (g Gattung) String() string {

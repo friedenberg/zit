@@ -113,13 +113,13 @@ func (a *assignment) addChild(c *assignment) {
 }
 
 func (a *assignment) parentOrRoot() (p *assignment) {
-  switch {
-  case a.parent == nil:
-    return a
+	switch {
+	case a.parent == nil:
+		return a
 
-  default:
-    return a.parent
-  }
+	default:
+		return a.parent
+	}
 }
 
 func (a *assignment) nthParent(n int) (p *assignment, err error) {

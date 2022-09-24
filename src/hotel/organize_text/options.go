@@ -20,6 +20,7 @@ type Options struct {
 	UsePrefixJoints        bool
 	UseRightAlignedIndents bool
 	UseRefiner             bool
+	UseMetadateiHeader     bool
 }
 
 func MakeOptions() Options {
@@ -35,6 +36,7 @@ func (o *Options) AddToFlagSet(f *flag.FlagSet) {
 	f.BoolVar(&o.UsePrefixJoints, "prefix-joints", true, "split etiketten around hyphens")
 	f.BoolVar(&o.UseRightAlignedIndents, "right-align", true, "right-align etiketten")
 	f.BoolVar(&o.UseRefiner, "refine", true, "refine the organize tree")
+	f.BoolVar(&o.UseMetadateiHeader, "metadatei-header", false, "metadatei header")
 }
 
 func (o Options) assignmentTreeConstructor() *AssignmentTreeConstructor {

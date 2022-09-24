@@ -70,7 +70,7 @@ func (c CatAlfred) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		}
 
 	case gattung.Akte:
-    fallthrough
+		fallthrough
 
 	case gattung.Zettel:
 		fallthrough

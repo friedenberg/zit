@@ -74,7 +74,7 @@ func (c Checkout) RunWithIds(s *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 	query := zettel_named.FilterIdSet{
 		Set: ids,
-		Or: c.Or,
+		Or:  c.Or,
 	}
 
 	if _, err = s.StoreWorkingDirectory().Checkout(options, query); err != nil {

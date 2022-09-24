@@ -21,7 +21,7 @@ func (atc *AssignmentTreeRefiner) shouldMergeAllChildrenIntoParent(a *assignment
 		ok = false
 	}
 
-  return
+	return
 }
 
 func (atc *AssignmentTreeRefiner) shouldMergeIntoParent(a *assignment) bool {

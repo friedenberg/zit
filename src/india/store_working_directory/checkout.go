@@ -49,15 +49,15 @@ func (s Store) shouldCheckOut(
 	cz zettel_checked_out.Zettel,
 ) (ok bool) {
 
-  switch {
-  case cz.Internal.Named.Stored.Zettel.Equals(cz.External.Named.Stored.Zettel):
+	switch {
+	case cz.Internal.Named.Stored.Zettel.Equals(cz.External.Named.Stored.Zettel):
 		cz.State = zettel_checked_out.StateJustCheckedOutButSame
 
-  //TODO wait why?
-  case cz.External.ZettelFD.Path == "":
+	//TODO wait why?
+	case cz.External.ZettelFD.Path == "":
 		ok = true
 
-  case options.Force || cz.State == zettel_checked_out.StateEmpty:
+	case options.Force || cz.State == zettel_checked_out.StateEmpty:
 		ok = true
 	}
 
@@ -97,7 +97,7 @@ func (s *Store) CheckoutOne(
 		}
 
 		if !s.shouldCheckOut(options, cz) {
-      s.zettelCheckedOutPrinter.ZettelCheckedOut(cz).Print()
+			s.zettelCheckedOutPrinter.ZettelCheckedOut(cz).Print()
 			return
 		}
 	}

@@ -89,7 +89,6 @@ func (f Text) ReadFrom(c *FormatContextRead) (n int64, err error) {
 			err = err1
 		}
 
-		errors.PrintDebug(state)
 		if !state.context.Zettel.Akte.IsNull() {
 			return
 		}
