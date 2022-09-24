@@ -9,7 +9,8 @@ import (
 )
 
 type Reader struct {
-	Metadatei, Akte io.ReaderFrom
+	RequireMetadatei bool
+	Metadatei, Akte  io.ReaderFrom
 }
 
 func (mr *Reader) ReadFrom(r1 io.Reader) (n int64, err error) {
@@ -49,9 +50,13 @@ LINE_READ_LOOP:
 
 		switch state {
 		case readerStateEmpty:
-			if line != Boundary {
+			switch {
+			case mr.RequireMetadatei && line != Boundary:
 				err = errors.Errorf("expected %q but got %q", Boundary, line)
 				return
+
+			case line != Boundary:
+				break LINE_READ_LOOP
 			}
 
 			state += 1
