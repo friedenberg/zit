@@ -79,8 +79,12 @@ func (i *indexZettelenTails) Flush() (err error) {
 
 func (i *indexZettelenTails) readIfNecessary() (err error) {
 	if i.didRead {
+		errors.Print("already read")
 		return
 	}
+
+	errors.Print("read start")
+	defer errors.Print("read end")
 
 	i.didRead = true
 

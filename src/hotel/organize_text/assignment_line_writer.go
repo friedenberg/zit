@@ -10,6 +10,7 @@ import (
 
 type assignmentLineWriter struct {
 	RightAlignedIndents bool
+  OmitLeadingEmptyLine bool
 	*line_format.Writer
 	maxDepth            int
 	maxKopf, maxScwhanz int
@@ -26,7 +27,7 @@ func (av assignmentLineWriter) write(a *assignment) (err error) {
 func (av assignmentLineWriter) writeNormal(a *assignment) (err error) {
 	tab_prefix := ""
 
-	if a.Depth() == 0 {
+	if a.Depth() == 0 && !av.OmitLeadingEmptyLine {
 		av.WriteExactlyOneEmpty()
 	} else if a.Depth() < 0 {
 		err = errors.Errorf("negative depth: %d", a.Depth())
@@ -80,7 +81,7 @@ func (av assignmentLineWriter) writeRightAligned(a *assignment) (err error) {
 
 	tab_prefix := strings.Repeat(" ", hinMaxWidth)
 
-	if a.Depth() == 0 {
+	if a.Depth() == 0 && !av.OmitLeadingEmptyLine {
 		av.WriteExactlyOneEmpty()
 	} else if a.Depth() < 0 {
 		err = errors.Errorf("negative depth: %d", a.Depth())

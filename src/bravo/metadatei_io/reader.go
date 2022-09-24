@@ -56,6 +56,12 @@ LINE_READ_LOOP:
 				return
 
 			case line != Boundary:
+				r2 := io.MultiReader(
+					strings.NewReader(rawLine),
+					r,
+				)
+
+				r = bufio.NewReader(r2)
 				break LINE_READ_LOOP
 			}
 

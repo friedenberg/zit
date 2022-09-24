@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/line_format"
 	"github.com/friedenberg/zit/src/bravo/metadatei_io"
+	"github.com/friedenberg/zit/src/charlie/etikett"
 )
 
 type Text struct {
@@ -51,9 +52,19 @@ func (t *Text) Refine() (err error) {
 }
 
 func (t *Text) ReadFrom(r io.Reader) (n int64, err error) {
-	r1 := assignmentLineReader{}
+	r1 := &assignmentLineReader{}
+	m := &metadatei{}
 
-	n, err = r1.ReadFrom(r)
+	mr := metadatei_io.Reader{
+		Metadatei: m,
+		Akte:      r1,
+	}
+
+	if t.Options.UseMetadateiHeader {
+		mr.Metadatei = m
+	}
+
+	n, err = mr.ReadFrom(r)
 
 	t.assignment = r1.root
 
@@ -66,11 +77,12 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 	kopf, scwhanz := ot.assignment.MaxKopfUndSchwanz()
 
 	aw := assignmentLineWriter{
-		Writer:              lw,
-		maxDepth:            ot.assignment.MaxDepth(),
-		maxKopf:             kopf,
-		maxScwhanz:          scwhanz,
-		RightAlignedIndents: ot.UseRightAlignedIndents,
+		Writer:               lw,
+		maxDepth:             ot.assignment.MaxDepth(),
+		maxKopf:              kopf,
+		maxScwhanz:           scwhanz,
+		RightAlignedIndents:  ot.UseRightAlignedIndents,
+		OmitLeadingEmptyLine: ot.Options.UseMetadateiHeader,
 	}
 
 	if err = aw.write(ot.assignment); err != nil {
@@ -80,6 +92,18 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 
 	mw := metadatei_io.Writer{
 		Akte: lw,
+	}
+
+	if ot.Options.UseMetadateiHeader {
+		set := etikett.MakeSet()
+
+		for _, c := range ot.assignment.children {
+			set.Merge(c.etiketten)
+		}
+
+		mw.Metadatei = metadatei{
+			Set: set,
+		}
 	}
 
 	if n, err = mw.WriteTo(out); err != nil {
