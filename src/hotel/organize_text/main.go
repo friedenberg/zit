@@ -5,6 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/line_format"
+	"github.com/friedenberg/zit/src/bravo/metadatei_io"
 )
 
 type Text struct {
@@ -77,7 +78,11 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 		return
 	}
 
-	if n, err = lw.WriteTo(out); err != nil {
+	mw := metadatei_io.Writer{
+		Akte: lw,
+	}
+
+	if n, err = mw.WriteTo(out); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

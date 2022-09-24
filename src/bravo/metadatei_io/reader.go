@@ -16,7 +16,7 @@ type Reader struct {
 func (mr *Reader) ReadFrom(r1 io.Reader) (n int64, err error) {
 	r := bufio.NewReader(r1)
 
-	if mr.Metadatei == nil {
+	if mr.RequireMetadatei && mr.Metadatei == nil {
 		err = errors.Errorf("metadatei reader is nil")
 		return
 	}
