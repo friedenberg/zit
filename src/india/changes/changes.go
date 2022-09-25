@@ -21,12 +21,14 @@ type Changes struct {
 	Added   []Change
 	Removed []Change
 	New     []New
+	AllB    []string
 }
 
 type changes struct {
 	Added   []Change
 	Removed []Change
 	New     map[string]etikett.Set
+	AllB    []string
 }
 
 func ChangesFrom(a1, b1 *organize_text.Text) (c1 Changes, err error) {
@@ -45,8 +47,11 @@ func ChangesFrom(a1, b1 *organize_text.Text) (c1 Changes, err error) {
 
 	c.Added = make([]Change, 0)
 	c.Removed = make([]Change, 0)
+	c.AllB = make([]string, 0, len(b.Named))
 
 	for h, es1 := range b.Named {
+		c.AllB = append(c.AllB, h)
+
 		for _, e1 := range es1 {
 			if a.Named.Contains(h, e1) {
 				//zettel had etikett previously
@@ -111,6 +116,7 @@ func ChangesFrom(a1, b1 *organize_text.Text) (c1 Changes, err error) {
 func (c changes) toChanges() (c1 Changes) {
 	c1.Added = c.Added
 	c1.Removed = c.Removed
+	c1.AllB = c.AllB
 	c1.New = make([]New, 0, len(c1.New))
 
 	for h, e := range c.New {
@@ -125,6 +131,11 @@ func (c changes) toChanges() (c1 Changes) {
 	sort.Slice(
 		c1.Removed,
 		func(i, j int) bool { return c1.Removed[i].Key < c1.Removed[j].Key },
+	)
+
+	sort.Slice(
+		c1.AllB,
+		func(i, j int) bool { return c1.AllB[i] < c1.AllB[j] },
 	)
 
 	sort.Slice(

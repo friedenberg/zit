@@ -2,7 +2,7 @@
 setlocal list
 let &l:t_ut = ''
 let &l:listchars = "tab:  ,trail:·,nbsp:·"
-let &l:equalprg = "zit format-organize %"
+let &l:equalprg = "zit format-organize -metadatei-header %"
 
 let &l:foldmethod = "expr"
 let &l:foldexpr = "GetZitOrganizeFold(v:lnum)"

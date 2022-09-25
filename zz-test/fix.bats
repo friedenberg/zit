@@ -47,6 +47,7 @@ cmd_zit_organize=(
 	-predictable-hinweisen
 	-right-align=false
 	-refine=true
+	-metadatei-header=false
 	"${cmd_zit_def[@]}"
 )
 
@@ -88,8 +89,10 @@ function commits_no_changes { # @test
 		echo "- vertically-adjustable wall tv mount"
 	} >"$expected_organize"
 
-	run "${cmd_zit_organize[@]}" -mode commit-directly \
-		-group-by project project-22q3-purchases \
+	run "${cmd_zit_organize[@]}" \
+    -mode commit-directly \
+		-group-by project \
+    project-22q3-purchases \
 		<"$expected_organize"
 
 	expected="$(mktemp)"

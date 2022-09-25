@@ -11,12 +11,26 @@ import (
 	"github.com/friedenberg/zit/src/charlie/typ"
 )
 
-type metadatei struct {
+type Metadatei struct {
 	etikett.Set
 	typ.Typ
 }
 
-func (m *metadatei) ReadFrom(r1 io.Reader) (n int64, err error) {
+func (m Metadatei) HasMetadateiContent() bool {
+  if m.Set.Len() > 0 {
+    return true
+  }
+
+	tString := m.Typ.String()
+
+	if tString != "" {
+    return true
+	}
+
+	return false
+}
+
+func (m *Metadatei) ReadFrom(r1 io.Reader) (n int64, err error) {
 	r := bufio.NewReader(r1)
 
 	m.Set = etikett.MakeSet()
@@ -76,7 +90,7 @@ func (m *metadatei) ReadFrom(r1 io.Reader) (n int64, err error) {
 	return
 }
 
-func (m metadatei) WriteTo(w1 io.Writer) (n int64, err error) {
+func (m Metadatei) WriteTo(w1 io.Writer) (n int64, err error) {
 	w := line_format.NewWriter()
 
 	for _, e := range m.Set.SortedString() {

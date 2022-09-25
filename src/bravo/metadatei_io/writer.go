@@ -18,7 +18,13 @@ func (w1 Writer) WriteTo(w2 io.Writer) (n int64, err error) {
 	var n1 int64
 	var n2 int
 
-	if w1.Metadatei != nil {
+  hasMetadateiContent := true
+
+  if mwt, ok := w1.Metadatei.(MetadateiWriterTo); ok {
+    hasMetadateiContent = mwt.HasMetadateiContent()
+  }
+
+	if w1.Metadatei != nil && hasMetadateiContent {
 		n2, err = w.WriteString(Boundary + "\n")
 		n += int64(n2)
 

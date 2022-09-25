@@ -57,7 +57,7 @@ func (in *Text) ToCompareMap() (out CompareMap, err error) {
 		Unnamed: make(SetKeyToEtiketten),
 	}
 
-	if err = in.assignment.addToCompareMap(etikett.NewSet(), &out); err != nil {
+	if err = in.assignment.addToCompareMap(in.Metadatei, etikett.NewSet(), &out); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -65,7 +65,7 @@ func (in *Text) ToCompareMap() (out CompareMap, err error) {
 	return
 }
 
-func (a *assignment) addToCompareMap(es *etikett.Set, out *CompareMap) (err error) {
+func (a *assignment) addToCompareMap(m Metadatei, es *etikett.Set, out *CompareMap) (err error) {
 	es = es.Copy()
 
 	var es1 etikett.Set
@@ -82,16 +82,26 @@ func (a *assignment) addToCompareMap(es *etikett.Set, out *CompareMap) (err erro
 		for _, e := range es.Sorted() {
 			out.Named.Add(z.Hinweis.String(), e)
 		}
+
+    for _, e := range m.Set {
+      //TODO add typ
+      out.Named.Add(z.Hinweis.String(), e)
+    }
 	}
 
 	for z, _ := range a.unnamed {
 		for _, e := range es.Sorted() {
 			out.Unnamed.Add(z.Bezeichnung.String(), e)
 		}
+
+    for _, e := range m.Set {
+      //TODO add typ
+      out.Unnamed.Add(z.Bezeichnung.String(), e)
+    }
 	}
 
 	for _, c := range a.children {
-		if err = c.addToCompareMap(es, out); err != nil {
+		if err = c.addToCompareMap(m, es, out); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

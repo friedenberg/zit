@@ -118,8 +118,19 @@ func (c *Organize) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 		Options: c.Options,
 	}
 
-	if createOrganizeFileOp.RootEtiketten, err = c.getEtikettenFromArgs(ids); err != nil {
-		err = errors.Wrap(err)
+	createOrganizeFileOp.RootEtiketten = ids.Etiketten()
+
+	typen := ids.Typen()
+
+	switch len(typen) {
+	case 0:
+    break
+
+	case 1:
+    createOrganizeFileOp.Typ = typen[0]
+
+	default:
+		err = errors.Errorf("only one typ is supported for organize, but got %q", typen)
 		return
 	}
 
@@ -272,12 +283,6 @@ func (c Organize) readFromVim(
 			return
 		}
 	}
-
-	return
-}
-
-func (c Organize) getEtikettenFromArgs(ids id_set.Set) (es etikett.Set, err error) {
-	es = ids.Etiketten()
 
 	return
 }

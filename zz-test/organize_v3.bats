@@ -46,6 +46,7 @@ cmd_zit_organize=(
 	organize
 	-right-align=false
 	-refine=true
+	-metadatei-header=false
 	"${cmd_zit_def[@]}"
 )
 
@@ -54,6 +55,7 @@ cmd_zit_organize_v3=(
 	organize
 	"${cmd_zit_def[@]}"
 	-prefix-joints=true
+	-metadatei-header=false
 	-refine=true
 )
 

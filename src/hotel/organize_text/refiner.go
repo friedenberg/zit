@@ -7,12 +7,12 @@ import (
 	"github.com/friedenberg/zit/src/charlie/etikett"
 )
 
-type AssignmentTreeRefiner struct {
+type Refiner struct {
 	Enabled         bool
 	UsePrefixJoints bool
 }
 
-func (atc *AssignmentTreeRefiner) shouldMergeAllChildrenIntoParent(a *assignment) (ok bool) {
+func (atc *Refiner) shouldMergeAllChildrenIntoParent(a *assignment) (ok bool) {
 	switch {
 	case a.parent.isRoot:
 		fallthrough
@@ -24,7 +24,7 @@ func (atc *AssignmentTreeRefiner) shouldMergeAllChildrenIntoParent(a *assignment
 	return
 }
 
-func (atc *AssignmentTreeRefiner) shouldMergeIntoParent(a *assignment) bool {
+func (atc *Refiner) shouldMergeIntoParent(a *assignment) bool {
 	errors.Printf("checking node should merge: %s", a)
 
 	if a.parent == nil {
@@ -65,7 +65,7 @@ func (atc *AssignmentTreeRefiner) shouldMergeIntoParent(a *assignment) bool {
 	return true
 }
 
-func (atc *AssignmentTreeRefiner) renameForPrefixJoint(a *assignment) (err error) {
+func (atc *Refiner) renameForPrefixJoint(a *assignment) (err error) {
 	if !atc.UsePrefixJoints {
 		return
 	}
@@ -107,7 +107,7 @@ func (atc *AssignmentTreeRefiner) renameForPrefixJoint(a *assignment) (err error
 }
 
 // passed-in assignment may be nil?
-func (atc *AssignmentTreeRefiner) Refine(a *assignment) (err error) {
+func (atc *Refiner) Refine(a *assignment) (err error) {
 	if !atc.Enabled {
 		return
 	}
@@ -164,7 +164,12 @@ func (atc *AssignmentTreeRefiner) Refine(a *assignment) (err error) {
 	return
 }
 
-func (atc AssignmentTreeRefiner) applyPrefixJoints(a *assignment) (err error) {
+type etikettBag struct {
+	etikett.Etikett
+	assignments []*assignment
+}
+
+func (atc Refiner) applyPrefixJoints(a *assignment) (err error) {
 	if !atc.UsePrefixJoints {
 		return
 	}
@@ -207,7 +212,7 @@ func (atc AssignmentTreeRefiner) applyPrefixJoints(a *assignment) (err error) {
 	return
 }
 
-func (a AssignmentTreeRefiner) childPrefixes(node *assignment) (out []etikettBag) {
+func (a Refiner) childPrefixes(node *assignment) (out []etikettBag) {
 	m := make(map[etikett.Etikett][]*assignment)
 	out = make([]etikettBag, 0, len(node.children))
 
