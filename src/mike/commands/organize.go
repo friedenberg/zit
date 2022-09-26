@@ -88,6 +88,12 @@ func (c Organize) ProtoIdList(u *umwelt.Umwelt) (is id_set.ProtoIdList) {
 	is = id_set.MakeProtoIdList(
 		id_set.ProtoId{
 			MutableId: &etikett.Etikett{},
+			Expand: func(v string) (out string, err error) {
+				var e etikett.Etikett
+				e, err = u.StoreObjekten().ExpandEtikettString(v)
+				out = e.String()
+				return
+			},
 		},
 		id_set.ProtoId{
 			MutableId: &hinweis.Hinweis{},
@@ -124,10 +130,10 @@ func (c *Organize) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 	switch len(typen) {
 	case 0:
-    break
+		break
 
 	case 1:
-    createOrganizeFileOp.Typ = typen[0]
+		createOrganizeFileOp.Typ = typen[0]
 
 	default:
 		err = errors.Errorf("only one typ is supported for organize, but got %q", typen)

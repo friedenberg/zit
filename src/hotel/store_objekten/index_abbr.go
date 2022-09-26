@@ -7,6 +7,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/charlie/tridex"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
@@ -16,6 +17,7 @@ type indexAbbrEncodableTridexes struct {
 	Shas             *tridex.Tridex
 	HinweisKopfen    *tridex.Tridex
 	HinweisSchwanzen *tridex.Tridex
+	Etiketten        *tridex.Tridex
 }
 
 type indexAbbr struct {
@@ -40,6 +42,7 @@ func newIndexAbbr(
 			Shas:             tridex.Make(),
 			HinweisKopfen:    tridex.Make(),
 			HinweisSchwanzen: tridex.Make(),
+			Etiketten:        tridex.Make(),
 		},
 	}
 
@@ -147,6 +150,10 @@ func (i *indexAbbr) addZettelTransacted(zt zettel_transacted.Zettel) (err error)
 	i.indexAbbrEncodableTridexes.Shas.Add(zt.Named.Stored.Zettel.Akte.String())
 	i.indexAbbrEncodableTridexes.HinweisKopfen.Add(zt.Named.Hinweis.Kopf())
 	i.indexAbbrEncodableTridexes.HinweisSchwanzen.Add(zt.Named.Hinweis.Schwanz())
+
+	for e, _ := range zt.Named.Stored.Zettel.Etiketten.Expanded(etikett.ExpanderRight{}) {
+		i.indexAbbrEncodableTridexes.Etiketten.Add(e)
+	}
 
 	return
 }
@@ -262,6 +269,45 @@ func (i *indexAbbr) ExpandHinweis(hAbbr hinweis.Hinweis) (h hinweis.Hinweis, err
 	}
 
 	errors.Print(h)
+
+	return
+}
+
+func (i *indexAbbr) ExpandEtikettString(s string) (e etikett.Etikett, err error) {
+	errors.Print(s)
+
+	if e = etikett.Make(s); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return i.ExpandEtikett(e)
+}
+
+func (i *indexAbbr) ExpandEtikett(eAbbr etikett.Etikett) (e etikett.Etikett, err error) {
+	errors.Print(eAbbr)
+	ctx := errors.Ctx{}
+
+	defer func() {
+		err = ctx.Error()
+	}()
+
+	if ctx.Err = i.readIfNecessary(); !ctx.IsEmpty() {
+		ctx.Wrap()
+		return
+	}
+
+	ex := i.indexAbbrEncodableTridexes.Etiketten.Expand(eAbbr.String())
+
+  if ex == "" {
+    //TODO should try to use the expansion if possible
+    ex = eAbbr.String()
+  }
+
+	if ctx.Err = e.Set(ex); !ctx.IsEmpty() {
+		ctx.Wrap()
+		return
+	}
 
 	return
 }

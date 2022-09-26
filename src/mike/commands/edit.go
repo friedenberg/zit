@@ -56,6 +56,12 @@ func (c Edit) ProtoIdList(u *umwelt.Umwelt) (is id_set.ProtoIdList) {
 		},
 		id_set.ProtoId{
 			MutableId: &etikett.Etikett{},
+			Expand: func(v string) (out string, err error) {
+				var e etikett.Etikett
+				e, err = u.StoreObjekten().ExpandEtikettString(v)
+				out = e.String()
+				return
+			},
 		},
 		id_set.ProtoId{
 			MutableId: &typ.Typ{},

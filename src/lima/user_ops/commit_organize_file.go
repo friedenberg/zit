@@ -155,9 +155,11 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 			return
 		}
 
-		if err = z.Typ.Set("md"); err != nil {
-			err = errors.Wrap(err)
-			return
+		if z.Typ.IsEmpty() {
+			if err = z.Typ.Set("md"); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 		}
 
 		if c.Konfig().DryRun {
