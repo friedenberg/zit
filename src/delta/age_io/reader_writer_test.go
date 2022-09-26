@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/age"
 )
 
-func makeAge(t *testing.T) age.Age {
+func makeAge(t *testing.T) *age.Age {
 	t.Helper()
 
 	d := t.TempDir()
@@ -33,7 +33,7 @@ func Test1(t *testing.T) {
 	var w *writer
 
 	o := WriteOptions{
-		Age:    age,
+		Age:    *age,
 		Writer: out,
 	}
 
@@ -53,7 +53,7 @@ func Test1(t *testing.T) {
 	var r *reader
 
 	ro := ReadOptions{
-		Age:    age,
+		Age:    *age,
 		Reader: in,
 	}
 

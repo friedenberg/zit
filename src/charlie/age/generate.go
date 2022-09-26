@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
-func Generate(basePath string) (a *ages, err error) {
+func Generate(basePath string) (a *Age, err error) {
 	var i *X25519Identity
 
 	if i, err = age.GenerateX25519Identity(); err != nil {
@@ -21,9 +21,9 @@ func Generate(basePath string) (a *ages, err error) {
 		return
 	}
 
-	a = &ages{
-		recipient: i.Recipient(),
-		identity:  i,
+	a = &Age{
+		recipients: []Recipient{i.Recipient()},
+		identities: []Identity{i},
 	}
 
 	return

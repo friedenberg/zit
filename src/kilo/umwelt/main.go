@@ -30,7 +30,7 @@ type Umwelt struct {
 	lock                  *file_lock.Lock
 	storeObjekten         *store_objekten.Store
 	akten                 akten.Akten
-	age                   age.Age
+	age                   *age.Age
 	storeWorkingDirectory *store_working_directory.Store
 	printerOut            *zettel_printer.Printer
 }
@@ -65,14 +65,14 @@ func (u *Umwelt) Initialize() (err error) {
 			return
 		}
 	} else {
-		u.age = age.MakeEmpty()
+		u.age = &age.Age{}
 	}
 
 	u.printerOut = zettel_printer.Make(u.standort, u.konfig, u.out)
 	//TODO move to konfig
 	// u.printerOut.ShouldAbbreviateHinweisen = true
 
-	if u.storeObjekten, err = store_objekten.Make(u.lock, u.age, u.konfig, u.standort); err != nil {
+	if u.storeObjekten, err = store_objekten.Make(u.lock, *u.age, u.konfig, u.standort); err != nil {
 		err = errors.Wrapf(err, "failed to initialize zettel meta store")
 		return
 	}
