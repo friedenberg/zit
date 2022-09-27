@@ -24,45 +24,38 @@ func (atc *AssignmentTreeRefiner) shouldMergeAllChildrenIntoParent(a *assignment
 	return
 }
 
-func (atc *AssignmentTreeRefiner) shouldMergeIntoParent(a *assignment) bool {
+func (atc *AssignmentTreeRefiner) shouldMergeIntoParent(a *assignment) (ok bool) {
 	errors.Printf("checking node should merge: %s", a)
 
-	if a.parent == nil {
-		errors.Print("parent is nil")
-		return false
+	switch {
+	case a.parent == nil:
+		return
+
+	case a.parent.isRoot:
+		return
+
+	case a.etiketten.Len() == 0:
+		ok = true
+
+  case a.etiketten.Len() == 1 && a.etiketten.Any().String() == "":
+		ok = true
+
+	case a.parent.etiketten.Len() != 1:
+		return
+
+	case a.etiketten.Len() != 1:
+		return
+
+	case !a.etiketten.Equals(a.parent.etiketten):
+		return
+
+	case a.parent.etiketten.Any().IsDependentLeaf() || a.etiketten.Any().IsDependentLeaf():
+		return
 	}
 
-	if a.parent.isRoot {
-		errors.Print("parent is root")
-		return false
-	}
+	ok = true
 
-	if a.parent.etiketten.Len() != 1 {
-		errors.Print("parent etiketten length is not 1")
-		return false
-	}
-
-	if a.etiketten.Len() != 1 {
-		errors.Print("etiketten length is not 1")
-		return false
-	}
-
-	if !a.etiketten.Equals(a.parent.etiketten) {
-		errors.Print("parent etiketten not equal")
-		return false
-	}
-
-	if a.parent.etiketten.Any().IsDependentLeaf() {
-		errors.Print("is prefix joint")
-		return false
-	}
-
-	if a.etiketten.Any().IsDependentLeaf() {
-		errors.Print("is prefix joint")
-		return false
-	}
-
-	return true
+	return
 }
 
 func (atc *AssignmentTreeRefiner) renameForPrefixJoint(a *assignment) (err error) {

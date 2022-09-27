@@ -84,17 +84,17 @@ func (a SetPrefixTransacted) Subset(e etikett.Etikett) (out SetPrefixTransactedS
 	out.Grouped = MakeSetPrefixTransacted(len(a.innerMap))
 
 	for e1, zSet := range a.innerMap {
+    if e1.String() == "" {
+      continue
+    }
+
 		for _, z := range zSet.innerMap {
 			intersection := z.Named.Stored.Zettel.Etiketten.IntersectPrefixes(etikett.MakeSet(e))
 			errors.Printf("%s yields %s", e1, intersection)
 
 			if intersection.Len() > 0 {
 				for _, e2 := range intersection {
-					if e2.Equals(e) {
-						out.Ungrouped.Add(z)
-					} else {
-						out.Grouped.addPair(e2, z)
-					}
+					out.Grouped.addPair(e2, z)
 				}
 			} else {
 				out.Ungrouped.Add(z)
