@@ -4,6 +4,7 @@ import (
 	"io"
 
 	"filippo.io/age"
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
 )
 
@@ -33,6 +34,27 @@ func Make(basePath string) (a *Age, err error) {
 	return
 }
 
+func (a *Age) AddBech32PivYubikeyEC256(bech string) (err error) {
+  var r *age.PivYubikeyEC256Recipient
+
+  if r, err = age.ParseBech32PivYubikeyEC256Recipient(bech); err != nil {
+    err = errors.Wrap(err)
+    return
+  }
+
+  var i *age.PivYubikeyEC256Identity
+
+  if i, err = age.ReadPivYubikeyEC256Identity(r); err != nil {
+    err = errors.Wrap(err)
+    return
+  }
+
+  a.recipients = append(a.recipients, r)
+  a.identities = append(a.identities, i)
+
+  return
+}
+
 func (a Age) Recipients() []Recipient {
 	return a.recipients
 }
@@ -41,26 +63,56 @@ func (a Age) Identities() []Identity {
 	return a.identities
 }
 
-func (a Age) Decrypt(src io.Reader) (io.Reader, error) {
+func (a Age) Decrypt(src io.Reader) (out io.Reader, err error) {
 	i := a.Identities()
 
 	switch len(i) {
 	case 0:
-		return src, nil
+		out = src
+		return
 
 	default:
-		return age.Decrypt(src, a.Identities()...)
+		if out, err = age.Decrypt(src, a.Identities()...); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
+
+	return
 }
 
-func (a Age) Encrypt(dst io.Writer) (io.WriteCloser, error) {
+func (a Age) Encrypt(dst io.Writer) (out io.WriteCloser, err error) {
 	r := a.Recipients()
 
 	switch len(r) {
 	case 0:
-		return writeCloser{dst}, nil
+		out = writeCloser{dst}
+		return
 
 	default:
-		return age.Encrypt(dst, r...)
+		if out, err = age.Encrypt(dst, r...); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
+
+	return
+}
+
+func (a *Age) Close() error {
+  if a == nil {
+    return nil
+  }
+
+	for _, i := range a.identities {
+		if c, ok := i.(io.Closer); ok {
+			err := c.Close()
+
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
 }

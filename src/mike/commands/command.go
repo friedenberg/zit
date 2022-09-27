@@ -139,6 +139,8 @@ func Run(args []string) (exitStatus int) {
 		}
 	}
 
+  defer u.Flush()
+
 	cmdArgs := cmd.FlagSet.Args()
 
 	if t, ok := cmd.Command.(CommandWithArgPreprocessor); ok {

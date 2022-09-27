@@ -6,4 +6,5 @@ type Toml struct {
 	Clean         string                  `toml:"clean"`
 	Smudge        string                  `toml:"smudge"`
 	Typen         map[string]KonfigTyp    `toml:"typen"`
+	Recipients    []string                `toml:"recipients"`
 }

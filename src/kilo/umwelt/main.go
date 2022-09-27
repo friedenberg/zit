@@ -50,6 +50,11 @@ func Make(c konfig.Konfig) (u *Umwelt, err error) {
 }
 
 func (u *Umwelt) Initialize() (err error) {
+	if err = u.Flush(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if u.standort, err = standort.Make(u.konfig); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -65,8 +70,19 @@ func (u *Umwelt) Initialize() (err error) {
 			return
 		}
 	} else {
-		u.age = &age.Age{}
+    u.age = &age.Age{}
+		// if u.age, err = age.MakeDefaultTest(); err != nil {
+		// 	errors.Wrap(err)
+		// 	return
+		// }
 	}
+
+  for _, rb := range u.konfig.Recipients {
+    if err = u.age.AddBech32PivYubikeyEC256(rb); err != nil {
+			errors.Wrap(err)
+			return
+    }
+  }
 
 	u.printerOut = zettel_printer.Make(u.standort, u.konfig, u.out)
 	//TODO move to konfig
@@ -126,4 +142,8 @@ func (u Umwelt) DefaultEtiketten() (etiketten etikett.Set, err error) {
 	}
 
 	return
+}
+
+func (u Umwelt) Flush() error {
+	return u.age.Close()
 }
