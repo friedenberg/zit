@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/etikett"
+	"github.com/friedenberg/zit/src/charlie/typ"
 	"github.com/friedenberg/zit/src/delta/id_set"
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
@@ -24,6 +25,7 @@ type Add struct {
 	Delete    bool
 	OpenAkten bool
 	Organize  bool
+	typ.Typ
 }
 
 func init() {
@@ -31,6 +33,8 @@ func init() {
 		"add",
 		func(f *flag.FlagSet) Command {
 			c := &Add{
+				//TODO move to proper place
+				Typ:       typ.Make("md"),
 				Etiketten: etikett.MakeSet(),
 			}
 
@@ -38,6 +42,7 @@ func init() {
 			f.BoolVar(&c.Delete, "delete", false, "delete the zettel and akte after successful checkin")
 			f.BoolVar(&c.Organize, "organize", false, "")
 			f.BoolVar(&c.OpenAkten, "open-akten", false, "also open the Akten")
+			f.Var(&c.Typ, "typ", "the Typ to use for the newly created Zettelen")
 
 			return c
 		},
@@ -53,6 +58,7 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	zettelsFromAkteOp := user_ops.ZettelFromExternalAkte{
 		Umwelt:    u,
+    //TODO add Typ
 		Etiketten: c.Etiketten,
 		Delete:    c.Delete,
 	}

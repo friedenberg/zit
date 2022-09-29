@@ -29,6 +29,7 @@ type New struct {
 	Count       int
 	Etiketten   etikett.Set
 	Filter      script_value.ScriptValue
+	typ.Typ
 }
 
 func (b *bez) Set(v string) (err error) {
@@ -41,6 +42,8 @@ func init() {
 		"new",
 		func(f *flag.FlagSet) Command {
 			c := &New{
+        //TODO move to proper place
+				Typ:       typ.Make("md"),
 				Etiketten: etikett.MakeSet(),
 			}
 
@@ -50,6 +53,7 @@ func init() {
 			f.BoolVar(&c.Delete, "delete", false, "delete the zettel and akte after successful checkin")
 			f.Var(&c.Bezeichnung, "bezeichnung", "zettel description (will overwrite existing Bezecihnung")
 			f.Var(&c.Etiketten, "etiketten", "comma-separated etiketten (will add to existing Etiketten)")
+			f.Var(&c.Typ, "typ", "the Typ to use for the newly created Zettelen")
 
 			return c
 		},
@@ -106,7 +110,7 @@ func (c New) readExistingFilesAsZettels(
 		Delete: c.Delete,
 	}
 
-	//TODO add bezeichnung and etiketten
+	//TODO add bezeichnung and etiketten, and typ?
 	if _, err = opCreateFromPath.Run(args...); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -139,7 +143,7 @@ func (c New) writeNewZettels(
 	z := zettel.Zettel{
 		Bezeichnung: c.Bezeichnung.Bezeichnung,
 		Etiketten:   c.Etiketten,
-		Typ:         typ.Make("md"),
+		Typ:         c.Typ,
 	}
 
 	if zsc, err = emptyOp.RunMany(z, c.Count); err != nil {

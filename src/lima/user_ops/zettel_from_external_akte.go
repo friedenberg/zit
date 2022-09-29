@@ -128,9 +128,13 @@ func (c ZettelFromExternalAkte) zettelForAkte(
 		return
 	}
 
-	if ctx.Err = z.Typ.Set(path.Ext(aktePath)); !ctx.IsEmpty() {
-		ctx.Wrap()
-		return
+	ext := path.Ext(aktePath)
+
+	if ext != "" {
+		if ctx.Err = z.Typ.Set(path.Ext(aktePath)); !ctx.IsEmpty() {
+			ctx.Wrap()
+			return
+		}
 	}
 
 	return
