@@ -73,7 +73,12 @@ func (c commandWithIds) Complete(u *umwelt.Umwelt, args ...string) (err error) {
 
 		err = zts.Each(
 			func(zt zettel_transacted.Zettel) (err error) {
-				errors.PrintOutf("%s\t%s", zt.Named.Hinweis, u.PrinterOut().ZettelNamed(zt.Named))
+        errors.PrintOutf(
+          "%s\tZettel: !%s %s",
+          zt.Named.Hinweis,
+          zt.Named.Stored.Zettel.Typ,
+          zt.Named.Stored.Zettel.Bezeichnung,
+        )
 
 				return
 			},

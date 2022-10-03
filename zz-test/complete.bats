@@ -63,7 +63,7 @@ function complete_show { # @test
 	assert_output "$(cat "$expected")"
 
 	{
-		echo "one/uno	[o/u@5 !md \"wow\"]"
+		echo "one/uno	Zettel: !md wow"
 		echo "ok	Etikett"
 	} >"$expected"
 
