@@ -5,6 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/typ"
+	"github.com/friedenberg/zit/src/delta/id_set"
 	"github.com/friedenberg/zit/src/kilo/umwelt"
 )
 
@@ -17,13 +18,23 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &EditTyp{}
 
-			return commandWithTypen{c}
+			return commandWithIds{CommandWithIds: c}
 		},
 	)
 }
 
-func (c EditTyp) RunWithTypen(u *umwelt.Umwelt, typen ...typ.Typ) (err error) {
-	errors.PrintOut(typen)
+func (c EditTyp) ProtoIdList(u *umwelt.Umwelt) (is id_set.ProtoIdList) {
+	is = id_set.MakeProtoIdList(
+		id_set.ProtoId{
+			MutableId: &typ.Typ{},
+		},
+	)
+
+	return
+}
+
+func (c EditTyp) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
+	errors.PrintOut(ids.Typen())
 
 	return
 }
