@@ -6,6 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
+	"github.com/friedenberg/zit/src/delta/id_set"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/kilo/umwelt"
 )
@@ -19,12 +20,30 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &Log{}
 
-			return commandWithHinweisen{c}
+			return commandWithIds{CommandWithIds: c}
 		},
 	)
 }
 
-func (c Log) RunWithHinweisen(os *umwelt.Umwelt, hs ...hinweis.Hinweis) (err error) {
+func (c Log) ProtoIdList(u *umwelt.Umwelt) (is id_set.ProtoIdList) {
+	is = id_set.MakeProtoIdList(
+		id_set.ProtoId{
+			MutableId: &hinweis.Hinweis{},
+			Expand: func(v string) (out string, err error) {
+				var h hinweis.Hinweis
+				h, err = u.StoreObjekten().ExpandHinweisString(v)
+				out = h.String()
+				return
+			},
+		},
+	)
+
+	return
+}
+
+func (c Log) RunWithIds(os *umwelt.Umwelt, is id_set.Set) (err error) {
+	hs := is.Hinweisen()
+
 	switch len(hs) {
 
 	case 0:

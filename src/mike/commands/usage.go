@@ -45,8 +45,8 @@ func (c command) PrintSubcommandUsage(flags flag.FlagSet) {
 	printTabbed(flags.Name())
 
 	//TODO determine why the interface doesn't actually work
-	if cwd, ok := c.Command.(CommandWithDescription); ok {
-		printTabbed(cwd.Description())
+	if v2, ok := c.Command.(CommandV2); ok {
+		printTabbed(v2.Description)
 	}
 
 	flags.PrintDefaults()
