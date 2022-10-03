@@ -10,22 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/kilo/umwelt"
 )
 
-type Command interface {
-	Run(*umwelt.Umwelt, ...string) error
-}
-
-type CommandSupportingErrors interface {
-	HandleError(*umwelt.Umwelt, error)
-}
-
-type CommandWithArgPreprocessor interface {
-	PreprocessArgs(*umwelt.Umwelt, []string) ([]string, error)
-}
-
-type CommandWithDescription interface {
-	Description() string
-}
-
 type command struct {
 	Command
 	*flag.FlagSet
@@ -139,7 +123,7 @@ func Run(args []string) (exitStatus int) {
 		}
 	}
 
-  defer u.Flush()
+	defer u.Flush()
 
 	cmdArgs := cmd.FlagSet.Args()
 
@@ -150,12 +134,27 @@ func Run(args []string) (exitStatus int) {
 		}
 	}
 
-	if err = cmd.Command.Run(u, cmdArgs...); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	switch {
+	case u.Konfig().Complete:
+		var t WithCompletion
+		ok := false
 
-	errors.Print()
+		if t, ok = cmd.Command.(WithCompletion); !ok {
+			err = errors.Normalf("Command does not support completion")
+      return
+		}
+
+		if err = t.Complete(u, cmdArgs...); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+	default:
+		if err = cmd.Command.Run(u, cmdArgs...); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
 
 	return
 }

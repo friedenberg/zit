@@ -9,10 +9,13 @@ import (
 )
 
 type Cli struct {
-	BasePath                         string
-	Debug                            bool
-	Verbose                          bool
-	DryRun                           bool
+	BasePath string
+
+	Debug    bool
+	Verbose  bool
+	DryRun   bool
+	Complete bool
+
 	AllowMissingHinweis              bool
 	CheckoutCacheEnabled             bool
 	IncludeHidden                    bool
@@ -27,9 +30,12 @@ type Cli struct {
 
 func (c *Cli) AddToFlags(f *flag.FlagSet) {
 	f.StringVar(&c.BasePath, "dir-zit", "", "")
+
 	f.BoolVar(&c.Debug, "debug", false, "")
 	f.BoolVar(&c.Verbose, "verbose", false, "")
 	f.BoolVar(&c.DryRun, "dry-run", false, "")
+	f.BoolVar(&c.Complete, "complete", false, "")
+
 	f.BoolVar(&c.CheckoutCacheEnabled, "checkout-cache-enabled", false, "")
 	f.BoolVar(&c.AllowMissingHinweis, "allow-missing-hinweis", false, "")
 	f.BoolVar(&c.IncludeHidden, "include-hidden", false, "include zettels that have hidden etiketten")

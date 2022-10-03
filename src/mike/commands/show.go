@@ -32,11 +32,38 @@ func init() {
 
 			f.Var(&c.Type, "type", "ObjekteType")
 
-			return commandWithIds{
-				CommandWithIds: c,
+			return CommandV2{
+        Command: commandWithIds{
+					CommandWithIds: c,
+				},
+        WithCompletion: c,
 			}
 		},
 	)
+}
+
+func (c Show) Complete(u *umwelt.Umwelt, args ...string) (err error) {
+	var zts zettel_transacted.Set
+
+	if zts, err = u.StoreObjekten().ZettelenSchwanzen(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	err = zts.Each(
+		func(zt zettel_transacted.Zettel) (err error) {
+			errors.PrintOutf("%s\t%s", zt.Named.Hinweis, u.PrinterOut().ZettelNamed(zt.Named))
+
+			return
+		},
+	)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (c Show) ProtoIdList(u *umwelt.Umwelt) (is id_set.ProtoIdList) {
