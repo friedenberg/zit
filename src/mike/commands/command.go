@@ -2,7 +2,17 @@ package commands
 
 import (
 	"flag"
+
+	"github.com/friedenberg/zit/src/kilo/umwelt"
 )
+
+type Command interface {
+	Run(*umwelt.Umwelt, ...string) error
+}
+
+type WithCompletion interface {
+	Complete(u *umwelt.Umwelt, args ...string) (err error)
+}
 
 type command struct {
 	Command

@@ -62,6 +62,11 @@ function complete_show { # @test
 	run zit show "${cmd_zit_def[@]}" one/uno
 	assert_output "$(cat "$expected")"
 
-  run zit show -complete
-	assert_output "$(printf "one/uno\t[o/u@5 !md \"wow\"]")"
+	{
+		echo "one/uno	[o/u@5 !md \"wow\"]"
+		echo "ok	Etikett"
+	} >"$expected"
+
+	run zit show -complete
+	assert_output "$(cat "$expected")"
 }

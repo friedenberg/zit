@@ -1,8 +1,11 @@
 package commands
 
 import (
+	"syscall"
+
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/charlie/ts"
 	"github.com/friedenberg/zit/src/charlie/typ"
@@ -58,25 +61,51 @@ func (c commandWithIds) getIdProtoSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 }
 
 func (c commandWithIds) Complete(u *umwelt.Umwelt, args ...string) (err error) {
-	// ps := c.getIdProtoSet(u)
+	ps := c.getIdProtoSet(u)
 
-	var zts zettel_transacted.Set
+	if ps.Contains(&hinweis.Hinweis{}) {
+		var zts zettel_transacted.Set
 
-	if zts, err = u.StoreObjekten().ZettelenSchwanzen(); err != nil {
-		err = errors.Wrap(err)
-		return
+		if zts, err = u.StoreObjekten().ZettelenSchwanzen(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		err = zts.Each(
+			func(zt zettel_transacted.Zettel) (err error) {
+				errors.PrintOutf("%s\t%s", zt.Named.Hinweis, u.PrinterOut().ZettelNamed(zt.Named))
+
+				return
+			},
+		)
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
-	err = zts.Each(
-		func(zt zettel_transacted.Zettel) (err error) {
-			errors.PrintOutf("%s\t%s", zt.Named.Hinweis, u.PrinterOut().ZettelNamed(zt.Named))
+	if ps.Contains(&etikett.Etikett{}) {
+		var ea []etikett.Etikett
 
+		if ea, err = u.StoreObjekten().Etiketten(); err != nil {
+			err = errors.Wrap(err)
 			return
-		},
-	)
+		}
 
-	if err != nil {
-		err = errors.Wrap(err)
+		for _, e := range ea {
+			if err = errors.PrintOutf("%s\tEtikett", e.String()); err != nil {
+				err = errors.IsAsNilOrWrapf(
+					err,
+					syscall.EPIPE,
+					"Etikett: %s",
+					e,
+				)
+
+				return
+			}
+		}
+
 		return
 	}
 
