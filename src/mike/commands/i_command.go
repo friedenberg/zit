@@ -6,9 +6,9 @@ type Command interface {
 	Run(*umwelt.Umwelt, ...string) error
 }
 
-type CommandSupportingErrors interface {
-	HandleError(*umwelt.Umwelt, error)
-}
+// type CommandSupportingErrors interface {
+// 	HandleError(*umwelt.Umwelt, error)
+// }
 
 type CommandWithArgPreprocessor interface {
 	PreprocessArgs(*umwelt.Umwelt, []string) ([]string, error)
