@@ -81,7 +81,7 @@ func (c Make) getZettel(
 	executor konfig.RemoteScript,
 	err error,
 ) {
-	ps := id_set.MakeProtoIdList(
+	ps := id_set.MakeProtoIdSet(
 		id_set.ProtoId{
 			MutableId: &sha.Sha{},
 		},

@@ -57,8 +57,8 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}()
 
 	zettelsFromAkteOp := user_ops.ZettelFromExternalAkte{
-		Umwelt:    u,
-    //TODO add Typ
+		Umwelt: u,
+		//TODO add Typ
 		Etiketten: c.Etiketten,
 		Delete:    c.Delete,
 	}

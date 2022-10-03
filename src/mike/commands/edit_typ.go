@@ -23,8 +23,8 @@ func init() {
 	)
 }
 
-func (c EditTyp) ProtoIdList(u *umwelt.Umwelt) (is id_set.ProtoIdList) {
-	is = id_set.MakeProtoIdList(
+func (c EditTyp) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
+	is = id_set.MakeProtoIdSet(
 		id_set.ProtoId{
 			MutableId: &typ.Typ{},
 		},

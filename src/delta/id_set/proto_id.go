@@ -17,6 +17,17 @@ type protoId struct {
 	reflect.Type
 }
 
+func makeProtoId(i ProtoId) protoId {
+	return protoId{
+		ProtoId: i,
+		Type:    reflect.TypeOf(i.MutableId), // this type of this variable is reflect.Type
+	}
+}
+
+func (pid protoId) String() string {
+	return pid.Type.Name()
+}
+
 func (pid protoId) Make(v string) (i id.Id, err error) {
 	if pid.Expand != nil {
 		if v, err = pid.Expand(v); err != nil {

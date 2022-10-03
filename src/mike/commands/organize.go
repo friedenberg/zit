@@ -84,8 +84,8 @@ func init() {
 	)
 }
 
-func (c Organize) ProtoIdList(u *umwelt.Umwelt) (is id_set.ProtoIdList) {
-	is = id_set.MakeProtoIdList(
+func (c Organize) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
+	is = id_set.MakeProtoIdSet(
 		id_set.ProtoId{
 			MutableId: &etikett.Etikett{},
 			Expand: func(v string) (out string, err error) {

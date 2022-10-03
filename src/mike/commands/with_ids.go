@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/ts"
 	"github.com/friedenberg/zit/src/charlie/typ"
 	"github.com/friedenberg/zit/src/delta/id_set"
+	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/kilo/umwelt"
 )
 
@@ -16,26 +17,22 @@ type CommandWithIds interface {
 
 type CommandWithIdsAndProtoSet interface {
 	CommandWithIds
-	ProtoIdList(*umwelt.Umwelt) id_set.ProtoIdList
+	ProtoIdSet(*umwelt.Umwelt) id_set.ProtoIdSet
 }
 
 type commandWithIds struct {
 	CommandWithIds
-	id_set.ProtoIdList
 }
 
-func (c commandWithIds) getIdProtoSet(u *umwelt.Umwelt) (is id_set.ProtoIdList) {
+func (c commandWithIds) getIdProtoSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 	tid, hasCustomProtoSet := c.CommandWithIds.(CommandWithIdsAndProtoSet)
 
 	switch {
-	case c.ProtoIdList.Len() != 0:
-		is = c.ProtoIdList
-
 	case hasCustomProtoSet:
-		is = tid.ProtoIdList(u)
+		is = tid.ProtoIdSet(u)
 
 	default:
-		is = id_set.MakeProtoIdList(
+		is = id_set.MakeProtoIdSet(
 			id_set.ProtoId{
 				MutableId: &sha.Sha{},
 			},
@@ -55,6 +52,32 @@ func (c commandWithIds) getIdProtoSet(u *umwelt.Umwelt) (is id_set.ProtoIdList) 
 				MutableId: &ts.Time{},
 			},
 		)
+	}
+
+	return
+}
+
+func (c commandWithIds) Complete(u *umwelt.Umwelt, args ...string) (err error) {
+	// ps := c.getIdProtoSet(u)
+
+	var zts zettel_transacted.Set
+
+	if zts, err = u.StoreObjekten().ZettelenSchwanzen(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	err = zts.Each(
+		func(zt zettel_transacted.Zettel) (err error) {
+			errors.PrintOutf("%s\t%s", zt.Named.Hinweis, u.PrinterOut().ZettelNamed(zt.Named))
+
+			return
+		},
+	)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

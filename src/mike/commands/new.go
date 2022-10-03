@@ -42,7 +42,7 @@ func init() {
 		"new",
 		func(f *flag.FlagSet) Command {
 			c := &New{
-        //TODO move to proper place
+				//TODO move to proper place
 				Typ:       typ.Make("md"),
 				Etiketten: etikett.MakeSet(),
 			}

@@ -25,8 +25,8 @@ func init() {
 	)
 }
 
-func (c Copy) ProtoIdList(u *umwelt.Umwelt) (is id_set.ProtoIdList) {
-	is = id_set.MakeProtoIdList(
+func (c Copy) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
+	is = id_set.MakeProtoIdSet(
 		id_set.ProtoId{
 			MutableId: &hinweis.Hinweis{},
 			Expand: func(v string) (out string, err error) {
@@ -42,7 +42,7 @@ func (c Copy) ProtoIdList(u *umwelt.Umwelt) (is id_set.ProtoIdList) {
 }
 
 func (c Copy) RunWithIds(s *umwelt.Umwelt, ids id_set.Set) (err error) {
-  hins := ids.Hinweisen()
+	hins := ids.Hinweisen()
 
 	zettels := make([]zettel_transacted.Zettel, len(hins))
 

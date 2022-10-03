@@ -23,8 +23,8 @@ func init() {
 	)
 }
 
-func (c ExpandHinweis) ProtoIdList(u *umwelt.Umwelt) (is id_set.ProtoIdList) {
-	is = id_set.MakeProtoIdList(
+func (c ExpandHinweis) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
+	is = id_set.MakeProtoIdSet(
 		id_set.ProtoId{
 			MutableId: &hinweis.Hinweis{},
 			Expand: func(v string) (out string, err error) {
