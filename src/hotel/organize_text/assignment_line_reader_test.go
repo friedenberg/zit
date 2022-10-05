@@ -53,14 +53,14 @@ func TestAssignmentLineReaderOneHeadingNoZettels(t *testing.T) {
 	}
 
 	if err != nil {
-		test_logz.Errorf(test_logz.T{T: t}, "expected no error but got %q", err)
+		test_logz.Fatalf(test_logz.T{T: t}, "expected no error but got %q", err)
 	}
 
 	{
-		expected := etikett.NewSet(etikett.Etikett{Value: "wow"})
+		expected := etikett.MakeSet(etikett.Etikett{Value: "wow"})
 		actual := sub.root.children[0].etiketten
 
-		if !actual.Equals(*expected) {
+		if !actual.Equals(expected) {
 			test_logz.Errorf(test_logz.T{T: t}, "\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
@@ -84,14 +84,14 @@ func TestAssignmentLineReader2Heading2Zettels(t *testing.T) {
 	}
 
 	if err != nil {
-		test_logz.Errorf(test_logz.T{T: t}, "expected no error but got %q", err)
+		test_logz.Fatalf(test_logz.T{T: t}, "expected no error but got %q", err)
 	}
 
 	{
-		expected := etikett.NewSet(etikett.Etikett{Value: "wow"})
+		expected := etikett.MakeSet(etikett.Etikett{Value: "wow"})
 		actual := sub.root.children[0].etiketten
 
-		if !actual.Equals(*expected) {
+		if !actual.Equals(expected) {
 			test_logz.Errorf(test_logz.T{T: t}, "\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
@@ -136,20 +136,20 @@ func TestAssignmentLineReader1_1Heading2_2Zettels(t *testing.T) {
 	}
 
 	if err != nil {
-		test_logz.Errorf(test_logz.T{T: t}, "expected no error but got %q", err)
+		test_logz.Fatalf(test_logz.T{T: t}, "expected no error but got %q", err)
 	}
 
 	{
-		expected := etikett.NewSet(etikett.Etikett{Value: "wow"})
+		expected := etikett.MakeSet(etikett.Etikett{Value: "wow"})
 		actual := sub.root.children[0].etiketten
 
-		if !actual.Equals(*expected) {
+		if !actual.Equals(expected) {
 			test_logz.Errorf(test_logz.T{T: t}, "\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
 
 	{
-		expected := etikett.NewSet(etikett.Etikett{Value: "sub-wow"})
+		expected := etikett.MakeSet(etikett.Etikett{Value: "sub-wow"})
 
 		if sub.root != sub.root.children[0].parent {
 			test_logz.Fatalf(test_logz.T{T: t}, "%v, %v", sub.root, sub.root.children[0].parent)
@@ -163,7 +163,7 @@ func TestAssignmentLineReader1_1Heading2_2Zettels(t *testing.T) {
 
 		actual := sub.root.children[0].children[0].etiketten
 
-		if !actual.Equals(*expected) {
+		if !actual.Equals(expected) {
 			test_logz.Errorf(test_logz.T{T: t}, "\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
@@ -216,20 +216,20 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 	}
 
 	if err != nil {
-		test_logz.Errorf(test_logz.T{T: t}, "expected no error but got %q", err)
+		test_logz.Fatalf(test_logz.T{T: t}, "expected no error but got %q", err)
 	}
 
 	{
-		expected := etikett.NewSet(etikett.Etikett{Value: "wow"})
+		expected := etikett.MakeSet(etikett.Etikett{Value: "wow"})
 		actual := sub.root.children[0].etiketten
 
-		if !actual.Equals(*expected) {
+		if !actual.Equals(expected) {
 			test_logz.Errorf(test_logz.T{T: t}, "\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
 
 	{
-		expected := etikett.NewSet(etikett.Etikett{Value: "sub-wow"})
+		expected := etikett.MakeSet(etikett.Etikett{Value: "sub-wow"})
 
 		l := len(sub.root.children[0].children)
 		if l != 1 {
@@ -238,16 +238,16 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 
 		actual := sub.root.children[0].children[0].etiketten
 
-		if !actual.Equals(*expected) {
+		if !actual.Equals(expected) {
 			test_logz.Errorf(test_logz.T{T: t}, "\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
 
 	{
-		expected := etikett.NewSet(etikett.Etikett{Value: "cow"})
+		expected := etikett.MakeSet(etikett.Etikett{Value: "cow"})
 		actual := sub.root.children[1].etiketten
 
-		if !actual.Equals(*expected) {
+		if !actual.Equals(expected) {
 			test_logz.Errorf(test_logz.T{T: t}, "\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
@@ -318,20 +318,20 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 	}
 
 	if err != nil {
-		test_logz.Errorf(test_logz.T{T: t}, "expected no error but got %q", err)
+		test_logz.Fatalf(test_logz.T{T: t}, "expected no error but got %q", err)
 	}
 
 	{
-		expected := etikett.NewSet(etikett.Etikett{Value: "sub-wow"})
+		expected := etikett.MakeSet(etikett.Etikett{Value: "sub-wow"})
 		actual := sub.root.children[0].etiketten
 
-		if !actual.Equals(*expected) {
+		if !actual.Equals(expected) {
 			test_logz.Errorf(test_logz.T{T: t}, "\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
 
 	{
-		expected := etikett.NewSet(etikett.Etikett{Value: "sub-cow"})
+		expected := etikett.MakeSet(etikett.Etikett{Value: "sub-cow"})
 
 		l := len(sub.root.children)
 		expLen := 2
@@ -341,7 +341,7 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 
 		actual := sub.root.children[1].etiketten
 
-		if !actual.Equals(*expected) {
+		if !actual.Equals(expected) {
 			test_logz.Errorf(test_logz.T{T: t}, "\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
@@ -415,10 +415,10 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 
 	// `# task
 	{
-		expected := etikett.NewSet(etikett.Etikett{Value: "task"})
+		expected := etikett.MakeSet(etikett.Etikett{Value: "task"})
 		actual := sub.root.children[0].etiketten
 
-		if !actual.Equals(*expected) {
+		if !actual.Equals(expected) {
 			test_logz.Errorf(test_logz.T{T: t}, "\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
@@ -446,7 +446,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 
 	// ## priority-1
 	{
-		expected := etikett.NewSet(etikett.Etikett{Value: "priority-1"})
+		expected := etikett.MakeSet(etikett.Etikett{Value: "priority-1"})
 
 		e := 2
 		l := len(sub.root.children[0].children)
@@ -456,17 +456,17 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 
 		actual := sub.root.children[0].children[0].etiketten
 
-		if !actual.Equals(*expected) {
+		if !actual.Equals(expected) {
 			test_logz.Errorf(test_logz.T{T: t}, "\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
 
 	// ### w-2022-07-09
 	{
-		expected := etikett.NewSet(etikett.Etikett{Value: "w-2022-07-09"})
+		expected := etikett.MakeSet(etikett.Etikett{Value: "w-2022-07-09"})
 		actual := sub.root.children[0].children[0].children[0].etiketten
 
-		if !actual.Equals(*expected) {
+		if !actual.Equals(expected) {
 			test_logz.Errorf(test_logz.T{T: t}, "\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}

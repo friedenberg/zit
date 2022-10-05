@@ -72,7 +72,9 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 			return
 		}
 
-		z.Stored.Zettel.Etiketten.Add(e)
+    mes := z.Stored.Zettel.Etiketten.MutableCopy()
+    mes.Add(e)
+		z.Stored.Zettel.Etiketten = mes.Copy()
 		toUpdate[z.Hinweis.String()] = z
 
 		errors.PrintErrf("Added etikett '%s' to zettel '%s'", e, z.Hinweis)
@@ -146,7 +148,7 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 		etts := n.Etiketten
 
 		z := zettel.Zettel{
-			Etiketten: etts,
+			Etiketten: etts.Copy(),
 			Typ:       b.Metadatei.Typ,
 		}
 

@@ -199,14 +199,16 @@ func (c OrganizeDuplicates) readFromVim(
 }
 
 func (c OrganizeDuplicates) getEtikettenFromArgs(args []string) (es etikett.Set, err error) {
-	es = etikett.MakeSet()
+  mes := etikett.MakeMutableSet()
 
 	for _, s := range args {
-		if err = es.AddString(s); err != nil {
+		if err = mes.AddString(s); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
+
+  es = mes.Copy()
 
 	return
 }

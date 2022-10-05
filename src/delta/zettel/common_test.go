@@ -10,12 +10,10 @@ import (
 )
 
 func makeEtiketten(t *testing.T, vs ...string) (es etikett.Set) {
-	es = etikett.MakeSet()
+	var err error
 
-	for _, v := range vs {
-		if err := es.AddString(v); err != nil {
-			t.Fatalf("%s", err)
-		}
+	if es, err = etikett.MakeSetFromStrings(vs...); err != nil {
+		t.Fatalf("%s", err)
 	}
 
 	return

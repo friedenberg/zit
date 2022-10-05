@@ -128,7 +128,7 @@ func (i *indexEtiketten) add(s etikett.Set) (err error) {
 
 	i.hasChanges = true
 
-	for _, e := range s {
+	for _, e := range s.Etiketten() {
 		errors.Printf("adding etiketten: %s", e)
 		var c int64
 
@@ -153,7 +153,7 @@ func (i *indexEtiketten) del(s etikett.Set) (err error) {
 
 	i.hasChanges = true
 
-	for _, e := range s {
+	for _, e := range s.Etiketten() {
 		errors.Printf("removing etikett: %s", e)
 		var c int64
 		ok := false

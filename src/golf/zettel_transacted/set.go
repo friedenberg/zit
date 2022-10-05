@@ -19,16 +19,16 @@ func MakeSetUnique(c int) Set {
 				sz.Named.Stored.Sha,
 			)
 		},
-		innerMap: make(map[string]Zettel),
+		innerMap: make(map[string]Zettel, c),
 	}
 }
 
-func MakeSetHinweis() Set {
+func MakeSetHinweis(c int) Set {
 	return Set{
 		keyFunc: func(sz Zettel) string {
 			return makeKey(sz.Named.Hinweis)
 		},
-		innerMap: make(map[string]Zettel),
+		innerMap: make(map[string]Zettel, c),
 	}
 }
 
@@ -40,7 +40,15 @@ func (m Set) Get(
 }
 
 func (m Set) Add(z Zettel) {
-	m.innerMap[m.keyFunc(z)] = z
+	k := m.keyFunc(z)
+
+	if old, ok := m.innerMap[k]; ok {
+		errors.Printf("replacing %s with %s", old, z)
+	} else {
+		errors.Printf("adding %s", z)
+	}
+
+	m.innerMap[k] = z
 }
 
 func (m Set) Del(z Zettel) {

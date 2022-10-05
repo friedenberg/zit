@@ -5,19 +5,22 @@ type Delta struct {
 }
 
 func MakeSetDelta(s1, s2 Set) (d Delta) {
-	d.Added = MakeSet()
-	d.Removed = *s1.Copy()
+  added := MakeMutableSet()
+  removed := s1.MutableCopy()
 
-	for _, e := range s2 {
+	for _, e := range s2.inner {
 		if s1.Contains(e) {
 			//zettel had etikett previously
 		} else {
 			//zettel did not have etikett previously
-			d.Added.Add(e)
+			added.Add(e)
 		}
 
-		d.Removed.Remove(e)
+		removed.Remove(e)
 	}
+
+  d.Added = added.Copy()
+  d.Removed = removed.Copy()
 
 	return
 }

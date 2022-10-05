@@ -14,11 +14,11 @@ type Options struct {
 	konfig.Konfig
 	hinweis.Abbr
 
-	RootEtiketten          etikett.Set
-	Typ                    typ.Typ
-	GroupingEtiketten      etikett.Slice
-	ExtraEtiketten         etikett.Set
-	Transacted             zettel_transacted.Set
+	RootEtiketten     etikett.Set
+	Typ               typ.Typ
+	GroupingEtiketten etikett.Slice
+	ExtraEtiketten    etikett.Set
+	Transacted        zettel_transacted.Set
 
 	UsePrefixJoints        bool
 	UseRightAlignedIndents bool

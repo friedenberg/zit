@@ -109,10 +109,14 @@ type duplicateAkteError struct {
 func (e duplicateAkteError) AddToLostAndFound(p string) (p1 string, err error) {
 	newEtikett := "zz-akte-" + e.ShaOldAkte.String()
 
-	if err = e.Zettel.Etiketten.AddString(newEtikett); err != nil {
+  m := e.Zettel.Etiketten.MutableCopy()
+
+	if err = m.AddString(newEtikett); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+  e.Zettel.Etiketten = m.Copy()
 
 	var f *os.File
 

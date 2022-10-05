@@ -9,8 +9,8 @@ import (
 )
 
 type assignmentLineWriter struct {
-	RightAlignedIndents bool
-  OmitLeadingEmptyLine bool
+	RightAlignedIndents  bool
+	OmitLeadingEmptyLine bool
 	*line_format.Writer
 	maxDepth            int
 	maxKopf, maxScwhanz int

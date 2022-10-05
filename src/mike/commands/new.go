@@ -44,7 +44,6 @@ func init() {
 			c := &New{
 				//TODO move to proper place
 				Typ:       typ.Make("md"),
-				Etiketten: etikett.MakeSet(),
 			}
 
 			f.Var(&c.Filter, "filter", "a script to run for each file to transform it the standard zettel format")

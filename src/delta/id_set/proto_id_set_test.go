@@ -36,21 +36,21 @@ func TestMakeProtoIdSet(t1 *testing.T) {
 		},
 	)
 
-  eLen := 4
+	eLen := 4
 
-  if sut.Len() != eLen {
-    t.Errorf("expected %d but got %d", eLen, sut.Len())
-  }
+	if sut.Len() != eLen {
+		t.Errorf("expected %d but got %d", eLen, sut.Len())
+	}
 
-  if !sut.Contains(&hinweis.Hinweis{}) {
-    t.Errorf("expected sut to contain hinweis, but did not")
-  }
+	if !sut.Contains(&hinweis.Hinweis{}) {
+		t.Errorf("expected sut to contain hinweis, but did not")
+	}
 
-  eString := "test/wow"
-  // var set Set
-  var err error
+	eString := "test/wow"
+	// var set Set
+	var err error
 
-  if _, err = sut.Make(eString); err != nil {
-    t.Errorf("expected sut create hinweis, but failed: %s", err)
-  }
+	if _, err = sut.Make(eString); err != nil {
+		t.Errorf("expected sut create hinweis, but failed: %s", err)
+	}
 }

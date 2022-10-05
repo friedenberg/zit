@@ -5,7 +5,7 @@ import (
 	"reflect"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	gattung "github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/paper"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/age"
@@ -586,6 +586,11 @@ func (s *Store) Reindex() (err error) {
 	}
 
 	if err = os.MkdirAll(s.standort.DirVerzeichnisse(), os.ModeDir|0755); err != nil {
+		err = errors.Wrapf(err, "failed to make verzeichnisse dir")
+		return
+	}
+
+	if err = os.MkdirAll(s.standort.DirVerzeichnisseZettelenNeue(), os.ModeDir|0755); err != nil {
 		err = errors.Wrapf(err, "failed to make verzeichnisse dir")
 		return
 	}

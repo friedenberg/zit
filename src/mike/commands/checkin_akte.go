@@ -24,7 +24,6 @@ func init() {
 		"checkin-akte",
 		func(f *flag.FlagSet) Command {
 			c := &CheckinAkte{
-				NewEtiketten: etikett.MakeSet(),
 			}
 
 			f.BoolVar(&c.Delete, "delete", false, "the checked-out file")

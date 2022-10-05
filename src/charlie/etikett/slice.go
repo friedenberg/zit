@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
+//TODO make mutable / immutable?
 type Slice []Etikett
 
 func NewSliceFromStrings(es ...string) (s Slice, err error) {

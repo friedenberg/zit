@@ -38,18 +38,18 @@ func ZettelToItem(z zettel_named.Zettel, ha hinweis.Abbr) (a alfred.Item) {
 	mb.AddMatches(z.Stored.Zettel.Typ.String())
 	mb.AddMatches(EtikettenStringsFromZettel(z.Stored.Zettel.Etiketten, true)...)
 
-	if ha != nil {
-		var h hinweis.Hinweis
-		var err error
+	// if ha != nil {
+	// 	var h hinweis.Hinweis
+	// 	var err error
 
-		if h, err = ha.AbbreviateHinweis(z.Hinweis); err != nil {
-			return ErrorToItem(err)
-		}
+	// 	if h, err = ha.AbbreviateHinweis(z.Hinweis); err != nil {
+	// 		return ErrorToItem(err)
+	// 	}
 
-		mb.AddMatches(h.String())
-		mb.AddMatches(h.Kopf())
-		mb.AddMatches(h.Schwanz())
-	}
+	// 	mb.AddMatches(h.String())
+	// 	mb.AddMatches(h.Kopf())
+	// 	mb.AddMatches(h.Schwanz())
+	// }
 
 	a.Match = mb.String()
 
@@ -110,7 +110,7 @@ func HinweisToItem(e hinweis.Hinweis) (a alfred.Item) {
 func EtikettenStringsFromZettel(es etikett.Set, shouldExpand bool) (out []string) {
 	out = make([]string, 0, es.Len())
 
-	for _, e := range es {
+	for _, e := range es.Etiketten() {
 		if shouldExpand {
 			out = append(out, e.Expanded().Strings()...)
 		} else {

@@ -221,7 +221,7 @@ func (a Refiner) childPrefixes(node *assignment) (out []etikettBag) {
 	}
 
 	for _, c := range node.children {
-		for _, e := range c.etiketten.Expanded(etikett.ExpanderRight{}) {
+		for _, e := range c.etiketten.Expanded(etikett.ExpanderRight{}).Etiketten() {
 			if e.String() == "" {
 				continue
 			}

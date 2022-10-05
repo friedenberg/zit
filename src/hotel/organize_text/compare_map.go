@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/etikett"
 )
 
-type SetKeyToEtiketten map[string]etikett.Set
+type SetKeyToEtiketten map[string]etikett.MutableSet
 
 func (m SetKeyToEtiketten) String() string {
 	sb := &strings.Builder{}
@@ -21,11 +21,11 @@ func (m SetKeyToEtiketten) String() string {
 }
 
 func (m SetKeyToEtiketten) Add(h string, e etikett.Etikett) {
-	var es etikett.Set
+	var es etikett.MutableSet
 	ok := false
 
 	if es, ok = m[h]; !ok {
-		es = etikett.MakeSet()
+		es = etikett.MakeMutableSet()
 	}
 
 	es.AddNormalized(e)
@@ -33,7 +33,7 @@ func (m SetKeyToEtiketten) Add(h string, e etikett.Etikett) {
 }
 
 func (m SetKeyToEtiketten) Contains(h string, e etikett.Etikett) (ok bool) {
-	var es etikett.Set
+	var es etikett.MutableSet
 
 	if es, ok = m[h]; !ok {
 		return
@@ -57,7 +57,7 @@ func (in *Text) ToCompareMap() (out CompareMap, err error) {
 		Unnamed: make(SetKeyToEtiketten),
 	}
 
-	if err = in.assignment.addToCompareMap(in.Metadatei, etikett.NewSet(), &out); err != nil {
+	if err = in.assignment.addToCompareMap(in.Metadatei, etikett.MakeSet(), &out); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -65,7 +65,7 @@ func (in *Text) ToCompareMap() (out CompareMap, err error) {
 	return
 }
 
-func (a *assignment) addToCompareMap(m Metadatei, es *etikett.Set, out *CompareMap) (err error) {
+func (a *assignment) addToCompareMap(m Metadatei, es etikett.Set, out *CompareMap) (err error) {
 	es = es.Copy()
 
 	var es1 etikett.Set
@@ -83,10 +83,10 @@ func (a *assignment) addToCompareMap(m Metadatei, es *etikett.Set, out *CompareM
 			out.Named.Add(z.Hinweis.String(), e)
 		}
 
-    for _, e := range m.Set {
-      //TODO add typ
-      out.Named.Add(z.Hinweis.String(), e)
-    }
+		for _, e := range m.Set.Etiketten() {
+			//TODO add typ
+			out.Named.Add(z.Hinweis.String(), e)
+		}
 	}
 
 	for z, _ := range a.unnamed {
@@ -94,10 +94,10 @@ func (a *assignment) addToCompareMap(m Metadatei, es *etikett.Set, out *CompareM
 			out.Unnamed.Add(z.Bezeichnung.String(), e)
 		}
 
-    for _, e := range m.Set {
-      //TODO add typ
-      out.Unnamed.Add(z.Bezeichnung.String(), e)
-    }
+		for _, e := range m.Set.Etiketten() {
+			//TODO add typ
+			out.Unnamed.Add(z.Bezeichnung.String(), e)
+		}
 	}
 
 	for _, c := range a.children {

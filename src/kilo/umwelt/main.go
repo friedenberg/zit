@@ -70,19 +70,19 @@ func (u *Umwelt) Initialize() (err error) {
 			return
 		}
 	} else {
-    u.age = &age.Age{}
+		u.age = &age.Age{}
 		// if u.age, err = age.MakeDefaultTest(); err != nil {
 		// 	errors.Wrap(err)
 		// 	return
 		// }
 	}
 
-  for _, rb := range u.konfig.Recipients {
-    if err = u.age.AddBech32PivYubikeyEC256(rb); err != nil {
+	for _, rb := range u.konfig.Recipients {
+		if err = u.age.AddBech32PivYubikeyEC256(rb); err != nil {
 			errors.Wrap(err)
 			return
-    }
-  }
+		}
+	}
 
 	u.printerOut = zettel_printer.Make(u.standort, u.konfig, u.out)
 	//TODO move to konfig
@@ -128,18 +128,20 @@ func (u *Umwelt) Initialize() (err error) {
 }
 
 func (u Umwelt) DefaultEtiketten() (etiketten etikett.Set, err error) {
-	etiketten = etikett.MakeSet()
+  metiketten := etikett.MakeMutableSet()
 
 	for e, t := range u.konfig.Tags {
 		if !t.AddToNewZettels {
 			continue
 		}
 
-		if err = etiketten.AddString(e); err != nil {
+		if err = metiketten.AddString(e); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
+
+  etiketten = metiketten.Copy()
 
 	return
 }

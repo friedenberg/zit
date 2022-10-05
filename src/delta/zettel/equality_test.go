@@ -11,7 +11,7 @@ func TestEqualitySelf(t *testing.T) {
 			"tag1",
 			"tag2",
 			"tag3",
-		),
+		).Copy(),
 		Typ: makeAkteExt(t, "text/plain"),
 	}
 
@@ -27,7 +27,7 @@ func TestEqualityNotSelf(t *testing.T) {
 			"tag1",
 			"tag2",
 			"tag3",
-		),
+		).Copy(),
 		Typ: makeAkteExt(t, "text/plain"),
 	}
 
@@ -37,7 +37,7 @@ func TestEqualityNotSelf(t *testing.T) {
 			"tag1",
 			"tag2",
 			"tag3",
-		),
+		).Copy(),
 		Typ: makeAkteExt(t, "text/plain"),
 	}
 

@@ -35,7 +35,6 @@ func init() {
 			c := &Add{
 				//TODO move to proper place
 				Typ:       typ.Make("md"),
-				Etiketten: etikett.MakeSet(),
 			}
 
 			f.Var(&c.Etiketten, "etiketten", "to add to the created zettels")

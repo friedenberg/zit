@@ -22,7 +22,7 @@ type PathComponents interface {
 
 type Sha struct {
 	Value string
-	Short string
+	Short string //TODO remove Short
 }
 
 func MakeSha(v string) (s Sha, err error) {
@@ -30,6 +30,10 @@ func MakeSha(v string) (s Sha, err error) {
 	err = s.Set(v)
 
 	return
+}
+
+func FromFormatString(f string, vs ...interface{}) Sha {
+	return FromString(fmt.Sprintf(f, vs...))
 }
 
 func FromString(s string) Sha {

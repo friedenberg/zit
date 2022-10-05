@@ -13,7 +13,7 @@ type AssignmentTreeConstructor struct {
 }
 
 func (atc *AssignmentTreeConstructor) Assignments() (roots []*assignment, err error) {
-	roots = make([]*assignment, 0, 1+len(atc.ExtraEtiketten))
+	roots = make([]*assignment, 0, 1+atc.ExtraEtiketten.Len())
 
 	root := newAssignment(0)
 	root.etiketten = atc.RootEtiketten
@@ -26,7 +26,7 @@ func (atc *AssignmentTreeConstructor) Assignments() (roots []*assignment, err er
 		return
 	}
 
-	for _, e := range atc.ExtraEtiketten {
+	for _, e := range atc.ExtraEtiketten.Etiketten() {
 		child := newAssignment(1)
 		child.etiketten = etikett.MakeSet(e)
 		roots = append(roots, child)

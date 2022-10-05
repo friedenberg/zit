@@ -9,8 +9,10 @@ import (
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/charlie/konfig"
+	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
+	"github.com/friedenberg/zit/src/hotel/verzeichnisse"
 )
 
 type indexZettelenTails struct {
@@ -20,6 +22,8 @@ type indexZettelenTails struct {
 	zettelen   zettel_transacted.Set
 	didRead    bool
 	hasChanges bool
+
+	*verzeichnisse.Zettelen
 }
 
 func newIndexZettelenTails(
@@ -31,7 +35,19 @@ func newIndexZettelenTails(
 		Konfig:    k,
 		path:      p,
 		ioFactory: f,
-		zettelen:  zettel_transacted.MakeSetHinweis(),
+		zettelen:  zettel_transacted.MakeSetHinweis(0),
+	}
+
+	var s standort.Standort
+
+	if s, err = standort.Make(k); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if i.Zettelen, err = verzeichnisse.MakeZettelen(k, s, f); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return
@@ -70,6 +86,11 @@ func (i *indexZettelenTails) Flush() (err error) {
 	)
 
 	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = i.Zettelen.Flush(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -134,6 +155,11 @@ func (i *indexZettelenTails) add(tz zettel_transacted.Zettel) (err error) {
 
 	i.zettelen.Add(tz)
 
+	if err = i.Zettelen.Add(tz); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	return
 }
 
@@ -165,6 +191,16 @@ func (i *indexZettelenTails) Read(h hinweis.Hinweis) (tz zettel_transacted.Zette
 
 	if tz, ok = i.zettelen.Get(h); !ok {
 		err = ErrNotFound{Id: h}
+		return
+	}
+
+  tz.Named.Stored.Zettel.Etiketten = tz.Named.Stored.Zettel.Etiketten.Copy()
+
+	if tz1, err1 := i.Zettelen.Read(h); err1 != nil {
+		err = errors.Wrap(err1)
+		return
+	} else if !tz1.Named.Equals(tz.Named) {
+		err = errors.Errorf("ZettelenNeue had different zettel:\nneue: %s\nold: %s", tz1, tz)
 		return
 	}
 

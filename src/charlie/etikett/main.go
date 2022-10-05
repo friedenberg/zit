@@ -105,7 +105,7 @@ func (e Etikett) Expanded(exes ...Expander) (expanded Set) {
 	}
 
 	for _, ex := range exes {
-		for _, e := range ex.Expand(e) {
+		for _, e := range ex.Expand(e).Etiketten() {
 			expanded.addOnlyExact(e)
 		}
 	}

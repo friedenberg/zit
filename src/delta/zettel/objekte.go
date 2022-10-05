@@ -37,7 +37,7 @@ func (f Objekte) WriteTo(z Zettel, out1 io.Writer) (n int64, err error) {
 }
 
 func (f *Objekte) ReadFrom(z *Zettel, in io.Reader) (n int64, err error) {
-	z.Etiketten = etikett.MakeSet()
+  etiketten := etikett.MakeMutableSet()
 
 	r := bufio.NewReader(in)
 
@@ -109,12 +109,14 @@ func (f *Objekte) ReadFrom(z *Zettel, in io.Reader) (n int64, err error) {
 			}
 
 		case gattung.Etikett:
-			if err = z.Etiketten.AddString(v); err != nil {
+			if err = etiketten.AddString(v); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 		}
 	}
+
+  z.Etiketten = etiketten.Copy()
 
 	return
 }

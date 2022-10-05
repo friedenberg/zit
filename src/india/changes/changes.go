@@ -14,7 +14,7 @@ type Change struct {
 
 type New struct {
 	Key       string
-	Etiketten etikett.Set
+	Etiketten etikett.MutableSet
 }
 
 type Changes struct {
@@ -27,7 +27,7 @@ type Changes struct {
 type changes struct {
 	Added   []Change
 	Removed []Change
-	New     map[string]etikett.Set
+	New     map[string]etikett.MutableSet
 	AllB    []string
 }
 
@@ -52,7 +52,7 @@ func ChangesFrom(a1, b1 *organize_text.Text) (c1 Changes, err error) {
 	for h, es1 := range b.Named {
 		c.AllB = append(c.AllB, h)
 
-		for _, e1 := range es1 {
+		for _, e1 := range es1.Etiketten() {
 			if a.Named.Contains(h, e1) {
 				//zettel had etikett previously
 			} else {
@@ -73,7 +73,7 @@ func ChangesFrom(a1, b1 *organize_text.Text) (c1 Changes, err error) {
 	}
 
 	for h, es := range a.Named {
-		for _, e1 := range es {
+		for _, e1 := range es.Etiketten() {
 			if e1.String() == "" {
 				err = errors.Errorf("empty etikett for %s", h)
 				return
@@ -89,13 +89,13 @@ func ChangesFrom(a1, b1 *organize_text.Text) (c1 Changes, err error) {
 		}
 	}
 
-	c.New = make(map[string]etikett.Set)
+	c.New = make(map[string]etikett.MutableSet)
 
 	addNew := func(bez, ett string) {
 		existing, ok := c.New[bez]
 
 		if !ok {
-			existing = etikett.MakeSet()
+			existing = etikett.MakeMutableSet()
 		}
 
 		existing.AddString(ett)
@@ -103,7 +103,7 @@ func ChangesFrom(a1, b1 *organize_text.Text) (c1 Changes, err error) {
 	}
 
 	for h, es := range b.Unnamed {
-		for _, e := range es {
+		for _, e := range es.Etiketten() {
 			addNew(h, e.String())
 		}
 	}

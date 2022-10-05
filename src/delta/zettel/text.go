@@ -46,6 +46,7 @@ const (
 )
 
 type textStateRead struct {
+	etiketten               etikett.MutableSet
 	context                 *FormatContextRead
 	field                   textStateReadField
 	lastFieldWasBezeichnung bool
@@ -66,6 +67,8 @@ func (s *textStateRead) Close() (err error) {
 		s.readAkteSha = s.akteWriter.Sha()
 	}
 
+  s.context.Zettel.Etiketten = s.etiketten.Copy()
+
 	return
 }
 
@@ -79,7 +82,8 @@ func (f Text) ReadFrom(c *FormatContextRead) (n int64, err error) {
 	c.Zettel.Etiketten = etikett.MakeSet()
 
 	state := &textStateRead{
-		context: c,
+		etiketten: etikett.MakeMutableSet(),
+		context:   c,
 	}
 
 	defer func() {
@@ -230,7 +234,7 @@ func (f Text) readMetadateiLine(state *textStateRead, line string) (err error) {
 
 	switch head {
 	case "- ":
-		err = state.context.Zettel.Etiketten.AddString(tail)
+		err = state.etiketten.AddString(tail)
 		state.lastFieldWasBezeichnung = false
 
 	case "! ":

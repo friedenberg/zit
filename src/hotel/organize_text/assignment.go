@@ -216,7 +216,7 @@ func (a *assignment) consume(b *assignment) (err error) {
 
 func (a *assignment) expandedEtiketten() (es etikett.Set, err error) {
 	if a.etiketten.Len() != 1 || a.parent == nil {
-		es = *(a.etiketten.Copy())
+		es = a.etiketten.Copy()
 		return
 	} else {
 		e := a.etiketten.Any()

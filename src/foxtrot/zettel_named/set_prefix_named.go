@@ -21,7 +21,7 @@ func NewSetPrefixNamed() *SetPrefixNamed {
 func (s *SetPrefixNamed) Add(z Zettel) {
 	es := z.Stored.Zettel.Etiketten.Expanded(etikett.ExpanderRight{})
 
-	for _, e := range es {
+	for _, e := range es.Etiketten() {
 		s.addPair(e, z)
 	}
 }
@@ -50,7 +50,7 @@ func (a SetPrefixNamed) Subset(e etikett.Etikett) (out SetPrefixNamedSegments) {
 			errors.Printf("%s yields %s", e1, intersection)
 
 			if intersection.Len() > 0 {
-				for _, e2 := range intersection {
+				for _, e2 := range intersection.Etiketten() {
 					out.Grouped.addPair(e2, z)
 				}
 			} else {

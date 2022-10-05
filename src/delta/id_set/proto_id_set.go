@@ -25,15 +25,15 @@ func (ps ProtoIdSet) Len() int {
 }
 
 func (ps ProtoIdSet) Contains(i id.MutableId) (ok bool) {
-  i2 := makeProtoId(ProtoId{MutableId: i})
-  for _, i1 := range ps.types {
-    if i1.Type == i2.Type {
-      ok = true
-      break
-    }
-  }
+	i2 := makeProtoId(ProtoId{MutableId: i})
+	for _, i1 := range ps.types {
+		if i1.Type == i2.Type {
+			ok = true
+			break
+		}
+	}
 
-  return
+	return
 }
 
 func (ps ProtoIdSet) Make(vs ...string) (s Set, err error) {

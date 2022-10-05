@@ -28,7 +28,7 @@ func (atc *Factory) Make() (ot *Text, err error) {
 		return
 	}
 
-	for _, e := range atc.ExtraEtiketten {
+	for _, e := range atc.ExtraEtiketten.Etiketten() {
 		child := newAssignment(1)
 		child.etiketten = etikett.MakeSet(e)
 		ot.assignment.addChild(child)

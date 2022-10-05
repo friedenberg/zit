@@ -119,7 +119,7 @@ func (s Set) AnyShasOrHinweisen() (ids []id.IdMitKorper) {
 }
 
 func (s Set) Etiketten() (etiketten etikett.Set) {
-	etiketten = etikett.MakeSet()
+  mes := etikett.MakeMutableSet()
 
 	val := reflect.ValueOf(&etikett.Etikett{})
 	t := val.Type()
@@ -128,9 +128,11 @@ func (s Set) Etiketten() (etiketten etikett.Set) {
 
 	for _, i1 := range s.ids {
 		if reflect.TypeOf(i1).AssignableTo(targetType) {
-			etiketten.Add(i1.(etikett.Etikett))
+			mes.Add(i1.(etikett.Etikett))
 		}
 	}
+
+  etiketten = mes.Copy()
 
 	return
 }

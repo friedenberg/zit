@@ -17,14 +17,14 @@ type Metadatei struct {
 }
 
 func (m Metadatei) HasMetadateiContent() bool {
-  if m.Set.Len() > 0 {
-    return true
-  }
+	if m.Set.Len() > 0 {
+		return true
+	}
 
 	tString := m.Typ.String()
 
 	if tString != "" {
-    return true
+		return true
 	}
 
 	return false
@@ -33,7 +33,7 @@ func (m Metadatei) HasMetadateiContent() bool {
 func (m *Metadatei) ReadFrom(r1 io.Reader) (n int64, err error) {
 	r := bufio.NewReader(r1)
 
-	m.Set = etikett.MakeSet()
+  mes := etikett.MakeMutableSet()
 
 	for {
 		var rawLine, line string
@@ -70,14 +70,10 @@ func (m *Metadatei) ReadFrom(r1 io.Reader) (n int64, err error) {
 
 		switch prefix {
 		case "-":
-			var e etikett.Etikett
-
-			if err = e.Set(tail); err != nil {
+			if err = mes.AddString(tail); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
-
-			m.Set.Add(e)
 
 		case "!":
 			if err = m.Typ.Set(tail); err != nil {
@@ -86,6 +82,8 @@ func (m *Metadatei) ReadFrom(r1 io.Reader) (n int64, err error) {
 			}
 		}
 	}
+
+	m.Set = mes.Copy()
 
 	return
 }

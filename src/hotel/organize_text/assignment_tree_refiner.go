@@ -37,7 +37,7 @@ func (atc *AssignmentTreeRefiner) shouldMergeIntoParent(a *assignment) (ok bool)
 	case a.etiketten.Len() == 0:
 		ok = true
 
-  case a.etiketten.Len() == 1 && a.etiketten.Any().String() == "":
+	case a.etiketten.Len() == 1 && a.etiketten.Any().String() == "":
 		ok = true
 
 	case a.parent.etiketten.Len() != 1:
@@ -209,7 +209,7 @@ func (a AssignmentTreeRefiner) childPrefixes(node *assignment) (out []etikettBag
 	}
 
 	for _, c := range node.children {
-		for _, e := range c.etiketten.Expanded(etikett.ExpanderRight{}) {
+		for _, e := range c.etiketten.Expanded(etikett.ExpanderRight{}).Etiketten() {
 			if e.String() == "" {
 				continue
 			}

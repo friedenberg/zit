@@ -151,8 +151,8 @@ func (i *indexAbbr) addZettelTransacted(zt zettel_transacted.Zettel) (err error)
 	i.indexAbbrEncodableTridexes.HinweisKopfen.Add(zt.Named.Hinweis.Kopf())
 	i.indexAbbrEncodableTridexes.HinweisSchwanzen.Add(zt.Named.Hinweis.Schwanz())
 
-	for e, _ := range zt.Named.Stored.Zettel.Etiketten.Expanded(etikett.ExpanderRight{}) {
-		i.indexAbbrEncodableTridexes.Etiketten.Add(e)
+	for _, e := range zt.Named.Stored.Zettel.Etiketten.Expanded(etikett.ExpanderRight{}).Etiketten() {
+		i.indexAbbrEncodableTridexes.Etiketten.Add(e.String())
 	}
 
 	return
@@ -299,10 +299,10 @@ func (i *indexAbbr) ExpandEtikett(eAbbr etikett.Etikett) (e etikett.Etikett, err
 
 	ex := i.indexAbbrEncodableTridexes.Etiketten.Expand(eAbbr.String())
 
-  if ex == "" {
-    //TODO should try to use the expansion if possible
-    ex = eAbbr.String()
-  }
+	if ex == "" {
+		//TODO should try to use the expansion if possible
+		ex = eAbbr.String()
+	}
 
 	if ctx.Err = e.Set(ex); !ctx.IsEmpty() {
 		ctx.Wrap()
