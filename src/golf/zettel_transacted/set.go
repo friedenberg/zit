@@ -45,6 +45,12 @@ func (m Set) Get(
 	return
 }
 
+func (m Set) WriteZettelTransacted(z Zettel) (err error) {
+	m.Add(z)
+
+	return
+}
+
 func (m Set) Add(z Zettel) {
 	k := m.keyFunc(z)
 

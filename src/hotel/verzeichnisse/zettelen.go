@@ -141,40 +141,34 @@ func (i *Zettelen) Read(h hinweis.Hinweis) (tz zettel_transacted.Zettel, err err
 }
 
 func (i *Zettelen) ReadMany(
-	w zettel_transacted.Writer,
+	w1 zettel_transacted.Writer,
 	qs ...zettel_named.NamedFilter,
 ) (err error) {
 	wg := &sync.WaitGroup{}
 	wg.Add(len(i.pages))
 
+	w := zettel_transacted.MakeWriterFilter(
+		w1,
+		func(zt zettel_transacted.Zettel) bool {
+			for _, q := range qs {
+				if !q.IncludeNamedZettel(zt.Named) {
+					return false
+				}
+			}
+
+			if !i.shouldIncludeTransacted(zt) {
+				return false
+			}
+
+			return true
+		},
+	)
+
 	for _, p := range i.pages {
 		go func(p *zettelenPageWithState) {
 			defer wg.Done()
 
-			if err = p.ReadAll(); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			err = p.innerSet.Each(
-				func(tz zettel_transacted.Zettel) (err error) {
-					for _, q := range qs {
-						if !q.IncludeNamedZettel(tz.Named) {
-							return
-						}
-					}
-
-					if !i.shouldIncludeTransacted(tz) {
-						return
-					}
-
-					w.WriteZettel(tz)
-
-					return
-				},
-			)
-
-			if err != nil {
+			if err = p.WriteZettelenTo(w); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

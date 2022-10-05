@@ -57,7 +57,7 @@ func (zp *zettelenPageWithState) ReadHinweis(
 		return
 	}
 
-  ok := false
+	ok := false
 
 	if tz, ok = zp.innerSet.Get(h); !ok {
 		err = errors.Normalf("not found")
@@ -85,6 +85,29 @@ func (zp *zettelenPageWithState) Flush() (err error) {
 	defer errors.PanicIfError(w.Close)
 
 	if _, err = zp.WriteTo(w); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (zp *zettelenPageWithState) WriteZettelenTo(w zettel_transacted.Writer) (err error) {
+	var r io.ReadCloser
+
+	if r, err = zp.ReadCloserVerzeichnisse(zp.path); err != nil {
+		if errors.IsNotExist(err) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+		}
+
+		return
+	}
+
+	defer r.Close()
+
+	if _, err = zp.zettelenPage.Copy(r, w); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -128,7 +151,7 @@ type zettelenPage struct {
 	innerSet zettel_transacted.Set
 }
 
-func (zp *zettelenPage) ReadFrom(r1 io.Reader) (n int64, err error) {
+func (zp zettelenPage) Copy(r1 io.Reader, w zettel_transacted.Writer) (n int64, err error) {
 	r := bufio.NewReader(r1)
 
 	dec := gob.NewDecoder(r)
@@ -146,10 +169,17 @@ func (zp *zettelenPage) ReadFrom(r1 io.Reader) (n int64, err error) {
 			}
 		}
 
-		zp.innerSet.Add(tz)
+		if err = w.WriteZettelTransacted(tz); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return
+}
+
+func (zp *zettelenPage) ReadFrom(r1 io.Reader) (n int64, err error) {
+	return zp.Copy(r1, zp.innerSet)
 }
 
 func (zp *zettelenPage) WriteTo(w1 io.Writer) (n int64, err error) {
