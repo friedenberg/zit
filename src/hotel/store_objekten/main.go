@@ -220,16 +220,6 @@ func (s Store) ReadOne(i id.Id) (tz zettel_transacted.Zettel, err error) {
 		err = errors.Errorf("unsupported identifier: %s, %#v", i, reflect.ValueOf(i))
 	}
 
-	sh := tz.Named.Stored.Sha
-	var ss string
-
-	if ss, err = s.AbbreviateSha(sh); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	tz.Named.Stored.Sha.Short = ss
-
 	return
 }
 
@@ -400,16 +390,6 @@ func (s *Store) Update(
 		err = errors.Wrap(err)
 		return
 	}
-
-	sh := tz.Named.Stored.Sha
-	var ss string
-
-	if ss, err = s.AbbreviateSha(sh); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	tz.Named.Stored.Sha.Short = ss
 
 	s.zettelTransactedPrinter.ZettelTransacted(tz).Print()
 

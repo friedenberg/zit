@@ -75,7 +75,6 @@ func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	for _, z := range readResults {
-		//TODO move to printer
 		zp.ZettelCheckedOut(z).Print()
 
 		switch {

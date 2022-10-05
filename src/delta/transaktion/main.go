@@ -5,11 +5,12 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	gattung "github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/charlie/ts"
+	"github.com/friedenberg/zit/src/charlie/typ"
 )
 
 type Transaktion struct {
@@ -63,8 +64,7 @@ func (o *Objekte) Set(v string) (err error) {
 		o.Id = &etikett.Etikett{}
 
 	case gattung.Typ:
-		//TODO
-		fallthrough
+		o.Id = &typ.Typ{}
 
 	default:
 		err = errors.Errorf("unsupported gattung: %s", o.Gattung)

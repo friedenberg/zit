@@ -298,16 +298,6 @@ func (s *Store) Read(p string) (cz zettel_checked_out.Zettel, err error) {
 			}
 		}
 
-		sh := cz.External.Named.Stored.Sha
-		var ss string
-
-		if ss, err = s.storeObjekten.AbbreviateSha(sh); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		cz.External.Named.Stored.Sha.Short = ss
-
 		if cz.Internal, err = s.storeObjekten.Read(cz.External.Named.Hinweis); err != nil {
 			if errors.Is(err, store_objekten.ErrNotFound{}) {
 				err = nil

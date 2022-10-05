@@ -72,7 +72,6 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		}
 	}
 
-	//TODO write new akte object for each and update sha
 	for i, p := range pairs {
 		var ow sha.WriteCloser
 

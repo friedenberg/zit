@@ -38,7 +38,6 @@ func (op ReadCheckedOut) RunOneString(
 
 func (op ReadCheckedOut) RunMany(
 	possible store_working_directory.CwdFiles,
-	//TODO switch to zettel_checked_out.Set
 ) (results zettel_checked_out.Set, err error) {
   results = zettel_checked_out.MakeSetUnique(possible.Len())
 
@@ -51,7 +50,7 @@ func (op ReadCheckedOut) RunMany(
 
 		if checked_out, err = op.StoreWorkingDirectory().Read(p.Zettel.Path); err != nil {
 			if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
-				//TODO log
+        errors.Print("external zettel does not exist: %s", p)
 				err = nil
 			} else {
 				err = errors.Wrap(err)
@@ -72,7 +71,7 @@ func (op ReadCheckedOut) RunMany(
 
 		if checked_out, err = op.StoreWorkingDirectory().ReadExternalZettelFromAktePath(p.Akte.Path); err != nil {
 			if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
-				//TODO log
+        errors.Print("external zettel does not exist: %s", p)
 				err = nil
 			} else {
 				err = errors.Wrapf(err, "akte path: %s", p.Akte.Path)

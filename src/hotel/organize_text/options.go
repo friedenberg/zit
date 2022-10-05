@@ -59,7 +59,6 @@ func (o Options) Factory() *Factory {
 
 func (o Options) refiner() *AssignmentTreeRefiner {
 	return &AssignmentTreeRefiner{
-		//TODO add to config
 		Enabled:         o.UseRefiner,
 		UsePrefixJoints: o.UsePrefixJoints,
 	}

@@ -21,7 +21,7 @@ func MakeSetPrefixTransacted(c int) (s SetPrefixTransacted) {
 	return s
 }
 
-//TODO mark that this splits on right-expanded
+//this splits on right-expanded
 func (s *SetPrefixTransacted) Add(z Zettel) {
 	es := z.Named.Stored.Zettel.Etiketten.Expanded(etikett.ExpanderRight{})
 

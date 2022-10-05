@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/echo/zettel_stored"
@@ -150,6 +151,13 @@ func (c CreateFromPaths) zettelsFromPath(p string) (out []zettel_external.Zettel
 		}
 	}
 
+	var s sha.Sha
+
+	if s, err = ctx.Zettel.ObjekteSha(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	out = append(
 		out,
 		zettel_external.Zettel{
@@ -158,7 +166,7 @@ func (c CreateFromPaths) zettelsFromPath(p string) (out []zettel_external.Zettel
 			},
 			Named: zettel_named.Zettel{
 				Stored: zettel_stored.Stored{
-					//TODO sha?
+					Sha:    s,
 					Zettel: ctx.Zettel,
 				},
 			},

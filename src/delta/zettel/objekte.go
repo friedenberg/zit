@@ -2,14 +2,31 @@ package zettel
 
 import (
 	"bufio"
+	"crypto/sha256"
 	"io"
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	gattung "github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/line_format"
+	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 )
+
+func (z Zettel) ObjekteSha() (s sha.Sha, err error) {
+	hash := sha256.New()
+
+	o := Objekte{}
+
+	if _, err = o.WriteTo(z, hash); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	s = sha.FromHash(hash)
+
+	return
+}
 
 type Objekte struct {
 	IgnoreTypErrors bool
@@ -37,7 +54,7 @@ func (f Objekte) WriteTo(z Zettel, out1 io.Writer) (n int64, err error) {
 }
 
 func (f *Objekte) ReadFrom(z *Zettel, in io.Reader) (n int64, err error) {
-  etiketten := etikett.MakeMutableSet()
+	etiketten := etikett.MakeMutableSet()
 
 	r := bufio.NewReader(in)
 
@@ -116,7 +133,7 @@ func (f *Objekte) ReadFrom(z *Zettel, in io.Reader) (n int64, err error) {
 		}
 	}
 
-  z.Etiketten = etiketten.Copy()
+	z.Etiketten = etiketten.Copy()
 
 	return
 }

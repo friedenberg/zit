@@ -207,7 +207,6 @@ func (i *indexZettelenTails) Read(h hinweis.Hinweis) (tz zettel_transacted.Zette
 	return
 }
 
-//TODO switch to zettel_named.Set
 func (i *indexZettelenTails) ZettelenSchwanzen(
 	qs ...zettel_named.NamedFilter,
 ) (zts zettel_transacted.Set, err error) {

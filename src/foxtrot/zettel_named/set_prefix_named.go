@@ -17,7 +17,7 @@ func NewSetPrefixNamed() *SetPrefixNamed {
 	return &s
 }
 
-//TODO mark that this splits on right-expanded
+//this splits on right-expanded
 func (s *SetPrefixNamed) Add(z Zettel) {
 	es := z.Stored.Zettel.Etiketten.Expanded(etikett.ExpanderRight{})
 
