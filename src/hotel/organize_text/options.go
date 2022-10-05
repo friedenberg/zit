@@ -29,7 +29,6 @@ type Options struct {
 func MakeOptions() Options {
 	return Options{
 		GroupingEtiketten: etikett.NewSlice(),
-		ExtraEtiketten:    etikett.MakeSet(),
 	}
 }
 

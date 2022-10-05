@@ -62,6 +62,14 @@ func (s *Set) Set(v string) (err error) {
 
 	es := strings.Split(v, ",")
 
+  if len(es) == 0 {
+    return
+  }
+
+  if es[0] == "" {
+    return
+  }
+
 	for _, e := range es {
     var e1 Etikett
 
