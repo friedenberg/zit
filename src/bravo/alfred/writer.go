@@ -8,20 +8,24 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
-type Writer interface {
-	io.WriteCloser
-	WriteItem(i Item) (n int, err error)
-}
-
-type writer struct {
+type Writer struct {
 	wBuf            *bufio.Writer
+	jsonEncoder     *json.Encoder
+	chItem          chan *Item
+	chDone          chan struct{}
 	afterFirstWrite bool
+	ItemPool
 }
 
-func NewWriter(out io.Writer) (w *writer, err error) {
-	w = &writer{
-		wBuf: bufio.NewWriter(out),
+func NewWriter(out io.Writer) (w *Writer, err error) {
+	w = &Writer{
+		wBuf:     bufio.NewWriter(out),
+		chItem:   make(chan *Item),
+		chDone:   make(chan struct{}),
+		ItemPool: MakeItemPool(),
 	}
+
+	w.jsonEncoder = json.NewEncoder(w.wBuf)
 
 	if err = w.open(); err != nil {
 		err = errors.Wrap(err)
@@ -31,51 +35,65 @@ func NewWriter(out io.Writer) (w *writer, err error) {
 	return
 }
 
-func (w writer) open() (err error) {
+func (w *Writer) open() (err error) {
 	_, err = w.wBuf.WriteString("{\"items\":[\n")
+
+	go func() {
+		errors.Print("write item loop")
+		defer errors.Print("done with write item loop")
+
+		for i := range w.chItem {
+			// var err error
+
+			errors.Print("running")
+			if _ = w.writeItem(i); err != nil {
+				// err = errors.Wrap(err)
+				//TODO
+			}
+		}
+
+		w.chDone <- struct{}{}
+	}()
 
 	return
 }
 
-func (w *writer) setAfterFirstWrite() {
+func (w *Writer) WriteItem(i *Item) {
+	errors.Print("writing")
+	defer errors.Print("done writing")
+
+	w.chItem <- i
+}
+
+func (w *Writer) setAfterFirstWrite() {
 	w.afterFirstWrite = true
 }
 
-func (w *writer) WriteItem(i Item) (n int, err error) {
-	var b []byte
-
-	if b, err = json.Marshal(i); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if n, err = w.Write(b); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (w *writer) Write(p []byte) (n int, err error) {
+func (w *Writer) writeItem(i *Item) (err error) {
 	defer w.setAfterFirstWrite()
-
-	var n1 int
+	defer w.Put(i)
 
 	if w.afterFirstWrite {
-		n1, err = w.wBuf.WriteString(",")
-
-		n += n1
+		if _, err = io.WriteString(w.wBuf, ","); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
-	n1, err = w.wBuf.Write(p)
-
-	n += 1
+	if err = w.jsonEncoder.Encode(i); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }
 
-func (w writer) Close() (err error) {
+func (w *Writer) Close() (err error) {
+	errors.Print("waiting to close")
+	close(w.chItem)
+	<-w.chDone
+	errors.Print("closing")
+
 	if _, err = w.wBuf.WriteString("]}\n"); err != nil {
 		err = errors.Wrap(err)
 		return

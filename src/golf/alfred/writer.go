@@ -7,16 +7,16 @@ import (
 	"github.com/friedenberg/zit/src/bravo/alfred"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
-	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
+	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 )
 
 type Writer struct {
-	alfredWriter alfred.Writer
+	alfredWriter *alfred.Writer
 	hinweis.Abbr
 }
 
 func New(out io.Writer, ha hinweis.Abbr) (w *Writer, err error) {
-	var aw alfred.Writer
+	var aw *alfred.Writer
 
 	if aw, err = alfred.NewWriter(out); err != nil {
 		err = errors.Wrap(err)
@@ -31,19 +31,22 @@ func New(out io.Writer, ha hinweis.Abbr) (w *Writer, err error) {
 	return
 }
 
-func (w *Writer) WriteZettel(z zettel_named.Zettel) (n int, err error) {
-	item := ZettelToItem(z, w.Abbr)
-	return w.alfredWriter.WriteItem(item)
+func (w *Writer) WriteZettel(z zettel_transacted.Zettel) (n int, err error) {
+	item := w.zettelToItem(z, w.Abbr)
+	w.alfredWriter.WriteItem(item)
+	return
 }
 
 func (w *Writer) WriteEtikett(e etikett.Etikett) (n int, err error) {
-	item := EtikettToItem(e)
-	return w.alfredWriter.WriteItem(item)
+	item := w.etikettToItem(e)
+	w.alfredWriter.WriteItem(item)
+	return
 }
 
 func (w *Writer) WriteHinweis(e hinweis.Hinweis) (n int, err error) {
-	item := HinweisToItem(e)
-	return w.alfredWriter.WriteItem(item)
+	item := w.hinweisToItem(e)
+	w.alfredWriter.WriteItem(item)
+	return
 }
 
 func (w *Writer) WriteError(in error) (n int, out error) {
@@ -51,8 +54,9 @@ func (w *Writer) WriteError(in error) (n int, out error) {
 		return 0, nil
 	}
 
-	item := ErrorToItem(in)
-	return w.alfredWriter.WriteItem(item)
+	item := w.errorToItem(in)
+	w.alfredWriter.WriteItem(item)
+	return
 }
 
 func (w Writer) Close() (err error) {

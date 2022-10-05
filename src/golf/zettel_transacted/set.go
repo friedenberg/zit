@@ -32,6 +32,12 @@ func MakeSetHinweis(c int) Set {
 	}
 }
 
+func (m Set) AddFrom(ch <-chan Zettel) {
+	for z := range ch {
+		m.Add(z)
+	}
+}
+
 func (m Set) Get(
 	s fmt.Stringer,
 ) (tz Zettel, ok bool) {
@@ -42,10 +48,10 @@ func (m Set) Get(
 func (m Set) Add(z Zettel) {
 	k := m.keyFunc(z)
 
-	if old, ok := m.innerMap[k]; ok {
-		errors.Printf("replacing %s with %s", old, z)
+	if _, ok := m.innerMap[k]; ok {
+		// errors.Printf("replacing %s with %s", old, z)
 	} else {
-		errors.Printf("adding %s", z)
+		// errors.Printf("adding %s", z)
 	}
 
 	m.innerMap[k] = z

@@ -5,8 +5,8 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/charlie/konfig"
 	"github.com/friedenberg/zit/src/charlie/debug"
+	"github.com/friedenberg/zit/src/charlie/konfig"
 	"github.com/friedenberg/zit/src/kilo/umwelt"
 )
 
@@ -68,16 +68,14 @@ func Run(args []string) (exitStatus int) {
 		return
 	}
 
-	if konfigCli.Debug {
-		var dc *debug.Context
+	var dc *debug.Context
 
-		if dc, err = debug.MakeContext(debug.Options{}); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		defer errors.PanicIfError(dc.Close)
+	if dc, err = debug.MakeContext(konfigCli.Debug); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
+
+	defer errors.PanicIfError(dc.Close)
 
 	var k konfig.Konfig
 

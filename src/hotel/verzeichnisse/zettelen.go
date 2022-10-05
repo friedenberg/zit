@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"strconv"
+	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/etikett"
@@ -140,39 +141,47 @@ func (i *Zettelen) Read(h hinweis.Hinweis) (tz zettel_transacted.Zettel, err err
 }
 
 func (i *Zettelen) ReadMany(
+	w zettel_transacted.Writer,
 	qs ...zettel_named.NamedFilter,
-) (zts zettel_transacted.Set, err error) {
-	zts = zettel_transacted.MakeSetUnique(0)
+) (err error) {
+	wg := &sync.WaitGroup{}
+	wg.Add(len(i.pages))
 
 	for _, p := range i.pages {
-		if err = p.ReadAll(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+		go func(p *zettelenPageWithState) {
+			defer wg.Done()
 
-		err = p.innerSet.Each(
-			func(tz zettel_transacted.Zettel) (err error) {
-				for _, q := range qs {
-					if !q.IncludeNamedZettel(tz.Named) {
+			if err = p.ReadAll(); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			err = p.innerSet.Each(
+				func(tz zettel_transacted.Zettel) (err error) {
+					for _, q := range qs {
+						if !q.IncludeNamedZettel(tz.Named) {
+							return
+						}
+					}
+
+					if !i.shouldIncludeTransacted(tz) {
 						return
 					}
-				}
 
-				if !i.shouldIncludeTransacted(tz) {
+					w.WriteZettel(tz)
+
 					return
-				}
+				},
+			)
 
-				zts.Add(tz)
-
+			if err != nil {
+				err = errors.Wrap(err)
 				return
-			},
-		)
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+			}
+		}(p)
 	}
+
+	wg.Wait()
 
 	return
 }

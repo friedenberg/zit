@@ -18,6 +18,18 @@ type Item struct {
 	// Valid        bool     `json:"valid,omitempty"`
 }
 
+func (i *Item) Reset() {
+	i.Title = ""
+	i.Arg = ""
+	i.Subtitle = ""
+	i.Match = ""
+	i.Icon.Type = ""
+	i.Icon.Path = ""
+	i.Uid = ""
+	i.QuicklookUrl = ""
+	i.Text.Copy = ""
+}
+
 type ItemText struct {
 	Copy string `json:"copy,omitempty"`
 }

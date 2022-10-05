@@ -2,6 +2,7 @@ package debug
 
 import (
 	"os"
+	"runtime/debug"
 	"runtime/pprof"
 	"runtime/trace"
 
@@ -16,21 +17,27 @@ type Context struct {
 func MakeContext(options Options) (c *Context, err error) {
 	c = &Context{}
 
-	if c.filePprof, err = files.Create("build/cpu1.pprof"); err != nil {
-		err = errors.Wrap(err)
-		return
+	if options.PProf {
+		if c.filePprof, err = files.Create("build/cpu1.pprof"); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		pprof.StartCPUProfile(c.filePprof)
 	}
 
-	pprof.StartCPUProfile(c.filePprof)
+	if options.Trace {
+		if c.fileTrace, err = files.Create("build/trace"); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
-	if c.fileTrace, err = files.Create("build/trace"); err != nil {
-		err = errors.Wrap(err)
-		return
+		trace.Start(c.fileTrace)
 	}
 
-	trace.Start(c.fileTrace)
-
-	// debug.SetGCPercent(-1)
+	if options.GCDisabled {
+		debug.SetGCPercent(-1)
+	}
 
 	return
 }

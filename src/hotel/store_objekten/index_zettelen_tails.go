@@ -54,6 +54,11 @@ func newIndexZettelenTails(
 }
 
 func (i *indexZettelenTails) Flush() (err error) {
+	if err = i.Zettelen.Flush(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if !i.hasChanges {
 		errors.Print("no changes")
 		return
@@ -86,11 +91,6 @@ func (i *indexZettelenTails) Flush() (err error) {
 	)
 
 	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = i.Zettelen.Flush(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -194,10 +194,11 @@ func (i *indexZettelenTails) Read(h hinweis.Hinweis) (tz zettel_transacted.Zette
 		return
 	}
 
-  tz.Named.Stored.Zettel.Etiketten = tz.Named.Stored.Zettel.Etiketten.Copy()
+	tz.Named.Stored.Zettel.Etiketten = tz.Named.Stored.Zettel.Etiketten.Copy()
+	var tz1 zettel_transacted.Zettel
 
-	if tz1, err1 := i.Zettelen.Read(h); err1 != nil {
-		err = errors.Wrap(err1)
+	if tz1, err = i.Zettelen.Read(h); err != nil {
+		err = errors.Wrap(err)
 		return
 	} else if !tz1.Named.Equals(tz.Named) {
 		err = errors.Errorf("ZettelenNeue had different zettel:\nneue: %s\nold: %s", tz1, tz)
@@ -205,6 +206,13 @@ func (i *indexZettelenTails) Read(h hinweis.Hinweis) (tz zettel_transacted.Zette
 	}
 
 	return
+}
+
+func (i *indexZettelenTails) ReadManySchwanzen(
+	w zettel_transacted.Writer,
+	qs ...zettel_named.NamedFilter,
+) (err error) {
+	return i.Zettelen.ReadMany(w, qs...)
 }
 
 func (i *indexZettelenTails) ZettelenSchwanzen(

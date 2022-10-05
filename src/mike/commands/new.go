@@ -136,7 +136,9 @@ func (c New) writeNewZettels(
 		return
 	}
 
-	c.Etiketten.Merge(defaultEtiketten)
+  mes := c.Etiketten.MutableCopy()
+  mes.Merge(defaultEtiketten)
+	c.Etiketten = mes.Copy()
 
 	z := zettel.Zettel{
 		Bezeichnung: c.Bezeichnung.Bezeichnung,

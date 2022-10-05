@@ -6,12 +6,13 @@ import (
 	"path"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/charlie/debug"
 )
 
 type Cli struct {
 	BasePath string
 
-	Debug    bool
+	Debug    debug.Options
 	Verbose  bool
 	DryRun   bool
 	Complete bool
@@ -31,7 +32,7 @@ type Cli struct {
 func (c *Cli) AddToFlags(f *flag.FlagSet) {
 	f.StringVar(&c.BasePath, "dir-zit", "", "")
 
-	f.BoolVar(&c.Debug, "debug", false, "")
+	f.Var(&c.Debug, "debug", "debugging options")
 	f.BoolVar(&c.Verbose, "verbose", false, "")
 	f.BoolVar(&c.DryRun, "dry-run", false, "")
 	f.BoolVar(&c.Complete, "complete", false, "")

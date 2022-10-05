@@ -5,10 +5,9 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	gattung "github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/golf/alfred"
-	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/kilo/umwelt"
 )
 
@@ -76,19 +75,10 @@ func (c CatAlfred) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		fallthrough
 
 	case gattung.Hinweis:
-		var all zettel_transacted.Set
-
-		if all, err = u.StoreObjekten().ZettelenSchwanzen(); err != nil {
+		if err = u.StoreObjekten().ReadManySchwanzen(aw); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
-
-		all.Each(
-			func(z zettel_transacted.Zettel) (err error) {
-				aw.WriteZettel(z.Named)
-				return
-			},
-		)
 
 	default:
 		err = errors.Errorf("unsupported objekte type: %s", c.Type)
