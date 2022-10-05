@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/charlie/typ"
 	"github.com/friedenberg/zit/src/delta/zettel"
-	"github.com/friedenberg/zit/src/golf/zettel_external"
 	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
 	"github.com/friedenberg/zit/src/india/store_working_directory"
 	"github.com/friedenberg/zit/src/kilo/umwelt"
@@ -43,7 +42,7 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &New{
 				//TODO move to proper place
-				Typ:       typ.Make("md"),
+				Typ: typ.Make("md"),
 			}
 
 			f.Var(&c.Filter, "filter", "a script to run for each file to transform it the standard zettel format")
@@ -195,7 +194,7 @@ func (c New) editZettelsIfRequested(
 		},
 	}
 
-	var zslc []zettel_checked_out.Zettel
+	var zslc zettel_checked_out.Set
 
 	if zslc, err = readOp.RunMany(cwdFiles); err != nil {
 		err = errors.Wrap(err)
@@ -207,11 +206,7 @@ func (c New) editZettelsIfRequested(
 		OptionsReadExternal: readOp.OptionsReadExternal,
 	}
 
-	zsle := make([]zettel_external.Zettel, len(zslc))
-
-	for i, zc := range zslc {
-		zsle[i] = zc.External
-	}
+	zsle := zslc.ToSliceZettelsExternal()
 
 	if _, err = checkinOp.Run(zsle...); err != nil {
 		err = errors.Wrap(err)

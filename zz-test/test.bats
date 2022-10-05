@@ -317,7 +317,8 @@ function can_update_akte { # @test
 }
 
 function can_duplicate_zettel_content { # @test
-	skip                                   #TODO:
+  # TODO
+  skip
 
 	# setup
 	wd="$(mktemp -d)"
@@ -335,19 +336,20 @@ function can_duplicate_zettel_content { # @test
 		echo ---
 		echo
 		echo the body
-	} >>"$expected"
+	} >"$expected"
 
 	run zit new "${cmd_zit_def[@]}" -edit=false "$expected"
-	assert_output --partial '[one/uno '
+	assert_output ''
 
 	run zit new "${cmd_zit_def[@]}" -edit=false "$expected"
-	assert_output --partial '[two/dos '
+	assert_output ''
 
 	# when
 	run zit show "${cmd_zit_def[@]}" one/uno
-	assert_output --partial "$(cat "$expected")"
+	assert_output ''
+
 	run zit show "${cmd_zit_def[@]}" two/dos
-	assert_output --partial "$(cat "$expected")"
+	assert_output ''
 }
 
 function indexes_are_implicitly_correct { # @test

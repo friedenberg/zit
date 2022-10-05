@@ -12,7 +12,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/id_set"
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
-	"github.com/friedenberg/zit/src/golf/zettel_external"
 	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
 	"github.com/friedenberg/zit/src/india/store_working_directory"
 	"github.com/friedenberg/zit/src/kilo/umwelt"
@@ -115,7 +114,7 @@ func (c Edit) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 		return
 	}
 
-	var readResults []zettel_checked_out.Zettel
+	var readResults zettel_checked_out.Set
 
 	readOp := user_ops.ReadCheckedOut{
 		Umwelt: u,
@@ -138,11 +137,7 @@ func (c Edit) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 		return
 	}
 
-	zettels := make([]zettel_external.Zettel, 0, len(readResults))
-
-	for _, z := range readResults {
-		zettels = append(zettels, z.External)
-	}
+	zettels := readResults.ToSliceZettelsExternal()
 
 	checkinOp := user_ops.Checkin{
 		Umwelt: u,

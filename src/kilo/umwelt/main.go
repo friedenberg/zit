@@ -85,8 +85,6 @@ func (u *Umwelt) Initialize() (err error) {
 	}
 
 	u.printerOut = zettel_printer.Make(u.standort, u.konfig, u.out)
-	//TODO move to konfig
-	// u.printerOut.ShouldAbbreviateHinweisen = true
 
 	if u.storeObjekten, err = store_objekten.Make(u.lock, *u.age, u.konfig, u.standort); err != nil {
 		err = errors.Wrapf(err, "failed to initialize zettel meta store")

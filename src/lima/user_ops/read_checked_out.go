@@ -39,8 +39,8 @@ func (op ReadCheckedOut) RunOneString(
 func (op ReadCheckedOut) RunMany(
 	possible store_working_directory.CwdFiles,
 	//TODO switch to zettel_checked_out.Set
-) (results []zettel_checked_out.Zettel, err error) {
-	results = make([]zettel_checked_out.Zettel, 0, possible.Len())
+) (results zettel_checked_out.Set, err error) {
+  results = zettel_checked_out.MakeSetUnique(possible.Len())
 
 	for _, p := range possible.Zettelen {
 		var checked_out zettel_checked_out.Zettel
@@ -60,7 +60,7 @@ func (op ReadCheckedOut) RunMany(
 
 		}
 
-		results = append(results, checked_out)
+    results.Add(checked_out)
 	}
 
 	for _, p := range possible.Zettelen {
@@ -80,7 +80,7 @@ func (op ReadCheckedOut) RunMany(
 			}
 		}
 
-		results = append(results, checked_out)
+    results.Add(checked_out)
 	}
 
 	return

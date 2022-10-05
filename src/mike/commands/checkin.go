@@ -51,7 +51,7 @@ func (c Checkin) Run(
 		}
 	}
 
-	var readResults []zettel_checked_out.Zettel
+	var readResults zettel_checked_out.Set
 
 	readOp := user_ops.ReadCheckedOut{
 		Umwelt: s,
@@ -70,11 +70,14 @@ func (c Checkin) Run(
 		OptionsReadExternal: readOp.OptionsReadExternal,
 	}
 
-	zettels := make([]zettel_external.Zettel, 0, len(readResults))
+	zettels := make([]zettel_external.Zettel, 0, readResults.Len())
 
-	for _, z := range readResults {
-		zettels = append(zettels, z.External)
-	}
+	err = readResults.Each(
+		func(zco zettel_checked_out.Zettel) (err error) {
+			zettels = append(zettels, zco.External)
+			return
+		},
+	)
 
 	if _, err = checkinOp.Run(zettels...); err != nil {
 		err = errors.Wrap(err)
@@ -86,11 +89,14 @@ func (c Checkin) Run(
 			Umwelt: s,
 		}
 
-		external := make([]zettel_external.Zettel, 0, len(readResults))
+		external := make([]zettel_external.Zettel, 0, readResults.Len())
 
-		for _, z := range readResults {
-			external = append(external, z.External)
-		}
+		err = readResults.Each(
+			func(zco zettel_checked_out.Zettel) (err error) {
+				external = append(external, zco.External)
+				return
+			},
+		)
 
 		if err = deleteOp.Run(external); err != nil {
 			err = errors.Wrap(err)

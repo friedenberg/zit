@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/golf/zettel_external"
 )
 
 type Set struct {
@@ -38,16 +39,16 @@ func MakeSetUnique(c int) Set {
 				sz.Internal.Named.Stored.Sha,
 			)
 		},
-		innerMap: make(map[string]Zettel),
+		innerMap: make(map[string]Zettel, c),
 	}
 }
 
-func MakeSetHinweisZettel() Set {
+func MakeSetHinweisZettel(c int) Set {
 	return Set{
 		keyFunc: func(sz Zettel) string {
 			return makeKey(sz.Internal.Named.Hinweis)
 		},
-		innerMap: make(map[string]Zettel),
+		innerMap: make(map[string]Zettel, c),
 	}
 }
 
@@ -101,6 +102,26 @@ func (a Set) Each(f func(Zettel) error) (err error) {
 
 			return
 		}
+	}
+
+	return
+}
+
+func (s Set) ToSlice() (out []Zettel) {
+	out = make([]Zettel, 0, s.Len())
+
+	for _, z := range s.innerMap {
+		out = append(out, z)
+	}
+
+	return
+}
+
+func (s Set) ToSliceZettelsExternal() (out []zettel_external.Zettel) {
+	out = make([]zettel_external.Zettel, 0, s.Len())
+
+	for _, z := range s.innerMap {
+		out = append(out, z.External)
 	}
 
 	return

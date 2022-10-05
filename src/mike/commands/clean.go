@@ -52,7 +52,7 @@ func (c Clean) Run(
 		Format: zettel.Text{},
 	}
 
-	var readResults []zettel_checked_out.Zettel
+	var readResults zettel_checked_out.Set
 
 	readOp := user_ops.ReadCheckedOut{
 		Umwelt:              s,
@@ -64,28 +64,32 @@ func (c Clean) Run(
 		return
 	}
 
-	toDelete := make([]zettel_external.Zettel, 0, len(readResults))
-	filesToDelete := make([]string, 0, len(readResults)+len(possible.EmptyDirectories))
+	toDelete := make([]zettel_external.Zettel, 0, readResults.Len())
+	filesToDelete := make([]string, 0, readResults.Len()+len(possible.EmptyDirectories))
 
 	for _, d := range possible.EmptyDirectories {
 		filesToDelete = append(filesToDelete, d)
 	}
 
-	for _, z := range readResults {
-		if z.State != zettel_checked_out.StateExistsAndSame {
-			continue
-		}
+	readResults.Each(
+		func(zco zettel_checked_out.Zettel) (err error) {
+      if zco.State != zettel_checked_out.StateExistsAndSame {
+				return
+			}
 
-		toDelete = append(toDelete, z.External)
+			toDelete = append(toDelete, zco.External)
 
-		if z.External.ZettelFD.Path != "" {
-			filesToDelete = append(filesToDelete, z.External.ZettelFD.Path)
-		}
+			if zco.External.ZettelFD.Path != "" {
+				filesToDelete = append(filesToDelete, zco.External.ZettelFD.Path)
+			}
 
-		if z.External.AkteFD.Path != "" {
-			filesToDelete = append(filesToDelete, z.External.AkteFD.Path)
-		}
-	}
+			if zco.External.AkteFD.Path != "" {
+				filesToDelete = append(filesToDelete, zco.External.AkteFD.Path)
+			}
+
+      return
+		},
+	)
 
 	for _, ua := range possible.UnsureAkten {
 		var szt zettel_transacted.Set

@@ -46,17 +46,19 @@ func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
 		Format: zettel.Text{},
 	}
 
-	var readResults []zettel_checked_out.Zettel
+	var readResultsSet zettel_checked_out.Set
 
 	readOp := user_ops.ReadCheckedOut{
 		Umwelt:              s,
 		OptionsReadExternal: options,
 	}
 
-	if readResults, err = readOp.RunMany(possible); err != nil {
+	if readResultsSet, err = readOp.RunMany(possible); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+  readResults := readResultsSet.ToSlice()
 
 	sort.Slice(
 		readResults,
