@@ -30,21 +30,22 @@ func makeZettelenPage(iof ioFactory, path string) (p *zettelenPageWithState) {
 		ioFactory: iof,
 		path:      path,
 		zettelenPage: zettelenPage{
-			innerSet: zettel_transacted.MakeSetHinweis(0),
+			existing: make([]*Zettel, 0),
+			added:    make([]*Zettel, 0),
 		},
 	}
 
 	return
 }
 
-func (zp *zettelenPageWithState) Add(zt zettel_transacted.Zettel) (err error) {
+func (zp *zettelenPageWithState) Add(z *Zettel) (err error) {
 	if err = zp.ReadAll(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	zp.State = StateChanged
-	zp.innerSet.Add(zt)
+	zp.added = append(zp.added, z)
 
 	return
 }
@@ -57,11 +58,24 @@ func (zp *zettelenPageWithState) ReadHinweis(
 		return
 	}
 
-	ok := false
+	var z *Zettel
 
-	if tz, ok = zp.innerSet.Get(h); !ok {
-		err = errors.Normalf("not found")
-		return
+	for _, z1 := range zp.zettelenPage.existing {
+		if z1.Transacted.Named.Hinweis.Equals(h) {
+			z = z1
+		}
+	}
+
+	for _, z1 := range zp.zettelenPage.added {
+		if z1.Transacted.Named.Hinweis.Equals(h) {
+			z = z1
+		}
+	}
+
+	if z == nil {
+		err = errors.Normalf("not found: %s", h)
+	} else {
+		tz = z.Transacted
 	}
 
 	return
@@ -92,7 +106,9 @@ func (zp *zettelenPageWithState) Flush() (err error) {
 	return
 }
 
-func (zp *zettelenPageWithState) WriteZettelenTo(w zettel_transacted.Writer) (err error) {
+func (zp *zettelenPageWithState) WriteZettelenTo(
+	w writer,
+) (err error) {
 	var r io.ReadCloser
 
 	if r, err = zp.ReadCloserVerzeichnisse(zp.path); err != nil {
@@ -148,18 +164,28 @@ func (zp *zettelenPageWithState) ReadAll() (err error) {
 }
 
 type zettelenPage struct {
-	innerSet zettel_transacted.Set
+	existing []*Zettel
+	added    []*Zettel
 }
 
-func (zp zettelenPage) Copy(r1 io.Reader, w zettel_transacted.Writer) (n int64, err error) {
+func (zp zettelenPage) Copy(
+	r1 io.Reader,
+	w writer,
+) (n int64, err error) {
 	r := bufio.NewReader(r1)
 
 	dec := gob.NewDecoder(r)
 
 	for {
-		var tz zettel_transacted.Zettel
+		var tz *Zettel
 
-		if err = dec.Decode(&tz); err != nil {
+		if w.ZettelPool == nil {
+			tz = &Zettel{}
+		} else {
+			tz = w.Get()
+		}
+
+		if err = dec.Decode(tz); err != nil {
 			if errors.IsEOF(err) {
 				err = nil
 				break
@@ -169,7 +195,7 @@ func (zp zettelenPage) Copy(r1 io.Reader, w zettel_transacted.Writer) (n int64, 
 			}
 		}
 
-		if err = w.WriteZettelTransacted(tz); err != nil {
+		if err = w.WriteZettelVerzeichnisse(tz); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -179,7 +205,19 @@ func (zp zettelenPage) Copy(r1 io.Reader, w zettel_transacted.Writer) (n int64, 
 }
 
 func (zp *zettelenPage) ReadFrom(r1 io.Reader) (n int64, err error) {
-	return zp.Copy(r1, zp.innerSet)
+	return zp.Copy(
+		r1,
+		writer{
+			writers: []Writer{
+				MakeWriter(
+					func(z *Zettel) (err error) {
+						zp.existing = append(zp.existing, z)
+						return
+					},
+				),
+			},
+		},
+	)
 }
 
 func (zp *zettelenPage) WriteTo(w1 io.Writer) (n int64, err error) {
@@ -189,20 +227,18 @@ func (zp *zettelenPage) WriteTo(w1 io.Writer) (n int64, err error) {
 
 	enc := gob.NewEncoder(w)
 
-	err = zp.innerSet.Each(
-		func(tz zettel_transacted.Zettel) (err error) {
-			if err = enc.Encode(tz); err != nil {
-				err = errors.Wrapf(err, "failed to write zettel: %s", tz.Named)
-				return
-			}
-
+	for _, z := range zp.existing {
+		if err = enc.Encode(z); err != nil {
+			err = errors.Wrapf(err, "failed to write zettel: %v", z)
 			return
-		},
-	)
+		}
+	}
 
-	if err != nil {
-		err = errors.Wrap(err)
-		return
+	for _, z := range zp.added {
+		if err = enc.Encode(z); err != nil {
+			err = errors.Wrapf(err, "failed to write zettel: %v", z)
+			return
+		}
 	}
 
 	return

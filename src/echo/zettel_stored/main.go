@@ -9,3 +9,8 @@ type Stored struct {
 	Sha    sha.Sha
 	Zettel zettel.Zettel
 }
+
+func (zs *Stored) Reset() {
+  zs.Sha = sha.Sha{}
+  zs.Zettel.Reset()
+}

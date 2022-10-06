@@ -17,6 +17,13 @@ type Zettel struct {
 	Etiketten   etikett.Set
 }
 
+func (z *Zettel) Reset() {
+	z.Akte = sha.Sha{}
+	z.Typ = typ.Typ{}
+	z.Bezeichnung = bezeichnung.Bezeichnung("")
+	z.Etiketten = etikett.Set{}
+}
+
 func (z Zettel) Description() (d string) {
 	d = z.Bezeichnung.String()
 

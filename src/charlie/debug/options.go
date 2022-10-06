@@ -8,7 +8,7 @@ import (
 )
 
 type Options struct {
-	Trace, PProf, GCDisabled bool
+	Trace, PProfCPU, PProfHeap, GCDisabled bool
 }
 
 func (o Options) String() string {
@@ -18,8 +18,12 @@ func (o Options) String() string {
 		sb.WriteString("gc_disabled")
 	}
 
-	if o.PProf {
-		sb.WriteString("pprof")
+	if o.PProfCPU {
+		sb.WriteString("pprof_cpu")
+	}
+
+	if o.PProfHeap {
+		sb.WriteString("pprof_heap")
 	}
 
 	if o.Trace {
@@ -38,23 +42,26 @@ func (o *Options) Set(v string) (err error) {
 
 	for _, p := range parts {
 		switch strings.ToLower(p) {
-    case "false":
+		case "false":
 
 		case "gc_disabled":
 			o.GCDisabled = true
 
-		case "pprof":
-			o.PProf = true
+		case "pprof_cpu":
+			o.PProfCPU = true
+
+		case "pprof_heap":
+			o.PProfHeap = true
 
 		case "trace":
 			o.Trace = true
 
 		case "true":
-      fallthrough
+			fallthrough
 
 		case "all":
 			o.GCDisabled = true
-			o.PProf = true
+			o.PProfCPU = true
 			o.Trace = true
 
 		default:

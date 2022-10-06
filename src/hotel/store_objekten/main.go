@@ -53,6 +53,7 @@ func Make(
 	a age.Age,
 	k konfig.Konfig,
 	st standort.Standort,
+	p zettel_transacted.Pool,
 ) (s *Store, err error) {
 	s = &Store{
 		lockSmith: lockSmith,
@@ -70,6 +71,7 @@ func Make(
 		k,
 		st.FileVerzeichnisseZettelenSchwanzen(),
 		s,
+		p,
 	)
 
 	s.indexZettelen, err = newIndexZettelen(

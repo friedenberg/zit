@@ -13,3 +13,11 @@ type Zettel struct {
 func (zt Zettel) IsNew() bool {
 	return zt.Kopf == zt.Schwanz
 }
+
+func (zt *Zettel) Reset() {
+	zt.Kopf = ts.Time{}
+	zt.Mutter = ts.Time{}
+	zt.Schwanz = ts.Time{}
+
+	zt.Named.Reset()
+}

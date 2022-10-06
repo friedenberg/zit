@@ -11,19 +11,22 @@ import (
 )
 
 type Context struct {
-	filePprof, fileTrace *os.File
+	filePprofCpu, filePprofHeap, fileTrace *os.File
+	options                                Options
 }
 
 func MakeContext(options Options) (c *Context, err error) {
-	c = &Context{}
+	c = &Context{
+		options: options,
+	}
 
-	if options.PProf {
-		if c.filePprof, err = files.Create("build/cpu1.pprof"); err != nil {
+	if options.PProfCPU {
+		if c.filePprofCpu, err = files.Create("build/cpu.pprof"); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		pprof.StartCPUProfile(c.filePprof)
+		pprof.StartCPUProfile(c.filePprofCpu)
 	}
 
 	if options.Trace {
@@ -52,10 +55,24 @@ func (c *Context) Close() (err error) {
 		}
 	}
 
-	if c.filePprof != nil {
+	if c.filePprofCpu != nil {
 		pprof.StopCPUProfile()
 
-		if err = c.filePprof.Close(); err != nil {
+		if err = c.filePprofCpu.Close(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	if c.options.PProfHeap {
+		if c.filePprofHeap, err = files.Create("build/heap.pprof"); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		pprof.WriteHeapProfile(c.filePprofHeap)
+
+		if err = c.filePprofHeap.Close(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

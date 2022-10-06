@@ -45,8 +45,8 @@ func (m Set) Get(
 	return
 }
 
-func (m Set) WriteZettelTransacted(z Zettel) (err error) {
-	m.Add(z)
+func (m Set) WriteZettelTransacted(z *Zettel) (err error) {
+	m.Add(*z)
 
 	return
 }

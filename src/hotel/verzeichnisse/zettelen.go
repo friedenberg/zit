@@ -2,12 +2,13 @@ package verzeichnisse
 
 import (
 	"fmt"
+	"io"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/charlie/konfig"
 	"github.com/friedenberg/zit/src/delta/standort"
@@ -15,12 +16,13 @@ import (
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 )
 
-const digitWidth = 1
-const pageCount = 16 ^ digitWidth
+const digitWidth = 2
+const pageCount = 1 << (digitWidth * 4)
 
 type Zettelen struct {
 	konfig.Konfig
 	path string
+	pool ZettelPool
 	ioFactory
 	pages [pageCount]*zettelenPageWithState
 }
@@ -29,11 +31,13 @@ func MakeZettelen(
 	k konfig.Konfig,
 	s standort.Standort,
 	f ioFactory,
+	p zettel_transacted.Pool,
 ) (i *Zettelen, err error) {
 	i = &Zettelen{
 		Konfig:    k,
 		path:      s.DirVerzeichnisseZettelenNeue(),
 		ioFactory: f,
+		pool:      MakeZettelPool(),
 	}
 
 	for n, _ := range i.pages {
@@ -114,7 +118,12 @@ func (i *Zettelen) Add(tz zettel_transacted.Zettel) (err error) {
 
 	p := i.pages[n]
 
-	if err = p.Add(tz); err != nil {
+	z := i.pool.Get()
+	z.Transacted = tz
+	z.EtikettenExpandedSorted = tz.Named.Stored.Zettel.Etiketten.Expanded().SortedString()
+	z.EtikettenSorted = tz.Named.Stored.Zettel.Etiketten.SortedString()
+
+	if err = p.Add(z); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -141,28 +150,33 @@ func (i *Zettelen) Read(h hinweis.Hinweis) (tz zettel_transacted.Zettel, err err
 }
 
 func (i *Zettelen) ReadMany(
-	w1 zettel_transacted.Writer,
+	w1 Writer,
 	qs ...zettel_named.NamedFilter,
 ) (err error) {
 	wg := &sync.WaitGroup{}
 	wg.Add(len(i.pages))
 
-	w := zettel_transacted.MakeWriterFilter(
-		w1,
-		func(zt zettel_transacted.Zettel) bool {
-			for _, q := range qs {
-				if !q.IncludeNamedZettel(zt.Named) {
-					return false
-				}
-			}
+	w := writer{
+		writers: []Writer{
+			MakeWriter(i.shouldIncludeVerzeichnisse),
+			WriterZettelTransacted{
+				Writer: zettel_transacted.MakeWriter(
+					func(zt *zettel_transacted.Zettel) (err error) {
+						for _, q := range qs {
+							if !q.IncludeNamedZettel(zt.Named) {
+								err = io.EOF
+								return
+							}
+						}
 
-			if !i.shouldIncludeTransacted(zt) {
-				return false
-			}
-
-			return true
+						return
+					},
+				),
+			},
+			w1,
 		},
-	)
+		ZettelPool: &i.pool,
+	}
 
 	for _, p := range i.pages {
 		go func(p *zettelenPageWithState) {
@@ -180,22 +194,23 @@ func (i *Zettelen) ReadMany(
 	return
 }
 
-func (i *Zettelen) shouldIncludeTransacted(tz zettel_transacted.Zettel) bool {
+func (i *Zettelen) shouldIncludeVerzeichnisse(z *Zettel) (err error) {
 	if i.IncludeHidden {
-		return true
+		return
 	}
 
-	prefixes := tz.Named.Stored.Zettel.Etiketten.Expanded(etikett.ExpanderRight{})
+	for _, p := range z.EtikettenExpandedSorted {
+		for tn, tv := range i.Tags {
+			if !tv.Hide {
+				continue
+			}
 
-	for tn, tv := range i.Tags {
-		if !tv.Hide {
-			continue
-		}
-
-		if prefixes.ContainsString(tn) {
-			return false
+			if strings.HasPrefix(p, tn) {
+				err = io.EOF
+				return
+			}
 		}
 	}
 
-	return true
+	return
 }

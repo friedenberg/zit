@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/konfig"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/echo/akten"
+	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/hotel/store_objekten"
 	"github.com/friedenberg/zit/src/india/store_working_directory"
 	"github.com/friedenberg/zit/src/juliett/zettel_printer"
@@ -45,4 +46,8 @@ func (u *Umwelt) StoreObjekten() *store_objekten.Store {
 
 func (u *Umwelt) StoreWorkingDirectory() *store_working_directory.Store {
 	return u.storeWorkingDirectory
+}
+
+func (u *Umwelt) ZettelTransactedPool() zettel_transacted.Pool {
+	return u.zettelTransactedPool
 }

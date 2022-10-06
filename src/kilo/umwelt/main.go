@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/konfig"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/echo/akten"
+	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/hotel/store_objekten"
 	"github.com/friedenberg/zit/src/india/store_working_directory"
 	"github.com/friedenberg/zit/src/juliett/zettel_printer"
@@ -33,15 +34,18 @@ type Umwelt struct {
 	age                   *age.Age
 	storeWorkingDirectory *store_working_directory.Store
 	printerOut            *zettel_printer.Printer
+
+	zettelTransactedPool zettel_transacted.Pool
 }
 
 func Make(c konfig.Konfig) (u *Umwelt, err error) {
 	u = &Umwelt{
-		konfig: c,
-		logger: c.Logger,
-		in:     os.Stdin,
-		out:    os.Stdout,
-		err:    os.Stderr,
+		konfig:               c,
+		logger:               c.Logger,
+		in:                   os.Stdin,
+		out:                  os.Stdout,
+		err:                  os.Stderr,
+		zettelTransactedPool: zettel_transacted.MakePool(),
 	}
 
 	err = u.Initialize()
@@ -86,7 +90,15 @@ func (u *Umwelt) Initialize() (err error) {
 
 	u.printerOut = zettel_printer.Make(u.standort, u.konfig, u.out)
 
-	if u.storeObjekten, err = store_objekten.Make(u.lock, *u.age, u.konfig, u.standort); err != nil {
+	u.storeObjekten, err = store_objekten.Make(
+		u.lock,
+		*u.age,
+		u.konfig,
+		u.standort,
+		u.zettelTransactedPool,
+	)
+
+	if err != nil {
 		err = errors.Wrapf(err, "failed to initialize zettel meta store")
 		return
 	}
@@ -126,7 +138,7 @@ func (u *Umwelt) Initialize() (err error) {
 }
 
 func (u Umwelt) DefaultEtiketten() (etiketten etikett.Set, err error) {
-  metiketten := etikett.MakeMutableSet()
+	metiketten := etikett.MakeMutableSet()
 
 	for e, t := range u.konfig.Tags {
 		if !t.AddToNewZettels {
@@ -139,7 +151,7 @@ func (u Umwelt) DefaultEtiketten() (etiketten etikett.Set, err error) {
 		}
 	}
 
-  etiketten = metiketten.Copy()
+	etiketten = metiketten.Copy()
 
 	return
 }

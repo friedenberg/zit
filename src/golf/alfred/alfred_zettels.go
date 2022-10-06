@@ -7,38 +7,38 @@ import (
 	"github.com/friedenberg/zit/src/bravo/alfred"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
-	"github.com/friedenberg/zit/src/golf/zettel_transacted"
+	"github.com/friedenberg/zit/src/hotel/verzeichnisse"
 )
 
-func (w *Writer) zettelToItem(z zettel_transacted.Zettel, ha hinweis.Abbr) (a *alfred.Item) {
+func (w *Writer) zettelToItem(z *verzeichnisse.Zettel, ha hinweis.Abbr) (a *alfred.Item) {
 	a = w.alfredWriter.Get()
 
-	a.Title = z.Named.Stored.Zettel.Bezeichnung.String()
+	a.Title = z.Transacted.Named.Stored.Zettel.Bezeichnung.String()
 
 	if a.Title == "" {
-		a.Title = z.Named.Hinweis.String()
+		a.Title = z.Transacted.Named.Hinweis.String()
 		a.Subtitle = fmt.Sprintf(
 			"%s",
-			strings.Join(z.Named.Stored.Zettel.Etiketten.SortedString(), ", "),
+			strings.Join(z.EtikettenSorted, ", "),
 		)
 	} else {
 		a.Subtitle = fmt.Sprintf(
 			"%s: %s",
-			z.Named.Hinweis.String(),
-			strings.Join(z.Named.Stored.Zettel.Etiketten.SortedString(), ", "),
+			z.Transacted.Named.Hinweis.String(),
+			strings.Join(z.EtikettenSorted, ", "),
 		)
 	}
 
-	a.Arg = z.Named.Hinweis.String()
+	a.Arg = z.Transacted.Named.Hinweis.String()
 
 	mb := alfred.NewMatchBuilder()
 
-	mb.AddMatches(z.Named.Hinweis.String())
-	mb.AddMatches(z.Named.Hinweis.Kopf())
-	mb.AddMatches(z.Named.Hinweis.Schwanz())
-	mb.AddMatches(z.Named.Stored.Zettel.Bezeichnung.String())
-	mb.AddMatches(z.Named.Stored.Zettel.Typ.String())
-	mb.AddMatches(w.etikettenStringsFromZettel(z.Named.Stored.Zettel.Etiketten, true)...)
+	mb.AddMatches(z.Transacted.Named.Hinweis.String())
+	mb.AddMatches(z.Transacted.Named.Hinweis.Kopf())
+	mb.AddMatches(z.Transacted.Named.Hinweis.Schwanz())
+	mb.AddMatches(z.Transacted.Named.Stored.Zettel.Bezeichnung.String())
+	mb.AddMatches(z.Transacted.Named.Stored.Zettel.Typ.String())
+	mb.AddMatches(z.EtikettenExpandedSorted...)
 
 	// if ha != nil {
 	// 	var h hinweis.Hinweis
@@ -59,8 +59,8 @@ func (w *Writer) zettelToItem(z zettel_transacted.Zettel, ha hinweis.Abbr) (a *a
 	// 	a.Match = a.Match[:100]
 	// }
 
-	a.Text.Copy = z.Named.Hinweis.String()
-	a.Uid = "zit://" + z.Named.Hinweis.String()
+	a.Text.Copy = z.Transacted.Named.Hinweis.String()
+	a.Uid = "zit://" + z.Transacted.Named.Hinweis.String()
 
 	return
 }
@@ -111,20 +111,6 @@ func (w *Writer) hinweisToItem(e hinweis.Hinweis) (a *alfred.Item) {
 
 	a.Text.Copy = e.String()
 	a.Uid = "zit://" + e.String()
-
-	return
-}
-
-func (w *Writer) etikettenStringsFromZettel(es etikett.Set, shouldExpand bool) (out []string) {
-	out = make([]string, 0, es.Len())
-
-	for _, e := range es.Etiketten() {
-		if shouldExpand {
-			out = append(out, e.Expanded().Strings()...)
-		} else {
-			out = append(out, e.String())
-		}
-	}
 
 	return
 }

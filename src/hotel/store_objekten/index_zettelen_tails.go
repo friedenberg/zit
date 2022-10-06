@@ -30,6 +30,7 @@ func newIndexZettelenTails(
 	k konfig.Konfig,
 	p string,
 	f ioFactory,
+	pool zettel_transacted.Pool,
 ) (i *indexZettelenTails, err error) {
 	i = &indexZettelenTails{
 		Konfig:    k,
@@ -45,7 +46,7 @@ func newIndexZettelenTails(
 		return
 	}
 
-	if i.Zettelen, err = verzeichnisse.MakeZettelen(k, s, f); err != nil {
+	if i.Zettelen, err = verzeichnisse.MakeZettelen(k, s, f, pool); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -209,7 +210,7 @@ func (i *indexZettelenTails) Read(h hinweis.Hinweis) (tz zettel_transacted.Zette
 }
 
 func (i *indexZettelenTails) ReadManySchwanzen(
-	w zettel_transacted.Writer,
+	w verzeichnisse.Writer,
 	qs ...zettel_named.NamedFilter,
 ) (err error) {
 	return i.Zettelen.ReadMany(w, qs...)

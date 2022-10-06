@@ -24,3 +24,8 @@ func (a Zettel) Equals(b Zettel) bool {
 
 	return true
 }
+
+func (zn *Zettel) Reset() {
+	zn.Hinweis = hinweis.Hinweis{}
+	zn.Stored.Reset()
+}
