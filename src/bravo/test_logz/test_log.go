@@ -24,14 +24,14 @@ type T struct {
 	Skip int
 }
 
-func Errorf(t T, format string, args ...interface{}) {
+func (t T) Errorf(format string, args ...interface{}) {
 	si, _ := MakeStackInfo(t.Skip + 1)
 	args = append([]interface{}{si}, args...)
 	os.Stderr.WriteString(fmt.Sprintf("%s"+format+"\n", args...))
 	t.Fail()
 }
 
-func Fatalf(t T, format string, args ...interface{}) {
+func (t T) Fatalf(format string, args ...interface{}) {
 	si, _ := MakeStackInfo(t.Skip + 1)
 	args = append([]interface{}{si}, args...)
 	os.Stderr.WriteString(fmt.Sprintf("%s"+format+"\n", args...))

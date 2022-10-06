@@ -16,7 +16,41 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-func TestContains(t *testing.T) {
+type t test_logz.T
+
+func (t t) assertCount(sut *Tridex, d int) {
+	if sut.Count() != d {
+		t.Fatalf("expected count %d but got %d", d, sut.Count())
+	}
+}
+
+func (t t) assertNotContains(sut *Tridex, v string) {
+	if sut.Contains(v) {
+		t.Fatalf("expected to not contain %q", v)
+	}
+}
+
+func (t t) assertContains(sut *Tridex, v string) {
+	if !sut.Contains(v) {
+		t.Fatalf("expected to contain %q", v)
+	}
+}
+
+func (t t) assertContainsExactly(sut *Tridex, v string) {
+	if !sut.ContainsExactly(v) {
+		t.Fatalf("expected to contain exactly %q", v)
+	}
+}
+
+func (t t) assertNotContainsExactly(sut *Tridex, v string) {
+	if sut.ContainsExactly(v) {
+		t.Fatalf("expected not to contain exactly %q", v)
+	}
+}
+
+func TestContains(t1 *testing.T) {
+	t := test_logz.T{T: t1}
+
 	sut := Make(
 		"123456",
 		"654321",
@@ -30,11 +64,8 @@ func TestContains(t *testing.T) {
 	}
 
 	for _, e := range expectedContains {
-		if !sut.Contains(e) {
-			test_logz.Errorf(
-				test_logz.T{T: t},
-				"expected %v to contain %s", sut, e,
-			)
+		if !sut.ContainsExactly(e) {
+			t.Errorf("expected %v to contain %s", sut, e)
 		}
 	}
 
@@ -55,13 +86,72 @@ func TestContains(t *testing.T) {
 	}
 
 	for _, e := range expectedNotContains {
-		if sut.Contains(e) {
-			test_logz.Errorf(test_logz.T{T: t}, "expected %v to not contain %s", sut, e)
+		if sut.ContainsExactly(e) {
+			t.Errorf("expected %v to not contain %s", sut, e)
 		}
 	}
 }
 
-func TestAbbreviateOrphan(t *testing.T) {
+func TestCount(t1 *testing.T) {
+	t := t(test_logz.T{T: t1})
+
+	sut := Make("one")
+	t.assertCount(sut, 1)
+  t.assertContains(sut, "o")
+  t.assertContains(sut, "on")
+  t.assertContains(sut, "one")
+  t.assertContainsExactly(sut, "one")
+
+  sut.Add("two")
+	t.assertCount(sut, 2)
+  t.assertContains(sut, "o")
+  t.assertContains(sut, "on")
+  t.assertContains(sut, "one")
+  t.assertContainsExactly(sut, "one")
+  t.assertContains(sut, "t")
+  t.assertContains(sut, "tw")
+  t.assertContains(sut, "two")
+  t.assertContainsExactly(sut, "two")
+
+  sut.Add("three")
+	t.assertCount(sut, 3)
+  t.assertContains(sut, "o")
+  t.assertContains(sut, "on")
+  t.assertContains(sut, "one")
+  t.assertContainsExactly(sut, "one")
+  t.assertContains(sut, "t")
+  t.assertContains(sut, "tw")
+  t.assertContains(sut, "two")
+  t.assertContainsExactly(sut, "two")
+  t.assertContains(sut, "t")
+  t.assertContains(sut, "th")
+  t.assertContains(sut, "thr")
+  t.assertContains(sut, "thre")
+  t.assertContains(sut, "three")
+
+  sut.Remove("one")
+	t.assertCount(sut, 2)
+  t.assertNotContainsExactly(sut, "one")
+  t.assertNotContains(sut, "o")
+  t.assertNotContains(sut, "on")
+  t.assertNotContains(sut, "one")
+
+  sut.Remove("three")
+	t.assertCount(sut, 1)
+  t.assertNotContainsExactly(sut, "three")
+  t.assertNotContains(sut, "th")
+  t.assertNotContains(sut, "thr")
+  t.assertNotContains(sut, "thre")
+  t.assertNotContains(sut, "three")
+
+  sut.Remove("two")
+	t.assertCount(sut, 0)
+  t.assertNotContainsExactly(sut, "two")
+}
+
+func TestAbbreviateOrphan(t1 *testing.T) {
+	t := test_logz.T{T: t1}
+
 	sut := Make(
 		"one",
 	)
@@ -72,12 +162,14 @@ func TestAbbreviateOrphan(t *testing.T) {
 
 	for e, c := range expectedContains {
 		if ca := sut.Abbreviate(e); ca != c {
-			test_logz.Errorf(test_logz.T{T: t}, "%q: expected shorted length %q but got %q", e, c, ca)
+			t.Errorf("%q: expected shorted length %q but got %q", e, c, ca)
 		}
 	}
 }
 
-func TestAbbreviateDegenerate(t *testing.T) {
+func TestAbbreviateDegenerate(t1 *testing.T) {
+	t := test_logz.T{T: t1}
+
 	sut := Make(
 		"mewtwo",
 		"mew",
@@ -91,12 +183,14 @@ func TestAbbreviateDegenerate(t *testing.T) {
 	for e, c := range expectedContains {
 		if ca := sut.Abbreviate(e); ca != c {
 			test_logz.Printf("%#v", sut)
-			test_logz.Errorf(test_logz.T{T: t}, "%q: expected shorted length %q but got %q", e, c, ca)
+			t.Errorf("%q: expected shorted length %q but got %q", e, c, ca)
 		}
 	}
 }
 
-func TestExpandDegenerate(t *testing.T) {
+func TestExpandDegenerate(t1 *testing.T) {
+	t := test_logz.T{T: t1}
+
 	sut := Make(
 		"mewtwo",
 		"mew",
@@ -110,12 +204,14 @@ func TestExpandDegenerate(t *testing.T) {
 	for e, c := range expectedContains {
 		if ca := sut.Expand(e); ca != c {
 			test_logz.Printf("%#v", sut)
-			test_logz.Errorf(test_logz.T{T: t}, "%q: expected expanded %q but got %q", e, c, ca)
+			t.Errorf("%q: expected expanded %q but got %q", e, c, ca)
 		}
 	}
 }
 
-func TestAbbreviate(t *testing.T) {
+func TestAbbreviate(t1 *testing.T) {
+	t := test_logz.T{T: t1}
+
 	sut := Make(
 		"12",
 		"121",
@@ -143,12 +239,14 @@ func TestAbbreviate(t *testing.T) {
 	for e, c := range expectedContains {
 		if ca := sut.Abbreviate(e); ca != c {
 			test_logz.Print(t, "%#v", sut)
-			test_logz.Errorf(test_logz.T{T: t}, "%q: expected shorted length %q but got %q", e, c, ca)
+			t.Errorf("%q: expected shorted length %q but got %q", e, c, ca)
 		}
 	}
 }
 
-func TestExpandOrphan(t *testing.T) {
+func TestExpandOrphan(t1 *testing.T) {
+	t := test_logz.T{T: t1}
+
 	sut := Make(
 		"654321",
 	)
@@ -160,12 +258,14 @@ func TestExpandOrphan(t *testing.T) {
 
 	for a, e := range expectedContains {
 		if ca := sut.Expand(a); ca != e {
-			test_logz.Errorf(test_logz.T{T: t}, "%q: expected expanded %q but got %q", e, e, ca)
+			t.Errorf("%q: expected expanded %q but got %q", e, e, ca)
 		}
 	}
 }
 
-func TestExpand(t *testing.T) {
+func TestExpand(t1 *testing.T) {
+	t := test_logz.T{T: t1}
+
 	sut := Make(
 		"12",
 		"121",
@@ -185,7 +285,85 @@ func TestExpand(t *testing.T) {
 
 	for a, e := range expectedContains {
 		if ca := sut.Expand(a); ca != e {
-			test_logz.Errorf(test_logz.T{T: t}, "%q: expected expanded %q but got %q", e, e, ca)
+			t.Errorf("%q: expected expanded %q but got %q", e, e, ca)
+		}
+	}
+}
+
+func TestDoesNotContainPrefix(t1 *testing.T) {
+	t := test_logz.T{T: t1}
+	makeSut := func() *Tridex {
+		return Make(
+			"121",
+			"127",
+			"128",
+			"123456",
+			"654321",
+		)
+	}
+
+	sut := makeSut()
+	e1 := "12"
+
+	if sut.ContainsExactly(e1) {
+		t.Errorf("expected not to contain exactly %q", e1)
+	}
+
+	if !sut.Contains(e1) {
+		t.Errorf("expected to contain %q", e1)
+	}
+}
+
+func TestRemove(t1 *testing.T) {
+  t1.Skip()
+
+	t := test_logz.T{T: t1}
+
+	makeSut := func() *Tridex {
+		return Make(
+			"12",
+			"121",
+			"127",
+			"128",
+			"123456",
+			"654321",
+		)
+	}
+
+	elements := []string{
+		"12",
+		"121",
+		"127",
+		"128",
+		"123456",
+		"654321",
+	}
+
+	for i, e := range elements {
+		sut := makeSut()
+
+		if sut.Count() != len(elements) {
+			t.Fatalf("expected %d elements but got %d", len(elements), sut.Count())
+		}
+
+		sut.Remove(e)
+
+		if sut.Count() != len(elements)-1 {
+			t.Fatalf("expected %d elements but got %d", len(elements)-1, sut.Count())
+		}
+
+		for j, e1 := range elements {
+			if j == i {
+				continue
+			}
+
+			if !sut.ContainsExactly(e1) {
+				t.Errorf("expected to contain %q", e1)
+			}
+		}
+
+		if sut.ContainsExactly(e) {
+			t.Errorf("expected not to contain %q", e)
 		}
 	}
 }

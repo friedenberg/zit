@@ -30,7 +30,7 @@ akte
 	sut.WriteTo(out)
 
 	if out.String() != expectedOut {
-		test_logz.Errorf(t, "expected %q but got %q", expectedOut, out.String())
+		t.Errorf("expected %q but got %q", expectedOut, out.String())
 	}
 }
 
@@ -54,7 +54,7 @@ metadatei
 	sut.WriteTo(out)
 
 	if out.String() != expectedOut {
-		test_logz.Errorf(t, "expected %q but got %q", expectedOut, out.String())
+		t.Errorf("expected %q but got %q", expectedOut, out.String())
 	}
 }
 
@@ -76,6 +76,6 @@ func TestWriter3(t1 *testing.T) {
 	sut.WriteTo(out)
 
 	if out.String() != expectedOut {
-		test_logz.Errorf(t, "expected %q but got %q", expectedOut, out.String())
+		t.Errorf("expected %q but got %q", expectedOut, out.String())
 	}
 }

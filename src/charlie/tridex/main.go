@@ -5,6 +5,8 @@ import (
 	"encoding/gob"
 	"encoding/json"
 	"strings"
+
+	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
 type Tridex struct {
@@ -34,8 +36,20 @@ func Make(vs ...string) (t *Tridex) {
 	return
 }
 
+func (t *Tridex) Count() int {
+  return t.root.Count
+}
+
+func (t *Tridex) Remove(v string) {
+	t.root.Remove(v)
+}
+
 func (t *Tridex) Contains(v string) bool {
 	return t.root.Contains(v)
+}
+
+func (t *Tridex) ContainsExactly(v string) bool {
+	return t.root.ContainsExactly(v)
 }
 
 func (t *Tridex) Abbreviate(v string) string {
@@ -54,7 +68,7 @@ func (t *Tridex) Expand(v string) string {
 }
 
 func (t *Tridex) Add(v string) {
-	if t.Contains(v) {
+	if t.ContainsExactly(v) {
 		return
 	}
 
@@ -94,17 +108,58 @@ func (n *node) Add(v string) {
 	n.Children[c] = child
 }
 
+func (n *node) Remove(v string) {
+	errors.Printf("removing %s", v)
+	defer errors.Printf("done removing %s", v)
+
+	if v == "" {
+		n.Count -= 1
+		errors.Print("v was empty")
+		n.IncludesTerminus = false
+		return
+	}
+
+	if n.Value == v {
+		errors.Print("value matched")
+		n.Count -= 1
+		n.Value = ""
+		return
+	}
+
+	first := v[0]
+	errors.Printf("value was %c", first)
+
+	rest := ""
+
+	if len(v) > 1 {
+		rest = v[1:]
+	}
+
+	errors.Printf("rest was %s", rest)
+
+	child, ok := n.Children[first]
+
+	if ok {
+		child.Remove(rest)
+    n.Count -= 1
+
+		errors.Printf("child.Count: %d", child.Count)
+
+		if child.Count == 0 {
+			errors.Printf("removing child", child.Count)
+			delete(n.Children, first)
+		}
+	}
+}
+
 func (n node) Contains(v string) (ok bool) {
 	if len(v) == 0 {
-		if !n.IncludesTerminus {
-			return false
-		}
-
-		return len(n.Children) == 0
+		ok = true
+		return
 	}
 
 	if n.Count == 1 && n.Value != "" {
-		ok = n.Value == v
+		ok = strings.HasPrefix(n.Value, v)
 		return
 	}
 
@@ -116,6 +171,36 @@ func (n node) Contains(v string) (ok bool) {
 
 	if ok {
 		ok = child.Contains(v[1:])
+	}
+
+	return
+}
+
+func (n node) ContainsExactly(v string) (ok bool) {
+	errors.Printf("ContainsExactly: %s", v)
+	defer errors.Printf("done ContainsExactly: %s", v)
+
+	if len(v) == 0 {
+		errors.Printf("ContainsExactly: includes terminus: %s", v)
+		errors.Printf("ContainsExactly: includes terminus: %q", n.IncludesTerminus)
+		ok = n.IncludesTerminus
+		return
+	}
+
+	if n.Value != "" {
+		errors.Printf("ContainsExactly: value: %s", v)
+		ok = n.Value == v
+		return
+	}
+
+	c := v[0]
+
+	var child node
+
+	child, ok = n.Children[c]
+
+	if ok {
+		ok = child.ContainsExactly(v[1:])
 	}
 
 	return
@@ -186,7 +271,7 @@ func (n node) Abbreviate(v string, loc int) string {
 		return v
 	}
 
-	if n.Count == 1 && n.Contains(v[loc:]) && !n.IncludesTerminus {
+	if n.Count == 1 && n.ContainsExactly(v[loc:]) && !n.IncludesTerminus {
 		return v[0:loc]
 	}
 

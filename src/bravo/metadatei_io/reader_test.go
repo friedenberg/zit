@@ -38,23 +38,23 @@ body
 	n, err = r.ReadFrom(strings.NewReader(in))
 
 	if n != nExpected {
-		test_logz.Errorf(t, "expected to read %d but read %d", nExpected, n)
+		t.Errorf("expected to read %d but read %d", nExpected, n)
 	}
 
 	if err != nil {
-		test_logz.Errorf(t, "expected no error but got %s", err)
+		t.Errorf("expected no error but got %s", err)
 	}
 
 	mActual := string(mr.Bytes())
 
 	if mActual != mExpected {
-		test_logz.Errorf(t, "expected %q but got %q", mExpected, mActual)
+		t.Errorf("expected %q but got %q", mExpected, mActual)
 	}
 
 	bActual := string(ar.Bytes())
 
 	if bActual != bExpected {
-		test_logz.Errorf(t, "expected %q but got %q", bExpected, bActual)
+		t.Errorf("expected %q but got %q", bExpected, bActual)
 	}
 }
 
@@ -86,22 +86,22 @@ metadatei
 	n, err = r.ReadFrom(strings.NewReader(in))
 
 	if n != nExpected {
-		test_logz.Errorf(t, "expected to read %d but read %d", nExpected, n)
+		t.Errorf("expected to read %d but read %d", nExpected, n)
 	}
 
 	if err != nil {
-		test_logz.Errorf(t, "expected no error but got %s", err)
+		t.Errorf("expected no error but got %s", err)
 	}
 
 	mActual := string(mr.Bytes())
 
 	if mActual != mExpected {
-		test_logz.Errorf(t, "expected %q but got %q", mExpected, mActual)
+		t.Errorf("expected %q but got %q", mExpected, mActual)
 	}
 
 	bActual := string(ar.Bytes())
 
 	if bActual != bExpected {
-		test_logz.Errorf(t, "expected %q but got %q", bExpected, bActual)
+		t.Errorf("expected %q but got %q", bExpected, bActual)
 	}
 }
