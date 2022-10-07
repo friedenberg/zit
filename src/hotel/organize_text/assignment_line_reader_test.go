@@ -38,7 +38,8 @@ func makeBez(t *testing.T, v string) (b bezeichnung.Bezeichnung) {
 	return
 }
 
-func TestAssignmentLineReaderOneHeadingNoZettels(t *testing.T) {
+func TestAssignmentLineReaderOneHeadingNoZettels(t1 *testing.T) {
+	t := test_logz.T{T: t1}
 	input :=
 		`# wow
     `
@@ -49,11 +50,11 @@ func TestAssignmentLineReaderOneHeadingNoZettels(t *testing.T) {
 	n, err := sub.ReadFrom(sr)
 
 	if n == 0 {
-		test_logz.Errorf(test_logz.T{T: t}, "expected read amount to be greater than 0")
+		t.Errorf("expected read amount to be greater than 0")
 	}
 
 	if err != nil {
-		test_logz.Fatalf(test_logz.T{T: t}, "expected no error but got %q", err)
+		t.Fatalf("expected no error but got %q", err)
 	}
 
 	{
@@ -61,12 +62,14 @@ func TestAssignmentLineReaderOneHeadingNoZettels(t *testing.T) {
 		actual := sub.root.children[0].etiketten
 
 		if !actual.Equals(expected) {
-			test_logz.Errorf(test_logz.T{T: t}, "\nexpected: %s\n  actual: %s", expected, actual)
+			t.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
 }
 
 func TestAssignmentLineReader2Heading2Zettels(t *testing.T) {
+	t1 := test_logz.T{T: t}
+
 	input :=
 		`# wow
 
@@ -80,11 +83,11 @@ func TestAssignmentLineReader2Heading2Zettels(t *testing.T) {
 	n, err := sub.ReadFrom(sr)
 
 	if n == 0 {
-		test_logz.Errorf(test_logz.T{T: t}, "expected read amount to be greater than 0")
+		t1.Errorf("expected read amount to be greater than 0")
 	}
 
 	if err != nil {
-		test_logz.Fatalf(test_logz.T{T: t}, "expected no error but got %q", err)
+		t1.Fatalf("expected no error but got %q", err)
 	}
 
 	{
@@ -92,7 +95,7 @@ func TestAssignmentLineReader2Heading2Zettels(t *testing.T) {
 		actual := sub.root.children[0].etiketten
 
 		if !actual.Equals(expected) {
-			test_logz.Errorf(test_logz.T{T: t}, "\nexpected: %s\n  actual: %s", expected, actual)
+			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
 
@@ -111,12 +114,14 @@ func TestAssignmentLineReader2Heading2Zettels(t *testing.T) {
 		actual := sub.root.children[0].named
 
 		if !actual.Equals(expected) {
-			test_logz.Errorf(test_logz.T{T: t}, "\nexpected: %s\n  actual: %s", expected, actual)
+			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
 }
 
-func TestAssignmentLineReader1_1Heading2_2Zettels(t *testing.T) {
+func TestAssignmentLineReader1_1Heading2_2Zettels(t1 *testing.T) {
+	t := test_logz.T{T: t1}
+
 	input :=
 		`# wow
 
@@ -132,11 +137,11 @@ func TestAssignmentLineReader1_1Heading2_2Zettels(t *testing.T) {
 	n, err := sub.ReadFrom(sr)
 
 	if n == 0 {
-		test_logz.Errorf(test_logz.T{T: t}, "expected read amount to be greater than 0")
+		t.Errorf("expected read amount to be greater than 0")
 	}
 
 	if err != nil {
-		test_logz.Fatalf(test_logz.T{T: t}, "expected no error but got %q", err)
+		t.Fatalf("expected no error but got %q", err)
 	}
 
 	{
@@ -144,7 +149,7 @@ func TestAssignmentLineReader1_1Heading2_2Zettels(t *testing.T) {
 		actual := sub.root.children[0].etiketten
 
 		if !actual.Equals(expected) {
-			test_logz.Errorf(test_logz.T{T: t}, "\nexpected: %s\n  actual: %s", expected, actual)
+			t.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
 
@@ -152,43 +157,45 @@ func TestAssignmentLineReader1_1Heading2_2Zettels(t *testing.T) {
 		expected := etikett.MakeSet(etikett.Etikett{Value: "sub-wow"})
 
 		if sub.root != sub.root.children[0].parent {
-			test_logz.Fatalf(test_logz.T{T: t}, "%v, %v", sub.root, sub.root.children[0].parent)
+			t.Fatalf("%v, %v", sub.root, sub.root.children[0].parent)
 		}
 
 		l := len(sub.root.children[0].children)
 
 		if l != 1 {
-			test_logz.Fatalf(test_logz.T{T: t}, "\nexpected: %d\n  actual: %d", 1, l)
+			t.Fatalf("\nexpected: %d\n  actual: %d", 1, l)
 		}
 
 		actual := sub.root.children[0].children[0].etiketten
 
 		if !actual.Equals(expected) {
-			test_logz.Errorf(test_logz.T{T: t}, "\nexpected: %s\n  actual: %s", expected, actual)
+			t.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
 
 	{
 		expected := makeZettelSet()
 		expected.Add(zettel{
-			Hinweis:     makeHinweis(t, "one/wow"),
-			Bezeichnung: makeBez(t, "uno"),
+			Hinweis:     makeHinweis(t1, "one/wow"),
+			Bezeichnung: makeBez(t1, "uno"),
 		})
 
 		expected.Add(zettel{
-			Hinweis:     makeHinweis(t, "dos/wow"),
-			Bezeichnung: makeBez(t, "two/wow"),
+			Hinweis:     makeHinweis(t1, "dos/wow"),
+			Bezeichnung: makeBez(t1, "two/wow"),
 		})
 
 		actual := sub.root.children[0].children[0].named
 
 		if !actual.Equals(expected) {
-			test_logz.Errorf(test_logz.T{T: t}, "\nexpected: %s\n  actual: %s", expected, actual)
+			t1.Errorf("\nexpected: %v\n  actual: %v", expected, actual)
 		}
 	}
 }
 
 func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
+	t1 := test_logz.T{T: t}
+
 	input :=
 		`# wow
 
@@ -212,11 +219,11 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 	n, err := sub.ReadFrom(sr)
 
 	if n == 0 {
-		test_logz.Errorf(test_logz.T{T: t}, "expected read amount to be greater than 0")
+		t1.Errorf("expected read amount to be greater than 0")
 	}
 
 	if err != nil {
-		test_logz.Fatalf(test_logz.T{T: t}, "expected no error but got %q", err)
+		t1.Fatalf("expected no error but got %q", err)
 	}
 
 	{
@@ -224,7 +231,7 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 		actual := sub.root.children[0].etiketten
 
 		if !actual.Equals(expected) {
-			test_logz.Errorf(test_logz.T{T: t}, "\nexpected: %s\n  actual: %s", expected, actual)
+			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
 
@@ -233,13 +240,13 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 
 		l := len(sub.root.children[0].children)
 		if l != 1 {
-			test_logz.Fatalf(test_logz.T{T: t}, "\nexpected: %d\n  actual: %d", 1, l)
+			t1.Fatalf("\nexpected: %d\n  actual: %d", 1, l)
 		}
 
 		actual := sub.root.children[0].children[0].etiketten
 
 		if !actual.Equals(expected) {
-			test_logz.Errorf(test_logz.T{T: t}, "\nexpected: %s\n  actual: %s", expected, actual)
+			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
 
@@ -248,7 +255,7 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 		actual := sub.root.children[1].etiketten
 
 		if !actual.Equals(expected) {
-			test_logz.Errorf(test_logz.T{T: t}, "\nexpected: %s\n  actual: %s", expected, actual)
+			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
 
@@ -267,7 +274,7 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 		actual := sub.root.children[0].named
 
 		if !actual.Equals(expected) {
-			test_logz.Errorf(test_logz.T{T: t}, "\nexpected: %s\n  actual: %s", expected, actual)
+			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
 
@@ -286,12 +293,14 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 		actual := sub.root.children[1].named
 
 		if !actual.Equals(expected) {
-			test_logz.Errorf(test_logz.T{T: t}, "\nexpected: %s\n  actual: %s", expected, actual)
+			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
 }
 
 func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
+	t1 := test_logz.T{T: t}
+
 	input :=
 		`
     - [one/wow] uno
@@ -314,11 +323,11 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 	n, err := sub.ReadFrom(sr)
 
 	if n == 0 {
-		test_logz.Errorf(test_logz.T{T: t}, "expected read amount to be greater than 0")
+		t1.Errorf("expected read amount to be greater than 0")
 	}
 
 	if err != nil {
-		test_logz.Fatalf(test_logz.T{T: t}, "expected no error but got %q", err)
+		t1.Fatalf("expected no error but got %q", err)
 	}
 
 	{
@@ -326,7 +335,7 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 		actual := sub.root.children[0].etiketten
 
 		if !actual.Equals(expected) {
-			test_logz.Errorf(test_logz.T{T: t}, "\nexpected: %s\n  actual: %s", expected, actual)
+			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
 
@@ -336,13 +345,13 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 		l := len(sub.root.children)
 		expLen := 2
 		if l != expLen {
-			test_logz.Fatalf(test_logz.T{T: t}, "\nexpected: %d\n  actual: %d", expLen, l)
+			t1.Fatalf("\nexpected: %d\n  actual: %d", expLen, l)
 		}
 
 		actual := sub.root.children[1].etiketten
 
 		if !actual.Equals(expected) {
-			test_logz.Errorf(test_logz.T{T: t}, "\nexpected: %s\n  actual: %s", expected, actual)
+			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
 
@@ -361,7 +370,7 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 		actual := sub.root.children[0].named
 
 		if !actual.Equals(expected) {
-			test_logz.Errorf(test_logz.T{T: t}, "\nexpected: %s\n  actual: %s", expected, actual)
+			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
 
@@ -380,12 +389,14 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 		actual := sub.root.children[1].named
 
 		if !actual.Equals(expected) {
-			test_logz.Errorf(test_logz.T{T: t}, "\nexpected: %s\n  actual: %s", expected, actual)
+			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
 }
 
 func TestAssignmentLineReaderBigCheese(t *testing.T) {
+	t1 := test_logz.T{T: t}
+
 	input :=
 		`# task
     - [one/wow] uno
@@ -406,11 +417,11 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 	n, err := sub.ReadFrom(sr)
 
 	if n == 0 {
-		test_logz.Errorf(test_logz.T{T: t}, "expected read amount to be greater than 0")
+		t1.Errorf("expected read amount to be greater than 0")
 	}
 
 	if err != nil {
-		test_logz.Fatalf(test_logz.T{T: t}, "expected no error but got %q", err)
+		t1.Fatalf("expected no error but got %q", err)
 	}
 
 	// `# task
@@ -419,7 +430,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 		actual := sub.root.children[0].etiketten
 
 		if !actual.Equals(expected) {
-			test_logz.Errorf(test_logz.T{T: t}, "\nexpected: %s\n  actual: %s", expected, actual)
+			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
 
@@ -440,7 +451,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 		actual := sub.root.children[0].named
 
 		if !actual.Equals(expected) {
-			test_logz.Errorf(test_logz.T{T: t}, "\nexpected: %s\n  actual: %s", expected, actual)
+			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
 
@@ -451,13 +462,13 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 		e := 2
 		l := len(sub.root.children[0].children)
 		if l != e {
-			test_logz.Fatalf(test_logz.T{T: t}, "\nexpected: %d\n  actual: %d", e, l)
+			t1.Fatalf("\nexpected: %d\n  actual: %d", e, l)
 		}
 
 		actual := sub.root.children[0].children[0].etiketten
 
 		if !actual.Equals(expected) {
-			test_logz.Errorf(test_logz.T{T: t}, "\nexpected: %s\n  actual: %s", expected, actual)
+			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
 
@@ -467,7 +478,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 		actual := sub.root.children[0].children[0].children[0].etiketten
 
 		if !actual.Equals(expected) {
-			test_logz.Errorf(test_logz.T{T: t}, "\nexpected: %s\n  actual: %s", expected, actual)
+			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
 
@@ -481,7 +492,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 		actual := sub.root.children[0].children[0].children[0].named
 
 		if !actual.Equals(expected) {
-			test_logz.Errorf(test_logz.T{T: t}, "\nexpected: %q\n  actual: %q", expected, actual)
+			t1.Errorf("\nexpected: %q\n  actual: %q", expected, actual)
 		}
 	}
 
@@ -496,7 +507,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 		actual := sub.root.children[0].children[0].named
 
 		if !actual.Equals(expected) {
-			test_logz.Errorf(test_logz.T{T: t}, "\nexpected: %q\n  actual: %q", expected, actual)
+			t1.Errorf("\nexpected: %q\n  actual: %q", expected, actual)
 		}
 	}
 
@@ -517,7 +528,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 		actual := sub.root.children[0].children[1].named
 
 		if !actual.Equals(expected) {
-			test_logz.Errorf(test_logz.T{T: t}, "\nexpected: %q\n  actual: %q", expected, actual)
+			t1.Errorf("\nexpected: %q\n  actual: %q", expected, actual)
 		}
 	}
 }

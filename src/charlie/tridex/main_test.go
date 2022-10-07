@@ -97,56 +97,81 @@ func TestCount(t1 *testing.T) {
 
 	sut := Make("one")
 	t.assertCount(sut, 1)
-  t.assertContains(sut, "o")
-  t.assertContains(sut, "on")
-  t.assertContains(sut, "one")
-  t.assertContainsExactly(sut, "one")
+	t.assertContains(sut, "o")
+	t.assertContains(sut, "on")
+	t.assertContains(sut, "one")
+	t.assertContainsExactly(sut, "one")
 
-  sut.Add("two")
+	sut.Add("two")
 	t.assertCount(sut, 2)
-  t.assertContains(sut, "o")
-  t.assertContains(sut, "on")
-  t.assertContains(sut, "one")
-  t.assertContainsExactly(sut, "one")
-  t.assertContains(sut, "t")
-  t.assertContains(sut, "tw")
-  t.assertContains(sut, "two")
-  t.assertContainsExactly(sut, "two")
+	t.assertContains(sut, "o")
+	t.assertContains(sut, "on")
+	t.assertContains(sut, "one")
+	t.assertContainsExactly(sut, "one")
+	t.assertContains(sut, "t")
+	t.assertContains(sut, "tw")
+	t.assertContains(sut, "two")
+	t.assertContainsExactly(sut, "two")
 
-  sut.Add("three")
+	sut.Add("three")
 	t.assertCount(sut, 3)
-  t.assertContains(sut, "o")
-  t.assertContains(sut, "on")
-  t.assertContains(sut, "one")
-  t.assertContainsExactly(sut, "one")
-  t.assertContains(sut, "t")
-  t.assertContains(sut, "tw")
-  t.assertContains(sut, "two")
-  t.assertContainsExactly(sut, "two")
-  t.assertContains(sut, "t")
-  t.assertContains(sut, "th")
-  t.assertContains(sut, "thr")
-  t.assertContains(sut, "thre")
-  t.assertContains(sut, "three")
+	t.assertContains(sut, "o")
+	t.assertContains(sut, "on")
+	t.assertContains(sut, "one")
+	t.assertContainsExactly(sut, "one")
+	t.assertContains(sut, "t")
+	t.assertContains(sut, "tw")
+	t.assertContains(sut, "two")
+	t.assertContainsExactly(sut, "two")
+	t.assertContains(sut, "t")
+	t.assertContains(sut, "th")
+	t.assertContains(sut, "thr")
+	t.assertContains(sut, "thre")
+	t.assertContains(sut, "three")
 
-  sut.Remove("one")
+	sut.Remove("one")
 	t.assertCount(sut, 2)
-  t.assertNotContainsExactly(sut, "one")
-  t.assertNotContains(sut, "o")
-  t.assertNotContains(sut, "on")
-  t.assertNotContains(sut, "one")
+	t.assertNotContainsExactly(sut, "one")
+	t.assertNotContains(sut, "o")
+	t.assertNotContains(sut, "on")
+	t.assertNotContains(sut, "one")
 
-  sut.Remove("three")
+	sut.Remove("three")
 	t.assertCount(sut, 1)
-  t.assertNotContainsExactly(sut, "three")
-  t.assertNotContains(sut, "th")
-  t.assertNotContains(sut, "thr")
-  t.assertNotContains(sut, "thre")
-  t.assertNotContains(sut, "three")
+	t.assertNotContainsExactly(sut, "three")
+	t.assertNotContains(sut, "th")
+	t.assertNotContains(sut, "thr")
+	t.assertNotContains(sut, "thre")
+	t.assertNotContains(sut, "three")
 
-  sut.Remove("two")
+	sut.Remove("two")
 	t.assertCount(sut, 0)
-  t.assertNotContainsExactly(sut, "two")
+	t.assertNotContainsExactly(sut, "two")
+
+	sut.Add("1")
+	sut.Add("12")
+	sut.Add("123")
+	sut.Add("1234")
+	t.assertCount(sut, 4)
+	t.assertContainsExactly(sut, "1")
+	t.assertContainsExactly(sut, "12")
+	t.assertContainsExactly(sut, "123")
+	t.assertContainsExactly(sut, "1234")
+	t.assertContains(sut, "1")
+	t.assertContains(sut, "12")
+	t.assertContains(sut, "123")
+	t.assertContains(sut, "1234")
+
+	sut.Remove("1")
+	t.assertCount(sut, 3)
+	t.assertNotContainsExactly(sut, "1")
+	t.assertContainsExactly(sut, "12")
+	t.assertContainsExactly(sut, "123")
+	t.assertContainsExactly(sut, "1234")
+	t.assertContains(sut, "1")
+	t.assertContains(sut, "12")
+	t.assertContains(sut, "123")
+	t.assertContains(sut, "1234")
 }
 
 func TestAbbreviateOrphan(t1 *testing.T) {
@@ -291,7 +316,7 @@ func TestExpand(t1 *testing.T) {
 }
 
 func TestDoesNotContainPrefix(t1 *testing.T) {
-	t := test_logz.T{T: t1}
+	t := t(test_logz.T{T: t1})
 	makeSut := func() *Tridex {
 		return Make(
 			"121",
@@ -305,19 +330,12 @@ func TestDoesNotContainPrefix(t1 *testing.T) {
 	sut := makeSut()
 	e1 := "12"
 
-	if sut.ContainsExactly(e1) {
-		t.Errorf("expected not to contain exactly %q", e1)
-	}
-
-	if !sut.Contains(e1) {
-		t.Errorf("expected to contain %q", e1)
-	}
+	t.assertNotContainsExactly(sut, e1)
+	t.assertContains(sut, e1)
 }
 
 func TestRemove(t1 *testing.T) {
-  t1.Skip()
-
-	t := test_logz.T{T: t1}
+	t := t(test_logz.T{T: t1})
 
 	makeSut := func() *Tridex {
 		return Make(
@@ -342,28 +360,18 @@ func TestRemove(t1 *testing.T) {
 	for i, e := range elements {
 		sut := makeSut()
 
-		if sut.Count() != len(elements) {
-			t.Fatalf("expected %d elements but got %d", len(elements), sut.Count())
-		}
+		t.assertCount(sut, len(elements))
 
 		sut.Remove(e)
 
-		if sut.Count() != len(elements)-1 {
-			t.Fatalf("expected %d elements but got %d", len(elements)-1, sut.Count())
-		}
+		t.assertCount(sut, len(elements)-1)
 
 		for j, e1 := range elements {
 			if j == i {
-				continue
+				t.assertNotContainsExactly(sut, e1)
+			} else {
+				t.assertContainsExactly(sut, e1)
 			}
-
-			if !sut.ContainsExactly(e1) {
-				t.Errorf("expected to contain %q", e1)
-			}
-		}
-
-		if sut.ContainsExactly(e) {
-			t.Errorf("expected not to contain %q", e)
 		}
 	}
 }

@@ -6,14 +6,16 @@ import (
 	"github.com/friedenberg/zit/src/bravo/test_logz"
 )
 
-func assertSetRemovesPrefixes(t *testing.T, ac Set, ex Set, prefix string) {
-	t.Helper()
+func assertSetRemovesPrefixes(t1 *testing.T, ac Set, ex Set, prefix string) {
+	t := test_logz.T{
+		T:    t1,
+		Skip: 1,
+	}
 
 	ac.RemovePrefixes(Etikett{Value: prefix})
 
 	if !ac.Equals(ex) {
-		test_logz.Errorf(
-			test_logz.T{T: t, Skip: 1},
+		t.Errorf(
 			"removing prefixes doesn't match:\nexpected: %q\n  actual: %q",
 			ex,
 			ac,

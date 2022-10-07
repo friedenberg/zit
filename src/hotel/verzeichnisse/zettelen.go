@@ -24,7 +24,8 @@ type Zettelen struct {
 	path string
 	pool ZettelPool
 	ioFactory
-	pages [pageCount]*zettelenPageWithState
+	pages       [pageCount]*zettelenPageWithState
+	pageIndexes [pageCount]*zettelenPageIndex
 }
 
 func MakeZettelen(
@@ -43,10 +44,20 @@ func MakeZettelen(
 	for n, _ := range i.pages {
 		i.pages[n] = makeZettelenPage(
 			i,
-			filepath.Join(i.path, fmt.Sprintf("%x", n)),
+			i.PathForPage(n),
 		)
 	}
 
+	return
+}
+
+func (i Zettelen) PathForPage(n int) (p string) {
+	p = filepath.Join(i.path, fmt.Sprintf("%x", n))
+	return
+}
+
+func (i Zettelen) PathForPageIndex(n int) (p string) {
+	p = filepath.Join(i.path, fmt.Sprintf("%x.schwanz", n))
 	return
 }
 
@@ -98,6 +109,26 @@ func (i *Zettelen) Flush() (err error) {
 		}
 	}
 
+	for n, p := range i.pageIndexes {
+		if p == nil {
+			continue
+		}
+
+		var w io.WriteCloser
+
+		if w, err = i.WriteCloserVerzeichnisse(i.PathForPageIndex(n)); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		defer errors.PanicIfError(w.Close)
+
+		if _, err = p.WriteTo(w); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
 	return
 }
 
@@ -128,6 +159,80 @@ func (i *Zettelen) Add(tz zettel_transacted.Zettel) (err error) {
 		return
 	}
 
+	var pi *zettelenPageIndex
+
+	if pi, err = i.GetPageIndex(n); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	key, value := i.GetPageIndexKeyValue(z.Transacted)
+
+	pi.self[key] = value
+
+	return
+}
+
+func (i *Zettelen) ZettelWriterSchwanzenOnly() Writer {
+	return MakeWriter(
+		func(z *Zettel) (err error) {
+			ok := false
+
+			if ok, err = i.IsSchwanz(z.Transacted); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if !ok {
+				err = io.EOF
+				return
+			}
+
+			return
+		},
+	)
+}
+
+func (i *Zettelen) GetPageIndexKeyValue(
+	zt zettel_transacted.Zettel,
+) (key string, value string) {
+	key = zt.Named.Hinweis.String()
+	value = fmt.Sprintf("%s.%s", zt.Schwanz, zt.Named.Stored.Sha)
+	return
+}
+
+func (i *Zettelen) GetPageIndex(n int) (pi *zettelenPageIndex, err error) {
+	pi = i.pageIndexes[n]
+
+	if pi != nil {
+		return
+	}
+
+	pi = &zettelenPageIndex{
+		self: make(map[string]string),
+	}
+
+	var r io.ReadCloser
+
+	if r, err = i.ReadCloserVerzeichnisse(i.PathForPageIndex(n)); err != nil {
+		if errors.IsNotExist(err) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+		}
+
+		return
+	}
+
+	defer r.Close()
+
+	if _, err = pi.ReadFrom(r); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	i.pageIndexes[n] = pi
+
 	return
 }
 
@@ -149,6 +254,35 @@ func (i *Zettelen) Read(h hinweis.Hinweis) (tz zettel_transacted.Zettel, err err
 	return
 }
 
+func (i *Zettelen) IsSchwanz(z zettel_transacted.Zettel) (ok bool, err error) {
+	key, value := i.GetPageIndexKeyValue(z)
+	n := i.PageForHinweis(z.Named.Hinweis)
+
+	var pi *zettelenPageIndex
+
+	if pi, err = i.GetPageIndex(n); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	var value1 string
+
+	value1, ok = pi.self[key]
+
+	switch {
+	case !ok:
+		return
+
+	case value1 != value:
+		ok = false
+
+	default:
+		ok = true
+	}
+
+	return
+}
+
 func (i *Zettelen) ReadMany(
 	w1 Writer,
 	qs ...zettel_named.NamedFilter,
@@ -158,6 +292,7 @@ func (i *Zettelen) ReadMany(
 
 	w := writer{
 		writers: []Writer{
+			i.ZettelWriterSchwanzenOnly(),
 			MakeWriter(i.shouldIncludeVerzeichnisse),
 			WriterZettelTransacted{
 				Writer: zettel_transacted.MakeWriter(
@@ -168,6 +303,8 @@ func (i *Zettelen) ReadMany(
 								return
 							}
 						}
+
+						//TODO add efficient parsing of hiding tags
 
 						return
 					},

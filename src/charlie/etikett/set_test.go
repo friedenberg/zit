@@ -44,12 +44,12 @@ func TestNormalize(t *testing.T) {
 	for d, te := range testEntries {
 		t.Run(
 			d,
-			func(t *testing.T) {
+			func(t1 *testing.T) {
+				t := test_logz.T{T: t1}
 				ac := te.ac.WithRemovedCommonPrefixes()
 
 				if !ac.Equals(te.ex) {
-					test_logz.Errorf(
-						test_logz.T{T: t},
+					t.Errorf(
 						"removing prefixes doesn't match:\nexpected: %q\n  actual: %q",
 						te.ex,
 						ac,

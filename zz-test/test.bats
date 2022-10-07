@@ -49,6 +49,8 @@ function can_initialize_without_age { # @test
 	cd "$wd" || exit 1
 
 	run zit init "${cmd_zit_def[@]}" -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	assert_success
+
 	[ -d .zit/ ]
 	[ ! -f .zit/AgeIdentity ]
 }
@@ -58,6 +60,8 @@ function can_initialize_with_age { # @test
 	cd "$wd" || exit 1
 
 	run zit init "${cmd_zit_def[@]}" -yin <(cat_yin) -yang <(cat_yang)
+	assert_success
+
 	[ -d .zit/ ]
 	[ -f .zit/AgeIdentity ]
 }
@@ -67,6 +71,7 @@ function can_new_zettel_file { # @test
 	cd "$wd" || exit 1
 
 	run zit init "${cmd_zit_def[@]}" -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	assert_success
 
 	to_add="$(mktemp)"
 	{
@@ -88,6 +93,7 @@ function can_new_zettel { # @test
 	cd "$wd" || exit 1
 
 	run zit init "${cmd_zit_def[@]}" -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	assert_success
 
 	expected="$(mktemp)"
 	{
@@ -110,6 +116,7 @@ function can_checkout_and_checkin { # @test
 	cd "$wd" || exit 1
 
 	run zit init "${cmd_zit_def[@]}" -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	assert_success
 
 	to_add="$(mktemp)"
 	{
@@ -144,6 +151,7 @@ function can_checkout_via_etiketten { # @test
 	cd "$wd" || exit 1
 
 	run zit init "${cmd_zit_def[@]}" -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	assert_success
 
 	to_add="$(mktemp)"
 	{
@@ -167,6 +175,7 @@ function can_output_organize { # @test
 	cd "$wd" || exit 1
 
 	run zit init "${cmd_zit_def[@]}" -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	assert_success
 
 	to_add="$(mktemp)"
 	{
@@ -217,6 +226,7 @@ function hides_hidden_etiketten_from_organize { # @test
 	cd "$wd" || exit 1
 
 	run zit init "${cmd_zit_def[@]}" -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	assert_success
 
 	{
 		echo "[tags.zz-archive]"
@@ -252,6 +262,7 @@ function can_new_zettel_with_metadatei { # @test
 	cd "$wd" || exit 1
 
 	run zit init "${cmd_zit_def[@]}" -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	assert_success
 
 	expected="$(mktemp)"
 	{
@@ -273,6 +284,7 @@ function can_update_akte { # @test
 	cd "$wd" || exit 1
 
 	run zit init "${cmd_zit_def[@]}" -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	assert_success
 
 	expected="$(mktemp)"
 	{
@@ -317,14 +329,15 @@ function can_update_akte { # @test
 }
 
 function can_duplicate_zettel_content { # @test
-  # TODO
-  skip
+	# TODO
+	skip
 
 	# setup
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
 	run zit init "${cmd_zit_def[@]}" -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	assert_success
 
 	expected="$(mktemp)"
 	{
@@ -358,6 +371,7 @@ function indexes_are_implicitly_correct { # @test
 	cd "$wd" || exit 1
 
 	run zit init "${cmd_zit_def[@]}" -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	assert_success
 
 	expected="$(mktemp)"
 	{
@@ -428,6 +442,7 @@ function checkouts_dont_overwrite { # @test
 	cd "$wd" || exit 1
 
 	run zit init "${cmd_zit_def[@]}" -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	assert_success
 
 	expected="$(mktemp)"
 	{

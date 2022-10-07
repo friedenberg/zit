@@ -5,8 +5,6 @@ import (
 	"encoding/gob"
 	"encoding/json"
 	"strings"
-
-	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
 type Tridex struct {
@@ -37,7 +35,7 @@ func Make(vs ...string) (t *Tridex) {
 }
 
 func (t *Tridex) Count() int {
-  return t.root.Count
+	return t.root.Count
 }
 
 func (t *Tridex) Remove(v string) {
@@ -109,25 +107,20 @@ func (n *node) Add(v string) {
 }
 
 func (n *node) Remove(v string) {
-	errors.Printf("removing %s", v)
-	defer errors.Printf("done removing %s", v)
 
 	if v == "" {
 		n.Count -= 1
-		errors.Print("v was empty")
 		n.IncludesTerminus = false
 		return
 	}
 
 	if n.Value == v {
-		errors.Print("value matched")
 		n.Count -= 1
 		n.Value = ""
 		return
 	}
 
 	first := v[0]
-	errors.Printf("value was %c", first)
 
 	rest := ""
 
@@ -135,19 +128,16 @@ func (n *node) Remove(v string) {
 		rest = v[1:]
 	}
 
-	errors.Printf("rest was %s", rest)
-
 	child, ok := n.Children[first]
 
 	if ok {
 		child.Remove(rest)
-    n.Count -= 1
-
-		errors.Printf("child.Count: %d", child.Count)
+		n.Count -= 1
 
 		if child.Count == 0 {
-			errors.Printf("removing child", child.Count)
 			delete(n.Children, first)
+		} else {
+			n.Children[first] = child
 		}
 	}
 }
@@ -177,18 +167,12 @@ func (n node) Contains(v string) (ok bool) {
 }
 
 func (n node) ContainsExactly(v string) (ok bool) {
-	errors.Printf("ContainsExactly: %s", v)
-	defer errors.Printf("done ContainsExactly: %s", v)
-
 	if len(v) == 0 {
-		errors.Printf("ContainsExactly: includes terminus: %s", v)
-		errors.Printf("ContainsExactly: includes terminus: %q", n.IncludesTerminus)
 		ok = n.IncludesTerminus
 		return
 	}
 
 	if n.Value != "" {
-		errors.Printf("ContainsExactly: value: %s", v)
 		ok = n.Value == v
 		return
 	}
