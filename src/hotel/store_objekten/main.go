@@ -22,6 +22,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
+	"github.com/friedenberg/zit/src/hotel/verzeichnisse"
 )
 
 type LockSmith interface {
@@ -45,6 +46,9 @@ type Store struct {
 	*indexEtiketten
 	*indexKennung
 	*indexAbbr
+
+	*verzeichnisse.Zettelen
+
 	transaktion.Transaktion
 }
 
@@ -67,11 +71,15 @@ func Make(
 		return
 	}
 
+	if s.Zettelen, err = verzeichnisse.MakeZettelen(k, st, s); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	s.indexZettelenTails, err = newIndexZettelenTails(
 		k,
 		st.FileVerzeichnisseZettelenSchwanzen(),
 		s,
-		p,
 	)
 
 	s.indexZettelen, err = newIndexZettelen(
@@ -175,6 +183,11 @@ func (s Store) writeNamedZettelToIndex(tz zettel_transacted.Zettel) (err error) 
 		return
 	}
 
+	if err = s.Zettelen.Add(tz); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if err = s.indexZettelen.add(tz); err != nil {
 		err = errors.Wrapf(err, "failed to write zettel to index: %s", tz.Named)
 		return
@@ -196,6 +209,20 @@ func (s Store) writeNamedZettelToIndex(tz zettel_transacted.Zettel) (err error) 
 	}
 
 	return
+}
+
+func (i *Store) ReadManySchwanzen(
+	ws ...verzeichnisse.Writer,
+) (err error) {
+	return i.Zettelen.ReadMany(
+		append(
+			[]verzeichnisse.Writer{
+				i.ZettelWriterSchwanzenOnly(),
+				i.ZettelWriterFilterHidden(),
+			},
+			ws...,
+		)...,
+	)
 }
 
 func (s Store) ReadMany(is id_set.Set) (zts zettel_transacted.Set, err error) {
@@ -473,6 +500,11 @@ func (s Store) Flush() (err error) {
 
 	if err = s.writeTransaktion(); err != nil {
 		err = errors.Wrapf(err, "failed to write transaction")
+		return
+	}
+
+	if err = s.Zettelen.Flush(); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 

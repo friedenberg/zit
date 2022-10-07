@@ -9,10 +9,8 @@ import (
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/charlie/konfig"
-	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
-	"github.com/friedenberg/zit/src/hotel/verzeichnisse"
 )
 
 type indexZettelenTails struct {
@@ -22,15 +20,12 @@ type indexZettelenTails struct {
 	zettelen   zettel_transacted.Set
 	didRead    bool
 	hasChanges bool
-
-	*verzeichnisse.Zettelen
 }
 
 func newIndexZettelenTails(
 	k konfig.Konfig,
 	p string,
 	f ioFactory,
-	pool zettel_transacted.Pool,
 ) (i *indexZettelenTails, err error) {
 	i = &indexZettelenTails{
 		Konfig:    k,
@@ -39,27 +34,10 @@ func newIndexZettelenTails(
 		zettelen:  zettel_transacted.MakeSetHinweis(0),
 	}
 
-	var s standort.Standort
-
-	if s, err = standort.Make(k); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if i.Zettelen, err = verzeichnisse.MakeZettelen(k, s, f, pool); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	return
 }
 
 func (i *indexZettelenTails) Flush() (err error) {
-	if err = i.Zettelen.Flush(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	if !i.hasChanges {
 		errors.Print("no changes")
 		return
@@ -156,29 +134,6 @@ func (i *indexZettelenTails) add(tz zettel_transacted.Zettel) (err error) {
 
 	i.zettelen.Add(tz)
 
-	if err = i.Zettelen.Add(tz); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (i *indexZettelenTails) IsSchwanz(zt zettel_transacted.Zettel) (ok bool, err error) {
-	var zta zettel_transacted.Zettel
-
-	if zta, err = i.Read(zt.Named.Hinweis); err != nil {
-		if errors.Is(err, ErrNotFound{}) {
-			err = nil
-		} else {
-			err = errors.Wrap(err)
-		}
-
-		return
-	}
-
-	ok = zta.Named.Equals(zt.Named)
-
 	return
 }
 
@@ -196,31 +151,8 @@ func (i *indexZettelenTails) Read(h hinweis.Hinweis) (tz zettel_transacted.Zette
 	}
 
 	tz.Named.Stored.Zettel.Etiketten = tz.Named.Stored.Zettel.Etiketten.Copy()
-	var tz1 zettel_transacted.Zettel
-
-	if tz1, err = i.Zettelen.ReadHinweisSchwanzen(h); err != nil {
-		err = errors.Wrap(err)
-		return
-	} else if !tz1.Named.Equals(tz.Named) {
-		err = errors.Errorf("ZettelenNeue had different zettel:\nneue: %s\nold: %s", tz1, tz)
-		return
-	}
 
 	return
-}
-
-func (i *indexZettelenTails) ReadManySchwanzen(
-	ws ...verzeichnisse.Writer,
-) (err error) {
-	return i.Zettelen.ReadMany(
-		append(
-			[]verzeichnisse.Writer{
-				i.ZettelWriterSchwanzenOnly(),
-				i.ZettelWriterFilterHidden(),
-			},
-			ws...,
-		)...,
-	)
 }
 
 func (i *indexZettelenTails) ZettelenSchwanzen(

@@ -28,7 +28,6 @@ func MakeZettelen(
 	k konfig.Konfig,
 	s standort.Standort,
 	f ioFactory,
-	p zettel_transacted.Pool,
 ) (i *Zettelen, err error) {
 	i = &Zettelen{
 		Konfig:    k,
