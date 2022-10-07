@@ -22,7 +22,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
-	"github.com/friedenberg/zit/src/hotel/verzeichnisse"
+	store_verzeichnisse "github.com/friedenberg/zit/src/hotel/store_verzeichnisse"
 )
 
 type LockSmith interface {
@@ -47,7 +47,7 @@ type Store struct {
 	*indexKennung
 	*indexAbbr
 
-	*verzeichnisse.Zettelen
+	*store_verzeichnisse.Zettelen
 
 	transaktion.Transaktion
 }
@@ -71,7 +71,7 @@ func Make(
 		return
 	}
 
-	if s.Zettelen, err = verzeichnisse.MakeZettelen(k, st, s); err != nil {
+	if s.Zettelen, err = store_verzeichnisse.MakeZettelen(k, st, s); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -212,11 +212,11 @@ func (s Store) writeNamedZettelToIndex(tz zettel_transacted.Zettel) (err error) 
 }
 
 func (i *Store) ReadManySchwanzen(
-	ws ...verzeichnisse.Writer,
+	ws ...store_verzeichnisse.Writer,
 ) (err error) {
 	return i.Zettelen.ReadMany(
 		append(
-			[]verzeichnisse.Writer{
+			[]store_verzeichnisse.Writer{
 				i.ZettelWriterSchwanzenOnly(),
 				i.ZettelWriterFilterHidden(),
 			},

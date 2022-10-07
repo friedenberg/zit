@@ -72,8 +72,8 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 			return
 		}
 
-    mes := z.Stored.Zettel.Etiketten.MutableCopy()
-    mes.Add(e)
+		mes := z.Stored.Zettel.Etiketten.MutableCopy()
+		mes.Add(e)
 		z.Stored.Zettel.Etiketten = mes.Copy()
 		toUpdate[z.Hinweis.String()] = z
 

@@ -12,8 +12,8 @@ import (
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/echo/akten"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
-	"github.com/friedenberg/zit/src/hotel/store_objekten"
-	"github.com/friedenberg/zit/src/india/store_working_directory"
+	"github.com/friedenberg/zit/src/india/store_objekten"
+	"github.com/friedenberg/zit/src/juliett/store_working_directory"
 	"github.com/friedenberg/zit/src/juliett/zettel_printer"
 )
 

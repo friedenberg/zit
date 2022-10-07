@@ -22,8 +22,8 @@ func (es MutableSet) AddString(v string) (err error) {
 	var e Etikett
 
 	if err = e.Set(v); err != nil {
-		err = errors.Wrap(err) 
-    return
+		err = errors.Wrap(err)
+		return
 	}
 
 	es.addOnlyExact(e)
@@ -34,8 +34,8 @@ func (es MutableSet) AddString(v string) (err error) {
 func (es MutableSet) AddNormalized(e Etikett) {
 	expanded := e.Expanded(ExpanderRight{})
 	i := MakeSet(e)
-  i.open()
-  defer i.close()
+	i.open()
+	defer i.close()
 
 	for _, e := range expanded.inner {
 		if es.Contains(e) {
@@ -100,8 +100,8 @@ func (s1 MutableSet) Merge(s2 Set) {
 
 func (s1 MutableSet) Copy() (s2 Set) {
 	s2 = MakeSet()
-  s2.open()
-  defer s2.close()
+	s2.open()
+	defer s2.close()
 
 	for _, e := range s1.inner {
 		s2.addOnlyExact(e)

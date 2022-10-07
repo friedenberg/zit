@@ -14,11 +14,11 @@ type Set struct {
 }
 
 func (s *Set) open() {
-  s.closed = false
+	s.closed = false
 }
 
 func (s *Set) close() {
-  s.closed = true
+	s.closed = true
 }
 
 func (s Set) Len() int {
@@ -27,8 +27,8 @@ func (s Set) Len() int {
 
 func MakeSet(es ...Etikett) (s Set) {
 	s.inner = make(map[string]Etikett, len(es))
-  s.open()
-  defer s.close()
+	s.open()
+	defer s.close()
 
 	for _, e := range es {
 		s.addOnlyExact(e)
@@ -57,7 +57,7 @@ func MakeSetFromStrings(es ...string) (s Set, err error) {
 }
 
 func (es *Set) addOnlyExact(e Etikett) {
-  es.add(e)
+	es.add(e)
 }
 
 func (es *Set) add(e Etikett) {
@@ -160,8 +160,8 @@ func (a Set) Equals(b Set) bool {
 
 func (s1 Set) Copy() (s2 Set) {
 	s2 = MakeSet()
-  s2.open()
-  defer s2.close()
+	s2.open()
+	defer s2.close()
 
 	for _, e := range s1.inner {
 		s2.addOnlyExact(e)
@@ -182,8 +182,8 @@ func (s1 Set) MutableCopy() (s2 MutableSet) {
 
 func (s Set) Expanded(exes ...Expander) (s1 Set) {
 	s1 = MakeSet()
-  s1.open()
-  defer s1.close()
+	s1.open()
+	defer s1.close()
 
 	for _, e := range s.inner {
 		for _, e1 := range e.Expanded(exes...).inner {
@@ -289,8 +289,8 @@ func (s1 Set) Subtract(s2 Set) (s3 Set) {
 
 func (s1 Set) IntersectPrefixes(s2 Set) (s3 Set) {
 	s3 = MakeSet()
-  s3.open()
-  defer s3.close()
+	s3.open()
+	defer s3.close()
 
 	for _, e1 := range s2.inner {
 		didAdd := false
@@ -339,8 +339,8 @@ func (s1 *Set) Withdraw(e Etikett) (s2 Set) {
 
 func (s1 Set) SubtractPrefix(e Etikett) (s2 Set) {
 	s2 = MakeSet()
-  s2.open()
-  defer s2.close()
+	s2.open()
+	defer s2.close()
 
 	for _, e1 := range s1.inner {
 		e2 := e1.LeftSubtract(e)

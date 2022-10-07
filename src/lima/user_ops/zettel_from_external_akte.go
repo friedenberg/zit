@@ -11,7 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
-	"github.com/friedenberg/zit/src/hotel/store_objekten"
+	"github.com/friedenberg/zit/src/india/store_objekten"
 	"github.com/friedenberg/zit/src/kilo/umwelt"
 )
 

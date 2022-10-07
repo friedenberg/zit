@@ -5,8 +5,8 @@ type Delta struct {
 }
 
 func MakeSetDelta(s1, s2 Set) (d Delta) {
-  added := MakeMutableSet()
-  removed := s1.MutableCopy()
+	added := MakeMutableSet()
+	removed := s1.MutableCopy()
 
 	for _, e := range s2.inner {
 		if s1.Contains(e) {
@@ -19,8 +19,8 @@ func MakeSetDelta(s1, s2 Set) (d Delta) {
 		removed.Remove(e)
 	}
 
-  d.Added = added.Copy()
-  d.Removed = removed.Copy()
+	d.Added = added.Copy()
+	d.Removed = removed.Copy()
 
 	return
 }

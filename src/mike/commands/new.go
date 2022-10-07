@@ -11,7 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/typ"
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
-	"github.com/friedenberg/zit/src/india/store_working_directory"
+	"github.com/friedenberg/zit/src/juliett/store_working_directory"
 	"github.com/friedenberg/zit/src/kilo/umwelt"
 	"github.com/friedenberg/zit/src/lima/user_ops"
 )
@@ -136,8 +136,8 @@ func (c New) writeNewZettels(
 		return
 	}
 
-  mes := c.Etiketten.MutableCopy()
-  mes.Merge(defaultEtiketten)
+	mes := c.Etiketten.MutableCopy()
+	mes.Merge(defaultEtiketten)
 	c.Etiketten = mes.Copy()
 
 	z := zettel.Zettel{

@@ -4,8 +4,8 @@ type ExpanderAll struct{}
 
 func (ex ExpanderAll) Expand(e Etikett) (expanded Set) {
 	expanded = Set(newSetExpanded())
-  expanded.open()
-  defer expanded.close()
+	expanded.open()
+	defer expanded.close()
 
 	expanded.addOnlyExact(e)
 

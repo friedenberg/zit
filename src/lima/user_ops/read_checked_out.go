@@ -5,7 +5,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/delta/hinweisen"
 	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
-	"github.com/friedenberg/zit/src/india/store_working_directory"
+	"github.com/friedenberg/zit/src/juliett/store_working_directory"
 	"github.com/friedenberg/zit/src/kilo/umwelt"
 )
 
@@ -39,7 +39,7 @@ func (op ReadCheckedOut) RunOneString(
 func (op ReadCheckedOut) RunMany(
 	possible store_working_directory.CwdFiles,
 ) (results zettel_checked_out.Set, err error) {
-  results = zettel_checked_out.MakeSetUnique(possible.Len())
+	results = zettel_checked_out.MakeSetUnique(possible.Len())
 
 	for _, p := range possible.Zettelen {
 		var checked_out zettel_checked_out.Zettel
@@ -50,7 +50,7 @@ func (op ReadCheckedOut) RunMany(
 
 		if checked_out, err = op.StoreWorkingDirectory().Read(p.Zettel.Path); err != nil {
 			if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
-        errors.Print("external zettel does not exist: %s", p)
+				errors.Print("external zettel does not exist: %s", p)
 				err = nil
 			} else {
 				err = errors.Wrap(err)
@@ -59,7 +59,7 @@ func (op ReadCheckedOut) RunMany(
 
 		}
 
-    results.Add(checked_out)
+		results.Add(checked_out)
 	}
 
 	for _, p := range possible.Zettelen {
@@ -71,7 +71,7 @@ func (op ReadCheckedOut) RunMany(
 
 		if checked_out, err = op.StoreWorkingDirectory().ReadExternalZettelFromAktePath(p.Akte.Path); err != nil {
 			if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
-        errors.Print("external zettel does not exist: %s", p)
+				errors.Print("external zettel does not exist: %s", p)
 				err = nil
 			} else {
 				err = errors.Wrapf(err, "akte path: %s", p.Akte.Path)
@@ -79,7 +79,7 @@ func (op ReadCheckedOut) RunMany(
 			}
 		}
 
-    results.Add(checked_out)
+		results.Add(checked_out)
 	}
 
 	return

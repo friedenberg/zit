@@ -11,6 +11,6 @@ type Stored struct {
 }
 
 func (zs *Stored) Reset() {
-  zs.Sha = sha.Sha{}
-  zs.Zettel.Reset()
+	zs.Sha = sha.Sha{}
+	zs.Zettel.Reset()
 }

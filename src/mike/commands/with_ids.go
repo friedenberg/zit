@@ -12,7 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/typ"
 	"github.com/friedenberg/zit/src/delta/id_set"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
-	"github.com/friedenberg/zit/src/hotel/verzeichnisse"
+	store_verzeichnisse "github.com/friedenberg/zit/src/hotel/store_verzeichnisse"
 	"github.com/friedenberg/zit/src/kilo/umwelt"
 )
 
@@ -70,8 +70,8 @@ func (c commandWithIds) Complete(u *umwelt.Umwelt, args ...string) (err error) {
 			zw := zettel_named.MakeWriterComplete(os.Stdout)
 			defer zw.Close()
 
-			w := verzeichnisse.MakeWriter(
-				func(z *verzeichnisse.Zettel) (err error) {
+			w := store_verzeichnisse.MakeWriter(
+				func(z *store_verzeichnisse.Zettel) (err error) {
 					zw.WriteZettelNamed(z.Transacted.Named)
 
 					return

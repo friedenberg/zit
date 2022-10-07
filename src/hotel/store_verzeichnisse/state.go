@@ -1,4 +1,4 @@
-package verzeichnisse
+package store_verzeichnisse
 
 type State int
 
@@ -7,4 +7,3 @@ const (
 	StateRead
 	StateChanged
 )
-

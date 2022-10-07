@@ -99,8 +99,8 @@ func (a Etikett) HasParentPrefix(b Etikett) (has bool) {
 
 func (e Etikett) Expanded(exes ...Expander) (expanded Set) {
 	expanded = MakeSet()
-  expanded.open()
-  defer expanded.close()
+	expanded.open()
+	defer expanded.close()
 
 	if len(exes) == 0 {
 		exes = []Expander{ExpanderAll{}}

@@ -66,7 +66,7 @@ func (in *Text) ToCompareMap() (out CompareMap, err error) {
 }
 
 func (a *assignment) addToCompareMap(m Metadatei, es etikett.Set, out *CompareMap) (err error) {
-  mes := es.MutableCopy()
+	mes := es.MutableCopy()
 
 	var es1 etikett.Set
 
@@ -76,7 +76,7 @@ func (a *assignment) addToCompareMap(m Metadatei, es etikett.Set, out *CompareMa
 	}
 
 	mes.Merge(es1)
-  es = mes.Copy()
+	es = mes.Copy()
 
 	for z, _ := range a.named {
 		for _, e := range es.Sorted() {

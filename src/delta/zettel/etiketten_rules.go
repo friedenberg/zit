@@ -62,9 +62,9 @@ func (z *Zettel) applyGoldenChild(
 
 	sort.Slice(prefixes, sortFunc)
 
-  mes := z.Etiketten.MutableCopy()
+	mes := z.Etiketten.MutableCopy()
 	mes.Add(prefixes[0])
-  z.Etiketten = mes.Copy()
+	z.Etiketten = mes.Copy()
 
 	return
 }

@@ -11,8 +11,8 @@ import (
 	"github.com/friedenberg/zit/src/echo/zettel_stored"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 	"github.com/friedenberg/zit/src/golf/zettel_external"
-	"github.com/friedenberg/zit/src/hotel/store_objekten"
 	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
+	"github.com/friedenberg/zit/src/india/store_objekten"
 	"github.com/friedenberg/zit/src/kilo/umwelt"
 )
 

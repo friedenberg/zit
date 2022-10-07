@@ -1,4 +1,4 @@
-package verzeichnisse
+package store_verzeichnisse
 
 import (
 	"io"

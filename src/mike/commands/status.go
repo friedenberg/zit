@@ -6,9 +6,9 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/zettel"
-	"github.com/friedenberg/zit/src/hotel/store_objekten"
 	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
-	"github.com/friedenberg/zit/src/india/store_working_directory"
+	"github.com/friedenberg/zit/src/india/store_objekten"
+	"github.com/friedenberg/zit/src/juliett/store_working_directory"
 	"github.com/friedenberg/zit/src/kilo/umwelt"
 	"github.com/friedenberg/zit/src/lima/user_ops"
 )
@@ -58,7 +58,7 @@ func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-  readResults := readResultsSet.ToSlice()
+	readResults := readResultsSet.ToSlice()
 
 	sort.Slice(
 		readResults,

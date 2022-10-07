@@ -67,7 +67,7 @@ func (s *textStateRead) Close() (err error) {
 		s.readAkteSha = s.akteWriter.Sha()
 	}
 
-  s.context.Zettel.Etiketten = s.etiketten.Copy()
+	s.context.Zettel.Etiketten = s.etiketten.Copy()
 
 	return
 }

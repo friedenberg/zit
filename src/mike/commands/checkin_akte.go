@@ -23,8 +23,7 @@ func init() {
 	registerCommand(
 		"checkin-akte",
 		func(f *flag.FlagSet) Command {
-			c := &CheckinAkte{
-			}
+			c := &CheckinAkte{}
 
 			f.BoolVar(&c.Delete, "delete", false, "the checked-out file")
 			f.Var(&c.NewEtiketten, "new-etiketten", "comma-separated etiketten (will replace existing Etiketten)")

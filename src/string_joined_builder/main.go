@@ -48,5 +48,5 @@ func (b *builder) WriteString(v string) (n int, err error) {
 }
 
 func (b *builder) String() string {
-  return b.builder.String()
+	return b.builder.String()
 }

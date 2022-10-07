@@ -3,7 +3,7 @@ package zettel_printer
 import (
 	"github.com/friedenberg/zit/src/bravo/paper"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
-	"github.com/friedenberg/zit/src/india/store_working_directory"
+	"github.com/friedenberg/zit/src/juliett/store_working_directory"
 )
 
 func (p *Printer) FileUnrecognized(fu store_working_directory.File) (pa *paper.Paper) {

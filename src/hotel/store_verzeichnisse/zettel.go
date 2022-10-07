@@ -1,4 +1,4 @@
-package verzeichnisse
+package store_verzeichnisse
 
 import (
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
@@ -33,4 +33,3 @@ func (z *Zettel) Reset() {
 	z.EtikettenExpandedSorted = z.EtikettenExpandedSorted[:0]
 	z.EtikettenSorted = z.EtikettenSorted[:0]
 }
-
