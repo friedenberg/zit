@@ -10,6 +10,11 @@ import (
 func (i *Zettelen) ZettelWriterSchwanzenOnly() Writer {
 	return MakeWriter(
 		func(z *Zettel) (err error) {
+			if z.PageSelection.Reason != PageSelectionReasonHinweis {
+				err = io.EOF
+				return
+			}
+
 			ok := false
 
 			if ok, err = i.IsSchwanz(z.Transacted); err != nil {

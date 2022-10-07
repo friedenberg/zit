@@ -3,7 +3,6 @@ package store_verzeichnisse
 import (
 	"fmt"
 	"path/filepath"
-	"strconv"
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -65,31 +64,6 @@ func (i Zettelen) ValidatePageIndex(n int) (err error) {
 	return
 }
 
-func (i Zettelen) PageForHinweis(h hinweis.Hinweis) (n int) {
-	s := h.Sha()
-	ss := s.String()[:digitWidth]
-
-	var err error
-	var n1 int64
-
-	if n1, err = strconv.ParseInt(ss, 16, 64); err != nil {
-		n1 = -1
-	}
-
-	n = int(n1)
-
-	return
-}
-
-func (i Zettelen) PagesForZettelTransacted(zt zettel_transacted.Zettel) (ns []int) {
-	ns = append(
-		ns,
-		i.PageForHinweis(zt.Named.Hinweis),
-	)
-
-	return
-}
-
 func (i *Zettelen) Flush() (err error) {
 	errors.Print("flushing")
 
@@ -104,29 +78,12 @@ func (i *Zettelen) Flush() (err error) {
 }
 
 func (i *Zettelen) Add(tz zettel_transacted.Zettel) (err error) {
-	ns := i.PagesForZettelTransacted(tz)
-
-	if len(ns) < 1 {
-		err = errors.Errorf("expected at least one page value, but got none")
-		return
-	}
-
-	n := ns[0]
-
-	if err = i.ValidatePageIndex(n); err != nil {
+	if err = i.addZettelHinweis(tz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	p := i.pages[n]
-
-	z := i.pool.Get()
-	z.PageSelection.Reason = PageSelectionReasonHinweis
-	z.Transacted = tz
-	z.EtikettenExpandedSorted = tz.Named.Stored.Zettel.Etiketten.Expanded().SortedString()
-	z.EtikettenSorted = tz.Named.Stored.Zettel.Etiketten.SortedString()
-
-	if err = p.Add(z); err != nil {
+	if err = i.addZettelTransacted(tz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -143,7 +100,12 @@ func (i *Zettelen) GetPageIndexKeyValue(
 }
 
 func (i *Zettelen) ReadHinweisSchwanzen(h hinweis.Hinweis) (tz zettel_transacted.Zettel, err error) {
-	n := i.PageForHinweis(h)
+	var n int
+
+	if n, err = i.PageForHinweis(h); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if err = i.ValidatePageIndex(n); err != nil {
 		err = errors.Wrap(err)
@@ -161,9 +123,27 @@ func (i *Zettelen) ReadHinweisSchwanzen(h hinweis.Hinweis) (tz zettel_transacted
 }
 
 func (i *Zettelen) IsSchwanz(z zettel_transacted.Zettel) (ok bool, err error) {
-	n := i.PageForHinweis(z.Named.Hinweis)
+	var n int
+
+	if n, err = i.PageForHinweis(z.Named.Hinweis); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	pi := i.pages[n]
-	ok, err = pi.IsSchwanz(z)
+
+	key, value := i.GetPageIndexKeyValue(z)
+
+	if err = pi.ReadJustIndex(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	var value1 string
+
+	if value1, ok = pi.zettelenPageIndex.self[key]; ok {
+		ok = value == value1
+	}
 
 	return
 }
@@ -172,7 +152,6 @@ func (i *Zettelen) ReadMany(
 	ws ...Writer,
 ) (err error) {
 	wg := &sync.WaitGroup{}
-	wg.Add(len(i.pages))
 
 	w := writer{
 		writers:    ws,
@@ -180,6 +159,12 @@ func (i *Zettelen) ReadMany(
 	}
 
 	for n, p := range i.pages {
+		if n > 233 {
+			continue
+		}
+
+		wg.Add(1)
+
 		go func(n int, p *zettelenPageWithState) {
 			defer wg.Done()
 

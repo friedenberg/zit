@@ -3,6 +3,7 @@ package store_verzeichnisse
 import (
 	"bufio"
 	"io"
+	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
@@ -12,6 +13,7 @@ import (
 type SchwanzEntryFunc func(z zettel_transacted.Zettel) (key string, value string)
 
 type zettelenPageWithState struct {
+	sync.Locker
 	path string
 	ioFactory
 	zettelenPage
@@ -26,6 +28,7 @@ func makeZettelenPage(
 	f SchwanzEntryFunc,
 ) (p *zettelenPageWithState) {
 	p = &zettelenPageWithState{
+		Locker:    &sync.Mutex{},
 		ioFactory: iof,
 		path:      path,
 		zettelenPage: zettelenPage{
@@ -41,47 +44,31 @@ func makeZettelenPage(
 	return
 }
 
+func (zp *zettelenPageWithState) getState() State {
+	zp.Lock()
+	defer zp.Unlock()
+	return zp.State
+}
+
+func (zp *zettelenPageWithState) setState(v State) {
+	zp.Lock()
+	defer zp.Unlock()
+	zp.State = v
+}
+
 func (zp *zettelenPageWithState) Add(z *Zettel) (err error) {
 	if err = zp.ReadAll(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	zp.State = StateChanged
+	zp.setState(StateChanged)
 	zp.added = append(zp.added, z)
 
 	if z.PageSelection.Reason == PageSelectionReasonHinweis {
 		key, value := zp.schwanzEntryFunc(z.Transacted)
 
 		zp.self[key] = value
-	}
-
-	return
-}
-
-func (zpi *zettelenPageWithState) IsSchwanz(
-	z zettel_transacted.Zettel,
-) (ok bool, err error) {
-	if err = zpi.ReadAll(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	key, value := zpi.schwanzEntryFunc(z)
-
-	var value1 string
-
-	value1, ok = zpi.self[key]
-
-	switch {
-	case !ok:
-		return
-
-	case value1 != value:
-		ok = false
-
-	default:
-		ok = true
 	}
 
 	return
@@ -119,7 +106,8 @@ func (zp *zettelenPageWithState) ReadHinweis(
 }
 
 func (zp *zettelenPageWithState) Flush() (err error) {
-	if zp.State <= StateRead {
+	state := zp.getState()
+	if state <= StateRead {
 		errors.Printf("no changes: %s", zp.path)
 		return
 	} else {
@@ -184,8 +172,44 @@ func (zp *zettelenPageWithState) WriteZettelenTo(
 	return
 }
 
+func (zp *zettelenPageWithState) ReadJustIndex() (err error) {
+	state := zp.getState()
+	if state <= StateReadJustIndex {
+		errors.Printf("already read %s", zp.path)
+		return
+	} else {
+		errors.Printf("reading: %s", zp.path)
+	}
+
+	var r io.ReadCloser
+
+	if r, err = zp.ReadCloserVerzeichnisse(zp.path); err != nil {
+		if errors.IsNotExist(err) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+		}
+
+		return
+	}
+
+	defer r.Close()
+
+	r1 := bufio.NewReader(r)
+
+	if _, err = zp.zettelenPageIndex.ReadFrom(r1); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	zp.setState(StateReadJustIndex)
+
+	return
+}
+
 func (zp *zettelenPageWithState) ReadAll() (err error) {
-	if zp.State >= StateRead {
+	state := zp.getState()
+	if state <= StateRead {
 		errors.Printf("already read %s", zp.path)
 		return
 	} else {
@@ -218,7 +242,7 @@ func (zp *zettelenPageWithState) ReadAll() (err error) {
 		return
 	}
 
-	zp.State = StateRead
+	zp.setState(StateRead)
 
 	return
 }

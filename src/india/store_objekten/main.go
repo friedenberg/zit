@@ -22,7 +22,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
-	store_verzeichnisse "github.com/friedenberg/zit/src/hotel/store_verzeichnisse"
+	"github.com/friedenberg/zit/src/hotel/store_verzeichnisse"
 )
 
 type LockSmith interface {

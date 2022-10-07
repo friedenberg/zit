@@ -17,7 +17,9 @@ func (zpi *zettelenPageIndex) ReadFrom(r1 io.Reader) (n int64, err error) {
 
 	dec := gob.NewDecoder(r)
 
-	if err = dec.Decode(&zpi.self); err != nil {
+	self := make(map[string]string)
+
+	if err = dec.Decode(&self); err != nil {
 		if errors.IsEOF(err) {
 			err = nil
 		} else {
@@ -26,6 +28,8 @@ func (zpi *zettelenPageIndex) ReadFrom(r1 io.Reader) (n int64, err error) {
 
 		return
 	}
+
+	zpi.self = self
 
 	return
 }
