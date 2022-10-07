@@ -104,10 +104,3 @@ func Errf(f string, a ...interface{}) {
 		fmt.Sprintf(f, a...),
 	)
 }
-
-func Err(a ...interface{}) {
-	fmt.Fprintln(
-		os.Stderr,
-		a...,
-	)
-}

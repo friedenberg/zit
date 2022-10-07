@@ -17,16 +17,14 @@ func (zpi *zettelenPageIndex) ReadFrom(r1 io.Reader) (n int64, err error) {
 
 	dec := gob.NewDecoder(r)
 
-	for {
-		if err = dec.Decode(&zpi.self); err != nil {
-			if errors.IsEOF(err) {
-				err = nil
-				break
-			} else {
-				err = errors.Wrap(err)
-				return
-			}
+	if err = dec.Decode(&zpi.self); err != nil {
+		if errors.IsEOF(err) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
 		}
+
+		return
 	}
 
 	return

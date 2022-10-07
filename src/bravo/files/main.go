@@ -10,10 +10,12 @@ import (
 )
 
 const (
-	buffer = 35
+	buffer = 10
 )
 
 //TODO-P5 add exponential backoff for too many files open error
+//TODO move away from openFilesGuard and honor too many files open error with
+//exponential backoffs instead
 type openFilesGuard struct {
 	channel chan struct{}
 }
@@ -39,6 +41,8 @@ func init() {
 	openFilesGuardInstance = &openFilesGuard{
 		channel: make(chan struct{}, limit-buffer),
 	}
+
+	close(openFilesGuardInstance.channel)
 }
 
 func Len() int {
@@ -46,8 +50,7 @@ func Len() int {
 }
 
 func (g *openFilesGuard) Lock() {
-	g.channel <- struct{}{}
-	// logz.Caller(3, "locked: %d", len(g.channel))
+	// g.channel <- struct{}{}
 }
 
 func (g *openFilesGuard) LockN(n int) {
@@ -58,7 +61,6 @@ func (g *openFilesGuard) LockN(n int) {
 
 func (g *openFilesGuard) Unlock() {
 	<-g.channel
-	// logz.Caller(3, "unlocked %d", len(g.channel))
 }
 
 func (g *openFilesGuard) UnlockN(n int) {

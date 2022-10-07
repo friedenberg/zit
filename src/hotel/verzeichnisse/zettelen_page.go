@@ -21,7 +21,10 @@ func (zp zettelenPage) Copy(
 
 	dec := gob.NewDecoder(r)
 
+	i := 0
 	for {
+		i += 1
+
 		var tz *Zettel
 
 		if w.ZettelPool == nil {

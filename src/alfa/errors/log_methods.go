@@ -2,7 +2,7 @@ package errors
 
 import (
 	"fmt"
-	"log"
+	log_package "log"
 	"os"
 )
 
@@ -26,9 +26,9 @@ func Caller(i int, f string, vs ...interface{}) {
 
 var (
 	//TODO add native methods
-	Panic  = log.Panic
-	Output = log.Output
-	Fatal  = log.Fatal
+	Panic  = log_package.Panic
+	Output = log_package.Output
+	Fatal  = log_package.Fatal
 )
 
 func Print(vs ...interface{}) {

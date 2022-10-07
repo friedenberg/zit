@@ -11,8 +11,10 @@ import (
 type Writer struct {
 	wBuf            *bufio.Writer
 	jsonEncoder     *json.Encoder
+
 	chItem          chan *Item
 	chDone          chan struct{}
+
 	afterFirstWrite bool
 	ItemPool
 }

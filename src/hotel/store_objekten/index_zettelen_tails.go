@@ -198,7 +198,7 @@ func (i *indexZettelenTails) Read(h hinweis.Hinweis) (tz zettel_transacted.Zette
 	tz.Named.Stored.Zettel.Etiketten = tz.Named.Stored.Zettel.Etiketten.Copy()
 	var tz1 zettel_transacted.Zettel
 
-	if tz1, err = i.Zettelen.Read(h); err != nil {
+	if tz1, err = i.Zettelen.ReadHinweisSchwanzen(h); err != nil {
 		err = errors.Wrap(err)
 		return
 	} else if !tz1.Named.Equals(tz.Named) {
@@ -210,10 +210,17 @@ func (i *indexZettelenTails) Read(h hinweis.Hinweis) (tz zettel_transacted.Zette
 }
 
 func (i *indexZettelenTails) ReadManySchwanzen(
-	w verzeichnisse.Writer,
-	qs ...zettel_named.NamedFilter,
+	ws ...verzeichnisse.Writer,
 ) (err error) {
-	return i.Zettelen.ReadMany(w, qs...)
+	return i.Zettelen.ReadMany(
+		append(
+			[]verzeichnisse.Writer{
+				i.ZettelWriterSchwanzenOnly(),
+				i.ZettelWriterFilterHidden(),
+			},
+			ws...,
+		)...,
+	)
 }
 
 func (i *indexZettelenTails) ZettelenSchwanzen(

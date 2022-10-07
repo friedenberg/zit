@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"os"
 	"syscall"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -10,7 +11,8 @@ import (
 	"github.com/friedenberg/zit/src/charlie/ts"
 	"github.com/friedenberg/zit/src/charlie/typ"
 	"github.com/friedenberg/zit/src/delta/id_set"
-	"github.com/friedenberg/zit/src/golf/zettel_transacted"
+	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
+	"github.com/friedenberg/zit/src/hotel/verzeichnisse"
 	"github.com/friedenberg/zit/src/kilo/umwelt"
 )
 
@@ -64,30 +66,23 @@ func (c commandWithIds) Complete(u *umwelt.Umwelt, args ...string) (err error) {
 	ps := c.getIdProtoSet(u)
 
 	if ps.Contains(&hinweis.Hinweis{}) {
-		var zts zettel_transacted.Set
+		func() {
+			zw := zettel_named.MakeWriterComplete(os.Stdout)
+			defer zw.Close()
 
-		if zts, err = u.StoreObjekten().ZettelenSchwanzen(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+			w := verzeichnisse.MakeWriter(
+				func(z *verzeichnisse.Zettel) (err error) {
+					zw.WriteZettelNamed(z.Transacted.Named)
 
-		err = zts.Each(
-			func(zt zettel_transacted.Zettel) (err error) {
-				errors.PrintOutf(
-					"%s\tZettel: !%s %s",
-					zt.Named.Hinweis,
-					zt.Named.Stored.Zettel.Typ,
-					zt.Named.Stored.Zettel.Bezeichnung,
-				)
+					return
+				},
+			)
 
+			if err = u.StoreObjekten().ReadManySchwanzen(w); err != nil {
+				err = errors.Wrap(err)
 				return
-			},
-		)
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+			}
+		}()
 	}
 
 	if ps.Contains(&etikett.Etikett{}) {

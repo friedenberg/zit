@@ -1,6 +1,7 @@
 package verzeichnisse
 
 import (
+	"bufio"
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -8,28 +9,32 @@ import (
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 )
 
-type State int
-
-const (
-	StateUnread = State(iota)
-	StateRead
-	StateChanged
-)
+type SchwanzEntryFunc func(z zettel_transacted.Zettel) (key string, value string)
 
 type zettelenPageWithState struct {
 	path string
 	ioFactory
 	zettelenPage
+	zettelenPageIndex
+	schwanzEntryFunc SchwanzEntryFunc
 	State
 }
 
-func makeZettelenPage(iof ioFactory, path string) (p *zettelenPageWithState) {
+func makeZettelenPage(
+	iof ioFactory,
+	path string,
+	f SchwanzEntryFunc,
+) (p *zettelenPageWithState) {
 	p = &zettelenPageWithState{
 		ioFactory: iof,
 		path:      path,
 		zettelenPage: zettelenPage{
 			existing: make([]*Zettel, 0),
 			added:    make([]*Zettel, 0),
+		},
+		schwanzEntryFunc: f,
+		zettelenPageIndex: zettelenPageIndex{
+			self: make(map[string]string),
 		},
 	}
 
@@ -44,6 +49,40 @@ func (zp *zettelenPageWithState) Add(z *Zettel) (err error) {
 
 	zp.State = StateChanged
 	zp.added = append(zp.added, z)
+
+	if z.PageSelection.Reason == PageSelectionReasonHinweis {
+		key, value := zp.schwanzEntryFunc(z.Transacted)
+
+		zp.self[key] = value
+	}
+
+	return
+}
+
+func (zpi *zettelenPageWithState) IsSchwanz(
+	z zettel_transacted.Zettel,
+) (ok bool, err error) {
+	if err = zpi.ReadAll(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	key, value := zpi.schwanzEntryFunc(z)
+
+	var value1 string
+
+	value1, ok = zpi.self[key]
+
+	switch {
+	case !ok:
+		return
+
+	case value1 != value:
+		ok = false
+
+	default:
+		ok = true
+	}
 
 	return
 }
@@ -96,7 +135,16 @@ func (zp *zettelenPageWithState) Flush() (err error) {
 
 	defer errors.PanicIfError(w.Close)
 
-	if _, err = zp.WriteTo(w); err != nil {
+	w1 := bufio.NewWriter(w)
+
+	defer errors.PanicIfError(w1.Flush)
+
+	if _, err = zp.zettelenPageIndex.WriteTo(w1); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if _, err = zp.zettelenPage.WriteTo(w1); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -121,7 +169,14 @@ func (zp *zettelenPageWithState) WriteZettelenTo(
 
 	defer r.Close()
 
-	if _, err = zp.zettelenPage.Copy(r, w); err != nil {
+	r1 := bufio.NewReader(r)
+
+	if _, err = zp.zettelenPageIndex.ReadFrom(r1); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if _, err = zp.zettelenPage.Copy(r1, w); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -151,7 +206,14 @@ func (zp *zettelenPageWithState) ReadAll() (err error) {
 
 	defer r.Close()
 
-	if _, err = zp.ReadFrom(r); err != nil {
+	r1 := bufio.NewReader(r)
+
+	if _, err = zp.zettelenPageIndex.ReadFrom(r1); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if _, err = zp.zettelenPage.ReadFrom(r1); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

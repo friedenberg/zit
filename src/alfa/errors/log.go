@@ -2,7 +2,7 @@ package errors
 
 import (
 	"io/ioutil"
-	"log"
+	log_package "log"
 	"os"
 	"path/filepath"
 )
@@ -33,22 +33,16 @@ func init() {
 	var err error
 
 	if cwd, err = os.Getwd(); err != nil {
-		log.Panic(err)
+		log_package.Panic(err)
 	}
 
-	log.SetOutput(ioutil.Discard)
+	log_package.SetOutput(ioutil.Discard)
 }
 
 func SetVerbose() {
 	verbose = true
-	log.SetFlags(log.LstdFlags | log.Lshortfile | log.Lmicroseconds)
-	log.Print("verbose")
-}
-
-//TODO experiment with callerframe looping
-func SetCallDepth(d int) {
-	maxCallDepth = d
-	log.Printf("maxCallDepth: %d", maxCallDepth)
+	log_package.SetFlags(log_package.LstdFlags | log_package.Lshortfile | log_package.Lmicroseconds)
+	log_package.Print("verbose")
 }
 
 func SetTesting() {
