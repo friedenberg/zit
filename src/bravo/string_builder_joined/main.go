@@ -1,4 +1,4 @@
-package string_joined_builder
+package string_builder_joined
 
 import (
 	"strings"

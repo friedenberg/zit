@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/string_joined_builder"
+	string_builder_joined "github.com/friedenberg/zit/src/bravo/string_builder_joined"
 )
 
 type Options struct {
@@ -12,7 +12,7 @@ type Options struct {
 }
 
 func (o Options) String() string {
-	sb := string_joined_builder.Make(",")
+	sb := string_builder_joined.Make(",")
 
 	if o.GCDisabled {
 		sb.WriteString("gc_disabled")
