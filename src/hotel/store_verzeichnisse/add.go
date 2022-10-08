@@ -20,11 +20,11 @@ func (i *Zettelen) addZettelHinweis(tz zettel_transacted.Zettel) (err error) {
 
 	p := i.pages[n]
 
-	z := i.pool.Get()
-	z.PageSelection.Reason = PageSelectionReasonHinweis
-	z.Transacted = tz
-	z.EtikettenExpandedSorted = tz.Named.Stored.Zettel.Etiketten.Expanded().SortedString()
-	z.EtikettenSorted = tz.Named.Stored.Zettel.Etiketten.SortedString()
+	z := i.MakeZettel(
+		tz,
+		PageSelectionReasonHinweis,
+		"",
+	)
 
 	if err = p.Add(z); err != nil {
 		err = errors.Wrap(err)
@@ -49,15 +49,75 @@ func (i *Zettelen) addZettelTransacted(tz zettel_transacted.Zettel) (err error) 
 
 	p := i.pages[n]
 
-	z := i.pool.Get()
-	z.PageSelection.Reason = PageSelectionReasonStoredSha
-	z.Transacted = tz
-	z.EtikettenExpandedSorted = tz.Named.Stored.Zettel.Etiketten.Expanded().SortedString()
-	z.EtikettenSorted = tz.Named.Stored.Zettel.Etiketten.SortedString()
+	z := i.MakeZettel(
+		tz,
+		PageSelectionReasonStoredSha,
+		"",
+	)
 
 	if err = p.Add(z); err != nil {
 		err = errors.Wrap(err)
 		return
+	}
+
+	return
+}
+
+func (i *Zettelen) addZettelAkte(tz zettel_transacted.Zettel) (err error) {
+	var n int
+
+	if n, err = i.PageForSha(tz.Named.Stored.Zettel.Akte); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = i.ValidatePageIndex(n); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	p := i.pages[n]
+
+	z := i.MakeZettel(
+		tz,
+		PageSelectionReasonAkte,
+		"",
+	)
+
+	if err = p.Add(z); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (i *Zettelen) addZettelEtikett(tz zettel_transacted.Zettel) (err error) {
+	z := i.MakeZettel(
+		tz,
+		PageSelectionReasonEtikett,
+		"",
+	)
+
+	for _, e := range tz.Named.Stored.Zettel.Etiketten.Etiketten() {
+		var n int
+
+		if n, err = i.PageForEtikett(e); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = i.ValidatePageIndex(n); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		p := i.pages[n]
+
+		if err = p.Add(z); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return

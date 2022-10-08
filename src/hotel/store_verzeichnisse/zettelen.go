@@ -88,6 +88,16 @@ func (i *Zettelen) Add(tz zettel_transacted.Zettel) (err error) {
 		return
 	}
 
+	if err = i.addZettelAkte(tz); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = i.addZettelEtikett(tz); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	return
 }
 
