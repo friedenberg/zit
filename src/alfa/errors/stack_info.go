@@ -7,6 +7,7 @@ import (
 )
 
 type StackInfo struct {
+	function    string
 	filename    string
 	relFilename string
 	line        int
@@ -18,9 +19,15 @@ func MakeStackInfo(d int) (si StackInfo, ok bool) {
 	si.depth = d
 	si.pc, si.filename, si.line, ok = runtime.Caller(d + 1)
 
-	if ok {
-		si.filename = filepath.Clean(si.filename)
+	if !ok {
+		return
 	}
+
+	si.filename = filepath.Clean(si.filename)
+	frames := runtime.CallersFrames([]uintptr{si.pc})
+
+	frame, _ := frames.Next()
+	si.function = frame.Function
 
 	// var err error
 

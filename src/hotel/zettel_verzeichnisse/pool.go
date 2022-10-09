@@ -29,8 +29,13 @@ func (ip Pool) Get() *Zettel {
 }
 
 func (ip Pool) Put(i *Zettel) {
-	i.Reset()
+	i.Reset(nil)
 	ip.inner.Put(i)
+}
+
+func (ip Pool) WriteZettelVerzeichnisse(z *Zettel) (err error) {
+	ip.Put(z)
+	return
 }
 
 func (p Pool) MakeZettel(

@@ -75,6 +75,15 @@ func (p printer) CallerNonEmpty(i int, v interface{}) {
 	}
 }
 
+func (p printer) FunctionName(skip int) {
+	if !p.on {
+		return
+	}
+
+	st, _ := MakeStackInfo(skip + 1)
+	io.WriteString(p.f, fmt.Sprintf("%s%s\n", st, st.function))
+}
+
 func (p printer) Caller(i int, f string, vs ...interface{}) {
 	if !p.on {
 		return

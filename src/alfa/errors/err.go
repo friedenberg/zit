@@ -3,7 +3,6 @@ package errors
 import (
 	"errors"
 	"fmt"
-	"runtime"
 	"strings"
 )
 
@@ -67,39 +66,25 @@ func Errorf(f string, values ...interface{}) (err errer) {
 }
 
 func newStackWrapError(skip int) (err stackWrapError, ok bool) {
-	var (
-		pc   uintptr
-		file string
-		line int
-	)
+	var si StackInfo
 
-	pc, file, line, ok = runtime.Caller(skip + 1)
-
-	if !ok {
+	if si, ok = MakeStackInfo(skip + 1); !ok {
 		return
 	}
 
-	frames := runtime.CallersFrames([]uintptr{pc})
-
-	frame, _ := frames.Next()
-
 	err = stackWrapError{
-		Frame: frame,
-		file:  file,
-		line:  line,
+		StackInfo: si,
 	}
 
 	return
 }
 
 type stackWrapError struct {
-	runtime.Frame
-	file string
-	line int
+	StackInfo
 }
 
 func (se stackWrapError) Error() string {
-	return fmt.Sprintf("- %s\n  %s:%d", se.Frame.Function, se.file, se.line)
+	return fmt.Sprintf("- %s\n  %s:%d", se.function, se.filename, se.line)
 }
 
 func Wrap(in error) (err error) {

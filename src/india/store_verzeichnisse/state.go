@@ -4,7 +4,6 @@ type State int
 
 const (
 	StateUnread = State(iota)
-	StateReadJustHeader
-	StateRead
+	StateReadHeader
 	StateChanged
 )

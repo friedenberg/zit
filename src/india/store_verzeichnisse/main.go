@@ -6,7 +6,6 @@ import (
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/charlie/konfig"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/hotel/zettel_verzeichnisse"
@@ -20,7 +19,7 @@ type Zettelen struct {
 	path string
 	pool *zettel_verzeichnisse.Pool
 	ioFactory
-	pages [PageCount]*zettelenPageWithState
+	pages [PageCount]*Page
 }
 
 type pageId struct {
@@ -52,13 +51,17 @@ func MakeZettelen(
 	return
 }
 
+func (i Zettelen) Pool() *zettel_verzeichnisse.Pool {
+	return i.pool
+}
+
 func (i Zettelen) PageIdForIndex(n int) (pid pageId) {
 	pid.index = n
 	pid.path = filepath.Join(i.path, fmt.Sprintf("%x", n))
 	return
 }
 
-func (i Zettelen) ValidatePageIndex(n int) (err error) {
+func (i Zettelen) GetPage(n int) (p *Page, err error) {
 	switch {
 	case n > PageCount:
 		fallthrough
@@ -67,6 +70,8 @@ func (i Zettelen) ValidatePageIndex(n int) (err error) {
 		err = errors.Errorf("expected page between 0 and %d, but got %d", PageCount-1, n)
 		return
 	}
+
+	p = i.pages[n]
 
 	return
 }
@@ -92,12 +97,12 @@ func (i *Zettelen) Add(tz zettel_transacted.Zettel, v string) (err error) {
 		return
 	}
 
-	if err = i.ValidatePageIndex(n); err != nil {
+	var p *Page
+
+	if p, err = i.GetPage(n); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	p := i.pages[n]
 
 	z := i.pool.MakeZettel(tz)
 
@@ -117,29 +122,6 @@ func (i *Zettelen) GetPageIndexKeyValue(
 	return
 }
 
-func (i *Zettelen) ReadHinweisSchwanzen(h hinweis.Hinweis) (tz zettel_transacted.Zettel, err error) {
-	var n int
-
-	if n, err = i.PageForHinweis(h); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = i.ValidatePageIndex(n); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	p := i.pages[n]
-
-	if tz, err = p.ReadHinweis(h); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
 func (i *Zettelen) ReadMany(
 	ws ...zettel_verzeichnisse.Writer,
 ) (err error) {
@@ -154,7 +136,7 @@ func (i *Zettelen) ReadMany(
 
 		wg.Add(1)
 
-		go func(n int, p *zettelenPageWithState) {
+		go func(n int, p *Page) {
 			defer wg.Done()
 
 			if err = p.WriteZettelenTo(w); err != nil {

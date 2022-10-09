@@ -32,42 +32,6 @@ func MakeWriter(f WriterFunc) Writer {
 	return writerFunc(f)
 }
 
-type multiWriter struct {
-	writers []Writer
-	*Pool
-}
-
-func MakeWriterMulti(p *Pool, ws ...Writer) Writer {
-	return &multiWriter{
-		Pool:    p,
-		writers: ws,
-	}
-}
-
-func (w multiWriter) ZettelVerzeichnissePool() *Pool {
-	return w.Pool
-}
-
-func (w multiWriter) WriteZettelVerzeichnisse(z *Zettel) (err error) {
-	if w.Pool != nil {
-		defer w.Put(z)
-	}
-
-	for _, w := range w.writers {
-		if err = w.WriteZettelVerzeichnisse(z); err != nil {
-			if errors.IsEOF(err) {
-				err = nil
-			} else {
-				err = errors.Wrap(err)
-			}
-
-			return
-		}
-	}
-
-	return
-}
-
 func MakeWriterNamed(fs ...zettel_named.Writer) Writer {
 	return MakeWriter(
 		func(zt *Zettel) (err error) {

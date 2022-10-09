@@ -2,6 +2,7 @@ package store_objekten
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/charlie/konfig"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
@@ -39,17 +40,50 @@ func makeVerzeichnisseSchwanzen(
 	return
 }
 
-func (s *verzeichnisseSchwanzen) Add(tz zettel_transacted.Zettel, v string) (err error) {
+func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
+	h hinweis.Hinweis,
+) (tz zettel_transacted.Zettel, err error) {
 	var n int
 
-	if n, err = s.PageForString(v); err != nil {
+	if n, err = s.Zettelen.PageForHinweis(h); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	_ = s.headers[n].WriteZettelTransacted(&tz)
+	var found *zettel_verzeichnisse.Zettel
+	pool := s.Zettelen.Pool()
 
-	if err = s.Zettelen.Add(tz, v); err != nil {
+	w := zettel_verzeichnisse.MakeWriter(
+		func(zv *zettel_verzeichnisse.Zettel) (err error) {
+			if !zv.Transacted.Named.Hinweis.Equals(h) {
+				pool.Put(zv)
+				return
+			}
+
+			if found == nil {
+				found = zv
+				return
+			}
+
+			if zv.Transacted.Schwanz.Less(found.Transacted.Schwanz) {
+				pool.Put(zv)
+				return
+			}
+
+			found = zv
+
+			return
+		},
+	)
+
+	var p *store_verzeichnisse.Page
+
+	if p, err = s.Zettelen.GetPage(n); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = p.WriteZettelenTo(w); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
