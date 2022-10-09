@@ -2,6 +2,7 @@ package transaktion
 
 import (
 	"flag"
+	"fmt"
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -15,7 +16,12 @@ import (
 
 type Transaktion struct {
 	ts.Time
-	Objekten []Objekte
+	Objekten map[string]Objekte
+}
+
+func (t *Transaktion) AddObjekte(o Objekte) {
+  k := o.GetKey()
+  t.Objekten[k] = o
 }
 
 type Mutter [2]ts.Time
@@ -84,4 +90,8 @@ func (o *Objekte) Set(v string) (err error) {
 	}
 
 	return
+}
+
+func (o Objekte) GetKey() string {
+	return fmt.Sprintf("%s.%s", o.Gattung, o.Id)
 }

@@ -87,9 +87,10 @@ func (c Cat) etiketten(u *umwelt.Umwelt) (err error) {
 }
 
 func (c Cat) zettelen(u *umwelt.Umwelt) (err error) {
-	var all zettel_transacted.Set
+	//TODO switch to stream
+	all := zettel_transacted.MakeSetUnique(0)
 
-	if all, err = u.StoreObjekten().ZettelenSchwanzen(); err != nil {
+	if err = u.StoreObjekten().ReadAllSchwanzen(all); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -182,9 +183,10 @@ func (c Cat) hinweisen(u *umwelt.Umwelt) (err error) {
 }
 
 func (c Cat) typen(u *umwelt.Umwelt) (err error) {
-	var all zettel_transacted.Set
+	//TODO switch to stream
+	all := zettel_transacted.MakeSetUnique(0)
 
-	if all, err = u.StoreObjekten().ZettelenSchwanzen(); err != nil {
+	if err = u.StoreObjekten().ReadAllSchwanzen(all); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -1,7 +1,9 @@
 package store_objekten
 
 import (
+	"bytes"
 	"io"
+	"io/ioutil"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
@@ -89,20 +91,10 @@ func (s Store) AkteWriter() (w sha.WriteCloser, err error) {
 	return
 }
 
-type nullReadCloser struct{}
-
-func (r nullReadCloser) Read(p []byte) (n int, err error) {
-	err = io.EOF
-	return
-}
-
-func (r nullReadCloser) Close() (err error) {
-	return
-}
-
 func (s Store) AkteReader(sha sha.Sha) (r io.ReadCloser, err error) {
 	if sha.IsNull() {
-		r = nullReadCloser{}
+		//TODO move to files?
+		r = ioutil.NopCloser(bytes.NewReader(nil))
 		return
 	}
 

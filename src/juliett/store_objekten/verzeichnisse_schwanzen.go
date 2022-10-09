@@ -1,6 +1,8 @@
 package store_objekten
 
 import (
+	"io"
+
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/charlie/konfig"
@@ -60,17 +62,9 @@ func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 				return
 			}
 
-			if found == nil {
-				found = zv
-				return
-			}
-
-			if zv.Transacted.Schwanz.Less(found.Transacted.Schwanz) {
-				pool.Put(zv)
-				return
-			}
-
 			found = zv
+
+			err = io.EOF
 
 			return
 		},
@@ -87,6 +81,14 @@ func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 		err = errors.Wrap(err)
 		return
 	}
+
+	if found == nil {
+		err = ErrNotFound{Id: h}
+		return
+	}
+
+	tz = found.Transacted
+	tz.Named.Stored.Zettel.Etiketten = tz.Named.Stored.Zettel.Etiketten.Copy()
 
 	return
 }

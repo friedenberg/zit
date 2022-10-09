@@ -144,7 +144,7 @@ func (s *Store) transactedWithHead(
 
 	var previous zettel_transacted.Zettel
 
-	if previous, err = s.indexZettelenTails.Read(z.Hinweis); err == nil {
+	if previous, err = s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(z.Hinweis); err == nil {
 		tz.Mutter = previous.Schwanz
 		tz.Kopf = previous.Kopf
 	} else {
@@ -233,8 +233,7 @@ func (s *Store) addZettelToTransaktion(z zettel_named.Zettel) (tz zettel_transac
 
 	mutter[0] = tz.Mutter
 
-	s.Transaktion.Objekten = append(
-		s.Transaktion.Objekten,
+	s.Transaktion.AddObjekte(
 		transaktion.Objekte{
 			Gattung: gattung.Zettel,
 			Mutter:  mutter,

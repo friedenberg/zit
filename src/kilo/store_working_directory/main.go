@@ -298,7 +298,7 @@ func (s *Store) Read(p string) (cz zettel_checked_out.Zettel, err error) {
 			}
 		}
 
-		if cz.Internal, err = s.storeObjekten.Read(cz.External.Named.Hinweis); err != nil {
+		if cz.Internal, err = s.storeObjekten.ReadHinweisSchwanzen(cz.External.Named.Hinweis); err != nil {
 			if errors.Is(err, store_objekten.ErrNotFound{}) {
 				err = nil
 			} else {

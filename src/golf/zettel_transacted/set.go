@@ -3,6 +3,7 @@ package zettel_transacted
 import (
 	"fmt"
 	"io"
+	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
@@ -10,6 +11,7 @@ import (
 
 func MakeSetUnique(c int) Set {
 	return Set{
+		lock: &sync.RWMutex{},
 		keyFunc: func(sz Zettel) string {
 			return makeKey(
 				sz.Kopf,
@@ -25,6 +27,7 @@ func MakeSetUnique(c int) Set {
 
 func MakeSetHinweis(c int) Set {
 	return Set{
+		lock: &sync.RWMutex{},
 		keyFunc: func(sz Zettel) string {
 			return makeKey(sz.Named.Hinweis)
 		},
@@ -41,7 +44,11 @@ func (m Set) AddFrom(ch <-chan Zettel) {
 func (m Set) Get(
 	s fmt.Stringer,
 ) (tz Zettel, ok bool) {
+	m.lock.RLock()
+	defer m.lock.RUnlock()
+
 	tz, ok = m.innerMap[s.String()]
+
 	return
 }
 
@@ -52,6 +59,9 @@ func (m Set) WriteZettelTransacted(z *Zettel) (err error) {
 }
 
 func (m Set) Add(z Zettel) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
 	k := m.keyFunc(z)
 
 	if _, ok := m.innerMap[k]; ok {

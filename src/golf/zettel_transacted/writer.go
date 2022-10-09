@@ -1,5 +1,7 @@
 package zettel_transacted
 
+import "github.com/friedenberg/zit/src/foxtrot/zettel_named"
+
 type Writer interface {
 	WriteZettelTransacted(*Zettel) error
 }
@@ -14,4 +16,12 @@ func MakeWriter(f WriterFunc) writer {
 
 func (w writer) WriteZettelTransacted(z *Zettel) (err error) {
 	return WriterFunc(w)(z)
+}
+
+type WriterZettelNamed struct {
+	zettel_named.Writer
+}
+
+func (w WriterZettelNamed) WriteZettelTransacted(z *Zettel) (err error) {
+	return w.WriteZettelNamed(&z.Named)
 }

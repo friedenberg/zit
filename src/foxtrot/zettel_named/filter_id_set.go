@@ -1,6 +1,7 @@
 package zettel_named
 
 import (
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/delta/id_set"
 )
@@ -11,6 +12,8 @@ type FilterIdSet struct {
 }
 
 func (f FilterIdSet) IncludeNamedZettel(z Zettel) (ok bool) {
+	errors.Print(z.Hinweis)
+
 	needsEt := f.Set.Etiketten().Len() > 0
 	okEt := false
 

@@ -16,11 +16,9 @@ import (
 	"github.com/friedenberg/zit/src/charlie/ts"
 	"github.com/friedenberg/zit/src/delta/age_io"
 	"github.com/friedenberg/zit/src/delta/hinweisen"
-	"github.com/friedenberg/zit/src/delta/id_set"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/delta/transaktion"
 	"github.com/friedenberg/zit/src/delta/zettel"
-	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/hotel/zettel_verzeichnisse"
 	"github.com/friedenberg/zit/src/india/store_verzeichnisse"
@@ -43,7 +41,7 @@ type Store struct {
 	zettelTransactedPrinter ZettelTransactedPrinter
 	hinweisen               *hinweisen.Hinweisen
 	*indexZettelen
-	*indexZettelenTails
+	// *indexZettelenTails
 	*indexEtiketten
 	*indexKennung
 	*indexAbbr
@@ -82,12 +80,6 @@ func Make(
 		err = errors.Wrap(err)
 		return
 	}
-
-	s.indexZettelenTails, err = newIndexZettelenTails(
-		k,
-		st.FileVerzeichnisseZettelenSchwanzen(),
-		s,
-	)
 
 	s.indexZettelen, err = newIndexZettelen(
 		st.FileVerzeichnisseZettelen(),
@@ -132,6 +124,7 @@ func Make(
 	}
 
 	s.Transaktion.Time = ts.Now()
+	s.Transaktion.Objekten = make(map[string]transaktion.Objekte)
 
 	return
 }
@@ -185,10 +178,10 @@ func (s Store) writeNamedZettelToIndex(tz zettel_transacted.Zettel) (err error) 
 
 	errors.Printf("writing zettel to index: %s", tz.Named)
 
-	if err = s.indexZettelenTails.add(tz); err != nil {
-		err = errors.Wrapf(err, "failed to write zettel to index: %s", tz.Named)
-		return
-	}
+	// if err = s.indexZettelenTails.add(tz); err != nil {
+	// 	err = errors.Wrapf(err, "failed to write zettel to index: %s", tz.Named)
+	// 	return
+	// }
 
 	if err = s.verzeichnisseSchwanzen.Add(tz, tz.Named.Hinweis.String()); err != nil {
 		err = errors.Wrap(err)
@@ -236,22 +229,27 @@ func (i *Store) ReadManySchwanzen(
 	)
 }
 
-func (s Store) ReadMany(is id_set.Set) (zts zettel_transacted.Set, err error) {
-	zts = zettel_transacted.MakeSetUnique(is.Len())
+func (s Store) ReadHinweisSchwanzen(
+	h hinweis.Hinweis,
+) (zv zettel_transacted.Zettel, err error) {
+	return s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(h)
+}
 
-	//TODO make this more performant?
-	return s.indexZettelenTails.ZettelenSchwanzen(
-		zettel_named.FilterIdSet{
-			//TODO add support for and
-			Set: is,
-		},
-	)
+func (s Store) ReadAllSchwanzen(ws ...zettel_transacted.Writer) (err error) {
+	w := zettel_verzeichnisse.WriterZettelTransacted{
+		Writer: zettel_transacted.MakeWriterMulti(
+			nil,
+			ws...,
+		),
+	}
+
+	return s.verzeichnisseSchwanzen.Zettelen.ReadMany(w)
 }
 
 func (s Store) ReadOne(i id.Id) (tz zettel_transacted.Zettel, err error) {
 	switch tid := i.(type) {
 	case hinweis.Hinweis:
-		if tz, err = s.indexZettelenTails.Read(tid); err != nil {
+		if tz, err = s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(tid); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -392,7 +390,7 @@ func (s *Store) Update(
 
 	var mutter zettel_transacted.Zettel
 
-	if mutter, err = s.Read(h); err != nil {
+	if mutter, err = s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(h); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -524,11 +522,6 @@ func (s Store) Flush() (err error) {
 		return
 	}
 
-	if err = s.indexZettelenTails.Flush(); err != nil {
-		err = errors.Wrapf(err, "failed to flush new zettel index")
-		return
-	}
-
 	if err = s.indexZettelen.Flush(); err != nil {
 		err = errors.Wrapf(err, "failed to flush new zettel index")
 		return
@@ -574,7 +567,7 @@ func (s *Store) ReadHinweisAt(
 ) (tz zettel_transacted.Zettel, err error) {
 	if h.Index < 0 {
 		errors.PrintDebug(h)
-		return s.indexZettelenTails.Read(h.Hinweis)
+		return s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(h.Hinweis)
 	}
 
 	var chain zettel_transacted.Slice
@@ -674,27 +667,6 @@ func (s *Store) Reindex() (err error) {
 			}
 		}
 	}
-
-	if err = s.indexZettelenTails.Flush(); err != nil {
-		err = errors.Wrapf(err, "failed to flush new zettel index")
-		return
-	}
-
-	var tails zettel_transacted.Set
-
-	if tails, err = s.ZettelenSchwanzen(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	errors.Printf("tail count: %d", tails.Len())
-
-	tails.Each(
-		func(zt zettel_transacted.Zettel) (err error) {
-			s.indexEtiketten.add(zt.Named.Stored.Zettel.Etiketten)
-			return
-		},
-	)
 
 	return
 }

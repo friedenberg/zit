@@ -130,10 +130,6 @@ func (i *Zettelen) ReadMany(
 	w := zettel_verzeichnisse.MakeWriterMulti(i.pool, ws...)
 
 	for n, p := range i.pages {
-		if n > 233 {
-			continue
-		}
-
 		wg.Add(1)
 
 		go func(n int, p *Page) {
@@ -142,6 +138,10 @@ func (i *Zettelen) ReadMany(
 			if err = p.WriteZettelenTo(w); err != nil {
 				err = errors.Wrap(err)
 				return
+			}
+
+			if err != nil {
+				errors.Printf("error reading page: %d: %s", n, err)
 			}
 		}(n, p)
 	}

@@ -76,13 +76,11 @@ func (zp *Page) Add(z *zettel_verzeichnisse.Zettel) (err error) {
 }
 
 func (zp *Page) Flush() (err error) {
-	state := zp.getState()
-	if state < StateChanged {
-		errors.Printf("no changes: %s", zp.path)
+	if zp.getState() < StateChanged {
 		return
-	} else {
-		errors.Printf("flushing: %s", zp.path)
 	}
+
+	errors.Printf("flushing page: %s", zp.path)
 
 	var w io.WriteCloser
 
@@ -118,6 +116,8 @@ func (zp *Page) WriteZettelenTo(
 	w zettel_verzeichnisse.Writer,
 ) (err error) {
 	var r io.ReadCloser
+
+	errors.Printf("reading page: %s", zp.path)
 
 	if r, err = zp.ReadCloserVerzeichnisse(zp.path); err != nil {
 		if errors.IsNotExist(err) {
@@ -221,7 +221,12 @@ func (zp *Page) Copy(
 		}
 
 		if err = w.WriteZettelVerzeichnisse(tz); err != nil {
-			err = errors.Wrap(err)
+			if errors.IsEOF(err) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+			}
+
 			return
 		}
 	}
@@ -231,7 +236,12 @@ func (zp *Page) Copy(
 		z1.Reset(z)
 
 		if err = w.WriteZettelVerzeichnisse(z1); err != nil {
-			err = errors.Wrap(err)
+			if errors.IsEOF(err) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+			}
+
 			return
 		}
 	}

@@ -140,14 +140,24 @@ func (c *Organize) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 		return
 	}
 
-	var getResults zettel_transacted.Set
+	getResults := zettel_transacted.MakeSetUnique(0)
 
 	query := zettel_named.FilterIdSet{
 		Set: ids,
 		Or:  c.Or,
 	}
 
-	if getResults, err = u.StoreObjekten().ZettelenSchwanzen(query); err != nil {
+	w := zettel_transacted.MakeWriterMulti(
+		nil,
+		zettel_transacted.WriterZettelNamed{
+			Writer: zettel_named.WriterFilter{
+				NamedFilter: query,
+			},
+		},
+		getResults,
+	)
+
+	if err = u.StoreObjekten().ReadAllSchwanzen(w); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

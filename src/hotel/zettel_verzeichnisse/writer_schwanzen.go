@@ -75,6 +75,8 @@ func (zws *WriterSchwanzen) Set(z *zettel_transacted.Zettel) (ok bool) {
 		if t1.Sha.Equals(sh) {
 			ok = true
 		} else {
+			errors.Err().Print("zettel schwanz exists with more than one sha in the same transaction")
+			//TODO this should be logged as it's a data consistency error
 			//This fixes an issue where some transactions have zettels appear more than
 			//once
 			ok = false
@@ -103,7 +105,9 @@ func (zws *WriterSchwanzen) WriteZettelTransacted(
 func (zws *WriterSchwanzen) WriteZettelVerzeichnisse(
 	z *Zettel,
 ) (err error) {
-	return zws.WriteZettelTransacted(&z.Transacted)
+	err = zws.WriteZettelTransacted(&z.Transacted)
+
+	return
 }
 
 func (zws *WriterSchwanzen) ReadFrom(r1 io.Reader) (n int64, err error) {

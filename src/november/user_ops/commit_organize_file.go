@@ -53,7 +53,7 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 		if z, ok = toUpdate[h.String()]; !ok {
 			var tz zettel_transacted.Zettel
 
-			if tz, err = store.Read(h); err != nil {
+			if tz, err = store.ReadHinweisSchwanzen(h); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

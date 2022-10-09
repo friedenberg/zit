@@ -36,7 +36,7 @@ func MakeWriterNamed(fs ...zettel_named.Writer) Writer {
 	return MakeWriter(
 		func(zt *Zettel) (err error) {
 			for _, q := range fs {
-				if err = q.WriteZettelNamed(zt.Transacted.Named); err != nil {
+				if err = q.WriteZettelNamed(&zt.Transacted.Named); err != nil {
 					if errors.IsEOF(err) {
 						break
 					} else {

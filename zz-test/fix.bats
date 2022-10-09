@@ -90,9 +90,9 @@ function commits_no_changes { # @test
 	} >"$expected_organize"
 
 	run "${cmd_zit_organize[@]}" \
-    -mode commit-directly \
+		-mode commit-directly \
 		-group-by project \
-    project-22q3-purchases \
+		project-22q3-purchases \
 		<"$expected_organize"
 
 	expected="$(mktemp)"

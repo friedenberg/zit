@@ -14,6 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/id_set"
 	"github.com/friedenberg/zit/src/delta/transaktion"
 	"github.com/friedenberg/zit/src/delta/zettel"
+	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/mike/umwelt"
 )
@@ -108,9 +109,20 @@ func (c Show) RunWithIds(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 }
 
 func (c Show) showZettels(store *umwelt.Umwelt, ids id_set.Set) (err error) {
-	var zts zettel_transacted.Set
+	zts := zettel_transacted.MakeSetUnique(0)
+	w := zettel_transacted.MakeWriterMulti(
+		nil,
+		zettel_transacted.WriterZettelNamed{
+			Writer: zettel_named.WriterFilter{
+				NamedFilter: zettel_named.FilterIdSet{
+					Set: ids,
+				},
+			},
+		},
+		zts,
+	)
 
-	if zts, err = store.StoreObjekten().ReadMany(ids); err != nil {
+	if err = store.StoreObjekten().ReadAllSchwanzen(w); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

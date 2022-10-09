@@ -3,11 +3,13 @@ package zettel_transacted
 import (
 	"fmt"
 	"strings"
+	"sync"
 )
 
 type SetKeyFunc func(Zettel) string
 
 type Set struct {
+	lock     *sync.RWMutex
 	keyFunc  SetKeyFunc
 	innerMap map[string]Zettel
 }

@@ -1,5 +1,5 @@
 package zettel_named
 
 type Writer interface {
-	WriteZettelNamed(Zettel) (err error)
+	WriteZettelNamed(*Zettel) (err error)
 }

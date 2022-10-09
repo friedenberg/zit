@@ -36,7 +36,7 @@ func (s Store) ReadExternalZettelFromAktePath(p string) (cz zettel_checked_out.Z
 		return
 	}
 
-	if cz.Internal, err = s.storeObjekten.Read(cz.External.Named.Hinweis); err != nil {
+	if cz.Internal, err = s.storeObjekten.ReadHinweisSchwanzen(cz.External.Named.Hinweis); err != nil {
 		if errors.Is(err, store_objekten.ErrNotFound{}) {
 			err = nil
 		} else {

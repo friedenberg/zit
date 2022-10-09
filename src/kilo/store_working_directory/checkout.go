@@ -20,9 +20,15 @@ func (s *Store) Checkout(
 	query zettel_named.NamedFilter,
 ) (zcs zettel_checked_out.Set, err error) {
 	zcs = zettel_checked_out.MakeSetUnique(0)
-	var zts zettel_transacted.Set
+	zts := zettel_transacted.MakeSetUnique(0)
 
-	if zts, err = s.storeObjekten.ZettelenSchwanzen(query); err != nil {
+	w := zettel_transacted.WriterZettelNamed{
+		Writer: zettel_named.WriterFilter{
+			NamedFilter: query,
+		},
+	}
+
+	if err = s.storeObjekten.ReadAllSchwanzen(w, zts); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -49,7 +49,7 @@ func (c Copy) RunWithIds(s *umwelt.Umwelt, ids id_set.Set) (err error) {
 	for i, h := range hins {
 		var tz zettel_transacted.Zettel
 
-		if tz, err = s.StoreObjekten().Read(h); err != nil {
+		if tz, err = s.StoreObjekten().ReadHinweisSchwanzen(h); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

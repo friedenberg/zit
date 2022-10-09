@@ -20,6 +20,8 @@ type readState struct {
 func (r *Reader) ReadFrom(r1 io.Reader) (n int64, err error) {
 	br := bufio.NewReader(r1)
 
+	r.Transaktion.Objekten = make(map[string]Objekte)
+
 	for {
 		var line string
 
@@ -53,7 +55,23 @@ func (r *Reader) ReadFrom(r1 io.Reader) (n int64, err error) {
 				return
 			}
 
-			r.Transaktion.Objekten = append(r.Transaktion.Objekten, o)
+			k := o.GetKey()
+			o1, ok := r.Transaktion.Objekten[k]
+
+			if ok {
+				errors.Err().Printf(
+					"Transation %s has duplicate entries:  (%s %s %s) & (%s %s %s)",
+					r.Transaktion,
+					o1.Gattung,
+					o1.Id,
+					o1.Sha,
+					o.Gattung,
+					o.Id,
+					o.Sha,
+				)
+			}
+
+			r.Transaktion.Objekten[k] = o
 		}
 
 		r.readState.lineNo += 1
