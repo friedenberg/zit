@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/alfred"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
-	"github.com/friedenberg/zit/src/zettel_verzeichnisse"
+	"github.com/friedenberg/zit/src/hotel/zettel_verzeichnisse"
 )
 
 func (w *Writer) zettelToItem(z *zettel_verzeichnisse.Zettel, ha hinweis.Abbr) (a *alfred.Item) {

@@ -5,7 +5,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/friedenberg/zit/src/mike/commands"
+	"github.com/friedenberg/zit/src/oscar/commands"
 )
 
 func main() {
