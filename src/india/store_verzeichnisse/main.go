@@ -126,24 +126,34 @@ func (i *Zettelen) ReadMany(
 	ws ...zettel_verzeichnisse.Writer,
 ) (err error) {
 	wg := &sync.WaitGroup{}
+	ch := make(chan struct{}, PageCount)
 
 	w := zettel_verzeichnisse.MakeWriterMulti(i.pool, ws...)
 
 	for n, p := range i.pages {
 		wg.Add(1)
 
-		go func(n int, p *Page) {
+		go func(n int, p *Page, openFileCh chan struct{}) {
 			defer wg.Done()
+			defer func(c chan<- struct{}) {
+				openFileCh <- struct{}{}
+			}(openFileCh)
 
-			if err = p.WriteZettelenTo(w); err != nil {
-				err = errors.Wrap(err)
-				return
+			for {
+				if err = p.WriteZettelenTo(w); err != nil {
+					if errors.IsTooManyOpenFiles(err) {
+						<-openFileCh
+						continue
+					}
+
+					err = errors.Wrap(err)
+					return
+				}
+
+				break
 			}
 
-			if err != nil {
-				errors.Printf("error reading page: %d: %s", n, err)
-			}
-		}(n, p)
+		}(n, p, ch)
 	}
 
 	wg.Wait()

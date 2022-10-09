@@ -9,19 +9,24 @@ import (
 
 type WriterComplete struct {
 	wBuf     *bufio.Writer
-	chZettel chan *Zettel
+	chZettel chan Zettel
 	chDone   chan struct{}
 }
 
 func MakeWriterComplete(w io.Writer) WriterComplete {
 	w1 := WriterComplete{
-		chZettel: make(chan *Zettel),
+		chZettel: make(chan Zettel),
 		chDone:   make(chan struct{}),
 		wBuf:     bufio.NewWriter(w),
 	}
 
 	go func(s *WriterComplete) {
 		for z := range s.chZettel {
+			if z.Hinweis.String() == "/" {
+				errors.Err().Printf("empty: %#v", z)
+				continue
+			}
+
 			//TODO handle errors
 			s.wBuf.WriteString(z.Hinweis.String())
 			s.wBuf.WriteString("\tZettel: !")
@@ -42,7 +47,7 @@ func (w *WriterComplete) WriteZettelNamed(z *Zettel) (err error) {
 	case <-w.chDone:
 		err = io.EOF
 
-	case w.chZettel <- z:
+	case w.chZettel <- *z:
 	}
 
 	return

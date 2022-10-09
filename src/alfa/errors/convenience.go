@@ -34,6 +34,11 @@ func Is(err, target error) bool {
 	return errors.Is(e, target)
 }
 
+func IsTooManyOpenFiles(err error) bool {
+	e := Unwrap(err)
+	return e.Error() == "too many open files"
+}
+
 func IsEOF(err error) bool {
 	return Is(err, io.EOF)
 }
