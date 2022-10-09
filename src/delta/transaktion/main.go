@@ -20,8 +20,25 @@ type Transaktion struct {
 }
 
 func (t *Transaktion) AddObjekte(o Objekte) {
-  k := o.GetKey()
-  t.Objekten[k] = o
+	k := o.GetKey()
+
+	o1, ok := t.Objekten[k]
+
+	if ok {
+    //TODO migrate to a hard fail here
+		errors.Printf(
+			"Transaktion %s has duplicate entries: (%s %s %s) & (%s %s %s)",
+			t.Time,
+			o1.Gattung,
+			o1.Id,
+			o1.Sha,
+			o.Gattung,
+			o.Id,
+			o.Sha,
+		)
+	}
+
+	t.Objekten[k] = o
 }
 
 type Mutter [2]ts.Time

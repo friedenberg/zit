@@ -55,23 +55,7 @@ func (r *Reader) ReadFrom(r1 io.Reader) (n int64, err error) {
 				return
 			}
 
-			k := o.GetKey()
-			o1, ok := r.Transaktion.Objekten[k]
-
-			if ok {
-				errors.Err().Printf(
-					"Transation %s has duplicate entries:  (%s %s %s) & (%s %s %s)",
-					r.Transaktion,
-					o1.Gattung,
-					o1.Id,
-					o1.Sha,
-					o.Gattung,
-					o.Id,
-					o.Sha,
-				)
-			}
-
-			r.Transaktion.Objekten[k] = o
+      r.Transaktion.AddObjekte(o)
 		}
 
 		r.readState.lineNo += 1

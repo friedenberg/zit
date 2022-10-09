@@ -41,7 +41,6 @@ type Store struct {
 	zettelTransactedPrinter ZettelTransactedPrinter
 	hinweisen               *hinweisen.Hinweisen
 	*indexZettelen
-	// *indexZettelenTails
 	*indexEtiketten
 	*indexKennung
 	*indexAbbr
@@ -177,11 +176,6 @@ func (s Store) writeNamedZettelToIndex(tz zettel_transacted.Zettel) (err error) 
 	}
 
 	errors.Printf("writing zettel to index: %s", tz.Named)
-
-	// if err = s.indexZettelenTails.add(tz); err != nil {
-	// 	err = errors.Wrapf(err, "failed to write zettel to index: %s", tz.Named)
-	// 	return
-	// }
 
 	if err = s.verzeichnisseSchwanzen.Add(tz, tz.Named.Hinweis.String()); err != nil {
 		err = errors.Wrap(err)
