@@ -1,4 +1,4 @@
-package store_verzeichnisse
+package zettel_verzeichnisse
 
 import (
 	"io"
@@ -32,13 +32,24 @@ func MakeWriter(f WriterFunc) Writer {
 	return writerFunc(f)
 }
 
-type writer struct {
+type multiWriter struct {
 	writers []Writer
-	*ZettelPool
+	*Pool
 }
 
-func (w writer) WriteZettelVerzeichnisse(z *Zettel) (err error) {
-	if w.ZettelPool != nil {
+func MakeWriterMulti(p *Pool, ws ...Writer) Writer {
+	return &multiWriter{
+		Pool:    p,
+		writers: ws,
+	}
+}
+
+func (w multiWriter) ZettelVerzeichnissePool() *Pool {
+	return w.Pool
+}
+
+func (w multiWriter) WriteZettelVerzeichnisse(z *Zettel) (err error) {
+	if w.Pool != nil {
 		defer w.Put(z)
 	}
 
@@ -55,6 +66,25 @@ func (w writer) WriteZettelVerzeichnisse(z *Zettel) (err error) {
 	}
 
 	return
+}
+
+func MakeWriterNamed(fs ...zettel_named.Writer) Writer {
+	return MakeWriter(
+		func(zt *Zettel) (err error) {
+			for _, q := range fs {
+				if err = q.WriteZettelNamed(zt.Transacted.Named); err != nil {
+					if errors.IsEOF(err) {
+						break
+					} else {
+						err = errors.Wrap(err)
+						return
+					}
+				}
+			}
+
+			return
+		},
+	)
 }
 
 func MakeWriterNamedFilters(fs ...zettel_named.NamedFilter) Writer {

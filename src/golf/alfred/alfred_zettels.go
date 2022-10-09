@@ -7,10 +7,10 @@ import (
 	"github.com/friedenberg/zit/src/bravo/alfred"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
-	store_verzeichnisse "github.com/friedenberg/zit/src/hotel/store_verzeichnisse"
+	"github.com/friedenberg/zit/src/zettel_verzeichnisse"
 )
 
-func (w *Writer) zettelToItem(z *store_verzeichnisse.Zettel, ha hinweis.Abbr) (a *alfred.Item) {
+func (w *Writer) zettelToItem(z *zettel_verzeichnisse.Zettel, ha hinweis.Abbr) (a *alfred.Item) {
 	a = w.alfredWriter.Get()
 
 	a.Title = z.Transacted.Named.Stored.Zettel.Bezeichnung.String()

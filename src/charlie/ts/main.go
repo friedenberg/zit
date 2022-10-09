@@ -5,7 +5,7 @@ import (
 	"io"
 	"strconv"
 	"strings"
-	"time"
+	tyme "time"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/sha"
@@ -16,12 +16,14 @@ const (
 )
 
 type Time struct {
-	time.Time
+	time
 }
+
+type time = tyme.Time
 
 func Now() Time {
 	return Time{
-		Time: time.Now(),
+		time: tyme.Now(),
 	}
 }
 
@@ -37,7 +39,7 @@ func (t *Time) Set(v string) (err error) {
 		return
 	}
 
-	t.Time = time.Unix(n, 0)
+	t.time = tyme.Unix(n, 0)
 
 	return
 }
@@ -62,6 +64,7 @@ func (t Time) Sha() sha.Sha {
 }
 
 func (t Time) MarshalText() (text []byte, err error) {
+	errors.Err().Printf(t.String())
 	text = []byte(t.String())
 
 	return
@@ -73,6 +76,10 @@ func (t *Time) UnmarshalText(text []byte) (err error) {
 	}
 
 	return
+}
+
+func (t Time) Equals(t1 Time) bool {
+	return t.Unix() == t1.Unix()
 }
 
 func (t Time) Less(t1 Time) bool {

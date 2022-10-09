@@ -12,8 +12,8 @@ import (
 	"github.com/friedenberg/zit/src/charlie/typ"
 	"github.com/friedenberg/zit/src/delta/id_set"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
-	store_verzeichnisse "github.com/friedenberg/zit/src/hotel/store_verzeichnisse"
 	"github.com/friedenberg/zit/src/kilo/umwelt"
+	"github.com/friedenberg/zit/src/zettel_verzeichnisse"
 )
 
 type CommandWithIds interface {
@@ -70,13 +70,7 @@ func (c commandWithIds) Complete(u *umwelt.Umwelt, args ...string) (err error) {
 			zw := zettel_named.MakeWriterComplete(os.Stdout)
 			defer zw.Close()
 
-			w := store_verzeichnisse.MakeWriter(
-				func(z *store_verzeichnisse.Zettel) (err error) {
-					zw.WriteZettelNamed(z.Transacted.Named)
-
-					return
-				},
-			)
+			w := zettel_verzeichnisse.MakeWriterNamed(&zw)
 
 			if err = u.StoreObjekten().ReadManySchwanzen(w); err != nil {
 				err = errors.Wrap(err)

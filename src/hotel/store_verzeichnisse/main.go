@@ -8,56 +8,63 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/charlie/konfig"
-	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
+	"github.com/friedenberg/zit/src/zettel_verzeichnisse"
 )
 
-const digitWidth = 2
-const pageCount = 1 << (digitWidth * 4)
+const DigitWidth = 2
+const PageCount = 1 << (DigitWidth * 4)
 
 type Zettelen struct {
 	konfig.Konfig
 	path string
-	pool ZettelPool
+	pool *zettel_verzeichnisse.Pool
 	ioFactory
-	pages [pageCount]*zettelenPageWithState
+	pages [PageCount]*zettelenPageWithState
+}
+
+type pageId struct {
+	index int
+	path  string
 }
 
 func MakeZettelen(
 	k konfig.Konfig,
-	s standort.Standort,
+	dir string,
 	f ioFactory,
+	p *zettel_verzeichnisse.Pool,
 ) (i *Zettelen, err error) {
 	i = &Zettelen{
 		Konfig:    k,
-		path:      s.DirVerzeichnisseZettelenNeue(),
+		path:      dir,
 		ioFactory: f,
-		pool:      MakeZettelPool(),
+		pool:      p,
 	}
 
 	for n, _ := range i.pages {
 		i.pages[n] = makeZettelenPage(
-			i,
-			i.PathForPage(n),
-			i.GetPageIndexKeyValue,
+			f,
+			i.PageIdForIndex(n),
+			p,
 		)
 	}
 
 	return
 }
 
-func (i Zettelen) PathForPage(n int) (p string) {
-	p = filepath.Join(i.path, fmt.Sprintf("%x", n))
+func (i Zettelen) PageIdForIndex(n int) (pid pageId) {
+	pid.index = n
+	pid.path = filepath.Join(i.path, fmt.Sprintf("%x", n))
 	return
 }
 
 func (i Zettelen) ValidatePageIndex(n int) (err error) {
 	switch {
-	case n > pageCount:
+	case n > PageCount:
 		fallthrough
 
 	case n < 0:
-		err = errors.Errorf("expected page between 0 and %d, but got %d", pageCount-1, n)
+		err = errors.Errorf("expected page between 0 and %d, but got %d", PageCount-1, n)
 		return
 	}
 
@@ -77,23 +84,24 @@ func (i *Zettelen) Flush() (err error) {
 	return
 }
 
-func (i *Zettelen) Add(tz zettel_transacted.Zettel) (err error) {
-	if err = i.addZettelHinweis(tz); err != nil {
+func (i *Zettelen) Add(tz zettel_transacted.Zettel, v string) (err error) {
+	var n int
+
+	if n, err = i.PageForString(v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = i.addZettelTransacted(tz); err != nil {
+	if err = i.ValidatePageIndex(n); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = i.addZettelAkte(tz); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	p := i.pages[n]
 
-	if err = i.addZettelEtikett(tz); err != nil {
+	z := i.pool.MakeZettel(tz)
+
+	if err = p.Add(z); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -132,41 +140,12 @@ func (i *Zettelen) ReadHinweisSchwanzen(h hinweis.Hinweis) (tz zettel_transacted
 	return
 }
 
-func (i *Zettelen) IsSchwanz(z zettel_transacted.Zettel) (ok bool, err error) {
-	var n int
-
-	if n, err = i.PageForHinweis(z.Named.Hinweis); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	pi := i.pages[n]
-
-	key, value := i.GetPageIndexKeyValue(z)
-
-	if err = pi.ReadJustIndex(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	var value1 string
-
-	if value1, ok = pi.zettelenPageIndex.self[key]; ok {
-		ok = value == value1
-	}
-
-	return
-}
-
 func (i *Zettelen) ReadMany(
-	ws ...Writer,
+	ws ...zettel_verzeichnisse.Writer,
 ) (err error) {
 	wg := &sync.WaitGroup{}
 
-	w := writer{
-		writers:    ws,
-		ZettelPool: &i.pool,
-	}
+	w := zettel_verzeichnisse.MakeWriterMulti(i.pool, ws...)
 
 	for n, p := range i.pages {
 		if n > 233 {

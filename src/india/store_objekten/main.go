@@ -23,6 +23,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/hotel/store_verzeichnisse"
+	"github.com/friedenberg/zit/src/zettel_verzeichnisse"
 )
 
 type LockSmith interface {
@@ -47,7 +48,8 @@ type Store struct {
 	*indexKennung
 	*indexAbbr
 
-	*store_verzeichnisse.Zettelen
+	verzeichnisseSchwanzen *verzeichnisseSchwanzen
+	verzeichnisseAll       *store_verzeichnisse.Zettelen
 
 	transaktion.Transaktion
 }
@@ -57,7 +59,7 @@ func Make(
 	a age.Age,
 	k konfig.Konfig,
 	st standort.Standort,
-	p zettel_transacted.Pool,
+	p *zettel_verzeichnisse.Pool,
 ) (s *Store, err error) {
 	s = &Store{
 		lockSmith: lockSmith,
@@ -71,7 +73,12 @@ func Make(
 		return
 	}
 
-	if s.Zettelen, err = store_verzeichnisse.MakeZettelen(k, st, s); err != nil {
+	if s.verzeichnisseSchwanzen, err = makeVerzeichnisseSchwanzen(k, st, s, p); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if s.verzeichnisseAll, err = store_verzeichnisse.MakeZettelen(k, st.DirVerzeichnisseZettelenNeue(), s, p); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -183,7 +190,12 @@ func (s Store) writeNamedZettelToIndex(tz zettel_transacted.Zettel) (err error) 
 		return
 	}
 
-	if err = s.Zettelen.Add(tz); err != nil {
+	if err = s.verzeichnisseSchwanzen.Add(tz, tz.Named.Hinweis.String()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.verzeichnisseAll.Add(tz, tz.Named.Stored.Sha.String()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -212,13 +224,12 @@ func (s Store) writeNamedZettelToIndex(tz zettel_transacted.Zettel) (err error) 
 }
 
 func (i *Store) ReadManySchwanzen(
-	ws ...store_verzeichnisse.Writer,
+	ws ...zettel_verzeichnisse.Writer,
 ) (err error) {
-	return i.Zettelen.ReadMany(
+	return i.verzeichnisseSchwanzen.ReadMany(
 		append(
-			[]store_verzeichnisse.Writer{
-				i.ZettelWriterSchwanzenOnly(),
-				i.ZettelWriterFilterHidden(),
+			[]zettel_verzeichnisse.Writer{
+				zettel_verzeichnisse.MakeWriterKonfig(i.konfig),
 			},
 			ws...,
 		)...,
@@ -503,7 +514,12 @@ func (s Store) Flush() (err error) {
 		return
 	}
 
-	if err = s.Zettelen.Flush(); err != nil {
+	if err = s.verzeichnisseSchwanzen.Flush(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.verzeichnisseAll.Flush(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -605,6 +621,11 @@ func (s *Store) Reindex() (err error) {
 	}
 
 	if err = os.MkdirAll(s.standort.DirVerzeichnisseZettelenNeue(), os.ModeDir|0755); err != nil {
+		err = errors.Wrapf(err, "failed to make verzeichnisse dir")
+		return
+	}
+
+	if err = os.MkdirAll(s.standort.DirVerzeichnisseZettelenNeueSchwanzen(), os.ModeDir|0755); err != nil {
 		err = errors.Wrapf(err, "failed to make verzeichnisse dir")
 		return
 	}

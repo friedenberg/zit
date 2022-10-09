@@ -7,8 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/alfred"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
-	"github.com/friedenberg/zit/src/golf/zettel_transacted"
-	store_verzeichnisse "github.com/friedenberg/zit/src/hotel/store_verzeichnisse"
+	"github.com/friedenberg/zit/src/zettel_verzeichnisse"
 )
 
 type Writer struct {
@@ -16,7 +15,7 @@ type Writer struct {
 	hinweis.Abbr
 }
 
-func New(out io.Writer, ha hinweis.Abbr, zp zettel_transacted.Pool) (w *Writer, err error) {
+func New(out io.Writer, ha hinweis.Abbr) (w *Writer, err error) {
 	var aw *alfred.Writer
 
 	if aw, err = alfred.NewWriter(out); err != nil {
@@ -32,7 +31,7 @@ func New(out io.Writer, ha hinweis.Abbr, zp zettel_transacted.Pool) (w *Writer, 
 	return
 }
 
-func (w *Writer) WriteZettelVerzeichnisse(z *store_verzeichnisse.Zettel) (err error) {
+func (w *Writer) WriteZettelVerzeichnisse(z *zettel_verzeichnisse.Zettel) (err error) {
 	item := w.zettelToItem(z, w.Abbr)
 	w.alfredWriter.WriteItem(item)
 

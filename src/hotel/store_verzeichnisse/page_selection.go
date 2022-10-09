@@ -47,7 +47,7 @@ func (i Zettelen) PageForString(s string) (n int, err error) {
 
 func (i Zettelen) PageForSha(s sha.Sha) (n int, err error) {
 	var n1 int64
-	ss := s.String()[:digitWidth]
+	ss := s.String()[:DigitWidth]
 
 	if n1, err = strconv.ParseInt(ss, 16, 64); err != nil {
 		err = errors.Wrap(err)

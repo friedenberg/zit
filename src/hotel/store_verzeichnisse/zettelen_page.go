@@ -6,16 +6,19 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/zettel_verzeichnisse"
 )
 
 type zettelenPage struct {
-	existing []*Zettel
-	added    []*Zettel
+	pool        *zettel_verzeichnisse.Pool
+	existing    []*zettel_verzeichnisse.Zettel
+	added       []*zettel_verzeichnisse.Zettel
+	flushFilter zettel_verzeichnisse.Writer
 }
 
 func (zp zettelenPage) Copy(
 	r1 io.Reader,
-	w writer,
+	w zettel_verzeichnisse.Writer,
 ) (n int64, err error) {
 	r := bufio.NewReader(r1)
 
@@ -25,12 +28,12 @@ func (zp zettelenPage) Copy(
 	for {
 		i += 1
 
-		var tz *Zettel
+		var tz *zettel_verzeichnisse.Zettel
 
-		if w.ZettelPool == nil {
-			tz = &Zettel{}
+		if zp.pool != nil {
+			tz = zp.pool.Get()
 		} else {
-			tz = w.Get()
+			tz = &zettel_verzeichnisse.Zettel{}
 		}
 
 		if err = dec.Decode(tz); err != nil {
@@ -55,16 +58,15 @@ func (zp zettelenPage) Copy(
 func (zp *zettelenPage) ReadFrom(r1 io.Reader) (n int64, err error) {
 	return zp.Copy(
 		r1,
-		writer{
-			writers: []Writer{
-				MakeWriter(
-					func(z *Zettel) (err error) {
-						zp.existing = append(zp.existing, z)
-						return
-					},
-				),
-			},
-		},
+		zettel_verzeichnisse.MakeWriterMulti(
+			zp.pool,
+			zettel_verzeichnisse.MakeWriter(
+				func(z *zettel_verzeichnisse.Zettel) (err error) {
+					zp.existing = append(zp.existing, z)
+					return
+				},
+			),
+		),
 	)
 }
 
@@ -76,17 +78,41 @@ func (zp *zettelenPage) WriteTo(w1 io.Writer) (n int64, err error) {
 	enc := gob.NewEncoder(w)
 
 	for _, z := range zp.existing {
-		if err = enc.Encode(z); err != nil {
+		if err = zp.writeOne(enc, z); err != nil {
 			err = errors.Wrapf(err, "failed to write zettel: %v", z)
 			return
 		}
 	}
 
 	for _, z := range zp.added {
-		if err = enc.Encode(z); err != nil {
+		if err = zp.writeOne(enc, z); err != nil {
 			err = errors.Wrapf(err, "failed to write zettel: %v", z)
 			return
 		}
+	}
+
+	return
+}
+
+func (zp *zettelenPage) writeOne(
+	enc *gob.Encoder,
+	z *zettel_verzeichnisse.Zettel,
+) (err error) {
+	if zp.flushFilter != nil {
+		if err = zp.flushFilter.WriteZettelVerzeichnisse(z); err != nil {
+			if errors.IsEOF(err) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+			}
+
+			return
+		}
+	}
+
+	if err = enc.Encode(z); err != nil {
+		err = errors.Wrapf(err, "failed to write zettel: %v", z)
+		return
 	}
 
 	return

@@ -44,7 +44,7 @@ func (c CatAlfred) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	var aw *alfred.Writer
 
-	if aw, err = alfred.New(wo, u.StoreObjekten(), u.ZettelTransactedPool()); err != nil {
+	if aw, err = alfred.New(wo, u.StoreObjekten()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

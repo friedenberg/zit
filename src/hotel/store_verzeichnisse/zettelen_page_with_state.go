@@ -8,36 +8,38 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
+	"github.com/friedenberg/zit/src/zettel_verzeichnisse"
 )
-
-type SchwanzEntryFunc func(z zettel_transacted.Zettel) (key string, value string)
 
 type zettelenPageWithState struct {
 	sync.Locker
-	path string
+	pageId
 	ioFactory
 	zettelenPage
-	zettelenPageIndex
-	schwanzEntryFunc SchwanzEntryFunc
 	State
 }
 
 func makeZettelenPage(
 	iof ioFactory,
-	path string,
-	f SchwanzEntryFunc,
+	pid pageId,
+	pool *zettel_verzeichnisse.Pool,
 ) (p *zettelenPageWithState) {
+	var flushFilter zettel_verzeichnisse.Writer
+	flushFilter = zettel_verzeichnisse.WriterIdentity{}
+
+	if zvwg, ok := iof.(ZettelVerzeichnisseWriterGetter); ok {
+		flushFilter = zvwg.ZettelVerzeichnisseWriter(pid.index)
+	}
+
 	p = &zettelenPageWithState{
 		Locker:    &sync.Mutex{},
 		ioFactory: iof,
-		path:      path,
+		pageId:    pid,
 		zettelenPage: zettelenPage{
-			existing: make([]*Zettel, 0),
-			added:    make([]*Zettel, 0),
-		},
-		schwanzEntryFunc: f,
-		zettelenPageIndex: zettelenPageIndex{
-			self: make(map[string]string),
+			pool:        pool,
+			existing:    make([]*zettel_verzeichnisse.Zettel, 0),
+			added:       make([]*zettel_verzeichnisse.Zettel, 0),
+			flushFilter: flushFilter,
 		},
 	}
 
@@ -56,7 +58,7 @@ func (zp *zettelenPageWithState) setState(v State) {
 	zp.State = v
 }
 
-func (zp *zettelenPageWithState) Add(z *Zettel) (err error) {
+func (zp *zettelenPageWithState) Add(z *zettel_verzeichnisse.Zettel) (err error) {
 	if err = zp.ReadAll(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -64,12 +66,6 @@ func (zp *zettelenPageWithState) Add(z *Zettel) (err error) {
 
 	zp.setState(StateChanged)
 	zp.added = append(zp.added, z)
-
-	if z.PageSelection.Reason == PageSelectionReasonHinweis {
-		key, value := zp.schwanzEntryFunc(z.Transacted)
-
-		zp.self[key] = value
-	}
 
 	return
 }
@@ -82,7 +78,7 @@ func (zp *zettelenPageWithState) ReadHinweis(
 		return
 	}
 
-	var z *Zettel
+	var z *zettel_verzeichnisse.Zettel
 
 	for _, z1 := range zp.zettelenPage.existing {
 		if z1.Transacted.Named.Hinweis.Equals(h) {
@@ -127,9 +123,13 @@ func (zp *zettelenPageWithState) Flush() (err error) {
 
 	defer errors.PanicIfError(w1.Flush)
 
-	if _, err = zp.zettelenPageIndex.WriteTo(w1); err != nil {
-		err = errors.Wrap(err)
-		return
+	if mpr, ok := zp.ioFactory.(PageHeader); ok {
+		wt := mpr.PageHeaderWriterTo(zp.index)
+
+		if _, err = wt.WriteTo(w1); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	if _, err = zp.zettelenPage.WriteTo(w1); err != nil {
@@ -141,7 +141,7 @@ func (zp *zettelenPageWithState) Flush() (err error) {
 }
 
 func (zp *zettelenPageWithState) WriteZettelenTo(
-	w writer,
+	w zettel_verzeichnisse.Writer,
 ) (err error) {
 	var r io.ReadCloser
 
@@ -159,9 +159,13 @@ func (zp *zettelenPageWithState) WriteZettelenTo(
 
 	r1 := bufio.NewReader(r)
 
-	if _, err = zp.zettelenPageIndex.ReadFrom(r1); err != nil {
-		err = errors.Wrap(err)
-		return
+	if mpr, ok := zp.ioFactory.(PageHeader); ok {
+		rf := mpr.PageHeaderReaderFrom(zp.index)
+
+		if _, err = rf.ReadFrom(r1); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	if _, err = zp.zettelenPage.Copy(r1, w); err != nil {
@@ -172,9 +176,17 @@ func (zp *zettelenPageWithState) WriteZettelenTo(
 	return
 }
 
-func (zp *zettelenPageWithState) ReadJustIndex() (err error) {
+func (zp *zettelenPageWithState) ReadJustHeader() (err error) {
+	var rf io.ReaderFrom
+
+	if mpr, ok := zp.ioFactory.(PageHeader); ok {
+		rf = mpr.PageHeaderReaderFrom(zp.index)
+	} else {
+		return
+	}
+
 	state := zp.getState()
-	if state <= StateReadJustIndex {
+	if state <= StateReadJustHeader {
 		errors.Printf("already read %s", zp.path)
 		return
 	} else {
@@ -197,12 +209,12 @@ func (zp *zettelenPageWithState) ReadJustIndex() (err error) {
 
 	r1 := bufio.NewReader(r)
 
-	if _, err = zp.zettelenPageIndex.ReadFrom(r1); err != nil {
+	if _, err = rf.ReadFrom(r1); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	zp.setState(StateReadJustIndex)
+	zp.setState(StateReadJustHeader)
 
 	return
 }
@@ -232,9 +244,13 @@ func (zp *zettelenPageWithState) ReadAll() (err error) {
 
 	r1 := bufio.NewReader(r)
 
-	if _, err = zp.zettelenPageIndex.ReadFrom(r1); err != nil {
-		err = errors.Wrap(err)
-		return
+	if mpr, ok := zp.ioFactory.(PageHeader); ok {
+		rf := mpr.PageHeaderReaderFrom(zp.index)
+
+		if _, err = rf.ReadFrom(r1); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	if _, err = zp.zettelenPage.ReadFrom(r1); err != nil {

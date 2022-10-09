@@ -11,10 +11,10 @@ import (
 	"github.com/friedenberg/zit/src/charlie/konfig"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/echo/akten"
-	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/india/store_objekten"
 	"github.com/friedenberg/zit/src/juliett/store_working_directory"
 	"github.com/friedenberg/zit/src/juliett/zettel_printer"
+	"github.com/friedenberg/zit/src/zettel_verzeichnisse"
 )
 
 type Umwelt struct {
@@ -35,17 +35,17 @@ type Umwelt struct {
 	storeWorkingDirectory *store_working_directory.Store
 	printerOut            *zettel_printer.Printer
 
-	zettelTransactedPool zettel_transacted.Pool
+	zettelVerzeichnissePool *zettel_verzeichnisse.Pool
 }
 
 func Make(c konfig.Konfig) (u *Umwelt, err error) {
 	u = &Umwelt{
-		konfig:               c,
-		logger:               c.Logger,
-		in:                   os.Stdin,
-		out:                  os.Stdout,
-		err:                  os.Stderr,
-		zettelTransactedPool: zettel_transacted.MakePool(),
+		konfig:                  c,
+		logger:                  c.Logger,
+		in:                      os.Stdin,
+		out:                     os.Stdout,
+		err:                     os.Stderr,
+		zettelVerzeichnissePool: zettel_verzeichnisse.MakePool(),
 	}
 
 	err = u.Initialize()
@@ -95,7 +95,7 @@ func (u *Umwelt) Initialize() (err error) {
 		*u.age,
 		u.konfig,
 		u.standort,
-		u.zettelTransactedPool,
+		u.zettelVerzeichnissePool,
 	)
 
 	if err != nil {

@@ -80,6 +80,10 @@ func (s Standort) DirVerzeichnisseZettelenNeue() string {
 	return s.DirVerzeichnisse("ZettelenNeue")
 }
 
+func (s Standort) DirVerzeichnisseZettelenNeueSchwanzen() string {
+	return s.DirVerzeichnisse("ZettelenNeueSchwanzen")
+}
+
 func (s Standort) DirVerzeichnisseAkten() string {
 	return s.DirVerzeichnisse("Akten")
 }

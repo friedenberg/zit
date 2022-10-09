@@ -28,6 +28,7 @@ func MakeWriterComplete(w io.Writer) WriterComplete {
 			s.wBuf.WriteString(z.Stored.Zettel.Typ.String())
 			s.wBuf.WriteString(" ")
 			s.wBuf.WriteString(z.Stored.Zettel.Bezeichnung.String())
+			s.wBuf.WriteString("\n")
 		}
 
 		s.chDone <- struct{}{}
@@ -36,8 +37,15 @@ func MakeWriterComplete(w io.Writer) WriterComplete {
 	return w1
 }
 
-func (w *WriterComplete) WriteZettelNamed(z Zettel) {
-	w.chZettel <- z
+func (w *WriterComplete) WriteZettelNamed(z Zettel) (err error) {
+	select {
+	case <-w.chDone:
+		err = io.EOF
+
+	case w.chZettel <- z:
+	}
+
+	return
 }
 
 func (w *WriterComplete) Close() (err error) {

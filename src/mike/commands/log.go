@@ -61,6 +61,8 @@ func (c Log) RunWithIds(os *umwelt.Umwelt, is id_set.Set) (err error) {
 			return
 		}
 
+		errors.Err().Printf("time: %s", chain[0].Schwanz)
+
 		chains = append(chains, chain)
 	}
 
