@@ -80,6 +80,22 @@ func (es MutableSet) Remove(es1 ...Etikett) {
 	}
 }
 
+func (s1 MutableSet) Withdraw(e Etikett) (s2 Set) {
+	s2 = MakeSet()
+	s2.open()
+	defer s2.close()
+
+	for _, e1 := range s1.inner {
+		if e1.Contains(e) {
+			s2.addOnlyExact(e1)
+		}
+	}
+
+	s1.Remove(s2.Etiketten()...)
+
+	return
+}
+
 func (es MutableSet) RemovePrefixes(needle Etikett) {
 	for haystack, _ := range es.inner {
 		if strings.HasPrefix(haystack, needle.String()) {

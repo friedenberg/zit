@@ -44,7 +44,9 @@ func (z *Zettel) applyGoldenChild(
 		return
 	}
 
-	prefixes := z.Etiketten.Withdraw(e).Etiketten()
+	mes := z.Etiketten.MutableCopy()
+
+	prefixes := mes.Withdraw(e).Etiketten()
 
 	if len(prefixes) == 0 {
 		return
@@ -62,7 +64,6 @@ func (z *Zettel) applyGoldenChild(
 
 	sort.Slice(prefixes, sortFunc)
 
-	mes := z.Etiketten.MutableCopy()
 	mes.Add(prefixes[0])
 	z.Etiketten = mes.Copy()
 
