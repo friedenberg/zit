@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/golf/alfred"
+	"github.com/friedenberg/zit/src/hotel/zettel_verzeichnisse"
 	"github.com/friedenberg/zit/src/mike/umwelt"
 )
 
@@ -75,7 +76,9 @@ func (c CatAlfred) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		fallthrough
 
 	case gattung.Hinweis:
-		if err = u.StoreObjekten().ReadManySchwanzen(aw); err != nil {
+		wk := zettel_verzeichnisse.MakeWriterKonfig(u.Konfig())
+
+		if err = u.StoreObjekten().ReadManySchwanzen(wk, aw); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

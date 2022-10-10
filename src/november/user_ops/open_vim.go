@@ -13,6 +13,11 @@ type OpenVimResults struct {
 }
 
 func (c OpenVim) Run(args ...string) (results OpenVimResults, err error) {
+	if len(args) == 0 {
+		err = errors.Errorf("no files to edit in vim")
+		return
+	}
+
 	vimArgs := make([]string, 0, len(c.Options)*2)
 
 	for _, o := range c.Options {

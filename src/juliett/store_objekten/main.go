@@ -188,11 +188,6 @@ func (s Store) writeNamedZettelToIndex(tz zettel_transacted.Zettel) (err error) 
 		return
 	}
 
-	// if err = s.indexZettelen.add(tz); err != nil {
-	// 	err = errors.Wrapf(err, "failed to write zettel to index: %s", tz.Named)
-	// 	return
-	// }
-
 	if err = s.indexKennung.addHinweis(tz.Named.Hinweis); err != nil {
 		if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
 			errors.PrintErrf("kennung does not contain value: %s", err)
@@ -214,14 +209,7 @@ func (s Store) writeNamedZettelToIndex(tz zettel_transacted.Zettel) (err error) 
 func (i *Store) ReadManySchwanzen(
 	ws ...zettel_verzeichnisse.Writer,
 ) (err error) {
-	return i.verzeichnisseSchwanzen.ReadMany(
-		append(
-			[]zettel_verzeichnisse.Writer{
-				zettel_verzeichnisse.MakeWriterKonfig(i.konfig),
-			},
-			ws...,
-		)...,
-	)
+	return i.verzeichnisseSchwanzen.ReadMany(ws...)
 }
 
 func (s Store) ReadHinweisSchwanzen(
@@ -231,7 +219,7 @@ func (s Store) ReadHinweisSchwanzen(
 }
 
 func (s Store) ReadAllSchwanzen(ws ...zettel_transacted.Writer) (err error) {
-  //TODO add proper support for pools upstream of this call
+	//TODO add proper support for pools upstream of this call
 	w := zettel_verzeichnisse.WriterZettelTransacted{
 		Writer: zettel_transacted.MakeWriterMulti(
 			nil,
@@ -239,10 +227,7 @@ func (s Store) ReadAllSchwanzen(ws ...zettel_transacted.Writer) (err error) {
 		),
 	}
 
-	return s.verzeichnisseSchwanzen.Zettelen.ReadMany(
-		zettel_verzeichnisse.MakeWriterKonfig(s.konfig),
-		w,
-	)
+	return s.verzeichnisseSchwanzen.Zettelen.ReadMany(w)
 }
 
 func (s Store) ReadOne(i id.Id) (tz zettel_transacted.Zettel, err error) {
@@ -412,7 +397,6 @@ func (s *Store) Update(
 		return
 	}
 
-	//TODO fix etiketten deltas
 	d := etikett.MakeSetDelta(
 		mutter.Named.Stored.Zettel.Etiketten,
 		tz.Named.Stored.Zettel.Etiketten,
@@ -645,11 +629,7 @@ func (s *Store) Reindex() (err error) {
 	}
 
 	for _, t := range ts {
-		errors.Print(t)
-
 		for _, o := range t.Objekten {
-			errors.Print(o)
-
 			switch o.Gattung {
 
 			case gattung.Zettel:
@@ -666,9 +646,29 @@ func (s *Store) Reindex() (err error) {
 					}
 				}
 
+				var mutter zettel_transacted.Zettel
+				hasMutter := false
+
+				if mutter1, err := s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(tz.Named.Hinweis); err == nil {
+					hasMutter = true
+					mutter = mutter1
+				}
+
 				if err = s.writeNamedZettelToIndex(tz); err != nil {
 					err = errors.Wrap(err)
 					return
+				}
+
+				if hasMutter {
+					d := etikett.MakeSetDelta(
+						mutter.Named.Stored.Zettel.Etiketten,
+						tz.Named.Stored.Zettel.Etiketten,
+					)
+
+					if err = s.indexEtiketten.processDelta(d); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
 				}
 
 			default:

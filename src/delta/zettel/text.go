@@ -297,9 +297,6 @@ func (f Text) readTyp(state *textStateRead, desc string) (err error) {
 
 	shaError := state.metadataiAkteSha.Set(head)
 
-	errors.Print(head)
-	errors.Print(tail)
-
 	if tail == "" {
 		//sha or ext
 		if shaError != nil {

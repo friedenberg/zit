@@ -17,6 +17,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/hotel/organize_text"
+	"github.com/friedenberg/zit/src/hotel/zettel_verzeichnisse"
 	"github.com/friedenberg/zit/src/mike/umwelt"
 	"github.com/friedenberg/zit/src/november/user_ops"
 )
@@ -147,17 +148,20 @@ func (c *Organize) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 		Or:  c.Or,
 	}
 
-	w := zettel_transacted.MakeWriterMulti(
-		nil,
-		zettel_transacted.WriterZettelNamed{
-			Writer: zettel_named.WriterFilter{
-				NamedFilter: query,
+	wk := zettel_verzeichnisse.MakeWriterKonfig(u.Konfig())
+	w := zettel_verzeichnisse.WriterZettelTransacted{
+		Writer: zettel_transacted.MakeWriterMulti(
+			nil,
+			zettel_transacted.WriterZettelNamed{
+				Writer: zettel_named.WriterFilter{
+					NamedFilter: query,
+				},
 			},
-		},
-		getResults,
-	)
+			getResults,
+		),
+	}
 
-	if err = u.StoreObjekten().ReadAllSchwanzen(w); err != nil {
+	if err = u.StoreObjekten().ReadManySchwanzen(wk, w); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -115,6 +115,20 @@ func (i *indexEtiketten) readIfNecessary() (err error) {
 	return
 }
 
+func (i *indexEtiketten) processDelta(d etikett.Delta) (err error) {
+	if err = i.add(d.Added); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = i.del(d.Removed); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (i *indexEtiketten) add(s etikett.Set) (err error) {
 	if s.Len() == 0 {
 		errors.Print("no etiketten to add")
