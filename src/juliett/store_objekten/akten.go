@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/id"
 	"github.com/friedenberg/zit/src/delta/age_io"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
+	"github.com/friedenberg/zit/src/hotel/zettel_verzeichnisse"
 )
 
 func (s Store) AkteExists(sh sha.Sha) (err error) {
@@ -21,9 +22,20 @@ func (s Store) AkteExists(sh sha.Sha) (err error) {
 		return
 	}
 
-	var set zettel_transacted.Set
+	set := zettel_transacted.MakeSetUnique(0)
 
-	if set, err = s.indexZettelen.ReadAkteSha(sh); err != nil {
+	w := zettel_verzeichnisse.MakeWriter(
+		func(z *zettel_verzeichnisse.Zettel) (err error) {
+			if !z.Transacted.Named.Stored.Zettel.Akte.Equals(sh) {
+				err = io.EOF
+				return
+			}
+
+			return
+		},
+	)
+
+	if err = s.verzeichnisseAll.ReadMany(w, zettel_verzeichnisse.WriterZettelTransacted{Writer: set}); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -56,7 +56,7 @@ func (s Store) ReadExternalZettelFromAktePath(p string) (cz zettel_checked_out.Z
 
 	cz.External.AkteFD.Path = p
 	cz.External.Named.Stored.Zettel.Akte = akteSha
-	cz.Matches.Akten, _ = s.storeObjekten.ReadAkteSha(akteSha)
+	// cz.Matches.Akten, _ = s.storeObjekten.ReadAkteSha(akteSha)
 
 	cz.DetermineState()
 

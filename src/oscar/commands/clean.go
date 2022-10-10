@@ -8,9 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_external"
-	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
-	"github.com/friedenberg/zit/src/juliett/store_objekten"
 	"github.com/friedenberg/zit/src/kilo/store_working_directory"
 	"github.com/friedenberg/zit/src/mike/umwelt"
 	"github.com/friedenberg/zit/src/november/user_ops"
@@ -91,22 +89,23 @@ func (c Clean) Run(
 		},
 	)
 
-	for _, ua := range possible.UnsureAkten {
-		var szt zettel_transacted.Set
+	//TODO rewrite in verzeichnisseAll
+	// for _, ua := range possible.UnsureAkten {
+	// 	var szt zettel_transacted.Set
 
-		if szt, err = s.StoreObjekten().ReadAkteSha(ua.Sha); err != nil {
-			if errors.Is(err, store_objekten.ErrNotFound{}) {
-				continue
-			} else {
-				err = errors.Wrap(err)
-				return
-			}
-		}
+	// 	if szt, err = s.StoreObjekten().ReadAkteSha(ua.Sha); err != nil {
+	// 		if errors.Is(err, store_objekten.ErrNotFound{}) {
+	// 			continue
+	// 		} else {
+	// 			err = errors.Wrap(err)
+	// 			return
+	// 		}
+	// 	}
 
-		if szt.Len() > 0 {
-			filesToDelete = append(filesToDelete, ua.Path)
-		}
-	}
+	// 	if szt.Len() > 0 {
+	// 		filesToDelete = append(filesToDelete, ua.Path)
+	// 	}
+	// }
 
 	if s.Konfig().DryRun {
 		for _, fOrD := range filesToDelete {

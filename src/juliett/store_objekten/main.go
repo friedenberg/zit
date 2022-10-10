@@ -1,6 +1,7 @@
 package store_objekten
 
 import (
+	"io"
 	"os"
 	"reflect"
 
@@ -40,7 +41,7 @@ type Store struct {
 
 	zettelTransactedPrinter ZettelTransactedPrinter
 	hinweisen               *hinweisen.Hinweisen
-	*indexZettelen
+	// *indexZettelen
 	*indexEtiketten
 	*indexKennung
 	*indexAbbr
@@ -80,10 +81,10 @@ func Make(
 		return
 	}
 
-	s.indexZettelen, err = newIndexZettelen(
-		st.FileVerzeichnisseZettelen(),
-		s,
-	)
+	// s.indexZettelen, err = newIndexZettelen(
+	// 	st.FileVerzeichnisseZettelen(),
+	// 	s,
+	// )
 
 	if err != nil {
 		err = errors.Wrapf(err, "failed to init zettel index")
@@ -187,10 +188,10 @@ func (s Store) writeNamedZettelToIndex(tz zettel_transacted.Zettel) (err error) 
 		return
 	}
 
-	if err = s.indexZettelen.add(tz); err != nil {
-		err = errors.Wrapf(err, "failed to write zettel to index: %s", tz.Named)
-		return
-	}
+	// if err = s.indexZettelen.add(tz); err != nil {
+	// 	err = errors.Wrapf(err, "failed to write zettel to index: %s", tz.Named)
+	// 	return
+	// }
 
 	if err = s.indexKennung.addHinweis(tz.Named.Hinweis); err != nil {
 		if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
@@ -230,6 +231,7 @@ func (s Store) ReadHinweisSchwanzen(
 }
 
 func (s Store) ReadAllSchwanzen(ws ...zettel_transacted.Writer) (err error) {
+  //TODO add proper support for pools upstream of this call
 	w := zettel_verzeichnisse.WriterZettelTransacted{
 		Writer: zettel_transacted.MakeWriterMulti(
 			nil,
@@ -237,7 +239,10 @@ func (s Store) ReadAllSchwanzen(ws ...zettel_transacted.Writer) (err error) {
 		),
 	}
 
-	return s.verzeichnisseSchwanzen.Zettelen.ReadMany(w)
+	return s.verzeichnisseSchwanzen.Zettelen.ReadMany(
+		zettel_verzeichnisse.MakeWriterKonfig(s.konfig),
+		w,
+	)
 }
 
 func (s Store) ReadOne(i id.Id) (tz zettel_transacted.Zettel, err error) {
@@ -516,10 +521,10 @@ func (s Store) Flush() (err error) {
 		return
 	}
 
-	if err = s.indexZettelen.Flush(); err != nil {
-		err = errors.Wrapf(err, "failed to flush new zettel index")
-		return
-	}
+	// if err = s.indexZettelen.Flush(); err != nil {
+	// 	err = errors.Wrapf(err, "failed to flush new zettel index")
+	// 	return
+	// }
 
 	if err = s.indexEtiketten.Flush(); err != nil {
 		err = errors.Wrapf(err, "failed to flush new zettel index")
@@ -540,9 +545,19 @@ func (s Store) Flush() (err error) {
 }
 
 func (s Store) AllInChain(h hinweis.Hinweis) (c zettel_transacted.Slice, err error) {
-	var mst zettel_transacted.Set
+	mst := zettel_transacted.MakeSetUnique(0)
+	w := zettel_verzeichnisse.MakeWriter(
+		func(z *zettel_verzeichnisse.Zettel) (err error) {
+			if !z.Transacted.Named.Hinweis.Equals(h) {
+				err = io.EOF
+				return
+			}
 
-	if mst, err = s.indexZettelen.ReadHinweis(h); err != nil {
+			return
+		},
+	)
+
+	if err = s.verzeichnisseAll.ReadMany(w, zettel_verzeichnisse.WriterZettelTransacted{Writer: mst}); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
