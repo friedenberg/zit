@@ -15,6 +15,10 @@ import (
 )
 
 func (s Store) AkteExists(sh sha.Sha) (err error) {
+	if sh.IsNull() {
+		return
+	}
+
 	p := id.Path(sh, s.standort.DirObjektenAkten())
 	ok := files.Exists(p)
 

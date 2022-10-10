@@ -174,7 +174,7 @@ func (c New) editZettelsIfRequested(
 
 	var cwdFiles store_working_directory.CwdFiles
 
-	if cwdFiles, err = store_working_directory.MakeCwdFiles(u.Standort().Cwd(), fs...); err != nil {
+	if cwdFiles, err = store_working_directory.MakeCwdFilesExactly(u.Standort().Cwd(), fs...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

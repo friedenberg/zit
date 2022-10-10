@@ -36,7 +36,7 @@ func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
 		fallthrough
 
 	default:
-		if possible, err = store_working_directory.MakeCwdFiles(s.Standort().Cwd(), args...); err != nil {
+		if possible, err = store_working_directory.MakeCwdFilesAll(s.Standort().Cwd()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -94,6 +94,7 @@ func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
 		switch {
 		case err == nil:
 			fallthrough
+
 		case errors.Is(err, store_objekten.ErrNotFound{}):
 			zp.FileUnrecognized(ua).Print()
 

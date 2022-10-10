@@ -117,7 +117,7 @@ func (s *Store) ReadAll() (err error) {
 
 	var possible CwdFiles
 
-	if possible, err = MakeCwdFiles(s.cwd); err != nil {
+	if possible, err = MakeCwdFilesAll(s.cwd); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

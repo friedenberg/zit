@@ -25,7 +25,7 @@ func (p *Printer) FileRecognized(
 	szt.Each(
 		func(tz1 zettel_transacted.Zettel) (err error) {
 			//TODO eliminate zettels marked as duplicates / hidden
-			pa.WriteFormat("\t%s", p.ZettelNamed(tz1.Named))
+			pa.WriteFormat("\t%s\n", p.ZettelNamed(tz1.Named))
 			err = pa.Error()
 			return
 		},

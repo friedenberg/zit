@@ -33,7 +33,7 @@ func (fs CwdFiles) ZettelFiles() (out []string) {
 	return
 }
 
-func MakeCwdFiles(dir string, files ...string) (fs CwdFiles, err error) {
+func makeCwdFiles(dir string) (fs CwdFiles) {
 	fs = CwdFiles{
 		dir:              dir,
 		Zettelen:         make(map[string]CwdZettel, 0),
@@ -41,14 +41,18 @@ func MakeCwdFiles(dir string, files ...string) (fs CwdFiles, err error) {
 		EmptyDirectories: make([]string, 0),
 	}
 
-	switch {
-	case len(files) > 0:
-		err = fs.readInputFiles(files...)
+	return
+}
 
-	default:
-		err = fs.readAll()
-	}
+func MakeCwdFilesAll(dir string) (fs CwdFiles, err error) {
+	fs = makeCwdFiles(dir)
+	err = fs.readAll()
+	return
+}
 
+func MakeCwdFilesExactly(dir string, files ...string) (fs CwdFiles, err error) {
+	fs = makeCwdFiles(dir)
+	err = fs.readInputFiles(files...)
 	return
 }
 
