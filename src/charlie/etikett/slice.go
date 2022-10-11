@@ -10,6 +10,16 @@ import (
 //TODO make mutable / immutable?
 type Slice []Etikett
 
+func MakeSlice(es ...Etikett) (s Slice) {
+	s = make([]Etikett, len(es))
+
+	for i, e := range es {
+		s[i] = e
+	}
+
+	return
+}
+
 func NewSliceFromStrings(es ...string) (s Slice, err error) {
 	s = make([]Etikett, len(es))
 

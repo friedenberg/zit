@@ -34,6 +34,30 @@ func (s *SetPrefixTransacted) Add(z Zettel) {
 	}
 }
 
+func (a SetPrefixTransacted) Merge(b SetPrefixTransacted) {
+	for e, s := range b.innerMap {
+		for _, z := range s.innerMap {
+			a.addPair(e, z)
+		}
+	}
+}
+
+func (a SetPrefixTransacted) Subtract(b Set) (c SetPrefixTransacted) {
+	c = MakeSetPrefixTransacted(len(a.innerMap))
+
+	for e, aSet := range a.innerMap {
+		for _, z := range aSet.innerMap {
+			if b.Contains(z) {
+				continue
+			}
+
+			c.addPair(e, z)
+		}
+	}
+
+	return
+}
+
 func (s SetPrefixTransacted) addPair(e etikett.Etikett, z Zettel) {
 	existing, ok := s.innerMap[e]
 

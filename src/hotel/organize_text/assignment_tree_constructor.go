@@ -21,15 +21,19 @@ func (atc *AssignmentTreeConstructor) Assignments() (roots []*assignment, err er
 
 	prefixSet := atc.Transacted.ToSetPrefixTransacted()
 
+	for _, e := range atc.ExtraEtiketten.Etiketten() {
+		errors.Err().Printf("making extras: %s", e)
+		errors.Err().Printf("prefix set before: %v", prefixSet)
+		if err = atc.makeChildren(root, prefixSet, etikett.MakeSlice(e)); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+		errors.Err().Printf("prefix set after: %v", prefixSet)
+	}
+
 	if err = atc.makeChildren(root, prefixSet, atc.GroupingEtiketten); err != nil {
 		err = errors.Wrap(err)
 		return
-	}
-
-	for _, e := range atc.ExtraEtiketten.Etiketten() {
-		child := newAssignment(1)
-		child.etiketten = etikett.MakeSet(e)
-		roots = append(roots, child)
 	}
 
 	return

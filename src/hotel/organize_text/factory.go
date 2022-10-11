@@ -23,15 +23,24 @@ func (atc *Factory) Make() (ot *Text, err error) {
 
 	prefixSet := atc.Transacted.ToSetPrefixTransacted()
 
-	if err = atc.makeChildren(ot.assignment, prefixSet, atc.GroupingEtiketten); err != nil {
-		err = errors.Wrap(err)
-		return
+	for _, e := range atc.ExtraEtiketten.Etiketten() {
+		ee := newAssignment(ot.Depth() + 1)
+		ee.etiketten = etikett.MakeSet(e)
+		ot.assignment.addChild(ee)
+
+		var used zettel_transacted.Set
+
+		if used, err = atc.makeChildren(ot.assignment, prefixSet, etikett.MakeSlice(e)); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		prefixSet = prefixSet.Subtract(used)
 	}
 
-	for _, e := range atc.ExtraEtiketten.Etiketten() {
-		child := newAssignment(1)
-		child.etiketten = etikett.MakeSet(e)
-		ot.assignment.addChild(child)
+	if _, err = atc.makeChildren(ot.assignment, prefixSet, atc.GroupingEtiketten); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	if err = ot.Refine(); err != nil {
@@ -46,8 +55,12 @@ func (atc Factory) makeChildren(
 	parent *assignment,
 	prefixSet zettel_transacted.SetPrefixTransacted,
 	groupingEtiketten etikett.Slice,
-) (err error) {
+) (used zettel_transacted.Set, err error) {
+	used = zettel_transacted.MakeSetUnique(0)
+
 	if groupingEtiketten.Len() == 0 {
+		used.Merge(prefixSet.ToSet())
+
 		err = prefixSet.EachZettel(
 			func(e etikett.Etikett, tz zettel_transacted.Zettel) (err error) {
 				var z zettel
@@ -122,12 +135,16 @@ func (atc Factory) makeChildren(
 						nextGroupingEtiketten = groupingEtiketten[1:]
 					}
 
-					err = atc.makeChildren(child, zs.ToSetPrefixTransacted(), nextGroupingEtiketten)
+					var usedChild zettel_transacted.Set
+
+					usedChild, err = atc.makeChildren(child, zs.ToSetPrefixTransacted(), nextGroupingEtiketten)
 
 					if err != nil {
 						err = errors.Wrap(err)
 						return
 					}
+
+					used.Merge(usedChild)
 
 					intermediate.addChild(child)
 				}
@@ -141,12 +158,16 @@ func (atc Factory) makeChildren(
 					nextGroupingEtiketten = groupingEtiketten[1:]
 				}
 
-				err = atc.makeChildren(child, zs.ToSetPrefixTransacted(), nextGroupingEtiketten)
+				var usedChild zettel_transacted.Set
+
+				usedChild, err = atc.makeChildren(child, zs.ToSetPrefixTransacted(), nextGroupingEtiketten)
 
 				if err != nil {
 					err = errors.Wrap(err)
 					return
 				}
+
+				used.Merge(usedChild)
 
 				parent.addChild(child)
 			}
