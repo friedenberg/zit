@@ -156,7 +156,7 @@ func (a *assignment) removeChild(c *assignment) (err error) {
 	}
 
 	cap1 := 0
-	cap2 := len(c.children) - 1
+	cap2 := len(a.children) - 1
 
 	if cap2 > 0 {
 		cap1 = cap2
@@ -179,20 +179,12 @@ func (a *assignment) removeChild(c *assignment) (err error) {
 }
 
 func (a *assignment) consume(b *assignment) (err error) {
-	errors.Print(a.etiketten)
-	errors.Print(a.named)
-	errors.Print(b.etiketten)
-	errors.Print(b.named)
-	errors.Caller(1, "test")
-
 	for _, c := range b.children {
-		errors.Print(c)
 		if err = c.removeFromParent(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		errors.Print(a)
 		a.addChild(c)
 	}
 

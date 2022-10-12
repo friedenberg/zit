@@ -18,6 +18,8 @@ func (atc *Factory) Make() (ot *Text, err error) {
 		assignment: newAssignment(0),
 	}
 
+	ot.assignment.isRoot = true
+
 	ot.Metadatei.Set = atc.Options.RootEtiketten
 	ot.Metadatei.Typ = atc.Options.Typ
 
@@ -28,9 +30,11 @@ func (atc *Factory) Make() (ot *Text, err error) {
 		ee.etiketten = etikett.MakeSet(e)
 		ot.assignment.addChild(ee)
 
+		segments := prefixSet.Subset(e)
+
 		var used zettel_transacted.Set
 
-		if used, err = atc.makeChildren(ot.assignment, prefixSet, etikett.MakeSlice(e)); err != nil {
+		if used, err = atc.makeChildren(ee, segments.Grouped, etikett.MakeSlice(e)); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
