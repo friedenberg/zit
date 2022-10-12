@@ -37,6 +37,16 @@ func (atc *Refiner) shouldMergeIntoParent(a *assignment) bool {
 		return false
 	}
 
+	if a.etiketten.Len() == 1 && a.etiketten.Any().IsEmpty() {
+		errors.Print("1 Etikett, and it's empty, merging")
+		return true
+	}
+
+	if a.etiketten.Len() == 0 {
+		errors.Print("etiketten length is 0, merging")
+		return true
+	}
+
 	if a.parent.etiketten.Len() != 1 {
 		errors.Print("parent etiketten length is not 1")
 		return false

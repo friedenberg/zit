@@ -57,8 +57,8 @@ func (o Options) Factory() *Factory {
 	}
 }
 
-func (o Options) refiner() *AssignmentTreeRefiner {
-	return &AssignmentTreeRefiner{
+func (o Options) refiner() *Refiner {
+	return &Refiner{
 		Enabled:         o.UseRefiner,
 		UsePrefixJoints: o.UsePrefixJoints,
 	}

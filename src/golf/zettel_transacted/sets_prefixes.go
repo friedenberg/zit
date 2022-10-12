@@ -8,6 +8,7 @@ import (
 )
 
 type SetPrefixTransacted struct {
+	count    int
 	innerMap map[etikett.Etikett]Set
 }
 
@@ -21,6 +22,10 @@ func MakeSetPrefixTransacted(c int) (s SetPrefixTransacted) {
 	return s
 }
 
+func (s SetPrefixTransacted) Len() int {
+	return s.count
+}
+
 //this splits on right-expanded
 func (s *SetPrefixTransacted) Add(z Zettel) {
 	es := z.Named.Stored.Zettel.Etiketten.Expanded(etikett.ExpanderRight{})
@@ -31,14 +36,6 @@ func (s *SetPrefixTransacted) Add(z Zettel) {
 
 	for _, e := range es.Etiketten() {
 		s.addPair(e, z)
-	}
-}
-
-func (a SetPrefixTransacted) Merge(b SetPrefixTransacted) {
-	for e, s := range b.innerMap {
-		for _, z := range s.innerMap {
-			a.addPair(e, z)
-		}
 	}
 }
 
@@ -58,7 +55,9 @@ func (a SetPrefixTransacted) Subtract(b Set) (c SetPrefixTransacted) {
 	return
 }
 
-func (s SetPrefixTransacted) addPair(e etikett.Etikett, z Zettel) {
+func (s *SetPrefixTransacted) addPair(e etikett.Etikett, z Zettel) {
+	s.count += 1
+
 	existing, ok := s.innerMap[e]
 
 	if !ok {

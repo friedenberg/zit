@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"bytes"
 	"flag"
 	"os"
 	"os/exec"
@@ -67,9 +66,7 @@ func (c Push) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	// 	logz.Print(err)
 	// 	return
 	// }
-	b := []byte{}
-
-	if err = c.runRemoteScript(u, remote, args, b); err != nil {
+	if err = c.runRemoteScript(u, remote, args); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -96,7 +93,7 @@ func (c Push) remoteScriptFromArg(u *umwelt.Umwelt, arg string) (remote konfig.R
 	return
 }
 
-func (c Push) runRemoteScript(u *umwelt.Umwelt, remote konfig.RemoteScript, args []string, b []byte) (err error) {
+func (c Push) runRemoteScript(u *umwelt.Umwelt, remote konfig.RemoteScript, args []string) (err error) {
 	var script *exec.Cmd
 
 	if script, err = remote.Cmd(append([]string{"push"}, args...)...); err != nil {
@@ -107,9 +104,6 @@ func (c Push) runRemoteScript(u *umwelt.Umwelt, remote konfig.RemoteScript, args
 	script.Stdin = os.Stdin
 	script.Stdout = os.Stdout
 	script.Stderr = os.Stderr
-
-	r := bytes.NewBuffer(b)
-	script.Stdin = r
 
 	if err = script.Run(); err != nil {
 		err = errors.Wrap(err)
