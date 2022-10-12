@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 type StackInfo struct {
+	pakkage     string
 	function    string
 	filename    string
 	relFilename string
@@ -28,13 +30,27 @@ func MakeStackInfo(d int) (si StackInfo, ok bool) {
 
 	frame, _ := frames.Next()
 	si.function = frame.Function
+	si.pakkage, si.function = getPackageAndFunctionName(si.function)
 
-	// var err error
+	si.relFilename, _ = filepath.Rel(cwd, si.filename)
 
-	// if si.relFilename, err = filepath.Rel(cwd, si.filename); err != nil {
-	// 	ok = false
-	// 	return
-	// }
+	return
+}
+
+func getPackageAndFunctionName(v string) (p string, f string) {
+  p, f = filepath.Split(v)
+
+	idx := strings.Index(f, ".")
+
+	if idx == -1 {
+		return
+	}
+
+	p += f[:idx]
+
+	if len(f) > idx+1 {
+		f = f[idx+1:]
+	}
 
 	return
 }
@@ -53,4 +69,58 @@ func (si StackInfo) String() string {
 	}
 
 	return fmt.Sprintf("%s%s:%d: ", testPrefix, filename, si.line)
+}
+
+type stackWrapError struct {
+	StackInfo
+	error
+}
+
+func newStackWrapError(skip int) (err stackWrapError, ok bool) {
+	var si StackInfo
+
+	if si, ok = MakeStackInfo(skip + 1); !ok {
+		return
+	}
+
+	err = stackWrapError{
+		StackInfo: si,
+	}
+
+	return
+}
+
+func (se stackWrapError) Unwrap() error {
+	return se.error
+}
+
+func (se stackWrapError) Error() string {
+	sb := &strings.Builder{}
+
+	// sb.WriteString("# ")
+	// sb.WriteString(se.pakkage)
+	// sb.WriteString("\n")
+
+	sb.WriteString("# ")
+	sb.WriteString(se.function)
+	sb.WriteString("\n")
+
+	if se.relFilename != "" {
+		sb.WriteString(se.relFilename)
+	} else {
+		sb.WriteString(se.filename)
+	}
+
+	sb.WriteString(":")
+	sb.WriteString(fmt.Sprintf("%d", se.line))
+	sb.WriteString(":")
+
+	if se.error != nil {
+		sb.WriteString(" ")
+		sb.WriteString(se.error.Error())
+	}
+
+	// sb.WriteString("\n")
+
+	return sb.String()
 }

@@ -3,109 +3,32 @@ package errors
 import (
 	"errors"
 	"fmt"
-	"strings"
 )
 
-type errer struct {
-	errers []error
-}
-
-func (ers errer) Unwrap() error {
-	if len(ers.errers) == 0 {
-		return nil
-	}
-
-	return ers.errers[0]
-}
-
-type wrapped struct {
-	outer, inner error
-}
-
-func (e wrapped) Error() string {
-	return fmt.Sprintf("%s: %s", e.outer, e.inner)
-}
-
-func (e wrapped) Unwrap() error {
-	return e.inner
+func Wrap(in error) (err error) {
+	return wrapf(1, in, "")
 }
 
 func Wrapf(in error, f string, values ...interface{}) (err errer) {
-	defer CallerNonEmpty(1, err)
-
-	err = errer{
-		errers: []error{
-			wrapped{
-				outer: errors.New(fmt.Sprintf(f, values...)),
-				inner: in,
-			},
-		},
-	}
-
-	if st, ok := newStackWrapError(1); ok {
-		err.errers = append(err.errers, st)
-	}
-
-	return
+	return wrapf(1, in, f, values...)
 }
 
-func Errorf(f string, values ...interface{}) (err errer) {
-	defer CallerNonEmpty(1, err)
-
-	err = errer{
-		errers: []error{
-			errors.New(fmt.Sprintf(f, values...)),
-		},
-	}
-
-	if st, ok := newStackWrapError(1); ok {
-		err.errers = append(err.errers, st)
-	}
-
-	return
-}
-
-func newStackWrapError(skip int) (err stackWrapError, ok bool) {
-	var si StackInfo
-
-	if si, ok = MakeStackInfo(skip + 1); !ok {
-		return
-	}
-
-	err = stackWrapError{
-		StackInfo: si,
-	}
-
-	return
-}
-
-type stackWrapError struct {
-	StackInfo
-}
-
-func (se stackWrapError) Error() string {
-	return fmt.Sprintf("- %s\n  %s:%d", se.function, se.filename, se.line)
-}
-
-func Wrap(in error) (err error) {
-	defer CallerNonEmpty(1, err)
-
-	var normal normalError
-
-	if As(in, &normal) {
-		err = normal
-		return
-	}
-
+func wrapf(skip int, in error, f string, values ...interface{}) (err errer) {
 	var stack errer
+	se, _ := newStackWrapError(1 + skip)
+
+	//TODO case where values are present but f is ""
+	if f != "" {
+		se.error = errors.New(fmt.Sprintf(f, values...))
+	}
 
 	if As(in, &stack) {
-		if in, ok := newStackWrapError(1); ok {
-			stack.errers = append(stack.errers, in)
+		in = se
+	} else {
+		in = wrapped{
+			outer: se,
+			inner: in,
 		}
-
-		err = stack
-		return
 	}
 
 	stack.errers = append(stack.errers, in)
@@ -114,28 +37,7 @@ func Wrap(in error) (err error) {
 	return
 }
 
-func (e errer) Error() string {
-	sb := &strings.Builder{}
-
-	for _, e := range e.errers {
-		sb.WriteString(fmt.Sprintf("%v\n", e))
-	}
-
-	return sb.String()
+func Errorf(f string, values ...interface{}) (err errer) {
+	e := errors.New(fmt.Sprintf(f, values...))
+	return wrapf(1, e, "")
 }
-
-// func (e errer) Format(s fmt.State, v rune) {
-// 	xerrors.FormatError(e, s, v)
-// }
-
-// func (e errer) FormatError(p xerrors.Printer) (next error) {
-// 	for _, f := range e.frames {
-// 		f.Format(p)
-// 	}
-
-// 	return e.err
-// }
-
-// func (e errer) Unwrap() error {
-// 	return e.err
-// }

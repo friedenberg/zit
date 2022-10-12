@@ -234,15 +234,27 @@ func (f Text) readMetadateiLine(state *textStateRead, line string) (err error) {
 
 	switch head {
 	case "- ":
-		err = state.etiketten.AddString(tail)
+		if err = state.etiketten.AddString(tail); err !=nil {
+      err = errors.Wrap(err)
+      return
+    }
+
 		state.lastFieldWasBezeichnung = false
 
 	case "! ":
-		err = f.readTyp(state, tail)
+		if err = f.readTyp(state, tail); err != nil {
+      err = errors.Wrap(err)
+      return
+    }
+
 		state.lastFieldWasBezeichnung = false
 
 	case "# ":
-		err = state.context.Zettel.Bezeichnung.Set(tail)
+		if err = state.context.Zettel.Bezeichnung.Set(tail); err != nil {
+      err = errors.Wrap(err)
+      return
+    }
+
 		state.lastFieldWasBezeichnung = true
 
 		// 		if state.lastFieldWasBezeichnung {
@@ -260,12 +272,8 @@ func (f Text) readMetadateiLine(state *textStateRead, line string) (err error) {
 				reflect.TypeOf(f).Name(),
 				head,
 			)
+      return
 		}
-	}
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
 	}
 
 	return
@@ -308,7 +316,7 @@ func (f Text) readTyp(state *textStateRead, desc string) (err error) {
 	} else {
 		//sha.ext or error
 		if shaError != nil {
-			err = errors.Wrap(err)
+			err = errors.Wrap(shaError)
 			return
 		}
 
