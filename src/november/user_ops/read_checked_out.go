@@ -41,6 +41,8 @@ func (op ReadCheckedOut) RunMany(
 ) (results zettel_checked_out.Set, err error) {
 	results = zettel_checked_out.MakeSetUnique(possible.Len())
 
+  //TODO refactor this and combine the loops and use an internal switch
+  //statement
 	for _, p := range possible.Zettelen {
 		var checked_out zettel_checked_out.Zettel
 

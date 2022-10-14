@@ -5,24 +5,32 @@ import (
 	"fmt"
 )
 
-func Wrap(in error) (err error) {
-	return wrapf(1, in, "")
+func Wrap(in error) (err errer) {
+	se, _ := newStackWrapError(1)
+	err = wrapf(se, in, "")
+	return
 }
 
 func Wrapf(in error, f string, values ...interface{}) (err errer) {
-	return wrapf(1, in, f, values...)
+	se, _ := newStackWrapError(1)
+	err = wrapf(se, in, f, values...)
+	return
 }
 
-func wrapf(skip int, in error, f string, values ...interface{}) (err errer) {
-	var stack errer
-	se, _ := newStackWrapError(1 + skip)
+func Errorf(f string, values ...interface{}) (err errer) {
+	e := errors.New(fmt.Sprintf(f, values...))
+	se, _ := newStackWrapError(1)
+	err = wrapf(se, e, "")
+	return
+}
 
+func wrapf(se stackWrapError, in error, f string, values ...interface{}) (err errer) {
 	//TODO case where values are present but f is ""
 	if f != "" {
 		se.error = errors.New(fmt.Sprintf(f, values...))
 	}
 
-	if As(in, &stack) {
+	if As(in, &err) {
 		in = se
 	} else {
 		in = wrapped{
@@ -31,13 +39,7 @@ func wrapf(skip int, in error, f string, values ...interface{}) (err errer) {
 		}
 	}
 
-	stack.errers = append(stack.errers, in)
-	err = stack
+	err.errers = append(err.errers, in)
 
 	return
-}
-
-func Errorf(f string, values ...interface{}) (err errer) {
-	e := errors.New(fmt.Sprintf(f, values...))
-	return wrapf(1, e, "")
 }

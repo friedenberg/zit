@@ -29,3 +29,13 @@ func (zn *Zettel) Reset() {
 	zn.Hinweis = hinweis.Hinweis{}
 	zn.Stored.Reset()
 }
+
+// func (zn *Zettel) LineFormat(k konfig.Konfig) zettel_line.Format {
+//   f := zettel_line.MakeFromKonfig(k).Builder().
+
+// 	zi := p.MakeZettelish().
+// 		Id(p.Hinweis(zn.Hinweis)).
+// 		Rev(p.Sha(zn.Stored.Sha)).
+// 		TypString(zn.Stored.Zettel.Typ.String()).
+// 		Bez(p.Bezeichnung(zn.Stored.Zettel))
+// }

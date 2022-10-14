@@ -21,6 +21,7 @@ const (
 
 type Text struct {
 	DoNotWriteEmptyBezeichnung bool
+	TypError                   error
 }
 
 type textStateReadField int
@@ -169,12 +170,14 @@ func (f Text) ReadFrom(c *FormatContextRead) (n int64, err error) {
 		case textStateReadFieldAkteBody:
 
 			if c.AktePath != "" {
-				c.RecoverableError = ErrHasInlineAkteAndFilePath{
-					Zettel:            c.Zettel,
-					AkteWriterFactory: c,
-					Sha:               state.readAkteSha,
-					FilePath:          c.AktePath,
-				}
+				c.RecoverableErrors.Add(
+					ErrHasInlineAkteAndFilePath{
+						Zettel:            c.Zettel,
+						AkteWriterFactory: c,
+						Sha:               state.readAkteSha,
+						FilePath:          c.AktePath,
+					},
+				)
 
 				c.AktePath = ""
 			}
@@ -234,26 +237,26 @@ func (f Text) readMetadateiLine(state *textStateRead, line string) (err error) {
 
 	switch head {
 	case "- ":
-		if err = state.etiketten.AddString(tail); err !=nil {
-      err = errors.Wrap(err)
-      return
-    }
+		if err = state.etiketten.AddString(tail); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
 		state.lastFieldWasBezeichnung = false
 
 	case "! ":
 		if err = f.readTyp(state, tail); err != nil {
-      err = errors.Wrap(err)
-      return
-    }
+			err = errors.Wrap(err)
+			return
+		}
 
 		state.lastFieldWasBezeichnung = false
 
 	case "# ":
 		if err = state.context.Zettel.Bezeichnung.Set(tail); err != nil {
-      err = errors.Wrap(err)
-      return
-    }
+			err = errors.Wrap(err)
+			return
+		}
 
 		state.lastFieldWasBezeichnung = true
 
@@ -272,7 +275,7 @@ func (f Text) readMetadateiLine(state *textStateRead, line string) (err error) {
 				reflect.TypeOf(f).Name(),
 				head,
 			)
-      return
+			return
 		}
 	}
 
@@ -316,7 +319,14 @@ func (f Text) readTyp(state *textStateRead, desc string) (err error) {
 	} else {
 		//sha.ext or error
 		if shaError != nil {
-			err = errors.Wrap(shaError)
+			state.context.RecoverableErrors.Add(
+				errors.Wrap(
+					ErrHasInvalidAkteShaOrFilePath{
+						Value: head,
+					},
+				),
+			)
+
 			return
 		}
 

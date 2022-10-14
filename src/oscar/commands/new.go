@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/charlie/typ"
 	"github.com/friedenberg/zit/src/delta/zettel"
+	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
 	"github.com/friedenberg/zit/src/kilo/store_working_directory"
 	"github.com/friedenberg/zit/src/mike/umwelt"
@@ -82,15 +83,31 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			return
 		}
 	} else {
-		if zsc, err = c.readExistingFilesAsZettels(u, f, args...); err != nil {
+		var zts zettel_transacted.Set
+
+		if zts, err = c.readExistingFilesAsZettels(u, f, args...); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
+
+		if c.Edit {
+			options := store_working_directory.CheckoutOptions{
+				CheckoutMode: store_working_directory.CheckoutModeZettelAndAkte,
+				Format:       zettel.Text{},
+			}
+
+			if zsc, err = u.StoreWorkingDirectory().Checkout(options, zts); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}
 	}
 
-	if err = c.editZettelsIfRequested(u, zsc); err != nil {
-		err = errors.Wrap(err)
-		return
+	if c.Edit {
+		if err = c.editZettels(u, zsc); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return
@@ -100,7 +117,7 @@ func (c New) readExistingFilesAsZettels(
 	u *umwelt.Umwelt,
 	f zettel.Format,
 	args ...string,
-) (zsc zettel_checked_out.Set, err error) {
+) (zts zettel_transacted.Set, err error) {
 	opCreateFromPath := user_ops.CreateFromPaths{
 		Umwelt: u,
 		Format: f,
@@ -109,7 +126,7 @@ func (c New) readExistingFilesAsZettels(
 	}
 
 	//TODO add bezeichnung and etiketten, and typ?
-	if _, err = opCreateFromPath.Run(args...); err != nil {
+	if zts, err = opCreateFromPath.Run(args...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -154,21 +171,13 @@ func (c New) writeNewZettels(
 	return
 }
 
-func (c New) editZettelsIfRequested(
+func (c New) editZettels(
 	u *umwelt.Umwelt,
 	zsc zettel_checked_out.Set,
 ) (err error) {
 	if !c.Edit {
 		errors.Print("edit set to false, not editing")
 		return
-	}
-
-	openVimOp := user_ops.OpenVim{
-		Options: vim_cli_options_builder.New().
-			WithCursorLocation(2, 3).
-			WithFileType("zit-zettel").
-			WithInsertMode().
-			Build(),
 	}
 
 	fs := zsc.ToSliceFilesZettelen()
@@ -178,6 +187,14 @@ func (c New) editZettelsIfRequested(
 	if cwdFiles, err = store_working_directory.MakeCwdFilesExactly(u.Standort().Cwd(), fs...); err != nil {
 		err = errors.Wrap(err)
 		return
+	}
+
+	openVimOp := user_ops.OpenVim{
+		Options: vim_cli_options_builder.New().
+			WithCursorLocation(2, 3).
+			WithFileType("zit-zettel").
+			WithInsertMode().
+			Build(),
 	}
 
 	if _, err = openVimOp.Run(cwdFiles.ZettelFiles()...); err != nil {

@@ -254,6 +254,46 @@ func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 	ez.Named.Stored.Zettel = c.Zettel
 	ez.AkteFD.Path = c.AktePath
 
+	var unrecoverableErrors errors.ErrorMulti
+
+	for _, e := range c.RecoverableErrors {
+		var errAkteInlineAndFilePath zettel.ErrHasInlineAkteAndFilePath
+
+		if errors.As(e, &errAkteInlineAndFilePath) {
+			var z1 zettel.Zettel
+
+			if z1, err = errAkteInlineAndFilePath.Recover(); err != nil {
+        unrecoverableErrors.Add(errors.Wrap(err))
+        continue
+			}
+
+			ez.Named.Stored.Zettel = z1
+      continue
+		}
+
+		var err1 zettel.ErrHasInvalidAkteShaOrFilePath
+
+		if errors.As(e, &err1) {
+      var mutter zettel_transacted.Zettel
+
+      if mutter, err = s.storeObjekten.ReadHinweisSchwanzen(ez.Named.Hinweis); err != nil {
+        unrecoverableErrors.Add(errors.Wrap(err))
+        continue
+      }
+
+      ez.Named.Stored.Zettel.Akte = mutter.Named.Stored.Zettel.Akte
+
+      continue
+		}
+
+    unrecoverableErrors.Add(e)
+	}
+
+	if !unrecoverableErrors.Empty() {
+		err = errors.Wrap(unrecoverableErrors)
+		return
+	}
+
 	return
 }
 

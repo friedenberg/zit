@@ -38,7 +38,7 @@ func MakeStackInfo(d int) (si StackInfo, ok bool) {
 }
 
 func getPackageAndFunctionName(v string) (p string, f string) {
-  p, f = filepath.Split(v)
+	p, f = filepath.Split(v)
 
 	idx := strings.Index(f, ".")
 

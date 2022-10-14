@@ -3,6 +3,7 @@ package zettel
 import (
 	"io"
 
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/konfig"
 )
@@ -16,10 +17,10 @@ type AkteReaderFactory interface {
 }
 
 type FormatContextRead struct {
-	Zettel           Zettel
-	AktePath         string
-	In               io.Reader
-	RecoverableError error
+	Zettel            Zettel
+	AktePath          string
+	In                io.Reader
+	RecoverableErrors errors.ErrorMulti
 	AkteWriterFactory
 }
 

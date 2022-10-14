@@ -11,7 +11,7 @@ type FilterIdSet struct {
 }
 
 //TODO improve the performance of this query
-func (f FilterIdSet) IncludeNamedZettel(z Zettel) (ok bool) {
+func (f FilterIdSet) IncludeNamedZettel(z *Zettel) (ok bool) {
 	needsEt := f.Set.Etiketten().Len() > 0
 	okEt := false
 

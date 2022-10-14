@@ -12,6 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/id_set"
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
+	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
 	"github.com/friedenberg/zit/src/kilo/store_working_directory"
 	"github.com/friedenberg/zit/src/mike/umwelt"
@@ -81,10 +82,12 @@ func (c Edit) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 	var checkoutResults zettel_checked_out.Set
 
-	query := zettel_named.FilterIdSet{
-		Set: ids,
-		Or:  c.Or,
-	}
+	query := zettel_transacted.WriterIds(
+		zettel_named.FilterIdSet{
+			Set: ids,
+			Or:  c.Or,
+		},
+	)
 
 	if checkoutResults, err = u.StoreWorkingDirectory().Checkout(checkoutOptions, query); err != nil {
 		err = errors.Wrap(err)

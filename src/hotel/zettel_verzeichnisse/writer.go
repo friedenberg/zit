@@ -55,7 +55,7 @@ func MakeWriterNamedFilters(fs ...zettel_named.NamedFilter) Writer {
 	return MakeWriter(
 		func(zt *Zettel) (err error) {
 			for _, q := range fs {
-				if !q.IncludeNamedZettel(zt.Transacted.Named) {
+				if !q.IncludeNamedZettel(&zt.Transacted.Named) {
 					err = io.EOF
 					return
 				}

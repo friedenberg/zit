@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/id"
 	"github.com/friedenberg/zit/src/delta/zettel"
-	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 	"github.com/friedenberg/zit/src/golf/zettel_external"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
@@ -17,18 +16,12 @@ import (
 
 func (s *Store) Checkout(
 	options CheckoutOptions,
-	query zettel_named.NamedFilter,
+	ztw zettel_transacted.Writer,
 ) (zcs zettel_checked_out.Set, err error) {
 	zcs = zettel_checked_out.MakeSetUnique(0)
 	zts := zettel_transacted.MakeSetUnique(0)
 
-	w := zettel_transacted.WriterZettelNamed{
-		Writer: zettel_named.WriterFilter{
-			NamedFilter: query,
-		},
-	}
-
-	if err = s.storeObjekten.ReadAllSchwanzen(w, zts); err != nil {
+	if err = s.storeObjekten.ReadAllSchwanzen(ztw, zts); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -78,7 +78,7 @@ func (s *Sha) Set(v string) (err error) {
 	v1 := strings.TrimSpace(v)
 
 	if _, err = hex.DecodeString(v1); err != nil {
-		err = errors.Errorf("%q: %s", v1, err)
+		err = errors.Wrapf(err, "%q", v1)
 		return
 	}
 
