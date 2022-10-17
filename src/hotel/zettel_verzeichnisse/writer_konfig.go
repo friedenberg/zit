@@ -19,7 +19,7 @@ func MakeWriterKonfig(k konfig.Konfig) Writer {
 			for _, p := range z.EtikettenSorted {
 				for _, t := range k.Compiled.EtikettenHidden {
 					if strings.HasPrefix(p, t) {
-						errors.Err().Printf("eliding: %s", z.Transacted.Named.Hinweis)
+						errors.Log().Printf("eliding: %s", z.Transacted.Named.Hinweis)
 						err = io.EOF
 						return
 					}
