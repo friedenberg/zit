@@ -30,6 +30,8 @@ cat_yang() (
 )
 
 function format_organize_right_align { # @test
+	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+
 	to_add="$(mktemp)"
 	{
 		echo "# task"

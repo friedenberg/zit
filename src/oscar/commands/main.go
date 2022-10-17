@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/debug"
 	"github.com/friedenberg/zit/src/charlie/konfig"
+	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/mike/umwelt"
 )
 
@@ -84,21 +85,31 @@ func Run(args []string) (exitStatus int) {
 		return
 	}
 
+	cmdArgs := cmd.FlagSet.Args()
+
 	var u *umwelt.Umwelt
 
 	if u, err = umwelt.Make(k); err != nil {
 		//the store doesn't exist yet
-		if errors.IsNotExist(err) {
+		switch {
+		case errors.IsNotExist(err):
 			err = nil
-		} else {
+
+		case errors.Is(err, standort.ErrNotInZitDir{}) && cmd.FlagSet.Name() == "init":
+			if err = cmd.Command.Run(u, cmdArgs...); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+
+		default:
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
 	defer u.Flush()
-
-	cmdArgs := cmd.FlagSet.Args()
 
 	switch {
 	case u.Konfig().Complete:
