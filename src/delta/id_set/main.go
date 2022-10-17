@@ -2,7 +2,6 @@ package id_set
 
 import (
 	"fmt"
-	"reflect"
 
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/etikett"
@@ -13,23 +12,42 @@ import (
 )
 
 type Set struct {
-	shas sha.Set
-	ids  []id.Id
+	shas       sha.Set
+	etiketten  etikett.MutableSet
+	hinweisen  hinweis.MutableSet
+	typen      typ.MutableSet
+	timestamps ts.MutableSet
+	ids        []id.Id
 }
 
 func Make(c int) Set {
 	return Set{
-		shas: sha.MakeSet(c),
-		ids:  make([]id.Id, 0, c),
+		shas:       sha.MakeSet(c),
+		etiketten:  etikett.MakeMutableSet(),
+		hinweisen:  hinweis.MakeMutableSet(),
+		typen:      typ.MakeMutableSet(),
+		timestamps: ts.MakeMutableSet(),
+		ids:        make([]id.Id, 0, c),
 	}
 }
 
 func (s *Set) Add(ids ...id.Id) {
 	for _, i := range ids {
 		switch it := i.(type) {
-		case *sha.Sha:
+		case etikett.Etikett:
+			s.etiketten.Add(it)
+
 		case sha.Sha:
 			s.shas.Add(it)
+
+		case hinweis.Hinweis:
+			s.hinweisen.Add(it)
+
+		case typ.Typ:
+			s.typen.Add(it)
+
+		case ts.Time:
+			s.timestamps.Add(it)
 
 		default:
 			s.ids = append(s.ids, it)
@@ -50,52 +68,19 @@ func (s Set) Len() int {
 }
 
 func (s Set) Hinweisen() (hinweisen []hinweis.Hinweis) {
-	hinweisen = make([]hinweis.Hinweis, 0, len(s.ids))
-
-	val := reflect.ValueOf(&hinweis.Hinweis{})
-	t := val.Type()
-
-	targetType := t.Elem()
-
-	for _, i1 := range s.ids {
-		if reflect.TypeOf(i1).AssignableTo(targetType) {
-			hinweisen = append(hinweisen, i1.(hinweis.Hinweis))
-		}
-	}
+	hinweisen = s.hinweisen.Elements()
 
 	return
 }
 
 func (s Set) Timestamps() (timestamps []ts.Time) {
-	timestamps = make([]ts.Time, 0, len(s.ids))
-
-	val := reflect.ValueOf(&ts.Time{})
-	t := val.Type()
-
-	targetType := t.Elem()
-
-	for _, i1 := range s.ids {
-		if reflect.TypeOf(i1).AssignableTo(targetType) {
-			timestamps = append(timestamps, i1.(ts.Time))
-		}
-	}
+	timestamps = s.timestamps.Elements()
 
 	return
 }
 
 func (s Set) Typen() (typen []typ.Typ) {
-	typen = make([]typ.Typ, 0, len(s.ids))
-
-	val := reflect.ValueOf(&typ.Typ{})
-	t := val.Type()
-
-	targetType := t.Elem()
-
-	for _, i1 := range s.ids {
-		if reflect.TypeOf(i1).AssignableTo(targetType) {
-			typen = append(typen, i1.(typ.Typ))
-		}
-	}
+	typen = s.typen.Elements()
 
 	return
 }
@@ -119,20 +104,7 @@ func (s Set) AnyShasOrHinweisen() (ids []id.IdMitKorper) {
 }
 
 func (s Set) Etiketten() (etiketten etikett.Set) {
-	mes := etikett.MakeMutableSet()
-
-	val := reflect.ValueOf(&etikett.Etikett{})
-	t := val.Type()
-
-	targetType := t.Elem()
-
-	for _, i1 := range s.ids {
-		if reflect.TypeOf(i1).AssignableTo(targetType) {
-			mes.Add(i1.(etikett.Etikett))
-		}
-	}
-
-	etiketten = mes.Copy()
+	etiketten = s.etiketten.Copy()
 
 	return
 }

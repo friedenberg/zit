@@ -8,6 +8,8 @@ import (
 
 type Gattung int
 
+// Do not change this order, various serialization formats rely on the
+// underlying integer values.
 const (
 	Unknown = Gattung(iota)
 	Akte
