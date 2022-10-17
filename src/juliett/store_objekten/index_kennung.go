@@ -78,8 +78,6 @@ func (i *indexKennung) Flush() (err error) {
 		return
 	}
 
-	errors.PrintDebug(i.encodedKennung)
-
 	return
 }
 
@@ -115,8 +113,6 @@ func (i *indexKennung) readIfNecessary() (err error) {
 		err = errors.Wrap(err)
 		return
 	}
-
-	errors.PrintDebug(i.encodedKennung)
 
 	return
 }

@@ -5,7 +5,8 @@ import (
 )
 
 type Zettel struct {
-	Transacted              zettel_transacted.Zettel
+	Transacted zettel_transacted.Zettel
+	// Etiketten               tridex.Tridex
 	EtikettenExpandedSorted []string
 	EtikettenSorted         []string
 }

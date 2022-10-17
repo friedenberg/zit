@@ -8,6 +8,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/etikett"
+	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 )
 
 type indexEtiketten struct {
@@ -110,6 +111,32 @@ func (i *indexEtiketten) readIfNecessary() (err error) {
 		}
 
 		i.etiketten[r.Etikett] = r.count
+	}
+
+	return
+}
+
+func (i *indexEtiketten) addZettelWithOptionalMutter(
+	z *zettel_transacted.Zettel,
+	zMutter *zettel_transacted.Zettel,
+) (err error) {
+	zEtiketten := z.Named.Stored.Zettel.Etiketten
+
+	if zMutter != nil {
+		d := etikett.MakeSetDelta(
+			zMutter.Named.Stored.Zettel.Etiketten,
+			zEtiketten,
+		)
+
+		if err = i.processDelta(d); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		if err = i.add(zEtiketten); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return

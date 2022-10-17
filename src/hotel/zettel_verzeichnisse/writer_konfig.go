@@ -4,24 +4,22 @@ import (
 	"io"
 	"strings"
 
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/konfig"
 )
 
 //TODO add efficient parsing of hiding tags
 func MakeWriterKonfig(k konfig.Konfig) Writer {
+	if k.IncludeHidden {
+		return WriterIdentity{}
+	}
+
 	return MakeWriter(
 		func(z *Zettel) (err error) {
-			if k.IncludeHidden {
-				return
-			}
-
-			for _, p := range z.EtikettenExpandedSorted {
-				for tn, tv := range k.Tags {
-					if !tv.Hide {
-						continue
-					}
-
-					if strings.HasPrefix(p, tn) {
+			for _, p := range z.EtikettenSorted {
+				for _, t := range k.Compiled.EtikettenHidden {
+					if strings.HasPrefix(p, t) {
+						errors.Err().Printf("eliding: %s", z.Transacted.Named.Hinweis)
 						err = io.EOF
 						return
 					}

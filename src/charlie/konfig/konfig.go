@@ -5,29 +5,14 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/toml"
+	toml_package "github.com/friedenberg/zit/src/alfa/toml"
 	"github.com/friedenberg/zit/src/bravo/files"
 )
 
-type KonfigTag struct {
-	AddToNewZettels bool `toml:"add-to-new-zettels"`
-	Hide            bool `toml:"hide"`
-}
-
-type EtikettRule struct {
-	GoldenChild EtikettRuleGoldenChild `toml:"golden-child"`
-}
-
-type KonfigTyp struct {
-	FormatScript   ScriptConfig           `toml:"format-script"`
-	InlineAkte     bool                   `toml:"inline-akte" default:"true"`
-	ExecCommand    ScriptConfig           `toml:"exec-command"`
-	EtikettenRules map[string]EtikettRule `toml:"etiketten-rules"`
-}
-
 type Konfig struct {
 	Cli
-	Toml
+	toml
+	Compiled
 	Logger errors.Logger
 }
 
@@ -57,13 +42,13 @@ func LoadKonfig(p string) (c Konfig, err error) {
 		}
 	}()
 
-	var tc Toml
-	err = toml.Unmarshal([]byte(doc), &tc)
-
-	c.Toml = tc
-
-	if err != nil {
+	if err = toml_package.Unmarshal([]byte(doc), &c.toml); err != nil {
 		err = errors.Errorf("failed to parse config: %s", err)
+		return
+	}
+
+	if c.Compiled, err = makeCompiled(c.toml); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 

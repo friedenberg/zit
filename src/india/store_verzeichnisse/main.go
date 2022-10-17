@@ -146,8 +146,10 @@ func (i *Zettelen) ReadMany(
 						continue
 					}
 
+          //TODO hand back error
 					err = errors.Wrap(err)
-					return
+          errors.Err().Print(err)
+					// return
 				}
 
 				break

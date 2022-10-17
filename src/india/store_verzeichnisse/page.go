@@ -61,6 +61,7 @@ func (zp *Page) setState(v State) {
 func (zp *Page) Add(z *zettel_verzeichnisse.Zettel) (err error) {
 	if err = zp.flushFilter.WriteZettelVerzeichnisse(z); err != nil {
 		if errors.IsEOF(err) {
+			errors.Log().Printf("eliding %s", z.Transacted.Named.Hinweis)
 			err = nil
 		} else {
 			err = errors.Wrap(err)

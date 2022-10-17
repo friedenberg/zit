@@ -206,16 +206,16 @@ func (s Store) writeNamedZettelToIndex(tz zettel_transacted.Zettel) (err error) 
 	return
 }
 
-func (i *Store) ReadManySchwanzen(
-	ws ...zettel_verzeichnisse.Writer,
-) (err error) {
-	return i.verzeichnisseSchwanzen.ReadMany(ws...)
-}
-
 func (s Store) ReadHinweisSchwanzen(
 	h hinweis.Hinweis,
 ) (zv zettel_transacted.Zettel, err error) {
 	return s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(h)
+}
+
+func (i *Store) ReadManySchwanzen(
+	ws ...zettel_verzeichnisse.Writer,
+) (err error) {
+	return i.verzeichnisseSchwanzen.ReadMany(ws...)
 }
 
 func (s Store) ReadAllSchwanzen(ws ...zettel_transacted.Writer) (err error) {
@@ -397,17 +397,7 @@ func (s *Store) Update(
 		return
 	}
 
-	d := etikett.MakeSetDelta(
-		mutter.Named.Stored.Zettel.Etiketten,
-		tz.Named.Stored.Zettel.Etiketten,
-	)
-
-	if err = s.indexEtiketten.add(d.Added); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.indexEtiketten.del(d.Removed); err != nil {
+	if err = s.indexEtiketten.addZettelWithOptionalMutter(&tz, &mutter); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -646,12 +636,10 @@ func (s *Store) Reindex() (err error) {
 					}
 				}
 
-				var mutter zettel_transacted.Zettel
-				hasMutter := false
+				var mutter *zettel_transacted.Zettel
 
 				if mutter1, err := s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(tz.Named.Hinweis); err == nil {
-					hasMutter = true
-					mutter = mutter1
+					mutter = &mutter1
 				}
 
 				if err = s.writeNamedZettelToIndex(tz); err != nil {
@@ -659,16 +647,9 @@ func (s *Store) Reindex() (err error) {
 					return
 				}
 
-				if hasMutter {
-					d := etikett.MakeSetDelta(
-						mutter.Named.Stored.Zettel.Etiketten,
-						tz.Named.Stored.Zettel.Etiketten,
-					)
-
-					if err = s.indexEtiketten.processDelta(d); err != nil {
-						err = errors.Wrap(err)
-						return
-					}
+				if err = s.indexEtiketten.addZettelWithOptionalMutter(&tz, mutter); err != nil {
+					err = errors.Wrap(err)
+					return
 				}
 
 			default:

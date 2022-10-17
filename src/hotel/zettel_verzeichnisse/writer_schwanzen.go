@@ -75,7 +75,7 @@ func (zws *WriterSchwanzen) Set(z *zettel_transacted.Zettel) (ok bool) {
 		if t1.Sha.Equals(sh) {
 			ok = true
 		} else {
-      //TODO this should be a hard error in the future
+			//TODO this should be a hard error in the future
 			errors.Print("zettel schwanz exists with more than one sha in the same transaction")
 			//TODO this should be logged as it's a data consistency error
 			//This fixes an issue where some transactions have zettels appear more than
