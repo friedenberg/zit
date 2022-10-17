@@ -128,7 +128,8 @@ func (i *Zettelen) ReadMany(
 	wg := &sync.WaitGroup{}
 	ch := make(chan struct{}, PageCount)
 
-	w := zettel_verzeichnisse.MakeWriterMulti(i.pool, ws...)
+	w1 := zettel_verzeichnisse.MakeWriterChain(ws...)
+	w := zettel_verzeichnisse.MakeWriterChainIgnoreEOF(w1, i.pool)
 
 	for n, p := range i.pages {
 		wg.Add(1)
@@ -146,9 +147,9 @@ func (i *Zettelen) ReadMany(
 						continue
 					}
 
-          //TODO hand back error
+					//TODO hand back error
 					err = errors.Wrap(err)
-          errors.Err().Print(err)
+					errors.Err().Print(err)
 					// return
 				}
 

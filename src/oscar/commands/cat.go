@@ -90,7 +90,7 @@ func (c Cat) zettelen(u *umwelt.Umwelt) (err error) {
 	//TODO switch to stream
 	all := zettel_transacted.MakeSetUnique(0)
 
-	if err = u.StoreObjekten().ReadAllSchwanzen(all); err != nil {
+	if err = u.StoreObjekten().ReadAllSchwanzenTransacted(all); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -186,7 +186,7 @@ func (c Cat) typen(u *umwelt.Umwelt) (err error) {
 	//TODO switch to stream
 	all := zettel_transacted.MakeSetUnique(0)
 
-	if err = u.StoreObjekten().ReadAllSchwanzen(all); err != nil {
+	if err = u.StoreObjekten().ReadAllSchwanzenTransacted(all); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

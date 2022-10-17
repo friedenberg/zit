@@ -28,7 +28,7 @@ func makeZettelenPage(
 	pool *zettel_verzeichnisse.Pool,
 ) (p *Page) {
 	var flushFilter zettel_verzeichnisse.Writer
-	flushFilter = zettel_verzeichnisse.WriterIdentity{}
+	flushFilter = zettel_verzeichnisse.WriterNoop{}
 
 	if zvwg, ok := iof.(ZettelVerzeichnisseWriterGetter); ok {
 		flushFilter = zvwg.ZettelVerzeichnisseWriter(pid.index)
@@ -255,10 +255,12 @@ func (zp *Page) WriteTo(w1 io.Writer) (n int64, err error) {
 
 	defer errors.PanicIfError(w.Flush)
 
-	wm := zettel_verzeichnisse.MakeWriterMulti(
+	wm := zettel_verzeichnisse.MakeWriterChainIgnoreEOF(
+		zettel_verzeichnisse.MakeWriterChain(
+			zp.flushFilter,
+			zettel_verzeichnisse.MakeWriterGobEncoder(w),
+		),
 		zp.pool,
-		zp.flushFilter,
-		zettel_verzeichnisse.MakeWriterGobEncoder(w),
 	)
 
 	if err = zp.WriteZettelenTo(wm); err != nil {

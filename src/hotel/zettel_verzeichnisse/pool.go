@@ -6,10 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 )
 
-type PoolGetter interface {
-	ZettelVerzeichnissePool() *Pool
-}
-
 type Pool struct {
 	inner *sync.Pool
 }
@@ -29,7 +25,11 @@ func (ip Pool) Get() *Zettel {
 }
 
 func (ip Pool) Put(i *Zettel) {
-	i.Reset(nil)
+  if i == nil {
+    return
+  }
+
+  i.Reset(nil)
 	ip.inner.Put(i)
 }
 

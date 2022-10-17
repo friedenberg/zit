@@ -78,7 +78,7 @@ func (c CatAlfred) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	case gattung.Hinweis:
 		wk := zettel_verzeichnisse.MakeWriterKonfig(u.Konfig())
 
-		if err = u.StoreObjekten().ReadManySchwanzen(wk, aw); err != nil {
+		if err = u.StoreObjekten().ReadAllSchwanzenVerzeichnisse(wk, aw); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

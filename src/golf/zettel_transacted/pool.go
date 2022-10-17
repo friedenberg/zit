@@ -2,10 +2,6 @@ package zettel_transacted
 
 import "sync"
 
-type PoolGetter interface {
-	ZettelTransactedPool() *Pool
-}
-
 type Pool struct {
 	inner *sync.Pool
 }
@@ -25,11 +21,15 @@ func (ip Pool) Get() *Zettel {
 }
 
 func (ip Pool) Put(i *Zettel) {
+	if i == nil {
+		return
+	}
+
 	i.Reset()
 	ip.inner.Put(i)
 }
 
-func (ip Pool) WriteZettelVerzeichnisse(z *Zettel) (err error) {
+func (ip Pool) WriteZettelTransacted(z *Zettel) (err error) {
 	ip.Put(z)
 	return
 }

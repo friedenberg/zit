@@ -21,7 +21,7 @@ func (s *Store) Checkout(
 	zcs = zettel_checked_out.MakeSetUnique(0)
 	zts := zettel_transacted.MakeSetUnique(0)
 
-	if err = s.storeObjekten.ReadAllSchwanzen(ztw, zts); err != nil {
+	if err = s.storeObjekten.ReadAllSchwanzenTransacted(ztw, zts); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

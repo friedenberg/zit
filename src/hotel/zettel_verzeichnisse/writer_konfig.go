@@ -11,7 +11,7 @@ import (
 //TODO add efficient parsing of hiding tags
 func MakeWriterKonfig(k konfig.Konfig) Writer {
 	if k.IncludeHidden {
-		return WriterIdentity{}
+		return WriterNoop{}
 	}
 
 	return MakeWriter(
