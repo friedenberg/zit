@@ -7,22 +7,24 @@ import (
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/charlie/id"
+	"github.com/friedenberg/zit/src/charlie/konfig"
 	"github.com/friedenberg/zit/src/charlie/ts"
 	"github.com/friedenberg/zit/src/charlie/typ"
 )
 
 type Set struct {
-	shas       sha.Set
+	shas       sha.MutableSet
 	etiketten  etikett.MutableSet
 	hinweisen  hinweis.MutableSet
 	typen      typ.MutableSet
 	timestamps ts.MutableSet
+	konfig     *konfig.Id
 	ids        []id.Id
 }
 
 func Make(c int) Set {
 	return Set{
-		shas:       sha.MakeSet(c),
+		shas:       sha.MakeMutableSet(),
 		etiketten:  etikett.MakeMutableSet(),
 		hinweisen:  hinweis.MakeMutableSet(),
 		typen:      typ.MakeMutableSet(),
@@ -49,14 +51,17 @@ func (s *Set) Add(ids ...id.Id) {
 		case ts.Time:
 			s.timestamps.Add(it)
 
+		case konfig.Id:
+			s.konfig = &it
+
 		default:
 			s.ids = append(s.ids, it)
 		}
 	}
 }
 
-func (s *Set) Shas() sha.Set {
-	return s.shas
+func (s *Set) Shas() (shas []sha.Sha) {
+	return s.shas.Elements()
 }
 
 func (s Set) String() string {
@@ -85,14 +90,19 @@ func (s Set) Typen() (typen []typ.Typ) {
 	return
 }
 
+func (s Set) Konfig() (ok bool) {
+	ok = s.konfig != nil
+
+	return
+}
+
 func (s Set) AnyShasOrHinweisen() (ids []id.IdMitKorper) {
 	hinweisen := s.Hinweisen()
 	ids = make([]id.IdMitKorper, 0, s.shas.Len()+len(hinweisen))
 
 	s.shas.Each(
-		func(sh sha.Sha) (err error) {
+		func(sh sha.Sha) {
 			ids = append(ids, sh)
-			return
 		},
 	)
 

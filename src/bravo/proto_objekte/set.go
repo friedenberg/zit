@@ -16,18 +16,6 @@ type Set[T ProtoObjekte, T1 interface {
 	inner  map[string]T
 }
 
-func (s *Set[T, T1]) open() {
-	s.closed = false
-}
-
-func (s *Set[T, T1]) close() {
-	s.closed = true
-}
-
-func (s Set[T, T1]) Len() int {
-	return len(s.inner)
-}
-
 func MakeSet[T ProtoObjekte, T1 interface {
 	*T
 	ProtoObjektePointer
@@ -65,12 +53,30 @@ func MakeSetStrings[T ProtoObjekte, T1 interface {
 	return
 }
 
+func (s *Set[T, T1]) open() {
+	s.closed = false
+}
+
+func (s *Set[T, T1]) close() {
+	s.closed = true
+}
+
+func (s Set[T, T1]) Len() int {
+	return len(s.inner)
+}
+
 func (es Set[T, T1]) add(e T) {
 	if es.closed {
 		panic("trying to add etikett to closed set")
 	}
 
 	es.inner[e.String()] = e
+}
+
+func (s Set[T, T1]) Each(f func(T)) {
+	for _, v := range s.inner {
+		f(v)
+	}
 }
 
 func (s *Set[T, T1]) Set(v string) (err error) {

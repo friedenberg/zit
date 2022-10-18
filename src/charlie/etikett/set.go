@@ -26,38 +26,6 @@ func MakeSetStrings(vs ...string) (s Set, err error) {
 	return
 }
 
-// func (s *Set) Set(v string) (err error) {
-// 	if s.closed {
-// 		err = errors.Errorf("trying to mutate closed set")
-// 		return
-// 	}
-
-// 	s.inner = make(map[string]Etikett, 1)
-
-// 	es := strings.Split(v, ",")
-
-// 	if len(es) == 0 {
-// 		return
-// 	}
-
-// 	if es[0] == "" {
-// 		return
-// 	}
-
-// 	for _, e := range es {
-// 		var e1 Etikett
-
-// 		if err = e1.Set(e); err != nil {
-// 			err = errors.Wrap(err)
-// 			return
-// 		}
-
-// 		s.addOnlyExact(e1)
-// 	}
-
-// 	return
-// }
-
 func WithRemovedCommonPrefixes(s Set) (s2 Set) {
 	es1 := s.Sorted()
 	es := make([]Etikett, 0, len(es1))
