@@ -118,8 +118,6 @@ func (zp *Page) WriteZettelenTo(
 ) (err error) {
 	var r io.ReadCloser
 
-	errors.Printf("reading page: %s", zp.path)
-
 	if r, err = zp.ReadCloserVerzeichnisse(zp.path); err != nil {
 		if errors.IsNotExist(err) {
 			r = ioutil.NopCloser(bytes.NewReader(nil))
@@ -129,6 +127,8 @@ func (zp *Page) WriteZettelenTo(
 			return
 		}
 	}
+
+	// errors.Printf("reading page: %s", zp.path)
 
 	defer r.Close()
 

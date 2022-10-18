@@ -1,106 +1,64 @@
 package etikett
 
 import (
-	"encoding/json"
-	"sort"
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/proto_objekte"
 )
 
-type Set struct {
-	closed bool
-	inner  map[string]Etikett
-}
-
-func (s *Set) open() {
-	s.closed = false
-}
-
-func (s *Set) close() {
-	s.closed = true
-}
-
-func (s Set) Len() int {
-	return len(s.inner)
-}
+type Set = proto_objekte.Set[Etikett, *Etikett]
 
 func MakeSet(es ...Etikett) (s Set) {
-	s.inner = make(map[string]Etikett, len(es))
-	s.open()
-	defer s.close()
+	return Set(proto_objekte.MakeSet(es...))
+}
 
-	for _, e := range es {
-		s.addOnlyExact(e)
+func MakeSetStrings(vs ...string) (s Set, err error) {
+	var s1 proto_objekte.Set[Etikett, *Etikett]
+
+	if s1, err = proto_objekte.MakeSetStrings[Etikett, *Etikett](vs...); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
+
+	s = Set(s1)
 
 	return
 }
 
-func MakeSetFromStrings(es ...string) (s Set, err error) {
-	s.inner = make(map[string]Etikett, len(es))
+// func (s *Set) Set(v string) (err error) {
+// 	if s.closed {
+// 		err = errors.Errorf("trying to mutate closed set")
+// 		return
+// 	}
 
-	for _, v := range es {
-		var e Etikett
+// 	s.inner = make(map[string]Etikett, 1)
 
-		if err = e.Set(v); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+// 	es := strings.Split(v, ",")
 
-		s.addOnlyExact(e)
-	}
+// 	if len(es) == 0 {
+// 		return
+// 	}
 
-	s.closed = true
+// 	if es[0] == "" {
+// 		return
+// 	}
 
-	return
-}
+// 	for _, e := range es {
+// 		var e1 Etikett
 
-func (es *Set) addOnlyExact(e Etikett) {
-	es.add(e)
-}
+// 		if err = e1.Set(e); err != nil {
+// 			err = errors.Wrap(err)
+// 			return
+// 		}
 
-func (es *Set) add(e Etikett) {
-	if es.closed {
-		panic("trying to add etikett to closed set")
-	}
+// 		s.addOnlyExact(e1)
+// 	}
 
-	es.inner[e.String()] = e
-}
+// 	return
+// }
 
-func (s *Set) Set(v string) (err error) {
-	if s.closed {
-		err = errors.Errorf("trying to mutate closed set")
-		return
-	}
-
-	s.inner = make(map[string]Etikett, 1)
-
-	es := strings.Split(v, ",")
-
-	if len(es) == 0 {
-		return
-	}
-
-	if es[0] == "" {
-		return
-	}
-
-	for _, e := range es {
-		var e1 Etikett
-
-		if err = e1.Set(e); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		s.addOnlyExact(e1)
-	}
-
-	return
-}
-
-func (s Set) WithRemovedCommonPrefixes() (s2 Set) {
+func WithRemovedCommonPrefixes(s Set) (s2 Set) {
 	es1 := s.Sorted()
 	es := make([]Etikett, 0, len(es1))
 
@@ -130,231 +88,69 @@ func (s Set) WithRemovedCommonPrefixes() (s2 Set) {
 	return
 }
 
-func (es *Set) Remove(es1 ...Etikett) {
-	for _, e := range es1 {
-		delete(es.inner, e.String())
-	}
-}
+func Expanded(s Set, exes ...Expander) (out Set) {
+	s1 := MakeMutableSet()
 
-func (es *Set) RemovePrefixes(needle Etikett) {
-	for haystack, _ := range es.inner {
-		if strings.HasPrefix(haystack, needle.String()) {
-			delete(es.inner, haystack)
-		}
-	}
-}
-
-func (a Set) Equals(b Set) bool {
-	if len(a.inner) != len(b.inner) {
-		return false
+	for _, e := range s.Elements() {
+		s1.Merge(e.Expanded(exes...))
 	}
 
-	for ae, _ := range a.inner {
-		if _, ok := b.inner[ae]; !ok {
-			return false
-		}
-	}
-
-	return true
-}
-
-func (s1 Set) Copy() (s2 Set) {
-	s2 = MakeSet()
-	s2.open()
-	defer s2.close()
-
-	for _, e := range s1.inner {
-		s2.addOnlyExact(e)
-	}
+	out = s1.Copy()
 
 	return
 }
 
-func (s1 Set) MutableCopy() (s2 MutableSet) {
-	s2 = MakeMutableSet()
+// func (s Set) String() string {
+// 	return strings.Join(s.SortedString(), ", ")
+// }
 
-	for _, e := range s1.inner {
-		s2.addOnlyExact(e)
-	}
+func IntersectPrefixes(s1 Set, s2 Set) (s3 Set) {
+	s4 := MakeMutableSet()
 
-	return
-}
-
-func (s Set) Expanded(exes ...Expander) (s1 Set) {
-	s1 = MakeSet()
-	s1.open()
-	defer s1.close()
-
-	for _, e := range s.inner {
-		for _, e1 := range e.Expanded(exes...).inner {
-			s1.addOnlyExact(e1)
-		}
-	}
-
-	return
-}
-
-func (s Set) String() string {
-	return strings.Join(s.SortedString(), ", ")
-}
-
-func (s Set) Strings() (out []string) {
-	out = make([]string, 0, len(s.inner))
-
-	for s, _ := range s.inner {
-		out = append(out, s)
-	}
-
-	return
-}
-
-func (es Set) Etiketten() (out []Etikett) {
-	out = make([]Etikett, len(es.inner))
-
-	i := 0
-
-	for _, e := range es.inner {
-		out[i] = e
-		i++
-	}
-
-	return
-}
-
-func (es Set) Sorted() (out []Etikett) {
-	out = es.Etiketten()
-
-	sort.Slice(
-		out,
-		func(i, j int) bool {
-			return out[i].String() < out[j].String()
-		},
-	)
-
-	return
-}
-
-func (es Set) SortedString() (out []string) {
-	out = make([]string, len(es.inner))
-
-	i := 0
-
-	for _, e := range es.inner {
-		out[i] = e.String()
-		i++
-	}
-
-	sort.Slice(
-		out,
-		func(i, j int) bool {
-			return out[i] < out[j]
-		},
-	)
-
-	return
-}
-
-func (s Set) Contains(e Etikett) bool {
-	return s.ContainsString(e.String())
-}
-
-func (s Set) ContainsString(es string) bool {
-	_, ok := s.inner[es]
-	return ok
-}
-
-func (a Set) ContainsSet(b Set) bool {
-	for _, e := range b.inner {
-		if !a.Contains(e) {
-			return false
-		}
-	}
-
-	return true
-}
-
-func (s1 Set) Subtract(s2 Set) (s3 Set) {
-	s3 = MakeSet()
-
-	for _, e1 := range s1.inner {
-		if s2.Contains(e1) {
-			continue
-		}
-
-		s3.addOnlyExact(e1)
-	}
-
-	return
-}
-
-func (s1 Set) IntersectPrefixes(s2 Set) (s3 Set) {
-	s3 = MakeSet()
-	s3.open()
-	defer s3.close()
-
-	for _, e1 := range s2.inner {
+	for _, e1 := range s2.Elements() {
 		didAdd := false
 
-		for _, e := range s1.inner {
+		for _, e := range s1.Elements() {
 			if strings.HasPrefix(e.String(), e1.String()) {
 				didAdd = true
-				s3.addOnlyExact(e)
+				s4.Add(e)
 			}
 		}
 
 		if !didAdd {
-			s3 = MakeSet()
+			s4 = MakeMutableSet()
 			return
 		}
 	}
 
-	return
-}
-
-func (s1 Set) Intersect(s2 Set) (s3 Set) {
-	s3 = MakeSet()
-
-	for _, e := range s1.inner {
-		if s2.Contains(e) {
-			s3.addOnlyExact(e)
-		}
-	}
+	s3 = s4.Copy()
 
 	return
 }
 
-func (s1 Set) SubtractPrefix(e Etikett) (s2 Set) {
-	s2 = MakeSet()
-	s2.open()
-	defer s2.close()
+func SubtractPrefix(s1 Set, e Etikett) (s2 Set) {
+	s3 := MakeMutableSet()
 
-	for _, e1 := range s1.inner {
+	for _, e1 := range s1.Elements() {
 		e2 := e1.LeftSubtract(e)
 
 		if e2.String() == "" {
 			continue
 		}
 
-		s2.addOnlyExact(e2)
+		s3.Add(e2)
 	}
+
+	s2 = s3.Copy()
 
 	return
 }
 
-func (s Set) Any() (e Etikett) {
-	for _, e1 := range s.inner {
-		e = e1
-		break
-	}
-
-	return e
-}
-
-func (es Set) Description() string {
+func Description(s Set) string {
 	sb := &strings.Builder{}
 	first := true
 
-	for _, e1 := range es.Sorted() {
+	for _, e1 := range s.Sorted() {
 		if !first {
 			sb.WriteString(", ")
 		}
@@ -365,47 +161,4 @@ func (es Set) Description() string {
 	}
 
 	return sb.String()
-}
-
-func (es Set) MarshalJSON() ([]byte, error) {
-	return json.Marshal(es.SortedString())
-}
-
-func (es *Set) UnmarshalJSON(b []byte) (err error) {
-	*es = MakeSet()
-	var vs []string
-
-	if err = json.Unmarshal(b, &vs); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	for _, v := range vs {
-		var e Etikett
-
-		if err = e.Set(v); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		es.addOnlyExact(e)
-	}
-
-	return
-}
-
-func (s Set) MarshalBinary() (text []byte, err error) {
-	text = []byte(s.String())
-
-	return
-}
-
-func (s *Set) UnmarshalBinary(text []byte) (err error) {
-	s.inner = make(map[string]Etikett)
-
-	if err = s.Set(string(text)); err != nil {
-		return
-	}
-
-	return
 }

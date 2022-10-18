@@ -28,13 +28,13 @@ func (s SetPrefixTransacted) Len() int {
 
 //this splits on right-expanded
 func (s *SetPrefixTransacted) Add(z Zettel) {
-	es := z.Named.Stored.Zettel.Etiketten.Expanded(etikett.ExpanderRight{})
+	es := etikett.Expanded(z.Named.Stored.Zettel.Etiketten, etikett.ExpanderRight{})
 
 	if es.Len() == 0 {
 		es = etikett.MakeSet(etikett.Etikett{})
 	}
 
-	for _, e := range es.Etiketten() {
+	for _, e := range es.Elements() {
 		s.addPair(e, z)
 	}
 }
@@ -116,7 +116,7 @@ func (a SetPrefixTransacted) Subset(e etikett.Etikett) (out SetPrefixTransactedS
 			errors.Printf("%s yields %s", e1, intersection)
 
 			if intersection.Len() > 0 {
-				for _, e2 := range intersection.Etiketten() {
+				for _, e2 := range intersection.Elements() {
 					out.Grouped.addPair(e2, z)
 				}
 			} else {

@@ -2,12 +2,14 @@ package etikett
 
 type ExpanderRight struct{}
 
-func (ex ExpanderRight) Expand(e Etikett) (expanded Set) {
-	expanded = Set(newSetExpanded())
-	expanded.open()
-	defer expanded.close()
+func (ex ExpanderRight) Expand(e Etikett) (out Set) {
+	expanded := MakeMutableSet()
 
-	expanded.addOnlyExact(e)
+	defer func() {
+		out = Set(newSetExpanded(expanded.Elements()...))
+	}()
+
+	expanded.Add(e)
 
 	s := e.String()
 
@@ -25,7 +27,7 @@ func (ex ExpanderRight) Expand(e Etikett) (expanded Set) {
 		locStart := loc[0]
 		t1 := s[0:locStart]
 
-		expanded.addOnlyExact(Etikett{Value: t1})
+		expanded.Add(Etikett{Value: t1})
 	}
 
 	return

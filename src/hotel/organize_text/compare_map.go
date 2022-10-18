@@ -28,7 +28,7 @@ func (m SetKeyToEtiketten) Add(h string, e etikett.Etikett) {
 		es = etikett.MakeMutableSet()
 	}
 
-	es.AddNormalized(e)
+	etikett.AddNormalized(es, e)
 	m[h] = es
 }
 
@@ -83,7 +83,7 @@ func (a *assignment) addToCompareMap(m Metadatei, es etikett.Set, out *CompareMa
 			out.Named.Add(z.Hinweis.String(), e)
 		}
 
-		for _, e := range m.Set.Etiketten() {
+		for _, e := range m.Set.Elements() {
 			//TODO add typ
 			out.Named.Add(z.Hinweis.String(), e)
 		}
@@ -94,7 +94,7 @@ func (a *assignment) addToCompareMap(m Metadatei, es etikett.Set, out *CompareMa
 			out.Unnamed.Add(z.Bezeichnung.String(), e)
 		}
 
-		for _, e := range m.Set.Etiketten() {
+		for _, e := range m.Set.Elements() {
 			//TODO add typ
 			out.Unnamed.Add(z.Bezeichnung.String(), e)
 		}

@@ -52,7 +52,7 @@ func ChangesFrom(a1, b1 *organize_text.Text) (c1 Changes, err error) {
 	for h, es1 := range b.Named {
 		c.AllB = append(c.AllB, h)
 
-		for _, e1 := range es1.Etiketten() {
+		for _, e1 := range es1.Elements() {
 			if a.Named.Contains(h, e1) {
 				//zettel had etikett previously
 			} else {
@@ -73,7 +73,7 @@ func ChangesFrom(a1, b1 *organize_text.Text) (c1 Changes, err error) {
 	}
 
 	for h, es := range a.Named {
-		for _, e1 := range es.Etiketten() {
+		for _, e1 := range es.Elements() {
 			if e1.String() == "" {
 				err = errors.Errorf("empty etikett for %s", h)
 				return
@@ -103,7 +103,7 @@ func ChangesFrom(a1, b1 *organize_text.Text) (c1 Changes, err error) {
 	}
 
 	for h, es := range b.Unnamed {
-		for _, e := range es.Etiketten() {
+		for _, e := range es.Elements() {
 			addNew(h, e.String())
 		}
 	}

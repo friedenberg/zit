@@ -43,7 +43,29 @@ func MakeSet[T ProtoObjekte, T1 interface {
 	return
 }
 
-func (es *Set[T, T1]) add(e T) {
+func MakeSetStrings[T ProtoObjekte, T1 interface {
+	*T
+	ProtoObjektePointer
+}](es ...string) (s Set[T, T1], err error) {
+	s.inner = make(map[string]T, len(es))
+	s.open()
+	defer s.close()
+
+	for _, e := range es {
+		e1 := T1(new(T))
+
+		if err = e1.Set(e); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		s.add(*e1)
+	}
+
+	return
+}
+
+func (es Set[T, T1]) add(e T) {
 	if es.closed {
 		panic("trying to add etikett to closed set")
 	}
@@ -52,6 +74,11 @@ func (es *Set[T, T1]) add(e T) {
 }
 
 func (s *Set[T, T1]) Set(v string) (err error) {
+	if s == nil {
+		s1 := MakeSet[T, T1]()
+		s = &s1
+	}
+
 	if s.closed {
 		err = errors.Errorf("trying to mutate closed set")
 		return
@@ -70,7 +97,7 @@ func (s *Set[T, T1]) Set(v string) (err error) {
 	}
 
 	for _, e := range es {
-		var e1 T1
+		e1 := T1(new(T))
 
 		if err = e1.Set(e); err != nil {
 			err = errors.Wrap(err)
@@ -127,7 +154,7 @@ func (s1 Set[T, T1]) MutableCopy() (s2 MutableSet[T, T1]) {
 	s2 = MakeMutableSet[T, T1]()
 
 	for _, e := range s1.inner {
-		s2.add(e)
+		s2.Add(e)
 	}
 
 	return
@@ -290,7 +317,7 @@ func (s Set[T, T1]) String() string {
 
 	for _, e1 := range s.Sorted() {
 		if !first {
-			sb.WriteString(",")
+			sb.WriteString(", ")
 		}
 
 		sb.WriteString(e1.String())

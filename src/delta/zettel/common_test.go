@@ -12,7 +12,7 @@ import (
 func makeEtiketten(t *testing.T, vs ...string) (es etikett.Set) {
 	var err error
 
-	if es, err = etikett.MakeSetFromStrings(vs...); err != nil {
+	if es, err = etikett.MakeSetStrings(vs...); err != nil {
 		t.Fatalf("%s", err)
 	}
 

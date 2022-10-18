@@ -39,6 +39,15 @@ func TestNormalize(t *testing.T) {
 				Etikett{Value: "zz-archive-task-done"},
 			),
 		},
+		"removes right order": testEntry{
+			ac: MakeSet(
+				Etikett{Value: "priority"},
+				Etikett{Value: "priority-1"},
+			),
+			ex: MakeSet(
+				Etikett{Value: "priority-1"},
+			),
+		},
 	}
 
 	for d, te := range testEntries {
@@ -46,7 +55,7 @@ func TestNormalize(t *testing.T) {
 			d,
 			func(t1 *testing.T) {
 				t := test_logz.T{T: t1}
-				ac := te.ac.WithRemovedCommonPrefixes()
+				ac := WithRemovedCommonPrefixes(te.ac)
 
 				if !ac.Equals(te.ex) {
 					t.Errorf(
@@ -137,7 +146,7 @@ func TestExpandedRight(t *testing.T) {
 		Etikett{Value: "zz-archive-task-done"},
 	)
 
-	ex := s.Expanded(ExpanderRight{})
+	ex := Expanded(s, ExpanderRight{})
 
 	expected := []string{
 		"project",

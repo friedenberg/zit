@@ -9,7 +9,7 @@ import (
 )
 
 func (z *Zettel) ApplyKonfig(k konfig.Konfig) (err error) {
-	normalized := z.Etiketten.WithRemovedCommonPrefixes()
+	normalized := etikett.WithRemovedCommonPrefixes(z.Etiketten)
 	z.Etiketten = normalized
 
 	var tk konfig.KonfigTyp
@@ -46,7 +46,7 @@ func (z *Zettel) applyGoldenChild(
 
 	mes := z.Etiketten.MutableCopy()
 
-	prefixes := mes.Withdraw(e).Etiketten()
+	prefixes := etikett.Withdraw(mes, e).Elements()
 
 	if len(prefixes) == 0 {
 		return

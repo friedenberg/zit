@@ -2,12 +2,14 @@ package etikett
 
 type ExpanderAll struct{}
 
-func (ex ExpanderAll) Expand(e Etikett) (expanded Set) {
-	expanded = Set(newSetExpanded())
-	expanded.open()
-	defer expanded.close()
+func (ex ExpanderAll) Expand(e Etikett) (out Set) {
+	expanded := MakeMutableSet()
 
-	expanded.addOnlyExact(e)
+	defer func() {
+		out = Set(newSetExpanded(expanded.Elements()...))
+	}()
+
+	expanded.Add(e)
 
 	s := e.String()
 
@@ -30,12 +32,12 @@ func (ex ExpanderAll) Expand(e Etikett) (expanded Set) {
 		t1 := s[0:locStart]
 		t2 := s[locEnd:end]
 
-		expanded.addOnlyExact(Etikett{Value: t1})
-		expanded.addOnlyExact(Etikett{Value: t2})
+		expanded.Add(Etikett{Value: t1})
+		expanded.Add(Etikett{Value: t2})
 
 		if 0 < i && i < len(hyphens) {
 			t1 := s[prevLocEnd:locStart]
-			expanded.addOnlyExact(Etikett{Value: t1})
+			expanded.Add(Etikett{Value: t1})
 		}
 
 		prevLocEnd = locEnd

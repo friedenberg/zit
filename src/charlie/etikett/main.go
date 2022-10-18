@@ -97,20 +97,18 @@ func (a Etikett) HasParentPrefix(b Etikett) (has bool) {
 	return
 }
 
-func (e Etikett) Expanded(exes ...Expander) (expanded Set) {
-	expanded = MakeSet()
-	expanded.open()
-	defer expanded.close()
+func (e Etikett) Expanded(exes ...Expander) (out Set) {
+	expanded := MakeMutableSet()
 
 	if len(exes) == 0 {
 		exes = []Expander{ExpanderAll{}}
 	}
 
 	for _, ex := range exes {
-		for _, e := range ex.Expand(e).Etiketten() {
-			expanded.addOnlyExact(e)
-		}
+		expanded.Merge(ex.Expand(e))
 	}
+
+	out = Set(expanded.Copy())
 
 	return
 }

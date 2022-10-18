@@ -21,7 +21,7 @@ func (atc *AssignmentTreeConstructor) Assignments() (roots []*assignment, err er
 
 	prefixSet := atc.Transacted.ToSetPrefixTransacted()
 
-	for _, e := range atc.ExtraEtiketten.Etiketten() {
+	for _, e := range atc.ExtraEtiketten.Elements() {
 		errors.Err().Printf("making extras: %s", e)
 		errors.Err().Printf("prefix set before: %v", prefixSet)
 		if err = atc.makeChildren(root, prefixSet, etikett.MakeSlice(e)); err != nil {

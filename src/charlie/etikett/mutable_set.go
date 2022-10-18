@@ -3,125 +3,63 @@ package etikett
 import (
 	"strings"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/proto_objekte"
 )
 
-type innerSet = Set
+type MutableSet = proto_objekte.MutableSet[Etikett, *Etikett]
 
-type MutableSet struct {
-	innerSet
+func MakeMutableSet(hs ...Etikett) MutableSet {
+	return MutableSet(proto_objekte.MakeMutableSet[Etikett, *Etikett](hs...))
 }
 
-func MakeMutableSet(es ...Etikett) (s MutableSet) {
-	s.innerSet = innerSet(MakeSet(es...))
+func AddNormalized(es MutableSet, e Etikett) {
+	es.Merge(e.Expanded(ExpanderRight{}))
+	es.Add(e)
 
-	return
+	es.Reset(WithRemovedCommonPrefixes(es.Copy()))
 }
 
-func (es MutableSet) AddString(v string) (err error) {
-	var e Etikett
-
-	if err = e.Set(v); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	es.addOnlyExact(e)
-
-	return
-}
-
-func (es MutableSet) AddNormalized(e Etikett) {
-	expanded := e.Expanded(ExpanderRight{})
-	i := MakeSet(e)
-	i.open()
-	defer i.close()
-
-	for _, e := range expanded.inner {
-		if es.Contains(e) {
-			es.Remove(e)
-			i.addOnlyExact(e)
+func RemovePrefixes(es MutableSet, needle Etikett) {
+	for _, haystack := range es.Elements() {
+		//TODO make more efficient
+		if strings.HasPrefix(haystack.String(), needle.String()) {
+			es.Remove(haystack)
 		}
 	}
-
-	for _, e1 := range i.WithRemovedCommonPrefixes().inner {
-		es.addOnlyExact(e1)
-	}
 }
 
-func (es MutableSet) Add(e Etikett) {
-	// expanded := e.Expanded(ExpanderRight{})
-	// intersection := es.Intersect(expanded)
-	// es.Remove(intersection.Etiketten()...)
+func Withdraw(s1 MutableSet, e Etikett) (s2 Set) {
+	s3 := MakeMutableSet()
 
-	es.addOnlyExact(e)
-}
-
-func (es MutableSet) addOnlyExact(e Etikett) {
-	es.inner[e.String()] = e
-}
-
-func (s MutableSet) Set(v string) (err error) {
-	es := strings.Split(v, ",")
-
-	for _, e := range es {
-		if err = s.AddString(e); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	return
-}
-
-func (es MutableSet) Remove(es1 ...Etikett) {
-	for _, e := range es1 {
-		delete(es.inner, e.String())
-	}
-}
-
-func (s1 MutableSet) Withdraw(e Etikett) (s2 Set) {
-	s2 = MakeSet()
-	s2.open()
-	defer s2.close()
-
-	for _, e1 := range s1.inner {
+	for _, e1 := range s1.Elements() {
 		if e1.Contains(e) {
-			s2.addOnlyExact(e1)
+			s3.Add(e1)
 		}
 	}
 
-	s1.Remove(s2.Etiketten()...)
+	s1.Remove(s3.Elements()...)
+	s2 = s3.Copy()
 
 	return
 }
 
-func (es MutableSet) RemovePrefixes(needle Etikett) {
-	for haystack, _ := range es.inner {
-		if strings.HasPrefix(haystack, needle.String()) {
-			delete(es.inner, haystack)
-		}
-	}
-}
+// func (s MutableSet) Set(v string) (err error) {
+// 	es := strings.Split(v, ",")
 
-func (a MutableSet) Equals(b MutableSet) bool {
-	return a.innerSet.Equals(b.innerSet)
-}
+// 	for _, e := range es {
+// 		if err = s.AddString(e); err != nil {
+// 			err = errors.Wrap(err)
+// 			return
+// 		}
+// 	}
 
-func (s1 MutableSet) Merge(s2 Set) {
-	for _, e := range s2.inner {
-		s1.addOnlyExact(e)
-	}
-}
+// 	return
+// }
 
-func (s1 MutableSet) Copy() (s2 Set) {
-	s2 = MakeSet()
-	s2.open()
-	defer s2.close()
-
-	for _, e := range s1.inner {
-		s2.addOnlyExact(e)
-	}
-
-	return
-}
+// func (es MutableSet) RemovePrefixes(needle Etikett) {
+// 	for haystack, _ := range es.inner {
+// 		if strings.HasPrefix(haystack, needle.String()) {
+// 			delete(es.inner, haystack)
+// 		}
+// 	}
+// }

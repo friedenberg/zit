@@ -216,7 +216,7 @@ func (atc Refiner) applyPrefixJoints(a *assignment) (err error) {
 			na.addChild(c)
 		}
 
-		c.etiketten = c.etiketten.SubtractPrefix(groupingPrefix.Etikett)
+		c.etiketten = etikett.SubtractPrefix(c.etiketten, groupingPrefix.Etikett)
 	}
 
 	return
@@ -231,7 +231,7 @@ func (a Refiner) childPrefixes(node *assignment) (out []etikettBag) {
 	}
 
 	for _, c := range node.children {
-		for _, e := range c.etiketten.Expanded(etikett.ExpanderRight{}).Etiketten() {
+		for _, e := range etikett.Expanded(c.etiketten, etikett.ExpanderRight{}).Elements() {
 			if e.String() == "" {
 				continue
 			}

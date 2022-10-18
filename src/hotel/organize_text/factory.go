@@ -25,7 +25,7 @@ func (atc *Factory) Make() (ot *Text, err error) {
 
 	prefixSet := atc.Transacted.ToSetPrefixTransacted()
 
-	for _, e := range atc.ExtraEtiketten.Etiketten() {
+	for _, e := range atc.ExtraEtiketten.Elements() {
 		ee := newAssignment(ot.Depth() + 1)
 		ee.etiketten = etikett.MakeSet(e)
 		ot.assignment.addChild(ee)

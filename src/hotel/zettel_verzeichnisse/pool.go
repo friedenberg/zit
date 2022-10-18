@@ -3,6 +3,7 @@ package zettel_verzeichnisse
 import (
 	"sync"
 
+	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 )
 
@@ -25,11 +26,11 @@ func (ip Pool) Get() *Zettel {
 }
 
 func (ip Pool) Put(i *Zettel) {
-  if i == nil {
-    return
-  }
+	if i == nil {
+		return
+	}
 
-  i.Reset(nil)
+	i.Reset(nil)
 	ip.inner.Put(i)
 }
 
@@ -43,7 +44,7 @@ func (p Pool) MakeZettel(
 ) (z *Zettel) {
 	z = p.Get()
 	z.Transacted = tz
-	z.EtikettenExpandedSorted = tz.Named.Stored.Zettel.Etiketten.Expanded().SortedString()
+	z.EtikettenExpandedSorted = etikett.Expanded(tz.Named.Stored.Zettel.Etiketten).SortedString()
 	z.EtikettenSorted = tz.Named.Stored.Zettel.Etiketten.SortedString()
 
 	return
