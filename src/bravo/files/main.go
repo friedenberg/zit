@@ -13,9 +13,9 @@ const (
 	buffer = 10
 )
 
-//TODO-P5 add exponential backoff for too many files open error
-//TODO move away from openFilesGuard and honor too many files open error with
-//exponential backoffs instead
+// TODO-P5 add exponential backoff for too many files open error
+// TODO move away from openFilesGuard and honor too many files open error with
+// exponential backoffs instead
 type openFilesGuard struct {
 	channel chan struct{}
 }

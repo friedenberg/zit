@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/konfig"
 )
 
-//TODO add efficient parsing of hiding tags
+// TODO add efficient parsing of hiding tags
 func MakeWriterKonfig(k konfig.Konfig) Writer {
 	if k.IncludeHidden {
 		return WriterNoop{}

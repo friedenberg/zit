@@ -26,7 +26,7 @@ func Make(k konfig.Konfig) (s Standort, err error) {
 	}
 
 	if ok := files.Exists(s.DirZit()); !ok {
-    err = ErrNotInZitDir{}
+		err = ErrNotInZitDir{}
 		return
 	}
 

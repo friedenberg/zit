@@ -1,6 +1,6 @@
 package typ
 
-import "github.com/friedenberg/zit/src/proto_objekte"
+import "github.com/friedenberg/zit/src/bravo/proto_objekte"
 
 type MutableSet = proto_objekte.MutableSet[Typ, *Typ]
 

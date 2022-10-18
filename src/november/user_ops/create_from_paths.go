@@ -80,7 +80,7 @@ func (c CreateFromPaths) Run(args ...string) (results zettel_transacted.Set, err
 	return
 }
 
-//TODO migrate this to use store_working_directory
+// TODO migrate this to use store_working_directory
 func (c CreateFromPaths) zettelsFromPath(p string) (out []zettel_external.Zettel, err error) {
 	var r io.Reader
 

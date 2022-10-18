@@ -55,7 +55,7 @@ func (r *Reader) ReadFrom(r1 io.Reader) (n int64, err error) {
 				return
 			}
 
-      r.Transaktion.AddObjekte(o)
+			r.Transaktion.AddObjekte(o)
 		}
 
 		r.readState.lineNo += 1

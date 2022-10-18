@@ -36,7 +36,7 @@ func init() {
 	)
 }
 
-//TODO switch to idset semantics
+// TODO switch to idset semantics
 func (c CatObjekte) RunWithIds(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 	switch c.Type {
 

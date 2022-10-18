@@ -26,7 +26,7 @@ func (s SetPrefixTransacted) Len() int {
 	return s.count
 }
 
-//this splits on right-expanded
+// this splits on right-expanded
 func (s *SetPrefixTransacted) Add(z Zettel) {
 	es := etikett.Expanded(z.Named.Stored.Zettel.Etiketten, etikett.ExpanderRight{})
 

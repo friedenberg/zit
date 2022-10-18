@@ -84,12 +84,12 @@ func (s1 MutableSet[T, T1]) Merge(s2 Set[T, T1]) {
 
 func (s1 MutableSet[T, T1]) Reset(s2 Set[T, T1]) {
 	for k, _ := range s1.inner {
-    delete(s1.inner, k)
+		delete(s1.inner, k)
 	}
 
-  for k, e := range s2.inner {
-    s1.inner[k] = e
-  }
+	for k, e := range s2.inner {
+		s1.inner[k] = e
+	}
 }
 
 func (s1 MutableSet[T, T1]) Copy() (s2 Set[T, T1]) {

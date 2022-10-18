@@ -37,7 +37,7 @@ func init() {
 	)
 }
 
-//TODO move to types as args
+// TODO move to types as args
 func (c Cat) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	switch c.Gattung {
 	case gattung.Etikett:

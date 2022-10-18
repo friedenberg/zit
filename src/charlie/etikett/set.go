@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/proto_objekte"
+	"github.com/friedenberg/zit/src/bravo/proto_objekte"
 )
 
 type Set = proto_objekte.Set[Etikett, *Etikett]

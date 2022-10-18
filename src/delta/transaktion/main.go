@@ -25,7 +25,7 @@ func (t *Transaktion) AddObjekte(o Objekte) {
 	o1, ok := t.Objekten[k]
 
 	if ok {
-    //TODO migrate to a hard fail here
+		//TODO migrate to a hard fail here
 		errors.Printf(
 			"Transaktion %s has duplicate entries: (%s %s %s) & (%s %s %s)",
 			t.Time,

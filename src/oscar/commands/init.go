@@ -110,7 +110,7 @@ func (c Init) populateYangIfNecessary(s standort.Standort) (err error) {
 	return
 }
 
-//TODO move to user operations
+// TODO move to user operations
 func (c Init) readAndTransferLines(in, out string) (err error) {
 	var fi, fo *os.File
 
