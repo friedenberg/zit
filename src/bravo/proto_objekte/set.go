@@ -12,8 +12,9 @@ type Set[T ProtoObjekte, T1 interface {
 	*T
 	ProtoObjektePointer
 }] struct {
-	closed bool
-	inner  map[string]T
+	keyFunc func(T) string
+	closed  bool
+	inner   map[string]T
 }
 
 func MakeSet[T ProtoObjekte, T1 interface {
@@ -65,12 +66,22 @@ func (s Set[T, T1]) Len() int {
 	return len(s.inner)
 }
 
+func (s Set[T, T1]) GetKeyFunc() func(T) string {
+	if s.keyFunc == nil {
+		return func(e T) string {
+			return e.String()
+		}
+	}
+
+	return s.keyFunc
+}
+
 func (es Set[T, T1]) add(e T) {
 	if es.closed {
 		panic("trying to add etikett to closed set")
 	}
 
-	es.inner[e.String()] = e
+	es.inner[es.GetKeyFunc()(e)] = e
 }
 
 func (s Set[T, T1]) Each(f func(T)) {
@@ -223,7 +234,7 @@ func (es Set[T, T1]) SortedString() (out []string) {
 }
 
 func (s Set[T, T1]) Contains(e T) bool {
-	return s.ContainsString(e.String())
+	return s.ContainsString(s.GetKeyFunc()(e))
 }
 
 func (s Set[T, T1]) ContainsString(es string) bool {
