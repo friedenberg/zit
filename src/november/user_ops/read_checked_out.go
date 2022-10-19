@@ -41,16 +41,30 @@ func (op ReadCheckedOut) RunMany(
 ) (results zettel_checked_out.Set, err error) {
 	results = zettel_checked_out.MakeSetUnique(possible.Len())
 
-	//TODO refactor this and combine the loops and use an internal switch
-	//statement
 	for _, p := range possible.Zettelen {
 		var checked_out zettel_checked_out.Zettel
 
-		if p.Zettel.Path == "" {
-			continue
+		var readFunc func() (zettel_checked_out.Zettel, error)
+
+		switch {
+		case p.Akte.Path == "":
+			readFunc = func() (zettel_checked_out.Zettel, error) {
+				return op.StoreWorkingDirectory().Read(p.Zettel.Path)
+			}
+
+		case p.Zettel.Path == "":
+			readFunc = func() (zettel_checked_out.Zettel, error) {
+				return op.StoreWorkingDirectory().ReadExternalZettelFromAktePath(p.Akte.Path)
+			}
+
+		default:
+			//TODO validate that the zettel file points to the akte in the metadatei
+			readFunc = func() (zettel_checked_out.Zettel, error) {
+				return op.StoreWorkingDirectory().Read(p.Zettel.Path)
+			}
 		}
 
-		if checked_out, err = op.StoreWorkingDirectory().Read(p.Zettel.Path); err != nil {
+		if checked_out, err = readFunc(); err != nil {
 			if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
 				errors.Print("external zettel does not exist: %s", p)
 				err = nil
@@ -59,26 +73,6 @@ func (op ReadCheckedOut) RunMany(
 				return
 			}
 
-		}
-
-		results.Add(checked_out)
-	}
-
-	for _, p := range possible.Zettelen {
-		var checked_out zettel_checked_out.Zettel
-
-		if p.Akte.Path == "" {
-			continue
-		}
-
-		if checked_out, err = op.StoreWorkingDirectory().ReadExternalZettelFromAktePath(p.Akte.Path); err != nil {
-			if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
-				errors.Print("external zettel does not exist: %s", p)
-				err = nil
-			} else {
-				err = errors.Wrapf(err, "akte path: %s", p.Akte.Path)
-				return
-			}
 		}
 
 		results.Add(checked_out)
