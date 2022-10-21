@@ -115,7 +115,7 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	if ctx.Err = u.Initialize(); !ctx.IsEmpty() {
+	if ctx.Err = u.Reset(); !ctx.IsEmpty() {
 		ctx.Wrap()
 		return
 	}

@@ -78,18 +78,11 @@ func Run(args []string) (exitStatus int) {
 
 	defer errors.PanicIfError(dc.Close)
 
-	var k konfig.Konfig
-
-	if k, err = konfigCli.Konfig(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	cmdArgs := cmd.FlagSet.Args()
 
 	var u *umwelt.Umwelt
 
-	if u, err = umwelt.Make(k); err != nil {
+	if u, err = umwelt.Make(konfigCli); err != nil {
 		//the store doesn't exist yet
 		switch {
 		case errors.IsNotExist(err):

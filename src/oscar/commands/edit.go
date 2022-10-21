@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
+	"github.com/friedenberg/zit/src/charlie/konfig"
 	"github.com/friedenberg/zit/src/charlie/ts"
 	"github.com/friedenberg/zit/src/charlie/typ"
 	"github.com/friedenberg/zit/src/delta/id_set"
@@ -45,6 +46,9 @@ func init() {
 
 func (c Edit) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 	is = id_set.MakeProtoIdSet(
+		id_set.ProtoId{
+			MutableId: &konfig.Id{},
+		},
 		id_set.ProtoId{
 			MutableId: &hinweis.Hinweis{},
 			Expand: func(v string) (out string, err error) {
@@ -107,12 +111,18 @@ func (c Edit) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 			Build(),
 	}
 
-	if _, err = openVimOp.Run(checkoutResults.ToSliceFilesZettelen()...); err != nil {
+	files := checkoutResults.ToSliceFilesZettelen()
+
+	if ids.HasKonfig() {
+		files = append(files, u.Standort().FileKonfigToml())
+	}
+
+	if _, err = openVimOp.Run(files...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = u.Initialize(); err != nil {
+	if err = u.Reset(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

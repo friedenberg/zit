@@ -2,10 +2,7 @@ package konfig
 
 import (
 	"flag"
-	"os"
-	"path"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/debug"
 )
 
@@ -47,68 +44,6 @@ func (c *Cli) AddToFlags(f *flag.FlagSet) {
 	f.BoolVar(&c.PrintNewShaSyntax, "new-zettel-sha-syntax", true, "")
 	f.BoolVar(&c.PrintIncludeTypen, "print-typen", true, "")
 	f.BoolVar(&c.PrintIncludeBezeichnungen, "print-bezeichnungen", true, "")
-}
-
-func (c Cli) DirZit() (p string, err error) {
-	if c.BasePath == "" {
-		if p, err = os.Getwd(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	} else {
-		p = c.BasePath
-	}
-
-	return
-}
-
-func (c Cli) KonfigPath() (p string, err error) {
-	// var usr *user.User
-
-	// if usr, err = user.Current(); err != nil {
-	// 	err = errors.Error(err)
-	// 	return
-	// }
-
-	// p = path.Join(
-	// 	usr.HomeDir,
-	// 	".config",
-	// 	"zettelkasten",
-	// 	"config.toml",
-	// )
-
-	if p, err = c.DirZit(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	p = path.Join(p, ".zit", "Konfig")
-
-	return
-}
-
-func (c Cli) Konfig() (k Konfig, err error) {
-	if c.Verbose {
-		errors.SetVerbose()
-	} else {
-		// logz.SetOutput(ioutil.Discard)
-	}
-
-	var p string
-
-	if p, err = c.KonfigPath(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if k, err = LoadKonfig(p); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	k.Cli = c
-
-	return
 }
 
 func DefaultCli() (c Cli) {

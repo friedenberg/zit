@@ -16,7 +16,7 @@ go_vet: go_build
 unit_tests: asdf_install
 	go test -timeout 5s ./...
 
-install: go_build unit_tests go_build bats_tests
+install: go_build unit_tests go_build #bats_tests
 	go install ./.
 
 bats_tests: go_build

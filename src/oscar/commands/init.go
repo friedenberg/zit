@@ -70,7 +70,7 @@ func (c Init) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	if err = u.Initialize(); err != nil {
+	if err = u.Reset(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

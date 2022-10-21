@@ -202,7 +202,7 @@ func (c New) editZettels(
 		return
 	}
 
-	if err = u.Initialize(); err != nil {
+	if err = u.Reset(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -1,6 +1,8 @@
 package umwelt
 
 import (
+	"io/ioutil"
+	"log"
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -18,14 +20,12 @@ import (
 )
 
 type Umwelt struct {
-	standort standort.Standort
-	konfig   konfig.Konfig
-
-	logger errors.Logger
-
 	in  *os.File
 	out *os.File
 	err *os.File
+
+	standort standort.Standort
+	konfig   konfig.Konfig
 
 	storesInitialized     bool
 	lock                  *file_lock.Lock
@@ -38,28 +38,52 @@ type Umwelt struct {
 	zettelVerzeichnissePool *zettel_verzeichnisse.Pool
 }
 
-func Make(c konfig.Konfig) (u *Umwelt, err error) {
+func Make(kCli konfig.Cli) (u *Umwelt, err error) {
 	u = &Umwelt{
-		konfig:                  c,
-		logger:                  c.Logger,
 		in:                      os.Stdin,
 		out:                     os.Stdout,
 		err:                     os.Stderr,
 		zettelVerzeichnissePool: zettel_verzeichnisse.MakePool(),
 	}
 
-	err = u.Initialize()
+	err = u.Initialize(kCli)
 
 	return
 }
 
-func (u *Umwelt) Initialize() (err error) {
+func (u *Umwelt) Reset() (err error) {
+	return u.Initialize(u.Konfig().Cli)
+}
+
+func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 	if err = u.Flush(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if u.standort, err = standort.Make(u.konfig); err != nil {
+	if kCli.Verbose {
+		errors.SetVerbose()
+	} else {
+		log.SetOutput(ioutil.Discard)
+	}
+
+	standortOptions := standort.Options{
+		BasePath: kCli.BasePath,
+	}
+
+	if standortOptions.BasePath == "" {
+		if standortOptions.BasePath, err = os.Getwd(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	if u.standort, err = standort.Make(standortOptions); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if u.konfig, err = konfig.Make(u.standort.FileKonfigToml(), kCli); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

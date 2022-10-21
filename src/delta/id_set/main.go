@@ -18,7 +18,7 @@ type Set struct {
 	hinweisen  hinweis.MutableSet
 	typen      typ.MutableSet
 	timestamps ts.MutableSet
-	konfig     *konfig.Id
+	hasKonfig  bool
 	ids        []id.Id
 }
 
@@ -52,7 +52,7 @@ func (s *Set) Add(ids ...id.Id) {
 			s.timestamps.Add(it)
 
 		case konfig.Id:
-			s.konfig = &it
+			s.hasKonfig = true
 
 		default:
 			s.ids = append(s.ids, it)
@@ -90,8 +90,8 @@ func (s Set) Typen() (typen []typ.Typ) {
 	return
 }
 
-func (s Set) Konfig() (ok bool) {
-	ok = s.konfig != nil
+func (s Set) HasKonfig() (ok bool) {
+	ok = s.hasKonfig
 
 	return
 }

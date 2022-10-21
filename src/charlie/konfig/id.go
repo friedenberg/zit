@@ -17,8 +17,8 @@ func (i Id) Set(v string) (err error) {
 	v = strings.TrimSpace(v)
 	v = strings.ToLower(v)
 
-	if v == "konfig" {
-		err = errors.Normalf("not konfig")
+	if v != "konfig" {
+		err = errors.Errorf("not konfig")
 		return
 	}
 

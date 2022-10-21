@@ -51,7 +51,12 @@ LOOP:
 		}
 	}
 
+  isEmpty := !needsHin && !needsTyp && !needsEt
+
 	switch {
+  case isEmpty:
+    ok = false
+
 	case f.Or:
 		ok = (okHin && needsHin) || (okTyp && needsTyp) || (okEt && needsEt)
 

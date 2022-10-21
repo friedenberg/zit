@@ -244,7 +244,7 @@ func (c *Organize) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 			return
 		}
 
-		if err = u.Initialize(); err != nil {
+		if err = u.Reset(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

@@ -1,12 +1,10 @@
 package standort
 
 import (
-	"os"
 	"path/filepath"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/charlie/konfig"
 )
 
 type Standort struct {
@@ -14,16 +12,14 @@ type Standort struct {
 	basePath string
 }
 
-func Make(k konfig.Konfig) (s Standort, err error) {
-	if s.basePath, err = k.DirZit(); err != nil {
+func Make(o Options) (s Standort, err error) {
+	if err = o.Validate(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if s.cwd, err = os.Getwd(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	s.basePath = o.BasePath
+	s.cwd = o.cwd
 
 	if ok := files.Exists(s.DirZit()); !ok {
 		err = ErrNotInZitDir{}
@@ -39,6 +35,24 @@ func (s Standort) Cwd() string {
 
 func stringSliceJoin(s string, vs []string) []string {
 	return append([]string{s}, vs...)
+}
+
+func (c Standort) FileKonfigToml() string {
+	// var usr *user.User
+
+	// if usr, err = user.Current(); err != nil {
+	// 	err = errors.Error(err)
+	// 	return
+	// }
+
+	// p = path.Join(
+	// 	usr.HomeDir,
+	// 	".config",
+	// 	"zettelkasten",
+	// 	"config.toml",
+	// )
+
+	return c.DirZit("Konfig")
 }
 
 func (s Standort) Dir(p ...string) string {

@@ -13,10 +13,10 @@ type Konfig struct {
 	Cli
 	toml
 	Compiled
-	Logger errors.Logger
 }
 
-func LoadKonfig(p string) (c Konfig, err error) {
+func Make(p string, kc Cli) (c Konfig, err error) {
+	c.Cli = kc
 	// c = DefaultKonfig()
 
 	var f *os.File
