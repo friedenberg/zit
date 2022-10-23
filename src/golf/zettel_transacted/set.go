@@ -58,6 +58,18 @@ func (m Set) WriteZettelTransacted(z *Zettel) (err error) {
 	return
 }
 
+func (m Set) WriterFilter() Writer {
+	return MakeWriter(
+		func(z *Zettel) (err error) {
+			if !m.Contains(*z) {
+				err = io.EOF
+			}
+
+			return
+		},
+	)
+}
+
 func (m Set) Add(z Zettel) {
 	m.lock.Lock()
 	defer m.lock.Unlock()

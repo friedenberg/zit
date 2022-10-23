@@ -70,11 +70,12 @@ function outputs_organize_one_etikett { # @test
 		echo "---"
 		echo "# wow"
 		echo "- ok"
+    echo "! md"
 		echo "---"
 	} >>"$to_add"
 
 	run "${cmd_zit_new[@]}" -edit=false "$to_add"
-	assert_output '[o/u@7 "wow"] (created)'
+	assert_output '[o/u@5 "wow"] (created)'
 
 	run zit expand-hinweis o/u
 	assert_output 'one/uno'
@@ -103,11 +104,12 @@ function outputs_organize_two_etiketten { # @test
 		echo "# wow"
 		echo "- ok"
 		echo "- brown"
+    echo "! md"
 		echo "---"
 	} >>"$to_add"
 
 	run "${cmd_zit_new[@]}" -edit=false "$to_add"
-	assert_output '[o/u@b "wow"] (created)'
+	assert_output '[o/u@3 "wow"] (created)'
 
 	expected_organize="$(mktemp)"
 	{
@@ -135,6 +137,7 @@ function outputs_organize_two_etiketten { # @test
 		echo "---"
 		echo "# wow"
 		echo "- ok"
+    echo "! md"
 		echo "---"
 	} >>"$expected_zettel"
 
@@ -155,11 +158,12 @@ function outputs_organize_one_etiketten_group_by_one { # @test
 		echo "- task"
 		echo "- priority-1"
 		echo "- priority-2"
+    echo "! md"
 		echo "---"
 	} >>"$to_add"
 
 	run "${cmd_zit_new[@]}" -edit=false "$to_add"
-	assert_output '[o/u@f "wow"] (created)'
+	assert_output '[o/u@ed "wow"] (created)'
 
 	expected_organize="$(mktemp)"
 	{
@@ -193,11 +197,12 @@ function outputs_organize_two_zettels_one_etiketten_group_by_one { # @test
 		echo "# one/uno"
 		echo "- task"
 		echo "- priority-1"
+    echo "! md"
 		echo "---"
 	} >>"$to_add"
 
 	run "${cmd_zit_new[@]}" -edit=false "$to_add"
-	assert_output '[o/u@5 "one/uno"] (created)'
+	assert_output '[o/u@4 "one/uno"] (created)'
 
 	to_add="$(mktemp)"
 	{
@@ -205,11 +210,12 @@ function outputs_organize_two_zettels_one_etiketten_group_by_one { # @test
 		echo "# two/dos"
 		echo "- task"
 		echo "- priority-2"
+    echo "! md"
 		echo "---"
 	} >>"$to_add"
 
 	run "${cmd_zit_new[@]}" -edit=false "$to_add"
-	assert_output '[o/d@3 "two/dos"] (created)'
+	assert_output '[o/d@b "two/dos"] (created)'
 
 	expected_organize="$(mktemp)"
 	{
@@ -245,6 +251,7 @@ function outputs_organize_one_etiketten_group_by_two { # @test
 		echo "- task"
 		echo "- priority-1"
 		echo "- w-2022-07-07"
+    echo "! md"
 		echo "---"
 	} >>"$to_add"
 
@@ -257,6 +264,7 @@ function outputs_organize_one_etiketten_group_by_two { # @test
 		echo "- task"
 		echo "- priority-1"
 		echo "- w-2022-07-06"
+    echo "! md"
 		echo "---"
 	} >>"$to_add"
 
@@ -297,6 +305,7 @@ function commits_organize_one_etiketten_group_by_two { # @test
 		echo "- task"
 		echo "- priority-1"
 		echo "- w-2022-07-07"
+    echo "! md"
 		echo "---"
 	} >>"$to_add"
 
@@ -309,6 +318,7 @@ function commits_organize_one_etiketten_group_by_two { # @test
 		echo "- task"
 		echo "- priority-1"
 		echo "- w-2022-07-06"
+    echo "! md"
 		echo "---"
 	} >>"$to_add"
 
@@ -321,6 +331,7 @@ function commits_organize_one_etiketten_group_by_two { # @test
 		echo "- task"
 		echo "- priority-1"
 		echo "- w-2022-07-06"
+    echo "! md"
 		echo "---"
 	} >>"$to_add"
 
@@ -357,6 +368,7 @@ function commits_organize_one_etiketten_group_by_two { # @test
 		echo "- priority-2"
 		echo "- task"
 		echo "- w-2022-07-07"
+    echo "! md"
 		echo "---"
 	} >>"$to_add"
 
@@ -369,6 +381,7 @@ function commits_organize_one_etiketten_group_by_two { # @test
 		echo "# 3"
 		echo "- priority-2"
 		echo "- task"
+    echo "! md"
 		echo "---"
 	} >>"$to_add"
 
@@ -389,6 +402,7 @@ function commits_organize_one_etiketten_group_by_two_new_zettels { # @test
 		echo "- task"
 		echo "- priority-1"
 		echo "- w-2022-07-07"
+    echo "! md"
 		echo "---"
 	} >>"$to_add"
 
@@ -418,6 +432,7 @@ function commits_organize_one_etiketten_group_by_two_new_zettels { # @test
 		echo "- task"
 		echo "- priority-1"
 		echo "- w-2022-07-06"
+    echo "! md"
 		echo "---"
 	} >>"$to_add"
 
@@ -440,6 +455,7 @@ function commits_organize_one_etiketten_group_by_two_new_zettels { # @test
 		echo "- task"
 		echo "- priority-1"
 		echo "- w-2022-07-06"
+    echo "! md"
 		echo "---"
 	} >>"$to_add"
 
@@ -480,6 +496,7 @@ function commits_organize_one_etiketten_group_by_two_new_zettels { # @test
 		echo "- priority-2"
 		echo "- task"
 		echo "- w-2022-07-07"
+    echo "! md"
 		echo "---"
 	} >>"$to_add"
 
@@ -492,6 +509,7 @@ function commits_organize_one_etiketten_group_by_two_new_zettels { # @test
 		echo "# 3"
 		echo "- priority-2"
 		echo "- task"
+    echo "! md"
 		echo "---"
 	} >>"$to_add"
 
@@ -528,11 +546,12 @@ function commits_no_changes { # @test
 		echo "- priority-1"
 		echo "- task"
 		echo "- w-2022-07-07"
+    echo "! md"
 		echo "---"
 	} >"$one"
 
 	run "${cmd_zit_new[@]}" -edit=false "$one"
-	assert_output '[o/u@f "one/uno"] (created)'
+	assert_output '[o/u@6 "one/uno"] (created)'
 
 	two="$(mktemp)"
 	{
@@ -541,11 +560,12 @@ function commits_no_changes { # @test
 		echo "- priority-1"
 		echo "- task"
 		echo "- w-2022-07-06"
+    echo "! md"
 		echo "---"
 	} >"$two"
 
 	run "${cmd_zit_new[@]}" -edit=false "$two"
-	assert_output '[o/d@6 "two/dos"] (created)'
+	assert_output '[o/d@c "two/dos"] (created)'
 
 	three="$(mktemp)"
 	{
@@ -554,11 +574,12 @@ function commits_no_changes { # @test
 		echo "- priority-1"
 		echo "- task"
 		echo "- w-2022-07-06"
+    echo "! md"
 		echo "---"
 	} >"$three"
 
 	run "${cmd_zit_new[@]}" -edit=false "$three"
-	assert_output '[t/u@1 "3"] (created)'
+	assert_output '[t/u@c5 "3"] (created)'
 
 	expected_organize="$(mktemp)"
 	{
@@ -606,6 +627,7 @@ function commits_dependent_leaf { # @test
 		echo "- priority-1"
 		echo "- task"
 		echo "- w-2022-07-07"
+    echo "! md"
 		echo "---"
 	} >"$one"
 
@@ -618,6 +640,7 @@ function commits_dependent_leaf { # @test
 		echo "- priority-1"
 		echo "- task"
 		echo "- w-2022-07-06"
+    echo "! md"
 		echo "---"
 	} >"$two"
 
@@ -630,6 +653,7 @@ function commits_dependent_leaf { # @test
 		echo "- priority-1"
 		echo "- task"
 		echo "- w-2022-07-06"
+    echo "! md"
 		echo "---"
 	} >"$three"
 
@@ -657,6 +681,7 @@ function commits_dependent_leaf { # @test
 		echo "- priority-2"
 		echo "- task"
 		echo "- w-2022-07-08"
+    echo "! md"
 		echo "---"
 	} >"$one"
 
@@ -670,6 +695,7 @@ function commits_dependent_leaf { # @test
 		echo "- priority-2"
 		echo "- task"
 		echo "- w-2022-07-07"
+    echo "! md"
 		echo "---"
 	} >"$two"
 
@@ -683,6 +709,7 @@ function commits_dependent_leaf { # @test
 		echo "- priority-2"
 		echo "- task"
 		echo "- w-2022-07-07"
+    echo "! md"
 		echo "---"
 	} >"$three"
 
@@ -750,11 +777,12 @@ function etiketten_correct { # @test
 	{
 		echo "---"
 		echo "- test4"
+    echo "! md"
 		echo "---"
 	} >"one/uno.md"
 
 	run zit checkin "${cmd_zit_def[@]}" one/uno.md
-	assert_output '[o/u@4 "test4"] (updated)'
+	assert_output '[o/u@1 "test4"] (updated)'
 
 	expected_etiketten="$(mktemp)"
 	{
@@ -769,11 +797,12 @@ function etiketten_correct { # @test
 		echo "---"
 		echo "- test4"
 		echo "- test1-ok"
+    echo "! md"
 		echo "---"
 	} >"one/uno.md"
 
 	run zit checkin "${cmd_zit_def[@]}" one/uno.md
-	assert_output '[o/u@7 "test1-ok, test4"] (updated)'
+	assert_output '[o/u@d "test1-ok, test4"] (updated)'
 
 	expected_etiketten="$(mktemp)"
 	{

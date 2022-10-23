@@ -33,6 +33,17 @@ func (s Standort) Cwd() string {
 	return s.cwd
 }
 
+func (s Standort) RelToCwdOrSame(p string) (p1 string) {
+  var err error
+  p1, err = filepath.Rel(s.Cwd(), p)
+
+  if err != nil {
+    p1 = p
+  }
+
+  return
+}
+
 func stringSliceJoin(s string, vs []string) []string {
 	return append([]string{s}, vs...)
 }

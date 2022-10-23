@@ -19,9 +19,10 @@ import (
 
 type CreateFromPaths struct {
 	*umwelt.Umwelt
-	Format zettel.Format
-	Filter script_value.ScriptValue
-	Delete bool
+	Format      zettel.Format
+	Filter      script_value.ScriptValue
+	ProtoZettel zettel.ProtoZettel
+	Delete      bool
 	// ReadHinweisFromPath bool
 }
 
@@ -72,8 +73,10 @@ func (c CreateFromPaths) Run(args ...string) (results zettel_transacted.Set, err
 				return
 			}
 
+			pathRel := c.Standort().RelToCwdOrSame(cz.External.ZettelFD.Path)
+
 			//TODO move to printer
-			errors.PrintOutf("[%s] (deleted)", cz.External.ZettelFD.Path)
+			errors.PrintOutf("[%s] (deleted)", pathRel)
 		}
 	}
 
@@ -133,6 +136,8 @@ func (c CreateFromPaths) zettelsFromPath(p string) (out []zettel_external.Zettel
 			return
 		}
 	}
+
+	c.ProtoZettel.Apply(&ctx.Zettel)
 
 	var s sha.Sha
 

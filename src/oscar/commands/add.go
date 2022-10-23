@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/etikett"
+	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/charlie/typ"
 	"github.com/friedenberg/zit/src/delta/id_set"
 	"github.com/friedenberg/zit/src/delta/zettel"
@@ -21,10 +22,13 @@ import (
 )
 
 type Add struct {
-	Etiketten etikett.Set
 	Delete    bool
 	OpenAkten bool
 	Organize  bool
+	Filter    script_value.ScriptValue
+
+	//TODO move to protozettel
+	Etiketten etikett.Set
 	typ.Typ
 }
 
@@ -37,10 +41,11 @@ func init() {
 				Typ: typ.Make("md"),
 			}
 
-			f.Var(&c.Etiketten, "etiketten", "to add to the created zettels")
 			f.BoolVar(&c.Delete, "delete", false, "delete the zettel and akte after successful checkin")
-			f.BoolVar(&c.Organize, "organize", false, "")
 			f.BoolVar(&c.OpenAkten, "open-akten", false, "also open the Akten")
+			f.BoolVar(&c.Organize, "organize", false, "")
+			f.Var(&c.Etiketten, "etiketten", "to add to the created zettels")
+			f.Var(&c.Filter, "filter", "a script to run for each file to transform it the standard zettel format")
 			f.Var(&c.Typ, "typ", "the Typ to use for the newly created Zettelen")
 
 			return c
@@ -59,6 +64,7 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		Umwelt: u,
 		//TODO add Typ
 		Etiketten: c.Etiketten,
+		Filter:    c.Filter,
 		Delete:    c.Delete,
 	}
 

@@ -17,18 +17,21 @@ import (
 	"github.com/friedenberg/zit/src/november/user_ops"
 )
 
+//TODO move to protozettel
 type bez struct {
 	bezeichnung.Bezeichnung
 	wasSet bool
 }
 
 type New struct {
-	Bezeichnung bez
 	Edit        bool
 	Delete      bool
 	Count       int
-	Etiketten   etikett.Set
 	Filter      script_value.ScriptValue
+
+  //TODO move to protozettel
+	Bezeichnung bez
+	Etiketten   etikett.Set
 	typ.Typ
 }
 
@@ -46,12 +49,12 @@ func init() {
 				Typ: typ.Make("md"),
 			}
 
-			f.Var(&c.Filter, "filter", "a script to run for each file to transform it the standard zettel format")
-			f.IntVar(&c.Count, "count", 1, "when creating new empty zettels, how many to create. otherwise ignored")
-			f.BoolVar(&c.Edit, "edit", true, "create a new empty zettel and open EDITOR or VISUAL for editing and then commit the resulting changes")
 			f.BoolVar(&c.Delete, "delete", false, "delete the zettel and akte after successful checkin")
+			f.BoolVar(&c.Edit, "edit", true, "create a new empty zettel and open EDITOR or VISUAL for editing and then commit the resulting changes")
+			f.IntVar(&c.Count, "count", 1, "when creating new empty zettels, how many to create. otherwise ignored")
 			f.Var(&c.Bezeichnung, "bezeichnung", "zettel description (will overwrite existing Bezecihnung")
 			f.Var(&c.Etiketten, "etiketten", "comma-separated etiketten (will add to existing Etiketten)")
+			f.Var(&c.Filter, "filter", "a script to run for each file to transform it the standard zettel format")
 			f.Var(&c.Typ, "typ", "the Typ to use for the newly created Zettelen")
 
 			return c
@@ -96,7 +99,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 				Format:       zettel.Text{},
 			}
 
-			if zsc, err = u.StoreWorkingDirectory().Checkout(options, zts); err != nil {
+			if zsc, err = u.StoreWorkingDirectory().Checkout(options, zts.WriterFilter()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -123,9 +126,16 @@ func (c New) readExistingFilesAsZettels(
 		Format: f,
 		Filter: c.Filter,
 		Delete: c.Delete,
+		ProtoZettel: zettel.ProtoZettel{
+			Typ:       &c.Typ,
+			Etiketten: c.Etiketten,
+		},
 	}
 
-	//TODO add bezeichnung and etiketten, and typ?
+	if c.Bezeichnung.wasSet {
+		opCreateFromPath.ProtoZettel.Bezeichnung = &c.Bezeichnung.Bezeichnung
+	}
+
 	if zts, err = opCreateFromPath.Run(args...); err != nil {
 		err = errors.Wrap(err)
 		return

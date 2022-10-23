@@ -78,11 +78,12 @@ function can_new_zettel_file { # @test
 		echo "---"
 		echo "# wow"
 		echo "- ok"
+    echo "! md"
 		echo "---"
 	} >>"$to_add"
 
 	run zit new "${cmd_zit_def[@]}" -edit=false -predictable-hinweisen "$to_add"
-	assert_output '[o/u@7 "wow"] (created)'
+	assert_output '[o/u@5 "wow"] (created)'
 
 	run zit show "${cmd_zit_def[@]}" one/uno
 	assert_output "$(cat "$to_add")"
@@ -127,10 +128,10 @@ function can_checkout_and_checkin { # @test
 	} >>"$to_add"
 
 	run zit new "${cmd_zit_def[@]}" -edit=false -predictable-hinweisen "$to_add"
-	assert_output '[o/u@7 "wow"] (created)'
+	assert_output '[o/u@5 "wow"] (created)'
 
 	run zit checkout "${cmd_zit_def[@]}" one/uno
-	assert_output '[one/uno.md@7 "wow"] (checked out)'
+	assert_output '[one/uno.md@5 "wow"] (checked out)'
 
 	{
 		echo "---"

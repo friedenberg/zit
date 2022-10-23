@@ -6,9 +6,9 @@ import (
 	"path"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/etikett"
+	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/store_objekten"
@@ -18,6 +18,7 @@ import (
 type ZettelFromExternalAkte struct {
 	*umwelt.Umwelt
 	Etiketten etikett.Set
+	Filter    script_value.ScriptValue
 	Delete    bool
 }
 
@@ -38,7 +39,7 @@ func (c ZettelFromExternalAkte) Run(
 		var z zettel.Zettel
 		var tz zettel_transacted.Zettel
 
-		if z = c.zettelForAkte(ctx, arg); !ctx.IsEmpty() {
+		if z, ctx.Err = c.zettelForAkte(arg); !ctx.IsEmpty() {
 			ctx.Wrap()
 			return
 		}
@@ -90,49 +91,50 @@ func (c ZettelFromExternalAkte) Run(
 }
 
 func (c ZettelFromExternalAkte) zettelForAkte(
-	ctx *errors.Ctx,
 	aktePath string,
-) (z zettel.Zettel) {
+) (z zettel.Zettel, err error) {
+	var r io.Reader
+
+	errors.Print("running")
+
+	if r, err = c.Filter.Run(aktePath); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer c.Filter.Close()
+
 	z.Etiketten = c.Etiketten
 
 	var akteWriter sha.WriteCloser
 
-	if akteWriter, ctx.Err = c.StoreObjekten().AkteWriter(); !ctx.IsEmpty() {
-		ctx.Wrap()
+	if akteWriter, err = c.StoreObjekten().AkteWriter(); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
-	var f *os.File
-
-	if f, ctx.Err = files.Open(aktePath); !ctx.IsEmpty() {
-		ctx.Wrap()
+	if _, err = io.Copy(akteWriter, r); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
-	defer ctx.Defer(func() error { return files.Close(f) })
-
-	if _, ctx.Err = io.Copy(akteWriter, f); !ctx.IsEmpty() {
-		ctx.Wrap()
-		return
-	}
-
-	if ctx.Err = akteWriter.Close(); !ctx.IsEmpty() {
-		ctx.Wrap()
+	if err = akteWriter.Close(); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
 	z.Akte = akteWriter.Sha()
 
-	if ctx.Err = z.Bezeichnung.Set(path.Base(aktePath)); !ctx.IsEmpty() {
-		ctx.Wrap()
+	if err = z.Bezeichnung.Set(path.Base(aktePath)); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
 	ext := path.Ext(aktePath)
 
 	if ext != "" {
-		if ctx.Err = z.Typ.Set(path.Ext(aktePath)); !ctx.IsEmpty() {
-			ctx.Wrap()
+		if err = z.Typ.Set(path.Ext(aktePath)); err != nil {
+			err = errors.Wrap(err)
 			return
 		}
 	}
