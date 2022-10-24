@@ -35,12 +35,6 @@ func MakeSetHinweis(c int) Set {
 	}
 }
 
-func (m Set) AddFrom(ch <-chan Zettel) {
-	for z := range ch {
-		m.Add(z)
-	}
-}
-
 func (m Set) Get(
 	s fmt.Stringer,
 ) (tz Zettel, ok bool) {
@@ -54,6 +48,22 @@ func (m Set) Get(
 
 func (m Set) WriteZettelTransacted(z *Zettel) (err error) {
 	m.Add(*z)
+
+	return
+}
+
+func (m Set) Filter(w Writer) (err error) {
+	for k, sz := range m.innerMap {
+		if err = w.WriteZettelTransacted(&sz); err != nil {
+			if errors.IsEOF(err) {
+				err = nil
+				delete(m.innerMap, k)
+			} else {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+	}
 
 	return
 }
@@ -129,33 +139,33 @@ func (a Set) Each(f func(Zettel) error) (err error) {
 	return
 }
 
-func (a Set) Filter(keyFunc SetKeyFunc, f func(Zettel) (bool, error)) (b Set, err error) {
-	if keyFunc == nil {
-		keyFunc = a.keyFunc
-	}
+// func (a Set) Filter(keyFunc SetKeyFunc, f func(Zettel) (bool, error)) (b Set, err error) {
+// 	if keyFunc == nil {
+// 		keyFunc = a.keyFunc
+// 	}
 
-	b = Set{
-		keyFunc:  keyFunc,
-		innerMap: make(map[string]Zettel, a.Len()),
-	}
+// 	b = Set{
+// 		keyFunc:  keyFunc,
+// 		innerMap: make(map[string]Zettel, a.Len()),
+// 	}
 
-	for _, sz := range a.innerMap {
-		var ok bool
+// 	for _, sz := range a.innerMap {
+// 		var ok bool
 
-		ok, err = f(sz)
+// 		ok, err = f(sz)
 
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+// 		if err != nil {
+// 			err = errors.Wrap(err)
+// 			return
+// 		}
 
-		if ok {
-			b.Add(sz)
-		}
-	}
+// 		if ok {
+// 			b.Add(sz)
+// 		}
+// 	}
 
-	return
-}
+// 	return
+// }
 
 func (m Set) ToSlice() (s Slice) {
 	s = MakeSlice(m.Len())

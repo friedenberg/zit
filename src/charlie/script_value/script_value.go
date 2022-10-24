@@ -29,6 +29,25 @@ func (s *ScriptValue) Set(v string) (err error) {
 	return
 }
 
+func (s *ScriptValue) RunWithInput(in io.Reader) (r io.Reader, err error) {
+	if s.IsEmpty() {
+		err = errors.Errorf("empty script")
+		return
+	}
+
+	s.cmd = exec.Command(s.script)
+	s.cmd.Stdin = in
+
+	if r, err = s.cmd.StdoutPipe(); err != nil {
+		errors.Fatal(err)
+		return
+	}
+
+	s.cmd.Start()
+
+	return
+}
+
 func (s *ScriptValue) Run(input string) (r io.Reader, err error) {
 	if s.IsEmpty() {
 		if input == "" || input == "-" {

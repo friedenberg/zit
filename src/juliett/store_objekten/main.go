@@ -542,38 +542,6 @@ func (s Store) AllInChain(h hinweis.Hinweis) (c zettel_transacted.Slice, err err
 	return
 }
 
-func (s *Store) ReadHinweisAt(
-	h hinweis.HinweisWithIndex,
-) (tz zettel_transacted.Zettel, err error) {
-	if h.Index < 0 {
-		errors.PrintDebug(h)
-		return s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(h.Hinweis)
-	}
-
-	var chain zettel_transacted.Slice
-
-	if chain, err = s.AllInChain(h.Hinweis); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if chain.Len() == 0 {
-		err = ErrNotFound{Id: h}
-		return
-	} else if chain.Len()-1 < h.Index {
-		err = ErrChainIndexOutOfBounds{
-			HinweisWithIndex: h,
-			ChainLength:      chain.Len(),
-		}
-
-		return
-	}
-
-	tz = chain.Get(h.Index)
-
-	return
-}
-
 func (s *Store) Reindex() (err error) {
 	if !s.lockSmith.IsAcquired() {
 		err = ErrLockRequired{

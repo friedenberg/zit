@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
+	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/charlie/ts"
 	"github.com/friedenberg/zit/src/charlie/typ"
 	"github.com/friedenberg/zit/src/delta/id_set"
@@ -26,6 +27,8 @@ type Organize struct {
 	Or bool
 	organize_text.Options
 	Mode organizeMode
+
+	Filter script_value.ScriptValue
 }
 
 type organizeMode int
@@ -74,8 +77,10 @@ func init() {
 				Options: organize_text.MakeOptions(),
 			}
 
-			f.Var(&c.Mode, "mode", "mode used for handling stdin and stdout")
 			f.BoolVar(&c.Or, "or", false, "allow optional criteria instead of required")
+			f.Var(&c.Filter, "filter", "a script to run for each file to transform it the standard zettel format")
+			f.Var(&c.Mode, "mode", "mode used for handling stdin and stdout")
+
 			c.Options.AddToFlagSet(f)
 
 			return commandWithIds{
