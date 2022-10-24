@@ -46,12 +46,6 @@ func (m Set) Get(
 	return
 }
 
-func (m Set) WriteZettelTransacted(z *Zettel) (err error) {
-	m.Add(*z)
-
-	return
-}
-
 func (m Set) Filter(w Writer) (err error) {
 	for k, sz := range m.innerMap {
 		if err = w.WriteZettelTransacted(&sz); err != nil {
@@ -66,6 +60,16 @@ func (m Set) Filter(w Writer) (err error) {
 	}
 
 	return
+}
+
+func (m Set) WriterAdder() Writer {
+	return MakeWriter(
+		func(z *Zettel) (err error) {
+			m.Add(*z)
+
+			return
+		},
+	)
 }
 
 func (m Set) WriterFilter() Writer {
@@ -123,9 +127,9 @@ func (a Set) Any() (tz Zettel) {
 	return
 }
 
-func (a Set) Each(f func(Zettel) error) (err error) {
+func (a Set) Each(f func(*Zettel) error) (err error) {
 	for _, sz := range a.innerMap {
-		if err = f(sz); err != nil {
+		if err = f(&sz); err != nil {
 			if errors.Is(err, io.EOF) {
 				err = nil
 			} else {

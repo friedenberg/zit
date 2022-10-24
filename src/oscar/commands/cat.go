@@ -90,7 +90,7 @@ func (c Cat) zettelen(u *umwelt.Umwelt) (err error) {
 	//TODO switch to stream
 	all := zettel_transacted.MakeSetUnique(0)
 
-	if err = u.StoreObjekten().ReadAllSchwanzenTransacted(all); err != nil {
+	if err = u.StoreObjekten().ReadAllSchwanzenTransacted(all.WriterAdder()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -99,7 +99,7 @@ func (c Cat) zettelen(u *umwelt.Umwelt) (err error) {
 
 		// not a bottleneck
 		all.Each(
-			func(z zettel_transacted.Zettel) (err error) {
+			func(z *zettel_transacted.Zettel) (err error) {
 				var b []byte
 
 				b, err = json.Marshal(z.Named.Stored)
@@ -134,7 +134,7 @@ func (c Cat) zettelen(u *umwelt.Umwelt) (err error) {
 
 		// not a bottleneck
 		all.Each(
-			func(z zettel_transacted.Zettel) (err error) {
+			func(z *zettel_transacted.Zettel) (err error) {
 				c.Zettel = z.Named.Stored.Zettel
 
 				if _, err = f.WriteTo(c); err != nil {
@@ -186,7 +186,7 @@ func (c Cat) typen(u *umwelt.Umwelt) (err error) {
 	//TODO switch to stream
 	all := zettel_transacted.MakeSetUnique(0)
 
-	if err = u.StoreObjekten().ReadAllSchwanzenTransacted(all); err != nil {
+	if err = u.StoreObjekten().ReadAllSchwanzenTransacted(all.WriterAdder()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -194,7 +194,7 @@ func (c Cat) typen(u *umwelt.Umwelt) (err error) {
 	typen := make(map[typ.Typ]bool)
 
 	all.Each(
-		func(z zettel_transacted.Zettel) (err error) {
+		func(z *zettel_transacted.Zettel) (err error) {
 			typen[z.Named.Stored.Zettel.Typ] = true
 
 			return

@@ -48,7 +48,7 @@ func (c OpenAkte) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 
 func (c OpenAkte) RunWithIds(store *umwelt.Umwelt, is id_set.Set) (err error) {
 	hins := is.Hinweisen()
-	paths := make([]string, len(hins))
+	paths := make([]string, hins.Len())
 
 	dir, err := ioutil.TempDir("", "")
 
@@ -57,7 +57,7 @@ func (c OpenAkte) RunWithIds(store *umwelt.Umwelt, is id_set.Set) (err error) {
 		return
 	}
 
-	for i, h := range hins {
+	for i, h := range hins.Elements() {
 		func(h hinweis.Hinweis) {
 			var tz zettel_transacted.Zettel
 
@@ -72,7 +72,7 @@ func (c OpenAkte) RunWithIds(store *umwelt.Umwelt, is id_set.Set) (err error) {
 
 			var filename string
 
-			if filename, err = id.MakeDirIfNecessary(hins[i], dir); err != nil {
+			if filename, err = id.MakeDirIfNecessary(h, dir); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

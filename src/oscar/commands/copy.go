@@ -44,9 +44,9 @@ func (c Copy) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 func (c Copy) RunWithIds(s *umwelt.Umwelt, ids id_set.Set) (err error) {
 	hins := ids.Hinweisen()
 
-	zettels := make([]zettel_transacted.Zettel, len(hins))
+	zettels := make([]zettel_transacted.Zettel, hins.Len())
 
-	for i, h := range hins {
+	for i, h := range hins.Elements() {
 		var tz zettel_transacted.Zettel
 
 		if tz, err = s.StoreObjekten().ReadHinweisSchwanzen(h); err != nil {

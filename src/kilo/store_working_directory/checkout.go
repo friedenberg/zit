@@ -21,16 +21,16 @@ func (s *Store) Checkout(
 	zcs = zettel_checked_out.MakeSetUnique(0)
 	zts := zettel_transacted.MakeSetUnique(0)
 
-	if err = s.storeObjekten.ReadAllSchwanzenTransacted(ztw, zts); err != nil {
+	if err = s.storeObjekten.ReadAllSchwanzenTransacted(ztw, zts.WriterAdder()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	zts.Each(
-		func(zt zettel_transacted.Zettel) (err error) {
+		func(zt *zettel_transacted.Zettel) (err error) {
 			var zc zettel_checked_out.Zettel
 
-			if zc, err = s.CheckoutOne(options, zt); err != nil {
+			if zc, err = s.CheckoutOne(options, *zt); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

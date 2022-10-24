@@ -29,21 +29,27 @@ func (s *ScriptValue) Set(v string) (err error) {
 	return
 }
 
-func (s *ScriptValue) RunWithInput(in io.Reader) (r io.Reader, err error) {
+func (s ScriptValue) Cmd() *exec.Cmd {
+	return s.cmd
+}
+
+func (s *ScriptValue) RunWithInput() (w io.WriteCloser, r io.Reader, err error) {
 	if s.IsEmpty() {
 		err = errors.Errorf("empty script")
 		return
 	}
 
 	s.cmd = exec.Command(s.script)
-	s.cmd.Stdin = in
+
+	if w, err = s.cmd.StdinPipe(); err != nil {
+		errors.Fatal(err)
+		return
+	}
 
 	if r, err = s.cmd.StdoutPipe(); err != nil {
 		errors.Fatal(err)
 		return
 	}
-
-	s.cmd.Start()
 
 	return
 }
@@ -83,13 +89,16 @@ func (s *ScriptValue) Run(input string) (r io.Reader, err error) {
 }
 
 func (s *ScriptValue) Close() (err error) {
-	errors.Print()
+	errors.Log().Print("closing script")
+	defer errors.Log().Print("done closing script")
 
 	if s.file != nil {
+		errors.Log().Print("closing file")
 		err = files.Close(s.file)
 	}
 
 	if s.cmd != nil {
+		errors.Log().Print("waiting for script")
 		err = s.cmd.Wait()
 	}
 

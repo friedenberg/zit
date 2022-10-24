@@ -23,7 +23,7 @@ func (p *Printer) FileRecognized(
 	pa.WriteFormat("[%s %s] (Akte recognized)", fu.Path, p.Sha(fu.Sha))
 
 	szt.Each(
-		func(tz1 zettel_transacted.Zettel) (err error) {
+		func(tz1 *zettel_transacted.Zettel) (err error) {
 			//TODO eliminate zettels marked as duplicates / hidden
 			pa.WriteFormat("\t%s\n", p.ZettelNamed(tz1.Named))
 			err = pa.Error()

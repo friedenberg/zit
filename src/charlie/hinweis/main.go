@@ -103,6 +103,7 @@ func (i Hinweis) Less(j Hinweis) bool {
 }
 
 func (h *Hinweis) Set(v string) (err error) {
+	v = strings.TrimSpace(v)
 	v = strings.ToLower(v)
 	v = strings.Map(
 		func(r rune) rune {

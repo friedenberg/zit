@@ -42,20 +42,17 @@ LOOP:
 		}
 	}
 
-	needsHin := len(f.Set.Hinweisen()) > 0
-	okHin := false || len(f.Set.Hinweisen()) == 0
+	hinweisen := f.Set.Hinweisen()
+	needsHin := hinweisen.Len() > 0
+	okHin := false || hinweisen.Len() == 0
 
-	for _, h := range f.Set.Hinweisen() {
-		if okHin = h.Equals(z.Hinweis); okHin {
-			break
-		}
-	}
+	okHin = hinweisen.Contains(z.Hinweis)
 
-  isEmpty := !needsHin && !needsTyp && !needsEt
+	isEmpty := !needsHin && !needsTyp && !needsEt
 
 	switch {
-  case isEmpty:
-    ok = false
+	case isEmpty:
+		ok = false
 
 	case f.Or:
 		ok = (okHin && needsHin) || (okTyp && needsTyp) || (okEt && needsEt)

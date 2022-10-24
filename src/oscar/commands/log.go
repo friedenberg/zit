@@ -44,16 +44,16 @@ func (c Log) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 func (c Log) RunWithIds(os *umwelt.Umwelt, is id_set.Set) (err error) {
 	hs := is.Hinweisen()
 
-	switch len(hs) {
+	switch hs.Len() {
 
 	case 0:
 		err = errors.Errorf("hinweis or zettel sha required")
 		return
 	}
 
-	chains := make([]zettel_transacted.Slice, 0, len(hs))
+	chains := make([]zettel_transacted.Slice, 0, hs.Len())
 
-	for _, h := range hs {
+	for _, h := range hs.Elements() {
 		var chain zettel_transacted.Slice
 
 		if chain, err = os.StoreObjekten().AllInChain(h); err != nil {

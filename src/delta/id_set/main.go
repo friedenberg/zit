@@ -72,8 +72,8 @@ func (s Set) Len() int {
 	return len(s.ids) + s.shas.Len()
 }
 
-func (s Set) Hinweisen() (hinweisen []hinweis.Hinweis) {
-	hinweisen = s.hinweisen.Elements()
+func (s Set) Hinweisen() (hinweisen hinweis.Set) {
+	hinweisen = s.hinweisen.Copy()
 
 	return
 }
@@ -98,7 +98,7 @@ func (s Set) HasKonfig() (ok bool) {
 
 func (s Set) AnyShasOrHinweisen() (ids []id.IdMitKorper) {
 	hinweisen := s.Hinweisen()
-	ids = make([]id.IdMitKorper, 0, s.shas.Len()+len(hinweisen))
+	ids = make([]id.IdMitKorper, 0, s.shas.Len()+hinweisen.Len())
 
 	s.shas.Each(
 		func(sh sha.Sha) {
@@ -106,9 +106,13 @@ func (s Set) AnyShasOrHinweisen() (ids []id.IdMitKorper) {
 		},
 	)
 
-	for _, h := range hinweisen {
-		ids = append(ids, h)
-	}
+	hinweisen.Each(
+		func(h hinweis.Hinweis) {
+			ids = append(ids, h)
+
+			return
+		},
+	)
 
 	return
 }

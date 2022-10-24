@@ -39,7 +39,7 @@ func (s Store) AkteExists(sh sha.Sha) (err error) {
 		},
 	)
 
-	if err = s.verzeichnisseAll.ReadMany(w, zettel_verzeichnisse.WriterZettelTransacted{Writer: set}); err != nil {
+	if err = s.verzeichnisseAll.ReadMany(w, zettel_verzeichnisse.WriterZettelTransacted{Writer: set.WriterAdder()}); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

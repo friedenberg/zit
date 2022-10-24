@@ -161,11 +161,21 @@ func (c *Organize) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 					NamedFilter: query,
 				},
 			},
-			getResults,
+			getResults.WriterAdder(),
 		),
 	}
 
 	if err = u.StoreObjekten().ReadAllSchwanzenVerzeichnisse(wk, w); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	filterOp := user_ops.FilterZettelsWithScript{
+		Set:    getResults,
+		Filter: c.Filter,
+	}
+
+	if err = filterOp.Run(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

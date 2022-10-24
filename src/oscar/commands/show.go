@@ -118,7 +118,7 @@ func (c Show) showZettels(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 				},
 			},
 		},
-		zts,
+		zts.WriterAdder(),
 	)
 
 	if err = store.StoreObjekten().ReadAllSchwanzenTransacted(w); err != nil {
@@ -134,7 +134,7 @@ func (c Show) showZettels(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 	}
 
 	zts.Each(
-		func(zt zettel_transacted.Zettel) (err error) {
+		func(zt *zettel_transacted.Zettel) (err error) {
 			if typKonfig, ok := store.Konfig().Typen[zt.Named.Stored.Zettel.Typ.String()]; ok {
 				ctx.IncludeAkte = typKonfig.InlineAkte
 			} else {

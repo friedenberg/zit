@@ -58,7 +58,7 @@ func (c CatObjekte) akteShasFromIds(
 ) (shas []sha.Sha, err error) {
 	shas = ids.Shas()
 
-	for _, h := range ids.Hinweisen() {
+	for _, h := range ids.Hinweisen().Elements() {
 		var zc zettel_checked_out.Zettel
 
 		if zc, err = u.StoreWorkingDirectory().Read(h.String() + ".md"); err != nil {

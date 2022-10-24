@@ -56,7 +56,7 @@ func (c ZettelFromExternalAkte) Run(
 				err1 := ctx.Err.(store_objekten.ErrAkteExists)
 				errors.PrintOutf("[%s %s] (has Akte matches)", arg, akteSha)
 				err1.Set.Each(
-					func(tz1 zettel_transacted.Zettel) (err error) {
+					func(tz1 *zettel_transacted.Zettel) (err error) {
 						if tz1.Named.Hinweis.Equals(tz.Named.Hinweis) {
 							return
 						}

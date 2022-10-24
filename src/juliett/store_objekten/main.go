@@ -528,7 +528,7 @@ func (s Store) AllInChain(h hinweis.Hinweis) (c zettel_transacted.Slice, err err
 		},
 	)
 
-	if err = s.verzeichnisseAll.ReadMany(w, zettel_verzeichnisse.WriterZettelTransacted{Writer: mst}); err != nil {
+	if err = s.verzeichnisseAll.ReadMany(w, zettel_verzeichnisse.WriterZettelTransacted{Writer: mst.WriterAdder()}); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

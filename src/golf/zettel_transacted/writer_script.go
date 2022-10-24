@@ -9,6 +9,7 @@ import (
 
 type WriterScript struct {
 	script    script_value.ScriptValue
+	scriptIn  io.WriteCloser
 	scriptOut io.Reader
 	enc       WriterJson
 }
@@ -18,11 +19,23 @@ func MakeWriterScript(s script_value.ScriptValue) (w WriterScript, err error) {
 		script: s,
 	}
 
-	r, w1 := io.Pipe()
+	if w.scriptIn, w.scriptOut, err = w.script.RunWithInput(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-	w.enc = MakeWriterJson(w1)
+	w.enc = MakeWriterJson(w.scriptIn)
 
-	if w.scriptOut, err = w.script.RunWithInput(r); err != nil {
+	return
+}
+
+func (w WriterScript) Reader() io.Reader {
+	return w.scriptOut
+}
+
+func (w WriterScript) WriteZettelTransacted(z *Zettel) (err error) {
+	errors.Log().Printf("writing zettel: %s", z)
+	if err = w.enc.WriteZettelTransacted(z); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -30,8 +43,13 @@ func MakeWriterScript(s script_value.ScriptValue) (w WriterScript, err error) {
 	return
 }
 
-func (w WriterScript) WriteZettelTransacted(z *Zettel) (err error) {
-	if err = w.enc.WriteZettelTransacted(z); err != nil {
+func (w WriterScript) Close() (err error) {
+	if err = w.scriptIn.Close(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = w.script.Close(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

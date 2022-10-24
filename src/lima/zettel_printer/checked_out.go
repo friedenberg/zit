@@ -73,7 +73,7 @@ func (p *Printer) appendZettelCheckedOutMatches(
 		if c.Len() == 1 && c.Any().Named.Stored.Zettel.Equals(ex.Named.Stored.Zettel) {
 		} else if c.Len() > 1 {
 			c.Each(
-				func(tz zettel_transacted.Zettel) (err error) {
+				func(tz *zettel_transacted.Zettel) (err error) {
 					pa.NewLine()
 					pa.WriteFormat("\t%s (%s match)", p.ZettelNamed(tz.Named), t)
 
