@@ -54,7 +54,20 @@ func New(i kennung.Int, pl Provider, pr Provider) (h Hinweis, err error) {
 }
 
 func MakeKopfUndSchwanz(kopf, schwanz string) (h Hinweis, err error) {
-	hs := fmt.Sprintf("%s/%s", strings.TrimSpace(kopf), strings.TrimSpace(schwanz))
+	kopf = strings.TrimSpace(kopf)
+	schwanz = strings.TrimSpace(schwanz)
+
+	switch {
+	case kopf == "":
+    err = errors.Errorf("kopf was empty: {Kopf: %q, Schwanz: %q}", kopf, schwanz)
+		return
+
+	case schwanz == "":
+    err = errors.Errorf("schwanz was empty: {Kopf: %q, Schwanz: %q}", kopf, schwanz)
+		return
+	}
+
+	hs := fmt.Sprintf("%s/%s", kopf, schwanz)
 
 	if err = h.Set(hs); err != nil {
 		err = errors.Errorf("failed to set hinweis: %s", err)
@@ -116,12 +129,11 @@ func (h *Hinweis) Set(v string) (err error) {
 		v,
 	)
 
-	parts := strings.Split(strings.ToLower(v), "/")
+	parts := strings.Split(v, "/")
 
 	count := len(parts)
 
 	switch count {
-
 	default:
 		err = errors.Errorf("hinweis needs exactly 2 components, but got %d: %q", count, v)
 		return
@@ -129,6 +141,16 @@ func (h *Hinweis) Set(v string) (err error) {
 	case 2:
 		h.Left = parts[0]
 		h.Right = parts[1]
+	}
+
+	switch {
+	case h.Left == "":
+		err = errors.Errorf("left is empty: %q", v)
+		return
+
+	case h.Right == "":
+		err = errors.Errorf("right is empty: %q", v)
+		return
 	}
 
 	return

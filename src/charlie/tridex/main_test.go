@@ -305,7 +305,7 @@ func TestExpand(t1 *testing.T) {
 		"654321": "654321",
 		"128":    "128",
 		"123":    "123456",
-		"1232":   "",
+		"1232":   "1232",
 	}
 
 	for a, e := range expectedContains {

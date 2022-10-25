@@ -248,27 +248,18 @@ func (i *indexAbbr) ExpandHinweisString(s string) (h hinweis.Hinweis, err error)
 }
 
 func (i *indexAbbr) ExpandHinweis(hAbbr hinweis.Hinweis) (h hinweis.Hinweis, err error) {
-	errors.Print(hAbbr)
-	ctx := errors.Ctx{}
-
-	defer func() {
-		err = ctx.Error()
-	}()
-
-	if ctx.Err = i.readIfNecessary(); !ctx.IsEmpty() {
-		ctx.Wrap()
+	if err = i.readIfNecessary(); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
 	kopf := i.indexAbbrEncodableTridexes.HinweisKopfen.Expand(hAbbr.Kopf())
 	schwanz := i.indexAbbrEncodableTridexes.HinweisSchwanzen.Expand(hAbbr.Schwanz())
 
-	if h, ctx.Err = hinweis.MakeKopfUndSchwanz(kopf, schwanz); !ctx.IsEmpty() {
-		ctx.Wrap()
+	if h, err = hinweis.MakeKopfUndSchwanz(kopf, schwanz); err != nil {
+		err = errors.Wrapf(err, "{Abbreviated: '%s'}", hAbbr)
 		return
 	}
-
-	errors.Print(h)
 
 	return
 }

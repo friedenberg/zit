@@ -43,7 +43,11 @@ func (ps ProtoIdSet) MakeOne(v string) (i id.Id, err error) {
 		}
 	}
 
-	if err != nil {
+	switch {
+	case err != nil && len(ps.types) == 1:
+		return
+
+	case err != nil:
 		err = errors.Errorf("no proto id was able to parse: %q", v)
 		return
 	}

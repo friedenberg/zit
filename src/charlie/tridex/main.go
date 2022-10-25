@@ -61,7 +61,7 @@ func (t *Tridex) Expand(v string) string {
 	if ok {
 		return sb.String()
 	} else {
-		return ""
+		return v
 	}
 }
 
