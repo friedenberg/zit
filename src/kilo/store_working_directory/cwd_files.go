@@ -9,6 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
+	"github.com/friedenberg/zit/src/charlie/konfig"
 )
 
 type CwdZettel struct {
@@ -17,6 +18,7 @@ type CwdZettel struct {
 }
 
 type CwdFiles struct {
+	konfig           konfig.Compiled
 	dir              string
 	Zettelen         map[string]CwdZettel
 	UnsureAkten      []File
@@ -33,8 +35,9 @@ func (fs CwdFiles) ZettelFiles() (out []string) {
 	return
 }
 
-func makeCwdFiles(dir string) (fs CwdFiles) {
+func makeCwdFiles(konfig konfig.Compiled, dir string) (fs CwdFiles) {
 	fs = CwdFiles{
+		konfig:           konfig,
 		dir:              dir,
 		Zettelen:         make(map[string]CwdZettel, 0),
 		UnsureAkten:      make([]File, 0),
@@ -44,14 +47,14 @@ func makeCwdFiles(dir string) (fs CwdFiles) {
 	return
 }
 
-func MakeCwdFilesAll(dir string) (fs CwdFiles, err error) {
-	fs = makeCwdFiles(dir)
+func MakeCwdFilesAll(k konfig.Compiled, dir string) (fs CwdFiles, err error) {
+	fs = makeCwdFiles(k, dir)
 	err = fs.readAll()
 	return
 }
 
-func MakeCwdFilesExactly(dir string, files ...string) (fs CwdFiles, err error) {
-	fs = makeCwdFiles(dir)
+func MakeCwdFilesExactly(k konfig.Compiled, dir string, files ...string) (fs CwdFiles, err error) {
+	fs = makeCwdFiles(k, dir)
 	err = fs.readInputFiles(files...)
 	return
 }
@@ -218,9 +221,8 @@ func (fs *CwdFiles) readSecondLevelFile(d string, a string) (err error) {
 		zcw.Hinweis = h
 	}
 
-	//TODO-refactor: akten vs zettel file extensions
 	//TODO read zettels
-	if path.Ext(a) == ".md" {
+	if path.Ext(a) == fs.konfig.GetZettelFileExtension() {
 		zcw.Zettel.Path = p
 	} else {
 		zcw.Akte.Path = p
@@ -244,7 +246,6 @@ func (c CwdFiles) hinweisFromPath(p string) (h hinweis.Hinweis, err error) {
 
 	default:
 		parts = parts[len(parts)-2:]
-
 	case 2:
 		break
 	}

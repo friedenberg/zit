@@ -117,7 +117,7 @@ func (s *Store) ReadAll() (err error) {
 
 	var possible CwdFiles
 
-	if possible, err = MakeCwdFilesAll(s.cwd); err != nil {
+	if possible, err = MakeCwdFilesAll(s.Konfig.Compiled, s.cwd); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -217,7 +217,7 @@ func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 		//extension
 		//TODO modify this to use globs
 		if filepath.Ext(ez.ZettelFD.Path) == "" {
-			ez.ZettelFD.Path = ez.ZettelFD.Path + ".md"
+			ez.ZettelFD.Path = ez.ZettelFD.Path + s.Konfig.GetZettelFileExtension()
 			return s.readZettelFromFile(ez)
 		}
 

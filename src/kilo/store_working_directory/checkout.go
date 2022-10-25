@@ -72,8 +72,7 @@ func (s Store) filenameForZettelTransacted(
 		return
 	}
 
-	//TODO move user-fs-representation of zettel path to own function
-	filename = originalFilename + ".md"
+	filename = originalFilename + s.Konfig.Compiled.GetZettelFileExtension()
 
 	return
 }

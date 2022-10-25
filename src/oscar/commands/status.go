@@ -36,7 +36,7 @@ func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
 		fallthrough
 
 	default:
-		if possible, err = store_working_directory.MakeCwdFilesAll(s.Standort().Cwd()); err != nil {
+		if possible, err = store_working_directory.MakeCwdFilesAll(s.Konfig().Compiled, s.Standort().Cwd()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

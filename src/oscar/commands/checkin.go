@@ -45,13 +45,13 @@ func (c Checkin) Run(
 		fallthrough
 
 	case c.All:
-		if pz, err = store_working_directory.MakeCwdFilesAll(s.Standort().Cwd()); err != nil {
+		if pz, err = store_working_directory.MakeCwdFilesAll(s.Konfig().Compiled, s.Standort().Cwd()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	default:
-		if pz, err = store_working_directory.MakeCwdFilesExactly(s.Standort().Cwd(), args...); err != nil {
+		if pz, err = store_working_directory.MakeCwdFilesExactly(s.Konfig().Compiled, s.Standort().Cwd(), args...); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

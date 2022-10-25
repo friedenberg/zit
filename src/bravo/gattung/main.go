@@ -20,6 +20,7 @@ const (
 	Transaktion
 	Zettel
 	Konfig
+	Kennung
 )
 
 func (g Gattung) String() string {
@@ -47,6 +48,9 @@ func (g Gattung) String() string {
 
 	case Konfig:
 		return "Konfig"
+
+	case Kennung:
+		return "Kennung"
 
 	default:
 		return "Unknown"
@@ -82,6 +86,9 @@ func (g *Gattung) Set(v string) (err error) {
 
 	case "konfig":
 		*g = Konfig
+
+	case "kennung":
+		*g = Kennung
 
 	default:
 		err = errors.Errorf("unknown gattung: %s", v)

@@ -1,14 +1,20 @@
 package konfig
 
-import "sort"
+import (
+	"fmt"
+	"sort"
+)
 
 type Compiled struct {
+	ZettelFileExtension string
 	EtikettenHidden     []string
 	EtikettenToAddToNew []string
 	//TODO add typen extensions
 }
 
 func makeCompiled(k toml) (kc Compiled, err error) {
+	kc.ZettelFileExtension = "md"
+
 	for tn, tv := range k.Tags {
 		switch {
 		case tv.Hide:
@@ -28,4 +34,8 @@ func makeCompiled(k toml) (kc Compiled, err error) {
 	})
 
 	return
+}
+
+func (c Compiled) GetZettelFileExtension() string {
+	return fmt.Sprintf(".%s", c.ZettelFileExtension)
 }

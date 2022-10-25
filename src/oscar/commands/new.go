@@ -24,12 +24,12 @@ type bez struct {
 }
 
 type New struct {
-	Edit        bool
-	Delete      bool
-	Count       int
-	Filter      script_value.ScriptValue
+	Edit   bool
+	Delete bool
+	Count  int
+	Filter script_value.ScriptValue
 
-  //TODO move to protozettel
+	//TODO move to protozettel
 	Bezeichnung bez
 	Etiketten   etikett.Set
 	typ.Typ
@@ -194,7 +194,7 @@ func (c New) editZettels(
 
 	var cwdFiles store_working_directory.CwdFiles
 
-	if cwdFiles, err = store_working_directory.MakeCwdFilesExactly(u.Standort().Cwd(), fs...); err != nil {
+	if cwdFiles, err = store_working_directory.MakeCwdFilesExactly(u.Konfig().Compiled, u.Standort().Cwd(), fs...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
