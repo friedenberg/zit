@@ -67,6 +67,10 @@ func (c CreateFromPaths) Run(args ...string) (results zettel_transacted.Set, err
 			External: z,
 		}
 
+    if z.Named.Stored.Zettel.IsEmpty() {
+      continue
+    }
+
 		if cz.Internal, err = c.StoreObjekten().Create(z.Named.Stored.Zettel); err != nil {
 			//TODO add file for error handling
 			c.handleStoreError(cz, "", err)

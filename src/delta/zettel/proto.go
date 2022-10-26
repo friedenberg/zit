@@ -13,21 +13,17 @@ type ProtoZettel struct {
 }
 
 func (pz ProtoZettel) Equals(z Zettel) (ok bool) {
-	var okTyp, okBez, okEt bool
+	var okTyp, okEt bool
 
-	if !pz.Typ.IsEmpty() && !pz.Typ.Equals(z.Typ) {
+	if !pz.Typ.IsEmpty() && pz.Typ.Equals(z.Typ) {
 		okTyp = true
 	}
 
-	if pz.Bezeichnung != nil && !pz.Bezeichnung.Equals(z.Bezeichnung) {
-		okBez = true
-	}
-
-	if pz.Etiketten.Len() > 0 && !pz.Etiketten.Equals(z.Etiketten) {
+	if pz.Etiketten.Len() > 0 && pz.Etiketten.Equals(z.Etiketten) {
 		okEt = true
 	}
 
-	ok = okTyp && okBez && okEt
+	ok = okTyp && okEt
 
 	return
 }
