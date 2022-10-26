@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/konfig"
 )
 
+//TODO move this to somewhere more appropriate
 func (z *Zettel) ApplyKonfig(k konfig.Konfig) (err error) {
 	normalized := etikett.WithRemovedCommonPrefixes(z.Etiketten)
 	z.Etiketten = normalized

@@ -13,7 +13,7 @@ type Zettel struct {
 }
 
 func (zt Zettel) IsNew() bool {
-	return zt.Kopf == zt.Schwanz
+	return zt.Kopf == zt.Schwanz && zt.TransaktionIndex == 0
 }
 
 func (zt *Zettel) Reset() {

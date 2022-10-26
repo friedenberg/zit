@@ -162,7 +162,7 @@ func (s *Store) transactedWithHead(
 
 func (s Store) transactedZettelFromTransaktionObjekte(
 	t transaktion.Transaktion,
-	o objekte.Objekte,
+	o objekte.ObjekteWithIndex,
 ) (tz zettel_transacted.Zettel, err error) {
 	ok := false
 
@@ -185,16 +185,18 @@ func (s Store) transactedZettelFromTransaktionObjekte(
 		return
 	}
 
+	tz.TransaktionIndex = o.Index
+
 	return
 }
 
 func (s Store) writeTransaktion() (err error) {
-	if len(s.Transaktion.Objekten) == 0 {
+	if s.Transaktion.Len() == 0 {
 		errors.Print("not writing Transaktion as there aren't any Objekten")
 		return
 	}
 
-	errors.Printf("writing Transaktion with %d Objekten", len(s.Transaktion.Objekten))
+	errors.Printf("writing Transaktion with %d Objekten", s.Transaktion.Len())
 
 	var p string
 
@@ -234,7 +236,7 @@ func (s *Store) addZettelToTransaktion(z zettel_named.Zettel) (tz zettel_transac
 
 	mutter[0] = tz.Mutter
 
-	s.Transaktion.AddObjekte(
+	i := s.Transaktion.Add(
 		objekte.Objekte{
 			Gattung: gattung.Zettel,
 			Mutter:  mutter,
@@ -242,6 +244,8 @@ func (s *Store) addZettelToTransaktion(z zettel_named.Zettel) (tz zettel_transac
 			Sha:     z.Stored.Sha,
 		},
 	)
+
+	tz.TransaktionIndex.SetInt(i)
 
 	return
 }

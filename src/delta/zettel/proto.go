@@ -7,21 +7,49 @@ import (
 )
 
 type ProtoZettel struct {
-	Typ         *typ.Typ
+	Typ         typ.Typ
 	Bezeichnung *bezeichnung.Bezeichnung
 	Etiketten   etikett.Set
 }
 
-func (pz ProtoZettel) Apply(z *Zettel) {
-	if pz.Typ != nil {
-		z.Typ = *pz.Typ
+func (pz ProtoZettel) Equals(z Zettel) (ok bool) {
+	var okTyp, okBez, okEt bool
+
+	if !pz.Typ.IsEmpty() && !pz.Typ.Equals(z.Typ) {
+		okTyp = true
 	}
 
-	if pz.Bezeichnung != nil {
+	if pz.Bezeichnung != nil && !pz.Bezeichnung.Equals(z.Bezeichnung) {
+		okBez = true
+	}
+
+	if pz.Etiketten.Len() > 0 && !pz.Etiketten.Equals(z.Etiketten) {
+		okEt = true
+	}
+
+	ok = okTyp && okBez && okEt
+
+	return
+}
+
+func (pz ProtoZettel) Apply(z *Zettel) (ok bool) {
+	if !pz.Typ.IsEmpty() && !z.Typ.Equals(pz.Typ) {
+		ok = true
+		z.Typ = pz.Typ
+	}
+
+	if pz.Bezeichnung != nil && !z.Bezeichnung.Equals(*pz.Bezeichnung) {
+		ok = true
 		z.Bezeichnung = *pz.Bezeichnung
+	}
+
+	if pz.Etiketten.Len() > 0 {
+		ok = true
 	}
 
 	mes := z.Etiketten.MutableCopy()
 	mes.Merge(pz.Etiketten)
 	z.Etiketten = mes.Copy()
+
+	return
 }

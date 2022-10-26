@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/delta/transaktion"
 	"github.com/friedenberg/zit/src/mike/umwelt"
+	"github.com/friedenberg/zit/src/objekte"
 )
 
 type Last struct {
@@ -38,15 +39,18 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	for _, o := range transaktion.Objekten {
-		switch o.Gattung {
-		case gattung.Zettel:
-			errors.PrintOut(o)
+	transaktion.Each(
+		objekte.MakeWriter(
+			func(o objekte.Objekte) (err error) {
+				switch o.Gattung {
+				case gattung.Zettel:
+					errors.PrintOut(o)
+				}
 
-		default:
-			continue
-		}
-	}
+				return
+			},
+		),
+	)
 
 	return
 }

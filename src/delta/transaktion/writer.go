@@ -4,6 +4,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/bravo/line_format"
+	"github.com/friedenberg/zit/src/objekte"
 )
 
 type Writer struct {
@@ -15,16 +16,7 @@ func (w Writer) WriteTo(w1 io.Writer) (n int64, err error) {
 
 	lw.WriteStringers(w.Transaktion.Time)
 
-	for _, o := range w.Transaktion.Objekten {
-		lw.WriteFormat(
-			"%s %s %s %s %s",
-			o.Gattung,
-			o.Mutter[0],
-			o.Mutter[1],
-			o.Id,
-			o.Sha,
-		)
-	}
+	w.Transaktion.Each(objekte.MakeWriterLineFormat(lw))
 
 	return lw.WriteTo(w1)
 }

@@ -7,9 +7,12 @@ import (
 
 type Transaktion struct {
 	ts.Time
-	Objekten []objekte.Objekte
+	objekte.MutableSet
 }
 
-func (t *Transaktion) AddObjekte(o objekte.Objekte) {
-	t.Objekten = append(t.Objekten, o)
+func MakeTransaktion(t ts.Time) Transaktion {
+	return Transaktion{
+		Time:       t,
+		MutableSet: objekte.MakeMutableSet(),
+	}
 }

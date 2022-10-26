@@ -19,3 +19,7 @@ func (b *Bezeichnung) Set(v string) (err error) {
 
 	return
 }
+
+func (a Bezeichnung) Equals(b Bezeichnung) (ok bool) {
+	return a == b
+}

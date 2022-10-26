@@ -17,7 +17,7 @@ import (
 	"github.com/friedenberg/zit/src/november/user_ops"
 )
 
-//TODO move to protozettel
+// TODO move to protozettel
 type bez struct {
 	bezeichnung.Bezeichnung
 	wasSet bool
@@ -46,7 +46,7 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &New{
 				//TODO move to proper place
-				Typ: typ.Make("md"),
+				Typ: typ.Make(""),
 			}
 
 			f.BoolVar(&c.Delete, "delete", false, "delete the zettel and akte after successful checkin")
@@ -127,7 +127,7 @@ func (c New) readExistingFilesAsZettels(
 		Filter: c.Filter,
 		Delete: c.Delete,
 		ProtoZettel: zettel.ProtoZettel{
-			Typ:       &c.Typ,
+			Typ:       c.Typ,
 			Etiketten: c.Etiketten,
 		},
 	}

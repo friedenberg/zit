@@ -35,10 +35,11 @@ type ZettelTransactedPrinter interface {
 }
 
 type Store struct {
-	lockSmith LockSmith
-	konfig    konfig.Konfig
-	standort  standort.Standort
-	age       age.Age
+	lockSmith   LockSmith
+	konfig      konfig.Konfig
+	protoZettel zettel.ProtoZettel
+	standort    standort.Standort
+	age         age.Age
 
 	zettelTransactedPrinter ZettelTransactedPrinter
 	hinweisen               *hinweisen.Hinweisen
@@ -65,6 +66,11 @@ func Make(
 		age:       a,
 		konfig:    k,
 		standort:  st,
+	}
+
+	if err = s.protoZettel.Typ.Set(k.Compiled.DefaultTyp); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	if s.hinweisen, err = hinweisen.New(st.DirZit()); err != nil {
@@ -124,8 +130,7 @@ func Make(
 		return
 	}
 
-	s.Transaktion.Time = ts.Now()
-	s.Transaktion.Objekten = make([]objekte.Objekte, 0)
+	s.Transaktion = transaktion.MakeTransaktion(ts.Now())
 
 	return
 }
@@ -267,10 +272,12 @@ func (s *Store) Create(in zettel.Zettel) (tz zettel_transacted.Zettel, err error
 		return
 	}
 
-	if in.IsEmpty() {
+	if in.IsEmpty() || s.protoZettel.Equals(in) {
 		err = errors.Normalf("zettel is empty")
 		return
 	}
+
+	s.protoZettel.Apply(&in)
 
 	if err = in.ApplyKonfig(s.konfig); err != nil {
 		err = errors.Wrap(err)
@@ -429,53 +436,59 @@ func (s Store) RevertTransaktion(t transaktion.Transaktion) (tzs zettel_transact
 		return
 	}
 
-	tzs = zettel_transacted.MakeSetUnique(len(t.Objekten))
+	tzs = zettel_transacted.MakeSetUnique(t.Len())
 
-	for _, o := range t.Objekten {
-		var h *hinweis.Hinweis
-		ok := false
+	t.Each(
+		objekte.MakeWriter(
+			func(o objekte.Objekte) (err error) {
+				var h *hinweis.Hinweis
+				ok := false
 
-		if h, ok = o.Id.(*hinweis.Hinweis); !ok {
-			//TODO
-			continue
-		}
+				if h, ok = o.Id.(*hinweis.Hinweis); !ok {
+					//TODO
+					return
+				}
 
-		if !o.Mutter[1].IsZero() {
-			err = errors.Errorf("merges reverts are not yet supported: %s", o)
-			return
-		}
+				if !o.Mutter[1].IsZero() {
+					err = errors.Errorf("merge reverts are not yet supported: %s", o)
+					return
+				}
 
-		errors.Print(o)
+				errors.Print(o)
 
-		var chain zettel_transacted.Slice
+				var chain zettel_transacted.Slice
 
-		if chain, err = s.AllInChain(*h); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+				if chain, err = s.AllInChain(*h); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
 
-		var tz zettel_transacted.Zettel
+				var tz zettel_transacted.Zettel
 
-		for _, someTz := range chain {
-			errors.Print(someTz)
-			if someTz.Schwanz == o.Mutter[0] {
-				tz = someTz
-				break
-			}
-		}
+				for _, someTz := range chain {
+					errors.Print(someTz)
+					if someTz.Schwanz == o.Mutter[0] {
+						tz = someTz
+						break
+					}
+				}
 
-		if tz.Named.Stored.Sha.IsNull() {
-			err = errors.Errorf("zettel not found in index!: %#v", o)
-			return
-		}
+				if tz.Named.Stored.Sha.IsNull() {
+					err = errors.Errorf("zettel not found in index!: %#v", o)
+					return
+				}
 
-		if tz, err = s.Update(*h, tz.Named.Stored.Zettel); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+				if tz, err = s.Update(*h, tz.Named.Stored.Zettel); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
 
-		tzs.Add(tz)
-	}
+				tzs.Add(tz)
+
+				return
+			},
+		),
+	)
 
 	return
 }
@@ -600,43 +613,49 @@ func (s *Store) Reindex() (err error) {
 	}
 
 	for _, t := range ts {
-		for _, o := range t.Objekten {
-			switch o.Gattung {
+		t.EachWithIndex(
+			objekte.MakeWriterWithIndex(
+				func(o objekte.ObjekteWithIndex) (err error) {
+					switch o.Gattung {
 
-			case gattung.Zettel:
-				var tz zettel_transacted.Zettel
+					case gattung.Zettel:
+						var tz zettel_transacted.Zettel
 
-				if tz, err = s.transactedZettelFromTransaktionObjekte(t, o); err != nil {
-					if errors.Is(err, ErrNotFound{}) {
-						errors.Print(err)
-						err = nil
-						continue
-					} else {
-						err = errors.Wrap(err)
+						if tz, err = s.transactedZettelFromTransaktionObjekte(t, o); err != nil {
+							if errors.Is(err, ErrNotFound{}) {
+								errors.Print(err)
+								err = nil
+								return
+							} else {
+								err = errors.Wrap(err)
+								return
+							}
+						}
+
+						var mutter *zettel_transacted.Zettel
+
+						if mutter1, err := s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(tz.Named.Hinweis); err == nil {
+							mutter = &mutter1
+						}
+
+						if err = s.writeNamedZettelToIndex(tz); err != nil {
+							err = errors.Wrap(err)
+							return
+						}
+
+						if err = s.indexEtiketten.addZettelWithOptionalMutter(&tz, mutter); err != nil {
+							err = errors.Wrap(err)
+							return
+						}
+
+					default:
 						return
 					}
-				}
 
-				var mutter *zettel_transacted.Zettel
-
-				if mutter1, err := s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(tz.Named.Hinweis); err == nil {
-					mutter = &mutter1
-				}
-
-				if err = s.writeNamedZettelToIndex(tz); err != nil {
-					err = errors.Wrap(err)
 					return
-				}
-
-				if err = s.indexEtiketten.addZettelWithOptionalMutter(&tz, mutter); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-			default:
-				continue
-			}
-		}
+				},
+			),
+		)
 	}
 
 	return

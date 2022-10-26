@@ -17,6 +17,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/mike/umwelt"
+	"github.com/friedenberg/zit/src/objekte"
 )
 
 type Show struct {
@@ -204,9 +205,14 @@ func (c Show) showTransaktions(store *umwelt.Umwelt, ids id_set.Set) (err error)
 
 		errors.PrintOutf("transaktion: %#v", t)
 
-		for _, o := range t.Objekten {
-			errors.Out().Print(o)
-		}
+		t.Each(
+			objekte.MakeWriter(
+				func(o objekte.Objekte) (err error) {
+					errors.Out().Print(o)
+					return
+				},
+			),
+		)
 	}
 
 	return

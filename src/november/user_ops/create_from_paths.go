@@ -74,6 +74,18 @@ func (c CreateFromPaths) Run(args ...string) (results zettel_transacted.Set, err
 			return
 		}
 
+		if c.ProtoZettel.Apply(&cz.Internal.Named.Stored.Zettel) {
+			if cz.Internal, err = c.StoreObjekten().Update(
+				cz.Internal.Named.Hinweis,
+				cz.Internal.Named.Stored.Zettel,
+			); err != nil {
+				//TODO add file for error handling
+				c.handleStoreError(cz, "", err)
+				err = nil
+				return
+			}
+		}
+
 		//TODO get matches
 		cz.DetermineState()
 
@@ -130,6 +142,13 @@ func (c CreateFromPaths) zettelsFromPath(p string) (out []zettel_external.Zettel
 				return
 			}
 
+			var s sha.Sha
+
+			if s, err = z1.ObjekteSha(); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
 			out = append(
 				out,
 				zettel_external.Zettel{
@@ -138,7 +157,7 @@ func (c CreateFromPaths) zettelsFromPath(p string) (out []zettel_external.Zettel
 					},
 					Named: zettel_named.Zettel{
 						Stored: zettel_stored.Stored{
-							//TODO sha?
+							Sha:    s,
 							Zettel: z1,
 						},
 					},

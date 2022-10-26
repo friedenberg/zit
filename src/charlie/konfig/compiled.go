@@ -7,6 +7,7 @@ import (
 
 type Compiled struct {
 	ZettelFileExtension string
+	DefaultTyp          string
 	EtikettenHidden     []string
 	EtikettenToAddToNew []string
 	//TODO add typen extensions
@@ -14,6 +15,7 @@ type Compiled struct {
 
 func makeCompiled(k toml) (kc Compiled, err error) {
 	kc.ZettelFileExtension = "md"
+	kc.DefaultTyp = "md"
 
 	for tn, tv := range k.Tags {
 		switch {

@@ -8,6 +8,10 @@ import (
 
 type IntValue int
 
+func Make(i int) IntValue {
+  return IntValue(i)
+}
+
 func (iv *IntValue) Reset() {
 	*iv = IntValue(0)
 }
