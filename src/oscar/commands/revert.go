@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/delta/id_set"
-	"github.com/friedenberg/zit/src/delta/transaktion"
+	"github.com/friedenberg/zit/src/echo/transaktion"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/mike/umwelt"
 )

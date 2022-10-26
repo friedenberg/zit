@@ -2,10 +2,10 @@ package zettel_transacted
 
 import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/bravo/int_value"
 	"github.com/friedenberg/zit/src/charlie/ts"
 	"github.com/friedenberg/zit/src/delta/objekte"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
-	"github.com/friedenberg/zit/src/bravo/int_value"
 )
 
 type Zettel struct {
