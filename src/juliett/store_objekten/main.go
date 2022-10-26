@@ -23,6 +23,7 @@ import (
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/hotel/zettel_verzeichnisse"
 	"github.com/friedenberg/zit/src/india/store_verzeichnisse"
+	"github.com/friedenberg/zit/src/objekte"
 )
 
 type LockSmith interface {
@@ -124,7 +125,7 @@ func Make(
 	}
 
 	s.Transaktion.Time = ts.Now()
-	s.Transaktion.Objekten = make(map[string]transaktion.Objekte)
+	s.Transaktion.Objekten = make([]objekte.Objekte, 0)
 
 	return
 }

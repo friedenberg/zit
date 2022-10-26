@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/objekte"
 )
 
 type Reader struct {
@@ -20,7 +21,7 @@ type readState struct {
 func (r *Reader) ReadFrom(r1 io.Reader) (n int64, err error) {
 	br := bufio.NewReader(r1)
 
-	r.Transaktion.Objekten = make(map[string]Objekte)
+	r.Transaktion.Objekten = make([]objekte.Objekte, 0)
 
 	for {
 		var line string
@@ -48,7 +49,7 @@ func (r *Reader) ReadFrom(r1 io.Reader) (n int64, err error) {
 			}
 
 		default:
-			var o Objekte
+			var o objekte.Objekte
 
 			if err = o.Set(line); err != nil {
 				err = errors.Wrapf(err, "failed to read line: %s", line)

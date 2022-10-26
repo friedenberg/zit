@@ -17,6 +17,7 @@ func MakeSetUnique(c int) Set {
 				sz.Kopf,
 				sz.Mutter,
 				sz.Schwanz,
+        sz.TransaktionIndex,
 				sz.Named.Hinweis,
 				sz.Named.Stored.Sha,
 			)
@@ -36,7 +37,7 @@ func MakeSetHinweis(c int) Set {
 }
 
 func (m Set) GetKey(z Zettel) string {
-  return m.keyFunc(z)
+	return m.keyFunc(z)
 }
 
 func (m Set) GetString(
@@ -50,11 +51,10 @@ func (m Set) GetString(
 	return
 }
 
-
 func (m Set) Get(
 	s fmt.Stringer,
 ) (tz Zettel, ok bool) {
-  return m.GetString(s.String())
+	return m.GetString(s.String())
 }
 
 func (m Set) Filter(w Writer) (err error) {

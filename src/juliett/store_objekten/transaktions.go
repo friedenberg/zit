@@ -17,6 +17,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/zettel_stored"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
+	"github.com/friedenberg/zit/src/objekte"
 )
 
 func (s Store) ReadLastTransaktion() (t transaktion.Transaktion, err error) {
@@ -161,7 +162,7 @@ func (s *Store) transactedWithHead(
 
 func (s Store) transactedZettelFromTransaktionObjekte(
 	t transaktion.Transaktion,
-	o transaktion.Objekte,
+	o objekte.Objekte,
 ) (tz zettel_transacted.Zettel, err error) {
 	ok := false
 
@@ -234,7 +235,7 @@ func (s *Store) addZettelToTransaktion(z zettel_named.Zettel) (tz zettel_transac
 	mutter[0] = tz.Mutter
 
 	s.Transaktion.AddObjekte(
-		transaktion.Objekte{
+		objekte.Objekte{
 			Gattung: gattung.Zettel,
 			Mutter:  mutter,
 			Id:      &z.Hinweis,

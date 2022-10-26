@@ -34,7 +34,7 @@ func (w WriterScript) Reader() io.Reader {
 }
 
 func (w WriterScript) WriteZettelTransacted(z *Zettel) (err error) {
-	errors.Log().Printf("writing zettel: %s", z)
+	errors.Log().Printf("writing zettel: %v", z)
 	if err = w.enc.WriteZettelTransacted(z); err != nil {
 		err = errors.Wrap(err)
 		return
