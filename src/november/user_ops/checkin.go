@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/golf/zettel_external"
 	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
-	"github.com/friedenberg/zit/src/kilo/store_working_directory"
+	"github.com/friedenberg/zit/src/lima/store_working_directory"
 	"github.com/friedenberg/zit/src/mike/umwelt"
 )
 

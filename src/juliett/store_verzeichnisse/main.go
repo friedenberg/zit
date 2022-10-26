@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/konfig"
 	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
-	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
+	"github.com/friedenberg/zit/src/india/zettel_verzeichnisse"
 )
 
 const DigitWidth = 2

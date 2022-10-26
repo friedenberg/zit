@@ -11,7 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/id"
 	"github.com/friedenberg/zit/src/delta/age_io"
 	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
-	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
+	"github.com/friedenberg/zit/src/india/zettel_verzeichnisse"
 )
 
 func (s Store) AkteExists(sh sha.Sha) (err error) {

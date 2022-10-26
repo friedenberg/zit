@@ -6,7 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/juliett/organize_text"
+	"github.com/friedenberg/zit/src/india/organize_text"
 	"github.com/friedenberg/zit/src/mike/umwelt"
 )
 

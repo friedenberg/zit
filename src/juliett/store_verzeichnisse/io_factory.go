@@ -3,7 +3,7 @@ package store_verzeichnisse
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
+	"github.com/friedenberg/zit/src/india/zettel_verzeichnisse"
 )
 
 type readCloserFactory interface {

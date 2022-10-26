@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/etikett"
-	"github.com/friedenberg/zit/src/juliett/organize_text"
+	"github.com/friedenberg/zit/src/india/organize_text"
 )
 
 type Change struct {

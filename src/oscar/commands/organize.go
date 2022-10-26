@@ -16,9 +16,9 @@ import (
 	"github.com/friedenberg/zit/src/charlie/typ"
 	"github.com/friedenberg/zit/src/delta/id_set"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
-	"github.com/friedenberg/zit/src/juliett/organize_text"
 	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
-	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
+	"github.com/friedenberg/zit/src/india/organize_text"
+	"github.com/friedenberg/zit/src/india/zettel_verzeichnisse"
 	"github.com/friedenberg/zit/src/mike/umwelt"
 	"github.com/friedenberg/zit/src/november/user_ops"
 )

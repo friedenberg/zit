@@ -9,7 +9,7 @@ import (
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
+	"github.com/friedenberg/zit/src/india/zettel_verzeichnisse"
 )
 
 type Page struct {

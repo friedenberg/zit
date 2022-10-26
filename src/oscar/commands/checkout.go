@@ -12,7 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
-	"github.com/friedenberg/zit/src/kilo/store_working_directory"
+	"github.com/friedenberg/zit/src/lima/store_working_directory"
 	"github.com/friedenberg/zit/src/mike/umwelt"
 )
 

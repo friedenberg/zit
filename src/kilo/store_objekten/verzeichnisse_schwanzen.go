@@ -8,8 +8,8 @@ import (
 	"github.com/friedenberg/zit/src/charlie/konfig"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
-	"github.com/friedenberg/zit/src/india/store_verzeichnisse"
-	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
+	"github.com/friedenberg/zit/src/india/zettel_verzeichnisse"
+	"github.com/friedenberg/zit/src/juliett/store_verzeichnisse"
 )
 
 type verzeichnisseSchwanzen struct {
