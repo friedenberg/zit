@@ -1,7 +1,7 @@
 package zettel_verzeichnisse
 
 import (
-	"github.com/friedenberg/zit/src/golf/zettel_transacted"
+	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
 )
 
 type Zettel struct {

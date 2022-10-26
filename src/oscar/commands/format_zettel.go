@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/konfig"
 	"github.com/friedenberg/zit/src/delta/zettel"
-	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
+	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
 	"github.com/friedenberg/zit/src/mike/umwelt"
 )
 

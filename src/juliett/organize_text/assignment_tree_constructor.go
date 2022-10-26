@@ -5,49 +5,33 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/etikett"
-	"github.com/friedenberg/zit/src/golf/zettel_transacted"
+	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
 )
 
-type Factory struct {
+type AssignmentTreeConstructor struct {
 	Options
 }
 
-func (atc *Factory) Make() (ot *Text, err error) {
-	ot = &Text{
-		Options:    atc.Options,
-		assignment: newAssignment(0),
-	}
+func (atc *AssignmentTreeConstructor) Assignments() (roots []*assignment, err error) {
+	roots = make([]*assignment, 0, 1+atc.ExtraEtiketten.Len())
 
-	ot.assignment.isRoot = true
-
-	ot.Metadatei.Set = atc.Options.RootEtiketten
-	ot.Metadatei.Typ = atc.Options.Typ
+	root := newAssignment(0)
+	root.etiketten = atc.RootEtiketten
+	roots = append(roots, root)
 
 	prefixSet := atc.Transacted.ToSetPrefixTransacted()
 
 	for _, e := range atc.ExtraEtiketten.Elements() {
-		ee := newAssignment(ot.Depth() + 1)
-		ee.etiketten = etikett.MakeSet(e)
-		ot.assignment.addChild(ee)
-
-		segments := prefixSet.Subset(e)
-
-		var used zettel_transacted.Set
-
-		if used, err = atc.makeChildren(ee, segments.Grouped, etikett.MakeSlice(e)); err != nil {
+		errors.Err().Printf("making extras: %s", e)
+		errors.Err().Printf("prefix set before: %v", prefixSet)
+		if err = atc.makeChildren(root, prefixSet, etikett.MakeSlice(e)); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
-
-		prefixSet = prefixSet.Subtract(used)
+		errors.Err().Printf("prefix set after: %v", prefixSet)
 	}
 
-	if _, err = atc.makeChildren(ot.assignment, prefixSet, atc.GroupingEtiketten); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = ot.Refine(); err != nil {
+	if err = atc.makeChildren(root, prefixSet, atc.GroupingEtiketten); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -55,16 +39,12 @@ func (atc *Factory) Make() (ot *Text, err error) {
 	return
 }
 
-func (atc Factory) makeChildren(
+func (atc AssignmentTreeConstructor) makeChildren(
 	parent *assignment,
 	prefixSet zettel_transacted.SetPrefixTransacted,
 	groupingEtiketten etikett.Slice,
-) (used zettel_transacted.Set, err error) {
-	used = zettel_transacted.MakeSetUnique(0)
-
+) (err error) {
 	if groupingEtiketten.Len() == 0 {
-		used.Merge(prefixSet.ToSet())
-
 		err = prefixSet.EachZettel(
 			func(e etikett.Etikett, tz zettel_transacted.Zettel) (err error) {
 				var z zettel
@@ -122,7 +102,7 @@ func (atc Factory) makeChildren(
 						lastChild = parent.children[len(parent.children)-1]
 					}
 
-					if lastChild != nil && (lastChild.etiketten.Equals(prefixJoint) || lastChild.etiketten.Len() == 0) {
+					if lastChild != nil && lastChild.etiketten.Equals(prefixJoint) {
 						intermediate = lastChild
 					} else {
 						intermediate = newAssignment(parent.Depth() + 1)
@@ -139,16 +119,12 @@ func (atc Factory) makeChildren(
 						nextGroupingEtiketten = groupingEtiketten[1:]
 					}
 
-					var usedChild zettel_transacted.Set
-
-					usedChild, err = atc.makeChildren(child, zs.ToSetPrefixTransacted(), nextGroupingEtiketten)
+					err = atc.makeChildren(child, zs.ToSetPrefixTransacted(), nextGroupingEtiketten)
 
 					if err != nil {
 						err = errors.Wrap(err)
 						return
 					}
-
-					used.Merge(usedChild)
 
 					intermediate.addChild(child)
 				}
@@ -162,16 +138,12 @@ func (atc Factory) makeChildren(
 					nextGroupingEtiketten = groupingEtiketten[1:]
 				}
 
-				var usedChild zettel_transacted.Set
-
-				usedChild, err = atc.makeChildren(child, zs.ToSetPrefixTransacted(), nextGroupingEtiketten)
+				err = atc.makeChildren(child, zs.ToSetPrefixTransacted(), nextGroupingEtiketten)
 
 				if err != nil {
 					err = errors.Wrap(err)
 					return
 				}
-
-				used.Merge(usedChild)
 
 				parent.addChild(child)
 			}

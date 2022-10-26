@@ -6,8 +6,8 @@ import (
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
-	"github.com/friedenberg/zit/src/golf/zettel_transacted"
-	"github.com/friedenberg/zit/src/hotel/organize_text"
+	"github.com/friedenberg/zit/src/juliett/organize_text"
+	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
 	"github.com/friedenberg/zit/src/india/changes"
 	"github.com/friedenberg/zit/src/mike/umwelt"
 )

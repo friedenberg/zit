@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/charlie/konfig"
 	"github.com/friedenberg/zit/src/charlie/typ"
-	"github.com/friedenberg/zit/src/golf/zettel_transacted"
+	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
 )
 
 type Options struct {

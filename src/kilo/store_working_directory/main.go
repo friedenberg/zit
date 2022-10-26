@@ -14,9 +14,9 @@ import (
 	"github.com/friedenberg/zit/src/charlie/id"
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/golf/zettel_external"
-	"github.com/friedenberg/zit/src/golf/zettel_transacted"
-	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
+	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/store_objekten"
+	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
 )
 
 type ZettelCheckedOutPrinter interface {

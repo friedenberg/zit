@@ -12,7 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/typ"
 	"github.com/friedenberg/zit/src/delta/id_set"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
-	"github.com/friedenberg/zit/src/hotel/zettel_verzeichnisse"
+	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
 	"github.com/friedenberg/zit/src/mike/umwelt"
 )
 

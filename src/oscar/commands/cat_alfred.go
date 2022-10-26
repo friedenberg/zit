@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/india/alfred"
-	"github.com/friedenberg/zit/src/hotel/zettel_verzeichnisse"
+	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
 	"github.com/friedenberg/zit/src/mike/umwelt"
 )
 

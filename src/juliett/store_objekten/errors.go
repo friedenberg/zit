@@ -12,7 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/echo/akten"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
-	"github.com/friedenberg/zit/src/golf/zettel_transacted"
+	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
 	"github.com/google/uuid"
 )
 

@@ -11,8 +11,8 @@ import (
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/charlie/id"
 	"github.com/friedenberg/zit/src/delta/age_io"
-	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
 	"github.com/friedenberg/zit/src/juliett/store_objekten"
+	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
 )
 
 func (s Store) ReadExternalZettelFromAktePath(p string) (cz zettel_checked_out.Zettel, err error) {

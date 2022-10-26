@@ -6,8 +6,8 @@ import (
 	gattung "github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/paper"
 	"github.com/friedenberg/zit/src/golf/zettel_external"
-	"github.com/friedenberg/zit/src/golf/zettel_transacted"
-	"github.com/friedenberg/zit/src/hotel/zettel_checked_out"
+	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
+	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
 )
 
 func (p *Printer) ZettelCheckedOut(zco zettel_checked_out.Zettel) (pa *paper.Paper) {

@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
-	"github.com/friedenberg/zit/src/golf/zettel_transacted"
+	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
 )
 
 func (i Zettelen) PageForHinweis(h hinweis.Hinweis) (n int, err error) {

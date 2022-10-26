@@ -4,7 +4,7 @@ import (
 	"sync"
 
 	"github.com/friedenberg/zit/src/charlie/etikett"
-	"github.com/friedenberg/zit/src/golf/zettel_transacted"
+	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
 )
 
 type Pool struct {

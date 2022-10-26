@@ -17,7 +17,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/transaktion"
 	"github.com/friedenberg/zit/src/echo/zettel_stored"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
-	"github.com/friedenberg/zit/src/golf/zettel_transacted"
+	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
 )
 
 func (s Store) ReadLastTransaktion() (t transaktion.Transaktion, err error) {

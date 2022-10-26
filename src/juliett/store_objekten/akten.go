@@ -10,8 +10,8 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/id"
 	"github.com/friedenberg/zit/src/delta/age_io"
-	"github.com/friedenberg/zit/src/golf/zettel_transacted"
-	"github.com/friedenberg/zit/src/hotel/zettel_verzeichnisse"
+	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
+	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
 )
 
 func (s Store) AkteExists(sh sha.Sha) (err error) {

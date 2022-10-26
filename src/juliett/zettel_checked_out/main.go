@@ -2,7 +2,7 @@ package zettel_checked_out
 
 import (
 	"github.com/friedenberg/zit/src/golf/zettel_external"
-	"github.com/friedenberg/zit/src/golf/zettel_transacted"
+	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
 )
 
 type Zettel struct {
