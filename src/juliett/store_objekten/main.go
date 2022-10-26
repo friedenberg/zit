@@ -565,7 +565,7 @@ func (s Store) AllInChain(h hinweis.Hinweis) (c zettel_transacted.Slice, err err
 	c = mst.ToSlice()
 
 	c.Sort(
-		func(i, j int) bool { return c.Get(i).Schwanz.Less(c.Get(j).Schwanz) },
+		func(i, j int) bool { return c.Get(i).ObjekteTransacted().Less(c.Get(j).ObjekteTransacted()) },
 	)
 
 	return

@@ -16,6 +16,7 @@ type Konfig struct {
 }
 
 func Make(p string, kc Cli) (c Konfig, err error) {
+	c.Compiled = MakeDefaultCompiled()
 	c.Cli = kc
 	// c = DefaultKonfig()
 

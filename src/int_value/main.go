@@ -9,7 +9,12 @@ import (
 type IntValue int
 
 func Make(i int) IntValue {
-  return IntValue(i)
+	return IntValue(i)
+}
+
+func (a IntValue) Less(b IntValue) (ok bool) {
+	ok = a.Int() < b.Int()
+	return
 }
 
 func (iv *IntValue) Reset() {

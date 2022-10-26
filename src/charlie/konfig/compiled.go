@@ -13,9 +13,15 @@ type Compiled struct {
 	//TODO add typen extensions
 }
 
+func MakeDefaultCompiled() Compiled {
+	return Compiled{
+		ZettelFileExtension: "md",
+		DefaultTyp:          "md",
+	}
+}
+
 func makeCompiled(k toml) (kc Compiled, err error) {
-	kc.ZettelFileExtension = "md"
-	kc.DefaultTyp = "md"
+	kc = MakeDefaultCompiled()
 
 	for tn, tv := range k.Tags {
 		switch {

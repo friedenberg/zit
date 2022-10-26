@@ -7,26 +7,21 @@ import (
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/charlie/ts"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
+	"github.com/friedenberg/zit/src/objekte"
 )
-
-type schwanzValue struct {
-	ts.Time
-	sha.Sha
-}
 
 type WriterSchwanzen struct {
 	lock      *sync.RWMutex
-	hinweisen map[hinweis.Hinweis]schwanzValue
+	hinweisen map[hinweis.Hinweis]objekte.ObjekteTransacted
 }
 
 func MakeWriterSchwanzen() *WriterSchwanzen {
 	return &WriterSchwanzen{
 		lock:      &sync.RWMutex{},
-		hinweisen: make(map[hinweis.Hinweis]schwanzValue),
+		hinweisen: make(map[hinweis.Hinweis]objekte.ObjekteTransacted),
 	}
 }
 
@@ -34,7 +29,7 @@ func (zws *WriterSchwanzen) Less(zt *zettel_transacted.Zettel) (ok bool) {
 	zws.lock.RLock()
 	defer zws.lock.RUnlock()
 
-	var t schwanzValue
+	var t objekte.ObjekteTransacted
 
 	t, ok = zws.hinweisen[zt.Named.Hinweis]
 
@@ -42,7 +37,7 @@ func (zws *WriterSchwanzen) Less(zt *zettel_transacted.Zettel) (ok bool) {
 	case !ok:
 		fallthrough
 
-	case zt.Schwanz.Less(t.Time):
+	case zt.ObjekteTransacted().Less(t):
 		ok = true
 	}
 
@@ -53,11 +48,11 @@ func (zws *WriterSchwanzen) Get(h hinweis.Hinweis) (t ts.Time, ok bool) {
 	zws.lock.RLock()
 	defer zws.lock.RUnlock()
 
-	var sw schwanzValue
+	var o objekte.ObjekteTransacted
 
-	sw, ok = zws.hinweisen[h]
+	o, ok = zws.hinweisen[h]
 
-	t = sw.Time
+	t = o.Schwanz
 
 	return
 }
@@ -68,10 +63,11 @@ func (zws *WriterSchwanzen) Set(z *zettel_transacted.Zettel) (ok bool) {
 
 	t := z.Schwanz
 	h := z.Named.Hinweis
+	o := z.ObjekteTransacted()
 	sh := z.Named.Stored.Sha
 	t1, _ := zws.hinweisen[h]
 
-	if t1.Time.Equals(t) {
+	if t1.Schwanz.Equals(t) {
 		if t1.Sha.Equals(sh) {
 			ok = true
 		} else {
@@ -82,8 +78,8 @@ func (zws *WriterSchwanzen) Set(z *zettel_transacted.Zettel) (ok bool) {
 			//once
 			ok = false
 		}
-	} else if t1.Less(t) {
-		zws.hinweisen[h] = schwanzValue{Time: t, Sha: sh}
+	} else if t1.Less(o) {
+		zws.hinweisen[h] = o
 		ok = true
 	} else {
 		ok = false
@@ -116,7 +112,7 @@ func (zws *WriterSchwanzen) ReadFrom(r1 io.Reader) (n int64, err error) {
 
 	dec := gob.NewDecoder(r)
 
-	m := make(map[hinweis.Hinweis]schwanzValue)
+	m := make(map[hinweis.Hinweis]objekte.ObjekteTransacted)
 
 	if err = dec.Decode(&m); err != nil {
 		if errors.IsEOF(err) {

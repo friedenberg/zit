@@ -30,6 +30,9 @@ cat_yang() (
 )
 
 function format_organize_right_align { # @test
+	wd="$(mktemp -d)"
+	cd "$wd" || exit 1
+
 	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
 
 	to_add="$(mktemp)"
@@ -58,6 +61,11 @@ function format_organize_right_align { # @test
 }
 
 function format_organize_left_align { # @test
+	wd="$(mktemp -d)"
+	cd "$wd" || exit 1
+
+	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+
 	to_add="$(mktemp)"
 	{
 		echo "# task"
