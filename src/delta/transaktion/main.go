@@ -2,7 +2,7 @@ package transaktion
 
 import (
 	"github.com/friedenberg/zit/src/charlie/ts"
-	"github.com/friedenberg/zit/src/objekte"
+	"github.com/friedenberg/zit/src/delta/objekte"
 )
 
 type Transaktion struct {

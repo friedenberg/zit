@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/delta/transaktion"
 	"github.com/friedenberg/zit/src/mike/umwelt"
-	"github.com/friedenberg/zit/src/objekte"
+	"github.com/friedenberg/zit/src/delta/objekte"
 )
 
 type Last struct {

@@ -34,14 +34,14 @@ func (s Standort) Cwd() string {
 }
 
 func (s Standort) RelToCwdOrSame(p string) (p1 string) {
-  var err error
-  p1, err = filepath.Rel(s.Cwd(), p)
+	var err error
+	p1, err = filepath.Rel(s.Cwd(), p)
 
-  if err != nil {
-    p1 = p
-  }
+	if err != nil {
+		p1 = p
+	}
 
-  return
+	return
 }
 
 func stringSliceJoin(s string, vs []string) []string {

@@ -59,11 +59,11 @@ func MakeKopfUndSchwanz(kopf, schwanz string) (h Hinweis, err error) {
 
 	switch {
 	case kopf == "":
-    err = errors.Errorf("kopf was empty: {Kopf: %q, Schwanz: %q}", kopf, schwanz)
+		err = errors.Errorf("kopf was empty: {Kopf: %q, Schwanz: %q}", kopf, schwanz)
 		return
 
 	case schwanz == "":
-    err = errors.Errorf("schwanz was empty: {Kopf: %q, Schwanz: %q}", kopf, schwanz)
+		err = errors.Errorf("schwanz was empty: {Kopf: %q, Schwanz: %q}", kopf, schwanz)
 		return
 	}
 

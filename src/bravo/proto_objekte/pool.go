@@ -3,7 +3,7 @@ package proto_objekte
 import "sync"
 
 type Swimmer[T any] interface {
-  *T
+	*T
 	Reset(*T)
 }
 

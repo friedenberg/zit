@@ -17,7 +17,7 @@ func MakeSetUnique(c int) Set {
 				sz.Kopf,
 				sz.Mutter,
 				sz.Schwanz,
-        sz.TransaktionIndex,
+				sz.TransaktionIndex,
 				sz.Named.Hinweis,
 				sz.Named.Stored.Sha,
 			)

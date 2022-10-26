@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/objekte"
+	"github.com/friedenberg/zit/src/delta/objekte"
 )
 
 type Reader struct {

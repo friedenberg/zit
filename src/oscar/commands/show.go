@@ -17,7 +17,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
 	"github.com/friedenberg/zit/src/mike/umwelt"
-	"github.com/friedenberg/zit/src/objekte"
+	"github.com/friedenberg/zit/src/delta/objekte"
 )
 
 type Show struct {

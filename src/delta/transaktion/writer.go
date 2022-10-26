@@ -4,7 +4,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/bravo/line_format"
-	"github.com/friedenberg/zit/src/objekte"
+	"github.com/friedenberg/zit/src/delta/objekte"
 )
 
 type Writer struct {
