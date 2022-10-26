@@ -35,15 +35,26 @@ func MakeSetHinweis(c int) Set {
 	}
 }
 
-func (m Set) Get(
-	s fmt.Stringer,
+func (m Set) GetKey(z Zettel) string {
+  return m.keyFunc(z)
+}
+
+func (m Set) GetString(
+	s string,
 ) (tz Zettel, ok bool) {
 	m.lock.RLock()
 	defer m.lock.RUnlock()
 
-	tz, ok = m.innerMap[s.String()]
+	tz, ok = m.innerMap[s]
 
 	return
+}
+
+
+func (m Set) Get(
+	s fmt.Stringer,
+) (tz Zettel, ok bool) {
+  return m.GetString(s.String())
 }
 
 func (m Set) Filter(w Writer) (err error) {

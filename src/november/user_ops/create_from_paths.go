@@ -49,6 +49,19 @@ func (c CreateFromPaths) Run(args ...string) (results zettel_transacted.Set, err
 
 	defer c.Unlock()
 
+	matchOptions := zettel_transacted.MakeWriterMatchesOptions(toCreate...)
+	writerMatches := zettel_transacted.MakeWriterMatches(matchOptions)
+
+	if err = c.StoreObjekten().ReadAllTransacted(&writerMatches); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	// matchReasonsZettelen := writerMatches.MatchReasonsZettelen()
+	// matchReasonsAkten := writerMatches.MatchReasonsAkten()
+	matches := writerMatches.Matches()
+	results.Merge(matches)
+
 	for _, z := range toCreate {
 		cz := zettel_checked_out.Zettel{
 			External: z,

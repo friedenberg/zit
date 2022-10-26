@@ -5,6 +5,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/proto_objekte"
 )
 
+type Set = proto_objekte.Set[Sha, *Sha]
 type MutableSet = proto_objekte.MutableSet[Sha, *Sha]
 
 func MakeMutableSet(es ...Sha) (s MutableSet) {

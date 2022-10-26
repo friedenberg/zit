@@ -227,6 +227,21 @@ func (s Store) ReadAllSchwanzenTransacted(ws ...zettel_transacted.Writer) (err e
 	return s.ReadAllSchwanzenVerzeichnisse(w)
 }
 
+func (i *Store) ReadAllVerzeichnisse(
+	ws ...zettel_verzeichnisse.Writer,
+) (err error) {
+	return i.verzeichnisseAll.ReadMany(ws...)
+}
+
+func (s Store) ReadAllTransacted(ws ...zettel_transacted.Writer) (err error) {
+	//TODO add proper support for pools upstream of this call
+	w := zettel_verzeichnisse.WriterZettelTransacted{
+		Writer: zettel_transacted.MakeWriterChain(ws...),
+	}
+
+	return s.ReadAllVerzeichnisse(w)
+}
+
 func (s Store) ReadOne(i id.Id) (tz zettel_transacted.Zettel, err error) {
 	switch tid := i.(type) {
 	case hinweis.Hinweis:
