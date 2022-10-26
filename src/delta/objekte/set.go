@@ -2,7 +2,7 @@ package objekte
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/int_value"
+	"github.com/friedenberg/zit/src/bravo/int_value"
 )
 
 type MutableSet struct {

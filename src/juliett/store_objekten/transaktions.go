@@ -12,12 +12,12 @@ import (
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/charlie/id"
 	"github.com/friedenberg/zit/src/charlie/ts"
+	"github.com/friedenberg/zit/src/delta/objekte"
 	"github.com/friedenberg/zit/src/delta/transaktion"
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/echo/zettel_stored"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 	"github.com/friedenberg/zit/src/golf/zettel_transacted"
-	"github.com/friedenberg/zit/src/delta/objekte"
 )
 
 func (s Store) ReadLastTransaktion() (t transaktion.Transaktion, err error) {
