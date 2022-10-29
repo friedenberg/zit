@@ -1,6 +1,10 @@
 package collections
 
-import "io"
+import (
+	"io"
+
+	"github.com/friedenberg/zit/src/alfa/errors"
+)
 
 type SetGeneric[T any] struct {
 	keyFunc func(T) string
@@ -33,7 +37,7 @@ func (s SetGeneric[T]) Len() int {
 	return len(s.inner)
 }
 
-func (s SetGeneric[T]) KeyFunc() func(T) string {
+func (s SetGeneric[T]) KeyFunc() KeyFunc[T] {
 	return s.keyFunc
 }
 
@@ -49,10 +53,20 @@ func (es SetGeneric[T]) add(e T) {
 	es.inner[es.KeyFunc()(e)] = e
 }
 
-func (s SetGeneric[T]) Each(f func(T)) {
+func (s SetGeneric[T]) Each(wf WriterFunc[T]) (err error) {
 	for _, v := range s.inner {
-		f(v)
+		if err = wf(v); err != nil {
+			if errors.IsEOF(err) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+			}
+
+			return
+		}
 	}
+
+	return
 }
 
 func (s1 SetGeneric[T]) Copy() (s2 SetGeneric[T]) {

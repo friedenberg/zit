@@ -44,6 +44,18 @@ LOOP:
 		}
 	}
 
+	shas := f.Set.Shas()
+	needsSha := shas.Len() > 0
+	okSha := false
+
+	switch {
+	case shas.Contains(z.Stored.Sha):
+		okSha = true
+
+	case shas.Contains(z.Stored.Zettel.Akte):
+		okSha = true
+	}
+
 	needsTyp := len(f.Set.Typen()) > 0
 	okTyp := false
 
@@ -59,17 +71,17 @@ LOOP:
 
 	okHin = hinweisen.Contains(z.Hinweis)
 
-	isEmpty := !needsHin && !needsTyp && !needsEt
+	isEmpty := !needsHin && !needsTyp && !needsEt && !needsSha
 
 	switch {
 	case isEmpty:
 		ok = false
 
 	case f.Or:
-		ok = (okHin && needsHin) || (okTyp && needsTyp) || (okEt && needsEt)
+		ok = (okHin && needsHin) || (okTyp && needsTyp) || (okEt && needsEt) || (okSha && needsSha)
 
 	default:
-		ok = (okHin || !needsHin) && (okTyp || !needsTyp) && (okEt || !needsEt)
+		ok = (okHin || !needsHin) && (okTyp || !needsTyp) && (okEt || !needsEt) && (okSha || !needsSha)
 	}
 
 	return

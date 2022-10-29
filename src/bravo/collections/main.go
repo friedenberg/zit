@@ -14,12 +14,14 @@ type ProtoObjektePointer interface {
 }
 
 type WriterFunc[T any] func(T) error
+type WriterFuncKey func(string) error
 
 type SetLike[T any] interface {
 	Len() int
 	Contains(T) bool
 	WriterContainer() WriterFunc[T]
 	Each(WriterFunc[T]) error
+	EachKey(WriterFuncKey) error
 }
 
 type MutableSetLike[T any] interface {

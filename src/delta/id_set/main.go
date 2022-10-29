@@ -60,8 +60,8 @@ func (s *Set) Add(ids ...id.Id) {
 	}
 }
 
-func (s *Set) Shas() (shas []sha.Sha) {
-	return s.shas.Elements()
+func (s *Set) Shas() (shas sha.Set) {
+	return s.shas.Copy()
 }
 
 func (s Set) String() string {

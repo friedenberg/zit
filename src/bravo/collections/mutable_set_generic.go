@@ -1,15 +1,21 @@
 package collections
 
+import (
+	"sync"
+)
+
 type innerSetGeneric[T any] struct {
 	SetGeneric[T]
 }
 
 type MutableSetGeneric[T any] struct {
 	innerSetGeneric[T]
+	lock sync.Locker
 }
 
 func MakeMutableSetGeneric[T any](kf KeyFunc[T], es ...T) (s MutableSetGeneric[T]) {
 	s.innerSetGeneric.SetGeneric = MakeSetGeneric[T](kf, es...)
+	s.lock = &sync.Mutex{}
 
 	return
 }
@@ -23,20 +29,23 @@ func (es MutableSetGeneric[T]) WriterAdder() WriterFunc[T] {
 			return
 		}
 
+		es.lock.Lock()
+		defer es.lock.Unlock()
 		es.innerSetGeneric.SetGeneric.inner[k] = e
 
 		return
 	}
 }
 
-func (es MutableSetGeneric[T]) WriterRemover() WriterFunc[T] {
-	return func(e T) (err error) {
-		k := es.Key(e)
-
+func (es MutableSetGeneric[T]) WriterRemoverKeys() WriterFuncKey {
+	return func(k string) (err error) {
 		if k == "" {
-			err = ErrEmptyKey[T]{Element: e}
+			err = ErrEmptyKey[T]{}
 			return
 		}
+
+		es.lock.Lock()
+		defer es.lock.Unlock()
 
 		delete(es.innerSetGeneric.SetGeneric.inner, k)
 
@@ -44,7 +53,17 @@ func (es MutableSetGeneric[T]) WriterRemover() WriterFunc[T] {
 	}
 }
 
-func (es MutableSetGeneric[T]) Remove(es1 ...T) {
+func (es MutableSetGeneric[T]) WriterRemover() WriterFunc[T] {
+	removerKeys := es.WriterRemoverKeys()
+
+	return func(e T) (err error) {
+		if err = removerKeys(es.KeyFunc()(e)); err != nil {
+			err = ErrEmptyKey[T]{Element: e}
+			return
+		}
+
+		return
+	}
 }
 
 // func (es MutableSetGeneric[T]) RemovePrefixes(needle T) {
@@ -56,9 +75,6 @@ func (es MutableSetGeneric[T]) Remove(es1 ...T) {
 // }
 
 func (a MutableSetGeneric[T]) Reset(b SetLike[T]) {
-	for k, _ := range a.innerSetGeneric.SetGeneric.inner {
-		delete(a.inner, k)
-	}
-
+	a.Each(a.WriterRemover())
 	b.Each(a.WriterAdder())
 }

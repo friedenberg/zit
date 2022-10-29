@@ -2,6 +2,7 @@ package zettel_named
 
 import "github.com/friedenberg/zit/src/charlie/hinweis"
 
+//TODO deprecate and move to MutableSet
 type SetNamed map[string]Zettel
 
 func NewSetNamed() *SetNamed {

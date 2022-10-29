@@ -26,6 +26,7 @@ type bez struct {
 type New struct {
 	Edit   bool
 	Delete bool
+	Dedupe bool
 	Count  int
 	Filter script_value.ScriptValue
 
@@ -50,6 +51,7 @@ func init() {
 			}
 
 			f.BoolVar(&c.Delete, "delete", false, "delete the zettel and akte after successful checkin")
+			f.BoolVar(&c.Dedupe, "dedupe", false, "deduplicate added Zettelen based on Akte sha")
 			f.BoolVar(&c.Edit, "edit", true, "create a new empty zettel and open EDITOR or VISUAL for editing and then commit the resulting changes")
 			f.IntVar(&c.Count, "count", 1, "when creating new empty zettels, how many to create. otherwise ignored")
 			f.Var(&c.Bezeichnung, "bezeichnung", "zettel description (will overwrite existing Bezecihnung")
@@ -126,6 +128,7 @@ func (c New) readExistingFilesAsZettels(
 		Format: f,
 		Filter: c.Filter,
 		Delete: c.Delete,
+		Dedupe: c.Dedupe,
 		ProtoZettel: zettel.ProtoZettel{
 			Typ:       c.Typ,
 			Etiketten: c.Etiketten,
