@@ -1,5 +1,7 @@
 package proto_objekte
 
+import "io"
+
 type SetGeneric[T any] struct {
 	keyFunc func(T) string
 	closed  bool
@@ -107,6 +109,25 @@ func (s1 SetGeneric[T]) Copy() (s2 SetGeneric[T]) {
 
 // 	return
 // }
+
+func (s MutableSetGeneric[T]) WriterContainer() WriterFunc[T] {
+	return func(e T) (err error) {
+		k := s.Key(e)
+
+		if k == "" {
+			err = ErrEmptyKey[T]{Element: e}
+			return
+		}
+
+		_, ok := s.inner[k]
+
+		if !ok {
+			err = io.EOF
+		}
+
+		return
+	}
+}
 
 func (s SetGeneric[T]) Contains(e T) (ok bool) {
 	k := s.Key(e)

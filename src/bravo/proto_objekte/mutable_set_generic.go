@@ -14,26 +14,37 @@ func MakeMutableSetGeneric[T any](kf KeyFunc[T], es ...T) (s MutableSetGeneric[T
 	return
 }
 
-func (es MutableSetGeneric[T]) Add(e T) {
-	k := es.Key(e)
-
-	if k == "" {
-		panic("empty key")
-	}
-
-	es.innerSetGeneric.SetGeneric.inner[k] = e
-}
-
-func (es MutableSetGeneric[T]) Remove(es1 ...T) {
-	for _, e := range es1 {
+func (es MutableSetGeneric[T]) WriterAdder() WriterFunc[T] {
+	return func(e T) (err error) {
 		k := es.Key(e)
 
 		if k == "" {
-			panic("empty key")
+			err = ErrEmptyKey[T]{Element: e}
+			return
+		}
+
+		es.innerSetGeneric.SetGeneric.inner[k] = e
+
+		return
+	}
+}
+
+func (es MutableSetGeneric[T]) WriterRemover() WriterFunc[T] {
+	return func(e T) (err error) {
+		k := es.Key(e)
+
+		if k == "" {
+			err = ErrEmptyKey[T]{Element: e}
+			return
 		}
 
 		delete(es.innerSetGeneric.SetGeneric.inner, k)
+
+		return
 	}
+}
+
+func (es MutableSetGeneric[T]) Remove(es1 ...T) {
 }
 
 // func (es MutableSetGeneric[T]) RemovePrefixes(needle T) {
@@ -44,19 +55,10 @@ func (es MutableSetGeneric[T]) Remove(es1 ...T) {
 // 	}
 // }
 
-func (a MutableSetGeneric[T]) AddFrom(b SetLike[T]) {
-	b.Each(
-		func(e T) error {
-			a.Add(e)
-			return nil
-		},
-	)
-}
-
 func (a MutableSetGeneric[T]) Reset(b SetLike[T]) {
 	for k, _ := range a.innerSetGeneric.SetGeneric.inner {
 		delete(a.inner, k)
 	}
 
-	a.AddFrom(b)
+	b.Each(a.WriterAdder())
 }

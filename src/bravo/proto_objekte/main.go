@@ -16,15 +16,15 @@ type ProtoObjektePointer interface {
 type WriterFunc[T any] func(T) error
 
 type SetLike[T any] interface {
-  Len() int
+	Len() int
 	Contains(T) bool
-	Any() T
+	WriterContainer() WriterFunc[T]
 	Each(WriterFunc[T]) error
 }
 
 type MutableSetLike[T any] interface {
 	SetLike[T]
-	Add(T)
-	Remove(T)
+	WriterAdder() WriterFunc[T]
+	WriterRemover() WriterFunc[T]
 	Reset(SetLike[T])
 }

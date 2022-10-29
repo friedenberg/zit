@@ -25,6 +25,13 @@ func (ip Pool[T]) Get() *T {
 	return ip.inner.Get().(*T)
 }
 
+func (ip Pool[T]) WriterPutter() WriterFunc[*T] {
+	return func(e *T) (err error) {
+		ip.Put(e)
+		return
+	}
+}
+
 func (ip Pool[T]) Put(i *T) {
 	if i == nil {
 		return
