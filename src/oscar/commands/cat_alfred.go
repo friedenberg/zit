@@ -3,6 +3,7 @@ package commands
 import (
 	"bufio"
 	"flag"
+	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/gattung"
@@ -77,10 +78,6 @@ func (c CatAlfred) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 
 func (c CatAlfred) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	//this command does its own error handling
-	defer func() {
-		err = nil
-	}()
-
 	wo := bufio.NewWriter(u.Out())
 	defer wo.Flush()
 
@@ -93,49 +90,86 @@ func (c CatAlfred) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 	defer errors.PanicIfError(aw.Close)
 
-	defer func() {
-		aw.WriteError(err)
-	}()
+	wg := &sync.WaitGroup{}
 
 	switch c.Type {
 	case gattung.Etikett:
-		var ea []etikett.Etikett
-
-		if ea, err = u.StoreObjekten().Etiketten(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		for _, e := range ea {
-			aw.WriteEtikett(e)
-		}
+		wg.Add(1)
+		go c.catEtiketten(u, ids, aw, wg)
 
 	case gattung.Akte:
-		fallthrough
+		wg.Add(1)
+		go c.catZettelen(u, ids, aw, wg)
 
 	case gattung.Zettel:
-		fallthrough
+		wg.Add(1)
+		go c.catZettelen(u, ids, aw, wg)
 
 	case gattung.Hinweis:
-		wk := zettel_verzeichnisse.MakeWriterKonfig(u.Konfig())
-
-		if err = u.StoreObjekten().ReadAllSchwanzenVerzeichnisse(
-			wk,
-			zettel_verzeichnisse.WriterZettelTransacted{
-				Writer: zettel_transacted.WriterZettelNamed{
-					Writer: zettel_named.FilterIdSet{
-						Set: ids,
-					},
-				},
-			},
-			aw,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+		wg.Add(1)
+		go c.catZettelen(u, ids, aw, wg)
 
 	default:
-		err = errors.Errorf("unsupported objekte type: %s", c.Type)
+		wg.Add(2)
+		go c.catEtiketten(u, ids, aw, wg)
+		go c.catZettelen(u, ids, aw, wg)
+	}
+
+	wg.Wait()
+
+	return
+}
+
+func (c CatAlfred) catEtiketten(
+	u *umwelt.Umwelt,
+	ids id_set.Set,
+	aw *alfred.Writer,
+	wg *sync.WaitGroup,
+) {
+	if wg != nil {
+		defer wg.Done()
+	}
+
+	var ea []etikett.Etikett
+
+	var err error
+
+	if ea, err = u.StoreObjekten().Etiketten(); err != nil {
+		aw.WriteError(err)
+		return
+	}
+
+	for _, e := range ea {
+		aw.WriteEtikett(e)
+	}
+}
+
+func (c CatAlfred) catZettelen(
+	u *umwelt.Umwelt,
+	ids id_set.Set,
+	aw *alfred.Writer,
+	wg *sync.WaitGroup,
+) {
+	if wg != nil {
+		defer wg.Done()
+	}
+
+	wk := zettel_verzeichnisse.MakeWriterKonfig(u.Konfig())
+
+	var err error
+
+	if err = u.StoreObjekten().ReadAllSchwanzenVerzeichnisse(
+		wk,
+		zettel_verzeichnisse.WriterZettelTransacted{
+			Writer: zettel_transacted.WriterZettelNamed{
+				Writer: zettel_named.FilterIdSet{
+					Set: ids,
+				},
+			},
+		},
+		aw,
+	); err != nil {
+		aw.WriteError(err)
 		return
 	}
 

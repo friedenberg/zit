@@ -68,13 +68,14 @@ func (w *Writer) zettelToItem(z *zettel_verzeichnisse.Zettel, ha hinweis.Abbr) (
 func (w *Writer) etikettToItem(e etikett.Etikett) (a *alfred.Item) {
 	a = w.alfredWriter.Get()
 
-	a.Title = e.String()
+	a.Title = "@" + e.String()
 	// a.Subtitle = fmt.Sprintf("%s: %s", z.Hinweis.String(), strings.Join(EtikettenStringsFromZettel(z, false), ", "))
 
 	a.Arg = e.String()
 
 	mb := alfred.NewMatchBuilder()
 
+	mb.AddMatches(a.Title)
 	mb.AddMatches(e.Expanded().Strings()...)
 
 	a.Match = mb.String()
