@@ -4,19 +4,19 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/proto_objekte"
+	collections "github.com/friedenberg/zit/src/bravo/collections"
 )
 
-type Set = proto_objekte.Set[Etikett, *Etikett]
+type Set = collections.Set[Etikett, *Etikett]
 
 func MakeSet(es ...Etikett) (s Set) {
-	return Set(proto_objekte.MakeSet(es...))
+	return Set(collections.MakeSet(es...))
 }
 
 func MakeSetStrings(vs ...string) (s Set, err error) {
-	var s1 proto_objekte.Set[Etikett, *Etikett]
+	var s1 collections.Set[Etikett, *Etikett]
 
-	if s1, err = proto_objekte.MakeSetStrings[Etikett, *Etikett](vs...); err != nil {
+	if s1, err = collections.MakeSetStrings[Etikett, *Etikett](vs...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

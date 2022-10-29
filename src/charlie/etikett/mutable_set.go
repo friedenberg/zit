@@ -3,13 +3,13 @@ package etikett
 import (
 	"strings"
 
-	"github.com/friedenberg/zit/src/bravo/proto_objekte"
+	collections "github.com/friedenberg/zit/src/bravo/collections"
 )
 
-type MutableSet = proto_objekte.MutableSet[Etikett, *Etikett]
+type MutableSet = collections.MutableSet[Etikett, *Etikett]
 
 func MakeMutableSet(hs ...Etikett) MutableSet {
-	return MutableSet(proto_objekte.MakeMutableSet[Etikett, *Etikett](hs...))
+	return MutableSet(collections.MakeMutableSet[Etikett, *Etikett](hs...))
 }
 
 func AddNormalized(es MutableSet, e Etikett) {

@@ -2,20 +2,20 @@ package sha
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/proto_objekte"
+	collections "github.com/friedenberg/zit/src/bravo/collections"
 )
 
-type Set = proto_objekte.Set[Sha, *Sha]
-type MutableSet = proto_objekte.MutableSet[Sha, *Sha]
+type Set = collections.Set[Sha, *Sha]
+type MutableSet = collections.MutableSet[Sha, *Sha]
 
 func MakeMutableSet(es ...Sha) (s MutableSet) {
-	return MutableSet(proto_objekte.MakeMutableSet(es...))
+	return MutableSet(collections.MakeMutableSet(es...))
 }
 
 func MakeMutableSetStrings(vs ...string) (s MutableSet, err error) {
-	var s1 proto_objekte.MutableSet[Sha, *Sha]
+	var s1 collections.MutableSet[Sha, *Sha]
 
-	if s1, err = proto_objekte.MakeMutableSetStrings[Sha, *Sha](vs...); err != nil {
+	if s1, err = collections.MakeMutableSetStrings[Sha, *Sha](vs...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

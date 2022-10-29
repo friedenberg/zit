@@ -1,5 +1,5 @@
 package ts
 
-import "github.com/friedenberg/zit/src/bravo/proto_objekte"
+import collections "github.com/friedenberg/zit/src/bravo/collections"
 
-type Set = proto_objekte.Set[Time, *Time]
+type Set = collections.Set[Time, *Time]

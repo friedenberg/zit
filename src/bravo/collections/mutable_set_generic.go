@@ -1,4 +1,4 @@
-package proto_objekte
+package collections
 
 type innerSetGeneric[T any] struct {
 	SetGeneric[T]

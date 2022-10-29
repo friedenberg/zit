@@ -1,4 +1,4 @@
-package proto_objekte
+package collections
 
 type ErrEmptyKey[T any] struct {
 	Element T

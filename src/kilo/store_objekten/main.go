@@ -375,7 +375,7 @@ func (s Store) Etiketten() (es []etikett.Etikett, err error) {
 	return s.indexEtiketten.allEtiketten()
 }
 
-//TODO support dry run
+// TODO support dry run
 func (s *Store) Update(
 	h hinweis.Hinweis,
 	z zettel.Zettel,

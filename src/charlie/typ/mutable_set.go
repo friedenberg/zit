@@ -1,9 +1,9 @@
 package typ
 
-import "github.com/friedenberg/zit/src/bravo/proto_objekte"
+import collections "github.com/friedenberg/zit/src/bravo/collections"
 
-type MutableSet = proto_objekte.MutableSet[Typ, *Typ]
+type MutableSet = collections.MutableSet[Typ, *Typ]
 
 func MakeMutableSet(hs ...Typ) MutableSet {
-	return MutableSet(proto_objekte.MakeMutableSet[Typ, *Typ](hs...))
+	return MutableSet(collections.MakeMutableSet[Typ, *Typ](hs...))
 }

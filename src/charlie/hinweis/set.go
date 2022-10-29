@@ -1,5 +1,5 @@
 package hinweis
 
-import "github.com/friedenberg/zit/src/bravo/proto_objekte"
+import collections "github.com/friedenberg/zit/src/bravo/collections"
 
-type Set = proto_objekte.Set[Hinweis, *Hinweis]
+type Set = collections.Set[Hinweis, *Hinweis]

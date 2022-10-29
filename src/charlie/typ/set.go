@@ -1,5 +1,5 @@
 package typ
 
-import "github.com/friedenberg/zit/src/bravo/proto_objekte"
+import collections "github.com/friedenberg/zit/src/bravo/collections"
 
-type Set = proto_objekte.Set[Typ, *Typ]
+type Set = collections.Set[Typ, *Typ]

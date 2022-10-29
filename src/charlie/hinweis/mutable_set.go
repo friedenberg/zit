@@ -1,9 +1,9 @@
 package hinweis
 
-import "github.com/friedenberg/zit/src/bravo/proto_objekte"
+import collections "github.com/friedenberg/zit/src/bravo/collections"
 
-type MutableSet = proto_objekte.MutableSet[Hinweis, *Hinweis]
+type MutableSet = collections.MutableSet[Hinweis, *Hinweis]
 
 func MakeMutableSet(hs ...Hinweis) MutableSet {
-	return MutableSet(proto_objekte.MakeMutableSet[Hinweis, *Hinweis](hs...))
+	return MutableSet(collections.MakeMutableSet[Hinweis, *Hinweis](hs...))
 }

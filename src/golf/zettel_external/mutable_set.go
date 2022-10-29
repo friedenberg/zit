@@ -1,9 +1,9 @@
 package zettel_external
 
-import "github.com/friedenberg/zit/src/bravo/proto_objekte"
+import collections "github.com/friedenberg/zit/src/bravo/collections"
 
 type MutableSet struct {
-	proto_objekte.MutableSetGeneric[*Zettel]
+	collections.MutableSetGeneric[*Zettel]
 }
 
 func MakeMutableSet(zs ...*Zettel) MutableSet {
@@ -12,6 +12,6 @@ func MakeMutableSet(zs ...*Zettel) MutableSet {
 	}
 
 	return MutableSet{
-		MutableSetGeneric: proto_objekte.MakeMutableSetGeneric[*Zettel](kf, zs...),
+		MutableSetGeneric: collections.MakeMutableSetGeneric[*Zettel](kf, zs...),
 	}
 }

@@ -1,9 +1,9 @@
 package ts
 
-import "github.com/friedenberg/zit/src/bravo/proto_objekte"
+import collections "github.com/friedenberg/zit/src/bravo/collections"
 
-type MutableSet = proto_objekte.MutableSet[Time, *Time]
+type MutableSet = collections.MutableSet[Time, *Time]
 
 func MakeMutableSet(hs ...Time) MutableSet {
-	return MutableSet(proto_objekte.MakeMutableSet[Time, *Time](hs...))
+	return MutableSet(collections.MakeMutableSet[Time, *Time](hs...))
 }

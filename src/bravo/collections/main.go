@@ -1,4 +1,4 @@
-package proto_objekte
+package collections
 
 import (
 	"flag"
