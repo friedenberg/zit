@@ -54,12 +54,6 @@ func init() {
 }
 
 func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
-	ctx := &errors.Ctx{}
-
-	defer func() {
-		err = ctx.Error()
-	}()
-
 	zettelsFromAkteOp := user_ops.ZettelFromExternalAkte{
 		Umwelt: u,
 		//TODO add Typ
@@ -70,13 +64,13 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	var zettelsFromAkteResults zettel_transacted.Set
 
-	if zettelsFromAkteResults = zettelsFromAkteOp.Run(ctx, args...); !ctx.IsEmpty() {
-		ctx.Wrap()
+	if zettelsFromAkteResults, err = zettelsFromAkteOp.Run(args...); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
-	if ctx.Err = c.openAktenIfNecessary(u, zettelsFromAkteResults); !ctx.IsEmpty() {
-		ctx.Wrap()
+	if err = c.openAktenIfNecessary(u, zettelsFromAkteResults); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -98,15 +92,15 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	var f *os.File
 
-	if f, ctx.Err = files.TempFileWithPattern("*.md"); !ctx.IsEmpty() {
-		ctx.Wrap()
+	if f, err = files.TempFileWithPattern("*.md"); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
-	createOrganizeFileResults, ctx.Err = createOrganizeFileOp.RunAndWrite(zettelsFromAkteResults, f)
+	createOrganizeFileResults, err = createOrganizeFileOp.RunAndWrite(zettelsFromAkteResults, f)
 
-	if !ctx.IsEmpty() {
-		ctx.Wrap()
+	if err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -116,13 +110,13 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			Build(),
 	}
 
-	if _, ctx.Err = openVimOp.Run(f.Name()); !ctx.IsEmpty() {
-		ctx.Wrap()
+	if _, err = openVimOp.Run(f.Name()); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
-	if ctx.Err = u.Reset(); !ctx.IsEmpty() {
-		ctx.Wrap()
+	if err = u.Reset(); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -132,8 +126,8 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		Umwelt: u,
 	}
 
-	if ot2, ctx.Err = readOrganizeTextOp.RunWithFile(f.Name()); !ctx.IsEmpty() {
-		ctx.Wrap()
+	if ot2, err = readOrganizeTextOp.RunWithFile(f.Name()); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -141,15 +135,15 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		Umwelt: u,
 	}
 
-	if ctx.Err = u.Lock(); !ctx.IsEmpty() {
-		ctx.Wrap()
+	if err = u.Lock(); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
 	defer u.Unlock()
 
-	if _, ctx.Err = commitOrganizeTextOp.Run(createOrganizeFileResults, ot2); !ctx.IsEmpty() {
-		ctx.Wrap()
+	if _, err = commitOrganizeTextOp.Run(createOrganizeFileResults, ot2); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 

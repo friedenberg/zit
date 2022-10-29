@@ -173,8 +173,6 @@ func (c CreateFromPaths) zettelsFromPath(p string) (out []zettel_external.Zettel
 		}
 	}
 
-	c.ProtoZettel.Apply(&ctx.Zettel)
-
 	var s sha.Sha
 
 	if s, err = ctx.Zettel.ObjekteSha(); err != nil {

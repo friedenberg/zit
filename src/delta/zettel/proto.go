@@ -29,7 +29,7 @@ func (pz ProtoZettel) Equals(z Zettel) (ok bool) {
 }
 
 func (pz ProtoZettel) Apply(z *Zettel) (ok bool) {
-	if !pz.Typ.IsEmpty() && !z.Typ.Equals(pz.Typ) {
+	if z.Typ.IsEmpty() && !pz.Typ.IsEmpty() && !z.Typ.Equals(pz.Typ) {
 		ok = true
 		z.Typ = pz.Typ
 	}

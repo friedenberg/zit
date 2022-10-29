@@ -7,6 +7,13 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/etikett"
+	"github.com/friedenberg/zit/src/charlie/hinweis"
+	"github.com/friedenberg/zit/src/charlie/konfig"
+	"github.com/friedenberg/zit/src/charlie/ts"
+	"github.com/friedenberg/zit/src/charlie/typ"
+	"github.com/friedenberg/zit/src/delta/id_set"
+	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
+	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
 	"github.com/friedenberg/zit/src/india/zettel_verzeichnisse"
 	"github.com/friedenberg/zit/src/juliett/alfred"
 	"github.com/friedenberg/zit/src/mike/umwelt"
@@ -25,16 +32,50 @@ func init() {
 				Type: gattung.Unknown,
 			}
 
-			c.Command = c
-
 			f.Var(&c.Type, "type", "ObjekteType")
 
-			return c
+			return commandWithIds{
+				CommandWithIds: c,
+			}
 		},
 	)
 }
 
-func (c CatAlfred) Run(u *umwelt.Umwelt, args ...string) (err error) {
+func (c CatAlfred) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
+	is = id_set.MakeProtoIdSet(
+		id_set.ProtoId{
+			MutableId: &konfig.Id{},
+		},
+		id_set.ProtoId{
+			MutableId: &hinweis.Hinweis{},
+			Expand: func(v string) (out string, err error) {
+				var h hinweis.Hinweis
+				h, err = u.StoreObjekten().ExpandHinweisString(v)
+				out = h.String()
+				return
+			},
+		},
+		id_set.ProtoId{
+			MutableId: &etikett.Etikett{},
+			Expand: func(v string) (out string, err error) {
+				var e etikett.Etikett
+				e, err = u.StoreObjekten().ExpandEtikettString(v)
+				out = e.String()
+				return
+			},
+		},
+		id_set.ProtoId{
+			MutableId: &typ.Typ{},
+		},
+		id_set.ProtoId{
+			MutableId: &ts.Time{},
+		},
+	)
+
+	return
+}
+
+func (c CatAlfred) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	//this command does its own error handling
 	defer func() {
 		err = nil
@@ -78,7 +119,17 @@ func (c CatAlfred) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	case gattung.Hinweis:
 		wk := zettel_verzeichnisse.MakeWriterKonfig(u.Konfig())
 
-		if err = u.StoreObjekten().ReadAllSchwanzenVerzeichnisse(wk, aw); err != nil {
+		if err = u.StoreObjekten().ReadAllSchwanzenVerzeichnisse(
+			wk,
+			zettel_verzeichnisse.WriterZettelTransacted{
+				Writer: zettel_transacted.WriterZettelNamed{
+					Writer: zettel_named.FilterIdSet{
+						Set: ids,
+					},
+				},
+			},
+			aw,
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

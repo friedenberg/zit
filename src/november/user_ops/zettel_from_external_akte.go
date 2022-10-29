@@ -23,15 +23,14 @@ type ZettelFromExternalAkte struct {
 }
 
 func (c ZettelFromExternalAkte) Run(
-	ctx *errors.Ctx,
 	args ...string,
-) (results zettel_transacted.Set) {
-	if ctx.Err = c.Lock(); !ctx.IsEmpty() {
-		ctx.Wrap()
+) (results zettel_transacted.Set, err error) {
+	if err = c.Lock(); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
-	defer ctx.Defer(c.Unlock)
+	defer c.Unlock()
 
 	results = zettel_transacted.MakeSetUnique(len(args))
 
@@ -39,21 +38,21 @@ func (c ZettelFromExternalAkte) Run(
 		var z zettel.Zettel
 		var tz zettel_transacted.Zettel
 
-		if z, ctx.Err = c.zettelForAkte(arg); !ctx.IsEmpty() {
-			ctx.Wrap()
+		if z, err = c.zettelForAkte(arg); err != nil {
+			err = errors.Wrap(err)
 			return
 		}
 
-		if tz, ctx.Err = c.StoreObjekten().Create(z); !ctx.IsEmpty() {
-			ctx.Wrap()
+		if tz, err = c.StoreObjekten().Create(z); err != nil {
+			err = errors.Wrap(err)
 			return
 		}
 
 		akteSha := tz.Named.Stored.Zettel.Akte
 
-		if ctx.Err = c.StoreObjekten().AkteExists(akteSha); !ctx.IsEmpty() {
-			if errors.Is(ctx.Err, store_objekten.ErrAkteExists{}) {
-				err1 := ctx.Err.(store_objekten.ErrAkteExists)
+		if err = c.StoreObjekten().AkteExists(akteSha); err != nil {
+			if errors.Is(err, store_objekten.ErrAkteExists{}) {
+				err1 := err.(store_objekten.ErrAkteExists)
 				errors.PrintOutf("[%s %s] (has Akte matches)", arg, akteSha)
 				err1.Set.Each(
 					func(tz1 *zettel_transacted.Zettel) (err error) {
@@ -65,9 +64,9 @@ func (c ZettelFromExternalAkte) Run(
 						return
 					},
 				)
-				ctx.Err = nil
+				err = nil
 			} else {
-				ctx.Wrapf("%s", arg)
+				err = errors.Wrapf(err, "%s", arg)
 				return
 			}
 		}
@@ -75,8 +74,8 @@ func (c ZettelFromExternalAkte) Run(
 		results.Add(tz)
 
 		if c.Delete {
-			if ctx.Err = os.Remove(arg); !ctx.IsEmpty() {
-				ctx.Wrap()
+			if err = os.Remove(arg); err != nil {
+				err = errors.Wrap(err)
 				return
 			}
 

@@ -46,7 +46,7 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &New{
 				//TODO move to proper place
-				Typ: typ.Make(""),
+				// Typ: typ.Make(""),
 			}
 
 			f.BoolVar(&c.Delete, "delete", false, "delete the zettel and akte after successful checkin")

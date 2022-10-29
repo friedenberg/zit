@@ -2,16 +2,23 @@ package commands
 
 import (
 	"flag"
+	"fmt"
 	"io"
+	"syscall"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	gattung "github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/charlie/etikett"
+	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/charlie/id"
+	"github.com/friedenberg/zit/src/charlie/konfig"
+	"github.com/friedenberg/zit/src/charlie/ts"
+	"github.com/friedenberg/zit/src/charlie/typ"
 	"github.com/friedenberg/zit/src/delta/id_set"
 	"github.com/friedenberg/zit/src/delta/zettel"
+	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
-	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
+	"github.com/friedenberg/zit/src/india/zettel_verzeichnisse"
 	"github.com/friedenberg/zit/src/mike/umwelt"
 )
 
@@ -36,6 +43,40 @@ func init() {
 	)
 }
 
+func (c CatObjekte) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
+	is = id_set.MakeProtoIdSet(
+		id_set.ProtoId{
+			MutableId: &konfig.Id{},
+		},
+		id_set.ProtoId{
+			MutableId: &hinweis.Hinweis{},
+			Expand: func(v string) (out string, err error) {
+				var h hinweis.Hinweis
+				h, err = u.StoreObjekten().ExpandHinweisString(v)
+				out = h.String()
+				return
+			},
+		},
+		id_set.ProtoId{
+			MutableId: &etikett.Etikett{},
+			Expand: func(v string) (out string, err error) {
+				var e etikett.Etikett
+				e, err = u.StoreObjekten().ExpandEtikettString(v)
+				out = e.String()
+				return
+			},
+		},
+		id_set.ProtoId{
+			MutableId: &typ.Typ{},
+		},
+		id_set.ProtoId{
+			MutableId: &ts.Time{},
+		},
+	)
+
+	return
+}
+
 // TODO switch to idset semantics
 func (c CatObjekte) RunWithIds(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 	switch c.Type {
@@ -55,38 +96,56 @@ func (c CatObjekte) RunWithIds(store *umwelt.Umwelt, ids id_set.Set) (err error)
 func (c CatObjekte) akteShasFromIds(
 	u *umwelt.Umwelt,
 	ids id_set.Set,
-) (shas []sha.Sha, err error) {
-	shas = ids.Shas()
+) (zettelen zettel_transacted.Set, err error) {
+	zettelen = zettel_transacted.MakeSetUnique(0)
 
-	for _, h := range ids.Hinweisen().Elements() {
-		var zc zettel_checked_out.Zettel
-
-		if zc, err = u.StoreWorkingDirectory().Read(h.String() + ".md"); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if zc.State == zettel_checked_out.StateExistsAndDifferent {
-			shas = append(shas, zc.External.Named.Stored.Zettel.Akte)
-		} else {
-			shas = append(shas, zc.Internal.Named.Stored.Zettel.Akte)
-		}
+	if err = u.StoreObjekten().ReadAllSchwanzenVerzeichnisse(
+		zettel_verzeichnisse.WriterZettelTransacted{
+			Writer: zettel_transacted.WriterZettelNamed{
+				Writer: zettel_named.FilterIdSet{
+					Set: ids,
+				},
+			},
+		},
+		zettel_verzeichnisse.WriterZettelTransacted{
+			Writer: zettelen.WriterAdder(),
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
+
+	// for _, h := range ids.Hinweisen().Elements() {
+	// 	var zc zettel_checked_out.Zettel
+
+	// 	if zc, err = u.StoreWorkingDirectory().Read(h.String() + ".md"); err != nil {
+	// 		err = errors.Wrap(err)
+	// 		return
+	// 	}
+
+	// 	if zc.State == zettel_checked_out.StateExistsAndDifferent {
+	// 		shas = append(shas, zc.External.Named.Stored.Zettel.Akte)
+	// 	} else {
+	// 		shas = append(shas, zc.Internal.Named.Stored.Zettel.Akte)
+	// 	}
+	// }
 
 	return
 }
 
 func (c CatObjekte) akten(store *umwelt.Umwelt, ids id_set.Set) (err error) {
-	var shas []sha.Sha
+	var zettelen zettel_transacted.Set
 
-	if shas, err = c.akteShasFromIds(store, ids); err != nil {
+	if zettelen, err = c.akteShasFromIds(store, ids); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	for _, sb := range shas {
-		func(sb sha.Sha) {
+	zettelen.Each(
+		func(z *zettel_transacted.Zettel) (err error) {
 			var r io.ReadCloser
+
+			sb := z.Named.Stored.Zettel.Akte
 
 			if r, err = store.StoreObjekten().AkteReader(sb); err != nil {
 				err = errors.Wrap(err)
@@ -95,12 +154,34 @@ func (c CatObjekte) akten(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 			defer errors.PanicIfError(r.Close)
 
-			if io.Copy(store.Out(), r); err != nil {
-				err = errors.Wrap(err)
+			if _, err = io.WriteString(
+				store.Out(),
+				fmt.Sprintf("['%s']\n", z.Named.Hinweis),
+			); err != nil {
+				err = errors.IsAsNilOrWrapf(
+					err,
+					syscall.EPIPE,
+					"Zettel: %s",
+					z.Named.Hinweis,
+				)
+
 				return
 			}
-		}(sb)
-	}
+
+			if _, err = io.Copy(store.Out(), r); err != nil {
+				err = errors.IsAsNilOrWrapf(
+					err,
+					syscall.EPIPE,
+					"Zettel: %s",
+					z.Named.Hinweis,
+				)
+
+				return
+			}
+
+			return
+		},
+	)
 
 	return
 }

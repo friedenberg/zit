@@ -1,6 +1,8 @@
 package zettel_named
 
 import (
+	"io"
+
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/delta/id_set"
 )
@@ -8,6 +10,15 @@ import (
 type FilterIdSet struct {
 	id_set.Set
 	Or bool
+}
+
+func (f FilterIdSet) WriteZettelNamed(z *Zettel) (err error) {
+	if !f.IncludeNamedZettel(z) {
+		err = io.EOF
+		return
+	}
+
+	return
 }
 
 // TODO improve the performance of this query
