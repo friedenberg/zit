@@ -2,7 +2,7 @@ package zettel_named
 
 import "github.com/friedenberg/zit/src/charlie/hinweis"
 
-//TODO deprecate and move to MutableSet
+// TODO deprecate and move to MutableSet
 type SetNamed map[string]Zettel
 
 func NewSetNamed() *SetNamed {
@@ -27,6 +27,11 @@ func (a SetNamed) Merge(b SetNamed) {
 	for _, z := range b {
 		a.Add(z)
 	}
+}
+
+func (a SetNamed) ContainsKey(k string) bool {
+	_, ok := a[k]
+	return ok
 }
 
 func (a SetNamed) Contains(z Zettel) bool {

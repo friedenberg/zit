@@ -37,12 +37,27 @@ func (s SetGeneric[T]) Len() int {
 	return len(s.inner)
 }
 
-func (s SetGeneric[T]) KeyFunc() KeyFunc[T] {
-	return s.keyFunc
+func (s SetGeneric[T]) Key(e T) string {
+	return s.keyFunc(e)
 }
 
-func (s SetGeneric[T]) Key(e T) string {
-	return s.KeyFunc()(e)
+func (s SetGeneric[T]) Get(k string) (e T, ok bool) {
+	e, ok = s.inner[k]
+	return
+}
+
+func (s SetGeneric[T]) ContainsKey(k string) (ok bool) {
+	if k == "" {
+		return
+	}
+
+	_, ok = s.inner[k]
+
+	return
+}
+
+func (s SetGeneric[T]) Contains(e T) (ok bool) {
+	return s.ContainsKey(s.Key(e))
 }
 
 func (es SetGeneric[T]) add(e T) {
@@ -50,9 +65,10 @@ func (es SetGeneric[T]) add(e T) {
 		panic("trying to add etikett to closed set")
 	}
 
-	es.inner[es.KeyFunc()(e)] = e
+	es.inner[es.Key(e)] = e
 }
 
+// TODO should this be locked mutable writes?
 func (s SetGeneric[T]) Each(wf WriterFunc[T]) (err error) {
 	for _, v := range s.inner {
 		if err = wf(v); err != nil {
@@ -70,7 +86,7 @@ func (s SetGeneric[T]) Each(wf WriterFunc[T]) (err error) {
 }
 
 func (s1 SetGeneric[T]) Copy() (s2 SetGeneric[T]) {
-	s2 = MakeSetGeneric[T](s1.KeyFunc())
+	s2 = MakeSetGeneric[T](s1.Key)
 	s2.open()
 	defer s2.close()
 
@@ -143,25 +159,13 @@ func (s MutableSetGeneric[T]) WriterContainer() WriterFunc[T] {
 	}
 }
 
-func (s SetGeneric[T]) Contains(e T) (ok bool) {
-	k := s.Key(e)
-
-	if k == "" {
-		return
-	}
-
-	_, ok = s.inner[k]
-
-	return
-}
-
 // func (s SetGeneric[T]) ContainsString(es string) bool {
 // 	_, ok := s.inner[es]
 // 	return ok
 // }
 
 func (s1 SetGeneric[T]) Subtract(s2 SetGeneric[T]) (s3 SetGeneric[T]) {
-	s3 = MakeSetGeneric[T](s1.KeyFunc())
+	s3 = MakeSetGeneric[T](s1.Key)
 
 	for _, e1 := range s1.inner {
 		if s2.Contains(e1) {
@@ -199,7 +203,7 @@ func (s1 SetGeneric[T]) Subtract(s2 SetGeneric[T]) (s3 SetGeneric[T]) {
 // }
 
 func (s1 SetGeneric[T]) Intersect(s2 SetGeneric[T]) (s3 SetGeneric[T]) {
-	s3 = MakeSetGeneric[T](s1.KeyFunc())
+	s3 = MakeSetGeneric[T](s1.Key)
 
 	for _, e := range s1.inner {
 		if s2.Contains(e) {
@@ -218,37 +222,3 @@ func (s SetGeneric[T]) Any() (e T) {
 
 	return e
 }
-
-// func (es SetGeneric[T]) Description() string {
-// 	sb := &strings.Builder{}
-// 	first := true
-
-// 	for _, e1 := range es.Sorted() {
-// 		if !first {
-// 			sb.WriteString(", ")
-// 		}
-
-// 		sb.WriteString(e1.String())
-
-// 		first = false
-// 	}
-
-// 	return sb.String()
-// }
-
-// func (s SetGeneric[T]) String() string {
-// 	sb := &strings.Builder{}
-// 	first := true
-
-// 	for _, e1 := range s.Sorted() {
-// 		if !first {
-// 			sb.WriteString(", ")
-// 		}
-
-// 		sb.WriteString(e1.String())
-
-// 		first = false
-// 	}
-
-// 	return sb.String()
-// }

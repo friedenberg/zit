@@ -34,13 +34,13 @@ func (c CreateFromPaths) Run(args ...string) (results zettel_transacted.Set, err
 	toCreate := zettel_external.MakeMutableSetUniqueAkte()
 
 	for _, arg := range args {
-		if err = c.zettelsFromPath(arg, toCreate.WriterAdder()); err != nil {
+		if err = c.zettelsFromPath(arg, toCreate.Add); err != nil {
 			err = errors.Errorf("zettel text format error for path: %s: %s", arg, err)
 			return
 		}
 	}
 
-	results = zettel_transacted.MakeSetUnique(toCreate.Len())
+	results = zettel_transacted.MakeSetHinweis(toCreate.Len())
 
 	if err = c.Lock(); err != nil {
 		err = errors.Wrap(err)
@@ -50,19 +50,36 @@ func (c CreateFromPaths) Run(args ...string) (results zettel_transacted.Set, err
 	defer c.Unlock()
 
 	if c.Dedupe {
-		matcher := toCreate.WriterRemoveMatches()
+		matcher := zettel_external.MakeMutableMatchSet(toCreate)
 
-		writerMatches := zettel_transacted.MakeWriter(
-			func(z *zettel_transacted.Zettel) (err error) {
-				return matcher(&z.Named)
-			},
-		)
+		writerMatches := zettel_transacted.WriterZettelNamed{
+			Writer: zettel_named.WriterFunc(matcher.WriterZettelNamed()),
+		}
 
-		if err = c.StoreObjekten().ReadAllTransacted(writerMatches); err != nil {
+		if err = c.StoreObjekten().ReadAllTransacted(
+			writerMatches,
+			results.WriterAdder(),
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
+
+	err = results.Each(
+		func(z *zettel_transacted.Zettel) (err error) {
+			if c.ProtoZettel.Apply(&z.Named.Stored.Zettel) {
+				if *z, err = c.StoreObjekten().Update(
+					z.Named.Hinweis,
+					z.Named.Stored.Zettel,
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			}
+
+			return
+		},
+	)
 
 	err = toCreate.Each(
 		func(z *zettel_external.Zettel) (err error) {

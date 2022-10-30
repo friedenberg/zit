@@ -2,7 +2,6 @@ package zettel_external
 
 import (
 	collections "github.com/friedenberg/zit/src/bravo/collections"
-	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 )
 
 type MutableSet struct {
@@ -37,13 +36,4 @@ func MakeMutableSetUniqueAkte(zs ...*Zettel) MutableSet {
 	}
 
 	return MakeMutableSet(kf, zs...)
-}
-
-func (s MutableSet) WriterRemoveMatches() collections.WriterFunc[*zettel_named.Zettel] {
-	remover := s.WriterRemoverKeys()
-
-	return func(z *zettel_named.Zettel) (err error) {
-    //TODO make this keyfunc match
-		return remover(z.Stored.Zettel.Akte.String())
-	}
 }

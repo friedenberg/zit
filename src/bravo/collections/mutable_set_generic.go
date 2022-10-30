@@ -20,61 +20,73 @@ func MakeMutableSetGeneric[T any](kf KeyFunc[T], es ...T) (s MutableSetGeneric[T
 	return
 }
 
-func (es MutableSetGeneric[T]) WriterAdder() WriterFunc[T] {
-	return func(e T) (err error) {
-		k := es.Key(e)
+func (es MutableSetGeneric[T]) Add(e T) (err error) {
+	k := es.Key(e)
 
-		if k == "" {
-			err = ErrEmptyKey[T]{Element: e}
-			return
-		}
-
-		es.lock.Lock()
-		defer es.lock.Unlock()
-		es.innerSetGeneric.SetGeneric.inner[k] = e
-
+	if k == "" {
+		err = ErrEmptyKey[T]{Element: e}
 		return
 	}
+
+	es.lock.Lock()
+	defer es.lock.Unlock()
+	es.innerSetGeneric.SetGeneric.inner[k] = e
+
+	return
 }
 
-func (es MutableSetGeneric[T]) WriterRemoverKeys() WriterFuncKey {
-	return func(k string) (err error) {
-		if k == "" {
-			err = ErrEmptyKey[T]{}
-			return
-		}
+func (es MutableSetGeneric[T]) Len() (l int) {
+	es.lock.Lock()
+	defer es.lock.Unlock()
+	l = es.innerSetGeneric.SetGeneric.Len()
+	return
+}
 
-		es.lock.Lock()
-		defer es.lock.Unlock()
+func (es MutableSetGeneric[T]) Get(k string) (e T, ok bool) {
+	es.lock.Lock()
+	defer es.lock.Unlock()
+	e, ok = es.innerSetGeneric.SetGeneric.Get(k)
+	return
+}
 
-		delete(es.innerSetGeneric.SetGeneric.inner, k)
+func (es MutableSetGeneric[T]) ContainsKey(k string) (ok bool) {
+	es.lock.Lock()
+	defer es.lock.Unlock()
+	ok = es.innerSetGeneric.SetGeneric.ContainsKey(k)
+	return
+}
 
+func (es MutableSetGeneric[T]) Contains(e T) (ok bool) {
+	es.lock.Lock()
+	defer es.lock.Unlock()
+	ok = es.innerSetGeneric.SetGeneric.Contains(e)
+	return
+}
+
+func (es MutableSetGeneric[T]) DelKey(k string) (err error) {
+	if k == "" {
+		err = ErrEmptyKey[T]{}
 		return
 	}
+
+	es.lock.Lock()
+	defer es.lock.Unlock()
+
+	delete(es.innerSetGeneric.SetGeneric.inner, k)
+
+	return
 }
 
-func (es MutableSetGeneric[T]) WriterRemover() WriterFunc[T] {
-	removerKeys := es.WriterRemoverKeys()
-
-	return func(e T) (err error) {
-		if err = removerKeys(es.KeyFunc()(e)); err != nil {
-			err = ErrEmptyKey[T]{Element: e}
-			return
-		}
-
+func (es MutableSetGeneric[T]) Del(e T) (err error) {
+	if err = es.DelKey(es.Key(e)); err != nil {
+		err = ErrEmptyKey[T]{Element: e}
 		return
 	}
-}
 
-// func (es MutableSetGeneric[T]) RemovePrefixes(needle T) {
-// 	for haystack, _ := range es.inner {
-// 		if strings.HasPrefix(haystack, needle.String()) {
-// 			delete(es.inner, haystack)
-// 		}
-// 	}
-// }
+	return
+}
 
 func (a MutableSetGeneric[T]) Reset(b SetLike[T]) {
-	a.Each(a.WriterRemover())
-	b.Each(a.WriterAdder())
+	a.Each(a.Del)
+	b.Each(a.Add)
 }
