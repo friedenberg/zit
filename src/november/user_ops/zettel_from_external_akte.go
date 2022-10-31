@@ -127,12 +127,12 @@ func (c ZettelFromExternalAkte) Run(
 	err = toDelete.Each(
 		func(z *zettel_external.Zettel) (err error) {
 			//TODO move to checkout store
-			if err = os.Remove(z.ZettelFD.Path); err != nil {
+			if err = os.Remove(z.AkteFD.Path); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			pathRel := c.Standort().RelToCwdOrSame(z.ZettelFD.Path)
+			pathRel := c.Standort().RelToCwdOrSame(z.AkteFD.Path)
 
 			//TODO move to printer
 			errors.PrintOutf("[%s] (deleted)", pathRel)
