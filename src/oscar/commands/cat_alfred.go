@@ -150,6 +150,7 @@ func (c CatAlfred) catZettelen(
 	aw *alfred.Writer,
 	wg *sync.WaitGroup,
 ) {
+	errors.Err().FunctionName(0)
 	if wg != nil {
 		defer wg.Done()
 	}
@@ -163,7 +164,8 @@ func (c CatAlfred) catZettelen(
 		zettel_verzeichnisse.WriterZettelTransacted{
 			Writer: zettel_transacted.WriterZettelNamed{
 				Writer: zettel_named.FilterIdSet{
-					Set: ids,
+					AllowEmpty: true,
+					Set:        ids,
 				},
 			},
 		},

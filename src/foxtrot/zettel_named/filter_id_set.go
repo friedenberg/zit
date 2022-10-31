@@ -9,7 +9,8 @@ import (
 
 type FilterIdSet struct {
 	id_set.Set
-	Or bool
+	AllowEmpty bool
+	Or         bool
 }
 
 func (f FilterIdSet) WriteZettelNamed(z *Zettel) (err error) {
@@ -74,6 +75,9 @@ LOOP:
 	isEmpty := !needsHin && !needsTyp && !needsEt && !needsSha
 
 	switch {
+	case isEmpty && f.AllowEmpty:
+		ok = true
+
 	case isEmpty:
 		ok = false
 
@@ -83,6 +87,8 @@ LOOP:
 	default:
 		ok = (okHin || !needsHin) && (okTyp || !needsTyp) && (okEt || !needsEt) && (okSha || !needsSha)
 	}
+
+	// errors.Err().Print(okHin, needsHin, okTyp, needsTyp, okEt, needsEt, okSha, needsSha)
 
 	return
 }
