@@ -61,25 +61,14 @@ func (zws *WriterSchwanzen) Set(z *zettel_transacted.Zettel) (ok bool) {
 	zws.lock.Lock()
 	defer zws.lock.Unlock()
 
-	t := z.Schwanz
 	h := z.Named.Hinweis
 	o := z.ObjekteTransacted()
-	sh := z.Named.Stored.Sha
 	t1, _ := zws.hinweisen[h]
 
-	if t1.Schwanz.Equals(t) {
-		if t1.Sha.Equals(sh) {
-			ok = true
-		} else {
-			//TODO this should be a hard error in the future
-			errors.Print("zettel schwanz exists with more than one sha in the same transaction")
-			//TODO this should be logged as it's a data consistency error
-			//This fixes an issue where some transactions have zettels appear more than
-			//once
-			ok = false
-		}
-	} else if t1.Less(o) {
+	if t1.Less(o) {
 		zws.hinweisen[h] = o
+		ok = true
+	} else if t1.Equals(o) {
 		ok = true
 	} else {
 		ok = false

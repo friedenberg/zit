@@ -21,6 +21,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/echo/transaktion"
+	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
 	"github.com/friedenberg/zit/src/india/zettel_verzeichnisse"
 	"github.com/friedenberg/zit/src/juliett/store_verzeichnisse"
@@ -377,8 +378,7 @@ func (s Store) Etiketten() (es []etikett.Etikett, err error) {
 
 // TODO support dry run
 func (s *Store) Update(
-	h hinweis.Hinweis,
-	z zettel.Zettel,
+	z *zettel_named.Zettel,
 ) (tz zettel_transacted.Zettel, err error) {
 	if !s.lockSmith.IsAcquired() {
 		err = ErrLockRequired{
@@ -388,22 +388,23 @@ func (s *Store) Update(
 		return
 	}
 
-	if err = z.ApplyKonfig(s.konfig); err != nil {
+	if err = z.Stored.Zettel.ApplyKonfig(s.konfig); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	var mutter zettel_transacted.Zettel
 
-	if mutter, err = s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(h); err != nil {
+	if mutter, err = s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(
+		z.Hinweis,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	tz.Named.Hinweis = h
-	tz.Named.Stored.Zettel = z
+	tz.Named = *z
 
-	if tz.Named.Stored.Sha, err = s.WriteZettelObjekte(z); err != nil {
+	if tz.Named.Stored.Sha, err = s.WriteZettelObjekte(z.Stored.Zettel); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -479,7 +480,7 @@ func (s Store) RevertTransaktion(t transaktion.Transaktion) (tzs zettel_transact
 					return
 				}
 
-				if tz, err = s.Update(*h, tz.Named.Stored.Zettel); err != nil {
+				if tz, err = s.Update(&tz.Named); err != nil {
 					err = errors.Wrap(err)
 					return
 				}

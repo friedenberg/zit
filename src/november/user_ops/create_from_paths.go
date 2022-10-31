@@ -31,10 +31,21 @@ type CreateFromPaths struct {
 func (c CreateFromPaths) Run(args ...string) (results zettel_transacted.Set, err error) {
 	//TODO support different modes of de-duplication
 	//TODO support merging of duplicated akten
-	toCreate := zettel_external.MakeMutableSetUniqueAkte()
+	toCreate := zettel_external.MakeMutableSetUniqueFD()
+	toDelete := zettel_external.MakeMutableSetUniqueFD()
 
 	for _, arg := range args {
-		if err = c.zettelsFromPath(arg, toCreate.Add); err != nil {
+		if err = c.zettelsFromPath(
+			arg,
+			func(z *zettel_external.Zettel) (err error) {
+				toCreate.Add(z)
+				if c.Delete {
+					toDelete.Add(z)
+				}
+
+				return
+			},
+		); err != nil {
 			err = errors.Errorf("zettel text format error for path: %s: %s", arg, err)
 			return
 		}
@@ -65,12 +76,16 @@ func (c CreateFromPaths) Run(args ...string) (results zettel_transacted.Set, err
 		}
 	}
 
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	err = results.Each(
 		func(z *zettel_transacted.Zettel) (err error) {
 			if c.ProtoZettel.Apply(&z.Named.Stored.Zettel) {
 				if *z, err = c.StoreObjekten().Update(
-					z.Named.Hinweis,
-					z.Named.Stored.Zettel,
+					&z.Named,
 				); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -100,8 +115,7 @@ func (c CreateFromPaths) Run(args ...string) (results zettel_transacted.Set, err
 
 			if c.ProtoZettel.Apply(&cz.Internal.Named.Stored.Zettel) {
 				if cz.Internal, err = c.StoreObjekten().Update(
-					cz.Internal.Named.Hinweis,
-					cz.Internal.Named.Stored.Zettel,
+					&cz.Internal.Named,
 				); err != nil {
 					//TODO add file for error handling
 					c.handleStoreError(cz, "", err)
@@ -115,18 +129,27 @@ func (c CreateFromPaths) Run(args ...string) (results zettel_transacted.Set, err
 
 			results.Add(cz.Internal)
 
-			if c.Delete {
-				//TODO move to checkout store
-				if err = os.Remove(cz.External.ZettelFD.Path); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
+			return
+		},
+	)
 
-				pathRel := c.Standort().RelToCwdOrSame(cz.External.ZettelFD.Path)
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-				//TODO move to printer
-				errors.PrintOutf("[%s] (deleted)", pathRel)
+	err = toDelete.Each(
+		func(z *zettel_external.Zettel) (err error) {
+			//TODO move to checkout store
+			if err = os.Remove(z.ZettelFD.Path); err != nil {
+				err = errors.Wrap(err)
+				return
 			}
+
+			pathRel := c.Standort().RelToCwdOrSame(z.ZettelFD.Path)
+
+			//TODO move to printer
+			errors.PrintOutf("[%s] (deleted)", pathRel)
 
 			return
 		},

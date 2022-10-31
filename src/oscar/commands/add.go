@@ -22,6 +22,7 @@ import (
 )
 
 type Add struct {
+	Dedupe    bool
 	Delete    bool
 	OpenAkten bool
 	Organize  bool
@@ -41,6 +42,7 @@ func init() {
 				Typ: typ.Make("md"),
 			}
 
+			f.BoolVar(&c.Dedupe, "dedupe", false, "deduplicate added Zettelen based on Akte sha")
 			f.BoolVar(&c.Delete, "delete", false, "delete the zettel and akte after successful checkin")
 			f.BoolVar(&c.OpenAkten, "open-akten", false, "also open the Akten")
 			f.BoolVar(&c.Organize, "organize", false, "")
@@ -57,9 +59,12 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	zettelsFromAkteOp := user_ops.ZettelFromExternalAkte{
 		Umwelt: u,
 		//TODO add Typ
-		Etiketten: c.Etiketten,
-		Filter:    c.Filter,
-		Delete:    c.Delete,
+		ProtoZettel: zettel.ProtoZettel{
+			Etiketten: c.Etiketten,
+		},
+		Filter: c.Filter,
+		Delete: c.Delete,
+		Dedupe: c.Dedupe,
 	}
 
 	var zettelsFromAkteResults zettel_transacted.Set

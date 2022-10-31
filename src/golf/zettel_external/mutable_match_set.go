@@ -11,6 +11,7 @@ type MutableMatchSet struct {
 	Original MutableSet
 	Stored   MutableSet
 	Akten    MutableSet
+	Matched  MutableSet
 }
 
 func MakeMutableMatchSet(in MutableSet) (out MutableMatchSet) {
@@ -18,6 +19,7 @@ func MakeMutableMatchSet(in MutableSet) (out MutableMatchSet) {
 		Original: in,
 		Stored:   MakeMutableSetUniqueStored(),
 		Akten:    MakeMutableSetUniqueAkte(),
+		Matched:  MakeMutableSetUniqueStored(),
 	}
 
 	in.Each(out.Stored.Add)
@@ -39,6 +41,10 @@ func (s MutableMatchSet) WriterZettelNamed() collections.WriterFunc[*zettel_name
 			s.Akten.DelKey(kAkte)
 			s.Original.Del(stored)
 			s.Original.Del(akte)
+
+			//These two should be redundant
+			s.Matched.Add(akte)
+			s.Matched.Add(stored)
 			return
 		}
 

@@ -34,7 +34,7 @@ func (c Checkin) Run(
 	for _, z := range zettelen {
 		var tz zettel_transacted.Zettel
 
-		if tz, err = c.StoreObjekten().Update(z.Named.Hinweis, z.Named.Stored.Zettel); err != nil {
+		if tz, err = c.StoreObjekten().Update(&z.Named); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

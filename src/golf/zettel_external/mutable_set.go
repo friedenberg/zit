@@ -16,6 +16,10 @@ func MakeMutableSet(kf collections.KeyFunc[*Zettel], zs ...*Zettel) MutableSet {
 
 func MakeMutableSetUniqueFD(zs ...*Zettel) MutableSet {
 	kf := func(z *Zettel) string {
+		if z == nil {
+			return ""
+		}
+
 		return z.String()
 	}
 
@@ -24,6 +28,14 @@ func MakeMutableSetUniqueFD(zs ...*Zettel) MutableSet {
 
 func MakeMutableSetUniqueStored(zs ...*Zettel) MutableSet {
 	kf := func(z *Zettel) string {
+		if z == nil {
+			return ""
+		}
+
+		if z.Named.Stored.Sha.IsNull() {
+			return ""
+		}
+
 		return z.Named.Stored.Sha.String()
 	}
 
@@ -32,6 +44,14 @@ func MakeMutableSetUniqueStored(zs ...*Zettel) MutableSet {
 
 func MakeMutableSetUniqueAkte(zs ...*Zettel) MutableSet {
 	kf := func(z *Zettel) string {
+		if z == nil {
+			return ""
+		}
+
+		if z.Named.Stored.Zettel.Akte.IsNull() {
+			return ""
+		}
+
 		return z.Named.Stored.Zettel.Akte.String()
 	}
 

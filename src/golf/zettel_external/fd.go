@@ -1,6 +1,10 @@
 package zettel_external
 
-import "github.com/friedenberg/zit/src/charlie/ts"
+import (
+	"path"
+
+	"github.com/friedenberg/zit/src/charlie/ts"
+)
 
 type FD struct {
 	Path    string
@@ -9,6 +13,10 @@ type FD struct {
 
 func (f FD) String() string {
 	return f.Path
+}
+
+func (e FD) Ext() string {
+	return path.Ext(e.Path)
 }
 
 func (f FD) IsEmpty() bool {

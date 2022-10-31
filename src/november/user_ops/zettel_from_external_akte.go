@@ -7,19 +7,20 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/delta/zettel"
+	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
+	"github.com/friedenberg/zit/src/golf/zettel_external"
 	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
-	"github.com/friedenberg/zit/src/kilo/store_objekten"
 	"github.com/friedenberg/zit/src/mike/umwelt"
 )
 
 type ZettelFromExternalAkte struct {
 	*umwelt.Umwelt
-	Etiketten etikett.Set
-	Filter    script_value.ScriptValue
-	Delete    bool
+	ProtoZettel zettel.ProtoZettel
+	Filter      script_value.ScriptValue
+	Delete      bool
+	Dedupe      bool
 }
 
 func (c ZettelFromExternalAkte) Run(
@@ -32,78 +33,139 @@ func (c ZettelFromExternalAkte) Run(
 
 	defer c.Unlock()
 
+	toCreate := zettel_external.MakeMutableSetUniqueAkte()
+	toDelete := zettel_external.MakeMutableSetUniqueFD()
+
 	results = zettel_transacted.MakeSetUnique(len(args))
 
 	for _, arg := range args {
-		var z zettel.Zettel
-		var tz zettel_transacted.Zettel
+		var z *zettel_external.Zettel
 
-		if z, err = c.zettelForAkte(arg); err != nil {
+		akteFD := zettel_external.FD{
+			Path: arg,
+		}
+
+		if z, err = c.zettelForAkte(akteFD); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if tz, err = c.StoreObjekten().Create(z); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		akteSha := tz.Named.Stored.Zettel.Akte
-
-		if err = c.StoreObjekten().AkteExists(akteSha); err != nil {
-			if errors.Is(err, store_objekten.ErrAkteExists{}) {
-				err1 := err.(store_objekten.ErrAkteExists)
-				errors.PrintOutf("[%s %s] (has Akte matches)", arg, akteSha)
-				err1.Set.Each(
-					func(tz1 *zettel_transacted.Zettel) (err error) {
-						if tz1.Named.Hinweis.Equals(tz.Named.Hinweis) {
-							return
-						}
-						//TODO eliminate zettels marked as duplicates / hidden
-						errors.PrintOutf("\t%s", tz1.Named)
-						return
-					},
-				)
-				err = nil
-			} else {
-				err = errors.Wrapf(err, "%s", arg)
-				return
-			}
-		}
-
-		results.Add(tz)
+		toCreate.Add(z)
 
 		if c.Delete {
-			if err = os.Remove(arg); err != nil {
+			toDelete.Add(z)
+		}
+	}
+
+	if c.Dedupe {
+		matcher := zettel_external.MakeMutableMatchSet(toCreate)
+
+		writerMatches := zettel_transacted.WriterZettelNamed{
+			Writer: zettel_named.WriterFunc(matcher.WriterZettelNamed()),
+		}
+
+		if err = c.StoreObjekten().ReadAllTransacted(
+			writerMatches,
+			results.WriterAdder(),
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	err = results.Each(
+		func(z *zettel_transacted.Zettel) (err error) {
+			if c.ProtoZettel.Apply(&z.Named.Stored.Zettel) {
+				if *z, err = c.StoreObjekten().Update(
+					&z.Named,
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			}
+
+			return
+		},
+	)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	err = toCreate.Each(
+		func(z *zettel_external.Zettel) (err error) {
+			if z.Named.Stored.Zettel.IsEmpty() {
+				return
+			}
+
+			var tz zettel_transacted.Zettel
+
+			if tz, err = c.StoreObjekten().Create(z.Named.Stored.Zettel); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			errors.PrintErrf("[%s] (deleted)", arg)
-		}
+			if c.ProtoZettel.Apply(&tz.Named.Stored.Zettel) {
+				if tz, err = c.StoreObjekten().Update(&tz.Named); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			}
 
-		//TODO-P3,D3 only emit if created rather than refound
-		errors.PrintOutf("%s (created)", tz.Named)
+			results.Add(tz)
+
+			return
+		},
+	)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	err = toDelete.Each(
+		func(z *zettel_external.Zettel) (err error) {
+			//TODO move to checkout store
+			if err = os.Remove(z.ZettelFD.Path); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			pathRel := c.Standort().RelToCwdOrSame(z.ZettelFD.Path)
+
+			//TODO move to printer
+			errors.PrintOutf("[%s] (deleted)", pathRel)
+
+			return
+		},
+	)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return
 }
 
 func (c ZettelFromExternalAkte) zettelForAkte(
-	aktePath string,
-) (z zettel.Zettel, err error) {
+	akteFD zettel_external.FD,
+) (z *zettel_external.Zettel, err error) {
+	z = &zettel_external.Zettel{
+		AkteFD: akteFD,
+	}
+
 	var r io.Reader
 
 	errors.Print("running")
 
-	if r, err = c.Filter.Run(aktePath); err != nil {
+	if r, err = c.Filter.Run(akteFD.Path); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	defer c.Filter.Close()
-
-	z.Etiketten = c.Etiketten
 
 	var akteWriter sha.WriteCloser
 
@@ -122,17 +184,21 @@ func (c ZettelFromExternalAkte) zettelForAkte(
 		return
 	}
 
-	z.Akte = akteWriter.Sha()
+	z.Named.Stored.Zettel.Akte = akteWriter.Sha()
 
-	if err = z.Bezeichnung.Set(path.Base(aktePath)); err != nil {
+	//TODO move to protozettel
+	if err = z.Named.Stored.Zettel.Bezeichnung.Set(
+		path.Base(akteFD.Path),
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	ext := path.Ext(aktePath)
+	//TODO use konfig
+	ext := akteFD.Ext()
 
 	if ext != "" {
-		if err = z.Typ.Set(path.Ext(aktePath)); err != nil {
+		if err = z.Named.Stored.Zettel.Typ.Set(akteFD.Ext()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

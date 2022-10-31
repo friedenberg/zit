@@ -12,6 +12,11 @@ func Make(i int) IntValue {
 	return IntValue(i)
 }
 
+func (a IntValue) Equals(b IntValue) (ok bool) {
+	ok = a.Int() == b.Int()
+	return
+}
+
 func (a IntValue) Less(b IntValue) (ok bool) {
 	ok = a.Int() < b.Int()
 	return

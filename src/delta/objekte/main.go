@@ -23,6 +23,26 @@ type Objekte struct {
 	sha.Sha
 }
 
+func (a Objekte) Equals(b Objekte) (ok bool) {
+	if a.Gattung != b.Gattung {
+		return
+	}
+
+	if a.Mutter != b.Mutter {
+		return
+	}
+
+	if a.Id.String() != b.Id.String() {
+		return
+	}
+
+	if !a.Sha.Equals(b.Sha) {
+		return
+	}
+
+	return true
+}
+
 func (o *Objekte) Set(v string) (err error) {
 	vs := strings.Split(v, " ")
 

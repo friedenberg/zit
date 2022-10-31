@@ -2,6 +2,7 @@ package collections
 
 import (
 	"io"
+	"reflect"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 )
@@ -13,6 +14,14 @@ type SetGeneric[T any] struct {
 }
 
 func MakeSetGeneric[T any](kf KeyFunc[T], es ...T) (s SetGeneric[T]) {
+	t := *new(T)
+
+	switch reflect.TypeOf(t).Kind() {
+	// case reflect.Map, reflect.Array, reflect.Chan, reflect.Slice:
+	case reflect.Ptr:
+		kf(t)
+	}
+
 	s.keyFunc = kf
 	s.inner = make(map[string]T, len(es))
 	s.open()
