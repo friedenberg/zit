@@ -1,76 +1,55 @@
 package zettel_named
 
-import "github.com/friedenberg/zit/src/charlie/hinweis"
+import (
+	"github.com/friedenberg/zit/src/bravo/collections"
+	"github.com/friedenberg/zit/src/charlie/hinweis"
+)
 
 // TODO deprecate and move to MutableSet
-type SetNamed map[string]Zettel
+type SetNamed struct {
+	collections.MutableSetLike[Zettel]
+}
 
 func NewSetNamed() *SetNamed {
-	s := MakeSetNamed()
-	return &s
-}
+	return &SetNamed{
+		MutableSetLike: collections.MakeMutableSetGeneric(
+			func(sz Zettel) string {
+				// if sz == nil {
+				// 	return ""
+				// }
 
-func MakeSetNamed() SetNamed {
-	return make(SetNamed)
-}
-
-func (s *SetNamed) Add(z Zettel) {
-	(*s)[z.Hinweis.String()] = z
-}
-
-func (s SetNamed) Get(h hinweis.Hinweis) (z Zettel, ok bool) {
-	z, ok = s[h.String()]
-	return
-}
-
-func (a SetNamed) Merge(b SetNamed) {
-	for _, z := range b {
-		a.Add(z)
+				return collections.MakeKey(
+					sz.Hinweis,
+				)
+			},
+		),
 	}
-}
-
-func (a SetNamed) ContainsKey(k string) bool {
-	_, ok := a[k]
-	return ok
-}
-
-func (a SetNamed) Contains(z Zettel) bool {
-	_, ok := a[z.Hinweis.String()]
-	return ok
 }
 
 func (s SetNamed) Hinweisen() (h []hinweis.Hinweis) {
-	h = make([]hinweis.Hinweis, 0, len(s))
+	h = make([]hinweis.Hinweis, 0, s.Len())
 
-	for _, z := range s {
-		h = append(h, z.Hinweis)
-	}
+	s.Each(
+		func(z Zettel) (err error) {
+			h = append(h, z.Hinweis)
+
+			return
+		},
+	)
 
 	return
 }
 
 func (s SetNamed) HinweisStrings() (h []string) {
-	h = make([]string, 0, len(s))
+	h = make([]string, 0, s.Len())
 
-	for i, _ := range s {
-		h = append(h, i)
-	}
+	s.Each(
+		func(z Zettel) (err error) {
+			h = append(h, z.Hinweis.String())
+
+			return
+		},
+	)
 
 	return
 }
-
-// func (s SetNamed) Slice() (slice []string) {
-// 	slice = make([]string, len(zs.etikettenToExisting))
-// 	i := 0
-
-// 	for e, _ := range zs.etikettenToExisting {
-// 		sorted[i] = e
-// 		i++
-// 	}
-
-// 	sort.Slice(sorted, func(i, j int) bool {
-// 		return sorted[i] < sorted[j]
-// 	})
-
-// 	return
-// }

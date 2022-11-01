@@ -11,9 +11,12 @@ type zettelSet map[zettel]bool
 func makeZettelZetFromSetNamed(set zettel_named.SetNamed) (zs zettelSet) {
 	zs = makeZettelSet()
 
-	for _, z := range set {
-		zs.Add(zettel{Hinweis: z.Hinweis, Bezeichnung: z.Stored.Zettel.Bezeichnung})
-	}
+	set.Each(
+		func(z zettel_named.Zettel) (err error) {
+			zs.Add(zettel{Hinweis: z.Hinweis, Bezeichnung: z.Stored.Zettel.Bezeichnung})
+			return
+		},
+	)
 
 	return
 }
