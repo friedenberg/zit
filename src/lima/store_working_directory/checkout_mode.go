@@ -35,12 +35,12 @@ func (m *CheckoutMode) Set(v string) (err error) {
 
 	switch v {
 	case "zettel":
-    fallthrough
+		fallthrough
 	case "zettel-only":
 		*m = CheckoutModeZettelOnly
 
 	case "akte":
-    fallthrough
+		fallthrough
 	case "akte-only":
 		*m = CheckoutModeAkteOnly
 

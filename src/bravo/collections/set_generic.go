@@ -16,7 +16,7 @@ type SetGeneric[T any] struct {
 func MakeSetGeneric[T any](kf KeyFunc[T], es ...T) (s SetGeneric[T]) {
 	t := *new(T)
 
-  //confirms that the key function supports nil pointers properly
+	//confirms that the key function supports nil pointers properly
 	switch reflect.TypeOf(t).Kind() {
 	// case reflect.Map, reflect.Array, reflect.Chan, reflect.Slice:
 	case reflect.Ptr:

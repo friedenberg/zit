@@ -8,7 +8,7 @@ import (
 
 type zettelSet map[zettel]bool
 
-func makeZettelZetFromSetNamed(set zettel_named.SetNamed) (zs zettelSet) {
+func makeZettelZetFromSetNamed(set zettel_named.MutableSet) (zs zettelSet) {
 	zs = makeZettelSet()
 
 	set.Each(

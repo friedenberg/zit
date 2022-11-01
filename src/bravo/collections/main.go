@@ -19,7 +19,7 @@ type WriterFuncKey func(string) error
 
 type SetLike[T any] interface {
 	Len() int
-  Key(T) string
+	Key(T) string
 	Get(string) (T, bool)
 	ContainsKey(string) bool
 	Contains(T) bool

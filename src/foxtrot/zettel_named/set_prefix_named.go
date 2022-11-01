@@ -5,10 +5,10 @@ import (
 	"github.com/friedenberg/zit/src/charlie/etikett"
 )
 
-type SetPrefixNamed map[etikett.Etikett]SetNamed
+type SetPrefixNamed map[etikett.Etikett]MutableSet
 
 type SetPrefixNamedSegments struct {
-	Ungrouped *SetNamed
+	Ungrouped *MutableSet
 	Grouped   *SetPrefixNamed
 }
 
@@ -30,7 +30,7 @@ func (s *SetPrefixNamed) addPair(e etikett.Etikett, z Zettel) {
 	existing, ok := (*s)[e]
 
 	if !ok {
-		existing = *(NewSetNamed())
+		existing = *(MakeMutableSet())
 	}
 
 	existing.Add(z)
@@ -41,7 +41,7 @@ func (s *SetPrefixNamed) addPair(e etikett.Etikett, z Zettel) {
 // etikett, and if there is a prefix match, group it out the output set segments
 // appropriately
 func (a SetPrefixNamed) Subset(e etikett.Etikett) (out SetPrefixNamedSegments) {
-	out.Ungrouped = NewSetNamed()
+	out.Ungrouped = MakeMutableSet()
 	out.Grouped = NewSetPrefixNamed()
 
 	for e1, zSet := range a {
@@ -66,8 +66,8 @@ func (a SetPrefixNamed) Subset(e etikett.Etikett) (out SetPrefixNamedSegments) {
 	return
 }
 
-func (s SetPrefixNamed) ToSetNamed() (out *SetNamed) {
-	out = NewSetNamed()
+func (s SetPrefixNamed) ToSetNamed() (out *MutableSet) {
+	out = MakeMutableSet()
 
 	for _, zs := range s {
 		zs.Each(
