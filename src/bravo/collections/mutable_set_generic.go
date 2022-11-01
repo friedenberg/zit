@@ -13,9 +13,12 @@ type MutableSetGeneric[T any] struct {
 	lock sync.Locker
 }
 
-func MakeMutableSetGeneric[T any](kf KeyFunc[T], es ...T) (s MutableSetGeneric[T]) {
-	s.innerSetGeneric.SetGeneric = MakeSetGeneric[T](kf, es...)
-	s.lock = &sync.Mutex{}
+func MakeMutableSetGeneric[T any](kf KeyFunc[T], es ...T) (s MutableSetLike[T]) {
+	var s1 MutableSetGeneric[T]
+	s1.innerSetGeneric.SetGeneric = MakeSetGeneric[T](kf, es...)
+	s1.lock = &sync.Mutex{}
+
+	s = s1
 
 	return
 }

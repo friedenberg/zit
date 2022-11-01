@@ -3,12 +3,12 @@ package zettel_named
 import "github.com/friedenberg/zit/src/bravo/collections"
 
 type MutableSet struct {
-	collections.MutableSetGeneric[*Zettel]
+	collections.MutableSetLike[*Zettel]
 }
 
 func MakeMutableSet(kf collections.KeyFunc[*Zettel], zs ...*Zettel) MutableSet {
 	return MutableSet{
-		MutableSetGeneric: collections.MakeMutableSetGeneric[*Zettel](kf, zs...),
+		MutableSetLike: collections.MakeMutableSetGeneric[*Zettel](kf, zs...),
 	}
 }
 
