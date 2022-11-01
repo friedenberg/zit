@@ -6,12 +6,12 @@ import (
 )
 
 type MutableSet struct {
-	collections.MutableSetLike[*Zettel]
+	collections.MutableSetGeneric[*Zettel]
 }
 
 func MakeMutableSetUnique(c int) MutableSet {
 	return MutableSet{
-		MutableSetLike: collections.MakeMutableSetGeneric(
+		MutableSetGeneric: collections.MakeMutableSetGeneric(
 			func(sz *Zettel) string {
 				if sz == nil {
 					return ""
@@ -31,7 +31,7 @@ func MakeMutableSetUnique(c int) MutableSet {
 
 func MakeMutableSetHinweisZettel(c int) MutableSet {
 	return MutableSet{
-		MutableSetLike: collections.MakeMutableSetGeneric(
+		MutableSetGeneric: collections.MakeMutableSetGeneric(
 			func(sz *Zettel) string {
 				if sz == nil {
 					return ""

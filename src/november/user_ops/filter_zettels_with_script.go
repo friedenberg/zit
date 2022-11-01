@@ -5,7 +5,6 @@ import (
 	"os/exec"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/delta/id_set"
@@ -61,8 +60,7 @@ func (op FilterZettelsWithScript) Run() (err error) {
 	case hinweisen := <-chDone:
 
 		errors.Printf("%#v", hinweisen)
-		collections.Chain(
-			collections.SetLike[*zettel_transacted.Zettel](op.Set),
+		op.Set.Chain(
 			func(z *zettel_transacted.Zettel) (err error) {
 				ok := hinweisen.Contains(z.Named.Hinweis)
 				errors.Print(ok)

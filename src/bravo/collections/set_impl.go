@@ -1,0 +1,114 @@
+package collections
+
+import (
+	"fmt"
+	"reflect"
+
+	"github.com/friedenberg/zit/src/alfa/errors"
+)
+
+type setGeneric[T any] struct {
+	keyFunc func(T) string
+	closed  bool
+	inner   map[string]T
+}
+
+func makeSetGeneric[T any](kf KeyFunc[T], es ...T) (s setGeneric[T]) {
+	t := *new(T)
+
+	//confirms that the key function supports nil pointers properly
+	switch reflect.TypeOf(t).Kind() {
+	// case reflect.Map, reflect.Array, reflect.Chan, reflect.Slice:
+	case reflect.Ptr:
+		kf(t)
+	}
+
+	s.keyFunc = kf
+	s.inner = make(map[string]T, len(es))
+	s.open()
+	defer s.close()
+
+	for _, e := range es {
+		s.add(e)
+	}
+
+	return
+}
+
+func (s *setGeneric[T]) open() {
+	s.closed = false
+}
+
+func (s *setGeneric[T]) close() {
+	s.closed = true
+}
+
+func (s setGeneric[T]) Len() int {
+	return len(s.inner)
+}
+
+func (s setGeneric[T]) Key(e T) string {
+	return s.keyFunc(e)
+}
+
+func (s setGeneric[T]) Get(k string) (e T, ok bool) {
+	e, ok = s.inner[k]
+	return
+}
+
+func (s setGeneric[T]) ContainsKey(k string) (ok bool) {
+	if k == "" {
+		return
+	}
+
+	_, ok = s.inner[k]
+
+	return
+}
+
+func (s setGeneric[T]) Contains(e T) (ok bool) {
+	return s.ContainsKey(s.Key(e))
+}
+
+func (es setGeneric[T]) add(e T) (err error) {
+	if es.closed {
+		panic(fmt.Sprintf("trying to add %T to closed set", e))
+	}
+
+	es.inner[es.Key(e)] = e
+
+	return
+}
+
+func (s setGeneric[T]) EachKey(wf WriterFuncKey) (err error) {
+	for v, _ := range s.inner {
+		if err = wf(v); err != nil {
+			if errors.IsEOF(err) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+			}
+
+			return
+		}
+	}
+
+	return
+}
+
+// TODO should this be locked mutable writes?
+func (s setGeneric[T]) Each(wf WriterFunc[T]) (err error) {
+	for _, v := range s.inner {
+		if err = wf(v); err != nil {
+			if errors.IsEOF(err) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+			}
+
+			return
+		}
+	}
+
+	return
+}

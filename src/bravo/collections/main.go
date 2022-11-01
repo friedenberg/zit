@@ -23,10 +23,8 @@ type SetLike[T any] interface {
 	Get(string) (T, bool)
 	ContainsKey(string) bool
 	Contains(T) bool
-	WriterContainer() WriterFunc[T]
 	Each(WriterFunc[T]) error
 	EachKey(WriterFuncKey) error
-	Elements() []T
 }
 
 type MutableSetLike[T any] interface {
