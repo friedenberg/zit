@@ -131,3 +131,44 @@ func (s SetGeneric[T]) Elements() (out []T) {
 
 	return
 }
+
+func (s SetGeneric[T]) Any() (e T) {
+	s.Each(
+		func(e1 T) (err error) {
+			e = e1
+			return io.EOF
+		},
+	)
+
+	return
+}
+
+func (s SetGeneric[T]) All(f WriterFunc[T]) (ok bool) {
+	err := s.Each(
+		func(e T) (err error) {
+			return f(e)
+		},
+	)
+
+	return err == nil
+}
+
+func (a SetGeneric[T]) Equals(b SetGeneric[T]) (ok bool) {
+	if a.Len() != b.Len() {
+		return
+	}
+
+	ok = a.All(b.WriterContainer())
+
+	return
+}
+
+func (outer SetGeneric[T]) ContainsSet(inner SetGeneric[T]) (ok bool) {
+	if outer.Len() < inner.Len() {
+		return
+	}
+
+	ok = inner.All(outer.WriterContainer())
+
+	return
+}
