@@ -5,13 +5,12 @@ import (
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 )
 
-// TODO deprecate and move to MutableSet
 type MutableSet struct {
 	collections.MutableSetLike[Zettel]
 }
 
-func MakeMutableSet() *MutableSet {
-	return &MutableSet{
+func MakeMutableSet() MutableSet {
+	return MutableSet{
 		MutableSetLike: collections.MakeMutableSetGeneric(
 			func(sz Zettel) string {
 				// if sz == nil {

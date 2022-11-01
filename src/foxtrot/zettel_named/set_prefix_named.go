@@ -8,7 +8,7 @@ import (
 type SetPrefixNamed map[etikett.Etikett]MutableSet
 
 type SetPrefixNamedSegments struct {
-	Ungrouped *MutableSet
+	Ungrouped MutableSet
 	Grouped   *SetPrefixNamed
 }
 
@@ -30,7 +30,7 @@ func (s *SetPrefixNamed) addPair(e etikett.Etikett, z Zettel) {
 	existing, ok := (*s)[e]
 
 	if !ok {
-		existing = *(MakeMutableSet())
+		existing = MakeMutableSet()
 	}
 
 	existing.Add(z)
@@ -66,7 +66,7 @@ func (a SetPrefixNamed) Subset(e etikett.Etikett) (out SetPrefixNamedSegments) {
 	return
 }
 
-func (s SetPrefixNamed) ToSetNamed() (out *MutableSet) {
+func (s SetPrefixNamed) ToSetNamed() (out MutableSet) {
 	out = MakeMutableSet()
 
 	for _, zs := range s {
