@@ -35,7 +35,7 @@ func (s *Store) Checkout(
 				return
 			}
 
-			zcs.Add(zc)
+			zcs.Add(&zc)
 			return
 		},
 	)

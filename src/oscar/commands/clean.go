@@ -70,7 +70,7 @@ func (c Clean) Run(
 	}
 
 	readResults.Each(
-		func(zco zettel_checked_out.Zettel) (err error) {
+		func(zco *zettel_checked_out.Zettel) (err error) {
 			if zco.State != zettel_checked_out.StateExistsAndSame {
 				return
 			}

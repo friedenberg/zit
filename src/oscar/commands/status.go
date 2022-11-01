@@ -58,7 +58,7 @@ func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	readResults := readResultsSet.ToSlice()
+	readResults := readResultsSet.Elements()
 
 	sort.Slice(
 		readResults,
@@ -75,7 +75,7 @@ func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	for _, z := range readResults {
-		zp.ZettelCheckedOut(z).Print()
+		zp.ZettelCheckedOut(*z).Print()
 
 		switch {
 		case zp.IsEPIPE():

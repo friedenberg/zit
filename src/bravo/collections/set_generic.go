@@ -106,6 +106,16 @@ func (s1 SetGeneric[T]) Copy() (s2 SetGeneric[T]) {
 	return
 }
 
+func (s SetGeneric[T]) Elements() (out []T) {
+	out = make([]T, 0, s.Len())
+
+	for _, e := range s.inner {
+		out = append(out, e)
+	}
+
+	return
+}
+
 // func (s1 SetGeneric[T]) MutableCopy() (s2 MutableSet[T]) {
 // 	s2 = MakeMutableSet[T]()
 

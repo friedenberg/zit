@@ -79,7 +79,7 @@ func (c Checkin) Run(
 	zettels := make([]zettel_external.Zettel, 0, readResults.Len())
 
 	err = readResults.Each(
-		func(zco zettel_checked_out.Zettel) (err error) {
+		func(zco *zettel_checked_out.Zettel) (err error) {
 			zettels = append(zettels, zco.External)
 			return
 		},
@@ -98,7 +98,7 @@ func (c Checkin) Run(
 		external := make([]zettel_external.Zettel, 0, readResults.Len())
 
 		err = readResults.Each(
-			func(zco zettel_checked_out.Zettel) (err error) {
+			func(zco *zettel_checked_out.Zettel) (err error) {
 				external = append(external, zco.External)
 				return
 			},

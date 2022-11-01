@@ -75,7 +75,7 @@ func (op ReadCheckedOut) RunMany(
 
 		}
 
-		results.Add(checked_out)
+		results.Add(&checked_out)
 	}
 
 	return
