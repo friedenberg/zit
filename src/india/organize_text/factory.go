@@ -63,7 +63,7 @@ func (atc Factory) makeChildren(
 	used = zettel_transacted.MakeSetUnique(0)
 
 	if groupingEtiketten.Len() == 0 {
-		used.Merge(prefixSet.ToSet())
+		prefixSet.ToSet().Each(used.Add)
 
 		err = prefixSet.EachZettel(
 			func(e etikett.Etikett, tz zettel_transacted.Zettel) (err error) {
@@ -148,7 +148,7 @@ func (atc Factory) makeChildren(
 						return
 					}
 
-					used.Merge(usedChild)
+					usedChild.Each(used.Add)
 
 					intermediate.addChild(child)
 				}
@@ -171,7 +171,7 @@ func (atc Factory) makeChildren(
 					return
 				}
 
-				used.Merge(usedChild)
+				usedChild.Each(used.Add)
 
 				parent.addChild(child)
 			}

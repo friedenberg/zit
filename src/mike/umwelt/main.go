@@ -35,7 +35,7 @@ type Umwelt struct {
 	storeWorkingDirectory *store_working_directory.Store
 	printerOut            *zettel_printer.Printer
 
-	zettelVerzeichnissePool *zettel_verzeichnisse.Pool
+	zettelVerzeichnissePool zettel_verzeichnisse.Pool
 }
 
 func Make(kCli konfig.Cli) (u *Umwelt, err error) {

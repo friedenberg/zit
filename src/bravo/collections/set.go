@@ -351,6 +351,10 @@ func (es Set[T, T1]) MarshalJSON() ([]byte, error) {
 
 func (es *Set[T, T1]) UnmarshalJSON(b []byte) (err error) {
 	*es = MakeSet[T, T1]()
+
+	es.open()
+	defer es.close()
+
 	var vs []string
 
 	if err = json.Unmarshal(b, &vs); err != nil {
@@ -380,6 +384,9 @@ func (s Set[T, T1]) MarshalBinary() (text []byte, err error) {
 
 func (s *Set[T, T1]) UnmarshalBinary(text []byte) (err error) {
 	s.inner = make(map[string]T)
+
+	s.open()
+	defer s.close()
 
 	if err = s.Set(string(text)); err != nil {
 		return

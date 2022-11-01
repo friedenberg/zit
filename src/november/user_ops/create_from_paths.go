@@ -69,7 +69,7 @@ func (c CreateFromPaths) Run(args ...string) (results zettel_transacted.Set, err
 
 		if err = c.StoreObjekten().ReadAllTransacted(
 			writerMatches,
-			results.WriterAdder(),
+			zettel_transacted.MakeWriter(results.Add),
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -127,7 +127,7 @@ func (c CreateFromPaths) Run(args ...string) (results zettel_transacted.Set, err
 			//TODO get matches
 			cz.DetermineState()
 
-			results.Add(cz.Internal)
+			results.Add(&cz.Internal)
 
 			return
 		},

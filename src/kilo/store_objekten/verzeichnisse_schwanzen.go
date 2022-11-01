@@ -22,7 +22,7 @@ func makeVerzeichnisseSchwanzen(
 	k konfig.Konfig,
 	st standort.Standort,
 	iof ioFactory,
-	p *zettel_verzeichnisse.Pool,
+	p zettel_verzeichnisse.Pool,
 ) (s *verzeichnisseSchwanzen, err error) {
 	s = &verzeichnisseSchwanzen{
 		ioFactory: iof,

@@ -112,7 +112,7 @@ func (c CatObjekte) akteShasFromIds(
 			},
 		},
 		zettel_verzeichnisse.WriterZettelTransacted{
-			Writer: zettelen.WriterAdder(),
+			Writer: zettel_transacted.MakeWriter(zettelen.Add),
 		},
 	); err != nil {
 		err = errors.Wrap(err)

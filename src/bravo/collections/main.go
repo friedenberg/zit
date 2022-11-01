@@ -19,12 +19,14 @@ type WriterFuncKey func(string) error
 
 type SetLike[T any] interface {
 	Len() int
+  Key(T) string
 	Get(string) (T, bool)
 	ContainsKey(string) bool
 	Contains(T) bool
 	WriterContainer() WriterFunc[T]
 	Each(WriterFunc[T]) error
 	EachKey(WriterFuncKey) error
+	Elements() []T
 }
 
 type MutableSetLike[T any] interface {

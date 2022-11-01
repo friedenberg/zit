@@ -24,11 +24,15 @@ type Options struct {
 	UseRightAlignedIndents bool
 	UseRefiner             bool
 	UseMetadateiHeader     bool
+
+	wasMade bool
 }
 
 func MakeOptions() Options {
 	return Options{
+		wasMade:           true,
 		GroupingEtiketten: etikett.NewSlice(),
+		Transacted:        zettel_transacted.MakeSetHinweis(0),
 	}
 }
 

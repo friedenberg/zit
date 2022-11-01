@@ -101,7 +101,10 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 				Format:       zettel.Text{},
 			}
 
-			if zsc, err = u.StoreWorkingDirectory().Checkout(options, zts.WriterFilter()); err != nil {
+			if zsc, err = u.StoreWorkingDirectory().Checkout(
+				options,
+				zettel_transacted.MakeWriter(zts.Del),
+			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

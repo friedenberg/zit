@@ -43,13 +43,17 @@ func (a SetPrefixTransacted) Subtract(b Set) (c SetPrefixTransacted) {
 	c = MakeSetPrefixTransacted(len(a.innerMap))
 
 	for e, aSet := range a.innerMap {
-		for _, z := range aSet.innerMap {
-			if b.Contains(z) {
-				continue
-			}
+		aSet.Each(
+			func(z *Zettel) (err error) {
+				if b.Contains(z) {
+					return
+				}
 
-			c.addPair(e, z)
-		}
+				c.addPair(e, *z)
+
+				return
+			},
+		)
 	}
 
 	return
@@ -64,7 +68,7 @@ func (s *SetPrefixTransacted) addPair(e etikett.Etikett, z Zettel) {
 		existing = MakeSetUnique(1)
 	}
 
-	existing.Add(z)
+	existing.Add(&z)
 	s.innerMap[e] = existing
 }
 
@@ -87,12 +91,12 @@ func (a SetPrefixTransacted) Each(f func(etikett.Etikett, Set) error) (err error
 func (a SetPrefixTransacted) EachZettel(f func(etikett.Etikett, Zettel) error) error {
 	return a.Each(
 		func(e etikett.Etikett, st Set) (err error) {
-			for _, sz := range st.innerMap {
-				if err = f(e, sz); err != nil {
-					err = errors.Wrap(err)
+			st.Each(
+				func(z *Zettel) (err error) {
+					err = f(e, *z)
 					return
-				}
-			}
+				},
+			)
 
 			return
 		},
@@ -111,18 +115,22 @@ func (a SetPrefixTransacted) Subset(e etikett.Etikett) (out SetPrefixTransactedS
 			continue
 		}
 
-		for _, z := range zSet.innerMap {
-			intersection := z.Named.Stored.Zettel.Etiketten.IntersectPrefixes(etikett.MakeSet(e))
-			errors.Printf("%s yields %s", e1, intersection)
+		zSet.Each(
+			func(z *Zettel) (err error) {
+				intersection := z.Named.Stored.Zettel.Etiketten.IntersectPrefixes(etikett.MakeSet(e))
+				errors.Printf("%s yields %s", e1, intersection)
 
-			if intersection.Len() > 0 {
-				for _, e2 := range intersection.Elements() {
-					out.Grouped.addPair(e2, z)
+				if intersection.Len() > 0 {
+					for _, e2 := range intersection.Elements() {
+						out.Grouped.addPair(e2, *z)
+					}
+				} else {
+					out.Ungrouped.Add(z)
 				}
-			} else {
-				out.Ungrouped.Add(z)
-			}
-		}
+
+				return
+			},
+		)
 	}
 
 	return
@@ -132,9 +140,7 @@ func (s SetPrefixTransacted) ToSet() (out Set) {
 	out = MakeSetUnique(len(s.innerMap))
 
 	for _, zs := range s.innerMap {
-		for _, z := range zs.innerMap {
-			out.Add(z)
-		}
+		zs.Each(out.Add)
 	}
 
 	return

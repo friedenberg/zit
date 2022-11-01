@@ -35,29 +35,54 @@ func (es MutableSetGeneric[T]) Add(e T) (err error) {
 	return
 }
 
-func (es MutableSetGeneric[T]) Len() (l int) {
+func (es MutableSetGeneric[T]) tryLock() (ok bool) {
+	if es.lock == nil {
+		return
+	}
+
+	ok = true
+
 	es.lock.Lock()
+
+	return
+}
+
+func (es MutableSetGeneric[T]) Len() (l int) {
+	if !es.tryLock() {
+		return
+	}
+
 	defer es.lock.Unlock()
+
 	l = es.innerSetGeneric.SetGeneric.Len()
 	return
 }
 
 func (es MutableSetGeneric[T]) Get(k string) (e T, ok bool) {
-	es.lock.Lock()
+	if !es.tryLock() {
+		return
+	}
+
 	defer es.lock.Unlock()
 	e, ok = es.innerSetGeneric.SetGeneric.Get(k)
 	return
 }
 
 func (es MutableSetGeneric[T]) ContainsKey(k string) (ok bool) {
-	es.lock.Lock()
+	if !es.tryLock() {
+		return
+	}
+
 	defer es.lock.Unlock()
 	ok = es.innerSetGeneric.SetGeneric.ContainsKey(k)
 	return
 }
 
 func (es MutableSetGeneric[T]) Contains(e T) (ok bool) {
-	es.lock.Lock()
+	if !es.tryLock() {
+		return
+	}
+
 	defer es.lock.Unlock()
 	ok = es.innerSetGeneric.SetGeneric.Contains(e)
 	return
@@ -69,7 +94,10 @@ func (es MutableSetGeneric[T]) DelKey(k string) (err error) {
 		return
 	}
 
-	es.lock.Lock()
+	if !es.tryLock() {
+		return
+	}
+
 	defer es.lock.Unlock()
 
 	delete(es.innerSetGeneric.SetGeneric.inner, k)
@@ -84,6 +112,16 @@ func (es MutableSetGeneric[T]) Del(e T) (err error) {
 	}
 
 	return
+}
+
+func (es MutableSetGeneric[T]) Each(wf WriterFunc[T]) (err error) {
+	if !es.tryLock() {
+		return
+	}
+
+	defer es.lock.Unlock()
+
+	return es.innerSetGeneric.SetGeneric.Each(wf)
 }
 
 func (a MutableSetGeneric[T]) Reset(b SetLike[T]) {

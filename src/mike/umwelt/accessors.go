@@ -48,6 +48,6 @@ func (u *Umwelt) StoreWorkingDirectory() *store_working_directory.Store {
 	return u.storeWorkingDirectory
 }
 
-func (u *Umwelt) ZettelVerzeichnissePool() *zettel_verzeichnisse.Pool {
+func (u *Umwelt) ZettelVerzeichnissePool() zettel_verzeichnisse.Pool {
 	return u.zettelVerzeichnissePool
 }

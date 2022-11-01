@@ -66,7 +66,7 @@ func (c ZettelFromExternalAkte) Run(
 
 		if err = c.StoreObjekten().ReadAllTransacted(
 			writerMatches,
-			results.WriterAdder(),
+			zettel_transacted.MakeWriter(results.Add),
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -113,7 +113,7 @@ func (c ZettelFromExternalAkte) Run(
 				}
 			}
 
-			results.Add(tz)
+			results.Add(&tz)
 
 			return
 		},

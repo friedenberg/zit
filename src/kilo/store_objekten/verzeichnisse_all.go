@@ -16,7 +16,7 @@ func makeVerzeichnisseAll(
 	k konfig.Konfig,
 	st standort.Standort,
 	iof ioFactory,
-	p *zettel_verzeichnisse.Pool,
+	p zettel_verzeichnisse.Pool,
 ) (s *verzeichnisseAll, err error) {
 	s = &verzeichnisseAll{
 		ioFactory: iof,

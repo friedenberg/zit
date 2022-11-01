@@ -16,6 +16,7 @@ type SetGeneric[T any] struct {
 func MakeSetGeneric[T any](kf KeyFunc[T], es ...T) (s SetGeneric[T]) {
 	t := *new(T)
 
+  //confirms that the key function supports nil pointers properly
 	switch reflect.TypeOf(t).Kind() {
 	// case reflect.Map, reflect.Array, reflect.Chan, reflect.Slice:
 	case reflect.Ptr:
@@ -75,6 +76,22 @@ func (es SetGeneric[T]) add(e T) {
 	}
 
 	es.inner[es.Key(e)] = e
+}
+
+func (s SetGeneric[T]) EachKey(wf WriterFuncKey) (err error) {
+	for v, _ := range s.inner {
+		if err = wf(v); err != nil {
+			if errors.IsEOF(err) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+			}
+
+			return
+		}
+	}
+
+	return
 }
 
 // TODO should this be locked mutable writes?
@@ -220,24 +237,3 @@ func (s1 SetGeneric[T]) Subtract(s2 SetGeneric[T]) (s3 SetGeneric[T]) {
 
 // 	return
 // }
-
-func (s1 SetGeneric[T]) Intersect(s2 SetGeneric[T]) (s3 SetGeneric[T]) {
-	s3 = MakeSetGeneric[T](s1.Key)
-
-	for _, e := range s1.inner {
-		if s2.Contains(e) {
-			s3.add(e)
-		}
-	}
-
-	return
-}
-
-func (s SetGeneric[T]) Any() (e T) {
-	for _, e1 := range s.inner {
-		e = e1
-		break
-	}
-
-	return e
-}

@@ -161,7 +161,7 @@ func (c *Organize) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 					NamedFilter: query,
 				},
 			},
-			getResults.WriterAdder(),
+			zettel_transacted.MakeWriter(getResults.Add),
 		),
 	}
 

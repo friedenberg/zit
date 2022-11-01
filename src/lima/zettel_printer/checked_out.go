@@ -3,10 +3,8 @@ package zettel_printer
 import (
 	"fmt"
 
-	gattung "github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/paper"
 	"github.com/friedenberg/zit/src/golf/zettel_external"
-	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
 )
 
@@ -63,23 +61,24 @@ func (p *Printer) appendZettelCheckedOutMatches(
 	pa *paper.Paper,
 	ex zettel_external.Zettel,
 ) {
-	typToCollection := map[gattung.Gattung]zettel_transacted.Set{
-		gattung.Akte:        m.Akten,
-		gattung.Bezeichnung: m.Bezeichnungen,
-		gattung.Zettel:      m.Zettelen,
-	}
+	return
+	// typToCollection := map[gattung.Gattung]zettel_transacted.Set{
+	// 	gattung.Akte:        m.Akten,
+	// 	gattung.Bezeichnung: m.Bezeichnungen,
+	// 	gattung.Zettel:      m.Zettelen,
+	// }
 
-	for t, c := range typToCollection {
-		if c.Len() == 1 && c.Any().Named.Stored.Zettel.Equals(ex.Named.Stored.Zettel) {
-		} else if c.Len() > 1 {
-			c.Each(
-				func(tz *zettel_transacted.Zettel) (err error) {
-					pa.NewLine()
-					pa.WriteFormat("\t%s (%s match)", p.ZettelNamed(tz.Named), t)
+	// for t, c := range typToCollection {
+	// 	if c.Len() == 1 && collections.Any[*zettel_transacted.Zettel](c).Named.Stored.Zettel.Equals(ex.Named.Stored.Zettel) {
+	// 	} else if c.Len() > 1 {
+	// 		c.Each(
+	// 			func(tz *zettel_transacted.Zettel) (err error) {
+	// 				pa.NewLine()
+	// 				pa.WriteFormat("\t%s (%s match)", p.ZettelNamed(tz.Named), t)
 
-					return
-				},
-			)
-		}
-	}
+	// 				return
+	// 			},
+	// 		)
+	// 	}
+	// }
 }

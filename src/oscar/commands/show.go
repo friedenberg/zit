@@ -119,7 +119,7 @@ func (c Show) showZettels(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 				},
 			},
 		},
-		zts.WriterAdder(),
+		zettel_transacted.MakeWriter(zts.Add),
 	)
 
 	if err = store.StoreObjekten().ReadAllSchwanzenTransacted(w); err != nil {

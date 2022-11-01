@@ -1,40 +1,29 @@
 package zettel_verzeichnisse
 
 import (
-	"sync"
+	"io"
 
+	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
 )
 
 type Pool struct {
-	inner *sync.Pool
+	*collections.Pool[Zettel]
 }
 
-func MakePool() *Pool {
-	return &Pool{
-		inner: &sync.Pool{
-			New: func() interface{} {
-				return &Zettel{}
-			},
-		},
+func MakePool() Pool {
+	return Pool{
+		Pool: collections.MakePool[Zettel](),
 	}
-}
-
-func (ip Pool) Get() *Zettel {
-	return ip.inner.Get().(*Zettel)
-}
-
-func (ip Pool) Put(i *Zettel) {
-	if i == nil {
-		return
-	}
-
-	i.Reset(nil)
-	ip.inner.Put(i)
 }
 
 func (ip Pool) WriteZettelVerzeichnisse(z *Zettel) (err error) {
+	if z == nil {
+		err = io.EOF
+		return
+	}
+
 	ip.Put(z)
 	return
 }

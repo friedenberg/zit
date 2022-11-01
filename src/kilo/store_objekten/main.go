@@ -4,6 +4,7 @@ import (
 	"io"
 	"os"
 	"reflect"
+	"sort"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/gattung"
@@ -60,7 +61,7 @@ func Make(
 	a age.Age,
 	k konfig.Konfig,
 	st standort.Standort,
-	p *zettel_verzeichnisse.Pool,
+	p zettel_verzeichnisse.Pool,
 ) (s *Store, err error) {
 	s = &Store{
 		lockSmith: lockSmith,
@@ -79,12 +80,22 @@ func Make(
 		return
 	}
 
-	if s.verzeichnisseSchwanzen, err = makeVerzeichnisseSchwanzen(k, st, s, p); err != nil {
+	if s.verzeichnisseSchwanzen, err = makeVerzeichnisseSchwanzen(
+		k,
+		st,
+		s,
+		p,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if s.verzeichnisseAll, err = store_verzeichnisse.MakeZettelen(k, st.DirVerzeichnisseZettelenNeue(), s, p); err != nil {
+	if s.verzeichnisseAll, err = store_verzeichnisse.MakeZettelen(
+		k,
+		st.DirVerzeichnisseZettelenNeue(),
+		s,
+		p,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -458,7 +469,7 @@ func (s Store) RevertTransaktion(t transaktion.Transaktion) (tzs zettel_transact
 
 				errors.Print(o)
 
-				var chain zettel_transacted.Slice
+				var chain []*zettel_transacted.Zettel
 
 				if chain, err = s.AllInChain(*h); err != nil {
 					err = errors.Wrap(err)
@@ -470,7 +481,7 @@ func (s Store) RevertTransaktion(t transaktion.Transaktion) (tzs zettel_transact
 				for _, someTz := range chain {
 					errors.Print(someTz)
 					if someTz.Schwanz == o.Mutter[0] {
-						tz = someTz
+						tz = *someTz
 						break
 					}
 				}
@@ -485,7 +496,7 @@ func (s Store) RevertTransaktion(t transaktion.Transaktion) (tzs zettel_transact
 					return
 				}
 
-				tzs.Add(tz)
+				tzs.Add(&tz)
 
 				return
 			},
@@ -546,7 +557,7 @@ func (s Store) Flush() (err error) {
 	return
 }
 
-func (s Store) AllInChain(h hinweis.Hinweis) (c zettel_transacted.Slice, err error) {
+func (s Store) AllInChain(h hinweis.Hinweis) (c []*zettel_transacted.Zettel, err error) {
 	mst := zettel_transacted.MakeSetUnique(0)
 	w := zettel_verzeichnisse.MakeWriter(
 		func(z *zettel_verzeichnisse.Zettel) (err error) {
@@ -559,15 +570,21 @@ func (s Store) AllInChain(h hinweis.Hinweis) (c zettel_transacted.Slice, err err
 		},
 	)
 
-	if err = s.verzeichnisseAll.ReadMany(w, zettel_verzeichnisse.WriterZettelTransacted{Writer: mst.WriterAdder()}); err != nil {
+	if err = s.verzeichnisseAll.ReadMany(
+		w,
+		zettel_verzeichnisse.WriterZettelTransacted{
+			Writer: zettel_transacted.MakeWriter(mst.Add),
+		},
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	c = mst.ToSlice()
+	c = mst.Elements()
 
-	c.Sort(
-		func(i, j int) bool { return c.Get(i).ObjekteTransacted().Less(c.Get(j).ObjekteTransacted()) },
+	sort.Slice(
+		c,
+		func(i, j int) bool { return c[i].ObjekteTransacted().Less(c[j].ObjekteTransacted()) },
 	)
 
 	return

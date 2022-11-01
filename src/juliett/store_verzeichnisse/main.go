@@ -17,7 +17,7 @@ const PageCount = 1 << (DigitWidth * 4)
 type Zettelen struct {
 	konfig.Konfig
 	path string
-	pool *zettel_verzeichnisse.Pool
+	pool zettel_verzeichnisse.Pool
 	ioFactory
 	pages [PageCount]*Page
 }
@@ -31,7 +31,7 @@ func MakeZettelen(
 	k konfig.Konfig,
 	dir string,
 	f ioFactory,
-	p *zettel_verzeichnisse.Pool,
+	p zettel_verzeichnisse.Pool,
 ) (i *Zettelen, err error) {
 	i = &Zettelen{
 		Konfig:    k,
@@ -51,7 +51,7 @@ func MakeZettelen(
 	return
 }
 
-func (i Zettelen) Pool() *zettel_verzeichnisse.Pool {
+func (i Zettelen) Pool() zettel_verzeichnisse.Pool {
 	return i.pool
 }
 

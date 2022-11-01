@@ -15,6 +15,10 @@ type Text struct {
 }
 
 func New(options Options) (ot *Text, err error) {
+	if !options.wasMade {
+		panic("options no initialized")
+	}
+
 	if options.UseMetadateiHeader {
 		ot, err = options.Factory().Make()
 	} else {
@@ -25,6 +29,10 @@ func New(options Options) (ot *Text, err error) {
 }
 
 func newWithoutMetadatei(options Options) (ot *Text, err error) {
+	if !options.wasMade {
+		panic("options no initialized")
+	}
+
 	ot = &Text{
 		Options:    options,
 		assignment: newAssignment(0),

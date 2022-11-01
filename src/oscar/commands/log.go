@@ -51,10 +51,10 @@ func (c Log) RunWithIds(os *umwelt.Umwelt, is id_set.Set) (err error) {
 		return
 	}
 
-	chains := make([]zettel_transacted.Slice, 0, hs.Len())
+	chains := make([][]*zettel_transacted.Zettel, 0, hs.Len())
 
 	for _, h := range hs.Elements() {
-		var chain zettel_transacted.Slice
+		var chain []*zettel_transacted.Zettel
 
 		if chain, err = os.StoreObjekten().AllInChain(h); err != nil {
 			err = errors.Wrap(err)

@@ -21,7 +21,10 @@ func (s *Store) Checkout(
 	zcs = zettel_checked_out.MakeSetUnique(0)
 	zts := zettel_transacted.MakeSetUnique(0)
 
-	if err = s.storeObjekten.ReadAllSchwanzenTransacted(ztw, zts.WriterAdder()); err != nil {
+	if err = s.storeObjekten.ReadAllSchwanzenTransacted(
+		ztw,
+		zettel_transacted.MakeWriter(zts.Add),
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -111,6 +114,7 @@ func (s *Store) CheckoutOne(
 				Path: filename,
 			},
 		},
+		Matches: zettel_checked_out.MakeMatches(),
 	}
 
 	c := zettel.FormatContextWrite{

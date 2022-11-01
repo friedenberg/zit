@@ -16,7 +16,7 @@ type Page struct {
 	sync.Locker
 	pageId
 	ioFactory
-	pool        *zettel_verzeichnisse.Pool
+	pool        zettel_verzeichnisse.Pool
 	added       []*zettel_verzeichnisse.Zettel
 	flushFilter zettel_verzeichnisse.Writer
 	State
@@ -25,7 +25,7 @@ type Page struct {
 func makeZettelenPage(
 	iof ioFactory,
 	pid pageId,
-	pool *zettel_verzeichnisse.Pool,
+	pool zettel_verzeichnisse.Pool,
 ) (p *Page) {
 	var flushFilter zettel_verzeichnisse.Writer
 	flushFilter = zettel_verzeichnisse.WriterNoop{}
@@ -205,11 +205,7 @@ func (zp *Page) Copy(
 	for {
 		var tz *zettel_verzeichnisse.Zettel
 
-		if zp.pool != nil {
-			tz = zp.pool.Get()
-		} else {
-			tz = &zettel_verzeichnisse.Zettel{}
-		}
+		tz = zp.pool.Get()
 
 		if err = dec.Decode(tz); err != nil {
 			if errors.IsEOF(err) {
