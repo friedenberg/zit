@@ -57,7 +57,7 @@ func (c Checkin) Run(
 		}
 	}
 
-	var readResults zettel_checked_out.Set
+	var readResults zettel_checked_out.MutableSet
 
 	readOp := user_ops.ReadCheckedOut{
 		Umwelt: s,

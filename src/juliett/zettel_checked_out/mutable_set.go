@@ -5,12 +5,12 @@ import (
 	"github.com/friedenberg/zit/src/golf/zettel_external"
 )
 
-type Set struct {
+type MutableSet struct {
 	collections.MutableSetLike[*Zettel]
 }
 
-func MakeSetUnique(c int) Set {
-	return Set{
+func MakeMutableSetUnique(c int) MutableSet {
+	return MutableSet{
 		MutableSetLike: collections.MakeMutableSetGeneric(
 			func(sz *Zettel) string {
 				if sz == nil {
@@ -29,8 +29,8 @@ func MakeSetUnique(c int) Set {
 	}
 }
 
-func MakeSetHinweisZettel(c int) Set {
-	return Set{
+func MakeMutableSetHinweisZettel(c int) MutableSet {
+	return MutableSet{
 		MutableSetLike: collections.MakeMutableSetGeneric(
 			func(sz *Zettel) string {
 				if sz == nil {
@@ -43,7 +43,7 @@ func MakeSetHinweisZettel(c int) Set {
 	}
 }
 
-func (s Set) ToSliceZettelsExternal() (out []zettel_external.Zettel) {
+func (s MutableSet) ToSliceZettelsExternal() (out []zettel_external.Zettel) {
 	out = make([]zettel_external.Zettel, 0, s.Len())
 
 	s.Each(
@@ -56,7 +56,7 @@ func (s Set) ToSliceZettelsExternal() (out []zettel_external.Zettel) {
 	return
 }
 
-func (s Set) ToSliceFilesZettelen() (out []string) {
+func (s MutableSet) ToSliceFilesZettelen() (out []string) {
 	out = make([]string, 0, s.Len())
 
 	s.Each(
@@ -74,7 +74,7 @@ func (s Set) ToSliceFilesZettelen() (out []string) {
 	return
 }
 
-func (s Set) ToSliceFilesAkten() (out []string) {
+func (s MutableSet) ToSliceFilesAkten() (out []string) {
 	out = make([]string, 0, s.Len())
 
 	s.Each(

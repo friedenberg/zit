@@ -26,7 +26,7 @@ func (s Store) AkteExists(sh sha.Sha) (err error) {
 		return
 	}
 
-	set := zettel_transacted.MakeSetUnique(0)
+	set := zettel_transacted.MakeMutableSetUnique(0)
 
 	w := zettel_verzeichnisse.MakeWriter(
 		func(z *zettel_verzeichnisse.Zettel) (err error) {
@@ -50,8 +50,8 @@ func (s Store) AkteExists(sh sha.Sha) (err error) {
 	}
 
 	err = ErrAkteExists{
-		Akte: sh,
-		Set:  set,
+		Akte:       sh,
+		MutableSet: set,
 	}
 
 	return

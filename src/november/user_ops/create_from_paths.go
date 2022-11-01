@@ -28,7 +28,7 @@ type CreateFromPaths struct {
 	// ReadHinweisFromPath bool
 }
 
-func (c CreateFromPaths) Run(args ...string) (results zettel_transacted.Set, err error) {
+func (c CreateFromPaths) Run(args ...string) (results zettel_transacted.MutableSet, err error) {
 	//TODO support different modes of de-duplication
 	//TODO support merging of duplicated akten
 	toCreate := zettel_external.MakeMutableSetUniqueFD()
@@ -51,7 +51,7 @@ func (c CreateFromPaths) Run(args ...string) (results zettel_transacted.Set, err
 		}
 	}
 
-	results = zettel_transacted.MakeSetHinweis(toCreate.Len())
+	results = zettel_transacted.MakeMutableSetHinweis(toCreate.Len())
 
 	if err = c.Lock(); err != nil {
 		err = errors.Wrap(err)

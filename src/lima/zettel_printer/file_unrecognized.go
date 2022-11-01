@@ -16,7 +16,7 @@ func (p *Printer) FileUnrecognized(fu store_working_directory.File) (pa *paper.P
 
 func (p *Printer) FileRecognized(
 	fu store_working_directory.File,
-	szt zettel_transacted.Set,
+	szt zettel_transacted.MutableSet,
 ) (pa *paper.Paper) {
 	pa = p.MakePaper()
 

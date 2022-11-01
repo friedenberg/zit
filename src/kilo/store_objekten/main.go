@@ -440,7 +440,7 @@ func (s *Store) Update(
 	return
 }
 
-func (s Store) RevertTransaktion(t transaktion.Transaktion) (tzs zettel_transacted.Set, err error) {
+func (s Store) RevertTransaktion(t transaktion.Transaktion) (tzs zettel_transacted.MutableSet, err error) {
 	if !s.lockSmith.IsAcquired() {
 		err = ErrLockRequired{
 			Operation: "revert",
@@ -449,7 +449,7 @@ func (s Store) RevertTransaktion(t transaktion.Transaktion) (tzs zettel_transact
 		return
 	}
 
-	tzs = zettel_transacted.MakeSetUnique(t.Len())
+	tzs = zettel_transacted.MakeMutableSetUnique(t.Len())
 
 	t.Each(
 		objekte.MakeWriter(
@@ -558,7 +558,7 @@ func (s Store) Flush() (err error) {
 }
 
 func (s Store) AllInChain(h hinweis.Hinweis) (c []*zettel_transacted.Zettel, err error) {
-	mst := zettel_transacted.MakeSetUnique(0)
+	mst := zettel_transacted.MakeMutableSetUnique(0)
 	w := zettel_verzeichnisse.MakeWriter(
 		func(z *zettel_verzeichnisse.Zettel) (err error) {
 			if !z.Transacted.Named.Hinweis.Equals(h) {

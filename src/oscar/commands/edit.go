@@ -84,7 +84,7 @@ func (c Edit) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 		Format:       zettel.Text{},
 	}
 
-	var checkoutResults zettel_checked_out.Set
+	var checkoutResults zettel_checked_out.MutableSet
 
 	query := zettel_transacted.WriterIds(
 		zettel_named.FilterIdSet{
@@ -127,7 +127,7 @@ func (c Edit) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 		return
 	}
 
-	var readResults zettel_checked_out.Set
+	var readResults zettel_checked_out.MutableSet
 
 	readOp := user_ops.ReadCheckedOut{
 		Umwelt: u,

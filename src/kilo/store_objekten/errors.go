@@ -123,7 +123,7 @@ func (e duplicateAkteError) AddToLostAndFound(p string) (p1 string, err error) {
 
 type ErrAkteExists struct {
 	Akte sha.Sha
-	zettel_transacted.Set
+	zettel_transacted.MutableSet
 }
 
 func (e ErrAkteExists) Is(target error) bool {
@@ -135,6 +135,6 @@ func (e ErrAkteExists) Error() string {
 	return fmt.Sprintf(
 		"zettelen already exist with akte:\n%s\n%v",
 		e.Akte,
-		e.Set,
+		e.MutableSet,
 	)
 }

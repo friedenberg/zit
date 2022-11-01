@@ -17,7 +17,7 @@ type WriteNewZettels struct {
 func (c WriteNewZettels) RunMany(
 	z zettel.Zettel,
 	count int,
-) (results zettel_checked_out.Set, err error) {
+) (results zettel_checked_out.MutableSet, err error) {
 	if err = c.Lock(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -25,7 +25,7 @@ func (c WriteNewZettels) RunMany(
 
 	defer c.Unlock()
 
-	results = zettel_checked_out.MakeSetUnique(count)
+	results = zettel_checked_out.MakeMutableSetUnique(count)
 
 	//TODO modify this to be run once
 	for i := 0; i < count; i++ {

@@ -38,8 +38,8 @@ func (op ReadCheckedOut) RunOneString(
 
 func (op ReadCheckedOut) RunMany(
 	possible store_working_directory.CwdFiles,
-) (results zettel_checked_out.Set, err error) {
-	results = zettel_checked_out.MakeSetUnique(possible.Len())
+) (results zettel_checked_out.MutableSet, err error) {
+	results = zettel_checked_out.MakeMutableSetUnique(possible.Len())
 
 	for _, p := range possible.Zettelen {
 		var checked_out zettel_checked_out.Zettel

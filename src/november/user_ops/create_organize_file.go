@@ -15,7 +15,7 @@ type CreateOrganizeFile struct {
 }
 
 func (c CreateOrganizeFile) RunAndWrite(
-	zettels zettel_transacted.Set,
+	zettels zettel_transacted.MutableSet,
 	w io.WriteCloser,
 ) (results *organize_text.Text, err error) {
 	defer errors.PanicIfError(w.Close)
@@ -33,7 +33,7 @@ func (c CreateOrganizeFile) RunAndWrite(
 	return
 }
 
-func (c CreateOrganizeFile) Run(zettels zettel_transacted.Set) (results *organize_text.Text, err error) {
+func (c CreateOrganizeFile) Run(zettels zettel_transacted.MutableSet) (results *organize_text.Text, err error) {
 	if results, err = organize_text.New(c.Options); err != nil {
 		err = errors.Wrap(err)
 		return

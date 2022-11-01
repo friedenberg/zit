@@ -18,7 +18,7 @@ type Options struct {
 	Typ               typ.Typ
 	GroupingEtiketten etikett.Slice
 	ExtraEtiketten    etikett.Set
-	Transacted        zettel_transacted.Set
+	Transacted        zettel_transacted.MutableSet
 
 	UsePrefixJoints        bool
 	UseRightAlignedIndents bool
@@ -32,7 +32,7 @@ func MakeOptions() Options {
 	return Options{
 		wasMade:           true,
 		GroupingEtiketten: etikett.NewSlice(),
-		Transacted:        zettel_transacted.MakeSetHinweis(0),
+		Transacted:        zettel_transacted.MakeMutableSetHinweis(0),
 	}
 }
 

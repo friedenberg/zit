@@ -110,7 +110,7 @@ func (c Show) RunWithIds(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 }
 
 func (c Show) showZettels(store *umwelt.Umwelt, ids id_set.Set) (err error) {
-	zts := zettel_transacted.MakeSetUnique(0)
+	zts := zettel_transacted.MakeMutableSetUnique(0)
 	w := zettel_transacted.MakeWriterChain(
 		zettel_transacted.WriterZettelNamed{
 			Writer: zettel_named.WriterFilter{

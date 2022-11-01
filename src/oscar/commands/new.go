@@ -80,7 +80,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	f := zettel.Text{}
-	var zsc zettel_checked_out.Set
+	var zsc zettel_checked_out.MutableSet
 
 	if len(args) == 0 {
 		if zsc, err = c.writeNewZettels(u, f); err != nil {
@@ -88,7 +88,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			return
 		}
 	} else {
-		var zts zettel_transacted.Set
+		var zts zettel_transacted.MutableSet
 
 		if zts, err = c.readExistingFilesAsZettels(u, f, args...); err != nil {
 			err = errors.Wrap(err)
@@ -125,7 +125,7 @@ func (c New) readExistingFilesAsZettels(
 	u *umwelt.Umwelt,
 	f zettel.Format,
 	args ...string,
-) (zts zettel_transacted.Set, err error) {
+) (zts zettel_transacted.MutableSet, err error) {
 	opCreateFromPath := user_ops.CreateFromPaths{
 		Umwelt: u,
 		Format: f,
@@ -153,7 +153,7 @@ func (c New) readExistingFilesAsZettels(
 func (c New) writeNewZettels(
 	u *umwelt.Umwelt,
 	f zettel.Format,
-) (zsc zettel_checked_out.Set, err error) {
+) (zsc zettel_checked_out.MutableSet, err error) {
 	emptyOp := user_ops.WriteNewZettels{
 		Umwelt:   u,
 		CheckOut: c.Edit,
@@ -189,7 +189,7 @@ func (c New) writeNewZettels(
 
 func (c New) editZettels(
 	u *umwelt.Umwelt,
-	zsc zettel_checked_out.Set,
+	zsc zettel_checked_out.MutableSet,
 ) (err error) {
 	if !c.Edit {
 		errors.Print("edit set to false, not editing")
@@ -230,7 +230,7 @@ func (c New) editZettels(
 		},
 	}
 
-	var zslc zettel_checked_out.Set
+	var zslc zettel_checked_out.MutableSet
 
 	if zslc, err = readOp.RunMany(cwdFiles); err != nil {
 		err = errors.Wrap(err)

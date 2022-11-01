@@ -11,19 +11,19 @@ import (
 )
 
 type Matches struct {
-	Akten, Bezeichnungen, Zettelen zettel_transacted.Set
+	Akten, Bezeichnungen, Zettelen zettel_transacted.MutableSet
 }
 
 func MakeMatches() Matches {
 	return Matches{
-		Akten:         zettel_transacted.MakeSetUnique(0),
-		Bezeichnungen: zettel_transacted.MakeSetUnique(0),
-		Zettelen:      zettel_transacted.MakeSetUnique(0),
+		Akten:         zettel_transacted.MakeMutableSetUnique(0),
+		Bezeichnungen: zettel_transacted.MakeMutableSetUnique(0),
+		Zettelen:      zettel_transacted.MakeMutableSetUnique(0),
 	}
 }
 
 func (m Matches) appendToStringBuilder(sb *strings.Builder, ex zettel_external.Zettel) {
-	typToCollection := map[gattung.Gattung]*zettel_transacted.Set{
+	typToCollection := map[gattung.Gattung]*zettel_transacted.MutableSet{
 		gattung.Akte:        &m.Akten,
 		gattung.Bezeichnung: &m.Bezeichnungen,
 		gattung.Zettel:      &m.Zettelen,

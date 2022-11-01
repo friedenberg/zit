@@ -17,9 +17,9 @@ import (
 func (s *Store) Checkout(
 	options CheckoutOptions,
 	ztw zettel_transacted.Writer,
-) (zcs zettel_checked_out.Set, err error) {
-	zcs = zettel_checked_out.MakeSetUnique(0)
-	zts := zettel_transacted.MakeSetUnique(0)
+) (zcs zettel_checked_out.MutableSet, err error) {
+	zcs = zettel_checked_out.MakeMutableSetUnique(0)
+	zts := zettel_transacted.MakeMutableSetUnique(0)
 
 	if err = s.storeObjekten.ReadAllSchwanzenTransacted(
 		ztw,

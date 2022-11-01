@@ -9,16 +9,16 @@ import (
 
 type SetPrefixTransacted struct {
 	count    int
-	innerMap map[etikett.Etikett]Set
+	innerMap map[etikett.Etikett]MutableSet
 }
 
 type SetPrefixTransactedSegments struct {
-	Ungrouped Set
+	Ungrouped MutableSet
 	Grouped   SetPrefixTransacted
 }
 
 func MakeSetPrefixTransacted(c int) (s SetPrefixTransacted) {
-	s.innerMap = make(map[etikett.Etikett]Set, c)
+	s.innerMap = make(map[etikett.Etikett]MutableSet, c)
 	return s
 }
 
@@ -39,7 +39,7 @@ func (s *SetPrefixTransacted) Add(z Zettel) {
 	}
 }
 
-func (a SetPrefixTransacted) Subtract(b Set) (c SetPrefixTransacted) {
+func (a SetPrefixTransacted) Subtract(b MutableSet) (c SetPrefixTransacted) {
 	c = MakeSetPrefixTransacted(len(a.innerMap))
 
 	for e, aSet := range a.innerMap {
@@ -65,14 +65,14 @@ func (s *SetPrefixTransacted) addPair(e etikett.Etikett, z Zettel) {
 	existing, ok := s.innerMap[e]
 
 	if !ok {
-		existing = MakeSetUnique(1)
+		existing = MakeMutableSetUnique(1)
 	}
 
 	existing.Add(&z)
 	s.innerMap[e] = existing
 }
 
-func (a SetPrefixTransacted) Each(f func(etikett.Etikett, Set) error) (err error) {
+func (a SetPrefixTransacted) Each(f func(etikett.Etikett, MutableSet) error) (err error) {
 	for e, ssz := range a.innerMap {
 		if err = f(e, ssz); err != nil {
 			if errors.Is(err, io.EOF) {
@@ -90,7 +90,7 @@ func (a SetPrefixTransacted) Each(f func(etikett.Etikett, Set) error) (err error
 
 func (a SetPrefixTransacted) EachZettel(f func(etikett.Etikett, Zettel) error) error {
 	return a.Each(
-		func(e etikett.Etikett, st Set) (err error) {
+		func(e etikett.Etikett, st MutableSet) (err error) {
 			st.Each(
 				func(z *Zettel) (err error) {
 					err = f(e, *z)
@@ -107,7 +107,7 @@ func (a SetPrefixTransacted) EachZettel(f func(etikett.Etikett, Zettel) error) e
 // etikett, and if there is a prefix match, group it out the output set segments
 // appropriately
 func (a SetPrefixTransacted) Subset(e etikett.Etikett) (out SetPrefixTransactedSegments) {
-	out.Ungrouped = MakeSetUnique(len(a.innerMap))
+	out.Ungrouped = MakeMutableSetUnique(len(a.innerMap))
 	out.Grouped = MakeSetPrefixTransacted(len(a.innerMap))
 
 	for e1, zSet := range a.innerMap {
@@ -136,8 +136,8 @@ func (a SetPrefixTransacted) Subset(e etikett.Etikett) (out SetPrefixTransactedS
 	return
 }
 
-func (s SetPrefixTransacted) ToSet() (out Set) {
-	out = MakeSetUnique(len(s.innerMap))
+func (s SetPrefixTransacted) ToSet() (out MutableSet) {
+	out = MakeMutableSetUnique(len(s.innerMap))
 
 	for _, zs := range s.innerMap {
 		zs.Each(out.Add)

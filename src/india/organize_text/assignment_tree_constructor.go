@@ -90,7 +90,7 @@ func (atc AssignmentTreeConstructor) makeChildren(
 	}
 
 	segments.Grouped.Each(
-		func(e etikett.Etikett, zs zettel_transacted.Set) (err error) {
+		func(e etikett.Etikett, zs zettel_transacted.MutableSet) (err error) {
 			if atc.UsePrefixJoints {
 				if parent.etiketten.Len() > 1 {
 				} else {

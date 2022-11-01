@@ -5,12 +5,12 @@ import (
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 )
 
-type Set struct {
+type MutableSet struct {
 	collections.MutableSetLike[*Zettel]
 }
 
-func MakeSetUnique(c int) Set {
-	return Set{
+func MakeMutableSetUnique(c int) MutableSet {
+	return MutableSet{
 		MutableSetLike: collections.MakeMutableSetGeneric(
 			func(sz *Zettel) string {
 				if sz == nil {
@@ -30,8 +30,8 @@ func MakeSetUnique(c int) Set {
 	}
 }
 
-func MakeSetHinweis(c int) Set {
-	return Set{
+func MakeMutableSetHinweis(c int) MutableSet {
+	return MutableSet{
 		MutableSetLike: collections.MakeMutableSetGeneric(
 			func(sz *Zettel) string {
 				if sz == nil {
@@ -62,7 +62,7 @@ func MakeSetHinweis(c int) Set {
 // 	return
 // }
 
-func (s Set) ToSetPrefixTransacted() (b SetPrefixTransacted) {
+func (s MutableSet) ToSetPrefixTransacted() (b SetPrefixTransacted) {
 	b = MakeSetPrefixTransacted(s.Len())
 
 	s.Each(
@@ -76,7 +76,7 @@ func (s Set) ToSetPrefixTransacted() (b SetPrefixTransacted) {
 	return
 }
 
-func (s Set) ToSliceHinweisen() (b []hinweis.Hinweis) {
+func (s MutableSet) ToSliceHinweisen() (b []hinweis.Hinweis) {
 	b = make([]hinweis.Hinweis, 0, s.Len())
 
 	s.Each(

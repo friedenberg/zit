@@ -67,7 +67,7 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		Dedupe: c.Dedupe,
 	}
 
-	var zettelsFromAkteResults zettel_transacted.Set
+	var zettelsFromAkteResults zettel_transacted.MutableSet
 
 	if zettelsFromAkteResults, err = zettelsFromAkteOp.Run(args...); err != nil {
 		err = errors.Wrap(err)
@@ -157,7 +157,7 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 func (c Add) openAktenIfNecessary(
 	u *umwelt.Umwelt,
-	zettels zettel_transacted.Set,
+	zettels zettel_transacted.MutableSet,
 ) (err error) {
 	if !c.OpenAkten {
 		return
@@ -175,7 +175,7 @@ func (c Add) openAktenIfNecessary(
 		Format:       zettel.Text{},
 	}
 
-	var checkoutResults zettel_checked_out.Set
+	var checkoutResults zettel_checked_out.MutableSet
 
 	query := zettel_transacted.WriterIds(
 		zettel_named.FilterIdSet{

@@ -46,7 +46,7 @@ func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
 		Format: zettel.Text{},
 	}
 
-	var readResultsSet zettel_checked_out.Set
+	var readResultsSet zettel_checked_out.MutableSet
 
 	readOp := user_ops.ReadCheckedOut{
 		Umwelt:              s,
@@ -110,7 +110,7 @@ func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
 
 		case errors.Is(err, store_objekten.ErrAkteExists{}):
 			err1 := err.(store_objekten.ErrAkteExists)
-			zp.FileRecognized(ua, err1.Set).Print()
+			zp.FileRecognized(ua, err1.MutableSet).Print()
 			err = zp.Error()
 
 		default:

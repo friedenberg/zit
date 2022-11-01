@@ -58,7 +58,7 @@ func (c Revert) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 	defer u.Unlock()
 
-	var zts zettel_transacted.Set
+	var zts zettel_transacted.MutableSet
 
 	if zts, err = s.RevertTransaktion(transaktion); err != nil {
 		err = errors.Wrap(err)

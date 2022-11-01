@@ -13,7 +13,7 @@ import (
 )
 
 type FilterZettelsWithScript struct {
-	Set    zettel_transacted.Set
+	Set    zettel_transacted.MutableSet
 	Filter script_value.ScriptValue
 }
 

@@ -146,7 +146,7 @@ func (c *Organize) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 		return
 	}
 
-	getResults := zettel_transacted.MakeSetUnique(0)
+	getResults := zettel_transacted.MakeMutableSetUnique(0)
 
 	query := zettel_named.FilterIdSet{
 		Set: ids,

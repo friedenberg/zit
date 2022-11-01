@@ -25,7 +25,7 @@ type ZettelFromExternalAkte struct {
 
 func (c ZettelFromExternalAkte) Run(
 	args ...string,
-) (results zettel_transacted.Set, err error) {
+) (results zettel_transacted.MutableSet, err error) {
 	if err = c.Lock(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -36,7 +36,7 @@ func (c ZettelFromExternalAkte) Run(
 	toCreate := zettel_external.MakeMutableSetUniqueAkte()
 	toDelete := zettel_external.MakeMutableSetUniqueFD()
 
-	results = zettel_transacted.MakeSetUnique(len(args))
+	results = zettel_transacted.MakeMutableSetUnique(len(args))
 
 	for _, arg := range args {
 		var z *zettel_external.Zettel

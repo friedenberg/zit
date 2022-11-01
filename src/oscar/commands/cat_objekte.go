@@ -100,8 +100,8 @@ func (c CatObjekte) RunWithIds(store *umwelt.Umwelt, ids id_set.Set) (err error)
 func (c CatObjekte) akteShasFromIds(
 	u *umwelt.Umwelt,
 	ids id_set.Set,
-) (zettelen zettel_transacted.Set, err error) {
-	zettelen = zettel_transacted.MakeSetUnique(0)
+) (zettelen zettel_transacted.MutableSet, err error) {
+	zettelen = zettel_transacted.MakeMutableSetUnique(0)
 
 	if err = u.StoreObjekten().ReadAllSchwanzenVerzeichnisse(
 		zettel_verzeichnisse.WriterZettelTransacted{
@@ -138,7 +138,7 @@ func (c CatObjekte) akteShasFromIds(
 }
 
 func (c CatObjekte) akten(store *umwelt.Umwelt, ids id_set.Set) (err error) {
-	var zettelen zettel_transacted.Set
+	var zettelen zettel_transacted.MutableSet
 
 	if zettelen, err = c.akteShasFromIds(store, ids); err != nil {
 		err = errors.Wrap(err)

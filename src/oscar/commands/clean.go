@@ -50,7 +50,7 @@ func (c Clean) Run(
 		Format: zettel.Text{},
 	}
 
-	var readResults zettel_checked_out.Set
+	var readResults zettel_checked_out.MutableSet
 
 	readOp := user_ops.ReadCheckedOut{
 		Umwelt:              s,

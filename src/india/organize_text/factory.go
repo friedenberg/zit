@@ -32,7 +32,7 @@ func (atc *Factory) Make() (ot *Text, err error) {
 
 		segments := prefixSet.Subset(e)
 
-		var used zettel_transacted.Set
+		var used zettel_transacted.MutableSet
 
 		if used, err = atc.makeChildren(ee, segments.Grouped, etikett.MakeSlice(e)); err != nil {
 			err = errors.Wrap(err)
@@ -59,8 +59,8 @@ func (atc Factory) makeChildren(
 	parent *assignment,
 	prefixSet zettel_transacted.SetPrefixTransacted,
 	groupingEtiketten etikett.Slice,
-) (used zettel_transacted.Set, err error) {
-	used = zettel_transacted.MakeSetUnique(0)
+) (used zettel_transacted.MutableSet, err error) {
+	used = zettel_transacted.MakeMutableSetUnique(0)
 
 	if groupingEtiketten.Len() == 0 {
 		prefixSet.ToSet().Each(used.Add)
@@ -110,7 +110,7 @@ func (atc Factory) makeChildren(
 	}
 
 	segments.Grouped.Each(
-		func(e etikett.Etikett, zs zettel_transacted.Set) (err error) {
+		func(e etikett.Etikett, zs zettel_transacted.MutableSet) (err error) {
 			if atc.UsePrefixJoints {
 				if parent.etiketten.Len() > 1 {
 				} else {
@@ -139,7 +139,7 @@ func (atc Factory) makeChildren(
 						nextGroupingEtiketten = groupingEtiketten[1:]
 					}
 
-					var usedChild zettel_transacted.Set
+					var usedChild zettel_transacted.MutableSet
 
 					usedChild, err = atc.makeChildren(child, zs.ToSetPrefixTransacted(), nextGroupingEtiketten)
 
@@ -162,7 +162,7 @@ func (atc Factory) makeChildren(
 					nextGroupingEtiketten = groupingEtiketten[1:]
 				}
 
-				var usedChild zettel_transacted.Set
+				var usedChild zettel_transacted.MutableSet
 
 				usedChild, err = atc.makeChildren(child, zs.ToSetPrefixTransacted(), nextGroupingEtiketten)
 
