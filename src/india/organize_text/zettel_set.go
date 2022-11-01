@@ -12,7 +12,7 @@ func makeZettelZetFromSetNamed(set zettel_named.MutableSet) (zs zettelSet) {
 	zs = makeZettelSet()
 
 	set.Each(
-		func(z zettel_named.Zettel) (err error) {
+		func(z *zettel_named.Zettel) (err error) {
 			zs.Add(zettel{Hinweis: z.Hinweis, Bezeichnung: z.Stored.Zettel.Bezeichnung})
 			return
 		},

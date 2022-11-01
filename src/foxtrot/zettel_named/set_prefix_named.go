@@ -33,7 +33,7 @@ func (s *SetPrefixNamed) addPair(e etikett.Etikett, z Zettel) {
 		existing = MakeMutableSet()
 	}
 
-	existing.Add(z)
+	existing.Add(&z)
 	(*s)[e] = existing
 }
 
@@ -46,13 +46,13 @@ func (a SetPrefixNamed) Subset(e etikett.Etikett) (out SetPrefixNamedSegments) {
 
 	for e1, zSet := range a {
 		zSet.Each(
-			func(z Zettel) (err error) {
+			func(z *Zettel) (err error) {
 				intersection := z.Stored.Zettel.Etiketten.IntersectPrefixes(etikett.MakeSet(e))
 				errors.Printf("%s yields %s", e1, intersection)
 
 				if intersection.Len() > 0 {
 					for _, e2 := range intersection.Elements() {
-						out.Grouped.addPair(e2, z)
+						out.Grouped.addPair(e2, *z)
 					}
 				} else {
 					out.Ungrouped.Add(z)
@@ -71,7 +71,7 @@ func (s SetPrefixNamed) ToSetNamed() (out MutableSet) {
 
 	for _, zs := range s {
 		zs.Each(
-			func(z Zettel) (err error) {
+			func(z *Zettel) (err error) {
 				out.Add(z)
 
 				return
