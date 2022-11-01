@@ -6,7 +6,7 @@ import (
 	collections "github.com/friedenberg/zit/src/bravo/collections"
 )
 
-type MutableSet = collections.MutableSet[Etikett, *Etikett]
+type MutableSet = collections.ValueMutableSet[Etikett, *Etikett]
 
 func MakeMutableSet(hs ...Etikett) MutableSet {
 	return MutableSet(collections.MakeMutableSet[Etikett, *Etikett](hs...))

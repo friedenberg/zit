@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
-type Set[T ProtoObjekte, T1 interface {
+type ValueSet[T ProtoObjekte, T1 interface {
 	*T
 	ProtoObjektePointer
 }] struct {
@@ -20,7 +20,7 @@ type Set[T ProtoObjekte, T1 interface {
 func MakeSet[T ProtoObjekte, T1 interface {
 	*T
 	ProtoObjektePointer
-}](es ...T) (s Set[T, T1]) {
+}](es ...T) (s ValueSet[T, T1]) {
 	s.inner = make(map[string]T, len(es))
 	s.open()
 	defer s.close()
@@ -35,7 +35,7 @@ func MakeSet[T ProtoObjekte, T1 interface {
 func MakeSetStrings[T ProtoObjekte, T1 interface {
 	*T
 	ProtoObjektePointer
-}](es ...string) (s Set[T, T1], err error) {
+}](es ...string) (s ValueSet[T, T1], err error) {
 	s.inner = make(map[string]T, len(es))
 	s.open()
 	defer s.close()
@@ -54,19 +54,19 @@ func MakeSetStrings[T ProtoObjekte, T1 interface {
 	return
 }
 
-func (s *Set[T, T1]) open() {
+func (s *ValueSet[T, T1]) open() {
 	s.closed = false
 }
 
-func (s *Set[T, T1]) close() {
+func (s *ValueSet[T, T1]) close() {
 	s.closed = true
 }
 
-func (s Set[T, T1]) Len() int {
+func (s ValueSet[T, T1]) Len() int {
 	return len(s.inner)
 }
 
-func (s Set[T, T1]) GetKeyFunc() func(T) string {
+func (s ValueSet[T, T1]) GetKeyFunc() func(T) string {
 	if s.keyFunc == nil {
 		return func(e T) string {
 			return e.String()
@@ -76,7 +76,7 @@ func (s Set[T, T1]) GetKeyFunc() func(T) string {
 	return s.keyFunc
 }
 
-func (es Set[T, T1]) add(e T) {
+func (es ValueSet[T, T1]) add(e T) {
 	if es.closed {
 		panic("trying to add etikett to closed set")
 	}
@@ -84,13 +84,13 @@ func (es Set[T, T1]) add(e T) {
 	es.inner[es.GetKeyFunc()(e)] = e
 }
 
-func (s Set[T, T1]) Each(f func(T)) {
+func (s ValueSet[T, T1]) Each(f func(T)) {
 	for _, v := range s.inner {
 		f(v)
 	}
 }
 
-func (s *Set[T, T1]) Set(v string) (err error) {
+func (s *ValueSet[T, T1]) Set(v string) (err error) {
 	if s == nil {
 		s1 := MakeSet[T, T1]()
 		s = &s1
@@ -127,13 +127,13 @@ func (s *Set[T, T1]) Set(v string) (err error) {
 	return
 }
 
-func (es *Set[T, T1]) Remove(es1 ...T) {
+func (es *ValueSet[T, T1]) Remove(es1 ...T) {
 	for _, e := range es1 {
 		delete(es.inner, e.String())
 	}
 }
 
-func (es *Set[T, T1]) RemovePrefixes(needle T) {
+func (es *ValueSet[T, T1]) RemovePrefixes(needle T) {
 	for haystack, _ := range es.inner {
 		if strings.HasPrefix(haystack, needle.String()) {
 			delete(es.inner, haystack)
@@ -141,7 +141,7 @@ func (es *Set[T, T1]) RemovePrefixes(needle T) {
 	}
 }
 
-func (a Set[T, T1]) Equals(b Set[T, T1]) bool {
+func (a ValueSet[T, T1]) Equals(b ValueSet[T, T1]) bool {
 	if len(a.inner) != len(b.inner) {
 		return false
 	}
@@ -155,7 +155,7 @@ func (a Set[T, T1]) Equals(b Set[T, T1]) bool {
 	return true
 }
 
-func (s1 Set[T, T1]) Copy() (s2 Set[T, T1]) {
+func (s1 ValueSet[T, T1]) Copy() (s2 ValueSet[T, T1]) {
 	s2 = MakeSet[T, T1]()
 	s2.open()
 	defer s2.close()
@@ -167,7 +167,7 @@ func (s1 Set[T, T1]) Copy() (s2 Set[T, T1]) {
 	return
 }
 
-func (s1 Set[T, T1]) MutableCopy() (s2 MutableSet[T, T1]) {
+func (s1 ValueSet[T, T1]) MutableCopy() (s2 ValueMutableSet[T, T1]) {
 	s2 = MakeMutableSet[T, T1]()
 
 	for _, e := range s1.inner {
@@ -177,7 +177,7 @@ func (s1 Set[T, T1]) MutableCopy() (s2 MutableSet[T, T1]) {
 	return
 }
 
-func (s Set[T, T1]) Strings() (out []string) {
+func (s ValueSet[T, T1]) Strings() (out []string) {
 	out = make([]string, 0, len(s.inner))
 
 	for s, _ := range s.inner {
@@ -187,7 +187,7 @@ func (s Set[T, T1]) Strings() (out []string) {
 	return
 }
 
-func (es Set[T, T1]) Elements() (out []T) {
+func (es ValueSet[T, T1]) Elements() (out []T) {
 	out = make([]T, len(es.inner))
 
 	i := 0
@@ -200,7 +200,7 @@ func (es Set[T, T1]) Elements() (out []T) {
 	return
 }
 
-func (es Set[T, T1]) Sorted() (out []T) {
+func (es ValueSet[T, T1]) Sorted() (out []T) {
 	out = es.Elements()
 
 	sort.Slice(
@@ -213,7 +213,7 @@ func (es Set[T, T1]) Sorted() (out []T) {
 	return
 }
 
-func (es Set[T, T1]) SortedString() (out []string) {
+func (es ValueSet[T, T1]) SortedString() (out []string) {
 	out = make([]string, len(es.inner))
 
 	i := 0
@@ -233,16 +233,16 @@ func (es Set[T, T1]) SortedString() (out []string) {
 	return
 }
 
-func (s Set[T, T1]) Contains(e T) bool {
+func (s ValueSet[T, T1]) Contains(e T) bool {
 	return s.ContainsString(s.GetKeyFunc()(e))
 }
 
-func (s Set[T, T1]) ContainsString(es string) bool {
+func (s ValueSet[T, T1]) ContainsString(es string) bool {
 	_, ok := s.inner[es]
 	return ok
 }
 
-func (a Set[T, T1]) ContainsSet(b Set[T, T1]) bool {
+func (a ValueSet[T, T1]) ContainsSet(b ValueSet[T, T1]) bool {
 	for _, e := range b.inner {
 		if !a.Contains(e) {
 			return false
@@ -252,7 +252,7 @@ func (a Set[T, T1]) ContainsSet(b Set[T, T1]) bool {
 	return true
 }
 
-func (s1 Set[T, T1]) Subtract(s2 Set[T, T1]) (s3 Set[T, T1]) {
+func (s1 ValueSet[T, T1]) Subtract(s2 ValueSet[T, T1]) (s3 ValueSet[T, T1]) {
 	s3 = MakeSet[T, T1]()
 
 	for _, e1 := range s1.inner {
@@ -266,7 +266,7 @@ func (s1 Set[T, T1]) Subtract(s2 Set[T, T1]) (s3 Set[T, T1]) {
 	return
 }
 
-func (s1 Set[T, T1]) IntersectPrefixes(s2 Set[T, T1]) (s3 Set[T, T1]) {
+func (s1 ValueSet[T, T1]) IntersectPrefixes(s2 ValueSet[T, T1]) (s3 ValueSet[T, T1]) {
 	s3 = MakeSet[T, T1]()
 	s3.open()
 	defer s3.close()
@@ -290,7 +290,7 @@ func (s1 Set[T, T1]) IntersectPrefixes(s2 Set[T, T1]) (s3 Set[T, T1]) {
 	return
 }
 
-func (s1 Set[T, T1]) Intersect(s2 Set[T, T1]) (s3 Set[T, T1]) {
+func (s1 ValueSet[T, T1]) Intersect(s2 ValueSet[T, T1]) (s3 ValueSet[T, T1]) {
 	s3 = MakeSet[T, T1]()
 
 	for _, e := range s1.inner {
@@ -302,7 +302,7 @@ func (s1 Set[T, T1]) Intersect(s2 Set[T, T1]) (s3 Set[T, T1]) {
 	return
 }
 
-func (s Set[T, T1]) Any() (e T) {
+func (s ValueSet[T, T1]) Any() (e T) {
 	for _, e1 := range s.inner {
 		e = e1
 		break
@@ -311,7 +311,7 @@ func (s Set[T, T1]) Any() (e T) {
 	return e
 }
 
-func (es Set[T, T1]) Description() string {
+func (es ValueSet[T, T1]) Description() string {
 	sb := &strings.Builder{}
 	first := true
 
@@ -328,7 +328,7 @@ func (es Set[T, T1]) Description() string {
 	return sb.String()
 }
 
-func (s Set[T, T1]) String() string {
+func (s ValueSet[T, T1]) String() string {
 	sb := &strings.Builder{}
 	first := true
 
@@ -345,11 +345,11 @@ func (s Set[T, T1]) String() string {
 	return sb.String()
 }
 
-func (es Set[T, T1]) MarshalJSON() ([]byte, error) {
+func (es ValueSet[T, T1]) MarshalJSON() ([]byte, error) {
 	return json.Marshal(es.SortedString())
 }
 
-func (es *Set[T, T1]) UnmarshalJSON(b []byte) (err error) {
+func (es *ValueSet[T, T1]) UnmarshalJSON(b []byte) (err error) {
 	*es = MakeSet[T, T1]()
 
 	es.open()
@@ -376,13 +376,13 @@ func (es *Set[T, T1]) UnmarshalJSON(b []byte) (err error) {
 	return
 }
 
-func (s Set[T, T1]) MarshalBinary() (text []byte, err error) {
+func (s ValueSet[T, T1]) MarshalBinary() (text []byte, err error) {
 	text = []byte(s.String())
 
 	return
 }
 
-func (s *Set[T, T1]) UnmarshalBinary(text []byte) (err error) {
+func (s *ValueSet[T, T1]) UnmarshalBinary(text []byte) (err error) {
 	s.inner = make(map[string]T)
 
 	s.open()

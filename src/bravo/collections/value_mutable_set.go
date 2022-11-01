@@ -10,10 +10,10 @@ type set[T ProtoObjekte, T1 interface {
 	*T
 	ProtoObjektePointer
 }] struct {
-	Set[T, T1]
+	ValueSet[T, T1]
 }
 
-type MutableSet[T ProtoObjekte, T1 interface {
+type ValueMutableSet[T ProtoObjekte, T1 interface {
 	*T
 	ProtoObjektePointer
 }] struct {
@@ -23,8 +23,8 @@ type MutableSet[T ProtoObjekte, T1 interface {
 func MakeMutableSet[T ProtoObjekte, T1 interface {
 	*T
 	ProtoObjektePointer
-}](es ...T) (s MutableSet[T, T1]) {
-	s.set.Set = MakeSet[T, T1](es...)
+}](es ...T) (s ValueMutableSet[T, T1]) {
+	s.set.ValueSet = MakeSet[T, T1](es...)
 
 	return
 }
@@ -32,8 +32,8 @@ func MakeMutableSet[T ProtoObjekte, T1 interface {
 func MakeMutableSetStrings[T ProtoObjekte, T1 interface {
 	*T
 	ProtoObjektePointer
-}](es ...string) (s MutableSet[T, T1], err error) {
-	if s.set.Set, err = MakeSetStrings[T, T1](es...); err != nil {
+}](es ...string) (s ValueMutableSet[T, T1], err error) {
+	if s.set.ValueSet, err = MakeSetStrings[T, T1](es...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -41,11 +41,11 @@ func MakeMutableSetStrings[T ProtoObjekte, T1 interface {
 	return
 }
 
-func (es MutableSet[T, T1]) Add(e T) {
+func (es ValueMutableSet[T, T1]) Add(e T) {
 	es.inner[e.String()] = e
 }
 
-func (es MutableSet[T, T1]) AddString(v string) (err error) {
+func (es ValueMutableSet[T, T1]) AddString(v string) (err error) {
 	e := T1(new(T))
 
 	if err = e.Set(v); err != nil {
@@ -58,13 +58,13 @@ func (es MutableSet[T, T1]) AddString(v string) (err error) {
 	return
 }
 
-func (es MutableSet[T, T1]) Remove(es1 ...T) {
+func (es ValueMutableSet[T, T1]) Remove(es1 ...T) {
 	for _, e := range es1 {
 		delete(es.inner, e.String())
 	}
 }
 
-func (es MutableSet[T, T1]) RemovePrefixes(needle T) {
+func (es ValueMutableSet[T, T1]) RemovePrefixes(needle T) {
 	for haystack, _ := range es.inner {
 		if strings.HasPrefix(haystack, needle.String()) {
 			delete(es.inner, haystack)
@@ -72,17 +72,17 @@ func (es MutableSet[T, T1]) RemovePrefixes(needle T) {
 	}
 }
 
-func (a MutableSet[T, T1]) Equals(b MutableSet[T, T1]) bool {
-	return a.set.Set.Equals(b.set.Set)
+func (a ValueMutableSet[T, T1]) Equals(b ValueMutableSet[T, T1]) bool {
+	return a.set.ValueSet.Equals(b.set.ValueSet)
 }
 
-func (s1 MutableSet[T, T1]) Merge(s2 Set[T, T1]) {
+func (s1 ValueMutableSet[T, T1]) Merge(s2 ValueSet[T, T1]) {
 	for _, e := range s2.inner {
 		s1.Add(e)
 	}
 }
 
-func (s1 MutableSet[T, T1]) Reset(s2 Set[T, T1]) {
+func (s1 ValueMutableSet[T, T1]) Reset(s2 ValueSet[T, T1]) {
 	for k, _ := range s1.inner {
 		delete(s1.inner, k)
 	}
@@ -92,7 +92,7 @@ func (s1 MutableSet[T, T1]) Reset(s2 Set[T, T1]) {
 	}
 }
 
-func (s1 MutableSet[T, T1]) Copy() (s2 Set[T, T1]) {
+func (s1 ValueMutableSet[T, T1]) Copy() (s2 ValueSet[T, T1]) {
 	s2 = MakeSet[T, T1]()
 	s2.open()
 	defer s2.close()

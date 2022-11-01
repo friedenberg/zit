@@ -7,14 +7,14 @@ import (
 	collections "github.com/friedenberg/zit/src/bravo/collections"
 )
 
-type Set = collections.Set[Etikett, *Etikett]
+type Set = collections.ValueSet[Etikett, *Etikett]
 
 func MakeSet(es ...Etikett) (s Set) {
 	return Set(collections.MakeSet(es...))
 }
 
 func MakeSetStrings(vs ...string) (s Set, err error) {
-	var s1 collections.Set[Etikett, *Etikett]
+	var s1 collections.ValueSet[Etikett, *Etikett]
 
 	if s1, err = collections.MakeSetStrings[Etikett, *Etikett](vs...); err != nil {
 		err = errors.Wrap(err)

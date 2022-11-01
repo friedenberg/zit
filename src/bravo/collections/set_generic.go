@@ -6,17 +6,17 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
-type SetGeneric[T any] struct {
+type Set[T any] struct {
 	SetLike[T]
 }
 
-func MakeSetGeneric[T any](kf KeyFunc[T], es ...T) (out SetGeneric[T]) {
+func MakeSetGeneric[T any](kf KeyFunc[T], es ...T) (out Set[T]) {
 	out.SetLike = makeSetGeneric(kf, es...)
 
 	return
 }
 
-func (s1 SetGeneric[T]) Copy() (out SetGeneric[T]) {
+func (s1 Set[T]) Copy() (out Set[T]) {
 	s2 := makeSetGeneric[T](s1.Key)
 	s2.open()
 	defer s2.close()
@@ -28,14 +28,14 @@ func (s1 SetGeneric[T]) Copy() (out SetGeneric[T]) {
 	return
 }
 
-func (s1 SetGeneric[T]) MutableCopy() (s2 MutableSetLike[T]) {
+func (s1 Set[T]) MutableCopy() (s2 MutableSetLike[T]) {
 	s2 = makeMutableSetGeneric[T](s1.Key)
 	s1.Each(s2.Add)
 
 	return
 }
 
-func (s SetGeneric[T]) WriterContainer() WriterFunc[T] {
+func (s Set[T]) WriterContainer() WriterFunc[T] {
 	return func(e T) (err error) {
 		k := s.Key(e)
 
@@ -70,7 +70,7 @@ func WriterFuncNegate[T any](wf WriterFunc[T]) WriterFunc[T] {
 	}
 }
 
-func (s1 SetGeneric[T]) Subtract(s2 SetGeneric[T]) (out SetGeneric[T]) {
+func (s1 Set[T]) Subtract(s2 Set[T]) (out Set[T]) {
 	s3 := makeSetGeneric[T](s1.Key)
 	s3.open()
 	defer s3.close()
@@ -85,9 +85,9 @@ func (s1 SetGeneric[T]) Subtract(s2 SetGeneric[T]) (out SetGeneric[T]) {
 	return
 }
 
-func (s1 SetGeneric[T]) Intersection(s2 SetLike[T]) (s3 MutableSetLike[T]) {
+func (s1 Set[T]) Intersection(s2 SetLike[T]) (s3 MutableSetLike[T]) {
 	s3 = MakeMutableSetGeneric[T](s1.Key)
-	s22 := SetGeneric[T]{
+	s22 := Set[T]{
 		SetLike: s2,
 	}
 
@@ -99,7 +99,7 @@ func (s1 SetGeneric[T]) Intersection(s2 SetLike[T]) (s3 MutableSetLike[T]) {
 	return
 }
 
-func (s1 SetGeneric[T]) Chain(fs ...WriterFunc[T]) error {
+func (s1 Set[T]) Chain(fs ...WriterFunc[T]) error {
 	return s1.Each(
 		func(e T) (err error) {
 			for _, f := range fs {
@@ -119,7 +119,7 @@ func (s1 SetGeneric[T]) Chain(fs ...WriterFunc[T]) error {
 	)
 }
 
-func (s SetGeneric[T]) Elements() (out []T) {
+func (s Set[T]) Elements() (out []T) {
 	out = make([]T, s.Len())
 
 	s.Each(
@@ -132,7 +132,7 @@ func (s SetGeneric[T]) Elements() (out []T) {
 	return
 }
 
-func (s SetGeneric[T]) Any() (e T) {
+func (s Set[T]) Any() (e T) {
 	s.Each(
 		func(e1 T) (err error) {
 			e = e1
@@ -143,7 +143,7 @@ func (s SetGeneric[T]) Any() (e T) {
 	return
 }
 
-func (s SetGeneric[T]) All(f WriterFunc[T]) (ok bool) {
+func (s Set[T]) All(f WriterFunc[T]) (ok bool) {
 	err := s.Each(
 		func(e T) (err error) {
 			return f(e)
@@ -153,7 +153,7 @@ func (s SetGeneric[T]) All(f WriterFunc[T]) (ok bool) {
 	return err == nil
 }
 
-func (a SetGeneric[T]) Equals(b SetGeneric[T]) (ok bool) {
+func (a Set[T]) Equals(b Set[T]) (ok bool) {
 	if a.Len() != b.Len() {
 		return
 	}
@@ -163,7 +163,7 @@ func (a SetGeneric[T]) Equals(b SetGeneric[T]) (ok bool) {
 	return
 }
 
-func (outer SetGeneric[T]) ContainsSet(inner SetGeneric[T]) (ok bool) {
+func (outer Set[T]) ContainsSet(inner Set[T]) (ok bool) {
 	if outer.Len() < inner.Len() {
 		return
 	}

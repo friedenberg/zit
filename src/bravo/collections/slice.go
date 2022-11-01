@@ -66,7 +66,7 @@ func (es *Slice[T, T1]) Add(e T) {
 	*es = append(*es, e)
 }
 
-func (s *Slice[T, T1]) Set(v string) (err error) {
+func (s *Slice[T, T1]) ValueSet(v string) (err error) {
 	es := strings.Split(v, ",")
 
 	for _, e := range es {
@@ -103,7 +103,7 @@ func (s Slice[T, T1]) String() string {
 	return strings.Join(s.SortedString(), ", ")
 }
 
-func (s Slice[T, T1]) ToSet() (se Set[T, T1]) {
+func (s Slice[T, T1]) ToSet() (se ValueSet[T, T1]) {
 	se = MakeSet[T, T1]()
 	se.open()
 	defer se.close()
