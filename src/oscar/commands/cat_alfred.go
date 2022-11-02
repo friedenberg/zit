@@ -150,7 +150,6 @@ func (c CatAlfred) catZettelen(
 	aw *alfred.Writer,
 	wg *sync.WaitGroup,
 ) {
-	errors.Err().FunctionName(0)
 	if wg != nil {
 		defer wg.Done()
 	}

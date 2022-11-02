@@ -24,17 +24,19 @@ func (ip Pool[T]) Get() *T {
 	return ip.inner.Get().(*T)
 }
 
-func (ip Pool[T]) Put(i *T) {
-	if i == nil {
-		return
-	}
+func (ip Pool[T]) Put(i *T) (err error) {
+	return
+	// if i == nil {
+	// 	return
+	// }
 
-	//TODO-P0
 	// ii := interface{}(i)
 
 	// if r, ok := ii.(Resettable[*T]); ok {
 	// 	r.Reset(nil)
 	// }
 
-	ip.inner.Put(i)
+	// ip.inner.Put(i)
+
+	// return
 }

@@ -129,7 +129,7 @@ func (i *Zettelen) ReadMany(
 	ch := make(chan struct{}, PageCount)
 
 	w1 := zettel_verzeichnisse.MakeWriterChain(ws...)
-	w := zettel_verzeichnisse.MakeWriterChainIgnoreEOF(w1, i.pool)
+	w := zettel_verzeichnisse.MakeWriterChain(w1, i.pool)
 
 	for n, p := range i.pages {
 		wg.Add(1)

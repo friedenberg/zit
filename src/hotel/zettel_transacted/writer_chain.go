@@ -3,21 +3,13 @@ package zettel_transacted
 import "github.com/friedenberg/zit/src/alfa/errors"
 
 type writerChain struct {
-	writers   []Writer
-	ignoreEOF bool
+	writers []Writer
 }
 
 func MakeWriterChain(ws ...Writer) *writerChain {
 	return &writerChain{
 		writers: ws,
 	}
-}
-
-func MakeWriterChainIgnoreEOF(ws ...Writer) (wc *writerChain) {
-	wc = MakeWriterChain(ws...)
-	wc.ignoreEOF = true
-
-	return
 }
 
 func (wc writerChain) WriteZettelTransacted(z *Zettel) (err error) {
@@ -28,16 +20,12 @@ func (wc writerChain) WriteZettelTransacted(z *Zettel) (err error) {
 		case z == nil && err == nil:
 			return
 
-		case errors.IsEOF(err) && !wc.ignoreEOF:
-			err = nil
-			return
-
-		case errors.IsEOF(err) && wc.ignoreEOF:
-			err = nil
-			continue
-
 		case err == nil:
 			continue
+
+		case errors.IsEOF(err):
+			err = nil
+			return
 
 		default:
 			err = errors.Wrap(err)

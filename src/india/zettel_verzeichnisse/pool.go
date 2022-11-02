@@ -18,6 +18,41 @@ func MakePool() Pool {
 	}
 }
 
+func (ip Pool) PutAlways(w Writer) Writer {
+	return MakeWriter(
+		func(z *Zettel) (err error) {
+			err = w.WriteZettelVerzeichnisse(z)
+			ip.Put(z)
+
+			return
+		},
+	)
+}
+
+func (ip Pool) PutOnEOF(w Writer) Writer {
+	return MakeWriter(
+		func(z *Zettel) (err error) {
+			if err = w.WriteZettelVerzeichnisse(z); err != nil {
+				ip.Put(z)
+			}
+
+			return
+		},
+	)
+}
+
+func (ip Pool) PutOnSuccess(w Writer) Writer {
+	return MakeWriter(
+		func(z *Zettel) (err error) {
+			if err = w.WriteZettelVerzeichnisse(z); err == nil {
+				ip.Put(z)
+			}
+
+			return
+		},
+	)
+}
+
 func (ip Pool) WriteZettelVerzeichnisse(z *Zettel) (err error) {
 	if z == nil {
 		err = io.EOF

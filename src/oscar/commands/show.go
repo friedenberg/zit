@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/etikett"
@@ -120,6 +121,9 @@ func (c Show) showZettels(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 			},
 		},
 		zettel_transacted.MakeWriter(zts.Add),
+		zettel_transacted.MakeWriter(
+			collections.MakeNiller[zettel_transacted.Zettel](),
+		),
 	)
 
 	if err = store.StoreObjekten().ReadAllSchwanzenTransacted(w); err != nil {

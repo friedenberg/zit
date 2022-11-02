@@ -1,21 +1,22 @@
 package zettel_transacted
 
-import "github.com/friedenberg/zit/src/foxtrot/zettel_named"
+import (
+	"github.com/friedenberg/zit/src/bravo/collections"
+	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
+)
 
 type Writer interface {
 	WriteZettelTransacted(*Zettel) error
 }
 
-type WriterFunc func(*Zettel) error
+type writer collections.WriterFunc[*Zettel]
 
-type writer WriterFunc
-
-func MakeWriter(f WriterFunc) writer {
+func MakeWriter(f collections.WriterFunc[*Zettel]) writer {
 	return writer(f)
 }
 
 func (w writer) WriteZettelTransacted(z *Zettel) (err error) {
-	return WriterFunc(w)(z)
+	return collections.WriterFunc[*Zettel](w)(z)
 }
 
 type WriterZettelNamed struct {
