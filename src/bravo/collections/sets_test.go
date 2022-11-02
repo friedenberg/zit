@@ -137,7 +137,7 @@ func TestSet(t1 *testing.T) {
 			"3 three",
 		)
 
-		sut := MakeSetGeneric[stringValue](
+		sut := MakeSet[stringValue](
 			func(v stringValue) string {
 				return v.String()
 			},

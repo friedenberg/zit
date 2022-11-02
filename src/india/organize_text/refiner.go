@@ -111,7 +111,6 @@ func (atc *Refiner) renameForPrefixJoint(a *assignment) (err error) {
 		return
 	}
 
-  //IS THIS THE BUG?
 	a.etiketten = etikett.MakeSet(a.etiketten.Any().LeftSubtract(a.parent.etiketten.Any()))
 
 	return
@@ -134,6 +133,7 @@ func (atc *Refiner) Refine(a *assignment) (err error) {
 		return
 	}
 
+	//TODO fix after breaking during migration to collections
 	// if atc.shouldMergeIntoParent(a) {
 	// 	errors.Print("merging into parent")
 	// 	p := a.parent

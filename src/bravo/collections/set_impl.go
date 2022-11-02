@@ -13,7 +13,11 @@ type set[T any] struct {
 	inner   map[string]T
 }
 
-func makeSetGeneric[T any](kf KeyFunc[T], es ...T) (s set[T]) {
+type setAlias[T any] struct {
+	Set[T]
+}
+
+func makeSet[T any](kf KeyFunc[T], es ...T) (s set[T]) {
 	t := *new(T)
 
 	//confirms that the key function supports nil pointers properly

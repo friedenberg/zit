@@ -10,14 +10,14 @@ type Set[T any] struct {
 	SetLike[T]
 }
 
-func MakeSetGeneric[T any](kf KeyFunc[T], es ...T) (out Set[T]) {
-	out.SetLike = makeSetGeneric(kf, es...)
+func MakeSet[T any](kf KeyFunc[T], es ...T) (out Set[T]) {
+	out.SetLike = makeSet(kf, es...)
 
 	return
 }
 
 func (s1 Set[T]) Copy() (out Set[T]) {
-	s2 := makeSetGeneric[T](s1.Key)
+	s2 := makeSet[T](s1.Key)
 	s2.open()
 	defer s2.close()
 
@@ -29,7 +29,7 @@ func (s1 Set[T]) Copy() (out Set[T]) {
 }
 
 func (s1 Set[T]) MutableCopy() (s2 MutableSetLike[T]) {
-	s2 = makeMutableSetGeneric[T](s1.Key)
+	s2 = makeMutableSet[T](s1.Key)
 	s1.Each(s2.Add)
 
 	return
@@ -71,7 +71,7 @@ func WriterFuncNegate[T any](wf WriterFunc[T]) WriterFunc[T] {
 }
 
 func (s1 Set[T]) Subtract(s2 Set[T]) (out Set[T]) {
-	s3 := makeSetGeneric[T](s1.Key)
+	s3 := makeSet[T](s1.Key)
 	s3.open()
 	defer s3.close()
 

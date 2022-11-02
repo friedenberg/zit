@@ -84,7 +84,7 @@ func (es MutableValueSet[T, T1]) RemovePrefixes(needle T) {
 
 func (es MutableValueSet[T, T1]) Copy() (out ValueSet[T, T1]) {
 	out.setAlias = setAlias[T]{
-		Set: MakeSetGeneric[T](es.Key, es.Elements()...),
+		Set: MakeSet[T](es.Key, es.Elements()...),
 	}
 
 	return

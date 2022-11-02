@@ -14,7 +14,7 @@ type Factory struct {
 
 func (atc *Factory) Make() (ot *Text, err error) {
 	ot = &Text{
-		Options: atc.Options,
+		Options:    atc.Options,
 		assignment: newAssignment(0),
 	}
 

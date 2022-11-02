@@ -7,9 +7,9 @@ type mutableSet[T any] struct {
 	lock sync.Locker
 }
 
-func makeMutableSetGeneric[T any](kf KeyFunc[T], es ...T) (ms mutableSet[T]) {
+func makeMutableSet[T any](kf KeyFunc[T], es ...T) (ms mutableSet[T]) {
 	ms = mutableSet[T]{
-		set:  makeSetGeneric(kf, es...),
+		set:  makeSet(kf, es...),
 		lock: &sync.Mutex{},
 	}
 

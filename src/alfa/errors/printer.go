@@ -23,7 +23,7 @@ func init() {
 
 	log = printer{
 		includesStack: true,
-		f:              os.Stderr,
+		f:             os.Stderr,
 	}
 }
 
@@ -50,7 +50,7 @@ func (p printer) Print(a ...interface{}) (err error) {
 		return
 	}
 
-  //TODO add support for includesStack
+	//TODO add support for includesStack
 	_, err = fmt.Fprintln(
 		p.f,
 		a...,

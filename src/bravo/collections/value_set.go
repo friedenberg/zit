@@ -8,10 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
-type setAlias[T any] struct {
-	Set[T]
-}
-
 type ValueSet[T ProtoObjekte, T1 interface {
 	*T
 	ProtoObjektePointer
@@ -24,7 +20,7 @@ func MakeValueSet[T ProtoObjekte, T1 interface {
 	ProtoObjektePointer
 }](es ...T) (s ValueSet[T, T1]) {
 	s.setAlias = setAlias[T]{
-		Set: MakeSetGeneric(
+		Set: MakeSet(
 			func(e T) string {
 				return e.String()
 			},
