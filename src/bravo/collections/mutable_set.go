@@ -11,3 +11,9 @@ func MakeMutableSetGeneric[T any](kf KeyFunc[T], es ...T) (out MutableSet[T]) {
 
 	return
 }
+
+func (s MutableSet[T]) AddAndDoNotRepool(e T) (err error) {
+  s.Add(e)
+  err = ErrDoNotRepool{}
+  return
+}

@@ -175,9 +175,14 @@ func (s Store) WriteZettelObjekte(z zettel.Zettel) (sh sha.Sha, err error) {
 
 	defer w.Close()
 
+	c := zettel.FormatContextWrite{
+		Zettel: z,
+		Out:    w,
+	}
+
 	f := zettel.Objekte{}
 
-	if _, err = f.WriteTo(z, w); err != nil {
+	if _, err = f.WriteTo(c); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

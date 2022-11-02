@@ -5,7 +5,6 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/etikett"
@@ -111,7 +110,6 @@ func (c Show) RunWithIds(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 }
 
 func (c Show) showZettels(store *umwelt.Umwelt, ids id_set.Set) (err error) {
-	zts := zettel_transacted.MakeMutableSetUnique(0)
 	w := zettel_transacted.MakeWriterChain(
 		zettel_transacted.WriterZettelNamed{
 			Writer: zettel_named.WriterFilter{
@@ -120,9 +118,13 @@ func (c Show) showZettels(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 				},
 			},
 		},
-		zettel_transacted.MakeWriter(zts.Add),
-		zettel_transacted.MakeWriter(
-			collections.MakeWriterDoNotRepool[zettel_transacted.Zettel](),
+		zettel_transacted.MakeWriterZettel(
+			zettel.MakeSerializedFormatWriter(
+				zettel.Text{},
+				store.Out(),
+				store.StoreObjekten(),
+				store.Konfig(),
+			),
 		),
 	)
 
@@ -130,32 +132,6 @@ func (c Show) showZettels(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 		err = errors.Wrap(err)
 		return
 	}
-
-	f := zettel.Text{}
-
-	ctx := zettel.FormatContextWrite{
-		Out:               store.Out(),
-		AkteReaderFactory: store.StoreObjekten(),
-	}
-
-	zts.Each(
-		func(zt *zettel_transacted.Zettel) (err error) {
-			if typKonfig, ok := store.Konfig().Typen[zt.Named.Stored.Zettel.Typ.String()]; ok {
-				ctx.IncludeAkte = typKonfig.InlineAkte
-			} else {
-				ctx.IncludeAkte = zt.Named.Stored.Zettel.Typ.String() == "md"
-			}
-
-			ctx.Zettel = zt.Named.Stored.Zettel
-
-			if _, err = f.WriteTo(ctx); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		},
-	)
 
 	return
 }

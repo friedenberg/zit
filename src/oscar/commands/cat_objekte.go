@@ -11,7 +11,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
-	"github.com/friedenberg/zit/src/charlie/id"
 	"github.com/friedenberg/zit/src/charlie/konfig"
 	"github.com/friedenberg/zit/src/charlie/ts"
 	"github.com/friedenberg/zit/src/charlie/typ"
@@ -190,32 +189,28 @@ func (c CatObjekte) akten(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 	return
 }
 
-func (c CatObjekte) zettelen(store *umwelt.Umwelt, ids ...id_set.Set) (err error) {
-	for _, is := range ids {
-		var i id.IdMitKorper
-		ok := false
+func (c CatObjekte) zettelen(store *umwelt.Umwelt, ids id_set.Set) (err error) {
+	w := zettel_transacted.MakeWriterChain(
+		zettel_transacted.WriterZettelNamed{
+			Writer: zettel_named.WriterFilter{
+				NamedFilter: zettel_named.FilterIdSet{
+					Set: ids,
+				},
+			},
+		},
+		zettel_transacted.MakeWriterZettel(
+			zettel.MakeSerializedFormatWriter(
+				&zettel.Objekte{},
+				store.Out(),
+				store.StoreObjekten(),
+				store.Konfig(),
+			),
+		),
+	)
 
-		if i, ok = is.AnyShaOrHinweis(); !ok {
-			errors.PrintErrf("unsupported id type: %s", is)
-			err = nil
-			continue
-		}
-
-		var tz zettel_transacted.Zettel
-
-		if tz, err = store.StoreObjekten().ReadOne(i); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		f := zettel.Objekte{}
-
-		errors.PrintDebug(tz)
-
-		if _, err = f.WriteTo(tz.Named.Stored.Zettel, store.Out()); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if err = store.StoreObjekten().ReadAllSchwanzenTransacted(w); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

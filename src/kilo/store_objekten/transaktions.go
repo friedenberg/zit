@@ -122,11 +122,16 @@ func (s Store) storedZettelFromSha(sh sha.Sha) (sz zettel_stored.Stored, err err
 		IgnoreTypErrors: true,
 	}
 
-	if _, err = f.ReadFrom(&sz.Zettel, or); err != nil {
+	c := zettel.FormatContextRead{
+		In: or,
+	}
+
+	if _, err = f.ReadFrom(&c); err != nil {
 		err = errors.Wrapf(err, "%s", sh)
 		return
 	}
 
+	sz.Zettel = c.Zettel
 	sz.Sha = sh
 
 	return

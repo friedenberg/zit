@@ -18,7 +18,12 @@ func (z Zettel) ObjekteSha() (s sha.Sha, err error) {
 
 	o := Objekte{}
 
-	if _, err = o.WriteTo(z, hash); err != nil {
+	c := FormatContextWrite{
+		Zettel: z,
+		Out:    hash,
+	}
+
+	if _, err = o.WriteTo(c); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -32,7 +37,8 @@ type Objekte struct {
 	IgnoreTypErrors bool
 }
 
-func (f Objekte) WriteTo(z Zettel, out1 io.Writer) (n int64, err error) {
+func (f Objekte) WriteTo(c FormatContextWrite) (n int64, err error) {
+	z := c.Zettel
 	w := line_format.NewWriter()
 
 	w.WriteFormat("%s %s", gattung.Akte, z.Akte)
@@ -43,7 +49,7 @@ func (f Objekte) WriteTo(z Zettel, out1 io.Writer) (n int64, err error) {
 		w.WriteFormat("%s %s", gattung.Etikett, e)
 	}
 
-	n, err = w.WriteTo(out1)
+	n, err = w.WriteTo(c.Out)
 
 	if err != nil {
 		err = errors.Wrap(err)
@@ -53,8 +59,10 @@ func (f Objekte) WriteTo(z Zettel, out1 io.Writer) (n int64, err error) {
 	return
 }
 
-func (f *Objekte) ReadFrom(z *Zettel, in io.Reader) (n int64, err error) {
+func (f *Objekte) ReadFrom(c *FormatContextRead) (n int64, err error) {
 	etiketten := etikett.MakeMutableSet()
+	in := c.In
+	z := c.Zettel
 
 	r := bufio.NewReader(in)
 
