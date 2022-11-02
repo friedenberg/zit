@@ -14,7 +14,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/typ"
 	"github.com/friedenberg/zit/src/delta/id_set"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
-	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
 	"github.com/friedenberg/zit/src/india/zettel_verzeichnisse"
 	"github.com/friedenberg/zit/src/juliett/alfred"
 	"github.com/friedenberg/zit/src/mike/umwelt"
@@ -160,14 +159,12 @@ func (c CatAlfred) catZettelen(
 
 	if err = u.StoreObjekten().ReadAllSchwanzenVerzeichnisse(
 		wk,
-		zettel_verzeichnisse.WriterZettelTransacted{
-			Writer: zettel_transacted.MakeWriterZettelNamed(
-				zettel_named.FilterIdSet{
-					AllowEmpty: true,
-					Set:        ids,
-				}.WriteZettelNamed,
-			),
-		},
+		zettel_verzeichnisse.MakeWriterZettelNamed(
+			zettel_named.FilterIdSet{
+				AllowEmpty: true,
+				Set:        ids,
+			}.WriteZettelNamed,
+		),
 		aw,
 	); err != nil {
 		aw.WriteError(err)

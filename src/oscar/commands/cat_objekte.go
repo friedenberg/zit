@@ -103,16 +103,13 @@ func (c CatObjekte) akteShasFromIds(
 	zettelen = zettel_transacted.MakeMutableSetUnique(0)
 
 	if err = u.StoreObjekten().ReadAllSchwanzenVerzeichnisse(
-		zettel_verzeichnisse.WriterZettelTransacted{
-			Writer: zettel_transacted.MakeWriterZettelNamed(
-				zettel_named.FilterIdSet{
-					Set: ids,
-				}.WriteZettelNamed,
-			),
-		},
-		zettel_verzeichnisse.WriterZettelTransacted{
-			Writer: zettel_transacted.MakeWriter(zettelen.Add),
-		},
+
+		zettel_verzeichnisse.MakeWriterZettelNamed(
+			zettel_named.FilterIdSet{
+				Set: ids,
+			}.WriteZettelNamed,
+		),
+		zettel_verzeichnisse.MakeWriterZettelTransacted(zettelen.Add),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

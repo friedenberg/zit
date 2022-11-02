@@ -154,14 +154,14 @@ func (c *Organize) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	}
 
 	wk := zettel_verzeichnisse.MakeWriterKonfig(u.Konfig())
-	w := zettel_verzeichnisse.WriterZettelTransacted{
-		Writer: zettel_transacted.MakeWriterChain(
+	w := zettel_verzeichnisse.MakeWriterZettelTransacted(
+		zettel_transacted.MakeWriterChain(
 			zettel_transacted.MakeWriterZettelNamed(
 				query.WriteZettelNamed,
 			),
 			zettel_transacted.MakeWriter(getResults.AddAndDoNotRepool),
-		),
-	}
+		).WriteZettelTransacted,
+	)
 
 	if err = u.StoreObjekten().ReadAllSchwanzenVerzeichnisse(wk, w); err != nil {
 		err = errors.Wrap(err)

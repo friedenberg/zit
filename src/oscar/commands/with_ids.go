@@ -70,7 +70,7 @@ func (c commandWithIds) Complete(u *umwelt.Umwelt, args ...string) (err error) {
 			zw := zettel_named.MakeWriterComplete(os.Stdout)
 			defer zw.Close()
 
-			w := zettel_verzeichnisse.MakeWriterNamed(&zw)
+			w := zettel_verzeichnisse.MakeWriterZettelNamed(zw.WriteZettelNamed)
 
 			if err = u.StoreObjekten().ReadAllSchwanzenVerzeichnisse(w); err != nil {
 				err = errors.Wrap(err)

@@ -1,8 +1,6 @@
 package zettel_verzeichnisse
 
 import (
-	"io"
-
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
@@ -13,12 +11,30 @@ type Writer interface {
 	WriteZettelVerzeichnisse(z *Zettel) (err error)
 }
 
-type WriterZettelTransacted struct {
-	zettel_transacted.Writer
+func MakeWriterZettelTransacted(wf collections.WriterFunc[*zettel_transacted.Zettel]) Writer {
+	return MakeWriter(
+		func(z *Zettel) (err error) {
+			if err = wf(&z.Transacted); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+	)
 }
 
-func (w WriterZettelTransacted) WriteZettelVerzeichnisse(z *Zettel) (err error) {
-	return w.WriteZettelTransacted(&z.Transacted)
+func MakeWriterZettelNamed(wf collections.WriterFunc[*zettel_named.Zettel]) Writer {
+	return MakeWriter(
+		func(z *Zettel) (err error) {
+			if err = wf(&z.Transacted.Named); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+	)
 }
 
 type writerFunc collections.WriterFunc[*Zettel]
@@ -29,38 +45,4 @@ func (w writerFunc) WriteZettelVerzeichnisse(z *Zettel) (err error) {
 
 func MakeWriter(f collections.WriterFunc[*Zettel]) Writer {
 	return writerFunc(f)
-}
-
-func MakeWriterNamed(fs ...zettel_named.Writer) Writer {
-	return MakeWriter(
-		func(zt *Zettel) (err error) {
-			for _, q := range fs {
-				if err = q.WriteZettelNamed(&zt.Transacted.Named); err != nil {
-					if errors.IsEOF(err) {
-						break
-					} else {
-						err = errors.Wrap(err)
-						return
-					}
-				}
-			}
-
-			return
-		},
-	)
-}
-
-func MakeWriterNamedFilters(fs ...zettel_named.NamedFilter) Writer {
-	return MakeWriter(
-		func(zt *Zettel) (err error) {
-			for _, q := range fs {
-				if !q.IncludeNamedZettel(&zt.Transacted.Named) {
-					err = io.EOF
-					return
-				}
-			}
-
-			return
-		},
-	)
 }

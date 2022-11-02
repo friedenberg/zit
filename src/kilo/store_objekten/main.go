@@ -244,10 +244,9 @@ func (i *Store) ReadAllSchwanzenVerzeichnisse(
 }
 
 func (s Store) ReadAllSchwanzenTransacted(ws ...zettel_transacted.Writer) (err error) {
-	//TODO add proper support for pools upstream of this call
-	w := zettel_verzeichnisse.WriterZettelTransacted{
-		Writer: zettel_transacted.MakeWriterChain(ws...),
-	}
+	w := zettel_verzeichnisse.MakeWriterZettelTransacted(
+		zettel_transacted.MakeWriterChain(ws...).WriteZettelTransacted,
+	)
 
 	return s.ReadAllSchwanzenVerzeichnisse(w)
 }
@@ -259,10 +258,9 @@ func (i *Store) ReadAllVerzeichnisse(
 }
 
 func (s Store) ReadAllTransacted(ws ...zettel_transacted.Writer) (err error) {
-	//TODO add proper support for pools upstream of this call
-	w := zettel_verzeichnisse.WriterZettelTransacted{
-		Writer: zettel_transacted.MakeWriterChain(ws...),
-	}
+	w := zettel_verzeichnisse.MakeWriterZettelTransacted(
+		zettel_transacted.MakeWriterChain(ws...).WriteZettelTransacted,
+	)
 
 	return s.ReadAllVerzeichnisse(w)
 }
@@ -579,9 +577,7 @@ func (s Store) AllInChain(h hinweis.Hinweis) (c []*zettel_transacted.Zettel, err
 
 	if err = s.verzeichnisseAll.ReadMany(
 		w,
-		zettel_verzeichnisse.WriterZettelTransacted{
-			Writer: zettel_transacted.MakeWriter(mst.Add),
-		},
+		zettel_verzeichnisse.MakeWriterZettelTransacted(mst.Add),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
