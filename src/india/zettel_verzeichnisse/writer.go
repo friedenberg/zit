@@ -4,6 +4,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
 )
@@ -20,15 +21,13 @@ func (w WriterZettelTransacted) WriteZettelVerzeichnisse(z *Zettel) (err error) 
 	return w.WriteZettelTransacted(&z.Transacted)
 }
 
-type WriterFunc func(*Zettel) error
-
-type writerFunc WriterFunc
+type writerFunc collections.WriterFunc[*Zettel]
 
 func (w writerFunc) WriteZettelVerzeichnisse(z *Zettel) (err error) {
-	return WriterFunc(w)(z)
+	return collections.WriterFunc[*Zettel](w)(z)
 }
 
-func MakeWriter(f WriterFunc) Writer {
+func MakeWriter(f collections.WriterFunc[*Zettel]) Writer {
 	return writerFunc(f)
 }
 

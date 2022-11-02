@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/india/zettel_verzeichnisse"
 )
 
@@ -18,7 +19,7 @@ type Page struct {
 	ioFactory
 	pool        zettel_verzeichnisse.Pool
 	added       []*zettel_verzeichnisse.Zettel
-	flushFilter zettel_verzeichnisse.Writer
+	flushFilter collections.WriterFunc[*zettel_verzeichnisse.Zettel]
 	State
 }
 
@@ -27,11 +28,10 @@ func makeZettelenPage(
 	pid pageId,
 	pool zettel_verzeichnisse.Pool,
 ) (p *Page) {
-	var flushFilter zettel_verzeichnisse.Writer
-	flushFilter = zettel_verzeichnisse.WriterNoop{}
+	flushFilter := collections.MakeWriterNoop[*zettel_verzeichnisse.Zettel]()
 
 	if zvwg, ok := iof.(ZettelVerzeichnisseWriterGetter); ok {
-		flushFilter = zvwg.ZettelVerzeichnisseWriter(pid.index)
+		flushFilter = zvwg.ZettelVerzeichnisseWriter(pid.index).WriteZettelVerzeichnisse
 	}
 
 	p = &Page{
@@ -59,7 +59,7 @@ func (zp *Page) setState(v State) {
 }
 
 func (zp *Page) Add(z *zettel_verzeichnisse.Zettel) (err error) {
-	if err = zp.flushFilter.WriteZettelVerzeichnisse(z); err != nil {
+	if err = zp.flushFilter(z); err != nil {
 		if errors.IsEOF(err) {
 			errors.Log().Printf("eliding %s", z.Transacted.Named.Hinweis)
 			err = nil
@@ -253,7 +253,7 @@ func (zp *Page) WriteTo(w1 io.Writer) (n int64, err error) {
 
 	wm := zp.pool.PutAlways(
 		zettel_verzeichnisse.MakeWriterChain(
-			zp.flushFilter,
+			zettel_verzeichnisse.MakeWriter(zp.flushFilter),
 			zettel_verzeichnisse.MakeWriterGobEncoder(w),
 		),
 	)

@@ -122,7 +122,7 @@ func (c Show) showZettels(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 		},
 		zettel_transacted.MakeWriter(zts.Add),
 		zettel_transacted.MakeWriter(
-			collections.MakeNiller[zettel_transacted.Zettel](),
+			collections.MakeWriterNil[zettel_transacted.Zettel](),
 		),
 	)
 
