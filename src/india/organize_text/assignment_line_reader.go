@@ -150,7 +150,7 @@ func (ar *assignmentLineReader) readOneHeading(l line) (err error) {
 		return
 	}
 
-	var currentEtiketten etikett.Set
+	currentEtiketten := etikett.MakeSet()
 
 	if l.value != "" {
 		if err = currentEtiketten.Set(l.value); err != nil {
@@ -162,6 +162,10 @@ func (ar *assignmentLineReader) readOneHeading(l line) (err error) {
 
 			return
 		}
+
+		errors.Print(currentEtiketten.String())
+		errors.Print(l.value)
+		errors.Print(currentEtiketten.Len())
 	}
 
 	var newAssignment *assignment
@@ -222,7 +226,7 @@ func (ar *assignmentLineReader) readOneHeadingLesserDepth(
 		// # zz-inbox
 		// `
 		assignment := newAssignment(d)
-		assignment.etiketten = e
+		assignment.etiketten = e.Copy()
 		newCurrent.addChild(assignment)
 		// logz.Print("adding to parent")
 		// logz.Print("child", assignment.etiketten)
@@ -260,7 +264,7 @@ func (ar *assignmentLineReader) readOneHeadingEqualDepth(
 		// ## priority-2
 		// `
 		assignment := newAssignment(d)
-		assignment.etiketten = e
+		assignment.etiketten = e.Copy()
 		newCurrent.addChild(assignment)
 		newCurrent = assignment
 	}
@@ -293,7 +297,7 @@ func (ar *assignmentLineReader) readOneHeadingGreaterDepth(
 		// ### priority-2
 		// `
 		assignment := newAssignment(d)
-		assignment.etiketten = e
+		assignment.etiketten = e.Copy()
 		newCurrent.addChild(assignment)
 		// logz.Print("adding to parent")
 		// logz.Print("child", assignment)

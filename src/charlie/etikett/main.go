@@ -105,7 +105,7 @@ func (e Etikett) Expanded(exes ...Expander) (out Set) {
 	}
 
 	for _, ex := range exes {
-		expanded.Merge(ex.Expand(e))
+		ex.Expand(e).Each(expanded.Add)
 	}
 
 	out = Set(expanded.Copy())

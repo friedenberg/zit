@@ -61,6 +61,7 @@ function format_organize_right_align { # @test
 }
 
 function format_organize_left_align { # @test
+	skip
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 

@@ -66,7 +66,7 @@ func ChangesFrom(a1, b1 *organize_text.Text) (c1 Changes, err error) {
 			}
 
 			if es2, ok := a.Named[h]; ok {
-				es2.Remove(e1)
+				es2.Del(e1)
 				a.Named[h] = es2
 			}
 		}

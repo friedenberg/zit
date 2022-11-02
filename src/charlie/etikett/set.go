@@ -10,13 +10,13 @@ import (
 type Set = collections.ValueSet[Etikett, *Etikett]
 
 func MakeSet(es ...Etikett) (s Set) {
-	return Set(collections.MakeSet(es...))
+	return Set(collections.MakeValueSet(es...))
 }
 
 func MakeSetStrings(vs ...string) (s Set, err error) {
 	var s1 collections.ValueSet[Etikett, *Etikett]
 
-	if s1, err = collections.MakeSetStrings[Etikett, *Etikett](vs...); err != nil {
+	if s1, err = collections.MakeValueSetStrings[Etikett, *Etikett](vs...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -60,7 +60,7 @@ func Expanded(s Set, exes ...Expander) (out Set) {
 	s1 := MakeMutableSet()
 
 	for _, e := range s.Elements() {
-		s1.Merge(e.Expanded(exes...))
+		e.Expanded(exes...).Each(s1.Add)
 	}
 
 	out = s1.Copy()

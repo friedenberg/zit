@@ -70,6 +70,8 @@ func Make(
 		standort:  st,
 	}
 
+  s.protoZettel = zettel.MakeProtoZettel()
+
 	if err = s.protoZettel.Typ.Set(k.Compiled.DefaultTyp); err != nil {
 		err = errors.Wrap(err)
 		return

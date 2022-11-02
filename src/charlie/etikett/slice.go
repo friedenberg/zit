@@ -37,16 +37,6 @@ func (s Slice) Len() int {
 	return len(s)
 }
 
-func NewSlice(es ...Etikett) (s Slice) {
-	s = make([]Etikett, len(es))
-
-	for i, e := range es {
-		s[i] = e
-	}
-
-	return
-}
-
 func (es *Slice) AddString(v string) (err error) {
 	var e Etikett
 

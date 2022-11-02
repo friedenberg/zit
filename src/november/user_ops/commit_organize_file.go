@@ -90,7 +90,10 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 			return
 		}
 
-		z.Stored.Zettel.Etiketten.RemovePrefixes(e)
+		mes := z.Stored.Zettel.Etiketten.MutableCopy()
+		mes.RemovePrefixes(e)
+		z.Stored.Zettel.Etiketten = mes.Copy()
+
 		toUpdate[z.Hinweis.String()] = z
 
 		errors.PrintErrf("Removed etikett '%s' from zettel '%s'", e, z.Hinweis)

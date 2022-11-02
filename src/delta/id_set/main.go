@@ -101,13 +101,15 @@ func (s Set) AnyShasOrHinweisen() (ids []id.IdMitKorper) {
 	ids = make([]id.IdMitKorper, 0, s.shas.Len()+hinweisen.Len())
 
 	s.shas.Each(
-		func(sh sha.Sha) {
+		func(sh sha.Sha) (err error) {
 			ids = append(ids, sh)
+
+			return
 		},
 	)
 
 	hinweisen.Each(
-		func(h hinweis.Hinweis) {
+		func(h hinweis.Hinweis) (err error) {
 			ids = append(ids, h)
 
 			return

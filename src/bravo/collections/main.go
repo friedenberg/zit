@@ -38,3 +38,7 @@ type MutableSetLike[T any] interface {
 type ValueSetLike[T flag.Value] interface {
 	SetLike[T]
 }
+
+type MutableValueSetLike[T flag.Value] interface {
+	MutableSetLike[T]
+}

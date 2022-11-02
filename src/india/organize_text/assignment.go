@@ -207,6 +207,8 @@ func (a *assignment) consume(b *assignment) (err error) {
 }
 
 func (a *assignment) expandedEtiketten() (es etikett.Set, err error) {
+	es = etikett.MakeSet()
+
 	if a.etiketten.Len() != 1 || a.parent == nil {
 		es = a.etiketten.Copy()
 		return
@@ -243,7 +245,6 @@ func (a *assignment) expandedEtiketten() (es etikett.Set, err error) {
 		}
 
 		es = etikett.MakeSet(e)
-		errors.Print(es)
 	}
 
 	return

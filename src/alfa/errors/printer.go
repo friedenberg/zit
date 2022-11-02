@@ -22,13 +22,15 @@ func init() {
 	}
 
 	log = printer{
-		f: os.Stderr,
+		includesStack: true,
+		f:              os.Stderr,
 	}
 }
 
 type printer struct {
-	f  *os.File
-	on bool
+	f             *os.File
+	includesStack bool
+	on            bool
 }
 
 func Out() printer {
@@ -48,6 +50,7 @@ func (p printer) Print(a ...interface{}) (err error) {
 		return
 	}
 
+  //TODO add support for includesStack
 	_, err = fmt.Fprintln(
 		p.f,
 		a...,

@@ -2,8 +2,8 @@ package ts
 
 import collections "github.com/friedenberg/zit/src/bravo/collections"
 
-type MutableSet = collections.ValueMutableSet[Time, *Time]
+type MutableSet = collections.MutableValueSet[Time, *Time]
 
 func MakeMutableSet(hs ...Time) MutableSet {
-	return MutableSet(collections.MakeMutableSet[Time, *Time](hs...))
+	return MutableSet(collections.MakeMutableValueSet[Time, *Time](hs...))
 }

@@ -12,6 +12,12 @@ type ProtoZettel struct {
 	Etiketten   etikett.Set
 }
 
+func MakeProtoZettel() ProtoZettel {
+	return ProtoZettel{
+		Etiketten: etikett.MakeSet(),
+	}
+}
+
 func (pz ProtoZettel) Equals(z Zettel) (ok bool) {
 	var okTyp, okEt bool
 
@@ -44,7 +50,7 @@ func (pz ProtoZettel) Apply(z *Zettel) (ok bool) {
 	}
 
 	mes := z.Etiketten.MutableCopy()
-	mes.Merge(pz.Etiketten)
+	pz.Etiketten.Each(mes.Add)
 	z.Etiketten = mes.Copy()
 
 	return

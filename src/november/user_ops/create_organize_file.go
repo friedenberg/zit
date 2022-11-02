@@ -41,38 +41,3 @@ func (c CreateOrganizeFile) Run(zettels zettel_transacted.MutableSet) (results *
 
 	return
 }
-
-// func (c CreateOrganizeFile) GroupZettel(z stored_zettel.Named) (ess []etikett.Set) {
-// 	var set etikett.Set
-
-// 	if c.GroupBy.Len() > 0 {
-// 		set = z.Zettel.Etiketten.IntersectPrefixes(c.GroupBy.ToSet())
-// 	} else {
-// 		set = z.Zettel.Etiketten
-// 	}
-
-// 	set = set.Subtract(c.RootEtiketten)
-
-// 	if false /*c.GroupByUnique*/ {
-// 		ess = append(ess, set)
-// 	} else if set.Len() > 0 {
-// 		for _, e := range set {
-// 			ns := etikett.MakeSet()
-// 			ns.Add(e)
-// 			ess = append(ess, ns)
-// 		}
-// 	} else {
-// 		// if the zettel has no etiketten, add an empty set
-// 		ess = append(ess, etikett.MakeSet())
-// 	}
-
-// 	return ess
-// }
-
-// func (c CreateOrganizeFile) SortGroups(a, b etikett.Set) bool {
-// 	return a.String() < b.String()
-// }
-
-// func (c CreateOrganizeFile) SortZettels(a, b stored_zettel.Named) bool {
-// 	return a.Hinweis.String() < b.Hinweis.String()
-// }

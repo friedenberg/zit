@@ -29,6 +29,7 @@ func (ip Pool[T]) Put(i *T) {
 		return
 	}
 
+	//TODO-P0
 	// ii := interface{}(i)
 
 	// if r, ok := ii.(Resettable[*T]); ok {

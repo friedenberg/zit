@@ -1,51 +1,62 @@
 package collections
 
 import (
+	"io"
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
-type set[T ProtoObjekte, T1 interface {
+type mutableSetAlias[T any] struct {
+	MutableSet[T]
+}
+
+type MutableValueSet[T ProtoObjekte, T1 interface {
 	*T
 	ProtoObjektePointer
 }] struct {
-	ValueSet[T, T1]
+	mutableSetAlias[T]
 }
 
-type ValueMutableSet[T ProtoObjekte, T1 interface {
+func MakeMutableValueSet[T ProtoObjekte, T1 interface {
 	*T
 	ProtoObjektePointer
-}] struct {
-	set[T, T1]
-}
-
-func MakeMutableSet[T ProtoObjekte, T1 interface {
-	*T
-	ProtoObjektePointer
-}](es ...T) (s ValueMutableSet[T, T1]) {
-	s.set.ValueSet = MakeSet[T, T1](es...)
-
-	return
-}
-
-func MakeMutableSetStrings[T ProtoObjekte, T1 interface {
-	*T
-	ProtoObjektePointer
-}](es ...string) (s ValueMutableSet[T, T1], err error) {
-	if s.set.ValueSet, err = MakeSetStrings[T, T1](es...); err != nil {
-		err = errors.Wrap(err)
-		return
+}](es ...T) (s MutableValueSet[T, T1]) {
+	s.mutableSetAlias = mutableSetAlias[T]{
+		MutableSet: MakeMutableSetGeneric(
+			func(e T) string {
+				return e.String()
+			},
+			es...,
+		),
 	}
 
 	return
 }
 
-func (es ValueMutableSet[T, T1]) Add(e T) {
-	es.inner[e.String()] = e
+func MakeMutableValueSetStrings[T ProtoObjekte, T1 interface {
+	*T
+	ProtoObjektePointer
+}](vs ...string) (s MutableValueSet[T, T1], err error) {
+	es := make([]T, len(vs))
+
+	for i, v := range vs {
+		e1 := T1(new(T))
+
+		if err = e1.Set(v); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		es[i] = T(*e1)
+	}
+
+	s = MakeMutableValueSet[T, T1](es...)
+
+	return
 }
 
-func (es ValueMutableSet[T, T1]) AddString(v string) (err error) {
+func (es MutableValueSet[T, T1]) AddString(v string) (err error) {
 	e := T1(new(T))
 
 	if err = e.Set(v); err != nil {
@@ -53,52 +64,27 @@ func (es ValueMutableSet[T, T1]) AddString(v string) (err error) {
 		return
 	}
 
-	es.Add(*e)
+	err = es.Add(*e)
 
 	return
 }
 
-func (es ValueMutableSet[T, T1]) Remove(es1 ...T) {
-	for _, e := range es1 {
-		delete(es.inner, e.String())
-	}
+func (es MutableValueSet[T, T1]) RemovePrefixes(needle T) {
+	es.Chain(
+		func(e T) (err error) {
+			if !strings.HasPrefix(e.String(), needle.String()) {
+				err = io.EOF
+			}
+
+			return
+		},
+		es.Del,
+	)
 }
 
-func (es ValueMutableSet[T, T1]) RemovePrefixes(needle T) {
-	for haystack, _ := range es.inner {
-		if strings.HasPrefix(haystack, needle.String()) {
-			delete(es.inner, haystack)
-		}
-	}
-}
-
-func (a ValueMutableSet[T, T1]) Equals(b ValueMutableSet[T, T1]) bool {
-	return a.set.ValueSet.Equals(b.set.ValueSet)
-}
-
-func (s1 ValueMutableSet[T, T1]) Merge(s2 ValueSet[T, T1]) {
-	for _, e := range s2.inner {
-		s1.Add(e)
-	}
-}
-
-func (s1 ValueMutableSet[T, T1]) Reset(s2 ValueSet[T, T1]) {
-	for k, _ := range s1.inner {
-		delete(s1.inner, k)
-	}
-
-	for k, e := range s2.inner {
-		s1.inner[k] = e
-	}
-}
-
-func (s1 ValueMutableSet[T, T1]) Copy() (s2 ValueSet[T, T1]) {
-	s2 = MakeSet[T, T1]()
-	s2.open()
-	defer s2.close()
-
-	for _, e := range s1.inner {
-		s2.add(e)
+func (es MutableValueSet[T, T1]) Copy() (out ValueSet[T, T1]) {
+	out.setAlias = setAlias[T]{
+		Set: MakeSetGeneric[T](es.Key, es.Elements()...),
 	}
 
 	return

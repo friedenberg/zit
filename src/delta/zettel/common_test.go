@@ -2,14 +2,14 @@ package zettel
 
 import (
 	"strings"
-	"testing"
 
 	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/bravo/test_logz"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/charlie/typ"
 )
 
-func makeEtiketten(t *testing.T, vs ...string) (es etikett.Set) {
+func makeEtiketten(t test_logz.T, vs ...string) (es etikett.Set) {
 	var err error
 
 	if es, err = etikett.MakeSetStrings(vs...); err != nil {
@@ -19,7 +19,7 @@ func makeEtiketten(t *testing.T, vs ...string) (es etikett.Set) {
 	return
 }
 
-func makeAkteExt(t *testing.T, v string) (es typ.Typ) {
+func makeAkteExt(t test_logz.T, v string) (es typ.Typ) {
 	if err := es.Set(v); err != nil {
 		t.Fatalf("%s", err)
 	}
@@ -47,7 +47,7 @@ func (aw akteWriterFactory) AkteWriter() (sha.WriteCloser, error) {
 	return aw, nil
 }
 
-func readFormat(t *testing.T, f Format, contents string) (z Zettel, a string) {
+func readFormat(t test_logz.T, f Format, contents string) (z Zettel, a string) {
 	t.Helper()
 
 	awf := akteWriterFactory{

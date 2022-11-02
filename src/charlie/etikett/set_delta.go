@@ -16,7 +16,7 @@ func MakeSetDelta(s1, s2 Set) (d Delta) {
 			added.Add(e)
 		}
 
-		removed.Remove(e)
+		removed.Del(e)
 	}
 
 	d.Added = added.Copy()

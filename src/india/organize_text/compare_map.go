@@ -75,7 +75,7 @@ func (a *assignment) addToCompareMap(m Metadatei, es etikett.Set, out *CompareMa
 		return
 	}
 
-	mes.Merge(es1)
+	es1.Each(mes.Add)
 	es = mes.Copy()
 
 	for z, _ := range a.named {

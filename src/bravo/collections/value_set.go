@@ -8,194 +8,89 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
+type setAlias[T any] struct {
+	Set[T]
+}
+
 type ValueSet[T ProtoObjekte, T1 interface {
 	*T
 	ProtoObjektePointer
 }] struct {
-	keyFunc func(T) string
-	closed  bool
-	inner   map[string]T
+	setAlias[T]
 }
 
-func MakeSet[T ProtoObjekte, T1 interface {
+func MakeValueSet[T ProtoObjekte, T1 interface {
 	*T
 	ProtoObjektePointer
 }](es ...T) (s ValueSet[T, T1]) {
-	s.inner = make(map[string]T, len(es))
-	s.open()
-	defer s.close()
-
-	for _, e := range es {
-		s.add(e)
+	s.setAlias = setAlias[T]{
+		Set: MakeSetGeneric(
+			func(e T) string {
+				return e.String()
+			},
+			es...,
+		),
 	}
 
 	return
 }
 
-func MakeSetStrings[T ProtoObjekte, T1 interface {
+func MakeValueSetStrings[T ProtoObjekte, T1 interface {
 	*T
 	ProtoObjektePointer
-}](es ...string) (s ValueSet[T, T1], err error) {
-	s.inner = make(map[string]T, len(es))
-	s.open()
-	defer s.close()
+}](vs ...string) (s ValueSet[T, T1], err error) {
+	es := make([]T, len(vs))
 
-	for _, e := range es {
+	for i, v := range vs {
 		e1 := T1(new(T))
 
-		if err = e1.Set(e); err != nil {
+		if err = e1.Set(v); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		s.add(*e1)
+		es[i] = T(*e1)
 	}
+
+	s = MakeValueSet[T, T1](es...)
 
 	return
-}
-
-func (s *ValueSet[T, T1]) open() {
-	s.closed = false
-}
-
-func (s *ValueSet[T, T1]) close() {
-	s.closed = true
-}
-
-func (s ValueSet[T, T1]) Len() int {
-	return len(s.inner)
-}
-
-func (s ValueSet[T, T1]) GetKeyFunc() func(T) string {
-	if s.keyFunc == nil {
-		return func(e T) string {
-			return e.String()
-		}
-	}
-
-	return s.keyFunc
-}
-
-func (es ValueSet[T, T1]) add(e T) {
-	if es.closed {
-		panic("trying to add etikett to closed set")
-	}
-
-	es.inner[es.GetKeyFunc()(e)] = e
-}
-
-func (s ValueSet[T, T1]) Each(f func(T)) {
-	for _, v := range s.inner {
-		f(v)
-	}
 }
 
 func (s *ValueSet[T, T1]) Set(v string) (err error) {
-	if s == nil {
-		s1 := MakeSet[T, T1]()
-		s = &s1
-	}
+	parts := strings.Split(v, ",")
 
-	if s.closed {
-		err = errors.Errorf("trying to mutate closed set")
+	if *s, err = MakeValueSetStrings[T, T1](parts...); err != nil {
+		err = errors.Wrap(err)
 		return
-	}
-
-	s.inner = make(map[string]T, 1)
-
-	es := strings.Split(v, ",")
-
-	if len(es) == 0 {
-		return
-	}
-
-	if es[0] == "" {
-		return
-	}
-
-	for _, e := range es {
-		e1 := T1(new(T))
-
-		if err = e1.Set(e); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		s.add(*e1)
 	}
 
 	return
-}
-
-func (es *ValueSet[T, T1]) Remove(es1 ...T) {
-	for _, e := range es1 {
-		delete(es.inner, e.String())
-	}
-}
-
-func (es *ValueSet[T, T1]) RemovePrefixes(needle T) {
-	for haystack, _ := range es.inner {
-		if strings.HasPrefix(haystack, needle.String()) {
-			delete(es.inner, haystack)
-		}
-	}
-}
-
-func (a ValueSet[T, T1]) Equals(b ValueSet[T, T1]) bool {
-	if len(a.inner) != len(b.inner) {
-		return false
-	}
-
-	for ae, _ := range a.inner {
-		if _, ok := b.inner[ae]; !ok {
-			return false
-		}
-	}
-
-	return true
 }
 
 func (s1 ValueSet[T, T1]) Copy() (s2 ValueSet[T, T1]) {
-	s2 = MakeSet[T, T1]()
-	s2.open()
-	defer s2.close()
-
-	for _, e := range s1.inner {
-		s2.add(e)
-	}
+	s2 = MakeValueSet[T, T1](s1.Elements()...)
 
 	return
 }
 
-func (s1 ValueSet[T, T1]) MutableCopy() (s2 ValueMutableSet[T, T1]) {
-	s2 = MakeMutableSet[T, T1]()
-
-	for _, e := range s1.inner {
-		s2.Add(e)
-	}
+func (s1 ValueSet[T, T1]) MutableCopy() (s2 MutableValueSet[T, T1]) {
+	s2 = MakeMutableValueSet[T, T1]()
+	s1.Each(s2.Add)
 
 	return
 }
 
 func (s ValueSet[T, T1]) Strings() (out []string) {
-	out = make([]string, 0, len(s.inner))
+	out = make([]string, 0, s.Len())
 
-	for s, _ := range s.inner {
-		out = append(out, s)
-	}
+	s.Each(
+		func(e T) (err error) {
+			out = append(out, e.String())
 
-	return
-}
-
-func (es ValueSet[T, T1]) Elements() (out []T) {
-	out = make([]T, len(es.inner))
-
-	i := 0
-
-	for _, e := range es.inner {
-		out[i] = e
-		i++
-	}
+			return
+		},
+	)
 
 	return
 }
@@ -214,14 +109,15 @@ func (es ValueSet[T, T1]) Sorted() (out []T) {
 }
 
 func (es ValueSet[T, T1]) SortedString() (out []string) {
-	out = make([]string, len(es.inner))
+	out = make([]string, 0, es.Len())
 
-	i := 0
+	es.Each(
+		func(e T) (err error) {
+			out = append(out, e.String())
 
-	for _, e := range es.inner {
-		out[i] = e.String()
-		i++
-	}
+			return
+		},
+	)
 
 	sort.Slice(
 		out,
@@ -233,94 +129,44 @@ func (es ValueSet[T, T1]) SortedString() (out []string) {
 	return
 }
 
-func (s ValueSet[T, T1]) Contains(e T) bool {
-	return s.ContainsString(s.GetKeyFunc()(e))
-}
-
 func (s ValueSet[T, T1]) ContainsString(es string) bool {
-	_, ok := s.inner[es]
-	return ok
+	return s.ContainsKey(es)
 }
 
-func (a ValueSet[T, T1]) ContainsSet(b ValueSet[T, T1]) bool {
-	for _, e := range b.inner {
-		if !a.Contains(e) {
-			return false
-		}
-	}
+func (s1 ValueSet[T, T1]) IntersectPrefixes(s2 ValueSet[T, T1]) (out ValueSet[T, T1]) {
+	s3 := MakeMutableValueSet[T, T1]()
 
-	return true
-}
+	s2.Each(
+		func(e1 T) (err error) {
+			s1.Each(
+				func(e T) (err error) {
+					if strings.HasPrefix(e.String(), e1.String()) {
+						s3.Add(e)
+					}
 
-func (s1 ValueSet[T, T1]) Subtract(s2 ValueSet[T, T1]) (s3 ValueSet[T, T1]) {
-	s3 = MakeSet[T, T1]()
+					return
+				},
+			)
 
-	for _, e1 := range s1.inner {
-		if s2.Contains(e1) {
-			continue
-		}
-
-		s3.add(e1)
-	}
-
-	return
-}
-
-func (s1 ValueSet[T, T1]) IntersectPrefixes(s2 ValueSet[T, T1]) (s3 ValueSet[T, T1]) {
-	s3 = MakeSet[T, T1]()
-	s3.open()
-	defer s3.close()
-
-	for _, e1 := range s2.inner {
-		didAdd := false
-
-		for _, e := range s1.inner {
-			if strings.HasPrefix(e.String(), e1.String()) {
-				didAdd = true
-				s3.add(e)
-			}
-		}
-
-		if !didAdd {
-			s3 = MakeSet[T, T1]()
 			return
-		}
-	}
+		},
+	)
+
+	out = s3.Copy()
 
 	return
-}
-
-func (s1 ValueSet[T, T1]) Intersect(s2 ValueSet[T, T1]) (s3 ValueSet[T, T1]) {
-	s3 = MakeSet[T, T1]()
-
-	for _, e := range s1.inner {
-		if s2.Contains(e) {
-			s3.add(e)
-		}
-	}
-
-	return
-}
-
-func (s ValueSet[T, T1]) Any() (e T) {
-	for _, e1 := range s.inner {
-		e = e1
-		break
-	}
-
-	return e
 }
 
 func (es ValueSet[T, T1]) Description() string {
 	sb := &strings.Builder{}
 	first := true
 
-	for _, e1 := range es.Sorted() {
+	for _, e1 := range es.SortedString() {
 		if !first {
 			sb.WriteString(", ")
 		}
 
-		sb.WriteString(e1.String())
+		sb.WriteString(e1)
 
 		first = false
 	}
@@ -332,12 +178,12 @@ func (s ValueSet[T, T1]) String() string {
 	sb := &strings.Builder{}
 	first := true
 
-	for _, e1 := range s.Sorted() {
+	for _, e1 := range s.SortedString() {
 		if !first {
 			sb.WriteString(", ")
 		}
 
-		sb.WriteString(e1.String())
+		sb.WriteString(e1)
 
 		first = false
 	}
@@ -350,11 +196,6 @@ func (es ValueSet[T, T1]) MarshalJSON() ([]byte, error) {
 }
 
 func (es *ValueSet[T, T1]) UnmarshalJSON(b []byte) (err error) {
-	*es = MakeSet[T, T1]()
-
-	es.open()
-	defer es.close()
-
 	var vs []string
 
 	if err = json.Unmarshal(b, &vs); err != nil {
@@ -362,15 +203,9 @@ func (es *ValueSet[T, T1]) UnmarshalJSON(b []byte) (err error) {
 		return
 	}
 
-	for _, v := range vs {
-		var e T1
-
-		if err = e.Set(v); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		es.add(*e)
+	if *es, err = MakeValueSetStrings[T, T1](vs...); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return
@@ -383,11 +218,6 @@ func (s ValueSet[T, T1]) MarshalBinary() (text []byte, err error) {
 }
 
 func (s *ValueSet[T, T1]) UnmarshalBinary(text []byte) (err error) {
-	s.inner = make(map[string]T)
-
-	s.open()
-	defer s.close()
-
 	if err = s.Set(string(text)); err != nil {
 		return
 	}

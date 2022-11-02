@@ -120,7 +120,7 @@ func (s1 Set[T]) Chain(fs ...WriterFunc[T]) error {
 }
 
 func (s Set[T]) Elements() (out []T) {
-	out = make([]T, s.Len())
+	out = make([]T, 0, s.Len())
 
 	s.Each(
 		func(e T) (err error) {
@@ -153,12 +153,12 @@ func (s Set[T]) All(f WriterFunc[T]) (ok bool) {
 	return err == nil
 }
 
-func (a Set[T]) Equals(b Set[T]) (ok bool) {
+func (a Set[T]) Equals(b SetLike[T]) (ok bool) {
 	if a.Len() != b.Len() {
 		return
 	}
 
-	ok = a.All(b.WriterContainer())
+	ok = a.All(Set[T]{SetLike: b}.WriterContainer())
 
 	return
 }

@@ -2,9 +2,13 @@ package zettel
 
 import (
 	"testing"
+
+	"github.com/friedenberg/zit/src/bravo/test_logz"
 )
 
-func TestReadWithoutAkte(t *testing.T) {
+func TestReadWithoutAkte(t1 *testing.T) {
+	t := test_logz.T{T: t1}
+
 	actual, akte := readFormat(
 		t,
 		Text{},
@@ -37,7 +41,9 @@ func TestReadWithoutAkte(t *testing.T) {
 	}
 }
 
-func TestReadWithoutAkteWithMultilineBezeichnung(t *testing.T) {
+func TestReadWithoutAkteWithMultilineBezeichnung(t1 *testing.T) {
+	t := test_logz.T{T: t1}
+
 	actual, akte := readFormat(
 		t,
 		Text{},
@@ -71,7 +77,9 @@ func TestReadWithoutAkteWithMultilineBezeichnung(t *testing.T) {
 	}
 }
 
-func TestReadWithAkte(t *testing.T) {
+func TestReadWithAkte(t1 *testing.T) {
+	t := test_logz.T{T: t1}
+
 	actual, akte := readFormat(
 		t,
 		Text{},

@@ -113,7 +113,7 @@ func (atc AssignmentTreeConstructor) makeChildren(
 					child := newAssignment(intermediate.Depth() + 1)
 					child.etiketten = etikett.MakeSet(e.LeftSubtract(groupingEtiketten[0]))
 
-					nextGroupingEtiketten := etikett.NewSlice()
+					nextGroupingEtiketten := etikett.MakeSlice()
 
 					if groupingEtiketten.Len() > 1 {
 						nextGroupingEtiketten = groupingEtiketten[1:]
@@ -132,7 +132,7 @@ func (atc AssignmentTreeConstructor) makeChildren(
 				child := newAssignment(parent.Depth() + 1)
 				child.etiketten = etikett.MakeSet(e)
 
-				nextGroupingEtiketten := etikett.NewSlice()
+				nextGroupingEtiketten := etikett.MakeSlice()
 
 				if groupingEtiketten.Len() > 1 {
 					nextGroupingEtiketten = groupingEtiketten[1:]

@@ -39,7 +39,8 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &Add{
 				//TODO move to proper place
-				Typ: typ.Make("md"),
+				Typ:       typ.Make("md"),
+				Etiketten: etikett.MakeSet(),
 			}
 
 			f.BoolVar(&c.Dedupe, "dedupe", false, "deduplicate added Zettelen based on Akte sha")
@@ -83,14 +84,14 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
+	options := organize_text.MakeOptions()
+	options.Abbr = u.StoreObjekten()
+	options.RootEtiketten = c.Etiketten
+	options.Transacted = zettelsFromAkteResults
+
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
-		Umwelt: u,
-		Options: organize_text.Options{
-			Abbr:              u.StoreObjekten(),
-			GroupingEtiketten: etikett.NewSlice(),
-			RootEtiketten:     c.Etiketten,
-			Transacted:        zettelsFromAkteResults,
-		},
+		Umwelt:  u,
+		Options: options,
 	}
 
 	var createOrganizeFileResults *organize_text.Text

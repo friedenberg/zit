@@ -21,7 +21,7 @@ func (z *Zettel) Reset() {
 	z.Akte = sha.Sha{}
 	z.Typ = typ.Typ{}
 	z.Bezeichnung = bezeichnung.Bezeichnung("")
-	z.Etiketten = etikett.Set{}
+	z.Etiketten = etikett.MakeSet()
 }
 
 func (z Zettel) Description() (d string) {

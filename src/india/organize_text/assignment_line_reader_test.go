@@ -59,6 +59,11 @@ func TestAssignmentLineReaderOneHeadingNoZettels(t1 *testing.T) {
 
 	{
 		expected := etikett.MakeSet(etikett.Etikett{Value: "wow"})
+
+		if len(sub.root.children) < 1 {
+			t.Fatalf("expected exactly 1 child")
+		}
+
 		actual := sub.root.children[0].etiketten
 
 		if !actual.Equals(expected) {

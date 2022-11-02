@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/bravo/test_logz"
 )
 
 type noopCloser struct {
@@ -19,7 +20,7 @@ func (c noopCloser) Close() error {
 }
 
 type akteReaderFactory struct {
-	t     *testing.T
+	t     test_logz.T
 	akten map[string]string
 }
 
@@ -36,7 +37,7 @@ func (arf akteReaderFactory) AkteReader(s sha.Sha) (r io.ReadCloser, err error) 
 	return
 }
 
-func writeFormat(t *testing.T, z Zettel, f Format, includeAkte bool, akteBody string) (out string) {
+func writeFormat(t test_logz.T, z Zettel, f Format, includeAkte bool, akteBody string) (out string) {
 	hash := sha256.New()
 	_, err := io.Copy(hash, strings.NewReader(akteBody))
 
@@ -76,7 +77,9 @@ func writeFormat(t *testing.T, z Zettel, f Format, includeAkte bool, akteBody st
 	return
 }
 
-func TestWriteWithoutAkte(t *testing.T) {
+func TestWriteWithoutAkte(t1 *testing.T) {
+	t := test_logz.T{T: t1}
+
 	z := Zettel{
 		Bezeichnung: "the title",
 		Etiketten: makeEtiketten(t,
@@ -103,7 +106,9 @@ func TestWriteWithoutAkte(t *testing.T) {
 	}
 }
 
-func TestWriteWithInlineAkte(t *testing.T) {
+func TestWriteWithInlineAkte(t1 *testing.T) {
+	t := test_logz.T{T: t1}
+
 	z := Zettel{
 		Bezeichnung: "the title",
 		Etiketten: makeEtiketten(t,

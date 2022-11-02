@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/line_format"
 	"github.com/friedenberg/zit/src/bravo/metadatei_io"
+	"github.com/friedenberg/zit/src/charlie/etikett"
 )
 
 type Text struct {
@@ -36,6 +37,9 @@ func newWithoutMetadatei(options Options) (ot *Text, err error) {
 	ot = &Text{
 		Options:    options,
 		assignment: newAssignment(0),
+		Metadatei: Metadatei{
+			Set: etikett.MakeSet(),
+		},
 	}
 
 	ot.assignment.isRoot = true

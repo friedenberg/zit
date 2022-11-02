@@ -7,13 +7,13 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
-type setGeneric[T any] struct {
+type set[T any] struct {
 	keyFunc func(T) string
 	closed  bool
 	inner   map[string]T
 }
 
-func makeSetGeneric[T any](kf KeyFunc[T], es ...T) (s setGeneric[T]) {
+func makeSetGeneric[T any](kf KeyFunc[T], es ...T) (s set[T]) {
 	t := *new(T)
 
 	//confirms that the key function supports nil pointers properly
@@ -35,28 +35,28 @@ func makeSetGeneric[T any](kf KeyFunc[T], es ...T) (s setGeneric[T]) {
 	return
 }
 
-func (s *setGeneric[T]) open() {
+func (s *set[T]) open() {
 	s.closed = false
 }
 
-func (s *setGeneric[T]) close() {
+func (s *set[T]) close() {
 	s.closed = true
 }
 
-func (s setGeneric[T]) Len() int {
+func (s set[T]) Len() int {
 	return len(s.inner)
 }
 
-func (s setGeneric[T]) Key(e T) string {
+func (s set[T]) Key(e T) string {
 	return s.keyFunc(e)
 }
 
-func (s setGeneric[T]) Get(k string) (e T, ok bool) {
+func (s set[T]) Get(k string) (e T, ok bool) {
 	e, ok = s.inner[k]
 	return
 }
 
-func (s setGeneric[T]) ContainsKey(k string) (ok bool) {
+func (s set[T]) ContainsKey(k string) (ok bool) {
 	if k == "" {
 		return
 	}
@@ -66,11 +66,11 @@ func (s setGeneric[T]) ContainsKey(k string) (ok bool) {
 	return
 }
 
-func (s setGeneric[T]) Contains(e T) (ok bool) {
+func (s set[T]) Contains(e T) (ok bool) {
 	return s.ContainsKey(s.Key(e))
 }
 
-func (es setGeneric[T]) add(e T) (err error) {
+func (es set[T]) add(e T) (err error) {
 	if es.closed {
 		panic(fmt.Sprintf("trying to add %T to closed set", e))
 	}
@@ -80,7 +80,7 @@ func (es setGeneric[T]) add(e T) (err error) {
 	return
 }
 
-func (s setGeneric[T]) EachKey(wf WriterFuncKey) (err error) {
+func (s set[T]) EachKey(wf WriterFuncKey) (err error) {
 	for v, _ := range s.inner {
 		if err = wf(v); err != nil {
 			if errors.IsEOF(err) {
@@ -96,8 +96,7 @@ func (s setGeneric[T]) EachKey(wf WriterFuncKey) (err error) {
 	return
 }
 
-// TODO should this be locked mutable writes?
-func (s setGeneric[T]) Each(wf WriterFunc[T]) (err error) {
+func (s set[T]) Each(wf WriterFunc[T]) (err error) {
 	for _, v := range s.inner {
 		if err = wf(v); err != nil {
 			if errors.IsEOF(err) {

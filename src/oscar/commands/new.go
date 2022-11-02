@@ -48,6 +48,7 @@ func init() {
 			c := &New{
 				//TODO move to proper place
 				// Typ: typ.Make(""),
+				Etiketten: etikett.MakeSet(),
 			}
 
 			f.BoolVar(&c.Delete, "delete", false, "delete the zettel and akte after successful checkin")
@@ -170,7 +171,7 @@ func (c New) writeNewZettels(
 	}
 
 	mes := c.Etiketten.MutableCopy()
-	mes.Merge(defaultEtiketten)
+	defaultEtiketten.Each(mes.Add)
 	c.Etiketten = mes.Copy()
 
 	z := zettel.Zettel{

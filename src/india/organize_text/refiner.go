@@ -111,6 +111,7 @@ func (atc *Refiner) renameForPrefixJoint(a *assignment) (err error) {
 		return
 	}
 
+  //IS THIS THE BUG?
 	a.etiketten = etikett.MakeSet(a.etiketten.Any().LeftSubtract(a.parent.etiketten.Any()))
 
 	return
@@ -133,22 +134,22 @@ func (atc *Refiner) Refine(a *assignment) (err error) {
 		return
 	}
 
-	if atc.shouldMergeIntoParent(a) {
-		errors.Print("merging into parent")
-		p := a.parent
+	// if atc.shouldMergeIntoParent(a) {
+	// 	errors.Print("merging into parent")
+	// 	p := a.parent
 
-		if err = p.consume(a); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	// 	if err = p.consume(a); err != nil {
+	// 		err = errors.Wrap(err)
+	// 		return
+	// 	}
 
-		return atc.Refine(p)
-	}
+	// 	return atc.Refine(p)
+	// }
 
-	if err = atc.applyPrefixJoints(a); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	// if err = atc.applyPrefixJoints(a); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
 
 	if err = atc.renameForPrefixJoint(a); err != nil {
 		err = errors.Wrap(err)
@@ -162,21 +163,16 @@ func (atc *Refiner) Refine(a *assignment) (err error) {
 		}
 	}
 
-	if err = atc.applyPrefixJoints(a); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	// if err = atc.applyPrefixJoints(a); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
 
 	sort.Slice(a.children, func(i, j int) bool {
 		return a.children[i].etiketten.String() < a.children[j].etiketten.String()
 	})
 
 	return
-}
-
-type etikettBag struct {
-	etikett.Etikett
-	assignments []*assignment
 }
 
 func (atc Refiner) applyPrefixJoints(a *assignment) (err error) {
@@ -222,6 +218,11 @@ func (atc Refiner) applyPrefixJoints(a *assignment) (err error) {
 	return
 }
 
+type etikettBag struct {
+	etikett.Etikett
+	assignments []*assignment
+}
+
 func (a Refiner) childPrefixes(node *assignment) (out []etikettBag) {
 	m := make(map[etikett.Etikett][]*assignment)
 	out = make([]etikettBag, 0, len(node.children))
@@ -231,22 +232,28 @@ func (a Refiner) childPrefixes(node *assignment) (out []etikettBag) {
 	}
 
 	for _, c := range node.children {
-		for _, e := range etikett.Expanded(c.etiketten, etikett.ExpanderRight{}).Elements() {
-			if e.String() == "" {
-				continue
-			}
+		expanded := etikett.Expanded(c.etiketten, etikett.ExpanderRight{})
 
-			var n []*assignment
-			ok := false
+		expanded.Each(
+			func(e etikett.Etikett) (err error) {
+				if e.String() == "" {
+					return
+				}
 
-			if n, ok = m[e]; !ok {
-				n = make([]*assignment, 0)
-			}
+				var n []*assignment
+				ok := false
 
-			n = append(n, c)
+				if n, ok = m[e]; !ok {
+					n = make([]*assignment, 0)
+				}
 
-			m[e] = n
-		}
+				n = append(n, c)
+
+				m[e] = n
+
+				return
+			},
+		)
 	}
 
 	for e, n := range m {
