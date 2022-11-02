@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/id"
@@ -24,6 +25,9 @@ func (s *Store) Checkout(
 	if err = s.storeObjekten.ReadAllSchwanzenTransacted(
 		ztw,
 		zettel_transacted.MakeWriter(zts.Add),
+		zettel_transacted.MakeWriter(
+			collections.MakeWriterDoNotRepool[zettel_transacted.Zettel](),
+		),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

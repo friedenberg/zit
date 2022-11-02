@@ -1,8 +1,8 @@
 package collections
 
-func MakeWriterNil[T any]() WriterFunc[*T] {
+func MakeWriterDoNotRepool[T any]() WriterFunc[*T] {
 	return func(e *T) (err error) {
-		e = nil
+		err = ErrDoNotRepool{}
 		return
 	}
 }

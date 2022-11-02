@@ -17,6 +17,11 @@ type WriterFunc[T any] func(T) error
 type WriterFuncWithKey[T any] func(string, T) error
 type WriterFuncKey func(string) error
 
+type PoolLike[T any] interface {
+	Get() *T
+	Put(i *T) (err error)
+}
+
 type SetLike[T any] interface {
 	Len() int
 	Key(T) string

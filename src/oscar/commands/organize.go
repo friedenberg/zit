@@ -8,6 +8,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
+	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
@@ -162,6 +163,9 @@ func (c *Organize) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 				},
 			},
 			zettel_transacted.MakeWriter(getResults.Add),
+			zettel_transacted.MakeWriter(
+				collections.MakeWriterDoNotRepool[zettel_transacted.Zettel](),
+			),
 		),
 	}
 

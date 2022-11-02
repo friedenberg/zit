@@ -129,7 +129,7 @@ func (i *Zettelen) ReadMany(
 	ch := make(chan struct{}, PageCount)
 
 	w1 := zettel_verzeichnisse.MakeWriterChain(ws...)
-	w := zettel_verzeichnisse.MakeWriterChain(w1, i.pool)
+	w := w1.ToPooledChain().WriterWithPool(i.pool)
 
 	for n, p := range i.pages {
 		wg.Add(1)
@@ -141,7 +141,7 @@ func (i *Zettelen) ReadMany(
 			}(openFileCh)
 
 			for {
-				if err = p.WriteZettelenTo(w); err != nil {
+				if err = p.WriteZettelenTo(zettel_verzeichnisse.MakeWriter(w)); err != nil {
 					if errors.IsTooManyOpenFiles(err) {
 						<-openFileCh
 						continue

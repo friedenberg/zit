@@ -251,11 +251,9 @@ func (zp *Page) WriteTo(w1 io.Writer) (n int64, err error) {
 
 	defer errors.PanicIfError(w.Flush)
 
-	wm := zp.pool.PutAlways(
-		zettel_verzeichnisse.MakeWriterChain(
-			zettel_verzeichnisse.MakeWriter(zp.flushFilter),
-			zettel_verzeichnisse.MakeWriterGobEncoder(w),
-		),
+	wm := zettel_verzeichnisse.MakeWriterChain(
+		zettel_verzeichnisse.MakeWriter(zp.flushFilter),
+		zettel_verzeichnisse.MakeWriterGobEncoder(w),
 	)
 
 	if err = zp.WriteZettelenTo(wm); err != nil {

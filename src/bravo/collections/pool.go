@@ -1,6 +1,8 @@
 package collections
 
-import "sync"
+import (
+	"sync"
+)
 
 type Resettable[T any] interface {
 	Reset(T)
@@ -25,18 +27,19 @@ func (ip Pool[T]) Get() *T {
 }
 
 func (ip Pool[T]) Put(i *T) (err error) {
-	return
-	// if i == nil {
-	// 	return
-	// }
-
-	// ii := interface{}(i)
-
-	// if r, ok := ii.(Resettable[*T]); ok {
-	// 	r.Reset(nil)
-	// }
-
-	// ip.inner.Put(i)
-
+	// errors.Err().Print("tried to put")
 	// return
+	if i == nil {
+		panic("tried to pool nil")
+	}
+
+	ii := interface{}(i)
+
+	if r, ok := ii.(Resettable[*T]); ok {
+		r.Reset(nil)
+	}
+
+	ip.inner.Put(i)
+
+	return
 }
