@@ -104,11 +104,11 @@ func (c CatObjekte) akteShasFromIds(
 
 	if err = u.StoreObjekten().ReadAllSchwanzenVerzeichnisse(
 		zettel_verzeichnisse.WriterZettelTransacted{
-			Writer: zettel_transacted.WriterZettelNamed{
-				Writer: zettel_named.FilterIdSet{
+			Writer: zettel_transacted.MakeWriterZettelNamed(
+				zettel_named.FilterIdSet{
 					Set: ids,
-				},
-			},
+				}.WriteZettelNamed,
+			),
 		},
 		zettel_verzeichnisse.WriterZettelTransacted{
 			Writer: zettel_transacted.MakeWriter(zettelen.Add),
@@ -136,6 +136,7 @@ func (c CatObjekte) akteShasFromIds(
 	return
 }
 
+// TODO move to stream
 func (c CatObjekte) akten(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 	var zettelen zettel_transacted.MutableSet
 
@@ -191,13 +192,11 @@ func (c CatObjekte) akten(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 func (c CatObjekte) zettelen(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 	w := zettel_transacted.MakeWriterChain(
-		zettel_transacted.WriterZettelNamed{
-			Writer: zettel_named.WriterFilter{
-				NamedFilter: zettel_named.FilterIdSet{
-					Set: ids,
-				},
-			},
-		},
+		zettel_transacted.MakeWriterZettelNamed(
+			zettel_named.FilterIdSet{
+				Set: ids,
+			}.WriteZettelNamed,
+		),
 		zettel_transacted.MakeWriterZettel(
 			zettel.MakeSerializedFormatWriter(
 				&zettel.Objekte{},

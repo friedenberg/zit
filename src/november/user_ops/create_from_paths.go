@@ -63,9 +63,9 @@ func (c CreateFromPaths) Run(args ...string) (results zettel_transacted.MutableS
 	if c.Dedupe {
 		matcher := zettel_external.MakeMutableMatchSet(toCreate)
 
-		writerMatches := zettel_transacted.WriterZettelNamed{
-			Writer: zettel_named.WriterFunc(matcher.WriterZettelNamed()),
-		}
+		writerMatches := zettel_transacted.MakeWriterZettelNamed(
+			matcher.WriterZettelNamed(),
+		)
 
 		if err = c.StoreObjekten().ReadAllTransacted(
 			writerMatches,

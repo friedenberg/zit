@@ -111,13 +111,11 @@ func (c Show) RunWithIds(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 func (c Show) showZettels(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 	w := zettel_transacted.MakeWriterChain(
-		zettel_transacted.WriterZettelNamed{
-			Writer: zettel_named.WriterFilter{
-				NamedFilter: zettel_named.FilterIdSet{
-					Set: ids,
-				},
-			},
-		},
+		zettel_transacted.MakeWriterZettelNamed(
+			zettel_named.FilterIdSet{
+				Set: ids,
+			}.WriteZettelNamed,
+		),
 		zettel_transacted.MakeWriterZettel(
 			zettel.MakeSerializedFormatWriter(
 				zettel.Text{},

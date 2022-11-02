@@ -21,6 +21,19 @@ func (w writer) WriteZettelTransacted(z *Zettel) (err error) {
 	return collections.WriterFunc[*Zettel](w)(z)
 }
 
+func MakeWriterZettelNamed(wf collections.WriterFunc[*zettel_named.Zettel]) Writer {
+	return MakeWriter(
+		func(z *Zettel) (err error) {
+			if err = wf(&z.Named); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+	)
+}
+
 func MakeWriterZettel(wf collections.WriterFunc[*zettel.Zettel]) Writer {
 	return MakeWriter(
 		func(z *Zettel) (err error) {
@@ -32,12 +45,4 @@ func MakeWriterZettel(wf collections.WriterFunc[*zettel.Zettel]) Writer {
 			return
 		},
 	)
-}
-
-type WriterZettelNamed struct {
-	zettel_named.Writer
-}
-
-func (w WriterZettelNamed) WriteZettelTransacted(z *Zettel) (err error) {
-	return w.WriteZettelNamed(&z.Named)
 }

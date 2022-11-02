@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/delta/zettel"
-	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 	"github.com/friedenberg/zit/src/golf/zettel_external"
 	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
 	"github.com/friedenberg/zit/src/mike/umwelt"
@@ -60,9 +59,9 @@ func (c ZettelFromExternalAkte) Run(
 	if c.Dedupe {
 		matcher := zettel_external.MakeMutableMatchSet(toCreate)
 
-		writerMatches := zettel_transacted.WriterZettelNamed{
-			Writer: zettel_named.WriterFunc(matcher.WriterZettelNamed()),
-		}
+		writerMatches := zettel_transacted.MakeWriterZettelNamed(
+			matcher.WriterZettelNamed(),
+		)
 
 		if err = c.StoreObjekten().ReadAllTransacted(
 			writerMatches,
