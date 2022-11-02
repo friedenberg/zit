@@ -2,7 +2,7 @@
 
 rm -rf build_options
 gmake
-go clean
+go clean --cache
 git add .
 git commit -m update || true
 git push
