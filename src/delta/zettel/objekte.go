@@ -61,10 +61,11 @@ func (f Objekte) WriteTo(c FormatContextWrite) (n int64, err error) {
 
 func (f *Objekte) ReadFrom(c *FormatContextRead) (n int64, err error) {
 	etiketten := etikett.MakeMutableSet()
-	in := c.In
-	z := c.Zettel
 
-	r := bufio.NewReader(in)
+	var z *Zettel
+	z = &c.Zettel
+
+	r := bufio.NewReader(c.In)
 
 	for {
 		var lineOriginal string
