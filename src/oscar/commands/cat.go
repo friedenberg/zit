@@ -1,12 +1,12 @@
 package commands
 
 import (
-	"encoding/json"
 	"flag"
 	"sort"
 	"syscall"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/etikett"
@@ -86,73 +86,38 @@ func (c Cat) etiketten(u *umwelt.Umwelt) (err error) {
 	return
 }
 
-func (c Cat) zettelen(u *umwelt.Umwelt) (err error) {
-	//TODO switch to stream
-	all := zettel_transacted.MakeMutableSetUnique(0)
+func (c Cat) zettelWriter(
+	u *umwelt.Umwelt,
+) collections.WriterFunc[*zettel.Zettel] {
+	switch c.Format {
+	case "json":
+		return zettel.MakeSerializedFormatWriter(
+			zettel.JsonObjekte{},
+			u.Out(),
+			u.StoreObjekten(),
+			u.Konfig(),
+		)
 
-	if err = u.StoreObjekten().ReadAllSchwanzenTransacted(
-		zettel_transacted.MakeWriter(all.Add),
-	); err != nil {
+	default:
+		return zettel.MakeSerializedFormatWriter(
+			zettel.Text{},
+			u.Out(),
+			u.StoreObjekten(),
+			u.Konfig(),
+		)
+	}
+}
+
+func (c Cat) zettelen(u *umwelt.Umwelt) (err error) {
+	w := zettel_transacted.MakeWriterChain(
+		zettel_transacted.MakeWriterZettel(
+			c.zettelWriter(u),
+		),
+	)
+
+	if err = u.StoreObjekten().ReadAllSchwanzenTransacted(w); err != nil {
 		err = errors.Wrap(err)
 		return
-	}
-
-	if c.Format == "json" {
-
-		// not a bottleneck
-		all.Each(
-			func(z *zettel_transacted.Zettel) (err error) {
-				var b []byte
-
-				b, err = json.Marshal(z.Named.Stored)
-
-				if err != nil {
-					err = errors.PrintErr(err)
-				} else {
-					err = errors.PrintOut(string(b))
-				}
-
-				if err != nil {
-					//TODO combined error
-					err = errors.IsAsNilOrWrapf(
-						err,
-						syscall.EPIPE,
-						"Zettel: %s",
-						z.Named.Hinweis,
-					)
-
-					return
-				}
-
-				return
-			},
-		)
-	} else {
-		f := zettel.Text{}
-
-		c := zettel.FormatContextWrite{
-			Out: u.Out(),
-		}
-
-		// not a bottleneck
-		all.Each(
-			func(z *zettel_transacted.Zettel) (err error) {
-				c.Zettel = z.Named.Stored.Zettel
-
-				if _, err = f.WriteTo(c); err != nil {
-					err = errors.IsAsNilOrWrapf(
-						err,
-						syscall.EPIPE,
-						"Zettel: %s",
-						z.Named.Hinweis,
-					)
-
-					return
-				}
-
-				return
-			},
-		)
 	}
 
 	return

@@ -63,10 +63,10 @@ func (op FilterZettelsWithScript) Run() (err error) {
 		op.Set.Chain(
 			func(z *zettel_transacted.Zettel) (err error) {
 				ok := hinweisen.Contains(z.Named.Hinweis)
-				errors.Print(ok)
 
-				if !ok {
+				if ok {
 					err = io.EOF
+					return
 				}
 
 				return
