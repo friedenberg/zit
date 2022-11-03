@@ -80,7 +80,6 @@ func (c CatObjekte) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 	return
 }
 
-// TODO switch to idset semantics
 func (c CatObjekte) RunWithIds(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 	switch c.Type {
 
@@ -96,6 +95,7 @@ func (c CatObjekte) RunWithIds(store *umwelt.Umwelt, ids id_set.Set) (err error)
 	}
 }
 
+//TODO switch to stream semantics
 func (c CatObjekte) akteShasFromIds(
 	u *umwelt.Umwelt,
 	ids id_set.Set,
@@ -109,12 +109,13 @@ func (c CatObjekte) akteShasFromIds(
 				Set: ids,
 			}.WriteZettelNamed,
 		),
-		zettel_verzeichnisse.MakeWriterZettelTransacted(zettelen.Add),
+		zettel_verzeichnisse.MakeWriterZettelTransacted(zettelen.AddAndDoNotRepool),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
+	//TODO add back support for changed akte in working directory
 	// for _, h := range ids.Hinweisen().Elements() {
 	// 	var zc zettel_checked_out.Zettel
 
@@ -133,7 +134,7 @@ func (c CatObjekte) akteShasFromIds(
 	return
 }
 
-// TODO move to stream
+//TODO switch to stream semantics
 func (c CatObjekte) akten(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 	var zettelen zettel_transacted.MutableSet
 
