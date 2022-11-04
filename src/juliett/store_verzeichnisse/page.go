@@ -128,8 +128,6 @@ func (zp *Page) WriteZettelenTo(
 		}
 	}
 
-	// errors.Printf("reading page: %s", zp.path)
-
 	defer r.Close()
 
 	r1 := bufio.NewReader(r)

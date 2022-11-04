@@ -349,11 +349,6 @@ func (s *Store) Read(p string) (cz zettel_checked_out.Zettel, err error) {
 
 		cz.DetermineState()
 
-		// filter := func(tz zettel_transacted.Zettel) (ok bool, err error) {
-		// 	ok = !tz.Named.Hinweis.Equals(cz.External.Named.Hinweis)
-		// 	return
-		// }
-
 		if cz.State > zettel_checked_out.StateExistsAndSame {
 			//TODO rewrite with verzeichnisseAll
 			// exSha := cz.External.Named.Stored.Sha

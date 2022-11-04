@@ -127,6 +127,18 @@ func (i *Zettelen) ReadMany(
 ) (err error) {
 	wg := &sync.WaitGroup{}
 	ch := make(chan struct{}, PageCount)
+	chErr := make(chan error)
+	chDone := make(chan struct{})
+
+	isDone := func() bool {
+		select {
+		case <-chDone:
+			return true
+
+		default:
+			return false
+		}
+	}
 
 	w1 := zettel_verzeichnisse.MakeWriterChain(ws...)
 	w := w1.ToPooledChain().WriterWithPool(i.pool)
@@ -141,16 +153,29 @@ func (i *Zettelen) ReadMany(
 			}(openFileCh)
 
 			for {
-				if err = p.WriteZettelenTo(zettel_verzeichnisse.MakeWriter(w)); err != nil {
-					if errors.IsTooManyOpenFiles(err) {
-						<-openFileCh
-						continue
+				if isDone() {
+					break
+				}
+
+				var err1 error
+
+				if err1 = p.WriteZettelenTo(zettel_verzeichnisse.MakeWriter(w)); err1 != nil {
+					if isDone() {
+						break
 					}
 
-					//TODO hand back error
-					err = errors.Wrap(err)
-					errors.Err().Print(err)
-					// return
+					switch {
+					case errors.IsTooManyOpenFiles(err1):
+						<-openFileCh
+						continue
+
+					case errors.IsEOF(err1):
+						break
+
+					default:
+						chErr <- err1
+						break
+					}
 				}
 
 				break
@@ -158,6 +183,11 @@ func (i *Zettelen) ReadMany(
 
 		}(n, p, ch)
 	}
+
+	go func() {
+		err = <-chErr
+		close(chDone)
+	}()
 
 	wg.Wait()
 

@@ -108,7 +108,6 @@ func (s Store) AkteWriter() (w sha.WriteCloser, err error) {
 
 func (s Store) AkteReader(sha sha.Sha) (r io.ReadCloser, err error) {
 	if sha.IsNull() {
-		//TODO move to files?
 		r = ioutil.NopCloser(bytes.NewReader(nil))
 		return
 	}
