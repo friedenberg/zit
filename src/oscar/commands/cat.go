@@ -3,7 +3,6 @@ package commands
 import (
 	"flag"
 	"fmt"
-	"sort"
 	"syscall"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -166,33 +165,22 @@ func (c Cat) hinweisen(u *umwelt.Umwelt) (err error) {
 }
 
 func (c Cat) typen(u *umwelt.Umwelt) (err error) {
-	//TODO switch to stream
-	all := zettel_transacted.MakeMutableSetUnique(0)
+	typen := collections.MakeMutableValueSet[typ.Typ, *typ.Typ]()
 
 	if err = u.StoreObjekten().ReadAllSchwanzenTransacted(
-		zettel_transacted.MakeWriter(all.Add),
+		zettel_transacted.MakeWriter(
+			func(z *zettel_transacted.Zettel) (err error) {
+				err = typen.Add(z.Named.Stored.Zettel.Typ)
+
+				return
+			},
+		),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	typen := make(map[typ.Typ]bool)
-
-	all.Each(
-		func(z *zettel_transacted.Zettel) (err error) {
-			typen[z.Named.Stored.Zettel.Typ] = true
-
-			return
-		},
-	)
-
-	sortedTypen := make([]typ.Typ, 0, len(typen))
-
-	for t, _ := range typen {
-		sortedTypen = append(sortedTypen, t)
-	}
-
-	sort.Slice(sortedTypen, func(i, j int) bool { return sortedTypen[i].Less(sortedTypen[j].Etikett) })
+	sortedTypen := typen.Copy().SortedString()
 
 	for _, t := range sortedTypen {
 		errors.PrintOut(t)
