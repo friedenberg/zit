@@ -2,6 +2,7 @@ package commands
 
 import (
 	"flag"
+	"fmt"
 	"sort"
 	"syscall"
 
@@ -11,6 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/charlie/typ"
+	"github.com/friedenberg/zit/src/delta/id_set"
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
 	"github.com/friedenberg/zit/src/mike/umwelt"
@@ -32,13 +34,13 @@ func init() {
 			f.Var(&c.Gattung, "gattung", "ObjekteType")
 			f.StringVar(&c.Format, "format", "", "ObjekteType")
 
-			return c
+			return commandWithIds{c}
 		},
 	)
 }
 
 // TODO move to types as args
-func (c Cat) Run(u *umwelt.Umwelt, args ...string) (err error) {
+func (c Cat) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	switch c.Gattung {
 	case gattung.Etikett:
 		err = c.etiketten(u)
@@ -47,7 +49,7 @@ func (c Cat) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		err = c.zettelen(u)
 
 	case gattung.Akte:
-		err = c.akten(u)
+		err = c.akten(u, ids)
 
 	case gattung.Hinweis:
 		err = c.hinweisen(u)
@@ -123,24 +125,38 @@ func (c Cat) zettelen(u *umwelt.Umwelt) (err error) {
 	return
 }
 
-func (c Cat) akten(u *umwelt.Umwelt) (err error) {
-	var shas []sha.Sha
-
-	if shas, err = u.StoreAkten().All(); err != nil {
+func (c Cat) akten(u *umwelt.Umwelt, ids id_set.Set) (err error) {
+	if err = u.StoreObjekten().ReadAllAktenShas(
+		func(s sha.Sha) (err error) {
+			_, err = fmt.Fprintln(u.Out(), s)
+			return
+		},
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+	// w := zettel_transacted.MakeWriterChain(
+	// 	zettel_transacted.MakeWriterZettelNamed(
+	// 		zettel_named.FilterIdSet{
+	// 			AllowEmpty: true,
+	// 			Set:        ids,
+	// 		}.WriteZettelNamed,
+	// 	),
+	// 	zettel_transacted.MakeWriterZettel(
+	// 		collections.MakeSyncSerializer(
+	// 			func(z *zettel.Zettel) (err error) {
+	// 				_, err = fmt.Fprintln(u.Out(), z.Akte.String())
 
-	for _, s := range shas {
-		if err = errors.PrintOut(s); err != nil {
-			if errors.Is(err, syscall.EPIPE) {
-				err = nil
-				break
-			} else {
-				errors.Print(err)
-			}
-		}
-	}
+	// 				return
+	// 			},
+	// 		),
+	// 	),
+	// )
+
+	// if err = u.StoreObjekten().ReadAllSchwanzenTransacted(w); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
 
 	return
 }

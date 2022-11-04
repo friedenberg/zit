@@ -5,7 +5,7 @@ type MutableSet[T any] struct {
 	MutableSetLike[T]
 }
 
-func MakeMutableSetGeneric[T any](kf KeyFunc[T], es ...T) (out MutableSet[T]) {
+func MakeMutableSet[T any](kf KeyFunc[T], es ...T) (out MutableSet[T]) {
 	out.MutableSetLike = makeMutableSet(kf, es...)
 	out.setAlias = setAlias[T]{Set: Set[T]{SetLike: out.MutableSetLike}}
 
@@ -13,7 +13,7 @@ func MakeMutableSetGeneric[T any](kf KeyFunc[T], es ...T) (out MutableSet[T]) {
 }
 
 func (s MutableSet[T]) AddAndDoNotRepool(e T) (err error) {
-  s.Add(e)
-  err = ErrDoNotRepool{}
-  return
+	s.Add(e)
+	err = ErrDoNotRepool{}
+	return
 }

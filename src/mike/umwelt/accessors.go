@@ -5,7 +5,6 @@ import (
 
 	"github.com/friedenberg/zit/src/charlie/konfig"
 	"github.com/friedenberg/zit/src/delta/standort"
-	"github.com/friedenberg/zit/src/echo/akten"
 	"github.com/friedenberg/zit/src/india/zettel_verzeichnisse"
 	"github.com/friedenberg/zit/src/kilo/store_objekten"
 	"github.com/friedenberg/zit/src/lima/store_working_directory"
@@ -34,10 +33,6 @@ func (u *Umwelt) Err() io.Writer {
 
 func (u *Umwelt) Standort() standort.Standort {
 	return u.standort
-}
-
-func (u *Umwelt) StoreAkten() akten.Akten {
-	return u.akten
 }
 
 func (u *Umwelt) StoreObjekten() *store_objekten.Store {

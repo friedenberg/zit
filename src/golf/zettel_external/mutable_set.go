@@ -10,7 +10,7 @@ type MutableSet struct {
 
 func MakeMutableSet(kf collections.KeyFunc[*Zettel], zs ...*Zettel) MutableSet {
 	return MutableSet{
-		MutableSetLike: collections.MakeMutableSetGeneric[*Zettel](kf, zs...),
+		MutableSetLike: collections.MakeMutableSet[*Zettel](kf, zs...),
 	}
 }
 

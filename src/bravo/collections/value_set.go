@@ -38,9 +38,9 @@ func MakeValueSetStrings[T ProtoObjekte, T1 interface {
 	es := make([]T, len(vs))
 
 	for i, v := range vs {
-    if strings.TrimSpace(v) == "" {
-      continue
-    }
+		if strings.TrimSpace(v) == "" {
+			continue
+		}
 
 		e1 := T1(new(T))
 

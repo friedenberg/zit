@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/id"
@@ -13,6 +14,34 @@ import (
 	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
 	"github.com/friedenberg/zit/src/india/zettel_verzeichnisse"
 )
+
+func (s Store) ReadAllAktenShas(w collections.WriterFunc[sha.Sha]) (err error) {
+	wf := func(p string) (err error) {
+		var sh sha.Sha
+
+		if sh, err = sha.MakeShaFromPath(p); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = w(sh); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+	}
+
+	if err = files.ReadDirNamesLevel2(
+		files.MakeDirNameWriterIgnoringHidden(wf),
+		s.standort.DirObjektenAkten(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
 
 func (s Store) AkteExists(sh sha.Sha) (err error) {
 	if sh.IsNull() {
@@ -52,41 +81,6 @@ func (s Store) AkteExists(sh sha.Sha) (err error) {
 	err = ErrAkteExists{
 		Akte:       sh,
 		MutableSet: set,
-	}
-
-	return
-}
-
-type akteMultiWriter struct {
-	io.Writer
-	writers []age_io.Writer
-}
-
-func (w akteMultiWriter) Close() (err error) {
-	for _, w1 := range w.writers {
-		if err = w1.Close(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	return
-}
-
-func (w akteMultiWriter) Sha() (s sha.Sha) {
-	s = w.writers[0].Sha()
-
-	for _, w1 := range w.writers[1:] {
-		s1 := w1.Sha()
-		if s1 != s {
-			panic(
-				errors.Errorf(
-					"shas from multi-writer don't match:\nexpected: %s\nactual: %s\n",
-					s,
-					s1,
-				),
-			)
-		}
 	}
 
 	return

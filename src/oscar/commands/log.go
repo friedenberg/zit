@@ -51,7 +51,7 @@ func (c Log) RunWithIds(os *umwelt.Umwelt, is id_set.Set) (err error) {
 		return
 	}
 
-  //TODO switch to streams
+	//TODO switch to streams
 	chains := make([][]*zettel_transacted.Zettel, 0, hs.Len())
 
 	for _, h := range hs.Elements() {

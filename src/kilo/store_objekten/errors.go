@@ -2,18 +2,11 @@ package store_objekten
 
 import (
 	"fmt"
-	"os"
-	"path"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
-	"github.com/friedenberg/zit/src/delta/zettel"
-	"github.com/friedenberg/zit/src/echo/akten"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
-	"github.com/google/uuid"
 )
 
 type stringId string
@@ -80,45 +73,6 @@ func (e ErrZettelSplitHistory) Error() string {
 		e.ShaA,
 		e.ShaB,
 	)
-}
-
-type duplicateAkteError struct {
-	akten.DuplicateAkteError
-	zettel.FormatContextWrite
-}
-
-func (e duplicateAkteError) AddToLostAndFound(p string) (p1 string, err error) {
-	newEtikett := "zz-akte-" + e.ShaOldAkte.String()
-
-	m := e.Zettel.Etiketten.MutableCopy()
-
-	if err = m.AddString(newEtikett); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	e.Zettel.Etiketten = m.Copy()
-
-	var f *os.File
-
-	p1 = path.Join(p, uuid.NewString())
-
-	if f, err = files.Create(p1); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer files.Close(f)
-
-	e.Out = f
-	format := zettel.Text{}
-
-	if _, err = format.WriteTo(e.FormatContextWrite); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
 }
 
 type ErrAkteExists struct {

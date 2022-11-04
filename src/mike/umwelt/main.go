@@ -12,7 +12,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/file_lock"
 	"github.com/friedenberg/zit/src/charlie/konfig"
 	"github.com/friedenberg/zit/src/delta/standort"
-	"github.com/friedenberg/zit/src/echo/akten"
 	"github.com/friedenberg/zit/src/india/zettel_verzeichnisse"
 	"github.com/friedenberg/zit/src/kilo/store_objekten"
 	"github.com/friedenberg/zit/src/lima/store_working_directory"
@@ -30,7 +29,6 @@ type Umwelt struct {
 	storesInitialized     bool
 	lock                  *file_lock.Lock
 	storeObjekten         *store_objekten.Store
-	akten                 akten.Akten
 	age                   *age.Age
 	storeWorkingDirectory *store_working_directory.Store
 	printerOut            *zettel_printer.Printer
@@ -124,11 +122,6 @@ func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 
 	if err != nil {
 		err = errors.Wrapf(err, "failed to initialize zettel meta store")
-		return
-	}
-
-	if u.akten, err = akten.New(u.standort.DirZit()); err != nil {
-		err = errors.Wrap(err)
 		return
 	}
 

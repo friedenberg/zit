@@ -11,7 +11,7 @@ type MutableSet struct {
 
 func MakeMutableSet() MutableSet {
 	return MutableSet{
-		MutableSetLike: collections.MakeMutableSetGeneric(
+		MutableSetLike: collections.MakeMutableSet(
 			func(sz *Zettel) string {
 				if sz == nil {
 					return ""

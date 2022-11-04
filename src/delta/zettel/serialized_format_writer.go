@@ -15,7 +15,7 @@ func MakeSerializedFormatWriter(
 	k konfig.Konfig,
 ) collections.WriterFunc[*Zettel] {
 	wf := func(z *Zettel) (err error) {
-		//use konfig
+		//TODO use konfig
 		includeAkte := z.Typ.String() == "md"
 
 		if typKonfig, ok := k.Typen[z.Typ.String()]; ok {
@@ -37,5 +37,5 @@ func MakeSerializedFormatWriter(
 		return
 	}
 
-	return collections.MakeSyncSerializer(wf).Do
+	return collections.MakeSyncSerializer(wf)
 }

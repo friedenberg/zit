@@ -86,7 +86,7 @@ func (s1 Set[T]) Subtract(s2 Set[T]) (out Set[T]) {
 }
 
 func (s1 Set[T]) Intersection(s2 SetLike[T]) (s3 MutableSetLike[T]) {
-	s3 = MakeMutableSetGeneric[T](s1.Key)
+	s3 = MakeMutableSet[T](s1.Key)
 	s22 := Set[T]{
 		SetLike: s2,
 	}

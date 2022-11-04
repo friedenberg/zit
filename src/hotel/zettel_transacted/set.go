@@ -11,7 +11,7 @@ type MutableSet struct {
 
 func MakeMutableSetUnique(c int) MutableSet {
 	return MutableSet{
-		MutableSet: collections.MakeMutableSetGeneric(
+		MutableSet: collections.MakeMutableSet(
 			func(sz *Zettel) string {
 				if sz == nil {
 					return ""
@@ -32,7 +32,7 @@ func MakeMutableSetUnique(c int) MutableSet {
 
 func MakeMutableSetHinweis(c int) MutableSet {
 	return MutableSet{
-		MutableSet: collections.MakeMutableSetGeneric(
+		MutableSet: collections.MakeMutableSet(
 			func(sz *Zettel) string {
 				if sz == nil {
 					return ""

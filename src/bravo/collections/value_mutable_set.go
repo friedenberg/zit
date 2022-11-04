@@ -23,7 +23,7 @@ func MakeMutableValueSet[T ProtoObjekte, T1 interface {
 	ProtoObjektePointer
 }](es ...T) (s MutableValueSet[T, T1]) {
 	s.mutableSetAlias = mutableSetAlias[T]{
-		MutableSet: MakeMutableSetGeneric(
+		MutableSet: MakeMutableSet(
 			func(e T) string {
 				return e.String()
 			},

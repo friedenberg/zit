@@ -7,6 +7,7 @@ import (
 	"hash"
 	"io"
 	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -27,6 +28,32 @@ type Sha struct {
 func MakeSha(v string) (s Sha, err error) {
 	s = Sha{}
 	err = s.Set(v)
+
+	return
+}
+
+func MakeShaFromPath(p string) (s Sha, err error) {
+	schwanz := filepath.Base(p)
+	kopf := filepath.Base(filepath.Dir(p))
+
+	switch {
+	case schwanz == string(filepath.Separator) || kopf == string(filepath.Separator):
+		fallthrough
+
+	case schwanz == "." || kopf == ".":
+		err = errors.Errorf(
+			"path cannot be turned into a kopf/schwanz pair: '%s/%s'",
+			kopf,
+			schwanz,
+		)
+
+		return
+	}
+
+	if s, err = MakeSha(fmt.Sprintf("%s%s", kopf, schwanz)); err != nil {
+		err = errors.Wrapf(err, "kopf: %q, schwanz: %q", kopf, schwanz)
+		return
+	}
 
 	return
 }

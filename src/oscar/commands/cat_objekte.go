@@ -95,7 +95,7 @@ func (c CatObjekte) RunWithIds(store *umwelt.Umwelt, ids id_set.Set) (err error)
 	}
 }
 
-//TODO switch to stream semantics
+// TODO switch to stream semantics
 func (c CatObjekte) akteShasFromIds(
 	u *umwelt.Umwelt,
 	ids id_set.Set,
@@ -134,7 +134,7 @@ func (c CatObjekte) akteShasFromIds(
 	return
 }
 
-//TODO switch to stream semantics
+// TODO switch to stream semantics
 func (c CatObjekte) akten(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 	var zettelen zettel_transacted.MutableSet
 
