@@ -1,17 +1,6 @@
 package objekte
 
-type Writer interface {
-	WriteObjekte(Objekte) error
-}
+import "github.com/friedenberg/zit/src/bravo/collections"
 
-type WriterFunc func(Objekte) error
-
-type writer WriterFunc
-
-func MakeWriter(f WriterFunc) Writer {
-	return writer(f)
-}
-
-func (w writer) WriteObjekte(o Objekte) (err error) {
-	return WriterFunc(w)(o)
-}
+type WriterFunc collections.WriterFunc[*Objekte]
+type WriterWithIndexFunc collections.WriterFunc[*ObjekteWithIndex]

@@ -32,7 +32,7 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	s := u.StoreObjekten()
 
-	var transaktion transaktion.Transaktion
+	var transaktion *transaktion.Transaktion
 
 	if transaktion, err = s.ReadLastTransaktion(); err != nil {
 		err = errors.Wrap(err)
@@ -40,16 +40,14 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	transaktion.Each(
-		objekte.MakeWriter(
-			func(o objekte.Objekte) (err error) {
-				switch o.Gattung {
-				case gattung.Zettel:
-					errors.PrintOut(o)
-				}
+		func(o *objekte.Objekte) (err error) {
+			switch o.Gattung {
+			case gattung.Zettel:
+				errors.PrintOut(o)
+			}
 
-				return
-			},
-		),
+			return
+		},
 	)
 
 	return

@@ -174,7 +174,7 @@ func (c Show) showAkten(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 func (c Show) showTransaktions(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 	for _, is := range ids.Timestamps() {
-		var t transaktion.Transaktion
+		var t *transaktion.Transaktion
 
 		if t, err = store.StoreObjekten().ReadTransaktion(is); err != nil {
 			errors.PrintErrf("error: %s", err)
@@ -184,12 +184,10 @@ func (c Show) showTransaktions(store *umwelt.Umwelt, ids id_set.Set) (err error)
 		errors.PrintOutf("transaktion: %#v", t)
 
 		t.Each(
-			objekte.MakeWriter(
-				func(o objekte.Objekte) (err error) {
-					errors.Out().Print(o)
-					return
-				},
-			),
+			func(o *objekte.Objekte) (err error) {
+				errors.Out().Print(o)
+				return
+			},
 		)
 	}
 

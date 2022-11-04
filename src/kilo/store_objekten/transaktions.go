@@ -2,10 +2,9 @@ package store_objekten
 
 import (
 	"io"
-	"path"
-	"sort"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
@@ -20,74 +19,65 @@ import (
 	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
 )
 
-func (s Store) ReadLastTransaktion() (t transaktion.Transaktion, err error) {
-	var all []transaktion.Transaktion
+func (s Store) ReadLastTransaktion() (t *transaktion.Transaktion, err error) {
+	if err = s.ReadAllTransaktions(
+		collections.MakeSyncSerializer(
+			func(t1 *transaktion.Transaktion) (err error) {
+				if t != nil && t1.Time.Less(t.Time) {
+					err = io.EOF
+					return
+				}
 
-	if all, err = s.ReadAllTransaktions(); err != nil {
+				t = t1
+
+				return
+			},
+		),
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if len(all) == 0 {
+	if t == nil {
 		err = ErrNotFound{}
 	}
-
-	sort.Slice(all, func(i, j int) bool { return all[j].Time.Less(all[i].Time) })
-
-	t = all[0]
 
 	return
 }
 
-//TODO move to stream
-func (s Store) ReadAllTransaktions() (out []transaktion.Transaktion, err error) {
-	var headNames []string
-
-	d := s.standort.DirObjektenTransaktion()
-
-	if headNames, err = files.ReadDirNames(d); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	for _, hn := range headNames {
-		errors.Print(hn)
-
-		var tailNames []string
-
-		if tailNames, err = files.ReadDirNames(d, hn); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		for _, tn := range tailNames {
-			errors.Print(tn)
-
-			p := path.Join(d, hn, tn)
-
-			var t transaktion.Transaktion
+func (s Store) ReadAllTransaktions(
+	f collections.WriterFunc[*transaktion.Transaktion],
+) (err error) {
+	if err = files.ReadDirNamesLevel2(
+		func(p string) (err error) {
+			var t *transaktion.Transaktion
 
 			if t, err = s.readTransaktion(p); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			out = append(out, t)
-		}
-	}
+			if err = f(t); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 
-	errors.Print("sorting")
-	sort.Slice(out, func(i, j int) bool { return out[i].Time.Less(out[j].Time) })
-	errors.Print("done")
+			return
+		},
+		s.standort.DirObjektenTransaktion(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }
 
-func (s Store) ReadTransaktion(t ts.Time) (tr transaktion.Transaktion, err error) {
+func (s Store) ReadTransaktion(t ts.Time) (tr *transaktion.Transaktion, err error) {
 	return s.readTransaktion(id.Path(t, s.standort.DirObjektenTransaktion()))
 }
 
-func (s Store) readTransaktion(p string) (t transaktion.Transaktion, err error) {
+func (s Store) readTransaktion(p string) (t *transaktion.Transaktion, err error) {
 	tr := &transaktion.Reader{}
 
 	var or io.ReadCloser
@@ -104,7 +94,7 @@ func (s Store) readTransaktion(p string) (t transaktion.Transaktion, err error) 
 		return
 	}
 
-	t = tr.Transaktion
+	t = &tr.Transaktion
 
 	return
 }
@@ -167,8 +157,8 @@ func (s *Store) transactedWithHead(
 }
 
 func (s Store) transactedZettelFromTransaktionObjekte(
-	t transaktion.Transaktion,
-	o objekte.ObjekteWithIndex,
+	t *transaktion.Transaktion,
+	o *objekte.ObjekteWithIndex,
 ) (tz zettel_transacted.Zettel, err error) {
 	ok := false
 
@@ -186,7 +176,7 @@ func (s Store) transactedZettelFromTransaktionObjekte(
 		return
 	}
 
-	if tz, err = s.transactedWithHead(tz.Named, t); err != nil {
+	if tz, err = s.transactedWithHead(tz.Named, *t); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

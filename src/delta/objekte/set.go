@@ -35,7 +35,7 @@ func (os MutableSet) Get(k string) []Objekte {
 	return os.objekten[k]
 }
 
-func (os MutableSet) EachWithIndex(w WriterWithIndex) (err error) {
+func (os MutableSet) EachWithIndex(w WriterWithIndexFunc) (err error) {
 	for _, oss := range os.objekten {
 		for i, o := range oss {
 			o1 := ObjekteWithIndex{
@@ -43,7 +43,7 @@ func (os MutableSet) EachWithIndex(w WriterWithIndex) (err error) {
 				Index:   int_value.Make(i),
 			}
 
-			if err = w.WriteObjekteWithIndex(o1); err != nil {
+			if err = w(&o1); err != nil {
 				switch {
 				case errors.IsEOF(err):
 					err = nil
@@ -60,12 +60,10 @@ func (os MutableSet) EachWithIndex(w WriterWithIndex) (err error) {
 	return
 }
 
-func (os MutableSet) Each(w Writer) (err error) {
+func (os MutableSet) Each(w WriterFunc) (err error) {
 	return os.EachWithIndex(
-		MakeWriterWithIndex(
-			func(o ObjekteWithIndex) (err error) {
-				return w.WriteObjekte(o.Objekte)
-			},
-		),
+		func(o *ObjekteWithIndex) (err error) {
+			return w(&o.Objekte)
+		},
 	)
 }
