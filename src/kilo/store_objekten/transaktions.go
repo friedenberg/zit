@@ -39,6 +39,7 @@ func (s Store) ReadLastTransaktion() (t transaktion.Transaktion, err error) {
 	return
 }
 
+//TODO move to stream
 func (s Store) ReadAllTransaktions() (out []transaktion.Transaktion, err error) {
 	var headNames []string
 
