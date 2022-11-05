@@ -15,7 +15,7 @@ type WriteNewZettels struct {
 }
 
 func (c WriteNewZettels) RunMany(
-	z zettel.Zettel,
+	z zettel.ProtoZettel,
 	count int,
 ) (results zettel_checked_out.MutableSet, err error) {
 	if err = c.Lock(); err != nil {
@@ -43,7 +43,7 @@ func (c WriteNewZettels) RunMany(
 }
 
 func (c WriteNewZettels) RunOne(
-	z zettel.Zettel,
+	z zettel.ProtoZettel,
 ) (result zettel_checked_out.Zettel, err error) {
 	if err = c.Lock(); err != nil {
 		err = errors.Wrap(err)
@@ -56,9 +56,10 @@ func (c WriteNewZettels) RunOne(
 }
 
 func (c WriteNewZettels) runOneAlreadyLocked(
-	z zettel.Zettel,
+	pz zettel.ProtoZettel,
 ) (result zettel_checked_out.Zettel, err error) {
-	if result.Internal, err = c.StoreObjekten().Create(z); err != nil {
+	z := pz.Make()
+	if result.Internal, err = c.StoreObjekten().Create(*z); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

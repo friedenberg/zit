@@ -3,12 +3,10 @@ package commands
 import (
 	"flag"
 
-	"github.com/friedenberg/zit/src/alfa/bezeichnung"
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/charlie/script_value"
-	"github.com/friedenberg/zit/src/charlie/typ"
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
@@ -17,12 +15,6 @@ import (
 	"github.com/friedenberg/zit/src/november/user_ops"
 )
 
-// TODO move to protozettel
-type bez struct {
-	bezeichnung.Bezeichnung
-	wasSet bool
-}
-
 type New struct {
 	Edit   bool
 	Delete bool
@@ -30,15 +22,7 @@ type New struct {
 	Count  int
 	Filter script_value.ScriptValue
 
-	//TODO move to protozettel
-	Bezeichnung bez
-	Etiketten   etikett.Set
-	typ.Typ
-}
-
-func (b *bez) Set(v string) (err error) {
-	b.wasSet = true
-	return b.Bezeichnung.Set(v)
+	zettel.ProtoZettel
 }
 
 func init() {
@@ -46,19 +30,16 @@ func init() {
 		"new",
 		func(f *flag.FlagSet) Command {
 			c := &New{
-				//TODO move to proper place
-				// Typ: typ.Make(""),
-				Etiketten: etikett.MakeSet(),
+				ProtoZettel: zettel.MakeProtoZettel(),
 			}
 
 			f.BoolVar(&c.Delete, "delete", false, "delete the zettel and akte after successful checkin")
 			f.BoolVar(&c.Dedupe, "dedupe", false, "deduplicate added Zettelen based on Akte sha")
 			f.BoolVar(&c.Edit, "edit", true, "create a new empty zettel and open EDITOR or VISUAL for editing and then commit the resulting changes")
 			f.IntVar(&c.Count, "count", 1, "when creating new empty zettels, how many to create. otherwise ignored")
-			f.Var(&c.Bezeichnung, "bezeichnung", "zettel description (will overwrite existing Bezecihnung")
-			f.Var(&c.Etiketten, "etiketten", "comma-separated etiketten (will add to existing Etiketten)")
+
 			f.Var(&c.Filter, "filter", "a script to run for each file to transform it the standard zettel format")
-			f.Var(&c.Typ, "typ", "the Typ to use for the newly created Zettelen")
+			c.ProtoZettel.AddToFlagSet(f)
 
 			return c
 		},
@@ -128,19 +109,12 @@ func (c New) readExistingFilesAsZettels(
 	args ...string,
 ) (zts zettel_transacted.MutableSet, err error) {
 	opCreateFromPath := user_ops.CreateFromPaths{
-		Umwelt: u,
-		Format: f,
-		Filter: c.Filter,
-		Delete: c.Delete,
-		Dedupe: c.Dedupe,
-		ProtoZettel: zettel.ProtoZettel{
-			Typ:       c.Typ,
-			Etiketten: c.Etiketten,
-		},
-	}
-
-	if c.Bezeichnung.wasSet {
-		opCreateFromPath.ProtoZettel.Bezeichnung = &c.Bezeichnung.Bezeichnung
+		Umwelt:      u,
+		Format:      f,
+		Filter:      c.Filter,
+		Delete:      c.Delete,
+		Dedupe:      c.Dedupe,
+		ProtoZettel: c.ProtoZettel,
 	}
 
 	if zts, err = opCreateFromPath.Run(args...); err != nil {
@@ -174,13 +148,7 @@ func (c New) writeNewZettels(
 	defaultEtiketten.Each(mes.Add)
 	c.Etiketten = mes.Copy()
 
-	z := zettel.Zettel{
-		Bezeichnung: c.Bezeichnung.Bezeichnung,
-		Etiketten:   c.Etiketten,
-		Typ:         c.Typ,
-	}
-
-	if zsc, err = emptyOp.RunMany(z, c.Count); err != nil {
+	if zsc, err = emptyOp.RunMany(c.ProtoZettel, c.Count); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

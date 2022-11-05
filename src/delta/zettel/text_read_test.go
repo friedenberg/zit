@@ -3,6 +3,7 @@ package zettel
 import (
 	"testing"
 
+	"github.com/friedenberg/zit/src/alfa/bezeichnung"
 	"github.com/friedenberg/zit/src/bravo/test_logz"
 )
 
@@ -23,7 +24,7 @@ func TestReadWithoutAkte(t1 *testing.T) {
 	)
 
 	expected := Zettel{
-		Bezeichnung: "the title",
+		Bezeichnung: bezeichnung.Make("the title"),
 		Etiketten: makeEtiketten(t,
 			"tag1",
 			"tag2",
@@ -59,7 +60,7 @@ func TestReadWithoutAkteWithMultilineBezeichnung(t1 *testing.T) {
 	)
 
 	expected := Zettel{
-		Bezeichnung: "the title continues",
+		Bezeichnung: bezeichnung.Make("the title continues"),
 		Etiketten: makeEtiketten(t,
 			"tag1",
 			"tag2",
@@ -96,7 +97,7 @@ the body
 	)
 
 	expected := Zettel{
-		Bezeichnung: "the title",
+		Bezeichnung: bezeichnung.Make("the title"),
 		Etiketten: makeEtiketten(t,
 			"tag1",
 			"tag2",

@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"io"
 	"os"
-	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/kennung"
@@ -39,7 +38,7 @@ func newProvider(path string) (p provider, err error) {
 			return
 		}
 
-		p = append(p, strings.TrimSuffix(line, "\n"))
+		p = append(p, Clean(line))
 	}
 
 	return
@@ -67,34 +66,11 @@ func (p provider) Len() int {
 }
 
 func (p provider) Kennung(v string) (i int, err error) {
-	v = strings.ToLower(v)
-	v = strings.Map(
-		func(r rune) rune {
-			if r > 'z' {
-				return -1
-			}
-
-			return r
-		},
-		v,
-	)
+	v = Clean(v)
 
 	var s string
 
 	for i, s = range p {
-		//TODO move to init and make common
-		s = strings.ToLower(s)
-		s = strings.Map(
-			func(r rune) rune {
-				if r > 'z' {
-					return -1
-				}
-
-				return r
-			},
-			s,
-		)
-
 		if s == v {
 			return
 		}

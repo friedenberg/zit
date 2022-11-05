@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/friedenberg/zit/src/alfa/bezeichnung"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/test_logz"
 )
@@ -81,7 +82,7 @@ func TestWriteWithoutAkte(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
 	z := Zettel{
-		Bezeichnung: "the title",
+		Bezeichnung: bezeichnung.Make("the title"),
 		Etiketten: makeEtiketten(t,
 			"tag1",
 			"tag2",
@@ -110,7 +111,7 @@ func TestWriteWithInlineAkte(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
 	z := Zettel{
-		Bezeichnung: "the title",
+		Bezeichnung: bezeichnung.Make("the title"),
 		Etiketten: makeEtiketten(t,
 			"tag1",
 			"tag2",

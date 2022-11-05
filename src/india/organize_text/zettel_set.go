@@ -46,7 +46,7 @@ func (zs zettelSet) sorted() (sorted []zettel) {
 		if sorted[i].Bezeichnung == sorted[j].Bezeichnung {
 			return sorted[i].Hinweis.Less(sorted[j].Hinweis)
 		} else {
-			return sorted[i].Bezeichnung < sorted[j].Bezeichnung
+			return sorted[i].Bezeichnung.Less(sorted[j].Bezeichnung)
 		}
 	})
 

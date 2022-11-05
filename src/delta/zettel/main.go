@@ -20,7 +20,7 @@ type Zettel struct {
 func (z *Zettel) Reset() {
 	z.Akte = sha.Sha{}
 	z.Typ = typ.Typ{}
-	z.Bezeichnung = bezeichnung.Bezeichnung("")
+	z.Bezeichnung = bezeichnung.Make("")
 	z.Etiketten = etikett.MakeSet()
 }
 

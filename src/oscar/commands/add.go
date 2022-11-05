@@ -7,9 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/charlie/script_value"
-	"github.com/friedenberg/zit/src/charlie/typ"
 	"github.com/friedenberg/zit/src/delta/id_set"
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
@@ -28,9 +26,7 @@ type Add struct {
 	Organize  bool
 	Filter    script_value.ScriptValue
 
-	//TODO move to protozettel
-	Etiketten etikett.Set
-	typ.Typ
+	zettel.ProtoZettel
 }
 
 func init() {
@@ -38,18 +34,14 @@ func init() {
 		"add",
 		func(f *flag.FlagSet) Command {
 			c := &Add{
-				//TODO move to proper place
-				Typ:       typ.Make("md"),
-				Etiketten: etikett.MakeSet(),
+				ProtoZettel: zettel.MakeProtoZettel(),
 			}
 
 			f.BoolVar(&c.Dedupe, "dedupe", false, "deduplicate added Zettelen based on Akte sha")
 			f.BoolVar(&c.Delete, "delete", false, "delete the zettel and akte after successful checkin")
 			f.BoolVar(&c.OpenAkten, "open-akten", false, "also open the Akten")
 			f.BoolVar(&c.Organize, "organize", false, "")
-			f.Var(&c.Etiketten, "etiketten", "to add to the created zettels")
-			f.Var(&c.Filter, "filter", "a script to run for each file to transform it the standard zettel format")
-			f.Var(&c.Typ, "typ", "the Typ to use for the newly created Zettelen")
+			c.ProtoZettel.AddToFlagSet(f)
 
 			return c
 		},
@@ -58,14 +50,11 @@ func init() {
 
 func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	zettelsFromAkteOp := user_ops.ZettelFromExternalAkte{
-		Umwelt: u,
-		//TODO add Typ
-		ProtoZettel: zettel.ProtoZettel{
-			Etiketten: c.Etiketten,
-		},
-		Filter: c.Filter,
-		Delete: c.Delete,
-		Dedupe: c.Dedupe,
+		Umwelt:      u,
+		ProtoZettel: c.ProtoZettel,
+		Filter:      c.Filter,
+		Delete:      c.Delete,
+		Dedupe:      c.Dedupe,
 	}
 
 	var zettelsFromAkteResults zettel_transacted.MutableSet

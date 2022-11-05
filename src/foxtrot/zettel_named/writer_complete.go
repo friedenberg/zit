@@ -27,7 +27,7 @@ func MakeWriterComplete(w io.Writer) WriterComplete {
 				continue
 			}
 
-			//TODO handle errors
+			//TODO-P4 handle write errors
 			s.wBuf.WriteString(z.Hinweis.String())
 			s.wBuf.WriteString("\tZettel: !")
 			s.wBuf.WriteString(z.Stored.Zettel.Typ.String())

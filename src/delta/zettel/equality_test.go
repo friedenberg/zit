@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/friedenberg/zit/src/alfa/bezeichnung"
 	"github.com/friedenberg/zit/src/bravo/test_logz"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 )
@@ -73,7 +74,7 @@ func TestEqualitySelf(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
 	text := Zettel{
-		Bezeichnung: "the title",
+		Bezeichnung: bezeichnung.Make("the title"),
 		Etiketten: makeEtiketten(t,
 			"tag1",
 			"tag2",
@@ -91,7 +92,7 @@ func TestEqualityNotSelf(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
 	text := Zettel{
-		Bezeichnung: "the title",
+		Bezeichnung: bezeichnung.Make("the title"),
 		Etiketten: makeEtiketten(t,
 			"tag1",
 			"tag2",
@@ -101,7 +102,7 @@ func TestEqualityNotSelf(t1 *testing.T) {
 	}
 
 	text1 := Zettel{
-		Bezeichnung: "the title",
+		Bezeichnung: bezeichnung.Make("the title"),
 		Etiketten: makeEtiketten(t,
 			"tag1",
 			"tag2",

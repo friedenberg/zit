@@ -31,7 +31,7 @@ func (zs newZettelSet) sorted() (sorted []newZettel) {
 	}
 
 	sort.Slice(sorted, func(i, j int) bool {
-		return sorted[i].Bezeichnung < sorted[j].Bezeichnung
+		return sorted[i].Bezeichnung.Less(sorted[j].Bezeichnung)
 	})
 
 	return
