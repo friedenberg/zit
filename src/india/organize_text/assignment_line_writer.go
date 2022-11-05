@@ -53,11 +53,11 @@ func (av assignmentLineWriter) writeNormal(a *assignment) (err error) {
 			fmt.Sprintf("%s- %s", tab_prefix, z.Bezeichnung))
 	}
 
-	for _, z := range a.named.sorted() {
+	for _, z := range sortZettelSet(a.named) {
 		av.WriteLines(fmt.Sprintf("%s- [%s] %s", tab_prefix, z.Hinweis, z.Bezeichnung))
 	}
 
-	if len(a.named) > 0 || len(a.unnamed) > 0 {
+	if a.named.Len() > 0 || len(a.unnamed) > 0 {
 		av.WriteExactlyOneEmpty()
 	}
 
@@ -109,12 +109,12 @@ func (av assignmentLineWriter) writeRightAligned(a *assignment) (err error) {
 			fmt.Sprintf("- %s%s", tab_prefix, z.Bezeichnung))
 	}
 
-	for _, z := range a.named.sorted() {
+	for _, z := range sortZettelSet(a.named) {
 		h := z.Hinweis.Aligned(av.maxKopf, av.maxScwhanz)
 		av.WriteLines(fmt.Sprintf("- [%s] %s", h, z.Bezeichnung))
 	}
 
-	if len(a.named) > 0 || len(a.unnamed) > 0 {
+	if a.named.Len() > 0 || len(a.unnamed) > 0 {
 		av.WriteExactlyOneEmpty()
 	}
 

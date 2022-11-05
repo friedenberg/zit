@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 )
 
@@ -11,7 +12,7 @@ type assignment struct {
 	isRoot    bool
 	depth     int
 	etiketten etikett.Set
-	named     zettelSet
+	named     collections.MutableValueSet[zettel, *zettel]
 	unnamed   newZettelSet
 	children  []*assignment
 	parent    *assignment
@@ -21,7 +22,7 @@ func newAssignment(d int) *assignment {
 	return &assignment{
 		depth:     d,
 		etiketten: etikett.MakeSet(),
-		named:     makeZettelSet(),
+		named:     collections.MakeMutableValueSet[zettel](),
 		unnamed:   makeNewZettelSet(),
 		children:  make([]*assignment, 0),
 	}
@@ -58,19 +59,23 @@ func (a assignment) AlignmentSpacing() int {
 }
 
 func (a assignment) MaxKopfUndSchwanz() (kopf, schwanz int) {
-	for z, _ := range a.named {
-		parts := [2]string{z.Hinweis.Kopf(), z.Hinweis.Schwanz()}
-		zKopf := len(parts[0])
-		zSchwanz := len(parts[1])
+	a.named.Each(
+		func(z zettel) (err error) {
+			parts := [2]string{z.Hinweis.Kopf(), z.Hinweis.Schwanz()}
+			zKopf := len(parts[0])
+			zSchwanz := len(parts[1])
 
-		if zKopf > kopf {
-			kopf = zKopf
-		}
+			if zKopf > kopf {
+				kopf = zKopf
+			}
 
-		if zSchwanz > schwanz {
-			schwanz = zSchwanz
-		}
-	}
+			if zSchwanz > schwanz {
+				schwanz = zSchwanz
+			}
+
+			return
+		},
+	)
 
 	for _, c := range a.children {
 		zKopf, zSchwanz := c.MaxKopfUndSchwanz()
@@ -188,10 +193,8 @@ func (a *assignment) consume(b *assignment) (err error) {
 		a.addChild(c)
 	}
 
-	for k, v := range b.named {
-		a.named[k] = v
-		delete(b.named, k)
-	}
+	b.named.Each(a.named.Add)
+	b.named.Each(b.named.Del)
 
 	for k, v := range b.unnamed {
 		a.unnamed[k] = v

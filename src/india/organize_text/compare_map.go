@@ -78,16 +78,20 @@ func (a *assignment) addToCompareMap(m Metadatei, es etikett.Set, out *CompareMa
 	es1.Each(mes.Add)
 	es = mes.Copy()
 
-	for z, _ := range a.named {
-		for _, e := range es.Sorted() {
-			out.Named.Add(z.Hinweis.String(), e)
-		}
+	a.named.Each(
+		func(z zettel) (err error) {
+			for _, e := range es.Sorted() {
+				out.Named.Add(z.Hinweis.String(), e)
+			}
 
-		for _, e := range m.Set.Elements() {
-			//TODO add typ
-			out.Named.Add(z.Hinweis.String(), e)
-		}
-	}
+			for _, e := range m.Set.Elements() {
+				//TODO add typ
+				out.Named.Add(z.Hinweis.String(), e)
+			}
+
+			return
+		},
+	)
 
 	for z, _ := range a.unnamed {
 		for _, e := range es.Sorted() {
