@@ -4,10 +4,10 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"syscall"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	gattung "github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/bravo/collections"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/etikett"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
@@ -95,21 +95,18 @@ func (c CatObjekte) RunWithIds(store *umwelt.Umwelt, ids id_set.Set) (err error)
 	}
 }
 
-// TODO switch to stream semantics
 func (c CatObjekte) akteShasFromIds(
 	u *umwelt.Umwelt,
 	ids id_set.Set,
-) (zettelen zettel_transacted.MutableSet, err error) {
-	zettelen = zettel_transacted.MakeMutableSetUnique(0)
-
+	f collections.WriterFunc[*zettel_transacted.Zettel],
+) (err error) {
 	if err = u.StoreObjekten().ReadAllSchwanzenVerzeichnisse(
-
 		zettel_verzeichnisse.MakeWriterZettelNamed(
 			zettel_named.FilterIdSet{
 				Set: ids,
 			}.WriteZettelNamed,
 		),
-		zettel_verzeichnisse.MakeWriterZettelTransacted(zettelen.AddAndDoNotRepool),
+		zettel_verzeichnisse.MakeWriterZettelTransacted(f),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -134,56 +131,66 @@ func (c CatObjekte) akteShasFromIds(
 	return
 }
 
-// TODO switch to stream semantics
 func (c CatObjekte) akten(store *umwelt.Umwelt, ids id_set.Set) (err error) {
-	var zettelen zettel_transacted.MutableSet
-
-	if zettelen, err = c.akteShasFromIds(store, ids); err != nil {
-		err = errors.Wrap(err)
-		return
+	type akteToWrite struct {
+		io.ReadCloser
+		*zettel_named.Zettel
 	}
 
-	zettelen.Each(
-		func(z *zettel_transacted.Zettel) (err error) {
-			var r io.ReadCloser
+	akteWriter := collections.MakeSyncSerializer(
+		func(a akteToWrite) (err error) {
+			defer errors.Deferred(&err, a.ReadCloser.Close)
 
-			sb := z.Named.Stored.Zettel.Akte
-
-			if r, err = store.StoreObjekten().AkteReader(sb); err != nil {
+			//TODO-P2 explicitly support toml
+			if _, err = io.WriteString(
+				store.Out(),
+				fmt.Sprintf("['%s']\n", a.Hinweis),
+			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			defer errors.PanicIfError(r.Close)
-
-			if _, err = io.WriteString(
-				store.Out(),
-				fmt.Sprintf("['%s']\n", z.Named.Hinweis),
-			); err != nil {
-				err = errors.IsAsNilOrWrapf(
-					err,
-					syscall.EPIPE,
-					"Zettel: %s",
-					z.Named.Hinweis,
-				)
-
-				return
-			}
-
-			if _, err = io.Copy(store.Out(), r); err != nil {
-				err = errors.IsAsNilOrWrapf(
-					err,
-					syscall.EPIPE,
-					"Zettel: %s",
-					z.Named.Hinweis,
-				)
-
+			if _, err = io.Copy(store.Out(), a.ReadCloser); err != nil {
+				err = errors.Wrap(err)
 				return
 			}
 
 			return
 		},
 	)
+	if err = c.akteShasFromIds(
+		store,
+		ids,
+		func(z *zettel_transacted.Zettel) (err error) {
+			sb := z.Named.Stored.Zettel.Akte
+
+			if sb.IsNull() {
+				return
+			}
+
+			var r io.ReadCloser
+
+			if r, err = store.StoreObjekten().AkteReader(sb); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if err = akteWriter(
+				akteToWrite{
+					ReadCloser: r,
+					Zettel:     &z.Named,
+				},
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }

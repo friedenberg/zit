@@ -1,6 +1,6 @@
 package ts
 
-import collections "github.com/friedenberg/zit/src/bravo/collections"
+import "github.com/friedenberg/zit/src/bravo/collections"
 
 type MutableSet = collections.MutableValueSet[Time, *Time]
 

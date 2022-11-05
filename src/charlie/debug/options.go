@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	string_builder_joined "github.com/friedenberg/zit/src/bravo/string_builder_joined"
+	"github.com/friedenberg/zit/src/bravo/string_builder_joined"
 )
 
 type Options struct {

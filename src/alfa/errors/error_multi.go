@@ -7,6 +7,20 @@ import (
 
 type ErrorMulti []error
 
+func MakeErrorMultiOrNil(errs ...error) *ErrorMulti {
+	em := ErrorMulti{}
+
+	for _, err := range errs {
+		em.Add(err)
+	}
+
+	if em.Empty() {
+		return nil
+	}
+
+	return &em
+}
+
 func (e ErrorMulti) Empty() (ok bool) {
 	ok = len(e) == 0
 	return

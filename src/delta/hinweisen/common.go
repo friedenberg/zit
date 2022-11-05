@@ -15,7 +15,7 @@ func Clean(v string) string {
 		v,
 	)
 
-  v = strings.TrimSpace(v)
+	v = strings.TrimSpace(v)
 
 	return v
 }

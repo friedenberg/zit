@@ -3,7 +3,7 @@ package etikett
 import (
 	"strings"
 
-	collections "github.com/friedenberg/zit/src/bravo/collections"
+	"github.com/friedenberg/zit/src/bravo/collections"
 )
 
 type MutableSet = collections.MutableValueSet[Etikett, *Etikett]

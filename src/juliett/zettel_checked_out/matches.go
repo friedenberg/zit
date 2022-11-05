@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	gattung "github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/golf/zettel_external"
 	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
 )

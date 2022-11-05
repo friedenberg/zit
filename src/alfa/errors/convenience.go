@@ -79,6 +79,15 @@ func IsAsNilOrWrapf(
 	return
 }
 
+func Deferred(
+	err *error,
+	f func() error,
+) {
+	if err1 := f(); err != nil {
+		*err = MakeErrorMultiOrNil(*err, err1)
+	}
+}
+
 func PanicIfError(err interface{}) {
 	if err == nil {
 		return

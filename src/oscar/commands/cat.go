@@ -38,7 +38,7 @@ func init() {
 	)
 }
 
-// TODO move to types as args
+// TODO-P3 move to types as args
 func (c Cat) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	switch c.Gattung {
 	case gattung.Etikett:

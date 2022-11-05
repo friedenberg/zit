@@ -3,7 +3,7 @@ package zettel_external
 import (
 	"io"
 
-	collections "github.com/friedenberg/zit/src/bravo/collections"
+	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 )
 
