@@ -93,16 +93,20 @@ func (a *assignment) addToCompareMap(m Metadatei, es etikett.Set, out *CompareMa
 		},
 	)
 
-	for z, _ := range a.unnamed {
-		for _, e := range es.Sorted() {
-			out.Unnamed.Add(z.Bezeichnung.String(), e)
-		}
+	a.unnamed.Each(
+		func(z newZettel) (err error) {
+			for _, e := range es.Sorted() {
+				out.Unnamed.Add(z.Bezeichnung.String(), e)
+			}
 
-		for _, e := range m.Set.Elements() {
-			//TODO add typ
-			out.Unnamed.Add(z.Bezeichnung.String(), e)
-		}
-	}
+			for _, e := range m.Set.Elements() {
+				//TODO add typ
+				out.Unnamed.Add(z.Bezeichnung.String(), e)
+			}
+
+			return
+		},
+	)
 
 	for _, c := range a.children {
 		if err = c.addToCompareMap(m, es, out); err != nil {

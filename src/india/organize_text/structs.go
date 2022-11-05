@@ -2,13 +2,22 @@ package organize_text
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/bezeichnung"
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 )
+
+//   _____    _   _       _
+//  |__  /___| |_| |_ ___| |
+//    / // _ \ __| __/ _ \ |
+//   / /|  __/ |_| ||  __/ |
+//  /____\___|\__|\__\___|_|
+//
 
 type zettel struct {
 	hinweis.Hinweis
@@ -76,6 +85,63 @@ func (z *zettel) Set(v string) (err error) {
 		err = errors.Wrap(err)
 		return
 	}
+
+	return
+}
+
+func sortZettelSet(
+	s collections.MutableValueSet[zettel, *zettel],
+) (out []zettel) {
+	out = s.Elements()
+
+	sort.Slice(out, func(i, j int) bool {
+		if out[i].Bezeichnung == out[j].Bezeichnung {
+			return out[i].Hinweis.Less(out[j].Hinweis)
+		} else {
+			return out[i].Bezeichnung.Less(out[j].Bezeichnung)
+		}
+	})
+
+	return
+}
+
+//   _   _                 _____    _   _       _
+//  | \ | | _____      __ |__  /___| |_| |_ ___| |
+//  |  \| |/ _ \ \ /\ / /   / // _ \ __| __/ _ \ |
+//  | |\  |  __/\ V  V /   / /|  __/ |_| ||  __/ |
+//  |_| \_|\___| \_/\_/   /____\___|\__|\__\___|_|
+//
+
+type newZettel struct {
+	bezeichnung.Bezeichnung
+}
+
+func (z *newZettel) Set(v string) (err error) {
+	remaining := v
+
+	if remaining[:2] != "- " {
+		err = errors.Errorf("expected '- ', but got '%s'", remaining[:2])
+		return
+	}
+
+	remaining = remaining[2:]
+
+	if err = z.Bezeichnung.Set(remaining); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func sortNewZettelSet(
+	s collections.MutableValueSet[newZettel, *newZettel],
+) (sorted []newZettel) {
+	sorted = s.Elements()
+
+	sort.Slice(sorted, func(i, j int) bool {
+		return sorted[i].Bezeichnung.Less(sorted[j].Bezeichnung)
+	})
 
 	return
 }

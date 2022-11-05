@@ -48,7 +48,7 @@ func (av assignmentLineWriter) writeNormal(a *assignment) (err error) {
 		av.WriteExactlyOneEmpty()
 	}
 
-	for _, z := range a.unnamed.sorted() {
+	for _, z := range sortNewZettelSet(a.unnamed) {
 		av.WriteLines(
 			fmt.Sprintf("%s- %s", tab_prefix, z.Bezeichnung))
 	}
@@ -57,7 +57,7 @@ func (av assignmentLineWriter) writeNormal(a *assignment) (err error) {
 		av.WriteLines(fmt.Sprintf("%s- [%s] %s", tab_prefix, z.Hinweis, z.Bezeichnung))
 	}
 
-	if a.named.Len() > 0 || len(a.unnamed) > 0 {
+	if a.named.Len() > 0 || a.unnamed.Len() > 0 {
 		av.WriteExactlyOneEmpty()
 	}
 
@@ -104,7 +104,7 @@ func (av assignmentLineWriter) writeRightAligned(a *assignment) (err error) {
 		av.WriteExactlyOneEmpty()
 	}
 
-	for _, z := range a.unnamed.sorted() {
+	for _, z := range sortNewZettelSet(a.unnamed) {
 		av.WriteLines(
 			fmt.Sprintf("- %s%s", tab_prefix, z.Bezeichnung))
 	}
@@ -114,7 +114,7 @@ func (av assignmentLineWriter) writeRightAligned(a *assignment) (err error) {
 		av.WriteLines(fmt.Sprintf("- [%s] %s", h, z.Bezeichnung))
 	}
 
-	if a.named.Len() > 0 || len(a.unnamed) > 0 {
+	if a.named.Len() > 0 || a.unnamed.Len() > 0 {
 		av.WriteExactlyOneEmpty()
 	}
 

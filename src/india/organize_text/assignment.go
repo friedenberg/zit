@@ -13,7 +13,7 @@ type assignment struct {
 	depth     int
 	etiketten etikett.Set
 	named     collections.MutableValueSet[zettel, *zettel]
-	unnamed   newZettelSet
+	unnamed   collections.MutableValueSet[newZettel, *newZettel]
 	children  []*assignment
 	parent    *assignment
 }
@@ -23,7 +23,7 @@ func newAssignment(d int) *assignment {
 		depth:     d,
 		etiketten: etikett.MakeSet(),
 		named:     collections.MakeMutableValueSet[zettel](),
-		unnamed:   makeNewZettelSet(),
+		unnamed:   collections.MakeMutableValueSet[newZettel](),
 		children:  make([]*assignment, 0),
 	}
 }
@@ -196,10 +196,8 @@ func (a *assignment) consume(b *assignment) (err error) {
 	b.named.Each(a.named.Add)
 	b.named.Each(b.named.Del)
 
-	for k, v := range b.unnamed {
-		a.unnamed[k] = v
-		delete(b.unnamed, k)
-	}
+	b.unnamed.Each(a.unnamed.Add)
+	b.unnamed.Each(b.unnamed.Del)
 
 	if err = b.removeFromParent(); err != nil {
 		err = errors.Wrap(err)
