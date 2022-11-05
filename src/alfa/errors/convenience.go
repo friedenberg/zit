@@ -1,9 +1,7 @@
 package errors
 
 import (
-	"errors"
 	"fmt"
-	"io"
 	"os"
 
 	"golang.org/x/xerrors"
@@ -29,25 +27,6 @@ func As(err error, target interface{}) bool {
 	return xerrors.As(err, target)
 }
 
-func Is(err, target error) bool {
-	e := Unwrap(err)
-	return errors.Is(e, target)
-}
-
-func IsTooManyOpenFiles(err error) bool {
-	e := Unwrap(err)
-	return e.Error() == "too many open files"
-}
-
-func IsEOF(err error) bool {
-	return Is(err, io.EOF)
-}
-
-func IsNotExist(err error) bool {
-	e := Unwrap(err)
-	return os.IsNotExist(e)
-}
-
 func unwrapOnce(err error) error {
 	if e, ok := err.(unwrappable); ok {
 		return e
@@ -64,26 +43,11 @@ func Unwrap(err error) error {
 	return err
 }
 
-func IsAsNilOrWrapf(
-	err error,
-	target error,
-	format string,
-	values ...interface{},
-) (out error) {
-	if Is(err, target) {
-		out = nil
-	} else {
-		out = Wrapf(err, format, values...)
-	}
-
-	return
-}
-
 func Deferred(
 	err *error,
 	f func() error,
 ) {
-	if err1 := f(); err != nil {
+	if err1 := f(); err1 != nil {
 		*err = MakeErrorMultiOrNil(*err, err1)
 	}
 }

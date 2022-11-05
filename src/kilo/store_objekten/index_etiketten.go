@@ -50,11 +50,11 @@ func (i *indexEtiketten) Flush() (err error) {
 		return
 	}
 
-	defer errors.PanicIfError(w1.Close)
+	defer errors.Deferred(&err, w1.Close)
 
 	w := bufio.NewWriter(w1)
 
-	defer errors.PanicIfError(w.Flush)
+	defer errors.Deferred(&err, w.Flush)
 
 	enc := gob.NewEncoder(w)
 

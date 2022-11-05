@@ -161,7 +161,7 @@ func (c Show) showAkten(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 			return
 		}
 
-		defer errors.PanicIfError(ar.Close)
+		defer errors.Deferred(&err, ar.Close)
 
 		if _, err = io.Copy(store.Out(), ar); err != nil {
 			err = errors.Wrap(err)

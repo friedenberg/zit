@@ -124,7 +124,7 @@ func (f Text) writeToInlineAkte(c FormatContextWrite) (n int64, err error) {
 		return
 	}
 
-	defer errors.PanicIfError(ar.Close)
+	defer errors.Deferred(&err, ar.Close)
 
 	in := ar
 
@@ -220,7 +220,7 @@ func (f Text) writeToExternalAkte(c FormatContextWrite) (n int64, err error) {
 		return
 	}
 
-	defer errors.PanicIfError(ar.Close)
+	defer errors.Deferred(&err, ar.Close)
 
 	var file *os.File
 

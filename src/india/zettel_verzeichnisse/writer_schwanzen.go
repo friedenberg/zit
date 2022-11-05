@@ -127,7 +127,7 @@ func (zws WriterSchwanzen) WriteTo(w1 io.Writer) (n int64, err error) {
 
 	w := bufio.NewWriter(w1)
 
-	defer errors.PanicIfError(w.Flush)
+	defer errors.Deferred(&err, w.Flush)
 
 	enc := gob.NewEncoder(w)
 

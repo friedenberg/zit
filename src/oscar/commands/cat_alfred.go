@@ -87,7 +87,7 @@ func (c CatAlfred) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 		return
 	}
 
-	defer errors.PanicIfError(aw.Close)
+	defer errors.Deferred(&err, aw.Close)
 
 	wg := &sync.WaitGroup{}
 

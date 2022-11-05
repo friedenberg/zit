@@ -90,11 +90,11 @@ func (zp *Page) Flush() (err error) {
 		return
 	}
 
-	defer errors.PanicIfError(w.Close)
+	defer errors.Deferred(&err, w.Close)
 
 	w1 := bufio.NewWriter(w)
 
-	defer errors.PanicIfError(w1.Flush)
+	defer errors.Deferred(&err, w1.Flush)
 
 	if mpr, ok := zp.ioFactory.(PageHeader); ok {
 		wt := mpr.PageHeaderWriterTo(zp.index)
@@ -247,7 +247,7 @@ func (zp *Page) Copy(
 func (zp *Page) WriteTo(w1 io.Writer) (n int64, err error) {
 	w := bufio.NewWriter(w1)
 
-	defer errors.PanicIfError(w.Flush)
+	defer errors.Deferred(&err, w.Flush)
 
 	wm := zettel_verzeichnisse.MakeWriterChain(
 		zettel_verzeichnisse.MakeWriter(zp.flushFilter),

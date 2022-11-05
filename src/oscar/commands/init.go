@@ -119,19 +119,19 @@ func (c Init) readAndTransferLines(in, out string) (err error) {
 		return
 	}
 
-	defer errors.PanicIfError(fi.Close)
+	defer errors.Deferred(&err, fi.Close)
 
 	if fo, err = files.Create(out); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.PanicIfError(fo.Close)
+	defer errors.Deferred(&err, fo.Close)
 
 	r := bufio.NewReader(fi)
 	w := bufio.NewWriter(fo)
 
-	defer errors.PanicIfError(w.Flush)
+	defer errors.Deferred(&err, w.Flush)
 
 	for {
 		var l string

@@ -20,7 +20,7 @@ func (f Akte) WriteTo(c FormatContextWrite) (n int64, err error) {
 		return
 	}
 
-	defer errors.PanicIfError(r.Close)
+	defer errors.Deferred(&err, r.Close)
 
 	if _, err = io.Copy(c.Out, r); err != nil {
 		err = errors.Wrap(err)
