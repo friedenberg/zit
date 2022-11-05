@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/etikett"
 )
 
+// TODO-P3 make generic
 type SetKeyToEtiketten map[string]etikett.MutableSet
 
 func (m SetKeyToEtiketten) String() string {

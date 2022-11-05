@@ -17,6 +17,43 @@ type Zettel struct {
 	Etiketten   etikett.Set
 }
 
+func (z Zettel) Equals(z1 Zettel) bool {
+	if !z.Akte.Equals(z1.Akte) {
+		return false
+	}
+
+	if !z.Typ.Equals(z1.Typ) {
+		return false
+	}
+
+	if z.Bezeichnung != z1.Bezeichnung {
+		return false
+	}
+
+	if !z.Etiketten.Equals(z1.Etiketten) {
+		return false
+	}
+
+	return true
+}
+
+func (z Zettel) IsEmpty() bool {
+	if strings.TrimSpace(z.Bezeichnung.String()) != "" {
+		return false
+	}
+
+	if z.Etiketten.Len() > 0 {
+		return false
+	}
+
+	if !z.Akte.IsNull() {
+		return false
+	}
+
+	return true
+}
+
+// TODO-P3 use reset with pointer pattern
 func (z *Zettel) Reset() {
 	z.Akte = sha.Sha{}
 	z.Typ = typ.Typ{}

@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/konfig"
 )
 
+// TODO-P2 rewrite this to better structure the interface like io.WriterTo
 type AkteWriterFactory interface {
 	AkteWriter() (sha.WriteCloser, error)
 }

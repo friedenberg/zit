@@ -1,5 +1,6 @@
 package zettel
 
+// TODO-P2 deprecate and move to writerfuncs
 type Writer interface {
 	WriteZettel(z *Zettel) (err error)
 }
