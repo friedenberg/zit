@@ -69,23 +69,8 @@ func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
 
 	zp := s.PrinterOut()
 
-	if !zp.IsEmpty() {
-		err = zp.Error()
-		return
-	}
-
 	for _, z := range readResults {
 		zp.ZettelCheckedOut(*z).Print()
-
-		switch {
-		case zp.IsEPIPE():
-			zp.ClearErr()
-			return
-
-		case !zp.IsEmpty():
-			err = zp.Error()
-			return
-		}
 	}
 
 	for _, ua := range possible.UnsureAkten {
@@ -98,20 +83,9 @@ func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
 		case errors.Is(err, store_objekten.ErrNotFound{}):
 			zp.FileUnrecognized(ua).Print()
 
-			switch {
-			case zp.IsEPIPE():
-				zp.ClearErr()
-				return
-
-			case !zp.IsEmpty():
-				err = zp.Error()
-				return
-			}
-
 		case errors.Is(err, store_objekten.ErrAkteExists{}):
 			err1 := err.(store_objekten.ErrAkteExists)
 			zp.FileRecognized(ua, err1.MutableSet).Print()
-			err = zp.Error()
 
 		default:
 			err = errors.Wrapf(err, "%s", ua)

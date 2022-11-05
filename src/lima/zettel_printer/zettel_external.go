@@ -25,7 +25,7 @@ func (p *Printer) ZettelExternal(ze zettel_external.Zettel) (pa *paper.Paper) {
 		ref = p.Sha(ze.Named.Stored.Zettel.Akte).String()
 
 	default:
-		pa.Err = errors.Errorf("zettel external in unknown state: %q", ze)
+		_ = errors.Errorf("zettel external in unknown state: %q", ze)
 	}
 
 	if pathRel, err := filepath.Rel(p.Cwd(), path); err == nil {

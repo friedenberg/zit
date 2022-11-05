@@ -4,7 +4,6 @@ import (
 	"io"
 	"os"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/paper"
 	"github.com/friedenberg/zit/src/charlie/konfig"
 	"github.com/friedenberg/zit/src/delta/standort"
@@ -19,7 +18,6 @@ type Printer struct {
 	includeBezeichnungen bool
 
 	printer
-	*errors.Ctx
 }
 
 type printer struct {
@@ -41,7 +39,6 @@ func Make(s standort.Standort, k konfig.Konfig, f *os.File) (p *Printer) {
 			Standort: s,
 			File:     f,
 		},
-		Ctx: &errors.Ctx{},
 	}
 
 	return
@@ -52,5 +49,6 @@ func (p *Printer) SetObjektenStore(s *store_objekten.Store) {
 }
 
 func (pr *Printer) MakePaper() (pa *paper.Paper) {
-	return paper.Make(pr.printer.File, pr.Ctx)
+	pa, _ = paper.Make(pr.printer.File)
+	return
 }

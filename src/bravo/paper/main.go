@@ -12,20 +12,18 @@ import (
 type Paper struct {
 	paper
 	file *os.File
-	*errors.Ctx
 }
 
 type paper struct {
 	*strings.Builder
 }
 
-func Make(f *os.File, ctx *errors.Ctx) (pa *Paper) {
+func Make(f *os.File) (pa *Paper, err error) {
 	pa = &Paper{
 		paper: paper{
 			Builder: &strings.Builder{},
 		},
 		file: f,
-		Ctx:  ctx,
 	}
 
 	return
@@ -35,13 +33,15 @@ func (p *Paper) WriteTo(w io.Writer) (n int64, err error) {
 	return io.Copy(w, strings.NewReader(p.String()))
 }
 
-func (p *Paper) WriteFrom(ws ...io.WriterTo) {
+func (p *Paper) WriteFrom(ws ...io.WriterTo) (err error) {
 	for _, w := range ws {
-		if _, p.Err = w.WriteTo(p.Builder); !p.IsEmpty() {
-			p.Wrap()
+		if _, err = w.WriteTo(p.Builder); err != nil {
+			err = errors.Wrap(err)
 			return
 		}
 	}
+
+	return
 }
 
 func (p *Paper) WriteFormat(f string, vs ...interface{}) {
@@ -53,7 +53,9 @@ func (p *Paper) NewLine() {
 	p.WriteString("\n")
 }
 
-func (p *Paper) Print() {
+func (p *Paper) Print() (err error) {
 	p.NewLine()
-	_, p.Err = io.WriteString(p.file, p.String())
+	_, err = io.WriteString(p.file, p.String())
+
+	return
 }

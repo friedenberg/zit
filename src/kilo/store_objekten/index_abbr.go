@@ -50,12 +50,6 @@ func newIndexAbbr(
 }
 
 func (i *indexAbbr) Flush() (err error) {
-	errCtx := errors.Ctx{}
-
-	defer func() {
-		err = errCtx.Error()
-	}()
-
 	if !i.hasChanges {
 		errors.Print("no changes")
 		return
@@ -63,21 +57,21 @@ func (i *indexAbbr) Flush() (err error) {
 
 	var w1 io.WriteCloser
 
-	if w1, errCtx.Err = i.WriteCloserVerzeichnisse(i.path); !errCtx.IsEmpty() {
-		errCtx.Wrap()
+	if w1, err = i.WriteCloserVerzeichnisse(i.path); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
-	defer errCtx.Defer(w1.Close)
+	defer errors.Deferred(&err, w1.Close)
 
 	w := bufio.NewWriter(w1)
 
-	defer errCtx.Defer(w.Flush)
+	defer errors.Deferred(&err, w.Flush)
 
 	enc := gob.NewEncoder(w)
 
-	if errCtx.Err = enc.Encode(i.indexAbbrEncodableTridexes); !errCtx.IsEmpty() {
-		errCtx.Wrapf("failed to write encoded kennung")
+	if err = enc.Encode(i.indexAbbrEncodableTridexes); err != nil {
+		err = errors.Wrapf(err, "failed to write encoded kennung")
 		return
 	}
 
@@ -86,11 +80,6 @@ func (i *indexAbbr) Flush() (err error) {
 
 func (i *indexAbbr) readIfNecessary() (err error) {
 	errors.Caller(1, "")
-	errCtx := errors.Ctx{}
-
-	defer func() {
-		err = errCtx.Error()
-	}()
 
 	if i.didRead {
 		errors.Print("already read")
@@ -103,17 +92,17 @@ func (i *indexAbbr) readIfNecessary() (err error) {
 
 	var r1 io.ReadCloser
 
-	if r1, errCtx.Err = i.ReadCloserVerzeichnisse(i.path); !errCtx.IsEmpty() {
-		if errors.IsNotExist(errCtx.Err) {
-			errCtx.ClearErr()
+	if r1, err = i.ReadCloserVerzeichnisse(i.path); err != nil {
+		if errors.IsNotExist(err) {
+			err = nil
 		} else {
-			errCtx.Wrap()
+			err = errors.Wrap(err)
 		}
 
 		return
 	}
 
-	defer errCtx.Defer(r1.Close)
+	defer errors.Deferred(&err, r1.Close)
 
 	r := bufio.NewReader(r1)
 
@@ -121,9 +110,9 @@ func (i *indexAbbr) readIfNecessary() (err error) {
 
 	errors.Print("starting decode")
 
-	if errCtx.Err = dec.Decode(&i.indexAbbrEncodableTridexes); !errCtx.IsEmpty() {
+	if err = dec.Decode(&i.indexAbbrEncodableTridexes); err != nil {
 		errors.Print("finished decode unsuccessfully")
-		errCtx.Wrap()
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -133,14 +122,8 @@ func (i *indexAbbr) readIfNecessary() (err error) {
 }
 
 func (i *indexAbbr) addZettelTransacted(zt zettel_transacted.Zettel) (err error) {
-	ctx := errors.Ctx{}
-
-	defer func() {
-		err = ctx.Error()
-	}()
-
-	if ctx.Err = i.readIfNecessary(); !ctx.IsEmpty() {
-		ctx.Wrap()
+	if err = i.readIfNecessary(); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -159,14 +142,8 @@ func (i *indexAbbr) addZettelTransacted(zt zettel_transacted.Zettel) (err error)
 }
 
 func (i *indexAbbr) AbbreviateSha(s sha.Sha) (abbr string, err error) {
-	ctx := errors.Ctx{}
-
-	defer func() {
-		err = ctx.Error()
-	}()
-
-	if ctx.Err = i.readIfNecessary(); !ctx.IsEmpty() {
-		ctx.Wrap()
+	if err = i.readIfNecessary(); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -176,21 +153,15 @@ func (i *indexAbbr) AbbreviateSha(s sha.Sha) (abbr string, err error) {
 }
 
 func (i *indexAbbr) ExpandShaString(st string) (s sha.Sha, err error) {
-	ctx := errors.Ctx{}
-
-	defer func() {
-		err = ctx.Error()
-	}()
-
-	if ctx.Err = i.readIfNecessary(); !ctx.IsEmpty() {
-		ctx.Wrap()
+	if err = i.readIfNecessary(); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
 	expanded := i.indexAbbrEncodableTridexes.Shas.Expand(st)
 
-	if ctx.Err = s.Set(expanded); !ctx.IsEmpty() {
-		ctx.Wrap()
+	if err = s.Set(expanded); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -198,15 +169,8 @@ func (i *indexAbbr) ExpandShaString(st string) (s sha.Sha, err error) {
 }
 
 func (i *indexAbbr) AbbreviateHinweis(h hinweis.Hinweis) (ha hinweis.Hinweis, err error) {
-	errors.Print(h)
-	ctx := errors.Ctx{}
-
-	defer func() {
-		err = ctx.Error()
-	}()
-
-	if ctx.Err = i.readIfNecessary(); !ctx.IsEmpty() {
-		ctx.Wrap()
+	if err = i.readIfNecessary(); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -216,18 +180,18 @@ func (i *indexAbbr) AbbreviateHinweis(h hinweis.Hinweis) (ha hinweis.Hinweis, er
 	schwanz = i.indexAbbrEncodableTridexes.HinweisSchwanzen.Abbreviate(h.Schwanz())
 
 	if kopf == "" || schwanz == "" {
-		ctx.Err = errors.Errorf("abbreviated kopf would be empty for %s", h)
+		err = errors.Errorf("abbreviated kopf would be empty for %s", h)
 		errors.PrintDebug(i.indexAbbrEncodableTridexes.HinweisKopfen)
 		return
 	}
 
 	if schwanz == "" {
-		ctx.Err = errors.Errorf("abbreviated schwanz would be empty for %s", h)
+		err = errors.Errorf("abbreviated schwanz would be empty for %s", h)
 		return
 	}
 
-	if ha, ctx.Err = hinweis.MakeKopfUndSchwanz(kopf, schwanz); !ctx.IsEmpty() {
-		ctx.Wrap()
+	if ha, err = hinweis.MakeKopfUndSchwanz(kopf, schwanz); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -277,14 +241,9 @@ func (i *indexAbbr) ExpandEtikettString(s string) (e etikett.Etikett, err error)
 
 func (i *indexAbbr) ExpandEtikett(eAbbr etikett.Etikett) (e etikett.Etikett, err error) {
 	errors.Print(eAbbr)
-	ctx := errors.Ctx{}
 
-	defer func() {
-		err = ctx.Error()
-	}()
-
-	if ctx.Err = i.readIfNecessary(); !ctx.IsEmpty() {
-		ctx.Wrap()
+	if err = i.readIfNecessary(); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -295,8 +254,8 @@ func (i *indexAbbr) ExpandEtikett(eAbbr etikett.Etikett) (e etikett.Etikett, err
 		ex = eAbbr.String()
 	}
 
-	if ctx.Err = e.Set(ex); !ctx.IsEmpty() {
-		ctx.Wrap()
+	if err = e.Set(ex); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 

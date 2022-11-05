@@ -9,10 +9,7 @@ func (p *Printer) Hinweis(h hinweis.Hinweis) (pa *paper.Paper) {
 	pa = p.MakePaper()
 
 	if p.abbreviateHinweisen {
-		if h, pa.Err = p.AbbreviateHinweis(h); !pa.IsEmpty() {
-			pa.Wrap()
-			return
-		}
+		h, _ = p.AbbreviateHinweis(h)
 	}
 
 	pa.WriteString(h.String())
