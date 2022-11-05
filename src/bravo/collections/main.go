@@ -3,6 +3,7 @@ package collections
 import (
 	"flag"
 	"fmt"
+	"io"
 )
 
 //   _____
@@ -15,6 +16,8 @@ import (
 type WriterFunc[T any] func(T) error
 type WriterFuncWithKey[T any] func(string, T) error
 type WriterFuncKey func(string) error
+type WriterFuncFormat[T any] func(io.Writer, *T) (int64, error)
+type ReaderFuncFormat[T any] func(io.Reader, *T) (int64, error)
 
 //   ____             _
 //  |  _ \ ___   ___ | |___

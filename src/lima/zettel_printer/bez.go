@@ -1,6 +1,7 @@
 package zettel_printer
 
 import (
+	"github.com/friedenberg/zit/src/alfa/bezeichnung"
 	"github.com/friedenberg/zit/src/bravo/paper"
 	"github.com/friedenberg/zit/src/delta/zettel"
 )
@@ -8,17 +9,14 @@ import (
 func (p *Printer) Bezeichnung(z zettel.Zettel) (pa *paper.Paper) {
 	pa = p.MakePaper()
 
-	b := z.Bezeichnung.String()
+	b := &z.Bezeichnung
 
-	switch {
-	case len(b) > 66:
-		b = b[:66] + "…"
-
-	case len(b) == 0:
-		b = z.Etiketten.Description()
+	if b.IsEmpty() {
+		pa.WriteFormat("\"%s\"", z.Etiketten.Description())
+	} else {
+		f := bezeichnung.MakeCliFormat()
+		f(pa, b)
 	}
-
-	pa.WriteFormat("\"%s\"", b)
 
 	return
 }
