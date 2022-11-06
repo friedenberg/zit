@@ -4,6 +4,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/charlie/konfig"
 	"github.com/friedenberg/zit/src/delta/standort"
@@ -93,6 +94,6 @@ func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 
 func (s *verzeichnisseSchwanzen) ZettelVerzeichnisseWriter(
 	n int,
-) zettel_verzeichnisse.Writer {
-	return s.headers[n]
+) collections.WriterFunc[*zettel_verzeichnisse.Zettel] {
+	return s.headers[n].WriteZettelVerzeichnisse
 }

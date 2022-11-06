@@ -31,7 +31,7 @@ func makeZettelenPage(
 	flushFilter := collections.MakeWriterNoop[*zettel_verzeichnisse.Zettel]()
 
 	if zvwg, ok := iof.(ZettelVerzeichnisseWriterGetter); ok {
-		flushFilter = zvwg.ZettelVerzeichnisseWriter(pid.index).WriteZettelVerzeichnisse
+		flushFilter = zvwg.ZettelVerzeichnisseWriter(pid.index)
 	}
 
 	p = &Page{

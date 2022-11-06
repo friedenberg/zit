@@ -7,10 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
 )
 
-type Writer interface {
-	WriteZettelVerzeichnisse(z *Zettel) (err error)
-}
-
 func MakeWriterZettelTransacted(
 	wf collections.WriterFunc[*zettel_transacted.Zettel],
 ) collections.WriterFunc[*Zettel] {

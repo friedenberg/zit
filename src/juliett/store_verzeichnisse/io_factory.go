@@ -3,6 +3,7 @@ package store_verzeichnisse
 import (
 	"io"
 
+	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/india/zettel_verzeichnisse"
 )
 
@@ -15,7 +16,7 @@ type writeCloserFactory interface {
 }
 
 type ZettelVerzeichnisseWriterGetter interface {
-	ZettelVerzeichnisseWriter(int) zettel_verzeichnisse.Writer
+	ZettelVerzeichnisseWriter(int) collections.WriterFunc[*zettel_verzeichnisse.Zettel]
 }
 
 type PageHeader interface {

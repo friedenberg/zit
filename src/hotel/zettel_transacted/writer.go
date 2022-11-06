@@ -7,12 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 )
 
-type Writer interface {
-	WriteZettelTransacted(*Zettel) error
-}
-
-type writer collections.WriterFunc[*Zettel]
-
 func MakeWriterZettelNamed(
 	wf collections.WriterFunc[*zettel_named.Zettel],
 ) collections.WriterFunc[*Zettel] {
