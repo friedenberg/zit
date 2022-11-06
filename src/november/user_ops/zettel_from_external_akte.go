@@ -59,13 +59,9 @@ func (c ZettelFromExternalAkte) Run(
 	if c.Dedupe {
 		matcher := zettel_external.MakeMutableMatchSet(toCreate)
 
-		writerMatches := zettel_transacted.MakeWriterZettelNamed(
-			matcher.WriterZettelNamed(),
-		)
-
 		if err = c.StoreObjekten().ReadAllTransacted(
-			writerMatches,
-			zettel_transacted.MakeWriter(results.Add),
+			zettel_transacted.MakeWriterZettelNamed(matcher.Match),
+			results.Add,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -183,6 +179,7 @@ func (c ZettelFromExternalAkte) zettelForAkte(
 		return
 	}
 
+	z.Named.Stored.Zettel.Reset()
 	z.Named.Stored.Zettel.Akte = akteWriter.Sha()
 
 	//TODO move to protozettel

@@ -57,7 +57,7 @@ func (s Store) AkteExists(sh sha.Sha) (err error) {
 
 	set := zettel_transacted.MakeMutableSetUnique(0)
 
-	w := zettel_verzeichnisse.MakeWriter(
+	if err = s.verzeichnisseAll.ReadMany(
 		func(z *zettel_verzeichnisse.Zettel) (err error) {
 			if !z.Transacted.Named.Stored.Zettel.Akte.Equals(sh) {
 				err = io.EOF
@@ -66,10 +66,6 @@ func (s Store) AkteExists(sh sha.Sha) (err error) {
 
 			return
 		},
-	)
-
-	if err = s.verzeichnisseAll.ReadMany(
-		w,
 		zettel_verzeichnisse.MakeWriterZettelTransacted(
 			set.Add,
 		),

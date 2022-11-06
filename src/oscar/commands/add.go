@@ -173,7 +173,10 @@ func (c Add) openAktenIfNecessary(
 		},
 	)
 
-	if checkoutResults, err = u.StoreWorkingDirectory().Checkout(options, query); err != nil {
+	if checkoutResults, err = u.StoreWorkingDirectory().Checkout(
+		options,
+		query.WriteZettelTransacted,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

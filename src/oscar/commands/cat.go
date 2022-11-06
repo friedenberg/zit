@@ -19,6 +19,7 @@ import (
 
 type Cat struct {
 	gattung.Gattung
+	//Specific to Gattung
 	Format string
 }
 
@@ -110,19 +111,83 @@ func (c Cat) zettelWriter(
 }
 
 func (c Cat) zettelen(u *umwelt.Umwelt) (err error) {
-	w := zettel_transacted.MakeWriterChain(
+	if err = u.StoreObjekten().ReadAllSchwanzenTransacted(
 		zettel_transacted.MakeWriterZettel(
 			c.zettelWriter(u),
 		),
-	)
-
-	if err = u.StoreObjekten().ReadAllSchwanzenTransacted(w); err != nil {
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	return
 }
+
+//func (c CatObjekte) akten(store *umwelt.Umwelt, ids id_set.Set) (err error) {
+//	type akteToWrite struct {
+//		io.ReadCloser
+//		*zettel_named.Zettel
+//	}
+
+//	akteWriter := collections.MakeSyncSerializer(
+//		func(a akteToWrite) (err error) {
+//			errors.Log().Printf("writing one: %s", a)
+//			defer errors.Deferred(&err, a.ReadCloser.Close)
+
+//			//TODO-P2 explicitly support toml
+//			if _, err = io.WriteString(
+//				store.Out(),
+//				fmt.Sprintf("['%s']\n", a.Hinweis),
+//			); err != nil {
+//				err = errors.Wrap(err)
+//				return
+//			}
+
+//			if _, err = io.Copy(store.Out(), a.ReadCloser); err != nil {
+//				err = errors.Wrap(err)
+//				return
+//			}
+
+//			return
+//		},
+//	)
+
+//	if err = c.akteShasFromIds(
+//		store,
+//		ids,
+//		func(z *zettel_transacted.Zettel) (err error) {
+//			sb := z.Named.Stored.Zettel.Akte
+
+//			if sb.IsNull() {
+//				return
+//			}
+
+//			var r io.ReadCloser
+
+//			if r, err = store.StoreObjekten().AkteReader(sb); err != nil {
+//				err = errors.Wrap(err)
+//				return
+//			}
+
+//			if err = akteWriter(
+//				akteToWrite{
+//					ReadCloser: r,
+//					Zettel:     &z.Named,
+//				},
+//			); err != nil {
+//				err = errors.Wrap(err)
+//				return
+//			}
+
+//			return
+//		},
+//	); err != nil {
+//		err = errors.Wrap(err)
+//		return
+//	}
+
+//	return
+//}
 
 func (c Cat) akten(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	if err = u.StoreObjekten().ReadAllAktenShas(
@@ -168,13 +233,11 @@ func (c Cat) typen(u *umwelt.Umwelt) (err error) {
 	typen := collections.MakeMutableValueSet[typ.Typ, *typ.Typ]()
 
 	if err = u.StoreObjekten().ReadAllSchwanzenTransacted(
-		zettel_transacted.MakeWriter(
-			func(z *zettel_transacted.Zettel) (err error) {
-				err = typen.Add(z.Named.Stored.Zettel.Typ)
+		func(z *zettel_transacted.Zettel) (err error) {
+			err = typen.Add(z.Named.Stored.Zettel.Typ)
 
-				return
-			},
-		),
+			return
+		},
 	); err != nil {
 		err = errors.Wrap(err)
 		return

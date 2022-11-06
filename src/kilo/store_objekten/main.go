@@ -7,6 +7,7 @@ import (
 	"sort"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/paper"
 	"github.com/friedenberg/zit/src/bravo/sha"
@@ -238,28 +239,32 @@ func (s Store) ReadHinweisSchwanzen(
 }
 
 func (i *Store) ReadAllSchwanzenVerzeichnisse(
-	ws ...zettel_verzeichnisse.Writer,
+	ws ...collections.WriterFunc[*zettel_verzeichnisse.Zettel],
 ) (err error) {
 	return i.verzeichnisseSchwanzen.ReadMany(ws...)
 }
 
-func (s Store) ReadAllSchwanzenTransacted(ws ...zettel_transacted.Writer) (err error) {
+func (s Store) ReadAllSchwanzenTransacted(
+	ws ...collections.WriterFunc[*zettel_transacted.Zettel],
+) (err error) {
 	w := zettel_verzeichnisse.MakeWriterZettelTransacted(
-		zettel_transacted.MakeWriterChain(ws...).WriteZettelTransacted,
+		collections.MakeChain(ws...),
 	)
 
 	return s.ReadAllSchwanzenVerzeichnisse(w)
 }
 
 func (i *Store) ReadAllVerzeichnisse(
-	ws ...zettel_verzeichnisse.Writer,
+	ws ...collections.WriterFunc[*zettel_verzeichnisse.Zettel],
 ) (err error) {
 	return i.verzeichnisseAll.ReadMany(ws...)
 }
 
-func (s Store) ReadAllTransacted(ws ...zettel_transacted.Writer) (err error) {
+func (s Store) ReadAllTransacted(
+	ws ...collections.WriterFunc[*zettel_transacted.Zettel],
+) (err error) {
 	w := zettel_verzeichnisse.MakeWriterZettelTransacted(
-		zettel_transacted.MakeWriterChain(ws...).WriteZettelTransacted,
+		collections.MakeChain(ws...),
 	)
 
 	return s.ReadAllVerzeichnisse(w)
@@ -564,7 +569,8 @@ func (s Store) Flush() (err error) {
 
 func (s Store) AllInChain(h hinweis.Hinweis) (c []*zettel_transacted.Zettel, err error) {
 	mst := zettel_transacted.MakeMutableSetUnique(0)
-	w := zettel_verzeichnisse.MakeWriter(
+
+	if err = s.verzeichnisseAll.ReadMany(
 		func(z *zettel_verzeichnisse.Zettel) (err error) {
 			if !z.Transacted.Named.Hinweis.Equals(h) {
 				err = io.EOF
@@ -573,10 +579,6 @@ func (s Store) AllInChain(h hinweis.Hinweis) (c []*zettel_transacted.Zettel, err
 
 			return
 		},
-	)
-
-	if err = s.verzeichnisseAll.ReadMany(
-		w,
 		zettel_verzeichnisse.MakeWriterZettelTransacted(mst.Add),
 	); err != nil {
 		err = errors.Wrap(err)

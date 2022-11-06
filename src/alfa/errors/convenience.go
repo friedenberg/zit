@@ -52,6 +52,15 @@ func Deferred(
 	}
 }
 
+func DeferredChan(
+	ch chan<- error,
+	f func() error,
+) {
+	if err := f(); err != nil {
+    ch<-err
+	}
+}
+
 func PanicIfError(err interface{}) {
 	if err == nil {
 		return

@@ -14,6 +14,7 @@ import (
 //
 
 type WriterFunc[T any] func(T) error
+// type WriterFuncFuncPooled[T any] func(PoolLike[T]) WriterFunc[*T]
 type WriterFuncWithKey[T any] func(string, T) error
 type WriterFuncKey func(string) error
 type WriterFuncFormat[T any] func(io.Writer, *T) (int64, error)

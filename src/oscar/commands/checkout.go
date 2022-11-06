@@ -80,7 +80,10 @@ func (c Checkout) RunWithIds(s *umwelt.Umwelt, ids id_set.Set) (err error) {
 		},
 	)
 
-	if _, err = s.StoreWorkingDirectory().Checkout(options, query); err != nil {
+	if _, err = s.StoreWorkingDirectory().Checkout(
+		options,
+		query.WriteZettelTransacted,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

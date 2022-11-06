@@ -55,20 +55,18 @@ func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 	var found *zettel_verzeichnisse.Zettel
 	pool := s.Zettelen.Pool()
 
-	w := zettel_verzeichnisse.MakeWriter(
-		func(zv *zettel_verzeichnisse.Zettel) (err error) {
-			if !zv.Transacted.Named.Hinweis.Equals(h) {
-				pool.Put(zv)
-				return
-			}
-
-			found = zv
-
-			err = io.EOF
-
+	w := func(zv *zettel_verzeichnisse.Zettel) (err error) {
+		if !zv.Transacted.Named.Hinweis.Equals(h) {
+			pool.Put(zv)
 			return
-		},
-	)
+		}
+
+		found = zv
+
+		err = io.EOF
+
+		return
+	}
 
 	var p *store_verzeichnisse.Page
 

@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/etikett"
@@ -110,7 +111,7 @@ func (c Show) RunWithIds(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 }
 
 func (c Show) showZettels(store *umwelt.Umwelt, ids id_set.Set) (err error) {
-	w := zettel_transacted.MakeWriterChain(
+	w := collections.MakeChain(
 		zettel_transacted.MakeWriterZettelNamed(
 			zettel_named.FilterIdSet{
 				Set: ids,

@@ -165,7 +165,7 @@ func (c CatAlfred) catZettelen(
 				Set:        ids,
 			}.WriteZettelNamed,
 		),
-		aw,
+		aw.WriteZettelVerzeichnisse,
 	); err != nil {
 		aw.WriteError(err)
 		return

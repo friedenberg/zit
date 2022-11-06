@@ -114,7 +114,7 @@ func (zp *Page) Flush() (err error) {
 }
 
 func (zp *Page) WriteZettelenTo(
-	w zettel_verzeichnisse.Writer,
+	w collections.WriterFunc[*zettel_verzeichnisse.Zettel],
 ) (err error) {
 	var r io.ReadCloser
 
@@ -194,7 +194,7 @@ func (zp *Page) ReadJustHeader() (err error) {
 
 func (zp *Page) Copy(
 	r1 io.Reader,
-	w zettel_verzeichnisse.Writer,
+	w collections.WriterFunc[*zettel_verzeichnisse.Zettel],
 ) (n int64, err error) {
 	r := bufio.NewReader(r1)
 
@@ -215,7 +215,7 @@ func (zp *Page) Copy(
 			}
 		}
 
-		if err = w.WriteZettelVerzeichnisse(tz); err != nil {
+		if err = w(tz); err != nil {
 			if errors.IsEOF(err) {
 				err = nil
 			} else {
@@ -230,7 +230,7 @@ func (zp *Page) Copy(
 		z1 := zp.pool.Get()
 		z1.Reset(z)
 
-		if err = w.WriteZettelVerzeichnisse(z1); err != nil {
+		if err = w(z1); err != nil {
 			if errors.IsEOF(err) {
 				err = nil
 			} else {
@@ -249,12 +249,12 @@ func (zp *Page) WriteTo(w1 io.Writer) (n int64, err error) {
 
 	defer errors.Deferred(&err, w.Flush)
 
-	wm := zettel_verzeichnisse.MakeWriterChain(
-		zettel_verzeichnisse.MakeWriter(zp.flushFilter),
-		zettel_verzeichnisse.MakeWriterGobEncoder(w),
-	)
-
-	if err = zp.WriteZettelenTo(wm); err != nil {
+	if err = zp.WriteZettelenTo(
+		collections.MakeChain(
+			zp.flushFilter,
+			zettel_verzeichnisse.MakeWriterGobEncoder(w).WriteZettelVerzeichnisse,
+		),
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -2,23 +2,16 @@ package commands
 
 import (
 	"flag"
-	"fmt"
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/etikett"
-	"github.com/friedenberg/zit/src/charlie/hinweis"
-	"github.com/friedenberg/zit/src/charlie/konfig"
-	"github.com/friedenberg/zit/src/charlie/ts"
-	"github.com/friedenberg/zit/src/charlie/typ"
 	"github.com/friedenberg/zit/src/delta/id_set"
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
-	"github.com/friedenberg/zit/src/india/zettel_verzeichnisse"
 	"github.com/friedenberg/zit/src/mike/umwelt"
 )
 
@@ -46,48 +39,22 @@ func init() {
 func (c CatObjekte) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 	is = id_set.MakeProtoIdSet(
 		id_set.ProtoId{
-			MutableId: &konfig.Id{},
-		},
-		id_set.ProtoId{
 			MutableId: &sha.Sha{},
-		},
-		id_set.ProtoId{
-			MutableId: &hinweis.Hinweis{},
-			Expand: func(v string) (out string, err error) {
-				var h hinweis.Hinweis
-				h, err = u.StoreObjekten().ExpandHinweisString(v)
-				out = h.String()
-				return
-			},
-		},
-		id_set.ProtoId{
-			MutableId: &etikett.Etikett{},
-			Expand: func(v string) (out string, err error) {
-				var e etikett.Etikett
-				e, err = u.StoreObjekten().ExpandEtikettString(v)
-				out = e.String()
-				return
-			},
-		},
-		id_set.ProtoId{
-			MutableId: &typ.Typ{},
-		},
-		id_set.ProtoId{
-			MutableId: &ts.Time{},
 		},
 	)
 
 	return
 }
 
-func (c CatObjekte) RunWithIds(store *umwelt.Umwelt, ids id_set.Set) (err error) {
-	switch c.Type {
+func (c CatObjekte) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
+	shas := ids.Shas()
 
+	switch c.Type {
 	case gattung.Akte:
-		return c.akten(store, ids)
+		return c.akten(u, shas)
 
 	case gattung.Zettel:
-		return c.zettelen(store, ids)
+		return c.zettelen(u, shas)
 
 	default:
 		err = errors.Errorf("unsupported objekte type: %s", c.Type)
@@ -95,62 +62,12 @@ func (c CatObjekte) RunWithIds(store *umwelt.Umwelt, ids id_set.Set) (err error)
 	}
 }
 
-func (c CatObjekte) akteShasFromIds(
-	u *umwelt.Umwelt,
-	ids id_set.Set,
-	f collections.WriterFunc[*zettel_transacted.Zettel],
-) (err error) {
-	if err = u.StoreObjekten().ReadAllSchwanzenVerzeichnisse(
-		zettel_verzeichnisse.MakeWriterZettelNamed(
-			zettel_named.FilterIdSet{
-				Set: ids,
-			}.WriteZettelNamed,
-		),
-		zettel_verzeichnisse.MakeWriterZettelTransacted(f),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	//TODO add back support for changed akte in working directory
-	// for _, h := range ids.Hinweisen().Elements() {
-	// 	var zc zettel_checked_out.Zettel
-
-	// 	if zc, err = u.StoreWorkingDirectory().Read(h.String() + ".md"); err != nil {
-	// 		err = errors.Wrap(err)
-	// 		return
-	// 	}
-
-	// 	if zc.State == zettel_checked_out.StateExistsAndDifferent {
-	// 		shas = append(shas, zc.External.Named.Stored.Zettel.Akte)
-	// 	} else {
-	// 		shas = append(shas, zc.Internal.Named.Stored.Zettel.Akte)
-	// 	}
-	// }
-
-	return
-}
-
-func (c CatObjekte) akten(store *umwelt.Umwelt, ids id_set.Set) (err error) {
-	type akteToWrite struct {
-		io.ReadCloser
-		*zettel_named.Zettel
-	}
-
+func (c CatObjekte) akten(u *umwelt.Umwelt, shas sha.Set) (err error) {
 	akteWriter := collections.MakeSyncSerializer(
-		func(a akteToWrite) (err error) {
-			defer errors.Deferred(&err, a.ReadCloser.Close)
+		func(rc io.ReadCloser) (err error) {
+			defer errors.Deferred(&err, rc.Close)
 
-			//TODO-P2 explicitly support toml
-			if _, err = io.WriteString(
-				store.Out(),
-				fmt.Sprintf("['%s']\n", a.Hinweis),
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			if _, err = io.Copy(store.Out(), a.ReadCloser); err != nil {
+			if _, err = io.Copy(u.Out(), rc); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -158,35 +75,26 @@ func (c CatObjekte) akten(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 			return
 		},
 	)
-	if err = c.akteShasFromIds(
-		store,
-		ids,
-		func(z *zettel_transacted.Zettel) (err error) {
-			sb := z.Named.Stored.Zettel.Akte
 
-			if sb.IsNull() {
+	if err = u.StoreObjekten().ReadAllAktenShas(
+		collections.MakeChain(
+			shas.WriterContainer(),
+			func(sb sha.Sha) (err error) {
+				var r io.ReadCloser
+
+				if r, err = u.StoreObjekten().AkteReader(sb); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				if err = akteWriter(r); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
 				return
-			}
-
-			var r io.ReadCloser
-
-			if r, err = store.StoreObjekten().AkteReader(sb); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			if err = akteWriter(
-				akteToWrite{
-					ReadCloser: r,
-					Zettel:     &z.Named,
-				},
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		},
+			},
+		),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -195,24 +103,28 @@ func (c CatObjekte) akten(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 	return
 }
 
-func (c CatObjekte) zettelen(store *umwelt.Umwelt, ids id_set.Set) (err error) {
-	w := zettel_transacted.MakeWriterChain(
+func (c CatObjekte) zettelen(u *umwelt.Umwelt, shas sha.Set) (err error) {
+	w := collections.MakeChain(
 		zettel_transacted.MakeWriterZettelNamed(
-			zettel_named.FilterIdSet{
-				Set: ids,
-			}.WriteZettelNamed,
+			func(z *zettel_named.Zettel) (err error) {
+				if !shas.Contains(z.Stored.Sha) {
+					err = io.EOF
+				}
+
+				return
+			},
 		),
 		zettel_transacted.MakeWriterZettel(
 			zettel.MakeSerializedFormatWriter(
 				&zettel.Objekte{},
-				store.Out(),
-				store.StoreObjekten(),
-				store.Konfig(),
+				u.Out(),
+				u.StoreObjekten(),
+				u.Konfig(),
 			),
 		),
 	)
 
-	if err = store.StoreObjekten().ReadAllSchwanzenTransacted(w); err != nil {
+	if err = u.StoreObjekten().ReadAllSchwanzenTransacted(w); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

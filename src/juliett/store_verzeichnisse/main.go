@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/charlie/konfig"
 	"github.com/friedenberg/zit/src/hotel/zettel_transacted"
 	"github.com/friedenberg/zit/src/india/zettel_verzeichnisse"
@@ -123,7 +124,8 @@ func (i *Zettelen) GetPageIndexKeyValue(
 }
 
 func (i *Zettelen) ReadMany(
-	ws ...zettel_verzeichnisse.Writer,
+  //TODO switch to single writer and force callers to make chains
+	ws ...collections.WriterFunc[*zettel_verzeichnisse.Zettel],
 ) (err error) {
 	wg := &sync.WaitGroup{}
 	ch := make(chan struct{}, PageCount)
@@ -140,8 +142,10 @@ func (i *Zettelen) ReadMany(
 		}
 	}
 
-	w1 := zettel_verzeichnisse.MakeWriterChain(ws...)
-	w := w1.ToPooledChain().WriterWithPool(i.pool)
+	w := collections.MakePooledChain[zettel_verzeichnisse.Zettel](
+		i.pool,
+		ws...,
+	)
 
 	for n, p := range i.pages {
 		wg.Add(1)
@@ -159,7 +163,7 @@ func (i *Zettelen) ReadMany(
 
 				var err1 error
 
-				if err1 = p.WriteZettelenTo(zettel_verzeichnisse.MakeWriter(w)); err1 != nil {
+				if err1 = p.WriteZettelenTo(w); err1 != nil {
 					if isDone() {
 						break
 					}

@@ -13,36 +13,28 @@ type Writer interface {
 
 type writer collections.WriterFunc[*Zettel]
 
-func MakeWriter(f collections.WriterFunc[*Zettel]) writer {
-	return writer(f)
-}
-
-func (w writer) WriteZettelTransacted(z *Zettel) (err error) {
-	return collections.WriterFunc[*Zettel](w)(z)
-}
-
-func MakeWriterZettelNamed(wf collections.WriterFunc[*zettel_named.Zettel]) Writer {
-	return MakeWriter(
-		func(z *Zettel) (err error) {
-			if err = wf(&z.Named); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
+func MakeWriterZettelNamed(
+	wf collections.WriterFunc[*zettel_named.Zettel],
+) collections.WriterFunc[*Zettel] {
+	return func(z *Zettel) (err error) {
+		if err = wf(&z.Named); err != nil {
+			err = errors.Wrap(err)
 			return
-		},
-	)
+		}
+
+		return
+	}
 }
 
-func MakeWriterZettel(wf collections.WriterFunc[*zettel.Zettel]) Writer {
-	return MakeWriter(
-		func(z *Zettel) (err error) {
-			if err = wf(&z.Named.Stored.Zettel); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
+func MakeWriterZettel(
+	wf collections.WriterFunc[*zettel.Zettel],
+) collections.WriterFunc[*Zettel] {
+	return func(z *Zettel) (err error) {
+		if err = wf(&z.Named.Stored.Zettel); err != nil {
+			err = errors.Wrap(err)
 			return
-		},
-	)
+		}
+
+		return
+	}
 }

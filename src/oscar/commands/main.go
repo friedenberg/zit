@@ -56,7 +56,7 @@ func Run(args []string) (exitStatus int) {
 	ok := false
 
 	if cmd, ok = cmds[specifiedSubcommand]; !ok {
-		return cmd.PrintUsage(errors.Errorf("No subcommand '%s'", specifiedSubcommand))
+		return cmd.PrintUsage(errors.Normalf("No subcommand '%s'", specifiedSubcommand))
 	}
 
 	args = os.Args[2:]

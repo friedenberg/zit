@@ -17,17 +17,15 @@ import (
 
 func (s *Store) Checkout(
 	options CheckoutOptions,
-	ztw zettel_transacted.Writer,
+	ztw collections.WriterFunc[*zettel_transacted.Zettel],
 ) (zcs zettel_checked_out.MutableSet, err error) {
 	zcs = zettel_checked_out.MakeMutableSetUnique(0)
 	zts := zettel_transacted.MakeMutableSetUnique(0)
 
 	if err = s.storeObjekten.ReadAllSchwanzenTransacted(
 		ztw,
-		zettel_transacted.MakeWriter(zts.Add),
-		zettel_transacted.MakeWriter(
-			collections.MakeWriterDoNotRepool[zettel_transacted.Zettel](),
-		),
+		zts.Add,
+		collections.MakeWriterDoNotRepool[zettel_transacted.Zettel](),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

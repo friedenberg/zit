@@ -3,7 +3,6 @@ package zettel_external
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/foxtrot/zettel_named"
 )
 
@@ -28,28 +27,26 @@ func MakeMutableMatchSet(in MutableSet) (out MutableMatchSet) {
 	return
 }
 
-func (s MutableMatchSet) WriterZettelNamed() collections.WriterFunc[*zettel_named.Zettel] {
-	return func(z *zettel_named.Zettel) (err error) {
-		kStored := z.Stored.Sha.String()
-		kAkte := z.Stored.Zettel.Akte.String()
+func (s MutableMatchSet) Match(z *zettel_named.Zettel) (err error) {
+	kStored := z.Stored.Sha.String()
+	kAkte := z.Stored.Zettel.Akte.String()
 
-		stored, okStored := s.Stored.Get(kStored)
-		akte, okAkte := s.Akten.Get(kAkte)
+	stored, okStored := s.Stored.Get(kStored)
+	akte, okAkte := s.Akten.Get(kAkte)
 
-		if okStored || okAkte {
-			s.Stored.DelKey(kStored)
-			s.Akten.DelKey(kAkte)
-			s.Original.Del(stored)
-			s.Original.Del(akte)
+	if okStored || okAkte {
+		s.Stored.DelKey(kStored)
+		s.Akten.DelKey(kAkte)
+		s.Original.Del(stored)
+		s.Original.Del(akte)
 
-			//These two should be redundant
-			s.Matched.Add(akte)
-			s.Matched.Add(stored)
-			return
-		}
-
-		err = io.EOF
-
+		//These two should be redundant
+		s.Matched.Add(akte)
+		s.Matched.Add(stored)
 		return
 	}
+
+	err = io.EOF
+
+	return
 }
