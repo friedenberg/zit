@@ -65,7 +65,7 @@ func (c CreateFromPaths) Run(args ...string) (results zettel_transacted.MutableS
 
 		if err = c.StoreObjekten().ReadAllTransacted(
 			zettel_transacted.MakeWriterZettelNamed(matcher.Match),
-			results.Add,
+			results.AddAndDoNotRepool,
 		); err != nil {
 			err = errors.Wrap(err)
 			return

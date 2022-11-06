@@ -61,7 +61,7 @@ func (c ZettelFromExternalAkte) Run(
 
 		if err = c.StoreObjekten().ReadAllTransacted(
 			zettel_transacted.MakeWriterZettelNamed(matcher.Match),
-			results.Add,
+			results.AddAndDoNotRepool,
 		); err != nil {
 			err = errors.Wrap(err)
 			return

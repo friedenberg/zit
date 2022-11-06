@@ -67,7 +67,7 @@ func (s Store) AkteExists(sh sha.Sha) (err error) {
 			return
 		},
 		zettel_verzeichnisse.MakeWriterZettelTransacted(
-			set.Add,
+			set.AddAndDoNotRepool,
 		),
 	); err != nil {
 		err = errors.Wrap(err)
