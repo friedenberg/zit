@@ -7,6 +7,8 @@ import (
 	"path"
 	"strconv"
 	"strings"
+
+	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
 const (
@@ -67,6 +69,15 @@ func (g *openFilesGuard) UnlockN(n int) {
 	for i := 0; i < n; i++ {
 		g.Unlock()
 	}
+}
+
+func CreateExclusiveWriteOnly(p string) (f *os.File, err error) {
+	if f, err = os.OpenFile(p, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0755); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func Create(s string) (f *os.File, err error) {

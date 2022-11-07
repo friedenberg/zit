@@ -1,11 +1,12 @@
 package age
 
 import (
-	"io/ioutil"
-	"path"
+	"io"
+	"os"
 
 	"filippo.io/age"
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/files"
 )
 
 func Generate(basePath string) (a *Age, err error) {
@@ -16,7 +17,16 @@ func Generate(basePath string) (a *Age, err error) {
 		return
 	}
 
-	if err = ioutil.WriteFile(path.Join(basePath), []byte(i.String()), 0755); err != nil {
+	var f *os.File
+
+	if f, err = files.CreateExclusiveWriteOnly(basePath); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.Deferred(&err, f.Close)
+
+	if _, err = io.WriteString(f, i.String()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

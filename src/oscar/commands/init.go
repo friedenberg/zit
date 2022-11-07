@@ -53,13 +53,19 @@ func (c Init) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	if !c.DisableAge {
 		if _, err = age.Generate(s.FileAge()); err != nil {
-			err = errors.Wrap(err)
-			return
+			//If the Age file exists, don't do anything and continue init
+			if errors.Is(err, os.ErrExist) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+				return
+			}
 		}
 	}
 
 	c.writeFile(s.DirZit("Konfig"), "")
 
+	//TODO how to handle re-init for yin and yang?
 	if err = c.populateYinIfNecessary(s); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -121,7 +127,7 @@ func (c Init) readAndTransferLines(in, out string) (err error) {
 
 	defer errors.Deferred(&err, fi.Close)
 
-	if fo, err = files.Create(out); err != nil {
+	if fo, err = files.CreateExclusiveWriteOnly(out); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

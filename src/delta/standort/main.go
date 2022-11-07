@@ -86,6 +86,11 @@ func (s Standort) DirObjekten(p ...string) string {
 	return s.DirZit(append([]string{"Objekten"}, p...)...)
 }
 
+//TODO spelling?
+func (s Standort) DirObjektenKennungen() string {
+	return s.DirObjekten("Kennungen")
+}
+
 func (s Standort) DirObjektenZettelen() string {
 	return s.DirObjekten("Zettelen")
 }
