@@ -19,7 +19,7 @@ func (c *Zettel) DetermineState() {
 		} else {
 			c.State = StateUntracked
 		}
-	} else if c.Internal.Named.Stored.Zettel.Equals(c.External.Named.Stored.Zettel) {
+	} else if c.Internal.Named.Stored.Sha.Equals(c.External.Named.Stored.Sha) {
 		c.State = StateExistsAndSame
 	} else if c.External.Named.Stored.Sha.IsNull() {
 		c.State = StateEmpty

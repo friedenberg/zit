@@ -7,6 +7,11 @@ import (
 	"strings"
 )
 
+type StackTracer interface {
+	error
+	ShouldShowStackTrace() bool
+}
+
 type StackInfo struct {
 	pakkage     string
 	function    string

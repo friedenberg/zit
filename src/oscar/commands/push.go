@@ -106,7 +106,7 @@ func (c Push) runRemoteScript(u *umwelt.Umwelt, remote konfig.RemoteScript, args
 	script.Stderr = os.Stderr
 
 	if err = script.Run(); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Normal(err)
 		return
 	}
 

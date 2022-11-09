@@ -2,11 +2,6 @@ package errors
 
 import "golang.org/x/xerrors"
 
-type StackTracer interface {
-	error
-	ShouldShowStackTrace() bool
-}
-
 type normalError struct {
 	error
 }

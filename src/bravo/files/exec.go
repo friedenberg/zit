@@ -18,6 +18,11 @@ func IsTty(f *os.File) (ok bool) {
 func OpenVimWithArgs(args []string, files ...string) (err error) {
 	var cmd *exec.Cmd
 
+  if len(files) == 0 {
+    err = ErrEmptyFileList{}
+    return
+  }
+
 	args = append(args, "-p")
 
 	if IsTty(os.Stdin) {

@@ -111,7 +111,7 @@ func (c Pull) runRemoteScript(u *umwelt.Umwelt, remote konfig.RemoteScript, args
 	script.Stdin = r
 
 	if err = script.Run(); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Normal(err)
 		return
 	}
 
