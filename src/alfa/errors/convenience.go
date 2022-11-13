@@ -57,7 +57,7 @@ func DeferredChan(
 	f func() error,
 ) {
 	if err := f(); err != nil {
-    ch<-err
+		ch <- err
 	}
 }
 

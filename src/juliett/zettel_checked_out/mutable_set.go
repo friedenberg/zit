@@ -2,7 +2,7 @@ package zettel_checked_out
 
 import (
 	"github.com/friedenberg/zit/src/bravo/collections"
-	"github.com/friedenberg/zit/src/golf/zettel_external"
+	"github.com/friedenberg/zit/src/india/zettel_external"
 )
 
 type MutableSet struct {
