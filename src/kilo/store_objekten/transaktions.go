@@ -24,7 +24,6 @@ func (s Store) ReadLastTransaktion() (t *transaktion.Transaktion, err error) {
 		collections.MakeSyncSerializer(
 			func(t1 *transaktion.Transaktion) (err error) {
 				if t != nil && t1.Time.Less(t.Time) {
-					err = io.EOF
 					return
 				}
 

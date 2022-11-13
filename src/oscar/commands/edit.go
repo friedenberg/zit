@@ -130,8 +130,6 @@ func (c Edit) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 		return
 	}
 
-	var readResults zettel_checked_out.MutableSet
-
 	readOp := user_ops.ReadCheckedOut{
 		Umwelt: u,
 		OptionsReadExternal: store_working_directory.OptionsReadExternal{
@@ -148,7 +146,9 @@ func (c Edit) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 		return
 	}
 
-	if readResults, err = readOp.RunMany(possible); err != nil {
+	readResults := zettel_checked_out.MakeMutableSetUnique(0)
+
+	if err = readOp.RunMany(possible, readResults.Add); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

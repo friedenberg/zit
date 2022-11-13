@@ -199,9 +199,9 @@ func (c New) editZettels(
 		},
 	}
 
-	var zslc zettel_checked_out.MutableSet
+	zslc := zettel_checked_out.MakeMutableSetUnique(0)
 
-	if zslc, err = readOp.RunMany(cwdFiles); err != nil {
+	if err = readOp.RunMany(cwdFiles, zslc.Add); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

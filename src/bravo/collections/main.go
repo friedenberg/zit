@@ -13,6 +13,7 @@ import (
 //  |_|   \__,_|_| |_|\___|___/
 //
 
+type Writer func(io.Writer) (int64, error)
 type WriterFunc[T any] func(T) error
 // type WriterFuncFuncPooled[T any] func(PoolLike[T]) WriterFunc[*T]
 type WriterFuncWithKey[T any] func(string, T) error

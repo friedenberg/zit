@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/bravo/paper"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/charlie/id"
 	"github.com/friedenberg/zit/src/delta/zettel"
@@ -19,11 +19,6 @@ import (
 	"github.com/friedenberg/zit/src/kilo/store_objekten"
 )
 
-type ZettelCheckedOutPrinter interface {
-	store_objekten.ZettelTransactedPrinter
-	ZettelCheckedOut(zettel_checked_out.Zettel) *paper.Paper
-}
-
 type Store struct {
 	Konfig
 
@@ -31,7 +26,7 @@ type Store struct {
 
 	storeObjekten *store_objekten.Store
 
-	zettelCheckedOutPrinter ZettelCheckedOutPrinter
+	zettelCheckedOutWriter collections.WriterFunc[*zettel_checked_out.Zettel]
 
 	path         string
 	cwd          string
@@ -59,8 +54,10 @@ func New(k Konfig, p string, storeObjekten *store_objekten.Store) (s *Store, err
 	return
 }
 
-func (s *Store) SetZettelCheckedOutPrinter(zcop ZettelCheckedOutPrinter) {
-	s.zettelCheckedOutPrinter = zcop
+func (s *Store) SetZettelCheckedOutWriter(
+	zcow collections.WriterFunc[*zettel_checked_out.Zettel],
+) {
+	s.zettelCheckedOutWriter = zcow
 }
 
 func (s Store) IndexFilePath() string {

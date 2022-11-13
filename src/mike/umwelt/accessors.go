@@ -8,15 +8,10 @@ import (
 	"github.com/friedenberg/zit/src/india/zettel_verzeichnisse"
 	"github.com/friedenberg/zit/src/kilo/store_objekten"
 	"github.com/friedenberg/zit/src/lima/store_working_directory"
-	"github.com/friedenberg/zit/src/lima/zettel_printer"
 )
 
 func (u *Umwelt) Konfig() konfig.Konfig {
 	return u.konfig
-}
-
-func (u *Umwelt) PrinterOut() *zettel_printer.Printer {
-	return u.printerOut
 }
 
 func (u *Umwelt) Out() io.Writer {

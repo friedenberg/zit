@@ -50,14 +50,14 @@ func (c Clean) Run(
 		Format: zettel.Text{},
 	}
 
-	var readResults zettel_checked_out.MutableSet
+	readResults := zettel_checked_out.MakeMutableSetUnique(0)
 
 	readOp := user_ops.ReadCheckedOut{
 		Umwelt:              s,
 		OptionsReadExternal: optionsReadExternal,
 	}
 
-	if readResults, err = readOp.RunMany(possible); err != nil {
+	if err = readOp.RunMany(possible, readResults.Add); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

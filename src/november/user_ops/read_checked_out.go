@@ -2,6 +2,7 @@ package user_ops
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/charlie/hinweis"
 	"github.com/friedenberg/zit/src/delta/hinweisen"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
@@ -38,9 +39,8 @@ func (op ReadCheckedOut) RunOneString(
 
 func (op ReadCheckedOut) RunMany(
 	possible store_working_directory.CwdFiles,
-) (results zettel_checked_out.MutableSet, err error) {
-	results = zettel_checked_out.MakeMutableSetUnique(possible.Len())
-
+	w collections.WriterFunc[*zettel_checked_out.Zettel],
+) (err error) {
 	for _, p := range possible.Zettelen {
 		var checked_out zettel_checked_out.Zettel
 
@@ -75,7 +75,10 @@ func (op ReadCheckedOut) RunMany(
 
 		}
 
-		results.Add(&checked_out)
+		if err = w(&checked_out); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return

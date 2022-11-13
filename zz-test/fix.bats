@@ -74,7 +74,7 @@ function outputs_organize_one_etikett { # @test
 	} >"$to_add"
 
 	run "${cmd_zit_new[@]}" -edit=false "$to_add"
-	assert_output '[one/uno@5 "wow"] (created)'
+	assert_output '(created) [one/uno@5 !md "wow"]'
 
 	run zit show one/uno
 	# assert_output "$(cat "$to_add")"

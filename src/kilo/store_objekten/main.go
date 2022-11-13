@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/bravo/paper"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/charlie/etikett"
@@ -33,10 +32,6 @@ type LockSmith interface {
 	IsAcquired() bool
 }
 
-type ZettelTransactedPrinter interface {
-	ZettelTransacted(zettel_transacted.Zettel) *paper.Paper
-}
-
 type Store struct {
 	lockSmith   LockSmith
 	konfig      konfig.Konfig
@@ -44,8 +39,9 @@ type Store struct {
 	standort    standort.Standort
 	age         age.Age
 
-	zettelTransactedPrinter ZettelTransactedPrinter
-	hinweisen               *hinweisen.Hinweisen
+	zettelTransactedWriter collections.WriterFunc[*zettel_transacted.Zettel]
+
+	hinweisen *hinweisen.Hinweisen
 	// *indexZettelen
 	*indexEtiketten
 	*indexKennung
@@ -150,8 +146,10 @@ func Make(
 	return
 }
 
-func (s *Store) SetZettelTransactedPrinter(ztp ZettelTransactedPrinter) {
-	s.zettelTransactedPrinter = ztp
+func (s *Store) SetZettelTransactedWriter(
+	ztw collections.WriterFunc[*zettel_transacted.Zettel],
+) {
+	s.zettelTransactedWriter = ztw
 }
 
 func (s Store) Hinweisen() *hinweisen.Hinweisen {
@@ -339,7 +337,10 @@ func (s *Store) Create(in zettel.Zettel) (tz zettel_transacted.Zettel, err error
 		return
 	}
 
-	s.zettelTransactedPrinter.ZettelTransacted(tz).Print()
+	if err = s.zettelTransactedWriter(&tz); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }
@@ -388,7 +389,10 @@ func (s *Store) CreateWithHinweis(
 		return
 	}
 
-	s.zettelTransactedPrinter.ZettelTransacted(tz).Print()
+	if err = s.zettelTransactedWriter(&tz); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }
@@ -445,7 +449,10 @@ func (s *Store) Update(
 		return
 	}
 
-	s.zettelTransactedPrinter.ZettelTransacted(tz).Print()
+	if err = s.zettelTransactedWriter(&tz); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }

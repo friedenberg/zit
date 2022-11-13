@@ -5,6 +5,7 @@ import (
 	"sort"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/delta/zettel"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
 	"github.com/friedenberg/zit/src/kilo/store_objekten"
@@ -46,14 +47,14 @@ func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
 		Format: zettel.Text{},
 	}
 
-	var readResultsSet zettel_checked_out.MutableSet
-
 	readOp := user_ops.ReadCheckedOut{
 		Umwelt:              s,
 		OptionsReadExternal: options,
 	}
 
-	if readResultsSet, err = readOp.RunMany(possible); err != nil {
+	readResultsSet := zettel_checked_out.MakeMutableSetUnique(0)
+
+	if err = readOp.RunMany(possible, readResultsSet.Add); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -67,10 +68,14 @@ func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
 		},
 	)
 
-	zp := s.PrinterOut()
-
-	for _, z := range readResults {
-		zp.ZettelCheckedOut(*z).Print()
+	if err = readResultsSet.Each(
+		collections.MakeWriterToWithNewLines(
+			s.Out(),
+			s.FormatZettelCheckedOut(),
+		),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	for _, ua := range possible.UnsureAkten {
@@ -81,11 +86,16 @@ func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
 			fallthrough
 
 		case errors.Is(err, store_objekten.ErrNotFound{}):
-			zp.FileUnrecognized(ua).Print()
+			err = s.PrinterFileNotRecognized()(&ua)
 
 		case errors.Is(err, store_objekten.ErrAkteExists{}):
 			err1 := err.(store_objekten.ErrAkteExists)
-			zp.FileRecognized(ua, err1.MutableSet).Print()
+			fr := store_working_directory.FileRecognized{
+				File:       ua,
+				Recognized: err1.MutableSet,
+			}
+
+			err = s.PrinterFileRecognized()(&fr)
 
 		default:
 			err = errors.Wrapf(err, "%s", ua)

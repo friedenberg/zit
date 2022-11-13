@@ -100,7 +100,11 @@ func (s *Store) CheckoutOne(
 		}
 
 		if !s.shouldCheckOut(options, cz) {
-			s.zettelCheckedOutPrinter.ZettelCheckedOut(cz).Print()
+			if err = s.zettelCheckedOutWriter(&cz); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
 			return
 		}
 	}
@@ -160,7 +164,10 @@ func (s *Store) CheckoutOne(
 		return
 	}
 
-	s.zettelCheckedOutPrinter.ZettelCheckedOut(cz).Print()
+	if err = s.zettelCheckedOutWriter(&cz); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }

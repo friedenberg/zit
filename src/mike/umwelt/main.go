@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/charlie/etikett"
@@ -15,7 +16,6 @@ import (
 	"github.com/friedenberg/zit/src/india/zettel_verzeichnisse"
 	"github.com/friedenberg/zit/src/kilo/store_objekten"
 	"github.com/friedenberg/zit/src/lima/store_working_directory"
-	"github.com/friedenberg/zit/src/lima/zettel_printer"
 )
 
 type Umwelt struct {
@@ -31,7 +31,6 @@ type Umwelt struct {
 	storeObjekten         *store_objekten.Store
 	age                   *age.Age
 	storeWorkingDirectory *store_working_directory.Store
-	printerOut            *zettel_printer.Printer
 
 	zettelVerzeichnissePool zettel_verzeichnisse.Pool
 }
@@ -110,8 +109,6 @@ func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 		}
 	}
 
-	u.printerOut = zettel_printer.Make(u.standort, u.konfig, u.out)
-
 	u.storeObjekten, err = store_objekten.Make(
 		u.lock,
 		*u.age,
@@ -145,9 +142,16 @@ func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 
 	errors.Print("done initing checkout store")
 
-	u.printerOut.SetObjektenStore(u.storeObjekten)
-	u.storeObjekten.SetZettelTransactedPrinter(u.printerOut)
-	u.storeWorkingDirectory.SetZettelCheckedOutPrinter(u.printerOut)
+	u.storeObjekten.SetZettelTransactedWriter(
+		u.PrinterZettelTransacted(),
+	)
+
+	u.storeWorkingDirectory.SetZettelCheckedOutWriter(
+		collections.MakeWriterToWithNewLines(
+			u.Out(),
+			u.FormatZettelCheckedOutFresh(),
+		),
+	)
 
 	u.storesInitialized = true
 

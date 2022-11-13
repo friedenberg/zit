@@ -57,8 +57,6 @@ func (c Checkin) Run(
 		}
 	}
 
-	var readResults zettel_checked_out.MutableSet
-
 	readOp := user_ops.ReadCheckedOut{
 		Umwelt: s,
 		OptionsReadExternal: store_working_directory.OptionsReadExternal{
@@ -66,7 +64,9 @@ func (c Checkin) Run(
 		},
 	}
 
-	if readResults, err = readOp.RunMany(pz); err != nil {
+	readResults := zettel_checked_out.MakeMutableSetUnique(0)
+
+	if err = readOp.RunMany(pz, readResults.Add); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
