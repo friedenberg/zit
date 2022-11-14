@@ -20,15 +20,15 @@ func MakeCliFormat(
 
 		if !z.External.ZettelFD.IsEmpty() {
 			wtsZettel = func(w io.Writer) (n int64, err error) {
-				diff := "changed"
+				diff := format.StringChanged
 
 				if z.Internal.Named.Stored.Sha.Equals(z.External.Named.Stored.Sha) {
-					diff = "same"
+					diff = format.StringSame
 				}
 
 				return format.Write(
 					w,
-					format.MakeFormatString("(%s) ", diff),
+					format.MakeFormatStringRightAlignedParen(diff),
 					format.MakeWriter(zef, &z.External),
 				)
 			}
@@ -36,15 +36,15 @@ func MakeCliFormat(
 
 		if !z.External.AkteFD.IsEmpty() {
 			wtsAkte = func(w io.Writer) (n int64, err error) {
-				diff := "changed"
+				diff := format.StringChanged
 
 				if z.Internal.Named.Stored.Zettel.Akte.Equals(z.External.Named.Stored.Zettel.Akte) {
-					diff = "same"
+					diff = format.StringSame
 				}
 
 				return format.Write(
 					w,
-					format.MakeFormatString("(%s) ", diff),
+					format.MakeFormatStringRightAlignedParen(diff),
 					format.MakeWriter(aef, &z.External),
 				)
 			}

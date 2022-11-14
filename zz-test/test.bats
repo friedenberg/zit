@@ -83,7 +83,7 @@ function can_new_zettel_file { # @test
 	} >>"$to_add"
 
 	run zit new "${cmd_zit_def[@]}" -edit=false -predictable-hinweisen "$to_add"
-	assert_output '(created) [o/u@5 !md "wow"]'
+	assert_output '          (new) [o/u@5 !md "wow"]'
 
 	run zit show "${cmd_zit_def[@]}" one/uno
 	assert_output "$(cat "$to_add")"
@@ -106,7 +106,7 @@ function can_new_zettel { # @test
 	} >"$expected"
 
 	run zit new "${cmd_zit_def[@]}" -edit=false -predictable-hinweisen -bezeichnung wow -etiketten ok
-	assert_output '(created) [o/u@5 !md "wow"]'
+	assert_output '          (new) [o/u@5 !md "wow"]'
 
 	run zit show "${cmd_zit_def[@]}" one/uno
 	assert_output "$(cat "$expected")"
@@ -128,7 +128,7 @@ function can_checkout_and_checkin { # @test
 	} >>"$to_add"
 
 	run zit new "${cmd_zit_def[@]}" -edit=false -predictable-hinweisen "$to_add"
-	assert_output '(created) [o/u@5 !md "wow"]'
+	assert_output '          (new) [o/u@5 !md "wow"]'
 
 	run zit checkout "${cmd_zit_def[@]}" one/uno
 	assert_output '(checked out) [one/uno.md@5 !md "wow"]'
@@ -144,7 +144,7 @@ function can_checkout_and_checkin { # @test
 
 	run zit checkin "${cmd_zit_def[@]}" one/uno.md
 	#TODO fix missing typ
-	assert_output '(updated) [o/u@eb ! "wow"]'
+	assert_output '      (updated) [o/u@eb ! "wow"]'
 }
 
 function can_checkout_via_etiketten { # @test
@@ -277,7 +277,7 @@ function can_new_zettel_with_metadatei { # @test
 	} >>"$expected"
 
 	run zit new "${cmd_zit_def[@]}" -edit=false -predictable-hinweisen -bezeichnung bez -etiketten et1,et2
-	assert_output '(created) [o/u@a !md "bez"]'
+	assert_output '          (new) [o/u@a !md "bez"]'
 }
 
 function can_update_akte { # @test
@@ -301,7 +301,7 @@ function can_update_akte { # @test
 	} >>"$expected"
 
 	run zit new "${cmd_zit_def[@]}" -edit=false -predictable-hinweisen "$expected"
-	assert_output '(created) [o/u@d !md "bez"]'
+	assert_output '          (new) [o/u@d !md "bez"]'
 
 	run zit show "${cmd_zit_def[@]}" one/uno
 	assert_output "$(cat "$expected")"
@@ -313,7 +313,7 @@ function can_update_akte { # @test
 	} >>"$new_akte"
 
 	run zit checkin-akte "${cmd_zit_def[@]}" -new-etiketten et3 one/uno "$new_akte"
-	assert_output '(updated) [o/u@f !md "bez"]'
+	assert_output '      (updated) [o/u@f !md "bez"]'
 
 	# then
 	{
@@ -388,7 +388,7 @@ function indexes_are_implicitly_correct { # @test
 	} >>"$expected"
 
 	run zit new "${cmd_zit_def[@]}" -edit=false -predictable-hinweisen "$expected"
-	assert_output '(created) [o/u@d !md "bez"]'
+	assert_output '          (new) [o/u@d !md "bez"]'
 
 	{
 		echo et1
@@ -419,7 +419,8 @@ function indexes_are_implicitly_correct { # @test
 	mkdir -p one
 	cp "$expected" "one/uno.md"
 	run zit checkin "${cmd_zit_def[@]}" -delete "one/uno.md"
-	assert_output --partial '(updated) [o/u@6 !md "bez"]'
+	assert_output --partial '      (updated) [o/u@6 !md "bez"]'
+  #TODO
 	assert_output --partial 'one/uno.md (checkout deleted)'
 
 	{
@@ -459,7 +460,7 @@ function checkouts_dont_overwrite { # @test
 	} >>"$expected"
 
 	run zit new "${cmd_zit_def[@]}" -edit=false -predictable-hinweisen "$expected"
-	assert_output '(created) [o/u@d !md "bez"]'
+	assert_output '          (new) [o/u@d !md "bez"]'
 
 	run zit checkout "${cmd_zit_def[@]}" one/uno
 	assert_output '(checked out) [one/uno.md@d !md "bez"]'

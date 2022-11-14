@@ -68,7 +68,7 @@ function outputs_organize_one_etikett { # @test
 	} >"$to_add"
 
 	run "${cmd_zit_new[@]}" -edit=false "$to_add"
-	assert_output '(created) [one/uno@5 !md "wow"]'
+	assert_output '          (new) [one/uno@5 !md "wow"]'
 
 	run zit show one/uno
 	assert_output "$(cat "$to_add")"
@@ -108,7 +108,7 @@ function outputs_organize_two_etiketten { # @test
 	} >"$to_add"
 
 	run "${cmd_zit_new[@]}" -edit=false "$to_add"
-	assert_output '(created) [one/uno@3 !md "wow"]'
+	assert_output '          (new) [one/uno@3 !md "wow"]'
 
 	expected_organize="$(mktemp)"
 	{
@@ -135,7 +135,7 @@ function outputs_organize_two_etiketten { # @test
 	expected_organize_output="$(mktemp)"
 	{
 		echo "Removed etikett 'brown' from zettel 'one/uno'"
-		echo '(updated) [one/uno@5 !md "wow"]'
+		echo '      (updated) [one/uno@5 !md "wow"]'
 	} >"$expected_organize_output"
 
 	run "${cmd_zit_organize[@]}" -mode commit-directly ok brown <"$expected_organize"
@@ -177,7 +177,7 @@ function outputs_organize_one_etiketten_group_by_one { # @test
 	} >"$to_add"
 
 	run "${cmd_zit_new[@]}" -edit=false "$to_add"
-	assert_output '(created) [one/uno@ed !md "wow"]'
+	assert_output '          (new) [one/uno@ed !md "wow"]'
 
 	expected_organize="$(mktemp)"
 	{
@@ -215,7 +215,7 @@ function outputs_organize_two_zettels_one_etiketten_group_by_one { # @test
 	} >"$to_add"
 
 	run "${cmd_zit_new[@]}" -edit=false "$to_add"
-	assert_output '(created) [one/uno@4 !md "one/uno"]'
+	assert_output '          (new) [one/uno@4 !md "one/uno"]'
 
 	to_add="$(mktemp)"
 	{
@@ -227,7 +227,7 @@ function outputs_organize_two_zettels_one_etiketten_group_by_one { # @test
 	} >"$to_add"
 
 	run "${cmd_zit_new[@]}" -edit=false "$to_add"
-	assert_output '(created) [one/dos@b !md "two/dos"]'
+	assert_output '          (new) [one/dos@b !md "two/dos"]'
 
 	expected_organize="$(mktemp)"
 	{
@@ -319,7 +319,7 @@ function commits_organize_one_etiketten_group_by_two { # @test
 	} >"$to_add"
 
 	run "${cmd_zit_new[@]}" -edit=false "$to_add"
-	assert_output '(created) [one/uno@6 !md "one/uno"]'
+	assert_output '          (new) [one/uno@6 !md "one/uno"]'
 
 	to_add="$(mktemp)"
 	{
@@ -332,7 +332,7 @@ function commits_organize_one_etiketten_group_by_two { # @test
 	} >"$to_add"
 
 	run "${cmd_zit_new[@]}" -edit=false "$to_add"
-	assert_output '(created) [one/dos@c !md "two/dos"]'
+	assert_output '          (new) [one/dos@c !md "two/dos"]'
 
 	to_add="$(mktemp)"
 	{
@@ -346,7 +346,7 @@ function commits_organize_one_etiketten_group_by_two { # @test
 	} >"$to_add"
 
 	run "${cmd_zit_new[@]}" -edit=false "$to_add"
-	assert_output '(created) [two/uno@c5 !md "3"]'
+	assert_output '          (new) [two/uno@c5 !md "3"]'
 
 	expected_organize="$(mktemp)"
 	{
@@ -793,7 +793,7 @@ function etiketten_correct { # @test
 
 	run zit checkin "${cmd_zit_def[@]}" one/uno.md
 	#TODO fix typ
-	assert_output '(updated) [one/uno@4 ! test4]'
+	assert_output '      (updated) [one/uno@4 ! test4]'
 
 	expected_etiketten="$(mktemp)"
 	{
@@ -812,7 +812,7 @@ function etiketten_correct { # @test
 	} >"one/uno.md"
 
 	run zit checkin "${cmd_zit_def[@]}" one/uno.md
-	assert_output '(updated) [one/uno@7 ! test1-ok, test4]'
+	assert_output '      (updated) [one/uno@7 ! test1-ok, test4]'
 
 	expected_etiketten="$(mktemp)"
 	{

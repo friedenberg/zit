@@ -1,12 +1,12 @@
 package umwelt
 
 import (
+	"github.com/friedenberg/zit/src/bravo/format"
 	"github.com/friedenberg/zit/src/charlie/bezeichnung"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/echo/typ"
-	"github.com/friedenberg/zit/src/bravo/format"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/hotel/zettel_named"
 	"github.com/friedenberg/zit/src/india/zettel_external"
@@ -111,9 +111,9 @@ func (u *Umwelt) FormatZettelTransacted() format.FormatWriterFunc[zettel_transac
 	)
 }
 
-// TODO support tty-colored output
 func (u *Umwelt) FormatFileNotRecognized() format.FormatWriterFunc[store_fs.File] {
 	return store_fs.MakeCliFormatNotRecognized(
+		u.FormatColorWriter(),
 		u.Standort(),
 		u.FormatSha(),
 	)
@@ -121,8 +121,16 @@ func (u *Umwelt) FormatFileNotRecognized() format.FormatWriterFunc[store_fs.File
 
 func (u *Umwelt) FormatFileRecognized() format.FormatWriterFunc[store_fs.FileRecognized] {
 	return store_fs.MakeCliFormatRecognized(
+		u.FormatColorWriter(),
 		u.Standort(),
 		u.FormatSha(),
 		u.FormatZettelNamed(),
+	)
+}
+
+func (u *Umwelt) FormatDirDeleted() format.FormatWriterFunc[store_fs.Dir] {
+	return store_fs.MakeCliFormatDirDeleted(
+		u.FormatColorWriter(),
+		u.Standort(),
 	)
 }

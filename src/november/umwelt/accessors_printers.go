@@ -35,3 +35,10 @@ func (u *Umwelt) PrinterFileRecognized() collections.WriterFunc[*store_fs.FileRe
 		u.FormatFileRecognized(),
 	)
 }
+
+func (u *Umwelt) PrinterPathDeleted() collections.WriterFunc[*store_fs.Dir] {
+	return format.MakeWriterToWithNewLines(
+		u.Out(),
+		u.FormatDirDeleted(),
+	)
+}

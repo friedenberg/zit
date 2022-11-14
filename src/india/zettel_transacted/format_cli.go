@@ -17,15 +17,15 @@ func MakeCliFormat(
 
 		switch {
 		case z.IsNew():
-			verb = "created"
+      verb = format.StringNew
 
 		default:
-			verb = "updated"
+      verb = format.StringUpdated
 		}
 
 		return format.Write(
 			w,
-			format.MakeFormatString("(%s) ", verb),
+      format.MakeFormatStringRightAlignedParen(verb),
 			format.MakeWriter(znf, &z.Named),
 		)
 	}

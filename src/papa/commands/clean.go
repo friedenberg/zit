@@ -124,12 +124,21 @@ func (c Clean) Run(
 		return
 	}
 
+	p := s.PrinterPathDeleted()
+
 	for _, fOrD := range filesToDelete {
 		if pRel, pErr := filepath.Rel(s.Standort().Cwd(), fOrD); pErr == nil {
 			fOrD = pRel
 		}
 
-		errors.PrintOutf("[%s] (deleted)", fOrD)
+		f := &store_fs.Dir{
+			Path: fOrD,
+		}
+
+		if err = p(f); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return
