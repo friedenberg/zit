@@ -793,7 +793,7 @@ function etiketten_correct { # @test
 
 	run zit checkin "${cmd_zit_def[@]}" one/uno.md
 	#TODO fix typ
-	assert_output '(updated) [one/uno@4 ! ""]'
+	assert_output '(updated) [one/uno@4 ! test4]'
 
 	expected_etiketten="$(mktemp)"
 	{
@@ -812,9 +812,7 @@ function etiketten_correct { # @test
 	} >"one/uno.md"
 
 	run zit checkin "${cmd_zit_def[@]}" one/uno.md
-	#TODO add support for etiketten in description
-	# assert_output '(updated) [one/uno@7 ! "test1-ok, test4"] (updated)'
-	assert_output '(updated) [one/uno@7 ! ""]'
+	assert_output '(updated) [one/uno@7 ! test1-ok, test4]'
 
 	expected_etiketten="$(mktemp)"
 	{

@@ -788,7 +788,7 @@ function etiketten_correct { # @test
 	} >"one/uno.md"
 
 	run zit checkin "${cmd_zit_def[@]}" one/uno.md
-	assert_output '(updated) [o/u@1 !md ""]'
+	assert_output '(updated) [o/u@1 !md test4]'
 
 	expected_etiketten="$(mktemp)"
 	{
@@ -808,9 +808,7 @@ function etiketten_correct { # @test
 	} >"one/uno.md"
 
 	run zit checkin "${cmd_zit_def[@]}" one/uno.md
-	#TODO
-	# assert_output '(updated) [o/u@d !md "test1-ok, test4"]'
-	assert_output '(updated) [o/u@d !md ""]'
+	assert_output '(updated) [o/u@d !md test1-ok, test4]'
 
 	expected_etiketten="$(mktemp)"
 	{
