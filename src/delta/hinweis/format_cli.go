@@ -15,8 +15,10 @@ func MakeCliFormat(
 	maxSchwanz int,
 ) format.FormatWriterFunc[Hinweis] {
 	return func(w io.Writer, h *Hinweis) (n int64, err error) {
+		h1 := *h
+
 		if a != nil {
-			if *h, err = a.AbbreviateHinweis(*h); err != nil {
+			if h1, err = a.AbbreviateHinweis(h1); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -24,7 +26,7 @@ func MakeCliFormat(
 
 		return format.Write(
 			w,
-			cw(format.MakeFormatString(h.Aligned(maxKopf, maxSchwanz)), format.ColorTypePointer),
+			cw(format.MakeFormatString(h1.Aligned(maxKopf, maxSchwanz)), format.ColorTypePointer),
 		)
 	}
 }

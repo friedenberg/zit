@@ -337,6 +337,7 @@ func (s *Store) Create(in zettel.Zettel) (tz zettel_transacted.Zettel, err error
 		return
 	}
 
+  //TODO-P2 assert no changes
 	if err = s.zettelTransactedWriter(&tz); err != nil {
 		err = errors.Wrap(err)
 		return
