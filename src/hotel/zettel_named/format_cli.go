@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/hinweis"
-	"github.com/friedenberg/zit/src/format"
+	"github.com/friedenberg/zit/src/bravo/format"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 )
 

@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/standort"
-	"github.com/friedenberg/zit/src/format"
+	"github.com/friedenberg/zit/src/bravo/format"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 )
 
@@ -21,7 +21,7 @@ func MakeCliFormatZettel(
 		return format.Write(
 			w,
 			format.MakeFormatString("["),
-			cw(s.MakeWriterRelativePath(z.ZettelFD.Path), format.ColorTypeConstant),
+			cw(s.MakeWriterRelativePath(z.ZettelFD.Path), format.ColorTypePointer),
 			format.MakeFormatString("@"),
 			format.MakeWriter(sf, &z.Named.Stored.Sha),
 			format.MakeFormatString(" "),
@@ -41,7 +41,7 @@ func MakeCliFormatAkte(
 		return format.Write(
 			w,
 			format.MakeFormatString("["),
-			cw(s.MakeWriterRelativePath(z.AkteFD.Path), format.ColorTypeConstant),
+			cw(s.MakeWriterRelativePath(z.AkteFD.Path), format.ColorTypePointer),
 			format.MakeFormatString("@"),
 			format.MakeWriter(sf, &z.Named.Stored.Zettel.Akte),
 			format.MakeFormatString("]"),

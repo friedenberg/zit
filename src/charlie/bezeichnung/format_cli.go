@@ -3,7 +3,7 @@ package bezeichnung
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/format"
+	"github.com/friedenberg/zit/src/bravo/format"
 )
 
 func MakeCliFormat(

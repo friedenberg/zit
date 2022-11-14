@@ -4,7 +4,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/format"
+	"github.com/friedenberg/zit/src/bravo/format"
 )
 
 // kopf/schwanz
@@ -24,7 +24,7 @@ func MakeCliFormat(
 
 		return format.Write(
 			w,
-			cw(format.MakeFormatString(h.Aligned(maxKopf, maxSchwanz)), format.ColorTypeConstant),
+			cw(format.MakeFormatString(h.Aligned(maxKopf, maxSchwanz)), format.ColorTypePointer),
 		)
 	}
 }

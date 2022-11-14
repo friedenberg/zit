@@ -4,7 +4,6 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/collections"
 )
 
 func Write(
@@ -28,7 +27,7 @@ func Write(
 func MakeWriterTo[T any](
 	w io.Writer,
 	wf FormatWriterFunc[T],
-) collections.WriterFunc[*T] {
+) func(*T) error {
 	return func(e *T) (err error) {
 		if _, err = wf(w, e); err != nil {
 			err = errors.Wrap(err)
@@ -42,7 +41,7 @@ func MakeWriterTo[T any](
 func MakeWriterToWithNewLines[T any](
 	w io.Writer,
 	wf FormatWriterFunc[T],
-) collections.WriterFunc[*T] {
+) func(*T) error {
 	return func(e *T) (err error) {
 		if _, err = wf(w, e); err != nil {
 			err = errors.Wrap(err)

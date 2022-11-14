@@ -3,7 +3,7 @@ package zettel_transacted
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/format"
+	"github.com/friedenberg/zit/src/bravo/format"
 	"github.com/friedenberg/zit/src/hotel/zettel_named"
 )
 

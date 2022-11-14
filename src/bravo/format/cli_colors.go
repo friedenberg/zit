@@ -15,10 +15,13 @@ const (
 	colorMagenta        = "\u001b[35m"
 	colorCyan           = "\u001b[36m"
 	colorWhite          = "\u001b[37m"
-	ColorTypeIdentifier = colorCyan
-	ColorTypeConstant   = colorBlue
+	colorItalic         = "\u001b[3m"
+	colorNone           = ""
+	ColorTypePointer    = colorBlue
+	ColorTypeConstant   = colorItalic
 	ColorTypeType       = colorYellow
-	ColorTypeTitle      = colorRed
+	ColorTypeIdentifier = colorCyan
+	ColorTypeTitle      = colorMagenta
 )
 
 func MakeFormatWriterNoopColor(

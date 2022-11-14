@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/bezeichnung"
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/echo/typ"
-	"github.com/friedenberg/zit/src/format"
+	"github.com/friedenberg/zit/src/bravo/format"
 )
 
 // !typ "bez"
