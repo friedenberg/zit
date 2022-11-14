@@ -3,9 +3,8 @@ package zettel_checked_out
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/bravo/format"
+	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/india/zettel_external"
 )
 
@@ -77,8 +76,7 @@ func MakeCliFormatFresh(
 	return func(w io.Writer, z *Zettel) (n int64, err error) {
 		var wtsZettel, wtsAkte format.WriterFunc
 
-		switch {
-		case !z.External.ZettelFD.IsEmpty():
+		if !z.External.ZettelFD.IsEmpty() {
 			wtsZettel = func(w io.Writer) (n int64, err error) {
 				return format.Write(
 					w,
@@ -86,8 +84,9 @@ func MakeCliFormatFresh(
 					format.MakeWriter(zef, &z.External),
 				)
 			}
+		}
 
-		case !z.External.AkteFD.IsEmpty():
+		if !z.External.AkteFD.IsEmpty() {
 			wtsAkte = func(w io.Writer) (n int64, err error) {
 				return format.Write(
 					w,
@@ -95,10 +94,6 @@ func MakeCliFormatFresh(
 					format.MakeWriter(aef, &z.External),
 				)
 			}
-
-		default:
-			err = errors.Errorf("zettel external in unknown state: %q", z.External)
-			return
 		}
 
 		ws := []format.WriterFunc{}
