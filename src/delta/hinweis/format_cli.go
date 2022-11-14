@@ -26,6 +26,7 @@ func MakeCliFormat(
 
 		return format.Write(
 			w,
+      //TODO do not use color for slash
 			cw(format.MakeFormatString(h1.Aligned(maxKopf, maxSchwanz)), format.ColorTypePointer),
 		)
 	}

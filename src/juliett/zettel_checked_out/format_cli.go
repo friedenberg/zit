@@ -80,7 +80,7 @@ func MakeCliFormatFresh(
 			wtsZettel = func(w io.Writer) (n int64, err error) {
 				return format.Write(
 					w,
-					format.MakeFormatString("(checked out) "),
+					format.MakeFormatStringRightAlignedParen(format.StringCheckedOut),
 					format.MakeWriter(zef, &z.External),
 				)
 			}
@@ -90,7 +90,7 @@ func MakeCliFormatFresh(
 			wtsAkte = func(w io.Writer) (n int64, err error) {
 				return format.Write(
 					w,
-					format.MakeFormatString("(checked out) "),
+					format.MakeFormatStringRightAlignedParen(format.StringCheckedOut),
 					format.MakeWriter(aef, &z.External),
 				)
 			}

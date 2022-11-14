@@ -131,7 +131,7 @@ function can_checkout_and_checkin { # @test
 	assert_output '          (new) [o/u@5 !md "wow"]'
 
 	run zit checkout "${cmd_zit_def[@]}" one/uno
-	assert_output '(checked out) [one/uno.md@5 !md "wow"]'
+	assert_output '  (checked out) [one/uno.md@5 !md "wow"]'
 
 	{
 		echo "---"
@@ -420,7 +420,7 @@ function indexes_are_implicitly_correct { # @test
 	cp "$expected" "one/uno.md"
 	run zit checkin "${cmd_zit_def[@]}" -delete "one/uno.md"
 	assert_output --partial '      (updated) [o/u@6 !md "bez"]'
-  #TODO
+	#TODO
 	assert_output --partial 'one/uno.md (checkout deleted)'
 
 	{
@@ -463,7 +463,7 @@ function checkouts_dont_overwrite { # @test
 	assert_output '          (new) [o/u@d !md "bez"]'
 
 	run zit checkout "${cmd_zit_def[@]}" one/uno
-	assert_output '(checked out) [one/uno.md@d !md "bez"]'
+	assert_output '  (checked out) [one/uno.md@d !md "bez"]'
 
 	run cat one/uno.md
 	assert_output "$(cat "$expected")"
@@ -482,7 +482,7 @@ function checkouts_dont_overwrite { # @test
 	cat "$expected" >"one/uno.md"
 
 	run zit checkout "${cmd_zit_def[@]}" one/uno
-	assert_output '(checked out) [one/uno.md@4 !md "bez"]'
+	assert_output '  (checked out) [one/uno.md@4 !md "bez"]'
 
 	run cat one/uno.md
 	assert_output "$(cat "$expected")"
