@@ -91,7 +91,7 @@ func (h Hinweis) String() string {
 	return h.inner.String()
 }
 
-func (h Hinweis) Aligned(kopf, schwanz int) string {
+func (h Hinweis) AlignedParts(kopf, schwanz int) (string, string) {
 	parts := h.Parts()
 
 	diffKopf := kopf - len(parts[0])
@@ -104,7 +104,12 @@ func (h Hinweis) Aligned(kopf, schwanz int) string {
 		parts[1] = parts[1] + strings.Repeat(" ", diffSchwanz)
 	}
 
-	return fmt.Sprintf("%s/%s", parts[0], parts[1])
+	return parts[0], parts[1]
+}
+
+func (h Hinweis) Aligned(kopf, schwanz int) string {
+	p1, p2 := h.AlignedParts(kopf, schwanz)
+	return fmt.Sprintf("%s/%s", p1, p2)
 }
 
 func (h Hinweis) Parts() [2]string {

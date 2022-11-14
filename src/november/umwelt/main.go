@@ -7,12 +7,12 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/bravo/format"
 	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/charlie/file_lock"
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/delta/konfig"
 	"github.com/friedenberg/zit/src/delta/standort"
-	"github.com/friedenberg/zit/src/bravo/format"
 	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
 	"github.com/friedenberg/zit/src/lima/store_objekten"
 	store_fs "github.com/friedenberg/zit/src/mike/store_fs"
@@ -158,8 +158,13 @@ func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 
 	errors.Print("done initing checkout store")
 
-	u.storeObjekten.SetZettelTransactedWriter(
-		u.PrinterZettelTransacted(),
+	u.storeObjekten.SetZettelTransactedLogWriter(
+		store_objekten.ZettelTransactedLogWriters{
+			New:       u.PrinterZettelTransacted(format.StringNew),
+			Updated:   u.PrinterZettelTransacted(format.StringUpdated),
+			Unchanged: u.PrinterZettelTransacted(format.StringUnchanged),
+			Archived:  u.PrinterZettelTransacted(format.StringArchived),
+		},
 	)
 
 	u.storeWorkingDirectory.SetZettelCheckedOutWriter(

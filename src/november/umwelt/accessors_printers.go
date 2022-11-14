@@ -8,10 +8,10 @@ import (
 	store_fs "github.com/friedenberg/zit/src/mike/store_fs"
 )
 
-func (u *Umwelt) PrinterZettelTransacted() collections.WriterFunc[*zettel_transacted.Zettel] {
+func (u *Umwelt) PrinterZettelTransacted(verb string) collections.WriterFunc[*zettel_transacted.Zettel] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
-		u.FormatZettelTransacted(),
+		u.FormatZettelTransacted(verb),
 	)
 }
 

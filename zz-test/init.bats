@@ -66,6 +66,9 @@ function init_and_init { # @test
 	run zit new -edit=false -predictable-hinweisen to_add
 	assert_output '          (new) [o/u@8 !md "wow"]'
 
+	run zit show one/uno
+	assert_output "$(cat to_add)"
+
 	run zit init -yin <(cat_yin) -yang <(cat_yang)
 	assert_failure
 

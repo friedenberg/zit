@@ -24,10 +24,13 @@ func MakeCliFormat(
 			}
 		}
 
+		p1, p2 := h1.AlignedParts(maxKopf, maxSchwanz)
+
 		return format.Write(
 			w,
-      //TODO do not use color for slash
-			cw(format.MakeFormatString(h1.Aligned(maxKopf, maxSchwanz)), format.ColorTypePointer),
+			cw(format.MakeFormatString("%s", p1), format.ColorTypePointer),
+			format.MakeFormatString("/"),
+			cw(format.MakeFormatString("%s", p2), format.ColorTypePointer),
 		)
 	}
 }

@@ -86,7 +86,6 @@ func (u *Umwelt) FormatZettelExternalAkte() format.FormatWriterFunc[zettel_exter
 	)
 }
 
-// TODO support tty-colored output
 func (u *Umwelt) FormatZettelCheckedOut() format.FormatWriterFunc[zettel_checked_out.Zettel] {
 	return zettel_checked_out.MakeCliFormat(
 		u.Standort(),
@@ -95,7 +94,6 @@ func (u *Umwelt) FormatZettelCheckedOut() format.FormatWriterFunc[zettel_checked
 	)
 }
 
-// TODO support tty-colored output
 func (u *Umwelt) FormatZettelCheckedOutFresh() format.FormatWriterFunc[zettel_checked_out.Zettel] {
 	return zettel_checked_out.MakeCliFormatFresh(
 		u.Standort(),
@@ -104,10 +102,10 @@ func (u *Umwelt) FormatZettelCheckedOutFresh() format.FormatWriterFunc[zettel_ch
 	)
 }
 
-// TODO support tty-colored output
-func (u *Umwelt) FormatZettelTransacted() format.FormatWriterFunc[zettel_transacted.Zettel] {
+func (u *Umwelt) FormatZettelTransacted(verb string) format.FormatWriterFunc[zettel_transacted.Zettel] {
 	return zettel_transacted.MakeCliFormat(
 		u.FormatZettelNamed(),
+		verb,
 	)
 }
 

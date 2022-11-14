@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/format"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/foxtrot/id_set"
 	"github.com/friedenberg/zit/src/golf/transaktion"
@@ -65,7 +66,7 @@ func (c Revert) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 		return
 	}
 
-	zts.Each(u.PrinterZettelTransacted())
+	zts.Each(u.PrinterZettelTransacted(format.StringUpdated))
 
 	return
 }

@@ -32,6 +32,11 @@ type LockSmith interface {
 	IsAcquired() bool
 }
 
+// TODO add archived state
+type ZettelTransactedLogWriters struct {
+	New, Updated, Archived, Unchanged collections.WriterFunc[*zettel_transacted.Zettel]
+}
+
 type Store struct {
 	lockSmith   LockSmith
 	konfig      konfig.Konfig
@@ -39,7 +44,7 @@ type Store struct {
 	standort    standort.Standort
 	age         age.Age
 
-	zettelTransactedWriter collections.WriterFunc[*zettel_transacted.Zettel]
+	zettelTransactedWriter ZettelTransactedLogWriters
 
 	hinweisen *hinweisen.Hinweisen
 	// *indexZettelen
@@ -146,10 +151,14 @@ func Make(
 	return
 }
 
-func (s *Store) SetZettelTransactedWriter(
-	ztw collections.WriterFunc[*zettel_transacted.Zettel],
+func (s *Store) CurrentTransaktionTime() ts.Time {
+	return s.Transaktion.Time
+}
+
+func (s *Store) SetZettelTransactedLogWriter(
+	ztlw ZettelTransactedLogWriters,
 ) {
-	s.zettelTransactedWriter = ztw
+	s.zettelTransactedWriter = ztlw
 }
 
 func (s Store) Hinweisen() *hinweisen.Hinweisen {
@@ -311,6 +320,7 @@ func (s *Store) Create(in zettel.Zettel) (tz zettel_transacted.Zettel, err error
 		return
 	}
 
+	//TODO-P1?
 	//If the zettel exists, short circuit and return that
 	// if tz2, err2 := s.Read(tz.Named.Stored.Sha); err2 == nil {
 	// 	tz = tz2
@@ -337,8 +347,8 @@ func (s *Store) Create(in zettel.Zettel) (tz zettel_transacted.Zettel, err error
 		return
 	}
 
-  //TODO-P2 assert no changes
-	if err = s.zettelTransactedWriter(&tz); err != nil {
+	//TODO-P2 assert no changes
+	if err = s.zettelTransactedWriter.New(&tz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -390,7 +400,7 @@ func (s *Store) CreateWithHinweis(
 		return
 	}
 
-	if err = s.zettelTransactedWriter(&tz); err != nil {
+	if err = s.zettelTransactedWriter.New(&tz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -428,6 +438,12 @@ func (s *Store) Update(
 		return
 	}
 
+	//TODO-P1 prevent useless duplicate transaktions
+	// if z.Equals(mutter.Named) {
+	// 	tz = mutter
+	// 	return
+	// }
+
 	tz.Named = *z
 
 	if tz.Named.Stored.Sha, err = s.WriteZettelObjekte(z.Stored.Zettel); err != nil {
@@ -450,9 +466,16 @@ func (s *Store) Update(
 		return
 	}
 
-	if err = s.zettelTransactedWriter(&tz); err != nil {
-		err = errors.Wrap(err)
-		return
+	if mutter.Named.Equals(tz.Named) {
+		if err = s.zettelTransactedWriter.Unchanged(&tz); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		if err = s.zettelTransactedWriter.Updated(&tz); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return
@@ -665,6 +688,18 @@ func (s *Store) Reindex() (err error) {
 					if err = s.writeNamedZettelToIndex(tz); err != nil {
 						err = errors.Wrap(err)
 						return
+					}
+
+					if mutter == nil {
+						if err = s.zettelTransactedWriter.New(&tz); err != nil {
+							err = errors.Wrap(err)
+							return
+						}
+					} else {
+						if err = s.zettelTransactedWriter.Updated(&tz); err != nil {
+							err = errors.Wrap(err)
+							return
+						}
 					}
 
 					if err = s.indexEtiketten.addZettelWithOptionalMutter(&tz, mutter); err != nil {

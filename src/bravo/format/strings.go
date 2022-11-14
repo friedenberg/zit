@@ -15,6 +15,7 @@ const (
 	StringDeleted      = "deleted"
 	StringUpdated      = "updated"
 	StringArchived     = "archived"
+	StringUnchanged    = "unchanged"
 	StringRecognized   = "recognized"
 	StringCheckedOut   = "checked out"
 	StringUnrecognized = "unrecognized"
