@@ -420,8 +420,7 @@ function indexes_are_implicitly_correct { # @test
 	cp "$expected" "one/uno.md"
 	run zit checkin "${cmd_zit_def[@]}" -delete "one/uno.md"
 	assert_output --partial '      (updated) [o/u@6 !md "bez"]'
-	#TODO
-	assert_output --partial 'one/uno.md (checkout deleted)'
+	assert_output --partial '      (deleted) [one/uno.md]'
 
 	{
 		echo et1

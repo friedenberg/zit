@@ -2,6 +2,7 @@ package user_ops
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/india/zettel_external"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
@@ -16,7 +17,15 @@ func (c DeleteCheckout) Run(
 	zettels []zettel_external.Zettel,
 ) (err error) {
 	toDelete := make([]zettel_external.Zettel, 0, len(zettels))
-	filesToDelete := make([]string, 0, len(zettels))
+	filesToDelete := collections.MakeMutableSet[*zettel_external.FD](
+		func(e *zettel_external.FD) string {
+			if e == nil {
+				return ""
+			}
+
+			return e.Path
+		},
+	)
 
 	for _, external := range zettels {
 		var internal zettel_transacted.Zettel
@@ -33,21 +42,28 @@ func (c DeleteCheckout) Run(
 		}
 
 		toDelete = append(toDelete, external)
-		filesToDelete = append(filesToDelete, external.ZettelFD.Path)
+		filesToDelete.Add(&external.ZettelFD)
 
 		if external.AkteFD.Path != "" {
-			filesToDelete = append(filesToDelete, external.AkteFD.Path)
+			filesToDelete.Add(&external.AkteFD)
 		}
 	}
 
-	if err = files.DeleteFilesAndDirs(filesToDelete...); err != nil {
+	fs := make([]string, 0, filesToDelete.Len())
+
+	filesToDelete.Each(
+		func(e *zettel_external.FD) (err error) {
+			fs = append(fs, e.Path)
+			return
+		},
+	)
+
+	if err = files.DeleteFilesAndDirs(fs...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	for _, f := range filesToDelete {
-		errors.PrintOutf("%s (checkout deleted)", f)
-	}
+	filesToDelete.Each(c.PrinterFDDeleted())
 
 	return
 }

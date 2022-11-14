@@ -3,9 +3,9 @@ package zettel_external
 import (
 	"io"
 
+	"github.com/friedenberg/zit/src/bravo/format"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/standort"
-	"github.com/friedenberg/zit/src/bravo/format"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 )
 
@@ -44,6 +44,23 @@ func MakeCliFormatAkte(
 			cw(s.MakeWriterRelativePath(z.AkteFD.Path), format.ColorTypePointer),
 			format.MakeFormatString("@"),
 			format.MakeWriter(sf, &z.Named.Stored.Zettel.Akte),
+			format.MakeFormatString("]"),
+		)
+	}
+}
+
+// [path.akte_ext@sha]
+func MakeCliFormatFD(
+	s standort.Standort,
+	cw format.FuncColorWriter,
+) format.FormatWriterFunc[FD] {
+	return func(w io.Writer, fd *FD) (n int64, err error) {
+		return format.Write(
+			w,
+			format.MakeFormatString("["),
+			cw(s.MakeWriterRelativePath(fd.Path), format.ColorTypePointer),
+			// format.MakeFormatString("@"),
+			// format.MakeWriter(sf, fd.Sha),
 			format.MakeFormatString("]"),
 		)
 	}

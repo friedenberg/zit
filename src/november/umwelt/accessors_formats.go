@@ -86,6 +86,13 @@ func (u *Umwelt) FormatZettelExternalAkte() format.FormatWriterFunc[zettel_exter
 	)
 }
 
+func (u *Umwelt) FormatZettelExternalFD() format.FormatWriterFunc[zettel_external.FD] {
+	return zettel_external.MakeCliFormatFD(
+		u.Standort(),
+		u.FormatColorWriter(),
+	)
+}
+
 func (u *Umwelt) FormatZettelCheckedOut() format.FormatWriterFunc[zettel_checked_out.Zettel] {
 	return zettel_checked_out.MakeCliFormat(
 		u.Standort(),
@@ -130,5 +137,13 @@ func (u *Umwelt) FormatDirDeleted() format.FormatWriterFunc[store_fs.Dir] {
 	return store_fs.MakeCliFormatDirDeleted(
 		u.FormatColorWriter(),
 		u.Standort(),
+	)
+}
+
+func (u *Umwelt) FormatFDDeleted() format.FormatWriterFunc[zettel_external.FD] {
+	return store_fs.MakeCliFormatFDDeleted(
+		u.FormatColorWriter(),
+		u.Standort(),
+		u.FormatZettelExternalFD(),
 	)
 }
