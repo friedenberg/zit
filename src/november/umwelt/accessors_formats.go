@@ -1,26 +1,36 @@
 package umwelt
 
 import (
-	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/charlie/bezeichnung"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/echo/typ"
+	"github.com/friedenberg/zit/src/format"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/hotel/zettel_named"
+	"github.com/friedenberg/zit/src/india/zettel_external"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
 	store_fs "github.com/friedenberg/zit/src/mike/store_fs"
 )
 
-func (u *Umwelt) FormatSha() collections.WriterFuncFormat[sha.Sha] {
+func (u *Umwelt) FormatColorWriter() format.FuncColorWriter {
+	if u.outIsTty {
+		return format.MakeFormatWriterWithColor
+	} else {
+		return format.MakeFormatWriterNoopColor
+	}
+}
+
+func (u *Umwelt) FormatSha() format.FormatWriterFunc[sha.Sha] {
 	return sha.MakeCliFormat(
+		u.FormatColorWriter(),
 		u.StoreObjekten(),
 	)
 }
 
-func (u *Umwelt) FormatHinweis() collections.WriterFuncFormat[hinweis.Hinweis] {
+func (u *Umwelt) FormatHinweis() format.FormatWriterFunc[hinweis.Hinweis] {
 	var a hinweis.Abbr
 
 	if u.konfig.PrintAbbreviatedHinweisen {
@@ -28,21 +38,30 @@ func (u *Umwelt) FormatHinweis() collections.WriterFuncFormat[hinweis.Hinweis] {
 	}
 
 	return hinweis.MakeCliFormat(
+		u.FormatColorWriter(),
 		a,
 		0,
 		0,
 	)
 }
 
-func (u *Umwelt) FormatZettel() collections.WriterFuncFormat[zettel.Zettel] {
+func (u *Umwelt) FormatBezeichnung() format.FormatWriterFunc[bezeichnung.Bezeichnung] {
+	return bezeichnung.MakeCliFormat(u.FormatColorWriter())
+}
+
+func (u *Umwelt) FormatTyp() format.FormatWriterFunc[typ.Typ] {
+	return typ.MakeCliFormat(u.FormatColorWriter())
+}
+
+func (u *Umwelt) FormatZettel() format.FormatWriterFunc[zettel.Zettel] {
 	return zettel.MakeCliFormat(
-		bezeichnung.MakeCliFormat(),
-		collections.MakeWriterFormatStringer[etikett.Set](),
-		collections.MakeWriterFormatStringer[typ.Typ](),
+		u.FormatBezeichnung(),
+		format.MakeFormatStringer[etikett.Set](),
+		u.FormatTyp(),
 	)
 }
 
-func (u *Umwelt) FormatZettelNamed() collections.WriterFuncFormat[zettel_named.Zettel] {
+func (u *Umwelt) FormatZettelNamed() format.FormatWriterFunc[zettel_named.Zettel] {
 	return zettel_named.MakeCliFormat(
 		u.FormatHinweis(),
 		u.FormatSha(),
@@ -50,40 +69,57 @@ func (u *Umwelt) FormatZettelNamed() collections.WriterFuncFormat[zettel_named.Z
 	)
 }
 
+func (u *Umwelt) FormatZettelExternal() format.FormatWriterFunc[zettel_external.Zettel] {
+	return zettel_external.MakeCliFormatZettel(
+		u.Standort(),
+		u.FormatColorWriter(),
+		u.FormatSha(),
+		u.FormatZettel(),
+	)
+}
+
+func (u *Umwelt) FormatZettelExternalAkte() format.FormatWriterFunc[zettel_external.Zettel] {
+	return zettel_external.MakeCliFormatAkte(
+		u.Standort(),
+		u.FormatColorWriter(),
+		u.FormatSha(),
+	)
+}
+
 // TODO support tty-colored output
-func (u *Umwelt) FormatZettelCheckedOut() collections.WriterFuncFormat[zettel_checked_out.Zettel] {
+func (u *Umwelt) FormatZettelCheckedOut() format.FormatWriterFunc[zettel_checked_out.Zettel] {
 	return zettel_checked_out.MakeCliFormat(
 		u.Standort(),
-		u.FormatSha(),
-		u.FormatZettel(),
+		u.FormatZettelExternal(),
+		u.FormatZettelExternalAkte(),
 	)
 }
 
 // TODO support tty-colored output
-func (u *Umwelt) FormatZettelCheckedOutFresh() collections.WriterFuncFormat[zettel_checked_out.Zettel] {
+func (u *Umwelt) FormatZettelCheckedOutFresh() format.FormatWriterFunc[zettel_checked_out.Zettel] {
 	return zettel_checked_out.MakeCliFormatFresh(
 		u.Standort(),
-		u.FormatSha(),
-		u.FormatZettel(),
+		u.FormatZettelExternal(),
+		u.FormatZettelExternalAkte(),
 	)
 }
 
 // TODO support tty-colored output
-func (u *Umwelt) FormatZettelTransacted() collections.WriterFuncFormat[zettel_transacted.Zettel] {
+func (u *Umwelt) FormatZettelTransacted() format.FormatWriterFunc[zettel_transacted.Zettel] {
 	return zettel_transacted.MakeCliFormat(
 		u.FormatZettelNamed(),
 	)
 }
 
 // TODO support tty-colored output
-func (u *Umwelt) FormatFileNotRecognized() collections.WriterFuncFormat[store_fs.File] {
+func (u *Umwelt) FormatFileNotRecognized() format.FormatWriterFunc[store_fs.File] {
 	return store_fs.MakeCliFormatNotRecognized(
 		u.Standort(),
 		u.FormatSha(),
 	)
 }
 
-func (u *Umwelt) FormatFileRecognized() collections.WriterFuncFormat[store_fs.FileRecognized] {
+func (u *Umwelt) FormatFileRecognized() format.FormatWriterFunc[store_fs.FileRecognized] {
 	return store_fs.MakeCliFormatRecognized(
 		u.Standort(),
 		u.FormatSha(),

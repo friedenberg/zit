@@ -6,13 +6,13 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/charlie/file_lock"
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/delta/konfig"
 	"github.com/friedenberg/zit/src/delta/standort"
+	"github.com/friedenberg/zit/src/format"
 	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
 	"github.com/friedenberg/zit/src/lima/store_objekten"
 	store_fs "github.com/friedenberg/zit/src/mike/store_fs"
@@ -22,6 +22,10 @@ type Umwelt struct {
 	in  *os.File
 	out *os.File
 	err *os.File
+
+	inIsTty  bool
+	outIsTty bool
+	errIsTty bool
 
 	standort standort.Standort
 	konfig   konfig.Konfig
@@ -41,6 +45,18 @@ func Make(kCli konfig.Cli) (u *Umwelt, err error) {
 		out:                     os.Stdout,
 		err:                     os.Stderr,
 		zettelVerzeichnissePool: zettel_verzeichnisse.MakePool(),
+	}
+
+	if files.IsTty(u.in) {
+		u.inIsTty = true
+	}
+
+	if files.IsTty(u.out) {
+		u.outIsTty = true
+	}
+
+	if files.IsTty(u.err) {
+		u.errIsTty = true
 	}
 
 	err = u.Initialize(kCli)
@@ -147,7 +163,7 @@ func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 	)
 
 	u.storeWorkingDirectory.SetZettelCheckedOutWriter(
-		collections.MakeWriterToWithNewLines(
+		format.MakeWriterToWithNewLines(
 			u.Out(),
 			u.FormatZettelCheckedOutFresh(),
 		),

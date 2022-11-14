@@ -4,9 +4,9 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/standort"
+	"github.com/friedenberg/zit/src/format"
 	"github.com/friedenberg/zit/src/hotel/zettel_named"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 )
@@ -14,14 +14,14 @@ import (
 // (not recognized) [path.ext@sha]
 func MakeCliFormatNotRecognized(
 	s standort.Standort,
-	sf collections.WriterFuncFormat[sha.Sha],
-) collections.WriterFuncFormat[File] {
+	sf format.FormatWriterFunc[sha.Sha],
+) format.FormatWriterFunc[File] {
 	return func(w io.Writer, fu *File) (n int64, err error) {
-		return collections.WriteFormats(
+		return format.Write(
 			w,
-			collections.MakeWriterLiteral("(not recognized) [%s@", fu.Path),
-			collections.MakeWriterFormatFunc(sf, &fu.Sha),
-			collections.MakeWriterLiteral("]"),
+			format.MakeFormatString("(not recognized) [%s@", fu.Path),
+			format.MakeWriter(sf, &fu.Sha),
+			format.MakeFormatString("]"),
 		)
 	}
 }
@@ -36,15 +36,15 @@ type FileRecognized struct {
 //	[kopf/schwanz@sha !typ "bez"]
 func MakeCliFormatRecognized(
 	s standort.Standort,
-	sf collections.WriterFuncFormat[sha.Sha],
-	znf collections.WriterFuncFormat[zettel_named.Zettel],
-) collections.WriterFuncFormat[FileRecognized] {
+	sf format.FormatWriterFunc[sha.Sha],
+	znf format.FormatWriterFunc[zettel_named.Zettel],
+) format.FormatWriterFunc[FileRecognized] {
 	return func(w io.Writer, zr *FileRecognized) (n int64, err error) {
-		return collections.WriteFormats(
+		return format.Write(
 			w,
-			collections.MakeWriterLiteral("(recognized) [%s@", zr.Path),
-			collections.MakeWriterFormatFunc(sf, &zr.Sha),
-			collections.MakeWriterLiteral("]\n"),
+			format.MakeFormatString("(recognized) [%s@", zr.Path),
+			format.MakeWriter(sf, &zr.Sha),
+			format.MakeFormatString("]\n"),
 			func(w io.Writer) (n int64, err error) {
 				err = zr.Recognized.Each(
 					func(zt *zettel_transacted.Zettel) (err error) {

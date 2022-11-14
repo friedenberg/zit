@@ -3,28 +3,28 @@ package zettel_named
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/hinweis"
+	"github.com/friedenberg/zit/src/format"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 )
 
 // [kopf/schwanz@sha !typ]
 func MakeCliFormat(
-	hf collections.WriterFuncFormat[hinweis.Hinweis],
-	sf collections.WriterFuncFormat[sha.Sha],
-	zf collections.WriterFuncFormat[zettel.Zettel],
-) collections.WriterFuncFormat[Zettel] {
+	hf format.FormatWriterFunc[hinweis.Hinweis],
+	sf format.FormatWriterFunc[sha.Sha],
+	zf format.FormatWriterFunc[zettel.Zettel],
+) format.FormatWriterFunc[Zettel] {
 	return func(w io.Writer, z *Zettel) (n int64, err error) {
-		return collections.WriteFormats(
+		return format.Write(
 			w,
-			collections.MakeWriterLiteral("["),
-			collections.MakeWriterFormatFunc(hf, &z.Hinweis),
-			collections.MakeWriterLiteral("@"),
-			collections.MakeWriterFormatFunc(sf, &z.Stored.Sha),
-			collections.MakeWriterLiteral(" "),
-			collections.MakeWriterFormatFunc(zf, &z.Stored.Zettel),
-			collections.MakeWriterLiteral("]"),
+			format.MakeFormatString("["),
+			format.MakeWriter(hf, &z.Hinweis),
+			format.MakeFormatString("@"),
+			format.MakeWriter(sf, &z.Stored.Sha),
+			format.MakeFormatString(" "),
+			format.MakeWriter(zf, &z.Stored.Zettel),
+			format.MakeFormatString("]"),
 		)
 	}
 }

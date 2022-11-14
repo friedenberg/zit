@@ -5,12 +5,12 @@ import (
 	"path/filepath"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/collections"
+	"github.com/friedenberg/zit/src/format"
 )
 
 func (s Standort) MakeWriterRelativePath(
 	p string,
-) collections.Writer {
+) format.WriterFunc {
 	return func(w io.Writer) (n int64, err error) {
 		var n1 int
 

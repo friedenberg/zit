@@ -144,9 +144,9 @@ func (s *Store) CheckoutOne(
 
 	case CheckoutModeZettelAndAkte:
 		c.IncludeAkte = true
+		cz.External.AkteFD.Path = originalFilename + "." + sz.Named.Stored.Zettel.AkteExt()
 
 		if !inlineAkte {
-			cz.External.AkteFD.Path = originalFilename + "." + sz.Named.Stored.Zettel.AkteExt()
 			c.ExternalAktePath = cz.External.AkteFD.Path
 		}
 

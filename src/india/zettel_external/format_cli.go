@@ -3,9 +3,9 @@ package zettel_external
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/standort"
+	"github.com/friedenberg/zit/src/format"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 )
 
@@ -13,19 +13,20 @@ import (
 // [path.akte_ext@sha]
 func MakeCliFormatZettel(
 	s standort.Standort,
-	sf collections.WriterFuncFormat[sha.Sha],
-	zf collections.WriterFuncFormat[zettel.Zettel],
-) collections.WriterFuncFormat[Zettel] {
+	cw format.FuncColorWriter,
+	sf format.FormatWriterFunc[sha.Sha],
+	zf format.FormatWriterFunc[zettel.Zettel],
+) format.FormatWriterFunc[Zettel] {
 	return func(w io.Writer, z *Zettel) (n int64, err error) {
-		return collections.WriteFormats(
+		return format.Write(
 			w,
-			collections.MakeWriterLiteral("["),
-			s.MakeWriterRelativePath(z.ZettelFD.Path),
-			collections.MakeWriterLiteral("@"),
-			collections.MakeWriterFormatFunc(sf, &z.Named.Stored.Sha),
-			collections.MakeWriterLiteral(" "),
-			collections.MakeWriterFormatFunc(zf, &z.Named.Stored.Zettel),
-			collections.MakeWriterLiteral("]"),
+			format.MakeFormatString("["),
+			cw(s.MakeWriterRelativePath(z.ZettelFD.Path), format.ColorTypeConstant),
+			format.MakeFormatString("@"),
+			format.MakeWriter(sf, &z.Named.Stored.Sha),
+			format.MakeFormatString(" "),
+			format.MakeWriter(zf, &z.Named.Stored.Zettel),
+			format.MakeFormatString("]"),
 		)
 	}
 }
@@ -33,16 +34,17 @@ func MakeCliFormatZettel(
 // [path.akte_ext@sha]
 func MakeCliFormatAkte(
 	s standort.Standort,
-	sf collections.WriterFuncFormat[sha.Sha],
-) collections.WriterFuncFormat[Zettel] {
+	cw format.FuncColorWriter,
+	sf format.FormatWriterFunc[sha.Sha],
+) format.FormatWriterFunc[Zettel] {
 	return func(w io.Writer, z *Zettel) (n int64, err error) {
-		return collections.WriteFormats(
+		return format.Write(
 			w,
-			collections.MakeWriterLiteral("["),
-			s.MakeWriterRelativePath(z.AkteFD.Path),
-			collections.MakeWriterLiteral("@"),
-			collections.MakeWriterFormatFunc(sf, &z.Named.Stored.Zettel.Akte),
-			collections.MakeWriterLiteral("]"),
+			format.MakeFormatString("["),
+			cw(s.MakeWriterRelativePath(z.AkteFD.Path), format.ColorTypeConstant),
+			format.MakeFormatString("@"),
+			format.MakeWriter(sf, &z.Named.Stored.Zettel.Akte),
+			format.MakeFormatString("]"),
 		)
 	}
 }

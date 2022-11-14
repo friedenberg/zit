@@ -3,7 +3,6 @@ package collections
 import (
 	"flag"
 	"fmt"
-	"io"
 )
 
 //   _____
@@ -13,14 +12,11 @@ import (
 //  |_|   \__,_|_| |_|\___|___/
 //
 
-type Writer func(io.Writer) (int64, error)
 type WriterFunc[T any] func(T) error
 
 // type WriterFuncFuncPooled[T any] func(PoolLike[T]) WriterFunc[*T]
 type WriterFuncWithKey[T any] func(string, T) error
 type WriterFuncKey func(string) error
-type WriterFuncFormat[T any] func(io.Writer, *T) (int64, error)
-type ReaderFuncFormat[T any] func(io.Reader, *T) (int64, error)
 
 //   ____             _
 //  |  _ \ ___   ___ | |___

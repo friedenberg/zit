@@ -5,7 +5,6 @@ import (
 	"sort"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
 	"github.com/friedenberg/zit/src/lima/store_objekten"
@@ -68,12 +67,7 @@ func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
 		},
 	)
 
-	if err = readResultsSet.Each(
-		collections.MakeWriterToWithNewLines(
-			s.Out(),
-			s.FormatZettelCheckedOut(),
-		),
-	); err != nil {
+	if err = readResultsSet.Each(s.PrinterZettelCheckedOut()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
