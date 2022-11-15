@@ -14,9 +14,9 @@ type DeleteCheckout struct {
 }
 
 func (c DeleteCheckout) Run(
-	zettels []zettel_external.Zettel,
+	zes zettel_external.MutableSet,
 ) (err error) {
-	toDelete := make([]zettel_external.Zettel, 0, len(zettels))
+	zesToDelete := zettel_external.MakeMutableSetUniqueFD()
 	filesToDelete := collections.MakeMutableSet[*zettel_external.FD](
 		func(e *zettel_external.FD) string {
 			if e == nil {
@@ -27,26 +27,33 @@ func (c DeleteCheckout) Run(
 		},
 	)
 
-	for _, external := range zettels {
-		var internal zettel_transacted.Zettel
+	if err = zes.Each(
+		func(external *zettel_external.Zettel) (err error) {
+			var internal zettel_transacted.Zettel
 
-		if internal, err = c.StoreObjekten().ReadHinweisSchwanzen(external.Named.Hinweis); err != nil {
-			err = errors.Wrap(err)
+			if internal, err = c.StoreObjekten().ReadHinweisSchwanzen(external.Named.Hinweis); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			//TODO add a safety check?
+			if !internal.Named.Stored.Zettel.Equals(external.Named.Stored.Zettel) {
+				errors.PrintOutf("[%s] (checkout different!)", external.Named.Hinweis)
+				return
+			}
+
+			zesToDelete.Add(external)
+			filesToDelete.Add(&external.ZettelFD)
+
+			if external.AkteFD.Path != "" {
+				filesToDelete.Add(&external.AkteFD)
+			}
+
 			return
-		}
-
-		//TODO add a safety check?
-		if !internal.Named.Stored.Zettel.Equals(external.Named.Stored.Zettel) {
-			errors.PrintOutf("[%s] (checkout different!)", external.Named.Hinweis)
-			continue
-		}
-
-		toDelete = append(toDelete, external)
-		filesToDelete.Add(&external.ZettelFD)
-
-		if external.AkteFD.Path != "" {
-			filesToDelete.Add(&external.AkteFD)
-		}
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	fs := make([]string, 0, filesToDelete.Len())

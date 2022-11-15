@@ -65,14 +65,15 @@ func (op ReadCheckedOut) RunMany(
 		}
 
 		if checked_out, err = readFunc(); err != nil {
+			//TODO decide if error handling like this is ok
 			if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
-				errors.Print("external zettel does not exist: %s", p)
-				err = nil
+				errors.Err().Printf("external zettel does not exist: %s", p)
 			} else {
-				err = errors.Wrap(err)
-				return
+				errors.Err().Print(err)
 			}
 
+			err = nil
+      continue
 		}
 
 		if err = w(&checked_out); err != nil {

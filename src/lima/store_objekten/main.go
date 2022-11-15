@@ -610,7 +610,7 @@ func (s Store) AllInChain(h hinweis.Hinweis) (c []*zettel_transacted.Zettel, err
 
 			return
 		},
-		zettel_verzeichnisse.MakeWriterZettelTransacted(mst.Add),
+		zettel_verzeichnisse.MakeWriterZettelTransacted(mst.AddAndDoNotRepool),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

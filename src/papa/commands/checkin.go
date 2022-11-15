@@ -95,12 +95,11 @@ func (c Checkin) Run(
 			Umwelt: s,
 		}
 
-		external := make([]zettel_external.Zettel, 0, readResults.Len())
+		external := zettel_external.MakeMutableSetUniqueFD()
 
 		err = readResults.Each(
 			func(zco *zettel_checked_out.Zettel) (err error) {
-				external = append(external, zco.External)
-				return
+				return external.Add(&zco.External)
 			},
 		)
 

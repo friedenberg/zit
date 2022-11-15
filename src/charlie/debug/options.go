@@ -62,6 +62,7 @@ func (o *Options) Set(v string) (err error) {
 		case "all":
 			o.GCDisabled = true
 			o.PProfCPU = true
+			o.PProfHeap = true
 			o.Trace = true
 
 		default:
