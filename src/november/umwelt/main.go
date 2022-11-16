@@ -13,6 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/delta/konfig"
 	"github.com/friedenberg/zit/src/delta/standort"
+	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
 	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
 	"github.com/friedenberg/zit/src/lima/store_objekten"
 	store_fs "github.com/friedenberg/zit/src/mike/store_fs"
@@ -167,11 +168,12 @@ func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 		},
 	)
 
-	u.storeWorkingDirectory.SetZettelCheckedOutWriter(
-		format.MakeWriterToWithNewLines(
-			u.Out(),
-			u.FormatZettelCheckedOutFresh(),
-		),
+	u.storeWorkingDirectory.SetZettelCheckedOutWriters(
+		store_fs.ZettelCheckedOutLogWriters{
+			ZettelOnly: u.PrinterZettelCheckedOutFresh(zettel_checked_out.ModeZettelOnly),
+			AkteOnly:   u.PrinterZettelCheckedOutFresh(zettel_checked_out.ModeZettelOnly),
+			Both:       u.PrinterZettelCheckedOutFresh(zettel_checked_out.ModeZettelOnly),
+		},
 	)
 
 	u.storesInitialized = true

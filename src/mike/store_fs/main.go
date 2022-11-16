@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/id"
@@ -26,7 +25,7 @@ type Store struct {
 
 	storeObjekten *store_objekten.Store
 
-	zettelCheckedOutWriter collections.WriterFunc[*zettel_checked_out.Zettel]
+	zettelCheckedOutWriters ZettelCheckedOutLogWriters
 
 	path         string
 	cwd          string
@@ -54,10 +53,10 @@ func New(k Konfig, p string, storeObjekten *store_objekten.Store) (s *Store, err
 	return
 }
 
-func (s *Store) SetZettelCheckedOutWriter(
-	zcow collections.WriterFunc[*zettel_checked_out.Zettel],
+func (s *Store) SetZettelCheckedOutWriters(
+	zcow ZettelCheckedOutLogWriters,
 ) {
-	s.zettelCheckedOutWriter = zcow
+	s.zettelCheckedOutWriters = zcow
 }
 
 func (s Store) IndexFilePath() string {

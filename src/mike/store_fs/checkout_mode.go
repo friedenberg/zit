@@ -1,56 +1,11 @@
 package store_fs
 
-import (
-	"strings"
+import "github.com/friedenberg/zit/src/juliett/zettel_checked_out"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-)
-
-type CheckoutMode int
+type CheckoutMode = zettel_checked_out.Mode
 
 const (
-	CheckoutModeZettelOnly = CheckoutMode(iota)
-	CheckoutModeZettelAndAkte
-	CheckoutModeAkteOnly
+	CheckoutModeZettelOnly    = zettel_checked_out.ModeZettelOnly
+	CheckoutModeZettelAndAkte = zettel_checked_out.ModeZettelAndAkte
+	CheckoutModeAkteOnly      = zettel_checked_out.ModeAkteOnly
 )
-
-func (m CheckoutMode) String() string {
-	switch m {
-	case CheckoutModeZettelOnly:
-		return "zettel-only"
-
-	case CheckoutModeAkteOnly:
-		return "akte-only"
-
-	case CheckoutModeZettelAndAkte:
-		return "both"
-
-	default:
-		return "unknown"
-	}
-}
-
-func (m *CheckoutMode) Set(v string) (err error) {
-	v = strings.ToLower(strings.TrimSpace(v))
-
-	switch v {
-	case "zettel":
-		fallthrough
-	case "zettel-only":
-		*m = CheckoutModeZettelOnly
-
-	case "akte":
-		fallthrough
-	case "akte-only":
-		*m = CheckoutModeAkteOnly
-
-	case "both":
-		*m = CheckoutModeZettelAndAkte
-
-	default:
-		err = errors.Errorf("unsupported checkout mode: %s", v)
-		return
-	}
-
-	return
-}

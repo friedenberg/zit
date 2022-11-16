@@ -93,19 +93,25 @@ func (u *Umwelt) FormatZettelExternalFD() format.FormatWriterFunc[zettel_externa
 	)
 }
 
-func (u *Umwelt) FormatZettelCheckedOut() format.FormatWriterFunc[zettel_checked_out.Zettel] {
+func (u *Umwelt) FormatZettelCheckedOut(
+	mode zettel_checked_out.Mode,
+) format.FormatWriterFunc[zettel_checked_out.Zettel] {
 	return zettel_checked_out.MakeCliFormat(
 		u.Standort(),
 		u.FormatZettelExternal(),
 		u.FormatZettelExternalAkte(),
+		mode,
 	)
 }
 
-func (u *Umwelt) FormatZettelCheckedOutFresh() format.FormatWriterFunc[zettel_checked_out.Zettel] {
+func (u *Umwelt) FormatZettelCheckedOutFresh(
+	mode zettel_checked_out.Mode,
+) format.FormatWriterFunc[zettel_checked_out.Zettel] {
 	return zettel_checked_out.MakeCliFormatFresh(
 		u.Standort(),
 		u.FormatZettelExternal(),
 		u.FormatZettelExternalAkte(),
+		mode,
 	)
 }
 

@@ -10,7 +10,6 @@ import (
 )
 
 // [path@sha !typ "bez"]
-// [path.akte_ext@sha]
 func MakeCliFormatZettel(
 	s standort.Standort,
 	cw format.FuncColorWriter,

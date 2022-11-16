@@ -15,6 +15,12 @@ import (
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
 )
 
+type ZettelCheckedOutLogWriters struct {
+	ZettelOnly collections.WriterFunc[*zettel_checked_out.Zettel]
+	AkteOnly   collections.WriterFunc[*zettel_checked_out.Zettel]
+	Both       collections.WriterFunc[*zettel_checked_out.Zettel]
+}
+
 func (s *Store) Checkout(
 	options CheckoutOptions,
 	ztw collections.WriterFunc[*zettel_transacted.Zettel],
@@ -100,7 +106,8 @@ func (s *Store) CheckoutOne(
 		}
 
 		if !s.shouldCheckOut(options, cz) {
-			if err = s.zettelCheckedOutWriter(&cz); err != nil {
+			//TODO handle fs state
+			if err = s.zettelCheckedOutWriters.ZettelOnly(&cz); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -119,8 +126,15 @@ func (s *Store) CheckoutOne(
 			ZettelFD: zettel_external.FD{
 				Path: filename,
 			},
+			Named: sz.Named,
 		},
 		Matches: zettel_checked_out.MakeMatches(),
+	}
+
+	if !inlineAkte {
+		cz.External.AkteFD = zettel_external.FD{
+			Path: originalFilename + "." + sz.Named.Stored.Zettel.AkteExt(),
+		}
 	}
 
 	c := zettel.FormatContextWrite{
@@ -129,22 +143,19 @@ func (s *Store) CheckoutOne(
 		AkteReaderFactory: s.storeObjekten,
 	}
 
-	cz.External.Named = sz.Named
-
 	switch options.CheckoutMode {
 	case CheckoutModeAkteOnly:
-		p := originalFilename + "." + sz.Named.Stored.Zettel.AkteExt()
-		cz.External.AkteFD.Path = p
-		cz.External.ZettelFD.Path = ""
-
-		if err = s.writeAkte(sz.Named.Stored.Zettel.Akte, p); err != nil {
+		if err = s.writeAkte(
+			cz.External.Named.Stored.Zettel.Akte,
+			cz.External.AkteFD.Path,
+			&cz,
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case CheckoutModeZettelAndAkte:
 		c.IncludeAkte = true
-		cz.External.AkteFD.Path = originalFilename + "." + sz.Named.Stored.Zettel.AkteExt()
 
 		if !inlineAkte {
 			c.ExternalAktePath = cz.External.AkteFD.Path
@@ -153,7 +164,7 @@ func (s *Store) CheckoutOne(
 		fallthrough
 
 	case CheckoutModeZettelOnly:
-		if err = s.writeFormat(options, filename, c); err != nil {
+		if err = s.writeFormat(options, filename, c, &cz); err != nil {
 			err = errors.Wrapf(err, "%s", sz.Named)
 			errors.PrintErrf("%s (check out failed):", sz.Named)
 			return
@@ -164,11 +175,6 @@ func (s *Store) CheckoutOne(
 		return
 	}
 
-	if err = s.zettelCheckedOutWriter(&cz); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	return
 }
 
@@ -176,6 +182,7 @@ func (s *Store) writeFormat(
 	o CheckoutOptions,
 	p string,
 	fc zettel.FormatContextWrite,
+	zco *zettel_checked_out.Zettel,
 ) (err error) {
 	var f *os.File
 
@@ -193,12 +200,25 @@ func (s *Store) writeFormat(
 		return
 	}
 
+	if fc.ExternalAktePath == "" {
+		if err = s.zettelCheckedOutWriters.ZettelOnly(zco); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		if err = s.zettelCheckedOutWriters.Both(zco); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
 	return
 }
 
 func (s *Store) writeAkte(
 	sh sha.Sha,
 	p string,
+	zco *zettel_checked_out.Zettel,
 ) (err error) {
 	var f *os.File
 
@@ -218,13 +238,15 @@ func (s *Store) writeAkte(
 
 	defer files.Close(f)
 
-	errors.Print("starting io copy")
 	if _, err = io.Copy(f, r); err != nil {
-		errors.Print(" io copy faile")
 		err = errors.Wrap(err)
 		return
 	}
-	errors.Print(" io copy succeed")
+
+	if err = s.zettelCheckedOutWriters.AkteOnly(zco); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }

@@ -16,10 +16,21 @@ func (u *Umwelt) PrinterZettelTransacted(verb string) collections.WriterFunc[*ze
 	)
 }
 
-func (u *Umwelt) PrinterZettelCheckedOut() collections.WriterFunc[*zettel_checked_out.Zettel] {
+func (u *Umwelt) PrinterZettelCheckedOut(
+	mode zettel_checked_out.Mode,
+) collections.WriterFunc[*zettel_checked_out.Zettel] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
-		u.FormatZettelCheckedOut(),
+		u.FormatZettelCheckedOut(mode),
+	)
+}
+
+func (u *Umwelt) PrinterZettelCheckedOutFresh(
+	mode zettel_checked_out.Mode,
+) collections.WriterFunc[*zettel_checked_out.Zettel] {
+	return format.MakeWriterToWithNewLines(
+		u.Out(),
+		u.FormatZettelCheckedOutFresh(mode),
 	)
 }
 
