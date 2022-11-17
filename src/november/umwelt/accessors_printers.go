@@ -61,3 +61,13 @@ func (u *Umwelt) PrinterFDDeleted() collections.WriterFunc[*zettel_external.FD] 
 		u.FormatFDDeleted(),
 	)
 }
+
+func (u *Umwelt) PrinterHeader() collections.WriterFunc[*string] {
+	return format.MakeWriterToWithNewLines(
+		u.Out(),
+		format.MakeWriterFormatStringIndentedHeader(
+			u.FormatColorWriter(),
+			format.StringHeaderIndent,
+		),
+	)
+}

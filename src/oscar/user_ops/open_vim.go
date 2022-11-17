@@ -3,6 +3,7 @@ package user_ops
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
 type OpenVim struct {
@@ -12,7 +13,10 @@ type OpenVim struct {
 type OpenVimResults struct {
 }
 
-func (c OpenVim) Run(args ...string) (results OpenVimResults, err error) {
+func (c OpenVim) Run(
+	u *umwelt.Umwelt,
+	args ...string,
+) (results OpenVimResults, err error) {
 	vimArgs := make([]string, 0, len(c.Options)*2)
 
 	for _, o := range c.Options {
@@ -25,6 +29,14 @@ func (c OpenVim) Run(args ...string) (results OpenVimResults, err error) {
 		} else {
 			err = errors.Wrap(err)
 		}
+
+		return
+	}
+
+	v := "opening vim"
+
+	if err = u.PrinterHeader()(&v); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 

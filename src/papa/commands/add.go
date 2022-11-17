@@ -105,7 +105,7 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			Build(),
 	}
 
-	if _, err = openVimOp.Run(f.Name()); err != nil {
+	if _, err = openVimOp.Run(u, f.Name()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -183,7 +183,7 @@ func (c Add) openAktenIfNecessary(
 
 	openOp := user_ops.OpenFiles{}
 
-	if err = openOp.Run(checkoutResults.ToSliceFilesAkten()...); err != nil {
+	if err = openOp.Run(u, checkoutResults.ToSliceFilesAkten()...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

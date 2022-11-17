@@ -101,7 +101,7 @@ func (c Edit) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 		return
 	}
 
-	if err = (user_ops.OpenFiles{}).Run(checkoutResults.ToSliceFilesAkten()...); err != nil {
+	if err = (user_ops.OpenFiles{}).Run(u, checkoutResults.ToSliceFilesAkten()...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -120,7 +120,7 @@ func (c Edit) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 		files = append(files, u.Standort().FileKonfigToml())
 	}
 
-	if _, err = openVimOp.Run(files...); err != nil {
+	if _, err = openVimOp.Run(u, files...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

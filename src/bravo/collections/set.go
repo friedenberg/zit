@@ -28,8 +28,8 @@ func (s1 Set[T]) Copy() (out Set[T]) {
 	return
 }
 
-func (s1 Set[T]) MutableCopy() (s2 MutableSetLike[T]) {
-	s2 = makeMutableSet[T](s1.Key)
+func (s1 Set[T]) MutableCopy() (s2 MutableSet[T]) {
+	s2 = MakeMutableSet[T](s1.Key)
 	s1.Each(s2.Add)
 
 	return

@@ -19,6 +19,7 @@ type KonfigTyp struct {
 	InlineAkte     bool                   `toml:"inline-akte" default:"true"`
 	ExecCommand    ScriptConfig           `toml:"exec-command"`
 	EtikettenRules map[string]EtikettRule `toml:"etiketten-rules"`
+	FileExtension  string                 `toml:"file-extension"`
 }
 
 type EtikettRule struct {

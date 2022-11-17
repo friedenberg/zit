@@ -182,7 +182,7 @@ func (c New) editZettels(
 			Build(),
 	}
 
-	if _, err = openVimOp.Run(cwdFiles.ZettelFiles()...); err != nil {
+	if _, err = openVimOp.Run(u, cwdFiles.ZettelFiles()...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

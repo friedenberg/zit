@@ -19,6 +19,7 @@ const (
 	StringRecognized   = "recognized"
 	StringCheckedOut   = "checked out"
 	StringUnrecognized = "unrecognized"
+	StringHeaderIndent = "=============== "
 	LenStringMax       = len(StringUnrecognized) + 4
 )
 
@@ -45,5 +46,18 @@ func MakeFormatStringRightAlignedParen(
 		n = int64(n1)
 
 		return
+	}
+}
+
+func MakeWriterFormatStringIndentedHeader(
+	cw FuncColorWriter,
+	indentString string,
+) FormatWriterFunc[string] {
+	return func(w io.Writer, v *string) (n int64, err error) {
+		return Write(
+			w,
+			MakeFormatString(indentString),
+			cw(MakeFormatString("%s", *v), ColorTypeTitle),
+		)
 	}
 }

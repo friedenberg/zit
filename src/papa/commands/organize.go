@@ -298,7 +298,7 @@ func (c Organize) readFromVim(
 			Build(),
 	}
 
-	if _, err = openVimOp.Run(f); err != nil {
+	if _, err = openVimOp.Run(u, f); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -21,7 +21,7 @@ const (
 	ColorTypeConstant   = colorItalic
 	ColorTypeType       = colorYellow
 	ColorTypeIdentifier = colorCyan
-	ColorTypeTitle      = colorMagenta
+	ColorTypeTitle      = colorRed
 )
 
 func MakeFormatWriterNoopColor(
