@@ -12,7 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/india/zettel_external"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
-	store_fs "github.com/friedenberg/zit/src/mike/store_fs"
+	"github.com/friedenberg/zit/src/mike/store_fs"
 )
 
 func (u *Umwelt) FormatColorWriter() format.FuncColorWriter {
