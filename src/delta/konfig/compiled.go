@@ -10,6 +10,7 @@ import (
 type Compiled struct {
 	ZettelFileExtension string
 	DefaultTyp          string
+	DefaultOrganizeExt  string
 	EtikettenHidden     []string
 	EtikettenToAddToNew []string
 	ExtensionsToTypen   map[string]string
@@ -20,6 +21,7 @@ func MakeDefaultCompiled() Compiled {
 	return Compiled{
 		ZettelFileExtension: "md",
 		DefaultTyp:          "md",
+		DefaultOrganizeExt:  "md",
 		ExtensionsToTypen:   make(map[string]string),
 		TypenInline: collections.MakeSet[string](
 			func(v string) string { return v },

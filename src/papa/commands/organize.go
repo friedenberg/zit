@@ -190,7 +190,7 @@ func (c *Organize) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 		var f *os.File
 
-		if f, err = files.TempFileWithPattern("*.md"); err != nil {
+		if f, err = files.TempFileWithPattern("*." + u.Konfig().DefaultOrganizeExt); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -241,7 +241,7 @@ func (c *Organize) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 		var f *os.File
 
-		if f, err = files.TempFileWithPattern("*.md"); err != nil {
+		if f, err = files.TempFileWithPattern("*." + u.Konfig().DefaultOrganizeExt); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

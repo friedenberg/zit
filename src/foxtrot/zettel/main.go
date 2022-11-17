@@ -87,16 +87,6 @@ func (z Zettel) DescriptionAndTags() (d string) {
 	return
 }
 
-func (z Zettel) TypOrDefault() (t typ.Typ) {
-	t = z.Typ
-
-	if t.String() == "" {
-		t = typ.Make("md")
-	}
-
-	return
-}
-
 //TODO remove
 func (z Zettel) IsInlineAkte(k konfig.Konfig) (isInline bool) {
 	return z.Typ.IsInline(k)
