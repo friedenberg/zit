@@ -15,18 +15,14 @@ func MakeSerializedFormatWriter(
 	k konfig.Konfig,
 ) collections.WriterFunc[*Zettel] {
 	wf := func(z *Zettel) (err error) {
-		//TODO use konfig
-		includeAkte := z.Typ.String() == "md"
-
-		if typKonfig, ok := k.Typen[z.Typ.String()]; ok {
-			includeAkte = typKonfig.InlineAkte
-		}
+		isInline := z.Typ.IsInline(k)
 
 		ctx := FormatContextWrite{
 			Out:               out,
 			AkteReaderFactory: arf,
 			Zettel:            *z,
-			IncludeAkte:       includeAkte,
+      //TODO this seems inverted for some reason
+			IncludeAkte:       isInline,
 		}
 
 		if _, err = f.WriteTo(ctx); err != nil {

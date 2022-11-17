@@ -97,13 +97,7 @@ func (z Zettel) TypOrDefault() (t typ.Typ) {
 	return
 }
 
+//TODO remove
 func (z Zettel) IsInlineAkte(k konfig.Konfig) (isInline bool) {
-	ts := z.Typ.String()
-	isInline = k.Compiled.TypenInline.Contains(ts)
-
-	if typKonfig, ok := k.Typen[ts]; ok {
-		isInline = typKonfig.InlineAkte
-	}
-
-	return
+	return z.Typ.IsInline(k)
 }

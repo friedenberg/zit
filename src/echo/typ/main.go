@@ -4,15 +4,8 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/delta/etikett"
+	"github.com/friedenberg/zit/src/delta/konfig"
 )
-
-var TextTypes map[string]bool
-
-func init() {
-	TextTypes = map[string]bool{
-		"md": true,
-	}
-}
 
 type Typ struct {
 	etikett.Etikett
@@ -30,8 +23,13 @@ func (v *Typ) Set(v1 string) (err error) {
 	return v.Etikett.Set(strings.TrimSpace(strings.Trim(v1, ".! ")))
 }
 
-func (v Typ) IsTextType() (is bool) {
-	is, _ = TextTypes[v.String()]
+func (t Typ) IsInline(k konfig.Konfig) (isInline bool) {
+	ts := t.String()
+	isInline = k.Compiled.TypenInline.Contains(ts)
+
+	if typKonfig, ok := k.Typen[ts]; ok {
+		isInline = typKonfig.InlineAkte
+	}
 
 	return
 }
