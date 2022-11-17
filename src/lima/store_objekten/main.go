@@ -74,7 +74,7 @@ func Make(
 
 	s.protoZettel = zettel.MakeProtoZettel()
 
-	if err = s.protoZettel.Typ.Set(k.Compiled.DefaultTyp); err != nil {
+	if err = s.protoZettel.Typ.Set(k.Compiled.DefaultTyp.Name); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

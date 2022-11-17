@@ -27,10 +27,6 @@ func (t Typ) IsInline(k konfig.Konfig) (isInline bool) {
 	ts := t.String()
 	isInline = k.Compiled.TypenInline.Contains(ts)
 
-	if typKonfig, ok := k.Typen[ts]; ok {
-		isInline = typKonfig.InlineAkte
-	}
-
 	return
 }
 

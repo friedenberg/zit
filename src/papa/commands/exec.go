@@ -115,7 +115,9 @@ func (c Exec) getZettel(
 
 	typ := tz.Named.Stored.Zettel.Typ.String()
 
-	if typKonfig, ok := u.Konfig().Typen[typ]; ok {
+	typKonfig, ok := u.Konfig().Compiled.Typen.Get(typ)
+
+	if ok {
 		executor = typKonfig.ExecCommand
 	} else {
 		err = errors.Normal(errors.Errorf("Typ does not have an exec-command set: %s", typ))
