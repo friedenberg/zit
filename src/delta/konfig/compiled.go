@@ -12,7 +12,7 @@ type Compiled struct {
 	DefaultTyp          string
 	EtikettenHidden     []string
 	EtikettenToAddToNew []string
-	TypenExtensions     map[string]string
+	ExtensionsToTypen   map[string]string
 	TypenInline         collections.Set[string]
 }
 
@@ -20,7 +20,7 @@ func MakeDefaultCompiled() Compiled {
 	return Compiled{
 		ZettelFileExtension: "md",
 		DefaultTyp:          "md",
-		TypenExtensions:     make(map[string]string),
+		ExtensionsToTypen:   make(map[string]string),
 		TypenInline: collections.MakeSet[string](
 			func(v string) string { return v },
 			"md",
@@ -57,7 +57,7 @@ func makeCompiled(k toml) (kc Compiled, err error) {
 		}
 
 		if tv.FileExtension != "" {
-			kc.TypenExtensions[tv.FileExtension] = tn
+			kc.ExtensionsToTypen[tv.FileExtension] = tn
 		}
 	}
 

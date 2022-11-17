@@ -97,13 +97,6 @@ func (z Zettel) TypOrDefault() (t typ.Typ) {
 	return
 }
 
-func (z Zettel) AkteExt() (ext string) {
-	t := z.TypOrDefault()
-	ext = t.String()
-
-	return
-}
-
 func (z Zettel) IsInlineAkte(k konfig.Konfig) (isInline bool) {
 	ts := z.Typ.String()
 	isInline = k.Compiled.TypenInline.Contains(ts)
