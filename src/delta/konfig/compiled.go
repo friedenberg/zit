@@ -80,7 +80,9 @@ func makeCompiled(k toml) (kc Compiled, err error) {
 			kc.ExtensionsToTypen[tv.FileExtension] = tn
 		}
 
-		ct := &compiledTyp{}
+		ct := &compiledTyp{
+			Name: tn,
+		}
 
 		ct.Apply(tv)
 		typen.Add(ct)
