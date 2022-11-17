@@ -9,17 +9,17 @@ import (
 
 type Compiled struct {
 	ZettelFileExtension string
-	DefaultTyp          compiledTyp
+	DefaultTyp          *compiledTyp
 	DefaultOrganizeExt  string
 	EtikettenHidden     []string
 	EtikettenToAddToNew []string
 	ExtensionsToTypen   map[string]string
 	TypenInline         collections.Set[string]
-	Typen               collections.Set[compiledTyp]
+	Typen               collections.Set[*compiledTyp]
 }
 
 func MakeDefaultCompiled() Compiled {
-	dt := compiledTyp{
+	dt := &compiledTyp{
 		Name:          "md",
 		InlineAkte:    true,
 		FileExtension: "md",
@@ -34,8 +34,14 @@ func MakeDefaultCompiled() Compiled {
 			func(v string) string { return v },
 			"md",
 		),
-		Typen: collections.MakeSet[compiledTyp](
-			func(v compiledTyp) string { return v.Name },
+		Typen: collections.MakeSet[*compiledTyp](
+			func(v *compiledTyp) string {
+				if v == nil {
+					return ""
+				}
+
+				return v.Name
+			},
 			dt,
 		),
 	}
@@ -74,12 +80,17 @@ func makeCompiled(k toml) (kc Compiled, err error) {
 			kc.ExtensionsToTypen[tv.FileExtension] = tn
 		}
 
-		var ct compiledTyp
+		ct := &compiledTyp{}
 
 		ct.Apply(tv)
-
 		typen.Add(ct)
 	}
+
+	typen.Each(
+		func(ct *compiledTyp) (err error) {
+			return
+		},
+	)
 
 	kc.TypenInline = inlineTypen.Copy()
 	kc.Typen = typen.Copy()

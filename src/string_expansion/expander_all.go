@@ -1,0 +1,58 @@
+package string_expansion
+
+import "github.com/friedenberg/zit/src/bravo/collections"
+
+type expanderAll[T collections.ProtoObjekte, T1 interface {
+	*T
+	collections.ProtoObjektePointer
+}] struct {
+	delimiter string
+}
+
+func MakeExpanderAll[T collections.ProtoObjekte, T1 interface {
+	*T
+	collections.ProtoObjektePointer
+}](delimiter string) expanderAll[T, T1] {
+	return expanderAll[T, T1]{
+		delimiter: delimiter,
+	}
+}
+
+func (ex expanderAll[T, T1]) Expand(s string) (out collections.ValueSet[T, T1]) {
+	expanded := collections.MakeMutableValueSet[T, T1]()
+	expanded.AddString(s)
+
+	if s == "" {
+		return
+	}
+
+	hyphens := regexExpandTagsHyphens.FindAllIndex([]byte(s), -1)
+
+	if hyphens == nil {
+		return
+	}
+
+	end := len(s)
+	prevLocEnd := 0
+
+	for i, loc := range hyphens {
+		locStart := loc[0]
+		locEnd := loc[1]
+		t1 := s[0:locStart]
+		t2 := s[locEnd:end]
+
+		expanded.AddString(t1)
+		expanded.AddString(t2)
+
+		if 0 < i && i < len(hyphens) {
+			t1 := s[prevLocEnd:locStart]
+			expanded.AddString(t1)
+		}
+
+		prevLocEnd = locEnd
+	}
+
+	out = expanded.Copy()
+
+	return
+}
