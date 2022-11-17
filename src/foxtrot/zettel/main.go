@@ -105,9 +105,10 @@ func (z Zettel) AkteExt() (ext string) {
 }
 
 func (z Zettel) IsInlineAkte(k konfig.Konfig) (isInline bool) {
-	isInline = z.TypOrDefault().String() == "md"
+	ts := z.Typ.String()
+	isInline = k.Compiled.TypenInline.Contains(ts)
 
-	if typKonfig, ok := k.Typen[z.Typ.String()]; ok {
+	if typKonfig, ok := k.Typen[ts]; ok {
 		isInline = typKonfig.InlineAkte
 	}
 

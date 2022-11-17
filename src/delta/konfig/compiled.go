@@ -21,7 +21,10 @@ func MakeDefaultCompiled() Compiled {
 		ZettelFileExtension: "md",
 		DefaultTyp:          "md",
 		TypenExtensions:     make(map[string]string),
-		TypenInline:         collections.MakeSet[string](func(v string) string { return v }),
+		TypenInline: collections.MakeSet[string](
+			func(v string) string { return v },
+			"md",
+		),
 	}
 }
 
