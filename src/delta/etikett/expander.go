@@ -1,6 +1,6 @@
 package etikett
 
-import "github.com/friedenberg/zit/src/string_expansion"
+import "github.com/friedenberg/zit/src/charlie/string_expansion"
 
 type Expander = string_expansion.Expander[Etikett, *Etikett]
 

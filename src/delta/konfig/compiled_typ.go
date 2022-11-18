@@ -9,7 +9,7 @@ type compiledTyp struct {
 	FileExtension  string
 }
 
-//TODO merge
+// TODO merge
 func (ct *compiledTyp) Apply(kt KonfigTyp) {
 	ct.FormatScript = kt.FormatScript
 	ct.InlineAkte = kt.InlineAkte

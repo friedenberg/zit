@@ -21,8 +21,8 @@ func MakeSerializedFormatWriter(
 			Out:               out,
 			AkteReaderFactory: arf,
 			Zettel:            *z,
-      //TODO this seems inverted for some reason
-			IncludeAkte:       isInline,
+			//TODO this seems inverted for some reason
+			IncludeAkte: isInline,
 		}
 
 		if _, err = f.WriteTo(ctx); err != nil {

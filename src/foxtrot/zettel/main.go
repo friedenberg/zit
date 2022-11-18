@@ -87,7 +87,7 @@ func (z Zettel) DescriptionAndTags() (d string) {
 	return
 }
 
-//TODO remove
+// TODO remove
 func (z Zettel) IsInlineAkte(k konfig.Konfig) (isInline bool) {
 	return z.Typ.IsInline(k)
 }
