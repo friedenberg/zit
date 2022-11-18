@@ -20,7 +20,7 @@ type Compiled struct {
 
 func MakeDefaultCompiled() Compiled {
 	dt := &compiledTyp{
-		Name:          "md",
+		Name:          collections.MakeStringValue("md"),
 		InlineAkte:    true,
 		FileExtension: "md",
 	}
@@ -81,7 +81,7 @@ func makeCompiled(k toml) (kc Compiled, err error) {
 		}
 
 		ct := &compiledTyp{
-			Name: collections.StringValue(tn),
+			Name: collections.MakeStringValue(tn),
 		}
 
 		ct.Apply(tv)

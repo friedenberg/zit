@@ -17,6 +17,7 @@ type compiledTyp struct {
 	Name           collections.StringValue
 	FormatScript   ScriptConfig
 	InlineAkte     bool
+	Actions        map[string]ScriptConfig
 	ExecCommand    ScriptConfig
 	EtikettenRules map[string]EtikettRule
 	FileExtension  string
@@ -25,6 +26,7 @@ type compiledTyp struct {
 func (ct *compiledTyp) Apply(kt KonfigTyp) {
 	ct.FormatScript = kt.FormatScript
 	ct.InlineAkte = kt.InlineAkte
+	ct.Actions = kt.Actions
 	ct.ExecCommand = kt.ExecCommand
 	ct.EtikettenRules = kt.EtikettenRules
 	ct.FileExtension = kt.FileExtension
@@ -49,6 +51,18 @@ func (ct *compiledTyp) Merge(ct2 *compiledTyp) {
 
 	if ct2.FileExtension != "" {
 		ct.FileExtension = ct2.FileExtension
+	}
+
+	for k, v := range ct2.Actions {
+		sc, ok := ct.Actions[k]
+
+		if !ok {
+			sc = v
+		} else {
+			sc.Merge(&v)
+		}
+
+		ct.Actions[k] = v
 	}
 }
 

@@ -15,11 +15,12 @@ type KonfigTag struct {
 }
 
 type KonfigTyp struct {
-	FormatScript   ScriptConfig           `toml:"format-script"`
-	InlineAkte     bool                   `toml:"inline-akte" default:"true"`
-	ExecCommand    ScriptConfig           `toml:"exec-command"`
-	EtikettenRules map[string]EtikettRule `toml:"etiketten-rules"`
-	FileExtension  string                 `toml:"file-extension"`
+	FormatScript   ScriptConfig            `toml:"format-script"`
+	InlineAkte     bool                    `toml:"inline-akte" default:"true"`
+	Actions        map[string]ScriptConfig `toml:"actions"`
+	ExecCommand    ScriptConfig            `toml:"exec-command"`
+	EtikettenRules map[string]EtikettRule  `toml:"etiketten-rules"`
+	FileExtension  string                  `toml:"file-extension"`
 }
 
 type EtikettRule struct {

@@ -20,7 +20,7 @@ func makeStringValues(vs ...string) (out []StringValue) {
 	out = make([]StringValue, len(vs))
 
 	for i, v := range vs {
-		out[i] = StringValue(v)
+		out[i] = MakeStringValue(v)
 	}
 
 	return
@@ -37,7 +37,7 @@ func assertSet(t test_logz.T, sut Set[StringValue], vals []StringValue) {
 	//Key(T) string
 	{
 		v := "wow"
-		k := sut.Key(StringValue(v))
+		k := sut.Key(MakeStringValue(v))
 
 		if k != v {
 			t.Fatalf("expected key %s but got %s", v, k)
@@ -74,7 +74,7 @@ func assertSet(t test_logz.T, sut Set[StringValue], vals []StringValue) {
 		ex := vals
 		ac := sut.Elements()
 
-		sort.Slice(ac, func(i, j int) bool { return ac[i] < ac[j] })
+		sort.Slice(ac, func(i, j int) bool { return ac[i].Less(ac[j]) })
 
 		if !reflect.DeepEqual(ex, ac) {
 			t.Fatalf("expected %s but got %s", ex, ac)
