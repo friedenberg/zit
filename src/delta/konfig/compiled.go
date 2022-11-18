@@ -130,7 +130,7 @@ func (c Compiled) GetZettelFileExtension() string {
 	return fmt.Sprintf(".%s", c.ZettelFileExtension)
 }
 
-func (k Compiled) GetType(n string) (ct *compiledTyp) {
+func (k Compiled) GetTyp(n string) (ct *compiledTyp) {
 	expandedActual := k.GetSortedTypenExpanded(n)
 
 	if len(expandedActual) > 0 {

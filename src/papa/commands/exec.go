@@ -115,7 +115,7 @@ func (c Exec) getZettel(
 
 	typ := tz.Named.Stored.Zettel.Typ.String()
 
-	typKonfig := u.Konfig().GetType(typ)
+	typKonfig := u.Konfig().GetTyp(typ)
 
 	if typKonfig != nil {
 		executor = typKonfig.ExecCommand
