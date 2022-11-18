@@ -116,7 +116,7 @@ func (s *Store) CheckoutOne(
 		}
 	}
 
-	inlineAkte := sz.Named.Stored.Zettel.IsInlineAkte(s.Konfig.Konfig)
+	inlineAkte := sz.Named.Stored.Zettel.Typ.IsInlineAkte(s.Konfig.Konfig)
 
 	cz = zettel_checked_out.Zettel{
 		//TODO check diff with fs if already exists

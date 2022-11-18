@@ -27,9 +27,15 @@ func (v Typ) Expanded() Set {
 	return ExpanderRight.Expand(v.String())
 }
 
-func (t Typ) IsInline(k konfig.Konfig) (isInline bool) {
+func (t Typ) IsInlineAkte(k konfig.Konfig) (isInline bool) {
 	ts := t.String()
-	isInline = k.Compiled.TypenInline.Contains(ts)
+	tc := k.GetTyp(ts)
+
+	if tc == nil {
+		return
+	}
+
+	isInline = tc.InlineAkte
 
 	return
 }

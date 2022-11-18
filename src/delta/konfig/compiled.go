@@ -14,7 +14,6 @@ type Compiled struct {
 	EtikettenHidden     []string
 	EtikettenToAddToNew []string
 	ExtensionsToTypen   map[string]string
-	TypenInline         collections.Set[string]
 	typen               collections.Set[*compiledTyp]
 }
 
@@ -30,10 +29,6 @@ func MakeDefaultCompiled() Compiled {
 		DefaultTyp:          dt,
 		DefaultOrganizeExt:  "md",
 		ExtensionsToTypen:   make(map[string]string),
-		TypenInline: collections.MakeSet[string](
-			func(v string) string { return v },
-			"md",
-		),
 		typen: collections.MakeSet[*compiledTyp](
 			func(v *compiledTyp) string {
 				if v == nil {
@@ -68,14 +63,9 @@ func makeCompiled(k tomlKonfig) (kc Compiled, err error) {
 		return kc.EtikettenToAddToNew[i] < kc.EtikettenToAddToNew[j]
 	})
 
-	inlineTypen := kc.TypenInline.MutableCopy()
 	typen := kc.typen.MutableCopy()
 
 	for tn, tv := range k.Typen {
-		if tv.InlineAkte {
-			inlineTypen.Add(tn)
-		}
-
 		if tv.FileExtension != "" {
 			kc.ExtensionsToTypen[tv.FileExtension] = tn
 		}
@@ -86,7 +76,6 @@ func makeCompiled(k tomlKonfig) (kc Compiled, err error) {
 	}
 
 	kc.typen = typen.Copy()
-	kc.TypenInline = inlineTypen.Copy()
 
 	typen.Each(
 		func(ct *compiledTyp) (err error) {

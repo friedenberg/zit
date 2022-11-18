@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/bezeichnung"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/etikett"
-	"github.com/friedenberg/zit/src/delta/konfig"
 	"github.com/friedenberg/zit/src/echo/typ"
 )
 
@@ -85,9 +84,4 @@ func (z Zettel) DescriptionAndTags() (d string) {
 	d = sb.String()
 
 	return
-}
-
-// TODO remove
-func (z Zettel) IsInlineAkte(k konfig.Konfig) (isInline bool) {
-	return z.Typ.IsInline(k)
 }
