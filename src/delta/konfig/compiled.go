@@ -47,7 +47,7 @@ func MakeDefaultCompiled() Compiled {
 	}
 }
 
-func makeCompiled(k toml) (kc Compiled, err error) {
+func makeCompiled(k tomlKonfig) (kc Compiled, err error) {
 	kc = MakeDefaultCompiled()
 
 	for tn, tv := range k.Tags {
@@ -80,10 +80,7 @@ func makeCompiled(k toml) (kc Compiled, err error) {
 			kc.ExtensionsToTypen[tv.FileExtension] = tn
 		}
 
-		ct := &compiledTyp{
-			Name: collections.MakeStringValue(tn),
-		}
-
+		ct := makeCompiledTyp(tn)
 		ct.Apply(tv)
 		typen.Add(ct)
 	}

@@ -1,6 +1,6 @@
 package konfig
 
-type toml struct {
+type tomlKonfig struct {
 	RemoteScripts map[string]RemoteScript `toml:"remote-scripts"`
 	Tags          map[string]KonfigTag    `toml:"tags"`
 	Typen         map[string]KonfigTyp    `toml:"typen"`
@@ -13,12 +13,12 @@ type KonfigTag struct {
 }
 
 type KonfigTyp struct {
-	FormatScript   ScriptConfig            `toml:"format-script"`
-	InlineAkte     bool                    `toml:"inline-akte" default:"true"`
-	Actions        map[string]ScriptConfig `toml:"actions"`
-	ExecCommand    ScriptConfig            `toml:"exec-command"`
-	EtikettenRules map[string]EtikettRule  `toml:"etiketten-rules"`
-	FileExtension  string                  `toml:"file-extension"`
+	InlineAkte     bool                     `toml:"inline-akte" default:"true"`
+	FileExtension  string                   `toml:"file-extension"`
+	FormatScript   *ScriptConfig            `toml:"format-script"`
+	ExecCommand    *ScriptConfig            `toml:"exec-command"`
+	Actions        map[string]*ScriptConfig `toml:"actions"`
+	EtikettenRules map[string]EtikettRule   `toml:"etiketten-rules"`
 }
 
 type EtikettRule struct {

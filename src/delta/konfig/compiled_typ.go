@@ -15,42 +15,60 @@ func init() {
 
 type compiledTyp struct {
 	Name           collections.StringValue
-	FormatScript   ScriptConfig
 	InlineAkte     bool
-	Actions        map[string]ScriptConfig
-	ExecCommand    ScriptConfig
-	EtikettenRules map[string]EtikettRule
 	FileExtension  string
+	FormatScript   *ScriptConfig
+	ExecCommand    *ScriptConfig
+	Actions        map[string]*ScriptConfig
+	EtikettenRules map[string]EtikettRule
+}
+
+func makeCompiledTyp(n string) *compiledTyp {
+	return &compiledTyp{
+		Name:           collections.MakeStringValue(n),
+		FormatScript:   &ScriptConfig{},
+		ExecCommand:    &ScriptConfig{},
+		Actions:        make(map[string]*ScriptConfig),
+		EtikettenRules: make(map[string]EtikettRule),
+	}
 }
 
 func (ct *compiledTyp) Apply(kt KonfigTyp) {
-	ct.FormatScript = kt.FormatScript
 	ct.InlineAkte = kt.InlineAkte
-	ct.Actions = kt.Actions
-	ct.ExecCommand = kt.ExecCommand
-	ct.EtikettenRules = kt.EtikettenRules
 	ct.FileExtension = kt.FileExtension
+
+	if len(kt.Actions) > 0 {
+		ct.Actions = kt.Actions
+	}
+
+	if kt.FormatScript != nil {
+		ct.FormatScript = kt.FormatScript
+	}
+
+	if kt.ExecCommand != nil {
+		ct.ExecCommand = kt.ExecCommand
+	}
+
+	if len(kt.EtikettenRules) > 0 {
+		ct.EtikettenRules = kt.EtikettenRules
+	}
+
 }
 
 func (ct *compiledTyp) Merge(ct2 *compiledTyp) {
-	ct.FormatScript.Merge(&ct2.FormatScript)
-
 	if ct2.InlineAkte {
 		ct.InlineAkte = true
 	}
 
-	if len(ct2.FormatScript.Shell) > 0 {
-		ct.FormatScript.Shell = ct2.FormatScript.Shell
+	if ct2.FileExtension != "" {
+		ct.FileExtension = ct2.FileExtension
 	}
 
-	ct.ExecCommand.Merge(&ct2.ExecCommand)
+	ct.FormatScript.Merge(ct2.FormatScript)
+	ct.ExecCommand.Merge(ct2.ExecCommand)
 
 	for k, v := range ct2.EtikettenRules {
 		ct.EtikettenRules[k] = v
-	}
-
-	if ct2.FileExtension != "" {
-		ct.FileExtension = ct2.FileExtension
 	}
 
 	for k, v := range ct2.Actions {
@@ -59,10 +77,10 @@ func (ct *compiledTyp) Merge(ct2 *compiledTyp) {
 		if !ok {
 			sc = v
 		} else {
-			sc.Merge(&v)
+			sc.Merge(v)
 		}
 
-		ct.Actions[k] = v
+		ct.Actions[k] = sc
 	}
 }
 

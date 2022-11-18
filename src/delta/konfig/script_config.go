@@ -12,6 +12,10 @@ type ScriptConfig struct {
 }
 
 func (s *ScriptConfig) Merge(s2 *ScriptConfig) {
+	if s2 == nil {
+		return
+	}
+
 	if len(s2.Shell) > 0 {
 		s.Shell = s2.Shell
 	}

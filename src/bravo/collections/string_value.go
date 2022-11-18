@@ -25,6 +25,10 @@ func (sv StringValue) String() string {
 	return sv.string
 }
 
+func (sv StringValue) IsEmpty() bool {
+	return len(sv.string) == 0
+}
+
 func (sv StringValue) Len() int {
 	return len(sv.string)
 }
@@ -34,5 +38,5 @@ func (a StringValue) Less(b StringValue) bool {
 }
 
 func (a StringValue) WasSet() bool {
-  return a.wasSet
+	return a.wasSet
 }
