@@ -1,12 +1,16 @@
 package string_expansion
 
-import "github.com/friedenberg/zit/src/bravo/collections"
+import (
+	"regexp"
+
+	"github.com/friedenberg/zit/src/bravo/collections"
+)
 
 type expanderRight[T collections.ProtoObjekte, T1 interface {
 	*T
 	collections.ProtoObjektePointer
 }] struct {
-	delimiter string
+	delimiter *regexp.Regexp
 }
 
 func MakeExpanderRight[T collections.ProtoObjekte, T1 interface {
@@ -14,7 +18,7 @@ func MakeExpanderRight[T collections.ProtoObjekte, T1 interface {
 	collections.ProtoObjektePointer
 }](delimiter string) expanderRight[T, T1] {
 	return expanderRight[T, T1]{
-		delimiter: delimiter,
+		delimiter: regexp.MustCompile(delimiter),
 	}
 }
 
@@ -22,11 +26,15 @@ func (ex expanderRight[T, T1]) Expand(s string) (out collections.ValueSet[T, T1]
 	expanded := collections.MakeMutableValueSet[T, T1]()
 	expanded.AddString(s)
 
+	defer func() {
+		out = expanded.Copy()
+	}()
+
 	if s == "" {
 		return
 	}
 
-	hyphens := regexExpandTagsHyphens.FindAllIndex([]byte(s), -1)
+	hyphens := ex.delimiter.FindAllIndex([]byte(s), -1)
 
 	if hyphens == nil {
 		return
@@ -38,8 +46,6 @@ func (ex expanderRight[T, T1]) Expand(s string) (out collections.ValueSet[T, T1]
 
 		expanded.AddString(t1)
 	}
-
-	out = expanded.Copy()
 
 	return
 }

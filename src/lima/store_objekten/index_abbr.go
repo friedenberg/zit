@@ -134,7 +134,7 @@ func (i *indexAbbr) addZettelTransacted(zt zettel_transacted.Zettel) (err error)
 	i.indexAbbrEncodableTridexes.HinweisKopfen.Add(zt.Named.Hinweis.Kopf())
 	i.indexAbbrEncodableTridexes.HinweisSchwanzen.Add(zt.Named.Hinweis.Schwanz())
 
-	for _, e := range etikett.Expanded(zt.Named.Stored.Zettel.Etiketten, etikett.ExpanderRight{}).Elements() {
+	for _, e := range etikett.Expanded(zt.Named.Stored.Zettel.Etiketten, etikett.ExpanderRight).Elements() {
 		i.indexAbbrEncodableTridexes.Etiketten.Add(e.String())
 	}
 

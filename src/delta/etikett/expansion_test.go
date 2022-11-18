@@ -83,7 +83,7 @@ func TestExpansionAll(t *testing.T) {
 
 func TestExpansionRight(t *testing.T) {
 	e := Etikett{Value: "this-is-a-tag"}
-	ex := e.Expanded(ExpanderRight{})
+	ex := e.Expanded(ExpanderRight)
 	expected := []string{
 		"this",
 		"this-is",

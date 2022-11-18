@@ -101,11 +101,11 @@ func (e Etikett) Expanded(exes ...Expander) (out Set) {
 	expanded := MakeMutableSet()
 
 	if len(exes) == 0 {
-		exes = []Expander{ExpanderAll{}}
+		exes = []Expander{ExpanderAll}
 	}
 
 	for _, ex := range exes {
-		ex.Expand(e).Each(expanded.Add)
+		ex.Expand(e.String()).Each(expanded.Add)
 	}
 
 	out = Set(expanded.Copy())

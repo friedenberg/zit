@@ -1,15 +1,15 @@
 package etikett
 
-import "regexp"
+import "github.com/friedenberg/zit/src/string_expansion"
+
+type Expander = string_expansion.Expander[Etikett, *Etikett]
 
 var (
-	regexExpandTagsHyphens *regexp.Regexp
+	ExpanderRight Expander
+	ExpanderAll   Expander
 )
 
 func init() {
-	regexExpandTagsHyphens = regexp.MustCompile(`-`)
-}
-
-type Expander interface {
-	Expand(Etikett) Set
+	ExpanderRight = string_expansion.MakeExpanderRight[Etikett, *Etikett](`-`)
+	ExpanderAll = string_expansion.MakeExpanderAll[Etikett, *Etikett](`-`)
 }

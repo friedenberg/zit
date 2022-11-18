@@ -146,7 +146,7 @@ func TestExpandedRight(t *testing.T) {
 		Etikett{Value: "zz-archive-task-done"},
 	)
 
-	ex := Expanded(s, ExpanderRight{})
+	ex := Expanded(s, ExpanderRight)
 
 	expected := []string{
 		"project",
