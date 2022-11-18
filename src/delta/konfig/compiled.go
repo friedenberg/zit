@@ -15,7 +15,7 @@ type Compiled struct {
 	EtikettenToAddToNew []string
 	ExtensionsToTypen   map[string]string
 	TypenInline         collections.Set[string]
-	Typen               collections.Set[*compiledTyp]
+	typen               collections.Set[*compiledTyp]
 }
 
 func MakeDefaultCompiled() Compiled {
@@ -34,13 +34,13 @@ func MakeDefaultCompiled() Compiled {
 			func(v string) string { return v },
 			"md",
 		),
-		Typen: collections.MakeSet[*compiledTyp](
+		typen: collections.MakeSet[*compiledTyp](
 			func(v *compiledTyp) string {
 				if v == nil {
 					return ""
 				}
 
-				return v.Name
+				return v.Name.String()
 			},
 			dt,
 		),
@@ -69,7 +69,7 @@ func makeCompiled(k toml) (kc Compiled, err error) {
 	})
 
 	inlineTypen := kc.TypenInline.MutableCopy()
-	typen := kc.Typen.MutableCopy()
+	typen := kc.typen.MutableCopy()
 
 	for tn, tv := range k.Typen {
 		if tv.InlineAkte {
@@ -81,25 +81,61 @@ func makeCompiled(k toml) (kc Compiled, err error) {
 		}
 
 		ct := &compiledTyp{
-			Name: tn,
+			Name: collections.StringValue(tn),
 		}
 
 		ct.Apply(tv)
 		typen.Add(ct)
 	}
 
+	kc.typen = typen.Copy()
+	kc.TypenInline = inlineTypen.Copy()
+
 	typen.Each(
 		func(ct *compiledTyp) (err error) {
+			ct.ApplyExpanded(kc)
 			return
 		},
 	)
 
-	kc.TypenInline = inlineTypen.Copy()
-	kc.Typen = typen.Copy()
+	return
+}
+
+func (c Compiled) GetSortedTypenExpanded(v string) (expandedActual []*compiledTyp) {
+	expandedMaybe := typExpander.Expand(v)
+	expandedActual = make([]*compiledTyp, 0)
+
+	expandedMaybe.Each(
+		func(v collections.StringValue) (err error) {
+			ct, ok := c.typen.Get(v.String())
+
+			if !ok {
+				return
+			}
+
+			expandedActual = append(expandedActual, ct)
+
+			return
+		},
+	)
+
+	sort.Slice(expandedActual, func(i, j int) bool {
+		return expandedActual[i].Name.Len() > expandedActual[j].Name.Len()
+	})
 
 	return
 }
 
 func (c Compiled) GetZettelFileExtension() string {
 	return fmt.Sprintf(".%s", c.ZettelFileExtension)
+}
+
+func (k Compiled) GetType(n string) (ct *compiledTyp) {
+	expandedActual := k.GetSortedTypenExpanded(n)
+
+	if len(expandedActual) > 0 {
+		ct = expandedActual[0]
+	}
+
+	return
 }

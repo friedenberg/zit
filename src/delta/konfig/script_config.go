@@ -11,6 +11,16 @@ type ScriptConfig struct {
 	Script string
 }
 
+func (s *ScriptConfig) Merge(s2 *ScriptConfig) {
+	if len(s2.Shell) > 0 {
+		s.Shell = s2.Shell
+	}
+
+	if s2.Script != "" {
+		s.Script = s2.Script
+	}
+}
+
 func (s ScriptConfig) Cmd(args ...string) (c *exec.Cmd, err error) {
 	switch {
 	case s.Script == "" && len(s.Shell) == 0:

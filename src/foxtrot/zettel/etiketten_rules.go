@@ -13,9 +13,9 @@ func (z *Zettel) ApplyKonfig(k konfig.Konfig) (err error) {
 	normalized := etikett.WithRemovedCommonPrefixes(z.Etiketten)
 	z.Etiketten = normalized
 
-	tk, ok := k.Compiled.Typen.Get(z.Typ.String())
+	tk := k.Compiled.GetType(z.Typ.String())
 
-	if !ok {
+	if tk == nil {
 		return
 	}
 

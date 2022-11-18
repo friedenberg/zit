@@ -23,6 +23,10 @@ func (v *Typ) Set(v1 string) (err error) {
 	return v.Etikett.Set(strings.TrimSpace(strings.Trim(v1, ".! ")))
 }
 
+func (v Typ) Expanded() Set {
+	return ExpanderRight.Expand(v.String())
+}
+
 func (t Typ) IsInline(k konfig.Konfig) (isInline bool) {
 	ts := t.String()
 	isInline = k.Compiled.TypenInline.Contains(ts)

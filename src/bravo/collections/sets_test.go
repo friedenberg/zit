@@ -16,28 +16,17 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-type stringValue string
-
-func (s stringValue) String() string {
-	return string(s)
-}
-
-func makeStringValues(vs ...string) (out []stringValue) {
-	out = make([]stringValue, len(vs))
+func makeStringValues(vs ...string) (out []StringValue) {
+	out = make([]StringValue, len(vs))
 
 	for i, v := range vs {
-		out[i] = stringValue(v)
+		out[i] = StringValue(v)
 	}
 
 	return
 }
 
-func (s *stringValue) Set(v string) error {
-	*s = stringValue(v)
-	return nil
-}
-
-func assertSet(t test_logz.T, sut Set[stringValue], vals []stringValue) {
+func assertSet(t test_logz.T, sut Set[StringValue], vals []StringValue) {
 	t.Helper()
 
 	//Len() int
@@ -48,7 +37,7 @@ func assertSet(t test_logz.T, sut Set[stringValue], vals []stringValue) {
 	//Key(T) string
 	{
 		v := "wow"
-		k := sut.Key(stringValue(v))
+		k := sut.Key(StringValue(v))
 
 		if k != v {
 			t.Fatalf("expected key %s but got %s", v, k)
@@ -137,8 +126,8 @@ func TestSet(t1 *testing.T) {
 			"3 three",
 		)
 
-		sut := MakeSet[stringValue](
-			func(v stringValue) string {
+		sut := MakeSet[StringValue](
+			func(v StringValue) string {
 				return v.String()
 			},
 			vals...,
@@ -154,14 +143,14 @@ func TestSet(t1 *testing.T) {
 			"3 three",
 		)
 
-		sut := MakeMutableSet[stringValue](
-			func(v stringValue) string {
+		sut := MakeMutableSet[StringValue](
+			func(v StringValue) string {
 				return v.String()
 			},
 			vals...,
 		)
 
-		assertSet(t, Set[stringValue]{SetLike: sut}, vals)
+		assertSet(t, Set[StringValue]{SetLike: sut}, vals)
 	}
 
 	{
@@ -171,11 +160,11 @@ func TestSet(t1 *testing.T) {
 			"3 three",
 		)
 
-		sut := MakeValueSet[stringValue](
+		sut := MakeValueSet[StringValue](
 			vals...,
 		)
 
-		assertSet(t, Set[stringValue]{SetLike: sut}, vals)
+		assertSet(t, Set[StringValue]{SetLike: sut}, vals)
 	}
 
 	{
@@ -185,10 +174,10 @@ func TestSet(t1 *testing.T) {
 			"3 three",
 		)
 
-		sut := MakeMutableValueSet[stringValue](
+		sut := MakeMutableValueSet[StringValue](
 			vals...,
 		)
 
-		assertSet(t, Set[stringValue]{SetLike: sut}, vals)
+		assertSet(t, Set[StringValue]{SetLike: sut}, vals)
 	}
 }
