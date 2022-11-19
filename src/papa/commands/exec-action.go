@@ -2,12 +2,10 @@ package commands
 
 import (
 	"flag"
+	"fmt"
 	"io"
 	"os"
 	"os/exec"
-	"path"
-	"sync"
-	"syscall"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/collections"
@@ -89,9 +87,6 @@ func (c ExecAction) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	)
 
 	iter := func(tz *zettel_transacted.Zettel) (err error) {
-		var executor konfig.RemoteScript
-		var ar io.ReadCloser
-
 		typ := tz.Named.Stored.Zettel.Typ.String()
 
 		typKonfig := u.Konfig().GetTyp(typ)
@@ -101,41 +96,17 @@ func (c ExecAction) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 			return
 		}
 
-		ok := false
-		executor, ok = typKonfig.Actions[c.Action.String()]
+		executor, ok := typKonfig.Actions[c.Action.String()]
 
 		if !ok {
 			err = errors.Normal(errors.Errorf("Typ does not have action: %s", c.Action))
 			return
 		}
 
-		if ar, err = u.StoreObjekten().AkteReader(tz.Named.Stored.Zettel.Akte); err != nil {
+		if err = c.runExecutor(u, executor, tz); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
-
-		var pipePath string
-
-		if pipePath, err = c.makeFifoPipe(tz); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		var cmd *exec.Cmd
-
-		if cmd, err = c.makeCmd(executor, pipePath); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		wg := &sync.WaitGroup{}
-		wg.Add(2)
-
-		go c.feedPipe(ar, wg, pipePath, tz)
-		go c.exec(wg, pipePath, cmd)
-
-		wg.Wait()
-		errors.Print("done waiting")
 
 		return
 	}
@@ -151,106 +122,81 @@ func (c ExecAction) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	return
 }
 
-func (c ExecAction) makeFifoPipe(tz *zettel_transacted.Zettel) (p string, err error) {
-	h := tz.Named.Hinweis
-	var d string
+func (c ExecAction) runExecutor(
+	u *umwelt.Umwelt,
+	executor *konfig.ScriptConfig,
+	z *zettel_transacted.Zettel,
+) (err error) {
+	var cmd *exec.Cmd
 
-	if d, err = os.MkdirTemp("", h.Kopf()); err != nil {
+	if cmd, err = executor.Cmd(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	p = path.Join(d, h.Schwanz()+"."+tz.Named.Stored.Zettel.Typ.String())
-
-	if err = syscall.Mknod(p, syscall.S_IFIFO|0666, 0); err != nil {
-		err = errors.Wrap(err)
-		return
+	env := map[string]string{
+		"ZETTEL": z.Named.Hinweis.String(),
+    "ZIT_BIN": u.Standort().Executable(),
 	}
 
-	if err = os.Remove(p); err != nil {
-		err = errors.Wrap(err)
-		return
+	envCollapsed := make([]string, 0, len(env))
+
+	for k, v := range env {
+		envCollapsed = append(envCollapsed, fmt.Sprintf("%s=%s", k, v))
 	}
 
-	return
-}
+	cmd.Env = envCollapsed
 
-func (c ExecAction) makeCmd(
-	executor konfig.RemoteScript,
-	p string,
-	args ...string,
-) (cmd *exec.Cmd, err error) {
-	cmdArgs := append([]string{p})
-
-	if len(args) > 1 {
-		cmdArgs = append(cmdArgs, args[1:]...)
-	}
-
-	if cmd, err = executor.Cmd(cmdArgs...); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	cmd.Stdin = os.Stdin
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout
 
-	return
-}
+	var wc io.WriteCloser
 
-func (c ExecAction) feedPipe(
-	ar io.ReadCloser,
-	wg *sync.WaitGroup,
-	p string,
-	tz *zettel_transacted.Zettel,
-) (err error) {
-	defer wg.Done()
-	var pipeFileWriter *os.File
-
-	if pipeFileWriter, err = os.OpenFile(p, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0777); err != nil {
+	if wc, err = cmd.StdinPipe(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer pipeFileWriter.Close()
+	chDone := make(chan struct{})
 
-	defer ar.Close()
+	go func() {
+		defer func() {
+			chDone <- struct{}{}
+		}()
 
-	if _, err = io.Copy(pipeFileWriter, ar); err != nil {
+		defer errors.Deferred(&err, wc.Close)
+
+		var ar io.ReadCloser
+
+		if ar, err = u.StoreObjekten().AkteReader(z.Named.Stored.Zettel.Akte); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		defer errors.Deferred(&err, ar.Close)
+
+		if _, err = io.Copy(wc, ar); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = wc.Close(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}()
+
+	if err = cmd.Start(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	errors.Print("done copying")
+	<-chDone
 
-	return
-}
-
-func (c ExecAction) exec(
-	wg *sync.WaitGroup,
-	p string,
-	cmd *exec.Cmd,
-) (err error) {
-	defer wg.Done()
-	// var pipeFileReader *os.File
-
-	// if pipeFileReader, err = os.OpenFile(pipePath, os.O_CREATE, os.ModeNamedPipe); err != nil {
-	// 	err = errors.Error(err)
-	// 	return
-	// }
-
-	// defer pipeFileReader.Close()
-
-	// cmd.ExtraFiles = append(cmd.ExtraFiles, pipeFileReader)
-
-	errors.Print("start running")
-
-	if err = cmd.Run(); err != nil {
+	if err = cmd.Wait(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	errors.Print("done running")
 
 	return
 }

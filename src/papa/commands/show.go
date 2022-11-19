@@ -23,6 +23,7 @@ import (
 
 type Show struct {
 	gattung.Gattung
+	zettel.FormatValue
 }
 
 func init() {
@@ -31,9 +32,13 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &Show{
 				Gattung: gattung.Zettel,
+				FormatValue: zettel.FormatValue{
+					Format: &zettel.Text{},
+				},
 			}
 
 			f.Var(&c.Gattung, "gattung", "Gattung")
+			f.Var(&c.FormatValue, "format", "format")
 
 			cwi := commandWithIds{
 				CommandWithIds: c,
@@ -119,7 +124,7 @@ func (c Show) showZettels(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 		),
 		zettel_transacted.MakeWriterZettel(
 			zettel.MakeSerializedFormatWriter(
-				zettel.Text{},
+				c.FormatValue.Format,
 				store.Out(),
 				store.StoreObjekten(),
 				store.Konfig(),

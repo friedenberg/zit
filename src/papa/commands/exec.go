@@ -10,7 +10,6 @@ import (
 	"syscall"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/id"
@@ -21,7 +20,6 @@ import (
 )
 
 type Exec struct {
-	Action collections.StringValue
 }
 
 func init() {
@@ -29,8 +27,6 @@ func init() {
 		"exec",
 		func(f *flag.FlagSet) Command {
 			c := &Exec{}
-
-			f.Var(&c.Action, "action", "which Typ action to execute")
 
 			return c
 		},
@@ -126,17 +122,7 @@ func (c Exec) getZettel(
 		return
 	}
 
-	if c.Action.WasSet() {
-		ok := false
-		executor, ok = typKonfig.Actions[c.Action.String()]
-
-		if !ok {
-			err = errors.Normal(errors.Errorf("Typ does not have action: %s", c.Action))
-			return
-		}
-	} else {
-		executor = typKonfig.ExecCommand
-	}
+	executor = typKonfig.ExecCommand
 
 	if ar, err = u.StoreObjekten().AkteReader(tz.Named.Stored.Zettel.Akte); err != nil {
 		err = errors.Wrap(err)

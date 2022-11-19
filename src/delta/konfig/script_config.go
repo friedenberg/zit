@@ -31,6 +31,10 @@ func (s ScriptConfig) Cmd(args ...string) (c *exec.Cmd, err error) {
 		err = errors.Errorf("no script or shell set")
 		return
 
+	case s.Script != "" && len(s.Shell) > 0:
+		all := append(s.Shell, s.Script)
+		c = exec.Command(s.Shell[0], all[1:]...)
+
 	case s.Script != "":
 		all := []string{
 			"--noprofile",
@@ -38,11 +42,13 @@ func (s ScriptConfig) Cmd(args ...string) (c *exec.Cmd, err error) {
 			"-c",
 		}
 
+		all = append(all, s.Script)
 		all = append(all, args...)
 		c = exec.Command("bash", all...)
 
 	case len(s.Shell) > 0:
 		all := append(s.Shell, args...)
+
 		if len(all) > 1 {
 			c = exec.Command(all[0], all[1:]...)
 		} else {

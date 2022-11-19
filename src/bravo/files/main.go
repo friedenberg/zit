@@ -5,14 +5,13 @@ import (
 	"os"
 	"os/exec"
 	"path"
-	"strconv"
-	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
 const (
 	buffer = 10
+	limit  = 256
 )
 
 // TODO-P5 add exponential backoff for too many files open error
@@ -25,20 +24,20 @@ type openFilesGuard struct {
 var openFilesGuardInstance *openFilesGuard
 
 func init() {
-	limitCmd := exec.Command("ulimit", "-S", "-n")
-	output, err := limitCmd.Output()
+	// limitCmd := exec.Command("ulimit", "-S", "-n")
+	// output, err := limitCmd.Output()
 
-	if err != nil {
-		panic(err)
-	}
+	// if err != nil {
+	// 	panic(err)
+	// }
 
-	limitStr := strings.TrimSpace(string(output))
+	// limitStr := strings.TrimSpace(string(output))
 
-	limit, err := strconv.ParseInt(string(limitStr), 10, 64)
+	// limit, err := strconv.ParseInt(string(limitStr), 10, 64)
 
-	if err != nil {
-		panic(err)
-	}
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 	openFilesGuardInstance = &openFilesGuard{
 		channel: make(chan struct{}, limit-buffer),

@@ -1,6 +1,7 @@
 package standort
 
 import (
+	"os"
 	"path/filepath"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -10,6 +11,7 @@ import (
 type Standort struct {
 	cwd      string
 	basePath string
+	execPath string
 }
 
 func Make(o Options) (s Standort, err error) {
@@ -26,11 +28,20 @@ func Make(o Options) (s Standort, err error) {
 		return
 	}
 
+	if s.execPath, err = os.Executable(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	return
 }
 
 func (s Standort) Cwd() string {
 	return s.cwd
+}
+
+func (s Standort) Executable() string {
+	return s.execPath
 }
 
 func (s Standort) RelToCwdOrSame(p string) (p1 string) {
