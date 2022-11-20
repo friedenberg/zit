@@ -115,3 +115,19 @@ func (s set[T]) Each(wf WriterFunc[T]) (err error) {
 
 	return
 }
+
+func (s set[T]) EachPtr(wf WriterFunc[*T]) (err error) {
+	for _, v := range s.inner {
+		if err = wf(&v); err != nil {
+			if errors.IsEOF(err) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+			}
+
+			return
+		}
+	}
+
+	return
+}

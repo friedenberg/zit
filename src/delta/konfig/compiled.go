@@ -14,7 +14,7 @@ type Compiled struct {
 	EtikettenHidden     []string
 	EtikettenToAddToNew []string
 	ExtensionsToTypen   map[string]string
-	typen               collections.Set[*compiledTyp]
+	Typen               collections.Set[*compiledTyp]
 }
 
 func MakeDefaultCompiled() Compiled {
@@ -29,7 +29,7 @@ func MakeDefaultCompiled() Compiled {
 		DefaultTyp:          dt,
 		DefaultOrganizeExt:  "md",
 		ExtensionsToTypen:   make(map[string]string),
-		typen: collections.MakeSet[*compiledTyp](
+		Typen: collections.MakeSet[*compiledTyp](
 			func(v *compiledTyp) string {
 				if v == nil {
 					return ""
@@ -63,7 +63,7 @@ func makeCompiled(k tomlKonfig) (kc Compiled, err error) {
 		return kc.EtikettenToAddToNew[i] < kc.EtikettenToAddToNew[j]
 	})
 
-	typen := kc.typen.MutableCopy()
+	typen := kc.Typen.MutableCopy()
 
 	for tn, tv := range k.Typen {
 		if tv.FileExtension != "" {
@@ -75,7 +75,7 @@ func makeCompiled(k tomlKonfig) (kc Compiled, err error) {
 		typen.Add(ct)
 	}
 
-	kc.typen = typen.Copy()
+	kc.Typen = typen.Copy()
 
 	typen.Each(
 		func(ct *compiledTyp) (err error) {
@@ -93,7 +93,7 @@ func (c Compiled) GetSortedTypenExpanded(v string) (expandedActual []*compiledTy
 
 	expandedMaybe.Each(
 		func(v collections.StringValue) (err error) {
-			ct, ok := c.typen.Get(v.String())
+			ct, ok := c.Typen.Get(v.String())
 
 			if !ok {
 				return

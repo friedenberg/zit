@@ -23,7 +23,7 @@ import (
 
 type Show struct {
 	gattung.Gattung
-	zettel.FormatValue
+	Format string
 }
 
 func init() {
@@ -32,13 +32,10 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &Show{
 				Gattung: gattung.Zettel,
-				FormatValue: zettel.FormatValue{
-					Format: &zettel.Text{},
-				},
 			}
 
 			f.Var(&c.Gattung, "gattung", "Gattung")
-			f.Var(&c.FormatValue, "format", "format")
+			f.StringVar(&c.Format, "format", "text", "format")
 
 			cwi := commandWithIds{
 				CommandWithIds: c,
@@ -86,6 +83,13 @@ func (c Show) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 			},
 		)
 
+	case gattung.Typ:
+		is = id_set.MakeProtoIdSet(
+			id_set.ProtoId{
+				MutableId: &typ.Typ{},
+			},
+		)
+
 	case gattung.Transaktion:
 		is = id_set.MakeProtoIdSet(
 			id_set.ProtoId{
@@ -104,10 +108,27 @@ func (c Show) RunWithIds(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 		return c.showAkten(store, ids)
 
 	case gattung.Zettel:
-		return c.showZettels(store, ids)
+		var fv zettel.FormatValue
+
+		if err = fv.Set(c.Format); err != nil {
+			err = errors.Normal(err)
+			return
+		}
+
+		return c.showZettels(store, ids, fv)
 
 	case gattung.Transaktion:
 		return c.showTransaktions(store, ids)
+
+	case gattung.Typ:
+		ev := typ.MakeEncoderValue(store.Konfig(), store.Out())
+
+		if err = ev.Set(c.Format); err != nil {
+			err = errors.Normal(err)
+			return
+		}
+
+		return c.showTypen(store, ids, ev.EncoderLike)
 
 	default:
 		err = errors.Errorf("unsupported Gattung: %s", c.Gattung)
@@ -115,7 +136,11 @@ func (c Show) RunWithIds(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 	}
 }
 
-func (c Show) showZettels(store *umwelt.Umwelt, ids id_set.Set) (err error) {
+func (c Show) showZettels(
+	store *umwelt.Umwelt,
+	ids id_set.Set,
+	fv zettel.FormatValue,
+) (err error) {
 	w := collections.MakeChain(
 		zettel_transacted.MakeWriterZettelNamed(
 			zettel_named.FilterIdSet{
@@ -124,7 +149,7 @@ func (c Show) showZettels(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 		),
 		zettel_transacted.MakeWriterZettel(
 			zettel.MakeSerializedFormatWriter(
-				c.FormatValue.Format,
+				fv.Format,
 				store.Out(),
 				store.StoreObjekten(),
 				store.Konfig(),
@@ -196,6 +221,30 @@ func (c Show) showTransaktions(store *umwelt.Umwelt, ids id_set.Set) (err error)
 			},
 		)
 	}
+
+	return
+}
+
+func (c Show) showTypen(
+	store *umwelt.Umwelt,
+	ids id_set.Set,
+	ev collections.EncoderLike[typ.Typ],
+) (err error) {
+	typen := typ.MakeMutableSet(ids.Typen()...)
+	typen.EachPtr(
+		collections.MakeChain(
+			func(t *typ.Typ) (err error) {
+				ct := store.Konfig().GetTyp(t.String())
+
+				if ct == nil {
+					return
+				}
+
+				return
+			},
+			collections.EncoderToWriter(ev),
+		),
+	)
 
 	return
 }

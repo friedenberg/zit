@@ -44,6 +44,7 @@ type SetLike[T any] interface {
 	ContainsKey(string) bool
 	Contains(T) bool
 	Each(WriterFunc[T]) error
+	EachPtr(WriterFunc[*T]) error
 	EachKey(WriterFuncKey) error
 }
 
