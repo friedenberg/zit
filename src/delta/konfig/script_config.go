@@ -1,6 +1,7 @@
 package konfig
 
 import (
+	"fmt"
 	"os/exec"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -9,6 +10,7 @@ import (
 type ScriptConfig struct {
 	Shell  []string
 	Script string
+	Env    map[string]string
 }
 
 func (s *ScriptConfig) Merge(s2 *ScriptConfig) {
@@ -22,6 +24,14 @@ func (s *ScriptConfig) Merge(s2 *ScriptConfig) {
 
 	if s2.Script != "" {
 		s.Script = s2.Script
+	}
+
+	if len(s.Env) == 0 {
+		s.Env = make(map[string]string)
+	}
+
+	for k, v := range s2.Env {
+		s.Env[k] = v
 	}
 }
 
@@ -55,6 +65,14 @@ func (s ScriptConfig) Cmd(args ...string) (c *exec.Cmd, err error) {
 			c = exec.Command(all[0])
 		}
 	}
+
+	envCollapsed := make([]string, 0, len(s.Env))
+
+	for k, v := range s.Env {
+		envCollapsed = append(envCollapsed, fmt.Sprintf("%s=%s", k, v))
+	}
+
+	c.Env = envCollapsed
 
 	return
 }
