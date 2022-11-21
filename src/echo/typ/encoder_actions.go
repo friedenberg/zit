@@ -27,10 +27,10 @@ func (f EncoderActionNames) Encode(t *Typ) (n int64, err error) {
 		return
 	}
 
-	for v, _ := range ct.Actions {
+	for v, v1 := range ct.Actions {
 		var n1 int
 
-		if n1, err = io.WriteString(f.out, fmt.Sprintf("%s\n", v)); err != nil {
+		if n1, err = io.WriteString(f.out, fmt.Sprintf("%s\t%s\n", v, v1.Description)); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

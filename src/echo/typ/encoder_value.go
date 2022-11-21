@@ -6,12 +6,12 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/collections"
+	"github.com/friedenberg/zit/src/collections_coding"
 	"github.com/friedenberg/zit/src/delta/konfig"
 )
 
 type EncoderValue struct {
-	collections.EncoderLike[Typ]
+	collections_coding.EncoderLike[Typ]
 	out    io.Writer
 	konfig konfig.Konfig
 }
@@ -31,8 +31,8 @@ func (f EncoderValue) String() string {
 	// case *Text:
 	// 	return "text"
 
-	// case *Objekte:
-	// 	return "objekte"
+	case *collections_coding.EncoderJson[Typ]:
+		return "json"
 
 	case *EncoderActionNames:
 		return "action-names"
@@ -44,6 +44,9 @@ func (f EncoderValue) String() string {
 
 func (f *EncoderValue) Set(v string) (err error) {
 	switch strings.TrimSpace(strings.ToLower(v)) {
+	case "json":
+		f.EncoderLike = collections_coding.MakeEncoderJson[Typ](f.out)
+
 	case "action-names":
 		f.EncoderLike = MakeEncoderActionNames(f.out, f.konfig)
 

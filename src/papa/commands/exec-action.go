@@ -99,7 +99,7 @@ func (c ExecAction) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 		executor, ok := typKonfig.Actions[c.Action.String()]
 
 		if !ok {
-			err = errors.Normal(errors.Errorf("Typ does not have action: %s", c.Action))
+			err = errors.Normalf("Typ '%s' does not have action '%s'", typ, c.Action)
 			return
 		}
 
@@ -124,7 +124,7 @@ func (c ExecAction) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 func (c ExecAction) runExecutor(
 	u *umwelt.Umwelt,
-	executor *konfig.ScriptConfig,
+	executor *konfig.KonfigTypAction,
 	z *zettel_transacted.Zettel,
 ) (err error) {
 	var cmd *exec.Cmd
@@ -135,8 +135,8 @@ func (c ExecAction) runExecutor(
 	}
 
 	env := map[string]string{
-		"ZETTEL": z.Named.Hinweis.String(),
-    "ZIT_BIN": u.Standort().Executable(),
+		"ZETTEL":  z.Named.Hinweis.String(),
+		"ZIT_BIN": u.Standort().Executable(),
 	}
 
 	envCollapsed := make([]string, 0, len(env))

@@ -17,18 +17,16 @@ type compiledTyp struct {
 	Name           collections.StringValue
 	InlineAkte     bool
 	FileExtension  string
-	FormatScript   *ScriptConfig
 	ExecCommand    *ScriptConfig
-	Actions        map[string]*ScriptConfig
+	Actions        map[string]*KonfigTypAction
 	EtikettenRules map[string]EtikettRule
 }
 
 func makeCompiledTyp(n string) *compiledTyp {
 	return &compiledTyp{
 		Name:           collections.MakeStringValue(n),
-		FormatScript:   &ScriptConfig{},
 		ExecCommand:    &ScriptConfig{},
-		Actions:        make(map[string]*ScriptConfig),
+		Actions:        make(map[string]*KonfigTypAction),
 		EtikettenRules: make(map[string]EtikettRule),
 	}
 }
@@ -37,12 +35,12 @@ func (ct *compiledTyp) Apply(kt KonfigTyp) {
 	ct.InlineAkte = kt.InlineAkte
 	ct.FileExtension = kt.FileExtension
 
+	// if kt.Description != "" {
+	// 	ct.Description = collections.MakeStringValue(kt.Description)
+	// }
+
 	if len(kt.Actions) > 0 {
 		ct.Actions = kt.Actions
-	}
-
-	if kt.FormatScript != nil {
-		ct.FormatScript = kt.FormatScript
 	}
 
 	if kt.ExecCommand != nil {
@@ -64,7 +62,6 @@ func (ct *compiledTyp) Merge(ct2 *compiledTyp) {
 		ct.FileExtension = ct2.FileExtension
 	}
 
-	ct.FormatScript.Merge(ct2.FormatScript)
 	ct.ExecCommand.Merge(ct2.ExecCommand)
 
 	for k, v := range ct2.EtikettenRules {

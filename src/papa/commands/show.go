@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/collections_coding"
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/ts"
@@ -108,7 +109,7 @@ func (c Show) RunWithIds(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 		return c.showAkten(store, ids)
 
 	case gattung.Zettel:
-		var fv zettel.FormatValue
+		fv := zettel.MakeFormatValue(store.Out(), store.Konfig())
 
 		if err = fv.Set(c.Format); err != nil {
 			err = errors.Normal(err)
@@ -139,7 +140,7 @@ func (c Show) RunWithIds(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 func (c Show) showZettels(
 	store *umwelt.Umwelt,
 	ids id_set.Set,
-	fv zettel.FormatValue,
+	fv *zettel.FormatValue,
 ) (err error) {
 	w := collections.MakeChain(
 		zettel_transacted.MakeWriterZettelNamed(
@@ -228,7 +229,7 @@ func (c Show) showTransaktions(store *umwelt.Umwelt, ids id_set.Set) (err error)
 func (c Show) showTypen(
 	store *umwelt.Umwelt,
 	ids id_set.Set,
-	ev collections.EncoderLike[typ.Typ],
+	ev collections_coding.EncoderLike[typ.Typ],
 ) (err error) {
 	typen := typ.MakeMutableSet(ids.Typen()...)
 	typen.EachPtr(
@@ -242,7 +243,7 @@ func (c Show) showTypen(
 
 				return
 			},
-			collections.EncoderToWriter(ev),
+			collections_coding.EncoderToWriter(ev),
 		),
 	)
 
