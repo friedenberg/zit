@@ -12,8 +12,7 @@ import (
 )
 
 type Writer interface {
-	io.WriteCloser
-	Sha() sha.Sha
+	sha.WriteCloser
 }
 
 type writer struct {
@@ -40,6 +39,15 @@ func NewWriter(o WriteOptions) (w *writer, err error) {
 	if o.UseZip {
 		w.wZip = gzip.NewWriter(w.wAge)
 		w.tee = io.MultiWriter(w.hash, w.wZip)
+	}
+
+	return
+}
+
+func (w *writer) ReadFrom(r io.Reader) (n int64, err error) {
+	if n, err = io.Copy(w.tee, r); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

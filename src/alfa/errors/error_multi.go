@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+//TODO rename to Multi
 type ErrorMulti []error
 
 func MakeErrorMultiOrNil(errs ...error) *ErrorMulti {

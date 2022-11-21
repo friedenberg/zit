@@ -1,6 +1,7 @@
 package zettel
 
 import (
+	"io"
 	"strings"
 
 	"github.com/friedenberg/zit/src/bravo/test_logz"
@@ -29,6 +30,11 @@ func makeAkteExt(t test_logz.T, v string) (es typ.Typ) {
 
 type stringBuilderCloser struct {
 	*strings.Builder
+}
+
+func (b stringBuilderCloser) ReadFrom(r io.Reader) (n int64, err error) {
+	n, err = io.Copy(b.Builder, r)
+	return
 }
 
 func (b stringBuilderCloser) Close() error {
