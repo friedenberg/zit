@@ -80,7 +80,7 @@ func (o *Objekte) Set(v string) (err error) {
 		o.Id = &etikett.Etikett{}
 
 	case gattung.Typ:
-		o.Id = &typ.Typ{}
+		o.Id = &typ.Kennung{}
 
 	default:
 		err = errors.Errorf("unsupported gattung: %s", o.Gattung)

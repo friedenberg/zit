@@ -51,7 +51,7 @@ func (c commandWithIds) getIdProtoSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 				},
 			},
 			id_set.ProtoId{
-				MutableId: &typ.Typ{},
+				MutableId: &typ.Kennung{},
 			},
 			id_set.ProtoId{
 				MutableId: &ts.Time{},

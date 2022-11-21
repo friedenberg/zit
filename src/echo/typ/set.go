@@ -2,4 +2,4 @@ package typ
 
 import "github.com/friedenberg/zit/src/bravo/collections"
 
-type Set = collections.ValueSet[Typ, *Typ]
+type Set = collections.ValueSet[Kennung, *Kennung]

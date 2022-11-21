@@ -20,7 +20,7 @@ func MakeEncoderActionNames(w io.Writer, k konfig.Konfig) EncoderActionNames {
 	}
 }
 
-func (f EncoderActionNames) Encode(t *Typ) (n int64, err error) {
+func (f EncoderActionNames) Encode(t *Kennung) (n int64, err error) {
 	ct := f.konfig.GetTyp(t.String())
 
 	if ct == nil {

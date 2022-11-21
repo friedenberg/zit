@@ -57,7 +57,7 @@ func (c Checkout) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 			MutableId: &etikett.Etikett{},
 		},
 		id_set.ProtoId{
-			MutableId: &typ.Typ{},
+			MutableId: &typ.Kennung{},
 		},
 		id_set.ProtoId{
 			MutableId: &ts.Time{},

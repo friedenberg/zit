@@ -13,7 +13,7 @@ import (
 
 type Metadatei struct {
 	etikett.Set
-	typ.Typ
+	Typ typ.Kennung
 }
 
 func (m Metadatei) HasMetadateiContent() bool {

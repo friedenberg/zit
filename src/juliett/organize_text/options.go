@@ -15,7 +15,7 @@ type Options struct {
 	hinweis.Abbr
 
 	RootEtiketten     etikett.Set
-	Typ               typ.Typ
+	Typ               typ.Kennung
 	GroupingEtiketten etikett.Slice
 	ExtraEtiketten    etikett.Set
 	Transacted        zettel_transacted.MutableSet

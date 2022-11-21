@@ -11,7 +11,7 @@ import (
 )
 
 type EncoderValue struct {
-	collections_coding.EncoderLike[Typ]
+	collections_coding.EncoderLike[Kennung]
 	out    io.Writer
 	konfig konfig.Konfig
 }
@@ -31,7 +31,7 @@ func (f EncoderValue) String() string {
 	// case *Text:
 	// 	return "text"
 
-	case *collections_coding.EncoderJson[Typ]:
+	case *collections_coding.EncoderJson[Kennung]:
 		return "json"
 
 	case *EncoderActionNames:
@@ -45,7 +45,7 @@ func (f EncoderValue) String() string {
 func (f *EncoderValue) Set(v string) (err error) {
 	switch strings.TrimSpace(strings.ToLower(v)) {
 	case "json":
-		f.EncoderLike = collections_coding.MakeEncoderJson[Typ](f.out)
+		f.EncoderLike = collections_coding.MakeEncoderJson[Kennung](f.out)
 
 	case "action-names":
 		f.EncoderLike = MakeEncoderActionNames(f.out, f.konfig)

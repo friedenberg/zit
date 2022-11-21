@@ -230,7 +230,7 @@ func (c Cat) hinweisen(u *umwelt.Umwelt) (err error) {
 }
 
 func (c Cat) typen(u *umwelt.Umwelt) (err error) {
-	typen := collections.MakeMutableValueSet[typ.Typ, *typ.Typ]()
+	typen := collections.MakeMutableValueSet[typ.Kennung, *typ.Kennung]()
 
 	if err = u.StoreObjekten().ReadAllSchwanzenTransacted(
 		func(z *zettel_transacted.Zettel) (err error) {

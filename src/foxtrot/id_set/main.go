@@ -45,7 +45,7 @@ func (s *Set) Add(ids ...id.Id) {
 		case hinweis.Hinweis:
 			s.hinweisen.Add(it)
 
-		case typ.Typ:
+		case typ.Kennung:
 			s.typen.Add(it)
 
 		case ts.Time:
@@ -84,7 +84,7 @@ func (s Set) Timestamps() (timestamps []ts.Time) {
 	return
 }
 
-func (s Set) Typen() (typen []typ.Typ) {
+func (s Set) Typen() (typen []typ.Kennung) {
 	typen = s.typen.Elements()
 
 	return

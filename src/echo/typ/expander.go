@@ -2,7 +2,7 @@ package typ
 
 import "github.com/friedenberg/zit/src/charlie/string_expansion"
 
-type Expander = string_expansion.Expander[Typ, *Typ]
+type Expander = string_expansion.Expander[Kennung, *Kennung]
 
 var (
 	ExpanderRight Expander
@@ -10,6 +10,6 @@ var (
 )
 
 func init() {
-	ExpanderRight = string_expansion.MakeExpanderRight[Typ, *Typ](`-`)
-	ExpanderAll = string_expansion.MakeExpanderAll[Typ, *Typ](`-`)
+	ExpanderRight = string_expansion.MakeExpanderRight[Kennung, *Kennung](`-`)
+	ExpanderAll = string_expansion.MakeExpanderAll[Kennung, *Kennung](`-`)
 }

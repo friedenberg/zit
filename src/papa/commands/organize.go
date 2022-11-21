@@ -112,7 +112,7 @@ func (c Organize) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 			},
 		},
 		id_set.ProtoId{
-			MutableId: &typ.Typ{},
+			MutableId: &typ.Kennung{},
 		},
 		id_set.ProtoId{
 			MutableId: &ts.Time{},

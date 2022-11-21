@@ -11,7 +11,7 @@ import (
 
 type Zettel struct {
 	Akte        sha.Sha
-	Typ         typ.Typ
+	Typ         typ.Kennung
 	Bezeichnung bezeichnung.Bezeichnung
 	Etiketten   etikett.Set
 }
@@ -56,7 +56,7 @@ func (z Zettel) IsEmpty() bool {
 // TODO-P3 use reset with pointer pattern
 func (z *Zettel) Reset() {
 	z.Akte = sha.Sha{}
-	z.Typ = typ.Typ{}
+	z.Typ = typ.Kennung{}
 	z.Bezeichnung = bezeichnung.Make("")
 	z.Etiketten = etikett.MakeSet()
 }

@@ -2,7 +2,7 @@ package typ
 
 import "strings"
 
-func (a Typ) Equals(b Typ) bool {
+func (a Kennung) Equals(b Kennung) bool {
 	if a.String() != b.String() {
 		return false
 	}
@@ -10,7 +10,7 @@ func (a Typ) Equals(b Typ) bool {
 	return true
 }
 
-func (a Typ) Contains(b Typ) bool {
+func (a Kennung) Contains(b Kennung) bool {
 	as := a.String()
 
 	if as == "" {

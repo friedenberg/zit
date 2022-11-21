@@ -7,27 +7,27 @@ import (
 	"github.com/friedenberg/zit/src/delta/konfig"
 )
 
-type Typ struct {
+type Kennung struct {
 	etikett.Etikett
 }
 
-func Make(v string) Typ {
-	return Typ{
+func Make(v string) Kennung {
+	return Kennung{
 		Etikett: etikett.Etikett{
 			Value: v,
 		},
 	}
 }
 
-func (v *Typ) Set(v1 string) (err error) {
+func (v *Kennung) Set(v1 string) (err error) {
 	return v.Etikett.Set(strings.TrimSpace(strings.Trim(v1, ".! ")))
 }
 
-func (v Typ) Expanded() Set {
+func (v Kennung) Expanded() Set {
 	return ExpanderRight.Expand(v.String())
 }
 
-func (t Typ) IsInlineAkte(k konfig.Konfig) (isInline bool) {
+func (t Kennung) IsInlineAkte(k konfig.Konfig) (isInline bool) {
 	ts := t.String()
 	tc := k.GetTyp(ts)
 
@@ -40,13 +40,13 @@ func (t Typ) IsInlineAkte(k konfig.Konfig) (isInline bool) {
 	return
 }
 
-func (t Typ) MarshalText() (text []byte, err error) {
+func (t Kennung) MarshalText() (text []byte, err error) {
 	text = []byte(t.String())
 
 	return
 }
 
-func (t *Typ) UnmarshalText(text []byte) (err error) {
+func (t *Kennung) UnmarshalText(text []byte) (err error) {
 	if err = t.Set(string(text)); err != nil {
 		return
 	}
@@ -54,13 +54,13 @@ func (t *Typ) UnmarshalText(text []byte) (err error) {
 	return
 }
 
-func (t Typ) MarshalBinary() (text []byte, err error) {
+func (t Kennung) MarshalBinary() (text []byte, err error) {
 	text = []byte(t.String())
 
 	return
 }
 
-func (t *Typ) UnmarshalBinary(text []byte) (err error) {
+func (t *Kennung) UnmarshalBinary(text []byte) (err error) {
 	t.Etikett.Value = string(text)
 
 	return

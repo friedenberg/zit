@@ -9,7 +9,7 @@ import (
 )
 
 type ProtoZettel struct {
-	Typ         typ.Typ
+	Typ         typ.Kennung
 	Bezeichnung bezeichnung.Bezeichnung
 	Etiketten   etikett.Set
 }

@@ -2,8 +2,8 @@ package typ
 
 import "github.com/friedenberg/zit/src/bravo/collections"
 
-type MutableSet = collections.MutableValueSet[Typ, *Typ]
+type MutableSet = collections.MutableValueSet[Kennung, *Kennung]
 
-func MakeMutableSet(hs ...Typ) MutableSet {
-	return MutableSet(collections.MakeMutableValueSet[Typ, *Typ](hs...))
+func MakeMutableSet(hs ...Kennung) MutableSet {
+	return MutableSet(collections.MakeMutableValueSet[Kennung, *Kennung](hs...))
 }

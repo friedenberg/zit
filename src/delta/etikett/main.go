@@ -45,6 +45,11 @@ func (e *Etikett) Set(v string) (err error) {
 	v1 := strings.ToLower(v)
 	v3 := strings.TrimSpace(v1)
 
+	if v3 == "" {
+		err = errors.Errorf("etikett cannot be empty")
+		return
+	}
+
 	if !EtikettRegex.Match([]byte(v3)) {
 		err = errors.Errorf("not a valid tag: '%s'", v)
 		return

@@ -29,7 +29,7 @@ func TestMakeProtoIdSet(t1 *testing.T) {
 			MutableId: &etikett.Etikett{},
 		},
 		ProtoId{
-			MutableId: &typ.Typ{},
+			MutableId: &typ.Kennung{},
 		},
 		ProtoId{
 			MutableId: &ts.Time{},
