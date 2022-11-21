@@ -36,6 +36,11 @@ func Make(p string, kc Cli) (c Konfig, err error) {
 
 	br := bufio.NewReader(f)
 
+	if err = c.tryParseToml(br); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -54,6 +59,24 @@ func Make(p string, kc Cli) (c Konfig, err error) {
 
 	if c.Compiled, err = makeCompiled(c.tomlKonfig); err != nil {
 		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (c *Konfig) tryParseToml(br *bufio.Reader) (err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			c = &Konfig{}
+			err = errors.Errorf("toml unmarshalling panicked: %q", r)
+		}
+	}()
+
+	td := toml.NewDecoder(br)
+
+	if err = td.Decode(&c.tomlKonfig); err != nil {
+		err = errors.Errorf("failed to parse config: %s", err)
 		return
 	}
 

@@ -35,9 +35,9 @@ func MakeValueSetStrings[T ProtoObjekte, T1 interface {
 	*T
 	ProtoObjektePointer
 }](vs ...string) (s ValueSet[T, T1], err error) {
-	es := make([]T, len(vs))
+	es := make([]T, 0, len(vs))
 
-	for i, v := range vs {
+	for _, v := range vs {
 		if strings.TrimSpace(v) == "" {
 			continue
 		}
@@ -49,7 +49,7 @@ func MakeValueSetStrings[T ProtoObjekte, T1 interface {
 			return
 		}
 
-		es[i] = T(*e1)
+		es = append(es, T(*e1))
 	}
 
 	s = MakeValueSet[T, T1](es...)
@@ -59,6 +59,10 @@ func MakeValueSetStrings[T ProtoObjekte, T1 interface {
 
 func (s *ValueSet[T, T1]) Set(v string) (err error) {
 	parts := strings.Split(v, ",")
+
+	if len(parts) == 1 && parts[0] == "" {
+		parts = []string{}
+	}
 
 	if *s, err = MakeValueSetStrings[T, T1](parts...); err != nil {
 		err = errors.Wrap(err)

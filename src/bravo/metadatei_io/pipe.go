@@ -1,6 +1,10 @@
 package metadatei_io
 
-import "io"
+import (
+	"io"
+
+	"github.com/friedenberg/zit/src/alfa/errors"
+)
 
 type pipedReaderFrom struct {
 	*io.PipeWriter
@@ -15,11 +19,16 @@ type readFromDone struct {
 func makePipedReaderFrom(r io.ReaderFrom) (p pipedReaderFrom) {
 	var pr *io.PipeReader
 	pr, p.PipeWriter = io.Pipe()
-	p.ch = make(chan readFromDone, 1)
+	p.ch = make(chan readFromDone)
 
 	go func() {
 		var msg readFromDone
-		msg.n, msg.err = r.ReadFrom(pr)
+		if msg.n, msg.err = r.ReadFrom(pr); msg.err != nil {
+			if !errors.IsEOF(msg.err) {
+				pr.CloseWithError(msg.err)
+			}
+		}
+
 		p.ch <- msg
 	}()
 

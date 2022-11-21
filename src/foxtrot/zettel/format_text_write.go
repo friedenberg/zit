@@ -39,10 +39,15 @@ func (f Text) writeToOmitAkte(c FormatContextWrite) (n int64, err error) {
 	}
 
 	for _, e := range c.Zettel.Etiketten.Sorted() {
+		if e.IsEmpty() {
+			continue
+		}
+
 		w.WriteFormat("- %s", e)
 	}
 
 	switch {
+	//TODO log this state
 	case c.Zettel.Akte.IsNull() && c.Zettel.Typ.String() == "":
 		break
 

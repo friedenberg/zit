@@ -661,7 +661,7 @@ func (s *Store) Reindex() (err error) {
 	}
 
 	f := func(t *transaktion.Transaktion) (err error) {
-		t.EachWithIndex(
+		if err = t.EachWithIndex(
 			func(o *objekte.ObjekteWithIndex) (err error) {
 				switch o.Gattung {
 
@@ -669,14 +669,8 @@ func (s *Store) Reindex() (err error) {
 					var tz zettel_transacted.Zettel
 
 					if tz, err = s.transactedZettelFromTransaktionObjekte(t, o); err != nil {
-						if errors.Is(err, ErrNotFound{}) {
-							errors.Print(err)
-							err = nil
-							return
-						} else {
-							err = errors.Wrap(err)
-							return
-						}
+						err = errors.Wrap(err)
+						return
 					}
 
 					var mutter *zettel_transacted.Zettel
@@ -713,7 +707,10 @@ func (s *Store) Reindex() (err error) {
 
 				return
 			},
-		)
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
 		return
 	}

@@ -120,7 +120,11 @@ func (f textStateReadMetadatei) ReadFrom(r1 io.Reader) (n int64, err error) {
 			head = line[:2]
 		default:
 			head = line[:2]
-			tail = line[2:]
+			tail = strings.TrimSpace(line[2:])
+		}
+
+		if tail == "" {
+			continue
 		}
 
 		switch head {
