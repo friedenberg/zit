@@ -135,8 +135,8 @@ func (c ExecAction) runExecutor(
 	}
 
 	env := map[string]string{
-		"ZIT_ZETTEL":  z.Named.Hinweis.String(),
-		"ZIT_BIN": u.Standort().Executable(),
+		"ZIT_ZETTEL": z.Named.Hinweis.String(),
+		"ZIT_BIN":    u.Standort().Executable(),
 	}
 
 	envCollapsed := make([]string, 0, len(env))

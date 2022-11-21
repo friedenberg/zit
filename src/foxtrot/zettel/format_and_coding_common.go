@@ -76,7 +76,7 @@ type textStateReadMetadatei struct {
 	*Zettel
 	etiketten         etikett.MutableSet
 	aktePath          string
-	recoverableErrors errors.ErrorMulti
+	recoverableErrors errors.Multi
 }
 
 func (s textStateReadMetadatei) Close() (err error) {

@@ -250,7 +250,7 @@ func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 	ez.Named.Stored.Zettel = c.Zettel
 	ez.AkteFD.Path = c.AktePath
 
-	var unrecoverableErrors errors.ErrorMulti
+	var unrecoverableErrors errors.Multi
 
 	for _, e := range c.RecoverableErrors {
 		var errAkteInlineAndFilePath zettel.ErrHasInlineAkteAndFilePath

@@ -48,7 +48,7 @@ func Deferred(
 	f func() error,
 ) {
 	if err1 := f(); err1 != nil {
-		*err = MakeErrorMultiOrNil(*err, err1)
+		*err = MakeMulti(*err, err1)
 	}
 }
 

@@ -26,7 +26,7 @@ func MakeTryFinally[T any](
 			err1 := finally(e)
 
 			if err != nil {
-				err = errors.MakeErrorMultiOrNil(err, err1)
+				err = errors.MakeMulti(err, err1)
 			} else {
 				err = err1
 			}

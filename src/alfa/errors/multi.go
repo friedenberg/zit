@@ -5,11 +5,10 @@ import (
 	"strings"
 )
 
-//TODO rename to Multi
-type ErrorMulti []error
+type Multi []error
 
-func MakeErrorMultiOrNil(errs ...error) *ErrorMulti {
-	em := ErrorMulti{}
+func MakeMulti(errs ...error) *Multi {
+	em := Multi{}
 
 	for _, err := range errs {
 		em.Add(err)
@@ -22,16 +21,16 @@ func MakeErrorMultiOrNil(errs ...error) *ErrorMulti {
 	return &em
 }
 
-func (e ErrorMulti) Empty() (ok bool) {
+func (e Multi) Empty() (ok bool) {
 	ok = len(e) == 0
 	return
 }
 
-func (e *ErrorMulti) Add(err error) {
+func (e *Multi) Add(err error) {
 	*e = append(*e, err)
 }
 
-func (e ErrorMulti) Is(target error) (ok bool) {
+func (e Multi) Is(target error) (ok bool) {
 	for _, err := range e {
 		if ok = Is(err, target); ok {
 			return
@@ -41,7 +40,7 @@ func (e ErrorMulti) Is(target error) (ok bool) {
 	return
 }
 
-func (e ErrorMulti) Error() string {
+func (e Multi) Error() string {
 	sb := &strings.Builder{}
 
 	sb.WriteString("# Multiple Errors")

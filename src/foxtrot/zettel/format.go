@@ -21,7 +21,7 @@ type FormatContextRead struct {
 	Zettel            Zettel
 	AktePath          string
 	In                io.Reader
-	RecoverableErrors errors.ErrorMulti
+	RecoverableErrors errors.Multi
 	AkteWriterFactory
 }
 
