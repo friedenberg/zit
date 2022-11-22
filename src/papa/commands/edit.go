@@ -5,6 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
+	"github.com/friedenberg/zit/src/cwd_files"
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/konfig"
@@ -139,9 +140,9 @@ func (c Edit) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 	fs := checkoutResults.ToSliceFilesZettelen()
 
-	var possible store_fs.CwdFiles
+	var possible cwd_files.CwdFiles
 
-	if possible, err = store_fs.MakeCwdFilesExactly(u.Konfig().Compiled, u.Standort().Cwd(), fs...); err != nil {
+	if possible, err = cwd_files.MakeCwdFilesExactly(u.Konfig().Compiled, u.Standort().Cwd(), fs...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

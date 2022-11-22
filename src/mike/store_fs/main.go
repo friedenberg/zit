@@ -43,12 +43,11 @@ func New(k Konfig, p string, storeObjekten *store_objekten.Store) (s *Store, err
 		entries:       make(map[string]Entry),
 	}
 
+	//TODO switch to standort
 	if s.cwd, err = os.Getwd(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	errors.Print()
 
 	return
 }
@@ -59,6 +58,7 @@ func (s *Store) SetZettelCheckedOutWriters(
 	s.zettelCheckedOutWriters = zcow
 }
 
+//TODO move to standort
 func (s Store) IndexFilePath() string {
 	return path.Join(s.path, ".ZitCheckoutStoreIndex")
 }
@@ -100,83 +100,6 @@ func (s Store) Flush() (err error) {
 		if err = os.Rename(tfp, s.IndexFilePath()); err != nil {
 			err = errors.Wrap(err)
 			return
-		}
-	}
-
-	return
-}
-
-func (s *Store) ReadAll() (err error) {
-	if s.indexWasRead {
-		return
-	}
-
-	var possible CwdFiles
-
-	if possible, err = MakeCwdFilesAll(s.Konfig.Compiled, s.cwd); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	for _, p := range possible.Zettelen {
-		if err = s.syncOne(p); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	s.indexWasRead = true
-
-	return
-}
-
-func (s *Store) syncOne(z CwdZettel) (err error) {
-	p := z.Zettel.Path
-	errors.Output(2, fmt.Sprintln("will sync one: ", p))
-	var hasCache, hasFs bool
-
-	var fi os.FileInfo
-
-	if fi, err = os.Stat(p); err != nil {
-		if !os.IsNotExist(err) {
-			err = errors.Wrap(err)
-			return
-		}
-	} else {
-		hasFs = true
-	}
-
-	var cached Entry
-
-	cached, hasCache = s.entries[p]
-
-	if !hasCache && !hasFs {
-		errors.Print(p, ": no cache, no fs")
-		return
-	} else if hasCache {
-		errors.Print(p, ": cache, no fs: deleting")
-		delete(s.entries, p)
-	} else {
-		errors.Print(p, ": cache, fs")
-		if !hasCache || fi.ModTime().After(cached.Time) {
-			var ez zettel_external.Zettel
-
-			if ez, err = s.MakeExternalZettelFromZettel(p); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			if err = s.readZettelFromFile(&ez); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			s.entries[p] = Entry{
-				Time: fi.ModTime(),
-				Sha:  ez.Named.Stored.Sha,
-			}
-
-			s.hasChanges = true
 		}
 	}
 
@@ -299,68 +222,39 @@ func (s *Store) Read(p string) (cz zettel_checked_out.Zettel, err error) {
 		return
 	}
 
-	if s.CacheEnabled {
-		if err = s.ReadAll(); err != nil {
+	if err = s.readZettelFromFile(&cz.External); err != nil {
+		if errors.IsNotExist(err) {
+			err = nil
+		} else {
 			err = errors.Wrapf(err, "%s", p)
 			return
 		}
+	}
 
-		var cached Entry
-		var hasEntry bool
-
-		if cached, hasEntry = s.entries[p]; !hasEntry {
-			errors.Printf("cached not found: %s", p)
-			errors.Printf("%#v", s.entries)
-			err = ErrNotInIndex(nil)
-			return
-		}
-
-		var named zettel_transacted.Zettel
-
-		if named, err = s.storeObjekten.ReadOne(cached.Sha); err != nil {
+	if cz.Internal, err = s.storeObjekten.ReadHinweisSchwanzen(cz.External.Named.Hinweis); err != nil {
+		if errors.Is(err, store_objekten.ErrNotFound{}) {
+			err = nil
+		} else {
 			err = errors.Wrap(err)
 			return
 		}
+	}
 
-		cz.External.Named.Stored.Sha = named.Named.Stored.Sha
-		cz.External.Named.Stored.Zettel = named.Named.Stored.Zettel
-	} else {
-		if err = s.readZettelFromFile(&cz.External); err != nil {
-			if errors.IsNotExist(err) {
-				err = nil
-			} else {
-				err = errors.Wrapf(err, "%s", p)
-				return
-			}
-		}
+	cz.DetermineState()
 
-		if cz.Internal, err = s.storeObjekten.ReadHinweisSchwanzen(cz.External.Named.Hinweis); err != nil {
-			if errors.Is(err, store_objekten.ErrNotFound{}) {
-				err = nil
-			} else {
-				err = errors.Wrap(err)
-				return
-			}
-		}
+	if cz.State > zettel_checked_out.StateExistsAndSame {
+		//TODO rewrite with verzeichnisseAll
+		// exSha := cz.External.Named.Stored.Sha
+		// cz.Matches.Zettelen, _ = s.storeObjekten.ReadZettelSha(exSha)
+		// cz.Matches.Zettelen, _ = cz.Matches.Zettelen.Filter(nil, filter)
 
-		cz.DetermineState()
+		// exAkteSha := cz.External.Named.Stored.Zettel.Akte
+		// cz.Matches.Akten, _ = s.storeObjekten.ReadAkteSha(exAkteSha)
+		// cz.Matches.Akten, _ = cz.Matches.Akten.Filter(nil, filter)
 
-		if cz.State > zettel_checked_out.StateExistsAndSame {
-			//TODO rewrite with verzeichnisseAll
-			// exSha := cz.External.Named.Stored.Sha
-			// cz.Matches.Zettelen, _ = s.storeObjekten.ReadZettelSha(exSha)
-			// cz.Matches.Zettelen, _ = cz.Matches.Zettelen.Filter(nil, filter)
-
-			// exAkteSha := cz.External.Named.Stored.Zettel.Akte
-			// cz.Matches.Akten, _ = s.storeObjekten.ReadAkteSha(exAkteSha)
-			// cz.Matches.Akten, _ = cz.Matches.Akten.Filter(nil, filter)
-
-			// bez := cz.External.Named.Stored.Zettel.Bezeichnung.String()
-			// cz.Matches.Bezeichnungen, _ = s.storeObjekten.ReadBezeichnung(bez)
-			// cz.Matches.Bezeichnungen, _ = cz.Matches.Bezeichnungen.Filter(nil, filter)
-		}
-
-		return
+		// bez := cz.External.Named.Stored.Zettel.Bezeichnung.String()
+		// cz.Matches.Bezeichnungen, _ = s.storeObjekten.ReadBezeichnung(bez)
+		// cz.Matches.Bezeichnungen, _ = cz.Matches.Bezeichnungen.Filter(nil, filter)
 	}
 
 	return

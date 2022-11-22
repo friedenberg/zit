@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
+//TODO move to store_fs
 type Checkin struct {
 	*umwelt.Umwelt
 	store_fs.OptionsReadExternal

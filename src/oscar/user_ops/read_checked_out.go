@@ -3,6 +3,7 @@ package user_ops
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/collections"
+	"github.com/friedenberg/zit/src/cwd_files"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/hinweisen"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
@@ -38,7 +39,7 @@ func (op ReadCheckedOut) RunOneString(
 }
 
 func (op ReadCheckedOut) RunMany(
-	possible store_fs.CwdFiles,
+	possible cwd_files.CwdFiles,
 	w collections.WriterFunc[*zettel_checked_out.Zettel],
 ) (err error) {
 	for _, p := range possible.Zettelen {

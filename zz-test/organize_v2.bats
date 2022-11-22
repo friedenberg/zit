@@ -789,9 +789,9 @@ function etiketten_correct { # @test
 		echo "---"
 		echo "- test4"
 		echo "---"
-	} >"one/uno.md"
+	} >"one/uno.zettel"
 
-	run zit checkin "${cmd_zit_def[@]}" one/uno.md
+	run zit checkin "${cmd_zit_def[@]}" one/uno.zettel
 	#TODO fix typ
 	assert_output '      (updated) [one/uno@4 ! test4]'
 
@@ -809,9 +809,9 @@ function etiketten_correct { # @test
 		echo "- test4"
 		echo "- test1-ok"
 		echo "---"
-	} >"one/uno.md"
+	} >"one/uno.zettel"
 
-	run zit checkin "${cmd_zit_def[@]}" one/uno.md
+	run zit checkin "${cmd_zit_def[@]}" one/uno.zettel
 	assert_output '      (updated) [one/uno@7 ! test1-ok, test4]'
 
 	expected_etiketten="$(mktemp)"

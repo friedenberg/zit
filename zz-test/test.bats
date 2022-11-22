@@ -131,7 +131,7 @@ function can_checkout_and_checkin { # @test
 	assert_output '          (new) [o/u@5 !md "wow"]'
 
 	run zit checkout "${cmd_zit_def[@]}" one/uno
-	assert_output '  (checked out) [one/uno.md@5 !md "wow"]'
+	assert_output '  (checked out) [one/uno.zettel@5 !md "wow"]'
 
 	{
 		echo "---"
@@ -140,9 +140,9 @@ function can_checkout_and_checkin { # @test
 		echo "---"
 		echo
 		echo "content"
-	} >"one/uno.md"
+	} >"one/uno.zettel"
 
-	run zit checkin "${cmd_zit_def[@]}" one/uno.md
+	run zit checkin "${cmd_zit_def[@]}" one/uno.zettel
 	#TODO fix missing typ
 	assert_output '      (updated) [o/u@eb ! "wow"]'
 }
@@ -417,10 +417,10 @@ function indexes_are_implicitly_correct { # @test
 	} >"$expected"
 
 	mkdir -p one
-	cp "$expected" "one/uno.md"
-	run zit checkin "${cmd_zit_def[@]}" -delete "one/uno.md"
+	cp "$expected" "one/uno.zettel"
+	run zit checkin "${cmd_zit_def[@]}" -delete "one/uno.zettel"
 	assert_output --partial '      (updated) [o/u@6 !md "bez"]'
-	assert_output --partial '      (deleted) [one/uno.md]'
+	assert_output --partial '      (deleted) [one/uno.zettel]'
 
 	{
 		echo et1
@@ -462,9 +462,9 @@ function checkouts_dont_overwrite { # @test
 	assert_output '          (new) [o/u@d !md "bez"]'
 
 	run zit checkout "${cmd_zit_def[@]}" one/uno
-	assert_output '  (checked out) [one/uno.md@d !md "bez"]'
+	assert_output '  (checked out) [one/uno.zettel@d !md "bez"]'
 
-	run cat one/uno.md
+	run cat one/uno.zettel
 	assert_output "$(cat "$expected")"
 
 	{
@@ -478,11 +478,11 @@ function checkouts_dont_overwrite { # @test
 		echo the body 2
 	} >"$expected"
 
-	cat "$expected" >"one/uno.md"
+	cat "$expected" >"one/uno.zettel"
 
 	run zit checkout "${cmd_zit_def[@]}" one/uno
-	assert_output '  (checked out) [one/uno.md@4 !md "bez"]'
+	assert_output '  (checked out) [one/uno.zettel@4 !md "bez"]'
 
-	run cat one/uno.md
+	run cat one/uno.zettel
 	assert_output "$(cat "$expected")"
 }

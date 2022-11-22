@@ -1,12 +1,11 @@
 package store_objekten
 
 import (
-	"io"
-
+	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/age_io"
 )
 
-func (s Store) ReadCloserObjekten(p string) (io.ReadCloser, error) {
+func (s Store) ReadCloserObjekten(p string) (sha.ReadCloser, error) {
 	o := age_io.FileReadOptions{
 		Age:  s.age,
 		Path: p,
@@ -15,7 +14,7 @@ func (s Store) ReadCloserObjekten(p string) (io.ReadCloser, error) {
 	return age_io.NewFileReader(o)
 }
 
-func (s Store) ReadCloserVerzeichnisse(p string) (io.ReadCloser, error) {
+func (s Store) ReadCloserVerzeichnisse(p string) (sha.ReadCloser, error) {
 	o := age_io.FileReadOptions{
 		Age:  s.age,
 		Path: p,
@@ -24,7 +23,7 @@ func (s Store) ReadCloserVerzeichnisse(p string) (io.ReadCloser, error) {
 	return age_io.NewFileReader(o)
 }
 
-func (s Store) WriteCloserObjekten(p string) (w io.WriteCloser, err error) {
+func (s Store) WriteCloserObjekten(p string) (w sha.WriteCloser, err error) {
 	return age_io.NewMover(
 		age_io.MoveOptions{
 			Age:       s.age,
@@ -34,7 +33,7 @@ func (s Store) WriteCloserObjekten(p string) (w io.WriteCloser, err error) {
 	)
 }
 
-func (s Store) WriteCloserVerzeichnisse(p string) (w io.WriteCloser, err error) {
+func (s Store) WriteCloserVerzeichnisse(p string) (w sha.WriteCloser, err error) {
 	return age_io.NewMover(
 		age_io.MoveOptions{
 			Age:       s.age,

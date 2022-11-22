@@ -1,15 +1,15 @@
 package store_objekten
 
-import "io"
+import "github.com/friedenberg/zit/src/charlie/sha"
 
 type readCloserFactory interface {
-	ReadCloserObjekten(string) (io.ReadCloser, error)
-	ReadCloserVerzeichnisse(string) (io.ReadCloser, error)
+	ReadCloserObjekten(string) (sha.ReadCloser, error)
+	ReadCloserVerzeichnisse(string) (sha.ReadCloser, error)
 }
 
 type writeCloserFactory interface {
-	WriteCloserObjekten(string) (io.WriteCloser, error)
-	WriteCloserVerzeichnisse(string) (io.WriteCloser, error)
+	WriteCloserObjekten(string) (sha.WriteCloser, error)
+	WriteCloserVerzeichnisse(string) (sha.WriteCloser, error)
 }
 
 type ioFactory interface {

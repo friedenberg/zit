@@ -25,7 +25,7 @@ type akteReaderFactory struct {
 	akten map[string]string
 }
 
-func (arf akteReaderFactory) AkteReader(s sha.Sha) (r io.ReadCloser, err error) {
+func (arf akteReaderFactory) AkteReader(s sha.Sha) (r sha.ReadCloser, err error) {
 	var v string
 	var ok bool
 
@@ -33,7 +33,7 @@ func (arf akteReaderFactory) AkteReader(s sha.Sha) (r io.ReadCloser, err error) 
 		arf.t.Fatalf("request for non-existent akte: %s", s)
 	}
 
-	r = noopCloser{strings.NewReader(v)}
+	r = sha.MakeNopReadCloser(io.NopCloser(strings.NewReader(v)))
 
 	return
 }

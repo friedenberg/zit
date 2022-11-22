@@ -2,9 +2,9 @@ package commands
 
 import (
 	"flag"
-	"sort"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/cwd_files"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
 	"github.com/friedenberg/zit/src/lima/store_objekten"
@@ -28,7 +28,7 @@ func init() {
 }
 
 func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
-	var possible store_fs.CwdFiles
+	var possible cwd_files.CwdFiles
 
 	switch {
 	case len(args) > 0:
@@ -36,7 +36,7 @@ func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
 		fallthrough
 
 	default:
-		if possible, err = store_fs.MakeCwdFilesAll(s.Konfig().Compiled, s.Standort().Cwd()); err != nil {
+		if possible, err = cwd_files.MakeCwdFilesAll(s.Konfig().Compiled, s.Standort().Cwd()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -57,15 +57,6 @@ func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
 		err = errors.Wrap(err)
 		return
 	}
-
-	readResults := readResultsSet.Elements()
-
-	sort.Slice(
-		readResults,
-		func(i, j int) bool {
-			return readResults[i].External.ZettelFD.Path < readResults[j].External.ZettelFD.Path
-		},
-	)
 
 	//TODO use right mode
 	if err = readResultsSet.Each(s.PrinterZettelCheckedOut(zettel_checked_out.ModeZettelAndAkte)); err != nil {

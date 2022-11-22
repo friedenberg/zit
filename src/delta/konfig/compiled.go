@@ -8,6 +8,7 @@ import (
 )
 
 type Compiled struct {
+	TypFileExtension    string
 	ZettelFileExtension string
 	DefaultTyp          *compiledTyp
 	DefaultOrganizeExt  string
@@ -25,7 +26,8 @@ func MakeDefaultCompiled() Compiled {
 	}
 
 	return Compiled{
-		ZettelFileExtension: "md",
+		TypFileExtension:    "typ",
+		ZettelFileExtension: "zettel",
 		DefaultTyp:          dt,
 		DefaultOrganizeExt:  "md",
 		ExtensionsToTypen:   make(map[string]string),

@@ -4,18 +4,12 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/bravo/metadatei_io"
 	"github.com/friedenberg/zit/src/delta/konfig"
 )
 
-// TODO-P2 rewrite this to better structure the interface like io.WriterTo
-type AkteWriterFactory interface {
-	AkteWriter() (sha.WriteCloser, error)
-}
-
-type AkteReaderFactory interface {
-	AkteReader(sha.Sha) (io.ReadCloser, error)
-}
+type AkteWriterFactory = metadatei_io.AkteWriterFactory
+type AkteReaderFactory = metadatei_io.AkteReaderFactory
 
 type FormatContextRead struct {
 	Zettel            Zettel

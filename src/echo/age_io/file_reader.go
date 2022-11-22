@@ -1,14 +1,13 @@
 package age_io
 
 import (
-	"io"
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
 )
 
-func NewFileReader(o FileReadOptions) (r io.ReadCloser, err error) {
+func NewFileReader(o FileReadOptions) (r Reader, err error) {
 	ar := objekteReader{}
 
 	if ar.file, err = files.Open(o.Path); err != nil {

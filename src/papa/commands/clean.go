@@ -6,6 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/cwd_files"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_external"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
@@ -32,7 +33,7 @@ func (c Clean) Run(
 	s *umwelt.Umwelt,
 	args ...string,
 ) (err error) {
-	var possible store_fs.CwdFiles
+	var possible cwd_files.CwdFiles
 
 	switch {
 	case len(args) > 0:
@@ -40,7 +41,7 @@ func (c Clean) Run(
 		fallthrough
 
 	default:
-		if possible, err = store_fs.MakeCwdFilesAll(s.Konfig().Compiled, s.Standort().Cwd()); err != nil {
+		if possible, err = cwd_files.MakeCwdFilesAll(s.Konfig().Compiled, s.Standort().Cwd()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

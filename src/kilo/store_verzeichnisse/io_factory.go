@@ -4,15 +4,16 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/bravo/collections"
+	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
 )
 
 type readCloserFactory interface {
-	ReadCloserVerzeichnisse(string) (io.ReadCloser, error)
+	ReadCloserVerzeichnisse(string) (sha.ReadCloser, error)
 }
 
 type writeCloserFactory interface {
-	WriteCloserVerzeichnisse(string) (io.WriteCloser, error)
+	WriteCloserVerzeichnisse(string) (sha.WriteCloser, error)
 }
 
 type ZettelVerzeichnisseWriterGetter interface {

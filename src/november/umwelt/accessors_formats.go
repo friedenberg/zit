@@ -4,6 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/format"
 	"github.com/friedenberg/zit/src/charlie/bezeichnung"
 	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/cwd_files"
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/echo/typ"
@@ -122,7 +123,7 @@ func (u *Umwelt) FormatZettelTransacted(verb string) format.FormatWriterFunc[zet
 	)
 }
 
-func (u *Umwelt) FormatFileNotRecognized() format.FormatWriterFunc[store_fs.File] {
+func (u *Umwelt) FormatFileNotRecognized() format.FormatWriterFunc[cwd_files.File] {
 	return store_fs.MakeCliFormatNotRecognized(
 		u.FormatColorWriter(),
 		u.Standort(),

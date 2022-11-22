@@ -11,8 +11,7 @@ import (
 )
 
 type Reader interface {
-	io.ReadCloser
-	Sha() sha.Sha
+	sha.ReadCloser
 }
 
 type reader struct {
@@ -44,6 +43,10 @@ func NewReader(o ReadOptions) (r *reader, err error) {
 	}
 
 	return
+}
+
+func (r *reader) WriteTo(w io.Writer) (n int64, err error) {
+	return io.Copy(w, r.tee)
 }
 
 func (r *reader) Read(p []byte) (n int, err error) {

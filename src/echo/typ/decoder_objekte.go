@@ -29,9 +29,7 @@ func (f *DecoderObjekte) Decode(t *Typ) (n int64, err error) {
 		if err == io.EOF {
 			err = nil
 			break
-		}
-
-		if err != nil {
+		} else if err != nil {
 			return
 		}
 

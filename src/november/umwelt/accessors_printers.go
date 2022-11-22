@@ -3,6 +3,7 @@ package umwelt
 import (
 	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/bravo/format"
+	"github.com/friedenberg/zit/src/cwd_files"
 	"github.com/friedenberg/zit/src/india/zettel_external"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
@@ -34,7 +35,7 @@ func (u *Umwelt) PrinterZettelCheckedOutFresh(
 	)
 }
 
-func (u *Umwelt) PrinterFileNotRecognized() collections.WriterFunc[*store_fs.File] {
+func (u *Umwelt) PrinterFileNotRecognized() collections.WriterFunc[*cwd_files.File] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
 		u.FormatFileNotRecognized(),

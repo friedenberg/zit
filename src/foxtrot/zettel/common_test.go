@@ -1,13 +1,13 @@
 package zettel
 
 import (
-	"io"
+	"bytes"
 	"strings"
 
 	"github.com/friedenberg/zit/src/bravo/test_logz"
-	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/echo/typ"
+	"github.com/friedenberg/zit/src/test_metadata_io"
 )
 
 func makeEtiketten(t test_logz.T, vs ...string) (es etikett.Set) {
@@ -28,37 +28,10 @@ func makeAkteExt(t test_logz.T, v string) (es typ.Kennung) {
 	return
 }
 
-type stringBuilderCloser struct {
-	*strings.Builder
-}
-
-func (b stringBuilderCloser) ReadFrom(r io.Reader) (n int64, err error) {
-	n, err = io.Copy(b.Builder, r)
-	return
-}
-
-func (b stringBuilderCloser) Close() error {
-	return nil
-}
-
-func (b stringBuilderCloser) Sha() sha.Sha {
-	return sha.Sha{}
-}
-
-type akteWriterFactory struct {
-	stringBuilderCloser
-}
-
-func (aw akteWriterFactory) AkteWriter() (sha.WriteCloser, error) {
-	return aw, nil
-}
-
 func readFormat(t test_logz.T, f Format, contents string) (z Zettel, a string) {
 	t.Helper()
 
-	awf := akteWriterFactory{
-		stringBuilderCloser{Builder: &strings.Builder{}},
-	}
+	awf := test_metadata_io.NopFactoryReadWriter(bytes.NewBuffer(nil))
 
 	c := FormatContextRead{
 		In:                strings.NewReader(contents),
