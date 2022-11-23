@@ -16,7 +16,7 @@ func (w *Writer) zettelToItem(z *zettel_verzeichnisse.Zettel, ha hinweis.Abbr) (
 	a.Title = z.Transacted.Named.Stored.Objekte.Bezeichnung.String()
 
 	if a.Title == "" {
-		a.Title = z.Transacted.Named.Hinweis.String()
+		a.Title = z.Transacted.Named.Kennung.String()
 		a.Subtitle = fmt.Sprintf(
 			"%s",
 			strings.Join(z.EtikettenSorted, ", "),
@@ -24,18 +24,18 @@ func (w *Writer) zettelToItem(z *zettel_verzeichnisse.Zettel, ha hinweis.Abbr) (
 	} else {
 		a.Subtitle = fmt.Sprintf(
 			"%s: %s",
-			z.Transacted.Named.Hinweis.String(),
+			z.Transacted.Named.Kennung.String(),
 			strings.Join(z.EtikettenSorted, ", "),
 		)
 	}
 
-	a.Arg = z.Transacted.Named.Hinweis.String()
+	a.Arg = z.Transacted.Named.Kennung.String()
 
 	mb := alfred.NewMatchBuilder()
 
-	mb.AddMatches(z.Transacted.Named.Hinweis.String())
-	mb.AddMatches(z.Transacted.Named.Hinweis.Kopf())
-	mb.AddMatches(z.Transacted.Named.Hinweis.Schwanz())
+	mb.AddMatches(z.Transacted.Named.Kennung.String())
+	mb.AddMatches(z.Transacted.Named.Kennung.Kopf())
+	mb.AddMatches(z.Transacted.Named.Kennung.Schwanz())
 	mb.AddMatches(z.Transacted.Named.Stored.Objekte.Bezeichnung.String())
 	mb.AddMatches(z.Transacted.Named.Stored.Objekte.Typ.String())
 	mb.AddMatches(z.EtikettenExpandedSorted...)
@@ -59,8 +59,8 @@ func (w *Writer) zettelToItem(z *zettel_verzeichnisse.Zettel, ha hinweis.Abbr) (
 	// 	a.Match = a.Match[:100]
 	// }
 
-	a.Text.Copy = z.Transacted.Named.Hinweis.String()
-	a.Uid = "zit://" + z.Transacted.Named.Hinweis.String()
+	a.Text.Copy = z.Transacted.Named.Kennung.String()
+	a.Uid = "zit://" + z.Transacted.Named.Kennung.String()
 
 	return
 }

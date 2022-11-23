@@ -70,7 +70,7 @@ LOOP:
 	needsHin := hinweisen.Len() > 0
 	okHin := false || hinweisen.Len() == 0
 
-	okHin = hinweisen.Contains(z.Hinweis)
+	okHin = hinweisen.Contains(z.Kennung)
 
 	isEmpty := !needsHin && !needsTyp && !needsEt && !needsSha
 

@@ -25,7 +25,7 @@ type zettel struct {
 }
 
 func makeZettel(named zettel_named.Zettel, ha hinweis.Abbr) (z zettel, err error) {
-	h := named.Hinweis
+	h := named.Kennung
 
 	if ha != nil {
 		if h, err = ha.AbbreviateHinweis(h); err != nil {

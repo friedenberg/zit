@@ -18,7 +18,7 @@ func MakeMutableSet() MutableSet {
 				}
 
 				return collections.MakeKey(
-					sz.Hinweis,
+					sz.Kennung,
 				)
 			},
 		),
@@ -30,7 +30,7 @@ func (s MutableSet) Hinweisen() (h []hinweis.Hinweis) {
 
 	s.Each(
 		func(z *Zettel) (err error) {
-			h = append(h, z.Hinweis)
+			h = append(h, z.Kennung)
 
 			return
 		},
@@ -44,7 +44,7 @@ func (s MutableSet) HinweisStrings() (h []string) {
 
 	s.Each(
 		func(z *Zettel) (err error) {
-			h = append(h, z.Hinweis.String())
+			h = append(h, z.Kennung.String())
 
 			return
 		},

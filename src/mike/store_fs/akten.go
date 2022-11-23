@@ -28,12 +28,12 @@ func (s Store) ReadExternalZettelFromAktePath(p string) (cz zettel_checked_out.Z
 
 	head, tail := id.HeadTailFromFileName(p)
 
-	if cz.External.Named.Hinweis, err = hinweis.Make(head + "/" + tail); err != nil {
+	if cz.External.Named.Kennung, err = hinweis.Make(head + "/" + tail); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if cz.Internal, err = s.storeObjekten.ReadHinweisSchwanzen(cz.External.Named.Hinweis); err != nil {
+	if cz.Internal, err = s.storeObjekten.ReadHinweisSchwanzen(cz.External.Named.Kennung); err != nil {
 		if errors.Is(err, store_objekten.ErrNotFound{}) {
 			err = nil
 		} else {

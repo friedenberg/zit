@@ -140,7 +140,7 @@ func (s *Store) transactedWithHead(
 
 	var previous zettel_transacted.Zettel
 
-	if previous, err = s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(z.Hinweis); err == nil {
+	if previous, err = s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(z.Kennung); err == nil {
 		tz.Mutter = previous.Schwanz
 		tz.Kopf = previous.Kopf
 	} else {
@@ -168,10 +168,10 @@ func (s Store) transactedZettelFromTransaktionObjekte(
 		return
 	}
 
-	tz.Named.Hinweis = *h
+	tz.Named.Kennung = *h
 
 	if tz.Named.Stored, err = s.storedZettelFromSha(o.Sha); err != nil {
-		err = errors.Wrapf(err, "failed to read zettel objekte: %s", tz.Named.Hinweis)
+		err = errors.Wrapf(err, "failed to read zettel objekte: %s", tz.Named.Kennung)
 		return
 	}
 
@@ -220,7 +220,7 @@ func (s Store) writeTransaktion() (err error) {
 }
 
 func (s *Store) addZettelToTransaktion(z zettel_named.Zettel) (tz zettel_transacted.Zettel, err error) {
-	errors.Printf("adding zettel to transaktion: %s", z.Hinweis)
+	errors.Printf("adding zettel to transaktion: %s", z.Kennung)
 
 	if tz, err = s.transactedWithHead(z, s.Transaktion); err != nil {
 		err = errors.Wrap(err)
@@ -235,7 +235,7 @@ func (s *Store) addZettelToTransaktion(z zettel_named.Zettel) (tz zettel_transac
 		objekte.Objekte{
 			Gattung: gattung.Zettel,
 			Mutter:  mutter,
-			Id:      &z.Hinweis,
+			Id:      &z.Kennung,
 			Sha:     z.Stored.Sha,
 		},
 	)

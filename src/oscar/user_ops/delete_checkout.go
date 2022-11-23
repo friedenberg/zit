@@ -31,14 +31,14 @@ func (c DeleteCheckout) Run(
 		func(external *zettel_external.Zettel) (err error) {
 			var internal zettel_transacted.Zettel
 
-			if internal, err = c.StoreObjekten().ReadHinweisSchwanzen(external.Named.Hinweis); err != nil {
+			if internal, err = c.StoreObjekten().ReadHinweisSchwanzen(external.Named.Kennung); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
 			//TODO add a safety check?
 			if !internal.Named.Stored.Objekte.Equals(&external.Named.Stored.Objekte) {
-				errors.PrintOutf("[%s] (checkout different!)", external.Named.Hinweis)
+				errors.PrintOutf("[%s] (checkout different!)", external.Named.Kennung)
 				return
 			}
 

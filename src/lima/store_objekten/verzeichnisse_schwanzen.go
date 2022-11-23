@@ -57,7 +57,7 @@ func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 	pool := s.Zettelen.Pool()
 
 	w := func(zv *zettel_verzeichnisse.Zettel) (err error) {
-		if !zv.Transacted.Named.Hinweis.Equals(h) {
+		if !zv.Transacted.Named.Kennung.Equals(h) {
 			pool.Put(zv)
 			return
 		}

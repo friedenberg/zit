@@ -8,7 +8,7 @@ import (
 
 type Zettel struct {
 	Stored  zettel_stored.Stored
-	Hinweis hinweis.Hinweis
+	Kennung hinweis.Hinweis
 }
 
 func (a *Zettel) Equals(b *Zettel) bool {
@@ -17,7 +17,7 @@ func (a *Zettel) Equals(b *Zettel) bool {
 		return false
 	}
 
-	if !a.Hinweis.Equals(b.Hinweis) {
+	if !a.Kennung.Equals(b.Kennung) {
 		errors.Print("hinweis")
 		return false
 	}
@@ -26,7 +26,7 @@ func (a *Zettel) Equals(b *Zettel) bool {
 }
 
 func (zn *Zettel) Reset() {
-	zn.Hinweis = hinweis.Hinweis{}
+	zn.Kennung = hinweis.Hinweis{}
 	zn.Stored.Reset()
 }
 

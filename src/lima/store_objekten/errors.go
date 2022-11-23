@@ -51,7 +51,7 @@ type ErrZettelDidNotChangeSinceUpdate struct {
 func (e ErrZettelDidNotChangeSinceUpdate) Error() string {
 	return fmt.Sprintf(
 		"zettel has not changed: [%s %s]",
-		e.NamedZettel.Hinweis,
+		e.NamedZettel.Kennung,
 		e.NamedZettel.Stored.Sha,
 	)
 }

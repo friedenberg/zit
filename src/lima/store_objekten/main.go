@@ -211,7 +211,7 @@ func (s Store) writeNamedZettelToIndex(tz zettel_transacted.Zettel) (err error) 
 
 	errors.Printf("writing zettel to index: %s", tz.Named)
 
-	if err = s.verzeichnisseSchwanzen.Add(tz, tz.Named.Hinweis.String()); err != nil {
+	if err = s.verzeichnisseSchwanzen.Add(tz, tz.Named.Kennung.String()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -221,7 +221,7 @@ func (s Store) writeNamedZettelToIndex(tz zettel_transacted.Zettel) (err error) 
 		return
 	}
 
-	if err = s.indexKennung.addHinweis(tz.Named.Hinweis); err != nil {
+	if err = s.indexKennung.addHinweis(tz.Named.Kennung); err != nil {
 		if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
 			errors.PrintErrf("kennung does not contain value: %s", err)
 			err = nil
@@ -327,7 +327,7 @@ func (s *Store) Create(in zettel.Zettel) (tz zettel_transacted.Zettel, err error
 	// 	return
 	// }
 
-	if tz.Named.Hinweis, err = s.indexKennung.createHinweis(); err != nil {
+	if tz.Named.Kennung, err = s.indexKennung.createHinweis(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -432,7 +432,7 @@ func (s *Store) Update(
 	var mutter zettel_transacted.Zettel
 
 	if mutter, err = s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(
-		z.Hinweis,
+		z.Kennung,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -603,7 +603,7 @@ func (s Store) AllInChain(h hinweis.Hinweis) (c []*zettel_transacted.Zettel, err
 
 	if err = s.verzeichnisseAll.ReadMany(
 		func(z *zettel_verzeichnisse.Zettel) (err error) {
-			if !z.Transacted.Named.Hinweis.Equals(h) {
+			if !z.Transacted.Named.Kennung.Equals(h) {
 				err = io.EOF
 				return
 			}
@@ -675,7 +675,7 @@ func (s *Store) Reindex() (err error) {
 
 					var mutter *zettel_transacted.Zettel
 
-					if mutter1, err := s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(tz.Named.Hinweis); err == nil {
+					if mutter1, err := s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(tz.Named.Kennung); err == nil {
 						mutter = &mutter1
 					}
 

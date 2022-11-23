@@ -75,9 +75,9 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 		mes := z.Stored.Objekte.Etiketten.MutableCopy()
 		mes.Add(e)
 		z.Stored.Objekte.Etiketten = mes.Copy()
-		toUpdate[z.Hinweis.String()] = z
+		toUpdate[z.Kennung.String()] = z
 
-		errors.PrintErrf("Added etikett '%s' to zettel '%s'", e, z.Hinweis)
+		errors.PrintErrf("Added etikett '%s' to zettel '%s'", e, z.Kennung)
 
 		return
 	}
@@ -94,9 +94,9 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 		mes.RemovePrefixes(e)
 		z.Stored.Objekte.Etiketten = mes.Copy()
 
-		toUpdate[z.Hinweis.String()] = z
+		toUpdate[z.Kennung.String()] = z
 
-		errors.PrintErrf("Removed etikett '%s' from zettel '%s'", e, z.Hinweis)
+		errors.PrintErrf("Removed etikett '%s' from zettel '%s'", e, z.Kennung)
 
 		return
 	}
@@ -140,9 +140,9 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 
 			z.Stored.Objekte.Typ = b.Metadatei.Typ
 
-			toUpdate[z.Hinweis.String()] = z
+			toUpdate[z.Kennung.String()] = z
 
-			errors.PrintErrf("Switched to typ '%s' for zettel '%s'", b.Metadatei.Typ, z.Hinweis)
+			errors.PrintErrf("Switched to typ '%s' for zettel '%s'", b.Metadatei.Typ, z.Kennung)
 		}
 	}
 
@@ -180,7 +180,7 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 
 	for _, z := range toUpdate {
 		if c.Konfig().DryRun {
-			errors.PrintOutf("[%s] (would update)", z.Hinweis)
+			errors.PrintOutf("[%s] (would update)", z.Kennung)
 			continue
 		}
 

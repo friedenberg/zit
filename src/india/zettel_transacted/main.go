@@ -24,7 +24,7 @@ func (zt Zettel) ObjekteTransacted() objekte.ObjekteTransacted {
 			Objekte: objekte.Objekte{
 				Gattung: gattung.Zettel,
 				//TODO add Mutter
-				Id:  &zt.Named.Hinweis,
+				Id:  &zt.Named.Kennung,
 				Sha: zt.Named.Stored.Sha,
 			},
 			Index: zt.TransaktionIndex,

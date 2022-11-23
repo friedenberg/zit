@@ -118,7 +118,7 @@ func (i *Zettelen) Add(tz zettel_transacted.Zettel, v string) (err error) {
 func (i *Zettelen) GetPageIndexKeyValue(
 	zt zettel_transacted.Zettel,
 ) (key string, value string) {
-	key = zt.Named.Hinweis.String()
+	key = zt.Named.Kennung.String()
 	value = fmt.Sprintf("%s.%s", zt.Schwanz, zt.Named.Stored.Sha)
 	return
 }

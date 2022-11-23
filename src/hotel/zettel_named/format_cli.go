@@ -19,7 +19,7 @@ func MakeCliFormat(
 		return format.Write(
 			w,
 			format.MakeFormatString("["),
-			format.MakeWriter(hf, &z.Hinweis),
+			format.MakeWriter(hf, &z.Kennung),
 			format.MakeFormatString("@"),
 			format.MakeWriter(sf, &z.Stored.Sha),
 			format.MakeFormatString(" "),

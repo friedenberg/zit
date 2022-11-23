@@ -31,7 +31,7 @@ func (zws *WriterSchwanzen) Less(zt *zettel_transacted.Zettel) (ok bool) {
 
 	var t objekte.ObjekteTransacted
 
-	t, ok = zws.hinweisen[zt.Named.Hinweis]
+	t, ok = zws.hinweisen[zt.Named.Kennung]
 
 	switch {
 	case !ok:
@@ -61,7 +61,7 @@ func (zws *WriterSchwanzen) Set(z *zettel_transacted.Zettel) (ok bool) {
 	zws.lock.Lock()
 	defer zws.lock.Unlock()
 
-	h := z.Named.Hinweis
+	h := z.Named.Kennung
 	o := z.ObjekteTransacted()
 	t1, _ := zws.hinweisen[h]
 

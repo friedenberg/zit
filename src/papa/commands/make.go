@@ -136,7 +136,7 @@ func (c Make) getZettel(
 }
 
 func (c Make) makeFifoPipe(tz zettel_transacted.Zettel) (p string, err error) {
-	h := tz.Named.Hinweis
+	h := tz.Named.Kennung
 	var d string
 
 	if d, err = os.MkdirTemp("", h.Kopf()); err != nil {

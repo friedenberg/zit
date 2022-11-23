@@ -21,7 +21,7 @@ func MakeMutableSetUnique(c int) MutableSet {
 					sz.Internal.Kopf,
 					sz.Internal.Mutter,
 					sz.Internal.Schwanz,
-					sz.Internal.Named.Hinweis,
+					sz.Internal.Named.Kennung,
 					sz.Internal.Named.Stored.Sha,
 				)
 			},
@@ -37,7 +37,7 @@ func MakeMutableSetHinweisZettel(c int) MutableSet {
 					return ""
 				}
 
-				return collections.MakeKey(sz.Internal.Named.Hinweis)
+				return collections.MakeKey(sz.Internal.Named.Kennung)
 			},
 		),
 	}

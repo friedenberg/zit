@@ -135,7 +135,7 @@ func (c ExecAction) runExecutor(
 	}
 
 	env := map[string]string{
-		"ZIT_ZETTEL": z.Named.Hinweis.String(),
+		"ZIT_ZETTEL": z.Named.Kennung.String(),
 		"ZIT_BIN":    u.Standort().Executable(),
 	}
 

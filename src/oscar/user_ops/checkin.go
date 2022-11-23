@@ -43,7 +43,7 @@ func (c Checkin) Run(
 		//TODO: add states to checkin process to indicate results of update call
 		// stdprinter.Outf("%s (unchanged)", tz.Named)
 
-		results.Zettelen[tz.Named.Hinweis] = zettel_checked_out.Zettel{
+		results.Zettelen[tz.Named.Kennung] = zettel_checked_out.Zettel{
 			Internal: tz,
 			External: z,
 		}

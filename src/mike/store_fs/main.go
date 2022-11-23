@@ -121,7 +121,7 @@ func (s Store) MakeExternalZettelFromZettel(p string) (ez zettel_external.Zettel
 
 	head, tail := id.HeadTailFromFileName(p)
 
-	if ez.Named.Hinweis, err = hinweis.Make(head + "/" + tail); err != nil {
+	if ez.Named.Kennung, err = hinweis.Make(head + "/" + tail); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -195,7 +195,7 @@ func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 		if errors.As(e, &err1) {
 			var mutter zettel_transacted.Zettel
 
-			if mutter, err = s.storeObjekten.ReadHinweisSchwanzen(ez.Named.Hinweis); err != nil {
+			if mutter, err = s.storeObjekten.ReadHinweisSchwanzen(ez.Named.Kennung); err != nil {
 				unrecoverableErrors.Add(errors.Wrap(err))
 				continue
 			}
@@ -231,7 +231,7 @@ func (s *Store) Read(p string) (cz zettel_checked_out.Zettel, err error) {
 		}
 	}
 
-	if cz.Internal, err = s.storeObjekten.ReadHinweisSchwanzen(cz.External.Named.Hinweis); err != nil {
+	if cz.Internal, err = s.storeObjekten.ReadHinweisSchwanzen(cz.External.Named.Kennung); err != nil {
 		if errors.Is(err, store_objekten.ErrNotFound{}) {
 			err = nil
 		} else {

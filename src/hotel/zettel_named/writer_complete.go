@@ -22,13 +22,13 @@ func MakeWriterComplete(w io.Writer) WriterComplete {
 
 	go func(s *WriterComplete) {
 		for z := range s.chZettel {
-			if z.Hinweis.String() == "/" {
+			if z.Kennung.String() == "/" {
 				errors.Err().Printf("empty: %#v", z)
 				continue
 			}
 
 			//TODO-P4 handle write errors
-			s.wBuf.WriteString(z.Hinweis.String())
+			s.wBuf.WriteString(z.Kennung.String())
 			s.wBuf.WriteString("\tZettel: !")
 			s.wBuf.WriteString(z.Stored.Objekte.Typ.String())
 			s.wBuf.WriteString(" ")
