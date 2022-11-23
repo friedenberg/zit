@@ -7,8 +7,8 @@ import (
 	"math/rand"
 	"time"
 
+	coordinates "github.com/friedenberg/zit/src/alfa/coordinates"
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/kennung"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/hinweisen"
 	"github.com/friedenberg/zit/src/delta/konfig"
@@ -135,9 +135,9 @@ func (i *indexKennung) reset() (err error) {
 
 	for l := 0; l <= lMax; l++ {
 		for r := 0; r <= rMax; r++ {
-			k := &kennung.Kennung{
-				Left:  kennung.Int(l),
-				Right: kennung.Int(r),
+			k := &coordinates.Kennung{
+				Left:  coordinates.Int(l),
+				Right: coordinates.Int(r),
 			}
 
 			errors.Print(k)
@@ -170,9 +170,9 @@ func (i *indexKennung) addHinweis(h hinweis.Hinweis) (err error) {
 		return
 	}
 
-	k := kennung.Kennung{
-		Left:  kennung.Int(left),
-		Right: kennung.Int(right),
+	k := coordinates.Kennung{
+		Left:  coordinates.Int(left),
+		Right: coordinates.Int(right),
 	}
 
 	n := k.Id()
@@ -246,8 +246,8 @@ func (i *indexKennung) createHinweis() (h hinweis.Hinweis, err error) {
 }
 
 func (i *indexKennung) makeHinweisButDontStore(j int) (h hinweis.Hinweis, err error) {
-	k := &kennung.Kennung{}
-	k.SetInt(kennung.Int(j))
+	k := &coordinates.Kennung{}
+	k.SetInt(coordinates.Int(j))
 
 	h, err = hinweis.New(
 		k.Id(),
@@ -277,8 +277,8 @@ func (i *indexKennung) PeekHinweisen(m int) (hs []hinweis.Hinweis, err error) {
 	j := 0
 
 	for n, _ := range i.AvailableKennung {
-		k := &kennung.Kennung{}
-		k.SetInt(kennung.Int(n))
+		k := &coordinates.Kennung{}
+		k.SetInt(coordinates.Int(n))
 
 		var h hinweis.Hinweis
 

@@ -4,8 +4,8 @@ import (
 	"path"
 	"sync"
 
+	coordinates "github.com/friedenberg/zit/src/alfa/coordinates"
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/kennung"
 )
 
 const (
@@ -17,7 +17,7 @@ type Hinweisen struct {
 	sync.Locker
 	yin     provider
 	yang    provider
-	counter kennung.Int
+	counter coordinates.Int
 }
 
 func New(basePath string) (f *Hinweisen, err error) {

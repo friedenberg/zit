@@ -1,8 +1,8 @@
 package typ
 
-import "github.com/friedenberg/zit/src/charlie/string_expansion"
+import kennung "github.com/friedenberg/zit/src/charlie/kennung"
 
-type Expander = string_expansion.Expander[Kennung, *Kennung]
+type Expander = kennung.Expander[Kennung, *Kennung]
 
 var (
 	ExpanderRight Expander
@@ -10,6 +10,6 @@ var (
 )
 
 func init() {
-	ExpanderRight = string_expansion.MakeExpanderRight[Kennung, *Kennung](`-`)
-	ExpanderAll = string_expansion.MakeExpanderAll[Kennung, *Kennung](`-`)
+	ExpanderRight = kennung.MakeExpanderRight[Kennung, *Kennung](`-`)
+	ExpanderAll = kennung.MakeExpanderAll[Kennung, *Kennung](`-`)
 }

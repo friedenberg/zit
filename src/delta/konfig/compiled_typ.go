@@ -2,15 +2,15 @@ package konfig
 
 import (
 	"github.com/friedenberg/zit/src/bravo/collections"
-	"github.com/friedenberg/zit/src/charlie/string_expansion"
+	kennung "github.com/friedenberg/zit/src/charlie/kennung"
 )
 
 var (
-	typExpander string_expansion.Expander[collections.StringValue, *collections.StringValue]
+	typExpander kennung.Expander[collections.StringValue, *collections.StringValue]
 )
 
 func init() {
-	typExpander = string_expansion.MakeExpanderRight[collections.StringValue, *collections.StringValue](`-`)
+	typExpander = kennung.MakeExpanderRight[collections.StringValue, *collections.StringValue](`-`)
 }
 
 type compiledTyp struct {

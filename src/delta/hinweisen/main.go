@@ -5,8 +5,8 @@ import (
 	"io"
 	"os"
 
+	coordinates "github.com/friedenberg/zit/src/alfa/coordinates"
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/kennung"
 	"github.com/friedenberg/zit/src/bravo/files"
 )
 
@@ -44,7 +44,7 @@ func newProvider(path string) (p provider, err error) {
 	return
 }
 
-func (p provider) Hinweis(i kennung.Int) (s string, err error) {
+func (p provider) Hinweis(i coordinates.Int) (s string, err error) {
 	if len(p)-1 < int(i) {
 		err = errors.Errorf(
 			"insuffient ids. requested %d, have %d, last %s",

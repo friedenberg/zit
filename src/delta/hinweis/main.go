@@ -7,8 +7,8 @@ import (
 	"io"
 	"strings"
 
+	coordinates "github.com/friedenberg/zit/src/alfa/coordinates"
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/kennung"
 	"github.com/friedenberg/zit/src/charlie/sha"
 )
 
@@ -21,7 +21,7 @@ type Hinweis struct {
 }
 
 type Provider interface {
-	Hinweis(i kennung.Int) (string, error)
+	Hinweis(i coordinates.Int) (string, error)
 }
 
 func NewEmpty() (h Hinweis) {
@@ -32,8 +32,8 @@ func NewEmpty() (h Hinweis) {
 
 //TODO is this really necessary?;w
 
-func New(i kennung.Int, pl Provider, pr Provider) (h Hinweis, err error) {
-	k := kennung.Kennung{}
+func New(i coordinates.Int, pl Provider, pr Provider) (h Hinweis, err error) {
+	k := coordinates.Kennung{}
 	k.SetInt(i)
 
 	h = Hinweis{}

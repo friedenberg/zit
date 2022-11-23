@@ -1,8 +1,8 @@
 package etikett
 
-import "github.com/friedenberg/zit/src/charlie/string_expansion"
+import kennung "github.com/friedenberg/zit/src/charlie/kennung"
 
-type Expander = string_expansion.Expander[Etikett, *Etikett]
+type Expander = kennung.Expander[Etikett, *Etikett]
 
 var (
 	ExpanderRight Expander
@@ -10,6 +10,6 @@ var (
 )
 
 func init() {
-	ExpanderRight = string_expansion.MakeExpanderRight[Etikett, *Etikett](`-`)
-	ExpanderAll = string_expansion.MakeExpanderAll[Etikett, *Etikett](`-`)
+	ExpanderRight = kennung.MakeExpanderRight[Etikett, *Etikett](`-`)
+	ExpanderAll = kennung.MakeExpanderAll[Etikett, *Etikett](`-`)
 }
