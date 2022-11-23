@@ -11,7 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/id"
 	"github.com/friedenberg/zit/src/delta/ts"
-	"github.com/friedenberg/zit/src/foxtrot/objekte"
+	sku "github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/golf/zettel_stored"
@@ -157,7 +157,7 @@ func (s *Store) transactedWithHead(
 
 func (s Store) transactedZettelFromTransaktionObjekte(
 	t *transaktion.Transaktion,
-	o *objekte.ObjekteWithIndex,
+	o *sku.Indexed,
 ) (tz zettel_transacted.Zettel, err error) {
 	ok := false
 
@@ -232,7 +232,7 @@ func (s *Store) addZettelToTransaktion(z zettel_named.Zettel) (tz zettel_transac
 	mutter[0] = tz.Mutter
 
 	i := s.Transaktion.Add(
-		objekte.Objekte{
+		sku.Sku{
 			Gattung: gattung.Zettel,
 			Mutter:  mutter,
 			Id:      &z.Kennung,

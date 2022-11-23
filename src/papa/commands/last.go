@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/foxtrot/objekte"
+	sku "github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
@@ -40,7 +40,7 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	transaktion.Each(
-		func(o *objekte.Objekte) (err error) {
+		func(o *sku.Sku) (err error) {
 			switch o.Gattung {
 			case gattung.Zettel:
 				errors.PrintOut(o)

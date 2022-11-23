@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/foxtrot/objekte"
+	sku "github.com/friedenberg/zit/src/foxtrot/sku"
 )
 
 type Reader struct {
@@ -21,7 +21,7 @@ type readState struct {
 func (r *Reader) ReadFrom(r1 io.Reader) (n int64, err error) {
 	br := bufio.NewReader(r1)
 
-	r.Transaktion.MutableSet = objekte.MakeMutableSet()
+	r.Transaktion.MutableSet = sku.MakeMutableSet()
 
 	for {
 		var line string
@@ -49,7 +49,7 @@ func (r *Reader) ReadFrom(r1 io.Reader) (n int64, err error) {
 			}
 
 		default:
-			var o objekte.Objekte
+			var o sku.Sku
 
 			if err = o.Set(line); err != nil {
 				err = errors.Wrapf(err, "failed to read line: %s", line)

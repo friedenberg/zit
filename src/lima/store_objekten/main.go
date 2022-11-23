@@ -19,7 +19,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/delta/ts"
 	"github.com/friedenberg/zit/src/echo/age_io"
-	"github.com/friedenberg/zit/src/foxtrot/objekte"
+	sku "github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/hotel/zettel_named"
@@ -495,7 +495,7 @@ func (s Store) RevertTransaktion(
 	tzs = zettel_transacted.MakeMutableSetUnique(t.Len())
 
 	t.Each(
-		func(o *objekte.Objekte) (err error) {
+		func(o *sku.Sku) (err error) {
 			var h *hinweis.Hinweis
 			ok := false
 
@@ -620,7 +620,7 @@ func (s Store) AllInChain(h hinweis.Hinweis) (c []*zettel_transacted.Zettel, err
 
 	sort.Slice(
 		c,
-		func(i, j int) bool { return c[i].ObjekteTransacted().Less(c[j].ObjekteTransacted()) },
+		func(i, j int) bool { return c[i].SkuTransacted().Less(c[j].SkuTransacted()) },
 	)
 
 	return
@@ -662,7 +662,7 @@ func (s *Store) Reindex() (err error) {
 
 	f := func(t *transaktion.Transaktion) (err error) {
 		if err = t.EachWithIndex(
-			func(o *objekte.ObjekteWithIndex) (err error) {
+			func(o *sku.Indexed) (err error) {
 				switch o.Gattung {
 
 				case gattung.Zettel:

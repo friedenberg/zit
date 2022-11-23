@@ -14,7 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/ts"
 	"github.com/friedenberg/zit/src/echo/typ"
 	"github.com/friedenberg/zit/src/foxtrot/id_set"
-	"github.com/friedenberg/zit/src/foxtrot/objekte"
+	sku "github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/hotel/zettel_named"
@@ -216,7 +216,7 @@ func (c Show) showTransaktions(store *umwelt.Umwelt, ids id_set.Set) (err error)
 		errors.PrintOutf("transaktion: %#v", t)
 
 		t.Each(
-			func(o *objekte.Objekte) (err error) {
+			func(o *sku.Sku) (err error) {
 				errors.Out().Print(o)
 				return
 			},

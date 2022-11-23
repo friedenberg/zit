@@ -4,7 +4,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/bravo/line_format"
-	"github.com/friedenberg/zit/src/foxtrot/objekte"
+	sku "github.com/friedenberg/zit/src/foxtrot/sku"
 )
 
 type Writer struct {
@@ -16,7 +16,7 @@ func (w Writer) WriteTo(w1 io.Writer) (n int64, err error) {
 
 	lw.WriteStringers(w.Transaktion.Time)
 
-	w.Transaktion.Each(objekte.MakeWriterLineFormat(lw))
+	w.Transaktion.Each(sku.MakeWriterLineFormat(lw))
 
 	return lw.WriteTo(w1)
 }

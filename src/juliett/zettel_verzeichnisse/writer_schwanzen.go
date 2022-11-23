@@ -9,19 +9,19 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/ts"
-	"github.com/friedenberg/zit/src/foxtrot/objekte"
+	sku "github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 )
 
 type WriterSchwanzen struct {
 	lock      *sync.RWMutex
-	hinweisen map[hinweis.Hinweis]objekte.ObjekteTransacted
+	hinweisen map[hinweis.Hinweis]sku.Transacted
 }
 
 func MakeWriterSchwanzen() *WriterSchwanzen {
 	return &WriterSchwanzen{
 		lock:      &sync.RWMutex{},
-		hinweisen: make(map[hinweis.Hinweis]objekte.ObjekteTransacted),
+		hinweisen: make(map[hinweis.Hinweis]sku.Transacted),
 	}
 }
 
@@ -29,7 +29,7 @@ func (zws *WriterSchwanzen) Less(zt *zettel_transacted.Zettel) (ok bool) {
 	zws.lock.RLock()
 	defer zws.lock.RUnlock()
 
-	var t objekte.ObjekteTransacted
+	var t sku.Transacted
 
 	t, ok = zws.hinweisen[zt.Named.Kennung]
 
@@ -37,7 +37,7 @@ func (zws *WriterSchwanzen) Less(zt *zettel_transacted.Zettel) (ok bool) {
 	case !ok:
 		fallthrough
 
-	case zt.ObjekteTransacted().Less(t):
+	case zt.SkuTransacted().Less(t):
 		ok = true
 	}
 
@@ -48,7 +48,7 @@ func (zws *WriterSchwanzen) Get(h hinweis.Hinweis) (t ts.Time, ok bool) {
 	zws.lock.RLock()
 	defer zws.lock.RUnlock()
 
-	var o objekte.ObjekteTransacted
+	var o sku.Transacted
 
 	o, ok = zws.hinweisen[h]
 
@@ -62,7 +62,7 @@ func (zws *WriterSchwanzen) Set(z *zettel_transacted.Zettel) (ok bool) {
 	defer zws.lock.Unlock()
 
 	h := z.Named.Kennung
-	o := z.ObjekteTransacted()
+	o := z.SkuTransacted()
 	t1, _ := zws.hinweisen[h]
 
 	if t1.Less(o) {
@@ -101,7 +101,7 @@ func (zws *WriterSchwanzen) ReadFrom(r1 io.Reader) (n int64, err error) {
 
 	dec := gob.NewDecoder(r)
 
-	m := make(map[hinweis.Hinweis]objekte.ObjekteTransacted)
+	m := make(map[hinweis.Hinweis]sku.Transacted)
 
 	if err = dec.Decode(&m); err != nil {
 		if errors.IsEOF(err) {
