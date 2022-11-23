@@ -6,8 +6,8 @@ import (
 
 	"github.com/friedenberg/zit/src/bravo/test_logz"
 	"github.com/friedenberg/zit/src/delta/etikett"
+	test_metadatei_io "github.com/friedenberg/zit/src/delta/test_metadatei_io"
 	"github.com/friedenberg/zit/src/echo/typ"
-	"github.com/friedenberg/zit/src/test_metadata_io"
 )
 
 func makeEtiketten(t test_logz.T, vs ...string) (es etikett.Set) {
@@ -31,7 +31,7 @@ func makeAkteExt(t test_logz.T, v string) (es typ.Kennung) {
 func readFormat(t test_logz.T, f Format, contents string) (z Zettel, a string) {
 	t.Helper()
 
-	awf := test_metadata_io.NopFactoryReadWriter(bytes.NewBuffer(nil))
+	awf := test_metadatei_io.NopFactoryReadWriter(bytes.NewBuffer(nil))
 
 	c := FormatContextRead{
 		In:                strings.NewReader(contents),

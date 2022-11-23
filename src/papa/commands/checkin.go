@@ -4,7 +4,7 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/cwd_files"
+	"github.com/friedenberg/zit/src/foxtrot/cwd_files"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_external"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"

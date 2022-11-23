@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/collections_coding"
+	"github.com/friedenberg/zit/src/charlie/collections_coding"
 	"github.com/friedenberg/zit/src/delta/konfig"
 )
 

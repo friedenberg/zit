@@ -6,8 +6,8 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/bravo/metadatei_io"
 	"github.com/friedenberg/zit/src/delta/etikett"
+	"github.com/friedenberg/zit/src/delta/metadatei_io"
 )
 
 const (

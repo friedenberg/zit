@@ -58,7 +58,7 @@ func (s *Store) SetZettelCheckedOutWriters(
 	s.zettelCheckedOutWriters = zcow
 }
 
-//TODO move to standort
+// TODO move to standort
 func (s Store) IndexFilePath() string {
 	return path.Join(s.path, ".ZitCheckoutStoreIndex")
 }

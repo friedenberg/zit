@@ -5,9 +5,9 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/cwd_files"
 	"github.com/friedenberg/zit/src/echo/typ"
-	"github.com/friedenberg/zit/src/typ_checked_out"
+	"github.com/friedenberg/zit/src/foxtrot/cwd_files"
+	"github.com/friedenberg/zit/src/foxtrot/typ_checked_out"
 )
 
 func (s *Store) CheckinTyp(p string) (t *typ.Typ, err error) {

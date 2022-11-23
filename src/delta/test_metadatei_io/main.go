@@ -1,4 +1,4 @@
-package test_metadata_io
+package test_metadatei_io
 
 import (
 	"io"

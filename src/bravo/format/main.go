@@ -15,7 +15,7 @@ type Format[T any] interface {
 type FuncReader func(io.Reader) (int64, error)
 type FuncReaderFormat[T any] func(io.Reader, *T) (int64, error)
 
-//TODO rename to Func-prefix
+// TODO rename to Func-prefix
 type WriterFunc func(io.Writer) (int64, error)
 type FormatWriterFunc[T any] func(io.Writer, *T) (int64, error)
 type FuncColorWriter func(WriterFunc, ColorType) WriterFunc

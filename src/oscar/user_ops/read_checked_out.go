@@ -3,9 +3,9 @@ package user_ops
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/collections"
-	"github.com/friedenberg/zit/src/cwd_files"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/hinweisen"
+	"github.com/friedenberg/zit/src/foxtrot/cwd_files"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
 	"github.com/friedenberg/zit/src/mike/store_fs"
 	"github.com/friedenberg/zit/src/november/umwelt"
