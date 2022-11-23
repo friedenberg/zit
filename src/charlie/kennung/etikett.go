@@ -22,7 +22,7 @@ type Etikett struct {
 	Value string
 }
 
-func Make(v string) Etikett {
+func MakeEtikett(v string) Etikett {
 	return Etikett{Value: v}
 }
 

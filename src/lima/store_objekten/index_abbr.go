@@ -231,7 +231,7 @@ func (i *indexAbbr) ExpandHinweis(hAbbr hinweis.Hinweis) (h hinweis.Hinweis, err
 func (i *indexAbbr) ExpandEtikettString(s string) (e kennung.Etikett, err error) {
 	errors.Print(s)
 
-	if e = kennung.Make(s); err != nil {
+	if e = kennung.MakeEtikett(s); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
