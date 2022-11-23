@@ -1,38 +1,41 @@
 package cwd_files
 
 import (
-	"path"
-	"path/filepath"
+	"os"
+	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/echo/typ"
+	"github.com/friedenberg/zit/src/fd"
 )
 
-type CwdTyp struct {
-	typ.Kennung
-	File
-}
+type CwdTyp = typ.External
 
-func (c *CwdFiles) tryTyp(d string, a string, p string) (err error) {
+func (c *CwdFiles) tryTyp(fi os.FileInfo) (err error) {
 	var h typ.Kennung
 
-	ext := filepath.Ext(a)
-	pathMinusExt := path.Base(a)[:len(ext)]
+	fd := fd.FileInfo(fi)
+	pathMinusExt := strings.ToLower(fd.FileNameSansExt())
 
 	if err = h.Set(pathMinusExt); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	var t CwdTyp
+	var t *CwdTyp
 
 	ok := false
 
-	if t, ok = c.Typen[t.String()]; !ok {
-		t.Kennung = h
+	if t, ok = c.Typen[pathMinusExt]; !ok {
+		t = &CwdTyp{
+			Named: typ.Typ{
+				Kennung: h,
+			},
+		}
 	}
 
-	t.Path = p
+	//TODO populate FD with more data
+	t.FD = fd
 	c.Typen[h.String()] = t
 
 	return

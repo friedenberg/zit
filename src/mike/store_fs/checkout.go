@@ -78,7 +78,7 @@ func (s Store) filenameForZettelTransacted(
 	options CheckoutOptions,
 	sz zettel_transacted.Zettel,
 ) (originalFilename string, filename string, err error) {
-	if originalFilename, err = id.MakeDirIfNecessary(sz.Named.Kennung, s.cwd); err != nil {
+	if originalFilename, err = id.MakeDirIfNecessary(sz.Named.Kennung, s.Cwd()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

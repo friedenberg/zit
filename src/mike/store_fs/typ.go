@@ -1,6 +1,7 @@
 package store_fs
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -10,7 +11,49 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/typ_checked_out"
 )
 
+//TODO move to generics for store methods and combine types for all objekten
+// type storeTyp struct {
+// }
+
 func (s *Store) CheckinTyp(p string) (t *typ.Typ, err error) {
+	return
+}
+
+func (s *Store) WriteTyp(t *typ.Typ) (tco *typ_checked_out.Typ, err error) {
+	tcwd := &cwd_files.CwdTyp{
+		FD: cwd_files.File{
+			Path: fmt.Sprintf("%s.%s", t.Kennung, s.Konfig.Compiled.TypFileExtension),
+		},
+		Named: typ.Typ{
+			Kennung: t.Kennung,
+		},
+	}
+
+	tco = &typ_checked_out.Typ{
+		CwdTyp: *tcwd,
+		Typ:    *t,
+	}
+
+	var f *os.File
+
+	if f, err = files.CreateExclusiveWriteOnly(tcwd.FD.Path); err != nil {
+		if errors.IsExist(err) {
+			tco, err = s.ReadTyp(tcwd)
+		} else {
+			err = errors.Wrap(err)
+		}
+		return
+	}
+
+	defer errors.Deferred(&err, f.Close)
+
+	format := typ.MakeFormatText(s.storeObjekten)
+
+	if _, err = format.WriteFormat(f, &t.Akte); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	return
 }
 
@@ -19,7 +62,7 @@ func (s *Store) ReadTyp(ct *cwd_files.CwdTyp) (t *typ_checked_out.Typ, err error
 
 	var f *os.File
 
-	if f, err = files.Open(ct.Path); err != nil {
+	if f, err = files.Open(ct.FD.Path); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -27,13 +70,13 @@ func (s *Store) ReadTyp(ct *cwd_files.CwdTyp) (t *typ_checked_out.Typ, err error
 	defer errors.Deferred(&err, f.Close)
 
 	t = &typ_checked_out.Typ{
-		Path: ct.Path,
+		CwdTyp: *ct,
 		Typ: typ.Typ{
-			Kennung: ct.Kennung,
+			Kennung: ct.Named.Kennung,
 		},
 	}
 
-	if _, err = format.ReadFormat(f, &t.Typ); err != nil {
+	if _, err = format.ReadFormat(f, &t.Typ.Akte); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

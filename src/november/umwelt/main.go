@@ -147,7 +147,7 @@ func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 	errors.Print("initing checkout store")
 	u.storeWorkingDirectory, err = store_fs.New(
 		csk,
-		u.standort.Cwd(),
+		u.standort,
 		u.storeObjekten,
 	)
 

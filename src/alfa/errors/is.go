@@ -20,6 +20,11 @@ func IsEOF(err error) bool {
 	return Is(err, io.EOF)
 }
 
+func IsExist(err error) bool {
+	e := Unwrap(err)
+	return os.IsExist(e)
+}
+
 func IsNotExist(err error) bool {
 	e := Unwrap(err)
 	return os.IsNotExist(e)

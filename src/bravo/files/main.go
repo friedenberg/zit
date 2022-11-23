@@ -71,7 +71,7 @@ func (g *openFilesGuard) UnlockN(n int) {
 }
 
 func CreateExclusiveWriteOnly(p string) (f *os.File, err error) {
-	if f, err = os.OpenFile(p, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0755); err != nil {
+	if f, err = os.OpenFile(p, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0666); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

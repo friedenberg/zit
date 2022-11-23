@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/id"
+	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_external"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
@@ -20,6 +21,7 @@ import (
 
 type Store struct {
 	Konfig
+	standort.Standort
 
 	format zettel.Format
 
@@ -27,26 +29,22 @@ type Store struct {
 
 	zettelCheckedOutWriters ZettelCheckedOutLogWriters
 
-	path         string
-	cwd          string
 	entries      map[string]Entry
 	indexWasRead bool
 	hasChanges   bool
 }
 
-func New(k Konfig, p string, storeObjekten *store_objekten.Store) (s *Store, err error) {
+func New(
+	k Konfig,
+	st standort.Standort,
+	storeObjekten *store_objekten.Store,
+) (s *Store, err error) {
 	s = &Store{
 		Konfig:        k,
+		Standort:      st,
 		format:        zettel.Text{},
 		storeObjekten: storeObjekten,
-		path:          p,
 		entries:       make(map[string]Entry),
-	}
-
-	//TODO switch to standort
-	if s.cwd, err = os.Getwd(); err != nil {
-		err = errors.Wrap(err)
-		return
 	}
 
 	return
@@ -60,7 +58,7 @@ func (s *Store) SetZettelCheckedOutWriters(
 
 // TODO move to standort
 func (s Store) IndexFilePath() string {
-	return path.Join(s.path, ".ZitCheckoutStoreIndex")
+	return path.Join(s.Cwd(), ".ZitCheckoutStoreIndex")
 }
 
 func (s Store) flushToTemp() (tfp string, err error) {
@@ -112,7 +110,7 @@ func (s Store) MakeExternalZettelFromZettel(p string) (ez zettel_external.Zettel
 		return
 	}
 
-	if p, err = filepath.Rel(s.path, p); err != nil {
+	if p, err = filepath.Rel(s.Cwd(), p); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

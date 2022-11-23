@@ -21,7 +21,7 @@ func (s Store) ReadExternalZettelFromAktePath(p string) (cz zettel_checked_out.Z
 		return
 	}
 
-	if p, err = filepath.Rel(s.path, p); err != nil {
+	if p, err = filepath.Rel(s.Cwd(), p); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

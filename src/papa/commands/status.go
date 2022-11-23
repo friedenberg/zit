@@ -69,7 +69,7 @@ func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
 	for _, p := range possible.Typen {
 		var t *typ_checked_out.Typ
 
-		if t, err = s.StoreWorkingDirectory().ReadTyp(&p); err != nil {
+		if t, err = s.StoreWorkingDirectory().ReadTyp(p); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

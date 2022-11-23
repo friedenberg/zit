@@ -15,7 +15,7 @@ type CwdFiles struct {
 	konfig           konfig.Compiled
 	dir              string
 	Zettelen         map[string]CwdZettel
-	Typen            map[string]CwdTyp
+	Typen            map[string]*CwdTyp
 	UnsureAkten      []File
 	EmptyDirectories []string
 }
@@ -34,7 +34,7 @@ func makeCwdFiles(konfig konfig.Compiled, dir string) (fs CwdFiles) {
 	fs = CwdFiles{
 		konfig:           konfig,
 		dir:              dir,
-		Typen:            make(map[string]CwdTyp, 0),
+		Typen:            make(map[string]*CwdTyp, 0),
 		Zettelen:         make(map[string]CwdZettel, 0),
 		UnsureAkten:      make([]File, 0),
 		EmptyDirectories: make([]string, 0),
@@ -177,7 +177,7 @@ func (fs *CwdFiles) readFirstLevelFile(a string) (err error) {
 
 	switch strings.TrimPrefix(ext, ".") {
 	case fs.konfig.TypFileExtension:
-		if err = fs.tryTyp(fs.dir, a, a); err != nil {
+		if err = fs.tryTyp(fi); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -220,7 +220,7 @@ func (fs *CwdFiles) readSecondLevelFile(d string, a string) (err error) {
 
 	switch strings.TrimPrefix(ext, ".") {
 	case fs.konfig.TypFileExtension:
-		if err = fs.tryTyp(d, a, p); err != nil {
+		if err = fs.tryTyp(fi); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

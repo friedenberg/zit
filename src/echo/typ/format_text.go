@@ -20,7 +20,7 @@ func MakeFormatText(arf metadatei_io.AkteIOFactory) *FormatText {
 	}
 }
 
-func (f FormatText) ReadFormat(r io.Reader, t *Typ) (n int64, err error) {
+func (f FormatText) ReadFormat(r io.Reader, t *Akte) (n int64, err error) {
 	var aw sha.WriteCloser
 
 	if aw, err = f.arf.AkteWriter(); err != nil {
@@ -40,7 +40,7 @@ func (f FormatText) ReadFormat(r io.Reader, t *Typ) (n int64, err error) {
 			close(chDone)
 		}()
 
-		if err := td.Decode(&t.Akte.KonfigTyp); err != nil {
+		if err := td.Decode(&t.KonfigTyp); err != nil {
 			if !errors.IsEOF(err) {
 				pr.CloseWithError(err)
 			}
@@ -61,15 +61,15 @@ func (f FormatText) ReadFormat(r io.Reader, t *Typ) (n int64, err error) {
 
 	<-chDone
 
-	t.Akte.Sha = aw.Sha()
+	t.Sha = aw.Sha()
 
 	return
 }
 
-func (f FormatText) WriteFormat(w io.Writer, t *Typ) (n int64, err error) {
+func (f FormatText) WriteFormat(w io.Writer, t *Akte) (n int64, err error) {
 	var ar sha.ReadCloser
 
-	if ar, err = f.arf.AkteReader(t.Akte.Sha); err != nil {
+	if ar, err = f.arf.AkteReader(t.Sha); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

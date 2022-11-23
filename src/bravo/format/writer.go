@@ -1,6 +1,7 @@
 package format
 
 import (
+	"bufio"
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -39,10 +40,16 @@ func MakeWriterTo[T any](
 }
 
 func MakeWriterToWithNewLines[T any](
-	w io.Writer,
+	w1 io.Writer,
 	wf FormatWriterFunc[T],
 ) func(*T) error {
+
+	w := bufio.NewWriter(w1)
+
 	return func(e *T) (err error) {
+    //TODO modify flushing behavior based on w1 being a TTY
+		defer errors.Deferred(&err, w.Flush)
+
 		if _, err = wf(w, e); err != nil {
 			err = errors.Wrap(err)
 			return

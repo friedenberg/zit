@@ -1,8 +1,11 @@
 package typ_checked_out
 
-import "github.com/friedenberg/zit/src/echo/typ"
+import (
+	"github.com/friedenberg/zit/src/echo/typ"
+	"github.com/friedenberg/zit/src/foxtrot/cwd_files"
+)
 
 type Typ struct {
-	Path string
+	cwd_files.CwdTyp
 	typ.Typ
 }
