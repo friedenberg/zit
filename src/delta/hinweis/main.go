@@ -161,6 +161,16 @@ func (h *Hinweis) Set(v string) (err error) {
 	return
 }
 
+func (h *Hinweis) Reset(h1 *Hinweis) {
+	if h1 == nil {
+		h.Left = ""
+		h.Right = ""
+	} else {
+		h.Left = h1.Left
+		h.Right = h1.Right
+	}
+}
+
 func (h Hinweis) Sha() sha.Sha {
 	hash := sha256.New()
 	sr := strings.NewReader(h.inner.String())

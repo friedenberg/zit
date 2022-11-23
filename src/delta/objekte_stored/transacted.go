@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/objekte"
 )
 
-type Transacted[T any, T1 ObjektePtr[T], T2 Identifier[T2], T3 IdentifierPtr[T2]] struct {
+type Transacted[T Objekte, T1 ObjektePtr[T], T2 Identifier[T2], T3 IdentifierPtr[T2]] struct {
 	Named                 Named[T, T1, T2, T3]
 	Kopf, Mutter, Schwanz ts.Time
 	TransaktionIndex      int_value.IntValue

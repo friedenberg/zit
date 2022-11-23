@@ -179,7 +179,7 @@ func (c ZettelFromExternalAkte) zettelForAkte(
 		return
 	}
 
-	z.Named.Stored.Objekte.Reset()
+	z.Named.Stored.Objekte.Reset(nil)
 	z.Named.Stored.Objekte.Akte = akteWriter.Sha()
 
 	//TODO move to protozettel

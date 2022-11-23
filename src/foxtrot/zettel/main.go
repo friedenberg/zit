@@ -3,6 +3,7 @@ package zettel
 import (
 	"strings"
 
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/bezeichnung"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/etikett"
@@ -14,6 +15,10 @@ type Zettel struct {
 	Typ         typ.Kennung
 	Bezeichnung bezeichnung.Bezeichnung
 	Etiketten   etikett.Set
+}
+
+func (z Zettel) Gattung() gattung.Gattung {
+	return gattung.Zettel
 }
 
 // TODO-P2 figure out why this doesn't always work for `status`
@@ -54,11 +59,18 @@ func (z Zettel) IsEmpty() bool {
 }
 
 // TODO-P3 use reset with pointer pattern
-func (z *Zettel) Reset() {
-	z.Akte = sha.Sha{}
-	z.Typ = typ.Kennung{}
-	z.Bezeichnung = bezeichnung.Make("")
-	z.Etiketten = etikett.MakeSet()
+func (z *Zettel) Reset(z1 *Zettel) {
+	if z1 == nil {
+		z.Akte = sha.Sha{}
+		z.Typ = typ.Kennung{}
+		z.Bezeichnung = bezeichnung.Make("")
+		z.Etiketten = etikett.MakeSet()
+	} else {
+		z.Akte = z1.Akte
+		z.Typ = z1.Typ
+		z.Bezeichnung = z1.Bezeichnung
+		z.Etiketten = z1.Etiketten
+	}
 }
 
 func (z Zettel) Description() (d string) {
