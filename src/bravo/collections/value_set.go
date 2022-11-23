@@ -8,17 +8,13 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
-type ValueSet[T ProtoObjekte, T1 interface {
-	*T
-	ProtoObjektePointer
-}] struct {
+type ValueSet[T ValueElement, T1 ValueElementPtr[T]] struct {
 	setAlias[T]
 }
 
-func MakeValueSet[T ProtoObjekte, T1 interface {
-	*T
-	ProtoObjektePointer
-}](es ...T) (s ValueSet[T, T1]) {
+func MakeValueSet[T ValueElement, T1 ValueElementPtr[T]](
+	es ...T,
+) (s ValueSet[T, T1]) {
 	s.setAlias = setAlias[T]{
 		Set: MakeSet(
 			func(e T) string {
@@ -31,10 +27,9 @@ func MakeValueSet[T ProtoObjekte, T1 interface {
 	return
 }
 
-func MakeValueSetStrings[T ProtoObjekte, T1 interface {
-	*T
-	ProtoObjektePointer
-}](vs ...string) (s ValueSet[T, T1], err error) {
+func MakeValueSetStrings[T ValueElement, T1 ValueElementPtr[T]](
+	vs ...string,
+) (s ValueSet[T, T1], err error) {
 	es := make([]T, 0, len(vs))
 
 	for _, v := range vs {

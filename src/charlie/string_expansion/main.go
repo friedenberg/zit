@@ -14,9 +14,6 @@ func init() {
 	regexExpandTagsHyphens = regexp.MustCompile(`-`)
 }
 
-type Expander[T collections.ProtoObjekte, T1 interface {
-	*T
-	collections.ProtoObjektePointer
-}] interface {
+type Expander[T collections.ValueElement, T1 collections.ValueElementPtr[T]] interface {
 	Expand(string) collections.ValueSet[T, T1]
 }

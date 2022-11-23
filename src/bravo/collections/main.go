@@ -63,11 +63,12 @@ type MutableSetLike[T any] interface {
 //     \_/ \__,_|_|\__,_|\___| |____/ \___|\__|___/
 //
 
-type ProtoObjekte interface {
+type ValueElement interface {
 	fmt.Stringer
 }
 
-type ProtoObjektePointer interface {
+type ValueElementPtr[T any] interface {
+	*T
 	flag.Value
 }
 

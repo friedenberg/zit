@@ -6,17 +6,13 @@ import (
 	"github.com/friedenberg/zit/src/bravo/collections"
 )
 
-type expanderAll[T collections.ProtoObjekte, T1 interface {
-	*T
-	collections.ProtoObjektePointer
-}] struct {
+type expanderAll[T collections.ValueElement, T1 collections.ValueElementPtr[T]] struct {
 	delimiter *regexp.Regexp
 }
 
-func MakeExpanderAll[T collections.ProtoObjekte, T1 interface {
-	*T
-	collections.ProtoObjektePointer
-}](delimiter string) expanderAll[T, T1] {
+func MakeExpanderAll[T collections.ValueElement, T1 collections.ValueElementPtr[T]](
+	delimiter string,
+) expanderAll[T, T1] {
 	return expanderAll[T, T1]{
 		delimiter: regexp.MustCompile(delimiter),
 	}

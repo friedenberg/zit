@@ -11,17 +11,13 @@ type mutableSetAlias[T any] struct {
 	MutableSet[T]
 }
 
-type MutableValueSet[T ProtoObjekte, T1 interface {
-	*T
-	ProtoObjektePointer
-}] struct {
+type MutableValueSet[T ValueElement, T1 ValueElementPtr[T]] struct {
 	mutableSetAlias[T]
 }
 
-func MakeMutableValueSet[T ProtoObjekte, T1 interface {
-	*T
-	ProtoObjektePointer
-}](es ...T) (s MutableValueSet[T, T1]) {
+func MakeMutableValueSet[T ValueElement, T1 ValueElementPtr[T]](
+	es ...T,
+) (s MutableValueSet[T, T1]) {
 	s.mutableSetAlias = mutableSetAlias[T]{
 		MutableSet: MakeMutableSet(
 			func(e T) string {
@@ -34,10 +30,9 @@ func MakeMutableValueSet[T ProtoObjekte, T1 interface {
 	return
 }
 
-func MakeMutableValueSetStrings[T ProtoObjekte, T1 interface {
-	*T
-	ProtoObjektePointer
-}](vs ...string) (s MutableValueSet[T, T1], err error) {
+func MakeMutableValueSetStrings[T ValueElement, T1 ValueElementPtr[T]](
+	vs ...string,
+) (s MutableValueSet[T, T1], err error) {
 	es := make([]T, len(vs))
 
 	for i, v := range vs {
