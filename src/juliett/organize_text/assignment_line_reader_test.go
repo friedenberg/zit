@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/bravo/test_logz"
 	"github.com/friedenberg/zit/src/charlie/bezeichnung"
-	"github.com/friedenberg/zit/src/delta/etikett"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 )
 
@@ -59,7 +59,7 @@ func TestAssignmentLineReaderOneHeadingNoZettels(t1 *testing.T) {
 	}
 
 	{
-		expected := etikett.MakeSet(etikett.Etikett{Value: "wow"})
+		expected := kennung.MakeSet(kennung.Etikett{Value: "wow"})
 
 		if len(sub.root.children) < 1 {
 			t.Fatalf("expected exactly 1 child")
@@ -97,7 +97,7 @@ func TestAssignmentLineReader2Heading2Zettels(t *testing.T) {
 	}
 
 	{
-		expected := etikett.MakeSet(etikett.Etikett{Value: "wow"})
+		expected := kennung.MakeSet(kennung.Etikett{Value: "wow"})
 		actual := sub.root.children[0].etiketten
 
 		if !actual.Equals(expected) {
@@ -151,7 +151,7 @@ func TestAssignmentLineReader1_1Heading2_2Zettels(t1 *testing.T) {
 	}
 
 	{
-		expected := etikett.MakeSet(etikett.Etikett{Value: "wow"})
+		expected := kennung.MakeSet(kennung.Etikett{Value: "wow"})
 		actual := sub.root.children[0].etiketten
 
 		if !actual.Equals(expected) {
@@ -160,7 +160,7 @@ func TestAssignmentLineReader1_1Heading2_2Zettels(t1 *testing.T) {
 	}
 
 	{
-		expected := etikett.MakeSet(etikett.Etikett{Value: "sub-wow"})
+		expected := kennung.MakeSet(kennung.Etikett{Value: "sub-wow"})
 
 		if sub.root != sub.root.children[0].parent {
 			t.Fatalf("%v, %v", sub.root, sub.root.children[0].parent)
@@ -233,7 +233,7 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 	}
 
 	{
-		expected := etikett.MakeSet(etikett.Etikett{Value: "wow"})
+		expected := kennung.MakeSet(kennung.Etikett{Value: "wow"})
 		actual := sub.root.children[0].etiketten
 
 		if !actual.Equals(expected) {
@@ -242,7 +242,7 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 	}
 
 	{
-		expected := etikett.MakeSet(etikett.Etikett{Value: "sub-wow"})
+		expected := kennung.MakeSet(kennung.Etikett{Value: "sub-wow"})
 
 		l := len(sub.root.children[0].children)
 		if l != 1 {
@@ -257,7 +257,7 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 	}
 
 	{
-		expected := etikett.MakeSet(etikett.Etikett{Value: "cow"})
+		expected := kennung.MakeSet(kennung.Etikett{Value: "cow"})
 		actual := sub.root.children[1].etiketten
 
 		if !actual.Equals(expected) {
@@ -337,7 +337,7 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 	}
 
 	{
-		expected := etikett.MakeSet(etikett.Etikett{Value: "sub-wow"})
+		expected := kennung.MakeSet(kennung.Etikett{Value: "sub-wow"})
 		actual := sub.root.children[0].etiketten
 
 		if !actual.Equals(expected) {
@@ -346,7 +346,7 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 	}
 
 	{
-		expected := etikett.MakeSet(etikett.Etikett{Value: "sub-cow"})
+		expected := kennung.MakeSet(kennung.Etikett{Value: "sub-cow"})
 
 		l := len(sub.root.children)
 		expLen := 2
@@ -432,7 +432,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 
 	// `# task
 	{
-		expected := etikett.MakeSet(etikett.Etikett{Value: "task"})
+		expected := kennung.MakeSet(kennung.Etikett{Value: "task"})
 		actual := sub.root.children[0].etiketten
 
 		if !actual.Equals(expected) {
@@ -463,7 +463,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 
 	// ## priority-1
 	{
-		expected := etikett.MakeSet(etikett.Etikett{Value: "priority-1"})
+		expected := kennung.MakeSet(kennung.Etikett{Value: "priority-1"})
 
 		e := 2
 		l := len(sub.root.children[0].children)
@@ -480,7 +480,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 
 	// ### w-2022-07-09
 	{
-		expected := etikett.MakeSet(etikett.Etikett{Value: "w-2022-07-09"})
+		expected := kennung.MakeSet(kennung.Etikett{Value: "w-2022-07-09"})
 		actual := sub.root.children[0].children[0].children[0].etiketten
 
 		if !actual.Equals(expected) {

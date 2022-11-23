@@ -5,8 +5,8 @@ import (
 
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/bezeichnung"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/echo/typ"
 )
 
@@ -14,7 +14,7 @@ type Zettel struct {
 	Akte        sha.Sha
 	Typ         typ.Kennung
 	Bezeichnung bezeichnung.Bezeichnung
-	Etiketten   etikett.Set
+	Etiketten   kennung.Set
 }
 
 func (z Zettel) Gattung() gattung.Gattung {
@@ -64,7 +64,7 @@ func (z *Zettel) Reset(z1 *Zettel) {
 		z.Akte = sha.Sha{}
 		z.Typ = typ.Kennung{}
 		z.Bezeichnung = bezeichnung.Make("")
-		z.Etiketten = etikett.MakeSet()
+		z.Etiketten = kennung.MakeSet()
 	} else {
 		z.Akte = z1.Akte
 		z.Typ = z1.Typ

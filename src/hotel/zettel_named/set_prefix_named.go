@@ -2,10 +2,10 @@ package zettel_named
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/delta/etikett"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 )
 
-type SetPrefixNamed map[etikett.Etikett]MutableSet
+type SetPrefixNamed map[kennung.Etikett]MutableSet
 
 type SetPrefixNamedSegments struct {
 	Ungrouped MutableSet
@@ -19,14 +19,14 @@ func NewSetPrefixNamed() *SetPrefixNamed {
 
 // this splits on right-expanded
 func (s *SetPrefixNamed) Add(z Zettel) {
-	es := etikett.Expanded(z.Stored.Objekte.Etiketten, etikett.ExpanderRight)
+	es := kennung.Expanded(z.Stored.Objekte.Etiketten, kennung.ExpanderEtikettRight)
 
 	for _, e := range es.Elements() {
 		s.addPair(e, z)
 	}
 }
 
-func (s *SetPrefixNamed) addPair(e etikett.Etikett, z Zettel) {
+func (s *SetPrefixNamed) addPair(e kennung.Etikett, z Zettel) {
 	existing, ok := (*s)[e]
 
 	if !ok {
@@ -40,14 +40,14 @@ func (s *SetPrefixNamed) addPair(e etikett.Etikett, z Zettel) {
 // for all of the zettels, check for intersections with the passed in
 // etikett, and if there is a prefix match, group it out the output set segments
 // appropriately
-func (a SetPrefixNamed) Subset(e etikett.Etikett) (out SetPrefixNamedSegments) {
+func (a SetPrefixNamed) Subset(e kennung.Etikett) (out SetPrefixNamedSegments) {
 	out.Ungrouped = MakeMutableSet()
 	out.Grouped = NewSetPrefixNamed()
 
 	for e1, zSet := range a {
 		zSet.Each(
 			func(z *Zettel) (err error) {
-				intersection := z.Stored.Objekte.Etiketten.IntersectPrefixes(etikett.MakeSet(e))
+				intersection := z.Stored.Objekte.Etiketten.IntersectPrefixes(kennung.MakeSet(e))
 				errors.Printf("%s yields %s", e1, intersection)
 
 				if intersection.Len() > 0 {

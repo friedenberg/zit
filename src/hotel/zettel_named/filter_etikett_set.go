@@ -1,12 +1,12 @@
 package zettel_named
 
 import (
-	"github.com/friedenberg/zit/src/delta/etikett"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 )
 
 type FilterEtikettSet struct {
 	Or bool
-	etikett.Set
+	kennung.Set
 }
 
 func (f FilterEtikettSet) IncludeNamedZettel(z Zettel) (ok bool) {

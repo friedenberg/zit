@@ -7,8 +7,8 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -16,7 +16,7 @@ import (
 
 type CheckinAkte struct {
 	Delete       bool
-	NewEtiketten etikett.Set
+	NewEtiketten kennung.Set
 }
 
 func init() {
@@ -24,7 +24,7 @@ func init() {
 		"checkin-akte",
 		func(f *flag.FlagSet) Command {
 			c := &CheckinAkte{
-				NewEtiketten: etikett.MakeSet(),
+				NewEtiketten: kennung.MakeSet(),
 			}
 
 			f.BoolVar(&c.Delete, "delete", false, "the checked-out file")

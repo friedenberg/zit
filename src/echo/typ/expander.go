@@ -1,6 +1,6 @@
 package typ
 
-import kennung "github.com/friedenberg/zit/src/charlie/kennung"
+import "github.com/friedenberg/zit/src/charlie/kennung"
 
 type Expander = kennung.Expander[Kennung, *Kennung]
 

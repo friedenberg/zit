@@ -4,12 +4,12 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/delta/etikett"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 )
 
 type SetPrefixTransacted struct {
 	count    int
-	innerMap map[etikett.Etikett]MutableSet
+	innerMap map[kennung.Etikett]MutableSet
 }
 
 type SetPrefixTransactedSegments struct {
@@ -18,7 +18,7 @@ type SetPrefixTransactedSegments struct {
 }
 
 func MakeSetPrefixTransacted(c int) (s SetPrefixTransacted) {
-	s.innerMap = make(map[etikett.Etikett]MutableSet, c)
+	s.innerMap = make(map[kennung.Etikett]MutableSet, c)
 	return s
 }
 
@@ -28,10 +28,10 @@ func (s SetPrefixTransacted) Len() int {
 
 // this splits on right-expanded
 func (s *SetPrefixTransacted) Add(z Zettel) {
-	es := etikett.Expanded(z.Named.Stored.Objekte.Etiketten, etikett.ExpanderRight)
+	es := kennung.Expanded(z.Named.Stored.Objekte.Etiketten, kennung.ExpanderEtikettRight)
 
 	if es.Len() == 0 {
-		es = etikett.MakeSet(etikett.Etikett{})
+		es = kennung.MakeSet(kennung.Etikett{})
 	}
 
 	for _, e := range es.Elements() {
@@ -59,7 +59,7 @@ func (a SetPrefixTransacted) Subtract(b MutableSet) (c SetPrefixTransacted) {
 	return
 }
 
-func (s *SetPrefixTransacted) addPair(e etikett.Etikett, z Zettel) {
+func (s *SetPrefixTransacted) addPair(e kennung.Etikett, z Zettel) {
 	s.count += 1
 
 	existing, ok := s.innerMap[e]
@@ -72,7 +72,7 @@ func (s *SetPrefixTransacted) addPair(e etikett.Etikett, z Zettel) {
 	s.innerMap[e] = existing
 }
 
-func (a SetPrefixTransacted) Each(f func(etikett.Etikett, MutableSet) error) (err error) {
+func (a SetPrefixTransacted) Each(f func(kennung.Etikett, MutableSet) error) (err error) {
 	for e, ssz := range a.innerMap {
 		if err = f(e, ssz); err != nil {
 			if errors.Is(err, io.EOF) {
@@ -88,9 +88,9 @@ func (a SetPrefixTransacted) Each(f func(etikett.Etikett, MutableSet) error) (er
 	return
 }
 
-func (a SetPrefixTransacted) EachZettel(f func(etikett.Etikett, Zettel) error) error {
+func (a SetPrefixTransacted) EachZettel(f func(kennung.Etikett, Zettel) error) error {
 	return a.Each(
-		func(e etikett.Etikett, st MutableSet) (err error) {
+		func(e kennung.Etikett, st MutableSet) (err error) {
 			st.Each(
 				func(z *Zettel) (err error) {
 					err = f(e, *z)
@@ -106,7 +106,7 @@ func (a SetPrefixTransacted) EachZettel(f func(etikett.Etikett, Zettel) error) e
 // for all of the zettels, check for intersections with the passed in
 // etikett, and if there is a prefix match, group it out the output set segments
 // appropriately
-func (a SetPrefixTransacted) Subset(e etikett.Etikett) (out SetPrefixTransactedSegments) {
+func (a SetPrefixTransacted) Subset(e kennung.Etikett) (out SetPrefixTransactedSegments) {
 	out.Ungrouped = MakeMutableSetUnique(len(a.innerMap))
 	out.Grouped = MakeSetPrefixTransacted(len(a.innerMap))
 
@@ -117,7 +117,7 @@ func (a SetPrefixTransacted) Subset(e etikett.Etikett) (out SetPrefixTransactedS
 
 		zSet.Each(
 			func(z *Zettel) (err error) {
-				intersection := z.Named.Stored.Objekte.Etiketten.IntersectPrefixes(etikett.MakeSet(e))
+				intersection := z.Named.Stored.Objekte.Etiketten.IntersectPrefixes(kennung.MakeSet(e))
 				errors.Printf("%s yields %s", e1, intersection)
 
 				if intersection.Len() > 0 {

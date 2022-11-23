@@ -9,11 +9,13 @@ renamed_pkg="$(basename "$renamed")"
 
 gofmt -w -r "$original_pkg.E -> $renamed_pkg.E" ./
 gofmt -w -r "$original_pkg -> $renamed_pkg" ./
-goimports -w ./
 
 mkdir -p "$(dirname "$renamed")"
 
-git mv "$original" "$renamed" || mv "$original" "$renamed"
+find "$original" -type f -exec \
+  git mv {} "$renamed/" \|\| mv {} "$renamed/" \;
+
+# git mv "$original" "$renamed" || mv "$original" "$renamed"
 
 declare -r sed_script="
   s|$prefix/$original|$prefix/$renamed|g;
@@ -22,3 +24,6 @@ declare -r sed_script="
 
 ag "$prefix/$original" -l0 |
 	xargs -0 sed -i '' "$sed_script"
+
+./bin/fix_redundant_import_alisas.bash
+goimports -w ./

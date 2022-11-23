@@ -4,7 +4,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/bravo/collections"
-	"github.com/friedenberg/zit/src/delta/etikett"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 )
 
@@ -33,7 +33,7 @@ func (p Pool) MakeZettel(
 ) (z *Zettel) {
 	z = p.Get()
 	z.Transacted = tz
-	z.EtikettenExpandedSorted = etikett.Expanded(tz.Named.Stored.Objekte.Etiketten).SortedString()
+	z.EtikettenExpandedSorted = kennung.Expanded(tz.Named.Stored.Objekte.Etiketten).SortedString()
 	z.EtikettenSorted = tz.Named.Stored.Objekte.Etiketten.SortedString()
 
 	return

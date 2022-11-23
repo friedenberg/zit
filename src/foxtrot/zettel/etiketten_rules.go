@@ -4,13 +4,13 @@ import (
 	"sort"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/delta/etikett"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/delta/konfig"
 )
 
 // TODO-P2 move this to somewhere more appropriate
 func (z *Zettel) ApplyKonfig(k konfig.Konfig) (err error) {
-	normalized := etikett.WithRemovedCommonPrefixes(z.Etiketten)
+	normalized := kennung.WithRemovedCommonPrefixes(z.Etiketten)
 	z.Etiketten = normalized
 
 	tk := k.Compiled.GetTyp(z.Typ.String())
@@ -20,7 +20,7 @@ func (z *Zettel) ApplyKonfig(k konfig.Konfig) (err error) {
 	}
 
 	for e, r := range tk.EtikettenRules {
-		e1 := etikett.Make(e)
+		e1 := kennung.Make(e)
 
 		if err = z.applyGoldenChild(e1, r.GoldenChild); err != nil {
 			err = errors.Wrap(err)
@@ -32,7 +32,7 @@ func (z *Zettel) ApplyKonfig(k konfig.Konfig) (err error) {
 }
 
 func (z *Zettel) applyGoldenChild(
-	e etikett.Etikett,
+	e kennung.Etikett,
 	mode konfig.EtikettRuleGoldenChild,
 ) (err error) {
 	if z.Etiketten.Len() == 0 {
@@ -46,7 +46,7 @@ func (z *Zettel) applyGoldenChild(
 
 	mes := z.Etiketten.MutableCopy()
 
-	prefixes := etikett.Withdraw(mes, e).Elements()
+	prefixes := kennung.Withdraw(mes, e).Elements()
 
 	if len(prefixes) == 0 {
 		return

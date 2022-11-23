@@ -7,7 +7,7 @@ import (
 	"math/rand"
 	"time"
 
-	coordinates "github.com/friedenberg/zit/src/alfa/coordinates"
+	"github.com/friedenberg/zit/src/alfa/coordinates"
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/hinweisen"

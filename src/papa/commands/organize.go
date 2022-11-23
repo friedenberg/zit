@@ -10,8 +10,8 @@ import (
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/charlie/script_value"
-	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/ts"
 	"github.com/friedenberg/zit/src/echo/typ"
@@ -94,9 +94,9 @@ func init() {
 func (c Organize) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 	is = id_set.MakeProtoIdSet(
 		id_set.ProtoId{
-			MutableId: &etikett.Etikett{},
+			MutableId: &kennung.Etikett{},
 			Expand: func(v string) (out string, err error) {
-				var e etikett.Etikett
+				var e kennung.Etikett
 				e, err = u.StoreObjekten().ExpandEtikettString(v)
 				out = e.String()
 				return

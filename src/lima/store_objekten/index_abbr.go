@@ -6,9 +6,9 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/charlie/tridex"
-	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 )
@@ -134,7 +134,7 @@ func (i *indexAbbr) addZettelTransacted(zt zettel_transacted.Zettel) (err error)
 	i.indexAbbrEncodableTridexes.HinweisKopfen.Add(zt.Named.Kennung.Kopf())
 	i.indexAbbrEncodableTridexes.HinweisSchwanzen.Add(zt.Named.Kennung.Schwanz())
 
-	for _, e := range etikett.Expanded(zt.Named.Stored.Objekte.Etiketten, etikett.ExpanderRight).Elements() {
+	for _, e := range kennung.Expanded(zt.Named.Stored.Objekte.Etiketten, kennung.ExpanderEtikettRight).Elements() {
 		i.indexAbbrEncodableTridexes.Etiketten.Add(e.String())
 	}
 
@@ -228,10 +228,10 @@ func (i *indexAbbr) ExpandHinweis(hAbbr hinweis.Hinweis) (h hinweis.Hinweis, err
 	return
 }
 
-func (i *indexAbbr) ExpandEtikettString(s string) (e etikett.Etikett, err error) {
+func (i *indexAbbr) ExpandEtikettString(s string) (e kennung.Etikett, err error) {
 	errors.Print(s)
 
-	if e = etikett.Make(s); err != nil {
+	if e = kennung.Make(s); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -239,7 +239,7 @@ func (i *indexAbbr) ExpandEtikettString(s string) (e etikett.Etikett, err error)
 	return i.ExpandEtikett(e)
 }
 
-func (i *indexAbbr) ExpandEtikett(eAbbr etikett.Etikett) (e etikett.Etikett, err error) {
+func (i *indexAbbr) ExpandEtikett(eAbbr kennung.Etikett) (e kennung.Etikett, err error) {
 	errors.Print(eAbbr)
 
 	if err = i.readIfNecessary(); err != nil {

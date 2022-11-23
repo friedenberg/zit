@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/alfred"
-	"github.com/friedenberg/zit/src/delta/etikett"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
 )
@@ -38,7 +38,7 @@ func (w *Writer) WriteZettelVerzeichnisse(z *zettel_verzeichnisse.Zettel) (err e
 	return
 }
 
-func (w *Writer) WriteEtikett(e etikett.Etikett) (n int, err error) {
+func (w *Writer) WriteEtikett(e kennung.Etikett) (n int, err error) {
 	item := w.etikettToItem(e)
 	w.alfredWriter.WriteItem(item)
 	return

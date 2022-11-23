@@ -5,11 +5,11 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/delta/etikett"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 )
 
 // TODO-P3 make generic
-type SetKeyToEtiketten map[string]etikett.MutableSet
+type SetKeyToEtiketten map[string]kennung.MutableSet
 
 func (m SetKeyToEtiketten) String() string {
 	sb := &strings.Builder{}
@@ -21,20 +21,20 @@ func (m SetKeyToEtiketten) String() string {
 	return sb.String()
 }
 
-func (m SetKeyToEtiketten) Add(h string, e etikett.Etikett) {
-	var es etikett.MutableSet
+func (m SetKeyToEtiketten) Add(h string, e kennung.Etikett) {
+	var es kennung.MutableSet
 	ok := false
 
 	if es, ok = m[h]; !ok {
-		es = etikett.MakeMutableSet()
+		es = kennung.MakeMutableSet()
 	}
 
-	etikett.AddNormalized(es, e)
+	kennung.AddNormalized(es, e)
 	m[h] = es
 }
 
-func (m SetKeyToEtiketten) Contains(h string, e etikett.Etikett) (ok bool) {
-	var es etikett.MutableSet
+func (m SetKeyToEtiketten) Contains(h string, e kennung.Etikett) (ok bool) {
+	var es kennung.MutableSet
 
 	if es, ok = m[h]; !ok {
 		return
@@ -58,7 +58,7 @@ func (in *Text) ToCompareMap() (out CompareMap, err error) {
 		Unnamed: make(SetKeyToEtiketten),
 	}
 
-	if err = in.assignment.addToCompareMap(in.Metadatei, etikett.MakeSet(), &out); err != nil {
+	if err = in.assignment.addToCompareMap(in.Metadatei, kennung.MakeSet(), &out); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -66,10 +66,10 @@ func (in *Text) ToCompareMap() (out CompareMap, err error) {
 	return
 }
 
-func (a *assignment) addToCompareMap(m Metadatei, es etikett.Set, out *CompareMap) (err error) {
+func (a *assignment) addToCompareMap(m Metadatei, es kennung.Set, out *CompareMap) (err error) {
 	mes := es.MutableCopy()
 
-	var es1 etikett.Set
+	var es1 kennung.Set
 
 	if es1, err = a.expandedEtiketten(); err != nil {
 		err = errors.Wrap(err)

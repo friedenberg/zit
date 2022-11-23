@@ -4,7 +4,7 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/delta/etikett"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/ts"
 	"github.com/friedenberg/zit/src/echo/typ"
@@ -54,7 +54,7 @@ func (c Checkout) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 		// 	MutableId: &sha.Sha{},
 		// },
 		id_set.ProtoId{
-			MutableId: &etikett.Etikett{},
+			MutableId: &kennung.Etikett{},
 		},
 		id_set.ProtoId{
 			MutableId: &typ.Kennung{},

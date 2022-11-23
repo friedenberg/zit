@@ -2,7 +2,7 @@ package user_ops
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/delta/etikett"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/hotel/zettel_named"
@@ -64,7 +64,7 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 		return
 	}
 
-	addEtikettToZettel := func(hString string, e etikett.Etikett) (err error) {
+	addEtikettToZettel := func(hString string, e kennung.Etikett) (err error) {
 		var z zettel_named.Zettel
 
 		if z, err = addOrGetToZettelToUpdate(hString); err != nil {
@@ -82,7 +82,7 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 		return
 	}
 
-	removeEtikettFromZettel := func(hString string, e etikett.Etikett) (err error) {
+	removeEtikettFromZettel := func(hString string, e kennung.Etikett) (err error) {
 		var z zettel_named.Zettel
 
 		if z, err = addOrGetToZettelToUpdate(hString); err != nil {
@@ -102,7 +102,7 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 	}
 
 	for _, c := range cs.Removed {
-		var e etikett.Etikett
+		var e kennung.Etikett
 
 		if err = e.Set(c.Etikett); err != nil {
 			err = errors.Wrap(err)
@@ -116,7 +116,7 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 	}
 
 	for _, c := range cs.Added {
-		var e etikett.Etikett
+		var e kennung.Etikett
 
 		if err = e.Set(c.Etikett); err != nil {
 			err = errors.Wrap(err)

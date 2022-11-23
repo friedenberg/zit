@@ -4,7 +4,7 @@ import (
 	"sort"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/delta/etikett"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 )
 
 type Refiner struct {
@@ -111,7 +111,7 @@ func (atc *Refiner) renameForPrefixJoint(a *assignment) (err error) {
 		return
 	}
 
-	a.etiketten = etikett.MakeSet(a.etiketten.Any().LeftSubtract(a.parent.etiketten.Any()))
+	a.etiketten = kennung.MakeSet(a.etiketten.Any().LeftSubtract(a.parent.etiketten.Any()))
 
 	return
 }
@@ -198,7 +198,7 @@ func (atc Refiner) applyPrefixJoints(a *assignment) (err error) {
 		na = a
 	} else {
 		na = newAssignment(a.Depth() + 1)
-		na.etiketten = etikett.MakeSet(groupingPrefix.Etikett)
+		na.etiketten = kennung.MakeSet(groupingPrefix.Etikett)
 		a.addChild(na)
 	}
 
@@ -212,19 +212,19 @@ func (atc Refiner) applyPrefixJoints(a *assignment) (err error) {
 			na.addChild(c)
 		}
 
-		c.etiketten = etikett.SubtractPrefix(c.etiketten, groupingPrefix.Etikett)
+		c.etiketten = kennung.SubtractPrefix(c.etiketten, groupingPrefix.Etikett)
 	}
 
 	return
 }
 
 type etikettBag struct {
-	etikett.Etikett
+	kennung.Etikett
 	assignments []*assignment
 }
 
 func (a Refiner) childPrefixes(node *assignment) (out []etikettBag) {
-	m := make(map[etikett.Etikett][]*assignment)
+	m := make(map[kennung.Etikett][]*assignment)
 	out = make([]etikettBag, 0, len(node.children))
 
 	if node.etiketten.Len() == 0 {
@@ -232,10 +232,10 @@ func (a Refiner) childPrefixes(node *assignment) (out []etikettBag) {
 	}
 
 	for _, c := range node.children {
-		expanded := etikett.Expanded(c.etiketten, etikett.ExpanderRight)
+		expanded := kennung.Expanded(c.etiketten, kennung.ExpanderEtikettRight)
 
 		expanded.Each(
-			func(e etikett.Etikett) (err error) {
+			func(e kennung.Etikett) (err error) {
 				if e.String() == "" {
 					return
 				}

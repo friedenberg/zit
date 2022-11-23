@@ -3,8 +3,8 @@ package id_set
 import (
 	"fmt"
 
+	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/id"
 	"github.com/friedenberg/zit/src/delta/konfig"
@@ -14,7 +14,7 @@ import (
 
 type Set struct {
 	shas       sha.MutableSet
-	etiketten  etikett.MutableSet
+	etiketten  kennung.MutableSet
 	hinweisen  hinweis.MutableSet
 	typen      typ.MutableSet
 	timestamps ts.MutableSet
@@ -25,7 +25,7 @@ type Set struct {
 func Make(c int) Set {
 	return Set{
 		shas:       sha.MakeMutableSet(),
-		etiketten:  etikett.MakeMutableSet(),
+		etiketten:  kennung.MakeMutableSet(),
 		hinweisen:  hinweis.MakeMutableSet(),
 		typen:      typ.MakeMutableSet(),
 		timestamps: ts.MakeMutableSet(),
@@ -36,7 +36,7 @@ func Make(c int) Set {
 func (s *Set) Add(ids ...id.Id) {
 	for _, i := range ids {
 		switch it := i.(type) {
-		case etikett.Etikett:
+		case kennung.Etikett:
 			s.etiketten.Add(it)
 
 		case sha.Sha:
@@ -119,7 +119,7 @@ func (s Set) AnyShasOrHinweisen() (ids []id.IdMitKorper) {
 	return
 }
 
-func (s Set) Etiketten() (etiketten etikett.Set) {
+func (s Set) Etiketten() (etiketten kennung.Set) {
 	etiketten = s.etiketten.Copy()
 
 	return

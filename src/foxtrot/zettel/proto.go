@@ -4,20 +4,20 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/charlie/bezeichnung"
-	"github.com/friedenberg/zit/src/delta/etikett"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/echo/typ"
 )
 
 type ProtoZettel struct {
 	Typ         typ.Kennung
 	Bezeichnung bezeichnung.Bezeichnung
-	Etiketten   etikett.Set
+	Etiketten   kennung.Set
 }
 
 func MakeProtoZettel() ProtoZettel {
 	return ProtoZettel{
 		//TODO-P2: use konfig to create correct default Typ
-		Etiketten: etikett.MakeSet(),
+		Etiketten: kennung.MakeSet(),
 	}
 }
 
@@ -49,7 +49,7 @@ func (pz ProtoZettel) Equals(z Zettel) (ok bool) {
 
 func (pz ProtoZettel) Make() (z *Zettel) {
 	z = &Zettel{
-		Etiketten: etikett.MakeSet(),
+		Etiketten: kennung.MakeSet(),
 	}
 
 	pz.Apply(z)

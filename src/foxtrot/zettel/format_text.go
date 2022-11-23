@@ -6,7 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/delta/etikett"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/delta/metadatei_io"
 )
 
@@ -23,7 +23,7 @@ func (f Text) ReadFrom(c *FormatContextRead) (n int64, err error) {
 	state := &textStateRead{
 		textStateReadMetadatei: textStateReadMetadatei{
 			Zettel:    &Zettel{},
-			etiketten: etikett.MakeMutableSet(),
+			etiketten: kennung.MakeMutableSet(),
 		},
 		context: c,
 	}

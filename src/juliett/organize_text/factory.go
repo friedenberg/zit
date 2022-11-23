@@ -4,7 +4,7 @@ import (
 	"sort"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/delta/etikett"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 )
 
@@ -27,14 +27,14 @@ func (atc *Factory) Make() (ot *Text, err error) {
 
 	for _, e := range atc.ExtraEtiketten.Elements() {
 		ee := newAssignment(ot.Depth() + 1)
-		ee.etiketten = etikett.MakeSet(e)
+		ee.etiketten = kennung.MakeSet(e)
 		ot.assignment.addChild(ee)
 
 		segments := prefixSet.Subset(e)
 
 		var used zettel_transacted.MutableSet
 
-		if used, err = atc.makeChildren(ee, segments.Grouped, etikett.MakeSlice(e)); err != nil {
+		if used, err = atc.makeChildren(ee, segments.Grouped, kennung.MakeSlice(e)); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -58,7 +58,7 @@ func (atc *Factory) Make() (ot *Text, err error) {
 func (atc Factory) makeChildren(
 	parent *assignment,
 	prefixSet zettel_transacted.SetPrefixTransacted,
-	groupingEtiketten etikett.Slice,
+	groupingEtiketten kennung.Slice,
 ) (used zettel_transacted.MutableSet, err error) {
 	used = zettel_transacted.MakeMutableSetUnique(0)
 
@@ -66,7 +66,7 @@ func (atc Factory) makeChildren(
 		prefixSet.ToSet().Each(used.Add)
 
 		err = prefixSet.EachZettel(
-			func(e etikett.Etikett, tz zettel_transacted.Zettel) (err error) {
+			func(e kennung.Etikett, tz zettel_transacted.Zettel) (err error) {
 				var z zettel
 
 				if z, err = makeZettel(tz.Named, atc.Abbr); err != nil {
@@ -110,11 +110,11 @@ func (atc Factory) makeChildren(
 	}
 
 	segments.Grouped.Each(
-		func(e etikett.Etikett, zs zettel_transacted.MutableSet) (err error) {
+		func(e kennung.Etikett, zs zettel_transacted.MutableSet) (err error) {
 			if atc.UsePrefixJoints {
 				if parent.etiketten.Len() > 1 {
 				} else {
-					prefixJoint := etikett.MakeSet(groupingEtiketten[0])
+					prefixJoint := kennung.MakeSet(groupingEtiketten[0])
 
 					var intermediate, lastChild *assignment
 
@@ -131,9 +131,9 @@ func (atc Factory) makeChildren(
 					}
 
 					child := newAssignment(intermediate.Depth() + 1)
-					child.etiketten = etikett.MakeSet(e.LeftSubtract(groupingEtiketten[0]))
+					child.etiketten = kennung.MakeSet(e.LeftSubtract(groupingEtiketten[0]))
 
-					nextGroupingEtiketten := etikett.MakeSlice()
+					nextGroupingEtiketten := kennung.MakeSlice()
 
 					if groupingEtiketten.Len() > 1 {
 						nextGroupingEtiketten = groupingEtiketten[1:]
@@ -154,9 +154,9 @@ func (atc Factory) makeChildren(
 				}
 			} else {
 				child := newAssignment(parent.Depth() + 1)
-				child.etiketten = etikett.MakeSet(e)
+				child.etiketten = kennung.MakeSet(e)
 
-				nextGroupingEtiketten := etikett.MakeSlice()
+				nextGroupingEtiketten := kennung.MakeSlice()
 
 				if groupingEtiketten.Len() > 1 {
 					nextGroupingEtiketten = groupingEtiketten[1:]

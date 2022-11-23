@@ -7,12 +7,12 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/line_format"
-	"github.com/friedenberg/zit/src/delta/etikett"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/echo/typ"
 )
 
 type Metadatei struct {
-	etikett.Set
+	kennung.Set
 	Typ typ.Kennung
 }
 
@@ -33,7 +33,7 @@ func (m Metadatei) HasMetadateiContent() bool {
 func (m *Metadatei) ReadFrom(r1 io.Reader) (n int64, err error) {
 	r := bufio.NewReader(r1)
 
-	mes := etikett.MakeMutableSet()
+	mes := kennung.MakeMutableSet()
 
 	for {
 		var rawLine, line string

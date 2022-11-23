@@ -5,14 +5,14 @@ import (
 
 	"github.com/friedenberg/zit/src/bravo/format"
 	"github.com/friedenberg/zit/src/charlie/bezeichnung"
-	"github.com/friedenberg/zit/src/delta/etikett"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/echo/typ"
 )
 
 // !typ "bez"
 func MakeCliFormat(
 	bf format.FormatWriterFunc[bezeichnung.Bezeichnung],
-	ef format.FormatWriterFunc[etikett.Set],
+	ef format.FormatWriterFunc[kennung.Set],
 	tf format.FormatWriterFunc[typ.Kennung],
 ) format.FormatWriterFunc[Zettel] {
 	return func(w io.Writer, z *Zettel) (n int64, err error) {

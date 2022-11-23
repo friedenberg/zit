@@ -3,7 +3,7 @@ package organize_text
 import (
 	"flag"
 
-	"github.com/friedenberg/zit/src/delta/etikett"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/konfig"
 	"github.com/friedenberg/zit/src/echo/typ"
@@ -14,10 +14,10 @@ type Options struct {
 	konfig.Konfig
 	hinweis.Abbr
 
-	RootEtiketten     etikett.Set
+	RootEtiketten     kennung.Set
 	Typ               typ.Kennung
-	GroupingEtiketten etikett.Slice
-	ExtraEtiketten    etikett.Set
+	GroupingEtiketten kennung.Slice
+	ExtraEtiketten    kennung.Set
 	Transacted        zettel_transacted.MutableSet
 
 	UsePrefixJoints        bool
@@ -31,9 +31,9 @@ type Options struct {
 func MakeOptions() Options {
 	return Options{
 		wasMade:           true,
-		RootEtiketten:     etikett.MakeSet(),
-		GroupingEtiketten: etikett.MakeSlice(),
-		ExtraEtiketten:    etikett.MakeSet(),
+		RootEtiketten:     kennung.MakeSet(),
+		GroupingEtiketten: kennung.MakeSlice(),
+		ExtraEtiketten:    kennung.MakeSet(),
 		Transacted:        zettel_transacted.MakeMutableSetHinweis(0),
 	}
 }

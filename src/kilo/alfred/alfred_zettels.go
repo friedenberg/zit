@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/bravo/alfred"
-	"github.com/friedenberg/zit/src/delta/etikett"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
 )
@@ -65,7 +65,7 @@ func (w *Writer) zettelToItem(z *zettel_verzeichnisse.Zettel, ha hinweis.Abbr) (
 	return
 }
 
-func (w *Writer) etikettToItem(e etikett.Etikett) (a *alfred.Item) {
+func (w *Writer) etikettToItem(e kennung.Etikett) (a *alfred.Item) {
 	a = w.alfredWriter.Get()
 
 	a.Title = "@" + e.String()

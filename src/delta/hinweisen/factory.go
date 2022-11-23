@@ -4,7 +4,7 @@ import (
 	"path"
 	"sync"
 
-	coordinates "github.com/friedenberg/zit/src/alfa/coordinates"
+	"github.com/friedenberg/zit/src/alfa/coordinates"
 	"github.com/friedenberg/zit/src/alfa/errors"
 )
 

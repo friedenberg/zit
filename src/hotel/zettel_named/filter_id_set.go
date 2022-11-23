@@ -3,7 +3,7 @@ package zettel_named
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/delta/etikett"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/id_set"
 )
 
@@ -27,7 +27,7 @@ func (f FilterIdSet) IncludeNamedZettel(z *Zettel) (ok bool) {
 	needsEt := f.Set.Etiketten().Len() > 0
 	okEt := false
 
-	expanded := etikett.Expanded(z.Stored.Objekte.Etiketten, etikett.ExpanderRight)
+	expanded := kennung.Expanded(z.Stored.Objekte.Etiketten, kennung.ExpanderEtikettRight)
 
 LOOP:
 	for _, e := range f.Set.Etiketten().Sorted() {

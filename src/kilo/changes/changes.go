@@ -4,7 +4,7 @@ import (
 	"sort"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/delta/etikett"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/juliett/organize_text"
 )
 
@@ -14,7 +14,7 @@ type Change struct {
 
 type New struct {
 	Key       string
-	Etiketten etikett.MutableSet
+	Etiketten kennung.MutableSet
 }
 
 type Changes struct {
@@ -27,7 +27,7 @@ type Changes struct {
 type changes struct {
 	Added   []Change
 	Removed []Change
-	New     map[string]etikett.MutableSet
+	New     map[string]kennung.MutableSet
 	AllB    []string
 }
 
@@ -89,13 +89,13 @@ func ChangesFrom(a1, b1 *organize_text.Text) (c1 Changes, err error) {
 		}
 	}
 
-	c.New = make(map[string]etikett.MutableSet)
+	c.New = make(map[string]kennung.MutableSet)
 
 	addNew := func(bez, ett string) {
 		existing, ok := c.New[bez]
 
 		if !ok {
-			existing = etikett.MakeMutableSet()
+			existing = kennung.MakeMutableSet()
 		}
 
 		existing.AddString(ett)

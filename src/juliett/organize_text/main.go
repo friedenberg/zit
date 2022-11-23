@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/line_format"
-	"github.com/friedenberg/zit/src/delta/etikett"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/delta/metadatei_io"
 )
 
@@ -38,7 +38,7 @@ func newWithoutMetadatei(options Options) (ot *Text, err error) {
 		Options:    options,
 		assignment: newAssignment(0),
 		Metadatei: Metadatei{
-			Set: etikett.MakeSet(),
+			Set: kennung.MakeSet(),
 		},
 	}
 

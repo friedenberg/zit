@@ -6,7 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/bravo/test_logz"
 	"github.com/friedenberg/zit/src/charlie/bezeichnung"
-	"github.com/friedenberg/zit/src/delta/etikett"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 )
 
 func TestMakeEtiketten(t1 *testing.T) {
@@ -18,10 +18,10 @@ func TestMakeEtiketten(t1 *testing.T) {
 		"tag3",
 	}
 
-	var sut etikett.Set
+	var sut kennung.Set
 	var err error
 
-	if sut, err = etikett.MakeSetStrings(vs...); err != nil {
+	if sut, err = kennung.MakeSetStrings(vs...); err != nil {
 		t.Fatalf("%s", err)
 	}
 

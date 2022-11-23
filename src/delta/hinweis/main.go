@@ -7,7 +7,7 @@ import (
 	"io"
 	"strings"
 
-	coordinates "github.com/friedenberg/zit/src/alfa/coordinates"
+	"github.com/friedenberg/zit/src/alfa/coordinates"
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/sha"
 )

@@ -5,7 +5,7 @@ import (
 	"io"
 	"os"
 
-	coordinates "github.com/friedenberg/zit/src/alfa/coordinates"
+	"github.com/friedenberg/zit/src/alfa/coordinates"
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
 )

@@ -3,12 +3,12 @@ package typ
 import (
 	"strings"
 
-	"github.com/friedenberg/zit/src/delta/etikett"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/delta/konfig"
 )
 
 type Kennung struct {
-	etikett.Etikett
+	kennung.Etikett
 }
 
 func (v *Kennung) Set(v1 string) (err error) {

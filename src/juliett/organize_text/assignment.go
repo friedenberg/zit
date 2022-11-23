@@ -5,13 +5,13 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/collections"
-	"github.com/friedenberg/zit/src/delta/etikett"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 )
 
 type assignment struct {
 	isRoot    bool
 	depth     int
-	etiketten etikett.Set
+	etiketten kennung.Set
 	named     collections.MutableValueSet[zettel, *zettel]
 	unnamed   collections.MutableValueSet[newZettel, *newZettel]
 	children  []*assignment
@@ -21,7 +21,7 @@ type assignment struct {
 func newAssignment(d int) *assignment {
 	return &assignment{
 		depth:     d,
-		etiketten: etikett.MakeSet(),
+		etiketten: kennung.MakeSet(),
 		named:     collections.MakeMutableValueSet[zettel](),
 		unnamed:   collections.MakeMutableValueSet[newZettel](),
 		children:  make([]*assignment, 0),
@@ -207,8 +207,8 @@ func (a *assignment) consume(b *assignment) (err error) {
 	return
 }
 
-func (a *assignment) expandedEtiketten() (es etikett.Set, err error) {
-	es = etikett.MakeSet()
+func (a *assignment) expandedEtiketten() (es kennung.Set, err error) {
+	es = kennung.MakeSet()
 
 	if a.etiketten.Len() != 1 || a.parent == nil {
 		es = a.etiketten.Copy()
@@ -217,7 +217,7 @@ func (a *assignment) expandedEtiketten() (es etikett.Set, err error) {
 		e := a.etiketten.Any()
 
 		if e.IsDependentLeaf() {
-			var pe etikett.Set
+			var pe kennung.Set
 
 			if pe, err = a.parent.expandedEtiketten(); err != nil {
 				err = errors.Wrap(err)
@@ -241,11 +241,11 @@ func (a *assignment) expandedEtiketten() (es etikett.Set, err error) {
 			}
 
 			errors.Print(e1, e)
-			e = etikett.Etikett{Value: fmt.Sprintf("%s%s", e1, e)}
+			e = kennung.Etikett{Value: fmt.Sprintf("%s%s", e1, e)}
 			errors.Print(e)
 		}
 
-		es = etikett.MakeSet(e)
+		es = kennung.MakeSet(e)
 	}
 
 	return

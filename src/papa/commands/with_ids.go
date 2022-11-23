@@ -5,8 +5,8 @@ import (
 	"syscall"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/ts"
 	"github.com/friedenberg/zit/src/echo/typ"
@@ -79,8 +79,8 @@ func (c commandWithIds) Complete(u *umwelt.Umwelt, args ...string) (err error) {
 		}()
 	}
 
-	if ps.Contains(&etikett.Etikett{}) {
-		var ea []etikett.Etikett
+	if ps.Contains(&kennung.Etikett{}) {
+		var ea []kennung.Etikett
 
 		if ea, err = u.StoreObjekten().Etiketten(); err != nil {
 			err = errors.Wrap(err)

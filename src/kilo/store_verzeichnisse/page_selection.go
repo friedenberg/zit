@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 )
@@ -23,7 +23,7 @@ func (i Zettelen) PageForTransacted(z zettel_transacted.Zettel) (n int, err erro
 	return i.PageForSha(s)
 }
 
-func (i Zettelen) PageForEtikett(e etikett.Etikett) (n int, err error) {
+func (i Zettelen) PageForEtikett(e kennung.Etikett) (n int, err error) {
 	//TODO does this actually work?
 	return i.PageForRune(rune(e.String()[0]))
 }

@@ -8,8 +8,8 @@ import (
 	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/collections_coding"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/ts"
 	"github.com/friedenberg/zit/src/echo/typ"
@@ -68,9 +68,9 @@ func (c Show) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 				},
 			},
 			id_set.ProtoId{
-				MutableId: &etikett.Etikett{},
+				MutableId: &kennung.Etikett{},
 				Expand: func(v string) (out string, err error) {
-					var e etikett.Etikett
+					var e kennung.Etikett
 					e, err = u.StoreObjekten().ExpandEtikettString(v)
 					out = e.String()
 					return

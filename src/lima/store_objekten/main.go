@@ -10,8 +10,8 @@ import (
 	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/age"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/hinweisen"
 	"github.com/friedenberg/zit/src/delta/id"
@@ -408,7 +408,7 @@ func (s *Store) CreateWithHinweis(
 	return
 }
 
-func (s Store) Etiketten() (es []etikett.Etikett, err error) {
+func (s Store) Etiketten() (es []kennung.Etikett, err error) {
 	return s.indexEtiketten.allEtiketten()
 }
 

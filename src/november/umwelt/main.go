@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/format"
 	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/charlie/file_lock"
-	"github.com/friedenberg/zit/src/delta/etikett"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/delta/konfig"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
@@ -181,8 +181,8 @@ func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 	return
 }
 
-func (u Umwelt) DefaultEtiketten() (etiketten etikett.Set, err error) {
-	metiketten := etikett.MakeMutableSet()
+func (u Umwelt) DefaultEtiketten() (etiketten kennung.Set, err error) {
+	metiketten := kennung.MakeMutableSet()
 
 	for e, t := range u.konfig.Tags {
 		if !t.AddToNewZettels {

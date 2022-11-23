@@ -9,8 +9,8 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/delta/etikett"
 )
 
 type textStateReadField int
@@ -74,7 +74,7 @@ type textStateWrite struct {
 
 type textStateReadMetadatei struct {
 	*Zettel
-	etiketten         etikett.MutableSet
+	etiketten         kennung.MutableSet
 	aktePath          string
 	recoverableErrors errors.Multi
 }

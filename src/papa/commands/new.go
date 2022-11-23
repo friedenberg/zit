@@ -5,8 +5,8 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/charlie/script_value"
-	"github.com/friedenberg/zit/src/delta/etikett"
 	"github.com/friedenberg/zit/src/foxtrot/cwd_files"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
@@ -138,7 +138,7 @@ func (c New) writeNewZettels(
 		},
 	}
 
-	var defaultEtiketten etikett.Set
+	var defaultEtiketten kennung.Set
 
 	if defaultEtiketten, err = u.DefaultEtiketten(); err != nil {
 		err = errors.Wrap(err)

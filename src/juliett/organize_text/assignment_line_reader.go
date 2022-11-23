@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/delta/etikett"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 )
 
 type assignmentLineReader struct {
@@ -150,7 +150,7 @@ func (ar *assignmentLineReader) readOneHeading(l line) (err error) {
 		return
 	}
 
-	currentEtiketten := etikett.MakeSet()
+	currentEtiketten := kennung.MakeSet()
 
 	if l.value != "" {
 		if err = currentEtiketten.Set(l.value); err != nil {
@@ -201,7 +201,7 @@ func (ar *assignmentLineReader) readOneHeading(l line) (err error) {
 
 func (ar *assignmentLineReader) readOneHeadingLesserDepth(
 	d int,
-	e etikett.Set,
+	e kennung.Set,
 ) (newCurrent *assignment, err error) {
 	depthDiff := d - ar.currentAssignment.Depth()
 
@@ -239,7 +239,7 @@ func (ar *assignmentLineReader) readOneHeadingLesserDepth(
 
 func (ar *assignmentLineReader) readOneHeadingEqualDepth(
 	d int,
-	e etikett.Set,
+	e kennung.Set,
 ) (newCurrent *assignment, err error) {
 	// logz.Print("depth count is ==")
 
@@ -274,7 +274,7 @@ func (ar *assignmentLineReader) readOneHeadingEqualDepth(
 
 func (ar *assignmentLineReader) readOneHeadingGreaterDepth(
 	d int,
-	e etikett.Set,
+	e kennung.Set,
 ) (newCurrent *assignment, err error) {
 	// logz.Print("depth count is >")
 	// logz.Print(e)

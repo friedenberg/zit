@@ -7,20 +7,20 @@ import (
 	"sort"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/delta/etikett"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 )
 
 type indexEtiketten struct {
 	path string
 	ioFactory
-	etiketten  map[etikett.Etikett]int64
+	etiketten  map[kennung.Etikett]int64
 	didRead    bool
 	hasChanges bool
 }
 
 type row struct {
-	etikett.Etikett
+	kennung.Etikett
 	count int64
 }
 
@@ -31,7 +31,7 @@ func newIndexEtiketten(
 	i = &indexEtiketten{
 		path:      p,
 		ioFactory: f,
-		etiketten: make(map[etikett.Etikett]int64),
+		etiketten: make(map[kennung.Etikett]int64),
 	}
 
 	return
@@ -123,7 +123,7 @@ func (i *indexEtiketten) addZettelWithOptionalMutter(
 	zEtiketten := z.Named.Stored.Objekte.Etiketten
 
 	if zMutter != nil {
-		d := etikett.MakeSetDelta(
+		d := kennung.MakeSetDelta(
 			zMutter.Named.Stored.Objekte.Etiketten,
 			zEtiketten,
 		)
@@ -142,7 +142,7 @@ func (i *indexEtiketten) addZettelWithOptionalMutter(
 	return
 }
 
-func (i *indexEtiketten) processDelta(d etikett.Delta) (err error) {
+func (i *indexEtiketten) processDelta(d kennung.Delta) (err error) {
 	if err = i.add(d.Added); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -156,7 +156,7 @@ func (i *indexEtiketten) processDelta(d etikett.Delta) (err error) {
 	return
 }
 
-func (i *indexEtiketten) add(s etikett.Set) (err error) {
+func (i *indexEtiketten) add(s kennung.Set) (err error) {
 	if s.Len() == 0 {
 		errors.Print("no etiketten to add")
 		return
@@ -181,7 +181,7 @@ func (i *indexEtiketten) add(s etikett.Set) (err error) {
 	return
 }
 
-func (i *indexEtiketten) del(s etikett.Set) (err error) {
+func (i *indexEtiketten) del(s kennung.Set) (err error) {
 	if s.Len() == 0 {
 		errors.Print("no etiketten to delete")
 		return
@@ -216,13 +216,13 @@ func (i *indexEtiketten) del(s etikett.Set) (err error) {
 	return
 }
 
-func (i *indexEtiketten) allEtiketten() (es []etikett.Etikett, err error) {
+func (i *indexEtiketten) allEtiketten() (es []kennung.Etikett, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	es = make([]etikett.Etikett, len(i.etiketten))
+	es = make([]kennung.Etikett, len(i.etiketten))
 
 	n := 0
 
