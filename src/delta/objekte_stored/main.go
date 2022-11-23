@@ -18,7 +18,6 @@ type ObjektePtr[T any] interface {
 type Stored[T any, T1 ObjektePtr[T]] struct {
 	Sha     sha.Sha
 	Objekte T
-	// Zettel zettel.Zettel
 }
 
 func (s *Stored[T, T1]) Reset() {

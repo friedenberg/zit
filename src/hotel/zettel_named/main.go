@@ -10,4 +10,5 @@ type Zettel = objekte_stored.Named[
 	zettel.Zettel,
 	*zettel.Zettel,
 	hinweis.Hinweis,
+	*hinweis.Hinweis,
 ]
