@@ -1,6 +1,6 @@
 package hinweis
 
-func (a inner) Equals(b Hinweis) bool {
+func (a inner) Equals(b *Hinweis) bool {
 	if a.Left != b.Left {
 		return false
 	}

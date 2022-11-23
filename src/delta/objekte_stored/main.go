@@ -5,9 +5,13 @@ import (
 	"github.com/friedenberg/zit/src/charlie/sha"
 )
 
+type Equatable[T any] interface {
+	Equals(*T) bool
+}
+
 type ObjektePtr[T any] interface {
 	*T
-	Equals(*T) bool
+	Equatable[T]
 	Reset()
 }
 

@@ -603,7 +603,7 @@ func (s Store) AllInChain(h hinweis.Hinweis) (c []*zettel_transacted.Zettel, err
 
 	if err = s.verzeichnisseAll.ReadMany(
 		func(z *zettel_verzeichnisse.Zettel) (err error) {
-			if !z.Transacted.Named.Kennung.Equals(h) {
+			if !z.Transacted.Named.Kennung.Equals(&h) {
 				err = io.EOF
 				return
 			}
