@@ -2,11 +2,11 @@ package zettel_transacted
 
 import (
 	"github.com/friedenberg/zit/src/delta/hinweis"
-	"github.com/friedenberg/zit/src/delta/objekte_stored"
+	objekte "github.com/friedenberg/zit/src/delta/objekte"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 )
 
-type Zettel = objekte_stored.Transacted[
+type Zettel = objekte.Transacted[
 	zettel.Zettel,
 	*zettel.Zettel,
 	hinweis.Hinweis,

@@ -1,4 +1,4 @@
-package objekte_stored
+package objekte
 
 import (
 	"github.com/friedenberg/zit/src/bravo/collections"

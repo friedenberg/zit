@@ -6,7 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/bravo/test_logz"
 	"github.com/friedenberg/zit/src/delta/etikett"
-	test_metadatei_io "github.com/friedenberg/zit/src/delta/test_metadatei_io"
+	"github.com/friedenberg/zit/src/delta/test_metadatei_io"
 	"github.com/friedenberg/zit/src/echo/typ"
 )
 
