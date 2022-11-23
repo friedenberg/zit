@@ -28,9 +28,9 @@ func Now() Time {
 }
 
 func Tyme(t tyme.Time) Time {
-  return Time{
-    time: t,
-  }
+	return Time{
+		time: t,
+	}
 }
 
 func (t Time) String() string {

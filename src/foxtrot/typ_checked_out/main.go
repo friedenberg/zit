@@ -7,5 +7,5 @@ import (
 
 type Typ struct {
 	cwd_files.CwdTyp
-	typ.Typ
+	typ.Named
 }

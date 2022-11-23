@@ -14,7 +14,7 @@ func MakeCliFormat(
 	s standort.Standort,
 	cw format.FuncColorWriter,
 	sf format.FormatWriterFunc[sha.Sha],
-	tf format.FormatWriterFunc[typ.Typ],
+	tf format.FormatWriterFunc[typ.Named],
 ) format.FormatWriterFunc[Typ] {
 	return func(w io.Writer, t *Typ) (n int64, err error) {
 		return format.Write(
@@ -25,7 +25,7 @@ func MakeCliFormat(
 			format.MakeFormatString("@"),
 			format.MakeWriter(sf, &t.Akte.Sha),
 			format.MakeFormatString(" "),
-			format.MakeWriter(tf, &t.Typ),
+			format.MakeWriter(tf, &t.Named),
 			format.MakeFormatString("]"),
 		)
 	}

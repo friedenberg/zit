@@ -28,13 +28,12 @@ func (c *CwdFiles) tryTyp(fi os.FileInfo) (err error) {
 
 	if t, ok = c.Typen[pathMinusExt]; !ok {
 		t = &CwdTyp{
-			Named: typ.Typ{
+			Named: typ.Named{
 				Kennung: h,
 			},
 		}
 	}
 
-	//TODO populate FD with more data
 	t.FD = fd
 	c.Typen[h.String()] = t
 

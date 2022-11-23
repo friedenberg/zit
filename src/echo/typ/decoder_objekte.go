@@ -19,7 +19,7 @@ func MakeDecoderObjekte(in io.Reader) *DecoderObjekte {
 	}
 }
 
-func (f *DecoderObjekte) Decode(t *Typ) (n int64, err error) {
+func (f *DecoderObjekte) Decode(t *Named) (n int64, err error) {
 	r := bufio.NewReader(f.in)
 
 	for {

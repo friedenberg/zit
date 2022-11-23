@@ -15,23 +15,23 @@ import (
 // type storeTyp struct {
 // }
 
-func (s *Store) CheckinTyp(p string) (t *typ.Typ, err error) {
+func (s *Store) CheckinTyp(p string) (t *typ.Named, err error) {
 	return
 }
 
-func (s *Store) WriteTyp(t *typ.Typ) (tco *typ_checked_out.Typ, err error) {
+func (s *Store) WriteTyp(t *typ.Named) (tco *typ_checked_out.Typ, err error) {
 	tcwd := &cwd_files.CwdTyp{
 		FD: cwd_files.File{
 			Path: fmt.Sprintf("%s.%s", t.Kennung, s.Konfig.Compiled.TypFileExtension),
 		},
-		Named: typ.Typ{
+		Named: typ.Named{
 			Kennung: t.Kennung,
 		},
 	}
 
 	tco = &typ_checked_out.Typ{
 		CwdTyp: *tcwd,
-		Typ:    *t,
+		Named:  *t,
 	}
 
 	var f *os.File
@@ -71,12 +71,12 @@ func (s *Store) ReadTyp(ct *cwd_files.CwdTyp) (t *typ_checked_out.Typ, err error
 
 	t = &typ_checked_out.Typ{
 		CwdTyp: *ct,
-		Typ: typ.Typ{
+		Named: typ.Named{
 			Kennung: ct.Named.Kennung,
 		},
 	}
 
-	if _, err = format.ReadFormat(f, &t.Typ.Akte); err != nil {
+	if _, err = format.ReadFormat(f, &t.Named.Akte); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

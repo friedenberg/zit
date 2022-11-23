@@ -27,7 +27,7 @@ func FileInfo(fi os.FileInfo) FD {
 	}
 }
 
-//TODO move this somewhere that prevents redundant reading
+// TODO move this somewhere that prevents redundant reading
 func (fd *FD) Set(v string) (err error) {
 	fd.Path = v
 

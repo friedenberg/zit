@@ -24,8 +24,8 @@ func MakeKennungCliFormat(
 // !typ
 func MakeCliFormat(
 	cw format.FuncColorWriter,
-) format.FormatWriterFunc[Typ] {
-	return func(w io.Writer, t *Typ) (n int64, err error) {
+) format.FormatWriterFunc[Named] {
+	return func(w io.Writer, t *Named) (n int64, err error) {
 		v := t.Kennung.String()
 
 		return format.Write(

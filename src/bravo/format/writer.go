@@ -47,7 +47,7 @@ func MakeWriterToWithNewLines[T any](
 	w := bufio.NewWriter(w1)
 
 	return func(e *T) (err error) {
-    //TODO modify flushing behavior based on w1 being a TTY
+		//TODO modify flushing behavior based on w1 being a TTY
 		defer errors.Deferred(&err, w.Flush)
 
 		if _, err = wf(w, e); err != nil {

@@ -41,7 +41,7 @@ func (c EditTyp) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 	if err = typen.Each(
 		func(tk typ.Kennung) (err error) {
-			t := &typ.Typ{
+			t := &typ.Named{
 				Kennung: tk,
 			}
 

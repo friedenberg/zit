@@ -5,6 +5,6 @@ import (
 )
 
 type External struct {
-	Named Typ
+	Named Named
 	FD    fd.FD
 }

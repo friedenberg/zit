@@ -19,7 +19,7 @@ func MakeEncoderObjekte(out io.Writer) *EncoderObjekte {
 	}
 }
 
-func (f EncoderObjekte) Encode(t *Typ) (n int64, err error) {
+func (f EncoderObjekte) Encode(t *Named) (n int64, err error) {
 	w := line_format.NewWriter()
 
 	w.WriteFormat("%s", gattung.Typ)
