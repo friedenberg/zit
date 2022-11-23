@@ -121,7 +121,7 @@ func (s Store) storedZettelFromSha(sh sha.Sha) (sz zettel_stored.Stored, err err
 		return
 	}
 
-	sz.Zettel = c.Zettel
+	sz.Objekte = c.Zettel
 	sz.Sha = sh
 
 	return

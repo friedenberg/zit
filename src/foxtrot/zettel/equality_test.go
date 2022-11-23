@@ -73,7 +73,7 @@ func TestMakeEtiketten(t1 *testing.T) {
 func TestEqualitySelf(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-	text := Zettel{
+	text := &Zettel{
 		Bezeichnung: bezeichnung.Make("the title"),
 		Etiketten: makeEtiketten(t,
 			"tag1",
@@ -91,7 +91,7 @@ func TestEqualitySelf(t1 *testing.T) {
 func TestEqualityNotSelf(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-	text := Zettel{
+	text := &Zettel{
 		Bezeichnung: bezeichnung.Make("the title"),
 		Etiketten: makeEtiketten(t,
 			"tag1",
@@ -101,7 +101,7 @@ func TestEqualityNotSelf(t1 *testing.T) {
 		Typ: makeAkteExt(t, "text/plain"),
 	}
 
-	text1 := Zettel{
+	text1 := &Zettel{
 		Bezeichnung: bezeichnung.Make("the title"),
 		Etiketten: makeEtiketten(t,
 			"tag1",

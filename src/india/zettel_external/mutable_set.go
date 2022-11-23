@@ -48,11 +48,11 @@ func MakeMutableSetUniqueAkte(zs ...*Zettel) MutableSet {
 			return ""
 		}
 
-		if z.Named.Stored.Zettel.Akte.IsNull() {
+		if z.Named.Stored.Objekte.Akte.IsNull() {
 			return ""
 		}
 
-		return z.Named.Stored.Zettel.Akte.String()
+		return z.Named.Stored.Objekte.Akte.String()
 	}
 
 	return MakeMutableSet(kf, zs...)

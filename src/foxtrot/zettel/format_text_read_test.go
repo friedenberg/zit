@@ -23,7 +23,7 @@ func TestReadWithoutAkte(t1 *testing.T) {
 `,
 	)
 
-	expected := Zettel{
+	expected := &Zettel{
 		Bezeichnung: bezeichnung.Make("the title"),
 		Etiketten: makeEtiketten(t,
 			"tag1",
@@ -59,7 +59,7 @@ func TestReadWithoutAkteWithMultilineBezeichnung(t1 *testing.T) {
 `,
 	)
 
-	expected := Zettel{
+	expected := &Zettel{
 		Bezeichnung: bezeichnung.Make("the title continues"),
 		Etiketten: makeEtiketten(t,
 			"tag1",
@@ -96,7 +96,7 @@ the body
 `,
 	)
 
-	expected := Zettel{
+	expected := &Zettel{
 		Bezeichnung: bezeichnung.Make("the title"),
 		Etiketten: makeEtiketten(t,
 			"tag1",

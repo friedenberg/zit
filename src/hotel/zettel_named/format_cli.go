@@ -23,7 +23,7 @@ func MakeCliFormat(
 			format.MakeFormatString("@"),
 			format.MakeWriter(sf, &z.Stored.Sha),
 			format.MakeFormatString(" "),
-			format.MakeWriter(zf, &z.Stored.Zettel),
+			format.MakeWriter(zf, &z.Stored.Objekte),
 			format.MakeFormatString("]"),
 		)
 	}

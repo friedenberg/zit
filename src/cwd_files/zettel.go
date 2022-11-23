@@ -9,6 +9,11 @@ import (
 	"github.com/friedenberg/zit/src/delta/hinweis"
 )
 
+type CwdZettel struct {
+	hinweis.Hinweis
+	Zettel, Akte File
+}
+
 func (c *CwdFiles) tryZettel(d string, a string, p string) (err error) {
 	var h hinweis.Hinweis
 

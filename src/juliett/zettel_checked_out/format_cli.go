@@ -146,7 +146,7 @@ func makeWriterFuncAkte(
 		return func(w io.Writer, z *Zettel) (n int64, err error) {
 			diff := format.StringChanged
 
-			if z.Internal.Named.Stored.Zettel.Akte.Equals(z.External.Named.Stored.Zettel.Akte) {
+			if z.Internal.Named.Stored.Objekte.Akte.Equals(z.External.Named.Stored.Objekte.Akte) {
 				diff = format.StringSame
 			}
 

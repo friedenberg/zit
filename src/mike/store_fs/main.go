@@ -170,7 +170,7 @@ func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 		return
 	}
 
-	ez.Named.Stored.Zettel = c.Zettel
+	ez.Named.Stored.Objekte = c.Zettel
 	ez.AkteFD.Path = c.AktePath
 
 	var unrecoverableErrors errors.Multi
@@ -186,7 +186,7 @@ func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 				continue
 			}
 
-			ez.Named.Stored.Zettel = z1
+			ez.Named.Stored.Objekte = z1
 			continue
 		}
 
@@ -200,7 +200,7 @@ func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 				continue
 			}
 
-			ez.Named.Stored.Zettel.Akte = mutter.Named.Stored.Zettel.Akte
+			ez.Named.Stored.Objekte.Akte = mutter.Named.Stored.Objekte.Akte
 
 			continue
 		}
@@ -248,11 +248,11 @@ func (s *Store) Read(p string) (cz zettel_checked_out.Zettel, err error) {
 		// cz.Matches.Zettelen, _ = s.storeObjekten.ReadZettelSha(exSha)
 		// cz.Matches.Zettelen, _ = cz.Matches.Zettelen.Filter(nil, filter)
 
-		// exAkteSha := cz.External.Named.Stored.Zettel.Akte
+		// exAkteSha := cz.External.Named.Stored.Objekte.Akte
 		// cz.Matches.Akten, _ = s.storeObjekten.ReadAkteSha(exAkteSha)
 		// cz.Matches.Akten, _ = cz.Matches.Akten.Filter(nil, filter)
 
-		// bez := cz.External.Named.Stored.Zettel.Bezeichnung.String()
+		// bez := cz.External.Named.Stored.Objekte.Bezeichnung.String()
 		// cz.Matches.Bezeichnungen, _ = s.storeObjekten.ReadBezeichnung(bez)
 		// cz.Matches.Bezeichnungen, _ = cz.Matches.Bezeichnungen.Filter(nil, filter)
 	}

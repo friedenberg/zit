@@ -79,7 +79,7 @@ func (c CreateFromPaths) Run(args ...string) (results zettel_transacted.MutableS
 
 	err = results.Each(
 		func(z *zettel_transacted.Zettel) (err error) {
-			if c.ProtoZettel.Apply(&z.Named.Stored.Zettel) {
+			if c.ProtoZettel.Apply(&z.Named.Stored.Objekte) {
 				if *z, err = c.StoreObjekten().Update(
 					&z.Named,
 				); err != nil {
@@ -98,18 +98,18 @@ func (c CreateFromPaths) Run(args ...string) (results zettel_transacted.MutableS
 				External: *z,
 			}
 
-			if z.Named.Stored.Zettel.IsEmpty() {
+			if z.Named.Stored.Objekte.IsEmpty() {
 				return
 			}
 
-			if cz.Internal, err = c.StoreObjekten().Create(z.Named.Stored.Zettel); err != nil {
+			if cz.Internal, err = c.StoreObjekten().Create(z.Named.Stored.Objekte); err != nil {
 				//TODO add file for error handling
 				c.handleStoreError(cz, "", err)
 				err = nil
 				return
 			}
 
-			if c.ProtoZettel.Apply(&cz.Internal.Named.Stored.Zettel) {
+			if c.ProtoZettel.Apply(&cz.Internal.Named.Stored.Objekte) {
 				if cz.Internal, err = c.StoreObjekten().Update(
 					&cz.Internal.Named,
 				); err != nil {
@@ -210,8 +210,8 @@ func (c CreateFromPaths) zettelsFromPath(
 					},
 					Named: zettel_named.Zettel{
 						Stored: zettel_stored.Stored{
-							Sha:    s,
-							Zettel: z1,
+							Sha:     s,
+							Objekte: z1,
 						},
 					},
 				},
@@ -236,8 +236,8 @@ func (c CreateFromPaths) zettelsFromPath(
 			},
 			Named: zettel_named.Zettel{
 				Stored: zettel_stored.Stored{
-					Sha:    s,
-					Zettel: ctx.Zettel,
+					Sha:     s,
+					Objekte: ctx.Zettel,
 				},
 			},
 		},

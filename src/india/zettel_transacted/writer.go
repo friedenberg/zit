@@ -24,7 +24,7 @@ func MakeWriterZettel(
 	wf collections.WriterFunc[*zettel.Zettel],
 ) collections.WriterFunc[*Zettel] {
 	return func(z *Zettel) (err error) {
-		if err = wf(&z.Named.Stored.Zettel); err != nil {
+		if err = wf(&z.Named.Stored.Objekte); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

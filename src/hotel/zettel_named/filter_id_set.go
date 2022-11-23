@@ -27,7 +27,7 @@ func (f FilterIdSet) IncludeNamedZettel(z *Zettel) (ok bool) {
 	needsEt := f.Set.Etiketten().Len() > 0
 	okEt := false
 
-	expanded := etikett.Expanded(z.Stored.Zettel.Etiketten, etikett.ExpanderRight)
+	expanded := etikett.Expanded(z.Stored.Objekte.Etiketten, etikett.ExpanderRight)
 
 LOOP:
 	for _, e := range f.Set.Etiketten().Sorted() {
@@ -53,7 +53,7 @@ LOOP:
 	case shas.Contains(z.Stored.Sha):
 		okSha = true
 
-	case shas.Contains(z.Stored.Zettel.Akte):
+	case shas.Contains(z.Stored.Objekte.Akte):
 		okSha = true
 	}
 
@@ -61,7 +61,7 @@ LOOP:
 	okTyp := false
 
 	for _, t := range f.Set.Typen() {
-		if okTyp = t.Includes(z.Stored.Zettel.Typ.Etikett); okTyp {
+		if okTyp = t.Includes(z.Stored.Objekte.Typ.Etikett); okTyp {
 			break
 		}
 	}

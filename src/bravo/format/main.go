@@ -7,6 +7,11 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
+type Format[T any] interface {
+	ReadFormat(io.Reader, *T) (int64, error)
+	WriteFormat(io.Writer, *T) (int64, error)
+}
+
 type FuncReader func(io.Reader) (int64, error)
 type FuncReaderFormat[T any] func(io.Reader, *T) (int64, error)
 

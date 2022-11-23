@@ -7,7 +7,6 @@ import (
 
 type Zettel struct {
 	Internal zettel_transacted.Zettel
-	Matches  Matches
 	External zettel_external.Zettel
 	State
 }

@@ -28,7 +28,7 @@ func (s SetPrefixTransacted) Len() int {
 
 // this splits on right-expanded
 func (s *SetPrefixTransacted) Add(z Zettel) {
-	es := etikett.Expanded(z.Named.Stored.Zettel.Etiketten, etikett.ExpanderRight)
+	es := etikett.Expanded(z.Named.Stored.Objekte.Etiketten, etikett.ExpanderRight)
 
 	if es.Len() == 0 {
 		es = etikett.MakeSet(etikett.Etikett{})
@@ -117,7 +117,7 @@ func (a SetPrefixTransacted) Subset(e etikett.Etikett) (out SetPrefixTransactedS
 
 		zSet.Each(
 			func(z *Zettel) (err error) {
-				intersection := z.Named.Stored.Zettel.Etiketten.IntersectPrefixes(etikett.MakeSet(e))
+				intersection := z.Named.Stored.Objekte.Etiketten.IntersectPrefixes(etikett.MakeSet(e))
 				errors.Printf("%s yields %s", e1, intersection)
 
 				if intersection.Len() > 0 {

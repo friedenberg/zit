@@ -11,8 +11,8 @@ type Zettel struct {
 	Hinweis hinweis.Hinweis
 }
 
-func (a Zettel) Equals(b Zettel) bool {
-	if !a.Stored.Equals(b.Stored) {
+func (a *Zettel) Equals(b *Zettel) bool {
+	if !a.Stored.Equals(&b.Stored) {
 		errors.Print("stored")
 		return false
 	}

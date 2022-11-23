@@ -113,7 +113,7 @@ func (c Exec) getZettel(
 		return
 	}
 
-	typ := tz.Named.Stored.Zettel.Typ.String()
+	typ := tz.Named.Stored.Objekte.Typ.String()
 
 	typKonfig := u.Konfig().GetTyp(typ)
 
@@ -124,7 +124,7 @@ func (c Exec) getZettel(
 
 	executor = typKonfig.ExecCommand
 
-	if ar, err = u.StoreObjekten().AkteReader(tz.Named.Stored.Zettel.Akte); err != nil {
+	if ar, err = u.StoreObjekten().AkteReader(tz.Named.Stored.Objekte.Akte); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -141,7 +141,7 @@ func (c Exec) makeFifoPipe(tz zettel_transacted.Zettel) (p string, err error) {
 		return
 	}
 
-	p = path.Join(d, h.Schwanz()+"."+tz.Named.Stored.Zettel.Typ.String())
+	p = path.Join(d, h.Schwanz()+"."+tz.Named.Stored.Objekte.Typ.String())
 
 	if err = syscall.Mknod(p, syscall.S_IFIFO|0666, 0); err != nil {
 		err = errors.Wrap(err)

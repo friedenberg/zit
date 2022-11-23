@@ -26,7 +26,7 @@ func (e Zettel) ExternalPathAndSha() string {
 	if !e.ZettelFD.IsEmpty() {
 		return fmt.Sprintf("[%s %s]", e.ZettelFD.Path, e.Named.Stored.Sha)
 	} else if !e.AkteFD.IsEmpty() {
-		return fmt.Sprintf("[%s %s]", e.AkteFD.Path, e.Named.Stored.Zettel.Akte)
+		return fmt.Sprintf("[%s %s]", e.AkteFD.Path, e.Named.Stored.Objekte.Akte)
 	} else {
 		return ""
 	}

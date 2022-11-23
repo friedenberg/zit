@@ -13,7 +13,7 @@ import (
 func (w *Writer) zettelToItem(z *zettel_verzeichnisse.Zettel, ha hinweis.Abbr) (a *alfred.Item) {
 	a = w.alfredWriter.Get()
 
-	a.Title = z.Transacted.Named.Stored.Zettel.Bezeichnung.String()
+	a.Title = z.Transacted.Named.Stored.Objekte.Bezeichnung.String()
 
 	if a.Title == "" {
 		a.Title = z.Transacted.Named.Hinweis.String()
@@ -36,8 +36,8 @@ func (w *Writer) zettelToItem(z *zettel_verzeichnisse.Zettel, ha hinweis.Abbr) (
 	mb.AddMatches(z.Transacted.Named.Hinweis.String())
 	mb.AddMatches(z.Transacted.Named.Hinweis.Kopf())
 	mb.AddMatches(z.Transacted.Named.Hinweis.Schwanz())
-	mb.AddMatches(z.Transacted.Named.Stored.Zettel.Bezeichnung.String())
-	mb.AddMatches(z.Transacted.Named.Stored.Zettel.Typ.String())
+	mb.AddMatches(z.Transacted.Named.Stored.Objekte.Bezeichnung.String())
+	mb.AddMatches(z.Transacted.Named.Stored.Objekte.Typ.String())
 	mb.AddMatches(z.EtikettenExpandedSorted...)
 
 	// if ha != nil {

@@ -15,7 +15,7 @@ func (f FilterEtikettSet) IncludeNamedZettel(z Zettel) (ok bool) {
 		return
 	}
 
-	set := z.Stored.Zettel.Etiketten.IntersectPrefixes(f.Set)
+	set := z.Stored.Objekte.Etiketten.IntersectPrefixes(f.Set)
 
 	if f.Or {
 		//at least one of the etiketten matches, resolving to a true or

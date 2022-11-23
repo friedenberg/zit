@@ -8,6 +8,11 @@ import (
 	"github.com/friedenberg/zit/src/echo/typ"
 )
 
+type CwdTyp struct {
+	typ.Kennung
+	File
+}
+
 func (c *CwdFiles) tryTyp(d string, a string, p string) (err error) {
 	var h typ.Kennung
 

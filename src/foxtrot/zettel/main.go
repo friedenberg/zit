@@ -17,7 +17,7 @@ type Zettel struct {
 }
 
 // TODO-P2 figure out why this doesn't always work for `status`
-func (z Zettel) Equals(z1 Zettel) bool {
+func (z *Zettel) Equals(z1 *Zettel) bool {
 	if !z.Akte.Equals(z1.Akte) {
 		return false
 	}

@@ -53,7 +53,7 @@ func (s Store) ReadExternalZettelFromAktePath(p string) (cz zettel_checked_out.Z
 
 	//TODO add mod time
 	cz.External.AkteFD.Path = p
-	cz.External.Named.Stored.Zettel.Akte = akteSha
+	cz.External.Named.Stored.Objekte.Akte = akteSha
 	// cz.Matches.Akten, _ = s.storeObjekten.ReadAkteSha(akteSha)
 
 	cz.DetermineState()

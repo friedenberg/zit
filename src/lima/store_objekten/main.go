@@ -313,9 +313,9 @@ func (s *Store) Create(in zettel.Zettel) (tz zettel_transacted.Zettel, err error
 		return
 	}
 
-	tz.Named.Stored.Zettel = in
+	tz.Named.Stored.Objekte = in
 
-	if tz.Named.Stored.Sha, err = s.WriteZettelObjekte(tz.Named.Stored.Zettel); err != nil {
+	if tz.Named.Stored.Sha, err = s.WriteZettelObjekte(tz.Named.Stored.Objekte); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -342,7 +342,7 @@ func (s *Store) Create(in zettel.Zettel) (tz zettel_transacted.Zettel, err error
 		return
 	}
 
-	if err = s.indexEtiketten.add(tz.Named.Stored.Zettel.Etiketten); err != nil {
+	if err = s.indexEtiketten.add(tz.Named.Stored.Objekte.Etiketten); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -378,9 +378,9 @@ func (s *Store) CreateWithHinweis(
 		return
 	}
 
-	tz.Named.Stored.Zettel = in
+	tz.Named.Stored.Objekte = in
 
-	if tz.Named.Stored.Sha, err = s.WriteZettelObjekte(tz.Named.Stored.Zettel); err != nil {
+	if tz.Named.Stored.Sha, err = s.WriteZettelObjekte(tz.Named.Stored.Objekte); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -395,7 +395,7 @@ func (s *Store) CreateWithHinweis(
 		return
 	}
 
-	if err = s.indexEtiketten.add(tz.Named.Stored.Zettel.Etiketten); err != nil {
+	if err = s.indexEtiketten.add(tz.Named.Stored.Objekte.Etiketten); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -424,7 +424,7 @@ func (s *Store) Update(
 		return
 	}
 
-	if err = z.Stored.Zettel.ApplyKonfig(s.konfig); err != nil {
+	if err = z.Stored.Objekte.ApplyKonfig(s.konfig); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -446,7 +446,7 @@ func (s *Store) Update(
 
 	tz.Named = *z
 
-	if tz.Named.Stored.Sha, err = s.WriteZettelObjekte(z.Stored.Zettel); err != nil {
+	if tz.Named.Stored.Sha, err = s.WriteZettelObjekte(z.Stored.Objekte); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -466,7 +466,7 @@ func (s *Store) Update(
 		return
 	}
 
-	if mutter.Named.Equals(tz.Named) {
+	if mutter.Named.Equals(&tz.Named) {
 		if err = s.zettelTransactedWriter.Unchanged(&tz); err != nil {
 			err = errors.Wrap(err)
 			return

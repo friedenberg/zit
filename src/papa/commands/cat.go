@@ -156,7 +156,7 @@ func (c Cat) zettelen(u *umwelt.Umwelt) (err error) {
 //		store,
 //		ids,
 //		func(z *zettel_transacted.Zettel) (err error) {
-//			sb := z.Named.Stored.Zettel.Akte
+//			sb := z.Named.Stored.Objekte.Akte
 
 //			if sb.IsNull() {
 //				return
@@ -234,7 +234,7 @@ func (c Cat) typen(u *umwelt.Umwelt) (err error) {
 
 	if err = u.StoreObjekten().ReadAllSchwanzenTransacted(
 		func(z *zettel_transacted.Zettel) (err error) {
-			err = typen.Add(z.Named.Stored.Zettel.Typ)
+			err = typen.Add(z.Named.Stored.Objekte.Typ)
 
 			return
 		},

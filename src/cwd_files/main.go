@@ -8,20 +8,8 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/konfig"
-	"github.com/friedenberg/zit/src/echo/typ"
 )
-
-type CwdTyp struct {
-	typ.Kennung
-	File
-}
-
-type CwdZettel struct {
-	hinweis.Hinweis
-	Zettel, Akte File
-}
 
 type CwdFiles struct {
 	konfig           konfig.Compiled
@@ -183,14 +171,27 @@ func (fs *CwdFiles) readFirstLevelFile(a string) (err error) {
 		return
 	}
 
-	var ut File
+	ext := filepath.Ext(a)
+	ext = strings.ToLower(ext)
+	ext = strings.TrimSpace(ext)
 
-	if ut, err = MakeFile(fs.dir, a); err != nil {
-		err = errors.Wrap(err)
-		return
+	switch strings.TrimPrefix(ext, ".") {
+	case fs.konfig.TypFileExtension:
+		if err = fs.tryTyp(fs.dir, a, a); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+	default:
+		var ut File
+
+		if ut, err = MakeFile(fs.dir, a); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		fs.UnsureAkten = append(fs.UnsureAkten, ut)
 	}
-
-	fs.UnsureAkten = append(fs.UnsureAkten, ut)
 
 	return
 }

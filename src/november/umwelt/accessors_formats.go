@@ -14,6 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
 	"github.com/friedenberg/zit/src/mike/store_fs"
+	"github.com/friedenberg/zit/src/typ_checked_out"
 )
 
 func (u *Umwelt) FormatColorWriter() format.FuncColorWriter {
@@ -50,15 +51,30 @@ func (u *Umwelt) FormatBezeichnung() format.FormatWriterFunc[bezeichnung.Bezeich
 	return bezeichnung.MakeCliFormat(u.FormatColorWriter())
 }
 
-func (u *Umwelt) FormatTyp() format.FormatWriterFunc[typ.Kennung] {
-	return typ.MakeCliFormat(u.FormatColorWriter())
+func (u *Umwelt) FormatTypKennung() format.FormatWriterFunc[typ.Kennung] {
+	return typ.MakeKennungCliFormat(u.FormatColorWriter())
+}
+
+func (u *Umwelt) FormatTyp() format.FormatWriterFunc[typ.Typ] {
+	return typ.MakeCliFormat(
+		u.FormatColorWriter(),
+	)
+}
+
+func (u *Umwelt) FormatTypCheckedOut() format.FormatWriterFunc[typ_checked_out.Typ] {
+	return typ_checked_out.MakeCliFormat(
+		u.Standort(),
+		u.FormatColorWriter(),
+		u.FormatSha(),
+		u.FormatTyp(),
+	)
 }
 
 func (u *Umwelt) FormatZettel() format.FormatWriterFunc[zettel.Zettel] {
 	return zettel.MakeCliFormat(
 		u.FormatBezeichnung(),
 		format.MakeFormatStringer[etikett.Set](),
-		u.FormatTyp(),
+		u.FormatTypKennung(),
 	)
 }
 

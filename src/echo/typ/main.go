@@ -8,7 +8,8 @@ import (
 )
 
 type Typ struct {
-	Akte Akte
+	Kennung
+	Akte
 }
 
 func (t *Typ) ObjekteSha() (s sha.Sha, err error) {

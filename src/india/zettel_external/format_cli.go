@@ -24,7 +24,7 @@ func MakeCliFormatZettel(
 			format.MakeFormatString("@"),
 			format.MakeWriter(sf, &z.Named.Stored.Sha),
 			format.MakeFormatString(" "),
-			format.MakeWriter(zf, &z.Named.Stored.Zettel),
+			format.MakeWriter(zf, &z.Named.Stored.Objekte),
 			format.MakeFormatString("]"),
 		)
 	}
@@ -42,7 +42,7 @@ func MakeCliFormatAkte(
 			format.MakeFormatString("["),
 			cw(s.MakeWriterRelativePath(z.AkteFD.Path), format.ColorTypePointer),
 			format.MakeFormatString("@"),
-			format.MakeWriter(sf, &z.Named.Stored.Zettel.Akte),
+			format.MakeWriter(sf, &z.Named.Stored.Objekte.Akte),
 			format.MakeFormatString("]"),
 		)
 	}

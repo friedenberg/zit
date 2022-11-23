@@ -87,7 +87,7 @@ func (c ExecAction) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	)
 
 	iter := func(tz *zettel_transacted.Zettel) (err error) {
-		typ := tz.Named.Stored.Zettel.Typ.String()
+		typ := tz.Named.Stored.Objekte.Typ.String()
 
 		typKonfig := u.Konfig().GetTyp(typ)
 
@@ -168,7 +168,7 @@ func (c ExecAction) runExecutor(
 
 		var ar io.ReadCloser
 
-		if ar, err = u.StoreObjekten().AkteReader(z.Named.Stored.Zettel.Akte); err != nil {
+		if ar, err = u.StoreObjekten().AkteReader(z.Named.Stored.Objekte.Akte); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

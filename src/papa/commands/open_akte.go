@@ -66,7 +66,7 @@ func (c OpenAkte) RunWithIds(store *umwelt.Umwelt, is id_set.Set) (err error) {
 				return
 			}
 
-			shaAkte := tz.Named.Stored.Zettel.Akte
+			shaAkte := tz.Named.Stored.Objekte.Akte
 
 			var f *os.File
 
@@ -77,7 +77,7 @@ func (c OpenAkte) RunWithIds(store *umwelt.Umwelt, is id_set.Set) (err error) {
 				return
 			}
 
-			filename = filename + "." + tz.Named.Stored.Zettel.Typ.String()
+			filename = filename + "." + tz.Named.Stored.Objekte.Typ.String()
 
 			if f, err = files.Create(filename); err != nil {
 				err = errors.Wrap(err)

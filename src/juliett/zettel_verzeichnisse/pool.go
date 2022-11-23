@@ -33,8 +33,8 @@ func (p Pool) MakeZettel(
 ) (z *Zettel) {
 	z = p.Get()
 	z.Transacted = tz
-	z.EtikettenExpandedSorted = etikett.Expanded(tz.Named.Stored.Zettel.Etiketten).SortedString()
-	z.EtikettenSorted = tz.Named.Stored.Zettel.Etiketten.SortedString()
+	z.EtikettenExpandedSorted = etikett.Expanded(tz.Named.Stored.Objekte.Etiketten).SortedString()
+	z.EtikettenSorted = tz.Named.Stored.Objekte.Etiketten.SortedString()
 
 	return
 }

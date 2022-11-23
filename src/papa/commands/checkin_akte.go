@@ -105,10 +105,10 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			return
 		}
 
-		zettels[i].Named.Stored.Zettel.Akte = ow.Sha()
+		zettels[i].Named.Stored.Objekte.Akte = ow.Sha()
 
 		if c.NewEtiketten.Len() > 0 {
-			zettels[i].Named.Stored.Zettel.Etiketten = c.NewEtiketten
+			zettels[i].Named.Stored.Objekte.Etiketten = c.NewEtiketten
 		}
 	}
 

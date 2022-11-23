@@ -70,7 +70,7 @@ func (c ZettelFromExternalAkte) Run(
 
 	err = results.Each(
 		func(z *zettel_transacted.Zettel) (err error) {
-			if c.ProtoZettel.Apply(&z.Named.Stored.Zettel) {
+			if c.ProtoZettel.Apply(&z.Named.Stored.Objekte) {
 				if *z, err = c.StoreObjekten().Update(
 					&z.Named,
 				); err != nil {
@@ -90,18 +90,18 @@ func (c ZettelFromExternalAkte) Run(
 
 	err = toCreate.Each(
 		func(z *zettel_external.Zettel) (err error) {
-			if z.Named.Stored.Zettel.IsEmpty() {
+			if z.Named.Stored.Objekte.IsEmpty() {
 				return
 			}
 
 			var tz zettel_transacted.Zettel
 
-			if tz, err = c.StoreObjekten().Create(z.Named.Stored.Zettel); err != nil {
+			if tz, err = c.StoreObjekten().Create(z.Named.Stored.Objekte); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			if c.ProtoZettel.Apply(&tz.Named.Stored.Zettel) {
+			if c.ProtoZettel.Apply(&tz.Named.Stored.Objekte) {
 				if tz, err = c.StoreObjekten().Update(&tz.Named); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -179,11 +179,11 @@ func (c ZettelFromExternalAkte) zettelForAkte(
 		return
 	}
 
-	z.Named.Stored.Zettel.Reset()
-	z.Named.Stored.Zettel.Akte = akteWriter.Sha()
+	z.Named.Stored.Objekte.Reset()
+	z.Named.Stored.Objekte.Akte = akteWriter.Sha()
 
 	//TODO move to protozettel
-	if err = z.Named.Stored.Zettel.Bezeichnung.Set(
+	if err = z.Named.Stored.Objekte.Bezeichnung.Set(
 		path.Base(akteFD.Path),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -194,7 +194,7 @@ func (c ZettelFromExternalAkte) zettelForAkte(
 	ext := akteFD.Ext()
 
 	if ext != "" {
-		if err = z.Named.Stored.Zettel.Typ.Set(akteFD.Ext()); err != nil {
+		if err = z.Named.Stored.Objekte.Typ.Set(akteFD.Ext()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

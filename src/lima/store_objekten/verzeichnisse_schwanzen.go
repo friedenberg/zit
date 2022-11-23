@@ -87,7 +87,7 @@ func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 	}
 
 	tz = found.Transacted
-	tz.Named.Stored.Zettel.Etiketten = tz.Named.Stored.Zettel.Etiketten.Copy()
+	tz.Named.Stored.Objekte.Etiketten = tz.Named.Stored.Objekte.Etiketten.Copy()
 
 	return
 }

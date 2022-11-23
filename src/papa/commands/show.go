@@ -183,7 +183,7 @@ func (c Show) showAkten(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 	var ar io.ReadCloser
 
 	for _, named := range zettels {
-		if ar, err = store.StoreObjekten().AkteReader(named.Named.Stored.Zettel.Akte); err != nil {
+		if ar, err = store.StoreObjekten().AkteReader(named.Named.Stored.Objekte.Akte); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

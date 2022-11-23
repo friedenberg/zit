@@ -29,7 +29,7 @@ func MakeMutableMatchSet(in MutableSet) (out MutableMatchSet) {
 
 func (s MutableMatchSet) Match(z *zettel_named.Zettel) (err error) {
 	kStored := z.Stored.Sha.String()
-	kAkte := z.Stored.Zettel.Akte.String()
+	kAkte := z.Stored.Objekte.Akte.String()
 
 	stored, okStored := s.Stored.Get(kStored)
 	akte, okAkte := s.Akten.Get(kAkte)

@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/mike/store_fs"
 	"github.com/friedenberg/zit/src/november/umwelt"
 	"github.com/friedenberg/zit/src/oscar/user_ops"
+	"github.com/friedenberg/zit/src/typ_checked_out"
 )
 
 type Status struct {
@@ -58,8 +59,43 @@ func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
+	v := "Typen"
+
+	if err = s.PrinterHeader()(&v); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	for _, p := range possible.Typen {
+		var t *typ_checked_out.Typ
+
+		if t, err = s.StoreWorkingDirectory().ReadTyp(&p); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = s.PrinterTypCheckedOut("same")(t); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	v = "Zettelen"
+
+	if err = s.PrinterHeader()(&v); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	//TODO use right mode
 	if err = readResultsSet.Each(s.PrinterZettelCheckedOut(zettel_checked_out.ModeZettelAndAkte)); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	v = "Akten"
+
+	if err = s.PrinterHeader()(&v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

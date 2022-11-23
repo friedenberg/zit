@@ -37,7 +37,7 @@ func (c DeleteCheckout) Run(
 			}
 
 			//TODO add a safety check?
-			if !internal.Named.Stored.Zettel.Equals(external.Named.Stored.Zettel) {
+			if !internal.Named.Stored.Objekte.Equals(&external.Named.Stored.Objekte) {
 				errors.PrintOutf("[%s] (checkout different!)", external.Named.Hinweis)
 				return
 			}

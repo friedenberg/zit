@@ -30,9 +30,9 @@ func MakeWriterComplete(w io.Writer) WriterComplete {
 			//TODO-P4 handle write errors
 			s.wBuf.WriteString(z.Hinweis.String())
 			s.wBuf.WriteString("\tZettel: !")
-			s.wBuf.WriteString(z.Stored.Zettel.Typ.String())
+			s.wBuf.WriteString(z.Stored.Objekte.Typ.String())
 			s.wBuf.WriteString(" ")
-			s.wBuf.WriteString(z.Stored.Zettel.Bezeichnung.String())
+			s.wBuf.WriteString(z.Stored.Objekte.Bezeichnung.String())
 			s.wBuf.WriteString("\n")
 		}
 

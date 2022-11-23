@@ -60,7 +60,7 @@ func (s Store) shouldCheckOut(
 ) (ok bool) {
 
 	switch {
-	case cz.Internal.Named.Stored.Zettel.Equals(cz.External.Named.Stored.Zettel):
+	case cz.Internal.Named.Stored.Objekte.Equals(&cz.External.Named.Stored.Objekte):
 		cz.State = zettel_checked_out.StateJustCheckedOutButSame
 
 	//TODO wait why?
@@ -116,7 +116,7 @@ func (s *Store) CheckoutOne(
 		}
 	}
 
-	inlineAkte := sz.Named.Stored.Zettel.Typ.IsInlineAkte(s.Konfig.Konfig)
+	inlineAkte := sz.Named.Stored.Objekte.Typ.IsInlineAkte(s.Konfig.Konfig)
 
 	cz = zettel_checked_out.Zettel{
 		//TODO check diff with fs if already exists
@@ -128,11 +128,10 @@ func (s *Store) CheckoutOne(
 			},
 			Named: sz.Named,
 		},
-		Matches: zettel_checked_out.MakeMatches(),
 	}
 
 	if !inlineAkte {
-		t := sz.Named.Stored.Zettel.Typ
+		t := sz.Named.Stored.Objekte.Typ
 
 		ty := s.Compiled.GetTyp(t.String())
 
@@ -144,7 +143,7 @@ func (s *Store) CheckoutOne(
 	}
 
 	c := zettel.FormatContextWrite{
-		Zettel:            sz.Named.Stored.Zettel,
+		Zettel:            sz.Named.Stored.Objekte,
 		IncludeAkte:       inlineAkte,
 		AkteReaderFactory: s.storeObjekten,
 	}
@@ -152,7 +151,7 @@ func (s *Store) CheckoutOne(
 	switch options.CheckoutMode {
 	case CheckoutModeAkteOnly:
 		if err = s.writeAkte(
-			cz.External.Named.Stored.Zettel.Akte,
+			cz.External.Named.Stored.Objekte.Akte,
 			cz.External.AkteFD.Path,
 			&cz,
 		); err != nil {

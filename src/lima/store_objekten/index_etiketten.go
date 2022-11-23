@@ -120,11 +120,11 @@ func (i *indexEtiketten) addZettelWithOptionalMutter(
 	z *zettel_transacted.Zettel,
 	zMutter *zettel_transacted.Zettel,
 ) (err error) {
-	zEtiketten := z.Named.Stored.Zettel.Etiketten
+	zEtiketten := z.Named.Stored.Objekte.Etiketten
 
 	if zMutter != nil {
 		d := etikett.MakeSetDelta(
-			zMutter.Named.Stored.Zettel.Etiketten,
+			zMutter.Named.Stored.Objekte.Etiketten,
 			zEtiketten,
 		)
 

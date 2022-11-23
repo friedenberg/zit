@@ -8,9 +8,21 @@ import (
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
 	"github.com/friedenberg/zit/src/mike/store_fs"
+	"github.com/friedenberg/zit/src/typ_checked_out"
 )
 
-func (u *Umwelt) PrinterZettelTransacted(verb string) collections.WriterFunc[*zettel_transacted.Zettel] {
+func (u *Umwelt) PrinterTypCheckedOut(
+	verb string,
+) collections.WriterFunc[*typ_checked_out.Typ] {
+	return format.MakeWriterToWithNewLines(
+		u.Out(),
+		u.FormatTypCheckedOut(),
+	)
+}
+
+func (u *Umwelt) PrinterZettelTransacted(
+	verb string,
+) collections.WriterFunc[*zettel_transacted.Zettel] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
 		u.FormatZettelTransacted(verb),
