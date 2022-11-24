@@ -11,7 +11,11 @@ fi
 gmake
 go clean -cache -fuzzcache
 git add .
-git commit -m update || true
+
+if [[ "$(git status --porcelain=v1 2>/dev/null | wc -l)" -gt 0 ]]; then
+	git commit -m update
+fi
+
 git push
 
 if [[ -d "$t" ]]; then

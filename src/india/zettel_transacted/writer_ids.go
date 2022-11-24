@@ -8,7 +8,7 @@ import (
 
 type WriterIds zettel_named.FilterIdSet
 
-func (w WriterIds) NamedFilter() zettel_named.NamedFilter {
+func (w WriterIds) NamedFilter() zettel_named.FilterIdSet {
 	return zettel_named.FilterIdSet(w)
 }
 
