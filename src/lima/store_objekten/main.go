@@ -21,7 +21,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/konfig"
 	"github.com/friedenberg/zit/src/echo/sku"
 	"github.com/friedenberg/zit/src/golf/transaktion"
-	"github.com/friedenberg/zit/src/hotel/zettel"
+	"github.com/friedenberg/zit/src/india/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
 	"github.com/friedenberg/zit/src/kilo/store_verzeichnisse"

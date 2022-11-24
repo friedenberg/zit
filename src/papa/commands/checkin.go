@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/hotel/cwd_files"
-	"github.com/friedenberg/zit/src/hotel/zettel"
+	"github.com/friedenberg/zit/src/india/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_external"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
 	"github.com/friedenberg/zit/src/mike/store_fs"

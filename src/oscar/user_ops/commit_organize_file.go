@@ -4,7 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/hotel/zettel"
+	"github.com/friedenberg/zit/src/india/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/organize_text"
 	"github.com/friedenberg/zit/src/kilo/changes"

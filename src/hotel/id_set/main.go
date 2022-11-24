@@ -12,7 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/golf/typ"
 )
 
-//TODO  move to kennung
+// TODO  move to kennung
 type Set struct {
 	shas       sha.MutableSet
 	etiketten  kennung.EtikettMutableSet
