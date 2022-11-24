@@ -5,7 +5,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/hinweisen"
-	"github.com/friedenberg/zit/src/foxtrot/cwd_files"
+	"github.com/friedenberg/zit/src/hotel/cwd_files"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
 	"github.com/friedenberg/zit/src/mike/store_fs"
 	"github.com/friedenberg/zit/src/november/umwelt"
