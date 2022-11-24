@@ -73,7 +73,7 @@ func (u *Umwelt) FormatTypCheckedOut() format.FormatWriterFunc[typ_checked_out.T
 func (u *Umwelt) FormatZettel() format.FormatWriterFunc[zettel.Zettel] {
 	return zettel.MakeCliFormat(
 		u.FormatBezeichnung(),
-		format.MakeFormatStringer[kennung.Set](),
+		format.MakeFormatStringer[kennung.EtikettSet](),
 		u.FormatTypKennung(),
 	)
 }

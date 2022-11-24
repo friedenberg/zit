@@ -7,13 +7,13 @@ import (
 	"github.com/friedenberg/zit/src/bravo/collections"
 )
 
-type Set = collections.ValueSet[Etikett, *Etikett]
+type EtikettSet = collections.ValueSet[Etikett, *Etikett]
 
-func MakeSet(es ...Etikett) (s Set) {
-	return Set(collections.MakeValueSet(es...))
+func MakeSet(es ...Etikett) (s EtikettSet) {
+	return EtikettSet(collections.MakeValueSet(es...))
 }
 
-func MakeSetStrings(vs ...string) (s Set, err error) {
+func MakeSetStrings(vs ...string) (s EtikettSet, err error) {
 	var s1 collections.ValueSet[Etikett, *Etikett]
 
 	if s1, err = collections.MakeValueSetStrings[Etikett, *Etikett](vs...); err != nil {
@@ -21,12 +21,12 @@ func MakeSetStrings(vs ...string) (s Set, err error) {
 		return
 	}
 
-	s = Set(s1)
+	s = EtikettSet(s1)
 
 	return
 }
 
-func WithRemovedCommonPrefixes(s Set) (s2 Set) {
+func WithRemovedCommonPrefixes(s EtikettSet) (s2 EtikettSet) {
 	es1 := s.Sorted()
 	es := make([]Etikett, 0, len(es1))
 
@@ -56,7 +56,7 @@ func WithRemovedCommonPrefixes(s Set) (s2 Set) {
 	return
 }
 
-func Expanded(s Set, exes ...Expander) (out Set) {
+func Expanded(s EtikettSet, exes ...Expander) (out EtikettSet) {
 	s1 := MakeMutableSet()
 
 	for _, e := range s.Elements() {
@@ -72,7 +72,7 @@ func Expanded(s Set, exes ...Expander) (out Set) {
 // 	return strings.Join(s.SortedString(), ", ")
 // }
 
-func IntersectPrefixes(s1 Set, s2 Set) (s3 Set) {
+func IntersectPrefixes(s1 EtikettSet, s2 EtikettSet) (s3 EtikettSet) {
 	s4 := MakeMutableSet()
 
 	for _, e1 := range s2.Elements() {
@@ -96,7 +96,7 @@ func IntersectPrefixes(s1 Set, s2 Set) (s3 Set) {
 	return
 }
 
-func SubtractPrefix(s1 Set, e Etikett) (s2 Set) {
+func SubtractPrefix(s1 EtikettSet, e Etikett) (s2 EtikettSet) {
 	s3 := MakeMutableSet()
 
 	for _, e1 := range s1.Elements() {
@@ -114,7 +114,7 @@ func SubtractPrefix(s1 Set, e Etikett) (s2 Set) {
 	return
 }
 
-func Description(s Set) string {
+func Description(s EtikettSet) string {
 	sb := &strings.Builder{}
 	first := true
 

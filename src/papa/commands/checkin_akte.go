@@ -16,7 +16,7 @@ import (
 
 type CheckinAkte struct {
 	Delete       bool
-	NewEtiketten kennung.Set
+	NewEtiketten kennung.EtikettSet
 }
 
 func init() {

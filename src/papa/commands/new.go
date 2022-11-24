@@ -138,7 +138,7 @@ func (c New) writeNewZettels(
 		},
 	}
 
-	var defaultEtiketten kennung.Set
+	var defaultEtiketten kennung.EtikettSet
 
 	if defaultEtiketten, err = u.DefaultEtiketten(); err != nil {
 		err = errors.Wrap(err)

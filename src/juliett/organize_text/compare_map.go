@@ -66,10 +66,10 @@ func (in *Text) ToCompareMap() (out CompareMap, err error) {
 	return
 }
 
-func (a *assignment) addToCompareMap(m Metadatei, es kennung.Set, out *CompareMap) (err error) {
+func (a *assignment) addToCompareMap(m Metadatei, es kennung.EtikettSet, out *CompareMap) (err error) {
 	mes := es.MutableCopy()
 
-	var es1 kennung.Set
+	var es1 kennung.EtikettSet
 
 	if es1, err = a.expandedEtiketten(); err != nil {
 		err = errors.Wrap(err)
@@ -85,7 +85,7 @@ func (a *assignment) addToCompareMap(m Metadatei, es kennung.Set, out *CompareMa
 				out.Named.Add(z.Hinweis.String(), e)
 			}
 
-			for _, e := range m.Set.Elements() {
+			for _, e := range m.EtikettSet.Elements() {
 				//TODO add typ
 				out.Named.Add(z.Hinweis.String(), e)
 			}
@@ -100,7 +100,7 @@ func (a *assignment) addToCompareMap(m Metadatei, es kennung.Set, out *CompareMa
 				out.Unnamed.Add(z.Bezeichnung.String(), e)
 			}
 
-			for _, e := range m.Set.Elements() {
+			for _, e := range m.EtikettSet.Elements() {
 				//TODO add typ
 				out.Unnamed.Add(z.Bezeichnung.String(), e)
 			}

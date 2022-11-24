@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/typ"
 )
 
-func makeEtiketten(t test_logz.T, vs ...string) (es kennung.Set) {
+func makeEtiketten(t test_logz.T, vs ...string) (es kennung.EtikettSet) {
 	var err error
 
 	if es, err = kennung.MakeSetStrings(vs...); err != nil {

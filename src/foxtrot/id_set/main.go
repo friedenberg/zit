@@ -119,7 +119,7 @@ func (s Set) AnyShasOrHinweisen() (ids []id.IdMitKorper) {
 	return
 }
 
-func (s Set) Etiketten() (etiketten kennung.Set) {
+func (s Set) Etiketten() (etiketten kennung.EtikettSet) {
 	etiketten = s.etiketten.Copy()
 
 	return

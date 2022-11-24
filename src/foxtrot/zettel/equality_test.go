@@ -18,7 +18,7 @@ func TestMakeEtiketten(t1 *testing.T) {
 		"tag3",
 	}
 
-	var sut kennung.Set
+	var sut kennung.EtikettSet
 	var err error
 
 	if sut, err = kennung.MakeSetStrings(vs...); err != nil {

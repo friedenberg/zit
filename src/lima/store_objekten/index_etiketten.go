@@ -156,7 +156,7 @@ func (i *indexEtiketten) processDelta(d kennung.Delta) (err error) {
 	return
 }
 
-func (i *indexEtiketten) add(s kennung.Set) (err error) {
+func (i *indexEtiketten) add(s kennung.EtikettSet) (err error) {
 	if s.Len() == 0 {
 		errors.Print("no etiketten to add")
 		return
@@ -181,7 +181,7 @@ func (i *indexEtiketten) add(s kennung.Set) (err error) {
 	return
 }
 
-func (i *indexEtiketten) del(s kennung.Set) (err error) {
+func (i *indexEtiketten) del(s kennung.EtikettSet) (err error) {
 	if s.Len() == 0 {
 		errors.Print("no etiketten to delete")
 		return

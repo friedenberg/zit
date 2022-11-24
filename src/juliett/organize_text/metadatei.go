@@ -12,12 +12,12 @@ import (
 )
 
 type Metadatei struct {
-	kennung.Set
+	kennung.EtikettSet
 	Typ typ.Kennung
 }
 
 func (m Metadatei) HasMetadateiContent() bool {
-	if m.Set.Len() > 0 {
+	if m.EtikettSet.Len() > 0 {
 		return true
 	}
 
@@ -83,7 +83,7 @@ func (m *Metadatei) ReadFrom(r1 io.Reader) (n int64, err error) {
 		}
 	}
 
-	m.Set = mes.Copy()
+	m.EtikettSet = mes.Copy()
 
 	return
 }
@@ -91,7 +91,7 @@ func (m *Metadatei) ReadFrom(r1 io.Reader) (n int64, err error) {
 func (m Metadatei) WriteTo(w1 io.Writer) (n int64, err error) {
 	w := line_format.NewWriter()
 
-	for _, e := range m.Set.SortedString() {
+	for _, e := range m.EtikettSet.SortedString() {
 		w.WriteFormat("- %s", e)
 	}
 

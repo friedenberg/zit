@@ -38,7 +38,7 @@ func newWithoutMetadatei(options Options) (ot *Text, err error) {
 		Options:    options,
 		assignment: newAssignment(0),
 		Metadatei: Metadatei{
-			Set: kennung.MakeSet(),
+			EtikettSet: kennung.MakeSet(),
 		},
 	}
 

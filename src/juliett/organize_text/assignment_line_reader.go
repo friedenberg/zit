@@ -201,7 +201,7 @@ func (ar *assignmentLineReader) readOneHeading(l line) (err error) {
 
 func (ar *assignmentLineReader) readOneHeadingLesserDepth(
 	d int,
-	e kennung.Set,
+	e kennung.EtikettSet,
 ) (newCurrent *assignment, err error) {
 	depthDiff := d - ar.currentAssignment.Depth()
 
@@ -239,7 +239,7 @@ func (ar *assignmentLineReader) readOneHeadingLesserDepth(
 
 func (ar *assignmentLineReader) readOneHeadingEqualDepth(
 	d int,
-	e kennung.Set,
+	e kennung.EtikettSet,
 ) (newCurrent *assignment, err error) {
 	// logz.Print("depth count is ==")
 
@@ -274,7 +274,7 @@ func (ar *assignmentLineReader) readOneHeadingEqualDepth(
 
 func (ar *assignmentLineReader) readOneHeadingGreaterDepth(
 	d int,
-	e kennung.Set,
+	e kennung.EtikettSet,
 ) (newCurrent *assignment, err error) {
 	// logz.Print("depth count is >")
 	// logz.Print(e)

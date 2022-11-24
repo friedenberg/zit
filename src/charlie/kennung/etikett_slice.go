@@ -91,6 +91,6 @@ func (s Slice) String() string {
 	return strings.Join(s.SortedString(), ", ")
 }
 
-func (s Slice) ToSet() Set {
+func (s Slice) ToSet() EtikettSet {
 	return MakeSet([]Etikett(s)...)
 }

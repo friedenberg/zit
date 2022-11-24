@@ -181,7 +181,7 @@ func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 	return
 }
 
-func (u Umwelt) DefaultEtiketten() (etiketten kennung.Set, err error) {
+func (u Umwelt) DefaultEtiketten() (etiketten kennung.EtikettSet, err error) {
 	metiketten := kennung.MakeMutableSet()
 
 	for e, t := range u.konfig.Tags {

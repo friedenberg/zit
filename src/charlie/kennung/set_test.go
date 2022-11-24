@@ -8,8 +8,8 @@ import (
 
 func TestNormalize(t *testing.T) {
 	type testEntry struct {
-		ac Set
-		ex Set
+		ac EtikettSet
+		ex EtikettSet
 	}
 
 	testEntries := map[string]testEntry{
@@ -71,8 +71,8 @@ func TestNormalize(t *testing.T) {
 
 func TestRemovePrefixes(t *testing.T) {
 	type testEntry struct {
-		ac     Set
-		ex     Set
+		ac     EtikettSet
+		ex     EtikettSet
 		prefix string
 	}
 

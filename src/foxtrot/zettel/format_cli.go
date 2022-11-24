@@ -12,7 +12,7 @@ import (
 // !typ "bez"
 func MakeCliFormat(
 	bf format.FormatWriterFunc[bezeichnung.Bezeichnung],
-	ef format.FormatWriterFunc[kennung.Set],
+	ef format.FormatWriterFunc[kennung.EtikettSet],
 	tf format.FormatWriterFunc[typ.Kennung],
 ) format.FormatWriterFunc[Zettel] {
 	return func(w io.Writer, z *Zettel) (n int64, err error) {

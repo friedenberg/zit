@@ -20,7 +20,7 @@ func (atc *Factory) Make() (ot *Text, err error) {
 
 	ot.assignment.isRoot = true
 
-	ot.Metadatei.Set = atc.Options.RootEtiketten
+	ot.Metadatei.EtikettSet = atc.Options.RootEtiketten
 	ot.Metadatei.Typ = atc.Options.Typ
 
 	prefixSet := atc.Transacted.ToSetPrefixTransacted()

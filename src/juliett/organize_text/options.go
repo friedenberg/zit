@@ -14,10 +14,10 @@ type Options struct {
 	konfig.Konfig
 	hinweis.Abbr
 
-	RootEtiketten     kennung.Set
+	RootEtiketten     kennung.EtikettSet
 	Typ               typ.Kennung
 	GroupingEtiketten kennung.Slice
-	ExtraEtiketten    kennung.Set
+	ExtraEtiketten    kennung.EtikettSet
 	Transacted        zettel_transacted.MutableSet
 
 	UsePrefixJoints        bool

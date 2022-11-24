@@ -11,7 +11,7 @@ import (
 type assignment struct {
 	isRoot    bool
 	depth     int
-	etiketten kennung.Set
+	etiketten kennung.EtikettSet
 	named     collections.MutableValueSet[zettel, *zettel]
 	unnamed   collections.MutableValueSet[newZettel, *newZettel]
 	children  []*assignment
@@ -207,7 +207,7 @@ func (a *assignment) consume(b *assignment) (err error) {
 	return
 }
 
-func (a *assignment) expandedEtiketten() (es kennung.Set, err error) {
+func (a *assignment) expandedEtiketten() (es kennung.EtikettSet, err error) {
 	es = kennung.MakeSet()
 
 	if a.etiketten.Len() != 1 || a.parent == nil {
@@ -217,7 +217,7 @@ func (a *assignment) expandedEtiketten() (es kennung.Set, err error) {
 		e := a.etiketten.Any()
 
 		if kennung.IsDependentLeaf(e) {
-			var pe kennung.Set
+			var pe kennung.EtikettSet
 
 			if pe, err = a.parent.expandedEtiketten(); err != nil {
 				err = errors.Wrap(err)

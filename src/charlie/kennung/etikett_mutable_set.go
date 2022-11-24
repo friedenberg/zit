@@ -28,7 +28,7 @@ func RemovePrefixes(es MutableSet, needle Etikett) {
 	}
 }
 
-func Withdraw(s1 MutableSet, e Etikett) (s2 Set) {
+func Withdraw(s1 MutableSet, e Etikett) (s2 EtikettSet) {
 	s3 := MakeMutableSet()
 
 	for _, e1 := range s1.Elements() {
@@ -42,24 +42,3 @@ func Withdraw(s1 MutableSet, e Etikett) (s2 Set) {
 
 	return
 }
-
-// func (s MutableSet) Set(v string) (err error) {
-// 	es := strings.Split(v, ",")
-
-// 	for _, e := range es {
-// 		if err = s.AddString(e); err != nil {
-// 			err = errors.Wrap(err)
-// 			return
-// 		}
-// 	}
-
-// 	return
-// }
-
-// func (es MutableSet) RemovePrefixes(needle Etikett) {
-// 	for haystack, _ := range es.inner {
-// 		if strings.HasPrefix(haystack, needle.String()) {
-// 			delete(es.inner, haystack)
-// 		}
-// 	}
-// }

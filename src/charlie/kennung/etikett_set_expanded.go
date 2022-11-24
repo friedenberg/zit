@@ -1,6 +1,6 @@
 package kennung
 
-type setExpanded Set
+type setExpanded EtikettSet
 
 func newSetExpanded(es ...Etikett) setExpanded {
 	return setExpanded(MakeSet(es...))

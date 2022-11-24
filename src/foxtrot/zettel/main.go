@@ -14,7 +14,7 @@ type Zettel struct {
 	Akte        sha.Sha
 	Typ         typ.Kennung
 	Bezeichnung bezeichnung.Bezeichnung
-	Etiketten   kennung.Set
+	Etiketten   kennung.EtikettSet
 }
 
 func (z Zettel) Gattung() gattung.Gattung {

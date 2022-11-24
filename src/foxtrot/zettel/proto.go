@@ -11,7 +11,7 @@ import (
 type ProtoZettel struct {
 	Typ         typ.Kennung
 	Bezeichnung bezeichnung.Bezeichnung
-	Etiketten   kennung.Set
+	Etiketten   kennung.EtikettSet
 }
 
 func MakeProtoZettel() ProtoZettel {

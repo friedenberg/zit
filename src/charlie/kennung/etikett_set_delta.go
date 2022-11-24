@@ -1,10 +1,10 @@
 package kennung
 
 type Delta struct {
-	Added, Removed Set
+	Added, Removed EtikettSet
 }
 
-func MakeSetDelta(s1, s2 Set) (d Delta) {
+func MakeSetDelta(s1, s2 EtikettSet) (d Delta) {
 	added := MakeMutableSet()
 	removed := s1.MutableCopy()
 
