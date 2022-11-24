@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
-	"github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/hotel/zettel_named"
 	"github.com/friedenberg/zit/src/india/zettel_external"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
@@ -209,7 +208,7 @@ func (c CreateFromPaths) zettelsFromPath(
 						Path: p,
 					},
 					Named: zettel_named.Zettel{
-						Stored: zettel_stored.Stored{
+						Stored: zettel.Stored{
 							Sha:     s,
 							Objekte: z1,
 						},
@@ -235,7 +234,7 @@ func (c CreateFromPaths) zettelsFromPath(
 				Path: p,
 			},
 			Named: zettel_named.Zettel{
-				Stored: zettel_stored.Stored{
+				Stored: zettel.Stored{
 					Sha:     s,
 					Objekte: ctx.Zettel,
 				},

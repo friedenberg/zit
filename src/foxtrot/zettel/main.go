@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/bezeichnung"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/objekte"
 )
 
 type Zettel struct {
@@ -15,6 +16,8 @@ type Zettel struct {
 	Bezeichnung bezeichnung.Bezeichnung
 	Etiketten   kennung.EtikettSet
 }
+
+type Stored = objekte.Stored[Zettel, *Zettel]
 
 func (z Zettel) Gattung() gattung.Gattung {
 	return gattung.Zettel

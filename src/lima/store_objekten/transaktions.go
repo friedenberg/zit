@@ -14,7 +14,6 @@ import (
 	"github.com/friedenberg/zit/src/echo/sku"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/golf/transaktion"
-	"github.com/friedenberg/zit/src/golf/zettel_stored"
 	"github.com/friedenberg/zit/src/hotel/zettel_named"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 )
@@ -98,7 +97,7 @@ func (s Store) readTransaktion(p string) (t *transaktion.Transaktion, err error)
 	return
 }
 
-func (s Store) storedZettelFromSha(sh sha.Sha) (sz zettel_stored.Stored, err error) {
+func (s Store) storedZettelFromSha(sh sha.Sha) (sz zettel.Stored, err error) {
 	var or io.ReadCloser
 
 	if or, err = s.ReadCloserObjekten(id.Path(sh, s.standort.DirObjektenZettelen())); err != nil {
