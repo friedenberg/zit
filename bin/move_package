@@ -13,8 +13,7 @@ gofmt -w -r "$original_pkg -> $renamed_pkg" ./
 mkdir -p "$renamed"
 
 git mv $original/* "$renamed" || mv $original/* "$renamed"
-
-# git mv "$original" "$renamed" || mv "$original" "$renamed"
+rm -r "$original"
 
 declare -r sed_script="
   s|$prefix/$original|$prefix/$renamed|g;

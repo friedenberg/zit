@@ -60,8 +60,8 @@ func (u *Umwelt) FormatTyp() format.FormatWriterFunc[typ.Named] {
 	)
 }
 
-func (u *Umwelt) FormatTypCheckedOut() format.FormatWriterFunc[typ.Typ] {
-	return typ.MakeCliFormatTyp(
+func (u *Umwelt) FormatTypCheckedOut() format.FormatWriterFunc[typ.External] {
+	return typ.MakeCliFormatExternal(
 		u.Standort(),
 		u.FormatColorWriter(),
 		u.FormatSha(),

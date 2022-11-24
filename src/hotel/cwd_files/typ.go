@@ -10,8 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/golf/typ"
 )
 
-type CwdTyp = typ.External
-
 func (c *CwdFiles) tryTyp(fi os.FileInfo) (err error) {
 	var h kennung.Typ
 
@@ -23,12 +21,12 @@ func (c *CwdFiles) tryTyp(fi os.FileInfo) (err error) {
 		return
 	}
 
-	var t *CwdTyp
+	var t *typ.External
 
 	ok := false
 
 	if t, ok = c.Typen[pathMinusExt]; !ok {
-		t = &CwdTyp{
+		t = &typ.External{
 			Named: typ.Named{
 				Kennung: h,
 			},

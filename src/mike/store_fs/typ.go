@@ -18,29 +18,23 @@ func (s *Store) CheckinTyp(p string) (t *typ.Named, err error) {
 	return
 }
 
-func (s *Store) WriteTyp(t *typ.Named) (tco *typ.Typ, err error) {
-	tcwd := &cwd_files.CwdTyp{
+func (s *Store) WriteTyp(t *typ.Named) (te *typ.External, err error) {
+	te = &typ.External{
 		FD: cwd_files.File{
 			Path: fmt.Sprintf("%s.%s", t.Kennung, s.Konfig.Compiled.TypFileExtension),
 		},
-		Named: typ.Named{
-			Kennung: t.Kennung,
-		},
-	}
-
-	tco = &typ.Typ{
-		External: *tcwd,
-		Named:    *t,
+		Named: *t,
 	}
 
 	var f *os.File
 
-	if f, err = files.CreateExclusiveWriteOnly(tcwd.FD.Path); err != nil {
+	if f, err = files.CreateExclusiveWriteOnly(te.FD.Path); err != nil {
 		if errors.IsExist(err) {
-			tco, err = s.ReadTyp(tcwd)
+			err = s.ReadTyp(te)
 		} else {
 			err = errors.Wrap(err)
 		}
+
 		return
 	}
 
@@ -48,7 +42,7 @@ func (s *Store) WriteTyp(t *typ.Named) (tco *typ.Typ, err error) {
 
 	format := typ.MakeFormatText(s.storeObjekten)
 
-	if _, err = format.WriteFormat(f, &t.Stored.Objekte); err != nil {
+	if _, err = format.WriteFormat(f, &te.Named.Stored); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -56,26 +50,19 @@ func (s *Store) WriteTyp(t *typ.Named) (tco *typ.Typ, err error) {
 	return
 }
 
-func (s *Store) ReadTyp(ct *cwd_files.CwdTyp) (t *typ.Typ, err error) {
+func (s *Store) ReadTyp(t *typ.External) (err error) {
 	format := typ.MakeFormatText(s.storeObjekten)
 
 	var f *os.File
 
-	if f, err = files.Open(ct.FD.Path); err != nil {
+	if f, err = files.Open(t.FD.Path); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	defer errors.Deferred(&err, f.Close)
 
-	t = &typ.Typ{
-		External: *ct,
-		Named: typ.Named{
-			Kennung: ct.Named.Kennung,
-		},
-	}
-
-	if _, err = format.ReadFormat(f, &t.Named.Stored.Objekte); err != nil {
+	if _, err = format.ReadFormat(f, &t.Named.Stored); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

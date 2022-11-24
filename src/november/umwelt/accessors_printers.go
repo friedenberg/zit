@@ -13,7 +13,7 @@ import (
 
 func (u *Umwelt) PrinterTypCheckedOut(
 	verb string,
-) collections.WriterFunc[*typ.Typ] {
+) collections.WriterFunc[*typ.External] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
 		u.FormatTypCheckedOut(),

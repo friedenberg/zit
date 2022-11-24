@@ -45,7 +45,7 @@ func (c EditTyp) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 				Kennung: tk,
 			}
 
-			var tco *typ.Typ
+			var tco *typ.External
 
 			if tco, err = u.StoreWorkingDirectory().WriteTyp(t); err != nil {
 				err = errors.Wrap(err)

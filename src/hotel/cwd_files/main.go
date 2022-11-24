@@ -9,13 +9,14 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/echo/konfig"
+	"github.com/friedenberg/zit/src/golf/typ"
 )
 
 type CwdFiles struct {
 	konfig           konfig.Compiled
 	dir              string
 	Zettelen         map[string]CwdZettel
-	Typen            map[string]*CwdTyp
+	Typen            map[string]*typ.External
 	UnsureAkten      []File
 	EmptyDirectories []string
 }
@@ -34,7 +35,7 @@ func makeCwdFiles(konfig konfig.Compiled, dir string) (fs CwdFiles) {
 	fs = CwdFiles{
 		konfig:           konfig,
 		dir:              dir,
-		Typen:            make(map[string]*CwdTyp, 0),
+		Typen:            make(map[string]*typ.External, 0),
 		Zettelen:         make(map[string]CwdZettel, 0),
 		UnsureAkten:      make([]File, 0),
 		EmptyDirectories: make([]string, 0),
