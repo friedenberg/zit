@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/foxtrot/cwd_files"
-	"github.com/friedenberg/zit/src/foxtrot/typ_checked_out"
 	"github.com/friedenberg/zit/src/golf/typ"
 )
 
@@ -19,7 +18,7 @@ func (s *Store) CheckinTyp(p string) (t *typ.Named, err error) {
 	return
 }
 
-func (s *Store) WriteTyp(t *typ.Named) (tco *typ_checked_out.Typ, err error) {
+func (s *Store) WriteTyp(t *typ.Named) (tco *typ.Typ, err error) {
 	tcwd := &cwd_files.CwdTyp{
 		FD: cwd_files.File{
 			Path: fmt.Sprintf("%s.%s", t.Kennung, s.Konfig.Compiled.TypFileExtension),
@@ -29,9 +28,9 @@ func (s *Store) WriteTyp(t *typ.Named) (tco *typ_checked_out.Typ, err error) {
 		},
 	}
 
-	tco = &typ_checked_out.Typ{
-		CwdTyp: *tcwd,
-		Named:  *t,
+	tco = &typ.Typ{
+		External: *tcwd,
+		Named:    *t,
 	}
 
 	var f *os.File
@@ -57,7 +56,7 @@ func (s *Store) WriteTyp(t *typ.Named) (tco *typ_checked_out.Typ, err error) {
 	return
 }
 
-func (s *Store) ReadTyp(ct *cwd_files.CwdTyp) (t *typ_checked_out.Typ, err error) {
+func (s *Store) ReadTyp(ct *cwd_files.CwdTyp) (t *typ.Typ, err error) {
 	format := typ.MakeFormatText(s.storeObjekten)
 
 	var f *os.File
@@ -69,8 +68,8 @@ func (s *Store) ReadTyp(ct *cwd_files.CwdTyp) (t *typ_checked_out.Typ, err error
 
 	defer errors.Deferred(&err, f.Close)
 
-	t = &typ_checked_out.Typ{
-		CwdTyp: *ct,
+	t = &typ.Typ{
+		External: *ct,
 		Named: typ.Named{
 			Kennung: ct.Named.Kennung,
 		},

@@ -4,7 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/bravo/format"
 	"github.com/friedenberg/zit/src/foxtrot/cwd_files"
-	"github.com/friedenberg/zit/src/foxtrot/typ_checked_out"
+	"github.com/friedenberg/zit/src/golf/typ"
 	"github.com/friedenberg/zit/src/india/zettel_external"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
@@ -13,7 +13,7 @@ import (
 
 func (u *Umwelt) PrinterTypCheckedOut(
 	verb string,
-) collections.WriterFunc[*typ_checked_out.Typ] {
+) collections.WriterFunc[*typ.Typ] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
 		u.FormatTypCheckedOut(),

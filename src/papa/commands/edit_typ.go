@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/id_set"
-	"github.com/friedenberg/zit/src/foxtrot/typ_checked_out"
 	"github.com/friedenberg/zit/src/golf/typ"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
@@ -46,7 +45,7 @@ func (c EditTyp) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 				Kennung: tk,
 			}
 
-			var tco *typ_checked_out.Typ
+			var tco *typ.Typ
 
 			if tco, err = u.StoreWorkingDirectory().WriteTyp(t); err != nil {
 				err = errors.Wrap(err)

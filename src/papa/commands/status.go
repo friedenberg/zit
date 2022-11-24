@@ -5,8 +5,8 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/foxtrot/cwd_files"
-	"github.com/friedenberg/zit/src/foxtrot/typ_checked_out"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
+	"github.com/friedenberg/zit/src/golf/typ"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
 	"github.com/friedenberg/zit/src/lima/store_objekten"
 	"github.com/friedenberg/zit/src/mike/store_fs"
@@ -67,7 +67,7 @@ func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	for _, p := range possible.Typen {
-		var t *typ_checked_out.Typ
+		var t *typ.Typ
 
 		if t, err = s.StoreWorkingDirectory().ReadTyp(p); err != nil {
 			err = errors.Wrap(err)

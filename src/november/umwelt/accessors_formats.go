@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/cwd_files"
-	"github.com/friedenberg/zit/src/foxtrot/typ_checked_out"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/golf/typ"
 	"github.com/friedenberg/zit/src/hotel/zettel_named"
@@ -61,8 +60,8 @@ func (u *Umwelt) FormatTyp() format.FormatWriterFunc[typ.Named] {
 	)
 }
 
-func (u *Umwelt) FormatTypCheckedOut() format.FormatWriterFunc[typ_checked_out.Typ] {
-	return typ_checked_out.MakeCliFormat(
+func (u *Umwelt) FormatTypCheckedOut() format.FormatWriterFunc[typ.Typ] {
+	return typ.MakeCliFormatTyp(
 		u.Standort(),
 		u.FormatColorWriter(),
 		u.FormatSha(),
