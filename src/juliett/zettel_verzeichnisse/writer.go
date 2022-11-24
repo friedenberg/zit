@@ -3,7 +3,7 @@ package zettel_verzeichnisse
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/collections"
-	"github.com/friedenberg/zit/src/foxtrot/zettel"
+	"github.com/friedenberg/zit/src/hotel/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 )
 

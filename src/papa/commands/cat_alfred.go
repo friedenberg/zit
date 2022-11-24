@@ -12,7 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/ts"
 	"github.com/friedenberg/zit/src/echo/konfig"
 	"github.com/friedenberg/zit/src/foxtrot/id_set"
-	"github.com/friedenberg/zit/src/foxtrot/zettel"
+	"github.com/friedenberg/zit/src/hotel/zettel"
 	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
 	"github.com/friedenberg/zit/src/kilo/alfred"
 	"github.com/friedenberg/zit/src/november/umwelt"

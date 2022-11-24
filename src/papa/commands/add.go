@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/foxtrot/id_set"
-	"github.com/friedenberg/zit/src/foxtrot/zettel"
+	"github.com/friedenberg/zit/src/hotel/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/organize_text"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"

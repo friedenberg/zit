@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/charlie/bezeichnung"
 	"github.com/friedenberg/zit/src/delta/hinweis"
-	zettel_pkg "github.com/friedenberg/zit/src/foxtrot/zettel"
+	zettel_pkg "github.com/friedenberg/zit/src/hotel/zettel"
 )
 
 //   _____    _   _       _

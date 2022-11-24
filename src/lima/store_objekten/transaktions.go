@@ -12,8 +12,8 @@ import (
 	"github.com/friedenberg/zit/src/delta/id"
 	"github.com/friedenberg/zit/src/delta/ts"
 	"github.com/friedenberg/zit/src/echo/sku"
-	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/golf/transaktion"
+	"github.com/friedenberg/zit/src/hotel/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 )
 

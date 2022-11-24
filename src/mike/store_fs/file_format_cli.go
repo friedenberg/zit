@@ -8,8 +8,8 @@ import (
 	"github.com/friedenberg/zit/src/bravo/format"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/standort"
-	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/hotel/cwd_files"
+	"github.com/friedenberg/zit/src/hotel/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 )
 

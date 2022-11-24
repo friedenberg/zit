@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/friedenberg/zit/src/foxtrot/zettel"
+	"github.com/friedenberg/zit/src/hotel/zettel"
 )
 
 type Zettel struct {

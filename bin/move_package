@@ -1,4 +1,4 @@
-#! /bin/bash -e
+#! /bin/bash -xe
 
 prefix=github.com/friedenberg/zit
 original="${1%/}"
@@ -14,7 +14,6 @@ mkdir -p "$renamed"
 
 git mv $original/* "$renamed" || mv $original/* "$renamed"
 find src -type d -empty -delete
-rm -r "$original"
 
 declare -r sed_script="
   s|$prefix/$original|$prefix/$renamed|g;
