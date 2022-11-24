@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/delta/konfig"
+	"github.com/friedenberg/zit/src/echo/typ"
 )
 
 func MakeSerializedFormatWriter(
@@ -15,7 +16,7 @@ func MakeSerializedFormatWriter(
 	k konfig.Konfig,
 ) collections.WriterFunc[*Zettel] {
 	wf := func(z *Zettel) (err error) {
-		isInline := z.Typ.IsInlineAkte(k)
+		isInline := typ.IsInlineAkte(z.Typ, k)
 
 		ctx := FormatContextWrite{
 			Out:               out,

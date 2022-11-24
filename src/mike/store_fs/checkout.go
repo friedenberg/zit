@@ -9,6 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/id"
+	"github.com/friedenberg/zit/src/echo/typ"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_external"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
@@ -116,7 +117,7 @@ func (s *Store) CheckoutOne(
 		}
 	}
 
-	inlineAkte := sz.Named.Stored.Objekte.Typ.IsInlineAkte(s.Konfig.Konfig)
+	inlineAkte := typ.IsInlineAkte(sz.Named.Stored.Objekte.Typ, s.Konfig.Konfig)
 
 	cz = zettel_checked_out.Zettel{
 		//TODO check diff with fs if already exists

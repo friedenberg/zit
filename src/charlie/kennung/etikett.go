@@ -44,7 +44,7 @@ func (e etikett) String() string {
 
 func (e *etikett) Set(v string) (err error) {
 	if !EtikettRegex.Match([]byte(v)) {
-		err = errors.Errorf("not a valid tag: '%s'", v)
+		err = errors.Errorf("not a valid etikett: '%s'", v)
 		return
 	}
 

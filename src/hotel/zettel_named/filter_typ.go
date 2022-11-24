@@ -7,6 +7,6 @@ import (
 type FilterTyp typ.Kennung
 
 func (f FilterTyp) IncludeNamedZettel(z Zettel) (ok bool) {
-	ok = typ.Kennung(f).Includes(z.Stored.Objekte.Typ.Etikett)
+	ok = typ.Kennung(f).Includes(z.Stored.Objekte.Typ)
 	return
 }

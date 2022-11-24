@@ -61,7 +61,7 @@ LOOP:
 	okTyp := false
 
 	for _, t := range f.Set.Typen() {
-		if okTyp = t.Includes(z.Stored.Objekte.Typ.Etikett); okTyp {
+		if okTyp = t.Includes(z.Stored.Objekte.Typ); okTyp {
 			break
 		}
 	}
