@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/foxtrot/id_set"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
-	"github.com/friedenberg/zit/src/hotel/zettel_named"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
@@ -106,7 +105,7 @@ func (c CatObjekte) akten(u *umwelt.Umwelt, shas sha.Set) (err error) {
 func (c CatObjekte) zettelen(u *umwelt.Umwelt, shas sha.Set) (err error) {
 	w := collections.MakeChain(
 		zettel_transacted.MakeWriterZettelNamed(
-			func(z *zettel_named.Zettel) (err error) {
+			func(z *zettel.Named) (err error) {
 				if !shas.Contains(z.Stored.Sha) {
 					err = io.EOF
 				}

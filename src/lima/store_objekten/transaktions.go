@@ -14,7 +14,6 @@ import (
 	"github.com/friedenberg/zit/src/echo/sku"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/golf/transaktion"
-	"github.com/friedenberg/zit/src/hotel/zettel_named"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 )
 
@@ -130,7 +129,7 @@ func (s Store) storedZettelFromSha(sh sha.Sha) (sz zettel.Stored, err error) {
 // dependency on the index being accurate for the immediate mutter of the zettel
 // in the arguments
 func (s *Store) transactedWithHead(
-	z zettel_named.Zettel,
+	z zettel.Named,
 	t transaktion.Transaktion,
 ) (tz zettel_transacted.Zettel, err error) {
 	tz.Named = z
@@ -218,7 +217,9 @@ func (s Store) writeTransaktion() (err error) {
 	return
 }
 
-func (s *Store) addZettelToTransaktion(z zettel_named.Zettel) (tz zettel_transacted.Zettel, err error) {
+func (s *Store) addZettelToTransaktion(
+	z zettel.Named,
+) (tz zettel_transacted.Zettel, err error) {
 	errors.Log().Printf("adding zettel to transaktion: %s", z.Kennung)
 
 	if tz, err = s.transactedWithHead(z, s.Transaktion); err != nil {

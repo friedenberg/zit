@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/friedenberg/zit/src/hotel/zettel_named"
+	"github.com/friedenberg/zit/src/foxtrot/zettel"
 )
 
 type Zettel struct {
-	Named    zettel_named.Zettel
+	Named    zettel.Named
 	ZettelFD FD
 	AkteFD   FD
 }

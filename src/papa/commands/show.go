@@ -17,7 +17,6 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/golf/typ"
-	"github.com/friedenberg/zit/src/hotel/zettel_named"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
@@ -144,7 +143,7 @@ func (c Show) showZettels(
 ) (err error) {
 	w := collections.MakeChain(
 		zettel_transacted.MakeWriterZettelNamed(
-			zettel_named.FilterIdSet{
+			zettel.FilterIdSet{
 				Set: ids,
 			}.WriteZettelNamed,
 		),

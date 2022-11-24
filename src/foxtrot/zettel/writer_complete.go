@@ -1,4 +1,4 @@
-package zettel_named
+package zettel
 
 import (
 	"bufio"
@@ -8,20 +8,20 @@ import (
 )
 
 type WriterComplete struct {
-	wBuf     *bufio.Writer
-	chZettel chan Zettel
-	chDone   chan struct{}
+	wBuf    *bufio.Writer
+	chNamed chan Named
+	chDone  chan struct{}
 }
 
 func MakeWriterComplete(w io.Writer) WriterComplete {
 	w1 := WriterComplete{
-		chZettel: make(chan Zettel),
-		chDone:   make(chan struct{}),
-		wBuf:     bufio.NewWriter(w),
+		chNamed: make(chan Named),
+		chDone:  make(chan struct{}),
+		wBuf:    bufio.NewWriter(w),
 	}
 
 	go func(s *WriterComplete) {
-		for z := range s.chZettel {
+		for z := range s.chNamed {
 			if z.Kennung.String() == "/" {
 				errors.Err().Printf("empty: %#v", z)
 				continue
@@ -42,19 +42,19 @@ func MakeWriterComplete(w io.Writer) WriterComplete {
 	return w1
 }
 
-func (w *WriterComplete) WriteZettelNamed(z *Zettel) (err error) {
+func (w *WriterComplete) WriteZettelNamed(z *Named) (err error) {
 	select {
 	case <-w.chDone:
 		err = io.EOF
 
-	case w.chZettel <- *z:
+	case w.chNamed <- *z:
 	}
 
 	return
 }
 
 func (w *WriterComplete) Close() (err error) {
-	close(w.chZettel)
+	close(w.chNamed)
 	<-w.chDone
 
 	if err = w.wBuf.Flush(); err != nil {

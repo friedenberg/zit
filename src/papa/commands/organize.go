@@ -15,7 +15,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/delta/ts"
 	"github.com/friedenberg/zit/src/foxtrot/id_set"
-	"github.com/friedenberg/zit/src/hotel/zettel_named"
+	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/organize_text"
 	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
@@ -148,7 +148,7 @@ func (c *Organize) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 	getResults := zettel_transacted.MakeMutableSetUnique(0)
 
-	query := zettel_named.FilterIdSet{
+	query := zettel.FilterIdSet{
 		Set: ids,
 		Or:  c.Or,
 	}

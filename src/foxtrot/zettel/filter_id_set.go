@@ -1,4 +1,4 @@
-package zettel_named
+package zettel
 
 import (
 	"io"
@@ -13,7 +13,7 @@ type FilterIdSet struct {
 	Or         bool
 }
 
-func (f FilterIdSet) WriteZettelNamed(z *Zettel) (err error) {
+func (f FilterIdSet) WriteZettelNamed(z *Named) (err error) {
 	if !f.IncludeNamedZettel(z) {
 		err = io.EOF
 		return
@@ -23,7 +23,7 @@ func (f FilterIdSet) WriteZettelNamed(z *Zettel) (err error) {
 }
 
 // TODO improve the performance of this query
-func (f FilterIdSet) IncludeNamedZettel(z *Zettel) (ok bool) {
+func (f FilterIdSet) IncludeNamedZettel(z *Named) (ok bool) {
 	needsEt := f.Set.Etiketten().Len() > 0
 	okEt := false
 

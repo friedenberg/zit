@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/bezeichnung"
 	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/objekte"
 )
@@ -18,6 +19,13 @@ type Zettel struct {
 }
 
 type Stored = objekte.Stored[Zettel, *Zettel]
+
+type Named = objekte.Named[
+	Zettel,
+	*Zettel,
+	hinweis.Hinweis,
+	*hinweis.Hinweis,
+]
 
 func (z Zettel) Gattung() gattung.Gattung {
 	return gattung.Zettel

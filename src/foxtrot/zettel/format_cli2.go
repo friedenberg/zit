@@ -1,4 +1,4 @@
-package zettel_named
+package zettel
 
 import (
 	"io"
@@ -6,16 +6,15 @@ import (
 	"github.com/friedenberg/zit/src/bravo/format"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/hinweis"
-	"github.com/friedenberg/zit/src/foxtrot/zettel"
 )
 
 // [kopf/schwanz@sha !typ]
-func MakeCliFormat(
+func MakeCliFormatNamed(
 	hf format.FormatWriterFunc[hinweis.Hinweis],
 	sf format.FormatWriterFunc[sha.Sha],
-	zf format.FormatWriterFunc[zettel.Zettel],
-) format.FormatWriterFunc[Zettel] {
-	return func(w io.Writer, z *Zettel) (n int64, err error) {
+	zf format.FormatWriterFunc[Zettel],
+) format.FormatWriterFunc[Named] {
+	return func(w io.Writer, z *Named) (n int64, err error) {
 		return format.Write(
 			w,
 			format.MakeFormatString("["),

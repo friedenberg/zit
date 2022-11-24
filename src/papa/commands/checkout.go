@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/ts"
 	"github.com/friedenberg/zit/src/foxtrot/id_set"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
-	"github.com/friedenberg/zit/src/hotel/zettel_named"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/mike/store_fs"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -73,7 +72,7 @@ func (c Checkout) RunWithIds(s *umwelt.Umwelt, ids id_set.Set) (err error) {
 	}
 
 	query := zettel_transacted.WriterIds(
-		zettel_named.FilterIdSet{
+		zettel.FilterIdSet{
 			Set: ids,
 			Or:  c.Or,
 		},

@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/delta/ts"
 	"github.com/friedenberg/zit/src/foxtrot/id_set"
-	"github.com/friedenberg/zit/src/hotel/zettel_named"
+	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
@@ -66,7 +66,7 @@ func (c commandWithIds) Complete(u *umwelt.Umwelt, args ...string) (err error) {
 
 	if ps.Contains(&hinweis.Hinweis{}) {
 		func() {
-			zw := zettel_named.MakeWriterComplete(os.Stdout)
+			zw := zettel.MakeWriterComplete(os.Stdout)
 			defer zw.Close()
 
 			w := zettel_verzeichnisse.MakeWriterZettelNamed(zw.WriteZettelNamed)

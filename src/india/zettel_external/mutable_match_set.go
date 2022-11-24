@@ -3,7 +3,7 @@ package zettel_external
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/hotel/zettel_named"
+	"github.com/friedenberg/zit/src/foxtrot/zettel"
 )
 
 type MutableMatchSet struct {
@@ -27,7 +27,7 @@ func MakeMutableMatchSet(in MutableSet) (out MutableMatchSet) {
 	return
 }
 
-func (s MutableMatchSet) Match(z *zettel_named.Zettel) (err error) {
+func (s MutableMatchSet) Match(z *zettel.Named) (err error) {
 	kStored := z.Stored.Sha.String()
 	kAkte := z.Stored.Objekte.Akte.String()
 

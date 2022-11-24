@@ -22,7 +22,6 @@ import (
 	"github.com/friedenberg/zit/src/echo/sku"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/golf/transaktion"
-	"github.com/friedenberg/zit/src/hotel/zettel_named"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
 	"github.com/friedenberg/zit/src/kilo/store_verzeichnisse"
@@ -414,7 +413,7 @@ func (s Store) Etiketten() (es []kennung.Etikett, err error) {
 
 // TODO support dry run
 func (s *Store) Update(
-	z *zettel_named.Zettel,
+	z *zettel.Named,
 ) (tz zettel_transacted.Zettel, err error) {
 	if !s.lockSmith.IsAcquired() {
 		err = ErrLockRequired{

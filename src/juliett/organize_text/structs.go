@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/charlie/bezeichnung"
 	"github.com/friedenberg/zit/src/delta/hinweis"
-	"github.com/friedenberg/zit/src/hotel/zettel_named"
+	zettel_pkg "github.com/friedenberg/zit/src/foxtrot/zettel"
 )
 
 //   _____    _   _       _
@@ -24,7 +24,7 @@ type zettel struct {
 	bezeichnung.Bezeichnung
 }
 
-func makeZettel(named zettel_named.Zettel, ha hinweis.Abbr) (z zettel, err error) {
+func makeZettel(named zettel_pkg.Named, ha hinweis.Abbr) (z zettel, err error) {
 	h := named.Kennung
 
 	if ha != nil {

@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/golf/typ"
 	"github.com/friedenberg/zit/src/hotel/cwd_files"
-	"github.com/friedenberg/zit/src/hotel/zettel_named"
 	"github.com/friedenberg/zit/src/india/zettel_external"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
@@ -77,8 +76,8 @@ func (u *Umwelt) FormatZettel() format.FormatWriterFunc[zettel.Zettel] {
 	)
 }
 
-func (u *Umwelt) FormatZettelNamed() format.FormatWriterFunc[zettel_named.Zettel] {
-	return zettel_named.MakeCliFormat(
+func (u *Umwelt) FormatZettelNamed() format.FormatWriterFunc[zettel.Named] {
+	return zettel.MakeCliFormatNamed(
 		u.FormatHinweis(),
 		u.FormatSha(),
 		u.FormatZettel(),

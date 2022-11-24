@@ -5,7 +5,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
-	"github.com/friedenberg/zit/src/hotel/zettel_named"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/organize_text"
 	"github.com/friedenberg/zit/src/kilo/changes"
@@ -38,9 +37,9 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 		return
 	}
 
-	toUpdate := make(map[string]zettel_named.Zettel)
+	toUpdate := make(map[string]zettel.Named)
 
-	addOrGetToZettelToUpdate := func(hString string) (z zettel_named.Zettel, err error) {
+	addOrGetToZettelToUpdate := func(hString string) (z zettel.Named, err error) {
 		var h hinweis.Hinweis
 
 		if h, err = store.ExpandHinweisString(hString); err != nil {
@@ -65,7 +64,7 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 	}
 
 	addEtikettToZettel := func(hString string, e kennung.Etikett) (err error) {
-		var z zettel_named.Zettel
+		var z zettel.Named
 
 		if z, err = addOrGetToZettelToUpdate(hString); err != nil {
 			err = errors.Wrap(err)
@@ -83,7 +82,7 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 	}
 
 	removeEtikettFromZettel := func(hString string, e kennung.Etikett) (err error) {
-		var z zettel_named.Zettel
+		var z zettel.Named
 
 		if z, err = addOrGetToZettelToUpdate(hString); err != nil {
 			err = errors.Wrap(err)
@@ -131,7 +130,7 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 
 	if !sameTyp {
 		for _, h := range cs.AllB {
-			var z zettel_named.Zettel
+			var z zettel.Named
 
 			if z, err = addOrGetToZettelToUpdate(h); err != nil {
 				err = errors.Wrap(err)

@@ -1,18 +1,18 @@
-package zettel_named
+package zettel
 
 import (
 	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 )
 
-type MutableSet struct {
-	collections.MutableSetLike[*Zettel]
+type NamedMutableSet struct {
+	collections.MutableSetLike[*Named]
 }
 
-func MakeMutableSet() MutableSet {
-	return MutableSet{
+func MakeNamedMutableSet() NamedMutableSet {
+	return NamedMutableSet{
 		MutableSetLike: collections.MakeMutableSet(
-			func(sz *Zettel) string {
+			func(sz *Named) string {
 				if sz == nil {
 					return ""
 				}
@@ -25,11 +25,11 @@ func MakeMutableSet() MutableSet {
 	}
 }
 
-func (s MutableSet) Hinweisen() (h []hinweis.Hinweis) {
+func (s NamedMutableSet) Hinweisen() (h []hinweis.Hinweis) {
 	h = make([]hinweis.Hinweis, 0, s.Len())
 
 	s.Each(
-		func(z *Zettel) (err error) {
+		func(z *Named) (err error) {
 			h = append(h, z.Kennung)
 
 			return
@@ -39,11 +39,11 @@ func (s MutableSet) Hinweisen() (h []hinweis.Hinweis) {
 	return
 }
 
-func (s MutableSet) HinweisStrings() (h []string) {
+func (s NamedMutableSet) HinweisStrings() (h []string) {
 	h = make([]string, 0, s.Len())
 
 	s.Each(
-		func(z *Zettel) (err error) {
+		func(z *Named) (err error) {
 			h = append(h, z.Kennung.String())
 
 			return

@@ -12,7 +12,6 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/id_set"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/hotel/cwd_files"
-	"github.com/friedenberg/zit/src/hotel/zettel_named"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
 	"github.com/friedenberg/zit/src/mike/store_fs"
@@ -87,7 +86,7 @@ func (c Edit) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	var checkoutResults zettel_checked_out.MutableSet
 
 	query := zettel_transacted.WriterIds(
-		zettel_named.FilterIdSet{
+		zettel.FilterIdSet{
 			Set: ids,
 			Or:  c.Or,
 		},

@@ -4,12 +4,12 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/bravo/format"
-	"github.com/friedenberg/zit/src/hotel/zettel_named"
+	"github.com/friedenberg/zit/src/foxtrot/zettel"
 )
 
 // (new|unchanged|updated|archived) [kopf/schwanz@sha !typ]
 func MakeCliFormat(
-	znf format.FormatWriterFunc[zettel_named.Zettel],
+	znf format.FormatWriterFunc[zettel.Named],
 	verb string,
 ) format.FormatWriterFunc[Zettel] {
 	return func(w io.Writer, z *Zettel) (n int64, err error) {

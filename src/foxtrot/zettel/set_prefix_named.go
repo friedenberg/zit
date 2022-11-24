@@ -1,14 +1,14 @@
-package zettel_named
+package zettel
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
-type SetPrefixNamed map[kennung.Etikett]MutableSet
+type SetPrefixNamed map[kennung.Etikett]NamedMutableSet
 
 type SetPrefixNamedSegments struct {
-	Ungrouped MutableSet
+	Ungrouped NamedMutableSet
 	Grouped   *SetPrefixNamed
 }
 
@@ -18,7 +18,7 @@ func NewSetPrefixNamed() *SetPrefixNamed {
 }
 
 // this splits on right-expanded
-func (s *SetPrefixNamed) Add(z Zettel) {
+func (s *SetPrefixNamed) Add(z Named) {
 	es := kennung.Expanded(z.Stored.Objekte.Etiketten, kennung.ExpanderRight)
 
 	for _, e := range es.Elements() {
@@ -26,11 +26,11 @@ func (s *SetPrefixNamed) Add(z Zettel) {
 	}
 }
 
-func (s *SetPrefixNamed) addPair(e kennung.Etikett, z Zettel) {
+func (s *SetPrefixNamed) addPair(e kennung.Etikett, z Named) {
 	existing, ok := (*s)[e]
 
 	if !ok {
-		existing = MakeMutableSet()
+		existing = MakeNamedMutableSet()
 	}
 
 	existing.Add(&z)
@@ -41,12 +41,12 @@ func (s *SetPrefixNamed) addPair(e kennung.Etikett, z Zettel) {
 // etikett, and if there is a prefix match, group it out the output set segments
 // appropriately
 func (a SetPrefixNamed) Subset(e kennung.Etikett) (out SetPrefixNamedSegments) {
-	out.Ungrouped = MakeMutableSet()
+	out.Ungrouped = MakeNamedMutableSet()
 	out.Grouped = NewSetPrefixNamed()
 
 	for e1, zSet := range a {
 		zSet.Each(
-			func(z *Zettel) (err error) {
+			func(z *Named) (err error) {
 				intersection := z.Stored.Objekte.Etiketten.IntersectPrefixes(kennung.MakeEtikettSet(e))
 				errors.Log().Printf("%s yields %s", e1, intersection)
 
@@ -66,12 +66,12 @@ func (a SetPrefixNamed) Subset(e kennung.Etikett) (out SetPrefixNamedSegments) {
 	return
 }
 
-func (s SetPrefixNamed) ToSetNamed() (out MutableSet) {
-	out = MakeMutableSet()
+func (s SetPrefixNamed) ToSetNamed() (out NamedMutableSet) {
+	out = MakeNamedMutableSet()
 
 	for _, zs := range s {
 		zs.Each(
-			func(z *Zettel) (err error) {
+			func(z *Named) (err error) {
 				out.Add(z)
 
 				return

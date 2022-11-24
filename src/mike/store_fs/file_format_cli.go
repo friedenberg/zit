@@ -8,8 +8,8 @@ import (
 	"github.com/friedenberg/zit/src/bravo/format"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/standort"
+	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/hotel/cwd_files"
-	"github.com/friedenberg/zit/src/hotel/zettel_named"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 )
 
@@ -44,7 +44,7 @@ func MakeCliFormatRecognized(
 	cw format.FuncColorWriter,
 	s standort.Standort,
 	sf format.FormatWriterFunc[sha.Sha],
-	znf format.FormatWriterFunc[zettel_named.Zettel],
+	znf format.FormatWriterFunc[zettel.Named],
 ) format.FormatWriterFunc[FileRecognized] {
 	return func(w io.Writer, zr *FileRecognized) (n int64, err error) {
 		return format.Write(
