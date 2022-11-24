@@ -144,7 +144,7 @@ func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 		CacheEnabled: u.konfig.CheckoutCacheEnabled,
 	}
 
-	errors.Print("initing checkout store")
+	errors.Log().Print("initing checkout store")
 	u.storeWorkingDirectory, err = store_fs.New(
 		csk,
 		u.standort,
@@ -152,12 +152,12 @@ func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 	)
 
 	if err != nil {
-		errors.Print(err)
+		errors.Log().Print(err)
 		err = errors.Wrap(err)
 		return
 	}
 
-	errors.Print("done initing checkout store")
+	errors.Log().Print("done initing checkout store")
 
 	u.storeObjekten.SetZettelTransactedLogWriter(
 		store_objekten.ZettelTransactedLogWriters{

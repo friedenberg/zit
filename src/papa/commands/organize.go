@@ -182,8 +182,8 @@ func (c *Organize) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 	switch c.Mode {
 	case organizeModeCommitDirectly:
-		errors.Print("neither stdin or stdout is a tty")
-		errors.Print("generate organize, read from stdin, commit")
+		errors.Log().Print("neither stdin or stdout is a tty")
+		errors.Log().Print("generate organize, read from stdin, commit")
 
 		var createOrganizeFileResults *organize_text.Text
 
@@ -228,14 +228,14 @@ func (c *Organize) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 		}
 
 	case organizeModeOutputOnly:
-		errors.Print("generate organize file and write to stdout")
+		errors.Log().Print("generate organize file and write to stdout")
 		if _, err = createOrganizeFileOp.RunAndWrite(getResults, os.Stdout); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case organizeModeInteractive:
-		errors.Print("generate temp file, write organize, open vim to edit, commit results")
+		errors.Log().Print("generate temp file, write organize, open vim to edit, commit results")
 		var createOrganizeFileResults *organize_text.Text
 
 		var f *os.File
@@ -311,7 +311,7 @@ func (c Organize) readFromVim(
 			err = nil
 			ot, err = c.readFromVim(u, f, results)
 		} else {
-			errors.PrintErrf("aborting organize")
+			errors.Err().Printf("aborting organize")
 			return
 		}
 	}
@@ -323,26 +323,26 @@ func (c Organize) handleReadChangesError(err error) (tryAgain bool) {
 	var errorRead organize_text.ErrorRead
 
 	if err != nil && !errors.As(err, &errorRead) {
-		errors.PrintErrf("unrecoverable organize read failure: %s", err)
+		errors.Err().Printf("unrecoverable organize read failure: %s", err)
 		tryAgain = false
 		return
 	}
 
-	errors.PrintErrf("reading changes failed: %q", err)
-	errors.PrintErrf("would you like to edit and try again? (y/*)")
+	errors.Err().Printf("reading changes failed: %q", err)
+	errors.Err().Printf("would you like to edit and try again? (y/*)")
 
 	var answer rune
 	var n int
 
 	if n, err = fmt.Scanf("%c", &answer); err != nil {
 		tryAgain = false
-		errors.PrintErrf("failed to read answer: %s", err)
+		errors.Err().Printf("failed to read answer: %s", err)
 		return
 	}
 
 	if n != 1 {
 		tryAgain = false
-		errors.PrintErrf("failed to read at exactly 1 answer: %s", err)
+		errors.Err().Printf("failed to read at exactly 1 answer: %s", err)
 		return
 	}
 

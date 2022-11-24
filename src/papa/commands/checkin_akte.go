@@ -63,7 +63,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	zettels := make([]zettel_transacted.Zettel, len(pairs))
-	errors.PrintDebug(pairs)
+	errors.Log().PrintDebug(pairs)
 
 	// iterate through pairs and read current zettel
 	for i, p := range pairs {

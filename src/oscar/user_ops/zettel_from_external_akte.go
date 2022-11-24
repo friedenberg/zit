@@ -130,7 +130,7 @@ func (c ZettelFromExternalAkte) Run(
 			pathRel := c.Standort().RelToCwdOrSame(z.AkteFD.Path)
 
 			//TODO move to printer
-			errors.PrintOutf("[%s] (deleted)", pathRel)
+			errors.Out().Printf("[%s] (deleted)", pathRel)
 
 			return
 		},
@@ -153,7 +153,7 @@ func (c ZettelFromExternalAkte) zettelForAkte(
 
 	var r io.Reader
 
-	errors.Print("running")
+	errors.Log().Print("running")
 
 	if r, err = c.Filter.Run(akteFD.Path); err != nil {
 		err = errors.Wrap(err)

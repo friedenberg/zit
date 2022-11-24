@@ -15,9 +15,9 @@ func Run(args []string) (exitStatus int) {
 	var err error
 
 	defer func() {
-		errors.Print("checking for open files")
+		errors.Log().Print("checking for open files")
 		l := files.Len()
-		errors.Printf("open files: %d", l)
+		errors.Log().Printf("open files: %d", l)
 
 		var normalError errors.StackTracer
 
@@ -26,10 +26,10 @@ func Run(args []string) (exitStatus int) {
 		}
 
 		if errors.As(err, &normalError) {
-			errors.PrintErrf("%s", normalError.Error())
+			errors.Err().Printf("%s", normalError.Error())
 		} else {
 			if err != nil {
-				errors.PrintErr(err)
+				errors.Err().Print(err)
 			}
 		}
 	}()
@@ -42,7 +42,7 @@ func Run(args []string) (exitStatus int) {
 	}
 
 	if len(os.Args) < 1 {
-		errors.Print("printing usage")
+		errors.Log().Print("printing usage")
 		return cmd.PrintUsage(nil)
 	}
 

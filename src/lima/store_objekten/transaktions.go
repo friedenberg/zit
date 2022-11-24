@@ -187,11 +187,11 @@ func (s Store) transactedZettelFromTransaktionObjekte(
 
 func (s Store) writeTransaktion() (err error) {
 	if s.Transaktion.Len() == 0 {
-		errors.Print("not writing Transaktion as there aren't any Objekten")
+		errors.Log().Print("not writing Transaktion as there aren't any Objekten")
 		return
 	}
 
-	errors.Printf("writing Transaktion with %d Objekten", s.Transaktion.Len())
+	errors.Log().Printf("writing Transaktion with %d Objekten", s.Transaktion.Len())
 
 	var p string
 
@@ -220,7 +220,7 @@ func (s Store) writeTransaktion() (err error) {
 }
 
 func (s *Store) addZettelToTransaktion(z zettel_named.Zettel) (tz zettel_transacted.Zettel, err error) {
-	errors.Printf("adding zettel to transaktion: %s", z.Kennung)
+	errors.Log().Printf("adding zettel to transaktion: %s", z.Kennung)
 
 	if tz, err = s.transactedWithHead(z, s.Transaktion); err != nil {
 		err = errors.Wrap(err)

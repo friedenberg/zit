@@ -145,7 +145,7 @@ func (c CreateFromPaths) Run(args ...string) (results zettel_transacted.MutableS
 			pathRel := c.Standort().RelToCwdOrSame(z.ZettelFD.Path)
 
 			//TODO move to printer
-			errors.PrintOutf("[%s] (deleted)", pathRel)
+			errors.Out().Printf("[%s] (deleted)", pathRel)
 
 			return
 		},
@@ -166,7 +166,7 @@ func (c CreateFromPaths) zettelsFromPath(
 ) (err error) {
 	var r io.Reader
 
-	errors.Print("running")
+	errors.Log().Print("running")
 
 	if r, err = c.Filter.Run(p); err != nil {
 		err = errors.Wrap(err)
@@ -256,16 +256,16 @@ func (c CreateFromPaths) handleStoreError(z zettel_checked_out.Zettel, f string,
 		var p string
 
 		if p, err = lostError.AddToLostAndFound(c.Standort().DirZit("Verloren+Gefunden")); err != nil {
-			errors.PrintErr(err)
+			errors.Err().Print(err)
 			return
 		}
 
-		errors.PrintOutf("lost+found: %s: %s", lostError.Error(), p)
+		errors.Out().Printf("lost+found: %s: %s", lostError.Error(), p)
 
 	} else if errors.As(in, &normalError) {
-		errors.PrintErrf("%s", normalError.Error())
+		errors.Err().Printf("%s", normalError.Error())
 	} else {
 		err = errors.Errorf("writing zettel failed: %s: %s", f, in)
-		errors.PrintErr(err)
+		errors.Err().Print(err)
 	}
 }

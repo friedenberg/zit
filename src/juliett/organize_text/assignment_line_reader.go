@@ -163,9 +163,9 @@ func (ar *assignmentLineReader) readOneHeading(l line) (err error) {
 			return
 		}
 
-		errors.Print(currentEtiketten.String())
-		errors.Print(l.value)
-		errors.Print(currentEtiketten.Len())
+		errors.Log().Print(currentEtiketten.String())
+		errors.Log().Print(l.value)
+		errors.Log().Print(currentEtiketten.Len())
 	}
 
 	var newAssignment *assignment

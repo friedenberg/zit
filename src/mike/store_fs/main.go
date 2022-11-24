@@ -78,7 +78,7 @@ func (s Store) flushToTemp() (tfp string, err error) {
 
 	for p, e := range s.entries {
 		out := fmt.Sprintf("%s %s\n", p, e)
-		errors.Printf("flushing zettel: %q", out)
+		errors.Log().Printf("flushing zettel: %q", out)
 		w.WriteString(fmt.Sprint(out))
 	}
 
@@ -94,7 +94,7 @@ func (s Store) Flush() (err error) {
 			return
 		}
 
-		errors.Printf("renaming %s to %s", tfp, s.IndexFilePath())
+		errors.Log().Printf("renaming %s to %s", tfp, s.IndexFilePath())
 		if err = os.Rename(tfp, s.IndexFilePath()); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -128,7 +128,7 @@ func (s Store) MakeExternalZettelFromZettel(p string) (ez zettel_external.Zettel
 }
 
 func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
-	errors.PrintDebug(ez)
+	errors.Log().PrintDebug(ez)
 	if !files.Exists(ez.ZettelFD.Path) {
 		//if the path does not have an extension, try looking for a file with that
 		//extension

@@ -67,7 +67,7 @@ func (c Make) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	go c.exec(wg, pipePath, cmd)
 
 	wg.Wait()
-	errors.Print("done waiting")
+	errors.Log().Print("done waiting")
 
 	return
 }
@@ -205,7 +205,7 @@ func (c Make) feedPipe(
 		return
 	}
 
-	errors.Print("done copying")
+	errors.Log().Print("done copying")
 
 	return
 }
@@ -227,14 +227,14 @@ func (c Make) exec(
 
 	// cmd.ExtraFiles = append(cmd.ExtraFiles, pipeFileReader)
 
-	errors.Print("start running")
+	errors.Log().Print("start running")
 
 	if err = cmd.Run(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	errors.Print("done running")
+	errors.Log().Print("done running")
 
 	return
 }

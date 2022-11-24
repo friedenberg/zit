@@ -29,12 +29,12 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 		return
 	}
 
-	errors.Printf("%#v", cs)
+	errors.Log().Printf("%#v", cs)
 
 	sameTyp := a.Metadatei.Typ.Equals(&b.Metadatei.Typ)
 
 	if len(cs.Added) == 0 && len(cs.Removed) == 0 && len(cs.New) == 0 && sameTyp {
-		errors.PrintErr("no changes")
+		errors.Err().Print("no changes")
 		return
 	}
 
@@ -77,7 +77,7 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 		z.Stored.Objekte.Etiketten = mes.Copy()
 		toUpdate[z.Kennung.String()] = z
 
-		errors.PrintErrf("Added etikett '%s' to zettel '%s'", e, z.Kennung)
+		errors.Err().Printf("Added etikett '%s' to zettel '%s'", e, z.Kennung)
 
 		return
 	}
@@ -96,7 +96,7 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 
 		toUpdate[z.Kennung.String()] = z
 
-		errors.PrintErrf("Removed etikett '%s' from zettel '%s'", e, z.Kennung)
+		errors.Err().Printf("Removed etikett '%s' from zettel '%s'", e, z.Kennung)
 
 		return
 	}
@@ -142,7 +142,7 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 
 			toUpdate[z.Kennung.String()] = z
 
-			errors.PrintErrf("Switched to typ '%s' for zettel '%s'", b.Metadatei.Typ, z.Kennung)
+			errors.Err().Printf("Switched to typ '%s' for zettel '%s'", b.Metadatei.Typ, z.Kennung)
 		}
 	}
 
@@ -168,7 +168,7 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 		}
 
 		if c.Konfig().DryRun {
-			errors.PrintOutf("[%s] (would create)", z.Bezeichnung)
+			errors.Out().Printf("[%s] (would create)", z.Bezeichnung)
 			continue
 		}
 
@@ -180,12 +180,12 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 
 	for _, z := range toUpdate {
 		if c.Konfig().DryRun {
-			errors.PrintOutf("[%s] (would update)", z.Kennung)
+			errors.Out().Printf("[%s] (would update)", z.Kennung)
 			continue
 		}
 
 		if _, err = store.Update(&z); err != nil {
-			errors.PrintErrf("failed to update zettel: %s", err)
+			errors.Err().Printf("failed to update zettel: %s", err)
 		}
 	}
 

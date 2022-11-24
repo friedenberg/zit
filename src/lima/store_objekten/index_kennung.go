@@ -54,7 +54,7 @@ func newIndexKennung(
 
 func (i *indexKennung) Flush() (err error) {
 	if !i.hasChanges {
-		errors.Print("no changes")
+		errors.Log().Print("no changes")
 		return
 	}
 
@@ -83,11 +83,11 @@ func (i *indexKennung) Flush() (err error) {
 
 func (i *indexKennung) readIfNecessary() (err error) {
 	if i.didRead {
-		errors.Print("already read")
+		errors.Log().Print("already read")
 		return
 	}
 
-	errors.Print("reading")
+	errors.Log().Print("reading")
 
 	i.didRead = true
 
@@ -140,7 +140,7 @@ func (i *indexKennung) reset() (err error) {
 				Right: coordinates.Int(r),
 			}
 
-			errors.Print(k)
+			errors.Log().Print(k)
 
 			n := int(k.Id())
 			i.AvailableKennung[n] = true
@@ -176,7 +176,7 @@ func (i *indexKennung) addHinweis(h hinweis.Hinweis) (err error) {
 	}
 
 	n := k.Id()
-	errors.Printf("deleting %d, %s", n, h)
+	errors.Log().Printf("deleting %d, %s", n, h)
 
 	if _, ok := i.AvailableKennung[int(n)]; ok {
 		delete(i.AvailableKennung, int(n))

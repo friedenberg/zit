@@ -82,7 +82,7 @@ func (s *ScriptValue) Run(input string) (r io.Reader, err error) {
 		return
 	}
 
-	errors.Print("starting")
+	errors.Log().Print("starting")
 	s.cmd.Start()
 
 	return

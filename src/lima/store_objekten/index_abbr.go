@@ -51,7 +51,7 @@ func newIndexAbbr(
 
 func (i *indexAbbr) Flush() (err error) {
 	if !i.hasChanges {
-		errors.Print("no changes")
+		errors.Log().Print("no changes")
 		return
 	}
 
@@ -79,14 +79,14 @@ func (i *indexAbbr) Flush() (err error) {
 }
 
 func (i *indexAbbr) readIfNecessary() (err error) {
-	errors.Caller(1, "")
+	errors.Log().Caller(1, "")
 
 	if i.didRead {
-		errors.Print("already read")
+		errors.Log().Print("already read")
 		return
 	}
 
-	errors.Print("reading")
+	errors.Log().Print("reading")
 
 	i.didRead = true
 
@@ -108,15 +108,15 @@ func (i *indexAbbr) readIfNecessary() (err error) {
 
 	dec := gob.NewDecoder(r)
 
-	errors.Print("starting decode")
+	errors.Log().Print("starting decode")
 
 	if err = dec.Decode(&i.indexAbbrEncodableTridexes); err != nil {
-		errors.Print("finished decode unsuccessfully")
+		errors.Log().Print("finished decode unsuccessfully")
 		err = errors.Wrap(err)
 		return
 	}
 
-	errors.Print("finished decode successfully")
+	errors.Log().Print("finished decode successfully")
 
 	return
 }
@@ -181,7 +181,7 @@ func (i *indexAbbr) AbbreviateHinweis(h hinweis.Hinweis) (ha hinweis.Hinweis, er
 
 	if kopf == "" || schwanz == "" {
 		err = errors.Errorf("abbreviated kopf would be empty for %s", h)
-		errors.PrintDebug(i.indexAbbrEncodableTridexes.HinweisKopfen)
+		errors.Log().PrintDebug(i.indexAbbrEncodableTridexes.HinweisKopfen)
 		return
 	}
 
@@ -199,7 +199,7 @@ func (i *indexAbbr) AbbreviateHinweis(h hinweis.Hinweis) (ha hinweis.Hinweis, er
 }
 
 func (i *indexAbbr) ExpandHinweisString(s string) (h hinweis.Hinweis, err error) {
-	errors.Print(s)
+	errors.Log().Print(s)
 
 	var ha hinweis.Hinweis
 
@@ -229,7 +229,7 @@ func (i *indexAbbr) ExpandHinweis(hAbbr hinweis.Hinweis) (h hinweis.Hinweis, err
 }
 
 func (i *indexAbbr) ExpandEtikettString(s string) (e kennung.Etikett, err error) {
-	errors.Print(s)
+	errors.Log().Print(s)
 
 	if e, err = kennung.MakeEtikett(s); err != nil {
 		err = errors.Wrap(err)
@@ -240,7 +240,7 @@ func (i *indexAbbr) ExpandEtikettString(s string) (e kennung.Etikett, err error)
 }
 
 func (i *indexAbbr) ExpandEtikett(eAbbr kennung.Etikett) (e kennung.Etikett, err error) {
-	errors.Print(eAbbr)
+	errors.Log().Print(eAbbr)
 
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)

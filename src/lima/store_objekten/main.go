@@ -209,7 +209,7 @@ func (s Store) writeNamedZettelToIndex(tz zettel_transacted.Zettel) (err error) 
 		return
 	}
 
-	errors.Printf("writing zettel to index: %s", tz.Named)
+	errors.Log().Printf("writing zettel to index: %s", tz.Named)
 
 	if err = s.verzeichnisseSchwanzen.Add(tz, tz.Named.Kennung.String()); err != nil {
 		err = errors.Wrap(err)
@@ -223,7 +223,7 @@ func (s Store) writeNamedZettelToIndex(tz zettel_transacted.Zettel) (err error) 
 
 	if err = s.indexKennung.addHinweis(tz.Named.Kennung); err != nil {
 		if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
-			errors.PrintErrf("kennung does not contain value: %s", err)
+			errors.Log().Printf("kennung does not contain value: %s", err)
 			err = nil
 		} else {
 			err = errors.Wrapf(err, "failed to write zettel to index: %s", tz.Named)
@@ -509,7 +509,7 @@ func (s Store) RevertTransaktion(
 				return
 			}
 
-			errors.Print(o)
+			errors.Log().Print(o)
 
 			var chain []*zettel_transacted.Zettel
 
@@ -521,7 +521,7 @@ func (s Store) RevertTransaktion(
 			var tz zettel_transacted.Zettel
 
 			for _, someTz := range chain {
-				errors.Print(someTz)
+				errors.Log().Print(someTz)
 				if someTz.Schwanz == o.Mutter[0] {
 					tz = *someTz
 					break

@@ -59,7 +59,7 @@ func (op FilterZettelsWithScript) Run() (err error) {
 
 	case hinweisen := <-chDone:
 
-		errors.Printf("%#v", hinweisen)
+		errors.Log().Printf("%#v", hinweisen)
 		op.Set.Chain(
 			func(z *zettel_transacted.Zettel) (err error) {
 				ok := hinweisen.Contains(z.Named.Kennung)

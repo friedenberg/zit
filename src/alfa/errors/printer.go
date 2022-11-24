@@ -45,6 +45,28 @@ func Log() printer {
 	return log
 }
 
+func (p printer) PrintDebug(vs ...interface{}) (err error) {
+	if !p.on {
+		return
+	}
+
+	si, _ := MakeStackInfo(1)
+
+	for _, v := range vs {
+		if _, err = fmt.Fprintf(
+			p.f,
+			"%s%#v\n",
+			si,
+			v,
+		); err != nil {
+			err = Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
 func (p printer) Print(a ...interface{}) (err error) {
 	if !p.on {
 		return
@@ -72,21 +94,6 @@ func (p printer) Printf(f string, a ...interface{}) (err error) {
 	return
 }
 
-func (p printer) CallerNonEmpty(i int, v interface{}) {
-	if v != nil {
-		Caller(i+1, "%s", v)
-	}
-}
-
-func (p printer) FunctionName(skip int) {
-	if !p.on {
-		return
-	}
-
-	st, _ := MakeStackInfo(skip + 1)
-	io.WriteString(p.f, fmt.Sprintf("%s%s\n", st, st.function))
-}
-
 func (p printer) Caller(i int, f string, vs ...interface{}) {
 	if !p.on {
 		return
@@ -97,4 +104,19 @@ func (p printer) Caller(i int, f string, vs ...interface{}) {
 	vs = append([]interface{}{st}, vs...)
 	//TODO strip trailing newline and add back
 	io.WriteString(p.f, fmt.Sprintf("%s"+f+"\n", vs...))
+}
+
+func (p printer) CallerNonEmpty(i int, v interface{}) {
+	if v != nil {
+		p.Caller(i+1, "%s", v)
+	}
+}
+
+func (p printer) FunctionName(skip int) {
+	if !p.on {
+		return
+	}
+
+	st, _ := MakeStackInfo(skip + 1)
+	io.WriteString(p.f, fmt.Sprintf("%s%s\n", st, st.function))
 }

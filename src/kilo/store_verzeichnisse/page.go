@@ -81,7 +81,7 @@ func (zp *Page) Flush() (err error) {
 		return
 	}
 
-	errors.Printf("flushing page: %s", zp.path)
+	errors.Log().Printf("flushing page: %s", zp.path)
 
 	var w io.WriteCloser
 
@@ -160,10 +160,10 @@ func (zp *Page) ReadJustHeader() (err error) {
 
 	state := zp.getState()
 	if state <= StateReadHeader {
-		errors.Printf("already read %s", zp.path)
+		errors.Log().Printf("already read %s", zp.path)
 		return
 	} else {
-		errors.Printf("reading: %s", zp.path)
+		errors.Log().Printf("reading: %s", zp.path)
 	}
 
 	var r io.ReadCloser

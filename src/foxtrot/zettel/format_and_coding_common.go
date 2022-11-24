@@ -171,7 +171,7 @@ func (f textStateReadMetadatei) readTyp(desc string) (err error) {
 
 	// path
 	if files.Exists(desc) {
-		errors.Print("valid path", desc)
+		errors.Log().Print("valid path", desc)
 
 		if err = f.Zettel.Typ.Set(tail); err != nil {
 			err = errors.Wrap(err)

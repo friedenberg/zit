@@ -41,13 +41,13 @@ func (w *Writer) open() (err error) {
 	_, err = w.wBuf.WriteString("{\"items\":[\n")
 
 	go func() {
-		errors.Print("write item loop")
-		defer errors.Print("done with write item loop")
+		errors.Log().Print("write item loop")
+		defer errors.Log().Print("done with write item loop")
 
 		for i := range w.chItem {
 			// var err error
 
-			errors.Print("running")
+			errors.Log().Print("running")
 			if _ = w.writeItem(i); err != nil {
 				// err = errors.Wrap(err)
 				//TODO
@@ -61,8 +61,8 @@ func (w *Writer) open() (err error) {
 }
 
 func (w *Writer) WriteItem(i *Item) {
-	errors.Print("writing")
-	defer errors.Print("done writing")
+	errors.Log().Print("writing")
+	defer errors.Log().Print("done writing")
 
 	w.chItem <- i
 }
@@ -91,10 +91,10 @@ func (w *Writer) writeItem(i *Item) (err error) {
 }
 
 func (w *Writer) Close() (err error) {
-	errors.Print("waiting to close")
+	errors.Log().Print("waiting to close")
 	close(w.chItem)
 	<-w.chDone
-	errors.Print("closing")
+	errors.Log().Print("closing")
 
 	if _, err = w.wBuf.WriteString("]}\n"); err != nil {
 		err = errors.Wrap(err)

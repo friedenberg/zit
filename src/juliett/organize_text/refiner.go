@@ -25,50 +25,50 @@ func (atc *Refiner) shouldMergeAllChildrenIntoParent(a *assignment) (ok bool) {
 }
 
 func (atc *Refiner) shouldMergeIntoParent(a *assignment) bool {
-	errors.Printf("checking node should merge: %s", a)
+	errors.Log().Printf("checking node should merge: %s", a)
 
 	if a.parent == nil {
-		errors.Print("parent is nil")
+		errors.Log().Print("parent is nil")
 		return false
 	}
 
 	if a.parent.isRoot {
-		errors.Print("parent is root")
+		errors.Log().Print("parent is root")
 		return false
 	}
 
 	if a.etiketten.Len() == 1 && a.etiketten.Any().IsEmpty() {
-		errors.Print("1 Etikett, and it's empty, merging")
+		errors.Log().Print("1 Etikett, and it's empty, merging")
 		return true
 	}
 
 	if a.etiketten.Len() == 0 {
-		errors.Print("etiketten length is 0, merging")
+		errors.Log().Print("etiketten length is 0, merging")
 		return true
 	}
 
 	if a.parent.etiketten.Len() != 1 {
-		errors.Print("parent etiketten length is not 1")
+		errors.Log().Print("parent etiketten length is not 1")
 		return false
 	}
 
 	if a.etiketten.Len() != 1 {
-		errors.Print("etiketten length is not 1")
+		errors.Log().Print("etiketten length is not 1")
 		return false
 	}
 
 	if !a.etiketten.Equals(a.parent.etiketten) {
-		errors.Print("parent etiketten not equal")
+		errors.Log().Print("parent etiketten not equal")
 		return false
 	}
 
 	if kennung.IsDependentLeaf(a.parent.etiketten.Any()) {
-		errors.Print("is prefix joint")
+		errors.Log().Print("is prefix joint")
 		return false
 	}
 
 	if kennung.IsDependentLeaf(a.etiketten.Any()) {
-		errors.Print("is prefix joint")
+		errors.Log().Print("is prefix joint")
 		return false
 	}
 
@@ -81,12 +81,12 @@ func (atc *Refiner) renameForPrefixJoint(a *assignment) (err error) {
 	}
 
 	if a == nil {
-		errors.Printf("assignment is nil")
+		errors.Log().Printf("assignment is nil")
 		return
 	}
 
 	if a.parent == nil {
-		errors.Printf("parent is nil: %#v", a)
+		errors.Log().Printf("parent is nil: %#v", a)
 		return
 	}
 
@@ -107,7 +107,7 @@ func (atc *Refiner) renameForPrefixJoint(a *assignment) (err error) {
 	}
 
 	if !kennung.HasParentPrefix(a.etiketten.Any(), a.parent.etiketten.Any()) {
-		errors.Print("parent is not prefix joint")
+		errors.Log().Print("parent is not prefix joint")
 		return
 	}
 
@@ -142,7 +142,7 @@ func (atc *Refiner) Refine(a *assignment) (err error) {
 
 	//TODO fix after breaking during migration to collections
 	// if atc.shouldMergeIntoParent(a) {
-	// 	errors.Print("merging into parent")
+	// 	errors.Log().Print("merging into parent")
 	// 	p := a.parent
 
 	// 	if err = p.consume(a); err != nil {

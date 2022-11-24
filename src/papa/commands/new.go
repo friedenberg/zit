@@ -162,7 +162,7 @@ func (c New) editZettels(
 	zsc zettel_checked_out.MutableSet,
 ) (err error) {
 	if !c.Edit {
-		errors.Print("edit set to false, not editing")
+		errors.Log().Print("edit set to false, not editing")
 		return
 	}
 

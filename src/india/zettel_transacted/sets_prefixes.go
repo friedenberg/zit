@@ -118,7 +118,7 @@ func (a SetPrefixTransacted) Subset(e kennung.Etikett) (out SetPrefixTransactedS
 		zSet.Each(
 			func(z *Zettel) (err error) {
 				intersection := z.Named.Stored.Objekte.Etiketten.IntersectPrefixes(kennung.MakeEtikettSet(e))
-				errors.Printf("%s yields %s", e1, intersection)
+				errors.Log().Printf("%s yields %s", e1, intersection)
 
 				if intersection.Len() > 0 {
 					for _, e2 := range intersection.Elements() {

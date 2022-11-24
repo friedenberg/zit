@@ -78,7 +78,7 @@ func (i Zettelen) GetPage(n int) (p *Page, err error) {
 }
 
 func (i *Zettelen) Flush() (err error) {
-	errors.Print("flushing")
+	errors.Log().Print("flushing")
 
 	for _, p := range i.pages {
 		if err = p.Flush(); err != nil {

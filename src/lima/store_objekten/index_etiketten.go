@@ -39,7 +39,7 @@ func newIndexEtiketten(
 
 func (i *indexEtiketten) Flush() (err error) {
 	if !i.hasChanges {
-		errors.Print("no changes")
+		errors.Log().Print("no changes")
 		return
 	}
 
@@ -158,7 +158,7 @@ func (i *indexEtiketten) processDelta(d kennung.Delta) (err error) {
 
 func (i *indexEtiketten) add(s kennung.EtikettSet) (err error) {
 	if s.Len() == 0 {
-		errors.Print("no etiketten to add")
+		errors.Log().Print("no etiketten to add")
 		return
 	}
 
@@ -170,7 +170,7 @@ func (i *indexEtiketten) add(s kennung.EtikettSet) (err error) {
 	i.hasChanges = true
 
 	for _, e := range s.Elements() {
-		errors.Printf("adding etiketten: %s", e)
+		errors.Log().Printf("adding etiketten: %s", e)
 		var c int64
 
 		c, _ = i.etiketten[e]
@@ -183,7 +183,7 @@ func (i *indexEtiketten) add(s kennung.EtikettSet) (err error) {
 
 func (i *indexEtiketten) del(s kennung.EtikettSet) (err error) {
 	if s.Len() == 0 {
-		errors.Print("no etiketten to delete")
+		errors.Log().Print("no etiketten to delete")
 		return
 	}
 
@@ -195,12 +195,12 @@ func (i *indexEtiketten) del(s kennung.EtikettSet) (err error) {
 	i.hasChanges = true
 
 	for _, e := range s.Elements() {
-		errors.Printf("removing etikett: %s", e)
+		errors.Log().Printf("removing etikett: %s", e)
 		var c int64
 		ok := false
 
 		if c, ok = i.etiketten[e]; !ok {
-			errors.Print(errors.Errorf("attempting to delete etikett that is already at 0"))
+			errors.Log().Print(errors.Errorf("attempting to delete etikett that is already at 0"))
 			return
 		}
 

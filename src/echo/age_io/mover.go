@@ -90,7 +90,7 @@ func (m *Mover) Close() (err error) {
 			Path: m.objektePath,
 		}
 
-		errors.Print(err)
+		errors.Log().Print(err)
 		err = nil
 
 		return
