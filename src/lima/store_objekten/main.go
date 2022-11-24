@@ -13,31 +13,16 @@ import (
 	"github.com/friedenberg/zit/src/echo/konfig"
 	"github.com/friedenberg/zit/src/echo/sku"
 	"github.com/friedenberg/zit/src/golf/transaktion"
-	"github.com/friedenberg/zit/src/india/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
-	"github.com/friedenberg/zit/src/kilo/store_verzeichnisse"
 )
 
 type Store struct {
-	lockSmith   LockSmith
-	konfig      konfig.Konfig
-	protoZettel zettel.ProtoZettel
-	standort    standort.Standort
-	age         age.Age
+	common common
+	indexAbbr
+	ioFactory
 
-	zettelTransactedWriter ZettelTransactedLogWriters
-
-	hinweisen *hinweisen.Hinweisen
-	// *indexZettelen
-	*indexEtiketten
-	*indexKennung
-	*indexAbbr
-
-	verzeichnisseSchwanzen *verzeichnisseSchwanzen
-	verzeichnisseAll       *store_verzeichnisse.Zettelen
-
-	transaktion.Transaktion
+	*zettelStore
 }
 
 func Make(
@@ -48,93 +33,43 @@ func Make(
 	p zettel_verzeichnisse.Pool,
 ) (s *Store, err error) {
 	s = &Store{
-		lockSmith: lockSmith,
-		age:       a,
-		konfig:    k,
-		standort:  st,
+		common: common{
+			LockSmith:   lockSmith,
+			Age:         a,
+			Konfig:      k,
+			Standort:    st,
+			Transaktion: transaktion.MakeTransaktion(ts.Now()),
+		},
 	}
 
-	s.protoZettel = zettel.MakeProtoZettel()
+	s.ioFactory = s.common
 
-	if err = s.protoZettel.Typ.Set(k.Compiled.DefaultTyp.Name.String()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if s.hinweisen, err = hinweisen.New(st.DirZit()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if s.verzeichnisseSchwanzen, err = makeVerzeichnisseSchwanzen(
-		k,
-		st,
-		s,
-		p,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if s.verzeichnisseAll, err = store_verzeichnisse.MakeZettelen(
-		k,
-		st.DirVerzeichnisseZettelenNeue(),
-		s,
-		p,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	// s.indexZettelen, err = newIndexZettelen(
-	// 	st.FileVerzeichnisseZettelen(),
-	// 	s,
-	// )
-
-	if err != nil {
-		err = errors.Wrapf(err, "failed to init zettel index")
-		return
-	}
-
-	s.indexEtiketten, err = newIndexEtiketten(
-		st.FileVerzeichnisseEtiketten(),
-		s,
-	)
-
-	if err != nil {
-		err = errors.Wrapf(err, "failed to init zettel index")
-		return
-	}
-
-	s.indexKennung, err = newIndexKennung(
-		k,
-		s,
-		s.hinweisen,
-		st.DirVerzeichnisse("Kennung"),
-	)
-
-	if err != nil {
-		err = errors.Wrapf(err, "failed to init kennung index")
-		return
-	}
-
-	s.indexAbbr, err = newIndexAbbr(
-		s,
+	if s.indexAbbr, err = newIndexAbbr(
+		s.common,
 		st.DirVerzeichnisse("Abbr"),
-	)
-
-	if err != nil {
+	); err != nil {
 		err = errors.Wrapf(err, "failed to init abbr index")
 		return
 	}
 
-	s.Transaktion = transaktion.MakeTransaktion(ts.Now())
+	if s.zettelStore, err = makeZettelStore(&s.common, p, &s.indexAbbr); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if s.indexEtiketten, err = newIndexEtiketten(
+		st.FileVerzeichnisseEtiketten(),
+		s,
+	); err != nil {
+		err = errors.Wrapf(err, "failed to init zettel index")
+		return
+	}
 
 	return
 }
 
 func (s *Store) CurrentTransaktionTime() ts.Time {
-	return s.Transaktion.Time
+	return s.common.Transaktion.Time
 }
 
 func (s Store) Hinweisen() *hinweisen.Hinweisen {
@@ -144,7 +79,7 @@ func (s Store) Hinweisen() *hinweisen.Hinweisen {
 func (s Store) RevertTransaktion(
 	t *transaktion.Transaktion,
 ) (tzs zettel_transacted.MutableSet, err error) {
-	if !s.lockSmith.IsAcquired() {
+	if !s.common.LockSmith.IsAcquired() {
 		err = ErrLockRequired{
 			Operation: "revert",
 		}
@@ -208,7 +143,7 @@ func (s Store) RevertTransaktion(
 }
 
 func (s Store) Flush() (err error) {
-	if !s.lockSmith.IsAcquired() {
+	if !s.common.LockSmith.IsAcquired() {
 		err = ErrLockRequired{
 			Operation: "flush",
 		}
@@ -216,7 +151,7 @@ func (s Store) Flush() (err error) {
 		return
 	}
 
-	if s.konfig.DryRun {
+	if s.common.Konfig.DryRun {
 		return
 	}
 
@@ -225,30 +160,15 @@ func (s Store) Flush() (err error) {
 		return
 	}
 
-	if err = s.verzeichnisseSchwanzen.Flush(); err != nil {
+	if err = s.zettelStore.Flush(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = s.verzeichnisseAll.Flush(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	// if err = s.indexZettelen.Flush(); err != nil {
-	// 	err = errors.Wrapf(err, "failed to flush new zettel index")
+	// if err = s.typStore.Flush(); err != nil {
+	// 	err = errors.Wrap(err)
 	// 	return
 	// }
-
-	if err = s.indexEtiketten.Flush(); err != nil {
-		err = errors.Wrapf(err, "failed to flush new zettel index")
-		return
-	}
-
-	if err = s.indexKennung.Flush(); err != nil {
-		err = errors.Wrapf(err, "failed to flush new kennung index")
-		return
-	}
 
 	if err = s.indexAbbr.Flush(); err != nil {
 		err = errors.Wrapf(err, "failed to flush abbr index")
@@ -259,7 +179,7 @@ func (s Store) Flush() (err error) {
 }
 
 func (s *Store) Reindex() (err error) {
-	if !s.lockSmith.IsAcquired() {
+	if !s.common.LockSmith.IsAcquired() {
 		err = ErrLockRequired{
 			Operation: "reindex",
 		}
@@ -267,22 +187,22 @@ func (s *Store) Reindex() (err error) {
 		return
 	}
 
-	if err = os.RemoveAll(s.standort.DirVerzeichnisse()); err != nil {
+	if err = os.RemoveAll(s.common.Standort.DirVerzeichnisse()); err != nil {
 		err = errors.Wrapf(err, "failed to remove verzeichnisse dir")
 		return
 	}
 
-	if err = os.MkdirAll(s.standort.DirVerzeichnisse(), os.ModeDir|0755); err != nil {
+	if err = os.MkdirAll(s.common.Standort.DirVerzeichnisse(), os.ModeDir|0755); err != nil {
 		err = errors.Wrapf(err, "failed to make verzeichnisse dir")
 		return
 	}
 
-	if err = os.MkdirAll(s.standort.DirVerzeichnisseZettelenNeue(), os.ModeDir|0755); err != nil {
+	if err = os.MkdirAll(s.common.Standort.DirVerzeichnisseZettelenNeue(), os.ModeDir|0755); err != nil {
 		err = errors.Wrapf(err, "failed to make verzeichnisse dir")
 		return
 	}
 
-	if err = os.MkdirAll(s.standort.DirVerzeichnisseZettelenNeueSchwanzen(), os.ModeDir|0755); err != nil {
+	if err = os.MkdirAll(s.common.Standort.DirVerzeichnisseZettelenNeueSchwanzen(), os.ModeDir|0755); err != nil {
 		err = errors.Wrapf(err, "failed to make verzeichnisse dir")
 		return
 	}
@@ -295,6 +215,7 @@ func (s *Store) Reindex() (err error) {
 	f := func(t *transaktion.Transaktion) (err error) {
 		if err = t.EachWithIndex(
 			func(o *sku.Indexed) (err error) {
+				errors.Err().Print(o)
 				switch o.Gattung {
 
 				case gattung.Zettel:

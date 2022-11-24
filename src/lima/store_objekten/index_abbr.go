@@ -34,8 +34,8 @@ type indexAbbr struct {
 func newIndexAbbr(
 	ioFactory ioFactory,
 	p string,
-) (i *indexAbbr, err error) {
-	i = &indexAbbr{
+) (i indexAbbr, err error) {
+	i = indexAbbr{
 		path:      p,
 		ioFactory: ioFactory,
 		indexAbbrEncodableTridexes: indexAbbrEncodableTridexes{

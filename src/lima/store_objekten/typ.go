@@ -16,7 +16,7 @@ type TypLogWriters struct {
 }
 
 type typStore struct {
-	substoreAccess
+	common *common
 	TypLogWriters
 }
 
@@ -26,14 +26,18 @@ func (s *typStore) SetTypLogWriters(
 	s.TypLogWriters = tlw
 }
 
+func (s typStore) Flush() (err error) {
+	return
+}
+
 func (s typStore) writeObjekte(t *typ.Stored) (sh sha.Sha, err error) {
 	//no lock required
 
 	var w *age_io.Mover
 
 	mo := age_io.MoveOptions{
-		Age:                      s.Age(),
-		FinalPath:                s.Standort().DirObjektenTypen(),
+		Age:                      s.common.Age,
+		FinalPath:                s.common.Standort.DirObjektenTypen(),
 		GenerateFinalPathFromSha: true,
 	}
 
@@ -44,7 +48,7 @@ func (s typStore) writeObjekte(t *typ.Stored) (sh sha.Sha, err error) {
 
 	defer w.Close()
 
-	f := typ.MakeFormatObjekte(s)
+	f := typ.MakeFormatObjekte(s.common)
 
 	if _, err = f.WriteFormat(w, t); err != nil {
 		err = errors.Wrap(err)
@@ -58,7 +62,7 @@ func (s typStore) writeObjekte(t *typ.Stored) (sh sha.Sha, err error) {
 
 //TODO write konfig compiled
 func (s typStore) writeTransactedToIndex(tt *typ.Transacted) (err error) {
-	if !s.IsAcquired() {
+	if !s.common.LockSmith.IsAcquired() {
 		err = ErrLockRequired{
 			Operation: "write named zettel to index",
 		}
@@ -77,7 +81,7 @@ func (s typStore) ReadOne(
 }
 
 func (s *typStore) Create(in typ.Akte, k kennung.Typ) (tt *typ.Transacted, err error) {
-	if !s.IsAcquired() {
+	if !s.common.LockSmith.IsAcquired() {
 		err = ErrLockRequired{
 			Operation: "create",
 		}
@@ -136,7 +140,7 @@ func (s *typStore) Create(in typ.Akte, k kennung.Typ) (tt *typ.Transacted, err e
 func (s *typStore) Update(
 	t *typ.Named,
 ) (tt *typ.Transacted, err error) {
-	if !s.IsAcquired() {
+	if !s.common.LockSmith.IsAcquired() {
 		err = ErrLockRequired{
 			Operation: "update",
 		}

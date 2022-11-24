@@ -80,7 +80,7 @@ function can_new_zettel_file { # @test
 		echo "- ok"
 		echo "! md"
 		echo "---"
-	} >>"$to_add"
+	} >"$to_add"
 
 	run zit new "${cmd_zit_def[@]}" -edit=false -predictable-hinweisen "$to_add"
 	assert_output '          (new) [o/u@5 !md "wow"]'
@@ -125,7 +125,7 @@ function can_checkout_and_checkin { # @test
 		echo "# wow"
 		echo "- ok"
 		echo "---"
-	} >>"$to_add"
+	} >"$to_add"
 
 	run zit new "${cmd_zit_def[@]}" -edit=false -predictable-hinweisen "$to_add"
 	assert_output '          (new) [o/u@5 !md "wow"]'
@@ -161,7 +161,7 @@ function can_checkout_via_etiketten { # @test
 		echo "# wow"
 		echo "- ok"
 		echo "---"
-	} >>"$to_add"
+	} >"$to_add"
 
 	run zit new "${cmd_zit_def[@]}" -edit=false "$to_add"
 	assert_output --partial '[one/uno '
@@ -185,7 +185,7 @@ function can_output_organize { # @test
 		echo "# wow"
 		echo "- ok"
 		echo "---"
-	} >>"$to_add"
+	} >"$to_add"
 
 	run zit new "${cmd_zit_def[@]}" -edit=false "$to_add"
 	assert_output --partial '[one/uno '
@@ -196,7 +196,7 @@ function can_output_organize { # @test
 		echo "# ok"
 		echo
 		echo "- [one/uno] wow"
-	} >>"$expected_organize"
+	} >"$expected_organize"
 
 	run zit organize "${cmd_zit_def[@]}" ok <"$(tty)"
 	assert_output "$(cat "$expected_organize")"
@@ -216,7 +216,7 @@ function can_output_organize { # @test
 		echo "# wow"
 		echo "- wow"
 		echo "---"
-	} >>"$expected_zettel"
+	} >"$expected_zettel"
 
 	run zit show "${cmd_zit_def[@]}" one/uno
 	assert_output "$(cat "$expected_zettel")"
@@ -233,7 +233,7 @@ function hides_hidden_etiketten_from_organize { # @test
 	{
 		echo "[tags.zz-archive]"
 		echo "hide = true"
-	} >>.zit/Konfig
+	} >.zit/Konfig
 
 	to_add="$(mktemp)"
 	{
@@ -243,7 +243,7 @@ function hides_hidden_etiketten_from_organize { # @test
 		echo - zz-archive-task-done
 		echo ! md
 		echo ---
-	} >>"$to_add"
+	} >"$to_add"
 
 	run zit new "${cmd_zit_def[@]}" -edit=false "$to_add"
 	assert_output --partial '[one/uno '
@@ -253,7 +253,7 @@ function hides_hidden_etiketten_from_organize { # @test
 		echo
 		echo "# project-2021-zit"
 		echo
-	} >>"$expected_organize"
+	} >"$expected_organize"
 
 	run zit organize "${cmd_zit_def[@]}" project-2021-zit
 	assert_output "$(cat "$expected_organize")"
@@ -274,7 +274,7 @@ function can_new_zettel_with_metadatei { # @test
 		echo - et2
 		echo ! md
 		echo ---
-	} >>"$expected"
+	} >"$expected"
 
 	run zit new "${cmd_zit_def[@]}" -edit=false -predictable-hinweisen -bezeichnung bez -etiketten et1,et2
 	assert_output '          (new) [o/u@a !md "bez"]'
@@ -298,7 +298,7 @@ function can_update_akte { # @test
 		echo ---
 		echo
 		echo the body
-	} >>"$expected"
+	} >"$expected"
 
 	run zit new "${cmd_zit_def[@]}" -edit=false -predictable-hinweisen "$expected"
 	assert_output '          (new) [o/u@d !md "bez"]'
@@ -310,7 +310,7 @@ function can_update_akte { # @test
 	new_akte="$(mktemp)"
 	{
 		echo the body but new
-	} >>"$new_akte"
+	} >"$new_akte"
 
 	run zit checkin-akte "${cmd_zit_def[@]}" -new-etiketten et3 one/uno "$new_akte"
 	assert_output '      (updated) [o/u@f !md "bez"]'
@@ -385,7 +385,7 @@ function indexes_are_implicitly_correct { # @test
 		echo ---
 		echo
 		echo the body
-	} >>"$expected"
+	} >"$expected"
 
 	run zit new "${cmd_zit_def[@]}" -edit=false -predictable-hinweisen "$expected"
 	assert_output '          (new) [o/u@d !md "bez"]'
@@ -456,7 +456,7 @@ function checkouts_dont_overwrite { # @test
 		echo ---
 		echo
 		echo the body
-	} >>"$expected"
+	} >"$expected"
 
 	run zit new "${cmd_zit_def[@]}" -edit=false -predictable-hinweisen "$expected"
 	assert_output '          (new) [o/u@d !md "bez"]'

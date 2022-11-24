@@ -36,63 +36,57 @@ cat_yang() (
 )
 
 cmd_zit_def=(
-	-abbreviate-hinweisen=false
+	-abbreviate-hinweisen=true
 	-predictable-hinweisen
 	-print-typen=false
 )
 
-cmd_zit_new=(
-	zit
-	new
-	"${cmd_zit_def[@]}"
-)
-
-cmd_zit_organize=(
-	zit
-	organize
-	"${cmd_zit_def[@]}"
-	-right-align=false
-	-prefix-joints=true
-	-metadatei-header=false
-	-refine=true
-)
-
-function outputs_organize_one_etikett { # @test
+function can_update_akte { # @test
+	# setup
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	run zit init "${cmd_zit_def[@]}" -disable-age -yin <(cat_yin) -yang <(cat_yang)
 	assert_success
 
-	to_add="$(mktemp)"
+	expected="$(mktemp)"
 	{
-		echo "---"
-		echo "# wow"
-		echo "- ok"
-		echo "! md"
-		echo "---"
-	} >"$to_add"
+		echo ---
+		echo "# bez"
+		echo - et1
+		echo - et2
+		echo ! md
+		echo ---
+		echo
+		echo the body
+	} >"$expected"
 
-	run "${cmd_zit_new[@]}" -edit=false "$to_add"
-	assert_output '          (new) [one/uno@5 !md "wow"]'
+	run zit new "${cmd_zit_def[@]}" -edit=false -predictable-hinweisen "$expected"
+	assert_output '          (new) [o/u@d !md "bez"]'
 
-	run zit show one/uno
-	# assert_output "$(cat "$to_add")"
+	run zit show "${cmd_zit_def[@]}" one/uno
+	assert_output "$(cat "$expected")"
 
-	run zit show ok
-	assert_output "$(cat "$to_add")"
-
-	run zit expand-hinweis o/u
-	assert_output 'one/uno'
-
-	expected_organize="$(mktemp)"
+	# when
+	new_akte="$(mktemp)"
 	{
-		echo
-		echo "# ok"
-		echo
-		echo "- [one/uno] wow"
-	} >"$expected_organize"
+		echo the body but new
+	} >"$new_akte"
 
-	run "${cmd_zit_organize[@]}" -mode output-only ok
-	assert_output "$(cat "$expected_organize")"
+	run zit checkin-akte "${cmd_zit_def[@]}" -new-etiketten et3 one/uno "$new_akte"
+	assert_output '      (updated) [o/u@f !md "bez"]'
+
+	# then
+	{
+		echo ---
+		echo "# bez"
+		echo - et3
+		echo ! md
+		echo ---
+		echo
+		echo the body but new
+	} >"$expected"
+
+	run zit show "${cmd_zit_def[@]}" one/uno
+	assert_output "$(cat "$expected")"
 }

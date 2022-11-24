@@ -7,35 +7,137 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/collections"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/hinweisen"
 	"github.com/friedenberg/zit/src/delta/id"
+	"github.com/friedenberg/zit/src/delta/ts"
 	"github.com/friedenberg/zit/src/echo/age_io"
+	"github.com/friedenberg/zit/src/echo/sku"
+	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/india/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
+	"github.com/friedenberg/zit/src/kilo/store_verzeichnisse"
 )
+
+type zettelStore struct {
+	common *common
+
+	indexAbbr *indexAbbr
+
+	protoZettel zettel.ProtoZettel
+
+	zettelTransactedWriter ZettelTransactedLogWriters
+
+	*indexKennung
+	hinweisen *hinweisen.Hinweisen
+	*indexEtiketten
+
+	verzeichnisseSchwanzen *verzeichnisseSchwanzen
+	verzeichnisseAll       *store_verzeichnisse.Zettelen
+
+	pool zettel_verzeichnisse.Pool
+}
+
+func makeZettelStore(
+	sa *common,
+	p zettel_verzeichnisse.Pool,
+	ia *indexAbbr,
+) (s *zettelStore, err error) {
+	s = &zettelStore{
+		common:      sa,
+		indexAbbr:   ia,
+		pool:        p,
+		protoZettel: zettel.MakeProtoZettel(),
+	}
+
+	if s.hinweisen, err = hinweisen.New(s.common.Standort.DirZit()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.protoZettel.Typ.Set(s.common.Konfig.Compiled.DefaultTyp.Name.String()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if s.verzeichnisseSchwanzen, err = makeVerzeichnisseSchwanzen(
+		s.common,
+		p,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if s.verzeichnisseAll, err = store_verzeichnisse.MakeZettelen(
+		s.common.Konfig,
+		s.common.Standort.DirVerzeichnisseZettelenNeue(),
+		s.common,
+		p,
+		nil,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if s.indexKennung, err = newIndexKennung(
+		s.common.Konfig,
+		s.common,
+		s.hinweisen,
+		s.common.Standort.DirVerzeichnisse("Kennung"),
+	); err != nil {
+		err = errors.Wrapf(err, "failed to init kennung index")
+		return
+	}
+
+	return
+}
+
+func (s *zettelStore) Flush() (err error) {
+	if err = s.verzeichnisseSchwanzen.Flush(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.verzeichnisseAll.Flush(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.indexEtiketten.Flush(); err != nil {
+		err = errors.Wrapf(err, "failed to flush new zettel index")
+		return
+	}
+
+	if err = s.indexKennung.Flush(); err != nil {
+		err = errors.Wrapf(err, "failed to flush new kennung index")
+		return
+	}
+
+	return
+}
 
 // TODO add archived state
 type ZettelTransactedLogWriters struct {
 	New, Updated, Archived, Unchanged collections.WriterFunc[*zettel_transacted.Zettel]
 }
 
-func (s *Store) SetZettelTransactedLogWriter(
+func (s *zettelStore) SetZettelTransactedLogWriter(
 	ztlw ZettelTransactedLogWriters,
 ) {
 	s.zettelTransactedWriter = ztlw
 }
 
-func (s Store) WriteZettelObjekte(z zettel.Zettel) (sh sha.Sha, err error) {
+func (s zettelStore) WriteZettelObjekte(z zettel.Zettel) (sh sha.Sha, err error) {
 	//no lock required
 
 	var w *age_io.Mover
 
 	mo := age_io.MoveOptions{
-		Age:                      s.age,
-		FinalPath:                s.standort.DirObjektenZettelen(),
+		Age:                      s.common.Age,
+		FinalPath:                s.common.Standort.DirObjektenZettelen(),
 		GenerateFinalPathFromSha: true,
 	}
 
@@ -63,8 +165,8 @@ func (s Store) WriteZettelObjekte(z zettel.Zettel) (sh sha.Sha, err error) {
 	return
 }
 
-func (s Store) writeNamedZettelToIndex(tz zettel_transacted.Zettel) (err error) {
-	if !s.lockSmith.IsAcquired() {
+func (s *zettelStore) writeNamedZettelToIndex(tz zettel_transacted.Zettel) (err error) {
+	if !s.common.LockSmith.IsAcquired() {
 		err = ErrLockRequired{
 			Operation: "write named zettel to index",
 		}
@@ -102,19 +204,19 @@ func (s Store) writeNamedZettelToIndex(tz zettel_transacted.Zettel) (err error) 
 	return
 }
 
-func (s Store) ReadHinweisSchwanzen(
+func (s zettelStore) ReadHinweisSchwanzen(
 	h hinweis.Hinweis,
 ) (zv zettel_transacted.Zettel, err error) {
 	return s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(h)
 }
 
-func (i *Store) ReadAllSchwanzenVerzeichnisse(
+func (i *zettelStore) ReadAllSchwanzenVerzeichnisse(
 	ws ...collections.WriterFunc[*zettel_verzeichnisse.Zettel],
 ) (err error) {
 	return i.verzeichnisseSchwanzen.ReadMany(ws...)
 }
 
-func (s Store) ReadAllSchwanzenTransacted(
+func (s zettelStore) ReadAllSchwanzenTransacted(
 	ws ...collections.WriterFunc[*zettel_transacted.Zettel],
 ) (err error) {
 	w := zettel_verzeichnisse.MakeWriterZettelTransacted(
@@ -124,13 +226,13 @@ func (s Store) ReadAllSchwanzenTransacted(
 	return s.ReadAllSchwanzenVerzeichnisse(w)
 }
 
-func (i *Store) ReadAllVerzeichnisse(
+func (i *zettelStore) ReadAllVerzeichnisse(
 	ws ...collections.WriterFunc[*zettel_verzeichnisse.Zettel],
 ) (err error) {
 	return i.verzeichnisseAll.ReadMany(ws...)
 }
 
-func (s Store) ReadAllTransacted(
+func (s zettelStore) ReadAllTransacted(
 	ws ...collections.WriterFunc[*zettel_transacted.Zettel],
 ) (err error) {
 	w := zettel_verzeichnisse.MakeWriterZettelTransacted(
@@ -140,7 +242,7 @@ func (s Store) ReadAllTransacted(
 	return s.ReadAllVerzeichnisse(w)
 }
 
-func (s Store) ReadOne(i id.Id) (tz zettel_transacted.Zettel, err error) {
+func (s zettelStore) ReadOne(i id.Id) (tz zettel_transacted.Zettel, err error) {
 	switch tid := i.(type) {
 	case hinweis.Hinweis:
 		if tz, err = s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(tid); err != nil {
@@ -155,8 +257,8 @@ func (s Store) ReadOne(i id.Id) (tz zettel_transacted.Zettel, err error) {
 	return
 }
 
-func (s *Store) Create(in zettel.Zettel) (tz zettel_transacted.Zettel, err error) {
-	if !s.lockSmith.IsAcquired() {
+func (s *zettelStore) Create(in zettel.Zettel) (tz zettel_transacted.Zettel, err error) {
+	if !s.common.LockSmith.IsAcquired() {
 		err = ErrLockRequired{
 			Operation: "create",
 		}
@@ -171,7 +273,7 @@ func (s *Store) Create(in zettel.Zettel) (tz zettel_transacted.Zettel, err error
 
 	s.protoZettel.Apply(&in)
 
-	if err = in.ApplyKonfig(s.konfig); err != nil {
+	if err = in.ApplyKonfig(s.common.Konfig); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -219,11 +321,11 @@ func (s *Store) Create(in zettel.Zettel) (tz zettel_transacted.Zettel, err error
 	return
 }
 
-func (s *Store) CreateWithHinweis(
+func (s *zettelStore) CreateWithHinweis(
 	in zettel.Zettel,
 	h hinweis.Hinweis,
 ) (tz zettel_transacted.Zettel, err error) {
-	if !s.lockSmith.IsAcquired() {
+	if !s.common.LockSmith.IsAcquired() {
 		err = ErrLockRequired{
 			Operation: "create with hinweis",
 		}
@@ -236,7 +338,7 @@ func (s *Store) CreateWithHinweis(
 		return
 	}
 
-	if err = in.ApplyKonfig(s.konfig); err != nil {
+	if err = in.ApplyKonfig(s.common.Konfig); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -272,10 +374,10 @@ func (s *Store) CreateWithHinweis(
 }
 
 // TODO support dry run
-func (s *Store) Update(
+func (s *zettelStore) Update(
 	z *zettel.Named,
 ) (tz zettel_transacted.Zettel, err error) {
-	if !s.lockSmith.IsAcquired() {
+	if !s.common.LockSmith.IsAcquired() {
 		err = ErrLockRequired{
 			Operation: "update",
 		}
@@ -283,7 +385,7 @@ func (s *Store) Update(
 		return
 	}
 
-	if err = z.Stored.Objekte.ApplyKonfig(s.konfig); err != nil {
+	if err = z.Stored.Objekte.ApplyKonfig(s.common.Konfig); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -340,7 +442,7 @@ func (s *Store) Update(
 	return
 }
 
-func (s Store) AllInChain(h hinweis.Hinweis) (c []*zettel_transacted.Zettel, err error) {
+func (s zettelStore) AllInChain(h hinweis.Hinweis) (c []*zettel_transacted.Zettel, err error) {
 	mst := zettel_transacted.MakeMutableSetUnique(0)
 
 	if err = s.verzeichnisseAll.ReadMany(
@@ -364,6 +466,121 @@ func (s Store) AllInChain(h hinweis.Hinweis) (c []*zettel_transacted.Zettel, err
 		c,
 		func(i, j int) bool { return c[i].SkuTransacted().Less(c[j].SkuTransacted()) },
 	)
+
+	return
+}
+
+func (s *zettelStore) addZettelToTransaktion(
+	z zettel.Named,
+) (tz zettel_transacted.Zettel, err error) {
+	errors.Log().Printf("adding zettel to transaktion: %s", z.Kennung)
+
+	if tz, err = s.transactedWithHead(z, &s.common.Transaktion); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	var mutter [2]ts.Time
+
+	mutter[0] = tz.Mutter
+
+	i := s.common.Transaktion.Add(
+		sku.Sku{
+			Gattung: gattung.Zettel,
+			Mutter:  mutter,
+			Id:      &z.Kennung,
+			Sha:     z.Stored.Sha,
+		},
+	)
+
+	tz.TransaktionIndex.SetInt(i)
+
+	return
+
+}
+func (s zettelStore) storedZettelFromSha(sh sha.Sha) (sz zettel.Stored, err error) {
+	var or io.ReadCloser
+
+	if or, err = s.common.ReadCloserObjekten(id.Path(sh, s.common.Standort.DirObjektenZettelen())); err != nil {
+		err = ErrNotFound{Id: sh}
+		return
+	}
+
+	defer or.Close()
+
+	f := zettel.Objekte{
+		IgnoreTypErrors: true,
+	}
+
+	c := zettel.FormatContextRead{
+		In: or,
+	}
+
+	if _, err = f.ReadFrom(&c); err != nil {
+		err = errors.Wrapf(err, "%s", sh)
+		return
+	}
+
+	sz.Objekte = c.Zettel
+	sz.Sha = sh
+
+	return
+}
+
+// should only be called when moving forward through time, as there is a
+// dependency on the index being accurate for the immediate mutter of the zettel
+// in the arguments
+func (s *zettelStore) transactedWithHead(
+	z zettel.Named,
+	t *transaktion.Transaktion,
+) (tz zettel_transacted.Zettel, err error) {
+	tz.Named = z
+	tz.Kopf = t.Time
+	tz.Schwanz = t.Time
+
+	var previous zettel_transacted.Zettel
+
+	if previous, err = s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(z.Kennung); err == nil {
+		tz.Mutter = previous.Schwanz
+		tz.Kopf = previous.Kopf
+	} else {
+		if errors.Is(err, ErrNotFound{}) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
+func (s zettelStore) transactedZettelFromTransaktionObjekte(
+	t *transaktion.Transaktion,
+	o *sku.Indexed,
+) (tz zettel_transacted.Zettel, err error) {
+	ok := false
+
+	var h *hinweis.Hinweis
+
+	if h, ok = o.Id.(*hinweis.Hinweis); !ok {
+		err = errors.Wrapf(err, "transaktion.Objekte Id was not hinweis but was %s", o.Id)
+		return
+	}
+
+	tz.Named.Kennung = *h
+
+	if tz.Named.Stored, err = s.storedZettelFromSha(o.Sha); err != nil {
+		err = errors.Wrapf(err, "failed to read zettel objekte: %s", tz.Named.Kennung)
+		return
+	}
+
+	if tz, err = s.transactedWithHead(tz.Named, t); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	tz.TransaktionIndex = o.Index
 
 	return
 }

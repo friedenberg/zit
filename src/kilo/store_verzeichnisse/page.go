@@ -27,11 +27,12 @@ func makeZettelenPage(
 	iof ioFactory,
 	pid pageId,
 	pool zettel_verzeichnisse.Pool,
+	fff ZettelVerzeichnisseWriterGetter,
 ) (p *Page) {
 	flushFilter := collections.MakeWriterNoop[*zettel_verzeichnisse.Zettel]()
 
-	if zvwg, ok := iof.(ZettelVerzeichnisseWriterGetter); ok {
-		flushFilter = zvwg.ZettelVerzeichnisseWriter(pid.index)
+	if fff != nil {
+		flushFilter = fff.ZettelVerzeichnisseWriter(pid.index)
 	}
 
 	p = &Page{

@@ -1,16 +1,13 @@
 package store_objekten
 
 import (
-	"bytes"
 	"io"
-	"io/ioutil"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/id"
-	"github.com/friedenberg/zit/src/echo/age_io"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
 )
@@ -34,7 +31,7 @@ func (s Store) ReadAllAktenShas(w collections.WriterFunc[sha.Sha]) (err error) {
 
 	if err = files.ReadDirNamesLevel2(
 		files.MakeDirNameWriterIgnoringHidden(wf),
-		s.standort.DirObjektenAkten(),
+		s.common.Standort.DirObjektenAkten(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -48,7 +45,7 @@ func (s Store) AkteExists(sh sha.Sha) (err error) {
 		return
 	}
 
-	p := id.Path(sh, s.standort.DirObjektenAkten())
+	p := id.Path(sh, s.common.Standort.DirObjektenAkten())
 	ok := files.Exists(p)
 
 	if !ok {
@@ -77,47 +74,6 @@ func (s Store) AkteExists(sh sha.Sha) (err error) {
 	err = ErrAkteExists{
 		Akte:       sh,
 		MutableSet: set,
-	}
-
-	return
-}
-
-func (s Store) AkteWriter() (w sha.WriteCloser, err error) {
-	var outer age_io.Writer
-
-	mo := age_io.MoveOptions{
-		Age:                      s.age,
-		FinalPath:                s.standort.DirObjektenAkten(),
-		GenerateFinalPathFromSha: true,
-		LockFile:                 true,
-	}
-
-	if outer, err = age_io.NewMover(mo); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	w = outer
-
-	return
-}
-
-func (s Store) AkteReader(sh sha.Sha) (r sha.ReadCloser, err error) {
-	if sh.IsNull() {
-		r = sha.MakeNopReadCloser(ioutil.NopCloser(bytes.NewReader(nil)))
-		return
-	}
-
-	p := id.Path(sh, s.standort.DirObjektenAkten())
-
-	o := age_io.FileReadOptions{
-		Age:  s.age,
-		Path: p,
-	}
-
-	if r, err = age_io.NewFileReader(o); err != nil {
-		err = errors.Wrap(err)
-		return
 	}
 
 	return

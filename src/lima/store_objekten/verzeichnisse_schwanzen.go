@@ -6,8 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/delta/hinweis"
-	"github.com/friedenberg/zit/src/delta/standort"
-	"github.com/friedenberg/zit/src/echo/konfig"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
 	"github.com/friedenberg/zit/src/kilo/store_verzeichnisse"
@@ -16,17 +14,15 @@ import (
 type verzeichnisseSchwanzen struct {
 	headers [store_verzeichnisse.PageCount]*zettel_verzeichnisse.WriterSchwanzen
 	*store_verzeichnisse.Zettelen
-	ioFactory
+	common *common
 }
 
 func makeVerzeichnisseSchwanzen(
-	k konfig.Konfig,
-	st standort.Standort,
-	iof ioFactory,
+	sa *common,
 	p zettel_verzeichnisse.Pool,
 ) (s *verzeichnisseSchwanzen, err error) {
 	s = &verzeichnisseSchwanzen{
-		ioFactory: iof,
+		common: sa,
 	}
 
 	for i, _ := range s.headers {
@@ -34,10 +30,11 @@ func makeVerzeichnisseSchwanzen(
 	}
 
 	s.Zettelen, err = store_verzeichnisse.MakeZettelen(
-		k,
-		st.DirVerzeichnisseZettelenNeueSchwanzen(),
-		s,
+		s.common.Konfig,
+		s.common.Standort.DirVerzeichnisseZettelenNeueSchwanzen(),
+		s.common,
 		p,
+		s,
 	)
 
 	return
