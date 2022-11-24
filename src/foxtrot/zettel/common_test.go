@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/test_logz"
 	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/delta/test_metadatei_io"
-	"github.com/friedenberg/zit/src/echo/typ"
 )
 
 func makeEtiketten(t test_logz.T, vs ...string) (es kennung.EtikettSet) {
@@ -20,7 +19,7 @@ func makeEtiketten(t test_logz.T, vs ...string) (es kennung.EtikettSet) {
 	return
 }
 
-func makeAkteExt(t test_logz.T, v string) (es typ.Kennung) {
+func makeAkteExt(t test_logz.T, v string) (es kennung.Typ) {
 	if err := es.Set(v); err != nil {
 		t.Fatalf("%s", err)
 	}

@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/delta/konfig"
 )
 
@@ -20,7 +21,7 @@ func MakeEncoderActionNames(w io.Writer, k konfig.Konfig) EncoderActionNames {
 	}
 }
 
-func (f EncoderActionNames) Encode(t *Kennung) (n int64, err error) {
+func (f EncoderActionNames) Encode(t *kennung.Typ) (n int64, err error) {
 	ct := f.konfig.GetTyp(t.String())
 
 	if ct == nil {

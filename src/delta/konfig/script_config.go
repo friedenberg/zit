@@ -13,6 +13,42 @@ type ScriptConfig struct {
 	Env    map[string]string
 }
 
+func (a *ScriptConfig) Equals(b *ScriptConfig) bool {
+	if len(a.Shell) != len(b.Shell) {
+		return false
+	}
+
+	for k, v := range a.Shell {
+		v1 := b.Shell[k]
+
+		if v != v1 {
+			return false
+		}
+	}
+
+	if a.Script != b.Script {
+		return false
+	}
+
+	if len(a.Env) != len(b.Env) {
+		return false
+	}
+
+	for k, v := range a.Env {
+		v1, ok := b.Env[k]
+
+		if !ok {
+			return false
+		}
+
+		if v != v1 {
+			return false
+		}
+	}
+
+	return true
+}
+
 func (s *ScriptConfig) Merge(s2 *ScriptConfig) {
 	if s2 == nil {
 		return

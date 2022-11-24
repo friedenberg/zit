@@ -49,7 +49,7 @@ func (s *Store) WriteTyp(t *typ.Named) (tco *typ_checked_out.Typ, err error) {
 
 	format := typ.MakeFormatText(s.storeObjekten)
 
-	if _, err = format.WriteFormat(f, &t.Akte); err != nil {
+	if _, err = format.WriteFormat(f, &t.Stored.Objekte); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -76,7 +76,7 @@ func (s *Store) ReadTyp(ct *cwd_files.CwdTyp) (t *typ_checked_out.Typ, err error
 		},
 	}
 
-	if _, err = format.ReadFormat(f, &t.Named.Akte); err != nil {
+	if _, err = format.ReadFormat(f, &t.Named.Stored.Objekte); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

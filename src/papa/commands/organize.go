@@ -14,7 +14,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/ts"
-	"github.com/friedenberg/zit/src/echo/typ"
 	"github.com/friedenberg/zit/src/foxtrot/id_set"
 	"github.com/friedenberg/zit/src/hotel/zettel_named"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
@@ -112,7 +111,7 @@ func (c Organize) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 			},
 		},
 		id_set.ProtoId{
-			MutableId: &typ.Kennung{},
+			MutableId: &kennung.Typ{},
 		},
 		id_set.ProtoId{
 			MutableId: &ts.Time{},

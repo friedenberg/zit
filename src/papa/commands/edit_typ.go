@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/echo/typ"
 	"github.com/friedenberg/zit/src/foxtrot/id_set"
 	"github.com/friedenberg/zit/src/foxtrot/typ_checked_out"
@@ -27,7 +28,7 @@ func init() {
 func (c EditTyp) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 	is = id_set.MakeProtoIdSet(
 		id_set.ProtoId{
-			MutableId: &typ.Kennung{},
+			MutableId: &kennung.Typ{},
 		},
 	)
 
@@ -40,7 +41,7 @@ func (c EditTyp) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	printerType := u.PrinterTypCheckedOut("checked out")
 
 	if err = typen.Each(
-		func(tk typ.Kennung) (err error) {
+		func(tk kennung.Typ) (err error) {
 			t := &typ.Named{
 				Kennung: tk,
 			}

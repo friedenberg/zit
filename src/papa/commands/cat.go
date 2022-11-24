@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/echo/typ"
 	"github.com/friedenberg/zit/src/foxtrot/id_set"
 	"github.com/friedenberg/zit/src/foxtrot/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
@@ -230,7 +229,7 @@ func (c Cat) hinweisen(u *umwelt.Umwelt) (err error) {
 }
 
 func (c Cat) typen(u *umwelt.Umwelt) (err error) {
-	typen := collections.MakeMutableValueSet[typ.Kennung, *typ.Kennung]()
+	typen := collections.MakeMutableValueSet[kennung.Typ, *kennung.Typ]()
 
 	if err = u.StoreObjekten().ReadAllSchwanzenTransacted(
 		func(z *zettel_transacted.Zettel) (err error) {

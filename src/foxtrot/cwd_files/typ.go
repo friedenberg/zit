@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/echo/typ"
 	"github.com/friedenberg/zit/src/fd"
 )
@@ -12,7 +13,7 @@ import (
 type CwdTyp = typ.External
 
 func (c *CwdFiles) tryTyp(fi os.FileInfo) (err error) {
-	var h typ.Kennung
+	var h kennung.Typ
 
 	fd := fd.FileInfo(fi)
 	pathMinusExt := strings.ToLower(fd.FileNameSansExt())

@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/ts"
-	"github.com/friedenberg/zit/src/echo/typ"
 )
 
 func TestMain(m *testing.M) {
@@ -29,7 +28,7 @@ func TestMakeProtoIdSet(t1 *testing.T) {
 			MutableId: &kennung.Etikett{},
 		},
 		ProtoId{
-			MutableId: &typ.Kennung{},
+			MutableId: &kennung.Typ{},
 		},
 		ProtoId{
 			MutableId: &ts.Time{},

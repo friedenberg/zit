@@ -23,7 +23,7 @@ func (f EncoderObjekte) Encode(t *Named) (n int64, err error) {
 	w := line_format.NewWriter()
 
 	w.WriteFormat("%s", gattung.Typ)
-	w.WriteFormat("%s %s", gattung.Akte, t.Akte.Sha)
+	w.WriteFormat("%s %s", gattung.Akte, t.Stored.Sha)
 
 	if n, err = w.WriteTo(f.out); err != nil {
 		err = errors.Wrap(err)

@@ -5,11 +5,10 @@ import (
 
 	"github.com/friedenberg/zit/src/charlie/bezeichnung"
 	"github.com/friedenberg/zit/src/charlie/kennung"
-	"github.com/friedenberg/zit/src/echo/typ"
 )
 
 type ProtoZettel struct {
-	Typ         typ.Kennung
+	Typ         kennung.Typ
 	Bezeichnung bezeichnung.Bezeichnung
 	Etiketten   kennung.EtikettSet
 }
@@ -30,7 +29,7 @@ func (pz *ProtoZettel) AddToFlagSet(f *flag.FlagSet) {
 func (pz ProtoZettel) Equals(z Zettel) (ok bool) {
 	var okTyp, okEt, okBez bool
 
-	if !pz.Typ.IsEmpty() && pz.Typ.Equals(z.Typ) {
+	if !pz.Typ.IsEmpty() && pz.Typ.Equals(&z.Typ) {
 		okTyp = true
 	}
 
@@ -58,7 +57,7 @@ func (pz ProtoZettel) Make() (z *Zettel) {
 }
 
 func (pz ProtoZettel) Apply(z *Zettel) (ok bool) {
-	if z.Typ.IsEmpty() && !pz.Typ.IsEmpty() && !z.Typ.Equals(pz.Typ) {
+	if z.Typ.IsEmpty() && !pz.Typ.IsEmpty() && !z.Typ.Equals(&pz.Typ) {
 		ok = true
 		z.Typ = pz.Typ
 	}

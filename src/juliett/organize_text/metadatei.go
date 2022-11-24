@@ -8,12 +8,11 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/line_format"
 	"github.com/friedenberg/zit/src/charlie/kennung"
-	"github.com/friedenberg/zit/src/echo/typ"
 )
 
 type Metadatei struct {
 	kennung.EtikettSet
-	Typ typ.Kennung
+	Typ kennung.Typ
 }
 
 func (m Metadatei) HasMetadateiContent() bool {

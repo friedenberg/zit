@@ -69,7 +69,19 @@ func (a Kennung[T, T1]) Contains(b Kennung[T, T1]) bool {
 	return strings.HasPrefix(a.value.String(), b.value.String())
 }
 
-func (a Kennung[T, T1]) Equals(b Kennung[T, T1]) bool {
+func (a Kennung[T, T1]) Reset(b *Kennung[T, T1]) {
+	if b != nil {
+		a.value = b.value
+	} else {
+		//TODO
+	}
+}
+
+func (a Kennung[T, T1]) Equals(b *Kennung[T, T1]) bool {
+	if b == nil {
+		return false
+	}
+
 	return a.value.String() == b.value.String()
 }
 

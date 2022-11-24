@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/konfig"
-	"github.com/friedenberg/zit/src/echo/typ"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 )
 
@@ -15,7 +14,7 @@ type Options struct {
 	hinweis.Abbr
 
 	RootEtiketten     kennung.EtikettSet
-	Typ               typ.Kennung
+	Typ               kennung.Typ
 	GroupingEtiketten kennung.Slice
 	ExtraEtiketten    kennung.EtikettSet
 	Transacted        zettel_transacted.MutableSet

@@ -1,28 +1,21 @@
 package typ
 
-import (
-	"crypto/sha256"
+// type Named struct {
+// 	Kennung kennung.Typ
+// 	Akte
+// }
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/sha"
-)
+// func (t *Named) ObjekteSha() (s sha.Sha, err error) {
+// 	hash := sha256.New()
 
-type Named struct {
-	Kennung
-	Akte
-}
+// 	enc := MakeEncoderObjekte(hash)
 
-func (t *Named) ObjekteSha() (s sha.Sha, err error) {
-	hash := sha256.New()
+// 	if _, err = enc.Encode(t); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	enc := MakeEncoderObjekte(hash)
+// 	s = sha.FromHash(hash)
 
-	if _, err = enc.Encode(t); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	s = sha.FromHash(hash)
-
-	return
-}
+// 	return
+// }

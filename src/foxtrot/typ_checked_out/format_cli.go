@@ -23,7 +23,7 @@ func MakeCliFormat(
 			format.MakeFormatString("["),
 			cw(s.MakeWriterRelativePath(t.FD.Path), format.ColorTypePointer),
 			format.MakeFormatString("@"),
-			format.MakeWriter(sf, &t.Akte.Sha),
+			format.MakeWriter(sf, &t.Stored.Sha),
 			format.MakeFormatString(" "),
 			format.MakeWriter(tf, &t.Named),
 			format.MakeFormatString("]"),

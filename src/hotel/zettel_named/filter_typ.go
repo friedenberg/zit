@@ -1,12 +1,10 @@
 package zettel_named
 
-import (
-	"github.com/friedenberg/zit/src/echo/typ"
-)
+import "github.com/friedenberg/zit/src/charlie/kennung"
 
-type FilterTyp typ.Kennung
+type FilterTyp kennung.Typ
 
 func (f FilterTyp) IncludeNamedZettel(z Zettel) (ok bool) {
-	ok = typ.Kennung(f).Includes(z.Stored.Objekte.Typ)
+	ok = kennung.Typ(f).Includes(z.Stored.Objekte.Typ)
 	return
 }

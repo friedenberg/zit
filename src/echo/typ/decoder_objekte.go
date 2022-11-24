@@ -66,7 +66,7 @@ func (f *DecoderObjekte) Decode(t *Named) (n int64, err error) {
 
 		switch g {
 		case gattung.Akte:
-			if err = t.Akte.Sha.Set(v); err != nil {
+			if err = t.Stored.Sha.Set(v); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

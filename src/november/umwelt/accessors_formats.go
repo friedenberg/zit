@@ -51,7 +51,7 @@ func (u *Umwelt) FormatBezeichnung() format.FormatWriterFunc[bezeichnung.Bezeich
 	return bezeichnung.MakeCliFormat(u.FormatColorWriter())
 }
 
-func (u *Umwelt) FormatTypKennung() format.FormatWriterFunc[typ.Kennung] {
+func (u *Umwelt) FormatTypKennung() format.FormatWriterFunc[kennung.Typ] {
 	return typ.MakeKennungCliFormat(u.FormatColorWriter())
 }
 

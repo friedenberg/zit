@@ -1,9 +1,12 @@
 package typ
 
-import "github.com/friedenberg/zit/src/bravo/collections"
+import (
+	"github.com/friedenberg/zit/src/bravo/collections"
+	"github.com/friedenberg/zit/src/charlie/kennung"
+)
 
-type MutableSet = collections.MutableValueSet[Kennung, *Kennung]
+type MutableSet = collections.MutableValueSet[kennung.Typ, *kennung.Typ]
 
-func MakeMutableSet(hs ...Kennung) MutableSet {
-	return MutableSet(collections.MakeMutableValueSet[Kennung, *Kennung](hs...))
+func MakeMutableSet(hs ...kennung.Typ) MutableSet {
+	return MutableSet(collections.MakeMutableValueSet[kennung.Typ, *kennung.Typ](hs...))
 }

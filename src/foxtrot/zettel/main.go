@@ -7,12 +7,11 @@ import (
 	"github.com/friedenberg/zit/src/charlie/bezeichnung"
 	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/echo/typ"
 )
 
 type Zettel struct {
 	Akte        sha.Sha
-	Typ         typ.Kennung
+	Typ         kennung.Typ
 	Bezeichnung bezeichnung.Bezeichnung
 	Etiketten   kennung.EtikettSet
 }
@@ -27,7 +26,7 @@ func (z *Zettel) Equals(z1 *Zettel) bool {
 		return false
 	}
 
-	if !z.Typ.Equals(z1.Typ) {
+	if !z.Typ.Equals(&z1.Typ) {
 		return false
 	}
 
@@ -62,7 +61,7 @@ func (z Zettel) IsEmpty() bool {
 func (z *Zettel) Reset(z1 *Zettel) {
 	if z1 == nil {
 		z.Akte = sha.Sha{}
-		z.Typ = typ.Kennung{}
+		z.Typ = kennung.Typ{}
 		z.Bezeichnung = bezeichnung.Make("")
 		z.Etiketten = kennung.MakeEtikettSet()
 	} else {

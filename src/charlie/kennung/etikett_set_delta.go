@@ -1,11 +1,11 @@
 package kennung
 
-//TODO rename
+// TODO rename
 type Delta struct {
 	Added, Removed EtikettSet
 }
 
-//TODO rename
+// TODO rename
 func MakeSetDelta(s1, s2 EtikettSet) (d Delta) {
 	added := MakeEtikettMutableSet()
 	removed := s1.MutableCopy()

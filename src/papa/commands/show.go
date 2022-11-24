@@ -77,7 +77,7 @@ func (c Show) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 				},
 			},
 			id_set.ProtoId{
-				MutableId: &typ.Kennung{},
+				MutableId: &kennung.Typ{},
 			},
 			id_set.ProtoId{
 				MutableId: &ts.Time{},
@@ -87,7 +87,7 @@ func (c Show) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 	case gattung.Typ:
 		is = id_set.MakeProtoIdSet(
 			id_set.ProtoId{
-				MutableId: &typ.Kennung{},
+				MutableId: &kennung.Typ{},
 			},
 		)
 
@@ -229,12 +229,12 @@ func (c Show) showTransaktions(store *umwelt.Umwelt, ids id_set.Set) (err error)
 func (c Show) showTypen(
 	store *umwelt.Umwelt,
 	ids id_set.Set,
-	ev collections_coding.EncoderLike[typ.Kennung],
+	ev collections_coding.EncoderLike[kennung.Typ],
 ) (err error) {
 	typen := typ.MakeMutableSet(ids.Typen()...)
 	typen.EachPtr(
 		collections.MakeChain(
-			func(t *typ.Kennung) (err error) {
+			func(t *kennung.Typ) (err error) {
 				ct := store.Konfig().GetTyp(t.String())
 
 				if ct == nil {

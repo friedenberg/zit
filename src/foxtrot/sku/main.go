@@ -11,7 +11,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/ts"
-	"github.com/friedenberg/zit/src/echo/typ"
 )
 
 type Mutter [2]ts.Time
@@ -80,7 +79,7 @@ func (o *Sku) Set(v string) (err error) {
 		o.Id = &kennung.Etikett{}
 
 	case gattung.Typ:
-		o.Id = &typ.Kennung{}
+		o.Id = &kennung.Typ{}
 
 	default:
 		err = errors.Errorf("unsupported gattung: %s", o.Gattung)

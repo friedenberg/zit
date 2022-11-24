@@ -201,7 +201,7 @@ func (atc Refiner) applyPrefixJoints(a *assignment) (err error) {
 
 	var na *assignment
 
-	if a.etiketten.Len() == 1 && a.etiketten.Any().Equals(groupingPrefix.Etikett) {
+	if a.etiketten.Len() == 1 && a.etiketten.Any().Equals(&groupingPrefix.Etikett) {
 		na = a
 	} else {
 		na = newAssignment(a.Depth() + 1)
