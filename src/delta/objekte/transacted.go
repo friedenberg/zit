@@ -3,7 +3,7 @@ package objekte
 import (
 	"github.com/friedenberg/zit/src/bravo/int_value"
 	"github.com/friedenberg/zit/src/delta/ts"
-	"github.com/friedenberg/zit/src/foxtrot/sku"
+	"github.com/friedenberg/zit/src/echo/sku"
 )
 
 type Transacted[T Objekte, T1 ObjektePtr[T], T2 Identifier[T2], T3 IdentifierPtr[T2]] struct {
