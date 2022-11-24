@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/kennung"
+	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
 // TODO-P3 make generic

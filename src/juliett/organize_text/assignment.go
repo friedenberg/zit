@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/collections"
-	"github.com/friedenberg/zit/src/charlie/kennung"
+	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
 type assignment struct {

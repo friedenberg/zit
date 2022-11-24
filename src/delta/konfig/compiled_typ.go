@@ -2,7 +2,7 @@ package konfig
 
 import (
 	"github.com/friedenberg/zit/src/bravo/collections"
-	"github.com/friedenberg/zit/src/charlie/kennung"
+	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
 var (

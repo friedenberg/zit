@@ -1,7 +1,7 @@
 package zettel_named
 
 import (
-	"github.com/friedenberg/zit/src/charlie/kennung"
+	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
 type FilterEtikettSet struct {

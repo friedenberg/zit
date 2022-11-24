@@ -3,7 +3,7 @@ package zettel_named
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/charlie/kennung"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/id_set"
 )
 

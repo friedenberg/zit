@@ -3,9 +3,9 @@ package umwelt
 import (
 	"github.com/friedenberg/zit/src/bravo/format"
 	"github.com/friedenberg/zit/src/charlie/bezeichnung"
-	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/hinweis"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/typ"
 	"github.com/friedenberg/zit/src/foxtrot/cwd_files"
 	"github.com/friedenberg/zit/src/foxtrot/typ_checked_out"

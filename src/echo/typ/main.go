@@ -1,7 +1,7 @@
 package typ
 
 import (
-	"github.com/friedenberg/zit/src/charlie/kennung"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/delta/objekte"
 )
 

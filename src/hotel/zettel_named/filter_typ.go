@@ -1,6 +1,6 @@
 package zettel_named
 
-import "github.com/friedenberg/zit/src/charlie/kennung"
+import "github.com/friedenberg/zit/src/delta/kennung"
 
 type FilterTyp kennung.Typ
 

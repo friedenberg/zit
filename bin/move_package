@@ -10,10 +10,9 @@ renamed_pkg="$(basename "$renamed")"
 gofmt -w -r "$original_pkg.E -> $renamed_pkg.E" ./
 gofmt -w -r "$original_pkg -> $renamed_pkg" ./
 
-mkdir -p "$(dirname "$renamed")"
+mkdir -p "$renamed"
 
-find "$original" -type f -exec \
-  git mv {} "$renamed/" \|\| mv {} "$renamed/" \;
+git mv $original/* "$renamed" || mv $original/* "$renamed"
 
 # git mv "$original" "$renamed" || mv "$original" "$renamed"
 

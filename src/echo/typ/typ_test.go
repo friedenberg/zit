@@ -3,7 +3,7 @@ package typ
 import (
 	"testing"
 
-	"github.com/friedenberg/zit/src/charlie/kennung"
+	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
 func TestAkteExt(t *testing.T) {
