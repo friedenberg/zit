@@ -9,7 +9,7 @@ import (
 )
 
 // TODO-P3 make generic
-type SetKeyToEtiketten map[string]kennung.MutableSet
+type SetKeyToEtiketten map[string]kennung.EtikettMutableSet
 
 func (m SetKeyToEtiketten) String() string {
 	sb := &strings.Builder{}
@@ -22,7 +22,7 @@ func (m SetKeyToEtiketten) String() string {
 }
 
 func (m SetKeyToEtiketten) Add(h string, e kennung.Etikett) {
-	var es kennung.MutableSet
+	var es kennung.EtikettMutableSet
 	ok := false
 
 	if es, ok = m[h]; !ok {
@@ -34,7 +34,7 @@ func (m SetKeyToEtiketten) Add(h string, e kennung.Etikett) {
 }
 
 func (m SetKeyToEtiketten) Contains(h string, e kennung.Etikett) (ok bool) {
-	var es kennung.MutableSet
+	var es kennung.EtikettMutableSet
 
 	if es, ok = m[h]; !ok {
 		return

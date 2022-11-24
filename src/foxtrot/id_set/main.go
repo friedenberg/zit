@@ -14,7 +14,7 @@ import (
 
 type Set struct {
 	shas       sha.MutableSet
-	etiketten  kennung.MutableSet
+	etiketten  kennung.EtikettMutableSet
 	hinweisen  hinweis.MutableSet
 	typen      typ.MutableSet
 	timestamps ts.MutableSet

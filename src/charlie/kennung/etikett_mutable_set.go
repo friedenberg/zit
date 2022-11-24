@@ -6,20 +6,20 @@ import (
 	"github.com/friedenberg/zit/src/bravo/collections"
 )
 
-type MutableSet = collections.MutableValueSet[Etikett, *Etikett]
+type EtikettMutableSet = collections.MutableValueSet[Etikett, *Etikett]
 
-func MakeMutableSet(hs ...Etikett) MutableSet {
-	return MutableSet(collections.MakeMutableValueSet[Etikett, *Etikett](hs...))
+func MakeMutableSet(hs ...Etikett) EtikettMutableSet {
+	return EtikettMutableSet(collections.MakeMutableValueSet[Etikett, *Etikett](hs...))
 }
 
-func AddNormalized(es MutableSet, e Etikett) {
+func AddNormalized(es EtikettMutableSet, e Etikett) {
 	e.Expanded(ExpanderRight).Each(es.Add)
 	es.Add(e)
 
 	es.Reset(WithRemovedCommonPrefixes(es.Copy()))
 }
 
-func RemovePrefixes(es MutableSet, needle Etikett) {
+func RemovePrefixes(es EtikettMutableSet, needle Etikett) {
 	for _, haystack := range es.Elements() {
 		//TODO make more efficient
 		if strings.HasPrefix(haystack.String(), needle.String()) {
@@ -28,7 +28,7 @@ func RemovePrefixes(es MutableSet, needle Etikett) {
 	}
 }
 
-func Withdraw(s1 MutableSet, e Etikett) (s2 EtikettSet) {
+func Withdraw(s1 EtikettMutableSet, e Etikett) (s2 EtikettSet) {
 	s3 := MakeMutableSet()
 
 	for _, e1 := range s1.Elements() {

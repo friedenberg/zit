@@ -74,7 +74,7 @@ type textStateWrite struct {
 
 type textStateReadMetadatei struct {
 	*Zettel
-	etiketten         kennung.MutableSet
+	etiketten         kennung.EtikettMutableSet
 	aktePath          string
 	recoverableErrors errors.Multi
 }
