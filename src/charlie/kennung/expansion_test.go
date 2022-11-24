@@ -1,6 +1,10 @@
 package kennung
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/friedenberg/zit/src/bravo/test_logz"
+)
 
 func stringSliceEquals(a, b []string) bool {
 	if len(a) != len(b) {
@@ -55,9 +59,10 @@ func TestStringSliceEquals(t *testing.T) {
 	}
 }
 
-func TestExpansionAll(t *testing.T) {
-	e := Etikett{Value: "this-is-a-tag"}
-	ex := e.Expanded()
+func TestExpansionAll(t1 *testing.T) {
+	t := test_logz.T{T: t1}
+	e := MustEtikett("this-is-a-tag")
+	ex := e.Expanded(ExpanderAll)
 	expected := []string{
 		"a",
 		"a-tag",
@@ -82,8 +87,8 @@ func TestExpansionAll(t *testing.T) {
 }
 
 func TestExpansionRight(t *testing.T) {
-	e := Etikett{Value: "this-is-a-tag"}
-	ex := e.Expanded(ExpanderEtikettRight)
+	e := MustEtikett("this-is-a-tag")
+	ex := e.Expanded(ExpanderRight)
 	expected := []string{
 		"this",
 		"this-is",

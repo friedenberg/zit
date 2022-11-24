@@ -2,24 +2,24 @@ package kennung
 
 import (
 	"regexp"
-
-	"github.com/friedenberg/zit/src/bravo/collections"
 )
-
-type ExpanderEtikett = Expander[Etikett, *Etikett]
 
 var (
 	regexExpandTagsHyphens *regexp.Regexp
-	ExpanderEtikettRight   ExpanderEtikett
-	ExpanderEtikettAll     ExpanderEtikett
+	ExpanderRight          Expander
+	ExpanderAll            Expander
 )
 
-type Expander[T collections.ValueElement, T1 collections.ValueElementPtr[T]] interface {
-	Expand(string) collections.ValueSet[T, T1]
+type stringAdder interface {
+	AddString(string) error
+}
+
+type Expander interface {
+	Expand(stringAdder, string)
 }
 
 func init() {
 	regexExpandTagsHyphens = regexp.MustCompile(`-`)
-	ExpanderEtikettRight = MakeExpanderRight[Etikett, *Etikett](`-`)
-	ExpanderEtikettAll = MakeExpanderAll[Etikett, *Etikett](`-`)
+	ExpanderRight = MakeExpanderRight(`-`)
+	ExpanderAll = MakeExpanderAll(`-`)
 }

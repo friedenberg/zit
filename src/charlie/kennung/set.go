@@ -56,7 +56,7 @@ func WithRemovedCommonPrefixes(s Set) (s2 Set) {
 	return
 }
 
-func Expanded(s Set, exes ...ExpanderEtikett) (out Set) {
+func Expanded(s Set, exes ...Expander) (out Set) {
 	s1 := MakeMutableSet()
 
 	for _, e := range s.Elements() {
@@ -100,7 +100,7 @@ func SubtractPrefix(s1 Set, e Etikett) (s2 Set) {
 	s3 := MakeMutableSet()
 
 	for _, e1 := range s1.Elements() {
-		e2 := e1.LeftSubtract(e)
+		e2, _ := e1.LeftSubtract(e)
 
 		if e2.String() == "" {
 			continue

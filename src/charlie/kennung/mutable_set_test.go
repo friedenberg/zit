@@ -4,14 +4,14 @@ import "testing"
 
 func TestAddNormalized(t *testing.T) {
 	sut := MakeMutableSet(
-		Etikett{Value: "project-2021-zit-test"},
-		Etikett{Value: "project-2021-zit-ewwwwww"},
-		Etikett{Value: "zz-archive-task-done"},
+		MustEtikett("project-2021-zit-test"),
+		MustEtikett("project-2021-zit-ewwwwww"),
+		MustEtikett("zz-archive-task-done"),
 	)
 
 	sutEx := sut.MutableCopy()
 
-	toAdd := Etikett{Value: "project-2021-zit"}
+	toAdd := MustEtikett("project-2021-zit")
 
 	AddNormalized(sut, toAdd)
 
@@ -22,7 +22,7 @@ func TestAddNormalized(t *testing.T) {
 
 func TestAddNormalizedEmpty(t *testing.T) {
 	sut := MakeMutableSet()
-	toAdd := Etikett{Value: "project-2021-zit"}
+	toAdd := MustEtikett("project-2021-zit")
 
 	sutEx := MakeMutableSet(toAdd)
 
@@ -35,14 +35,14 @@ func TestAddNormalizedEmpty(t *testing.T) {
 
 func TestAddNormalizedFromEmptyBuild(t *testing.T) {
 	toAdd := []Etikett{
-		Etikett{Value: "priority"},
-		Etikett{Value: "priority-1"},
+		MustEtikett("priority"),
+		MustEtikett("priority-1"),
 	}
 
 	sut := MakeMutableSet()
 
 	sutEx := MakeMutableSet(
-		Etikett{Value: "priority-1"},
+		MustEtikett("priority-1"),
 	)
 
 	for _, e := range toAdd {

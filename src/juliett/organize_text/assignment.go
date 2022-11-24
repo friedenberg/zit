@@ -51,7 +51,7 @@ func (a assignment) MaxDepth() (d int) {
 }
 
 func (a assignment) AlignmentSpacing() int {
-	if a.etiketten.Len() == 1 && a.etiketten.Any().IsDependentLeaf() {
+	if a.etiketten.Len() == 1 && kennung.IsDependentLeaf(a.etiketten.Any()) {
 		return a.parent.AlignmentSpacing() + len(a.parent.etiketten.Any().String())
 	}
 
@@ -216,7 +216,7 @@ func (a *assignment) expandedEtiketten() (es kennung.Set, err error) {
 	} else {
 		e := a.etiketten.Any()
 
-		if e.IsDependentLeaf() {
+		if kennung.IsDependentLeaf(e) {
 			var pe kennung.Set
 
 			if pe, err = a.parent.expandedEtiketten(); err != nil {
@@ -240,9 +240,10 @@ func (a *assignment) expandedEtiketten() (es kennung.Set, err error) {
 				return
 			}
 
-			errors.Print(e1, e)
-			e = kennung.Etikett{Value: fmt.Sprintf("%s%s", e1, e)}
-			errors.Print(e)
+			if err = e.Set(fmt.Sprintf("%s%s", e1, e)); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 		}
 
 		es = kennung.MakeSet(e)

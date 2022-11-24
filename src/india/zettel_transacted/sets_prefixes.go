@@ -28,7 +28,7 @@ func (s SetPrefixTransacted) Len() int {
 
 // this splits on right-expanded
 func (s *SetPrefixTransacted) Add(z Zettel) {
-	es := kennung.Expanded(z.Named.Stored.Objekte.Etiketten, kennung.ExpanderEtikettRight)
+	es := kennung.Expanded(z.Named.Stored.Objekte.Etiketten, kennung.ExpanderRight)
 
 	if es.Len() == 0 {
 		es = kennung.MakeSet(kennung.Etikett{})

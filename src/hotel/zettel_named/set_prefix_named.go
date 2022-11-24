@@ -19,7 +19,7 @@ func NewSetPrefixNamed() *SetPrefixNamed {
 
 // this splits on right-expanded
 func (s *SetPrefixNamed) Add(z Zettel) {
-	es := kennung.Expanded(z.Stored.Objekte.Etiketten, kennung.ExpanderEtikettRight)
+	es := kennung.Expanded(z.Stored.Objekte.Etiketten, kennung.ExpanderRight)
 
 	for _, e := range es.Elements() {
 		s.addPair(e, z)

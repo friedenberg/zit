@@ -15,37 +15,37 @@ func TestNormalize(t *testing.T) {
 	testEntries := map[string]testEntry{
 		"removes all": testEntry{
 			ac: MakeSet(
-				Etikett{Value: "project-2021-zit"},
-				Etikett{Value: "project-2021-zit-test"},
-				Etikett{Value: "project-2021-zit-ewwwwww"},
-				Etikett{Value: "project-archive-task-done"},
+				MustEtikett("project-2021-zit"),
+				MustEtikett("project-2021-zit-test"),
+				MustEtikett("project-2021-zit-ewwwwww"),
+				MustEtikett("project-archive-task-done"),
 			),
 			ex: MakeSet(
-				Etikett{Value: "project-2021-zit-test"},
-				Etikett{Value: "project-2021-zit-ewwwwww"},
-				Etikett{Value: "project-archive-task-done"},
+				MustEtikett("project-2021-zit-test"),
+				MustEtikett("project-2021-zit-ewwwwww"),
+				MustEtikett("project-archive-task-done"),
 			),
 		},
 		"removes non": testEntry{
 			ac: MakeSet(
-				Etikett{Value: "project-2021-zit"},
-				Etikett{Value: "project-2021-zit-test"},
-				Etikett{Value: "project-2021-zit-ewwwwww"},
-				Etikett{Value: "zz-archive-task-done"},
+				MustEtikett("project-2021-zit"),
+				MustEtikett("project-2021-zit-test"),
+				MustEtikett("project-2021-zit-ewwwwww"),
+				MustEtikett("zz-archive-task-done"),
 			),
 			ex: MakeSet(
-				Etikett{Value: "project-2021-zit-test"},
-				Etikett{Value: "project-2021-zit-ewwwwww"},
-				Etikett{Value: "zz-archive-task-done"},
+				MustEtikett("project-2021-zit-test"),
+				MustEtikett("project-2021-zit-ewwwwww"),
+				MustEtikett("zz-archive-task-done"),
 			),
 		},
 		"removes right order": testEntry{
 			ac: MakeSet(
-				Etikett{Value: "priority"},
-				Etikett{Value: "priority-1"},
+				MustEtikett("priority"),
+				MustEtikett("priority-1"),
 			),
 			ex: MakeSet(
-				Etikett{Value: "priority-1"},
+				MustEtikett("priority-1"),
 			),
 		},
 	}
@@ -79,52 +79,52 @@ func TestRemovePrefixes(t *testing.T) {
 	testEntries := map[string]testEntry{
 		"removes all": testEntry{
 			ac: MakeSet(
-				Etikett{Value: "project-2021-zit"},
-				Etikett{Value: "project-2021-zit-test"},
-				Etikett{Value: "project-2021-zit-ewwwwww"},
-				Etikett{Value: "project-archive-task-done"},
+				MustEtikett("project-2021-zit"),
+				MustEtikett("project-2021-zit-test"),
+				MustEtikett("project-2021-zit-ewwwwww"),
+				MustEtikett("project-archive-task-done"),
 			),
 			ex:     MakeSet(),
 			prefix: "project",
 		},
 		"removes non": testEntry{
 			ac: MakeSet(
-				Etikett{Value: "project-2021-zit"},
-				Etikett{Value: "project-2021-zit-test"},
-				Etikett{Value: "project-2021-zit-ewwwwww"},
-				Etikett{Value: "zz-archive-task-done"},
+				MustEtikett("project-2021-zit"),
+				MustEtikett("project-2021-zit-test"),
+				MustEtikett("project-2021-zit-ewwwwww"),
+				MustEtikett("zz-archive-task-done"),
 			),
 			ex: MakeSet(
-				Etikett{Value: "project-2021-zit"},
-				Etikett{Value: "project-2021-zit-test"},
-				Etikett{Value: "project-2021-zit-ewwwwww"},
-				Etikett{Value: "zz-archive-task-done"},
+				MustEtikett("project-2021-zit"),
+				MustEtikett("project-2021-zit-test"),
+				MustEtikett("project-2021-zit-ewwwwww"),
+				MustEtikett("zz-archive-task-done"),
 			),
 			prefix: "xx",
 		},
 		"removes one": testEntry{
 			ac: MakeSet(
-				Etikett{Value: "project-2021-zit"},
-				Etikett{Value: "project-2021-zit-test"},
-				Etikett{Value: "project-2021-zit-ewwwwww"},
-				Etikett{Value: "zz-archive-task-done"},
+				MustEtikett("project-2021-zit"),
+				MustEtikett("project-2021-zit-test"),
+				MustEtikett("project-2021-zit-ewwwwww"),
+				MustEtikett("zz-archive-task-done"),
 			),
 			ex: MakeSet(
-				Etikett{Value: "project-2021-zit"},
-				Etikett{Value: "project-2021-zit-test"},
-				Etikett{Value: "project-2021-zit-ewwwwww"},
+				MustEtikett("project-2021-zit"),
+				MustEtikett("project-2021-zit-test"),
+				MustEtikett("project-2021-zit-ewwwwww"),
 			),
 			prefix: "zz",
 		},
 		"removes most": testEntry{
 			ac: MakeSet(
-				Etikett{Value: "project-2021-zit"},
-				Etikett{Value: "project-2021-zit-test"},
-				Etikett{Value: "project-2021-zit-ewwwwww"},
-				Etikett{Value: "zz-archive-task-done"},
+				MustEtikett("project-2021-zit"),
+				MustEtikett("project-2021-zit-test"),
+				MustEtikett("project-2021-zit-ewwwwww"),
+				MustEtikett("zz-archive-task-done"),
 			),
 			ex: MakeSet(
-				Etikett{Value: "zz-archive-task-done"},
+				MustEtikett("zz-archive-task-done"),
 			),
 			prefix: "project",
 		},
@@ -142,11 +142,11 @@ func TestRemovePrefixes(t *testing.T) {
 
 func TestExpandedRight(t *testing.T) {
 	s := MakeSet(
-		Etikett{Value: "project-2021-zit"},
-		Etikett{Value: "zz-archive-task-done"},
+		MustEtikett("project-2021-zit"),
+		MustEtikett("zz-archive-task-done"),
 	)
 
-	ex := Expanded(s, ExpanderEtikettRight)
+	ex := Expanded(s, ExpanderRight)
 
 	expected := []string{
 		"project",
@@ -171,11 +171,11 @@ func TestExpandedRight(t *testing.T) {
 
 func TestPrefixIntersection(t *testing.T) {
 	s := MakeSet(
-		Etikett{Value: "project-2021-zit"},
-		Etikett{Value: "zz-archive-task-done"},
+		MustEtikett("project-2021-zit"),
+		MustEtikett("zz-archive-task-done"),
 	)
 
-	ex := s.IntersectPrefixes(MakeSet(Etikett{Value: "project"}))
+	ex := s.IntersectPrefixes(MakeSet(MustEtikett("project")))
 
 	expected := []string{
 		"project-2021-zit",
@@ -193,7 +193,7 @@ func TestPrefixIntersection(t *testing.T) {
 }
 
 // func TestExpansionRight(t *testing.T) {
-// 	e := Etikett{Value: "this-is-a-tag"}
+// 	e := MustEtikett("this-is-a-tag")
 // 	ex := e.Expanded(ExpanderRight{})
 // 	expected := []string{
 // 		"this",
@@ -215,19 +215,19 @@ func TestPrefixIntersection(t *testing.T) {
 
 func TestDelta1(t *testing.T) {
 	a := MakeSet(
-		Etikett{Value: "project-2021-zit"},
-		Etikett{Value: "task-todo"},
+		MustEtikett("project-2021-zit"),
+		MustEtikett("task-todo"),
 	)
 
 	b := MakeSet(
-		Etikett{Value: "project-2021-zit"},
-		Etikett{Value: "zz-archive-task-done"},
+		MustEtikett("project-2021-zit"),
+		MustEtikett("zz-archive-task-done"),
 	)
 
 	d := MakeSetDelta(a, b)
 
 	c_expected := MakeSet(
-		Etikett{Value: "zz-archive-task-done"},
+		MustEtikett("zz-archive-task-done"),
 	)
 
 	if !c_expected.Equals(d.Added) {
@@ -235,7 +235,7 @@ func TestDelta1(t *testing.T) {
 	}
 
 	d_expected := MakeSet(
-		Etikett{Value: "task-todo"},
+		MustEtikett("task-todo"),
 	)
 
 	if !d_expected.Equals(d.Removed) {

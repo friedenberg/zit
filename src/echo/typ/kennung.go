@@ -3,6 +3,8 @@ package typ
 import (
 	"strings"
 
+	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/charlie/kennung"
 	"github.com/friedenberg/zit/src/delta/konfig"
 )
@@ -16,7 +18,9 @@ func (v *Kennung) Set(v1 string) (err error) {
 }
 
 func (v Kennung) Expanded() Set {
-	return ExpanderRight.Expand(v.String())
+	s := collections.MakeMutableValueSet[Kennung, *Kennung]()
+	ExpanderRight.Expand(s, v.String())
+	return s.Copy()
 }
 
 func (a Kennung) Equals(b Kennung) bool {
@@ -75,7 +79,10 @@ func (t Kennung) MarshalBinary() (text []byte, err error) {
 }
 
 func (t *Kennung) UnmarshalBinary(text []byte) (err error) {
-	t.Etikett.Value = string(text)
+	if err = t.Etikett.Set(string(text)); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }

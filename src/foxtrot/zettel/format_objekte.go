@@ -119,10 +119,10 @@ func (f *Objekte) ReadFrom(c *FormatContextRead) (n int64, err error) {
 			}
 
 		case gattung.Typ:
-			if f.IgnoreTypErrors {
-				z.Typ.Etikett.Value = strings.TrimSpace(v)
-			} else {
-				if err = z.Typ.Set(v); err != nil {
+			if err = z.Typ.Set(v); err != nil {
+				if f.IgnoreTypErrors {
+					err = nil
+				} else {
 					err = errors.Wrap(err)
 					return
 				}

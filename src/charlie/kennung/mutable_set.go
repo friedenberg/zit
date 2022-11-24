@@ -13,7 +13,7 @@ func MakeMutableSet(hs ...Etikett) MutableSet {
 }
 
 func AddNormalized(es MutableSet, e Etikett) {
-	e.Expanded(ExpanderEtikettRight).Each(es.Add)
+	e.Expanded(ExpanderRight).Each(es.Add)
 	es.Add(e)
 
 	es.Reset(WithRemovedCommonPrefixes(es.Copy()))

@@ -3,30 +3,30 @@ package kennung
 import (
 	"crypto/sha256"
 	"io"
-	"regexp"
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/charlie/sha"
 )
 
-const KennungRegexString = `^[-a-z0-9_/]+$`
-
-var KennungRegex *regexp.Regexp
-
-func init() {
-	KennungRegex = regexp.MustCompile(KennungRegexString)
+type Kennung[T collections.ValueElement, T1 collections.ValueElementPtr[T]] struct {
+	value T
 }
 
-type Kennung struct {
-	Value string
+func makeKennung[T collections.ValueElement, T1 collections.ValueElementPtr[T]](
+	v string,
+) (k Kennung[T, T1], err error) {
+	k.value = *T1(new(T))
+
+	if err = k.Set(v); err != nil {
+		err = errors.Wrap(err)
+	}
+
+	return
 }
 
-func Make(v string) Kennung {
-	return Kennung{Value: v}
-}
-
-func (e Kennung) Sha() sha.Sha {
+func (e Kennung[T, T1]) Sha() sha.Sha {
 	hash := sha256.New()
 	sr := strings.NewReader(e.String())
 
@@ -37,83 +37,99 @@ func (e Kennung) Sha() sha.Sha {
 	return sha.FromHash(hash)
 }
 
-func (e Kennung) String() string {
-	return e.Value
+func (e Kennung[T, T1]) String() string {
+	return e.value.String()
 }
 
-func (e *Kennung) Set(v string) (err error) {
+func (e *Kennung[T, T1]) Set(v string) (err error) {
 	v1 := strings.ToLower(v)
 	v3 := strings.TrimSpace(v1)
 
 	if v3 == "" {
-		err = errors.Errorf("etikett cannot be empty")
+		err = errors.Errorf("Kennung cannot be empty")
 		return
 	}
 
-	if !KennungRegex.Match([]byte(v3)) {
-		err = errors.Errorf("not a valid tag: '%s'", v)
-		return
-	}
-
-	e.Value = v3
-
-	return
+	return T1(&e.value).Set(v3)
 }
 
-func (e Kennung) Len() int {
-	return len(e.Value)
+func (e Kennung[T, T1]) Len() int {
+	return len(e.value.String())
 }
 
-func (a Kennung) Includes(b Kennung) bool {
+func (a Kennung[T, T1]) Includes(b Kennung[T, T1]) bool {
 	return b.Contains(a)
 }
 
-func (a Kennung) Contains(b Kennung) bool {
+func (a Kennung[T, T1]) Contains(b Kennung[T, T1]) bool {
 	if b.Len() > a.Len() {
 		return false
 	}
 
-	return strings.HasPrefix(a.Value, b.Value)
+	return strings.HasPrefix(a.value.String(), b.value.String())
 }
 
-func (a Kennung) Equals(b Kennung) bool {
-	return a.Value == b.Value
+func (a Kennung[T, T1]) Equals(b Kennung[T, T1]) bool {
+	return a.value.String() == b.value.String()
 }
 
-func (a Kennung) Less(b Kennung) bool {
-	return a.Value < b.Value
+func (a Kennung[T, T1]) Less(b Kennung[T, T1]) bool {
+	return a.value.String() < b.value.String()
 }
 
-func (a Kennung) LeftSubtract(b Kennung) (c Kennung) {
-	return Kennung{Value: strings.TrimPrefix(a.String(), b.String())}
-}
+func (a Kennung[T, T1]) LeftSubtract(b Kennung[T, T1]) (c Kennung[T, T1], err error) {
+	c.value = *T1(new(T))
 
-func (a Kennung) IsEmpty() bool {
-	return a.Value == ""
-}
+	if err = c.Set(strings.TrimPrefix(a.String(), b.String())); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-func (a Kennung) IsDependentLeaf() (has bool) {
-	has = strings.HasPrefix(strings.TrimSpace(a.Value), "-")
 	return
 }
 
-func (a Kennung) HasParentPrefix(b Kennung) (has bool) {
-	has = strings.HasPrefix(strings.TrimSpace(a.Value), b.Value)
+func (a Kennung[T, T1]) IsEmpty() bool {
+	return a.Len() == 0
+}
+
+func (e Kennung[T, T1]) Expanded(
+	exes ...Expander,
+) (out collections.ValueSet[Kennung[T, T1], *Kennung[T, T1]]) {
+	expanded := collections.MakeMutableValueSet[Kennung[T, T1], *Kennung[T, T1]]()
+
+	for _, ex := range exes {
+		ex.Expand(expanded, e.String())
+	}
+
+	out = expanded.Copy()
+
 	return
 }
 
-// func (e Kennung) Expanded(exes ...ExpanderKennung) (out Set) {
-// 	expanded := MakeMutableSet()
+func (t Kennung[T, T1]) MarshalText() (text []byte, err error) {
+	text = []byte(t.String())
+	return
+}
 
-// 	if len(exes) == 0 {
-// 		exes = []ExpanderKennung{ExpanderKennungAll}
-// 	}
+func (t *Kennung[T, T1]) UnmarshalText(text []byte) (err error) {
+	if err = t.Set(string(text)); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-// 	for _, ex := range exes {
-// 		ex.Expand(e.String()).Each(expanded.Add)
-// 	}
+	return
+}
 
-// 	out = Set(expanded.Copy())
+func (t Kennung[T, T1]) GobEncode() (by []byte, err error) {
+	by = []byte(t.String())
+	return
+}
 
-// 	return
-// }
+func (t *Kennung[T, T1]) GobDecode(b []byte) (err error) {
+	if err = t.Set(string(b)); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}

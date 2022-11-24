@@ -90,7 +90,8 @@ func makeCompiled(k tomlKonfig) (kc Compiled, err error) {
 }
 
 func (c Compiled) GetSortedTypenExpanded(v string) (expandedActual []*compiledTyp) {
-	expandedMaybe := typExpander.Expand(v)
+	expandedMaybe := collections.MakeMutableValueSet[collections.StringValue, *collections.StringValue]()
+	typExpander.Expand(expandedMaybe, v)
 	expandedActual = make([]*compiledTyp, 0)
 
 	expandedMaybe.Each(

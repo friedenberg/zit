@@ -134,7 +134,7 @@ func (i *indexAbbr) addZettelTransacted(zt zettel_transacted.Zettel) (err error)
 	i.indexAbbrEncodableTridexes.HinweisKopfen.Add(zt.Named.Kennung.Kopf())
 	i.indexAbbrEncodableTridexes.HinweisSchwanzen.Add(zt.Named.Kennung.Schwanz())
 
-	for _, e := range kennung.Expanded(zt.Named.Stored.Objekte.Etiketten, kennung.ExpanderEtikettRight).Elements() {
+	for _, e := range kennung.Expanded(zt.Named.Stored.Objekte.Etiketten, kennung.ExpanderRight).Elements() {
 		i.indexAbbrEncodableTridexes.Etiketten.Add(e.String())
 	}
 
@@ -231,7 +231,7 @@ func (i *indexAbbr) ExpandHinweis(hAbbr hinweis.Hinweis) (h hinweis.Hinweis, err
 func (i *indexAbbr) ExpandEtikettString(s string) (e kennung.Etikett, err error) {
 	errors.Print(s)
 
-	if e = kennung.MakeEtikett(s); err != nil {
+	if e, err = kennung.MakeEtikett(s); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -20,7 +20,12 @@ func (z *Zettel) ApplyKonfig(k konfig.Konfig) (err error) {
 	}
 
 	for e, r := range tk.EtikettenRules {
-		e1 := kennung.MakeEtikett(e)
+		var e1 kennung.Etikett
+
+		if e1, err = kennung.MakeEtikett(e); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
 		if err = z.applyGoldenChild(e1, r.GoldenChild); err != nil {
 			err = errors.Wrap(err)

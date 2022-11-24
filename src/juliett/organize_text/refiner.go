@@ -62,12 +62,12 @@ func (atc *Refiner) shouldMergeIntoParent(a *assignment) bool {
 		return false
 	}
 
-	if a.parent.etiketten.Any().IsDependentLeaf() {
+	if kennung.IsDependentLeaf(a.parent.etiketten.Any()) {
 		errors.Print("is prefix joint")
 		return false
 	}
 
-	if a.etiketten.Any().IsDependentLeaf() {
+	if kennung.IsDependentLeaf(a.etiketten.Any()) {
 		errors.Print("is prefix joint")
 		return false
 	}
@@ -98,20 +98,27 @@ func (atc *Refiner) renameForPrefixJoint(a *assignment) (err error) {
 		return
 	}
 
-	if a.parent.etiketten.Any().IsDependentLeaf() {
+	if kennung.IsDependentLeaf(a.parent.etiketten.Any()) {
 		return
 	}
 
-	if a.etiketten.Any().IsDependentLeaf() {
+	if kennung.IsDependentLeaf(a.etiketten.Any()) {
 		return
 	}
 
-	if !a.etiketten.Any().HasParentPrefix(a.parent.etiketten.Any()) {
+	if !kennung.HasParentPrefix(a.etiketten.Any(), a.parent.etiketten.Any()) {
 		errors.Print("parent is not prefix joint")
 		return
 	}
 
-	a.etiketten = kennung.MakeSet(a.etiketten.Any().LeftSubtract(a.parent.etiketten.Any()))
+	var ls kennung.Etikett
+
+	if ls, err = a.etiketten.Any().LeftSubtract(a.parent.etiketten.Any()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	a.etiketten = kennung.MakeSet(ls)
 
 	return
 }
@@ -232,7 +239,7 @@ func (a Refiner) childPrefixes(node *assignment) (out []etikettBag) {
 	}
 
 	for _, c := range node.children {
-		expanded := kennung.Expanded(c.etiketten, kennung.ExpanderEtikettRight)
+		expanded := kennung.Expanded(c.etiketten, kennung.ExpanderRight)
 
 		expanded.Each(
 			func(e kennung.Etikett) (err error) {

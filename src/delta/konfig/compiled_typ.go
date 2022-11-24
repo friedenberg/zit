@@ -6,11 +6,11 @@ import (
 )
 
 var (
-	typExpander kennung.Expander[collections.StringValue, *collections.StringValue]
+	typExpander kennung.Expander
 )
 
 func init() {
-	typExpander = kennung.MakeExpanderRight[collections.StringValue, *collections.StringValue](`-`)
+	typExpander = kennung.MakeExpanderRight(`-`)
 }
 
 type compiledTyp struct {

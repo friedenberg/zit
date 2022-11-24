@@ -2,29 +2,25 @@ package kennung
 
 import (
 	"regexp"
-
-	"github.com/friedenberg/zit/src/bravo/collections"
 )
 
-type expanderAll[T collections.ValueElement, T1 collections.ValueElementPtr[T]] struct {
+type expanderAll struct {
 	delimiter *regexp.Regexp
 }
 
-func MakeExpanderAll[T collections.ValueElement, T1 collections.ValueElementPtr[T]](
+func MakeExpanderAll(
 	delimiter string,
-) expanderAll[T, T1] {
-	return expanderAll[T, T1]{
+) expanderAll {
+	return expanderAll{
 		delimiter: regexp.MustCompile(delimiter),
 	}
 }
 
-func (ex expanderAll[T, T1]) Expand(s string) (out collections.ValueSet[T, T1]) {
-	expanded := collections.MakeMutableValueSet[T, T1]()
-	expanded.AddString(s)
-
-	defer func() {
-		out = expanded.Copy()
-	}()
+func (ex expanderAll) Expand(
+	sa stringAdder,
+	s string,
+) {
+	sa.AddString(s)
 
 	if s == "" {
 		return
@@ -45,12 +41,12 @@ func (ex expanderAll[T, T1]) Expand(s string) (out collections.ValueSet[T, T1]) 
 		t1 := s[0:locStart]
 		t2 := s[locEnd:end]
 
-		expanded.AddString(t1)
-		expanded.AddString(t2)
+		sa.AddString(t1)
+		sa.AddString(t2)
 
 		if 0 < i && i < len(hyphens) {
 			t1 := s[prevLocEnd:locStart]
-			expanded.AddString(t1)
+			sa.AddString(t1)
 		}
 
 		prevLocEnd = locEnd

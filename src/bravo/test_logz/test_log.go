@@ -25,6 +25,7 @@ type T struct {
 }
 
 func (t T) Errorf(format string, args ...interface{}) {
+	errors.SetTesting()
 	si, _ := MakeStackInfo(t.Skip + 1)
 	args = append([]interface{}{si}, args...)
 	os.Stderr.WriteString(fmt.Sprintf("%s"+format+"\n", args...))
@@ -32,6 +33,7 @@ func (t T) Errorf(format string, args ...interface{}) {
 }
 
 func (t T) Fatalf(format string, args ...interface{}) {
+	errors.SetTesting()
 	si, _ := MakeStackInfo(t.Skip + 1)
 	args = append([]interface{}{si}, args...)
 	os.Stderr.WriteString(fmt.Sprintf("%s"+format+"\n", args...))

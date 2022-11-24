@@ -13,7 +13,7 @@ func assertSetRemovesPrefixes(t1 *testing.T, ac1 Set, ex Set, prefix string) {
 	}
 
 	ac := ac1.MutableCopy()
-	ac.RemovePrefixes(Etikett{Value: prefix})
+	ac.RemovePrefixes(MustEtikett(prefix))
 
 	if !ac.Equals(ex) {
 		t.Errorf(

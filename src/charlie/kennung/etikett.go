@@ -1,13 +1,10 @@
 package kennung
 
 import (
-	"crypto/sha256"
-	"io"
 	"regexp"
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/sha"
 )
 
 const EtikettRegexString = `^[-a-z0-9_/]+$`
@@ -18,102 +15,50 @@ func init() {
 	EtikettRegex = regexp.MustCompile(EtikettRegexString)
 }
 
-type Etikett struct {
-	Value string
-}
+type Etikett = Kennung[etikett, *etikett]
 
-func MakeEtikett(v string) Etikett {
-	return Etikett{Value: v}
-}
+func MustEtikett(v string) (e Etikett) {
+	var err error
 
-func (e Etikett) Sha() sha.Sha {
-	hash := sha256.New()
-	sr := strings.NewReader(e.String())
-
-	if _, err := io.Copy(hash, sr); err != nil {
+	if e, err = makeKennung[etikett, *etikett](v); err != nil {
 		errors.PanicIfError(err)
 	}
 
-	return sha.FromHash(hash)
+	return
 }
 
-func (e Etikett) String() string {
-	return e.Value
-}
-
-func (e *Etikett) Set(v string) (err error) {
-	v1 := strings.ToLower(v)
-	v3 := strings.TrimSpace(v1)
-
-	if v3 == "" {
-		err = errors.Errorf("etikett cannot be empty")
+func MakeEtikett(v string) (e Etikett, err error) {
+	if e, err = makeKennung[etikett, *etikett](v); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
-	if !EtikettRegex.Match([]byte(v3)) {
+	return
+}
+
+type etikett string
+
+func (e etikett) String() string {
+	return string(e)
+}
+
+func (e *etikett) Set(v string) (err error) {
+	if !EtikettRegex.Match([]byte(v)) {
 		err = errors.Errorf("not a valid tag: '%s'", v)
 		return
 	}
 
-	e.Value = v3
+	*e = etikett(v)
 
 	return
 }
 
-func (e Etikett) Len() int {
-	return len(e.Value)
-}
-
-func (a Etikett) Includes(b Etikett) bool {
-	return b.Contains(a)
-}
-
-func (a Etikett) Contains(b Etikett) bool {
-	if b.Len() > a.Len() {
-		return false
-	}
-
-	return strings.HasPrefix(a.Value, b.Value)
-}
-
-func (a Etikett) Equals(b Etikett) bool {
-	return a.Value == b.Value
-}
-
-func (a Etikett) Less(b Etikett) bool {
-	return a.Value < b.Value
-}
-
-func (a Etikett) LeftSubtract(b Etikett) (c Etikett) {
-	return Etikett{Value: strings.TrimPrefix(a.String(), b.String())}
-}
-
-func (a Etikett) IsEmpty() bool {
-	return a.Value == ""
-}
-
-func (a Etikett) IsDependentLeaf() (has bool) {
-	has = strings.HasPrefix(strings.TrimSpace(a.Value), "-")
+func IsDependentLeaf(a Etikett) (has bool) {
+	has = strings.HasPrefix(strings.TrimSpace(a.String()), "-")
 	return
 }
 
-func (a Etikett) HasParentPrefix(b Etikett) (has bool) {
-	has = strings.HasPrefix(strings.TrimSpace(a.Value), b.Value)
-	return
-}
-
-func (e Etikett) Expanded(exes ...ExpanderEtikett) (out Set) {
-	expanded := MakeMutableSet()
-
-	if len(exes) == 0 {
-		exes = []ExpanderEtikett{ExpanderEtikettAll}
-	}
-
-	for _, ex := range exes {
-		ex.Expand(e.String()).Each(expanded.Add)
-	}
-
-	out = Set(expanded.Copy())
-
+func HasParentPrefix(a, b Etikett) (has bool) {
+	has = strings.HasPrefix(strings.TrimSpace(a.String()), b.String())
 	return
 }

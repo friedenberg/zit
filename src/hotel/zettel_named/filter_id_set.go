@@ -27,7 +27,7 @@ func (f FilterIdSet) IncludeNamedZettel(z *Zettel) (ok bool) {
 	needsEt := f.Set.Etiketten().Len() > 0
 	okEt := false
 
-	expanded := kennung.Expanded(z.Stored.Objekte.Etiketten, kennung.ExpanderEtikettRight)
+	expanded := kennung.Expanded(z.Stored.Objekte.Etiketten, kennung.ExpanderRight)
 
 LOOP:
 	for _, e := range f.Set.Etiketten().Sorted() {

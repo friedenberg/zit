@@ -2,29 +2,25 @@ package kennung
 
 import (
 	"regexp"
-
-	"github.com/friedenberg/zit/src/bravo/collections"
 )
 
-type expanderRight[T collections.ValueElement, T1 collections.ValueElementPtr[T]] struct {
+type expanderRight struct {
 	delimiter *regexp.Regexp
 }
 
-func MakeExpanderRight[T collections.ValueElement, T1 collections.ValueElementPtr[T]](
+func MakeExpanderRight(
 	delimiter string,
-) expanderRight[T, T1] {
-	return expanderRight[T, T1]{
+) expanderRight {
+	return expanderRight{
 		delimiter: regexp.MustCompile(delimiter),
 	}
 }
 
-func (ex expanderRight[T, T1]) Expand(s string) (out collections.ValueSet[T, T1]) {
-	expanded := collections.MakeMutableValueSet[T, T1]()
-	expanded.AddString(s)
-
-	defer func() {
-		out = expanded.Copy()
-	}()
+func (ex expanderRight) Expand(
+	sa stringAdder,
+	s string,
+) {
+	sa.AddString(s)
 
 	if s == "" {
 		return
@@ -40,7 +36,7 @@ func (ex expanderRight[T, T1]) Expand(s string) (out collections.ValueSet[T, T1]
 		locStart := loc[0]
 		t1 := s[0:locStart]
 
-		expanded.AddString(t1)
+		sa.AddString(t1)
 	}
 
 	return

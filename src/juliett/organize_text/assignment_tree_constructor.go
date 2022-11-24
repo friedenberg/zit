@@ -111,7 +111,15 @@ func (atc AssignmentTreeConstructor) makeChildren(
 					}
 
 					child := newAssignment(intermediate.Depth() + 1)
-					child.etiketten = kennung.MakeSet(e.LeftSubtract(groupingEtiketten[0]))
+
+					var ls kennung.Etikett
+
+					if ls, err = e.LeftSubtract(groupingEtiketten[0]); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+
+					child.etiketten = kennung.MakeSet(ls)
 
 					nextGroupingEtiketten := kennung.MakeSlice()
 
