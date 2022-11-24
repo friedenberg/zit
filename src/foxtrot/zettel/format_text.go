@@ -23,7 +23,7 @@ func (f Text) ReadFrom(c *FormatContextRead) (n int64, err error) {
 	state := &textStateRead{
 		textStateReadMetadatei: textStateReadMetadatei{
 			Zettel:    &Zettel{},
-			etiketten: kennung.MakeMutableSet(),
+			etiketten: kennung.MakeEtikettMutableSet(),
 		},
 		context: c,
 	}

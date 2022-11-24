@@ -94,7 +94,7 @@ func (atc AssignmentTreeConstructor) makeChildren(
 			if atc.UsePrefixJoints {
 				if parent.etiketten.Len() > 1 {
 				} else {
-					prefixJoint := kennung.MakeSet(groupingEtiketten[0])
+					prefixJoint := kennung.MakeEtikettSet(groupingEtiketten[0])
 
 					var intermediate, lastChild *assignment
 
@@ -119,7 +119,7 @@ func (atc AssignmentTreeConstructor) makeChildren(
 						return
 					}
 
-					child.etiketten = kennung.MakeSet(ls)
+					child.etiketten = kennung.MakeEtikettSet(ls)
 
 					nextGroupingEtiketten := kennung.MakeSlice()
 
@@ -138,7 +138,7 @@ func (atc AssignmentTreeConstructor) makeChildren(
 				}
 			} else {
 				child := newAssignment(parent.Depth() + 1)
-				child.etiketten = kennung.MakeSet(e)
+				child.etiketten = kennung.MakeEtikettSet(e)
 
 				nextGroupingEtiketten := kennung.MakeSlice()
 

@@ -33,7 +33,7 @@ func (m Metadatei) HasMetadateiContent() bool {
 func (m *Metadatei) ReadFrom(r1 io.Reader) (n int64, err error) {
 	r := bufio.NewReader(r1)
 
-	mes := kennung.MakeMutableSet()
+	mes := kennung.MakeEtikettMutableSet()
 
 	for {
 		var rawLine, line string

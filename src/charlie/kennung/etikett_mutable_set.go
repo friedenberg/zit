@@ -8,7 +8,7 @@ import (
 
 type EtikettMutableSet = collections.MutableValueSet[Etikett, *Etikett]
 
-func MakeMutableSet(hs ...Etikett) EtikettMutableSet {
+func MakeEtikettMutableSet(hs ...Etikett) EtikettMutableSet {
 	return EtikettMutableSet(collections.MakeMutableValueSet[Etikett, *Etikett](hs...))
 }
 
@@ -29,7 +29,7 @@ func RemovePrefixes(es EtikettMutableSet, needle Etikett) {
 }
 
 func Withdraw(s1 EtikettMutableSet, e Etikett) (s2 EtikettSet) {
-	s3 := MakeMutableSet()
+	s3 := MakeEtikettMutableSet()
 
 	for _, e1 := range s1.Elements() {
 		if e1.Contains(e) {

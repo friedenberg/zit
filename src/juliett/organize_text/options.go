@@ -31,9 +31,9 @@ type Options struct {
 func MakeOptions() Options {
 	return Options{
 		wasMade:           true,
-		RootEtiketten:     kennung.MakeSet(),
+		RootEtiketten:     kennung.MakeEtikettSet(),
 		GroupingEtiketten: kennung.MakeSlice(),
-		ExtraEtiketten:    kennung.MakeSet(),
+		ExtraEtiketten:    kennung.MakeEtikettSet(),
 		Transacted:        zettel_transacted.MakeMutableSetHinweis(0),
 	}
 }

@@ -1,11 +1,11 @@
 package kennung
 
-type setExpanded EtikettSet
+type etikettSetExpanded EtikettSet
 
-func newSetExpanded(es ...Etikett) setExpanded {
-	return setExpanded(MakeSet(es...))
+func newEtikettSetExpanded(es ...Etikett) etikettSetExpanded {
+	return etikettSetExpanded(MakeEtikettSet(es...))
 }
 
-func (_ setExpanded) IsExpanded() bool {
+func (_ etikettSetExpanded) IsExpanded() bool {
 	return true
 }

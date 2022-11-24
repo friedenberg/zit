@@ -95,7 +95,7 @@ func ChangesFrom(a1, b1 *organize_text.Text) (c1 Changes, err error) {
 		existing, ok := c.New[bez]
 
 		if !ok {
-			existing = kennung.MakeMutableSet()
+			existing = kennung.MakeEtikettMutableSet()
 		}
 
 		existing.AddString(ett)

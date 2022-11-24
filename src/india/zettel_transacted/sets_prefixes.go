@@ -31,7 +31,7 @@ func (s *SetPrefixTransacted) Add(z Zettel) {
 	es := kennung.Expanded(z.Named.Stored.Objekte.Etiketten, kennung.ExpanderRight)
 
 	if es.Len() == 0 {
-		es = kennung.MakeSet(kennung.Etikett{})
+		es = kennung.MakeEtikettSet(kennung.Etikett{})
 	}
 
 	for _, e := range es.Elements() {
@@ -117,7 +117,7 @@ func (a SetPrefixTransacted) Subset(e kennung.Etikett) (out SetPrefixTransactedS
 
 		zSet.Each(
 			func(z *Zettel) (err error) {
-				intersection := z.Named.Stored.Objekte.Etiketten.IntersectPrefixes(kennung.MakeSet(e))
+				intersection := z.Named.Stored.Objekte.Etiketten.IntersectPrefixes(kennung.MakeEtikettSet(e))
 				errors.Printf("%s yields %s", e1, intersection)
 
 				if intersection.Len() > 0 {

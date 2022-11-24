@@ -25,7 +25,7 @@ type Set struct {
 func Make(c int) Set {
 	return Set{
 		shas:       sha.MakeMutableSet(),
-		etiketten:  kennung.MakeMutableSet(),
+		etiketten:  kennung.MakeEtikettMutableSet(),
 		hinweisen:  hinweis.MakeMutableSet(),
 		typen:      typ.MakeMutableSet(),
 		timestamps: ts.MakeMutableSet(),

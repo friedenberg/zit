@@ -27,7 +27,7 @@ func (atc *Factory) Make() (ot *Text, err error) {
 
 	for _, e := range atc.ExtraEtiketten.Elements() {
 		ee := newAssignment(ot.Depth() + 1)
-		ee.etiketten = kennung.MakeSet(e)
+		ee.etiketten = kennung.MakeEtikettSet(e)
 		ot.assignment.addChild(ee)
 
 		segments := prefixSet.Subset(e)
@@ -114,7 +114,7 @@ func (atc Factory) makeChildren(
 			if atc.UsePrefixJoints {
 				if parent.etiketten.Len() > 1 {
 				} else {
-					prefixJoint := kennung.MakeSet(groupingEtiketten[0])
+					prefixJoint := kennung.MakeEtikettSet(groupingEtiketten[0])
 
 					var intermediate, lastChild *assignment
 
@@ -139,7 +139,7 @@ func (atc Factory) makeChildren(
 						return
 					}
 
-					child.etiketten = kennung.MakeSet(ls)
+					child.etiketten = kennung.MakeEtikettSet(ls)
 
 					nextGroupingEtiketten := kennung.MakeSlice()
 
@@ -162,7 +162,7 @@ func (atc Factory) makeChildren(
 				}
 			} else {
 				child := newAssignment(parent.Depth() + 1)
-				child.etiketten = kennung.MakeSet(e)
+				child.etiketten = kennung.MakeEtikettSet(e)
 
 				nextGroupingEtiketten := kennung.MakeSlice()
 

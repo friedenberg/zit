@@ -21,7 +21,7 @@ type assignment struct {
 func newAssignment(d int) *assignment {
 	return &assignment{
 		depth:     d,
-		etiketten: kennung.MakeSet(),
+		etiketten: kennung.MakeEtikettSet(),
 		named:     collections.MakeMutableValueSet[zettel](),
 		unnamed:   collections.MakeMutableValueSet[newZettel](),
 		children:  make([]*assignment, 0),
@@ -208,7 +208,7 @@ func (a *assignment) consume(b *assignment) (err error) {
 }
 
 func (a *assignment) expandedEtiketten() (es kennung.EtikettSet, err error) {
-	es = kennung.MakeSet()
+	es = kennung.MakeEtikettSet()
 
 	if a.etiketten.Len() != 1 || a.parent == nil {
 		es = a.etiketten.Copy()
@@ -246,7 +246,7 @@ func (a *assignment) expandedEtiketten() (es kennung.EtikettSet, err error) {
 			}
 		}
 
-		es = kennung.MakeSet(e)
+		es = kennung.MakeEtikettSet(e)
 	}
 
 	return

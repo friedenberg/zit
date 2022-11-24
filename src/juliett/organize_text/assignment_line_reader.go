@@ -150,7 +150,7 @@ func (ar *assignmentLineReader) readOneHeading(l line) (err error) {
 		return
 	}
 
-	currentEtiketten := kennung.MakeSet()
+	currentEtiketten := kennung.MakeEtikettSet()
 
 	if l.value != "" {
 		if err = currentEtiketten.Set(l.value); err != nil {

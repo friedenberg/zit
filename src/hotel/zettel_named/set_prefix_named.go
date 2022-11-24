@@ -47,7 +47,7 @@ func (a SetPrefixNamed) Subset(e kennung.Etikett) (out SetPrefixNamedSegments) {
 	for e1, zSet := range a {
 		zSet.Each(
 			func(z *Zettel) (err error) {
-				intersection := z.Stored.Objekte.Etiketten.IntersectPrefixes(kennung.MakeSet(e))
+				intersection := z.Stored.Objekte.Etiketten.IntersectPrefixes(kennung.MakeEtikettSet(e))
 				errors.Printf("%s yields %s", e1, intersection)
 
 				if intersection.Len() > 0 {

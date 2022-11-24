@@ -26,7 +26,7 @@ func (m SetKeyToEtiketten) Add(h string, e kennung.Etikett) {
 	ok := false
 
 	if es, ok = m[h]; !ok {
-		es = kennung.MakeMutableSet()
+		es = kennung.MakeEtikettMutableSet()
 	}
 
 	kennung.AddNormalized(es, e)
@@ -58,7 +58,7 @@ func (in *Text) ToCompareMap() (out CompareMap, err error) {
 		Unnamed: make(SetKeyToEtiketten),
 	}
 
-	if err = in.assignment.addToCompareMap(in.Metadatei, kennung.MakeSet(), &out); err != nil {
+	if err = in.assignment.addToCompareMap(in.Metadatei, kennung.MakeEtikettSet(), &out); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

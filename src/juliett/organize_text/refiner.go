@@ -118,7 +118,7 @@ func (atc *Refiner) renameForPrefixJoint(a *assignment) (err error) {
 		return
 	}
 
-	a.etiketten = kennung.MakeSet(ls)
+	a.etiketten = kennung.MakeEtikettSet(ls)
 
 	return
 }
@@ -205,7 +205,7 @@ func (atc Refiner) applyPrefixJoints(a *assignment) (err error) {
 		na = a
 	} else {
 		na = newAssignment(a.Depth() + 1)
-		na.etiketten = kennung.MakeSet(groupingPrefix.Etikett)
+		na.etiketten = kennung.MakeEtikettSet(groupingPrefix.Etikett)
 		a.addChild(na)
 	}
 

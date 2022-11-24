@@ -17,7 +17,7 @@ type ProtoZettel struct {
 func MakeProtoZettel() ProtoZettel {
 	return ProtoZettel{
 		//TODO-P2: use konfig to create correct default Typ
-		Etiketten: kennung.MakeSet(),
+		Etiketten: kennung.MakeEtikettSet(),
 	}
 }
 
@@ -49,7 +49,7 @@ func (pz ProtoZettel) Equals(z Zettel) (ok bool) {
 
 func (pz ProtoZettel) Make() (z *Zettel) {
 	z = &Zettel{
-		Etiketten: kennung.MakeSet(),
+		Etiketten: kennung.MakeEtikettSet(),
 	}
 
 	pz.Apply(z)

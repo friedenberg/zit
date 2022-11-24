@@ -3,7 +3,7 @@ package kennung
 import "testing"
 
 func TestAddNormalized(t *testing.T) {
-	sut := MakeMutableSet(
+	sut := MakeEtikettMutableSet(
 		MustEtikett("project-2021-zit-test"),
 		MustEtikett("project-2021-zit-ewwwwww"),
 		MustEtikett("zz-archive-task-done"),
@@ -21,10 +21,10 @@ func TestAddNormalized(t *testing.T) {
 }
 
 func TestAddNormalizedEmpty(t *testing.T) {
-	sut := MakeMutableSet()
+	sut := MakeEtikettMutableSet()
 	toAdd := MustEtikett("project-2021-zit")
 
-	sutEx := MakeMutableSet(toAdd)
+	sutEx := MakeEtikettMutableSet(toAdd)
 
 	AddNormalized(sut, toAdd)
 
@@ -39,9 +39,9 @@ func TestAddNormalizedFromEmptyBuild(t *testing.T) {
 		MustEtikett("priority-1"),
 	}
 
-	sut := MakeMutableSet()
+	sut := MakeEtikettMutableSet()
 
-	sutEx := MakeMutableSet(
+	sutEx := MakeEtikettMutableSet(
 		MustEtikett("priority-1"),
 	)
 

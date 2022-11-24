@@ -60,7 +60,7 @@ func (f Objekte) WriteTo(c FormatContextWrite) (n int64, err error) {
 }
 
 func (f *Objekte) ReadFrom(c *FormatContextRead) (n int64, err error) {
-	etiketten := kennung.MakeMutableSet()
+	etiketten := kennung.MakeEtikettMutableSet()
 
 	var z *Zettel
 	z = &c.Zettel

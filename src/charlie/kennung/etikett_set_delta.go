@@ -5,7 +5,7 @@ type Delta struct {
 }
 
 func MakeSetDelta(s1, s2 EtikettSet) (d Delta) {
-	added := MakeMutableSet()
+	added := MakeEtikettMutableSet()
 	removed := s1.MutableCopy()
 
 	for _, e := range s2.Elements() {

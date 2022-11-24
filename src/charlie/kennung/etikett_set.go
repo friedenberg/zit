@@ -9,7 +9,7 @@ import (
 
 type EtikettSet = collections.ValueSet[Etikett, *Etikett]
 
-func MakeSet(es ...Etikett) (s EtikettSet) {
+func MakeEtikettSet(es ...Etikett) (s EtikettSet) {
 	return EtikettSet(collections.MakeValueSet(es...))
 }
 
@@ -51,13 +51,13 @@ func WithRemovedCommonPrefixes(s EtikettSet) (s2 EtikettSet) {
 		}
 	}
 
-	s2 = MakeSet(es...)
+	s2 = MakeEtikettSet(es...)
 
 	return
 }
 
 func Expanded(s EtikettSet, exes ...Expander) (out EtikettSet) {
-	s1 := MakeMutableSet()
+	s1 := MakeEtikettMutableSet()
 
 	for _, e := range s.Elements() {
 		e.Expanded(exes...).Each(s1.Add)
@@ -73,7 +73,7 @@ func Expanded(s EtikettSet, exes ...Expander) (out EtikettSet) {
 // }
 
 func IntersectPrefixes(s1 EtikettSet, s2 EtikettSet) (s3 EtikettSet) {
-	s4 := MakeMutableSet()
+	s4 := MakeEtikettMutableSet()
 
 	for _, e1 := range s2.Elements() {
 		didAdd := false
@@ -86,7 +86,7 @@ func IntersectPrefixes(s1 EtikettSet, s2 EtikettSet) (s3 EtikettSet) {
 		}
 
 		if !didAdd {
-			s4 = MakeMutableSet()
+			s4 = MakeEtikettMutableSet()
 			return
 		}
 	}
@@ -97,7 +97,7 @@ func IntersectPrefixes(s1 EtikettSet, s2 EtikettSet) (s3 EtikettSet) {
 }
 
 func SubtractPrefix(s1 EtikettSet, e Etikett) (s2 EtikettSet) {
-	s3 := MakeMutableSet()
+	s3 := MakeEtikettMutableSet()
 
 	for _, e1 := range s1.Elements() {
 		e2, _ := e1.LeftSubtract(e)

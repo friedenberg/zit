@@ -64,7 +64,7 @@ func (z *Zettel) Reset(z1 *Zettel) {
 		z.Akte = sha.Sha{}
 		z.Typ = typ.Kennung{}
 		z.Bezeichnung = bezeichnung.Make("")
-		z.Etiketten = kennung.MakeSet()
+		z.Etiketten = kennung.MakeEtikettSet()
 	} else {
 		z.Akte = z1.Akte
 		z.Typ = z1.Typ

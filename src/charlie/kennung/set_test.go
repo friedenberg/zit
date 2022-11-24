@@ -14,37 +14,37 @@ func TestNormalize(t *testing.T) {
 
 	testEntries := map[string]testEntry{
 		"removes all": testEntry{
-			ac: MakeSet(
+			ac: MakeEtikettSet(
 				MustEtikett("project-2021-zit"),
 				MustEtikett("project-2021-zit-test"),
 				MustEtikett("project-2021-zit-ewwwwww"),
 				MustEtikett("project-archive-task-done"),
 			),
-			ex: MakeSet(
+			ex: MakeEtikettSet(
 				MustEtikett("project-2021-zit-test"),
 				MustEtikett("project-2021-zit-ewwwwww"),
 				MustEtikett("project-archive-task-done"),
 			),
 		},
 		"removes non": testEntry{
-			ac: MakeSet(
+			ac: MakeEtikettSet(
 				MustEtikett("project-2021-zit"),
 				MustEtikett("project-2021-zit-test"),
 				MustEtikett("project-2021-zit-ewwwwww"),
 				MustEtikett("zz-archive-task-done"),
 			),
-			ex: MakeSet(
+			ex: MakeEtikettSet(
 				MustEtikett("project-2021-zit-test"),
 				MustEtikett("project-2021-zit-ewwwwww"),
 				MustEtikett("zz-archive-task-done"),
 			),
 		},
 		"removes right order": testEntry{
-			ac: MakeSet(
+			ac: MakeEtikettSet(
 				MustEtikett("priority"),
 				MustEtikett("priority-1"),
 			),
-			ex: MakeSet(
+			ex: MakeEtikettSet(
 				MustEtikett("priority-1"),
 			),
 		},
@@ -78,23 +78,23 @@ func TestRemovePrefixes(t *testing.T) {
 
 	testEntries := map[string]testEntry{
 		"removes all": testEntry{
-			ac: MakeSet(
+			ac: MakeEtikettSet(
 				MustEtikett("project-2021-zit"),
 				MustEtikett("project-2021-zit-test"),
 				MustEtikett("project-2021-zit-ewwwwww"),
 				MustEtikett("project-archive-task-done"),
 			),
-			ex:     MakeSet(),
+			ex:     MakeEtikettSet(),
 			prefix: "project",
 		},
 		"removes non": testEntry{
-			ac: MakeSet(
+			ac: MakeEtikettSet(
 				MustEtikett("project-2021-zit"),
 				MustEtikett("project-2021-zit-test"),
 				MustEtikett("project-2021-zit-ewwwwww"),
 				MustEtikett("zz-archive-task-done"),
 			),
-			ex: MakeSet(
+			ex: MakeEtikettSet(
 				MustEtikett("project-2021-zit"),
 				MustEtikett("project-2021-zit-test"),
 				MustEtikett("project-2021-zit-ewwwwww"),
@@ -103,13 +103,13 @@ func TestRemovePrefixes(t *testing.T) {
 			prefix: "xx",
 		},
 		"removes one": testEntry{
-			ac: MakeSet(
+			ac: MakeEtikettSet(
 				MustEtikett("project-2021-zit"),
 				MustEtikett("project-2021-zit-test"),
 				MustEtikett("project-2021-zit-ewwwwww"),
 				MustEtikett("zz-archive-task-done"),
 			),
-			ex: MakeSet(
+			ex: MakeEtikettSet(
 				MustEtikett("project-2021-zit"),
 				MustEtikett("project-2021-zit-test"),
 				MustEtikett("project-2021-zit-ewwwwww"),
@@ -117,13 +117,13 @@ func TestRemovePrefixes(t *testing.T) {
 			prefix: "zz",
 		},
 		"removes most": testEntry{
-			ac: MakeSet(
+			ac: MakeEtikettSet(
 				MustEtikett("project-2021-zit"),
 				MustEtikett("project-2021-zit-test"),
 				MustEtikett("project-2021-zit-ewwwwww"),
 				MustEtikett("zz-archive-task-done"),
 			),
-			ex: MakeSet(
+			ex: MakeEtikettSet(
 				MustEtikett("zz-archive-task-done"),
 			),
 			prefix: "project",
@@ -141,7 +141,7 @@ func TestRemovePrefixes(t *testing.T) {
 }
 
 func TestExpandedRight(t *testing.T) {
-	s := MakeSet(
+	s := MakeEtikettSet(
 		MustEtikett("project-2021-zit"),
 		MustEtikett("zz-archive-task-done"),
 	)
@@ -170,12 +170,12 @@ func TestExpandedRight(t *testing.T) {
 }
 
 func TestPrefixIntersection(t *testing.T) {
-	s := MakeSet(
+	s := MakeEtikettSet(
 		MustEtikett("project-2021-zit"),
 		MustEtikett("zz-archive-task-done"),
 	)
 
-	ex := s.IntersectPrefixes(MakeSet(MustEtikett("project")))
+	ex := s.IntersectPrefixes(MakeEtikettSet(MustEtikett("project")))
 
 	expected := []string{
 		"project-2021-zit",
@@ -214,19 +214,19 @@ func TestPrefixIntersection(t *testing.T) {
 // }
 
 func TestDelta1(t *testing.T) {
-	a := MakeSet(
+	a := MakeEtikettSet(
 		MustEtikett("project-2021-zit"),
 		MustEtikett("task-todo"),
 	)
 
-	b := MakeSet(
+	b := MakeEtikettSet(
 		MustEtikett("project-2021-zit"),
 		MustEtikett("zz-archive-task-done"),
 	)
 
 	d := MakeSetDelta(a, b)
 
-	c_expected := MakeSet(
+	c_expected := MakeEtikettSet(
 		MustEtikett("zz-archive-task-done"),
 	)
 
@@ -234,7 +234,7 @@ func TestDelta1(t *testing.T) {
 		t.Errorf("expected\n%s\nactual:\n%s", c_expected, d.Added)
 	}
 
-	d_expected := MakeSet(
+	d_expected := MakeEtikettSet(
 		MustEtikett("task-todo"),
 	)
 
