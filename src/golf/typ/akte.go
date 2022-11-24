@@ -5,6 +5,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/konfig"
 )
 
+//TODO rename to Objekte
 type Akte struct {
 	KonfigTyp konfig.KonfigTyp
 }

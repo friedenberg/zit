@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/objekte"
 )
 
+//TODO rename to Objekte
 type Zettel struct {
 	Akte        sha.Sha
 	Typ         kennung.Typ
