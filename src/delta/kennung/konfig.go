@@ -1,4 +1,4 @@
-package konfig
+package kennung
 
 import (
 	"strings"
@@ -7,13 +7,13 @@ import (
 	"github.com/friedenberg/zit/src/charlie/sha"
 )
 
-type Id struct{}
+type Konfig struct{}
 
-func (i Id) String() string {
+func (i Konfig) String() string {
 	return "konfig"
 }
 
-func (i Id) Set(v string) (err error) {
+func (i Konfig) Set(v string) (err error) {
 	v = strings.TrimSpace(v)
 	v = strings.ToLower(v)
 
@@ -25,6 +25,6 @@ func (i Id) Set(v string) (err error) {
 	return
 }
 
-func (i Id) Sha() sha.Sha {
+func (i Konfig) Sha() sha.Sha {
 	return sha.FromString(i.String())
 }

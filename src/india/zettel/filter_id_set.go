@@ -4,7 +4,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/hotel/id_set"
+	"github.com/friedenberg/zit/src/echo/id_set"
 )
 
 type FilterIdSet struct {

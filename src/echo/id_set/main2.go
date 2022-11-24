@@ -8,7 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/id"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/delta/ts"
-	"github.com/friedenberg/zit/src/echo/konfig"
 )
 
 // TODO  move to kennung
@@ -51,7 +50,7 @@ func (s *Set) Add(ids ...id.Id) {
 		case ts.Time:
 			s.timestamps.Add(it)
 
-		case konfig.Id:
+		case kennung.Konfig:
 			s.hasKonfig = true
 
 		default:
