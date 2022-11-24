@@ -42,12 +42,12 @@ func (s *ScriptValue) RunWithInput() (w io.WriteCloser, r io.Reader, err error) 
 	s.cmd = exec.Command(s.script)
 
 	if w, err = s.cmd.StdinPipe(); err != nil {
-		errors.Fatal(err)
+		errors.Wrap(err)
 		return
 	}
 
 	if r, err = s.cmd.StdoutPipe(); err != nil {
-		errors.Fatal(err)
+		errors.Wrap(err)
 		return
 	}
 
@@ -78,7 +78,7 @@ func (s *ScriptValue) Run(input string) (r io.Reader, err error) {
 	}
 
 	if r, err = s.cmd.StdoutPipe(); err != nil {
-		errors.Fatal(err)
+		errors.Wrap(err)
 		return
 	}
 

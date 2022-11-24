@@ -27,14 +27,14 @@ func (op FilterZettelsWithScript) Run() (err error) {
 	var w io.WriteCloser
 
 	if w, err = cmd.StdinPipe(); err != nil {
-		errors.Fatal(err)
+		errors.Wrap(err)
 		return
 	}
 
 	var r io.Reader
 
 	if r, err = cmd.StdoutPipe(); err != nil {
-		errors.Fatal(err)
+		errors.Wrap(err)
 		return
 	}
 
