@@ -4,8 +4,8 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/delta/konfig"
 	"github.com/friedenberg/zit/src/delta/metadatei_io"
+	"github.com/friedenberg/zit/src/echo/konfig"
 )
 
 type AkteWriterFactory = metadatei_io.AkteWriterFactory

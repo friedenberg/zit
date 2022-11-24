@@ -6,9 +6,9 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/echo/typ"
 	"github.com/friedenberg/zit/src/foxtrot/cwd_files"
 	"github.com/friedenberg/zit/src/foxtrot/typ_checked_out"
+	"github.com/friedenberg/zit/src/golf/typ"
 )
 
 //TODO move to generics for store methods and combine types for all objekten

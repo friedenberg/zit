@@ -11,7 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/hinweisen"
-	"github.com/friedenberg/zit/src/delta/konfig"
+	"github.com/friedenberg/zit/src/echo/konfig"
 )
 
 type encodedKennung struct {

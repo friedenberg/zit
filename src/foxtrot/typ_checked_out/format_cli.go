@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/format"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/standort"
-	"github.com/friedenberg/zit/src/echo/typ"
+	"github.com/friedenberg/zit/src/golf/typ"
 )
 
 // [typ.typ@sha !typ]

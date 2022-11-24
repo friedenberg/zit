@@ -7,7 +7,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/collections"
-	"github.com/friedenberg/zit/src/delta/konfig"
+	"github.com/friedenberg/zit/src/echo/konfig"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
 )

@@ -1,8 +1,8 @@
 package store_objekten
 
 import (
-	"github.com/friedenberg/zit/src/delta/konfig"
 	"github.com/friedenberg/zit/src/delta/standort"
+	"github.com/friedenberg/zit/src/echo/konfig"
 	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
 	"github.com/friedenberg/zit/src/kilo/store_verzeichnisse"
 )

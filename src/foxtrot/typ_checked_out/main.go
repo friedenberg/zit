@@ -1,8 +1,8 @@
 package typ_checked_out
 
 import (
-	"github.com/friedenberg/zit/src/echo/typ"
 	"github.com/friedenberg/zit/src/foxtrot/cwd_files"
+	"github.com/friedenberg/zit/src/golf/typ"
 )
 
 type Typ struct {

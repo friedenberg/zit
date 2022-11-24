@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/delta/konfig"
+	"github.com/friedenberg/zit/src/echo/konfig"
 )
 
 // TODO-P2 move this to somewhere more appropriate

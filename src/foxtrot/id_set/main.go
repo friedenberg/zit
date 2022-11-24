@@ -7,9 +7,9 @@ import (
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/id"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/delta/konfig"
 	"github.com/friedenberg/zit/src/delta/ts"
-	"github.com/friedenberg/zit/src/echo/typ"
+	"github.com/friedenberg/zit/src/echo/konfig"
+	"github.com/friedenberg/zit/src/golf/typ"
 )
 
 type Set struct {

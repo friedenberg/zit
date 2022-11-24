@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/delta/konfig"
+	"github.com/friedenberg/zit/src/echo/konfig"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 )
 
