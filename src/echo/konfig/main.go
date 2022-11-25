@@ -7,7 +7,20 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/toml"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/fd"
+	"github.com/friedenberg/zit/src/foxtrot/objekte"
 )
+
+type Stored = objekte.Stored[Konfig, *Konfig]
+type Named = objekte.Named[Konfig, *Konfig, kennung.Konfig, *kennung.Konfig]
+type Transacted = objekte.Transacted[Konfig, *Konfig, kennung.Konfig, *kennung.Konfig]
+
+type External struct {
+	Named Named
+	FD    fd.FD
+}
 
 type Konfig struct {
 	Cli
@@ -65,6 +78,21 @@ func Make(p string, kc Cli) (c Konfig, err error) {
 	return
 }
 
+func (a *Konfig) Equals(b *Konfig) bool {
+	panic("TODO not implemented")
+	// return false
+}
+
+func (a *Konfig) Reset(b *Konfig) {
+	panic("TODO not implemented")
+	// return false
+}
+
+func (c Konfig) Gattung() gattung.Gattung {
+	return gattung.Konfig
+}
+
+//TODO move to format
 func (c *Konfig) tryParseToml(br *bufio.Reader) (err error) {
 	defer func() {
 		if r := recover(); r != nil {

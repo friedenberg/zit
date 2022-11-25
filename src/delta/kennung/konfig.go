@@ -9,6 +9,18 @@ import (
 
 type Konfig struct{}
 
+func (a Konfig) Equals(b *Konfig) bool {
+	if b == nil {
+		return false
+	}
+
+	return true
+}
+
+func (a Konfig) Reset(b *Konfig) {
+	return
+}
+
 func (i Konfig) String() string {
 	return "konfig"
 }

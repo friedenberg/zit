@@ -33,7 +33,7 @@ func MakeZettelen(
 	dir string,
 	f ioFactory,
 	p zettel_verzeichnisse.Pool,
-  fff ZettelVerzeichnisseWriterGetter,
+	fff ZettelVerzeichnisseWriterGetter,
 ) (i *Zettelen, err error) {
 	i = &Zettelen{
 		Konfig:    k,
@@ -47,7 +47,7 @@ func MakeZettelen(
 			f,
 			i.PageIdForIndex(n),
 			p,
-      fff,
+			fff,
 		)
 	}
 
