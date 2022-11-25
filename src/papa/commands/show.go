@@ -157,7 +157,7 @@ func (c Show) showZettels(
 		),
 	)
 
-	if err = store.StoreObjekten().ReadAllSchwanzenTransacted(w); err != nil {
+	if err = store.StoreObjekten().Zettel().ReadAllSchwanzenTransacted(w); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

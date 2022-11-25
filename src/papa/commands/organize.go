@@ -163,7 +163,7 @@ func (c *Organize) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 		),
 	)
 
-	if err = u.StoreObjekten().ReadAllSchwanzenVerzeichnisse(wk, w); err != nil {
+	if err = u.StoreObjekten().Zettel().ReadAllSchwanzenVerzeichnisse(wk, w); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

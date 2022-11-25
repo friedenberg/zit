@@ -29,7 +29,7 @@ func (s *Store) Checkout(
 	zcs = zettel_checked_out.MakeMutableSetUnique(0)
 	zts := zettel_transacted.MakeMutableSetUnique(0)
 
-	if err = s.storeObjekten.ReadAllSchwanzenTransacted(
+	if err = s.storeObjekten.Zettel().ReadAllSchwanzenTransacted(
 		ztw,
 		zts.Add,
 		collections.MakeWriterDoNotRepool[zettel_transacted.Zettel](),

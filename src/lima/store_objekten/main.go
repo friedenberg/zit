@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/delta/hinweis"
-	"github.com/friedenberg/zit/src/delta/hinweisen"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/delta/ts"
 	"github.com/friedenberg/zit/src/echo/konfig"
@@ -22,8 +21,8 @@ type Store struct {
 	indexAbbr
 	ioFactory
 
-	*zettelStore
-	*typStore
+	zettelStore *zettelStore
+	typStore    *typStore
 }
 
 func Make(
@@ -63,14 +62,6 @@ func Make(
 		return
 	}
 
-	if s.indexEtiketten, err = newIndexEtiketten(
-		st.FileVerzeichnisseEtiketten(),
-		s,
-	); err != nil {
-		err = errors.Wrapf(err, "failed to init zettel index")
-		return
-	}
-
 	return
 }
 
@@ -84,10 +75,6 @@ func (s *Store) Typ() *typStore {
 
 func (s *Store) CurrentTransaktionTime() ts.Time {
 	return s.common.Transaktion.Time
-}
-
-func (s Store) Hinweisen() *hinweisen.Hinweisen {
-	return s.hinweisen
 }
 
 func (s Store) RevertTransaktion(
@@ -221,7 +208,8 @@ func (s *Store) Reindex() (err error) {
 		return
 	}
 
-	if err = s.indexKennung.reset(); err != nil {
+	//TODO move all below to zettelStore
+	if err = s.zettelStore.indexKennung.reset(); err != nil {
 		err = errors.Wrapf(err, "failed to reset index kennung")
 		return
 	}
@@ -235,35 +223,35 @@ func (s *Store) Reindex() (err error) {
 				case gattung.Zettel:
 					var tz zettel_transacted.Zettel
 
-					if tz, err = s.transactedZettelFromTransaktionObjekte(t, o); err != nil {
+					if tz, err = s.zettelStore.transactedZettelFromTransaktionObjekte(t, o); err != nil {
 						err = errors.Wrap(err)
 						return
 					}
 
 					var mutter *zettel_transacted.Zettel
 
-					if mutter1, err := s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(tz.Named.Kennung); err == nil {
+					if mutter1, err := s.zettelStore.verzeichnisseSchwanzen.ReadHinweisSchwanzen(tz.Named.Kennung); err == nil {
 						mutter = &mutter1
 					}
 
-					if err = s.writeNamedZettelToIndex(tz); err != nil {
+					if err = s.zettelStore.writeNamedZettelToIndex(tz); err != nil {
 						err = errors.Wrap(err)
 						return
 					}
 
 					if mutter == nil {
-						if err = s.zettelTransactedWriter.New(&tz); err != nil {
+						if err = s.zettelStore.zettelTransactedWriter.New(&tz); err != nil {
 							err = errors.Wrap(err)
 							return
 						}
 					} else {
-						if err = s.zettelTransactedWriter.Updated(&tz); err != nil {
+						if err = s.zettelStore.zettelTransactedWriter.Updated(&tz); err != nil {
 							err = errors.Wrap(err)
 							return
 						}
 					}
 
-					if err = s.indexEtiketten.addZettelWithOptionalMutter(&tz, mutter); err != nil {
+					if err = s.zettelStore.indexEtiketten.addZettelWithOptionalMutter(&tz, mutter); err != nil {
 						err = errors.Wrap(err)
 						return
 					}

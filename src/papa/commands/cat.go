@@ -110,7 +110,7 @@ func (c Cat) zettelWriter(
 }
 
 func (c Cat) zettelen(u *umwelt.Umwelt) (err error) {
-	if err = u.StoreObjekten().ReadAllSchwanzenTransacted(
+	if err = u.StoreObjekten().Zettel().ReadAllSchwanzenTransacted(
 		zettel_transacted.MakeWriterZettel(
 			c.zettelWriter(u),
 		),
@@ -231,7 +231,7 @@ func (c Cat) hinweisen(u *umwelt.Umwelt) (err error) {
 func (c Cat) typen(u *umwelt.Umwelt) (err error) {
 	typen := collections.MakeMutableValueSet[kennung.Typ, *kennung.Typ]()
 
-	if err = u.StoreObjekten().ReadAllSchwanzenTransacted(
+	if err = u.StoreObjekten().Zettel().ReadAllSchwanzenTransacted(
 		func(z *zettel_transacted.Zettel) (err error) {
 			err = typen.Add(z.Named.Stored.Objekte.Typ)
 

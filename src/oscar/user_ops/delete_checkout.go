@@ -31,7 +31,7 @@ func (c DeleteCheckout) Run(
 		func(external *zettel_external.Zettel) (err error) {
 			var internal zettel_transacted.Zettel
 
-			if internal, err = c.StoreObjekten().ReadHinweisSchwanzen(external.Named.Kennung); err != nil {
+			if internal, err = c.StoreObjekten().Zettel().ReadHinweisSchwanzen(external.Named.Kennung); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

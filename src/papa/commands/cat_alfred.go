@@ -155,7 +155,7 @@ func (c CatAlfred) catZettelen(
 
 	var err error
 
-	if err = u.StoreObjekten().ReadAllSchwanzenVerzeichnisse(
+	if err = u.StoreObjekten().Zettel().ReadAllSchwanzenVerzeichnisse(
 		wk,
 		zettel_verzeichnisse.MakeWriterZettelNamed(
 			zettel.FilterIdSet{

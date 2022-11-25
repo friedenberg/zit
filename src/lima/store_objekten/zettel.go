@@ -92,9 +92,20 @@ func makeZettelStore(
 		return
 	}
 
+	if s.indexEtiketten, err = newIndexEtiketten(
+		s.common.Standort.FileVerzeichnisseEtiketten(),
+		s.common,
+	); err != nil {
+		err = errors.Wrapf(err, "failed to init zettel index")
+		return
+	}
+
 	return
 }
 
+func (s *zettelStore) Hinweisen() *hinweisen.Hinweisen {
+	return s.hinweisen
+}
 func (s *zettelStore) Flush() (err error) {
 	if err = s.verzeichnisseSchwanzen.Flush(); err != nil {
 		err = errors.Wrap(err)

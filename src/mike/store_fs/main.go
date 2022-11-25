@@ -163,7 +163,7 @@ func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 		return
 	}
 
-	if ez.Named.Stored.Sha, err = s.storeObjekten.WriteZettelObjekte(c.Zettel); err != nil {
+	if ez.Named.Stored.Sha, err = s.storeObjekten.Zettel().WriteZettelObjekte(c.Zettel); err != nil {
 		err = errors.Wrapf(err, "%s", f.Name())
 		return
 	}
@@ -193,7 +193,7 @@ func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 		if errors.As(e, &err1) {
 			var mutter zettel_transacted.Zettel
 
-			if mutter, err = s.storeObjekten.ReadHinweisSchwanzen(ez.Named.Kennung); err != nil {
+			if mutter, err = s.storeObjekten.Zettel().ReadHinweisSchwanzen(ez.Named.Kennung); err != nil {
 				unrecoverableErrors.Add(errors.Wrap(err))
 				continue
 			}
@@ -229,7 +229,7 @@ func (s *Store) Read(p string) (cz zettel_checked_out.Zettel, err error) {
 		}
 	}
 
-	if cz.Internal, err = s.storeObjekten.ReadHinweisSchwanzen(cz.External.Named.Kennung); err != nil {
+	if cz.Internal, err = s.storeObjekten.Zettel().ReadHinweisSchwanzen(cz.External.Named.Kennung); err != nil {
 		if errors.Is(err, store_objekten.ErrNotFound{}) {
 			err = nil
 		} else {

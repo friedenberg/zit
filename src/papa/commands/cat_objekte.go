@@ -123,7 +123,7 @@ func (c CatObjekte) zettelen(u *umwelt.Umwelt, shas sha.Set) (err error) {
 		),
 	)
 
-	if err = u.StoreObjekten().ReadAllSchwanzenTransacted(w); err != nil {
+	if err = u.StoreObjekten().Zettel().ReadAllSchwanzenTransacted(w); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

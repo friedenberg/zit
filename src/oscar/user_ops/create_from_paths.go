@@ -61,7 +61,7 @@ func (c CreateFromPaths) Run(args ...string) (results zettel_transacted.MutableS
 	if c.Dedupe {
 		matcher := zettel_external.MakeMutableMatchSet(toCreate)
 
-		if err = c.StoreObjekten().ReadAllTransacted(
+		if err = c.StoreObjekten().Zettel().ReadAllTransacted(
 			zettel_transacted.MakeWriterZettelNamed(matcher.Match),
 			results.AddAndDoNotRepool,
 		); err != nil {
