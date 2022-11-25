@@ -3,29 +3,28 @@ package store_objekten
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/collections"
-	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/age_io"
 	"github.com/friedenberg/zit/src/echo/konfig"
 )
 
-type konfigLogWriter = collections.WriterFunc[*konfig.Transacted]
+type KonfigLogWriter = collections.WriterFunc[*konfig.Transacted]
 
-type konfigLogWriters struct {
-	New, Updated, Archived, Unchanged konfigLogWriter
+type KonfigLogWriters struct {
+	Updated, Unchanged KonfigLogWriter
 }
 
 type konfigStore struct {
 	common *common
-	konfigLogWriters
+	KonfigLogWriters
 }
 
-func (s *konfigStore) SetkonfigLogWriters(
-	tlw konfigLogWriters,
+func (s *konfigStore) SetKonfigLogWriters(
+	tlw KonfigLogWriters,
 ) {
-	s.konfigLogWriters = tlw
+	s.KonfigLogWriters = tlw
 }
 
-func makekonfigStore(
+func makeKonfigStore(
 	sa *common,
 ) (s *konfigStore, err error) {
 	s = &konfigStore{
@@ -83,81 +82,17 @@ func (s konfigStore) writeTransactedToIndex(tt *konfig.Transacted) (err error) {
 }
 
 //TODO
-func (s konfigStore) ReadOne(
-	k kennung.Konfig,
-) (tt *konfig.Transacted, err error) {
-	ct := s.common.Konfig.GetTyp(k.String())
-
-	if ct == nil {
-		err = errors.Wrap(ErrNotFound{Id: k})
-		return
-	}
-
+func (s konfigStore) Read() (tt *konfig.Transacted, err error) {
 	tt = &konfig.Transacted{
 		Named: konfig.Named{
-			Kennung: k,
 			Stored: konfig.Stored{
 				//TODO
 				// Sha: sha,
-				Objekte: konfig.Konfig{},
+				Objekte: konfig.Objekte{
+					//TODO get objekte
+				},
 			},
 		},
-	}
-
-	return
-}
-
-func (s *konfigStore) Create(in konfig.Konfig) (tt *konfig.Transacted, err error) {
-	if !s.common.LockSmith.IsAcquired() {
-		err = ErrLockRequired{
-			Operation: "create",
-		}
-
-		return
-	}
-
-	//TODO
-	// if in.IsEmpty() {
-	// 	err = errors.Normalf("%s is empty", in.Gattung())
-	// 	return
-	// }
-
-	tt = &konfig.Transacted{
-		Named: konfig.Named{
-			Stored: konfig.Stored{
-				Objekte: in,
-			},
-			Kennung: kennung.Konfig{},
-		},
-	}
-
-	if err = s.writeObjekte(&tt.Named.Stored); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	//TODO-P1?
-	//If the zettel exists, short circuit and return that
-	// if tz2, err2 := s.Read(tz.Named.Stored.Sha); err2 == nil {
-	// 	tz = tz2
-	// 	return
-	// }
-
-	//TODO?
-	// if tz, err = s.addZettelToTransaktion(tz.Named); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
-
-	if err = s.writeTransactedToIndex(tt); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	//TODO-P2 assert no changes
-	if err = s.konfigLogWriters.New(tt); err != nil {
-		err = errors.Wrap(err)
-		return
 	}
 
 	return
@@ -165,7 +100,7 @@ func (s *konfigStore) Create(in konfig.Konfig) (tt *konfig.Transacted, err error
 
 // TODO support dry run
 func (s *konfigStore) Update(
-	t *konfig.Named,
+	t *konfig.Objekte,
 ) (tt *konfig.Transacted, err error) {
 	if !s.common.LockSmith.IsAcquired() {
 		err = ErrLockRequired{
@@ -177,17 +112,15 @@ func (s *konfigStore) Update(
 
 	var mutter *konfig.Transacted
 
-	if mutter, err = s.ReadOne(
-		t.Kennung,
-	); err != nil {
+	if mutter, err = s.Read(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if t.Equals(&mutter.Named) {
+	if t.Equals(&mutter.Named.Stored.Objekte) {
 		tt = mutter
 
-		if err = s.konfigLogWriters.Unchanged(tt); err != nil {
+		if err = s.KonfigLogWriters.Unchanged(tt); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -195,9 +128,9 @@ func (s *konfigStore) Update(
 		return
 	}
 
-	tt.Named = *t
+	tt.Named.Stored.Objekte = *t
 
-	if err = s.writeObjekte(&t.Stored); err != nil {
+	if err = s.writeObjekte(&tt.Named.Stored); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -207,7 +140,7 @@ func (s *konfigStore) Update(
 		return
 	}
 
-	if err = s.konfigLogWriters.Updated(tt); err != nil {
+	if err = s.KonfigLogWriters.Updated(tt); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -216,29 +149,6 @@ func (s *konfigStore) Update(
 }
 
 func (s konfigStore) AllInChain() (c []*konfig.Transacted, err error) {
-	// mst := zettel_transacted.MakeMutableSetUnique(0)
-
-	// if err = s.verzeichnisseAll.ReadMany(
-	// 	func(z *zettel_verzeichnisse.Zettel) (err error) {
-	// 		if !z.Transacted.Named.Kennung.Equals(&h) {
-	// 			err = io.EOF
-	// 			return
-	// 		}
-
-	// 		return
-	// 	},
-	// 	zettel_verzeichnisse.MakeWriterZettelTransacted(mst.AddAndDoNotRepool),
-	// ); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
-
-	// c = mst.Elements()
-
-	// sort.Slice(
-	// 	c,
-	// 	func(i, j int) bool { return c[i].SkuTransacted().Less(c[j].SkuTransacted()) },
-	// )
 
 	return
 }

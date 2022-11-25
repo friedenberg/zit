@@ -23,6 +23,7 @@ type Store struct {
 
 	zettelStore *zettelStore
 	typStore    *typStore
+	konfigStore *konfigStore
 }
 
 func Make(
@@ -62,6 +63,11 @@ func Make(
 		return
 	}
 
+	if s.konfigStore, err = makeKonfigStore(&s.common); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	return
 }
 
@@ -71,6 +77,10 @@ func (s *Store) Zettel() *zettelStore {
 
 func (s *Store) Typ() *typStore {
 	return s.typStore
+}
+
+func (s *Store) Konfig() *konfigStore {
+	return s.konfigStore
 }
 
 func (s *Store) CurrentTransaktionTime() ts.Time {

@@ -45,9 +45,6 @@ func init() {
 func (c Edit) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 	is = id_set.MakeProtoIdSet(
 		id_set.ProtoId{
-			MutableId: &kennung.Konfig{},
-		},
-		id_set.ProtoId{
 			MutableId: &hinweis.Hinweis{},
 			Expand: func(v string) (out string, err error) {
 				var h hinweis.Hinweis
@@ -113,10 +110,6 @@ func (c Edit) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	}
 
 	files := checkoutResults.ToSliceFilesZettelen()
-
-	if ids.HasKonfig() {
-		files = append(files, u.Standort().FileKonfigToml())
-	}
 
 	if _, err = openVimOp.Run(u, files...); err != nil {
 		err = errors.Wrap(err)
