@@ -5,24 +5,29 @@ import (
 	"sort"
 
 	"github.com/friedenberg/zit/src/bravo/collections"
+	"github.com/friedenberg/zit/src/typ_toml"
 )
 
 type Compiled struct {
-	TypFileExtension    string
 	ZettelFileExtension string
-	DefaultTyp          *compiledTyp
 	DefaultOrganizeExt  string
 	EtikettenHidden     []string
 	EtikettenToAddToNew []string
-	ExtensionsToTypen   map[string]string
-	Typen               collections.Set[*compiledTyp]
+
+  //Typen
+	ExtensionsToTypen map[string]string
+	TypFileExtension  string
+	DefaultTyp        *compiledTyp
+	Typen             collections.Set[*compiledTyp]
 }
 
 func MakeDefaultCompiled() Compiled {
 	dt := &compiledTyp{
-		Name:          collections.MakeStringValue("md"),
-		InlineAkte:    true,
-		FileExtension: "md",
+		Name: collections.MakeStringValue("md"),
+		Typ: typ_toml.Typ{
+			InlineAkte:    true,
+			FileExtension: "md",
+		},
 	}
 
 	return Compiled{
@@ -73,7 +78,7 @@ func makeCompiled(k tomlKonfig) (kc Compiled, err error) {
 		}
 
 		ct := makeCompiledTyp(tn)
-		ct.Apply(tv)
+		ct.Apply(&tv)
 		typen.Add(ct)
 	}
 

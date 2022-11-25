@@ -13,10 +13,10 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/delta/ts"
 	"github.com/friedenberg/zit/src/echo/id_set"
-	"github.com/friedenberg/zit/src/echo/konfig"
 	"github.com/friedenberg/zit/src/india/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/november/umwelt"
+	"github.com/friedenberg/zit/src/typ_toml"
 )
 
 type ExecAction struct {
@@ -123,7 +123,7 @@ func (c ExecAction) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 func (c ExecAction) runExecutor(
 	u *umwelt.Umwelt,
-	executor *konfig.KonfigTypAction,
+	executor *typ_toml.Action,
 	z *zettel_transacted.Zettel,
 ) (err error) {
 	var cmd *exec.Cmd

@@ -77,12 +77,7 @@ func (f FormatText) WriteFormat(w io.Writer, t *Stored) (n int64, err error) {
 
 	defer errors.Deferred(&err, ar.Close)
 
-	mw := metadatei_io.Writer{
-		// Metadatei: ,
-		Akte: ar,
-	}
-
-	if n, err = mw.WriteTo(w); err != nil {
+	if n, err = io.Copy(w, ar); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -2,17 +2,17 @@ package typ
 
 import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/echo/konfig"
+	"github.com/friedenberg/zit/src/typ_toml"
 )
 
 //TODO rename to Objekte
 type Akte struct {
-	KonfigTyp konfig.KonfigTyp
+	KonfigTyp typ_toml.Typ
 }
 
 func (a *Akte) Reset(b *Akte) {
 	if b == nil {
-		a.KonfigTyp = konfig.KonfigTyp{}
+		a.KonfigTyp = typ_toml.Typ{}
 	} else {
 		a.KonfigTyp = b.KonfigTyp
 	}

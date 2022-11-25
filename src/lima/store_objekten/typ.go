@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/age_io"
 	"github.com/friedenberg/zit/src/golf/typ"
+	"github.com/friedenberg/zit/src/typ_toml"
 )
 
 type typLogWriter = collections.WriterFunc[*typ.Transacted]
@@ -87,6 +88,32 @@ func (s typStore) writeTransactedToIndex(tt *typ.Transacted) (err error) {
 func (s typStore) ReadOne(
 	k kennung.Typ,
 ) (tt *typ.Transacted, err error) {
+	ct := s.common.Konfig.GetTyp(k.String())
+
+	if ct == nil {
+		err = errors.Wrap(ErrNotFound{Id: k})
+		return
+	}
+
+	tt = &typ.Transacted{
+		Named: typ.Named{
+			Kennung: k,
+			Stored: typ.Stored{
+        //TODO
+        // Sha: sha,
+				Objekte: typ.Akte{
+					KonfigTyp: typ_toml.Typ{
+						InlineAkte:     ct.InlineAkte,
+						FileExtension:  ct.FileExtension,
+						ExecCommand:    ct.ExecCommand,
+						Actions:        ct.Actions,
+						EtikettenRules: ct.EtikettenRules,
+					},
+				},
+			},
+		},
+	}
+
 	return
 }
 

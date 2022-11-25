@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/konfig"
+	"github.com/friedenberg/zit/src/typ_toml"
 )
 
 // TODO-P2 move this to somewhere more appropriate
@@ -38,14 +39,14 @@ func (z *Zettel) ApplyKonfig(k konfig.Konfig) (err error) {
 
 func (z *Zettel) applyGoldenChild(
 	e kennung.Etikett,
-	mode konfig.EtikettRuleGoldenChild,
+	mode typ_toml.EtikettRuleGoldenChild,
 ) (err error) {
 	if z.Etiketten.Len() == 0 {
 		return
 	}
 
 	switch mode {
-	case konfig.EtikettRuleGoldenChildUnset:
+	case typ_toml.EtikettRuleGoldenChildUnset:
 		return
 	}
 
@@ -60,10 +61,10 @@ func (z *Zettel) applyGoldenChild(
 	var sortFunc func(i, j int) bool
 
 	switch mode {
-	case konfig.EtikettRuleGoldenChildLowest:
+	case typ_toml.EtikettRuleGoldenChildLowest:
 		sortFunc = func(i, j int) bool { return prefixes[j].Less(prefixes[i]) }
 
-	case konfig.EtikettRuleGoldenChildHighest:
+	case typ_toml.EtikettRuleGoldenChildHighest:
 		sortFunc = func(i, j int) bool { return prefixes[i].Less(prefixes[j]) }
 	}
 

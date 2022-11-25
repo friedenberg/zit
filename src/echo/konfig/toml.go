@@ -1,9 +1,11 @@
 package konfig
 
+import "github.com/friedenberg/zit/src/typ_toml"
+
 type tomlKonfig struct {
 	RemoteScripts map[string]RemoteScript `toml:"remote-scripts"`
 	Tags          map[string]KonfigTag    `toml:"tags"`
-	Typen         map[string]KonfigTyp    `toml:"typen"`
+	Typen         map[string]typ_toml.Typ `toml:"typen"`
 	Recipients    []string                `toml:"recipients"`
 }
 
