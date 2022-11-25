@@ -23,6 +23,7 @@ type Store struct {
 	ioFactory
 
 	*zettelStore
+	*typStore
 }
 
 func Make(
@@ -57,6 +58,11 @@ func Make(
 		return
 	}
 
+	if s.typStore, err = makeTypStore(&s.common); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if s.indexEtiketten, err = newIndexEtiketten(
 		st.FileVerzeichnisseEtiketten(),
 		s,
@@ -66,6 +72,14 @@ func Make(
 	}
 
 	return
+}
+
+func (s *Store) Zettel() *zettelStore {
+	return s.zettelStore
+}
+
+func (s *Store) Typ() *typStore {
+	return s.typStore
 }
 
 func (s *Store) CurrentTransaktionTime() ts.Time {
@@ -108,7 +122,7 @@ func (s Store) RevertTransaktion(
 
 			var chain []*zettel_transacted.Zettel
 
-			if chain, err = s.AllInChain(*h); err != nil {
+			if chain, err = s.zettelStore.AllInChain(*h); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -128,7 +142,7 @@ func (s Store) RevertTransaktion(
 				return
 			}
 
-			if tz, err = s.Update(&tz.Named); err != nil {
+			if tz, err = s.zettelStore.Update(&tz.Named); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

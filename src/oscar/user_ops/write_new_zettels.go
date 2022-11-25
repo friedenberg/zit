@@ -59,7 +59,7 @@ func (c WriteNewZettels) runOneAlreadyLocked(
 	pz zettel.ProtoZettel,
 ) (result zettel_checked_out.Zettel, err error) {
 	z := pz.Make()
-	if result.Internal, err = c.StoreObjekten().Create(*z); err != nil {
+	if result.Internal, err = c.StoreObjekten().Zettel().Create(*z); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -111,7 +111,7 @@ func (c Make) getZettel(
 		return
 	}
 
-	if tz, err = u.StoreObjekten().ReadOne(idd); err != nil {
+	if tz, err = u.StoreObjekten().Zettel().ReadOne(idd); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

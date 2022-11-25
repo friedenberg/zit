@@ -26,6 +26,16 @@ func (s *typStore) SetTypLogWriters(
 	s.TypLogWriters = tlw
 }
 
+func makeTypStore(
+	sa *common,
+) (s *typStore, err error) {
+	s = &typStore{
+		common: sa,
+	}
+
+	return
+}
+
 func (s typStore) Flush() (err error) {
 	return
 }

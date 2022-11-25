@@ -171,7 +171,7 @@ func (c Show) showAkten(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 	for i, is := range ids.AnyShasOrHinweisen() {
 		var tz zettel_transacted.Zettel
 
-		if tz, err = store.StoreObjekten().ReadOne(is); err != nil {
+		if tz, err = store.StoreObjekten().Zettel().ReadOne(is); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

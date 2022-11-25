@@ -57,7 +57,7 @@ func (c Log) RunWithIds(os *umwelt.Umwelt, is id_set.Set) (err error) {
 	for _, h := range hs.Elements() {
 		var chain []*zettel_transacted.Zettel
 
-		if chain, err = os.StoreObjekten().AllInChain(h); err != nil {
+		if chain, err = os.StoreObjekten().Zettel().AllInChain(h); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

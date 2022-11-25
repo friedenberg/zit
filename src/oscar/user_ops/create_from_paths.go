@@ -78,7 +78,7 @@ func (c CreateFromPaths) Run(args ...string) (results zettel_transacted.MutableS
 	err = results.Each(
 		func(z *zettel_transacted.Zettel) (err error) {
 			if c.ProtoZettel.Apply(&z.Named.Stored.Objekte) {
-				if *z, err = c.StoreObjekten().Update(
+				if *z, err = c.StoreObjekten().Zettel().Update(
 					&z.Named,
 				); err != nil {
 					err = errors.Wrap(err)
@@ -100,7 +100,7 @@ func (c CreateFromPaths) Run(args ...string) (results zettel_transacted.MutableS
 				return
 			}
 
-			if cz.Internal, err = c.StoreObjekten().Create(z.Named.Stored.Objekte); err != nil {
+			if cz.Internal, err = c.StoreObjekten().Zettel().Create(z.Named.Stored.Objekte); err != nil {
 				//TODO add file for error handling
 				c.handleStoreError(cz, "", err)
 				err = nil
@@ -108,7 +108,7 @@ func (c CreateFromPaths) Run(args ...string) (results zettel_transacted.MutableS
 			}
 
 			if c.ProtoZettel.Apply(&cz.Internal.Named.Stored.Objekte) {
-				if cz.Internal, err = c.StoreObjekten().Update(
+				if cz.Internal, err = c.StoreObjekten().Zettel().Update(
 					&cz.Internal.Named,
 				); err != nil {
 					//TODO add file for error handling

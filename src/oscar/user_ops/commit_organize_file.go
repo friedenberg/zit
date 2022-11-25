@@ -171,7 +171,7 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 			continue
 		}
 
-		if _, err = store.Create(z); err != nil {
+		if _, err = store.Zettel().Create(z); err != nil {
 			err = errors.Errorf("failed to create zettel: %s", err)
 			return
 		}
@@ -183,7 +183,7 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 			continue
 		}
 
-		if _, err = store.Update(&z); err != nil {
+		if _, err = store.Zettel().Update(&z); err != nil {
 			errors.Err().Printf("failed to update zettel: %s", err)
 		}
 	}

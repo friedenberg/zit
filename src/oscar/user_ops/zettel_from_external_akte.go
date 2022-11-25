@@ -71,7 +71,7 @@ func (c ZettelFromExternalAkte) Run(
 	err = results.Each(
 		func(z *zettel_transacted.Zettel) (err error) {
 			if c.ProtoZettel.Apply(&z.Named.Stored.Objekte) {
-				if *z, err = c.StoreObjekten().Update(
+				if *z, err = c.StoreObjekten().Zettel().Update(
 					&z.Named,
 				); err != nil {
 					err = errors.Wrap(err)
@@ -96,13 +96,13 @@ func (c ZettelFromExternalAkte) Run(
 
 			var tz zettel_transacted.Zettel
 
-			if tz, err = c.StoreObjekten().Create(z.Named.Stored.Objekte); err != nil {
+			if tz, err = c.StoreObjekten().Zettel().Create(z.Named.Stored.Objekte); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
 			if c.ProtoZettel.Apply(&tz.Named.Stored.Objekte) {
-				if tz, err = c.StoreObjekten().Update(&tz.Named); err != nil {
+				if tz, err = c.StoreObjekten().Zettel().Update(&tz.Named); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
