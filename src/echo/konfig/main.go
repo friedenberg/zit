@@ -1,6 +1,7 @@
 package konfig
 
 import (
+	"encoding/gob"
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -9,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/delta/metadatei_io"
+	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/fd"
 	"github.com/friedenberg/zit/src/foxtrot/objekte"
 )
@@ -24,23 +26,24 @@ type External struct {
 
 type Objekte struct {
 	Sha  sha.Sha
-	Akte Konfig
+	Akte Compiled
 }
 
 type Konfig struct {
 	Cli
 	tomlKonfig
-	Compiled
+	Objekte  Objekte
+	Compiled Compiled
 }
 
-func Make(p string, kc Cli) (c Objekte, err error) {
-	c.Akte.Compiled = MakeDefaultCompiled()
-	c.Akte.Cli = kc
+func Make(s standort.Standort, kc Cli) (c Konfig, err error) {
+	c.Objekte.Akte = MakeDefaultCompiled()
+	c.Cli = kc
 	// c = DefaultKonfig()
 
 	var f *os.File
 
-	if f, err = files.Open(p); err != nil {
+	if f, err = files.Open(s.FileKonfigToml()); err != nil {
 		if os.IsNotExist(err) {
 			err = nil
 			return
@@ -54,7 +57,42 @@ func Make(p string, kc Cli) (c Objekte, err error) {
 
 	format := MakeFormatText(metadatei_io.NopAkteFactory())
 
-	if _, err = format.ReadFormat(f, &c); err != nil {
+	if _, err = format.ReadFormat(f, &c.Objekte); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if c.Compiled, err = makeCompiled(c.tomlKonfig); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = c.Objekte.readCompiled2(s); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (a *Objekte) readCompiled2(s standort.Standort) (err error) {
+	var f *os.File
+
+	if f, err = files.Open(s.FileKonfigCompiled()); err != nil {
+		if errors.IsNotExist(err) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+		}
+
+		return
+	}
+
+	defer errors.Deferred(&err, f.Close)
+
+	dec := gob.NewDecoder(f)
+
+	if err = dec.Decode(&a); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

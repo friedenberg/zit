@@ -14,11 +14,11 @@ type Compiled struct {
 	EtikettenHidden     []string
 	EtikettenToAddToNew []string
 
-  //Typen
+	//Typen
 	ExtensionsToTypen map[string]string
 	TypFileExtension  string
 	DefaultTyp        *compiledTyp
-	Typen             collections.Set[*compiledTyp]
+	Typen             compiledTypSet
 }
 
 func MakeDefaultCompiled() Compiled {
@@ -36,23 +36,14 @@ func MakeDefaultCompiled() Compiled {
 		DefaultTyp:          dt,
 		DefaultOrganizeExt:  "md",
 		ExtensionsToTypen:   make(map[string]string),
-		Typen: collections.MakeSet[*compiledTyp](
-			func(v *compiledTyp) string {
-				if v == nil {
-					return ""
-				}
-
-				return v.Name.String()
-			},
-			dt,
-		),
+		Typen:               makeCompiledTypSet(nil),
 	}
 }
 
-func makeCompiled(k tomlKonfig) (kc Compiled, err error) {
+func makeCompiled(kt tomlKonfig) (kc Compiled, err error) {
 	kc = MakeDefaultCompiled()
 
-	for tn, tv := range k.Tags {
+	for tn, tv := range kt.Tags {
 		switch {
 		case tv.Hide:
 			kc.EtikettenHidden = append(kc.EtikettenHidden, tn)
@@ -70,9 +61,12 @@ func makeCompiled(k tomlKonfig) (kc Compiled, err error) {
 		return kc.EtikettenToAddToNew[i] < kc.EtikettenToAddToNew[j]
 	})
 
-	typen := kc.Typen.MutableCopy()
+	typen := collections.MakeMutableSet[*compiledTyp](
+		kc.Typen.Key,
+		kc.DefaultTyp,
+	)
 
-	for tn, tv := range k.Typen {
+	for tn, tv := range kt.Typen {
 		if tv.FileExtension != "" {
 			kc.ExtensionsToTypen[tv.FileExtension] = tn
 		}
@@ -82,7 +76,7 @@ func makeCompiled(k tomlKonfig) (kc Compiled, err error) {
 		typen.Add(ct)
 	}
 
-	kc.Typen = typen.Copy()
+	kc.Typen = makeCompiledTypSet(typen)
 
 	typen.Each(
 		func(ct *compiledTyp) (err error) {
@@ -124,8 +118,8 @@ func (c Compiled) GetZettelFileExtension() string {
 	return fmt.Sprintf(".%s", c.ZettelFileExtension)
 }
 
-func (k Compiled) GetTyp(n string) (ct *compiledTyp) {
-	expandedActual := k.GetSortedTypenExpanded(n)
+func (kc Compiled) GetTyp(n string) (ct *compiledTyp) {
+	expandedActual := kc.GetSortedTypenExpanded(n)
 
 	if len(expandedActual) > 0 {
 		ct = expandedActual[0]

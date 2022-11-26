@@ -88,9 +88,7 @@ func (s konfigStore) Read() (tt *konfig.Transacted, err error) {
 			Stored: konfig.Stored{
 				//TODO
 				// Sha: sha,
-				Objekte: konfig.Objekte{
-					//TODO get objekte
-				},
+				Objekte: s.common.Konfig.Objekte,
 			},
 		},
 	}

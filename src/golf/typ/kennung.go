@@ -7,7 +7,7 @@ import (
 
 func IsInlineAkte(t kennung.Typ, k konfig.Konfig) (isInline bool) {
 	ts := t.String()
-	tc := k.GetTyp(ts)
+	tc := k.Compiled.GetTyp(ts)
 
 	if tc == nil {
 		return

@@ -88,7 +88,7 @@ func (s typStore) writeTransactedToIndex(tt *typ.Transacted) (err error) {
 func (s typStore) ReadOne(
 	k kennung.Typ,
 ) (tt *typ.Transacted, err error) {
-	ct := s.common.Konfig.GetTyp(k.String())
+	ct := s.common.Konfig.Compiled.GetTyp(k.String())
 
 	if ct == nil {
 		err = errors.Wrap(ErrNotFound{Id: k})
@@ -99,8 +99,8 @@ func (s typStore) ReadOne(
 		Named: typ.Named{
 			Kennung: k,
 			Stored: typ.Stored{
-        //TODO
-        // Sha: sha,
+				//TODO
+				// Sha: sha,
 				Objekte: typ.Akte{
 					KonfigTyp: typ_toml.Typ{
 						InlineAkte:     ct.InlineAkte,

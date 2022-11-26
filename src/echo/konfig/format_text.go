@@ -39,7 +39,7 @@ func (c *FormatText) ReadFormat(r1 io.Reader, k *Objekte) (n int64, err error) {
 			close(chDone)
 		}()
 
-		if err := td.Decode(&k.Akte.tomlKonfig); err != nil {
+		if err := td.Decode(&k.Akte); err != nil {
 			if !errors.IsEOF(err) {
 				pr.CloseWithError(err)
 			}
@@ -70,11 +70,6 @@ func (c *FormatText) ReadFormat(r1 io.Reader, k *Objekte) (n int64, err error) {
 	<-chDone
 
 	k.Sha = aw.Sha()
-
-	if k.Akte.Compiled, err = makeCompiled(k.Akte.tomlKonfig); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
 
 	return
 }

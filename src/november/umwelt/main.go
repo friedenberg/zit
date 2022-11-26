@@ -97,14 +97,17 @@ func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 		return
 	}
 
-	var ko konfig.Objekte
+	var k konfig.Konfig
 
-	if ko, err = konfig.Make(u.standort.FileKonfigToml(), kCli); err != nil {
+	if k, err = konfig.Make(
+		u.standort,
+		kCli,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	u.konfig = ko.Akte
+	u.konfig = k
 
 	u.lock = file_lock.New(u.standort.DirZit("Lock"))
 

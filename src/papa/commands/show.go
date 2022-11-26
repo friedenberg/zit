@@ -234,7 +234,7 @@ func (c Show) showTypen(
 	typen.EachPtr(
 		collections.MakeChain(
 			func(t *kennung.Typ) (err error) {
-				ct := store.Konfig().GetTyp(t.String())
+				ct := store.Konfig().Compiled.GetTyp(t.String())
 
 				if ct == nil {
 					return

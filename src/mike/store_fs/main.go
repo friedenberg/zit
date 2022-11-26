@@ -134,7 +134,7 @@ func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 		//extension
 		//TODO modify this to use globs
 		if filepath.Ext(ez.ZettelFD.Path) == "" {
-			ez.ZettelFD.Path = ez.ZettelFD.Path + s.Konfig.GetZettelFileExtension()
+			ez.ZettelFD.Path = ez.ZettelFD.Path + s.Konfig.Compiled.GetZettelFileExtension()
 			return s.readZettelFromFile(ez)
 		}
 

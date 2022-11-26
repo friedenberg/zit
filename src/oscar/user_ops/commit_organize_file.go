@@ -160,7 +160,7 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 		}
 
 		if z.Typ.IsEmpty() {
-			if err = z.Typ.Set(c.Konfig().DefaultTyp.Name.String()); err != nil {
+			if err = z.Typ.Set(c.Konfig().Compiled.DefaultTyp.Name.String()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
