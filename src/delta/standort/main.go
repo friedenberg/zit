@@ -59,6 +59,10 @@ func stringSliceJoin(s string, vs []string) []string {
 	return append([]string{s}, vs...)
 }
 
+func (c Standort) FileKonfigCompiled() string {
+	return c.DirZit("KonfigCompiled")
+}
+
 func (c Standort) FileKonfigToml() string {
 	// var usr *user.User
 

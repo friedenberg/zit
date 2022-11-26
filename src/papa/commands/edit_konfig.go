@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"encoding/gob"
 	"flag"
 	"io"
 	"os"
@@ -61,10 +62,15 @@ func (c EditKonfig) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	errors.Err().Print(k)
+	if k, err = c.partTwo(u, p); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-	//TODO read, validate, and compile konfig file
-	//TODO checkin new konfig
+	if err = c.partThree(u, k); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }
@@ -127,6 +133,29 @@ func (c EditKonfig) partTwo(
 	k = &konfig.Objekte{}
 
 	if _, err = format.ReadFormat(f, k); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (c EditKonfig) partThree(
+	u *umwelt.Umwelt,
+	k *konfig.Objekte,
+) (err error) {
+	var f *os.File
+
+	if f, err = files.Create(u.Standort().FileKonfigCompiled()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.Deferred(&err, f.Close)
+
+	enc := gob.NewEncoder(f)
+
+	if err = enc.Encode(k); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
