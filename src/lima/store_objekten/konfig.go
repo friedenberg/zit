@@ -1,8 +1,12 @@
 package store_objekten
 
 import (
+	"encoding/gob"
+	"os"
+
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/collections"
+	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/echo/age_io"
 	"github.com/friedenberg/zit/src/echo/konfig"
 )
@@ -40,7 +44,6 @@ func (s konfigStore) Flush() (err error) {
 
 func (s konfigStore) writeObjekte(t *konfig.Stored) (err error) {
 	//no lock required
-
 	var w *age_io.Mover
 
 	mo := age_io.MoveOptions{
@@ -68,7 +71,6 @@ func (s konfigStore) writeObjekte(t *konfig.Stored) (err error) {
 	return
 }
 
-//TODO write konfig compiled
 func (s konfigStore) writeTransactedToIndex(tt *konfig.Transacted) (err error) {
 	if !s.common.LockSmith.IsAcquired() {
 		err = ErrLockRequired{
@@ -78,20 +80,29 @@ func (s konfigStore) writeTransactedToIndex(tt *konfig.Transacted) (err error) {
 		return
 	}
 
+	var f *os.File
+
+	if f, err = files.OpenExclusiveWriteOnly(s.common.Standort.FileKonfigCompiled()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.Deferred(&err, f.Close)
+
+	enc := gob.NewEncoder(f)
+
+	if err = enc.Encode(tt); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	return
 }
 
-//TODO
-func (s konfigStore) Read() (tt *konfig.Transacted, err error) {
-	tt = &konfig.Transacted{
-		Named: konfig.Named{
-			Stored: konfig.Stored{
-				//TODO
-				// Sha: sha,
-				Objekte: s.common.Konfig.Objekte,
-			},
-		},
-	}
+//This is intentionally a value to prevent accidental global changes to the
+//current Konfig
+func (s konfigStore) Read() (tt konfig.Transacted, err error) {
+	tt = s.common.Konfig.Transacted
 
 	return
 }
@@ -108,28 +119,34 @@ func (s *konfigStore) Update(
 		return
 	}
 
-	var mutter *konfig.Transacted
+	var mutter konfig.Transacted
 
 	if mutter, err = s.Read(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if t.Equals(&mutter.Named.Stored.Objekte) {
-		tt = mutter
+	tt = &konfig.Transacted{
+		Named: konfig.Named{
+			Stored: konfig.Stored{
+				Objekte: *t,
+			},
+		},
+	}
+
+	if err = s.writeObjekte(&tt.Named.Stored); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if tt.Named.Stored.Sha.Equals(mutter.Named.Stored.Sha) {
+		tt = &mutter
 
 		if err = s.KonfigLogWriters.Unchanged(tt); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		return
-	}
-
-	tt.Named.Stored.Objekte = *t
-
-	if err = s.writeObjekte(&tt.Named.Stored); err != nil {
-		err = errors.Wrap(err)
 		return
 	}
 

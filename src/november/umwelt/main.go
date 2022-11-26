@@ -175,6 +175,13 @@ func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 		},
 	)
 
+	u.storeObjekten.Konfig().SetKonfigLogWriters(
+		store_objekten.KonfigLogWriters{
+			Updated:   u.PrinterKonfigTransacted(format.StringUpdated),
+			Unchanged: u.PrinterKonfigTransacted(format.StringUnchanged),
+		},
+	)
+
 	u.storeWorkingDirectory.SetZettelCheckedOutWriters(
 		store_fs.ZettelCheckedOutLogWriters{
 			ZettelOnly: u.PrinterZettelCheckedOutFresh(zettel_checked_out.ModeZettelOnly),

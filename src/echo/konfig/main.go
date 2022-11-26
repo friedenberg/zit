@@ -32,12 +32,12 @@ type Objekte struct {
 type Konfig struct {
 	Cli
 	tomlKonfig
-	Objekte  Objekte
-	Compiled Compiled
+	Transacted Transacted
+	Compiled   Compiled
 }
 
 func Make(s standort.Standort, kc Cli) (c Konfig, err error) {
-	c.Objekte.Akte = MakeDefaultCompiled()
+	c.Transacted.Named.Stored.Objekte.Akte = MakeDefaultCompiled()
 	c.Cli = kc
 	// c = DefaultKonfig()
 
@@ -57,7 +57,10 @@ func Make(s standort.Standort, kc Cli) (c Konfig, err error) {
 
 	format := MakeFormatText(metadatei_io.NopAkteFactory())
 
-	if _, err = format.ReadFormat(f, &c.Objekte); err != nil {
+	if _, err = format.ReadFormat(
+		f,
+		&c.Transacted.Named.Stored.Objekte,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -67,7 +70,7 @@ func Make(s standort.Standort, kc Cli) (c Konfig, err error) {
 		return
 	}
 
-	if err = c.Objekte.readCompiled2(s); err != nil {
+	if err = c.tryReadTransacted(s); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -75,7 +78,7 @@ func Make(s standort.Standort, kc Cli) (c Konfig, err error) {
 	return
 }
 
-func (a *Objekte) readCompiled2(s standort.Standort) (err error) {
+func (a *Konfig) tryReadTransacted(s standort.Standort) (err error) {
 	var f *os.File
 
 	if f, err = files.Open(s.FileKonfigCompiled()); err != nil {
@@ -92,7 +95,7 @@ func (a *Objekte) readCompiled2(s standort.Standort) (err error) {
 
 	dec := gob.NewDecoder(f)
 
-	if err = dec.Decode(&a); err != nil {
+	if err = dec.Decode(&a.Transacted); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

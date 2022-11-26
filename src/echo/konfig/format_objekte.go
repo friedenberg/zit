@@ -108,7 +108,7 @@ func (f FormatObjekte) WriteFormat(w1 io.Writer, t *Stored) (n int64, err error)
 	w := line_format.NewWriter()
 
 	w.WriteFormat("%s", gattung.Typ)
-	w.WriteFormat("%s %s", gattung.Akte, t.Sha)
+	w.WriteFormat("%s %s", gattung.Akte, t.Objekte.Sha)
 
 	if n, err = w.WriteTo(w1); err != nil {
 		err = errors.Wrap(err)
