@@ -100,7 +100,7 @@ func (c EditKonfig) partOne(
 	var ar sha.ReadCloser
 
 	if ar, err = u.StoreObjekten().AkteReader(
-		k.Named.Stored.Objekte.Sha,
+		k.Objekte.Sha,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

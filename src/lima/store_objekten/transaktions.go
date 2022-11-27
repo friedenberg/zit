@@ -81,7 +81,7 @@ func (s Store) readTransaktion(p string) (t *transaktion.Transaktion, err error)
 	defer or.Close()
 
 	if _, err = tr.ReadFrom(or); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "file: '%s'", p)
 		return
 	}
 

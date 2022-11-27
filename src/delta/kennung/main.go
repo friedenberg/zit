@@ -7,8 +7,20 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/collections"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
 )
+
+type KennungLike[T any] interface {
+	Gattung() gattung.Gattung
+	collections.ValueElement
+	collections.Equatable[T]
+}
+
+type KennungLikePtr[T any] interface {
+	collections.ValueElementPtr[T]
+	collections.Resetable[T]
+}
 
 type Kennung[T collections.ValueElement, T1 collections.ValueElementPtr[T]] struct {
 	value T

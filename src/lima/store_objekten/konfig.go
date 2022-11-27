@@ -7,9 +7,12 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/delta/ts"
 	"github.com/friedenberg/zit/src/echo/age_io"
 	"github.com/friedenberg/zit/src/echo/konfig"
+	"github.com/friedenberg/zit/src/echo/sku"
+	"github.com/friedenberg/zit/src/foxtrot/objekte"
 )
 
 type KonfigLogWriter = collections.WriterFunc[*konfig.Transacted]
@@ -43,8 +46,17 @@ func (s konfigStore) Flush() (err error) {
 	return
 }
 
-func (s konfigStore) writeObjekte(t *konfig.Stored) (err error) {
-	//no lock required
+func (s konfigStore) transact(
+	ko *konfig.Objekte,
+) (kt *konfig.Transacted, err error) {
+	if !s.common.LockSmith.IsAcquired() {
+		err = ErrLockRequired{
+			Operation: "transact konfig",
+		}
+
+		return
+	}
+
 	var w *age_io.Mover
 
 	mo := age_io.MoveOptions{
@@ -60,38 +72,43 @@ func (s konfigStore) writeObjekte(t *konfig.Stored) (err error) {
 
 	defer w.Close()
 
-	f := konfig.MakeFormatObjekte(s.common)
+	var mutter konfig.Transacted
 
-	if _, err = f.WriteFormat(w, t); err != nil {
+	if mutter, err = s.Read(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	t.Sha = w.Sha()
+	kt = &konfig.Transacted{
+		Objekte: *ko,
+		Sku: sku.Sku2[kennung.Konfig, *kennung.Konfig]{
+			Schwanz: s.common.Transaktion.Time,
+			Kopf:    mutter.Sku.Kopf,
+			Mutter:  sku.Mutter{mutter.Sku.Schwanz, ts.Time{}},
+		},
+	}
 
-	return
-}
+	fo := objekte.MakeFormatObjekte(s.common)
 
-func (s konfigStore) transact(
-	tt *konfig.Transacted,
-	mutterKopf ts.Time,
-	mutterSchanz ts.Time,
-) (err error) {
-	if !s.common.LockSmith.IsAcquired() {
-		err = ErrLockRequired{
-			Operation: "write named zettel to index",
+	if _, err = fo.WriteFormat(w, kt); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	kt.Sku.Sha = w.Sha()
+
+	if kt.Sha().Equals(mutter.Sha()) {
+		kt = &mutter
+
+		if err = s.KonfigLogWriters.Unchanged(kt); err != nil {
+			err = errors.Wrap(err)
+			return
 		}
 
 		return
 	}
 
-	tt.Schwanz = s.common.Transaktion.Time
-	tt.Kopf = mutterKopf
-	tt.Mutter[0] = mutterSchanz
-
-	sk := tt.SkuTransacted()
-
-	tt.TransaktionIndex.SetInt(s.common.Transaktion.Add(sk.Sku))
+	s.common.Transaktion.Add2(&kt.Sku)
 
 	var f *os.File
 
@@ -104,7 +121,12 @@ func (s konfigStore) transact(
 
 	enc := gob.NewEncoder(f)
 
-	if err = enc.Encode(tt); err != nil {
+	if err = enc.Encode(kt); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.KonfigLogWriters.Updated(kt); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -122,8 +144,8 @@ func (s konfigStore) Read() (tt konfig.Transacted, err error) {
 
 // TODO support dry run
 func (s *konfigStore) Update(
-	t *konfig.Objekte,
-) (tt *konfig.Transacted, err error) {
+	ko *konfig.Objekte,
+) (kt *konfig.Transacted, err error) {
 	if !s.common.LockSmith.IsAcquired() {
 		err = ErrLockRequired{
 			Operation: "update",
@@ -132,47 +154,7 @@ func (s *konfigStore) Update(
 		return
 	}
 
-	var mutter konfig.Transacted
-
-	if mutter, err = s.Read(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	tt = &konfig.Transacted{
-		Named: konfig.Named{
-			Stored: konfig.Stored{
-				Objekte: *t,
-			},
-		},
-	}
-
-	if err = s.writeObjekte(&tt.Named.Stored); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if tt.Named.Stored.Sha.Equals(mutter.Named.Stored.Sha) {
-		tt = &mutter
-
-		if err = s.KonfigLogWriters.Unchanged(tt); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		return
-	}
-
-	if err = s.transact(
-		tt,
-		mutter.Kopf,
-		mutter.Schwanz,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.KonfigLogWriters.Updated(tt); err != nil {
+	if kt, err = s.transact(ko); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

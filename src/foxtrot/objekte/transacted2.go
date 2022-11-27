@@ -1,14 +1,46 @@
 package objekte
 
 import (
+	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/delta/metadatei_io"
 	"github.com/friedenberg/zit/src/echo/sku"
 )
 
-//Gattung is in Sku2
-type Transacted2[T any, T1 ObjektePtr[T], T2 Identifier[T2], T3 IdentifierPtr[T2]] struct {
+type Transacted2[T Objekte2, T1 ObjektePtr[T], T2 Identifier2[T2], T3 IdentifierPtr[T2]] struct {
 	Objekte T
-	Kennung T2
-	Sku     sku.Sku2
+	Sku     sku.Sku2[T2, T3]
+}
+
+func (t Transacted2[T, T1, T2, T3]) Kennung() T3 {
+	return &t.Sku.Kennung
+}
+
+func (t Transacted2[T, T1, T2, T3]) Sha() sha.Sha {
+	return t.Sku.Sha
+}
+
+func (t Transacted2[T, T1, T2, T3]) AkteSha() sha.Sha {
+	return t.Objekte.AkteSha()
+}
+
+func (t *Transacted2[T, T1, T2, T3]) SetSha(
+	arf metadatei_io.AkteReaderFactory,
+	v string,
+) (err error) {
+	if err = t.Sku.Sha.Set(v); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	//TODO provide opportunity for Objekte to bootstrap from arf
+
+	return
+}
+
+func (t Transacted2[T, T1, T2, T3]) Gattung() gattung.Gattung {
+	return t.Sku.Kennung.Gattung()
 }
 
 func (zt Transacted2[T, T1, T2, T3]) IsNew() bool {

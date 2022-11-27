@@ -79,3 +79,11 @@ type ValueSetLike[T flag.Value] interface {
 type MutableValueSetLike[T flag.Value] interface {
 	MutableSetLike[T]
 }
+
+type Equatable[T any] interface {
+	Equals(*T) bool
+}
+
+type Resetable[T any] interface {
+	Reset(*T)
+}

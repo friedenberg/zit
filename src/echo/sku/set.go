@@ -20,6 +20,23 @@ func (os *MutableSet) Len() int {
 	return os.count
 }
 
+type SkuLike interface {
+	GetKey() string
+	SetTransactionIndex(int)
+	Sku() Sku
+}
+
+func (os *MutableSet) Add2(o SkuLike) {
+	os.count++
+	k := o.GetKey()
+	s, _ := os.objekten[k]
+	o.SetTransactionIndex(len(s))
+	s = append(s, o.Sku())
+	os.objekten[k] = s
+
+	return
+}
+
 func (os *MutableSet) Add(o Sku) (i int) {
 	os.count++
 	k := o.GetKey()

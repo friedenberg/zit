@@ -18,9 +18,9 @@ func MakeCliFormatTransacted(
 			w,
 			format.MakeFormatStringRightAlignedParen(verb),
 			format.MakeFormatString("["),
-			cw(format.MakeFormatString("%s", &kt.Named.Kennung), format.ColorTypePointer),
+			cw(format.MakeFormatString("%s", kt.Kennung()), format.ColorTypePointer),
 			format.MakeFormatString("@"),
-			format.MakeWriter(sf, &kt.Named.Stored.Sha),
+			format.MakeWriter(sf, &kt.Sku.Sha),
 			format.MakeFormatString("]"),
 		)
 	}

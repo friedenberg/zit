@@ -11,23 +11,24 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/delta/metadatei_io"
 	"github.com/friedenberg/zit/src/delta/standort"
-	"github.com/friedenberg/zit/src/fd"
 	"github.com/friedenberg/zit/src/foxtrot/objekte"
 )
-
-type Stored = objekte.Stored[Objekte, *Objekte]
-type Named = objekte.Named[Objekte, *Objekte, kennung.Konfig, *kennung.Konfig]
-type Transacted = objekte.Transacted[Objekte, *Objekte, kennung.Konfig, *kennung.Konfig]
-
-type External struct {
-	Named Named
-	FD    fd.FD
-}
 
 type Objekte struct {
 	Sha  sha.Sha
 	Akte Compiled
 }
+
+func (o Objekte) AkteSha() sha.Sha {
+	return o.Sha
+}
+
+type Transacted = objekte.Transacted2[Objekte, *Objekte, kennung.Konfig, *kennung.Konfig]
+
+// type External struct {
+// 	Named Named
+// 	FD    fd.FD
+// }
 
 type Konfig struct {
 	Cli
@@ -37,7 +38,7 @@ type Konfig struct {
 }
 
 func Make(s standort.Standort, kc Cli) (c Konfig, err error) {
-	c.Transacted.Named.Stored.Objekte.Akte = MakeDefaultCompiled()
+	c.Transacted.Objekte.Akte = MakeDefaultCompiled()
 	c.Cli = kc
 	// c = DefaultKonfig()
 
@@ -59,7 +60,7 @@ func Make(s standort.Standort, kc Cli) (c Konfig, err error) {
 
 	if _, err = format.ReadFormat(
 		f,
-		&c.Transacted.Named.Stored.Objekte,
+		&c.Transacted.Objekte,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -96,8 +97,12 @@ func (a *Konfig) tryReadTransacted(s standort.Standort) (err error) {
 	dec := gob.NewDecoder(f)
 
 	if err = dec.Decode(&a.Transacted); err != nil {
-		err = errors.Wrap(err)
-		return
+		if errors.IsEOF(err) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return

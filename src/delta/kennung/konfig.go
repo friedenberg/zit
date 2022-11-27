@@ -4,10 +4,15 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
 )
 
 type Konfig struct{}
+
+func (a Konfig) Gattung() gattung.Gattung {
+	return gattung.Konfig
+}
 
 func (a Konfig) Equals(b *Konfig) bool {
 	if b == nil {
