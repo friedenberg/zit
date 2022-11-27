@@ -39,9 +39,12 @@ func (c *FormatText) ReadFormat(r1 io.Reader, k *Objekte) (n int64, err error) {
 			close(chDone)
 		}()
 
-		if err := td.Decode(&k.Akte); err != nil {
-			if !errors.IsEOF(err) {
-				pr.CloseWithError(err)
+    //TODO fix issue with wrap not adding stack
+		if err = td.Decode(&k.Akte); err != nil {
+			if errors.IsEOF(err) {
+				err = nil
+			} else {
+				pr.CloseWithError(errors.Wrap(err))
 			}
 		}
 	}()

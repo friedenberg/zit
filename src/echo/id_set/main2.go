@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/ts"
 )
 
-// TODO  move to kennung
+// TODO-P4 move to kennung
 type Set struct {
 	shas       sha.MutableSet
 	etiketten  kennung.EtikettMutableSet

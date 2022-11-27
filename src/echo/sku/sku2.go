@@ -43,7 +43,7 @@ func (a *Sku2[T, T1]) Reset(b *Sku2[T, T1]) {
 		a.TransactionIndex.SetInt(b.TransactionIndex.Int())
 	} else {
 		a.Kopf = ts.Time{}
-		//TODO reset Kennung
+		//TODO-P3 reset Kennung
 		// a.Kennung = T{}
 		a.Mutter[0] = ts.Time{}
 		a.Mutter[1] = ts.Time{}

@@ -59,14 +59,14 @@ func (op ReadCheckedOut) RunMany(
 			}
 
 		default:
-			//TODO validate that the zettel file points to the akte in the metadatei
+			//TODO-P3 validate that the zettel file points to the akte in the metadatei
 			readFunc = func() (zettel_checked_out.Zettel, error) {
 				return op.StoreWorkingDirectory().Read(p.Zettel.Path)
 			}
 		}
 
 		if checked_out, err = readFunc(); err != nil {
-			//TODO decide if error handling like this is ok
+			//TODO-P3 decide if error handling like this is ok
 			if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
 				errors.Err().Printf("external zettel does not exist: %s", p)
 			} else {

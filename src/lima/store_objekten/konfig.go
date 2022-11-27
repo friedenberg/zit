@@ -74,6 +74,7 @@ func (s konfigStore) transact(
 
 	var mutter konfig.Transacted
 
+  //TODO offer option to edit again
 	if mutter, err = s.Read(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -110,20 +111,23 @@ func (s konfigStore) transact(
 
 	s.common.Transaktion.Add2(&kt.Sku)
 
-	var f *os.File
+	if !s.common.Konfig.DryRun {
+		var f *os.File
 
-	if f, err = files.OpenExclusiveWriteOnly(s.common.Standort.FileKonfigCompiled()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+    //TODO use objekte mover
+		if f, err = files.OpenExclusiveWriteOnly(s.common.Standort.FileKonfigCompiled()); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
-	defer errors.Deferred(&err, f.Close)
+		defer errors.Deferred(&err, f.Close)
 
-	enc := gob.NewEncoder(f)
+		enc := gob.NewEncoder(f)
 
-	if err = enc.Encode(kt); err != nil {
-		err = errors.Wrap(err)
-		return
+		if err = enc.Encode(kt); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	if err = s.KonfigLogWriters.Updated(kt); err != nil {
@@ -142,7 +146,6 @@ func (s konfigStore) Read() (tt konfig.Transacted, err error) {
 	return
 }
 
-// TODO support dry run
 func (s *konfigStore) Update(
 	ko *konfig.Objekte,
 ) (kt *konfig.Transacted, err error) {

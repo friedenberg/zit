@@ -44,7 +44,7 @@ func (f FormatObjekte) ReadFormat(r1 io.Reader, t *Stored) (n int64, err error) 
 		loc := strings.Index(line, " ")
 
 		if line == "" {
-			//TODO this should be cleaned up
+			//TODO-P2 this should be cleaned up
 		}
 
 		var g gattung.Gattung

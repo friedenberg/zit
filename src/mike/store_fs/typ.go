@@ -10,10 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/hotel/cwd_files"
 )
 
-//TODO move to generics for store methods and combine types for all objekten
-// type storeTyp struct {
-// }
-
 func (s *Store) CheckinTyp(p string) (t *typ.Named, err error) {
 	return
 }

@@ -5,7 +5,6 @@ import (
 	"github.com/friedenberg/zit/src/typ_toml"
 )
 
-//TODO rename to Objekte
 type Akte struct {
 	KonfigTyp typ_toml.Typ
 }

@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/metadatei_io"
 )
 
-// TODO rename to FormatObjekteText
+// TODO-P4 rename to FormatObjekteText
 type FormatText struct {
 	arf             metadatei_io.AkteIOFactory
 	IgnoreTypErrors bool

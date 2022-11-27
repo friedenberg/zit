@@ -34,7 +34,7 @@ func (t *Transacted2[T, T1, T2, T3]) SetSha(
 		return
 	}
 
-	//TODO provide opportunity for Objekte to bootstrap from arf
+	//TODO-P0 provide opportunity for Objekte to bootstrap from arf
 
 	return
 }
@@ -47,7 +47,7 @@ func (zt Transacted2[T, T1, T2, T3]) IsNew() bool {
 	return zt.Sku.Kopf == zt.Sku.Schwanz && zt.Sku.TransactionIndex == 0
 }
 
-//TODO
+//TODO-P0
 func (a Transacted2[T, T1, T2, T3]) Equals(
 	b Transacted2[T, T1, T2, T3],
 ) bool {
@@ -58,7 +58,7 @@ func (a *Transacted2[T, T1, T2, T3]) Reset(
 	b *Transacted2[T, T1, T2, T3],
 ) {
 	a.Sku.Reset(&b.Sku)
-	//TODO
+	//TODO-P0
 	// a.Kennung.Reset(b.Kennung)
 	// a.Objekte.Reset(b.Objekte)
 }
