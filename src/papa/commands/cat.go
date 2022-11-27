@@ -72,7 +72,7 @@ func (c Cat) etiketten(u *umwelt.Umwelt) (err error) {
 	}
 
 	for _, e := range ea {
-		if err = errors.PrintOut(e.String()); err != nil {
+		if err = errors.Out().Print(e.String()); err != nil {
 			err = errors.IsAsNilOrWrapf(
 				err,
 				syscall.EPIPE,
@@ -245,7 +245,7 @@ func (c Cat) typen(u *umwelt.Umwelt) (err error) {
 	sortedTypen := typen.Copy().SortedString()
 
 	for _, t := range sortedTypen {
-		errors.PrintOut(t)
+		errors.Out().Print(t)
 	}
 
 	return

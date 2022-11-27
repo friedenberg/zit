@@ -212,7 +212,7 @@ func (c Show) showTransaktions(store *umwelt.Umwelt, ids id_set.Set) (err error)
 			continue
 		}
 
-		errors.PrintOutf("transaktion: %#v", t)
+		errors.Out().Printf("transaktion: %#v", t)
 
 		t.Each(
 			func(o *sku.Sku) (err error) {

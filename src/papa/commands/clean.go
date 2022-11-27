@@ -114,7 +114,7 @@ func (c Clean) Run(
 				fOrD = pRel
 			}
 
-			errors.PrintOutf("[%s] (would delete)", fOrD)
+			errors.Out().Printf("[%s] (would delete)", fOrD)
 		}
 
 		return

@@ -19,7 +19,8 @@ func MakeMutableSetUnique(c int) MutableSet {
 
 				return collections.MakeKey(
 					sz.Internal.Kopf,
-					sz.Internal.Mutter,
+					sz.Internal.Mutter[0],
+					sz.Internal.Mutter[1],
 					sz.Internal.Schwanz,
 					sz.Internal.Named.Kennung,
 					sz.Internal.Named.Stored.Sha,

@@ -12,7 +12,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/hinweisen"
 	"github.com/friedenberg/zit/src/delta/id"
-	"github.com/friedenberg/zit/src/delta/ts"
 	"github.com/friedenberg/zit/src/echo/age_io"
 	"github.com/friedenberg/zit/src/echo/sku"
 	"github.com/friedenberg/zit/src/golf/transaktion"
@@ -491,14 +490,10 @@ func (s *zettelStore) addZettelToTransaktion(
 		return
 	}
 
-	var mutter [2]ts.Time
-
-	mutter[0] = tz.Mutter
-
 	i := s.common.Transaktion.Add(
 		sku.Sku{
 			Gattung: gattung.Zettel,
-			Mutter:  mutter,
+			Mutter:  tz.Mutter,
 			Id:      &z.Kennung,
 			Sha:     z.Stored.Sha,
 		},
@@ -552,7 +547,7 @@ func (s *zettelStore) transactedWithHead(
 	var previous zettel_transacted.Zettel
 
 	if previous, err = s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(z.Kennung); err == nil {
-		tz.Mutter = previous.Schwanz
+		tz.Mutter[0] = previous.Schwanz
 		tz.Kopf = previous.Kopf
 	} else {
 		if errors.Is(err, ErrNotFound{}) {

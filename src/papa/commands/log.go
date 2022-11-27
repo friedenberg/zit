@@ -74,7 +74,7 @@ func (c Log) RunWithIds(os *umwelt.Umwelt, is id_set.Set) (err error) {
 		return
 	}
 
-	errors.PrintOut(string(b))
+	errors.Out().Print(string(b))
 
 	return
 }

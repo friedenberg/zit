@@ -49,7 +49,7 @@ func (c PeekHinweisen) Run(store *umwelt.Umwelt, args ...string) (err error) {
 	)
 
 	for i, h := range hs {
-		errors.PrintOutf("%d: %s", i, h)
+		errors.Out().Printf("%d: %s", i, h)
 	}
 
 	return

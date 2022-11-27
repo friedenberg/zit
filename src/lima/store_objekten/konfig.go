@@ -87,7 +87,7 @@ func (s konfigStore) transact(
 
 	tt.Schwanz = s.common.Transaktion.Time
 	tt.Kopf = mutterKopf
-	tt.Mutter = mutterSchanz
+	tt.Mutter[0] = mutterSchanz
 
 	sk := tt.SkuTransacted()
 

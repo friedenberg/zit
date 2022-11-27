@@ -43,7 +43,7 @@ func (c ExpandHinweis) RunWithIds(s *umwelt.Umwelt, ids id_set.Set) (err error) 
 	hins := ids.Hinweisen()
 
 	for _, h := range hins.Elements() {
-		errors.PrintOut(h)
+		errors.Out().Print(h)
 	}
 
 	return

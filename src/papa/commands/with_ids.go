@@ -87,7 +87,7 @@ func (c commandWithIds) Complete(u *umwelt.Umwelt, args ...string) (err error) {
 		}
 
 		for _, e := range ea {
-			if err = errors.PrintOutf("%s\tEtikett", e.String()); err != nil {
+			if err = errors.Out().Printf("%s\tEtikett", e.String()); err != nil {
 				err = errors.IsAsNilOrWrapf(
 					err,
 					syscall.EPIPE,
