@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/delta/ts"
 	"github.com/friedenberg/zit/src/echo/age_io"
 	"github.com/friedenberg/zit/src/echo/konfig"
 )
@@ -71,7 +72,11 @@ func (s konfigStore) writeObjekte(t *konfig.Stored) (err error) {
 	return
 }
 
-func (s konfigStore) writeTransactedToIndex(tt *konfig.Transacted) (err error) {
+func (s konfigStore) transact(
+	tt *konfig.Transacted,
+	mutterKopf ts.Time,
+	mutterSchanz ts.Time,
+) (err error) {
 	if !s.common.LockSmith.IsAcquired() {
 		err = ErrLockRequired{
 			Operation: "write named zettel to index",
@@ -79,6 +84,14 @@ func (s konfigStore) writeTransactedToIndex(tt *konfig.Transacted) (err error) {
 
 		return
 	}
+
+	tt.Schwanz = s.common.Transaktion.Time
+	tt.Kopf = mutterKopf
+	tt.Mutter = mutterSchanz
+
+	sk := tt.SkuTransacted()
+
+	tt.TransaktionIndex.SetInt(s.common.Transaktion.Add(sk.Sku))
 
 	var f *os.File
 
@@ -150,7 +163,11 @@ func (s *konfigStore) Update(
 		return
 	}
 
-	if err = s.writeTransactedToIndex(tt); err != nil {
+	if err = s.transact(
+		tt,
+		mutter.Kopf,
+		mutter.Schwanz,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -81,6 +81,9 @@ func (o *Sku) Set(v string) (err error) {
 	case gattung.Typ:
 		o.Id = &kennung.Typ{}
 
+	case gattung.Konfig:
+		o.Id = &kennung.Konfig{}
+
 	default:
 		err = errors.Errorf("unsupported gattung: %s", o.Gattung)
 		return

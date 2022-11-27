@@ -27,7 +27,7 @@ func init() {
 
 func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	if len(args) != 0 {
-		errors.PrintOut("ignoring arguments")
+		errors.Out().Print("ignoring arguments")
 	}
 
 	s := u.StoreObjekten()
@@ -41,10 +41,7 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	transaktion.Each(
 		func(o *sku.Sku) (err error) {
-			switch o.Gattung {
-			case gattung.Zettel:
-				errors.PrintOut(o)
-			}
+			errors.Out().Print(o)
 
 			return
 		},
