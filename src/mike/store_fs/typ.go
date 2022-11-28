@@ -21,7 +21,7 @@ func (s *Store) WriteTyp(t *typ.Transacted) (te *typ.External, err error) {
 		},
 		//TODO move to central place
 		Objekte: t.Objekte,
-		Sha:     t.Sku.Sha,
+		Sha:     t.Objekte.Sha,
 		Kennung: t.Sku.Kennung,
 	}
 
