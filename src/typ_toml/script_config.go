@@ -9,7 +9,7 @@ import (
 
 type ScriptConfig struct {
 	Shell  []string          `toml:"shell,omitempty"`
-	Script string            `toml:"script,omitempty"`
+	Script string            `toml:"script,omitempty,multiline"`
 	Env    map[string]string `toml:"env,omitempty"`
 }
 

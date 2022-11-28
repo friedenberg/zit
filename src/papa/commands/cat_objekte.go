@@ -15,7 +15,7 @@ import (
 )
 
 type CatObjekte struct {
-	Type gattung.Gattung
+	Gattung gattung.Gattung
 }
 
 func init() {
@@ -23,10 +23,10 @@ func init() {
 		"cat-objekte",
 		func(f *flag.FlagSet) Command {
 			c := &CatObjekte{
-				Type: gattung.Unknown,
+				Gattung: gattung.Unknown,
 			}
 
-			f.Var(&c.Type, "type", "ObjekteType")
+			f.Var(&c.Gattung, "gattung", "ObjekteType")
 
 			return commandWithIds{
 				CommandWithIds: c,
@@ -48,15 +48,17 @@ func (c CatObjekte) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 func (c CatObjekte) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	shas := ids.Shas()
 
-	switch c.Type {
+	switch c.Gattung {
 	case gattung.Akte:
 		return c.akten(u, shas)
 
 	case gattung.Zettel:
 		return c.zettelen(u, shas)
 
+		//TODO add typ
+
 	default:
-		err = errors.Errorf("unsupported objekte type: %s", c.Type)
+		err = errors.Errorf("unsupported objekte type: %s", c.Gattung)
 		return
 	}
 }

@@ -5,6 +5,16 @@ import (
 	"os"
 )
 
+func TempDir() (d string, err error) {
+	openFilesGuardInstance.Lock()
+
+	if d, err = ioutil.TempDir("", ""); err != nil {
+		openFilesGuardInstance.Unlock()
+	}
+
+	return
+}
+
 func TempFile() (f *os.File, err error) {
 	openFilesGuardInstance.Lock()
 

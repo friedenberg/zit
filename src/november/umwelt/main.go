@@ -182,6 +182,14 @@ func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 		},
 	)
 
+	u.storeObjekten.Typ().SetTypLogWriters(
+		store_objekten.TypLogWriters{
+			New:       u.PrinterTypTransacted(format.StringUpdated),
+			Updated:   u.PrinterTypTransacted(format.StringUpdated),
+			Unchanged: u.PrinterTypTransacted(format.StringUnchanged),
+		},
+	)
+
 	u.storeWorkingDirectory.SetZettelCheckedOutWriters(
 		store_fs.ZettelCheckedOutLogWriters{
 			ZettelOnly: u.PrinterZettelCheckedOutFresh(zettel_checked_out.ModeZettelOnly),

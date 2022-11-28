@@ -20,6 +20,24 @@ type FD struct {
 	Sha     sha.Sha
 }
 
+func File(f *os.File) (fd FD, err error) {
+	if f == nil {
+		err = errors.Errorf("nil file desriptor")
+		return
+	}
+
+	var fi os.FileInfo
+
+	if fi, err = f.Stat(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	fd = FileInfo(fi)
+
+	return
+}
+
 func FileInfo(fi os.FileInfo) FD {
 	return FD{
 		Path:    fi.Name(),

@@ -51,6 +51,14 @@ func (ct compiledTyp) AkteSha() sha.Sha {
 	return ct.Typ.Sha
 }
 
+func (ct *compiledTyp) SetAkteSha(v sha.Sha) {
+	ct.Typ.Sha = v
+}
+
+func (ct compiledTyp) ObjekteSha() sha.Sha {
+	return ct.Sku.Sha
+}
+
 func (ct *compiledTyp) SetObjekteSha(
 	arf metadatei_io.AkteReaderFactory,
 	v string,
@@ -61,14 +69,6 @@ func (ct *compiledTyp) SetObjekteSha(
 	}
 
 	return
-}
-
-func (ct *compiledTyp) SetAkteSha(v sha.Sha) {
-	ct.Typ.Sha = v
-}
-
-func (ct compiledTyp) ObjekteSha() sha.Sha {
-	return ct.Sku.Sha
 }
 
 func (ct *compiledTyp) generateSha() {

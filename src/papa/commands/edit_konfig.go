@@ -29,6 +29,10 @@ func init() {
 }
 
 func (c EditKonfig) Run(u *umwelt.Umwelt, args ...string) (err error) {
+  if len(args) > 0 {
+    errors.Err().Print("Command edit-konfig ignores passed in arguments.")
+  }
+
 	var p string
 
 	if p, err = c.makeTempKonfigFile(u); err != nil {
@@ -39,7 +43,7 @@ func (c EditKonfig) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	openVimOp := user_ops.OpenVim{
 		Options: vim_cli_options_builder.New().
 			WithCursorLocation(2, 3).
-			WithFileType("toml").
+			WithFileType("zit-konfig").
 			WithInsertMode().
 			Build(),
 	}

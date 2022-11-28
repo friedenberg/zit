@@ -2,6 +2,7 @@ package objekte_format
 
 import (
 	"bufio"
+	"crypto/sha256"
 	"io"
 	"strings"
 
@@ -149,12 +150,20 @@ func (f Format) WriteFormat(
 	w1 io.Writer,
 	o Stored2,
 ) (n int64, err error) {
+	hash := sha256.New()
+	w2 := io.MultiWriter(w1, hash)
+
 	w := line_format.NewWriter()
 
 	w.WriteFormat("%s", o.Gattung())
 	w.WriteFormat("%s %s", gattung.Akte, o.AkteSha())
 
-	if n, err = w.WriteTo(w1); err != nil {
+	if n, err = w.WriteTo(w2); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = o.SetObjekteSha(f.arf, sha.FromHash(hash).String()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

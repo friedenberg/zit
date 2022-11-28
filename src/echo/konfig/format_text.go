@@ -30,8 +30,6 @@ func (c *FormatText) ReadFormat(r1 io.Reader, k *Objekte) (n int64, err error) {
 	r := bufio.NewReader(r1)
 
 	pr, pw := io.Pipe()
-	//TODO-P2 enable strict konfig checking
-	// td.DisallowUnknownFields()
 
 	chDone := make(chan struct{})
 
@@ -41,6 +39,7 @@ func (c *FormatText) ReadFormat(r1 io.Reader, k *Objekte) (n int64, err error) {
 		}()
 
 		td := toml.NewDecoder(pr)
+		td.DisallowUnknownFields()
 
 		//TODO fix issue with wrap not adding stack
 		if err = td.Decode(&k.tomlKonfig); err != nil {

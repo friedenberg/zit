@@ -14,6 +14,10 @@ func (u *Umwelt) Konfig() konfig.Konfig {
 	return u.konfig
 }
 
+func (u *Umwelt) KonfigPtr() *konfig.Konfig {
+	return &u.konfig
+}
+
 func (u *Umwelt) Out() io.Writer {
 	return u.out
 }

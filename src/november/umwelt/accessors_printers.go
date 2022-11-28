@@ -25,6 +25,15 @@ func (u *Umwelt) PrinterKonfigTransacted(
 	)
 }
 
+func (u *Umwelt) PrinterTypTransacted(
+	verb string,
+) collections.WriterFunc[*typ.Transacted] {
+	return format.MakeWriterToWithNewLines(
+		u.Out(),
+		u.FormatTypTransacted(verb),
+	)
+}
+
 func (u *Umwelt) PrinterTypCheckedOut(
 	verb string,
 ) collections.WriterFunc[*typ.External] {

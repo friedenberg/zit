@@ -13,7 +13,7 @@ import (
 type typLogWriter = collections.WriterFunc[*typ.Transacted]
 
 type TypLogWriters struct {
-	New, Updated, Archived, Unchanged typLogWriter
+	New, Updated, Unchanged typLogWriter
 }
 
 type typStore struct {
@@ -78,6 +78,7 @@ func (s typStore) transact(
 	tt = &typ.Transacted{
 		Objekte: *to,
 		Sku: sku.Sku2[kennung.Typ, *kennung.Typ]{
+			Kennung: *tk,
 			Schwanz: s.common.Transaktion.Time,
 		},
 	}
@@ -112,7 +113,7 @@ func (s typStore) transact(
 	s.common.Transaktion.Add2(&tt.Sku)
 
 	if mutter == nil {
-		if err = s.TypLogWriters.Unchanged(tt); err != nil {
+		if err = s.TypLogWriters.New(tt); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

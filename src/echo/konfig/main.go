@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/delta/metadatei_io"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/foxtrot/objekte"
 )
@@ -22,31 +21,6 @@ type Konfig struct {
 func Make(s standort.Standort, kc Cli) (c Konfig, err error) {
 	c.Transacted.Objekte.Akte = MakeDefaultCompiled()
 	c.Cli = kc
-	// c = DefaultKonfig()
-
-	var f *os.File
-
-	if f, err = files.Open(s.FileKonfigToml()); err != nil {
-		if os.IsNotExist(err) {
-			err = nil
-			return
-		}
-
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer files.Close(f)
-
-	format := MakeFormatText(metadatei_io.NopAkteFactory())
-
-	if _, err = format.ReadFormat(
-		f,
-		&c.Transacted.Objekte,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
 
 	if err = c.tryReadTransacted(s); err != nil {
 		err = errors.Wrap(err)

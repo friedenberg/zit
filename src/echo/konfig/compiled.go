@@ -93,7 +93,7 @@ func makeCompiled(kt tomlKonfig) (kc Compiled, err error) {
 
 	kc.Typen = makeCompiledTypSet(typen)
 
-	typen.Each(
+	kc.Typen.Each(
 		func(ct *compiledTyp) (err error) {
 			ct.ApplyExpanded(kc)
 			ct.generateSha()

@@ -53,6 +53,18 @@ func (u *Umwelt) FormatTyp() format.FormatWriterFunc[kennung.Typ] {
 	return typ.MakeCliFormat(u.FormatColorWriter())
 }
 
+func (u *Umwelt) FormatTypTransacted(
+	verb string,
+) format.FormatWriterFunc[typ.Transacted] {
+	return typ.MakeCliFormatTransacted(
+		u.Standort(),
+		u.FormatColorWriter(),
+		u.FormatSha(),
+		u.FormatTyp(),
+		verb,
+	)
+}
+
 func (u *Umwelt) FormatTypCheckedOut() format.FormatWriterFunc[typ.External] {
 	return typ.MakeCliFormatExternal(
 		u.Standort(),

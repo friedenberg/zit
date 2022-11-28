@@ -45,3 +45,24 @@ func MakeCliFormatExternal(
 		)
 	}
 }
+
+// [typ.typ@sha !typ]
+func MakeCliFormatTransacted(
+	s standort.Standort,
+	cw format.FuncColorWriter,
+	sf format.FormatWriterFunc[sha.Sha],
+	tf format.FormatWriterFunc[kennung.Typ],
+	verb string,
+) format.FormatWriterFunc[Transacted] {
+	return func(w io.Writer, t *Transacted) (n int64, err error) {
+		return format.Write(
+			w,
+			format.MakeFormatStringRightAlignedParen(verb),
+			format.MakeFormatString("["),
+			cw(format.MakeWriter(tf, t.Kennung()), format.ColorTypePointer),
+			format.MakeFormatString("@"),
+			format.MakeWriter(sf, &t.Sku.Sha),
+			format.MakeFormatString("]"),
+		)
+	}
+}
