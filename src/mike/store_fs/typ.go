@@ -10,16 +10,19 @@ import (
 	"github.com/friedenberg/zit/src/hotel/cwd_files"
 )
 
-func (s *Store) CheckinTyp(p string) (t *typ.Named, err error) {
+func (s *Store) CheckinTyp(p string) (t *typ.Transacted, err error) {
 	return
 }
 
-func (s *Store) WriteTyp(t *typ.Named) (te *typ.External, err error) {
+func (s *Store) WriteTyp(t *typ.Transacted) (te *typ.External, err error) {
 	te = &typ.External{
 		FD: cwd_files.File{
-			Path: fmt.Sprintf("%s.%s", t.Kennung, s.Konfig.Transacted.Objekte.Akte.TypFileExtension),
+			Path: fmt.Sprintf("%s.%s", t.Kennung(), s.Konfig.Transacted.Objekte.Akte.TypFileExtension),
 		},
-		Named: *t,
+		//TODO move to central place
+		Objekte: t.Objekte,
+		Sha:     t.Sku.Sha,
+		Kennung: t.Sku.Kennung,
 	}
 
 	var f *os.File
@@ -38,7 +41,7 @@ func (s *Store) WriteTyp(t *typ.Named) (te *typ.External, err error) {
 
 	format := typ.MakeFormatText(s.storeObjekten)
 
-	if _, err = format.WriteFormat(f, &te.Named.Stored); err != nil {
+	if _, err = format.WriteFormat(f, &te.Objekte); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -58,7 +61,7 @@ func (s *Store) ReadTyp(t *typ.External) (err error) {
 
 	defer errors.Deferred(&err, f.Close)
 
-	if _, err = format.ReadFormat(f, &t.Named.Stored); err != nil {
+	if _, err = format.ReadFormat(f, &t.Objekte); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

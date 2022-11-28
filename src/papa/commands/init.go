@@ -45,6 +45,7 @@ func (c Init) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	c.mkdirAll(s.DirObjektenAkten())
 	c.mkdirAll(s.DirObjektenZettelen())
+	c.mkdirAll(s.DirObjektenTypen())
 	c.mkdirAll(s.DirObjektenTransaktion())
 
 	c.mkdirAll(s.DirVerlorenUndGefunden())

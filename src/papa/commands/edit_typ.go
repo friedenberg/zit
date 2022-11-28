@@ -43,14 +43,14 @@ func (c EditTyp) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 		func(tk kennung.Typ) (err error) {
 			var tt *typ.Transacted
 
-			if tt, err = u.StoreObjekten().Typ().ReadOne(tk); err != nil {
+			if tt, err = u.StoreObjekten().Typ().ReadOne(&tk); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
 			var tco *typ.External
 
-			if tco, err = u.StoreWorkingDirectory().WriteTyp(&tt.Named); err != nil {
+			if tco, err = u.StoreWorkingDirectory().WriteTyp(tt); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

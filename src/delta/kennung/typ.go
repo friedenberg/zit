@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 )
 
 type Typ = Kennung[typ, *typ]
@@ -28,6 +29,28 @@ func MakeTyp(v string) (e Typ, err error) {
 }
 
 type typ string
+
+func (e *typ) Reset(e1 *typ) {
+	if e1 == nil {
+		*e = typ("")
+	} else {
+		*e = *e1
+	}
+
+	return
+}
+
+func (e typ) Equals(e1 *typ) bool {
+	if e1 == nil {
+		return false
+	}
+
+	return e == *e1
+}
+
+func (o typ) Gattung() gattung.Gattung {
+	return gattung.Typ
+}
 
 func (e typ) String() string {
 	return string(e)

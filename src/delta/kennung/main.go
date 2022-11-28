@@ -22,11 +22,11 @@ type KennungLikePtr[T any] interface {
 	collections.Resetable[T]
 }
 
-type Kennung[T collections.ValueElement, T1 collections.ValueElementPtr[T]] struct {
+type Kennung[T KennungLike[T], T1 KennungLikePtr[T]] struct {
 	value T
 }
 
-func makeKennung[T collections.ValueElement, T1 collections.ValueElementPtr[T]](
+func makeKennung[T KennungLike[T], T1 KennungLikePtr[T]](
 	v string,
 ) (k Kennung[T, T1], err error) {
 	k.value = *T1(new(T))
@@ -47,6 +47,10 @@ func (e Kennung[T, T1]) Sha() sha.Sha {
 	}
 
 	return sha.FromHash(hash)
+}
+
+func (e Kennung[T, T1]) Gattung() gattung.Gattung {
+	return e.value.Gattung()
 }
 
 func (e Kennung[T, T1]) String() string {

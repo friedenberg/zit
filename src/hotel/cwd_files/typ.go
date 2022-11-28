@@ -27,9 +27,7 @@ func (c *CwdFiles) tryTyp(fi os.FileInfo) (err error) {
 
 	if t, ok = c.Typen[pathMinusExt]; !ok {
 		t = &typ.External{
-			Named: typ.Named{
-				Kennung: h,
-			},
+			Kennung: h,
 		}
 	}
 

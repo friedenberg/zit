@@ -49,14 +49,8 @@ func (u *Umwelt) FormatBezeichnung() format.FormatWriterFunc[bezeichnung.Bezeich
 	return bezeichnung.MakeCliFormat(u.FormatColorWriter())
 }
 
-func (u *Umwelt) FormatTypKennung() format.FormatWriterFunc[kennung.Typ] {
-	return typ.MakeKennungCliFormat(u.FormatColorWriter())
-}
-
-func (u *Umwelt) FormatTyp() format.FormatWriterFunc[typ.Named] {
-	return typ.MakeCliFormat(
-		u.FormatColorWriter(),
-	)
+func (u *Umwelt) FormatTyp() format.FormatWriterFunc[kennung.Typ] {
+	return typ.MakeCliFormat(u.FormatColorWriter())
 }
 
 func (u *Umwelt) FormatTypCheckedOut() format.FormatWriterFunc[typ.External] {
@@ -72,7 +66,7 @@ func (u *Umwelt) FormatZettel() format.FormatWriterFunc[zettel.Zettel] {
 	return zettel.MakeCliFormat(
 		u.FormatBezeichnung(),
 		format.MakeFormatStringer[kennung.EtikettSet](),
-		u.FormatTypKennung(),
+		u.FormatTyp(),
 	)
 }
 

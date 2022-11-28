@@ -55,7 +55,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	typKonfig := u.Konfig().Transacted.Objekte.GetTyp(cz.External.Named.Stored.Objekte.Typ.String())
 
 	if typKonfig != nil {
-		if f, ok := typKonfig.Actions["format"]; ok {
+		if f, ok := typKonfig.Typ.Actions["format"]; ok {
 			formatter = f
 		}
 	}

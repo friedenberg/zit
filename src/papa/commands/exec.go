@@ -122,7 +122,7 @@ func (c Exec) getZettel(
 		return
 	}
 
-	executor = typKonfig.ExecCommand
+	executor = typKonfig.Typ.ExecCommand
 
 	if ar, err = u.StoreObjekten().AkteReader(tz.Named.Stored.Objekte.Akte); err != nil {
 		err = errors.Wrap(err)

@@ -79,7 +79,7 @@ func makeCompiled(kt tomlKonfig) (kc Compiled, err error) {
 		}
 
 		ct := makeCompiledTyp(tn)
-		ct.Apply(&tv)
+		ct.Typ.Apply(&tv)
 		typen.Add(ct)
 	}
 

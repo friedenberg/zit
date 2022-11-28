@@ -87,14 +87,15 @@ func (f FormatObjekte) ReadFormat(
 			return
 		}
 
-		v := line[loc+1:]
+		// v := line[loc+1:]
 
 		switch g {
 		case gattung.Akte:
-			if err = o.SetSha(f.arf, v); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+			//TODO-P0
+			// if err = o.SetSha(f.arf, v); err != nil {
+			// 	err = errors.Wrap(err)
+			// 	return
+			// }
 
 		default:
 			err = errors.Errorf("unsupported gattung: %s", g)

@@ -1,7 +1,6 @@
 package typ
 
 import (
-	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/typ_toml"
 )
 
@@ -23,8 +22,4 @@ func (a *Akte) Equals(b *Akte) bool {
 	}
 
 	return true
-}
-
-func (a Akte) Gattung() gattung.Gattung {
-	return gattung.Typ
 }

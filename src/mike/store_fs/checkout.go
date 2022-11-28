@@ -136,9 +136,9 @@ func (s *Store) CheckoutOne(
 
 		ty := s.Transacted.Objekte.GetTyp(t.String())
 
-		if ty != nil && ty.FileExtension != "" {
+		if ty != nil && ty.Typ.FileExtension != "" {
 			cz.External.AkteFD = zettel_external.FD{
-				Path: originalFilename + "." + ty.FileExtension,
+				Path: originalFilename + "." + ty.Typ.FileExtension,
 			}
 		}
 	}

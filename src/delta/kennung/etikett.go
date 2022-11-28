@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 )
 
 const EtikettRegexString = `^[-a-z0-9_/]+$`
@@ -37,6 +38,28 @@ func MakeEtikett(v string) (e Etikett, err error) {
 }
 
 type etikett string
+
+func (e etikett) Gattung() gattung.Gattung {
+	return gattung.Etikett
+}
+
+func (e *etikett) Reset(e1 *etikett) {
+	if e1 == nil {
+		*e = etikett("")
+	} else {
+		*e = *e1
+	}
+
+	return
+}
+
+func (e etikett) Equals(e1 *etikett) bool {
+	if e1 == nil {
+		return false
+	}
+
+	return e == *e1
+}
 
 func (e etikett) String() string {
 	return string(e)

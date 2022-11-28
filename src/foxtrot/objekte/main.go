@@ -14,11 +14,12 @@ type Objekte interface {
 type Objekte2 interface {
 	Objekte
 	AkteSha() sha.Sha
+	//TODO
+	// SetAkteSha(sha.Sha)
 }
 
 type Stored2 interface {
-	Gattung() gattung.Gattung
-	AkteSha() sha.Sha
+	Objekte2
 	Sha() sha.Sha
 	SetSha(metadatei_io.AkteReaderFactory, string) error
 }

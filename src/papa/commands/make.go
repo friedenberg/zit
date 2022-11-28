@@ -121,7 +121,7 @@ func (c Make) getZettel(
 	typKonfig := u.Konfig().Transacted.Objekte.GetTyp(typ)
 
 	if typKonfig != nil {
-		executor = typKonfig.ExecCommand
+		executor = typKonfig.Typ.ExecCommand
 	} else {
 		err = errors.Normal(errors.Errorf("Typ does not have an exec-command set: %s", typ))
 		return

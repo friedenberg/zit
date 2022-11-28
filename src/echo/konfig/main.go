@@ -25,11 +25,6 @@ func (o Objekte) AkteSha() sha.Sha {
 
 type Transacted = objekte.Transacted2[Objekte, *Objekte, kennung.Konfig, *kennung.Konfig]
 
-// type External struct {
-// 	Named Named
-// 	FD    fd.FD
-// }
-
 type Konfig struct {
 	Cli
 	Transacted Transacted

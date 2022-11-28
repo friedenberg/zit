@@ -95,7 +95,7 @@ func (c ExecAction) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 			return
 		}
 
-		executor, ok := typKonfig.Actions[c.Action.String()]
+		executor, ok := typKonfig.Typ.Actions[c.Action.String()]
 
 		if !ok {
 			err = errors.Normalf("Typ '%s' does not have action '%s'", typ, c.Action)

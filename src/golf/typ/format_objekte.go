@@ -22,7 +22,7 @@ func MakeFormatObjekte(arf metadatei_io.AkteIOFactory) *FormatObjekte {
 	}
 }
 
-func (f FormatObjekte) ReadFormat(r1 io.Reader, t *Stored) (n int64, err error) {
+func (f FormatObjekte) ReadFormat(r1 io.Reader, t *Objekte) (n int64, err error) {
 	r := bufio.NewReader(r1)
 
 	for {
@@ -105,7 +105,7 @@ func (f FormatObjekte) ReadFormat(r1 io.Reader, t *Stored) (n int64, err error) 
 	return
 }
 
-func (f FormatObjekte) WriteFormat(w1 io.Writer, t *Stored) (n int64, err error) {
+func (f FormatObjekte) WriteFormat(w1 io.Writer, t *Objekte) (n int64, err error) {
 	w := line_format.NewWriter()
 
 	w.WriteFormat("%s", gattung.Typ)

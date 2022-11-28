@@ -13,7 +13,7 @@ func IsInlineAkte(t kennung.Typ, k konfig.Konfig) (isInline bool) {
 		return
 	}
 
-	isInline = tc.InlineAkte
+	isInline = tc.Typ.InlineAkte
 
 	return
 }

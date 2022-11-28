@@ -3,9 +3,10 @@ package store_objekten
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/collections"
-	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/age_io"
+	"github.com/friedenberg/zit/src/echo/sku"
+	"github.com/friedenberg/zit/src/foxtrot/objekte"
 	"github.com/friedenberg/zit/src/golf/typ"
 	"github.com/friedenberg/zit/src/typ_toml"
 )
@@ -41,8 +42,17 @@ func (s typStore) Flush() (err error) {
 	return
 }
 
-func (s typStore) writeObjekte(t *typ.Stored) (sh sha.Sha, err error) {
-	//no lock required
+func (s typStore) transact(
+	to *typ.Objekte,
+	tk *kennung.Typ,
+) (tt *typ.Transacted, err error) {
+	if !s.common.LockSmith.IsAcquired() {
+		err = ErrLockRequired{
+			Operation: "transact typ",
+		}
+
+		return
+	}
 
 	var w *age_io.Mover
 
@@ -59,14 +69,60 @@ func (s typStore) writeObjekte(t *typ.Stored) (sh sha.Sha, err error) {
 
 	defer w.Close()
 
-	f := typ.MakeFormatObjekte(s.common)
+	var mutter *typ.Transacted
 
-	if _, err = f.WriteFormat(w, t); err != nil {
+	if mutter, err = s.ReadOne(tk); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	sh = w.Sha()
+	tt = &typ.Transacted{
+		Objekte: *to,
+		Sku: sku.Sku2[kennung.Typ, *kennung.Typ]{
+			Schwanz: s.common.Transaktion.Time,
+		},
+	}
+
+	if mutter != nil {
+		tt.Sku.Kopf = mutter.Sku.Kopf
+		tt.Sku.Mutter[0] = mutter.Sku.Schwanz
+	} else {
+		tt.Sku.Kopf = s.common.Transaktion.Time
+	}
+
+	fo := objekte.MakeFormatObjekte(s.common)
+
+	if _, err = fo.WriteFormat(w, tt); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	tt.Sku.Sha = w.Sha()
+
+	if mutter != nil && tt.Sha().Equals(mutter.Sha()) {
+		tt = mutter
+
+		if err = s.TypLogWriters.Unchanged(tt); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+	}
+
+	s.common.Transaktion.Add2(&tt.Sku)
+
+	if mutter == nil {
+		if err = s.TypLogWriters.Unchanged(tt); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		if err = s.TypLogWriters.Updated(tt); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
 
 	return
 }
@@ -86,7 +142,7 @@ func (s typStore) writeTransactedToIndex(tt *typ.Transacted) (err error) {
 
 //TODO
 func (s typStore) ReadOne(
-	k kennung.Typ,
+	k *kennung.Typ,
 ) (tt *typ.Transacted, err error) {
 	ct := s.common.Konfig.Transacted.Objekte.GetTyp(k.String())
 
@@ -96,19 +152,18 @@ func (s typStore) ReadOne(
 	}
 
 	tt = &typ.Transacted{
-		Named: typ.Named{
-			Kennung: k,
-			Stored: typ.Stored{
-				//TODO
-				// Sha: sha,
-				Objekte: typ.Akte{
-					KonfigTyp: typ_toml.Typ{
-						InlineAkte:     ct.InlineAkte,
-						FileExtension:  ct.FileExtension,
-						ExecCommand:    ct.ExecCommand,
-						Actions:        ct.Actions,
-						EtikettenRules: ct.EtikettenRules,
-					},
+		//TODO
+		Sku: sku.Sku2[kennung.Typ, *kennung.Typ]{
+			Kennung: *k,
+		},
+		Objekte: typ.Objekte{
+			Akte: typ.Akte{
+				KonfigTyp: typ_toml.Typ{
+					InlineAkte:     ct.Typ.InlineAkte,
+					FileExtension:  ct.Typ.FileExtension,
+					ExecCommand:    ct.Typ.ExecCommand,
+					Actions:        ct.Typ.Actions,
+					EtikettenRules: ct.Typ.EtikettenRules,
 				},
 			},
 		},
@@ -117,7 +172,10 @@ func (s typStore) ReadOne(
 	return
 }
 
-func (s *typStore) Create(in typ.Akte, k kennung.Typ) (tt *typ.Transacted, err error) {
+func (s *typStore) Create(
+	in *typ.Objekte,
+	tk *kennung.Typ,
+) (tt *typ.Transacted, err error) {
 	if !s.common.LockSmith.IsAcquired() {
 		err = ErrLockRequired{
 			Operation: "create",
@@ -126,38 +184,10 @@ func (s *typStore) Create(in typ.Akte, k kennung.Typ) (tt *typ.Transacted, err e
 		return
 	}
 
-	//TODO
-	// if in.IsEmpty() {
-	// 	err = errors.Normalf("%s is empty", in.Gattung())
-	// 	return
-	// }
-
-	tt = &typ.Transacted{
-		Named: typ.Named{
-			Stored: typ.Stored{
-				Objekte: in,
-			},
-			Kennung: k,
-		},
-	}
-
-	if tt.Named.Stored.Sha, err = s.writeObjekte(&tt.Named.Stored); err != nil {
+	if tt, err = s.transact(in, tk); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	//TODO-P1?
-	//If the zettel exists, short circuit and return that
-	// if tz2, err2 := s.Read(tz.Named.Stored.Sha); err2 == nil {
-	// 	tz = tz2
-	// 	return
-	// }
-
-	//TODO?
-	// if tz, err = s.addZettelToTransaktion(tz.Named); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
 
 	if err = s.writeTransactedToIndex(tt); err != nil {
 		err = errors.Wrap(err)
@@ -175,49 +205,23 @@ func (s *typStore) Create(in typ.Akte, k kennung.Typ) (tt *typ.Transacted, err e
 
 // TODO support dry run
 func (s *typStore) Update(
-	t *typ.Named,
+	t *typ.Objekte,
+	tk *kennung.Typ,
 ) (tt *typ.Transacted, err error) {
 	if !s.common.LockSmith.IsAcquired() {
 		err = ErrLockRequired{
-			Operation: "update",
+			Operation: "update typ",
 		}
 
 		return
 	}
 
-	var mutter *typ.Transacted
-
-	if mutter, err = s.ReadOne(
-		t.Kennung,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if t.Equals(&mutter.Named) {
-		tt = mutter
-
-		if err = s.TypLogWriters.Unchanged(tt); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		return
-	}
-
-	tt.Named = *t
-
-	if tt.Named.Stored.Sha, err = s.writeObjekte(&t.Stored); err != nil {
+	if tt, err = s.transact(t, tk); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	if err = s.writeTransactedToIndex(tt); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.TypLogWriters.Updated(tt); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
