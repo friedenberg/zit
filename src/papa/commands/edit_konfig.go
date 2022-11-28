@@ -31,7 +31,7 @@ func init() {
 func (c EditKonfig) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	var p string
 
-	if p, err = c.partOne(u); err != nil {
+	if p, err = c.makeTempKonfigFile(u); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -56,7 +56,7 @@ func (c EditKonfig) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	var k *konfig.Objekte
 
-	if k, err = c.partTwo(u, p); err != nil {
+	if k, err = c.readTempKonfigFile(u, p); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -76,7 +76,7 @@ func (c EditKonfig) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	return
 }
 
-func (c EditKonfig) partOne(
+func (c EditKonfig) makeTempKonfigFile(
 	u *umwelt.Umwelt,
 ) (p string, err error) {
 	var k konfig.Transacted
@@ -116,7 +116,7 @@ func (c EditKonfig) partOne(
 	return
 }
 
-func (c EditKonfig) partTwo(
+func (c EditKonfig) readTempKonfigFile(
 	u *umwelt.Umwelt,
 	p string,
 ) (k *konfig.Objekte, err error) {
@@ -133,6 +133,7 @@ func (c EditKonfig) partTwo(
 
 	k = &konfig.Objekte{}
 
+	//TODO offer option to edit again
 	if _, err = format.ReadFormat(f, k); err != nil {
 		err = errors.Wrap(err)
 		return

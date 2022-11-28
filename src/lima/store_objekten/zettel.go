@@ -57,7 +57,7 @@ func makeZettelStore(
 		return
 	}
 
-	if err = s.protoZettel.Typ.Set(s.common.Konfig.Compiled.DefaultTyp.Name.String()); err != nil {
+	if err = s.protoZettel.Typ.Set(s.common.Konfig.Transacted.Objekte.Akte.DefaultTyp.Name.String()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

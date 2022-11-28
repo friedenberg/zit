@@ -132,7 +132,11 @@ func (c Edit) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 	var possible cwd_files.CwdFiles
 
-	if possible, err = cwd_files.MakeCwdFilesExactly(u.Konfig().Compiled, u.Standort().Cwd(), fs...); err != nil {
+	if possible, err = cwd_files.MakeCwdFilesExactly(
+		u.Konfig(),
+		u.Standort().Cwd(),
+		fs...,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

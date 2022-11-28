@@ -14,7 +14,7 @@ func (z *Zettel) ApplyKonfig(k konfig.Konfig) (err error) {
 	normalized := kennung.WithRemovedCommonPrefixes(z.Etiketten)
 	z.Etiketten = normalized
 
-	tk := k.Compiled.GetTyp(z.Typ.String())
+	tk := k.Transacted.Objekte.GetTyp(z.Typ.String())
 
 	if tk == nil {
 		return

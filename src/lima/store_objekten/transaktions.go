@@ -64,8 +64,14 @@ func (s Store) ReadAllTransaktions(
 	return
 }
 
+func (s Store) TransaktionPath(t ts.Time) (p string) {
+	p = id.Path(t, s.common.Standort.DirObjektenTransaktion())
+
+	return
+}
+
 func (s Store) ReadTransaktion(t ts.Time) (tr *transaktion.Transaktion, err error) {
-	return s.readTransaktion(id.Path(t, s.common.Standort.DirObjektenTransaktion()))
+	return s.readTransaktion(s.TransaktionPath(t))
 }
 
 func (s Store) readTransaktion(p string) (t *transaktion.Transaktion, err error) {
@@ -100,7 +106,10 @@ func (s Store) writeTransaktion() (err error) {
 
 	var p string
 
-	if p, err = id.MakeDirIfNecessary(s.common.Transaktion.Time, s.common.Standort.DirObjektenTransaktion()); err != nil {
+	if p, err = id.MakeDirIfNecessary(
+		s.common.Transaktion.Time,
+		s.common.Standort.DirObjektenTransaktion(),
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -112,7 +121,7 @@ func (s Store) writeTransaktion() (err error) {
 		return
 	}
 
-	defer w.Close()
+	defer errors.Deferred(&err, w.Close)
 
 	f := transaktion.Writer{Transaktion: s.common.Transaktion}
 

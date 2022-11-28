@@ -7,7 +7,7 @@ import (
 
 func IsInlineAkte(t kennung.Typ, k konfig.Konfig) (isInline bool) {
 	ts := t.String()
-	tc := k.Compiled.GetTyp(ts)
+	tc := k.Transacted.Objekte.GetTyp(ts)
 
 	if tc == nil {
 		return

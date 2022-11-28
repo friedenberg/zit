@@ -17,7 +17,7 @@ func (s *Store) CheckinTyp(p string) (t *typ.Named, err error) {
 func (s *Store) WriteTyp(t *typ.Named) (te *typ.External, err error) {
 	te = &typ.External{
 		FD: cwd_files.File{
-			Path: fmt.Sprintf("%s.%s", t.Kennung, s.Konfig.Compiled.TypFileExtension),
+			Path: fmt.Sprintf("%s.%s", t.Kennung, s.Konfig.Transacted.Objekte.Akte.TypFileExtension),
 		},
 		Named: *t,
 	}

@@ -84,7 +84,7 @@ func (s Store) filenameForZettelTransacted(
 		return
 	}
 
-	filename = originalFilename + s.Konfig.Compiled.GetZettelFileExtension()
+	filename = originalFilename + s.Konfig.Transacted.Objekte.GetZettelFileExtension()
 
 	return
 }
@@ -134,7 +134,7 @@ func (s *Store) CheckoutOne(
 	if !inlineAkte {
 		t := sz.Named.Stored.Objekte.Typ
 
-		ty := s.Compiled.GetTyp(t.String())
+		ty := s.Transacted.Objekte.GetTyp(t.String())
 
 		if ty != nil && ty.FileExtension != "" {
 			cz.External.AkteFD = zettel_external.FD{

@@ -12,14 +12,16 @@ type Mover struct {
 	file *os.File
 	Writer
 
-	basePath    string
-	objektePath string
-	lockFile    bool
+	basePath                  string
+	objektePath               string
+	lockFile                  bool
+	errorOnAttemptedOverwrite bool
 }
 
 func NewMover(o MoveOptions) (m *Mover, err error) {
 	m = &Mover{
-		lockFile: o.LockFile,
+		lockFile:                  o.LockFile,
+		errorOnAttemptedOverwrite: o.ErrorOnAttemptedOverwrite,
 	}
 
 	if o.GenerateFinalPathFromSha {
@@ -83,24 +85,22 @@ func (m *Mover) Close() (err error) {
 		}
 	}
 
-	//TODO create options for handling already exists as an error
-	if m.lockFile && files.Exists(m.objektePath) {
-		err = ErrAlreadyExists{
-			Sha:  sha,
-			Path: m.objektePath,
-		}
-
-		errors.Log().Print(err)
-		err = nil
-
-		return
-	}
-
 	p := m.file.Name()
 
 	if err = os.Rename(p, m.objektePath); err != nil {
-		err = errors.Wrap(err)
-		return
+		if files.Exists(m.objektePath) {
+			if m.errorOnAttemptedOverwrite {
+				err = ErrAlreadyExists{
+					Sha:  sha,
+					Path: m.objektePath,
+				}
+
+				return
+			}
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	if m.lockFile {

@@ -32,7 +32,7 @@ func (c *CwdFiles) tryZettel(d string, a string, p string) (err error) {
 	}
 
 	//TODO read zettels
-	if path.Ext(a) == c.konfig.GetZettelFileExtension() {
+	if path.Ext(a) == c.konfig.Transacted.Objekte.GetZettelFileExtension() {
 		zcw.Zettel.Path = p
 	} else {
 		zcw.Akte.Path = p

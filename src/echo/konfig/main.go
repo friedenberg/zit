@@ -32,9 +32,7 @@ type Transacted = objekte.Transacted2[Objekte, *Objekte, kennung.Konfig, *kennun
 
 type Konfig struct {
 	Cli
-	tomlKonfig
 	Transacted Transacted
-	Compiled   Compiled
 }
 
 func Make(s standort.Standort, kc Cli) (c Konfig, err error) {
@@ -62,11 +60,6 @@ func Make(s standort.Standort, kc Cli) (c Konfig, err error) {
 		f,
 		&c.Transacted.Objekte,
 	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if c.Compiled, err = makeCompiled(c.tomlKonfig); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

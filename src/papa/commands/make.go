@@ -118,7 +118,7 @@ func (c Make) getZettel(
 
 	typ := tz.Named.Stored.Objekte.Typ.String()
 
-	typKonfig := u.Konfig().Compiled.GetTyp(typ)
+	typKonfig := u.Konfig().Transacted.Objekte.GetTyp(typ)
 
 	if typKonfig != nil {
 		executor = typKonfig.ExecCommand

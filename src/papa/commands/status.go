@@ -36,7 +36,10 @@ func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
 		fallthrough
 
 	default:
-		if possible, err = cwd_files.MakeCwdFilesAll(s.Konfig().Compiled, s.Standort().Cwd()); err != nil {
+		if possible, err = cwd_files.MakeCwdFilesAll(
+			s.Konfig(),
+			s.Standort().Cwd(),
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

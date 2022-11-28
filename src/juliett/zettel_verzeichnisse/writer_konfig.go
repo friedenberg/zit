@@ -17,7 +17,7 @@ func MakeWriterKonfig(k konfig.Konfig) collections.WriterFunc[*Zettel] {
 
 	return func(z *Zettel) (err error) {
 		for _, p := range z.EtikettenSorted {
-			for _, t := range k.Compiled.EtikettenHidden {
+			for _, t := range k.Transacted.Objekte.Akte.EtikettenHidden {
 				if strings.HasPrefix(p, t) {
 					errors.Log().Printf("eliding: %s", z.Transacted.Named.Kennung)
 					err = io.EOF

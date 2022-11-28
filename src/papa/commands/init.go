@@ -12,6 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/delta/standort"
+	"github.com/friedenberg/zit/src/echo/konfig"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
@@ -64,6 +65,7 @@ func (c Init) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	c.writeFile(s.DirZit("Konfig"), "")
+	c.writeFile(s.DirZit("KonfigCompiled"), "")
 
 	//TODO how to handle re-init for yin and yang?
 	if err = c.populateYinIfNecessary(s); err != nil {
@@ -87,6 +89,15 @@ func (c Init) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	defer u.Unlock()
+
+	k := konfig.Objekte{
+		Akte: konfig.MakeDefaultCompiled(),
+	}
+
+	if _, err = u.StoreObjekten().Konfig().Update(&k); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if err = u.StoreObjekten().Reindex(); err != nil {
 		err = errors.Wrap(err)
@@ -166,6 +177,11 @@ func (c Init) mkdirAll(elements ...string) {
 }
 
 func (c Init) writeFile(path, contents string) {
+	if files.Exists(path) {
+		errors.Err().Printf("%s already exists, not overwriting", path)
+		return
+	}
+
 	err := ioutil.WriteFile(path, []byte(contents), 0755)
 	errors.PanicIfError(err)
 }

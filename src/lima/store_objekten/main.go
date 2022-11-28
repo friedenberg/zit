@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/delta/hinweis"
@@ -35,13 +36,26 @@ func Make(
 ) (s *Store, err error) {
 	s = &Store{
 		common: common{
-			LockSmith:   lockSmith,
-			Age:         a,
-			Konfig:      k,
-			Standort:    st,
-			Transaktion: transaktion.MakeTransaktion(ts.Now()),
+			LockSmith: lockSmith,
+			Age:       a,
+			Konfig:    k,
+			Standort:  st,
 		},
 	}
+
+	t := ts.Now()
+
+	for {
+		p := s.TransaktionPath(t)
+
+		if !files.Exists(p) {
+			break
+		}
+
+		t.MoveForwardIota()
+	}
+
+	s.common.Transaktion = transaktion.MakeTransaktion(t)
 
 	s.ioFactory = s.common
 
@@ -227,7 +241,6 @@ func (s *Store) Reindex() (err error) {
 	f := func(t *transaktion.Transaktion) (err error) {
 		if err = t.EachWithIndex(
 			func(o *sku.Indexed) (err error) {
-				errors.Err().Print(o)
 				switch o.Gattung {
 
 				case gattung.Zettel:

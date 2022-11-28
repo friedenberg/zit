@@ -86,7 +86,7 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	var f *os.File
 
-	if f, err = files.TempFileWithPattern("*." + u.Konfig().Compiled.DefaultOrganizeExt); err != nil {
+	if f, err = files.TempFileWithPattern("*." + u.Konfig().Transacted.Objekte.Akte.DefaultOrganizeExt); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -88,7 +88,7 @@ func (c ExecAction) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	iter := func(tz *zettel_transacted.Zettel) (err error) {
 		typ := tz.Named.Stored.Objekte.Typ.String()
 
-		typKonfig := u.Konfig().Compiled.GetTyp(typ)
+		typKonfig := u.Konfig().Transacted.Objekte.GetTyp(typ)
 
 		if typKonfig == nil {
 			err = errors.Normal(errors.Errorf("Typ does not have an exec-command set: %s", typ))

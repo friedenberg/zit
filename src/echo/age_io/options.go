@@ -30,7 +30,8 @@ type MoveOptions struct {
 	age.Age
 	UseZip bool
 
-	LockFile                 bool
-	FinalPath                string
-	GenerateFinalPathFromSha bool
+	ErrorOnAttemptedOverwrite bool
+	LockFile                  bool
+	FinalPath                 string
+	GenerateFinalPathFromSha  bool
 }

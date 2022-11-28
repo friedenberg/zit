@@ -21,7 +21,7 @@ type Compiled struct {
 	Typen             compiledTypSet
 }
 
-func MakeDefaultCompiled() Compiled {
+func MakeDefaultCompiled() (c Compiled) {
 	dt := &compiledTyp{
 		Name: collections.MakeStringValue("md"),
 		Typ: typ_toml.Typ{
@@ -30,14 +30,21 @@ func MakeDefaultCompiled() Compiled {
 		},
 	}
 
-	return Compiled{
+	typen := collections.MakeMutableSet[*compiledTyp](
+		c.Typen.Key,
+		dt,
+	)
+
+	c = Compiled{
 		TypFileExtension:    "typ",
 		ZettelFileExtension: "zettel",
 		DefaultTyp:          dt,
 		DefaultOrganizeExt:  "md",
 		ExtensionsToTypen:   make(map[string]string),
-		Typen:               makeCompiledTypSet(nil),
+		Typen:               makeCompiledTypSet(typen),
 	}
+
+	return
 }
 
 func makeCompiled(kt tomlKonfig) (kc Compiled, err error) {
@@ -114,12 +121,12 @@ func (c Compiled) GetSortedTypenExpanded(v string) (expandedActual []*compiledTy
 	return
 }
 
-func (c Compiled) GetZettelFileExtension() string {
-	return fmt.Sprintf(".%s", c.ZettelFileExtension)
+func (c Objekte) GetZettelFileExtension() string {
+	return fmt.Sprintf(".%s", c.Akte.ZettelFileExtension)
 }
 
-func (kc Compiled) GetTyp(n string) (ct *compiledTyp) {
-	expandedActual := kc.GetSortedTypenExpanded(n)
+func (kc Objekte) GetTyp(n string) (ct *compiledTyp) {
+	expandedActual := kc.Akte.GetSortedTypenExpanded(n)
 
 	if len(expandedActual) > 0 {
 		ct = expandedActual[0]

@@ -11,13 +11,13 @@ import (
 
 type EncoderActionNames struct {
 	out    io.Writer
-	konfig konfig.Compiled
+	konfig konfig.Objekte
 }
 
 func MakeEncoderActionNames(w io.Writer, k konfig.Konfig) EncoderActionNames {
 	return EncoderActionNames{
 		out:    w,
-		konfig: k.Compiled,
+		konfig: k.Transacted.Objekte,
 	}
 }
 

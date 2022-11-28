@@ -33,6 +33,10 @@ func Tyme(t tyme.Time) Time {
 	}
 }
 
+func (t *Time) MoveForwardIota() {
+	t.time = t.time.Add(tyme.Second)
+}
+
 func (t Time) String() string {
 	return strconv.FormatInt(t.Unix(), 10)
 }

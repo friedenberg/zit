@@ -74,7 +74,6 @@ func (s konfigStore) transact(
 
 	var mutter konfig.Transacted
 
-  //TODO offer option to edit again
 	if mutter, err = s.Read(); err != nil {
 		err = errors.Wrap(err)
 		return

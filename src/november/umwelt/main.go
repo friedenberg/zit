@@ -126,12 +126,12 @@ func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 		// }
 	}
 
-	for _, rb := range u.konfig.Recipients {
-		if err = u.age.AddBech32PivYubikeyEC256(rb); err != nil {
-			errors.Wrap(err)
-			return
-		}
-	}
+	// for _, rb := range u.konfig.Transacted.Objekte.Akte.Recipients {
+	// 	if err = u.age.AddBech32PivYubikeyEC256(rb); err != nil {
+	// 		errors.Wrap(err)
+	// 		return
+	// 	}
+	// }
 
 	u.storeObjekten, err = store_objekten.Make(
 		u.lock,
@@ -198,11 +198,7 @@ func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 func (u Umwelt) DefaultEtiketten() (etiketten kennung.EtikettSet, err error) {
 	metiketten := kennung.MakeEtikettMutableSet()
 
-	for e, t := range u.konfig.Tags {
-		if !t.AddToNewZettels {
-			continue
-		}
-
+	for _, e := range u.konfig.Transacted.Objekte.Akte.EtikettenToAddToNew {
 		if err = metiketten.AddString(e); err != nil {
 			err = errors.Wrap(err)
 			return

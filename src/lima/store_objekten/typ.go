@@ -88,7 +88,7 @@ func (s typStore) writeTransactedToIndex(tt *typ.Transacted) (err error) {
 func (s typStore) ReadOne(
 	k kennung.Typ,
 ) (tt *typ.Transacted, err error) {
-	ct := s.common.Konfig.Compiled.GetTyp(k.String())
+	ct := s.common.Konfig.Transacted.Objekte.GetTyp(k.String())
 
 	if ct == nil {
 		err = errors.Wrap(ErrNotFound{Id: k})

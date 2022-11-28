@@ -75,19 +75,15 @@ func (c Push) Run(u *umwelt.Umwelt, args ...string) (err error) {
 }
 
 func (c Push) remoteScriptFromArg(u *umwelt.Umwelt, arg string) (remote konfig.RemoteScript, err error) {
-	ok := false
+	p := u.Standort().DirZit("bin", arg)
 
-	if remote, ok = u.Konfig().RemoteScripts[arg]; !ok {
-		p := u.Standort().DirZit("bin", arg)
+	if !files.Exists(p) {
+		err = errors.Errorf("remote not defined: '%s'", arg)
+		return
+	}
 
-		if !files.Exists(p) {
-			err = errors.Errorf("remote not defined: '%s'", arg)
-			return
-		}
-
-		remote = konfig.RemoteScriptFile{
-			Path: p,
-		}
+	remote = konfig.RemoteScriptFile{
+		Path: p,
 	}
 
 	return

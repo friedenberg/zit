@@ -13,7 +13,7 @@ import (
 )
 
 type CwdFiles struct {
-	konfig           konfig.Compiled
+	konfig           konfig.Konfig
 	dir              string
 	Zettelen         map[string]CwdZettel
 	Typen            map[string]*typ.External
@@ -31,7 +31,7 @@ func (fs CwdFiles) ZettelFiles() (out []string) {
 	return
 }
 
-func makeCwdFiles(konfig konfig.Compiled, dir string) (fs CwdFiles) {
+func makeCwdFiles(konfig konfig.Konfig, dir string) (fs CwdFiles) {
 	fs = CwdFiles{
 		konfig:           konfig,
 		dir:              dir,
@@ -44,13 +44,13 @@ func makeCwdFiles(konfig konfig.Compiled, dir string) (fs CwdFiles) {
 	return
 }
 
-func MakeCwdFilesAll(k konfig.Compiled, dir string) (fs CwdFiles, err error) {
+func MakeCwdFilesAll(k konfig.Konfig, dir string) (fs CwdFiles, err error) {
 	fs = makeCwdFiles(k, dir)
 	err = fs.readAll()
 	return
 }
 
-func MakeCwdFilesExactly(k konfig.Compiled, dir string, files ...string) (fs CwdFiles, err error) {
+func MakeCwdFilesExactly(k konfig.Konfig, dir string, files ...string) (fs CwdFiles, err error) {
 	fs = makeCwdFiles(k, dir)
 	err = fs.readInputFiles(files...)
 	return
@@ -177,7 +177,7 @@ func (fs *CwdFiles) readFirstLevelFile(a string) (err error) {
 	ext = strings.TrimSpace(ext)
 
 	switch strings.TrimPrefix(ext, ".") {
-	case fs.konfig.TypFileExtension:
+	case fs.konfig.Transacted.Objekte.Akte.TypFileExtension:
 		if err = fs.tryTyp(fi); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -220,13 +220,13 @@ func (fs *CwdFiles) readSecondLevelFile(d string, a string) (err error) {
 	ext = strings.TrimSpace(ext)
 
 	switch strings.TrimPrefix(ext, ".") {
-	case fs.konfig.TypFileExtension:
+	case fs.konfig.Transacted.Objekte.Akte.TypFileExtension:
 		if err = fs.tryTyp(fi); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case fs.konfig.ZettelFileExtension:
+	case fs.konfig.Transacted.Objekte.Akte.ZettelFileExtension:
 		fallthrough
 
 		//Zettel-Akten can have any extension, and so default is Zettel

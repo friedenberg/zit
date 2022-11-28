@@ -42,6 +42,8 @@ function init_and_deinit { # @test
 	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
 	assert_success
 
+	[[ -f .zit/KonfigCompiled ]]
+
 	run zit deinit
 	assert_success
 }

@@ -170,7 +170,7 @@ func (c New) editZettels(
 
 	var cwdFiles cwd_files.CwdFiles
 
-	if cwdFiles, err = cwd_files.MakeCwdFilesExactly(u.Konfig().Compiled, u.Standort().Cwd(), fs...); err != nil {
+	if cwdFiles, err = cwd_files.MakeCwdFilesExactly(u.Konfig(), u.Standort().Cwd(), fs...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
