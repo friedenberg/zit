@@ -5,6 +5,8 @@ import (
 	"sort"
 
 	"github.com/friedenberg/zit/src/bravo/collections"
+	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/echo/sku"
 	"github.com/friedenberg/zit/src/typ_toml"
 )
 
@@ -23,7 +25,9 @@ type Compiled struct {
 
 func MakeDefaultCompiled() (c Compiled) {
 	dt := &compiledTyp{
-		Name: collections.MakeStringValue("md"),
+		Sku: sku.Sku2[kennung.Typ, *kennung.Typ]{
+			Kennung: kennung.MustTyp("md"),
+		},
 		Typ: typ_toml.Typ{
 			InlineAkte:    true,
 			FileExtension: "md",
@@ -115,7 +119,7 @@ func (c Compiled) GetSortedTypenExpanded(v string) (expandedActual []*compiledTy
 	)
 
 	sort.Slice(expandedActual, func(i, j int) bool {
-		return expandedActual[i].Name.Len() > expandedActual[j].Name.Len()
+		return expandedActual[i].Sku.Kennung.Less(expandedActual[j].Sku.Kennung)
 	})
 
 	return

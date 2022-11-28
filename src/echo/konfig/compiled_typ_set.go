@@ -25,5 +25,5 @@ func (s compiledTypSet) Key(v *compiledTyp) string {
 		return ""
 	}
 
-	return v.Name.String()
+	return v.Sku.Kennung.String()
 }
