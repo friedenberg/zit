@@ -15,8 +15,9 @@ import (
 )
 
 type Objekte struct {
-	Sha  sha.Sha
-	Akte Compiled
+	Sha        sha.Sha
+	Akte       Compiled
+	tomlKonfig tomlKonfig
 }
 
 func (o Objekte) AkteSha() sha.Sha {

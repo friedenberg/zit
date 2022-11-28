@@ -8,7 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/echo/sku"
 	"github.com/friedenberg/zit/src/foxtrot/objekte"
 	"github.com/friedenberg/zit/src/golf/typ"
-	"github.com/friedenberg/zit/src/typ_toml"
 )
 
 type typLogWriter = collections.WriterFunc[*typ.Transacted]
@@ -140,7 +139,6 @@ func (s typStore) writeTransactedToIndex(tt *typ.Transacted) (err error) {
 	return
 }
 
-//TODO
 func (s typStore) ReadOne(
 	k *kennung.Typ,
 ) (tt *typ.Transacted, err error) {
@@ -152,19 +150,12 @@ func (s typStore) ReadOne(
 	}
 
 	tt = &typ.Transacted{
-		//TODO
-		Sku: sku.Sku2[kennung.Typ, *kennung.Typ]{
-			Kennung: *k,
-		},
+		Sku: ct.Sku,
 		Objekte: typ.Objekte{
+			//TODO
+			//Sha
 			Akte: typ.Akte{
-				KonfigTyp: typ_toml.Typ{
-					InlineAkte:     ct.Typ.InlineAkte,
-					FileExtension:  ct.Typ.FileExtension,
-					ExecCommand:    ct.Typ.ExecCommand,
-					Actions:        ct.Typ.Actions,
-					EtikettenRules: ct.Typ.EtikettenRules,
-				},
+				KonfigTyp: ct.Typ,
 			},
 		},
 	}
@@ -178,7 +169,7 @@ func (s *typStore) Create(
 ) (tt *typ.Transacted, err error) {
 	if !s.common.LockSmith.IsAcquired() {
 		err = ErrLockRequired{
-			Operation: "create",
+			Operation: "create typ",
 		}
 
 		return
@@ -194,16 +185,9 @@ func (s *typStore) Create(
 		return
 	}
 
-	//TODO-P2 assert no changes
-	if err = s.TypLogWriters.New(tt); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	return
 }
 
-// TODO support dry run
 func (s *typStore) Update(
 	t *typ.Objekte,
 	tk *kennung.Typ,

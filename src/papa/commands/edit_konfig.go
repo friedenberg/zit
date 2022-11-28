@@ -93,9 +93,9 @@ func (c EditKonfig) makeTempKonfigFile(
 		return
 	}
 
-	p = f.Name()
-
 	defer errors.Deferred(&err, f.Close)
+
+	p = f.Name()
 
 	var ar sha.ReadCloser
 

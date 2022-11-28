@@ -113,7 +113,7 @@ func (s konfigStore) transact(
 	if !s.common.Konfig.DryRun {
 		var f *os.File
 
-    //TODO use objekte mover
+		//TODO use objekte mover
 		if f, err = files.OpenExclusiveWriteOnly(s.common.Standort.FileKonfigCompiled()); err != nil {
 			err = errors.Wrap(err)
 			return
