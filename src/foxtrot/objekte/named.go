@@ -2,9 +2,10 @@ package objekte
 
 import (
 	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/objekte_format"
 )
 
-type Named[T Objekte, T1 ObjektePtr[T], T2 Identifier[T2], T3 IdentifierPtr[T2]] struct {
+type Named[T objekte_format.Objekte, T1 objekte_format.ObjektePtr[T], T2 Identifier[T2], T3 IdentifierPtr[T2]] struct {
 	Stored  Stored[T, T1]
 	Sha     sha.Sha
 	Kennung T2

@@ -28,7 +28,7 @@ func (f EncoderActionNames) Encode(t *kennung.Typ) (n int64, err error) {
 		return
 	}
 
-	for v, v1 := range ct.Typ.Actions {
+	for v, v1 := range ct.Typ.Akte.Actions {
 		var n1 int
 
 		if n1, err = io.WriteString(f.out, fmt.Sprintf("%s\t%s\n", v, v1.Description)); err != nil {

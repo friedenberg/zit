@@ -4,9 +4,10 @@ import (
 	"github.com/friedenberg/zit/src/bravo/int_value"
 	"github.com/friedenberg/zit/src/delta/ts"
 	"github.com/friedenberg/zit/src/echo/sku"
+	"github.com/friedenberg/zit/src/objekte_format"
 )
 
-type Transacted[T Objekte, T1 ObjektePtr[T], T2 Identifier[T2], T3 IdentifierPtr[T2]] struct {
+type Transacted[T objekte_format.Objekte, T1 objekte_format.ObjektePtr[T], T2 Identifier[T2], T3 IdentifierPtr[T2]] struct {
 	Named            Named[T, T1, T2, T3]
 	Kopf, Schwanz    ts.Time
 	Mutter           sku.Mutter

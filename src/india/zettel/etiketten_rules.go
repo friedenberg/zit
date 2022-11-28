@@ -20,7 +20,7 @@ func (z *Zettel) ApplyKonfig(k konfig.Konfig) (err error) {
 		return
 	}
 
-	for e, r := range tk.Typ.EtikettenRules {
+	for e, r := range tk.Typ.Akte.EtikettenRules {
 		var e1 kennung.Etikett
 
 		if e1, err = kennung.MakeEtikett(e); err != nil {

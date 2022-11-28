@@ -1,4 +1,4 @@
-package typ
+package objekte_format
 
 import (
 	"bufio"
@@ -6,23 +6,61 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/line_format"
+	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/metadatei_io"
 )
 
-type FormatObjekte struct {
-	arf             metadatei_io.AkteIOFactory
-	IgnoreTypErrors bool
+type Objekte interface {
+	Gattung() gattung.Gattung
 }
 
-func MakeFormatObjekte(arf metadatei_io.AkteIOFactory) *FormatObjekte {
-	return &FormatObjekte{
+type Objekte2 interface {
+	Objekte
+
+	AkteSha() sha.Sha
+}
+
+type ObjektePtr[T any] interface {
+	*T
+	collections.Equatable[T]
+	collections.Resetable[T]
+}
+
+type Objekte2Ptr[T any] interface {
+	*T
+	collections.Equatable[T]
+	collections.Resetable[T]
+
+	SetAkteSha(sha.Sha)
+}
+
+type Stored2 interface {
+	Gattung() gattung.Gattung
+
+	AkteSha() sha.Sha
+	SetAkteSha(sha.Sha)
+
+	SetObjekteSha(metadatei_io.AkteReaderFactory, string) error
+	ObjekteSha() sha.Sha
+}
+
+type Format struct {
+	arf metadatei_io.AkteIOFactory
+}
+
+func MakeFormat(arf metadatei_io.AkteIOFactory) *Format {
+	return &Format{
 		arf: arf,
 	}
 }
 
-func (f FormatObjekte) ReadFormat(r1 io.Reader, t *Objekte) (n int64, err error) {
+func (f Format) ReadFormat(
+	r1 io.Reader,
+	o Stored2,
+) (n int64, err error) {
 	r := bufio.NewReader(r1)
 
 	for {
@@ -44,7 +82,7 @@ func (f FormatObjekte) ReadFormat(r1 io.Reader, t *Objekte) (n int64, err error)
 		loc := strings.Index(line, " ")
 
 		if line == "" {
-			//TODO-P2 this should be cleaned up
+			//TODO this should be cleaned up
 		}
 
 		var g gattung.Gattung
@@ -60,10 +98,10 @@ func (f FormatObjekte) ReadFormat(r1 io.Reader, t *Objekte) (n int64, err error)
 				return
 			}
 
-			if g != gattung.Typ {
+			if g != o.Gattung() {
 				err = errors.Errorf(
 					"expected objekte to have gattung '%s' but got '%s'",
-					gattung.Typ,
+					gattung.Konfig,
 					g,
 				)
 
@@ -89,12 +127,14 @@ func (f FormatObjekte) ReadFormat(r1 io.Reader, t *Objekte) (n int64, err error)
 
 		switch g {
 		case gattung.Akte:
-			if err = t.Sha.Set(v); err != nil {
+			var sh sha.Sha
+
+			if err = sh.Set(v); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-		case gattung.Typ:
+			o.SetAkteSha(sh)
 
 		default:
 			err = errors.Errorf("unsupported gattung: %s", g)
@@ -105,11 +145,14 @@ func (f FormatObjekte) ReadFormat(r1 io.Reader, t *Objekte) (n int64, err error)
 	return
 }
 
-func (f FormatObjekte) WriteFormat(w1 io.Writer, t *Objekte) (n int64, err error) {
+func (f Format) WriteFormat(
+	w1 io.Writer,
+	o Stored2,
+) (n int64, err error) {
 	w := line_format.NewWriter()
 
-	w.WriteFormat("%s", gattung.Typ)
-	w.WriteFormat("%s %s", gattung.Akte, t.Sha)
+	w.WriteFormat("%s", o.Gattung())
+	w.WriteFormat("%s %s", gattung.Akte, o.AkteSha())
 
 	if n, err = w.WriteTo(w1); err != nil {
 		err = errors.Wrap(err)

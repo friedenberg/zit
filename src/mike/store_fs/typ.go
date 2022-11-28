@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/golf/typ"
 	"github.com/friedenberg/zit/src/hotel/cwd_files"
+	"github.com/friedenberg/zit/src/typ_toml"
 )
 
 func (s *Store) CheckinTyp(p string) (t *typ.Transacted, err error) {
@@ -21,7 +22,7 @@ func (s *Store) WriteTyp(t *typ.Transacted) (te *typ.External, err error) {
 		},
 		//TODO move to central place
 		Objekte: t.Objekte,
-		Sha:     t.Objekte.Sha,
+		Sha:     t.ObjekteSha(),
 		Kennung: t.Sku.Kennung,
 	}
 
@@ -39,7 +40,7 @@ func (s *Store) WriteTyp(t *typ.Transacted) (te *typ.External, err error) {
 
 	defer errors.Deferred(&err, f.Close)
 
-	format := typ.MakeFormatText(s.storeObjekten)
+	format := typ_toml.MakeFormatText(s.storeObjekten)
 
 	if _, err = format.WriteFormat(f, &te.Objekte); err != nil {
 		err = errors.Wrap(err)
@@ -50,7 +51,7 @@ func (s *Store) WriteTyp(t *typ.Transacted) (te *typ.External, err error) {
 }
 
 func (s *Store) ReadTyp(t *typ.External) (err error) {
-	format := typ.MakeFormatText(s.storeObjekten)
+	format := typ_toml.MakeFormatText(s.storeObjekten)
 
 	var f *os.File
 

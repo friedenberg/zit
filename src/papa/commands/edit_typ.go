@@ -48,8 +48,6 @@ func (c EditTyp) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 				return
 			}
 
-			errors.Err().Print(tt)
-
 			var tco *typ.External
 
 			if tco, err = u.StoreWorkingDirectory().WriteTyp(tt); err != nil {

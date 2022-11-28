@@ -8,6 +8,13 @@ type Typ struct {
 	EtikettenRules map[string]EtikettRule `toml:"etiketten-rules,omitempty"`
 }
 
+func (a *Typ) Reset(b *Typ) {
+	panic("not implemented")
+	// if b == nil {
+	// } else {
+	// }
+}
+
 func (a *Typ) Equals(b *Typ) bool {
 	if b == nil || a == nil {
 		return false

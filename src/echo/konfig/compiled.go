@@ -28,11 +28,15 @@ func MakeDefaultCompiled() (c Compiled) {
 		Sku: sku.Sku2[kennung.Typ, *kennung.Typ]{
 			Kennung: kennung.MustTyp("md"),
 		},
-		Typ: typ_toml.Typ{
-			InlineAkte:    true,
-			FileExtension: "md",
+		Typ: typ_toml.Objekte{
+			Akte: typ_toml.Typ{
+				InlineAkte:    true,
+				FileExtension: "md",
+			},
 		},
 	}
+
+	dt.generateSha()
 
 	typen := collections.MakeMutableSet[*compiledTyp](
 		c.Typen.Key,
@@ -83,7 +87,7 @@ func makeCompiled(kt tomlKonfig) (kc Compiled, err error) {
 		}
 
 		ct := makeCompiledTyp(tn)
-		ct.Typ.Apply(&tv)
+		ct.Typ.Akte.Apply(&tv)
 		typen.Add(ct)
 	}
 
@@ -92,6 +96,7 @@ func makeCompiled(kt tomlKonfig) (kc Compiled, err error) {
 	typen.Each(
 		func(ct *compiledTyp) (err error) {
 			ct.ApplyExpanded(kc)
+			ct.generateSha()
 			return
 		},
 	)
@@ -119,7 +124,7 @@ func (c Compiled) GetSortedTypenExpanded(v string) (expandedActual []*compiledTy
 	)
 
 	sort.Slice(expandedActual, func(i, j int) bool {
-		return expandedActual[i].Sku.Kennung.Less(expandedActual[j].Sku.Kennung)
+		return expandedActual[i].Sku.Kennung.Len() > expandedActual[j].Sku.Kennung.Len()
 	})
 
 	return

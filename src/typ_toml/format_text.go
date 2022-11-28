@@ -1,4 +1,4 @@
-package typ
+package typ_toml
 
 import (
 	"io"
@@ -41,7 +41,7 @@ func (f FormatText) ReadFormat(r io.Reader, t *Objekte) (n int64, err error) {
 			close(chDone)
 		}()
 
-		if err := td.Decode(&t.Akte.KonfigTyp); err != nil {
+		if err := td.Decode(&t.Akte); err != nil {
 			if !errors.IsEOF(err) {
 				pr.CloseWithError(err)
 			}
@@ -71,8 +71,20 @@ func (f FormatText) WriteFormat(w io.Writer, t *Objekte) (n int64, err error) {
 	var ar sha.ReadCloser
 
 	if ar, err = f.arf.AkteReader(t.Sha); err != nil {
-		err = errors.Wrap(err)
-		return
+    //TODO surface as format option
+		if errors.IsNotExist(err) {
+			enc := toml.NewEncoder(w)
+
+			if err = enc.Encode(&t.Akte); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	defer errors.Deferred(&err, ar.Close)

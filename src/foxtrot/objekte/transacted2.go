@@ -6,9 +6,10 @@ import (
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/metadatei_io"
 	"github.com/friedenberg/zit/src/echo/sku"
+	"github.com/friedenberg/zit/src/objekte_format"
 )
 
-type Transacted2[T Objekte2, T1 ObjektePtr[T], T2 Identifier2[T2], T3 IdentifierPtr[T2]] struct {
+type Transacted2[T objekte_format.Objekte2, T1 objekte_format.Objekte2Ptr[T], T2 Identifier2[T2], T3 IdentifierPtr[T2]] struct {
 	Objekte T
 	Sku     sku.Sku2[T2, T3]
 }
@@ -17,15 +18,21 @@ func (t Transacted2[T, T1, T2, T3]) Kennung() T3 {
 	return &t.Sku.Kennung
 }
 
-func (t Transacted2[T, T1, T2, T3]) Sha() sha.Sha {
-	return t.Sku.Sha
-}
-
 func (t Transacted2[T, T1, T2, T3]) AkteSha() sha.Sha {
 	return t.Objekte.AkteSha()
 }
 
-func (t *Transacted2[T, T1, T2, T3]) SetSha(
+func (t *Transacted2[T, T1, T2, T3]) SetAkteSha(
+	s sha.Sha,
+) {
+	T1(&t.Objekte).SetAkteSha(s)
+}
+
+func (t Transacted2[T, T1, T2, T3]) ObjekteSha() sha.Sha {
+	return t.Sku.Sha
+}
+
+func (t *Transacted2[T, T1, T2, T3]) SetObjekteSha(
 	arf metadatei_io.AkteReaderFactory,
 	v string,
 ) (err error) {

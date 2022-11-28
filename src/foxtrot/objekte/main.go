@@ -3,32 +3,12 @@ package objekte
 import (
 	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/delta/metadatei_io"
+	"github.com/friedenberg/zit/src/objekte_format"
 )
 
-type Objekte interface {
-	Gattung() gattung.Gattung
-}
-
-type Objekte2 interface {
-	Objekte
-	AkteSha() sha.Sha
-	//TODO
-	// SetAkteSha(sha.Sha)
-}
-
-type Stored2 interface {
-	Objekte2
-	Sha() sha.Sha
-	SetSha(metadatei_io.AkteReaderFactory, string) error
-}
-
-type ObjektePtr[T any] interface {
-	*T
-	collections.Equatable[T]
-	collections.Resetable[T]
-}
+type Objekte = objekte_format.Objekte
+type Objekte2 = objekte_format.Objekte2
+type Stored2 = objekte_format.Stored2
 
 type Identifier[T any] interface {
 	collections.ValueElement

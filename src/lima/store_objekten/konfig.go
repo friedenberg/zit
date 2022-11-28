@@ -97,7 +97,7 @@ func (s konfigStore) transact(
 
 	kt.Sku.Sha = w.Sha()
 
-	if kt.Sha().Equals(mutter.Sha()) {
+	if kt.ObjekteSha().Equals(mutter.ObjekteSha()) {
 		kt = &mutter
 
 		if err = s.KonfigLogWriters.Unchanged(kt); err != nil {

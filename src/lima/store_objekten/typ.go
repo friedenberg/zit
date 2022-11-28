@@ -98,7 +98,7 @@ func (s typStore) transact(
 
 	tt.Sku.Sha = w.Sha()
 
-	if mutter != nil && tt.Sha().Equals(mutter.Sha()) {
+	if mutter != nil && tt.ObjekteSha().Equals(mutter.ObjekteSha()) {
 		tt = mutter
 
 		if err = s.TypLogWriters.Unchanged(tt); err != nil {
@@ -150,14 +150,8 @@ func (s typStore) ReadOne(
 	}
 
 	tt = &typ.Transacted{
-		Sku: ct.Sku,
-		Objekte: typ.Objekte{
-			//TODO
-			//Sha
-			Akte: typ.Akte{
-				KonfigTyp: ct.Typ,
-			},
-		},
+		Sku:     ct.Sku,
+		Objekte: ct.Typ,
 	}
 
 	return

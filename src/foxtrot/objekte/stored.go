@@ -2,9 +2,10 @@ package objekte
 
 import (
 	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/objekte_format"
 )
 
-type Stored[T Objekte, T1 ObjektePtr[T]] struct {
+type Stored[T objekte_format.Objekte, T1 objekte_format.ObjektePtr[T]] struct {
 	Sha     sha.Sha
 	Objekte T
 }
