@@ -5,17 +5,18 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 )
 
 type mutableSetAlias[T any] struct {
 	MutableSet[T]
 }
 
-type MutableValueSet[T ValueElement, T1 ValueElementPtr[T]] struct {
+type MutableValueSet[T gattung.ValueElement, T1 gattung.ValueElementPtr[T]] struct {
 	mutableSetAlias[T]
 }
 
-func MakeMutableValueSet[T ValueElement, T1 ValueElementPtr[T]](
+func MakeMutableValueSet[T gattung.ValueElement, T1 gattung.ValueElementPtr[T]](
 	es ...T,
 ) (s MutableValueSet[T, T1]) {
 	s.mutableSetAlias = mutableSetAlias[T]{
@@ -30,7 +31,7 @@ func MakeMutableValueSet[T ValueElement, T1 ValueElementPtr[T]](
 	return
 }
 
-func MakeMutableValueSetStrings[T ValueElement, T1 ValueElementPtr[T]](
+func MakeMutableValueSetStrings[T gattung.ValueElement, T1 gattung.ValueElementPtr[T]](
 	vs ...string,
 ) (s MutableValueSet[T, T1], err error) {
 	es := make([]T, len(vs))

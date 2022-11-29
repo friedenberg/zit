@@ -5,14 +5,15 @@ import (
 	"encoding/gob"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 )
 
-type MutableSet2[T Element, T1 ElementPtr[T]] struct {
+type MutableSet2[T gattung.Element, T1 gattung.ElementPtr[T]] struct {
 	private setPrivate[T, T1]
 }
 
-func MutableSet2FromSlice[T Element, T1 ElementPtr[T]](
-	keyer Keyer[T, T1],
+func MutableSet2FromSlice[T gattung.Element, T1 gattung.ElementPtr[T]](
+	keyer gattung.Keyer[T, T1],
 	es ...T1,
 ) (s MutableSet2[T, T1]) {
 	s.private = setPrivateFromSlice(keyer, es...)
@@ -20,8 +21,8 @@ func MutableSet2FromSlice[T Element, T1 ElementPtr[T]](
 	return
 }
 
-func MutableSet2FromSetLike[T Element, T1 ElementPtr[T]](
-	keyer Keyer[T, T1],
+func MutableSet2FromSetLike[T gattung.Element, T1 gattung.ElementPtr[T]](
+	keyer gattung.Keyer[T, T1],
 	s1 SetLike[T1],
 ) (s MutableSet2[T, T1]) {
 	s.private = setPrivateFromSetLike(keyer, s1)

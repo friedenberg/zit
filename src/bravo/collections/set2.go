@@ -5,25 +5,15 @@ import (
 	"encoding/gob"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 )
 
-type Element interface {
-}
-
-type ElementPtr[T Element] interface {
-	*T
-}
-
-type Keyer[T Element, T1 ElementPtr[T]] interface {
-	Key(T1) string
-}
-
-type Set2[T Element, T1 ElementPtr[T]] struct {
+type Set2[T gattung.Element, T1 gattung.ElementPtr[T]] struct {
 	private setPrivate[T, T1]
 }
 
-func Set2FromSlice[T Element, T1 ElementPtr[T]](
-	keyer Keyer[T, T1],
+func Set2FromSlice[T gattung.Element, T1 gattung.ElementPtr[T]](
+	keyer gattung.Keyer[T, T1],
 	es ...T1,
 ) (s Set2[T, T1]) {
 	s.private = setPrivateFromSlice(keyer, es...)
@@ -31,8 +21,8 @@ func Set2FromSlice[T Element, T1 ElementPtr[T]](
 	return
 }
 
-func Set2FromSetLike[T Element, T1 ElementPtr[T]](
-	keyer Keyer[T, T1],
+func Set2FromSetLike[T gattung.Element, T1 gattung.ElementPtr[T]](
+	keyer gattung.Keyer[T, T1],
 	s1 SetLike[T1],
 ) (s Set2[T, T1]) {
 	s.private = setPrivateFromSetLike(keyer, s1)

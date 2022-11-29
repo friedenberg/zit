@@ -13,13 +13,13 @@ import (
 
 type KennungLike[T any] interface {
 	Gattung() gattung.Gattung
-	collections.ValueElement
-	collections.Equatable[T]
+	gattung.ValueElement
+	gattung.Equatable[T]
 }
 
 type KennungLikePtr[T any] interface {
-	collections.ValueElementPtr[T]
-	collections.Resetable[T]
+	gattung.ValueElementPtr[T]
+	gattung.Resetable[T]
 }
 
 type Kennung[T KennungLike[T], T1 KennungLikePtr[T]] struct {

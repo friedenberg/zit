@@ -9,7 +9,12 @@ import (
 	"github.com/friedenberg/zit/src/objekte_format"
 )
 
-type Transacted2[T objekte_format.Objekte2, T1 objekte_format.Objekte2Ptr[T], T2 Identifier2[T2], T3 IdentifierPtr[T2]] struct {
+type Transacted2[
+	T objekte_format.Objekte2,
+	T1 objekte_format.Objekte2Ptr[T],
+	T2 gattung.Identifier2[T2],
+	T3 gattung.IdentifierPtr[T2],
+] struct {
 	Objekte T
 	Sku     sku.Sku2[T2, T3]
 }

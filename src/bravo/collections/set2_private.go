@@ -1,12 +1,14 @@
 package collections
 
-type setPrivate[T Element, T1 ElementPtr[T]] struct {
+import "github.com/friedenberg/zit/src/bravo/gattung"
+
+type setPrivate[T gattung.Element, T1 gattung.ElementPtr[T]] struct {
 	Elements map[string]T1
-	Keyer[T, T1]
+	gattung.Keyer[T, T1]
 }
 
-func setPrivateFromSetLike[T Element, T1 ElementPtr[T]](
-	keyer Keyer[T, T1],
+func setPrivateFromSetLike[T gattung.Element, T1 gattung.ElementPtr[T]](
+	keyer gattung.Keyer[T, T1],
 	s1 SetLike[T1],
 ) (s setPrivate[T, T1]) {
 	l := 0
@@ -30,8 +32,8 @@ func setPrivateFromSetLike[T Element, T1 ElementPtr[T]](
 	return
 }
 
-func setPrivateFromSlice[T Element, T1 ElementPtr[T]](
-	keyer Keyer[T, T1],
+func setPrivateFromSlice[T gattung.Element, T1 gattung.ElementPtr[T]](
+	keyer gattung.Keyer[T, T1],
 	es ...T1,
 ) (s setPrivate[T, T1]) {
 	s = setPrivate[T, T1]{

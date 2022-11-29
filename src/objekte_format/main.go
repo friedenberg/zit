@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/line_format"
 	"github.com/friedenberg/zit/src/charlie/sha"
@@ -26,14 +25,14 @@ type Objekte2 interface {
 
 type ObjektePtr[T any] interface {
 	*T
-	collections.Equatable[T]
-	collections.Resetable[T]
+	gattung.Equatable[T]
+	gattung.Resetable[T]
 }
 
 type Objekte2Ptr[T any] interface {
 	*T
-	collections.Equatable[T]
-	collections.Resetable[T]
+	gattung.Equatable[T]
+	gattung.Resetable[T]
 
 	SetAkteSha(sha.Sha)
 }

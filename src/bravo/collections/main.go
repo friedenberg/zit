@@ -2,7 +2,6 @@ package collections
 
 import (
 	"flag"
-	"fmt"
 )
 
 //   _____
@@ -63,27 +62,10 @@ type MutableSetLike[T any] interface {
 //     \_/ \__,_|_|\__,_|\___| |____/ \___|\__|___/
 //
 
-type ValueElement interface {
-	fmt.Stringer
-}
-
-type ValueElementPtr[T any] interface {
-	*T
-	flag.Value
-}
-
 type ValueSetLike[T flag.Value] interface {
 	SetLike[T]
 }
 
 type MutableValueSetLike[T flag.Value] interface {
 	MutableSetLike[T]
-}
-
-type Equatable[T any] interface {
-	Equals(*T) bool
-}
-
-type Resetable[T any] interface {
-	Reset(*T)
 }
