@@ -5,8 +5,8 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/delta/typ_toml"
 	"github.com/friedenberg/zit/src/echo/konfig"
-	"github.com/friedenberg/zit/src/typ_toml"
 )
 
 // TODO-P2 move this to somewhere more appropriate

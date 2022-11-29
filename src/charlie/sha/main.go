@@ -1,6 +1,6 @@
 package sha
 
-import "github.com/friedenberg/zit/src/sha_core"
+import "github.com/friedenberg/zit/src/bravo/sha_core"
 
 const ShaNull = sha_core.ShaNull
 

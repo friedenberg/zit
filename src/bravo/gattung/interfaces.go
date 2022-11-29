@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 
-	"github.com/friedenberg/zit/src/sha_core"
+	"github.com/friedenberg/zit/src/bravo/sha_core"
 )
 
 type Equatable[T any] interface {

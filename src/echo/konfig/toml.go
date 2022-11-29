@@ -1,6 +1,6 @@
 package konfig
 
-import "github.com/friedenberg/zit/src/typ_toml"
+import "github.com/friedenberg/zit/src/delta/typ_toml"
 
 type tomlKonfig struct {
 	RemoteScripts map[string]RemoteScript `toml:"remote-scripts"`

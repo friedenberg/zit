@@ -1,7 +1,7 @@
 package typ
 
 import (
-	"github.com/friedenberg/zit/src/typ_toml"
+	"github.com/friedenberg/zit/src/delta/typ_toml"
 )
 
 type Akte struct {
