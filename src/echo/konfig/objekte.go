@@ -9,9 +9,14 @@ import (
 )
 
 type Objekte struct {
-	Sha        sha.Sha
-	Akte       Compiled
-	tomlKonfig tomlKonfig
+	Sha  sha.Sha
+	Akte Compiled
+	Toml objekteToml
+}
+
+type objekteToml struct {
+	Sha    sha.Sha
+	Konfig tomlKonfig
 }
 
 func (o *Objekte) SetAkteSha(v sha.Sha) {
@@ -50,7 +55,7 @@ func (k *Objekte) AddTyp(
 }
 
 func (k *Objekte) Recompile() (err error) {
-	if err = k.Akte.Recompile(); err != nil {
+	if k.Sha, err = k.Akte.recompile(k.Toml.Sha); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

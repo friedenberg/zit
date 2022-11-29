@@ -42,17 +42,12 @@ func (c *FormatText) ReadFormat(r1 io.Reader, k *Objekte) (n int64, err error) {
 		td.DisallowUnknownFields()
 
 		//TODO fix issue with wrap not adding stack
-		if err = td.Decode(&k.tomlKonfig); err != nil {
+		if err = td.Decode(&k.Toml.Konfig); err != nil {
 			if errors.IsEOF(err) {
 				err = nil
 			} else {
 				pr.CloseWithError(errors.Wrap(err))
 			}
-		}
-
-		if k.Akte, err = makeCompiled(k.tomlKonfig); err != nil {
-			err = errors.Wrap(err)
-			return
 		}
 	}()
 
@@ -79,7 +74,36 @@ func (c *FormatText) ReadFormat(r1 io.Reader, k *Objekte) (n int64, err error) {
 
 	<-chDone
 
-	k.Sha = aw.Sha()
+	k.Toml.Sha = aw.Sha()
+
+	if k.Akte, k.Sha, err = makeCompiled(k.Toml); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (c *FormatText) WriteFormat(w1 io.Writer, k *Objekte) (n int64, err error) {
+	w := bufio.NewWriter(w1)
+
+	defer errors.Deferred(&err, w.Flush)
+
+	var ar sha.ReadCloser
+
+	if ar, err = c.af.AkteReader(
+		k.Toml.Sha,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.Deferred(&err, ar.Close)
+
+	if _, err = io.Copy(w, ar); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }

@@ -6,6 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/collections"
+	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/sku"
 	"github.com/friedenberg/zit/src/typ_toml"
@@ -56,10 +57,12 @@ func MakeDefaultCompiled() (c Compiled) {
 	return
 }
 
-func makeCompiled(kt tomlKonfig) (kc Compiled, err error) {
+func makeCompiled(
+	kt objekteToml,
+) (kc Compiled, sha sha.Sha, err error) {
 	kc = MakeDefaultCompiled()
 
-	for tn, tv := range kt.Tags {
+	for tn, tv := range kt.Konfig.Tags {
 		switch {
 		case tv.Hide:
 			kc.EtikettenHidden = append(kc.EtikettenHidden, tn)
@@ -82,7 +85,7 @@ func makeCompiled(kt tomlKonfig) (kc Compiled, err error) {
 		kc.DefaultTyp,
 	)
 
-	for tn, tv := range kt.Typen {
+	for tn, tv := range kt.Konfig.Typen {
 		ct := makeCompiledTyp(tn)
 		ct.Typ.Akte.Apply(&tv)
 		typen.Add(ct)
@@ -90,7 +93,7 @@ func makeCompiled(kt tomlKonfig) (kc Compiled, err error) {
 
 	kc.Typen = makeCompiledTypSet(typen)
 
-	if err = kc.Recompile(); err != nil {
+	if sha, err = kc.recompile(kt.Sha); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -98,7 +101,9 @@ func makeCompiled(kt tomlKonfig) (kc Compiled, err error) {
 	return
 }
 
-func (c *Compiled) Recompile() (err error) {
+func (c *Compiled) recompile(inSha sha.Sha) (outSha sha.Sha, err error) {
+	shasTypen := sha.MakeMutableSet(inSha)
+
 	if err = c.Typen.Each(
 		func(ct *compiledTyp) (err error) {
 			fe := ct.Typ.Akte.FileExtension
@@ -109,12 +114,17 @@ func (c *Compiled) Recompile() (err error) {
 
 			ct.ApplyExpanded(c)
 			ct.generateSha()
+
+			shasTypen.Add(ct.Sku.Sha)
+
 			return
 		},
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	outSha = sha.ShaFromSet(shasTypen)
 
 	return
 }

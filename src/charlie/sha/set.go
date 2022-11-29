@@ -1,6 +1,10 @@
 package sha
 
 import (
+	"crypto/sha256"
+	"io"
+	"sort"
+
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/collections"
 )
@@ -23,4 +27,30 @@ func MakeMutableSetStrings(vs ...string) (s MutableSet, err error) {
 	s = MutableSet(s1)
 
 	return
+}
+
+func ShaFromSet(s collections.SetLike[Sha]) Sha {
+	hash := sha256.New()
+
+	elements := make([]Sha, 0, s.Len())
+
+	s.Each(
+		func(s Sha) (err error) {
+			elements = append(elements, s)
+			return
+		},
+	)
+
+	sort.Slice(
+		elements,
+		func(i, j int) bool { return elements[i].String() < elements[j].String() },
+	)
+
+	for _, e := range elements {
+		if _, err := io.WriteString(hash, e.String()); err != nil {
+			errors.PanicIfError(errors.Wrap(err))
+		}
+	}
+
+	return FromHash(hash)
 }

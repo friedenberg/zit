@@ -2,13 +2,11 @@ package commands
 
 import (
 	"flag"
-	"io"
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/konfig"
 	"github.com/friedenberg/zit/src/november/umwelt"
 	"github.com/friedenberg/zit/src/oscar/user_ops"
@@ -29,9 +27,9 @@ func init() {
 }
 
 func (c EditKonfig) Run(u *umwelt.Umwelt, args ...string) (err error) {
-  if len(args) > 0 {
-    errors.Err().Print("Command edit-konfig ignores passed in arguments.")
-  }
+	if len(args) > 0 {
+		errors.Err().Print("Command edit-konfig ignores passed in arguments.")
+	}
 
 	var p string
 
@@ -101,18 +99,9 @@ func (c EditKonfig) makeTempKonfigFile(
 
 	p = f.Name()
 
-	var ar sha.ReadCloser
+	format := konfig.MakeFormatText(u.StoreObjekten())
 
-	if ar, err = u.StoreObjekten().AkteReader(
-		k.Objekte.Sha,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.Deferred(&err, ar.Close)
-
-	if _, err = io.Copy(f, ar); err != nil {
+	if _, err = format.WriteFormat(f, &k.Objekte); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
