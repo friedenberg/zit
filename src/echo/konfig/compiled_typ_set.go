@@ -14,6 +14,12 @@ type compiledTypSet struct {
 	collections.Set2[compiledTyp, *compiledTyp]
 }
 
+func makeCompiledTypSetFromSlice(s1 []*compiledTyp) (s compiledTypSet) {
+	s.Set2 = collections.Set2FromSlice[compiledTyp, *compiledTyp](s, s1...)
+
+	return
+}
+
 func makeCompiledTypSet(s1 collections.SetLike[*compiledTyp]) (s compiledTypSet) {
 	s.Set2 = collections.Set2FromSetLike[compiledTyp, *compiledTyp](s, s1)
 

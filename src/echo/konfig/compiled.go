@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"sort"
 
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/sku"
@@ -82,10 +83,6 @@ func makeCompiled(kt tomlKonfig) (kc Compiled, err error) {
 	)
 
 	for tn, tv := range kt.Typen {
-		if tv.FileExtension != "" {
-			kc.ExtensionsToTypen[tv.FileExtension] = tn
-		}
-
 		ct := makeCompiledTyp(tn)
 		ct.Typ.Akte.Apply(&tv)
 		typen.Add(ct)
@@ -93,13 +90,31 @@ func makeCompiled(kt tomlKonfig) (kc Compiled, err error) {
 
 	kc.Typen = makeCompiledTypSet(typen)
 
-	kc.Typen.Each(
+	if err = kc.Recompile(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (c *Compiled) Recompile() (err error) {
+	if err = c.Typen.Each(
 		func(ct *compiledTyp) (err error) {
-			ct.ApplyExpanded(kc)
+			fe := ct.Typ.Akte.FileExtension
+
+			if fe != "" {
+				c.ExtensionsToTypen[fe] = ct.Sku.Kennung.String()
+			}
+
+			ct.ApplyExpanded(c)
 			ct.generateSha()
 			return
 		},
-	)
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }

@@ -150,6 +150,16 @@ func (s Set2[T, T1]) Each(wf WriterFunc[T1]) (err error) {
 	return
 }
 
+func (s Set2[T, T1]) Elements() (out []T1) {
+	out = make([]T1, 0, s.Len())
+
+	for _, v := range s.private.Elements {
+		out = append(out, v)
+	}
+
+	return
+}
+
 func (s *Set2[T, T1]) GobDecode(bs []byte) (err error) {
 	b := bytes.NewBuffer(bs)
 	dec := gob.NewDecoder(b)

@@ -40,15 +40,17 @@ func (k *Objekte) AddTyp(
 	t *typ_toml.Typ,
 	tk *kennung.Typ,
 ) {
-	//TODO
-	// k.Akte.Typen[tk.String()] = *t
+	ct := makeCompiledTyp(tk.String())
+	ct.Typ.Akte.Apply(t)
+	m := k.Akte.Typen.Elements()
+	m = append(m, ct)
+	k.Akte.Typen = makeCompiledTypSetFromSlice(m)
 
 	return
 }
 
 func (k *Objekte) Recompile() (err error) {
-	//TODO
-	if k.Akte, err = makeCompiled(k.tomlKonfig); err != nil {
+	if err = k.Akte.Recompile(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

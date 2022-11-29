@@ -88,7 +88,7 @@ func (ct *compiledTyp) generateSha() {
 	}
 }
 
-func (ct *compiledTyp) ApplyExpanded(c Compiled) {
+func (ct *compiledTyp) ApplyExpanded(c *Compiled) {
 	expandedActual := c.GetSortedTypenExpanded(ct.Sku.Kennung.String())
 
 	for _, ex := range expandedActual {
