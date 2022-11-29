@@ -1,11 +1,14 @@
 package objekte
 
 import (
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/objekte_format"
 )
 
-type Stored[T objekte_format.Objekte, T1 objekte_format.ObjektePtr[T]] struct {
+type Stored[
+	T gattung.Objekte,
+	T1 gattung.ObjektePtr[T],
+] struct {
 	Sha     sha.Sha
 	Objekte T
 }

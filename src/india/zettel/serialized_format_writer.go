@@ -5,6 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/collections"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/echo/konfig"
 	"github.com/friedenberg/zit/src/golf/typ"
 )
@@ -12,7 +13,7 @@ import (
 func MakeSerializedFormatWriter(
 	f Format,
 	out io.Writer,
-	arf AkteReaderFactory,
+	arf gattung.AkteReaderFactory,
 	k konfig.Konfig,
 ) collections.WriterFunc[*Zettel] {
 	wf := func(z *Zettel) (err error) {

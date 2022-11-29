@@ -1,8 +1,8 @@
 package store_objekten
 
 import (
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/delta/metadatei_io"
 )
 
 type LockSmith interface {
@@ -20,7 +20,7 @@ type writeCloserFactory interface {
 }
 
 type ioFactory interface {
-	metadatei_io.AkteIOFactory
+	gattung.AkteIOFactory
 	readCloserFactory
 	writeCloserFactory
 }

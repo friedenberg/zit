@@ -10,48 +10,13 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/line_format"
 	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/delta/metadatei_io"
 )
 
-type Objekte interface {
-	Gattung() gattung.Gattung
-}
-
-type Objekte2 interface {
-	Objekte
-
-	AkteSha() sha.Sha
-}
-
-type ObjektePtr[T any] interface {
-	*T
-	gattung.Equatable[T]
-	gattung.Resetable[T]
-}
-
-type Objekte2Ptr[T any] interface {
-	*T
-	gattung.Equatable[T]
-	gattung.Resetable[T]
-
-	SetAkteSha(sha.Sha)
-}
-
-type Stored2 interface {
-	Gattung() gattung.Gattung
-
-	AkteSha() sha.Sha
-	SetAkteSha(sha.Sha)
-
-	SetObjekteSha(metadatei_io.AkteReaderFactory, string) error
-	ObjekteSha() sha.Sha
-}
-
 type Format struct {
-	arf metadatei_io.AkteIOFactory
+	arf gattung.AkteIOFactory
 }
 
-func MakeFormat(arf metadatei_io.AkteIOFactory) *Format {
+func MakeFormat(arf gattung.AkteIOFactory) *Format {
 	return &Format{
 		arf: arf,
 	}
@@ -59,7 +24,7 @@ func MakeFormat(arf metadatei_io.AkteIOFactory) *Format {
 
 func (f Format) ReadFormat(
 	r1 io.Reader,
-	o Stored2,
+	o gattung.Stored2,
 ) (n int64, err error) {
 	r := bufio.NewReader(r1)
 
@@ -147,7 +112,7 @@ func (f Format) ReadFormat(
 
 func (f Format) WriteFormat(
 	w1 io.Writer,
-	o Stored2,
+	o gattung.Stored2,
 ) (n int64, err error) {
 	hash := sha256.New()
 	w2 := io.MultiWriter(w1, hash)

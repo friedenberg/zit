@@ -10,13 +10,14 @@ import (
 	"github.com/friedenberg/zit/src/delta/id"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
+	"github.com/friedenberg/zit/src/sha_core"
 )
 
 func (s Store) ReadAllAktenShas(w collections.WriterFunc[sha.Sha]) (err error) {
 	wf := func(p string) (err error) {
 		var sh sha.Sha
 
-		if sh, err = sha.MakeShaFromPath(p); err != nil {
+		if sh, err = sha_core.MakeShaFromPath(p); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

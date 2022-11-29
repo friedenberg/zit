@@ -6,15 +6,15 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/toml"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/delta/metadatei_io"
 )
 
 type FormatText struct {
-	af metadatei_io.AkteIOFactory
+	af gattung.AkteIOFactory
 }
 
-func MakeFormatText(af metadatei_io.AkteIOFactory) *FormatText {
+func MakeFormatText(af gattung.AkteIOFactory) *FormatText {
 	return &FormatText{
 		af: af,
 	}

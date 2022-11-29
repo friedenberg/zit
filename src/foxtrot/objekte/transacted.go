@@ -5,12 +5,11 @@ import (
 	"github.com/friedenberg/zit/src/bravo/int_value"
 	"github.com/friedenberg/zit/src/delta/ts"
 	"github.com/friedenberg/zit/src/echo/sku"
-	"github.com/friedenberg/zit/src/objekte_format"
 )
 
 type Transacted[
-	T objekte_format.Objekte,
-	T1 objekte_format.ObjektePtr[T],
+	T gattung.Objekte,
+	T1 gattung.ObjektePtr[T],
 	T2 gattung.Identifier[T2],
 	T3 gattung.IdentifierPtr[T2],
 ] struct {

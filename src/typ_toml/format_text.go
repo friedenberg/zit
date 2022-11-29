@@ -5,16 +5,16 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/toml"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/delta/metadatei_io"
 )
 
 type FormatText struct {
-	arf             metadatei_io.AkteIOFactory
+	arf             gattung.AkteIOFactory
 	IgnoreTypErrors bool
 }
 
-func MakeFormatText(arf metadatei_io.AkteIOFactory) *FormatText {
+func MakeFormatText(arf gattung.AkteIOFactory) *FormatText {
 	return &FormatText{
 		arf: arf,
 	}
@@ -70,7 +70,7 @@ func (f FormatText) WriteFormat(w io.Writer, t *Objekte) (n int64, err error) {
 	var ar sha.ReadCloser
 
 	if ar, err = f.arf.AkteReader(t.Sha); err != nil {
-    //TODO surface as format option
+		//TODO surface as format option
 		if errors.IsNotExist(err) {
 			enc := toml.NewEncoder(w)
 

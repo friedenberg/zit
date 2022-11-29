@@ -4,14 +4,12 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/delta/metadatei_io"
 	"github.com/friedenberg/zit/src/echo/sku"
-	"github.com/friedenberg/zit/src/objekte_format"
 )
 
 type Transacted2[
-	T objekte_format.Objekte2,
-	T1 objekte_format.Objekte2Ptr[T],
+	T gattung.Objekte2,
+	T1 gattung.Objekte2Ptr[T],
 	T2 gattung.Identifier2[T2],
 	T3 gattung.IdentifierPtr[T2],
 ] struct {
@@ -38,7 +36,7 @@ func (t Transacted2[T, T1, T2, T3]) ObjekteSha() sha.Sha {
 }
 
 func (t *Transacted2[T, T1, T2, T3]) SetObjekteSha(
-	arf metadatei_io.AkteReaderFactory,
+	arf gattung.AkteReaderFactory,
 	v string,
 ) (err error) {
 	if err = t.Sku.Sha.Set(v); err != nil {

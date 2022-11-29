@@ -60,7 +60,7 @@ func (ct compiledTyp) ObjekteSha() sha.Sha {
 }
 
 func (ct *compiledTyp) SetObjekteSha(
-	arf metadatei_io.AkteReaderFactory,
+	arf gattung.AkteReaderFactory,
 	v string,
 ) (err error) {
 	if err = ct.Sku.Sha.Set(v); err != nil {

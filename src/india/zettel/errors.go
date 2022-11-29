@@ -7,6 +7,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
 )
 
@@ -14,7 +15,7 @@ type ErrHasInlineAkteAndFilePath struct {
 	FilePath string
 	Zettel
 	sha.Sha
-	AkteWriterFactory
+	gattung.AkteWriterFactory
 }
 
 func (e ErrHasInlineAkteAndFilePath) Error() string {

@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
-func (s Sha) Glob(pc ...string) (globbed Sha, err error) {
+func Glob(s Sha, pc ...string) (globbed Sha, err error) {
 	p := s.Path(pc...)
 
 	var matches []string

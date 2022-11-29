@@ -4,19 +4,16 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/delta/metadatei_io"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/echo/konfig"
 )
-
-type AkteWriterFactory = metadatei_io.AkteWriterFactory
-type AkteReaderFactory = metadatei_io.AkteReaderFactory
 
 type FormatContextRead struct {
 	Zettel            Zettel
 	AktePath          string
 	In                io.Reader
 	RecoverableErrors errors.Multi
-	AkteWriterFactory
+	gattung.AkteWriterFactory
 }
 
 type FormatContextWrite struct {
@@ -25,7 +22,7 @@ type FormatContextWrite struct {
 	IncludeAkte      bool
 	FormatScript     konfig.RemoteScript
 	ExternalAktePath string
-	AkteReaderFactory
+	gattung.AkteReaderFactory
 }
 
 type Format interface {

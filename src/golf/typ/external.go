@@ -5,7 +5,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/delta/metadatei_io"
 	"github.com/friedenberg/zit/src/fd"
 	"github.com/friedenberg/zit/src/typ_toml"
 )
@@ -44,7 +43,7 @@ func (e External) ObjekteSha() sha.Sha {
 }
 
 func (e *External) SetObjekteSha(
-	arf metadatei_io.AkteReaderFactory,
+	arf gattung.AkteReaderFactory,
 	v string,
 ) (err error) {
 	if err = e.Sha.Set(v); err != nil {

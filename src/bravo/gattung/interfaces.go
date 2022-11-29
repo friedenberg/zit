@@ -3,6 +3,8 @@ package gattung
 import (
 	"flag"
 	"fmt"
+
+	"github.com/friedenberg/zit/src/sha_core"
 )
 
 type Equatable[T any] interface {
@@ -47,4 +49,55 @@ type Identifier2[T any] interface {
 type IdentifierPtr[T any] interface {
 	ValueElementPtr[T]
 	Reset(*T)
+}
+
+type Objekte interface {
+	Gattung() Gattung
+}
+
+type Objekte2 interface {
+	Objekte
+
+	AkteSha() sha_core.Sha
+}
+
+type ObjektePtr[T any] interface {
+	*T
+	Equatable[T]
+	Resetable[T]
+}
+
+type Objekte2Ptr[T any] interface {
+	*T
+	Equatable[T]
+	Resetable[T]
+
+	SetAkteSha(sha_core.Sha)
+}
+
+type Stored2 interface {
+	Gattung() Gattung
+
+	AkteSha() sha_core.Sha
+	SetAkteSha(sha_core.Sha)
+
+	SetObjekteSha(AkteReaderFactory, string) error
+	ObjekteSha() sha_core.Sha
+}
+
+type AkteIOFactory interface {
+	AkteReaderFactory
+	AkteWriterFactory
+}
+
+type AkteReaderFactory interface {
+	AkteReader(sha_core.Sha) (sha_core.ReadCloser, error)
+}
+
+type AkteWriterFactory interface {
+	AkteWriter() (sha_core.WriteCloser, error)
+}
+
+type AkteIOFactoryFactory interface {
+	AkteFactory(Gattung) AkteIOFactory
 }
