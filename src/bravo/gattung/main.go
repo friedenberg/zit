@@ -51,7 +51,7 @@ func (g Gattung) String() string {
 
 	case Kennung:
 		return "Kennung"
-    
+
 	default:
 		return "Unknown"
 	}

@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/fd"
+	"github.com/friedenberg/zit/src/echo/fd"
 )
 
 // TODO remove

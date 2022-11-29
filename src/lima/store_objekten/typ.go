@@ -127,7 +127,7 @@ func (s typStore) transact(
 	return
 }
 
-//TODO write konfig compiled
+// TODO write konfig compiled
 func (s typStore) writeTransactedToIndex(tt *typ.Transacted) (err error) {
 	if !s.common.LockSmith.IsAcquired() {
 		err = ErrLockRequired{

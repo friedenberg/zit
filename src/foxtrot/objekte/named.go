@@ -28,7 +28,7 @@ func (a *Named[T, T1, T2, T3]) Equals(b *Named[T, T1, T2, T3]) bool {
 	return true
 }
 
-//TODO include kennung in reset
+// TODO include kennung in reset
 func (zn *Named[T, T1, T2, T3]) Reset() {
 	// zn.Kennung = hinweis.Hinweis{}
 	zn.Stored.Reset()

@@ -137,8 +137,8 @@ func (s konfigStore) transact(
 	return
 }
 
-//This is intentionally a value to prevent accidental global changes to the
-//current Konfig
+// This is intentionally a value to prevent accidental global changes to the
+// current Konfig
 func (s konfigStore) Read() (tt konfig.Transacted, err error) {
 	tt = s.common.Konfig.Transacted
 

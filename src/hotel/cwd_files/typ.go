@@ -6,7 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/fd"
+	"github.com/friedenberg/zit/src/echo/fd"
 	"github.com/friedenberg/zit/src/golf/typ"
 )
 

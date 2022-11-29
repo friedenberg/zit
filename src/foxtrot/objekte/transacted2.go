@@ -57,7 +57,7 @@ func (zt Transacted2[T, T1, T2, T3]) IsNew() bool {
 	return zt.Sku.Kopf == zt.Sku.Schwanz && zt.Sku.TransactionIndex == 0
 }
 
-//TODO-P0
+// TODO-P0
 func (a Transacted2[T, T1, T2, T3]) Equals(
 	b Transacted2[T, T1, T2, T3],
 ) bool {
