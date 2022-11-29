@@ -25,7 +25,7 @@ func MakeWriterSchwanzen() *WriterSchwanzen {
 	}
 }
 
-func (zws *WriterSchwanzen) Less(zt *zettel_transacted.Zettel) (ok bool) {
+func (zws *WriterSchwanzen) Less(zt *zettel_transacted.Transacted) (ok bool) {
 	zws.lock.RLock()
 	defer zws.lock.RUnlock()
 
@@ -57,7 +57,7 @@ func (zws *WriterSchwanzen) Get(h hinweis.Hinweis) (t ts.Time, ok bool) {
 	return
 }
 
-func (zws *WriterSchwanzen) Set(z *zettel_transacted.Zettel) (ok bool) {
+func (zws *WriterSchwanzen) Set(z *zettel_transacted.Transacted) (ok bool) {
 	zws.lock.Lock()
 	defer zws.lock.Unlock()
 
@@ -78,7 +78,7 @@ func (zws *WriterSchwanzen) Set(z *zettel_transacted.Zettel) (ok bool) {
 }
 
 func (zws *WriterSchwanzen) WriteZettelTransacted(
-	z *zettel_transacted.Zettel,
+	z *zettel_transacted.Transacted,
 ) (err error) {
 	if ok := zws.Set(z); !ok {
 		err = io.EOF

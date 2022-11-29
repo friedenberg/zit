@@ -6,7 +6,7 @@ import (
 )
 
 type Zettel struct {
-	Internal zettel_transacted.Zettel
+	Internal zettel_transacted.Transacted
 	External zettel_external.Zettel
 	State
 }

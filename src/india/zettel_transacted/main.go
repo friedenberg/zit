@@ -13,6 +13,6 @@ type zettel_transacted = objekte.Transacted[
 	*hinweis.Hinweis,
 ]
 
-type Zettel = zettel_transacted
+type Transacted = zettel_transacted
 
 // type Zettel = zettel2.Transacted

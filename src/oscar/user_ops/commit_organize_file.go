@@ -50,7 +50,7 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 		var ok bool
 
 		if z, ok = toUpdate[h.String()]; !ok {
-			var tz zettel_transacted.Zettel
+			var tz zettel_transacted.Transacted
 
 			if tz, err = store.Zettel().ReadHinweisSchwanzen(h); err != nil {
 				err = errors.Wrapf(err, "{Hinweis String: '%s'}: {Hinweis: '%s'}", hString, h)

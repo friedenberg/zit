@@ -191,7 +191,7 @@ func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 		var err1 zettel.ErrHasInvalidAkteShaOrFilePath
 
 		if errors.As(e, &err1) {
-			var mutter zettel_transacted.Zettel
+			var mutter zettel_transacted.Transacted
 
 			if mutter, err = s.storeObjekten.Zettel().ReadHinweisSchwanzen(ez.Named.Kennung); err != nil {
 				unrecoverableErrors.Add(errors.Wrap(err))

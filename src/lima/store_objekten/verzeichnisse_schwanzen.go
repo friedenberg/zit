@@ -42,7 +42,7 @@ func makeVerzeichnisseSchwanzen(
 
 func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 	h hinweis.Hinweis,
-) (tz zettel_transacted.Zettel, err error) {
+) (tz zettel_transacted.Transacted, err error) {
 	var n int
 
 	if n, err = s.Zettelen.PageForHinweis(h); err != nil {

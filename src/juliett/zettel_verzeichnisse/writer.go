@@ -8,7 +8,7 @@ import (
 )
 
 func MakeWriterZettelTransacted(
-	wf collections.WriterFunc[*zettel_transacted.Zettel],
+	wf collections.WriterFunc[*zettel_transacted.Transacted],
 ) collections.WriterFunc[*Zettel] {
 	return func(z *Zettel) (err error) {
 		if err = wf(&z.Transacted); err != nil {

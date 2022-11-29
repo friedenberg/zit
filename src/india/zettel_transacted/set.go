@@ -6,13 +6,13 @@ import (
 )
 
 type MutableSet struct {
-	collections.MutableSet[*Zettel]
+	collections.MutableSet[*Transacted]
 }
 
 func MakeMutableSetUnique(c int) MutableSet {
 	return MutableSet{
 		MutableSet: collections.MakeMutableSet(
-			func(sz *Zettel) string {
+			func(sz *Transacted) string {
 				if sz == nil {
 					return ""
 				}
@@ -34,7 +34,7 @@ func MakeMutableSetUnique(c int) MutableSet {
 func MakeMutableSetHinweis(c int) MutableSet {
 	return MutableSet{
 		MutableSet: collections.MakeMutableSet(
-			func(sz *Zettel) string {
+			func(sz *Transacted) string {
 				if sz == nil {
 					return ""
 				}
@@ -67,7 +67,7 @@ func (s MutableSet) ToSetPrefixTransacted() (b SetPrefixTransacted) {
 	b = MakeSetPrefixTransacted(s.Len())
 
 	s.Each(
-		func(z *Zettel) (err error) {
+		func(z *Transacted) (err error) {
 			b.Add(*z)
 
 			return
@@ -81,7 +81,7 @@ func (s MutableSet) ToSliceHinweisen() (b []hinweis.Hinweis) {
 	b = make([]hinweis.Hinweis, 0, s.Len())
 
 	s.Each(
-		func(z *Zettel) (err error) {
+		func(z *Transacted) (err error) {
 			b = append(b, z.Named.Kennung)
 
 			return

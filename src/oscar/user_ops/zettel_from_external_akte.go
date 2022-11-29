@@ -69,7 +69,7 @@ func (c ZettelFromExternalAkte) Run(
 	}
 
 	err = results.Each(
-		func(z *zettel_transacted.Zettel) (err error) {
+		func(z *zettel_transacted.Transacted) (err error) {
 			if c.ProtoZettel.Apply(&z.Named.Stored.Objekte) {
 				if *z, err = c.StoreObjekten().Zettel().Update(
 					&z.Named,
@@ -94,7 +94,7 @@ func (c ZettelFromExternalAkte) Run(
 				return
 			}
 
-			var tz zettel_transacted.Zettel
+			var tz zettel_transacted.Transacted
 
 			if tz, err = c.StoreObjekten().Zettel().Create(z.Named.Stored.Objekte); err != nil {
 				err = errors.Wrap(err)

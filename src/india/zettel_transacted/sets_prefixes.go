@@ -27,7 +27,7 @@ func (s SetPrefixTransacted) Len() int {
 }
 
 // this splits on right-expanded
-func (s *SetPrefixTransacted) Add(z Zettel) {
+func (s *SetPrefixTransacted) Add(z Transacted) {
 	es := kennung.Expanded(z.Named.Stored.Objekte.Etiketten, kennung.ExpanderRight)
 
 	if es.Len() == 0 {
@@ -44,7 +44,7 @@ func (a SetPrefixTransacted) Subtract(b MutableSet) (c SetPrefixTransacted) {
 
 	for e, aSet := range a.innerMap {
 		aSet.Each(
-			func(z *Zettel) (err error) {
+			func(z *Transacted) (err error) {
 				if b.Contains(z) {
 					return
 				}
@@ -59,7 +59,7 @@ func (a SetPrefixTransacted) Subtract(b MutableSet) (c SetPrefixTransacted) {
 	return
 }
 
-func (s *SetPrefixTransacted) addPair(e kennung.Etikett, z Zettel) {
+func (s *SetPrefixTransacted) addPair(e kennung.Etikett, z Transacted) {
 	s.count += 1
 
 	existing, ok := s.innerMap[e]
@@ -88,11 +88,11 @@ func (a SetPrefixTransacted) Each(f func(kennung.Etikett, MutableSet) error) (er
 	return
 }
 
-func (a SetPrefixTransacted) EachZettel(f func(kennung.Etikett, Zettel) error) error {
+func (a SetPrefixTransacted) EachZettel(f func(kennung.Etikett, Transacted) error) error {
 	return a.Each(
 		func(e kennung.Etikett, st MutableSet) (err error) {
 			st.Each(
-				func(z *Zettel) (err error) {
+				func(z *Transacted) (err error) {
 					err = f(e, *z)
 					return
 				},
@@ -116,7 +116,7 @@ func (a SetPrefixTransacted) Subset(e kennung.Etikett) (out SetPrefixTransactedS
 		}
 
 		zSet.Each(
-			func(z *Zettel) (err error) {
+			func(z *Transacted) (err error) {
 				intersection := z.Named.Stored.Objekte.Etiketten.IntersectPrefixes(kennung.MakeEtikettSet(e))
 				errors.Log().Printf("%s yields %s", e1, intersection)
 

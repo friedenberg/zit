@@ -11,8 +11,8 @@ import (
 func MakeCliFormat(
 	znf format.FormatWriterFunc[zettel.Named],
 	verb string,
-) format.FormatWriterFunc[Zettel] {
-	return func(w io.Writer, z *Zettel) (n int64, err error) {
+) format.FormatWriterFunc[Transacted] {
+	return func(w io.Writer, z *Transacted) (n int64, err error) {
 		return format.Write(
 			w,
 			format.MakeFormatStringRightAlignedParen(verb),

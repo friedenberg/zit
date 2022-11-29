@@ -8,12 +8,12 @@ import (
 
 type OptionsReadExternal struct {
 	zettel.Format
-	Zettelen map[hinweis.Hinweis]zettel_transacted.Zettel
+	Zettelen map[hinweis.Hinweis]zettel_transacted.Transacted
 }
 
 type CheckoutOptions struct {
 	Force bool
 	CheckoutMode
 	zettel.Format
-	Zettelen map[hinweis.Hinweis]zettel_transacted.Zettel
+	Zettelen map[hinweis.Hinweis]zettel_transacted.Transacted
 }

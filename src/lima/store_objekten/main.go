@@ -131,14 +131,14 @@ func (s Store) RevertTransaktion(
 
 			errors.Log().Print(o)
 
-			var chain []*zettel_transacted.Zettel
+			var chain []*zettel_transacted.Transacted
 
 			if chain, err = s.zettelStore.AllInChain(*h); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			var tz zettel_transacted.Zettel
+			var tz zettel_transacted.Transacted
 
 			for _, someTz := range chain {
 				errors.Log().Print(someTz)
@@ -244,14 +244,14 @@ func (s *Store) Reindex() (err error) {
 				switch o.Gattung {
 
 				case gattung.Zettel:
-					var tz zettel_transacted.Zettel
+					var tz zettel_transacted.Transacted
 
 					if tz, err = s.zettelStore.transactedZettelFromTransaktionObjekte(t, o); err != nil {
 						err = errors.Wrap(err)
 						return
 					}
 
-					var mutter *zettel_transacted.Zettel
+					var mutter *zettel_transacted.Transacted
 
 					if mutter1, err := s.zettelStore.verzeichnisseSchwanzen.ReadHinweisSchwanzen(tz.Named.Kennung); err == nil {
 						mutter = &mutter1

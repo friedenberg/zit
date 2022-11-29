@@ -13,13 +13,13 @@ type WriterIds struct {
 	Filter id_set.Filter
 }
 
-func (w WriterIds) WriteZettelTransacted(z *Zettel) (err error) {
-	z1 := zettelFilterable{Zettel: z}
+func (w WriterIds) WriteZettelTransacted(z *Transacted) (err error) {
+	z1 := zettelFilterable{Transacted: z}
 	return w.Filter.Include(z1)
 }
 
 type zettelFilterable struct {
-	*Zettel
+	*Transacted
 }
 
 func (z zettelFilterable) Gattung() gattung.Gattung {

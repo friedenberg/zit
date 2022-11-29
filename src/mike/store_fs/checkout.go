@@ -24,7 +24,7 @@ type ZettelCheckedOutLogWriters struct {
 
 func (s *Store) Checkout(
 	options CheckoutOptions,
-	ztw collections.WriterFunc[*zettel_transacted.Zettel],
+	ztw collections.WriterFunc[*zettel_transacted.Transacted],
 ) (zcs zettel_checked_out.MutableSet, err error) {
 	zcs = zettel_checked_out.MakeMutableSetUnique(0)
 	zts := zettel_transacted.MakeMutableSetUnique(0)
@@ -32,14 +32,14 @@ func (s *Store) Checkout(
 	if err = s.storeObjekten.Zettel().ReadAllSchwanzenTransacted(
 		ztw,
 		zts.Add,
-		collections.MakeWriterDoNotRepool[zettel_transacted.Zettel](),
+		collections.MakeWriterDoNotRepool[zettel_transacted.Transacted](),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	zts.Each(
-		func(zt *zettel_transacted.Zettel) (err error) {
+		func(zt *zettel_transacted.Transacted) (err error) {
 			var zc zettel_checked_out.Zettel
 
 			if zc, err = s.CheckoutOne(options, *zt); err != nil {
@@ -77,7 +77,7 @@ func (s Store) shouldCheckOut(
 
 func (s Store) filenameForZettelTransacted(
 	options CheckoutOptions,
-	sz zettel_transacted.Zettel,
+	sz zettel_transacted.Transacted,
 ) (originalFilename string, filename string, err error) {
 	if originalFilename, err = id.MakeDirIfNecessary(sz.Named.Kennung, s.Cwd()); err != nil {
 		err = errors.Wrap(err)
@@ -91,7 +91,7 @@ func (s Store) filenameForZettelTransacted(
 
 func (s *Store) CheckoutOne(
 	options CheckoutOptions,
-	sz zettel_transacted.Zettel,
+	sz zettel_transacted.Transacted,
 ) (cz zettel_checked_out.Zettel, err error) {
 	var originalFilename, filename string
 

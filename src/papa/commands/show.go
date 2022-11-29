@@ -166,10 +166,10 @@ func (c Show) showZettels(
 }
 
 func (c Show) showAkten(store *umwelt.Umwelt, ids id_set.Set) (err error) {
-	zettels := make([]zettel_transacted.Zettel, ids.Len())
+	zettels := make([]zettel_transacted.Transacted, ids.Len())
 
 	for i, is := range ids.AnyShasOrHinweisen() {
-		var tz zettel_transacted.Zettel
+		var tz zettel_transacted.Transacted
 
 		if tz, err = store.StoreObjekten().Zettel().ReadOne(is); err != nil {
 			err = errors.Wrap(err)

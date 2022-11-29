@@ -121,7 +121,7 @@ func (i *indexAbbr) readIfNecessary() (err error) {
 	return
 }
 
-func (i *indexAbbr) addZettelTransacted(zt zettel_transacted.Zettel) (err error) {
+func (i *indexAbbr) addZettelTransacted(zt zettel_transacted.Transacted) (err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return

@@ -29,7 +29,7 @@ func (ip Pool) WriteZettelVerzeichnisse(z *Zettel) (err error) {
 }
 
 func (p Pool) MakeZettel(
-	tz zettel_transacted.Zettel,
+	tz zettel_transacted.Transacted,
 ) (z *Zettel) {
 	z = p.Get()
 	z.Transacted = tz

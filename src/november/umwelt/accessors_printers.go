@@ -45,7 +45,7 @@ func (u *Umwelt) PrinterTypCheckedOut(
 
 func (u *Umwelt) PrinterZettelTransacted(
 	verb string,
-) collections.WriterFunc[*zettel_transacted.Zettel] {
+) collections.WriterFunc[*zettel_transacted.Transacted] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
 		u.FormatZettelTransacted(verb),

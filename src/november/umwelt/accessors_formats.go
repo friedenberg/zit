@@ -136,7 +136,7 @@ func (u *Umwelt) FormatZettelCheckedOutFresh(
 	)
 }
 
-func (u *Umwelt) FormatZettelTransacted(verb string) format.FormatWriterFunc[zettel_transacted.Zettel] {
+func (u *Umwelt) FormatZettelTransacted(verb string) format.FormatWriterFunc[zettel_transacted.Transacted] {
 	return zettel_transacted.MakeCliFormat(
 		u.FormatZettelNamed(),
 		verb,

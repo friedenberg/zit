@@ -4,21 +4,21 @@ import (
 	"sort"
 )
 
-type Slice []Zettel
+type Slice []Transacted
 
 func MakeSlice(c int) Slice {
-	return make([]Zettel, 0, c)
+	return make([]Transacted, 0, c)
 }
 
 func (s Slice) Len() int {
 	return len(s)
 }
 
-func (s *Slice) Append(tz Zettel) {
+func (s *Slice) Append(tz Transacted) {
 	*s = append(*s, tz)
 }
 
-func (s Slice) Get(i int) Zettel {
+func (s Slice) Get(i int) Transacted {
 	return s[i]
 }
 

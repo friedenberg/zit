@@ -8,8 +8,8 @@ import (
 
 func MakeWriterZettelNamed(
 	wf collections.WriterFunc[*zettel.Named],
-) collections.WriterFunc[*Zettel] {
-	return func(z *Zettel) (err error) {
+) collections.WriterFunc[*Transacted] {
+	return func(z *Transacted) (err error) {
 		if err = wf(&z.Named); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -21,8 +21,8 @@ func MakeWriterZettelNamed(
 
 func MakeWriterZettel(
 	wf collections.WriterFunc[*zettel.Zettel],
-) collections.WriterFunc[*Zettel] {
-	return func(z *Zettel) (err error) {
+) collections.WriterFunc[*Transacted] {
+	return func(z *Transacted) (err error) {
 		if err = wf(&z.Named.Stored.Objekte); err != nil {
 			err = errors.Wrap(err)
 			return

@@ -52,10 +52,10 @@ func (c Log) RunWithIds(os *umwelt.Umwelt, is id_set.Set) (err error) {
 	}
 
 	//TODO-P2 switch to streams
-	chains := make([][]*zettel_transacted.Zettel, 0, hs.Len())
+	chains := make([][]*zettel_transacted.Transacted, 0, hs.Len())
 
 	for _, h := range hs.Elements() {
-		var chain []*zettel_transacted.Zettel
+		var chain []*zettel_transacted.Transacted
 
 		if chain, err = os.StoreObjekten().Zettel().AllInChain(h); err != nil {
 			err = errors.Wrap(err)

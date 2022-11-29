@@ -66,7 +66,7 @@ func (atc Factory) makeChildren(
 		prefixSet.ToSet().Each(used.Add)
 
 		err = prefixSet.EachZettel(
-			func(e kennung.Etikett, tz zettel_transacted.Zettel) (err error) {
+			func(e kennung.Etikett, tz zettel_transacted.Transacted) (err error) {
 				var z zettel
 
 				if z, err = makeZettel(tz.Named, atc.Abbr); err != nil {
@@ -91,7 +91,7 @@ func (atc Factory) makeChildren(
 	segments := prefixSet.Subset(groupingEtiketten[0])
 
 	err = segments.Ungrouped.Each(
-		func(tz *zettel_transacted.Zettel) (err error) {
+		func(tz *zettel_transacted.Transacted) (err error) {
 			var z zettel
 
 			if z, err = makeZettel(tz.Named, atc.Abbr); err != nil {

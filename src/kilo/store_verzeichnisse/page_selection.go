@@ -18,7 +18,7 @@ func (i Zettelen) PageForHinweis(h hinweis.Hinweis) (n int, err error) {
 	return i.PageForSha(s)
 }
 
-func (i Zettelen) PageForTransacted(z zettel_transacted.Zettel) (n int, err error) {
+func (i Zettelen) PageForTransacted(z zettel_transacted.Transacted) (n int, err error) {
 	s := z.Named.Stored.Sha
 	return i.PageForSha(s)
 }

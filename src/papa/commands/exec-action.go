@@ -84,7 +84,7 @@ func (c ExecAction) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 		},
 	}
 
-	iter := func(tz *zettel_transacted.Zettel) (err error) {
+	iter := func(tz *zettel_transacted.Transacted) (err error) {
 		typ := tz.Named.Stored.Objekte.Typ.String()
 
 		typKonfig := u.Konfig().Transacted.Objekte.GetTyp(typ)
@@ -123,7 +123,7 @@ func (c ExecAction) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 func (c ExecAction) runExecutor(
 	u *umwelt.Umwelt,
 	executor *typ_toml.Action,
-	z *zettel_transacted.Zettel,
+	z *zettel_transacted.Transacted,
 ) (err error) {
 	var cmd *exec.Cmd
 

@@ -33,7 +33,7 @@ func (c Checkin) Run(
 	defer c.Unlock()
 
 	for _, z := range zettelen {
-		var tz zettel_transacted.Zettel
+		var tz zettel_transacted.Transacted
 
 		if tz, err = c.StoreObjekten().Zettel().Update(&z.Named); err != nil {
 			err = errors.Wrap(err)

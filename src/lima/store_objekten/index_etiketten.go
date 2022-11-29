@@ -117,8 +117,8 @@ func (i *indexEtiketten) readIfNecessary() (err error) {
 }
 
 func (i *indexEtiketten) addZettelWithOptionalMutter(
-	z *zettel_transacted.Zettel,
-	zMutter *zettel_transacted.Zettel,
+	z *zettel_transacted.Transacted,
+	zMutter *zettel_transacted.Transacted,
 ) (err error) {
 	zEtiketten := z.Named.Stored.Objekte.Etiketten
 

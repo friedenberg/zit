@@ -76,7 +76,7 @@ func (c CreateFromPaths) Run(args ...string) (results zettel_transacted.MutableS
 	}
 
 	err = results.Each(
-		func(z *zettel_transacted.Zettel) (err error) {
+		func(z *zettel_transacted.Transacted) (err error) {
 			if c.ProtoZettel.Apply(&z.Named.Stored.Objekte) {
 				if *z, err = c.StoreObjekten().Zettel().Update(
 					&z.Named,

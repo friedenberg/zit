@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/id_set"
 )
 
-//TODO rename
+// TODO rename
 type SetPrefixNamed map[kennung.Etikett]collections.MutableSet[id_set.Element]
 
 type SetPrefixNamedSegments struct {

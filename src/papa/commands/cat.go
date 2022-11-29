@@ -232,7 +232,7 @@ func (c Cat) typen(u *umwelt.Umwelt) (err error) {
 	typen := collections.MakeMutableValueSet[kennung.Typ, *kennung.Typ]()
 
 	if err = u.StoreObjekten().Zettel().ReadAllSchwanzenTransacted(
-		func(z *zettel_transacted.Zettel) (err error) {
+		func(z *zettel_transacted.Transacted) (err error) {
 			err = typen.Add(z.Named.Stored.Objekte.Typ)
 
 			return
