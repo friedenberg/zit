@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/echo/id_set"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
+	"github.com/friedenberg/zit/src/india/zettel"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
@@ -44,10 +44,10 @@ func (c Copy) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 func (c Copy) RunWithIds(s *umwelt.Umwelt, ids id_set.Set) (err error) {
 	hins := ids.Hinweisen()
 
-	zettels := make([]zettel_transacted.Transacted, hins.Len())
+	zettels := make([]zettel.Transacted, hins.Len())
 
 	for i, h := range hins.Elements() {
-		var tz zettel_transacted.Transacted
+		var tz zettel.Transacted
 
 		if tz, err = s.StoreObjekten().Zettel().ReadHinweisSchwanzen(h); err != nil {
 			err = errors.Wrap(err)

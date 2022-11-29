@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/india/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_external"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
@@ -24,7 +23,7 @@ type ZettelFromExternalAkte struct {
 
 func (c ZettelFromExternalAkte) Run(
 	args ...string,
-) (results zettel_transacted.MutableSet, err error) {
+) (results zettel.MutableSet, err error) {
 	if err = c.Lock(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -35,7 +34,7 @@ func (c ZettelFromExternalAkte) Run(
 	toCreate := zettel_external.MakeMutableSetUniqueAkte()
 	toDelete := zettel_external.MakeMutableSetUniqueFD()
 
-	results = zettel_transacted.MakeMutableSetUnique(len(args))
+	results = zettel.MakeMutableSetUnique(len(args))
 
 	for _, arg := range args {
 		var z *zettel_external.Zettel
@@ -60,7 +59,7 @@ func (c ZettelFromExternalAkte) Run(
 		matcher := zettel_external.MakeMutableMatchSet(toCreate)
 
 		if err = c.StoreObjekten().Zettel().ReadAllTransacted(
-			zettel_transacted.MakeWriterZettelNamed(matcher.Match),
+			zettel.MakeWriterZettelNamed(matcher.Match),
 			results.AddAndDoNotRepool,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -69,7 +68,7 @@ func (c ZettelFromExternalAkte) Run(
 	}
 
 	err = results.Each(
-		func(z *zettel_transacted.Transacted) (err error) {
+		func(z *zettel.Transacted) (err error) {
 			if c.ProtoZettel.Apply(&z.Named.Stored.Objekte) {
 				if *z, err = c.StoreObjekten().Zettel().Update(
 					&z.Named,
@@ -94,7 +93,7 @@ func (c ZettelFromExternalAkte) Run(
 				return
 			}
 
-			var tz zettel_transacted.Transacted
+			var tz zettel.Transacted
 
 			if tz, err = c.StoreObjekten().Zettel().Create(z.Named.Stored.Objekte); err != nil {
 				err = errors.Wrap(err)

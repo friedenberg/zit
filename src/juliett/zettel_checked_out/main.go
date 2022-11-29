@@ -1,12 +1,12 @@
 package zettel_checked_out
 
 import (
+	"github.com/friedenberg/zit/src/india/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_external"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
 )
 
 type Zettel struct {
-	Internal zettel_transacted.Transacted
+	Internal zettel.Transacted
 	External zettel_external.Zettel
 	State
 }

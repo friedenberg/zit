@@ -4,8 +4,8 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/india/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_external"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
@@ -29,7 +29,7 @@ func (c DeleteCheckout) Run(
 
 	if err = zes.Each(
 		func(external *zettel_external.Zettel) (err error) {
-			var internal zettel_transacted.Transacted
+			var internal zettel.Transacted
 
 			if internal, err = c.StoreObjekten().Zettel().ReadHinweisSchwanzen(external.Named.Kennung); err != nil {
 				err = errors.Wrap(err)

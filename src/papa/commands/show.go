@@ -17,7 +17,6 @@ import (
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/golf/typ"
 	"github.com/friedenberg/zit/src/india/zettel"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
@@ -142,12 +141,12 @@ func (c Show) showZettels(
 	fv *zettel.FormatValue,
 ) (err error) {
 	w := collections.MakeChain(
-		zettel_transacted.WriterIds{
+		zettel.WriterIds{
 			Filter: id_set.Filter{
 				Set: ids,
 			},
 		}.WriteZettelTransacted,
-		zettel_transacted.MakeWriterZettel(
+		zettel.MakeWriterZettel(
 			zettel.MakeSerializedFormatWriter(
 				fv.Format,
 				store.Out(),
@@ -166,10 +165,10 @@ func (c Show) showZettels(
 }
 
 func (c Show) showAkten(store *umwelt.Umwelt, ids id_set.Set) (err error) {
-	zettels := make([]zettel_transacted.Transacted, ids.Len())
+	zettels := make([]zettel.Transacted, ids.Len())
 
 	for i, is := range ids.AnyShasOrHinweisen() {
-		var tz zettel_transacted.Transacted
+		var tz zettel.Transacted
 
 		if tz, err = store.StoreObjekten().Zettel().ReadOne(is); err != nil {
 			err = errors.Wrap(err)

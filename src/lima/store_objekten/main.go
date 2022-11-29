@@ -13,7 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/konfig"
 	"github.com/friedenberg/zit/src/echo/sku"
 	"github.com/friedenberg/zit/src/golf/transaktion"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
+	"github.com/friedenberg/zit/src/india/zettel"
 	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
 )
 
@@ -103,7 +103,7 @@ func (s *Store) CurrentTransaktionTime() ts.Time {
 
 func (s Store) RevertTransaktion(
 	t *transaktion.Transaktion,
-) (tzs zettel_transacted.MutableSet, err error) {
+) (tzs zettel.MutableSet, err error) {
 	if !s.common.LockSmith.IsAcquired() {
 		err = ErrLockRequired{
 			Operation: "revert",
@@ -112,7 +112,7 @@ func (s Store) RevertTransaktion(
 		return
 	}
 
-	tzs = zettel_transacted.MakeMutableSetUnique(t.Len())
+	tzs = zettel.MakeMutableSetUnique(t.Len())
 
 	t.Each(
 		func(o *sku.Sku) (err error) {
@@ -131,14 +131,14 @@ func (s Store) RevertTransaktion(
 
 			errors.Log().Print(o)
 
-			var chain []*zettel_transacted.Transacted
+			var chain []*zettel.Transacted
 
 			if chain, err = s.zettelStore.AllInChain(*h); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			var tz zettel_transacted.Transacted
+			var tz zettel.Transacted
 
 			for _, someTz := range chain {
 				errors.Log().Print(someTz)
@@ -244,14 +244,14 @@ func (s *Store) Reindex() (err error) {
 				switch o.Gattung {
 
 				case gattung.Zettel:
-					var tz zettel_transacted.Transacted
+					var tz zettel.Transacted
 
 					if tz, err = s.zettelStore.transactedZettelFromTransaktionObjekte(t, o); err != nil {
 						err = errors.Wrap(err)
 						return
 					}
 
-					var mutter *zettel_transacted.Transacted
+					var mutter *zettel.Transacted
 
 					if mutter1, err := s.zettelStore.verzeichnisseSchwanzen.ReadHinweisSchwanzen(tz.Named.Kennung); err == nil {
 						mutter = &mutter1

@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/ts"
 	"github.com/friedenberg/zit/src/echo/sku"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
+	"github.com/friedenberg/zit/src/india/zettel"
 )
 
 type WriterSchwanzen struct {
@@ -25,7 +25,7 @@ func MakeWriterSchwanzen() *WriterSchwanzen {
 	}
 }
 
-func (zws *WriterSchwanzen) Less(zt *zettel_transacted.Transacted) (ok bool) {
+func (zws *WriterSchwanzen) Less(zt *zettel.Transacted) (ok bool) {
 	zws.lock.RLock()
 	defer zws.lock.RUnlock()
 
@@ -57,7 +57,7 @@ func (zws *WriterSchwanzen) Get(h hinweis.Hinweis) (t ts.Time, ok bool) {
 	return
 }
 
-func (zws *WriterSchwanzen) Set(z *zettel_transacted.Transacted) (ok bool) {
+func (zws *WriterSchwanzen) Set(z *zettel.Transacted) (ok bool) {
 	zws.lock.Lock()
 	defer zws.lock.Unlock()
 
@@ -78,7 +78,7 @@ func (zws *WriterSchwanzen) Set(z *zettel_transacted.Transacted) (ok bool) {
 }
 
 func (zws *WriterSchwanzen) WriteZettelTransacted(
-	z *zettel_transacted.Transacted,
+	z *zettel.Transacted,
 ) (err error) {
 	if ok := zws.Set(z); !ok {
 		err = io.EOF

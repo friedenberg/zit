@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
+	zettel_pkg "github.com/friedenberg/zit/src/india/zettel"
 )
 
 type Factory struct {
@@ -32,7 +32,7 @@ func (atc *Factory) Make() (ot *Text, err error) {
 
 		segments := prefixSet.Subset(e)
 
-		var used zettel_transacted.MutableSet
+		var used zettel_pkg.MutableSet
 
 		if used, err = atc.makeChildren(ee, segments.Grouped, kennung.MakeSlice(e)); err != nil {
 			err = errors.Wrap(err)
@@ -57,16 +57,16 @@ func (atc *Factory) Make() (ot *Text, err error) {
 
 func (atc Factory) makeChildren(
 	parent *assignment,
-	prefixSet zettel_transacted.SetPrefixTransacted,
+	prefixSet zettel_pkg.SetPrefixTransacted,
 	groupingEtiketten kennung.Slice,
-) (used zettel_transacted.MutableSet, err error) {
-	used = zettel_transacted.MakeMutableSetUnique(0)
+) (used zettel_pkg.MutableSet, err error) {
+	used = zettel_pkg.MakeMutableSetUnique(0)
 
 	if groupingEtiketten.Len() == 0 {
 		prefixSet.ToSet().Each(used.Add)
 
 		err = prefixSet.EachZettel(
-			func(e kennung.Etikett, tz zettel_transacted.Transacted) (err error) {
+			func(e kennung.Etikett, tz zettel_pkg.Transacted) (err error) {
 				var z zettel
 
 				if z, err = makeZettel(tz.Named, atc.Abbr); err != nil {
@@ -91,7 +91,7 @@ func (atc Factory) makeChildren(
 	segments := prefixSet.Subset(groupingEtiketten[0])
 
 	err = segments.Ungrouped.Each(
-		func(tz *zettel_transacted.Transacted) (err error) {
+		func(tz *zettel_pkg.Transacted) (err error) {
 			var z zettel
 
 			if z, err = makeZettel(tz.Named, atc.Abbr); err != nil {
@@ -110,7 +110,7 @@ func (atc Factory) makeChildren(
 	}
 
 	segments.Grouped.Each(
-		func(e kennung.Etikett, zs zettel_transacted.MutableSet) (err error) {
+		func(e kennung.Etikett, zs zettel_pkg.MutableSet) (err error) {
 			if atc.UsePrefixJoints {
 				if parent.etiketten.Len() > 1 {
 				} else {
@@ -147,7 +147,7 @@ func (atc Factory) makeChildren(
 						nextGroupingEtiketten = groupingEtiketten[1:]
 					}
 
-					var usedChild zettel_transacted.MutableSet
+					var usedChild zettel_pkg.MutableSet
 
 					usedChild, err = atc.makeChildren(child, zs.ToSetPrefixTransacted(), nextGroupingEtiketten)
 
@@ -170,7 +170,7 @@ func (atc Factory) makeChildren(
 					nextGroupingEtiketten = groupingEtiketten[1:]
 				}
 
-				var usedChild zettel_transacted.MutableSet
+				var usedChild zettel_pkg.MutableSet
 
 				usedChild, err = atc.makeChildren(child, zs.ToSetPrefixTransacted(), nextGroupingEtiketten)
 

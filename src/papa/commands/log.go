@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/echo/id_set"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
+	"github.com/friedenberg/zit/src/india/zettel"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
@@ -52,10 +52,10 @@ func (c Log) RunWithIds(os *umwelt.Umwelt, is id_set.Set) (err error) {
 	}
 
 	//TODO-P2 switch to streams
-	chains := make([][]*zettel_transacted.Transacted, 0, hs.Len())
+	chains := make([][]*zettel.Transacted, 0, hs.Len())
 
 	for _, h := range hs.Elements() {
-		var chain []*zettel_transacted.Transacted
+		var chain []*zettel.Transacted
 
 		if chain, err = os.StoreObjekten().Zettel().AllInChain(h); err != nil {
 			err = errors.Wrap(err)

@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
+	"github.com/friedenberg/zit/src/india/zettel"
 )
 
 func (i Zettelen) PageForHinweis(h hinweis.Hinweis) (n int, err error) {
@@ -18,7 +18,7 @@ func (i Zettelen) PageForHinweis(h hinweis.Hinweis) (n int, err error) {
 	return i.PageForSha(s)
 }
 
-func (i Zettelen) PageForTransacted(z zettel_transacted.Transacted) (n int, err error) {
+func (i Zettelen) PageForTransacted(z zettel.Transacted) (n int, err error) {
 	s := z.Named.Stored.Sha
 	return i.PageForSha(s)
 }

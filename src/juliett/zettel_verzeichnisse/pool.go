@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
+	"github.com/friedenberg/zit/src/india/zettel"
 )
 
 type Pool struct {
@@ -29,7 +29,7 @@ func (ip Pool) WriteZettelVerzeichnisse(z *Zettel) (err error) {
 }
 
 func (p Pool) MakeZettel(
-	tz zettel_transacted.Transacted,
+	tz zettel.Transacted,
 ) (z *Zettel) {
 	z = p.Get()
 	z.Transacted = tz

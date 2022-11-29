@@ -1,4 +1,4 @@
-package zettel_transacted
+package zettel
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"

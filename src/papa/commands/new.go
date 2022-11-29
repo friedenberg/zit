@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/hotel/cwd_files"
 	"github.com/friedenberg/zit/src/india/zettel"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
 	"github.com/friedenberg/zit/src/mike/store_fs"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -71,7 +70,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			return
 		}
 	} else {
-		var zts zettel_transacted.MutableSet
+		var zts zettel.MutableSet
 
 		if zts, err = c.readExistingFilesAsZettels(u, f, args...); err != nil {
 			err = errors.Wrap(err)
@@ -108,7 +107,7 @@ func (c New) readExistingFilesAsZettels(
 	u *umwelt.Umwelt,
 	f zettel.Format,
 	args ...string,
-) (zts zettel_transacted.MutableSet, err error) {
+) (zts zettel.MutableSet, err error) {
 	opCreateFromPath := user_ops.CreateFromPaths{
 		Umwelt:      u,
 		Format:      f,

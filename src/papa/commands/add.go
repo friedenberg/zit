@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/echo/id_set"
 	"github.com/friedenberg/zit/src/india/zettel"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/organize_text"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
 	"github.com/friedenberg/zit/src/mike/store_fs"
@@ -56,7 +55,7 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		Dedupe:      c.Dedupe,
 	}
 
-	var zettelsFromAkteResults zettel_transacted.MutableSet
+	var zettelsFromAkteResults zettel.MutableSet
 
 	if zettelsFromAkteResults, err = zettelsFromAkteOp.Run(args...); err != nil {
 		err = errors.Wrap(err)
@@ -146,7 +145,7 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 func (c Add) openAktenIfNecessary(
 	u *umwelt.Umwelt,
-	zettels zettel_transacted.MutableSet,
+	zettels zettel.MutableSet,
 ) (err error) {
 	if !c.OpenAkten {
 		return
@@ -166,7 +165,7 @@ func (c Add) openAktenIfNecessary(
 
 	var checkoutResults zettel_checked_out.MutableSet
 
-	query := zettel_transacted.WriterIds{
+	query := zettel.WriterIds{
 		Filter: id_set.Filter{
 			Set: ids,
 		},

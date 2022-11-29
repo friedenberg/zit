@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/india/zettel"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
 )
 
 type stringId string
@@ -77,7 +76,7 @@ func (e ErrZettelSplitHistory) Error() string {
 
 type ErrAkteExists struct {
 	Akte sha.Sha
-	zettel_transacted.MutableSet
+	zettel.MutableSet
 }
 
 func (e ErrAkteExists) Is(target error) bool {

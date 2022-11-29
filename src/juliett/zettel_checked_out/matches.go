@@ -5,24 +5,24 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/india/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_external"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
 )
 
 type Matches struct {
-	Akten, Bezeichnungen, Zettelen zettel_transacted.MutableSet
+	Akten, Bezeichnungen, Zettelen zettel.MutableSet
 }
 
 func MakeMatches() Matches {
 	return Matches{
-		Akten:         zettel_transacted.MakeMutableSetUnique(0),
-		Bezeichnungen: zettel_transacted.MakeMutableSetUnique(0),
-		Zettelen:      zettel_transacted.MakeMutableSetUnique(0),
+		Akten:         zettel.MakeMutableSetUnique(0),
+		Bezeichnungen: zettel.MakeMutableSetUnique(0),
+		Zettelen:      zettel.MakeMutableSetUnique(0),
 	}
 }
 
 func (m Matches) appendToStringBuilder(sb *strings.Builder, ex zettel_external.Zettel) {
-	typToCollection := map[gattung.Gattung]*zettel_transacted.MutableSet{
+	typToCollection := map[gattung.Gattung]*zettel.MutableSet{
 		gattung.Akte:        &m.Akten,
 		gattung.Bezeichnung: &m.Bezeichnungen,
 		gattung.Zettel:      &m.Zettelen,
@@ -32,7 +32,7 @@ func (m Matches) appendToStringBuilder(sb *strings.Builder, ex zettel_external.Z
 		if c.Len() == 1 && c.Any().Named.Stored.Objekte.Equals(&ex.Named.Stored.Objekte) {
 		} else if c.Len() > 1 {
 			c.Each(
-				func(tz *zettel_transacted.Transacted) (err error) {
+				func(tz *zettel.Transacted) (err error) {
 					sb.WriteString(fmt.Sprintf("\n\t%s (%s match)", tz.Named, t))
 					return
 				},

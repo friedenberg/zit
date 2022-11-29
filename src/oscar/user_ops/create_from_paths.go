@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/india/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_external"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
 	"github.com/friedenberg/zit/src/lima/store_objekten"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -26,7 +25,7 @@ type CreateFromPaths struct {
 	// ReadHinweisFromPath bool
 }
 
-func (c CreateFromPaths) Run(args ...string) (results zettel_transacted.MutableSet, err error) {
+func (c CreateFromPaths) Run(args ...string) (results zettel.MutableSet, err error) {
 	//TODO support different modes of de-duplication
 	//TODO support merging of duplicated akten
 	toCreate := zettel_external.MakeMutableSetUniqueFD()
@@ -49,7 +48,7 @@ func (c CreateFromPaths) Run(args ...string) (results zettel_transacted.MutableS
 		}
 	}
 
-	results = zettel_transacted.MakeMutableSetHinweis(toCreate.Len())
+	results = zettel.MakeMutableSetHinweis(toCreate.Len())
 
 	if err = c.Lock(); err != nil {
 		err = errors.Wrap(err)
@@ -62,7 +61,7 @@ func (c CreateFromPaths) Run(args ...string) (results zettel_transacted.MutableS
 		matcher := zettel_external.MakeMutableMatchSet(toCreate)
 
 		if err = c.StoreObjekten().Zettel().ReadAllTransacted(
-			zettel_transacted.MakeWriterZettelNamed(matcher.Match),
+			zettel.MakeWriterZettelNamed(matcher.Match),
 			results.AddAndDoNotRepool,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -76,7 +75,7 @@ func (c CreateFromPaths) Run(args ...string) (results zettel_transacted.MutableS
 	}
 
 	err = results.Each(
-		func(z *zettel_transacted.Transacted) (err error) {
+		func(z *zettel.Transacted) (err error) {
 			if c.ProtoZettel.Apply(&z.Named.Stored.Objekte) {
 				if *z, err = c.StoreObjekten().Zettel().Update(
 					&z.Named,

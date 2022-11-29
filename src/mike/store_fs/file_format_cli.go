@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/hotel/cwd_files"
 	"github.com/friedenberg/zit/src/india/zettel"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
 )
 
 // (unrecognized) [path.ext@sha]
@@ -34,7 +33,7 @@ func MakeCliFormatNotRecognized(
 
 type FileRecognized struct {
 	cwd_files.File
-	Recognized zettel_transacted.MutableSet
+	Recognized zettel.MutableSet
 }
 
 // (recognized) [path.ext@sha]
@@ -57,7 +56,7 @@ func MakeCliFormatRecognized(
 			format.MakeFormatString("]\n"),
 			func(w io.Writer) (n int64, err error) {
 				err = zr.Recognized.Each(
-					func(zt *zettel_transacted.Transacted) (err error) {
+					func(zt *zettel.Transacted) (err error) {
 						var n2 int
 
 						if n2, err = io.WriteString(

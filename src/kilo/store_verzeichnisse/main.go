@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/echo/konfig"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
+	"github.com/friedenberg/zit/src/india/zettel"
 	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
 )
 
@@ -92,7 +92,7 @@ func (i *Zettelen) Flush() (err error) {
 	return
 }
 
-func (i *Zettelen) Add(tz zettel_transacted.Transacted, v string) (err error) {
+func (i *Zettelen) Add(tz zettel.Transacted, v string) (err error) {
 	var n int
 
 	if n, err = i.PageForString(v); err != nil {
@@ -118,7 +118,7 @@ func (i *Zettelen) Add(tz zettel_transacted.Transacted, v string) (err error) {
 }
 
 func (i *Zettelen) GetPageIndexKeyValue(
-	zt zettel_transacted.Transacted,
+	zt zettel.Transacted,
 ) (key string, value string) {
 	key = zt.Named.Kennung.String()
 	value = fmt.Sprintf("%s.%s", zt.Schwanz, zt.Named.Stored.Sha)

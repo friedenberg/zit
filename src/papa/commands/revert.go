@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/echo/id_set"
 	"github.com/friedenberg/zit/src/golf/transaktion"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
+	"github.com/friedenberg/zit/src/india/zettel"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
@@ -59,7 +59,7 @@ func (c Revert) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 	defer u.Unlock()
 
-	var zts zettel_transacted.MutableSet
+	var zts zettel.MutableSet
 
 	if zts, err = s.RevertTransaktion(transaktion); err != nil {
 		err = errors.Wrap(err)

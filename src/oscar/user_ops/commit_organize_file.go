@@ -5,7 +5,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/india/zettel"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/organize_text"
 	"github.com/friedenberg/zit/src/kilo/changes"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -50,7 +49,7 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 		var ok bool
 
 		if z, ok = toUpdate[h.String()]; !ok {
-			var tz zettel_transacted.Transacted
+			var tz zettel.Transacted
 
 			if tz, err = store.Zettel().ReadHinweisSchwanzen(h); err != nil {
 				err = errors.Wrapf(err, "{Hinweis String: '%s'}: {Hinweis: '%s'}", hString, h)

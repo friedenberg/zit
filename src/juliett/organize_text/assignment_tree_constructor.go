@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
+	zettel_pkg "github.com/friedenberg/zit/src/india/zettel"
 )
 
 type AssignmentTreeConstructor struct {
@@ -41,12 +41,12 @@ func (atc *AssignmentTreeConstructor) Assignments() (roots []*assignment, err er
 
 func (atc AssignmentTreeConstructor) makeChildren(
 	parent *assignment,
-	prefixSet zettel_transacted.SetPrefixTransacted,
+	prefixSet zettel_pkg.SetPrefixTransacted,
 	groupingEtiketten kennung.Slice,
 ) (err error) {
 	if groupingEtiketten.Len() == 0 {
 		err = prefixSet.EachZettel(
-			func(e kennung.Etikett, tz zettel_transacted.Transacted) (err error) {
+			func(e kennung.Etikett, tz zettel_pkg.Transacted) (err error) {
 				var z zettel
 
 				if z, err = makeZettel(tz.Named, atc.Abbr); err != nil {
@@ -71,7 +71,7 @@ func (atc AssignmentTreeConstructor) makeChildren(
 	segments := prefixSet.Subset(groupingEtiketten[0])
 
 	err = segments.Ungrouped.Each(
-		func(tz *zettel_transacted.Transacted) (err error) {
+		func(tz *zettel_pkg.Transacted) (err error) {
 			var z zettel
 
 			if z, err = makeZettel(tz.Named, atc.Abbr); err != nil {
@@ -90,7 +90,7 @@ func (atc AssignmentTreeConstructor) makeChildren(
 	}
 
 	segments.Grouped.Each(
-		func(e kennung.Etikett, zs zettel_transacted.MutableSet) (err error) {
+		func(e kennung.Etikett, zs zettel_pkg.MutableSet) (err error) {
 			if atc.UsePrefixJoints {
 				if parent.etiketten.Len() > 1 {
 				} else {

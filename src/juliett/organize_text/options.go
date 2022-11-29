@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/konfig"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
+	zettel_pkg "github.com/friedenberg/zit/src/india/zettel"
 )
 
 type Options struct {
@@ -17,7 +17,7 @@ type Options struct {
 	Typ               kennung.Typ
 	GroupingEtiketten kennung.Slice
 	ExtraEtiketten    kennung.EtikettSet
-	Transacted        zettel_transacted.MutableSet
+	Transacted        zettel_pkg.MutableSet
 
 	UsePrefixJoints        bool
 	UseRightAlignedIndents bool
@@ -33,7 +33,7 @@ func MakeOptions() Options {
 		RootEtiketten:     kennung.MakeEtikettSet(),
 		GroupingEtiketten: kennung.MakeSlice(),
 		ExtraEtiketten:    kennung.MakeEtikettSet(),
-		Transacted:        zettel_transacted.MakeMutableSetHinweis(0),
+		Transacted:        zettel_pkg.MakeMutableSetHinweis(0),
 	}
 }
 

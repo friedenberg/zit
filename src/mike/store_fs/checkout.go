@@ -12,7 +12,6 @@ import (
 	"github.com/friedenberg/zit/src/golf/typ"
 	"github.com/friedenberg/zit/src/india/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_external"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
 )
 
@@ -24,22 +23,22 @@ type ZettelCheckedOutLogWriters struct {
 
 func (s *Store) Checkout(
 	options CheckoutOptions,
-	ztw collections.WriterFunc[*zettel_transacted.Transacted],
+	ztw collections.WriterFunc[*zettel.Transacted],
 ) (zcs zettel_checked_out.MutableSet, err error) {
 	zcs = zettel_checked_out.MakeMutableSetUnique(0)
-	zts := zettel_transacted.MakeMutableSetUnique(0)
+	zts := zettel.MakeMutableSetUnique(0)
 
 	if err = s.storeObjekten.Zettel().ReadAllSchwanzenTransacted(
 		ztw,
 		zts.Add,
-		collections.MakeWriterDoNotRepool[zettel_transacted.Transacted](),
+		collections.MakeWriterDoNotRepool[zettel.Transacted](),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	zts.Each(
-		func(zt *zettel_transacted.Transacted) (err error) {
+		func(zt *zettel.Transacted) (err error) {
 			var zc zettel_checked_out.Zettel
 
 			if zc, err = s.CheckoutOne(options, *zt); err != nil {
@@ -77,7 +76,7 @@ func (s Store) shouldCheckOut(
 
 func (s Store) filenameForZettelTransacted(
 	options CheckoutOptions,
-	sz zettel_transacted.Transacted,
+	sz zettel.Transacted,
 ) (originalFilename string, filename string, err error) {
 	if originalFilename, err = id.MakeDirIfNecessary(sz.Named.Kennung, s.Cwd()); err != nil {
 		err = errors.Wrap(err)
@@ -91,7 +90,7 @@ func (s Store) filenameForZettelTransacted(
 
 func (s *Store) CheckoutOne(
 	options CheckoutOptions,
-	sz zettel_transacted.Transacted,
+	sz zettel.Transacted,
 ) (cz zettel_checked_out.Zettel, err error) {
 	var originalFilename, filename string
 

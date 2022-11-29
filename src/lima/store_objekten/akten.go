@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha_core"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/id"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
+	"github.com/friedenberg/zit/src/india/zettel"
 	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
 )
 
@@ -53,7 +53,7 @@ func (s Store) AkteExists(sh sha.Sha) (err error) {
 		return
 	}
 
-	set := zettel_transacted.MakeMutableSetUnique(0)
+	set := zettel.MakeMutableSetUnique(0)
 
 	if err = s.zettelStore.verzeichnisseAll.ReadMany(
 		func(z *zettel_verzeichnisse.Zettel) (err error) {

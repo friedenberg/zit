@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/id_set"
 	"github.com/friedenberg/zit/src/india/zettel"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
@@ -106,7 +105,7 @@ func (c CatObjekte) akten(u *umwelt.Umwelt, shas sha.Set) (err error) {
 
 func (c CatObjekte) zettelen(u *umwelt.Umwelt, shas sha.Set) (err error) {
 	w := collections.MakeChain(
-		zettel_transacted.MakeWriterZettelNamed(
+		zettel.MakeWriterZettelNamed(
 			func(z *zettel.Named) (err error) {
 				if !shas.Contains(z.Stored.Sha) {
 					err = io.EOF
@@ -115,7 +114,7 @@ func (c CatObjekte) zettelen(u *umwelt.Umwelt, shas sha.Set) (err error) {
 				return
 			},
 		),
-		zettel_transacted.MakeWriterZettel(
+		zettel.MakeWriterZettel(
 			zettel.MakeSerializedFormatWriter(
 				&zettel.Objekte{},
 				u.Out(),

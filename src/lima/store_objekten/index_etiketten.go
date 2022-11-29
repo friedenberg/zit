@@ -8,7 +8,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
+	"github.com/friedenberg/zit/src/india/zettel"
 )
 
 type indexEtiketten struct {
@@ -117,8 +117,8 @@ func (i *indexEtiketten) readIfNecessary() (err error) {
 }
 
 func (i *indexEtiketten) addZettelWithOptionalMutter(
-	z *zettel_transacted.Transacted,
-	zMutter *zettel_transacted.Transacted,
+	z *zettel.Transacted,
+	zMutter *zettel.Transacted,
 ) (err error) {
 	zEtiketten := z.Named.Stored.Objekte.Etiketten
 

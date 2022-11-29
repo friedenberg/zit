@@ -19,6 +19,17 @@ type Zettel struct {
 	Etiketten   kennung.EtikettSet
 }
 
+type zettel_transacted = objekte.Transacted[
+	Zettel,
+	*Zettel,
+	hinweis.Hinweis,
+	*hinweis.Hinweis,
+]
+
+type Transacted = zettel_transacted
+
+// type Zettel = zettel2.Transacted
+
 type Stored = objekte.Stored[Zettel, *Zettel]
 
 type Named = objekte.Named[

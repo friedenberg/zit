@@ -1,13 +1,12 @@
-package zettel_transacted
+package zettel
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/collections"
-	"github.com/friedenberg/zit/src/india/zettel"
 )
 
 func MakeWriterZettelNamed(
-	wf collections.WriterFunc[*zettel.Named],
+	wf collections.WriterFunc[*Named],
 ) collections.WriterFunc[*Transacted] {
 	return func(z *Transacted) (err error) {
 		if err = wf(&z.Named); err != nil {
@@ -20,7 +19,7 @@ func MakeWriterZettelNamed(
 }
 
 func MakeWriterZettel(
-	wf collections.WriterFunc[*zettel.Zettel],
+	wf collections.WriterFunc[*Zettel],
 ) collections.WriterFunc[*Transacted] {
 	return func(z *Transacted) (err error) {
 		if err = wf(&z.Named.Stored.Objekte); err != nil {

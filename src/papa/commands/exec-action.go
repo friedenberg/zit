@@ -14,7 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/ts"
 	"github.com/friedenberg/zit/src/delta/typ_toml"
 	"github.com/friedenberg/zit/src/echo/id_set"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
+	"github.com/friedenberg/zit/src/india/zettel"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
@@ -77,14 +77,14 @@ func (c ExecAction) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 		return
 	}
 
-	query := zettel_transacted.WriterIds{
+	query := zettel.WriterIds{
 		Filter: id_set.Filter{
 			Set: ids,
 			// Or:  c.Or,
 		},
 	}
 
-	iter := func(tz *zettel_transacted.Transacted) (err error) {
+	iter := func(tz *zettel.Transacted) (err error) {
 		typ := tz.Named.Stored.Objekte.Typ.String()
 
 		typKonfig := u.Konfig().Transacted.Objekte.GetTyp(typ)
@@ -123,7 +123,7 @@ func (c ExecAction) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 func (c ExecAction) runExecutor(
 	u *umwelt.Umwelt,
 	executor *typ_toml.Action,
-	z *zettel_transacted.Transacted,
+	z *zettel.Transacted,
 ) (err error) {
 	var cmd *exec.Cmd
 

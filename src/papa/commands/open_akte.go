@@ -12,7 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/id"
 	"github.com/friedenberg/zit/src/echo/id_set"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
+	"github.com/friedenberg/zit/src/india/zettel"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
@@ -59,7 +59,7 @@ func (c OpenAkte) RunWithIds(store *umwelt.Umwelt, is id_set.Set) (err error) {
 
 	for i, h := range hins.Elements() {
 		func(h hinweis.Hinweis) {
-			var tz zettel_transacted.Transacted
+			var tz zettel.Transacted
 
 			if tz, err = store.StoreObjekten().Zettel().ReadHinweisSchwanzen(h); err != nil {
 				err = errors.Wrap(err)

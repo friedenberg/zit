@@ -12,7 +12,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/id_set"
 	"github.com/friedenberg/zit/src/india/zettel"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
@@ -111,7 +110,7 @@ func (c Cat) zettelWriter(
 
 func (c Cat) zettelen(u *umwelt.Umwelt) (err error) {
 	if err = u.StoreObjekten().Zettel().ReadAllSchwanzenTransacted(
-		zettel_transacted.MakeWriterZettel(
+		zettel.MakeWriterZettel(
 			c.zettelWriter(u),
 		),
 	); err != nil {
@@ -154,7 +153,7 @@ func (c Cat) zettelen(u *umwelt.Umwelt) (err error) {
 //	if err = c.akteShasFromIds(
 //		store,
 //		ids,
-//		func(z *zettel_transacted.Zettel) (err error) {
+//		func(z *zettel.Zettel) (err error) {
 //			sb := z.Named.Stored.Objekte.Akte
 
 //			if sb.IsNull() {
@@ -198,14 +197,14 @@ func (c Cat) akten(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 		err = errors.Wrap(err)
 		return
 	}
-	// w := zettel_transacted.MakeWriterChain(
-	// 	zettel_transacted.MakeWriterZettelNamed(
+	// w := zettel.MakeWriterChain(
+	// 	zettel.MakeWriterZettelNamed(
 	// 		zettel_named.FilterIdSet{
 	// 			AllowEmpty: true,
 	// 			Set:        ids,
 	// 		}.WriteZettelNamed,
 	// 	),
-	// 	zettel_transacted.MakeWriterZettel(
+	// 	zettel.MakeWriterZettel(
 	// 		collections.MakeSyncSerializer(
 	// 			func(z *zettel.Zettel) (err error) {
 	// 				_, err = fmt.Fprintln(u.Out(), z.Akte.String())
@@ -232,7 +231,7 @@ func (c Cat) typen(u *umwelt.Umwelt) (err error) {
 	typen := collections.MakeMutableValueSet[kennung.Typ, *kennung.Typ]()
 
 	if err = u.StoreObjekten().Zettel().ReadAllSchwanzenTransacted(
-		func(z *zettel_transacted.Transacted) (err error) {
+		func(z *zettel.Transacted) (err error) {
 			err = typen.Add(z.Named.Stored.Objekte.Typ)
 
 			return

@@ -14,7 +14,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/india/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_external"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
 	"github.com/friedenberg/zit/src/lima/store_objekten"
 )
@@ -191,7 +190,7 @@ func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 		var err1 zettel.ErrHasInvalidAkteShaOrFilePath
 
 		if errors.As(e, &err1) {
-			var mutter zettel_transacted.Transacted
+			var mutter zettel.Transacted
 
 			if mutter, err = s.storeObjekten.Zettel().ReadHinweisSchwanzen(ez.Named.Kennung); err != nil {
 				unrecoverableErrors.Add(errors.Wrap(err))

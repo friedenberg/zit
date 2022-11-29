@@ -3,8 +3,8 @@ package user_ops
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/hinweis"
+	"github.com/friedenberg/zit/src/india/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_external"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
 	"github.com/friedenberg/zit/src/mike/store_fs"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -33,7 +33,7 @@ func (c Checkin) Run(
 	defer c.Unlock()
 
 	for _, z := range zettelen {
-		var tz zettel_transacted.Transacted
+		var tz zettel.Transacted
 
 		if tz, err = c.StoreObjekten().Zettel().Update(&z.Named); err != nil {
 			err = errors.Wrap(err)

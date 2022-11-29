@@ -8,11 +8,11 @@ import (
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/echo/id_set"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
+	"github.com/friedenberg/zit/src/india/zettel"
 )
 
 type FilterZettelsWithScript struct {
-	Set    zettel_transacted.MutableSet
+	Set    zettel.MutableSet
 	Filter script_value.ScriptValue
 }
 
@@ -38,7 +38,7 @@ func (op FilterZettelsWithScript) Run() (err error) {
 		return
 	}
 
-	enc := zettel_transacted.MakeWriterJson(w)
+	enc := zettel.MakeWriterJson(w)
 
 	chDone, chErr := op.runGetHinweisen(r)
 
@@ -61,7 +61,7 @@ func (op FilterZettelsWithScript) Run() (err error) {
 
 		errors.Log().Printf("%#v", hinweisen)
 		op.Set.Chain(
-			func(z *zettel_transacted.Transacted) (err error) {
+			func(z *zettel.Transacted) (err error) {
 				ok := hinweisen.Contains(z.Named.Kennung)
 
 				if ok {

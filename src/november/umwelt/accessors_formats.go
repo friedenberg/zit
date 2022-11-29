@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/hotel/cwd_files"
 	"github.com/friedenberg/zit/src/india/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_external"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
 	"github.com/friedenberg/zit/src/mike/store_fs"
 )
@@ -136,8 +135,8 @@ func (u *Umwelt) FormatZettelCheckedOutFresh(
 	)
 }
 
-func (u *Umwelt) FormatZettelTransacted(verb string) format.FormatWriterFunc[zettel_transacted.Transacted] {
-	return zettel_transacted.MakeCliFormat(
+func (u *Umwelt) FormatZettelTransacted(verb string) format.FormatWriterFunc[zettel.Transacted] {
+	return zettel.MakeCliFormatTransacted(
 		u.FormatZettelNamed(),
 		verb,
 	)

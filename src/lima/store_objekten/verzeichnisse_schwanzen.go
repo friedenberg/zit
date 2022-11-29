@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/delta/hinweis"
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
+	"github.com/friedenberg/zit/src/india/zettel"
 	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
 	"github.com/friedenberg/zit/src/kilo/store_verzeichnisse"
 )
@@ -42,7 +42,7 @@ func makeVerzeichnisseSchwanzen(
 
 func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 	h hinweis.Hinweis,
-) (tz zettel_transacted.Transacted, err error) {
+) (tz zettel.Transacted, err error) {
 	var n int
 
 	if n, err = s.Zettelen.PageForHinweis(h); err != nil {

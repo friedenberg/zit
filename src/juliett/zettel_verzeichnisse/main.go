@@ -1,11 +1,11 @@
 package zettel_verzeichnisse
 
 import (
-	"github.com/friedenberg/zit/src/india/zettel_transacted"
+	"github.com/friedenberg/zit/src/india/zettel"
 )
 
 type Zettel struct {
-	Transacted zettel_transacted.Transacted
+	Transacted zettel.Transacted
 	// Etiketten               tridex.Tridex
 	EtikettenExpandedSorted []string
 	EtikettenSorted         []string
