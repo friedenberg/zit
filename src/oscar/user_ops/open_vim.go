@@ -23,6 +23,13 @@ func (c OpenVim) Run(
 		vimArgs = append(vimArgs, "-c", o)
 	}
 
+	v := "vim started"
+
+	if err = u.PrinterHeader()(&v); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if err = files.OpenVimWithArgs(vimArgs, args...); err != nil {
 		if errors.Is(err, files.ErrEmptyFileList{}) {
 			err = errors.Normal(errors.Wrapf(err, "nothing to open in vim"))
@@ -33,7 +40,7 @@ func (c OpenVim) Run(
 		return
 	}
 
-	v := "opening vim"
+	v = "vim exited"
 
 	if err = u.PrinterHeader()(&v); err != nil {
 		err = errors.Wrap(err)

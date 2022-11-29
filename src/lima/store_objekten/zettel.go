@@ -295,12 +295,11 @@ func (s *zettelStore) Create(in zettel.Zettel) (tz zettel_transacted.Zettel, err
 		return
 	}
 
-	//TODO-P1?
 	//If the zettel exists, short circuit and return that
-	// if tz2, err2 := s.Read(tz.Named.Stored.Sha); err2 == nil {
-	// 	tz = tz2
-	// 	return
-	// }
+	if tz2, err2 := s.ReadOne(tz.Named.Stored.Sha); err2 == nil {
+		tz = tz2
+		return
+	}
 
 	if tz.Named.Kennung, err = s.indexKennung.createHinweis(); err != nil {
 		err = errors.Wrap(err)
@@ -409,16 +408,21 @@ func (s *zettelStore) Update(
 		return
 	}
 
-	//TODO-P1 prevent useless duplicate transaktions
-	// if z.Equals(mutter.Named) {
-	// 	tz = mutter
-	// 	return
-	// }
-
 	tz.Named = *z
 
 	if tz.Named.Stored.Sha, err = s.WriteZettelObjekte(z.Stored.Objekte); err != nil {
 		err = errors.Wrap(err)
+		return
+	}
+
+	if tz.Named.Stored.Sha.Equals(mutter.Named.Stored.Sha) {
+		tz = mutter
+
+		if err = s.zettelTransactedWriter.Unchanged(&tz); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 		return
 	}
 
@@ -437,16 +441,9 @@ func (s *zettelStore) Update(
 		return
 	}
 
-	if mutter.Named.Equals(&tz.Named) {
-		if err = s.zettelTransactedWriter.Unchanged(&tz); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	} else {
-		if err = s.zettelTransactedWriter.Updated(&tz); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if err = s.zettelTransactedWriter.Updated(&tz); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return
