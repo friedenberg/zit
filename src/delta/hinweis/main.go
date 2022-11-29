@@ -9,6 +9,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/coordinates"
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
 )
 
@@ -180,4 +181,8 @@ func (h Hinweis) Sha() sha.Sha {
 	}
 
 	return sha.FromHash(hash)
+}
+
+func (h Hinweis) Gattung() gattung.Gattung {
+	return gattung.Zettel
 }

@@ -166,11 +166,11 @@ func (c Add) openAktenIfNecessary(
 
 	var checkoutResults zettel_checked_out.MutableSet
 
-	query := zettel_transacted.WriterIds(
-		zettel.FilterIdSet{
+	query := zettel_transacted.WriterIds{
+		Filter: id_set.Filter{
 			Set: ids,
 		},
-	)
+	}
 
 	if checkoutResults, err = u.StoreWorkingDirectory().Checkout(
 		options,

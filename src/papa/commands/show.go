@@ -142,11 +142,11 @@ func (c Show) showZettels(
 	fv *zettel.FormatValue,
 ) (err error) {
 	w := collections.MakeChain(
-		zettel_transacted.MakeWriterZettelNamed(
-			zettel.FilterIdSet{
+		zettel_transacted.WriterIds{
+			Filter: id_set.Filter{
 				Set: ids,
-			}.WriteZettelNamed,
-		),
+			},
+		}.WriteZettelTransacted,
 		zettel_transacted.MakeWriterZettel(
 			zettel.MakeSerializedFormatWriter(
 				fv.Format,

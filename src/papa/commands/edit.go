@@ -81,12 +81,12 @@ func (c Edit) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 	var checkoutResults zettel_checked_out.MutableSet
 
-	query := zettel_transacted.WriterIds(
-		zettel.FilterIdSet{
+	query := zettel_transacted.WriterIds{
+		Filter: id_set.Filter{
 			Set: ids,
 			Or:  c.Or,
 		},
-	)
+	}
 
 	if checkoutResults, err = u.StoreWorkingDirectory().Checkout(
 		checkoutOptions,

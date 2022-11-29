@@ -15,7 +15,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/delta/ts"
 	"github.com/friedenberg/zit/src/echo/id_set"
-	"github.com/friedenberg/zit/src/india/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_transacted"
 	"github.com/friedenberg/zit/src/juliett/organize_text"
 	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
@@ -148,17 +147,17 @@ func (c *Organize) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 	getResults := zettel_transacted.MakeMutableSetUnique(0)
 
-	query := zettel.FilterIdSet{
-		Set: ids,
-		Or:  c.Or,
+	query := zettel_transacted.WriterIds{
+		Filter: id_set.Filter{
+			Set: ids,
+			Or:  c.Or,
+		},
 	}
 
 	wk := zettel_verzeichnisse.MakeWriterKonfig(u.Konfig())
 	w := zettel_verzeichnisse.MakeWriterZettelTransacted(
 		collections.MakeChain(
-			zettel_transacted.MakeWriterZettelNamed(
-				query.WriteZettelNamed,
-			),
+			query.WriteZettelTransacted,
 			getResults.AddAndDoNotRepool,
 		),
 	)

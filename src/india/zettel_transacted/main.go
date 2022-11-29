@@ -6,9 +6,13 @@ import (
 	"github.com/friedenberg/zit/src/india/zettel"
 )
 
-type Zettel = objekte.Transacted[
+type zettel_transacted = objekte.Transacted[
 	zettel.Zettel,
 	*zettel.Zettel,
 	hinweis.Hinweis,
 	*hinweis.Hinweis,
 ]
+
+type Zettel = zettel_transacted
+
+// type Zettel = zettel2.Transacted
