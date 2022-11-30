@@ -2,7 +2,6 @@ package zettel_external
 
 import (
 	"fmt"
-	"io"
 
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/echo/fd"
@@ -17,11 +16,6 @@ type Zettel struct {
 	Sku      Sku
 	ZettelFD fd.FD
 	AkteFD   fd.FD
-}
-
-type ExternalFormat interface {
-	ReadExternalZettelFrom(*Zettel, io.Reader) (int64, error)
-	WriteExternalZettelTo(Zettel, io.Writer) (int64, error)
 }
 
 func (e Zettel) String() string {
