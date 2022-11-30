@@ -12,7 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/line_format"
 )
 
-//TODO switch to three different formats
+// TODO switch to three different formats
 // metadatei, zettel-akte-external, zettel-akte-inline
 func (f Text) WriteTo(c FormatContextWrite) (n int64, err error) {
 	switch {

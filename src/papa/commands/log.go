@@ -25,8 +25,8 @@ func init() {
 	)
 }
 
-//TODO modify this to support other identifiers and provide option to search all
-//or just schwanzen
+// TODO modify this to support other identifiers and provide option to search all
+// or just schwanzen
 func (c Log) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 	is = id_set.MakeProtoIdSet(
 		id_set.ProtoId{

@@ -7,4 +7,4 @@ import (
 )
 
 type Objekte = typ_toml.Objekte
-type Transacted = objekte.Transacted2[typ_toml.Objekte, *typ_toml.Objekte, kennung.Typ, *kennung.Typ]
+type Transacted = objekte.Transacted[typ_toml.Objekte, *typ_toml.Objekte, kennung.Typ, *kennung.Typ]

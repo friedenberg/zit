@@ -24,7 +24,7 @@ type Objekte = Zettel
 
 type Sku = sku.Sku2[hinweis.Hinweis, *hinweis.Hinweis]
 
-type Transacted = objekte.Transacted2[
+type Transacted = objekte.Transacted[
 	Zettel,
 	*Zettel,
 	hinweis.Hinweis,

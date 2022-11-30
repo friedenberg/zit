@@ -11,7 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/objekte"
 )
 
-type Transacted = objekte.Transacted2[Objekte, *Objekte, kennung.Konfig, *kennung.Konfig]
+type Transacted = objekte.Transacted[Objekte, *Objekte, kennung.Konfig, *kennung.Konfig]
 
 type Konfig struct {
 	Cli
