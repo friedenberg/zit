@@ -24,7 +24,7 @@ func MakeFormat(arf gattung.AkteIOFactory) *Format {
 
 func (f Format) ReadFormat(
 	r1 io.Reader,
-	o gattung.Stored2,
+	o gattung.Stored,
 ) (n int64, err error) {
 	r := bufio.NewReader(r1)
 
@@ -112,7 +112,7 @@ func (f Format) ReadFormat(
 
 func (f Format) WriteFormat(
 	w1 io.Writer,
-	o gattung.Stored2,
+	o gattung.Stored,
 ) (n int64, err error) {
 	hash := sha256.New()
 	w2 := io.MultiWriter(w1, hash)

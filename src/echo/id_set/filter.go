@@ -9,7 +9,7 @@ import (
 )
 
 type Element interface {
-	gattung.Stored2
+	gattung.Stored
 	AkteEtiketten() kennung.EtikettSet
 	AkteTyp() kennung.Typ
 	Hinweis() hinweis.Hinweis

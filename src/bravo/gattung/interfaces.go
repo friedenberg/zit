@@ -36,11 +36,6 @@ type ValueElementPtr[T any] interface {
 }
 
 type Identifier[T any] interface {
-	ValueElement
-	Equatable[T]
-}
-
-type Identifier2[T any] interface {
 	Gattung() Gattung
 	ValueElement
 	Equatable[T]
@@ -53,11 +48,6 @@ type IdentifierPtr[T any] interface {
 
 type Objekte interface {
 	Gattung() Gattung
-}
-
-type Objekte2 interface {
-	Objekte
-
 	AkteSha() sha_core.Sha
 }
 
@@ -65,17 +55,11 @@ type ObjektePtr[T any] interface {
 	*T
 	Equatable[T]
 	Resetable[T]
-}
-
-type Objekte2Ptr[T any] interface {
-	*T
-	Equatable[T]
-	Resetable[T]
 
 	SetAkteSha(sha_core.Sha)
 }
 
-type Stored2 interface {
+type Stored interface {
 	Gattung() Gattung
 
 	AkteSha() sha_core.Sha

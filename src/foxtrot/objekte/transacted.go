@@ -8,9 +8,9 @@ import (
 )
 
 type Transacted[
-	T gattung.Objekte2,
-	T1 gattung.Objekte2Ptr[T],
-	T2 gattung.Identifier2[T2],
+	T gattung.Objekte,
+	T1 gattung.ObjektePtr[T],
+	T2 gattung.Identifier[T2],
 	T3 gattung.IdentifierPtr[T2],
 ] struct {
 	Objekte T
