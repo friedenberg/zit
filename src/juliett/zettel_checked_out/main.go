@@ -18,9 +18,9 @@ func (c *Zettel) DetermineState() {
 		} else {
 			c.State = StateUntracked
 		}
-	} else if c.Internal.Sku.Sha.Equals(c.External.Sha) {
+	} else if c.Internal.Sku.Sha.Equals(c.External.Sku.Sha) {
 		c.State = StateExistsAndSame
-	} else if c.External.Sha.IsNull() {
+	} else if c.External.Sku.Sha.IsNull() {
 		c.State = StateEmpty
 	} else {
 		c.State = StateExistsAndDifferent

@@ -4,16 +4,17 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/echo/fd"
+	"github.com/friedenberg/zit/src/echo/sku"
 	"github.com/friedenberg/zit/src/india/zettel"
 )
 
+type Sku = sku.External[hinweis.Hinweis, *hinweis.Hinweis]
+
 type Zettel struct {
 	Objekte  zettel.Zettel
-	Kennung  hinweis.Hinweis
-	Sha      sha.Sha
+	Sku      Sku
 	ZettelFD fd.FD
 	AkteFD   fd.FD
 }
@@ -29,7 +30,7 @@ func (e Zettel) String() string {
 
 func (e Zettel) ExternalPathAndSha() string {
 	if !e.ZettelFD.IsEmpty() {
-		return fmt.Sprintf("[%s %s]", e.ZettelFD.Path, e.Sha)
+		return fmt.Sprintf("[%s %s]", e.ZettelFD.Path, e.Sku.Sha)
 	} else if !e.AkteFD.IsEmpty() {
 		return fmt.Sprintf("[%s %s]", e.AkteFD.Path, e.Objekte.Akte)
 	} else {

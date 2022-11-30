@@ -23,7 +23,7 @@ func MakeCliFormatZettel(
 			format.MakeFormatString("["),
 			cw(s.MakeWriterRelativePath(z.ZettelFD.Path), format.ColorTypePointer),
 			format.MakeFormatString("@"),
-			format.MakeWriter(sf, &z.Sha),
+			format.MakeWriter(sf, &z.Sku.Sha),
 			format.MakeFormatString(" "),
 			format.MakeWriter(zf, &z.Objekte),
 			format.MakeFormatString("]"),

@@ -118,7 +118,7 @@ func makeWriterFuncZettel(
 		return func(w io.Writer, z *Zettel) (n int64, err error) {
 			diff := format.StringChanged
 
-			if z.Internal.Sku.Sha.Equals(z.External.Sha) {
+			if z.Internal.Sku.Sha.Equals(z.External.Sku.Sha) {
 				diff = format.StringSame
 			}
 
@@ -146,7 +146,7 @@ func makeWriterFuncAkte(
 		return func(w io.Writer, z *Zettel) (n int64, err error) {
 			diff := format.StringChanged
 
-			if z.Internal.Objekte.Akte.Equals(z.External.Sha) {
+			if z.Internal.Objekte.Akte.Equals(z.External.Sku.Sha) {
 				diff = format.StringSame
 			}
 

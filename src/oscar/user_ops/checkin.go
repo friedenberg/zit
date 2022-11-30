@@ -37,7 +37,7 @@ func (c Checkin) Run(
 
 		if tz, err = c.StoreObjekten().Zettel().Update(
 			&z.Objekte,
-			&z.Kennung,
+			&z.Sku.Kennung,
 		); err != nil {
 			err = errors.Wrap(err)
 			return

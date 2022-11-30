@@ -209,9 +209,11 @@ func (c CreateFromPaths) zettelsFromPath(
 						Path: p,
 					},
 					Objekte: z1,
-					Sha:     s,
-					//TODO
-					// Kennung: z.Sku.Kennung,
+					Sku: zettel_external.Sku{
+						Sha: s,
+						//TODO
+						// Kennung: z.Sku.Kennung,
+					},
 				},
 			)
 		} else {
@@ -232,7 +234,9 @@ func (c CreateFromPaths) zettelsFromPath(
 			ZettelFD: fd.FD{
 				Path: p,
 			},
-			Sha:     s,
+			Sku: zettel_external.Sku{
+				Sha: s,
+			},
 			Objekte: ctx.Zettel,
 		},
 	)

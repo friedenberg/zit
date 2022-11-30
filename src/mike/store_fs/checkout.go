@@ -128,8 +128,10 @@ func (s *Store) CheckoutOne(
 				Path: filename,
 			},
 			Objekte: sz.Objekte,
-			Sha:     sz.Sku.Sha,
-			Kennung: sz.Sku.Kennung,
+			Sku: zettel_external.Sku{
+				Sha:     sz.Sku.Sha,
+				Kennung: sz.Sku.Kennung,
+			},
 		},
 	}
 
