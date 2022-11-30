@@ -18,7 +18,7 @@ func init() {
 }
 
 type Hinweis struct {
-	inner
+	left, right string
 }
 
 type Provider interface {
@@ -42,7 +42,7 @@ func New(i coordinates.Int, pl Provider, pr Provider) (h Hinweis, err error) {
 	var l, r string
 
 	if l, err = pl.Hinweis(k.Left); err != nil {
-		err = errors.Errorf("failed to make Left kennung: %s", err)
+		err = errors.Errorf("failed to make left kennung: %s", err)
 		return
 	}
 
@@ -88,8 +88,39 @@ func Make(v string) (h Hinweis, err error) {
 	return
 }
 
+func (a Hinweis) Equals(b *Hinweis) bool {
+	if a.left != b.left {
+		return false
+	}
+
+	if a.right != b.right {
+		return false
+	}
+
+	return true
+}
+
+func (h Hinweis) Kopf() string {
+	return h.left
+}
+
+func (h Hinweis) Schwanz() string {
+	return h.right
+}
+
 func (h Hinweis) String() string {
-	return h.inner.String()
+	return fmt.Sprintf("%s/%s", h.left, h.right)
+}
+
+func (h Hinweis) Sha() sha.Sha {
+	hash := sha256.New()
+	sr := strings.NewReader(h.String())
+
+	if _, err := io.Copy(hash, sr); err != nil {
+		errors.PanicIfError(err)
+	}
+
+	return sha.FromHash(hash)
 }
 
 func (h Hinweis) AlignedParts(kopf, schwanz int) (string, string) {
@@ -145,16 +176,16 @@ func (h *Hinweis) Set(v string) (err error) {
 		return
 
 	case 2:
-		h.Left = parts[0]
-		h.Right = parts[1]
+		h.left = parts[0]
+		h.right = parts[1]
 	}
 
 	switch {
-	case h.Left == "":
+	case h.left == "":
 		err = errors.Errorf("left is empty: %q", v)
 		return
 
-	case h.Right == "":
+	case h.right == "":
 		err = errors.Errorf("right is empty: %q", v)
 		return
 	}
@@ -164,23 +195,12 @@ func (h *Hinweis) Set(v string) (err error) {
 
 func (h *Hinweis) Reset(h1 *Hinweis) {
 	if h1 == nil {
-		h.Left = ""
-		h.Right = ""
+		h.left = ""
+		h.right = ""
 	} else {
-		h.Left = h1.Left
-		h.Right = h1.Right
+		h.left = h1.left
+		h.right = h1.right
 	}
-}
-
-func (h Hinweis) Sha() sha.Sha {
-	hash := sha256.New()
-	sr := strings.NewReader(h.inner.String())
-
-	if _, err := io.Copy(hash, sr); err != nil {
-		errors.PanicIfError(err)
-	}
-
-	return sha.FromHash(hash)
 }
 
 func (h Hinweis) Gattung() gattung.Gattung {
