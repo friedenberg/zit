@@ -15,8 +15,7 @@ type Resetable[T any] interface {
 	Reset(*T)
 }
 
-type Element interface {
-}
+type Element interface{}
 
 type ElementPtr[T Element] interface {
 	*T
@@ -27,11 +26,12 @@ type Keyer[T Element, T1 ElementPtr[T]] interface {
 }
 
 type ValueElement interface {
+	Element
 	fmt.Stringer
 }
 
-type ValueElementPtr[T any] interface {
-	*T
+type ValueElementPtr[T ValueElement] interface {
+	ElementPtr[T]
 	flag.Value
 }
 
@@ -41,9 +41,9 @@ type Identifier[T any] interface {
 	Equatable[T]
 }
 
-type IdentifierPtr[T any] interface {
+type IdentifierPtr[T ValueElement] interface {
 	ValueElementPtr[T]
-	Reset(*T)
+	Resetable[T]
 }
 
 type Objekte interface {
@@ -51,8 +51,9 @@ type Objekte interface {
 	AkteSha() sha_core.Sha
 }
 
-type ObjektePtr[T any] interface {
-	*T
+type ObjektePtr[T Element] interface {
+	ElementPtr[T]
+
 	Equatable[T]
 	Resetable[T]
 

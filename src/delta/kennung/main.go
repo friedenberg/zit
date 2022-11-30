@@ -17,7 +17,7 @@ type KennungLike[T any] interface {
 	gattung.Equatable[T]
 }
 
-type KennungLikePtr[T any] interface {
+type KennungLikePtr[T gattung.ValueElement] interface {
 	gattung.ValueElementPtr[T]
 	gattung.Resetable[T]
 }
