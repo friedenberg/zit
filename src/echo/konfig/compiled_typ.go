@@ -24,13 +24,13 @@ func init() {
 }
 
 type compiledTyp struct {
-	Sku sku.Sku2[kennung.Typ, *kennung.Typ]
+	Sku sku.Transacted[kennung.Typ, *kennung.Typ]
 	Typ typ_toml.Objekte
 }
 
 func makeCompiledTyp(n string) *compiledTyp {
 	return &compiledTyp{
-		Sku: sku.Sku2[kennung.Typ, *kennung.Typ]{
+		Sku: sku.Transacted[kennung.Typ, *kennung.Typ]{
 			Kennung: kennung.MustTyp(n),
 		},
 		Typ: typ_toml.Objekte{

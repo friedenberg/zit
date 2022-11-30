@@ -22,7 +22,7 @@ type Zettel struct {
 
 type Objekte = Zettel
 
-type Sku = sku.Sku2[hinweis.Hinweis, *hinweis.Hinweis]
+type Sku = sku.Transacted[hinweis.Hinweis, *hinweis.Hinweis]
 
 type Transacted = objekte.Transacted[
 	Zettel,

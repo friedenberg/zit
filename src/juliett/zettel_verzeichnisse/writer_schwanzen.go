@@ -15,13 +15,13 @@ import (
 
 type WriterSchwanzen struct {
 	lock      *sync.RWMutex
-	hinweisen map[hinweis.Hinweis]sku.Sku2[hinweis.Hinweis, *hinweis.Hinweis]
+	hinweisen map[hinweis.Hinweis]sku.Transacted[hinweis.Hinweis, *hinweis.Hinweis]
 }
 
 func MakeWriterSchwanzen() *WriterSchwanzen {
 	return &WriterSchwanzen{
 		lock:      &sync.RWMutex{},
-		hinweisen: make(map[hinweis.Hinweis]sku.Sku2[hinweis.Hinweis, *hinweis.Hinweis]),
+		hinweisen: make(map[hinweis.Hinweis]sku.Transacted[hinweis.Hinweis, *hinweis.Hinweis]),
 	}
 }
 
@@ -29,7 +29,7 @@ func (zws *WriterSchwanzen) Less(zt *zettel.Transacted) (ok bool) {
 	zws.lock.RLock()
 	defer zws.lock.RUnlock()
 
-	var t sku.Sku2[hinweis.Hinweis, *hinweis.Hinweis]
+	var t sku.Transacted[hinweis.Hinweis, *hinweis.Hinweis]
 
 	t, ok = zws.hinweisen[zt.Sku.Kennung]
 
@@ -48,7 +48,7 @@ func (zws *WriterSchwanzen) Get(h hinweis.Hinweis) (t ts.Time, ok bool) {
 	zws.lock.RLock()
 	defer zws.lock.RUnlock()
 
-	var o sku.Sku2[hinweis.Hinweis, *hinweis.Hinweis]
+	var o sku.Transacted[hinweis.Hinweis, *hinweis.Hinweis]
 
 	o, ok = zws.hinweisen[h]
 

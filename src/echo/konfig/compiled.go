@@ -27,7 +27,7 @@ type Compiled struct {
 
 func MakeDefaultCompiled() (c Compiled) {
 	dt := &compiledTyp{
-		Sku: sku.Sku2[kennung.Typ, *kennung.Typ]{
+		Sku: sku.Transacted[kennung.Typ, *kennung.Typ]{
 			Kennung: kennung.MustTyp("md"),
 		},
 		Typ: typ_toml.Objekte{

@@ -81,7 +81,7 @@ func (s konfigStore) transact(
 
 	kt = &konfig.Transacted{
 		Objekte: *ko,
-		Sku: sku.Sku2[kennung.Konfig, *kennung.Konfig]{
+		Sku: sku.Transacted[kennung.Konfig, *kennung.Konfig]{
 			Schwanz: s.common.Transaktion.Time,
 			Kopf:    mutter.Sku.Kopf,
 			Mutter:  sku.Mutter{mutter.Sku.Schwanz, ts.Time{}},

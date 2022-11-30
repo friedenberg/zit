@@ -12,7 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/ts"
 )
 
-type Sku2[T kennung.KennungLike[T], T1 kennung.KennungLikePtr[T]] struct {
+type Transacted[T kennung.KennungLike[T], T1 kennung.KennungLikePtr[T]] struct {
 	Mutter           Mutter
 	Kennung          T
 	Sha              sha.Sha
@@ -20,7 +20,7 @@ type Sku2[T kennung.KennungLike[T], T1 kennung.KennungLikePtr[T]] struct {
 	Kopf, Schwanz    ts.Time
 }
 
-func (a Sku2[T, T1]) Sku() Sku {
+func (a Transacted[T, T1]) Sku() Sku {
 	return Sku{
 		Gattung: a.Kennung.Gattung(),
 		Mutter:  a.Mutter,
@@ -29,13 +29,14 @@ func (a Sku2[T, T1]) Sku() Sku {
 	}
 }
 
-func (a *Sku2[T, T1]) SetTransactionIndex(i int) {
+func (a *Transacted[T, T1]) SetTransactionIndex(i int) {
 	a.TransactionIndex.SetInt(i)
 }
 
-func (a *Sku2[T, T1]) Reset(b *Sku2[T, T1]) {
+func (a *Transacted[T, T1]) Reset(b *Transacted[T, T1]) {
 	if b == nil {
 		a.Kopf = ts.Time{}
+		a.Sha = sha.Sha{}
 		T1(&a.Kennung).Reset(nil)
 		a.Mutter[0] = ts.Time{}
 		a.Mutter[1] = ts.Time{}
@@ -43,6 +44,7 @@ func (a *Sku2[T, T1]) Reset(b *Sku2[T, T1]) {
 		a.TransactionIndex.Reset()
 	} else {
 		a.Kopf = b.Kopf
+		a.Sha = b.Sha
 		T1(&a.Kennung).Reset(&b.Kennung)
 		a.Mutter[0] = b.Mutter[0]
 		a.Mutter[1] = b.Mutter[1]
@@ -51,7 +53,7 @@ func (a *Sku2[T, T1]) Reset(b *Sku2[T, T1]) {
 	}
 }
 
-func (a Sku2[T, T1]) Less(b *Sku2[T, T1]) (ok bool) {
+func (a Transacted[T, T1]) Less(b *Transacted[T, T1]) (ok bool) {
 	if a.Schwanz.Less(b.Schwanz) {
 		ok = true
 		return
@@ -65,7 +67,7 @@ func (a Sku2[T, T1]) Less(b *Sku2[T, T1]) (ok bool) {
 	return
 }
 
-func (a Sku2[T, T1]) Equals(b *Sku2[T, T1]) (ok bool) {
+func (a Transacted[T, T1]) Equals(b *Transacted[T, T1]) (ok bool) {
 	if !a.TransactionIndex.Equals(b.TransactionIndex) {
 		return
 	}
@@ -89,7 +91,7 @@ func (a Sku2[T, T1]) Equals(b *Sku2[T, T1]) (ok bool) {
 	return true
 }
 
-func (o *Sku2[T, T1]) Set(v string) (err error) {
+func (o *Transacted[T, T1]) Set(v string) (err error) {
 	vs := strings.Split(v, " ")
 
 	if len(vs) != 5 {
@@ -145,6 +147,6 @@ func (o *Sku2[T, T1]) Set(v string) (err error) {
 	return
 }
 
-func (o Sku2[T, T1]) GetKey() string {
+func (o Transacted[T, T1]) GetKey() string {
 	return fmt.Sprintf("%s.%s", o.Kennung.Gattung(), o.Kennung)
 }

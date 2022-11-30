@@ -14,7 +14,7 @@ type Transacted[
 	T3 gattung.IdentifierPtr[T2],
 ] struct {
 	Objekte T
-	Sku     sku.Sku2[T2, T3]
+	Sku     sku.Transacted[T2, T3]
 }
 
 func (t Transacted[T, T1, T2, T3]) Kennung() T3 {

@@ -77,7 +77,7 @@ func (s typStore) transact(
 
 	tt = &typ.Transacted{
 		Objekte: *to,
-		Sku: sku.Sku2[kennung.Typ, *kennung.Typ]{
+		Sku: sku.Transacted[kennung.Typ, *kennung.Typ]{
 			Kennung: *tk,
 			Schwanz: s.common.Transaktion.Time,
 		},
