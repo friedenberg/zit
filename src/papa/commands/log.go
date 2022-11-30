@@ -25,6 +25,8 @@ func init() {
 	)
 }
 
+//TODO modify this to support other identifiers and provide option to search all
+//or just schwanzen
 func (c Log) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 	is = id_set.MakeProtoIdSet(
 		id_set.ProtoId{
@@ -61,8 +63,6 @@ func (c Log) RunWithIds(os *umwelt.Umwelt, is id_set.Set) (err error) {
 			err = errors.Wrap(err)
 			return
 		}
-
-		errors.Err().Printf("time: %s", chain[0].Sku.Schwanz)
 
 		chains = append(chains, chain)
 	}

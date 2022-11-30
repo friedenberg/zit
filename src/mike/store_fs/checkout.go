@@ -138,9 +138,15 @@ func (s *Store) CheckoutOne(
 
 		ty := s.Transacted.Objekte.GetTyp(t.String())
 
-		if ty != nil && ty.Typ.Akte.FileExtension != "" {
+		if ty != nil {
+			fe := ty.Typ.Akte.FileExtension
+
+			if fe == "" {
+				fe = t.String()
+			}
+
 			cz.External.AkteFD = fd.FD{
-				Path: originalFilename + "." + ty.Typ.Akte.FileExtension,
+				Path: originalFilename + "." + fe,
 			}
 		}
 	}
@@ -172,6 +178,8 @@ func (s *Store) CheckoutOne(
 		fallthrough
 
 	case CheckoutModeZettelOnly:
+		cz.External.AkteFD = fd.FD{}
+
 		if err = s.writeFormat(options, filename, c, &cz); err != nil {
 			err = errors.Wrapf(err, "%s", sz.Sku)
 			errors.PrintErrf("%s (check out failed):", sz.Sku)
