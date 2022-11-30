@@ -17,5 +17,5 @@ func (nrc nopReadCloser) WriteTo(w io.Writer) (n int64, err error) {
 }
 
 func (nrc nopReadCloser) Sha() Sha {
-	return Sha{Value: ShaNull}
+	return Sha{}
 }

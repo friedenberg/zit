@@ -34,7 +34,7 @@ type PathComponents interface {
 }
 
 type Sha struct {
-	Value string
+	value string
 }
 
 func MakeSha(v string) (s Sha, err error) {
@@ -87,16 +87,16 @@ func FromString(s string) Sha {
 
 func FromHash(h hash.Hash) (s Sha) {
 	s = Sha{}
-	s.Value = fmt.Sprintf("%x", h.Sum(nil))
+	s.value = fmt.Sprintf("%x", h.Sum(nil))
 
 	return
 }
 
 func (s Sha) String() string {
-	if s.Value == "" {
+	if s.value == "" {
 		return ShaNull
 	} else {
-		return s.Value
+		return s.value
 	}
 }
 
@@ -121,17 +121,17 @@ func (s *Sha) Set(v string) (err error) {
 		return
 	}
 
-	s.Value = v1
+	s.value = v1
 
 	return
 }
 
 func (s Sha) IsNull() bool {
-	if s.Value == "" {
+	if s.value == "" {
 		return true
 	}
 
-	if s.Value == ShaNull {
+	if s.value == ShaNull {
 		return true
 	}
 
@@ -155,6 +155,20 @@ func (s Sha) Path(pc ...string) string {
 	pc = append(pc, s.Schwanz())
 
 	return path.Join(pc...)
+}
+
+func (s Sha) MarshalBinary() (text []byte, err error) {
+	text = []byte(s.String())
+
+	return
+}
+
+func (s *Sha) UnmarshalBinary(text []byte) (err error) {
+	if err = s.Set(string(text)); err != nil {
+		return
+	}
+
+	return
 }
 
 func (s Sha) MarshalText() (text []byte, err error) {
