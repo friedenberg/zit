@@ -35,20 +35,19 @@ func (a *Sku2[T, T1]) SetTransactionIndex(i int) {
 
 func (a *Sku2[T, T1]) Reset(b *Sku2[T, T1]) {
 	if b == nil {
-		a.Kopf = b.Kopf
-		a.Kennung = b.Kennung
-		a.Mutter[0] = b.Mutter[0]
-		a.Mutter[1] = b.Mutter[1]
-		a.Schwanz = b.Schwanz
-		a.TransactionIndex.SetInt(b.TransactionIndex.Int())
-	} else {
 		a.Kopf = ts.Time{}
-		//TODO-P3 reset Kennung
-		// a.Kennung = T{}
+		T1(&a.Kennung).Reset(nil)
 		a.Mutter[0] = ts.Time{}
 		a.Mutter[1] = ts.Time{}
 		a.Schwanz = ts.Time{}
 		a.TransactionIndex.Reset()
+	} else {
+		a.Kopf = b.Kopf
+		T1(&a.Kennung).Reset(&b.Kennung)
+		a.Mutter[0] = b.Mutter[0]
+		a.Mutter[1] = b.Mutter[1]
+		a.Schwanz = b.Schwanz
+		a.TransactionIndex.SetInt(b.TransactionIndex.Int())
 	}
 }
 

@@ -7,7 +7,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/collections"
-	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/hinweisen"
@@ -104,6 +103,7 @@ func makeZettelStore(
 func (s *zettelStore) Hinweisen() *hinweisen.Hinweisen {
 	return s.hinweisen
 }
+
 func (s *zettelStore) Flush() (err error) {
 	if err = s.verzeichnisseSchwanzen.Flush(); err != nil {
 		err = errors.Wrap(err)
@@ -162,7 +162,8 @@ func (s zettelStore) WriteZettelObjekte(z zettel.Zettel) (sh sha.Sha, err error)
 		Out:    w,
 	}
 
-	f := zettel.Objekte{}
+	//TODO switch to objekte_format
+	f := zettel.FormatObjekte{}
 
 	if _, err = f.WriteTo(c); err != nil {
 		err = errors.Wrap(err)
@@ -183,30 +184,30 @@ func (s *zettelStore) writeNamedZettelToIndex(tz zettel.Transacted) (err error) 
 		return
 	}
 
-	errors.Log().Printf("writing zettel to index: %s", tz.Named)
+	errors.Log().Printf("writing zettel to index: %s", tz.Sku)
 
-	if err = s.verzeichnisseSchwanzen.Add(tz, tz.Named.Kennung.String()); err != nil {
+	if err = s.verzeichnisseSchwanzen.Add(tz, tz.Sku.Kennung.String()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = s.verzeichnisseAll.Add(tz, tz.Named.Stored.Sha.String()); err != nil {
+	if err = s.verzeichnisseAll.Add(tz, tz.Sku.Sha.String()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = s.indexKennung.addHinweis(tz.Named.Kennung); err != nil {
+	if err = s.indexKennung.addHinweis(tz.Sku.Kennung); err != nil {
 		if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
 			errors.Log().Printf("kennung does not contain value: %s", err)
 			err = nil
 		} else {
-			err = errors.Wrapf(err, "failed to write zettel to index: %s", tz.Named)
+			err = errors.Wrapf(err, "failed to write zettel to index: %s", tz.Sku)
 			return
 		}
 	}
 
 	if err = s.indexAbbr.addZettelTransacted(tz); err != nil {
-		err = errors.Wrapf(err, "failed to write zettel to index: %s", tz.Named)
+		err = errors.Wrapf(err, "failed to write zettel to index: %s", tz.Sku)
 		return
 	}
 
@@ -287,25 +288,31 @@ func (s *zettelStore) Create(in zettel.Zettel) (tz zettel.Transacted, err error)
 		return
 	}
 
-	tz.Named.Stored.Objekte = in
+	var shaObj sha.Sha
 
-	if tz.Named.Stored.Sha, err = s.WriteZettelObjekte(tz.Named.Stored.Objekte); err != nil {
+	if shaObj, err = s.WriteZettelObjekte(in); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	//If the zettel exists, short circuit and return that
-	if tz2, err2 := s.ReadOne(tz.Named.Stored.Sha); err2 == nil {
+	if tz2, err2 := s.ReadOne(shaObj); err2 == nil {
 		tz = tz2
 		return
 	}
 
-	if tz.Named.Kennung, err = s.indexKennung.createHinweis(); err != nil {
+	var ken hinweis.Hinweis
+
+	if ken, err = s.indexKennung.createHinweis(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if tz, err = s.addZettelToTransaktion(tz.Named); err != nil {
+	if tz, err = s.addZettelToTransaktion(
+		&in,
+		&shaObj,
+		&ken,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -315,7 +322,7 @@ func (s *zettelStore) Create(in zettel.Zettel) (tz zettel.Transacted, err error)
 		return
 	}
 
-	if err = s.indexEtiketten.add(tz.Named.Stored.Objekte.Etiketten); err != nil {
+	if err = s.indexEtiketten.add(tz.Objekte.Etiketten); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -351,14 +358,18 @@ func (s *zettelStore) CreateWithHinweis(
 		return
 	}
 
-	tz.Named.Stored.Objekte = in
+	var shaObj sha.Sha
 
-	if tz.Named.Stored.Sha, err = s.WriteZettelObjekte(tz.Named.Stored.Objekte); err != nil {
+	if shaObj, err = s.WriteZettelObjekte(in); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if tz, err = s.addZettelToTransaktion(tz.Named); err != nil {
+	if tz, err = s.addZettelToTransaktion(
+		&in,
+		&shaObj,
+		&h,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -368,7 +379,7 @@ func (s *zettelStore) CreateWithHinweis(
 		return
 	}
 
-	if err = s.indexEtiketten.add(tz.Named.Stored.Objekte.Etiketten); err != nil {
+	if err = s.indexEtiketten.add(tz.Objekte.Etiketten); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -383,7 +394,8 @@ func (s *zettelStore) CreateWithHinweis(
 
 // TODO support dry run
 func (s *zettelStore) Update(
-	z *zettel.Named,
+	z *zettel.Objekte,
+	h *hinweis.Hinweis,
 ) (tz zettel.Transacted, err error) {
 	if !s.common.LockSmith.IsAcquired() {
 		err = ErrLockRequired{
@@ -393,7 +405,7 @@ func (s *zettelStore) Update(
 		return
 	}
 
-	if err = z.Stored.Objekte.ApplyKonfig(s.common.Konfig); err != nil {
+	if err = z.ApplyKonfig(s.common.Konfig); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -401,20 +413,20 @@ func (s *zettelStore) Update(
 	var mutter zettel.Transacted
 
 	if mutter, err = s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(
-		z.Kennung,
+		*h,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	tz.Named = *z
+	var shaObj sha.Sha
 
-	if tz.Named.Stored.Sha, err = s.WriteZettelObjekte(z.Stored.Objekte); err != nil {
+	if shaObj, err = s.WriteZettelObjekte(*z); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if tz.Named.Stored.Sha.Equals(mutter.Named.Stored.Sha) {
+	if shaObj.Equals(mutter.Sku.Sha) {
 		tz = mutter
 
 		if err = s.zettelTransactedWriter.Unchanged(&tz); err != nil {
@@ -425,7 +437,11 @@ func (s *zettelStore) Update(
 		return
 	}
 
-	if tz, err = s.addZettelToTransaktion(tz.Named); err != nil {
+	if tz, err = s.addZettelToTransaktion(
+		z,
+		&shaObj,
+		h,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -453,7 +469,7 @@ func (s zettelStore) AllInChain(h hinweis.Hinweis) (c []*zettel.Transacted, err 
 
 	if err = s.verzeichnisseAll.ReadMany(
 		func(z *zettel_verzeichnisse.Zettel) (err error) {
-			if !z.Transacted.Named.Kennung.Equals(&h) {
+			if !z.Transacted.Sku.Kennung.Equals(&h) {
 				err = io.EOF
 				return
 			}
@@ -470,37 +486,39 @@ func (s zettelStore) AllInChain(h hinweis.Hinweis) (c []*zettel.Transacted, err 
 
 	sort.Slice(
 		c,
-		func(i, j int) bool { return c[i].SkuTransacted().Less(c[j].SkuTransacted()) },
+		func(i, j int) bool { return c[i].Sku.Less(&c[j].Sku) },
 	)
 
 	return
 }
 
 func (s *zettelStore) addZettelToTransaktion(
-	z zettel.Named,
+	zo *zettel.Objekte,
+	zs *sha.Sha,
+	zk *hinweis.Hinweis,
 ) (tz zettel.Transacted, err error) {
-	errors.Log().Printf("adding zettel to transaktion: %s", z.Kennung)
+	errors.Log().Printf("adding zettel to transaktion: %s", zk)
 
-	if tz, err = s.transactedWithHead(z, &s.common.Transaktion); err != nil {
+	if tz, err = s.transactedWithHead(
+		*zo,
+		*zk,
+		&s.common.Transaktion,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	i := s.common.Transaktion.Add(
-		sku.Sku{
-			Gattung: gattung.Zettel,
-			Mutter:  tz.Mutter,
-			Id:      &z.Kennung,
-			Sha:     z.Stored.Sha,
-		},
-	)
+	tz.Sku.Kennung = *zk
+	tz.Sku.Sha = *zs
 
-	tz.TransaktionIndex.SetInt(i)
+	s.common.Transaktion.Add2(&tz.Sku)
 
 	return
 
 }
-func (s zettelStore) storedZettelFromSha(sh sha.Sha) (sz zettel.Stored, err error) {
+func (s zettelStore) storedZettelFromSha(
+	sh sha.Sha,
+) (sz zettel.Objekte, err error) {
 	var or io.ReadCloser
 
 	if or, err = s.common.ReadCloserObjekten(id.Path(sh, s.common.Standort.DirObjektenZettelen())); err != nil {
@@ -510,7 +528,7 @@ func (s zettelStore) storedZettelFromSha(sh sha.Sha) (sz zettel.Stored, err erro
 
 	defer or.Close()
 
-	f := zettel.Objekte{
+	f := zettel.FormatObjekte{
 		IgnoreTypErrors: true,
 	}
 
@@ -523,8 +541,7 @@ func (s zettelStore) storedZettelFromSha(sh sha.Sha) (sz zettel.Stored, err erro
 		return
 	}
 
-	sz.Objekte = c.Zettel
-	sz.Sha = sh
+	sz = c.Zettel
 
 	return
 }
@@ -533,18 +550,20 @@ func (s zettelStore) storedZettelFromSha(sh sha.Sha) (sz zettel.Stored, err erro
 // dependency on the index being accurate for the immediate mutter of the zettel
 // in the arguments
 func (s *zettelStore) transactedWithHead(
-	z zettel.Named,
+	z zettel.Objekte,
+	h hinweis.Hinweis,
 	t *transaktion.Transaktion,
 ) (tz zettel.Transacted, err error) {
-	tz.Named = z
-	tz.Kopf = t.Time
-	tz.Schwanz = t.Time
+	tz.Objekte = z
+	tz.Sku.Kennung = h
+	tz.Sku.Kopf = t.Time
+	tz.Sku.Schwanz = t.Time
 
 	var previous zettel.Transacted
 
-	if previous, err = s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(z.Kennung); err == nil {
-		tz.Mutter[0] = previous.Schwanz
-		tz.Kopf = previous.Kopf
+	if previous, err = s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(h); err == nil {
+		tz.Sku.Mutter[0] = previous.Sku.Schwanz
+		tz.Sku.Kopf = previous.Sku.Kopf
 	} else {
 		if errors.Is(err, ErrNotFound{}) {
 			err = nil
@@ -559,7 +578,7 @@ func (s *zettelStore) transactedWithHead(
 
 func (s zettelStore) transactedZettelFromTransaktionObjekte(
 	t *transaktion.Transaktion,
-	o *sku.Indexed,
+	o *sku.Sku,
 ) (tz zettel.Transacted, err error) {
 	ok := false
 
@@ -570,19 +589,21 @@ func (s zettelStore) transactedZettelFromTransaktionObjekte(
 		return
 	}
 
-	tz.Named.Kennung = *h
+	tz.Sku.Kennung = *h
 
-	if tz.Named.Stored, err = s.storedZettelFromSha(o.Sha); err != nil {
-		err = errors.Wrapf(err, "failed to read zettel objekte: %s", tz.Named.Kennung)
+	if tz.Objekte, err = s.storedZettelFromSha(o.Sha); err != nil {
+		err = errors.Wrapf(err, "failed to read zettel objekte: %s", tz.Sku.Kennung)
 		return
 	}
 
-	if tz, err = s.transactedWithHead(tz.Named, t); err != nil {
+	if tz, err = s.transactedWithHead(tz.Objekte, tz.Sku.Kennung, t); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	tz.TransaktionIndex = o.Index
+	tz.Sku.Sha = o.Sha
+
+	tz.Sku.TransactionIndex = o.TransactionIndex
 
 	return
 }

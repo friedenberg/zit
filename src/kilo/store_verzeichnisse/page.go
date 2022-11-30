@@ -60,14 +60,24 @@ func (zp *Page) setState(v State) {
 }
 
 func (zp *Page) Add(z *zettel_verzeichnisse.Zettel) (err error) {
+	if z == nil {
+		err = errors.Errorf("trying to add nil zettel_verzeichnisse.Zettel")
+		return
+	}
+
 	if err = zp.flushFilter(z); err != nil {
 		if errors.IsEOF(err) {
-			errors.Log().Printf("eliding %s", z.Transacted.Named.Kennung)
+			errors.Log().Printf("eliding %s", z.Transacted.Kennung())
 			err = nil
 		} else {
 			err = errors.Wrap(err)
 		}
 
+		return
+	}
+
+	if z == nil {
+		err = errors.Errorf("trying to add nil zettel_verzeichnisse.Zettel")
 		return
 	}
 
@@ -229,6 +239,7 @@ func (zp *Page) Copy(
 
 	for _, z := range zp.added {
 		z1 := zp.pool.Get()
+
 		z1.Reset(z)
 
 		if err = w(z1); err != nil {

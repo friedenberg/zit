@@ -36,9 +36,14 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 		return
 	}
 
-	toUpdate := make(map[string]zettel.Named)
+	type zettelToUpdate struct {
+		objekte zettel.Objekte
+		kennung hinweis.Hinweis
+	}
 
-	addOrGetToZettelToUpdate := func(hString string) (z zettel.Named, err error) {
+	toUpdate := make(map[string]zettelToUpdate)
+
+	addOrGetToZettelToUpdate := func(hString string) (z zettelToUpdate, err error) {
 		var h hinweis.Hinweis
 
 		if h, err = store.ExpandHinweisString(hString); err != nil {
@@ -56,45 +61,46 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 				return
 			}
 
-			z = tz.Named
+			z.objekte = tz.Objekte
+			z.kennung = tz.Sku.Kennung
 		}
 
 		return
 	}
 
 	addEtikettToZettel := func(hString string, e kennung.Etikett) (err error) {
-		var z zettel.Named
+		var z zettelToUpdate
 
 		if z, err = addOrGetToZettelToUpdate(hString); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		mes := z.Stored.Objekte.Etiketten.MutableCopy()
+		mes := z.objekte.Etiketten.MutableCopy()
 		mes.Add(e)
-		z.Stored.Objekte.Etiketten = mes.Copy()
-		toUpdate[z.Kennung.String()] = z
+		z.objekte.Etiketten = mes.Copy()
+		toUpdate[z.kennung.String()] = z
 
-		errors.Err().Printf("Added etikett '%s' to zettel '%s'", e, z.Kennung)
+		errors.Err().Printf("Added etikett '%s' to zettel '%s'", e, z.kennung)
 
 		return
 	}
 
 	removeEtikettFromZettel := func(hString string, e kennung.Etikett) (err error) {
-		var z zettel.Named
+		var z zettelToUpdate
 
 		if z, err = addOrGetToZettelToUpdate(hString); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		mes := z.Stored.Objekte.Etiketten.MutableCopy()
+		mes := z.objekte.Etiketten.MutableCopy()
 		mes.RemovePrefixes(e)
-		z.Stored.Objekte.Etiketten = mes.Copy()
+		z.objekte.Etiketten = mes.Copy()
 
-		toUpdate[z.Kennung.String()] = z
+		toUpdate[z.kennung.String()] = z
 
-		errors.Err().Printf("Removed etikett '%s' from zettel '%s'", e, z.Kennung)
+		errors.Err().Printf("Removed etikett '%s' from zettel '%s'", e, z.kennung)
 
 		return
 	}
@@ -129,18 +135,18 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 
 	if !sameTyp {
 		for _, h := range cs.AllB {
-			var z zettel.Named
+			var z zettelToUpdate
 
 			if z, err = addOrGetToZettelToUpdate(h); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			z.Stored.Objekte.Typ = b.Metadatei.Typ
+			z.objekte.Typ = b.Metadatei.Typ
 
-			toUpdate[z.Kennung.String()] = z
+			toUpdate[z.kennung.String()] = z
 
-			errors.Err().Printf("Switched to typ '%s' for zettel '%s'", b.Metadatei.Typ, z.Kennung)
+			errors.Err().Printf("Switched to typ '%s' for zettel '%s'", b.Metadatei.Typ, z.kennung)
 		}
 	}
 
@@ -178,11 +184,11 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 
 	for _, z := range toUpdate {
 		if c.Konfig().DryRun {
-			errors.Out().Printf("[%s] (would update)", z.Kennung)
+			errors.Out().Printf("[%s] (would update)", z.kennung)
 			continue
 		}
 
-		if _, err = store.Zettel().Update(&z); err != nil {
+		if _, err = store.Zettel().Update(&z.objekte, &z.kennung); err != nil {
 			errors.Err().Printf("failed to update zettel: %s", err)
 		}
 	}

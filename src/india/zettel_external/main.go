@@ -4,13 +4,18 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/delta/hinweis"
+	"github.com/friedenberg/zit/src/echo/fd"
 	"github.com/friedenberg/zit/src/india/zettel"
 )
 
 type Zettel struct {
-	Named    zettel.Named
-	ZettelFD FD
-	AkteFD   FD
+	Objekte  zettel.Zettel
+	Kennung  hinweis.Hinweis
+	Sha      sha.Sha
+	ZettelFD fd.FD
+	AkteFD   fd.FD
 }
 
 type ExternalFormat interface {
@@ -24,9 +29,9 @@ func (e Zettel) String() string {
 
 func (e Zettel) ExternalPathAndSha() string {
 	if !e.ZettelFD.IsEmpty() {
-		return fmt.Sprintf("[%s %s]", e.ZettelFD.Path, e.Named.Stored.Sha)
+		return fmt.Sprintf("[%s %s]", e.ZettelFD.Path, e.Sha)
 	} else if !e.AkteFD.IsEmpty() {
-		return fmt.Sprintf("[%s %s]", e.AkteFD.Path, e.Named.Stored.Objekte.Akte)
+		return fmt.Sprintf("[%s %s]", e.AkteFD.Path, e.Objekte.Akte)
 	} else {
 		return ""
 	}

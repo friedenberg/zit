@@ -27,9 +27,9 @@ func MakeMutableMatchSet(in MutableSet) (out MutableMatchSet) {
 	return
 }
 
-func (s MutableMatchSet) Match(z *zettel.Named) (err error) {
-	kStored := z.Stored.Sha.String()
-	kAkte := z.Stored.Objekte.Akte.String()
+func (s MutableMatchSet) Match(z *zettel.Transacted) (err error) {
+	kStored := z.Sku.Sha.String()
+	kAkte := z.Objekte.Akte.String()
 
 	stored, okStored := s.Stored.Get(kStored)
 	akte, okAkte := s.Akten.Get(kAkte)

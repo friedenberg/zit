@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/format"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/standort"
+	"github.com/friedenberg/zit/src/echo/fd"
 	"github.com/friedenberg/zit/src/india/zettel"
 )
 
@@ -22,9 +23,9 @@ func MakeCliFormatZettel(
 			format.MakeFormatString("["),
 			cw(s.MakeWriterRelativePath(z.ZettelFD.Path), format.ColorTypePointer),
 			format.MakeFormatString("@"),
-			format.MakeWriter(sf, &z.Named.Stored.Sha),
+			format.MakeWriter(sf, &z.Sha),
 			format.MakeFormatString(" "),
-			format.MakeWriter(zf, &z.Named.Stored.Objekte),
+			format.MakeWriter(zf, &z.Objekte),
 			format.MakeFormatString("]"),
 		)
 	}
@@ -42,7 +43,7 @@ func MakeCliFormatAkte(
 			format.MakeFormatString("["),
 			cw(s.MakeWriterRelativePath(z.AkteFD.Path), format.ColorTypePointer),
 			format.MakeFormatString("@"),
-			format.MakeWriter(sf, &z.Named.Stored.Objekte.Akte),
+			format.MakeWriter(sf, &z.Objekte.Akte),
 			format.MakeFormatString("]"),
 		)
 	}
@@ -52,8 +53,8 @@ func MakeCliFormatAkte(
 func MakeCliFormatFD(
 	s standort.Standort,
 	cw format.FuncColorWriter,
-) format.FormatWriterFunc[FD] {
-	return func(w io.Writer, fd *FD) (n int64, err error) {
+) format.FormatWriterFunc[fd.FD] {
+	return func(w io.Writer, fd *fd.FD) (n int64, err error) {
 		return format.Write(
 			w,
 			format.MakeFormatString("["),

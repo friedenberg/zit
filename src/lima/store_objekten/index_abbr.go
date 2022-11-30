@@ -129,12 +129,12 @@ func (i *indexAbbr) addZettelTransacted(zt zettel.Transacted) (err error) {
 
 	i.hasChanges = true
 
-	i.indexAbbrEncodableTridexes.Shas.Add(zt.Named.Stored.Sha.String())
-	i.indexAbbrEncodableTridexes.Shas.Add(zt.Named.Stored.Objekte.Akte.String())
-	i.indexAbbrEncodableTridexes.HinweisKopfen.Add(zt.Named.Kennung.Kopf())
-	i.indexAbbrEncodableTridexes.HinweisSchwanzen.Add(zt.Named.Kennung.Schwanz())
+	i.indexAbbrEncodableTridexes.Shas.Add(zt.Sku.Sha.String())
+	i.indexAbbrEncodableTridexes.Shas.Add(zt.Objekte.Akte.String())
+	i.indexAbbrEncodableTridexes.HinweisKopfen.Add(zt.Kennung().Kopf())
+	i.indexAbbrEncodableTridexes.HinweisSchwanzen.Add(zt.Kennung().Schwanz())
 
-	for _, e := range kennung.Expanded(zt.Named.Stored.Objekte.Etiketten, kennung.ExpanderRight).Elements() {
+	for _, e := range kennung.Expanded(zt.Objekte.Etiketten, kennung.ExpanderRight).Elements() {
 		i.indexAbbrEncodableTridexes.Etiketten.Add(e.String())
 	}
 

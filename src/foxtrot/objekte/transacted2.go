@@ -67,8 +67,11 @@ func (a Transacted2[T, T1, T2, T3]) Equals(
 func (a *Transacted2[T, T1, T2, T3]) Reset(
 	b *Transacted2[T, T1, T2, T3],
 ) {
-	a.Sku.Reset(&b.Sku)
-	//TODO-P0
-	// a.Kennung.Reset(b.Kennung)
-	// a.Objekte.Reset(b.Objekte)
+	if b == nil {
+		a.Sku.Reset(nil)
+		T1(&a.Objekte).Reset(nil)
+	} else {
+		a.Sku.Reset(&b.Sku)
+		T1(&a.Objekte).Reset(&b.Objekte)
+	}
 }

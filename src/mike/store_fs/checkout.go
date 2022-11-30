@@ -9,6 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/id"
+	"github.com/friedenberg/zit/src/echo/fd"
 	"github.com/friedenberg/zit/src/golf/typ"
 	"github.com/friedenberg/zit/src/india/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_external"
@@ -60,7 +61,7 @@ func (s Store) shouldCheckOut(
 ) (ok bool) {
 
 	switch {
-	case cz.Internal.Named.Stored.Objekte.Equals(&cz.External.Named.Stored.Objekte):
+	case cz.Internal.Objekte.Equals(&cz.External.Objekte):
 		cz.State = zettel_checked_out.StateJustCheckedOutButSame
 
 	//TODO wait why?
@@ -78,7 +79,7 @@ func (s Store) filenameForZettelTransacted(
 	options CheckoutOptions,
 	sz zettel.Transacted,
 ) (originalFilename string, filename string, err error) {
-	if originalFilename, err = id.MakeDirIfNecessary(sz.Named.Kennung, s.Cwd()); err != nil {
+	if originalFilename, err = id.MakeDirIfNecessary(sz.Sku.Kennung, s.Cwd()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -116,34 +117,36 @@ func (s *Store) CheckoutOne(
 		}
 	}
 
-	inlineAkte := typ.IsInlineAkte(sz.Named.Stored.Objekte.Typ, s.Konfig.Konfig)
+	inlineAkte := typ.IsInlineAkte(sz.Objekte.Typ, s.Konfig.Konfig)
 
 	cz = zettel_checked_out.Zettel{
 		//TODO check diff with fs if already exists
 		State:    zettel_checked_out.StateJustCheckedOut,
 		Internal: sz,
 		External: zettel_external.Zettel{
-			ZettelFD: zettel_external.FD{
+			ZettelFD: fd.FD{
 				Path: filename,
 			},
-			Named: sz.Named,
+			Objekte: sz.Objekte,
+			Sha:     sz.Sku.Sha,
+			Kennung: sz.Sku.Kennung,
 		},
 	}
 
 	if !inlineAkte {
-		t := sz.Named.Stored.Objekte.Typ
+		t := sz.Objekte.Typ
 
 		ty := s.Transacted.Objekte.GetTyp(t.String())
 
 		if ty != nil && ty.Typ.Akte.FileExtension != "" {
-			cz.External.AkteFD = zettel_external.FD{
+			cz.External.AkteFD = fd.FD{
 				Path: originalFilename + "." + ty.Typ.Akte.FileExtension,
 			}
 		}
 	}
 
 	c := zettel.FormatContextWrite{
-		Zettel:            sz.Named.Stored.Objekte,
+		Zettel:            sz.Objekte,
 		IncludeAkte:       inlineAkte,
 		AkteReaderFactory: s.storeObjekten,
 	}
@@ -151,7 +154,7 @@ func (s *Store) CheckoutOne(
 	switch options.CheckoutMode {
 	case CheckoutModeAkteOnly:
 		if err = s.writeAkte(
-			cz.External.Named.Stored.Objekte.Akte,
+			cz.External.Objekte.Akte,
 			cz.External.AkteFD.Path,
 			&cz,
 		); err != nil {
@@ -170,8 +173,8 @@ func (s *Store) CheckoutOne(
 
 	case CheckoutModeZettelOnly:
 		if err = s.writeFormat(options, filename, c, &cz); err != nil {
-			err = errors.Wrapf(err, "%s", sz.Named)
-			errors.PrintErrf("%s (check out failed):", sz.Named)
+			err = errors.Wrapf(err, "%s", sz.Sku)
+			errors.PrintErrf("%s (check out failed):", sz.Sku)
 			return
 		}
 

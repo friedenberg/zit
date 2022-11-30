@@ -16,7 +16,7 @@ import (
 func (z Zettel) ObjekteSha() (s sha.Sha, err error) {
 	hash := sha256.New()
 
-	o := Objekte{}
+	o := FormatObjekte{}
 
 	c := FormatContextWrite{
 		Zettel: z,
@@ -33,11 +33,11 @@ func (z Zettel) ObjekteSha() (s sha.Sha, err error) {
 	return
 }
 
-type Objekte struct {
+type FormatObjekte struct {
 	IgnoreTypErrors bool
 }
 
-func (f Objekte) WriteTo(c FormatContextWrite) (n int64, err error) {
+func (f FormatObjekte) WriteTo(c FormatContextWrite) (n int64, err error) {
 	z := c.Zettel
 	w := line_format.NewWriter()
 
@@ -59,7 +59,7 @@ func (f Objekte) WriteTo(c FormatContextWrite) (n int64, err error) {
 	return
 }
 
-func (f *Objekte) ReadFrom(c *FormatContextRead) (n int64, err error) {
+func (f *FormatObjekte) ReadFrom(c *FormatContextRead) (n int64, err error) {
 	etiketten := kennung.MakeEtikettMutableSet()
 
 	var z *Zettel

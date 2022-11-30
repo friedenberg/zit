@@ -54,7 +54,7 @@ func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 	pool := s.Zettelen.Pool()
 
 	w := func(zv *zettel_verzeichnisse.Zettel) (err error) {
-		if !zv.Transacted.Named.Kennung.Equals(&h) {
+		if !zv.Transacted.Sku.Kennung.Equals(&h) {
 			pool.Put(zv)
 			return
 		}
@@ -84,7 +84,7 @@ func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 	}
 
 	tz = found.Transacted
-	tz.Named.Stored.Objekte.Etiketten = tz.Named.Stored.Objekte.Etiketten.Copy()
+	tz.Objekte.Etiketten = tz.Objekte.Etiketten.Copy()
 
 	return
 }

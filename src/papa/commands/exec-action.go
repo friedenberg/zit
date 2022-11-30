@@ -85,7 +85,7 @@ func (c ExecAction) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	}
 
 	iter := func(tz *zettel.Transacted) (err error) {
-		typ := tz.Named.Stored.Objekte.Typ.String()
+		typ := tz.Objekte.Typ.String()
 
 		typKonfig := u.Konfig().Transacted.Objekte.GetTyp(typ)
 
@@ -133,7 +133,7 @@ func (c ExecAction) runExecutor(
 	}
 
 	env := map[string]string{
-		"ZIT_ZETTEL": z.Named.Kennung.String(),
+		"ZIT_ZETTEL": z.Sku.Kennung.String(),
 		"ZIT_BIN":    u.Standort().Executable(),
 	}
 
@@ -166,7 +166,7 @@ func (c ExecAction) runExecutor(
 
 		var ar io.ReadCloser
 
-		if ar, err = u.StoreObjekten().AkteReader(z.Named.Stored.Objekte.Akte); err != nil {
+		if ar, err = u.StoreObjekten().AkteReader(z.Objekte.Akte); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

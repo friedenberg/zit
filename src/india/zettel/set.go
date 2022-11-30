@@ -18,13 +18,13 @@ func MakeMutableSetUnique(c int) MutableSet {
 				}
 
 				return collections.MakeKey(
-					sz.Kopf,
-					sz.Mutter[0],
-					sz.Mutter[1],
-					sz.Schwanz,
-					sz.TransaktionIndex,
-					sz.Named.Kennung,
-					sz.Named.Stored.Sha,
+					sz.Sku.Kopf,
+					sz.Sku.Mutter[0],
+					sz.Sku.Mutter[1],
+					sz.Sku.Schwanz,
+					sz.Sku.TransactionIndex,
+					sz.Sku.Kennung,
+					sz.Sku.Sha,
 				)
 			},
 		),
@@ -40,7 +40,7 @@ func MakeMutableSetHinweis(c int) MutableSet {
 				}
 
 				return collections.MakeKey(
-					sz.Named.Kennung,
+					sz.Sku.Kennung,
 				)
 			},
 		),
@@ -82,7 +82,7 @@ func (s MutableSet) ToSliceHinweisen() (b []hinweis.Hinweis) {
 
 	s.Each(
 		func(z *Transacted) (err error) {
-			b = append(b, z.Named.Kennung)
+			b = append(b, z.Sku.Kennung)
 
 			return
 		},

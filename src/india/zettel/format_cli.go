@@ -5,6 +5,8 @@ import (
 
 	"github.com/friedenberg/zit/src/bravo/format"
 	"github.com/friedenberg/zit/src/charlie/bezeichnung"
+	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
@@ -34,14 +36,22 @@ func MakeCliFormat(
 
 // (new|unchanged|updated|archived) [kopf/schwanz@sha !typ]
 func MakeCliFormatTransacted(
-	znf format.FormatWriterFunc[Named],
+	hf format.FormatWriterFunc[hinweis.Hinweis],
+	sf format.FormatWriterFunc[sha.Sha],
+	zf format.FormatWriterFunc[Zettel],
 	verb string,
 ) format.FormatWriterFunc[Transacted] {
 	return func(w io.Writer, z *Transacted) (n int64, err error) {
 		return format.Write(
 			w,
 			format.MakeFormatStringRightAlignedParen(verb),
-			format.MakeWriter(znf, &z.Named),
+			format.MakeFormatString("["),
+			format.MakeWriter(hf, z.Kennung()),
+			format.MakeFormatString("@"),
+			format.MakeWriter(sf, &z.Sku.Sha),
+			format.MakeFormatString(" "),
+			format.MakeWriter[Zettel](zf, &z.Objekte),
+			format.MakeFormatString("]"),
 		)
 	}
 }

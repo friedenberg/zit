@@ -7,6 +7,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/bravo/int_value"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/kennung"
@@ -16,10 +17,11 @@ import (
 type Mutter [2]ts.Time
 
 type Sku struct {
-	gattung.Gattung
-	Mutter
-	Id flag.Value
-	sha.Sha
+	Gattung          gattung.Gattung
+	Mutter           Mutter
+	Id               flag.Value
+	Sha              sha.Sha
+	TransactionIndex int_value.IntValue
 }
 
 func (a Sku) Equals(b Sku) (ok bool) {

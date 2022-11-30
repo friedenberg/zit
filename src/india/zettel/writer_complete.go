@@ -8,31 +8,31 @@ import (
 )
 
 type WriterComplete struct {
-	wBuf    *bufio.Writer
-	chNamed chan Named
-	chDone  chan struct{}
+	wBuf         *bufio.Writer
+	chTransacted chan Transacted
+	chDone       chan struct{}
 }
 
 func MakeWriterComplete(w io.Writer) WriterComplete {
 	w1 := WriterComplete{
-		chNamed: make(chan Named),
-		chDone:  make(chan struct{}),
-		wBuf:    bufio.NewWriter(w),
+		chTransacted: make(chan Transacted),
+		chDone:       make(chan struct{}),
+		wBuf:         bufio.NewWriter(w),
 	}
 
 	go func(s *WriterComplete) {
-		for z := range s.chNamed {
-			if z.Kennung.String() == "/" {
+		for z := range s.chTransacted {
+			if z.Sku.Kennung.String() == "/" {
 				errors.Err().Printf("empty: %#v", z)
 				continue
 			}
 
 			//TODO-P4 handle write errors
-			s.wBuf.WriteString(z.Kennung.String())
+			s.wBuf.WriteString(z.Sku.Kennung.String())
 			s.wBuf.WriteString("\tZettel: !")
-			s.wBuf.WriteString(z.Stored.Objekte.Typ.String())
+			s.wBuf.WriteString(z.Objekte.Typ.String())
 			s.wBuf.WriteString(" ")
-			s.wBuf.WriteString(z.Stored.Objekte.Bezeichnung.String())
+			s.wBuf.WriteString(z.Objekte.Bezeichnung.String())
 			s.wBuf.WriteString("\n")
 		}
 
@@ -42,19 +42,19 @@ func MakeWriterComplete(w io.Writer) WriterComplete {
 	return w1
 }
 
-func (w *WriterComplete) WriteZettelNamed(z *Named) (err error) {
+func (w *WriterComplete) WriteZettelTransacted(z *Transacted) (err error) {
 	select {
 	case <-w.chDone:
 		err = io.EOF
 
-	case w.chNamed <- *z:
+	case w.chTransacted <- *z:
 	}
 
 	return
 }
 
 func (w *WriterComplete) Close() (err error) {
-	close(w.chNamed)
+	close(w.chTransacted)
 	<-w.chDone
 
 	if err = w.wBuf.Flush(); err != nil {

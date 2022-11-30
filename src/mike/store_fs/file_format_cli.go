@@ -43,7 +43,7 @@ func MakeCliFormatRecognized(
 	cw format.FuncColorWriter,
 	s standort.Standort,
 	sf format.FormatWriterFunc[sha.Sha],
-	znf format.FormatWriterFunc[zettel.Named],
+	znf format.FormatWriterFunc[zettel.Objekte],
 ) format.FormatWriterFunc[FileRecognized] {
 	return func(w io.Writer, zr *FileRecognized) (n int64, err error) {
 		return format.Write(
@@ -71,7 +71,7 @@ func MakeCliFormatRecognized(
 
 						var n1 int64
 
-						if n1, err = znf(w, &zt.Named); err != nil {
+						if n1, err = znf(w, &zt.Objekte); err != nil {
 							err = errors.Wrap(err)
 							return
 						}

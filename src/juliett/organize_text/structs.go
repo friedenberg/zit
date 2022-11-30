@@ -24,8 +24,11 @@ type zettel struct {
 	bezeichnung.Bezeichnung
 }
 
-func makeZettel(named zettel_pkg.Named, ha hinweis.Abbr) (z zettel, err error) {
-	h := named.Kennung
+func makeZettel(
+	named *zettel_pkg.Transacted,
+	ha hinweis.Abbr,
+) (z zettel, err error) {
+	h := *named.Kennung()
 
 	if ha != nil {
 		if h, err = ha.AbbreviateHinweis(h); err != nil {
@@ -37,7 +40,7 @@ func makeZettel(named zettel_pkg.Named, ha hinweis.Abbr) (z zettel, err error) {
 	z = zettel{
 		Hinweis: h,
 		//TODO do this smart
-		Bezeichnung: bezeichnung.Make(named.Stored.Objekte.Description()),
+		Bezeichnung: bezeichnung.Make(named.Objekte.Description()),
 	}
 
 	return

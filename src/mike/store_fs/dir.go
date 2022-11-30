@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/bravo/format"
 	"github.com/friedenberg/zit/src/delta/standort"
-	"github.com/friedenberg/zit/src/india/zettel_external"
+	"github.com/friedenberg/zit/src/echo/fd"
 )
 
 type Dir struct {
@@ -36,9 +36,9 @@ func MakeCliFormatDirDeleted(
 func MakeCliFormatFDDeleted(
 	cw format.FuncColorWriter,
 	s standort.Standort,
-	fdw format.FormatWriterFunc[zettel_external.FD],
-) format.FormatWriterFunc[zettel_external.FD] {
-	return func(w io.Writer, fd *zettel_external.FD) (n int64, err error) {
+	fdw format.FormatWriterFunc[fd.FD],
+) format.FormatWriterFunc[fd.FD] {
+	return func(w io.Writer, fd *fd.FD) (n int64, err error) {
 		return format.Write(
 			w,
 			format.MakeFormatStringRightAlignedParen(format.StringDeleted),

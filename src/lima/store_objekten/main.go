@@ -142,18 +142,18 @@ func (s Store) RevertTransaktion(
 
 			for _, someTz := range chain {
 				errors.Log().Print(someTz)
-				if someTz.Schwanz == o.Mutter[0] {
+				if someTz.Sku.Schwanz == o.Mutter[0] {
 					tz = *someTz
 					break
 				}
 			}
 
-			if tz.Named.Stored.Sha.IsNull() {
+			if tz.Sku.Sha.IsNull() {
 				err = errors.Errorf("zettel not found in index!: %#v", o)
 				return
 			}
 
-			if tz, err = s.zettelStore.Update(&tz.Named); err != nil {
+			if tz, err = s.zettelStore.Update(&tz.Objekte, &tz.Sku.Kennung); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -239,8 +239,8 @@ func (s *Store) Reindex() (err error) {
 	}
 
 	f := func(t *transaktion.Transaktion) (err error) {
-		if err = t.EachWithIndex(
-			func(o *sku.Indexed) (err error) {
+		if err = t.Each(
+			func(o *sku.Sku) (err error) {
 				switch o.Gattung {
 
 				case gattung.Zettel:
@@ -253,7 +253,7 @@ func (s *Store) Reindex() (err error) {
 
 					var mutter *zettel.Transacted
 
-					if mutter1, err := s.zettelStore.verzeichnisseSchwanzen.ReadHinweisSchwanzen(tz.Named.Kennung); err == nil {
+					if mutter1, err := s.zettelStore.verzeichnisseSchwanzen.ReadHinweisSchwanzen(tz.Sku.Kennung); err == nil {
 						mutter = &mutter1
 					}
 

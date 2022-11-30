@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/echo/fd"
 	"github.com/friedenberg/zit/src/golf/typ"
 	"github.com/friedenberg/zit/src/hotel/cwd_files"
 	"github.com/friedenberg/zit/src/india/zettel"
@@ -81,14 +82,6 @@ func (u *Umwelt) FormatZettel() format.FormatWriterFunc[zettel.Zettel] {
 	)
 }
 
-func (u *Umwelt) FormatZettelNamed() format.FormatWriterFunc[zettel.Named] {
-	return zettel.MakeCliFormatNamed(
-		u.FormatHinweis(),
-		u.FormatSha(),
-		u.FormatZettel(),
-	)
-}
-
 func (u *Umwelt) FormatZettelExternal() format.FormatWriterFunc[zettel_external.Zettel] {
 	return zettel_external.MakeCliFormatZettel(
 		u.Standort(),
@@ -106,7 +99,7 @@ func (u *Umwelt) FormatZettelExternalAkte() format.FormatWriterFunc[zettel_exter
 	)
 }
 
-func (u *Umwelt) FormatZettelExternalFD() format.FormatWriterFunc[zettel_external.FD] {
+func (u *Umwelt) FormatZettelExternalFD() format.FormatWriterFunc[fd.FD] {
 	return zettel_external.MakeCliFormatFD(
 		u.Standort(),
 		u.FormatColorWriter(),
@@ -137,7 +130,9 @@ func (u *Umwelt) FormatZettelCheckedOutFresh(
 
 func (u *Umwelt) FormatZettelTransacted(verb string) format.FormatWriterFunc[zettel.Transacted] {
 	return zettel.MakeCliFormatTransacted(
-		u.FormatZettelNamed(),
+		u.FormatHinweis(),
+		u.FormatSha(),
+		u.FormatZettel(),
 		verb,
 	)
 }
@@ -155,7 +150,7 @@ func (u *Umwelt) FormatFileRecognized() format.FormatWriterFunc[store_fs.FileRec
 		u.FormatColorWriter(),
 		u.Standort(),
 		u.FormatSha(),
-		u.FormatZettelNamed(),
+		u.FormatZettel(),
 	)
 }
 
@@ -166,7 +161,7 @@ func (u *Umwelt) FormatDirDeleted() format.FormatWriterFunc[store_fs.Dir] {
 	)
 }
 
-func (u *Umwelt) FormatFDDeleted() format.FormatWriterFunc[zettel_external.FD] {
+func (u *Umwelt) FormatFDDeleted() format.FormatWriterFunc[fd.FD] {
 	return store_fs.MakeCliFormatFDDeleted(
 		u.FormatColorWriter(),
 		u.Standort(),

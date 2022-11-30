@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/echo/fd"
 	"github.com/friedenberg/zit/src/india/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_external"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -39,7 +40,7 @@ func (c ZettelFromExternalAkte) Run(
 	for _, arg := range args {
 		var z *zettel_external.Zettel
 
-		akteFD := zettel_external.FD{
+		akteFD := fd.FD{
 			Path: arg,
 		}
 
@@ -59,7 +60,7 @@ func (c ZettelFromExternalAkte) Run(
 		matcher := zettel_external.MakeMutableMatchSet(toCreate)
 
 		if err = c.StoreObjekten().Zettel().ReadAllTransacted(
-			zettel.MakeWriterZettelNamed(matcher.Match),
+			matcher.Match,
 			results.AddAndDoNotRepool,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -69,9 +70,10 @@ func (c ZettelFromExternalAkte) Run(
 
 	err = results.Each(
 		func(z *zettel.Transacted) (err error) {
-			if c.ProtoZettel.Apply(&z.Named.Stored.Objekte) {
+			if c.ProtoZettel.Apply(&z.Objekte) {
 				if *z, err = c.StoreObjekten().Zettel().Update(
-					&z.Named,
+					&z.Objekte,
+					&z.Sku.Kennung,
 				); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -89,19 +91,22 @@ func (c ZettelFromExternalAkte) Run(
 
 	err = toCreate.Each(
 		func(z *zettel_external.Zettel) (err error) {
-			if z.Named.Stored.Objekte.IsEmpty() {
+			if z.Objekte.IsEmpty() {
 				return
 			}
 
 			var tz zettel.Transacted
 
-			if tz, err = c.StoreObjekten().Zettel().Create(z.Named.Stored.Objekte); err != nil {
+			if tz, err = c.StoreObjekten().Zettel().Create(z.Objekte); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			if c.ProtoZettel.Apply(&tz.Named.Stored.Objekte) {
-				if tz, err = c.StoreObjekten().Zettel().Update(&tz.Named); err != nil {
+			if c.ProtoZettel.Apply(&tz.Objekte) {
+				if tz, err = c.StoreObjekten().Zettel().Update(
+					&tz.Objekte,
+					&tz.Sku.Kennung,
+				); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -144,7 +149,7 @@ func (c ZettelFromExternalAkte) Run(
 }
 
 func (c ZettelFromExternalAkte) zettelForAkte(
-	akteFD zettel_external.FD,
+	akteFD fd.FD,
 ) (z *zettel_external.Zettel, err error) {
 	z = &zettel_external.Zettel{
 		AkteFD: akteFD,
@@ -178,11 +183,11 @@ func (c ZettelFromExternalAkte) zettelForAkte(
 		return
 	}
 
-	z.Named.Stored.Objekte.Reset(nil)
-	z.Named.Stored.Objekte.Akte = akteWriter.Sha()
+	z.Objekte.Reset(nil)
+	z.Objekte.Akte = akteWriter.Sha()
 
 	//TODO-P4 move to protozettel
-	if err = z.Named.Stored.Objekte.Bezeichnung.Set(
+	if err = z.Objekte.Bezeichnung.Set(
 		path.Base(akteFD.Path),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -193,7 +198,7 @@ func (c ZettelFromExternalAkte) zettelForAkte(
 	ext := akteFD.Ext()
 
 	if ext != "" {
-		if err = z.Named.Stored.Objekte.Typ.Set(akteFD.Ext()); err != nil {
+		if err = z.Objekte.Typ.Set(akteFD.Ext()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

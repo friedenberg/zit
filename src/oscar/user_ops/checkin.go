@@ -35,7 +35,10 @@ func (c Checkin) Run(
 	for _, z := range zettelen {
 		var tz zettel.Transacted
 
-		if tz, err = c.StoreObjekten().Zettel().Update(&z.Named); err != nil {
+		if tz, err = c.StoreObjekten().Zettel().Update(
+			&z.Objekte,
+			&z.Kennung,
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -43,7 +46,7 @@ func (c Checkin) Run(
 		//TODO: add states to checkin process to indicate results of update call
 		// stdprinter.Outf("%s (unchanged)", tz.Named)
 
-		results.Zettelen[tz.Named.Kennung] = zettel_checked_out.Zettel{
+		results.Zettelen[tz.Sku.Kennung] = zettel_checked_out.Zettel{
 			Internal: tz,
 			External: z,
 		}

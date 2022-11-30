@@ -62,7 +62,7 @@ func (op FilterZettelsWithScript) Run() (err error) {
 		errors.Log().Printf("%#v", hinweisen)
 		op.Set.Chain(
 			func(z *zettel.Transacted) (err error) {
-				ok := hinweisen.Contains(z.Named.Kennung)
+				ok := hinweisen.Contains(z.Sku.Kennung)
 
 				if ok {
 					err = io.EOF

@@ -2,7 +2,7 @@ package sku
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/int_value"
+	"github.com/friedenberg/zit/src/bravo/collections"
 )
 
 type MutableSet struct {
@@ -52,15 +52,12 @@ func (os MutableSet) Get(k string) []Sku {
 	return os.objekten[k]
 }
 
-func (os MutableSet) EachWithIndex(w WriterWithIndexFunc) (err error) {
+func (os MutableSet) Each(
+	w collections.WriterFunc[*Sku],
+) (err error) {
 	for _, oss := range os.objekten {
-		for i, o := range oss {
-			o1 := Indexed{
-				Sku:   o,
-				Index: int_value.Make(i),
-			}
-
-			if err = w(&o1); err != nil {
+		for _, o := range oss {
+			if err = w(&o); err != nil {
 				switch {
 				case errors.IsEOF(err):
 					err = nil
@@ -75,12 +72,4 @@ func (os MutableSet) EachWithIndex(w WriterWithIndexFunc) (err error) {
 	}
 
 	return
-}
-
-func (os MutableSet) Each(w WriterFunc) (err error) {
-	return os.EachWithIndex(
-		func(o *Indexed) (err error) {
-			return w(&o.Sku)
-		},
-	)
 }

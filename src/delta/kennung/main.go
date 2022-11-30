@@ -62,7 +62,7 @@ func (e *Kennung[T, T1]) Set(v string) (err error) {
 	v3 := strings.TrimSpace(v1)
 
 	if v3 == "" {
-		err = errors.Errorf("Kennung cannot be empty")
+		err = gattung.ErrEmptyKennung{}
 		return
 	}
 

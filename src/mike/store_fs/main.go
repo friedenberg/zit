@@ -118,7 +118,7 @@ func (s Store) MakeExternalZettelFromZettel(p string) (ez zettel_external.Zettel
 
 	head, tail := id.HeadTailFromFileName(p)
 
-	if ez.Named.Kennung, err = hinweis.Make(head + "/" + tail); err != nil {
+	if ez.Kennung, err = hinweis.Make(head + "/" + tail); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -162,12 +162,12 @@ func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 		return
 	}
 
-	if ez.Named.Stored.Sha, err = s.storeObjekten.Zettel().WriteZettelObjekte(c.Zettel); err != nil {
+	if ez.Sha, err = s.storeObjekten.Zettel().WriteZettelObjekte(c.Zettel); err != nil {
 		err = errors.Wrapf(err, "%s", f.Name())
 		return
 	}
 
-	ez.Named.Stored.Objekte = c.Zettel
+	ez.Objekte = c.Zettel
 	ez.AkteFD.Path = c.AktePath
 
 	var unrecoverableErrors errors.Multi
@@ -183,7 +183,7 @@ func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 				continue
 			}
 
-			ez.Named.Stored.Objekte = z1
+			ez.Objekte = z1
 			continue
 		}
 
@@ -192,12 +192,12 @@ func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 		if errors.As(e, &err1) {
 			var mutter zettel.Transacted
 
-			if mutter, err = s.storeObjekten.Zettel().ReadHinweisSchwanzen(ez.Named.Kennung); err != nil {
+			if mutter, err = s.storeObjekten.Zettel().ReadHinweisSchwanzen(ez.Kennung); err != nil {
 				unrecoverableErrors.Add(errors.Wrap(err))
 				continue
 			}
 
-			ez.Named.Stored.Objekte.Akte = mutter.Named.Stored.Objekte.Akte
+			ez.Objekte.Akte = mutter.Objekte.Akte
 
 			continue
 		}
@@ -228,7 +228,7 @@ func (s *Store) Read(p string) (cz zettel_checked_out.Zettel, err error) {
 		}
 	}
 
-	if cz.Internal, err = s.storeObjekten.Zettel().ReadHinweisSchwanzen(cz.External.Named.Kennung); err != nil {
+	if cz.Internal, err = s.storeObjekten.Zettel().ReadHinweisSchwanzen(cz.External.Kennung); err != nil {
 		if errors.Is(err, store_objekten.ErrNotFound{}) {
 			err = nil
 		} else {
@@ -241,15 +241,15 @@ func (s *Store) Read(p string) (cz zettel_checked_out.Zettel, err error) {
 
 	if cz.State > zettel_checked_out.StateExistsAndSame {
 		//TODO rewrite with verzeichnisseAll
-		// exSha := cz.External.Named.Stored.Sha
+		// exSha := cz.External.Sku.Sha
 		// cz.Matches.Zettelen, _ = s.storeObjekten.ReadZettelSha(exSha)
 		// cz.Matches.Zettelen, _ = cz.Matches.Zettelen.Filter(nil, filter)
 
-		// exAkteSha := cz.External.Named.Stored.Objekte.Akte
+		// exAkteSha := cz.External.Objekte.Akte
 		// cz.Matches.Akten, _ = s.storeObjekten.ReadAkteSha(exAkteSha)
 		// cz.Matches.Akten, _ = cz.Matches.Akten.Filter(nil, filter)
 
-		// bez := cz.External.Named.Stored.Objekte.Bezeichnung.String()
+		// bez := cz.External.Objekte.Bezeichnung.String()
 		// cz.Matches.Bezeichnungen, _ = s.storeObjekten.ReadBezeichnung(bez)
 		// cz.Matches.Bezeichnungen, _ = cz.Matches.Bezeichnungen.Filter(nil, filter)
 	}

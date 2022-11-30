@@ -49,7 +49,7 @@ func (atc AssignmentTreeConstructor) makeChildren(
 			func(e kennung.Etikett, tz zettel_pkg.Transacted) (err error) {
 				var z zettel
 
-				if z, err = makeZettel(tz.Named, atc.Abbr); err != nil {
+				if z, err = makeZettel(&tz, atc.Abbr); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -74,7 +74,7 @@ func (atc AssignmentTreeConstructor) makeChildren(
 		func(tz *zettel_pkg.Transacted) (err error) {
 			var z zettel
 
-			if z, err = makeZettel(tz.Named, atc.Abbr); err != nil {
+			if z, err = makeZettel(tz, atc.Abbr); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

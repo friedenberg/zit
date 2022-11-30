@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/echo/fd"
 	"github.com/friedenberg/zit/src/india/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_external"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
@@ -61,7 +62,7 @@ func (c CreateFromPaths) Run(args ...string) (results zettel.MutableSet, err err
 		matcher := zettel_external.MakeMutableMatchSet(toCreate)
 
 		if err = c.StoreObjekten().Zettel().ReadAllTransacted(
-			zettel.MakeWriterZettelNamed(matcher.Match),
+			matcher.Match,
 			results.AddAndDoNotRepool,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -76,9 +77,10 @@ func (c CreateFromPaths) Run(args ...string) (results zettel.MutableSet, err err
 
 	err = results.Each(
 		func(z *zettel.Transacted) (err error) {
-			if c.ProtoZettel.Apply(&z.Named.Stored.Objekte) {
+			if c.ProtoZettel.Apply(&z.Objekte) {
 				if *z, err = c.StoreObjekten().Zettel().Update(
-					&z.Named,
+					&z.Objekte,
+					&z.Sku.Kennung,
 				); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -95,20 +97,21 @@ func (c CreateFromPaths) Run(args ...string) (results zettel.MutableSet, err err
 				External: *z,
 			}
 
-			if z.Named.Stored.Objekte.IsEmpty() {
+			if z.Objekte.IsEmpty() {
 				return
 			}
 
-			if cz.Internal, err = c.StoreObjekten().Zettel().Create(z.Named.Stored.Objekte); err != nil {
+			if cz.Internal, err = c.StoreObjekten().Zettel().Create(z.Objekte); err != nil {
 				//TODO add file for error handling
 				c.handleStoreError(cz, "", err)
 				err = nil
 				return
 			}
 
-			if c.ProtoZettel.Apply(&cz.Internal.Named.Stored.Objekte) {
+			if c.ProtoZettel.Apply(&cz.Internal.Objekte) {
 				if cz.Internal, err = c.StoreObjekten().Zettel().Update(
-					&cz.Internal.Named,
+					&cz.Internal.Objekte,
+					&cz.Internal.Sku.Kennung,
 				); err != nil {
 					//TODO add file for error handling
 					c.handleStoreError(cz, "", err)
@@ -202,15 +205,13 @@ func (c CreateFromPaths) zettelsFromPath(
 
 			wf(
 				&zettel_external.Zettel{
-					ZettelFD: zettel_external.FD{
+					ZettelFD: fd.FD{
 						Path: p,
 					},
-					Named: zettel.Named{
-						Stored: zettel.Stored{
-							Sha:     s,
-							Objekte: z1,
-						},
-					},
+					Objekte: z1,
+					Sha:     s,
+					//TODO
+					// Kennung: z.Sku.Kennung,
 				},
 			)
 		} else {
@@ -228,15 +229,11 @@ func (c CreateFromPaths) zettelsFromPath(
 
 	wf(
 		&zettel_external.Zettel{
-			ZettelFD: zettel_external.FD{
+			ZettelFD: fd.FD{
 				Path: p,
 			},
-			Named: zettel.Named{
-				Stored: zettel.Stored{
-					Sha:     s,
-					Objekte: ctx.Zettel,
-				},
-			},
+			Sha:     s,
+			Objekte: ctx.Zettel,
 		},
 	)
 

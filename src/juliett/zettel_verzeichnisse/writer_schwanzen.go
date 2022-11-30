@@ -15,13 +15,13 @@ import (
 
 type WriterSchwanzen struct {
 	lock      *sync.RWMutex
-	hinweisen map[hinweis.Hinweis]sku.Transacted
+	hinweisen map[hinweis.Hinweis]sku.Sku2[hinweis.Hinweis, *hinweis.Hinweis]
 }
 
 func MakeWriterSchwanzen() *WriterSchwanzen {
 	return &WriterSchwanzen{
 		lock:      &sync.RWMutex{},
-		hinweisen: make(map[hinweis.Hinweis]sku.Transacted),
+		hinweisen: make(map[hinweis.Hinweis]sku.Sku2[hinweis.Hinweis, *hinweis.Hinweis]),
 	}
 }
 
@@ -29,15 +29,15 @@ func (zws *WriterSchwanzen) Less(zt *zettel.Transacted) (ok bool) {
 	zws.lock.RLock()
 	defer zws.lock.RUnlock()
 
-	var t sku.Transacted
+	var t sku.Sku2[hinweis.Hinweis, *hinweis.Hinweis]
 
-	t, ok = zws.hinweisen[zt.Named.Kennung]
+	t, ok = zws.hinweisen[zt.Sku.Kennung]
 
 	switch {
 	case !ok:
 		fallthrough
 
-	case zt.SkuTransacted().Less(t):
+	case zt.Sku.Less(&t):
 		ok = true
 	}
 
@@ -48,7 +48,7 @@ func (zws *WriterSchwanzen) Get(h hinweis.Hinweis) (t ts.Time, ok bool) {
 	zws.lock.RLock()
 	defer zws.lock.RUnlock()
 
-	var o sku.Transacted
+	var o sku.Sku2[hinweis.Hinweis, *hinweis.Hinweis]
 
 	o, ok = zws.hinweisen[h]
 
@@ -61,14 +61,14 @@ func (zws *WriterSchwanzen) Set(z *zettel.Transacted) (ok bool) {
 	zws.lock.Lock()
 	defer zws.lock.Unlock()
 
-	h := z.Named.Kennung
-	o := z.SkuTransacted()
+	h := z.Sku.Kennung
+	o := z.Sku
 	t1, _ := zws.hinweisen[h]
 
-	if t1.Less(o) {
+	if t1.Less(&o) {
 		zws.hinweisen[h] = o
 		ok = true
-	} else if t1.Equals(o) {
+	} else if t1.Equals(&o) {
 		ok = true
 	} else {
 		ok = false
@@ -101,7 +101,7 @@ func (zws *WriterSchwanzen) ReadFrom(r1 io.Reader) (n int64, err error) {
 
 	dec := gob.NewDecoder(r)
 
-	m := make(map[hinweis.Hinweis]sku.Transacted)
+	m := make(map[hinweis.Hinweis]zettel.Sku)
 
 	if err = dec.Decode(&m); err != nil {
 		if errors.IsEOF(err) {

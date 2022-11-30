@@ -27,30 +27,30 @@ func (z zettelFilterable) Gattung() gattung.Gattung {
 }
 
 func (z zettelFilterable) Hinweis() hinweis.Hinweis {
-	return z.Named.Kennung
+	return z.Sku.Kennung
 }
 
 func (z zettelFilterable) AkteEtiketten() kennung.EtikettSet {
-	return z.Named.Stored.Objekte.Etiketten
+	return z.Objekte.Etiketten
 }
 
 func (z zettelFilterable) AkteSha() sha.Sha {
-	return z.Named.Stored.Objekte.Akte
+	return z.Objekte.Akte
 }
 
 func (z zettelFilterable) SetAkteSha(v sha.Sha) {
-	z.Named.Stored.Objekte.Akte = v
+	z.Objekte.Akte = v
 }
 
 func (z zettelFilterable) ObjekteSha() sha.Sha {
-	return z.Named.Stored.Sha
+	return z.Sku.Sha
 }
 
 func (z zettelFilterable) SetObjekteSha(
 	arf gattung.AkteReaderFactory,
 	v string,
 ) (err error) {
-	if err = z.Named.Stored.Sha.Set(v); err != nil {
+	if err = z.Sku.Sha.Set(v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -59,5 +59,5 @@ func (z zettelFilterable) SetObjekteSha(
 }
 
 func (z zettelFilterable) AkteTyp() kennung.Typ {
-	return z.Named.Stored.Objekte.Typ
+	return z.Objekte.Typ
 }

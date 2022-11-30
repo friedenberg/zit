@@ -8,7 +8,7 @@ package files
 // 		return
 // 	}
 
-// 	p = path.Join(d, h.Schwanz()+"."+tz.Named.Stored.Objekte.Typ.String())
+// 	p = path.Join(d, h.Schwanz()+"."+tz.Objekte.Typ.String())
 
 // 	if err = syscall.Mknod(p, syscall.S_IFIFO|0666, 0); err != nil {
 // 		err = errors.Wrap(err)

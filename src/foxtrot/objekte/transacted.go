@@ -23,20 +23,20 @@ func (zt Transacted[T, T1, T2, T3]) IsNew() bool {
 	return zt.Kopf == zt.Schwanz && zt.TransaktionIndex == 0
 }
 
-func (zt Transacted[T, T1, T2, T3]) SkuTransacted() sku.Transacted {
-	return sku.Transacted{
-		Indexed: sku.Indexed{
-			Sku: sku.Sku{
-				Gattung: zt.Named.Stored.Objekte.Gattung(),
-				Mutter:  zt.Mutter,
-				Id:      T3(&zt.Named.Kennung),
-				Sha:     zt.Named.Stored.Sha,
-			},
-			Index: zt.TransaktionIndex,
-		},
-		Schwanz: zt.Schwanz,
-	}
-}
+// func (zt Transacted[T, T1, T2, T3]) SkuTransacted() sku.Transacted {
+// 	return sku.Transacted{
+// 		Indexed: sku.Indexed{
+// 			Sku: sku.Sku{
+// 				Gattung: zt.Objekte.Gattung(),
+// 				Mutter:  zt.Mutter,
+// 				Id:      T3(&zt.Sku.Kennung),
+// 				Sha:     zt.Sku.Sha,
+// 			},
+// 			Index: zt.TransaktionIndex,
+// 		},
+// 		Schwanz: zt.Schwanz,
+// 	}
+// }
 
 func (zt *Transacted[T, T1, T2, T3]) Reset() {
 	zt.Kopf = ts.Time{}

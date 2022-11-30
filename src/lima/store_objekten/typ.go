@@ -213,7 +213,7 @@ func (s typStore) AllInChain(k kennung.Typ) (c []*typ.Transacted, err error) {
 
 	// if err = s.verzeichnisseAll.ReadMany(
 	// 	func(z *zettel_verzeichnisse.Zettel) (err error) {
-	// 		if !z.Transacted.Named.Kennung.Equals(&h) {
+	// 		if !z.Transacted.Sku.Kennung.Equals(&h) {
 	// 			err = io.EOF
 	// 			return
 	// 		}

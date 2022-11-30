@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/echo/sku"
 	"github.com/friedenberg/zit/src/foxtrot/objekte"
 )
 
@@ -19,6 +20,10 @@ type Zettel struct {
 	Etiketten   kennung.EtikettSet
 }
 
+type Objekte = Zettel
+
+type Sku = sku.Sku2[hinweis.Hinweis, *hinweis.Hinweis]
+
 type zettel_transacted = objekte.Transacted[
 	Zettel,
 	*Zettel,
@@ -26,9 +31,14 @@ type zettel_transacted = objekte.Transacted[
 	*hinweis.Hinweis,
 ]
 
-type Transacted = zettel_transacted
+// type Transacted = zettel_transacted
 
-// type Zettel = zettel2.Transacted
+type Transacted = objekte.Transacted2[
+	Zettel,
+	*Zettel,
+	hinweis.Hinweis,
+	*hinweis.Hinweis,
+]
 
 type Stored = objekte.Stored[Zettel, *Zettel]
 
@@ -41,6 +51,14 @@ type Named = objekte.Named[
 
 func (z Zettel) Gattung() gattung.Gattung {
 	return gattung.Zettel
+}
+
+func (z Zettel) AkteSha() sha.Sha {
+	return z.Akte
+}
+
+func (z *Zettel) SetAkteSha(v sha.Sha) {
+	z.Akte = v
 }
 
 // TODO-P2 figure out why this doesn't always work for `status`

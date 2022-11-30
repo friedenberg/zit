@@ -12,7 +12,7 @@ type Zettel struct {
 }
 
 func (z *Zettel) Reset(z1 *Zettel) {
-	z.Transacted.Reset()
+	z.Transacted.Reset(nil)
 	z.EtikettenExpandedSorted = z.EtikettenExpandedSorted[:0]
 	z.EtikettenSorted = z.EtikettenSorted[:0]
 

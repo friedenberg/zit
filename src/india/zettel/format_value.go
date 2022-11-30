@@ -30,7 +30,7 @@ func (f FormatValue) String() string {
 	case *Text:
 		return "text"
 
-	case *Objekte:
+	case *FormatObjekte:
 		return "objekte"
 
 	case *Akte:
@@ -53,7 +53,7 @@ func (f *FormatValue) Set(v string) (err error) {
 	// 	f.EncoderLike = collections_coding.MakeEncoderJson[Zettel](f.out)
 
 	case "objekte":
-		f.Format = &Objekte{}
+		f.Format = &FormatObjekte{}
 
 	case "text":
 		f.Format = &Text{}

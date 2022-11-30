@@ -105,18 +105,16 @@ func (c CatObjekte) akten(u *umwelt.Umwelt, shas sha.Set) (err error) {
 
 func (c CatObjekte) zettelen(u *umwelt.Umwelt, shas sha.Set) (err error) {
 	w := collections.MakeChain(
-		zettel.MakeWriterZettelNamed(
-			func(z *zettel.Named) (err error) {
-				if !shas.Contains(z.Stored.Sha) {
-					err = io.EOF
-				}
+		func(z *zettel.Transacted) (err error) {
+			if !shas.Contains(z.Sku.Sha) {
+				err = io.EOF
+			}
 
-				return
-			},
-		),
+			return
+		},
 		zettel.MakeWriterZettel(
 			zettel.MakeSerializedFormatWriter(
-				&zettel.Objekte{},
+				&zettel.FormatObjekte{},
 				u.Out(),
 				u.StoreObjekten(),
 				u.Konfig(),

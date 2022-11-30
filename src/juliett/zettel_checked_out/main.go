@@ -12,15 +12,15 @@ type Zettel struct {
 }
 
 func (c *Zettel) DetermineState() {
-	if c.Internal.Named.Stored.Sha.IsNull() {
+	if c.Internal.Sku.Sha.IsNull() {
 		if c.External.ExternalPathAndSha() == "" {
 			c.State = StateEmpty
 		} else {
 			c.State = StateUntracked
 		}
-	} else if c.Internal.Named.Stored.Sha.Equals(c.External.Named.Stored.Sha) {
+	} else if c.Internal.Sku.Sha.Equals(c.External.Sha) {
 		c.State = StateExistsAndSame
-	} else if c.External.Named.Stored.Sha.IsNull() {
+	} else if c.External.Sha.IsNull() {
 		c.State = StateEmpty
 	} else {
 		c.State = StateExistsAndDifferent

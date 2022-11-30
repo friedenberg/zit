@@ -11,7 +11,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/ts"
 	"github.com/friedenberg/zit/src/echo/id_set"
 	"github.com/friedenberg/zit/src/india/zettel"
-	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
@@ -69,9 +68,9 @@ func (c commandWithIds) Complete(u *umwelt.Umwelt, args ...string) (err error) {
 			zw := zettel.MakeWriterComplete(os.Stdout)
 			defer zw.Close()
 
-			w := zettel_verzeichnisse.MakeWriterZettelNamed(zw.WriteZettelNamed)
+			w := zw.WriteZettelTransacted
 
-			if err = u.StoreObjekten().Zettel().ReadAllSchwanzenVerzeichnisse(w); err != nil {
+			if err = u.StoreObjekten().Zettel().ReadAllSchwanzenTransacted(w); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

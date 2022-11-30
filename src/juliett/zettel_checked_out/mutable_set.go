@@ -18,12 +18,12 @@ func MakeMutableSetUnique(c int) MutableSet {
 				}
 
 				return collections.MakeKey(
-					sz.Internal.Kopf,
-					sz.Internal.Mutter[0],
-					sz.Internal.Mutter[1],
-					sz.Internal.Schwanz,
-					sz.Internal.Named.Kennung,
-					sz.Internal.Named.Stored.Sha,
+					sz.Internal.Sku.Kopf,
+					sz.Internal.Sku.Mutter[0],
+					sz.Internal.Sku.Mutter[1],
+					sz.Internal.Sku.Schwanz,
+					sz.Internal.Sku.Kennung,
+					sz.Internal.Sku.Sha,
 				)
 			},
 		),
@@ -38,7 +38,7 @@ func MakeMutableSetHinweisZettel(c int) MutableSet {
 					return ""
 				}
 
-				return collections.MakeKey(sz.Internal.Named.Kennung)
+				return collections.MakeKey(sz.Internal.Sku.Kennung)
 			},
 		),
 	}

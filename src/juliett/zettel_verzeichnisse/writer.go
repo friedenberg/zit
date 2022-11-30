@@ -18,16 +18,3 @@ func MakeWriterZettelTransacted(
 		return
 	}
 }
-
-func MakeWriterZettelNamed(
-	wf collections.WriterFunc[*zettel.Named],
-) collections.WriterFunc[*Zettel] {
-	return func(z *Zettel) (err error) {
-		if err = wf(&z.Transacted.Named); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		return
-	}
-}

@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/delta/id"
 	"github.com/friedenberg/zit/src/delta/ts"
 	"github.com/friedenberg/zit/src/golf/transaktion"
@@ -44,8 +45,14 @@ func (s Store) ReadAllTransaktions(
 			var t *transaktion.Transaktion
 
 			if t, err = s.readTransaktion(p); err != nil {
-				err = errors.Wrap(err)
-				return
+				if errors.Is(err, gattung.ErrEmptyKennung{}) {
+					errors.Err().Print(err)
+					err = nil
+					return
+				} else {
+					err = errors.Wrap(err)
+					return
+				}
 			}
 
 			if err = f(t); err != nil {
