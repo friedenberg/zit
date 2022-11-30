@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/delta/typ_toml"
 	"github.com/friedenberg/zit/src/echo/fd"
+	"github.com/friedenberg/zit/src/echo/sku"
 )
 
 type ExternalKeyer struct{}
@@ -16,13 +17,12 @@ func (_ ExternalKeyer) Key(e *External) string {
 		return ""
 	}
 
-	return e.Kennung.String()
+	return e.Sku.Kennung.String()
 }
 
 type External struct {
 	Objekte typ_toml.Objekte
-	Kennung kennung.Typ
-	Sha     sha.Sha
+	Sku     sku.External[kennung.Typ, *kennung.Typ]
 	FD      fd.FD
 }
 
@@ -46,7 +46,7 @@ func (e *External) SetObjekteSha(
 	arf gattung.AkteReaderFactory,
 	v string,
 ) (err error) {
-	if err = e.Sha.Set(v); err != nil {
+	if err = e.Sku.Sha.Set(v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

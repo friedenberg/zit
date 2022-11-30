@@ -13,6 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/typ_toml"
 	"github.com/friedenberg/zit/src/echo/fd"
 	"github.com/friedenberg/zit/src/echo/id_set"
+	"github.com/friedenberg/zit/src/echo/sku"
 	"github.com/friedenberg/zit/src/golf/typ"
 	"github.com/friedenberg/zit/src/november/umwelt"
 	"github.com/friedenberg/zit/src/oscar/user_ops"
@@ -86,7 +87,7 @@ func (c EditTyp) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 		func(e *typ.External) (err error) {
 			if _, err = u.StoreObjekten().Typ().Update(
 				&e.Objekte,
-				&e.Kennung,
+				&e.Sku.Kennung,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -94,7 +95,7 @@ func (c EditTyp) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 			u.KonfigPtr().Transacted.Objekte.AddTyp(
 				&e.Objekte.Akte,
-				&e.Kennung,
+				&e.Sku.Kennung,
 			)
 
 			return
@@ -197,8 +198,10 @@ func (c EditTyp) readTempTypFiles(
 			}
 
 			te := &typ.External{
-				Kennung: kennung.MustTyp(fdee.FileNameSansExt()),
-				FD:      fdee,
+				Sku: sku.External[kennung.Typ, *kennung.Typ]{
+					Kennung: kennung.MustTyp(fdee.FileNameSansExt()),
+				},
+				FD: fdee,
 			}
 
 			//TODO offer option to edit again

@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/fd"
+	"github.com/friedenberg/zit/src/echo/sku"
 	"github.com/friedenberg/zit/src/golf/typ"
 )
 
@@ -27,7 +28,9 @@ func (c *CwdFiles) tryTyp(fi os.FileInfo) (err error) {
 
 	if t, ok = c.Typen[pathMinusExt]; !ok {
 		t = &typ.External{
-			Kennung: h,
+			Sku: sku.External[kennung.Typ, *kennung.Typ]{
+				Kennung: h,
+			},
 		}
 	}
 

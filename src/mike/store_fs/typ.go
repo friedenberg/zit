@@ -6,7 +6,9 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/delta/typ_toml"
+	"github.com/friedenberg/zit/src/echo/sku"
 	"github.com/friedenberg/zit/src/golf/typ"
 	"github.com/friedenberg/zit/src/hotel/cwd_files"
 )
@@ -22,8 +24,10 @@ func (s *Store) WriteTyp(t *typ.Transacted) (te *typ.External, err error) {
 		},
 		//TODO move to central place
 		Objekte: t.Objekte,
-		Sha:     t.ObjekteSha(),
-		Kennung: t.Sku.Kennung,
+		Sku: sku.External[kennung.Typ, *kennung.Typ]{
+			Sha:     t.ObjekteSha(),
+			Kennung: t.Sku.Kennung,
+		},
 	}
 
 	var f *os.File
