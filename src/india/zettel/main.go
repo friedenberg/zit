@@ -24,25 +24,7 @@ type Objekte = Zettel
 
 type Sku = sku.Sku2[hinweis.Hinweis, *hinweis.Hinweis]
 
-type zettel_transacted = objekte.Transacted[
-	Zettel,
-	*Zettel,
-	hinweis.Hinweis,
-	*hinweis.Hinweis,
-]
-
-// type Transacted = zettel_transacted
-
 type Transacted = objekte.Transacted2[
-	Zettel,
-	*Zettel,
-	hinweis.Hinweis,
-	*hinweis.Hinweis,
-]
-
-type Stored = objekte.Stored[Zettel, *Zettel]
-
-type Named = objekte.Named[
 	Zettel,
 	*Zettel,
 	hinweis.Hinweis,

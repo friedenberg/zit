@@ -127,19 +127,6 @@ func (s typStore) transact(
 	return
 }
 
-// TODO write konfig compiled
-func (s typStore) writeTransactedToIndex(tt *typ.Transacted) (err error) {
-	if !s.common.LockSmith.IsAcquired() {
-		err = ErrLockRequired{
-			Operation: "write named zettel to index",
-		}
-
-		return
-	}
-
-	return
-}
-
 func (s typStore) ReadOne(
 	k *kennung.Typ,
 ) (tt *typ.Transacted, err error) {
@@ -175,11 +162,6 @@ func (s *typStore) Create(
 		return
 	}
 
-	if err = s.writeTransactedToIndex(tt); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	return
 }
 
@@ -196,11 +178,6 @@ func (s *typStore) Update(
 	}
 
 	if tt, err = s.transact(t, tk); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.writeTransactedToIndex(tt); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

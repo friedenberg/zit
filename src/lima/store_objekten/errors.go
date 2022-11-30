@@ -43,18 +43,6 @@ func (e ErrNotFound) Error() string {
 	return fmt.Sprintf("objekte with id '%s' not found", e.Id)
 }
 
-type ErrZettelDidNotChangeSinceUpdate struct {
-	NamedZettel zettel.Named
-}
-
-func (e ErrZettelDidNotChangeSinceUpdate) Error() string {
-	return fmt.Sprintf(
-		"zettel has not changed: [%s %s]",
-		e.NamedZettel.Kennung,
-		e.NamedZettel.Stored.Sha,
-	)
-}
-
 type VerlorenAndGefundenError interface {
 	error
 	AddToLostAndFound(string) (string, error)
