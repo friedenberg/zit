@@ -47,6 +47,10 @@ func (ct compiledTyp) Gattung() gattung.Gattung {
 	return gattung.Typ
 }
 
+func (ct compiledTyp) Kennung() gattung.Identifier[kennung.Konfig] {
+	return kennung.Konfig{}
+}
+
 func (ct compiledTyp) AkteSha() sha.Sha {
 	return ct.Typ.Sha
 }

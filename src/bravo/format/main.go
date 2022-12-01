@@ -5,15 +5,18 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 )
 
 type Format[T any] interface {
-	ReadFormat(io.Reader, *T) (int64, error)
-	WriteFormat(io.Writer, *T) (int64, error)
+	gattung.FormatReader[T]
+	gattung.FormatWriter[T]
 }
 
 type FuncReader func(io.Reader) (int64, error)
 type FuncReaderFormat[T any] func(io.Reader, *T) (int64, error)
+type FuncWriterElement[T any] func(io.Writer, *T) (int64, error)
+type FuncWriter = WriterFunc
 
 // TODO rename to Func-prefix
 type WriterFunc func(io.Writer) (int64, error)
@@ -37,6 +40,24 @@ func MakeFormatString(
 		var n1 int
 
 		if n1, err = io.WriteString(w, fmt.Sprintf(f, vs...)); err != nil {
+			n = int64(n1)
+			err = errors.Wrap(err)
+			return
+		}
+
+		n = int64(n1)
+
+		return
+	}
+}
+
+func MakeStringer(
+  v fmt.Stringer,
+) WriterFunc {
+	return func(w io.Writer) (n int64, err error) {
+		var n1 int
+
+		if n1, err = io.WriteString(w, v.String()); err != nil {
 			n = int64(n1)
 			err = errors.Wrap(err)
 			return

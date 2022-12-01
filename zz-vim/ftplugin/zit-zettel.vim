@@ -19,6 +19,7 @@ endfunction
 
 noremap gf :call Gf()<CR>
 
+" TODO support external akte
 function! ZitTypActionMenu()
   let l:items = systemlist("zit show -format typ-action-names " . expand("%:r"))
 

@@ -6,45 +6,50 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/format"
 )
 
-type Writer []string
+type Writer struct {
+	lastWasNewline bool
+	elements       []format.FuncWriter
+}
 
 func NewWriter() *Writer {
-	w := Writer(make([]string, 0))
-	return &w
+	w := &Writer{
+		elements: make([]format.FuncWriter, 0),
+	}
+
+	return w
 }
 
 func (w *Writer) WriteTo(out io.Writer) (n int64, err error) {
 	w1 := bufio.NewWriter(out)
-	defer func() {
-		if err == nil {
-			err = w1.Flush()
-		}
-	}()
+	defer errors.Deferred(&err, w1.Flush)
 
-	var n1 int
+	var n1 int64
+	var n2 int
 
-	for _, l := range *w {
-		n1, err = w1.WriteString(fmt.Sprintln(l))
-		n += int64(n1)
-
-		if err != nil {
+	for _, l := range w.elements {
+		if n1, err = l(w1); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
+
+		n += n1
+
+		if n2, err = io.WriteString(w1, "\n"); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		n += int64(n2)
 	}
 
 	return
 }
 
 func (w *Writer) WriteExactlyOneEmpty() {
-	if len(*w) == 0 {
-		w.WriteEmpty()
-		return
-	}
-
-	if (*w)[len(*w)-1] != "" {
+	if len(w.elements) == 0 || !w.lastWasNewline {
 		w.WriteEmpty()
 		return
 	}
@@ -53,25 +58,54 @@ func (w *Writer) WriteExactlyOneEmpty() {
 }
 
 func (w *Writer) WriteEmpty() {
-	*w = append(*w, "")
+	w.lastWasNewline = true
+
+	w.elements = append(
+		w.elements,
+		func(_ io.Writer) (_ int64, _ error) {
+			return
+		},
+	)
 }
 
 func (w *Writer) WriteLines(ls ...string) {
-	*w = append(*w, ls...)
+	w.lastWasNewline = false
+
+	for _, v := range ls {
+		w.elements = append(
+			w.elements,
+			format.MakeFormatString("%s", v),
+		)
+	}
 }
 
 func (w *Writer) WriteStringers(ss ...fmt.Stringer) {
-	for _, s := range ss {
-		w.WriteLines(s.String())
+	w.lastWasNewline = false
+
+	for _, v := range ss {
+		w.elements = append(
+			w.elements,
+			format.MakeStringer(v),
+		)
 	}
 }
 
 func (w *Writer) WriteFormat(f string, values ...interface{}) {
-	w.WriteLines(fmt.Sprintf(f, values...))
+	w.lastWasNewline = false
+
+	w.elements = append(
+		w.elements,
+		format.MakeFormatString(f, values...),
+	)
 }
 
 func (w *Writer) WriteFormats(f string, values ...interface{}) {
+	w.lastWasNewline = false
+
 	for _, v := range values {
-		w.WriteLines(fmt.Sprintf(f, v))
+		w.elements = append(
+			w.elements,
+			format.MakeFormatString(f, v),
+		)
 	}
 }

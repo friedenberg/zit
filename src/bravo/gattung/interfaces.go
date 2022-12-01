@@ -3,6 +3,7 @@ package gattung
 import (
 	"flag"
 	"fmt"
+	"io"
 
 	"github.com/friedenberg/zit/src/bravo/sha_core"
 )
@@ -62,6 +63,7 @@ type ObjektePtr[T Element] interface {
 
 type Stored interface {
 	Gattung() Gattung
+	// Kennung() Identifier[any]
 
 	AkteSha() sha_core.Sha
 	SetAkteSha(sha_core.Sha)
@@ -85,4 +87,17 @@ type AkteWriterFactory interface {
 
 type AkteIOFactoryFactory interface {
 	AkteFactory(Gattung) AkteIOFactory
+}
+
+type FormatReader[T any] interface {
+	ReadFormat(io.Reader, *T) (int64, error)
+}
+
+type FormatWriter[T any] interface {
+	WriteFormat(io.Writer, *T) (int64, error)
+}
+
+type Formatter[T any] interface {
+	FormatReader[T]
+	FormatWriter[T]
 }

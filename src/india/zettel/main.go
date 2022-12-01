@@ -20,6 +20,13 @@ type Zettel struct {
 	Etiketten   kennung.EtikettSet
 }
 
+type Stored = objekte.Stored[
+	Zettel,
+	*Zettel,
+	hinweis.Hinweis,
+	*hinweis.Hinweis,
+]
+
 type Objekte = Zettel
 
 type Sku = sku.Transacted[hinweis.Hinweis, *hinweis.Hinweis]
