@@ -3,9 +3,9 @@ package organize_text
 import (
 	"bufio"
 	"io"
-	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/format"
 	"github.com/friedenberg/zit/src/bravo/line_format"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
@@ -34,52 +34,13 @@ func (m *Metadatei) ReadFrom(r1 io.Reader) (n int64, err error) {
 
 	mes := kennung.MakeEtikettMutableSet()
 
-	for {
-		var rawLine, line string
-
-		rawLine, err = r.ReadString('\n')
-		n += int64(len(rawLine))
-
-		if err != nil && err != io.EOF {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err == io.EOF {
-			err = nil
-			break
-		}
-
-		line = strings.TrimSuffix(rawLine, "\n")
-		line = strings.TrimSpace(line)
-
-		if line == "" {
-			continue
-		}
-
-		parts := strings.Split(line, " ")
-
-		if len(parts) != 2 {
-			err = errors.Errorf("expected exactly two space-separated strings but got %q", parts)
-			return
-		}
-
-		prefix := parts[0]
-		tail := parts[1]
-
-		switch prefix {
-		case "-":
-			if err = mes.AddString(tail); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-		case "!":
-			if err = m.Typ.Set(tail); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-		}
+	if n, err = format.ReadLines(
+		r,
+		format.MakeLineReaderKeyValue("-", mes.AddString),
+		format.MakeLineReaderKeyValue("!", m.Typ.Set),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	m.EtikettSet = mes.Copy()

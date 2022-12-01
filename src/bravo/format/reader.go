@@ -8,12 +8,15 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
+//TODO make loose variant that allows any order for keys
 func ReadLines(
 	r1 io.Reader,
 	rffs ...FuncReadLine,
 ) (n int64, err error) {
 	r := bufio.NewReader(r1)
 	i := 0
+
+	var last error
 
 	for {
 		var rawLine, line string
@@ -36,21 +39,25 @@ func ReadLines(
 		if len(rffs) == i {
 			//TODO add line
 			err = errors.Errorf("ran out of read line funcs before fully consuming reader")
+
+			if last != nil {
+				err = errors.MakeMulti(err, last)
+			}
+
 			return
 		}
 
 		frl := rffs[i]
 
 		if err = frl(line); err != nil {
-			if errors.IsEOF(err) {
-				err = nil
-				i++
-				continue
-			} else {
-				err = errors.Wrap(err)
-				return
-			}
+			last = err
+			err = nil
+			i++
 		}
+	}
+
+	if last != nil && !errors.IsEOF(last) {
+		err = last
 	}
 
 	return
