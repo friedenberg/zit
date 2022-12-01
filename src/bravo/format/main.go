@@ -13,6 +13,7 @@ type Format[T any] interface {
 	gattung.FormatWriter[T]
 }
 
+type FuncReadLine func(string) error
 type FuncReader func(io.Reader) (int64, error)
 type FuncReaderFormat[T any] func(io.Reader, *T) (int64, error)
 type FuncWriterElement[T any] func(io.Writer, *T) (int64, error)
@@ -52,7 +53,7 @@ func MakeFormatString(
 }
 
 func MakeStringer(
-  v fmt.Stringer,
+	v fmt.Stringer,
 ) WriterFunc {
 	return func(w io.Writer) (n int64, err error) {
 		var n1 int
