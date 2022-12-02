@@ -66,17 +66,17 @@ func (f *FormatObjekte) ReadFrom(c *FormatContextRead) (n int64, err error) {
 
 	r := bufio.NewReader(c.In)
 
-	bezLineReader := z.Bezeichnung.Set
+	typLineReader := z.Typ.Set
 
 	if f.IgnoreTypErrors {
-		bezLineReader = format.MakeLineReaderIgnoreErrors(bezLineReader)
+		typLineReader = format.MakeLineReaderIgnoreErrors(typLineReader)
 	}
 
 	if n, err = format.ReadLines(
 		r,
 		format.MakeLineReaderKeyValue(gattung.Akte.String(), z.Akte.Set),
-		format.MakeLineReaderKeyValue(gattung.Typ.String(), z.Typ.Set),
-		format.MakeLineReaderKeyValue(gattung.Bezeichnung.String(), bezLineReader),
+		format.MakeLineReaderKeyValue(gattung.Typ.String(), typLineReader),
+		format.MakeLineReaderKeyValue(gattung.Bezeichnung.String(), z.Bezeichnung.Set),
 		format.MakeLineReaderKeyValue(gattung.Etikett.String(), etiketten.AddString),
 	); err != nil {
 		err = errors.Wrap(err)

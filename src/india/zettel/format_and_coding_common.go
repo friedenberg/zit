@@ -4,11 +4,10 @@ import (
 	"bufio"
 	"io"
 	"path"
-	"reflect"
-	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/bravo/format"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
@@ -87,75 +86,21 @@ func (s textStateReadMetadatei) Close() (err error) {
 func (f textStateReadMetadatei) ReadFrom(r1 io.Reader) (n int64, err error) {
 	r := bufio.NewReader(r1)
 
-	for {
-		var rawLine, line string
-
-		rawLine, err = r.ReadString('\n')
-		n += int64(len(rawLine))
-
-		if err != nil && err != io.EOF {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err == io.EOF {
-			err = nil
-			break
-		}
-
-		line = strings.TrimSuffix(rawLine, "\n")
-		line = strings.TrimSpace(line)
-
-		if line == "" {
-			continue
-		}
-
-		var head, tail string
-
-		switch len(line) {
-		case 0:
-		case 1:
-			head = line[:1] + " "
-		case 2:
-			head = line[:2]
-		default:
-			head = line[:2]
-			tail = strings.TrimSpace(line[2:])
-		}
-
-		if tail == "" {
-			continue
-		}
-
-		switch head {
-		case "- ":
-			if err = f.etiketten.AddString(tail); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-		case "! ":
-			if err = f.readTyp(tail); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-		case "# ":
-			if err = f.Zettel.Bezeichnung.Set(tail); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-		default:
-			if strings.TrimSpace(head) != "" || strings.TrimSpace(tail) != "" {
-				err = errors.Errorf(
-					"unsupported metadatei prefix for format (%q): %q",
-					reflect.TypeOf(f).Name(),
-					head,
-				)
-				return
-			}
-		}
+	if n, err = format.ReadLines(
+		r,
+		format.MakeLineReaderRepeat(
+			format.MakeLineReaderKeyValues(
+				map[string]format.FuncReadLine{
+					"#": f.Zettel.Bezeichnung.Set,
+					"%": format.MakeLineReaderNop(),
+					"-": f.etiketten.AddString,
+					"!": f.readTyp,
+				},
+			),
+		),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

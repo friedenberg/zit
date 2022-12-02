@@ -8,7 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
-//TODO make loose variant that allows any order for keys
 func ReadLines(
 	r1 io.Reader,
 	rffs ...FuncReadLine,
@@ -63,9 +62,8 @@ func ReadLines(
 	return
 }
 
-func MakeLineReaderKeyValue(
-	key string,
-	value FuncReadLine,
+func MakeLineReaderKeyValues(
+	dict map[string]FuncReadLine,
 ) FuncReadLine {
 	return func(line string) (err error) {
 		loc := strings.Index(line, " ")
@@ -75,17 +73,71 @@ func MakeLineReaderKeyValue(
 			return
 		}
 
-		if line[:loc] != key {
-			err = errors.Errorf("expected key %q but got %q", key, line[:loc])
+		key := line[:loc]
+		value := line[loc+1:]
+
+		var reader FuncReadLine
+		ok := false
+
+		if reader, ok = dict[key]; !ok {
+			err = errors.Errorf("key not supported: %q", key)
 			return
 		}
 
-		if err = value(line[loc+1:]); err != nil {
-			err = errors.Errorf("%s: %q", err, line[loc+1:])
+		if err = reader(value); err != nil {
+			err = errors.Errorf("%s: %q", err, value)
 			return
 		}
 
 		err = io.EOF
+
+		return
+	}
+}
+
+func MakeLineReaderKeyValue(
+	key string,
+	valueReader FuncReadLine,
+) FuncReadLine {
+	return func(line string) (err error) {
+		loc := strings.Index(line, " ")
+
+		if loc == -1 {
+			err = errors.Errorf("expected at least one space, but found none: %q", line)
+			return
+		}
+
+		keyActual := line[:loc]
+		value := line[loc+1:]
+
+		if keyActual != key {
+			err = errors.Errorf("expected key %q but got %q", key, keyActual)
+			return
+		}
+
+		if err = valueReader(value); err != nil {
+			err = errors.Errorf("%s: %q", err, value)
+			return
+		}
+
+		err = io.EOF
+
+		return
+	}
+}
+
+func MakeLineReaderRepeat(
+	in FuncReadLine,
+) FuncReadLine {
+	return func(line string) (err error) {
+		if err = in(line); err != nil {
+			if errors.IsEOF(err) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+				return
+			}
+		}
 
 		return
 	}
@@ -97,6 +149,12 @@ func MakeLineReaderIgnoreErrors(
 	return func(line string) (err error) {
 		in(line)
 
+		return
+	}
+}
+
+func MakeLineReaderNop() FuncReadLine {
+	return func(line string) (err error) {
 		return
 	}
 }
