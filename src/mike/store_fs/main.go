@@ -173,19 +173,19 @@ func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 	var unrecoverableErrors errors.Multi
 
 	for _, e := range c.RecoverableErrors {
-		var errAkteInlineAndFilePath zettel.ErrHasInlineAkteAndFilePath
+		// var errAkteInlineAndFilePath zettel.ErrHasInlineAkteAndFilePath
 
-		if errors.As(e, &errAkteInlineAndFilePath) {
-			var z1 zettel.Zettel
+		// if errors.As(e, &errAkteInlineAndFilePath) {
+		// 	var z1 zettel.Zettel
 
-			if z1, err = errAkteInlineAndFilePath.Recover(); err != nil {
-				unrecoverableErrors.Add(errors.Wrap(err))
-				continue
-			}
+		// 	if z1, err = errAkteInlineAndFilePath.Recover(); err != nil {
+		// 		unrecoverableErrors.Add(errors.Wrap(err))
+		// 		continue
+		// 	}
 
-			ez.Objekte = z1
-			continue
-		}
+		// 	ez.Objekte = z1
+		// 	continue
+		// }
 
 		var err1 zettel.ErrHasInvalidAkteShaOrFilePath
 

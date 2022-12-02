@@ -10,7 +10,10 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/line_format"
+	"github.com/friedenberg/zit/src/delta/metadatei_io"
 )
+
+const MetadateiBoundary = metadatei_io.Boundary
 
 // TODO switch to three different formats
 // metadatei, zettel-akte-external, zettel-akte-inline

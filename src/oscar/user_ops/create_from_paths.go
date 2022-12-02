@@ -186,40 +186,40 @@ func (c CreateFromPaths) zettelsFromPath(
 	}
 
 	for _, e := range ctx.RecoverableErrors {
-		var errAkteInlineAndFilePath zettel.ErrHasInlineAkteAndFilePath
+		//var errAkteInlineAndFilePath zettel.ErrHasInlineAkteAndFilePath
 
-		if errors.As(e, &errAkteInlineAndFilePath) {
-			var z1 zettel.Zettel
+		//if errors.As(e, &errAkteInlineAndFilePath) {
+		//	var z1 zettel.Zettel
 
-			if z1, err = errAkteInlineAndFilePath.Recover(); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+		//	if z1, err = errAkteInlineAndFilePath.Recover(); err != nil {
+		//		err = errors.Wrap(err)
+		//		return
+		//	}
 
-			var s sha.Sha
+		//	var s sha.Sha
 
-			if s, err = z1.ObjekteSha(); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+		//	if s, err = z1.ObjekteSha(); err != nil {
+		//		err = errors.Wrap(err)
+		//		return
+		//	}
 
-			wf(
-				&zettel_external.Zettel{
-					ZettelFD: fd.FD{
-						Path: p,
-					},
-					Objekte: z1,
-					Sku: zettel_external.Sku{
-						Sha: s,
-						//TODO
-						// Kennung: z.Sku.Kennung,
-					},
-				},
-			)
-		} else {
-			err = errors.Errorf("unsupported recoverable error: %s", e)
-			return
-		}
+		//	wf(
+		//		&zettel_external.Zettel{
+		//			ZettelFD: fd.FD{
+		//				Path: p,
+		//			},
+		//			Objekte: z1,
+		//			Sku: zettel_external.Sku{
+		//				Sha: s,
+		//				//TODO
+		//				// Kennung: z.Sku.Kennung,
+		//			},
+		//		},
+		//	)
+		//} else {
+		err = errors.Errorf("unsupported recoverable error: %s", e)
+		return
+		// }
 	}
 
 	var s sha.Sha

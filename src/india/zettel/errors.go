@@ -2,61 +2,62 @@ package zettel
 
 import (
 	"fmt"
-	"io"
-	"os"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
 )
 
+type externalFile struct {
+	Sha  sha.Sha
+	Path string
+}
+
 type ErrHasInlineAkteAndFilePath struct {
-	FilePath string
+	External  externalFile
+	InlineSha sha.Sha
 	Zettel
-	sha.Sha
-	gattung.AkteWriterFactory
 }
 
 func (e ErrHasInlineAkteAndFilePath) Error() string {
 	return fmt.Sprintf(
-		"zettel text has both inline akte and filepath: %q",
-		e.FilePath,
+		"zettel text has both inline akte and filepath: \nexternal path: %s\nexternal sha: %s\ninline sha: %s",
+		e.External.Path,
+		e.External.Sha,
+		e.InlineSha,
 	)
 }
 
-func (e ErrHasInlineAkteAndFilePath) Recover() (z Zettel, err error) {
-	if e.AkteWriterFactory == nil {
-		err = errors.Errorf("akte writer factory is nil")
-		return
-	}
+// func (e ErrHasInlineAkteAndFilePath) Recover() (z Zettel, err error) {
+// 	if e.AkteWriterFactory == nil {
+// 		err = errors.Errorf("akte writer factory is nil")
+// 		return
+// 	}
 
-	var akteWriter sha.WriteCloser
+// 	var akteWriter sha.WriteCloser
 
-	if akteWriter, err = e.AkteWriter(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+// 	if akteWriter, err = e.AkteWriter(); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	var f *os.File
+// 	var f *os.File
 
-	if f, err = files.Open(e.FilePath); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+// 	if f, err = files.Open(e.FilePath); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	defer files.Close(f)
+// 	defer files.Close(f)
 
-	if _, err = io.Copy(akteWriter, f); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+// 	if _, err = io.Copy(akteWriter, f); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	z = e.Zettel
-	z.Akte = akteWriter.Sha()
+// 	z = e.Zettel
+// 	z.Akte = akteWriter.Sha()
 
-	return
-}
+// 	return
+// }
 
 type ErrHasInvalidAkteShaOrFilePath struct {
 	Value string
