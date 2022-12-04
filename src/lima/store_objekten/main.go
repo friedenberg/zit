@@ -247,7 +247,10 @@ func (s *Store) Reindex() (err error) {
 					var tz zettel.Transacted
 
 					if tz, err = s.zettelStore.transactedZettelFromTransaktionObjekte(t, o); err != nil {
-						err = errors.Wrap(err)
+            //TODO decide on how to handle format errors
+            errors.Err().Print(err)
+            err = nil
+						// err = errors.Wrap(err)
 						return
 					}
 

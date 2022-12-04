@@ -36,12 +36,14 @@ func (m *Metadatei) ReadFrom(r1 io.Reader) (n int64, err error) {
 
 	if n, err = format.ReadLines(
 		r,
-		format.MakeLineReaderKeyValues(
-			map[string]format.FuncReadLine{
-				"%": format.MakeLineReaderNop(),
-				"-": mes.AddString,
-				"!": m.Typ.Set,
-			},
+		format.MakeLineReaderRepeat(
+			format.MakeLineReaderKeyValues(
+				map[string]format.FuncReadLine{
+					"%": format.MakeLineReaderNop(),
+					"-": mes.AddString,
+					"!": m.Typ.Set,
+				},
+			),
 		),
 	); err != nil {
 		err = errors.Wrap(err)

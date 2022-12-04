@@ -74,10 +74,20 @@ func (f *FormatObjekte) ReadFrom(c *FormatContextRead) (n int64, err error) {
 
 	if n, err = format.ReadLines(
 		r,
-		format.MakeLineReaderKeyValue(gattung.Akte.String(), z.Akte.Set),
-		format.MakeLineReaderKeyValue(gattung.Typ.String(), typLineReader),
-		format.MakeLineReaderKeyValue(gattung.Bezeichnung.String(), z.Bezeichnung.Set),
-		format.MakeLineReaderKeyValue(gattung.Etikett.String(), etiketten.AddString),
+		format.MakeLineReaderRepeat(
+			format.MakeLineReaderKeyValues(
+				map[string]format.FuncReadLine{
+					gattung.Akte.String():        z.Akte.Set,
+					gattung.Typ.String():         typLineReader,
+					gattung.Bezeichnung.String(): z.Bezeichnung.Set,
+					gattung.Etikett.String():     etiketten.AddString,
+				},
+			),
+		),
+		// format.MakeLineReaderKeyValue(gattung.Akte.String(), z.Akte.Set),
+		// format.MakeLineReaderKeyValue(gattung.Typ.String(), typLineReader),
+		// format.MakeLineReaderKeyValue(gattung.Bezeichnung.String(), z.Bezeichnung.Set),
+		// format.MakeLineReaderKeyValue(gattung.Etikett.String(), etiketten.AddString),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
