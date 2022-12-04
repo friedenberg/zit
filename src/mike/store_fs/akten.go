@@ -44,7 +44,7 @@ func (s Store) ReadExternalZettelFromAktePath(p string) (cz zettel_checked_out.Z
 		}
 	}
 
-	//TODO capture this as a function
+	//TODO-P4 capture this as a function
 	cz.External.Objekte = cz.Internal.Objekte
 	cz.External.Sku.Sha = cz.Internal.Sku.Sha
 	cz.External.Sku.Kennung = cz.Internal.Sku.Kennung
@@ -56,7 +56,7 @@ func (s Store) ReadExternalZettelFromAktePath(p string) (cz zettel_checked_out.Z
 		return
 	}
 
-	//TODO add mod time
+	//TODO-P2 add mod time
 	cz.External.AkteFD.Path = p
 	cz.External.Objekte.Akte = akteSha
 	// cz.Matches.Akten, _ = s.storeObjekten.ReadAkteSha(akteSha)

@@ -55,7 +55,7 @@ func (s *Store) SetZettelCheckedOutWriters(
 	s.zettelCheckedOutWriters = zcow
 }
 
-// TODO move to standort
+// TODO-P3 move to standort
 func (s Store) IndexFilePath() string {
 	return path.Join(s.Cwd(), ".ZitCheckoutStoreIndex")
 }
@@ -131,7 +131,7 @@ func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 	if !files.Exists(ez.ZettelFD.Path) {
 		//if the path does not have an extension, try looking for a file with that
 		//extension
-		//TODO modify this to use globs
+		//TODO-P4 modify this to use globs
 		if filepath.Ext(ez.ZettelFD.Path) == "" {
 			ez.ZettelFD.Path = ez.ZettelFD.Path + s.Konfig.Transacted.Objekte.GetZettelFileExtension()
 			return s.readZettelFromFile(ez)
@@ -240,7 +240,7 @@ func (s *Store) Read(p string) (cz zettel_checked_out.Zettel, err error) {
 	cz.DetermineState()
 
 	if cz.State > zettel_checked_out.StateExistsAndSame {
-		//TODO rewrite with verzeichnisseAll
+		//TODO-P4 rewrite with verzeichnisseAll
 		// exSha := cz.External.Sku.Sha
 		// cz.Matches.Zettelen, _ = s.storeObjekten.ReadZettelSha(exSha)
 		// cz.Matches.Zettelen, _ = cz.Matches.Zettelen.Filter(nil, filter)

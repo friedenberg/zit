@@ -87,7 +87,7 @@ func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	//TODO use right mode
+	//TODO-P4 use right mode
 	if err = readResultsSet.Each(s.PrinterZettelCheckedOut(zettel_checked_out.ModeZettelAndAkte)); err != nil {
 		err = errors.Wrap(err)
 		return

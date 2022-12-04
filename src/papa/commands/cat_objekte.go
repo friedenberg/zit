@@ -54,7 +54,7 @@ func (c CatObjekte) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	case gattung.Zettel:
 		return c.zettelen(u, shas)
 
-		//TODO add typ
+		//TODO-P2 add typ
 
 	default:
 		err = errors.Errorf("unsupported objekte type: %s", c.Gattung)

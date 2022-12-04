@@ -72,7 +72,7 @@ func (p printer) Print(a ...interface{}) (err error) {
 		return
 	}
 
-	//TODO add support for includesStack
+	//TODO-P3 add support for includesStack
 	_, err = fmt.Fprintln(
 		p.f,
 		a...,
@@ -102,7 +102,7 @@ func (p printer) Caller(i int, f string, vs ...interface{}) {
 	st, _ := MakeStackInfo(i + 1)
 
 	vs = append([]interface{}{st}, vs...)
-	//TODO strip trailing newline and add back
+	//TODO-P4 strip trailing newline and add back
 	io.WriteString(p.f, fmt.Sprintf("%s"+f+"\n", vs...))
 }
 

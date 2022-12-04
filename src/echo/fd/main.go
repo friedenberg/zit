@@ -45,7 +45,7 @@ func FileInfo(fi os.FileInfo) FD {
 	}
 }
 
-// TODO move this somewhere that prevents redundant reading
+// TODO-P4 move this somewhere that prevents redundant reading
 func (fd *FD) Set(v string) (err error) {
 	fd.Path = v
 
@@ -70,7 +70,7 @@ func (fd *FD) Set(v string) (err error) {
 	return
 }
 
-//TODO add formatter
+//TODO-P4 add formatter
 // func (ut File) String() string {
 // 	return fmt.Sprintf("[%s %s]", ut.Path, ut.Sha)
 // }

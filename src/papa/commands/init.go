@@ -68,7 +68,7 @@ func (c Init) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	c.writeFile(s.DirZit("Konfig"), "")
 	c.writeFile(s.DirZit("KonfigCompiled"), "")
 
-	//TODO how to handle re-init for yin and yang?
+	//TODO-P2 how to handle re-init for yin and yang?
 	if err = c.populateYinIfNecessary(s); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -165,7 +165,7 @@ func (c Init) readAndTransferLines(in, out string) (err error) {
 			return
 		}
 
-		//TODO sterilize line
+		//TODO-P2 sterilize line
 		w.WriteString(l)
 	}
 

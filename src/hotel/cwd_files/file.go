@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/fd"
 )
 
-// TODO remove
+// TODO-P1 remove
 type File = fd.FD
 
 func MakeFile(dir string, p string) (ut File, err error) {

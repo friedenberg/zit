@@ -89,7 +89,8 @@ func (a Kennung[T, T1]) Reset(b *Kennung[T, T1]) {
 	if b != nil {
 		a.value = b.value
 	} else {
-		//TODO
+		var a1 T
+		a.value = a1
 	}
 }
 

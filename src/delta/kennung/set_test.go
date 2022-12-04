@@ -224,7 +224,7 @@ func TestDelta1(t *testing.T) {
 		MustEtikett("zz-archive-task-done"),
 	)
 
-	d := MakeSetDelta(a, b)
+	d := MakeSetEtikettDelta(a, b)
 
 	c_expected := MakeEtikettSet(
 		MustEtikett("zz-archive-task-done"),

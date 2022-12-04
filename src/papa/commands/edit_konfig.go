@@ -126,7 +126,7 @@ func (c EditKonfig) readTempKonfigFile(
 
 	k = &konfig.Objekte{}
 
-	//TODO offer option to edit again
+	//TODO-P2 offer option to edit again
 	if _, err = format.ReadFormat(f, k); err != nil {
 		err = errors.Wrap(err)
 		return

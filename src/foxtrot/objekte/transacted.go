@@ -67,11 +67,22 @@ func (zt Transacted[T, T1, T2, T3]) IsNew() bool {
 	return zt.Sku.Kopf == zt.Sku.Schwanz && zt.Sku.TransactionIndex == 0
 }
 
-// TODO-P0
 func (a Transacted[T, T1, T2, T3]) Equals(
-	b Transacted[T, T1, T2, T3],
+	b *Transacted[T, T1, T2, T3],
 ) bool {
-	return false
+	if b == nil {
+		return false
+	}
+
+	if !a.Sku.Equals(&b.Sku) {
+		return false
+	}
+
+	if !T1(&a.Objekte).Equals(&b.Objekte) {
+		return false
+	}
+
+	return true
 }
 
 func (a *Transacted[T, T1, T2, T3]) Reset(

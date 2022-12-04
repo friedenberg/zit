@@ -55,6 +55,7 @@ type Objekte interface {
 type ObjektePtr[T Element] interface {
 	ElementPtr[T]
 
+  //TODO move to Objekte?
 	Equatable[T]
 	Resetable[T]
 

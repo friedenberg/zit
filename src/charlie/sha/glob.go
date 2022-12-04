@@ -12,7 +12,7 @@ func Glob(s Sha, pc ...string) (globbed Sha, err error) {
 
 	var matches []string
 
-	//TODO move to open_file_guard
+	//TODO-P3 move to open_file_guard
 	if matches, err = filepath.Glob(p + "*"); err != nil {
 		err = errors.Wrap(err)
 		return

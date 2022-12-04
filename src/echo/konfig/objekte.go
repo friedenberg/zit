@@ -28,12 +28,12 @@ func (o Objekte) AkteSha() sha.Sha {
 }
 
 func (a *Objekte) Equals(b *Objekte) bool {
-	panic("TODO not implemented")
+	panic("TODO-P0 not implemented")
 	// return false
 }
 
 func (a *Objekte) Reset(b *Objekte) {
-	panic("TODO not implemented")
+	panic("TODO-P0 not implemented")
 	// return false
 }
 

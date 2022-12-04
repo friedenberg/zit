@@ -25,7 +25,7 @@ func Errorf(f string, values ...interface{}) (err errer) {
 }
 
 func wrapf(se stackWrapError, in error, f string, values ...interface{}) (err errer) {
-	//TODO case where values are present but f is ""
+	//TODO-P2 case where values are present but f is ""
 	if f != "" {
 		se.error = errors.New(fmt.Sprintf(f, values...))
 	}

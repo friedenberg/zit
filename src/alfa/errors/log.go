@@ -49,6 +49,6 @@ func SetVerbose() {
 func SetTesting() {
 	SetVerbose()
 	isTest = true
-	//TODO use base directory for project
+	//TODO-P3 use base directory for project
 	cwd = filepath.Dir(filepath.Dir(cwd))
 }

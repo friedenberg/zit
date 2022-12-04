@@ -25,7 +25,7 @@ func Write(
 	return
 }
 
-//TODO rename
+// TODO rename
 func MakeWriterTo[T any](
 	w io.Writer,
 	wf FormatWriterFunc[T],

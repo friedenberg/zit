@@ -123,7 +123,7 @@ func (i *indexEtiketten) addZettelWithOptionalMutter(
 	zEtiketten := z.Objekte.Etiketten
 
 	if zMutter != nil {
-		d := kennung.MakeSetDelta(
+		d := kennung.MakeSetEtikettDelta(
 			zMutter.Objekte.Etiketten,
 			zEtiketten,
 		)
@@ -142,7 +142,7 @@ func (i *indexEtiketten) addZettelWithOptionalMutter(
 	return
 }
 
-func (i *indexEtiketten) processDelta(d kennung.Delta) (err error) {
+func (i *indexEtiketten) processDelta(d kennung.EtikettDelta) (err error) {
 	if err = i.add(d.Added); err != nil {
 		err = errors.Wrap(err)
 		return

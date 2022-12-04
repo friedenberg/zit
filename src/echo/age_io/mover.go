@@ -73,7 +73,7 @@ func (m *Mover) Close() (err error) {
 	sha := m.Writer.Sha()
 
 	if m.objektePath == "" {
-		//TODO move this validation to options
+		//TODO-P3 move this validation to options
 		if m.basePath == "" {
 			err = errors.Errorf("basepath is nil")
 			return

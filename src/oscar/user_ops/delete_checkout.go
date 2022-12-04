@@ -41,6 +41,7 @@ func (c DeleteCheckout) Run(
 
 			//TODO add a safety check?
 			if !internal.Objekte.Equals(&external.Objekte) {
+        //TODO move to printer
 				errors.Out().Printf("[%s] (checkout different!)", external.Sku.Kennung)
 				return
 			}

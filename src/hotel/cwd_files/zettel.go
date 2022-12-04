@@ -31,7 +31,7 @@ func (c *CwdFiles) tryZettel(d string, a string, p string) (err error) {
 		zcw.Hinweis = h
 	}
 
-	//TODO read zettels
+	//TODO-P2 read zettels
 	if path.Ext(a) == c.konfig.Transacted.Objekte.GetZettelFileExtension() {
 		zcw.Zettel.Path = p
 	} else {

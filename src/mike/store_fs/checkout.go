@@ -64,7 +64,7 @@ func (s Store) shouldCheckOut(
 	case cz.Internal.Objekte.Equals(&cz.External.Objekte):
 		cz.State = zettel_checked_out.StateJustCheckedOutButSame
 
-	//TODO wait why?
+	//TODO-P0 wait why?
 	case cz.External.ZettelFD.Path == "":
 		ok = true
 
@@ -107,7 +107,7 @@ func (s *Store) CheckoutOne(
 		}
 
 		if !s.shouldCheckOut(options, cz) {
-			//TODO handle fs state
+			//TODO-P2 handle fs state
 			if err = s.zettelCheckedOutWriters.ZettelOnly(&cz); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -120,7 +120,7 @@ func (s *Store) CheckoutOne(
 	inlineAkte := typ.IsInlineAkte(sz.Objekte.Typ, s.Konfig.Konfig)
 
 	cz = zettel_checked_out.Zettel{
-		//TODO check diff with fs if already exists
+		//TODO-P2 check diff with fs if already exists
 		State:    zettel_checked_out.StateJustCheckedOut,
 		Internal: sz,
 		External: zettel_external.Zettel{

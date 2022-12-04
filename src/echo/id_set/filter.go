@@ -21,7 +21,7 @@ type Filter struct {
 	Or         bool
 }
 
-// TODO improve the performance of this query
+// TODO-P4 improve the performance of this query
 func (f Filter) Include(e Element) (err error) {
 	ok := false
 
