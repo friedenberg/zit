@@ -2,12 +2,9 @@ package zettel
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/format"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/metadatei_io"
-)
-
-const (
-// MetadateiBoundary = "---"
 )
 
 type Text struct {
@@ -38,7 +35,7 @@ func (f Text) ReadFrom(c *FormatContextRead) (n int64, err error) {
 	}
 
 	mr := metadatei_io.Reader{
-		Metadatei: state,
+		Metadatei: format.MakeReaderFrom[Objekte](state.ReadFormat, &c.Zettel),
 		Akte:      akteWriter,
 	}
 

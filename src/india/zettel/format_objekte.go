@@ -48,9 +48,7 @@ func (f FormatObjekte) WriteTo(c FormatContextWrite) (n int64, err error) {
 		w.WriteFormat("%s %s", gattung.Etikett, e)
 	}
 
-	n, err = w.WriteTo(c.Out)
-
-	if err != nil {
+	if n, err = w.WriteTo(c.Out); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

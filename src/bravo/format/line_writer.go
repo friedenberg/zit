@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
+//TODO rename to LineWriter
 type Writer struct {
 	lastWasNewline bool
 	elements       []FuncWriter

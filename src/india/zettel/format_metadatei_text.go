@@ -14,27 +14,18 @@ import (
 )
 
 type FormatMetadateiText struct {
-	recoverableErrors errors.Multi
-
 	context *FormatContextRead
-
-	etiketten kennung.EtikettMutableSet
 
 	aktePath string
 	akteSha  sha.Sha
 }
 
-func (s *FormatMetadateiText) close() (err error) {
-	s.context.RecoverableErrors = s.recoverableErrors
-	s.context.Zettel.Etiketten = s.etiketten.Copy()
+func (f FormatMetadateiText) ReadFormat(r1 io.Reader, z *Objekte) (n int64, err error) {
+	etiketten := kennung.MakeEtikettMutableSet()
 
-	return
-}
-
-func (f FormatMetadateiText) ReadFrom(r1 io.Reader) (n int64, err error) {
-	defer errors.Deferred(&err, f.close)
-
-	f.etiketten = kennung.MakeEtikettMutableSet()
+	defer func() {
+		z.Etiketten = etiketten.Copy()
+	}()
 
 	r := bufio.NewReader(r1)
 
@@ -45,7 +36,7 @@ func (f FormatMetadateiText) ReadFrom(r1 io.Reader) (n int64, err error) {
 				map[string]format.FuncReadLine{
 					"#": f.context.Zettel.Bezeichnung.Set,
 					"%": format.MakeLineReaderNop(),
-					"-": f.etiketten.AddString,
+					"-": etiketten.AddString,
 					"!": f.readTyp,
 				},
 			),

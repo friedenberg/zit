@@ -8,6 +8,25 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
+type readerFrom[T any] struct {
+	rf FuncReaderFormat[T]
+	e  *T
+}
+
+func (rf readerFrom[T]) ReadFrom(r io.Reader) (n int64, err error) {
+	return rf.rf(r, rf.e)
+}
+
+func MakeReaderFrom[T any](
+	rf FuncReaderFormat[T],
+	e *T,
+) io.ReaderFrom {
+	return readerFrom[T]{
+		rf: rf,
+		e:  e,
+	}
+}
+
 func ReadLines(
 	r1 io.Reader,
 	rffs ...FuncReadLine,

@@ -27,8 +27,14 @@ func (f FormatValue) String() string {
 	// case *collections_coding.EncoderJson[Zettel]:
 	// 	return "json"
 
-	case *Text:
-		return "text"
+	case *FormatToFormat2:
+		switch f2 := f1.Format.(type) {
+		case *Text2:
+			return "text"
+
+		default:
+			return fmt.Sprintf("%T", f2)
+		}
 
 	case *FormatObjekte:
 		return "objekte"
