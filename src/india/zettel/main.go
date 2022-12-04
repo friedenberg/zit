@@ -12,7 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/objekte"
 )
 
-// TODO rename to Objekte
+// TODO-P0 rename to Objekte
 type Zettel struct {
 	Akte        sha.Sha
 	Typ         kennung.Typ
@@ -91,7 +91,6 @@ func (z Zettel) IsEmpty() bool {
 	return true
 }
 
-// TODO-P3 use reset with pointer pattern
 func (z *Zettel) Reset(z1 *Zettel) {
 	if z1 == nil {
 		z.Akte = sha.Sha{}
@@ -102,7 +101,7 @@ func (z *Zettel) Reset(z1 *Zettel) {
 		z.Akte = z1.Akte
 		z.Typ = z1.Typ
 		z.Bezeichnung = z1.Bezeichnung
-		z.Etiketten = z1.Etiketten
+		z.Etiketten = z1.Etiketten.Copy()
 	}
 }
 

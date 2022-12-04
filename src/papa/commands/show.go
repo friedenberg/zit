@@ -146,12 +146,14 @@ func (c Show) showZettels(
 				Set: ids,
 			},
 		}.WriteZettelTransacted,
-		zettel.MakeWriterZettel(
-			zettel.MakeSerializedFormatWriter(
-				fv.Format,
-				store.Out(),
-				store.StoreObjekten(),
-				store.Konfig(),
+		store.StoreWorkingDirectory().ZettelTransactedWriter(
+			zettel.MakeWriterZettel(
+				zettel.MakeSerializedFormatWriter(
+					fv.Format,
+					store.Out(),
+					store.StoreObjekten(),
+					store.Konfig(),
+				),
 			),
 		),
 	)

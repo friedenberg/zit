@@ -8,10 +8,13 @@ import (
 	"path/filepath"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/id"
 	"github.com/friedenberg/zit/src/delta/standort"
+	"github.com/friedenberg/zit/src/echo/fd"
+	"github.com/friedenberg/zit/src/echo/sku"
 	"github.com/friedenberg/zit/src/india/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_external"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
@@ -127,7 +130,6 @@ func (s Store) MakeExternalZettelFromZettel(p string) (ez zettel_external.Zettel
 }
 
 func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
-	errors.Log().PrintDebug(ez)
 	if !files.Exists(ez.ZettelFD.Path) {
 		//if the path does not have an extension, try looking for a file with that
 		//extension
@@ -211,6 +213,43 @@ func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 	}
 
 	return
+}
+
+func (s *Store) ZettelTransactedWriter(
+	w1 collections.WriterFunc[*zettel.Transacted],
+) (w collections.WriterFunc[*zettel.Transacted]) {
+	return func(z *zettel.Transacted) (err error) {
+		//TODO-P2 akte fd?
+		ze := zettel_external.Zettel{
+			ZettelFD: fd.FD{
+				Path: z.Sku.Kennung.String(),
+			},
+		}
+
+		if err1 := s.readZettelFromFile(&ze); err1 == nil {
+			z1 := &zettel.Transacted{
+				Sku: sku.Transacted[hinweis.Hinweis, *hinweis.Hinweis]{
+					Kennung: ze.Sku.Kennung,
+					Sha:     ze.Sku.Sha,
+				},
+				Objekte: ze.Objekte,
+			}
+
+			if err = w1(z1); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+
+		if err = w1(z); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+	}
 }
 
 func (s *Store) Read(p string) (cz zettel_checked_out.Zettel, err error) {
