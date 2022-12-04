@@ -46,8 +46,15 @@ func (a Objekte) Equals(b *Objekte) bool {
 }
 
 func (a *Objekte) Reset(b *Objekte) {
-	panic("TODO-P0 not implemented")
-	// return false
+	if b == nil {
+		a.Sha = b.Sha
+		a.Akte = b.Akte
+		a.Toml = b.Toml
+	} else {
+		a.Sha = sha.Sha{}
+		a.Akte = MakeDefaultCompiled()
+		a.Toml = objekteToml{}
+	}
 }
 
 func (c Objekte) Gattung() gattung.Gattung {
