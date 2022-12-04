@@ -27,7 +27,7 @@ func (o Objekte) AkteSha() sha.Sha {
 	return o.Sha
 }
 
-func (a *Objekte) Equals(b *Objekte) bool {
+func (a Objekte) Equals(b *Objekte) bool {
 	panic("TODO-P0 not implemented")
 	// return false
 }

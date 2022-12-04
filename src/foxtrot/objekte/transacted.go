@@ -8,7 +8,7 @@ import (
 )
 
 type Transacted[
-	T gattung.Objekte,
+	T gattung.Objekte[T],
 	T1 gattung.ObjektePtr[T],
 	T2 gattung.Identifier[T2],
 	T3 gattung.IdentifierPtr[T2],
@@ -78,7 +78,7 @@ func (a Transacted[T, T1, T2, T3]) Equals(
 		return false
 	}
 
-	if !T1(&a.Objekte).Equals(&b.Objekte) {
+	if !a.Objekte.Equals(&b.Objekte) {
 		return false
 	}
 

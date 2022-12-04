@@ -36,7 +36,13 @@ type ValueElementPtr[T ValueElement] interface {
 	flag.Value
 }
 
+type IdentifierLike interface {
+	Gattung() Gattung
+	fmt.Stringer
+}
+
 type Identifier[T any] interface {
+	IdentifierLike
 	Gattung() Gattung
 	ValueElement
 	Equatable[T]
@@ -47,24 +53,21 @@ type IdentifierPtr[T ValueElement] interface {
 	Resetable[T]
 }
 
-type Objekte interface {
+type Objekte[T any] interface {
 	Gattung() Gattung
 	AkteSha() sha_core.Sha
+	Equatable[T]
 }
 
 type ObjektePtr[T Element] interface {
 	ElementPtr[T]
-
-  //TODO move to Objekte?
-	Equatable[T]
 	Resetable[T]
-
 	SetAkteSha(sha_core.Sha)
 }
 
 type Stored interface {
 	Gattung() Gattung
-	// Kennung() Identifier[any]
+	// Identifier() IdentifierLike
 
 	AkteSha() sha_core.Sha
 	SetAkteSha(sha_core.Sha)

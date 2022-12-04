@@ -51,7 +51,11 @@ func (z *Zettel) SetAkteSha(v sha.Sha) {
 }
 
 // TODO-P2 figure out why this doesn't always work for `status`
-func (z *Zettel) Equals(z1 *Zettel) bool {
+func (z Zettel) Equals(z1 *Zettel) bool {
+	if z1 == nil {
+		return false
+	}
+
 	if !z.Akte.Equals(z1.Akte) {
 		return false
 	}

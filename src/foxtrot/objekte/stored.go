@@ -6,7 +6,7 @@ import (
 )
 
 type Stored[
-	T gattung.Objekte,
+	T gattung.Objekte[T],
 	T1 gattung.ObjektePtr[T],
 	T2 gattung.Identifier[T2],
 	T3 gattung.IdentifierPtr[T2],
