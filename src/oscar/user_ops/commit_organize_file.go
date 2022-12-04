@@ -154,7 +154,7 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 		bez := n.Key
 		etts := n.Etiketten
 
-		z := zettel.Zettel{
+		z := zettel.Objekte{
 			Etiketten: etts.Copy(),
 			Typ:       b.Metadatei.Typ,
 		}

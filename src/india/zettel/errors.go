@@ -14,7 +14,7 @@ type externalFile struct {
 type ErrHasInlineAkteAndFilePath struct {
 	External  externalFile
 	InlineSha sha.Sha
-	Zettel
+	Objekte
 }
 
 func (e ErrHasInlineAkteAndFilePath) Error() string {
@@ -26,7 +26,7 @@ func (e ErrHasInlineAkteAndFilePath) Error() string {
 	)
 }
 
-// func (e ErrHasInlineAkteAndFilePath) Recover() (z Zettel, err error) {
+// func (e ErrHasInlineAkteAndFilePath) Recover() (z Objekte, err error) {
 // 	if e.AkteWriterFactory == nil {
 // 		err = errors.Errorf("akte writer factory is nil")
 // 		return
@@ -53,7 +53,7 @@ func (e ErrHasInlineAkteAndFilePath) Error() string {
 // 		return
 // 	}
 
-// 	z = e.Zettel
+// 	z = e.Objekte
 // 	z.Akte = akteWriter.Sha()
 
 // 	return

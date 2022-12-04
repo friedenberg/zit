@@ -15,7 +15,7 @@ func MakeCliFormatZettel(
 	s standort.Standort,
 	cw format.FuncColorWriter,
 	sf format.FormatWriterFunc[sha.Sha],
-	zf format.FormatWriterFunc[zettel.Zettel],
+	zf format.FormatWriterFunc[zettel.Objekte],
 ) format.FormatWriterFunc[Zettel] {
 	return func(w io.Writer, z *Zettel) (n int64, err error) {
 		return format.Write(

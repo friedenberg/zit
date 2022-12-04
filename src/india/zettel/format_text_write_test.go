@@ -38,7 +38,7 @@ func (arf akteReaderFactory) AkteReader(s sha.Sha) (r sha.ReadCloser, err error)
 	return
 }
 
-func writeFormat(t test_logz.T, z Zettel, f Format, includeAkte bool, akteBody string) (out string) {
+func writeFormat(t test_logz.T, z Objekte, f Format, includeAkte bool, akteBody string) (out string) {
 	hash := sha256.New()
 	_, err := io.Copy(hash, strings.NewReader(akteBody))
 
@@ -81,7 +81,7 @@ func writeFormat(t test_logz.T, z Zettel, f Format, includeAkte bool, akteBody s
 func TestWriteWithoutAkte(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-	z := Zettel{
+	z := Objekte{
 		Bezeichnung: bezeichnung.Make("the title"),
 		Etiketten: makeEtiketten(t,
 			"tag1",
@@ -110,7 +110,7 @@ func TestWriteWithoutAkte(t1 *testing.T) {
 func TestWriteWithInlineAkte(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-	z := Zettel{
+	z := Objekte{
 		Bezeichnung: bezeichnung.Make("the title"),
 		Etiketten: makeEtiketten(t,
 			"tag1",

@@ -15,8 +15,8 @@ func MakeCliFormat(
 	bf format.FormatWriterFunc[bezeichnung.Bezeichnung],
 	ef format.FormatWriterFunc[kennung.EtikettSet],
 	tf format.FormatWriterFunc[kennung.Typ],
-) format.FormatWriterFunc[Zettel] {
-	return func(w io.Writer, z *Zettel) (n int64, err error) {
+) format.FormatWriterFunc[Objekte] {
+	return func(w io.Writer, z *Objekte) (n int64, err error) {
 		var lastWriter format.WriterFunc
 
 		if z.Bezeichnung.IsEmpty() {
@@ -38,7 +38,7 @@ func MakeCliFormat(
 func MakeCliFormatTransacted(
 	hf format.FormatWriterFunc[hinweis.Hinweis],
 	sf format.FormatWriterFunc[sha.Sha],
-	zf format.FormatWriterFunc[Zettel],
+	zf format.FormatWriterFunc[Objekte],
 	verb string,
 ) format.FormatWriterFunc[Transacted] {
 	return func(w io.Writer, z *Transacted) (n int64, err error) {
@@ -50,7 +50,7 @@ func MakeCliFormatTransacted(
 			format.MakeFormatString("@"),
 			format.MakeWriter(sf, &z.Sku.Sha),
 			format.MakeFormatString(" "),
-			format.MakeWriter[Zettel](zf, &z.Objekte),
+			format.MakeWriter[Objekte](zf, &z.Objekte),
 			format.MakeFormatString("]"),
 		)
 	}

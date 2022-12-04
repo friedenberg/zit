@@ -10,7 +10,7 @@ import (
 )
 
 // TODO-P2 move this to somewhere more appropriate
-func (z *Zettel) ApplyKonfig(k konfig.Konfig) (err error) {
+func (z *Objekte) ApplyKonfig(k konfig.Konfig) (err error) {
 	normalized := kennung.WithRemovedCommonPrefixes(z.Etiketten)
 	z.Etiketten = normalized
 
@@ -37,7 +37,7 @@ func (z *Zettel) ApplyKonfig(k konfig.Konfig) (err error) {
 	return
 }
 
-func (z *Zettel) applyGoldenChild(
+func (z *Objekte) applyGoldenChild(
 	e kennung.Etikett,
 	mode typ_toml.EtikettRuleGoldenChild,
 ) (err error) {

@@ -54,7 +54,7 @@ func (f FormatMetadateiText2) ReadFormat(r1 io.Reader, z *Objekte) (n int64, err
 }
 
 func (f FormatMetadateiText2) makeReadTypFunc(
-	z *Zettel,
+	z *Objekte,
 ) format.FuncReadLine {
 	return func(desc string) (err error) {
 		if desc == "" {

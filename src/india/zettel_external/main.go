@@ -12,7 +12,7 @@ import (
 type Sku = sku.External[hinweis.Hinweis, *hinweis.Hinweis]
 
 type Zettel struct {
-	Objekte  zettel.Zettel
+	Objekte  zettel.Objekte
 	Sku      Sku
 	ZettelFD fd.FD
 	AkteFD   fd.FD

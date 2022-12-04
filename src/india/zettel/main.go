@@ -12,8 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/objekte"
 )
 
-// TODO-P0 rename to Objekte
-type Zettel struct {
+type Objekte struct {
 	Akte        sha.Sha
 	Typ         kennung.Typ
 	Bezeichnung bezeichnung.Bezeichnung
@@ -21,37 +20,35 @@ type Zettel struct {
 }
 
 type Stored = objekte.Stored[
-	Zettel,
-	*Zettel,
+	Objekte,
+	*Objekte,
 	hinweis.Hinweis,
 	*hinweis.Hinweis,
 ]
-
-type Objekte = Zettel
 
 type Sku = sku.Transacted[hinweis.Hinweis, *hinweis.Hinweis]
 
 type Transacted = objekte.Transacted[
-	Zettel,
-	*Zettel,
+	Objekte,
+	*Objekte,
 	hinweis.Hinweis,
 	*hinweis.Hinweis,
 ]
 
-func (z Zettel) Gattung() gattung.Gattung {
+func (z Objekte) Gattung() gattung.Gattung {
 	return gattung.Zettel
 }
 
-func (z Zettel) AkteSha() sha.Sha {
+func (z Objekte) AkteSha() sha.Sha {
 	return z.Akte
 }
 
-func (z *Zettel) SetAkteSha(v sha.Sha) {
+func (z *Objekte) SetAkteSha(v sha.Sha) {
 	z.Akte = v
 }
 
 // TODO-P2 figure out why this doesn't always work for `status`
-func (z Zettel) Equals(z1 *Zettel) bool {
+func (z Objekte) Equals(z1 *Objekte) bool {
 	if z1 == nil {
 		return false
 	}
@@ -75,7 +72,7 @@ func (z Zettel) Equals(z1 *Zettel) bool {
 	return true
 }
 
-func (z Zettel) IsEmpty() bool {
+func (z Objekte) IsEmpty() bool {
 	if strings.TrimSpace(z.Bezeichnung.String()) != "" {
 		return false
 	}
@@ -91,7 +88,7 @@ func (z Zettel) IsEmpty() bool {
 	return true
 }
 
-func (z *Zettel) Reset(z1 *Zettel) {
+func (z *Objekte) Reset(z1 *Objekte) {
 	if z1 == nil {
 		z.Akte = sha.Sha{}
 		z.Typ = kennung.Typ{}
@@ -105,7 +102,7 @@ func (z *Zettel) Reset(z1 *Zettel) {
 	}
 }
 
-func (z Zettel) Description() (d string) {
+func (z Objekte) Description() (d string) {
 	d = z.Bezeichnung.String()
 
 	if strings.TrimSpace(d) == "" {
@@ -115,7 +112,7 @@ func (z Zettel) Description() (d string) {
 	return
 }
 
-func (z Zettel) DescriptionAndTags() (d string) {
+func (z Objekte) DescriptionAndTags() (d string) {
 	sb := &strings.Builder{}
 
 	sb.WriteString(z.Bezeichnung.String())

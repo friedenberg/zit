@@ -65,7 +65,7 @@ func (f Text) ReadFrom(c *FormatContextRead) (n int64, err error) {
 				Path: state.aktePath,
 			},
 			InlineSha: inlineAkteSha,
-			Zettel:    c.Zettel,
+			Objekte:   c.Zettel,
 		}
 
 		return

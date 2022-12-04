@@ -76,7 +76,7 @@ func (f Text2) ReadFormat(
 				Path: formatMetadatei.aktePath,
 			},
 			InlineSha: inlineAkteSha,
-			Zettel:    *z,
+			Objekte:   *z,
 		}
 
 		return

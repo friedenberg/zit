@@ -26,7 +26,7 @@ func (pz *ProtoZettel) AddToFlagSet(f *flag.FlagSet) {
 	f.Var(&pz.Etiketten, "etiketten", "the Etiketten to use for created or updated Zttelen")
 }
 
-func (pz ProtoZettel) Equals(z Zettel) (ok bool) {
+func (pz ProtoZettel) Equals(z Objekte) (ok bool) {
 	var okTyp, okEt, okBez bool
 
 	if !pz.Typ.IsEmpty() && pz.Typ.Equals(&z.Typ) {
@@ -46,8 +46,8 @@ func (pz ProtoZettel) Equals(z Zettel) (ok bool) {
 	return
 }
 
-func (pz ProtoZettel) Make() (z *Zettel) {
-	z = &Zettel{
+func (pz ProtoZettel) Make() (z *Objekte) {
+	z = &Objekte{
 		Etiketten: kennung.MakeEtikettSet(),
 	}
 
@@ -56,7 +56,7 @@ func (pz ProtoZettel) Make() (z *Zettel) {
 	return
 }
 
-func (pz ProtoZettel) Apply(z *Zettel) (ok bool) {
+func (pz ProtoZettel) Apply(z *Objekte) (ok bool) {
 	if z.Typ.IsEmpty() && !pz.Typ.IsEmpty() && !z.Typ.Equals(&pz.Typ) {
 		ok = true
 		z.Typ = pz.Typ

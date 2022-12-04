@@ -6,7 +6,7 @@ import (
 )
 
 func MakeWriterZettel(
-	wf collections.WriterFunc[*Zettel],
+	wf collections.WriterFunc[*Objekte],
 ) collections.WriterFunc[*Transacted] {
 	return func(z *Transacted) (err error) {
 		if err = wf(&z.Objekte); err != nil {

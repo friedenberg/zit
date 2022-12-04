@@ -88,7 +88,7 @@ func (c Cat) etiketten(u *umwelt.Umwelt) (err error) {
 
 func (c Cat) zettelWriter(
 	u *umwelt.Umwelt,
-) collections.WriterFunc[*zettel.Zettel] {
+) collections.WriterFunc[*zettel.Objekte] {
 	switch c.Format {
 	case "json":
 		return zettel.MakeSerializedFormatWriter(

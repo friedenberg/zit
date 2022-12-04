@@ -139,7 +139,7 @@ func (s *zettelStore) SetZettelTransactedLogWriter(
 	s.zettelTransactedWriter = ztlw
 }
 
-func (s zettelStore) WriteZettelObjekte(z zettel.Zettel) (sh sha.Sha, err error) {
+func (s zettelStore) WriteZettelObjekte(z zettel.Objekte) (sh sha.Sha, err error) {
 	//no lock required
 
 	var w *age_io.Mover
@@ -267,7 +267,7 @@ func (s zettelStore) ReadOne(i id.Id) (tz zettel.Transacted, err error) {
 	return
 }
 
-func (s *zettelStore) Create(in zettel.Zettel) (tz zettel.Transacted, err error) {
+func (s *zettelStore) Create(in zettel.Objekte) (tz zettel.Transacted, err error) {
 	if !s.common.LockSmith.IsAcquired() {
 		err = ErrLockRequired{
 			Operation: "create",
@@ -337,7 +337,7 @@ func (s *zettelStore) Create(in zettel.Zettel) (tz zettel.Transacted, err error)
 }
 
 func (s *zettelStore) CreateWithHinweis(
-	in zettel.Zettel,
+	in zettel.Objekte,
 	h hinweis.Hinweis,
 ) (tz zettel.Transacted, err error) {
 	if !s.common.LockSmith.IsAcquired() {

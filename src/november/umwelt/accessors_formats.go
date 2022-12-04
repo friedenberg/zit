@@ -74,7 +74,7 @@ func (u *Umwelt) FormatTypCheckedOut() format.FormatWriterFunc[typ.External] {
 	)
 }
 
-func (u *Umwelt) FormatZettel() format.FormatWriterFunc[zettel.Zettel] {
+func (u *Umwelt) FormatZettel() format.FormatWriterFunc[zettel.Objekte] {
 	return zettel.MakeCliFormat(
 		u.FormatBezeichnung(),
 		format.MakeFormatStringer[kennung.EtikettSet](),

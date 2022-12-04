@@ -10,7 +10,7 @@ import (
 )
 
 type FormatContextRead struct {
-	Zettel            Zettel
+	Zettel            Objekte
 	AktePath          string
 	In                io.Reader
 	RecoverableErrors errors.Multi
@@ -18,7 +18,7 @@ type FormatContextRead struct {
 }
 
 type FormatContextWrite struct {
-	Zettel           Zettel
+	Zettel           Objekte
 	Out              io.Writer
 	IncludeAkte      bool
 	FormatScript     konfig.RemoteScript

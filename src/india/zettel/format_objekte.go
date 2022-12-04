@@ -12,7 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
-func (z Zettel) ObjekteSha() (s sha.Sha, err error) {
+func (z Objekte) ObjekteSha() (s sha.Sha, err error) {
 	hash := sha256.New()
 
 	o := FormatObjekte{}
@@ -59,7 +59,7 @@ func (f FormatObjekte) WriteTo(c FormatContextWrite) (n int64, err error) {
 func (f *FormatObjekte) ReadFrom(c *FormatContextRead) (n int64, err error) {
 	etiketten := kennung.MakeEtikettMutableSet()
 
-	var z *Zettel
+	var z *Objekte
 	z = &c.Zettel
 
 	r := bufio.NewReader(c.In)

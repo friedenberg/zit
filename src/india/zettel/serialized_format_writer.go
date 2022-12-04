@@ -15,8 +15,8 @@ func MakeSerializedFormatWriter(
 	out io.Writer,
 	arf gattung.AkteReaderFactory,
 	k konfig.Konfig,
-) collections.WriterFunc[*Zettel] {
-	wf := func(z *Zettel) (err error) {
+) collections.WriterFunc[*Objekte] {
+	wf := func(z *Objekte) (err error) {
 		isInline := typ.IsInlineAkte(z.Typ, k)
 
 		ctx := FormatContextWrite{

@@ -27,7 +27,7 @@ func makeAkteExt(t test_logz.T, v string) (es kennung.Typ) {
 	return
 }
 
-func readFormat(t test_logz.T, f Format, contents string) (z Zettel, a string) {
+func readFormat(t test_logz.T, f Format, contents string) (z Objekte, a string) {
 	t.Helper()
 
 	awf := test_metadatei_io.NopFactoryReadWriter(bytes.NewBuffer(nil))

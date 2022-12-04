@@ -132,7 +132,6 @@ func (c ExecAction) runExecutor(
 		return
 	}
 
-	//TODO-P0 support external akte
 	env := map[string]string{
 		"ZIT_ZETTEL": z.Sku.Kennung.String(),
 		"ZIT_BIN":    u.Standort().Executable(),
