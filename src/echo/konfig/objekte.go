@@ -9,9 +9,11 @@ import (
 )
 
 type Objekte struct {
-	Sha  sha.Sha
-	Akte Compiled
-	Toml objekteToml
+	Sha sha.Sha
+
+	wasCompiled bool
+	Akte        Compiled
+	Toml        objekteToml
 }
 
 type objekteToml struct {
@@ -28,8 +30,19 @@ func (o Objekte) AkteSha() sha.Sha {
 }
 
 func (a Objekte) Equals(b *Objekte) bool {
-	panic("TODO-P0 not implemented")
-	// return false
+	if b == nil {
+		return false
+	}
+
+	if !b.wasCompiled {
+		return false
+	}
+
+	if !a.Sha.Equals(b.Sha) {
+		return false
+	}
+
+	return true
 }
 
 func (a *Objekte) Reset(b *Objekte) {
@@ -59,6 +72,8 @@ func (k *Objekte) Recompile() (err error) {
 		err = errors.Wrap(err)
 		return
 	}
+
+	k.wasCompiled = true
 
 	return
 }

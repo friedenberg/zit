@@ -54,7 +54,7 @@ func (t *Transacted[T, T1, T2, T3]) SetObjekteSha(
 		return
 	}
 
-	//TODO-P0 provide opportunity for Objekte to bootstrap from arf
+	//TODO-P3 provide opportunity for Objekte to bootstrap from arf
 
 	return
 }

@@ -56,5 +56,7 @@ func (a *Konfig) tryReadTransacted(s standort.Standort) (err error) {
 		}
 	}
 
+	a.Transacted.Objekte.wasCompiled = true
+
 	return
 }
