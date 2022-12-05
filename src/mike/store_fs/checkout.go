@@ -14,6 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/india/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_external"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
+	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
 )
 
 type ZettelCheckedOutLogWriters struct {
@@ -29,10 +30,13 @@ func (s *Store) Checkout(
 	zcs = zettel_checked_out.MakeMutableSetUnique(0)
 	zts := zettel.MakeMutableSetUnique(0)
 
-	if err = s.storeObjekten.Zettel().ReadAllSchwanzenTransacted(
-		ztw,
-		zts.Add,
-		collections.MakeWriterDoNotRepool[zettel.Transacted](),
+	if err = s.storeObjekten.Zettel().ReadAllSchwanzenVerzeichnisse(
+		zettel_verzeichnisse.MakeWriterKonfig(s.Konfig.Konfig),
+		zettel_verzeichnisse.MakeWriterZettelTransacted(ztw),
+		zettel_verzeichnisse.MakeWriterZettelTransacted(zts.Add),
+		zettel_verzeichnisse.MakeWriterZettelTransacted(
+			collections.MakeWriterDoNotRepool[zettel.Transacted](),
+		),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
