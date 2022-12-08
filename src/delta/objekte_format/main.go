@@ -12,6 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/sha"
 )
 
+//TODO-P3 move to objekte
 type Format struct {
 	arf gattung.AkteIOFactory
 }

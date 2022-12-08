@@ -83,6 +83,7 @@ func (s Set) Timestamps() (timestamps []ts.Time) {
 	return
 }
 
+//TODO-P2 switch to set
 func (s Set) Typen() (typen []kennung.Typ) {
 	typen = s.typen.Elements()
 

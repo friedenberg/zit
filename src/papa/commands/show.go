@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/charlie/collections_coding"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/kennung"
@@ -120,14 +119,22 @@ func (c Show) RunWithIds(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 		return c.showTransaktions(store, ids)
 
 	case gattung.Typ:
-		ev := typ.MakeEncoderValue(store.Konfig(), store.Out())
+		var ev typ.FormatterValue
 
 		if err = ev.Set(c.Format); err != nil {
 			err = errors.Normal(err)
 			return
 		}
 
-		return c.showTypen(store, ids, ev.EncoderLike)
+		return c.showTypen(
+			store,
+			ids,
+			ev.FuncFormatter(
+				store.Out(),
+				store.Konfig(),
+				store.StoreObjekten(),
+			),
+		)
 
 	default:
 		err = errors.Errorf("unsupported Gattung: %s", c.Gattung)
@@ -227,25 +234,40 @@ func (c Show) showTransaktions(store *umwelt.Umwelt, ids id_set.Set) (err error)
 }
 
 func (c Show) showTypen(
-	store *umwelt.Umwelt,
+	u *umwelt.Umwelt,
 	ids id_set.Set,
-	ev collections_coding.EncoderLike[kennung.Typ],
+	f collections.WriterFunc[*typ.Transacted],
 ) (err error) {
+	f1 := collections.MakeSyncSerializer(f)
+
 	typen := typ.MakeMutableSet(ids.Typen()...)
-	typen.EachPtr(
+	if err = typen.EachPtr(
 		collections.MakeChain(
 			func(t *kennung.Typ) (err error) {
-				ct := store.Konfig().Transacted.Objekte.GetTyp(t.String())
+				//TODO-P2 move to store_objekten
+				ct := u.Konfig().Transacted.Objekte.GetTyp(t.String())
 
 				if ct == nil {
 					return
 				}
 
+				ty := &typ.Transacted{
+					Sku:     ct.Sku,
+					Objekte: ct.Typ,
+				}
+
+				if err = f1(ty); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
 				return
 			},
-			collections_coding.EncoderToWriter(ev),
 		),
-	)
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }

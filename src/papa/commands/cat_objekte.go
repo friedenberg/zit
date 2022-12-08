@@ -54,7 +54,8 @@ func (c CatObjekte) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	case gattung.Zettel:
 		return c.zettelen(u, shas)
 
-		//TODO-P2 add typ
+	case gattung.Typ:
+		return c.typen(u, shas)
 
 	default:
 		err = errors.Errorf("unsupported objekte type: %s", c.Gattung)
@@ -63,6 +64,7 @@ func (c CatObjekte) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 }
 
 func (c CatObjekte) akten(u *umwelt.Umwelt, shas sha.Set) (err error) {
+	//TODO-P3 refactor into reusable
 	akteWriter := collections.MakeSyncSerializer(
 		func(rc io.ReadCloser) (err error) {
 			defer errors.Deferred(&err, rc.Close)
@@ -127,5 +129,11 @@ func (c CatObjekte) zettelen(u *umwelt.Umwelt, shas sha.Set) (err error) {
 		return
 	}
 
+	return
+}
+
+// TODO
+func (c CatObjekte) typen(u *umwelt.Umwelt, shas sha.Set) (err error) {
+	err = errors.Normalf("not implemented")
 	return
 }

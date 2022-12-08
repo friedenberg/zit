@@ -85,12 +85,6 @@ func makeCompiled(
 		kc.DefaultTyp,
 	)
 
-	for tn, tv := range kt.Konfig.Typen {
-		ct := makeCompiledTyp(tn)
-		ct.Typ.Akte.Apply(&tv)
-		typen.Add(ct)
-	}
-
 	kc.Typen = makeCompiledTypSet(typen)
 
 	if sha, err = kc.recompile(kt.Sha); err != nil {
