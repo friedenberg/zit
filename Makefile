@@ -11,21 +11,18 @@ ifeq ($(origin .RECIPEPREFIX), undefined)
 endif
 .RECIPEPREFIX = >
 
-.PHONY: build watch exclude bats_tests unit_tests go_vet graph_dependencies install asdf_install;
+.PHONY: build watch exclude bats_tests unit_tests go_vet graph_dependencies install;
 
 # build: install unit_tests go_vet graph_dependencies;
 build: install unit_tests go_vet;
 
-asdf_install: .tool-versions
-> asdf install
-
-go_build: asdf_install
+go_build:
 > go build -o build/zit ./.
 
 go_vet: go_build
 > go vet ./...
 
-unit_tests: asdf_install
+unit_tests:
 > go test -timeout 5s ./...
 
 install: go_build unit_tests go_build bats_tests

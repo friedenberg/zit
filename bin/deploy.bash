@@ -1,4 +1,5 @@
-#! /bin/bash -e
+#! /usr/bin/env nix-shell
+#! nix-shell -i bash
 
 declare t
 
@@ -8,7 +9,7 @@ if [[ -d build_options ]]; then
 fi
 
 #TODO pause mr-build-and-watch and then resume after
-gmake
+make
 go clean -cache -fuzzcache
 git add .
 
