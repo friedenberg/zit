@@ -95,3 +95,7 @@ func (t Time) Equals(t1 Time) bool {
 func (t Time) Less(t1 Time) bool {
 	return t.Unix() < t1.Unix()
 }
+
+func (t Time) IsEmpty() bool {
+	return t.time.IsZero()
+}

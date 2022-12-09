@@ -15,6 +15,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/konfig"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
 	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
+	"github.com/friedenberg/zit/src/konfig_compiled"
 	"github.com/friedenberg/zit/src/lima/store_objekten"
 	"github.com/friedenberg/zit/src/mike/store_fs"
 )
@@ -29,7 +30,7 @@ type Umwelt struct {
 	errIsTty bool
 
 	standort standort.Standort
-	konfig   konfig.Konfig
+	konfig   konfig_compiled.Compiled
 
 	storesInitialized     bool
 	lock                  *file_lock.Lock
@@ -66,7 +67,7 @@ func Make(kCli konfig.Cli) (u *Umwelt, err error) {
 }
 
 func (u *Umwelt) Reset() (err error) {
-	return u.Initialize(u.Konfig().Cli)
+	return u.Initialize(u.Konfig().Cli())
 }
 
 func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
@@ -75,39 +76,44 @@ func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 		return
 	}
 
-	if kCli.Verbose {
-		errors.SetVerbose()
-	} else {
-		log.SetOutput(ioutil.Discard)
-	}
+	//TODO-P4 consider moving to konfig_compiled
+	{
+		if kCli.Verbose {
+			errors.SetVerbose()
+		} else {
+			log.SetOutput(ioutil.Discard)
+		}
 
-	standortOptions := standort.Options{
-		BasePath: kCli.BasePath,
-	}
+		standortOptions := standort.Options{
+			BasePath: kCli.BasePath,
+		}
 
-	if standortOptions.BasePath == "" {
-		if standortOptions.BasePath, err = os.Getwd(); err != nil {
+		if standortOptions.BasePath == "" {
+			if standortOptions.BasePath, err = os.Getwd(); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+
+		if u.standort, err = standort.Make(standortOptions); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	if u.standort, err = standort.Make(standortOptions); err != nil {
-		err = errors.Wrap(err)
-		return
+	{
+		var k *konfig_compiled.Compiled
+
+		if k, err = konfig_compiled.Make(
+			u.standort,
+			kCli,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		u.konfig = *k
 	}
-
-	var k konfig.Konfig
-
-	if k, err = konfig.Make(
-		u.standort,
-		kCli,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	u.konfig = k
 
 	u.lock = file_lock.New(u.standort.DirZit("Lock"))
 
@@ -146,14 +152,9 @@ func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 		return
 	}
 
-	csk := store_fs.Konfig{
-		Konfig:       u.konfig,
-		CacheEnabled: u.konfig.CheckoutCacheEnabled,
-	}
-
 	errors.Log().Print("initing checkout store")
 	u.storeWorkingDirectory, err = store_fs.New(
-		csk,
+		u.konfig,
 		u.standort,
 		u.storeObjekten,
 	)
@@ -206,7 +207,7 @@ func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 func (u Umwelt) DefaultEtiketten() (etiketten kennung.EtikettSet, err error) {
 	metiketten := kennung.MakeEtikettMutableSet()
 
-	for _, e := range u.konfig.Transacted.Objekte.Akte.EtikettenToAddToNew {
+	for _, e := range u.konfig.EtikettenToAddToNew {
 		if err = metiketten.AddString(e); err != nil {
 			err = errors.Wrap(err)
 			return

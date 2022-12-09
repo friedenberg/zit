@@ -22,8 +22,6 @@ import (
 type zettelStore struct {
 	common *common
 
-	indexAbbr *indexAbbr
-
 	protoZettel zettel.ProtoZettel
 
 	zettelTransactedWriter ZettelTransactedLogWriters
@@ -41,11 +39,9 @@ type zettelStore struct {
 func makeZettelStore(
 	sa *common,
 	p zettel_verzeichnisse.Pool,
-	ia *indexAbbr,
 ) (s *zettelStore, err error) {
 	s = &zettelStore{
 		common:      sa,
-		indexAbbr:   ia,
 		pool:        p,
 		protoZettel: zettel.MakeProtoZettel(),
 	}
@@ -55,7 +51,9 @@ func makeZettelStore(
 		return
 	}
 
-	if err = s.protoZettel.Typ.Set(s.common.Konfig.Transacted.Objekte.Akte.DefaultTyp.Sku.Kennung.String()); err != nil {
+	if err = s.protoZettel.Typ.Set(
+		s.common.Konfig.DefaultTyp.Sku.Kennung.String(),
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -206,7 +204,7 @@ func (s *zettelStore) writeNamedZettelToIndex(tz zettel.Transacted) (err error) 
 		}
 	}
 
-	if err = s.indexAbbr.addZettelTransacted(tz); err != nil {
+	if err = s.common.Abbr.addZettelTransacted(tz); err != nil {
 		err = errors.Wrapf(err, "failed to write zettel to index: %s", tz.Sku)
 		return
 	}

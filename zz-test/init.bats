@@ -78,7 +78,6 @@ function init_and_init { # @test
 	assert_output --partial '.zit/Kennung/Counter already exists, not overwriting'
 	assert_output --partial '.zit/Konfig already exists, not overwriting'
 	assert_output --partial '.zit/KonfigCompiled already exists, not overwriting'
-	assert_output --partial '    (unchanged) [konfig@e]'
 	assert_output --partial '          (new) [o/u@8 !md "wow"]'
 
 	# run zit reindex

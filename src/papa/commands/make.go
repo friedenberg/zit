@@ -89,7 +89,7 @@ func (c Make) getZettel(
 			MutableId: &hinweis.Hinweis{},
 			Expand: func(v string) (out string, err error) {
 				var h hinweis.Hinweis
-				h, err = u.StoreObjekten().ExpandHinweisString(v)
+				h, err = u.StoreObjekten().Abbr().ExpandHinweisString(v)
 				out = h.String()
 				return
 			},
@@ -118,10 +118,10 @@ func (c Make) getZettel(
 
 	typ := tz.Objekte.Typ.String()
 
-	typKonfig := u.Konfig().Transacted.Objekte.GetTyp(typ)
+	typKonfig := u.Konfig().GetTyp(typ)
 
 	if typKonfig != nil {
-		executor = typKonfig.Typ.Akte.ExecCommand
+		executor = typKonfig.Objekte.Akte.ExecCommand
 	} else {
 		err = errors.Normal(errors.Errorf("Typ does not have an exec-command set: %s", typ))
 		return

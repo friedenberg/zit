@@ -6,21 +6,21 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/delta/typ_toml"
-	"github.com/friedenberg/zit/src/echo/konfig"
+	"github.com/friedenberg/zit/src/konfig_compiled"
 )
 
 // TODO-P2 move this to somewhere more appropriate
-func (z *Objekte) ApplyKonfig(k konfig.Konfig) (err error) {
+func (z *Objekte) ApplyKonfig(k konfig_compiled.Compiled) (err error) {
 	normalized := kennung.WithRemovedCommonPrefixes(z.Etiketten)
 	z.Etiketten = normalized
 
-	tk := k.Transacted.Objekte.GetTyp(z.Typ.String())
+	tk := k.GetTyp(z.Typ.String())
 
 	if tk == nil {
 		return
 	}
 
-	for e, r := range tk.Typ.Akte.EtikettenRules {
+	for e, r := range tk.Objekte.Akte.EtikettenRules {
 		var e1 kennung.Etikett
 
 		if e1, err = kennung.MakeEtikett(e); err != nil {

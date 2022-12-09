@@ -20,7 +20,7 @@ func (s *Store) CheckinTyp(p string) (t *typ.Transacted, err error) {
 func (s *Store) WriteTyp(t *typ.Transacted) (te *typ.External, err error) {
 	te = &typ.External{
 		FD: cwd_files.File{
-			Path: fmt.Sprintf("%s.%s", t.Kennung(), s.Konfig.Transacted.Objekte.Akte.TypFileExtension),
+			Path: fmt.Sprintf("%s.%s", t.Kennung(), s.konfig.TypFileExtension),
 		},
 		//TODO-P2 move to central place
 		Objekte: t.Objekte,

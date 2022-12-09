@@ -110,6 +110,10 @@ func (s Standort) DirObjektenZettelen() string {
 	return s.DirObjekten("Zettelen")
 }
 
+func (s Standort) DirObjektenKonfig() string {
+	return s.DirObjekten("Konfig")
+}
+
 func (s Standort) DirObjektenTypen() string {
 	return s.DirObjekten("Typen")
 }

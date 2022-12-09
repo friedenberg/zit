@@ -70,7 +70,14 @@ func (c EditKonfig) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	defer errors.Deferred(&err, u.Unlock)
 
-	if _, err = u.StoreObjekten().Konfig().Update(k); err != nil {
+	var tt *konfig.Transacted
+
+	if tt, err = u.StoreObjekten().Konfig().Update(k); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = u.KonfigPtr().Recompile(u.Standort(), tt); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -81,7 +88,7 @@ func (c EditKonfig) Run(u *umwelt.Umwelt, args ...string) (err error) {
 func (c EditKonfig) makeTempKonfigFile(
 	u *umwelt.Umwelt,
 ) (p string, err error) {
-	var k konfig.Transacted
+	var k *konfig.Transacted
 
 	if k, err = u.StoreObjekten().Konfig().Read(); err != nil {
 		err = errors.Wrap(err)

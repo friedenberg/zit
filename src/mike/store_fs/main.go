@@ -18,11 +18,12 @@ import (
 	"github.com/friedenberg/zit/src/india/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_external"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
+	"github.com/friedenberg/zit/src/konfig_compiled"
 	"github.com/friedenberg/zit/src/lima/store_objekten"
 )
 
 type Store struct {
-	Konfig
+	konfig konfig_compiled.Compiled
 	standort.Standort
 
 	format zettel.Format
@@ -37,12 +38,12 @@ type Store struct {
 }
 
 func New(
-	k Konfig,
+	k konfig_compiled.Compiled,
 	st standort.Standort,
 	storeObjekten *store_objekten.Store,
 ) (s *Store, err error) {
 	s = &Store{
-		Konfig:        k,
+		konfig:        k,
 		Standort:      st,
 		format:        zettel.Text{},
 		storeObjekten: storeObjekten,
@@ -135,7 +136,7 @@ func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 		//extension
 		//TODO-P4 modify this to use globs
 		if filepath.Ext(ez.ZettelFD.Path) == "" {
-			ez.ZettelFD.Path = ez.ZettelFD.Path + s.Konfig.Transacted.Objekte.GetZettelFileExtension()
+			ez.ZettelFD.Path = ez.ZettelFD.Path + s.konfig.GetZettelFileExtension()
 			return s.readZettelFromFile(ez)
 		}
 

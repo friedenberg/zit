@@ -1,62 +1,50 @@
 package konfig
 
 import (
-	"encoding/gob"
-	"os"
-
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/foxtrot/objekte"
 )
 
 type Transacted = objekte.Transacted[Objekte, *Objekte, kennung.Konfig, *kennung.Konfig]
 
-type Konfig struct {
-	Cli
-	Transacted Transacted
+type Objekte struct {
+	Sha  sha.Sha
+	Akte Toml
 }
 
-func Make(s standort.Standort, kc Cli) (c Konfig, err error) {
-	c.Transacted.Objekte.Akte = MakeDefaultCompiled()
-	c.Cli = kc
-
-	if err = c.tryReadTransacted(s); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
+func (o *Objekte) SetAkteSha(v sha.Sha) {
+	o.Sha = v
 }
 
-func (a *Konfig) tryReadTransacted(s standort.Standort) (err error) {
-	var f *os.File
+func (o Objekte) AkteSha() sha.Sha {
+	return o.Sha
+}
 
-	if f, err = files.Open(s.FileKonfigCompiled()); err != nil {
-		if errors.IsNotExist(err) {
-			err = nil
-		} else {
-			err = errors.Wrap(err)
-		}
-
-		return
+func (a Objekte) Equals(b *Objekte) bool {
+	if b == nil {
+		return false
 	}
 
-	defer errors.Deferred(&err, f.Close)
-
-	dec := gob.NewDecoder(f)
-
-	if err = dec.Decode(&a.Transacted); err != nil {
-		if errors.IsEOF(err) {
-			err = nil
-		} else {
-			err = errors.Wrap(err)
-			return
-		}
+	if !a.Sha.Equals(b.Sha) {
+		return false
 	}
 
-	a.Transacted.Objekte.wasCompiled = true
+	return true
+}
 
-	return
+func (a *Objekte) Reset(b *Objekte) {
+	if b == nil {
+		a.Sha = b.Sha
+		a.Akte = b.Akte
+	} else {
+		a.Sha = sha.Sha{}
+		//TODO
+		// a.Akte = MakeDefaultCompiled()
+	}
+}
+
+func (c Objekte) Gattung() gattung.Gattung {
+	return gattung.Konfig
 }

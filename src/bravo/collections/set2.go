@@ -85,6 +85,22 @@ func (s Set2[T, T1]) Each(wf WriterFunc[T1]) (err error) {
 	return
 }
 
+func (s Set2[T, T1]) EachPtr(wf WriterFunc[T]) (err error) {
+	for _, v := range s.private.Elements {
+		if err = wf(*v); err != nil {
+			if errors.IsEOF(err) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+			}
+
+			return
+		}
+	}
+
+	return
+}
+
 func (s Set2[T, T1]) Elements() (out []T1) {
 	out = make([]T1, 0, s.Len())
 

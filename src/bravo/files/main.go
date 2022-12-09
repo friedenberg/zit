@@ -109,6 +109,21 @@ func Open(s string) (f *os.File, err error) {
 	return
 }
 
+func OpenExclusiveWriteOnlyTruncate(s string) (f *os.File, err error) {
+	openFilesGuardInstance.Lock()
+
+	if f, err = os.OpenFile(
+		s,
+		os.O_WRONLY|os.O_EXCL|os.O_TRUNC,
+		0666,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func OpenExclusiveWriteOnly(s string) (f *os.File, err error) {
 	openFilesGuardInstance.Lock()
 

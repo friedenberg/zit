@@ -11,7 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/hinweisen"
-	"github.com/friedenberg/zit/src/echo/konfig"
+	"github.com/friedenberg/zit/src/konfig_compiled"
 )
 
 type encodedKennung struct {
@@ -34,7 +34,7 @@ type indexKennung struct {
 }
 
 func newIndexKennung(
-	k konfig.Konfig,
+	k konfig_compiled.Compiled,
 	ioFactory ioFactory,
 	oldHinweisenStore *hinweisen.Hinweisen,
 	p string,

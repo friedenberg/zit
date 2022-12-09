@@ -5,12 +5,12 @@ import (
 
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/echo/konfig"
 	zettel_pkg "github.com/friedenberg/zit/src/india/zettel"
+	"github.com/friedenberg/zit/src/konfig_compiled"
 )
 
 type Options struct {
-	konfig.Konfig
+	Konfig konfig_compiled.Compiled
 	hinweis.Abbr
 
 	RootEtiketten     kennung.EtikettSet
@@ -47,7 +47,7 @@ func (o *Options) AddToFlagSet(f *flag.FlagSet) {
 }
 
 func (o Options) assignmentTreeConstructor() *AssignmentTreeConstructor {
-	if !o.PrintAbbreviatedHinweisen {
+	if !o.Konfig.PrintAbbreviatedHinweisen {
 		o.Abbr = nil
 	}
 

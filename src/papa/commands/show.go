@@ -59,7 +59,7 @@ func (c Show) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 				MutableId: &hinweis.Hinweis{},
 				Expand: func(v string) (out string, err error) {
 					var h hinweis.Hinweis
-					h, err = u.StoreObjekten().ExpandHinweisString(v)
+					h, err = u.StoreObjekten().Abbr().ExpandHinweisString(v)
 					out = h.String()
 					return
 				},
@@ -68,7 +68,7 @@ func (c Show) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 				MutableId: &kennung.Etikett{},
 				Expand: func(v string) (out string, err error) {
 					var e kennung.Etikett
-					e, err = u.StoreObjekten().ExpandEtikettString(v)
+					e, err = u.StoreObjekten().Abbr().ExpandEtikettString(v)
 					out = e.String()
 					return
 				},
@@ -131,7 +131,6 @@ func (c Show) RunWithIds(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 			ids,
 			ev.FuncFormatter(
 				store.Out(),
-				store.Konfig(),
 				store.StoreObjekten(),
 			),
 		)
@@ -245,15 +244,10 @@ func (c Show) showTypen(
 		collections.MakeChain(
 			func(t *kennung.Typ) (err error) {
 				//TODO-P2 move to store_objekten
-				ct := u.Konfig().Transacted.Objekte.GetTyp(t.String())
+				ty := u.Konfig().GetTyp(t.String())
 
-				if ct == nil {
+				if ty == nil {
 					return
-				}
-
-				ty := &typ.Transacted{
-					Sku:     ct.Sku,
-					Objekte: ct.Typ,
 				}
 
 				if err = f1(ty); err != nil {

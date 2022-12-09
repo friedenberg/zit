@@ -83,6 +83,7 @@ func (s typStore) transact(
 		},
 	}
 
+	//TODO-P3 refactor into reusable
 	if mutter != nil {
 		tt.Sku.Kopf = mutter.Sku.Kopf
 		tt.Sku.Mutter[0] = mutter.Sku.Schwanz
@@ -130,16 +131,11 @@ func (s typStore) transact(
 func (s typStore) ReadOne(
 	k *kennung.Typ,
 ) (tt *typ.Transacted, err error) {
-	ct := s.common.Konfig.Transacted.Objekte.GetTyp(k.String())
+	tt = s.common.Konfig.GetTyp(k.String())
 
-	if ct == nil {
+	if tt == nil {
 		err = errors.Wrap(ErrNotFound{Id: k})
 		return
-	}
-
-	tt = &typ.Transacted{
-		Sku:     ct.Sku,
-		Objekte: ct.Typ,
 	}
 
 	return

@@ -6,15 +6,15 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/collections"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/echo/konfig"
 	"github.com/friedenberg/zit/src/golf/typ"
+	"github.com/friedenberg/zit/src/konfig_compiled"
 )
 
 func MakeSerializedFormatWriter(
 	f Format,
 	out io.Writer,
 	arf gattung.AkteReaderFactory,
-	k konfig.Konfig,
+	k konfig_compiled.Compiled,
 ) collections.WriterFunc[*Objekte] {
 	wf := func(z *Objekte) (err error) {
 		isInline := typ.IsInlineAkte(z.Typ, k)

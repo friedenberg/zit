@@ -65,6 +65,7 @@ type ObjektePtr[T Element] interface {
 	SetAkteSha(sha_core.Sha)
 }
 
+// TODO-P2 split into Stored and StoredPtr
 type Stored interface {
 	Gattung() Gattung
 	// Identifier() IdentifierLike
@@ -74,6 +75,12 @@ type Stored interface {
 
 	SetObjekteSha(AkteReaderFactory, string) error
 	ObjekteSha() sha_core.Sha
+}
+
+type StoredPtr interface {
+	Stored
+	SetAkteSha(sha_core.Sha)
+	SetObjekteSha(AkteReaderFactory, string) error
 }
 
 type AkteIOFactory interface {

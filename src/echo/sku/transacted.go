@@ -12,6 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/ts"
 )
 
+//TODO-P3 examine adding objekte and akte shas to Skus
 type Transacted[T kennung.KennungLike[T], T1 kennung.KennungLikePtr[T]] struct {
 	Mutter           Mutter
 	Kennung          T

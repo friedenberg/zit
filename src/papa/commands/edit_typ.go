@@ -13,6 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/typ_toml"
 	"github.com/friedenberg/zit/src/echo/fd"
 	"github.com/friedenberg/zit/src/echo/id_set"
+	"github.com/friedenberg/zit/src/echo/konfig"
 	"github.com/friedenberg/zit/src/echo/sku"
 	"github.com/friedenberg/zit/src/golf/typ"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -85,7 +86,9 @@ func (c EditTyp) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 	if err = tes.Each(
 		func(e *typ.External) (err error) {
-			if _, err = u.StoreObjekten().Typ().Update(
+			var tt *typ.Transacted
+
+			if tt, err = u.StoreObjekten().Typ().Update(
 				&e.Objekte,
 				&e.Sku.Kennung,
 			); err != nil {
@@ -93,10 +96,7 @@ func (c EditTyp) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 				return
 			}
 
-			u.KonfigPtr().Transacted.Objekte.AddTyp(
-				&e.Objekte.Akte,
-				&e.Sku.Kennung,
-			)
+			u.KonfigPtr().AddTyp(tt)
 
 			return
 		},
@@ -105,16 +105,16 @@ func (c EditTyp) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 		return
 	}
 
-	k := u.KonfigPtr()
+	var kt *konfig.Transacted
 
-	if err = k.Transacted.Objekte.Recompile(); err != nil {
+	if kt, err = u.StoreObjekten().Konfig().Read(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if _, err = u.StoreObjekten().Konfig().Update(
-		&k.Transacted.Objekte,
-	); err != nil {
+	k := u.KonfigPtr()
+
+	if err = k.Recompile(u.Standort(), kt); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

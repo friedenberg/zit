@@ -59,6 +59,7 @@ func (g Gattung) String() string {
 
 func (g *Gattung) Set(v string) (err error) {
 	v1 := strings.ToLower(v)
+
 	switch v1 {
 	case "akte":
 		*g = Akte
@@ -91,7 +92,8 @@ func (g *Gattung) Set(v string) (err error) {
 		*g = Kennung
 
 	default:
-		err = errors.Errorf("unknown gattung: %s", v)
+		err = errors.Errorf("unknown gattung: %q", v1)
+    return
 	}
 
 	return

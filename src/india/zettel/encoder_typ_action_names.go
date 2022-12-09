@@ -2,30 +2,25 @@ package zettel
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/echo/konfig"
 	"github.com/friedenberg/zit/src/golf/typ"
+	"github.com/friedenberg/zit/src/konfig_compiled"
 )
 
 type EncoderTypActionNames struct {
-	konfig konfig.Konfig
+	konfig konfig_compiled.Compiled
 }
 
 func (e EncoderTypActionNames) WriteTo(c FormatContextWrite) (n int64, err error) {
 	e1 := typ.MakeFormatterActionNames(c.Out)
 
 	//TODO-P2 move to store_objekten
-	ct := e.konfig.Transacted.Objekte.GetTyp(c.Zettel.Typ.String())
+	ct := e.konfig.GetTyp(c.Zettel.Typ.String())
 
 	if ct == nil {
 		return
 	}
 
-	ty := &typ.Transacted{
-		Sku:     ct.Sku,
-		Objekte: ct.Typ,
-	}
-
-	if n, err = e1.Encode(ty); err != nil {
+	if n, err = e1.Encode(ct); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

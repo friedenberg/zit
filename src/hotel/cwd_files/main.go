@@ -8,12 +8,12 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/echo/konfig"
 	"github.com/friedenberg/zit/src/golf/typ"
+	"github.com/friedenberg/zit/src/konfig_compiled"
 )
 
 type CwdFiles struct {
-	konfig           konfig.Konfig
+	konfig           konfig_compiled.Compiled
 	dir              string
 	Zettelen         map[string]CwdZettel
 	Typen            map[string]*typ.External
@@ -31,7 +31,7 @@ func (fs CwdFiles) ZettelFiles() (out []string) {
 	return
 }
 
-func makeCwdFiles(konfig konfig.Konfig, dir string) (fs CwdFiles) {
+func makeCwdFiles(konfig konfig_compiled.Compiled, dir string) (fs CwdFiles) {
 	fs = CwdFiles{
 		konfig:           konfig,
 		dir:              dir,
@@ -44,13 +44,19 @@ func makeCwdFiles(konfig konfig.Konfig, dir string) (fs CwdFiles) {
 	return
 }
 
-func MakeCwdFilesAll(k konfig.Konfig, dir string) (fs CwdFiles, err error) {
+func MakeCwdFilesAll(
+	k konfig_compiled.Compiled,
+	dir string,
+) (fs CwdFiles, err error) {
 	fs = makeCwdFiles(k, dir)
 	err = fs.readAll()
 	return
 }
 
-func MakeCwdFilesExactly(k konfig.Konfig, dir string, files ...string) (fs CwdFiles, err error) {
+func MakeCwdFilesExactly(
+	k konfig_compiled.Compiled,
+	dir string, files ...string,
+) (fs CwdFiles, err error) {
 	fs = makeCwdFiles(k, dir)
 	err = fs.readInputFiles(files...)
 	return
@@ -177,7 +183,7 @@ func (fs *CwdFiles) readFirstLevelFile(a string) (err error) {
 	ext = strings.TrimSpace(ext)
 
 	switch strings.TrimPrefix(ext, ".") {
-	case fs.konfig.Transacted.Objekte.Akte.TypFileExtension:
+	case fs.konfig.TypFileExtension:
 		if err = fs.tryTyp(fi); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -220,13 +226,13 @@ func (fs *CwdFiles) readSecondLevelFile(d string, a string) (err error) {
 	ext = strings.TrimSpace(ext)
 
 	switch strings.TrimPrefix(ext, ".") {
-	case fs.konfig.Transacted.Objekte.Akte.TypFileExtension:
+	case fs.konfig.TypFileExtension:
 		if err = fs.tryTyp(fi); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case fs.konfig.Transacted.Objekte.Akte.ZettelFileExtension:
+	case fs.konfig.ZettelFileExtension:
 		fallthrough
 
 		//Zettel-Akten can have any extension, and so default is Zettel

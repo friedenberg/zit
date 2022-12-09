@@ -1,6 +1,6 @@
 package konfig
 
-type tomlKonfig struct {
+type Toml struct {
 	RemoteScripts map[string]RemoteScript `toml:"remote-scripts"`
 	Tags          map[string]KonfigTag    `toml:"tags"`
 	Recipients    []string                `toml:"recipients"`

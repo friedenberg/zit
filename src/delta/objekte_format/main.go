@@ -12,7 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/sha"
 )
 
-//TODO-P3 move to objekte
+// TODO-P3 move to objekte
 type Format struct {
 	arf gattung.AkteIOFactory
 }
@@ -40,8 +40,7 @@ func (f Format) ReadFormat(
 			return
 		}
 
-		// line := strings.TrimSpace(lineOriginal)
-		line := lineOriginal
+		line := strings.TrimSpace(lineOriginal)
 
 		n += int64(len(lineOriginal))
 
@@ -59,8 +58,8 @@ func (f Format) ReadFormat(
 			return
 
 		case line != "" && loc == -1:
-			if err = g.Set(line[:loc]); err != nil {
-				err = errors.Errorf("%s: %s", err, line[:loc])
+			if err = g.Set(line); err != nil {
+				err = errors.Errorf("%s: %s", err, line)
 				return
 			}
 

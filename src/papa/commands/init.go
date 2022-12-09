@@ -12,7 +12,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/delta/standort"
-	"github.com/friedenberg/zit/src/echo/konfig"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
@@ -44,9 +43,10 @@ func (c Init) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	c.mkdirAll(base, "bin")
 
 	c.mkdirAll(s.DirObjektenAkten())
-	c.mkdirAll(s.DirObjektenZettelen())
-	c.mkdirAll(s.DirObjektenTypen())
+	c.mkdirAll(s.DirObjektenKonfig())
 	c.mkdirAll(s.DirObjektenTransaktion())
+	c.mkdirAll(s.DirObjektenTypen())
+	c.mkdirAll(s.DirObjektenZettelen())
 
 	c.mkdirAll(s.DirVerlorenUndGefunden())
 
@@ -90,15 +90,6 @@ func (c Init) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	defer u.Unlock()
-
-	k := konfig.Objekte{
-		Akte: konfig.MakeDefaultCompiled(),
-	}
-
-	if _, err = u.StoreObjekten().Konfig().Update(&k); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
 
 	if err = u.StoreObjekten().Reindex(); err != nil {
 		err = errors.Wrap(err)

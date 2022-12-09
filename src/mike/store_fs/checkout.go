@@ -31,7 +31,7 @@ func (s *Store) Checkout(
 	zts := zettel.MakeMutableSetUnique(0)
 
 	if err = s.storeObjekten.Zettel().ReadAllSchwanzenVerzeichnisse(
-		zettel_verzeichnisse.MakeWriterKonfig(s.Konfig.Konfig),
+		zettel_verzeichnisse.MakeWriterKonfig(s.konfig),
 		zettel_verzeichnisse.MakeWriterZettelTransacted(ztw),
 		zettel_verzeichnisse.MakeWriterZettelTransacted(zts.Add),
 		zettel_verzeichnisse.MakeWriterZettelTransacted(
@@ -88,7 +88,7 @@ func (s Store) filenameForZettelTransacted(
 		return
 	}
 
-	filename = originalFilename + s.Konfig.Transacted.Objekte.GetZettelFileExtension()
+	filename = originalFilename + s.konfig.GetZettelFileExtension()
 
 	return
 }
@@ -121,7 +121,7 @@ func (s *Store) CheckoutOne(
 		}
 	}
 
-	inlineAkte := typ.IsInlineAkte(sz.Objekte.Typ, s.Konfig.Konfig)
+	inlineAkte := typ.IsInlineAkte(sz.Objekte.Typ, s.konfig)
 
 	cz = zettel_checked_out.Zettel{
 		//TODO-P2 check diff with fs if already exists
@@ -142,10 +142,10 @@ func (s *Store) CheckoutOne(
 	if !inlineAkte {
 		t := sz.Objekte.Typ
 
-		ty := s.Transacted.Objekte.GetTyp(t.String())
+		ty := s.konfig.GetTyp(t.String())
 
 		if ty != nil {
-			fe := ty.Typ.Akte.FileExtension
+			fe := ty.Objekte.Akte.FileExtension
 
 			if fe == "" {
 				fe = t.String()

@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/collections_coding"
 	"github.com/friedenberg/zit/src/delta/typ_toml"
-	"github.com/friedenberg/zit/src/echo/konfig"
 	"github.com/friedenberg/zit/src/foxtrot/objekte"
 )
 
@@ -37,7 +36,6 @@ func (f *FormatterValue) Set(v string) (err error) {
 
 func (f *FormatterValue) FuncFormatter(
 	out io.Writer,
-	konfig konfig.Konfig,
 	af gattung.AkteIOFactory,
 ) collections.WriterFunc[*Transacted] {
 	switch f.string {

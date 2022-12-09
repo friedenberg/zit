@@ -48,7 +48,7 @@ func (c CatAlfred) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 			MutableId: &hinweis.Hinweis{},
 			Expand: func(v string) (out string, err error) {
 				var h hinweis.Hinweis
-				h, err = u.StoreObjekten().ExpandHinweisString(v)
+				h, err = u.StoreObjekten().Abbr().ExpandHinweisString(v)
 				out = h.String()
 				return
 			},
@@ -57,7 +57,7 @@ func (c CatAlfred) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 			MutableId: &kennung.Etikett{},
 			Expand: func(v string) (out string, err error) {
 				var e kennung.Etikett
-				e, err = u.StoreObjekten().ExpandEtikettString(v)
+				e, err = u.StoreObjekten().Abbr().ExpandEtikettString(v)
 				out = e.String()
 				return
 			},

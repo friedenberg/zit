@@ -1,14 +1,11 @@
 package store_objekten
 
 import (
-	"encoding/gob"
-	"os"
-
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/collections"
-	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/delta/id"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/delta/ts"
 	"github.com/friedenberg/zit/src/echo/age_io"
 	"github.com/friedenberg/zit/src/echo/konfig"
 	"github.com/friedenberg/zit/src/echo/sku"
@@ -61,7 +58,7 @@ func (s konfigStore) transact(
 
 	mo := age_io.MoveOptions{
 		Age:                      s.common.Age,
-		FinalPath:                s.common.Standort.DirObjektenAkten(),
+		FinalPath:                s.common.Standort.DirObjektenKonfig(),
 		GenerateFinalPathFromSha: true,
 	}
 
@@ -72,7 +69,7 @@ func (s konfigStore) transact(
 
 	defer w.Close()
 
-	var mutter konfig.Transacted
+	var mutter *konfig.Transacted
 
 	if mutter, err = s.Read(); err != nil {
 		err = errors.Wrap(err)
@@ -83,9 +80,15 @@ func (s konfigStore) transact(
 		Objekte: *ko,
 		Sku: sku.Transacted[kennung.Konfig, *kennung.Konfig]{
 			Schwanz: s.common.Transaktion.Time,
-			Kopf:    mutter.Sku.Kopf,
-			Mutter:  sku.Mutter{mutter.Sku.Schwanz, ts.Time{}},
 		},
+	}
+
+	//TODO-P3 refactor into reusable
+	if mutter != nil {
+		kt.Sku.Kopf = mutter.Sku.Kopf
+		kt.Sku.Mutter[0] = mutter.Sku.Schwanz
+	} else {
+		kt.Sku.Kopf = s.common.Transaktion.Time
 	}
 
 	fo := objekte.MakeFormatObjekte(s.common)
@@ -97,8 +100,8 @@ func (s konfigStore) transact(
 
 	kt.Sku.Sha = w.Sha()
 
-	if kt.ObjekteSha().Equals(mutter.ObjekteSha()) {
-		kt = &mutter
+	if mutter != nil && kt.ObjekteSha().Equals(mutter.ObjekteSha()) {
+		kt = mutter
 
 		if err = s.KonfigLogWriters.Unchanged(kt); err != nil {
 			err = errors.Wrap(err)
@@ -110,23 +113,9 @@ func (s konfigStore) transact(
 
 	s.common.Transaktion.Add2(&kt.Sku)
 
-	if !s.common.Konfig.DryRun {
-		var f *os.File
-
-		//TODO use objekte mover
-		if f, err = files.OpenExclusiveWriteOnly(s.common.Standort.FileKonfigCompiled()); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		defer errors.Deferred(&err, f.Close)
-
-		enc := gob.NewEncoder(f)
-
-		if err = enc.Encode(kt); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if err = s.common.Abbr.addStored(kt); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	if err = s.KonfigLogWriters.Updated(kt); err != nil {
@@ -137,10 +126,52 @@ func (s konfigStore) transact(
 	return
 }
 
-// This is intentionally a value to prevent accidental global changes to the
-// current Konfig
-func (s konfigStore) Read() (tt konfig.Transacted, err error) {
-	tt = s.common.Konfig.Transacted
+func (s konfigStore) Read() (tt *konfig.Transacted, err error) {
+	tt = &konfig.Transacted{
+		Sku: s.common.Konfig.Sku,
+	}
+
+	if !tt.Sku.Schwanz.IsEmpty() {
+		{
+			var r sha.ReadCloser
+
+			if r, err = s.common.ReadCloserObjekten(
+				id.Path(tt.Sku.Sha, s.common.Standort.DirObjektenKonfig()),
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			defer errors.Deferred(&err, r.Close)
+
+			fo := objekte.MakeFormatObjekte(s.common)
+
+			if _, err = fo.ReadFormat(r, tt); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+
+		{
+			var r sha.ReadCloser
+
+			if r, err = s.common.ReadCloserObjekten(
+				id.Path(tt.Objekte.Sha, s.common.Standort.DirObjektenAkten()),
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			defer errors.Deferred(&err, r.Close)
+
+			fo := konfig.MakeFormatText(s.common)
+
+			if _, err = fo.ReadFormat(r, &tt.Objekte); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+	}
 
 	return
 }

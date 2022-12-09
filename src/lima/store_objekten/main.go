@@ -7,20 +7,27 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/age"
+	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/delta/ts"
-	"github.com/friedenberg/zit/src/echo/konfig"
 	"github.com/friedenberg/zit/src/echo/sku"
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/india/zettel"
 	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
+	"github.com/friedenberg/zit/src/konfig_compiled"
 )
+
+type shaAbbr = sha.Abbr
+type hinweisAbbr = hinweis.Abbr
 
 type Store struct {
 	common common
-	indexAbbr
+
+	//TODO move to methods
 	ioFactory
+	shaAbbr
+	hinweisAbbr
 
 	zettelStore *zettelStore
 	typStore    *typStore
@@ -30,7 +37,7 @@ type Store struct {
 func Make(
 	lockSmith LockSmith,
 	a age.Age,
-	k konfig.Konfig,
+	k konfig_compiled.Compiled,
 	st standort.Standort,
 	p zettel_verzeichnisse.Pool,
 ) (s *Store, err error) {
@@ -59,15 +66,18 @@ func Make(
 
 	s.ioFactory = s.common
 
-	if s.indexAbbr, err = newIndexAbbr(
-		s.common,
+	if s.common.Abbr, err = newIndexAbbr(
+		&s.common,
 		st.DirVerzeichnisse("Abbr"),
 	); err != nil {
 		err = errors.Wrapf(err, "failed to init abbr index")
 		return
 	}
 
-	if s.zettelStore, err = makeZettelStore(&s.common, p, &s.indexAbbr); err != nil {
+	s.shaAbbr = s.common.Abbr
+	s.hinweisAbbr = s.common.Abbr
+
+	if s.zettelStore, err = makeZettelStore(&s.common, p); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -83,6 +93,10 @@ func Make(
 	}
 
 	return
+}
+
+func (s *Store) Abbr() *indexAbbr {
+	return s.common.Abbr
 }
 
 func (s *Store) Zettel() *zettelStore {
@@ -195,7 +209,7 @@ func (s Store) Flush() (err error) {
 	// 	return
 	// }
 
-	if err = s.indexAbbr.Flush(); err != nil {
+	if err = s.common.Abbr.Flush(); err != nil {
 		err = errors.Wrapf(err, "failed to flush abbr index")
 		return
 	}

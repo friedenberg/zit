@@ -6,6 +6,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/charlie/tridex"
 	"github.com/friedenberg/zit/src/delta/hinweis"
@@ -34,8 +35,8 @@ type indexAbbr struct {
 func newIndexAbbr(
 	ioFactory ioFactory,
 	p string,
-) (i indexAbbr, err error) {
-	i = indexAbbr{
+) (i *indexAbbr, err error) {
+	i = &indexAbbr{
 		path:      p,
 		ioFactory: ioFactory,
 		indexAbbrEncodableTridexes: indexAbbrEncodableTridexes{
@@ -121,6 +122,20 @@ func (i *indexAbbr) readIfNecessary() (err error) {
 	return
 }
 
+func (i *indexAbbr) addStored(o gattung.Stored) (err error) {
+	if err = i.readIfNecessary(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	i.hasChanges = true
+
+	i.indexAbbrEncodableTridexes.Shas.Add(o.AkteSha().String())
+	i.indexAbbrEncodableTridexes.Shas.Add(o.ObjekteSha().String())
+
+	return
+}
+
 func (i *indexAbbr) addZettelTransacted(zt zettel.Transacted) (err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
@@ -129,8 +144,11 @@ func (i *indexAbbr) addZettelTransacted(zt zettel.Transacted) (err error) {
 
 	i.hasChanges = true
 
-	i.indexAbbrEncodableTridexes.Shas.Add(zt.Sku.Sha.String())
-	i.indexAbbrEncodableTridexes.Shas.Add(zt.Objekte.Akte.String())
+	if err = i.addStored(&zt); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	i.indexAbbrEncodableTridexes.HinweisKopfen.Add(zt.Kennung().Kopf())
 	i.indexAbbrEncodableTridexes.HinweisSchwanzen.Add(zt.Kennung().Schwanz())
 

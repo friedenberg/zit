@@ -2,18 +2,21 @@ package typ
 
 import (
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/echo/konfig"
 )
 
-func IsInlineAkte(t kennung.Typ, k konfig.Konfig) (isInline bool) {
+type typGetter interface {
+	GetTyp(string) *Transacted
+}
+
+func IsInlineAkte(t kennung.Typ, k typGetter) (isInline bool) {
 	ts := t.String()
-	tc := k.Transacted.Objekte.GetTyp(ts)
+	tc := k.GetTyp(ts)
 
 	if tc == nil {
 		return
 	}
 
-	isInline = tc.Typ.Akte.InlineAkte
+	isInline = tc.Objekte.Akte.InlineAkte
 
 	return
 }

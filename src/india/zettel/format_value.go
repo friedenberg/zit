@@ -6,16 +6,16 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/echo/konfig"
+	"github.com/friedenberg/zit/src/konfig_compiled"
 )
 
 type FormatValue struct {
 	out    io.Writer
-	konfig konfig.Konfig
+	konfig konfig_compiled.Compiled
 	Format
 }
 
-func MakeFormatValue(out io.Writer, k konfig.Konfig) *FormatValue {
+func MakeFormatValue(out io.Writer, k konfig_compiled.Compiled) *FormatValue {
 	return &FormatValue{
 		out:    out,
 		konfig: k,

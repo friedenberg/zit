@@ -10,16 +10,17 @@ import (
 	"github.com/friedenberg/zit/src/delta/id"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/echo/age_io"
-	"github.com/friedenberg/zit/src/echo/konfig"
 	"github.com/friedenberg/zit/src/golf/transaktion"
+	"github.com/friedenberg/zit/src/konfig_compiled"
 )
 
 type common struct {
 	LockSmith   LockSmith
 	Age         age.Age
-	Konfig      konfig.Konfig
+	Konfig      konfig_compiled.Compiled
 	Standort    standort.Standort
 	Transaktion transaktion.Transaktion
+	Abbr        *indexAbbr
 }
 
 func (s common) ReadCloserObjekten(p string) (sha.ReadCloser, error) {
