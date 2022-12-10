@@ -87,11 +87,6 @@ func Make(
 	return
 }
 
-// if k.Akte, k.Sha, err = makeCompiled(k.Toml); err != nil {
-// 	err = errors.Wrap(err)
-// 	return
-// }
-
 func makeDefaultCompiled() (c compiled) {
 	dt := typ.Transacted{
 		Sku: sku.Transacted[kennung.Typ, *kennung.Typ]{

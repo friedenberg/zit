@@ -53,21 +53,6 @@ func (s typStore) transact(
 		return
 	}
 
-	var w *age_io.Mover
-
-	mo := age_io.MoveOptions{
-		Age:                      s.common.Age,
-		FinalPath:                s.common.Standort.DirObjektenTypen(),
-		GenerateFinalPathFromSha: true,
-	}
-
-	if w, err = age_io.NewMover(mo); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer w.Close()
-
 	var mutter *typ.Transacted
 
 	if mutter, err = s.ReadOne(tk); err != nil {
@@ -92,6 +77,21 @@ func (s typStore) transact(
 	}
 
 	fo := objekte.MakeFormatObjekte(s.common)
+
+	var w *age_io.Mover
+
+	mo := age_io.MoveOptions{
+		Age:                      s.common.Age,
+		FinalPath:                s.common.Standort.DirObjektenTypen(),
+		GenerateFinalPathFromSha: true,
+	}
+
+	if w, err = age_io.NewMover(mo); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.Deferred(&err, w.Close)
 
 	if _, err = fo.WriteFormat(w, tt); err != nil {
 		err = errors.Wrap(err)

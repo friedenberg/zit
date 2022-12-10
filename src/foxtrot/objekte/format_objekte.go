@@ -65,8 +65,8 @@ func (f Formatter[T]) ReadFormat(
 			return
 
 		case line != "" && loc == -1:
-			if err = g.Set(line[:loc]); err != nil {
-				err = errors.Errorf("%s: %s", err, line[:loc])
+			if err = g.Set(line); err != nil {
+				err = errors.Errorf("%s: %s", err, line)
 				return
 			}
 
