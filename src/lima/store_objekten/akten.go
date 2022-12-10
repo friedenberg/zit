@@ -9,8 +9,8 @@ import (
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/id"
-	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
 	"github.com/friedenberg/zit/src/kilo/zettel"
+	"github.com/friedenberg/zit/src/lima/zettel_verzeichnisse"
 )
 
 func (s Store) ReadAllAktenShas(w collections.WriterFunc[sha.Sha]) (err error) {

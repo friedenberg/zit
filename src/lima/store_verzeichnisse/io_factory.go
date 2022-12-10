@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/sha"
-	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
+	"github.com/friedenberg/zit/src/lima/zettel_verzeichnisse"
 )
 
 type readCloserFactory interface {

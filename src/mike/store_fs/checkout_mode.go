@@ -1,6 +1,6 @@
 package store_fs
 
-import "github.com/friedenberg/zit/src/juliett/zettel_checked_out"
+import "github.com/friedenberg/zit/src/mike/zettel_checked_out"
 
 type CheckoutMode = zettel_checked_out.Mode
 

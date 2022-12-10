@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
-	"github.com/friedenberg/zit/src/juliett/organize_text"
+	"github.com/friedenberg/zit/src/lima/organize_text"
 )
 
 type Change struct {
