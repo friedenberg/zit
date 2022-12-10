@@ -19,7 +19,7 @@ func OpenVimWithArgs(args []string, files ...string) (err error) {
 	var cmd *exec.Cmd
 
 	if len(files) == 0 {
-		err = ErrEmptyFileList{}
+		err = errors.Wrap(ErrEmptyFileList{})
 		return
 	}
 

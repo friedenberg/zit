@@ -1,6 +1,10 @@
 package collections
 
-import "sync"
+import (
+	"sync"
+
+	"github.com/friedenberg/zit/src/alfa/errors"
+)
 
 type mutableSet[T any] struct {
 	set[T]
@@ -22,7 +26,7 @@ func (es mutableSet[T]) Add(e T) (err error) {
 	k := es.Key(e)
 
 	if k == "" {
-		err = ErrEmptyKey[T]{Element: e}
+		err = errors.Wrap(ErrEmptyKey[T]{Element: e})
 		return
 	}
 
@@ -36,7 +40,7 @@ func (es mutableSet[T]) Add(e T) (err error) {
 
 func (es mutableSet[T]) DelKey(k string) (err error) {
 	if k == "" {
-		err = ErrEmptyKey[T]{}
+		err = errors.Wrap(ErrEmptyKey[T]{})
 		return
 	}
 
@@ -50,7 +54,7 @@ func (es mutableSet[T]) DelKey(k string) (err error) {
 
 func (es mutableSet[T]) Del(e T) (err error) {
 	if err = es.DelKey(es.Key(e)); err != nil {
-		err = ErrEmptyKey[T]{Element: e}
+		err = errors.Wrap(ErrEmptyKey[T]{Element: e})
 		return
 	}
 

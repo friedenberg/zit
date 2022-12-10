@@ -133,12 +133,12 @@ func (c *Organize) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 	typen := ids.Typen()
 
-	switch len(typen) {
+	switch typen.Len() {
 	case 0:
 		break
 
 	case 1:
-		createOrganizeFileOp.Typ = typen[0]
+		createOrganizeFileOp.Typ = typen.Any()
 
 	default:
 		err = errors.Errorf("only one typ is supported for organize, but got %q", typen)

@@ -3,6 +3,7 @@ package id_set
 import (
 	"fmt"
 
+	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/id"
@@ -84,8 +85,8 @@ func (s Set) Timestamps() (timestamps []ts.Time) {
 }
 
 // TODO-P2 switch to set
-func (s Set) Typen() (typen []kennung.Typ) {
-	typen = s.typen.Elements()
+func (s Set) Typen() (typen collections.ValueSet[kennung.Typ, *kennung.Typ]) {
+	typen = s.typen.Copy()
 
 	return
 }

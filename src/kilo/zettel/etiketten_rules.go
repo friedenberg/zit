@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
 )
 
-// TODO-P2 move this to somewhere more appropriate
+// TODO-P4 move this to somewhere more appropriate
 func (z *Objekte) ApplyKonfig(k konfig_compiled.Compiled) (err error) {
 	normalized := kennung.WithRemovedCommonPrefixes(z.Etiketten)
 	z.Etiketten = normalized

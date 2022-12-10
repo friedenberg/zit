@@ -24,7 +24,7 @@ func Make(o Options) (s Standort, err error) {
 	s.cwd = o.cwd
 
 	if ok := files.Exists(s.DirZit()); !ok {
-		err = ErrNotInZitDir{}
+		err = errors.Wrap(ErrNotInZitDir{})
 		return
 	}
 

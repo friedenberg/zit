@@ -47,10 +47,7 @@ func (s konfigStore) transact(
 	ko *konfig.Objekte,
 ) (kt *konfig.Transacted, err error) {
 	if !s.common.LockSmith.IsAcquired() {
-		err = ErrLockRequired{
-			Operation: "transact konfig",
-		}
-
+		err = errors.Wrap(ErrLockRequired{Operation: "transact konfig"})
 		return
 	}
 
@@ -218,9 +215,7 @@ func (s *konfigStore) Update(
 	ko *konfig.Objekte,
 ) (kt *konfig.Transacted, err error) {
 	if !s.common.LockSmith.IsAcquired() {
-		err = ErrLockRequired{
-			Operation: "update",
-		}
+		err = errors.Wrap(ErrLockRequired{Operation: "update"})
 
 		return
 	}

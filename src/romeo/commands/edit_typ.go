@@ -123,9 +123,9 @@ func (c EditTyp) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 func (c EditTyp) makeTempTypFiles(
 	u *umwelt.Umwelt,
-	tks []kennung.Typ,
+	tks collections.ValueSet[kennung.Typ, *kennung.Typ],
 ) (ps []string, err error) {
-	ps = make([]string, 0, len(tks))
+	ps = make([]string, 0, tks.Len())
 
 	var tempDir string
 
@@ -134,17 +134,17 @@ func (c EditTyp) makeTempTypFiles(
 		return
 	}
 
-	for _, tk := range tks {
-		var tt *typ.Transacted
+	tks.Each(
+		func(tk kennung.Typ) (err error) {
+			var tt *typ.Transacted
 
-		if tt, err = u.StoreObjekten().Typ().ReadOne(&tk); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+			if tt, err = u.StoreObjekten().Typ().ReadOne(&tk); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 
-		format := typ.MakeFormatText(u.StoreObjekten())
+			format := typ.MakeFormatText(u.StoreObjekten())
 
-		func() {
 			var f *os.File
 
 			if f, err = files.CreateExclusiveWriteOnly(
@@ -162,8 +162,10 @@ func (c EditTyp) makeTempTypFiles(
 				err = errors.Wrap(err)
 				return
 			}
-		}()
-	}
+
+			return
+		},
+	)
 
 	return
 }

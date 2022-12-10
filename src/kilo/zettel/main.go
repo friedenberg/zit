@@ -47,7 +47,7 @@ func (z *Objekte) SetAkteSha(v sha.Sha) {
 	z.Akte = v
 }
 
-// TODO-P2 figure out why this doesn't always work for `status`
+// TODO-P4 figure out why this doesn't always work for `status`
 func (z Objekte) Equals(z1 *Objekte) bool {
 	if z1 == nil {
 		return false

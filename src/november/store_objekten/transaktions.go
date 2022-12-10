@@ -31,7 +31,7 @@ func (s Store) ReadLastTransaktion() (t *transaktion.Transaktion, err error) {
 	}
 
 	if t == nil {
-		err = ErrNotFound{}
+		err = errors.Wrap(ErrNotFound{})
 	}
 
 	return

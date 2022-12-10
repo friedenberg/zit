@@ -17,7 +17,7 @@ type ProtoZettel struct {
 func MakeProtoZettel(k konfig_compiled.Compiled) ProtoZettel {
 	return ProtoZettel{
 		Typ: k.DefaultTyp.Sku.Kennung,
-		//TODO-P2: modify konfig to keep etiketten set
+		//TODO-P1: modify konfig to keep etiketten set
 		Etiketten: kennung.MakeEtikettSet(),
 	}
 }

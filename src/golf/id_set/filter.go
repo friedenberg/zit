@@ -58,14 +58,19 @@ LOOP:
 		okSha = true
 	}
 
-	needsTyp := len(f.Set.Typen()) > 0
+	ty := f.Set.Typen()
+	needsTyp := ty.Len() > 0
 	okTyp := false
 
-	for _, t := range f.Set.Typen() {
-		if okTyp = t.Includes(e.AkteTyp()); okTyp {
-			break
-		}
-	}
+	ty.Each(
+		func(t kennung.Typ) (err error) {
+			if okTyp = t.Includes(e.AkteTyp()); okTyp {
+				err = io.EOF
+			}
+
+			return
+		},
+	)
 
 	hinweisen := f.Set.Hinweisen()
 	needsHin := hinweisen.Len() > 0
