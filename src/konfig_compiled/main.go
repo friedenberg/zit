@@ -37,6 +37,8 @@ func (a *Compiled) ResetWithInner(b compiled) {
 type cli = konfig.Cli
 
 type compiled struct {
+	hasChanges bool
+
 	Sku sku.Transacted[kennung.Konfig, *kennung.Konfig]
 
 	konfig.Toml
@@ -92,9 +94,10 @@ func (kc Compiled) Cli() konfig.Cli {
 }
 
 func (kc *compiled) Recompile(
-	s standort.Standort,
 	kt *konfig.Transacted,
 ) (err error) {
+	kc.hasChanges = true
+
 	kc.Sku = kt.Sku
 	kc.Toml = kt.Objekte.Akte
 
@@ -130,6 +133,14 @@ func (kc *compiled) Recompile(
 		},
 	); err != nil {
 		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (kc *compiled) Flush(s standort.Standort) (err error) {
+	if !kc.hasChanges {
 		return
 	}
 

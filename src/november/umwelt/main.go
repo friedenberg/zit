@@ -29,8 +29,8 @@ type Umwelt struct {
 	outIsTty bool
 	errIsTty bool
 
-	standort standort.Standort
-	konfig   konfig_compiled.Compiled
+	standort         standort.Standort
+	konfig           konfig_compiled.Compiled
 
 	storesInitialized     bool
 	lock                  *file_lock.Lock

@@ -117,6 +117,13 @@ func (s konfigStore) transact(
 
 	s.common.Transaktion.Add2(&kt.Sku)
 
+	if err = s.common.Konfig.Recompile(
+		kt,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if err = s.common.Abbr.addStored(kt); err != nil {
 		err = errors.Wrap(err)
 		return

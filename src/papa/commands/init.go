@@ -117,8 +117,10 @@ func (c Init) initDefaultTypAndKonfig(u *umwelt.Umwelt) (err error) {
 
 	defer errors.Deferred(&err, u.Unlock)
 
-	{
-		defaultTyp, defaultTypKennung := typ.Default()
+	defaultTyp, defaultTypKennung := typ.Default()
+
+	if _, err = u.StoreObjekten().Typ().ReadOne(defaultTypKennung); err != nil {
+		err = nil
 
 		if err = u.StoreObjekten().Typ().WriteAkte(
 			defaultTyp,
@@ -129,7 +131,6 @@ func (c Init) initDefaultTypAndKonfig(u *umwelt.Umwelt) (err error) {
 
 		var defaultTypTransacted *typ.Transacted
 
-		//TODO-P0 modify this to not clobber existing typ on re init
 		if defaultTypTransacted, err = u.StoreObjekten().Typ().Create(
 			defaultTyp, defaultTypKennung,
 		); err != nil {
@@ -162,7 +163,6 @@ func (c Init) initDefaultTypAndKonfig(u *umwelt.Umwelt) (err error) {
 		}
 
 		if err = u.KonfigPtr().Recompile(
-			u.Standort(),
 			defaultKonfigTransacted,
 		); err != nil {
 			err = errors.Wrap(err)

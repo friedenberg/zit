@@ -114,7 +114,7 @@ func (c EditTyp) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 	k := u.KonfigPtr()
 
-	if err = k.Recompile(u.Standort(), kt); err != nil {
+	if err = k.Recompile(kt); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
