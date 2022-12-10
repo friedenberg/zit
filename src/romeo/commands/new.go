@@ -30,7 +30,7 @@ func init() {
 		"new",
 		func(f *flag.FlagSet) Command {
 			c := &New{
-				ProtoZettel: zettel.MakeProtoZettel(),
+				ProtoZettel: zettel.MakeEmptyProtoZettel(),
 			}
 
 			f.BoolVar(&c.Delete, "delete", false, "delete the zettel and akte after successful checkin")

@@ -260,8 +260,7 @@ func (c Show) showTypen(
 	if err = typen.EachPtr(
 		collections.MakeChain(
 			func(t *kennung.Typ) (err error) {
-				//TODO-P2 move to store_objekten
-				ty := u.Konfig().GetTyp(t.String())
+				ty := u.Konfig().GetTyp(*t)
 
 				if ty == nil {
 					return

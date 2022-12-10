@@ -5,12 +5,11 @@ import (
 )
 
 type typGetter interface {
-	GetTyp(string) *Transacted
+	GetTyp(kennung.Typ) *Transacted
 }
 
 func IsInlineAkte(t kennung.Typ, k typGetter) (isInline bool) {
-	ts := t.String()
-	tc := k.GetTyp(ts)
+	tc := k.GetTyp(t)
 
 	if tc == nil {
 		return

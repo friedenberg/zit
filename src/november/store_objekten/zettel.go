@@ -6,7 +6,6 @@ import (
 	"sort"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
@@ -44,23 +43,12 @@ func makeZettelStore(
 	s = &zettelStore{
 		common:      sa,
 		pool:        p,
-		protoZettel: zettel.MakeProtoZettel(),
+		protoZettel: zettel.MakeProtoZettel(sa.Konfig),
 	}
 
 	if s.hinweisen, err = hinweisen.New(s.common.Standort.DirZit()); err != nil {
 		err = errors.Wrap(err)
 		return
-	}
-
-	if err = s.protoZettel.Typ.Set(
-		s.common.Konfig.DefaultTyp.Sku.Kennung.String(),
-	); err != nil {
-		if errors.Is(err, gattung.ErrEmptyKennung{}) {
-			err = nil
-		} else {
-			err = errors.Wrap(err)
-			return
-		}
 	}
 
 	if s.verzeichnisseSchwanzen, err = makeVerzeichnisseSchwanzen(

@@ -13,8 +13,7 @@ type EncoderTypActionNames struct {
 func (e EncoderTypActionNames) WriteTo(c FormatContextWrite) (n int64, err error) {
 	e1 := typ.MakeFormatterActionNames(c.Out)
 
-	//TODO-P2 move to store_objekten
-	ct := e.konfig.GetTyp(c.Zettel.Typ.String())
+	ct := e.konfig.GetTyp(c.Zettel.Typ)
 
 	if ct == nil {
 		return

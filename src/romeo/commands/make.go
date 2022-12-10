@@ -116,7 +116,7 @@ func (c Make) getZettel(
 		return
 	}
 
-	typ := tz.Objekte.Typ.String()
+	typ := tz.Objekte.Typ
 
 	typKonfig := u.Konfig().GetTyp(typ)
 

@@ -142,7 +142,7 @@ func (s *Store) CheckoutOne(
 	if !inlineAkte {
 		t := sz.Objekte.Typ
 
-		ty := s.konfig.GetTyp(t.String())
+		ty := s.konfig.GetTyp(t)
 
 		if ty != nil {
 			fe := ty.Objekte.Akte.FileExtension

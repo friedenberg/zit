@@ -5,6 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
+	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
 )
 
 type ProtoZettel struct {
@@ -13,9 +14,16 @@ type ProtoZettel struct {
 	Etiketten   kennung.EtikettSet
 }
 
-func MakeProtoZettel() ProtoZettel {
+func MakeProtoZettel(k konfig_compiled.Compiled) ProtoZettel {
 	return ProtoZettel{
-		//TODO-P2: use konfig to create correct default Typ
+		Typ: k.DefaultTyp.Sku.Kennung,
+		//TODO-P2: modify konfig to keep etiketten set
+		Etiketten: kennung.MakeEtikettSet(),
+	}
+}
+
+func MakeEmptyProtoZettel() ProtoZettel {
+	return ProtoZettel{
 		Etiketten: kennung.MakeEtikettSet(),
 	}
 }

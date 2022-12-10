@@ -159,7 +159,7 @@ func (s typStore) WriteAkte(
 func (s typStore) ReadOne(
 	k *kennung.Typ,
 ) (tt *typ.Transacted, err error) {
-	tt = s.common.Konfig.GetTyp(k.String())
+	tt = s.common.Konfig.GetTyp(*k)
 
 	if tt == nil {
 		err = errors.Wrap(ErrNotFound{Id: k})

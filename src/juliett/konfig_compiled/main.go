@@ -195,8 +195,8 @@ func (c compiled) GetZettelFileExtension() string {
 	return fmt.Sprintf(".%s", c.FileExtensions.Zettel)
 }
 
-func (kc compiled) GetTyp(n string) (ct *typ.Transacted) {
-	expandedActual := kc.GetSortedTypenExpanded(n)
+func (kc compiled) GetTyp(k kennung.Typ) (ct *typ.Transacted) {
+	expandedActual := kc.GetSortedTypenExpanded(k.String())
 
 	if len(expandedActual) > 0 {
 		ct = expandedActual[0]

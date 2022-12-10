@@ -85,7 +85,7 @@ func (c ExecAction) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	}
 
 	iter := func(tz *zettel.Transacted) (err error) {
-		typ := tz.Objekte.Typ.String()
+		typ := tz.Objekte.Typ
 
 		typKonfig := u.Konfig().GetTyp(typ)
 

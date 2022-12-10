@@ -32,7 +32,7 @@ func init() {
 		"add",
 		func(f *flag.FlagSet) Command {
 			c := &Add{
-				ProtoZettel: zettel.MakeProtoZettel(),
+				ProtoZettel: zettel.MakeEmptyProtoZettel(),
 			}
 
 			f.BoolVar(&c.Dedupe, "dedupe", false, "deduplicate added Zettelen based on Akte sha")
