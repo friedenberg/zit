@@ -7,9 +7,9 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/id"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/golf/age_io"
-	"github.com/friedenberg/zit/src/golf/konfig"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/hotel/objekte"
+	"github.com/friedenberg/zit/src/india/konfig"
 )
 
 type KonfigLogWriter = collections.WriterFunc[*konfig.Transacted]
@@ -95,7 +95,7 @@ func (s konfigStore) transact(
 		kt.Sku.Kopf = s.common.Transaktion.Time
 	}
 
-	fo := objekte.MakeFormatObjekte(s.common)
+	fo := objekte.MakeFormatter[*konfig.Transacted](s.common)
 
 	if _, err = fo.WriteFormat(w, kt); err != nil {
 		err = errors.Wrap(err)
@@ -178,7 +178,7 @@ func (s konfigStore) Read() (tt *konfig.Transacted, err error) {
 
 			defer errors.Deferred(&err, r.Close)
 
-			fo := objekte.MakeFormatObjekte(s.common)
+			fo := objekte.MakeFormatter[*konfig.Transacted](s.common)
 
 			if _, err = fo.ReadFormat(r, tt); err != nil {
 				err = errors.Wrap(err)

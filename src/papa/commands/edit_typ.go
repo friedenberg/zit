@@ -13,9 +13,9 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/typ_toml"
 	"github.com/friedenberg/zit/src/golf/fd"
 	"github.com/friedenberg/zit/src/golf/id_set"
-	"github.com/friedenberg/zit/src/golf/konfig"
 	"github.com/friedenberg/zit/src/golf/sku"
-	"github.com/friedenberg/zit/src/hotel/typ"
+	"github.com/friedenberg/zit/src/india/konfig"
+	"github.com/friedenberg/zit/src/india/typ"
 	"github.com/friedenberg/zit/src/november/umwelt"
 	"github.com/friedenberg/zit/src/oscar/user_ops"
 )

@@ -15,8 +15,9 @@ mkdir -p "$renamed"
 git mv $original/* "$renamed" || mv $original/* "$renamed"
 find src -type d -empty -delete
 
+# https://unix.stackexchange.com/questions/190334/sed-word-boundaries-on-macos
 declare -r sed_script="
-  s|\W$prefix/$original\W|$prefix/$renamed|g;
+  s|[[:<:]]$prefix/$original[[:>:]]|$prefix/$renamed|g;
   s|^package $original_pkg\$|package $renamed_pkg|g;
 "
 

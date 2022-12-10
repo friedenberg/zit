@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/golf/age_io"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/hotel/objekte"
-	"github.com/friedenberg/zit/src/hotel/typ"
+	"github.com/friedenberg/zit/src/india/typ"
 )
 
 type typLogWriter = collections.WriterFunc[*typ.Transacted]
@@ -82,7 +82,7 @@ func (s typStore) transact(
 		tt.Sku.Kopf = s.common.Transaktion.Time
 	}
 
-	fo := objekte.MakeFormatObjekte(s.common)
+	fo := objekte.MakeFormatter[*typ.Transacted](s.common)
 
 	var w *age_io.Mover
 

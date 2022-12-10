@@ -40,7 +40,7 @@ func (f *FormatterValue) FuncFormatter(
 ) collections.WriterFunc[*Transacted] {
 	switch f.string {
 	case "objekte":
-		f := objekte.MakeFormatObjekte(af)
+		f := objekte.MakeFormatter[*Transacted](af)
 
 		return func(o *Transacted) (err error) {
 			if _, err = f.WriteFormat(out, o); err != nil {
