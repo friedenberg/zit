@@ -5,7 +5,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/typ_toml"
 	"github.com/friedenberg/zit/src/golf/fd"
 	"github.com/friedenberg/zit/src/golf/sku"
 )
@@ -21,7 +20,7 @@ func (_ ExternalKeyer) Key(e *External) string {
 }
 
 type External struct {
-	Objekte typ_toml.Objekte
+	Objekte Objekte
 	Sku     sku.External[kennung.Typ, *kennung.Typ]
 	FD      fd.FD
 }

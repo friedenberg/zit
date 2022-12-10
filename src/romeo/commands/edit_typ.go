@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/typ_toml"
 	"github.com/friedenberg/zit/src/golf/fd"
 	"github.com/friedenberg/zit/src/golf/id_set"
 	"github.com/friedenberg/zit/src/golf/sku"
@@ -143,7 +142,7 @@ func (c EditTyp) makeTempTypFiles(
 			return
 		}
 
-		format := typ_toml.MakeFormatText(u.StoreObjekten())
+		format := typ.MakeFormatText(u.StoreObjekten())
 
 		func() {
 			var f *os.File
@@ -177,7 +176,7 @@ func (c EditTyp) readTempTypFiles(
 		typ.ExternalKeyer{}.Key,
 	)
 
-	formatText := typ_toml.MakeFormatText(u.StoreObjekten())
+	formatText := typ.MakeFormatText(u.StoreObjekten())
 
 	for _, p := range ps {
 		func() {

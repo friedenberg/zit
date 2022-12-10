@@ -12,8 +12,8 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/ts"
-	"github.com/friedenberg/zit/src/foxtrot/typ_toml"
 	"github.com/friedenberg/zit/src/golf/id_set"
+	"github.com/friedenberg/zit/src/india/typ"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/papa/umwelt"
 )
@@ -122,12 +122,12 @@ func (c ExecAction) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 func (c ExecAction) runExecutor(
 	u *umwelt.Umwelt,
-	executor *typ_toml.Action,
+	executor *typ.Action,
 	z *zettel.Transacted,
 ) (err error) {
 	var cmd *exec.Cmd
 
-	if cmd, err = executor.Cmd(); err != nil {
+	if cmd, err = executor.ScriptConfig.Cmd(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

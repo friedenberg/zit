@@ -5,7 +5,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/typ_toml"
 	"github.com/friedenberg/zit/src/golf/age_io"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/hotel/objekte"
@@ -147,7 +146,7 @@ func (s typStore) WriteAkte(
 
 	defer errors.Deferred(&err, w.Close)
 
-	if _, err = typ_toml.WriteObjekteToText(w, t); err != nil {
+	if _, err = typ.WriteObjekteToText(w, t); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

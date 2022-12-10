@@ -1,8 +1,10 @@
-package typ_toml
+package typ
+
+import "github.com/friedenberg/zit/src/script_config"
 
 type Action struct {
-	ScriptConfig
-	Description string `toml:"description"`
+	ScriptConfig script_config.ScriptConfig
+	Description  string `toml:"description"`
 }
 
 func (a *Action) Equals(b *Action) bool {

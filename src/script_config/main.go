@@ -1,4 +1,4 @@
-package typ_toml
+package script_config
 
 import (
 	"fmt"

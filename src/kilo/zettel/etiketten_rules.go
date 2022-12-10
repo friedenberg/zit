@@ -4,8 +4,8 @@ import (
 	"sort"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/etikett_rule"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/typ_toml"
 	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
 )
 
@@ -39,14 +39,14 @@ func (z *Objekte) ApplyKonfig(k konfig_compiled.Compiled) (err error) {
 
 func (z *Objekte) applyGoldenChild(
 	e kennung.Etikett,
-	mode typ_toml.EtikettRuleGoldenChild,
+	mode etikett_rule.RuleGoldenChild,
 ) (err error) {
 	if z.Etiketten.Len() == 0 {
 		return
 	}
 
 	switch mode {
-	case typ_toml.EtikettRuleGoldenChildUnset:
+	case etikett_rule.RuleGoldenChildUnset:
 		return
 	}
 
@@ -61,10 +61,10 @@ func (z *Objekte) applyGoldenChild(
 	var sortFunc func(i, j int) bool
 
 	switch mode {
-	case typ_toml.EtikettRuleGoldenChildLowest:
+	case etikett_rule.RuleGoldenChildLowest:
 		sortFunc = func(i, j int) bool { return prefixes[j].Less(prefixes[i]) }
 
-	case typ_toml.EtikettRuleGoldenChildHighest:
+	case etikett_rule.RuleGoldenChildHighest:
 		sortFunc = func(i, j int) bool { return prefixes[i].Less(prefixes[j]) }
 	}
 

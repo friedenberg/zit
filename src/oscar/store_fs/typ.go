@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/typ_toml"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/india/typ"
 	"github.com/friedenberg/zit/src/kilo/cwd_files"
@@ -44,7 +43,7 @@ func (s *Store) WriteTyp(t *typ.Transacted) (te *typ.External, err error) {
 
 	defer errors.Deferred(&err, f.Close)
 
-	format := typ_toml.MakeFormatText(s.storeObjekten)
+	format := typ.MakeFormatText(s.storeObjekten)
 
 	if _, err = format.WriteFormat(f, &te.Objekte); err != nil {
 		err = errors.Wrap(err)
@@ -55,7 +54,7 @@ func (s *Store) WriteTyp(t *typ.Transacted) (te *typ.External, err error) {
 }
 
 func (s *Store) ReadTyp(t *typ.External) (err error) {
-	format := typ_toml.MakeFormatText(s.storeObjekten)
+	format := typ.MakeFormatText(s.storeObjekten)
 
 	var f *os.File
 

@@ -8,7 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/collections_coding"
-	"github.com/friedenberg/zit/src/foxtrot/typ_toml"
 	"github.com/friedenberg/zit/src/hotel/objekte"
 )
 
@@ -52,7 +51,7 @@ func (f *FormatterValue) FuncFormatter(
 		}
 
 	case "text":
-		f := typ_toml.MakeFormatText(af)
+		f := MakeFormatText(af)
 
 		return func(o *Transacted) (err error) {
 			if _, err = f.WriteFormat(out, &o.Objekte); err != nil {
