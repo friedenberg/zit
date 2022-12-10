@@ -7,15 +7,15 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/bravo/format"
 	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/charlie/file_lock"
+	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/echo/konfig"
+	"github.com/friedenberg/zit/src/hotel/konfig_compiled"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
 	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
-	"github.com/friedenberg/zit/src/konfig_compiled"
 	"github.com/friedenberg/zit/src/lima/store_objekten"
 	"github.com/friedenberg/zit/src/mike/store_fs"
 )
@@ -29,8 +29,8 @@ type Umwelt struct {
 	outIsTty bool
 	errIsTty bool
 
-	standort         standort.Standort
-	konfig           konfig_compiled.Compiled
+	standort standort.Standort
+	konfig   konfig_compiled.Compiled
 
 	storesInitialized     bool
 	lock                  *file_lock.Lock

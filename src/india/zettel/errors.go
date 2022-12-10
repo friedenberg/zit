@@ -3,7 +3,7 @@ package zettel
 import (
 	"fmt"
 
-	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/delta/sha"
 )
 
 type externalFile struct {

@@ -6,10 +6,10 @@ import (
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/collections"
+	"github.com/friedenberg/zit/src/delta/collections"
+	"github.com/friedenberg/zit/src/hotel/konfig_compiled"
 	"github.com/friedenberg/zit/src/india/zettel"
 	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
-	"github.com/friedenberg/zit/src/konfig_compiled"
 )
 
 const DigitWidth = 2

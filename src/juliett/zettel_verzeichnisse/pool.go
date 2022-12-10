@@ -3,7 +3,7 @@ package zettel_verzeichnisse
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/bravo/collections"
+	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/india/zettel"
 )

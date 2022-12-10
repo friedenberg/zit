@@ -3,11 +3,11 @@ package zettel
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/bravo/format"
-	"github.com/friedenberg/zit/src/charlie/bezeichnung"
-	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/delta/sha"
+	"github.com/friedenberg/zit/src/echo/bezeichnung"
 )
 
 // !typ "bez"

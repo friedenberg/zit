@@ -3,7 +3,7 @@ package transaktion
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/bravo/line_format"
+	"github.com/friedenberg/zit/src/delta/line_format"
 	"github.com/friedenberg/zit/src/echo/sku"
 )
 

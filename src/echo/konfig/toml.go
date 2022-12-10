@@ -1,6 +1,6 @@
 package konfig
 
-//TODO-P4 rename to Akte
+// TODO-P4 rename to Akte
 type Toml struct {
 	FileExtensions FileExtensions          `toml:"file-extensions"`
 	RemoteScripts  map[string]RemoteScript `toml:"remote-scripts"`
@@ -14,7 +14,7 @@ type FileExtensions struct {
 	Typ      string `toml:"typ"`
 }
 
-//TODO-P2 move to etikett package
+// TODO-P2 move to etikett package
 type KonfigTag struct {
 	AddToNewZettels bool `toml:"add-to-new-zettels"`
 	Hide            bool `toml:"hide"`

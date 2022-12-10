@@ -5,11 +5,11 @@ import (
 	"crypto/sha256"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/format"
-	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/bravo/line_format"
-	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/delta/line_format"
+	"github.com/friedenberg/zit/src/delta/sha"
 )
 
 func (z Objekte) ObjekteSha() (s sha.Sha, err error) {

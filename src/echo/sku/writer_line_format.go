@@ -1,8 +1,8 @@
 package sku
 
 import (
-	"github.com/friedenberg/zit/src/bravo/collections"
-	"github.com/friedenberg/zit/src/bravo/line_format"
+	"github.com/friedenberg/zit/src/delta/collections"
+	"github.com/friedenberg/zit/src/delta/line_format"
 )
 
 func MakeWriterLineFormat(

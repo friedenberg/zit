@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/format"
+	"github.com/friedenberg/zit/src/delta/format"
 )
 
 func (s Standort) MakeWriterRelativePath(

@@ -3,7 +3,7 @@ package zettel
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/golf/typ"
-	"github.com/friedenberg/zit/src/konfig_compiled"
+	"github.com/friedenberg/zit/src/hotel/konfig_compiled"
 )
 
 type EncoderTypActionNames struct {

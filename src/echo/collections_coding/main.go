@@ -1,6 +1,6 @@
 package collections_coding
 
-import "github.com/friedenberg/zit/src/bravo/collections"
+import "github.com/friedenberg/zit/src/delta/collections"
 
 type EncoderLike[T any] interface {
 	Encode(*T) (int64, error)

@@ -93,7 +93,7 @@ func (g *Gattung) Set(v string) (err error) {
 
 	default:
 		err = errors.Errorf("unknown gattung: %q", v1)
-    return
+		return
 	}
 
 	return

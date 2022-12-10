@@ -5,8 +5,8 @@ import (
 
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/hotel/konfig_compiled"
 	zettel_pkg "github.com/friedenberg/zit/src/india/zettel"
-	"github.com/friedenberg/zit/src/konfig_compiled"
 )
 
 type Options struct {

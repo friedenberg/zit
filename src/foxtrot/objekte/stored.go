@@ -1,7 +1,7 @@
 package objekte
 
 import (
-	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/sku"
 )
 

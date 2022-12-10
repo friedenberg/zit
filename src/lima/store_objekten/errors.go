@@ -3,8 +3,8 @@ package store_objekten
 import (
 	"fmt"
 
-	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/hinweis"
+	"github.com/friedenberg/zit/src/delta/sha"
 	"github.com/friedenberg/zit/src/india/zettel"
 )
 

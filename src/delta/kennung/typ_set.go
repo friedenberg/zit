@@ -1,6 +1,6 @@
 package kennung
 
-import "github.com/friedenberg/zit/src/bravo/collections"
+import "github.com/friedenberg/zit/src/delta/collections"
 
 type TypSet = collections.ValueSet[Typ, *Typ]
 

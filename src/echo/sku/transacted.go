@@ -5,14 +5,14 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/int_value"
-	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/delta/sha"
 	"github.com/friedenberg/zit/src/delta/ts"
 )
 
-//TODO-P3 examine adding objekte and akte shas to Skus
+// TODO-P3 examine adding objekte and akte shas to Skus
 type Transacted[T kennung.KennungLike[T], T1 kennung.KennungLikePtr[T]] struct {
 	Mutter           Mutter
 	Kennung          T

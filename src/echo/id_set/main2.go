@@ -3,10 +3,10 @@ package id_set
 import (
 	"fmt"
 
-	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/id"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/delta/sha"
 	"github.com/friedenberg/zit/src/delta/ts"
 )
 
@@ -83,7 +83,7 @@ func (s Set) Timestamps() (timestamps []ts.Time) {
 	return
 }
 
-//TODO-P2 switch to set
+// TODO-P2 switch to set
 func (s Set) Typen() (typen []kennung.Typ) {
 	typen = s.typen.Elements()
 

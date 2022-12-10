@@ -3,8 +3,8 @@ package store_verzeichnisse
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/bravo/collections"
-	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/delta/collections"
+	"github.com/friedenberg/zit/src/delta/sha"
 	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
 )
 

@@ -3,7 +3,7 @@ package kennung
 import (
 	"strings"
 
-	"github.com/friedenberg/zit/src/bravo/collections"
+	"github.com/friedenberg/zit/src/delta/collections"
 )
 
 type EtikettMutableSet = collections.MutableValueSet[Etikett, *Etikett]

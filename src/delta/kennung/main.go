@@ -6,9 +6,9 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/collections"
-	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/delta/collections"
+	"github.com/friedenberg/zit/src/delta/sha"
 )
 
 type KennungLike[T any] interface {
@@ -62,7 +62,7 @@ func (e *Kennung[T, T1]) Set(v string) (err error) {
 	v3 := strings.TrimSpace(v1)
 
 	if v3 == "" {
-    //TODO-P2 modify all err = err{} to include a wrap
+		//TODO-P2 modify all err = err{} to include a wrap
 		err = errors.Wrap(gattung.ErrEmptyKennung{})
 		return
 	}

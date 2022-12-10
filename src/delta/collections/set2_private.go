@@ -1,6 +1,6 @@
 package collections
 
-import "github.com/friedenberg/zit/src/bravo/gattung"
+import "github.com/friedenberg/zit/src/charlie/gattung"
 
 type setPrivate[T gattung.Element, T1 gattung.ElementPtr[T]] struct {
 	Elements map[string]T1

@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/friedenberg/zit/src/bravo/test_logz"
-	"github.com/friedenberg/zit/src/charlie/bezeichnung"
+	"github.com/friedenberg/zit/src/echo/bezeichnung"
 )
 
 func TestReadWithoutAkte(t1 *testing.T) {

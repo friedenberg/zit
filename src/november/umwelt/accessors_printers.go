@@ -1,8 +1,8 @@
 package umwelt
 
 import (
-	"github.com/friedenberg/zit/src/bravo/collections"
-	"github.com/friedenberg/zit/src/bravo/format"
+	"github.com/friedenberg/zit/src/delta/collections"
+	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/echo/fd"
 	"github.com/friedenberg/zit/src/echo/konfig"
 	"github.com/friedenberg/zit/src/golf/typ"

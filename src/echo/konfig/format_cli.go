@@ -3,8 +3,8 @@ package konfig
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/bravo/format"
-	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/delta/format"
+	"github.com/friedenberg/zit/src/delta/sha"
 )
 
 // (unchanged|updated) [konfig@sha]

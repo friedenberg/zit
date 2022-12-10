@@ -5,17 +5,17 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/age"
-	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/hinweis"
+	"github.com/friedenberg/zit/src/delta/sha"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/delta/ts"
 	"github.com/friedenberg/zit/src/echo/sku"
 	"github.com/friedenberg/zit/src/golf/transaktion"
+	"github.com/friedenberg/zit/src/hotel/konfig_compiled"
 	"github.com/friedenberg/zit/src/india/zettel"
 	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"
-	"github.com/friedenberg/zit/src/konfig_compiled"
 )
 
 type shaAbbr = sha.Abbr
@@ -210,7 +210,7 @@ func (s Store) Flush() (err error) {
 	// }
 
 	if err = s.common.Abbr.Flush(); err != nil {
-    errors.Err().Print(err)
+		errors.Err().Print(err)
 		err = errors.Wrapf(err, "failed to flush abbr index")
 		return
 	}

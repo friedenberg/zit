@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/collections"
-	"github.com/friedenberg/zit/src/konfig_compiled"
+	"github.com/friedenberg/zit/src/delta/collections"
+	"github.com/friedenberg/zit/src/hotel/konfig_compiled"
 )
 
 // TODO add efficient parsing of hiding tags
