@@ -9,7 +9,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/echo/line_format"
+	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei_io"
 )
 
@@ -31,7 +31,7 @@ func (f Text) WriteTo(c FormatContextWrite) (n int64, err error) {
 }
 
 func (f Text) writeToOmitAkte(c FormatContextWrite) (n int64, err error) {
-	w := line_format.NewWriter()
+	w := format.NewWriter()
 
 	w.WriteLines(
 		MetadateiBoundary,
@@ -87,7 +87,7 @@ func (f Text) writeToInlineAkte(c FormatContextWrite) (n int64, err error) {
 		return
 	}
 
-	w := line_format.NewWriter()
+	w := format.NewWriter()
 
 	w.WriteLines(
 		MetadateiBoundary,
@@ -183,7 +183,7 @@ func (f Text) writeToInlineAkte(c FormatContextWrite) (n int64, err error) {
 }
 
 func (f Text) writeToExternalAkte(c FormatContextWrite) (n int64, err error) {
-	w := line_format.NewWriter()
+	w := format.NewWriter()
 
 	w.WriteLines(
 		MetadateiBoundary,

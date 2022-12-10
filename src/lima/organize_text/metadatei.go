@@ -6,7 +6,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/format"
-	"github.com/friedenberg/zit/src/echo/line_format"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 )
 
@@ -56,7 +55,7 @@ func (m *Metadatei) ReadFrom(r1 io.Reader) (n int64, err error) {
 }
 
 func (m Metadatei) WriteTo(w1 io.Writer) (n int64, err error) {
-	w := line_format.NewWriter()
+	w := format.NewWriter()
 
 	for _, e := range m.EtikettSet.SortedString() {
 		w.WriteFormat("- %s", e)

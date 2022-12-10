@@ -8,7 +8,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/echo/line_format"
+	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/echo/sha"
 )
 
@@ -118,7 +118,7 @@ func (f Formatter[T]) WriteFormat(
 	hash := sha256.New()
 	w2 := io.MultiWriter(w1, hash)
 
-	w := line_format.NewWriter()
+	w := format.NewWriter()
 
 	w.WriteFormat("%s", o.Gattung())
 	w.WriteFormat("%s %s", gattung.Akte, o.AkteSha())

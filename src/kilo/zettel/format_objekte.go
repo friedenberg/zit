@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/format"
-	"github.com/friedenberg/zit/src/echo/line_format"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 )
@@ -38,7 +37,7 @@ type FormatObjekte struct {
 
 func (f FormatObjekte) WriteTo(c FormatContextWrite) (n int64, err error) {
 	z := c.Zettel
-	w := line_format.NewWriter()
+	w := format.NewWriter()
 
 	w.WriteFormat("%s %s", gattung.Akte, z.Akte)
 	w.WriteFormat("%s %s", gattung.Typ, z.Typ)

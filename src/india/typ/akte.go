@@ -1,8 +1,8 @@
 package typ
 
 import (
-	"github.com/friedenberg/zit/src/etikett_rule"
-	"github.com/friedenberg/zit/src/script_config"
+	"github.com/friedenberg/zit/src/alfa/etikett_rule"
+	"github.com/friedenberg/zit/src/bravo/script_config"
 )
 
 type Akte struct {

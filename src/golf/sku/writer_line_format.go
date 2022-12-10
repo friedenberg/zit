@@ -2,11 +2,11 @@ package sku
 
 import (
 	"github.com/friedenberg/zit/src/delta/collections"
-	"github.com/friedenberg/zit/src/echo/line_format"
+	"github.com/friedenberg/zit/src/delta/format"
 )
 
 func MakeWriterLineFormat(
-	lf *line_format.Writer,
+	lf *format.Writer,
 ) collections.WriterFunc[*Sku] {
 	return func(o *Sku) (err error) {
 		lf.WriteFormat(

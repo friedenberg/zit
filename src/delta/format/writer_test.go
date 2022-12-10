@@ -1,4 +1,4 @@
-package line_format
+package format
 
 import (
 	"strings"

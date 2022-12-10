@@ -3,7 +3,7 @@ package transaktion
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/echo/line_format"
+	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/golf/sku"
 )
 
@@ -12,7 +12,7 @@ type Writer struct {
 }
 
 func (w Writer) WriteTo(w1 io.Writer) (n int64, err error) {
-	lw := line_format.NewWriter()
+	lw := format.NewWriter()
 
 	lw.WriteStringers(w.Transaktion.Time)
 

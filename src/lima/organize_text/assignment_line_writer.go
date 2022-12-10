@@ -5,13 +5,13 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/echo/line_format"
+	"github.com/friedenberg/zit/src/delta/format"
 )
 
 type assignmentLineWriter struct {
 	RightAlignedIndents  bool
 	OmitLeadingEmptyLine bool
-	*line_format.Writer
+	*format.Writer
 	maxDepth            int
 	maxKopf, maxScwhanz int
 }

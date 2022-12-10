@@ -1,6 +1,6 @@
 package typ
 
-import "github.com/friedenberg/zit/src/script_config"
+import "github.com/friedenberg/zit/src/bravo/script_config"
 
 type Action struct {
 	ScriptConfig script_config.ScriptConfig

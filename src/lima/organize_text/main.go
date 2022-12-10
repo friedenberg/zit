@@ -4,7 +4,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/echo/line_format"
+	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei_io"
 )
@@ -89,7 +89,7 @@ func (t *Text) ReadFrom(r io.Reader) (n int64, err error) {
 }
 
 func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
-	lw := line_format.NewWriter()
+	lw := format.NewWriter()
 
 	kopf, scwhanz := ot.assignment.MaxKopfUndSchwanz()
 
