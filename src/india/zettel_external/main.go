@@ -3,8 +3,8 @@ package zettel_external
 import (
 	"fmt"
 
-	"github.com/friedenberg/zit/src/echo/fd"
 	"github.com/friedenberg/zit/src/echo/sku"
+	"github.com/friedenberg/zit/src/foxtrot/fd"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/india/zettel"
 )
