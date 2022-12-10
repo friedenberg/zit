@@ -2,7 +2,7 @@ package zettel
 
 import (
 	"github.com/friedenberg/zit/src/delta/collections"
-	"github.com/friedenberg/zit/src/delta/hinweis"
+	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 )
 
 type MutableSet struct {

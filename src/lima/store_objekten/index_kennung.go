@@ -9,8 +9,8 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/coordinates"
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/delta/hinweis"
-	"github.com/friedenberg/zit/src/delta/hinweisen"
+	"github.com/friedenberg/zit/src/foxtrot/hinweis"
+	"github.com/friedenberg/zit/src/foxtrot/hinweisen"
 	"github.com/friedenberg/zit/src/hotel/konfig_compiled"
 )
 

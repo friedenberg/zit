@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/delta/hinweis"
+	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 )
 
 type CwdZettel struct {

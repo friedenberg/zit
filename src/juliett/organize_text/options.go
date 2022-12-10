@@ -3,8 +3,8 @@ package organize_text
 import (
 	"flag"
 
-	"github.com/friedenberg/zit/src/delta/hinweis"
-	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/hotel/konfig_compiled"
 	zettel_pkg "github.com/friedenberg/zit/src/india/zettel"
 )

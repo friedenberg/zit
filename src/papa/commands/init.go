@@ -11,8 +11,8 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/age"
-	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/echo/konfig"
+	"github.com/friedenberg/zit/src/echo/standort"
 	"github.com/friedenberg/zit/src/golf/typ"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )

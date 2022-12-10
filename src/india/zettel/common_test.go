@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/bravo/test_logz"
-	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/delta/test_metadatei_io"
+	"github.com/friedenberg/zit/src/echo/kennung"
 )
 
 func makeEtiketten(t test_logz.T, vs ...string) (es kennung.EtikettSet) {

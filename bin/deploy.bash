@@ -8,7 +8,12 @@ if [[ -d build_options ]]; then
 fi
 
 #TODO pause mr-build-and-watch and then resume after
-make
+if command -v gmake 2>&1 >/dev/null ; then
+  gmake
+else
+  make
+fi
+
 go clean -cache -fuzzcache
 git add .
 

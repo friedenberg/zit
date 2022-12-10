@@ -6,8 +6,8 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/delta/typ_toml"
+	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/echo/sku"
 	"github.com/friedenberg/zit/src/golf/typ"
 	"github.com/friedenberg/zit/src/hotel/cwd_files"

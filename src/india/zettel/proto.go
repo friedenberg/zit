@@ -3,8 +3,8 @@ package zettel
 import (
 	"flag"
 
-	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
+	"github.com/friedenberg/zit/src/echo/kennung"
 )
 
 type ProtoZettel struct {

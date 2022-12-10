@@ -4,9 +4,9 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/delta/format"
-	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/delta/standort"
+	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/echo/sha"
+	"github.com/friedenberg/zit/src/echo/standort"
 )
 
 // !typ

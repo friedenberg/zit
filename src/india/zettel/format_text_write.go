@@ -9,8 +9,8 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/delta/line_format"
 	"github.com/friedenberg/zit/src/delta/metadatei_io"
+	"github.com/friedenberg/zit/src/echo/line_format"
 )
 
 const MetadateiBoundary = metadatei_io.Boundary
