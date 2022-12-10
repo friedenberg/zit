@@ -1,5 +1,7 @@
 package konfig
 
+import "github.com/friedenberg/zit/src/etikett"
+
 // TODO-P4 rename to Akte
 type Toml struct {
 	FileExtensions FileExtensions          `toml:"file-extensions"`
@@ -14,8 +16,4 @@ type FileExtensions struct {
 	Typ      string `toml:"typ"`
 }
 
-// TODO-P2 move to etikett package
-type KonfigTag struct {
-	AddToNewZettels bool `toml:"add-to-new-zettels"`
-	Hide            bool `toml:"hide"`
-}
+type KonfigTag = etikett.Akte

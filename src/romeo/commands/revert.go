@@ -35,8 +35,8 @@ func (c Revert) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 	s := u.StoreObjekten()
 
-	if len(timestamps) == 1 {
-		if transaktion, err = s.ReadTransaktion(timestamps[0]); err != nil {
+	if timestamps.Len() == 1 {
+		if transaktion, err = s.ReadTransaktion(timestamps.Any()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

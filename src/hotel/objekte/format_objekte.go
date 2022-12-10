@@ -12,11 +12,11 @@ import (
 	"github.com/friedenberg/zit/src/echo/sha"
 )
 
-type Formatter[T gattung.Stored] struct {
+type Formatter[T gattung.StoredPtr] struct {
 	arf gattung.AkteIOFactory
 }
 
-func MakeFormatter[T gattung.Stored](
+func MakeFormatter[T gattung.StoredPtr](
 	arf gattung.AkteIOFactory,
 ) *Formatter[T] {
 	return &Formatter[T]{

@@ -78,13 +78,12 @@ func (s Set) Hinweisen() (hinweisen hinweis.Set) {
 	return
 }
 
-func (s Set) Timestamps() (timestamps []ts.Time) {
-	timestamps = s.timestamps.Elements()
+func (s Set) Timestamps() (timestamps collections.ValueSet[ts.Time, *ts.Time]) {
+	timestamps = s.timestamps.Copy()
 
 	return
 }
 
-// TODO-P2 switch to set
 func (s Set) Typen() (typen collections.ValueSet[kennung.Typ, *kennung.Typ]) {
 	typen = s.typen.Copy()
 

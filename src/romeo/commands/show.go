@@ -228,23 +228,27 @@ func (c Show) showAkten(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 }
 
 func (c Show) showTransaktions(store *umwelt.Umwelt, ids id_set.Set) (err error) {
-	for _, is := range ids.Timestamps() {
-		var t *transaktion.Transaktion
+	ids.Timestamps().Each(
+		func(is ts.Time) (err error) {
+			var t *transaktion.Transaktion
 
-		if t, err = store.StoreObjekten().ReadTransaktion(is); err != nil {
-			errors.PrintErrf("error: %s", err)
-			continue
-		}
-
-		errors.Out().Printf("transaktion: %#v", t)
-
-		t.Each(
-			func(o *sku.Sku) (err error) {
-				errors.Out().Print(o)
+			if t, err = store.StoreObjekten().ReadTransaktion(is); err != nil {
+				errors.PrintErrf("error: %s", err)
 				return
-			},
-		)
-	}
+			}
+
+			errors.Out().Printf("transaktion: %#v", t)
+
+			t.Each(
+				func(o *sku.Sku) (err error) {
+					errors.Out().Print(o)
+					return
+				},
+			)
+
+			return
+		},
+	)
 
 	return
 }

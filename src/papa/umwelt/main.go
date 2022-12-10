@@ -202,7 +202,7 @@ func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 	return
 }
 
-// TODO-P2 remove this?
+// TODO-P2 remove this
 func (u Umwelt) DefaultEtiketten() (etiketten kennung.EtikettSet, err error) {
 	metiketten := kennung.MakeEtikettMutableSet()
 
