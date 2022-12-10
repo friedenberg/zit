@@ -16,8 +16,8 @@ import (
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/kilo/zettel"
-	"github.com/friedenberg/zit/src/lima/store_verzeichnisse"
 	"github.com/friedenberg/zit/src/lima/zettel_verzeichnisse"
+	"github.com/friedenberg/zit/src/mike/store_verzeichnisse"
 )
 
 type zettelStore struct {

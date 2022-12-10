@@ -5,8 +5,8 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/kilo/zettel"
-	"github.com/friedenberg/zit/src/lima/changes"
 	"github.com/friedenberg/zit/src/lima/organize_text"
+	"github.com/friedenberg/zit/src/mike/changes"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 

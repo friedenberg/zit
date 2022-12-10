@@ -12,8 +12,8 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/ts"
 	"github.com/friedenberg/zit/src/golf/id_set"
 	"github.com/friedenberg/zit/src/kilo/zettel"
-	"github.com/friedenberg/zit/src/lima/alfred"
 	"github.com/friedenberg/zit/src/lima/zettel_verzeichnisse"
+	"github.com/friedenberg/zit/src/mike/alfred"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 

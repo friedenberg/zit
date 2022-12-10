@@ -11,7 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/id"
 	"github.com/friedenberg/zit/src/golf/age_io"
-	"github.com/friedenberg/zit/src/lima/store_objekten"
+	"github.com/friedenberg/zit/src/mike/store_objekten"
 	"github.com/friedenberg/zit/src/mike/zettel_checked_out"
 )
 
