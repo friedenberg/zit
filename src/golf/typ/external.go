@@ -4,9 +4,9 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/delta/sha"
 	"github.com/friedenberg/zit/src/delta/typ_toml"
 	"github.com/friedenberg/zit/src/echo/fd"
+	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/echo/sku"
 )
 

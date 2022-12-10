@@ -8,7 +8,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/delta/sha"
+	"github.com/friedenberg/zit/src/echo/sha"
 )
 
 type Writer interface {

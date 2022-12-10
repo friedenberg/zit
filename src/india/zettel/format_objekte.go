@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/delta/line_format"
-	"github.com/friedenberg/zit/src/delta/sha"
+	"github.com/friedenberg/zit/src/echo/sha"
 )
 
 func (z Objekte) ObjekteSha() (s sha.Sha, err error) {

@@ -9,7 +9,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/delta/sha"
+	"github.com/friedenberg/zit/src/echo/sha"
 )
 
 type Id interface {

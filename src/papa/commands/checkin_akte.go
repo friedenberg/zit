@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/delta/sha"
+	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/india/zettel"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )

@@ -4,7 +4,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/friedenberg/zit/src/delta/sha"
+	"github.com/friedenberg/zit/src/echo/sha"
 )
 
 type nopReadWriteCloser struct {

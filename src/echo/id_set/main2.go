@@ -5,8 +5,8 @@ import (
 
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/delta/sha"
 	"github.com/friedenberg/zit/src/echo/id"
+	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/echo/ts"
 )
 
