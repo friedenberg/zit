@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/golf/fd"
 	"github.com/friedenberg/zit/src/india/konfig"
 	"github.com/friedenberg/zit/src/india/typ"
-	"github.com/friedenberg/zit/src/kilo/cwd_files"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/mike/zettel_checked_out"
 	"github.com/friedenberg/zit/src/oscar/store_fs"
@@ -70,7 +69,7 @@ func (u *Umwelt) PrinterZettelCheckedOutFresh(
 	)
 }
 
-func (u *Umwelt) PrinterFileNotRecognized() collections.WriterFunc[*cwd_files.File] {
+func (u *Umwelt) PrinterFileNotRecognized() collections.WriterFunc[*fd.FD] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
 		u.FormatFileNotRecognized(),

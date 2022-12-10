@@ -1,4 +1,4 @@
-package sha_core
+package sha
 
 import (
 	"crypto/sha256"

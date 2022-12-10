@@ -1,14 +1,15 @@
 package sha
 
-import "github.com/friedenberg/zit/src/bravo/sha_core"
+import "github.com/friedenberg/zit/src/bravo/sha"
 
-const ShaNull = sha_core.ShaNull
+const ShaNull = sha.ShaNull
 
-type Sha = sha_core.Sha
-type ReadCloser = sha_core.ReadCloser
-type WriteCloser = sha_core.WriteCloser
+type Sha = sha.Sha
+type ReadCloser = sha.ReadCloser
+type WriteCloser = sha.WriteCloser
 
 var (
-	FromHash   = sha_core.FromHash
-	FromString = sha_core.FromString
+	FromHash        = sha.FromHash
+	FromString      = sha.FromString
+	MakeShaFromPath = sha.MakeShaFromPath
 )

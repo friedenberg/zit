@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/friedenberg/zit/src/bravo/sha_core"
+	"github.com/friedenberg/zit/src/bravo/sha"
 )
 
 type Equatable[T any] interface {
@@ -55,14 +55,14 @@ type IdentifierPtr[T ValueElement] interface {
 
 type Objekte[T any] interface {
 	Gattung() Gattung
-	AkteSha() sha_core.Sha
+	AkteSha() sha.Sha
 	Equatable[T]
 }
 
 type ObjektePtr[T Element] interface {
 	ElementPtr[T]
 	Resetable[T]
-	SetAkteSha(sha_core.Sha)
+	SetAkteSha(sha.Sha)
 }
 
 // TODO-P2 split into Stored and StoredPtr
@@ -70,16 +70,16 @@ type Stored interface {
 	Gattung() Gattung
 	// Identifier() IdentifierLike
 
-	AkteSha() sha_core.Sha
-	SetAkteSha(sha_core.Sha)
+	AkteSha() sha.Sha
+	SetAkteSha(sha.Sha)
 
 	SetObjekteSha(AkteReaderFactory, string) error
-	ObjekteSha() sha_core.Sha
+	ObjekteSha() sha.Sha
 }
 
 type StoredPtr interface {
 	Stored
-	SetAkteSha(sha_core.Sha)
+	SetAkteSha(sha.Sha)
 	SetObjekteSha(AkteReaderFactory, string) error
 }
 
@@ -89,11 +89,11 @@ type AkteIOFactory interface {
 }
 
 type AkteReaderFactory interface {
-	AkteReader(sha_core.Sha) (sha_core.ReadCloser, error)
+	AkteReader(sha.Sha) (sha.ReadCloser, error)
 }
 
 type AkteWriterFactory interface {
-	AkteWriter() (sha_core.WriteCloser, error)
+	AkteWriter() (sha.WriteCloser, error)
 }
 
 type AkteIOFactoryFactory interface {

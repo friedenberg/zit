@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/echo/standort"
-	"github.com/friedenberg/zit/src/kilo/cwd_files"
+	"github.com/friedenberg/zit/src/golf/fd"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 
@@ -17,8 +17,8 @@ func MakeCliFormatNotRecognized(
 	cw format.FuncColorWriter,
 	s standort.Standort,
 	sf format.FormatWriterFunc[sha.Sha],
-) format.FormatWriterFunc[cwd_files.File] {
-	return func(w io.Writer, fu *cwd_files.File) (n int64, err error) {
+) format.FormatWriterFunc[fd.FD] {
+	return func(w io.Writer, fu *fd.FD) (n int64, err error) {
 		return format.Write(
 			w,
 			format.MakeFormatStringRightAlignedParen(format.StringUnrecognized),
@@ -32,7 +32,7 @@ func MakeCliFormatNotRecognized(
 }
 
 type FileRecognized struct {
-	cwd_files.File
+	fd.FD
 	Recognized zettel.MutableSet
 }
 

@@ -7,9 +7,9 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
+	"github.com/friedenberg/zit/src/golf/fd"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/india/typ"
-	"github.com/friedenberg/zit/src/kilo/cwd_files"
 )
 
 func (s *Store) CheckinTyp(p string) (t *typ.Transacted, err error) {
@@ -18,7 +18,7 @@ func (s *Store) CheckinTyp(p string) (t *typ.Transacted, err error) {
 
 func (s *Store) WriteTyp(t *typ.Transacted) (te *typ.External, err error) {
 	te = &typ.External{
-		FD: cwd_files.File{
+		FD: fd.FD{
 			Path: fmt.Sprintf("%s.%s", t.Kennung(), s.konfig.FileExtensions.Typ),
 		},
 		//TODO-P2 move to central place

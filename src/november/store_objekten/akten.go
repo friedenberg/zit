@@ -5,7 +5,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/bravo/sha_core"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/id"
@@ -17,7 +16,7 @@ func (s Store) ReadAllAktenShas(w collections.WriterFunc[sha.Sha]) (err error) {
 	wf := func(p string) (err error) {
 		var sh sha.Sha
 
-		if sh, err = sha_core.MakeShaFromPath(p); err != nil {
+		if sh, err = sha.MakeShaFromPath(p); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

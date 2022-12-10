@@ -8,11 +8,8 @@ import (
 	"github.com/friedenberg/zit/src/golf/fd"
 )
 
-// TODO-P1 remove
-type File = fd.FD
-
-func MakeFile(dir string, p string) (ut File, err error) {
-	ut = File{}
+func MakeFile(dir string, p string) (ut fd.FD, err error) {
+	ut = fd.FD{}
 
 	p = path.Join(dir, p)
 

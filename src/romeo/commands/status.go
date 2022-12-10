@@ -113,7 +113,7 @@ func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
 		case errors.Is(err, store_objekten.ErrAkteExists{}):
 			err1 := err.(store_objekten.ErrAkteExists)
 			fr := store_fs.FileRecognized{
-				File:       ua,
+				FD:         ua,
 				Recognized: err1.MutableSet,
 			}
 

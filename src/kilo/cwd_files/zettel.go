@@ -7,11 +7,12 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
+	"github.com/friedenberg/zit/src/golf/fd"
 )
 
 type CwdZettel struct {
 	hinweis.Hinweis
-	Zettel, Akte File
+	Zettel, Akte fd.FD
 }
 
 func (c *CwdFiles) tryZettel(d string, a string, p string) (err error) {

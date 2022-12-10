@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/golf/fd"
 	"github.com/friedenberg/zit/src/india/typ"
 	"github.com/friedenberg/zit/src/india/zettel_external"
-	"github.com/friedenberg/zit/src/kilo/cwd_files"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/mike/zettel_checked_out"
 	"github.com/friedenberg/zit/src/oscar/store_fs"
@@ -137,7 +136,7 @@ func (u *Umwelt) FormatZettelTransacted(verb string) format.FormatWriterFunc[zet
 	)
 }
 
-func (u *Umwelt) FormatFileNotRecognized() format.FormatWriterFunc[cwd_files.File] {
+func (u *Umwelt) FormatFileNotRecognized() format.FormatWriterFunc[fd.FD] {
 	return store_fs.MakeCliFormatNotRecognized(
 		u.FormatColorWriter(),
 		u.Standort(),
