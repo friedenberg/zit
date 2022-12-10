@@ -11,7 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
-	"github.com/friedenberg/zit/src/india/zettel"
+	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 
 type indexAbbrEncodableTridexes struct {

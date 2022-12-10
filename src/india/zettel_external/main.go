@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/golf/fd"
 	"github.com/friedenberg/zit/src/golf/sku"
-	"github.com/friedenberg/zit/src/india/zettel"
+	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 
 type Sku = sku.External[hinweis.Hinweis, *hinweis.Hinweis]

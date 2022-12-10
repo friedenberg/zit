@@ -9,8 +9,8 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/typ_toml"
 	"github.com/friedenberg/zit/src/golf/sku"
-	"github.com/friedenberg/zit/src/hotel/cwd_files"
 	"github.com/friedenberg/zit/src/india/typ"
+	"github.com/friedenberg/zit/src/kilo/cwd_files"
 )
 
 func (s *Store) CheckinTyp(p string) (t *typ.Transacted, err error) {

@@ -1,8 +1,8 @@
 package zettel_checked_out
 
 import (
-	"github.com/friedenberg/zit/src/india/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_external"
+	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 
 type Zettel struct {

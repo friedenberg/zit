@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/hotel/konfig_compiled"
+	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
 )
 
 type FormatValue struct {

@@ -8,8 +8,8 @@ import (
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/echo/standort"
-	"github.com/friedenberg/zit/src/hotel/cwd_files"
-	"github.com/friedenberg/zit/src/india/zettel"
+	"github.com/friedenberg/zit/src/kilo/cwd_files"
+	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 
 // (unrecognized) [path.ext@sha]

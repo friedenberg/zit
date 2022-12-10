@@ -1,7 +1,7 @@
 package zettel_verzeichnisse
 
 import (
-	"github.com/friedenberg/zit/src/india/zettel"
+	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 
 type Zettel struct {

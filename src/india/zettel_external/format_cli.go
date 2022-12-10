@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/echo/standort"
 	"github.com/friedenberg/zit/src/golf/fd"
-	"github.com/friedenberg/zit/src/india/zettel"
+	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 
 // [path@sha !typ "bez"]

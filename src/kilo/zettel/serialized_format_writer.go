@@ -6,8 +6,8 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
-	"github.com/friedenberg/zit/src/hotel/konfig_compiled"
 	"github.com/friedenberg/zit/src/india/typ"
+	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
 )
 
 func MakeSerializedFormatWriter(

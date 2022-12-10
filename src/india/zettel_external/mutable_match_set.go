@@ -3,7 +3,7 @@ package zettel_external
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/india/zettel"
+	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 
 type MutableMatchSet struct {

@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
-	zettel_pkg "github.com/friedenberg/zit/src/india/zettel"
+	zettel_pkg "github.com/friedenberg/zit/src/kilo/zettel"
 )
 
 type Factory struct {

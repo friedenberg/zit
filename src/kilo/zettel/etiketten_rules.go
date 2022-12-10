@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/typ_toml"
-	"github.com/friedenberg/zit/src/hotel/konfig_compiled"
+	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
 )
 
 // TODO-P2 move this to somewhere more appropriate
