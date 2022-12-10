@@ -4,7 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/objekte"
+	"github.com/friedenberg/zit/src/golf/objekte"
 )
 
 type Transacted = objekte.Transacted[Objekte, *Objekte, kennung.Konfig, *kennung.Konfig]

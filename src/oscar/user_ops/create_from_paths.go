@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/sha"
-	"github.com/friedenberg/zit/src/foxtrot/fd"
+	"github.com/friedenberg/zit/src/golf/fd"
 	"github.com/friedenberg/zit/src/india/zettel"
 	"github.com/friedenberg/zit/src/india/zettel_external"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"

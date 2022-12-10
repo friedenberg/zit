@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/debug"
 	"github.com/friedenberg/zit/src/echo/standort"
-	"github.com/friedenberg/zit/src/foxtrot/konfig"
+	"github.com/friedenberg/zit/src/golf/konfig"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 

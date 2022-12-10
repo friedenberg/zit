@@ -8,8 +8,8 @@ import (
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/objekte"
-	"github.com/friedenberg/zit/src/foxtrot/sku"
+	"github.com/friedenberg/zit/src/golf/objekte"
+	"github.com/friedenberg/zit/src/golf/sku"
 )
 
 type Objekte struct {

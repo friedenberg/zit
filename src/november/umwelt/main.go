@@ -12,7 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/echo/standort"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/konfig"
+	"github.com/friedenberg/zit/src/golf/konfig"
 	"github.com/friedenberg/zit/src/hotel/konfig_compiled"
 	"github.com/friedenberg/zit/src/juliett/zettel_checked_out"
 	"github.com/friedenberg/zit/src/juliett/zettel_verzeichnisse"

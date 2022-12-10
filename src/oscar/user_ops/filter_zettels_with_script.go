@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
-	"github.com/friedenberg/zit/src/foxtrot/id_set"
+	"github.com/friedenberg/zit/src/golf/id_set"
 	"github.com/friedenberg/zit/src/india/zettel"
 )
 

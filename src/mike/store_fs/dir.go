@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/echo/standort"
-	"github.com/friedenberg/zit/src/foxtrot/fd"
+	"github.com/friedenberg/zit/src/golf/fd"
 )
 
 type Dir struct {

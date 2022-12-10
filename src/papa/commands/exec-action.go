@@ -10,10 +10,10 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
-	"github.com/friedenberg/zit/src/foxtrot/id_set"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/ts"
 	"github.com/friedenberg/zit/src/foxtrot/typ_toml"
+	"github.com/friedenberg/zit/src/golf/id_set"
 	"github.com/friedenberg/zit/src/india/zettel"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )

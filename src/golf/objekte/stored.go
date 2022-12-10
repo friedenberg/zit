@@ -2,7 +2,7 @@ package objekte
 
 import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/foxtrot/sku"
+	"github.com/friedenberg/zit/src/golf/sku"
 )
 
 type Stored[

@@ -3,8 +3,8 @@ package zettel
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/collections"
-	"github.com/friedenberg/zit/src/foxtrot/id_set"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
+	"github.com/friedenberg/zit/src/golf/id_set"
 )
 
 // TODO rename

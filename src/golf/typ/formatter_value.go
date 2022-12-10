@@ -8,8 +8,8 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/collections_coding"
-	"github.com/friedenberg/zit/src/foxtrot/objekte"
 	"github.com/friedenberg/zit/src/foxtrot/typ_toml"
+	"github.com/friedenberg/zit/src/golf/objekte"
 )
 
 type FormatterValue struct {
