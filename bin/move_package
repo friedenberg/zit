@@ -1,4 +1,4 @@
-#! /bin/bash -xe
+#! /bin/bash -e
 
 prefix=github.com/friedenberg/zit
 original="${1%/}"
@@ -25,3 +25,5 @@ ag "$prefix/$original" -l0 |
 
 ./bin/fix_redundant_import_alisas.bash
 goimports -w ./
+
+go build -o /dev/null

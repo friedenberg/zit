@@ -1,8 +1,8 @@
 package transaktion
 
 import (
-	"github.com/friedenberg/zit/src/delta/ts"
 	"github.com/friedenberg/zit/src/echo/sku"
+	"github.com/friedenberg/zit/src/echo/ts"
 )
 
 type Transaktion struct {

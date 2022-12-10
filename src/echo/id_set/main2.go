@@ -4,10 +4,10 @@ import (
 	"fmt"
 
 	"github.com/friedenberg/zit/src/delta/hinweis"
-	"github.com/friedenberg/zit/src/delta/id"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/delta/sha"
-	"github.com/friedenberg/zit/src/delta/ts"
+	"github.com/friedenberg/zit/src/echo/id"
+	"github.com/friedenberg/zit/src/echo/ts"
 )
 
 // TODO-P4 move to kennung

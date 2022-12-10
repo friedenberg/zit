@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/test_logz"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/delta/ts"
+	"github.com/friedenberg/zit/src/echo/ts"
 )
 
 func TestMain(m *testing.M) {

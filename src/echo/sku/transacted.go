@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/delta/sha"
-	"github.com/friedenberg/zit/src/delta/ts"
+	"github.com/friedenberg/zit/src/echo/ts"
 )
 
 // TODO-P3 examine adding objekte and akte shas to Skus

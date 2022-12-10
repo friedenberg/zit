@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/exec"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/delta/hinweis"
-	"github.com/friedenberg/zit/src/delta/id"
+	"github.com/friedenberg/zit/src/echo/id"
 	"github.com/friedenberg/zit/src/echo/id_set"
 	"github.com/friedenberg/zit/src/india/zettel"
 	"github.com/friedenberg/zit/src/november/umwelt"
