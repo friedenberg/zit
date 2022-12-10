@@ -11,7 +11,9 @@ func MakeMulti(errs ...error) *Multi {
 	em := Multi{}
 
 	for _, err := range errs {
-		em.Add(err)
+		if err != nil {
+			em.Add(err)
+		}
 	}
 
 	if em.Empty() {

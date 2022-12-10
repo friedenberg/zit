@@ -12,6 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/delta/ts"
 	"github.com/friedenberg/zit/src/echo/id_set"
+	"github.com/friedenberg/zit/src/echo/konfig"
 	"github.com/friedenberg/zit/src/echo/sku"
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/golf/typ"
@@ -129,6 +130,22 @@ func (c Show) RunWithIds(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 		return c.showTypen(
 			store,
 			ids,
+			ev.FuncFormatter(
+				store.Out(),
+				store.StoreObjekten(),
+			),
+		)
+
+	case gattung.Konfig:
+		var ev konfig.FormatterValue
+
+		if err = ev.Set(c.Format); err != nil {
+			err = errors.Normal(err)
+			return
+		}
+
+		return c.showKonfig(
+			store,
 			ev.FuncFormatter(
 				store.Out(),
 				store.StoreObjekten(),
@@ -259,6 +276,27 @@ func (c Show) showTypen(
 			},
 		),
 	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (c Show) showKonfig(
+	u *umwelt.Umwelt,
+	f collections.WriterFunc[*konfig.Transacted],
+) (err error) {
+	f1 := collections.MakeSyncSerializer(f)
+
+	var k *konfig.Transacted
+
+	if k, err = u.StoreObjekten().Konfig().Read(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = f1(k); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

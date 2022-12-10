@@ -215,7 +215,7 @@ function outputs_organize_two_zettels_one_etiketten_group_by_one { # @test
 	} >"$to_add"
 
 	run "${cmd_zit_new[@]}" -edit=false "$to_add"
-	assert_output '          (new) [one/uno@4 !md "one/uno"]'
+	assert_output '          (new) [one/uno@42 !md "one/uno"]'
 
 	to_add="$(mktemp)"
 	{
@@ -319,7 +319,7 @@ function commits_organize_one_etiketten_group_by_two { # @test
 	} >"$to_add"
 
 	run "${cmd_zit_new[@]}" -edit=false "$to_add"
-	assert_output '          (new) [one/uno@6 !md "one/uno"]'
+	assert_output '          (new) [one/uno@6e !md "one/uno"]'
 
 	to_add="$(mktemp)"
 	{
@@ -793,7 +793,7 @@ function etiketten_correct { # @test
 
 	run zit checkin "${cmd_zit_def[@]}" one/uno.zettel
 	#TODO fix typ
-	assert_output '      (updated) [one/uno@4 ! test4]'
+	assert_output '      (updated) [one/uno@49c ! test4]'
 
 	expected_etiketten="$(mktemp)"
 	{

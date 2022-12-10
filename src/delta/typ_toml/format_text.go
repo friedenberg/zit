@@ -70,20 +70,13 @@ func (f FormatText) WriteFormat(w io.Writer, t *Objekte) (n int64, err error) {
 	var ar sha.ReadCloser
 
 	if ar, err = f.arf.AkteReader(t.Sha); err != nil {
-		//TODO surface as format option
 		if errors.IsNotExist(err) {
-			enc := toml.NewEncoder(w)
-
-			if err = enc.Encode(&t.Akte); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
+			err = nil
 		} else {
 			err = errors.Wrap(err)
-			return
 		}
+
+		return
 	}
 
 	defer errors.Deferred(&err, ar.Close)

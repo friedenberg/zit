@@ -89,7 +89,7 @@ function write_objekte_one_file { # @test
 	assert_output "$(printf "%s\n" wow)"
 
 	run zit cat -gattung akte
-	assert_output "f40cd21f276e47d533371afce1778447e858eb5c9c0c0ed61c65f5c5d57caf63"
+	assert_output --partial "f40cd21f276e47d533371afce1778447e858eb5c9c0c0ed61c65f5c5d57caf63"
 }
 
 function write_objekte_one_file_one_stdin { # @test

@@ -7,6 +7,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/collections"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/hinweis"
 	"github.com/friedenberg/zit/src/delta/hinweisen"
@@ -54,8 +55,12 @@ func makeZettelStore(
 	if err = s.protoZettel.Typ.Set(
 		s.common.Konfig.DefaultTyp.Sku.Kennung.String(),
 	); err != nil {
-		err = errors.Wrap(err)
-		return
+		if errors.Is(err, gattung.ErrEmptyKennung{}) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	if s.verzeichnisseSchwanzen, err = makeVerzeichnisseSchwanzen(

@@ -3,7 +3,9 @@ package store_objekten
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/collections"
+	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/delta/typ_toml"
 	"github.com/friedenberg/zit/src/echo/age_io"
 	"github.com/friedenberg/zit/src/echo/sku"
 	"github.com/friedenberg/zit/src/foxtrot/objekte"
@@ -56,8 +58,12 @@ func (s typStore) transact(
 	var mutter *typ.Transacted
 
 	if mutter, err = s.ReadOne(tk); err != nil {
-		err = errors.Wrap(err)
-		return
+		if errors.Is(err, ErrNotFound{}) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	tt = &typ.Transacted{
@@ -124,6 +130,29 @@ func (s typStore) transact(
 			return
 		}
 	}
+
+	return
+}
+
+// TODO-P0 disambiguate from akte
+func (s typStore) WriteAkte(
+	t *typ.Objekte,
+) (err error) {
+	var w sha.WriteCloser
+
+	if w, err = s.common.AkteWriter(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.Deferred(&err, w.Close)
+
+	if _, err = typ_toml.WriteObjekteToText(w, t); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	t.Sha = w.Sha()
 
 	return
 }

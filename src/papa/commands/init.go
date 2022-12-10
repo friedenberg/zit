@@ -12,6 +12,8 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/delta/standort"
+	"github.com/friedenberg/zit/src/echo/konfig"
+	"github.com/friedenberg/zit/src/golf/typ"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
@@ -47,6 +49,7 @@ func (c Init) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	c.mkdirAll(s.DirObjektenTransaktion())
 	c.mkdirAll(s.DirObjektenTypen())
 	c.mkdirAll(s.DirObjektenZettelen())
+	c.mkdirAll(s.DirVerzeichnisse())
 
 	c.mkdirAll(s.DirVerlorenUndGefunden())
 
@@ -84,16 +87,87 @@ func (c Init) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
+	if err = c.initDefaultTypAndKonfig(u); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	{
+		if err = u.Lock(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		defer errors.Deferred(&err, u.Unlock)
+
+		if err = u.StoreObjekten().Reindex(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
+func (c Init) initDefaultTypAndKonfig(u *umwelt.Umwelt) (err error) {
 	if err = u.Lock(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer u.Unlock()
+	defer errors.Deferred(&err, u.Unlock)
 
-	if err = u.StoreObjekten().Reindex(); err != nil {
-		err = errors.Wrap(err)
-		return
+	{
+		defaultTyp, defaultTypKennung := typ.Default()
+
+		if err = u.StoreObjekten().Typ().WriteAkte(
+			defaultTyp,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		var defaultTypTransacted *typ.Transacted
+
+		//TODO-P0 modify this to not clobber existing typ on re init
+		if defaultTypTransacted, err = u.StoreObjekten().Typ().Create(
+			defaultTyp, defaultTypKennung,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		//TODO flush?
+		u.KonfigPtr().AddTyp(defaultTypTransacted)
+		u.KonfigPtr().DefaultTyp = *defaultTypTransacted
+	}
+
+	{
+		defaultKonfig := konfig.Default()
+
+		if err = u.StoreObjekten().Konfig().WriteAkte(
+			defaultKonfig,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		var defaultKonfigTransacted *konfig.Transacted
+
+		if defaultKonfigTransacted, err = u.StoreObjekten().Konfig().Update(
+			defaultKonfig,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = u.KonfigPtr().Recompile(
+			u.Standort(),
+			defaultKonfigTransacted,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return

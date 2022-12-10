@@ -79,23 +79,22 @@ func (c *FormatText) ReadFormat(r1 io.Reader, k *Objekte) (n int64, err error) {
 	return
 }
 
-func (c *FormatText) WriteFormat(w1 io.Writer, k *Objekte) (n int64, err error) {
-	w := bufio.NewWriter(w1)
-
-	defer errors.Deferred(&err, w.Flush)
-
+func (f FormatText) WriteFormat(w io.Writer, t *Objekte) (n int64, err error) {
 	var ar sha.ReadCloser
 
-	if ar, err = c.af.AkteReader(
-		k.Sha,
-	); err != nil {
-		err = errors.Wrap(err)
+	if ar, err = f.af.AkteReader(t.Sha); err != nil {
+		if errors.IsNotExist(err) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+		}
+
 		return
 	}
 
 	defer errors.Deferred(&err, ar.Close)
 
-	if _, err = io.Copy(w, ar); err != nil {
+	if n, err = io.Copy(w, ar); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

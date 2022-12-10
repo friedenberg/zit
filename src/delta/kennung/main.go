@@ -62,7 +62,8 @@ func (e *Kennung[T, T1]) Set(v string) (err error) {
 	v3 := strings.TrimSpace(v1)
 
 	if v3 == "" {
-		err = gattung.ErrEmptyKennung{}
+    //TODO-P2 modify all err = err{} to include a wrap
+		err = errors.Wrap(gattung.ErrEmptyKennung{})
 		return
 	}
 

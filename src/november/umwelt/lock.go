@@ -14,6 +14,7 @@ func (u *Umwelt) Lock() (err error) {
 	return
 }
 
+//TODO-P0 flush konfig_compiled
 func (u *Umwelt) Unlock() (err error) {
 	errors.Log().Caller(1, "Umwelt Unlock")
 	if u.storesInitialized {

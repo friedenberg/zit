@@ -72,8 +72,12 @@ func (s konfigStore) transact(
 	var mutter *konfig.Transacted
 
 	if mutter, err = s.Read(); err != nil {
-		err = errors.Wrap(err)
-		return
+		if errors.Is(err, ErrNotFound{}) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	kt = &konfig.Transacted{
@@ -126,6 +130,29 @@ func (s konfigStore) transact(
 	return
 }
 
+// TODO-P0 disambiguate
+func (s konfigStore) WriteAkte(
+	t *konfig.Objekte,
+) (err error) {
+	var w sha.WriteCloser
+
+	if w, err = s.common.AkteWriter(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.Deferred(&err, w.Close)
+
+	if _, err = konfig.WriteObjekteToText(w, t); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	t.Sha = w.Sha()
+
+	return
+}
+
 func (s konfigStore) Read() (tt *konfig.Transacted, err error) {
 	tt = &konfig.Transacted{
 		Sku: s.common.Konfig.Sku,
@@ -158,7 +185,11 @@ func (s konfigStore) Read() (tt *konfig.Transacted, err error) {
 			if r, err = s.common.ReadCloserObjekten(
 				id.Path(tt.Objekte.Sha, s.common.Standort.DirObjektenAkten()),
 			); err != nil {
-				err = errors.Wrap(err)
+				if errors.IsNotExist(err) {
+					err = errors.Wrap(ErrNotFound{})
+				} else {
+					err = errors.Wrap(err)
+				}
 				return
 			}
 

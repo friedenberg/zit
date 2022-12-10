@@ -102,6 +102,23 @@ func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 	}
 
 	{
+		fa := u.standort.FileAge()
+
+		if files.Exists(fa) {
+			if u.age, err = age.Make(fa); err != nil {
+				errors.Wrap(err)
+				return
+			}
+		} else {
+			u.age = &age.Age{}
+			// if u.age, err = age.MakeDefaultTest(); err != nil {
+			// 	errors.Wrap(err)
+			// 	return
+			// }
+		}
+	}
+
+	{
 		var k *konfig_compiled.Compiled
 
 		if k, err = konfig_compiled.Make(
@@ -117,21 +134,6 @@ func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 
 	u.lock = file_lock.New(u.standort.DirZit("Lock"))
 
-	fa := u.standort.FileAge()
-
-	if files.Exists(fa) {
-		if u.age, err = age.Make(fa); err != nil {
-			errors.Wrap(err)
-			return
-		}
-	} else {
-		u.age = &age.Age{}
-		// if u.age, err = age.MakeDefaultTest(); err != nil {
-		// 	errors.Wrap(err)
-		// 	return
-		// }
-	}
-
 	// for _, rb := range u.konfig.Transacted.Objekte.Akte.Recipients {
 	// 	if err = u.age.AddBech32PivYubikeyEC256(rb); err != nil {
 	// 		errors.Wrap(err)
@@ -139,27 +141,23 @@ func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 	// 	}
 	// }
 
-	u.storeObjekten, err = store_objekten.Make(
+	if u.storeObjekten, err = store_objekten.Make(
 		u.lock,
 		*u.age,
 		u.konfig,
 		u.standort,
 		u.zettelVerzeichnissePool,
-	)
-
-	if err != nil {
+	); err != nil {
 		err = errors.Wrapf(err, "failed to initialize zettel meta store")
 		return
 	}
 
 	errors.Log().Print("initing checkout store")
-	u.storeWorkingDirectory, err = store_fs.New(
+	if u.storeWorkingDirectory, err = store_fs.New(
 		u.konfig,
 		u.standort,
 		u.storeObjekten,
-	)
-
-	if err != nil {
+	); err != nil {
 		errors.Log().Print(err)
 		err = errors.Wrap(err)
 		return
@@ -204,6 +202,7 @@ func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 	return
 }
 
+// TODO-P2 remove this?
 func (u Umwelt) DefaultEtiketten() (etiketten kennung.EtikettSet, err error) {
 	metiketten := kennung.MakeEtikettMutableSet()
 

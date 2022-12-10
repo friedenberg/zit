@@ -419,7 +419,7 @@ function indexes_are_implicitly_correct { # @test
 	mkdir -p one
 	cp "$expected" "one/uno.zettel"
 	run zit checkin "${cmd_zit_def[@]}" -delete "one/uno.zettel"
-	assert_output --partial '      (updated) [o/u@6 !md "bez"]'
+	assert_output --partial '      (updated) [o/u@65 !md "bez"]'
 	assert_output --partial '      (deleted) [one/uno.zettel]'
 
 	{
@@ -481,7 +481,7 @@ function checkouts_dont_overwrite { # @test
 	cat "$expected" >"one/uno.zettel"
 
 	run zit checkout "${cmd_zit_def[@]}" one/uno
-	assert_output '  (checked out) [one/uno.zettel@4 !md "bez"]'
+	assert_output '  (checked out) [one/uno.zettel@4f !md "bez"]'
 
 	run cat one/uno.zettel
 	assert_output "$(cat "$expected")"

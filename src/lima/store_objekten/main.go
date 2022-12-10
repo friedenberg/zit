@@ -210,6 +210,7 @@ func (s Store) Flush() (err error) {
 	// }
 
 	if err = s.common.Abbr.Flush(); err != nil {
+    errors.Err().Print(err)
 		err = errors.Wrapf(err, "failed to flush abbr index")
 		return
 	}

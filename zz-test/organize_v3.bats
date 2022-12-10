@@ -203,7 +203,7 @@ function outputs_organize_two_zettels_one_etiketten_group_by_one { # @test
 	} >"$to_add"
 
 	run "${cmd_zit_new[@]}" -edit=false "$to_add"
-	assert_output '          (new) [o/u@4 !md "one/uno"]'
+	assert_output '          (new) [o/u@42 !md "one/uno"]'
 
 	to_add="$(mktemp)"
 	{
@@ -552,7 +552,7 @@ function commits_no_changes { # @test
 	} >"$one"
 
 	run "${cmd_zit_new[@]}" -edit=false "$one"
-	assert_output '          (new) [o/u@6 !md "one/uno"]'
+	assert_output '          (new) [o/u@6e !md "one/uno"]'
 
 	two="$(mktemp)"
 	{

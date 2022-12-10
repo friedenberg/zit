@@ -183,7 +183,7 @@ func (fs *CwdFiles) readFirstLevelFile(a string) (err error) {
 	ext = strings.TrimSpace(ext)
 
 	switch strings.TrimPrefix(ext, ".") {
-	case fs.konfig.TypFileExtension:
+	case fs.konfig.FileExtensions.Typ:
 		if err = fs.tryTyp(fi); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -226,13 +226,13 @@ func (fs *CwdFiles) readSecondLevelFile(d string, a string) (err error) {
 	ext = strings.TrimSpace(ext)
 
 	switch strings.TrimPrefix(ext, ".") {
-	case fs.konfig.TypFileExtension:
+	case fs.konfig.FileExtensions.Typ:
 		if err = fs.tryTyp(fi); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case fs.konfig.ZettelFileExtension:
+	case fs.konfig.FileExtensions.Zettel:
 		fallthrough
 
 		//Zettel-Akten can have any extension, and so default is Zettel

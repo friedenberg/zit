@@ -11,7 +11,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/delta/standort"
-	"github.com/friedenberg/zit/src/delta/typ_toml"
 	"github.com/friedenberg/zit/src/echo/konfig"
 	"github.com/friedenberg/zit/src/echo/sku"
 	"github.com/friedenberg/zit/src/golf/typ"
@@ -30,13 +29,17 @@ type Compiled struct {
 	compiled
 }
 
+// TODO-P4 rename this
+func (a *Compiled) ResetWithInner(b compiled) {
+	a.compiled = b
+}
+
 type cli = konfig.Cli
 
 type compiled struct {
 	Sku sku.Transacted[kennung.Konfig, *kennung.Konfig]
 
-	ZettelFileExtension string
-	DefaultOrganizeExt  string
+	konfig.Toml
 
 	//TODO
 	//Etiketten
@@ -45,7 +48,6 @@ type compiled struct {
 
 	//Typen
 	ExtensionsToTypen map[string]string
-	TypFileExtension  string
 	DefaultTyp        typ.Transacted
 	Typen             typSet
 }
@@ -55,19 +57,16 @@ func Make(
 	kcli konfig.Cli,
 ) (c *Compiled, err error) {
 	c = &Compiled{
-		cli:      kcli,
-		compiled: makeDefaultCompiled(),
+		cli: kcli,
+		compiled: compiled{
+			ExtensionsToTypen: make(map[string]string),
+		},
 	}
 
 	var f *os.File
 
 	if f, err = files.Open(s.FileKonfigCompiled()); err != nil {
-		if errors.IsNotExist(err) {
-			err = nil
-		} else {
-			err = errors.Wrap(err)
-		}
-
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -80,39 +79,9 @@ func Make(
 			err = nil
 		} else {
 			err = errors.Wrap(err)
-			return
 		}
-	}
 
-	return
-}
-
-func makeDefaultCompiled() (c compiled) {
-	dt := typ.Transacted{
-		Sku: sku.Transacted[kennung.Typ, *kennung.Typ]{
-			//TODO-P0 generate sha
-			Kennung: kennung.MustTyp("md"),
-		},
-		Objekte: typ.Objekte{
-			Akte: typ_toml.Typ{
-				InlineAkte:    true,
-				FileExtension: "md",
-			},
-		},
-	}
-
-	typen := collections.MakeMutableSet[*typ.Transacted](
-		c.Typen.Key,
-		&dt,
-	)
-
-	c = compiled{
-		TypFileExtension:    "typ",
-		ZettelFileExtension: "zettel",
-		DefaultTyp:          dt,
-		DefaultOrganizeExt:  "md",
-		ExtensionsToTypen:   make(map[string]string),
-		Typen:               makeCompiledTypSet(typen),
+		return
 	}
 
 	return
@@ -127,6 +96,7 @@ func (kc *compiled) Recompile(
 	kt *konfig.Transacted,
 ) (err error) {
 	kc.Sku = kt.Sku
+	kc.Toml = kt.Objekte.Akte
 
 	for tn, tv := range kt.Objekte.Akte.Tags {
 		switch {
@@ -211,7 +181,7 @@ func (c compiled) GetSortedTypenExpanded(v string) (expandedActual []*typ.Transa
 }
 
 func (c compiled) GetZettelFileExtension() string {
-	return fmt.Sprintf(".%s", c.ZettelFileExtension)
+	return fmt.Sprintf(".%s", c.FileExtensions.Zettel)
 }
 
 func (kc compiled) GetTyp(n string) (ct *typ.Transacted) {
