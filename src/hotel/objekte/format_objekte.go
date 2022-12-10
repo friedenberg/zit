@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/line_format"
 	"github.com/friedenberg/zit/src/echo/sha"
-	"github.com/friedenberg/zit/src/golf/objekte_format"
+	"github.com/friedenberg/zit/src/hotel/objekte_format"
 )
 
 var MakeFormatObjekte = objekte_format.MakeFormat

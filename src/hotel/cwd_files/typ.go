@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/golf/fd"
 	"github.com/friedenberg/zit/src/golf/sku"
-	"github.com/friedenberg/zit/src/golf/typ"
+	"github.com/friedenberg/zit/src/hotel/typ"
 )
 
 func (c *CwdFiles) tryTyp(fi os.FileInfo) (err error) {

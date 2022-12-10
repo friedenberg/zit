@@ -8,8 +8,8 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/golf/age_io"
 	"github.com/friedenberg/zit/src/golf/konfig"
-	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/golf/sku"
+	"github.com/friedenberg/zit/src/hotel/objekte"
 )
 
 type KonfigLogWriter = collections.WriterFunc[*konfig.Transacted]

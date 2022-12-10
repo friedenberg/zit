@@ -16,7 +16,7 @@ git mv $original/* "$renamed" || mv $original/* "$renamed"
 find src -type d -empty -delete
 
 declare -r sed_script="
-  s|$prefix/$original|$prefix/$renamed|g;
+  s|\W$prefix/$original\W|$prefix/$renamed|g;
   s|^package $original_pkg\$|package $renamed_pkg|g;
 "
 

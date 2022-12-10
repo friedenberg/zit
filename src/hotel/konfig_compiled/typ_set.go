@@ -4,7 +4,7 @@ import (
 	"encoding/gob"
 
 	"github.com/friedenberg/zit/src/delta/collections"
-	"github.com/friedenberg/zit/src/golf/typ"
+	"github.com/friedenberg/zit/src/hotel/typ"
 )
 
 func init() {

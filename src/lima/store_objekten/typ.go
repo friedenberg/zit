@@ -7,9 +7,9 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/typ_toml"
 	"github.com/friedenberg/zit/src/golf/age_io"
-	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/golf/sku"
-	"github.com/friedenberg/zit/src/golf/typ"
+	"github.com/friedenberg/zit/src/hotel/objekte"
+	"github.com/friedenberg/zit/src/hotel/typ"
 )
 
 type typLogWriter = collections.WriterFunc[*typ.Transacted]

@@ -13,7 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/echo/standort"
 	"github.com/friedenberg/zit/src/golf/konfig"
-	"github.com/friedenberg/zit/src/golf/typ"
+	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 

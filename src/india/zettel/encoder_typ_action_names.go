@@ -2,8 +2,8 @@ package zettel
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/golf/typ"
 	"github.com/friedenberg/zit/src/hotel/konfig_compiled"
+	"github.com/friedenberg/zit/src/hotel/typ"
 )
 
 type EncoderTypActionNames struct {

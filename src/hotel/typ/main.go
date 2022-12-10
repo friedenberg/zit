@@ -3,7 +3,7 @@ package typ
 import (
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/typ_toml"
-	"github.com/friedenberg/zit/src/golf/objekte"
+	"github.com/friedenberg/zit/src/hotel/objekte"
 )
 
 type Objekte = typ_toml.Objekte

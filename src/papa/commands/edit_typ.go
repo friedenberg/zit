@@ -15,7 +15,7 @@ import (
 	"github.com/friedenberg/zit/src/golf/id_set"
 	"github.com/friedenberg/zit/src/golf/konfig"
 	"github.com/friedenberg/zit/src/golf/sku"
-	"github.com/friedenberg/zit/src/golf/typ"
+	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/november/umwelt"
 	"github.com/friedenberg/zit/src/oscar/user_ops"
 )
