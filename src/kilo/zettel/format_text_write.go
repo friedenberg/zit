@@ -239,7 +239,7 @@ func (f Text) writeToExternalAkte(c FormatContextWrite) (n int64, err error) {
 		return
 	}
 
-	defer files.Close(file)
+	defer errors.Deferred(&err, file.Close)
 
 	var n1 int64
 

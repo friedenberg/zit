@@ -20,7 +20,7 @@ func newProvider(path string) (p provider, err error) {
 		return
 	}
 
-	defer files.Close(f)
+	defer errors.Deferred(&err, f.Close)
 
 	r := bufio.NewReader(f)
 

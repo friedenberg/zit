@@ -102,7 +102,7 @@ func Run(args []string) (exitStatus int) {
 		}
 	}
 
-	defer u.Flush()
+	defer errors.Deferred(&err, u.Flush)
 
 	switch {
 	case u.Konfig().Complete:

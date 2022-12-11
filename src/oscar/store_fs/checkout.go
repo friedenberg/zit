@@ -215,7 +215,7 @@ func (s *Store) writeFormat(
 
 	fc.Out = f
 
-	defer files.Close(f)
+	defer errors.Deferred(&err, f.Close)
 
 	if _, err = o.Format.WriteTo(fc); err != nil {
 		err = errors.Wrap(err)
@@ -249,7 +249,7 @@ func (s *Store) writeAkte(
 		return
 	}
 
-	defer files.Close(f)
+	defer errors.Deferred(&err, f.Close)
 
 	var r io.ReadCloser
 
@@ -258,7 +258,7 @@ func (s *Store) writeAkte(
 		return
 	}
 
-	defer files.Close(f)
+	defer errors.Deferred(&err, f.Close)
 
 	if _, err = io.Copy(f, r); err != nil {
 		err = errors.Wrap(err)

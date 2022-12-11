@@ -13,7 +13,7 @@ type Writer struct {
 
 func (w1 Writer) WriteTo(w2 io.Writer) (n int64, err error) {
 	w := bufio.NewWriter(w2)
-	defer w.Flush()
+	defer errors.Deferred(&err, w.Flush)
 
 	var n1 int64
 	var n2 int

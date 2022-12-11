@@ -76,7 +76,7 @@ func (c CatAlfred) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 func (c CatAlfred) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	//this command does its own error handling
 	wo := bufio.NewWriter(u.Out())
-	defer wo.Flush()
+	defer errors.Deferred(&err, wo.Flush)
 
 	var aw *alfred.Writer
 

@@ -146,7 +146,7 @@ func (s zettelStore) WriteZettelObjekte(z zettel.Objekte) (sh sha.Sha, err error
 		return
 	}
 
-	defer w.Close()
+	defer errors.Deferred(&err, w.Close)
 
 	c := zettel.FormatContextWrite{
 		Zettel: z,
@@ -517,7 +517,7 @@ func (s zettelStore) storedZettelFromSha(
 		return
 	}
 
-	defer or.Close()
+	defer errors.Deferred(&err, or.Close)
 
 	f := zettel.FormatObjekte{
 		IgnoreTypErrors: true,

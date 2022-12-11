@@ -139,7 +139,7 @@ func (zp *Page) WriteZettelenTo(
 		}
 	}
 
-	defer r.Close()
+	defer errors.Deferred(&err, r.Close)
 
 	r1 := bufio.NewReader(r)
 
@@ -189,7 +189,7 @@ func (zp *Page) ReadJustHeader() (err error) {
 		return
 	}
 
-	defer r.Close()
+	defer errors.Deferred(&err, r.Close)
 
 	r1 := bufio.NewReader(r)
 

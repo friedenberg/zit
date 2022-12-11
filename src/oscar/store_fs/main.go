@@ -74,10 +74,10 @@ func (s Store) flushToTemp() (tfp string, err error) {
 
 	tfp = f.Name()
 
-	defer files.Close(f)
+	defer errors.Deferred(&err, f.Close)
 
 	w := bufio.NewWriter(f)
-	defer w.Flush()
+	defer errors.Deferred(&err, w.Flush)
 
 	for p, e := range s.entries {
 		out := fmt.Sprintf("%s %s\n", p, e)
@@ -156,7 +156,7 @@ func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 		return
 	}
 
-	defer files.Close(f)
+	defer errors.Deferred(&err, f.Close)
 
 	c.In = f
 

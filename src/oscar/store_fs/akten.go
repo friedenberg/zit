@@ -81,7 +81,7 @@ func (s Store) AkteShaFromPath(p string) (sh sha.Sha, err error) {
 		return
 	}
 
-	defer files.Close(f)
+	defer errors.Deferred(&err, f.Close)
 
 	if _, err = io.Copy(aw, f); err != nil {
 		err = errors.Wrap(err)

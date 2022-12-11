@@ -45,7 +45,7 @@ func (c *FormatOrganize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	defer files.Close(f)
+	defer errors.Deferred(&err, f.Close)
 
 	var ot *organize_text.Text
 

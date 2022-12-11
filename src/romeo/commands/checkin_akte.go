@@ -88,7 +88,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			return
 		}
 
-		defer files.Close(f)
+		defer errors.Deferred(&err, f.Close)
 
 		if _, err = io.Copy(ow, f); err != nil {
 			err = errors.Wrap(err)
@@ -117,7 +117,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	defer u.Unlock()
+	defer errors.Deferred(&err, u.Unlock)
 
 	for _, z := range zettels {
 		if z, err = u.StoreObjekten().Zettel().Update(

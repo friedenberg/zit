@@ -193,9 +193,9 @@ func (c Exec) feedPipe(
 		return
 	}
 
-	defer pipeFileWriter.Close()
+	defer errors.Deferred(&err, pipeFileWriter.Close)
 
-	defer ar.Close()
+	defer errors.Deferred(&err, ar.Close)
 
 	if _, err = io.Copy(pipeFileWriter, ar); err != nil {
 		err = errors.Wrap(err)

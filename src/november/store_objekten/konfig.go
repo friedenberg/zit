@@ -64,7 +64,7 @@ func (s konfigStore) transact(
 		return
 	}
 
-	defer w.Close()
+	defer errors.Deferred(&err, w.Close)
 
 	var mutter *konfig.Transacted
 

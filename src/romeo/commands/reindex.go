@@ -32,7 +32,7 @@ func (c Reindex) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	defer u.Unlock()
+	defer errors.Deferred(&err, u.Unlock)
 
 	if err = u.StoreObjekten().Reindex(); err != nil {
 		err = errors.Wrap(err)

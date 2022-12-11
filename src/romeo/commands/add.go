@@ -135,7 +135,7 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	defer u.Unlock()
+	defer errors.Deferred(&err, u.Unlock)
 
 	if _, err = commitOrganizeTextOp.Run(createOrganizeFileResults, ot2); err != nil {
 		err = errors.Wrap(err)

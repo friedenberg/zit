@@ -57,7 +57,7 @@ func (c Revert) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 		return
 	}
 
-	defer u.Unlock()
+	defer errors.Deferred(&err, u.Unlock)
 
 	var zts zettel.MutableSet
 

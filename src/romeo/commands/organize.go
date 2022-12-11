@@ -217,7 +217,7 @@ func (c *Organize) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 			return
 		}
 
-		defer u.Unlock()
+		defer errors.Deferred(&err, u.Unlock)
 
 		commitOrganizeTextOp := user_ops.CommitOrganizeFile{
 			Umwelt: u,
@@ -270,7 +270,7 @@ func (c *Organize) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 			return
 		}
 
-		defer u.Unlock()
+		defer errors.Deferred(&err, u.Unlock)
 
 		commitOrganizeTextOp := user_ops.CommitOrganizeFile{
 			Umwelt: u,

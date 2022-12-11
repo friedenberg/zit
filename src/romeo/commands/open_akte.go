@@ -84,7 +84,7 @@ func (c OpenAkte) RunWithIds(store *umwelt.Umwelt, is id_set.Set) (err error) {
 				return
 			}
 
-			defer files.Close(f)
+			defer errors.Deferred(&err, f.Close)
 
 			paths[i] = f.Name()
 
@@ -95,7 +95,7 @@ func (c OpenAkte) RunWithIds(store *umwelt.Umwelt, is id_set.Set) (err error) {
 				return
 			}
 
-			defer r.Close()
+			defer errors.Deferred(&err, r.Close)
 
 			if _, err = io.Copy(f, r); err != nil {
 				err = errors.Wrap(err)
