@@ -597,3 +597,48 @@ func (s zettelStore) transactedZettelFromTransaktionObjekte(
 
 	return
 }
+
+func (s *zettelStore) reindexOne(
+	t *transaktion.Transaktion,
+	o *sku.Sku,
+) (err error) {
+	var tz zettel.Transacted
+
+	if tz, err = s.transactedZettelFromTransaktionObjekte(t, o); err != nil {
+		//TODO decide on how to handle format errors
+		errors.Err().Print(err)
+		err = nil
+		// err = errors.Wrap(err)
+		return
+	}
+
+	var mutter *zettel.Transacted
+
+	if mutter1, err := s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(tz.Sku.Kennung); err == nil {
+		mutter = &mutter1
+	}
+
+	if err = s.writeNamedZettelToIndex(tz); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if mutter == nil {
+		if err = s.zettelTransactedWriter.New(&tz); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		if err = s.zettelTransactedWriter.Updated(&tz); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	if err = s.indexEtiketten.addZettelWithOptionalMutter(&tz, mutter); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}

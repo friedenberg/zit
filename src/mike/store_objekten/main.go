@@ -272,41 +272,38 @@ func (s *Store) Reindex() (err error) {
 			func(o *sku.Sku) (err error) {
 				switch o.Gattung {
 
-				case gattung.Zettel:
-					var tz zettel.Transacted
-
-					if tz, err = s.zettelStore.transactedZettelFromTransaktionObjekte(t, o); err != nil {
-						//TODO decide on how to handle format errors
-						errors.Err().Print(err)
-						err = nil
-						// err = errors.Wrap(err)
-						return
-					}
-
-					var mutter *zettel.Transacted
-
-					if mutter1, err := s.zettelStore.verzeichnisseSchwanzen.ReadHinweisSchwanzen(tz.Sku.Kennung); err == nil {
-						mutter = &mutter1
-					}
-
-					if err = s.zettelStore.writeNamedZettelToIndex(tz); err != nil {
+				case gattung.Konfig:
+					if err = s.konfigStore.reindexOne(
+						t,
+						o,
+					); err != nil {
 						err = errors.Wrap(err)
 						return
 					}
 
-					if mutter == nil {
-						if err = s.zettelStore.zettelTransactedWriter.New(&tz); err != nil {
-							err = errors.Wrap(err)
-							return
-						}
-					} else {
-						if err = s.zettelStore.zettelTransactedWriter.Updated(&tz); err != nil {
-							err = errors.Wrap(err)
-							return
-						}
+				case gattung.Typ:
+					if err = s.typStore.reindexOne(
+						t,
+						o,
+					); err != nil {
+						err = errors.Wrap(err)
+						return
 					}
 
-					if err = s.zettelStore.indexEtiketten.addZettelWithOptionalMutter(&tz, mutter); err != nil {
+				case gattung.Etikett:
+					if err = s.etikettStore.reindexOne(
+						t,
+						o,
+					); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+
+				case gattung.Zettel:
+					if err = s.zettelStore.reindexOne(
+						t,
+						o,
+					); err != nil {
 						err = errors.Wrap(err)
 						return
 					}

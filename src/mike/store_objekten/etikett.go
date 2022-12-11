@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/golf/age_io"
 	"github.com/friedenberg/zit/src/golf/sku"
+	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/hotel/objekte"
 )
 
@@ -233,6 +234,51 @@ func (s etikettStore) AllInChain(k kennung.Etikett) (c []*etikett.Transacted, er
 	// 	c,
 	// 	func(i, j int) bool { return c[i].SkuTransacted().Less(c[j].SkuTransacted()) },
 	// )
+
+	return
+}
+
+func (s *etikettStore) reindexOne(
+	t *transaktion.Transaktion,
+	o *sku.Sku,
+) (err error) {
+	//var tz zettel.Transacted
+
+	//if tz, err = s.transactedZettelFromTransaktionObjekte(t, o); err != nil {
+	//	//TODO decide on how to handle format errors
+	//	errors.Err().Print(err)
+	//	err = nil
+	//	// err = errors.Wrap(err)
+	//	return
+	//}
+
+	//var mutter *zettel.Transacted
+
+	//if mutter1, err := s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(tz.Sku.Kennung); err == nil {
+	//	mutter = &mutter1
+	//}
+
+	//if err = s.writeNamedZettelToIndex(tz); err != nil {
+	//	err = errors.Wrap(err)
+	//	return
+	//}
+
+	//if mutter == nil {
+	//	if err = s.zettelTransactedWriter.New(&tz); err != nil {
+	//		err = errors.Wrap(err)
+	//		return
+	//	}
+	//} else {
+	//	if err = s.zettelTransactedWriter.Updated(&tz); err != nil {
+	//		err = errors.Wrap(err)
+	//		return
+	//	}
+	//}
+
+	//if err = s.indexEtiketten.addZettelWithOptionalMutter(&tz, mutter); err != nil {
+	//	err = errors.Wrap(err)
+	//	return
+	//}
 
 	return
 }
