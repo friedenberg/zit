@@ -15,7 +15,6 @@ import (
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
 	"github.com/friedenberg/zit/src/kilo/zettel"
-	"github.com/friedenberg/zit/src/lima/zettel_verzeichnisse"
 )
 
 type shaAbbr = sha.Abbr
@@ -39,7 +38,7 @@ func Make(
 	a age.Age,
 	k konfig_compiled.Compiled,
 	st standort.Standort,
-	p *zettel_verzeichnisse.PoolVerzeichnisse,
+	p *zettel.PoolVerzeichnisse,
 ) (s *Store, err error) {
 	s = &Store{
 		common: common{

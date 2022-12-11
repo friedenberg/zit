@@ -10,26 +10,26 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/collections"
-	"github.com/friedenberg/zit/src/lima/zettel_verzeichnisse"
+	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 
 type Page struct {
 	sync.Locker
 	pageId
 	ioFactory
-	pool        *zettel_verzeichnisse.PoolVerzeichnisse
-	added       []*zettel_verzeichnisse.Verzeichnisse
-	flushFilter collections.WriterFunc[*zettel_verzeichnisse.Verzeichnisse]
+	pool        *zettel.PoolVerzeichnisse
+	added       []*zettel.Verzeichnisse
+	flushFilter collections.WriterFunc[*zettel.Verzeichnisse]
 	State
 }
 
 func makeZettelenPage(
 	iof ioFactory,
 	pid pageId,
-	pool *zettel_verzeichnisse.PoolVerzeichnisse,
+	pool *zettel.PoolVerzeichnisse,
 	fff ZettelVerzeichnisseWriterGetter,
 ) (p *Page) {
-	flushFilter := collections.MakeWriterNoop[*zettel_verzeichnisse.Verzeichnisse]()
+	flushFilter := collections.MakeWriterNoop[*zettel.Verzeichnisse]()
 
 	if fff != nil {
 		flushFilter = fff.ZettelVerzeichnisseWriter(pid.index)
@@ -40,7 +40,7 @@ func makeZettelenPage(
 		ioFactory:   iof,
 		pageId:      pid,
 		pool:        pool,
-		added:       make([]*zettel_verzeichnisse.Verzeichnisse, 0),
+		added:       make([]*zettel.Verzeichnisse, 0),
 		flushFilter: flushFilter,
 	}
 
@@ -59,9 +59,9 @@ func (zp *Page) setState(v State) {
 	zp.State = v
 }
 
-func (zp *Page) Add(z *zettel_verzeichnisse.Verzeichnisse) (err error) {
+func (zp *Page) Add(z *zettel.Verzeichnisse) (err error) {
 	if z == nil {
-		err = errors.Errorf("trying to add nil zettel_verzeichnisse.Zettel")
+		err = errors.Errorf("trying to add nil zettel.Verzeichnisse")
 		return
 	}
 
@@ -77,7 +77,7 @@ func (zp *Page) Add(z *zettel_verzeichnisse.Verzeichnisse) (err error) {
 	}
 
 	if z == nil {
-		err = errors.Errorf("trying to add nil zettel_verzeichnisse.Zettel")
+		err = errors.Errorf("trying to add nil zettel.Zettel")
 		return
 	}
 
@@ -125,7 +125,7 @@ func (zp *Page) Flush() (err error) {
 }
 
 func (zp *Page) WriteZettelenTo(
-	w collections.WriterFunc[*zettel_verzeichnisse.Verzeichnisse],
+	w collections.WriterFunc[*zettel.Verzeichnisse],
 ) (err error) {
 	var r io.ReadCloser
 
@@ -205,14 +205,14 @@ func (zp *Page) ReadJustHeader() (err error) {
 
 func (zp *Page) Copy(
 	r1 io.Reader,
-	w collections.WriterFunc[*zettel_verzeichnisse.Verzeichnisse],
+	w collections.WriterFunc[*zettel.Verzeichnisse],
 ) (n int64, err error) {
 	r := bufio.NewReader(r1)
 
 	dec := gob.NewDecoder(r)
 
 	for {
-		var tz *zettel_verzeichnisse.Verzeichnisse
+		var tz *zettel.Verzeichnisse
 
 		tz = zp.pool.Get()
 
@@ -264,7 +264,7 @@ func (zp *Page) WriteTo(w1 io.Writer) (n int64, err error) {
 	if err = zp.WriteZettelenTo(
 		collections.MakeChain(
 			zp.flushFilter,
-			zettel_verzeichnisse.MakeWriterGobEncoder(w).WriteZettelVerzeichnisse,
+			zettel.MakeWriterGobEncoder(w).WriteZettelVerzeichnisse,
 		),
 	); err != nil {
 		err = errors.Wrap(err)

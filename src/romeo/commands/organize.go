@@ -17,7 +17,6 @@ import (
 	"github.com/friedenberg/zit/src/golf/id_set"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/lima/organize_text"
-	"github.com/friedenberg/zit/src/lima/zettel_verzeichnisse"
 	"github.com/friedenberg/zit/src/papa/umwelt"
 	"github.com/friedenberg/zit/src/quebec/user_ops"
 )
@@ -154,8 +153,8 @@ func (c *Organize) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 		},
 	}
 
-	wk := zettel_verzeichnisse.MakeWriterKonfig(u.Konfig())
-	w := zettel_verzeichnisse.MakeWriterZettelTransacted(
+	wk := zettel.MakeWriterKonfig(u.Konfig())
+	w := zettel.MakeWriterZettelTransacted(
 		collections.MakeChain(
 			query.WriteZettelTransacted,
 			getResults.AddAndDoNotRepool,

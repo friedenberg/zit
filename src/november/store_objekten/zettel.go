@@ -15,7 +15,6 @@ import (
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/kilo/zettel"
-	"github.com/friedenberg/zit/src/lima/zettel_verzeichnisse"
 	"github.com/friedenberg/zit/src/mike/store_verzeichnisse"
 )
 
@@ -33,12 +32,12 @@ type zettelStore struct {
 	verzeichnisseSchwanzen *verzeichnisseSchwanzen
 	verzeichnisseAll       *store_verzeichnisse.Zettelen
 
-	pool *zettel_verzeichnisse.PoolVerzeichnisse
+	pool *zettel.PoolVerzeichnisse
 }
 
 func makeZettelStore(
 	sa *common,
-	p *zettel_verzeichnisse.PoolVerzeichnisse,
+	p *zettel.PoolVerzeichnisse,
 ) (s *zettelStore, err error) {
 	s = &zettelStore{
 		common:      sa,
@@ -212,7 +211,7 @@ func (s zettelStore) ReadHinweisSchwanzen(
 }
 
 func (i *zettelStore) ReadAllSchwanzenVerzeichnisse(
-	ws ...collections.WriterFunc[*zettel_verzeichnisse.Verzeichnisse],
+	ws ...collections.WriterFunc[*zettel.Verzeichnisse],
 ) (err error) {
 	return i.verzeichnisseSchwanzen.ReadMany(ws...)
 }
@@ -220,7 +219,7 @@ func (i *zettelStore) ReadAllSchwanzenVerzeichnisse(
 func (s zettelStore) ReadAllSchwanzenTransacted(
 	ws ...collections.WriterFunc[*zettel.Transacted],
 ) (err error) {
-	w := zettel_verzeichnisse.MakeWriterZettelTransacted(
+	w := zettel.MakeWriterZettelTransacted(
 		collections.MakeChain(ws...),
 	)
 
@@ -228,7 +227,7 @@ func (s zettelStore) ReadAllSchwanzenTransacted(
 }
 
 func (i *zettelStore) ReadAllVerzeichnisse(
-	ws ...collections.WriterFunc[*zettel_verzeichnisse.Verzeichnisse],
+	ws ...collections.WriterFunc[*zettel.Verzeichnisse],
 ) (err error) {
 	return i.verzeichnisseAll.ReadMany(ws...)
 }
@@ -236,7 +235,7 @@ func (i *zettelStore) ReadAllVerzeichnisse(
 func (s zettelStore) ReadAllTransacted(
 	ws ...collections.WriterFunc[*zettel.Transacted],
 ) (err error) {
-	w := zettel_verzeichnisse.MakeWriterZettelTransacted(
+	w := zettel.MakeWriterZettelTransacted(
 		collections.MakeChain(ws...),
 	)
 
@@ -459,7 +458,7 @@ func (s zettelStore) AllInChain(h hinweis.Hinweis) (c []*zettel.Transacted, err 
 	mst := zettel.MakeMutableSetUnique(0)
 
 	if err = s.verzeichnisseAll.ReadMany(
-		func(z *zettel_verzeichnisse.Verzeichnisse) (err error) {
+		func(z *zettel.Verzeichnisse) (err error) {
 			if !z.Transacted.Sku.Kennung.Equals(&h) {
 				err = io.EOF
 				return
@@ -467,7 +466,7 @@ func (s zettelStore) AllInChain(h hinweis.Hinweis) (c []*zettel.Transacted, err 
 
 			return
 		},
-		zettel_verzeichnisse.MakeWriterZettelTransacted(mst.AddAndDoNotRepool),
+		zettel.MakeWriterZettelTransacted(mst.AddAndDoNotRepool),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

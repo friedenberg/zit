@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
 	"github.com/friedenberg/zit/src/kilo/zettel"
-	"github.com/friedenberg/zit/src/lima/zettel_verzeichnisse"
 )
 
 const DigitWidth = 2
@@ -18,7 +17,7 @@ const PageCount = 1 << (DigitWidth * 4)
 type Zettelen struct {
 	konfig konfig_compiled.Compiled
 	path   string
-	pool   *zettel_verzeichnisse.PoolVerzeichnisse
+	pool   *zettel.PoolVerzeichnisse
 	ioFactory
 	pages [PageCount]*Page
 }
@@ -32,7 +31,7 @@ func MakeZettelen(
 	k konfig_compiled.Compiled,
 	dir string,
 	f ioFactory,
-	p *zettel_verzeichnisse.PoolVerzeichnisse,
+	p *zettel.PoolVerzeichnisse,
 	fff ZettelVerzeichnisseWriterGetter,
 ) (i *Zettelen, err error) {
 	i = &Zettelen{
@@ -54,7 +53,7 @@ func MakeZettelen(
 	return
 }
 
-func (i Zettelen) Pool() *zettel_verzeichnisse.PoolVerzeichnisse {
+func (i Zettelen) Pool() *zettel.PoolVerzeichnisse {
 	return i.pool
 }
 
@@ -129,7 +128,7 @@ func (i *Zettelen) GetPageIndexKeyValue(
 
 func (i *Zettelen) ReadMany(
 	//TODO switch to single writer and force callers to make chains
-	ws ...collections.WriterFunc[*zettel_verzeichnisse.Verzeichnisse],
+	ws ...collections.WriterFunc[*zettel.Verzeichnisse],
 ) (err error) {
 	wg := &sync.WaitGroup{}
 	ch := make(chan struct{}, PageCount)
@@ -146,7 +145,7 @@ func (i *Zettelen) ReadMany(
 		}
 	}
 
-	w := collections.MakePooledChain[zettel_verzeichnisse.Verzeichnisse](
+	w := collections.MakePooledChain[zettel.Verzeichnisse](
 		i.pool,
 		ws...,
 	)

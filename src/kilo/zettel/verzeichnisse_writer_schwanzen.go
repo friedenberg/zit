@@ -1,4 +1,4 @@
-package zettel_verzeichnisse
+package zettel
 
 import (
 	"bufio"
@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/ts"
 	"github.com/friedenberg/zit/src/golf/sku"
-	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 
 type WriterSchwanzen struct {
@@ -25,7 +24,7 @@ func MakeWriterSchwanzen() *WriterSchwanzen {
 	}
 }
 
-func (zws *WriterSchwanzen) Less(zt *zettel.Transacted) (ok bool) {
+func (zws *WriterSchwanzen) Less(zt *Transacted) (ok bool) {
 	zws.lock.RLock()
 	defer zws.lock.RUnlock()
 
@@ -57,7 +56,7 @@ func (zws *WriterSchwanzen) Get(h hinweis.Hinweis) (t ts.Time, ok bool) {
 	return
 }
 
-func (zws *WriterSchwanzen) Set(z *zettel.Transacted) (ok bool) {
+func (zws *WriterSchwanzen) Set(z *Transacted) (ok bool) {
 	zws.lock.Lock()
 	defer zws.lock.Unlock()
 
@@ -78,7 +77,7 @@ func (zws *WriterSchwanzen) Set(z *zettel.Transacted) (ok bool) {
 }
 
 func (zws *WriterSchwanzen) WriteZettelTransacted(
-	z *zettel.Transacted,
+	z *Transacted,
 ) (err error) {
 	if ok := zws.Set(z); !ok {
 		err = io.EOF
@@ -100,7 +99,7 @@ func (zws *WriterSchwanzen) ReadFrom(r1 io.Reader) (n int64, err error) {
 
 	dec := gob.NewDecoder(r)
 
-	m := make(map[hinweis.Hinweis]zettel.Sku)
+	m := make(map[hinweis.Hinweis]Sku)
 
 	if err = dec.Decode(&m); err != nil {
 		if errors.IsEOF(err) {

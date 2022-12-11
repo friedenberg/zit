@@ -7,26 +7,25 @@ import (
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/kilo/zettel"
-	"github.com/friedenberg/zit/src/lima/zettel_verzeichnisse"
 	"github.com/friedenberg/zit/src/mike/store_verzeichnisse"
 )
 
 type verzeichnisseSchwanzen struct {
-	headers [store_verzeichnisse.PageCount]*zettel_verzeichnisse.WriterSchwanzen
+	headers [store_verzeichnisse.PageCount]*zettel.WriterSchwanzen
 	*store_verzeichnisse.Zettelen
 	common *common
 }
 
 func makeVerzeichnisseSchwanzen(
 	sa *common,
-	p *zettel_verzeichnisse.PoolVerzeichnisse,
+	p *zettel.PoolVerzeichnisse,
 ) (s *verzeichnisseSchwanzen, err error) {
 	s = &verzeichnisseSchwanzen{
 		common: sa,
 	}
 
 	for i, _ := range s.headers {
-		s.headers[i] = zettel_verzeichnisse.MakeWriterSchwanzen()
+		s.headers[i] = zettel.MakeWriterSchwanzen()
 	}
 
 	s.Zettelen, err = store_verzeichnisse.MakeZettelen(
@@ -50,10 +49,10 @@ func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 		return
 	}
 
-	var found *zettel_verzeichnisse.Verzeichnisse
+	var found *zettel.Verzeichnisse
 	pool := s.Zettelen.Pool()
 
-	w := func(zv *zettel_verzeichnisse.Verzeichnisse) (err error) {
+	w := func(zv *zettel.Verzeichnisse) (err error) {
 		if !zv.Transacted.Sku.Kennung.Equals(&h) {
 			pool.Put(zv)
 			return
@@ -91,6 +90,6 @@ func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 
 func (s *verzeichnisseSchwanzen) ZettelVerzeichnisseWriter(
 	n int,
-) collections.WriterFunc[*zettel_verzeichnisse.Verzeichnisse] {
+) collections.WriterFunc[*zettel.Verzeichnisse] {
 	return s.headers[n].WriteZettelVerzeichnisse
 }

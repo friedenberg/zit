@@ -13,7 +13,6 @@ import (
 	"github.com/friedenberg/zit/src/india/typ"
 	"github.com/friedenberg/zit/src/india/zettel_external"
 	"github.com/friedenberg/zit/src/kilo/zettel"
-	"github.com/friedenberg/zit/src/lima/zettel_verzeichnisse"
 	"github.com/friedenberg/zit/src/mike/zettel_checked_out"
 )
 
@@ -31,10 +30,10 @@ func (s *Store) Checkout(
 	zts := zettel.MakeMutableSetUnique(0)
 
 	if err = s.storeObjekten.Zettel().ReadAllSchwanzenVerzeichnisse(
-		zettel_verzeichnisse.MakeWriterKonfig(s.konfig),
-		zettel_verzeichnisse.MakeWriterZettelTransacted(ztw),
-		zettel_verzeichnisse.MakeWriterZettelTransacted(zts.Add),
-		zettel_verzeichnisse.MakeWriterZettelTransacted(
+		zettel.MakeWriterKonfig(s.konfig),
+		zettel.MakeWriterZettelTransacted(ztw),
+		zettel.MakeWriterZettelTransacted(zts.Add),
+		zettel.MakeWriterZettelTransacted(
 			collections.MakeWriterDoNotRepool[zettel.Transacted](),
 		),
 	); err != nil {

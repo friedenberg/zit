@@ -15,7 +15,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/india/konfig"
 	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
-	"github.com/friedenberg/zit/src/lima/zettel_verzeichnisse"
+	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/mike/zettel_checked_out"
 	"github.com/friedenberg/zit/src/november/store_objekten"
 	"github.com/friedenberg/zit/src/oscar/store_fs"
@@ -39,7 +39,7 @@ type Umwelt struct {
 	age                   *age.Age
 	storeWorkingDirectory *store_fs.Store
 
-	zettelVerzeichnissePool *zettel_verzeichnisse.PoolVerzeichnisse
+	zettelVerzeichnissePool *zettel.PoolVerzeichnisse
 }
 
 func Make(kCli konfig.Cli) (u *Umwelt, err error) {
@@ -47,7 +47,7 @@ func Make(kCli konfig.Cli) (u *Umwelt, err error) {
 		in:                      os.Stdin,
 		out:                     os.Stdout,
 		err:                     os.Stderr,
-		zettelVerzeichnissePool: collections.MakePool[zettel_verzeichnisse.Verzeichnisse](),
+		zettelVerzeichnissePool: collections.MakePool[zettel.Verzeichnisse](),
 	}
 
 	if files.IsTty(u.in) {

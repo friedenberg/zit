@@ -7,10 +7,10 @@ import (
 	"github.com/friedenberg/zit/src/bravo/alfred"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
-	"github.com/friedenberg/zit/src/lima/zettel_verzeichnisse"
+	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 
-func (w *Writer) zettelToItem(z *zettel_verzeichnisse.Verzeichnisse, ha hinweis.Abbr) (a *alfred.Item) {
+func (w *Writer) zettelToItem(z *zettel.Verzeichnisse, ha hinweis.Abbr) (a *alfred.Item) {
 	a = w.alfredWriter.Get()
 
 	a.Title = z.Transacted.Objekte.Bezeichnung.String()

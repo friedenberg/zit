@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/id"
 	"github.com/friedenberg/zit/src/kilo/zettel"
-	"github.com/friedenberg/zit/src/lima/zettel_verzeichnisse"
 )
 
 func (s Store) ReadAllAktenShas(w collections.WriterFunc[sha.Sha]) (err error) {
@@ -55,7 +54,7 @@ func (s Store) AkteExists(sh sha.Sha) (err error) {
 	set := zettel.MakeMutableSetUnique(0)
 
 	if err = s.zettelStore.verzeichnisseAll.ReadMany(
-		func(z *zettel_verzeichnisse.Verzeichnisse) (err error) {
+		func(z *zettel.Verzeichnisse) (err error) {
 			if !z.Transacted.Objekte.Akte.Equals(sh) {
 				err = io.EOF
 				return
@@ -63,7 +62,7 @@ func (s Store) AkteExists(sh sha.Sha) (err error) {
 
 			return
 		},
-		zettel_verzeichnisse.MakeWriterZettelTransacted(
+		zettel.MakeWriterZettelTransacted(
 			set.AddAndDoNotRepool,
 		),
 	); err != nil {

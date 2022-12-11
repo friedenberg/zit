@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/echo/standort"
 	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
-	"github.com/friedenberg/zit/src/lima/zettel_verzeichnisse"
+	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/november/store_objekten"
 	"github.com/friedenberg/zit/src/oscar/store_fs"
 )
@@ -42,6 +42,6 @@ func (u *Umwelt) StoreWorkingDirectory() *store_fs.Store {
 	return u.storeWorkingDirectory
 }
 
-func (u *Umwelt) ZettelVerzeichnissePool() *zettel_verzeichnisse.PoolVerzeichnisse {
+func (u *Umwelt) ZettelVerzeichnissePool() *zettel.PoolVerzeichnisse {
 	return u.zettelVerzeichnissePool
 }

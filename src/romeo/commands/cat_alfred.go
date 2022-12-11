@@ -12,7 +12,6 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/ts"
 	"github.com/friedenberg/zit/src/golf/id_set"
 	"github.com/friedenberg/zit/src/kilo/zettel"
-	"github.com/friedenberg/zit/src/lima/zettel_verzeichnisse"
 	"github.com/friedenberg/zit/src/mike/alfred"
 	"github.com/friedenberg/zit/src/papa/umwelt"
 )
@@ -151,13 +150,13 @@ func (c CatAlfred) catZettelen(
 		defer wg.Done()
 	}
 
-	wk := zettel_verzeichnisse.MakeWriterKonfig(u.Konfig())
+	wk := zettel.MakeWriterKonfig(u.Konfig())
 
 	var err error
 
 	if err = u.StoreObjekten().Zettel().ReadAllSchwanzenVerzeichnisse(
 		wk,
-		zettel_verzeichnisse.MakeWriterZettelTransacted(
+		zettel.MakeWriterZettelTransacted(
 			zettel.WriterIds{
 				Filter: id_set.Filter{
 					Set:        ids,

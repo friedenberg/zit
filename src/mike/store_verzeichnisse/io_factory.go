@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/sha"
-	"github.com/friedenberg/zit/src/lima/zettel_verzeichnisse"
+	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 
 type readCloserFactory interface {
@@ -17,7 +17,7 @@ type writeCloserFactory interface {
 }
 
 type ZettelVerzeichnisseWriterGetter interface {
-	ZettelVerzeichnisseWriter(int) collections.WriterFunc[*zettel_verzeichnisse.Verzeichnisse]
+	ZettelVerzeichnisseWriter(int) collections.WriterFunc[*zettel.Verzeichnisse]
 }
 
 type PageHeader interface {
