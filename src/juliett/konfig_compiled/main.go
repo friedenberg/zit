@@ -94,13 +94,8 @@ func (kc Compiled) Cli() konfig.Cli {
 	return kc.cli
 }
 
-func (kc *compiled) Recompile(
-	kt *konfig.Transacted,
-) (err error) {
+func (kc *compiled) recompile() (err error) {
 	kc.hasChanges = true
-
-	kc.Sku = kt.Sku
-	kc.Toml = kt.Objekte.Akte
 
 	if err = kc.Etiketten.Each(
 		func(ct *etikett.Transacted) (err error) {
@@ -154,6 +149,11 @@ func (kc *compiled) Recompile(
 
 func (kc *compiled) Flush(s standort.Standort) (err error) {
 	if !kc.hasChanges {
+		return
+	}
+
+	if err = kc.recompile(); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -257,9 +257,18 @@ func (kc compiled) GetEtikett(k kennung.Etikett) (ct *etikett.Transacted) {
 	return
 }
 
+func (k *compiled) SetTransacted(
+	kt *konfig.Transacted,
+) {
+	k.hasChanges = true
+	k.Sku = kt.Sku
+	k.Toml = kt.Objekte.Akte
+}
+
 func (k *compiled) AddTyp(
 	ct *typ.Transacted,
 ) {
+	k.hasChanges = true
 	m := k.Typen.Elements()
 	m = append(m, ct)
 	k.Typen = makeCompiledTypSetFromSlice(m)
@@ -270,6 +279,7 @@ func (k *compiled) AddTyp(
 func (k *compiled) AddEtikett(
 	ct *etikett.Transacted,
 ) {
+	k.hasChanges = true
 	m := k.Etiketten.Elements()
 	m = append(m, ct)
 	k.Etiketten = makeCompiledEtikettSetFromSlice(m)

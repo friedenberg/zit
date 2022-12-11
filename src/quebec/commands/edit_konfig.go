@@ -77,10 +77,7 @@ func (c EditKonfig) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	if err = u.KonfigPtr().Recompile(tt); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	u.KonfigPtr().SetTransacted(tt)
 
 	return
 }

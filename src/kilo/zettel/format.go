@@ -32,7 +32,7 @@ type Format interface {
 }
 
 type FormatToFormat2 struct {
-	format.Format[Objekte]
+	format.Format[Objekte, *Objekte]
 }
 
 func (ftf *FormatToFormat2) ReadFrom(

@@ -2,9 +2,11 @@ package store_objekten
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/etikett"
+	"github.com/friedenberg/zit/src/foxtrot/id"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/golf/age_io"
 	"github.com/friedenberg/zit/src/golf/sku"
@@ -118,6 +120,7 @@ func (s etikettStore) transact(
 	}
 
 	s.common.Transaktion.Add2(&tt.Sku)
+	s.common.KonfigPtr().AddEtikett(tt)
 
 	if mutter == nil {
 		if err = s.EtikettLogWriters.New(tt); err != nil {
@@ -160,7 +163,7 @@ func (s etikettStore) WriteAkte(
 func (s etikettStore) ReadOne(
 	k *kennung.Etikett,
 ) (tt *etikett.Transacted, err error) {
-	tt = s.common.Konfig.GetEtikett(*k)
+	tt = s.common.Konfig().GetEtikett(*k)
 
 	if tt == nil {
 		err = errors.Wrap(ErrNotFound{Id: k})
@@ -238,47 +241,46 @@ func (s etikettStore) AllInChain(k kennung.Etikett) (c []*etikett.Transacted, er
 	return
 }
 
+//TODO-P0
 func (s *etikettStore) reindexOne(
 	t *transaktion.Transaktion,
 	o *sku.Sku,
 ) (err error) {
-	//var tz zettel.Transacted
+	te := &etikett.Transacted{}
 
-	//if tz, err = s.transactedZettelFromTransaktionObjekte(t, o); err != nil {
-	//	//TODO decide on how to handle format errors
-	//	errors.Err().Print(err)
-	//	err = nil
-	//	// err = errors.Wrap(err)
-	//	return
-	//}
+	if err = te.SetTransactionAndObjekte(
+		t,
+		o,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-	//var mutter *zettel.Transacted
+	//TODO-P0 make static
+	hy := objekte.MakeHydrator(
+		s.common,
+		func(sh sha.Sha) (r sha.ReadCloser, err error) {
+			return s.common.ReadCloserObjekten(
+				id.Path(sh, s.common.Standort.DirObjektenEtiketten()),
+			)
+		},
+		gattung.Formatter[etikett.Objekte, *etikett.Objekte](
+			etikett.MakeFormatText(s.common),
+		),
+	)
 
-	//if mutter1, err := s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(tz.Sku.Kennung); err == nil {
-	//	mutter = &mutter1
-	//}
+	if err = hy.Hydrate(te, &te.Objekte); err != nil {
+		errors.Wrap(err)
+		return
+	}
 
-	//if err = s.writeNamedZettelToIndex(tz); err != nil {
-	//	err = errors.Wrap(err)
-	//	return
-	//}
+	s.common.KonfigPtr().AddEtikett(te)
 
-	//if mutter == nil {
-	//	if err = s.zettelTransactedWriter.New(&tz); err != nil {
-	//		err = errors.Wrap(err)
-	//		return
-	//	}
-	//} else {
-	//	if err = s.zettelTransactedWriter.Updated(&tz); err != nil {
-	//		err = errors.Wrap(err)
-	//		return
-	//	}
-	//}
-
-	//if err = s.indexEtiketten.addZettelWithOptionalMutter(&tz, mutter); err != nil {
-	//	err = errors.Wrap(err)
-	//	return
-	//}
+	if te.IsNew() {
+		s.EtikettLogWriters.New(te)
+	} else {
+		s.EtikettLogWriters.Updated(te)
+	}
 
 	return
 }

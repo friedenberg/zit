@@ -145,7 +145,7 @@ func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 	if u.storeObjekten, err = store_objekten.Make(
 		u.lock,
 		*u.age,
-		u.konfig,
+		u.KonfigPtr(),
 		u.standort,
 		u.zettelVerzeichnissePool,
 	); err != nil {
@@ -155,7 +155,7 @@ func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 
 	errors.Log().Print("initing checkout store")
 	if u.storeWorkingDirectory, err = store_fs.New(
-		u.konfig,
+		u.Konfig(),
 		u.standort,
 		u.storeObjekten,
 	); err != nil {

@@ -17,10 +17,18 @@ import (
 type common struct {
 	LockSmith   LockSmith
 	Age         age.Age
-	Konfig      konfig_compiled.Compiled
+	konfig      *konfig_compiled.Compiled
 	Standort    standort.Standort
 	Transaktion transaktion.Transaktion
 	Abbr        *indexAbbr
+}
+
+func (s common) Konfig() konfig_compiled.Compiled {
+	return *s.konfig
+}
+
+func (s common) KonfigPtr() *konfig_compiled.Compiled {
+	return s.konfig
 }
 
 func (s common) ReadCloserObjekten(p string) (sha.ReadCloser, error) {

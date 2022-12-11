@@ -146,15 +146,15 @@ type AkteIOFactoryFactory interface {
 	AkteFactory(Gattung) AkteIOFactory
 }
 
-type FormatReader[T any] interface {
-	ReadFormat(io.Reader, *T) (int64, error)
+type FormatReader[T Element, T1 ElementPtr[T]] interface {
+	ReadFormat(io.Reader, T1) (int64, error)
 }
 
-type FormatWriter[T any] interface {
-	WriteFormat(io.Writer, *T) (int64, error)
+type FormatWriter[T Element, T1 ElementPtr[T]] interface {
+	WriteFormat(io.Writer, T1) (int64, error)
 }
 
-type Formatter[T any] interface {
-	FormatReader[T]
-	FormatWriter[T]
+type Formatter[T Element, T1 ElementPtr[T]] interface {
+	FormatReader[T, T1]
+	FormatWriter[T, T1]
 }

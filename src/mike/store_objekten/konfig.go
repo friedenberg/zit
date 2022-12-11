@@ -2,6 +2,7 @@ package store_objekten
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/id"
@@ -115,12 +116,7 @@ func (s konfigStore) transact(
 
 	s.common.Transaktion.Add2(&kt.Sku)
 
-	if err = s.common.Konfig.Recompile(
-		kt,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	s.common.KonfigPtr().SetTransacted(kt)
 
 	if err = s.common.Abbr.addStored(kt); err != nil {
 		err = errors.Wrap(err)
@@ -160,9 +156,9 @@ func (s konfigStore) WriteAkte(
 
 func (s konfigStore) Read() (tt *konfig.Transacted, err error) {
 	tt = &konfig.Transacted{
-		Sku: s.common.Konfig.Sku,
+		Sku: s.common.Konfig().Sku,
 		Objekte: konfig.Objekte{
-			Akte: s.common.Konfig.Toml,
+			Akte: s.common.Konfig().Toml,
 		},
 	}
 
@@ -242,47 +238,41 @@ func (s konfigStore) AllInChain() (c []*konfig.Transacted, err error) {
 	return
 }
 
+//TODO-P0
 func (s *konfigStore) reindexOne(
 	t *transaktion.Transaktion,
 	o *sku.Sku,
 ) (err error) {
-	//var tz zettel.Transacted
+	te := &konfig.Transacted{}
 
-	//if tz, err = s.transactedZettelFromTransaktionObjekte(t, o); err != nil {
-	//	//TODO decide on how to handle format errors
-	//	errors.Err().Print(err)
-	//	err = nil
-	//	// err = errors.Wrap(err)
-	//	return
-	//}
+	if err = te.SetTransactionAndObjekte(
+		t,
+		o,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-	//var mutter *zettel.Transacted
+	//TODO-P0 make static
+	hy := objekte.MakeHydrator(
+		s.common,
+		func(sh sha.Sha) (r sha.ReadCloser, err error) {
+			return s.common.ReadCloserObjekten(
+				id.Path(sh, s.common.Standort.DirObjektenKonfig()),
+			)
+		},
+		gattung.Formatter[konfig.Objekte, *konfig.Objekte](
+			konfig.MakeFormatText(s.common),
+		),
+	)
 
-	//if mutter1, err := s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(tz.Sku.Kennung); err == nil {
-	//	mutter = &mutter1
-	//}
+	if err = hy.Hydrate(te, &te.Objekte); err != nil {
+		errors.Wrap(err)
+		return
+	}
 
-	//if err = s.writeNamedZettelToIndex(tz); err != nil {
-	//	err = errors.Wrap(err)
-	//	return
-	//}
-
-	//if mutter == nil {
-	//	if err = s.zettelTransactedWriter.New(&tz); err != nil {
-	//		err = errors.Wrap(err)
-	//		return
-	//	}
-	//} else {
-	//	if err = s.zettelTransactedWriter.Updated(&tz); err != nil {
-	//		err = errors.Wrap(err)
-	//		return
-	//	}
-	//}
-
-	//if err = s.indexEtiketten.addZettelWithOptionalMutter(&tz, mutter); err != nil {
-	//	err = errors.Wrap(err)
-	//	return
-	//}
+	s.common.KonfigPtr().SetTransacted(te)
+	s.KonfigLogWriters.Updated(te)
 
 	return
 }

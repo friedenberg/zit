@@ -163,12 +163,7 @@ func (c Init) initDefaultTypAndKonfig(u *umwelt.Umwelt) (err error) {
 			return
 		}
 
-		if err = u.KonfigPtr().Recompile(
-			defaultKonfigTransacted,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+		u.KonfigPtr().SetTransacted(defaultKonfigTransacted)
 	}
 
 	return

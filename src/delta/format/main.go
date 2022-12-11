@@ -8,9 +8,10 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 )
 
-type Format[T any] interface {
-	gattung.FormatReader[T]
-	gattung.FormatWriter[T]
+//TODO-P4 remove
+type Format[T gattung.Element, T1 gattung.ElementPtr[T]] interface {
+	gattung.FormatReader[T, T1]
+	gattung.FormatWriter[T, T1]
 }
 
 type FuncReadLine func(string) error

@@ -37,7 +37,7 @@ type Store struct {
 func Make(
 	lockSmith LockSmith,
 	a age.Age,
-	k konfig_compiled.Compiled,
+	k *konfig_compiled.Compiled,
 	st standort.Standort,
 	p *zettel.PoolVerzeichnisse,
 ) (s *Store, err error) {
@@ -45,7 +45,7 @@ func Make(
 		common: common{
 			LockSmith: lockSmith,
 			Age:       a,
-			Konfig:    k,
+			konfig:    k,
 			Standort:  st,
 		},
 	}
@@ -199,7 +199,7 @@ func (s Store) Flush() (err error) {
 		return
 	}
 
-	if s.common.Konfig.DryRun {
+	if s.common.Konfig().DryRun {
 		return
 	}
 
@@ -268,6 +268,8 @@ func (s *Store) Reindex() (err error) {
 	}
 
 	f := func(t *transaktion.Transaktion) (err error) {
+		errors.Out().Printf("%s/%s: %s", t.Time.Kopf(), t.Time.Schwanz(), t.Time)
+
 		if err = t.Each(
 			func(o *sku.Sku) (err error) {
 				switch o.Gattung {
@@ -295,7 +297,12 @@ func (s *Store) Reindex() (err error) {
 						t,
 						o,
 					); err != nil {
-						err = errors.Wrap(err)
+						err = errors.Wrapf(
+							err,
+							"Sku: %s",
+							o,
+						)
+
 						return
 					}
 
@@ -315,7 +322,13 @@ func (s *Store) Reindex() (err error) {
 				return
 			},
 		); err != nil {
-			err = errors.Wrap(err)
+			err = errors.Wrapf(
+				err,
+				"Transaktion: %s/%s: %s",
+				t.Time.Kopf(),
+				t.Time.Schwanz(),
+				t.Time,
+			)
 			return
 		}
 

@@ -15,7 +15,6 @@ import (
 	"github.com/friedenberg/zit/src/golf/fd"
 	"github.com/friedenberg/zit/src/golf/id_set"
 	"github.com/friedenberg/zit/src/golf/sku"
-	"github.com/friedenberg/zit/src/india/konfig"
 	"github.com/friedenberg/zit/src/mike/store_objekten"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 	"github.com/friedenberg/zit/src/papa/user_ops"
@@ -114,9 +113,7 @@ func (c EditEtikett) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 	if err = tes.Each(
 		func(e *etikett.External) (err error) {
-			var tt *etikett.Transacted
-
-			if tt, err = u.StoreObjekten().Etikett().Update(
+			if _, err = u.StoreObjekten().Etikett().Update(
 				&e.Objekte,
 				&e.Sku.Kennung,
 			); err != nil {
@@ -124,25 +121,9 @@ func (c EditEtikett) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 				return
 			}
 
-			u.KonfigPtr().AddEtikett(tt)
-
 			return
 		},
 	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	var kt *konfig.Transacted
-
-	if kt, err = u.StoreObjekten().Konfig().Read(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	k := u.KonfigPtr()
-
-	if err = k.Recompile(kt); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -95,8 +95,11 @@ func (m *Mover) Close() (err error) {
 					Path: m.objektePath,
 				}
 
-				return
+			} else {
+				err = nil
 			}
+
+			return
 		} else {
 			err = errors.Wrap(err)
 			return

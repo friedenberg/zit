@@ -9,6 +9,15 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
+func ReadDir(ps ...string) (dirEntries []os.DirEntry, err error) {
+	if dirEntries, err = os.ReadDir(path.Join(ps...)); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func ReadDirNames(ps ...string) (names []string, err error) {
 	var d *os.File
 
@@ -31,15 +40,15 @@ func ReadDirNamesTo(
 	wf func(string) error,
 	p string,
 ) (err error) {
-	var names []string
+	var names []os.DirEntry
 
-	if names, err = ReadDirNames(p); err != nil {
+	if names, err = ReadDir(p); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	for _, n := range names {
-		if err = wf(path.Join(p, n)); err != nil {
+		if err = wf(path.Join(p, n.Name())); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

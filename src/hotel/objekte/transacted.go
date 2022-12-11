@@ -5,6 +5,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/golf/sku"
+	"github.com/friedenberg/zit/src/golf/transaktion"
 )
 
 type Transacted[
@@ -85,14 +86,36 @@ func (a Transacted[T, T1, T2, T3]) Equals(
 	return true
 }
 
+//TODO-P1 check if necessary
 func (a *Transacted[T, T1, T2, T3]) SetSku(
 	v sku.Transacted[T2, T3],
 ) {
 	a.Sku = v
 }
 
+func (a *Transacted[T, T1, T2, T3]) SetTransactionAndObjekte(
+	t *transaktion.Transaktion,
+	o *sku.Sku,
+) (err error) {
+	var h T2
+
+	if err = T3(&h).Set(o.Id.String()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	a.Sku.Kennung = h
+	a.Sku.Sha = o.Sha
+	a.Sku.TransactionIndex = o.TransactionIndex
+	a.Sku.Kopf = t.Time
+	a.Sku.Schwanz = t.Time
+	a.Sku.Mutter = o.Mutter
+
+	return
+}
+
 func (a Transacted[T, T1, T2, T3]) GetKennungString() string {
-  return a.Sku.Kennung.String()
+	return a.Sku.Kennung.String()
 }
 
 func (a *Transacted[T, T1, T2, T3]) Reset(
