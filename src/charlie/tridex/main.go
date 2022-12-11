@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+//TODO-P4 make generic
 type Tridex struct {
 	root node
 }

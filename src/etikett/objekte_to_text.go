@@ -1,4 +1,4 @@
-package typ
+package etikett
 
 import (
 	"io"

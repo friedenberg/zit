@@ -1,4 +1,4 @@
-package typ
+package etikett
 
 import (
 	"io"
@@ -10,7 +10,7 @@ import (
 )
 
 type FormatText struct {
-	arf             gattung.AkteIOFactory
+	arf gattung.AkteIOFactory
 }
 
 func MakeFormatText(arf gattung.AkteIOFactory) *FormatText {

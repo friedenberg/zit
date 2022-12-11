@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/standort"
+	"github.com/friedenberg/zit/src/etikett"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/india/konfig"
@@ -201,6 +202,17 @@ func (kc compiled) GetTyp(k kennung.Typ) (ct *typ.Transacted) {
 	if len(expandedActual) > 0 {
 		ct = expandedActual[0]
 	}
+
+	return
+}
+
+//TODO-P0
+func (kc compiled) GetEtikett(k kennung.Etikett) (ct *etikett.Transacted) {
+	// expandedActual := kc.GetSortedEtikettenExpanded(k.String())
+
+	// if len(expandedActual) > 0 {
+	// 	ct = expandedActual[0]
+	// }
 
 	return
 }

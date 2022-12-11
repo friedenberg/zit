@@ -28,9 +28,10 @@ type Store struct {
 	shaAbbr
 	hinweisAbbr
 
-	zettelStore *zettelStore
-	typStore    *typStore
-	konfigStore *konfigStore
+	zettelStore  *zettelStore
+	typStore     *typStore
+	etikettStore *etikettStore
+	konfigStore  *konfigStore
 }
 
 func Make(
@@ -86,6 +87,11 @@ func Make(
 		return
 	}
 
+	if s.etikettStore, err = makeEtikettStore(&s.common); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if s.konfigStore, err = makeKonfigStore(&s.common); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -104,6 +110,10 @@ func (s *Store) Zettel() *zettelStore {
 
 func (s *Store) Typ() *typStore {
 	return s.typStore
+}
+
+func (s *Store) Etikett() *etikettStore {
+	return s.etikettStore
 }
 
 func (s *Store) Konfig() *konfigStore {
@@ -204,6 +214,11 @@ func (s Store) Flush() (err error) {
 	}
 
 	// if err = s.typStore.Flush(); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
+
+	// if err = s.etikettStore.Flush(); err != nil {
 	// 	err = errors.Wrap(err)
 	// 	return
 	// }

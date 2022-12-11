@@ -9,6 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
 )
 
+//TODO-P1 convert to FormatterValue like src/india/typ/formatter_value.go
 type FormatValue struct {
 	out    io.Writer
 	konfig konfig_compiled.Compiled

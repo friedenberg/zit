@@ -56,8 +56,3 @@ func (a Objekte) Equals(b *Objekte) bool {
 
 	return true
 }
-
-type Akte struct {
-	AddToNewZettels bool `toml:"add-to-new-zettels"`
-	Hide            bool `toml:"hide"`
-}
