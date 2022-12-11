@@ -118,6 +118,10 @@ func (s Standort) DirObjektenTypen() string {
 	return s.DirObjekten("Typen")
 }
 
+func (s Standort) DirObjektenEtiketten() string {
+	return s.DirObjekten("Etiketten")
+}
+
 func (s Standort) DirObjektenTransaktion() string {
 	return s.DirObjekten("Transaktion")
 }

@@ -190,6 +190,14 @@ func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 		},
 	)
 
+	u.storeObjekten.Etikett().SetEtikettLogWriters(
+		store_objekten.EtikettLogWriters{
+			New:       u.PrinterEtikettTransacted(format.StringUpdated),
+			Updated:   u.PrinterEtikettTransacted(format.StringUpdated),
+			Unchanged: u.PrinterEtikettTransacted(format.StringUnchanged),
+		},
+	)
+
 	u.storeWorkingDirectory.SetZettelCheckedOutWriters(
 		store_fs.ZettelCheckedOutLogWriters{
 			ZettelOnly: u.PrinterZettelCheckedOutFresh(zettel_checked_out.ModeZettelOnly),

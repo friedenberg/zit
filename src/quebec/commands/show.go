@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/sha"
+	"github.com/friedenberg/zit/src/etikett"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/ts"
@@ -128,6 +129,23 @@ func (c Show) RunWithIds(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 		}
 
 		return c.showTypen(
+			store,
+			ids,
+			ev.FuncFormatter(
+				store.Out(),
+				store.StoreObjekten(),
+			),
+		)
+
+	case gattung.Etikett:
+		var ev etikett.FormatterValue
+
+		if err = ev.Set(c.Format); err != nil {
+			err = errors.Normal(err)
+			return
+		}
+
+		return c.showEtiketten(
 			store,
 			ids,
 			ev.FuncFormatter(
@@ -265,6 +283,39 @@ func (c Show) showTypen(
 		collections.MakeChain(
 			func(t *kennung.Typ) (err error) {
 				ty := u.Konfig().GetTyp(*t)
+
+				if ty == nil {
+					return
+				}
+
+				if err = f1(ty); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				return
+			},
+		),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (c Show) showEtiketten(
+	u *umwelt.Umwelt,
+	ids id_set.Set,
+	f collections.WriterFunc[*etikett.Transacted],
+) (err error) {
+	f1 := collections.MakeSyncSerializer(f)
+
+	etiketten := ids.Etiketten().MutableCopy()
+	if err = etiketten.EachPtr(
+		collections.MakeChain(
+			func(t *kennung.Etikett) (err error) {
+				ty := u.Konfig().GetEtikett(*t)
 
 				if ty == nil {
 					return

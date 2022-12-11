@@ -3,6 +3,7 @@ package umwelt
 import (
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/delta/format"
+	"github.com/friedenberg/zit/src/etikett"
 	"github.com/friedenberg/zit/src/golf/fd"
 	"github.com/friedenberg/zit/src/india/konfig"
 	"github.com/friedenberg/zit/src/india/typ"
@@ -30,6 +31,15 @@ func (u *Umwelt) PrinterTypTransacted(
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
 		u.FormatTypTransacted(verb),
+	)
+}
+
+func (u *Umwelt) PrinterEtikettTransacted(
+	verb string,
+) collections.WriterFunc[*etikett.Transacted] {
+	return format.MakeWriterToWithNewLines(
+		u.Out(),
+		u.FormatEtikettTransacted(verb),
 	)
 }
 

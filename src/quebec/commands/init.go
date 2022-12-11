@@ -48,6 +48,7 @@ func (c Init) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	c.mkdirAll(s.DirObjektenKonfig())
 	c.mkdirAll(s.DirObjektenTransaktion())
 	c.mkdirAll(s.DirObjektenTypen())
+	c.mkdirAll(s.DirObjektenEtiketten())
 	c.mkdirAll(s.DirObjektenZettelen())
 	c.mkdirAll(s.DirVerzeichnisse())
 

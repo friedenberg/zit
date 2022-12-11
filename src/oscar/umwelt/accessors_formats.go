@@ -4,6 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/echo/sha"
+	"github.com/friedenberg/zit/src/etikett"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/golf/fd"
@@ -52,6 +53,10 @@ func (u *Umwelt) FormatTyp() format.FormatWriterFunc[kennung.Typ] {
 	return typ.MakeCliFormat(u.FormatColorWriter())
 }
 
+func (u *Umwelt) FormatEtikett() format.FormatWriterFunc[kennung.Etikett] {
+	return etikett.MakeCliFormat(u.FormatColorWriter())
+}
+
 func (u *Umwelt) FormatTypTransacted(
 	verb string,
 ) format.FormatWriterFunc[typ.Transacted] {
@@ -60,6 +65,18 @@ func (u *Umwelt) FormatTypTransacted(
 		u.FormatColorWriter(),
 		u.FormatSha(),
 		u.FormatTyp(),
+		verb,
+	)
+}
+
+func (u *Umwelt) FormatEtikettTransacted(
+	verb string,
+) format.FormatWriterFunc[etikett.Transacted] {
+	return etikett.MakeCliFormatTransacted(
+		u.Standort(),
+		u.FormatColorWriter(),
+		u.FormatSha(),
+		u.FormatEtikett(),
 		verb,
 	)
 }

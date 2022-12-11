@@ -10,7 +10,8 @@ import (
 )
 
 func init() {
-	gob.Register(makeCompiledTypSet(nil))
+	gob.RegisterName("typSet", makeCompiledTypSet(nil))
+	gob.RegisterName("etikettSet", makeCompiledEtikettSet(nil))
 }
 
 type set[E gattung.Transacted[E], EPtr gattung.TransactedPtr[E]] struct {

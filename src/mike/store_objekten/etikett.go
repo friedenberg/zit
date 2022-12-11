@@ -87,7 +87,7 @@ func (s etikettStore) transact(
 
 	mo := age_io.MoveOptions{
 		Age:                      s.common.Age,
-		FinalPath:                s.common.Standort.DirObjektenTypen(),
+		FinalPath:                s.common.Standort.DirObjektenEtiketten(),
 		GenerateFinalPathFromSha: true,
 	}
 

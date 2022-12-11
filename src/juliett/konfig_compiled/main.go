@@ -247,13 +247,12 @@ func (kc compiled) GetTyp(k kennung.Typ) (ct *typ.Transacted) {
 	return
 }
 
-//TODO-P0
 func (kc compiled) GetEtikett(k kennung.Etikett) (ct *etikett.Transacted) {
-	// expandedActual := kc.GetSortedEtikettenExpanded(k.String())
+	expandedActual := kc.GetSortedEtikettenExpanded(k.String())
 
-	// if len(expandedActual) > 0 {
-	// 	ct = expandedActual[0]
-	// }
+	if len(expandedActual) > 0 {
+		ct = expandedActual[0]
+	}
 
 	return
 }
