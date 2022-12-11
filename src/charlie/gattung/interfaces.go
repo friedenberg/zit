@@ -108,19 +108,18 @@ type StoredPtr interface {
 //    |_||_|  \__,_|_| |_|___/\__,_|\___|\__\___|\__,_|
 //
 
-
-type Transacted[T any] interface {
+type Transacted[T Element] interface {
 	Equatable[T]
-  Stored
+	Stored
 
-  GetObjekte()
-  GetSku()
+	GetKennungString() string
 }
 
 type TransactedPtr[T Element] interface {
+	Transacted[T]
 	ElementPtr[T]
 	Resetable[T]
-  StoredPtr
+	StoredPtr
 }
 
 //      _    _    _       ___ ___

@@ -91,9 +91,8 @@ func (a *Transacted[T, T1, T2, T3]) SetSku(
 	a.Sku = v
 }
 
-func (a Transacted[T, T1, T2, T3]) GetSku() (v sku.Transacted[T2, T3]) {
-	v = a.Sku
-  return
+func (a Transacted[T, T1, T2, T3]) GetKennungString() string {
+  return a.Sku.Kennung.String()
 }
 
 func (a *Transacted[T, T1, T2, T3]) Reset(

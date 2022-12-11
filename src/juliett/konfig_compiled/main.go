@@ -44,10 +44,10 @@ type compiled struct {
 
 	konfig.Toml
 
-	//TODO
 	//Etiketten
 	EtikettenHidden     []string
 	EtikettenToAddToNew []string
+	Etiketten           etikettSet
 
 	//Typen
 	ExtensionsToTypen map[string]string
@@ -102,14 +102,26 @@ func (kc *compiled) Recompile(
 	kc.Sku = kt.Sku
 	kc.Toml = kt.Objekte.Akte
 
-	for tn, tv := range kt.Objekte.Akte.Tags {
-		switch {
-		case tv.Hide:
-			kc.EtikettenHidden = append(kc.EtikettenHidden, tn)
+	if err = kc.Etiketten.Each(
+		func(ct *etikett.Transacted) (err error) {
+			tn := ct.Sku.Kennung.String()
+			tv := ct.Objekte.Akte
 
-		case tv.AddToNewZettels:
-			kc.EtikettenToAddToNew = append(kc.EtikettenToAddToNew, tn)
-		}
+			switch {
+			case tv.Hide:
+				kc.EtikettenHidden = append(kc.EtikettenHidden, tn)
+
+			case tv.AddToNewZettels:
+				kc.EtikettenToAddToNew = append(kc.EtikettenToAddToNew, tn)
+			}
+
+			kc.applyExpandedEtikett(ct)
+
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	sort.Slice(kc.EtikettenHidden, func(i, j int) bool {
@@ -166,6 +178,11 @@ func (kc *compiled) Flush(s standort.Standort) (err error) {
 	return
 }
 
+func (c compiled) GetZettelFileExtension() string {
+	return fmt.Sprintf(".%s", c.FileExtensions.Zettel)
+}
+
+//TODO-P3 merge all the below
 func (c compiled) GetSortedTypenExpanded(v string) (expandedActual []*typ.Transacted) {
 	expandedMaybe := collections.MakeMutableValueSet[collections.StringValue, *collections.StringValue]()
 	typExpander.Expand(expandedMaybe, v)
@@ -192,8 +209,32 @@ func (c compiled) GetSortedTypenExpanded(v string) (expandedActual []*typ.Transa
 	return
 }
 
-func (c compiled) GetZettelFileExtension() string {
-	return fmt.Sprintf(".%s", c.FileExtensions.Zettel)
+func (c compiled) GetSortedEtikettenExpanded(
+	v string,
+) (expandedActual []*etikett.Transacted) {
+	expandedMaybe := collections.MakeMutableValueSet[collections.StringValue, *collections.StringValue]()
+	typExpander.Expand(expandedMaybe, v)
+	expandedActual = make([]*etikett.Transacted, 0)
+
+	expandedMaybe.Each(
+		func(v collections.StringValue) (err error) {
+			ct, ok := c.Etiketten.Get(v.String())
+
+			if !ok {
+				return
+			}
+
+			expandedActual = append(expandedActual, ct)
+
+			return
+		},
+	)
+
+	sort.Slice(expandedActual, func(i, j int) bool {
+		return expandedActual[i].Sku.Kennung.Len() > expandedActual[j].Sku.Kennung.Len()
+	})
+
+	return
 }
 
 func (kc compiled) GetTyp(k kennung.Typ) (ct *typ.Transacted) {
@@ -227,8 +268,26 @@ func (k *compiled) AddTyp(
 	return
 }
 
+func (k *compiled) AddEtikett(
+	ct *etikett.Transacted,
+) {
+	m := k.Etiketten.Elements()
+	m = append(m, ct)
+	k.Etiketten = makeCompiledEtikettSetFromSlice(m)
+
+	return
+}
+
 func (c *compiled) applyExpandedTyp(ct *typ.Transacted) {
 	expandedActual := c.GetSortedTypenExpanded(ct.Sku.Kennung.String())
+
+	for _, ex := range expandedActual {
+		ct.Objekte.Akte.Merge(&ex.Objekte.Akte)
+	}
+}
+
+func (c *compiled) applyExpandedEtikett(ct *etikett.Transacted) {
+	expandedActual := c.GetSortedEtikettenExpanded(ct.Sku.Kennung.String())
 
 	for _, ex := range expandedActual {
 		ct.Objekte.Akte.Merge(&ex.Objekte.Akte)

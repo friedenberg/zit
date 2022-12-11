@@ -7,6 +7,7 @@ func Default() (k *Objekte) {
 				Typ:      "typ",
 				Zettel:   "zettel",
 				Organize: "md",
+				Etikett:  "etikett",
 			},
 		},
 	}
