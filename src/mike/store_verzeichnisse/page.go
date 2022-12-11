@@ -17,7 +17,7 @@ type Page struct {
 	sync.Locker
 	pageId
 	ioFactory
-	pool        zettel_verzeichnisse.Pool
+	pool        *zettel_verzeichnisse.Pool
 	added       []*zettel_verzeichnisse.Zettel
 	flushFilter collections.WriterFunc[*zettel_verzeichnisse.Zettel]
 	State
@@ -26,7 +26,7 @@ type Page struct {
 func makeZettelenPage(
 	iof ioFactory,
 	pid pageId,
-	pool zettel_verzeichnisse.Pool,
+	pool *zettel_verzeichnisse.Pool,
 	fff ZettelVerzeichnisseWriterGetter,
 ) (p *Page) {
 	flushFilter := collections.MakeWriterNoop[*zettel_verzeichnisse.Zettel]()

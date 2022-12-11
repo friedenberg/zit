@@ -9,6 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/charlie/file_lock"
+	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/echo/standort"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
@@ -38,7 +39,7 @@ type Umwelt struct {
 	age                   *age.Age
 	storeWorkingDirectory *store_fs.Store
 
-	zettelVerzeichnissePool zettel_verzeichnisse.Pool
+	zettelVerzeichnissePool *zettel_verzeichnisse.Pool
 }
 
 func Make(kCli konfig.Cli) (u *Umwelt, err error) {
@@ -46,7 +47,7 @@ func Make(kCli konfig.Cli) (u *Umwelt, err error) {
 		in:                      os.Stdin,
 		out:                     os.Stdout,
 		err:                     os.Stderr,
-		zettelVerzeichnissePool: zettel_verzeichnisse.MakePool(),
+		zettelVerzeichnissePool: collections.MakePool[zettel_verzeichnisse.Zettel](),
 	}
 
 	if files.IsTty(u.in) {

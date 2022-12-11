@@ -1,40 +1,38 @@
 package zettel_verzeichnisse
 
 import (
-	"io"
-
 	"github.com/friedenberg/zit/src/delta/collections"
-	"github.com/friedenberg/zit/src/foxtrot/kennung"
-	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 
-type Pool struct {
-	*collections.Pool[Zettel]
-}
+type Pool = collections.Pool[Zettel]
 
-func MakePool() Pool {
-	return Pool{
-		Pool: collections.MakePool[Zettel](),
-	}
-}
+// type Pool struct {
+// 	*collections.Pool[Zettel]
+// }
 
-func (ip Pool) WriteZettelVerzeichnisse(z *Zettel) (err error) {
-	if z == nil {
-		err = io.EOF
-		return
-	}
+// func MakePool() Pool {
+// 	return Pool{
+// 		Pool: collections.MakePool[Zettel](),
+// 	}
+// }
 
-	ip.Put(z)
-	return
-}
+// func (ip Pool) WriteZettelVerzeichnisse(z *Zettel) (err error) {
+// 	if z == nil {
+// 		err = io.EOF
+// 		return
+// 	}
 
-func (p Pool) MakeZettel(
-	tz zettel.Transacted,
-) (z *Zettel) {
-	z = p.Get()
-	z.Transacted = tz
-	z.EtikettenExpandedSorted = kennung.Expanded(tz.Objekte.Etiketten).SortedString()
-	z.EtikettenSorted = tz.Objekte.Etiketten.SortedString()
+// 	ip.Put(z)
+// 	return
+// }
 
-	return
-}
+// func (p Pool) MakeZettel(
+// 	tz zettel.Transacted,
+// ) (z *Zettel) {
+// 	z = p.Get()
+// 	z.Transacted = tz
+// 	z.EtikettenExpandedSorted = kennung.Expanded(tz.Objekte.Etiketten).SortedString()
+// 	z.EtikettenSorted = tz.Objekte.Etiketten.SortedString()
+
+// 	return
+// }

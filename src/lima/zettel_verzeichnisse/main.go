@@ -1,6 +1,7 @@
 package zettel_verzeichnisse
 
 import (
+	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 
@@ -11,13 +12,24 @@ type Zettel struct {
 	EtikettenSorted         []string
 }
 
+func (z *Zettel) ResetWithTransacted(z1 *zettel.Transacted) {
+	if z1 != nil {
+		z.Transacted.Reset(z1)
+		z.EtikettenExpandedSorted = kennung.Expanded(z1.Objekte.Etiketten).SortedString()
+		z.EtikettenSorted = z1.Objekte.Etiketten.SortedString()
+	} else {
+		z.Transacted.Reset(nil)
+		z.EtikettenExpandedSorted = []string{}
+		z.EtikettenSorted = []string{}
+	}
+}
+
 func (z *Zettel) Reset(z1 *Zettel) {
-	z.Transacted.Reset(nil)
 	z.EtikettenExpandedSorted = z.EtikettenExpandedSorted[:0]
 	z.EtikettenSorted = z.EtikettenSorted[:0]
 
 	if z1 != nil {
-		z.Transacted = z1.Transacted
+		z.Transacted.Reset(&z1.Transacted)
 
 		z.EtikettenExpandedSorted = append(
 			z.EtikettenExpandedSorted,
@@ -28,5 +40,7 @@ func (z *Zettel) Reset(z1 *Zettel) {
 			z.EtikettenSorted,
 			z1.EtikettenSorted...,
 		)
+	} else {
+		z.Transacted.Reset(nil)
 	}
 }

@@ -27,8 +27,7 @@ func (ip Pool[T]) Get() *T {
 }
 
 func (ip Pool[T]) Put(i *T) (err error) {
-	// errors.Err().Print("tried to put")
-	// return
+  //TODO-P3 determine what the right behavior should be
 	if i == nil {
 		panic("tried to pool nil")
 	}

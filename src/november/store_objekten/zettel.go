@@ -33,12 +33,12 @@ type zettelStore struct {
 	verzeichnisseSchwanzen *verzeichnisseSchwanzen
 	verzeichnisseAll       *store_verzeichnisse.Zettelen
 
-	pool zettel_verzeichnisse.Pool
+	pool *zettel_verzeichnisse.Pool
 }
 
 func makeZettelStore(
 	sa *common,
-	p zettel_verzeichnisse.Pool,
+	p *zettel_verzeichnisse.Pool,
 ) (s *zettelStore, err error) {
 	s = &zettelStore{
 		common:      sa,
