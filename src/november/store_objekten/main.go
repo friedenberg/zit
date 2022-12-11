@@ -39,7 +39,7 @@ func Make(
 	a age.Age,
 	k konfig_compiled.Compiled,
 	st standort.Standort,
-	p *zettel_verzeichnisse.Pool,
+	p *zettel_verzeichnisse.PoolVerzeichnisse,
 ) (s *Store, err error) {
 	s = &Store{
 		common: common{

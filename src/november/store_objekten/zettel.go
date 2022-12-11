@@ -33,12 +33,12 @@ type zettelStore struct {
 	verzeichnisseSchwanzen *verzeichnisseSchwanzen
 	verzeichnisseAll       *store_verzeichnisse.Zettelen
 
-	pool *zettel_verzeichnisse.Pool
+	pool *zettel_verzeichnisse.PoolVerzeichnisse
 }
 
 func makeZettelStore(
 	sa *common,
-	p *zettel_verzeichnisse.Pool,
+	p *zettel_verzeichnisse.PoolVerzeichnisse,
 ) (s *zettelStore, err error) {
 	s = &zettelStore{
 		common:      sa,
@@ -212,7 +212,7 @@ func (s zettelStore) ReadHinweisSchwanzen(
 }
 
 func (i *zettelStore) ReadAllSchwanzenVerzeichnisse(
-	ws ...collections.WriterFunc[*zettel_verzeichnisse.Zettel],
+	ws ...collections.WriterFunc[*zettel_verzeichnisse.Verzeichnisse],
 ) (err error) {
 	return i.verzeichnisseSchwanzen.ReadMany(ws...)
 }
@@ -228,7 +228,7 @@ func (s zettelStore) ReadAllSchwanzenTransacted(
 }
 
 func (i *zettelStore) ReadAllVerzeichnisse(
-	ws ...collections.WriterFunc[*zettel_verzeichnisse.Zettel],
+	ws ...collections.WriterFunc[*zettel_verzeichnisse.Verzeichnisse],
 ) (err error) {
 	return i.verzeichnisseAll.ReadMany(ws...)
 }
@@ -459,7 +459,7 @@ func (s zettelStore) AllInChain(h hinweis.Hinweis) (c []*zettel.Transacted, err 
 	mst := zettel.MakeMutableSetUnique(0)
 
 	if err = s.verzeichnisseAll.ReadMany(
-		func(z *zettel_verzeichnisse.Zettel) (err error) {
+		func(z *zettel_verzeichnisse.Verzeichnisse) (err error) {
 			if !z.Transacted.Sku.Kennung.Equals(&h) {
 				err = io.EOF
 				return

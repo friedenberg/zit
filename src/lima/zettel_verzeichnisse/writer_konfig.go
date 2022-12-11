@@ -10,12 +10,12 @@ import (
 )
 
 // TODO add efficient parsing of hiding tags
-func MakeWriterKonfig(k konfig_compiled.Compiled) collections.WriterFunc[*Zettel] {
+func MakeWriterKonfig(k konfig_compiled.Compiled) collections.WriterFunc[*Verzeichnisse] {
 	if k.IncludeHidden {
-		return collections.MakeWriterNoop[*Zettel]()
+		return collections.MakeWriterNoop[*Verzeichnisse]()
 	}
 
-	return func(z *Zettel) (err error) {
+	return func(z *Verzeichnisse) (err error) {
 		for _, p := range z.EtikettenSorted {
 			for _, t := range k.EtikettenHidden {
 				if strings.HasPrefix(p, t) {

@@ -17,7 +17,7 @@ type writeCloserFactory interface {
 }
 
 type ZettelVerzeichnisseWriterGetter interface {
-	ZettelVerzeichnisseWriter(int) collections.WriterFunc[*zettel_verzeichnisse.Zettel]
+	ZettelVerzeichnisseWriter(int) collections.WriterFunc[*zettel_verzeichnisse.Verzeichnisse]
 }
 
 type PageHeader interface {

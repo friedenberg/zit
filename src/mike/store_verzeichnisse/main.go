@@ -18,7 +18,7 @@ const PageCount = 1 << (DigitWidth * 4)
 type Zettelen struct {
 	konfig konfig_compiled.Compiled
 	path   string
-	pool   *zettel_verzeichnisse.Pool
+	pool   *zettel_verzeichnisse.PoolVerzeichnisse
 	ioFactory
 	pages [PageCount]*Page
 }
@@ -32,7 +32,7 @@ func MakeZettelen(
 	k konfig_compiled.Compiled,
 	dir string,
 	f ioFactory,
-	p *zettel_verzeichnisse.Pool,
+	p *zettel_verzeichnisse.PoolVerzeichnisse,
 	fff ZettelVerzeichnisseWriterGetter,
 ) (i *Zettelen, err error) {
 	i = &Zettelen{
@@ -54,7 +54,7 @@ func MakeZettelen(
 	return
 }
 
-func (i Zettelen) Pool() *zettel_verzeichnisse.Pool {
+func (i Zettelen) Pool() *zettel_verzeichnisse.PoolVerzeichnisse {
 	return i.pool
 }
 
@@ -92,7 +92,7 @@ func (i *Zettelen) Flush() (err error) {
 	return
 }
 
-//TODO-P2 switch to pointer
+// TODO-P2 switch to pointer
 func (i *Zettelen) Add(tz zettel.Transacted, v string) (err error) {
 	var n int
 
@@ -129,7 +129,7 @@ func (i *Zettelen) GetPageIndexKeyValue(
 
 func (i *Zettelen) ReadMany(
 	//TODO switch to single writer and force callers to make chains
-	ws ...collections.WriterFunc[*zettel_verzeichnisse.Zettel],
+	ws ...collections.WriterFunc[*zettel_verzeichnisse.Verzeichnisse],
 ) (err error) {
 	wg := &sync.WaitGroup{}
 	ch := make(chan struct{}, PageCount)
@@ -146,7 +146,7 @@ func (i *Zettelen) ReadMany(
 		}
 	}
 
-	w := collections.MakePooledChain[zettel_verzeichnisse.Zettel](
+	w := collections.MakePooledChain[zettel_verzeichnisse.Verzeichnisse](
 		i.pool,
 		ws...,
 	)

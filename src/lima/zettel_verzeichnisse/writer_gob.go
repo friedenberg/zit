@@ -15,6 +15,6 @@ func MakeWriterGobEncoder(w io.Writer) writerGobEncoder {
 	}
 }
 
-func (w writerGobEncoder) WriteZettelVerzeichnisse(z *Zettel) (err error) {
+func (w writerGobEncoder) WriteZettelVerzeichnisse(z *Verzeichnisse) (err error) {
 	return w.enc.Encode(z)
 }

@@ -19,7 +19,7 @@ type verzeichnisseSchwanzen struct {
 
 func makeVerzeichnisseSchwanzen(
 	sa *common,
-	p *zettel_verzeichnisse.Pool,
+	p *zettel_verzeichnisse.PoolVerzeichnisse,
 ) (s *verzeichnisseSchwanzen, err error) {
 	s = &verzeichnisseSchwanzen{
 		common: sa,
@@ -50,10 +50,10 @@ func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 		return
 	}
 
-	var found *zettel_verzeichnisse.Zettel
+	var found *zettel_verzeichnisse.Verzeichnisse
 	pool := s.Zettelen.Pool()
 
-	w := func(zv *zettel_verzeichnisse.Zettel) (err error) {
+	w := func(zv *zettel_verzeichnisse.Verzeichnisse) (err error) {
 		if !zv.Transacted.Sku.Kennung.Equals(&h) {
 			pool.Put(zv)
 			return
@@ -91,6 +91,6 @@ func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 
 func (s *verzeichnisseSchwanzen) ZettelVerzeichnisseWriter(
 	n int,
-) collections.WriterFunc[*zettel_verzeichnisse.Zettel] {
+) collections.WriterFunc[*zettel_verzeichnisse.Verzeichnisse] {
 	return s.headers[n].WriteZettelVerzeichnisse
 }

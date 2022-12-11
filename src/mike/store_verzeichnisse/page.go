@@ -17,19 +17,19 @@ type Page struct {
 	sync.Locker
 	pageId
 	ioFactory
-	pool        *zettel_verzeichnisse.Pool
-	added       []*zettel_verzeichnisse.Zettel
-	flushFilter collections.WriterFunc[*zettel_verzeichnisse.Zettel]
+	pool        *zettel_verzeichnisse.PoolVerzeichnisse
+	added       []*zettel_verzeichnisse.Verzeichnisse
+	flushFilter collections.WriterFunc[*zettel_verzeichnisse.Verzeichnisse]
 	State
 }
 
 func makeZettelenPage(
 	iof ioFactory,
 	pid pageId,
-	pool *zettel_verzeichnisse.Pool,
+	pool *zettel_verzeichnisse.PoolVerzeichnisse,
 	fff ZettelVerzeichnisseWriterGetter,
 ) (p *Page) {
-	flushFilter := collections.MakeWriterNoop[*zettel_verzeichnisse.Zettel]()
+	flushFilter := collections.MakeWriterNoop[*zettel_verzeichnisse.Verzeichnisse]()
 
 	if fff != nil {
 		flushFilter = fff.ZettelVerzeichnisseWriter(pid.index)
@@ -40,7 +40,7 @@ func makeZettelenPage(
 		ioFactory:   iof,
 		pageId:      pid,
 		pool:        pool,
-		added:       make([]*zettel_verzeichnisse.Zettel, 0),
+		added:       make([]*zettel_verzeichnisse.Verzeichnisse, 0),
 		flushFilter: flushFilter,
 	}
 
@@ -59,7 +59,7 @@ func (zp *Page) setState(v State) {
 	zp.State = v
 }
 
-func (zp *Page) Add(z *zettel_verzeichnisse.Zettel) (err error) {
+func (zp *Page) Add(z *zettel_verzeichnisse.Verzeichnisse) (err error) {
 	if z == nil {
 		err = errors.Errorf("trying to add nil zettel_verzeichnisse.Zettel")
 		return
@@ -125,7 +125,7 @@ func (zp *Page) Flush() (err error) {
 }
 
 func (zp *Page) WriteZettelenTo(
-	w collections.WriterFunc[*zettel_verzeichnisse.Zettel],
+	w collections.WriterFunc[*zettel_verzeichnisse.Verzeichnisse],
 ) (err error) {
 	var r io.ReadCloser
 
@@ -205,14 +205,14 @@ func (zp *Page) ReadJustHeader() (err error) {
 
 func (zp *Page) Copy(
 	r1 io.Reader,
-	w collections.WriterFunc[*zettel_verzeichnisse.Zettel],
+	w collections.WriterFunc[*zettel_verzeichnisse.Verzeichnisse],
 ) (n int64, err error) {
 	r := bufio.NewReader(r1)
 
 	dec := gob.NewDecoder(r)
 
 	for {
-		var tz *zettel_verzeichnisse.Zettel
+		var tz *zettel_verzeichnisse.Verzeichnisse
 
 		tz = zp.pool.Get()
 

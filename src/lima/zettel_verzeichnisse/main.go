@@ -5,14 +5,14 @@ import (
 	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 
-type Zettel struct {
+type Verzeichnisse struct {
 	Transacted zettel.Transacted
 	// Etiketten               tridex.Tridex
 	EtikettenExpandedSorted []string
 	EtikettenSorted         []string
 }
 
-func (z *Zettel) ResetWithTransacted(z1 *zettel.Transacted) {
+func (z *Verzeichnisse) ResetWithTransacted(z1 *zettel.Transacted) {
 	if z1 != nil {
 		z.Transacted.Reset(z1)
 		z.EtikettenExpandedSorted = kennung.Expanded(z1.Objekte.Etiketten).SortedString()
@@ -24,7 +24,7 @@ func (z *Zettel) ResetWithTransacted(z1 *zettel.Transacted) {
 	}
 }
 
-func (z *Zettel) Reset(z1 *Zettel) {
+func (z *Verzeichnisse) Reset(z1 *Verzeichnisse) {
 	z.EtikettenExpandedSorted = z.EtikettenExpandedSorted[:0]
 	z.EtikettenSorted = z.EtikettenSorted[:0]
 

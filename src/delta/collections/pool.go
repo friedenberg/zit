@@ -27,7 +27,7 @@ func (ip Pool[T]) Get() *T {
 }
 
 func (ip Pool[T]) Put(i *T) (err error) {
-  //TODO-P3 determine what the right behavior should be
+	//TODO-P3 determine what the right behavior should be
 	if i == nil {
 		panic("tried to pool nil")
 	}

@@ -39,7 +39,7 @@ type Umwelt struct {
 	age                   *age.Age
 	storeWorkingDirectory *store_fs.Store
 
-	zettelVerzeichnissePool *zettel_verzeichnisse.Pool
+	zettelVerzeichnissePool *zettel_verzeichnisse.PoolVerzeichnisse
 }
 
 func Make(kCli konfig.Cli) (u *Umwelt, err error) {
@@ -47,7 +47,7 @@ func Make(kCli konfig.Cli) (u *Umwelt, err error) {
 		in:                      os.Stdin,
 		out:                     os.Stdout,
 		err:                     os.Stderr,
-		zettelVerzeichnissePool: collections.MakePool[zettel_verzeichnisse.Zettel](),
+		zettelVerzeichnissePool: collections.MakePool[zettel_verzeichnisse.Verzeichnisse](),
 	}
 
 	if files.IsTty(u.in) {
