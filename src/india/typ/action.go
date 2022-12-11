@@ -3,8 +3,9 @@ package typ
 import "github.com/friedenberg/zit/src/bravo/script_config"
 
 type Action struct {
-	ScriptConfig script_config.ScriptConfig
-	Description  string `toml:"description"`
+	Description string `toml:"description"`
+  //Must be embedded for toml formatting purposes
+	script_config.ScriptConfig
 }
 
 func (a *Action) Equals(b *Action) bool {

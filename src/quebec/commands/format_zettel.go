@@ -58,7 +58,6 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	if typKonfig != nil {
 		if f, ok := typKonfig.Objekte.Akte.Actions["format"]; ok {
 			formatter = f.ScriptConfig
-			errors.Err().PrintDebug(formatter)
 		}
 	}
 
