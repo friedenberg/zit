@@ -132,8 +132,7 @@ func (c CatObjekte) zettelen(u *umwelt.Umwelt, shas sha.Set) (err error) {
 	return
 }
 
-// TODO
 func (c CatObjekte) typen(u *umwelt.Umwelt, shas sha.Set) (err error) {
-	err = errors.Normalf("not implemented")
+	err = errors.Normalf("TODO-P3 not implemented")
 	return
 }

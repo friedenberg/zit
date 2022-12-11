@@ -160,6 +160,9 @@ func (s konfigStore) WriteAkte(
 func (s konfigStore) Read() (tt *konfig.Transacted, err error) {
 	tt = &konfig.Transacted{
 		Sku: s.common.Konfig.Sku,
+		Objekte: konfig.Objekte{
+			Akte: s.common.Konfig.Toml,
+		},
 	}
 
 	if !tt.Sku.Schwanz.IsEmpty() {
@@ -169,7 +172,12 @@ func (s konfigStore) Read() (tt *konfig.Transacted, err error) {
 			if r, err = s.common.ReadCloserObjekten(
 				id.Path(tt.Sku.Sha, s.common.Standort.DirObjektenKonfig()),
 			); err != nil {
-				err = errors.Wrap(err)
+				if errors.IsNotExist(err) {
+					err = nil
+				} else {
+					err = errors.Wrap(err)
+				}
+
 				return
 			}
 

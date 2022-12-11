@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/ts"
 	"github.com/friedenberg/zit/src/golf/id_set"
+	"github.com/friedenberg/zit/src/india/typ"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/papa/umwelt"
 )
@@ -66,7 +67,7 @@ func (c commandWithIds) Complete(u *umwelt.Umwelt, args ...string) (err error) {
 	if ps.Contains(&hinweis.Hinweis{}) {
 		func() {
 			zw := zettel.MakeWriterComplete(os.Stdout)
-			defer zw.Close()
+			defer errors.Deferred(&err, zw.Close)
 
 			w := zw.WriteZettelTransacted
 
@@ -96,6 +97,30 @@ func (c commandWithIds) Complete(u *umwelt.Umwelt, args ...string) (err error) {
 
 				return
 			}
+		}
+
+		return
+	}
+
+	if ps.Contains(&kennung.Typ{}) {
+		if err = u.Konfig().Typen.Each(
+			func(tt *typ.Transacted) (err error) {
+				if err = errors.Out().Printf("%s\tTyp", tt.Sku.Kennung); err != nil {
+					err = errors.IsAsNilOrWrapf(
+						err,
+						syscall.EPIPE,
+						"Typ: %s",
+						tt.Sku.Kennung,
+					)
+
+					return
+				}
+
+				return
+			},
+		); err != nil {
+			err = errors.Wrap(err)
+			return
 		}
 
 		return

@@ -2,6 +2,7 @@ package commands
 
 import (
 	"flag"
+	"fmt"
 	"os"
 	"path"
 
@@ -15,11 +16,13 @@ import (
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/india/konfig"
 	"github.com/friedenberg/zit/src/india/typ"
+	"github.com/friedenberg/zit/src/november/store_objekten"
 	"github.com/friedenberg/zit/src/papa/umwelt"
 	"github.com/friedenberg/zit/src/quebec/user_ops"
 )
 
 type EditTyp struct {
+	All bool
 }
 
 func init() {
@@ -27,6 +30,8 @@ func init() {
 		"edit-typ",
 		func(f *flag.FlagSet) Command {
 			c := &EditTyp{}
+
+			f.BoolVar(&c.All, "all", false, "edit all Typen")
 
 			return commandWithIds{CommandWithIds: c}
 		},
@@ -44,9 +49,33 @@ func (c EditTyp) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 }
 
 func (c EditTyp) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
+	tks := ids.Typen()
+
+	switch {
+	case tks.Len() == 0 && !c.All:
+		err = errors.Normalf("No Typen specified for editing. To edit all, use -all.")
+		return
+
+	case c.All && tks.Len() > 0:
+		errors.Err().Print("Ignoring arguments because -all is set.")
+
+		fallthrough
+
+	case c.All:
+		mtks := collections.MakeMutableValueSet[kennung.Typ, *kennung.Typ]()
+
+		u.Konfig().Typen.Each(
+			func(tt *typ.Transacted) (err error) {
+				return mtks.Add(tt.Sku.Kennung)
+			},
+		)
+
+		tks = mtks.Copy()
+	}
+
 	var ps []string
 
-	if ps, err = c.makeTempTypFiles(u, ids.Typen()); err != nil {
+	if ps, err = c.makeTempTypFiles(u, tks); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -134,21 +163,30 @@ func (c EditTyp) makeTempTypFiles(
 		return
 	}
 
-	tks.Each(
+	format := typ.MakeFormatText(u.StoreObjekten())
+
+	if err = tks.Each(
 		func(tk kennung.Typ) (err error) {
 			var tt *typ.Transacted
 
 			if tt, err = u.StoreObjekten().Typ().ReadOne(&tk); err != nil {
-				err = errors.Wrap(err)
-				return
+				if errors.Is(err, store_objekten.ErrNotFound{}) {
+					err = nil
+					tt = &typ.Transacted{
+						Sku: sku.Transacted[kennung.Typ, *kennung.Typ]{
+							Kennung: tk,
+						},
+					}
+				} else {
+					err = errors.Wrap(err)
+					return
+				}
 			}
-
-			format := typ.MakeFormatText(u.StoreObjekten())
 
 			var f *os.File
 
 			if f, err = files.CreateExclusiveWriteOnly(
-				path.Join(tempDir, tk.String()),
+				path.Join(tempDir, fmt.Sprintf("%s.%s", tk.String(), u.Konfig().FileExtensions.Typ)),
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -165,7 +203,10 @@ func (c EditTyp) makeTempTypFiles(
 
 			return
 		},
-	)
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }

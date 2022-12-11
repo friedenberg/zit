@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 )
 
-// TODO-P3 make generic
+// TODO-P4 make generic
 type SetKeyToEtiketten map[string]kennung.EtikettMutableSet
 
 func (m SetKeyToEtiketten) String() string {
@@ -86,7 +86,7 @@ func (a *assignment) addToCompareMap(m Metadatei, es kennung.EtikettSet, out *Co
 			}
 
 			for _, e := range m.EtikettSet.Elements() {
-				//TODO add typ
+				//TODO-P4 add typ
 				out.Named.Add(z.Hinweis.String(), e)
 			}
 
@@ -101,7 +101,7 @@ func (a *assignment) addToCompareMap(m Metadatei, es kennung.EtikettSet, out *Co
 			}
 
 			for _, e := range m.EtikettSet.Elements() {
-				//TODO add typ
+				//TODO-P4 add typ
 				out.Unnamed.Add(z.Bezeichnung.String(), e)
 			}
 
