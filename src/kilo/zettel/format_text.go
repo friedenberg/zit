@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/metadatei_io"
 )
 
+//TODO-P0 remove entirely and replace with Text2
 type Text struct {
 	DoNotWriteEmptyBezeichnung bool
 	TypError                   error

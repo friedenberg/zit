@@ -108,14 +108,22 @@ func (c Show) RunWithIds(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 		return c.showAkten(store, ids)
 
 	case gattung.Zettel:
-		fv := zettel.MakeFormatValue(store.Out(), store.Konfig())
+		var fv zettel.FormatterValue
 
 		if err = fv.Set(c.Format); err != nil {
 			err = errors.Normal(err)
 			return
 		}
 
-		return c.showZettels(store, ids, fv)
+		return c.showZettels(
+			store,
+			ids,
+			fv.FuncFormatter(
+				store.Out(),
+				store.StoreObjekten(),
+				store.Konfig(),
+			),
+		)
 
 	case gattung.Transaktion:
 		return c.showTransaktions(store, ids)
@@ -179,8 +187,10 @@ func (c Show) RunWithIds(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 func (c Show) showZettels(
 	store *umwelt.Umwelt,
 	ids id_set.Set,
-	fv *zettel.FormatValue,
+	fv collections.WriterFunc[*zettel.Transacted],
 ) (err error) {
+	f1 := collections.MakeSyncSerializer(fv)
+
 	w := collections.MakeChain(
 		zettel.WriterIds{
 			Filter: id_set.Filter{
@@ -188,14 +198,7 @@ func (c Show) showZettels(
 			},
 		}.WriteZettelTransacted,
 		store.StoreWorkingDirectory().ZettelTransactedWriter(
-			zettel.MakeWriterZettel(
-				zettel.MakeSerializedFormatWriter(
-					fv.Format,
-					store.Out(),
-					store.StoreObjekten(),
-					store.Konfig(),
-				),
-			),
+			f1,
 		),
 	)
 
