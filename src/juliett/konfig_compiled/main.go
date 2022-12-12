@@ -268,6 +268,14 @@ func (k *compiled) SetTransacted(
 func (k *compiled) AddTyp(
 	ct *typ.Transacted,
 ) {
+  if ct.Objekte.Akte.Actions == nil {
+    panic(errors.Errorf("actions were nil"))
+  }
+
+  if ct.Objekte.Akte.EtikettenRules == nil {
+    panic(errors.Errorf("etiketten rules were nil"))
+  }
+
 	k.hasChanges = true
 	m := k.Typen.Elements()
 	m = append(m, ct)

@@ -101,7 +101,7 @@ func (c ExecAction) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 			return
 		}
 
-		if err = c.runExecutor(u, executor, tz); err != nil {
+		if err = c.runExecutor(u, &executor, tz); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

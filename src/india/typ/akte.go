@@ -9,7 +9,7 @@ type Akte struct {
 	InlineAkte     bool                         `toml:"inline-akte,omitempty"`
 	FileExtension  string                       `toml:"file-extension,omitempty"`
 	ExecCommand    *script_config.ScriptConfig  `toml:"exec-command,omitempty"`
-	Actions        map[string]*Action           `toml:"actions,omitempty"`
+	Actions        map[string]Action            `toml:"actions,omitempty"`
 	EtikettenRules map[string]etikett_rule.Rule `toml:"etiketten-rules,omitempty"`
 }
 
@@ -48,7 +48,7 @@ func (a *Akte) Equals(b *Akte) bool {
 			return false
 		}
 
-		if !v.Equals(v1) {
+		if !v.Equals(&v1) {
 			return false
 		}
 	}
@@ -114,7 +114,7 @@ func (ct *Akte) Merge(ct2 *Akte) {
 		if !ok {
 			sc = v
 		} else {
-			sc.Merge(v)
+			sc.Merge(&v)
 		}
 
 		ct.Actions[k] = sc

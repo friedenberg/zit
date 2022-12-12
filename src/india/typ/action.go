@@ -4,7 +4,7 @@ import "github.com/friedenberg/zit/src/bravo/script_config"
 
 type Action struct {
 	Description string `toml:"description"`
-  //Must be embedded for toml formatting purposes
+	//Must be embedded for toml formatting purposes
 	script_config.ScriptConfig
 }
 

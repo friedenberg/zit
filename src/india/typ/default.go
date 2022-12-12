@@ -1,6 +1,7 @@
 package typ
 
 import (
+	"github.com/friedenberg/zit/src/alfa/etikett_rule"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 )
 
@@ -10,8 +11,10 @@ func Default() (t *Objekte, k *kennung.Typ) {
 
 	t = &Objekte{
 		Akte: Akte{
-			InlineAkte:    true,
-			FileExtension: "md",
+			InlineAkte:     true,
+			FileExtension:  "md",
+			Actions:        make(map[string]Action),
+			EtikettenRules: make(map[string]etikett_rule.Rule),
 		},
 	}
 

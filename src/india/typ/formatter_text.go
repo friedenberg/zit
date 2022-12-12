@@ -4,13 +4,14 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/etikett_rule"
 	"github.com/friedenberg/zit/src/alfa/toml"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/sha"
 )
 
 type FormatText struct {
-	arf             gattung.AkteIOFactory
+	arf gattung.AkteIOFactory
 }
 
 func MakeFormatText(arf gattung.AkteIOFactory) *FormatText {
@@ -43,6 +44,14 @@ func (f FormatText) ReadFormat(r io.Reader, t *Objekte) (n int64, err error) {
 			if !errors.IsEOF(err) {
 				pr.CloseWithError(err)
 			}
+		}
+
+		if t.Akte.Actions == nil {
+			t.Akte.Actions = make(map[string]Action)
+		}
+
+		if t.Akte.EtikettenRules == nil {
+			t.Akte.EtikettenRules = make(map[string]etikett_rule.Rule)
 		}
 	}()
 

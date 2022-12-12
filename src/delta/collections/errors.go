@@ -1,5 +1,17 @@
 package collections
 
+type ErrNilPointer struct {
+}
+
+func (e ErrNilPointer) Error() string {
+	return "nil pointer"
+}
+
+func (e ErrNilPointer) Is(target error) (ok bool) {
+	_, ok = target.(ErrNilPointer)
+	return
+}
+
 type ErrNotFound struct {
 }
 

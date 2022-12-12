@@ -36,6 +36,11 @@ func (s Set2[T, T1]) Len() int {
 
 func (s Set2[T, T1]) Get(k string) (e T1, ok bool) {
 	e, ok = s.private.Elements[k]
+
+	if ok && e == nil {
+		panic(ErrNilPointer{})
+	}
+
 	return
 }
 
