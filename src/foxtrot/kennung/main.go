@@ -110,7 +110,7 @@ func (a Kennung[T, T1]) LeftSubtract(b Kennung[T, T1]) (c Kennung[T, T1], err er
 	c.value = *T1(new(T))
 
 	if err = c.Set(strings.TrimPrefix(a.String(), b.String())); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "'%s' - '%s'", a, b)
 		return
 	}
 

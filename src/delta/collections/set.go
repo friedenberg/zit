@@ -35,7 +35,7 @@ func (s1 Set[T]) MutableCopy() (s2 MutableSet[T]) {
 	return
 }
 
-func (s Set[T]) WriterContainer() WriterFunc[T] {
+func (s Set[T]) WriterContainer(sigil error) WriterFunc[T] {
 	return func(e T) (err error) {
 		k := s.Key(e)
 
@@ -47,7 +47,7 @@ func (s Set[T]) WriterContainer() WriterFunc[T] {
 		_, ok := s.Get(k)
 
 		if !ok {
-			err = io.EOF
+			err = errors.Wrap(sigil)
 		}
 
 		return
@@ -76,7 +76,7 @@ func (s1 Set[T]) Subtract(s2 Set[T]) (out Set[T]) {
 	defer s3.close()
 
 	s1.Chain(
-		WriterFuncNegate(s2.WriterContainer()),
+		WriterFuncNegate(s2.WriterContainer(io.EOF)),
 		s3.add,
 	)
 
@@ -92,7 +92,7 @@ func (s1 Set[T]) Intersection(s2 SetLike[T]) (s3 MutableSetLike[T]) {
 	}
 
 	s1.Chain(
-		s22.WriterContainer(),
+		s22.WriterContainer(io.EOF),
 		s3.Add,
 	)
 
@@ -158,7 +158,7 @@ func (a Set[T]) Equals(b SetLike[T]) (ok bool) {
 		return
 	}
 
-	ok = a.All(Set[T]{SetLike: b}.WriterContainer())
+	ok = a.All(Set[T]{SetLike: b}.WriterContainer(ErrNotFound{}))
 
 	return
 }
@@ -168,7 +168,7 @@ func (outer Set[T]) ContainsSet(inner Set[T]) (ok bool) {
 		return
 	}
 
-	ok = inner.All(outer.WriterContainer())
+	ok = inner.All(outer.WriterContainer(ErrNotFound{}))
 
 	return
 }

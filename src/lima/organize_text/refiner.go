@@ -57,7 +57,9 @@ func (atc *Refiner) shouldMergeIntoParent(a *assignment) bool {
 		return false
 	}
 
-	if !a.etiketten.Equals(a.parent.etiketten) {
+	equal := a.etiketten.Equals(a.parent.etiketten)
+
+	if !equal {
 		errors.Log().Print("parent etiketten not equal")
 		return false
 	}
@@ -111,9 +113,17 @@ func (atc *Refiner) renameForPrefixJoint(a *assignment) (err error) {
 		return
 	}
 
+	aEtt := a.etiketten.Any()
+	pEtt := a.parent.etiketten.Any()
+
+	if aEtt.Equals(&pEtt) {
+		errors.Log().Print("parent is is equal to child")
+		return
+	}
+
 	var ls kennung.Etikett
 
-	if ls, err = a.etiketten.Any().LeftSubtract(a.parent.etiketten.Any()); err != nil {
+	if ls, err = aEtt.LeftSubtract(pEtt); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -140,23 +150,22 @@ func (atc *Refiner) Refine(a *assignment) (err error) {
 		return
 	}
 
-	//TODO fix after breaking during migration to collections
-	// if atc.shouldMergeIntoParent(a) {
-	// 	errors.Log().Print("merging into parent")
-	// 	p := a.parent
+	if atc.shouldMergeIntoParent(a) {
+		errors.Log().Print("merging into parent")
+		p := a.parent
 
-	// 	if err = p.consume(a); err != nil {
-	// 		err = errors.Wrap(err)
-	// 		return
-	// 	}
+		if err = p.consume(a); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
-	// 	return atc.Refine(p)
-	// }
+		return atc.Refine(p)
+	}
 
-	// if err = atc.applyPrefixJoints(a); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
+	if err = atc.applyPrefixJoints(a); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if err = atc.renameForPrefixJoint(a); err != nil {
 		err = errors.Wrap(err)
@@ -170,10 +179,10 @@ func (atc *Refiner) Refine(a *assignment) (err error) {
 		}
 	}
 
-	// if err = atc.applyPrefixJoints(a); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
+	if err = atc.applyPrefixJoints(a); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	sort.Slice(a.children, func(i, j int) bool {
 		return a.children[i].etiketten.String() < a.children[j].etiketten.String()

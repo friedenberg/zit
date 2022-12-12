@@ -1,5 +1,17 @@
 package collections
 
+type ErrNotFound struct {
+}
+
+func (e ErrNotFound) Error() string {
+	return "not found"
+}
+
+func (e ErrNotFound) Is(target error) (ok bool) {
+	_, ok = target.(ErrNotFound)
+	return
+}
+
 type ErrEmptyKey[T any] struct {
 	Element T
 }

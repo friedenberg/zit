@@ -2,6 +2,7 @@ package commands
 
 import (
 	"flag"
+	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
@@ -85,7 +86,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 			if zsc, err = u.StoreWorkingDirectory().Checkout(
 				options,
-				zts.WriterContainer(),
+				zts.WriterContainer(io.EOF),
 			); err != nil {
 				err = errors.Wrap(err)
 				return

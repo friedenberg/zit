@@ -80,7 +80,7 @@ func (c CatObjekte) akten(u *umwelt.Umwelt, shas sha.Set) (err error) {
 
 	if err = u.StoreObjekten().ReadAllAktenShas(
 		collections.MakeChain(
-			shas.WriterContainer(),
+			shas.WriterContainer(io.EOF),
 			func(sb sha.Sha) (err error) {
 				var r io.ReadCloser
 
