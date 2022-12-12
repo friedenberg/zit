@@ -329,6 +329,7 @@ func (s *Store) Reindex() (err error) {
 				t.Time.Schwanz(),
 				t.Time,
 			)
+
 			return
 		}
 
