@@ -14,9 +14,11 @@ type Cli struct {
 	DryRun   bool
 	Complete bool
 
+	IncludeHidden  bool
+	IncludeHistory bool
+
 	AllowMissingHinweis              bool
 	CheckoutCacheEnabled             bool
-	IncludeHidden                    bool
 	PredictableHinweisen             bool
 	UseRightAlignedIndentsInOrganize bool
 	PrintAbbreviatedHinweisen        bool
@@ -34,9 +36,11 @@ func (c *Cli) AddToFlags(f *flag.FlagSet) {
 	f.BoolVar(&c.DryRun, "dry-run", false, "")
 	f.BoolVar(&c.Complete, "complete", false, "")
 
+	f.BoolVar(&c.IncludeHidden, "include-hidden", false, "include zettels that have hidden etiketten")
+	f.BoolVar(&c.IncludeHistory, "include-history", false, "include past zettels")
+
 	f.BoolVar(&c.CheckoutCacheEnabled, "checkout-cache-enabled", false, "")
 	f.BoolVar(&c.AllowMissingHinweis, "allow-missing-hinweis", false, "")
-	f.BoolVar(&c.IncludeHidden, "include-hidden", false, "include zettels that have hidden etiketten")
 	f.BoolVar(&c.PredictableHinweisen, "predictable-hinweisen", false, "don't randomly select new hinweisen")
 
 	f.BoolVar(&c.PrintAbbreviatedShas, "abbreviate-shas", true, "")

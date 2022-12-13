@@ -101,11 +101,11 @@ func (c Show) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 	return
 }
 
-func (c Show) RunWithIds(store *umwelt.Umwelt, ids id_set.Set) (err error) {
+func (c Show) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	switch c.Gattung {
 
 	case gattung.Akte:
-		return c.showAkten(store, ids)
+		return c.showAkten(u, ids)
 
 	case gattung.Zettel:
 		var fv zettel.FormatterValue
@@ -116,17 +116,17 @@ func (c Show) RunWithIds(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 		}
 
 		return c.showZettels(
-			store,
+			u,
 			ids,
 			fv.FuncFormatter(
-				store.Out(),
-				store.StoreObjekten(),
-				store.Konfig(),
+				u.Out(),
+				u.StoreObjekten(),
+				u.Konfig(),
 			),
 		)
 
 	case gattung.Transaktion:
-		return c.showTransaktions(store, ids)
+		return c.showTransaktions(u, ids)
 
 	case gattung.Typ:
 		var ev typ.FormatterValue
@@ -137,11 +137,11 @@ func (c Show) RunWithIds(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 		}
 
 		return c.showTypen(
-			store,
+			u,
 			ids,
 			ev.FuncFormatter(
-				store.Out(),
-				store.StoreObjekten(),
+				u.Out(),
+				u.StoreObjekten(),
 			),
 		)
 
@@ -154,11 +154,11 @@ func (c Show) RunWithIds(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 		}
 
 		return c.showEtiketten(
-			store,
+			u,
 			ids,
 			ev.FuncFormatter(
-				store.Out(),
-				store.StoreObjekten(),
+				u.Out(),
+				u.StoreObjekten(),
 			),
 		)
 
@@ -171,10 +171,10 @@ func (c Show) RunWithIds(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 		}
 
 		return c.showKonfig(
-			store,
+			u,
 			ev.FuncFormatter(
-				store.Out(),
-				store.StoreObjekten(),
+				u.Out(),
+				u.StoreObjekten(),
 			),
 		)
 
@@ -185,7 +185,7 @@ func (c Show) RunWithIds(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 }
 
 func (c Show) showZettels(
-	store *umwelt.Umwelt,
+	u *umwelt.Umwelt,
 	ids id_set.Set,
 	fv collections.WriterFunc[*zettel.Transacted],
 ) (err error) {
@@ -197,12 +197,18 @@ func (c Show) showZettels(
 				Set: ids,
 			},
 		}.WriteZettelTransacted,
-		store.StoreWorkingDirectory().ZettelTransactedWriter(
+		u.StoreWorkingDirectory().ZettelTransactedWriter(
 			f1,
 		),
 	)
 
-	if err = store.StoreObjekten().Zettel().ReadAllSchwanzenTransacted(w); err != nil {
+	method := u.StoreObjekten().Zettel().ReadAllSchwanzenTransacted
+
+	if u.Konfig().IncludeHistory {
+		method = u.StoreObjekten().Zettel().ReadAllTransacted
+	}
+
+	if err = method(w); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -210,13 +216,13 @@ func (c Show) showZettels(
 	return
 }
 
-func (c Show) showAkten(store *umwelt.Umwelt, ids id_set.Set) (err error) {
+func (c Show) showAkten(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	zettels := make([]zettel.Transacted, ids.Len())
 
 	for i, is := range ids.AnyShasOrHinweisen() {
 		var tz zettel.Transacted
 
-		if tz, err = store.StoreObjekten().Zettel().ReadOne(is); err != nil {
+		if tz, err = u.StoreObjekten().Zettel().ReadOne(is); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -227,7 +233,7 @@ func (c Show) showAkten(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 	var ar io.ReadCloser
 
 	for _, named := range zettels {
-		if ar, err = store.StoreObjekten().AkteReader(named.Objekte.Akte); err != nil {
+		if ar, err = u.StoreObjekten().AkteReader(named.Objekte.Akte); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -239,7 +245,7 @@ func (c Show) showAkten(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 		defer errors.Deferred(&err, ar.Close)
 
-		if _, err = io.Copy(store.Out(), ar); err != nil {
+		if _, err = io.Copy(u.Out(), ar); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -248,12 +254,12 @@ func (c Show) showAkten(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 	return
 }
 
-func (c Show) showTransaktions(store *umwelt.Umwelt, ids id_set.Set) (err error) {
+func (c Show) showTransaktions(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	ids.Timestamps().Each(
 		func(is ts.Time) (err error) {
 			var t *transaktion.Transaktion
 
-			if t, err = store.StoreObjekten().ReadTransaktion(is); err != nil {
+			if t, err = u.StoreObjekten().ReadTransaktion(is); err != nil {
 				errors.PrintErrf("error: %s", err)
 				return
 			}
