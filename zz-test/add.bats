@@ -95,3 +95,64 @@ function add_1 { # @test
 	assert_output --partial '      (updated) [o/u@d !md "to_add.md"]'
 	assert_output --partial '[to_add.md] (deleted)'
 }
+
+function add_dedupe_1 { # @test
+	wd="$(mktemp -d)"
+	cd "$wd" || exit 1
+
+	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	assert_success
+
+	f=to_add.md
+	{
+		echo test file
+	} >"$f"
+
+	run zit add \
+		-predictable-hinweisen \
+		-dedupe \
+		-etiketten zz-inbox-2022-11-14 \
+		"$f"
+
+	assert_output --partial '          (new) [o/u@b !md "to_add.md"]'
+	assert_output --partial '      (updated) [o/u@d !md "to_add.md"]'
+	# assert_output --partial '[to_add.md] (deleted)'
+
+	run zit checkout o/u
+	assert_output '  (checked out) [one/uno.zettel@d !md "to_add.md"]'
+
+	{
+		echo '---'
+		echo '# new title'
+		echo '- new-tag'
+		echo '! md'
+		echo '---'
+		echo ''
+		echo 'test file'
+	} >one/uno.zettel
+
+	run zit checkin -delete one/uno.zettel
+	assert_output --partial '      (updated) [o/u@a !md "new title"]'
+	assert_output --partial '      (deleted) [one/uno.zettel]'
+
+	run zit add \
+		-predictable-hinweisen \
+		-dedupe \
+		-delete \
+		-etiketten new-etikett-2 \
+		"$f"
+
+	{
+		echo '---'
+		echo '# new title'
+		echo '- new-etikett-2'
+		echo '- new-tag'
+		echo '! md'
+		echo '---'
+		echo ''
+		echo 'test file'
+	} >expected
+
+	run zit show o/u
+	assert_output "$(cat expected)"
+}

@@ -68,7 +68,7 @@ func (c ZettelFromExternalAkte) Run(
 		}
 	}
 
-	err = results.Each(
+	if err = results.Each(
 		func(z *zettel.Transacted) (err error) {
 			if c.ProtoZettel.Apply(&z.Objekte) {
 				if *z, err = c.StoreObjekten().Zettel().Update(
@@ -82,9 +82,7 @@ func (c ZettelFromExternalAkte) Run(
 
 			return
 		},
-	)
-
-	if err != nil {
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
