@@ -35,7 +35,7 @@ func (c ZettelFromExternalAkte) Run(
 	toCreate := zettel_external.MakeMutableSetUniqueAkte()
 	toDelete := zettel_external.MakeMutableSetUniqueFD()
 
-	results = zettel.MakeMutableSetUnique(len(args))
+	results = zettel.MakeMutableSetHinweis(len(args))
 
 	for _, arg := range args {
 		var z *zettel_external.Zettel

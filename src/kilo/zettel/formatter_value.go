@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/collections_coding"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/hotel/objekte"
+	"github.com/friedenberg/zit/src/india/typ"
 	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
 )
 
@@ -25,7 +26,7 @@ func (f FormatterValue) String() string {
 func (f *FormatterValue) Set(v string) (err error) {
 	v1 := strings.TrimSpace(strings.ToLower(v))
 	switch v1 {
-	case "text", "objekte", "json", "toml", "action-names":
+	case "text", "objekte", "json", "toml", "action-names", "hinweis-akte":
 		f.string = v1
 
 	default:
@@ -62,12 +63,21 @@ func (f *FormatterValue) FuncFormatter(
 				Out:               out,
 				Zettel:            o.Objekte,
 				AkteReaderFactory: af,
-				IncludeAkte:       true,
+			}
+
+			if typ.IsInlineAkte(o.Objekte.Typ, k) {
+				c.IncludeAkte = true
 			}
 
 			if _, err = f.WriteTo(c); err != nil {
-				err = errors.Wrap(err)
-				return
+				err = errors.Wrapf(err, "Hinweis: %s", o.Sku.Kennung)
+
+				if errors.IsNotExist(err) {
+					errors.Err().Print(err)
+					err = nil
+				} else {
+					return
+				}
 			}
 
 			return
@@ -86,7 +96,7 @@ func (f *FormatterValue) FuncFormatter(
 		}
 
 	case "toml":
-    //TODO-P0 limit to just zettels that support toml
+		//TODO-P0 limit to just zettels that support toml
 		return func(o *Transacted) (err error) {
 			if _, err = io.WriteString(
 				out, fmt.Sprintf("['%s']\n", o.Sku.Kennung),
@@ -126,6 +136,23 @@ func (f *FormatterValue) FuncFormatter(
 			}
 
 			if _, err = f.WriteTo(c); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+
+	case "hinweis-akte":
+		return func(o *Transacted) (err error) {
+			//TODO-P3 make into option
+			if o.Objekte.Akte.IsNull() {
+				return
+			}
+
+			if _, err = io.WriteString(
+				out, fmt.Sprintf("%s %s\n", o.Sku.Kennung, o.Objekte.Akte),
+			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

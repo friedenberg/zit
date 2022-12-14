@@ -61,7 +61,7 @@ func (z Objekte) Equals(z1 *Objekte) bool {
 		return false
 	}
 
-	if z.Bezeichnung != z1.Bezeichnung {
+	if !z.Bezeichnung.Equals(z1.Bezeichnung) {
 		return false
 	}
 

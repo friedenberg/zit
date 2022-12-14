@@ -43,6 +43,8 @@ func (c DeleteCheckout) Run(
 			if !internal.Objekte.Equals(&external.Objekte) {
 				//TODO move to printer
 				errors.Out().Printf("[%s] (checkout different!)", external.Sku.Kennung)
+				errors.Out().Printf("Internal %s", internal.Objekte)
+				errors.Out().Printf("External %s", external.Objekte)
 				return
 			}
 

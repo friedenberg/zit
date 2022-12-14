@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/metadatei_io"
 )
 
-//TODO-P0 remove entirely and replace with Text2
+// TODO-P0 remove entirely and replace with Text2
 type Text struct {
 	DoNotWriteEmptyBezeichnung bool
 	TypError                   error
@@ -51,7 +51,9 @@ func (f Text) ReadFrom(c *FormatContextRead) (n int64, err error) {
 	}
 
 	inlineAkteSha := akteWriter.Sha()
+	c.AktePath = state.aktePath
 
+  //TODO-P1 handle akte path
 	switch {
 	case state.akteSha.IsNull() && !inlineAkteSha.IsNull():
 		c.Zettel.Akte = inlineAkteSha

@@ -20,7 +20,7 @@ type FormatMetadateiText struct {
 	akteSha  sha.Sha
 }
 
-func (f FormatMetadateiText) ReadFormat(r1 io.Reader, z *Objekte) (n int64, err error) {
+func (f *FormatMetadateiText) ReadFormat(r1 io.Reader, z *Objekte) (n int64, err error) {
 	etiketten := kennung.MakeEtikettMutableSet()
 
 	defer func() {
@@ -49,7 +49,7 @@ func (f FormatMetadateiText) ReadFormat(r1 io.Reader, z *Objekte) (n int64, err 
 	return
 }
 
-func (f FormatMetadateiText) readTyp(desc string) (err error) {
+func (f *FormatMetadateiText) readTyp(desc string) (err error) {
 	if desc == "" {
 		return
 	}

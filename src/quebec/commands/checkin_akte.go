@@ -63,7 +63,6 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	zettels := make([]zettel.Transacted, len(pairs))
-	errors.Log().PrintDebug(pairs)
 
 	// iterate through pairs and read current zettel
 	for i, p := range pairs {
@@ -81,31 +80,45 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			return
 		}
 
-		var f *os.File
+		var as sha.Sha
 
-		if f, err = files.Open(p.path); err != nil {
-			err = errors.Wrap(err)
+		shaError := as.Set(p.path)
+
+		switch {
+		case files.Exists(p.path):
+			var f *os.File
+
+			if f, err = files.Open(p.path); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			defer errors.Deferred(&err, f.Close)
+
+			if _, err = io.Copy(ow, f); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if err = ow.Close(); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if zettels[i], err = u.StoreObjekten().Zettel().ReadHinweisSchwanzen(p.Hinweis); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			zettels[i].Objekte.Akte = ow.Sha()
+
+		case shaError == nil:
+			zettels[i].Objekte.Akte = as
+
+		default:
+			err = errors.Errorf("argument is neither sha nor path")
 			return
 		}
-
-		defer errors.Deferred(&err, f.Close)
-
-		if _, err = io.Copy(ow, f); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = ow.Close(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if zettels[i], err = u.StoreObjekten().Zettel().ReadHinweisSchwanzen(p.Hinweis); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		zettels[i].Objekte.Akte = ow.Sha()
 
 		if c.NewEtiketten.Len() > 0 {
 			zettels[i].Objekte.Etiketten = c.NewEtiketten

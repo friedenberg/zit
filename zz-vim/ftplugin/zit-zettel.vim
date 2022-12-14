@@ -3,7 +3,7 @@ let &l:equalprg = "zit format-zettel %"
 let &l:comments = "fb:*,fb:-,fb:+,n:>"
 let &l:commentstring = "<!--%s-->"
 
-function! Gf()
+function! GfZettel()
   let l:f = expand("<cfile>") . ".md"
 
   if !filereadable(l:f)
@@ -17,7 +17,7 @@ function! Gf()
   " endtry
 endfunction
 
-noremap gf :call Gf()<CR>
+noremap gf :call GfZettel()<CR>
 
 " TODO support external akte
 function! ZitTypActionMenu()

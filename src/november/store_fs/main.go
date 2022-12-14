@@ -14,7 +14,6 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/id"
 	"github.com/friedenberg/zit/src/golf/fd"
-	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/india/zettel_external"
 	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
 	"github.com/friedenberg/zit/src/kilo/zettel"
@@ -165,7 +164,9 @@ func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 		return
 	}
 
-	if ez.Sku.Sha, err = s.storeObjekten.Zettel().WriteZettelObjekte(c.Zettel); err != nil {
+	if ez.Sku.Sha, err = s.storeObjekten.Zettel().WriteZettelObjekte(
+    c.Zettel,
+  ); err != nil {
 		err = errors.Wrapf(err, "%s", f.Name())
 		return
 	}
@@ -229,12 +230,11 @@ func (s *Store) ZettelTransactedWriter(
 
 		if err1 := s.readZettelFromFile(&ze); err1 == nil {
 			z1 := &zettel.Transacted{
-				Sku: sku.Transacted[hinweis.Hinweis, *hinweis.Hinweis]{
-					Kennung: ze.Sku.Kennung,
-					Sha:     ze.Sku.Sha,
-				},
+				Sku:     z.Sku,
 				Objekte: ze.Objekte,
 			}
+
+			z1.Sku.Sha = ze.Sku.Sha
 
 			if err = w1(z1); err != nil {
 				err = errors.Wrap(err)
@@ -268,7 +268,9 @@ func (s *Store) Read(p string) (cz zettel_checked_out.Zettel, err error) {
 		}
 	}
 
-	if cz.Internal, err = s.storeObjekten.Zettel().ReadHinweisSchwanzen(cz.External.Sku.Kennung); err != nil {
+	if cz.Internal, err = s.storeObjekten.Zettel().ReadHinweisSchwanzen(
+    cz.External.Sku.Kennung,
+  ); err != nil {
 		if errors.Is(err, store_objekten.ErrNotFound{}) {
 			err = nil
 		} else {

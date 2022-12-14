@@ -14,6 +14,18 @@ func MakeMutableSet(kf collections.KeyFunc[*Zettel], zs ...*Zettel) MutableSet {
 	}
 }
 
+func MakeMutableSetUniqueHinweis(zs ...*Zettel) MutableSet {
+	kf := func(z *Zettel) string {
+		if z == nil {
+			return ""
+		}
+
+		return z.Sku.Kennung.String()
+	}
+
+	return MakeMutableSet(kf, zs...)
+}
+
 func MakeMutableSetUniqueFD(zs ...*Zettel) MutableSet {
 	kf := func(z *Zettel) string {
 		if z == nil {

@@ -189,14 +189,37 @@ func (c Show) showZettels(
 	ids id_set.Set,
 	fv collections.WriterFunc[*zettel.Transacted],
 ) (err error) {
+	filter := zettel.WriterIds{
+		Filter: id_set.Filter{
+			Set: ids,
+		},
+	}.WriteZettelTransacted
+
+	if u.Konfig().IncludeHistory {
+		hinweisen := hinweis.MakeMutableSet()
+
+		if err = u.StoreObjekten().Zettel().ReadAllSchwanzenTransacted(
+			filter,
+			func(o *zettel.Transacted) (err error) {
+        return hinweisen.Add(o.Sku.Kennung)
+			},
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		hContainer := hinweisen.WriterContainer(io.EOF)
+
+		filter = func(o *zettel.Transacted) (err error) {
+			return hContainer(o.Sku.Kennung)
+		}
+	}
+
 	f1 := collections.MakeSyncSerializer(fv)
 
 	w := collections.MakeChain(
-		zettel.WriterIds{
-			Filter: id_set.Filter{
-				Set: ids,
-			},
-		}.WriteZettelTransacted,
+		filter,
+    //TODO-P1 make option for reading from fs
 		u.StoreWorkingDirectory().ZettelTransactedWriter(
 			f1,
 		),

@@ -23,7 +23,7 @@ function! GetZitOrganizeFold(lnum)
   endif
 endfunction
 
-function! Gf()
+function! GfOrganize()
   let l:h = trim(system("zit expand-hinweis " . expand("<cfile>")))
 
   if !filereadable(l:h)
@@ -36,5 +36,5 @@ function! Gf()
   execute 'tabedit' l:f
 endfunction
 
-noremap gf :call Gf()<CR>
+noremap gf :call GfOrganize()<CR>
 

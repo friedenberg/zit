@@ -32,16 +32,13 @@ func (s *Store) Checkout(
 	if err = s.storeObjekten.Zettel().ReadAllSchwanzenVerzeichnisse(
 		zettel.MakeWriterKonfig(s.konfig),
 		zettel.MakeWriterZettelTransacted(ztw),
-		zettel.MakeWriterZettelTransacted(zts.Add),
-		zettel.MakeWriterZettelTransacted(
-			collections.MakeWriterDoNotRepool[zettel.Transacted](),
-		),
+		zettel.MakeWriterZettelTransacted(zts.AddAndDoNotRepool),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	zts.Each(
+	if err = zts.Each(
 		func(zt *zettel.Transacted) (err error) {
 			var zc zettel_checked_out.Zettel
 
@@ -53,7 +50,10 @@ func (s *Store) Checkout(
 			zcs.Add(&zc)
 			return
 		},
-	)
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }
@@ -62,7 +62,6 @@ func (s Store) shouldCheckOut(
 	options CheckoutOptions,
 	cz zettel_checked_out.Zettel,
 ) (ok bool) {
-
 	switch {
 	case cz.Internal.Objekte.Equals(&cz.External.Objekte):
 		cz.State = zettel_checked_out.StateJustCheckedOutButSame
@@ -165,7 +164,7 @@ func (s *Store) CheckoutOne(
 	switch options.CheckoutMode {
 	case CheckoutModeAkteOnly:
 		if err = s.writeAkte(
-			cz.External.Objekte.Akte,
+			cz.Internal.Objekte.Akte,
 			cz.External.AkteFD.Path,
 			&cz,
 		); err != nil {
@@ -257,7 +256,7 @@ func (s *Store) writeAkte(
 		return
 	}
 
-	defer errors.Deferred(&err, f.Close)
+	defer errors.Deferred(&err, r.Close)
 
 	if _, err = io.Copy(f, r); err != nil {
 		err = errors.Wrap(err)
