@@ -33,14 +33,16 @@ func (f FormatText) ReadFormat(r io.Reader, t *Objekte) (n int64, err error) {
 	pr, pw := io.Pipe()
 	td := toml.NewDecoder(pr)
 
-	chDone := make(chan struct{})
+	chDone := make(chan error)
 
-	go func() {
+	go func(pr *io.PipeReader) {
+		var err error
 		defer func() {
+			chDone <- err
 			close(chDone)
 		}()
 
-		if err := td.Decode(&t.Akte); err != nil {
+		if err = td.Decode(&t.Akte); err != nil {
 			if !errors.IsEOF(err) {
 				pr.CloseWithError(err)
 			}
@@ -53,7 +55,7 @@ func (f FormatText) ReadFormat(r io.Reader, t *Objekte) (n int64, err error) {
 		if t.Akte.EtikettenRules == nil {
 			t.Akte.EtikettenRules = make(map[string]etikett_rule.Rule)
 		}
-	}()
+	}(pr)
 
 	mw := io.MultiWriter(aw, pw)
 
@@ -67,7 +69,10 @@ func (f FormatText) ReadFormat(r io.Reader, t *Objekte) (n int64, err error) {
 		return
 	}
 
-	<-chDone
+	if err = <-chDone; err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	t.Sha = aw.Sha()
 

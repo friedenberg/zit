@@ -206,39 +206,46 @@ func (c EditTyp) readTempTypFiles(
 
 	formatText := typ.MakeFormatText(u.StoreObjekten())
 
+	iter := func(p string) (err error) {
+		var f *os.File
+
+		if f, err = files.Open(p); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		defer errors.Deferred(&err, f.Close)
+
+		var fdee fd.FD
+
+		if fdee, err = fd.File(f); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		te := &typ.External{
+			Sku: sku.External[kennung.Typ, *kennung.Typ]{
+				Kennung: kennung.MustTyp(fdee.FileNameSansExt()),
+			},
+			FD: fdee,
+		}
+
+		//TODO offer option to edit again
+		if _, err = formatText.ReadFormat(f, &te.Objekte); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		ts.Add(te)
+
+		return
+	}
+
 	for _, p := range ps {
-		func() {
-			var f *os.File
-
-			if f, err = files.Open(p); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			defer errors.Deferred(&err, f.Close)
-
-			var fdee fd.FD
-
-			if fdee, err = fd.File(f); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			te := &typ.External{
-				Sku: sku.External[kennung.Typ, *kennung.Typ]{
-					Kennung: kennung.MustTyp(fdee.FileNameSansExt()),
-				},
-				FD: fdee,
-			}
-
-			//TODO offer option to edit again
-			if _, err = formatText.ReadFormat(f, &te.Objekte); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			ts.Add(te)
-		}()
+		if err = iter(p); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	out = ts.Copy()

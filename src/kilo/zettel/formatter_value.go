@@ -26,7 +26,7 @@ func (f FormatterValue) String() string {
 func (f *FormatterValue) Set(v string) (err error) {
 	v1 := strings.TrimSpace(strings.ToLower(v))
 	switch v1 {
-	case "text", "objekte", "json", "toml", "action-names", "hinweis-akte":
+	case "akte", "text", "objekte", "json", "toml", "action-names", "hinweis-akte":
 		f.string = v1
 
 	default:
@@ -88,6 +88,25 @@ func (f *FormatterValue) FuncFormatter(
 
 		return func(o *Transacted) (err error) {
 			if _, err = f.Encode(o); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+
+	case "akte":
+		return func(o *Transacted) (err error) {
+			var r sha.ReadCloser
+
+			if r, err = af.AkteReader(o.Objekte.Akte); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			defer errors.Deferred(&err, r.Close)
+
+			if _, err = io.Copy(out, r); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

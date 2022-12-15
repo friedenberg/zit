@@ -111,7 +111,7 @@ func (c ExecAction) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 	if err = u.StoreObjekten().Zettel().ReadAllSchwanzenTransacted(
 		query.WriteZettelTransacted,
-		iter,
+		u.StoreWorkingDirectory().ZettelTransactedWriter(iter),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -137,7 +137,7 @@ func (c ExecAction) runExecutor(
 		"ZIT_BIN":    u.Standort().Executable(),
 	}
 
-	envCollapsed := make([]string, 0, len(env))
+	envCollapsed := os.Environ()
 
 	for k, v := range env {
 		envCollapsed = append(envCollapsed, fmt.Sprintf("%s=%s", k, v))

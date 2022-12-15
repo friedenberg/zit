@@ -6,8 +6,8 @@ import (
 	"github.com/friedenberg/zit/src/echo/sha"
 )
 
-type FuncReadCloser func(sha.Sha) (sha.ReadCloser, error)
-type FuncWriteCloser func(sha.Sha) (sha.WriteCloser, error)
+// type FuncReadCloser func(sha.Sha) (sha.ReadCloser, error)
+// type FuncWriteCloser func(sha.Sha) (sha.WriteCloser, error)
 
 type hydrator[T gattung.Element, T1 gattung.ElementPtr[T]] struct {
 	af               gattung.AkteIOFactory

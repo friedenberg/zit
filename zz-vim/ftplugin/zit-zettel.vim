@@ -21,7 +21,7 @@ noremap gf :call GfZettel()<CR>
 
 " TODO support external akte
 function! ZitTypActionMenu()
-  let l:items = systemlist("zit show -format typ-action-names " . expand("%:r"))
+  let l:items = systemlist("zit show -format action-names " . expand("%:r"))
 
   func! ZitTypActionMenuItemPicked(id, result) closure
     if a:result == -1

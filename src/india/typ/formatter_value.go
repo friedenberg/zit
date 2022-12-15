@@ -22,7 +22,7 @@ func (f FormatterValue) String() string {
 func (f *FormatterValue) Set(v string) (err error) {
 	v1 := strings.TrimSpace(strings.ToLower(v))
 	switch v1 {
-	case "text", "objekte", "json", "action-names":
+	case "text", "objekte", "json", "action-names", "debug":
 		f.string = v1
 
 	default:
@@ -82,6 +82,13 @@ func (f *FormatterValue) FuncFormatter(
 				err = errors.Wrap(err)
 				return
 			}
+
+			return
+		}
+
+	case "debug":
+		return func(o *Transacted) (err error) {
+      errors.Err().PrintDebug(o)
 
 			return
 		}
