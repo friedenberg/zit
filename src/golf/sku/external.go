@@ -12,6 +12,15 @@ type External[T kennung.KennungLike[T], T1 kennung.KennungLikePtr[T]] struct {
 	Sha     sha.Sha
 }
 
+func (a *External[T, T1]) Transacted() (b Transacted[T, T1]) {
+  b = Transacted[T, T1]{
+    Kennung: a.Kennung,
+    Sha: a.Sha,
+  }
+
+  return
+}
+
 func (a *External[T, T1]) Reset(b *External[T, T1]) {
 	if b == nil {
 		a.Sha = sha.Sha{}

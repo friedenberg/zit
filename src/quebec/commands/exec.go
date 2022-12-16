@@ -108,10 +108,14 @@ func (c Exec) getZettel(
 		return
 	}
 
-	if tz, err = u.StoreObjekten().Zettel().ReadOne(idd); err != nil {
+	var zt *zettel.Transacted
+
+	if zt, err = u.StoreObjekten().Zettel().ReadOne(idd); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	tz = *zt
 
 	typ := tz.Objekte.Typ
 

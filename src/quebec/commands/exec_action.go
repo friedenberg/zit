@@ -110,8 +110,10 @@ func (c ExecAction) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	}
 
 	if err = u.StoreObjekten().Zettel().ReadAllSchwanzenTransacted(
-		query.WriteZettelTransacted,
-		u.StoreWorkingDirectory().ZettelTransactedWriter(iter),
+		collections.MakeChain(
+			query.WriteZettelTransacted,
+			u.StoreWorkingDirectory().ZettelTransactedWriter(iter),
+		),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

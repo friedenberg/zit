@@ -241,12 +241,11 @@ func (s typStore) AllInChain(k kennung.Typ) (c []*typ.Transacted, err error) {
 	return
 }
 
-//TODO-P0
-func (s *typStore) reindexOne(
+func (s *typStore) Hydrate(
 	t *transaktion.Transaktion,
 	o *sku.Sku,
-) (err error) {
-	te := &typ.Transacted{}
+) (te *typ.Transacted, err error) {
+	te = &typ.Transacted{}
 
 	if err = te.SetTransactionAndObjekte(
 		t,
@@ -271,6 +270,21 @@ func (s *typStore) reindexOne(
 
 	if err = hy.Hydrate(te, &te.Objekte); err != nil {
 		errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+//TODO-P0
+func (s *typStore) reindexOne(
+	t *transaktion.Transaktion,
+	o *sku.Sku,
+) (err error) {
+	var te *typ.Transacted
+
+	if te, err = s.Hydrate(t, o); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 

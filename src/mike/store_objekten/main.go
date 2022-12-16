@@ -161,12 +161,12 @@ func (s Store) RevertTransaktion(
 				return
 			}
 
-			var tz zettel.Transacted
+			var tz *zettel.Transacted
 
 			for _, someTz := range chain {
 				errors.Log().Print(someTz)
 				if someTz.Sku.Schwanz == o.Mutter[0] {
-					tz = *someTz
+					tz = someTz
 					break
 				}
 			}
@@ -181,7 +181,7 @@ func (s Store) RevertTransaktion(
 				return
 			}
 
-			tzs.Add(&tz)
+			tzs.Add(tz)
 
 			return
 		},

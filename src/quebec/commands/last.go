@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/golf/transaktion"
+	"github.com/friedenberg/zit/src/india/typ"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
 
@@ -27,7 +28,7 @@ func init() {
 
 func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	if len(args) != 0 {
-		errors.Out().Print("ignoring arguments")
+		errors.Err().Print("ignoring arguments")
 	}
 
 	s := u.StoreObjekten()
@@ -39,13 +40,29 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	transaktion.Each(
+	if err = transaktion.Each(
 		func(o *sku.Sku) (err error) {
-			errors.Out().Print(o)
+			switch o.Gattung {
+			case gattung.Typ:
+				var te *typ.Transacted
+
+				if te, err = u.StoreObjekten().Typ().Hydrate(transaktion, o); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				u.PrinterTypTransacted("test")(te)
+
+			default:
+				errors.Out().Print(o)
+			}
 
 			return
 		},
-	)
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }

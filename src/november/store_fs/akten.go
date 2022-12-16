@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/id"
 	"github.com/friedenberg/zit/src/golf/age_io"
+	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/mike/store_objekten"
 	"github.com/friedenberg/zit/src/mike/zettel_checked_out"
 )
@@ -33,7 +34,9 @@ func (s Store) ReadExternalZettelFromAktePath(p string) (cz zettel_checked_out.Z
 		return
 	}
 
-	if cz.Internal, err = s.storeObjekten.Zettel().ReadHinweisSchwanzen(
+	var zt *zettel.Transacted
+
+	if zt, err = s.storeObjekten.Zettel().ReadHinweisSchwanzen(
 		cz.External.Sku.Kennung,
 	); err != nil {
 		if errors.Is(err, store_objekten.ErrNotFound{}) {
@@ -43,6 +46,8 @@ func (s Store) ReadExternalZettelFromAktePath(p string) (cz zettel_checked_out.Z
 			return
 		}
 	}
+
+	cz.Internal = *zt
 
 	//TODO-P4 capture this as a function
 	cz.External.Objekte = cz.Internal.Objekte

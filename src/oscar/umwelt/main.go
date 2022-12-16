@@ -13,6 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/echo/standort"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/ts"
 	"github.com/friedenberg/zit/src/india/konfig"
 	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
 	"github.com/friedenberg/zit/src/kilo/zettel"
@@ -22,6 +23,8 @@ import (
 )
 
 type Umwelt struct {
+	sonnenaufgang ts.Time
+
 	in  *os.File
 	out *os.File
 	err *os.File
@@ -76,6 +79,8 @@ func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 		err = errors.Wrap(err)
 		return
 	}
+
+	u.sonnenaufgang = ts.Now()
 
 	//TODO-P4 consider moving to konfig_compiled
 	{
@@ -155,6 +160,7 @@ func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 
 	errors.Log().Print("initing checkout store")
 	if u.storeWorkingDirectory, err = store_fs.New(
+		u.Sonnenaufgang(),
 		u.Konfig(),
 		u.standort,
 		u.storeObjekten,
@@ -166,13 +172,9 @@ func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 
 	errors.Log().Print("done initing checkout store")
 
+	//TODO-P0 move to objekte-specific packages
 	u.storeObjekten.Zettel().SetZettelTransactedLogWriter(
-		store_objekten.ZettelTransactedLogWriters{
-			New:       u.PrinterZettelTransacted(format.StringNew),
-			Updated:   u.PrinterZettelTransacted(format.StringUpdated),
-			Unchanged: u.PrinterZettelTransacted(format.StringUnchanged),
-			Archived:  u.PrinterZettelTransacted(format.StringArchived),
-		},
+		u.WriterZettelTransacted(),
 	)
 
 	u.storeObjekten.Konfig().SetKonfigLogWriters(

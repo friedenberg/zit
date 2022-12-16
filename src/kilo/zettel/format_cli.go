@@ -3,6 +3,7 @@ package zettel
 import (
 	"io"
 
+	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/echo/sha"
@@ -34,17 +35,15 @@ func MakeCliFormat(
 	}
 }
 
-// (new|unchanged|updated|archived) [kopf/schwanz@sha !typ]
+// [kopf/schwanz@sha !typ]
 func MakeCliFormatTransacted(
 	hf format.FormatWriterFunc[hinweis.Hinweis],
 	sf format.FormatWriterFunc[sha.Sha],
 	zf format.FormatWriterFunc[Objekte],
-	verb string,
 ) format.FormatWriterFunc[Transacted] {
 	return func(w io.Writer, z *Transacted) (n int64, err error) {
 		return format.Write(
 			w,
-			format.MakeFormatStringRightAlignedParen(verb),
 			format.MakeFormatString("["),
 			format.MakeWriter(hf, z.Kennung()),
 			format.MakeFormatString("@"),
@@ -54,4 +53,22 @@ func MakeCliFormatTransacted(
 			format.MakeFormatString("]"),
 		)
 	}
+}
+
+// (new|unchanged|updated|archived) [kopf/schwanz@sha !typ]
+func MakeCliFormatTransactedDelta(
+	verb string,
+	ztf format.FormatWriterFunc[Transacted],
+) format.FormatWriterFunc[Transacted] {
+	return func(w io.Writer, z *Transacted) (n int64, err error) {
+		return format.Write(
+			w,
+			format.MakeFormatStringRightAlignedParen(verb),
+			format.MakeWriter(ztf, z),
+		)
+	}
+}
+
+type TransactedWriters struct {
+	New, Updated, Archived, Unchanged collections.WriterFunc[*Transacted]
 }

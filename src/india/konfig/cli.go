@@ -14,6 +14,7 @@ type Cli struct {
 	DryRun   bool
 	Complete bool
 
+	IncludeCwd     bool
 	IncludeHidden  bool
 	IncludeHistory bool
 
@@ -36,8 +37,9 @@ func (c *Cli) AddToFlags(f *flag.FlagSet) {
 	f.BoolVar(&c.DryRun, "dry-run", false, "")
 	f.BoolVar(&c.Complete, "complete", false, "")
 
+	f.BoolVar(&c.IncludeCwd, "include-cwd", true, "include checked-out Objekten in the working directory")
 	f.BoolVar(&c.IncludeHidden, "include-hidden", false, "include zettels that have hidden etiketten")
-	f.BoolVar(&c.IncludeHistory, "include-history", false, "include past zettels")
+	f.BoolVar(&c.IncludeHistory, "include-history", false, "include past Objekten")
 
 	f.BoolVar(&c.CheckoutCacheEnabled, "checkout-cache-enabled", false, "")
 	f.BoolVar(&c.AllowMissingHinweis, "allow-missing-hinweis", false, "")

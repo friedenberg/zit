@@ -92,7 +92,7 @@ func (i *Zettelen) Flush() (err error) {
 }
 
 // TODO-P2 switch to pointer
-func (i *Zettelen) Add(tz zettel.Transacted, v string) (err error) {
+func (i *Zettelen) Add(tz *zettel.Transacted, v string) (err error) {
 	var n int
 
 	if n, err = i.PageForString(v); err != nil {
@@ -108,7 +108,7 @@ func (i *Zettelen) Add(tz zettel.Transacted, v string) (err error) {
 	}
 
 	z := i.pool.Get()
-	z.ResetWithTransacted(&tz)
+	z.ResetWithTransacted(tz)
 
 	if err = p.Add(z); err != nil {
 		err = errors.Wrap(err)

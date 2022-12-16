@@ -66,7 +66,7 @@ func (c Revert) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 		return
 	}
 
-	zts.Each(u.PrinterZettelTransacted(format.StringUpdated))
+	zts.Each(u.PrinterZettelTransactedDelta(format.StringUpdated))
 
 	return
 }

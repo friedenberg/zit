@@ -7,6 +7,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/ts"
@@ -155,16 +156,18 @@ func (c CatAlfred) catZettelen(
 	var err error
 
 	if err = u.StoreObjekten().Zettel().ReadAllSchwanzenVerzeichnisse(
-		wk,
-		zettel.MakeWriterZettelTransacted(
-			zettel.WriterIds{
-				Filter: id_set.Filter{
-					Set:        ids,
-					AllowEmpty: true,
-				},
-			}.WriteZettelTransacted,
+		collections.MakeChain(
+			wk,
+			zettel.MakeWriterZettelTransacted(
+				zettel.WriterIds{
+					Filter: id_set.Filter{
+						Set:        ids,
+						AllowEmpty: true,
+					},
+				}.WriteZettelTransacted,
+			),
+			aw.WriteZettelVerzeichnisse,
 		),
-		aw.WriteZettelVerzeichnisse,
 	); err != nil {
 		aw.WriteError(err)
 		return

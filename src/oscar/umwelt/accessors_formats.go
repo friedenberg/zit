@@ -144,12 +144,18 @@ func (u *Umwelt) FormatZettelCheckedOutFresh(
 	)
 }
 
-func (u *Umwelt) FormatZettelTransacted(verb string) format.FormatWriterFunc[zettel.Transacted] {
+func (u *Umwelt) FormatZettelTransacted() format.FormatWriterFunc[zettel.Transacted] {
 	return zettel.MakeCliFormatTransacted(
 		u.FormatHinweis(),
 		u.FormatSha(),
 		u.FormatZettel(),
+	)
+}
+
+func (u *Umwelt) FormatZettelTransactedDelta(verb string) format.FormatWriterFunc[zettel.Transacted] {
+	return zettel.MakeCliFormatTransactedDelta(
 		verb,
+		u.FormatZettelTransacted(),
 	)
 }
 

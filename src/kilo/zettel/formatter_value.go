@@ -26,7 +26,7 @@ func (f FormatterValue) String() string {
 func (f *FormatterValue) Set(v string) (err error) {
 	v1 := strings.TrimSpace(strings.ToLower(v))
 	switch v1 {
-	case "akte", "text", "objekte", "json", "toml", "action-names", "hinweis-akte":
+	case "log", "akte", "hinweis-text", "text", "objekte", "json", "toml", "action-names", "hinweis-akte":
 		f.string = v1
 
 	default:
@@ -37,12 +37,16 @@ func (f *FormatterValue) Set(v string) (err error) {
 	return
 }
 
-func (f *FormatterValue) FuncFormatter(
+func (fv *FormatterValue) FuncFormatter(
 	out io.Writer,
 	af gattung.AkteIOFactory,
 	k konfig_compiled.Compiled,
+	logFunc collections.WriterFunc[*Transacted],
 ) collections.WriterFunc[*Transacted] {
-	switch f.string {
+	switch fv.string {
+	case "log":
+		return logFunc
+
 	case "objekte":
 		f := objekte.MakeFormatter[*Transacted](af)
 
@@ -55,10 +59,20 @@ func (f *FormatterValue) FuncFormatter(
 			return
 		}
 
-	case "text":
+	case "text", "hinweis-text":
 		f := Text{}
 
 		return func(o *Transacted) (err error) {
+			if fv.string == "hinweis-text" {
+				if _, err = io.WriteString(
+					out,
+					fmt.Sprintf("= %s\n", o.Sku.Kennung),
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			}
+
 			c := FormatContextWrite{
 				Out:               out,
 				Zettel:            o.Objekte,
@@ -181,7 +195,7 @@ func (f *FormatterValue) FuncFormatter(
 
 	default:
 		return func(_ *Transacted) (err error) {
-			return errors.Errorf("unsupported format for typen: %s", f.string)
+			return errors.Errorf("unsupported format for typen: %s", fv.string)
 		}
 	}
 }

@@ -52,12 +52,29 @@ func (u *Umwelt) PrinterTypCheckedOut(
 	)
 }
 
-func (u *Umwelt) PrinterZettelTransacted(
+//TODO-P0 rename
+func (u *Umwelt) WriterZettelTransacted() zettel.TransactedWriters {
+	return zettel.TransactedWriters{
+		New:       u.PrinterZettelTransactedDelta(format.StringNew),
+		Updated:   u.PrinterZettelTransactedDelta(format.StringUpdated),
+		Unchanged: u.PrinterZettelTransactedDelta(format.StringUnchanged),
+		Archived:  u.PrinterZettelTransactedDelta(format.StringArchived),
+	}
+}
+
+func (u *Umwelt) PrinterZettelTransacted() collections.WriterFunc[*zettel.Transacted] {
+	return format.MakeWriterToWithNewLines(
+		u.Out(),
+		u.FormatZettelTransacted(),
+	)
+}
+
+func (u *Umwelt) PrinterZettelTransactedDelta(
 	verb string,
 ) collections.WriterFunc[*zettel.Transacted] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
-		u.FormatZettelTransacted(verb),
+		u.FormatZettelTransactedDelta(verb),
 	)
 }
 

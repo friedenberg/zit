@@ -41,7 +41,7 @@ func makeVerzeichnisseSchwanzen(
 
 func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 	h hinweis.Hinweis,
-) (tz zettel.Transacted, err error) {
+) (tz *zettel.Transacted, err error) {
 	var n int
 
 	if n, err = s.Zettelen.PageForHinweis(h); err != nil {
@@ -82,7 +82,7 @@ func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 		return
 	}
 
-	tz = found.Transacted
+	tz = &found.Transacted
 	tz.Objekte.Etiketten = tz.Objekte.Etiketten.Copy()
 
 	return

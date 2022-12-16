@@ -20,6 +20,7 @@ const (
 	StringCheckedOut   = "checked out"
 	StringUnrecognized = "unrecognized"
 	StringHeaderIndent = "=============== "
+  //TODO-P4 use reflection?
 	LenStringMax       = len(StringUnrecognized) + 4
 )
 

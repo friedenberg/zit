@@ -30,7 +30,7 @@ func (c DeleteCheckout) Run(
 
 	if err = zes.Each(
 		func(external *zettel_external.Zettel) (err error) {
-			var internal zettel.Transacted
+			var internal *zettel.Transacted
 
 			if internal, err = c.StoreObjekten().Zettel().ReadHinweisSchwanzen(
 				external.Sku.Kennung,

@@ -22,6 +22,7 @@ import (
 )
 
 type Show struct {
+	//TODO-P0 gattung.Set
 	gattung.Gattung
 	Format string
 }
@@ -122,6 +123,7 @@ func (c Show) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 				u.Out(),
 				u.StoreObjekten(),
 				u.Konfig(),
+				u.PrinterZettelTransacted(),
 			),
 		)
 
@@ -195,14 +197,19 @@ func (c Show) showZettels(
 		},
 	}.WriteZettelTransacted
 
+	method := u.StoreObjekten().Zettel().ReadAllSchwanzenTransacted
+
 	if u.Konfig().IncludeHistory {
+		method = u.StoreObjekten().Zettel().ReadAllTransacted
 		hinweisen := hinweis.MakeMutableSet()
 
 		if err = u.StoreObjekten().Zettel().ReadAllSchwanzenTransacted(
-			filter,
-			func(o *zettel.Transacted) (err error) {
-        return hinweisen.Add(o.Sku.Kennung)
-			},
+			collections.MakeChain(
+				filter,
+				func(o *zettel.Transacted) (err error) {
+					return hinweisen.Add(o.Sku.Kennung)
+				},
+			),
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -219,19 +226,15 @@ func (c Show) showZettels(
 
 	w := collections.MakeChain(
 		filter,
-    //TODO-P1 make option for reading from fs
-		u.StoreWorkingDirectory().ZettelTransactedWriter(
-			f1,
-		),
+		f1,
 	)
 
-	method := u.StoreObjekten().Zettel().ReadAllSchwanzenTransacted
-
-	if u.Konfig().IncludeHistory {
-		method = u.StoreObjekten().Zettel().ReadAllTransacted
-	}
-
-	if err = method(w); err != nil {
+	//TODO-P1 make option for reading from fs
+	if err = collections.Multiplex(
+		w,
+		method,
+		u.StoreWorkingDirectory().ReadAllSchwanzenTransacted,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -240,10 +243,10 @@ func (c Show) showZettels(
 }
 
 func (c Show) showAkten(u *umwelt.Umwelt, ids id_set.Set) (err error) {
-	zettels := make([]zettel.Transacted, ids.Len())
+	zettels := make([]*zettel.Transacted, ids.Len())
 
 	for i, is := range ids.AnyShasOrHinweisen() {
-		var tz zettel.Transacted
+		var tz *zettel.Transacted
 
 		if tz, err = u.StoreObjekten().Zettel().ReadOne(is); err != nil {
 			err = errors.Wrap(err)

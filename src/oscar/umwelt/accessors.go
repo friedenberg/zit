@@ -4,11 +4,16 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/echo/standort"
+	"github.com/friedenberg/zit/src/foxtrot/ts"
 	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/mike/store_objekten"
 	"github.com/friedenberg/zit/src/november/store_fs"
 )
+
+func (u *Umwelt) Sonnenaufgang() ts.Time {
+	return u.sonnenaufgang
+}
 
 func (u *Umwelt) Konfig() konfig_compiled.Compiled {
 	return u.konfig

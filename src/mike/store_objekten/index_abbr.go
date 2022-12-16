@@ -136,7 +136,7 @@ func (i *indexAbbr) addStored(o gattung.Stored) (err error) {
 	return
 }
 
-func (i *indexAbbr) addZettelTransacted(zt zettel.Transacted) (err error) {
+func (i *indexAbbr) addZettelTransacted(zt *zettel.Transacted) (err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -144,7 +144,7 @@ func (i *indexAbbr) addZettelTransacted(zt zettel.Transacted) (err error) {
 
 	i.hasChanges = true
 
-	if err = i.addStored(&zt); err != nil {
+	if err = i.addStored(zt); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

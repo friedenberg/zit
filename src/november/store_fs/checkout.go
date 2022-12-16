@@ -30,9 +30,11 @@ func (s *Store) Checkout(
 	zts := zettel.MakeMutableSetUnique(0)
 
 	if err = s.storeObjekten.Zettel().ReadAllSchwanzenVerzeichnisse(
-		zettel.MakeWriterKonfig(s.konfig),
-		zettel.MakeWriterZettelTransacted(ztw),
-		zettel.MakeWriterZettelTransacted(zts.AddAndDoNotRepool),
+		collections.MakeChain(
+			zettel.MakeWriterKonfig(s.konfig),
+			zettel.MakeWriterZettelTransacted(ztw),
+			zettel.MakeWriterZettelTransacted(zts.AddAndDoNotRepool),
+		),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

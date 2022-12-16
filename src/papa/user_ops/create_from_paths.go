@@ -62,8 +62,10 @@ func (c CreateFromPaths) Run(args ...string) (results zettel.MutableSet, err err
 		matcher := zettel_external.MakeMutableMatchSet(toCreate)
 
 		if err = c.StoreObjekten().Zettel().ReadAllTransacted(
-			matcher.Match,
-			results.AddAndDoNotRepool,
+			collections.MakeChain(
+				matcher.Match,
+				results.AddAndDoNotRepool,
+			),
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -78,7 +80,7 @@ func (c CreateFromPaths) Run(args ...string) (results zettel.MutableSet, err err
 	err = results.Each(
 		func(z *zettel.Transacted) (err error) {
 			if c.ProtoZettel.Apply(&z.Objekte) {
-				if *z, err = c.StoreObjekten().Zettel().Update(
+				if z, err = c.StoreObjekten().Zettel().Update(
 					&z.Objekte,
 					&z.Sku.Kennung,
 				); err != nil {
@@ -101,15 +103,19 @@ func (c CreateFromPaths) Run(args ...string) (results zettel.MutableSet, err err
 				return
 			}
 
-			if cz.Internal, err = c.StoreObjekten().Zettel().Create(z.Objekte); err != nil {
+			var zt *zettel.Transacted
+
+			if zt, err = c.StoreObjekten().Zettel().Create(z.Objekte); err != nil {
 				//TODO add file for error handling
 				c.handleStoreError(cz, "", err)
 				err = nil
 				return
 			}
 
+			cz.Internal = *zt
+
 			if c.ProtoZettel.Apply(&cz.Internal.Objekte) {
-				if cz.Internal, err = c.StoreObjekten().Zettel().Update(
+				if zt, err = c.StoreObjekten().Zettel().Update(
 					&cz.Internal.Objekte,
 					&cz.Internal.Sku.Kennung,
 				); err != nil {
@@ -118,6 +124,8 @@ func (c CreateFromPaths) Run(args ...string) (results zettel.MutableSet, err err
 					err = nil
 					return
 				}
+
+				cz.Internal = *zt
 			}
 
 			//TODO get matches

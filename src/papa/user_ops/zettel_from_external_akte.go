@@ -7,6 +7,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/script_value"
+	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/golf/fd"
 	"github.com/friedenberg/zit/src/india/zettel_external"
@@ -60,8 +61,10 @@ func (c ZettelFromExternalAkte) Run(
 		matcher := zettel_external.MakeMutableMatchSet(toCreate)
 
 		if err = c.StoreObjekten().Zettel().ReadAllTransacted(
-			matcher.Match,
-			results.AddAndDoNotRepool,
+			collections.MakeChain(
+				matcher.Match,
+				results.AddAndDoNotRepool,
+			),
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -71,7 +74,7 @@ func (c ZettelFromExternalAkte) Run(
 	if err = results.Each(
 		func(z *zettel.Transacted) (err error) {
 			if c.ProtoZettel.Apply(&z.Objekte) {
-				if *z, err = c.StoreObjekten().Zettel().Update(
+				if z, err = c.StoreObjekten().Zettel().Update(
 					&z.Objekte,
 					&z.Sku.Kennung,
 				); err != nil {
@@ -93,7 +96,7 @@ func (c ZettelFromExternalAkte) Run(
 				return
 			}
 
-			var tz zettel.Transacted
+			var tz *zettel.Transacted
 
 			if tz, err = c.StoreObjekten().Zettel().Create(z.Objekte); err != nil {
 				err = errors.Wrap(err)
@@ -110,7 +113,7 @@ func (c ZettelFromExternalAkte) Run(
 				}
 			}
 
-			results.Add(&tz)
+			results.Add(tz)
 
 			return
 		},

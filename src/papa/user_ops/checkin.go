@@ -33,7 +33,7 @@ func (c Checkin) Run(
 	defer c.Unlock()
 
 	for _, z := range zettelen {
-		var tz zettel.Transacted
+		var tz *zettel.Transacted
 
 		if tz, err = c.StoreObjekten().Zettel().Update(
 			&z.Objekte,
@@ -47,7 +47,7 @@ func (c Checkin) Run(
 		// stdprinter.Outf("%s (unchanged)", tz.Named)
 
 		results.Zettelen[tz.Sku.Kennung] = zettel_checked_out.Zettel{
-			Internal: tz,
+			Internal: *tz,
 			External: z,
 		}
 	}
