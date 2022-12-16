@@ -227,6 +227,7 @@ func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 // ReadOne
 // ReadMany
 // ReadManyHistory
+//TODO-P1 transition to ZettelVerzeichnisse
 func (s *Store) ReadOne(h hinweis.Hinweis) (zt *zettel.Transacted, err error) {
 	if zt, err = s.storeObjekten.Zettel().ReadHinweisSchwanzen(h); err != nil {
 		err = errors.Wrap(err)
@@ -294,69 +295,132 @@ func (s *Store) ReadOne(h hinweis.Hinweis) (zt *zettel.Transacted, err error) {
 	return
 }
 
-// States:
-// one               | many             | many+history
-// include fs        | include fs       | include fs
-// don't include fs  | don't include fs | don't include fs
-func (s *Store) ReadAllSchwanzenTransacted(
-	w collections.WriterFunc[*zettel.Transacted],
+func (s *Store) ReadMany(
+	w1 collections.WriterFunc[*zettel.Verzeichnisse],
 ) (err error) {
-	var pz cwd_files.CwdFiles
+	w := w1
 
-	if pz, err = cwd_files.MakeCwdFilesAll(s.konfig, s.Standort.Cwd()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	for _, p := range pz.Zettelen {
-		var checked_out zettel_checked_out.Zettel
-
-		var readFunc func() (zettel_checked_out.Zettel, error)
-
-		switch {
-		case p.Akte.Path == "":
-			readFunc = func() (zettel_checked_out.Zettel, error) {
-				return s.Read(p.Zettel.Path)
+	if s.konfig.IncludeCwd {
+		w = func(z *zettel.Verzeichnisse) (err error) {
+			//TODO-P2 akte fd?
+			ze := zettel_external.Zettel{
+				ZettelFD: fd.FD{
+					Path: z.Transacted.Sku.Kennung.String(),
+				},
 			}
 
-		case p.Zettel.Path == "":
-			readFunc = func() (zettel_checked_out.Zettel, error) {
-				return s.ReadExternalZettelFromAktePath(p.Akte.Path)
+			if err1 := s.readZettelFromFile(&ze); err1 == nil {
+				z1 := &zettel.Transacted{
+					Sku:     z.Transacted.Sku,
+					Objekte: ze.Objekte,
+				}
+
+				z1.Sku.Sha = ze.Sku.Sha
+
+				z2 := &zettel.Verzeichnisse{}
+
+				z2.ResetWithTransacted(z1)
+
+				if err = w1(z2); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				return
 			}
 
-		default:
-			//TODO-P3 validate that the zettel file points to the akte in the metadatei
-			readFunc = func() (zettel_checked_out.Zettel, error) {
-				return s.Read(p.Zettel.Path)
-			}
-		}
-
-		if checked_out, err = readFunc(); err != nil {
-			//TODO-P3 decide if error handling like this is ok
-			if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
-				errors.Err().Printf("external zettel does not exist: %s", p)
-			} else {
-				errors.Err().Print(err)
+			if err = w1(z); err != nil {
+				err = errors.Wrap(err)
+				return
 			}
 
-			err = nil
-			continue
-		}
-
-		zt := &zettel.Transacted{
-			Sku:     checked_out.External.Sku.Transacted(),
-			Objekte: checked_out.External.Objekte,
-		}
-
-		zt.Sku.Schwanz = s.sonnenaufgang
-
-		if err = w(zt); err != nil {
-			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	return
+	return s.storeObjekten.Zettel().ReadAllSchwanzenVerzeichnisse(
+		w,
+	)
+}
+
+func (s *Store) ReadManyHistory(
+	w collections.WriterFunc[*zettel.Verzeichnisse],
+) (err error) {
+	queries := []func(collections.WriterFunc[*zettel.Verzeichnisse]) error{
+		s.storeObjekten.Zettel().ReadAllVerzeichnisse,
+	}
+
+	if s.konfig.IncludeCwd {
+		queries = append(
+			queries,
+			func(w collections.WriterFunc[*zettel.Verzeichnisse]) (err error) {
+				var pz cwd_files.CwdFiles
+
+				if pz, err = cwd_files.MakeCwdFilesAll(s.konfig, s.Standort.Cwd()); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				for _, p := range pz.Zettelen {
+					var checked_out zettel_checked_out.Zettel
+
+					var readFunc func() (zettel_checked_out.Zettel, error)
+
+					switch {
+					case p.Akte.Path == "":
+						readFunc = func() (zettel_checked_out.Zettel, error) {
+							return s.Read(p.Zettel.Path)
+						}
+
+					case p.Zettel.Path == "":
+						readFunc = func() (zettel_checked_out.Zettel, error) {
+							return s.ReadExternalZettelFromAktePath(p.Akte.Path)
+						}
+
+					default:
+						//TODO-P3 validate that the zettel file points to the akte in the metadatei
+						readFunc = func() (zettel_checked_out.Zettel, error) {
+							return s.Read(p.Zettel.Path)
+						}
+					}
+
+					if checked_out, err = readFunc(); err != nil {
+						//TODO-P3 decide if error handling like this is ok
+						if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
+							errors.Err().Printf("external zettel does not exist: %s", p)
+						} else {
+							errors.Err().Print(err)
+						}
+
+						err = nil
+						continue
+					}
+
+					zt := &zettel.Transacted{
+						Sku:     checked_out.External.Sku.Transacted(),
+						Objekte: checked_out.External.Objekte,
+					}
+
+					zt.Sku.Schwanz = s.sonnenaufgang
+
+					zv := &zettel.Verzeichnisse{}
+					zv.ResetWithTransacted(zt)
+
+					if err = w(zv); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+				}
+
+				return
+			},
+		)
+	}
+
+	return collections.Multiplex(
+		w,
+		queries...,
+	)
 }
 
 //TODO-P1 deprecate in favor of above method

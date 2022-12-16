@@ -37,6 +37,22 @@ func (f *FormatterValue) Set(v string) (err error) {
 	return
 }
 
+func (fv *FormatterValue) FuncFormatterVerzeichnisse(
+	out io.Writer,
+	af gattung.AkteIOFactory,
+	k konfig_compiled.Compiled,
+	logFunc collections.WriterFunc[*Transacted],
+) collections.WriterFunc[*Verzeichnisse] {
+	return MakeWriterZettelTransacted(
+		fv.FuncFormatter(
+			out,
+			af,
+			k,
+			logFunc,
+		),
+	)
+}
+
 func (fv *FormatterValue) FuncFormatter(
 	out io.Writer,
 	af gattung.AkteIOFactory,

@@ -9,12 +9,18 @@ import (
 	"github.com/friedenberg/zit/src/golf/id_set"
 )
 
+//TODO-P2 move away from this and replace with compiled filter
 type WriterIds struct {
 	Filter id_set.Filter
 }
 
 func (w WriterIds) WriteZettelTransacted(z *Transacted) (err error) {
 	z1 := zettelFilterable{Transacted: z}
+	return w.Filter.Include(z1)
+}
+
+func (w WriterIds) WriteZettelVerzeichnisse(z *Verzeichnisse) (err error) {
+	z1 := zettelFilterable{Transacted: &z.Transacted}
 	return w.Filter.Include(z1)
 }
 

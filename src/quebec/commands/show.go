@@ -119,7 +119,7 @@ func (c Show) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 		return c.showZettels(
 			u,
 			ids,
-			fv.FuncFormatter(
+			fv.FuncFormatterVerzeichnisse(
 				u.Out(),
 				u.StoreObjekten(),
 				u.Konfig(),
@@ -189,25 +189,25 @@ func (c Show) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 func (c Show) showZettels(
 	u *umwelt.Umwelt,
 	ids id_set.Set,
-	fv collections.WriterFunc[*zettel.Transacted],
+	fv collections.WriterFunc[*zettel.Verzeichnisse],
 ) (err error) {
 	filter := zettel.WriterIds{
 		Filter: id_set.Filter{
 			Set: ids,
 		},
-	}.WriteZettelTransacted
+	}.WriteZettelVerzeichnisse
 
-	method := u.StoreObjekten().Zettel().ReadAllSchwanzenTransacted
+	method := u.StoreWorkingDirectory().ReadMany
 
 	if u.Konfig().IncludeHistory {
-		method = u.StoreObjekten().Zettel().ReadAllTransacted
+		method = u.StoreWorkingDirectory().ReadManyHistory
 		hinweisen := hinweis.MakeMutableSet()
 
-		if err = u.StoreObjekten().Zettel().ReadAllSchwanzenTransacted(
+		if err = u.StoreObjekten().Zettel().ReadAllSchwanzenVerzeichnisse(
 			collections.MakeChain(
 				filter,
-				func(o *zettel.Transacted) (err error) {
-					return hinweisen.Add(o.Sku.Kennung)
+				func(o *zettel.Verzeichnisse) (err error) {
+					return hinweisen.Add(o.Transacted.Sku.Kennung)
 				},
 			),
 		); err != nil {
@@ -217,23 +217,18 @@ func (c Show) showZettels(
 
 		hContainer := hinweisen.WriterContainer(io.EOF)
 
-		filter = func(o *zettel.Transacted) (err error) {
-			return hContainer(o.Sku.Kennung)
+		filter = func(o *zettel.Verzeichnisse) (err error) {
+			return hContainer(o.Transacted.Sku.Kennung)
 		}
 	}
 
 	f1 := collections.MakeSyncSerializer(fv)
 
-	w := collections.MakeChain(
-		filter,
-		f1,
-	)
-
-	//TODO-P1 make option for reading from fs
-	if err = collections.Multiplex(
-		w,
-		method,
-		u.StoreWorkingDirectory().ReadAllSchwanzenTransacted,
+	if err = method(
+		collections.MakeChain(
+			filter,
+			f1,
+		),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
