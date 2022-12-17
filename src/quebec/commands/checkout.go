@@ -64,10 +64,12 @@ func (c Checkout) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 	return
 }
 
-func (c Checkout) RunWithIds(s *umwelt.Umwelt, ids id_set.Set) (err error) {
+func (c Checkout) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	options := store_fs.CheckoutOptions{
 		CheckoutMode: c.CheckoutMode,
-		Format:       zettel.Text{},
+		Format: zettel.Text{
+			AkteFactory: u.StoreObjekten(),
+		},
 	}
 
 	query := zettel.WriterIds{
@@ -77,7 +79,7 @@ func (c Checkout) RunWithIds(s *umwelt.Umwelt, ids id_set.Set) (err error) {
 		},
 	}
 
-	if _, err = s.StoreWorkingDirectory().Checkout(
+	if _, err = u.StoreWorkingDirectory().Checkout(
 		options,
 		query.WriteZettelTransacted,
 	); err != nil {

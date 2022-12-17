@@ -76,7 +76,9 @@ func (fv *FormatterValue) FuncFormatter(
 		}
 
 	case "text", "hinweis-text":
-		f := Text{}
+		f := Text{
+			AkteFactory: af,
+		}
 
 		return func(o *Transacted) (err error) {
 			if fv.string == "hinweis-text" {
@@ -90,9 +92,8 @@ func (fv *FormatterValue) FuncFormatter(
 			}
 
 			c := FormatContextWrite{
-				Out:               out,
-				Zettel:            o.Objekte,
-				AkteReaderFactory: af,
+				Out:    out,
+				Zettel: o.Objekte,
 			}
 
 			if typ.IsInlineAkte(o.Objekte.Typ, k) {
@@ -145,7 +146,7 @@ func (fv *FormatterValue) FuncFormatter(
 		}
 
 	case "toml":
-		//TODO-P0 limit to just zettels that support toml
+		//TODO-P3 limit to just zettels that support toml
 		return func(o *Transacted) (err error) {
 			if _, err = io.WriteString(
 				out, fmt.Sprintf("['%s']\n", o.Sku.Kennung),
@@ -178,10 +179,9 @@ func (fv *FormatterValue) FuncFormatter(
 
 		return func(o *Transacted) (err error) {
 			c := FormatContextWrite{
-				Out:               out,
-				Zettel:            o.Objekte,
-				AkteReaderFactory: af,
-				IncludeAkte:       true,
+				Out:         out,
+				Zettel:      o.Objekte,
+				IncludeAkte: true,
 			}
 
 			if _, err = f.WriteTo(c); err != nil {

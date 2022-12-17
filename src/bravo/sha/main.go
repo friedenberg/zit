@@ -37,6 +37,16 @@ type Sha struct {
 	value string
 }
 
+func Must(v string) (s Sha) {
+	s = Sha{}
+
+	if err := s.Set(v); err != nil {
+		panic(errors.Wrap(err))
+	}
+
+	return
+}
+
 func MakeSha(v string) (s Sha, err error) {
 	s = Sha{}
 	err = s.Set(v)

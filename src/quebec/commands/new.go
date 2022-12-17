@@ -62,7 +62,10 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	f := zettel.Text{}
+	f := zettel.Text{
+		AkteFactory: u.StoreObjekten(),
+	}
+
 	var zsc zettel_checked_out.MutableSet
 
 	if len(args) == 0 {
@@ -81,7 +84,9 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		if c.Edit {
 			options := store_fs.CheckoutOptions{
 				CheckoutMode: store_fs.CheckoutModeZettelAndAkte,
-				Format:       zettel.Text{},
+				Format: zettel.Text{
+					AkteFactory: u.StoreObjekten(),
+				},
 			}
 
 			if zsc, err = u.StoreWorkingDirectory().Checkout(

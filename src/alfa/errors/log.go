@@ -4,7 +4,6 @@ import (
 	"io/ioutil"
 	log_package "log"
 	"os"
-	"path/filepath"
 )
 
 type Logger interface {
@@ -49,6 +48,4 @@ func SetVerbose() {
 func SetTesting() {
 	SetVerbose()
 	isTest = true
-	//TODO-P3 use base directory for project
-	cwd = filepath.Dir(filepath.Dir(cwd))
 }

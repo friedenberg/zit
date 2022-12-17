@@ -1,68 +1,56 @@
 package test_metadatei_io
 
 import (
+	"bytes"
 	"io"
 	"strings"
 
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/echo/sha"
+	"github.com/friedenberg/zit/src/golf/age_io"
 )
 
-type nopReadWriteCloser struct {
-	io.ReadWriter
+type AkteIOFactory struct {
+	contents      map[string]string
+	currentBuffer *bytes.Buffer
 }
 
-func NopReadWriteCloser(rw io.ReadWriter) *nopReadWriteCloser {
-	return &nopReadWriteCloser{
-		ReadWriter: rw,
+func FixtureFactoryReadWriteCloser(
+	contents map[string]string,
+) *AkteIOFactory {
+	return &AkteIOFactory{
+		contents: contents,
 	}
 }
 
-func (nrwc *nopReadWriteCloser) Close() (err error) {
-	return
-}
-
-type nopAkteIoFactory struct {
-	io.ReadWriteCloser
-}
-
-func NopFactoryReadWriter(rw io.ReadWriter) *nopAkteIoFactory {
-	return NopFactoryReadWriteCloser(
-		NopReadWriteCloser(rw),
-	)
-}
-
-func NopFactoryReadWriteCloser(rwc io.ReadWriteCloser) *nopAkteIoFactory {
-	return &nopAkteIoFactory{
-		ReadWriteCloser: rwc,
+func (aw AkteIOFactory) AkteReader(sh sha.Sha) (rc sha.ReadCloser, err error) {
+	if s, ok := aw.contents[sh.String()]; ok {
+		rc = sha.MakeNopReadCloser(io.NopCloser(strings.NewReader(s)))
+	} else {
+		err = errors.Errorf("not found: %s", sh)
+		return
 	}
-}
 
-func (b nopAkteIoFactory) ReadFrom(r io.Reader) (n int64, err error) {
-	n, err = io.Copy(b.ReadWriteCloser, r)
 	return
 }
 
-func (b nopAkteIoFactory) WriteTo(w io.Writer) (n int64, err error) {
-	n, err = io.Copy(w, b.ReadWriteCloser)
-	return
+func (aw *AkteIOFactory) AkteWriter() (sha.WriteCloser, error) {
+	aw.currentBuffer = bytes.NewBuffer(nil)
+	wo := age_io.WriteOptions{
+		Writer: aw.currentBuffer,
+	}
+
+	return age_io.NewWriter(wo)
 }
 
-func (b nopAkteIoFactory) Sha() sha.Sha {
-	return sha.Sha{}
-}
+func (aw AkteIOFactory) CurrentBufferString() string {
+	if aw.currentBuffer == nil {
+		return ""
+	}
 
-func (aw nopAkteIoFactory) AkteReader(sh sha.Sha) (sha.ReadCloser, error) {
-	return aw, nil
-}
-
-func (aw nopAkteIoFactory) AkteWriter() (sha.WriteCloser, error) {
-	return aw, nil
-}
-
-func (aw nopAkteIoFactory) String() string {
 	sb := &strings.Builder{}
 
-	io.Copy(sb, aw)
+	io.Copy(sb, aw.currentBuffer)
 
 	return sb.String()
 }

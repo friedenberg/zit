@@ -3,16 +3,30 @@ package zettel
 import (
 	"testing"
 
+	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/test_logz"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
+	"github.com/friedenberg/zit/src/foxtrot/test_metadatei_io"
 )
+
+func makeTestTextFormat(af *test_metadatei_io.AkteIOFactory) Format {
+	if af == nil {
+		af = test_metadatei_io.FixtureFactoryReadWriteCloser(nil)
+	}
+
+	return Text{
+		AkteFactory: af,
+	}
+}
 
 func TestReadWithoutAkte(t1 *testing.T) {
 	t := test_logz.T{T: t1}
+	af := test_metadatei_io.FixtureFactoryReadWriteCloser(nil)
 
 	actual, akte := readFormat(
 		t,
-		Text{},
+		makeTestTextFormat(af),
+		af,
 		`---
 # the title
 - tag1
@@ -45,9 +59,12 @@ func TestReadWithoutAkte(t1 *testing.T) {
 func TestReadWithoutAkteWithMultilineBezeichnung(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
+	af := test_metadatei_io.FixtureFactoryReadWriteCloser(nil)
+
 	actual, akte := readFormat(
 		t,
-		Text{},
+		makeTestTextFormat(af),
+		af,
 		`---
 # the title
 # continues
@@ -81,9 +98,17 @@ func TestReadWithoutAkteWithMultilineBezeichnung(t1 *testing.T) {
 func TestReadWithAkte(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
+	af := test_metadatei_io.FixtureFactoryReadWriteCloser(
+		map[string]string{
+			"fa8242e99f48966ca514092b4233b446851f42b57ad5031bf133e1dd76787f3e": "the body\n",
+			"036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064": "the body",
+		},
+	)
+
 	actual, akte := readFormat(
 		t,
-		Text{},
+		makeTestTextFormat(af),
+		af,
 		`---
 # the title
 - tag1
@@ -97,6 +122,7 @@ the body
 	)
 
 	expected := &Objekte{
+		Akte:        sha.Must("036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064"),
 		Bezeichnung: bezeichnung.Make("the title"),
 		Etiketten: makeEtiketten(t,
 			"tag1",

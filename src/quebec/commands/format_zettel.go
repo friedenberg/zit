@@ -42,7 +42,9 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	defer errors.Deferred(&err, f.Close)
 
-	format := zettel.Text{}
+	format := zettel.Text{
+		AkteFactory: u.StoreObjekten(),
+	}
 
 	var cz zettel_checked_out.Zettel
 
@@ -69,11 +71,10 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	inlineAkte := typ.IsInlineAkte(cz.External.Objekte.Typ, u.Konfig())
 
 	ctx := zettel.FormatContextWrite{
-		Zettel:            cz.External.Objekte,
-		IncludeAkte:       inlineAkte,
-		AkteReaderFactory: u.StoreObjekten(),
-		FormatScript:      formatter,
-		Out:               os.Stdout,
+		Zettel:       cz.External.Objekte,
+		IncludeAkte:  inlineAkte,
+		FormatScript: formatter,
+		Out:          os.Stdout,
 	}
 
 	if _, err = format.WriteTo(ctx); err != nil {

@@ -4,10 +4,12 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 )
 
 type Akte struct {
-	Toml bool
+	Toml        bool
+	AkteFactory gattung.AkteIOFactory
 }
 
 func (f Akte) WriteTo(c FormatContextWrite) (n int64, err error) {
@@ -15,7 +17,7 @@ func (f Akte) WriteTo(c FormatContextWrite) (n int64, err error) {
 
 	sb := c.Zettel.Akte
 
-	if r, err = c.AkteReader(sb); err != nil {
+	if r, err = f.AkteFactory.AkteReader(sb); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

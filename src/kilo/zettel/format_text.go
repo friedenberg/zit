@@ -1,16 +1,34 @@
 package zettel
 
 import (
+	"io"
+
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei_io"
 )
 
-// TODO-P0 remove entirely and replace with Text2
+// TODO-P0 migrate to format.Format
 type Text struct {
+	AkteFactory                gattung.AkteIOFactory
 	DoNotWriteEmptyBezeichnung bool
 	TypError                   error
+}
+
+func (f Text) ReadFormat(r io.Reader, o *Objekte) (n int64, err error) {
+	c := &FormatContextRead{
+		In:     r,
+		Zettel: *o,
+	}
+
+	if n, err = f.ReadFrom(c); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (f Text) ReadFrom(c *FormatContextRead) (n int64, err error) {
@@ -20,12 +38,12 @@ func (f Text) ReadFrom(c *FormatContextRead) (n int64, err error) {
 
 	var akteWriter sha.WriteCloser
 
-	if c.AkteWriterFactory == nil {
-		err = errors.Errorf("akte writer factory is nil")
+	if f.AkteFactory == nil {
+		err = errors.Errorf("akte factory is nil")
 		return
 	}
 
-	if akteWriter, err = c.AkteWriter(); err != nil {
+	if akteWriter, err = f.AkteFactory.AkteWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -53,7 +71,7 @@ func (f Text) ReadFrom(c *FormatContextRead) (n int64, err error) {
 	inlineAkteSha := akteWriter.Sha()
 	c.AktePath = state.aktePath
 
-  //TODO-P1 handle akte path
+	//TODO-P1 handle akte path
 	switch {
 	case state.akteSha.IsNull() && !inlineAkteSha.IsNull():
 		c.Zettel.Akte = inlineAkteSha

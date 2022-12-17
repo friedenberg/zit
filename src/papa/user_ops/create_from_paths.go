@@ -184,8 +184,7 @@ func (c CreateFromPaths) zettelsFromPath(
 	defer c.Filter.Close()
 
 	ctx := zettel.FormatContextRead{
-		In:                r,
-		AkteWriterFactory: c.StoreObjekten(),
+		In: r,
 	}
 
 	if _, err = c.Format.ReadFrom(&ctx); err != nil {

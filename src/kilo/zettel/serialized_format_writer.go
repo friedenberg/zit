@@ -20,9 +20,8 @@ func MakeSerializedFormatWriter(
 		isInline := typ.IsInlineAkte(z.Typ, k)
 
 		ctx := FormatContextWrite{
-			Out:               out,
-			AkteReaderFactory: arf,
-			Zettel:            *z,
+			Out:    out,
+			Zettel: *z,
 			//TODO this seems inverted for some reason
 			IncludeAkte: isInline,
 		}

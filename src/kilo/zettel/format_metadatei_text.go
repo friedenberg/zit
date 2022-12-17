@@ -8,13 +8,15 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 )
 
 type FormatMetadateiText struct {
-	context *FormatContextRead
+	AkteFactory gattung.AkteIOFactory
+	context     *FormatContextRead
 
 	aktePath string
 	akteSha  sha.Sha
@@ -70,7 +72,7 @@ func (f *FormatMetadateiText) readTyp(desc string) (err error) {
 
 		var akteWriter sha.WriteCloser
 
-		if akteWriter, err = f.context.AkteWriter(); err != nil {
+		if akteWriter, err = f.AkteFactory.AkteWriter(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

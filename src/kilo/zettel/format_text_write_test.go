@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/test_logz"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/echo/sha"
+	"github.com/friedenberg/zit/src/foxtrot/test_metadatei_io"
 )
 
 type noopCloser struct {
@@ -61,12 +62,6 @@ func writeFormat(t test_logz.T, z Objekte, f Format, includeAkte bool, akteBody 
 		Zettel:      z,
 		Out:         sb,
 		IncludeAkte: includeAkte,
-		AkteReaderFactory: akteReaderFactory{
-			t: t,
-			akten: map[string]string{
-				akteShaRaw: akteBody,
-			},
-		},
 	}
 
 	if _, err := f.WriteTo(c); err != nil {
@@ -120,7 +115,15 @@ func TestWriteWithInlineAkte(t1 *testing.T) {
 		Typ: makeAkteExt(t, "md"),
 	}
 
-	actual := writeFormat(t, z, Text{}, true, `the body`)
+	format := Text{
+		AkteFactory: test_metadatei_io.FixtureFactoryReadWriteCloser(
+			map[string]string{
+				"fa8242e99f48966ca514092b4233b446851f42b57ad5031bf133e1dd76787f3e": "the body\n",
+			},
+		),
+	}
+
+	actual := writeFormat(t, z, format, true, `the body`)
 
 	expected := `---
 # the title
@@ -130,7 +133,8 @@ func TestWriteWithInlineAkte(t1 *testing.T) {
 ! md
 ---
 
-the body`
+the body
+`
 
 	if expected != actual {
 		t.Fatalf("zettel:\nexpected: %#v\n  actual: %#v", expected, actual)

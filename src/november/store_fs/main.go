@@ -50,7 +50,9 @@ func New(
 		sonnenaufgang: t,
 		konfig:        k,
 		Standort:      st,
-		format:        zettel.Text{},
+		format: zettel.Text{
+			AkteFactory: storeObjekten,
+		},
 		storeObjekten: storeObjekten,
 		entries:       make(map[string]Entry),
 	}
@@ -150,9 +152,7 @@ func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 		return
 	}
 
-	c := zettel.FormatContextRead{
-		AkteWriterFactory: s.storeObjekten,
-	}
+	c := zettel.FormatContextRead{}
 
 	var f *os.File
 

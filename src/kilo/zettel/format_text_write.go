@@ -117,12 +117,12 @@ func (f Text) writeToInlineAkte(c FormatContextWrite) (n int64, err error) {
 
 	var ar io.ReadCloser
 
-	if c.AkteReaderFactory == nil {
+	if f.AkteFactory == nil {
 		err = errors.Errorf("akte reader factory is nil")
 		return
 	}
 
-	ar, err = c.AkteReader(c.Zettel.Akte)
+	ar, err = f.AkteFactory.AkteReader(c.Zettel.Akte)
 
 	if err != nil {
 		err = errors.Wrap(err)
@@ -215,12 +215,12 @@ func (f Text) writeToExternalAkte(c FormatContextWrite) (n int64, err error) {
 
 	var ar io.ReadCloser
 
-	if c.AkteReaderFactory == nil {
+	if f.AkteFactory == nil {
 		err = errors.Errorf("akte reader factory is nil")
 		return
 	}
 
-	if ar, err = c.AkteReader(c.Zettel.Akte); err != nil {
+	if ar, err = f.AkteFactory.AkteReader(c.Zettel.Akte); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
