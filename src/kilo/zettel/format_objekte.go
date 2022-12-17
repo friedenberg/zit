@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 )
 
+//TODO-P1 remove this
 func (z Objekte) ObjekteSha() (s sha.Sha, err error) {
 	hash := sha256.New()
 
@@ -31,6 +32,7 @@ func (z Objekte) ObjekteSha() (s sha.Sha, err error) {
 	return
 }
 
+//TODO-P1 replace with objekte.Format
 type FormatObjekte struct {
 	IgnoreTypErrors bool
 }
