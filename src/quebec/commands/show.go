@@ -25,6 +25,7 @@ type Show struct {
 	//TODO-P0 gattung.Set
 	gattung.Gattung
 	Format string
+	All    bool
 }
 
 func init() {
@@ -37,6 +38,7 @@ func init() {
 
 			f.Var(&c.Gattung, "gattung", "Gattung")
 			f.StringVar(&c.Format, "format", "text", "format")
+			f.BoolVar(&c.All, "all", false, "show all Objekten")
 
 			cwi := commandWithIds{
 				CommandWithIds: c,
@@ -193,7 +195,8 @@ func (c Show) showZettels(
 ) (err error) {
 	filter := zettel.WriterIds{
 		Filter: id_set.Filter{
-			Set: ids,
+			AllowEmpty: c.All,
+			Set:        ids,
 		},
 	}.WriteZettelVerzeichnisse
 
@@ -237,6 +240,7 @@ func (c Show) showZettels(
 	return
 }
 
+//TODO-P3 support All
 func (c Show) showAkten(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	zettels := make([]*zettel.Transacted, ids.Len())
 
@@ -275,6 +279,7 @@ func (c Show) showAkten(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	return
 }
 
+//TODO-P3 support All
 func (c Show) showTransaktions(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	ids.Timestamps().Each(
 		func(is ts.Time) (err error) {
@@ -301,6 +306,7 @@ func (c Show) showTransaktions(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	return
 }
 
+//TODO-P3 support All
 func (c Show) showTypen(
 	u *umwelt.Umwelt,
 	ids id_set.Set,
@@ -334,6 +340,7 @@ func (c Show) showTypen(
 	return
 }
 
+//TODO-P3 support All
 func (c Show) showEtiketten(
 	u *umwelt.Umwelt,
 	ids id_set.Set,
