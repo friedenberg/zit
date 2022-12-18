@@ -140,8 +140,8 @@ func (f Text) writeToInlineAkte(c FormatContextWrite) (n int64, err error) {
 
 	var cmd *exec.Cmd
 
-	if c.FormatScript != nil {
-		if cmd, err = c.FormatScript.Cmd(); err != nil {
+	if f.AkteFormatter != nil {
+		if cmd, err = f.AkteFormatter.Cmd(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

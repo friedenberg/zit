@@ -4,7 +4,6 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/india/konfig"
 )
 
 type FormatContextRead struct {
@@ -18,7 +17,6 @@ type FormatContextWrite struct {
 	Zettel           Objekte
 	Out              io.Writer
 	IncludeAkte      bool
-	FormatScript     konfig.RemoteScript
 	ExternalAktePath string
 }
 

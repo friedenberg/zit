@@ -6,7 +6,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/india/konfig"
 	"github.com/friedenberg/zit/src/india/typ"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/mike/zettel_checked_out"
@@ -53,13 +52,11 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	var formatter konfig.RemoteScript
-
 	typKonfig := u.Konfig().GetTyp(cz.External.Objekte.Typ)
 
 	if typKonfig != nil {
 		if f, ok := typKonfig.Objekte.Akte.Actions["format"]; ok {
-			formatter = f.ScriptConfig
+			format.AkteFormatter = f.ScriptConfig
 		}
 	}
 
@@ -71,10 +68,9 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	inlineAkte := typ.IsInlineAkte(cz.External.Objekte.Typ, u.Konfig())
 
 	ctx := zettel.FormatContextWrite{
-		Zettel:       cz.External.Objekte,
-		IncludeAkte:  inlineAkte,
-		FormatScript: formatter,
-		Out:          os.Stdout,
+		Zettel:      cz.External.Objekte,
+		IncludeAkte: inlineAkte,
+		Out:         os.Stdout,
 	}
 
 	if _, err = format.WriteTo(ctx); err != nil {
