@@ -76,7 +76,7 @@ func (fv *FormatterValue) FuncFormatter(
 		}
 
 	case "text", "hinweis-text":
-		f := TextParser{
+		f := textParser{
 			AkteFactory: af,
 		}
 

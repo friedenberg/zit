@@ -86,7 +86,7 @@ func TestWriteWithoutAkte(t1 *testing.T) {
 		Typ: makeAkteExt(t, "md"),
 	}
 
-	actual := writeFormat(t, z, TextParser{}, false, `the body`)
+	actual := writeFormat(t, z, textParser{}, false, `the body`)
 
 	expected := `---
 # the title
@@ -115,7 +115,7 @@ func TestWriteWithInlineAkte(t1 *testing.T) {
 		Typ: makeAkteExt(t, "md"),
 	}
 
-	format := TextParser{
+	format := textParser{
 		AkteFactory: test_metadatei_io.FixtureFactoryReadWriteCloser(
 			map[string]string{
 				"fa8242e99f48966ca514092b4233b446851f42b57ad5031bf133e1dd76787f3e": "the body\n",

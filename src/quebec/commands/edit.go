@@ -75,7 +75,10 @@ func (c Edit) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 func (c Edit) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	checkoutOptions := store_fs.CheckoutOptions{
 		CheckoutMode: c.CheckoutMode,
-		Format:       zettel.TextParser{},
+		Format: zettel.MakeTextParser(
+			u.StoreObjekten(),
+			nil,
+		),
 	}
 
 	var checkoutResults zettel_checked_out.MutableSet
@@ -123,7 +126,10 @@ func (c Edit) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	readOp := user_ops.ReadCheckedOut{
 		Umwelt: u,
 		OptionsReadExternal: store_fs.OptionsReadExternal{
-			Format: zettel.TextParser{},
+			Format: zettel.MakeTextParser(
+				u.StoreObjekten(),
+				nil,
+			),
 		},
 	}
 
@@ -152,7 +158,10 @@ func (c Edit) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	checkinOp := user_ops.Checkin{
 		Umwelt: u,
 		OptionsReadExternal: store_fs.OptionsReadExternal{
-			Format: zettel.TextParser{},
+			Format: zettel.MakeTextParser(
+				u.StoreObjekten(),
+				nil,
+			),
 		},
 	}
 

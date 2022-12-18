@@ -12,7 +12,7 @@ import (
 )
 
 // TODO-P0 migrate to format.Format
-type TextParser struct {
+type textParser struct {
 	AkteFactory                gattung.AkteIOFactory
 	AkteFormatter              konfig.RemoteScript
 	DoNotWriteEmptyBezeichnung bool
@@ -22,14 +22,14 @@ type TextParser struct {
 func MakeTextParser(
 	akteFactory gattung.AkteIOFactory,
 	akteFormatter konfig.RemoteScript,
-) *TextParser {
-	return &TextParser{
+) textParser {
+	return textParser{
 		AkteFactory:   akteFactory,
 		AkteFormatter: akteFormatter,
 	}
 }
 
-func (f TextParser) ReadFormat(r io.Reader, o *Objekte) (n int64, err error) {
+func (f textParser) ReadFormat(r io.Reader, o *Objekte) (n int64, err error) {
 	c := &FormatContextRead{
 		In:     r,
 		Zettel: *o,
@@ -43,7 +43,7 @@ func (f TextParser) ReadFormat(r io.Reader, o *Objekte) (n int64, err error) {
 	return
 }
 
-func (f TextParser) ReadFrom(c *FormatContextRead) (n int64, err error) {
+func (f textParser) ReadFrom(c *FormatContextRead) (n int64, err error) {
 	state := &TextMetadateiParser{
 		context: c,
 	}

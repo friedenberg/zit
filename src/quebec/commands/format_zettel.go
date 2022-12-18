@@ -41,9 +41,10 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	defer errors.Deferred(&err, f.Close)
 
-	format := zettel.TextParser{
-		AkteFactory: u.StoreObjekten(),
-	}
+	format := zettel.MakeTextParser(
+		u.StoreObjekten(),
+		nil,
+	)
 
 	var cz zettel_checked_out.Zettel
 

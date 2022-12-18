@@ -50,9 +50,10 @@ func New(
 		sonnenaufgang: t,
 		konfig:        k,
 		Standort:      st,
-		format: zettel.TextParser{
-			AkteFactory: storeObjekten,
-		},
+		format: zettel.MakeTextParser(
+			storeObjekten,
+			nil,
+		),
 		storeObjekten: storeObjekten,
 		entries:       make(map[string]Entry),
 	}

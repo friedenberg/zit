@@ -62,9 +62,10 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	f := zettel.TextParser{
-		AkteFactory: u.StoreObjekten(),
-	}
+	f := zettel.MakeTextParser(
+		u.StoreObjekten(),
+		nil,
+	)
 
 	var zsc zettel_checked_out.MutableSet
 
@@ -84,9 +85,10 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		if c.Edit {
 			options := store_fs.CheckoutOptions{
 				CheckoutMode: store_fs.CheckoutModeZettelAndAkte,
-				Format: zettel.TextParser{
-					AkteFactory: u.StoreObjekten(),
-				},
+				Format: zettel.MakeTextParser(
+					u.StoreObjekten(),
+					nil,
+				),
 			}
 
 			if zsc, err = u.StoreWorkingDirectory().Checkout(
@@ -201,7 +203,10 @@ func (c New) editZettels(
 	readOp := user_ops.ReadCheckedOut{
 		Umwelt: u,
 		OptionsReadExternal: store_fs.OptionsReadExternal{
-			Format: zettel.TextParser{},
+			Format: zettel.MakeTextParser(
+				u.StoreObjekten(),
+				nil,
+			),
 		},
 	}
 

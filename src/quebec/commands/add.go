@@ -162,7 +162,10 @@ func (c Add) openAktenIfNecessary(
 
 	options := store_fs.CheckoutOptions{
 		CheckoutMode: store_fs.CheckoutModeAkteOnly,
-		Format:       zettel.TextParser{},
+		Format: zettel.MakeTextParser(
+			u.StoreObjekten(),
+			nil,
+		),
 	}
 
 	var checkoutResults zettel_checked_out.MutableSet
