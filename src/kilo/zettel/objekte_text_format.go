@@ -6,7 +6,7 @@ import (
 )
 
 type objekteTextFormat struct {
-	textParser
+	objekteTextParser
 }
 
 func MakeObjekteTextFormat(
@@ -14,7 +14,7 @@ func MakeObjekteTextFormat(
 	akteFormatter konfig.RemoteScript,
 ) *objekteTextFormat {
 	return &objekteTextFormat{
-		textParser: MakeTextParser(
+		objekteTextParser: MakeTextParser(
 			akteFactory,
 			akteFormatter,
 		),
