@@ -11,7 +11,6 @@ import (
 	"github.com/friedenberg/zit/src/echo/collections_coding"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/hotel/objekte"
-	"github.com/friedenberg/zit/src/india/typ"
 	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
 )
 
@@ -76,9 +75,11 @@ func (fv *FormatterValue) FuncFormatter(
 		}
 
 	case "text", "hinweis-text":
-		f := objekteTextParser{
-			AkteFactory: af,
-		}
+		f := MakeObjekteTextFormatterIncludeAkte(
+			k,
+			af,
+			nil,
+		)
 
 		return func(o *Transacted) (err error) {
 			if fv.string == "hinweis-text" {
@@ -94,10 +95,6 @@ func (fv *FormatterValue) FuncFormatter(
 			c := FormatContextWrite{
 				Out:    out,
 				Zettel: o.Objekte,
-			}
-
-			if typ.IsInlineAkte(o.Objekte.Typ, k) {
-				c.IncludeAkte = true
 			}
 
 			if _, err = f.WriteTo(c); err != nil {

@@ -8,6 +8,12 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/test_metadatei_io"
 )
 
+type alwaysInlineTypChecker struct{}
+
+func (_ alwaysInlineTypChecker) IsInlineTyp(k kennung.Typ) bool {
+	return true
+}
+
 func makeEtiketten(t test_logz.T, vs ...string) (es kennung.EtikettSet) {
 	var err error
 

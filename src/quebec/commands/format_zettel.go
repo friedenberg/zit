@@ -6,7 +6,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/india/typ"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/mike/zettel_checked_out"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
@@ -41,7 +40,10 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	defer errors.Deferred(&err, f.Close)
 
-	format := zettel.MakeTextParser(
+	//TODO-P4 read the format type (akte included or not) and determine
+	//appropriately
+	format := zettel.MakeObjekteTextFormatterIncludeAkte(
+		u.Konfig(),
 		u.StoreObjekten(),
 		nil,
 	)
@@ -66,15 +68,15 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	inlineAkte := typ.IsInlineAkte(cz.External.Objekte.Typ, u.Konfig())
+	//TODO-P0
+	// inlineAkte := typ.IsInlineAkte(cz.External.Objekte.Typ, u.Konfig())
+	// ctx := zettel.FormatContextWrite{
+	// 	Zettel:      cz.External.Objekte,
+	// 	IncludeAkte: inlineAkte,
+	// 	Out:         os.Stdout,
+	// }
 
-	ctx := zettel.FormatContextWrite{
-		Zettel:      cz.External.Objekte,
-		IncludeAkte: inlineAkte,
-		Out:         os.Stdout,
-	}
-
-	if _, err = format.WriteTo(ctx); err != nil {
+	if _, err = format.Format(u.Out(), &cz.External.Objekte); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

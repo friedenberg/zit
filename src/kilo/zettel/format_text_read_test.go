@@ -14,9 +14,10 @@ func makeTestTextFormat(af *test_metadatei_io.AkteIOFactory) Format {
 		af = test_metadatei_io.FixtureFactoryReadWriteCloser(nil)
 	}
 
-	return objekteTextParser{
-		AkteFactory: af,
-	}
+	return MakeObjekteTextFormat(
+		af,
+		nil,
+	)
 }
 
 func TestReadWithoutAkte(t1 *testing.T) {

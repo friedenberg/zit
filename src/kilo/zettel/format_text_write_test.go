@@ -39,7 +39,13 @@ func (arf akteReaderFactory) AkteReader(s sha.Sha) (r sha.ReadCloser, err error)
 	return
 }
 
-func writeFormat(t test_logz.T, z Objekte, f Format, includeAkte bool, akteBody string) (out string) {
+func writeFormat(
+	t test_logz.T,
+	z Objekte,
+	f ObjekteFormatter,
+	includeAkte bool,
+	akteBody string,
+) (out string) {
 	hash := sha256.New()
 	_, err := io.Copy(hash, strings.NewReader(akteBody))
 
@@ -58,13 +64,7 @@ func writeFormat(t test_logz.T, z Objekte, f Format, includeAkte bool, akteBody 
 
 	sb := &strings.Builder{}
 
-	c := FormatContextWrite{
-		Zettel:      z,
-		Out:         sb,
-		IncludeAkte: includeAkte,
-	}
-
-	if _, err := f.WriteTo(c); err != nil {
+	if _, err := f.Format(sb, &z); err != nil {
 		t.Errorf("%s", err)
 	}
 
@@ -86,7 +86,7 @@ func TestWriteWithoutAkte(t1 *testing.T) {
 		Typ: makeAkteExt(t, "md"),
 	}
 
-	actual := writeFormat(t, z, objekteTextParser{}, false, `the body`)
+	actual := writeFormat(t, z, objekteTextFormatter{}, false, `the body`)
 
 	expected := `---
 # the title
@@ -115,13 +115,17 @@ func TestWriteWithInlineAkte(t1 *testing.T) {
 		Typ: makeAkteExt(t, "md"),
 	}
 
-	format := objekteTextParser{
-		AkteFactory: test_metadatei_io.FixtureFactoryReadWriteCloser(
-			map[string]string{
-				"fa8242e99f48966ca514092b4233b446851f42b57ad5031bf133e1dd76787f3e": "the body\n",
-			},
-		),
-	}
+	af := test_metadatei_io.FixtureFactoryReadWriteCloser(
+		map[string]string{
+			"fa8242e99f48966ca514092b4233b446851f42b57ad5031bf133e1dd76787f3e": "the body\n",
+		},
+	)
+
+	format := MakeObjekteTextFormatterIncludeAkte(
+		alwaysInlineTypChecker{},
+		af,
+		nil,
+	)
 
 	actual := writeFormat(t, z, format, true, `the body`)
 

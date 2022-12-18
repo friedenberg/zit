@@ -19,6 +19,7 @@ type objekteTextParser struct {
 	TypError                   error
 }
 
+//TODO-P1 rename dto MakeObjekteTextParser
 func MakeTextParser(
 	akteFactory gattung.AkteIOFactory,
 	akteFormatter konfig.RemoteScript,

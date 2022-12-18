@@ -7,6 +7,7 @@ import (
 
 type objekteTextFormat struct {
 	objekteTextParser
+	objekteTextFormatter
 }
 
 func MakeObjekteTextFormat(
@@ -18,5 +19,8 @@ func MakeObjekteTextFormat(
 			akteFactory,
 			akteFormatter,
 		),
+		objekteTextFormatter: objekteTextFormatter{
+			AkteFactory: akteFactory,
+		},
 	}
 }

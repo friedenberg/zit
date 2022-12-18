@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/id"
 	"github.com/friedenberg/zit/src/golf/fd"
-	"github.com/friedenberg/zit/src/india/typ"
 	"github.com/friedenberg/zit/src/india/zettel_external"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/mike/zettel_checked_out"
@@ -121,7 +120,7 @@ func (s *Store) CheckoutOne(
 		}
 	}
 
-	inlineAkte := typ.IsInlineAkte(sz.Objekte.Typ, s.konfig)
+	inlineAkte := s.konfig.IsInlineTyp(sz.Objekte.Typ)
 
 	cz = zettel_checked_out.Zettel{
 		//TODO-P2 check diff with fs if already exists
@@ -216,7 +215,7 @@ func (s *Store) writeFormat(
 
 	defer errors.Deferred(&err, f.Close)
 
-	if _, err = o.Format.WriteTo(fc); err != nil {
+	if _, err = o.Formatter.Format(f, &fc.Zettel); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

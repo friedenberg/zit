@@ -1,255 +1,240 @@
 package zettel
 
-import (
-	"fmt"
-	"io"
-	"os"
-	"os/exec"
-	"strings"
+//// TODO switch to three different formats
+//// metadatei, zettel-akte-external, zettel-akte-inline
+//func (f objekteTextParser) WriteTo(c FormatContextWrite) (n int64, err error) {
+//	switch {
+//	case c.IncludeAkte && c.ExternalAktePath == "":
+//		return f.writeToInlineAkte(c)
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/delta/format"
-	"github.com/friedenberg/zit/src/foxtrot/metadatei_io"
-)
+//	case c.IncludeAkte:
+//		return f.writeToExternalAkte(c)
 
-const MetadateiBoundary = metadatei_io.Boundary
+//	default:
+//		return f.writeToOmitAkte(c)
+//	}
+//}
 
-// TODO switch to three different formats
-// metadatei, zettel-akte-external, zettel-akte-inline
-func (f objekteTextParser) WriteTo(c FormatContextWrite) (n int64, err error) {
-	switch {
-	case c.IncludeAkte && c.ExternalAktePath == "":
-		return f.writeToInlineAkte(c)
+//func (f objekteTextParser) writeToOmitAkte(c FormatContextWrite) (n int64, err error) {
+//	w := format.NewWriter()
 
-	case c.IncludeAkte:
-		return f.writeToExternalAkte(c)
+//	w.WriteLines(
+//		MetadateiBoundary,
+//	)
 
-	default:
-		return f.writeToOmitAkte(c)
-	}
-}
+//	if c.Zettel.Bezeichnung.String() != "" || !f.DoNotWriteEmptyBezeichnung {
+//		w.WriteLines(
+//			fmt.Sprintf("# %s", c.Zettel.Bezeichnung),
+//		)
+//	}
 
-func (f objekteTextParser) writeToOmitAkte(c FormatContextWrite) (n int64, err error) {
-	w := format.NewWriter()
+//	for _, e := range c.Zettel.Etiketten.Sorted() {
+//		if e.IsEmpty() {
+//			continue
+//		}
 
-	w.WriteLines(
-		MetadateiBoundary,
-	)
+//		w.WriteFormat("- %s", e)
+//	}
 
-	if c.Zettel.Bezeichnung.String() != "" || !f.DoNotWriteEmptyBezeichnung {
-		w.WriteLines(
-			fmt.Sprintf("# %s", c.Zettel.Bezeichnung),
-		)
-	}
+//	switch {
+//	//TODO log this state
+//	case c.Zettel.Akte.IsNull() && c.Zettel.Typ.String() == "":
+//		break
 
-	for _, e := range c.Zettel.Etiketten.Sorted() {
-		if e.IsEmpty() {
-			continue
-		}
+//	case c.Zettel.Akte.IsNull():
+//		w.WriteLines(
+//			fmt.Sprintf("! %s", c.Zettel.Typ),
+//		)
 
-		w.WriteFormat("- %s", e)
-	}
+//	case c.Zettel.Typ.String() == "":
+//		w.WriteLines(
+//			fmt.Sprintf("! %s", c.Zettel.Akte),
+//		)
 
-	switch {
-	//TODO log this state
-	case c.Zettel.Akte.IsNull() && c.Zettel.Typ.String() == "":
-		break
+//	default:
+//		w.WriteLines(
+//			fmt.Sprintf("! %s.%s", c.Zettel.Akte, c.Zettel.Typ),
+//		)
+//	}
 
-	case c.Zettel.Akte.IsNull():
-		w.WriteLines(
-			fmt.Sprintf("! %s", c.Zettel.Typ),
-		)
+//	w.WriteLines(
+//		MetadateiBoundary,
+//	)
 
-	case c.Zettel.Typ.String() == "":
-		w.WriteLines(
-			fmt.Sprintf("! %s", c.Zettel.Akte),
-		)
+//	n, err = w.WriteTo(c.Out)
 
-	default:
-		w.WriteLines(
-			fmt.Sprintf("! %s.%s", c.Zettel.Akte, c.Zettel.Typ),
-		)
-	}
+//	return
+//}
 
-	w.WriteLines(
-		MetadateiBoundary,
-	)
+//func (f objekteTextParser) writeToInlineAkte(c FormatContextWrite) (n int64, err error) {
+//	if c.Out == nil {
+//		err = errors.Errorf("context.Out is empty")
+//		return
+//	}
 
-	n, err = w.WriteTo(c.Out)
+//	w := format.NewWriter()
 
-	return
-}
+//	w.WriteLines(
+//		MetadateiBoundary,
+//		fmt.Sprintf("# %s", c.Zettel.Bezeichnung),
+//	)
 
-func (f objekteTextParser) writeToInlineAkte(c FormatContextWrite) (n int64, err error) {
-	if c.Out == nil {
-		err = errors.Errorf("context.Out is empty")
-		return
-	}
+//	for _, e := range c.Zettel.Etiketten.Sorted() {
+//		w.WriteFormat("- %s", e)
+//	}
 
-	w := format.NewWriter()
+//	w.WriteLines(
+//		fmt.Sprintf("! %s", c.Zettel.Typ),
+//	)
 
-	w.WriteLines(
-		MetadateiBoundary,
-		fmt.Sprintf("# %s", c.Zettel.Bezeichnung),
-	)
+//	w.WriteLines(
+//		MetadateiBoundary,
+//	)
 
-	for _, e := range c.Zettel.Etiketten.Sorted() {
-		w.WriteFormat("- %s", e)
-	}
+//	w.WriteEmpty()
 
-	w.WriteLines(
-		fmt.Sprintf("! %s", c.Zettel.Typ),
-	)
+//	n, err = w.WriteTo(c.Out)
 
-	w.WriteLines(
-		MetadateiBoundary,
-	)
+//	if err != nil {
+//		err = errors.Wrap(err)
+//		return
+//	}
 
-	w.WriteEmpty()
+//	var ar io.ReadCloser
 
-	n, err = w.WriteTo(c.Out)
+//	if f.AkteFactory == nil {
+//		err = errors.Errorf("akte reader factory is nil")
+//		return
+//	}
 
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+//	ar, err = f.AkteFactory.AkteReader(c.Zettel.Akte)
 
-	var ar io.ReadCloser
+//	if err != nil {
+//		err = errors.Wrap(err)
+//		return
+//	}
 
-	if f.AkteFactory == nil {
-		err = errors.Errorf("akte reader factory is nil")
-		return
-	}
+//	if ar == nil {
+//		err = errors.Errorf("akte reader is nil")
+//		return
+//	}
 
-	ar, err = f.AkteFactory.AkteReader(c.Zettel.Akte)
+//	defer errors.Deferred(&err, ar.Close)
 
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+//	in := ar
 
-	if ar == nil {
-		err = errors.Errorf("akte reader is nil")
-		return
-	}
+//	var cmd *exec.Cmd
 
-	defer errors.Deferred(&err, ar.Close)
+//	if f.AkteFormatter != nil {
+//		if cmd, err = f.AkteFormatter.Cmd(); err != nil {
+//			err = errors.Wrap(err)
+//			return
+//		}
+//	}
 
-	in := ar
+//	if cmd != nil {
+//		cmd.Stdin = ar
+//		cmd.Stderr = os.Stderr
 
-	var cmd *exec.Cmd
+//		if in, err = cmd.StdoutPipe(); err != nil {
+//			err = errors.Wrap(err)
+//			return
+//		}
 
-	if f.AkteFormatter != nil {
-		if cmd, err = f.AkteFormatter.Cmd(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
+//		if err = cmd.Start(); err != nil {
+//			err = errors.Wrap(err)
+//			return
+//		}
+//	}
 
-	if cmd != nil {
-		cmd.Stdin = ar
-		cmd.Stderr = os.Stderr
+//	var n1 int64
 
-		if in, err = cmd.StdoutPipe(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+//	n1, err = io.Copy(c.Out, in)
+//	n += n1
 
-		if err = cmd.Start(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
+//	if err != nil {
+//		err = errors.Wrap(err)
+//		return
+//	}
 
-	var n1 int64
+//	if cmd != nil {
+//		if err = cmd.Wait(); err != nil {
+//			err = errors.Wrap(err)
+//			return
+//		}
+//	}
 
-	n1, err = io.Copy(c.Out, in)
-	n += n1
+//	return
+//}
 
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+//func (f objekteTextParser) writeToExternalAkte(c FormatContextWrite) (n int64, err error) {
+//	w := format.NewWriter()
 
-	if cmd != nil {
-		if err = cmd.Wait(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
+//	w.WriteLines(
+//		MetadateiBoundary,
+//		fmt.Sprintf("# %s", c.Zettel.Bezeichnung),
+//	)
 
-	return
-}
+//	for _, e := range c.Zettel.Etiketten.Sorted() {
+//		w.WriteFormat("- %s", e)
+//	}
 
-func (f objekteTextParser) writeToExternalAkte(c FormatContextWrite) (n int64, err error) {
-	w := format.NewWriter()
+//	if strings.Index(c.ExternalAktePath, "\n") != -1 {
+//		panic(errors.Errorf("ExternalAktePath contains newline: %q", c.ExternalAktePath))
+//	}
 
-	w.WriteLines(
-		MetadateiBoundary,
-		fmt.Sprintf("# %s", c.Zettel.Bezeichnung),
-	)
+//	w.WriteLines(
+//		fmt.Sprintf("! %s", c.ExternalAktePath),
+//	)
 
-	for _, e := range c.Zettel.Etiketten.Sorted() {
-		w.WriteFormat("- %s", e)
-	}
+//	w.WriteLines(
+//		MetadateiBoundary,
+//	)
 
-	if strings.Index(c.ExternalAktePath, "\n") != -1 {
-		panic(errors.Errorf("ExternalAktePath contains newline: %q", c.ExternalAktePath))
-	}
+//	n, err = w.WriteTo(c.Out)
 
-	w.WriteLines(
-		fmt.Sprintf("! %s", c.ExternalAktePath),
-	)
+//	if err != nil {
+//		err = errors.Wrap(err)
+//		return
+//	}
 
-	w.WriteLines(
-		MetadateiBoundary,
-	)
+//	var ar io.ReadCloser
 
-	n, err = w.WriteTo(c.Out)
+//	if f.AkteFactory == nil {
+//		err = errors.Errorf("akte reader factory is nil")
+//		return
+//	}
 
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+//	if ar, err = f.AkteFactory.AkteReader(c.Zettel.Akte); err != nil {
+//		err = errors.Wrap(err)
+//		return
+//	}
 
-	var ar io.ReadCloser
+//	if ar == nil {
+//		err = errors.Errorf("akte reader is nil")
+//		return
+//	}
 
-	if f.AkteFactory == nil {
-		err = errors.Errorf("akte reader factory is nil")
-		return
-	}
+//	defer errors.Deferred(&err, ar.Close)
 
-	if ar, err = f.AkteFactory.AkteReader(c.Zettel.Akte); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+//	var file *os.File
 
-	if ar == nil {
-		err = errors.Errorf("akte reader is nil")
-		return
-	}
+//	if file, err = files.Create(c.ExternalAktePath); err != nil {
+//		err = errors.Wrap(err)
+//		return
+//	}
 
-	defer errors.Deferred(&err, ar.Close)
+//	defer errors.Deferred(&err, file.Close)
 
-	var file *os.File
+//	var n1 int64
 
-	if file, err = files.Create(c.ExternalAktePath); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+//	n1, err = io.Copy(file, ar)
+//	n += n1
 
-	defer errors.Deferred(&err, file.Close)
+//	if err != nil {
+//		err = errors.Wrap(err)
+//		return
+//	}
 
-	var n1 int64
-
-	n1, err = io.Copy(file, ar)
-	n += n1
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
+//	return
+//}

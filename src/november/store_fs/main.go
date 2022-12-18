@@ -50,7 +50,7 @@ func New(
 		sonnenaufgang: t,
 		konfig:        k,
 		Standort:      st,
-		format: zettel.MakeTextParser(
+		format: zettel.MakeObjekteTextFormat(
 			storeObjekten,
 			nil,
 		),

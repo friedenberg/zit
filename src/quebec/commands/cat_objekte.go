@@ -116,7 +116,11 @@ func (c CatObjekte) zettelen(u *umwelt.Umwelt, shas sha.Set) (err error) {
 		},
 		zettel.MakeWriterZettel(
 			zettel.MakeSerializedFormatWriter(
-				&zettel.FormatObjekte{},
+				zettel.MakeObjekteTextFormatterIncludeAkte(
+					u.Konfig(),
+					u.StoreObjekten(),
+					nil,
+				),
 				u.Out(),
 				u.StoreObjekten(),
 				u.Konfig(),

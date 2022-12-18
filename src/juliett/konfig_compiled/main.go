@@ -237,6 +237,18 @@ func (c compiled) GetSortedEtikettenExpanded(
 	return
 }
 
+func (kc compiled) IsInlineTyp(k kennung.Typ) (isInline bool) {
+	tc := kc.GetTyp(k)
+
+	if tc == nil {
+		return
+	}
+
+	isInline = tc.Objekte.Akte.InlineAkte
+
+	return
+}
+
 func (kc compiled) GetTyp(k kennung.Typ) (ct *typ.Transacted) {
 	expandedActual := kc.GetSortedTypenExpanded(k.String())
 

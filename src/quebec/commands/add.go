@@ -160,9 +160,10 @@ func (c Add) openAktenIfNecessary(
 		ids.Add(h)
 	}
 
+	//TODO-P0 update to new checkout process
 	options := store_fs.CheckoutOptions{
 		CheckoutMode: store_fs.CheckoutModeAkteOnly,
-		Format: zettel.MakeTextParser(
+		Formatter: zettel.MakeObjekteTextFormatterAkteShaOnly(
 			u.StoreObjekten(),
 			nil,
 		),

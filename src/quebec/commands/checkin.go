@@ -65,10 +65,10 @@ func (c Checkin) Run(
 	readOp := user_ops.ReadCheckedOut{
 		Umwelt: s,
 		OptionsReadExternal: store_fs.OptionsReadExternal{
-      Format: zettel.MakeTextParser(
-        s.StoreObjekten(),
-        nil,
-      ),
+			Parser: zettel.MakeTextParser(
+				s.StoreObjekten(),
+				nil,
+			),
 		},
 	}
 

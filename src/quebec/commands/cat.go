@@ -15,6 +15,7 @@ import (
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
 
+// TODO-P3 examine removing cat entirely
 type Cat struct {
 	gattung.Gattung
 	//Specific to Gattung
@@ -92,7 +93,7 @@ func (c Cat) zettelWriter(
 	switch c.Format {
 	case "json":
 		return zettel.MakeSerializedFormatWriter(
-			zettel.JsonObjekte{},
+			zettel.MakeObjekteFormatterJson(),
 			u.Out(),
 			u.StoreObjekten(),
 			u.Konfig(),
@@ -100,7 +101,8 @@ func (c Cat) zettelWriter(
 
 	default:
 		return zettel.MakeSerializedFormatWriter(
-			zettel.MakeTextParser(
+			zettel.MakeObjekteTextFormatterIncludeAkte(
+				u.Konfig(),
 				u.StoreObjekten(),
 				nil,
 			),

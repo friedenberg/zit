@@ -62,7 +62,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	f := zettel.MakeTextParser(
+	f := zettel.MakeObjekteTextFormat(
 		u.StoreObjekten(),
 		nil,
 	)
@@ -85,7 +85,8 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		if c.Edit {
 			options := store_fs.CheckoutOptions{
 				CheckoutMode: store_fs.CheckoutModeZettelAndAkte,
-				Format: zettel.MakeTextParser(
+				Formatter: zettel.MakeObjekteTextFormatterIncludeAkte(
+					u.Konfig(),
 					u.StoreObjekten(),
 					nil,
 				),
@@ -135,13 +136,13 @@ func (c New) readExistingFilesAsZettels(
 
 func (c New) writeNewZettels(
 	u *umwelt.Umwelt,
-	f zettel.Format,
+	f zettel.ObjekteFormatter,
 ) (zsc zettel_checked_out.MutableSet, err error) {
 	emptyOp := user_ops.WriteNewZettels{
 		Umwelt:   u,
 		CheckOut: c.Edit,
 		CheckoutOptions: store_fs.CheckoutOptions{
-			Format: f,
+			Formatter: f,
 		},
 	}
 
@@ -203,7 +204,7 @@ func (c New) editZettels(
 	readOp := user_ops.ReadCheckedOut{
 		Umwelt: u,
 		OptionsReadExternal: store_fs.OptionsReadExternal{
-			Format: zettel.MakeTextParser(
+			Parser: zettel.MakeTextParser(
 				u.StoreObjekten(),
 				nil,
 			),
