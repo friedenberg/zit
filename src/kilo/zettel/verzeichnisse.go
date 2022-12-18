@@ -16,8 +16,8 @@ type Verzeichnisse struct {
 	// Etiketten               tridex.Tridex
 	EtikettenExpandedSorted []string
 	EtikettenSorted         []string
-  //TODO-P3 add
-  // Hidden bool
+	//TODO-P3 add
+	// Hidden bool
 }
 
 type PoolVerzeichnisse = collections.Pool[Verzeichnisse]

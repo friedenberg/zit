@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/golf/id_set"
 )
 
-//TODO-P2 move away from this and replace with compiled filter
+// TODO-P2 move away from this and replace with compiled filter
 type WriterIds struct {
 	Filter id_set.Filter
 }

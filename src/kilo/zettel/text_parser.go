@@ -34,7 +34,7 @@ func (f TextParser) ReadFormat(r io.Reader, o *Objekte) (n int64, err error) {
 }
 
 func (f TextParser) ReadFrom(c *FormatContextRead) (n int64, err error) {
-	state := &FormatMetadateiText{
+	state := &TextMetadateiParser{
 		context: c,
 	}
 
