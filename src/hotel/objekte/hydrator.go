@@ -13,13 +13,13 @@ type hydrator[T gattung.Element, T1 gattung.ElementPtr[T]] struct {
 	af               gattung.AkteIOFactory
 	frc              FuncReadCloser
 	objekteFormatter Formatter2
-	akteFormatter    gattung.Formatter[T, T1]
+	akteFormatter    gattung.Parser[T, T1] //TODO-P1 rename to akteParser
 }
 
 func MakeHydrator[T gattung.Element, T1 gattung.ElementPtr[T]](
 	af gattung.AkteIOFactory,
 	frc FuncReadCloser,
-	akteFormatter gattung.Formatter[T, T1],
+	akteFormatter gattung.Parser[T, T1],
 ) *hydrator[T, T1] {
 	return &hydrator[T, T1]{
 		af:               af,
@@ -59,7 +59,7 @@ func (h *hydrator[T, T1]) Hydrate(
 
 		defer errors.Deferred(&err, r.Close)
 
-		if _, err = h.akteFormatter.ReadFormat(r, a); err != nil {
+		if _, err = h.akteFormatter.Parse(r, a); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

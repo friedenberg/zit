@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/sha"
 )
 
+//TODO-P1 rename to TextFormat
 type FormatText struct {
 	af gattung.AkteIOFactory
 }
@@ -18,6 +19,10 @@ func MakeFormatText(af gattung.AkteIOFactory) *FormatText {
 	return &FormatText{
 		af: af,
 	}
+}
+
+func (c *FormatText) Parse(r1 io.Reader, k *Objekte) (n int64, err error) {
+	return c.ReadFormat(r1, k)
 }
 
 func (c *FormatText) ReadFormat(r1 io.Reader, k *Objekte) (n int64, err error) {

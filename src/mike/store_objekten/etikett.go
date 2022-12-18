@@ -264,7 +264,7 @@ func (s *etikettStore) reindexOne(
 				id.Path(sh, s.common.Standort.DirObjektenEtiketten()),
 			)
 		},
-		gattung.Formatter[etikett.Objekte, *etikett.Objekte](
+		gattung.Parser[etikett.Objekte, *etikett.Objekte](
 			etikett.MakeFormatText(s.common),
 		),
 	)

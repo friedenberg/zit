@@ -22,6 +22,10 @@ type TextMetadateiParser struct {
 	akteSha  sha.Sha
 }
 
+func (f *TextMetadateiParser) Parse(r1 io.Reader, z *Objekte) (n int64, err error) {
+	return f.ReadFormat(r1, z)
+}
+
 func (f *TextMetadateiParser) ReadFormat(r1 io.Reader, z *Objekte) (n int64, err error) {
 	etiketten := kennung.MakeEtikettMutableSet()
 

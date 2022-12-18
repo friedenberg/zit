@@ -154,7 +154,20 @@ type FormatWriter[T Element, T1 ElementPtr[T]] interface {
 	WriteFormat(io.Writer, T1) (int64, error)
 }
 
+// type Formatter[T Element, T1 ElementPtr[T]] interface {
+// 	FormatReader[T, T1]
+// 	FormatWriter[T, T1]
+// }
+
+type Parser[T Element, T1 ElementPtr[T]] interface {
+	Parse(io.Reader, T1) (int64, error)
+}
+
 type Formatter[T Element, T1 ElementPtr[T]] interface {
-	FormatReader[T, T1]
-	FormatWriter[T, T1]
+	Format(io.Writer, T1) (int64, error)
+}
+
+type Format[T Element, T1 ElementPtr[T]] interface {
+	Parser[T, T1]
+	Formatter[T, T1]
 }

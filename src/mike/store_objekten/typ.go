@@ -263,7 +263,7 @@ func (s *typStore) Hydrate(
 				id.Path(sh, s.common.Standort.DirObjektenTypen()),
 			)
 		},
-		gattung.Formatter[typ.Objekte, *typ.Objekte](
+		gattung.Parser[typ.Objekte, *typ.Objekte](
 			typ.MakeFormatText(s.common),
 		),
 	)

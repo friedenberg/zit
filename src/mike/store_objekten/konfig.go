@@ -261,7 +261,7 @@ func (s *konfigStore) reindexOne(
 				id.Path(sh, s.common.Standort.DirObjektenKonfig()),
 			)
 		},
-		gattung.Formatter[konfig.Objekte, *konfig.Objekte](
+		gattung.Parser[konfig.Objekte, *konfig.Objekte](
 			konfig.MakeFormatText(s.common),
 		),
 	)
