@@ -54,14 +54,14 @@ func (s MutableMatchSet) Match(z *zettel.Transacted) (err error) {
 
 	s.lock.RUnlock()
 
-  // This function gets called out of order for all zettels because it is
-  // parallelized. The only case this does not correctly handle is if the akte
-  // is mutated or removed at some point in a zettel's history. Then, when
-  // reading verzeichnisse, the _latest_ (highest Schwanz) zettel may pass
-  // through this function _before_ the function has matched on a historical
-  // akte or stored sha. In that case, the zettel would accidentally be
-  // reverted.
-  // TODO-P2 solve for the above
+	// This function gets called out of order for all zettels because it is
+	// parallelized. The only case this does not correctly handle is if the akte
+	// is mutated or removed at some point in a zettel's history. Then, when
+	// reading verzeichnisse, the _latest_ (highest Schwanz) zettel may pass
+	// through this function _before_ the function has matched on a historical
+	// akte or stored sha. In that case, the zettel would accidentally be
+	// reverted.
+	// TODO-P2 solve for the above
 	if okStored || okAkte || (okHinweis && okSchwanz) {
 		s.lock.Lock()
 		defer s.lock.Unlock()

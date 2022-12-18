@@ -4,6 +4,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 )
 
 type FormatContextRead struct {
@@ -23,4 +24,12 @@ type FormatContextWrite struct {
 type Format interface {
 	ReadFrom(*FormatContextRead) (int64, error)
 	WriteTo(FormatContextWrite) (int64, error)
+}
+
+type ObjekteParser = gattung.Parser[Objekte, *Objekte]
+type ObjekteFormatter = gattung.Formatter[Objekte, *Objekte]
+
+type ObjekteFormat interface {
+	ObjekteParser
+	ObjekteFormatter
 }

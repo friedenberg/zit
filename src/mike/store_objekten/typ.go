@@ -276,7 +276,7 @@ func (s *typStore) Hydrate(
 	return
 }
 
-//TODO-P0
+// TODO-P0
 func (s *typStore) reindexOne(
 	t *transaktion.Transaktion,
 	o *sku.Sku,

@@ -67,7 +67,7 @@ func (c Checkout) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 func (c Checkout) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	options := store_fs.CheckoutOptions{
 		CheckoutMode: c.CheckoutMode,
-		Format: zettel.Text{
+		Format: zettel.TextParser{
 			AkteFactory: u.StoreObjekten(),
 		},
 	}

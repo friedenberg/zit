@@ -52,7 +52,7 @@ func (u *Umwelt) PrinterTypCheckedOut(
 	)
 }
 
-//TODO-P0 rename
+// TODO-P0 rename
 func (u *Umwelt) WriterZettelTransacted() zettel.TransactedWriters {
 	return zettel.TransactedWriters{
 		New:       u.PrinterZettelTransactedDelta(format.StringNew),

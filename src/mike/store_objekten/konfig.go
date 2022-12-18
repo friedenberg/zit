@@ -238,7 +238,7 @@ func (s konfigStore) AllInChain() (c []*konfig.Transacted, err error) {
 	return
 }
 
-//TODO-P0
+// TODO-P0
 func (s *konfigStore) reindexOne(
 	t *transaktion.Transaktion,
 	o *sku.Sku,

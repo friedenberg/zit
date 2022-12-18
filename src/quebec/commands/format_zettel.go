@@ -41,7 +41,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	defer errors.Deferred(&err, f.Close)
 
-	format := zettel.Text{
+	format := zettel.TextParser{
 		AkteFactory: u.StoreObjekten(),
 	}
 

@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 )
 
-//TODO-P1 implement for zettel_external
+// TODO-P1 implement for zettel_external
 type TextMetadateiFormatter struct {
 	AkteFactory gattung.AkteIOFactory
 }

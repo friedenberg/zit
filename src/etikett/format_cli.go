@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 )
 
-// 
 func MakeCliFormat(
 	cw format.FuncColorWriter,
 ) format.FormatWriterFunc[kennung.Etikett] {

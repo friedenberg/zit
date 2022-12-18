@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 )
 
-//TODO-P4 remove
+// TODO-P4 remove
 type Format[T gattung.Element, T1 gattung.ElementPtr[T]] interface {
 	gattung.FormatReader[T, T1]
 	gattung.FormatWriter[T, T1]

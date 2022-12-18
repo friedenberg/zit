@@ -9,7 +9,7 @@ super_package="$4"
 
 (
 	go_refactor_args=(
-    "-w"
+		"-w"
 		"-r"
 		"$package.$old -> $package.$new"
 	)
@@ -19,9 +19,9 @@ super_package="$4"
 
 (
 	go_refactor_args=(
-    "-w"
+		"-w"
 		"-r"
-		"$old -> $package"
+		"$old -> $new"
 	)
 
 	gofmt "${go_refactor_args[@]}" "src/$super_package/$package"

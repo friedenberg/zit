@@ -46,7 +46,7 @@ func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	options := store_fs.OptionsReadExternal{
-		Format: zettel.Text{},
+		Format: zettel.TextParser{},
 	}
 
 	readOp := user_ops.ReadCheckedOut{

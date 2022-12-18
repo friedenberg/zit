@@ -51,7 +51,7 @@ func (c Clean) Run(
 	}
 
 	optionsReadExternal := store_fs.OptionsReadExternal{
-		Format: zettel.Text{},
+		Format: zettel.TextParser{},
 	}
 
 	readResults := zettel_checked_out.MakeMutableSetUnique(0)

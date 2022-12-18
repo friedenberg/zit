@@ -50,7 +50,7 @@ func New(
 		sonnenaufgang: t,
 		konfig:        k,
 		Standort:      st,
-		format: zettel.Text{
+		format: zettel.TextParser{
 			AkteFactory: storeObjekten,
 		},
 		storeObjekten: storeObjekten,
@@ -227,7 +227,7 @@ func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 // ReadOne
 // ReadMany
 // ReadManyHistory
-//TODO-P1 transition to ZettelVerzeichnisse
+// TODO-P1 transition to ZettelVerzeichnisse
 func (s *Store) ReadOne(h hinweis.Hinweis) (zt *zettel.Transacted, err error) {
 	if zt, err = s.storeObjekten.Zettel().ReadHinweisSchwanzen(h); err != nil {
 		err = errors.Wrap(err)
@@ -423,7 +423,7 @@ func (s *Store) ReadManyHistory(
 	)
 }
 
-//TODO-P1 deprecate in favor of above method
+// TODO-P1 deprecate in favor of above method
 func (s *Store) ZettelTransactedWriter(
 	w1 collections.WriterFunc[*zettel.Transacted],
 ) (w collections.WriterFunc[*zettel.Transacted]) {

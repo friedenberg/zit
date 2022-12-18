@@ -100,7 +100,7 @@ func (c Cat) zettelWriter(
 
 	default:
 		return zettel.MakeSerializedFormatWriter(
-			zettel.Text{},
+			zettel.TextParser{},
 			u.Out(),
 			u.StoreObjekten(),
 			u.Konfig(),

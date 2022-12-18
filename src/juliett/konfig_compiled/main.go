@@ -182,7 +182,7 @@ func (c compiled) GetZettelFileExtension() string {
 	return fmt.Sprintf(".%s", c.FileExtensions.Zettel)
 }
 
-//TODO-P3 merge all the below
+// TODO-P3 merge all the below
 func (c compiled) GetSortedTypenExpanded(v string) (expandedActual []*typ.Transacted) {
 	expandedMaybe := collections.MakeMutableValueSet[collections.StringValue, *collections.StringValue]()
 	typExpander.Expand(expandedMaybe, v)
@@ -268,13 +268,13 @@ func (k *compiled) SetTransacted(
 func (k *compiled) AddTyp(
 	ct *typ.Transacted,
 ) {
-  if ct.Objekte.Akte.Actions == nil {
-    panic(errors.Errorf("actions were nil"))
-  }
+	if ct.Objekte.Akte.Actions == nil {
+		panic(errors.Errorf("actions were nil"))
+	}
 
-  if ct.Objekte.Akte.EtikettenRules == nil {
-    panic(errors.Errorf("etiketten rules were nil"))
-  }
+	if ct.Objekte.Akte.EtikettenRules == nil {
+		panic(errors.Errorf("etiketten rules were nil"))
+	}
 
 	k.hasChanges = true
 	m := k.Typen.Elements()

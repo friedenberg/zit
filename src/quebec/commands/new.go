@@ -62,7 +62,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	f := zettel.Text{
+	f := zettel.TextParser{
 		AkteFactory: u.StoreObjekten(),
 	}
 
@@ -84,7 +84,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		if c.Edit {
 			options := store_fs.CheckoutOptions{
 				CheckoutMode: store_fs.CheckoutModeZettelAndAkte,
-				Format: zettel.Text{
+				Format: zettel.TextParser{
 					AkteFactory: u.StoreObjekten(),
 				},
 			}
@@ -201,7 +201,7 @@ func (c New) editZettels(
 	readOp := user_ops.ReadCheckedOut{
 		Umwelt: u,
 		OptionsReadExternal: store_fs.OptionsReadExternal{
-			Format: zettel.Text{},
+			Format: zettel.TextParser{},
 		},
 	}
 

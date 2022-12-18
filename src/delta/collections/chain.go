@@ -30,7 +30,7 @@ func MakeChain[T any](wfs ...WriterFunc[T]) WriterFunc[T] {
 }
 
 func Multiplex[T any](
-  e WriterFunc[T],
+	e WriterFunc[T],
 	producers ...func(WriterFunc[T]) error,
 ) (err error) {
 	ch := make(chan error, len(producers))

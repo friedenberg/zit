@@ -16,12 +16,12 @@ func (s Store) ReadAllAktenShas(w collections.WriterFunc[sha.Sha]) (err error) {
 		var sh sha.Sha
 
 		if sh, err = sha.MakeShaFromPath(p); err != nil {
-      err = errors.Wrapf(err, "Path: %s", p)
+			err = errors.Wrapf(err, "Path: %s", p)
 			return
 		}
 
 		if err = w(sh); err != nil {
-      err = errors.Wrapf(err, "Sha: %s", sh)
+			err = errors.Wrapf(err, "Sha: %s", sh)
 			return
 		}
 

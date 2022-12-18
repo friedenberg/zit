@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/toml"
 )
 
-//TODO-P2 merge into virtual objekte handling
+// TODO-P2 merge into virtual objekte handling
 func WriteObjekteToText(w io.Writer, t *Objekte) (n int64, err error) {
 	enc := toml.NewEncoder(w)
 

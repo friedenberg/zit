@@ -19,6 +19,16 @@ type TextParser struct {
 	TypError                   error
 }
 
+func MakeTextParser(
+	akteFactory gattung.AkteIOFactory,
+	akteFormatter konfig.RemoteScript,
+) *TextParser {
+	return &TextParser{
+		AkteFactory:   akteFactory,
+		AkteFormatter: akteFormatter,
+	}
+}
+
 func (f TextParser) ReadFormat(r io.Reader, o *Objekte) (n int64, err error) {
 	c := &FormatContextRead{
 		In:     r,

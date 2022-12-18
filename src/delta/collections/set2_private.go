@@ -52,9 +52,9 @@ func setPrivateFromSlice[T gattung.Element, T1 gattung.ElementPtr[T]](
 }
 
 func (es setPrivate[T, T1]) add(e T1) (err error) {
-  if e == nil {
-    panic(ErrNilPointer{})
-  }
+	if e == nil {
+		panic(ErrNilPointer{})
+	}
 
 	es.Elements[es.Key(e)] = e
 

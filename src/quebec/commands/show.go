@@ -240,7 +240,7 @@ func (c Show) showZettels(
 	return
 }
 
-//TODO-P3 support All
+// TODO-P3 support All
 func (c Show) showAkten(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	zettels := make([]*zettel.Transacted, ids.Len())
 
@@ -279,7 +279,7 @@ func (c Show) showAkten(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	return
 }
 
-//TODO-P3 support All
+// TODO-P3 support All
 func (c Show) showTransaktions(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	ids.Timestamps().Each(
 		func(is ts.Time) (err error) {
@@ -306,7 +306,7 @@ func (c Show) showTransaktions(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	return
 }
 
-//TODO-P3 support All
+// TODO-P3 support All
 func (c Show) showTypen(
 	u *umwelt.Umwelt,
 	ids id_set.Set,
@@ -340,7 +340,7 @@ func (c Show) showTypen(
 	return
 }
 
-//TODO-P3 support All
+// TODO-P3 support All
 func (c Show) showEtiketten(
 	u *umwelt.Umwelt,
 	ids id_set.Set,

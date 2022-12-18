@@ -10,22 +10,21 @@ import (
 	"github.com/friedenberg/zit/src/echo/sha"
 )
 
-// TODO-P1 rename to TextFormat
-type FormatText struct {
+type TextFormat struct {
 	arf gattung.AkteIOFactory
 }
 
-func MakeFormatText(arf gattung.AkteIOFactory) *FormatText {
-	return &FormatText{
+func MakeFormatText(arf gattung.AkteIOFactory) *TextFormat {
+	return &TextFormat{
 		arf: arf,
 	}
 }
 
-func (f FormatText) Parse(r io.Reader, t *Objekte) (n int64, err error) {
+func (f TextFormat) Parse(r io.Reader, t *Objekte) (n int64, err error) {
 	return f.ReadFormat(r, t)
 }
 
-func (f FormatText) ReadFormat(r io.Reader, t *Objekte) (n int64, err error) {
+func (f TextFormat) ReadFormat(r io.Reader, t *Objekte) (n int64, err error) {
 	var aw sha.WriteCloser
 
 	if aw, err = f.arf.AkteWriter(); err != nil {
@@ -84,7 +83,11 @@ func (f FormatText) ReadFormat(r io.Reader, t *Objekte) (n int64, err error) {
 	return
 }
 
-func (f FormatText) WriteFormat(w io.Writer, t *Objekte) (n int64, err error) {
+func (f TextFormat) Format(w io.Writer, t *Objekte) (n int64, err error) {
+	return f.WriteFormat(w, t)
+}
+
+func (f TextFormat) WriteFormat(w io.Writer, t *Objekte) (n int64, err error) {
 	var ar sha.ReadCloser
 
 	if ar, err = f.arf.AkteReader(t.Sha); err != nil {

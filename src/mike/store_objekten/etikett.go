@@ -241,7 +241,7 @@ func (s etikettStore) AllInChain(k kennung.Etikett) (c []*etikett.Transacted, er
 	return
 }
 
-//TODO-P0
+// TODO-P0
 func (s *etikettStore) reindexOne(
 	t *transaktion.Transaktion,
 	o *sku.Sku,

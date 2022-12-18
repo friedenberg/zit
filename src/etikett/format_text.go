@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/sha"
 )
 
-//TODO-P1 rename to TextFormat
+// TODO-P1 rename to TextFormat
 type FormatText struct {
 	arf gattung.AkteIOFactory
 }

@@ -49,7 +49,7 @@ func ReadDirNamesTo(
 
 	for _, n := range names {
 		if err = wf(path.Join(p, n.Name())); err != nil {
-      err = errors.Wrapf(err, "Path: %q, Name: %q", p, n.Name())
+			err = errors.Wrapf(err, "Path: %q, Name: %q", p, n.Name())
 			return
 		}
 	}

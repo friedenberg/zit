@@ -158,8 +158,8 @@ func (s *Store) CheckoutOne(
 	}
 
 	c := zettel.FormatContextWrite{
-		Zettel:            sz.Objekte,
-		IncludeAkte:       inlineAkte,
+		Zettel:      sz.Objekte,
+		IncludeAkte: inlineAkte,
 	}
 
 	switch options.CheckoutMode {

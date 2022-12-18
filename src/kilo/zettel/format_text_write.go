@@ -17,7 +17,7 @@ const MetadateiBoundary = metadatei_io.Boundary
 
 // TODO switch to three different formats
 // metadatei, zettel-akte-external, zettel-akte-inline
-func (f Text) WriteTo(c FormatContextWrite) (n int64, err error) {
+func (f TextParser) WriteTo(c FormatContextWrite) (n int64, err error) {
 	switch {
 	case c.IncludeAkte && c.ExternalAktePath == "":
 		return f.writeToInlineAkte(c)
@@ -30,7 +30,7 @@ func (f Text) WriteTo(c FormatContextWrite) (n int64, err error) {
 	}
 }
 
-func (f Text) writeToOmitAkte(c FormatContextWrite) (n int64, err error) {
+func (f TextParser) writeToOmitAkte(c FormatContextWrite) (n int64, err error) {
 	w := format.NewWriter()
 
 	w.WriteLines(
@@ -81,7 +81,7 @@ func (f Text) writeToOmitAkte(c FormatContextWrite) (n int64, err error) {
 	return
 }
 
-func (f Text) writeToInlineAkte(c FormatContextWrite) (n int64, err error) {
+func (f TextParser) writeToInlineAkte(c FormatContextWrite) (n int64, err error) {
 	if c.Out == nil {
 		err = errors.Errorf("context.Out is empty")
 		return
@@ -182,7 +182,7 @@ func (f Text) writeToInlineAkte(c FormatContextWrite) (n int64, err error) {
 	return
 }
 
-func (f Text) writeToExternalAkte(c FormatContextWrite) (n int64, err error) {
+func (f TextParser) writeToExternalAkte(c FormatContextWrite) (n int64, err error) {
 	w := format.NewWriter()
 
 	w.WriteLines(
