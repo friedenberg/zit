@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/format"
+	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei_io"
 	"github.com/friedenberg/zit/src/india/konfig"
 	"github.com/friedenberg/zit/src/india/typ"
@@ -19,12 +19,11 @@ import (
 const MetadateiBoundary = metadatei_io.Boundary
 
 type objekteTextFormatter struct {
-	InlineChecker              typ.InlineChecker
-	AkteFactory                gattung.AkteIOFactory
-	AkteFormatter              konfig.RemoteScript
-	DoNotWriteEmptyBezeichnung bool
-	TypError                   error
-	IncludeAkte                bool
+	InlineChecker typ.InlineChecker
+	AkteFactory   gattung.AkteIOFactory
+	AkteFormatter konfig.RemoteScript
+	TypError      error
+	IncludeAkte   bool
 }
 
 func MakeObjekteTextFormatterIncludeAkte(
@@ -67,170 +66,36 @@ func (f objekteTextFormatter) Format(
 // TODO switch to three different formats
 // metadatei, zettel-akte-external, zettel-akte-inline
 func (f objekteTextFormatter) WriteTo(c FormatContextWrite) (n int64, err error) {
-	switch {
-	case f.IncludeAkte:
-		if f.InlineChecker.IsInlineTyp(c.Zettel.Typ) {
-			return f.writeToInlineAkte(c)
+	inline := f.InlineChecker.IsInlineTyp(c.Zettel.Typ)
+
+	mtw := TextMetadateiFormatter{
+		IncludeAkteSha: !inline,
+	}
+
+	var ar sha.ReadCloser
+
+	if inline {
+		if ar, err = f.AkteFactory.AkteReader(c.Zettel.Akte); err != nil {
+			err = errors.Wrap(err)
+			return
 		}
 
-		fallthrough
-
-	// case c.IncludeAkte:
-	// 	return f.writeToExternalAkte(c)
-
-	default:
-		//TODO-P1 rename to writeToAkteSha
-		return f.writeToOmitAkte(c)
-	}
-}
-
-func (f objekteTextFormatter) writeToOmitAkte(c FormatContextWrite) (n int64, err error) {
-	w := format.NewWriter()
-
-	w.WriteLines(
-		MetadateiBoundary,
-	)
-
-	if c.Zettel.Bezeichnung.String() != "" || !f.DoNotWriteEmptyBezeichnung {
-		w.WriteLines(
-			fmt.Sprintf("# %s", c.Zettel.Bezeichnung),
-		)
+    defer errors.Deferred(&err, ar.Close)
 	}
 
-	for _, e := range c.Zettel.Etiketten.Sorted() {
-		if e.IsEmpty() {
-			continue
-		}
-
-		w.WriteFormat("- %s", e)
+	mw := metadatei_io.Writer{
+		Metadatei: format.MakeWriterTo2(
+			mtw.Format,
+			&Metadatei{
+				Objekte: c.Zettel,
+			},
+		),
+		Akte: ar,
 	}
 
-	switch {
-	//TODO log this state
-	case c.Zettel.Akte.IsNull() && c.Zettel.Typ.String() == "":
-		break
-
-	case c.Zettel.Akte.IsNull():
-		w.WriteLines(
-			fmt.Sprintf("! %s", c.Zettel.Typ),
-		)
-
-	case c.Zettel.Typ.String() == "":
-		w.WriteLines(
-			fmt.Sprintf("! %s", c.Zettel.Akte),
-		)
-
-	default:
-		w.WriteLines(
-			fmt.Sprintf("! %s.%s", c.Zettel.Akte, c.Zettel.Typ),
-		)
-	}
-
-	w.WriteLines(
-		MetadateiBoundary,
-	)
-
-	n, err = w.WriteTo(c.Out)
-
-	return
-}
-
-func (f objekteTextFormatter) writeToInlineAkte(c FormatContextWrite) (n int64, err error) {
-	if c.Out == nil {
-		err = errors.Errorf("context.Out is empty")
-		return
-	}
-
-	w := format.NewWriter()
-
-	w.WriteLines(
-		MetadateiBoundary,
-		fmt.Sprintf("# %s", c.Zettel.Bezeichnung),
-	)
-
-	for _, e := range c.Zettel.Etiketten.Sorted() {
-		w.WriteFormat("- %s", e)
-	}
-
-	w.WriteLines(
-		fmt.Sprintf("! %s", c.Zettel.Typ),
-	)
-
-	w.WriteLines(
-		MetadateiBoundary,
-	)
-
-	w.WriteEmpty()
-
-	n, err = w.WriteTo(c.Out)
-
-	if err != nil {
+	if n, err = mw.WriteTo(c.Out); err != nil {
 		err = errors.Wrap(err)
 		return
-	}
-
-	var ar io.ReadCloser
-
-	if f.AkteFactory == nil {
-		err = errors.Errorf("akte reader factory is nil")
-		return
-	}
-
-	ar, err = f.AkteFactory.AkteReader(c.Zettel.Akte)
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if ar == nil {
-		err = errors.Errorf("akte reader is nil")
-		return
-	}
-
-	defer errors.Deferred(&err, ar.Close)
-
-	in := ar
-
-	var cmd *exec.Cmd
-
-	if f.AkteFormatter != nil {
-		if cmd, err = f.AkteFormatter.Cmd(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	if cmd != nil {
-		cmd.Stdin = ar
-		cmd.Stderr = os.Stderr
-
-		if in, err = cmd.StdoutPipe(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = cmd.Start(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	var n1 int64
-
-	n1, err = io.Copy(c.Out, in)
-	n += n1
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if cmd != nil {
-		if err = cmd.Wait(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
 	}
 
 	return

@@ -1,16 +1,63 @@
 package zettel
 
 import (
+	"fmt"
 	"io"
 
-	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/delta/format"
 )
 
-// TODO-P1 implement for zettel_external
-type TextMetadateiFormatter struct {
-	AkteFactory gattung.AkteIOFactory
+type Metadatei struct {
+	Objekte
+	AktePath string
 }
 
-func (f *TextMetadateiFormatter) Format(w1 io.Writer, z *Objekte) (n int64, err error) {
+type TextMetadateiFormatter struct {
+	DoNotWriteEmptyBezeichnung bool
+	IncludeAkteSha             bool
+}
+
+// TODO-P3 turn *Objekte into an interface to allow zettel_external to use this
+func (f *TextMetadateiFormatter) Format(w1 io.Writer, m *Metadatei) (n int64, err error) {
+	w := format.NewWriter()
+
+	if m.Bezeichnung.String() != "" || !f.DoNotWriteEmptyBezeichnung {
+		w.WriteLines(
+			fmt.Sprintf("# %s", m.Bezeichnung),
+		)
+	}
+
+	for _, e := range m.Etiketten.Sorted() {
+		//TODO-P3 determine how to handle this
+		if e.IsEmpty() {
+			continue
+		}
+
+		w.WriteFormat("- %s", e)
+	}
+
+	switch {
+	case m.AktePath != "":
+		w.WriteLines(
+			fmt.Sprintf("! %s", m.AktePath),
+		)
+
+	case f.IncludeAkteSha:
+		w.WriteLines(
+			fmt.Sprintf("! %s.%s", m.Akte, m.Typ),
+		)
+
+	default:
+		w.WriteLines(
+			fmt.Sprintf("! %s", m.Typ),
+		)
+	}
+
+	if n, err = w.WriteTo(w1); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	return
 }
