@@ -5,27 +5,20 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/golf/id_set"
-	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
 
 type CatObjekte struct {
-	Gattung gattung.Gattung
 }
 
 func init() {
 	registerCommand(
 		"cat-objekte",
 		func(f *flag.FlagSet) Command {
-			c := &CatObjekte{
-				Gattung: gattung.Unknown,
-			}
-
-			f.Var(&c.Gattung, "gattung", "ObjekteType")
+			c := &CatObjekte{}
 
 			return commandWithIds{
 				CommandWithIds: c,
@@ -38,6 +31,12 @@ func (c CatObjekte) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 	is = id_set.MakeProtoIdSet(
 		id_set.ProtoId{
 			MutableId: &sha.Sha{},
+			Expand: func(v string) (out string, err error) {
+				var s sha.Sha
+				s, err = u.StoreObjekten().Abbr().ExpandShaString(v)
+				out = s.String()
+				return
+			},
 		},
 	)
 
@@ -46,21 +45,7 @@ func (c CatObjekte) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 
 func (c CatObjekte) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	shas := ids.Shas()
-
-	switch c.Gattung {
-	case gattung.Akte:
-		return c.akten(u, shas)
-
-	case gattung.Zettel:
-		return c.zettelen(u, shas)
-
-	case gattung.Typ:
-		return c.typen(u, shas)
-
-	default:
-		err = errors.Errorf("unsupported objekte type: %s", c.Gattung)
-		return
-	}
+	return c.akten(u, shas)
 }
 
 func (c CatObjekte) akten(u *umwelt.Umwelt, shas sha.Set) (err error) {
@@ -102,41 +87,5 @@ func (c CatObjekte) akten(u *umwelt.Umwelt, shas sha.Set) (err error) {
 		return
 	}
 
-	return
-}
-
-func (c CatObjekte) zettelen(u *umwelt.Umwelt, shas sha.Set) (err error) {
-	w := collections.MakeChain(
-		func(z *zettel.Transacted) (err error) {
-			if !shas.Contains(z.Sku.Sha) {
-				err = io.EOF
-			}
-
-			return
-		},
-		zettel.MakeWriterZettel(
-			zettel.MakeSerializedFormatWriter(
-				zettel.MakeObjekteTextFormatterIncludeAkte(
-					u.Konfig(),
-					u.StoreObjekten(),
-					nil,
-				),
-				u.Out(),
-				u.StoreObjekten(),
-				u.Konfig(),
-			),
-		),
-	)
-
-	if err = u.StoreObjekten().Zettel().ReadAllSchwanzenTransacted(w); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (c CatObjekte) typen(u *umwelt.Umwelt, shas sha.Set) (err error) {
-	err = errors.Normalf("TODO-P3 not implemented")
 	return
 }

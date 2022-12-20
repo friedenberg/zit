@@ -14,19 +14,27 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 )
 
-type TextMetadateiParser struct {
-	AkteFactory gattung.AkteIOFactory
-	context     *FormatContextRead
+type textMetadateiParser struct {
+	awf gattung.AkteWriterFactory
+	// context *FormatContextRead
 
 	aktePath string
 	akteSha  sha.Sha
 }
 
-func (f *TextMetadateiParser) Parse(r1 io.Reader, z *Objekte) (n int64, err error) {
+func MakeTextMetadateiParser(
+	awf gattung.AkteWriterFactory,
+) textMetadateiParser {
+	return textMetadateiParser{
+		awf: awf,
+	}
+}
+
+func (f *textMetadateiParser) Parse(r1 io.Reader, z *Objekte) (n int64, err error) {
 	return f.ReadFormat(r1, z)
 }
 
-func (f *TextMetadateiParser) ReadFormat(r1 io.Reader, z *Objekte) (n int64, err error) {
+func (f *textMetadateiParser) ReadFormat(r1 io.Reader, z *Objekte) (n int64, err error) {
 	etiketten := kennung.MakeEtikettMutableSet()
 
 	defer func() {
@@ -40,10 +48,12 @@ func (f *TextMetadateiParser) ReadFormat(r1 io.Reader, z *Objekte) (n int64, err
 		format.MakeLineReaderRepeat(
 			format.MakeLineReaderKeyValues(
 				map[string]format.FuncReadLine{
-					"#": f.context.Zettel.Bezeichnung.Set,
+					"#": z.Bezeichnung.Set,
 					"%": format.MakeLineReaderNop(),
 					"-": etiketten.AddString,
-					"!": f.readTyp,
+					"!": func(v string) (err error) {
+						return f.readTyp(z, v)
+					},
 				},
 			),
 		),
@@ -55,7 +65,10 @@ func (f *TextMetadateiParser) ReadFormat(r1 io.Reader, z *Objekte) (n int64, err
 	return
 }
 
-func (f *TextMetadateiParser) readTyp(desc string) (err error) {
+func (f *textMetadateiParser) readTyp(
+	z *Objekte,
+	desc string,
+) (err error) {
 	if desc == "" {
 		return
 	}
@@ -67,7 +80,7 @@ func (f *TextMetadateiParser) readTyp(desc string) (err error) {
 	//! <path>.<typ ext>
 	switch {
 	case files.Exists(desc):
-		if err = f.context.Zettel.Typ.Set(tail); err != nil {
+		if err = z.Typ.Set(tail); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -76,7 +89,7 @@ func (f *TextMetadateiParser) readTyp(desc string) (err error) {
 
 		var akteWriter sha.WriteCloser
 
-		if akteWriter, err = f.AkteFactory.AkteWriter(); err != nil {
+		if akteWriter, err = f.awf.AkteWriter(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -109,19 +122,19 @@ func (f *TextMetadateiParser) readTyp(desc string) (err error) {
 
 	//! <sha>.<typ ext>
 	case tail != "":
-		if err = f.context.Zettel.Akte.Set(head); err != nil {
+		if err = z.Akte.Set(head); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if err = f.context.Zettel.Typ.Set(tail); err != nil {
+		if err = z.Typ.Set(tail); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	//! <sha>
 	case tail == "":
-		if err = f.context.Zettel.Akte.Set(head); err == nil {
+		if err = z.Akte.Set(head); err == nil {
 			return
 		}
 
@@ -131,7 +144,7 @@ func (f *TextMetadateiParser) readTyp(desc string) (err error) {
 
 	//! <typ ext>
 	default:
-		if err = f.context.Zettel.Typ.Set(head); err != nil {
+		if err = z.Typ.Set(head); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

@@ -6,46 +6,69 @@ import (
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/echo/standort"
+	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/golf/fd"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 
 // [path@sha !typ "bez"]
-func MakeCliFormatZettel(
+// [path.akte_ext@sha]
+func MakeCliFormat(
 	s standort.Standort,
 	cw format.FuncColorWriter,
+	hf format.FormatWriterFunc[hinweis.Hinweis],
 	sf format.FormatWriterFunc[sha.Sha],
 	zf format.FormatWriterFunc[zettel.Objekte],
 ) format.FormatWriterFunc[Zettel] {
 	return func(w io.Writer, z *Zettel) (n int64, err error) {
-		return format.Write(
-			w,
-			format.MakeFormatString("["),
-			cw(s.MakeWriterRelativePath(z.ZettelFD.Path), format.ColorTypePointer),
-			format.MakeFormatString("@"),
-			format.MakeWriter(sf, &z.Sku.Sha),
-			format.MakeFormatString(" "),
-			format.MakeWriter(zf, &z.Objekte),
-			format.MakeFormatString("]"),
-		)
-	}
-}
+		switch {
+		case z.AkteFD.Path != "" && z.ZettelFD.Path != "":
+			return format.Write(
+				w,
+				format.MakeFormatStringRightAlignedParen(format.StringCheckedOut),
+				format.MakeFormatString("["),
+				cw(s.MakeWriterRelativePath(z.ZettelFD.Path), format.ColorTypePointer),
+				format.MakeFormatString("@"),
+				format.MakeWriter(sf, &z.Sku.Sha),
+				format.MakeFormatString(" "),
+				format.MakeWriter(zf, &z.Objekte),
+				format.MakeFormatString("]\n"),
+				format.MakeFormatStringRightAlignedParen(""),
+				format.MakeFormatString("["),
+				cw(s.MakeWriterRelativePath(z.AkteFD.Path), format.ColorTypePointer),
+				format.MakeFormatString("@"),
+				format.MakeWriter(sf, &z.Objekte.Akte),
+				format.MakeFormatString("]"),
+			)
 
-// [path.akte_ext@sha]
-func MakeCliFormatAkte(
-	s standort.Standort,
-	cw format.FuncColorWriter,
-	sf format.FormatWriterFunc[sha.Sha],
-) format.FormatWriterFunc[Zettel] {
-	return func(w io.Writer, z *Zettel) (n int64, err error) {
-		return format.Write(
-			w,
-			format.MakeFormatString("["),
-			cw(s.MakeWriterRelativePath(z.AkteFD.Path), format.ColorTypePointer),
-			format.MakeFormatString("@"),
-			format.MakeWriter(sf, &z.Objekte.Akte),
-			format.MakeFormatString("]"),
-		)
+		case z.AkteFD.Path != "":
+			return format.Write(
+				w,
+				format.MakeFormatStringRightAlignedParen(format.StringCheckedOut),
+				format.MakeFormatString("["),
+				cw(s.MakeWriterRelativePath(z.AkteFD.Path), format.ColorTypePointer),
+				format.MakeFormatString("@"),
+				format.MakeWriter(sf, &z.Objekte.Akte),
+				format.MakeFormatString(" "),
+				format.MakeWriter(zf, &z.Objekte),
+				format.MakeFormatString("]"),
+			)
+
+		case z.ZettelFD.Path != "":
+			return format.Write(
+				w,
+				format.MakeFormatStringRightAlignedParen(format.StringCheckedOut),
+				format.MakeFormatString("["),
+				cw(s.MakeWriterRelativePath(z.ZettelFD.Path), format.ColorTypePointer),
+				format.MakeFormatString("@"),
+				format.MakeWriter(sf, &z.Sku.Sha),
+				format.MakeFormatString(" "),
+				format.MakeWriter(zf, &z.Objekte),
+				format.MakeFormatString("]"),
+			)
+		}
+
+		return
 	}
 }
 

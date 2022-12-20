@@ -85,7 +85,7 @@ function write_objekte_one_file { # @test
 	run "${cmd_zit_write_objekte[@]}" <(echo wow)
 	assert_output --partial 'f40cd21f276e47d533371afce1778447e858eb5c9c0c0ed61c65f5c5d57caf63 /dev/fd/'
 
-	run "${cmd_zit_cat_objekte[@]}" -gattung akte "f40cd21f276e47d533371afce1778447e858eb5c9c0c0ed61c65f5c5d57caf63"
+	run "${cmd_zit_cat_objekte[@]}" "f40cd21f276e47d533371afce1778447e858eb5c9c0c0ed61c65f5c5d57caf63"
 	assert_output "$(printf "%s\n" wow)"
 
 	run zit cat -gattung akte

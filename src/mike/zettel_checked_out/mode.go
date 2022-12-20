@@ -54,3 +54,23 @@ func (m *Mode) Set(v string) (err error) {
 
 	return
 }
+
+func (m Mode) IncludesAkte() bool {
+	switch m {
+	case ModeZettelAndAkte, ModeAkteOnly:
+		return true
+
+	default:
+		return false
+	}
+}
+
+func (m Mode) IncludesZettel() bool {
+	switch m {
+	case ModeZettelAndAkte, ModeZettelOnly:
+		return true
+
+	default:
+		return false
+	}
+}

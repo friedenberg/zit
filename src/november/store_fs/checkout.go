@@ -1,25 +1,14 @@
 package store_fs
 
 import (
-	"io"
-	"os"
-
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/delta/collections"
-	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/id"
-	"github.com/friedenberg/zit/src/golf/fd"
 	"github.com/friedenberg/zit/src/india/zettel_external"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/mike/zettel_checked_out"
 )
-
-type ZettelCheckedOutLogWriters struct {
-	ZettelOnly collections.WriterFunc[*zettel_checked_out.Zettel]
-	AkteOnly   collections.WriterFunc[*zettel_checked_out.Zettel]
-	Both       collections.WriterFunc[*zettel_checked_out.Zettel]
-}
 
 func (s *Store) Checkout(
 	options CheckoutOptions,
@@ -111,7 +100,7 @@ func (s *Store) CheckoutOne(
 
 		if !s.shouldCheckOut(options, cz) {
 			//TODO-P2 handle fs state
-			if err = s.zettelCheckedOutWriters.ZettelOnly(&cz); err != nil {
+			if err = s.zettelExternalLogPrinter(&cz.External); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -127,9 +116,6 @@ func (s *Store) CheckoutOne(
 		State:    zettel_checked_out.StateJustCheckedOut,
 		Internal: sz,
 		External: zettel_external.Zettel{
-			ZettelFD: fd.FD{
-				Path: filename,
-			},
 			Objekte: sz.Objekte,
 			Sku: zettel_external.Sku{
 				Sha:     sz.Sku.Sha,
@@ -138,132 +124,39 @@ func (s *Store) CheckoutOne(
 		},
 	}
 
-	if !inlineAkte {
+	if options.CheckoutMode.IncludesZettel() {
+		cz.External.ZettelFD.Path = filename
+	}
+
+	if !inlineAkte && options.CheckoutMode.IncludesAkte() {
 		t := sz.Objekte.Typ
 
 		ty := s.konfig.GetTyp(t)
 
+		var fe string
+
 		if ty != nil {
-			fe := ty.Objekte.Akte.FileExtension
-
-			if fe == "" {
-				fe = t.String()
-			}
-
-			cz.External.AkteFD = fd.FD{
-				Path: originalFilename + "." + fe,
-			}
+			fe = ty.Objekte.Akte.FileExtension
 		}
+
+		if fe == "" {
+			fe = t.String()
+		}
+
+		cz.External.AkteFD.Path = originalFilename + "." + fe
 	}
 
-	c := zettel.FormatContextWrite{
-		Zettel:      sz.Objekte,
-		IncludeAkte: inlineAkte,
-	}
+	e := zettel_external.MakeFileEncoder(
+		s.storeObjekten,
+		s.konfig,
+	)
 
-	switch options.CheckoutMode {
-	case CheckoutModeAkteOnly:
-		if err = s.writeAkte(
-			cz.Internal.Objekte.Akte,
-			cz.External.AkteFD.Path,
-			&cz,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	case CheckoutModeZettelAndAkte:
-		c.IncludeAkte = true
-
-		if !inlineAkte {
-			c.ExternalAktePath = cz.External.AkteFD.Path
-		}
-
-		fallthrough
-
-	case CheckoutModeZettelOnly:
-		cz.External.AkteFD = fd.FD{}
-
-		if err = s.writeFormat(options, filename, c, &cz); err != nil {
-			err = errors.Wrapf(err, "%s", sz.Sku)
-			errors.PrintErrf("%s (check out failed):", sz.Sku)
-			return
-		}
-
-	default:
-		err = errors.Errorf("unsupported checkout mode: %s", options.CheckoutMode)
-		return
-	}
-
-	return
-}
-
-func (s *Store) writeFormat(
-	o CheckoutOptions,
-	p string,
-	fc zettel.FormatContextWrite,
-	zco *zettel_checked_out.Zettel,
-) (err error) {
-	var f *os.File
-
-	if f, err = files.Create(p); err != nil {
+	if err = e.Encode(&cz.External); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	fc.Out = f
-
-	defer errors.Deferred(&err, f.Close)
-
-	if _, err = o.Formatter.Format(f, &fc.Zettel); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if fc.ExternalAktePath == "" {
-		if err = s.zettelCheckedOutWriters.ZettelOnly(zco); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	} else {
-		if err = s.zettelCheckedOutWriters.Both(zco); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	return
-}
-
-func (s *Store) writeAkte(
-	sh sha.Sha,
-	p string,
-	zco *zettel_checked_out.Zettel,
-) (err error) {
-	var f *os.File
-
-	if f, err = files.Create(p); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.Deferred(&err, f.Close)
-
-	var r io.ReadCloser
-
-	if r, err = s.storeObjekten.AkteReader(sh); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.Deferred(&err, r.Close)
-
-	if _, err = io.Copy(f, r); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.zettelCheckedOutWriters.AkteOnly(zco); err != nil {
+	if err = s.zettelExternalLogPrinter(&cz.External); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -18,7 +18,6 @@ import (
 	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/mike/store_objekten"
-	"github.com/friedenberg/zit/src/mike/zettel_checked_out"
 	"github.com/friedenberg/zit/src/november/store_fs"
 )
 
@@ -200,12 +199,8 @@ func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 		},
 	)
 
-	u.storeWorkingDirectory.SetZettelCheckedOutWriters(
-		store_fs.ZettelCheckedOutLogWriters{
-			ZettelOnly: u.PrinterZettelCheckedOutFresh(zettel_checked_out.ModeZettelOnly),
-			AkteOnly:   u.PrinterZettelCheckedOutFresh(zettel_checked_out.ModeZettelOnly),
-			Both:       u.PrinterZettelCheckedOutFresh(zettel_checked_out.ModeZettelOnly),
-		},
+	u.storeWorkingDirectory.SetZettelExternalLogPrinter(
+		u.PrinterZettelExternal(),
 	)
 
 	u.storesInitialized = true

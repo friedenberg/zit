@@ -3,158 +3,107 @@ package zettel_checked_out
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/format"
+	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/echo/standort"
-	"github.com/friedenberg/zit/src/india/zettel_external"
+	"github.com/friedenberg/zit/src/foxtrot/hinweis"
+	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 
 // (same|changed) [path@sha !typ "bez"]
 // (same|changed) [path.akte_ext@sha]
 func MakeCliFormat(
 	s standort.Standort,
-	zef format.FormatWriterFunc[zettel_external.Zettel],
-	aef format.FormatWriterFunc[zettel_external.Zettel],
-	mode Mode,
+	cw format.FuncColorWriter,
+	hf format.FormatWriterFunc[hinweis.Hinweis],
+	sf format.FormatWriterFunc[sha.Sha],
+	zf format.FormatWriterFunc[zettel.Objekte],
 ) format.FormatWriterFunc[Zettel] {
-	wzef := makeWriterFuncZettel(zef, false)
-	waef := makeWriterFuncAkte(aef, false)
+	wzef := makeWriterFuncZettel(
+		s, cw, hf, sf, zf,
+	)
 
-	switch mode {
-	case ModeAkteOnly:
-		return func(w io.Writer, z *Zettel) (n int64, err error) {
-			return format.Write(
-				w,
-				format.MakeWriter(waef, z),
-			)
-		}
+	waef := makeWriterFuncAkte(
+		s, cw, hf, sf, zf,
+	)
 
-	case ModeZettelAndAkte:
-		return func(w io.Writer, z *Zettel) (n int64, err error) {
+	return func(w io.Writer, z *Zettel) (n int64, err error) {
+		switch {
+		case z.External.AkteFD.Path != "" && z.External.ZettelFD.Path != "":
 			return format.Write(
 				w,
 				format.MakeWriter(wzef, z),
 				format.MakeFormatString("\n"),
 				format.MakeWriter(waef, z),
 			)
-		}
 
-	case ModeZettelOnly:
-		return func(w io.Writer, z *Zettel) (n int64, err error) {
+		case z.External.AkteFD.Path != "":
 			return format.Write(
 				w,
-				format.MakeWriter(wzef, z),
-			)
-		}
-
-	default:
-		return func(w io.Writer, z *Zettel) (n int64, err error) {
-			err = errors.Errorf("unsupported checkout mode: %s", mode)
-			return
-		}
-	}
-}
-
-func MakeCliFormatFresh(
-	s standort.Standort,
-	zef format.FormatWriterFunc[zettel_external.Zettel],
-	aef format.FormatWriterFunc[zettel_external.Zettel],
-	mode Mode,
-) format.FormatWriterFunc[Zettel] {
-	wzef := makeWriterFuncZettel(zef, true)
-	waef := makeWriterFuncAkte(aef, true)
-
-	switch mode {
-	case ModeAkteOnly:
-		return func(w io.Writer, z *Zettel) (n int64, err error) {
-			return format.Write(
-				w,
-				format.MakeFormatStringRightAlignedParen(format.StringCheckedOut),
-				format.MakeWriter(wzef, z),
-			)
-		}
-
-	case ModeZettelAndAkte:
-		return func(w io.Writer, z *Zettel) (n int64, err error) {
-			return format.Write(
-				w,
-				format.MakeFormatStringRightAlignedParen(format.StringCheckedOut),
-				format.MakeWriter(wzef, z),
-				format.MakeFormatString("\n"),
-				format.MakeFormatStringRightAlignedParen(format.StringCheckedOut),
 				format.MakeWriter(waef, z),
 			)
-		}
 
-	case ModeZettelOnly:
-		return func(w io.Writer, z *Zettel) (n int64, err error) {
+		case z.External.ZettelFD.Path != "":
 			return format.Write(
 				w,
-				format.MakeFormatStringRightAlignedParen(format.StringCheckedOut),
 				format.MakeWriter(wzef, z),
 			)
 		}
 
-	default:
-		return func(w io.Writer, z *Zettel) (n int64, err error) {
-			err = errors.Errorf("unsupported checkout mode: %s", mode)
-			return
-		}
+		return
 	}
 }
 
 func makeWriterFuncZettel(
-	zef format.FormatWriterFunc[zettel_external.Zettel],
-	fresh bool,
+	s standort.Standort,
+	cw format.FuncColorWriter,
+	hf format.FormatWriterFunc[hinweis.Hinweis],
+	sf format.FormatWriterFunc[sha.Sha],
+	zf format.FormatWriterFunc[zettel.Objekte],
 ) format.FormatWriterFunc[Zettel] {
-	if fresh {
-		return func(w io.Writer, z *Zettel) (n int64, err error) {
-			return format.Write(
-				w,
-				format.MakeWriter(zef, &z.External),
-			)
-		}
-	} else {
-		return func(w io.Writer, z *Zettel) (n int64, err error) {
-			diff := format.StringChanged
+	return func(w io.Writer, z *Zettel) (n int64, err error) {
+		diff := format.StringChanged
 
-			if z.Internal.Sku.Sha.Equals(z.External.Sku.Sha) {
-				diff = format.StringSame
-			}
-
-			return format.Write(
-				w,
-				format.MakeFormatStringRightAlignedParen(diff),
-				format.MakeWriter(zef, &z.External),
-			)
+		if z.Internal.Sku.Sha.Equals(z.External.Sku.Sha) {
+			diff = format.StringSame
 		}
+
+		return format.Write(
+			w,
+			format.MakeFormatStringRightAlignedParen(diff),
+			format.MakeFormatString("["),
+			cw(s.MakeWriterRelativePath(z.External.ZettelFD.Path), format.ColorTypePointer),
+			format.MakeFormatString("@"),
+			format.MakeWriter(sf, &z.External.Sku.Sha),
+			format.MakeFormatString(" "),
+			format.MakeWriter(zf, &z.External.Objekte),
+			format.MakeFormatString("]"),
+		)
 	}
 }
 
 func makeWriterFuncAkte(
-	aef format.FormatWriterFunc[zettel_external.Zettel],
-	fresh bool,
+	s standort.Standort,
+	cw format.FuncColorWriter,
+	hf format.FormatWriterFunc[hinweis.Hinweis],
+	sf format.FormatWriterFunc[sha.Sha],
+	zf format.FormatWriterFunc[zettel.Objekte],
 ) format.FormatWriterFunc[Zettel] {
-	if fresh {
-		return func(w io.Writer, z *Zettel) (n int64, err error) {
-			return format.Write(
-				w,
-				format.MakeWriter(aef, &z.External),
-			)
-		}
-	} else {
-		return func(w io.Writer, z *Zettel) (n int64, err error) {
-			diff := format.StringChanged
+	return func(w io.Writer, z *Zettel) (n int64, err error) {
+		diff := format.StringChanged
 
-			if z.Internal.Objekte.Akte.Equals(z.External.Objekte.Akte) {
-				diff = format.StringSame
-			}
-
-			return format.Write(
-				w,
-				format.MakeFormatStringRightAlignedParen(diff),
-				format.MakeWriter(aef, &z.External),
-			)
+		if z.Internal.Objekte.Akte.Equals(z.External.Objekte.Akte) {
+			diff = format.StringSame
 		}
+
+		return format.Write(
+			w,
+			format.MakeFormatStringRightAlignedParen(diff),
+			format.MakeFormatString("["),
+			cw(s.MakeWriterRelativePath(z.External.AkteFD.Path), format.ColorTypePointer),
+			format.MakeFormatString("@"),
+			format.MakeWriter(sf, &z.External.Objekte.Akte),
+			format.MakeFormatString("]"),
+		)
 	}
 }

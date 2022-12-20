@@ -33,7 +33,7 @@ type Store struct {
 
 	storeObjekten *store_objekten.Store
 
-	zettelCheckedOutWriters ZettelCheckedOutLogWriters
+	zettelExternalLogPrinter collections.WriterFunc[*zettel_external.Zettel]
 
 	entries      map[string]Entry
 	indexWasRead bool
@@ -61,10 +61,10 @@ func New(
 	return
 }
 
-func (s *Store) SetZettelCheckedOutWriters(
-	zcow ZettelCheckedOutLogWriters,
+func (s *Store) SetZettelExternalLogPrinter(
+	zelw collections.WriterFunc[*zettel_external.Zettel],
 ) {
-	s.zettelCheckedOutWriters = zcow
+	s.zettelExternalLogPrinter = zelw
 }
 
 // TODO-P3 move to standort

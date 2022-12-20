@@ -19,7 +19,7 @@ type objekteTextParser struct {
 	TypError                   error
 }
 
-//TODO-P1 rename dto MakeObjekteTextParser
+// TODO-P1 rename dto MakeObjekteTextParser
 func MakeTextParser(
 	akteFactory gattung.AkteIOFactory,
 	akteFormatter konfig.RemoteScript,
@@ -49,9 +49,9 @@ func (f objekteTextParser) ReadFormat(r io.Reader, o *Objekte) (n int64, err err
 }
 
 func (f objekteTextParser) ReadFrom(c *FormatContextRead) (n int64, err error) {
-	state := &TextMetadateiParser{
-		context: c,
-	}
+	state := MakeTextMetadateiParser(
+		f.AkteFactory,
+	)
 
 	var akteWriter sha.WriteCloser
 

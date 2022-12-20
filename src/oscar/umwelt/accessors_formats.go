@@ -99,19 +99,12 @@ func (u *Umwelt) FormatZettel() format.FormatWriterFunc[zettel.Objekte] {
 }
 
 func (u *Umwelt) FormatZettelExternal() format.FormatWriterFunc[zettel_external.Zettel] {
-	return zettel_external.MakeCliFormatZettel(
+	return zettel_external.MakeCliFormat(
 		u.Standort(),
 		u.FormatColorWriter(),
+		u.FormatHinweis(),
 		u.FormatSha(),
 		u.FormatZettel(),
-	)
-}
-
-func (u *Umwelt) FormatZettelExternalAkte() format.FormatWriterFunc[zettel_external.Zettel] {
-	return zettel_external.MakeCliFormatAkte(
-		u.Standort(),
-		u.FormatColorWriter(),
-		u.FormatSha(),
 	)
 }
 
@@ -122,25 +115,13 @@ func (u *Umwelt) FormatZettelExternalFD() format.FormatWriterFunc[fd.FD] {
 	)
 }
 
-func (u *Umwelt) FormatZettelCheckedOut(
-	mode zettel_checked_out.Mode,
-) format.FormatWriterFunc[zettel_checked_out.Zettel] {
+func (u *Umwelt) FormatZettelCheckedOut() format.FormatWriterFunc[zettel_checked_out.Zettel] {
 	return zettel_checked_out.MakeCliFormat(
 		u.Standort(),
-		u.FormatZettelExternal(),
-		u.FormatZettelExternalAkte(),
-		mode,
-	)
-}
-
-func (u *Umwelt) FormatZettelCheckedOutFresh(
-	mode zettel_checked_out.Mode,
-) format.FormatWriterFunc[zettel_checked_out.Zettel] {
-	return zettel_checked_out.MakeCliFormatFresh(
-		u.Standort(),
-		u.FormatZettelExternal(),
-		u.FormatZettelExternalAkte(),
-		mode,
+		u.FormatColorWriter(),
+		u.FormatHinweis(),
+		u.FormatSha(),
+		u.FormatZettel(),
 	)
 }
 

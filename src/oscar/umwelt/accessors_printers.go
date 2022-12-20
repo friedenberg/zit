@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/golf/fd"
 	"github.com/friedenberg/zit/src/india/konfig"
 	"github.com/friedenberg/zit/src/india/typ"
+	"github.com/friedenberg/zit/src/india/zettel_external"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/mike/zettel_checked_out"
 	"github.com/friedenberg/zit/src/november/store_fs"
@@ -78,21 +79,24 @@ func (u *Umwelt) PrinterZettelTransactedDelta(
 	)
 }
 
-func (u *Umwelt) PrinterZettelCheckedOut(
-	mode zettel_checked_out.Mode,
-) collections.WriterFunc[*zettel_checked_out.Zettel] {
+func (u *Umwelt) PrinterZettelExternal() collections.WriterFunc[*zettel_external.Zettel] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
-		u.FormatZettelCheckedOut(mode),
+		u.FormatZettelExternal(),
 	)
 }
 
-func (u *Umwelt) PrinterZettelCheckedOutFresh(
-	mode zettel_checked_out.Mode,
-) collections.WriterFunc[*zettel_checked_out.Zettel] {
+func (u *Umwelt) PrinterZettelCheckedOut() collections.WriterFunc[*zettel_checked_out.Zettel] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
-		u.FormatZettelCheckedOutFresh(mode),
+		u.FormatZettelCheckedOut(),
+	)
+}
+
+func (u *Umwelt) PrinterZettelCheckedOutFresh() collections.WriterFunc[*zettel_checked_out.Zettel] {
+	return format.MakeWriterToWithNewLines(
+		u.Out(),
+		u.FormatZettelCheckedOut(),
 	)
 }
 
