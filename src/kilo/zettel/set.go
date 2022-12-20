@@ -6,25 +6,25 @@ import (
 )
 
 type MutableSet struct {
-	collections.MutableSet[*Transacted]
+	collections.MutableSet[*Verzeichnisse]
 }
 
 func MakeMutableSetUnique(c int) MutableSet {
 	return MutableSet{
 		MutableSet: collections.MakeMutableSet(
-			func(sz *Transacted) string {
+			func(sz *Verzeichnisse) string {
 				if sz == nil {
 					return ""
 				}
 
 				return collections.MakeKey(
-					sz.Sku.Kopf,
-					sz.Sku.Mutter[0],
-					sz.Sku.Mutter[1],
-					sz.Sku.Schwanz,
-					sz.Sku.TransactionIndex,
-					sz.Sku.Kennung,
-					sz.Sku.Sha,
+					sz.Transacted.Sku.Kopf,
+					sz.Transacted.Sku.Mutter[0],
+					sz.Transacted.Sku.Mutter[1],
+					sz.Transacted.Sku.Schwanz,
+					sz.Transacted.Sku.TransactionIndex,
+					sz.Transacted.Sku.Kennung,
+					sz.Transacted.Sku.Sha,
 				)
 			},
 		),
@@ -34,13 +34,13 @@ func MakeMutableSetUnique(c int) MutableSet {
 func MakeMutableSetHinweis(c int) MutableSet {
 	return MutableSet{
 		MutableSet: collections.MakeMutableSet(
-			func(sz *Transacted) string {
+			func(sz *Verzeichnisse) string {
 				if sz == nil {
 					return ""
 				}
 
 				return collections.MakeKey(
-					sz.Sku.Kennung,
+					sz.Transacted.Sku.Kennung,
 				)
 			},
 		),
@@ -49,7 +49,7 @@ func MakeMutableSetHinweis(c int) MutableSet {
 
 // func (m Set) Filter(w Writer) (err error) {
 // 	for k, sz := range m.innerMap {
-// 		if err = w.WriteZettelTransacted(&sz); err != nil {
+// 		if err = w.WriteZettelVerzeichnisse(&sz); err != nil {
 // 			if errors.IsEOF(err) {
 // 				err = nil
 // 				delete(m.innerMap, k)
@@ -63,11 +63,11 @@ func MakeMutableSetHinweis(c int) MutableSet {
 // 	return
 // }
 
-func (s MutableSet) ToSetPrefixTransacted() (b SetPrefixTransacted) {
-	b = MakeSetPrefixTransacted(s.Len())
+func (s MutableSet) ToSetPrefixVerzeichnisse() (b SetPrefixVerzeichnisse) {
+	b = MakeSetPrefixVerzeichnisse(s.Len())
 
 	s.Each(
-		func(z *Transacted) (err error) {
+		func(z *Verzeichnisse) (err error) {
 			b.Add(*z)
 
 			return
@@ -81,8 +81,8 @@ func (s MutableSet) ToSliceHinweisen() (b []hinweis.Hinweis) {
 	b = make([]hinweis.Hinweis, 0, s.Len())
 
 	s.Each(
-		func(z *Transacted) (err error) {
-			b = append(b, z.Sku.Kennung)
+		func(z *Verzeichnisse) (err error) {
+			b = append(b, z.Transacted.Sku.Kennung)
 
 			return
 		},

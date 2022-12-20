@@ -7,28 +7,28 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 )
 
-type SetPrefixTransacted struct {
+type SetPrefixVerzeichnisse struct {
 	count    int
 	innerMap map[kennung.Etikett]MutableSet
 }
 
-type SetPrefixTransactedSegments struct {
+type SetPrefixVerzeichnisseSegments struct {
 	Ungrouped MutableSet
-	Grouped   SetPrefixTransacted
+	Grouped   SetPrefixVerzeichnisse
 }
 
-func MakeSetPrefixTransacted(c int) (s SetPrefixTransacted) {
+func MakeSetPrefixVerzeichnisse(c int) (s SetPrefixVerzeichnisse) {
 	s.innerMap = make(map[kennung.Etikett]MutableSet, c)
 	return s
 }
 
-func (s SetPrefixTransacted) Len() int {
+func (s SetPrefixVerzeichnisse) Len() int {
 	return s.count
 }
 
 // this splits on right-expanded
-func (s *SetPrefixTransacted) Add(z Transacted) {
-	es := kennung.Expanded(z.Objekte.Etiketten, kennung.ExpanderRight)
+func (s *SetPrefixVerzeichnisse) Add(z Verzeichnisse) {
+	es := kennung.Expanded(z.Transacted.Objekte.Etiketten, kennung.ExpanderRight)
 
 	if es.Len() == 0 {
 		es = kennung.MakeEtikettSet(kennung.Etikett{})
@@ -39,12 +39,12 @@ func (s *SetPrefixTransacted) Add(z Transacted) {
 	}
 }
 
-func (a SetPrefixTransacted) Subtract(b MutableSet) (c SetPrefixTransacted) {
-	c = MakeSetPrefixTransacted(len(a.innerMap))
+func (a SetPrefixVerzeichnisse) Subtract(b MutableSet) (c SetPrefixVerzeichnisse) {
+	c = MakeSetPrefixVerzeichnisse(len(a.innerMap))
 
 	for e, aSet := range a.innerMap {
 		aSet.Each(
-			func(z *Transacted) (err error) {
+			func(z *Verzeichnisse) (err error) {
 				if b.Contains(z) {
 					return
 				}
@@ -59,7 +59,7 @@ func (a SetPrefixTransacted) Subtract(b MutableSet) (c SetPrefixTransacted) {
 	return
 }
 
-func (s *SetPrefixTransacted) addPair(e kennung.Etikett, z Transacted) {
+func (s *SetPrefixVerzeichnisse) addPair(e kennung.Etikett, z Verzeichnisse) {
 	s.count += 1
 
 	existing, ok := s.innerMap[e]
@@ -72,7 +72,7 @@ func (s *SetPrefixTransacted) addPair(e kennung.Etikett, z Transacted) {
 	s.innerMap[e] = existing
 }
 
-func (a SetPrefixTransacted) Each(f func(kennung.Etikett, MutableSet) error) (err error) {
+func (a SetPrefixVerzeichnisse) Each(f func(kennung.Etikett, MutableSet) error) (err error) {
 	for e, ssz := range a.innerMap {
 		if err = f(e, ssz); err != nil {
 			if errors.Is(err, io.EOF) {
@@ -88,11 +88,11 @@ func (a SetPrefixTransacted) Each(f func(kennung.Etikett, MutableSet) error) (er
 	return
 }
 
-func (a SetPrefixTransacted) EachZettel(f func(kennung.Etikett, Transacted) error) error {
+func (a SetPrefixVerzeichnisse) EachZettel(f func(kennung.Etikett, Verzeichnisse) error) error {
 	return a.Each(
 		func(e kennung.Etikett, st MutableSet) (err error) {
 			st.Each(
-				func(z *Transacted) (err error) {
+				func(z *Verzeichnisse) (err error) {
 					err = f(e, *z)
 					return
 				},
@@ -106,9 +106,9 @@ func (a SetPrefixTransacted) EachZettel(f func(kennung.Etikett, Transacted) erro
 // for all of the zettels, check for intersections with the passed in
 // etikett, and if there is a prefix match, group it out the output set segments
 // appropriately
-func (a SetPrefixTransacted) Subset(e kennung.Etikett) (out SetPrefixTransactedSegments) {
+func (a SetPrefixVerzeichnisse) Subset(e kennung.Etikett) (out SetPrefixVerzeichnisseSegments) {
 	out.Ungrouped = MakeMutableSetUnique(len(a.innerMap))
-	out.Grouped = MakeSetPrefixTransacted(len(a.innerMap))
+	out.Grouped = MakeSetPrefixVerzeichnisse(len(a.innerMap))
 
 	for e1, zSet := range a.innerMap {
 		if e1.String() == "" {
@@ -116,8 +116,8 @@ func (a SetPrefixTransacted) Subset(e kennung.Etikett) (out SetPrefixTransactedS
 		}
 
 		zSet.Each(
-			func(z *Transacted) (err error) {
-				intersection := z.Objekte.Etiketten.IntersectPrefixes(kennung.MakeEtikettSet(e))
+			func(z *Verzeichnisse) (err error) {
+				intersection := z.Transacted.Objekte.Etiketten.IntersectPrefixes(kennung.MakeEtikettSet(e))
 				errors.Log().Printf("%s yields %s", e1, intersection)
 
 				if intersection.Len() > 0 {
@@ -136,7 +136,7 @@ func (a SetPrefixTransacted) Subset(e kennung.Etikett) (out SetPrefixTransactedS
 	return
 }
 
-func (s SetPrefixTransacted) ToSet() (out MutableSet) {
+func (s SetPrefixVerzeichnisse) ToSet() (out MutableSet) {
 	out = MakeMutableSetUnique(len(s.innerMap))
 
 	for _, zs := range s.innerMap {

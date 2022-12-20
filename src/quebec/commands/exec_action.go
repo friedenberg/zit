@@ -112,9 +112,7 @@ func (c ExecAction) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	//TODO-P1 support new store_fs reading
 	if err = u.StoreObjekten().Zettel().ReadAllSchwanzenVerzeichnisse(
 		collections.MakeChain(
-			zettel.MakeWriterZettelTransacted(
-				query.WriteZettelTransacted,
-			),
+			query.WriteZettelVerzeichnisse,
 			zettel.MakeWriterZettelTransacted(
 				u.StoreWorkingDirectory().ZettelTransactedWriter(iter),
 			),

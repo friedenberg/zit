@@ -154,34 +154,39 @@ func (s Store) RevertTransaktion(
 
 			errors.Log().Print(o)
 
-			var chain []*zettel.Transacted
+			var chain []*zettel.Verzeichnisse
 
 			if chain, err = s.zettelStore.AllInChain(*h); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			var tz *zettel.Transacted
+			var tz *zettel.Verzeichnisse
 
 			for _, someTz := range chain {
 				errors.Log().Print(someTz)
-				if someTz.Sku.Schwanz == o.Mutter[0] {
+				if someTz.Transacted.Sku.Schwanz == o.Mutter[0] {
 					tz = someTz
 					break
 				}
 			}
 
-			if tz.Sku.Sha.IsNull() {
+			if tz.Transacted.Sku.Sha.IsNull() {
 				err = errors.Errorf("zettel not found in index!: %#v", o)
 				return
 			}
 
-			if tz, err = s.zettelStore.Update(&tz.Objekte, &tz.Sku.Kennung); err != nil {
+			var tz1 *zettel.Transacted
+
+			if tz1, err = s.zettelStore.Update(
+				&tz.Transacted.Objekte,
+				&tz.Transacted.Sku.Kennung,
+			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			tzs.Add(tz)
+			tzs.Add(zettel.MakeVerzeichnisse(tz1))
 
 			return
 		},

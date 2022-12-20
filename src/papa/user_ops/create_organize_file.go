@@ -33,7 +33,9 @@ func (c CreateOrganizeFile) RunAndWrite(
 	return
 }
 
-func (c CreateOrganizeFile) Run(zettels zettel.MutableSet) (results *organize_text.Text, err error) {
+func (c CreateOrganizeFile) Run(
+	zettels zettel.MutableSet,
+) (results *organize_text.Text, err error) {
 	if results, err = organize_text.New(c.Options); err != nil {
 		err = errors.Wrap(err)
 		return

@@ -92,7 +92,10 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	createOrganizeFileResults, err = createOrganizeFileOp.RunAndWrite(zettelsFromAkteResults, f)
+	createOrganizeFileResults, err = createOrganizeFileOp.RunAndWrite(
+		zettelsFromAkteResults,
+		f,
+	)
 
 	if err != nil {
 		err = errors.Wrap(err)
@@ -179,7 +182,7 @@ func (c Add) openAktenIfNecessary(
 
 	if checkoutResults, err = u.StoreWorkingDirectory().Checkout(
 		options,
-		query.WriteZettelTransacted,
+		query.WriteZettelVerzeichnisse,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

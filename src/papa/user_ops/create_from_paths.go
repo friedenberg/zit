@@ -26,7 +26,9 @@ type CreateFromPaths struct {
 	// ReadHinweisFromPath bool
 }
 
-func (c CreateFromPaths) Run(args ...string) (results zettel.MutableSet, err error) {
+func (c CreateFromPaths) Run(
+	args ...string,
+) (results collections.MutableSet[*zettel.Verzeichnisse], err error) {
 	//TODO support different modes of de-duplication
 	//TODO support merging of duplicated akten
 	toCreate := zettel_external.MakeMutableSetUniqueFD()
@@ -49,7 +51,15 @@ func (c CreateFromPaths) Run(args ...string) (results zettel.MutableSet, err err
 		}
 	}
 
-	results = zettel.MakeMutableSetHinweis(toCreate.Len())
+	results = collections.MakeMutableSet[*zettel.Verzeichnisse](
+		func(zv *zettel.Verzeichnisse) string {
+			if zv == nil {
+				return ""
+			}
+
+			return zv.Transacted.Sku.Kennung.String()
+		},
+	)
 
 	if err = c.Lock(); err != nil {
 		err = errors.Wrap(err)
@@ -62,11 +72,11 @@ func (c CreateFromPaths) Run(args ...string) (results zettel.MutableSet, err err
 		matcher := zettel_external.MakeMutableMatchSet(toCreate)
 
 		if err = c.StoreObjekten().Zettel().ReadAllVerzeichnisse(
-			zettel.MakeWriterZettelTransacted(
-				collections.MakeChain(
+			collections.MakeChain(
+				zettel.MakeWriterZettelTransacted(
 					matcher.Match,
-					results.AddAndDoNotRepool,
 				),
+				results.AddAndDoNotRepool,
 			),
 		); err != nil {
 			err = errors.Wrap(err)
@@ -80,15 +90,19 @@ func (c CreateFromPaths) Run(args ...string) (results zettel.MutableSet, err err
 	}
 
 	err = results.Each(
-		func(z *zettel.Transacted) (err error) {
-			if c.ProtoZettel.Apply(&z.Objekte) {
-				if z, err = c.StoreObjekten().Zettel().Update(
-					&z.Objekte,
-					&z.Sku.Kennung,
+		func(z *zettel.Verzeichnisse) (err error) {
+			if c.ProtoZettel.Apply(&z.Transacted.Objekte) {
+				var zt *zettel.Transacted
+
+				if zt, err = c.StoreObjekten().Zettel().Update(
+					&z.Transacted.Objekte,
+					&z.Transacted.Sku.Kennung,
 				); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
+
+				z.Transacted = *zt
 			}
 
 			return
@@ -133,7 +147,11 @@ func (c CreateFromPaths) Run(args ...string) (results zettel.MutableSet, err err
 			//TODO get matches
 			cz.DetermineState()
 
-			results.Add(&cz.Internal)
+			zv := &zettel.Verzeichnisse{}
+
+			zv.ResetWithTransacted(&cz.Internal)
+
+			results.Add(zv)
 
 			return
 		},

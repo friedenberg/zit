@@ -25,10 +25,10 @@ type zettel struct {
 }
 
 func makeZettel(
-	named *zettel_pkg.Transacted,
+	named *zettel_pkg.Verzeichnisse,
 	ha hinweis.Abbr,
 ) (z zettel, err error) {
-	h := *named.Kennung()
+	h := *named.Transacted.Kennung()
 
 	if ha != nil {
 		if h, err = ha.AbbreviateHinweis(h); err != nil {
@@ -40,7 +40,7 @@ func makeZettel(
 	z = zettel{
 		Hinweis: h,
 		//TODO do this smart
-		Bezeichnung: bezeichnung.Make(named.Objekte.Description()),
+		Bezeichnung: bezeichnung.Make(named.Transacted.Objekte.Description()),
 	}
 
 	return

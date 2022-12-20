@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/src/charlie/script_value"
+	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/kilo/cwd_files"
 	"github.com/friedenberg/zit/src/kilo/zettel"
@@ -75,7 +76,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			return
 		}
 	} else {
-		var zts zettel.MutableSet
+		var zts collections.MutableSet[*zettel.Verzeichnisse]
 
 		if zts, err = c.readExistingFilesAsZettels(u, f, args...); err != nil {
 			err = errors.Wrap(err)
@@ -116,7 +117,7 @@ func (c New) readExistingFilesAsZettels(
 	u *umwelt.Umwelt,
 	f zettel.ObjekteParser,
 	args ...string,
-) (zts zettel.MutableSet, err error) {
+) (zts collections.MutableSet[*zettel.Verzeichnisse], err error) {
 	opCreateFromPath := user_ops.CreateFromPaths{
 		Umwelt:      u,
 		Format:      f,

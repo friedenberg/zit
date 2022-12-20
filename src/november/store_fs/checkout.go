@@ -12,7 +12,7 @@ import (
 
 func (s *Store) Checkout(
 	options CheckoutOptions,
-	ztw collections.WriterFunc[*zettel.Transacted],
+	ztw collections.WriterFunc[*zettel.Verzeichnisse],
 ) (zcs zettel_checked_out.MutableSet, err error) {
 	zcs = zettel_checked_out.MakeMutableSetUnique(0)
 	zts := zettel.MakeMutableSetUnique(0)
@@ -20,8 +20,8 @@ func (s *Store) Checkout(
 	if err = s.storeObjekten.Zettel().ReadAllSchwanzenVerzeichnisse(
 		collections.MakeChain(
 			zettel.MakeWriterKonfig(s.konfig),
-			zettel.MakeWriterZettelTransacted(ztw),
-			zettel.MakeWriterZettelTransacted(zts.AddAndDoNotRepool),
+			ztw,
+			zts.AddAndDoNotRepool,
 		),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -29,10 +29,10 @@ func (s *Store) Checkout(
 	}
 
 	if err = zts.Each(
-		func(zt *zettel.Transacted) (err error) {
+		func(zt *zettel.Verzeichnisse) (err error) {
 			var zc zettel_checked_out.Zettel
 
-			if zc, err = s.CheckoutOne(options, *zt); err != nil {
+			if zc, err = s.CheckoutOne(options, zt.Transacted); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

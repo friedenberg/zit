@@ -23,7 +23,7 @@ func (atc *Factory) Make() (ot *Text, err error) {
 	ot.Metadatei.EtikettSet = atc.Options.RootEtiketten
 	ot.Metadatei.Typ = atc.Options.Typ
 
-	prefixSet := atc.Transacted.ToSetPrefixTransacted()
+	prefixSet := atc.Transacted.ToSetPrefixVerzeichnisse()
 
 	for _, e := range atc.ExtraEtiketten.Elements() {
 		ee := newAssignment(ot.Depth() + 1)
@@ -57,7 +57,7 @@ func (atc *Factory) Make() (ot *Text, err error) {
 
 func (atc Factory) makeChildren(
 	parent *assignment,
-	prefixSet zettel_pkg.SetPrefixTransacted,
+	prefixSet zettel_pkg.SetPrefixVerzeichnisse,
 	groupingEtiketten kennung.Slice,
 ) (used zettel_pkg.MutableSet, err error) {
 	used = zettel_pkg.MakeMutableSetUnique(0)
@@ -66,7 +66,7 @@ func (atc Factory) makeChildren(
 		prefixSet.ToSet().Each(used.Add)
 
 		err = prefixSet.EachZettel(
-			func(e kennung.Etikett, tz zettel_pkg.Transacted) (err error) {
+			func(e kennung.Etikett, tz zettel_pkg.Verzeichnisse) (err error) {
 				var z zettel
 
 				if z, err = makeZettel(&tz, atc.Abbr); err != nil {
@@ -91,7 +91,7 @@ func (atc Factory) makeChildren(
 	segments := prefixSet.Subset(groupingEtiketten[0])
 
 	err = segments.Ungrouped.Each(
-		func(tz *zettel_pkg.Transacted) (err error) {
+		func(tz *zettel_pkg.Verzeichnisse) (err error) {
 			var z zettel
 
 			if z, err = makeZettel(tz, atc.Abbr); err != nil {
@@ -149,7 +149,7 @@ func (atc Factory) makeChildren(
 
 					var usedChild zettel_pkg.MutableSet
 
-					usedChild, err = atc.makeChildren(child, zs.ToSetPrefixTransacted(), nextGroupingEtiketten)
+					usedChild, err = atc.makeChildren(child, zs.ToSetPrefixVerzeichnisse(), nextGroupingEtiketten)
 
 					if err != nil {
 						err = errors.Wrap(err)
@@ -172,7 +172,7 @@ func (atc Factory) makeChildren(
 
 				var usedChild zettel_pkg.MutableSet
 
-				usedChild, err = atc.makeChildren(child, zs.ToSetPrefixTransacted(), nextGroupingEtiketten)
+				usedChild, err = atc.makeChildren(child, zs.ToSetPrefixVerzeichnisse(), nextGroupingEtiketten)
 
 				if err != nil {
 					err = errors.Wrap(err)

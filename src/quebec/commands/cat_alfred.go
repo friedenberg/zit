@@ -158,14 +158,12 @@ func (c CatAlfred) catZettelen(
 	if err = u.StoreObjekten().Zettel().ReadAllSchwanzenVerzeichnisse(
 		collections.MakeChain(
 			wk,
-			zettel.MakeWriterZettelTransacted(
-				zettel.WriterIds{
-					Filter: id_set.Filter{
-						Set:        ids,
-						AllowEmpty: true,
-					},
-				}.WriteZettelTransacted,
-			),
+			zettel.WriterIds{
+				Filter: id_set.Filter{
+					Set:        ids,
+					AllowEmpty: true,
+				},
+			}.WriteZettelVerzeichnisse,
 			aw.WriteZettelVerzeichnisse,
 		),
 	); err != nil {

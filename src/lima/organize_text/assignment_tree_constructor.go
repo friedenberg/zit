@@ -19,7 +19,7 @@ func (atc *AssignmentTreeConstructor) Assignments() (roots []*assignment, err er
 	root.etiketten = atc.RootEtiketten
 	roots = append(roots, root)
 
-	prefixSet := atc.Transacted.ToSetPrefixTransacted()
+	prefixSet := atc.Transacted.ToSetPrefixVerzeichnisse()
 
 	for _, e := range atc.ExtraEtiketten.Elements() {
 		errors.Err().Printf("making extras: %s", e)
@@ -41,12 +41,12 @@ func (atc *AssignmentTreeConstructor) Assignments() (roots []*assignment, err er
 
 func (atc AssignmentTreeConstructor) makeChildren(
 	parent *assignment,
-	prefixSet zettel_pkg.SetPrefixTransacted,
+	prefixSet zettel_pkg.SetPrefixVerzeichnisse,
 	groupingEtiketten kennung.Slice,
 ) (err error) {
 	if groupingEtiketten.Len() == 0 {
 		err = prefixSet.EachZettel(
-			func(e kennung.Etikett, tz zettel_pkg.Transacted) (err error) {
+			func(e kennung.Etikett, tz zettel_pkg.Verzeichnisse) (err error) {
 				var z zettel
 
 				if z, err = makeZettel(&tz, atc.Abbr); err != nil {
@@ -71,7 +71,7 @@ func (atc AssignmentTreeConstructor) makeChildren(
 	segments := prefixSet.Subset(groupingEtiketten[0])
 
 	err = segments.Ungrouped.Each(
-		func(tz *zettel_pkg.Transacted) (err error) {
+		func(tz *zettel_pkg.Verzeichnisse) (err error) {
 			var z zettel
 
 			if z, err = makeZettel(tz, atc.Abbr); err != nil {
@@ -127,7 +127,7 @@ func (atc AssignmentTreeConstructor) makeChildren(
 						nextGroupingEtiketten = groupingEtiketten[1:]
 					}
 
-					err = atc.makeChildren(child, zs.ToSetPrefixTransacted(), nextGroupingEtiketten)
+					err = atc.makeChildren(child, zs.ToSetPrefixVerzeichnisse(), nextGroupingEtiketten)
 
 					if err != nil {
 						err = errors.Wrap(err)
@@ -146,7 +146,7 @@ func (atc AssignmentTreeConstructor) makeChildren(
 					nextGroupingEtiketten = groupingEtiketten[1:]
 				}
 
-				err = atc.makeChildren(child, zs.ToSetPrefixTransacted(), nextGroupingEtiketten)
+				err = atc.makeChildren(child, zs.ToSetPrefixVerzeichnisse(), nextGroupingEtiketten)
 
 				if err != nil {
 					err = errors.Wrap(err)

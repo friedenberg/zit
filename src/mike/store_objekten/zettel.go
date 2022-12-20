@@ -435,7 +435,7 @@ func (s *zettelStore) Update(
 	return
 }
 
-func (s zettelStore) AllInChain(h hinweis.Hinweis) (c []*zettel.Transacted, err error) {
+func (s zettelStore) AllInChain(h hinweis.Hinweis) (c []*zettel.Verzeichnisse, err error) {
 	mst := zettel.MakeMutableSetUnique(0)
 
 	if err = s.verzeichnisseAll.ReadMany(
@@ -447,7 +447,7 @@ func (s zettelStore) AllInChain(h hinweis.Hinweis) (c []*zettel.Transacted, err 
 
 			return
 		},
-		zettel.MakeWriterZettelTransacted(mst.AddAndDoNotRepool),
+		mst.AddAndDoNotRepool,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -457,7 +457,7 @@ func (s zettelStore) AllInChain(h hinweis.Hinweis) (c []*zettel.Transacted, err 
 
 	sort.Slice(
 		c,
-		func(i, j int) bool { return c[i].Sku.Less(&c[j].Sku) },
+		func(i, j int) bool { return c[i].Transacted.Sku.Less(&c[j].Transacted.Sku) },
 	)
 
 	return

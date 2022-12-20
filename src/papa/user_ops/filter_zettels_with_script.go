@@ -6,13 +6,14 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/script_value"
+	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/golf/id_set"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 
 type FilterZettelsWithScript struct {
-	Set    zettel.MutableSet
+	Set    collections.MutableSetLike[*zettel.Verzeichnisse]
 	Filter script_value.ScriptValue
 }
 
@@ -49,7 +50,7 @@ func (op FilterZettelsWithScript) Run() (err error) {
 
 	go func() {
 		defer w.Close()
-		op.Set.Each(enc.WriteZettelTransacted)
+		op.Set.Each(enc.WriteZettelVerzeichnisse)
 	}()
 
 	select {
@@ -60,18 +61,20 @@ func (op FilterZettelsWithScript) Run() (err error) {
 	case hinweisen := <-chDone:
 
 		errors.Log().Printf("%#v", hinweisen)
-		op.Set.Chain(
-			func(z *zettel.Transacted) (err error) {
-				ok := hinweisen.Contains(z.Sku.Kennung)
+		op.Set.Each(
+			collections.MakeChain(
+				func(z *zettel.Verzeichnisse) (err error) {
+					ok := hinweisen.Contains(z.Transacted.Sku.Kennung)
 
-				if ok {
-					err = io.EOF
+					if ok {
+						err = io.EOF
+						return
+					}
+
 					return
-				}
-
-				return
-			},
-			op.Set.Del,
+				},
+				op.Set.Del,
+			),
 		)
 	}
 

@@ -61,11 +61,11 @@ func (c ZettelFromExternalAkte) Run(
 		matcher := zettel_external.MakeMutableMatchSet(toCreate)
 
 		if err = c.StoreObjekten().Zettel().ReadAllVerzeichnisse(
-			zettel.MakeWriterZettelTransacted(
-				collections.MakeChain(
+			collections.MakeChain(
+				zettel.MakeWriterZettelTransacted(
 					matcher.Match,
-					results.AddAndDoNotRepool,
 				),
+				results.AddAndDoNotRepool,
 			),
 		); err != nil {
 			err = errors.Wrap(err)
@@ -74,15 +74,19 @@ func (c ZettelFromExternalAkte) Run(
 	}
 
 	if err = results.Each(
-		func(z *zettel.Transacted) (err error) {
-			if c.ProtoZettel.Apply(&z.Objekte) {
-				if z, err = c.StoreObjekten().Zettel().Update(
-					&z.Objekte,
-					&z.Sku.Kennung,
+		func(z *zettel.Verzeichnisse) (err error) {
+			if c.ProtoZettel.Apply(&z.Transacted.Objekte) {
+				var zt *zettel.Transacted
+
+				if zt, err = c.StoreObjekten().Zettel().Update(
+					&z.Transacted.Objekte,
+					&z.Transacted.Sku.Kennung,
 				); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
+
+				z = zettel.MakeVerzeichnisse(zt)
 			}
 
 			return
@@ -115,7 +119,7 @@ func (c ZettelFromExternalAkte) Run(
 				}
 			}
 
-			results.Add(tz)
+			results.Add(zettel.MakeVerzeichnisse(tz))
 
 			return
 		},
