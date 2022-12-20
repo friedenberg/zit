@@ -219,15 +219,6 @@ func (i *zettelStore) ReadAllVerzeichnisse(
 	return i.verzeichnisseAll.ReadMany(w)
 }
 
-// TODO-P1 remove
-func (s zettelStore) ReadAllTransacted(
-	w1 collections.WriterFunc[*zettel.Transacted],
-) (err error) {
-	w := zettel.MakeWriterZettelTransacted(w1)
-
-	return s.ReadAllVerzeichnisse(w)
-}
-
 func (s zettelStore) ReadOne(
 	i id.Id,
 ) (tz *zettel.Transacted, err error) {
