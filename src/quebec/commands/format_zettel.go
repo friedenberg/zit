@@ -68,15 +68,12 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	//TODO-P0
-	// inlineAkte := typ.IsInlineAkte(cz.External.Objekte.Typ, u.Konfig())
-	// ctx := zettel.FormatContextWrite{
-	// 	Zettel:      cz.External.Objekte,
-	// 	IncludeAkte: inlineAkte,
-	// 	Out:         os.Stdout,
-	// }
+	ctx := zettel.FormatContextWrite{
+		Zettel:      cz.External.Objekte,
+		IncludeAkte: u.Konfig().IsInlineTyp(cz.External.Objekte.Typ),
+	}
 
-	if _, err = format.Format(u.Out(), &cz.External.Objekte); err != nil {
+	if _, err = format.Format(u.Out(), &ctx); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

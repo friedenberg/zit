@@ -18,7 +18,7 @@ import (
 
 type CreateFromPaths struct {
 	*umwelt.Umwelt
-	Format      zettel.Format
+	Format      zettel.ObjekteParser
 	Filter      script_value.ScriptValue
 	ProtoZettel zettel.ProtoZettel
 	Delete      bool
@@ -183,11 +183,9 @@ func (c CreateFromPaths) zettelsFromPath(
 
 	defer c.Filter.Close()
 
-	ctx := zettel.FormatContextRead{
-		In: r,
-	}
+	ctx := zettel.FormatContextRead{}
 
-	if _, err = c.Format.ReadFrom(&ctx); err != nil {
+	if _, err = c.Format.Parse(r, &ctx); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

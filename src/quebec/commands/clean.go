@@ -51,7 +51,7 @@ func (c Clean) Run(
 	}
 
 	optionsReadExternal := store_fs.OptionsReadExternal{
-		Parser: zettel.MakeTextParser(
+		Parser: zettel.MakeObjekteTextParser(
 			s.StoreObjekten(),
 			nil,
 		),

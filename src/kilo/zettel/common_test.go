@@ -8,8 +8,8 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/test_metadatei_io"
 )
 
-type inlineTypChecker struct{
-  answer bool
+type inlineTypChecker struct {
+	answer bool
 }
 
 func (t inlineTypChecker) IsInlineTyp(k kennung.Typ) bool {
@@ -36,17 +36,18 @@ func makeAkteExt(t test_logz.T, v string) (es kennung.Typ) {
 
 func readFormat(
 	t test_logz.T,
-	f Format,
+	f ObjekteFormat,
 	af *test_metadatei_io.AkteIOFactory,
 	contents string,
 ) (z Objekte, a string) {
 	t.Helper()
 
-	c := FormatContextRead{
-		In: strings.NewReader(contents),
-	}
+	c := FormatContextRead{}
 
-	n, err := f.ReadFrom(&c)
+	n, err := f.Parse(
+		strings.NewReader(contents),
+		&c,
+	)
 
 	if err != nil {
 		t.Fatalf("failed to read zettel format: %s", err)

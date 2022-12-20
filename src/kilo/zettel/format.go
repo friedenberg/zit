@@ -10,24 +10,22 @@ import (
 type FormatContextRead struct {
 	Zettel            Objekte
 	AktePath          string
-	In                io.Reader
 	RecoverableErrors errors.Multi
 }
 
 type FormatContextWrite struct {
 	Zettel           Objekte
-	Out              io.Writer
 	IncludeAkte      bool
 	ExternalAktePath string
 }
 
 type Format interface {
-	ReadFrom(*FormatContextRead) (int64, error)
-	WriteTo(FormatContextWrite) (int64, error)
+	Parse(io.Reader, *FormatContextRead) (int64, error)
+	Format(io.Writer, FormatContextWrite) (int64, error)
 }
 
-type ObjekteParser = gattung.Parser[Objekte, *Objekte]
-type ObjekteFormatter = gattung.Formatter[Objekte, *Objekte]
+type ObjekteParser = gattung.Parser[FormatContextRead, *FormatContextRead]
+type ObjekteFormatter = gattung.Formatter[FormatContextWrite, *FormatContextWrite]
 
 type ObjekteFormat interface {
 	ObjekteParser

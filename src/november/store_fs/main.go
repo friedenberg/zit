@@ -29,7 +29,7 @@ type Store struct {
 	konfig        konfig_compiled.Compiled
 	standort.Standort
 
-	format zettel.Format
+	format zettel.ObjekteFormat
 
 	storeObjekten *store_objekten.Store
 
@@ -164,9 +164,7 @@ func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 
 	defer errors.Deferred(&err, f.Close)
 
-	c.In = f
-
-	if _, err = s.format.ReadFrom(&c); err != nil {
+	if _, err = s.format.Parse(f, &c); err != nil {
 		err = errors.Wrapf(err, "%s", f.Name())
 		return
 	}

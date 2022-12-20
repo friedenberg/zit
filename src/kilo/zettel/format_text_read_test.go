@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/test_metadatei_io"
 )
 
-func makeTestTextFormat(af *test_metadatei_io.AkteIOFactory) Format {
+func makeTestTextFormat(af *test_metadatei_io.AkteIOFactory) ObjekteFormat {
 	if af == nil {
 		af = test_metadatei_io.FixtureFactoryReadWriteCloser(nil)
 	}

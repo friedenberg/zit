@@ -15,7 +15,7 @@ func MakeObjekteTextFormat(
 	akteFormatter konfig.RemoteScript,
 ) *objekteTextFormat {
 	return &objekteTextFormat{
-		objekteTextParser: MakeTextParser(
+		objekteTextParser: MakeObjekteTextParser(
 			akteFactory,
 			akteFormatter,
 		),

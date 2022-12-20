@@ -3,6 +3,7 @@ package zettel
 import (
 	"bufio"
 	"crypto/sha256"
+	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
@@ -19,10 +20,9 @@ func (z Objekte) ObjekteSha() (s sha.Sha, err error) {
 
 	c := FormatContextWrite{
 		Zettel: z,
-		Out:    hash,
 	}
 
-	if _, err = o.WriteTo(c); err != nil {
+	if _, err = o.Format(hash, c); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -37,7 +37,10 @@ type FormatObjekte struct {
 	IgnoreTypErrors bool
 }
 
-func (f FormatObjekte) WriteTo(c FormatContextWrite) (n int64, err error) {
+func (f FormatObjekte) Format(
+	w1 io.Writer,
+	c FormatContextWrite,
+) (n int64, err error) {
 	z := c.Zettel
 	w := format.NewWriter()
 
@@ -49,7 +52,7 @@ func (f FormatObjekte) WriteTo(c FormatContextWrite) (n int64, err error) {
 		w.WriteFormat("%s %s", gattung.Etikett, e)
 	}
 
-	if n, err = w.WriteTo(c.Out); err != nil {
+	if n, err = w.WriteTo(w1); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -57,13 +60,16 @@ func (f FormatObjekte) WriteTo(c FormatContextWrite) (n int64, err error) {
 	return
 }
 
-func (f *FormatObjekte) ReadFrom(c *FormatContextRead) (n int64, err error) {
+func (f *FormatObjekte) Parse(
+	r1 io.Reader,
+	c *FormatContextRead,
+) (n int64, err error) {
 	etiketten := kennung.MakeEtikettMutableSet()
 
 	var z *Objekte
 	z = &c.Zettel
 
-	r := bufio.NewReader(c.In)
+	r := bufio.NewReader(r1)
 
 	typLineReader := z.Typ.Set
 

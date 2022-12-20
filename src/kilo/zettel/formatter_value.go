@@ -93,11 +93,10 @@ func (fv *FormatterValue) FuncFormatter(
 			}
 
 			c := FormatContextWrite{
-				Out:    out,
 				Zettel: o.Objekte,
 			}
 
-			if _, err = f.WriteTo(c); err != nil {
+			if _, err = f.Format(out, &c); err != nil {
 				err = errors.Wrapf(err, "Hinweis: %s", o.Sku.Kennung)
 
 				if errors.IsNotExist(err) {
@@ -176,12 +175,11 @@ func (fv *FormatterValue) FuncFormatter(
 
 		return func(o *Transacted) (err error) {
 			c := FormatContextWrite{
-				Out:         out,
 				Zettel:      o.Objekte,
 				IncludeAkte: true,
 			}
 
-			if _, err = f.WriteTo(c); err != nil {
+			if _, err = f.Format(out, c); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

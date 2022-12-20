@@ -19,8 +19,7 @@ type objekteTextParser struct {
 	TypError                   error
 }
 
-// TODO-P1 rename dto MakeObjekteTextParser
-func MakeTextParser(
+func MakeObjekteTextParser(
 	akteFactory gattung.AkteIOFactory,
 	akteFormatter konfig.RemoteScript,
 ) objekteTextParser {
@@ -30,25 +29,10 @@ func MakeTextParser(
 	}
 }
 
-func (f objekteTextParser) Parse(r io.Reader, o *Objekte) (n int64, err error) {
-	return f.ReadFormat(r, o)
-}
-
-func (f objekteTextParser) ReadFormat(r io.Reader, o *Objekte) (n int64, err error) {
-	c := &FormatContextRead{
-		In:     r,
-		Zettel: *o,
-	}
-
-	if n, err = f.ReadFrom(c); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (f objekteTextParser) ReadFrom(c *FormatContextRead) (n int64, err error) {
+func (f objekteTextParser) Parse(
+	r io.Reader,
+	c *FormatContextRead,
+) (n int64, err error) {
 	state := MakeTextMetadateiParser(
 		f.AkteFactory,
 	)
@@ -75,7 +59,7 @@ func (f objekteTextParser) ReadFrom(c *FormatContextRead) (n int64, err error) {
 		Akte:      akteWriter,
 	}
 
-	if n, err = mr.ReadFrom(c.In); err != nil {
+	if n, err = mr.ReadFrom(r); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -145,13 +145,12 @@ func (s zettelStore) WriteZettelObjekte(z zettel.Objekte) (sh sha.Sha, err error
 
 	c := zettel.FormatContextWrite{
 		Zettel: z,
-		Out:    w,
 	}
 
 	//TODO switch to objekte_format
 	f := zettel.FormatObjekte{}
 
-	if _, err = f.WriteTo(c); err != nil {
+	if _, err = f.Format(w, c); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -522,11 +521,9 @@ func (s zettelStore) storedZettelFromSha(
 		IgnoreTypErrors: true,
 	}
 
-	c := zettel.FormatContextRead{
-		In: or,
-	}
+	c := zettel.FormatContextRead{}
 
-	if _, err = f.ReadFrom(&c); err != nil {
+	if _, err = f.Parse(or, &c); err != nil {
 		err = errors.Wrapf(err, "%s", sh)
 		return
 	}

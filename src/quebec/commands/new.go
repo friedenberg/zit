@@ -114,7 +114,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 func (c New) readExistingFilesAsZettels(
 	u *umwelt.Umwelt,
-	f zettel.Format,
+	f zettel.ObjekteParser,
 	args ...string,
 ) (zts zettel.MutableSet, err error) {
 	opCreateFromPath := user_ops.CreateFromPaths{
@@ -204,7 +204,7 @@ func (c New) editZettels(
 	readOp := user_ops.ReadCheckedOut{
 		Umwelt: u,
 		OptionsReadExternal: store_fs.OptionsReadExternal{
-			Parser: zettel.MakeTextParser(
+			Parser: zettel.MakeObjekteTextParser(
 				u.StoreObjekten(),
 				nil,
 			),

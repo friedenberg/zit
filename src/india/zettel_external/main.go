@@ -11,7 +11,7 @@ import (
 
 type Sku = sku.External[hinweis.Hinweis, *hinweis.Hinweis]
 
-//TODO-P3 rename to External?
+// TODO-P3 rename to External?
 type Zettel struct {
 	Objekte  zettel.Objekte
 	Sku      Sku

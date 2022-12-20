@@ -46,7 +46,7 @@ func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	options := store_fs.OptionsReadExternal{
-		Parser: zettel.MakeTextParser(
+		Parser: zettel.MakeObjekteTextParser(
 			s.StoreObjekten(),
 			nil,
 		),

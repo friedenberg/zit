@@ -49,23 +49,12 @@ func MakeObjekteTextFormatterAkteShaOnly(
 	}
 }
 
-func (f objekteTextFormatter) Format(
-	w io.Writer,
-	o *Objekte,
-) (n int64, err error) {
-	return f.WriteTo(
-		FormatContextWrite{
-			Out:    w,
-			Zettel: *o,
-			//TODO external akte
-			//TODO inline akte
-		},
-	)
-}
-
 // TODO switch to three different formats
 // metadatei, zettel-akte-external, zettel-akte-inline
-func (f objekteTextFormatter) WriteTo(c FormatContextWrite) (n int64, err error) {
+func (f objekteTextFormatter) Format(
+	w io.Writer,
+	c *FormatContextWrite,
+) (n int64, err error) {
 	inline := f.InlineChecker.IsInlineTyp(c.Zettel.Typ)
 
 	mtw := TextMetadateiFormatter{
@@ -80,7 +69,7 @@ func (f objekteTextFormatter) WriteTo(c FormatContextWrite) (n int64, err error)
 			return
 		}
 
-    defer errors.Deferred(&err, ar.Close)
+		defer errors.Deferred(&err, ar.Close)
 	}
 
 	mw := metadatei_io.Writer{
@@ -93,7 +82,7 @@ func (f objekteTextFormatter) WriteTo(c FormatContextWrite) (n int64, err error)
 		Akte: ar,
 	}
 
-	if n, err = mw.WriteTo(c.Out); err != nil {
+	if n, err = mw.WriteTo(w); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -101,7 +90,10 @@ func (f objekteTextFormatter) WriteTo(c FormatContextWrite) (n int64, err error)
 	return
 }
 
-func (f objekteTextFormatter) writeToExternalAkte(c FormatContextWrite) (n int64, err error) {
+func (f objekteTextFormatter) writeToExternalAkte(
+	w1 io.Writer,
+	c *FormatContextWrite,
+) (n int64, err error) {
 	w := format.NewWriter()
 
 	w.WriteLines(
@@ -125,7 +117,7 @@ func (f objekteTextFormatter) writeToExternalAkte(c FormatContextWrite) (n int64
 		MetadateiBoundary,
 	)
 
-	n, err = w.WriteTo(c.Out)
+	n, err = w.WriteTo(w1)
 
 	if err != nil {
 		err = errors.Wrap(err)
