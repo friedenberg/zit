@@ -171,9 +171,8 @@ func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 
 	errors.Log().Print("done initing checkout store")
 
-	//TODO-P0 move to objekte-specific packages
 	u.storeObjekten.Zettel().SetZettelTransactedLogWriter(
-		u.WriterZettelTransacted(),
+		u.ZettelTransactedLogPrinters(),
 	)
 
 	u.storeObjekten.Konfig().SetKonfigLogWriters(

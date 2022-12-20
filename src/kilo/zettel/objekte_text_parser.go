@@ -11,7 +11,6 @@ import (
 	"github.com/friedenberg/zit/src/india/konfig"
 )
 
-// TODO-P0 migrate to format.Format
 type objekteTextParser struct {
 	AkteFactory                gattung.AkteIOFactory
 	AkteFormatter              konfig.RemoteScript
@@ -71,7 +70,6 @@ func (f objekteTextParser) Parse(
 	inlineAkteSha := akteWriter.Sha()
 	c.AktePath = state.aktePath
 
-	//TODO-P1 handle akte path
 	switch {
 	case state.akteSha.IsNull() && !inlineAkteSha.IsNull():
 		c.Zettel.Akte = inlineAkteSha
