@@ -213,15 +213,6 @@ func (i *zettelStore) ReadAllSchwanzenVerzeichnisse(
 	return i.verzeichnisseSchwanzen.ReadMany(w)
 }
 
-// TODO-P1 remove
-func (s zettelStore) ReadAllSchwanzenTransacted(
-	w1 collections.WriterFunc[*zettel.Transacted],
-) (err error) {
-	w := zettel.MakeWriterZettelTransacted(w1)
-
-	return s.ReadAllSchwanzenVerzeichnisse(w)
-}
-
 func (i *zettelStore) ReadAllVerzeichnisse(
 	w collections.WriterFunc[*zettel.Verzeichnisse],
 ) (err error) {

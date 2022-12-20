@@ -69,9 +69,9 @@ func (c commandWithIds) Complete(u *umwelt.Umwelt, args ...string) (err error) {
 			zw := zettel.MakeWriterComplete(os.Stdout)
 			defer errors.Deferred(&err, zw.Close)
 
-			w := zw.WriteZettelTransacted
+			w := zw.WriteZettelVerzeichnisse
 
-			if err = u.StoreObjekten().Zettel().ReadAllSchwanzenTransacted(w); err != nil {
+			if err = u.StoreObjekten().Zettel().ReadAllSchwanzenVerzeichnisse(w); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
