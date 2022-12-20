@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
 )
 
+// TODO-P1 merge into Transacted
 type Verzeichnisse struct {
 	Transacted Transacted
 	// Etiketten               tridex.Tridex
@@ -23,9 +24,9 @@ type Verzeichnisse struct {
 type PoolVerzeichnisse = collections.Pool[Verzeichnisse]
 
 func MakeVerzeichnisse(z1 *Transacted) (z2 *Verzeichnisse) {
-  z2 = &Verzeichnisse{}
-  z2.ResetWithTransacted(z1)
-  return
+	z2 = &Verzeichnisse{}
+	z2.ResetWithTransacted(z1)
+	return
 }
 
 func (z *Verzeichnisse) ResetWithTransacted(z1 *Transacted) {

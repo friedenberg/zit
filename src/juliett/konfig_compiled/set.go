@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
-	"github.com/friedenberg/zit/src/etikett"
+	"github.com/friedenberg/zit/src/india/etikett"
 	"github.com/friedenberg/zit/src/india/typ"
 )
 

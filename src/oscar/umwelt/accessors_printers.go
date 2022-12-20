@@ -3,8 +3,8 @@ package umwelt
 import (
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/delta/format"
-	"github.com/friedenberg/zit/src/etikett"
 	"github.com/friedenberg/zit/src/golf/fd"
+	"github.com/friedenberg/zit/src/india/etikett"
 	"github.com/friedenberg/zit/src/india/konfig"
 	"github.com/friedenberg/zit/src/india/typ"
 	"github.com/friedenberg/zit/src/india/zettel_external"

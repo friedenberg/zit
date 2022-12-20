@@ -5,13 +5,13 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/sha"
-	"github.com/friedenberg/zit/src/etikett"
 	"github.com/friedenberg/zit/src/foxtrot/id"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/golf/age_io"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/hotel/objekte"
+	"github.com/friedenberg/zit/src/india/etikett"
 )
 
 type etikettLogWriter = collections.WriterFunc[*etikett.Transacted]
