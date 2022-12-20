@@ -153,7 +153,7 @@ func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 		return
 	}
 
-	c := zettel.FormatContextRead{}
+	c := zettel.ObjekteParserContext{}
 
 	var f *os.File
 

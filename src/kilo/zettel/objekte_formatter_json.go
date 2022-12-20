@@ -15,8 +15,7 @@ func MakeObjekteFormatterJson() objekteFormatterJson {
 
 func (f objekteFormatterJson) Format(
 	w io.Writer,
-	c *FormatContextWrite,
-) (n int64, err error) {
+	c *ObjekteFormatterContext) (n int64, err error) {
 	enc := json.NewEncoder(w)
 
 	if err = enc.Encode(c.Zettel); err != nil {

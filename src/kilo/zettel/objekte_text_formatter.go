@@ -53,8 +53,7 @@ func MakeObjekteTextFormatterAkteShaOnly(
 // metadatei, zettel-akte-external, zettel-akte-inline
 func (f objekteTextFormatter) Format(
 	w io.Writer,
-	c *FormatContextWrite,
-) (n int64, err error) {
+	c *ObjekteFormatterContext) (n int64, err error) {
 	inline := f.InlineChecker.IsInlineTyp(c.Zettel.Typ)
 
 	mtw := TextMetadateiFormatter{
@@ -92,8 +91,7 @@ func (f objekteTextFormatter) Format(
 
 func (f objekteTextFormatter) writeToExternalAkte(
 	w1 io.Writer,
-	c *FormatContextWrite,
-) (n int64, err error) {
+	c *ObjekteFormatterContext) (n int64, err error) {
 	w := format.NewWriter()
 
 	w.WriteLines(

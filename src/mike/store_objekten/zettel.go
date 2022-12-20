@@ -143,7 +143,7 @@ func (s zettelStore) WriteZettelObjekte(z zettel.Objekte) (sh sha.Sha, err error
 
 	defer errors.Deferred(&err, w.Close)
 
-	c := zettel.FormatContextWrite{
+	c := zettel.ObjekteFormatterContext{
 		Zettel: z,
 	}
 
@@ -521,7 +521,7 @@ func (s zettelStore) storedZettelFromSha(
 		IgnoreTypErrors: true,
 	}
 
-	c := zettel.FormatContextRead{}
+	c := zettel.ObjekteParserContext{}
 
 	if _, err = f.Parse(or, &c); err != nil {
 		err = errors.Wrapf(err, "%s", sh)

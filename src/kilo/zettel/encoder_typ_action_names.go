@@ -14,8 +14,7 @@ type EncoderTypActionNames struct {
 
 func (e EncoderTypActionNames) Format(
 	w io.Writer,
-	c FormatContextWrite,
-) (n int64, err error) {
+	c ObjekteFormatterContext) (n int64, err error) {
 	e1 := typ.MakeFormatterActionNames(w)
 
 	ct := e.konfig.GetTyp(c.Zettel.Typ)
@@ -32,6 +31,6 @@ func (e EncoderTypActionNames) Format(
 	return
 }
 
-func (f *EncoderTypActionNames) ReadFrom(c *FormatContextRead) (n int64, err error) {
+func (f *EncoderTypActionNames) ReadFrom(c *ObjekteParserContext) (n int64, err error) {
 	return
 }

@@ -92,7 +92,7 @@ func (fv *FormatterValue) FuncFormatter(
 				}
 			}
 
-			c := FormatContextWrite{
+			c := ObjekteFormatterContext{
 				Zettel: o.Objekte,
 			}
 
@@ -174,7 +174,7 @@ func (fv *FormatterValue) FuncFormatter(
 		}
 
 		return func(o *Transacted) (err error) {
-			c := FormatContextWrite{
+			c := ObjekteFormatterContext{
 				Zettel:      o.Objekte,
 				IncludeAkte: true,
 			}

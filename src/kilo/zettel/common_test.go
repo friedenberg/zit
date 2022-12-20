@@ -42,7 +42,7 @@ func readFormat(
 ) (z Objekte, a string) {
 	t.Helper()
 
-	c := FormatContextRead{}
+	c := ObjekteParserContext{}
 
 	n, err := f.Parse(
 		strings.NewReader(contents),

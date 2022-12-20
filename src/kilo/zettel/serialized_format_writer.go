@@ -16,7 +16,7 @@ func MakeSerializedFormatWriter(
 	k konfig_compiled.Compiled,
 ) collections.WriterFunc[*Objekte] {
 	wf := func(z *Objekte) (err error) {
-		c := FormatContextWrite{
+		c := ObjekteFormatterContext{
 			Zettel:      *z,
 			IncludeAkte: k.IsInlineTyp(z.Typ),
 		}

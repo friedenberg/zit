@@ -183,7 +183,7 @@ func (c CreateFromPaths) zettelsFromPath(
 
 	defer c.Filter.Close()
 
-	ctx := zettel.FormatContextRead{}
+	ctx := zettel.ObjekteParserContext{}
 
 	if _, err = c.Format.Parse(r, &ctx); err != nil {
 		err = errors.Wrap(err)

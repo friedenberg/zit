@@ -64,7 +64,7 @@ func writeFormat(
 
 	sb := &strings.Builder{}
 
-	if _, err := f.Format(sb, &FormatContextWrite{Zettel: z}); err != nil {
+	if _, err := f.Format(sb, &ObjekteFormatterContext{Zettel: z}); err != nil {
 		t.Errorf("%s", err)
 	}
 

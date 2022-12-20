@@ -68,7 +68,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	ctx := zettel.FormatContextWrite{
+	ctx := zettel.ObjekteFormatterContext{
 		Zettel:      cz.External.Objekte,
 		IncludeAkte: u.Konfig().IsInlineTyp(cz.External.Objekte.Typ),
 	}

@@ -18,7 +18,7 @@ func (z Objekte) ObjekteSha() (s sha.Sha, err error) {
 
 	o := FormatObjekte{}
 
-	c := FormatContextWrite{
+	c := ObjekteFormatterContext{
 		Zettel: z,
 	}
 
@@ -39,8 +39,7 @@ type FormatObjekte struct {
 
 func (f FormatObjekte) Format(
 	w1 io.Writer,
-	c FormatContextWrite,
-) (n int64, err error) {
+	c ObjekteFormatterContext) (n int64, err error) {
 	z := c.Zettel
 	w := format.NewWriter()
 
@@ -62,8 +61,7 @@ func (f FormatObjekte) Format(
 
 func (f *FormatObjekte) Parse(
 	r1 io.Reader,
-	c *FormatContextRead,
-) (n int64, err error) {
+	c *ObjekteParserContext) (n int64, err error) {
 	etiketten := kennung.MakeEtikettMutableSet()
 
 	var z *Objekte
