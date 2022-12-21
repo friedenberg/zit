@@ -8,13 +8,22 @@ import (
 )
 
 type ScriptConfig struct {
-	Shell  []string          `toml:"shell,omitempty"`
-	Script string            `toml:"script,omitempty,multiline"`
-	Env    map[string]string `toml:"env,omitempty"`
+	Description string            `toml:"description"`
+	Shell       []string          `toml:"shell,omitempty"`
+	Script      string            `toml:"script,omitempty,multiline"`
+	Env         map[string]string `toml:"env,omitempty"`
+}
+
+func (a *ScriptConfig) Environ() map[string]string {
+	return a.Env
 }
 
 func (a *ScriptConfig) Equals(b *ScriptConfig) bool {
 	if len(a.Shell) != len(b.Shell) {
+		return false
+	}
+
+	if a.Description != b.Description {
 		return false
 	}
 
@@ -54,6 +63,10 @@ func (s *ScriptConfig) Merge(s2 *ScriptConfig) {
 		return
 	}
 
+	if s2.Description != "" {
+		s.Description = s2.Description
+	}
+
 	if len(s2.Shell) > 0 {
 		s.Shell = s2.Shell
 	}
@@ -78,7 +91,8 @@ func (s ScriptConfig) Cmd(args ...string) (c *exec.Cmd, err error) {
 		return
 
 	case s.Script != "" && len(s.Shell) > 0:
-		all := append(s.Shell, s.Script)
+		all := append(s.Shell, s.Script, "--")
+		all = append(all, args...)
 		c = exec.Command(s.Shell[0], all[1:]...)
 
 	case s.Script != "":
@@ -88,12 +102,13 @@ func (s ScriptConfig) Cmd(args ...string) (c *exec.Cmd, err error) {
 			"-c",
 		}
 
-		all = append(all, s.Script)
+		all = append(all, s.Script, "--")
 		all = append(all, args...)
 		c = exec.Command("bash", all...)
 
 	case len(s.Shell) > 0:
-		all := append(s.Shell, args...)
+		all := append(s.Shell, "--")
+		all = append(all, args...)
 
 		if len(all) > 1 {
 			c = exec.Command(all[0], all[1:]...)

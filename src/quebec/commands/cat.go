@@ -102,6 +102,7 @@ func (c Cat) zettelWriter(
 	default:
 		return zettel.MakeSerializedFormatWriter(
 			zettel.MakeObjekteTextFormatterIncludeAkte(
+				u.Standort(),
 				u.Konfig(),
 				u.StoreObjekten(),
 				nil,

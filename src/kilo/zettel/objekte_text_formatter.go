@@ -8,9 +8,11 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/bravo/script_config"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/echo/sha"
+	"github.com/friedenberg/zit/src/echo/standort"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei_io"
 	"github.com/friedenberg/zit/src/india/konfig"
 	"github.com/friedenberg/zit/src/india/typ"
@@ -19,19 +21,39 @@ import (
 const MetadateiBoundary = metadatei_io.Boundary
 
 type objekteTextFormatter struct {
-	InlineChecker typ.InlineChecker
-	AkteFactory   gattung.AkteIOFactory
-	AkteFormatter konfig.RemoteScript
-	TypError      error
-	IncludeAkte   bool
+	standort         standort.Standort
+	InlineChecker    typ.InlineChecker
+	AkteFactory      gattung.AkteIOFactory
+	AkteFormatter    konfig.RemoteScript
+	TypError         error
+	IncludeAkte      bool
+	ExcludeMetadatei bool
 }
 
-func MakeObjekteTextFormatterIncludeAkte(
+func MakeObjekteTextFormatterExcludeMetadatei(
+	standort standort.Standort,
 	inlineChecker typ.InlineChecker,
 	akteFactory gattung.AkteIOFactory,
 	akteFormatter konfig.RemoteScript,
 ) objekteTextFormatter {
 	return objekteTextFormatter{
+		standort:         standort,
+		InlineChecker:    inlineChecker,
+		AkteFactory:      akteFactory,
+		AkteFormatter:    akteFormatter,
+		IncludeAkte:      true,
+		ExcludeMetadatei: true,
+	}
+}
+
+func MakeObjekteTextFormatterIncludeAkte(
+	standort standort.Standort,
+	inlineChecker typ.InlineChecker,
+	akteFactory gattung.AkteIOFactory,
+	akteFormatter konfig.RemoteScript,
+) objekteTextFormatter {
+	return objekteTextFormatter{
+		standort:      standort,
 		InlineChecker: inlineChecker,
 		AkteFactory:   akteFactory,
 		AkteFormatter: akteFormatter,
@@ -40,26 +62,37 @@ func MakeObjekteTextFormatterIncludeAkte(
 }
 
 func MakeObjekteTextFormatterAkteShaOnly(
+	standort standort.Standort,
 	akteFactory gattung.AkteIOFactory,
 	akteFormatter konfig.RemoteScript,
 ) objekteTextFormatter {
 	return objekteTextFormatter{
+		standort:      standort,
 		AkteFactory:   akteFactory,
 		AkteFormatter: akteFormatter,
 	}
 }
 
-// TODO switch to three different formats
-// metadatei, zettel-akte-external, zettel-akte-inline
 func (f objekteTextFormatter) Format(
 	w io.Writer,
-	c *ObjekteFormatterContext) (n int64, err error) {
+	c *ObjekteFormatterContext,
+) (n int64, err error) {
 	inline := f.InlineChecker.IsInlineTyp(c.Zettel.Typ)
 
-	mtw := TextMetadateiFormatter{
-		IncludeAkteSha: !inline,
+	var mtw io.WriterTo
+
+	if !f.ExcludeMetadatei {
+		mtw = format.MakeWriterTo2(
+			(&TextMetadateiFormatter{
+				IncludeAkteSha: !inline,
+			}).Format,
+			&Metadatei{
+				Objekte: c.Zettel,
+			},
+		)
 	}
 
+	var wt io.WriterTo
 	var ar sha.ReadCloser
 
 	if inline {
@@ -69,16 +102,26 @@ func (f objekteTextFormatter) Format(
 		}
 
 		defer errors.Deferred(&err, ar.Close)
+
+		wt = ar
+	}
+
+	if f.AkteFormatter != nil {
+		if wt, err = script_config.MakeWriterToWithStdin(
+			f.AkteFormatter,
+			map[string]string{
+				"ZIT_BIN": f.standort.Executable(),
+			},
+			ar,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	mw := metadatei_io.Writer{
-		Metadatei: format.MakeWriterTo2(
-			mtw.Format,
-			&Metadatei{
-				Objekte: c.Zettel,
-			},
-		),
-		Akte: ar,
+		Metadatei: mtw,
+		Akte:      wt,
 	}
 
 	if n, err = mw.WriteTo(w); err != nil {

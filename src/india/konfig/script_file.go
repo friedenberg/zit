@@ -1,6 +1,8 @@
 package konfig
 
-import "os/exec"
+import (
+	"os/exec"
+)
 
 type RemoteScriptFile struct {
 	Path string

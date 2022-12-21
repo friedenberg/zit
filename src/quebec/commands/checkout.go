@@ -68,6 +68,7 @@ func (c Checkout) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	options := store_fs.CheckoutOptions{
 		CheckoutMode: c.CheckoutMode,
 		Formatter: zettel.MakeObjekteTextFormatterIncludeAkte(
+			u.Standort(),
 			u.Konfig(),
 			u.StoreObjekten(),
 			nil,

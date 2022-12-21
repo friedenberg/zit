@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/test_logz"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/echo/sha"
+	"github.com/friedenberg/zit/src/echo/standort"
 	"github.com/friedenberg/zit/src/foxtrot/test_metadatei_io"
 )
 
@@ -93,6 +94,7 @@ func TestWriteWithoutAkte(t1 *testing.T) {
 	)
 
 	format := MakeObjekteTextFormatterIncludeAkte(
+		standort.Standort{},
 		inlineTypChecker{},
 		af,
 		nil,
@@ -134,6 +136,7 @@ func TestWriteWithInlineAkte(t1 *testing.T) {
 	)
 
 	format := MakeObjekteTextFormatterIncludeAkte(
+		standort.Standort{},
 		inlineTypChecker{answer: true},
 		af,
 		nil,

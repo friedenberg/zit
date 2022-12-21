@@ -2,18 +2,15 @@ package commands
 
 import (
 	"flag"
-	"fmt"
 	"io"
-	"os"
-	"os/exec"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/script_config"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/ts"
 	"github.com/friedenberg/zit/src/golf/id_set"
-	"github.com/friedenberg/zit/src/india/typ"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
@@ -28,7 +25,7 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &ExecAction{}
 
-			f.Var(&c.Action, "action", "which Typ action to execute")
+			f.Var(&c.Action, "action", "which Konfig action to execute")
 
 			return commandWithIds{
 				CommandWithIds: c,
@@ -77,6 +74,18 @@ func (c ExecAction) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 		return
 	}
 
+	var sc script_config.ScriptConfig
+	ok := false
+
+	if sc, ok = u.Konfig().Actions[c.Action.String()]; !ok {
+		err = errors.Normalf(
+			"Konfig Action '%s' not found",
+			c.Action.String(),
+		)
+
+		return
+	}
+
 	query := zettel.WriterIds{
 		Filter: id_set.Filter{
 			Set: ids,
@@ -84,39 +93,24 @@ func (c ExecAction) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 		},
 	}
 
-	iter := func(tz *zettel.Transacted) (err error) {
-		typ := tz.Objekte.Typ
+	hinweisen := hinweis.MakeMutableSet()
 
-		typKonfig := u.Konfig().GetTyp(typ)
-
-		if typKonfig == nil {
-			err = errors.Normal(errors.Errorf("Typ does not have an exec-command set: %s", typ))
-			return
-		}
-
-		executor, ok := typKonfig.Objekte.Akte.Actions[c.Action.String()]
-
-		if !ok {
-			err = errors.Normalf("Typ '%s' does not have action '%s'", typ, c.Action)
-			return
-		}
-
-		if err = c.runExecutor(u, &executor, tz); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
+	if err = u.StoreWorkingDirectory().ReadMany(
+		collections.MakeChain(
+			query.WriteZettelVerzeichnisse,
+			func(z *zettel.Verzeichnisse) (err error) {
+				return hinweisen.Add(z.Transacted.Sku.Kennung)
+			},
+		),
+	); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
-	//TODO-P1 support new store_fs reading
-	if err = u.StoreObjekten().Zettel().ReadAllSchwanzenVerzeichnisse(
-		collections.MakeChain(
-			query.WriteZettelVerzeichnisse,
-			zettel.MakeWriterZettelTransacted(
-				u.StoreWorkingDirectory().ZettelTransactedWriter(iter),
-			),
-		),
+	if err = c.runAction(
+		u,
+		sc,
+		hinweisen,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -125,78 +119,25 @@ func (c ExecAction) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	return
 }
 
-func (c ExecAction) runExecutor(
+func (c ExecAction) runAction(
 	u *umwelt.Umwelt,
-	executor *typ.Action,
-	z *zettel.Transacted,
+	sc script_config.ScriptConfig,
+	hinweisen hinweis.MutableSet,
 ) (err error) {
-	var cmd *exec.Cmd
+	var wt io.WriterTo
 
-	if cmd, err = executor.ScriptConfig.Cmd(); err != nil {
+	if wt, err = script_config.MakeWriterTo(
+		sc,
+		map[string]string{
+			"ZIT_BIN": u.Standort().Executable(),
+		},
+		hinweisen.Strings()...,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	env := map[string]string{
-		"ZIT_ZETTEL": z.Sku.Kennung.String(),
-		"ZIT_BIN":    u.Standort().Executable(),
-	}
-
-	envCollapsed := os.Environ()
-
-	for k, v := range env {
-		envCollapsed = append(envCollapsed, fmt.Sprintf("%s=%s", k, v))
-	}
-
-	cmd.Env = envCollapsed
-
-	cmd.Stderr = os.Stderr
-	cmd.Stdout = os.Stdout
-
-	var wc io.WriteCloser
-
-	if wc, err = cmd.StdinPipe(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	chDone := make(chan struct{})
-
-	go func() {
-		defer func() {
-			chDone <- struct{}{}
-		}()
-
-		defer errors.Deferred(&err, wc.Close)
-
-		var ar io.ReadCloser
-
-		if ar, err = u.StoreObjekten().AkteReader(z.Objekte.Akte); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		defer errors.Deferred(&err, ar.Close)
-
-		if _, err = io.Copy(wc, ar); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = wc.Close(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}()
-
-	if err = cmd.Start(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	<-chDone
-
-	if err = cmd.Wait(); err != nil {
+	if _, err = wt.WriteTo(u.Out()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

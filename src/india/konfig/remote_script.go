@@ -1,9 +1,5 @@
 package konfig
 
-import (
-	"os/exec"
-)
+import "github.com/friedenberg/zit/src/bravo/script_config"
 
-type RemoteScript interface {
-	Cmd(args ...string) (*exec.Cmd, error)
-}
+type RemoteScript = script_config.RemoteScript

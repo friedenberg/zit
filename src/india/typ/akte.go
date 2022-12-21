@@ -6,11 +6,12 @@ import (
 )
 
 type Akte struct {
-	InlineAkte     bool                         `toml:"inline-akte,omitempty"`
-	FileExtension  string                       `toml:"file-extension,omitempty"`
-	ExecCommand    *script_config.ScriptConfig  `toml:"exec-command,omitempty"`
-	Actions        map[string]Action            `toml:"actions,omitempty"`
-	EtikettenRules map[string]etikett_rule.Rule `toml:"etiketten-rules,omitempty"`
+	InlineAkte     bool                                         `toml:"inline-akte,omitempty"`
+	FileExtension  string                                       `toml:"file-extension,omitempty"`
+	ExecCommand    *script_config.ScriptConfig                  `toml:"exec-command,omitempty"`
+	Formatters     map[string]script_config.ScriptConfigWithUTI `toml:"formatters,omitempty"`
+	Actions        map[string]script_config.ScriptConfig        `toml:"actions,omitempty"`
+	EtikettenRules map[string]etikett_rule.Rule                 `toml:"etiketten-rules,omitempty"`
 }
 
 func (a *Akte) Reset(b *Akte) {
@@ -41,8 +42,24 @@ func (a *Akte) Equals(b *Akte) bool {
 		return false
 	}
 
+	if len(a.Formatters) != len(b.Formatters) {
+		return false
+	}
+
 	for k, v := range a.Actions {
 		v1, ok := b.Actions[k]
+
+		if !ok {
+			return false
+		}
+
+		if !v.Equals(&v1) {
+			return false
+		}
+	}
+
+	for k, v := range a.Formatters {
+		v1, ok := b.Formatters[k]
 
 		if !ok {
 			return false
@@ -84,6 +101,10 @@ func (ct *Akte) Apply(kt *Akte) {
 		ct.Actions = kt.Actions
 	}
 
+	if len(kt.Formatters) > 0 {
+		ct.Formatters = kt.Formatters
+	}
+
 	if kt.ExecCommand != nil {
 		ct.ExecCommand = kt.ExecCommand
 	}
@@ -118,5 +139,17 @@ func (ct *Akte) Merge(ct2 *Akte) {
 		}
 
 		ct.Actions[k] = sc
+	}
+
+	for k, v := range ct2.Formatters {
+		sc, ok := ct.Formatters[k]
+
+		if !ok {
+			sc = v
+		} else {
+			sc.Merge(&v)
+		}
+
+		ct.Formatters[k] = sc
 	}
 }

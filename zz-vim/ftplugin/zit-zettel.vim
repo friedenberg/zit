@@ -1,5 +1,5 @@
 
-let &l:equalprg = "zit format-zettel %"
+let &l:equalprg = "zit format-zettel -include-cwd %:r"
 let &l:comments = "fb:*,fb:-,fb:+,n:>"
 let &l:commentstring = "<!--%s-->"
 

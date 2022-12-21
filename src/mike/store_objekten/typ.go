@@ -264,7 +264,7 @@ func (s *typStore) Hydrate(
 			)
 		},
 		gattung.Parser[typ.Objekte, *typ.Objekte](
-			typ.MakeFormatText(s.common),
+			typ.MakeFormatTextIgnoreTomlErrors(s.common),
 		),
 	)
 

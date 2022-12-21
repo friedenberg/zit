@@ -75,10 +75,10 @@ func (f *FormatterValue) FuncFormatter(
 		}
 
 	case "action-names":
-		f := MakeFormatterActionNames(out)
+		f := MakeFormatterActionNames()
 
 		return func(o *Transacted) (err error) {
-			if _, err = f.Encode(o); err != nil {
+			if _, err = f.Format(out, o); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

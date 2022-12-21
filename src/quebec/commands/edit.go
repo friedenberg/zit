@@ -77,6 +77,7 @@ func (c Edit) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 		CheckoutMode: c.CheckoutMode,
 		//TODO-P1 support mode
 		Formatter: zettel.MakeObjekteTextFormatterIncludeAkte(
+			u.Standort(),
 			u.Konfig(),
 			u.StoreObjekten(),
 			nil,

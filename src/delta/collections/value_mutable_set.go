@@ -52,6 +52,20 @@ func MakeMutableValueSetStrings[T gattung.ValueElement, T1 gattung.ValueElementP
 	return
 }
 
+func (s MutableValueSet[T, T1]) Strings() (out []string) {
+	out = make([]string, 0, s.Len())
+
+	s.Each(
+		func(e T) (err error) {
+			out = append(out, e.String())
+
+			return
+		},
+	)
+
+	return
+}
+
 func (es MutableValueSet[T, T1]) AddString(v string) (err error) {
 	e := T1(new(T))
 

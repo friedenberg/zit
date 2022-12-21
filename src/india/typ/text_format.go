@@ -6,17 +6,26 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/etikett_rule"
 	"github.com/friedenberg/zit/src/alfa/toml"
+	"github.com/friedenberg/zit/src/bravo/script_config"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/sha"
 )
 
 type TextFormat struct {
-	arf gattung.AkteIOFactory
+	arf              gattung.AkteIOFactory
+	IgnoreTomlErrors bool
 }
 
 func MakeFormatText(arf gattung.AkteIOFactory) *TextFormat {
 	return &TextFormat{
 		arf: arf,
+	}
+}
+
+func MakeFormatTextIgnoreTomlErrors(arf gattung.AkteIOFactory) *TextFormat {
+	return &TextFormat{
+		arf:              arf,
+		IgnoreTomlErrors: true,
 	}
 }
 
@@ -53,7 +62,11 @@ func (f TextFormat) ReadFormat(r io.Reader, t *Objekte) (n int64, err error) {
 		}
 
 		if t.Akte.Actions == nil {
-			t.Akte.Actions = make(map[string]Action)
+			t.Akte.Actions = make(map[string]script_config.ScriptConfig)
+		}
+
+		if t.Akte.Formatters == nil {
+			t.Akte.Formatters = make(map[string]script_config.ScriptConfigWithUTI)
 		}
 
 		if t.Akte.EtikettenRules == nil {
@@ -74,8 +87,13 @@ func (f TextFormat) ReadFormat(r io.Reader, t *Objekte) (n int64, err error) {
 	}
 
 	if err = <-chDone; err != nil {
-		err = errors.Wrap(err)
-		return
+		if f.IgnoreTomlErrors {
+			errors.Err().Print(err)
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	t.Sha = aw.Sha()

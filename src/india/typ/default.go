@@ -2,6 +2,7 @@ package typ
 
 import (
 	"github.com/friedenberg/zit/src/alfa/etikett_rule"
+	"github.com/friedenberg/zit/src/bravo/script_config"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 )
 
@@ -13,7 +14,8 @@ func Default() (t *Objekte, k *kennung.Typ) {
 		Akte: Akte{
 			InlineAkte:     true,
 			FileExtension:  "md",
-			Actions:        make(map[string]Action),
+			Formatters:     make(map[string]script_config.ScriptConfigWithUTI),
+			Actions:        make(map[string]script_config.ScriptConfig),
 			EtikettenRules: make(map[string]etikett_rule.Rule),
 		},
 	}

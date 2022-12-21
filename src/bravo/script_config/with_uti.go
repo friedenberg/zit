@@ -1,0 +1,30 @@
+package script_config
+
+type ScriptConfigWithUTI struct {
+	ScriptConfig
+	UTI string `toml:"uti"`
+}
+
+func (a *ScriptConfigWithUTI) Equals(b *ScriptConfigWithUTI) bool {
+	if b == nil {
+		return false
+	}
+
+	if a.UTI != b.UTI {
+		return false
+	}
+
+	return true
+}
+
+func (s *ScriptConfigWithUTI) Merge(s2 *ScriptConfigWithUTI) {
+	if s2 == nil {
+		return
+	}
+
+	if s2.UTI != "" {
+		s.UTI = s2.UTI
+	}
+
+	s.ScriptConfig.Merge(&s2.ScriptConfig)
+}

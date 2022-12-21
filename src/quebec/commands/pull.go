@@ -77,7 +77,10 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	return
 }
 
-func (c Pull) remoteScriptFromArg(u *umwelt.Umwelt, arg string) (remote konfig.RemoteScript, err error) {
+func (c Pull) remoteScriptFromArg(
+	u *umwelt.Umwelt,
+	arg string,
+) (remote konfig.RemoteScript, err error) {
 	p := u.Standort().DirZit("bin", arg)
 
 	if !files.Exists(p) {

@@ -293,7 +293,7 @@ func (s *Store) Reindex() (err error) {
 						t,
 						o,
 					); err != nil {
-						err = errors.Wrap(err)
+						err = errors.Wrapf(err, "Kennung: %s", o.Id)
 						return
 					}
 

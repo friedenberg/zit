@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/collections_coding"
 	"github.com/friedenberg/zit/src/echo/sha"
+	"github.com/friedenberg/zit/src/echo/standort"
 	"github.com/friedenberg/zit/src/hotel/objekte"
 	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
 )
@@ -76,6 +77,7 @@ func (fv *FormatterValue) FuncFormatter(
 
 	case "text", "hinweis-text":
 		f := MakeObjekteTextFormatterIncludeAkte(
+			standort.Standort{},
 			k,
 			af,
 			nil,
@@ -169,9 +171,7 @@ func (fv *FormatterValue) FuncFormatter(
 		}
 
 	case "action-names":
-		f := &EncoderTypActionNames{
-			konfig: k,
-		}
+		f := MakeFormatterTypActionNames(k, true)
 
 		return func(o *Transacted) (err error) {
 			c := ObjekteFormatterContext{

@@ -87,6 +87,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			options := store_fs.CheckoutOptions{
 				CheckoutMode: store_fs.CheckoutModeZettelAndAkte,
 				Formatter: zettel.MakeObjekteTextFormatterIncludeAkte(
+					u.Standort(),
 					u.Konfig(),
 					u.StoreObjekten(),
 					nil,
