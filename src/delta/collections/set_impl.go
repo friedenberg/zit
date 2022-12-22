@@ -48,6 +48,10 @@ func (s *set[T]) close() {
 }
 
 func (s set[T]) Len() int {
+	if s.inner == nil {
+		return 0
+	}
+
 	return len(s.inner)
 }
 
@@ -85,7 +89,7 @@ func (es set[T]) add(e T) (err error) {
 }
 
 func (s set[T]) EachKey(wf WriterFuncKey) (err error) {
-	for v, _ := range s.inner {
+	for v := range s.inner {
 		if err = wf(v); err != nil {
 			if errors.IsEOF(err) {
 				err = nil
