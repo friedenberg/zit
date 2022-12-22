@@ -26,7 +26,7 @@ func (f FormatterValue) String() string {
 func (f *FormatterValue) Set(v string) (err error) {
 	v1 := strings.TrimSpace(strings.ToLower(v))
 	switch v1 {
-	case "log", "akte", "hinweis-text", "text", "objekte", "json", "toml", "action-names", "hinweis-akte":
+	case "typ-formatter-uti-groups", "log", "akte", "hinweis-text", "text", "objekte", "json", "toml", "action-names", "hinweis-akte":
 		f.string = v1
 
 	default:
@@ -53,6 +53,7 @@ func (fv *FormatterValue) FuncFormatterVerzeichnisse(
 	)
 }
 
+//TODO-P2 convert to Verzeichnisse
 func (fv *FormatterValue) FuncFormatter(
 	out io.Writer,
 	af gattung.AkteIOFactory,
@@ -163,6 +164,23 @@ func (fv *FormatterValue) FuncFormatter(
 			defer errors.Deferred(&err, r.Close)
 
 			if _, err = io.Copy(out, r); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+
+	case "typ-formatter-uti-groups":
+		f := MakeFormatterTypFormatterUTIGroups(k)
+
+		return func(o *Transacted) (err error) {
+			c := ObjekteFormatterContext{
+				Zettel:      o.Objekte,
+				IncludeAkte: true,
+			}
+
+			if _, err = f.Format(out, c); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

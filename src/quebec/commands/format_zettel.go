@@ -12,8 +12,9 @@ import (
 )
 
 type FormatZettel struct {
-	Format string
-	Mode   zettel_checked_out.Mode
+	Format   string
+	UTIGroup string
+	Mode     zettel_checked_out.Mode
 }
 
 func init() {
@@ -25,6 +26,7 @@ func init() {
 			}
 
 			f.Var(&c.Mode, "mode", "zettel, akte, or both")
+			f.StringVar(&c.UTIGroup, "uti-group", "", "lookup format from UTI group")
 
 			return c
 		},
@@ -59,8 +61,17 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	var zt *zettel.Transacted
 
 	if zt, err = u.StoreWorkingDirectory().ReadOne(h); err != nil {
-		err = errors.Wrap(err)
-		return
+		if errors.IsNotExist(err) {
+			if zt, err = u.StoreObjekten().Zettel().ReadHinweisSchwanzen(
+				h,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	typKonfig := u.Konfig().GetTyp(zt.Objekte.Typ)
@@ -68,12 +79,26 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	var akteFormatter script_config.ScriptConfig
 
 	if typKonfig != nil {
-		if f, ok := typKonfig.Objekte.Akte.Formatters[formatId]; ok {
+		actualFormatId := formatId
+		var f script_config.ScriptConfigWithUTI
+		ok := false
+
+		if c.UTIGroup != "" {
+			if g, ok := typKonfig.Objekte.Akte.FormatterUTIGroups[c.UTIGroup]; ok {
+				if ft, ok := g.Map()[formatId]; ok {
+					actualFormatId = ft
+				}
+			}
+		}
+
+		f, ok = typKonfig.Objekte.Akte.Formatters[actualFormatId]
+
+		if ok {
 			akteFormatter = f.ScriptConfig
 		} else {
 			err = errors.Normalf(
 				"format '%s' for Typ '%s' not found",
-				formatId,
+				actualFormatId,
 				zt.Objekte.Typ,
 			)
 

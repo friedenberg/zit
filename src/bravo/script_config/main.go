@@ -85,13 +85,17 @@ func (s *ScriptConfig) Merge(s2 *ScriptConfig) {
 }
 
 func (s ScriptConfig) Cmd(args ...string) (c *exec.Cmd, err error) {
+	if len(args) > 0 {
+		args = append([]string{"--"}, args...)
+	}
+
 	switch {
 	case s.Script == "" && len(s.Shell) == 0:
 		err = errors.Errorf("no script or shell set")
 		return
 
 	case s.Script != "" && len(s.Shell) > 0:
-		all := append(s.Shell, s.Script, "--")
+		all := append(s.Shell, s.Script)
 		all = append(all, args...)
 		c = exec.Command(s.Shell[0], all[1:]...)
 
@@ -102,12 +106,12 @@ func (s ScriptConfig) Cmd(args ...string) (c *exec.Cmd, err error) {
 			"-c",
 		}
 
-		all = append(all, s.Script, "--")
+		all = append(all, s.Script)
 		all = append(all, args...)
 		c = exec.Command("bash", all...)
 
 	case len(s.Shell) > 0:
-		all := append(s.Shell, "--")
+		all := append(s.Shell)
 		all = append(all, args...)
 
 		if len(all) > 1 {

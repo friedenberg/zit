@@ -72,6 +72,10 @@ func (f TextFormat) ReadFormat(r io.Reader, t *Objekte) (n int64, err error) {
 		if t.Akte.EtikettenRules == nil {
 			t.Akte.EtikettenRules = make(map[string]etikett_rule.Rule)
 		}
+
+		if t.Akte.FormatterUTIGroups == nil {
+			t.Akte.FormatterUTIGroups = make(map[string]FormatterUTIGroup)
+		}
 	}(pr)
 
 	mw := io.MultiWriter(aw, pw)

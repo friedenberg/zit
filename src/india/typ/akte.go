@@ -6,12 +6,13 @@ import (
 )
 
 type Akte struct {
-	InlineAkte     bool                                         `toml:"inline-akte,omitempty"`
-	FileExtension  string                                       `toml:"file-extension,omitempty"`
-	ExecCommand    *script_config.ScriptConfig                  `toml:"exec-command,omitempty"`
-	Formatters     map[string]script_config.ScriptConfigWithUTI `toml:"formatters,omitempty"`
-	Actions        map[string]script_config.ScriptConfig        `toml:"actions,omitempty"`
-	EtikettenRules map[string]etikett_rule.Rule                 `toml:"etiketten-rules,omitempty"`
+	InlineAkte         bool                                         `toml:"inline-akte,omitempty"`
+	FileExtension      string                                       `toml:"file-extension,omitempty"`
+	ExecCommand        *script_config.ScriptConfig                  `toml:"exec-command,omitempty"`
+	FormatterUTIGroups map[string]FormatterUTIGroup                 `toml:"formatter-uti-groups"`
+	Formatters         map[string]script_config.ScriptConfigWithUTI `toml:"formatters,omitempty"`
+	Actions            map[string]script_config.ScriptConfig        `toml:"actions,omitempty"`
+	EtikettenRules     map[string]etikett_rule.Rule                 `toml:"etiketten-rules,omitempty"`
 }
 
 func (a *Akte) Reset(b *Akte) {
@@ -38,6 +39,10 @@ func (a *Akte) Equals(b *Akte) bool {
 		return false
 	}
 
+	if len(a.FormatterUTIGroups) != len(b.FormatterUTIGroups) {
+		return false
+	}
+
 	if len(a.Actions) != len(b.Actions) {
 		return false
 	}
@@ -48,6 +53,18 @@ func (a *Akte) Equals(b *Akte) bool {
 
 	for k, v := range a.Actions {
 		v1, ok := b.Actions[k]
+
+		if !ok {
+			return false
+		}
+
+		if !v.Equals(&v1) {
+			return false
+		}
+	}
+
+	for k, v := range a.FormatterUTIGroups {
+		v1, ok := b.FormatterUTIGroups[k]
 
 		if !ok {
 			return false
@@ -105,6 +122,10 @@ func (ct *Akte) Apply(kt *Akte) {
 		ct.Formatters = kt.Formatters
 	}
 
+	if len(kt.FormatterUTIGroups) > 0 {
+		ct.FormatterUTIGroups = kt.FormatterUTIGroups
+	}
+
 	if kt.ExecCommand != nil {
 		ct.ExecCommand = kt.ExecCommand
 	}
@@ -151,5 +172,17 @@ func (ct *Akte) Merge(ct2 *Akte) {
 		}
 
 		ct.Formatters[k] = sc
+	}
+
+	for k, v := range ct2.FormatterUTIGroups {
+		sc, ok := ct.FormatterUTIGroups[k]
+
+		if !ok {
+			sc = v
+		} else {
+			sc.Merge(&v)
+		}
+
+		ct.FormatterUTIGroups[k] = sc
 	}
 }
