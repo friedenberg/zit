@@ -114,7 +114,6 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		)
 	}
 
-	//TODO-P1 what is this?
 	if err = zt.Objekte.ApplyKonfig(u.Konfig()); err != nil {
 		err = errors.Wrap(err)
 		return
