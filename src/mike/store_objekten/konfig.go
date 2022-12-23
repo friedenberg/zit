@@ -219,7 +219,7 @@ func (s konfigStore) Read() (tt *konfig.Transacted, err error) {
 
 			fo := konfig.MakeFormatText(s.common)
 
-			if _, err = fo.ReadFormat(r, &tt.Objekte); err != nil {
+			if _, err = fo.Parse(r, &tt.Objekte); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

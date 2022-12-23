@@ -177,7 +177,7 @@ func (c EditEtikett) makeTempEtikettFiles(
 
 			ps = append(ps, f.Name())
 
-			if _, err = format.WriteFormat(f, &tt.Objekte); err != nil {
+			if _, err = format.Format(f, &tt.Objekte); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -227,8 +227,8 @@ func (c EditEtikett) readTempEtikettFiles(
 				FD: fdee,
 			}
 
-			//TODO offer option to edit again
-			if _, err = formatText.ReadFormat(f, &te.Objekte); err != nil {
+			//TODO-P2 offer option to edit again
+			if _, err = formatText.Parse(f, &te.Objekte); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

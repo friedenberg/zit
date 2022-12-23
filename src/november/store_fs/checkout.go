@@ -56,10 +56,6 @@ func (s Store) shouldCheckOut(
 	case cz.Internal.Objekte.Equals(&cz.External.Objekte):
 		cz.State = zettel_checked_out.StateJustCheckedOutButSame
 
-	//TODO-P0 wait why?
-	case cz.External.ZettelFD.Path == "":
-		ok = true
-
 	case options.Force || cz.State == zettel_checked_out.StateEmpty:
 		ok = true
 	}

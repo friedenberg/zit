@@ -21,10 +21,6 @@ func MakeFormatText(arf gattung.AkteIOFactory) *FormatText {
 }
 
 func (f FormatText) Parse(r io.Reader, t *Objekte) (n int64, err error) {
-	return f.ReadFormat(r, t)
-}
-
-func (f FormatText) ReadFormat(r io.Reader, t *Objekte) (n int64, err error) {
 	var aw sha.WriteCloser
 
 	if aw, err = f.arf.AkteWriter(); err != nil {
@@ -70,7 +66,7 @@ func (f FormatText) ReadFormat(r io.Reader, t *Objekte) (n int64, err error) {
 	return
 }
 
-func (f FormatText) WriteFormat(w io.Writer, t *Objekte) (n int64, err error) {
+func (f FormatText) Format(w io.Writer, t *Objekte) (n int64, err error) {
 	var ar sha.ReadCloser
 
 	if ar, err = f.arf.AkteReader(t.Sha); err != nil {

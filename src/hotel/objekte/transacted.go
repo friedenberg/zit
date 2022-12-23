@@ -86,13 +86,6 @@ func (a Transacted[T, T1, T2, T3]) Equals(
 	return true
 }
 
-// TODO-P1 check if necessary
-func (a *Transacted[T, T1, T2, T3]) SetSku(
-	v sku.Transacted[T2, T3],
-) {
-	a.Sku = v
-}
-
 func (a *Transacted[T, T1, T2, T3]) SetTransactionAndObjekte(
 	t *transaktion.Transaktion,
 	o *sku.Sku,

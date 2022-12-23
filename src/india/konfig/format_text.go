@@ -22,10 +22,6 @@ func MakeFormatText(af gattung.AkteIOFactory) *FormatText {
 }
 
 func (c *FormatText) Parse(r1 io.Reader, k *Objekte) (n int64, err error) {
-	return c.ReadFormat(r1, k)
-}
-
-func (c *FormatText) ReadFormat(r1 io.Reader, k *Objekte) (n int64, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err = errors.Errorf("toml unmarshalling panicked: %q", r)
@@ -84,7 +80,7 @@ func (c *FormatText) ReadFormat(r1 io.Reader, k *Objekte) (n int64, err error) {
 	return
 }
 
-func (f FormatText) WriteFormat(w io.Writer, t *Objekte) (n int64, err error) {
+func (f FormatText) Format(w io.Writer, t *Objekte) (n int64, err error) {
 	var ar sha.ReadCloser
 
 	if ar, err = f.af.AkteReader(t.Sha); err != nil {

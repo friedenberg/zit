@@ -53,7 +53,7 @@ func (f *FormatterValue) FuncFormatter(
 		f := MakeFormatText(af)
 
 		return func(o *Transacted) (err error) {
-			if _, err = f.WriteFormat(out, &o.Objekte); err != nil {
+			if _, err = f.Format(out, &o.Objekte); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

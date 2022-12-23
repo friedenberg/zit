@@ -422,43 +422,6 @@ func (s *Store) ReadManyHistory(
 	)
 }
 
-// TODO-P1 deprecate in favor of above method
-func (s *Store) ZettelTransactedWriter(
-	w1 collections.WriterFunc[*zettel.Transacted],
-) (w collections.WriterFunc[*zettel.Transacted]) {
-	return func(z *zettel.Transacted) (err error) {
-		//TODO-P2 akte fd?
-		ze := zettel_external.Zettel{
-			ZettelFD: fd.FD{
-				Path: z.Sku.Kennung.String(),
-			},
-		}
-
-		if err1 := s.readZettelFromFile(&ze); err1 == nil {
-			z1 := &zettel.Transacted{
-				Sku:     z.Sku,
-				Objekte: ze.Objekte,
-			}
-
-			z1.Sku.Sha = ze.Sku.Sha
-
-			if err = w1(z1); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		}
-
-		if err = w1(z); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		return
-	}
-}
-
 func (s *Store) Read(p string) (cz zettel_checked_out.Zettel, err error) {
 	if cz.External, err = s.MakeExternalZettelFromZettel(p); err != nil {
 		err = errors.Wrapf(err, "%s", p)
