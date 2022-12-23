@@ -46,7 +46,10 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			case gattung.Typ:
 				var te *typ.Transacted
 
-				if te, err = u.StoreObjekten().Typ().Hydrate(transaktion, o); err != nil {
+				if te, err = u.StoreObjekten().Typ().Inflate(
+					transaktion,
+					o,
+				); err != nil {
 					err = errors.Wrap(err)
 					return
 				}

@@ -21,8 +21,15 @@ type TypLogWriters struct {
 }
 
 type typStore struct {
-	common   *common
-	hydrator gattung.Hydrator[typ.Objekte, *typ.Objekte]
+	common *common
+
+	objekte.Inflator[
+		typ.Objekte,
+		*typ.Objekte,
+		kennung.Typ,
+		*kennung.Typ,
+	]
+
 	TypLogWriters
 }
 
@@ -37,7 +44,12 @@ func makeTypStore(
 ) (s *typStore, err error) {
 	s = &typStore{
 		common: sa,
-		hydrator: objekte.MakeHydrator(
+		Inflator: objekte.MakeTransactedInflator[
+			typ.Objekte,
+			*typ.Objekte,
+			kennung.Typ,
+			*kennung.Typ,
+		](
 			sa,
 			func(sh sha.Sha) (r sha.ReadCloser, err error) {
 				return s.common.ReadCloserObjekten(
@@ -253,31 +265,6 @@ func (s typStore) AllInChain(k kennung.Typ) (c []*typ.Transacted, err error) {
 	return
 }
 
-func (s *typStore) Hydrate(
-	t *transaktion.Transaktion,
-	o *sku.Sku,
-) (te *typ.Transacted, err error) {
-	te = &typ.Transacted{}
-
-	if err = te.SetTransactionAndObjekte(
-		t,
-		o,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.hydrator.Hydrate(
-		te,
-		&te.Objekte,
-	); err != nil {
-		errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
 // TODO-P0
 func (s *typStore) reindexOne(
 	t *transaktion.Transaktion,
@@ -285,7 +272,7 @@ func (s *typStore) reindexOne(
 ) (err error) {
 	var te *typ.Transacted
 
-	if te, err = s.Hydrate(t, o); err != nil {
+	if te, err = s.Inflate(t, o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

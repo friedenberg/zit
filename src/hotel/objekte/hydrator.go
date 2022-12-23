@@ -10,7 +10,7 @@ type hydrator[T gattung.Element, T1 gattung.ElementPtr[T]] struct {
 	arf              gattung.AkteReaderFactory
 	frc              FuncReadCloser
 	objekteFormatter Formatter2
-	akteParser       gattung.Parser[T, T1] //TODO-P1 rename to akteParser
+	akteParser       gattung.Parser[T, T1]
 }
 
 func MakeHydrator[T gattung.Element, T1 gattung.ElementPtr[T]](
