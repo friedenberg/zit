@@ -33,6 +33,13 @@ type zettelStore struct {
 	verzeichnisseSchwanzen *verzeichnisseSchwanzen
 	verzeichnisseAll       *store_verzeichnisse.Zettelen
 
+	objekte.Inflator[
+		zettel.Objekte,
+		*zettel.Objekte,
+		hinweis.Hinweis,
+		*hinweis.Hinweis,
+	]
+
 	pool *zettel.PoolVerzeichnisse
 }
 
@@ -44,6 +51,23 @@ func makeZettelStore(
 		common:      sa,
 		pool:        p,
 		protoZettel: zettel.MakeProtoZettel(sa.Konfig()),
+		Inflator: objekte.MakeTransactedInflatorAlternateObjekteFormatter[
+			zettel.Objekte,
+			*zettel.Objekte,
+			hinweis.Hinweis,
+			*hinweis.Hinweis,
+		](
+			sa,
+			func(sh sha.Sha) (r sha.ReadCloser, err error) {
+				return sa.ReadCloserObjekten(
+					id.Path(sh, sa.Standort.DirObjektenZettelen()),
+				)
+			},
+			nil,
+			&zettel.FormatObjekte{
+				IgnoreTypErrors: true,
+			},
+		),
 	}
 
 	if s.hinweisen, err = hinweisen.New(s.common.Standort.DirZit()); err != nil {
@@ -150,7 +174,7 @@ func (s zettelStore) WriteZettelObjekte(z zettel.Objekte) (sh sha.Sha, err error
 	//TODO-P2 switch to objekte_format
 	f := zettel.FormatObjekte{}
 
-	if _, err = f.Format(w, c); err != nil {
+	if _, err = f.Format(w, c.Zettel); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -487,6 +511,7 @@ func (s *zettelStore) addZettelToTransaktion(
 	return
 
 }
+
 func (s zettelStore) storedZettelFromSha(
 	sh sha.Sha,
 ) (sz zettel.Objekte, err error) {
@@ -505,7 +530,7 @@ func (s zettelStore) storedZettelFromSha(
 
 	c := zettel.ObjekteParserContext{}
 
-	if _, err = f.Parse(or, &c); err != nil {
+	if _, err = f.Parse(or, &c.Zettel); err != nil {
 		err = errors.Wrapf(err, "%s", sh)
 		return
 	}
@@ -553,69 +578,37 @@ func (s zettelStore) transactedZettelFromTransaktionObjekte(
 	t *transaktion.Transaktion,
 	o *sku.Sku,
 ) (tz *zettel.Transacted, err error) {
-	ok := false
+	return s.Inflate(t, o)
+	// ok := false
 
-	var h *hinweis.Hinweis
+	// var h *hinweis.Hinweis
 
-	if h, ok = o.Id.(*hinweis.Hinweis); !ok {
-		err = errors.Wrapf(err, "transaktion.Objekte Id was not hinweis but was %s", o.Id)
-		return
-	}
+	// if h, ok = o.Id.(*hinweis.Hinweis); !ok {
+	// 	err = errors.Wrapf(err, "transaktion.Objekte Id was not hinweis but was %s", o.Id)
+	// 	return
+	// }
 
-	tz = &zettel.Transacted{
-		Sku: sku.Transacted[hinweis.Hinweis, *hinweis.Hinweis]{
-			Kennung: *h,
-		},
-	}
+	// tz = &zettel.Transacted{
+	// 	Sku: sku.Transacted[hinweis.Hinweis, *hinweis.Hinweis]{
+	// 		Kennung: *h,
+	// 	},
+	// }
 
-	if tz.Objekte, err = s.storedZettelFromSha(o.Sha); err != nil {
-		err = errors.Wrapf(err, "failed to read zettel objekte: %s", tz.Sku.Kennung)
-		return
-	}
+	// if tz.Objekte, err = s.storedZettelFromSha(o.Sha); err != nil {
+	// 	err = errors.Wrapf(err, "failed to read zettel objekte: %s", tz.Sku.Kennung)
+	// 	return
+	// }
 
-	if tz, err = s.transactedWithHead(tz.Objekte, tz.Sku.Kennung, t); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	// if tz, err = s.transactedWithHead(tz.Objekte, tz.Sku.Kennung, t); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
 
-	tz.Sku.Sha = o.Sha
+	// tz.Sku.Sha = o.Sha
 
-	tz.Sku.TransactionIndex = o.TransactionIndex
+	// tz.Sku.TransactionIndex = o.TransactionIndex
 
-	return
-}
-
-func (s *zettelStore) Hydrate(
-	t *transaktion.Transaktion,
-	o *sku.Sku,
-) (zt *zettel.Transacted, err error) {
-	zt = &zettel.Transacted{}
-
-	if err = zt.SetTransactionAndObjekte(
-		t,
-		o,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	//TODO-P0 make static
-	hy := objekte.MakeHydrator[zettel.Objekte, *zettel.Objekte](
-		s.common,
-		func(sh sha.Sha) (r sha.ReadCloser, err error) {
-			return s.common.ReadCloserObjekten(
-				id.Path(sh, s.common.Standort.DirObjektenZettelen()),
-			)
-		},
-		nil,
-	)
-
-	if err = hy.Hydrate(zt, &zt.Objekte); err != nil {
-		errors.Wrap(err)
-		return
-	}
-
-	return
+	// return
 }
 
 func (s *zettelStore) reindexOne(

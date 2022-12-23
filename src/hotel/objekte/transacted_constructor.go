@@ -23,10 +23,11 @@ type transactedInflator[
 	T2 gattung.Identifier[T2],
 	T3 gattung.IdentifierPtr[T2],
 ] struct {
-	arf              gattung.AkteReaderFactory
-	frc              FuncReadCloser
-	objekteFormatter Formatter2
-	akteParser       gattung.Parser[T, T1]
+	arf                    gattung.AkteReaderFactory
+	frc                    FuncReadCloser
+	objekteFormatter       Formatter2
+	alternateObjekteParser gattung.Parser[T, T1]
+	akteParser             gattung.Parser[T, T1]
 }
 
 func MakeTransactedInflator[
@@ -44,6 +45,26 @@ func MakeTransactedInflator[
 		frc:              frc,
 		objekteFormatter: *MakeFormatter2(),
 		akteParser:       akteParser,
+	}
+}
+
+func MakeTransactedInflatorAlternateObjekteFormatter[
+	T gattung.Objekte[T],
+	T1 gattung.ObjektePtr[T],
+	T2 gattung.Identifier[T2],
+	T3 gattung.IdentifierPtr[T2],
+](
+	arf gattung.AkteReaderFactory,
+	frc FuncReadCloser,
+	akteParser gattung.Parser[T, T1],
+	alternateObjekteParser gattung.Parser[T, T1],
+) *transactedInflator[T, T1, T2, T3] {
+	return &transactedInflator[T, T1, T2, T3]{
+		arf:                    arf,
+		frc:                    frc,
+		objekteFormatter:       *MakeFormatter2(),
+		akteParser:             akteParser,
+		alternateObjekteParser: alternateObjekteParser,
 	}
 }
 
@@ -70,10 +91,16 @@ func (h *transactedInflator[T, T1, T2, T3]) Inflate(
 		}
 
 		defer errors.Deferred(&err, r.Close)
-
-		if _, err = h.objekteFormatter.ReadFormat(r, t); err != nil {
-			err = errors.Wrap(err)
-			return
+		if h.alternateObjekteParser != nil {
+			if _, err = h.alternateObjekteParser.Parse(r, &t.Objekte); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		} else {
+			if _, err = h.objekteFormatter.ReadFormat(r, t); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 		}
 	}
 

@@ -22,7 +22,7 @@ func (z Objekte) ObjekteSha() (s sha.Sha, err error) {
 		Zettel: z,
 	}
 
-	if _, err = o.Format(hash, c); err != nil {
+	if _, err = o.Format(hash, c.Zettel); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -39,8 +39,8 @@ type FormatObjekte struct {
 
 func (f FormatObjekte) Format(
 	w1 io.Writer,
-	c ObjekteFormatterContext) (n int64, err error) {
-	z := c.Zettel
+	z Objekte,
+) (n int64, err error) {
 	w := format.NewWriter()
 
 	w.WriteFormat("%s %s", gattung.Akte, z.Akte)
@@ -61,11 +61,9 @@ func (f FormatObjekte) Format(
 
 func (f *FormatObjekte) Parse(
 	r1 io.Reader,
-	c *ObjekteParserContext) (n int64, err error) {
+	z *Objekte,
+) (n int64, err error) {
 	etiketten := kennung.MakeEtikettMutableSet()
-
-	var z *Objekte
-	z = &c.Zettel
 
 	r := bufio.NewReader(r1)
 

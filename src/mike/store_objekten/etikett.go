@@ -22,6 +22,14 @@ type EtikettLogWriters struct {
 
 type etikettStore struct {
 	common *common
+
+	objekte.Inflator[
+		etikett.Objekte,
+		*etikett.Objekte,
+		kennung.Etikett,
+		*kennung.Etikett,
+	]
+
 	EtikettLogWriters
 }
 
@@ -36,6 +44,22 @@ func makeEtikettStore(
 ) (s *etikettStore, err error) {
 	s = &etikettStore{
 		common: sa,
+		Inflator: objekte.MakeTransactedInflator[
+			etikett.Objekte,
+			*etikett.Objekte,
+			kennung.Etikett,
+			*kennung.Etikett,
+		](
+			sa,
+			func(sh sha.Sha) (r sha.ReadCloser, err error) {
+				return s.common.ReadCloserObjekten(
+					id.Path(sh, sa.Standort.DirObjektenEtiketten()),
+				)
+			},
+			gattung.Parser[etikett.Objekte, *etikett.Objekte](
+				etikett.MakeFormatText(sa),
+			),
+		),
 	}
 
 	return
@@ -241,35 +265,13 @@ func (s etikettStore) AllInChain(k kennung.Etikett) (c []*etikett.Transacted, er
 	return
 }
 
-// TODO-P0
 func (s *etikettStore) reindexOne(
 	t *transaktion.Transaktion,
 	o *sku.Sku,
 ) (err error) {
-	te := &etikett.Transacted{}
+	var te *etikett.Transacted
 
-	if err = te.SetTransactionAndObjekte(
-		t,
-		o,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	//TODO-P0 make static
-	hy := objekte.MakeHydrator(
-		s.common,
-		func(sh sha.Sha) (r sha.ReadCloser, err error) {
-			return s.common.ReadCloserObjekten(
-				id.Path(sh, s.common.Standort.DirObjektenEtiketten()),
-			)
-		},
-		gattung.Parser[etikett.Objekte, *etikett.Objekte](
-			etikett.MakeFormatText(s.common),
-		),
-	)
-
-	if err = hy.Hydrate(te, &te.Objekte); err != nil {
+	if te, err = s.Inflate(t, o); err != nil {
 		errors.Wrap(err)
 		return
 	}
