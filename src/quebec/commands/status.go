@@ -5,7 +5,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/kilo/cwd_files"
-	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/mike/store_objekten"
 	"github.com/friedenberg/zit/src/mike/zettel_checked_out"
 	"github.com/friedenberg/zit/src/november/store_fs"
@@ -45,12 +44,7 @@ func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
 		}
 	}
 
-	options := store_fs.OptionsReadExternal{
-		Parser: zettel.MakeObjekteTextParser(
-			s.StoreObjekten(),
-			nil,
-		),
-	}
+	options := store_fs.OptionsReadExternal{}
 
 	readOp := user_ops.ReadCheckedOut{
 		Umwelt:              s,

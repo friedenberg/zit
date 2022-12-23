@@ -33,7 +33,6 @@ func init() {
 	)
 }
 
-// TODO-P1 migrate to using store_fs
 func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	formatId := "text"
 	var h hinweis.Hinweis

@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/india/zettel_external"
 	"github.com/friedenberg/zit/src/kilo/cwd_files"
-	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/mike/zettel_checked_out"
 	"github.com/friedenberg/zit/src/november/store_fs"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
@@ -63,13 +62,8 @@ func (c Checkin) Run(
 	}
 
 	readOp := user_ops.ReadCheckedOut{
-		Umwelt: s,
-		OptionsReadExternal: store_fs.OptionsReadExternal{
-			Parser: zettel.MakeObjekteTextParser(
-				s.StoreObjekten(),
-				nil,
-			),
-		},
+		Umwelt:              s,
+		OptionsReadExternal: store_fs.OptionsReadExternal{},
 	}
 
 	readResults := zettel_checked_out.MakeMutableSetUnique(0)

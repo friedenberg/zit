@@ -8,7 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/india/zettel_external"
 	"github.com/friedenberg/zit/src/kilo/cwd_files"
-	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/mike/zettel_checked_out"
 	"github.com/friedenberg/zit/src/november/store_fs"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
@@ -50,12 +49,7 @@ func (c Clean) Run(
 		}
 	}
 
-	optionsReadExternal := store_fs.OptionsReadExternal{
-		Parser: zettel.MakeObjekteTextParser(
-			s.StoreObjekten(),
-			nil,
-		),
-	}
+	optionsReadExternal := store_fs.OptionsReadExternal{}
 
 	readResults := zettel_checked_out.MakeMutableSetUnique(0)
 

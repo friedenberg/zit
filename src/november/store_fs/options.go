@@ -6,13 +6,11 @@ import (
 )
 
 type OptionsReadExternal struct {
-	Parser   zettel.ObjekteParser //TODO-P1 switch to zettel_external.Parser
 	Zettelen map[hinweis.Hinweis]zettel.Transacted
 }
 
 type CheckoutOptions struct {
 	Force bool
 	CheckoutMode
-	Formatter zettel.ObjekteFormatter //TODO-P1 switch to zettel_external.Formatter
-	Zettelen  map[hinweis.Hinweis]zettel.Transacted
+	Zettelen map[hinweis.Hinweis]zettel.Transacted
 }

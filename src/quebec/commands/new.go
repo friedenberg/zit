@@ -86,12 +86,6 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		if c.Edit {
 			options := store_fs.CheckoutOptions{
 				CheckoutMode: store_fs.CheckoutModeZettelAndAkte,
-				Formatter: zettel.MakeObjekteTextFormatterIncludeAkte(
-					u.Standort(),
-					u.Konfig(),
-					u.StoreObjekten(),
-					nil,
-				),
 			}
 
 			if zsc, err = u.StoreWorkingDirectory().Checkout(
@@ -141,11 +135,9 @@ func (c New) writeNewZettels(
 	f zettel.ObjekteFormatter,
 ) (zsc zettel_checked_out.MutableSet, err error) {
 	emptyOp := user_ops.WriteNewZettels{
-		Umwelt:   u,
-		CheckOut: c.Edit,
-		CheckoutOptions: store_fs.CheckoutOptions{
-			Formatter: f,
-		},
+		Umwelt:          u,
+		CheckOut:        c.Edit,
+		CheckoutOptions: store_fs.CheckoutOptions{},
 	}
 
 	var defaultEtiketten kennung.EtikettSet
@@ -204,13 +196,8 @@ func (c New) editZettels(
 	}
 
 	readOp := user_ops.ReadCheckedOut{
-		Umwelt: u,
-		OptionsReadExternal: store_fs.OptionsReadExternal{
-			Parser: zettel.MakeObjekteTextParser(
-				u.StoreObjekten(),
-				nil,
-			),
-		},
+		Umwelt:              u,
+		OptionsReadExternal: store_fs.OptionsReadExternal{},
 	}
 
 	zslc := zettel_checked_out.MakeMutableSetUnique(0)
