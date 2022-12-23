@@ -12,19 +12,19 @@ import (
 	"github.com/friedenberg/zit/src/echo/sha"
 )
 
-type Format3[
+type Format[
 	T gattung.Objekte[T],
 	T1 gattung.ObjektePtr[T],
 ] struct{}
 
-func MakeFormat3[
+func MakeFormat[
 	T gattung.Objekte[T],
 	T1 gattung.ObjektePtr[T],
-]() *Format3[T, T1] {
-	return &Format3[T, T1]{}
+]() *Format[T, T1] {
+	return &Format[T, T1]{}
 }
 
-func (f Format3[T, T1]) Parse(
+func (f Format[T, T1]) Parse(
 	r1 io.Reader,
 	o T1,
 ) (n int64, err error) {
@@ -111,7 +111,7 @@ func (f Format3[T, T1]) Parse(
 	return
 }
 
-func (f Format3[T, T1]) Format(
+func (f Format[T, T1]) Format(
 	w1 io.Writer,
 	o T1,
 ) (n int64, err error) {

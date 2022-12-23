@@ -109,7 +109,7 @@ func (s typStore) transact(
 		tt.Sku.Kopf = s.common.Transaktion.Time
 	}
 
-	fo := objekte.MakeFormat3[typ.Objekte, *typ.Objekte]()
+	fo := objekte.MakeFormat[typ.Objekte, *typ.Objekte]()
 
 	var w *age_io.Mover
 

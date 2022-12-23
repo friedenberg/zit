@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
-//TODO-P3 move to zettel
+// TODO-P3 move to zettel
 type Mode int
 
 const (

@@ -109,7 +109,7 @@ func (s etikettStore) transact(
 		tt.Sku.Kopf = s.common.Transaktion.Time
 	}
 
-	fo := objekte.MakeFormat3[etikett.Objekte, *etikett.Objekte]()
+	fo := objekte.MakeFormat[etikett.Objekte, *etikett.Objekte]()
 
 	var w *age_io.Mover
 

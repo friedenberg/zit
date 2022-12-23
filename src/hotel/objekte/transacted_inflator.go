@@ -41,7 +41,7 @@ func MakeTransactedInflator[
 	akteParser gattung.Parser[T, T1],
 ) *transactedInflator[T, T1, T2, T3] {
 	if objekteParser == nil {
-		objekteParser = MakeFormat3[T, T1]()
+		objekteParser = MakeFormat[T, T1]()
 	}
 
 	return &transactedInflator[T, T1, T2, T3]{

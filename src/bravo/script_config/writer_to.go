@@ -46,8 +46,8 @@ func MakeWriterTo(
 		}
 	}
 
-  //TODO-P2 move to constructor?
-  wt.cmd.Stderr = os.Stdout
+	//TODO-P2 move to constructor?
+	wt.cmd.Stderr = os.Stdout
 	wt.cmd.Env = envCollapsed
 
 	return
@@ -88,7 +88,7 @@ func (wt *writerTo) WriteTo(w io.Writer) (n int64, err error) {
 	}
 
 	if err = wt.cmd.Wait(); err != nil {
-    err = errors.Wrapf(err, "Command: '%s'", wt.cmd.String())
+		err = errors.Wrapf(err, "Command: '%s'", wt.cmd.String())
 		return
 	}
 

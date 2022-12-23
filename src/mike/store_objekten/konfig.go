@@ -119,7 +119,7 @@ func (s konfigStore) transact(
 		kt.Sku.Kopf = s.common.Transaktion.Time
 	}
 
-	fo := objekte.MakeFormat3[konfig.Objekte, *konfig.Objekte]()
+	fo := objekte.MakeFormat[konfig.Objekte, *konfig.Objekte]()
 
 	if _, err = fo.Format(w, &kt.Objekte); err != nil {
 		err = errors.Wrap(err)
@@ -205,7 +205,7 @@ func (s konfigStore) Read() (tt *konfig.Transacted, err error) {
 
 			defer errors.Deferred(&err, r.Close)
 
-			fo := objekte.MakeFormat3[konfig.Objekte, *konfig.Objekte]()
+			fo := objekte.MakeFormat[konfig.Objekte, *konfig.Objekte]()
 
 			if _, err = fo.Parse(r, &tt.Objekte); err != nil {
 				err = errors.Wrap(err)
