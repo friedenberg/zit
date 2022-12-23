@@ -82,13 +82,13 @@ func (s etikettStore) Flush() (err error) {
 	return
 }
 
-func (s etikettStore) transact(
+func (s etikettStore) CreateOrUpdate(
 	to *etikett.Objekte,
 	tk *kennung.Etikett,
 ) (tt *etikett.Transacted, err error) {
 	if !s.common.LockSmith.IsAcquired() {
 		err = ErrLockRequired{
-			Operation: "transact etikett",
+			Operation: "create or update etikett",
 		}
 
 		return
@@ -187,71 +187,7 @@ func (s etikettStore) ReadOne(
 	return
 }
 
-func (s *etikettStore) Create(
-	in *etikett.Objekte,
-	tk *kennung.Etikett,
-) (tt *etikett.Transacted, err error) {
-	if !s.common.LockSmith.IsAcquired() {
-		err = ErrLockRequired{
-			Operation: "create etikett",
-		}
-
-		return
-	}
-
-	if tt, err = s.transact(in, tk); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (s *etikettStore) Update(
-	t *etikett.Objekte,
-	tk *kennung.Etikett,
-) (tt *etikett.Transacted, err error) {
-	if !s.common.LockSmith.IsAcquired() {
-		err = ErrLockRequired{
-			Operation: "update etikett",
-		}
-
-		return
-	}
-
-	if tt, err = s.transact(t, tk); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
 func (s etikettStore) AllInChain(k kennung.Etikett) (c []*etikett.Transacted, err error) {
-	// mst := zettel_transacted.MakeMutableSetUnique(0)
-
-	// if err = s.verzeichnisseAll.ReadMany(
-	// 	func(z *zettel_verzeichnisse.Zettel) (err error) {
-	// 		if !z.Transacted.Sku.Kennung.Equals(&h) {
-	// 			err = io.EOF
-	// 			return
-	// 		}
-
-	// 		return
-	// 	},
-	// 	zettel_verzeichnisse.MakeWriterZettelTransacted(mst.AddAndDoNotRepool),
-	// ); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
-
-	// c = mst.Elements()
-
-	// sort.Slice(
-	// 	c,
-	// 	func(i, j int) bool { return c[i].SkuTransacted().Less(c[j].SkuTransacted()) },
-	// )
-
 	return
 }
 

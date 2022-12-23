@@ -113,7 +113,7 @@ func (c EditEtikett) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 	if err = tes.Each(
 		func(e *etikett.External) (err error) {
-			if _, err = u.StoreObjekten().Etikett().Update(
+			if _, err = u.StoreObjekten().Etikett().CreateOrUpdate(
 				&e.Objekte,
 				&e.Sku.Kennung,
 			); err != nil {

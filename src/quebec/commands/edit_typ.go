@@ -115,7 +115,7 @@ func (c EditTyp) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 		func(e *typ.External) (err error) {
 			var tt *typ.Transacted
 
-			if tt, err = u.StoreObjekten().Typ().Update(
+			if tt, err = u.StoreObjekten().Typ().CreateOrUpdate(
 				&e.Objekte,
 				&e.Sku.Kennung,
 			); err != nil {

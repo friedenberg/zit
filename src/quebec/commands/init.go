@@ -132,14 +132,14 @@ func (c Init) initDefaultTypAndKonfig(u *umwelt.Umwelt) (err error) {
 
 		var defaultTypTransacted *typ.Transacted
 
-		if defaultTypTransacted, err = u.StoreObjekten().Typ().Create(
-			defaultTyp, defaultTypKennung,
+		if defaultTypTransacted, err = u.StoreObjekten().Typ().CreateOrUpdate(
+			defaultTyp,
+			defaultTypKennung,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		//TODO flush?
 		u.KonfigPtr().AddTyp(defaultTypTransacted)
 		u.KonfigPtr().DefaultTyp = *defaultTypTransacted
 	}

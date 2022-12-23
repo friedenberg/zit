@@ -9,6 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
 )
 
+// TODO-P3 rename to MakeSingleplexedFormatWriter
 func MakeSerializedFormatWriter(
 	f ObjekteFormatter,
 	out io.Writer,
