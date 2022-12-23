@@ -159,6 +159,10 @@ type FormatWriter[T Element, T1 ElementPtr[T]] interface {
 // 	FormatWriter[T, T1]
 // }
 
+type Hydrator[T Element, T1 ElementPtr[T]] interface {
+	Hydrate(to StoredPtr, a T1) (err error)
+}
+
 type Parser[T Element, T1 ElementPtr[T]] interface {
 	Parse(io.Reader, T1) (int64, error)
 }

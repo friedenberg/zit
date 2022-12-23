@@ -6,32 +6,29 @@ import (
 	"github.com/friedenberg/zit/src/echo/sha"
 )
 
-// type FuncReadCloser func(sha.Sha) (sha.ReadCloser, error)
-// type FuncWriteCloser func(sha.Sha) (sha.WriteCloser, error)
-
 type hydrator[T gattung.Element, T1 gattung.ElementPtr[T]] struct {
-	af               gattung.AkteIOFactory
+	arf              gattung.AkteReaderFactory
 	frc              FuncReadCloser
 	objekteFormatter Formatter2
-	akteFormatter    gattung.Parser[T, T1] //TODO-P1 rename to akteParser
+	akteParser       gattung.Parser[T, T1] //TODO-P1 rename to akteParser
 }
 
 func MakeHydrator[T gattung.Element, T1 gattung.ElementPtr[T]](
-	af gattung.AkteIOFactory,
+	arf gattung.AkteReaderFactory,
 	frc FuncReadCloser,
-	akteFormatter gattung.Parser[T, T1],
+	akteParser gattung.Parser[T, T1],
 ) *hydrator[T, T1] {
 	return &hydrator[T, T1]{
-		af:               af,
+		arf:              arf,
 		frc:              frc,
 		objekteFormatter: *MakeFormatter2(),
-		akteFormatter:    akteFormatter,
+		akteParser:       akteParser,
 	}
 }
 
 func (h *hydrator[T, T1]) Hydrate(
 	to gattung.StoredPtr,
-	a *T,
+	a T1,
 ) (err error) {
 	{
 		var r sha.ReadCloser
@@ -49,17 +46,17 @@ func (h *hydrator[T, T1]) Hydrate(
 		}
 	}
 
-	if h.akteFormatter != nil {
+	if h.akteParser != nil {
 		var r sha.ReadCloser
 
-		if r, err = h.af.AkteReader(to.AkteSha()); err != nil {
+		if r, err = h.arf.AkteReader(to.AkteSha()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 		defer errors.Deferred(&err, r.Close)
 
-		if _, err = h.akteFormatter.Parse(r, a); err != nil {
+		if _, err = h.akteParser.Parse(r, a); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
