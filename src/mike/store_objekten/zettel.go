@@ -509,37 +509,9 @@ func (s *zettelStore) addZettelToTransaktion(
 	s.common.Transaktion.Add2(&tz.Sku)
 
 	return
-
 }
 
-func (s zettelStore) storedZettelFromSha(
-	sh sha.Sha,
-) (sz zettel.Objekte, err error) {
-	var or io.ReadCloser
-
-	if or, err = s.common.ReadCloserObjekten(id.Path(sh, s.common.Standort.DirObjektenZettelen())); err != nil {
-		err = ErrNotFound{Id: sh}
-		return
-	}
-
-	defer errors.Deferred(&err, or.Close)
-
-	f := zettel.FormatObjekte{
-		IgnoreTypErrors: true,
-	}
-
-	c := zettel.ObjekteParserContext{}
-
-	if _, err = f.Parse(or, &c.Zettel); err != nil {
-		err = errors.Wrapf(err, "%s", sh)
-		return
-	}
-
-	sz = c.Zettel
-
-	return
-}
-
+// TODO-P1 modify this to not require immediate mutter
 // should only be called when moving forward through time, as there is a
 // dependency on the index being accurate for the immediate mutter of the zettel
 // in the arguments
@@ -574,51 +546,14 @@ func (s *zettelStore) transactedWithHead(
 	return
 }
 
-func (s zettelStore) transactedZettelFromTransaktionObjekte(
-	t *transaktion.Transaktion,
-	o *sku.Sku,
-) (tz *zettel.Transacted, err error) {
-	return s.Inflate(t, o)
-	// ok := false
-
-	// var h *hinweis.Hinweis
-
-	// if h, ok = o.Id.(*hinweis.Hinweis); !ok {
-	// 	err = errors.Wrapf(err, "transaktion.Objekte Id was not hinweis but was %s", o.Id)
-	// 	return
-	// }
-
-	// tz = &zettel.Transacted{
-	// 	Sku: sku.Transacted[hinweis.Hinweis, *hinweis.Hinweis]{
-	// 		Kennung: *h,
-	// 	},
-	// }
-
-	// if tz.Objekte, err = s.storedZettelFromSha(o.Sha); err != nil {
-	// 	err = errors.Wrapf(err, "failed to read zettel objekte: %s", tz.Sku.Kennung)
-	// 	return
-	// }
-
-	// if tz, err = s.transactedWithHead(tz.Objekte, tz.Sku.Kennung, t); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
-
-	// tz.Sku.Sha = o.Sha
-
-	// tz.Sku.TransactionIndex = o.TransactionIndex
-
-	// return
-}
-
 func (s *zettelStore) reindexOne(
 	t *transaktion.Transaktion,
 	o *sku.Sku,
 ) (err error) {
 	var tz *zettel.Transacted
 
-	if tz, err = s.transactedZettelFromTransaktionObjekte(t, o); err != nil {
-		//TODO decide on how to handle format errors
+	if tz, err = s.Inflate(t, o); err != nil {
+		//TODO-P2 decide on how to handle format errors
 		errors.Err().Print(err)
 		err = nil
 		// err = errors.Wrap(err)
