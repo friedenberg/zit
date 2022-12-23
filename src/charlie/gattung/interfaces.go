@@ -74,6 +74,7 @@ type Objekte[T any] interface {
 }
 
 type ObjektePtr[T Element] interface {
+	Objekte[T]
 	ElementPtr[T]
 	Resetable[T]
 	SetAkteSha(sha.Sha)

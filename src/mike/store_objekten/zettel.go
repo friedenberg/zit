@@ -51,7 +51,7 @@ func makeZettelStore(
 		common:      sa,
 		pool:        p,
 		protoZettel: zettel.MakeProtoZettel(sa.Konfig()),
-		Inflator: objekte.MakeTransactedInflatorAlternateObjekteFormatter[
+		Inflator: objekte.MakeTransactedInflator[
 			zettel.Objekte,
 			*zettel.Objekte,
 			hinweis.Hinweis,
@@ -63,10 +63,10 @@ func makeZettelStore(
 					id.Path(sh, sa.Standort.DirObjektenZettelen()),
 				)
 			},
-			nil,
 			&zettel.FormatObjekte{
 				IgnoreTypErrors: true,
 			},
+			nil,
 		),
 	}
 

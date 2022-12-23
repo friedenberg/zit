@@ -56,6 +56,7 @@ func makeTypStore(
 					id.Path(sh, sa.Standort.DirObjektenTypen()),
 				)
 			},
+			nil,
 			gattung.Parser[typ.Objekte, *typ.Objekte](
 				typ.MakeFormatTextIgnoreTomlErrors(sa),
 			),

@@ -56,6 +56,7 @@ func makeKonfigStore(
 					id.Path(sh, sa.Standort.DirObjektenKonfig()),
 				)
 			},
+			nil,
 			gattung.Parser[konfig.Objekte, *konfig.Objekte](
 				konfig.MakeFormatText(sa),
 			),

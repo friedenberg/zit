@@ -56,6 +56,7 @@ func makeEtikettStore(
 					id.Path(sh, sa.Standort.DirObjektenEtiketten()),
 				)
 			},
+			nil,
 			gattung.Parser[etikett.Objekte, *etikett.Objekte](
 				etikett.MakeFormatText(sa),
 			),
