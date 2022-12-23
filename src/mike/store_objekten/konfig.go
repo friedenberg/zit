@@ -30,6 +30,11 @@ type konfigStore struct {
 		*kennung.Konfig,
 	]
 
+	objekte.AkteTextSaver[
+		konfig.Objekte,
+		*konfig.Objekte,
+	]
+
 	KonfigLogWriters
 }
 
@@ -60,6 +65,13 @@ func makeKonfigStore(
 			gattung.Parser[konfig.Objekte, *konfig.Objekte](
 				konfig.MakeFormatText(sa),
 			),
+		),
+		AkteTextSaver: objekte.MakeAkteTextSaver[
+			konfig.Objekte,
+			*konfig.Objekte,
+		](
+			sa,
+			&konfig.FormatterAkteTextToml{},
 		),
 	}
 
@@ -152,29 +164,6 @@ func (s konfigStore) transact(
 		err = errors.Wrap(err)
 		return
 	}
-
-	return
-}
-
-// TODO-P0 disambiguate
-func (s konfigStore) WriteAkte(
-	t *konfig.Objekte,
-) (err error) {
-	var w sha.WriteCloser
-
-	if w, err = s.common.AkteWriter(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.Deferred(&err, w.Close)
-
-	if _, err = konfig.WriteObjekteToText(w, t); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	t.Sha = w.Sha()
 
 	return
 }

@@ -7,7 +7,12 @@ import (
 	"github.com/friedenberg/zit/src/alfa/toml"
 )
 
-func WriteObjekteToText(w io.Writer, t *Objekte) (n int64, err error) {
+type FormatterAkteTextToml struct{}
+
+func (_ FormatterAkteTextToml) Format(
+	w io.Writer,
+	t *Objekte,
+) (n int64, err error) {
 	enc := toml.NewEncoder(w)
 
 	if err = enc.Encode(&t.Akte); err != nil {

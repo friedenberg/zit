@@ -123,7 +123,7 @@ func (c Init) initDefaultTypAndKonfig(u *umwelt.Umwelt) (err error) {
 	if _, err = u.StoreObjekten().Typ().ReadOne(defaultTypKennung); err != nil {
 		err = nil
 
-		if err = u.StoreObjekten().Typ().WriteAkte(
+		if _, err = u.StoreObjekten().Typ().SaveAkteText(
 			defaultTyp,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -147,7 +147,7 @@ func (c Init) initDefaultTypAndKonfig(u *umwelt.Umwelt) (err error) {
 	{
 		defaultKonfig := konfig.Default()
 
-		if err = u.StoreObjekten().Konfig().WriteAkte(
+		if _, err = u.StoreObjekten().Konfig().SaveAkteText(
 			defaultKonfig,
 		); err != nil {
 			err = errors.Wrap(err)

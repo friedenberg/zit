@@ -30,6 +30,11 @@ type typStore struct {
 		*kennung.Typ,
 	]
 
+	objekte.AkteTextSaver[
+		typ.Objekte,
+		*typ.Objekte,
+	]
+
 	TypLogWriters
 }
 
@@ -60,6 +65,13 @@ func makeTypStore(
 			gattung.Parser[typ.Objekte, *typ.Objekte](
 				typ.MakeFormatTextIgnoreTomlErrors(sa),
 			),
+		),
+		AkteTextSaver: objekte.MakeAkteTextSaver[
+			typ.Objekte,
+			*typ.Objekte,
+		](
+			sa,
+			&typ.FormatterAkteTextToml{},
 		),
 	}
 
@@ -158,29 +170,6 @@ func (s typStore) transact(
 			return
 		}
 	}
-
-	return
-}
-
-// TODO-P0 disambiguate from akte
-func (s typStore) WriteAkte(
-	t *typ.Objekte,
-) (err error) {
-	var w sha.WriteCloser
-
-	if w, err = s.common.AkteWriter(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.Deferred(&err, w.Close)
-
-	if _, err = typ.WriteObjekteToText(w, t); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	t.Sha = w.Sha()
 
 	return
 }

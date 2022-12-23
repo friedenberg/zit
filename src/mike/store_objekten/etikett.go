@@ -30,6 +30,11 @@ type etikettStore struct {
 		*kennung.Etikett,
 	]
 
+	objekte.AkteTextSaver[
+		etikett.Objekte,
+		*etikett.Objekte,
+	]
+
 	EtikettLogWriters
 }
 
@@ -60,6 +65,13 @@ func makeEtikettStore(
 			gattung.Parser[etikett.Objekte, *etikett.Objekte](
 				etikett.MakeFormatText(sa),
 			),
+		),
+		AkteTextSaver: objekte.MakeAkteTextSaver[
+			etikett.Objekte,
+			*etikett.Objekte,
+		](
+			sa,
+			&etikett.FormatterAkteTextToml{},
 		),
 	}
 
@@ -158,29 +170,6 @@ func (s etikettStore) transact(
 			return
 		}
 	}
-
-	return
-}
-
-// TODO-P0 disambiguate from akte
-func (s etikettStore) WriteAkte(
-	t *etikett.Objekte,
-) (err error) {
-	var w sha.WriteCloser
-
-	if w, err = s.common.AkteWriter(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.Deferred(&err, w.Close)
-
-	if _, err = etikett.WriteObjekteToText(w, t); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	t.Sha = w.Sha()
 
 	return
 }
