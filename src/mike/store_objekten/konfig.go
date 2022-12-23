@@ -82,11 +82,11 @@ func (s konfigStore) Flush() (err error) {
 	return
 }
 
-func (s konfigStore) transact(
+func (s konfigStore) Update(
 	ko *konfig.Objekte,
 ) (kt *konfig.Transacted, err error) {
 	if !s.common.LockSmith.IsAcquired() {
-		err = errors.Wrap(ErrLockRequired{Operation: "transact konfig"})
+		err = errors.Wrap(ErrLockRequired{Operation: "update konfig"})
 		return
 	}
 
@@ -152,7 +152,6 @@ func (s konfigStore) transact(
 	}
 
 	s.common.Transaktion.Add2(&kt.Sku)
-
 	s.common.KonfigPtr().SetTransacted(kt)
 
 	if err = s.common.Abbr.addStored(kt); err != nil {
@@ -230,25 +229,7 @@ func (s konfigStore) Read() (tt *konfig.Transacted, err error) {
 	return
 }
 
-func (s *konfigStore) Update(
-	ko *konfig.Objekte,
-) (kt *konfig.Transacted, err error) {
-	if !s.common.LockSmith.IsAcquired() {
-		err = errors.Wrap(ErrLockRequired{Operation: "update"})
-
-		return
-	}
-
-	if kt, err = s.transact(ko); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
 func (s konfigStore) AllInChain() (c []*konfig.Transacted, err error) {
-
 	return
 }
 
