@@ -22,6 +22,14 @@ type KonfigLogWriters struct {
 
 type konfigStore struct {
 	common *common
+
+	objekte.Inflator[
+		konfig.Objekte,
+		*konfig.Objekte,
+		kennung.Konfig,
+		*kennung.Konfig,
+	]
+
 	KonfigLogWriters
 }
 
@@ -36,6 +44,22 @@ func makeKonfigStore(
 ) (s *konfigStore, err error) {
 	s = &konfigStore{
 		common: sa,
+		Inflator: objekte.MakeTransactedInflator[
+			konfig.Objekte,
+			*konfig.Objekte,
+			kennung.Konfig,
+			*kennung.Konfig,
+		](
+			sa,
+			func(sh sha.Sha) (r sha.ReadCloser, err error) {
+				return s.common.ReadCloserObjekten(
+					id.Path(sh, sa.Standort.DirObjektenKonfig()),
+				)
+			},
+			gattung.Parser[konfig.Objekte, *konfig.Objekte](
+				konfig.MakeFormatText(sa),
+			),
+		),
 	}
 
 	return
@@ -238,35 +262,13 @@ func (s konfigStore) AllInChain() (c []*konfig.Transacted, err error) {
 	return
 }
 
-// TODO-P0
 func (s *konfigStore) reindexOne(
 	t *transaktion.Transaktion,
 	o *sku.Sku,
 ) (err error) {
-	te := &konfig.Transacted{}
+	var te *konfig.Transacted
 
-	if err = te.SetTransactionAndObjekte(
-		t,
-		o,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	//TODO-P0 make static
-	hy := objekte.MakeHydrator(
-		s.common,
-		func(sh sha.Sha) (r sha.ReadCloser, err error) {
-			return s.common.ReadCloserObjekten(
-				id.Path(sh, s.common.Standort.DirObjektenKonfig()),
-			)
-		},
-		gattung.Parser[konfig.Objekte, *konfig.Objekte](
-			konfig.MakeFormatText(s.common),
-		),
-	)
-
-	if err = hy.Hydrate(te, &te.Objekte); err != nil {
+	if te, err = s.Inflate(t, o); err != nil {
 		errors.Wrap(err)
 		return
 	}

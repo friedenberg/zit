@@ -265,7 +265,6 @@ func (s typStore) AllInChain(k kennung.Typ) (c []*typ.Transacted, err error) {
 	return
 }
 
-// TODO-P0
 func (s *typStore) reindexOne(
 	t *transaktion.Transaktion,
 	o *sku.Sku,
