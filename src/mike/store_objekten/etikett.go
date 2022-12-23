@@ -23,7 +23,7 @@ type EtikettLogWriters struct {
 type etikettStore struct {
 	common *common
 
-	objekte.Inflator[
+	objekte.TransactedInflator[
 		etikett.Objekte,
 		*etikett.Objekte,
 		kennung.Etikett,
@@ -44,7 +44,7 @@ func makeEtikettStore(
 ) (s *etikettStore, err error) {
 	s = &etikettStore{
 		common: sa,
-		Inflator: objekte.MakeTransactedInflator[
+		TransactedInflator: objekte.MakeTransactedInflator[
 			etikett.Objekte,
 			*etikett.Objekte,
 			kennung.Etikett,

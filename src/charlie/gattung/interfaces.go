@@ -143,9 +143,19 @@ type AkteWriterFactory interface {
 	AkteWriter() (sha.WriteCloser, error)
 }
 
+type FuncReadCloser func(sha.Sha) (sha.ReadCloser, error)
+type FuncWriteCloser func(sha.Sha) (sha.WriteCloser, error)
+
 type AkteIOFactoryFactory interface {
 	AkteFactory(Gattung) AkteIOFactory
 }
+
+//   _____                          _
+//  |  ___|__  _ __ _ __ ___   __ _| |_
+//  | |_ / _ \| '__| '_ ` _ \ / _` | __|
+//  |  _| (_) | |  | | | | | | (_| | |_
+//  |_|  \___/|_|  |_| |_| |_|\__,_|\__|
+//
 
 type FormatReader[T Element, T1 ElementPtr[T]] interface {
 	ReadFormat(io.Reader, T1) (int64, error)
@@ -154,11 +164,6 @@ type FormatReader[T Element, T1 ElementPtr[T]] interface {
 type FormatWriter[T Element, T1 ElementPtr[T]] interface {
 	WriteFormat(io.Writer, T1) (int64, error)
 }
-
-// type Formatter[T Element, T1 ElementPtr[T]] interface {
-// 	FormatReader[T, T1]
-// 	FormatWriter[T, T1]
-// }
 
 type Parser[T Element, T1 ElementPtr[T]] interface {
 	Parse(io.Reader, T1) (int64, error)

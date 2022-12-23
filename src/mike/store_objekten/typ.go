@@ -23,7 +23,7 @@ type TypLogWriters struct {
 type typStore struct {
 	common *common
 
-	objekte.Inflator[
+	objekte.TransactedInflator[
 		typ.Objekte,
 		*typ.Objekte,
 		kennung.Typ,
@@ -44,7 +44,7 @@ func makeTypStore(
 ) (s *typStore, err error) {
 	s = &typStore{
 		common: sa,
-		Inflator: objekte.MakeTransactedInflator[
+		TransactedInflator: objekte.MakeTransactedInflator[
 			typ.Objekte,
 			*typ.Objekte,
 			kennung.Typ,

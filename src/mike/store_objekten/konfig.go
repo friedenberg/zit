@@ -23,7 +23,7 @@ type KonfigLogWriters struct {
 type konfigStore struct {
 	common *common
 
-	objekte.Inflator[
+	objekte.TransactedInflator[
 		konfig.Objekte,
 		*konfig.Objekte,
 		kennung.Konfig,
@@ -44,7 +44,7 @@ func makeKonfigStore(
 ) (s *konfigStore, err error) {
 	s = &konfigStore{
 		common: sa,
-		Inflator: objekte.MakeTransactedInflator[
+		TransactedInflator: objekte.MakeTransactedInflator[
 			konfig.Objekte,
 			*konfig.Objekte,
 			kennung.Konfig,

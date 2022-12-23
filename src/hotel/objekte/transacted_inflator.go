@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/golf/transaktion"
 )
 
-type Inflator[
+type TransactedInflator[
 	T gattung.Objekte[T],
 	T1 gattung.ObjektePtr[T],
 	T2 gattung.Identifier[T2],
@@ -24,7 +24,7 @@ type transactedInflator[
 	T3 gattung.IdentifierPtr[T2],
 ] struct {
 	arf           gattung.AkteReaderFactory
-	frc           FuncReadCloser
+	frc           gattung.FuncReadCloser
 	objekteParser gattung.Parser[T, T1]
 	akteParser    gattung.Parser[T, T1]
 }
@@ -36,7 +36,7 @@ func MakeTransactedInflator[
 	T3 gattung.IdentifierPtr[T2],
 ](
 	arf gattung.AkteReaderFactory,
-	frc FuncReadCloser,
+	frc gattung.FuncReadCloser,
 	objekteParser gattung.Parser[T, T1],
 	akteParser gattung.Parser[T, T1],
 ) *transactedInflator[T, T1, T2, T3] {

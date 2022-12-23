@@ -33,7 +33,7 @@ type zettelStore struct {
 	verzeichnisseSchwanzen *verzeichnisseSchwanzen
 	verzeichnisseAll       *store_verzeichnisse.Zettelen
 
-	objekte.Inflator[
+	objekte.TransactedInflator[
 		zettel.Objekte,
 		*zettel.Objekte,
 		hinweis.Hinweis,
@@ -51,7 +51,7 @@ func makeZettelStore(
 		common:      sa,
 		pool:        p,
 		protoZettel: zettel.MakeProtoZettel(sa.Konfig()),
-		Inflator: objekte.MakeTransactedInflator[
+		TransactedInflator: objekte.MakeTransactedInflator[
 			zettel.Objekte,
 			*zettel.Objekte,
 			hinweis.Hinweis,
@@ -171,7 +171,6 @@ func (s zettelStore) WriteZettelObjekte(z zettel.Objekte) (sh sha.Sha, err error
 		Zettel: z,
 	}
 
-	//TODO-P2 switch to objekte_format
 	f := zettel.FormatObjekte{}
 
 	if _, err = f.Format(w, &c.Zettel); err != nil {
