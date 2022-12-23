@@ -60,17 +60,8 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	var zt *zettel.Transacted
 
 	if zt, err = u.StoreWorkingDirectory().ReadOne(h); err != nil {
-		if errors.IsNotExist(err) {
-			if zt, err = u.StoreObjekten().Zettel().ReadHinweisSchwanzen(
-				h,
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-		} else {
-			err = errors.Wrap(err)
-			return
-		}
+		err = errors.Wrap(err)
+		return
 	}
 
 	typKonfig := u.Konfig().GetTyp(zt.Objekte.Typ)
