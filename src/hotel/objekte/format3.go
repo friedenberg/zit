@@ -111,7 +111,7 @@ func (f Format3[T, T1]) Parse(
 	return
 }
 
-func (f Format3[T, T1]) WriteFormat(
+func (f Format3[T, T1]) Format(
 	w1 io.Writer,
 	o T1,
 ) (n int64, err error) {

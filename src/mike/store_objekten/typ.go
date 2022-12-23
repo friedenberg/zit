@@ -109,7 +109,7 @@ func (s typStore) transact(
 		tt.Sku.Kopf = s.common.Transaktion.Time
 	}
 
-	fo := objekte.MakeFormatter[*typ.Transacted](s.common)
+	fo := objekte.MakeFormat3[typ.Objekte, *typ.Objekte]()
 
 	var w *age_io.Mover
 
@@ -126,7 +126,7 @@ func (s typStore) transact(
 
 	defer errors.Deferred(&err, w.Close)
 
-	if _, err = fo.WriteFormat(w, tt); err != nil {
+	if _, err = fo.Format(w, &tt.Objekte); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

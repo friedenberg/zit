@@ -174,7 +174,7 @@ func (s zettelStore) WriteZettelObjekte(z zettel.Objekte) (sh sha.Sha, err error
 	//TODO-P2 switch to objekte_format
 	f := zettel.FormatObjekte{}
 
-	if _, err = f.Format(w, c.Zettel); err != nil {
+	if _, err = f.Format(w, &c.Zettel); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

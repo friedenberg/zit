@@ -11,7 +11,6 @@ import (
 	"github.com/friedenberg/zit/src/echo/collections_coding"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/echo/standort"
-	"github.com/friedenberg/zit/src/hotel/objekte"
 	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
 )
 
@@ -53,7 +52,7 @@ func (fv *FormatterValue) FuncFormatterVerzeichnisse(
 	)
 }
 
-//TODO-P2 convert to Verzeichnisse
+// TODO-P2 convert to Verzeichnisse
 func (fv *FormatterValue) FuncFormatter(
 	out io.Writer,
 	af gattung.AkteIOFactory,
@@ -65,10 +64,10 @@ func (fv *FormatterValue) FuncFormatter(
 		return logFunc
 
 	case "objekte":
-		f := objekte.MakeFormatter[*Transacted](af)
+		f := FormatObjekte{}
 
 		return func(o *Transacted) (err error) {
-			if _, err = f.WriteFormat(out, o); err != nil {
+			if _, err = f.Format(out, &o.Objekte); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

@@ -22,7 +22,7 @@ func (z Objekte) ObjekteSha() (s sha.Sha, err error) {
 		Zettel: z,
 	}
 
-	if _, err = o.Format(hash, c.Zettel); err != nil {
+	if _, err = o.Format(hash, &c.Zettel); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -39,7 +39,7 @@ type FormatObjekte struct {
 
 func (f FormatObjekte) Format(
 	w1 io.Writer,
-	z Objekte,
+	z *Objekte,
 ) (n int64, err error) {
 	w := format.NewWriter()
 
