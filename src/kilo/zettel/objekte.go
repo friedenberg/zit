@@ -14,7 +14,7 @@ type Objekte struct {
 	Typ           kennung.Typ
 	Bezeichnung   bezeichnung.Bezeichnung
 	Etiketten     kennung.EtikettSet
-	Verzeichnisse Verzeichnisse2
+	Verzeichnisse Verzeichnisse
 }
 
 func (z Objekte) Gattung() gattung.Gattung {

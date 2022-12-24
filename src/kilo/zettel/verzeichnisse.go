@@ -6,56 +6,48 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/delta/collections"
+	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
 )
 
-// type PoolVerzeichnisse = collections.Pool[Transacted]
+type Verzeichnisse struct {
+	wasPopulated bool
+	// Etiketten               tridex.Tridex
+	EtikettenExpandedSorted []string
+	EtikettenSorted         []string
+	//TODO-P3 add
+	// Hidden bool
+}
 
-// func (z *Verzeichnisse) ResetWithTransacted(z1 *Transacted) {
-// 	if z1 != nil {
-// 		z.Transacted.Reset(z1)
-// 		z.EtikettenExpandedSorted = kennung.Expanded(z1.Objekte.Etiketten).SortedString()
-// 		z.EtikettenSorted = z1.Objekte.Etiketten.SortedString()
-// 	} else {
-// 		z.Transacted.Reset(nil)
-// 		z.EtikettenExpandedSorted = []string{}
-// 		z.EtikettenSorted = []string{}
-// 	}
-// }
+func (z *Verzeichnisse) ResetWithObjekte(z1 *Objekte) {
+	if z1 != nil {
+		z.wasPopulated = true
+		z.EtikettenExpandedSorted = kennung.Expanded(z1.Etiketten).SortedString()
+		z.EtikettenSorted = z1.Etiketten.SortedString()
+	} else {
+		z.wasPopulated = false
+		z.EtikettenExpandedSorted = []string{}
+		z.EtikettenSorted = []string{}
+	}
+}
 
-// func (z *Verzeichnisse) Reset(z1 *Verzeichnisse) {
-// 	z.EtikettenExpandedSorted = z.EtikettenExpandedSorted[:0]
-// 	z.EtikettenSorted = z.EtikettenSorted[:0]
+func (z *Verzeichnisse) Reset(z1 *Verzeichnisse) {
+	z.ResetWithObjekte(nil)
 
-// 	if z1 != nil {
-// 		z.Transacted.Reset(&z1.Transacted)
+	if z1 == nil {
+		return
+	}
 
-// 		z.EtikettenExpandedSorted = append(
-// 			z.EtikettenExpandedSorted,
-// 			z1.EtikettenExpandedSorted...,
-// 		)
+	z.EtikettenExpandedSorted = append(
+		z.EtikettenExpandedSorted,
+		z1.EtikettenExpandedSorted...,
+	)
 
-// 		z.EtikettenSorted = append(
-// 			z.EtikettenSorted,
-// 			z1.EtikettenSorted...,
-// 		)
-// 	} else {
-// 		z.Transacted.Reset(nil)
-// 	}
-// }
-
-// func MakeWriterZettelTransacted(
-// 	wf collections.WriterFunc[*Transacted],
-// ) collections.WriterFunc[*Verzeichnisse] {
-// 	return func(z *Verzeichnisse) (err error) {
-// 		if err = wf(&z.Transacted); err != nil {
-// 			err = errors.Wrap(err)
-// 			return
-// 		}
-
-// 		return
-// 	}
-// }
+	z.EtikettenSorted = append(
+		z.EtikettenSorted,
+		z1.EtikettenSorted...,
+	)
+}
 
 type writerGobEncoder struct {
 	enc *gob.Encoder

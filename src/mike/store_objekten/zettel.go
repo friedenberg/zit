@@ -38,8 +38,8 @@ type zettelStore struct {
 		*zettel.Objekte,
 		hinweis.Hinweis,
 		*hinweis.Hinweis,
-		zettel.Verzeichnisse2,
-		*zettel.Verzeichnisse2,
+		zettel.Verzeichnisse,
+		*zettel.Verzeichnisse,
 	]
 
 	pool *collections.Pool[zettel.Transacted]
@@ -58,8 +58,8 @@ func makeZettelStore(
 			*zettel.Objekte,
 			hinweis.Hinweis,
 			*hinweis.Hinweis,
-			zettel.Verzeichnisse2,
-			*zettel.Verzeichnisse2,
+			zettel.Verzeichnisse,
+			*zettel.Verzeichnisse,
 		](
 			sa,
 			func(sh sha.Sha) (r sha.ReadCloser, err error) {

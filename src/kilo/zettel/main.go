@@ -20,6 +20,6 @@ type Transacted = objekte.Transacted[
 	*Objekte,
 	hinweis.Hinweis,
 	*hinweis.Hinweis,
-	Verzeichnisse2,
-	*Verzeichnisse2,
+	Verzeichnisse,
+	*Verzeichnisse,
 ]
