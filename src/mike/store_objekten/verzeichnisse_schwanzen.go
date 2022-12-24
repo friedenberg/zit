@@ -24,7 +24,7 @@ func makeVerzeichnisseSchwanzen(
 		common: sa,
 	}
 
-	for i, _ := range s.headers {
+	for i := range s.headers {
 		s.headers[i] = zettel.MakeWriterSchwanzen()
 	}
 
@@ -53,7 +53,7 @@ func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 	pool := s.Zettelen.Pool()
 
 	w := func(zv *zettel.Verzeichnisse) (err error) {
-		if !zv.Transacted.Sku.Kennung.Equals(&h) {
+		if !zv.Sku.Kennung.Equals(&h) {
 			pool.Put(zv)
 			return
 		}
@@ -82,7 +82,7 @@ func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 		return
 	}
 
-	tz = &found.Transacted
+	tz = found
 	tz.Objekte.Etiketten = tz.Objekte.Etiketten.Copy()
 
 	return

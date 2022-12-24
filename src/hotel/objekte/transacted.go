@@ -118,9 +118,11 @@ func (a *Transacted[T, T1, T2, T3, T4, T5]) Reset(
 	b *Transacted[T, T1, T2, T3, T4, T5],
 ) {
 	if b == nil {
+		T5(&a.Verzeichnisse).ResetWithObjekte(nil)
 		a.Sku.Reset(nil)
 		T1(&a.Objekte).Reset(nil)
 	} else {
+		T5(&a.Verzeichnisse).ResetWithObjekte(&b.Objekte)
 		a.Sku.Reset(&b.Sku)
 		T1(&a.Objekte).Reset(&b.Objekte)
 	}

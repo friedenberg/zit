@@ -165,13 +165,13 @@ func (s Store) RevertTransaktion(
 
 			for _, someTz := range chain {
 				errors.Log().Print(someTz)
-				if someTz.Transacted.Sku.Schwanz == o.Mutter[0] {
+				if someTz.Sku.Schwanz == o.Mutter[0] {
 					tz = someTz
 					break
 				}
 			}
 
-			if tz.Transacted.Sku.Sha.IsNull() {
+			if tz.Sku.Sha.IsNull() {
 				err = errors.Errorf("zettel not found in index!: %#v", o)
 				return
 			}
@@ -179,8 +179,8 @@ func (s Store) RevertTransaktion(
 			var tz1 *zettel.Transacted
 
 			if tz1, err = s.zettelStore.Update(
-				&tz.Transacted.Objekte,
-				&tz.Transacted.Sku.Kennung,
+				&tz.Objekte,
+				&tz.Sku.Kennung,
 			); err != nil {
 				err = errors.Wrap(err)
 				return

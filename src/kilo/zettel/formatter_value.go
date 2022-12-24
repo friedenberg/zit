@@ -42,13 +42,11 @@ func (fv *FormatterValue) FuncFormatterVerzeichnisse(
 	k konfig_compiled.Compiled,
 	logFunc collections.WriterFunc[*Transacted],
 ) collections.WriterFunc[*Verzeichnisse] {
-	return MakeWriterZettelTransacted(
-		fv.FuncFormatter(
-			out,
-			af,
-			k,
-			logFunc,
-		),
+	return fv.FuncFormatter(
+		out,
+		af,
+		k,
+		logFunc,
 	)
 }
 

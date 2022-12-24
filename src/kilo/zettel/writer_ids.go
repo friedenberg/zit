@@ -15,7 +15,7 @@ type WriterIds struct {
 }
 
 func (w WriterIds) WriteZettelVerzeichnisse(z *Verzeichnisse) (err error) {
-	z1 := zettelFilterable{Transacted: &z.Transacted}
+	z1 := zettelFilterable{Transacted: z}
 	return w.Filter.Include(z1)
 }
 

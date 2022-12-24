@@ -113,6 +113,7 @@ type Verzeichnisse[T any] interface {
 }
 
 type VerzeichnissePtr[T Element, T1 Objekte[T1]] interface {
+	ElementPtr[T]
 	Verzeichnisse[T]
 	ResetWithObjekte(*T1)
 }

@@ -71,7 +71,7 @@ func MakeCliFormatRecognized(
 
 						var n1 int64
 
-						if n1, err = znf(w, &zt.Transacted.Objekte); err != nil {
+						if n1, err = znf(w, &zt.Objekte); err != nil {
 							err = errors.Wrap(err)
 							return
 						}

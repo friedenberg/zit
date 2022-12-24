@@ -67,7 +67,7 @@ func (zp *Page) Add(z *zettel.Verzeichnisse) (err error) {
 
 	if err = zp.flushFilter(z); err != nil {
 		if errors.IsEOF(err) {
-			errors.Log().Printf("eliding %s", z.Transacted.Kennung())
+			errors.Log().Printf("eliding %s", z.Kennung())
 			err = nil
 		} else {
 			err = errors.Wrap(err)

@@ -99,7 +99,7 @@ func (c ExecAction) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 		collections.MakeChain(
 			query.WriteZettelVerzeichnisse,
 			func(z *zettel.Verzeichnisse) (err error) {
-				return hinweisen.Add(z.Transacted.Sku.Kennung)
+				return hinweisen.Add(z.Sku.Kennung)
 			},
 		),
 	); err != nil {

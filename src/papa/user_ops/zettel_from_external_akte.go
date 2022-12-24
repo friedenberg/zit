@@ -62,9 +62,7 @@ func (c ZettelFromExternalAkte) Run(
 
 		if err = c.StoreObjekten().Zettel().ReadAllVerzeichnisse(
 			collections.MakeChain(
-				zettel.MakeWriterZettelTransacted(
-					matcher.Match,
-				),
+				matcher.Match,
 				results.AddAndDoNotRepool,
 			),
 		); err != nil {
@@ -75,12 +73,12 @@ func (c ZettelFromExternalAkte) Run(
 
 	if err = results.Each(
 		func(z *zettel.Verzeichnisse) (err error) {
-			if c.ProtoZettel.Apply(&z.Transacted.Objekte) {
+			if c.ProtoZettel.Apply(&z.Objekte) {
 				var zt *zettel.Transacted
 
 				if zt, err = c.StoreObjekten().Zettel().Update(
-					&z.Transacted.Objekte,
-					&z.Transacted.Sku.Kennung,
+					&z.Objekte,
+					&z.Sku.Kennung,
 				); err != nil {
 					err = errors.Wrap(err)
 					return

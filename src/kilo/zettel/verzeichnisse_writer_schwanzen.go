@@ -88,8 +88,9 @@ func (zws *WriterSchwanzen) WriteZettelTransacted(
 }
 
 func (zws *WriterSchwanzen) WriteZettelVerzeichnisse(
-	z *Verzeichnisse) (err error) {
-	err = zws.WriteZettelTransacted(&z.Transacted)
+	z *Verzeichnisse,
+) (err error) {
+	err = zws.WriteZettelTransacted(z)
 
 	return
 }

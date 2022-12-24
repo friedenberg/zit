@@ -304,13 +304,13 @@ func (s *Store) ReadMany(
 			//TODO-P2 akte fd?
 			ze := zettel_external.Zettel{
 				ZettelFD: fd.FD{
-					Path: z.Transacted.Sku.Kennung.String(),
+					Path: z.Sku.Kennung.String(),
 				},
 			}
 
 			if err1 := s.readZettelFromFile(&ze); err1 == nil {
 				z1 := &zettel.Transacted{
-					Sku:     z.Transacted.Sku,
+					Sku:     z.Sku,
 					Objekte: ze.Objekte,
 				}
 

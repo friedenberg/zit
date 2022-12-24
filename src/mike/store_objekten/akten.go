@@ -55,7 +55,7 @@ func (s Store) AkteExists(sh sha.Sha) (err error) {
 
 	if err = s.zettelStore.verzeichnisseAll.ReadMany(
 		func(z *zettel.Verzeichnisse) (err error) {
-			if !z.Transacted.Objekte.Akte.Equals(sh) {
+			if !z.Objekte.Akte.Equals(sh) {
 				err = io.EOF
 				return
 			}

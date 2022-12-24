@@ -22,17 +22,17 @@ func MakeWriterComplete(w io.Writer) WriterComplete {
 
 	go func(s *WriterComplete) {
 		for z := range s.chTransacted {
-			if z.Transacted.Sku.Kennung.String() == "/" {
+			if z.Sku.Kennung.String() == "/" {
 				errors.Err().Printf("empty: %#v", z)
 				continue
 			}
 
 			//TODO-P4 handle write errors
-			s.wBuf.WriteString(z.Transacted.Sku.Kennung.String())
+			s.wBuf.WriteString(z.Sku.Kennung.String())
 			s.wBuf.WriteString("\tZettel: !")
-			s.wBuf.WriteString(z.Transacted.Objekte.Typ.String())
+			s.wBuf.WriteString(z.Objekte.Typ.String())
 			s.wBuf.WriteString(" ")
-			s.wBuf.WriteString(z.Transacted.Objekte.Bezeichnung.String())
+			s.wBuf.WriteString(z.Objekte.Bezeichnung.String())
 			s.wBuf.WriteString("\n")
 		}
 

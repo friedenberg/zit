@@ -41,7 +41,7 @@ func MakeZettelen(
 		pool:      p,
 	}
 
-	for n, _ := range i.pages {
+	for n := range i.pages {
 		i.pages[n] = makeZettelenPage(
 			f,
 			i.PageIdForIndex(n),
@@ -108,7 +108,7 @@ func (i *Zettelen) Add(tz *zettel.Transacted, v string) (err error) {
 	}
 
 	z := i.pool.Get()
-	z.ResetWithTransacted(tz)
+	z.Reset(tz)
 
 	if err = p.Add(z); err != nil {
 		err = errors.Wrap(err)

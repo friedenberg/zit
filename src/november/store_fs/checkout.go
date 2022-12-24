@@ -32,7 +32,7 @@ func (s *Store) Checkout(
 		func(zt *zettel.Verzeichnisse) (err error) {
 			var zc zettel_checked_out.Zettel
 
-			if zc, err = s.CheckoutOne(options, zt.Transacted); err != nil {
+			if zc, err = s.CheckoutOne(options, *zt); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

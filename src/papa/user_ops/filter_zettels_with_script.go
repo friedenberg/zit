@@ -64,7 +64,7 @@ func (op FilterZettelsWithScript) Run() (err error) {
 		op.Set.Each(
 			collections.MakeChain(
 				func(z *zettel.Verzeichnisse) (err error) {
-					ok := hinweisen.Contains(z.Transacted.Sku.Kennung)
+					ok := hinweisen.Contains(z.Sku.Kennung)
 
 					if ok {
 						err = io.EOF

@@ -210,7 +210,7 @@ func (c Show) showZettels(
 			collections.MakeChain(
 				filter,
 				func(o *zettel.Verzeichnisse) (err error) {
-					return hinweisen.Add(o.Transacted.Sku.Kennung)
+					return hinweisen.Add(o.Sku.Kennung)
 				},
 			),
 		); err != nil {
@@ -221,7 +221,7 @@ func (c Show) showZettels(
 		hContainer := hinweisen.WriterContainer(io.EOF)
 
 		filter = func(o *zettel.Verzeichnisse) (err error) {
-			return hContainer(o.Transacted.Sku.Kennung)
+			return hContainer(o.Sku.Kennung)
 		}
 	}
 

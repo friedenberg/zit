@@ -411,7 +411,7 @@ func (s zettelStore) AllInChain(h hinweis.Hinweis) (c []*zettel.Verzeichnisse, e
 
 	if err = s.verzeichnisseAll.ReadMany(
 		func(z *zettel.Verzeichnisse) (err error) {
-			if !z.Transacted.Sku.Kennung.Equals(&h) {
+			if !z.Sku.Kennung.Equals(&h) {
 				err = io.EOF
 				return
 			}
@@ -428,7 +428,7 @@ func (s zettelStore) AllInChain(h hinweis.Hinweis) (c []*zettel.Verzeichnisse, e
 
 	sort.Slice(
 		c,
-		func(i, j int) bool { return c[i].Transacted.Sku.Less(&c[j].Transacted.Sku) },
+		func(i, j int) bool { return c[i].Sku.Less(&c[j].Sku) },
 	)
 
 	return
