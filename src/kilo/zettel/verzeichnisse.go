@@ -14,12 +14,6 @@ type Verzeichnisse = Transacted
 
 type PoolVerzeichnisse = collections.Pool[Verzeichnisse]
 
-func MakeVerzeichnisse(z1 *Transacted) (z2 *Verzeichnisse) {
-	z2 = &Verzeichnisse{}
-	z2.Reset(z1)
-	return
-}
-
 // func (z *Verzeichnisse) ResetWithTransacted(z1 *Transacted) {
 // 	if z1 != nil {
 // 		z.Transacted.Reset(z1)

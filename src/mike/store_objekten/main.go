@@ -176,9 +176,7 @@ func (s Store) RevertTransaktion(
 				return
 			}
 
-			var tz1 *zettel.Transacted
-
-			if tz1, err = s.zettelStore.Update(
+			if tz, err = s.zettelStore.Update(
 				&tz.Objekte,
 				&tz.Sku.Kennung,
 			); err != nil {
@@ -186,7 +184,7 @@ func (s Store) RevertTransaktion(
 				return
 			}
 
-			tzs.Add(zettel.MakeVerzeichnisse(tz1))
+			tzs.Add(tz)
 
 			return
 		},

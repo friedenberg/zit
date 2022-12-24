@@ -490,6 +490,8 @@ func (s *zettelStore) transactedWithHead(
 		}
 	}
 
+	tz.GenerateVerzeichnisse()
+
 	return
 }
 

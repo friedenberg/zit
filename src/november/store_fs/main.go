@@ -309,16 +309,12 @@ func (s *Store) ReadMany(
 			}
 
 			if err1 := s.readZettelFromFile(&ze); err1 == nil {
-				z1 := &zettel.Transacted{
-					Sku:     z.Sku,
-					Objekte: ze.Objekte,
-				}
+				z.Objekte = ze.Objekte
+				z.Sku.Sha = ze.Sku.Sha //TODO-P1 determine what else in sku is needed
 
-				z1.Sku.Sha = ze.Sku.Sha
+				z.GenerateVerzeichnisse()
 
-				z2 := zettel.MakeVerzeichnisse(z1)
-
-				if err = w1(z2); err != nil {
+				if err = w1(z); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -399,10 +395,9 @@ func (s *Store) ReadManyHistory(
 					}
 
 					zt.Sku.Schwanz = s.sonnenaufgang
+					zt.GenerateVerzeichnisse()
 
-					zv := zettel.MakeVerzeichnisse(zt)
-
-					if err = w(zv); err != nil {
+					if err = w(zt); err != nil {
 						err = errors.Wrap(err)
 						return
 					}

@@ -74,17 +74,13 @@ func (c ZettelFromExternalAkte) Run(
 	if err = results.Each(
 		func(z *zettel.Transacted) (err error) {
 			if c.ProtoZettel.Apply(&z.Objekte) {
-				var zt *zettel.Transacted
-
-				if zt, err = c.StoreObjekten().Zettel().Update(
+				if z, err = c.StoreObjekten().Zettel().Update(
 					&z.Objekte,
 					&z.Sku.Kennung,
 				); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
-
-				z = zettel.MakeVerzeichnisse(zt)
 			}
 
 			return
@@ -117,7 +113,7 @@ func (c ZettelFromExternalAkte) Run(
 				}
 			}
 
-			results.Add(zettel.MakeVerzeichnisse(tz))
+			results.Add(tz)
 
 			return
 		},
