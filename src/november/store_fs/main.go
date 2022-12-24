@@ -316,9 +316,7 @@ func (s *Store) ReadMany(
 
 				z1.Sku.Sha = ze.Sku.Sha
 
-				z2 := &zettel.Verzeichnisse{}
-
-				z2.ResetWithTransacted(z1)
+				z2 := zettel.MakeVerzeichnisse(z1)
 
 				if err = w1(z2); err != nil {
 					err = errors.Wrap(err)
@@ -402,8 +400,7 @@ func (s *Store) ReadManyHistory(
 
 					zt.Sku.Schwanz = s.sonnenaufgang
 
-					zv := &zettel.Verzeichnisse{}
-					zv.ResetWithTransacted(zt)
+					zv := zettel.MakeVerzeichnisse(zt)
 
 					if err = w(zv); err != nil {
 						err = errors.Wrap(err)

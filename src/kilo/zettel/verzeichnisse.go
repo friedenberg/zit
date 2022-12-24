@@ -14,11 +14,7 @@ import (
 // TODO-P1 merge into Transacted
 type Verzeichnisse struct {
 	Transacted Transacted
-	// Etiketten               tridex.Tridex
-	EtikettenExpandedSorted []string
-	EtikettenSorted         []string
-	//TODO-P3 add
-	// Hidden bool
+	Verzeichnisse2
 }
 
 type PoolVerzeichnisse = collections.Pool[Verzeichnisse]
