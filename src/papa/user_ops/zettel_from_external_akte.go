@@ -72,7 +72,7 @@ func (c ZettelFromExternalAkte) Run(
 	}
 
 	if err = results.Each(
-		func(z *zettel.Verzeichnisse) (err error) {
+		func(z *zettel.Transacted) (err error) {
 			if c.ProtoZettel.Apply(&z.Objekte) {
 				var zt *zettel.Transacted
 

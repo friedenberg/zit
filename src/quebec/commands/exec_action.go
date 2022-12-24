@@ -98,7 +98,7 @@ func (c ExecAction) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	if err = u.StoreWorkingDirectory().ReadMany(
 		collections.MakeChain(
 			query.WriteZettelVerzeichnisse,
-			func(z *zettel.Verzeichnisse) (err error) {
+			func(z *zettel.Transacted) (err error) {
 				return hinweisen.Add(z.Sku.Kennung)
 			},
 		),

@@ -56,7 +56,7 @@ func MakeCliFormatRecognized(
 			format.MakeFormatString("]\n"),
 			func(w io.Writer) (n int64, err error) {
 				err = zr.Recognized.Each(
-					func(zt *zettel.Verzeichnisse) (err error) {
+					func(zt *zettel.Transacted) (err error) {
 						var n2 int
 
 						if n2, err = io.WriteString(

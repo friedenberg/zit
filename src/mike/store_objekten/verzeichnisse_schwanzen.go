@@ -49,10 +49,10 @@ func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 		return
 	}
 
-	var found *zettel.Verzeichnisse
+	var found *zettel.Transacted
 	pool := s.Zettelen.Pool()
 
-	w := func(zv *zettel.Verzeichnisse) (err error) {
+	w := func(zv *zettel.Transacted) (err error) {
 		if !zv.Sku.Kennung.Equals(&h) {
 			pool.Put(zv)
 			return
@@ -90,6 +90,6 @@ func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 
 func (s *verzeichnisseSchwanzen) ZettelVerzeichnisseWriter(
 	n int,
-) collections.WriterFunc[*zettel.Verzeichnisse] {
+) collections.WriterFunc[*zettel.Transacted] {
 	return s.headers[n].WriteZettelVerzeichnisse
 }

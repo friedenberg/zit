@@ -49,7 +49,7 @@ func Make(kCli konfig.Cli) (u *Umwelt, err error) {
 		in:                      os.Stdin,
 		out:                     os.Stdout,
 		err:                     os.Stderr,
-		zettelVerzeichnissePool: collections.MakePool[zettel.Verzeichnisse](),
+		zettelVerzeichnissePool: collections.MakePool[zettel.Transacted](),
 	}
 
 	if files.IsTty(u.in) {

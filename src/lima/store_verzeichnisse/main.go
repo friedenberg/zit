@@ -128,7 +128,7 @@ func (i *Zettelen) GetPageIndexKeyValue(
 
 func (i *Zettelen) ReadMany(
 	//TODO switch to single writer and force callers to make chains
-	ws ...collections.WriterFunc[*zettel.Verzeichnisse],
+	ws ...collections.WriterFunc[*zettel.Transacted],
 ) (err error) {
 	wg := &sync.WaitGroup{}
 	ch := make(chan struct{}, PageCount)
@@ -145,7 +145,7 @@ func (i *Zettelen) ReadMany(
 		}
 	}
 
-	w := collections.MakePooledChain[zettel.Verzeichnisse](
+	w := collections.MakePooledChain[zettel.Transacted](
 		i.pool,
 		ws...,
 	)

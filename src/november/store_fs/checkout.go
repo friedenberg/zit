@@ -12,7 +12,7 @@ import (
 
 func (s *Store) Checkout(
 	options CheckoutOptions,
-	ztw collections.WriterFunc[*zettel.Verzeichnisse],
+	ztw collections.WriterFunc[*zettel.Transacted],
 ) (zcs zettel_checked_out.MutableSet, err error) {
 	zcs = zettel_checked_out.MakeMutableSetUnique(0)
 	zts := zettel.MakeMutableSetUnique(0)
@@ -29,7 +29,7 @@ func (s *Store) Checkout(
 	}
 
 	if err = zts.Each(
-		func(zt *zettel.Verzeichnisse) (err error) {
+		func(zt *zettel.Transacted) (err error) {
 			var zc zettel_checked_out.Zettel
 
 			if zc, err = s.CheckoutOne(options, *zt); err != nil {

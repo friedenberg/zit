@@ -154,14 +154,14 @@ func (s Store) RevertTransaktion(
 
 			errors.Log().Print(o)
 
-			var chain []*zettel.Verzeichnisse
+			var chain []*zettel.Transacted
 
 			if chain, err = s.zettelStore.AllInChain(*h); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			var tz *zettel.Verzeichnisse
+			var tz *zettel.Transacted
 
 			for _, someTz := range chain {
 				errors.Log().Print(someTz)

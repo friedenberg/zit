@@ -31,7 +31,7 @@ func New(out io.Writer, ha hinweis.Abbr) (w *Writer, err error) {
 	return
 }
 
-func (w *Writer) WriteZettelVerzeichnisse(z *zettel.Verzeichnisse) (err error) {
+func (w *Writer) WriteZettelVerzeichnisse(z *zettel.Transacted) (err error) {
 	item := w.zettelToItem(z, w.Abbr)
 	w.alfredWriter.WriteItem(item)
 

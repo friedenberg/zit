@@ -76,7 +76,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			return
 		}
 	} else {
-		var zts collections.MutableSet[*zettel.Verzeichnisse]
+		var zts collections.MutableSet[*zettel.Transacted]
 
 		if zts, err = c.readExistingFilesAsZettels(u, f, args...); err != nil {
 			err = errors.Wrap(err)
@@ -112,7 +112,7 @@ func (c New) readExistingFilesAsZettels(
 	u *umwelt.Umwelt,
 	f zettel.ObjekteParser,
 	args ...string,
-) (zts collections.MutableSet[*zettel.Verzeichnisse], err error) {
+) (zts collections.MutableSet[*zettel.Transacted], err error) {
 	opCreateFromPath := user_ops.CreateFromPaths{
 		Umwelt:      u,
 		Format:      f,

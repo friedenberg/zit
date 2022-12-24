@@ -191,7 +191,7 @@ func (c Show) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 func (c Show) showZettels(
 	u *umwelt.Umwelt,
 	ids id_set.Set,
-	fv collections.WriterFunc[*zettel.Verzeichnisse],
+	fv collections.WriterFunc[*zettel.Transacted],
 ) (err error) {
 	filter := zettel.WriterIds{
 		Filter: id_set.Filter{
@@ -209,7 +209,7 @@ func (c Show) showZettels(
 		if err = u.StoreObjekten().Zettel().ReadAllSchwanzenVerzeichnisse(
 			collections.MakeChain(
 				filter,
-				func(o *zettel.Verzeichnisse) (err error) {
+				func(o *zettel.Transacted) (err error) {
 					return hinweisen.Add(o.Sku.Kennung)
 				},
 			),
@@ -220,7 +220,7 @@ func (c Show) showZettels(
 
 		hContainer := hinweisen.WriterContainer(io.EOF)
 
-		filter = func(o *zettel.Verzeichnisse) (err error) {
+		filter = func(o *zettel.Transacted) (err error) {
 			return hContainer(o.Sku.Kennung)
 		}
 	}

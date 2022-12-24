@@ -235,13 +235,13 @@ func (s zettelStore) ReadHinweisSchwanzen(
 }
 
 func (i *zettelStore) ReadAllSchwanzenVerzeichnisse(
-	w collections.WriterFunc[*zettel.Verzeichnisse],
+	w collections.WriterFunc[*zettel.Transacted],
 ) (err error) {
 	return i.verzeichnisseSchwanzen.ReadMany(w)
 }
 
 func (i *zettelStore) ReadAllVerzeichnisse(
-	w collections.WriterFunc[*zettel.Verzeichnisse],
+	w collections.WriterFunc[*zettel.Transacted],
 ) (err error) {
 	return i.verzeichnisseAll.ReadMany(w)
 }
@@ -406,11 +406,11 @@ func (s *zettelStore) Update(
 	return
 }
 
-func (s zettelStore) AllInChain(h hinweis.Hinweis) (c []*zettel.Verzeichnisse, err error) {
+func (s zettelStore) AllInChain(h hinweis.Hinweis) (c []*zettel.Transacted, err error) {
 	mst := zettel.MakeMutableSetUnique(0)
 
 	if err = s.verzeichnisseAll.ReadMany(
-		func(z *zettel.Verzeichnisse) (err error) {
+		func(z *zettel.Transacted) (err error) {
 			if !z.Sku.Kennung.Equals(&h) {
 				err = io.EOF
 				return

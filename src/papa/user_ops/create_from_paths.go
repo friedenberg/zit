@@ -28,7 +28,7 @@ type CreateFromPaths struct {
 
 func (c CreateFromPaths) Run(
 	args ...string,
-) (results collections.MutableSet[*zettel.Verzeichnisse], err error) {
+) (results collections.MutableSet[*zettel.Transacted], err error) {
 	//TODO support different modes of de-duplication
 	//TODO support merging of duplicated akten
 	toCreate := zettel_external.MakeMutableSetUniqueFD()
@@ -51,8 +51,8 @@ func (c CreateFromPaths) Run(
 		}
 	}
 
-	results = collections.MakeMutableSet[*zettel.Verzeichnisse](
-		func(zv *zettel.Verzeichnisse) string {
+	results = collections.MakeMutableSet[*zettel.Transacted](
+		func(zv *zettel.Transacted) string {
 			if zv == nil {
 				return ""
 			}
@@ -88,7 +88,7 @@ func (c CreateFromPaths) Run(
 	}
 
 	err = results.Each(
-		func(z *zettel.Verzeichnisse) (err error) {
+		func(z *zettel.Transacted) (err error) {
 			if c.ProtoZettel.Apply(&z.Objekte) {
 				var zt *zettel.Transacted
 
@@ -145,7 +145,7 @@ func (c CreateFromPaths) Run(
 			//TODO get matches
 			cz.DetermineState()
 
-			zv := &zettel.Verzeichnisse{}
+			zv := &zettel.Transacted{}
 
 			zv.Reset(&cz.Internal)
 

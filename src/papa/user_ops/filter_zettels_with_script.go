@@ -13,7 +13,7 @@ import (
 )
 
 type FilterZettelsWithScript struct {
-	Set    collections.MutableSetLike[*zettel.Verzeichnisse]
+	Set    collections.MutableSetLike[*zettel.Transacted]
 	Filter script_value.ScriptValue
 }
 
@@ -63,7 +63,7 @@ func (op FilterZettelsWithScript) Run() (err error) {
 		errors.Log().Printf("%#v", hinweisen)
 		op.Set.Each(
 			collections.MakeChain(
-				func(z *zettel.Verzeichnisse) (err error) {
+				func(z *zettel.Transacted) (err error) {
 					ok := hinweisen.Contains(z.Sku.Kennung)
 
 					if ok {

@@ -295,12 +295,12 @@ func (s *Store) ReadOne(h hinweis.Hinweis) (zt *zettel.Transacted, err error) {
 }
 
 func (s *Store) ReadMany(
-	w1 collections.WriterFunc[*zettel.Verzeichnisse],
+	w1 collections.WriterFunc[*zettel.Transacted],
 ) (err error) {
 	w := w1
 
 	if s.konfig.IncludeCwd {
-		w = func(z *zettel.Verzeichnisse) (err error) {
+		w = func(z *zettel.Transacted) (err error) {
 			//TODO-P2 akte fd?
 			ze := zettel_external.Zettel{
 				ZettelFD: fd.FD{
@@ -341,16 +341,16 @@ func (s *Store) ReadMany(
 }
 
 func (s *Store) ReadManyHistory(
-	w collections.WriterFunc[*zettel.Verzeichnisse],
+	w collections.WriterFunc[*zettel.Transacted],
 ) (err error) {
-	queries := []func(collections.WriterFunc[*zettel.Verzeichnisse]) error{
+	queries := []func(collections.WriterFunc[*zettel.Transacted]) error{
 		s.storeObjekten.Zettel().ReadAllVerzeichnisse,
 	}
 
 	if s.konfig.IncludeCwd {
 		queries = append(
 			queries,
-			func(w collections.WriterFunc[*zettel.Verzeichnisse]) (err error) {
+			func(w collections.WriterFunc[*zettel.Transacted]) (err error) {
 				var pz cwd_files.CwdFiles
 
 				if pz, err = cwd_files.MakeCwdFilesAll(s.konfig, s.Standort.Cwd()); err != nil {

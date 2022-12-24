@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 
-func (w *Writer) zettelToItem(z *zettel.Verzeichnisse, ha hinweis.Abbr) (a *alfred.Item) {
+func (w *Writer) zettelToItem(z *zettel.Transacted, ha hinweis.Abbr) (a *alfred.Item) {
 	a = w.alfredWriter.Get()
 
 	a.Title = z.Objekte.Bezeichnung.String()
