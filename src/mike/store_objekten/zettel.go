@@ -42,12 +42,12 @@ type zettelStore struct {
 		*zettel.Verzeichnisse2,
 	]
 
-	pool *zettel.PoolVerzeichnisse
+	pool *collections.Pool[zettel.Transacted]
 }
 
 func makeZettelStore(
 	sa *common,
-	p *zettel.PoolVerzeichnisse,
+	p *collections.Pool[zettel.Transacted],
 ) (s *zettelStore, err error) {
 	s = &zettelStore{
 		common:      sa,

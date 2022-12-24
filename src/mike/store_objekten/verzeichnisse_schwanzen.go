@@ -18,7 +18,7 @@ type verzeichnisseSchwanzen struct {
 
 func makeVerzeichnisseSchwanzen(
 	sa *common,
-	p *zettel.PoolVerzeichnisse,
+	p *collections.Pool[zettel.Transacted],
 ) (s *verzeichnisseSchwanzen, err error) {
 	s = &verzeichnisseSchwanzen{
 		common: sa,

@@ -41,7 +41,7 @@ type Umwelt struct {
 	age                   *age.Age
 	storeWorkingDirectory *store_fs.Store
 
-	zettelVerzeichnissePool *zettel.PoolVerzeichnisse
+	zettelVerzeichnissePool *collections.Pool[zettel.Transacted]
 }
 
 func Make(kCli konfig.Cli) (u *Umwelt, err error) {

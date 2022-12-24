@@ -17,7 +17,7 @@ const PageCount = 1 << (DigitWidth * 4)
 type Zettelen struct {
 	konfig konfig_compiled.Compiled
 	path   string
-	pool   *zettel.PoolVerzeichnisse
+	pool   *collections.Pool[zettel.Transacted]
 	ioFactory
 	pages [PageCount]*Page
 }
@@ -31,7 +31,7 @@ func MakeZettelen(
 	k konfig_compiled.Compiled,
 	dir string,
 	f ioFactory,
-	p *zettel.PoolVerzeichnisse,
+	p *collections.Pool[zettel.Transacted],
 	fff ZettelVerzeichnisseWriterGetter,
 ) (i *Zettelen, err error) {
 	i = &Zettelen{
@@ -53,7 +53,7 @@ func MakeZettelen(
 	return
 }
 
-func (i Zettelen) Pool() *zettel.PoolVerzeichnisse {
+func (i Zettelen) Pool() *collections.Pool[zettel.Transacted] {
 	return i.pool
 }
 

@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/echo/standort"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
@@ -39,7 +40,7 @@ func Make(
 	a age.Age,
 	k *konfig_compiled.Compiled,
 	st standort.Standort,
-	p *zettel.PoolVerzeichnisse,
+	p *collections.Pool[zettel.Transacted],
 ) (s *Store, err error) {
 	s = &Store{
 		common: common{

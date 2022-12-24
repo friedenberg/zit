@@ -9,8 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
 )
 
-// TODO-P1 merge into Transacted
-type PoolVerzeichnisse = collections.Pool[Transacted]
+// type PoolVerzeichnisse = collections.Pool[Transacted]
 
 // func (z *Verzeichnisse) ResetWithTransacted(z1 *Transacted) {
 // 	if z1 != nil {
