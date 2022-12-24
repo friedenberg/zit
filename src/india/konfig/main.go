@@ -7,7 +7,14 @@ import (
 	"github.com/friedenberg/zit/src/hotel/objekte"
 )
 
-type Transacted = objekte.Transacted[Objekte, *Objekte, kennung.Konfig, *kennung.Konfig]
+type Transacted = objekte.Transacted[
+	Objekte,
+	*Objekte,
+	kennung.Konfig,
+	*kennung.Konfig,
+	objekte.NilVerzeichnisse[Objekte],
+	*objekte.NilVerzeichnisse[Objekte],
+]
 
 type Objekte struct {
 	Sha  sha.Sha

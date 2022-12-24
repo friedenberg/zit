@@ -28,6 +28,8 @@ type konfigStore struct {
 		*konfig.Objekte,
 		kennung.Konfig,
 		*kennung.Konfig,
+		objekte.NilVerzeichnisse[konfig.Objekte],
+		*objekte.NilVerzeichnisse[konfig.Objekte],
 	]
 
 	objekte.AkteTextSaver[
@@ -54,6 +56,8 @@ func makeKonfigStore(
 			*konfig.Objekte,
 			kennung.Konfig,
 			*kennung.Konfig,
+			objekte.NilVerzeichnisse[konfig.Objekte],
+			*objekte.NilVerzeichnisse[konfig.Objekte],
 		](
 			sa,
 			func(sh sha.Sha) (r sha.ReadCloser, err error) {

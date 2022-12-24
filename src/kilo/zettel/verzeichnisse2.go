@@ -13,9 +13,11 @@ type Verzeichnisse2 struct {
 
 func (z *Verzeichnisse2) ResetWithObjekte(z1 *Objekte) {
 	if z1 != nil {
+		z.wasPopulated = true
 		z.EtikettenExpandedSorted = kennung.Expanded(z1.Etiketten).SortedString()
 		z.EtikettenSorted = z1.Etiketten.SortedString()
 	} else {
+		z.wasPopulated = false
 		z.EtikettenExpandedSorted = []string{}
 		z.EtikettenSorted = []string{}
 	}

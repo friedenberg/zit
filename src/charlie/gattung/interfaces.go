@@ -69,8 +69,8 @@ type IdentifierPtr[T ValueElement] interface {
 
 type Objekte[T any] interface {
 	Gattung() Gattung
-	AkteSha() sha.Sha
 	Equatable[T]
+	AkteSha() sha.Sha
 }
 
 type ObjektePtr[T Element] interface {
@@ -100,6 +100,21 @@ type StoredPtr interface {
 	Stored
 	SetAkteSha(sha.Sha)
 	SetObjekteSha(AkteReaderFactory, string) error
+}
+
+//  __     __                _      _           _
+//  \ \   / /__ _ __ _______(_) ___| |__  _ __ (_)___ ___  ___
+//   \ \ / / _ \ '__|_  / _ \ |/ __| '_ \| '_ \| / __/ __|/ _ \
+//    \ V /  __/ |   / /  __/ | (__| | | | | | | \__ \__ \  __/
+//     \_/ \___|_|  /___\___|_|\___|_| |_|_| |_|_|___/___/\___|
+//
+
+type Verzeichnisse[T any] interface {
+}
+
+type VerzeichnissePtr[T Element, T1 Objekte[T1]] interface {
+	Verzeichnisse[T]
+	ResetWithObjekte(*T1)
 }
 
 //   _____                               _           _

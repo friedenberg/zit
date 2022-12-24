@@ -28,6 +28,8 @@ type typStore struct {
 		*typ.Objekte,
 		kennung.Typ,
 		*kennung.Typ,
+		objekte.NilVerzeichnisse[typ.Objekte],
+		*objekte.NilVerzeichnisse[typ.Objekte],
 	]
 
 	objekte.AkteTextSaver[
@@ -54,6 +56,8 @@ func makeTypStore(
 			*typ.Objekte,
 			kennung.Typ,
 			*kennung.Typ,
+			objekte.NilVerzeichnisse[typ.Objekte],
+			*objekte.NilVerzeichnisse[typ.Objekte],
 		](
 			sa,
 			func(sh sha.Sha) (r sha.ReadCloser, err error) {

@@ -39,12 +39,12 @@ func (c DeleteCheckout) Run(
 				return
 			}
 
-			//TODO add a safety check?
+			//TODO-P1 add a safety check?
 			if !internal.Objekte.Equals(&external.Objekte) {
-				//TODO move to printer
+				//TODO-P2 move to printer
 				errors.Out().Printf("[%s] (checkout different!)", external.Sku.Kennung)
-				errors.Out().Printf("Internal %s", internal.Objekte)
-				errors.Out().Printf("External %s", external.Objekte)
+				errors.Out().Printf("Internal %v", internal.Objekte)
+				errors.Out().Printf("External %v", external.Objekte)
 				return
 			}
 

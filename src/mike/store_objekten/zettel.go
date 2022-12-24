@@ -38,6 +38,8 @@ type zettelStore struct {
 		*zettel.Objekte,
 		hinweis.Hinweis,
 		*hinweis.Hinweis,
+		zettel.Verzeichnisse2,
+		*zettel.Verzeichnisse2,
 	]
 
 	pool *zettel.PoolVerzeichnisse
@@ -56,6 +58,8 @@ func makeZettelStore(
 			*zettel.Objekte,
 			hinweis.Hinweis,
 			*hinweis.Hinweis,
+			zettel.Verzeichnisse2,
+			*zettel.Verzeichnisse2,
 		](
 			sa,
 			func(sh sha.Sha) (r sha.ReadCloser, err error) {
@@ -322,62 +326,6 @@ func (s *zettelStore) Create(
 	}
 
 	//TODO-P2 assert no changes
-	if err = s.zettelTransactedWriter.New(tz); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (s *zettelStore) CreateWithHinweis(
-	in zettel.Objekte,
-	h hinweis.Hinweis,
-) (tz *zettel.Transacted, err error) {
-	if !s.common.LockSmith.IsAcquired() {
-		err = ErrLockRequired{
-			Operation: "create with hinweis",
-		}
-
-		return
-	}
-
-	if in.IsEmpty() {
-		err = errors.Normalf("zettel is empty")
-		return
-	}
-
-	if err = in.ApplyKonfig(s.common.Konfig()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	var shaObj sha.Sha
-
-	if shaObj, err = s.WriteZettelObjekte(in); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if tz, err = s.addZettelToTransaktion(
-		&in,
-		&shaObj,
-		&h,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.writeNamedZettelToIndex(tz); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.indexEtiketten.add(tz.Objekte.Etiketten); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	if err = s.zettelTransactedWriter.New(tz); err != nil {
 		err = errors.Wrap(err)
 		return

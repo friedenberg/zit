@@ -12,6 +12,8 @@ type Transacted = objekte.Transacted[
 	*Objekte,
 	kennung.Etikett,
 	*kennung.Etikett,
+	objekte.NilVerzeichnisse[Objekte],
+	*objekte.NilVerzeichnisse[Objekte],
 ]
 
 type Objekte struct {

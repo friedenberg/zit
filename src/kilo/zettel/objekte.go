@@ -10,10 +10,11 @@ import (
 )
 
 type Objekte struct {
-	Akte        sha.Sha
-	Typ         kennung.Typ
-	Bezeichnung bezeichnung.Bezeichnung
-	Etiketten   kennung.EtikettSet
+	Akte          sha.Sha
+	Typ           kennung.Typ
+	Bezeichnung   bezeichnung.Bezeichnung
+	Etiketten     kennung.EtikettSet
+	Verzeichnisse Verzeichnisse2
 }
 
 func (z Objekte) Gattung() gattung.Gattung {

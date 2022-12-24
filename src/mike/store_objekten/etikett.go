@@ -28,6 +28,8 @@ type etikettStore struct {
 		*etikett.Objekte,
 		kennung.Etikett,
 		*kennung.Etikett,
+		objekte.NilVerzeichnisse[etikett.Objekte],
+		*objekte.NilVerzeichnisse[etikett.Objekte],
 	]
 
 	objekte.AkteTextSaver[
@@ -54,6 +56,8 @@ func makeEtikettStore(
 			*etikett.Objekte,
 			kennung.Etikett,
 			*kennung.Etikett,
+			objekte.NilVerzeichnisse[etikett.Objekte],
+			*objekte.NilVerzeichnisse[etikett.Objekte],
 		](
 			sa,
 			func(sh sha.Sha) (r sha.ReadCloser, err error) {

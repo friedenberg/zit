@@ -13,8 +13,10 @@ type TransactedInflator[
 	T1 gattung.ObjektePtr[T],
 	T2 gattung.Identifier[T2],
 	T3 gattung.IdentifierPtr[T2],
+	T4 gattung.Verzeichnisse[T],
+	T5 gattung.VerzeichnissePtr[T4, T],
 ] interface {
-	Inflate(*transaktion.Transaktion, *sku.Sku) (*Transacted[T, T1, T2, T3], error)
+	Inflate(*transaktion.Transaktion, *sku.Sku) (*Transacted[T, T1, T2, T3, T4, T5], error)
 }
 
 type transactedInflator[
@@ -22,6 +24,8 @@ type transactedInflator[
 	T1 gattung.ObjektePtr[T],
 	T2 gattung.Identifier[T2],
 	T3 gattung.IdentifierPtr[T2],
+	T4 gattung.Verzeichnisse[T],
+	T5 gattung.VerzeichnissePtr[T4, T],
 ] struct {
 	arf           gattung.AkteReaderFactory
 	frc           gattung.FuncReadCloser
@@ -34,17 +38,19 @@ func MakeTransactedInflator[
 	T1 gattung.ObjektePtr[T],
 	T2 gattung.Identifier[T2],
 	T3 gattung.IdentifierPtr[T2],
+	T4 gattung.Verzeichnisse[T],
+	T5 gattung.VerzeichnissePtr[T4, T],
 ](
 	arf gattung.AkteReaderFactory,
 	frc gattung.FuncReadCloser,
 	objekteParser gattung.Parser[T, T1],
 	akteParser gattung.Parser[T, T1],
-) *transactedInflator[T, T1, T2, T3] {
+) *transactedInflator[T, T1, T2, T3, T4, T5] {
 	if objekteParser == nil {
 		objekteParser = MakeFormat[T, T1]()
 	}
 
-	return &transactedInflator[T, T1, T2, T3]{
+	return &transactedInflator[T, T1, T2, T3, T4, T5]{
 		arf:           arf,
 		frc:           frc,
 		objekteParser: objekteParser,
@@ -52,11 +58,11 @@ func MakeTransactedInflator[
 	}
 }
 
-func (h *transactedInflator[T, T1, T2, T3]) Inflate(
+func (h *transactedInflator[T, T1, T2, T3, T4, T5]) Inflate(
 	tr *transaktion.Transaktion,
 	o *sku.Sku,
-) (t *Transacted[T, T1, T2, T3], err error) {
-	t = new(Transacted[T, T1, T2, T3])
+) (t *Transacted[T, T1, T2, T3, T4, T5], err error) {
+	t = new(Transacted[T, T1, T2, T3, T4, T5])
 
 	if err = t.SetTransactionAndObjekte(
 		tr,

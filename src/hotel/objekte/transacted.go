@@ -13,12 +13,15 @@ type Transacted[
 	T1 gattung.ObjektePtr[T],
 	T2 gattung.Identifier[T2],
 	T3 gattung.IdentifierPtr[T2],
+	T4 gattung.Verzeichnisse[T],
+	T5 gattung.VerzeichnissePtr[T4, T],
 ] struct {
-	Objekte T
-	Sku     sku.Transacted[T2, T3]
+	Objekte       T
+	Verzeichnisse T4
+	Sku           sku.Transacted[T2, T3]
 }
 
-func (t Transacted[T, T1, T2, T3]) Stored() *Stored[T, T1, T2, T3] {
+func (t Transacted[T, T1, T2, T3, T4, T5]) Stored() *Stored[T, T1, T2, T3] {
 	return &Stored[T, T1, T2, T3]{
 		Objekte: t.Objekte,
 		Sku: sku.External[T2, T3]{
@@ -28,25 +31,25 @@ func (t Transacted[T, T1, T2, T3]) Stored() *Stored[T, T1, T2, T3] {
 	}
 }
 
-func (t Transacted[T, T1, T2, T3]) Kennung() T3 {
+func (t Transacted[T, T1, T2, T3, T4, T5]) Kennung() T3 {
 	return &t.Sku.Kennung
 }
 
-func (t Transacted[T, T1, T2, T3]) AkteSha() sha.Sha {
+func (t Transacted[T, T1, T2, T3, T4, T5]) AkteSha() sha.Sha {
 	return t.Objekte.AkteSha()
 }
 
-func (t *Transacted[T, T1, T2, T3]) SetAkteSha(
+func (t *Transacted[T, T1, T2, T3, T4, T5]) SetAkteSha(
 	s sha.Sha,
 ) {
 	T1(&t.Objekte).SetAkteSha(s)
 }
 
-func (t Transacted[T, T1, T2, T3]) ObjekteSha() sha.Sha {
+func (t Transacted[T, T1, T2, T3, T4, T5]) ObjekteSha() sha.Sha {
 	return t.Sku.Sha
 }
 
-func (t *Transacted[T, T1, T2, T3]) SetObjekteSha(
+func (t *Transacted[T, T1, T2, T3, T4, T5]) SetObjekteSha(
 	arf gattung.AkteReaderFactory,
 	v string,
 ) (err error) {
@@ -60,16 +63,16 @@ func (t *Transacted[T, T1, T2, T3]) SetObjekteSha(
 	return
 }
 
-func (t Transacted[T, T1, T2, T3]) Gattung() gattung.Gattung {
+func (t Transacted[T, T1, T2, T3, T4, T5]) Gattung() gattung.Gattung {
 	return t.Sku.Kennung.Gattung()
 }
 
-func (zt Transacted[T, T1, T2, T3]) IsNew() bool {
+func (zt Transacted[T, T1, T2, T3, T4, T5]) IsNew() bool {
 	return zt.Sku.Kopf == zt.Sku.Schwanz && zt.Sku.TransactionIndex == 0
 }
 
-func (a Transacted[T, T1, T2, T3]) Equals(
-	b *Transacted[T, T1, T2, T3],
+func (a Transacted[T, T1, T2, T3, T4, T5]) Equals(
+	b *Transacted[T, T1, T2, T3, T4, T5],
 ) bool {
 	if b == nil {
 		return false
@@ -86,7 +89,7 @@ func (a Transacted[T, T1, T2, T3]) Equals(
 	return true
 }
 
-func (a *Transacted[T, T1, T2, T3]) SetTransactionAndObjekte(
+func (a *Transacted[T, T1, T2, T3, T4, T5]) SetTransactionAndObjekte(
 	t *transaktion.Transaktion,
 	o *sku.Sku,
 ) (err error) {
@@ -107,12 +110,12 @@ func (a *Transacted[T, T1, T2, T3]) SetTransactionAndObjekte(
 	return
 }
 
-func (a Transacted[T, T1, T2, T3]) GetKennungString() string {
+func (a Transacted[T, T1, T2, T3, T4, T5]) GetKennungString() string {
 	return a.Sku.Kennung.String()
 }
 
-func (a *Transacted[T, T1, T2, T3]) Reset(
-	b *Transacted[T, T1, T2, T3],
+func (a *Transacted[T, T1, T2, T3, T4, T5]) Reset(
+	b *Transacted[T, T1, T2, T3, T4, T5],
 ) {
 	if b == nil {
 		a.Sku.Reset(nil)
