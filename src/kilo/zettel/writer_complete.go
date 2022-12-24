@@ -9,13 +9,13 @@ import (
 
 type WriterComplete struct {
 	wBuf         *bufio.Writer
-	chTransacted chan Verzeichnisse
+	chTransacted chan Transacted
 	chDone       chan struct{}
 }
 
 func MakeWriterComplete(w io.Writer) WriterComplete {
 	w1 := WriterComplete{
-		chTransacted: make(chan Verzeichnisse),
+		chTransacted: make(chan Transacted),
 		chDone:       make(chan struct{}),
 		wBuf:         bufio.NewWriter(w),
 	}
@@ -42,7 +42,7 @@ func MakeWriterComplete(w io.Writer) WriterComplete {
 	return w1
 }
 
-func (w *WriterComplete) WriteZettelVerzeichnisse(z *Verzeichnisse) (err error) {
+func (w *WriterComplete) WriteZettelVerzeichnisse(z *Transacted) (err error) {
 	select {
 	case <-w.chDone:
 		err = io.EOF

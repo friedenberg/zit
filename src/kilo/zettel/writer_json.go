@@ -17,7 +17,7 @@ func MakeWriterJson(w io.Writer) (w1 WriterJson) {
 	}
 }
 
-func (w WriterJson) WriteZettelVerzeichnisse(z *Verzeichnisse) (err error) {
+func (w WriterJson) WriteZettelVerzeichnisse(z *Transacted) (err error) {
 	errors.Log().Printf("writing zettel: %v", z)
 	if err = w.enc.Encode(z); err != nil {
 		err = errors.Wrap(err)

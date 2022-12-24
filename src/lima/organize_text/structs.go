@@ -25,7 +25,7 @@ type zettel struct {
 }
 
 func makeZettel(
-	named *zettel_pkg.Verzeichnisse,
+	named *zettel_pkg.Transacted,
 	ha hinweis.Abbr,
 ) (z zettel, err error) {
 	h := *named.Kennung()

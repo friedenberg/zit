@@ -46,7 +46,7 @@ func (atc AssignmentTreeConstructor) makeChildren(
 ) (err error) {
 	if groupingEtiketten.Len() == 0 {
 		err = prefixSet.EachZettel(
-			func(e kennung.Etikett, tz zettel_pkg.Verzeichnisse) (err error) {
+			func(e kennung.Etikett, tz zettel_pkg.Transacted) (err error) {
 				var z zettel
 
 				if z, err = makeZettel(&tz, atc.Abbr); err != nil {
@@ -71,7 +71,7 @@ func (atc AssignmentTreeConstructor) makeChildren(
 	segments := prefixSet.Subset(groupingEtiketten[0])
 
 	err = segments.Ungrouped.Each(
-		func(tz *zettel_pkg.Verzeichnisse) (err error) {
+		func(tz *zettel_pkg.Transacted) (err error) {
 			var z zettel
 
 			if z, err = makeZettel(tz, atc.Abbr); err != nil {

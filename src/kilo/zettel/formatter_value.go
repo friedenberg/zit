@@ -41,7 +41,7 @@ func (fv *FormatterValue) FuncFormatterVerzeichnisse(
 	af gattung.AkteIOFactory,
 	k konfig_compiled.Compiled,
 	logFunc collections.WriterFunc[*Transacted],
-) collections.WriterFunc[*Verzeichnisse] {
+) collections.WriterFunc[*Transacted] {
 	return fv.FuncFormatter(
 		out,
 		af,

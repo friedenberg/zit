@@ -6,13 +6,13 @@ import (
 )
 
 type MutableSet struct {
-	collections.MutableSet[*Verzeichnisse]
+	collections.MutableSet[*Transacted]
 }
 
 func MakeMutableSetUnique(c int) MutableSet {
 	return MutableSet{
 		MutableSet: collections.MakeMutableSet(
-			func(sz *Verzeichnisse) string {
+			func(sz *Transacted) string {
 				if sz == nil {
 					return ""
 				}
@@ -34,7 +34,7 @@ func MakeMutableSetUnique(c int) MutableSet {
 func MakeMutableSetHinweis(c int) MutableSet {
 	return MutableSet{
 		MutableSet: collections.MakeMutableSet(
-			func(sz *Verzeichnisse) string {
+			func(sz *Transacted) string {
 				if sz == nil {
 					return ""
 				}
@@ -67,7 +67,7 @@ func (s MutableSet) ToSetPrefixVerzeichnisse() (b SetPrefixVerzeichnisse) {
 	b = MakeSetPrefixVerzeichnisse(s.Len())
 
 	s.Each(
-		func(z *Verzeichnisse) (err error) {
+		func(z *Transacted) (err error) {
 			b.Add(*z)
 
 			return
@@ -81,7 +81,7 @@ func (s MutableSet) ToSliceHinweisen() (b []hinweis.Hinweis) {
 	b = make([]hinweis.Hinweis, 0, s.Len())
 
 	s.Each(
-		func(z *Verzeichnisse) (err error) {
+		func(z *Transacted) (err error) {
 			b = append(b, z.Sku.Kennung)
 
 			return

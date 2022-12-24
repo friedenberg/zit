@@ -10,9 +10,7 @@ import (
 )
 
 // TODO-P1 merge into Transacted
-type Verzeichnisse = Transacted
-
-type PoolVerzeichnisse = collections.Pool[Verzeichnisse]
+type PoolVerzeichnisse = collections.Pool[Transacted]
 
 // func (z *Verzeichnisse) ResetWithTransacted(z1 *Transacted) {
 // 	if z1 != nil {
@@ -70,19 +68,19 @@ func MakeWriterGobEncoder(w io.Writer) writerGobEncoder {
 	}
 }
 
-func (w writerGobEncoder) WriteZettelVerzeichnisse(z *Verzeichnisse) (err error) {
+func (w writerGobEncoder) WriteZettelVerzeichnisse(z *Transacted) (err error) {
 	return w.enc.Encode(z)
 }
 
 // TODO-P3 add efficient parsing of hiding tags
 func MakeWriterKonfig(
 	k konfig_compiled.Compiled,
-) collections.WriterFunc[*Verzeichnisse] {
+) collections.WriterFunc[*Transacted] {
 	if k.IncludeHidden {
-		return collections.MakeWriterNoop[*Verzeichnisse]()
+		return collections.MakeWriterNoop[*Transacted]()
 	}
 
-	return func(z *Verzeichnisse) (err error) {
+	return func(z *Transacted) (err error) {
 		for _, p := range z.Verzeichnisse.EtikettenSorted {
 			for _, t := range k.EtikettenHidden {
 				if strings.HasPrefix(p, t) {
