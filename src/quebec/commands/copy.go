@@ -42,7 +42,7 @@ func (c Copy) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 }
 
 func (c Copy) RunWithIds(s *umwelt.Umwelt, ids id_set.Set) (err error) {
-	hins := ids.Hinweisen()
+	hins := ids.Hinweisen.Copy()
 
 	zettels := make([]*zettel.Transacted, hins.Len())
 

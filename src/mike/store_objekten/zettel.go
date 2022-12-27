@@ -190,6 +190,8 @@ func (s zettelStore) WriteZettelObjekte(z zettel.Objekte) (sh sha.Sha, err error
 func (s *zettelStore) writeNamedZettelToIndex(
 	tz *zettel.Transacted,
 ) (err error) {
+  errors.Log().Print("writing to index")
+
 	if !s.common.LockSmith.IsAcquired() {
 		err = ErrLockRequired{
 			Operation: "write named zettel to index",
@@ -491,6 +493,43 @@ func (s *zettelStore) transactedWithHead(
 	}
 
 	tz.GenerateVerzeichnisse()
+
+	return
+}
+
+func (s *zettelStore) Inherit(tz *zettel.Transacted) (err error) {
+	// var mutter *zettel.Transacted
+
+	// if mutter1, err := s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(
+	// 	tz.Sku.Kennung,
+	// ); err == nil {
+	// 	mutter = mutter1
+	// }
+
+	if err = s.writeNamedZettelToIndex(tz); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	// if mutter == nil {
+	if err = s.zettelTransactedWriter.New(tz); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+	// } else {
+	// 	if err = s.zettelTransactedWriter.Updated(tz); err != nil {
+	// 		err = errors.Wrap(err)
+	// 		return
+	// 	}
+	// }
+
+	// if err = s.indexEtiketten.addZettelWithOptionalMutter(
+	// 	tz,
+	// 	nil,
+	// ); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
 
 	return
 }

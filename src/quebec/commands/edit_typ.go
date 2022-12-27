@@ -48,7 +48,7 @@ func (c EditTyp) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 }
 
 func (c EditTyp) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
-	tks := ids.Typen()
+	tks := ids.Typen.Copy()
 
 	switch {
 	case tks.Len() == 0 && !c.All:

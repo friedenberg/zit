@@ -25,13 +25,15 @@ type Filter struct {
 func (f Filter) Include(e Element) (err error) {
 	ok := false
 
-	needsEt := f.Set.Etiketten().Len() > 0
+	//TODO-P3 pull into static
+	needsEt := f.Set.Etiketten.Len() > 0
 	okEt := false
 
 	expanded := kennung.Expanded(e.AkteEtiketten(), kennung.ExpanderRight)
 
 LOOP:
-	for _, e := range f.Set.Etiketten().Sorted() {
+	//TODO-P3 pull into static
+	for _, e := range f.Set.Etiketten.Copy().Sorted() {
 		okEt = expanded.Contains(e)
 
 		switch {
@@ -46,7 +48,8 @@ LOOP:
 		}
 	}
 
-	shas := f.Set.Shas()
+	//TODO-P2 make static
+	shas := f.Set.Shas.Copy()
 	needsSha := shas.Len() > 0
 	okSha := false
 
@@ -58,7 +61,7 @@ LOOP:
 		okSha = true
 	}
 
-	ty := f.Set.Typen()
+	ty := f.Set.Typen.Copy()
 	needsTyp := ty.Len() > 0
 	okTyp := false
 
@@ -72,7 +75,7 @@ LOOP:
 		},
 	)
 
-	hinweisen := f.Set.Hinweisen()
+	hinweisen := f.Set.Hinweisen.Copy()
 	needsHin := hinweisen.Len() > 0
 	okHin := false || hinweisen.Len() == 0
 

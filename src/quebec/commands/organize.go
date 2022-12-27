@@ -128,9 +128,9 @@ func (c *Organize) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 		Options: c.Options,
 	}
 
-	createOrganizeFileOp.RootEtiketten = ids.Etiketten()
+	createOrganizeFileOp.RootEtiketten = ids.Etiketten.Copy()
 
-	typen := ids.Typen()
+	typen := ids.Typen.Copy()
 
 	switch typen.Len() {
 	case 0:

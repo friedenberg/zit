@@ -47,7 +47,7 @@ func (c OpenAkte) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 }
 
 func (c OpenAkte) RunWithIds(store *umwelt.Umwelt, is id_set.Set) (err error) {
-	hins := is.Hinweisen()
+	hins := is.Hinweisen.Copy()
 	paths := make([]string, hins.Len())
 
 	dir, err := ioutil.TempDir("", "")

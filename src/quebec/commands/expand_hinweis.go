@@ -40,7 +40,7 @@ func (c ExpandHinweis) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 }
 
 func (c ExpandHinweis) RunWithIds(s *umwelt.Umwelt, ids id_set.Set) (err error) {
-	hins := ids.Hinweisen()
+	hins := ids.Hinweisen.Copy()
 
 	for _, h := range hins.Elements() {
 		errors.Out().Print(h)

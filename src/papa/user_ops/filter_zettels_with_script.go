@@ -110,7 +110,7 @@ func (op FilterZettelsWithScript) runGetHinweisen(
 			return
 		}
 
-		doneBoth <- irl.Set.Hinweisen()
+		doneBoth <- irl.Set.Hinweisen.Copy()
 	}()
 
 	return

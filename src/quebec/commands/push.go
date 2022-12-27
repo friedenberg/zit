@@ -2,109 +2,96 @@ package commands
 
 import (
 	"flag"
-	"os"
-	"os/exec"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/india/konfig"
+	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/echo/sha"
+	"github.com/friedenberg/zit/src/foxtrot/hinweis"
+	"github.com/friedenberg/zit/src/foxtrot/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/ts"
+	"github.com/friedenberg/zit/src/golf/id_set"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
 
 type Push struct {
+	gattung.Gattung
+	All bool
 }
 
 func init() {
 	registerCommand(
 		"push",
 		func(f *flag.FlagSet) Command {
-			c := &Push{}
+			c := &Push{
+				Gattung: gattung.Zettel,
+			}
 
-			return c
+			f.Var(&c.Gattung, "gattung", "Gattung")
+			f.BoolVar(&c.All, "all", false, "pull all Objekten")
+
+			cwi := commandWithIds{
+				CommandWithIds: c,
+			}
+
+			return CommandV2{
+				Command:        cwi,
+				WithCompletion: cwi,
+			}
 		},
 	)
 }
 
-func (c Push) Run(u *umwelt.Umwelt, args ...string) (err error) {
-	if len(args) == 0 {
-		err = errors.Normalf("no remote specified")
-		return
-	}
+func (c Push) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
+	switch c.Gattung {
 
-	var remote konfig.RemoteScript
+	default:
+		is = id_set.MakeProtoIdSet(
+			id_set.ProtoId{
+				MutableId: &sha.Sha{},
+			},
+			id_set.ProtoId{
+				MutableId: &hinweis.Hinweis{},
+				Expand: func(v string) (out string, err error) {
+					var h hinweis.Hinweis
+					h, err = u.StoreObjekten().Abbr().ExpandHinweisString(v)
+					out = h.String()
+					return
+				},
+			},
+			id_set.ProtoId{
+				MutableId: &kennung.Etikett{},
+				Expand: func(v string) (out string, err error) {
+					var e kennung.Etikett
+					e, err = u.StoreObjekten().Abbr().ExpandEtikettString(v)
+					out = e.String()
+					return
+				},
+			},
+			id_set.ProtoId{
+				MutableId: &kennung.Typ{},
+			},
+			id_set.ProtoId{
+				MutableId: &ts.Time{},
+			},
+		)
 
-	if remote, err = c.remoteScriptFromArg(u, args[0]); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	case gattung.Typ:
+		is = id_set.MakeProtoIdSet(
+			id_set.ProtoId{
+				MutableId: &kennung.Typ{},
+			},
+		)
 
-	if len(args) > 1 {
-		args = args[1:]
-	} else {
-		args = []string{}
-	}
-
-	// var hins []hinweis.Hinweis
-
-	// if _, hins, err = zs.Hinweisen().All(); err != nil {
-	// 	err = errors.Error(err)
-	// 	return
-	// }
-
-	// chains := make([]zettels.Chain, len(hins))
-
-	// for i, h := range hins {
-	// 	if chains[i], err = zs.AllInChain(h); err != nil {
-	// 		err = errors.Error(err)
-	// 		return
-	// 	}
-	// }
-
-	// b, err := json.Marshal(chains)
-
-	// if err != nil {
-	// 	logz.Print(err)
-	// 	return
-	// }
-	if err = c.runRemoteScript(u, remote, args); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (c Push) remoteScriptFromArg(u *umwelt.Umwelt, arg string) (remote konfig.RemoteScript, err error) {
-	p := u.Standort().DirZit("bin", arg)
-
-	if !files.Exists(p) {
-		err = errors.Errorf("remote not defined: '%s'", arg)
-		return
-	}
-
-	remote = konfig.RemoteScriptFile{
-		Path: p,
+	case gattung.Transaktion:
+		is = id_set.MakeProtoIdSet(
+			id_set.ProtoId{
+				MutableId: &ts.Time{},
+			},
+		)
 	}
 
 	return
 }
 
-func (c Push) runRemoteScript(u *umwelt.Umwelt, remote konfig.RemoteScript, args []string) (err error) {
-	var script *exec.Cmd
-
-	if script, err = remote.Cmd(append([]string{"push"}, args...)...); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	script.Stdin = os.Stdin
-	script.Stdout = os.Stdout
-	script.Stderr = os.Stderr
-
-	if err = script.Run(); err != nil {
-		err = errors.Normal(err)
-		return
-	}
-
+func (c Push) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	return
 }

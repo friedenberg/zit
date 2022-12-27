@@ -44,7 +44,7 @@ func (c Log) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 }
 
 func (c Log) RunWithIds(os *umwelt.Umwelt, is id_set.Set) (err error) {
-	hs := is.Hinweisen()
+	hs := is.Hinweisen.Copy()
 
 	switch hs.Len() {
 

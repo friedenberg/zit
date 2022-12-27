@@ -94,6 +94,10 @@ func (kc Compiled) Cli() konfig.Cli {
 	return kc.cli
 }
 
+func (kc *Compiled) SetCli(k konfig.Cli) {
+	kc.cli = k
+}
+
 func (kc *compiled) recompile() (err error) {
 	kc.hasChanges = true
 

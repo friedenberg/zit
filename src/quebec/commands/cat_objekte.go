@@ -44,7 +44,7 @@ func (c CatObjekte) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 }
 
 func (c CatObjekte) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
-	shas := ids.Shas()
+	shas := ids.Shas.Copy()
 	return c.akten(u, shas)
 }
 

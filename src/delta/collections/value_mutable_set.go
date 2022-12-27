@@ -2,6 +2,7 @@ package collections
 
 import (
 	"io"
+	"sort"
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -95,6 +96,77 @@ func (es MutableValueSet[T, T1]) RemovePrefixes(needle T) {
 func (es MutableValueSet[T, T1]) Copy() (out ValueSet[T, T1]) {
 	out.setAlias = setAlias[T]{
 		Set: MakeSet[T](es.Key, es.Elements()...),
+	}
+
+	return
+}
+
+func (es MutableValueSet[T, T1]) SortedString() (out []string) {
+	out = make([]string, 0, es.Len())
+
+	es.Each(
+		func(e T) (err error) {
+			out = append(out, e.String())
+
+			return
+		},
+	)
+
+	sort.Slice(
+		out,
+		func(i, j int) bool {
+			return out[i] < out[j]
+		},
+	)
+
+	return
+}
+
+func (s MutableValueSet[T, T1]) String() string {
+	if s.SetLike == nil || s.Len() == 0 {
+		return ""
+	}
+
+	sb := &strings.Builder{}
+	first := true
+
+	for _, e1 := range s.SortedString() {
+		if !first {
+			sb.WriteString(", ")
+		}
+
+		sb.WriteString(e1)
+
+		first = false
+	}
+
+	return sb.String()
+}
+
+func (s *MutableValueSet[T, T1]) Set(v string) (err error) {
+	parts := strings.Split(v, ",")
+
+	if len(parts) == 1 && parts[0] == "" {
+		parts = []string{}
+	}
+
+	if *s, err = MakeMutableValueSetStrings[T, T1](parts...); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s MutableValueSet[T, T1]) MarshalBinary() (text []byte, err error) {
+	text = []byte(s.String())
+
+	return
+}
+
+func (s *MutableValueSet[T, T1]) UnmarshalBinary(text []byte) (err error) {
+	if err = s.Set(string(text)); err != nil {
+		return
 	}
 
 	return

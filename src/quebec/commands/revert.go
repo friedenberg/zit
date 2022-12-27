@@ -30,7 +30,7 @@ func init() {
 }
 
 func (c Revert) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
-	timestamps := ids.Timestamps()
+	timestamps := ids.Timestamps.Copy()
 	var transaktion *transaktion.Transaktion
 
 	s := u.StoreObjekten()

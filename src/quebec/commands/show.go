@@ -281,7 +281,7 @@ func (c Show) showAkten(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 // TODO-P3 support All
 func (c Show) showTransaktions(u *umwelt.Umwelt, ids id_set.Set) (err error) {
-	ids.Timestamps().Each(
+	ids.Timestamps.Copy().Each(
 		func(is ts.Time) (err error) {
 			var t *transaktion.Transaktion
 
@@ -314,7 +314,7 @@ func (c Show) showTypen(
 ) (err error) {
 	f1 := collections.MakeSyncSerializer(f)
 
-	typen := ids.Typen().MutableCopy()
+	typen := ids.Typen.MutableCopy()
 	if err = typen.EachPtr(
 		collections.MakeChain(
 			func(t *kennung.Typ) (err error) {
@@ -348,7 +348,7 @@ func (c Show) showEtiketten(
 ) (err error) {
 	f1 := collections.MakeSyncSerializer(f)
 
-	etiketten := ids.Etiketten().MutableCopy()
+	etiketten := ids.Etiketten.Copy().MutableCopy()
 	if err = etiketten.EachPtr(
 		collections.MakeChain(
 			func(t *kennung.Etikett) (err error) {
