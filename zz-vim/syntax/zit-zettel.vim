@@ -3,9 +3,22 @@ if exists("b:current_syntax")
   finish
 endif
 
-" TODO dynamically source syntax based on extension of akte
-let g:markdown_syntax_conceal = 0
-source $VIMRUNTIME/syntax/markdown.vim
+
+let zettel = expand("%:r")
+
+if zettel != ""
+  let zettelTypSyntax = system("zit show -format typ-vim-syntax-type " . zettel)
+
+  if zettelTypSyntax != ""
+    if zettelTypSyntax == "markdown"
+      let g:markdown_syntax_conceal = 0
+    endif
+
+    exec "source " . $VIMRUNTIME . "/syntax/" . zettelTypSyntax . ".vim"
+  else
+    echom "Zettel Typ has no vim syntax set"
+  endif
+endif
 
 " syn case match
 

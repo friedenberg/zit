@@ -22,7 +22,7 @@ func (f FormatterValue) String() string {
 func (f *FormatterValue) Set(v string) (err error) {
 	v1 := strings.TrimSpace(strings.ToLower(v))
 	switch v1 {
-	case "text", "objekte", "json", "action-names", "debug":
+	case "text", "objekte", "json", "action-names", "debug", "vim-syntax-type":
 		f.string = v1
 
 	default:
@@ -76,6 +76,18 @@ func (f *FormatterValue) FuncFormatter(
 
 	case "action-names":
 		f := MakeFormatterActionNames()
+
+		return func(o *Transacted) (err error) {
+			if _, err = f.Format(out, o); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+
+	case "vim-syntax-type":
+		f := MakeFormatterVimSyntaxType()
 
 		return func(o *Transacted) (err error) {
 			if _, err = f.Format(out, o); err != nil {

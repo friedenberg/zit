@@ -497,6 +497,8 @@ func (s *zettelStore) transactedWithHead(
 	return
 }
 
+//TODO-P0 implement correctly
+// include writing objekten and checking akten?
 func (s *zettelStore) Inherit(tz *zettel.Transacted) (err error) {
 	// var mutter *zettel.Transacted
 

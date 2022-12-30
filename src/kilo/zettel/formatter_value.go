@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/collections_coding"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/echo/standort"
+	"github.com/friedenberg/zit/src/india/typ"
 	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
 )
 
@@ -25,7 +26,19 @@ func (f FormatterValue) String() string {
 func (f *FormatterValue) Set(v string) (err error) {
 	v1 := strings.TrimSpace(strings.ToLower(v))
 	switch v1 {
-	case "typ-formatter-uti-groups", "log", "akte", "hinweis-text", "text", "objekte", "json", "toml", "action-names", "hinweis-akte":
+	case
+		"typ-vim-syntax-type",
+		"typ",
+		"typ-formatter-uti-groups",
+		"log",
+		"akte",
+		"hinweis-text",
+		"text",
+		"objekte",
+		"json",
+		"toml",
+		"action-names",
+		"hinweis-akte":
 		f.string = v1
 
 	default:
@@ -60,6 +73,32 @@ func (fv *FormatterValue) FuncFormatter(
 	switch fv.string {
 	case "log":
 		return logFunc
+
+	case "typ":
+		return func(o *Transacted) (err error) {
+			if _, err = io.WriteString(out, o.Objekte.Typ.String()); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+
+	case "typ-vim-syntax-type":
+		return func(o *Transacted) (err error) {
+			var t *typ.Transacted
+
+			if t = k.GetTyp(o.Objekte.Typ); t == nil {
+				return
+			}
+
+			if _, err = io.WriteString(out, t.Objekte.Akte.VimSyntaxType); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
 
 	case "objekte":
 		f := FormatObjekte{}

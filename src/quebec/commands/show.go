@@ -315,6 +315,7 @@ func (c Show) showTypen(
 	f1 := collections.MakeSyncSerializer(f)
 
 	typen := ids.Typen.MutableCopy()
+
 	if err = typen.EachPtr(
 		collections.MakeChain(
 			func(t *kennung.Typ) (err error) {

@@ -134,29 +134,6 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	if err = s.Send("sending"); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	{
-		var msg string
-
-		if err = s.Receive(&msg); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		errors.Err().Print(msg)
-	}
-
-	{
-		if err = s.Send("ok"); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
 	if err = s.Send(ids); err != nil {
 		err = errors.Wrap(err)
 		return

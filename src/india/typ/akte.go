@@ -6,9 +6,11 @@ import (
 )
 
 type Akte struct {
-	InlineAkte         bool                                         `toml:"inline-akte,omitempty"`
-	FileExtension      string                                       `toml:"file-extension,omitempty"`
-	ExecCommand        *script_config.ScriptConfig                  `toml:"exec-command,omitempty"`
+	InlineAkte    bool                        `toml:"inline-akte,omitempty"`
+	FileExtension string                      `toml:"file-extension,omitempty"`
+	ExecCommand   *script_config.ScriptConfig `toml:"exec-command,omitempty"`
+	VimSyntaxType string                      `toml:"vim-syntax-type"`
+	//TODO-P4 rename to uti-groups
 	FormatterUTIGroups map[string]FormatterUTIGroup                 `toml:"formatter-uti-groups"`
 	Formatters         map[string]script_config.ScriptConfigWithUTI `toml:"formatters,omitempty"`
 	Actions            map[string]script_config.ScriptConfig        `toml:"actions,omitempty"`
@@ -103,55 +105,67 @@ func (a *Akte) Equals(b *Akte) bool {
 		}
 	}
 
+	if a.VimSyntaxType != b.VimSyntaxType {
+		return false
+	}
+
 	return true
 }
 
-func (ct *Akte) Apply(kt *Akte) {
-	ct.InlineAkte = kt.InlineAkte
-	ct.FileExtension = kt.FileExtension
+func (a *Akte) Apply(b *Akte) {
+	a.InlineAkte = b.InlineAkte
+	a.FileExtension = b.FileExtension
 
-	// if kt.Description != "" {
-	// 	ct.Description = collections.MakeStringValue(kt.Description)
+	if len(b.Actions) > 0 {
+		a.Actions = b.Actions
+	}
+
+	// if b.Description != "" {
+	// 	a.Description = collections.MakeStringValue(b.Description)
 	// }
 
-	if len(kt.Actions) > 0 {
-		ct.Actions = kt.Actions
+	if len(b.Actions) > 0 {
+		a.Actions = b.Actions
 	}
 
-	if len(kt.Formatters) > 0 {
-		ct.Formatters = kt.Formatters
+	if len(b.Formatters) > 0 {
+		a.Formatters = b.Formatters
 	}
 
-	if len(kt.FormatterUTIGroups) > 0 {
-		ct.FormatterUTIGroups = kt.FormatterUTIGroups
+	if len(b.FormatterUTIGroups) > 0 {
+		a.FormatterUTIGroups = b.FormatterUTIGroups
 	}
 
-	if kt.ExecCommand != nil {
-		ct.ExecCommand = kt.ExecCommand
+	if b.ExecCommand != nil {
+		a.ExecCommand = b.ExecCommand
 	}
 
-	if len(kt.EtikettenRules) > 0 {
-		ct.EtikettenRules = kt.EtikettenRules
+	if len(b.EtikettenRules) > 0 {
+		a.EtikettenRules = b.EtikettenRules
+	}
+
+	if len(b.VimSyntaxType) > 0 {
+		a.VimSyntaxType = b.VimSyntaxType
 	}
 }
 
-func (ct *Akte) Merge(ct2 *Akte) {
-	if ct2.InlineAkte {
-		ct.InlineAkte = true
+func (a *Akte) Merge(b *Akte) {
+	if b.InlineAkte {
+		a.InlineAkte = true
 	}
 
-	if ct2.FileExtension != "" {
-		ct.FileExtension = ct2.FileExtension
+	if b.FileExtension != "" {
+		a.FileExtension = b.FileExtension
 	}
 
-	ct.ExecCommand.Merge(ct2.ExecCommand)
+	a.ExecCommand.Merge(b.ExecCommand)
 
-	for k, v := range ct2.EtikettenRules {
-		ct.EtikettenRules[k] = v
+	for k, v := range b.EtikettenRules {
+		a.EtikettenRules[k] = v
 	}
 
-	for k, v := range ct2.Actions {
-		sc, ok := ct.Actions[k]
+	for k, v := range b.Actions {
+		sc, ok := a.Actions[k]
 
 		if !ok {
 			sc = v
@@ -159,11 +173,11 @@ func (ct *Akte) Merge(ct2 *Akte) {
 			sc.Merge(&v)
 		}
 
-		ct.Actions[k] = sc
+		a.Actions[k] = sc
 	}
 
-	for k, v := range ct2.Formatters {
-		sc, ok := ct.Formatters[k]
+	for k, v := range b.Formatters {
+		sc, ok := a.Formatters[k]
 
 		if !ok {
 			sc = v
@@ -171,11 +185,11 @@ func (ct *Akte) Merge(ct2 *Akte) {
 			sc.Merge(&v)
 		}
 
-		ct.Formatters[k] = sc
+		a.Formatters[k] = sc
 	}
 
-	for k, v := range ct2.FormatterUTIGroups {
-		sc, ok := ct.FormatterUTIGroups[k]
+	for k, v := range b.FormatterUTIGroups {
+		sc, ok := a.FormatterUTIGroups[k]
 
 		if !ok {
 			sc = v
@@ -183,6 +197,10 @@ func (ct *Akte) Merge(ct2 *Akte) {
 			sc.Merge(&v)
 		}
 
-		ct.FormatterUTIGroups[k] = sc
+		a.FormatterUTIGroups[k] = sc
+	}
+
+	if len(b.VimSyntaxType) > 0 {
+		a.VimSyntaxType = b.VimSyntaxType
 	}
 }

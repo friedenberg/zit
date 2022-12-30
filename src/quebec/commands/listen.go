@@ -47,33 +47,6 @@ func (c Listen) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	u.KonfigPtr().SetCli(theirCliKonfig)
 
-	if err = s.Send("listening"); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	{
-		var msg string
-
-		if err = s.Receive(&msg); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		errors.Err().Print(msg)
-	}
-
-	{
-		var msg string
-
-		if err = s.Receive(&msg); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		errors.Err().Print(msg)
-	}
-
 	var ids id_set.Set
 
 	if err = s.Receive(&ids); err != nil {
