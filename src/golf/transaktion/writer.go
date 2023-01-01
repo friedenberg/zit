@@ -16,7 +16,7 @@ func (w Writer) WriteTo(w1 io.Writer) (n int64, err error) {
 
 	lw.WriteStringers(w.Transaktion.Time)
 
-	w.Transaktion.Each(sku.MakeWriterLineFormat(lw))
+	w.Transaktion.Skus.Each(sku.MakeWriterLineFormat(lw))
 
 	return lw.WriteTo(w1)
 }

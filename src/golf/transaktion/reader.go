@@ -21,7 +21,7 @@ type readState struct {
 func (r *Reader) ReadFrom(r1 io.Reader) (n int64, err error) {
 	br := bufio.NewReader(r1)
 
-	r.Transaktion.MutableSet = sku.MakeMutableSet()
+	r.Transaktion.Skus = sku.MakeMutableSet()
 
 	for {
 		var line string
@@ -56,7 +56,7 @@ func (r *Reader) ReadFrom(r1 io.Reader) (n int64, err error) {
 				return
 			}
 
-			r.Transaktion.Add(o)
+			r.Transaktion.Skus.Add(o)
 		}
 
 		r.readState.lineNo += 1

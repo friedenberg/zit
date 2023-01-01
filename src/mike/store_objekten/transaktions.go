@@ -97,12 +97,12 @@ func (s Store) readTransaktion(p string) (t *transaktion.Transaktion, err error)
 }
 
 func (s Store) writeTransaktion() (err error) {
-	if s.common.Transaktion.Len() == 0 {
+	if s.common.Transaktion.Skus.Len() == 0 {
 		errors.Log().Print("not writing Transaktion as there aren't any Objekten")
 		return
 	}
 
-	errors.Log().Printf("writing Transaktion with %d Objekten", s.common.Transaktion.Len())
+	errors.Log().Printf("writing Transaktion with %d Objekten", s.common.Transaktion.Skus.Len())
 
 	var p string
 

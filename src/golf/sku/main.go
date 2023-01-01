@@ -16,10 +16,16 @@ import (
 
 type Mutter [2]ts.Time
 
+type SkuLike interface {
+	GetKey() string
+	SetTransactionIndex(int)
+	Sku() Sku
+}
+
 type Sku struct {
 	Gattung          gattung.Gattung
 	Mutter           Mutter
-	Id               flag.Value
+	Id               fmt.Stringer
 	Sha              sha.Sha
 	TransactionIndex int_value.IntValue
 }
@@ -73,28 +79,32 @@ func (o *Sku) Set(v string) (err error) {
 
 	vs = vs[1:]
 
+	var id flag.Value
+
 	switch o.Gattung {
 	case gattung.Zettel:
-		o.Id = &hinweis.Hinweis{}
+		id = &hinweis.Hinweis{}
 
 	case gattung.Etikett:
-		o.Id = &kennung.Etikett{}
+		id = &kennung.Etikett{}
 
 	case gattung.Typ:
-		o.Id = &kennung.Typ{}
+		id = &kennung.Typ{}
 
 	case gattung.Konfig:
-		o.Id = &kennung.Konfig{}
+		id = &kennung.Konfig{}
 
 	default:
 		err = errors.Errorf("unsupported gattung: %s", o.Gattung)
 		return
 	}
 
-	if err = o.Id.Set(vs[0]); err != nil {
+	if err = id.Set(vs[0]); err != nil {
 		err = errors.Wrapf(err, "failed to set id: %s", vs[1])
 		return
 	}
+
+	o.Id = id
 
 	vs = vs[1:]
 

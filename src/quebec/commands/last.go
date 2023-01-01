@@ -40,7 +40,7 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	if err = transaktion.Each(
+	if err = transaktion.Skus.Each(
 		func(o *sku.Sku) (err error) {
 			switch o.Gattung {
 			case gattung.Typ:

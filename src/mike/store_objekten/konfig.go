@@ -155,7 +155,7 @@ func (s konfigStore) Update(
 		return
 	}
 
-	s.common.Transaktion.Add2(&kt.Sku)
+	s.common.Transaktion.Skus.Add2(&kt.Sku)
 	s.common.KonfigPtr().SetTransacted(kt)
 
 	if err = s.common.Abbr.addStored(kt); err != nil {

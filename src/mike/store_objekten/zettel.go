@@ -6,6 +6,7 @@ import (
 	"sort"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
@@ -190,7 +191,7 @@ func (s zettelStore) WriteZettelObjekte(z zettel.Objekte) (sh sha.Sha, err error
 func (s *zettelStore) writeNamedZettelToIndex(
 	tz *zettel.Transacted,
 ) (err error) {
-  errors.Log().Print("writing to index")
+	errors.Log().Print("writing to index")
 
 	if !s.common.LockSmith.IsAcquired() {
 		err = ErrLockRequired{
@@ -455,7 +456,7 @@ func (s *zettelStore) addZettelToTransaktion(
 	tz.Sku.Kennung = *zk
 	tz.Sku.Sha = *zs
 
-	s.common.Transaktion.Add2(&tz.Sku)
+	s.common.Transaktion.Skus.Add2(&tz.Sku)
 
 	return
 }
@@ -497,41 +498,31 @@ func (s *zettelStore) transactedWithHead(
 	return
 }
 
-//TODO-P0 implement correctly
+func (s *zettelStore) HasObjekte(sh sha.Sha) (ok bool) {
+	p := id.Path(sh, s.common.Standort.DirObjektenZettelen())
+	ok = files.Exists(p)
+
+	return
+}
+
+// TODO-P0 implement correctly
 // include writing objekten and checking akten?
 func (s *zettelStore) Inherit(tz *zettel.Transacted) (err error) {
-	// var mutter *zettel.Transacted
-
-	// if mutter1, err := s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(
-	// 	tz.Sku.Kennung,
-	// ); err == nil {
-	// 	mutter = mutter1
-	// }
+	if _, err = s.WriteZettelObjekte(tz.Objekte); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if err = s.writeNamedZettelToIndex(tz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	// if mutter == nil {
+  //TODO-P3 use right verb
 	if err = s.zettelTransactedWriter.New(tz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-	// } else {
-	// 	if err = s.zettelTransactedWriter.Updated(tz); err != nil {
-	// 		err = errors.Wrap(err)
-	// 		return
-	// 	}
-	// }
-
-	// if err = s.indexEtiketten.addZettelWithOptionalMutter(
-	// 	tz,
-	// 	nil,
-	// ); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
 
 	return
 }

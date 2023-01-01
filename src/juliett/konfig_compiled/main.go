@@ -98,6 +98,12 @@ func (kc *Compiled) SetCli(k konfig.Cli) {
 	kc.cli = k
 }
 
+func (kc *Compiled) SetCliFromCommander(k konfig.Cli) {
+	oldBasePath := kc.cli.BasePath
+	kc.cli = k
+	kc.cli.BasePath = oldBasePath
+}
+
 func (kc *compiled) recompile() (err error) {
 	kc.hasChanges = true
 

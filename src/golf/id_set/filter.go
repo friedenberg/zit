@@ -16,7 +16,7 @@ type Element interface {
 }
 
 type Filter struct {
-	Set
+	Set        Set
 	AllowEmpty bool
 	Or         bool
 }

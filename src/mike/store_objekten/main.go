@@ -136,9 +136,9 @@ func (s Store) RevertTransaktion(
 		return
 	}
 
-	tzs = zettel.MakeMutableSetUnique(t.Len())
+	tzs = zettel.MakeMutableSetUnique(t.Skus.Len())
 
-	t.Each(
+	t.Skus.Each(
 		func(o *sku.Sku) (err error) {
 			var h *hinweis.Hinweis
 			ok := false
@@ -274,7 +274,7 @@ func (s *Store) Reindex() (err error) {
 	f := func(t *transaktion.Transaktion) (err error) {
 		errors.Out().Printf("%s/%s: %s", t.Time.Kopf(), t.Time.Schwanz(), t.Time)
 
-		if err = t.Each(
+		if err = t.Skus.Each(
 			func(o *sku.Sku) (err error) {
 				switch o.Gattung {
 

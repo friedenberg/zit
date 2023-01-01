@@ -48,7 +48,7 @@ func (c Revert) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 		errors.Out().Printf(
 			"ignoring arguments and using last transkation: %s",
-			transaktion,
+			transaktion.Time,
 		)
 	}
 

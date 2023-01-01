@@ -160,7 +160,7 @@ func (s typStore) CreateOrUpdate(
 		return
 	}
 
-	s.common.Transaktion.Add2(&tt.Sku)
+	s.common.Transaktion.Skus.Add2(&tt.Sku)
 	s.common.KonfigPtr().AddTyp(tt)
 
 	if mutter == nil {

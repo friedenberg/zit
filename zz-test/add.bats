@@ -154,5 +154,6 @@ function add_dedupe_1 { # @test
 	} >expected
 
 	run zit show o/u
+	#TODO-P2 fix race condition
 	assert_output "$(cat expected)"
 }

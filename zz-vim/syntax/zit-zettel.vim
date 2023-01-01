@@ -15,6 +15,8 @@ if zettel != ""
     endif
 
     exec "source " . $VIMRUNTIME . "/syntax/" . zettelTypSyntax . ".vim"
+    " TODO-P3
+    " exec "source " . $VIMRUNTIME . "/ftplugin/" . zettelTypSyntax . ".vim"
   else
     echom "Zettel Typ has no vim syntax set"
   endif

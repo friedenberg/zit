@@ -6,13 +6,13 @@ import (
 )
 
 type Transaktion struct {
-	ts.Time
-	sku.MutableSet
+	Time ts.Time
+	Skus sku.MutableSet
 }
 
 func MakeTransaktion(t ts.Time) Transaktion {
 	return Transaktion{
-		Time:       t,
-		MutableSet: sku.MakeMutableSet(),
+		Time: t,
+		Skus: sku.MakeMutableSet(),
 	}
 }
