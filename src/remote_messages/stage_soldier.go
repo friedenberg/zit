@@ -39,7 +39,11 @@ func (s StageSoldier) Close() (err error) {
 		}
 	}
 
-	close(s.chStopWaitingForDialogues)
+	select {
+	case <-s.chStopWaitingForDialogues:
+	default:
+		close(s.chStopWaitingForDialogues)
+	}
 
 	return
 }
@@ -111,9 +115,21 @@ func (s *StageSoldier) RegisterHandler(
 func (s *StageSoldier) Listen() (err error) {
 	defer errors.Deferred(&err, s.Close)
 
-	go s.awaitRegisteredDialogueHandlers()
+	chErr := make(chan error)
 
-	errors.Log().Printf("waiting for done")
+	go func() {
+		for err1 := range chErr {
+			err = errors.MakeMulti(err, err1)
+
+			select {
+			case <-s.chStopWaitingForDialogues:
+			default:
+				close(s.chStopWaitingForDialogues)
+			}
+		}
+	}()
+
+	go s.awaitRegisteredDialogueHandlers(chErr)
 
 	s.wg.Wait()
 
@@ -122,12 +138,10 @@ func (s *StageSoldier) Listen() (err error) {
 		return
 	}
 
-	errors.Log().Printf("done")
-
 	return
 }
 
-func (s *StageSoldier) awaitRegisteredDialogueHandlers() {
+func (s *StageSoldier) awaitRegisteredDialogueHandlers(chErr chan<- error) {
 	errors.Log().Printf("waiting for handlers")
 
 	for {
@@ -142,7 +156,7 @@ func (s *StageSoldier) awaitRegisteredDialogueHandlers() {
 			errors.Log().Printf("waiting for connection")
 
 			if el = s.AwaitDialogue(); el.error != nil {
-				//TODO-P1 handle accept errors
+				chErr <- errors.Wrap(el.error)
 				continue
 			}
 
@@ -152,7 +166,10 @@ func (s *StageSoldier) awaitRegisteredDialogueHandlers() {
 			ok := false
 
 			if h, ok = s.handlers[el.Dialogue.Type()]; !ok {
-				//TODO-P1 handle unsupported dialogue type
+				chErr <- errors.Errorf(
+					"unregistered dialogue type: %d", el.Dialogue.Type(),
+				)
+
 				continue
 			}
 
@@ -166,8 +183,7 @@ func (s *StageSoldier) awaitRegisteredDialogueHandlers() {
 				defer errors.Log().Printf("end handler: %d", el.Dialogue.Type())
 
 				if err := h(el.Dialogue); err != nil {
-					//TODO-P1 handle handler error
-					errors.Log().Printf("handler error: %s", err)
+					chErr <- errors.Wrap(err)
 				}
 			}()
 		}

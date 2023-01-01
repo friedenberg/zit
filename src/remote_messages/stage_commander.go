@@ -26,6 +26,12 @@ type StageCommander struct {
 }
 
 func (s StageCommander) Close() (err error) {
+	//TODO-P3 determine if this is the right place
+	if err = s.MainDialogue().Send(MessageDone{}); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if err = s.remoteActorCmd.Wait(); err != nil {
 		err = errors.Wrap(err)
 		return

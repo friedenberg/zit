@@ -508,7 +508,18 @@ func (s *zettelStore) HasObjekte(sh sha.Sha) (ok bool) {
 // TODO-P0 implement correctly
 // include writing objekten and checking akten?
 func (s *zettelStore) Inherit(tz *zettel.Transacted) (err error) {
+	errors.Log().Printf("inheriting %s", tz.Sku.Sha)
+
 	if _, err = s.WriteZettelObjekte(tz.Objekte); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if tz, err = s.addZettelToTransaktion(
+		&tz.Objekte,
+		&tz.Sku.Sha,
+		&tz.Sku.Kennung,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -518,7 +529,7 @@ func (s *zettelStore) Inherit(tz *zettel.Transacted) (err error) {
 		return
 	}
 
-  //TODO-P3 use right verb
+	//TODO-P3 use right verb
 	if err = s.zettelTransactedWriter.New(tz); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -533,7 +544,7 @@ func (s *zettelStore) reindexOne(
 ) (err error) {
 	var tz *zettel.Transacted
 
-	if tz, err = s.Inflate(t, o); err != nil {
+	if tz, err = s.Inflate(t.Time, o); err != nil {
 		//TODO-P2 decide on how to handle format errors
 		errors.Err().Print(err)
 		err = nil

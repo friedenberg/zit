@@ -201,7 +201,7 @@ func (s *typStore) reindexOne(
 ) (err error) {
 	var te *typ.Transacted
 
-	if te, err = s.Inflate(t, o); err != nil {
+	if te, err = s.Inflate(t.Time, o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

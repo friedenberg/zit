@@ -47,7 +47,7 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 				var te *typ.Transacted
 
 				if te, err = u.StoreObjekten().Typ().Inflate(
-					transaktion,
+					transaktion.Time,
 					o,
 				); err != nil {
 					err = errors.Wrap(err)

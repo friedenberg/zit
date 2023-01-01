@@ -7,6 +7,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
@@ -102,7 +103,10 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	if len(args) > 1 {
 		args = args[1:]
-		//TODO-P3 handle all is set
+
+		if c.All {
+			errors.Log().Print("-all is set but arguments passed in. Ignore -all.")
+		}
 	} else if !c.All {
 		err = errors.Normalf("Refusing to pull all unless -all is set.")
 		return
@@ -168,11 +172,6 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	if err = s.MainDialogue().Send(remote_messages.MessageDone{}); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	return
 }
 
@@ -183,7 +182,15 @@ func (c Pull) handleDialoguePullObjekten(
 	skus sku.MutableSet,
 	wg *sync.WaitGroup,
 ) (err error) {
-	skusNeeded := sku.MakeMutableSet()
+	skusNeeded := collections.MakeMutableSet[*sku.Sku](
+		func(sk *sku.Sku) string {
+			if sk == nil {
+				return ""
+			}
+
+			return sk.Sha.String()
+		},
+	)
 
 	if err = skus.Each(
 		func(sk *sku.Sku) (err error) {
@@ -193,10 +200,12 @@ func (c Pull) handleDialoguePullObjekten(
 			}
 
 			if u.StoreObjekten().Zettel().HasObjekte(sk.Sha) {
+				errors.Log().Printf("already have %s", sk.Sha)
 				return
 			}
 
-			skusNeeded.Add(*sk)
+			errors.Log().Printf("don't have %s", sk.Sha)
+			skusNeeded.Add(sk)
 
 			return
 		},
@@ -207,7 +216,7 @@ func (c Pull) handleDialoguePullObjekten(
 
 	defer wg.Done()
 
-	if err = d.Send(skusNeeded); err != nil {
+	if err = d.Send(skusNeeded.Elements()); err != nil {
 		errors.Log().Print("failed to send skus")
 		err = errors.Wrap(err)
 		return
@@ -327,15 +336,15 @@ func (c Pull) handleDialoguePull(
 	wg := &sync.WaitGroup{}
 
 	wg.Add(1)
-	go c.handleDialoguePullObjekten(u, s, pullObjektenDialogue, t.Skus, wg)
-	wg.Wait()
 
-	//	//TODO-P2 deal with errors that might close the channel
-	//	if err = u.StoreObjekten().Zettel().Inherit(z); err != nil {
-	//		err = errors.Wrap(err)
-	//		return
-	//	}
-	//}
+	go errors.Deferred(
+		&err,
+		func() error {
+			return c.handleDialoguePullObjekten(u, s, pullObjektenDialogue, t.Skus, wg)
+		},
+	)
+
+	wg.Wait()
 
 	return
 }

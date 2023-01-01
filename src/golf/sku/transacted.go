@@ -13,6 +13,7 @@ import (
 )
 
 // TODO-P3 examine adding objekte and akte shas to Skus
+// TODO-P2 move sku.Sku to sku.Transacted
 type Transacted[T kennung.KennungLike[T], T1 kennung.KennungLikePtr[T]] struct {
 	Mutter           Mutter
 	Kennung          T

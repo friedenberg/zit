@@ -4,8 +4,8 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/sha"
+	"github.com/friedenberg/zit/src/foxtrot/ts"
 	"github.com/friedenberg/zit/src/golf/sku"
-	"github.com/friedenberg/zit/src/golf/transaktion"
 )
 
 type TransactedInflator[
@@ -16,7 +16,7 @@ type TransactedInflator[
 	T4 gattung.Verzeichnisse[T],
 	T5 gattung.VerzeichnissePtr[T4, T],
 ] interface {
-	Inflate(*transaktion.Transaktion, *sku.Sku) (*Transacted[T, T1, T2, T3, T4, T5], error)
+	Inflate(ts.Time, *sku.Sku) (*Transacted[T, T1, T2, T3, T4, T5], error)
 }
 
 type transactedInflator[
@@ -59,15 +59,12 @@ func MakeTransactedInflator[
 }
 
 func (h *transactedInflator[T, T1, T2, T3, T4, T5]) Inflate(
-	tr *transaktion.Transaktion,
+	ti ts.Time,
 	o *sku.Sku,
 ) (t *Transacted[T, T1, T2, T3, T4, T5], err error) {
 	t = new(Transacted[T, T1, T2, T3, T4, T5])
 
-	if err = t.SetTransactionAndObjekte(
-		tr,
-		o,
-	); err != nil {
+	if err = t.SetTimeAndObjekte(ti, o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

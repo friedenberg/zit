@@ -8,7 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/sha"
-	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/ts"
 	"github.com/friedenberg/zit/src/golf/id_set"
 	"github.com/friedenberg/zit/src/golf/sku"
@@ -134,7 +133,13 @@ func (c Listen) handleDialoguePull(
 
 	t := transaktion.MakeTransaktion(ts.Now())
 
-	if err = u.StoreObjekten().Zettel().ReadAllSchwanzenVerzeichnisse(
+	method := u.StoreObjekten().Zettel().ReadAllSchwanzenVerzeichnisse
+
+	if u.Konfig().IncludeHistory {
+		method = u.StoreObjekten().Zettel().ReadAllVerzeichnisse
+	}
+
+	if err = method(
 		collections.MakeChain(
 			zettel.WriterIds{Filter: filter}.WriteZettelVerzeichnisse,
 			func(z *zettel.Transacted) (err error) {
@@ -159,7 +164,7 @@ func (c Listen) handleDialoguePullObjekten(
 	u *umwelt.Umwelt,
 	d remote_messages.Dialogue,
 ) (err error) {
-	skus := sku.MakeMutableSet()
+	var skus []sku.Sku
 
 	errors.Log().Print("waiting to receive skus")
 
@@ -168,34 +173,29 @@ func (c Listen) handleDialoguePullObjekten(
 		return
 	}
 
-	errors.Log().Printf("did receive skus: %d", skus.Len())
+	errors.Log().Printf("did receive skus: %d", len(skus))
 
-	if err = skus.Each(
-		func(s *sku.Sku) (err error) {
-			//TODO-P1 support any transacted objekte
-			if s.Gattung != gattung.Zettel {
-				return
-			}
-
-			h := s.Id.(hinweis.Hinweis)
-
-			var zt *zettel.Transacted
-
-			if zt, err = u.StoreObjekten().Zettel().ReadHinweisSchwanzen(h); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			if err = d.Send(zt); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
+	for _, s := range skus {
+		//TODO-P1 support any transacted objekte
+		if s.Gattung != gattung.Zettel {
 			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+		}
+
+		var zt *zettel.Transacted
+
+		if zt, err = u.StoreObjekten().Zettel().Inflate(
+			//TODO-P2 use an actually correct time
+			ts.Now(),
+			&s,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = d.Send(zt); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	if err = d.Close(); err != nil {

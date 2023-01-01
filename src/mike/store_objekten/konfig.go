@@ -243,7 +243,7 @@ func (s *konfigStore) reindexOne(
 ) (err error) {
 	var te *konfig.Transacted
 
-	if te, err = s.Inflate(t, o); err != nil {
+	if te, err = s.Inflate(t.Time, o); err != nil {
 		errors.Wrap(err)
 		return
 	}
