@@ -161,11 +161,16 @@ func (op RemoteMessagesPullOrPush) SendSkus(
 	d remote_messages.Dialogue,
 	skus []sku.Sku,
 ) (err error) {
+	errors.Log().Printf("starting zettel send loop: %d", len(skus))
+
 	for _, s := range skus {
 		//TODO-P1 support any transacted objekte
 		if s.Gattung != gattung.Zettel {
-			return
+			errors.Err().Printf("not a zettel, continuing: %v", s)
+			continue
 		}
+
+		errors.Log().Printf("found a zettel, sending: %v", s)
 
 		var zt *zettel.Transacted
 
@@ -174,14 +179,19 @@ func (op RemoteMessagesPullOrPush) SendSkus(
 			ts.Now(),
 			&s,
 		); err != nil {
+			errors.Log().Printf("error inflating zettel for send: %v", err)
 			err = errors.Wrap(err)
 			return
 		}
+
+		errors.Log().Printf("sending zettel.Transacted: %v", zt)
 
 		if err = d.Send(zt); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
+
+		errors.Log().Printf("did send zettel.Transacted: %v", zt)
 	}
 
 	return
@@ -195,6 +205,7 @@ func (op RemoteMessagesPullOrPush) handleDialoguePushObjekten(
 	errors.Log().Print("waiting to receive skus")
 
 	if err = d.Receive(&skus); err != nil {
+		errors.Log().Printf("error receiving skus: %s", err)
 		err = errors.Wrap(err)
 		return
 	}
@@ -206,10 +217,14 @@ func (op RemoteMessagesPullOrPush) handleDialoguePushObjekten(
 		return
 	}
 
+	errors.Log().Printf("send objekten")
+
 	if err = d.Close(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	errors.Log().Printf("did close")
 
 	return
 }
@@ -272,7 +287,7 @@ func (op RemoteMessagesPullOrPush) HandleDialoguePullObjekten(
 	}
 
 	for {
-		errors.Log().Print("did start loop")
+		errors.Log().Print("did start zettel receive loop")
 		var zt zettel.Transacted
 
 		if err = d.Receive(&zt); err != nil {

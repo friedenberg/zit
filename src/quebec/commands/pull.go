@@ -143,8 +143,6 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	errors.Log().Printf("")
-
 	defer errors.Deferred(&err, s.Close)
 
 	var dialoguePull remote_messages.Dialogue
@@ -158,12 +156,16 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
+	if err = dialoguePull.Send(filter); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	pullOrPushOp := user_ops.MakeRemoteMessagesPullOrPush(u)
 
 	if err = c.handleDialoguePull(
 		pullOrPushOp,
 		s,
-		filter,
 		dialoguePull,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -176,14 +178,8 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 func (c Pull) handleDialoguePull(
 	op user_ops.RemoteMessagesPullOrPush,
 	s *remote_messages.StageCommander,
-	filter id_set.Filter,
 	d remote_messages.Dialogue,
 ) (err error) {
-	if err = d.Send(filter); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	t := transaktion.MakeTransaktion(ts.Now())
 
 	if err = d.Receive(&t); err != nil {
@@ -200,12 +196,10 @@ func (c Pull) handleDialoguePull(
 		return
 	}
 
-	go errors.Deferred(
-		&err,
-		func() error {
-			return op.HandleDialoguePullObjekten(s, pullObjektenDialogue, t.Skus)
-		},
-	)
+	if err = op.HandleDialoguePullObjekten(s, pullObjektenDialogue, t.Skus); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }
