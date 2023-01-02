@@ -15,6 +15,9 @@ const (
 	DialogueTypePull
 	DialogueTypePullObjekten
 	DialogueTypePullAkte
+	DialogueTypePush
+	DialogueTypePushObjekten
+	DialogueTypePushAkte
 )
 
 type Dialogue struct {

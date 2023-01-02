@@ -2,21 +2,17 @@ package commands
 
 import (
 	"flag"
-	"io"
-	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/ts"
 	"github.com/friedenberg/zit/src/golf/id_set"
-	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/golf/transaktion"
-	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
+	"github.com/friedenberg/zit/src/papa/user_ops"
 	"github.com/friedenberg/zit/src/remote_messages"
 )
 
@@ -156,14 +152,16 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	errors.Log().Printf("starting pull dialogue")
 
 	if dialoguePull, err = s.StartDialogue(
-		remote_messages.DialogueTypePull,
+		remote_messages.DialogueTypePush,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
+	pullOrPushOp := user_ops.MakeRemoteMessagesPullOrPush(u)
+
 	if err = c.handleDialoguePull(
-		u,
+		pullOrPushOp,
 		s,
 		filter,
 		dialoguePull,
@@ -175,139 +173,8 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	return
 }
 
-func (c Pull) handleDialoguePullObjekten(
-	u *umwelt.Umwelt,
-	s *remote_messages.StageCommander,
-	d remote_messages.Dialogue,
-	skus sku.MutableSet,
-	wg *sync.WaitGroup,
-) (err error) {
-	skusNeeded := collections.MakeMutableSet[*sku.Sku](
-		func(sk *sku.Sku) string {
-			if sk == nil {
-				return ""
-			}
-
-			return sk.Sha.String()
-		},
-	)
-
-	if err = skus.Each(
-		func(sk *sku.Sku) (err error) {
-			//TODO-P1 support other gattung
-			if sk.Gattung != gattung.Zettel {
-				return
-			}
-
-			if u.StoreObjekten().Zettel().HasObjekte(sk.Sha) {
-				errors.Log().Printf("already have %s", sk.Sha)
-				return
-			}
-
-			errors.Log().Printf("don't have %s", sk.Sha)
-			skusNeeded.Add(sk)
-
-			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer wg.Done()
-
-	if err = d.Send(skusNeeded.Elements()); err != nil {
-		errors.Log().Print("failed to send skus")
-		err = errors.Wrap(err)
-		return
-	}
-
-	errors.Log().Print("did send skus")
-
-	for {
-		errors.Log().Print("did start loop")
-		var zt zettel.Transacted
-
-		if err = d.Receive(&zt); err != nil {
-			errors.Log().Printf("did receive error: %s", errors.Wrap(err))
-
-			if errors.IsEOF(err) {
-				err = nil
-				break
-			} else {
-				err = errors.Wrap(err)
-				return
-			}
-		}
-
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-
-			if err := c.handleDialoguePullAkte(u, s, zt.Objekte.Akte); err != nil {
-				errors.Log().Printf("pull akte error: %s", err)
-			}
-		}()
-
-		if err = u.StoreObjekten().Zettel().Inherit(&zt); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		errors.Log().Print("did receive no error")
-
-		errors.Log().Print(zt)
-	}
-
-	return
-}
-
-func (c Pull) handleDialoguePullAkte(
-	u *umwelt.Umwelt,
-	s *remote_messages.StageCommander,
-	sh sha.Sha,
-) (err error) {
-	if sh.IsNull() {
-		return
-	}
-
-	var d remote_messages.Dialogue
-
-	if d, err = s.StartDialogue(remote_messages.DialogueTypePullAkte); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.Deferred(&err, d.Close)
-
-	if err = d.Send(sh); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	var aw sha.WriteCloser
-
-	if aw, err = u.StoreObjekten().AkteWriter(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.Deferred(&err, aw.Close)
-
-	if _, err = io.Copy(aw, d); err != nil {
-		if errors.IsEOF(err) {
-			err = nil
-		} else {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	return
-}
-
 func (c Pull) handleDialoguePull(
-	u *umwelt.Umwelt,
+	op user_ops.RemoteMessagesPullOrPush,
 	s *remote_messages.StageCommander,
 	filter id_set.Filter,
 	d remote_messages.Dialogue,
@@ -327,24 +194,18 @@ func (c Pull) handleDialoguePull(
 	var pullObjektenDialogue remote_messages.Dialogue
 
 	if pullObjektenDialogue, err = s.StartDialogue(
-		remote_messages.DialogueTypePullObjekten,
+		remote_messages.DialogueTypePushObjekten,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	wg := &sync.WaitGroup{}
-
-	wg.Add(1)
-
 	go errors.Deferred(
 		&err,
 		func() error {
-			return c.handleDialoguePullObjekten(u, s, pullObjektenDialogue, t.Skus, wg)
+			return op.HandleDialoguePullObjekten(s, pullObjektenDialogue, t.Skus)
 		},
 	)
-
-	wg.Wait()
 
 	return
 }

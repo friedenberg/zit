@@ -50,7 +50,6 @@ func (s StageSoldier) Close() (err error) {
 
 func MakeStageSoldier(u *umwelt.Umwelt) (
 	s *StageSoldier,
-	msgTheirHi MessageHiCommander,
 	err error,
 ) {
 	s = &StageSoldier{
@@ -89,7 +88,14 @@ func MakeStageSoldier(u *umwelt.Umwelt) (
 	}
 
 	s.mainDialogue = el.Dialogue
-	msgTheirHi = el.MessageHiCommander
+	u.KonfigPtr().SetCliFromCommander(el.MessageHiCommander.CliKonfig)
+	errors.Log().Printf("set konfig")
+
+	if err = u.Reset(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	err = el.error
 
 	return
