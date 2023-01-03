@@ -101,7 +101,7 @@ func (op RemoteMessagesPullOrPush) handleDialoguePushAkte(
 		return
 	}
 
-	errors.Log().Printf("copied %d bytes", n)
+	errors.Log().Printf("sent %d akte bytes", n)
 
 	return
 }
@@ -332,7 +332,9 @@ func (op RemoteMessagesPullOrPush) ReceiveAkte(
 
 	defer errors.Deferred(&err, aw.Close)
 
-	if _, err = io.Copy(aw, d); err != nil {
+	var n int64
+
+	if n, err = io.Copy(aw, d); err != nil {
 		if errors.IsEOF(err) {
 			err = nil
 		} else {
@@ -340,6 +342,8 @@ func (op RemoteMessagesPullOrPush) ReceiveAkte(
 			return
 		}
 	}
+
+	errors.Log().Printf("received %d akte bytes", n)
 
 	return
 }

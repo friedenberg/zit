@@ -101,6 +101,7 @@ function pull { # @test
 	} >"$expected"
 
 	run zit show one/uno
+	# TODO-P2 figure out why some pulls experience a race condition for akten
 	assert_output "$(cat "$expected")"
 
 	cd "$wd" || exit 1
