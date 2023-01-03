@@ -3,6 +3,7 @@ package objekte
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/ts"
 	"github.com/friedenberg/zit/src/golf/sku"
@@ -31,6 +32,7 @@ type transactedInflator[
 	frc           gattung.FuncReadCloser
 	objekteParser gattung.Parser[T, T1]
 	akteParser    gattung.Parser[T, T1]
+	pool          collections.PoolLike[Transacted[T, T1, T2, T3, T4, T5]]
 }
 
 func MakeTransactedInflator[
@@ -45,6 +47,7 @@ func MakeTransactedInflator[
 	frc gattung.FuncReadCloser,
 	objekteParser gattung.Parser[T, T1],
 	akteParser gattung.Parser[T, T1],
+	pool collections.PoolLike[Transacted[T, T1, T2, T3, T4, T5]],
 ) *transactedInflator[T, T1, T2, T3, T4, T5] {
 	if objekteParser == nil {
 		objekteParser = MakeFormat[T, T1]()
@@ -55,6 +58,7 @@ func MakeTransactedInflator[
 		frc:           frc,
 		objekteParser: objekteParser,
 		akteParser:    akteParser,
+		pool:          pool,
 	}
 }
 
@@ -62,7 +66,11 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) Inflate(
 	ti ts.Time,
 	o *sku.Sku,
 ) (t *Transacted[T, T1, T2, T3, T4, T5], err error) {
-	t = new(Transacted[T, T1, T2, T3, T4, T5])
+	if h.pool == nil {
+		t = new(Transacted[T, T1, T2, T3, T4, T5])
+	} else {
+		t = h.pool.Get()
+	}
 
 	if err = t.SetTimeAndObjekte(ti, o); err != nil {
 		err = errors.Wrap(err)

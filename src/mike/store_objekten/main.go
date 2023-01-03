@@ -22,10 +22,9 @@ type shaAbbr = sha.Abbr
 type hinweisAbbr = hinweis.Abbr
 
 type Store struct {
-	common common
+	common
 
 	//TODO move to methods
-	ioFactory
 	shaAbbr
 	hinweisAbbr
 
@@ -64,8 +63,6 @@ func Make(
 	}
 
 	s.common.Transaktion = transaktion.MakeTransaktion(t)
-
-	s.ioFactory = s.common
 
 	if s.common.Abbr, err = newIndexAbbr(
 		&s.common,

@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
+	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
@@ -146,6 +147,7 @@ func (c Show) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 			ev.FuncFormatter(
 				u.Out(),
 				u.StoreObjekten(),
+				u.PrinterTypTransacted(format.StringNew),
 			),
 		)
 
@@ -306,7 +308,7 @@ func (c Show) showTransaktions(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	return
 }
 
-// TODO-P3 support All
+// TODO-P3 support -all and -include-history
 func (c Show) showTypen(
 	u *umwelt.Umwelt,
 	ids id_set.Set,
@@ -316,23 +318,27 @@ func (c Show) showTypen(
 
 	typen := ids.Typen.MutableCopy()
 
-	if err = typen.EachPtr(
-		collections.MakeChain(
-			func(t *kennung.Typ) (err error) {
-				ty := u.Konfig().GetTyp(*t)
+	method := u.StoreObjekten().Typ().ReadAllSchwanzen
 
-				if ty == nil {
-					return
-				}
+	if u.Konfig().IncludeHistory {
+		method = u.StoreObjekten().Typ().ReadAll
+	}
 
-				if err = f1(ty); err != nil {
+	if err = method(
+		func(t *typ.Transacted) (err error) {
+			switch {
+			case c.All:
+				fallthrough
+
+			case typen.Contains(t.Sku.Kennung):
+				if err = f1(t); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
+			}
 
-				return
-			},
-		),
+			return
+		},
 	); err != nil {
 		err = errors.Wrap(err)
 		return

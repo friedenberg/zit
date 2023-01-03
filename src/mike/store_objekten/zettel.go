@@ -72,6 +72,7 @@ func makeZettelStore(
 				IgnoreTypErrors: true,
 			},
 			nil,
+			p,
 		),
 	}
 
@@ -231,18 +232,21 @@ func (s *zettelStore) writeNamedZettelToIndex(
 	return
 }
 
+// TODO-P3 rename to ReadOne
 func (s zettelStore) ReadHinweisSchwanzen(
 	h hinweis.Hinweis,
 ) (zv *zettel.Transacted, err error) {
 	return s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(h)
 }
 
+// TODO-P3 rename to ReadAllSchwanzen
 func (i *zettelStore) ReadAllSchwanzenVerzeichnisse(
 	w collections.WriterFunc[*zettel.Transacted],
 ) (err error) {
 	return i.verzeichnisseSchwanzen.ReadMany(w)
 }
 
+// TODO-P3 rename to ReadAll
 func (i *zettelStore) ReadAllVerzeichnisse(
 	w collections.WriterFunc[*zettel.Transacted],
 ) (err error) {
@@ -543,6 +547,7 @@ func (s *zettelStore) reindexOne(
 	o *sku.Sku,
 ) (err error) {
 	var tz *zettel.Transacted
+	defer s.pool.Put(tz)
 
 	if tz, err = s.Inflate(t.Time, o); err != nil {
 		//TODO-P2 decide on how to handle format errors
@@ -554,7 +559,9 @@ func (s *zettelStore) reindexOne(
 
 	var mutter *zettel.Transacted
 
-	if mutter1, err := s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(tz.Sku.Kennung); err == nil {
+	if mutter1, err := s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(
+		tz.Sku.Kennung,
+	); err == nil {
 		mutter = mutter1
 	}
 

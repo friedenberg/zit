@@ -23,6 +23,8 @@ type EtikettLogWriters struct {
 type etikettStore struct {
 	common *common
 
+	pool collections.PoolLike[etikett.Transacted]
+
 	objekte.TransactedInflator[
 		etikett.Objekte,
 		*etikett.Objekte,
@@ -49,8 +51,11 @@ func (s *etikettStore) SetEtikettLogWriters(
 func makeEtikettStore(
 	sa *common,
 ) (s *etikettStore, err error) {
+	pool := collections.MakePool[etikett.Transacted]()
+
 	s = &etikettStore{
 		common: sa,
+		pool:   pool,
 		TransactedInflator: objekte.MakeTransactedInflator[
 			etikett.Objekte,
 			*etikett.Objekte,
@@ -69,6 +74,7 @@ func makeEtikettStore(
 			gattung.Parser[etikett.Objekte, *etikett.Objekte](
 				etikett.MakeFormatText(sa),
 			),
+			pool,
 		),
 		AkteTextSaver: objekte.MakeAkteTextSaver[
 			etikett.Objekte,
@@ -200,6 +206,7 @@ func (s *etikettStore) reindexOne(
 	o *sku.Sku,
 ) (err error) {
 	var te *etikett.Transacted
+	defer s.pool.Put(te)
 
 	if te, err = s.Inflate(t.Time, o); err != nil {
 		errors.Wrap(err)

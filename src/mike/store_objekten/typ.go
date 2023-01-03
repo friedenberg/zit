@@ -2,6 +2,7 @@ package store_objekten
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/toml"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/sha"
@@ -22,6 +23,8 @@ type TypLogWriters struct {
 
 type typStore struct {
 	common *common
+
+	pool collections.PoolLike[typ.Transacted]
 
 	objekte.TransactedInflator[
 		typ.Objekte,
@@ -49,8 +52,11 @@ func (s *typStore) SetTypLogWriters(
 func makeTypStore(
 	sa *common,
 ) (s *typStore, err error) {
+	pool := collections.MakePool[typ.Transacted]()
+
 	s = &typStore{
 		common: sa,
+		pool:   pool,
 		TransactedInflator: objekte.MakeTransactedInflator[
 			typ.Objekte,
 			*typ.Objekte,
@@ -69,6 +75,7 @@ func makeTypStore(
 			gattung.Parser[typ.Objekte, *typ.Objekte](
 				typ.MakeFormatTextIgnoreTomlErrors(sa),
 			),
+			pool,
 		),
 		AkteTextSaver: objekte.MakeAkteTextSaver[
 			typ.Objekte,
@@ -178,6 +185,77 @@ func (s typStore) CreateOrUpdate(
 	return
 }
 
+// TODO-P3
+func (s typStore) ReadAllSchwanzen(
+	f collections.WriterFunc[*typ.Transacted],
+) (err error) {
+	if err = s.common.konfig.Typen.Each(f); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s typStore) ReadAll(
+	f collections.WriterFunc[*typ.Transacted],
+) (err error) {
+	//TODO-P2 move to construction of inflator
+	// p := collections.MakePool[*typ.Transacted]()
+
+	if err = s.common.ReadAllTransaktions(
+		func(t *transaktion.Transaktion) (err error) {
+			if err = t.Skus.Each(
+				func(o *sku.Sku) (err error) {
+					if o.Gattung != gattung.Typ {
+						return
+					}
+
+					var te *typ.Transacted
+
+					if te, err = s.Inflate(t.Time, o); err != nil {
+						if errors.Is(err, toml.Error{}) {
+							err = nil
+						} else {
+							err = errors.Wrap(err)
+							return
+						}
+					}
+
+					if err = f(te); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+
+					// if err = p.Apply(f, te); err != nil {
+					// 	err = errors.Wrap(err)
+					// 	return
+					// }
+
+					return
+				},
+			); err != nil {
+				err = errors.Wrapf(
+					err,
+					"Transaktion: %s/%s: %s",
+					t.Time.Kopf(),
+					t.Time.Schwanz(),
+					t.Time,
+				)
+
+				return
+			}
+
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (s typStore) ReadOne(
 	k *kennung.Typ,
 ) (tt *typ.Transacted, err error) {
@@ -200,6 +278,7 @@ func (s *typStore) reindexOne(
 	o *sku.Sku,
 ) (err error) {
 	var te *typ.Transacted
+	defer s.pool.Put(te)
 
 	if te, err = s.Inflate(t.Time, o); err != nil {
 		err = errors.Wrap(err)

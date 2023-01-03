@@ -23,6 +23,8 @@ type KonfigLogWriters struct {
 type konfigStore struct {
 	common *common
 
+	pool collections.PoolLike[konfig.Transacted]
+
 	objekte.TransactedInflator[
 		konfig.Objekte,
 		*konfig.Objekte,
@@ -49,8 +51,11 @@ func (s *konfigStore) SetKonfigLogWriters(
 func makeKonfigStore(
 	sa *common,
 ) (s *konfigStore, err error) {
+	pool := collections.MakePool[konfig.Transacted]()
+
 	s = &konfigStore{
 		common: sa,
+		pool:   pool,
 		TransactedInflator: objekte.MakeTransactedInflator[
 			konfig.Objekte,
 			*konfig.Objekte,
@@ -69,6 +74,7 @@ func makeKonfigStore(
 			gattung.Parser[konfig.Objekte, *konfig.Objekte](
 				konfig.MakeFormatText(sa),
 			),
+			pool,
 		),
 		AkteTextSaver: objekte.MakeAkteTextSaver[
 			konfig.Objekte,
@@ -242,6 +248,7 @@ func (s *konfigStore) reindexOne(
 	o *sku.Sku,
 ) (err error) {
 	var te *konfig.Transacted
+	defer s.pool.Put(te)
 
 	if te, err = s.Inflate(t.Time, o); err != nil {
 		errors.Wrap(err)

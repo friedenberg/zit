@@ -88,4 +88,23 @@ function pull { # @test
 
 	run zit pull -abbreviate-hinweisen=false -all "$wd"
 	assert_output '          (new) [one/uno@d !md "to_add.md"]'
+
+	expected="$(mktemp)"
+	{
+		echo '---'
+		echo '# to_add.md'
+		echo '- zz-inbox-2022-11-14'
+		echo '! md'
+		echo '---'
+		echo ''
+		echo 'test file'
+	} >"$expected"
+
+	run zit show one/uno
+	assert_output "$(cat "$expected")"
+
+	cd "$wd" || exit 1
+
+	run zit show one/uno
+	assert_output "$(cat "$expected")"
 }

@@ -12,8 +12,7 @@ import (
 )
 
 type TextFormat struct {
-	arf              gattung.AkteIOFactory
-	IgnoreTomlErrors bool
+	arf gattung.AkteIOFactory
 }
 
 func MakeFormatText(arf gattung.AkteIOFactory) *TextFormat {
@@ -22,10 +21,10 @@ func MakeFormatText(arf gattung.AkteIOFactory) *TextFormat {
 	}
 }
 
+// TODO-P4 remove
 func MakeFormatTextIgnoreTomlErrors(arf gattung.AkteIOFactory) *TextFormat {
 	return &TextFormat{
-		arf:              arf,
-		IgnoreTomlErrors: true,
+		arf: arf,
 	}
 }
 
@@ -57,6 +56,7 @@ func (f TextFormat) ReadFormat(r io.Reader, t *Objekte) (n int64, err error) {
 
 		if err = td.Decode(&t.Akte); err != nil {
 			if !errors.IsEOF(err) {
+				err = errors.Wrap(toml.MakeError(err))
 				pr.CloseWithError(err)
 			}
 		}
@@ -91,13 +91,8 @@ func (f TextFormat) ReadFormat(r io.Reader, t *Objekte) (n int64, err error) {
 	}
 
 	if err = <-chDone; err != nil {
-		if f.IgnoreTomlErrors {
-			errors.Err().Print(err)
-			err = nil
-		} else {
-			err = errors.Wrap(err)
-			return
-		}
+		err = errors.Wrap(err)
+		return
 	}
 
 	t.Sha = aw.Sha()

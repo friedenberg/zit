@@ -7,7 +7,3 @@ var (
 	NewDecoder = toml.NewDecoder
 	NewEncoder = toml.NewEncoder
 )
-
-type (
-	StrictMissingError = toml.StrictMissingError
-)

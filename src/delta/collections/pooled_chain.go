@@ -2,6 +2,7 @@ package collections
 
 import "github.com/friedenberg/zit/src/alfa/errors"
 
+// TODO-P4 migrate to single writerfunc
 func MakePooledChain[T any](p PoolLike[T], wfs ...WriterFunc[*T]) WriterFunc[*T] {
 	return func(e *T) (err error) {
 		for _, w := range wfs {

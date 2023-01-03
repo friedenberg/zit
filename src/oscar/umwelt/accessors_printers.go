@@ -26,6 +26,7 @@ func (u *Umwelt) PrinterKonfigTransacted(
 	)
 }
 
+// TODO-P4 move away from passed-in verbs
 func (u *Umwelt) PrinterTypTransacted(
 	verb string,
 ) collections.WriterFunc[*typ.Transacted] {
