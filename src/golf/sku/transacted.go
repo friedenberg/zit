@@ -61,15 +61,6 @@ type Transacted[T kennung.KennungLike[T], T1 kennung.KennungLikePtr[T]] struct {
 	Kopf, Schwanz ts.Time
 }
 
-func (a Transacted[T, T1]) Sku() Sku {
-	return Sku{
-		Gattung: a.Kennung.Gattung(),
-		Mutter:  a.Mutter,
-		Id:      T1(&a.Kennung),
-		Sha:     a.Sha,
-	}
-}
-
 func (a *Transacted[T, T1]) SetTransactionIndex(i int) {
 	a.TransactionIndex.SetInt(i)
 }
