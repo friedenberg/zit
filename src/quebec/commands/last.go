@@ -41,8 +41,8 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	if err = transaktion.Skus.Each(
-		func(o *sku.Sku) (err error) {
-			switch o.Gattung {
+		func(o sku.SkuLike) (err error) {
+			switch o.GetGattung() {
 			case gattung.Typ:
 				var te *typ.Transacted
 

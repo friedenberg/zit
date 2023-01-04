@@ -91,22 +91,23 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) Equals(
 
 func (a *Transacted[T, T1, T2, T3, T4, T5]) SetTimeAndObjekte(
 	t ts.Time,
-	o *sku.Sku,
+	o sku.SkuLike,
 ) (err error) {
 	var h T2
+	ok := false
 
-	if err = T3(&h).Set(o.Id.String()); err != nil {
-		err = errors.Wrap(err)
+	if h, ok = o.GetId().(T2); !ok {
+		err = errors.Errorf("wrong type for Kennung. Expected %T but got %T", h, o.GetId())
 		return
 	}
 
 	a.Sku.Kennung = h
-	a.Sku.Sha = o.Sha
-	a.Sku.TransactionIndex = o.TransactionIndex
+	a.Sku.Sha = o.GetObjekteSha()
+	a.Sku.TransactionIndex = o.GetTransactionIndex()
 	//TODO-P3 fix sku kopf and schwanz
 	a.Sku.Kopf = t
 	a.Sku.Schwanz = t
-	a.Sku.Mutter = o.Mutter
+	a.Sku.Mutter = o.GetMutter()
 
 	return
 }

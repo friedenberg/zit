@@ -161,7 +161,7 @@ func (s konfigStore) Update(
 		return
 	}
 
-	s.common.Transaktion.Skus.Add2(&kt.Sku)
+	s.common.Transaktion.Skus.Add(&kt.Sku)
 	s.common.KonfigPtr().SetTransacted(kt)
 
 	if err = s.common.Abbr.addStored(kt); err != nil {
@@ -245,7 +245,7 @@ func (s konfigStore) AllInChain() (c []*konfig.Transacted, err error) {
 
 func (s *konfigStore) reindexOne(
 	t *transaktion.Transaktion,
-	o *sku.Sku,
+	o sku.SkuLike,
 ) (err error) {
 	var te *konfig.Transacted
 	defer s.pool.Put(te)

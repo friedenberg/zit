@@ -166,7 +166,7 @@ func (s etikettStore) CreateOrUpdate(
 		return
 	}
 
-	s.common.Transaktion.Skus.Add2(&tt.Sku)
+	s.common.Transaktion.Skus.Add(&tt.Sku)
 	s.common.KonfigPtr().AddEtikett(tt)
 
 	if mutter == nil {
@@ -203,7 +203,7 @@ func (s etikettStore) AllInChain(k kennung.Etikett) (c []*etikett.Transacted, er
 
 func (s *etikettStore) reindexOne(
 	t *transaktion.Transaktion,
-	o *sku.Sku,
+	o sku.SkuLike,
 ) (err error) {
 	var te *etikett.Transacted
 	defer s.pool.Put(te)

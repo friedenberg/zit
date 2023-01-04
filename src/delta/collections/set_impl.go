@@ -19,12 +19,19 @@ type setAlias[T any] struct {
 
 func makeSet[T any](kf KeyFunc[T], es ...T) (s set[T]) {
 	t := *new(T)
+  // Required because interface types do not properly get handled by
+  // `reflect.TypeOf`
+	t1 := make([]T, 1)
 
-	//confirms that the key function supports nil pointers properly
-	switch reflect.TypeOf(t).Kind() {
-	// case reflect.Map, reflect.Array, reflect.Chan, reflect.Slice:
-	case reflect.Ptr:
-		kf(t)
+	if reflect.TypeOf(t1).Elem().Kind() == reflect.Interface {
+		kf(t1[0])
+	} else {
+		//confirms that the key function supports nil pointers properly
+		switch reflect.TypeOf(t).Kind() {
+		// case reflect.Map, reflect.Array, reflect.Chan, reflect.Slice:
+		case reflect.Ptr:
+			kf(t)
+		}
 	}
 
 	s.keyFunc = kf

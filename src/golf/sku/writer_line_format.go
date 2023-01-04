@@ -7,15 +7,15 @@ import (
 
 func MakeWriterLineFormat(
 	lf *format.Writer,
-) collections.WriterFunc[*Sku] {
-	return func(o *Sku) (err error) {
+) collections.WriterFunc[SkuLike] {
+	return func(o SkuLike) (err error) {
 		lf.WriteFormat(
 			"%s %s %s %s %s",
-			o.Gattung,
-			o.Mutter[0],
-			o.Mutter[1],
-			o.Id,
-			o.Sha,
+			o.GetGattung(),
+			o.GetMutter()[0],
+			o.GetMutter()[1],
+			o.GetId(),
+			o.GetObjekteSha(),
 		)
 
 		return

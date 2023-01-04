@@ -122,7 +122,7 @@ func (op RemoteMessagesPullOrPush) SendFiltered(
 		collections.MakeChain(
 			zettel.WriterIds{Filter: filter}.WriteZettelVerzeichnisse,
 			func(z *zettel.Transacted) (err error) {
-				t.Skus.Add2(&z.Sku)
+				t.Skus.Add(&z.Sku)
 				return
 			},
 		),
@@ -159,13 +159,13 @@ func (op RemoteMessagesPullOrPush) handleDialoguePush(
 
 func (op RemoteMessagesPullOrPush) SendSkus(
 	d remote_messages.Dialogue,
-	skus []sku.Sku,
+	skus []sku.SkuLike,
 ) (err error) {
 	errors.Log().Printf("starting zettel send loop: %d", len(skus))
 
 	for _, s := range skus {
 		//TODO-P1 support any transacted objekte
-		if s.Gattung != gattung.Zettel {
+		if s.GetGattung() != gattung.Zettel {
 			errors.Err().Printf("not a zettel, continuing: %v", s)
 			continue
 		}
@@ -177,7 +177,7 @@ func (op RemoteMessagesPullOrPush) SendSkus(
 		if zt, err = op.umwelt.StoreObjekten().Zettel().Inflate(
 			//TODO-P2 use an actually correct time
 			ts.Now(),
-			&s,
+			s,
 		); err != nil {
 			errors.Log().Printf("error inflating zettel for send: %v", err)
 			err = errors.Wrap(err)
@@ -200,7 +200,7 @@ func (op RemoteMessagesPullOrPush) SendSkus(
 func (op RemoteMessagesPullOrPush) handleDialoguePushObjekten(
 	d remote_messages.Dialogue,
 ) (err error) {
-	var skus []sku.Sku
+	var skus []sku.SkuLike
 
 	errors.Log().Print("waiting to receive skus")
 
@@ -233,29 +233,29 @@ func (op RemoteMessagesPullOrPush) SendNeededSkus(
 	d remote_messages.Dialogue,
 	skus sku.MutableSet,
 ) (err error) {
-	skusNeeded := collections.MakeMutableSet[*sku.Sku](
-		func(sk *sku.Sku) string {
+	skusNeeded := collections.MakeMutableSet[sku.SkuLike](
+		func(sk sku.SkuLike) string {
 			if sk == nil {
 				return ""
 			}
 
-			return sk.Sha.String()
+			return sk.GetObjekteSha().String()
 		},
 	)
 
 	if err = skus.Each(
-		func(sk *sku.Sku) (err error) {
+		func(sk sku.SkuLike) (err error) {
 			//TODO-P1 support other gattung
-			if sk.Gattung != gattung.Zettel {
+			if sk.GetGattung() != gattung.Zettel {
 				return
 			}
 
-			if op.umwelt.StoreObjekten().Zettel().HasObjekte(sk.Sha) {
-				errors.Log().Printf("already have %s", sk.Sha)
+			if op.umwelt.StoreObjekten().Zettel().HasObjekte(sk.GetObjekteSha()) {
+				errors.Log().Printf("already have %s", sk.GetObjekteSha())
 				return
 			}
 
-			errors.Log().Printf("don't have %s", sk.Sha)
+			errors.Log().Printf("don't have %s", sk.GetObjekteSha())
 			skusNeeded.Add(sk)
 
 			return

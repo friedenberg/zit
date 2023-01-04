@@ -460,7 +460,7 @@ func (s *zettelStore) addZettelToTransaktion(
 	tz.Sku.Kennung = *zk
 	tz.Sku.Sha = *zs
 
-	s.common.Transaktion.Skus.Add2(&tz.Sku)
+	s.common.Transaktion.Skus.Add(&tz.Sku)
 
 	return
 }
@@ -544,7 +544,7 @@ func (s *zettelStore) Inherit(tz *zettel.Transacted) (err error) {
 
 func (s *zettelStore) reindexOne(
 	t *transaktion.Transaktion,
-	o *sku.Sku,
+	o sku.SkuLike,
 ) (err error) {
 	var tz *zettel.Transacted
 	defer s.pool.Put(tz)

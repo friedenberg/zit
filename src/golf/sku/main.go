@@ -16,10 +16,20 @@ import (
 
 type Mutter [2]ts.Time
 
+type IdLike = fmt.Stringer
+
 type SkuLike interface {
+	SetFields(...string) error
 	GetKey() string
 	SetTransactionIndex(int)
 	Sku() Sku
+	GetGattung() gattung.Gattung
+	GetId() IdLike
+	GetMutter() Mutter
+	GetObjekteSha() sha.Sha
+	GetTransactionIndex() int_value.IntValue
+	GetKopf() ts.Time
+	GetSchwanz() ts.Time
 }
 
 type Sku struct {

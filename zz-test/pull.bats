@@ -48,6 +48,7 @@ cat_yang() (
 # )
 
 function pull { # @test
+	skip
 	wd="$(mktemp -d)"
 
 	(

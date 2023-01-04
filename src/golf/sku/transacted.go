@@ -8,18 +8,57 @@ import (
 	"github.com/friedenberg/zit/src/bravo/int_value"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/sha"
+	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/ts"
 )
 
+// TODO-P2 include sku versions
+func MakeSku(line string) (out SkuLike, err error) {
+	fields := strings.Fields(line)
+	var g gattung.Gattung
+
+	if err = g.Set(fields[0]); err != nil {
+		err = errors.Wrapf(err, "failed to set type: %s", fields[0])
+		return
+	}
+
+	switch g {
+	case gattung.Zettel:
+		out = &Transacted[hinweis.Hinweis, *hinweis.Hinweis]{}
+
+	case gattung.Typ:
+		out = &Transacted[kennung.Typ, *kennung.Typ]{}
+
+	case gattung.Etikett:
+		out = &Transacted[kennung.Etikett, *kennung.Etikett]{}
+
+	case gattung.Konfig:
+		out = &Transacted[kennung.Konfig, *kennung.Konfig]{}
+
+	default:
+		err = errors.Errorf("unsupported gattung: %s", g)
+		return
+	}
+
+	if err = out.SetFields(fields[1:]...); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 // TODO-P3 examine adding objekte and akte shas to Skus
 // TODO-P2 move sku.Sku to sku.Transacted
 type Transacted[T kennung.KennungLike[T], T1 kennung.KennungLikePtr[T]] struct {
-	Mutter           Mutter
-	Kennung          T
+	Mutter  Mutter
+	Kennung T
+	//TODO rename to objekte sha
 	Sha              sha.Sha
 	TransactionIndex int_value.IntValue
-	Kopf, Schwanz    ts.Time
+	//TODO-P2 add verzeichnisse
+	Kopf, Schwanz ts.Time
 }
 
 func (a Transacted[T, T1]) Sku() Sku {
@@ -93,32 +132,11 @@ func (a Transacted[T, T1]) Equals(b *Transacted[T, T1]) (ok bool) {
 	return true
 }
 
-func (o *Transacted[T, T1]) Set(v string) (err error) {
-	vs := strings.Split(v, " ")
-
-	if len(vs) != 5 {
-		err = errors.Errorf("expected 5 elements but got %d", len(vs))
+func (o *Transacted[T, T1]) SetFields(vs ...string) (err error) {
+	if len(vs) != 4 {
+		err = errors.Errorf("expected 4 elements but got %d", len(vs))
 		return
 	}
-
-	var g gattung.Gattung
-
-	if err = g.Set(vs[0]); err != nil {
-		err = errors.Wrapf(err, "failed to set type: %s", vs[0])
-		return
-	}
-
-	if g != o.Kennung.Gattung() {
-		err = errors.Errorf(
-			"expected gattung %s but got %s",
-			o.Kennung.Gattung(),
-			g,
-		)
-
-		return
-	}
-
-	vs = vs[1:]
 
 	if err = o.Mutter[0].Set(vs[0]); err != nil {
 		err = errors.Wrapf(err, "failed to set mutter 0: %s", vs[0])
@@ -147,6 +165,34 @@ func (o *Transacted[T, T1]) Set(v string) (err error) {
 	}
 
 	return
+}
+
+func (s Transacted[T, T1]) GetMutter() Mutter {
+	return s.Mutter
+}
+
+func (s Transacted[T, T1]) GetGattung() gattung.Gattung {
+	return s.Kennung.Gattung()
+}
+
+func (s Transacted[T, T1]) GetId() IdLike {
+	return s.Kennung
+}
+
+func (s Transacted[T, T1]) GetObjekteSha() sha.Sha {
+	return s.Sha
+}
+
+func (s Transacted[T, T1]) GetTransactionIndex() int_value.IntValue {
+	return s.TransactionIndex
+}
+
+func (s Transacted[T, T1]) GetKopf() ts.Time {
+	return s.Kopf
+}
+
+func (s Transacted[T, T1]) GetSchwanz() ts.Time {
+	return s.Schwanz
 }
 
 func (o Transacted[T, T1]) GetKey() string {

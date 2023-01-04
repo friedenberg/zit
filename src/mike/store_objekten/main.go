@@ -136,16 +136,16 @@ func (s Store) RevertTransaktion(
 	tzs = zettel.MakeMutableSetUnique(t.Skus.Len())
 
 	t.Skus.Each(
-		func(o *sku.Sku) (err error) {
+		func(o sku.SkuLike) (err error) {
 			var h *hinweis.Hinweis
 			ok := false
 
-			if h, ok = o.Id.(*hinweis.Hinweis); !ok {
+			if h, ok = o.GetId().(*hinweis.Hinweis); !ok {
 				//TODO
 				return
 			}
 
-			if !o.Mutter[1].IsZero() {
+			if !o.GetMutter()[1].IsZero() {
 				err = errors.Errorf("merge reverts are not yet supported: %s", o)
 				return
 			}
@@ -163,7 +163,7 @@ func (s Store) RevertTransaktion(
 
 			for _, someTz := range chain {
 				errors.Log().Print(someTz)
-				if someTz.Sku.Schwanz == o.Mutter[0] {
+				if someTz.Sku.Schwanz == o.GetMutter()[0] {
 					tz = someTz
 					break
 				}
@@ -272,8 +272,8 @@ func (s *Store) Reindex() (err error) {
 		errors.Out().Printf("%s/%s: %s", t.Time.Kopf(), t.Time.Schwanz(), t.Time)
 
 		if err = t.Skus.Each(
-			func(o *sku.Sku) (err error) {
-				switch o.Gattung {
+			func(o sku.SkuLike) (err error) {
+				switch o.GetGattung() {
 
 				case gattung.Konfig:
 					if err = s.konfigStore.reindexOne(
@@ -289,7 +289,7 @@ func (s *Store) Reindex() (err error) {
 						t,
 						o,
 					); err != nil {
-						err = errors.Wrapf(err, "Kennung: %s", o.Id)
+						err = errors.Wrapf(err, "Kennung: %s", o.GetId())
 						return
 					}
 

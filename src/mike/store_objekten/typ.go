@@ -167,7 +167,7 @@ func (s typStore) CreateOrUpdate(
 		return
 	}
 
-	s.common.Transaktion.Skus.Add2(&tt.Sku)
+	s.common.Transaktion.Skus.Add(&tt.Sku)
 	s.common.KonfigPtr().AddTyp(tt)
 
 	if mutter == nil {
@@ -206,8 +206,8 @@ func (s typStore) ReadAll(
 	if err = s.common.ReadAllTransaktions(
 		func(t *transaktion.Transaktion) (err error) {
 			if err = t.Skus.Each(
-				func(o *sku.Sku) (err error) {
-					if o.Gattung != gattung.Typ {
+				func(o sku.SkuLike) (err error) {
+					if o.GetGattung() != gattung.Typ {
 						return
 					}
 
@@ -275,7 +275,7 @@ func (s typStore) AllInChain(k kennung.Typ) (c []*typ.Transacted, err error) {
 
 func (s *typStore) reindexOne(
 	t *transaktion.Transaktion,
-	o *sku.Sku,
+	o sku.SkuLike,
 ) (err error) {
 	var te *typ.Transacted
 	defer s.pool.Put(te)

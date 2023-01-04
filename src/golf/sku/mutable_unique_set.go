@@ -6,17 +6,17 @@ import (
 	"github.com/friedenberg/zit/src/delta/collections"
 )
 
-type MutableSetUnique = collections.MutableSet[*Sku]
+type MutableSetUnique = collections.MutableSet[SkuLike]
 
 func init() {
 	gob.Register(
-		collections.MakeMutableSet[*Sku](
-			func(s *Sku) string {
+		collections.MakeMutableSet[SkuLike](
+			func(s SkuLike) string {
 				if s == nil {
 					return ""
 				}
 
-				return s.Sha.String()
+				return s.GetObjekteSha().String()
 			},
 		),
 	)

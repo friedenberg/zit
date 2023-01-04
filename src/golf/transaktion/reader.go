@@ -49,9 +49,10 @@ func (r *Reader) ReadFrom(r1 io.Reader) (n int64, err error) {
 			}
 
 		default:
-			var o sku.Sku
+			var o sku.SkuLike
 
-			if err = o.Set(line); err != nil {
+			//TODO-P0 use generic construction method
+			if o, err = sku.MakeSku(line); err != nil {
 				err = errors.Wrapf(err, "failed to read line: %s", line)
 				return
 			}

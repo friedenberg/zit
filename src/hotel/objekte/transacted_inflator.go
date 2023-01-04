@@ -17,7 +17,7 @@ type TransactedInflator[
 	T4 gattung.Verzeichnisse[T],
 	T5 gattung.VerzeichnissePtr[T4, T],
 ] interface {
-	Inflate(ts.Time, *sku.Sku) (*Transacted[T, T1, T2, T3, T4, T5], error)
+	Inflate(ts.Time, sku.SkuLike) (*Transacted[T, T1, T2, T3, T4, T5], error)
 }
 
 type transactedInflator[
@@ -64,7 +64,7 @@ func MakeTransactedInflator[
 
 func (h *transactedInflator[T, T1, T2, T3, T4, T5]) Inflate(
 	ti ts.Time,
-	o *sku.Sku,
+	o sku.SkuLike,
 ) (t *Transacted[T, T1, T2, T3, T4, T5], err error) {
 	if h.pool == nil {
 		t = new(Transacted[T, T1, T2, T3, T4, T5])

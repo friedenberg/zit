@@ -10,7 +10,7 @@ import (
 )
 
 type codable struct {
-	Objekten map[string][]Sku
+	Objekten map[string][]SkuLike
 	Count    int
 }
 
@@ -23,7 +23,7 @@ func MakeMutableSet() MutableSet {
 	return MutableSet{
 		lock: &sync.RWMutex{},
 		codable: codable{
-			Objekten: make(map[string][]Sku),
+			Objekten: make(map[string][]SkuLike),
 		},
 	}
 }
@@ -32,25 +32,7 @@ func (os *MutableSet) Len() int {
 	return os.codable.Count
 }
 
-func (os *MutableSet) Add2(o SkuLike) {
-	os.codable.Count++
-	k := o.GetKey()
-
-	os.lock.RLock()
-	s, _ := os.codable.Objekten[k]
-	os.lock.RUnlock()
-
-	o.SetTransactionIndex(len(s))
-	s = append(s, o.Sku())
-
-	os.lock.Lock()
-	os.codable.Objekten[k] = s
-	os.lock.Unlock()
-
-	return
-}
-
-func (os *MutableSet) Add(o Sku) (i int) {
+func (os *MutableSet) Add(o SkuLike) (i int) {
 	os.codable.Count++
 	k := o.GetKey()
 
@@ -68,7 +50,7 @@ func (os *MutableSet) Add(o Sku) (i int) {
 	return
 }
 
-func (os MutableSet) Get(k string) []Sku {
+func (os MutableSet) Get(k string) []SkuLike {
 	os.lock.RLock()
 	defer os.lock.RUnlock()
 
@@ -76,14 +58,14 @@ func (os MutableSet) Get(k string) []Sku {
 }
 
 func (os MutableSet) Each(
-	w collections.WriterFunc[*Sku],
+	w collections.WriterFunc[SkuLike],
 ) (err error) {
 	os.lock.RLock()
 	defer os.lock.RUnlock()
 
 	for _, oss := range os.codable.Objekten {
 		for _, o := range oss {
-			if err = w(&o); err != nil {
+			if err = w(o); err != nil {
 				switch {
 				case errors.IsEOF(err):
 					err = nil
