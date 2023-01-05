@@ -2,6 +2,7 @@ package errors
 
 import (
 	"fmt"
+	"io"
 	"os"
 
 	"golang.org/x/xerrors"
@@ -43,11 +44,35 @@ func Unwrap(err error) error {
 	return err
 }
 
+func DeferredCloser(
+	err *error,
+	c io.Closer,
+) {
+	if err1 := c.Close(); err1 != nil {
+		*err = MakeMulti(*err, err1)
+	}
+}
+
 func Deferred(
 	err *error,
-	f func() error,
+	ef func() error,
 ) {
-	if err1 := f(); err1 != nil {
+	if err1 := ef(); err1 != nil {
+		*err = MakeMulti(*err, err1)
+	}
+}
+
+func DeferredChanError(
+	err *error,
+	ch <-chan error,
+) {
+	var err1 error
+
+	select {
+	case err1 = <-ch:
+	}
+
+	if err1 != nil {
 		*err = MakeMulti(*err, err1)
 	}
 }

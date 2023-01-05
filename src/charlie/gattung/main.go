@@ -23,6 +23,10 @@ const (
 	Kennung
 )
 
+func (g Gattung) GetGattung() Gattung {
+	return g
+}
+
 func (g Gattung) String() string {
 	switch g {
 	case Akte:

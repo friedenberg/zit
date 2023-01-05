@@ -4,6 +4,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/delta/collections"
 )
 
 func Write(
@@ -45,20 +46,22 @@ func MakeWriterToWithNewLines[T any](
 ) func(*T) error {
 	// w := bufio.NewWriter(w1)
 
-	return func(e *T) (err error) {
-		//TODO modify flushing behavior based on w1 being a TTY
-		// defer errors.Deferred(&err, w.Flush)
+	return collections.MakeSyncSerializer(
+		func(e *T) (err error) {
+			//TODO modify flushing behavior based on w1 being a TTY
+			// defer errors.Deferred(&err, w.Flush)
 
-		if _, err = wf(w, e); err != nil {
-			err = errors.Wrap(err)
+			if _, err = wf(w, e); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if _, err = io.WriteString(w, "\n"); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
 			return
-		}
-
-		if _, err = io.WriteString(w, "\n"); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		return
-	}
+		},
+	)
 }

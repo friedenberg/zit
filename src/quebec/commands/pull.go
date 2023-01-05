@@ -2,18 +2,21 @@ package commands
 
 import (
 	"flag"
+	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/ts"
 	"github.com/friedenberg/zit/src/golf/id_set"
-	"github.com/friedenberg/zit/src/golf/transaktion"
+	"github.com/friedenberg/zit/src/golf/sku"
+	"github.com/friedenberg/zit/src/hotel/objekte"
+	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
-	"github.com/friedenberg/zit/src/papa/user_ops"
-	"github.com/friedenberg/zit/src/remote_messages"
+	"github.com/friedenberg/zit/src/quebec/remote_pull"
 )
 
 type Pull struct {
@@ -110,8 +113,6 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		args = []string{}
 	}
 
-	errors.Log().Print(args)
-
 	ps := c.ProtoIdSet(u)
 
 	var ids id_set.Set
@@ -133,70 +134,90 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	defer errors.Deferred(&err, u.Unlock)
 
-	var s *remote_messages.StageCommander
+	var client remote_pull.Client
 
-	if s, err = remote_messages.MakeStageCommander(
-		u,
-		from,
+	if client, err = remote_pull.MakeClient(u, from); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.Deferred(&err, client.Close)
+
+	p := collections.MakePool[zettel.Transacted]()
+
+	inflator := objekte.MakeTransactedInflator[
+		zettel.Objekte,
+		*zettel.Objekte,
+		hinweis.Hinweis,
+		*hinweis.Hinweis,
+		zettel.Verzeichnisse,
+		*zettel.Verzeichnisse,
+	](
+		func(sk sku.SkuLike) (rc sha.ReadCloser, err error) {
+			var or io.ReadCloser
+
+			if or, err = client.ObjekteReaderForSku(sk); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			errors.Log().Printf("got reader for sku: %s", sk)
+
+			var ow sha.WriteCloser
+
+			if ow, err = u.StoreObjekten().WriteCloserObjektenGattung(sk); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			rc = sha.MakeReadCloserTee(or, ow)
+
+			return
+		},
+		client.AkteReader,
+		&zettel.FormatObjekte{
+			IgnoreTypErrors: true,
+		},
+		nil,
+		// objekte.MakeNopAkteParser[zettel.Objekte, *zettel.Objekte](),
+		p,
+	)
+
+	if err = client.SkusFromFilter(
+		filter,
+		func(sk sku.SkuLike) (err error) {
+			if sk.GetGattung() != gattung.Zettel {
+				return
+			}
+
+			if u.StoreObjekten().Zettel().HasObjekte(sk.GetObjekteSha()) {
+				errors.Log().Printf("already have objekte: %s", sk.GetObjekteSha())
+				return
+			}
+
+			errors.Log().Printf("need objekte: %s", sk.GetObjekteSha())
+
+			//TODO-P1 check for akte sha
+			//TODO-P1 write akte
+
+			var t *zettel.Transacted
+
+			if t, err = inflator.Inflate(
+				ts.Now(),
+				sk,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if err = u.StoreObjekten().Zettel().Inherit(t); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
 	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.Deferred(&err, s.Close)
-
-	var dialoguePull remote_messages.Dialogue
-
-	errors.Log().Printf("starting pull dialogue")
-
-	if dialoguePull, err = s.StartDialogue(
-		remote_messages.DialogueTypePush,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = dialoguePull.Send(filter); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	pullOrPushOp := user_ops.MakeRemoteMessagesPullOrPush(u)
-
-	if err = c.handleDialoguePull(
-		pullOrPushOp,
-		s,
-		dialoguePull,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (c Pull) handleDialoguePull(
-	op user_ops.RemoteMessagesPullOrPush,
-	s *remote_messages.StageCommander,
-	d remote_messages.Dialogue,
-) (err error) {
-	t := transaktion.MakeTransaktion(ts.Now())
-
-	if err = d.Receive(&t); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	var pullObjektenDialogue remote_messages.Dialogue
-
-	if pullObjektenDialogue, err = s.StartDialogue(
-		remote_messages.DialogueTypePushObjekten,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = op.HandleDialoguePullObjekten(s, pullObjektenDialogue, t.Skus); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

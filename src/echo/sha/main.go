@@ -9,7 +9,9 @@ type ReadCloser = sha.ReadCloser
 type WriteCloser = sha.WriteCloser
 
 var (
-	FromHash        = sha.FromHash
-	FromString      = sha.FromString
-	MakeShaFromPath = sha.MakeShaFromPath
+	FromHash          = sha.FromHash
+	FromString        = sha.FromString
+	MakeShaFromPath   = sha.MakeShaFromPath
+	MakeReadCloser    = sha.MakeReadCloser
+	MakeReadCloserTee = sha.MakeReadCloserTee
 )

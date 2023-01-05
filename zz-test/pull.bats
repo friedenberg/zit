@@ -88,7 +88,7 @@ function pull { # @test
 	cd "$wd1" || exit 1
 
 	run zit pull -abbreviate-hinweisen=false -all "$wd"
-	assert_output '          (new) [one/uno@d !md "to_add.md"]'
+	assert_output '          (new) [one/uno@b !md "to_add.md"]'
 
 	expected="$(mktemp)"
 	{

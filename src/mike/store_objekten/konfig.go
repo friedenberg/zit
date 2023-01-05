@@ -64,12 +64,8 @@ func makeKonfigStore(
 			objekte.NilVerzeichnisse[konfig.Objekte],
 			*objekte.NilVerzeichnisse[konfig.Objekte],
 		](
-			sa,
-			func(sh sha.Sha) (r sha.ReadCloser, err error) {
-				return s.common.ReadCloserObjekten(
-					id.Path(sh, sa.Standort.DirObjektenKonfig()),
-				)
-			},
+			sa.ReadCloserObjektenSku,
+			sa.AkteReader,
 			nil,
 			gattung.Parser[konfig.Objekte, *konfig.Objekte](
 				konfig.MakeFormatText(sa),

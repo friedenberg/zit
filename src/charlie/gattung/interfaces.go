@@ -8,6 +8,10 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 )
 
+type GattungLike interface {
+	GetGattung() Gattung
+}
+
 type Equatable[T any] interface {
 	Equals(*T) bool
 }
@@ -159,7 +163,10 @@ type AkteWriterFactory interface {
 	AkteWriter() (sha.WriteCloser, error)
 }
 
+// TODO-P3 rename to FuncShaReadCloser
 type FuncReadCloser func(sha.Sha) (sha.ReadCloser, error)
+
+// TODO-P3 rename to FuncShaWriteCloser
 type FuncWriteCloser func(sha.Sha) (sha.WriteCloser, error)
 
 type AkteIOFactoryFactory interface {

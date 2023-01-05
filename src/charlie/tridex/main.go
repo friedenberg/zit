@@ -5,10 +5,12 @@ import (
 	"encoding/gob"
 	"encoding/json"
 	"strings"
+	"sync"
 )
 
 // TODO-P4 make generic
 type Tridex struct {
+	lock *sync.RWMutex
 	root node
 }
 
@@ -22,6 +24,7 @@ type node struct {
 
 func Make(vs ...string) (t *Tridex) {
 	t = &Tridex{
+		lock: &sync.RWMutex{},
 		root: node{
 			Children: make(map[byte]node),
 			IsRoot:   true,
@@ -36,26 +39,37 @@ func Make(vs ...string) (t *Tridex) {
 }
 
 func (t *Tridex) Count() int {
+	t.lock.RLock()
+	defer t.lock.RUnlock()
+
 	return t.root.Count
 }
 
-func (t *Tridex) Remove(v string) {
-	t.root.Remove(v)
-}
-
 func (t *Tridex) Contains(v string) bool {
+	t.lock.RLock()
+	defer t.lock.RUnlock()
+
 	return t.root.Contains(v)
 }
 
 func (t *Tridex) ContainsExactly(v string) bool {
+	t.lock.RLock()
+	defer t.lock.RUnlock()
+
 	return t.root.ContainsExactly(v)
 }
 
 func (t *Tridex) Abbreviate(v string) string {
+	t.lock.RLock()
+	defer t.lock.RUnlock()
+
 	return t.root.Abbreviate(v, 0)
 }
 
 func (t *Tridex) Expand(v string) string {
+	t.lock.RLock()
+	defer t.lock.RUnlock()
+
 	sb := &strings.Builder{}
 	ok := t.root.Expand(v, sb)
 
@@ -66,8 +80,18 @@ func (t *Tridex) Expand(v string) string {
 	}
 }
 
+func (t *Tridex) Remove(v string) {
+	t.lock.Lock()
+	defer t.lock.Unlock()
+
+	t.root.Remove(v)
+}
+
 func (t *Tridex) Add(v string) {
-	if t.ContainsExactly(v) {
+	t.lock.Lock()
+	defer t.lock.Unlock()
+
+	if t.root.ContainsExactly(v) {
 		return
 	}
 
@@ -192,7 +216,7 @@ func (n node) ContainsExactly(v string) (ok bool) {
 }
 
 func (n node) Any() byte {
-	for c, _ := range n.Children {
+	for c := range n.Children {
 		return c
 	}
 

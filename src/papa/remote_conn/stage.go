@@ -1,8 +1,8 @@
-package remote_messages
+package remote_conn
 
 type stage struct {
-	sockPath       string
-	mainDialogue   Dialogue
+	sockPath     string
+	mainDialogue Dialogue
 }
 
 func (s stage) MainDialogue() Dialogue {

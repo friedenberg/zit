@@ -5,8 +5,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/toml"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
-	"github.com/friedenberg/zit/src/echo/sha"
-	"github.com/friedenberg/zit/src/foxtrot/id"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/golf/age_io"
 	"github.com/friedenberg/zit/src/golf/sku"
@@ -65,12 +63,8 @@ func makeTypStore(
 			objekte.NilVerzeichnisse[typ.Objekte],
 			*objekte.NilVerzeichnisse[typ.Objekte],
 		](
-			sa,
-			func(sh sha.Sha) (r sha.ReadCloser, err error) {
-				return s.common.ReadCloserObjekten(
-					id.Path(sh, sa.Standort.DirObjektenTypen()),
-				)
-			},
+			sa.ReadCloserObjektenSku,
+			sa.AkteReader,
 			nil,
 			gattung.Parser[typ.Objekte, *typ.Objekte](
 				typ.MakeFormatTextIgnoreTomlErrors(sa),
@@ -281,8 +275,13 @@ func (s *typStore) reindexOne(
 	defer s.pool.Put(te)
 
 	if te, err = s.Inflate(t.Time, o); err != nil {
-		err = errors.Wrap(err)
-		return
+		if errors.Is(err, toml.Error{}) {
+			err = nil
+      return
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	s.common.KonfigPtr().AddTyp(te)

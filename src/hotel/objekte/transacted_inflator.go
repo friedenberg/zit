@@ -28,8 +28,8 @@ type transactedInflator[
 	T4 gattung.Verzeichnisse[T],
 	T5 gattung.VerzeichnissePtr[T4, T],
 ] struct {
-	arf           gattung.AkteReaderFactory
-	frc           gattung.FuncReadCloser
+	orc           sku.FuncSkuObjekteReader
+	arc           gattung.FuncReadCloser
 	objekteParser gattung.Parser[T, T1]
 	akteParser    gattung.Parser[T, T1]
 	pool          collections.PoolLike[Transacted[T, T1, T2, T3, T4, T5]]
@@ -43,8 +43,8 @@ func MakeTransactedInflator[
 	T4 gattung.Verzeichnisse[T],
 	T5 gattung.VerzeichnissePtr[T4, T],
 ](
-	arf gattung.AkteReaderFactory,
-	frc gattung.FuncReadCloser,
+	orc sku.FuncSkuObjekteReader,
+	arc gattung.FuncReadCloser,
 	objekteParser gattung.Parser[T, T1],
 	akteParser gattung.Parser[T, T1],
 	pool collections.PoolLike[Transacted[T, T1, T2, T3, T4, T5]],
@@ -54,14 +54,15 @@ func MakeTransactedInflator[
 	}
 
 	return &transactedInflator[T, T1, T2, T3, T4, T5]{
-		arf:           arf,
-		frc:           frc,
+		orc:           orc,
+		arc:           arc,
 		objekteParser: objekteParser,
 		akteParser:    akteParser,
 		pool:          pool,
 	}
 }
 
+// TODO-P3 rename to InflateFromSku
 func (h *transactedInflator[T, T1, T2, T3, T4, T5]) Inflate(
 	ti ts.Time,
 	o sku.SkuLike,
@@ -77,36 +78,53 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) Inflate(
 		return
 	}
 
-	{
+	func() {
 		var r sha.ReadCloser
 
-		if r, err = h.frc(t.ObjekteSha()); err != nil {
+		if r, err = h.orc(o); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 		defer errors.Deferred(&err, r.Close)
 
-		if _, err = h.objekteParser.Parse(r, &t.Objekte); err != nil {
+		var n int64
+
+		if n, err = h.objekteParser.Parse(r, &t.Objekte); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
-	}
+
+		errors.Log().Printf("parsed %d objekte bytes", n)
+		errors.Log().Printf("produced: %v", t.Objekte)
+	}()
 
 	if h.akteParser != nil {
-		var r sha.ReadCloser
+		func() {
+			sh := t.AkteSha()
 
-		if r, err = h.arf.AkteReader(t.AkteSha()); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+			if sh.IsNull() {
+				return
+			}
 
-		defer errors.Deferred(&err, r.Close)
+			var r sha.ReadCloser
 
-		if _, err = h.akteParser.Parse(r, &t.Objekte); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+			if r, err = h.arc(t.AkteSha()); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			defer errors.DeferredCloser(&err, r)
+
+			var n int64
+
+			if n, err = h.akteParser.Parse(r, &t.Objekte); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			errors.Log().Printf("parsed %d akte bytes", n)
+		}()
 	}
 
 	return

@@ -1,4 +1,4 @@
-package remote_messages
+package remote_conn
 
 import (
 	"encoding/gob"
@@ -13,6 +13,10 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
+
+type Listener interface {
+	Listen() error
+}
 
 type MessageHiSoldier struct{}
 
@@ -101,16 +105,6 @@ func MakeStageSoldier(u *umwelt.Umwelt) (
 	return
 }
 
-func (s *StageSoldier) RegisterHandlerWithUmwelt(
-	t DialogueType,
-	u *umwelt.Umwelt,
-	h func(*umwelt.Umwelt, Dialogue) error,
-) {
-	s.handlers[t] = func(d Dialogue) (err error) {
-		return h(u, d)
-	}
-}
-
 func (s *StageSoldier) RegisterHandler(
 	t DialogueType,
 	h func(Dialogue) error,
@@ -139,9 +133,15 @@ func (s *StageSoldier) Listen() (err error) {
 
 	s.wg.Wait()
 
-	if err = s.MainDialogue().Receive(&MessageDone{}); err != nil {
-		err = errors.Wrap(err)
-		return
+	var done interface{}
+
+	if err = s.MainDialogue().Receive(done); err != nil {
+		if errors.IsEOF(err) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return
@@ -166,27 +166,35 @@ func (s *StageSoldier) awaitRegisteredDialogueHandlers(chErr chan<- error) {
 				continue
 			}
 
-			errors.Log().Printf("connection accepted")
-
-			var h func(Dialogue) error
-			ok := false
-
-			if h, ok = s.handlers[el.Dialogue.Type()]; !ok {
-				chErr <- errors.Errorf(
-					"unregistered dialogue type: %d", el.Dialogue.Type(),
-				)
-
-				continue
-			}
-
-			errors.Log().Printf("found handler: %d", el.Dialogue.Type())
-
 			s.wg.Add(1)
 
 			go func() {
+				defer ReleaseConnLicense()
+
+				if el.Dialogue.Type() == DialogueTypeMain {
+					err := errors.Errorf("receive request for main dialog after handshake")
+					chErr <- err
+					return
+				}
+
+				errors.Log().Printf("connection accepted")
+
+				var h func(Dialogue) error
+				ok := false
+
+				if h, ok = s.handlers[el.Dialogue.Type()]; !ok {
+					chErr <- errors.Errorf(
+						"unregistered dialogue type: %s", el.Dialogue.Type(),
+					)
+
+					return
+				}
+
+				errors.Log().Printf("found handler: %s", el.Dialogue.Type())
+
 				defer s.wg.Done()
-				errors.Log().Printf("start handler: %d", el.Dialogue.Type())
-				defer errors.Log().Printf("end handler: %d", el.Dialogue.Type())
+				errors.Log().Printf("start handler: %s", el.Dialogue.Type())
+				defer errors.Log().Printf("end handler: %s", el.Dialogue.Type())
 
 				if err := h(el.Dialogue); err != nil {
 					chErr <- errors.Wrap(err)
@@ -197,6 +205,8 @@ func (s *StageSoldier) awaitRegisteredDialogueHandlers(chErr chan<- error) {
 }
 
 func (s *StageSoldier) AwaitDialogue() (out SoldierDialogueChanElement) {
+	AcquireConnLicense()
+
 	out.Dialogue.stage = &s.stage
 
 	if out.Dialogue.conn, out.error = s.listener.Accept(); out.error != nil {

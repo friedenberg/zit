@@ -1,23 +1,10 @@
-package remote_messages
+package remote_conn
 
 import (
 	"encoding/gob"
 	"net"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-)
-
-type DialogueType int
-
-const (
-	DialogueTypeUnknown = DialogueType(iota)
-	DialogueTypeDirector
-	DialogueTypePull
-	DialogueTypePullObjekten
-	DialogueTypePullAkte
-	DialogueTypePush
-	DialogueTypePushObjekten
-	DialogueTypePushAkte
 )
 
 type Dialogue struct {
@@ -60,8 +47,15 @@ func (s Dialogue) Type() DialogueType {
 }
 
 func (s Dialogue) Send(e any) (err error) {
+	// errors.Log().Printf("%s sending %T:%v", s.Type(), e, e)
+	// defer errors.Log().Printf("%s sent %T:%v", s.Type(), e, e)
+
 	if err = s.enc.Encode(e); err != nil {
-		err = errors.Wrap(err)
+		if errors.IsEOF(err) {
+			errors.Log().Caller(1, "%s EOF", s.Type())
+		}
+
+		err = errors.Wrapf(err, "%s", s.Type())
 		return
 	}
 
@@ -69,9 +63,16 @@ func (s Dialogue) Send(e any) (err error) {
 }
 
 func (s Dialogue) Receive(e any) (err error) {
+	// errors.Log().Printf("%s receiving %T:%v", s.Type(), e, e)
+	// defer errors.Log().Printf("%s received %T:%v", s.Type(), e, e)
+
 	if err = s.dec.Decode(e); err != nil {
-		err = errors.Wrap(err)
-		return
+		if errors.IsEOF(err) {
+			errors.Log().Caller(1, "%s EOF", s.Type())
+		} else {
+			err = errors.Wrapf(err, "%s", s.Type())
+			return
+		}
 	}
 
 	return

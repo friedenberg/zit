@@ -16,7 +16,11 @@ endif
 # build: install unit_tests go_vet graph_dependencies;
 build: install unit_tests go_vet;
 
-go_build:
+go_generate:
+> go generate ./...
+.PHONY: go_generate
+
+go_build: go_generate
 > go build -o build/zit ./.
 
 go_vet: go_build

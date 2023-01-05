@@ -5,6 +5,7 @@ import (
 	"encoding/gob"
 	"io"
 	"math/rand"
+	"sync"
 	"time"
 
 	"github.com/friedenberg/zit/src/alfa/coordinates"
@@ -21,6 +22,7 @@ type encodedKennung struct {
 type indexKennung struct {
 	ioFactory
 
+	lock *sync.RWMutex
 	path string
 
 	encodedKennung
@@ -40,6 +42,7 @@ func newIndexKennung(
 	p string,
 ) (i *indexKennung, err error) {
 	i = &indexKennung{
+		lock:               &sync.RWMutex{},
 		path:               p,
 		nonRandomSelection: k.PredictableHinweisen,
 		oldHinweisenStore:  oldHinweisenStore,
@@ -53,10 +56,15 @@ func newIndexKennung(
 }
 
 func (i *indexKennung) Flush() (err error) {
+	i.lock.RLock()
+
 	if !i.hasChanges {
 		errors.Log().Print("no changes")
+		i.lock.RUnlock()
 		return
 	}
+
+	i.lock.RUnlock()
 
 	var w1 io.WriteCloser
 
@@ -82,10 +90,17 @@ func (i *indexKennung) Flush() (err error) {
 }
 
 func (i *indexKennung) readIfNecessary() (err error) {
+	i.lock.RLock()
+
 	if i.didRead {
-		errors.Log().Print("already read")
+		i.lock.RUnlock()
 		return
 	}
+
+	i.lock.RUnlock()
+
+	i.lock.Lock()
+	defer i.lock.Unlock()
 
 	errors.Log().Print("reading")
 
@@ -178,6 +193,9 @@ func (i *indexKennung) addHinweis(h hinweis.Hinweis) (err error) {
 	n := k.Id()
 	errors.Log().Printf("deleting %d, %s", n, h)
 
+	i.lock.Lock()
+	defer i.lock.Unlock()
+
 	if _, ok := i.AvailableKennung[int(n)]; ok {
 		delete(i.AvailableKennung, int(n))
 	}
@@ -214,7 +232,7 @@ func (i *indexKennung) createHinweis() (h hinweis.Hinweis, err error) {
 	m := 0
 	j := 0
 
-	for n, _ := range i.AvailableKennung {
+	for n := range i.AvailableKennung {
 		if i.nonRandomSelection {
 			if m == 0 {
 				m = n
@@ -276,7 +294,7 @@ func (i *indexKennung) PeekHinweisen(m int) (hs []hinweis.Hinweis, err error) {
 	hs = make([]hinweis.Hinweis, 0, m)
 	j := 0
 
-	for n, _ := range i.AvailableKennung {
+	for n := range i.AvailableKennung {
 		k := &coordinates.Kennung{}
 		k.SetInt(coordinates.Int(n))
 

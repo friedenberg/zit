@@ -2,11 +2,12 @@ package commands
 
 import (
 	"flag"
+	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
-	"github.com/friedenberg/zit/src/papa/user_ops"
-	"github.com/friedenberg/zit/src/remote_messages"
+	"github.com/friedenberg/zit/src/papa/remote_conn"
+	"github.com/friedenberg/zit/src/quebec/remote_pull"
 )
 
 type Listen struct {
@@ -24,17 +25,27 @@ func init() {
 }
 
 func (c Listen) Run(u *umwelt.Umwelt, args ...string) (err error) {
-	var s *remote_messages.StageSoldier
-
-	if s, err = remote_messages.MakeStageSoldier(u); err != nil {
-		err = errors.Wrap(err)
+	if len(args) == 0 {
+		err = errors.Normalf("must specify command to listen for")
 		return
 	}
 
-	pullOrPushOp := user_ops.MakeRemoteMessagesPullOrPush(u)
-	pullOrPushOp.AddToSoldierStage(s)
+	command := args[0]
+	var l remote_conn.Listener
 
-	if err = s.Listen(); err != nil {
+	switch strings.ToLower(strings.TrimSpace(command)) {
+	case "pull":
+		if l, err = remote_pull.MakeServer(u); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+	default:
+		err = errors.Normalf("unsupported command: %q", command)
+		return
+	}
+
+	if err = l.Listen(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

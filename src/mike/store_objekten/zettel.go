@@ -7,12 +7,12 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/hinweisen"
 	"github.com/friedenberg/zit/src/foxtrot/id"
-	"github.com/friedenberg/zit/src/golf/age_io"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/hotel/objekte"
@@ -62,12 +62,8 @@ func makeZettelStore(
 			zettel.Verzeichnisse,
 			*zettel.Verzeichnisse,
 		](
-			sa,
-			func(sh sha.Sha) (r sha.ReadCloser, err error) {
-				return sa.ReadCloserObjekten(
-					id.Path(sh, sa.Standort.DirObjektenZettelen()),
-				)
-			},
+			sa.ReadCloserObjektenSku,
+			sa.AkteReader,
 			&zettel.FormatObjekte{
 				IgnoreTypErrors: true,
 			},
@@ -158,20 +154,14 @@ func (s *zettelStore) SetZettelTransactedLogWriter(
 func (s zettelStore) WriteZettelObjekte(z zettel.Objekte) (sh sha.Sha, err error) {
 	//no lock required
 
-	var w *age_io.Mover
+	var wc sha.WriteCloser
 
-	mo := age_io.MoveOptions{
-		Age:                      s.common.Age,
-		FinalPath:                s.common.Standort.DirObjektenZettelen(),
-		GenerateFinalPathFromSha: true,
-	}
-
-	if w, err = age_io.NewMover(mo); err != nil {
+	if wc, err = s.common.WriteCloserObjektenGattung(gattung.Zettel); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.Deferred(&err, w.Close)
+	defer errors.DeferredCloser(&err, wc)
 
 	c := zettel.ObjekteFormatterContext{
 		Zettel: z,
@@ -179,12 +169,12 @@ func (s zettelStore) WriteZettelObjekte(z zettel.Objekte) (sh sha.Sha, err error
 
 	f := zettel.FormatObjekte{}
 
-	if _, err = f.Format(w, &c.Zettel); err != nil {
+	if _, err = f.Format(wc, &c.Zettel); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	sh = w.Sha()
+	sh = wc.Sha()
 
 	return
 }

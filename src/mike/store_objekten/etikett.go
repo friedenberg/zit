@@ -4,8 +4,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
-	"github.com/friedenberg/zit/src/echo/sha"
-	"github.com/friedenberg/zit/src/foxtrot/id"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/golf/age_io"
 	"github.com/friedenberg/zit/src/golf/sku"
@@ -64,12 +62,8 @@ func makeEtikettStore(
 			objekte.NilVerzeichnisse[etikett.Objekte],
 			*objekte.NilVerzeichnisse[etikett.Objekte],
 		](
-			sa,
-			func(sh sha.Sha) (r sha.ReadCloser, err error) {
-				return s.common.ReadCloserObjekten(
-					id.Path(sh, sa.Standort.DirObjektenEtiketten()),
-				)
-			},
+			sa.ReadCloserObjektenSku,
+			sa.AkteReader,
 			nil,
 			gattung.Parser[etikett.Objekte, *etikett.Objekte](
 				etikett.MakeFormatText(sa),

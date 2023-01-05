@@ -1,8 +1,9 @@
-package remote_messages
+package remote_conn
 
 import (
 	"bufio"
 	"encoding/gob"
+	"fmt"
 	"io"
 	"net"
 	"os"
@@ -27,7 +28,7 @@ type StageCommander struct {
 
 func (s StageCommander) Close() (err error) {
 	//TODO-P3 determine if this is the right place
-	if err = s.MainDialogue().Send(MessageDone{}); err != nil {
+	if err = s.MainDialogue().Close(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -43,6 +44,7 @@ func (s StageCommander) Close() (err error) {
 func MakeStageCommander(
 	u *umwelt.Umwelt,
 	from string,
+	command string,
 ) (s *StageCommander, err error) {
 	s = &StageCommander{
 		konfigCli: u.Konfig().Cli(),
@@ -53,9 +55,15 @@ func MakeStageCommander(
 		"listen",
 		"-dir-zit",
 		from,
+		command,
 	)
 
-	s.remoteActorCmd.Stderr = os.Stderr
+	var rErr io.ReadCloser
+
+	if rErr, err = s.remoteActorCmd.StderrPipe(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	var r io.ReadCloser
 
@@ -76,14 +84,25 @@ func MakeStageCommander(
 		return
 	}
 
-	go func() {
-		io.Copy(os.Stdout, rb)
-	}()
+	copyWithPrefix := func(r *bufio.Reader, w io.Writer) {
+		for {
+			var line string
+
+			if line, err = r.ReadString('\n'); err != nil {
+				break
+			}
+
+			fmt.Fprintf(w, "remote: %s", line)
+		}
+	}
+
+	go copyWithPrefix(rb, os.Stdout)
+	go copyWithPrefix(bufio.NewReader(rErr), os.Stderr)
 
 	s.sockPath = strings.TrimSpace(s.sockPath)
 
 	if s.mainDialogue, err = s.StartDialogue(
-		DialogueTypeDirector,
+		DialogueTypeMain,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

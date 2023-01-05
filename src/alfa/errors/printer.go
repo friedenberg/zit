@@ -72,10 +72,16 @@ func (p printer) Print(a ...interface{}) (err error) {
 		return
 	}
 
-	//TODO-P3 add support for includesStack
+	args := []interface{}{}
+
+	if p.includesStack {
+		si, _ := MakeStackInfo(1)
+		args = []interface{}{si}
+	}
+
 	_, err = fmt.Fprintln(
 		p.f,
-		a...,
+		append(args, a...)...,
 	)
 
 	return
@@ -84,6 +90,12 @@ func (p printer) Print(a ...interface{}) (err error) {
 func (p printer) Printf(f string, a ...interface{}) (err error) {
 	if !p.on {
 		return
+	}
+
+	if p.includesStack {
+		si, _ := MakeStackInfo(1)
+		f = "%s" + f
+		a = append([]interface{}{si}, a...)
 	}
 
 	_, err = fmt.Fprintln(

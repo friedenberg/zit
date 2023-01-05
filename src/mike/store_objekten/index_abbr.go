@@ -80,10 +80,7 @@ func (i *indexAbbr) Flush() (err error) {
 }
 
 func (i *indexAbbr) readIfNecessary() (err error) {
-	errors.Log().Caller(1, "")
-
 	if i.didRead {
-		errors.Log().Print("already read")
 		return
 	}
 

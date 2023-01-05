@@ -8,13 +8,14 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/sha"
+	"github.com/friedenberg/zit/src/foxtrot/hinweis"
+	"github.com/friedenberg/zit/src/foxtrot/id"
 	"github.com/friedenberg/zit/src/foxtrot/ts"
 	"github.com/friedenberg/zit/src/golf/id_set"
 	"github.com/friedenberg/zit/src/golf/sku"
-	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
-	"github.com/friedenberg/zit/src/remote_messages"
+	"github.com/friedenberg/zit/src/papa/remote_conn"
 )
 
 type RemoteMessagesPullOrPush struct {
@@ -32,20 +33,30 @@ func MakeRemoteMessagesPullOrPush(
 }
 
 func (op RemoteMessagesPullOrPush) AddToSoldierStage(
-	s *remote_messages.StageSoldier,
+	s *remote_conn.StageSoldier,
 ) {
 	s.RegisterHandler(
-		remote_messages.DialogueTypePush,
+		remote_conn.DialogueTypeSkusForFilter,
+		op.skusForFilter,
+	)
+
+	s.RegisterHandler(
+		remote_conn.DialogueTypeObjekteReaderForSku,
+		op.objekteReaderForSku,
+	)
+
+	s.RegisterHandler(
+		remote_conn.DialogueTypePush,
 		op.handleDialoguePush,
 	)
 
 	s.RegisterHandler(
-		remote_messages.DialogueTypePushObjekten,
+		remote_conn.DialogueTypePushObjekten,
 		op.handleDialoguePushObjekten,
 	)
 
 	s.RegisterHandler(
-		remote_messages.DialogueTypePushAkte,
+		remote_conn.DialogueTypePushAkte,
 		op.handleDialoguePushAkte,
 	)
 
@@ -66,7 +77,7 @@ func (op RemoteMessagesPullOrPush) AddToSoldierStage(
 }
 
 func (op RemoteMessagesPullOrPush) handleDialoguePushAkte(
-	d remote_messages.Dialogue,
+	d remote_conn.Dialogue,
 ) (err error) {
 	var sh sha.Sha
 
@@ -107,11 +118,9 @@ func (op RemoteMessagesPullOrPush) handleDialoguePushAkte(
 }
 
 func (op RemoteMessagesPullOrPush) SendFiltered(
-	d remote_messages.Dialogue,
+	d remote_conn.Dialogue,
 	filter id_set.Filter,
 ) (err error) {
-	t := transaktion.MakeTransaktion(ts.Now())
-
 	method := op.umwelt.StoreObjekten().Zettel().ReadAllSchwanzenVerzeichnisse
 
 	if op.umwelt.Konfig().IncludeHistory {
@@ -122,7 +131,13 @@ func (op RemoteMessagesPullOrPush) SendFiltered(
 		collections.MakeChain(
 			zettel.WriterIds{Filter: filter}.WriteZettelVerzeichnisse,
 			func(z *zettel.Transacted) (err error) {
-				t.Skus.Add(&z.Sku)
+				if err = d.Send(sku.String(&z.Sku)); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				errors.Err().Print(z.Sku)
+
 				return
 			},
 		),
@@ -131,7 +146,7 @@ func (op RemoteMessagesPullOrPush) SendFiltered(
 		return
 	}
 
-	if err = d.Send(t); err != nil {
+	if err = d.Close(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -139,8 +154,42 @@ func (op RemoteMessagesPullOrPush) SendFiltered(
 	return
 }
 
-func (op RemoteMessagesPullOrPush) handleDialoguePush(
-	d remote_messages.Dialogue,
+func (op RemoteMessagesPullOrPush) objekteReaderForSku(
+	d remote_conn.Dialogue,
+) (err error) {
+	var strSku string
+
+	if err = d.Receive(&strSku); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	var sk sku.SkuLike
+
+	if sk, err = sku.MakeSku(strSku); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	var or io.ReadCloser
+
+	if or, err = op.umwelt.StoreObjekten().ReadCloserObjekten(
+		id.Path(sk.GetObjekteSha(), op.umwelt.Standort().DirObjektenZettelen()),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if _, err = io.Copy(d, or); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (op RemoteMessagesPullOrPush) skusForFilter(
+	d remote_conn.Dialogue,
 ) (err error) {
 	var filter id_set.Filter
 
@@ -157,150 +206,135 @@ func (op RemoteMessagesPullOrPush) handleDialoguePush(
 	return
 }
 
-func (op RemoteMessagesPullOrPush) SendSkus(
-	d remote_messages.Dialogue,
-	skus []sku.SkuLike,
+func (op RemoteMessagesPullOrPush) handleDialoguePush(
+	d remote_conn.Dialogue,
 ) (err error) {
-	errors.Log().Printf("starting zettel send loop: %d", len(skus))
+	var filter id_set.Filter
 
-	for _, s := range skus {
-		//TODO-P1 support any transacted objekte
-		if s.GetGattung() != gattung.Zettel {
-			errors.Err().Printf("not a zettel, continuing: %v", s)
-			continue
-		}
-
-		errors.Log().Printf("found a zettel, sending: %v", s)
-
-		var zt *zettel.Transacted
-
-		if zt, err = op.umwelt.StoreObjekten().Zettel().Inflate(
-			//TODO-P2 use an actually correct time
-			ts.Now(),
-			s,
-		); err != nil {
-			errors.Log().Printf("error inflating zettel for send: %v", err)
-			err = errors.Wrap(err)
-			return
-		}
-
-		errors.Log().Printf("sending zettel.Transacted: %v", zt)
-
-		if err = d.Send(zt); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		errors.Log().Printf("did send zettel.Transacted: %v", zt)
+	if err = d.Receive(&filter); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
+
+	if err = op.SendFiltered(d, filter); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (op RemoteMessagesPullOrPush) SendObjekte(
+	d remote_conn.Dialogue,
+	s sku.SkuLike,
+) (err error) {
+	//TODO-P1 support any transacted objekte
+	if s.GetGattung() != gattung.Zettel {
+		errors.Err().Printf("not a zettel, continuing: %v", s)
+		return
+	}
+
+	sk := s.(*sku.Transacted[hinweis.Hinweis, *hinweis.Hinweis])
+
+	errors.Log().Printf("found a zettel, sending: %v", s)
+
+	var zt *zettel.Transacted
+
+	if zt, err = op.umwelt.StoreObjekten().Zettel().Inflate(
+		//TODO-P2 use an actually correct time
+		ts.Now(),
+		sk,
+	); err != nil {
+		errors.Log().Printf("error inflating zettel for send: %v", err)
+		err = errors.Wrap(err)
+		return
+	}
+
+	errors.Log().Printf("sending zettel.Transacted: %v", zt)
+
+	if err = d.Send(zt); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	errors.Log().Printf("did send zettel.Transacted: %v", zt)
 
 	return
 }
 
 func (op RemoteMessagesPullOrPush) handleDialoguePushObjekten(
-	d remote_messages.Dialogue,
+	d remote_conn.Dialogue,
 ) (err error) {
-	var skus []sku.SkuLike
-
 	errors.Log().Print("waiting to receive skus")
 
-	if err = d.Receive(&skus); err != nil {
-		errors.Log().Printf("error receiving skus: %s", err)
-		err = errors.Wrap(err)
-		return
+	for {
+		var strSku string
+
+		if err = d.Receive(&strSku); err != nil {
+			errors.Log().Printf("error receiving skus: %s", err)
+			err = errors.Wrap(err)
+			return
+		}
+
+		errors.Log().Printf("received sku: %s", strSku)
+
+		var sk sku.SkuLike
+
+		if sk, err = sku.MakeSku(strSku); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		errors.Log().Printf("sending sku: %s", strSku)
+
+		if err = op.SendObjekte(d, sk); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		errors.Log().Printf("did send sku: %s", strSku)
 	}
-
-	errors.Log().Printf("did receive skus: %d", len(skus))
-
-	if err = op.SendSkus(d, skus); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	errors.Log().Printf("send objekten")
-
-	if err = d.Close(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	errors.Log().Printf("did close")
-
-	return
 }
 
 func (op RemoteMessagesPullOrPush) SendNeededSkus(
-	d remote_messages.Dialogue,
-	skus sku.MutableSet,
+	d remote_conn.Dialogue,
+	skus []sku.SkuLike,
 ) (err error) {
-	skusNeeded := collections.MakeMutableSet[sku.SkuLike](
-		func(sk sku.SkuLike) string {
-			if sk == nil {
-				return ""
-			}
+	errors.Log().Print("sending needed skus")
+	defer errors.Log().Print("sent needed skus")
 
-			return sk.GetObjekteSha().String()
-		},
-	)
-
-	if err = skus.Each(
-		func(sk sku.SkuLike) (err error) {
-			//TODO-P1 support other gattung
-			if sk.GetGattung() != gattung.Zettel {
-				return
-			}
-
-			if op.umwelt.StoreObjekten().Zettel().HasObjekte(sk.GetObjekteSha()) {
-				errors.Log().Printf("already have %s", sk.GetObjekteSha())
-				return
-			}
-
-			errors.Log().Printf("don't have %s", sk.GetObjekteSha())
-			skusNeeded.Add(sk)
-
+	for _, sk := range skus {
+		if err = d.Send(sku.String(sk)); err != nil {
+			err = errors.Wrap(err)
 			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = d.Send(skusNeeded.Elements()); err != nil {
-		errors.Log().Print("failed to send skus")
-		err = errors.Wrap(err)
-		return
+		}
 	}
 
 	return
 }
 
 func (op RemoteMessagesPullOrPush) HandleDialoguePullObjekten(
-	s *remote_messages.StageCommander,
-	d remote_messages.Dialogue,
-	skus sku.MutableSet,
+	s *remote_conn.StageCommander,
+	d remote_conn.Dialogue,
+	skus []sku.SkuLike,
 ) (err error) {
-	errors.Log().Print("did send skus")
-
 	if err = op.SendNeededSkus(d, skus); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	for {
-		errors.Log().Print("did start zettel receive loop")
+	for i := 0; i < len(skus); i++ {
+		errors.Log().Print("waiting to receive one zettel")
 		var zt zettel.Transacted
 
 		if err = d.Receive(&zt); err != nil {
 			errors.Log().Printf("did receive error: %s", errors.Wrap(err))
 
-			if errors.IsEOF(err) {
-				err = nil
-				break
-			} else {
-				err = errors.Wrap(err)
-				return
-			}
+			err = errors.Wrap(err)
+			return
 		}
+
+		errors.Log().Printf("did receive one zettel: %s", zt.Sku.Kennung)
 
 		go func() {
 			if err := op.handleDialoguePullAkte(s, zt.Objekte.Akte); err != nil {
@@ -321,7 +355,7 @@ func (op RemoteMessagesPullOrPush) HandleDialoguePullObjekten(
 }
 
 func (op RemoteMessagesPullOrPush) ReceiveAkte(
-	d remote_messages.Dialogue,
+	d remote_conn.Dialogue,
 ) (err error) {
 	var aw sha.WriteCloser
 
@@ -349,16 +383,16 @@ func (op RemoteMessagesPullOrPush) ReceiveAkte(
 }
 
 func (op RemoteMessagesPullOrPush) handleDialoguePullAkte(
-	s *remote_messages.StageCommander,
+	s *remote_conn.StageCommander,
 	sh sha.Sha,
 ) (err error) {
 	if sh.IsNull() {
 		return
 	}
 
-	var d remote_messages.Dialogue
+	var d remote_conn.Dialogue
 
-	if d, err = s.StartDialogue(remote_messages.DialogueTypePushAkte); err != nil {
+	if d, err = s.StartDialogue(remote_conn.DialogueTypePushAkte); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
