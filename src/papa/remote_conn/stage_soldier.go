@@ -1,13 +1,11 @@
 package remote_conn
 
 import (
-	"encoding/gob"
 	"fmt"
 	"io"
 	"net"
 	"os"
 	"path/filepath"
-	"sync"
 	"syscall"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -28,7 +26,6 @@ type SoldierDialogueChanElement struct {
 
 type StageSoldier struct {
 	listener                  net.Listener
-	wg                        *sync.WaitGroup
 	chStopWaitingForDialogues chan struct{}
 	chDialogue                chan SoldierDialogueChanElement
 	handlers                  map[DialogueType]func(Dialogue) error
@@ -59,7 +56,6 @@ func MakeStageSoldier(u *umwelt.Umwelt) (
 	s = &StageSoldier{
 		chStopWaitingForDialogues: make(chan struct{}),
 		handlers:                  make(map[DialogueType]func(Dialogue) error),
-		wg:                        &sync.WaitGroup{},
 	}
 
 	var d string
@@ -131,8 +127,6 @@ func (s *StageSoldier) Listen() (err error) {
 
 	go s.awaitRegisteredDialogueHandlers(chErr)
 
-	s.wg.Wait()
-
 	var done interface{}
 
 	if err = s.MainDialogue().Receive(done); err != nil {
@@ -166,11 +160,7 @@ func (s *StageSoldier) awaitRegisteredDialogueHandlers(chErr chan<- error) {
 				continue
 			}
 
-			s.wg.Add(1)
-
 			go func() {
-				defer ReleaseConnLicense()
-
 				if el.Dialogue.Type() == DialogueTypeMain {
 					err := errors.Errorf("receive request for main dialog after handshake")
 					chErr <- err
@@ -192,7 +182,6 @@ func (s *StageSoldier) awaitRegisteredDialogueHandlers(chErr chan<- error) {
 
 				errors.Log().Printf("found handler: %s", el.Dialogue.Type())
 
-				defer s.wg.Done()
 				errors.Log().Printf("start handler: %s", el.Dialogue.Type())
 				defer errors.Log().Printf("end handler: %s", el.Dialogue.Type())
 
@@ -205,33 +194,13 @@ func (s *StageSoldier) awaitRegisteredDialogueHandlers(chErr chan<- error) {
 }
 
 func (s *StageSoldier) AwaitDialogue() (out SoldierDialogueChanElement) {
-	AcquireConnLicense()
-
-	out.Dialogue.stage = &s.stage
-
-	if out.Dialogue.conn, out.error = s.listener.Accept(); out.error != nil {
-		out.error = errors.Wrap(out.error)
-		return
-	}
-
-	out.Dialogue.enc = gob.NewEncoder(out.Dialogue.conn)
-	out.Dialogue.dec = gob.NewDecoder(out.Dialogue.conn)
-
-	msgOurHi := MessageHiSoldier{}
-
-	if out.error = out.Dialogue.Send(msgOurHi); out.error != nil {
-		out.error = errors.Wrap(out.error)
-		return
-	}
-
-	if out.error = out.Dialogue.Receive(
-		&out.MessageHiCommander,
+	if out.Dialogue, out.MessageHiCommander, out.error = makeDialogueListen(
+		&s.stage,
+		s.listener,
 	); out.error != nil {
 		out.error = errors.Wrap(out.error)
 		return
 	}
-
-	out.Dialogue.typ = out.MessageHiCommander.DialogueType
 
 	return
 }

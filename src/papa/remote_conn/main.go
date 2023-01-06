@@ -15,6 +15,61 @@ type Dialogue struct {
 	enc   *gob.Encoder
 }
 
+func makeDialogueListen(
+	s *stage,
+	l net.Listener,
+) (d Dialogue, msg MessageHiCommander, err error) {
+	AcquireConnLicense()
+
+	d.stage = s
+
+	if d.conn, err = l.Accept(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	d.enc = gob.NewEncoder(d.conn)
+	d.dec = gob.NewDecoder(d.conn)
+
+	msgOurHi := MessageHiSoldier{}
+
+	if err = d.Send(msgOurHi); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = d.Receive(
+		&msg,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	d.typ = msg.DialogueType
+
+	return
+}
+
+func makeDialogueDial(
+	s *stage,
+	t DialogueType,
+) (d Dialogue, err error) {
+	AcquireConnLicense()
+
+	d.stage = s
+	d.typ = t
+
+	if d.conn, err = net.Dial("unix", s.sockPath); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	d.enc = gob.NewEncoder(d.conn)
+	d.dec = gob.NewDecoder(d.conn)
+
+	return
+}
+
 func (s Dialogue) Write(p []byte) (n int, err error) {
 	if n, err = s.conn.Write(p); err != nil {
 		err = errors.Wrap(err)
@@ -34,6 +89,8 @@ func (s Dialogue) Read(p []byte) (n int, err error) {
 }
 
 func (s Dialogue) Close() (err error) {
+	ReleaseConnLicense()
+
 	if err = s.conn.Close(); err != nil {
 		err = errors.Wrap(err)
 		return

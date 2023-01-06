@@ -34,6 +34,23 @@ func (s common) KonfigPtr() *konfig_compiled.Compiled {
 	return s.konfig
 }
 
+func (s common) SizeForAkteSha(
+	sh sha.Sha,
+) (n int64, err error) {
+	p := s.Standort.DirObjektenAkten()
+
+	var fi os.FileInfo
+
+	if fi, err = os.Stat(id.Path(sh, p)); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	n = fi.Size()
+
+	return
+}
+
 func (s common) SizeForObjektenSku(
 	sk sku.SkuLike,
 ) (n int64, err error) {

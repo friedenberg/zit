@@ -2,10 +2,8 @@ package remote_conn
 
 import (
 	"bufio"
-	"encoding/gob"
 	"fmt"
 	"io"
-	"net"
 	"os"
 	"os/exec"
 	"strings"
@@ -112,16 +110,10 @@ func MakeStageCommander(
 }
 
 func (s *StageCommander) StartDialogue(t DialogueType) (d Dialogue, err error) {
-	d.typ = t
-	d.stage = &s.stage
-
-	if d.conn, err = net.Dial("unix", s.sockPath); err != nil {
+	if d, err = makeDialogueDial(&s.stage, t); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	d.enc = gob.NewEncoder(d.conn)
-	d.dec = gob.NewDecoder(d.conn)
 
 	msgOurHi := MessageHiCommander{
 		DialogueType: d.Type(),

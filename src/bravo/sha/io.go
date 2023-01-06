@@ -75,9 +75,14 @@ func (src *readCloser) setupTee() {
 }
 
 func (r readCloser) WriteTo(w io.Writer) (n int64, err error) {
+	//TODO-P3 determine why something in the copy returns an EOF
 	if n, err = io.Copy(w, r.tee); err != nil {
-		err = errors.Wrap(err)
-		return
+		if errors.IsEOF(err) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return

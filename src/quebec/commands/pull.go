@@ -174,12 +174,31 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 			return
 		},
-		client.AkteReader,
+		func(sh sha.Sha) (rc sha.ReadCloser, err error) {
+			var or io.ReadCloser
+
+			if or, err = client.AkteReader(sh); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			errors.Log().Printf("got reader for sha: %s", sh)
+
+			var ow sha.WriteCloser
+
+			if ow, err = u.StoreObjekten().AkteWriter(); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			rc = sha.MakeReadCloserTee(or, ow)
+
+			return
+		},
 		&zettel.FormatObjekte{
 			IgnoreTypErrors: true,
 		},
-		nil,
-		// objekte.MakeNopAkteParser[zettel.Objekte, *zettel.Objekte](),
+		objekte.MakeNopAkteParser[zettel.Objekte, *zettel.Objekte](),
 		p,
 	)
 

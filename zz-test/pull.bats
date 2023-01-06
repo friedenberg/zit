@@ -48,7 +48,6 @@ cat_yang() (
 # )
 
 function pull { # @test
-	skip
 	wd="$(mktemp -d)"
 
 	(
@@ -69,27 +68,6 @@ function pull { # @test
 
 	cd "$wd" || exit 1
 
-	f=to_add.md
-	{
-		echo test file
-	} >"$f"
-
-	run zit add \
-		-abbreviate-hinweisen=false \
-		-predictable-hinweisen \
-		-dedupe \
-		-delete \
-		-etiketten zz-inbox-2022-11-14 \
-		"$f"
-
-	assert_output --partial '          (new) [one/uno@b !md "to_add.md"]'
-	assert_output --partial '      (updated) [one/uno@d !md "to_add.md"]'
-
-	cd "$wd1" || exit 1
-
-	run zit pull -abbreviate-hinweisen=false -all "$wd"
-	assert_output '          (new) [one/uno@b !md "to_add.md"]'
-
 	expected="$(mktemp)"
 	{
 		echo '---'
@@ -101,8 +79,20 @@ function pull { # @test
 		echo 'test file'
 	} >"$expected"
 
+	run zit new \
+		-predictable-hinweisen \
+		-abbreviate-hinweisen=false \
+		-edit=false \
+		"$expected"
+
+	assert_output --partial '          (new) [one/uno@d !md "to_add.md"]'
+
+	cd "$wd1" || exit 1
+
+	run zit pull -abbreviate-hinweisen=false -all "$wd"
+	assert_output '          (new) [one/uno@d !md "to_add.md"]'
+
 	run zit show one/uno
-	# TODO-P2 figure out why some pulls experience a race condition for akten
 	assert_output "$(cat "$expected")"
 
 	cd "$wd" || exit 1

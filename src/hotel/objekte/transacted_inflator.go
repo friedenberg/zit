@@ -96,7 +96,6 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) Inflate(
 		}
 
 		errors.Log().Printf("parsed %d objekte bytes", n)
-		errors.Log().Printf("produced: %v", t.Objekte)
 	}()
 
 	if h.akteParser != nil {

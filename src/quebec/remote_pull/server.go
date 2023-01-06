@@ -1,7 +1,6 @@
 package remote_pull
 
 import (
-	"fmt"
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -57,7 +56,7 @@ func (op Server) addToSoldierStage() {
 	)
 
 	op.stage.RegisterHandler(
-		remote_conn.DialogueTypeAkteReaderForSha,
+		remote_conn.DialogueTypeAkten,
 		op.akteReaderForSha,
 	)
 }
@@ -74,23 +73,25 @@ func (op Server) akteReaderForSha(
 		return
 	}
 
-	var ar io.ReadCloser
+	errors.Log().Printf("received sha: %s", sh)
 
-	if ar, err = op.umwelt.StoreObjekten().AkteReader(sh); err != nil {
+	var or io.ReadCloser
+
+	if or, err = op.umwelt.StoreObjekten().AkteReader(sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.DeferredCloser(&err, ar)
+	defer errors.Deferred(&err, or.Close)
 
 	var n int64
 
-	if n, err = io.Copy(d, ar); err != nil {
+	if n, err = io.Copy(d, or); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	errors.Log().Printf("served %d akte bytes", n)
+	errors.Log().Printf("served %d objekte bytes", n)
 
 	return
 }
@@ -98,64 +99,52 @@ func (op Server) akteReaderForSha(
 func (op Server) objekteReaderForSku(
 	d remote_conn.Dialogue,
 ) (err error) {
-	for {
-		var strSku string
+	defer errors.DeferredCloser(&err, d)
 
-		if err = d.Receive(&strSku); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	var strSku string
 
-		errors.Log().Printf("received sku str: %s", strSku)
-
-		var sk sku.SkuLike
-
-		if sk, err = sku.MakeSku(strSku); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		errors.Log().Printf("received sku: %s", sk)
-
-		var n int64
-
-		if n, err = op.umwelt.StoreObjekten().SizeForObjektenSku(sk); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		errors.Log().Printf("about to serve %d bytes", n)
-
-		if _, err = io.WriteString(d, fmt.Sprintf("%d\n", n)); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		func() {
-			var or io.ReadCloser
-
-			if or, err = op.umwelt.StoreObjekten().ReadCloserObjektenSku(sk); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			defer errors.Deferred(&err, or.Close)
-
-			var n int64
-
-			if n, err = io.Copy(d, or); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			errors.Log().Printf("served %d objekte bytes", n)
-		}()
+	if err = d.Receive(&strSku); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
+
+	errors.Log().Printf("received sku str: %s", strSku)
+
+	var sk sku.SkuLike
+
+	if sk, err = sku.MakeSku(strSku); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	errors.Log().Printf("received sku: %s", sk)
+
+	var or io.ReadCloser
+
+	if or, err = op.umwelt.StoreObjekten().ReadCloserObjektenSku(sk); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.Deferred(&err, or.Close)
+
+	var n int64
+
+	if n, err = io.Copy(d, or); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	errors.Log().Printf("served %d objekte bytes", n)
+
+	return
 }
 
 func (op Server) skusForFilter(
 	d remote_conn.Dialogue,
 ) (err error) {
+	defer errors.DeferredCloser(&err, d)
+
 	var filter id_set.Filter
 
 	if err = d.Receive(&filter); err != nil {
@@ -182,11 +171,6 @@ func (op Server) skusForFilter(
 			},
 		),
 	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = d.Close(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
