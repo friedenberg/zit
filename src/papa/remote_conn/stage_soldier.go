@@ -25,7 +25,7 @@ type SoldierDialogueChanElement struct {
 }
 
 type StageSoldier struct {
-	listener                  net.Listener
+	listener                  *net.UnixListener
 	chStopWaitingForDialogues chan struct{}
 	chDialogue                chan SoldierDialogueChanElement
 	handlers                  map[DialogueType]func(Dialogue) error
@@ -67,7 +67,12 @@ func MakeStageSoldier(u *umwelt.Umwelt) (
 
 	s.sockPath = filepath.Join(d, "zit.sock")
 
-	if s.listener, err = net.Listen("unix", s.sockPath); err != nil {
+	if s.address, err = net.ResolveUnixAddr("unix", s.sockPath); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if s.listener, err = net.ListenUnix("unix", s.address); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

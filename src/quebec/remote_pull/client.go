@@ -144,6 +144,8 @@ func (c *client) makeAndProcessOneSkuStringWithFilter(
 		select {
 		case <-c.chDone:
 		case chError <- errors.Wrap(err):
+		default:
+			errors.Err().Printf("Client Error: %s", err)
 		}
 
 		return
@@ -155,6 +157,8 @@ func (c *client) makeAndProcessOneSkuStringWithFilter(
 			select {
 			case <-c.chDone:
 			case chError <- errors.Wrap(err):
+			default:
+				errors.Err().Printf("Client Error: %s", err)
 			}
 		}
 

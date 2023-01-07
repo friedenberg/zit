@@ -3,13 +3,14 @@ package remote_conn
 import (
 	"encoding/gob"
 	"net"
+	"syscall"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
 type Dialogue struct {
 	typ   DialogueType
-	conn  net.Conn
+	conn  *net.UnixConn
 	stage *stage
 	dec   *gob.Decoder
 	enc   *gob.Encoder
@@ -17,15 +18,18 @@ type Dialogue struct {
 
 func makeDialogueListen(
 	s *stage,
-	l net.Listener,
+	l *net.UnixListener,
 ) (d Dialogue, msg MessageHiCommander, err error) {
-	AcquireConnLicense()
-
 	d.stage = s
 
-	if d.conn, err = l.Accept(); err != nil {
-		err = errors.Wrap(err)
-		return
+	if d.conn, err = l.AcceptUnix(); err != nil {
+		//TODO-P2 determine what errors accept can throw
+		if errors.IsErrno(err, syscall.ENODATA) || true {
+			panic(errors.Wrapf(err, "ErrorExact: %#v", err))
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	d.enc = gob.NewEncoder(d.conn)
@@ -54,14 +58,23 @@ func makeDialogueDial(
 	s *stage,
 	t DialogueType,
 ) (d Dialogue, err error) {
-	AcquireConnLicense()
-
 	d.stage = s
 	d.typ = t
 
-	if d.conn, err = net.Dial("unix", s.sockPath); err != nil {
-		err = errors.Wrap(err)
-		return
+	for {
+		//TODO-P2 timeout
+		if d.conn, err = net.DialUnix("unix", nil, s.address); err != nil {
+			//TODO-P5 why is the hex 0x3d which is ENODATA in docs?
+			if errors.IsErrno(err, syscall.ECONNREFUSED) {
+				WaitForConnectionLicense()
+				continue
+			} else {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+
+		break
 	}
 
 	d.enc = gob.NewEncoder(d.conn)
@@ -89,7 +102,7 @@ func (s Dialogue) Read(p []byte) (n int, err error) {
 }
 
 func (s Dialogue) Close() (err error) {
-	ReleaseConnLicense()
+	ReturnConnLicense()
 
 	if err = s.conn.Close(); err != nil {
 		err = errors.Wrap(err)

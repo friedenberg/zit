@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"net"
 	"os"
 	"os/exec"
 	"strings"
@@ -98,6 +99,11 @@ func MakeStageCommander(
 	go copyWithPrefix(bufio.NewReader(rErr), os.Stderr)
 
 	s.sockPath = strings.TrimSpace(s.sockPath)
+
+	if s.address, err = net.ResolveUnixAddr("unix", s.sockPath); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if s.mainDialogue, err = s.StartDialogue(
 		DialogueTypeMain,

@@ -4,7 +4,20 @@ import (
 	"errors"
 	"io"
 	"os"
+	"syscall"
 )
+
+func IsErrno(err error, target syscall.Errno) (ok bool) {
+	var errno syscall.Errno
+
+	err = Unwrap(err)
+
+	if errno, ok = err.(syscall.Errno); ok {
+		ok = errno == target
+	}
+
+	return
+}
 
 func Is(err, target error) bool {
 	e := Unwrap(err)

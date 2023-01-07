@@ -78,53 +78,75 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) Inflate(
 		return
 	}
 
-	func() {
-		var r sha.ReadCloser
-
-		if r, err = h.orc(o); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		defer errors.Deferred(&err, r.Close)
-
-		var n int64
-
-		if n, err = h.objekteParser.Parse(r, &t.Objekte); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		errors.Log().Printf("parsed %d objekte bytes", n)
-	}()
-
-	if h.akteParser != nil {
-		func() {
-			sh := t.AkteSha()
-
-			if sh.IsNull() {
-				return
-			}
-
-			var r sha.ReadCloser
-
-			if r, err = h.arc(t.AkteSha()); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			defer errors.DeferredCloser(&err, r)
-
-			var n int64
-
-			if n, err = h.akteParser.Parse(r, &t.Objekte); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			errors.Log().Printf("parsed %d akte bytes", n)
-		}()
+	if err = h.readObjekte(o, t); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
+
+	sh := t.AkteSha()
+
+	if sh.IsNull() {
+		return
+	}
+
+	if err = h.readAkte(sh, t); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (h *transactedInflator[T, T1, T2, T3, T4, T5]) readObjekte(
+	sk sku.SkuLike,
+	t *Transacted[T, T1, T2, T3, T4, T5],
+) (err error) {
+	var r sha.ReadCloser
+
+	if r, err = h.orc(sk); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.Deferred(&err, r.Close)
+
+	var n int64
+
+	if n, err = h.objekteParser.Parse(r, &t.Objekte); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	errors.Log().Printf("parsed %d objekte bytes", n)
+
+	return
+}
+
+func (h *transactedInflator[T, T1, T2, T3, T4, T5]) readAkte(
+	sh sha.Sha,
+	t *Transacted[T, T1, T2, T3, T4, T5],
+) (err error) {
+	if h.akteParser == nil {
+		return
+	}
+
+	var r sha.ReadCloser
+
+	if r, err = h.arc(t.AkteSha()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.DeferredCloser(&err, r)
+
+	var n int64
+
+	if n, err = h.akteParser.Parse(r, &t.Objekte); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	errors.Log().Printf("parsed %d akte bytes", n)
 
 	return
 }

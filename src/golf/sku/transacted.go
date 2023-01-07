@@ -13,6 +13,18 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/ts"
 )
 
+// TODO-P3 examine adding objekte and akte shas to Skus
+// TODO-P2 move sku.Sku to sku.Transacted
+type Transacted[T kennung.KennungLike[T], T1 kennung.KennungLikePtr[T]] struct {
+	Mutter  Mutter
+	Kennung T
+	//TODO rename to objekte sha
+	Sha sha.Sha
+	//TODO-P2 add verzeichnisse
+	TransactionIndex int_value.IntValue
+	Kopf, Schwanz    ts.Time
+}
+
 // TODO-P2 include sku versions
 func MakeSku(line string) (out SkuLike, err error) {
 	fields := strings.Fields(line)
@@ -47,18 +59,6 @@ func MakeSku(line string) (out SkuLike, err error) {
 	}
 
 	return
-}
-
-// TODO-P3 examine adding objekte and akte shas to Skus
-// TODO-P2 move sku.Sku to sku.Transacted
-type Transacted[T kennung.KennungLike[T], T1 kennung.KennungLikePtr[T]] struct {
-	Mutter  Mutter
-	Kennung T
-	//TODO rename to objekte sha
-	Sha              sha.Sha
-	TransactionIndex int_value.IntValue
-	//TODO-P2 add verzeichnisse
-	Kopf, Schwanz ts.Time
 }
 
 func (a *Transacted[T, T1]) SetTransactionIndex(i int) {

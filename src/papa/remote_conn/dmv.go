@@ -1,15 +1,39 @@
 package remote_conn
 
-var chConnectionLimit chan struct{}
+import "sync"
+
+var ticketDeficit int
+var ticketDeficitLock sync.Locker
+var chConnectionTickets chan struct{}
 
 func init() {
-	chConnectionLimit = make(chan struct{}, 100)
+	//200 causes errors
+	//150 sometimes causes errors
+	// chConnectionTickets = make(chan struct{}, 150)
+	ticketDeficitLock = &sync.Mutex{}
+	chConnectionTickets = make(chan struct{})
 }
 
-func AcquireConnLicense() {
-	chConnectionLimit <- struct{}{}
+func WaitForConnectionLicense() {
+	ticketDeficitLock.Lock()
+	ticketDeficit++
+	ticketDeficitLock.Unlock()
+
+	<-chConnectionTickets
+
+	ticketDeficitLock.Lock()
+	ticketDeficit--
+	ticketDeficitLock.Unlock()
 }
 
-func ReleaseConnLicense() {
-	<-chConnectionLimit
+func ReturnConnLicense() {
+	ticketDeficitLock.Lock()
+
+	if ticketDeficit > 0 {
+		go func() {
+			chConnectionTickets <- struct{}{}
+		}()
+	}
+
+	ticketDeficitLock.Unlock()
 }
