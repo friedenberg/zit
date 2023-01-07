@@ -468,8 +468,10 @@ func (s *zettelStore) transactedWithHead(
 		Objekte: z,
 		Sku: sku.Transacted[hinweis.Hinweis, *hinweis.Hinweis]{
 			Kennung: h,
-			Kopf:    t.Time,
-			Schwanz: t.Time,
+			Verzeichnisse: sku.Verzeichnisse{
+				Kopf:    t.Time,
+				Schwanz: t.Time,
+			},
 		},
 	}
 

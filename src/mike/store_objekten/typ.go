@@ -114,7 +114,9 @@ func (s typStore) CreateOrUpdate(
 		Objekte: *to,
 		Sku: sku.Transacted[kennung.Typ, *kennung.Typ]{
 			Kennung: *tk,
-			Schwanz: s.common.Transaktion.Time,
+			Verzeichnisse: sku.Verzeichnisse{
+				Schwanz: s.common.Transaktion.Time,
+			},
 		},
 	}
 

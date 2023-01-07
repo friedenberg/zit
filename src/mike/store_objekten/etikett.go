@@ -113,7 +113,9 @@ func (s etikettStore) CreateOrUpdate(
 		Objekte: *to,
 		Sku: sku.Transacted[kennung.Etikett, *kennung.Etikett]{
 			Kennung: *tk,
-			Schwanz: s.common.Transaktion.Time,
+			Verzeichnisse: sku.Verzeichnisse{
+				Schwanz: s.common.Transaktion.Time,
+			},
 		},
 	}
 

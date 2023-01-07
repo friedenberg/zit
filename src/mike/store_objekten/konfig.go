@@ -125,7 +125,9 @@ func (s konfigStore) Update(
 	kt = &konfig.Transacted{
 		Objekte: *ko,
 		Sku: sku.Transacted[kennung.Konfig, *kennung.Konfig]{
-			Schwanz: s.common.Transaktion.Time,
+			Verzeichnisse: sku.Verzeichnisse{
+				Schwanz: s.common.Transaktion.Time,
+			},
 		},
 	}
 

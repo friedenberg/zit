@@ -21,8 +21,7 @@ type Transacted[T kennung.KennungLike[T], T1 kennung.KennungLikePtr[T]] struct {
 	ObjekteSha sha.Sha
 	AkteSha    sha.Sha
 	//TODO-P2 add verzeichnisse
-	TransactionIndex int_value.IntValue
-	Kopf, Schwanz    ts.Time
+	Verzeichnisse
 }
 
 // TODO-P2 include sku versions
