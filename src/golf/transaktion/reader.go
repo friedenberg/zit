@@ -52,7 +52,7 @@ func (r *Reader) ReadFrom(r1 io.Reader) (n int64, err error) {
 			var o sku.SkuLike
 
 			//TODO-P0 use generic construction method
-			if o, err = sku.MakeSku(line); err != nil {
+			if o, err = sku.MakeSkuTransacted(line); err != nil {
 				err = errors.Wrapf(err, "failed to read line: %s", line)
 				return
 			}

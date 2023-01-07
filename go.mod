@@ -10,6 +10,7 @@ require (
 )
 
 require (
+	github.com/brandondube/tai v0.1.0 // indirect
 	github.com/go-piv/piv-go v1.10.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	golang.org/x/crypto v0.1.0 // indirect

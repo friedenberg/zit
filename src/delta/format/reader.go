@@ -27,6 +27,61 @@ func MakeReaderFrom[T any](
 	}
 }
 
+func ReadSep(
+	delim byte,
+	r1 io.Reader,
+	rffs ...FuncSet,
+) (n int64, err error) {
+	r := bufio.NewReader(r1)
+	i := 0
+
+	var last error
+
+	for {
+		var rawLine, line string
+
+		rawLine, err = r.ReadString(delim)
+		n += int64(len(rawLine))
+
+		if err != nil && !errors.IsEOF(err) {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if errors.IsEOF(err) {
+			err = nil
+			break
+		}
+
+		line = strings.TrimSuffix(rawLine, string([]byte{delim}))
+
+		if len(rffs) == i {
+			//TODO add line
+			err = errors.Errorf("ran out of read line funcs before fully consuming reader")
+
+			if last != nil {
+				err = errors.MakeMulti(err, last)
+			}
+
+			return
+		}
+
+		frl := rffs[i]
+
+		if err = frl(line); err != nil {
+			last = err
+			err = nil
+			i++
+		}
+	}
+
+	if last != nil && !errors.IsEOF(last) {
+		err = last
+	}
+
+	return
+}
+
 func ReadLines(
 	r1 io.Reader,
 	rffs ...FuncReadLine,

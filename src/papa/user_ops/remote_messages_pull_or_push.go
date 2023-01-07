@@ -166,7 +166,7 @@ func (op RemoteMessagesPullOrPush) objekteReaderForSku(
 
 	var sk sku.SkuLike
 
-	if sk, err = sku.MakeSku(strSku); err != nil {
+	if sk, err = sku.MakeSkuTransacted(strSku); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -280,7 +280,7 @@ func (op RemoteMessagesPullOrPush) handleDialoguePushObjekten(
 
 		var sk sku.SkuLike
 
-		if sk, err = sku.MakeSku(strSku); err != nil {
+		if sk, err = sku.MakeSkuTransacted(strSku); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

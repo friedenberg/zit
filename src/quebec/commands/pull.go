@@ -153,10 +153,10 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		zettel.Verzeichnisse,
 		*zettel.Verzeichnisse,
 	](
-		func(sk sku.SkuLike) (rc sha.ReadCloser, err error) {
+		func(sk sku.DataIdentity) (rc sha.ReadCloser, err error) {
 			var or io.ReadCloser
 
-			if or, err = client.ObjekteReaderForSku(sk); err != nil {
+			if or, err = client.ObjekteReaderForSku(sk.(sku.Sku)); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -204,28 +204,25 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	if err = client.SkusFromFilter(
 		filter,
-		func(sk sku.SkuLike) (err error) {
-			if sk.GetGattung() != gattung.Zettel {
+		func(sk sku.Sku) (err error) {
+			if sk.Gattung != gattung.Zettel {
 				return
 			}
 
-			if u.StoreObjekten().Zettel().HasObjekte(sk.GetObjekteSha()) {
-				errors.Log().Printf("already have objekte: %s", sk.GetObjekteSha())
+			if u.StoreObjekten().Zettel().HasObjekte(sk.ObjekteSha) {
+				errors.Log().Printf("already have objekte: %s", sk.ObjekteSha)
 				return
 			}
 
-			errors.Log().Printf("need objekte: %s", sk.GetObjekteSha())
+			errors.Log().Printf("need objekte: %s", sk.ObjekteSha)
 
 			//TODO-P1 check for akte sha
 			//TODO-P1 write akte
 
 			var t *zettel.Transacted
 
-			if t, err = inflator.Inflate(
-				ts.Now(),
-				sk,
-			); err != nil {
-				err = errors.Wrap(err)
+			if t, err = inflator.Inflate2(sk); err != nil {
+				err = errors.Wrapf(err, "Sku: %s", sk)
 				return
 			}
 

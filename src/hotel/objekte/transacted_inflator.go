@@ -17,6 +17,7 @@ type TransactedInflator[
 	T4 gattung.Verzeichnisse[T],
 	T5 gattung.VerzeichnissePtr[T4, T],
 ] interface {
+	Inflate2(sku.Sku) (*Transacted[T, T1, T2, T3, T4, T5], error)
 	Inflate(ts.Time, sku.SkuLike) (*Transacted[T, T1, T2, T3, T4, T5], error)
 }
 
@@ -63,6 +64,51 @@ func MakeTransactedInflator[
 }
 
 // TODO-P3 rename to InflateFromSku
+func (h *transactedInflator[T, T1, T2, T3, T4, T5]) Inflate2(
+	o sku.Sku,
+) (t *Transacted[T, T1, T2, T3, T4, T5], err error) {
+	if h.pool == nil {
+		t = new(Transacted[T, T1, T2, T3, T4, T5])
+	} else {
+		t = h.pool.Get()
+	}
+
+	if t.Sku.Kennung.Gattung() != o.Gattung {
+		err = errors.Errorf(
+			"expected gattung %s but got %s",
+			t.Sku.Kennung.Gattung(),
+			o.Gattung,
+		)
+		return
+	}
+
+	if err = T3(&t.Sku.Kennung).Set(o.Kennung.String()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	t.Sku.ObjekteSha = o.ObjekteSha
+
+	if err = h.readObjekte(o, t); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	sh := t.AkteSha()
+
+	if sh.IsNull() {
+		return
+	}
+
+	if err = h.readAkte(sh, t); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+// TODO-P3 rename to InflateFromSku
 func (h *transactedInflator[T, T1, T2, T3, T4, T5]) Inflate(
 	ti ts.Time,
 	o sku.SkuLike,
@@ -98,7 +144,7 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) Inflate(
 }
 
 func (h *transactedInflator[T, T1, T2, T3, T4, T5]) readObjekte(
-	sk sku.SkuLike,
+	sk sku.DataIdentity,
 	t *Transacted[T, T1, T2, T3, T4, T5],
 ) (err error) {
 	var r sha.ReadCloser

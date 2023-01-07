@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/int_value"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
@@ -16,16 +17,15 @@ import (
 // TODO-P3 examine adding objekte and akte shas to Skus
 // TODO-P2 move sku.Sku to sku.Transacted
 type Transacted[T kennung.KennungLike[T], T1 kennung.KennungLikePtr[T]] struct {
-	Mutter     Mutter
+	Time       ts.Time
 	Kennung    T
 	ObjekteSha sha.Sha
 	AkteSha    sha.Sha
-	//TODO-P2 add verzeichnisse
 	Verzeichnisse
 }
 
 // TODO-P2 include sku versions
-func MakeSku(line string) (out SkuLike, err error) {
+func MakeSkuTransacted(line string) (out SkuLike, err error) {
 	fields := strings.Fields(line)
 	var g gattung.Gattung
 
@@ -58,6 +58,16 @@ func MakeSku(line string) (out SkuLike, err error) {
 	}
 
 	return
+}
+
+func (a *Transacted[T, T1]) Sku(t ts.Time, n int) Sku {
+	return Sku{
+		Time:       ts.TaiFromTimeWithIndex(t, n),
+		Gattung:    a.GetGattung(),
+		Kennung:    collections.MakeStringValue(a.Kennung.String()),
+		ObjekteSha: a.ObjekteSha,
+		AkteSha:    a.AkteSha,
+	}
 }
 
 func (a *Transacted[T, T1]) SetTransactionIndex(i int) {

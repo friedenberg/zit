@@ -47,7 +47,7 @@ func (s StringValue) MarshalBinary() (text []byte, err error) {
 	return
 }
 
-func (s StringValue) UnmarshalBinary(text []byte) (err error) {
+func (s *StringValue) UnmarshalBinary(text []byte) (err error) {
 	if err = s.Set(string(text)); err != nil {
 		return
 	}

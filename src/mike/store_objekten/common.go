@@ -3,7 +3,6 @@ package store_objekten
 import (
 	"bytes"
 	"io/ioutil"
-	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/age"
@@ -34,47 +33,8 @@ func (s common) KonfigPtr() *konfig_compiled.Compiled {
 	return s.konfig
 }
 
-func (s common) SizeForAkteSha(
-	sh sha.Sha,
-) (n int64, err error) {
-	p := s.Standort.DirObjektenAkten()
-
-	var fi os.FileInfo
-
-	if fi, err = os.Stat(id.Path(sh, p)); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	n = fi.Size()
-
-	return
-}
-
-func (s common) SizeForObjektenSku(
-	sk sku.SkuLike,
-) (n int64, err error) {
-	var p string
-
-	if p, err = s.Standort.DirObjektenGattung(sk); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	var fi os.FileInfo
-
-	if fi, err = os.Stat(id.Path(sk.GetObjekteSha(), p)); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	n = fi.Size()
-
-	return
-}
-
 func (s common) ReadCloserObjektenSku(
-	sk sku.SkuLike,
+	sk sku.DataIdentity,
 ) (rc sha.ReadCloser, err error) {
 	var p string
 

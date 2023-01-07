@@ -101,18 +101,9 @@ func (op Server) objekteReaderForSku(
 ) (err error) {
 	defer errors.DeferredCloser(&err, d)
 
-	var strSku string
+	var sk sku.Sku
 
-	if err = d.Receive(&strSku); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	errors.Log().Printf("received sku str: %s", strSku)
-
-	var sk sku.SkuLike
-
-	if sk, err = sku.MakeSku(strSku); err != nil {
+	if err = d.Receive(&sk); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -162,7 +153,12 @@ func (op Server) skusForFilter(
 		collections.MakeChain(
 			zettel.WriterIds{Filter: filter}.WriteZettelVerzeichnisse,
 			func(z *zettel.Transacted) (err error) {
-				if err = d.Send(sku.String(&z.Sku)); err != nil {
+				sk := z.Sku.Sku(
+					z.Sku.Schwanz,
+					z.Sku.TransactionIndex.Int(),
+				)
+
+				if err = d.Send(sk); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
