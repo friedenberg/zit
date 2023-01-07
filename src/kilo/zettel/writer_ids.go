@@ -44,14 +44,14 @@ func (z zettelFilterable) SetAkteSha(v sha.Sha) {
 }
 
 func (z zettelFilterable) ObjekteSha() sha.Sha {
-	return z.Sku.Sha
+	return z.Sku.ObjekteSha
 }
 
 func (z zettelFilterable) SetObjekteSha(
 	arf gattung.AkteReaderFactory,
 	v string,
 ) (err error) {
-	if err = z.Sku.Sha.Set(v); err != nil {
+	if err = z.Sku.ObjekteSha.Set(v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -199,7 +199,7 @@ func (s *zettelStore) writeNamedZettelToIndex(
 		return
 	}
 
-	if err = s.verzeichnisseAll.Add(tz, tz.Sku.Sha.String()); err != nil {
+	if err = s.verzeichnisseAll.Add(tz, tz.Sku.ObjekteSha.String()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -365,7 +365,7 @@ func (s *zettelStore) Update(
 		return
 	}
 
-	if shaObj.Equals(mutter.Sku.Sha) {
+	if shaObj.Equals(mutter.Sku.ObjekteSha) {
 		tz = mutter
 
 		if err = s.zettelTransactedWriter.Unchanged(tz); err != nil {
@@ -448,7 +448,7 @@ func (s *zettelStore) addZettelToTransaktion(
 	}
 
 	tz.Sku.Kennung = *zk
-	tz.Sku.Sha = *zs
+	tz.Sku.ObjekteSha = *zs
 
 	s.common.Transaktion.Skus.Add(&tz.Sku)
 
@@ -502,7 +502,7 @@ func (s *zettelStore) HasObjekte(sh sha.Sha) (ok bool) {
 // TODO-P0 implement correctly
 // include writing objekten and checking akten?
 func (s *zettelStore) Inherit(tz *zettel.Transacted) (err error) {
-	errors.Log().Printf("inheriting %s", tz.Sku.Sha)
+	errors.Log().Printf("inheriting %s", tz.Sku.ObjekteSha)
 
 	if _, err = s.WriteZettelObjekte(tz.Objekte); err != nil {
 		err = errors.Wrap(err)
@@ -511,7 +511,7 @@ func (s *zettelStore) Inherit(tz *zettel.Transacted) (err error) {
 
 	if tz, err = s.addZettelToTransaktion(
 		&tz.Objekte,
-		&tz.Sku.Sha,
+		&tz.Sku.ObjekteSha,
 		&tz.Sku.Kennung,
 	); err != nil {
 		err = errors.Wrap(err)

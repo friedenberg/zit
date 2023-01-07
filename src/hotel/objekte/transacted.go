@@ -25,8 +25,9 @@ func (t Transacted[T, T1, T2, T3, T4, T5]) Stored() *Stored[T, T1, T2, T3] {
 	return &Stored[T, T1, T2, T3]{
 		Objekte: t.Objekte,
 		Sku: sku.External[T2, T3]{
-			Sha:     t.Sku.Sha,
-			Kennung: t.Sku.Kennung,
+			ObjekteSha: t.Sku.ObjekteSha,
+			AkteSha:    t.Sku.AkteSha,
+			Kennung:    t.Sku.Kennung,
 		},
 	}
 }
@@ -46,14 +47,14 @@ func (t *Transacted[T, T1, T2, T3, T4, T5]) SetAkteSha(
 }
 
 func (t Transacted[T, T1, T2, T3, T4, T5]) ObjekteSha() sha.Sha {
-	return t.Sku.Sha
+	return t.Sku.ObjekteSha
 }
 
 func (t *Transacted[T, T1, T2, T3, T4, T5]) SetObjekteSha(
 	arf gattung.AkteReaderFactory,
 	v string,
 ) (err error) {
-	if err = t.Sku.Sha.Set(v); err != nil {
+	if err = t.Sku.ObjekteSha.Set(v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -102,7 +103,7 @@ func (a *Transacted[T, T1, T2, T3, T4, T5]) SetTimeAndObjekte(
 	}
 
 	a.Sku.Kennung = h
-	a.Sku.Sha = o.GetObjekteSha()
+	a.Sku.ObjekteSha = o.GetObjekteSha()
 	a.Sku.TransactionIndex = o.GetTransactionIndex()
 	//TODO-P3 fix sku kopf and schwanz
 	a.Sku.Kopf = t

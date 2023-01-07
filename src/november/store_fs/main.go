@@ -169,7 +169,7 @@ func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 		return
 	}
 
-	if ez.Sku.Sha, err = s.storeObjekten.Zettel().WriteZettelObjekte(
+	if ez.Sku.ObjekteSha, err = s.storeObjekten.Zettel().WriteZettelObjekte(
 		c.Zettel,
 	); err != nil {
 		err = errors.Wrapf(err, "%s", f.Name())
@@ -310,7 +310,7 @@ func (s *Store) ReadMany(
 
 			if err1 := s.readZettelFromFile(&ze); err1 == nil {
 				z.Objekte = ze.Objekte
-				z.Sku.Sha = ze.Sku.Sha //TODO-P1 determine what else in sku is needed
+				z.Sku.ObjekteSha = ze.Sku.ObjekteSha //TODO-P1 determine what else in sku is needed
 
 				z.GenerateVerzeichnisse()
 

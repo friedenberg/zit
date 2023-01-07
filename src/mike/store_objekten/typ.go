@@ -148,7 +148,7 @@ func (s typStore) CreateOrUpdate(
 		return
 	}
 
-	tt.Sku.Sha = w.Sha()
+	tt.Sku.ObjekteSha = w.Sha()
 
 	if mutter != nil && tt.ObjekteSha().Equals(mutter.ObjekteSha()) {
 		tt = mutter
@@ -277,7 +277,7 @@ func (s *typStore) reindexOne(
 	if te, err = s.Inflate(t.Time, o); err != nil {
 		if errors.Is(err, toml.Error{}) {
 			err = nil
-      return
+			return
 		} else {
 			err = errors.Wrap(err)
 			return

@@ -258,7 +258,7 @@ func (c CreateFromPaths) zettelsFromPath(
 				Path: p,
 			},
 			Sku: zettel_external.Sku{
-				Sha: s,
+				ObjekteSha: s,
 			},
 			Objekte: ctx.Zettel,
 		},

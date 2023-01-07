@@ -24,7 +24,7 @@ func MakeMutableSetUnique(c int) MutableSet {
 					sz.Sku.Schwanz,
 					sz.Sku.TransactionIndex,
 					sz.Sku.Kennung,
-					sz.Sku.Sha,
+					sz.Sku.ObjekteSha,
 				)
 			},
 		),

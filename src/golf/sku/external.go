@@ -8,14 +8,16 @@ import (
 )
 
 type External[T kennung.KennungLike[T], T1 kennung.KennungLikePtr[T]] struct {
-	Kennung T
-	Sha     sha.Sha
+	Kennung    T
+	AkteSha    sha.Sha
+	ObjekteSha sha.Sha
 }
 
 func (a *External[T, T1]) Transacted() (b Transacted[T, T1]) {
 	b = Transacted[T, T1]{
-		Kennung: a.Kennung,
-		Sha:     a.Sha,
+		Kennung:    a.Kennung,
+		ObjekteSha: a.ObjekteSha,
+		AkteSha:    a.AkteSha,
 	}
 
 	return
@@ -23,10 +25,12 @@ func (a *External[T, T1]) Transacted() (b Transacted[T, T1]) {
 
 func (a *External[T, T1]) Reset(b *External[T, T1]) {
 	if b == nil {
-		a.Sha = sha.Sha{}
+		a.ObjekteSha = sha.Sha{}
+		a.AkteSha = sha.Sha{}
 		T1(&a.Kennung).Reset(nil)
 	} else {
-		a.Sha = b.Sha
+		a.ObjekteSha = b.ObjekteSha
+		a.AkteSha = b.AkteSha
 		T1(&a.Kennung).Reset(&b.Kennung)
 	}
 }
@@ -36,7 +40,7 @@ func (a External[T, T1]) Equals(b *External[T, T1]) (ok bool) {
 		return
 	}
 
-	if !a.Sha.Equals(b.Sha) {
+	if !a.ObjekteSha.Equals(b.ObjekteSha) {
 		return
 	}
 

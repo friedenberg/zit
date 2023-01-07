@@ -23,7 +23,7 @@ func MakeMutableSetUnique(c int) MutableSet {
 					sz.Internal.Sku.Mutter[1],
 					sz.Internal.Sku.Schwanz,
 					sz.Internal.Sku.Kennung,
-					sz.Internal.Sku.Sha,
+					sz.Internal.Sku.ObjekteSha,
 				)
 			},
 		),

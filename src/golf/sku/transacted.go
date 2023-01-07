@@ -16,10 +16,10 @@ import (
 // TODO-P3 examine adding objekte and akte shas to Skus
 // TODO-P2 move sku.Sku to sku.Transacted
 type Transacted[T kennung.KennungLike[T], T1 kennung.KennungLikePtr[T]] struct {
-	Mutter  Mutter
-	Kennung T
-	//TODO rename to objekte sha
-	Sha sha.Sha
+	Mutter     Mutter
+	Kennung    T
+	ObjekteSha sha.Sha
+	AkteSha    sha.Sha
 	//TODO-P2 add verzeichnisse
 	TransactionIndex int_value.IntValue
 	Kopf, Schwanz    ts.Time
@@ -68,7 +68,8 @@ func (a *Transacted[T, T1]) SetTransactionIndex(i int) {
 func (a *Transacted[T, T1]) Reset(b *Transacted[T, T1]) {
 	if b == nil {
 		a.Kopf = ts.Time{}
-		a.Sha = sha.Sha{}
+		a.ObjekteSha = sha.Sha{}
+		a.AkteSha = sha.Sha{}
 		T1(&a.Kennung).Reset(nil)
 		a.Mutter[0] = ts.Time{}
 		a.Mutter[1] = ts.Time{}
@@ -76,7 +77,8 @@ func (a *Transacted[T, T1]) Reset(b *Transacted[T, T1]) {
 		a.TransactionIndex.Reset()
 	} else {
 		a.Kopf = b.Kopf
-		a.Sha = b.Sha
+		a.ObjekteSha = b.ObjekteSha
+		a.AkteSha = b.AkteSha
 		T1(&a.Kennung).Reset(&b.Kennung)
 		a.Mutter[0] = b.Mutter[0]
 		a.Mutter[1] = b.Mutter[1]
@@ -116,7 +118,7 @@ func (a Transacted[T, T1]) Equals(b *Transacted[T, T1]) (ok bool) {
 		return
 	}
 
-	if !a.Sha.Equals(b.Sha) {
+	if !a.ObjekteSha.Equals(b.ObjekteSha) {
 		return
 	}
 
@@ -150,7 +152,7 @@ func (o *Transacted[T, T1]) SetFields(vs ...string) (err error) {
 
 	vs = vs[1:]
 
-	if err = o.Sha.Set(vs[0]); err != nil {
+	if err = o.ObjekteSha.Set(vs[0]); err != nil {
 		err = errors.Wrapf(err, "failed to set sha: %s", vs[2])
 		return
 	}
@@ -171,7 +173,7 @@ func (s Transacted[T, T1]) GetId() IdLike {
 }
 
 func (s Transacted[T, T1]) GetObjekteSha() sha.Sha {
-	return s.Sha
+	return s.ObjekteSha
 }
 
 func (s Transacted[T, T1]) GetTransactionIndex() int_value.IntValue {

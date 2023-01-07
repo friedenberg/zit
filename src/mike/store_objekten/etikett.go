@@ -147,7 +147,7 @@ func (s etikettStore) CreateOrUpdate(
 		return
 	}
 
-	tt.Sku.Sha = w.Sha()
+	tt.Sku.ObjekteSha = w.Sha()
 
 	if mutter != nil && tt.ObjekteSha().Equals(mutter.ObjekteSha()) {
 		tt = mutter

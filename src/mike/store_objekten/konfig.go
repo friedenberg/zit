@@ -144,7 +144,7 @@ func (s konfigStore) Update(
 		return
 	}
 
-	kt.Sku.Sha = w.Sha()
+	kt.Sku.ObjekteSha = w.Sha()
 
 	if mutter != nil && kt.ObjekteSha().Equals(mutter.ObjekteSha()) {
 		kt = mutter
@@ -186,7 +186,7 @@ func (s konfigStore) Read() (tt *konfig.Transacted, err error) {
 			var r sha.ReadCloser
 
 			if r, err = s.common.ReadCloserObjekten(
-				id.Path(tt.Sku.Sha, s.common.Standort.DirObjektenKonfig()),
+				id.Path(tt.Sku.ObjekteSha, s.common.Standort.DirObjektenKonfig()),
 			); err != nil {
 				if errors.IsNotExist(err) {
 					err = nil

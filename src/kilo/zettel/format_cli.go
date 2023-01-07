@@ -47,7 +47,7 @@ func MakeCliFormatTransacted(
 			format.MakeFormatString("["),
 			format.MakeWriter(hf, z.Kennung()),
 			format.MakeFormatString("@"),
-			format.MakeWriter(sf, &z.Sku.Sha),
+			format.MakeWriter(sf, &z.Sku.ObjekteSha),
 			format.MakeFormatString(" "),
 			format.MakeWriter[Objekte](zf, &z.Objekte),
 			format.MakeFormatString("]"),

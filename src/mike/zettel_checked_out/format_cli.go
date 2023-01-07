@@ -64,7 +64,7 @@ func makeWriterFuncZettel(
 	return func(w io.Writer, z *Zettel) (n int64, err error) {
 		diff := format.StringChanged
 
-		if z.Internal.Sku.Sha.Equals(z.External.Sku.Sha) {
+		if z.Internal.Sku.ObjekteSha.Equals(z.External.Sku.ObjekteSha) {
 			diff = format.StringSame
 		}
 
@@ -74,7 +74,7 @@ func makeWriterFuncZettel(
 			format.MakeFormatString("["),
 			cw(s.MakeWriterRelativePath(z.External.ZettelFD.Path), format.ColorTypePointer),
 			format.MakeFormatString("@"),
-			format.MakeWriter(sf, &z.External.Sku.Sha),
+			format.MakeWriter(sf, &z.External.Sku.ObjekteSha),
 			format.MakeFormatString(" "),
 			format.MakeWriter(zf, &z.External.Objekte),
 			format.MakeFormatString("]"),

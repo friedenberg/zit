@@ -45,7 +45,7 @@ func (e *External) SetObjekteSha(
 	arf gattung.AkteReaderFactory,
 	v string,
 ) (err error) {
-	if err = e.Sku.Sha.Set(v); err != nil {
+	if err = e.Sku.ObjekteSha.Set(v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

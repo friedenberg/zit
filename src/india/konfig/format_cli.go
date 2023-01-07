@@ -20,7 +20,7 @@ func MakeCliFormatTransacted(
 			format.MakeFormatString("["),
 			cw(format.MakeFormatString("%s", kt.Kennung()), format.ColorTypePointer),
 			format.MakeFormatString("@"),
-			format.MakeWriter(sf, &kt.Sku.Sha),
+			format.MakeWriter(sf, &kt.Sku.ObjekteSha),
 			format.MakeFormatString("]"),
 		)
 	}

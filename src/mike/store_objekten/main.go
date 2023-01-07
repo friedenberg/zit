@@ -169,7 +169,7 @@ func (s Store) RevertTransaktion(
 				}
 			}
 
-			if tz.Sku.Sha.IsNull() {
+			if tz.Sku.ObjekteSha.IsNull() {
 				err = errors.Errorf("zettel not found in index!: %#v", o)
 				return
 			}

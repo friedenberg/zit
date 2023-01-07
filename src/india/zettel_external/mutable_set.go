@@ -44,11 +44,11 @@ func MakeMutableSetUniqueStored(zs ...*Zettel) MutableSet {
 			return ""
 		}
 
-		if z.Sku.Sha.IsNull() {
+		if z.Sku.ObjekteSha.IsNull() {
 			return ""
 		}
 
-		return z.Sku.Sha.String()
+		return z.Sku.ObjekteSha.String()
 	}
 
 	return MakeMutableSet(kf, zs...)

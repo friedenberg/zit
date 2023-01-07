@@ -51,7 +51,7 @@ func (s Store) ReadExternalZettelFromAktePath(p string) (cz zettel_checked_out.Z
 
 	//TODO-P4 capture this as a function
 	cz.External.Objekte = cz.Internal.Objekte
-	cz.External.Sku.Sha = cz.Internal.Sku.Sha
+	cz.External.Sku.ObjekteSha = cz.Internal.Sku.ObjekteSha
 	cz.External.Sku.Kennung = cz.Internal.Sku.Kennung
 
 	var akteSha sha.Sha

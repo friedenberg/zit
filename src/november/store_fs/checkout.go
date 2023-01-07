@@ -114,8 +114,8 @@ func (s *Store) CheckoutOne(
 		External: zettel_external.Zettel{
 			Objekte: sz.Objekte,
 			Sku: zettel_external.Sku{
-				Sha:     sz.Sku.Sha,
-				Kennung: sz.Sku.Kennung,
+				ObjekteSha: sz.Sku.ObjekteSha,
+				Kennung:    sz.Sku.Kennung,
 			},
 		},
 	}
