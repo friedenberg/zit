@@ -43,7 +43,7 @@ func (o Objekte) Equals(o1 *Objekte) bool {
 	return true
 }
 
-func (o Objekte) Gattung() gattung.Gattung {
+func (o Objekte) GetGattung() gattung.Gattung {
 	return gattung.Typ
 }
 

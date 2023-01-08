@@ -44,12 +44,59 @@ func Unwrap(err error) error {
 	return err
 }
 
+type Flusher interface {
+	Flush() error
+}
+
+func Split(err error) (out []error) {
+	switch e := err.(type) {
+	case nil:
+		return []error{}
+
+	case *multi:
+		out = e.Errors()
+
+	case multi:
+		out = e.Errors()
+
+	default:
+		out = []error{err}
+	}
+
+	return
+}
+
+func Join(es ...error) error {
+	switch {
+	case len(es) == 2 && es[0] == nil && es[1] == nil:
+		return nil
+
+	case len(es) == 2 && es[0] == nil:
+		return es[1]
+
+	case len(es) == 2 && es[1] == nil:
+		return es[0]
+
+	default:
+		return MakeMulti(es...)
+	}
+}
+
+func DeferredFlusher(
+	err *error,
+	f Flusher,
+) {
+	if err1 := f.Flush(); err1 != nil {
+		*err = Join(*err, err1)
+	}
+}
+
 func DeferredCloser(
 	err *error,
 	c io.Closer,
 ) {
 	if err1 := c.Close(); err1 != nil {
-		*err = MakeMulti(*err, err1)
+		*err = Join(*err, err1)
 	}
 }
 
@@ -58,7 +105,7 @@ func Deferred(
 	ef func() error,
 ) {
 	if err1 := ef(); err1 != nil {
-		*err = MakeMulti(*err, err1)
+		*err = Join(*err, err1)
 	}
 }
 
@@ -73,7 +120,7 @@ func DeferredChanError(
 	}
 
 	if err1 != nil {
-		*err = MakeMulti(*err, err1)
+		*err = Join(*err, err1)
 	}
 }
 

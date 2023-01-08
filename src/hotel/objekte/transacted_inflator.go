@@ -29,7 +29,7 @@ type transactedInflator[
 	T4 gattung.Verzeichnisse[T],
 	T5 gattung.VerzeichnissePtr[T4, T],
 ] struct {
-	orc           sku.FuncSkuObjekteReader
+	orc           gattung.FuncObjekteReader
 	arc           gattung.FuncReadCloser
 	objekteParser gattung.Parser[T, T1]
 	akteParser    gattung.Parser[T, T1]
@@ -44,7 +44,7 @@ func MakeTransactedInflator[
 	T4 gattung.Verzeichnisse[T],
 	T5 gattung.VerzeichnissePtr[T4, T],
 ](
-	orc sku.FuncSkuObjekteReader,
+	orc gattung.FuncObjekteReader,
 	arc gattung.FuncReadCloser,
 	objekteParser gattung.Parser[T, T1],
 	akteParser gattung.Parser[T, T1],
@@ -73,10 +73,10 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) Inflate2(
 		t = h.pool.Get()
 	}
 
-	if t.Sku.Kennung.Gattung() != o.Gattung {
+	if t.Sku.Kennung.GetGattung() != o.Gattung {
 		err = errors.Errorf(
 			"expected gattung %s but got %s",
-			t.Sku.Kennung.Gattung(),
+			t.Sku.Kennung.GetGattung(),
 			o.Gattung,
 		)
 		return
@@ -149,12 +149,12 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) readObjekte(
 ) (err error) {
 	var r sha.ReadCloser
 
-	if r, err = h.orc(sk); err != nil {
+	if r, err = h.orc(sk, sk.GetObjekteSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.Deferred(&err, r.Close)
+	defer errors.DeferredCloser(&err, r)
 
 	var n int64
 

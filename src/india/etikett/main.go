@@ -21,7 +21,7 @@ type Objekte struct {
 	Akte Akte
 }
 
-func (_ Objekte) Gattung() gattung.Gattung {
+func (_ Objekte) GetGattung() gattung.Gattung {
 	return gattung.Etikett
 }
 

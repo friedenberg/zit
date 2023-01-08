@@ -39,7 +39,7 @@ func MakeEtikett(v string) (e Etikett, err error) {
 
 type etikett string
 
-func (e etikett) Gattung() gattung.Gattung {
+func (e etikett) GetGattung() gattung.Gattung {
 	return gattung.Etikett
 }
 

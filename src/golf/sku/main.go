@@ -39,8 +39,6 @@ type SkuLike interface {
 	GetSchwanz() ts.Time
 }
 
-type FuncSkuObjekteReader func(DataIdentity) (sha.ReadCloser, error)
-
 type Sku struct {
 	Gattung gattung.Gattung
 

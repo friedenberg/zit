@@ -52,6 +52,6 @@ func (a *Objekte) Reset(b *Objekte) {
 	}
 }
 
-func (c Objekte) Gattung() gattung.Gattung {
+func (c Objekte) GetGattung() gattung.Gattung {
 	return gattung.Konfig
 }

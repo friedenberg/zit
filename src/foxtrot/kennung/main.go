@@ -12,7 +12,7 @@ import (
 )
 
 type KennungLike[T any] interface {
-	Gattung() gattung.Gattung
+	gattung.GattungLike
 	gattung.ValueElement
 	gattung.Equatable[T]
 }
@@ -38,7 +38,7 @@ func makeKennung[T KennungLike[T], T1 KennungLikePtr[T]](
 	return
 }
 
-func (e Kennung[T, T1]) Sha() sha.Sha {
+func (e Kennung[T, T1]) GetSha() sha.Sha {
 	hash := sha256.New()
 	sr := strings.NewReader(e.String())
 
@@ -49,8 +49,8 @@ func (e Kennung[T, T1]) Sha() sha.Sha {
 	return sha.FromHash(hash)
 }
 
-func (e Kennung[T, T1]) Gattung() gattung.Gattung {
-	return e.value.Gattung()
+func (e Kennung[T, T1]) GetGattung() gattung.Gattung {
+	return e.value.GetGattung()
 }
 
 func (e Kennung[T, T1]) String() string {

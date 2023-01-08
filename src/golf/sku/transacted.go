@@ -174,7 +174,7 @@ func (s Transacted[T, T1]) GetMutter() Mutter {
 }
 
 func (s Transacted[T, T1]) GetGattung() gattung.Gattung {
-	return s.Kennung.Gattung()
+	return s.Kennung.GetGattung()
 }
 
 func (s Transacted[T, T1]) GetId() IdLike {
@@ -198,5 +198,5 @@ func (s Transacted[T, T1]) GetSchwanz() ts.Time {
 }
 
 func (o Transacted[T, T1]) GetKey() string {
-	return fmt.Sprintf("%s.%s", o.Kennung.Gattung(), o.Kennung)
+	return fmt.Sprintf("%s.%s", o.Kennung.GetGattung(), o.Kennung)
 }

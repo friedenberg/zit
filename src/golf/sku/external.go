@@ -48,5 +48,5 @@ func (a External[T, T1]) Equals(b *External[T, T1]) (ok bool) {
 }
 
 func (o External[T, T1]) GetKey() string {
-	return fmt.Sprintf("%s.%s", o.Kennung.Gattung(), o.Kennung)
+	return fmt.Sprintf("%s.%s", o.Kennung.GetGattung(), o.Kennung)
 }

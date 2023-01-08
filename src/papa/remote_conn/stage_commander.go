@@ -8,6 +8,8 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"sync"
+	"syscall"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/india/konfig"
@@ -22,18 +24,26 @@ type MessageHiCommander struct {
 type StageCommander struct {
 	remoteActorCmd *exec.Cmd
 	konfigCli      konfig.Cli
+	wg             *sync.WaitGroup
 	stage
 }
 
 func (s StageCommander) Close() (err error) {
 	//TODO-P3 determine if this is the right place
 	if err = s.MainDialogue().Close(); err != nil {
-		err = errors.Wrap(err)
-		return
+		if errors.IsErrno(err, syscall.EPIPE) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
 	}
+
+	s.wg.Wait()
 
 	if err = s.remoteActorCmd.Wait(); err != nil {
 		err = errors.Wrap(err)
+		// errors.Err().Printf("close error: %s", err)
 		return
 	}
 
@@ -46,6 +56,7 @@ func MakeStageCommander(
 	command string,
 ) (s *StageCommander, err error) {
 	s = &StageCommander{
+		wg:        &sync.WaitGroup{},
 		konfigCli: u.Konfig().Cli(),
 	}
 
@@ -84,6 +95,8 @@ func MakeStageCommander(
 	}
 
 	copyWithPrefix := func(r *bufio.Reader, w io.Writer) {
+		defer s.wg.Done()
+
 		for {
 			var line string
 
@@ -95,6 +108,7 @@ func MakeStageCommander(
 		}
 	}
 
+	s.wg.Add(2)
 	go copyWithPrefix(rb, os.Stdout)
 	go copyWithPrefix(bufio.NewReader(rErr), os.Stderr)
 

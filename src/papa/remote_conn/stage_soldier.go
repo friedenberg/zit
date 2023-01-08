@@ -40,12 +40,6 @@ func (s StageSoldier) Close() (err error) {
 		}
 	}
 
-	select {
-	case <-s.chStopWaitingForDialogues:
-	default:
-		close(s.chStopWaitingForDialogues)
-	}
-
 	return
 }
 
@@ -114,23 +108,24 @@ func (s *StageSoldier) RegisterHandler(
 }
 
 func (s *StageSoldier) Listen() (err error) {
-	defer errors.Deferred(&err, s.Close)
+	errMulti := errors.MakeMulti()
 
-	chErr := make(chan error)
+	defer func() {
+		errMulti.Add(err)
 
-	go func() {
-		for err1 := range chErr {
-			err = errors.MakeMulti(err, err1)
-
-			select {
-			case <-s.chStopWaitingForDialogues:
-			default:
-				close(s.chStopWaitingForDialogues)
-			}
+		if !errMulti.Empty() {
+			err = errMulti
 		}
 	}()
 
-	go s.awaitRegisteredDialogueHandlers(chErr)
+	defer errors.Deferred(&err, s.Close)
+
+	go func() {
+		<-errMulti.ChanOnErr()
+		errMulti.Add(s.MainDialogue().Close())
+	}()
+
+	go s.awaitRegisteredDialogueHandlers(errMulti)
 
 	var done interface{}
 
@@ -138,7 +133,7 @@ func (s *StageSoldier) Listen() (err error) {
 		if errors.IsEOF(err) {
 			err = nil
 		} else {
-			err = errors.Wrap(err)
+			errMulti.Add(errors.Wrap(err))
 			return
 		}
 	}
@@ -146,55 +141,71 @@ func (s *StageSoldier) Listen() (err error) {
 	return
 }
 
-func (s *StageSoldier) awaitRegisteredDialogueHandlers(chErr chan<- error) {
+func (s *StageSoldier) awaitRegisteredDialogueHandlers(errMulti errors.Multi) {
 	errors.Log().Printf("waiting for handlers")
 
 	for {
-		select {
-		case <-s.chStopWaitingForDialogues:
-			//TODO-P2 handle remaining connections
+		if !errMulti.Empty() {
 			return
+		}
 
-		default:
-			var el SoldierDialogueChanElement
+		var el SoldierDialogueChanElement
 
-			errors.Log().Printf("waiting for connection")
+		errors.Log().Printf("waiting for connection")
 
-			if el = s.AwaitDialogue(); el.error != nil {
-				chErr <- errors.Wrap(el.error)
-				continue
-			}
+		if el = s.AwaitDialogue(); el.error != nil {
+			errMulti.Add(el.error)
+			return
+		}
 
-			go func() {
-				if el.Dialogue.Type() == DialogueTypeMain {
-					err := errors.Errorf("receive request for main dialog after handshake")
-					chErr <- err
-					return
-				}
+		if !errMulti.Empty() {
+			return
+		}
 
-				errors.Log().Printf("connection accepted")
-
-				var h func(Dialogue) error
-				ok := false
-
-				if h, ok = s.handlers[el.Dialogue.Type()]; !ok {
-					chErr <- errors.Errorf(
-						"unregistered dialogue type: %s", el.Dialogue.Type(),
-					)
-
-					return
-				}
-
-				errors.Log().Printf("found handler: %s", el.Dialogue.Type())
-
-				errors.Log().Printf("start handler: %s", el.Dialogue.Type())
-				defer errors.Log().Printf("end handler: %s", el.Dialogue.Type())
-
-				if err := h(el.Dialogue); err != nil {
-					chErr <- errors.Wrap(err)
+		go func() {
+			defer func() {
+				if e := recover(); e != nil {
+					if err, ok := e.(error); ok {
+						errMulti.Add(err)
+					} else {
+						panic(e)
+					}
 				}
 			}()
-		}
+
+			if !errMulti.Empty() {
+				return
+			}
+
+			if el.Dialogue.Type() == DialogueTypeMain {
+				err := errors.Errorf("receive request for main dialog after handshake")
+				errMulti.Add(err)
+				return
+			}
+
+			errors.Log().Printf("connection accepted")
+
+			var h func(Dialogue) error
+			ok := false
+
+			if h, ok = s.handlers[el.Dialogue.Type()]; !ok {
+				err := errors.Errorf(
+					"unregistered dialogue type: %s", el.Dialogue.Type(),
+				)
+
+				errMulti.Add(err)
+				return
+			}
+
+			errors.Log().Printf("found handler: %s", el.Dialogue.Type())
+
+			errors.Log().Printf("start handler: %s", el.Dialogue.Type())
+			defer errors.Log().Printf("end handler: %s", el.Dialogue.Type())
+
+			if err := h(el.Dialogue); err != nil {
+				errMulti.Add(errors.Wrap(err))
+			}
+		}()
 	}
 }
 

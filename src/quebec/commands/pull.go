@@ -141,7 +141,7 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	defer errors.Deferred(&err, client.Close)
+	defer errors.DeferredCloser(&err, client)
 
 	p := collections.MakePool[zettel.Transacted]()
 
@@ -153,27 +153,7 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		zettel.Verzeichnisse,
 		*zettel.Verzeichnisse,
 	](
-		func(sk sku.DataIdentity) (rc sha.ReadCloser, err error) {
-			var or io.ReadCloser
-
-			if or, err = client.ObjekteReaderForSku(sk.(sku.Sku)); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			errors.Log().Printf("got reader for sku: %s", sk)
-
-			var ow sha.WriteCloser
-
-			if ow, err = u.StoreObjekten().WriteCloserObjektenGattung(sk); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			rc = sha.MakeReadCloserTee(or, ow)
-
-			return
-		},
+		client.ObjekteReader,
 		func(sh sha.Sha) (rc sha.ReadCloser, err error) {
 			var or io.ReadCloser
 
@@ -195,9 +175,12 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 			return
 		},
-		&zettel.FormatObjekte{
-			IgnoreTypErrors: true,
-		},
+		objekte.MakeParserStorerWithCustomFormat[zettel.Objekte, *zettel.Objekte](
+			u.StoreObjekten(),
+			&zettel.FormatObjekte{
+				IgnoreTypErrors: true,
+			},
+		),
 		objekte.MakeNopAkteParser[zettel.Objekte, *zettel.Objekte](),
 		p,
 	)
@@ -221,6 +204,8 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 			var t *zettel.Transacted
 
+			//TODO-P0 ensure objekte is written after being parsed rather than being
+			//tee'd
 			if t, err = inflator.Inflate2(sk); err != nil {
 				err = errors.Wrapf(err, "Sku: %s", sk)
 				return

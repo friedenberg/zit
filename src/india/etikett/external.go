@@ -25,7 +25,7 @@ type External struct {
 	FD      fd.FD
 }
 
-func (e External) Gattung() gattung.Gattung {
+func (e External) GetGattung() gattung.Gattung {
 	return gattung.Etikett
 }
 

@@ -2,14 +2,10 @@ package remote_pull
 
 import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/echo/sha"
 )
 
-type messageServeData struct {
-	Size int64
-}
-
-type messageServeAkte messageServeData
-type messageServeObjekte struct {
+type messageRequestObjekteData struct {
 	Gattung gattung.Gattung
-	messageServeData
+	Sha     sha.Sha
 }

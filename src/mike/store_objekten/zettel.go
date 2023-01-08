@@ -62,7 +62,7 @@ func makeZettelStore(
 			zettel.Verzeichnisse,
 			*zettel.Verzeichnisse,
 		](
-			sa.ReadCloserObjektenSku,
+			sa.ObjekteReader,
 			sa.AkteReader,
 			&zettel.FormatObjekte{
 				IgnoreTypErrors: true,
@@ -156,7 +156,7 @@ func (s zettelStore) WriteZettelObjekte(z zettel.Objekte) (sh sha.Sha, err error
 
 	var wc sha.WriteCloser
 
-	if wc, err = s.common.WriteCloserObjektenGattung(gattung.Zettel); err != nil {
+	if wc, err = s.common.ObjekteWriter(gattung.Zettel); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

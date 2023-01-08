@@ -63,7 +63,7 @@ func makeTypStore(
 			objekte.NilVerzeichnisse[typ.Objekte],
 			*objekte.NilVerzeichnisse[typ.Objekte],
 		](
-			sa.ReadCloserObjektenSku,
+			sa.ObjekteReader,
 			sa.AkteReader,
 			nil,
 			gattung.Parser[typ.Objekte, *typ.Objekte](

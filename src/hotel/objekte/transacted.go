@@ -64,8 +64,8 @@ func (t *Transacted[T, T1, T2, T3, T4, T5]) SetObjekteSha(
 	return
 }
 
-func (t Transacted[T, T1, T2, T3, T4, T5]) Gattung() gattung.Gattung {
-	return t.Sku.Kennung.Gattung()
+func (t Transacted[T, T1, T2, T3, T4, T5]) GetGattung() gattung.Gattung {
+	return t.Sku.Kennung.GetGattung()
 }
 
 func (zt Transacted[T, T1, T2, T3, T4, T5]) IsNew() bool {

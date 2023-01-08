@@ -62,7 +62,7 @@ func makeEtikettStore(
 			objekte.NilVerzeichnisse[etikett.Objekte],
 			*objekte.NilVerzeichnisse[etikett.Objekte],
 		](
-			sa.ReadCloserObjektenSku,
+			sa.ObjekteReader,
 			sa.AkteReader,
 			nil,
 			gattung.Parser[etikett.Objekte, *etikett.Objekte](

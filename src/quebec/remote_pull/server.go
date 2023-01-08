@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/golf/id_set"
-	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 	"github.com/friedenberg/zit/src/papa/remote_conn"
@@ -101,18 +100,21 @@ func (op Server) objekteReaderForSku(
 ) (err error) {
 	defer errors.DeferredCloser(&err, d)
 
-	var sk sku.Sku
+	var msg messageRequestObjekteData
 
-	if err = d.Receive(&sk); err != nil {
+	if err = d.Receive(&msg); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	errors.Log().Printf("received sku: %s", sk)
+	errors.Log().Printf("received request: %#v", msg)
 
 	var or io.ReadCloser
 
-	if or, err = op.umwelt.StoreObjekten().ReadCloserObjektenSku(sk); err != nil {
+	if or, err = op.umwelt.StoreObjekten().ObjekteReader(
+		msg.Gattung,
+		msg.Sha,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

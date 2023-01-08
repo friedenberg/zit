@@ -1,14 +1,13 @@
 package zettel
 
 import (
-	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 )
 
 type ObjekteParserContext struct {
 	Zettel            Objekte
 	AktePath          string
-	RecoverableErrors errors.Multi
+	RecoverableErrors error
 }
 
 type ObjekteFormatterContext struct {

@@ -11,7 +11,6 @@ import (
 	"github.com/friedenberg/zit/src/echo/standort"
 	"github.com/friedenberg/zit/src/foxtrot/id"
 	"github.com/friedenberg/zit/src/golf/age_io"
-	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
 )
@@ -33,19 +32,20 @@ func (s common) KonfigPtr() *konfig_compiled.Compiled {
 	return s.konfig
 }
 
-func (s common) ReadCloserObjektenSku(
-	sk sku.DataIdentity,
+func (s common) ObjekteReader(
+	g gattung.GattungLike,
+	sh sha.ShaLike,
 ) (rc sha.ReadCloser, err error) {
 	var p string
 
-	if p, err = s.Standort.DirObjektenGattung(sk); err != nil {
+	if p, err = s.Standort.DirObjektenGattung(g); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	o := age_io.FileReadOptions{
 		Age:  s.Age,
-		Path: id.Path(sk.GetObjekteSha(), p),
+		Path: id.Path(sh.GetSha(), p),
 	}
 
 	if rc, err = age_io.NewFileReader(o); err != nil {
@@ -56,12 +56,12 @@ func (s common) ReadCloserObjektenSku(
 	return
 }
 
-func (s common) WriteCloserObjektenGattung(
+func (s common) ObjekteWriter(
 	g gattung.GattungLike,
 ) (wc sha.WriteCloser, err error) {
 	var p string
 
-	if p, err = s.Standort.DirObjektenGattung(g.GetGattung()); err != nil {
+	if p, err = s.Standort.DirObjektenGattung(g); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -12,6 +12,10 @@ type GattungLike interface {
 	GetGattung() Gattung
 }
 
+type ShaLike interface {
+	GetSha() sha.Sha
+}
+
 type Equatable[T any] interface {
 	Equals(*T) bool
 }
@@ -48,13 +52,13 @@ type ValueElementPtr[T ValueElement] interface {
 //
 
 type IdentifierLike interface {
-	Gattung() Gattung
+	GattungLike
 	fmt.Stringer
 }
 
 type Identifier[T any] interface {
 	IdentifierLike
-	Gattung() Gattung
+	GattungLike
 	ValueElement
 	Equatable[T]
 }
@@ -72,7 +76,7 @@ type IdentifierPtr[T ValueElement] interface {
 //            |__/
 
 type Objekte[T any] interface {
-	Gattung() Gattung
+	GattungLike
 	Equatable[T]
 	AkteSha() sha.Sha
 }
@@ -92,7 +96,7 @@ type ObjektePtr[T Element] interface {
 //
 
 type Stored interface {
-	Gattung() Gattung
+	GattungLike
 	//TODO-P4 add identifier
 	// Identifier() IdentifierLike
 
@@ -142,6 +146,29 @@ type TransactedPtr[T Element] interface {
 	Resetable[T]
 	StoredPtr
 }
+
+//    ___  _     _      _    _       ___ ___
+//   / _ \| |__ (_) ___| | _| |_ ___|_ _/ _ \
+//  | | | | '_ \| |/ _ \ |/ / __/ _ \| | | | |
+//  | |_| | |_) | |  __/   <| ||  __/| | |_| |
+//   \___/|_.__// |\___|_|\_\\__\___|___\___/
+//            |__/
+
+type ObjekteIOFactory interface {
+	ObjekteReaderFactory
+	ObjekteWriterFactory
+}
+
+type ObjekteReaderFactory interface {
+	ObjekteReader(GattungLike, ShaLike) (sha.ReadCloser, error)
+}
+
+type ObjekteWriterFactory interface {
+	ObjekteWriter(GattungLike) (sha.WriteCloser, error)
+}
+
+type FuncObjekteReader func(GattungLike, ShaLike) (sha.ReadCloser, error)
+type FuncObjekteWriter func(GattungLike) (sha.ReadCloser, error)
 
 //      _    _    _       ___ ___
 //     / \  | | _| |_ ___|_ _/ _ \

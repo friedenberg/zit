@@ -64,7 +64,7 @@ func (f Format[T, T1]) Parse(
 				return
 			}
 
-			if g != o.Gattung() {
+			if g != o.GetGattung() {
 				err = errors.Errorf(
 					"expected objekte to have gattung '%s' but got '%s'",
 					gattung.Konfig,
@@ -120,7 +120,7 @@ func (f Format[T, T1]) Format(
 
 	w := format.NewWriter()
 
-	w.WriteFormat("%s", o.Gattung())
+	w.WriteFormat("%s", o.GetGattung())
 	w.WriteFormat("%s %s", gattung.Akte, o.AkteSha())
 
 	if n, err = w.WriteTo(w2); err != nil {

@@ -48,7 +48,7 @@ func (e typ) Equals(e1 *typ) bool {
 	return e == *e1
 }
 
-func (o typ) Gattung() gattung.Gattung {
+func (o typ) GetGattung() gattung.Gattung {
 	return gattung.Typ
 }
 

@@ -10,7 +10,7 @@ import (
 
 type Konfig struct{}
 
-func (a Konfig) Gattung() gattung.Gattung {
+func (a Konfig) GetGattung() gattung.Gattung {
 	return gattung.Konfig
 }
 
@@ -42,6 +42,6 @@ func (i Konfig) Set(v string) (err error) {
 	return
 }
 
-func (i Konfig) Sha() sha.Sha {
+func (i Konfig) GetSha() sha.Sha {
 	return sha.FromString(i.String())
 }

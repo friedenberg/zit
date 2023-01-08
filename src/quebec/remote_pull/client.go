@@ -3,8 +3,10 @@ package remote_pull
 import (
 	"net"
 	"sync"
+	"syscall"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/golf/id_set"
 	"github.com/friedenberg/zit/src/golf/sku"
@@ -12,24 +14,31 @@ import (
 	"github.com/friedenberg/zit/src/papa/remote_conn"
 )
 
+const (
+	concurrentSkuFilterJobLimit = 100
+	// concurrentSkuFilterJobLimit = 1
+)
+
 type FuncSku func(sku.Sku) error
 
 type Client interface {
 	SkusFromFilter(id_set.Filter, FuncSku) error
-	ObjekteReaderForSku(sku.Sku) (sha.ReadCloser, error)
-	AkteReader(sha.Sha) (sha.ReadCloser, error)
+	gattung.ObjekteReaderFactory
+	gattung.AkteReaderFactory
 	Close() error
 }
 
 type client struct {
-	umwelt *umwelt.Umwelt
-	stage  *remote_conn.StageCommander
-	chDone chan struct{}
+	umwelt             *umwelt.Umwelt
+	stage              *remote_conn.StageCommander
+	chDone             chan struct{}
+	chFilterSkuTickets chan struct{}
 }
 
 func MakeClient(u *umwelt.Umwelt, from string) (c *client, err error) {
 	c = &client{
-		chDone: make(chan struct{}),
+		chDone:             make(chan struct{}),
+		chFilterSkuTickets: make(chan struct{}, concurrentSkuFilterJobLimit),
 	}
 
 	if c.stage, err = remote_conn.MakeStageCommander(
@@ -46,8 +55,12 @@ func MakeClient(u *umwelt.Umwelt, from string) (c *client, err error) {
 
 func (c client) Close() (err error) {
 	if err = c.stage.MainDialogue().Send(struct{}{}); err != nil {
-		err = errors.Wrap(err)
-		return
+		if errors.IsErrno(err, syscall.EPIPE) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	if err = c.stage.Close(); err != nil {
@@ -69,22 +82,16 @@ func (c client) SkusFromFilter(ids id_set.Filter, f FuncSku) (err error) {
 	}
 
 	wg := &sync.WaitGroup{}
-	chErr := make(chan error)
+	errMulti := errors.MakeMulti()
 
 	defer func() {
 		d.Close()
-
 		wg.Wait()
 
-	LOOP:
-		for {
-			select {
-			case e := <-chErr:
-				err = errors.MakeMulti(err, e)
+		errMulti.Add(err)
 
-			default:
-				break LOOP
-			}
+		if !errMulti.Empty() {
+			err = errMulti
 		}
 	}()
 
@@ -93,13 +100,8 @@ func (c client) SkusFromFilter(ids id_set.Filter, f FuncSku) (err error) {
 		return
 	}
 
-LOOP:
 	for {
-		select {
-		case <-c.chDone:
-			break LOOP
-
-		default:
+		if !errMulti.Empty() {
 			break
 		}
 
@@ -117,12 +119,13 @@ LOOP:
 
 		errors.Log().Printf("received sku: %s", sk)
 
+		c.chFilterSkuTickets <- struct{}{}
 		wg.Add(1)
 		go c.makeAndProcessOneSkuWithFilter(
 			sk,
 			f,
 			wg,
-			chErr,
+			errMulti,
 		)
 	}
 
@@ -133,37 +136,34 @@ func (c *client) makeAndProcessOneSkuWithFilter(
 	sk sku.Sku,
 	f FuncSku,
 	wg *sync.WaitGroup,
-	chError chan<- error,
+	errMulti errors.Multi,
 ) {
-	var err error
 	defer func() {
+		<-c.chFilterSkuTickets
 		if r := recover(); r != nil {
 			//TODO-P0 add to err chan
 			errors.Err().Printf("panicked during process one sku: %s", r)
 		}
 
 		wg.Done()
-
-		if err != nil {
-			go func() {
-				chError <- err
-			}()
-		}
 	}()
 
-	if err = f(sk); err != nil {
+	if err := f(sk); err != nil {
 		if errors.IsEOF(err) || errors.Is(err, net.ErrClosed) {
 			err = nil
 		} else {
 			err = errors.Wrap(err)
 		}
 
+		errMulti.Add(err)
+
 		return
 	}
 }
 
-func (c *client) ObjekteReaderForSku(
-	sk sku.Sku,
+func (c *client) ObjekteReader(
+	g gattung.GattungLike,
+	sh gattung.ShaLike,
 ) (rc sha.ReadCloser, err error) {
 	var d remote_conn.Dialogue
 
@@ -174,7 +174,12 @@ func (c *client) ObjekteReaderForSku(
 		return
 	}
 
-	if err = d.Send(sk); err != nil {
+	msgRequest := messageRequestObjekteData{
+		Gattung: g.GetGattung(),
+		Sha:     sh.GetSha(),
+	}
+
+	if err = d.Send(msgRequest); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

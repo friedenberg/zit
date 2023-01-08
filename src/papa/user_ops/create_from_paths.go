@@ -208,7 +208,7 @@ func (c CreateFromPaths) zettelsFromPath(
 		return
 	}
 
-	for _, e := range ctx.RecoverableErrors {
+	for _, e := range errors.Split(ctx.RecoverableErrors) {
 		//var errAkteInlineAndFilePath zettel.ErrHasInlineAkteAndFilePath
 
 		//if errors.As(e, &errAkteInlineAndFilePath) {

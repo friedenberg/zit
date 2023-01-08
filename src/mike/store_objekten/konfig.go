@@ -64,7 +64,7 @@ func makeKonfigStore(
 			objekte.NilVerzeichnisse[konfig.Objekte],
 			*objekte.NilVerzeichnisse[konfig.Objekte],
 		](
-			sa.ReadCloserObjektenSku,
+			sa.ObjekteReader,
 			sa.AkteReader,
 			nil,
 			gattung.Parser[konfig.Objekte, *konfig.Objekte](

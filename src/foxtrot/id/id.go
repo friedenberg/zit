@@ -9,12 +9,11 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/echo/sha"
 )
 
 type Id interface {
-	String() string
-	Sha() sha.Sha
+	// String() string
+	gattung.ShaLike
 }
 
 type IdMitKorper interface {
@@ -29,9 +28,14 @@ type MutableId interface {
 }
 
 type TypedId interface {
+	gattung.GattungLike
 	Id
-	Type() gattung.Gattung
 }
+
+// func Path(i IdMitKorper, pc ...string) string {
+// 	pc = append(pc, i.Kopf(), i.Schwanz())
+// 	return path.Join(pc...)
+// }
 
 func Path(i IdMitKorper, pc ...string) string {
 	pc = append(pc, i.Kopf(), i.Schwanz())
@@ -50,6 +54,7 @@ func MakeDirIfNecessary(i IdMitKorper, pc ...string) (p string, err error) {
 	return
 }
 
+// TODO-P2 determine if this is used
 func HeadTailFromFileName(fileName string) (head string, tail string) {
 	head, tail = filepath.Split(fileName)
 	tail = tail[0 : len(tail)-len(path.Ext(tail))]

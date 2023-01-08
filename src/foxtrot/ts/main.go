@@ -62,7 +62,7 @@ func (t Time) Schwanz() string {
 	return strconv.FormatInt(t.Unix()-Epoch, 10)
 }
 
-func (t Time) Sha() sha.Sha {
+func (t Time) GetSha() sha.Sha {
 	hash := sha256.New()
 	sr := strings.NewReader(t.String())
 

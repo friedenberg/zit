@@ -124,6 +124,10 @@ func (s *Sha) Set(v string) (err error) {
 	return
 }
 
+func (s Sha) GetSha() Sha {
+	return s
+}
+
 func (s Sha) IsNull() bool {
 	if s.value == "" {
 		return true

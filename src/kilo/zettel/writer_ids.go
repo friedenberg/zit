@@ -23,7 +23,7 @@ type zettelFilterable struct {
 	*Transacted
 }
 
-func (z zettelFilterable) Gattung() gattung.Gattung {
+func (z zettelFilterable) GetGattung() gattung.Gattung {
 	return gattung.Zettel
 }
 

@@ -112,7 +112,7 @@ func (h Hinweis) String() string {
 	return fmt.Sprintf("%s/%s", h.left, h.right)
 }
 
-func (h Hinweis) Sha() sha.Sha {
+func (h Hinweis) GetSha() sha.Sha {
 	hash := sha256.New()
 	sr := strings.NewReader(h.String())
 
@@ -203,6 +203,6 @@ func (h *Hinweis) Reset(h1 *Hinweis) {
 	}
 }
 
-func (h Hinweis) Gattung() gattung.Gattung {
+func (h Hinweis) GetGattung() gattung.Gattung {
 	return gattung.Zettel
 }

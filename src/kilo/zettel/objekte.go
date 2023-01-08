@@ -17,7 +17,7 @@ type Objekte struct {
 	Verzeichnisse Verzeichnisse
 }
 
-func (z Objekte) Gattung() gattung.Gattung {
+func (z Objekte) GetGattung() gattung.Gattung {
 	return gattung.Zettel
 }
 
