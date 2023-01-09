@@ -12,18 +12,21 @@ func _() {
 	_ = x[DialogueTypeSkusForFilter-1]
 	_ = x[DialogueTypeObjekten-2]
 	_ = x[DialogueTypeAkten-3]
-	_ = x[DialogueTypeObjekteReaderForSku-4]
-	_ = x[DialogueTypeAkteReaderForSha-5]
-	_ = x[DialogueTypePull-6]
-	_ = x[DialogueTypePullAkte-7]
-	_ = x[DialogueTypePush-8]
-	_ = x[DialogueTypePushObjekten-9]
-	_ = x[DialogueTypePushAkte-10]
+	_ = x[DialogueTypeObjekteReader-4]
+	_ = x[DialogueTypeAkteReader-5]
+	_ = x[DialogueTypeObjekteWriter-6]
+	_ = x[DialogueTypeAkteWriter-7]
+	_ = x[DialogueTypePull-8]
+	_ = x[DialogueTypePullAkte-9]
+	_ = x[DialogueTypePush-10]
+	_ = x[DialogueTypePushObjekten-11]
+	_ = x[DialogueTypePushAkte-12]
+	_ = x[DialogueTypeGetNeededSkus-13]
 }
 
-const _DialogueType_name = "DialogueTypeMainDialogueTypeSkusForFilterDialogueTypeObjektenDialogueTypeAktenDialogueTypeObjekteReaderForSkuDialogueTypeAkteReaderForShaDialogueTypePullDialogueTypePullAkteDialogueTypePushDialogueTypePushObjektenDialogueTypePushAkte"
+const _DialogueType_name = "DialogueTypeMainDialogueTypeSkusForFilterDialogueTypeObjektenDialogueTypeAktenDialogueTypeObjekteReaderDialogueTypeAkteReaderDialogueTypeObjekteWriterDialogueTypeAkteWriterDialogueTypePullDialogueTypePullAkteDialogueTypePushDialogueTypePushObjektenDialogueTypePushAkteDialogueTypeGetNeededSkus"
 
-var _DialogueType_index = [...]uint8{0, 16, 41, 61, 78, 109, 137, 153, 173, 189, 213, 233}
+var _DialogueType_index = [...]uint16{0, 16, 41, 61, 78, 103, 125, 150, 172, 188, 208, 224, 248, 268, 293}
 
 func (i DialogueType) String() string {
 	if i < 0 || i >= DialogueType(len(_DialogueType_index)-1) {

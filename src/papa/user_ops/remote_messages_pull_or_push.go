@@ -41,7 +41,7 @@ func (op RemoteMessagesPullOrPush) AddToSoldierStage(
 	)
 
 	s.RegisterHandler(
-		remote_conn.DialogueTypeObjekteReaderForSku,
+		remote_conn.DialogueTypeObjekteReader,
 		op.objekteReaderForSku,
 	)
 

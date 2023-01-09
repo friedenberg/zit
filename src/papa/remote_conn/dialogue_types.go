@@ -10,11 +10,14 @@ const (
 	DialogueTypeSkusForFilter
 	DialogueTypeObjekten
 	DialogueTypeAkten
-	DialogueTypeObjekteReaderForSku
-	DialogueTypeAkteReaderForSha
+	DialogueTypeObjekteReader
+	DialogueTypeAkteReader
+	DialogueTypeObjekteWriter
+	DialogueTypeAkteWriter
 	DialogueTypePull
 	DialogueTypePullAkte
 	DialogueTypePush
 	DialogueTypePushObjekten
 	DialogueTypePushAkte
+  DialogueTypeGetNeededSkus
 )
