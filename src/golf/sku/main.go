@@ -50,7 +50,16 @@ type Sku struct {
 }
 
 func MakeSku(line string) (sk Sku, err error) {
-	r := bufio.NewReader(strings.NewReader(line))
+	if err = sk.Set(line); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (sk *Sku) Set(line string) (err error) {
+	r := strings.NewReader(line)
 
 	if _, err = format.ReadSep(
 		' ',

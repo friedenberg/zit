@@ -14,18 +14,36 @@ import (
 type tai = chai.TAI
 
 type Tai struct {
+	wasSet bool
 	tai
 }
 
 func NowTai() Tai {
 	return Tai{
-		tai: chai.Now(),
+		wasSet: true,
+		tai:    chai.Now(),
 	}
 }
 
+func TaiFromTime(t1 Time) (t2 Tai) {
+	t2 = TaiFromTimeWithIndex(t1, 0)
+	return
+}
+
 func TaiFromTimeWithIndex(t1 Time, n int) (t2 Tai) {
+	t2.wasSet = true
 	t2.tai = chai.FromTime(t1.time)
 	t2.tai.Asec += int64(n * chai.Attosecond)
+
+	return
+}
+
+func (t Tai) AsTime() (t1 Time) {
+	// if t.wasSet && !t.tai.Eq(tai{}) {
+	t1 = Time{time: t.tai.AsTime()}
+	// }
+
+	errors.Log().Printf("TODO: %#v -> %#v -> %#v", t, t.tai.AsTime(), t1)
 
 	return
 }
@@ -39,6 +57,7 @@ func (t Tai) String() string {
 }
 
 func (t *Tai) Set(v string) (err error) {
+	t.wasSet = true
 	r := bufio.NewReader(strings.NewReader(v))
 
 	if _, err = format.ReadSep(
@@ -113,7 +132,7 @@ func (t Tai) Equals(t1 *Tai) bool {
 		return false
 	}
 
-	if t != *t1 {
+	if !t.tai.Eq(t1.tai) {
 		return false
 	}
 

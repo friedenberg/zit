@@ -24,6 +24,49 @@ type Transacted[T kennung.KennungLike[T], T1 kennung.KennungLikePtr[T]] struct {
 	Verzeichnisse
 }
 
+func (t *Transacted[T, T1]) SetFromSku(sk Sku) (err error) {
+	t.Schwanz = sk.Time
+
+	if err = T1(&t.Kennung).Set(sk.Kennung.String()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	t.ObjekteSha = sk.ObjekteSha
+	t.AkteSha = sk.AkteSha
+
+	//TODO-P0 Verzeichnisse
+
+	return
+}
+
+func TransactedFromSku(sk Sku) (out SkuLike, err error) {
+	switch sk.Gattung {
+	case gattung.Zettel:
+		out = &Transacted[hinweis.Hinweis, *hinweis.Hinweis]{}
+
+	case gattung.Typ:
+		out = &Transacted[kennung.Typ, *kennung.Typ]{}
+
+	case gattung.Etikett:
+		out = &Transacted[kennung.Etikett, *kennung.Etikett]{}
+
+	case gattung.Konfig:
+		out = &Transacted[kennung.Konfig, *kennung.Konfig]{}
+
+	default:
+		err = errors.Errorf("unsupported gattung: %s", sk.Gattung)
+		return
+	}
+
+	if err = out.SetFromSku(sk); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 // TODO-P2 include sku versions
 func MakeSkuTransacted(line string) (out SkuLike, err error) {
 	fields := strings.Fields(line)
@@ -58,6 +101,10 @@ func MakeSkuTransacted(line string) (out SkuLike, err error) {
 	}
 
 	return
+}
+
+func (a *Transacted[T, T1]) GetTime() ts.Time {
+	return a.Schwanz
 }
 
 func (a *Transacted[T, T1]) Sku(t ts.Time, n int) Sku {
