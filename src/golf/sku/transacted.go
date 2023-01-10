@@ -68,7 +68,7 @@ func (t *Transacted[T, T1]) SetFromSku(sk Sku) (err error) {
 // }
 
 // TODO-P2 include sku versions
-func MakeSkuTransacted(line string) (out SkuLike, err error) {
+func MakeSkuTransacted(t ts.Time, line string) (out SkuLike, err error) {
 	fields := strings.Fields(line)
 	var g gattung.Gattung
 
@@ -95,7 +95,7 @@ func MakeSkuTransacted(line string) (out SkuLike, err error) {
 		return
 	}
 
-	if err = out.SetFields(fields[1:]...); err != nil {
+	if err = out.SetTimeAndFields(t, fields[1:]...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -181,7 +181,9 @@ func (a Transacted[T, T1]) Equals(b *Transacted[T, T1]) (ok bool) {
 	return true
 }
 
-func (o *Transacted[T, T1]) SetFields(vs ...string) (err error) {
+func (o *Transacted[T, T1]) SetTimeAndFields(t ts.Time, vs ...string) (err error) {
+	o.Schwanz = t
+
 	if len(vs) != 4 {
 		err = errors.Errorf("expected 4 elements but got %d", len(vs))
 		return

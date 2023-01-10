@@ -27,7 +27,7 @@ type DataIdentity interface {
 type SkuLike interface {
 	DataIdentity
 	GetId() IdLike
-	SetFields(...string) error
+	SetTimeAndFields(ts.Time, ...string) error
 
 	GetKey() string
 
