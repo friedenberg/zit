@@ -32,7 +32,7 @@ func MakeZettelen(
 	dir string,
 	f ioFactory,
 	p *collections.Pool[zettel.Transacted],
-	fff ZettelVerzeichnisseWriterGetter,
+	fff ZettelTransactedWriterGetter,
 ) (i *Zettelen, err error) {
 	i = &Zettelen{
 		konfig:    k,

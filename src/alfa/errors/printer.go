@@ -87,6 +87,8 @@ func (p printer) Print(a ...interface{}) (err error) {
 	return
 }
 
+//TODO-P1 add a todo function for easy grepping
+
 func (p printer) Printf(f string, a ...interface{}) (err error) {
 	if !p.on {
 		return

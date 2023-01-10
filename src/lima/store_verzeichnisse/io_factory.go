@@ -16,8 +16,8 @@ type writeCloserFactory interface {
 	WriteCloserVerzeichnisse(string) (sha.WriteCloser, error)
 }
 
-type ZettelVerzeichnisseWriterGetter interface {
-	ZettelVerzeichnisseWriter(int) collections.WriterFunc[*zettel.Transacted]
+type ZettelTransactedWriterGetter interface {
+	ZettelTransactedWriter(int) collections.WriterFunc[*zettel.Transacted]
 }
 
 type PageHeader interface {

@@ -11,7 +11,7 @@ import (
 )
 
 type verzeichnisseSchwanzen struct {
-	headers [store_verzeichnisse.PageCount]*zettel.WriterSchwanzen
+	headers [store_verzeichnisse.PageCount]*zettel.Schwanzen
 	*store_verzeichnisse.Zettelen
 	common *common
 }
@@ -25,7 +25,7 @@ func makeVerzeichnisseSchwanzen(
 	}
 
 	for i := range s.headers {
-		s.headers[i] = zettel.MakeWriterSchwanzen()
+		s.headers[i] = zettel.MakeSchwanzen()
 	}
 
 	s.Zettelen, err = store_verzeichnisse.MakeZettelen(
@@ -88,8 +88,8 @@ func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 	return
 }
 
-func (s *verzeichnisseSchwanzen) ZettelVerzeichnisseWriter(
+func (s *verzeichnisseSchwanzen) ZettelTransactedWriter(
 	n int,
 ) collections.WriterFunc[*zettel.Transacted] {
-	return s.headers[n].WriteZettelVerzeichnisse
+	return s.headers[n].WriteZettelTransacted
 }

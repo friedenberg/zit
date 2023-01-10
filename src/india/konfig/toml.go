@@ -8,6 +8,7 @@ type Toml struct {
 	RemoteScripts  map[string]RemoteScript               `toml:"remote-scripts"`
 	Recipients     []string                              `toml:"recipients"`
 	Actions        map[string]script_config.ScriptConfig `toml:"actions,omitempty"`
+	StoreVersion   string                                `toml:"store-version,omitempty"`
 }
 
 type FileExtensions struct {

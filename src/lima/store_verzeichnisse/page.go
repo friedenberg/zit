@@ -27,12 +27,12 @@ func makeZettelenPage(
 	iof ioFactory,
 	pid pageId,
 	pool *collections.Pool[zettel.Transacted],
-	fff ZettelVerzeichnisseWriterGetter,
+	fff ZettelTransactedWriterGetter,
 ) (p *Page) {
 	flushFilter := collections.MakeWriterNoop[*zettel.Transacted]()
 
 	if fff != nil {
-		flushFilter = fff.ZettelVerzeichnisseWriter(pid.index)
+		flushFilter = fff.ZettelTransactedWriter(pid.index)
 	}
 
 	p = &Page{
@@ -81,6 +81,7 @@ func (zp *Page) Add(z *zettel.Transacted) (err error) {
 		return
 	}
 
+	//TODO-P0 sort
 	zp.added = append(zp.added, z)
 	zp.setState(StateChanged)
 
@@ -203,6 +204,7 @@ func (zp *Page) ReadJustHeader() (err error) {
 	return
 }
 
+// TODO-P0 merge sort between decoded and added
 func (zp *Page) Copy(
 	r1 io.Reader,
 	w collections.WriterFunc[*zettel.Transacted],

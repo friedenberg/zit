@@ -11,15 +11,38 @@ import (
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/echo/standort"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
+	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/ts"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/golf/transaktion"
+	"github.com/friedenberg/zit/src/hotel/objekte"
+	"github.com/friedenberg/zit/src/india/typ"
 	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 
 type shaAbbr = sha.Abbr
 type hinweisAbbr = hinweis.Abbr
+
+type TypStore interface {
+	reindexOne(*transaktion.Transaktion, sku.SkuLike) error
+	objekte.Store[
+		typ.Objekte,
+		*typ.Objekte,
+		kennung.Typ,
+		*kennung.Typ,
+		objekte.NilVerzeichnisse[typ.Objekte],
+		*objekte.NilVerzeichnisse[typ.Objekte],
+	]
+	objekte.StoreWithCreateOrUpdate[
+		typ.Objekte,
+		*typ.Objekte,
+		kennung.Typ,
+		*kennung.Typ,
+		objekte.NilVerzeichnisse[typ.Objekte],
+		*objekte.NilVerzeichnisse[typ.Objekte],
+	]
+}
 
 type Store struct {
 	common
@@ -28,8 +51,10 @@ type Store struct {
 	shaAbbr
 	hinweisAbbr
 
-	zettelStore  *zettelStore
-	typStore     *typStore
+	zettelStore *zettelStore
+	typStore    TypStore
+
+	// typStore     *typStore
 	etikettStore *etikettStore
 	konfigStore  *konfigStore
 }
@@ -106,7 +131,7 @@ func (s *Store) Zettel() *zettelStore {
 	return s.zettelStore
 }
 
-func (s *Store) Typ() *typStore {
+func (s *Store) Typ() TypStore {
 	return s.typStore
 }
 
@@ -262,7 +287,7 @@ func (s *Store) Reindex() (err error) {
 		return
 	}
 
-	//TODO move all below to zettelStore
+	//TODO-P3 move to zettelStore
 	if err = s.zettelStore.indexKennung.reset(); err != nil {
 		err = errors.Wrapf(err, "failed to reset index kennung")
 		return

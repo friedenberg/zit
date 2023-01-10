@@ -8,6 +8,48 @@ import (
 	"github.com/friedenberg/zit/src/delta/collections"
 )
 
+// func StringSep(
+// 	delim byte,
+// 	sfs ...fmt.Stringer,
+// ) string {
+//   sb := &strings.Builder{}
+
+// 	for _, sf := range sfs {
+// 		var n1 int
+
+// 		if n1, err = io.WriteString(w, sf.String()); err != nil {
+// 			err = errors.Wrap(err)
+// 			return
+// 		}
+
+// 		n += int64(n1)
+// 	}
+
+// 	return sb.String()
+// }
+
+// func WriteStringSep(
+// 	delim byte,
+// 	w1 io.Writer,
+// 	sfs ...fmt.Stringer,
+// ) (n int64, err error) {
+// 	w := bufio.NewWriter(w1)
+// 	defer errors.DeferredFlusher(&err, w)
+
+// 	for _, sf := range sfs {
+// 		var n1 int
+
+// 		if n1, err = io.WriteString(w, sf.String()); err != nil {
+// 			err = errors.Wrap(err)
+// 			return
+// 		}
+
+// 		n += int64(n1)
+// 	}
+
+// 	return
+// }
+
 func Write(
 	w io.Writer,
 	wffs ...WriterFunc,

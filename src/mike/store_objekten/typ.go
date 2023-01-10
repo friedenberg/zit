@@ -13,38 +13,43 @@ import (
 	"github.com/friedenberg/zit/src/india/typ"
 )
 
-type typLogWriter = collections.WriterFunc[*typ.Transacted]
+type TypInflator = objekte.TransactedInflator[
+	typ.Objekte,
+	*typ.Objekte,
+	kennung.Typ,
+	*kennung.Typ,
+	objekte.NilVerzeichnisse[typ.Objekte],
+	*objekte.NilVerzeichnisse[typ.Objekte],
+]
 
-type TypLogWriters struct {
-	New, Updated, Unchanged typLogWriter
-}
+type TypLogWriter = objekte.LogWriter[
+	typ.Objekte,
+	*typ.Objekte,
+	kennung.Typ,
+	*kennung.Typ,
+	objekte.NilVerzeichnisse[typ.Objekte],
+	*objekte.NilVerzeichnisse[typ.Objekte],
+]
+
+type TypAkteTextSaver = objekte.AkteTextSaver[
+	typ.Objekte,
+	*typ.Objekte,
+]
 
 type typStore struct {
 	common *common
 
 	pool collections.PoolLike[typ.Transacted]
 
-	objekte.TransactedInflator[
-		typ.Objekte,
-		*typ.Objekte,
-		kennung.Typ,
-		*kennung.Typ,
-		objekte.NilVerzeichnisse[typ.Objekte],
-		*objekte.NilVerzeichnisse[typ.Objekte],
-	]
-
-	objekte.AkteTextSaver[
-		typ.Objekte,
-		*typ.Objekte,
-	]
-
-	TypLogWriters
+	TypInflator
+	TypAkteTextSaver
+	TypLogWriter
 }
 
-func (s *typStore) SetTypLogWriters(
-	tlw TypLogWriters,
+func (s *typStore) SetLogWriter(
+	tlw TypLogWriter,
 ) {
-	s.TypLogWriters = tlw
+	s.TypLogWriter = tlw
 }
 
 func makeTypStore(
@@ -55,7 +60,7 @@ func makeTypStore(
 	s = &typStore{
 		common: sa,
 		pool:   pool,
-		TransactedInflator: objekte.MakeTransactedInflator[
+		TypInflator: objekte.MakeTransactedInflator[
 			typ.Objekte,
 			*typ.Objekte,
 			kennung.Typ,
@@ -71,7 +76,7 @@ func makeTypStore(
 			),
 			pool,
 		),
-		AkteTextSaver: objekte.MakeAkteTextSaver[
+		TypAkteTextSaver: objekte.MakeAkteTextSaver[
 			typ.Objekte,
 			*typ.Objekte,
 		](
@@ -155,7 +160,7 @@ func (s typStore) CreateOrUpdate(
 	if mutter != nil && tt.ObjekteSha().Equals(mutter.ObjekteSha()) {
 		tt = mutter
 
-		if err = s.TypLogWriters.Unchanged(tt); err != nil {
+		if err = s.TypLogWriter.Unchanged(tt); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -167,12 +172,12 @@ func (s typStore) CreateOrUpdate(
 	s.common.KonfigPtr().AddTyp(tt)
 
 	if mutter == nil {
-		if err = s.TypLogWriters.New(tt); err != nil {
+		if err = s.TypLogWriter.New(tt); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	} else {
-		if err = s.TypLogWriters.Updated(tt); err != nil {
+		if err = s.TypLogWriter.Updated(tt); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -289,9 +294,9 @@ func (s *typStore) reindexOne(
 	s.common.KonfigPtr().AddTyp(te)
 
 	if te.IsNew() {
-		s.TypLogWriters.New(te)
+		s.TypLogWriter.New(te)
 	} else {
-		s.TypLogWriters.Updated(te)
+		s.TypLogWriter.Updated(te)
 	}
 
 	return

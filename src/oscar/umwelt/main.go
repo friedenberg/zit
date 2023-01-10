@@ -182,11 +182,12 @@ func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 		},
 	)
 
-	u.storeObjekten.Typ().SetTypLogWriters(
-		store_objekten.TypLogWriters{
+	u.storeObjekten.Typ().SetLogWriter(
+		store_objekten.TypLogWriter{
 			New:       u.PrinterTypTransacted(format.StringUpdated),
 			Updated:   u.PrinterTypTransacted(format.StringUpdated),
 			Unchanged: u.PrinterTypTransacted(format.StringUnchanged),
+			Archived:  u.PrinterTypTransacted(format.StringArchived),
 		},
 	)
 

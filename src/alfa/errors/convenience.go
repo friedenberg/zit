@@ -8,28 +8,12 @@ import (
 	"golang.org/x/xerrors"
 )
 
-type errorWithIsMethod interface {
-	error
-	Is(error) bool
-}
-
-func ErrorHasIsMethod(err error) bool {
-	_, ok := err.(errorWithIsMethod)
-
-	return ok
-}
-
-type unwrappable interface {
-	error
-	Unwrap() error
-}
-
 func As(err error, target interface{}) bool {
 	return xerrors.As(err, target)
 }
 
 func unwrapOnce(err error) error {
-	if e, ok := err.(unwrappable); ok {
+	if e, ok := err.(Unwrapper); ok {
 		return e
 	}
 
@@ -37,15 +21,11 @@ func unwrapOnce(err error) error {
 }
 
 func Unwrap(err error) error {
-	if e, ok := err.(unwrappable); ok {
+	if e, ok := err.(Unwrapper); ok {
 		return Unwrap(e.Unwrap())
 	}
 
 	return err
-}
-
-type Flusher interface {
-	Flush() error
 }
 
 func Split(err error) (out []error) {

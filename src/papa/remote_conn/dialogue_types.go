@@ -19,5 +19,5 @@ const (
 	DialogueTypePush
 	DialogueTypePushObjekten
 	DialogueTypePushAkte
-  DialogueTypeGetNeededSkus
+	DialogueTypeGetNeededSkus
 )

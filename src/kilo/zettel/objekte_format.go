@@ -5,8 +5,9 @@ import (
 )
 
 type ObjekteParserContext struct {
-	Zettel            Objekte
-	AktePath          string
+	Zettel   Objekte
+	AktePath string
+	//TODO-P3 rename to Errors
 	RecoverableErrors error
 }
 
