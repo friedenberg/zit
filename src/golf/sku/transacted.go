@@ -25,7 +25,7 @@ type Transacted[T kennung.KennungLike[T], T1 kennung.KennungLikePtr[T]] struct {
 }
 
 func (t *Transacted[T, T1]) SetFromSku(sk Sku) (err error) {
-	t.Schwanz = sk.Time
+	t.Schwanz = sk.Time.AsTime()
 
 	if err = T1(&t.Kennung).Set(sk.Kennung.String()); err != nil {
 		err = errors.Wrap(err)
@@ -40,32 +40,32 @@ func (t *Transacted[T, T1]) SetFromSku(sk Sku) (err error) {
 	return
 }
 
-func TransactedFromSku(sk Sku) (out SkuLike, err error) {
-	switch sk.Gattung {
-	case gattung.Zettel:
-		out = &Transacted[hinweis.Hinweis, *hinweis.Hinweis]{}
+// func TransactedFromSku(sk Sku) (out SkuLike, err error) {
+// 	switch sk.Gattung {
+// 	case gattung.Zettel:
+// 		out = &Transacted[hinweis.Hinweis, *hinweis.Hinweis]{}
 
-	case gattung.Typ:
-		out = &Transacted[kennung.Typ, *kennung.Typ]{}
+// 	case gattung.Typ:
+// 		out = &Transacted[kennung.Typ, *kennung.Typ]{}
 
-	case gattung.Etikett:
-		out = &Transacted[kennung.Etikett, *kennung.Etikett]{}
+// 	case gattung.Etikett:
+// 		out = &Transacted[kennung.Etikett, *kennung.Etikett]{}
 
-	case gattung.Konfig:
-		out = &Transacted[kennung.Konfig, *kennung.Konfig]{}
+// 	case gattung.Konfig:
+// 		out = &Transacted[kennung.Konfig, *kennung.Konfig]{}
 
-	default:
-		err = errors.Errorf("unsupported gattung: %s", sk.Gattung)
-		return
-	}
+// 	default:
+// 		err = errors.Errorf("unsupported gattung: %s", sk.Gattung)
+// 		return
+// 	}
 
-	if err = out.SetFromSku(sk); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+// 	if err = out.SetFromSku(sk); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	return
-}
+// 	return
+// }
 
 // TODO-P2 include sku versions
 func MakeSkuTransacted(line string) (out SkuLike, err error) {

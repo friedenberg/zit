@@ -124,7 +124,7 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) Inflate(
 		t = h.pool.Get()
 	}
 
-	if err = t.SetSkuLike(o); err != nil {
+	if err = t.SetTimeAndObjekte(ti, o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

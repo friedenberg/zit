@@ -1,7 +1,6 @@
 package sku
 
 import (
-	"bufio"
 	"fmt"
 	"strings"
 
