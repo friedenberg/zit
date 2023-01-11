@@ -204,7 +204,7 @@ func (s *etikettStore) reindexOne(
 	var te *etikett.Transacted
 	defer s.pool.Put(te)
 
-	if te, err = s.Inflate(t.Time, o); err != nil {
+	if te, err = s.InflateFromSkuLike(o); err != nil {
 		errors.Wrap(err)
 		return
 	}

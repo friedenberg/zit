@@ -5,7 +5,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/sha"
-	"github.com/friedenberg/zit/src/foxtrot/ts"
 	"github.com/friedenberg/zit/src/golf/sku"
 )
 
@@ -17,8 +16,8 @@ type TransactedInflator[
 	T4 gattung.Verzeichnisse[T],
 	T5 gattung.VerzeichnissePtr[T4, T],
 ] interface {
-	Inflate2(sku.Sku) (*Transacted[T, T1, T2, T3, T4, T5], error)
-	Inflate(ts.Time, sku.SkuLike) (*Transacted[T, T1, T2, T3, T4, T5], error)
+	InflateFromSku(sku.Sku) (*Transacted[T, T1, T2, T3, T4, T5], error)
+	InflateFromSkuLike(sku.SkuLike) (*Transacted[T, T1, T2, T3, T4, T5], error)
 }
 
 type transactedInflator[
@@ -64,7 +63,7 @@ func MakeTransactedInflator[
 }
 
 // TODO-P3 rename to InflateFromSku
-func (h *transactedInflator[T, T1, T2, T3, T4, T5]) Inflate2(
+func (h *transactedInflator[T, T1, T2, T3, T4, T5]) InflateFromSku(
 	o sku.Sku,
 ) (t *Transacted[T, T1, T2, T3, T4, T5], err error) {
 	if h.pool == nil {
@@ -113,9 +112,7 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) Inflate2(
 	return
 }
 
-// TODO-P3 rename to InflateFromSku
-func (h *transactedInflator[T, T1, T2, T3, T4, T5]) Inflate(
-	ti ts.Time,
+func (h *transactedInflator[T, T1, T2, T3, T4, T5]) InflateFromSkuLike(
 	o sku.SkuLike,
 ) (t *Transacted[T, T1, T2, T3, T4, T5], err error) {
 	if h.pool == nil {
@@ -124,7 +121,7 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) Inflate(
 		t = h.pool.Get()
 	}
 
-	if err = t.SetTimeAndObjekte(ti, o); err != nil {
+	if err = t.SetSkuLike(o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

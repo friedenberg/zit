@@ -541,7 +541,9 @@ func (s *zettelStore) reindexOne(
 	var tz *zettel.Transacted
 	defer s.pool.Put(tz)
 
-	if tz, err = s.Inflate(t.Time, o); err != nil {
+	errors.Log().Printf("reindexing: %#v", o)
+
+	if tz, err = s.InflateFromSkuLike(o); err != nil {
 		//TODO-P2 decide on how to handle format errors
 		errors.Err().Print(err)
 		err = nil

@@ -18,6 +18,7 @@ type Mutter [2]ts.Time
 type IdLike = fmt.Stringer
 
 type DataIdentity interface {
+	GetTime() ts.Time
 	gattung.GattungLike
 	GetObjekteSha() sha.Sha
 	//TODO-P1 add GetTime
@@ -28,6 +29,7 @@ type SkuLike interface {
 	DataIdentity
 	GetId() IdLike
 	SetTimeAndFields(ts.Time, ...string) error
+	SetFromSku(Sku) error
 
 	GetKey() string
 
@@ -41,7 +43,7 @@ type SkuLike interface {
 type Sku struct {
 	Gattung gattung.Gattung
 
-	Time ts.Tai
+	Time ts.Time
 
 	Kennung    collections.StringValue
 	ObjekteSha sha.Sha
@@ -86,6 +88,10 @@ func (a *Sku) Reset(b *Sku) {
 	}
 }
 
+func (a Sku) GetTime() ts.Time {
+	return a.Time
+}
+
 func (a Sku) GetGattung() gattung.Gattung {
 	return a.Gattung
 }
@@ -109,4 +115,15 @@ func (a Sku) Equals(b *Sku) (ok bool) {
 	}
 
 	return true
+}
+
+func (s Sku) String() string {
+	return fmt.Sprintf(
+		"%s %s %s %s %s",
+		s.Gattung,
+		s.Time,
+		s.Kennung,
+		s.ObjekteSha,
+		s.AkteSha,
+	)
 }

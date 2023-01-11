@@ -206,7 +206,7 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 			//TODO-P0 ensure objekte is written after being parsed rather than being
 			//tee'd
-			if t, err = inflator.Inflate2(sk); err != nil {
+			if t, err = inflator.InflateFromSku(sk); err != nil {
 				err = errors.Wrapf(err, "Sku: %s", sk)
 				return
 			}

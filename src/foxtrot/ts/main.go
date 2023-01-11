@@ -33,6 +33,13 @@ func Tyme(t tyme.Time) Time {
 	}
 }
 
+func TimeWithIndex(t1 Time, n int) (t2 Time) {
+	t2 = t1
+	t2.time.Add(tyme.Nanosecond * tyme.Duration(n))
+
+	return
+}
+
 func (t *Time) MoveForwardIota() {
 	t.time = t.time.Add(tyme.Second)
 }

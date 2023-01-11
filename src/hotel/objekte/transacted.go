@@ -4,7 +4,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/sha"
-	"github.com/friedenberg/zit/src/foxtrot/ts"
 	"github.com/friedenberg/zit/src/golf/sku"
 )
 
@@ -90,8 +89,7 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) Equals(
 	return true
 }
 
-func (a *Transacted[T, T1, T2, T3, T4, T5]) SetTimeAndObjekte(
-	t ts.Time,
+func (a *Transacted[T, T1, T2, T3, T4, T5]) SetSkuLike(
 	o sku.SkuLike,
 ) (err error) {
 	var h T2
@@ -106,8 +104,8 @@ func (a *Transacted[T, T1, T2, T3, T4, T5]) SetTimeAndObjekte(
 	a.Sku.ObjekteSha = o.GetObjekteSha()
 	a.Sku.TransactionIndex = o.GetTransactionIndex()
 	//TODO-P3 fix sku kopf and schwanz
-	a.Sku.Kopf = t
-	a.Sku.Schwanz = t
+	// a.Sku.Kopf = t
+	a.Sku.Schwanz = o.GetTime()
 	a.Sku.Mutter = o.GetMutter()
 
 	return

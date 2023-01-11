@@ -13,6 +13,7 @@ import (
 type Verzeichnisse struct {
 	wasPopulated bool
 	// Etiketten               tridex.Tridex
+  //TODO-P0 add typen expanded sorted
 	EtikettenExpandedSorted []string
 	EtikettenSorted         []string
 	//TODO-P3 add

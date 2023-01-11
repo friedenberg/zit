@@ -14,10 +14,14 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/ts"
 )
 
+type SkuLikeOld interface {
+	SkuLike
+	SetTimeAndFields(ts.Time, ...string) error
+}
+
 // TODO-P3 examine adding objekte and akte shas to Skus
 // TODO-P2 move sku.Sku to sku.Transacted
 type Transacted[T kennung.KennungLike[T], T1 kennung.KennungLikePtr[T]] struct {
-	Time       ts.Time
 	Kennung    T
 	ObjekteSha sha.Sha
 	AkteSha    sha.Sha
@@ -25,7 +29,7 @@ type Transacted[T kennung.KennungLike[T], T1 kennung.KennungLikePtr[T]] struct {
 }
 
 func (t *Transacted[T, T1]) SetFromSku(sk Sku) (err error) {
-	t.Schwanz = sk.Time.AsTime()
+	t.Schwanz = sk.Time
 
 	if err = T1(&t.Kennung).Set(sk.Kennung.String()); err != nil {
 		err = errors.Wrap(err)
@@ -109,7 +113,7 @@ func (a *Transacted[T, T1]) GetTime() ts.Time {
 
 func (a *Transacted[T, T1]) Sku(t ts.Time, n int) Sku {
 	return Sku{
-		Time:       ts.TaiFromTimeWithIndex(t, n),
+		Time:       ts.TimeWithIndex(t, n),
 		Gattung:    a.GetGattung(),
 		Kennung:    collections.MakeStringValue(a.Kennung.String()),
 		ObjekteSha: a.ObjekteSha,

@@ -248,7 +248,7 @@ func (s *konfigStore) reindexOne(
 	var te *konfig.Transacted
 	defer s.pool.Put(te)
 
-	if te, err = s.Inflate(t.Time, o); err != nil {
+	if te, err = s.InflateFromSkuLike(o); err != nil {
 		errors.Wrap(err)
 		return
 	}

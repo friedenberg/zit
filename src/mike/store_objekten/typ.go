@@ -214,7 +214,7 @@ func (s typStore) ReadAll(
 
 					var te *typ.Transacted
 
-					if te, err = s.Inflate(t.Time, o); err != nil {
+					if te, err = s.InflateFromSkuLike(o); err != nil {
 						if errors.Is(err, toml.Error{}) {
 							err = nil
 						} else {
@@ -281,7 +281,7 @@ func (s *typStore) reindexOne(
 	var te *typ.Transacted
 	defer s.pool.Put(te)
 
-	if te, err = s.Inflate(t.Time, o); err != nil {
+	if te, err = s.InflateFromSkuLike(o); err != nil {
 		if errors.Is(err, toml.Error{}) {
 			err = nil
 			return
