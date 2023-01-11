@@ -8,6 +8,8 @@ import (
 	"golang.org/x/xerrors"
 )
 
+var New = xerrors.New
+
 func As(err error, target interface{}) bool {
 	return xerrors.As(err, target)
 }

@@ -6,7 +6,7 @@ import (
 
 func MakeWriterDoNotRepool[T any]() WriterFunc[*T] {
 	return func(e *T) (err error) {
-		err = ErrDoNotRepool{}
+		err = ErrDoNotRepool
 		return
 	}
 }

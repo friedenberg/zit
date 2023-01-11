@@ -14,6 +14,6 @@ func MakeMutableSet[T any](kf KeyFunc[T], es ...T) (out MutableSet[T]) {
 
 func (s MutableSet[T]) AddAndDoNotRepool(e T) (err error) {
 	s.Add(e)
-	err = ErrDoNotRepool{}
+	err = ErrDoNotRepool
 	return
 }
