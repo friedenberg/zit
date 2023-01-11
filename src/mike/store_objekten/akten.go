@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 
+//TODO-P2 move to Standort
 func (s Store) ReadAllAktenShas(w collections.WriterFunc[sha.Sha]) (err error) {
 	wf := func(p string) (err error) {
 		var sh sha.Sha

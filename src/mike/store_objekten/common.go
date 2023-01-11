@@ -15,6 +15,7 @@ import (
 	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
 )
 
+//TODO-P3 move to own package
 type common struct {
 	LockSmith   LockSmith
 	Age         age.Age

@@ -1,8 +1,6 @@
 package collections
 
 import (
-	"io"
-
 	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
@@ -60,7 +58,7 @@ func WriterFuncNegate[T any](wf WriterFunc[T]) WriterFunc[T] {
 
 		switch {
 		case err == nil:
-			err = io.EOF
+			err = ErrStopIteration
 
 		case errors.IsEOF(err):
 			err = nil
@@ -76,7 +74,7 @@ func (s1 Set[T]) Subtract(s2 Set[T]) (out Set[T]) {
 	defer s3.close()
 
 	s1.Chain(
-		WriterFuncNegate(s2.WriterContainer(io.EOF)),
+		WriterFuncNegate(s2.WriterContainer(ErrStopIteration)),
 		s3.add,
 	)
 
@@ -92,7 +90,7 @@ func (s1 Set[T]) Intersection(s2 SetLike[T]) (s3 MutableSetLike[T]) {
 	}
 
 	s1.Chain(
-		s22.WriterContainer(io.EOF),
+		s22.WriterContainer(ErrStopIteration),
 		s3.Add,
 	)
 
@@ -136,7 +134,7 @@ func (s Set[T]) Any() (e T) {
 	s.Each(
 		func(e1 T) (err error) {
 			e = e1
-			return io.EOF
+			return ErrStopIteration
 		},
 	)
 

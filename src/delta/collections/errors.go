@@ -1,5 +1,21 @@
 package collections
 
+import "io"
+
+var ErrStopIteration = io.EOF
+
+// type ErrStopIteration struct {
+// }
+
+// func (e ErrStopIteration) Error() string {
+// 	return "nil pointer"
+// }
+
+// func (e ErrStopIteration) Is(target error) (ok bool) {
+// 	_, ok = target.(ErrStopIteration)
+// 	return
+// }
+
 type ErrNilPointer struct {
 }
 

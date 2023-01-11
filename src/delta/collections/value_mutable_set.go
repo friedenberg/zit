@@ -1,7 +1,6 @@
 package collections
 
 import (
-	"io"
 	"sort"
 	"strings"
 
@@ -84,7 +83,7 @@ func (es MutableValueSet[T, T1]) RemovePrefixes(needle T) {
 	es.Chain(
 		func(e T) (err error) {
 			if !strings.HasPrefix(e.String(), needle.String()) {
-				err = io.EOF
+				err = ErrStopIteration
 			}
 
 			return
