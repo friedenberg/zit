@@ -11,12 +11,9 @@ import (
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/echo/standort"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
-	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/ts"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/golf/transaktion"
-	"github.com/friedenberg/zit/src/hotel/objekte"
-	"github.com/friedenberg/zit/src/india/typ"
 	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 )
@@ -24,24 +21,8 @@ import (
 type shaAbbr = sha.Abbr
 type hinweisAbbr = hinweis.Abbr
 
-type TypStore interface {
+type reindexer interface {
 	reindexOne(*transaktion.Transaktion, sku.SkuLike) error
-	objekte.Store[
-		typ.Objekte,
-		*typ.Objekte,
-		kennung.Typ,
-		*kennung.Typ,
-		objekte.NilVerzeichnisse[typ.Objekte],
-		*objekte.NilVerzeichnisse[typ.Objekte],
-	]
-	objekte.StoreWithCreateOrUpdate[
-		typ.Objekte,
-		*typ.Objekte,
-		kennung.Typ,
-		*kennung.Typ,
-		objekte.NilVerzeichnisse[typ.Objekte],
-		*objekte.NilVerzeichnisse[typ.Objekte],
-	]
 }
 
 type Store struct {
@@ -51,12 +32,10 @@ type Store struct {
 	shaAbbr
 	hinweisAbbr
 
-	zettelStore *zettelStore
-	typStore    TypStore
-
-	// typStore     *typStore
-	etikettStore *etikettStore
-	konfigStore  *konfigStore
+	zettelStore  *zettelStore
+	typStore     TypStore
+	etikettStore EtikettStore
+	konfigStore  KonfigStore
 }
 
 func Make(
@@ -135,11 +114,11 @@ func (s *Store) Typ() TypStore {
 	return s.typStore
 }
 
-func (s *Store) Etikett() *etikettStore {
+func (s *Store) Etikett() EtikettStore {
 	return s.etikettStore
 }
 
-func (s *Store) Konfig() *konfigStore {
+func (s *Store) Konfig() KonfigStore {
 	return s.konfigStore
 }
 

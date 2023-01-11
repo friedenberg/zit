@@ -13,6 +13,37 @@ import (
 	"github.com/friedenberg/zit/src/india/typ"
 )
 
+type TypStore interface {
+	reindexer
+
+	objekte.Store[
+		typ.Objekte,
+		*typ.Objekte,
+		kennung.Typ,
+		*kennung.Typ,
+		objekte.NilVerzeichnisse[typ.Objekte],
+		*objekte.NilVerzeichnisse[typ.Objekte],
+	]
+
+	objekte.StoreIdReader[
+		typ.Objekte,
+		*typ.Objekte,
+		kennung.Typ,
+		*kennung.Typ,
+		objekte.NilVerzeichnisse[typ.Objekte],
+		*objekte.NilVerzeichnisse[typ.Objekte],
+	]
+
+	objekte.StoreCreateUpdater[
+		typ.Objekte,
+		*typ.Objekte,
+		kennung.Typ,
+		*kennung.Typ,
+		objekte.NilVerzeichnisse[typ.Objekte],
+		*objekte.NilVerzeichnisse[typ.Objekte],
+	]
+}
+
 type TypInflator = objekte.TransactedInflator[
 	typ.Objekte,
 	*typ.Objekte,

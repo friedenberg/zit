@@ -175,8 +175,8 @@ func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 		u.ZettelTransactedLogPrinters(),
 	)
 
-	u.storeObjekten.Konfig().SetKonfigLogWriters(
-		store_objekten.KonfigLogWriters{
+	u.storeObjekten.Konfig().SetLogWriter(
+		store_objekten.KonfigLogWriter{
 			Updated:   u.PrinterKonfigTransacted(format.StringUpdated),
 			Unchanged: u.PrinterKonfigTransacted(format.StringUnchanged),
 		},
@@ -191,8 +191,8 @@ func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 		},
 	)
 
-	u.storeObjekten.Etikett().SetEtikettLogWriters(
-		store_objekten.EtikettLogWriters{
+	u.storeObjekten.Etikett().SetLogWriter(
+		store_objekten.EtikettLogWriter{
 			New:       u.PrinterEtikettTransacted(format.StringUpdated),
 			Updated:   u.PrinterEtikettTransacted(format.StringUpdated),
 			Unchanged: u.PrinterEtikettTransacted(format.StringUnchanged),

@@ -12,18 +12,10 @@ import (
 	"github.com/friedenberg/zit/src/india/etikett"
 )
 
-type etikettLogWriter = collections.WriterFunc[*etikett.Transacted]
+type EtikettStore interface {
+	reindexer
 
-type EtikettLogWriters struct {
-	New, Updated, Unchanged etikettLogWriter
-}
-
-type etikettStore struct {
-	common *common
-
-	pool collections.PoolLike[etikett.Transacted]
-
-	objekte.TransactedInflator[
+	objekte.Store[
 		etikett.Objekte,
 		*etikett.Objekte,
 		kennung.Etikett,
@@ -32,18 +24,62 @@ type etikettStore struct {
 		*objekte.NilVerzeichnisse[etikett.Objekte],
 	]
 
-	objekte.AkteTextSaver[
+	objekte.StoreIdReader[
 		etikett.Objekte,
 		*etikett.Objekte,
+		kennung.Etikett,
+		*kennung.Etikett,
+		objekte.NilVerzeichnisse[etikett.Objekte],
+		*objekte.NilVerzeichnisse[etikett.Objekte],
 	]
 
-	EtikettLogWriters
+	objekte.StoreCreateUpdater[
+		etikett.Objekte,
+		*etikett.Objekte,
+		kennung.Etikett,
+		*kennung.Etikett,
+		objekte.NilVerzeichnisse[etikett.Objekte],
+		*objekte.NilVerzeichnisse[etikett.Objekte],
+	]
 }
 
-func (s *etikettStore) SetEtikettLogWriters(
-	tlw EtikettLogWriters,
+type EtikettInflator = objekte.TransactedInflator[
+	etikett.Objekte,
+	*etikett.Objekte,
+	kennung.Etikett,
+	*kennung.Etikett,
+	objekte.NilVerzeichnisse[etikett.Objekte],
+	*objekte.NilVerzeichnisse[etikett.Objekte],
+]
+
+type EtikettLogWriter = objekte.LogWriter[
+	etikett.Objekte,
+	*etikett.Objekte,
+	kennung.Etikett,
+	*kennung.Etikett,
+	objekte.NilVerzeichnisse[etikett.Objekte],
+	*objekte.NilVerzeichnisse[etikett.Objekte],
+]
+
+type EtikettAkteTextSaver = objekte.AkteTextSaver[
+	etikett.Objekte,
+	*etikett.Objekte,
+]
+
+type etikettStore struct {
+	common *common
+
+	pool collections.PoolLike[etikett.Transacted]
+
+	EtikettInflator
+	EtikettAkteTextSaver
+	EtikettLogWriter
+}
+
+func (s *etikettStore) SetLogWriter(
+	tlw EtikettLogWriter,
 ) {
-	s.EtikettLogWriters = tlw
+	s.EtikettLogWriter = tlw
 }
 
 func makeEtikettStore(
@@ -54,7 +90,7 @@ func makeEtikettStore(
 	s = &etikettStore{
 		common: sa,
 		pool:   pool,
-		TransactedInflator: objekte.MakeTransactedInflator[
+		EtikettInflator: objekte.MakeTransactedInflator[
 			etikett.Objekte,
 			*etikett.Objekte,
 			kennung.Etikett,
@@ -70,7 +106,7 @@ func makeEtikettStore(
 			),
 			pool,
 		),
-		AkteTextSaver: objekte.MakeAkteTextSaver[
+		EtikettAkteTextSaver: objekte.MakeAkteTextSaver[
 			etikett.Objekte,
 			*etikett.Objekte,
 		](
@@ -154,7 +190,7 @@ func (s etikettStore) CreateOrUpdate(
 	if mutter != nil && tt.ObjekteSha().Equals(mutter.ObjekteSha()) {
 		tt = mutter
 
-		if err = s.EtikettLogWriters.Unchanged(tt); err != nil {
+		if err = s.EtikettLogWriter.Unchanged(tt); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -166,12 +202,12 @@ func (s etikettStore) CreateOrUpdate(
 	s.common.KonfigPtr().AddEtikett(tt)
 
 	if mutter == nil {
-		if err = s.EtikettLogWriters.New(tt); err != nil {
+		if err = s.EtikettLogWriter.New(tt); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	} else {
-		if err = s.EtikettLogWriters.Updated(tt); err != nil {
+		if err = s.EtikettLogWriter.Updated(tt); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -190,6 +226,20 @@ func (s etikettStore) ReadOne(
 		return
 	}
 
+	return
+}
+
+func (s etikettStore) ReadAllSchwanzen(
+	f collections.WriterFunc[*etikett.Transacted],
+) (err error) {
+	//TODO-P2
+	return
+}
+
+func (s etikettStore) ReadAll(
+	f collections.WriterFunc[*etikett.Transacted],
+) (err error) {
+	//TODO-P2
 	return
 }
 
@@ -212,9 +262,9 @@ func (s *etikettStore) reindexOne(
 	s.common.KonfigPtr().AddEtikett(te)
 
 	if te.IsNew() {
-		s.EtikettLogWriters.New(te)
+		s.EtikettLogWriter.New(te)
 	} else {
-		s.EtikettLogWriters.Updated(te)
+		s.EtikettLogWriter.Updated(te)
 	}
 
 	return

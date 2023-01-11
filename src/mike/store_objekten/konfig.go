@@ -14,18 +14,12 @@ import (
 	"github.com/friedenberg/zit/src/india/konfig"
 )
 
-type KonfigLogWriter = collections.WriterFunc[*konfig.Transacted]
+type KonfigStore interface {
+	reindexer
 
-type KonfigLogWriters struct {
-	Updated, Unchanged KonfigLogWriter
-}
+	Read() (*konfig.Transacted, error)
 
-type konfigStore struct {
-	common *common
-
-	pool collections.PoolLike[konfig.Transacted]
-
-	objekte.TransactedInflator[
+	objekte.Store[
 		konfig.Objekte,
 		*konfig.Objekte,
 		kennung.Konfig,
@@ -34,18 +28,53 @@ type konfigStore struct {
 		*objekte.NilVerzeichnisse[konfig.Objekte],
 	]
 
-	objekte.AkteTextSaver[
+	objekte.StoreUpdater[
 		konfig.Objekte,
 		*konfig.Objekte,
+		kennung.Konfig,
+		*kennung.Konfig,
+		objekte.NilVerzeichnisse[konfig.Objekte],
+		*objekte.NilVerzeichnisse[konfig.Objekte],
 	]
-
-	KonfigLogWriters
 }
 
-func (s *konfigStore) SetKonfigLogWriters(
-	tlw KonfigLogWriters,
+type KonfigInflator = objekte.TransactedInflator[
+	konfig.Objekte,
+	*konfig.Objekte,
+	kennung.Konfig,
+	*kennung.Konfig,
+	objekte.NilVerzeichnisse[konfig.Objekte],
+	*objekte.NilVerzeichnisse[konfig.Objekte],
+]
+
+type KonfigLogWriter = objekte.LogWriter[
+	konfig.Objekte,
+	*konfig.Objekte,
+	kennung.Konfig,
+	*kennung.Konfig,
+	objekte.NilVerzeichnisse[konfig.Objekte],
+	*objekte.NilVerzeichnisse[konfig.Objekte],
+]
+
+type KonfigAkteTextSaver = objekte.AkteTextSaver[
+	konfig.Objekte,
+	*konfig.Objekte,
+]
+
+type konfigStore struct {
+	common *common
+
+	pool collections.PoolLike[konfig.Transacted]
+
+	KonfigInflator
+	KonfigAkteTextSaver
+	KonfigLogWriter
+}
+
+func (s *konfigStore) SetLogWriter(
+	tlw KonfigLogWriter,
 ) {
-	s.KonfigLogWriters = tlw
+	s.KonfigLogWriter = tlw
 }
 
 func makeKonfigStore(
@@ -56,7 +85,7 @@ func makeKonfigStore(
 	s = &konfigStore{
 		common: sa,
 		pool:   pool,
-		TransactedInflator: objekte.MakeTransactedInflator[
+		KonfigInflator: objekte.MakeTransactedInflator[
 			konfig.Objekte,
 			*konfig.Objekte,
 			kennung.Konfig,
@@ -72,7 +101,7 @@ func makeKonfigStore(
 			),
 			pool,
 		),
-		AkteTextSaver: objekte.MakeAkteTextSaver[
+		KonfigAkteTextSaver: objekte.MakeAkteTextSaver[
 			konfig.Objekte,
 			*konfig.Objekte,
 		](
@@ -151,7 +180,7 @@ func (s konfigStore) Update(
 	if mutter != nil && kt.ObjekteSha().Equals(mutter.ObjekteSha()) {
 		kt = mutter
 
-		if err = s.KonfigLogWriters.Unchanged(kt); err != nil {
+		if err = s.KonfigLogWriter.Unchanged(kt); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -167,7 +196,7 @@ func (s konfigStore) Update(
 		return
 	}
 
-	if err = s.KonfigLogWriters.Updated(kt); err != nil {
+	if err = s.KonfigLogWriter.Updated(kt); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -254,7 +283,7 @@ func (s *konfigStore) reindexOne(
 	}
 
 	s.common.KonfigPtr().SetTransacted(te)
-	s.KonfigLogWriters.Updated(te)
+	s.KonfigLogWriter.Updated(te)
 
 	return
 }
