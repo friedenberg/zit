@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/age"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/standort"
 	"github.com/friedenberg/zit/src/india/konfig"
 	"github.com/friedenberg/zit/src/india/typ"
@@ -44,14 +45,23 @@ func (c Init) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	c.mkdirAll(base, "bin")
 
-	c.mkdirAll(s.DirObjektenAkten())
-	c.mkdirAll(s.DirObjektenKonfig())
-	c.mkdirAll(s.DirObjektenTransaktion())
-	c.mkdirAll(s.DirObjektenTypen())
-	c.mkdirAll(s.DirObjektenEtiketten())
-	c.mkdirAll(s.DirObjektenZettelen())
-	c.mkdirAll(s.DirVerzeichnisse())
+	for _, g := range gattung.All() {
+		var d string
 
+		if d, err = s.DirObjektenGattung(g); err != nil {
+			if errors.Is(err, gattung.ErrUnsupportedGattung) {
+				err = nil
+				continue
+			} else {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+
+		c.mkdirAll(d)
+	}
+
+	c.mkdirAll(s.DirVerzeichnisse())
 	c.mkdirAll(s.DirVerlorenUndGefunden())
 
 	c.mkdirAll(s.DirKennung())

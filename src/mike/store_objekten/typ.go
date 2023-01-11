@@ -14,9 +14,7 @@ import (
 )
 
 type TypStore interface {
-	reindexer
-
-	objekte.Store[
+	GattungStore[
 		typ.Objekte,
 		*typ.Objekte,
 		kennung.Typ,

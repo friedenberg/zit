@@ -21,10 +21,6 @@ import (
 type shaAbbr = sha.Abbr
 type hinweisAbbr = hinweis.Abbr
 
-type reindexer interface {
-	reindexOne(*transaktion.Transaktion, sku.SkuLike) error
-}
-
 type Store struct {
 	common
 

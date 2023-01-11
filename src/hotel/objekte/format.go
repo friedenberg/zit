@@ -121,7 +121,7 @@ func (f Format[T, T1]) Format(
 	w := format.NewWriter()
 
 	w.WriteFormat("%s", o.GetGattung())
-	w.WriteFormat("%s %s", gattung.Akte, o.AkteSha())
+	w.WriteFormat("%s %s", gattung.Akte, o.GetAkteSha())
 
 	if n, err = w.WriteTo(w2); err != nil {
 		err = errors.Wrap(err)

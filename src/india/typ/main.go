@@ -47,7 +47,7 @@ func (o Objekte) GetGattung() gattung.Gattung {
 	return gattung.Typ
 }
 
-func (o Objekte) AkteSha() sha.Sha {
+func (o Objekte) GetAkteSha() sha.Sha {
 	return o.Sha
 }
 

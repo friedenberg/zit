@@ -15,11 +15,9 @@ import (
 )
 
 type KonfigStore interface {
-	reindexer
-
 	Read() (*konfig.Transacted, error)
 
-	objekte.Store[
+	GattungStore[
 		konfig.Objekte,
 		*konfig.Objekte,
 		kennung.Konfig,

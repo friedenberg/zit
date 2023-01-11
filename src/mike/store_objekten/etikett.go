@@ -13,9 +13,7 @@ import (
 )
 
 type EtikettStore interface {
-	reindexer
-
-	objekte.Store[
+	GattungStore[
 		etikett.Objekte,
 		*etikett.Objekte,
 		kennung.Etikett,

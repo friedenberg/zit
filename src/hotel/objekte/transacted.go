@@ -36,7 +36,7 @@ func (t Transacted[T, T1, T2, T3, T4, T5]) Kennung() T3 {
 }
 
 func (t Transacted[T, T1, T2, T3, T4, T5]) AkteSha() sha.Sha {
-	return t.Objekte.AkteSha()
+	return t.Objekte.GetAkteSha()
 }
 
 func (t *Transacted[T, T1, T2, T3, T4, T5]) SetAkteSha(

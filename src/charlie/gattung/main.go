@@ -21,7 +21,20 @@ const (
 	Zettel
 	Konfig
 	Kennung
+	Bestandsaufnahme
+
+	MaxGattung = Bestandsaufnahme
 )
+
+func All() (out []Gattung) {
+	out = make([]Gattung, 0, MaxGattung-1)
+
+	for i := Unknown + 1; i <= MaxGattung; i++ {
+		out = append(out, Gattung(i))
+	}
+
+	return
+}
 
 func (g Gattung) GetGattung() Gattung {
 	return g
@@ -55,6 +68,9 @@ func (g Gattung) String() string {
 
 	case Kennung:
 		return "Kennung"
+
+	case Bestandsaufnahme:
+		return "Bestandsaufnahme"
 
 	default:
 		return "Unknown"
@@ -94,6 +110,9 @@ func (g *Gattung) Set(v string) (err error) {
 
 	case "kennung":
 		*g = Kennung
+
+	case "bestandsaufnahme":
+		*g = Bestandsaufnahme
 
 	default:
 		err = errors.Errorf("unknown gattung: %q", v1)

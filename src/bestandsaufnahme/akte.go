@@ -1,0 +1,33 @@
+package bestandsaufnahme
+
+import (
+	"github.com/friedenberg/zit/src/delta/collections"
+	"github.com/friedenberg/zit/src/golf/sku"
+)
+
+type Akte struct {
+	Skus collections.MutableValueSet[sku.Sku, *sku.Sku]
+}
+
+func MakeAkte() *Akte {
+	return &Akte{
+		Skus: collections.MakeMutableValueSet[sku.Sku, *sku.Sku](),
+	}
+}
+
+func (a Akte) Equals(b *Akte) bool {
+	if !a.Skus.Equals(b.Skus) {
+		return false
+	}
+
+	return true
+}
+
+func (a *Akte) Reset(b *Akte) {
+	if b == nil {
+		//TODO-P4 make more performant
+		a.Skus = collections.MakeMutableValueSet[sku.Sku, *sku.Sku]()
+	} else {
+		a.Skus.Reset(b.Skus)
+	}
+}

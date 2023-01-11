@@ -21,12 +21,12 @@ type Objekte struct {
 	Akte Toml
 }
 
-func (o *Objekte) SetAkteSha(v sha.Sha) {
-	o.Sha = v
+func (o Objekte) GetAkteSha() sha.Sha {
+	return o.Sha
 }
 
-func (o Objekte) AkteSha() sha.Sha {
-	return o.Sha
+func (o *Objekte) SetAkteSha(v sha.Sha) {
+	o.Sha = v
 }
 
 func (a Objekte) Equals(b *Objekte) bool {

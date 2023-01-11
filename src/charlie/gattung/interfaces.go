@@ -51,15 +51,29 @@ type ValueElementPtr[T ValueElement] interface {
 //  |___\__,_|\___|_| |_|\__|_|_| |_|\___|_|
 //
 
-type IdentifierLike interface {
-	GattungLike
+type IdLike interface {
 	fmt.Stringer
 }
 
+type IdentifierLike interface {
+	GattungLike
+	IdLike
+}
+
+type Id[T ValueElement] interface {
+	Equatable[T]
+	fmt.Stringer
+}
+
+type IdPtr[T ValueElement] interface {
+	Id[T]
+	ValueElementPtr[T]
+}
+
+// TODO-P2 rename to ObjekteKennung
 type Identifier[T any] interface {
 	IdentifierLike
 	GattungLike
-	ValueElement
 	Equatable[T]
 }
 
@@ -78,7 +92,7 @@ type IdentifierPtr[T ValueElement] interface {
 type Objekte[T any] interface {
 	GattungLike
 	Equatable[T]
-	AkteSha() sha.Sha
+	GetAkteSha() sha.Sha
 }
 
 type ObjektePtr[T Element] interface {

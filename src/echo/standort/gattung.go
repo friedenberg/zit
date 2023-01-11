@@ -5,6 +5,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 )
 
+// TODO-P4 switch to gattung-matched directories
 func (s Standort) DirObjektenGattung(
 	g gattung.GattungLike,
 ) (p string, err error) {
@@ -21,8 +22,12 @@ func (s Standort) DirObjektenGattung(
 	case gattung.Zettel:
 		p = s.DirObjektenZettelen()
 
+	case gattung.Bestandsaufnahme:
+		p = s.DirObjektenBestandsaufnahme()
+
 	default:
-		err = errors.Errorf("unsupported gattung: %s", g)
+		err = gattung.ErrUnsupportedGattung
+		err = errors.Wrapf(err, "Gattung: %s", g)
 		return
 	}
 
@@ -35,6 +40,10 @@ func (s Standort) DirObjektenKennungen() string {
 
 func (s Standort) DirObjektenZettelen() string {
 	return s.DirObjekten("Zettelen")
+}
+
+func (s Standort) DirObjektenBestandsaufnahme() string {
+	return s.DirObjekten("Bestandsaufnahme")
 }
 
 func (s Standort) DirObjektenKonfig() string {

@@ -1,6 +1,13 @@
 package gattung
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
+
+var (
+	ErrUnsupportedGattung = errors.New("unsupported gattung")
+)
 
 type ErrWrongType struct {
 	ExpectedType, ActualType Gattung

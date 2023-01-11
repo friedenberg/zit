@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/golf/sku"
 )
 
+//TODO-P1 split into ObjekteInflator
 type TransactedInflator[
 	T gattung.Objekte[T],
 	T1 gattung.ObjektePtr[T],

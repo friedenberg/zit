@@ -17,6 +17,17 @@ type LogWriter[
 	New, Updated, Unchanged, Archived collections.WriterFunc[*Transacted[T, T1, T2, T3, T4, T5]]
 }
 
+type StoreLogger[
+	T gattung.Objekte[T],
+	T1 gattung.ObjektePtr[T],
+	T2 gattung.Identifier[T2],
+	T3 gattung.IdentifierPtr[T2],
+	T4 gattung.Verzeichnisse[T],
+	T5 gattung.VerzeichnissePtr[T4, T],
+] interface {
+	SetLogWriter(LogWriter[T, T1, T2, T3, T4, T5])
+}
+
 type Store[
 	T gattung.Objekte[T],
 	T1 gattung.ObjektePtr[T],
@@ -28,7 +39,6 @@ type Store[
 	errors.Flusher
 	AkteTextSaver[T, T1]
 	TransactedInflator[T, T1, T2, T3, T4, T5]
-	SetLogWriter(LogWriter[T, T1, T2, T3, T4, T5])
 }
 
 type StoreIdReader[

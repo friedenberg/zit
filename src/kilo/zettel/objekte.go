@@ -21,7 +21,7 @@ func (z Objekte) GetGattung() gattung.Gattung {
 	return gattung.Zettel
 }
 
-func (z Objekte) AkteSha() sha.Sha {
+func (z Objekte) GetAkteSha() sha.Sha {
 	return z.Akte
 }
 
