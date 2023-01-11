@@ -54,9 +54,9 @@ func (s MutableSet2[T, T1]) Contains(e T1) (ok bool) {
 }
 
 func (s MutableSet2[T, T1]) EachKey(wf WriterFuncKey) (err error) {
-	for v, _ := range s.private.Elements {
+	for v := range s.private.Elements {
 		if err = wf(v); err != nil {
-			if errors.IsEOF(err) {
+			if IsStopIteration(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)
@@ -72,7 +72,7 @@ func (s MutableSet2[T, T1]) EachKey(wf WriterFuncKey) (err error) {
 func (s MutableSet2[T, T1]) Each(wf WriterFunc[T1]) (err error) {
 	for _, v := range s.private.Elements {
 		if err = wf(v); err != nil {
-			if errors.IsEOF(err) {
+			if IsStopIteration(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)

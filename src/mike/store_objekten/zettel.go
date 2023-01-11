@@ -1,7 +1,6 @@
 package store_objekten
 
 import (
-	"io"
 	"reflect"
 	"sort"
 
@@ -409,7 +408,7 @@ func (s zettelStore) AllInChain(h hinweis.Hinweis) (c []*zettel.Transacted, err 
 	if err = s.verzeichnisseAll.ReadMany(
 		func(z *zettel.Transacted) (err error) {
 			if !z.Sku.Kennung.Equals(&h) {
-				err = io.EOF
+				err = collections.ErrStopIteration
 				return
 			}
 

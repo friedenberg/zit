@@ -1,9 +1,8 @@
 package id_set
 
 import (
-	"io"
-
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 )
@@ -68,7 +67,7 @@ LOOP:
 	ty.Each(
 		func(t kennung.Typ) (err error) {
 			if okTyp = t.Includes(e.AkteTyp()); okTyp {
-				err = io.EOF
+				err = collections.ErrStopIteration
 			}
 
 			return
@@ -98,7 +97,7 @@ LOOP:
 	}
 
 	if !ok {
-		err = io.EOF
+		err = collections.ErrStopIteration
 	}
 
 	return

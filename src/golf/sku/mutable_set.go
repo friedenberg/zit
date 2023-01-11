@@ -67,7 +67,7 @@ func (os MutableSet) Each(
 		for _, o := range oss {
 			if err = w(o); err != nil {
 				switch {
-				case errors.IsEOF(err):
+				case collections.IsStopIteration(err):
 					err = nil
 					return
 

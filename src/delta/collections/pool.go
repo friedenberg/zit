@@ -29,11 +29,11 @@ func (p Pool[T]) Apply(f WriterFunc[T], e T) (err error) {
 
 	switch {
 
-	case errors.Is(err, ErrDoNotRepool{}):
+	case IsDoNotRepool(err):
 		err = nil
 		return
 
-	case errors.IsEOF(err):
+	case IsStopIteration(err):
 		err = nil
 		p.Put(&e)
 

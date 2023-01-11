@@ -12,11 +12,11 @@ func MakePooledChain[T any](p PoolLike[T], wfs ...WriterFunc[*T]) WriterFunc[*T]
 			case err == nil:
 				continue
 
-			case errors.Is(err, ErrDoNotRepool{}):
+			case IsDoNotRepool(err):
 				err = nil
 				return
 
-			case errors.IsEOF(err):
+			case IsStopIteration(err):
 				err = nil
 				p.Put(e)
 				return

@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/ts"
 	"github.com/friedenberg/zit/src/golf/sku"
@@ -81,7 +82,7 @@ func (zws *Schwanzen) WriteZettelTransacted(
 ) (err error) {
 	if ok := zws.Set(z); !ok {
 		errors.Log().Printf("TODO unable to set %s", z.Sku.Kennung)
-		err = io.EOF
+		err = collections.ErrStopIteration
 		return
 	}
 

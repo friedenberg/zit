@@ -76,7 +76,7 @@ func MakeWriterKonfig(
 		for _, p := range z.Verzeichnisse.EtikettenSorted {
 			for _, t := range k.EtikettenHidden {
 				if strings.HasPrefix(p, t) {
-					err = io.EOF
+					err = collections.ErrStopIteration
 					return
 				}
 			}

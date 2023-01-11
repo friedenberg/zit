@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/delta/collections"
 )
 
 type readerFrom[T any] struct {
@@ -75,7 +76,7 @@ func ReadSep(
 		}
 	}
 
-	if last != nil && !errors.IsEOF(last) {
+	if last != nil && !errors.Is(last, collections.ErrStopIteration) {
 		err = last
 	}
 
@@ -129,7 +130,7 @@ func ReadLines(
 		}
 	}
 
-	if last != nil && !errors.IsEOF(last) {
+	if last != nil && !errors.Is(last, collections.ErrStopIteration) {
 		err = last
 	}
 
@@ -163,7 +164,7 @@ func MakeLineReaderKeyValues(
 			return
 		}
 
-		err = io.EOF
+		err = collections.ErrStopIteration
 
 		return
 	}
@@ -194,7 +195,7 @@ func MakeLineReaderKeyValue(
 			return
 		}
 
-		err = io.EOF
+		err = collections.ErrStopIteration
 
 		return
 	}
@@ -205,7 +206,7 @@ func MakeLineReaderRepeat(
 ) FuncReadLine {
 	return func(line string) (err error) {
 		if err = in(line); err != nil {
-			if errors.IsEOF(err) {
+			if errors.Is(err, collections.ErrStopIteration) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)

@@ -59,9 +59,9 @@ func (s Set2[T, T1]) Contains(e T1) (ok bool) {
 }
 
 func (s Set2[T, T1]) EachKey(wf WriterFuncKey) (err error) {
-	for v, _ := range s.private.Elements {
+	for v := range s.private.Elements {
 		if err = wf(v); err != nil {
-			if errors.IsEOF(err) {
+			if IsStopIteration(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)
@@ -77,7 +77,7 @@ func (s Set2[T, T1]) EachKey(wf WriterFuncKey) (err error) {
 func (s Set2[T, T1]) Each(wf WriterFunc[T1]) (err error) {
 	for _, v := range s.private.Elements {
 		if err = wf(v); err != nil {
-			if errors.IsEOF(err) {
+			if IsStopIteration(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)
@@ -93,7 +93,7 @@ func (s Set2[T, T1]) Each(wf WriterFunc[T1]) (err error) {
 func (s Set2[T, T1]) EachPtr(wf WriterFunc[T]) (err error) {
 	for _, v := range s.private.Elements {
 		if err = wf(*v); err != nil {
-			if errors.IsEOF(err) {
+			if IsStopIteration(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)

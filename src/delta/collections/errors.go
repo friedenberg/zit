@@ -1,8 +1,16 @@
 package collections
 
-import "io"
+import (
+	"io"
+
+	"github.com/friedenberg/zit/src/alfa/errors"
+)
 
 var ErrStopIteration = io.EOF
+
+func IsStopIteration(err error) bool {
+	return errors.Is(err, ErrStopIteration)
+}
 
 // type ErrStopIteration struct {
 // }
@@ -62,4 +70,8 @@ func (e ErrDoNotRepool) Error() string {
 func (e ErrDoNotRepool) Is(target error) (ok bool) {
 	_, ok = target.(ErrDoNotRepool)
 	return
+}
+
+func IsDoNotRepool(err error) bool {
+	return errors.Is(err, ErrDoNotRepool{})
 }

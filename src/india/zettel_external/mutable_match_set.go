@@ -1,9 +1,9 @@
 package zettel_external
 
 import (
-	"io"
 	"sync"
 
+	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/ts"
 	"github.com/friedenberg/zit/src/kilo/zettel"
@@ -79,7 +79,7 @@ func (s MutableMatchSet) Match(z *zettel.Transacted) (err error) {
 		return
 	}
 
-	err = io.EOF
+	err = collections.ErrStopIteration
 
 	return
 }

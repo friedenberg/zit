@@ -1,8 +1,6 @@
 package store_objekten
 
 import (
-	"io"
-
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
@@ -60,7 +58,7 @@ func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 
 		found = zv
 
-		err = io.EOF
+		err = collections.ErrStopIteration
 
 		return
 	}

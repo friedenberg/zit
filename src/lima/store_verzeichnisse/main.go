@@ -176,7 +176,7 @@ func (i *Zettelen) ReadMany(
 						<-openFileCh
 						continue
 
-					case errors.IsEOF(err1):
+					case errors.Is(err1, collections.ErrStopIteration):
 						break
 
 					default:

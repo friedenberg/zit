@@ -1,8 +1,6 @@
 package store_objekten
 
 import (
-	"io"
-
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/delta/collections"
@@ -11,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 
-//TODO-P2 move to Standort
+// TODO-P2 move to Standort
 func (s Store) ReadAllAktenShas(w collections.WriterFunc[sha.Sha]) (err error) {
 	wf := func(p string) (err error) {
 		var sh sha.Sha
@@ -57,7 +55,7 @@ func (s Store) AkteExists(sh sha.Sha) (err error) {
 	if err = s.zettelStore.verzeichnisseAll.ReadMany(
 		func(z *zettel.Transacted) (err error) {
 			if !z.Objekte.Akte.Equals(sh) {
-				err = io.EOF
+				err = collections.ErrStopIteration
 				return
 			}
 

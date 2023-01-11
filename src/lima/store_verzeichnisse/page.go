@@ -66,7 +66,7 @@ func (zp *Page) Add(z *zettel.Transacted) (err error) {
 	}
 
 	if err = zp.flushFilter(z); err != nil {
-		if errors.IsEOF(err) {
+		if errors.Is(err, collections.ErrStopIteration) {
 			errors.Log().Printf("eliding %s", z.Kennung())
 			err = nil
 		} else {
@@ -229,7 +229,7 @@ func (zp *Page) Copy(
 		}
 
 		if err = w(tz); err != nil {
-			if errors.IsEOF(err) {
+			if errors.Is(err, collections.ErrStopIteration) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)
@@ -245,7 +245,7 @@ func (zp *Page) Copy(
 		z1.Reset(z)
 
 		if err = w(z1); err != nil {
-			if errors.IsEOF(err) {
+			if errors.Is(err, collections.ErrStopIteration) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)

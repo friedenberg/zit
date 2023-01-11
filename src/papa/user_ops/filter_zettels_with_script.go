@@ -67,7 +67,7 @@ func (op FilterZettelsWithScript) Run() (err error) {
 					ok := hinweisen.Contains(z.Sku.Kennung)
 
 					if ok {
-						err = io.EOF
+						err = collections.ErrStopIteration
 						return
 					}
 

@@ -220,7 +220,7 @@ func (c Show) showZettels(
 			return
 		}
 
-		hContainer := hinweisen.WriterContainer(io.EOF)
+		hContainer := hinweisen.WriterContainer(collections.ErrStopIteration)
 
 		filter = func(o *zettel.Transacted) (err error) {
 			return hContainer(o.Sku.Kennung)

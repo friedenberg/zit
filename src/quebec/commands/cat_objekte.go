@@ -65,7 +65,7 @@ func (c CatObjekte) akten(u *umwelt.Umwelt, shas sha.Set) (err error) {
 
 	if err = u.StoreObjekten().ReadAllAktenShas(
 		collections.MakeChain(
-			shas.WriterContainer(io.EOF),
+			shas.WriterContainer(collections.ErrStopIteration),
 			func(sb sha.Sha) (err error) {
 				var r io.ReadCloser
 

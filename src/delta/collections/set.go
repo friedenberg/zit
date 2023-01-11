@@ -60,7 +60,7 @@ func WriterFuncNegate[T any](wf WriterFunc[T]) WriterFunc[T] {
 		case err == nil:
 			err = ErrStopIteration
 
-		case errors.IsEOF(err):
+		case IsStopIteration(err):
 			err = nil
 		}
 
@@ -102,7 +102,7 @@ func (s1 Set[T]) Chain(fs ...WriterFunc[T]) error {
 		func(e T) (err error) {
 			for _, f := range fs {
 				if err = f(e); err != nil {
-					if errors.IsEOF(err) {
+					if IsStopIteration(err) {
 						err = nil
 					} else {
 						err = errors.Wrap(err)

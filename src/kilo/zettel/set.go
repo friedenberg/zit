@@ -47,22 +47,6 @@ func MakeMutableSetHinweis(c int) MutableSet {
 	}
 }
 
-// func (m Set) Filter(w Writer) (err error) {
-// 	for k, sz := range m.innerMap {
-// 		if err = w.WriteZettelVerzeichnisse(&sz); err != nil {
-// 			if errors.IsEOF(err) {
-// 				err = nil
-// 				delete(m.innerMap, k)
-// 			} else {
-// 				err = errors.Wrap(err)
-// 				return
-// 			}
-// 		}
-// 	}
-
-// 	return
-// }
-
 func (s MutableSet) ToSetPrefixVerzeichnisse() (b SetPrefixVerzeichnisse) {
 	b = MakeSetPrefixVerzeichnisse(s.Len())
 

@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/delta/collections"
 )
 
 type WriterComplete struct {
@@ -45,7 +46,7 @@ func MakeWriterComplete(w io.Writer) WriterComplete {
 func (w *WriterComplete) WriteZettelVerzeichnisse(z *Transacted) (err error) {
 	select {
 	case <-w.chDone:
-		err = io.EOF
+		err = collections.ErrStopIteration
 
 	case w.chTransacted <- *z:
 	}
