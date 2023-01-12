@@ -13,31 +13,19 @@ import (
 )
 
 type EtikettStore interface {
-	GattungStore[
-		etikett.Objekte,
-		*etikett.Objekte,
-		kennung.Etikett,
+	GattungStore
+
+	objekte.TransactedLogger[*etikett.Transacted]
+
+	objekte.ReaderTransacted[
 		*kennung.Etikett,
-		objekte.NilVerzeichnisse[etikett.Objekte],
-		*objekte.NilVerzeichnisse[etikett.Objekte],
+		*etikett.Transacted,
 	]
 
-	objekte.StoreIdReader[
-		etikett.Objekte,
+	objekte.CreateOrUpdater[
 		*etikett.Objekte,
-		kennung.Etikett,
 		*kennung.Etikett,
-		objekte.NilVerzeichnisse[etikett.Objekte],
-		*objekte.NilVerzeichnisse[etikett.Objekte],
-	]
-
-	objekte.StoreCreateUpdater[
-		etikett.Objekte,
-		*etikett.Objekte,
-		kennung.Etikett,
-		*kennung.Etikett,
-		objekte.NilVerzeichnisse[etikett.Objekte],
-		*objekte.NilVerzeichnisse[etikett.Objekte],
+		*etikett.Transacted,
 	]
 }
 
@@ -50,14 +38,7 @@ type EtikettInflator = objekte.TransactedInflator[
 	*objekte.NilVerzeichnisse[etikett.Objekte],
 ]
 
-type EtikettLogWriter = objekte.LogWriter[
-	etikett.Objekte,
-	*etikett.Objekte,
-	kennung.Etikett,
-	*kennung.Etikett,
-	objekte.NilVerzeichnisse[etikett.Objekte],
-	*objekte.NilVerzeichnisse[etikett.Objekte],
-]
+type EtikettLogWriter = objekte.LogWriter[*etikett.Transacted]
 
 type EtikettAkteTextSaver = objekte.AkteTextSaver[
 	etikett.Objekte,

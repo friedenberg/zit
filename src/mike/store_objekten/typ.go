@@ -14,25 +14,27 @@ import (
 )
 
 type TypStore interface {
-	GattungStore[
+	GattungStore
+
+	objekte.TransactedLogger[*typ.Transacted]
+
+	objekte.AkteTextSaver[
 		typ.Objekte,
 		*typ.Objekte,
-		kennung.Typ,
-		*kennung.Typ,
-		objekte.NilVerzeichnisse[typ.Objekte],
-		*objekte.NilVerzeichnisse[typ.Objekte],
 	]
 
-	objekte.StoreIdReader[
-		typ.Objekte,
+	objekte.ReaderTransacted[
+		*kennung.Typ,
+		*typ.Transacted,
+	]
+
+	objekte.CreateOrUpdater[
 		*typ.Objekte,
-		kennung.Typ,
 		*kennung.Typ,
-		objekte.NilVerzeichnisse[typ.Objekte],
-		*objekte.NilVerzeichnisse[typ.Objekte],
+		*typ.Transacted,
 	]
 
-	objekte.StoreCreateUpdater[
+	objekte.TransactedInflator[
 		typ.Objekte,
 		*typ.Objekte,
 		kennung.Typ,
@@ -51,14 +53,7 @@ type TypInflator = objekte.TransactedInflator[
 	*objekte.NilVerzeichnisse[typ.Objekte],
 ]
 
-type TypLogWriter = objekte.LogWriter[
-	typ.Objekte,
-	*typ.Objekte,
-	kennung.Typ,
-	*kennung.Typ,
-	objekte.NilVerzeichnisse[typ.Objekte],
-	*objekte.NilVerzeichnisse[typ.Objekte],
-]
+type TypLogWriter = objekte.LogWriter[*typ.Transacted]
 
 type TypAkteTextSaver = objekte.AkteTextSaver[
 	typ.Objekte,

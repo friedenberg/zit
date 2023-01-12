@@ -16,24 +16,12 @@ import (
 
 type KonfigStore interface {
 	Read() (*konfig.Transacted, error)
+	Update(*konfig.Objekte) (*konfig.Transacted, error)
 
-	GattungStore[
-		konfig.Objekte,
-		*konfig.Objekte,
-		kennung.Konfig,
-		*kennung.Konfig,
-		objekte.NilVerzeichnisse[konfig.Objekte],
-		*objekte.NilVerzeichnisse[konfig.Objekte],
-	]
+	GattungStore
 
-	objekte.StoreUpdater[
-		konfig.Objekte,
-		*konfig.Objekte,
-		kennung.Konfig,
-		*kennung.Konfig,
-		objekte.NilVerzeichnisse[konfig.Objekte],
-		*objekte.NilVerzeichnisse[konfig.Objekte],
-	]
+	objekte.TransactedLogger[*konfig.Transacted]
+	objekte.AkteTextSaver[konfig.Objekte, *konfig.Objekte]
 }
 
 type KonfigInflator = objekte.TransactedInflator[
@@ -45,14 +33,7 @@ type KonfigInflator = objekte.TransactedInflator[
 	*objekte.NilVerzeichnisse[konfig.Objekte],
 ]
 
-type KonfigLogWriter = objekte.LogWriter[
-	konfig.Objekte,
-	*konfig.Objekte,
-	kennung.Konfig,
-	*kennung.Konfig,
-	objekte.NilVerzeichnisse[konfig.Objekte],
-	*objekte.NilVerzeichnisse[konfig.Objekte],
-]
+type KonfigLogWriter = objekte.LogWriter[*konfig.Transacted]
 
 type KonfigAkteTextSaver = objekte.AkteTextSaver[
 	konfig.Objekte,

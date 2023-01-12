@@ -1,77 +1,48 @@
 package objekte
 
 import (
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
 )
 
 type LogWriter[
-	T gattung.Objekte[T],
-	T1 gattung.ObjektePtr[T],
-	T2 gattung.Identifier[T2],
-	T3 gattung.IdentifierPtr[T2],
-	T4 gattung.Verzeichnisse[T],
-	T5 gattung.VerzeichnissePtr[T4, T],
+	T any,
 ] struct {
-	New, Updated, Unchanged, Archived collections.WriterFunc[*Transacted[T, T1, T2, T3, T4, T5]]
+	New, Updated, Unchanged, Archived collections.WriterFunc[T]
 }
 
-type StoreLogger[
-	T gattung.Objekte[T],
-	T1 gattung.ObjektePtr[T],
-	T2 gattung.Identifier[T2],
-	T3 gattung.IdentifierPtr[T2],
-	T4 gattung.Verzeichnisse[T],
-	T5 gattung.VerzeichnissePtr[T4, T],
+type TransactedLogger[
+	T any,
 ] interface {
-	SetLogWriter(LogWriter[T, T1, T2, T3, T4, T5])
+	SetLogWriter(LogWriter[T])
 }
 
-type Store[
-	T gattung.Objekte[T],
-	T1 gattung.ObjektePtr[T],
-	T2 gattung.Identifier[T2],
-	T3 gattung.IdentifierPtr[T2],
-	T4 gattung.Verzeichnisse[T],
-	T5 gattung.VerzeichnissePtr[T4, T],
+type Reader[
+	K any,
+	V any,
 ] interface {
-	errors.Flusher
-	AkteTextSaver[T, T1]
-	TransactedInflator[T, T1, T2, T3, T4, T5]
+	ReadOne(K) (V, error)
+	ReadAllSchwanzen(collections.WriterFunc[V]) error
 }
 
-type StoreIdReader[
-	T gattung.Objekte[T],
-	T1 gattung.ObjektePtr[T],
-	T2 gattung.Identifier[T2],
-	T3 gattung.IdentifierPtr[T2],
-	T4 gattung.Verzeichnisse[T],
-	T5 gattung.VerzeichnissePtr[T4, T],
+type ReaderTransacted[
+	K any,
+	V any,
 ] interface {
-	ReadOne(T3) (*Transacted[T, T1, T2, T3, T4, T5], error)
-	ReadAllSchwanzen(collections.WriterFunc[*Transacted[T, T1, T2, T3, T4, T5]]) error
-	ReadAll(collections.WriterFunc[*Transacted[T, T1, T2, T3, T4, T5]]) error
+	Reader[K, V]
+	ReadAll(collections.WriterFunc[V]) error
 }
 
-type StoreCreateUpdater[
-	T gattung.Objekte[T],
-	T1 gattung.ObjektePtr[T],
-	T2 gattung.Identifier[T2],
-	T3 gattung.IdentifierPtr[T2],
-	T4 gattung.Verzeichnisse[T],
-	T5 gattung.VerzeichnissePtr[T4, T],
+type CreateOrUpdater[
+	O any,
+	K any,
+	V any,
 ] interface {
-	CreateOrUpdate(T1, T3) (*Transacted[T, T1, T2, T3, T4, T5], error)
+	CreateOrUpdate(O, K) (V, error)
 }
 
-type StoreUpdater[
-	T gattung.Objekte[T],
-	T1 gattung.ObjektePtr[T],
-	T2 gattung.Identifier[T2],
-	T3 gattung.IdentifierPtr[T2],
-	T4 gattung.Verzeichnisse[T],
-	T5 gattung.VerzeichnissePtr[T4, T],
+type Updater[
+	O any,
+	V any,
 ] interface {
-	Update(T1) (*Transacted[T, T1, T2, T3, T4, T5], error)
+	Update(O) (V, error)
 }

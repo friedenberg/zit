@@ -63,7 +63,6 @@ func MakeTransactedInflator[
 	}
 }
 
-// TODO-P3 rename to InflateFromSku
 func (h *transactedInflator[T, T1, T2, T3, T4, T5]) InflateFromSku(
 	o sku.Sku,
 ) (t *Transacted[T, T1, T2, T3, T4, T5], err error) {
@@ -73,11 +72,13 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) InflateFromSku(
 		t = h.pool.Get()
 	}
 
+  //TODO make generic
 	if err = t.Sku.SetFromSku(o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
+  //TODO make generic
 	if t.Sku.Kennung.GetGattung() != o.Gattung {
 		err = errors.Errorf(
 			"expected gattung %s but got %s",
