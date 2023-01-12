@@ -49,10 +49,8 @@ func ReadSep(
 			return
 		}
 
-		if errors.IsEOF(err) {
-			err = nil
-			break
-		}
+		isEof := errors.IsEOF(err)
+		err = nil
 
 		line = strings.TrimSuffix(rawLine, string([]byte{delim}))
 
@@ -72,7 +70,12 @@ func ReadSep(
 		if err = frl(line); err != nil {
 			last = err
 			err = nil
-			i++
+		}
+
+		i++
+
+		if isEof {
+			break
 		}
 	}
 

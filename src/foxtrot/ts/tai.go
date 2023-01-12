@@ -3,6 +3,7 @@ package ts
 import (
 	"bufio"
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
 
@@ -49,11 +50,13 @@ func (t Tai) AsTime() (t1 Time) {
 }
 
 func (t Tai) String() string {
-	return fmt.Sprintf(
-		"%s.%s",
-		strconv.FormatInt(t.tai.Sec, 10),
-		strconv.FormatInt(t.tai.Asec, 10),
-	)
+	a := strings.TrimRight(fmt.Sprintf("%018d", t.tai.Asec), "0")
+
+	if a == "" {
+		a = "0"
+	}
+
+	return fmt.Sprintf("%s.%s", strconv.FormatInt(t.tai.Sec, 10), a)
 }
 
 func (t *Tai) Set(v string) (err error) {
@@ -64,6 +67,12 @@ func (t *Tai) Set(v string) (err error) {
 		'.',
 		r,
 		func(v string) (err error) {
+			v = strings.TrimSpace(v)
+
+			if v == "" {
+				return
+			}
+
 			if t.tai.Sec, err = strconv.ParseInt(v, 10, 64); err != nil {
 				err = errors.Wrapf(err, "failed to parse Sec time: %s", v)
 				return
@@ -72,10 +81,21 @@ func (t *Tai) Set(v string) (err error) {
 			return
 		},
 		func(v string) (err error) {
-			if t.tai.Asec, err = strconv.ParseInt(v, 10, 64); err != nil {
+			v = strings.TrimSpace(v)
+			v = strings.TrimRight(v, "0")
+
+			if v == "" {
+				return
+			}
+
+			var pre int64
+
+			if pre, err = strconv.ParseInt(v, 10, 64); err != nil {
 				err = errors.Wrapf(err, "failed to parse Asec time: %s", v)
 				return
 			}
+
+			t.tai.Asec = pre * int64(math.Pow10(18-len(v)))
 
 			return
 		},

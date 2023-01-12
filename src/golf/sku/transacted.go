@@ -28,6 +28,22 @@ type Transacted[T kennung.KennungLike[T], T1 kennung.KennungLikePtr[T]] struct {
 	Verzeichnisse
 }
 
+func (t *Transacted[T, T1]) SetFromSku2(sk Sku2) (err error) {
+	t.Schwanz = sk.GetTime()
+
+	if err = T1(&t.Kennung).Set(sk.Kennung.String()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	t.ObjekteSha = sk.ObjekteSha
+	t.AkteSha = sk.AkteSha
+
+	//TODO-P0 Verzeichnisse
+
+	return
+}
+
 func (t *Transacted[T, T1]) SetFromSku(sk Sku) (err error) {
 	t.Schwanz = sk.Time
 
@@ -107,13 +123,26 @@ func MakeSkuTransacted(t ts.Time, line string) (out SkuLike, err error) {
 	return
 }
 
-func (a *Transacted[T, T1]) GetTime() ts.Time {
+func (a Transacted[T, T1]) GetTime() ts.Time {
 	return a.Schwanz
 }
 
-func (a *Transacted[T, T1]) Sku(t ts.Time, n int) Sku {
+func (a *Transacted[T, T1]) Sku() Sku {
 	return Sku{
-		Time:       ts.TimeWithIndex(t, n),
+		Time:       ts.TimeWithIndex(a.GetTime(), a.GetTransactionIndex().Int()),
+		Gattung:    a.GetGattung(),
+		Kennung:    collections.MakeStringValue(a.Kennung.String()),
+		ObjekteSha: a.ObjekteSha,
+		AkteSha:    a.AkteSha,
+	}
+}
+
+func (a *Transacted[T, T1]) Sku2() Sku2 {
+	return Sku2{
+		Tai: ts.TaiFromTimeWithIndex(
+			a.GetTime(),
+			a.GetTransactionIndex().Int(),
+		),
 		Gattung:    a.GetGattung(),
 		Kennung:    collections.MakeStringValue(a.Kennung.String()),
 		ObjekteSha: a.ObjekteSha,

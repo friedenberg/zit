@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/gob"
 	"io"
+	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
@@ -22,6 +23,7 @@ type indexAbbrEncodableTridexes struct {
 }
 
 type indexAbbr struct {
+	lock sync.Locker
 	ioFactory
 
 	path string
@@ -37,6 +39,7 @@ func newIndexAbbr(
 	p string,
 ) (i *indexAbbr, err error) {
 	i = &indexAbbr{
+		lock:      &sync.Mutex{},
 		path:      p,
 		ioFactory: ioFactory,
 		indexAbbrEncodableTridexes: indexAbbrEncodableTridexes{
@@ -51,6 +54,9 @@ func newIndexAbbr(
 }
 
 func (i *indexAbbr) Flush() (err error) {
+	i.lock.Lock()
+	defer i.lock.Unlock()
+
 	if !i.hasChanges {
 		errors.Log().Print("no changes")
 		return
@@ -80,6 +86,9 @@ func (i *indexAbbr) Flush() (err error) {
 }
 
 func (i *indexAbbr) readIfNecessary() (err error) {
+	i.lock.Lock()
+	defer i.lock.Unlock()
+
 	if i.didRead {
 		return
 	}

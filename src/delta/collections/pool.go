@@ -10,6 +10,7 @@ type Resettable[T any] interface {
 	Reset(T)
 }
 
+// TODO-P4 switch to interface
 type Pool[T any] struct {
 	inner *sync.Pool
 }
@@ -18,7 +19,15 @@ func MakePool[T any]() *Pool[T] {
 	return &Pool[T]{
 		inner: &sync.Pool{
 			New: func() interface{} {
-				return new(T)
+				o := new(T)
+
+				ii := interface{}(o)
+
+				if r, ok := ii.(Resettable[*T]); ok {
+					r.Reset(nil)
+				}
+
+				return o
 			},
 		},
 	}

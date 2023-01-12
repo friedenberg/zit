@@ -3,9 +3,11 @@ package bestandsaufnahme
 import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/sha"
+	"github.com/friedenberg/zit/src/foxtrot/ts"
 )
 
 type Objekte struct {
+	Tai     ts.Tai
 	Akte    Akte
 	AkteSha sha.Sha
 }
@@ -47,7 +49,9 @@ func (a *Objekte) Reset(b *Objekte) {
 
 	if b == nil {
 		a.AkteSha = sha.Sha{}
+		a.Tai = ts.Tai{}
 	} else {
 		a.AkteSha = b.AkteSha
+		a.Tai = b.Tai
 	}
 }

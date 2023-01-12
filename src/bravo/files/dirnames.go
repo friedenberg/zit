@@ -70,6 +70,7 @@ func MakeDirNameWriterIgnoringHidden(
 	}
 }
 
+// TODO-P3 support ErrStopIteration
 func ReadDirNamesLevel2(
 	wf func(string) error,
 	p string,

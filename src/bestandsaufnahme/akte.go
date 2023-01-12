@@ -6,12 +6,12 @@ import (
 )
 
 type Akte struct {
-	Skus collections.MutableValueSet[sku.Sku, *sku.Sku]
+	Skus collections.MutableValueSet[sku.Sku2, *sku.Sku2]
 }
 
 func MakeAkte() *Akte {
 	return &Akte{
-		Skus: collections.MakeMutableValueSet[sku.Sku, *sku.Sku](),
+		Skus: collections.MakeMutableValueSet[sku.Sku2, *sku.Sku2](),
 	}
 }
 
@@ -26,7 +26,7 @@ func (a Akte) Equals(b *Akte) bool {
 func (a *Akte) Reset(b *Akte) {
 	if b == nil {
 		//TODO-P4 make more performant
-		a.Skus = collections.MakeMutableValueSet[sku.Sku, *sku.Sku]()
+		a.Skus = collections.MakeMutableValueSet[sku.Sku2, *sku.Sku2]()
 	} else {
 		a.Skus.Reset(b.Skus)
 	}

@@ -120,6 +120,7 @@ func (f Format[T, T1]) Format(
 
 	w := format.NewWriter()
 
+  //TODO-P4 use new format methods
 	w.WriteFormat("%s", o.GetGattung())
 	w.WriteFormat("%s %s", gattung.Akte, o.GetAkteSha())
 

@@ -6,20 +6,20 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	format_pkg "github.com/friedenberg/zit/src/delta/format"
+	"github.com/friedenberg/zit/src/delta/format"
 )
 
-type format struct {
+type formatAkte struct {
 }
 
-func MakeFormat() *format {
-	return &format{}
+func MakeFormatAkte() *formatAkte {
+	return &formatAkte{}
 }
 
-func (f *format) Parse(r io.Reader, b *Akte) (n int64, err error) {
-	if n, err = format_pkg.ReadLines(
+func (f *formatAkte) Parse(r io.Reader, o *Objekte) (n int64, err error) {
+	if n, err = format.ReadLines(
 		r,
-		b.Skus.AddString,
+		o.Akte.Skus.AddString,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -28,8 +28,8 @@ func (f *format) Parse(r io.Reader, b *Akte) (n int64, err error) {
 	return
 }
 
-func (f *format) Format(w io.Writer, b *Akte) (n int64, err error) {
-	sorted := b.Skus.SortedString()
+func (f *formatAkte) Format(w io.Writer, o *Objekte) (n int64, err error) {
+	sorted := o.Akte.Skus.SortedString()
 	bw := bufio.NewWriter(w)
 	defer errors.DeferredFlusher(&err, bw)
 

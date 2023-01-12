@@ -502,7 +502,7 @@ func (s *zettelStore) HasObjekte(sh sha.Sha) (ok bool) {
 
 // TODO-P0 implement correctly
 // include writing objekten and checking akten?
-func (s *zettelStore) Inherit(tz *zettel.Transacted) (err error) {
+func (s *zettelStore) Inherit(tz *zettel.Transacted, sk sku.Sku2) (err error) {
 	errors.Log().Printf("inheriting %s", tz.Sku.ObjekteSha)
 
 	if _, err = s.WriteZettelObjekte(tz.Objekte); err != nil {
@@ -510,14 +510,16 @@ func (s *zettelStore) Inherit(tz *zettel.Transacted) (err error) {
 		return
 	}
 
-	if tz, err = s.addZettelToTransaktion(
-		&tz.Objekte,
-		&tz.Sku.ObjekteSha,
-		&tz.Sku.Kennung,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	// if tz, err = s.addZettelToTransaktion(
+	// 	&tz.Objekte,
+	// 	&tz.Sku.ObjekteSha,
+	// 	&tz.Sku.Kennung,
+	// ); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
+
+	s.common.Bestandsaufnahme.Akte.Skus.Add(sk)
 
 	if err = s.writeNamedZettelToIndex(tz); err != nil {
 		err = errors.Wrap(err)
@@ -534,7 +536,6 @@ func (s *zettelStore) Inherit(tz *zettel.Transacted) (err error) {
 }
 
 func (s *zettelStore) reindexOne(
-	t *transaktion.Transaktion,
 	o sku.SkuLike,
 ) (err error) {
 	var tz *zettel.Transacted

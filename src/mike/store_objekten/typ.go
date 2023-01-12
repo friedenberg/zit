@@ -299,7 +299,6 @@ func (s typStore) AllInChain(k kennung.Typ) (c []*typ.Transacted, err error) {
 }
 
 func (s *typStore) reindexOne(
-	t *transaktion.Transaktion,
 	o sku.SkuLike,
 ) (err error) {
 	var te *typ.Transacted

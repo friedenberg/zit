@@ -17,6 +17,7 @@ type Transacted = objekte.Transacted[
 ]
 
 type Objekte struct {
+	//TODO-P3 rename to AkteSha
 	Sha  sha.Sha
 	Akte Toml
 }
@@ -43,12 +44,11 @@ func (a Objekte) Equals(b *Objekte) bool {
 
 func (a *Objekte) Reset(b *Objekte) {
 	if b == nil {
-		a.Sha = b.Sha
-		a.Akte = b.Akte
-	} else {
 		a.Sha = sha.Sha{}
-		//TODO
-		// a.Akte = MakeDefaultCompiled()
+		a.Akte.Reset(nil)
+	} else {
+		a.Sha = b.Sha
+		a.Akte.Reset(&b.Akte)
 	}
 }
 

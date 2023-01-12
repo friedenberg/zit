@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/charlie/gattung"
@@ -28,10 +29,11 @@ type Store struct {
 	shaAbbr
 	hinweisAbbr
 
-	zettelStore  *zettelStore
-	typStore     TypStore
-	etikettStore EtikettStore
-	konfigStore  KonfigStore
+	zettelStore           *zettelStore
+	typStore              TypStore
+	etikettStore          EtikettStore
+	konfigStore           KonfigStore
+	bestandsaufnahmeStore bestandsaufnahme.Store
 }
 
 func Make(
@@ -51,6 +53,7 @@ func Make(
 	}
 
 	t := ts.Now()
+	ta := ts.NowTai()
 
 	for {
 		p := s.TransaktionPath(t)
@@ -63,6 +66,12 @@ func Make(
 	}
 
 	s.common.Transaktion = transaktion.MakeTransaktion(t)
+	s.common.Bestandsaufnahme = &bestandsaufnahme.Objekte{
+		Tai: ta,
+		Akte: bestandsaufnahme.Akte{
+			Skus: collections.MakeMutableValueSet[sku.Sku2, *sku.Sku2](),
+		},
+	}
 
 	if s.common.Abbr, err = newIndexAbbr(
 		&s.common,
@@ -91,6 +100,14 @@ func Make(
 	}
 
 	if s.konfigStore, err = makeKonfigStore(&s.common); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if s.bestandsaufnahmeStore, err = bestandsaufnahme.MakeStore(
+		s.common.Standort,
+		&s.common,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -204,6 +221,17 @@ func (s Store) Flush() (err error) {
 		return
 	}
 
+	if _, err = s.bestandsaufnahmeStore.Create(s.common.Bestandsaufnahme); err != nil {
+		if errors.Is(err, bestandsaufnahme.ErrEmpty) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	//TODO-P2 add Bestandsaufnahme to Transaktion
+
 	if err = s.writeTransaktion(); err != nil {
 		err = errors.Wrapf(err, "failed to write transaction")
 		return
@@ -277,7 +305,6 @@ func (s *Store) Reindex() (err error) {
 
 				case gattung.Konfig:
 					if err = s.konfigStore.reindexOne(
-						t,
 						o,
 					); err != nil {
 						err = errors.Wrap(err)
@@ -286,7 +313,6 @@ func (s *Store) Reindex() (err error) {
 
 				case gattung.Typ:
 					if err = s.typStore.reindexOne(
-						t,
 						o,
 					); err != nil {
 						err = errors.Wrapf(err, "Kennung: %s", o.GetId())
@@ -295,7 +321,6 @@ func (s *Store) Reindex() (err error) {
 
 				case gattung.Etikett:
 					if err = s.etikettStore.reindexOne(
-						t,
 						o,
 					); err != nil {
 						err = errors.Wrapf(
@@ -309,7 +334,6 @@ func (s *Store) Reindex() (err error) {
 
 				case gattung.Zettel:
 					if err = s.zettelStore.reindexOne(
-						t,
 						o,
 					); err != nil {
 						err = errors.Wrap(err)

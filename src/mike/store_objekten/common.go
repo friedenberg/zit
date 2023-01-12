@@ -5,24 +5,41 @@ import (
 	"io/ioutil"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/echo/standort"
 	"github.com/friedenberg/zit/src/foxtrot/id"
+	"github.com/friedenberg/zit/src/foxtrot/ts"
 	"github.com/friedenberg/zit/src/golf/age_io"
+	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
 )
 
-//TODO-P3 move to own package
+// TODO-P3 move to own package
 type common struct {
-	LockSmith   LockSmith
-	Age         age.Age
-	konfig      *konfig_compiled.Compiled
-	Standort    standort.Standort
-	Transaktion transaktion.Transaktion
-	Abbr        *indexAbbr
+	LockSmith        LockSmith
+	Age              age.Age
+	konfig           *konfig_compiled.Compiled
+	Standort         standort.Standort
+	Transaktion      transaktion.Transaktion
+	Bestandsaufnahme *bestandsaufnahme.Objekte
+	Abbr             *indexAbbr
+}
+
+func (s common) AddSkuToBestandsaufnahme(sk sku.SkuLike, as sha.Sha) {
+	s.Bestandsaufnahme.Akte.Skus.Add(
+		sku.Sku2{
+			Gattung:    sk.GetGattung(),
+			Tai:        ts.TaiFromTimeWithIndex(sk.GetTime(), sk.GetTransactionIndex().Int()),
+			Kennung:    collections.MakeStringValue(sk.GetId().String()),
+			ObjekteSha: sk.GetObjekteSha(),
+			AkteSha:    as,
+		},
+	)
 }
 
 func (s common) Konfig() konfig_compiled.Compiled {

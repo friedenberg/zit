@@ -187,7 +187,7 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	if err = client.SkusFromFilter(
 		filter,
-		func(sk sku.Sku) (err error) {
+		func(sk sku.Sku2) (err error) {
 			if sk.Gattung != gattung.Zettel {
 				return
 			}
@@ -206,12 +206,12 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 			//TODO-P0 ensure objekte is written after being parsed rather than being
 			//tee'd
-			if t, err = inflator.InflateFromSku(sk); err != nil {
+			if t, err = inflator.InflateFromSku2(sk); err != nil {
 				err = errors.Wrapf(err, "Sku: %s", sk)
 				return
 			}
 
-			if err = u.StoreObjekten().Zettel().Inherit(t); err != nil {
+			if err = u.StoreObjekten().Zettel().Inherit(t, sk); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

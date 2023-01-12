@@ -11,9 +11,20 @@ type Toml struct {
 	StoreVersion   string                                `toml:"store-version,omitempty"`
 }
 
-type FileExtensions struct {
-	Zettel   string `toml:"zettel"`
-	Organize string `toml:"organize"`
-	Typ      string `toml:"typ"`
-	Etikett  string `toml:"etikett"`
+func (a *Toml) Reset(b *Toml) {
+	if b == nil {
+		a.FileExtensions.Reset(nil)
+		a.RemoteScripts = make(map[string]RemoteScript)
+		//TODO-P4 should reuse
+		a.Recipients = make([]string, 0)
+		a.Actions = make(map[string]script_config.ScriptConfig)
+		a.StoreVersion = ""
+	} else {
+		a.FileExtensions.Reset(&b.FileExtensions)
+		//TODO-P4 should copy
+		a.RemoteScripts = b.RemoteScripts
+		a.Recipients = b.Recipients
+		a.Actions = b.Actions
+		a.StoreVersion = b.StoreVersion
+	}
 }

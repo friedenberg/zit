@@ -8,14 +8,13 @@ import (
 	"github.com/friedenberg/zit/src/golf/sku"
 )
 
-// TODO-P1 split into ObjekteInflator
 type ObjekteInflator[
 	T gattung.Objekte[T],
 	T1 gattung.ObjektePtr[T],
 	T4 gattung.Verzeichnisse[T],
 	T5 gattung.VerzeichnissePtr[T4, T],
 ] interface {
-	InflateObjekteFromSku(sku.Sku) (*T1, error)
+	InflateObjekteFromSku(sku.Sku) (T1, error)
 }
 
 type objekteInflator[
@@ -56,7 +55,6 @@ func MakeObjekteInflator[
 	}
 }
 
-// TODO-P3 rename to InflateFromSku
 func (h *objekteInflator[T, T1, T2, T3]) InflateObjekteFromSku(
 	sk sku.Sku,
 ) (o T1, err error) {

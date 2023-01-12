@@ -204,6 +204,21 @@ type AkteWriterFactory interface {
 	AkteWriter() (sha.WriteCloser, error)
 }
 
+type ObjekteAkteReaderFactory interface {
+	ObjekteReaderFactory
+	AkteReaderFactory
+}
+
+type ObjekteAkteWriterFactory interface {
+	ObjekteWriterFactory
+	AkteWriterFactory
+}
+
+type ObjekteAkteFactory interface {
+	ObjekteAkteReaderFactory
+	ObjekteAkteWriterFactory
+}
+
 // TODO-P3 rename to FuncShaReadCloser
 type FuncReadCloser func(sha.Sha) (sha.ReadCloser, error)
 

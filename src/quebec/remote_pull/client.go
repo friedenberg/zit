@@ -20,7 +20,7 @@ const (
 	// concurrentSkuFilterJobLimit = 1
 )
 
-type FuncSku func(sku.Sku) error
+type FuncSku func(sku.Sku2) error
 
 type Client interface {
 	SkusFromFilter(id_set.Filter, FuncSku) error
@@ -106,7 +106,7 @@ func (c client) SkusFromFilter(ids id_set.Filter, f FuncSku) (err error) {
 			break
 		}
 
-		var sk sku.Sku
+		var sk sku.Sku2
 
 		if err = d.Receive(&sk); err != nil {
 			if errors.IsEOF(err) || errors.Is(err, net.ErrClosed) {
@@ -118,7 +118,7 @@ func (c client) SkusFromFilter(ids id_set.Filter, f FuncSku) (err error) {
 			return
 		}
 
-		errors.Log().Printf("received sku: %s", sk)
+		errors.Log().Printf("received sku: %v", sk)
 
 		c.chFilterSkuTickets <- struct{}{}
 		wg.Add(1)
@@ -134,7 +134,7 @@ func (c client) SkusFromFilter(ids id_set.Filter, f FuncSku) (err error) {
 }
 
 func (c *client) makeAndProcessOneSkuWithFilter(
-	sk sku.Sku,
+	sk sku.Sku2,
 	f FuncSku,
 	wg *sync.WaitGroup,
 	errMulti errors.Multi,

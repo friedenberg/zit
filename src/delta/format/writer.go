@@ -3,6 +3,7 @@ package format
 import (
 	"bufio"
 	"io"
+	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/collections"
@@ -63,6 +64,38 @@ func Write(
 		}
 
 		n += n1
+	}
+
+	return
+}
+
+func WriteLines(
+	w1 io.Writer,
+	wffs ...WriterFunc,
+) (n int64, err error) {
+	w := bufio.NewWriter(w1)
+	defer errors.DeferredFlusher(&err, w)
+
+	sb := &strings.Builder{}
+
+	for _, wf := range wffs {
+		sb.Reset()
+
+		if _, err = wf(sb); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		sb.WriteByte('\n')
+
+		var n1 int
+
+		if n1, err = io.WriteString(w, sb.String()); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		n += int64(n1)
 	}
 
 	return

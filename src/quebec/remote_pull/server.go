@@ -155,10 +155,9 @@ func (op Server) skusForFilter(
 		collections.MakeChain(
 			zettel.WriterIds{Filter: filter}.WriteZettelVerzeichnisse,
 			func(z *zettel.Transacted) (err error) {
-				sk := z.Sku.Sku(
-					z.Sku.Schwanz,
-					z.Sku.TransactionIndex.Int(),
-				)
+				sk := z.Sku.Sku2()
+
+				errors.Log().Printf("da sku2: %s", sk)
 
 				if err = d.Send(sk); err != nil {
 					err = errors.Wrap(err)

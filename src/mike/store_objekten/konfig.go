@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/golf/age_io"
 	"github.com/friedenberg/zit/src/golf/sku"
-	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/hotel/objekte"
 	"github.com/friedenberg/zit/src/india/konfig"
 )
@@ -250,7 +249,6 @@ func (s konfigStore) AllInChain() (c []*konfig.Transacted, err error) {
 }
 
 func (s *konfigStore) reindexOne(
-	t *transaktion.Transaktion,
 	o sku.SkuLike,
 ) (err error) {
 	var te *konfig.Transacted

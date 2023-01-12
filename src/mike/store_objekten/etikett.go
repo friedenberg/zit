@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/golf/age_io"
 	"github.com/friedenberg/zit/src/golf/sku"
-	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/hotel/objekte"
 	"github.com/friedenberg/zit/src/india/etikett"
 )
@@ -227,7 +226,6 @@ func (s etikettStore) AllInChain(k kennung.Etikett) (c []*etikett.Transacted, er
 }
 
 func (s *etikettStore) reindexOne(
-	t *transaktion.Transaktion,
 	o sku.SkuLike,
 ) (err error) {
 	var te *etikett.Transacted
