@@ -66,17 +66,8 @@ func (s MutableValueSet[T, T1]) Strings() (out []string) {
 	return
 }
 
-func (es MutableValueSet[T, T1]) AddString(v string) (err error) {
-	e := T1(new(T))
-
-	if err = e.Set(v); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	err = es.Add(*e)
-
-	return
+func (s MutableValueSet[T, T1]) StringAdder() FuncSetString {
+	return MakeFuncSetString[T, T1](s)
 }
 
 func (es MutableValueSet[T, T1]) RemovePrefixes(needle T) {

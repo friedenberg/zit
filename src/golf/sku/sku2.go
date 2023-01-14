@@ -92,7 +92,7 @@ func (a Sku2) GetObjekteSha() sha.Sha {
 	return a.ObjekteSha
 }
 
-func (a Sku2) Less(b *Sku2) (ok bool) {
+func (a Sku2) Less(b Sku2) (ok bool) {
 	if a.Tai.Less(b.Tai) {
 		ok = true
 		return
@@ -102,6 +102,10 @@ func (a Sku2) Less(b *Sku2) (ok bool) {
 }
 
 func (a Sku2) Equals(b *Sku2) (ok bool) {
+	if b == nil {
+		return false
+	}
+
 	if a != *b {
 		return false
 	}

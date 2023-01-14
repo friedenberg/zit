@@ -7,6 +7,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
@@ -73,6 +74,8 @@ func (f *FormatObjekte) Parse(
 		typLineReader = format.MakeLineReaderIgnoreErrors(typLineReader)
 	}
 
+	esa := collections.MakeFuncSetString[kennung.Etikett, *kennung.Etikett](etiketten)
+
 	if n, err = format.ReadLines(
 		r,
 		format.MakeLineReaderRepeat(
@@ -81,7 +84,7 @@ func (f *FormatObjekte) Parse(
 					gattung.Akte.String():        z.Akte.Set,
 					gattung.Typ.String():         typLineReader,
 					gattung.Bezeichnung.String(): z.Bezeichnung.Set,
-					gattung.Etikett.String():     etiketten.AddString,
+					gattung.Etikett.String():     esa,
 				},
 			),
 		),

@@ -21,7 +21,8 @@ import (
 
 type Pull struct {
 	gattung.Gattung
-	All bool
+	All        bool
+	RewriteTai bool
 }
 
 func init() {
@@ -34,6 +35,7 @@ func init() {
 
 			f.Var(&c.Gattung, "gattung", "Gattung")
 			f.BoolVar(&c.All, "all", false, "pull all Objekten")
+			f.BoolVar(&c.RewriteTai, "rewrite-tai", false, "generate new Taimstamps for pulled Objektes")
 
 			return c
 		},

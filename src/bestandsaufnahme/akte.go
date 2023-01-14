@@ -1,17 +1,16 @@
 package bestandsaufnahme
 
 import (
-	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/golf/sku"
 )
 
 type Akte struct {
-	Skus collections.MutableValueSet[sku.Sku2, *sku.Sku2]
+	Skus sku.Sku2Heap
 }
 
 func MakeAkte() *Akte {
 	return &Akte{
-		Skus: collections.MakeMutableValueSet[sku.Sku2, *sku.Sku2](),
+		Skus: sku.MakeSku2Heap(),
 	}
 }
 
@@ -25,9 +24,8 @@ func (a Akte) Equals(b *Akte) bool {
 
 func (a *Akte) Reset(b *Akte) {
 	if b == nil {
-		//TODO-P4 make more performant
-		a.Skus = collections.MakeMutableValueSet[sku.Sku2, *sku.Sku2]()
+		a.Skus.Reset(nil)
 	} else {
-		a.Skus.Reset(b.Skus)
+		a.Skus.Reset(&b.Skus)
 	}
 }

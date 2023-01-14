@@ -69,7 +69,7 @@ func Make(
 	s.common.Bestandsaufnahme = &bestandsaufnahme.Objekte{
 		Tai: ta,
 		Akte: bestandsaufnahme.Akte{
-			Skus: collections.MakeMutableValueSet[sku.Sku2, *sku.Sku2](),
+			Skus: sku.MakeSku2Heap(),
 		},
 	}
 

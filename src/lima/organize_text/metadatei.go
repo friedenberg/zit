@@ -39,7 +39,7 @@ func (m *Metadatei) ReadFrom(r1 io.Reader) (n int64, err error) {
 			format.MakeLineReaderKeyValues(
 				map[string]format.FuncReadLine{
 					"%": format.MakeLineReaderNop(),
-					"-": mes.AddString,
+					"-": mes.StringAdder(),
 					"!": m.Typ.Set,
 				},
 			),

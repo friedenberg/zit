@@ -2,6 +2,8 @@ package kennung
 
 import (
 	"regexp"
+
+	"github.com/friedenberg/zit/src/delta/collections"
 )
 
 var (
@@ -10,12 +12,8 @@ var (
 	ExpanderAll            Expander
 )
 
-type stringAdder interface {
-	AddString(string) error
-}
-
 type Expander interface {
-	Expand(stringAdder, string)
+	Expand(collections.FuncSetString, string)
 }
 
 func init() {

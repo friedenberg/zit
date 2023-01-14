@@ -2,6 +2,8 @@ package kennung
 
 import (
 	"regexp"
+
+	"github.com/friedenberg/zit/src/delta/collections"
 )
 
 type expanderRight struct {
@@ -17,10 +19,10 @@ func MakeExpanderRight(
 }
 
 func (ex expanderRight) Expand(
-	sa stringAdder,
+	sa collections.FuncSetString,
 	s string,
 ) {
-	sa.AddString(s)
+	sa(s)
 
 	if s == "" {
 		return
@@ -36,7 +38,7 @@ func (ex expanderRight) Expand(
 		locStart := loc[0]
 		t1 := s[0:locStart]
 
-		sa.AddString(t1)
+		sa(t1)
 	}
 
 	return

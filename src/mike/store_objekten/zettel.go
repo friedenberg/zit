@@ -519,7 +519,7 @@ func (s *zettelStore) Inherit(tz *zettel.Transacted, sk sku.Sku2) (err error) {
 	// 	return
 	// }
 
-	s.common.Bestandsaufnahme.Akte.Skus.Add(sk)
+	s.common.Bestandsaufnahme.Akte.Skus.Push(sk)
 
 	if err = s.writeNamedZettelToIndex(tz); err != nil {
 		err = errors.Wrap(err)

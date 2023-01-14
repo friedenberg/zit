@@ -195,7 +195,8 @@ func (c compiled) GetZettelFileExtension() string {
 // TODO-P3 merge all the below
 func (c compiled) GetSortedTypenExpanded(v string) (expandedActual []*typ.Transacted) {
 	expandedMaybe := collections.MakeMutableValueSet[collections.StringValue, *collections.StringValue]()
-	typExpander.Expand(expandedMaybe, v)
+	sa := collections.MakeFuncSetString[collections.StringValue, *collections.StringValue](expandedMaybe)
+	typExpander.Expand(sa, v)
 	expandedActual = make([]*typ.Transacted, 0)
 
 	expandedMaybe.Each(
@@ -223,7 +224,8 @@ func (c compiled) GetSortedEtikettenExpanded(
 	v string,
 ) (expandedActual []*etikett.Transacted) {
 	expandedMaybe := collections.MakeMutableValueSet[collections.StringValue, *collections.StringValue]()
-	typExpander.Expand(expandedMaybe, v)
+	sa := collections.MakeFuncSetString[collections.StringValue, *collections.StringValue](expandedMaybe)
+	typExpander.Expand(sa, v)
 	expandedActual = make([]*etikett.Transacted, 0)
 
 	expandedMaybe.Each(

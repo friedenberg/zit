@@ -127,7 +127,7 @@ func (e Kennung[T, T1]) Expanded(
 	expanded := collections.MakeMutableValueSet[Kennung[T, T1], *Kennung[T, T1]]()
 
 	for _, ex := range exes {
-		ex.Expand(expanded, e.String())
+		ex.Expand(collections.MakeFuncSetString[Kennung[T, T1], *Kennung[T, T1]](expanded), e.String())
 	}
 
 	out = expanded.Copy()

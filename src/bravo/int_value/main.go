@@ -12,8 +12,9 @@ func Make(i int) IntValue {
 	return IntValue(i)
 }
 
-func (a IntValue) Equals(b IntValue) (ok bool) {
+func (a IntValue) Equals(b *IntValue) (ok bool) {
 	ok = a.Int() == b.Int()
+
 	return
 }
 

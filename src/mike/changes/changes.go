@@ -4,6 +4,7 @@ import (
 	"sort"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/lima/organize_text"
 )
@@ -98,7 +99,7 @@ func ChangesFrom(a1, b1 *organize_text.Text) (c1 Changes, err error) {
 			existing = kennung.MakeEtikettMutableSet()
 		}
 
-		existing.AddString(ett)
+		collections.AddString[kennung.Etikett, *kennung.Etikett](existing, ett)
 		c.New[bez] = existing
 	}
 

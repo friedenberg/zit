@@ -157,7 +157,9 @@ func (op Server) skusForFilter(
 			func(z *zettel.Transacted) (err error) {
 				sk := z.Sku.Sku2()
 
-				errors.Log().Printf("da sku2: %s", sk)
+				if z.Sku.GetTransactionIndex().Int() > 0 {
+					errors.Log().Printf("da sku has a big index: %s, %v, %d", sk, z.Sku, z.Sku.GetTransactionIndex())
+				}
 
 				if err = d.Send(sk); err != nil {
 					err = errors.Wrap(err)

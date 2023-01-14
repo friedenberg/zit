@@ -50,7 +50,7 @@ func (f *textMetadateiParser) ReadFormat(r1 io.Reader, z *Objekte) (n int64, err
 				map[string]format.FuncReadLine{
 					"#": z.Bezeichnung.Set,
 					"%": format.MakeLineReaderNop(),
-					"-": etiketten.AddString,
+					"-": etiketten.StringAdder(),
 					"!": func(v string) (err error) {
 						return f.readTyp(z, v)
 					},

@@ -212,8 +212,10 @@ func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 func (u Umwelt) DefaultEtiketten() (etiketten kennung.EtikettSet, err error) {
 	metiketten := kennung.MakeEtikettMutableSet()
 
+	sa := metiketten.StringAdder()
+
 	for _, e := range u.konfig.EtikettenToAddToNew {
-		if err = metiketten.AddString(e); err != nil {
+		if err = sa(e); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

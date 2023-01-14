@@ -71,6 +71,12 @@ func (zt Transacted[T, T1, T2, T3, T4, T5]) IsNew() bool {
 	return zt.Sku.Kopf == zt.Sku.Schwanz && zt.Sku.TransactionIndex == 0
 }
 
+func (a Transacted[T, T1, T2, T3, T4, T5]) Less(
+	b Transacted[T, T1, T2, T3, T4, T5],
+) bool {
+	return a.Sku.GetTime().Less(b.Sku.GetTime())
+}
+
 func (a Transacted[T, T1, T2, T3, T4, T5]) Equals(
 	b *Transacted[T, T1, T2, T3, T4, T5],
 ) bool {

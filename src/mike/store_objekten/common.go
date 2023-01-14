@@ -31,7 +31,7 @@ type common struct {
 }
 
 func (s common) AddSkuToBestandsaufnahme(sk sku.SkuLike, as sha.Sha) {
-	s.Bestandsaufnahme.Akte.Skus.Add(
+	s.Bestandsaufnahme.Akte.Skus.Push(
 		sku.Sku2{
 			Gattung:    sk.GetGattung(),
 			Tai:        ts.TaiFromTimeWithIndex(sk.GetTime(), sk.GetTransactionIndex().Int()),

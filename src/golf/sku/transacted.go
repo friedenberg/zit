@@ -39,7 +39,7 @@ func (t *Transacted[T, T1]) SetFromSku2(sk Sku2) (err error) {
 	t.ObjekteSha = sk.ObjekteSha
 	t.AkteSha = sk.AkteSha
 
-	//TODO-P0 Verzeichnisse
+	t.Verzeichnisse.SetFromSku2(sk)
 
 	return
 }
@@ -55,7 +55,7 @@ func (t *Transacted[T, T1]) SetFromSku(sk Sku) (err error) {
 	t.ObjekteSha = sk.ObjekteSha
 	t.AkteSha = sk.AkteSha
 
-	//TODO-P0 Verzeichnisse
+	t.Verzeichnisse.SetFromSku(sk)
 
 	return
 }
@@ -191,7 +191,7 @@ func (a Transacted[T, T1]) Less(b *Transacted[T, T1]) (ok bool) {
 }
 
 func (a Transacted[T, T1]) Equals(b *Transacted[T, T1]) (ok bool) {
-	if !a.TransactionIndex.Equals(b.TransactionIndex) {
+	if !a.TransactionIndex.Equals(&b.TransactionIndex) {
 		return
 	}
 
