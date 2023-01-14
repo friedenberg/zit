@@ -208,7 +208,7 @@ func (c Show) showZettels(
 		method = u.StoreWorkingDirectory().ReadManyHistory
 		hinweisen := hinweis.MakeMutableSet()
 
-		if err = u.StoreObjekten().Zettel().ReadAllSchwanzenVerzeichnisse(
+		if err = u.StoreObjekten().Zettel().ReadAllSchwanzen(
 			collections.MakeChain(
 				filter,
 				func(o *zettel.Transacted) (err error) {

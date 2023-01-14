@@ -201,7 +201,7 @@ func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 		if errors.As(e, &err1) {
 			var mutter *zettel.Transacted
 
-			if mutter, err = s.storeObjekten.Zettel().ReadHinweisSchwanzen(ez.Sku.Kennung); err != nil {
+			if mutter, err = s.storeObjekten.Zettel().ReadOne(ez.Sku.Kennung); err != nil {
 				unrecoverableErrors.Add(errors.Wrap(err))
 				continue
 			}
@@ -226,9 +226,8 @@ func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 // ReadOne
 // ReadMany
 // ReadManyHistory
-// TODO-P1 transition to ZettelVerzeichnisse
 func (s *Store) ReadOne(h hinweis.Hinweis) (zt *zettel.Transacted, err error) {
-	if zt, err = s.storeObjekten.Zettel().ReadHinweisSchwanzen(h); err != nil {
+	if zt, err = s.storeObjekten.Zettel().ReadOne(h); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -331,7 +330,7 @@ func (s *Store) ReadMany(
 		}
 	}
 
-	return s.storeObjekten.Zettel().ReadAllSchwanzenVerzeichnisse(
+	return s.storeObjekten.Zettel().ReadAllSchwanzen(
 		w,
 	)
 }
@@ -340,7 +339,7 @@ func (s *Store) ReadManyHistory(
 	w collections.WriterFunc[*zettel.Transacted],
 ) (err error) {
 	queries := []func(collections.WriterFunc[*zettel.Transacted]) error{
-		s.storeObjekten.Zettel().ReadAllVerzeichnisse,
+		s.storeObjekten.Zettel().ReadAll,
 	}
 
 	if s.konfig.IncludeCwd {
@@ -431,7 +430,7 @@ func (s *Store) Read(p string) (cz zettel_checked_out.Zettel, err error) {
 
 	var zt *zettel.Transacted
 
-	if zt, err = s.storeObjekten.Zettel().ReadHinweisSchwanzen(
+	if zt, err = s.storeObjekten.Zettel().ReadOne(
 		cz.External.Sku.Kennung,
 	); err != nil {
 		// if errors.Is(err, store_objekten.ErrNotFound{}) {

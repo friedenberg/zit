@@ -220,27 +220,6 @@ func (s *zettelStore) writeNamedZettelToIndex(
 	return
 }
 
-// TODO-P3 rename to ReadOne
-func (s zettelStore) ReadHinweisSchwanzen(
-	h hinweis.Hinweis,
-) (zv *zettel.Transacted, err error) {
-	return s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(h)
-}
-
-// TODO-P3 rename to ReadAllSchwanzen
-func (i *zettelStore) ReadAllSchwanzenVerzeichnisse(
-	w collections.WriterFunc[*zettel.Transacted],
-) (err error) {
-	return i.verzeichnisseSchwanzen.ReadMany(w)
-}
-
-// TODO-P3 rename to ReadAll
-func (i *zettelStore) ReadAllVerzeichnisse(
-	w collections.WriterFunc[*zettel.Transacted],
-) (err error) {
-	return i.verzeichnisseAll.ReadMany(w)
-}
-
 func (s zettelStore) ReadOne(
 	i id.Id,
 ) (tz *zettel.Transacted, err error) {
@@ -256,6 +235,18 @@ func (s zettelStore) ReadOne(
 	}
 
 	return
+}
+
+func (i *zettelStore) ReadAllSchwanzen(
+	w collections.WriterFunc[*zettel.Transacted],
+) (err error) {
+	return i.verzeichnisseSchwanzen.ReadMany(w)
+}
+
+func (i *zettelStore) ReadAll(
+	w collections.WriterFunc[*zettel.Transacted],
+) (err error) {
+	return i.verzeichnisseAll.ReadMany(w)
 }
 
 func (s *zettelStore) Create(
@@ -320,7 +311,7 @@ func (s *zettelStore) Create(
 		return
 	}
 
-	//TODO-P2 assert no changes
+	errors.Todo(errors.P2, "assert no changes")
 	if err = s.zettelTransactedWriter.New(tz); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -329,11 +320,12 @@ func (s *zettelStore) Create(
 	return
 }
 
-// TODO support dry run
 func (s *zettelStore) Update(
 	z *zettel.Objekte,
 	h *hinweis.Hinweis,
 ) (tz *zettel.Transacted, err error) {
+	errors.Todo(errors.P2, "support dry run")
+
 	if !s.common.LockSmith.IsAcquired() {
 		err = ErrLockRequired{
 			Operation: "update",

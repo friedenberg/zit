@@ -36,7 +36,7 @@ func (s Store) ReadExternalZettelFromAktePath(p string) (cz zettel_checked_out.Z
 
 	var zt *zettel.Transacted
 
-	if zt, err = s.storeObjekten.Zettel().ReadHinweisSchwanzen(
+	if zt, err = s.storeObjekten.Zettel().ReadOne(
 		cz.External.Sku.Kennung,
 	); err != nil {
 		if errors.Is(err, store_objekten.ErrNotFound{}) {

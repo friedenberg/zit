@@ -61,7 +61,7 @@ func (c OpenAkte) RunWithIds(store *umwelt.Umwelt, is id_set.Set) (err error) {
 		func(h hinweis.Hinweis) {
 			var tz *zettel.Transacted
 
-			if tz, err = store.StoreObjekten().Zettel().ReadHinweisSchwanzen(h); err != nil {
+			if tz, err = store.StoreObjekten().Zettel().ReadOne(h); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

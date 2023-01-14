@@ -145,10 +145,10 @@ func (op Server) skusForFilter(
 		return
 	}
 
-	method := op.umwelt.StoreObjekten().Zettel().ReadAllSchwanzenVerzeichnisse
+	method := op.umwelt.StoreObjekten().Zettel().ReadAllSchwanzen
 
 	if op.umwelt.Konfig().IncludeHistory {
-		method = op.umwelt.StoreObjekten().Zettel().ReadAllVerzeichnisse
+		method = op.umwelt.StoreObjekten().Zettel().ReadAll
 	}
 
 	if err = method(

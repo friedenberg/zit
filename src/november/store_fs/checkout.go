@@ -17,7 +17,7 @@ func (s *Store) Checkout(
 	zcs = zettel_checked_out.MakeMutableSetUnique(0)
 	zts := zettel.MakeMutableSetUnique(0)
 
-	if err = s.storeObjekten.Zettel().ReadAllSchwanzenVerzeichnisse(
+	if err = s.storeObjekten.Zettel().ReadAllSchwanzen(
 		collections.MakeChain(
 			zettel.MakeWriterKonfig(s.konfig),
 			ztw,
