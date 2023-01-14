@@ -70,13 +70,18 @@ func (f KeyValues) ReadFormat(
 		loc := strings.Index(line, " ")
 
 		if line == "" {
-			//TODO this should be cleaned up
+			errors.Todo(errors.P4, "handle empty lines in a more structured way")
 		}
 
 		if tryHeader {
 			if line != header {
-				//TODO include line number
-				err = errors.Errorf("expected header %q but got %q", header, line)
+				err = errors.Errorf(
+					"expected header %q but got %q, line number: %d",
+					header,
+					line,
+					loc,
+				)
+
 				return
 			}
 
@@ -85,8 +90,7 @@ func (f KeyValues) ReadFormat(
 			v := line[loc+1:]
 
 			if err = o.SetKeyValue(line[:loc], v); err != nil {
-				//TODO include line number
-				err = errors.Wrap(err)
+				err = errors.Wrapf(err, "Line Number: %d", loc)
 				return
 			}
 		}

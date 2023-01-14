@@ -81,12 +81,16 @@ func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 
 	u.sonnenaufgang = ts.Now()
 
-	//TODO-P4 consider moving to konfig_compiled
+	errors.Todo(errors.P4, "find a better place for this")
 	{
 		if kCli.Verbose {
 			errors.SetVerbose()
 		} else {
 			log.SetOutput(ioutil.Discard)
+		}
+
+		if kCli.Todo {
+			errors.SetTodoOn()
 		}
 
 		standortOptions := standort.Options{

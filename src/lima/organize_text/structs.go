@@ -37,9 +37,9 @@ func makeZettel(
 		}
 	}
 
+	errors.Todo(errors.P4, "add bez in a better way")
 	z = zettel{
-		Hinweis: h,
-		//TODO do this smart
+		Hinweis:     h,
 		Bezeichnung: bezeichnung.Make(named.Objekte.Description()),
 	}
 

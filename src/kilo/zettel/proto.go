@@ -3,6 +3,7 @@ package zettel
 import (
 	"flag"
 
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
@@ -15,9 +16,10 @@ type ProtoZettel struct {
 }
 
 func MakeProtoZettel(k konfig_compiled.Compiled) ProtoZettel {
+	errors.Todo(errors.P1, "modify konfig to keep etiketten set")
+
 	return ProtoZettel{
-		Typ: k.DefaultTyp.Sku.Kennung,
-		//TODO-P1: modify konfig to keep etiketten set
+		Typ:       k.DefaultTyp.Sku.Kennung,
 		Etiketten: kennung.MakeEtikettSet(),
 	}
 }

@@ -81,12 +81,9 @@ func (zws *Schwanzen) WriteZettelTransacted(
 	z *Transacted,
 ) (err error) {
 	if ok := zws.Set(z); !ok {
-		errors.Log().Printf("TODO unable to set %s", z.Sku.Kennung)
 		err = collections.ErrStopIteration
 		return
 	}
-
-	errors.Log().Printf("TODO unable to set %s", z.Sku.Kennung)
 
 	return
 }

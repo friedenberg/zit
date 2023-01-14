@@ -5,7 +5,6 @@ import (
 	"sort"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/sha"
@@ -493,16 +492,9 @@ func (s *zettelStore) transactedWithHead(
 	return
 }
 
-func (s *zettelStore) HasObjekte(sh sha.Sha) (ok bool) {
-	p := id.Path(sh, s.common.Standort.DirObjektenZettelen())
-	ok = files.Exists(p)
-
-	return
-}
-
 // TODO-P0 implement correctly
 // include writing objekten and checking akten?
-func (s *zettelStore) Inherit(tz *zettel.Transacted, sk sku.Sku2) (err error) {
+func (s *zettelStore) Inherit(tz *zettel.Transacted) (err error) {
 	errors.Log().Printf("inheriting %s", tz.Sku.ObjekteSha)
 
 	if _, err = s.WriteZettelObjekte(tz.Objekte); err != nil {
@@ -510,16 +502,8 @@ func (s *zettelStore) Inherit(tz *zettel.Transacted, sk sku.Sku2) (err error) {
 		return
 	}
 
-	// if tz, err = s.addZettelToTransaktion(
-	// 	&tz.Objekte,
-	// 	&tz.Sku.ObjekteSha,
-	// 	&tz.Sku.Kennung,
-	// ); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
-
-	s.common.Bestandsaufnahme.Akte.Skus.Push(sk)
+	s.common.Bestandsaufnahme.Akte.Skus.Push(tz.Sku.Sku2())
+	s.common.Transaktion.Skus.Add(&tz.Sku)
 
 	if err = s.writeNamedZettelToIndex(tz); err != nil {
 		err = errors.Wrap(err)

@@ -83,7 +83,7 @@ func (op Server) GetNeededSkus(
 			continue
 		}
 
-		if op.umwelt.StoreObjekten().Zettel().HasObjekte(sk.ObjekteSha) {
+		if op.umwelt.Standort().HasObjekte(sk.Gattung, sk.ObjekteSha) {
 			errors.Log().Printf("already have objekte: %s", sk.ObjekteSha)
 			return
 		}

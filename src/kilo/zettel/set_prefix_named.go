@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/golf/id_set"
 )
 
-// TODO rename
 type SetPrefixNamed map[kennung.Etikett]collections.MutableSet[id_set.Element]
 
 type SetPrefixNamedSegments struct {
@@ -16,6 +15,7 @@ type SetPrefixNamedSegments struct {
 }
 
 func NewSetPrefixNamed() *SetPrefixNamed {
+	errors.Todo(errors.P4, "rename set prefix named")
 	s := make(SetPrefixNamed)
 	return &s
 }

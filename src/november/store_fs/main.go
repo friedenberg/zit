@@ -434,12 +434,13 @@ func (s *Store) Read(p string) (cz zettel_checked_out.Zettel, err error) {
 	if zt, err = s.storeObjekten.Zettel().ReadHinweisSchwanzen(
 		cz.External.Sku.Kennung,
 	); err != nil {
-		if errors.Is(err, store_objekten.ErrNotFound{}) {
-			err = nil
-		} else {
-			err = errors.Wrap(err)
-			return
-		}
+		// if errors.Is(err, store_objekten.ErrNotFound{}) {
+		// 	err = nil
+		// } else {
+		err = errors.Wrap(err)
+		// }
+
+		return
 	}
 
 	cz.Internal = *zt

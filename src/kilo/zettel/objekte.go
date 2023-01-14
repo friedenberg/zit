@@ -3,6 +3,7 @@ package zettel
 import (
 	"strings"
 
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/echo/sha"
@@ -29,8 +30,9 @@ func (z *Objekte) SetAkteSha(v sha.Sha) {
 	z.Akte = v
 }
 
-// TODO-P4 figure out why this doesn't always work for `status`
 func (z Objekte) Equals(z1 *Objekte) bool {
+	errors.Todo(errors.P4, "figure out why this doesn't always work for `status`")
+
 	if z1 == nil {
 		return false
 	}

@@ -9,13 +9,14 @@ import (
 	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
 )
 
-// TODO-P3 rename to MakeSingleplexedFormatWriter
 func MakeSerializedFormatWriter(
 	f ObjekteFormatter,
 	out io.Writer,
 	arf gattung.AkteReaderFactory,
 	k konfig_compiled.Compiled,
 ) collections.WriterFunc[*Objekte] {
+	errors.Todo(errors.P3, "rename to MakeSingleplexedFormatWriter")
+
 	wf := func(z *Objekte) (err error) {
 		c := ObjekteFormatterContext{
 			Zettel:      *z,

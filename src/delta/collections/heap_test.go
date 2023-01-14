@@ -7,11 +7,29 @@ import (
 	"github.com/friedenberg/zit/src/bravo/test_logz"
 )
 
-// func TestMain(m *testing.M) {
-// 	errors.SetTesting()
-// 	code := m.Run()
-// 	os.Exit(code)
-// }
+func TestReset(t1 *testing.T) {
+	t := test_logz.T{T: t1}
+
+	els := []int_value.IntValue{
+		int_value.Make(1),
+		int_value.Make(0),
+		int_value.Make(3),
+		int_value.Make(4),
+		int_value.Make(2),
+	}
+
+	sut := MakeHeapFromSlice(els)
+
+	if sut.Len() != 5 {
+		t.Fatalf("expected len 5 but got %d", sut.Len())
+	}
+
+	sut.Reset(nil)
+
+	if sut.Len() != 0 {
+		t.Fatalf("expected len 0 but got %d", sut.Len())
+	}
+}
 
 func TestSaveAndRestore(t1 *testing.T) {
 	t := test_logz.T{T: t1}

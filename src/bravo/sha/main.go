@@ -25,6 +25,11 @@ type Sha struct {
 	value string
 }
 
+func MakeHashWriter() (h hash.Hash) {
+	h = sha256.New()
+	return
+}
+
 func Must(v string) (s Sha) {
 	s = Sha{}
 

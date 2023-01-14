@@ -99,4 +99,7 @@ function pull { # @test
 
 	run zit show one/uno
 	assert_output "$(cat "$expected")"
+
+	run zit pull -abbreviate-hinweisen=false -all "$wd"
+	assert_output ''
 }

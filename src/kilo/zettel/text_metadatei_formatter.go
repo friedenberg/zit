@@ -18,8 +18,9 @@ type TextMetadateiFormatter struct {
 	IncludeAkteSha             bool
 }
 
-// TODO-P3 turn *Objekte into an interface to allow zettel_external to use this
 func (f *TextMetadateiFormatter) Format(w1 io.Writer, m *Metadatei) (n int64, err error) {
+	errors.Todo(errors.P3, "turn *Objekte into an interface to allow zettel_external to use this")
+
 	w := format.NewWriter()
 
 	if m.Bezeichnung.String() != "" || !f.DoNotWriteEmptyBezeichnung {
@@ -29,7 +30,8 @@ func (f *TextMetadateiFormatter) Format(w1 io.Writer, m *Metadatei) (n int64, er
 	}
 
 	for _, e := range m.Etiketten.Sorted() {
-		//TODO-P3 determine how to handle this
+		errors.Todo(errors.P3, "determine how to handle this")
+
 		if e.IsEmpty() {
 			continue
 		}

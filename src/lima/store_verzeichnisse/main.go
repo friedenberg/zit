@@ -91,7 +91,6 @@ func (i *Zettelen) Flush() (err error) {
 	return
 }
 
-// TODO-P2 switch to pointer
 func (i *Zettelen) Add(tz *zettel.Transacted, v string) (err error) {
 	var n int
 
@@ -127,9 +126,10 @@ func (i *Zettelen) GetPageIndexKeyValue(
 }
 
 func (i *Zettelen) ReadMany(
-	//TODO switch to single writer and force callers to make chains
 	ws ...collections.WriterFunc[*zettel.Transacted],
 ) (err error) {
+	errors.Todo(errors.P3, "switch to single writer and force callers to make chains")
+
 	wg := &sync.WaitGroup{}
 	ch := make(chan struct{}, PageCount)
 	chErr := make(chan error)

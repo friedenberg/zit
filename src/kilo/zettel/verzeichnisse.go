@@ -5,6 +5,7 @@ import (
 	"io"
 	"strings"
 
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
@@ -13,7 +14,7 @@ import (
 type Verzeichnisse struct {
 	wasPopulated bool
 	// Etiketten               tridex.Tridex
-  //TODO-P0 add typen expanded sorted
+	//TODO-P0 add typen expanded sorted
 	EtikettenExpandedSorted []string
 	EtikettenSorted         []string
 	//TODO-P3 add
@@ -64,10 +65,11 @@ func (w writerGobEncoder) WriteZettelVerzeichnisse(z *Transacted) (err error) {
 	return w.enc.Encode(z)
 }
 
-// TODO-P3 add efficient parsing of hiding tags
 func MakeWriterKonfig(
 	k konfig_compiled.Compiled,
 ) collections.WriterFunc[*Transacted] {
+	errors.Todo(errors.P3, "add efficient parsing of hiding tags")
+
 	if k.IncludeHidden {
 		return collections.MakeWriterNoop[*Transacted]()
 	}

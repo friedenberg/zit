@@ -157,6 +157,7 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	](
 		client.ObjekteReader,
 		func(sh sha.Sha) (rc sha.ReadCloser, err error) {
+			errors.Todo(errors.P2, "move to own constructor")
 			var or io.ReadCloser
 
 			if or, err = client.AkteReader(sh); err != nil {
@@ -177,12 +178,15 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 			return
 		},
-		objekte.MakeParserStorerWithCustomFormat[zettel.Objekte, *zettel.Objekte](
-			u.StoreObjekten(),
-			&zettel.FormatObjekte{
-				IgnoreTypErrors: true,
-			},
-		),
+		&zettel.FormatObjekte{
+			IgnoreTypErrors: true,
+		},
+		// objekte.MakeParserStorerWithCustomFormat[zettel.Objekte, *zettel.Objekte](
+		// 	u.StoreObjekten(),
+		// 	&zettel.FormatObjekte{
+		// 		IgnoreTypErrors: true,
+		// 	},
+		// ),
 		objekte.MakeNopAkteParser[zettel.Objekte, *zettel.Objekte](),
 		p,
 	)
@@ -194,26 +198,44 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 				return
 			}
 
-			if u.StoreObjekten().Zettel().HasObjekte(sk.ObjekteSha) {
+			//TODO-P1 check for akte sha
+			//TODO-P1 write akte
+			if u.Standort().HasObjekte(sk.Gattung, sk.ObjekteSha) {
 				errors.Log().Printf("already have objekte: %s", sk.ObjekteSha)
 				return
 			}
 
 			errors.Log().Printf("need objekte: %s", sk.ObjekteSha)
 
-			//TODO-P1 check for akte sha
-			//TODO-P1 write akte
-
 			var t *zettel.Transacted
 
-			//TODO-P0 ensure objekte is written after being parsed rather than being
-			//tee'd
 			if t, err = inflator.InflateFromSku2(sk); err != nil {
 				err = errors.Wrapf(err, "Sku: %s", sk)
 				return
 			}
 
-			if err = u.StoreObjekten().Zettel().Inherit(t, sk); err != nil {
+			f := &zettel.FormatObjekte{
+				IgnoreTypErrors: true,
+			}
+
+			var ow sha.WriteCloser
+
+			if ow, err = u.StoreObjekten().ObjekteWriter(t.GetGattung()); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			defer errors.DeferredCloser(&err, ow)
+
+			if _, err = f.Format(ow, &t.Objekte); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			t.Sku.ObjekteSha = ow.Sha()
+			t.Sku.AkteSha = t.AkteSha()
+
+			if err = u.StoreObjekten().Zettel().Inherit(t); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

@@ -1,20 +1,12 @@
 package collections
 
 import (
-	"os"
 	"reflect"
 	"sort"
 	"testing"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/test_logz"
 )
-
-func TestMain(m *testing.M) {
-	errors.SetTesting()
-	code := m.Run()
-	os.Exit(code)
-}
 
 func makeStringValues(vs ...string) (out []StringValue) {
 	out = make([]StringValue, len(vs))

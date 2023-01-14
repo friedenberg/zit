@@ -101,13 +101,7 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) InflateFromSku2(
 		return
 	}
 
-	sh := t.AkteSha()
-
-	if sh.IsNull() {
-		return
-	}
-
-	if err = h.readAkte(sh, t); err != nil {
+	if err = h.readAkte(t); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -152,13 +146,7 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) InflateFromSku(
 		return
 	}
 
-	sh := t.AkteSha()
-
-	if sh.IsNull() {
-		return
-	}
-
-	if err = h.readAkte(sh, t); err != nil {
+	if err = h.readAkte(t); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -185,13 +173,7 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) InflateFromSkuLike(
 		return
 	}
 
-	sh := t.AkteSha()
-
-	if sh.IsNull() {
-		return
-	}
-
-	if err = h.readAkte(sh, t); err != nil {
+	if err = h.readAkte(t); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -225,10 +207,13 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) readObjekte(
 }
 
 func (h *transactedInflator[T, T1, T2, T3, T4, T5]) readAkte(
-	sh sha.Sha,
 	t *Transacted[T, T1, T2, T3, T4, T5],
 ) (err error) {
 	if h.akteParser == nil {
+		return
+	}
+
+	if t.AkteSha().IsNull() {
 		return
 	}
 

@@ -63,6 +63,7 @@ func (f ParserStorer[T, T1]) Parse(
 
 	defer errors.DeferredCloser(&err, ow)
 
+	errors.Todo(errors.P0, "must update sku with sha from writing to OW")
 	if _, err = f.format.Format(ow, o); err != nil {
 		err = errors.Wrap(err)
 		return

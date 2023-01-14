@@ -18,7 +18,7 @@ type Page struct {
 	pageId
 	ioFactory
 	pool        *collections.Pool[zettel.Transacted]
-	added2      zettel.HeapTransacted
+	added       zettel.HeapTransacted
 	flushFilter collections.WriterFunc[*zettel.Transacted]
 	State
 }
@@ -40,7 +40,7 @@ func makeZettelenPage(
 		ioFactory:   iof,
 		pageId:      pid,
 		pool:        pool,
-		added2:      zettel.MakeHeapTransacted(),
+		added:       zettel.MakeHeapTransacted(),
 		flushFilter: flushFilter,
 	}
 
@@ -81,8 +81,7 @@ func (zp *Page) Add(z *zettel.Transacted) (err error) {
 		return
 	}
 
-	//TODO-P0 sort
-	zp.added2.Add(*z)
+	zp.added.Add(*z)
 	zp.setState(StateChanged)
 
 	return
@@ -121,6 +120,8 @@ func (zp *Page) Flush() (err error) {
 		err = errors.Wrap(err)
 		return
 	}
+
+	zp.added.Reset(nil)
 
 	return
 }
@@ -213,7 +214,7 @@ func (zp *Page) Copy(
 	dec := gob.NewDecoder(r)
 
 	defer func() {
-		zp.added2.Restore()
+		zp.added.Restore()
 	}()
 
 	for {
@@ -231,14 +232,23 @@ func (zp *Page) Copy(
 			}
 		}
 
+	LOOP:
 		for {
-			peeked, ok := zp.added2.PeekPtr()
+			peeked, ok := zp.added.PeekPtr()
 
-			if !ok || !peeked.Less(*tz) {
+			switch {
+			case !ok:
+				break LOOP
+
+			case peeked.Equals(tz):
+				zp.added.PopAndSave()
 				break
+
+			case !peeked.Less(*tz):
+				break LOOP
 			}
 
-			popped, _ := zp.added2.PopAndSave()
+			popped, _ := zp.added.PopAndSave()
 
 			if err = w(&popped); err != nil {
 				if collections.IsStopIteration(err) {
@@ -263,7 +273,7 @@ func (zp *Page) Copy(
 	}
 
 	for {
-		popped, ok := zp.added2.PopAndSave()
+		popped, ok := zp.added.PopAndSave()
 
 		if !ok {
 			break

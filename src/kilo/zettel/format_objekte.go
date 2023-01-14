@@ -13,8 +13,9 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 )
 
-// TODO-P1 remove this
 func (z Objekte) ObjekteSha() (s sha.Sha, err error) {
+	errors.Todo(errors.P1, "remove this")
+
 	hash := sha256.New()
 
 	o := FormatObjekte{}
@@ -33,7 +34,6 @@ func (z Objekte) ObjekteSha() (s sha.Sha, err error) {
 	return
 }
 
-// TODO-P1 replace with objekte.Format
 type FormatObjekte struct {
 	IgnoreTypErrors bool
 }
@@ -42,6 +42,8 @@ func (f FormatObjekte) Format(
 	w1 io.Writer,
 	z *Objekte,
 ) (n int64, err error) {
+	errors.Todo(errors.P1, "replace with objekte.Format")
+
 	w := format.NewWriter()
 
 	w.WriteFormat("%s %s", gattung.Akte, z.Akte)

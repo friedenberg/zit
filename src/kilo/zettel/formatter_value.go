@@ -63,13 +63,14 @@ func (fv *FormatterValue) FuncFormatterVerzeichnisse(
 	)
 }
 
-// TODO-P2 convert to Verzeichnisse
 func (fv *FormatterValue) FuncFormatter(
 	out io.Writer,
 	af gattung.AkteIOFactory,
 	k konfig_compiled.Compiled,
 	logFunc collections.WriterFunc[*Transacted],
 ) collections.WriterFunc[*Transacted] {
+	errors.Todo(errors.P2, "convert to verzeichnisse")
+
 	switch fv.string {
 	case "log":
 		return logFunc
@@ -181,7 +182,7 @@ func (fv *FormatterValue) FuncFormatter(
 		}
 
 	case "toml":
-		//TODO-P3 limit to just zettels that support toml
+		errors.Todo(errors.P3, "limit to only zettels supporting toml")
 		return func(o *Transacted) (err error) {
 			if _, err = io.WriteString(
 				out, fmt.Sprintf("['%s']\n", o.Sku.Kennung),
@@ -243,7 +244,7 @@ func (fv *FormatterValue) FuncFormatter(
 
 	case "hinweis-akte":
 		return func(o *Transacted) (err error) {
-			//TODO-P3 make into option
+			errors.Todo(errors.P3, "convert into an option")
 			if o.Objekte.Akte.IsNull() {
 				return
 			}
