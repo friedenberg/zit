@@ -72,10 +72,6 @@ func (a Sku2) GetSchwanz() ts.Time {
 	return a.Tai.AsTime()
 }
 
-func (a Sku2) GetId() IdLike {
-	return a.Kennung
-}
-
 func (a Sku2) GetKey() string {
 	return a.String()
 }
@@ -84,12 +80,20 @@ func (a Sku2) GetTime() ts.Time {
 	return a.Tai.AsTime()
 }
 
+func (a Sku2) GetId() IdLike {
+	return a.Kennung
+}
+
 func (a Sku2) GetGattung() gattung.Gattung {
 	return a.Gattung
 }
 
 func (a Sku2) GetObjekteSha() sha.Sha {
 	return a.ObjekteSha
+}
+
+func (a Sku2) GetAkteSha() sha.Sha {
+	return a.AkteSha
 }
 
 func (a Sku2) Less(b Sku2) (ok bool) {

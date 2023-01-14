@@ -15,15 +15,15 @@ type IdLike = fmt.Stringer
 
 type DataIdentity interface {
 	GetTime() ts.Time
+	GetId() IdLike
 	gattung.GattungLike
 	GetObjekteSha() sha.Sha
-	//TODO-P1 add GetTime
+	GetAkteSha() sha.Sha
 	//TODO-P1 add GetAkteSha
 }
 
 type SkuLike interface {
 	DataIdentity
-	GetId() IdLike
 	SetTimeAndFields(ts.Time, ...string) error
 	SetFromSku(Sku) error
 

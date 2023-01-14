@@ -226,12 +226,12 @@ func (s etikettStore) AllInChain(k kennung.Etikett) (c []*etikett.Transacted, er
 }
 
 func (s *etikettStore) reindexOne(
-	o sku.SkuLike,
+  o sku.DataIdentity,
 ) (err error) {
 	var te *etikett.Transacted
 	defer s.pool.Put(te)
 
-	if te, err = s.InflateFromSkuLike(o); err != nil {
+	if te, err = s.InflateFromDataIdentity(o); err != nil {
 		errors.Wrap(err)
 		return
 	}

@@ -19,7 +19,7 @@ type TransactedInflator[
 ] interface {
 	InflateFromSku(sku.Sku) (*Transacted[T, T1, T2, T3, T4, T5], error)
 	InflateFromSku2(sku.Sku2) (*Transacted[T, T1, T2, T3, T4, T5], error)
-	InflateFromSkuLike(sku.SkuLike) (*Transacted[T, T1, T2, T3, T4, T5], error)
+	InflateFromDataIdentity(sku.DataIdentity) (*Transacted[T, T1, T2, T3, T4, T5], error)
 }
 
 type transactedInflator[
@@ -154,8 +154,8 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) InflateFromSku(
 	return
 }
 
-func (h *transactedInflator[T, T1, T2, T3, T4, T5]) InflateFromSkuLike(
-	o sku.SkuLike,
+func (h *transactedInflator[T, T1, T2, T3, T4, T5]) InflateFromDataIdentity(
+	o sku.DataIdentity,
 ) (t *Transacted[T, T1, T2, T3, T4, T5], err error) {
 	if h.pool == nil {
 		t = new(Transacted[T, T1, T2, T3, T4, T5])
@@ -163,7 +163,7 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) InflateFromSkuLike(
 		t = h.pool.Get()
 	}
 
-	if err = t.SetSkuLike(o); err != nil {
+	if err = t.SetDataIdentity(o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

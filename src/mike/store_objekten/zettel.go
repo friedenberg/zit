@@ -512,14 +512,14 @@ func (s *zettelStore) Inherit(tz *zettel.Transacted) (err error) {
 }
 
 func (s *zettelStore) reindexOne(
-	o sku.SkuLike,
+	o sku.DataIdentity,
 ) (err error) {
 	var tz *zettel.Transacted
 	defer s.pool.Put(tz)
 
 	errors.Log().Printf("reindexing: %#v", o)
 
-	if tz, err = s.InflateFromSkuLike(o); err != nil {
+	if tz, err = s.InflateFromDataIdentity(o); err != nil {
 		//TODO-P2 decide on how to handle format errors
 		errors.Err().Print(err)
 		err = nil

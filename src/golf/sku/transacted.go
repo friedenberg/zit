@@ -267,6 +267,10 @@ func (s Transacted[T, T1]) GetObjekteSha() sha.Sha {
 	return s.ObjekteSha
 }
 
+func (s Transacted[T, T1]) GetAkteSha() sha.Sha {
+	return s.AkteSha
+}
+
 func (s Transacted[T, T1]) GetTransactionIndex() int_value.IntValue {
 	return s.TransactionIndex
 }

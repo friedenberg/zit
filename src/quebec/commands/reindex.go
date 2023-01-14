@@ -38,7 +38,10 @@ func (c Reindex) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	defer errors.Deferred(&err, u.Unlock)
 
 	if c.UseBestandsaufnahme {
-		errors.Todo(errors.P0, "implement Bestandsaufnahme reindexing")
+		if err = u.StoreObjekten().ReindexBestandsaufnahme(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	} else {
 		if err = u.StoreObjekten().Reindex(); err != nil {
 			err = errors.Wrap(err)

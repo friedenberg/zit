@@ -129,3 +129,27 @@ func (s Standort) FileVerzeichnisseZettelen() string {
 func (s Standort) FileVerzeichnisseEtiketten() string {
 	return s.DirVerzeichnisse("Etiketten")
 }
+
+func (s Standort) ResetVerzeichnisse() (err error) {
+	if err = os.RemoveAll(s.DirVerzeichnisse()); err != nil {
+		err = errors.Wrapf(err, "failed to remove verzeichnisse dir")
+		return
+	}
+
+	if err = os.MkdirAll(s.DirVerzeichnisse(), os.ModeDir|0755); err != nil {
+		err = errors.Wrapf(err, "failed to make verzeichnisse dir")
+		return
+	}
+
+	if err = os.MkdirAll(s.DirVerzeichnisseZettelenNeue(), os.ModeDir|0755); err != nil {
+		err = errors.Wrapf(err, "failed to make verzeichnisse dir")
+		return
+	}
+
+	if err = os.MkdirAll(s.DirVerzeichnisseZettelenNeueSchwanzen(), os.ModeDir|0755); err != nil {
+		err = errors.Wrapf(err, "failed to make verzeichnisse dir")
+		return
+	}
+
+	return
+}

@@ -238,7 +238,7 @@ func (s typStore) ReadAll(
 
 					var te *typ.Transacted
 
-					if te, err = s.InflateFromSkuLike(o); err != nil {
+					if te, err = s.InflateFromDataIdentity(o); err != nil {
 						if errors.Is(err, toml.Error{}) {
 							err = nil
 						} else {
@@ -299,12 +299,12 @@ func (s typStore) AllInChain(k kennung.Typ) (c []*typ.Transacted, err error) {
 }
 
 func (s *typStore) reindexOne(
-	o sku.SkuLike,
+	o sku.DataIdentity,
 ) (err error) {
 	var te *typ.Transacted
 	defer s.pool.Put(te)
 
-	if te, err = s.InflateFromSkuLike(o); err != nil {
+	if te, err = s.InflateFromDataIdentity(o); err != nil {
 		if errors.Is(err, toml.Error{}) {
 			err = nil
 			return

@@ -95,6 +95,24 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) Equals(
 	return true
 }
 
+func (a *Transacted[T, T1, T2, T3, T4, T5]) SetDataIdentity(
+	o sku.DataIdentity,
+) (err error) {
+	var h T2
+
+	if err = T3(&h).Set(o.GetId().String()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	a.Sku.Kennung = h
+	a.Sku.ObjekteSha = o.GetObjekteSha()
+	a.Sku.AkteSha = o.GetAkteSha()
+	a.Sku.Schwanz = o.GetTime()
+
+	return
+}
+
 func (a *Transacted[T, T1, T2, T3, T4, T5]) SetSkuLike(
 	o sku.SkuLike,
 ) (err error) {

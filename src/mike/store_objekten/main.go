@@ -1,8 +1,6 @@
 package store_objekten
 
 import (
-	"os"
-
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/bravo/files"
@@ -270,23 +268,8 @@ func (s *Store) Reindex() (err error) {
 		return
 	}
 
-	if err = os.RemoveAll(s.common.Standort.DirVerzeichnisse()); err != nil {
-		err = errors.Wrapf(err, "failed to remove verzeichnisse dir")
-		return
-	}
-
-	if err = os.MkdirAll(s.common.Standort.DirVerzeichnisse(), os.ModeDir|0755); err != nil {
-		err = errors.Wrapf(err, "failed to make verzeichnisse dir")
-		return
-	}
-
-	if err = os.MkdirAll(s.common.Standort.DirVerzeichnisseZettelenNeue(), os.ModeDir|0755); err != nil {
-		err = errors.Wrapf(err, "failed to make verzeichnisse dir")
-		return
-	}
-
-	if err = os.MkdirAll(s.common.Standort.DirVerzeichnisseZettelenNeueSchwanzen(), os.ModeDir|0755); err != nil {
-		err = errors.Wrapf(err, "failed to make verzeichnisse dir")
+	if err = s.common.Standort.ResetVerzeichnisse(); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -296,55 +279,13 @@ func (s *Store) Reindex() (err error) {
 		return
 	}
 
+	f1 := s.getReindexFunc()
 	f := func(t *transaktion.Transaktion) (err error) {
 		errors.Out().Printf("%s/%s: %s", t.Time.Kopf(), t.Time.Schwanz(), t.Time)
 
 		if err = t.Skus.Each(
-			func(o sku.SkuLike) (err error) {
-				switch o.GetGattung() {
-
-				case gattung.Konfig:
-					if err = s.konfigStore.reindexOne(
-						o,
-					); err != nil {
-						err = errors.Wrap(err)
-						return
-					}
-
-				case gattung.Typ:
-					if err = s.typStore.reindexOne(
-						o,
-					); err != nil {
-						err = errors.Wrapf(err, "Kennung: %s", o.GetId())
-						return
-					}
-
-				case gattung.Etikett:
-					if err = s.etikettStore.reindexOne(
-						o,
-					); err != nil {
-						err = errors.Wrapf(
-							err,
-							"Sku: %s",
-							o,
-						)
-
-						return
-					}
-
-				case gattung.Zettel:
-					if err = s.zettelStore.reindexOne(
-						o,
-					); err != nil {
-						err = errors.Wrap(err)
-						return
-					}
-
-				default:
-					return
-				}
-
-				return
+			func(sk sku.SkuLike) (err error) {
+				return f1(sk)
 			},
 		); err != nil {
 			err = errors.Wrapf(
@@ -362,6 +303,83 @@ func (s *Store) Reindex() (err error) {
 	}
 
 	if err = s.ReadAllTransaktions(f); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Store) getReindexFunc() func(sku.DataIdentity) error {
+	stores := map[gattung.Gattung]reindexer{
+		gattung.Konfig:  s.konfigStore,
+		gattung.Typ:     s.typStore,
+		gattung.Etikett: s.etikettStore,
+		gattung.Zettel:  s.zettelStore,
+	}
+
+	return func(o sku.DataIdentity) (err error) {
+		var st reindexer
+		ok := false
+
+		g := o.GetGattung()
+
+		if st, ok = stores[g]; !ok {
+			err = errors.Wrapf(gattung.ErrUnsupportedGattung, "Gattung: %s", g)
+			return
+		}
+
+		if err = st.reindexOne(o); err != nil {
+			err = errors.Wrapf(err, "Sku %s", o)
+			return
+		}
+
+		return
+	}
+}
+
+func (s *Store) ReindexBestandsaufnahme() (err error) {
+	if !s.common.LockSmith.IsAcquired() {
+		err = ErrLockRequired{
+			Operation: "reindex",
+		}
+
+		return
+	}
+
+	if err = s.common.Standort.ResetVerzeichnisse(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	//TODO-P3 move to zettelStore
+	if err = s.zettelStore.indexKennung.reset(); err != nil {
+		err = errors.Wrapf(err, "failed to reset index kennung")
+		return
+	}
+
+	f1 := s.getReindexFunc()
+	f := func(t *bestandsaufnahme.Objekte) (err error) {
+		errors.Out().Printf("%s", t)
+
+		if err = t.Akte.Skus.Each(
+			func(sk sku.Sku2) (err error) {
+				return f1(sk)
+			},
+		); err != nil {
+			err = errors.Wrapf(
+				err,
+				"Bestandsaufnahme: %s",
+				t.Tai,
+			)
+
+			return
+		}
+
+		return
+	}
+
+	if err = s.bestandsaufnahmeStore.ReadAll(f); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

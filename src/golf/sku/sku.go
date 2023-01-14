@@ -64,12 +64,20 @@ func (a Sku) GetTime() ts.Time {
 	return a.Time
 }
 
+func (a Sku) GetId() IdLike {
+	return a.Kennung
+}
+
 func (a Sku) GetGattung() gattung.Gattung {
 	return a.Gattung
 }
 
 func (a Sku) GetObjekteSha() sha.Sha {
 	return a.ObjekteSha
+}
+
+func (a Sku) GetAkteSha() sha.Sha {
+	return a.AkteSha
 }
 
 func (a Sku) Less(b *Sku) (ok bool) {

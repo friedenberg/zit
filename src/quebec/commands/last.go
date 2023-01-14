@@ -46,7 +46,7 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			case gattung.Typ:
 				var te *typ.Transacted
 
-				if te, err = u.StoreObjekten().Typ().InflateFromSkuLike(
+				if te, err = u.StoreObjekten().Typ().InflateFromDataIdentity(
 					o,
 				); err != nil {
 					err = errors.Wrap(err)

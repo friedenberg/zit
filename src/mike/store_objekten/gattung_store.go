@@ -11,5 +11,5 @@ type GattungStore interface {
 }
 
 type reindexer interface {
-	reindexOne(sku.SkuLike) error
+	reindexOne(sku.DataIdentity) error
 }
