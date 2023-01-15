@@ -12,7 +12,8 @@ import (
 )
 
 type TextFormat struct {
-	arf gattung.AkteIOFactory
+	arf              gattung.AkteIOFactory
+	ignoreTomlErrors bool
 }
 
 func MakeFormatText(arf gattung.AkteIOFactory) *TextFormat {
@@ -24,7 +25,8 @@ func MakeFormatText(arf gattung.AkteIOFactory) *TextFormat {
 // TODO-P4 remove
 func MakeFormatTextIgnoreTomlErrors(arf gattung.AkteIOFactory) *TextFormat {
 	return &TextFormat{
-		arf: arf,
+		arf:              arf,
+		ignoreTomlErrors: true,
 	}
 }
 
@@ -54,10 +56,27 @@ func (f TextFormat) ReadFormat(r io.Reader, t *Objekte) (n int64, err error) {
 			close(chDone)
 		}()
 
+		defer func() {
+			if r := recover(); r != nil {
+				switch {
+				case !errors.IsEOF(err) && !f.ignoreTomlErrors:
+					err = toml.MakeError(errors.Errorf("panicked during toml decoding: %s", r))
+					pr.CloseWithError(errors.Wrap(err))
+
+				case !errors.IsEOF(err) && f.ignoreTomlErrors:
+					err = nil
+				}
+			}
+		}()
+
 		if err = td.Decode(&t.Akte); err != nil {
-			if !errors.IsEOF(err) {
+			switch {
+			case !errors.IsEOF(err) && !f.ignoreTomlErrors:
 				err = errors.Wrap(toml.MakeError(err))
 				pr.CloseWithError(err)
+
+			case !errors.IsEOF(err) && f.ignoreTomlErrors:
+				err = nil
 			}
 		}
 

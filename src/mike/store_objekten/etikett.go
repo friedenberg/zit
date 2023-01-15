@@ -79,7 +79,7 @@ func makeEtikettStore(
 			sa,
 			sa,
 			nil,
-			gattung.Parser[etikett.Objekte, *etikett.Objekte](
+			gattung.Format[etikett.Objekte, *etikett.Objekte](
 				etikett.MakeFormatText(sa),
 			),
 			pool,

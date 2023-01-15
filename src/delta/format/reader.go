@@ -95,7 +95,13 @@ func ReadLines(
 
 	var last error
 
+	isEOF := false
+
 	for {
+		if isEOF {
+			break
+		}
+
 		var rawLine, line string
 
 		rawLine, err = r.ReadString('\n')
@@ -107,11 +113,15 @@ func ReadLines(
 		}
 
 		if errors.IsEOF(err) {
+			isEOF = true
 			err = nil
-			break
 		}
 
 		line = strings.TrimSuffix(rawLine, "\n")
+
+		if line == "" {
+			continue
+		}
 
 		if len(rffs) == i {
 			//TODO add line
@@ -143,11 +153,13 @@ func ReadLines(
 func MakeLineReaderKeyValues(
 	dict map[string]FuncReadLine,
 ) FuncReadLine {
+	si, _ := errors.MakeStackInfo(1)
+
 	return func(line string) (err error) {
 		loc := strings.Index(line, " ")
 
 		if loc == -1 {
-			err = errors.Errorf("expected at least one space, but found none: %q", line)
+			err = si.Errorf("expected at least one space, but found none: %q", line)
 			return
 		}
 
@@ -158,12 +170,12 @@ func MakeLineReaderKeyValues(
 		ok := false
 
 		if reader, ok = dict[key]; !ok {
-			err = errors.Errorf("key not supported: %q", key)
+			err = si.Errorf("key not supported: %q", key)
 			return
 		}
 
 		if err = reader(value); err != nil {
-			err = errors.Errorf("%s: %q", err, value)
+			err = si.Errorf("%s: %q", err, value)
 			return
 		}
 

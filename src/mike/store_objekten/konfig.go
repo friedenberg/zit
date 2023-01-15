@@ -74,7 +74,7 @@ func makeKonfigStore(
 			sa,
 			sa,
 			nil,
-			gattung.Parser[konfig.Objekte, *konfig.Objekte](
+			gattung.Format[konfig.Objekte, *konfig.Objekte](
 				konfig.MakeFormatText(sa),
 			),
 			pool,

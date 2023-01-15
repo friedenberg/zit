@@ -16,6 +16,7 @@ import (
 type TypStore interface {
 	GattungStore
 
+	objekte.Inheritor[*typ.Transacted]
 	objekte.TransactedLogger[*typ.Transacted]
 
 	objekte.AkteTextSaver[
@@ -95,7 +96,7 @@ func makeTypStore(
 			sa,
 			sa,
 			nil,
-			gattung.Parser[typ.Objekte, *typ.Objekte](
+			gattung.Format[typ.Objekte, *typ.Objekte](
 				typ.MakeFormatTextIgnoreTomlErrors(sa),
 			),
 			pool,
@@ -295,6 +296,22 @@ func (s typStore) ReadOne(
 }
 
 func (s typStore) AllInChain(k kennung.Typ) (c []*typ.Transacted, err error) {
+	return
+}
+
+func (s *typStore) Inherit(t *typ.Transacted) (err error) {
+	errors.Log().Printf("inheriting %s", t.Sku.ObjekteSha)
+
+	s.common.Bestandsaufnahme.Akte.Skus.Push(t.Sku.Sku2())
+	s.common.Transaktion.Skus.Add(&t.Sku)
+	s.common.KonfigPtr().AddTyp(t)
+
+	if t.IsNew() {
+		s.TypLogWriter.New(t)
+	} else {
+		s.TypLogWriter.Updated(t)
+	}
+
 	return
 }
 

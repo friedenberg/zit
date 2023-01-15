@@ -66,7 +66,7 @@ function init_and_init { # @test
 	} >to_add
 
 	run zit new -edit=false -predictable-hinweisen to_add
-	assert_output '          (new) [o/u@8 !md "wow"]'
+	assert_output '          (new) [o/u@3 !md "wow"]'
 
 	run zit show one/uno
 	assert_output "$(cat to_add)"
@@ -78,7 +78,7 @@ function init_and_init { # @test
 	assert_output --partial '.zit/Kennung/Counter already exists, not overwriting'
 	assert_output --partial '.zit/Konfig already exists, not overwriting'
 	assert_output --partial '.zit/KonfigCompiled already exists, not overwriting'
-	assert_output --partial '          (new) [o/u@8 !md "wow"]'
+	assert_output --partial '          (new) [o/u@3 !md "wow"]'
 
 	# run zit reindex
 	# assert_output "$(cat to_add)"

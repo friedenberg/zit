@@ -2,6 +2,8 @@ package collections
 
 import (
 	"flag"
+
+	"github.com/friedenberg/zit/src/charlie/gattung"
 )
 
 //   _____
@@ -27,6 +29,11 @@ type WriterFuncKey func(string) error
 type PoolLike[T any] interface {
 	Get() *T
 	Put(i *T) (err error)
+}
+
+type Pool2Like[T gattung.Element, TPtr gattung.ElementPtr[T]] interface {
+	Get() TPtr
+	Put(i TPtr) (err error)
 }
 
 //   ____       _

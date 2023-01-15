@@ -85,6 +85,7 @@ func (f *FormatObjekte) Parse(
 				map[string]format.FuncReadLine{
 					gattung.Akte.String():        z.Akte.Set,
 					gattung.Typ.String():         typLineReader,
+					gattung.AkteTyp.String():     typLineReader,
 					gattung.Bezeichnung.String(): z.Bezeichnung.Set,
 					gattung.Etikett.String():     esa,
 				},

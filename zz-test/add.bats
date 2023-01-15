@@ -67,8 +67,8 @@ function add { # @test
 		-etiketten zz-inbox-2022-11-14 \
 		"$f"
 
-	assert_output --partial '          (new) [one/uno@b !md "to_add.md"]'
-	assert_output --partial '      (updated) [one/uno@d !md "to_add.md"]'
+	assert_output --partial '          (new) [one/uno@4 !md "to_add.md"]'
+	assert_output --partial '      (updated) [one/uno@11 !md "to_add.md"]'
 	assert_output --partial '[to_add.md] (deleted)'
 }
 
@@ -91,8 +91,8 @@ function add_1 { # @test
 		-etiketten zz-inbox-2022-11-14 \
 		"$f"
 
-	assert_output --partial '          (new) [o/u@b !md "to_add.md"]'
-	assert_output --partial '      (updated) [o/u@d !md "to_add.md"]'
+	assert_output --partial '          (new) [o/u@4 !md "to_add.md"]'
+	assert_output --partial '      (updated) [o/u@11 !md "to_add.md"]'
 	assert_output --partial '[to_add.md] (deleted)'
 }
 

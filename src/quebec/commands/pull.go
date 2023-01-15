@@ -5,15 +5,11 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/ts"
 	"github.com/friedenberg/zit/src/golf/id_set"
-	"github.com/friedenberg/zit/src/golf/sku"
-	"github.com/friedenberg/zit/src/hotel/objekte"
-	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 	"github.com/friedenberg/zit/src/quebec/remote_pull"
 )
@@ -144,70 +140,7 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	defer errors.DeferredCloser(&err, client)
 
-	p := collections.MakePool[zettel.Transacted]()
-
-	inflator := objekte.MakeTransactedInflator[
-		zettel.Objekte,
-		*zettel.Objekte,
-		hinweis.Hinweis,
-		*hinweis.Hinweis,
-		zettel.Verzeichnisse,
-		*zettel.Verzeichnisse,
-	](
-		gattung.MakeBespokeObjekteReadWriterFactory(
-			client,
-			u.StoreObjekten(),
-		),
-		gattung.MakeBespokeAkteReadWriterFactory(
-			client,
-			u.StoreObjekten(),
-		),
-		&zettel.FormatObjekte{
-			IgnoreTypErrors: true,
-		},
-		objekte.MakeNopAkteParser[zettel.Objekte, *zettel.Objekte](),
-		p,
-	)
-
-	if err = client.SkusFromFilter(
-		filter,
-		func(sk sku.Sku2) (err error) {
-			if sk.Gattung != gattung.Zettel {
-				return
-			}
-
-			//TODO-P1 check for akte sha
-			//TODO-P1 write akte
-			if u.Standort().HasObjekte(sk.Gattung, sk.ObjekteSha) {
-				errors.Log().Printf("already have objekte: %s", sk.ObjekteSha)
-				return
-			}
-
-			errors.Log().Printf("need objekte: %s", sk.ObjekteSha)
-
-			var t *zettel.Transacted
-
-			if t, err = inflator.InflateFromSku2(sk); err != nil {
-				err = errors.Wrapf(err, "Sku: %s", sk)
-				return
-			}
-
-			if err = inflator.StoreObjekte(
-				u.StoreObjekten().ObjekteWriter,
-				t,
-			); err != nil {
-				err = errors.Wrapf(err, "Sku: %s", sk)
-				return
-			}
-
-			if err = u.StoreObjekten().Zettel().Inherit(t); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		},
-	); err != nil {
+	if err = client.PullSkus(filter); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

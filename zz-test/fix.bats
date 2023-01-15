@@ -62,7 +62,7 @@ function can_update_akte { # @test
 	} >"$expected"
 
 	run zit new "${cmd_zit_def[@]}" -edit=false -predictable-hinweisen "$expected"
-	assert_output '          (new) [o/u@d !md "bez"]'
+	assert_output '          (new) [o/u@18 !md "bez"]'
 
 	run zit show "${cmd_zit_def[@]}" one/uno
 	assert_output "$(cat "$expected")"
@@ -74,7 +74,7 @@ function can_update_akte { # @test
 	} >"$new_akte"
 
 	run zit checkin-akte "${cmd_zit_def[@]}" -new-etiketten et3 one/uno "$new_akte"
-	assert_output '      (updated) [o/u@f !md "bez"]'
+	assert_output '      (updated) [o/u@6 !md "bez"]'
 
 	# then
 	{

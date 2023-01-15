@@ -8,6 +8,18 @@ import (
 	"github.com/friedenberg/zit/src/golf/sku"
 )
 
+type TransactedDataIdentityInflator[T any] interface {
+	InflateFromDataIdentity(sku.DataIdentity) (T, error)
+}
+
+type ObjekteStorer[T any] interface {
+	StoreObjekte(T) error
+}
+
+type AkteStorer[T any] interface {
+	StoreAkte(T) error
+}
+
 // TODO-P1 split into ObjekteInflator
 type TransactedInflator[
 	T gattung.Objekte[T],
@@ -19,9 +31,8 @@ type TransactedInflator[
 ] interface {
 	InflateFromSku(sku.Sku) (*Transacted[T, T1, T2, T3, T4, T5], error)
 	InflateFromSku2(sku.Sku2) (*Transacted[T, T1, T2, T3, T4, T5], error)
-	InflateFromDataIdentity(sku.DataIdentity) (*Transacted[T, T1, T2, T3, T4, T5], error)
-	StoreObjekte(gattung.FuncObjekteWriter, *Transacted[T, T1, T2, T3, T4, T5]) error
-	InflateFromDataIdentityAndStore(gattung.FuncObjekteWriter, sku.DataIdentity) error
+	InflatorStorer[*Transacted[T, T1, T2, T3, T4, T5]]
+	InflateFromDataIdentityAndStore(sku.DataIdentity) error
 }
 
 type transactedInflator[
@@ -35,7 +46,7 @@ type transactedInflator[
 	of            gattung.ObjekteIOFactory
 	af            gattung.AkteIOFactory
 	objekteFormat gattung.Format[T, T1]
-	akteParser    gattung.Parser[T, T1]
+	akteFormat    gattung.Format[T, T1]
 	pool          collections.PoolLike[Transacted[T, T1, T2, T3, T4, T5]]
 }
 
@@ -50,7 +61,7 @@ func MakeTransactedInflator[
 	of gattung.ObjekteIOFactory,
 	af gattung.AkteIOFactory,
 	objekteFormat gattung.Format[T, T1],
-	akteParser gattung.Parser[T, T1],
+	akteFormat gattung.Format[T, T1],
 	pool collections.PoolLike[Transacted[T, T1, T2, T3, T4, T5]],
 ) *transactedInflator[T, T1, T2, T3, T4, T5] {
 	if objekteFormat == nil {
@@ -61,7 +72,7 @@ func MakeTransactedInflator[
 		of:            of,
 		af:            af,
 		objekteFormat: objekteFormat,
-		akteParser:    akteParser,
+		akteFormat:    akteFormat,
 		pool:          pool,
 	}
 }
@@ -183,13 +194,35 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) InflateFromDataIdentity(
 	return
 }
 
+func (h *transactedInflator[T, T1, T2, T3, T4, T5]) StoreAkte(
+	t *Transacted[T, T1, T2, T3, T4, T5],
+) (err error) {
+	var aw sha.WriteCloser
+
+	if aw, err = h.af.AkteWriter(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.DeferredCloser(&err, aw)
+
+	if _, err = h.akteFormat.Format(aw, &t.Objekte); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	t.SetAkteSha(aw.Sha())
+	t.Sku.AkteSha = aw.Sha()
+
+	return
+}
+
 func (h *transactedInflator[T, T1, T2, T3, T4, T5]) StoreObjekte(
-	owc gattung.FuncObjekteWriter,
 	t *Transacted[T, T1, T2, T3, T4, T5],
 ) (err error) {
 	var ow sha.WriteCloser
 
-	if ow, err = owc(t.GetGattung()); err != nil {
+	if ow, err = h.of.ObjekteWriter(t.GetGattung()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -208,7 +241,6 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) StoreObjekte(
 }
 
 func (h *transactedInflator[T, T1, T2, T3, T4, T5]) InflateFromDataIdentityAndStore(
-	owc gattung.FuncObjekteWriter,
 	o sku.DataIdentity,
 ) (err error) {
 	var t *Transacted[T, T1, T2, T3, T4, T5]
@@ -218,7 +250,7 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) InflateFromDataIdentityAndSt
 		return
 	}
 
-	if err = h.StoreObjekte(owc, t); err != nil {
+	if err = h.StoreObjekte(t); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -254,7 +286,7 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) readObjekte(
 func (h *transactedInflator[T, T1, T2, T3, T4, T5]) readAkte(
 	t *Transacted[T, T1, T2, T3, T4, T5],
 ) (err error) {
-	if h.akteParser == nil {
+	if h.akteFormat == nil {
 		return
 	}
 
@@ -273,7 +305,7 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) readAkte(
 
 	var n int64
 
-	if n, err = h.akteParser.Parse(r, &t.Objekte); err != nil {
+	if n, err = h.akteFormat.Parse(r, &t.Objekte); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

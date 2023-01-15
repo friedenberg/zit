@@ -77,6 +77,37 @@ func (si StackInfo) String() string {
 	return fmt.Sprintf("%s%s:%d: ", testPrefix, filename, si.line)
 }
 
+func (si StackInfo) Wrap(in error) (err errer) {
+	se := stackWrapError{StackInfo: si}
+	err = wrapf(se, in, "")
+
+	se, _ = newStackWrapError(1)
+	err = wrapf(se, err, "")
+
+	return
+}
+
+func (si StackInfo) Wrapf(in error, f string, values ...interface{}) (err errer) {
+	se := stackWrapError{StackInfo: si}
+	err = wrapf(se, in, f, values...)
+
+	se, _ = newStackWrapError(1)
+	err = wrapf(se, err, "")
+
+	return
+}
+
+func (si StackInfo) Errorf(f string, values ...interface{}) (err errer) {
+	e := New(fmt.Sprintf(f, values...))
+	se := stackWrapError{StackInfo: si}
+	err = wrapf(se, e, "")
+
+	se, _ = newStackWrapError(1)
+	err = wrapf(se, err, "")
+
+	return
+}
+
 type stackWrapError struct {
 	StackInfo
 	error

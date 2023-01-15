@@ -22,8 +22,9 @@ const (
 	Konfig
 	Kennung
 	Bestandsaufnahme
+	AkteTyp
 
-	MaxGattung = Bestandsaufnahme
+	MaxGattung = AkteTyp
 )
 
 func All() (out []Gattung) {
@@ -46,6 +47,9 @@ func (g Gattung) String() string {
 		return "Akte"
 
 	case Typ:
+		return "Typ"
+
+	case AkteTyp:
 		return "AkteTyp"
 
 	case Etikett:

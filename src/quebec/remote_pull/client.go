@@ -23,6 +23,7 @@ type FuncSku func(sku.Sku2) error
 
 type Client interface {
 	SkusFromFilter(id_set.Filter, FuncSku) error
+	PullSkus(id_set.Filter) error
 	gattung.ObjekteReaderFactory
 	gattung.AkteReaderFactory
 	Close() error
@@ -151,13 +152,13 @@ func (c *client) makeAndProcessOneSkuWithFilter(
 	}()
 
 	if err := f(sk); err != nil {
-		if collections.IsStopIteration(err) || errors.Is(err, net.ErrClosed) {
+		if collections.IsStopIteration(err) {
 			err = nil
 		} else {
+			errors.TodoP1("support net.ErrClosed downstream")
 			err = errors.Wrap(err)
+			errMulti.Add(err)
 		}
-
-		errMulti.Add(err)
 
 		return
 	}
@@ -194,6 +195,7 @@ func (c *client) ObjekteReader(
 func (c client) AkteReader(
 	sh sha.ShaLike,
 ) (rc sha.ReadCloser, err error) {
+
 	var d remote_conn.Dialogue
 
 	if d, err = c.stage.StartDialogue(

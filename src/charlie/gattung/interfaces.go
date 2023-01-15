@@ -24,6 +24,15 @@ type Resetable[T any] interface {
 	Reset(*T)
 }
 
+type Resetter[T any] interface {
+	ElementPtr[T]
+	Reset2()
+}
+
+type ResetWither[T any, TPtr ElementPtr[T]] interface {
+	ResetWith(TPtr)
+}
+
 type Element interface{}
 
 type ElementPtr[T Element] interface {

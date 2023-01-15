@@ -30,14 +30,24 @@ func (f Format[T, T1]) Parse(
 ) (n int64, err error) {
 	r := bufio.NewReader(r1)
 
+	isEOF := false
+
 	for {
+		if isEOF {
+			break
+		}
+
 		var lineOriginal string
 		lineOriginal, err = r.ReadString('\n')
 
-		if err == io.EOF {
+		switch {
+		case errors.IsEOF(err):
 			err = nil
+			isEOF = true
 			break
-		} else if err != nil {
+
+		case err != nil:
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -55,7 +65,6 @@ func (f Format[T, T1]) Parse(
 
 		switch {
 		case line == "":
-			err = errors.Errorf("found empty line: %q", lineOriginal)
 			return
 
 		case line != "" && loc == -1:

@@ -85,12 +85,12 @@ function pull { # @test
 		-edit=false \
 		"$expected"
 
-	assert_output --partial '          (new) [one/uno@d !md "to_add.md"]'
+	assert_output --partial '          (new) [one/uno@11 !md "to_add.md"]'
 
 	cd "$wd1" || exit 1
 
 	run zit pull -abbreviate-hinweisen=false -all "$wd"
-	assert_output '          (new) [one/uno@d !md "to_add.md"]'
+	assert_output '          (new) [one/uno@11 !md "to_add.md"]'
 
 	run zit show one/uno
 	assert_output "$(cat "$expected")"

@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/golf/id_set"
+	"github.com/friedenberg/zit/src/india/typ"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 	"github.com/friedenberg/zit/src/papa/remote_conn"
@@ -138,6 +139,13 @@ func (op Server) skusForFilter(
 ) (err error) {
 	defer errors.DeferredCloser(&err, d)
 
+	defer func() {
+		if e := recover(); e != nil {
+			errors.Todo(errors.P0, "panicked: %s", e)
+			panic(e)
+		}
+	}()
+
 	var filter id_set.Filter
 
 	if err = d.Receive(&filter); err != nil {
@@ -151,15 +159,27 @@ func (op Server) skusForFilter(
 		method = op.umwelt.StoreObjekten().Zettel().ReadAll
 	}
 
+	if err = op.umwelt.StoreObjekten().Typ().ReadAll(
+		func(z *typ.Transacted) (err error) {
+			sk := z.Sku.Sku2()
+
+			if err = d.Send(sk); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if err = method(
 		collections.MakeChain(
 			zettel.WriterIds{Filter: filter}.WriteZettelVerzeichnisse,
 			func(z *zettel.Transacted) (err error) {
 				sk := z.Sku.Sku2()
-
-				if z.Sku.GetTransactionIndex().Int() > 0 {
-					errors.Log().Printf("da sku has a big index: %s, %v, %d", sk, z.Sku, z.Sku.GetTransactionIndex())
-				}
 
 				if err = d.Send(sk); err != nil {
 					err = errors.Wrap(err)

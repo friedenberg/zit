@@ -7,24 +7,29 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 )
 
-type nopAkteParser[
+type nopAkteFormat[
 	T gattung.Objekte[T],
 	T1 gattung.ObjektePtr[T],
 ] struct {
 }
 
-func MakeNopAkteParser[
+func MakeNopAkteFormat[
 	T gattung.Objekte[T],
 	T1 gattung.ObjektePtr[T],
-]() nopAkteParser[T, T1] {
-	return nopAkteParser[T, T1]{}
+]() nopAkteFormat[T, T1] {
+	return nopAkteFormat[T, T1]{}
 }
 
-func (_ nopAkteParser[T, T1]) Parse(r io.Reader, _ T1) (n int64, err error) {
+func (_ nopAkteFormat[T, T1]) Parse(r io.Reader, _ T1) (n int64, err error) {
 	if n, err = io.Copy(io.Discard, r); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
+	return
+}
+
+func (_ nopAkteFormat[T, T1]) Format(w io.Writer, _ T1) (n int64, err error) {
+	errors.TodoP0("how to format without content?")
 	return
 }
