@@ -78,8 +78,8 @@ func MakeStore(
 			objekte.NilVerzeichnisse[Objekte],
 			*objekte.NilVerzeichnisse[Objekte],
 		](
-			oaf.ObjekteReader,
-			oaf.AkteReader,
+			oaf,
+			oaf,
 			of,
 			af,
 			p,

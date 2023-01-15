@@ -17,7 +17,6 @@ import (
 
 const (
 	concurrentSkuFilterJobLimit = 100
-	// concurrentSkuFilterJobLimit = 1
 )
 
 type FuncSku func(sku.Sku2) error
@@ -38,6 +37,7 @@ type client struct {
 
 func MakeClient(u *umwelt.Umwelt, from string) (c *client, err error) {
 	c = &client{
+		umwelt:             u,
 		chDone:             make(chan struct{}),
 		chFilterSkuTickets: make(chan struct{}, concurrentSkuFilterJobLimit),
 	}
@@ -141,10 +141,11 @@ func (c *client) makeAndProcessOneSkuWithFilter(
 ) {
 	defer func() {
 		<-c.chFilterSkuTickets
-		if r := recover(); r != nil {
-			//TODO-P0 add to err chan
-			errors.Err().Printf("panicked during process one sku: %s", r)
-		}
+
+		//if r := recover(); r != nil {
+		//	//TODO-P0 add to err chan
+		//	errors.Err().Printf("panicked during process one sku: %s", r)
+		//}
 
 		wg.Done()
 	}()
@@ -191,7 +192,7 @@ func (c *client) ObjekteReader(
 }
 
 func (c client) AkteReader(
-	sh sha.Sha,
+	sh sha.ShaLike,
 ) (rc sha.ReadCloser, err error) {
 	var d remote_conn.Dialogue
 
@@ -202,12 +203,19 @@ func (c client) AkteReader(
 		return
 	}
 
-	if err = d.Send(sh); err != nil {
+	if err = d.Send(sh.GetSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	rc = sha.MakeReadCloser(d)
+	var ow sha.WriteCloser
+
+	if ow, err = c.umwelt.StoreObjekten().AkteWriter(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	rc = sha.MakeReadCloserTee(d, ow)
 
 	return
 }

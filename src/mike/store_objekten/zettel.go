@@ -60,8 +60,8 @@ func makeZettelStore(
 			zettel.Verzeichnisse,
 			*zettel.Verzeichnisse,
 		](
-			sa.ObjekteReader,
-			sa.AkteReader,
+			sa,
+			sa,
 			&zettel.FormatObjekte{
 				IgnoreTypErrors: true,
 			},

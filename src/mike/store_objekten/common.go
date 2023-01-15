@@ -157,13 +157,13 @@ func (s common) AkteWriter() (w sha.WriteCloser, err error) {
 	return
 }
 
-func (s common) AkteReader(sh sha.Sha) (r sha.ReadCloser, err error) {
-	if sh.IsNull() {
+func (s common) AkteReader(sh sha.ShaLike) (r sha.ReadCloser, err error) {
+	if sh.GetSha().IsNull() {
 		r = sha.MakeNopReadCloser(ioutil.NopCloser(bytes.NewReader(nil)))
 		return
 	}
 
-	p := id.Path(sh, s.Standort.DirObjektenAkten())
+	p := id.Path(sh.GetSha(), s.Standort.DirObjektenAkten())
 
 	o := age_io.FileReadOptions{
 		Age:  s.Age,

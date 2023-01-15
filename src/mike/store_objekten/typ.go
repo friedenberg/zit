@@ -92,8 +92,8 @@ func makeTypStore(
 			objekte.NilVerzeichnisse[typ.Objekte],
 			*objekte.NilVerzeichnisse[typ.Objekte],
 		](
-			sa.ObjekteReader,
-			sa.AkteReader,
+			sa,
+			sa,
 			nil,
 			gattung.Parser[typ.Objekte, *typ.Objekte](
 				typ.MakeFormatTextIgnoreTomlErrors(sa),

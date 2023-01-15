@@ -2,7 +2,6 @@ package commands
 
 import (
 	"flag"
-	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
@@ -155,38 +154,17 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		zettel.Verzeichnisse,
 		*zettel.Verzeichnisse,
 	](
-		client.ObjekteReader,
-		func(sh sha.Sha) (rc sha.ReadCloser, err error) {
-			errors.Todo(errors.P2, "move to own constructor")
-			var or io.ReadCloser
-
-			if or, err = client.AkteReader(sh); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			errors.Log().Printf("got reader for sha: %s", sh)
-
-			var ow sha.WriteCloser
-
-			if ow, err = u.StoreObjekten().AkteWriter(); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			rc = sha.MakeReadCloserTee(or, ow)
-
-			return
-		},
+		gattung.MakeBespokeObjekteReadWriterFactory(
+			client,
+			u.StoreObjekten(),
+		),
+		gattung.MakeBespokeAkteReadWriterFactory(
+			client,
+			u.StoreObjekten(),
+		),
 		&zettel.FormatObjekte{
 			IgnoreTypErrors: true,
 		},
-		// objekte.MakeParserStorerWithCustomFormat[zettel.Objekte, *zettel.Objekte](
-		// 	u.StoreObjekten(),
-		// 	&zettel.FormatObjekte{
-		// 		IgnoreTypErrors: true,
-		// 	},
-		// ),
 		objekte.MakeNopAkteParser[zettel.Objekte, *zettel.Objekte](),
 		p,
 	)

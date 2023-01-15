@@ -23,8 +23,8 @@ type objekteInflator[
 	T2 gattung.Verzeichnisse[T],
 	T3 gattung.VerzeichnissePtr[T2, T],
 ] struct {
-	orc           gattung.FuncObjekteReader
-	arc           gattung.FuncReadCloser
+	or            gattung.ObjekteReaderFactory
+	ar            gattung.AkteReaderFactory
 	objekteParser gattung.Parser[T, T1]
 	akteParser    gattung.Parser[T, T1]
 	pool          collections.PoolLike[T]
@@ -36,8 +36,8 @@ func MakeObjekteInflator[
 	T2 gattung.Verzeichnisse[T],
 	T3 gattung.VerzeichnissePtr[T2, T],
 ](
-	orc gattung.FuncObjekteReader,
-	arc gattung.FuncReadCloser,
+	or gattung.ObjekteReaderFactory,
+	ar gattung.AkteReaderFactory,
 	objekteParser gattung.Parser[T, T1],
 	akteParser gattung.Parser[T, T1],
 	pool collections.PoolLike[T],
@@ -47,8 +47,8 @@ func MakeObjekteInflator[
 	}
 
 	return &objekteInflator[T, T1, T2, T3]{
-		orc:           orc,
-		arc:           arc,
+		or:            or,
+		ar:            ar,
 		objekteParser: objekteParser,
 		akteParser:    akteParser,
 		pool:          pool,
@@ -89,7 +89,7 @@ func (h *objekteInflator[T, T1, T2, T3]) readObjekte(
 ) (err error) {
 	var r sha.ReadCloser
 
-	if r, err = h.orc(sk, sk.GetObjekteSha()); err != nil {
+	if r, err = h.or.ObjekteReader(sk, sk.GetObjekteSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -118,7 +118,7 @@ func (h *objekteInflator[T, T1, T2, T3]) readAkte(
 
 	var r sha.ReadCloser
 
-	if r, err = h.arc(sh); err != nil {
+	if r, err = h.ar.AkteReader(sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

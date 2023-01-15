@@ -76,8 +76,8 @@ func makeEtikettStore(
 			objekte.NilVerzeichnisse[etikett.Objekte],
 			*objekte.NilVerzeichnisse[etikett.Objekte],
 		](
-			sa.ObjekteReader,
-			sa.AkteReader,
+			sa,
+			sa,
 			nil,
 			gattung.Parser[etikett.Objekte, *etikett.Objekte](
 				etikett.MakeFormatText(sa),
@@ -226,7 +226,7 @@ func (s etikettStore) AllInChain(k kennung.Etikett) (c []*etikett.Transacted, er
 }
 
 func (s *etikettStore) reindexOne(
-  o sku.DataIdentity,
+	o sku.DataIdentity,
 ) (err error) {
 	var te *etikett.Transacted
 	defer s.pool.Put(te)

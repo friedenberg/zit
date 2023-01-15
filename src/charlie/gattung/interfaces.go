@@ -161,59 +161,6 @@ type TransactedPtr[T Element] interface {
 	StoredPtr
 }
 
-//    ___  _     _      _    _       ___ ___
-//   / _ \| |__ (_) ___| | _| |_ ___|_ _/ _ \
-//  | | | | '_ \| |/ _ \ |/ / __/ _ \| | | | |
-//  | |_| | |_) | |  __/   <| ||  __/| | |_| |
-//   \___/|_.__// |\___|_|\_\\__\___|___\___/
-//            |__/
-
-type ObjekteIOFactory interface {
-	ObjekteReaderFactory
-	ObjekteWriterFactory
-}
-
-type ObjekteReaderFactory interface {
-	ObjekteReader(GattungLike, ShaLike) (sha.ReadCloser, error)
-}
-
-type ObjekteWriterFactory interface {
-	ObjekteWriter(GattungLike) (sha.WriteCloser, error)
-}
-
-type FuncObjekteReader func(GattungLike, ShaLike) (sha.ReadCloser, error)
-type FuncObjekteWriter func(GattungLike) (sha.WriteCloser, error)
-
-//      _    _    _       ___ ___
-//     / \  | | _| |_ ___|_ _/ _ \
-//    / _ \ | |/ / __/ _ \| | | | |
-//   / ___ \|   <| ||  __/| | |_| |
-//  /_/   \_\_|\_\\__\___|___\___/
-//
-
-type AkteIOFactory interface {
-	AkteReaderFactory
-	AkteWriterFactory
-}
-
-type AkteReaderFactory interface {
-	AkteReader(sha.Sha) (sha.ReadCloser, error)
-}
-
-type AkteWriterFactory interface {
-	AkteWriter() (sha.WriteCloser, error)
-}
-
-type ObjekteAkteReaderFactory interface {
-	ObjekteReaderFactory
-	AkteReaderFactory
-}
-
-type ObjekteAkteWriterFactory interface {
-	ObjekteWriterFactory
-	AkteWriterFactory
-}
-
 type ObjekteAkteFactory interface {
 	ObjekteAkteReaderFactory
 	ObjekteAkteWriterFactory
@@ -225,6 +172,7 @@ type FuncReadCloser func(sha.Sha) (sha.ReadCloser, error)
 // TODO-P3 rename to FuncShaWriteCloser
 type FuncWriteCloser func(sha.Sha) (sha.WriteCloser, error)
 
+// TODO-P4 remove
 type AkteIOFactoryFactory interface {
 	AkteFactory(Gattung) AkteIOFactory
 }

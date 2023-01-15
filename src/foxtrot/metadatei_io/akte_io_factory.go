@@ -22,7 +22,7 @@ func (_ nopAkteFactory) AkteWriter() (sha.WriteCloser, error) {
 	return NewNopWriter(), nil
 }
 
-func (_ nopAkteFactory) AkteReader(s sha.Sha) (sha.ReadCloser, error) {
+func (_ nopAkteFactory) AkteReader(s sha.ShaLike) (sha.ReadCloser, error) {
 	return sha.MakeNopReadCloser(io.NopCloser(bytes.NewBuffer(nil))), nil
 }
 
