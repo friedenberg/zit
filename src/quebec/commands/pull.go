@@ -214,26 +214,13 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 				return
 			}
 
-			f := &zettel.FormatObjekte{
-				IgnoreTypErrors: true,
-			}
-
-			var ow sha.WriteCloser
-
-			if ow, err = u.StoreObjekten().ObjekteWriter(t.GetGattung()); err != nil {
-				err = errors.Wrap(err)
+			if err = inflator.StoreObjekte(
+				u.StoreObjekten().ObjekteWriter,
+				t,
+			); err != nil {
+				err = errors.Wrapf(err, "Sku: %s", sk)
 				return
 			}
-
-			defer errors.DeferredCloser(&err, ow)
-
-			if _, err = f.Format(ow, &t.Objekte); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			t.Sku.ObjekteSha = ow.Sha()
-			t.Sku.AkteSha = t.AkteSha()
 
 			if err = u.StoreObjekten().Zettel().Inherit(t); err != nil {
 				err = errors.Wrap(err)

@@ -20,6 +20,7 @@ type TransactedInflator[
 	InflateFromSku(sku.Sku) (*Transacted[T, T1, T2, T3, T4, T5], error)
 	InflateFromSku2(sku.Sku2) (*Transacted[T, T1, T2, T3, T4, T5], error)
 	InflateFromDataIdentity(sku.DataIdentity) (*Transacted[T, T1, T2, T3, T4, T5], error)
+	StoreObjekte(gattung.FuncObjekteWriter, *Transacted[T, T1, T2, T3, T4, T5]) error
 }
 
 type transactedInflator[
@@ -32,7 +33,7 @@ type transactedInflator[
 ] struct {
 	orc           gattung.FuncObjekteReader
 	arc           gattung.FuncReadCloser
-	objekteParser gattung.Parser[T, T1]
+	objekteFormat gattung.Format[T, T1]
 	akteParser    gattung.Parser[T, T1]
 	pool          collections.PoolLike[Transacted[T, T1, T2, T3, T4, T5]]
 }
@@ -47,18 +48,18 @@ func MakeTransactedInflator[
 ](
 	orc gattung.FuncObjekteReader,
 	arc gattung.FuncReadCloser,
-	objekteParser gattung.Parser[T, T1],
+	objekteFormat gattung.Format[T, T1],
 	akteParser gattung.Parser[T, T1],
 	pool collections.PoolLike[Transacted[T, T1, T2, T3, T4, T5]],
 ) *transactedInflator[T, T1, T2, T3, T4, T5] {
-	if objekteParser == nil {
-		objekteParser = MakeFormat[T, T1]()
+	if objekteFormat == nil {
+		objekteFormat = MakeFormat[T, T1]()
 	}
 
 	return &transactedInflator[T, T1, T2, T3, T4, T5]{
 		orc:           orc,
 		arc:           arc,
-		objekteParser: objekteParser,
+		objekteFormat: objekteFormat,
 		akteParser:    akteParser,
 		pool:          pool,
 	}
@@ -181,6 +182,30 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) InflateFromDataIdentity(
 	return
 }
 
+func (h *transactedInflator[T, T1, T2, T3, T4, T5]) StoreObjekte(
+	owc gattung.FuncObjekteWriter,
+	t *Transacted[T, T1, T2, T3, T4, T5],
+) (err error) {
+	var ow sha.WriteCloser
+
+	if ow, err = owc(t.GetGattung()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.DeferredCloser(&err, ow)
+
+	if _, err = h.objekteFormat.Format(ow, &t.Objekte); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	t.Sku.ObjekteSha = ow.Sha()
+	t.Sku.AkteSha = t.AkteSha()
+
+	return
+}
+
 func (h *transactedInflator[T, T1, T2, T3, T4, T5]) readObjekte(
 	sk sku.DataIdentity,
 	t *Transacted[T, T1, T2, T3, T4, T5],
@@ -196,7 +221,7 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) readObjekte(
 
 	var n int64
 
-	if n, err = h.objekteParser.Parse(r, &t.Objekte); err != nil {
+	if n, err = h.objekteFormat.Parse(r, &t.Objekte); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

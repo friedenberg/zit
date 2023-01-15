@@ -182,7 +182,7 @@ type ObjekteWriterFactory interface {
 }
 
 type FuncObjekteReader func(GattungLike, ShaLike) (sha.ReadCloser, error)
-type FuncObjekteWriter func(GattungLike) (sha.ReadCloser, error)
+type FuncObjekteWriter func(GattungLike) (sha.WriteCloser, error)
 
 //      _    _    _       ___ ___
 //     / \  | | _| |_ ___|_ _/ _ \
