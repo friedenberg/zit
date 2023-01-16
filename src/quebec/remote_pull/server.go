@@ -140,9 +140,11 @@ func (op Server) skusForFilter(
 	defer errors.DeferredCloser(&err, d)
 
 	defer func() {
-		if e := recover(); e != nil {
-			errors.Todo(errors.P0, "panicked: %s", e)
-			panic(e)
+		if r := recover(); r != nil {
+			err = errors.MakeMulti(
+				err,
+				errors.Errorf("panicked during toml decoding: %s", r),
+			)
 		}
 	}()
 

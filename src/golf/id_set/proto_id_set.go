@@ -10,11 +10,25 @@ type ProtoIdSet struct {
 }
 
 func MakeProtoIdSet(types ...ProtoId) (ps ProtoIdSet) {
-	ps.types = make([]protoId, len(types))
+	ps.types = make([]protoId, 0, len(types))
 
-	for i, t := range types {
-		pid := makeProtoId(t)
-		ps.types[i] = pid
+	for _, t := range types {
+		ps.Add(t)
+	}
+
+	return
+}
+
+func (ps *ProtoIdSet) Add(t ProtoId) (err error) {
+	pid := makeProtoId(t)
+	ps.types = append(ps.types, pid)
+
+	return
+}
+
+func (ps *ProtoIdSet) AddMany(ts ...ProtoId) (err error) {
+	for _, t := range ts {
+		ps.Add(t)
 	}
 
 	return

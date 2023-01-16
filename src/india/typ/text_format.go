@@ -58,13 +58,11 @@ func (f TextFormat) ReadFormat(r io.Reader, t *Objekte) (n int64, err error) {
 
 		defer func() {
 			if r := recover(); r != nil {
-				switch {
-				case !errors.IsEOF(err) && !f.ignoreTomlErrors:
+				if f.ignoreTomlErrors {
+					err = nil
+				} else {
 					err = toml.MakeError(errors.Errorf("panicked during toml decoding: %s", r))
 					pr.CloseWithError(errors.Wrap(err))
-
-				case !errors.IsEOF(err) && f.ignoreTomlErrors:
-					err = nil
 				}
 			}
 		}()

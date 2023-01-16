@@ -12,6 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/ts"
+	"github.com/friedenberg/zit/src/gattung_set"
 	"github.com/friedenberg/zit/src/golf/id_set"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/golf/transaktion"
@@ -23,10 +24,9 @@ import (
 )
 
 type Show struct {
-	//TODO-P0 gattung.Set
-	gattung.Gattung
-	Format string
-	All    bool
+	GattungSet gattung_set.MutableSet
+	Format     string
+	All        bool
 }
 
 func init() {
@@ -34,10 +34,15 @@ func init() {
 		"show",
 		func(f *flag.FlagSet) Command {
 			c := &Show{
-				Gattung: gattung.Zettel,
+				GattungSet: gattung_set.MakeMutableSet(gattung.Zettel),
 			}
 
-			f.Var(&c.Gattung, "gattung", "Gattung")
+			gsvs := collections.MutableValueSet2[gattung.Gattung, *gattung.Gattung]{
+				MutableSetLike: &c.GattungSet,
+				SetterPolicy:   collections.SetterPolicyReset,
+			}
+
+			f.Var(gsvs, "gattung", "Gattung")
 			f.StringVar(&c.Format, "format", "text", "format")
 			f.BoolVar(&c.All, "all", false, "show all Objekten")
 
@@ -54,10 +59,10 @@ func init() {
 }
 
 func (c Show) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
-	switch c.Gattung {
+	is = id_set.MakeProtoIdSet()
 
-	default:
-		is = id_set.MakeProtoIdSet(
+	if c.GattungSet.Contains(gattung.Zettel) {
+		is.AddMany(
 			id_set.ProtoId{
 				MutableId: &sha.Sha{},
 			},
@@ -86,16 +91,18 @@ func (c Show) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 				MutableId: &ts.Time{},
 			},
 		)
+	}
 
-	case gattung.Typ:
-		is = id_set.MakeProtoIdSet(
+	if c.GattungSet.Contains(gattung.Typ) {
+		is.AddMany(
 			id_set.ProtoId{
 				MutableId: &kennung.Typ{},
 			},
 		)
+	}
 
-	case gattung.Transaktion:
-		is = id_set.MakeProtoIdSet(
+	if c.GattungSet.Contains(gattung.Transaktion) {
+		is.AddMany(
 			id_set.ProtoId{
 				MutableId: &ts.Time{},
 			},
@@ -106,88 +113,97 @@ func (c Show) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 }
 
 func (c Show) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
-	switch c.Gattung {
+	if err = c.GattungSet.Each(
+		func(g gattung.Gattung) (err error) {
+			switch g {
 
-	case gattung.Akte:
-		return c.showAkten(u, ids)
+			case gattung.Akte:
+				return c.showAkten(u, ids)
 
-	case gattung.Zettel:
-		var fv zettel.FormatterValue
+			case gattung.Zettel:
+				var fv zettel.FormatterValue
 
-		if err = fv.Set(c.Format); err != nil {
-			err = errors.Normal(err)
-			return
-		}
+				if err = fv.Set(c.Format); err != nil {
+					err = errors.Normal(err)
+					return
+				}
 
-		return c.showZettels(
-			u,
-			ids,
-			fv.FuncFormatterVerzeichnisse(
-				u.Out(),
-				u.StoreObjekten(),
-				u.Konfig(),
-				u.PrinterZettelTransacted(),
-			),
-		)
+				return c.showZettels(
+					u,
+					ids,
+					fv.FuncFormatterVerzeichnisse(
+						u.Out(),
+						u.StoreObjekten(),
+						u.Konfig(),
+						u.PrinterZettelTransacted(),
+					),
+				)
 
-	case gattung.Transaktion:
-		return c.showTransaktions(u, ids)
+			case gattung.Transaktion:
+				return c.showTransaktions(u, ids)
 
-	case gattung.Typ:
-		var ev typ.FormatterValue
+			case gattung.Typ:
+				var ev typ.FormatterValue
 
-		if err = ev.Set(c.Format); err != nil {
-			err = errors.Normal(err)
-			return
-		}
+				if err = ev.Set(c.Format); err != nil {
+					err = errors.Normal(err)
+					return
+				}
 
-		return c.showTypen(
-			u,
-			ids,
-			ev.FuncFormatter(
-				u.Out(),
-				u.StoreObjekten(),
-				u.PrinterTypTransacted(format.StringNew),
-			),
-		)
+				return c.showTypen(
+					u,
+					ids,
+					ev.FuncFormatter(
+						u.Out(),
+						u.StoreObjekten(),
+						u.PrinterTypTransacted(format.StringNew),
+					),
+				)
 
-	case gattung.Etikett:
-		var ev etikett.FormatterValue
+			case gattung.Etikett:
+				var ev etikett.FormatterValue
 
-		if err = ev.Set(c.Format); err != nil {
-			err = errors.Normal(err)
-			return
-		}
+				if err = ev.Set(c.Format); err != nil {
+					err = errors.Normal(err)
+					return
+				}
 
-		return c.showEtiketten(
-			u,
-			ids,
-			ev.FuncFormatter(
-				u.Out(),
-				u.StoreObjekten(),
-			),
-		)
+				return c.showEtiketten(
+					u,
+					ids,
+					ev.FuncFormatter(
+						u.Out(),
+						u.StoreObjekten(),
+					),
+				)
 
-	case gattung.Konfig:
-		var ev konfig.FormatterValue
+			case gattung.Konfig:
+				var ev konfig.FormatterValue
 
-		if err = ev.Set(c.Format); err != nil {
-			err = errors.Normal(err)
-			return
-		}
+				if err = ev.Set(c.Format); err != nil {
+					err = errors.Normal(err)
+					return
+				}
 
-		return c.showKonfig(
-			u,
-			ev.FuncFormatter(
-				u.Out(),
-				u.StoreObjekten(),
-			),
-		)
+				return c.showKonfig(
+					u,
+					ev.FuncFormatter(
+						u.Out(),
+						u.StoreObjekten(),
+					),
+				)
 
-	default:
-		err = errors.Errorf("unsupported Gattung: %s", c.Gattung)
+			default:
+				err = errors.Errorf("unsupported Gattung: %s", g)
+				return
+			}
+		},
+	); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
+
+	return
 }
 
 func (c Show) showZettels(

@@ -7,25 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 )
 
-type FuncSetString = gattung.FuncSetString
-
-type Setter interface {
-	Set(string) error
-}
-
-type SetterPtr[T any] interface {
-	gattung.ElementPtr[T]
-	Setter
-}
-
-type Adder[E any] interface {
-	Add(E) error
-}
-
-type StringAdder interface {
-	AddString(string) error
-}
-
 func MakeFuncSetString[E gattung.Element, EPtr SetterPtr[E]](
 	c Adder[E],
 ) FuncSetString {
@@ -51,6 +32,13 @@ func AddString[E gattung.Element, EPtr SetterPtr[E]](
 	}
 
 	return
+}
+
+func String[E ValueSetElement](
+	c EachPtrer[E],
+) string {
+	errors.TodoP1("implement")
+	return ""
 }
 
 func ReverseSortable(s sort.Interface) {

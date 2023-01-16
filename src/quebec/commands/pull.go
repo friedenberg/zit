@@ -5,17 +5,19 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/ts"
+	"github.com/friedenberg/zit/src/gattung_set"
 	"github.com/friedenberg/zit/src/golf/id_set"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 	"github.com/friedenberg/zit/src/quebec/remote_pull"
 )
 
 type Pull struct {
-	gattung.Gattung
+	GattungSet gattung_set.MutableSet
 	All        bool
 	RewriteTai bool
 }
@@ -25,10 +27,15 @@ func init() {
 		"pull",
 		func(f *flag.FlagSet) Command {
 			c := &Pull{
-				Gattung: gattung.Zettel,
+				GattungSet: gattung_set.MakeMutableSet(gattung.Zettel),
 			}
 
-			f.Var(&c.Gattung, "gattung", "Gattung")
+			gsvs := collections.MutableValueSet2[gattung.Gattung, *gattung.Gattung]{
+				MutableSetLike: &c.GattungSet,
+				SetterPolicy:   collections.SetterPolicyReset,
+			}
+
+			f.Var(gsvs, "gattung", "Gattung")
 			f.BoolVar(&c.All, "all", false, "pull all Objekten")
 			f.BoolVar(&c.RewriteTai, "rewrite-tai", false, "generate new Taimstamps for pulled Objektes")
 
@@ -38,10 +45,10 @@ func init() {
 }
 
 func (c Pull) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
-	switch c.Gattung {
+	is = id_set.MakeProtoIdSet()
 
-	default:
-		is = id_set.MakeProtoIdSet(
+	if c.GattungSet.Contains(gattung.Zettel) {
+		is.AddMany(
 			id_set.ProtoId{
 				MutableId: &sha.Sha{},
 			},
@@ -70,16 +77,18 @@ func (c Pull) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 				MutableId: &ts.Time{},
 			},
 		)
+	}
 
-	case gattung.Typ:
-		is = id_set.MakeProtoIdSet(
+	if c.GattungSet.Contains(gattung.Typ) {
+		is.AddMany(
 			id_set.ProtoId{
 				MutableId: &kennung.Typ{},
 			},
 		)
+	}
 
-	case gattung.Transaktion:
-		is = id_set.MakeProtoIdSet(
+	if c.GattungSet.Contains(gattung.Transaktion) {
+		is.AddMany(
 			id_set.ProtoId{
 				MutableId: &ts.Time{},
 			},

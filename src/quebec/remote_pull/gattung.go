@@ -31,7 +31,7 @@ func (c *client) PullSkus(
 				return
 			}
 
-			errors.Todo(errors.P0, "check for akte sha")
+			errors.TodoP2("check for akte sha")
 
 			if c.umwelt.Standort().HasObjekte(sk.Gattung, sk.ObjekteSha) {
 				errors.Log().Printf("already have objekte: %s", sk.ObjekteSha)

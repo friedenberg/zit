@@ -3,6 +3,7 @@ package id_set
 import (
 	"fmt"
 
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/id"
@@ -60,12 +61,11 @@ func (s *Set) Add(ids ...id.Id) {
 	}
 }
 
-// TODO-P0 fix this
 func (s Set) String() string {
+	errors.TodoP4("improve the string creation method")
 	return fmt.Sprintf("%#v", s.ids)
 }
 
-// TODO-P0 fix this
 func (s Set) Len() int {
 	k := 0
 
