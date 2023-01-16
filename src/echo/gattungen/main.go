@@ -1,4 +1,4 @@
-package gattung_set
+package gattungen
 
 import (
 	"github.com/friedenberg/zit/src/charlie/gattung"

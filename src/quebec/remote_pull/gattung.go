@@ -4,6 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
+	"github.com/friedenberg/zit/src/echo/gattungen"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/golf/id_set"
@@ -15,7 +16,9 @@ import (
 
 func (c *client) PullSkus(
 	filter id_set.Filter,
+	gattungSet gattungen.Set,
 ) (err error) {
+	errors.TodoP0("implement etikett and akte")
 	gattungInheritors := map[gattung.Gattung]objekte.TransactedInheritor{
 		gattung.Zettel: c.GetInheritorZettel(),
 		gattung.Typ:    c.GetInheritorTyp(),
@@ -23,6 +26,7 @@ func (c *client) PullSkus(
 
 	if err = c.SkusFromFilter(
 		filter,
+		gattungSet,
 		func(sk sku.Sku2) (err error) {
 			var el objekte.TransactedInheritor
 			ok := false
@@ -89,6 +93,7 @@ func (c *client) GetInheritorZettel() objekte.TransactedInheritor {
 }
 
 func (c *client) GetInheritorTyp() objekte.TransactedInheritor {
+	errors.TodoP0("fix issues with typ skus being delivered with empty data")
 	p := collections.MakePool2[typ.Transacted, *typ.Transacted]()
 
 	inflator := objekte.MakeTransactedInflator[

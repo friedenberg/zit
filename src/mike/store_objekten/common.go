@@ -67,7 +67,8 @@ func (s common) ObjekteReader(
 	}
 
 	if rc, err = age_io.NewFileReader(o); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "Gattung: %s", g.GetGattung())
+		err = errors.Wrapf(err, "Sha: %s", sh.GetSha())
 		return
 	}
 

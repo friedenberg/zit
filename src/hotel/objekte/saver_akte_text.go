@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/sha"
 )
 
-//TODO-P3 rename to AkteSaver
+// TODO-P3 rename to AkteSaver
 type AkteTextSaver[
 	T gattung.Objekte[T],
 	T1 gattung.ObjektePtr[T],

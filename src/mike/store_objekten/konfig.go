@@ -14,10 +14,11 @@ import (
 )
 
 type KonfigStore interface {
+	reindexer
+	GattungStore
+
 	Read() (*konfig.Transacted, error)
 	Update(*konfig.Objekte) (*konfig.Transacted, error)
-
-	GattungStore
 
 	objekte.TransactedLogger[*konfig.Transacted]
 	objekte.AkteTextSaver[konfig.Objekte, *konfig.Objekte]

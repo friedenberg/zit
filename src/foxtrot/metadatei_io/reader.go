@@ -29,13 +29,13 @@ func (mr *Reader) ReadFrom(r1 io.Reader) (n int64, err error) {
 	var metadatei, akte pipedReaderFrom
 	var state readerState
 
-  isEOF := false
+	isEOF := false
 
 LINE_READ_LOOP:
 	for {
-    if isEOF {
-      break
-    }
+		if isEOF {
+			break
+		}
 
 		var rawLine, line string
 
@@ -48,7 +48,7 @@ LINE_READ_LOOP:
 		}
 
 		if errors.IsEOF(err) {
-      isEOF = true
+			isEOF = true
 		}
 
 		line = strings.TrimSuffix(rawLine, "\n")

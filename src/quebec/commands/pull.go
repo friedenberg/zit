@@ -6,20 +6,19 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
+	"github.com/friedenberg/zit/src/echo/gattungen"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/ts"
-	"github.com/friedenberg/zit/src/gattung_set"
 	"github.com/friedenberg/zit/src/golf/id_set"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 	"github.com/friedenberg/zit/src/quebec/remote_pull"
 )
 
 type Pull struct {
-	GattungSet gattung_set.MutableSet
+	GattungSet gattungen.MutableSet
 	All        bool
-	RewriteTai bool
 }
 
 func init() {
@@ -27,7 +26,7 @@ func init() {
 		"pull",
 		func(f *flag.FlagSet) Command {
 			c := &Pull{
-				GattungSet: gattung_set.MakeMutableSet(gattung.Zettel),
+				GattungSet: gattungen.MakeMutableSet(gattung.Zettel),
 			}
 
 			gsvs := collections.MutableValueSet2[gattung.Gattung, *gattung.Gattung]{
@@ -37,7 +36,6 @@ func init() {
 
 			f.Var(gsvs, "gattung", "Gattung")
 			f.BoolVar(&c.All, "all", false, "pull all Objekten")
-			f.BoolVar(&c.RewriteTai, "rewrite-tai", false, "generate new Taimstamps for pulled Objektes")
 
 			return c
 		},
@@ -149,7 +147,7 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	defer errors.DeferredCloser(&err, client)
 
-	if err = client.PullSkus(filter); err != nil {
+	if err = client.PullSkus(filter, c.GattungSet.Copy()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

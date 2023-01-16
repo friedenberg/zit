@@ -78,7 +78,7 @@ func (c Checkout) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 	if _, err = u.StoreWorkingDirectory().Checkout(
 		options,
-		query.WriteZettelVerzeichnisse,
+		query.WriteZettelTransacted,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

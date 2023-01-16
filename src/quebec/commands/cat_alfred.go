@@ -163,7 +163,7 @@ func (c CatAlfred) catZettelen(
 					Set:        ids,
 					AllowEmpty: true,
 				},
-			}.WriteZettelVerzeichnisse,
+			}.WriteZettelTransacted,
 			aw.WriteZettelVerzeichnisse,
 		),
 	); err != nil {

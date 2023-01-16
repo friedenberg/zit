@@ -12,11 +12,12 @@ import (
 )
 
 type EtikettStore interface {
+	reindexer
 	GattungStore
 
 	objekte.TransactedLogger[*etikett.Transacted]
 
-	objekte.ReaderTransacted[
+	objekte.TransactedReader[
 		*kennung.Etikett,
 		*etikett.Transacted,
 	]

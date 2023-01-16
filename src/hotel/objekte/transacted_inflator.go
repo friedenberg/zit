@@ -177,17 +177,17 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) InflateFromDataIdentity(
 	}
 
 	if err = t.SetDataIdentity(o); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "DataIdentity: %s", o)
 		return
 	}
 
 	if err = h.readObjekte(o, t); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "DataIdentity: %s", o)
 		return
 	}
 
 	if err = h.readAkte(t); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "DataIdentity: %s", o)
 		return
 	}
 
@@ -251,7 +251,7 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) InflateFromDataIdentityAndSt
 	}
 
 	if err = h.StoreObjekte(t); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "DataIdentity: %s", o)
 		return
 	}
 
@@ -262,6 +262,10 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) readObjekte(
 	sk sku.DataIdentity,
 	t *Transacted[T, T1, T2, T3, T4, T5],
 ) (err error) {
+	if t.ObjekteSha().IsNull() {
+		return
+	}
+
 	var r sha.ReadCloser
 
 	if r, err = h.of.ObjekteReader(sk, sk.GetObjekteSha()); err != nil {

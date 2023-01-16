@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/golf/id_set"
+	"github.com/friedenberg/zit/src/hotel/objekte"
 )
 
 // TODO-P2 move away from this and replace with compiled filter
@@ -14,7 +15,15 @@ type WriterIds struct {
 	Filter id_set.Filter
 }
 
-func (w WriterIds) WriteZettelVerzeichnisse(z *Transacted) (err error) {
+func (w WriterIds) WriteTransactedLike(maybeZ objekte.TransactedLike) (err error) {
+	if z, ok := maybeZ.(*Transacted); ok {
+		return w.WriteZettelTransacted(z)
+	}
+
+	return
+}
+
+func (w WriterIds) WriteZettelTransacted(z *Transacted) (err error) {
 	z1 := zettelFilterable{Transacted: z}
 	return w.Filter.Include(z1)
 }

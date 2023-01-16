@@ -14,6 +14,7 @@ import (
 )
 
 type TypStore interface {
+	reindexer
 	GattungStore
 
 	objekte.Inheritor[*typ.Transacted]
@@ -24,7 +25,7 @@ type TypStore interface {
 		*typ.Objekte,
 	]
 
-	objekte.ReaderTransacted[
+	objekte.TransactedReader[
 		*kennung.Typ,
 		*typ.Transacted,
 	]

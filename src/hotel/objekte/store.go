@@ -24,7 +24,7 @@ type Reader[
 	ReadAllSchwanzen(collections.WriterFunc[V]) error
 }
 
-type ReaderTransacted[
+type TransactedReader[
 	K any,
 	V any,
 ] interface {

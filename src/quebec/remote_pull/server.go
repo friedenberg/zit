@@ -5,9 +5,9 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/collections"
+	"github.com/friedenberg/zit/src/echo/gattungen"
 	"github.com/friedenberg/zit/src/echo/sha"
-	"github.com/friedenberg/zit/src/golf/id_set"
-	"github.com/friedenberg/zit/src/india/typ"
+	"github.com/friedenberg/zit/src/hotel/objekte"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 	"github.com/friedenberg/zit/src/papa/remote_conn"
@@ -148,40 +148,25 @@ func (op Server) skusForFilter(
 		}
 	}()
 
-	var filter id_set.Filter
+	var msg messageRequestSkus
 
-	if err = d.Receive(&filter); err != nil {
+	if err = d.Receive(&msg); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	method := op.umwelt.StoreObjekten().Zettel().ReadAllSchwanzen
+	method := op.umwelt.StoreObjekten().ReadAllSchwanzen
 
 	if op.umwelt.Konfig().IncludeHistory {
-		method = op.umwelt.StoreObjekten().Zettel().ReadAll
-	}
-
-	if err = op.umwelt.StoreObjekten().Typ().ReadAll(
-		func(z *typ.Transacted) (err error) {
-			sk := z.Sku.Sku2()
-
-			if err = d.Send(sk); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+		method = op.umwelt.StoreObjekten().ReadAll
 	}
 
 	if err = method(
+		gattungen.MakeSet(msg.GattungSlice...),
 		collections.MakeChain(
-			zettel.WriterIds{Filter: filter}.WriteZettelVerzeichnisse,
-			func(z *zettel.Transacted) (err error) {
-				sk := z.Sku.Sku2()
+			zettel.WriterIds{Filter: msg.Filter}.WriteTransactedLike,
+			func(tl objekte.TransactedLike) (err error) {
+				sk := tl.GetSku2()
 
 				if err = d.Send(sk); err != nil {
 					err = errors.Wrap(err)

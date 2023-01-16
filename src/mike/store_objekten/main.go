@@ -7,12 +7,16 @@ import (
 	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
+	"github.com/friedenberg/zit/src/echo/gattungen"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/echo/standort"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/ts"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/golf/transaktion"
+	"github.com/friedenberg/zit/src/hotel/objekte"
+	"github.com/friedenberg/zit/src/india/etikett"
+	"github.com/friedenberg/zit/src/india/typ"
 	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 )
@@ -32,6 +36,13 @@ type Store struct {
 	etikettStore          EtikettStore
 	konfigStore           KonfigStore
 	bestandsaufnahmeStore bestandsaufnahme.Store
+
+	//Gattungen
+	gattungStores     map[gattung.Gattung]GattungStore
+	reindexers        map[gattung.Gattung]reindexer
+	flushers          map[gattung.Gattung]errors.Flusher
+	readers           map[gattung.Gattung]objekte.FuncReaderTransactedLike
+	transactedReaders map[gattung.Gattung]objekte.FuncReaderTransactedLike
 }
 
 func Make(
@@ -110,6 +121,65 @@ func Make(
 		return
 	}
 
+	s.gattungStores = map[gattung.Gattung]GattungStore{
+		gattung.Zettel:  s.zettelStore,
+		gattung.Typ:     s.typStore,
+		gattung.Etikett: s.etikettStore,
+		gattung.Konfig:  s.konfigStore,
+	}
+
+	s.readers = map[gattung.Gattung]objekte.FuncReaderTransactedLike{
+		gattung.Zettel: objekte.MakeApplyTransactedLike[*zettel.Transacted](
+			s.zettelStore.ReadAllSchwanzen,
+		),
+		gattung.Typ: objekte.MakeApplyTransactedLike[*typ.Transacted](
+			s.typStore.ReadAllSchwanzen,
+		),
+		gattung.Etikett: objekte.MakeApplyTransactedLike[*etikett.Transacted](
+			s.etikettStore.ReadAllSchwanzen,
+		),
+		// gattung.Konfig:           objekte.MakeApplyTransactedLike[*konfig.Transacted](
+		// s.konfigStore.ReadAllSchwanzen,
+		// ),
+		// gattung.Bestandsaufnahme: objekte.MakeApplyTransactedLike[*bestandsaufnahme.Objekte](
+		// 	s.bestandsaufnahmeStore.ReadAll,
+		// ),
+	}
+
+	s.transactedReaders = map[gattung.Gattung]objekte.FuncReaderTransactedLike{
+		gattung.Zettel: objekte.MakeApplyTransactedLike[*zettel.Transacted](
+			s.zettelStore.ReadAll,
+		),
+		gattung.Typ: objekte.MakeApplyTransactedLike[*typ.Transacted](
+			s.typStore.ReadAll,
+		),
+		gattung.Etikett: objekte.MakeApplyTransactedLike[*etikett.Transacted](
+			s.etikettStore.ReadAll,
+		),
+		// gattung.Konfig:           objekte.MakeApplyTransactedLike[*konfig.Transacted](
+		// s.konfigStore.ReadAllSchwanzen,
+		// ),
+		// gattung.Bestandsaufnahme: objekte.MakeApplyTransactedLike[*bestandsaufnahme.Objekte](
+		// 	s.bestandsaufnahmeStore.ReadAll,
+		// ),
+	}
+
+	s.flushers = make(map[gattung.Gattung]errors.Flusher)
+
+	for g, gs := range s.gattungStores {
+		if fl, ok := gs.(errors.Flusher); ok {
+			s.flushers[g] = fl
+		}
+	}
+
+	s.reindexers = make(map[gattung.Gattung]reindexer)
+
+	for g, gs := range s.gattungStores {
+		if gs1, ok := gs.(reindexer); ok {
+			s.reindexers[g] = gs1
+		}
+	}
+
 	return
 }
 
@@ -140,6 +210,8 @@ func (s *Store) CurrentTransaktionTime() ts.Time {
 func (s Store) RevertTransaktion(
 	t *transaktion.Transaktion,
 ) (tzs zettel.MutableSet, err error) {
+	errors.TodoP0("implement")
+
 	if !s.common.LockSmith.IsAcquired() {
 		err = ErrLockRequired{
 			Operation: "revert",
@@ -235,20 +307,12 @@ func (s Store) Flush() (err error) {
 		return
 	}
 
-	if err = s.zettelStore.Flush(); err != nil {
-		err = errors.Wrap(err)
-		return
+	for _, fl := range s.flushers {
+		if err = fl.Flush(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
-
-	// if err = s.typStore.Flush(); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
-
-	// if err = s.etikettStore.Flush(); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
 
 	if err = s.common.Abbr.Flush(); err != nil {
 		errors.Err().Print(err)
@@ -310,21 +374,72 @@ func (s *Store) Reindex() (err error) {
 	return
 }
 
-func (s *Store) getReindexFunc() func(sku.DataIdentity) error {
-	stores := map[gattung.Gattung]reindexer{
-		gattung.Konfig:  s.konfigStore,
-		gattung.Typ:     s.typStore,
-		gattung.Etikett: s.etikettStore,
-		gattung.Zettel:  s.zettelStore,
+func (s *Store) ReadAllSchwanzen(
+	gs gattungen.Set,
+	f collections.WriterFunc[objekte.TransactedLike],
+) (err error) {
+	chErr := make(chan error, gs.Len())
+
+	for g, s1 := range s.readers {
+		if !gs.Contains(g) {
+			continue
+		}
+
+		go func(s1 objekte.FuncReaderTransactedLike) {
+			var subErr error
+
+			defer func() {
+				chErr <- subErr
+			}()
+
+			subErr = s1(f)
+		}(s1)
 	}
 
+	for i := 0; i < gs.Len(); i++ {
+		err = errors.MakeMulti(err, <-chErr)
+	}
+
+	return
+}
+
+func (s *Store) ReadAll(
+	gs gattungen.Set,
+	f collections.WriterFunc[objekte.TransactedLike],
+) (err error) {
+	chErr := make(chan error, gs.Len())
+
+	for g, s1 := range s.transactedReaders {
+		if !gs.Contains(g) {
+			continue
+		}
+
+		go func(s1 objekte.FuncReaderTransactedLike) {
+			var subErr error
+
+			defer func() {
+				chErr <- subErr
+			}()
+
+			subErr = s1(f)
+		}(s1)
+	}
+
+	for i := 0; i < gs.Len(); i++ {
+		err = errors.MakeMulti(err, <-chErr)
+	}
+
+	return
+}
+
+func (s *Store) getReindexFunc() func(sku.DataIdentity) error {
 	return func(o sku.DataIdentity) (err error) {
 		var st reindexer
 		ok := false
 
 		g := o.GetGattung()
 
-		if st, ok = stores[g]; !ok {
+		if st, ok = s.reindexers[g]; !ok {
 			err = errors.Wrapf(gattung.ErrUnsupportedGattung, "Gattung: %s", g)
 			return
 		}

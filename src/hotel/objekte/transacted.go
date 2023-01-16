@@ -95,6 +95,10 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) Equals(
 	return true
 }
 
+func (a Transacted[T, T1, T2, T3, T4, T5]) GetSku2() sku.Sku2 {
+	return a.Sku.Sku2()
+}
+
 func (a *Transacted[T, T1, T2, T3, T4, T5]) SetDataIdentity(
 	o sku.DataIdentity,
 ) (err error) {

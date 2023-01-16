@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
+	"github.com/friedenberg/zit/src/echo/gattungen"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/golf/id_set"
 	"github.com/friedenberg/zit/src/golf/sku"
@@ -22,8 +23,8 @@ const (
 type FuncSku func(sku.Sku2) error
 
 type Client interface {
-	SkusFromFilter(id_set.Filter, FuncSku) error
-	PullSkus(id_set.Filter) error
+	SkusFromFilter(id_set.Filter, gattungen.Set, FuncSku) error
+	PullSkus(id_set.Filter, gattungen.Set) error
 	gattung.ObjekteReaderFactory
 	gattung.AkteReaderFactory
 	Close() error
@@ -73,7 +74,11 @@ func (c client) Close() (err error) {
 	return
 }
 
-func (c client) SkusFromFilter(ids id_set.Filter, f FuncSku) (err error) {
+func (c client) SkusFromFilter(
+	ids id_set.Filter,
+	gattungSet gattungen.Set,
+	f FuncSku,
+) (err error) {
 	var d remote_conn.Dialogue
 
 	if d, err = c.stage.StartDialogue(
@@ -97,7 +102,12 @@ func (c client) SkusFromFilter(ids id_set.Filter, f FuncSku) (err error) {
 		}
 	}()
 
-	if err = d.Send(ids); err != nil {
+	msg := messageRequestSkus{
+		Filter:       ids,
+		GattungSlice: gattungSet.Elements(),
+	}
+
+	if err = d.Send(msg); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
