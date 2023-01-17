@@ -42,7 +42,7 @@ type compiled struct {
 
 	Sku sku.Transacted[kennung.Konfig, *kennung.Konfig]
 
-	konfig.Toml
+	konfig.Akte
 
 	//Etiketten
 	EtikettenHidden     []string
@@ -286,7 +286,7 @@ func (k *compiled) SetTransacted(
 ) {
 	k.hasChanges = true
 	k.Sku = kt.Sku
-	k.Toml = kt.Objekte.Akte
+	k.Akte = kt.Objekte.Akte
 }
 
 func (k *compiled) AddTyp(

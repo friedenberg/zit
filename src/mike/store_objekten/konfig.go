@@ -187,7 +187,7 @@ func (s konfigStore) Read() (tt *konfig.Transacted, err error) {
 	tt = &konfig.Transacted{
 		Sku: s.common.Konfig().Sku,
 		Objekte: konfig.Objekte{
-			Akte: s.common.Konfig().Toml,
+			Akte: s.common.Konfig().Akte,
 		},
 	}
 

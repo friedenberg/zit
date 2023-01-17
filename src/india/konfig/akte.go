@@ -3,7 +3,7 @@ package konfig
 import "github.com/friedenberg/zit/src/bravo/script_config"
 
 // TODO-P4 rename to Akte
-type Toml struct {
+type Akte struct {
 	FileExtensions FileExtensions                        `toml:"file-extensions"`
 	RemoteScripts  map[string]RemoteScript               `toml:"remote-scripts"`
 	Recipients     []string                              `toml:"recipients"`
@@ -11,7 +11,7 @@ type Toml struct {
 	StoreVersion   string                                `toml:"store-version,omitempty"`
 }
 
-func (a *Toml) Reset(b *Toml) {
+func (a *Akte) Reset(b *Akte) {
 	if b == nil {
 		a.FileExtensions.Reset(nil)
 		a.RemoteScripts = make(map[string]RemoteScript)

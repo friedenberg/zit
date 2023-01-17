@@ -19,7 +19,7 @@ type Transacted = objekte.Transacted[
 type Objekte struct {
 	//TODO-P3 rename to AkteSha
 	Sha  sha.Sha
-	Akte Toml
+	Akte Akte
 }
 
 func (o Objekte) GetAkteSha() sha.Sha {

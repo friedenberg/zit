@@ -2,7 +2,7 @@ package konfig
 
 func Default() (k *Objekte) {
 	k = &Objekte{
-		Akte: Toml{
+		Akte: Akte{
 			FileExtensions: FileExtensions{
 				Typ:      "typ",
 				Zettel:   "zettel",
