@@ -12,7 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/echo/standort"
 	"github.com/friedenberg/zit/src/india/typ"
-	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
+	"github.com/friedenberg/zit/src/juliett/konfig"
 )
 
 type FormatterValue struct {
@@ -52,7 +52,7 @@ func (f *FormatterValue) Set(v string) (err error) {
 func (fv *FormatterValue) FuncFormatterVerzeichnisse(
 	out io.Writer,
 	af gattung.AkteIOFactory,
-	k konfig_compiled.Compiled,
+	k konfig.Compiled,
 	logFunc collections.WriterFunc[*Transacted],
 ) collections.WriterFunc[*Transacted] {
 	return fv.FuncFormatter(
@@ -66,7 +66,7 @@ func (fv *FormatterValue) FuncFormatterVerzeichnisse(
 func (fv *FormatterValue) FuncFormatter(
 	out io.Writer,
 	af gattung.AkteIOFactory,
-	k konfig_compiled.Compiled,
+	k konfig.Compiled,
 	logFunc collections.WriterFunc[*Transacted],
 ) collections.WriterFunc[*Transacted] {
 	errors.TodoP2("convert to verzeichnisse")

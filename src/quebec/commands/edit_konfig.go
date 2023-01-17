@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/india/konfig"
+	"github.com/friedenberg/zit/src/india/erworben"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 	"github.com/friedenberg/zit/src/papa/user_ops"
 )
@@ -56,7 +56,7 @@ func (c EditKonfig) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	var k *konfig.Objekte
+	var k *erworben.Objekte
 
 	if k, err = c.readTempKonfigFile(u, p); err != nil {
 		err = errors.Wrap(err)
@@ -70,7 +70,7 @@ func (c EditKonfig) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	defer errors.Deferred(&err, u.Unlock)
 
-	var tt *konfig.Transacted
+	var tt *erworben.Transacted
 
 	if tt, err = u.StoreObjekten().Konfig().Update(k); err != nil {
 		err = errors.Wrap(err)
@@ -85,7 +85,7 @@ func (c EditKonfig) Run(u *umwelt.Umwelt, args ...string) (err error) {
 func (c EditKonfig) makeTempKonfigFile(
 	u *umwelt.Umwelt,
 ) (p string, err error) {
-	var k *konfig.Transacted
+	var k *erworben.Transacted
 
 	if k, err = u.StoreObjekten().Konfig().Read(); err != nil {
 		err = errors.Wrap(err)
@@ -103,7 +103,7 @@ func (c EditKonfig) makeTempKonfigFile(
 
 	p = f.Name()
 
-	format := konfig.MakeFormatText(u.StoreObjekten())
+	format := erworben.MakeFormatText(u.StoreObjekten())
 
 	if _, err = format.Format(f, &k.Objekte); err != nil {
 		err = errors.Wrap(err)
@@ -116,7 +116,7 @@ func (c EditKonfig) makeTempKonfigFile(
 func (c EditKonfig) readTempKonfigFile(
 	u *umwelt.Umwelt,
 	p string,
-) (k *konfig.Objekte, err error) {
+) (k *erworben.Objekte, err error) {
 	var f *os.File
 
 	if f, err = files.Open(p); err != nil {
@@ -126,9 +126,9 @@ func (c EditKonfig) readTempKonfigFile(
 
 	defer errors.Deferred(&err, f.Close)
 
-	format := konfig.MakeFormatText(u.StoreObjekten())
+	format := erworben.MakeFormatText(u.StoreObjekten())
 
-	k = &konfig.Objekte{}
+	k = &erworben.Objekte{}
 
 	//TODO-P3 offer option to edit again
 	if _, err = format.Parse(f, k); err != nil {

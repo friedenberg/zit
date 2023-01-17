@@ -10,40 +10,40 @@ import (
 	"github.com/friedenberg/zit/src/golf/age_io"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/hotel/objekte"
-	"github.com/friedenberg/zit/src/india/konfig"
+	"github.com/friedenberg/zit/src/india/erworben"
 )
 
 type KonfigStore interface {
 	reindexer
 	GattungStore
 
-	Read() (*konfig.Transacted, error)
-	Update(*konfig.Objekte) (*konfig.Transacted, error)
+	Read() (*erworben.Transacted, error)
+	Update(*erworben.Objekte) (*erworben.Transacted, error)
 
-	objekte.TransactedLogger[*konfig.Transacted]
-	objekte.AkteTextSaver[konfig.Objekte, *konfig.Objekte]
+	objekte.TransactedLogger[*erworben.Transacted]
+	objekte.AkteTextSaver[erworben.Objekte, *erworben.Objekte]
 }
 
 type KonfigInflator = objekte.TransactedInflator[
-	konfig.Objekte,
-	*konfig.Objekte,
+	erworben.Objekte,
+	*erworben.Objekte,
 	kennung.Konfig,
 	*kennung.Konfig,
-	objekte.NilVerzeichnisse[konfig.Objekte],
-	*objekte.NilVerzeichnisse[konfig.Objekte],
+	objekte.NilVerzeichnisse[erworben.Objekte],
+	*objekte.NilVerzeichnisse[erworben.Objekte],
 ]
 
-type KonfigLogWriter = objekte.LogWriter[*konfig.Transacted]
+type KonfigLogWriter = objekte.LogWriter[*erworben.Transacted]
 
 type KonfigAkteTextSaver = objekte.AkteTextSaver[
-	konfig.Objekte,
-	*konfig.Objekte,
+	erworben.Objekte,
+	*erworben.Objekte,
 ]
 
 type konfigStore struct {
 	common *common
 
-	pool collections.PoolLike[konfig.Transacted]
+	pool collections.PoolLike[erworben.Transacted]
 
 	KonfigInflator
 	KonfigAkteTextSaver
@@ -59,33 +59,33 @@ func (s *konfigStore) SetLogWriter(
 func makeKonfigStore(
 	sa *common,
 ) (s *konfigStore, err error) {
-	pool := collections.MakePool[konfig.Transacted]()
+	pool := collections.MakePool[erworben.Transacted]()
 
 	s = &konfigStore{
 		common: sa,
 		pool:   pool,
 		KonfigInflator: objekte.MakeTransactedInflator[
-			konfig.Objekte,
-			*konfig.Objekte,
+			erworben.Objekte,
+			*erworben.Objekte,
 			kennung.Konfig,
 			*kennung.Konfig,
-			objekte.NilVerzeichnisse[konfig.Objekte],
-			*objekte.NilVerzeichnisse[konfig.Objekte],
+			objekte.NilVerzeichnisse[erworben.Objekte],
+			*objekte.NilVerzeichnisse[erworben.Objekte],
 		](
 			sa,
 			sa,
 			nil,
-			gattung.Format[konfig.Objekte, *konfig.Objekte](
-				konfig.MakeFormatText(sa),
+			gattung.Format[erworben.Objekte, *erworben.Objekte](
+				erworben.MakeFormatText(sa),
 			),
 			pool,
 		),
 		KonfigAkteTextSaver: objekte.MakeAkteTextSaver[
-			konfig.Objekte,
-			*konfig.Objekte,
+			erworben.Objekte,
+			*erworben.Objekte,
 		](
 			sa,
-			&konfig.FormatterAkteTextToml{},
+			&erworben.FormatterAkteTextToml{},
 		),
 	}
 
@@ -97,8 +97,8 @@ func (s konfigStore) Flush() (err error) {
 }
 
 func (s konfigStore) Update(
-	ko *konfig.Objekte,
-) (kt *konfig.Transacted, err error) {
+	ko *erworben.Objekte,
+) (kt *erworben.Transacted, err error) {
 	if !s.common.LockSmith.IsAcquired() {
 		err = errors.Wrap(ErrLockRequired{Operation: "update konfig"})
 		return
@@ -119,7 +119,7 @@ func (s konfigStore) Update(
 
 	defer errors.Deferred(&err, w.Close)
 
-	var mutter *konfig.Transacted
+	var mutter *erworben.Transacted
 
 	if mutter, err = s.Read(); err != nil {
 		if errors.Is(err, ErrNotFound{}) {
@@ -130,7 +130,7 @@ func (s konfigStore) Update(
 		}
 	}
 
-	kt = &konfig.Transacted{
+	kt = &erworben.Transacted{
 		Objekte: *ko,
 		Sku: sku.Transacted[kennung.Konfig, *kennung.Konfig]{
 			Verzeichnisse: sku.Verzeichnisse{
@@ -147,7 +147,7 @@ func (s konfigStore) Update(
 		kt.Sku.Kopf = s.common.Transaktion.Time
 	}
 
-	fo := objekte.MakeFormat[konfig.Objekte, *konfig.Objekte]()
+	fo := objekte.MakeFormat[erworben.Objekte, *erworben.Objekte]()
 
 	if _, err = fo.Format(w, &kt.Objekte); err != nil {
 		err = errors.Wrap(err)
@@ -183,10 +183,10 @@ func (s konfigStore) Update(
 	return
 }
 
-func (s konfigStore) Read() (tt *konfig.Transacted, err error) {
-	tt = &konfig.Transacted{
+func (s konfigStore) Read() (tt *erworben.Transacted, err error) {
+	tt = &erworben.Transacted{
 		Sku: s.common.Konfig().Sku,
-		Objekte: konfig.Objekte{
+		Objekte: erworben.Objekte{
 			Akte: s.common.Konfig().Akte,
 		},
 	}
@@ -209,7 +209,7 @@ func (s konfigStore) Read() (tt *konfig.Transacted, err error) {
 
 			defer errors.Deferred(&err, r.Close)
 
-			fo := objekte.MakeFormat[konfig.Objekte, *konfig.Objekte]()
+			fo := objekte.MakeFormat[erworben.Objekte, *erworben.Objekte]()
 
 			if _, err = fo.Parse(r, &tt.Objekte); err != nil {
 				err = errors.Wrap(err)
@@ -233,7 +233,7 @@ func (s konfigStore) Read() (tt *konfig.Transacted, err error) {
 
 			defer errors.Deferred(&err, r.Close)
 
-			fo := konfig.MakeFormatText(s.common)
+			fo := erworben.MakeFormatText(s.common)
 
 			if _, err = fo.Parse(r, &tt.Objekte); err != nil {
 				err = errors.Wrap(err)
@@ -245,14 +245,14 @@ func (s konfigStore) Read() (tt *konfig.Transacted, err error) {
 	return
 }
 
-func (s konfigStore) AllInChain() (c []*konfig.Transacted, err error) {
+func (s konfigStore) AllInChain() (c []*erworben.Transacted, err error) {
 	return
 }
 
 func (s *konfigStore) reindexOne(
 	sk sku.DataIdentity,
 ) (o gattung.Stored, err error) {
-	var te *konfig.Transacted
+	var te *erworben.Transacted
 	defer s.pool.Put(te)
 
 	if te, err = s.InflateFromDataIdentity(sk); err != nil {

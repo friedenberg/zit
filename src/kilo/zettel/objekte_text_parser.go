@@ -8,19 +8,19 @@ import (
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei_io"
-	"github.com/friedenberg/zit/src/india/konfig"
+	"github.com/friedenberg/zit/src/india/erworben"
 )
 
 type objekteTextParser struct {
 	AkteFactory                gattung.AkteIOFactory
-	AkteFormatter              konfig.RemoteScript
+	AkteFormatter              erworben.RemoteScript
 	DoNotWriteEmptyBezeichnung bool
 	TypError                   error
 }
 
 func MakeObjekteTextParser(
 	akteFactory gattung.AkteIOFactory,
-	akteFormatter konfig.RemoteScript,
+	akteFormatter erworben.RemoteScript,
 ) objekteTextParser {
 	return objekteTextParser{
 		AkteFactory:   akteFactory,

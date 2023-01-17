@@ -5,18 +5,18 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/india/typ"
-	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
+	"github.com/friedenberg/zit/src/juliett/konfig"
 )
 
 type formatterTypFormatterUTIGroups struct {
-	konfig konfig_compiled.Compiled
+	erworben konfig.Compiled
 }
 
 func MakeFormatterTypFormatterUTIGroups(
-	konfig konfig_compiled.Compiled,
+	erworben konfig.Compiled,
 ) *formatterTypFormatterUTIGroups {
 	return &formatterTypFormatterUTIGroups{
-		konfig: konfig,
+		erworben: erworben,
 	}
 }
 
@@ -26,7 +26,7 @@ func (e formatterTypFormatterUTIGroups) Format(
 ) (n int64, err error) {
 	e1 := typ.MakeFormatterFormatterUTIGroups()
 
-	ct := e.konfig.GetTyp(c.Zettel.Typ)
+	ct := e.erworben.GetTyp(c.Zettel.Typ)
 
 	if ct == nil {
 		return

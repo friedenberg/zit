@@ -63,6 +63,14 @@ func (c Standort) FileKonfigCompiled() string {
 	return c.DirZit("KonfigCompiled")
 }
 
+func (c Standort) FileKonfigAngeboren() string {
+	return c.DirZit("KonfigAngeboren")
+}
+
+func (c Standort) FileKonfigErworben() string {
+	return c.DirZit("KonfigErworben")
+}
+
 func (c Standort) FileKonfigToml() string {
 	// var usr *user.User
 

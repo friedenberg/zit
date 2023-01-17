@@ -2,7 +2,7 @@ package zettel
 
 import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/india/konfig"
+	"github.com/friedenberg/zit/src/india/erworben"
 )
 
 type objekteTextFormat struct {
@@ -12,7 +12,7 @@ type objekteTextFormat struct {
 
 func MakeObjekteTextFormat(
 	akteFactory gattung.AkteIOFactory,
-	akteFormatter konfig.RemoteScript,
+	akteFormatter erworben.RemoteScript,
 ) *objekteTextFormat {
 	return &objekteTextFormat{
 		objekteTextParser: MakeObjekteTextParser(

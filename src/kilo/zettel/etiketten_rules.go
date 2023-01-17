@@ -6,10 +6,10 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/etikett_rule"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
-	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
+	"github.com/friedenberg/zit/src/juliett/konfig"
 )
 
-func (z *Objekte) ApplyKonfig(k konfig_compiled.Compiled) (err error) {
+func (z *Objekte) ApplyKonfig(k konfig.Compiled) (err error) {
 	errors.TodoP4("move this somewhere more appropriate")
 
 	normalized := kennung.WithRemovedCommonPrefixes(z.Etiketten)

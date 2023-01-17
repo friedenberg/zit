@@ -1,4 +1,4 @@
-package konfig
+package erworben
 
 type FileExtensions struct {
 	Zettel   string `toml:"zettel"`

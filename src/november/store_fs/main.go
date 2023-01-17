@@ -17,7 +17,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/ts"
 	"github.com/friedenberg/zit/src/golf/fd"
 	"github.com/friedenberg/zit/src/india/zettel_external"
-	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
+	"github.com/friedenberg/zit/src/juliett/konfig"
 	"github.com/friedenberg/zit/src/kilo/cwd_files"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/mike/store_objekten"
@@ -26,7 +26,7 @@ import (
 
 type Store struct {
 	sonnenaufgang ts.Time
-	konfig        konfig_compiled.Compiled
+	erworben      konfig.Compiled
 	standort.Standort
 
 	format zettel.ObjekteFormat
@@ -42,13 +42,13 @@ type Store struct {
 
 func New(
 	t ts.Time,
-	k konfig_compiled.Compiled,
+	k konfig.Compiled,
 	st standort.Standort,
 	storeObjekten *store_objekten.Store,
 ) (s *Store, err error) {
 	s = &Store{
 		sonnenaufgang: t,
-		konfig:        k,
+		erworben:      k,
 		Standort:      st,
 		format: zettel.MakeObjekteTextFormat(
 			storeObjekten,
@@ -144,7 +144,7 @@ func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 		//extension
 		//TODO-P4 modify this to use globs
 		if filepath.Ext(ez.ZettelFD.Path) == "" {
-			ez.ZettelFD.Path = ez.ZettelFD.Path + s.konfig.GetZettelFileExtension()
+			ez.ZettelFD.Path = ez.ZettelFD.Path + s.erworben.GetZettelFileExtension()
 			return s.readZettelFromFile(ez)
 		}
 
@@ -232,16 +232,16 @@ func (s *Store) ReadOne(h hinweis.Hinweis) (zt *zettel.Transacted, err error) {
 		return
 	}
 
-	if !s.konfig.IncludeCwd {
+	if !s.erworben.IncludeCwd {
 		return
 	}
 
 	var pz cwd_files.CwdFiles
 
 	if pz, err = cwd_files.MakeCwdFilesExactly(
-		s.konfig,
+		s.erworben,
 		s.Standort.Cwd(),
-		fmt.Sprintf("%s.%s", h, s.konfig.FileExtensions.Zettel),
+		fmt.Sprintf("%s.%s", h, s.erworben.FileExtensions.Zettel),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -298,7 +298,7 @@ func (s *Store) ReadMany(
 ) (err error) {
 	w := w1
 
-	if s.konfig.IncludeCwd {
+	if s.erworben.IncludeCwd {
 		w = func(z *zettel.Transacted) (err error) {
 			//TODO-P2 akte fd?
 			ze := zettel_external.Zettel{
@@ -342,13 +342,13 @@ func (s *Store) ReadManyHistory(
 		s.storeObjekten.Zettel().ReadAll,
 	}
 
-	if s.konfig.IncludeCwd {
+	if s.erworben.IncludeCwd {
 		queries = append(
 			queries,
 			func(w collections.WriterFunc[*zettel.Transacted]) (err error) {
 				var pz cwd_files.CwdFiles
 
-				if pz, err = cwd_files.MakeCwdFilesAll(s.konfig, s.Standort.Cwd()); err != nil {
+				if pz, err = cwd_files.MakeCwdFilesAll(s.erworben, s.Standort.Cwd()); err != nil {
 					err = errors.Wrap(err)
 					return
 				}

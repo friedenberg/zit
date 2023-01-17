@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
-	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
+	"github.com/friedenberg/zit/src/juliett/konfig"
 )
 
 type Verzeichnisse struct {
@@ -66,7 +66,7 @@ func (w writerGobEncoder) WriteZettelVerzeichnisse(z *Transacted) (err error) {
 }
 
 func MakeWriterKonfig(
-	k konfig_compiled.Compiled,
+	k konfig.Compiled,
 ) collections.WriterFunc[*Transacted] {
 	errors.TodoP3("add efficient parsing of hiding tags")
 

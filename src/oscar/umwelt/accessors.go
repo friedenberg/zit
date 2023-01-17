@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/standort"
 	"github.com/friedenberg/zit/src/foxtrot/ts"
-	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
+	"github.com/friedenberg/zit/src/juliett/konfig"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/mike/store_objekten"
 	"github.com/friedenberg/zit/src/november/store_fs"
@@ -16,11 +16,11 @@ func (u *Umwelt) Sonnenaufgang() ts.Time {
 	return u.sonnenaufgang
 }
 
-func (u *Umwelt) Konfig() konfig_compiled.Compiled {
+func (u *Umwelt) Konfig() konfig.Compiled {
 	return u.konfig
 }
 
-func (u *Umwelt) KonfigPtr() *konfig_compiled.Compiled {
+func (u *Umwelt) KonfigPtr() *konfig.Compiled {
 	return &u.konfig
 }
 

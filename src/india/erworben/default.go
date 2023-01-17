@@ -1,4 +1,4 @@
-package konfig
+package erworben
 
 func Default() (k *Objekte) {
 	k = &Objekte{

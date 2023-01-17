@@ -14,8 +14,8 @@ import (
 	"github.com/friedenberg/zit/src/echo/standort"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/ts"
-	"github.com/friedenberg/zit/src/india/konfig"
-	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
+	"github.com/friedenberg/zit/src/india/erworben"
+	"github.com/friedenberg/zit/src/juliett/konfig"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/mike/store_objekten"
 	"github.com/friedenberg/zit/src/november/store_fs"
@@ -33,7 +33,7 @@ type Umwelt struct {
 	errIsTty bool
 
 	standort standort.Standort
-	konfig   konfig_compiled.Compiled
+	konfig   konfig.Compiled
 
 	storesInitialized     bool
 	lock                  *file_lock.Lock
@@ -44,7 +44,7 @@ type Umwelt struct {
 	zettelVerzeichnissePool *collections.Pool[zettel.Transacted]
 }
 
-func Make(kCli konfig.Cli) (u *Umwelt, err error) {
+func Make(kCli erworben.Cli) (u *Umwelt, err error) {
 	u = &Umwelt{
 		in:                      os.Stdin,
 		out:                     os.Stdout,
@@ -73,7 +73,7 @@ func (u *Umwelt) Reset() (err error) {
 	return u.Initialize(u.Konfig().Cli())
 }
 
-func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
+func (u *Umwelt) Initialize(kCli erworben.Cli) (err error) {
 	if err = u.Flush(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -128,9 +128,9 @@ func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 	}
 
 	{
-		var k *konfig_compiled.Compiled
+		var k *konfig.Compiled
 
-		if k, err = konfig_compiled.Make(
+		if k, err = konfig.Make(
 			u.standort,
 			kCli,
 		); err != nil {

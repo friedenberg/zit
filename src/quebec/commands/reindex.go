@@ -8,7 +8,6 @@ import (
 )
 
 type Reindex struct {
-	UseBestandsaufnahme bool
 }
 
 func init() {
@@ -16,8 +15,6 @@ func init() {
 		"reindex",
 		func(f *flag.FlagSet) Command {
 			c := &Reindex{}
-
-			f.BoolVar(&c.UseBestandsaufnahme, "use-bestandsaufnahme", false, "use bestandsaufnahme")
 
 			return c
 		},
@@ -37,16 +34,9 @@ func (c Reindex) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	defer errors.Deferred(&err, u.Unlock)
 
-	if c.UseBestandsaufnahme {
-		if err = u.StoreObjekten().ReindexBestandsaufnahme(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	} else {
-		if err = u.StoreObjekten().Reindex(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if err = u.StoreObjekten().Reindex(); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

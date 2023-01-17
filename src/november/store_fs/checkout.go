@@ -19,7 +19,7 @@ func (s *Store) Checkout(
 
 	if err = s.storeObjekten.Zettel().ReadAllSchwanzen(
 		collections.MakeChain(
-			zettel.MakeWriterKonfig(s.konfig),
+			zettel.MakeWriterKonfig(s.erworben),
 			ztw,
 			zts.AddAndDoNotRepool,
 		),
@@ -72,7 +72,7 @@ func (s Store) filenameForZettelTransacted(
 		return
 	}
 
-	filename = originalFilename + s.konfig.GetZettelFileExtension()
+	filename = originalFilename + s.erworben.GetZettelFileExtension()
 
 	return
 }
@@ -105,7 +105,7 @@ func (s *Store) CheckoutOne(
 		}
 	}
 
-	inlineAkte := s.konfig.IsInlineTyp(sz.Objekte.Typ)
+	inlineAkte := s.erworben.IsInlineTyp(sz.Objekte.Typ)
 
 	cz = zettel_checked_out.Zettel{
 		//TODO-P2 check diff with fs if already exists
@@ -127,7 +127,7 @@ func (s *Store) CheckoutOne(
 	if !inlineAkte && options.CheckoutMode.IncludesAkte() {
 		t := sz.Objekte.Typ
 
-		ty := s.konfig.GetTyp(t)
+		ty := s.erworben.GetTyp(t)
 
 		var fe string
 
@@ -144,7 +144,7 @@ func (s *Store) CheckoutOne(
 
 	e := zettel_external.MakeFileEncoder(
 		s.storeObjekten,
-		s.konfig,
+		s.erworben,
 	)
 
 	if err = e.Encode(&cz.External); err != nil {

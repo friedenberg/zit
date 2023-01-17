@@ -2,18 +2,19 @@ package commands
 
 import (
 	"bufio"
+	"encoding/gob"
 	"flag"
 	"io"
-	"io/ioutil"
 	"os"
 	"path"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/angeboren"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/standort"
-	"github.com/friedenberg/zit/src/india/konfig"
+	"github.com/friedenberg/zit/src/india/erworben"
 	"github.com/friedenberg/zit/src/india/typ"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
@@ -22,17 +23,21 @@ type Init struct {
 	DisableAge bool
 	Yin        string
 	Yang       string
+	Angeboren  angeboren.Konfig
 }
 
 func init() {
 	registerCommand(
 		"init",
 		func(f *flag.FlagSet) Command {
-			c := &Init{}
+			c := &Init{
+				Angeboren: angeboren.Default(),
+			}
 
 			f.BoolVar(&c.DisableAge, "disable-age", false, "")
 			f.StringVar(&c.Yin, "yin", "", "File containing list of Kennung")
 			f.StringVar(&c.Yang, "yang", "", "File containing list of Kennung")
+			c.Angeboren.AddToFlags(f)
 
 			return c
 		},
@@ -79,8 +84,13 @@ func (c Init) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		}
 	}
 
-	c.writeFile(s.DirZit("Konfig"), "")
-	c.writeFile(s.DirZit("KonfigCompiled"), "")
+	c.writeFile(s.FileKonfigAngeboren(), c.Angeboren)
+
+	if c.Angeboren.UseKonfigErworbenFile {
+		c.writeFile(s.FileKonfigErworben(), "")
+	} else {
+		c.writeFile(s.FileKonfigCompiled(), "")
+	}
 
 	//TODO-P2 how to handle re-init for yin and yang?
 	if err = c.populateYinIfNecessary(s); err != nil {
@@ -155,7 +165,7 @@ func (c Init) initDefaultTypAndKonfig(u *umwelt.Umwelt) (err error) {
 	}
 
 	{
-		defaultKonfig := konfig.Default()
+		defaultKonfig := erworben.Default()
 
 		if _, err = u.StoreObjekten().Konfig().SaveAkteText(
 			defaultKonfig,
@@ -164,7 +174,7 @@ func (c Init) initDefaultTypAndKonfig(u *umwelt.Umwelt) (err error) {
 			return
 		}
 
-		var defaultKonfigTransacted *konfig.Transacted
+		var defaultKonfigTransacted *erworben.Transacted
 
 		if defaultKonfigTransacted, err = u.StoreObjekten().Konfig().Update(
 			defaultKonfig,
@@ -248,12 +258,27 @@ func (c Init) mkdirAll(elements ...string) {
 	errors.PanicIfError(err)
 }
 
-func (c Init) writeFile(path, contents string) {
-	if files.Exists(path) {
-		errors.Err().Printf("%s already exists, not overwriting", path)
+func (c Init) writeFile(p string, contents any) {
+	var f *os.File
+	var err error
+
+	if f, err = files.CreateExclusiveWriteOnly(p); err != nil {
+		if errors.IsExist(err) {
+			errors.Err().Printf("%s already exists, not overwriting", p)
+			err = nil
+		} else {
+		}
+
 		return
 	}
 
-	err := ioutil.WriteFile(path, []byte(contents), 0755)
-	errors.PanicIfError(err)
+	defer errors.PanicIfError(err)
+	defer errors.DeferredCloser(&err, f)
+
+	if s, ok := contents.(string); ok {
+		_, err = io.WriteString(f, s)
+	} else {
+		enc := gob.NewEncoder(f)
+		err = enc.Encode(contents)
+	}
 }

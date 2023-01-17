@@ -1,4 +1,4 @@
-package konfig
+package erworben
 
 type Options int
 

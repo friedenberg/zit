@@ -1,4 +1,4 @@
-package konfig_compiled
+package konfig
 
 import (
 	"encoding/gob"

@@ -69,7 +69,11 @@ func DeferredFlusher(
 	f Flusher,
 ) {
 	if err1 := f.Flush(); err1 != nil {
-		*err = Join(*err, err1)
+		if err == nil {
+			panic(err)
+		} else {
+			*err = Join(*err, err1)
+		}
 	}
 }
 
@@ -78,7 +82,11 @@ func DeferredCloser(
 	c io.Closer,
 ) {
 	if err1 := c.Close(); err1 != nil {
-		*err = Join(*err, err1)
+		if err == nil {
+			panic(err)
+		} else {
+			*err = Join(*err, err1)
+		}
 	}
 }
 
@@ -87,7 +95,11 @@ func Deferred(
 	ef func() error,
 ) {
 	if err1 := ef(); err1 != nil {
-		*err = Join(*err, err1)
+		if err == nil {
+			panic(err)
+		} else {
+			*err = Join(*err, err1)
+		}
 	}
 }
 

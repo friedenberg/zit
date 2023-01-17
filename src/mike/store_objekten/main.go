@@ -17,7 +17,7 @@ import (
 	"github.com/friedenberg/zit/src/hotel/objekte"
 	"github.com/friedenberg/zit/src/india/etikett"
 	"github.com/friedenberg/zit/src/india/typ"
-	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
+	"github.com/friedenberg/zit/src/juliett/konfig"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 
@@ -47,7 +47,7 @@ type Store struct {
 func Make(
 	lockSmith LockSmith,
 	a age.Age,
-	k *konfig_compiled.Compiled,
+	k *konfig.Compiled,
 	st standort.Standort,
 	p *collections.Pool[zettel.Transacted],
 ) (s *Store, err error) {
@@ -322,57 +322,6 @@ func (s Store) Flush() (err error) {
 	return
 }
 
-func (s *Store) Reindex() (err error) {
-	if !s.common.LockSmith.IsAcquired() {
-		err = ErrLockRequired{
-			Operation: "reindex",
-		}
-
-		return
-	}
-
-	if err = s.common.Standort.ResetVerzeichnisse(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	//TODO-P3 move to zettelStore
-	if err = s.zettelStore.indexKennung.reset(); err != nil {
-		err = errors.Wrapf(err, "failed to reset index kennung")
-		return
-	}
-
-	f1 := s.getReindexFunc()
-	f := func(t *transaktion.Transaktion) (err error) {
-		errors.Out().Printf("%s/%s: %s", t.Time.Kopf(), t.Time.Schwanz(), t.Time)
-
-		if err = t.Skus.Each(
-			func(sk sku.SkuLike) (err error) {
-				return f1(sk)
-			},
-		); err != nil {
-			err = errors.Wrapf(
-				err,
-				"Transaktion: %s/%s: %s",
-				t.Time.Kopf(),
-				t.Time.Schwanz(),
-				t.Time,
-			)
-
-			return
-		}
-
-		return
-	}
-
-	if err = s.ReadAllTransaktions(f); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
 func (s *Store) ReadAllSchwanzen(
 	gs gattungen.Set,
 	f collections.WriterFunc[objekte.TransactedLike],
@@ -459,7 +408,7 @@ func (s *Store) getReindexFunc() func(sku.DataIdentity) error {
 	}
 }
 
-func (s *Store) ReindexBestandsaufnahme() (err error) {
+func (s *Store) Reindex() (err error) {
 	if !s.common.LockSmith.IsAcquired() {
 		err = ErrLockRequired{
 			Operation: "reindex",
@@ -480,26 +429,58 @@ func (s *Store) ReindexBestandsaufnahme() (err error) {
 	}
 
 	f1 := s.getReindexFunc()
-	f := func(t *bestandsaufnahme.Objekte) (err error) {
-		if err = t.Akte.Skus.Each(
-			func(sk sku.Sku2) (err error) {
-				return f1(sk)
-			},
-		); err != nil {
-			err = errors.Wrapf(
-				err,
-				"Bestandsaufnahme: %s",
-				t.Tai,
-			)
+
+	if s.common.Konfig().UseBestandsaufnahme {
+		f := func(t *bestandsaufnahme.Objekte) (err error) {
+			if err = t.Akte.Skus.Each(
+				func(sk sku.Sku2) (err error) {
+					return f1(sk)
+				},
+			); err != nil {
+				err = errors.Wrapf(
+					err,
+					"Bestandsaufnahme: %s",
+					t.Tai,
+				)
+
+				return
+			}
 
 			return
 		}
 
-		return
-	}
+		if err = s.bestandsaufnahmeStore.ReadAll(f); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		f := func(t *transaktion.Transaktion) (err error) {
+			errors.Out().Printf("%s/%s: %s", t.Time.Kopf(), t.Time.Schwanz(), t.Time)
 
-	if err = s.bestandsaufnahmeStore.ReadAll(f); err != nil {
-		err = errors.Wrap(err)
+			if err = t.Skus.Each(
+				func(sk sku.SkuLike) (err error) {
+					return f1(sk)
+				},
+			); err != nil {
+				err = errors.Wrapf(
+					err,
+					"Transaktion: %s/%s: %s",
+					t.Time.Kopf(),
+					t.Time.Schwanz(),
+					t.Time,
+				)
+
+				return
+			}
+
+			return
+		}
+
+		if err = s.ReadAllTransaktions(f); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 		return
 	}
 

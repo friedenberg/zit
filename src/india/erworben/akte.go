@@ -1,8 +1,7 @@
-package konfig
+package erworben
 
 import "github.com/friedenberg/zit/src/bravo/script_config"
 
-// TODO-P4 rename to Akte
 type Akte struct {
 	FileExtensions FileExtensions                        `toml:"file-extensions"`
 	RemoteScripts  map[string]RemoteScript               `toml:"remote-scripts"`

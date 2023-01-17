@@ -8,7 +8,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/india/konfig"
+	"github.com/friedenberg/zit/src/india/erworben"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
 
@@ -32,7 +32,7 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	var remote konfig.RemoteScript
+	var remote erworben.RemoteScript
 
 	if remote, err = c.remoteScriptFromArg(u, args[0]); err != nil {
 		err = errors.Wrap(err)
@@ -80,7 +80,7 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 func (c Import) remoteScriptFromArg(
 	u *umwelt.Umwelt,
 	arg string,
-) (remote konfig.RemoteScript, err error) {
+) (remote erworben.RemoteScript, err error) {
 	p := u.Standort().DirZit("bin", arg)
 
 	if !files.Exists(p) {
@@ -88,7 +88,7 @@ func (c Import) remoteScriptFromArg(
 		return
 	}
 
-	remote = konfig.RemoteScriptFile{
+	remote = erworben.RemoteScriptFile{
 		Path: p,
 	}
 
@@ -97,7 +97,7 @@ func (c Import) remoteScriptFromArg(
 
 func (c Import) runRemoteScript(
 	u *umwelt.Umwelt,
-	remote konfig.RemoteScript,
+	remote erworben.RemoteScript,
 	args []string,
 	b []byte,
 ) (err error) {

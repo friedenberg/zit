@@ -6,14 +6,14 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
-	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
+	"github.com/friedenberg/zit/src/juliett/konfig"
 )
 
 func MakeSerializedFormatWriter(
 	f ObjekteFormatter,
 	out io.Writer,
 	arf gattung.AkteReaderFactory,
-	k konfig_compiled.Compiled,
+	k konfig.Compiled,
 ) collections.WriterFunc[*Objekte] {
 	errors.TodoP3("rename to MakeSingleplexedFormatWriter")
 

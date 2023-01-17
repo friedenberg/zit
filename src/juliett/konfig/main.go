@@ -1,4 +1,4 @@
-package konfig_compiled
+package konfig
 
 import (
 	"encoding/gob"
@@ -7,13 +7,14 @@ import (
 	"sort"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	pkg_angeboren "github.com/friedenberg/zit/src/angeboren"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/standort"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/golf/sku"
+	"github.com/friedenberg/zit/src/india/erworben"
 	"github.com/friedenberg/zit/src/india/etikett"
-	"github.com/friedenberg/zit/src/india/konfig"
 	"github.com/friedenberg/zit/src/india/typ"
 )
 
@@ -25,9 +26,12 @@ func init() {
 	typExpander = kennung.MakeExpanderRight(`-`)
 }
 
+type angeboren = pkg_angeboren.Konfig
+
 type Compiled struct {
 	cli
 	compiled
+	angeboren
 }
 
 // TODO-P4 rename this
@@ -35,14 +39,14 @@ func (a *Compiled) ResetWithInner(b compiled) {
 	a.compiled = b
 }
 
-type cli = konfig.Cli
+type cli = erworben.Cli
 
 type compiled struct {
 	hasChanges bool
 
 	Sku sku.Transacted[kennung.Konfig, *kennung.Konfig]
 
-	konfig.Akte
+	erworben.Akte
 
 	//Etiketten
 	EtikettenHidden     []string
@@ -57,7 +61,7 @@ type compiled struct {
 
 func Make(
 	s standort.Standort,
-	kcli konfig.Cli,
+	kcli erworben.Cli,
 ) (c *Compiled, err error) {
 	c = &Compiled{
 		cli: kcli,
@@ -66,9 +70,54 @@ func Make(
 		},
 	}
 
+	if err = c.loadKonfigAngeboren(s); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = c.loadKonfigErworben(s); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (kc *Compiled) loadKonfigAngeboren(s standort.Standort) (err error) {
 	var f *os.File
 
-	if f, err = files.Open(s.FileKonfigCompiled()); err != nil {
+	if f, err = files.OpenExclusiveReadOnly(s.FileKonfigAngeboren()); err != nil {
+		if errors.IsNotExist(err) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+		}
+
+		return
+	}
+
+	defer errors.Deferred(&err, f.Close)
+
+	dec := gob.NewDecoder(f)
+
+	if err = dec.Decode(&kc.angeboren); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (kc *Compiled) loadKonfigErworben(s standort.Standort) (err error) {
+	var f *os.File
+
+	p := s.FileKonfigCompiled()
+
+	if kc.angeboren.UseKonfigErworbenFile {
+		p = s.FileKonfigErworben()
+	}
+
+	if f, err = files.Open(p); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -77,7 +126,7 @@ func Make(
 
 	dec := gob.NewDecoder(f)
 
-	if err = dec.Decode(&c.compiled); err != nil {
+	if err = dec.Decode(&kc.compiled); err != nil {
 		if errors.IsEOF(err) {
 			err = nil
 		} else {
@@ -90,15 +139,15 @@ func Make(
 	return
 }
 
-func (kc Compiled) Cli() konfig.Cli {
+func (kc Compiled) Cli() erworben.Cli {
 	return kc.cli
 }
 
-func (kc *Compiled) SetCli(k konfig.Cli) {
+func (kc *Compiled) SetCli(k erworben.Cli) {
 	kc.cli = k
 }
 
-func (kc *Compiled) SetCliFromCommander(k konfig.Cli) {
+func (kc *Compiled) SetCliFromCommander(k erworben.Cli) {
 	oldBasePath := kc.cli.BasePath
 	kc.cli = k
 	kc.cli.BasePath = oldBasePath
@@ -157,7 +206,7 @@ func (kc *compiled) recompile() (err error) {
 	return
 }
 
-func (kc *compiled) Flush(s standort.Standort) (err error) {
+func (kc *Compiled) Flush(s standort.Standort) (err error) {
 	if !kc.hasChanges {
 		return
 	}
@@ -167,11 +216,15 @@ func (kc *compiled) Flush(s standort.Standort) (err error) {
 		return
 	}
 
+	p := s.FileKonfigCompiled()
+
+	if kc.angeboren.UseKonfigErworbenFile {
+		p = s.FileKonfigErworben()
+	}
+
 	var f *os.File
 
-	if f, err = files.OpenExclusiveWriteOnlyTruncate(
-		s.FileKonfigCompiled(),
-	); err != nil {
+	if f, err = files.OpenExclusiveWriteOnlyTruncate(p); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -180,7 +233,7 @@ func (kc *compiled) Flush(s standort.Standort) (err error) {
 
 	dec := gob.NewEncoder(f)
 
-	if err = dec.Encode(kc); err != nil {
+	if err = dec.Encode(kc.compiled); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -282,7 +335,7 @@ func (kc compiled) GetEtikett(k kennung.Etikett) (ct *etikett.Transacted) {
 }
 
 func (k *compiled) SetTransacted(
-	kt *konfig.Transacted,
+	kt *erworben.Transacted,
 ) {
 	k.hasChanges = true
 	k.Sku = kt.Sku

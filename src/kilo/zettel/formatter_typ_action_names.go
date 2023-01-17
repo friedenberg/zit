@@ -4,22 +4,22 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/india/konfig"
+	"github.com/friedenberg/zit/src/india/erworben"
 	"github.com/friedenberg/zit/src/india/typ"
-	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
+	"github.com/friedenberg/zit/src/juliett/konfig"
 )
 
 type formatterTypActionNames struct {
-	konfig               konfig_compiled.Compiled
+	erworben             konfig.Compiled
 	includeKonfigActions bool
 }
 
 func MakeFormatterTypActionNames(
-	konfig konfig_compiled.Compiled,
+	erworben konfig.Compiled,
 	includeKonfigActions bool,
 ) *formatterTypActionNames {
 	return &formatterTypActionNames{
-		konfig:               konfig,
+		erworben:             erworben,
 		includeKonfigActions: includeKonfigActions,
 	}
 }
@@ -30,7 +30,7 @@ func (e formatterTypActionNames) Format(
 ) (n int64, err error) {
 	e1 := typ.MakeFormatterActionNames()
 
-	ct := e.konfig.GetTyp(c.Zettel.Typ)
+	ct := e.erworben.GetTyp(c.Zettel.Typ)
 
 	if ct == nil {
 		return
@@ -45,9 +45,9 @@ func (e formatterTypActionNames) Format(
 		return
 	}
 
-	e2 := konfig.MakeFormatterActionNames()
+	e2 := erworben.MakeFormatterActionNames()
 
-	if n, err = e2.Format(w, e.konfig.Actions); err != nil {
+	if n, err = e2.Format(w, e.erworben.Actions); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

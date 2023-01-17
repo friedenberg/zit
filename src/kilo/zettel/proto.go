@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
-	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
+	"github.com/friedenberg/zit/src/juliett/konfig"
 )
 
 type ProtoZettel struct {
@@ -15,7 +15,7 @@ type ProtoZettel struct {
 	Etiketten   kennung.EtikettSet
 }
 
-func MakeProtoZettel(k konfig_compiled.Compiled) ProtoZettel {
+func MakeProtoZettel(k konfig.Compiled) ProtoZettel {
 	errors.TodoP1("modify konfig to keep etiketten set")
 
 	return ProtoZettel{

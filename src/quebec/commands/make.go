@@ -14,7 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/id"
 	"github.com/friedenberg/zit/src/golf/id_set"
-	"github.com/friedenberg/zit/src/india/konfig"
+	"github.com/friedenberg/zit/src/india/erworben"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
@@ -38,7 +38,7 @@ func init() {
 
 func (c Make) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	var tz *zettel.Transacted
-	var executor konfig.RemoteScript
+	var executor erworben.RemoteScript
 	var ar io.ReadCloser
 
 	if tz, ar, executor, err = c.getZettel(u, args[0]); err != nil {
@@ -78,7 +78,7 @@ func (c Make) getZettel(
 ) (
 	tz *zettel.Transacted,
 	ar io.ReadCloser,
-	executor konfig.RemoteScript,
+	executor erworben.RemoteScript,
 	err error,
 ) {
 	ps := id_set.MakeProtoIdSet(
@@ -160,7 +160,7 @@ func (c Make) makeFifoPipe(tz *zettel.Transacted) (p string, err error) {
 }
 
 func (c Make) makeCmd(
-	executor konfig.RemoteScript,
+	executor erworben.RemoteScript,
 	p string,
 	args ...string,
 ) (cmd *exec.Cmd, err error) {

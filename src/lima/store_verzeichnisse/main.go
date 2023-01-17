@@ -7,7 +7,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/collections"
-	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
+	"github.com/friedenberg/zit/src/juliett/konfig"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 
@@ -15,9 +15,9 @@ const DigitWidth = 2
 const PageCount = 1 << (DigitWidth * 4)
 
 type Zettelen struct {
-	konfig konfig_compiled.Compiled
-	path   string
-	pool   *collections.Pool[zettel.Transacted]
+	erworben konfig.Compiled
+	path     string
+	pool     *collections.Pool[zettel.Transacted]
 	ioFactory
 	pages [PageCount]*Page
 }
@@ -28,14 +28,14 @@ type pageId struct {
 }
 
 func MakeZettelen(
-	k konfig_compiled.Compiled,
+	k konfig.Compiled,
 	dir string,
 	f ioFactory,
 	p *collections.Pool[zettel.Transacted],
 	fff ZettelTransactedWriterGetter,
 ) (i *Zettelen, err error) {
 	i = &Zettelen{
-		konfig:    k,
+		erworben:  k,
 		path:      dir,
 		ioFactory: f,
 		pool:      p,

@@ -42,7 +42,7 @@ function init_and_deinit { # @test
 	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
 	assert_success
 
-	[[ -f .zit/KonfigCompiled ]]
+	[[ -f .zit/KonfigAngeboren ]]
 
 	run zit deinit
 	assert_success
@@ -76,8 +76,8 @@ function init_and_init { # @test
 
 	run zit init
 	assert_output --partial '.zit/Kennung/Counter already exists, not overwriting'
-	assert_output --partial '.zit/Konfig already exists, not overwriting'
-	assert_output --partial '.zit/KonfigCompiled already exists, not overwriting'
+	assert_output --partial '.zit/KonfigAngeboren already exists, not overwriting'
+	assert_output --partial '.zit/KonfigErworben already exists, not overwriting'
 	assert_output --partial '          (new) [o/u@3 !md "wow"]'
 
 	# run zit reindex

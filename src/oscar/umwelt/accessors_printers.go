@@ -4,8 +4,8 @@ import (
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/golf/fd"
+	"github.com/friedenberg/zit/src/india/erworben"
 	"github.com/friedenberg/zit/src/india/etikett"
-	"github.com/friedenberg/zit/src/india/konfig"
 	"github.com/friedenberg/zit/src/india/typ"
 	"github.com/friedenberg/zit/src/india/zettel_external"
 	"github.com/friedenberg/zit/src/kilo/zettel"
@@ -15,10 +15,10 @@ import (
 
 func (u *Umwelt) PrinterKonfigTransacted(
 	verb string,
-) collections.WriterFunc[*konfig.Transacted] {
+) collections.WriterFunc[*erworben.Transacted] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
-		konfig.MakeCliFormatTransacted(
+		erworben.MakeCliFormatTransacted(
 			u.FormatColorWriter(),
 			u.FormatSha(),
 			verb,

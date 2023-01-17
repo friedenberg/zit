@@ -12,18 +12,18 @@ import (
 	"syscall"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/india/konfig"
+	"github.com/friedenberg/zit/src/india/erworben"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
 
 type MessageHiCommander struct {
 	DialogueType
-	CliKonfig konfig.Cli
+	CliKonfig erworben.Cli
 }
 
 type StageCommander struct {
 	remoteActorCmd *exec.Cmd
-	konfigCli      konfig.Cli
+	konfigCli      erworben.Cli
 	wg             *sync.WaitGroup
 	stage
 }

@@ -12,7 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/hinweisen"
-	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
+	"github.com/friedenberg/zit/src/juliett/konfig"
 )
 
 type encodedKennung struct {
@@ -36,7 +36,7 @@ type indexKennung struct {
 }
 
 func newIndexKennung(
-	k konfig_compiled.Compiled,
+	k konfig.Compiled,
 	ioFactory ioFactory,
 	oldHinweisenStore *hinweisen.Hinweisen,
 	p string,

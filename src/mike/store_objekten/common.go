@@ -16,14 +16,14 @@ import (
 	"github.com/friedenberg/zit/src/golf/age_io"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/golf/transaktion"
-	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
+	"github.com/friedenberg/zit/src/juliett/konfig"
 )
 
 // TODO-P3 move to own package
 type common struct {
 	LockSmith        LockSmith
 	Age              age.Age
-	konfig           *konfig_compiled.Compiled
+	konfig           *konfig.Compiled
 	Standort         standort.Standort
 	Transaktion      transaktion.Transaktion
 	Bestandsaufnahme *bestandsaufnahme.Objekte
@@ -44,11 +44,11 @@ func (s common) AddSkuToBestandsaufnahme(sk sku.SkuLike, as sha.Sha) {
 	)
 }
 
-func (s common) Konfig() konfig_compiled.Compiled {
+func (s common) Konfig() konfig.Compiled {
 	return *s.konfig
 }
 
-func (s common) KonfigPtr() *konfig_compiled.Compiled {
+func (s common) KonfigPtr() *konfig.Compiled {
 	return s.konfig
 }
 

@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/debug"
 	"github.com/friedenberg/zit/src/echo/standort"
-	"github.com/friedenberg/zit/src/india/konfig"
+	"github.com/friedenberg/zit/src/india/erworben"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
 
@@ -61,7 +61,7 @@ func Run(args []string) (exitStatus int) {
 
 	args = os.Args[2:]
 
-	konfigCli := konfig.DefaultCli()
+	konfigCli := erworben.DefaultCli()
 	konfigCli.AddToFlags(cmd.FlagSet)
 
 	if err = cmd.FlagSet.Parse(args); err != nil {

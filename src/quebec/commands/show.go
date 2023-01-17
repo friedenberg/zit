@@ -16,8 +16,8 @@ import (
 	"github.com/friedenberg/zit/src/golf/id_set"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/golf/transaktion"
+	"github.com/friedenberg/zit/src/india/erworben"
 	"github.com/friedenberg/zit/src/india/etikett"
-	"github.com/friedenberg/zit/src/india/konfig"
 	"github.com/friedenberg/zit/src/india/typ"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
@@ -178,7 +178,7 @@ func (c Show) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 				)
 
 			case gattung.Konfig:
-				var ev konfig.FormatterValue
+				var ev erworben.FormatterValue
 
 				if err = ev.Set(c.Format); err != nil {
 					err = errors.Normal(err)
@@ -398,11 +398,11 @@ func (c Show) showEtiketten(
 
 func (c Show) showKonfig(
 	u *umwelt.Umwelt,
-	f collections.WriterFunc[*konfig.Transacted],
+	f collections.WriterFunc[*erworben.Transacted],
 ) (err error) {
 	f1 := collections.MakeSyncSerializer(f)
 
-	var k *konfig.Transacted
+	var k *erworben.Transacted
 
 	if k, err = u.StoreObjekten().Konfig().Read(); err != nil {
 		err = errors.Wrap(err)

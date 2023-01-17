@@ -1,4 +1,4 @@
-package konfig
+package erworben
 
 import "github.com/friedenberg/zit/src/bravo/script_config"
 

@@ -5,12 +5,12 @@ import (
 
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
-	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
+	"github.com/friedenberg/zit/src/juliett/konfig"
 	zettel_pkg "github.com/friedenberg/zit/src/kilo/zettel"
 )
 
 type Options struct {
-	Konfig konfig_compiled.Compiled
+	Konfig konfig.Compiled
 	hinweis.Abbr
 
 	RootEtiketten     kennung.EtikettSet

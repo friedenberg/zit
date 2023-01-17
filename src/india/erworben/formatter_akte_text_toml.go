@@ -1,4 +1,4 @@
-package konfig
+package erworben
 
 import (
 	"io"

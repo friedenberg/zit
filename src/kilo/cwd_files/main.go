@@ -10,11 +10,11 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/golf/fd"
 	"github.com/friedenberg/zit/src/india/typ"
-	"github.com/friedenberg/zit/src/juliett/konfig_compiled"
+	"github.com/friedenberg/zit/src/juliett/konfig"
 )
 
 type CwdFiles struct {
-	konfig           konfig_compiled.Compiled
+	erworben         konfig.Compiled
 	dir              string
 	Zettelen         map[string]CwdZettel
 	Typen            map[string]*typ.External
@@ -32,9 +32,9 @@ func (fs CwdFiles) ZettelFiles() (out []string) {
 	return
 }
 
-func makeCwdFiles(konfig konfig_compiled.Compiled, dir string) (fs CwdFiles) {
+func makeCwdFiles(erworben konfig.Compiled, dir string) (fs CwdFiles) {
 	fs = CwdFiles{
-		konfig:           konfig,
+		erworben:         erworben,
 		dir:              dir,
 		Typen:            make(map[string]*typ.External, 0),
 		Zettelen:         make(map[string]CwdZettel, 0),
@@ -46,7 +46,7 @@ func makeCwdFiles(konfig konfig_compiled.Compiled, dir string) (fs CwdFiles) {
 }
 
 func MakeCwdFilesAll(
-	k konfig_compiled.Compiled,
+	k konfig.Compiled,
 	dir string,
 ) (fs CwdFiles, err error) {
 	fs = makeCwdFiles(k, dir)
@@ -55,7 +55,7 @@ func MakeCwdFilesAll(
 }
 
 func MakeCwdFilesExactly(
-	k konfig_compiled.Compiled,
+	k konfig.Compiled,
 	dir string, files ...string,
 ) (fs CwdFiles, err error) {
 	fs = makeCwdFiles(k, dir)
@@ -184,7 +184,7 @@ func (fs *CwdFiles) readFirstLevelFile(a string) (err error) {
 	ext = strings.TrimSpace(ext)
 
 	switch strings.TrimPrefix(ext, ".") {
-	case fs.konfig.FileExtensions.Typ:
+	case fs.erworben.FileExtensions.Typ:
 		if err = fs.tryTyp(fi); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -227,13 +227,13 @@ func (fs *CwdFiles) readSecondLevelFile(d string, a string) (err error) {
 	ext = strings.TrimSpace(ext)
 
 	switch strings.TrimPrefix(ext, ".") {
-	case fs.konfig.FileExtensions.Typ:
+	case fs.erworben.FileExtensions.Typ:
 		if err = fs.tryTyp(fi); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case fs.konfig.FileExtensions.Zettel:
+	case fs.erworben.FileExtensions.Zettel:
 		fallthrough
 
 		//Zettel-Akten can have any extension, and so default is Zettel
