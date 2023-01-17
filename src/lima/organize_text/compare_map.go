@@ -86,7 +86,7 @@ func (a *assignment) addToCompareMap(m Metadatei, es kennung.EtikettSet, out *Co
 			}
 
 			for _, e := range m.EtikettSet.Elements() {
-				errors.Todo(errors.P4, "add typ")
+				errors.TodoP4("add typ")
 				out.Named.Add(z.Hinweis.String(), e)
 			}
 
@@ -101,7 +101,7 @@ func (a *assignment) addToCompareMap(m Metadatei, es kennung.EtikettSet, out *Co
 			}
 
 			for _, e := range m.EtikettSet.Elements() {
-				errors.Todo(errors.P4, "add typ")
+				errors.TodoP4("add typ")
 				out.Unnamed.Add(z.Bezeichnung.String(), e)
 			}
 

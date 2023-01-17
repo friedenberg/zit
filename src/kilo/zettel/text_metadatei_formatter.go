@@ -19,7 +19,7 @@ type TextMetadateiFormatter struct {
 }
 
 func (f *TextMetadateiFormatter) Format(w1 io.Writer, m *Metadatei) (n int64, err error) {
-	errors.Todo(errors.P3, "turn *Objekte into an interface to allow zettel_external to use this")
+	errors.TodoP3("turn *Objekte into an interface to allow zettel_external to use this")
 
 	w := format.NewWriter()
 
@@ -30,7 +30,7 @@ func (f *TextMetadateiFormatter) Format(w1 io.Writer, m *Metadatei) (n int64, er
 	}
 
 	for _, e := range m.Etiketten.Sorted() {
-		errors.Todo(errors.P3, "determine how to handle this")
+		errors.TodoP3("determine how to handle this")
 
 		if e.IsEmpty() {
 			continue

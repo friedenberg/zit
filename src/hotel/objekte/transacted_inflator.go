@@ -235,7 +235,7 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) StoreObjekte(
 	}
 
 	t.Sku.ObjekteSha = ow.Sha()
-	t.Sku.AkteSha = t.AkteSha()
+	t.Sku.AkteSha = t.GetAkteSha()
 
 	return
 }
@@ -262,7 +262,7 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) readObjekte(
 	sk sku.DataIdentity,
 	t *Transacted[T, T1, T2, T3, T4, T5],
 ) (err error) {
-	if t.ObjekteSha().IsNull() {
+	if sk.GetObjekteSha().IsNull() {
 		return
 	}
 
@@ -282,6 +282,18 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) readObjekte(
 		return
 	}
 
+	t.Sku.ObjekteSha = r.Sha()
+
+	if !t.Sku.ObjekteSha.Equals(sk.GetObjekteSha()) {
+		errors.Todo(
+			"objekte sha mismatch for %s! expected %s but got %s.\nObjekte: %v",
+			sk.GetGattung(),
+			sk.GetObjekteSha(),
+			t.Sku.ObjekteSha,
+			t.Objekte,
+		)
+	}
+
 	errors.Log().Printf("parsed %d objekte bytes", n)
 
 	return
@@ -294,13 +306,13 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) readAkte(
 		return
 	}
 
-	if t.AkteSha().IsNull() {
+	if t.GetAkteSha().IsNull() {
 		return
 	}
 
 	var r sha.ReadCloser
 
-	if r, err = h.af.AkteReader(t.AkteSha()); err != nil {
+	if r, err = h.af.AkteReader(t.GetAkteSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -3,6 +3,7 @@ package zettel_external
 import (
 	"fmt"
 
+	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/golf/fd"
 	"github.com/friedenberg/zit/src/golf/sku"
@@ -17,6 +18,10 @@ type Zettel struct {
 	Sku      Sku
 	ZettelFD fd.FD
 	AkteFD   fd.FD
+}
+
+func (e Zettel) GetObjekteSha() sha.Sha {
+	return e.Sku.ObjekteSha
 }
 
 func (e Zettel) String() string {

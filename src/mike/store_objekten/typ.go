@@ -183,7 +183,7 @@ func (s typStore) CreateOrUpdate(
 
 	tt.Sku.ObjekteSha = w.Sha()
 
-	if mutter != nil && tt.ObjekteSha().Equals(mutter.ObjekteSha()) {
+	if mutter != nil && tt.GetObjekteSha().Equals(mutter.GetObjekteSha()) {
 		tt = mutter
 
 		if err = s.TypLogWriter.Unchanged(tt); err != nil {
@@ -305,7 +305,10 @@ func (s *typStore) Inherit(t *typ.Transacted) (err error) {
 
 	s.common.Bestandsaufnahme.Akte.Skus.Push(t.Sku.Sku2())
 	s.common.Transaktion.Skus.Add(&t.Sku)
-	s.common.KonfigPtr().AddTyp(t)
+
+	if old := s.common.Konfig().GetTyp(t.Sku.Kennung); old == nil || old.Less(*t) {
+		s.common.KonfigPtr().AddTyp(t)
+	}
 
 	if t.IsNew() {
 		s.TypLogWriter.New(t)
@@ -317,12 +320,12 @@ func (s *typStore) Inherit(t *typ.Transacted) (err error) {
 }
 
 func (s *typStore) reindexOne(
-	o sku.DataIdentity,
-) (err error) {
+	sk sku.DataIdentity,
+) (o gattung.Stored, err error) {
 	var te *typ.Transacted
 	defer s.pool.Put(te)
 
-	if te, err = s.InflateFromDataIdentity(o); err != nil {
+	if te, err = s.InflateFromDataIdentity(sk); err != nil {
 		if errors.Is(err, toml.Error{}) {
 			err = nil
 			return
@@ -331,6 +334,8 @@ func (s *typStore) reindexOne(
 			return
 		}
 	}
+
+	o = te
 
 	s.common.KonfigPtr().AddTyp(te)
 

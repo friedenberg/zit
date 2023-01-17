@@ -34,8 +34,8 @@ const (
 	P5
 )
 
-func Todo(pr Priority, f string, a ...interface{}) (err error) {
-	return todo.printf(1, pr, f, a...)
+func Todo(f string, a ...interface{}) (err error) {
+	return Err().printf(1, "TODO: "+f, a...)
 }
 
 func TodoP0(f string, a ...interface{}) (err error) {

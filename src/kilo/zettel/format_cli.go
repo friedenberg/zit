@@ -3,12 +3,12 @@ package zettel
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
+	"github.com/friedenberg/zit/src/hotel/objekte"
 )
 
 // !typ "bez"
@@ -17,18 +17,18 @@ func MakeCliFormat(
 	ef format.FormatWriterFunc[kennung.EtikettSet],
 	tf format.FormatWriterFunc[kennung.Typ],
 ) format.FormatWriterFunc[Objekte] {
-	return func(w io.Writer, z *Objekte) (n int64, err error) {
+	return func(w io.Writer, z Objekte) (n int64, err error) {
 		var lastWriter format.WriterFunc
 
 		if z.Bezeichnung.IsEmpty() {
-			lastWriter = format.MakeWriter(ef, &z.Etiketten)
+			lastWriter = format.MakeWriter(ef, z.Etiketten)
 		} else {
-			lastWriter = format.MakeWriter(bf, &z.Bezeichnung)
+			lastWriter = format.MakeWriter(bf, z.Bezeichnung)
 		}
 
 		return format.Write(
 			w,
-			format.MakeWriter(tf, &z.Typ),
+			format.MakeWriter(tf, z.Typ),
 			format.MakeFormatString(" "),
 			lastWriter,
 		)
@@ -41,15 +41,15 @@ func MakeCliFormatTransacted(
 	sf format.FormatWriterFunc[sha.Sha],
 	zf format.FormatWriterFunc[Objekte],
 ) format.FormatWriterFunc[Transacted] {
-	return func(w io.Writer, z *Transacted) (n int64, err error) {
+	return func(w io.Writer, z Transacted) (n int64, err error) {
 		return format.Write(
 			w,
 			format.MakeFormatString("["),
-			format.MakeWriter(hf, z.Kennung()),
+			format.MakeWriter(hf, *z.Kennung()),
 			format.MakeFormatString("@"),
-			format.MakeWriter(sf, &z.Sku.ObjekteSha),
+			format.MakeWriter(sf, z.GetObjekteSha()),
 			format.MakeFormatString(" "),
-			format.MakeWriter[Objekte](zf, &z.Objekte),
+			format.MakeWriter[Objekte](zf, z.Objekte),
 			format.MakeFormatString("]"),
 		)
 	}
@@ -60,7 +60,7 @@ func MakeCliFormatTransactedDelta(
 	verb string,
 	ztf format.FormatWriterFunc[Transacted],
 ) format.FormatWriterFunc[Transacted] {
-	return func(w io.Writer, z *Transacted) (n int64, err error) {
+	return func(w io.Writer, z Transacted) (n int64, err error) {
 		return format.Write(
 			w,
 			format.MakeFormatStringRightAlignedParen(verb),
@@ -69,6 +69,8 @@ func MakeCliFormatTransactedDelta(
 	}
 }
 
-type TransactedWriters struct {
-	New, Updated, Archived, Unchanged collections.WriterFunc[*Transacted]
-}
+// TODO-P4 rename
+type TransactedWriters = objekte.LogWriter[*Transacted]
+
+// New, Updated, Archived, Unchanged collections.WriterFunc[*Transacted]
+// }

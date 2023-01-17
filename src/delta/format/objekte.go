@@ -70,7 +70,7 @@ func (f KeyValues) ReadFormat(
 		loc := strings.Index(line, " ")
 
 		if line == "" {
-			errors.Todo(errors.P4, "handle empty lines in a more structured way")
+			errors.TodoP4("handle empty lines in a more structured way")
 		}
 
 		if tryHeader {

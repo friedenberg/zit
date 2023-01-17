@@ -10,7 +10,7 @@ import (
 )
 
 func (z *Objekte) ApplyKonfig(k konfig_compiled.Compiled) (err error) {
-	errors.Todo(errors.P4, "move this somewhere more appropriate")
+	errors.TodoP4("move this somewhere more appropriate")
 
 	normalized := kennung.WithRemovedCommonPrefixes(z.Etiketten)
 	z.Etiketten = normalized

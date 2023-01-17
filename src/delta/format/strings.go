@@ -55,11 +55,11 @@ func MakeWriterFormatStringIndentedHeader(
 	cw FuncColorWriter,
 	indentString string,
 ) FormatWriterFunc[string] {
-	return func(w io.Writer, v *string) (n int64, err error) {
+	return func(w io.Writer, v string) (n int64, err error) {
 		return Write(
 			w,
 			MakeFormatString(indentString),
-			cw(MakeFormatString("%s", *v), ColorTypeTitle),
+			cw(MakeFormatString("%s", v), ColorTypeTitle),
 		)
 	}
 }

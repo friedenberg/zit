@@ -105,8 +105,8 @@ func WriteLines(
 func MakeWriterTo[T any](
 	w io.Writer,
 	wf FormatWriterFunc[T],
-) func(*T) error {
-	return func(e *T) (err error) {
+) func(T) error {
+	return func(e T) (err error) {
 		if _, err = wf(w, e); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -127,7 +127,7 @@ func MakeWriterToWithNewLines[T any](
 			//TODO-P3 modify flushing behavior based on w1 being a TTY
 			defer errors.DeferredFlusher(&err, w)
 
-			if _, err = wf(w, e); err != nil {
+			if _, err = wf(w, *e); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

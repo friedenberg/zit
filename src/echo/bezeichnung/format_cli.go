@@ -9,7 +9,7 @@ import (
 func MakeCliFormat(
 	cw format.FuncColorWriter,
 ) format.FormatWriterFunc[Bezeichnung] {
-	return func(w io.Writer, b1 *Bezeichnung) (n int64, err error) {
+	return func(w io.Writer, b1 Bezeichnung) (n int64, err error) {
 		b := b1.value
 
 		switch {

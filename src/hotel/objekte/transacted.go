@@ -35,7 +35,7 @@ func (t Transacted[T, T1, T2, T3, T4, T5]) Kennung() T3 {
 	return &t.Sku.Kennung
 }
 
-func (t Transacted[T, T1, T2, T3, T4, T5]) AkteSha() sha.Sha {
+func (t Transacted[T, T1, T2, T3, T4, T5]) GetAkteSha() sha.Sha {
 	return t.Objekte.GetAkteSha()
 }
 
@@ -45,7 +45,14 @@ func (t *Transacted[T, T1, T2, T3, T4, T5]) SetAkteSha(
 	T1(&t.Objekte).SetAkteSha(s)
 }
 
-func (t Transacted[T, T1, T2, T3, T4, T5]) ObjekteSha() sha.Sha {
+func (t Transacted[T, T1, T2, T3, T4, T5]) GetObjekteSha() sha.Sha {
+	if !t.GetAkteSha().IsNull() && t.Sku.ObjekteSha.IsNull() {
+		errors.Todo(
+			"objekte sha is null while akte sha is %s",
+			t.GetAkteSha(),
+		)
+	}
+
 	return t.Sku.ObjekteSha
 }
 
@@ -95,8 +102,11 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) Equals(
 	return true
 }
 
-func (a Transacted[T, T1, T2, T3, T4, T5]) GetSku2() sku.Sku2 {
-	return a.Sku.Sku2()
+func (a Transacted[T, T1, T2, T3, T4, T5]) GetSku2() (sk sku.Sku2) {
+	sk = a.Sku.Sku2()
+	errors.TodoP2("make certain akte sha is in sku")
+	sk.AkteSha = a.GetAkteSha()
+	return
 }
 
 func (a *Transacted[T, T1, T2, T3, T4, T5]) SetDataIdentity(

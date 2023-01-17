@@ -15,7 +15,7 @@ type SetPrefixNamedSegments struct {
 }
 
 func NewSetPrefixNamed() *SetPrefixNamed {
-	errors.Todo(errors.P4, "rename set prefix named")
+	errors.TodoP4("rename set prefix named")
 	s := make(SetPrefixNamed)
 	return &s
 }

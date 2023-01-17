@@ -29,7 +29,11 @@ func (e External) GetGattung() gattung.Gattung {
 	return gattung.Etikett
 }
 
-func (e External) AkteSha() sha.Sha {
+func (e External) GetObjekteSha() sha.Sha {
+	return e.Sku.ObjekteSha
+}
+
+func (e External) GetAkteSha() sha.Sha {
 	return e.Objekte.Sha
 }
 

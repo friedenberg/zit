@@ -9,14 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 )
 
-type Lessor[T any] interface {
-	Less(T) bool
-}
-
-type Equaler[T any] interface {
-	Equals(*T) bool
-}
-
 type HeapElement[T gattung.Element] interface {
 	Equaler[T]
 	Lessor[T]

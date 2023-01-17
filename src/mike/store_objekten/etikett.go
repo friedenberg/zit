@@ -166,7 +166,7 @@ func (s etikettStore) CreateOrUpdate(
 
 	tt.Sku.ObjekteSha = w.Sha()
 
-	if mutter != nil && tt.ObjekteSha().Equals(mutter.ObjekteSha()) {
+	if mutter != nil && tt.GetObjekteSha().Equals(mutter.GetObjekteSha()) {
 		tt = mutter
 
 		if err = s.EtikettLogWriter.Unchanged(tt); err != nil {
@@ -227,15 +227,17 @@ func (s etikettStore) AllInChain(k kennung.Etikett) (c []*etikett.Transacted, er
 }
 
 func (s *etikettStore) reindexOne(
-	o sku.DataIdentity,
-) (err error) {
+	sk sku.DataIdentity,
+) (o gattung.Stored, err error) {
 	var te *etikett.Transacted
 	defer s.pool.Put(te)
 
-	if te, err = s.InflateFromDataIdentity(o); err != nil {
+	if te, err = s.InflateFromDataIdentity(sk); err != nil {
 		errors.Wrap(err)
 		return
 	}
+
+	o = te
 
 	s.common.KonfigPtr().AddEtikett(te)
 

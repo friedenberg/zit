@@ -18,14 +18,14 @@ func MakeCliFormatNotRecognized(
 	s standort.Standort,
 	sf format.FormatWriterFunc[sha.Sha],
 ) format.FormatWriterFunc[fd.FD] {
-	return func(w io.Writer, fu *fd.FD) (n int64, err error) {
+	return func(w io.Writer, fu fd.FD) (n int64, err error) {
 		return format.Write(
 			w,
 			format.MakeFormatStringRightAlignedParen(format.StringUnrecognized),
 			format.MakeFormatString("["),
 			cw(format.MakeFormatString(fu.Path), format.ColorTypePointer),
 			format.MakeFormatString("@"),
-			format.MakeWriter(sf, &fu.Sha),
+			format.MakeWriter(sf, fu.Sha),
 			format.MakeFormatString("]"),
 		)
 	}
@@ -45,14 +45,14 @@ func MakeCliFormatRecognized(
 	sf format.FormatWriterFunc[sha.Sha],
 	znf format.FormatWriterFunc[zettel.Objekte],
 ) format.FormatWriterFunc[FileRecognized] {
-	return func(w io.Writer, zr *FileRecognized) (n int64, err error) {
+	return func(w io.Writer, zr FileRecognized) (n int64, err error) {
 		return format.Write(
 			w,
 			format.MakeFormatStringRightAlignedParen(format.StringRecognized),
 			format.MakeFormatString("["),
 			cw(format.MakeFormatString(zr.Path), format.ColorTypePointer),
 			format.MakeFormatString("@"),
-			format.MakeWriter(sf, &zr.Sha),
+			format.MakeWriter(sf, zr.Sha),
 			format.MakeFormatString("]\n"),
 			func(w io.Writer) (n int64, err error) {
 				err = zr.Recognized.Each(
@@ -71,7 +71,7 @@ func MakeCliFormatRecognized(
 
 						var n1 int64
 
-						if n1, err = znf(w, &zt.Objekte); err != nil {
+						if n1, err = znf(w, zt.Objekte); err != nil {
 							err = errors.Wrap(err)
 							return
 						}

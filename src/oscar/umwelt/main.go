@@ -81,7 +81,7 @@ func (u *Umwelt) Initialize(kCli konfig.Cli) (err error) {
 
 	u.sonnenaufgang = ts.Now()
 
-	errors.Todo(errors.P4, "find a better place for this")
+	errors.TodoP4("find a better place for this")
 	{
 		if kCli.Verbose {
 			errors.SetVerbose()

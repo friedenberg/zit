@@ -136,30 +136,16 @@ func (i *indexAbbr) addStored(o gattung.Stored) (err error) {
 
 	i.hasChanges = true
 
-	i.indexAbbrEncodableTridexes.Shas.Add(o.AkteSha().String())
-	i.indexAbbrEncodableTridexes.Shas.Add(o.ObjekteSha().String())
+	i.indexAbbrEncodableTridexes.Shas.Add(o.GetAkteSha().String())
+	i.indexAbbrEncodableTridexes.Shas.Add(o.GetObjekteSha().String())
 
-	return
-}
+	if z, ok := o.(*zettel.Transacted); ok {
+		i.indexAbbrEncodableTridexes.HinweisKopfen.Add(z.Kennung().Kopf())
+		i.indexAbbrEncodableTridexes.HinweisSchwanzen.Add(z.Kennung().Schwanz())
 
-func (i *indexAbbr) addZettelTransacted(zt *zettel.Transacted) (err error) {
-	if err = i.readIfNecessary(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	i.hasChanges = true
-
-	if err = i.addStored(zt); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	i.indexAbbrEncodableTridexes.HinweisKopfen.Add(zt.Kennung().Kopf())
-	i.indexAbbrEncodableTridexes.HinweisSchwanzen.Add(zt.Kennung().Schwanz())
-
-	for _, e := range kennung.Expanded(zt.Objekte.Etiketten, kennung.ExpanderRight).Elements() {
-		i.indexAbbrEncodableTridexes.Etiketten.Add(e.String())
+		for _, e := range kennung.Expanded(z.Objekte.Etiketten, kennung.ExpanderRight).Elements() {
+			i.indexAbbrEncodableTridexes.Etiketten.Add(e.String())
+		}
 	}
 
 	return

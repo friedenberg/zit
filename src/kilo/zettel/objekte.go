@@ -31,7 +31,7 @@ func (z *Objekte) SetAkteSha(v sha.Sha) {
 }
 
 func (z Objekte) Equals(z1 *Objekte) bool {
-	errors.Todo(errors.P4, "figure out why this doesn't always work for `status`")
+	errors.TodoP4("figure out why this doesn't always work for `status`")
 
 	if z1 == nil {
 		return false

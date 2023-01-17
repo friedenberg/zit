@@ -212,7 +212,7 @@ func (s *zettelStore) writeNamedZettelToIndex(
 		}
 	}
 
-	if err = s.common.Abbr.addZettelTransacted(tz); err != nil {
+	if err = s.common.Abbr.addStored(tz); err != nil {
 		err = errors.Wrapf(err, "failed to write zettel to index: %s", tz.Sku)
 		return
 	}
@@ -311,7 +311,7 @@ func (s *zettelStore) Create(
 		return
 	}
 
-	errors.Todo(errors.P2, "assert no changes")
+	errors.TodoP2("assert no changes")
 	if err = s.zettelTransactedWriter.New(tz); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -324,7 +324,7 @@ func (s *zettelStore) Update(
 	z *zettel.Objekte,
 	h *hinweis.Hinweis,
 ) (tz *zettel.Transacted, err error) {
-	errors.Todo(errors.P2, "support dry run")
+	errors.TodoP2("support dry run")
 
 	if !s.common.LockSmith.IsAcquired() {
 		err = ErrLockRequired{
@@ -510,20 +510,22 @@ func (s *zettelStore) Inherit(tz *zettel.Transacted) (err error) {
 }
 
 func (s *zettelStore) reindexOne(
-	o sku.DataIdentity,
-) (err error) {
+	sk sku.DataIdentity,
+) (o gattung.Stored, err error) {
 	var tz *zettel.Transacted
 	defer s.pool.Put(tz)
 
 	errors.Log().Printf("reindexing: %#v", o)
 
-	if tz, err = s.InflateFromDataIdentity(o); err != nil {
+	if tz, err = s.InflateFromDataIdentity(sk); err != nil {
 		//TODO-P2 decide on how to handle format errors
 		errors.Err().Print(err)
 		err = nil
 		// err = errors.Wrap(err)
 		return
 	}
+
+	o = tz
 
 	var mutter *zettel.Transacted
 

@@ -68,7 +68,7 @@ func (w writerGobEncoder) WriteZettelVerzeichnisse(z *Transacted) (err error) {
 func MakeWriterKonfig(
 	k konfig_compiled.Compiled,
 ) collections.WriterFunc[*Transacted] {
-	errors.Todo(errors.P3, "add efficient parsing of hiding tags")
+	errors.TodoP3("add efficient parsing of hiding tags")
 
 	if k.IncludeHidden {
 		return collections.MakeWriterNoop[*Transacted]()

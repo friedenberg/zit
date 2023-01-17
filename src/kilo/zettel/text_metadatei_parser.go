@@ -76,7 +76,7 @@ func (f *textMetadateiParser) readTyp(
 	tail := path.Ext(desc)
 	head := desc[:len(desc)-len(tail)]
 
-	errors.Todo(errors.P3, "handle akte descs that are invalid files")
+	errors.TodoP3("handle akte descs that are invalid files")
 	//! <path>.<typ ext>
 	switch {
 	case files.Exists(desc):

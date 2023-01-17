@@ -14,7 +14,7 @@ import (
 )
 
 func (z Objekte) ObjekteSha() (s sha.Sha, err error) {
-	errors.Todo(errors.P1, "remove this")
+	errors.TodoP1("remove this")
 
 	hash := sha256.New()
 
@@ -42,7 +42,7 @@ func (f FormatObjekte) Format(
 	w1 io.Writer,
 	z *Objekte,
 ) (n int64, err error) {
-	errors.Todo(errors.P1, "replace with objekte.Format")
+	errors.TodoP1("replace with objekte.Format")
 
 	w := format.NewWriter()
 

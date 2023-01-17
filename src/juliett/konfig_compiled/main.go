@@ -303,6 +303,7 @@ func (k *compiled) AddTyp(
 	}
 
 	k.hasChanges = true
+	// collections.AddIfGreater(k.Typen, ct)
 	m := k.Typen.Elements()
 	m = append(m, ct)
 	k.Typen = makeCompiledTypSetFromSlice(m)

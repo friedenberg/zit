@@ -433,19 +433,26 @@ func (s *Store) ReadAll(
 }
 
 func (s *Store) getReindexFunc() func(sku.DataIdentity) error {
-	return func(o sku.DataIdentity) (err error) {
+	return func(sk sku.DataIdentity) (err error) {
 		var st reindexer
 		ok := false
 
-		g := o.GetGattung()
+		g := sk.GetGattung()
 
 		if st, ok = s.reindexers[g]; !ok {
 			err = errors.Wrapf(gattung.ErrUnsupportedGattung, "Gattung: %s", g)
 			return
 		}
 
-		if err = st.reindexOne(o); err != nil {
-			err = errors.Wrapf(err, "Sku %s", o)
+		var o gattung.Stored
+
+		if o, err = st.reindexOne(sk); err != nil {
+			err = errors.Wrapf(err, "Sku %s", sk)
+			return
+		}
+
+		if err = s.common.Abbr.addStored(o); err != nil {
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -475,8 +482,6 @@ func (s *Store) ReindexBestandsaufnahme() (err error) {
 
 	f1 := s.getReindexFunc()
 	f := func(t *bestandsaufnahme.Objekte) (err error) {
-		errors.Out().Printf("%s", t)
-
 		if err = t.Akte.Skus.Each(
 			func(sk sku.Sku2) (err error) {
 				return f1(sk)

@@ -156,7 +156,7 @@ func (s konfigStore) Update(
 
 	kt.Sku.ObjekteSha = w.Sha()
 
-	if mutter != nil && kt.ObjekteSha().Equals(mutter.ObjekteSha()) {
+	if mutter != nil && kt.GetObjekteSha().Equals(mutter.GetObjekteSha()) {
 		kt = mutter
 
 		if err = s.KonfigLogWriter.Unchanged(kt); err != nil {
@@ -250,15 +250,17 @@ func (s konfigStore) AllInChain() (c []*konfig.Transacted, err error) {
 }
 
 func (s *konfigStore) reindexOne(
-	o sku.DataIdentity,
-) (err error) {
+	sk sku.DataIdentity,
+) (o gattung.Stored, err error) {
 	var te *konfig.Transacted
 	defer s.pool.Put(te)
 
-	if te, err = s.InflateFromDataIdentity(o); err != nil {
+	if te, err = s.InflateFromDataIdentity(sk); err != nil {
 		errors.Wrap(err)
 		return
 	}
+
+	o = te
 
 	s.common.KonfigPtr().SetTransacted(te)
 	s.KonfigLogWriter.Updated(te)

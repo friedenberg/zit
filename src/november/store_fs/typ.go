@@ -24,7 +24,7 @@ func (s *Store) WriteTyp(t *typ.Transacted) (te *typ.External, err error) {
 		//TODO-P2 move to central place
 		Objekte: t.Objekte,
 		Sku: sku.External[kennung.Typ, *kennung.Typ]{
-			ObjekteSha: t.ObjekteSha(),
+			ObjekteSha: t.GetObjekteSha(),
 			Kennung:    t.Sku.Kennung,
 		},
 	}

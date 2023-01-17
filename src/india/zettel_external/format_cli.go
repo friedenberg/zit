@@ -20,7 +20,7 @@ func MakeCliFormat(
 	sf format.FormatWriterFunc[sha.Sha],
 	zf format.FormatWriterFunc[zettel.Objekte],
 ) format.FormatWriterFunc[Zettel] {
-	return func(w io.Writer, z *Zettel) (n int64, err error) {
+	return func(w io.Writer, z Zettel) (n int64, err error) {
 		switch {
 		case z.AkteFD.Path != "" && z.ZettelFD.Path != "":
 			return format.Write(
@@ -29,15 +29,15 @@ func MakeCliFormat(
 				format.MakeFormatString("["),
 				cw(s.MakeWriterRelativePath(z.ZettelFD.Path), format.ColorTypePointer),
 				format.MakeFormatString("@"),
-				format.MakeWriter(sf, &z.Sku.ObjekteSha),
+				format.MakeWriter(sf, z.GetObjekteSha()),
 				format.MakeFormatString(" "),
-				format.MakeWriter(zf, &z.Objekte),
+				format.MakeWriter(zf, z.Objekte),
 				format.MakeFormatString("]\n"),
 				format.MakeFormatStringRightAlignedParen(""),
 				format.MakeFormatString("["),
 				cw(s.MakeWriterRelativePath(z.AkteFD.Path), format.ColorTypePointer),
 				format.MakeFormatString("@"),
-				format.MakeWriter(sf, &z.Objekte.Akte),
+				format.MakeWriter(sf, z.Objekte.Akte),
 				format.MakeFormatString("]"),
 			)
 
@@ -48,9 +48,9 @@ func MakeCliFormat(
 				format.MakeFormatString("["),
 				cw(s.MakeWriterRelativePath(z.AkteFD.Path), format.ColorTypePointer),
 				format.MakeFormatString("@"),
-				format.MakeWriter(sf, &z.Objekte.Akte),
+				format.MakeWriter(sf, z.Objekte.Akte),
 				format.MakeFormatString(" "),
-				format.MakeWriter(zf, &z.Objekte),
+				format.MakeWriter(zf, z.Objekte),
 				format.MakeFormatString("]"),
 			)
 
@@ -61,9 +61,9 @@ func MakeCliFormat(
 				format.MakeFormatString("["),
 				cw(s.MakeWriterRelativePath(z.ZettelFD.Path), format.ColorTypePointer),
 				format.MakeFormatString("@"),
-				format.MakeWriter(sf, &z.Sku.ObjekteSha),
+				format.MakeWriter(sf, z.GetObjekteSha()),
 				format.MakeFormatString(" "),
-				format.MakeWriter(zf, &z.Objekte),
+				format.MakeWriter(zf, z.Objekte),
 				format.MakeFormatString("]"),
 			)
 		}
@@ -77,7 +77,7 @@ func MakeCliFormatFD(
 	s standort.Standort,
 	cw format.FuncColorWriter,
 ) format.FormatWriterFunc[fd.FD] {
-	return func(w io.Writer, fd *fd.FD) (n int64, err error) {
+	return func(w io.Writer, fd fd.FD) (n int64, err error) {
 		return format.Write(
 			w,
 			format.MakeFormatString("["),

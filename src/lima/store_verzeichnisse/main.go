@@ -128,7 +128,7 @@ func (i *Zettelen) GetPageIndexKeyValue(
 func (i *Zettelen) ReadMany(
 	ws ...collections.WriterFunc[*zettel.Transacted],
 ) (err error) {
-	errors.Todo(errors.P3, "switch to single writer and force callers to make chains")
+	errors.TodoP3("switch to single writer and force callers to make chains")
 
 	wg := &sync.WaitGroup{}
 	ch := make(chan struct{}, PageCount)

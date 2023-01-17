@@ -87,7 +87,24 @@ func (p printer) Print(a ...interface{}) (err error) {
 	return
 }
 
-//TODO-P1 add a todo function for easy grepping
+func (p printer) printf(depth int, f string, a ...interface{}) (err error) {
+	if !p.on {
+		return
+	}
+
+	if p.includesStack {
+		si, _ := MakeStackInfo(1 + depth)
+		f = "%s" + f
+		a = append([]interface{}{si}, a...)
+	}
+
+	_, err = fmt.Fprintln(
+		p.f,
+		fmt.Sprintf(f, a...),
+	)
+
+	return
+}
 
 func (p printer) Printf(f string, a ...interface{}) (err error) {
 	if !p.on {

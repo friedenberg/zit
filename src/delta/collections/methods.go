@@ -34,6 +34,26 @@ func AddString[E gattung.Element, EPtr SetterPtr[E]](
 	return
 }
 
+type AddGetKeyer[E Lessor[E]] interface {
+	Adder[E]
+	Get(string) (E, bool)
+	Key(E) string
+}
+
+func AddIfGreater[E Lessor[E]](
+	c AddGetKeyer[E],
+	e E,
+) (ok bool) {
+	k := c.Key(e)
+	var old E
+
+	if old, ok = c.Get(k); !ok || old.Less(e) {
+		c.Add(e)
+	}
+
+	return
+}
+
 func String[E ValueSetElement](
 	c EachPtrer[E],
 ) string {

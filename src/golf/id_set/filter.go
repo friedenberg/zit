@@ -53,10 +53,10 @@ LOOP:
 	okSha := false
 
 	switch {
-	case shas.Contains(e.ObjekteSha()):
+	case shas.Contains(e.GetObjekteSha()):
 		okSha = true
 
-	case shas.Contains(e.AkteSha()):
+	case shas.Contains(e.GetAkteSha()):
 		okSha = true
 	}
 

@@ -21,7 +21,7 @@ func MakeCliFormatDirDeleted(
 	cw format.FuncColorWriter,
 	s standort.Standort,
 ) format.FormatWriterFunc[Dir] {
-	return func(w io.Writer, d *Dir) (n int64, err error) {
+	return func(w io.Writer, d Dir) (n int64, err error) {
 		return format.Write(
 			w,
 			format.MakeFormatStringRightAlignedParen(format.StringDeleted),
@@ -38,7 +38,7 @@ func MakeCliFormatFDDeleted(
 	s standort.Standort,
 	fdw format.FormatWriterFunc[fd.FD],
 ) format.FormatWriterFunc[fd.FD] {
-	return func(w io.Writer, fd *fd.FD) (n int64, err error) {
+	return func(w io.Writer, fd fd.FD) (n int64, err error) {
 		return format.Write(
 			w,
 			format.MakeFormatStringRightAlignedParen(format.StringDeleted),

@@ -23,11 +23,22 @@ type FuncWriter = WriterFunc
 
 // TODO rename to Func-prefix
 type WriterFunc func(io.Writer) (int64, error)
-type FormatWriterFunc[T any] func(io.Writer, *T) (int64, error)
+type FormatWriterFunc[T any] func(io.Writer, T) (int64, error)
+
+// type FormatWriterFunc[T any] func(io.Writer, *T) (int64, error)
 type FuncColorWriter func(WriterFunc, ColorType) WriterFunc
 
 func MakeWriter[T any](
 	wff FormatWriterFunc[T],
+	e T,
+) WriterFunc {
+	return func(w io.Writer) (int64, error) {
+		return wff(w, e)
+	}
+}
+
+func MakeWriterPtr[T any](
+	wff FormatWriterFunc[*T],
 	e *T,
 ) WriterFunc {
 	return func(w io.Writer) (int64, error) {
@@ -73,10 +84,10 @@ func MakeStringer(
 }
 
 func MakeFormatStringer[T fmt.Stringer]() FormatWriterFunc[T] {
-	return func(w io.Writer, e *T) (n int64, err error) {
+	return func(w io.Writer, e T) (n int64, err error) {
 		var n1 int
 
-		if n1, err = io.WriteString(w, T(*e).String()); err != nil {
+		if n1, err = io.WriteString(w, e.String()); err != nil {
 			n = int64(n1)
 			err = errors.Wrap(err)
 			return

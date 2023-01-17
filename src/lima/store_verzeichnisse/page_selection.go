@@ -24,7 +24,7 @@ func (i Zettelen) PageForTransacted(z zettel.Transacted) (n int, err error) {
 }
 
 func (i Zettelen) PageForEtikett(e kennung.Etikett) (n int, err error) {
-	errors.Todo(errors.P4, "does this actually work")
+	errors.TodoP4("does this actually work")
 	return i.PageForRune(rune(e.String()[0]))
 }
 

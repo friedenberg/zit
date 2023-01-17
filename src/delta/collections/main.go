@@ -95,6 +95,14 @@ type Adder[E any] interface {
 	Add(E) error
 }
 
+type Lessor[T any] interface {
+	Less(T) bool
+}
+
+type Equaler[T any] interface {
+	Equals(*T) bool
+}
+
 type Eacher[E any] interface {
 	Each(WriterFunc[E]) error
 }

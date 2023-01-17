@@ -123,8 +123,8 @@ type Stored interface {
 	//TODO-P4 add identifier
 	// Identifier() IdentifierLike
 
-	AkteSha() sha.Sha
-	ObjekteSha() sha.Sha
+	GetAkteSha() sha.Sha
+	GetObjekteSha() sha.Sha
 }
 
 type StoredPtr interface {
