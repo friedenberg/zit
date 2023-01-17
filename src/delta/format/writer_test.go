@@ -6,7 +6,7 @@ import (
 )
 
 func TestWriter1(t *testing.T) {
-	w := NewWriter()
+	w := NewLineWriter()
 
 	w.WriteLines(
 		"one",

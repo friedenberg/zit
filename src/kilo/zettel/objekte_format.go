@@ -7,8 +7,7 @@ import (
 type ObjekteParserContext struct {
 	Zettel   Objekte
 	AktePath string
-	//TODO-P3 rename to Errors
-	RecoverableErrors error
+	Errors   error
 }
 
 type ObjekteFormatterContext struct {

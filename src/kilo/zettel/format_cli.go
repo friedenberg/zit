@@ -69,8 +69,4 @@ func MakeCliFormatTransactedDelta(
 	}
 }
 
-// TODO-P4 rename
-type TransactedWriters = objekte.LogWriter[*Transacted]
-
-// New, Updated, Archived, Unchanged collections.WriterFunc[*Transacted]
-// }
+type LogWriter = objekte.LogWriter[*Transacted]

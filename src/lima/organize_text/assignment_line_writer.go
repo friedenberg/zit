@@ -11,7 +11,7 @@ import (
 type assignmentLineWriter struct {
 	RightAlignedIndents  bool
 	OmitLeadingEmptyLine bool
-	*format.Writer
+	*format.LineWriter
 	maxDepth            int
 	maxKopf, maxScwhanz int
 }

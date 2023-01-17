@@ -192,7 +192,12 @@ func (c *client) ObjekteReader(
 	}
 
 	if err = d.Send(msgRequest); err != nil {
-		err = errors.Wrap(err)
+		if c.stage.ShouldIgnoreConnectionError(err) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+		}
+
 		return
 	}
 
@@ -222,7 +227,12 @@ func (c client) AkteReader(
 	var ow sha.WriteCloser
 
 	if ow, err = c.umwelt.StoreObjekten().AkteWriter(); err != nil {
-		err = errors.Wrap(err)
+		if c.stage.ShouldIgnoreConnectionError(err) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+		}
+
 		return
 	}
 

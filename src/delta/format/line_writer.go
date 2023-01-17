@@ -8,21 +8,20 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
-// TODO rename to LineWriter
-type Writer struct {
+type LineWriter struct {
 	lastWasNewline bool
 	elements       []FuncWriter
 }
 
-func NewWriter() *Writer {
-	w := &Writer{
+func NewLineWriter() *LineWriter {
+	w := &LineWriter{
 		elements: make([]FuncWriter, 0),
 	}
 
 	return w
 }
 
-func (w *Writer) WriteTo(out io.Writer) (n int64, err error) {
+func (w *LineWriter) WriteTo(out io.Writer) (n int64, err error) {
 	w1 := bufio.NewWriter(out)
 	defer errors.Deferred(&err, w1.Flush)
 
@@ -48,7 +47,7 @@ func (w *Writer) WriteTo(out io.Writer) (n int64, err error) {
 	return
 }
 
-func (w *Writer) WriteExactlyOneEmpty() {
+func (w *LineWriter) WriteExactlyOneEmpty() {
 	if len(w.elements) == 0 || !w.lastWasNewline {
 		w.WriteEmpty()
 		return
@@ -57,7 +56,7 @@ func (w *Writer) WriteExactlyOneEmpty() {
 	return
 }
 
-func (w *Writer) WriteEmpty() {
+func (w *LineWriter) WriteEmpty() {
 	w.lastWasNewline = true
 
 	w.elements = append(
@@ -68,7 +67,7 @@ func (w *Writer) WriteEmpty() {
 	)
 }
 
-func (w *Writer) WriteLines(ls ...string) {
+func (w *LineWriter) WriteLines(ls ...string) {
 	w.lastWasNewline = false
 
 	for _, v := range ls {
@@ -79,7 +78,7 @@ func (w *Writer) WriteLines(ls ...string) {
 	}
 }
 
-func (w *Writer) WriteStringers(ss ...fmt.Stringer) {
+func (w *LineWriter) WriteStringers(ss ...fmt.Stringer) {
 	w.lastWasNewline = false
 
 	for _, v := range ss {
@@ -90,7 +89,7 @@ func (w *Writer) WriteStringers(ss ...fmt.Stringer) {
 	}
 }
 
-func (w *Writer) WriteFormat(f string, values ...interface{}) {
+func (w *LineWriter) WriteFormat(f string, values ...interface{}) {
 	w.lastWasNewline = false
 
 	w.elements = append(
@@ -99,7 +98,7 @@ func (w *Writer) WriteFormat(f string, values ...interface{}) {
 	)
 }
 
-func (w *Writer) WriteFormats(f string, values ...interface{}) {
+func (w *LineWriter) WriteFormats(f string, values ...interface{}) {
 	w.lastWasNewline = false
 
 	for _, v := range values {

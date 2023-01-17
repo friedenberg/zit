@@ -228,9 +228,6 @@ func (s typStore) ReadAllSchwanzen(
 func (s typStore) ReadAll(
 	f collections.WriterFunc[*typ.Transacted],
 ) (err error) {
-	//TODO-P2 move to construction of inflator
-	// p := collections.MakePool[*typ.Transacted]()
-
 	if s.common.Konfig().UseBestandsaufnahme {
 		f1 := func(t *bestandsaufnahme.Objekte) (err error) {
 			if err = t.Akte.Skus.Each(
@@ -254,11 +251,6 @@ func (s typStore) ReadAll(
 						err = errors.Wrap(err)
 						return
 					}
-
-					// if err = p.Apply(f, te); err != nil {
-					// 	err = errors.Wrap(err)
-					// 	return
-					// }
 
 					return
 				},
@@ -303,11 +295,6 @@ func (s typStore) ReadAll(
 							err = errors.Wrap(err)
 							return
 						}
-
-						// if err = p.Apply(f, te); err != nil {
-						// 	err = errors.Wrap(err)
-						// 	return
-						// }
 
 						return
 					},

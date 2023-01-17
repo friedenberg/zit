@@ -23,7 +23,7 @@ type zettelStore struct {
 
 	protoZettel zettel.ProtoZettel
 
-	zettelTransactedWriter zettel.TransactedWriters
+	logWriter zettel.LogWriter
 
 	*indexKennung
 	hinweisen *hinweisen.Hinweisen
@@ -143,10 +143,10 @@ func (s *zettelStore) Flush() (err error) {
 	return
 }
 
-func (s *zettelStore) SetZettelTransactedLogWriter(
-	ztlw zettel.TransactedWriters,
+func (s *zettelStore) SetLogWriter(
+	ztlw zettel.LogWriter,
 ) {
-	s.zettelTransactedWriter = ztlw
+	s.logWriter = ztlw
 }
 
 func (s zettelStore) WriteZettelObjekte(z zettel.Objekte) (sh sha.Sha, err error) {
@@ -312,7 +312,7 @@ func (s *zettelStore) Create(
 	}
 
 	errors.TodoP2("assert no changes")
-	if err = s.zettelTransactedWriter.New(tz); err != nil {
+	if err = s.logWriter.New(tz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -358,7 +358,7 @@ func (s *zettelStore) Update(
 	if shaObj.Equals(mutter.Sku.ObjekteSha) {
 		tz = mutter
 
-		if err = s.zettelTransactedWriter.Unchanged(tz); err != nil {
+		if err = s.logWriter.Unchanged(tz); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -385,7 +385,7 @@ func (s *zettelStore) Update(
 		return
 	}
 
-	if err = s.zettelTransactedWriter.Updated(tz); err != nil {
+	if err = s.logWriter.Updated(tz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -501,7 +501,7 @@ func (s *zettelStore) Inherit(tz *zettel.Transacted) (err error) {
 	}
 
 	//TODO-P3 use right verb
-	if err = s.zettelTransactedWriter.New(tz); err != nil {
+	if err = s.logWriter.New(tz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -541,12 +541,12 @@ func (s *zettelStore) reindexOne(
 	}
 
 	if mutter == nil {
-		if err = s.zettelTransactedWriter.New(tz); err != nil {
+		if err = s.logWriter.New(tz); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	} else {
-		if err = s.zettelTransactedWriter.Updated(tz); err != nil {
+		if err = s.logWriter.Updated(tz); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

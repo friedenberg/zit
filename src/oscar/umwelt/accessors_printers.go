@@ -54,8 +54,8 @@ func (u *Umwelt) PrinterTypCheckedOut(
 	)
 }
 
-func (u *Umwelt) ZettelTransactedLogPrinters() zettel.TransactedWriters {
-	return zettel.TransactedWriters{
+func (u *Umwelt) ZettelTransactedLogPrinters() zettel.LogWriter {
+	return zettel.LogWriter{
 		New:       u.PrinterZettelTransactedDelta(format.StringNew),
 		Updated:   u.PrinterZettelTransactedDelta(format.StringUpdated),
 		Unchanged: u.PrinterZettelTransactedDelta(format.StringUnchanged),

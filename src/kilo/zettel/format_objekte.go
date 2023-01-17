@@ -44,7 +44,7 @@ func (f FormatObjekte) Format(
 ) (n int64, err error) {
 	errors.TodoP1("replace with objekte.Format")
 
-	w := format.NewWriter()
+	w := format.NewLineWriter()
 
 	w.WriteFormat("%s %s", gattung.Akte, z.Akte)
 	w.WriteFormat("%s %s", gattung.Typ, z.Typ)

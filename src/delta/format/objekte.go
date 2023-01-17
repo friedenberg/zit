@@ -103,7 +103,7 @@ func (f KeyValues) WriteFormat(
 	w1 io.Writer,
 	o KeyValueGetter,
 ) (n int64, err error) {
-	w := NewWriter()
+	w := NewLineWriter()
 
 	if h, ok := o.(KeyValueGetterHeader); ok {
 		header := h.Header()

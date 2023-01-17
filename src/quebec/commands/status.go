@@ -67,7 +67,7 @@ func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
 
 	for _, p := range possible.Typen {
 		if err = s.StoreWorkingDirectory().ReadTyp(p); err != nil {
-			err = errors.Wrap(err)
+			err = errors.Wrapf(err, "Path: %s", p.FD)
 			return
 		}
 

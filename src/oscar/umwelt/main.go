@@ -175,7 +175,7 @@ func (u *Umwelt) Initialize(kCli erworben.Cli) (err error) {
 
 	errors.Log().Print("done initing checkout store")
 
-	u.storeObjekten.Zettel().SetZettelTransactedLogWriter(
+	u.storeObjekten.Zettel().SetLogWriter(
 		u.ZettelTransactedLogPrinters(),
 	)
 

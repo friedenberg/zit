@@ -12,7 +12,7 @@ type Writer struct {
 }
 
 func (w Writer) WriteTo(w1 io.Writer) (n int64, err error) {
-	lw := format.NewWriter()
+	lw := format.NewLineWriter()
 
 	lw.WriteStringers(w.Transaktion.Time)
 

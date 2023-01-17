@@ -124,7 +124,7 @@ func MakeWriterToWithNewLines[T any](
 
 	return collections.MakeSyncSerializer(
 		func(e *T) (err error) {
-			//TODO-P3 modify flushing behavior based on w1 being a TTY
+			errors.TodoP3("modify flushing behavior based on w1 being a TTY")
 			defer errors.DeferredFlusher(&err, w)
 
 			if _, err = wf(w, *e); err != nil {

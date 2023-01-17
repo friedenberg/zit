@@ -89,12 +89,12 @@ func (t *Text) ReadFrom(r io.Reader) (n int64, err error) {
 }
 
 func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
-	lw := format.NewWriter()
+	lw := format.NewLineWriter()
 
 	kopf, scwhanz := ot.assignment.MaxKopfUndSchwanz()
 
 	aw := assignmentLineWriter{
-		Writer:               lw,
+		LineWriter:           lw,
 		maxDepth:             ot.assignment.MaxDepth(),
 		maxKopf:              kopf,
 		maxScwhanz:           scwhanz,

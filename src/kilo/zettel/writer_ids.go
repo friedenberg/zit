@@ -10,7 +10,10 @@ import (
 	"github.com/friedenberg/zit/src/hotel/objekte"
 )
 
-// TODO-P2 move away from this and replace with compiled filter
+func init() {
+	errors.TodoP2("move away from this and replace with compiled filter")
+}
+
 type WriterIds struct {
 	Filter id_set.Filter
 }

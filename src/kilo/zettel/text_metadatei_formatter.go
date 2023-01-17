@@ -21,7 +21,7 @@ type TextMetadateiFormatter struct {
 func (f *TextMetadateiFormatter) Format(w1 io.Writer, m *Metadatei) (n int64, err error) {
 	errors.TodoP3("turn *Objekte into an interface to allow zettel_external to use this")
 
-	w := format.NewWriter()
+	w := format.NewLineWriter()
 
 	if m.Bezeichnung.String() != "" || !f.DoNotWriteEmptyBezeichnung {
 		w.WriteLines(

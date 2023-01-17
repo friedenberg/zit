@@ -11,13 +11,16 @@ import (
 	"github.com/friedenberg/zit/src/juliett/konfig"
 )
 
+func init() {
+	errors.TodoP0("add typen expanded sorted")
+	errors.TodoP0("add hidden")
+}
+
 type Verzeichnisse struct {
 	wasPopulated bool
 	// Etiketten               tridex.Tridex
-	//TODO-P0 add typen expanded sorted
 	EtikettenExpandedSorted []string
 	EtikettenSorted         []string
-	//TODO-P3 add
 	// Hidden bool
 }
 

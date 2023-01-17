@@ -127,7 +127,7 @@ func (f Format[T, T1]) Format(
 	hash := sha256.New()
 	w2 := io.MultiWriter(w1, hash)
 
-	w := format.NewWriter()
+	w := format.NewLineWriter()
 
 	//TODO-P4 use new format methods
 	w.WriteFormat("%s", o.GetGattung())

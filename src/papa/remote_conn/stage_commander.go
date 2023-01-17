@@ -22,10 +22,15 @@ type MessageHiCommander struct {
 }
 
 type StageCommander struct {
-	remoteActorCmd *exec.Cmd
-	konfigCli      erworben.Cli
-	wg             *sync.WaitGroup
+	remoteActorCmd      *exec.Cmd
+	konfigCli           erworben.Cli
+	wg                  *sync.WaitGroup
+	chRemoteCommandDone chan struct{}
 	stage
+}
+
+func (s StageCommander) ChanRemoteCommandDone() <-chan struct{} {
+	return s.chRemoteCommandDone
 }
 
 func (s StageCommander) Close() (err error) {
@@ -47,6 +52,21 @@ func (s StageCommander) Close() (err error) {
 		return
 	}
 
+	close(s.chRemoteCommandDone)
+
+	return
+}
+
+func (c StageCommander) ShouldIgnoreConnectionError(in error) (ok bool) {
+	select {
+	case <-c.chRemoteCommandDone:
+		if errors.Is(in, net.ErrClosed) {
+			ok = true
+		}
+
+	default:
+	}
+
 	return
 }
 
@@ -56,8 +76,9 @@ func MakeStageCommander(
 	command string,
 ) (s *StageCommander, err error) {
 	s = &StageCommander{
-		wg:        &sync.WaitGroup{},
-		konfigCli: u.Konfig().Cli(),
+		wg:                  &sync.WaitGroup{},
+		konfigCli:           u.Konfig().Cli(),
+		chRemoteCommandDone: make(chan struct{}),
 	}
 
 	s.remoteActorCmd = exec.Command(

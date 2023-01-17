@@ -21,7 +21,7 @@ func String(o SkuLike) (str string) {
 }
 
 func MakeWriterLineFormat(
-	lf *format.Writer,
+	lf *format.LineWriter,
 ) collections.WriterFunc[SkuLike] {
 	return func(o SkuLike) (err error) {
 		lf.WriteFormat("%s", String(o))
