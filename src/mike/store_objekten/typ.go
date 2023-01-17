@@ -3,12 +3,12 @@ package store_objekten
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/toml"
+	"github.com/friedenberg/zit/src/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/golf/age_io"
 	"github.com/friedenberg/zit/src/golf/sku"
-	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/hotel/objekte"
 	"github.com/friedenberg/zit/src/india/typ"
 )
@@ -230,52 +230,50 @@ func (s typStore) ReadAll(
 	//TODO-P2 move to construction of inflator
 	// p := collections.MakePool[*typ.Transacted]()
 
-	if err = s.common.ReadAllTransaktions(
-		func(t *transaktion.Transaktion) (err error) {
-			if err = t.Skus.Each(
-				func(o sku.SkuLike) (err error) {
-					if o.GetGattung() != gattung.Typ {
-						return
-					}
+	f1 := func(t *bestandsaufnahme.Objekte) (err error) {
+		if err = t.Akte.Skus.Each(
+			func(sk sku.Sku2) (err error) {
+				if sk.GetGattung() != gattung.Typ {
+					return
+				}
 
-					var te *typ.Transacted
+				var te *typ.Transacted
 
-					if te, err = s.InflateFromDataIdentity(o); err != nil {
-						if errors.Is(err, toml.Error{}) {
-							err = nil
-						} else {
-							err = errors.Wrap(err)
-							return
-						}
-					}
-
-					if err = f(te); err != nil {
+				if te, err = s.InflateFromDataIdentity(sk); err != nil {
+					if errors.Is(err, toml.Error{}) {
+						err = nil
+					} else {
 						err = errors.Wrap(err)
 						return
 					}
+				}
 
-					// if err = p.Apply(f, te); err != nil {
-					// 	err = errors.Wrap(err)
-					// 	return
-					// }
-
+				if err = f(te); err != nil {
+					err = errors.Wrap(err)
 					return
-				},
-			); err != nil {
-				err = errors.Wrapf(
-					err,
-					"Transaktion: %s/%s: %s",
-					t.Time.Kopf(),
-					t.Time.Schwanz(),
-					t.Time,
-				)
+				}
+
+				// if err = p.Apply(f, te); err != nil {
+				// 	err = errors.Wrap(err)
+				// 	return
+				// }
 
 				return
-			}
+			},
+		); err != nil {
+			err = errors.Wrapf(
+				err,
+				"Bestandsaufnahme: %s",
+				t.Tai,
+			)
 
 			return
-		},
-	); err != nil {
+		}
+
+		return
+	}
+
+	if err = s.common.bestandsaufnahmeStore.ReadAll(f1); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

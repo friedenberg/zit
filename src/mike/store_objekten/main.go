@@ -31,11 +31,10 @@ type Store struct {
 	shaAbbr
 	hinweisAbbr
 
-	zettelStore           *zettelStore
-	typStore              TypStore
-	etikettStore          EtikettStore
-	konfigStore           KonfigStore
-	bestandsaufnahmeStore bestandsaufnahme.Store
+	zettelStore  *zettelStore
+	typStore     TypStore
+	etikettStore EtikettStore
+	konfigStore  KonfigStore
 
 	//Gattungen
 	gattungStores     map[gattung.Gattung]GattungStore

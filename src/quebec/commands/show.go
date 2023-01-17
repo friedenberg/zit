@@ -324,7 +324,6 @@ func (c Show) showTransaktions(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	return
 }
 
-// TODO-P3 support -all and -include-history
 func (c Show) showTypen(
 	u *umwelt.Umwelt,
 	ids id_set.Set,

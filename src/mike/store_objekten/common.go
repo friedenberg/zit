@@ -28,6 +28,8 @@ type common struct {
 	Transaktion      transaktion.Transaktion
 	Bestandsaufnahme *bestandsaufnahme.Objekte
 	Abbr             *indexAbbr
+
+	bestandsaufnahmeStore bestandsaufnahme.Store
 }
 
 func (s common) AddSkuToBestandsaufnahme(sk sku.SkuLike, as sha.Sha) {
