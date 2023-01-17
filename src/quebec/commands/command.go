@@ -15,6 +15,7 @@ type WithCompletion interface {
 }
 
 type command struct {
+	sansUmwelt bool
 	Command
 	*flag.FlagSet
 }
@@ -39,6 +40,24 @@ func registerCommand(n string, makeFunc func(*flag.FlagSet) Command) {
 	commands[n] = command{
 		Command: c,
 		FlagSet: f,
+	}
+
+	return
+}
+
+func registerCommandSansUmwelt(n string, makeFunc func(*flag.FlagSet) Command) {
+	f := flag.NewFlagSet(n, flag.ExitOnError)
+
+	c := makeFunc(f)
+
+	if _, ok := commands[n]; ok {
+		panic("command added more than once: " + n)
+	}
+
+	commands[n] = command{
+		sansUmwelt: true,
+		Command:    c,
+		FlagSet:    f,
 	}
 
 	return

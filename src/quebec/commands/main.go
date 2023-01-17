@@ -83,26 +83,15 @@ func Run(args []string) (exitStatus int) {
 	var u *umwelt.Umwelt
 
 	if u, err = umwelt.Make(konfigCli); err != nil {
-		//the store doesn't exist yet
-		switch {
-		case errors.IsNotExist(err):
+		if errors.Is(err, standort.ErrNotInZitDir{}) && cmd.sansUmwelt {
 			err = nil
-
-		case errors.Is(err, standort.ErrNotInZitDir{}) && cmd.FlagSet.Name() == "init":
-			if err = cmd.Command.Run(u, cmdArgs...); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-
-		default:
+		} else {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	defer errors.Deferred(&err, u.Flush)
+	defer errors.DeferredFlusher(&err, u)
 
 	switch {
 	case u.Konfig().Complete:
