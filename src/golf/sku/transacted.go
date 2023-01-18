@@ -155,26 +155,26 @@ func (a *Transacted[T, T1]) SetTransactionIndex(i int) {
 	a.TransactionIndex.SetInt(i)
 }
 
-func (a *Transacted[T, T1]) Reset(b *Transacted[T, T1]) {
-	if b == nil {
-		a.Kopf = ts.Time{}
-		a.ObjekteSha = sha.Sha{}
-		a.AkteSha = sha.Sha{}
-		T1(&a.Kennung).Reset(nil)
-		a.Mutter[0] = ts.Time{}
-		a.Mutter[1] = ts.Time{}
-		a.Schwanz = ts.Time{}
-		a.TransactionIndex.Reset()
-	} else {
-		a.Kopf = b.Kopf
-		a.ObjekteSha = b.ObjekteSha
-		a.AkteSha = b.AkteSha
-		T1(&a.Kennung).Reset(&b.Kennung)
-		a.Mutter[0] = b.Mutter[0]
-		a.Mutter[1] = b.Mutter[1]
-		a.Schwanz = b.Schwanz
-		a.TransactionIndex.SetInt(b.TransactionIndex.Int())
-	}
+func (a *Transacted[T, T1]) Reset() {
+	a.Kopf = ts.Time{}
+	a.ObjekteSha = sha.Sha{}
+	a.AkteSha = sha.Sha{}
+	T1(&a.Kennung).Reset()
+	a.Mutter[0] = ts.Time{}
+	a.Mutter[1] = ts.Time{}
+	a.Schwanz = ts.Time{}
+	a.TransactionIndex.Reset()
+}
+
+func (a *Transacted[T, T1]) ResetWith(b Transacted[T, T1]) {
+	a.Kopf = b.Kopf
+	a.ObjekteSha = b.ObjekteSha
+	a.AkteSha = b.AkteSha
+	T1(&a.Kennung).ResetWith(b.Kennung)
+	a.Mutter[0] = b.Mutter[0]
+	a.Mutter[1] = b.Mutter[1]
+	a.Schwanz = b.Schwanz
+	a.TransactionIndex.SetInt(b.TransactionIndex.Int())
 }
 
 func (a Transacted[T, T1]) Less(b *Transacted[T, T1]) (ok bool) {

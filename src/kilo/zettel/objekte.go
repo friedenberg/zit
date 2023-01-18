@@ -68,18 +68,18 @@ func (z Objekte) IsEmpty() bool {
 	return true
 }
 
-func (z *Objekte) Reset(z1 *Objekte) {
-	if z1 == nil {
-		z.Akte = sha.Sha{}
-		z.Typ = kennung.Typ{}
-		z.Bezeichnung = bezeichnung.Make("")
-		z.Etiketten = kennung.MakeEtikettSet()
-	} else {
-		z.Akte = z1.Akte
-		z.Typ = z1.Typ
-		z.Bezeichnung = z1.Bezeichnung
-		z.Etiketten = z1.Etiketten.Copy()
-	}
+func (z *Objekte) Reset() {
+	z.Akte = sha.Sha{}
+	z.Typ = kennung.Typ{}
+	z.Bezeichnung = bezeichnung.Make("")
+	z.Etiketten = kennung.MakeEtikettSet()
+}
+
+func (z *Objekte) ResetWith(z1 Objekte) {
+	z.Akte = z1.Akte
+	z.Typ = z1.Typ
+	z.Bezeichnung = z1.Bezeichnung
+	z.Etiketten = z1.Etiketten.Copy()
 }
 
 func (z Objekte) Description() (d string) {

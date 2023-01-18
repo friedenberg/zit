@@ -24,7 +24,7 @@ func TestReset(t1 *testing.T) {
 		t.Fatalf("expected len 5 but got %d", sut.Len())
 	}
 
-	sut.Reset(nil)
+	sut.Reset()
 
 	if sut.Len() != 0 {
 		t.Fatalf("expected len 0 but got %d", sut.Len())

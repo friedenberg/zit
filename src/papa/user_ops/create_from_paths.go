@@ -147,7 +147,7 @@ func (c CreateFromPaths) Run(
 
 			zv := &zettel.Transacted{}
 
-			zv.Reset(&cz.Internal)
+			zv.ResetWith(cz.Internal)
 
 			results.Add(zv)
 

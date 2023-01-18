@@ -44,14 +44,12 @@ func (e etikett) GetGattung() schnittstellen.Gattung {
 	return gattung.Etikett
 }
 
-func (e *etikett) Reset(e1 *etikett) {
-	if e1 == nil {
-		*e = etikett("")
-	} else {
-		*e = *e1
-	}
+func (e *etikett) ResetWith(e1 etikett) {
+	*e = e1
+}
 
-	return
+func (e *etikett) Reset() {
+	*e = etikett("")
 }
 
 func (a etikett) Equals(b etikett) bool {

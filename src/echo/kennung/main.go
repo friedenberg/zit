@@ -20,7 +20,7 @@ type KennungLike[T any] interface {
 
 type KennungLikePtr[T schnittstellen.Value] interface {
 	schnittstellen.ValuePtr[T]
-	gattung.Resetable[T]
+	schnittstellen.Resetable[T]
 }
 
 type Kennung[T KennungLike[T], T1 KennungLikePtr[T]] struct {
@@ -86,13 +86,13 @@ func (a Kennung[T, T1]) Contains(b Kennung[T, T1]) bool {
 	return strings.HasPrefix(a.value.String(), b.value.String())
 }
 
-func (a Kennung[T, T1]) Reset(b *Kennung[T, T1]) {
-	if b != nil {
-		a.value = b.value
-	} else {
-		var a1 T
-		a.value = a1
-	}
+func (a Kennung[T, T1]) Reset() {
+	var a1 T
+	a.value = a1
+}
+
+func (a Kennung[T, T1]) ResetWith(b Kennung[T, T1]) {
+	a.value = b.value
 }
 
 func (a Kennung[T, T1]) Equals(b Kennung[T, T1]) bool {

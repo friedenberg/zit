@@ -11,14 +11,14 @@ type Objekte struct {
 	Akte Akte
 }
 
-func (o Objekte) Reset(o1 *Objekte) {
-	if o1 == nil {
-		o.Sha = sha.Sha{}
-		o.Akte.Reset(nil)
-	} else {
-		o.Sha = o1.Sha
-		o.Akte.Reset(&o1.Akte)
-	}
+func (o Objekte) Reset() {
+	o.Sha = sha.Sha{}
+	o.Akte.Reset()
+}
+
+func (o Objekte) ResetWith(o1 Objekte) {
+	o.Sha = o1.Sha
+	o.Akte.ResetWith(o1.Akte)
 }
 
 func (o Objekte) Equals(o1 Objekte) bool {

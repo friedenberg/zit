@@ -1,8 +1,6 @@
 package gattung
 
 import (
-	"fmt"
-
 	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
@@ -15,15 +13,6 @@ type IdMitKorper interface {
 	schnittstellen.Value
 	Kopf() string
 	Schwanz() string
-}
-
-type Resetable[T any] interface {
-	Reset(*T)
-}
-
-type Resetter[T any] interface {
-	schnittstellen.Ptr[T]
-	Reset2()
 }
 
 type ResetWither[T any, TPtr schnittstellen.Ptr[T]] interface {
@@ -41,31 +30,16 @@ type Keyer[T any, T1 schnittstellen.Ptr[T]] interface {
 //  |___\__,_|\___|_| |_|\__|_|_| |_|\___|_|
 //
 
-type IdentifierLike interface {
-	schnittstellen.GattungGetter
-	schnittstellen.Value
-}
-
-type Id[T schnittstellen.Value] interface {
-	schnittstellen.Equatable[T]
-	fmt.Stringer
-}
-
-type IdPtr[T schnittstellen.Value] interface {
-	Id[T]
-	schnittstellen.ValuePtr[T]
-}
-
 // TODO-P2 rename to ObjekteKennung
 type Identifier[T any] interface {
 	schnittstellen.GattungGetter
 	schnittstellen.Equatable[T]
-	IdentifierLike
+	schnittstellen.IdLike
 }
 
 type IdentifierPtr[T schnittstellen.Value] interface {
 	schnittstellen.ValuePtr[T]
-	Resetable[T]
+	schnittstellen.Resetable[T]
 }
 
 //    ___  _     _      _    _
@@ -84,7 +58,7 @@ type Objekte[T any] interface {
 type ObjektePtr[T any] interface {
 	Objekte[T]
 	schnittstellen.Ptr[T]
-	Resetable[T]
+	schnittstellen.Resetable[T]
 	SetAkteSha(schnittstellen.Sha)
 }
 
@@ -138,6 +112,6 @@ type Transacted[T any] interface {
 type TransactedPtr[T any] interface {
 	Transacted[T]
 	schnittstellen.Ptr[T]
-	Resetable[T]
+	schnittstellen.Resetable[T]
 	StoredPtr
 }

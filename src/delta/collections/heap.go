@@ -240,16 +240,17 @@ func (a Heap[T]) Sorted() (b heapPrivate[T]) {
 	return
 }
 
-func (a *Heap[T]) Reset(b *Heap[T]) {
+func (a *Heap[T]) Reset() {
+	a.l = &sync.Mutex{}
+	a.h = heapPrivate[T](make([]T, 0))
+}
+
+func (a *Heap[T]) ResetWith(b Heap[T]) {
 	a.l = &sync.Mutex{}
 
-	if b == nil {
-		a.h = heapPrivate[T](make([]T, 0))
-	} else {
-		a.h = heapPrivate[T](make([]T, b.Len()))
+	a.h = heapPrivate[T](make([]T, b.Len()))
 
-		for i, bv := range b.h {
-			a.h[i] = bv
-		}
+	for i, bv := range b.h {
+		a.h[i] = bv
 	}
 }

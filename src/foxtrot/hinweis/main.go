@@ -194,14 +194,14 @@ func (h *Hinweis) Set(v string) (err error) {
 	return
 }
 
-func (h *Hinweis) Reset(h1 *Hinweis) {
-	if h1 == nil {
-		h.left = ""
-		h.right = ""
-	} else {
-		h.left = h1.left
-		h.right = h1.right
-	}
+func (h *Hinweis) Reset() {
+	h.left = ""
+	h.right = ""
+}
+
+func (h *Hinweis) ResetWith(h1 Hinweis) {
+	h.left = h1.left
+	h.right = h1.right
 }
 
 func (h Hinweis) GetGattung() schnittstellen.Gattung {

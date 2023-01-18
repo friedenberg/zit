@@ -31,14 +31,12 @@ func MakeTyp(v string) (e Typ, err error) {
 
 type typ string
 
-func (e *typ) Reset(e1 *typ) {
-	if e1 == nil {
-		*e = typ("")
-	} else {
-		*e = *e1
-	}
+func (e *typ) Reset() {
+	*e = typ("")
+}
 
-	return
+func (e *typ) ResetWith(e1 typ) {
+	*e = e1
 }
 
 func (a typ) Equals(b typ) bool {

@@ -39,14 +39,14 @@ func (a Objekte) Equals(b Objekte) bool {
 	return true
 }
 
-func (a *Objekte) Reset(b *Objekte) {
-	if b == nil {
-		a.Sha = sha.Sha{}
-		a.Akte.Reset(nil)
-	} else {
-		a.Sha = b.Sha
-		a.Akte.Reset(&b.Akte)
-	}
+func (a *Objekte) Reset() {
+	a.Sha = sha.Sha{}
+	a.Akte.Reset()
+}
+
+func (a *Objekte) ResetWith(b Objekte) {
+	a.Sha = b.Sha
+	a.Akte.ResetWith(b.Akte)
 }
 
 func (c Objekte) GetGattung() schnittstellen.Gattung {

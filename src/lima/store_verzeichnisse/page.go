@@ -121,7 +121,7 @@ func (zp *Page) Flush() (err error) {
 		return
 	}
 
-	zp.added.Reset(nil)
+	zp.added.Reset()
 
 	return
 }

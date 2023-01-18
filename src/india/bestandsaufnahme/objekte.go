@@ -41,15 +41,14 @@ func (a Objekte) Equals(b Objekte) bool {
 	return true
 }
 
-func (a *Objekte) Reset(b *Objekte) {
+func (a *Objekte) Reset() {
+	a.AkteSha = sha.Sha{}
+	a.Tai = ts.Tai{}
+	a.Akte.Reset()
+}
 
-	if b == nil {
-		a.AkteSha = sha.Sha{}
-		a.Tai = ts.Tai{}
-		a.Akte.Reset(nil)
-	} else {
-		a.Akte.Reset(&b.Akte)
-		a.AkteSha = b.AkteSha
-		a.Tai = b.Tai
-	}
+func (a *Objekte) ResetWith(b Objekte) {
+	a.Akte.ResetWith(b.Akte)
+	a.AkteSha = b.AkteSha
+	a.Tai = b.Tai
 }

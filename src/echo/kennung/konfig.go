@@ -19,7 +19,11 @@ func (a Konfig) Equals(b Konfig) bool {
 	return true
 }
 
-func (a Konfig) Reset(b *Konfig) {
+func (a *Konfig) Reset() {
+	return
+}
+
+func (a *Konfig) ResetWith(_ Konfig) {
 	return
 }
 

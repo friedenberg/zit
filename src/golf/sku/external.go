@@ -23,16 +23,16 @@ func (a *External[T, T1]) Transacted() (b Transacted[T, T1]) {
 	return
 }
 
-func (a *External[T, T1]) Reset(b *External[T, T1]) {
-	if b == nil {
-		a.ObjekteSha = sha.Sha{}
-		a.AkteSha = sha.Sha{}
-		T1(&a.Kennung).Reset(nil)
-	} else {
-		a.ObjekteSha = b.ObjekteSha
-		a.AkteSha = b.AkteSha
-		T1(&a.Kennung).Reset(&b.Kennung)
-	}
+func (a *External[T, T1]) Reset() {
+	a.ObjekteSha = sha.Sha{}
+	a.AkteSha = sha.Sha{}
+	T1(&a.Kennung).Reset()
+}
+
+func (a *External[T, T1]) ResetWith(b *External[T, T1]) {
+	a.ObjekteSha = b.ObjekteSha
+	a.AkteSha = b.AkteSha
+	T1(&a.Kennung).ResetWith(b.Kennung)
 }
 
 func (a External[T, T1]) Equals(b *External[T, T1]) (ok bool) {

@@ -163,16 +163,16 @@ func (a *Transacted[T, T1, T2, T3, T4, T5]) GenerateVerzeichnisse() {
 	T5(&a.Verzeichnisse).ResetWithObjekte(&a.Objekte)
 }
 
-func (a *Transacted[T, T1, T2, T3, T4, T5]) Reset(
-	b *Transacted[T, T1, T2, T3, T4, T5],
-) {
-	if b == nil {
-		a.Sku.Reset(nil)
-		T1(&a.Objekte).Reset(nil)
-	} else {
-		a.Sku.Reset(&b.Sku)
-		T1(&a.Objekte).Reset(&b.Objekte)
-	}
+func (a *Transacted[T, T1, T2, T3, T4, T5]) Reset() {
+	a.Sku.Reset()
+	T1(&a.Objekte).Reset()
+	a.GenerateVerzeichnisse()
+}
 
+func (a *Transacted[T, T1, T2, T3, T4, T5]) ResetWith(
+	b Transacted[T, T1, T2, T3, T4, T5],
+) {
+	a.Sku.ResetWith(b.Sku)
+	T1(&a.Objekte).ResetWith(b.Objekte)
 	a.GenerateVerzeichnisse()
 }

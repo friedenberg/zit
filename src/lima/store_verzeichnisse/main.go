@@ -107,7 +107,7 @@ func (i *Zettelen) Add(tz *zettel.Transacted, v string) (err error) {
 	}
 
 	z := i.pool.Get()
-	z.Reset(tz)
+	z.ResetWith(*tz)
 
 	if err = p.Add(z); err != nil {
 		err = errors.Wrap(err)

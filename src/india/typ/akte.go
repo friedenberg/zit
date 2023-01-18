@@ -1,6 +1,7 @@
 package typ
 
 import (
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/etikett_rule"
 	"github.com/friedenberg/zit/src/bravo/script_config"
 )
@@ -18,28 +19,28 @@ type Akte struct {
 	EtikettenRules map[string]etikett_rule.Rule                 `toml:"etiketten-rules,omitempty"`
 }
 
-func (a *Akte) Reset(b *Akte) {
-	if b == nil {
-		a.InlineAkte = true
-		a.FileExtension = ""
-		a.ExecCommand = nil
-		a.VimSyntaxType = ""
-		a.FormatterUTIGroups = make(map[string]FormatterUTIGroup)
-		a.Formatters = make(map[string]script_config.ScriptConfigWithUTI)
-		a.Actions = make(map[string]script_config.ScriptConfig)
-		a.EtikettenRules = make(map[string]etikett_rule.Rule)
-	} else {
-		a.InlineAkte = b.InlineAkte
-		a.FileExtension = b.FileExtension
-		a.ExecCommand = b.ExecCommand
-		a.VimSyntaxType = b.VimSyntaxType
+func (a *Akte) Reset() {
+	a.InlineAkte = true
+	a.FileExtension = ""
+	a.ExecCommand = nil
+	a.VimSyntaxType = ""
+	a.FormatterUTIGroups = make(map[string]FormatterUTIGroup)
+	a.Formatters = make(map[string]script_config.ScriptConfigWithUTI)
+	a.Actions = make(map[string]script_config.ScriptConfig)
+	a.EtikettenRules = make(map[string]etikett_rule.Rule)
+}
 
-		//TODO-P1 should copy
-		a.FormatterUTIGroups = b.FormatterUTIGroups
-		a.Formatters = b.Formatters
-		a.Actions = b.Actions
-		a.EtikettenRules = b.EtikettenRules
-	}
+func (a *Akte) ResetWith(b Akte) {
+	a.InlineAkte = b.InlineAkte
+	a.FileExtension = b.FileExtension
+	a.ExecCommand = b.ExecCommand
+	a.VimSyntaxType = b.VimSyntaxType
+
+	errors.TodoP1("copy instead of assign")
+	a.FormatterUTIGroups = b.FormatterUTIGroups
+	a.Formatters = b.Formatters
+	a.Actions = b.Actions
+	a.EtikettenRules = b.EtikettenRules
 }
 
 func (a *Akte) Equals(b *Akte) bool {

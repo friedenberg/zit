@@ -34,14 +34,14 @@ func (o *Objekte) SetAkteSha(v schnittstellen.Sha) {
 	o.Sha = sha.Make(v)
 }
 
-func (a *Objekte) Reset(b *Objekte) {
-	if b == nil {
-		a.Sha = sha.Sha{}
-		a.Akte = Akte{}
-	} else {
-		a.Sha = b.Sha
-		a.Akte = b.Akte
-	}
+func (a *Objekte) Reset() {
+	a.Sha = sha.Sha{}
+	a.Akte = Akte{}
+}
+
+func (a *Objekte) ResetWith(b Objekte) {
+	a.Sha = b.Sha
+	a.Akte = b.Akte
 }
 
 func (a Objekte) Equals(b Objekte) bool {

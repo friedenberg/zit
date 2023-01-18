@@ -7,16 +7,16 @@ type FileExtensions struct {
 	Etikett  string `toml:"etikett"`
 }
 
-func (a *FileExtensions) Reset(b *FileExtensions) {
-	if b == nil {
-		a.Zettel = ""
-		a.Organize = ""
-		a.Typ = ""
-		a.Etikett = ""
-	} else {
-		a.Zettel = b.Zettel
-		a.Organize = b.Organize
-		a.Typ = b.Typ
-		a.Etikett = b.Etikett
-	}
+func (a *FileExtensions) Reset() {
+	a.Zettel = ""
+	a.Organize = ""
+	a.Typ = ""
+	a.Etikett = ""
+}
+
+func (a *FileExtensions) ResetWith(b FileExtensions) {
+	a.Zettel = b.Zettel
+	a.Organize = b.Organize
+	a.Typ = b.Typ
+	a.Etikett = b.Etikett
 }

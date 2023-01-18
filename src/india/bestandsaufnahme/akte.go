@@ -22,10 +22,10 @@ func (a Akte) Equals(b *Akte) bool {
 	return true
 }
 
-func (a *Akte) Reset(b *Akte) {
-	if b == nil {
-		a.Skus.Reset(nil)
-	} else {
-		a.Skus.Reset(&b.Skus)
-	}
+func (a *Akte) Reset() {
+	a.Skus.Reset()
+}
+
+func (a *Akte) ResetWith(b Akte) {
+	a.Skus.ResetWith(b.Skus)
 }
