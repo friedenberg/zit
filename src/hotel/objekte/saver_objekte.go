@@ -3,28 +3,27 @@ package objekte
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type ObjekteSaver[
-	T gattung.Objekte[T],
-	T1 gattung.ObjektePtr[T],
+	T schnittstellen.Objekte[T],
+	T1 schnittstellen.ObjektePtr[T],
 ] interface {
 	SaveObjekte(T1) (schnittstellen.Sha, error)
 }
 
 type objekteSaver[
-	T gattung.Objekte[T],
-	T1 gattung.ObjektePtr[T],
+	T schnittstellen.Objekte[T],
+	T1 schnittstellen.ObjektePtr[T],
 ] struct {
 	writerFactory schnittstellen.ObjekteWriterFactory
 	formatter     schnittstellen.Formatter[T, T1]
 }
 
 func MakeObjekteSaver[
-	T gattung.Objekte[T],
-	T1 gattung.ObjektePtr[T],
+	T schnittstellen.Objekte[T],
+	T1 schnittstellen.ObjektePtr[T],
 ](
 	writerFactory schnittstellen.ObjekteWriterFactory,
 	formatter schnittstellen.Formatter[T, T1],

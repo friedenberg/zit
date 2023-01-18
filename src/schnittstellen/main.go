@@ -13,3 +13,8 @@ type Resetable[T any] interface {
 	ResetWith(T)
 	Reset()
 }
+
+type ResetWither[T any] interface {
+	Ptr[T]
+	ResetWith(T)
+}

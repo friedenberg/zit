@@ -1,7 +1,7 @@
 package objekte
 
-import "github.com/friedenberg/zit/src/charlie/gattung"
+import "github.com/friedenberg/zit/src/schnittstellen"
 
-type NilVerzeichnisse[T gattung.Objekte[T]] struct{}
+type NilVerzeichnisse[T schnittstellen.Objekte[T]] struct{}
 
 func (_ NilVerzeichnisse[T]) ResetWithObjekte(o *T) {}

@@ -23,8 +23,8 @@ type AkteStorer[T any] interface {
 
 // TODO-P1 split into ObjekteInflator
 type TransactedInflator[
-	T gattung.Objekte[T],
-	T1 gattung.ObjektePtr[T],
+	T schnittstellen.Objekte[T],
+	T1 schnittstellen.ObjektePtr[T],
 	T2 gattung.Identifier[T2],
 	T3 gattung.IdentifierPtr[T2],
 	T4 gattung.Verzeichnisse[T],
@@ -37,8 +37,8 @@ type TransactedInflator[
 }
 
 type transactedInflator[
-	T gattung.Objekte[T],
-	T1 gattung.ObjektePtr[T],
+	T schnittstellen.Objekte[T],
+	T1 schnittstellen.ObjektePtr[T],
 	T2 gattung.Identifier[T2],
 	T3 gattung.IdentifierPtr[T2],
 	T4 gattung.Verzeichnisse[T],
@@ -52,8 +52,8 @@ type transactedInflator[
 }
 
 func MakeTransactedInflator[
-	T gattung.Objekte[T],
-	T1 gattung.ObjektePtr[T],
+	T schnittstellen.Objekte[T],
+	T1 schnittstellen.ObjektePtr[T],
 	T2 gattung.Identifier[T2],
 	T3 gattung.IdentifierPtr[T2],
 	T4 gattung.Verzeichnisse[T],

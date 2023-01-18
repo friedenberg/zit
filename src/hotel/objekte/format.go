@@ -10,16 +10,17 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/format"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type Format[
-	T gattung.Objekte[T],
-	T1 gattung.ObjektePtr[T],
+	T schnittstellen.Objekte[T],
+	T1 schnittstellen.ObjektePtr[T],
 ] struct{}
 
 func MakeFormat[
-	T gattung.Objekte[T],
-	T1 gattung.ObjektePtr[T],
+	T schnittstellen.Objekte[T],
+	T1 schnittstellen.ObjektePtr[T],
 ]() *Format[T, T1] {
 	return &Format[T, T1]{}
 }

@@ -3,29 +3,28 @@ package objekte
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 // TODO-P3 rename to AkteSaver
 type AkteTextSaver[
-	T gattung.Objekte[T],
-	T1 gattung.ObjektePtr[T],
+	T schnittstellen.Objekte[T],
+	T1 schnittstellen.ObjektePtr[T],
 ] interface {
 	SaveAkteText(T1) (int64, error)
 }
 
 type akteTextSaver[
-	T gattung.Objekte[T],
-	T1 gattung.ObjektePtr[T],
+	T schnittstellen.Objekte[T],
+	T1 schnittstellen.ObjektePtr[T],
 ] struct {
 	awf           schnittstellen.AkteWriterFactory
 	akteFormatter schnittstellen.Formatter[T, T1]
 }
 
 func MakeAkteTextSaver[
-	T gattung.Objekte[T],
-	T1 gattung.ObjektePtr[T],
+	T schnittstellen.Objekte[T],
+	T1 schnittstellen.ObjektePtr[T],
 ](
 	awf schnittstellen.AkteWriterFactory,
 	akteFormatter schnittstellen.Formatter[T, T1],

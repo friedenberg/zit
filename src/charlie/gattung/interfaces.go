@@ -15,10 +15,6 @@ type IdMitKorper interface {
 	Schwanz() string
 }
 
-type ResetWither[T any, TPtr schnittstellen.Ptr[T]] interface {
-	ResetWith(TPtr)
-}
-
 type Keyer[T any, T1 schnittstellen.Ptr[T]] interface {
 	Key(T1) string
 }
@@ -40,26 +36,6 @@ type Identifier[T any] interface {
 type IdentifierPtr[T schnittstellen.Value] interface {
 	schnittstellen.ValuePtr[T]
 	schnittstellen.Resetable[T]
-}
-
-//    ___  _     _      _    _
-//   / _ \| |__ (_) ___| | _| |_ ___
-//  | | | | '_ \| |/ _ \ |/ / __/ _ \
-//  | |_| | |_) | |  __/   <| ||  __/
-//   \___/|_.__// |\___|_|\_\\__\___|
-//            |__/
-
-type Objekte[T any] interface {
-	schnittstellen.GattungGetter
-	schnittstellen.Equatable[T]
-	GetAkteSha() schnittstellen.Sha
-}
-
-type ObjektePtr[T any] interface {
-	Objekte[T]
-	schnittstellen.Ptr[T]
-	schnittstellen.Resetable[T]
-	SetAkteSha(schnittstellen.Sha)
 }
 
 //   ____  _                     _
@@ -91,7 +67,7 @@ type StoredPtr interface {
 type Verzeichnisse[T any] interface {
 }
 
-type VerzeichnissePtr[T any, T1 Objekte[T1]] interface {
+type VerzeichnissePtr[T any, T1 schnittstellen.Objekte[T1]] interface {
 	schnittstellen.Ptr[T]
 	Verzeichnisse[T]
 	ResetWithObjekte(*T1)
