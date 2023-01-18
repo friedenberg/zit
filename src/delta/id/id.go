@@ -1,7 +1,6 @@
 package id
 
 import (
-	"flag"
 	"os"
 	"path"
 	"path/filepath"
@@ -12,14 +11,9 @@ import (
 	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
-type MutableId interface {
-	gattung.IdLike
-	flag.Value
-}
-
 type TypedId interface {
 	schnittstellen.Gattung
-	gattung.IdLike
+	schnittstellen.Setter
 }
 
 // func Path(i IdMitKorper, pc ...string) string {

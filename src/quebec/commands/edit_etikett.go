@@ -40,7 +40,7 @@ func init() {
 func (c EditEtikett) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 	is = id_set.MakeProtoIdSet(
 		id_set.ProtoId{
-			MutableId: &kennung.Etikett{},
+			Setter: &kennung.Etikett{},
 		},
 	)
 

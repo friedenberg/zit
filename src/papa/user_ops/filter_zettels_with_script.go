@@ -98,7 +98,7 @@ func (op FilterZettelsWithScript) runGetHinweisen(
 	go func() {
 		is := id_set.MakeProtoIdSet(
 			id_set.ProtoId{
-				MutableId: &hinweis.Hinweis{},
+				Setter: &hinweis.Hinweis{},
 			},
 		)
 

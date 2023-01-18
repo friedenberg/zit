@@ -33,7 +33,7 @@ func init() {
 func (c OpenAkte) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 	is = id_set.MakeProtoIdSet(
 		id_set.ProtoId{
-			MutableId: &hinweis.Hinweis{},
+			Setter: &hinweis.Hinweis{},
 			Expand: func(v string) (out string, err error) {
 				var h hinweis.Hinweis
 				h, err = u.StoreObjekten().Abbr().ExpandHinweisString(v)

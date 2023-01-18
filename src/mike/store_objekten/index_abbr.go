@@ -14,6 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/kilo/zettel"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type indexAbbrEncodableTridexes struct {
@@ -152,7 +153,7 @@ func (i *indexAbbr) addStoredAbbreviation(o gattung.Stored) (err error) {
 	return
 }
 
-func (i *indexAbbr) AbbreviateSha(s gattung.IdLike) (abbr string, err error) {
+func (i *indexAbbr) AbbreviateSha(s schnittstellen.Value) (abbr string, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return

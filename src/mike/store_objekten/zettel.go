@@ -15,6 +15,7 @@ import (
 	"github.com/friedenberg/zit/src/hotel/objekte"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/lima/store_verzeichnisse"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type zettelStore struct {
@@ -224,7 +225,7 @@ func (s *zettelStore) writeNamedZettelToIndex(
 }
 
 func (s zettelStore) ReadOne(
-	i gattung.IdLike,
+	i schnittstellen.Value,
 ) (tz *zettel.Transacted, err error) {
 	switch tid := i.(type) {
 	case hinweis.Hinweis:

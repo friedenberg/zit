@@ -5,7 +5,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type ReaderLine struct {
@@ -40,7 +40,7 @@ func (rl *ReaderLine) ReadFrom(r1 io.Reader) (n int64, err error) {
 			continue
 		}
 
-		var i gattung.IdLike
+		var i schnittstellen.Value
 
 		if i, err = rl.ProtoIdSet.MakeOne(line); err != nil {
 			err = errors.Wrap(err)

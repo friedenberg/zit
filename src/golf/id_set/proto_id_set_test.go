@@ -22,16 +22,16 @@ func TestMakeProtoIdSet(t1 *testing.T) {
 
 	sut := MakeProtoIdSet(
 		ProtoId{
-			MutableId: &hinweis.Hinweis{},
+			Setter: &hinweis.Hinweis{},
 		},
 		ProtoId{
-			MutableId: &kennung.Etikett{},
+			Setter: &kennung.Etikett{},
 		},
 		ProtoId{
-			MutableId: &kennung.Typ{},
+			Setter: &kennung.Typ{},
 		},
 		ProtoId{
-			MutableId: &ts.Time{},
+			Setter: &ts.Time{},
 		},
 	)
 

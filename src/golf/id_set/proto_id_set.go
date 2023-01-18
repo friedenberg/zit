@@ -2,8 +2,7 @@ package id_set
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/delta/id"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type ProtoIdSet struct {
@@ -39,8 +38,8 @@ func (ps ProtoIdSet) Len() int {
 	return len(ps.types)
 }
 
-func (ps ProtoIdSet) Contains(i id.MutableId) (ok bool) {
-	i2 := makeProtoId(ProtoId{MutableId: i})
+func (ps ProtoIdSet) Contains(i schnittstellen.Setter) (ok bool) {
+	i2 := makeProtoId(ProtoId{Setter: i})
 	for _, i1 := range ps.types {
 		if i1.Type == i2.Type {
 			ok = true
@@ -51,7 +50,7 @@ func (ps ProtoIdSet) Contains(i id.MutableId) (ok bool) {
 	return
 }
 
-func (ps ProtoIdSet) MakeOne(v string) (i gattung.IdLike, err error) {
+func (ps ProtoIdSet) MakeOne(v string) (i schnittstellen.Value, err error) {
 	for _, t := range ps.types {
 		if i, err = t.Make(v); err == nil {
 			break
@@ -74,7 +73,7 @@ func (ps ProtoIdSet) Make(vs ...string) (s Set, err error) {
 	s = Make(len(vs))
 
 	for _, v := range vs {
-		var i gattung.IdLike
+		var i schnittstellen.Value
 
 		if i, err = ps.MakeOne(v); err != nil {
 			err = errors.Wrap(err)

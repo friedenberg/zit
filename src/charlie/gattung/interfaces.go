@@ -6,17 +6,13 @@ import (
 	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
-type FuncAbbrId func(IdLike) (string, error)
+type FuncAbbrId func(schnittstellen.Value) (string, error)
 type FuncAbbrIdMitKorper func(IdMitKorper) (string, error)
 
 type ShaLike = schnittstellen.Sha
 
-type IdLike interface {
-	fmt.Stringer
-}
-
 type IdMitKorper interface {
-	IdLike
+	schnittstellen.Value
 	Kopf() string
 	Schwanz() string
 }
@@ -47,7 +43,7 @@ type Keyer[T any, T1 schnittstellen.Ptr[T]] interface {
 
 type IdentifierLike interface {
 	schnittstellen.GattungGetter
-	IdLike
+	schnittstellen.Value
 }
 
 type Id[T schnittstellen.Value] interface {

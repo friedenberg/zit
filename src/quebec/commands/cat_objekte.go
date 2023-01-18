@@ -31,7 +31,7 @@ func init() {
 func (c CatObjekte) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 	is = id_set.MakeProtoIdSet(
 		id_set.ProtoId{
-			MutableId: &sha.Sha{},
+			Setter: &sha.Sha{},
 			Expand: func(v string) (out string, err error) {
 				var s sha.Sha
 				s, err = u.StoreObjekten().Abbr().ExpandShaString(v)

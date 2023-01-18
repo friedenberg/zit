@@ -38,10 +38,10 @@ func (c commandWithIds) getIdProtoSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 	default:
 		is = id_set.MakeProtoIdSet(
 			id_set.ProtoId{
-				MutableId: &sha.Sha{},
+				Setter: &sha.Sha{},
 			},
 			id_set.ProtoId{
-				MutableId: &hinweis.Hinweis{},
+				Setter: &hinweis.Hinweis{},
 				Expand: func(v string) (out string, err error) {
 					var h hinweis.Hinweis
 					h, err = u.StoreObjekten().Abbr().ExpandHinweisString(v)
@@ -50,10 +50,10 @@ func (c commandWithIds) getIdProtoSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 				},
 			},
 			id_set.ProtoId{
-				MutableId: &kennung.Typ{},
+				Setter: &kennung.Typ{},
 			},
 			id_set.ProtoId{
-				MutableId: &ts.Time{},
+				Setter: &ts.Time{},
 			},
 		)
 	}

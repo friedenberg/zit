@@ -9,6 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/ts"
+	"github.com/friedenberg/zit/src/schnittstellen"
 	"github.com/friedenberg/zit/src/sha_collections"
 )
 
@@ -21,7 +22,7 @@ type Set struct {
 	Typen      kennung.TypMutableSet
 	Timestamps ts.MutableSet
 	HasKonfig  bool
-	ids        []gattung.IdLike
+	ids        []schnittstellen.Value
 }
 
 func Make(c int) Set {
@@ -31,11 +32,11 @@ func Make(c int) Set {
 		Etiketten:  kennung.MakeEtikettMutableSet(),
 		Hinweisen:  hinweis.MakeMutableSet(),
 		Typen:      kennung.MakeTypMutableSet(),
-		ids:        make([]gattung.IdLike, 0, c),
+		ids:        make([]schnittstellen.Value, 0, c),
 	}
 }
 
-func (s *Set) Add(ids ...gattung.IdLike) {
+func (s *Set) Add(ids ...schnittstellen.Value) {
 	for _, i := range ids {
 		switch it := i.(type) {
 		case kennung.Etikett:

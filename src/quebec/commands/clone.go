@@ -54,19 +54,19 @@ func (c Clone) ProtoIdSet(_ *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 	if c.GattungSet.Contains(gattung.Zettel) {
 		is.AddMany(
 			id_set.ProtoId{
-				MutableId: &sha.Sha{},
+				Setter: &sha.Sha{},
 			},
 			id_set.ProtoId{
-				MutableId: &hinweis.Hinweis{},
+				Setter: &hinweis.Hinweis{},
 			},
 			id_set.ProtoId{
-				MutableId: &kennung.Etikett{},
+				Setter: &kennung.Etikett{},
 			},
 			id_set.ProtoId{
-				MutableId: &kennung.Typ{},
+				Setter: &kennung.Typ{},
 			},
 			id_set.ProtoId{
-				MutableId: &ts.Time{},
+				Setter: &ts.Time{},
 			},
 		)
 	}
@@ -74,7 +74,7 @@ func (c Clone) ProtoIdSet(_ *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 	if c.GattungSet.Contains(gattung.Typ) {
 		is.AddMany(
 			id_set.ProtoId{
-				MutableId: &kennung.Typ{},
+				Setter: &kennung.Typ{},
 			},
 		)
 	}
@@ -82,7 +82,7 @@ func (c Clone) ProtoIdSet(_ *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 	if c.GattungSet.Contains(gattung.Transaktion) {
 		is.AddMany(
 			id_set.ProtoId{
-				MutableId: &ts.Time{},
+				Setter: &ts.Time{},
 			},
 		)
 	}

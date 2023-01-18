@@ -4,12 +4,11 @@ import (
 	"reflect"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/delta/id"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type ProtoId struct {
-	id.MutableId
+	schnittstellen.Setter
 	Expand func(string) (string, error)
 }
 
@@ -21,7 +20,7 @@ type protoId struct {
 func makeProtoId(i ProtoId) protoId {
 	return protoId{
 		ProtoId: i,
-		Type:    reflect.TypeOf(i.MutableId), // this type of this variable is reflect.Type
+		Type:    reflect.TypeOf(i.Setter), // this type of this variable is reflect.Type
 	}
 }
 
@@ -29,7 +28,7 @@ func (pid protoId) String() string {
 	return pid.Type.Name()
 }
 
-func (pid protoId) Make(v string) (i gattung.IdLike, err error) {
+func (pid protoId) Make(v string) (i schnittstellen.Value, err error) {
 	if pid.Expand != nil {
 		if v, err = pid.Expand(v); err != nil {
 			err = errors.Wrap(err)
@@ -39,14 +38,14 @@ func (pid protoId) Make(v string) (i gattung.IdLike, err error) {
 
 	idPointer := reflect.New(pid.Type.Elem()) // this type of this variable is reflect.Value.
 	idInterface := idPointer.Interface()      // this type of this variable is interface{}
-	id2 := idInterface.(id.MutableId)
+	id2 := idInterface.(schnittstellen.Setter)
 
 	if err = id2.Set(v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	i = reflect.ValueOf(id2).Elem().Interface().(gattung.IdLike)
+	i = reflect.ValueOf(id2).Elem().Interface().(schnittstellen.Value)
 
 	return
 }
