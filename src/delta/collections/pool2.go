@@ -4,14 +4,14 @@ import (
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
-type pool2[T gattung.Element, TPtr gattung.ElementPtr[T]] struct {
+type pool2[T any, TPtr schnittstellen.Ptr[T]] struct {
 	inner *sync.Pool
 }
 
-func MakePool2[T gattung.Element, TPtr gattung.ElementPtr[T]]() *pool2[T, TPtr] {
+func MakePool2[T any, TPtr schnittstellen.Ptr[T]]() *pool2[T, TPtr] {
 	return &pool2[T, TPtr]{
 		inner: &sync.Pool{
 			New: func() interface{} {

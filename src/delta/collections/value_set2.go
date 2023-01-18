@@ -1,6 +1,8 @@
 package collections
 
-type ValueSet2[E ValueSetElement] struct {
+import "github.com/friedenberg/zit/src/schnittstellen"
+
+type ValueSet2[E schnittstellen.Value] struct {
 	SetLike[E]
 }
 

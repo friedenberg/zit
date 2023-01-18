@@ -27,3 +27,6 @@ type ShaWriteCloser interface {
 	io.WriteCloser
 	Sha() Sha
 }
+
+type FuncShaReadCloser func(Sha) (ShaReadCloser, error)
+type FuncShaWriteCloser func(Sha) (ShaWriteCloser, error)

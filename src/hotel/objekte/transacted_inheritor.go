@@ -2,9 +2,9 @@ package objekte
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/golf/sku"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type TransactedInheritor interface {
@@ -22,11 +22,10 @@ type Inheritor[T any] interface {
 }
 
 type heritableElement interface {
-	gattung.Element
 }
 
-type heritableElementPtr[T gattung.Element] interface {
-	gattung.ElementPtr[T]
+type heritableElementPtr[T any] interface {
+	schnittstellen.Ptr[T]
 }
 
 type transactedInheritor[T heritableElement, TPtr heritableElementPtr[T]] struct {

@@ -46,8 +46,8 @@ type transactedInflator[
 ] struct {
 	of            schnittstellen.ObjekteIOFactory
 	af            schnittstellen.AkteIOFactory
-	objekteFormat gattung.Format[T, T1]
-	akteFormat    gattung.Format[T, T1]
+	objekteFormat schnittstellen.Format[T, T1]
+	akteFormat    schnittstellen.Format[T, T1]
 	pool          collections.PoolLike[Transacted[T, T1, T2, T3, T4, T5]]
 }
 
@@ -61,8 +61,8 @@ func MakeTransactedInflator[
 ](
 	of schnittstellen.ObjekteIOFactory,
 	af schnittstellen.AkteIOFactory,
-	objekteFormat gattung.Format[T, T1],
-	akteFormat gattung.Format[T, T1],
+	objekteFormat schnittstellen.Format[T, T1],
+	akteFormat schnittstellen.Format[T, T1],
 	pool collections.PoolLike[Transacted[T, T1, T2, T3, T4, T5]],
 ) *transactedInflator[T, T1, T2, T3, T4, T5] {
 	if objekteFormat == nil {

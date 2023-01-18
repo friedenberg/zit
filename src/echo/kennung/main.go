@@ -14,12 +14,12 @@ import (
 
 type KennungLike[T any] interface {
 	gattung.GattungLike
-	gattung.ValueElement
+	schnittstellen.Value
 	gattung.Equatable[T]
 }
 
-type KennungLikePtr[T gattung.ValueElement] interface {
-	gattung.ValueElementPtr[T]
+type KennungLikePtr[T schnittstellen.Value] interface {
+	schnittstellen.ValuePtr[T]
 	gattung.Resetable[T]
 }
 

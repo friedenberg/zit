@@ -6,13 +6,14 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
-type MutableSet2[T gattung.Element, T1 gattung.ElementPtr[T]] struct {
+type MutableSet2[T any, T1 schnittstellen.Ptr[T]] struct {
 	private setPrivate[T, T1]
 }
 
-func MutableSet2FromSlice[T gattung.Element, T1 gattung.ElementPtr[T]](
+func MutableSet2FromSlice[T any, T1 schnittstellen.Ptr[T]](
 	keyer gattung.Keyer[T, T1],
 	es ...T1,
 ) (s MutableSet2[T, T1]) {
@@ -21,7 +22,7 @@ func MutableSet2FromSlice[T gattung.Element, T1 gattung.ElementPtr[T]](
 	return
 }
 
-func MutableSet2FromSetLike[T gattung.Element, T1 gattung.ElementPtr[T]](
+func MutableSet2FromSetLike[T any, T1 schnittstellen.Ptr[T]](
 	keyer gattung.Keyer[T, T1],
 	s1 SetLike[T1],
 ) (s MutableSet2[T, T1]) {

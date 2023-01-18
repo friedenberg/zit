@@ -3,7 +3,7 @@ package kennung
 import (
 	"regexp"
 
-	"github.com/friedenberg/zit/src/delta/collections"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type expanderRight struct {
@@ -19,7 +19,7 @@ func MakeExpanderRight(
 }
 
 func (ex expanderRight) Expand(
-	sa collections.FuncSetString,
+	sa schnittstellen.FuncSetString,
 	s string,
 ) {
 	sa(s)

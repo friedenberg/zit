@@ -2,9 +2,7 @@ package collections
 
 import (
 	"flag"
-	"fmt"
 
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
@@ -33,7 +31,7 @@ type PoolLike[T any] interface {
 	Put(i *T) (err error)
 }
 
-type Pool2Like[T gattung.Element, TPtr gattung.ElementPtr[T]] interface {
+type Pool2Like[T any, TPtr schnittstellen.Ptr[T]] interface {
 	Get() TPtr
 	Put(i TPtr) (err error)
 }
@@ -70,27 +68,6 @@ type MutableSetLike[T any] interface {
 //    \ V / (_| | | |_| |  __/  ___) |  __/ |_\__ \
 //     \_/ \__,_|_|\__,_|\___| |____/ \___|\__|___/
 //
-
-type ValueSetElement interface {
-	gattung.Element
-	fmt.Stringer
-}
-
-type ValueSetElementPtr[E gattung.Element] interface {
-	gattung.ElementPtr[E]
-	Setter
-}
-
-type FuncSetString = schnittstellen.FuncSetString
-
-type Setter interface {
-	Set(string) error
-}
-
-type SetterPtr[T any] interface {
-	gattung.ElementPtr[T]
-	Setter
-}
 
 type Adder[E any] interface {
 	Add(E) error

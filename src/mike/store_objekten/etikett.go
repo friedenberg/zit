@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/hotel/objekte"
 	"github.com/friedenberg/zit/src/india/etikett"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type EtikettStore interface {
@@ -81,7 +82,7 @@ func makeEtikettStore(
 			sa,
 			sa,
 			nil,
-			gattung.Format[etikett.Objekte, *etikett.Objekte](
+			schnittstellen.Format[etikett.Objekte, *etikett.Objekte](
 				etikett.MakeFormatText(sa),
 			),
 			pool,

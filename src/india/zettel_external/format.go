@@ -1,9 +1,9 @@
 package zettel_external
 
-import "github.com/friedenberg/zit/src/charlie/gattung"
+import "github.com/friedenberg/zit/src/schnittstellen"
 
-type Parser = gattung.Parser[Zettel, *Zettel]
-type Formatter = gattung.Formatter[Zettel, *Zettel]
+type Parser = schnittstellen.Parser[Zettel, *Zettel]
+type Formatter = schnittstellen.Formatter[Zettel, *Zettel]
 
 type Format interface {
 	Parser

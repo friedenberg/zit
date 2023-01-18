@@ -6,18 +6,18 @@ import (
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
-type HeapElement[T gattung.Element] interface {
+type HeapElement[T any] interface {
 	Equaler[T]
 	Lessor[T]
 }
 
-type HeapElementPtr[T gattung.Element] interface {
-	gattung.ElementPtr[T]
+type HeapElementPtr[T any] interface {
+	schnittstellen.Ptr[T]
 	HeapElement[T]
-	Setter
+	schnittstellen.Setter
 }
 
 type heapPrivate[T Lessor[T]] []T

@@ -20,7 +20,7 @@ type akteTextSaver[
 	T1 gattung.ObjektePtr[T],
 ] struct {
 	awf           schnittstellen.AkteWriterFactory
-	akteFormatter gattung.Formatter[T, T1]
+	akteFormatter schnittstellen.Formatter[T, T1]
 }
 
 func MakeAkteTextSaver[
@@ -28,7 +28,7 @@ func MakeAkteTextSaver[
 	T1 gattung.ObjektePtr[T],
 ](
 	awf schnittstellen.AkteWriterFactory,
-	akteFormatter gattung.Formatter[T, T1],
+	akteFormatter schnittstellen.Formatter[T, T1],
 ) *akteTextSaver[T, T1] {
 	return &akteTextSaver[T, T1]{
 		awf:           awf,

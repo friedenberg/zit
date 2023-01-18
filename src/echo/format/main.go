@@ -5,14 +5,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/gattung"
 )
-
-// TODO-P4 remove
-type Format[T gattung.Element, T1 gattung.ElementPtr[T]] interface {
-	gattung.FormatReader[T, T1]
-	gattung.FormatWriter[T, T1]
-}
 
 type FuncReader func(io.Reader) (int64, error)
 type FuncReaderFormat[T any] func(io.Reader, *T) (int64, error)

@@ -1,7 +1,7 @@
 package zettel
 
 import (
-	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type ObjekteParserContext struct {
@@ -16,12 +16,12 @@ type ObjekteFormatterContext struct {
 	ExternalAktePath string
 }
 
-type ObjekteParser = gattung.Parser[
+type ObjekteParser = schnittstellen.Parser[
 	ObjekteParserContext,
 	*ObjekteParserContext,
 ]
 
-type ObjekteFormatter = gattung.Formatter[
+type ObjekteFormatter = schnittstellen.Formatter[
 	ObjekteFormatterContext,
 	*ObjekteFormatterContext,
 ]

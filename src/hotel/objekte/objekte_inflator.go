@@ -26,8 +26,8 @@ type objekteInflator[
 ] struct {
 	or            schnittstellen.ObjekteReaderFactory
 	ar            schnittstellen.AkteReaderFactory
-	objekteParser gattung.Parser[T, T1]
-	akteParser    gattung.Parser[T, T1]
+	objekteParser schnittstellen.Parser[T, T1]
+	akteParser    schnittstellen.Parser[T, T1]
 	pool          collections.PoolLike[T]
 }
 
@@ -39,8 +39,8 @@ func MakeObjekteInflator[
 ](
 	or schnittstellen.ObjekteReaderFactory,
 	ar schnittstellen.AkteReaderFactory,
-	objekteParser gattung.Parser[T, T1],
-	akteParser gattung.Parser[T, T1],
+	objekteParser schnittstellen.Parser[T, T1],
+	akteParser schnittstellen.Parser[T, T1],
 	pool collections.PoolLike[T],
 ) *objekteInflator[T, T1, T2, T3] {
 	if objekteParser == nil {

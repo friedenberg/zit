@@ -1,13 +1,16 @@
 package collections
 
-import "github.com/friedenberg/zit/src/charlie/gattung"
+import (
+	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/schnittstellen"
+)
 
-type setPrivate[T gattung.Element, T1 gattung.ElementPtr[T]] struct {
+type setPrivate[T any, T1 schnittstellen.Ptr[T]] struct {
 	Elements map[string]T1
 	gattung.Keyer[T, T1]
 }
 
-func setPrivateFromSetLike[T gattung.Element, T1 gattung.ElementPtr[T]](
+func setPrivateFromSetLike[T any, T1 schnittstellen.Ptr[T]](
 	keyer gattung.Keyer[T, T1],
 	s1 SetLike[T1],
 ) (s setPrivate[T, T1]) {
@@ -32,7 +35,7 @@ func setPrivateFromSetLike[T gattung.Element, T1 gattung.ElementPtr[T]](
 	return
 }
 
-func setPrivateFromSlice[T gattung.Element, T1 gattung.ElementPtr[T]](
+func setPrivateFromSlice[T any, T1 schnittstellen.Ptr[T]](
 	keyer gattung.Keyer[T, T1],
 	es ...T1,
 ) (s setPrivate[T, T1]) {

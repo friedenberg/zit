@@ -1,9 +1,7 @@
 package gattung
 
 import (
-	"flag"
 	"fmt"
-	"io"
 
 	"github.com/friedenberg/zit/src/schnittstellen"
 )
@@ -34,32 +32,16 @@ type Resetable[T any] interface {
 }
 
 type Resetter[T any] interface {
-	ElementPtr[T]
+	schnittstellen.Ptr[T]
 	Reset2()
 }
 
-type ResetWither[T any, TPtr ElementPtr[T]] interface {
+type ResetWither[T any, TPtr schnittstellen.Ptr[T]] interface {
 	ResetWith(TPtr)
 }
 
-type Element interface{}
-
-type ElementPtr[T Element] interface {
-	*T
-}
-
-type Keyer[T Element, T1 ElementPtr[T]] interface {
+type Keyer[T any, T1 schnittstellen.Ptr[T]] interface {
 	Key(T1) string
-}
-
-type ValueElement interface {
-	Element
-	fmt.Stringer
-}
-
-type ValueElementPtr[T ValueElement] interface {
-	ElementPtr[T]
-	flag.Value
 }
 
 //   ___    _            _   _  __ _
@@ -74,14 +56,14 @@ type IdentifierLike interface {
 	IdLike
 }
 
-type Id[T ValueElement] interface {
+type Id[T schnittstellen.Value] interface {
 	Equatable[T]
 	fmt.Stringer
 }
 
-type IdPtr[T ValueElement] interface {
+type IdPtr[T schnittstellen.Value] interface {
 	Id[T]
-	ValueElementPtr[T]
+	schnittstellen.ValuePtr[T]
 }
 
 // TODO-P2 rename to ObjekteKennung
@@ -91,8 +73,8 @@ type Identifier[T any] interface {
 	Equatable[T]
 }
 
-type IdentifierPtr[T ValueElement] interface {
-	ValueElementPtr[T]
+type IdentifierPtr[T schnittstellen.Value] interface {
+	schnittstellen.ValuePtr[T]
 	Resetable[T]
 }
 
@@ -109,9 +91,9 @@ type Objekte[T any] interface {
 	GetAkteSha() schnittstellen.Sha
 }
 
-type ObjektePtr[T Element] interface {
+type ObjektePtr[T any] interface {
 	Objekte[T]
-	ElementPtr[T]
+	schnittstellen.Ptr[T]
 	Resetable[T]
 	SetAkteSha(schnittstellen.Sha)
 }
@@ -148,8 +130,8 @@ type StoredPtr interface {
 type Verzeichnisse[T any] interface {
 }
 
-type VerzeichnissePtr[T Element, T1 Objekte[T1]] interface {
-	ElementPtr[T]
+type VerzeichnissePtr[T any, T1 Objekte[T1]] interface {
+	schnittstellen.Ptr[T]
 	Verzeichnisse[T]
 	ResetWithObjekte(*T1)
 }
@@ -161,55 +143,16 @@ type VerzeichnissePtr[T Element, T1 Objekte[T1]] interface {
 //    |_||_|  \__,_|_| |_|___/\__,_|\___|\__\___|\__,_|
 //
 
-type Transacted[T Element] interface {
+type Transacted[T any] interface {
 	Equatable[T]
 	Stored
 
 	GetKennungString() string
 }
 
-type TransactedPtr[T Element] interface {
+type TransactedPtr[T any] interface {
 	Transacted[T]
-	ElementPtr[T]
+	schnittstellen.Ptr[T]
 	Resetable[T]
 	StoredPtr
-}
-
-type ObjekteAkteFactory interface {
-	schnittstellen.ObjekteAkteReaderFactory
-	schnittstellen.ObjekteAkteWriterFactory
-}
-
-// TODO-P3 rename to FuncShaReadCloser
-type FuncReadCloser func(schnittstellen.Sha) (schnittstellen.ShaReadCloser, error)
-
-// TODO-P3 rename to FuncShaWriteCloser
-type FuncWriteCloser func(schnittstellen.Sha) (schnittstellen.ShaWriteCloser, error)
-
-//   _____                          _
-//  |  ___|__  _ __ _ __ ___   __ _| |_
-//  | |_ / _ \| '__| '_ ` _ \ / _` | __|
-//  |  _| (_) | |  | | | | | | (_| | |_
-//  |_|  \___/|_|  |_| |_| |_|\__,_|\__|
-//
-
-type FormatReader[T Element, T1 ElementPtr[T]] interface {
-	ReadFormat(io.Reader, T1) (int64, error)
-}
-
-type FormatWriter[T Element, T1 ElementPtr[T]] interface {
-	WriteFormat(io.Writer, T1) (int64, error)
-}
-
-type Parser[T Element, T1 ElementPtr[T]] interface {
-	Parse(io.Reader, T1) (int64, error)
-}
-
-type Formatter[T Element, T1 ElementPtr[T]] interface {
-	Format(io.Writer, T1) (int64, error)
-}
-
-type Format[T Element, T1 ElementPtr[T]] interface {
-	Parser[T, T1]
-	Formatter[T, T1]
 }

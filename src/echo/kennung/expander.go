@@ -3,7 +3,7 @@ package kennung
 import (
 	"regexp"
 
-	"github.com/friedenberg/zit/src/delta/collections"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 var (
@@ -13,7 +13,7 @@ var (
 )
 
 type Expander interface {
-	Expand(collections.FuncSetString, string)
+	Expand(schnittstellen.FuncSetString, string)
 }
 
 func init() {

@@ -38,19 +38,19 @@ type ObjekteInflator = objekte.ObjekteInflator[
 	*objekte.NilVerzeichnisse[Objekte],
 ]
 
-type ObjekteFormat = gattung.Format[
+type ObjekteFormat = schnittstellen.Format[
 	Objekte,
 	*Objekte,
 ]
 
-type AkteFormat = gattung.Format[
+type AkteFormat = schnittstellen.Format[
 	Objekte,
 	*Objekte,
 ]
 
 type store struct {
 	standort standort.Standort
-	oaf      gattung.ObjekteAkteFactory
+	oaf      schnittstellen.ObjekteAkteFactory
 	pool     *collections.Pool[Objekte]
 	ObjekteFormat
 	AkteFormat
@@ -61,7 +61,7 @@ type store struct {
 
 func MakeStore(
 	standort standort.Standort,
-	oaf gattung.ObjekteAkteFactory,
+	oaf schnittstellen.ObjekteAkteFactory,
 ) (s *store, err error) {
 	p := collections.MakePool[Objekte]()
 	of := MakeFormatObjekte()

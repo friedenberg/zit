@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/hotel/objekte"
 	"github.com/friedenberg/zit/src/india/erworben"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type KonfigStore interface {
@@ -75,7 +76,7 @@ func makeKonfigStore(
 			sa,
 			sa,
 			nil,
-			gattung.Format[erworben.Objekte, *erworben.Objekte](
+			schnittstellen.Format[erworben.Objekte, *erworben.Objekte](
 				erworben.MakeFormatText(sa),
 			),
 			pool,

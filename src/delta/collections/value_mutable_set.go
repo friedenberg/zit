@@ -5,18 +5,24 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type mutableSetAlias[T any] struct {
 	MutableSet[T]
 }
 
-type MutableValueSet[T gattung.ValueElement, T1 gattung.ValueElementPtr[T]] struct {
+type MutableValueSet[
+	T schnittstellen.Value,
+	T1 schnittstellen.ValuePtr[T],
+] struct {
 	mutableSetAlias[T]
 }
 
-func MakeMutableValueSet[T gattung.ValueElement, T1 gattung.ValueElementPtr[T]](
+func MakeMutableValueSet[
+	T schnittstellen.Value,
+	T1 schnittstellen.ValuePtr[T],
+](
 	es ...T,
 ) (s MutableValueSet[T, T1]) {
 	s.mutableSetAlias = mutableSetAlias[T]{
@@ -31,7 +37,10 @@ func MakeMutableValueSet[T gattung.ValueElement, T1 gattung.ValueElementPtr[T]](
 	return
 }
 
-func MakeMutableValueSetStrings[T gattung.ValueElement, T1 gattung.ValueElementPtr[T]](
+func MakeMutableValueSetStrings[
+	T schnittstellen.Value,
+	T1 schnittstellen.ValuePtr[T],
+](
 	vs ...string,
 ) (s MutableValueSet[T, T1], err error) {
 	es := make([]T, len(vs))
@@ -66,7 +75,7 @@ func (s MutableValueSet[T, T1]) Strings() (out []string) {
 	return
 }
 
-func (s MutableValueSet[T, T1]) StringAdder() FuncSetString {
+func (s MutableValueSet[T, T1]) StringAdder() schnittstellen.FuncSetString {
 	return MakeFuncSetString[T, T1](s)
 }
 

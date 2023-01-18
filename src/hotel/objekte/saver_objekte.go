@@ -19,7 +19,7 @@ type objekteSaver[
 	T1 gattung.ObjektePtr[T],
 ] struct {
 	writerFactory schnittstellen.ObjekteWriterFactory
-	formatter     gattung.Formatter[T, T1]
+	formatter     schnittstellen.Formatter[T, T1]
 }
 
 func MakeObjekteSaver[
@@ -27,7 +27,7 @@ func MakeObjekteSaver[
 	T1 gattung.ObjektePtr[T],
 ](
 	writerFactory schnittstellen.ObjekteWriterFactory,
-	formatter gattung.Formatter[T, T1],
+	formatter schnittstellen.Formatter[T, T1],
 ) *objekteSaver[T, T1] {
 	return &objekteSaver[T, T1]{
 		writerFactory: writerFactory,

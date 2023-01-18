@@ -4,18 +4,21 @@ import (
 	"sort"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
-func MakeFuncSetString[E gattung.Element, EPtr SetterPtr[E]](
+func MakeFuncSetString[
+	E any,
+	EPtr schnittstellen.SetterPtr[E],
+](
 	c Adder[E],
-) FuncSetString {
+) schnittstellen.FuncSetString {
 	return func(v string) (err error) {
 		return AddString[E, EPtr](c, v)
 	}
 }
 
-func AddString[E gattung.Element, EPtr SetterPtr[E]](
+func AddString[E any, EPtr schnittstellen.SetterPtr[E]](
 	c Adder[E],
 	v string,
 ) (err error) {
@@ -54,7 +57,7 @@ func AddIfGreater[E Lessor[E]](
 	return
 }
 
-func String[E ValueSetElement](
+func String[E schnittstellen.Value](
 	c EachPtrer[E],
 ) string {
 	errors.TodoP1("implement")

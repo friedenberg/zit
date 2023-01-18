@@ -13,6 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/hotel/objekte"
 	"github.com/friedenberg/zit/src/india/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/india/typ"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type TypStore interface {
@@ -99,7 +100,7 @@ func makeTypStore(
 			sa,
 			sa,
 			nil,
-			gattung.Format[typ.Objekte, *typ.Objekte](
+			schnittstellen.Format[typ.Objekte, *typ.Objekte](
 				typ.MakeFormatTextIgnoreTomlErrors(sa),
 			),
 			pool,

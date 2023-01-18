@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type SetterPolicy int
@@ -13,7 +14,10 @@ const (
 	SetterPolicyReset
 )
 
-type MutableValueSet2[E ValueSetElement, EPtr ValueSetElementPtr[E]] struct {
+type MutableValueSet2[
+	E schnittstellen.Value,
+	EPtr schnittstellen.ValuePtr[E],
+] struct {
 	MutableSetLike[E]
 	SetterPolicy
 }

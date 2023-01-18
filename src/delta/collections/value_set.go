@@ -6,14 +6,20 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
-type ValueSet[T gattung.ValueElement, T1 gattung.ValueElementPtr[T]] struct {
+type ValueSet[
+	T schnittstellen.Value,
+	T1 schnittstellen.ValuePtr[T],
+] struct {
 	setAlias[T]
 }
 
-func MakeValueSet[T gattung.ValueElement, T1 gattung.ValueElementPtr[T]](
+func MakeValueSet[
+	T schnittstellen.Value,
+	T1 schnittstellen.ValuePtr[T],
+](
 	es ...T,
 ) (s ValueSet[T, T1]) {
 	s.setAlias = setAlias[T]{
@@ -28,7 +34,10 @@ func MakeValueSet[T gattung.ValueElement, T1 gattung.ValueElementPtr[T]](
 	return
 }
 
-func MakeValueSetStrings[T gattung.ValueElement, T1 gattung.ValueElementPtr[T]](
+func MakeValueSetStrings[
+	T schnittstellen.Value,
+	T1 schnittstellen.ValuePtr[T],
+](
 	vs ...string,
 ) (s ValueSet[T, T1], err error) {
 	es := make([]T, 0, len(vs))
