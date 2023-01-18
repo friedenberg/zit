@@ -7,15 +7,15 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/toml"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 // TODO-P1 rename to TextFormat
 type FormatText struct {
-	af gattung.AkteIOFactory
+	af schnittstellen.AkteIOFactory
 }
 
-func MakeFormatText(af gattung.AkteIOFactory) *FormatText {
+func MakeFormatText(af schnittstellen.AkteIOFactory) *FormatText {
 	return &FormatText{
 		af: af,
 	}
@@ -75,7 +75,7 @@ func (c *FormatText) Parse(r1 io.Reader, k *Objekte) (n int64, err error) {
 
 	<-chDone
 
-	k.Sha = aw.Sha()
+	k.Sha = sha.Make(aw.Sha())
 
 	return
 }

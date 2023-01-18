@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/foxtrot/bezeichnung"
-	"github.com/friedenberg/zit/src/golf/hinweis"
+	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	zettel_pkg "github.com/friedenberg/zit/src/kilo/zettel"
 )
 

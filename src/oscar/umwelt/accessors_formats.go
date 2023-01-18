@@ -1,19 +1,19 @@
 package umwelt
 
 import (
-	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/format"
+	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/bezeichnung"
-	"github.com/friedenberg/zit/src/foxtrot/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/golf/fd"
-	"github.com/friedenberg/zit/src/golf/hinweis"
 	"github.com/friedenberg/zit/src/india/etikett"
 	"github.com/friedenberg/zit/src/india/typ"
 	"github.com/friedenberg/zit/src/india/zettel_external"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/mike/zettel_checked_out"
 	"github.com/friedenberg/zit/src/november/store_fs"
+	"github.com/friedenberg/zit/src/schnittstellen"
 	"github.com/friedenberg/zit/src/sha_cli_format"
 )
 
@@ -27,7 +27,7 @@ func (u *Umwelt) FormatColorWriter() format.FuncColorWriter {
 
 func (u *Umwelt) FormatSha(
 	a gattung.FuncAbbrId,
-) format.FormatWriterFunc[sha.Sha] {
+) format.FormatWriterFunc[schnittstellen.Sha] {
 	return sha_cli_format.MakeCliFormat(u.FormatColorWriter(), a)
 }
 

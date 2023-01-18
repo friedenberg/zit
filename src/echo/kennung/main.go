@@ -9,6 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type KennungLike[T any] interface {
@@ -49,7 +50,7 @@ func (e Kennung[T, T1]) GetSha() sha.Sha {
 	return sha.FromHash(hash)
 }
 
-func (e Kennung[T, T1]) GetGattung() gattung.Gattung {
+func (e Kennung[T, T1]) GetGattung() schnittstellen.Gattung {
 	return e.value.GetGattung()
 }
 

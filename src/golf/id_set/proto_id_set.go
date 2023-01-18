@@ -3,7 +3,7 @@ package id_set
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/foxtrot/id"
+	"github.com/friedenberg/zit/src/delta/id"
 )
 
 type ProtoIdSet struct {

@@ -8,22 +8,22 @@ import (
 	"github.com/friedenberg/zit/src/alfa/toml"
 	"github.com/friedenberg/zit/src/bravo/script_config"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type TextFormat struct {
-	arf              gattung.AkteIOFactory
+	arf              schnittstellen.AkteIOFactory
 	ignoreTomlErrors bool
 }
 
-func MakeFormatText(arf gattung.AkteIOFactory) *TextFormat {
+func MakeFormatText(arf schnittstellen.AkteIOFactory) *TextFormat {
 	return &TextFormat{
 		arf: arf,
 	}
 }
 
 // TODO-P4 remove
-func MakeFormatTextIgnoreTomlErrors(arf gattung.AkteIOFactory) *TextFormat {
+func MakeFormatTextIgnoreTomlErrors(arf schnittstellen.AkteIOFactory) *TextFormat {
 	return &TextFormat{
 		arf:              arf,
 		ignoreTomlErrors: true,
@@ -112,7 +112,7 @@ func (f TextFormat) ReadFormat(r io.Reader, t *Objekte) (n int64, err error) {
 		return
 	}
 
-	t.Sha = aw.Sha()
+	t.Sha = sha.Make(aw.Sha())
 
 	return
 }

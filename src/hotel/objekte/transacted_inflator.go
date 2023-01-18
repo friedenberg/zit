@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/golf/sku"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type TransactedDataIdentityInflator[T any] interface {
@@ -43,8 +44,8 @@ type transactedInflator[
 	T4 gattung.Verzeichnisse[T],
 	T5 gattung.VerzeichnissePtr[T4, T],
 ] struct {
-	of            gattung.ObjekteIOFactory
-	af            gattung.AkteIOFactory
+	of            schnittstellen.ObjekteIOFactory
+	af            schnittstellen.AkteIOFactory
 	objekteFormat gattung.Format[T, T1]
 	akteFormat    gattung.Format[T, T1]
 	pool          collections.PoolLike[Transacted[T, T1, T2, T3, T4, T5]]
@@ -58,8 +59,8 @@ func MakeTransactedInflator[
 	T4 gattung.Verzeichnisse[T],
 	T5 gattung.VerzeichnissePtr[T4, T],
 ](
-	of gattung.ObjekteIOFactory,
-	af gattung.AkteIOFactory,
+	of schnittstellen.ObjekteIOFactory,
+	af schnittstellen.AkteIOFactory,
 	objekteFormat gattung.Format[T, T1],
 	akteFormat gattung.Format[T, T1],
 	pool collections.PoolLike[Transacted[T, T1, T2, T3, T4, T5]],
@@ -212,7 +213,7 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) StoreAkte(
 	}
 
 	t.SetAkteSha(aw.Sha())
-	t.Sku.AkteSha = aw.Sha()
+	t.Sku.AkteSha = sha.Make(aw.Sha())
 
 	return
 }
@@ -234,8 +235,8 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) StoreObjekte(
 		return
 	}
 
-	t.Sku.ObjekteSha = ow.Sha()
-	t.Sku.AkteSha = t.GetAkteSha()
+	t.Sku.ObjekteSha = sha.Make(ow.Sha())
+	t.Sku.AkteSha = sha.Make(t.GetAkteSha())
 
 	return
 }
@@ -282,7 +283,7 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) readObjekte(
 		return
 	}
 
-	t.Sku.ObjekteSha = r.Sha()
+	t.Sku.ObjekteSha = sha.Make(r.Sha())
 
 	if !t.Sku.ObjekteSha.Equals(sk.GetObjekteSha()) {
 		errors.Todo(

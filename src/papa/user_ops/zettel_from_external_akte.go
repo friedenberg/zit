@@ -185,7 +185,7 @@ func (c ZettelFromExternalAkte) zettelForAkte(
 	}
 
 	z.Objekte.Reset(nil)
-	z.Objekte.Akte = akteWriter.Sha()
+	z.Objekte.Akte = sha.Make(akteWriter.Sha())
 
 	//TODO-P4 move to protozettel
 	if err = z.Objekte.Bezeichnung.Set(

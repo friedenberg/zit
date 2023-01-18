@@ -4,9 +4,8 @@ import (
 	"fmt"
 
 	"github.com/friedenberg/zit/src/bravo/int_value"
-	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/golf/ts"
+	"github.com/friedenberg/zit/src/foxtrot/ts"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type Mutter [2]ts.Time
@@ -16,9 +15,9 @@ type IdLike = fmt.Stringer
 type DataIdentity interface {
 	GetTime() ts.Time
 	GetId() IdLike
-	gattung.GattungLike
-	GetObjekteSha() sha.Sha
-	GetAkteSha() sha.Sha
+	schnittstellen.GattungGetter
+	GetObjekteSha() schnittstellen.Sha
+	GetAkteSha() schnittstellen.Sha
 	//TODO-P1 add GetAkteSha
 }
 

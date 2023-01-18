@@ -2,10 +2,11 @@ package store_objekten
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
-	"github.com/friedenberg/zit/src/foxtrot/kennung"
-	"github.com/friedenberg/zit/src/golf/age_io"
+	"github.com/friedenberg/zit/src/echo/age_io"
+	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/hotel/objekte"
 	"github.com/friedenberg/zit/src/india/etikett"
@@ -164,7 +165,7 @@ func (s etikettStore) CreateOrUpdate(
 		return
 	}
 
-	tt.Sku.ObjekteSha = w.Sha()
+	tt.Sku.ObjekteSha = sha.Make(w.Sha())
 
 	if mutter != nil && tt.GetObjekteSha().Equals(mutter.GetObjekteSha()) {
 		tt = mutter

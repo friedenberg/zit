@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type Gattung int
@@ -37,8 +38,20 @@ func All() (out []Gattung) {
 	return
 }
 
-func (g Gattung) GetGattung() Gattung {
+func Make(g schnittstellen.Gattung) Gattung {
+	return g.(Gattung)
+}
+
+func (g Gattung) GetGattung() schnittstellen.Gattung {
 	return g
+}
+
+func (a Gattung) Equals(b schnittstellen.Gattung) bool {
+	return a.GetGattungString() == b.GetGattungString()
+}
+
+func (g Gattung) GetGattungString() string {
+	return g.String()
 }
 
 func (g Gattung) String() string {

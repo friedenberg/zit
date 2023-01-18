@@ -3,7 +3,8 @@ package bestandsaufnahme
 import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/golf/ts"
+	"github.com/friedenberg/zit/src/foxtrot/ts"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type Objekte struct {
@@ -12,20 +13,20 @@ type Objekte struct {
 	AkteSha sha.Sha
 }
 
-func (o Objekte) GetGattung() (g gattung.Gattung) {
+func (o Objekte) GetGattung() (g schnittstellen.Gattung) {
 	g = gattung.Bestandsaufnahme
 
 	return
 }
 
-func (o Objekte) GetAkteSha() (v sha.Sha) {
+func (o Objekte) GetAkteSha() (v schnittstellen.Sha) {
 	v = o.AkteSha
 
 	return
 }
 
-func (o *Objekte) SetAkteSha(v sha.Sha) {
-	o.AkteSha = v
+func (o *Objekte) SetAkteSha(v schnittstellen.Sha) {
+	o.AkteSha = sha.Make(v)
 }
 
 func (a Objekte) Equals(b *Objekte) bool {

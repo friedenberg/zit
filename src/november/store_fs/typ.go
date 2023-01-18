@@ -6,7 +6,8 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/foxtrot/kennung"
+	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/fd"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/india/typ"
@@ -24,7 +25,7 @@ func (s *Store) WriteTyp(t *typ.Transacted) (te *typ.External, err error) {
 		//TODO-P2 move to central place
 		Objekte: t.Objekte,
 		Sku: sku.External[kennung.Typ, *kennung.Typ]{
-			ObjekteSha: t.GetObjekteSha(),
+			ObjekteSha: sha.Make(t.GetObjekteSha()),
 			Kennung:    t.Sku.Kennung,
 		},
 	}

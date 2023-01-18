@@ -2,7 +2,7 @@ package store_objekten
 
 import (
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type LockSmith interface {
@@ -22,7 +22,7 @@ type writeCloserFactory interface {
 }
 
 type ioFactory interface {
-	gattung.AkteIOFactory
+	schnittstellen.AkteIOFactory
 	readCloserFactory
 	writeCloserFactory
 }

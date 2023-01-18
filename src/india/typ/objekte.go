@@ -3,6 +3,7 @@ package typ
 import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type Objekte struct {
@@ -32,14 +33,14 @@ func (o Objekte) Equals(o1 *Objekte) bool {
 	return true
 }
 
-func (o Objekte) GetGattung() gattung.Gattung {
+func (o Objekte) GetGattung() schnittstellen.Gattung {
 	return gattung.Typ
 }
 
-func (o Objekte) GetAkteSha() sha.Sha {
+func (o Objekte) GetAkteSha() schnittstellen.Sha {
 	return o.Sha
 }
 
-func (o *Objekte) SetAkteSha(v sha.Sha) {
-	o.Sha = v
+func (o *Objekte) SetAkteSha(v schnittstellen.Sha) {
+	o.Sha = sha.Make(v)
 }

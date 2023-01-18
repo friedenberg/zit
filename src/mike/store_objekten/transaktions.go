@@ -6,9 +6,9 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/delta/collections"
-	"github.com/friedenberg/zit/src/foxtrot/id"
+	"github.com/friedenberg/zit/src/delta/id"
+	"github.com/friedenberg/zit/src/foxtrot/ts"
 	"github.com/friedenberg/zit/src/golf/transaktion"
-	"github.com/friedenberg/zit/src/golf/ts"
 )
 
 func (s common) ReadLastTransaktion() (t *transaktion.Transaktion, err error) {

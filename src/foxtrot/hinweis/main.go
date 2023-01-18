@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 func init() {
@@ -112,7 +113,7 @@ func (h Hinweis) String() string {
 	return fmt.Sprintf("%s/%s", h.left, h.right)
 }
 
-func (h Hinweis) GetSha() sha.Sha {
+func (h Hinweis) GetSha() schnittstellen.Sha {
 	hash := sha256.New()
 	sr := strings.NewReader(h.String())
 
@@ -203,6 +204,6 @@ func (h *Hinweis) Reset(h1 *Hinweis) {
 	}
 }
 
-func (h Hinweis) GetGattung() gattung.Gattung {
+func (h Hinweis) GetGattung() schnittstellen.Gattung {
 	return gattung.Zettel
 }

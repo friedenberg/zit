@@ -3,10 +3,10 @@ package typ
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/echo/format"
-	"github.com/friedenberg/zit/src/foxtrot/kennung"
-	"github.com/friedenberg/zit/src/golf/standort"
+	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/standort"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 // !typ
@@ -28,7 +28,7 @@ func MakeCliFormat(
 func MakeCliFormatExternal(
 	s standort.Standort,
 	cw format.FuncColorWriter,
-	sf format.FormatWriterFunc[sha.Sha],
+	sf format.FormatWriterFunc[schnittstellen.Sha],
 	tf format.FormatWriterFunc[kennung.Typ],
 ) format.FormatWriterFunc[External] {
 	return func(w io.Writer, t External) (n int64, err error) {
@@ -38,7 +38,7 @@ func MakeCliFormatExternal(
 			format.MakeFormatString("["),
 			cw(s.MakeWriterRelativePath(t.FD.Path), format.ColorTypePointer),
 			format.MakeFormatString("@"),
-			format.MakeWriter(sf, t.GetObjekteSha()),
+			format.MakeWriter(sf, t.GetObjekteSha().GetSha()),
 			format.MakeFormatString(" "),
 			format.MakeWriter(tf, t.Sku.Kennung),
 			format.MakeFormatString("]"),
@@ -50,7 +50,7 @@ func MakeCliFormatExternal(
 func MakeCliFormatTransacted(
 	s standort.Standort,
 	cw format.FuncColorWriter,
-	sf format.FormatWriterFunc[sha.Sha],
+	sf format.FormatWriterFunc[schnittstellen.Sha],
 	tf format.FormatWriterFunc[kennung.Typ],
 	verb string,
 ) format.FormatWriterFunc[Transacted] {

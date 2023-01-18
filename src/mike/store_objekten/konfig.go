@@ -5,9 +5,9 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
-	"github.com/friedenberg/zit/src/foxtrot/id"
-	"github.com/friedenberg/zit/src/foxtrot/kennung"
-	"github.com/friedenberg/zit/src/golf/age_io"
+	"github.com/friedenberg/zit/src/delta/id"
+	"github.com/friedenberg/zit/src/echo/age_io"
+	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/hotel/objekte"
 	"github.com/friedenberg/zit/src/india/erworben"
@@ -154,7 +154,7 @@ func (s konfigStore) Update(
 		return
 	}
 
-	kt.Sku.ObjekteSha = w.Sha()
+	kt.Sku.ObjekteSha = sha.Make(w.Sha())
 
 	if mutter != nil && kt.GetObjekteSha().Equals(mutter.GetObjekteSha()) {
 		kt = mutter

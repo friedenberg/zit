@@ -5,7 +5,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/delta/collections"
-	"github.com/friedenberg/zit/src/foxtrot/id"
+	"github.com/friedenberg/zit/src/delta/id"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 

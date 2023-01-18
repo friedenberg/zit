@@ -4,6 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 // TODO-P3 rename to AkteSaver
@@ -18,7 +19,7 @@ type akteTextSaver[
 	T gattung.Objekte[T],
 	T1 gattung.ObjektePtr[T],
 ] struct {
-	awf           gattung.AkteWriterFactory
+	awf           schnittstellen.AkteWriterFactory
 	akteFormatter gattung.Formatter[T, T1]
 }
 
@@ -26,7 +27,7 @@ func MakeAkteTextSaver[
 	T gattung.Objekte[T],
 	T1 gattung.ObjektePtr[T],
 ](
-	awf gattung.AkteWriterFactory,
+	awf schnittstellen.AkteWriterFactory,
 	akteFormatter gattung.Formatter[T, T1],
 ) *akteTextSaver[T, T1] {
 	return &akteTextSaver[T, T1]{

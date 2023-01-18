@@ -5,6 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type Typ = Kennung[typ, *typ]
@@ -48,7 +49,7 @@ func (e typ) Equals(e1 *typ) bool {
 	return e == *e1
 }
 
-func (o typ) GetGattung() gattung.Gattung {
+func (o typ) GetGattung() schnittstellen.Gattung {
 	return gattung.Typ
 }
 

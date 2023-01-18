@@ -7,20 +7,20 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/delta/metadatei_io"
 	"github.com/friedenberg/zit/src/echo/format"
-	"github.com/friedenberg/zit/src/foxtrot/metadatei_io"
 	"github.com/friedenberg/zit/src/india/typ"
 	"github.com/friedenberg/zit/src/kilo/zettel"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type fileEncoder struct {
-	arf gattung.AkteReaderFactory
+	arf schnittstellen.AkteReaderFactory
 	ic  typ.InlineChecker
 }
 
 func MakeFileEncoder(
-	arf gattung.AkteReaderFactory,
+	arf schnittstellen.AkteReaderFactory,
 	ic typ.InlineChecker,
 ) fileEncoder {
 	return fileEncoder{

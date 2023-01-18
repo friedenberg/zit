@@ -6,8 +6,9 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/bezeichnung"
-	"github.com/friedenberg/zit/src/foxtrot/kennung"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type Objekte struct {
@@ -18,16 +19,16 @@ type Objekte struct {
 	Verzeichnisse Verzeichnisse
 }
 
-func (z Objekte) GetGattung() gattung.Gattung {
+func (z Objekte) GetGattung() schnittstellen.Gattung {
 	return gattung.Zettel
 }
 
-func (z Objekte) GetAkteSha() sha.Sha {
+func (z Objekte) GetAkteSha() schnittstellen.Sha {
 	return z.Akte
 }
 
-func (z *Objekte) SetAkteSha(v sha.Sha) {
-	z.Akte = v
+func (z *Objekte) SetAkteSha(v schnittstellen.Sha) {
+	z.Akte = sha.Make(v)
 }
 
 func (z Objekte) Equals(z1 *Objekte) bool {

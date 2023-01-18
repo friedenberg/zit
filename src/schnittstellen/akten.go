@@ -1,6 +1,4 @@
-package gattung
-
-import "github.com/friedenberg/zit/src/bravo/sha"
+package schnittstellen
 
 //      _    _    _       ___ ___
 //     / \  | | _| |_ ___|_ _/ _ \
@@ -15,11 +13,11 @@ type AkteIOFactory interface {
 }
 
 type AkteReaderFactory interface {
-	AkteReader(ShaLike) (sha.ReadCloser, error)
+	AkteReader(ShaGetter) (ShaReadCloser, error)
 }
 
 type AkteWriterFactory interface {
-	AkteWriter() (sha.WriteCloser, error)
+	AkteWriter() (ShaWriteCloser, error)
 }
 
 type ObjekteAkteReaderFactory interface {
@@ -32,8 +30,8 @@ type ObjekteAkteWriterFactory interface {
 	AkteWriterFactory
 }
 
-type FuncAkteReader func(ShaLike) (sha.ReadCloser, error)
-type FuncAkteWriter func() (sha.WriteCloser, error)
+type FuncAkteReader func(ShaGetter) (ShaReadCloser, error)
+type FuncAkteWriter func() (ShaWriteCloser, error)
 
 type bespokeAkteReadWriterFactory struct {
 	AkteReaderFactory
@@ -63,8 +61,8 @@ func MakeBespokeAkteReadFactory(
 }
 
 func (b bespokeAkteReadFactory) AkteReader(
-	sh ShaLike,
-) (sha.ReadCloser, error) {
+	sh ShaGetter,
+) (ShaReadCloser, error) {
 	return b.FuncAkteReader(sh)
 }
 
@@ -80,6 +78,6 @@ func MakeBespokeAkteWriteFactory(
 	}
 }
 
-func (b bespokeAkteWriteFactory) AkteWriter() (sha.WriteCloser, error) {
+func (b bespokeAkteWriteFactory) AkteWriter() (ShaWriteCloser, error) {
 	return b.FuncAkteWriter()
 }

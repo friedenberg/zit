@@ -3,12 +3,12 @@ package zettel_external
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/echo/format"
+	"github.com/friedenberg/zit/src/foxtrot/hinweis"
+	"github.com/friedenberg/zit/src/foxtrot/standort"
 	"github.com/friedenberg/zit/src/golf/fd"
-	"github.com/friedenberg/zit/src/golf/hinweis"
-	"github.com/friedenberg/zit/src/golf/standort"
 	"github.com/friedenberg/zit/src/kilo/zettel"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 // [path@sha !typ "bez"]
@@ -17,7 +17,7 @@ func MakeCliFormat(
 	s standort.Standort,
 	cw format.FuncColorWriter,
 	hf format.FormatWriterFunc[hinweis.Hinweis],
-	sf format.FormatWriterFunc[sha.Sha],
+	sf format.FormatWriterFunc[schnittstellen.Sha],
 	zf format.FormatWriterFunc[zettel.Objekte],
 ) format.FormatWriterFunc[Zettel] {
 	return func(w io.Writer, z Zettel) (n int64, err error) {
@@ -29,7 +29,7 @@ func MakeCliFormat(
 				format.MakeFormatString("["),
 				cw(s.MakeWriterRelativePath(z.ZettelFD.Path), format.ColorTypePointer),
 				format.MakeFormatString("@"),
-				format.MakeWriter(sf, z.GetObjekteSha()),
+				format.MakeWriter(sf, z.GetObjekteSha().GetSha()),
 				format.MakeFormatString(" "),
 				format.MakeWriter(zf, z.Objekte),
 				format.MakeFormatString("]\n"),
@@ -37,7 +37,7 @@ func MakeCliFormat(
 				format.MakeFormatString("["),
 				cw(s.MakeWriterRelativePath(z.AkteFD.Path), format.ColorTypePointer),
 				format.MakeFormatString("@"),
-				format.MakeWriter(sf, z.Objekte.Akte),
+				format.MakeWriter(sf, z.Objekte.Akte.GetSha()),
 				format.MakeFormatString("]"),
 			)
 
@@ -48,7 +48,7 @@ func MakeCliFormat(
 				format.MakeFormatString("["),
 				cw(s.MakeWriterRelativePath(z.AkteFD.Path), format.ColorTypePointer),
 				format.MakeFormatString("@"),
-				format.MakeWriter(sf, z.Objekte.Akte),
+				format.MakeWriter(sf, z.Objekte.Akte.GetSha()),
 				format.MakeFormatString(" "),
 				format.MakeWriter(zf, z.Objekte),
 				format.MakeFormatString("]"),
@@ -61,7 +61,7 @@ func MakeCliFormat(
 				format.MakeFormatString("["),
 				cw(s.MakeWriterRelativePath(z.ZettelFD.Path), format.ColorTypePointer),
 				format.MakeFormatString("@"),
-				format.MakeWriter(sf, z.GetObjekteSha()),
+				format.MakeWriter(sf, z.GetObjekteSha().GetSha()),
 				format.MakeFormatString(" "),
 				format.MakeWriter(zf, z.Objekte),
 				format.MakeFormatString("]"),

@@ -7,17 +7,18 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/gattungen"
-	"github.com/friedenberg/zit/src/golf/hinweis"
+	"github.com/friedenberg/zit/src/foxtrot/hinweis"
+	"github.com/friedenberg/zit/src/foxtrot/standort"
+	"github.com/friedenberg/zit/src/foxtrot/ts"
 	"github.com/friedenberg/zit/src/golf/sku"
-	"github.com/friedenberg/zit/src/golf/standort"
 	"github.com/friedenberg/zit/src/golf/transaktion"
-	"github.com/friedenberg/zit/src/golf/ts"
 	"github.com/friedenberg/zit/src/hotel/objekte"
 	"github.com/friedenberg/zit/src/india/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/india/etikett"
 	"github.com/friedenberg/zit/src/india/typ"
 	"github.com/friedenberg/zit/src/juliett/konfig"
 	"github.com/friedenberg/zit/src/kilo/zettel"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type Store struct {
@@ -29,11 +30,11 @@ type Store struct {
 	konfigStore  KonfigStore
 
 	//Gattungen
-	gattungStores     map[gattung.Gattung]GattungStore
-	reindexers        map[gattung.Gattung]reindexer
-	flushers          map[gattung.Gattung]errors.Flusher
-	readers           map[gattung.Gattung]objekte.FuncReaderTransactedLike
-	transactedReaders map[gattung.Gattung]objekte.FuncReaderTransactedLike
+	gattungStores     map[schnittstellen.Gattung]GattungStore
+	reindexers        map[schnittstellen.Gattung]reindexer
+	flushers          map[schnittstellen.Gattung]errors.Flusher
+	readers           map[schnittstellen.Gattung]objekte.FuncReaderTransactedLike
+	transactedReaders map[schnittstellen.Gattung]objekte.FuncReaderTransactedLike
 }
 
 func Make(
@@ -109,14 +110,14 @@ func Make(
 		return
 	}
 
-	s.gattungStores = map[gattung.Gattung]GattungStore{
+	s.gattungStores = map[schnittstellen.Gattung]GattungStore{
 		gattung.Zettel:  s.zettelStore,
 		gattung.Typ:     s.typStore,
 		gattung.Etikett: s.etikettStore,
 		gattung.Konfig:  s.konfigStore,
 	}
 
-	s.readers = map[gattung.Gattung]objekte.FuncReaderTransactedLike{
+	s.readers = map[schnittstellen.Gattung]objekte.FuncReaderTransactedLike{
 		gattung.Zettel: objekte.MakeApplyTransactedLike[*zettel.Transacted](
 			s.zettelStore.ReadAllSchwanzen,
 		),
@@ -134,7 +135,7 @@ func Make(
 		// ),
 	}
 
-	s.transactedReaders = map[gattung.Gattung]objekte.FuncReaderTransactedLike{
+	s.transactedReaders = map[schnittstellen.Gattung]objekte.FuncReaderTransactedLike{
 		gattung.Zettel: objekte.MakeApplyTransactedLike[*zettel.Transacted](
 			s.zettelStore.ReadAll,
 		),
@@ -152,7 +153,7 @@ func Make(
 		// ),
 	}
 
-	s.flushers = make(map[gattung.Gattung]errors.Flusher)
+	s.flushers = make(map[schnittstellen.Gattung]errors.Flusher)
 
 	for g, gs := range s.gattungStores {
 		if fl, ok := gs.(errors.Flusher); ok {
@@ -160,7 +161,7 @@ func Make(
 		}
 	}
 
-	s.reindexers = make(map[gattung.Gattung]reindexer)
+	s.reindexers = make(map[schnittstellen.Gattung]reindexer)
 
 	for g, gs := range s.gattungStores {
 		if gs1, ok := gs.(reindexer); ok {
@@ -318,7 +319,7 @@ func (s *Store) ReadAllSchwanzen(
 	chErr := make(chan error, gs.Len())
 
 	for g, s1 := range s.readers {
-		if !gs.Contains(g) {
+		if !gs.ContainsKey(g.GetGattungString()) {
 			continue
 		}
 
@@ -347,7 +348,7 @@ func (s *Store) ReadAll(
 	chErr := make(chan error, gs.Len())
 
 	for g, s1 := range s.transactedReaders {
-		if !gs.Contains(g) {
+		if !gs.ContainsKey(g.GetGattungString()) {
 			continue
 		}
 

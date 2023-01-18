@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/golf/sku"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type ObjekteInflator[
@@ -23,8 +24,8 @@ type objekteInflator[
 	T2 gattung.Verzeichnisse[T],
 	T3 gattung.VerzeichnissePtr[T2, T],
 ] struct {
-	or            gattung.ObjekteReaderFactory
-	ar            gattung.AkteReaderFactory
+	or            schnittstellen.ObjekteReaderFactory
+	ar            schnittstellen.AkteReaderFactory
 	objekteParser gattung.Parser[T, T1]
 	akteParser    gattung.Parser[T, T1]
 	pool          collections.PoolLike[T]
@@ -36,8 +37,8 @@ func MakeObjekteInflator[
 	T2 gattung.Verzeichnisse[T],
 	T3 gattung.VerzeichnissePtr[T2, T],
 ](
-	or gattung.ObjekteReaderFactory,
-	ar gattung.AkteReaderFactory,
+	or schnittstellen.ObjekteReaderFactory,
+	ar schnittstellen.AkteReaderFactory,
 	objekteParser gattung.Parser[T, T1],
 	akteParser gattung.Parser[T, T1],
 	pool collections.PoolLike[T],
@@ -109,7 +110,7 @@ func (h *objekteInflator[T, T1, T2, T3]) readObjekte(
 }
 
 func (h *objekteInflator[T, T1, T2, T3]) readAkte(
-	sh sha.Sha,
+	sh schnittstellen.Sha,
 	o T1,
 ) (err error) {
 	if h.akteParser == nil {

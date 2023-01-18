@@ -6,19 +6,12 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
-type ReadCloser interface {
-	io.WriterTo
-	io.ReadCloser
-	Sha() Sha
-}
-
-type WriteCloser interface {
-	io.ReaderFrom
-	io.WriteCloser
-	Sha() Sha
-}
+// TODO-P4 remove
+type ReadCloser = schnittstellen.ShaReadCloser
+type WriteCloser = schnittstellen.ShaWriteCloser
 
 type readCloser struct {
 	tee  io.Reader
@@ -104,7 +97,7 @@ func (r readCloser) Close() (err error) {
 	return
 }
 
-func (r readCloser) Sha() Sha {
+func (r readCloser) Sha() schnittstellen.Sha {
 	return FromHash(r.hash)
 }
 
@@ -122,6 +115,6 @@ func (nrc nopReadCloser) WriteTo(w io.Writer) (n int64, err error) {
 	return io.Copy(w, nrc.ReadCloser)
 }
 
-func (nrc nopReadCloser) Sha() Sha {
+func (nrc nopReadCloser) Sha() schnittstellen.Sha {
 	return Sha{}
 }

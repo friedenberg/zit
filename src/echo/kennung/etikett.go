@@ -6,6 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 const EtikettRegexString = `^[-a-z0-9_/]+$`
@@ -39,7 +40,7 @@ func MakeEtikett(v string) (e Etikett, err error) {
 
 type etikett string
 
-func (e etikett) GetGattung() gattung.Gattung {
+func (e etikett) GetGattung() schnittstellen.Gattung {
 	return gattung.Etikett
 }
 

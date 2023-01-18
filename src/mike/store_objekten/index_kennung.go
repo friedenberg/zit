@@ -10,8 +10,8 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/coordinates"
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/foxtrot/hinweisen"
-	"github.com/friedenberg/zit/src/golf/hinweis"
+	"github.com/friedenberg/zit/src/charlie/hinweisen"
+	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/juliett/konfig"
 )
 

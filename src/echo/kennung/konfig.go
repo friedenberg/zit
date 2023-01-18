@@ -6,11 +6,12 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type Konfig struct{}
 
-func (a Konfig) GetGattung() gattung.Gattung {
+func (a Konfig) GetGattung() schnittstellen.Gattung {
 	return gattung.Konfig
 }
 

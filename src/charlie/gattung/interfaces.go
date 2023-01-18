@@ -5,17 +5,15 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type FuncAbbrId func(IdLike) (string, error)
 type FuncAbbrIdMitKorper func(IdMitKorper) (string, error)
 
-type GattungLike interface {
-	GetGattung() Gattung
-}
+type GattungLike = schnittstellen.GattungGetter
 
-type ShaLike = sha.ShaLike
+type ShaLike = schnittstellen.Sha
 
 type IdLike interface {
 	fmt.Stringer
@@ -108,14 +106,14 @@ type IdentifierPtr[T ValueElement] interface {
 type Objekte[T any] interface {
 	GattungLike
 	Equatable[T]
-	GetAkteSha() sha.Sha
+	GetAkteSha() schnittstellen.Sha
 }
 
 type ObjektePtr[T Element] interface {
 	Objekte[T]
 	ElementPtr[T]
 	Resetable[T]
-	SetAkteSha(sha.Sha)
+	SetAkteSha(schnittstellen.Sha)
 }
 
 //   ____  _                     _
@@ -130,14 +128,14 @@ type Stored interface {
 	//TODO-P4 add identifier
 	// Identifier() IdentifierLike
 
-	GetAkteSha() sha.Sha
-	GetObjekteSha() sha.Sha
+	GetAkteSha() schnittstellen.Sha
+	GetObjekteSha() schnittstellen.Sha
 }
 
 type StoredPtr interface {
 	Stored
-	SetAkteSha(sha.Sha)
-	SetObjekteSha(AkteReaderFactory, string) error
+	SetAkteSha(schnittstellen.Sha)
+	SetObjekteSha(schnittstellen.AkteReaderFactory, string) error
 }
 
 //  __     __                _      _           _
@@ -178,20 +176,15 @@ type TransactedPtr[T Element] interface {
 }
 
 type ObjekteAkteFactory interface {
-	ObjekteAkteReaderFactory
-	ObjekteAkteWriterFactory
+	schnittstellen.ObjekteAkteReaderFactory
+	schnittstellen.ObjekteAkteWriterFactory
 }
 
 // TODO-P3 rename to FuncShaReadCloser
-type FuncReadCloser func(sha.Sha) (sha.ReadCloser, error)
+type FuncReadCloser func(schnittstellen.Sha) (schnittstellen.ShaReadCloser, error)
 
 // TODO-P3 rename to FuncShaWriteCloser
-type FuncWriteCloser func(sha.Sha) (sha.WriteCloser, error)
-
-// TODO-P4 remove
-type AkteIOFactoryFactory interface {
-	AkteFactory(Gattung) AkteIOFactory
-}
+type FuncWriteCloser func(schnittstellen.Sha) (schnittstellen.ShaWriteCloser, error)
 
 //   _____                          _
 //  |  ___|__  _ __ _ __ ___   __ _| |_

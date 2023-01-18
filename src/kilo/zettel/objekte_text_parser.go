@@ -5,21 +5,21 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/delta/metadatei_io"
 	"github.com/friedenberg/zit/src/echo/format"
-	"github.com/friedenberg/zit/src/foxtrot/metadatei_io"
 	"github.com/friedenberg/zit/src/india/erworben"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type objekteTextParser struct {
-	AkteFactory                gattung.AkteIOFactory
+	AkteFactory                schnittstellen.AkteIOFactory
 	AkteFormatter              erworben.RemoteScript
 	DoNotWriteEmptyBezeichnung bool
 	TypError                   error
 }
 
 func MakeObjekteTextParser(
-	akteFactory gattung.AkteIOFactory,
+	akteFactory schnittstellen.AkteIOFactory,
 	akteFormatter erworben.RemoteScript,
 ) objekteTextParser {
 	return objekteTextParser{
@@ -72,7 +72,7 @@ func (f objekteTextParser) Parse(
 
 	switch {
 	case state.akteSha.IsNull() && !inlineAkteSha.IsNull():
-		c.Zettel.Akte = inlineAkteSha
+		c.Zettel.Akte = sha.Make(inlineAkteSha)
 
 	case !state.akteSha.IsNull() && inlineAkteSha.IsNull():
 		c.Zettel.Akte = state.akteSha
@@ -83,7 +83,7 @@ func (f objekteTextParser) Parse(
 				Sha:  state.akteSha,
 				Path: state.aktePath,
 			},
-			InlineSha: inlineAkteSha,
+			InlineSha: sha.Make(inlineAkteSha),
 			Objekte:   c.Zettel,
 		}
 

@@ -4,8 +4,8 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/echo/format"
+	"github.com/friedenberg/zit/src/foxtrot/standort"
 	"github.com/friedenberg/zit/src/golf/fd"
-	"github.com/friedenberg/zit/src/golf/standort"
 )
 
 type Dir struct {

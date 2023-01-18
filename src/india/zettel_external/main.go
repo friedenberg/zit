@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/golf/fd"
-	"github.com/friedenberg/zit/src/golf/hinweis"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 )

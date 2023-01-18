@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/friedenberg/zit/src/bravo/test_logz"
+	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/bezeichnung"
-	"github.com/friedenberg/zit/src/foxtrot/kennung"
 )
 
 func TestMakeEtiketten(t1 *testing.T) {

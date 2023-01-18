@@ -4,15 +4,15 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/juliett/konfig"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 func MakeSerializedFormatWriter(
 	f ObjekteFormatter,
 	out io.Writer,
-	arf gattung.AkteReaderFactory,
+	arf schnittstellen.AkteReaderFactory,
 	k konfig.Compiled,
 ) collections.WriterFunc[*Objekte] {
 	errors.TodoP3("rename to MakeSingleplexedFormatWriter")

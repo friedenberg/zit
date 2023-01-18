@@ -5,6 +5,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/golf/sku"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type Transacted[
@@ -35,17 +36,17 @@ func (t Transacted[T, T1, T2, T3, T4, T5]) Kennung() T3 {
 	return &t.Sku.Kennung
 }
 
-func (t Transacted[T, T1, T2, T3, T4, T5]) GetAkteSha() sha.Sha {
+func (t Transacted[T, T1, T2, T3, T4, T5]) GetAkteSha() schnittstellen.Sha {
 	return t.Objekte.GetAkteSha()
 }
 
 func (t *Transacted[T, T1, T2, T3, T4, T5]) SetAkteSha(
-	s sha.Sha,
+	s schnittstellen.Sha,
 ) {
 	T1(&t.Objekte).SetAkteSha(s)
 }
 
-func (t Transacted[T, T1, T2, T3, T4, T5]) GetObjekteSha() sha.Sha {
+func (t Transacted[T, T1, T2, T3, T4, T5]) GetObjekteSha() schnittstellen.Sha {
 	if !t.GetAkteSha().IsNull() && t.Sku.ObjekteSha.IsNull() {
 		errors.Todo(
 			"objekte sha is null while akte sha is %s",
@@ -57,7 +58,7 @@ func (t Transacted[T, T1, T2, T3, T4, T5]) GetObjekteSha() sha.Sha {
 }
 
 func (t *Transacted[T, T1, T2, T3, T4, T5]) SetObjekteSha(
-	arf gattung.AkteReaderFactory,
+	arf schnittstellen.AkteReaderFactory,
 	v string,
 ) (err error) {
 	if err = t.Sku.ObjekteSha.Set(v); err != nil {
@@ -70,7 +71,7 @@ func (t *Transacted[T, T1, T2, T3, T4, T5]) SetObjekteSha(
 	return
 }
 
-func (t Transacted[T, T1, T2, T3, T4, T5]) GetGattung() gattung.Gattung {
+func (t Transacted[T, T1, T2, T3, T4, T5]) GetGattung() schnittstellen.Gattung {
 	return t.Sku.Kennung.GetGattung()
 }
 
@@ -110,7 +111,7 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) GetObjekte() (o T) {
 func (a Transacted[T, T1, T2, T3, T4, T5]) GetSku2() (sk sku.Sku2) {
 	sk = a.Sku.Sku2()
 	errors.TodoP2("make certain akte sha is in sku")
-	sk.AkteSha = a.GetAkteSha()
+	sk.AkteSha = sha.Make(a.GetAkteSha())
 	return
 }
 
@@ -125,8 +126,8 @@ func (a *Transacted[T, T1, T2, T3, T4, T5]) SetDataIdentity(
 	}
 
 	a.Sku.Kennung = h
-	a.Sku.ObjekteSha = o.GetObjekteSha()
-	a.Sku.AkteSha = o.GetAkteSha()
+	a.Sku.ObjekteSha = sha.Make(o.GetObjekteSha())
+	a.Sku.AkteSha = sha.Make(o.GetAkteSha())
 	a.Sku.Schwanz = o.GetTime()
 
 	return
@@ -144,7 +145,7 @@ func (a *Transacted[T, T1, T2, T3, T4, T5]) SetSkuLike(
 	}
 
 	a.Sku.Kennung = h
-	a.Sku.ObjekteSha = o.GetObjekteSha()
+	a.Sku.ObjekteSha = sha.Make(o.GetObjekteSha())
 	a.Sku.TransactionIndex = o.GetTransactionIndex()
 	//TODO-P3 fix sku kopf and schwanz
 	// a.Sku.Kopf = t

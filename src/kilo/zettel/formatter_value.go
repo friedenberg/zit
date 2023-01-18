@@ -7,12 +7,12 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/collections_coding"
-	"github.com/friedenberg/zit/src/golf/standort"
+	"github.com/friedenberg/zit/src/foxtrot/standort"
 	"github.com/friedenberg/zit/src/india/typ"
 	"github.com/friedenberg/zit/src/juliett/konfig"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type FormatterValue struct {
@@ -51,7 +51,7 @@ func (f *FormatterValue) Set(v string) (err error) {
 
 func (fv *FormatterValue) FuncFormatterVerzeichnisse(
 	out io.Writer,
-	af gattung.AkteIOFactory,
+	af schnittstellen.AkteIOFactory,
 	k konfig.Compiled,
 	logFunc collections.WriterFunc[*Transacted],
 ) collections.WriterFunc[*Transacted] {
@@ -65,7 +65,7 @@ func (fv *FormatterValue) FuncFormatterVerzeichnisse(
 
 func (fv *FormatterValue) FuncFormatter(
 	out io.Writer,
-	af gattung.AkteIOFactory,
+	af schnittstellen.AkteIOFactory,
 	k konfig.Compiled,
 	logFunc collections.WriterFunc[*Transacted],
 ) collections.WriterFunc[*Transacted] {

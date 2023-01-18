@@ -5,13 +5,14 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/gattungen"
-	"github.com/friedenberg/zit/src/foxtrot/kennung"
-	"github.com/friedenberg/zit/src/golf/hinweis"
+	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/golf/id_set"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/hotel/objekte"
 	"github.com/friedenberg/zit/src/india/typ"
 	"github.com/friedenberg/zit/src/kilo/zettel"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 func (c *client) PullSkus(
@@ -70,11 +71,11 @@ func (c *client) GetInheritorZettel() objekte.TransactedInheritor {
 		zettel.Verzeichnisse,
 		*zettel.Verzeichnisse,
 	](
-		gattung.MakeBespokeObjekteReadWriterFactory(
+		schnittstellen.MakeBespokeObjekteReadWriterFactory(
 			c,
 			c.umwelt.StoreObjekten(),
 		),
-		gattung.MakeBespokeAkteReadWriterFactory(
+		schnittstellen.MakeBespokeAkteReadWriterFactory(
 			c,
 			c.umwelt.StoreObjekten(),
 		),
@@ -104,11 +105,11 @@ func (c *client) GetInheritorTyp() objekte.TransactedInheritor {
 		objekte.NilVerzeichnisse[typ.Objekte],
 		*objekte.NilVerzeichnisse[typ.Objekte],
 	](
-		gattung.MakeBespokeObjekteReadWriterFactory(
+		schnittstellen.MakeBespokeObjekteReadWriterFactory(
 			c,
 			c.umwelt.StoreObjekten(),
 		),
-		gattung.MakeBespokeAkteReadWriterFactory(
+		schnittstellen.MakeBespokeAkteReadWriterFactory(
 			c,
 			c.umwelt.StoreObjekten(),
 		),

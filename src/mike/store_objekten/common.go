@@ -9,12 +9,12 @@ import (
 	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
-	"github.com/friedenberg/zit/src/foxtrot/id"
-	"github.com/friedenberg/zit/src/golf/age_io"
+	"github.com/friedenberg/zit/src/delta/id"
+	"github.com/friedenberg/zit/src/echo/age_io"
+	"github.com/friedenberg/zit/src/foxtrot/standort"
+	"github.com/friedenberg/zit/src/foxtrot/ts"
 	"github.com/friedenberg/zit/src/golf/sku"
-	"github.com/friedenberg/zit/src/golf/standort"
 	"github.com/friedenberg/zit/src/golf/transaktion"
-	"github.com/friedenberg/zit/src/golf/ts"
 	"github.com/friedenberg/zit/src/india/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/juliett/konfig"
 )
@@ -35,10 +35,10 @@ type common struct {
 func (s common) AddSkuToBestandsaufnahme(sk sku.SkuLike, as sha.Sha) {
 	s.Bestandsaufnahme.Akte.Skus.Push(
 		sku.Sku2{
-			Gattung:    sk.GetGattung(),
+			Gattung:    gattung.Make(sk.GetGattung()),
 			Tai:        ts.TaiFromTimeWithIndex(sk.GetTime(), sk.GetTransactionIndex().Int()),
 			Kennung:    collections.MakeStringValue(sk.GetId().String()),
-			ObjekteSha: sk.GetObjekteSha(),
+			ObjekteSha: sha.Make(sk.GetObjekteSha()),
 			AkteSha:    as,
 		},
 	)

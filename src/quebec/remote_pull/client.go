@@ -14,6 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 	"github.com/friedenberg/zit/src/papa/remote_conn"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 const (
@@ -25,8 +26,8 @@ type FuncSku func(sku.Sku2) error
 type Client interface {
 	SkusFromFilter(id_set.Filter, gattungen.Set, FuncSku) error
 	PullSkus(id_set.Filter, gattungen.Set) error
-	gattung.ObjekteReaderFactory
-	gattung.AkteReaderFactory
+	schnittstellen.ObjekteReaderFactory
+	schnittstellen.AkteReaderFactory
 	Close() error
 }
 
@@ -174,8 +175,8 @@ func (c *client) makeAndProcessOneSkuWithFilter(
 }
 
 func (c *client) ObjekteReader(
-	g gattung.GattungLike,
-	sh gattung.ShaLike,
+	g schnittstellen.GattungGetter,
+	sh schnittstellen.ShaGetter,
 ) (rc sha.ReadCloser, err error) {
 	var d remote_conn.Dialogue
 
@@ -187,8 +188,8 @@ func (c *client) ObjekteReader(
 	}
 
 	msgRequest := messageRequestObjekteData{
-		Gattung: g.GetGattung(),
-		Sha:     sh.GetSha(),
+		Gattung: gattung.Make(g.GetGattung()),
+		Sha:     sha.Make(sh.GetSha()),
 	}
 
 	if err = d.Send(msgRequest); err != nil {

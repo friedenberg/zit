@@ -6,15 +6,16 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
-	"github.com/friedenberg/zit/src/golf/standort"
+	"github.com/friedenberg/zit/src/foxtrot/standort"
 	"github.com/friedenberg/zit/src/hotel/objekte"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type Store interface {
 	ObjekteInflator
 	ObjekteSaver
 	AkteTextSaver
-	Create(*Objekte) (sha.Sha, error)
+	Create(*Objekte) (schnittstellen.Sha, error)
 	ReadOne(sha.Sha) (*Objekte, error)
 	ReadAll(collections.WriterFunc[*Objekte]) error
 	// errors.Flusher
@@ -97,7 +98,7 @@ func MakeStore(
 	return
 }
 
-func (s *store) Create(o *Objekte) (sh sha.Sha, err error) {
+func (s *store) Create(o *Objekte) (sh schnittstellen.Sha, err error) {
 	if o.Akte.Skus.Len() == 0 {
 		err = errors.Wrap(ErrEmpty)
 		return

@@ -5,8 +5,9 @@ import (
 
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/echo/format"
-	"github.com/friedenberg/zit/src/foxtrot/kennung"
-	"github.com/friedenberg/zit/src/golf/standort"
+	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/standort"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 func MakeCliFormat(
@@ -49,7 +50,7 @@ func MakeCliFormatExternal(
 func MakeCliFormatTransacted(
 	s standort.Standort,
 	cw format.FuncColorWriter,
-	sf format.FormatWriterFunc[sha.Sha],
+	sf format.FormatWriterFunc[schnittstellen.Sha],
 	tf format.FormatWriterFunc[kennung.Etikett],
 	verb string,
 ) format.FormatWriterFunc[Transacted] {

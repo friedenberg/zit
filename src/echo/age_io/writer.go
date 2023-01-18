@@ -9,6 +9,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type Writer interface {
@@ -78,7 +79,7 @@ func (w *writer) Close() (err error) {
 	return
 }
 
-func (w *writer) Sha() (s sha.Sha) {
+func (w *writer) Sha() (s schnittstellen.Sha) {
 	s = sha.FromHash(w.hash)
 
 	return

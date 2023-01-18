@@ -5,7 +5,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/foxtrot/id"
+	"github.com/friedenberg/zit/src/delta/id"
 )
 
 // TODO-P4 switch to gattung-matched directories

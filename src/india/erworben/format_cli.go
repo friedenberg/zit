@@ -3,14 +3,14 @@ package erworben
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/echo/format"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 // (unchanged|updated) [konfig@sha]
 func MakeCliFormatTransacted(
 	cw format.FuncColorWriter,
-	sf format.FormatWriterFunc[sha.Sha],
+	sf format.FormatWriterFunc[schnittstellen.Sha],
 	verb string,
 ) format.FormatWriterFunc[Transacted] {
 	return func(w io.Writer, kt Transacted) (n int64, err error) {

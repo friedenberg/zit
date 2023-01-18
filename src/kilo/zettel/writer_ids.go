@@ -4,10 +4,11 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/foxtrot/kennung"
-	"github.com/friedenberg/zit/src/golf/hinweis"
+	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/golf/id_set"
 	"github.com/friedenberg/zit/src/hotel/objekte"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 func init() {
@@ -35,7 +36,7 @@ type zettelFilterable struct {
 	*Transacted
 }
 
-func (z zettelFilterable) GetGattung() gattung.Gattung {
+func (z zettelFilterable) GetGattung() schnittstellen.Gattung {
 	return gattung.Zettel
 }
 
@@ -60,7 +61,7 @@ func (z zettelFilterable) ObjekteSha() sha.Sha {
 }
 
 func (z zettelFilterable) SetObjekteSha(
-	arf gattung.AkteReaderFactory,
+	arf schnittstellen.AkteReaderFactory,
 	v string,
 ) (err error) {
 	if err = z.Sku.ObjekteSha.Set(v); err != nil {

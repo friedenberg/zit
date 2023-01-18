@@ -4,9 +4,10 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/foxtrot/kennung"
+	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/fd"
 	"github.com/friedenberg/zit/src/golf/sku"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type ExternalKeyer struct{}
@@ -46,7 +47,7 @@ func (e External) ObjekteSha() sha.Sha {
 }
 
 func (e *External) SetObjekteSha(
-	arf gattung.AkteReaderFactory,
+	arf schnittstellen.AkteReaderFactory,
 	v string,
 ) (err error) {
 	if err = e.Sku.ObjekteSha.Set(v); err != nil {

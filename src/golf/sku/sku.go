@@ -9,7 +9,8 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/format"
-	"github.com/friedenberg/zit/src/golf/ts"
+	"github.com/friedenberg/zit/src/foxtrot/ts"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type Sku struct {
@@ -68,15 +69,15 @@ func (a Sku) GetId() IdLike {
 	return a.Kennung
 }
 
-func (a Sku) GetGattung() gattung.Gattung {
+func (a Sku) GetGattung() schnittstellen.Gattung {
 	return a.Gattung
 }
 
-func (a Sku) GetObjekteSha() sha.Sha {
+func (a Sku) GetObjekteSha() schnittstellen.Sha {
 	return a.ObjekteSha
 }
 
-func (a Sku) GetAkteSha() sha.Sha {
+func (a Sku) GetAkteSha() schnittstellen.Sha {
 	return a.AkteSha
 }
 

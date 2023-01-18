@@ -1,6 +1,4 @@
-package gattung
-
-import "github.com/friedenberg/zit/src/bravo/sha"
+package schnittstellen
 
 //    ___  _     _      _    _       ___ ___
 //   / _ \| |__ (_) ___| | _| |_ ___|_ _/ _ \
@@ -15,15 +13,15 @@ type ObjekteIOFactory interface {
 }
 
 type ObjekteReaderFactory interface {
-	ObjekteReader(GattungLike, ShaLike) (sha.ReadCloser, error)
+	ObjekteReader(GattungGetter, ShaGetter) (ShaReadCloser, error)
 }
 
 type ObjekteWriterFactory interface {
-	ObjekteWriter(GattungLike) (sha.WriteCloser, error)
+	ObjekteWriter(GattungGetter) (ShaWriteCloser, error)
 }
 
-type FuncObjekteReader func(GattungLike, ShaLike) (sha.ReadCloser, error)
-type FuncObjekteWriter func(GattungLike) (sha.WriteCloser, error)
+type FuncObjekteReader func(GattungGetter, ShaGetter) (ShaReadCloser, error)
+type FuncObjekteWriter func(GattungGetter) (ShaWriteCloser, error)
 
 type bespokeObjekteReadWriterFactory struct {
 	ObjekteReaderFactory
@@ -53,9 +51,9 @@ func MakeBespokeObjekteReadFactory(
 }
 
 func (b bespokeObjekteReadFactory) ObjekteReader(
-	g GattungLike,
-	sh ShaLike,
-) (sha.ReadCloser, error) {
+	g GattungGetter,
+	sh ShaGetter,
+) (ShaReadCloser, error) {
 	return b.FuncObjekteReader(g, sh)
 }
 
@@ -72,7 +70,7 @@ func MakeBespokeObjekteWriteFactory(
 }
 
 func (b bespokeObjekteWriteFactory) ObjekteWriter(
-	g GattungLike,
-) (sha.WriteCloser, error) {
+	g GattungGetter,
+) (ShaWriteCloser, error) {
 	return b.FuncObjekteWriter(g)
 }

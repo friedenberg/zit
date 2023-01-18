@@ -1,13 +1,13 @@
 package objekte
 
 import (
-	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/golf/sku"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type TransactedLike interface {
-	GetAkteSha() sha.Sha
+	GetAkteSha() schnittstellen.Sha
 	GetSku2() sku.Sku2
 }
 

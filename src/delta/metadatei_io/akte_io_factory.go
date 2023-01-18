@@ -8,12 +8,12 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type nopAkteFactory struct{}
 
-func NopAkteFactory() gattung.AkteIOFactory {
+func NopAkteFactory() schnittstellen.AkteIOFactory {
 	return nopAkteFactory{}
 }
 
@@ -54,7 +54,7 @@ func (w *nopWriter) Close() (err error) {
 	return
 }
 
-func (w *nopWriter) Sha() (s sha.Sha) {
+func (w *nopWriter) Sha() (s schnittstellen.Sha) {
 	s = sha.FromHash(w.hash)
 
 	return

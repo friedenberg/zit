@@ -1,10 +1,11 @@
 package id_set
 
 import (
+	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
-	"github.com/friedenberg/zit/src/foxtrot/kennung"
-	"github.com/friedenberg/zit/src/golf/hinweis"
+	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 )
 
 type Element interface {
@@ -53,10 +54,10 @@ LOOP:
 	okSha := false
 
 	switch {
-	case shas.Contains(e.GetObjekteSha()):
+	case shas.Contains(sha.Make(e.GetObjekteSha())):
 		okSha = true
 
-	case shas.Contains(e.GetAkteSha()):
+	case shas.Contains(sha.Make(e.GetAkteSha())):
 		okSha = true
 	}
 

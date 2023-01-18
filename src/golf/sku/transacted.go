@@ -9,9 +9,10 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
-	"github.com/friedenberg/zit/src/foxtrot/kennung"
-	"github.com/friedenberg/zit/src/golf/hinweis"
-	"github.com/friedenberg/zit/src/golf/ts"
+	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/hinweis"
+	"github.com/friedenberg/zit/src/foxtrot/ts"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type SkuLikeOld interface {
@@ -130,7 +131,7 @@ func (a Transacted[T, T1]) GetTime() ts.Time {
 func (a *Transacted[T, T1]) Sku() Sku {
 	return Sku{
 		Time:       ts.TimeWithIndex(a.GetTime(), a.GetTransactionIndex().Int()),
-		Gattung:    a.GetGattung(),
+		Gattung:    gattung.Make(a.GetGattung()),
 		Kennung:    collections.MakeStringValue(a.Kennung.String()),
 		ObjekteSha: a.ObjekteSha,
 		AkteSha:    a.AkteSha,
@@ -143,7 +144,7 @@ func (a *Transacted[T, T1]) Sku2() Sku2 {
 			a.GetTime(),
 			a.GetTransactionIndex().Int(),
 		),
-		Gattung:    a.GetGattung(),
+		Gattung:    gattung.Make(a.GetGattung()),
 		Kennung:    collections.MakeStringValue(a.Kennung.String()),
 		ObjekteSha: a.ObjekteSha,
 		AkteSha:    a.AkteSha,
@@ -255,7 +256,7 @@ func (s Transacted[T, T1]) GetMutter() Mutter {
 	return s.Mutter
 }
 
-func (s Transacted[T, T1]) GetGattung() gattung.Gattung {
+func (s Transacted[T, T1]) GetGattung() schnittstellen.Gattung {
 	return s.Kennung.GetGattung()
 }
 
@@ -263,11 +264,11 @@ func (s Transacted[T, T1]) GetId() IdLike {
 	return s.Kennung
 }
 
-func (s Transacted[T, T1]) GetObjekteSha() sha.Sha {
+func (s Transacted[T, T1]) GetObjekteSha() schnittstellen.Sha {
 	return s.ObjekteSha
 }
 
-func (s Transacted[T, T1]) GetAkteSha() sha.Sha {
+func (s Transacted[T, T1]) GetAkteSha() schnittstellen.Sha {
 	return s.AkteSha
 }
 

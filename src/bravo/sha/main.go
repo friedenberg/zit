@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 const (
@@ -21,9 +22,7 @@ type PathComponents interface {
 	PathComponents() []string
 }
 
-type ShaLike interface {
-	GetSha() Sha
-}
+type ShaLike = schnittstellen.ShaGetter
 
 type Sha struct {
 	value string
@@ -32,6 +31,10 @@ type Sha struct {
 func MakeHashWriter() (h hash.Hash) {
 	h = sha256.New()
 	return
+}
+
+func Make(s schnittstellen.Sha) Sha {
+	return s.(Sha)
 }
 
 func Must(v string) (s Sha) {
@@ -99,6 +102,10 @@ func FromHash(h hash.Hash) (s Sha) {
 	return
 }
 
+func (s Sha) GetShaString() string {
+	return s.String()
+}
+
 func (s Sha) String() string {
 	if s.value == "" {
 		return ShaNull
@@ -133,7 +140,7 @@ func (s *Sha) Set(v string) (err error) {
 	return
 }
 
-func (s Sha) GetSha() Sha {
+func (s Sha) GetSha() schnittstellen.Sha {
 	return s
 }
 
@@ -157,8 +164,8 @@ func (s Sha) Schwanz() string {
 	return s.String()[2:]
 }
 
-func (a Sha) Equals(b Sha) bool {
-	return a.String() == b.String()
+func (a Sha) Equals(b schnittstellen.Sha) bool {
+	return a.GetShaString() == b.GetShaString()
 }
 
 func (s Sha) Path(pc ...string) string {

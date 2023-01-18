@@ -102,8 +102,8 @@ func (c *client) ObjekteWriter(
 	}
 
 	msgRequest := messageRequestObjekteData{
-		Gattung: g.GetGattung(),
-		Sha:     sh.GetSha(),
+		Gattung: gattung.Make(g.GetGattung()),
+		Sha:     sha.Make(sh.GetSha()),
 	}
 
 	if err = d.Send(msgRequest); err != nil {

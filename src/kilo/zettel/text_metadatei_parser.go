@@ -9,13 +9,13 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/format"
-	"github.com/friedenberg/zit/src/foxtrot/kennung"
+	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type textMetadateiParser struct {
-	awf gattung.AkteWriterFactory
+	awf schnittstellen.AkteWriterFactory
 	// context *FormatContextRead
 
 	aktePath string
@@ -23,7 +23,7 @@ type textMetadateiParser struct {
 }
 
 func MakeTextMetadateiParser(
-	awf gattung.AkteWriterFactory,
+	awf schnittstellen.AkteWriterFactory,
 ) textMetadateiParser {
 	return textMetadateiParser{
 		awf: awf,
@@ -118,7 +118,7 @@ func (f *textMetadateiParser) readTyp(
 			return
 		}
 
-		f.akteSha = akteWriter.Sha()
+		f.akteSha = sha.Make(akteWriter.Sha())
 
 	//! <sha>.<typ ext>
 	case tail != "":

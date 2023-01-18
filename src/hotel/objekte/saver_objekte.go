@@ -4,20 +4,21 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type ObjekteSaver[
 	T gattung.Objekte[T],
 	T1 gattung.ObjektePtr[T],
 ] interface {
-	SaveObjekte(T1) (sha.Sha, error)
+	SaveObjekte(T1) (schnittstellen.Sha, error)
 }
 
 type objekteSaver[
 	T gattung.Objekte[T],
 	T1 gattung.ObjektePtr[T],
 ] struct {
-	writerFactory gattung.ObjekteWriterFactory
+	writerFactory schnittstellen.ObjekteWriterFactory
 	formatter     gattung.Formatter[T, T1]
 }
 
@@ -25,7 +26,7 @@ func MakeObjekteSaver[
 	T gattung.Objekte[T],
 	T1 gattung.ObjektePtr[T],
 ](
-	writerFactory gattung.ObjekteWriterFactory,
+	writerFactory schnittstellen.ObjekteWriterFactory,
 	formatter gattung.Formatter[T, T1],
 ) *objekteSaver[T, T1] {
 	return &objekteSaver[T, T1]{
@@ -36,7 +37,7 @@ func MakeObjekteSaver[
 
 func (h *objekteSaver[T, T1]) SaveObjekte(
 	o T1,
-) (sh sha.Sha, err error) {
+) (sh schnittstellen.Sha, err error) {
 	var w sha.WriteCloser
 
 	if w, err = h.writerFactory.ObjekteWriter(

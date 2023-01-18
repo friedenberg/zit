@@ -5,7 +5,8 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/foxtrot/id"
+	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/delta/id"
 )
 
 type Mover struct {
@@ -70,7 +71,7 @@ func (m *Mover) Close() (err error) {
 		return
 	}
 
-	sha := m.Writer.Sha()
+	sh := m.Writer.Sha()
 
 	if m.objektePath == "" {
 		//TODO-P3 move this validation to options
@@ -79,7 +80,7 @@ func (m *Mover) Close() (err error) {
 			return
 		}
 
-		if m.objektePath, err = id.MakeDirIfNecessary(sha, m.basePath); err != nil {
+		if m.objektePath, err = id.MakeDirIfNecessary(sh, m.basePath); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -91,7 +92,7 @@ func (m *Mover) Close() (err error) {
 		if files.Exists(m.objektePath) {
 			if m.errorOnAttemptedOverwrite {
 				err = ErrAlreadyExists{
-					Sha:  sha,
+					Sha:  sha.Make(sh),
 					Path: m.objektePath,
 				}
 
