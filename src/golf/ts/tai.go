@@ -9,7 +9,7 @@ import (
 
 	chai "github.com/brandondube/tai"
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/delta/format"
+	"github.com/friedenberg/zit/src/echo/format"
 )
 
 type tai = chai.TAI

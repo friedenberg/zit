@@ -4,6 +4,7 @@ import (
 	"reflect"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/foxtrot/id"
 )
 
@@ -28,7 +29,7 @@ func (pid protoId) String() string {
 	return pid.Type.Name()
 }
 
-func (pid protoId) Make(v string) (i id.Id, err error) {
+func (pid protoId) Make(v string) (i gattung.IdLike, err error) {
 	if pid.Expand != nil {
 		if v, err = pid.Expand(v); err != nil {
 			err = errors.Wrap(err)
@@ -45,7 +46,7 @@ func (pid protoId) Make(v string) (i id.Id, err error) {
 		return
 	}
 
-	i = reflect.ValueOf(id2).Elem().Interface().(id.Id)
+	i = reflect.ValueOf(id2).Elem().Interface().(gattung.IdLike)
 
 	return
 }

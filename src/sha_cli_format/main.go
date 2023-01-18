@@ -1,24 +1,26 @@
-package sha
+package sha_cli_format
 
 import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/delta/format"
+	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/echo/format"
 )
 
 // sha
 func MakeCliFormat(
 	cw format.FuncColorWriter,
-	a Abbr,
-) format.FormatWriterFunc[Sha] {
-	return func(w io.Writer, s Sha) (n int64, err error) {
+	a gattung.FuncAbbrId,
+) format.FormatWriterFunc[sha.Sha] {
+	return func(w io.Writer, s sha.Sha) (n int64, err error) {
 		v := s.String()
 
 		if a != nil {
 			var v1 string
 
-			if v1, err = a.AbbreviateSha(s); err != nil {
+			if v1, err = a(s); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

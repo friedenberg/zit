@@ -4,11 +4,11 @@ import (
 	"fmt"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/echo/sha"
-	"github.com/friedenberg/zit/src/foxtrot/hinweis"
-	"github.com/friedenberg/zit/src/foxtrot/id"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/ts"
+	"github.com/friedenberg/zit/src/foxtrot/sha"
+	"github.com/friedenberg/zit/src/golf/hinweis"
+	"github.com/friedenberg/zit/src/golf/ts"
 )
 
 // TODO-P4 move to kennung
@@ -20,7 +20,7 @@ type Set struct {
 	Typen      kennung.TypMutableSet
 	Timestamps ts.MutableSet
 	HasKonfig  bool
-	ids        []id.Id
+	ids        []gattung.IdLike
 }
 
 func Make(c int) Set {
@@ -30,11 +30,11 @@ func Make(c int) Set {
 		Etiketten:  kennung.MakeEtikettMutableSet(),
 		Hinweisen:  hinweis.MakeMutableSet(),
 		Typen:      kennung.MakeTypMutableSet(),
-		ids:        make([]id.Id, 0, c),
+		ids:        make([]gattung.IdLike, 0, c),
 	}
 }
 
-func (s *Set) Add(ids ...id.Id) {
+func (s *Set) Add(ids ...gattung.IdLike) {
 	for _, i := range ids {
 		switch it := i.(type) {
 		case kennung.Etikett:
@@ -76,8 +76,8 @@ func (s Set) Len() int {
 	return s.Shas.Len() + s.Etiketten.Len() + s.Hinweisen.Len() + s.Typen.Len() + s.Timestamps.Len() + k
 }
 
-func (s Set) AnyShasOrHinweisen() (ids []id.IdMitKorper) {
-	ids = make([]id.IdMitKorper, 0, s.Shas.Len()+s.Hinweisen.Len())
+func (s Set) AnyShasOrHinweisen() (ids []gattung.IdMitKorper) {
+	ids = make([]gattung.IdMitKorper, 0, s.Shas.Len()+s.Hinweisen.Len())
 
 	s.Shas.Each(
 		func(sh sha.Sha) (err error) {
@@ -98,7 +98,7 @@ func (s Set) AnyShasOrHinweisen() (ids []id.IdMitKorper) {
 	return
 }
 
-func (s Set) AnyShaOrHinweis() (i1 id.IdMitKorper, ok bool) {
+func (s Set) AnyShaOrHinweis() (i1 gattung.IdMitKorper, ok bool) {
 	ids := s.AnyShasOrHinweisen()
 
 	if len(ids) > 0 {

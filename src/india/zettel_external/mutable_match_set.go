@@ -4,8 +4,8 @@ import (
 	"sync"
 
 	"github.com/friedenberg/zit/src/delta/collections"
-	"github.com/friedenberg/zit/src/foxtrot/hinweis"
-	"github.com/friedenberg/zit/src/foxtrot/ts"
+	"github.com/friedenberg/zit/src/golf/hinweis"
+	"github.com/friedenberg/zit/src/golf/ts"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 

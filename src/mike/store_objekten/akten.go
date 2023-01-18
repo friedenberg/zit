@@ -4,8 +4,8 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/delta/collections"
-	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/id"
+	"github.com/friedenberg/zit/src/foxtrot/sha"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 

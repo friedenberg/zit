@@ -5,7 +5,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/foxtrot/id"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 )
 
 type ReaderLine struct {
@@ -40,7 +40,7 @@ func (rl *ReaderLine) ReadFrom(r1 io.Reader) (n int64, err error) {
 			continue
 		}
 
-		var i id.Id
+		var i gattung.IdLike
 
 		if i, err = rl.ProtoIdSet.MakeOne(line); err != nil {
 			err = errors.Wrap(err)

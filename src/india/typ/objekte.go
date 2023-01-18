@@ -2,7 +2,7 @@ package typ
 
 import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/echo/sha"
+	"github.com/friedenberg/zit/src/foxtrot/sha"
 )
 
 type Objekte struct {

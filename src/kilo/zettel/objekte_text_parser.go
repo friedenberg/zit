@@ -5,9 +5,9 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/delta/format"
-	"github.com/friedenberg/zit/src/echo/sha"
+	"github.com/friedenberg/zit/src/echo/format"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei_io"
+	"github.com/friedenberg/zit/src/foxtrot/sha"
 	"github.com/friedenberg/zit/src/india/erworben"
 )
 

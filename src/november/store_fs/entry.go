@@ -3,7 +3,7 @@ package store_fs
 import (
 	"time"
 
-	"github.com/friedenberg/zit/src/echo/sha"
+	"github.com/friedenberg/zit/src/foxtrot/sha"
 )
 
 type Entry struct {

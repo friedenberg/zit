@@ -9,8 +9,8 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/collections_coding"
-	"github.com/friedenberg/zit/src/echo/sha"
-	"github.com/friedenberg/zit/src/echo/standort"
+	"github.com/friedenberg/zit/src/foxtrot/sha"
+	"github.com/friedenberg/zit/src/golf/standort"
 	"github.com/friedenberg/zit/src/india/typ"
 	"github.com/friedenberg/zit/src/juliett/konfig"
 )

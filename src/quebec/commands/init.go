@@ -3,8 +3,8 @@ package commands
 import (
 	"flag"
 
+	"github.com/friedenberg/zit/src/alfa/angeboren"
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/angeboren"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
 

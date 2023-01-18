@@ -3,11 +3,11 @@ package zettel
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/delta/format"
-	"github.com/friedenberg/zit/src/echo/bezeichnung"
-	"github.com/friedenberg/zit/src/echo/sha"
-	"github.com/friedenberg/zit/src/foxtrot/hinweis"
+	"github.com/friedenberg/zit/src/echo/format"
+	"github.com/friedenberg/zit/src/foxtrot/bezeichnung"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/sha"
+	"github.com/friedenberg/zit/src/golf/hinweis"
 	"github.com/friedenberg/zit/src/hotel/objekte"
 )
 

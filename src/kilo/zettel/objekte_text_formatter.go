@@ -10,10 +10,10 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/script_config"
 	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/delta/format"
-	"github.com/friedenberg/zit/src/echo/sha"
-	"github.com/friedenberg/zit/src/echo/standort"
+	"github.com/friedenberg/zit/src/echo/format"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei_io"
+	"github.com/friedenberg/zit/src/foxtrot/sha"
+	"github.com/friedenberg/zit/src/golf/standort"
 	"github.com/friedenberg/zit/src/india/erworben"
 	"github.com/friedenberg/zit/src/india/typ"
 )

@@ -3,7 +3,7 @@ package organize_text
 import (
 	"flag"
 
-	"github.com/friedenberg/zit/src/foxtrot/hinweis"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/juliett/konfig"
 	zettel_pkg "github.com/friedenberg/zit/src/kilo/zettel"
@@ -11,7 +11,7 @@ import (
 
 type Options struct {
 	Konfig konfig.Compiled
-	hinweis.Abbr
+	Abbr   gattung.FuncAbbrIdMitKorper
 
 	RootEtiketten     kennung.EtikettSet
 	Typ               kennung.Typ

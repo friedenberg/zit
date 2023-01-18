@@ -3,8 +3,8 @@ package sku
 import (
 	"fmt"
 
-	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/sha"
 )
 
 type External[T kennung.KennungLike[T], T1 kennung.KennungLikePtr[T]] struct {

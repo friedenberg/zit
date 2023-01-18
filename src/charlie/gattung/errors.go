@@ -7,6 +7,7 @@ import (
 
 var (
 	ErrUnsupportedGattung = errors.New("unsupported gattung")
+	ErrNoAbbreviation     = errors.New("no abbreviation")
 )
 
 type ErrWrongType struct {

@@ -5,8 +5,8 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
-	"github.com/friedenberg/zit/src/echo/sha"
-	"github.com/friedenberg/zit/src/echo/standort"
+	"github.com/friedenberg/zit/src/foxtrot/sha"
+	"github.com/friedenberg/zit/src/golf/standort"
 	"github.com/friedenberg/zit/src/hotel/objekte"
 )
 

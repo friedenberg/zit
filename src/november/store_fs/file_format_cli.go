@@ -5,10 +5,10 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/delta/format"
-	"github.com/friedenberg/zit/src/echo/sha"
-	"github.com/friedenberg/zit/src/echo/standort"
+	"github.com/friedenberg/zit/src/echo/format"
+	"github.com/friedenberg/zit/src/foxtrot/sha"
 	"github.com/friedenberg/zit/src/golf/fd"
+	"github.com/friedenberg/zit/src/golf/standort"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 

@@ -8,10 +8,10 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
-	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/ts"
+	"github.com/friedenberg/zit/src/golf/hinweis"
 	"github.com/friedenberg/zit/src/golf/id_set"
+	"github.com/friedenberg/zit/src/golf/ts"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/mike/alfred"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
@@ -80,7 +80,7 @@ func (c CatAlfred) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 	var aw *alfred.Writer
 
-	if aw, err = alfred.New(wo, u.StoreObjekten()); err != nil {
+	if aw, err = alfred.New(wo, u.StoreObjekten().Abbr().AbbreviateHinweis); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

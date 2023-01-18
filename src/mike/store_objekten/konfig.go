@@ -4,9 +4,9 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
-	"github.com/friedenberg/zit/src/echo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/id"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/sha"
 	"github.com/friedenberg/zit/src/golf/age_io"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/hotel/objekte"
@@ -170,7 +170,7 @@ func (s konfigStore) Update(
 	s.common.Transaktion.Skus.Add(&kt.Sku)
 	s.common.KonfigPtr().SetTransacted(kt)
 
-	if err = s.common.Abbr.addStored(kt); err != nil {
+	if err = s.common.Abbr.addStoredAbbreviation(kt); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

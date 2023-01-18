@@ -4,27 +4,37 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/delta/format"
+	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/echo/format"
 )
 
 // kopf/schwanz
 func MakeCliFormat(
 	cw format.FuncColorWriter,
-	a Abbr,
+	a gattung.FuncAbbrIdMitKorper,
 	maxKopf int,
 	maxSchwanz int,
 ) format.FormatWriterFunc[Hinweis] {
 	return func(w io.Writer, h Hinweis) (n int64, err error) {
-		h1 := h
-
 		if a != nil {
-			if h1, err = a.AbbreviateHinweis(h1); err != nil {
+			var v string
+
+			if v, err = a(h); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
+
+			if v != "" {
+				if err = h.Set(v); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			} else {
+				errors.Todo("empty hinweis abbr")
+			}
 		}
 
-		p1, p2 := h1.AlignedParts(maxKopf, maxSchwanz)
+		p1, p2 := h.AlignedParts(maxKopf, maxSchwanz)
 
 		return format.Write(
 			w,

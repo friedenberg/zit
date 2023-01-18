@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/friedenberg/zit/src/delta/collections"
-	"github.com/friedenberg/zit/src/delta/format"
+	"github.com/friedenberg/zit/src/echo/format"
 )
 
 func String(o SkuLike) (str string) {

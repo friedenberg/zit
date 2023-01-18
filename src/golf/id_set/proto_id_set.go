@@ -2,6 +2,7 @@ package id_set
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/foxtrot/id"
 )
 
@@ -50,7 +51,7 @@ func (ps ProtoIdSet) Contains(i id.MutableId) (ok bool) {
 	return
 }
 
-func (ps ProtoIdSet) MakeOne(v string) (i id.Id, err error) {
+func (ps ProtoIdSet) MakeOne(v string) (i gattung.IdLike, err error) {
 	for _, t := range ps.types {
 		if i, err = t.Make(v); err == nil {
 			break
@@ -73,7 +74,7 @@ func (ps ProtoIdSet) Make(vs ...string) (s Set, err error) {
 	s = Make(len(vs))
 
 	for _, v := range vs {
-		var i id.Id
+		var i gattung.IdLike
 
 		if i, err = ps.MakeOne(v); err != nil {
 			err = errors.Wrap(err)

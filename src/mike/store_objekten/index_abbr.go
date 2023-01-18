@@ -3,15 +3,16 @@ package store_objekten
 import (
 	"bufio"
 	"encoding/gob"
+	"fmt"
 	"io"
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/tridex"
-	"github.com/friedenberg/zit/src/echo/sha"
-	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/sha"
+	"github.com/friedenberg/zit/src/golf/hinweis"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 
@@ -128,7 +129,7 @@ func (i *indexAbbr) readIfNecessary() (err error) {
 	return
 }
 
-func (i *indexAbbr) addStored(o gattung.Stored) (err error) {
+func (i *indexAbbr) addStoredAbbreviation(o gattung.Stored) (err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -151,7 +152,7 @@ func (i *indexAbbr) addStored(o gattung.Stored) (err error) {
 	return
 }
 
-func (i *indexAbbr) AbbreviateSha(s sha.Sha) (abbr string, err error) {
+func (i *indexAbbr) AbbreviateSha(s gattung.IdLike) (abbr string, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -178,7 +179,7 @@ func (i *indexAbbr) ExpandShaString(st string) (s sha.Sha, err error) {
 	return
 }
 
-func (i *indexAbbr) AbbreviateHinweis(h hinweis.Hinweis) (ha hinweis.Hinweis, err error) {
+func (i *indexAbbr) AbbreviateHinweis(h gattung.IdMitKorper) (v string, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -200,10 +201,7 @@ func (i *indexAbbr) AbbreviateHinweis(h hinweis.Hinweis) (ha hinweis.Hinweis, er
 		return
 	}
 
-	if ha, err = hinweis.MakeKopfUndSchwanz(kopf, schwanz); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	v = fmt.Sprintf("%s/%s", kopf, schwanz)
 
 	return
 }

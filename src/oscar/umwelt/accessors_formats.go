@@ -1,18 +1,20 @@
 package umwelt
 
 import (
-	"github.com/friedenberg/zit/src/delta/format"
-	"github.com/friedenberg/zit/src/echo/bezeichnung"
-	"github.com/friedenberg/zit/src/echo/sha"
-	"github.com/friedenberg/zit/src/foxtrot/hinweis"
+	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/echo/format"
+	"github.com/friedenberg/zit/src/foxtrot/bezeichnung"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/sha"
 	"github.com/friedenberg/zit/src/golf/fd"
+	"github.com/friedenberg/zit/src/golf/hinweis"
 	"github.com/friedenberg/zit/src/india/etikett"
 	"github.com/friedenberg/zit/src/india/typ"
 	"github.com/friedenberg/zit/src/india/zettel_external"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/mike/zettel_checked_out"
 	"github.com/friedenberg/zit/src/november/store_fs"
+	"github.com/friedenberg/zit/src/sha_cli_format"
 )
 
 func (u *Umwelt) FormatColorWriter() format.FuncColorWriter {
@@ -23,18 +25,17 @@ func (u *Umwelt) FormatColorWriter() format.FuncColorWriter {
 	}
 }
 
-func (u *Umwelt) FormatSha() format.FormatWriterFunc[sha.Sha] {
-	return sha.MakeCliFormat(
-		u.FormatColorWriter(),
-		u.StoreObjekten(),
-	)
+func (u *Umwelt) FormatSha(
+	a gattung.FuncAbbrId,
+) format.FormatWriterFunc[sha.Sha] {
+	return sha_cli_format.MakeCliFormat(u.FormatColorWriter(), a)
 }
 
 func (u *Umwelt) FormatHinweis() format.FormatWriterFunc[hinweis.Hinweis] {
-	var a hinweis.Abbr
+	var a gattung.FuncAbbrIdMitKorper
 
 	if u.konfig.PrintAbbreviatedHinweisen {
-		a = u.StoreObjekten()
+		a = u.StoreObjekten().Abbr().AbbreviateHinweis
 	}
 
 	return hinweis.MakeCliFormat(
@@ -63,7 +64,7 @@ func (u *Umwelt) FormatTypTransacted(
 	return typ.MakeCliFormatTransacted(
 		u.Standort(),
 		u.FormatColorWriter(),
-		u.FormatSha(),
+		u.FormatSha(u.StoreObjekten().Abbr().AbbreviateSha),
 		u.FormatTyp(),
 		verb,
 	)
@@ -75,7 +76,7 @@ func (u *Umwelt) FormatEtikettTransacted(
 	return etikett.MakeCliFormatTransacted(
 		u.Standort(),
 		u.FormatColorWriter(),
-		u.FormatSha(),
+		u.FormatSha(u.StoreObjekten().Abbr().AbbreviateSha),
 		u.FormatEtikett(),
 		verb,
 	)
@@ -85,7 +86,7 @@ func (u *Umwelt) FormatTypCheckedOut() format.FormatWriterFunc[typ.External] {
 	return typ.MakeCliFormatExternal(
 		u.Standort(),
 		u.FormatColorWriter(),
-		u.FormatSha(),
+		u.FormatSha(u.StoreObjekten().Abbr().AbbreviateSha),
 		u.FormatTyp(),
 	)
 }
@@ -103,7 +104,7 @@ func (u *Umwelt) FormatZettelExternal() format.FormatWriterFunc[zettel_external.
 		u.Standort(),
 		u.FormatColorWriter(),
 		u.FormatHinweis(),
-		u.FormatSha(),
+		u.FormatSha(u.StoreObjekten().Abbr().AbbreviateSha),
 		u.FormatZettel(),
 	)
 }
@@ -120,7 +121,7 @@ func (u *Umwelt) FormatZettelCheckedOut() format.FormatWriterFunc[zettel_checked
 		u.Standort(),
 		u.FormatColorWriter(),
 		u.FormatHinweis(),
-		u.FormatSha(),
+		u.FormatSha(u.StoreObjekten().Abbr().AbbreviateSha),
 		u.FormatZettel(),
 	)
 }
@@ -128,7 +129,7 @@ func (u *Umwelt) FormatZettelCheckedOut() format.FormatWriterFunc[zettel_checked
 func (u *Umwelt) FormatZettelTransacted() format.FormatWriterFunc[zettel.Transacted] {
 	return zettel.MakeCliFormatTransacted(
 		u.FormatHinweis(),
-		u.FormatSha(),
+		u.FormatSha(u.StoreObjekten().Abbr().AbbreviateSha),
 		u.FormatZettel(),
 	)
 }
@@ -144,7 +145,7 @@ func (u *Umwelt) FormatFileNotRecognized() format.FormatWriterFunc[fd.FD] {
 	return store_fs.MakeCliFormatNotRecognized(
 		u.FormatColorWriter(),
 		u.Standort(),
-		u.FormatSha(),
+		u.FormatSha(u.StoreObjekten().Abbr().AbbreviateSha),
 	)
 }
 
@@ -152,7 +153,7 @@ func (u *Umwelt) FormatFileRecognized() format.FormatWriterFunc[store_fs.FileRec
 	return store_fs.MakeCliFormatRecognized(
 		u.FormatColorWriter(),
 		u.Standort(),
-		u.FormatSha(),
+		u.FormatSha(u.StoreObjekten().Abbr().AbbreviateSha),
 		u.FormatZettel(),
 	)
 }

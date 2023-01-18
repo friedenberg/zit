@@ -2,34 +2,26 @@ package store_objekten
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/gattungen"
-	"github.com/friedenberg/zit/src/echo/sha"
-	"github.com/friedenberg/zit/src/echo/standort"
-	"github.com/friedenberg/zit/src/foxtrot/hinweis"
-	"github.com/friedenberg/zit/src/foxtrot/ts"
+	"github.com/friedenberg/zit/src/golf/hinweis"
 	"github.com/friedenberg/zit/src/golf/sku"
+	"github.com/friedenberg/zit/src/golf/standort"
 	"github.com/friedenberg/zit/src/golf/transaktion"
+	"github.com/friedenberg/zit/src/golf/ts"
 	"github.com/friedenberg/zit/src/hotel/objekte"
+	"github.com/friedenberg/zit/src/india/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/india/etikett"
 	"github.com/friedenberg/zit/src/india/typ"
 	"github.com/friedenberg/zit/src/juliett/konfig"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 
-type shaAbbr = sha.Abbr
-type hinweisAbbr = hinweis.Abbr
-
 type Store struct {
 	common
-
-	//TODO move to methods
-	shaAbbr
-	hinweisAbbr
 
 	zettelStore  *zettelStore
 	typStore     TypStore
@@ -88,9 +80,6 @@ func Make(
 		err = errors.Wrapf(err, "failed to init abbr index")
 		return
 	}
-
-	s.shaAbbr = s.common.Abbr
-	s.hinweisAbbr = s.common.Abbr
 
 	if s.zettelStore, err = makeZettelStore(&s.common, p); err != nil {
 		err = errors.Wrap(err)
@@ -399,7 +388,7 @@ func (s *Store) getReindexFunc() func(sku.DataIdentity) error {
 			return
 		}
 
-		if err = s.common.Abbr.addStored(o); err != nil {
+		if err = s.common.Abbr.addStoredAbbreviation(o); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

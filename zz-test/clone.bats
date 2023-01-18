@@ -65,6 +65,7 @@ function clone { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
+  # TODO P0 fix issue with non-deterministic sha abbreviations
 	run zit clone -all -include-history -gattung zettel,typ "$wd1"
 	assert_output --partial '(updated) [!md@e1d34e9ec6d4f741d0566dbf6683d3644c3b6b3b27f718a6c09668a906c7df51]'
 	assert_output --partial '(updated) [konfig@e]'

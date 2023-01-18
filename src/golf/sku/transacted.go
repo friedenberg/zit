@@ -8,10 +8,10 @@ import (
 	"github.com/friedenberg/zit/src/bravo/int_value"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
-	"github.com/friedenberg/zit/src/echo/sha"
-	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/ts"
+	"github.com/friedenberg/zit/src/foxtrot/sha"
+	"github.com/friedenberg/zit/src/golf/hinweis"
+	"github.com/friedenberg/zit/src/golf/ts"
 )
 
 type SkuLikeOld interface {

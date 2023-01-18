@@ -7,10 +7,9 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
-	"github.com/friedenberg/zit/src/echo/sha"
-	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/hinweisen"
-	"github.com/friedenberg/zit/src/foxtrot/id"
+	"github.com/friedenberg/zit/src/foxtrot/sha"
+	"github.com/friedenberg/zit/src/golf/hinweis"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/hotel/objekte"
@@ -216,7 +215,7 @@ func (s *zettelStore) writeNamedZettelToIndex(
 		}
 	}
 
-	if err = s.common.Abbr.addStored(tz); err != nil {
+	if err = s.common.Abbr.addStoredAbbreviation(tz); err != nil {
 		err = errors.Wrapf(err, "failed to write zettel to index: %s", tz.Sku)
 		return
 	}
@@ -225,7 +224,7 @@ func (s *zettelStore) writeNamedZettelToIndex(
 }
 
 func (s zettelStore) ReadOne(
-	i id.Id,
+	i gattung.IdLike,
 ) (tz *zettel.Transacted, err error) {
 	switch tid := i.(type) {
 	case hinweis.Hinweis:

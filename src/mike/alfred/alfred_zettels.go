@@ -5,12 +5,16 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/bravo/alfred"
-	"github.com/friedenberg/zit/src/foxtrot/hinweis"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
+	"github.com/friedenberg/zit/src/golf/hinweis"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 
-func (w *Writer) zettelToItem(z *zettel.Transacted, ha hinweis.Abbr) (a *alfred.Item) {
+func (w *Writer) zettelToItem(
+	z *zettel.Transacted,
+	ha gattung.FuncAbbrIdMitKorper,
+) (a *alfred.Item) {
 	a = w.alfredWriter.Get()
 
 	a.Title = z.Objekte.Bezeichnung.String()

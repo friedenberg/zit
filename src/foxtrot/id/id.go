@@ -11,25 +11,14 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 )
 
-type Id interface {
-	// String() string
-	gattung.ShaLike
-}
-
-type IdMitKorper interface {
-	Id
-	Kopf() string
-	Schwanz() string
-}
-
 type MutableId interface {
-	Id
+	gattung.IdLike
 	flag.Value
 }
 
 type TypedId interface {
 	gattung.GattungLike
-	Id
+	gattung.IdLike
 }
 
 // func Path(i IdMitKorper, pc ...string) string {
@@ -37,12 +26,12 @@ type TypedId interface {
 // 	return path.Join(pc...)
 // }
 
-func Path(i IdMitKorper, pc ...string) string {
+func Path(i gattung.IdMitKorper, pc ...string) string {
 	pc = append(pc, i.Kopf(), i.Schwanz())
 	return path.Join(pc...)
 }
 
-func MakeDirIfNecessary(i IdMitKorper, pc ...string) (p string, err error) {
+func MakeDirIfNecessary(i gattung.IdMitKorper, pc ...string) (p string, err error) {
 	p = Path(i, pc...)
 	dir := path.Dir(p)
 

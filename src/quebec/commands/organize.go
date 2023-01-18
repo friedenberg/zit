@@ -11,10 +11,10 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/delta/collections"
-	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/ts"
+	"github.com/friedenberg/zit/src/golf/hinweis"
 	"github.com/friedenberg/zit/src/golf/id_set"
+	"github.com/friedenberg/zit/src/golf/ts"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/lima/organize_text"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
@@ -121,7 +121,7 @@ func (c Organize) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 
 func (c *Organize) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	c.Options.Konfig = u.Konfig()
-	c.Options.Abbr = u.StoreObjekten()
+	c.Options.Abbr = u.StoreObjekten().Abbr().AbbreviateHinweis
 
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
 		Umwelt:  u,

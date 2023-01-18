@@ -8,12 +8,25 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 )
 
+type FuncAbbrId func(IdLike) (string, error)
+type FuncAbbrIdMitKorper func(IdMitKorper) (string, error)
+
 type GattungLike interface {
 	GetGattung() Gattung
 }
 
 type ShaLike interface {
 	GetSha() sha.Sha
+}
+
+type IdLike interface {
+	fmt.Stringer
+}
+
+type IdMitKorper interface {
+	IdLike
+	Kopf() string
+	Schwanz() string
 }
 
 type Equatable[T any] interface {
@@ -59,10 +72,6 @@ type ValueElementPtr[T ValueElement] interface {
 //   | | (_| |  __/ | | | |_| |  _| |  __/ |
 //  |___\__,_|\___|_| |_|\__|_|_| |_|\___|_|
 //
-
-type IdLike interface {
-	fmt.Stringer
-}
 
 type IdentifierLike interface {
 	GattungLike

@@ -6,9 +6,10 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
-	"github.com/friedenberg/zit/src/echo/bezeichnung"
-	"github.com/friedenberg/zit/src/foxtrot/hinweis"
+	"github.com/friedenberg/zit/src/foxtrot/bezeichnung"
+	"github.com/friedenberg/zit/src/golf/hinweis"
 	zettel_pkg "github.com/friedenberg/zit/src/kilo/zettel"
 )
 
@@ -26,12 +27,19 @@ type zettel struct {
 
 func makeZettel(
 	named *zettel_pkg.Transacted,
-	ha hinweis.Abbr,
+	ha gattung.FuncAbbrIdMitKorper,
 ) (z zettel, err error) {
 	h := *named.Kennung()
 
 	if ha != nil {
-		if h, err = ha.AbbreviateHinweis(h); err != nil {
+		var v string
+
+		if v, err = ha(h); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = h.Set(v); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
