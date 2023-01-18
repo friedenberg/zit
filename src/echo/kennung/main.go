@@ -13,9 +13,9 @@ import (
 )
 
 type KennungLike[T any] interface {
-	gattung.GattungLike
+	schnittstellen.GattungGetter
 	schnittstellen.Value
-	gattung.Equatable[T]
+	schnittstellen.Equatable[T]
 }
 
 type KennungLikePtr[T schnittstellen.Value] interface {
@@ -95,12 +95,8 @@ func (a Kennung[T, T1]) Reset(b *Kennung[T, T1]) {
 	}
 }
 
-func (a Kennung[T, T1]) Equals(b *Kennung[T, T1]) bool {
-	if b == nil {
-		return false
-	}
-
-	return a.value.String() == b.value.String()
+func (a Kennung[T, T1]) Equals(b Kennung[T, T1]) bool {
+	return a.value.Equals(b.value)
 }
 
 func (a Kennung[T, T1]) Less(b Kennung[T, T1]) bool {

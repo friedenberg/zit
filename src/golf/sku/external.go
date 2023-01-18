@@ -36,7 +36,7 @@ func (a *External[T, T1]) Reset(b *External[T, T1]) {
 }
 
 func (a External[T, T1]) Equals(b *External[T, T1]) (ok bool) {
-	if a.Kennung.Equals(&b.Kennung) {
+	if a.Kennung.Equals(b.Kennung) {
 		return
 	}
 

@@ -46,7 +46,14 @@ func (g Gattung) GetGattung() schnittstellen.Gattung {
 	return g
 }
 
-func (a Gattung) Equals(b schnittstellen.Gattung) bool {
+func (a Gattung) Equals(b1 any) bool {
+	var b Gattung
+	ok := false
+
+	if b, ok = b1.(Gattung); !ok {
+		return false
+	}
+
 	return a.GetGattungString() == b.GetGattungString()
 }
 

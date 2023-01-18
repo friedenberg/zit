@@ -54,12 +54,8 @@ func (e *etikett) Reset(e1 *etikett) {
 	return
 }
 
-func (e etikett) Equals(e1 *etikett) bool {
-	if e1 == nil {
-		return false
-	}
-
-	return e == *e1
+func (a etikett) Equals(b etikett) bool {
+	return a == b
 }
 
 func (e etikett) String() string {

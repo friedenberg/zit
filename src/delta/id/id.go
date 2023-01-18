@@ -9,6 +9,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type MutableId interface {
@@ -17,7 +18,7 @@ type MutableId interface {
 }
 
 type TypedId interface {
-	gattung.GattungLike
+	schnittstellen.Gattung
 	gattung.IdLike
 }
 

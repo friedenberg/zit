@@ -6,11 +6,12 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/id"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 // TODO-P4 switch to gattung-matched directories
 func (s Standort) DirObjektenGattung(
-	g gattung.GattungLike,
+	g schnittstellen.GattungGetter,
 ) (p string, err error) {
 	switch g.GetGattung() {
 	case gattung.Konfig:
@@ -37,7 +38,7 @@ func (s Standort) DirObjektenGattung(
 	return
 }
 
-func (s Standort) HasObjekte(g gattung.GattungLike, sh sha.ShaLike) (ok bool) {
+func (s Standort) HasObjekte(g schnittstellen.GattungGetter, sh sha.ShaLike) (ok bool) {
 	var d string
 	var err error
 

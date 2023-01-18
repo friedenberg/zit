@@ -9,8 +9,6 @@ import (
 type FuncAbbrId func(IdLike) (string, error)
 type FuncAbbrIdMitKorper func(IdMitKorper) (string, error)
 
-type GattungLike = schnittstellen.GattungGetter
-
 type ShaLike = schnittstellen.Sha
 
 type IdLike interface {
@@ -21,10 +19,6 @@ type IdMitKorper interface {
 	IdLike
 	Kopf() string
 	Schwanz() string
-}
-
-type Equatable[T any] interface {
-	Equals(*T) bool
 }
 
 type Resetable[T any] interface {
@@ -52,12 +46,12 @@ type Keyer[T any, T1 schnittstellen.Ptr[T]] interface {
 //
 
 type IdentifierLike interface {
-	GattungLike
+	schnittstellen.GattungGetter
 	IdLike
 }
 
 type Id[T schnittstellen.Value] interface {
-	Equatable[T]
+	schnittstellen.Equatable[T]
 	fmt.Stringer
 }
 
@@ -68,9 +62,9 @@ type IdPtr[T schnittstellen.Value] interface {
 
 // TODO-P2 rename to ObjekteKennung
 type Identifier[T any] interface {
+	schnittstellen.GattungGetter
+	schnittstellen.Equatable[T]
 	IdentifierLike
-	GattungLike
-	Equatable[T]
 }
 
 type IdentifierPtr[T schnittstellen.Value] interface {
@@ -86,8 +80,8 @@ type IdentifierPtr[T schnittstellen.Value] interface {
 //            |__/
 
 type Objekte[T any] interface {
-	GattungLike
-	Equatable[T]
+	schnittstellen.GattungGetter
+	schnittstellen.Equatable[T]
 	GetAkteSha() schnittstellen.Sha
 }
 
@@ -106,10 +100,7 @@ type ObjektePtr[T any] interface {
 //
 
 type Stored interface {
-	GattungLike
-	//TODO-P4 add identifier
-	// Identifier() IdentifierLike
-
+	schnittstellen.GattungGetter
 	GetAkteSha() schnittstellen.Sha
 	GetObjekteSha() schnittstellen.Sha
 }
@@ -144,9 +135,7 @@ type VerzeichnissePtr[T any, T1 Objekte[T1]] interface {
 //
 
 type Transacted[T any] interface {
-	Equatable[T]
 	Stored
-
 	GetKennungString() string
 }
 

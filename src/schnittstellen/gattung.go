@@ -2,7 +2,6 @@ package schnittstellen
 
 type Gattung interface {
 	GetGattungString() string
-	Equals(Gattung) bool
 	GattungGetter
 }
 

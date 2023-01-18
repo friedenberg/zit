@@ -31,18 +31,13 @@ func (z *Objekte) SetAkteSha(v schnittstellen.Sha) {
 	z.Akte = sha.Make(v)
 }
 
-func (z Objekte) Equals(z1 *Objekte) bool {
+func (z Objekte) Equals(z1 Objekte) bool {
 	errors.TodoP4("figure out why this doesn't always work for `status`")
-
-	if z1 == nil {
-		return false
-	}
-
 	if !z.Akte.Equals(z1.Akte) {
 		return false
 	}
 
-	if !z.Typ.Equals(&z1.Typ) {
+	if !z.Typ.Equals(z1.Typ) {
 		return false
 	}
 

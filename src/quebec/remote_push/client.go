@@ -9,6 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/golf/id_set"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 	"github.com/friedenberg/zit/src/papa/remote_conn"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 const (
@@ -89,7 +90,7 @@ func (c client) SendNeededSkus(filter id_set.Filter) (err error) {
 }
 
 func (c *client) ObjekteWriter(
-	g gattung.GattungLike,
+	g schnittstellen.GattungGetter,
 	sh gattung.ShaLike,
 ) (rc sha.ReadCloser, err error) {
 	var d remote_conn.Dialogue

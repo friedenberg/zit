@@ -29,7 +29,7 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 
 	errors.Log().Printf("%#v", cs)
 
-	sameTyp := a.Metadatei.Typ.Equals(&b.Metadatei.Typ)
+	sameTyp := a.Metadatei.Typ.Equals(b.Metadatei.Typ)
 
 	if len(cs.Added) == 0 && len(cs.Removed) == 0 && len(cs.New) == 0 && sameTyp {
 		errors.Err().Print("no changes")

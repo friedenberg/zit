@@ -17,6 +17,7 @@ import (
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/india/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/juliett/konfig"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 // TODO-P3 move to own package
@@ -61,7 +62,7 @@ func (s common) GetKonfigPtr() *konfig.Compiled {
 }
 
 func (s common) ObjekteReader(
-	g gattung.GattungLike,
+	g schnittstellen.GattungGetter,
 	sh sha.ShaLike,
 ) (rc sha.ReadCloser, err error) {
 	var p string
@@ -86,7 +87,7 @@ func (s common) ObjekteReader(
 }
 
 func (s common) ObjekteWriter(
-	g gattung.GattungLike,
+	g schnittstellen.GattungGetter,
 ) (wc sha.WriteCloser, err error) {
 	var p string
 

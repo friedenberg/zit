@@ -41,12 +41,8 @@ func (e *typ) Reset(e1 *typ) {
 	return
 }
 
-func (e typ) Equals(e1 *typ) bool {
-	if e1 == nil {
-		return false
-	}
-
-	return e == *e1
+func (a typ) Equals(b typ) bool {
+	return a == b
 }
 
 func (o typ) GetGattung() schnittstellen.Gattung {

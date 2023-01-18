@@ -89,7 +89,7 @@ func Make(v string) (h Hinweis, err error) {
 	return
 }
 
-func (a Hinweis) Equals(b *Hinweis) bool {
+func (a Hinweis) Equals(b Hinweis) bool {
 	if a.left != b.left {
 		return false
 	}

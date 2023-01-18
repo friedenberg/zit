@@ -14,6 +14,7 @@ require (
 	github.com/go-piv/piv-go v1.10.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	golang.org/x/crypto v0.1.0 // indirect
+	golang.org/x/exp v0.0.0-20230118134722-a68e582fa157 // indirect
 )
 
 replace filippo.io/age v1.0.0 => github.com/friedenberg/age v1.0.1

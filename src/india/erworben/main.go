@@ -31,11 +31,7 @@ func (o *Objekte) SetAkteSha(v schnittstellen.Sha) {
 	o.Sha = sha.Make(v)
 }
 
-func (a Objekte) Equals(b *Objekte) bool {
-	if b == nil {
-		return false
-	}
-
+func (a Objekte) Equals(b Objekte) bool {
 	if !a.Sha.Equals(b.Sha) {
 		return false
 	}

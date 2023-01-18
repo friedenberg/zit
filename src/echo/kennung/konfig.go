@@ -15,11 +15,7 @@ func (a Konfig) GetGattung() schnittstellen.Gattung {
 	return gattung.Konfig
 }
 
-func (a Konfig) Equals(b *Konfig) bool {
-	if b == nil {
-		return false
-	}
-
+func (a Konfig) Equals(b Konfig) bool {
 	return true
 }
 

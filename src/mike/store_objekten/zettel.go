@@ -401,7 +401,7 @@ func (s zettelStore) AllInChain(h hinweis.Hinweis) (c []*zettel.Transacted, err 
 
 	if err = s.verzeichnisseAll.ReadMany(
 		func(z *zettel.Transacted) (err error) {
-			if !z.Sku.Kennung.Equals(&h) {
+			if !z.Sku.Kennung.Equals(h) {
 				err = collections.ErrStopIteration
 				return
 			}

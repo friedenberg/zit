@@ -116,7 +116,7 @@ func (atc *Refiner) renameForPrefixJoint(a *assignment) (err error) {
 	aEtt := a.etiketten.Any()
 	pEtt := a.parent.etiketten.Any()
 
-	if aEtt.Equals(&pEtt) {
+	if aEtt.Equals(pEtt) {
 		errors.Log().Print("parent is is equal to child")
 		return
 	}
@@ -210,7 +210,7 @@ func (atc Refiner) applyPrefixJoints(a *assignment) (err error) {
 
 	var na *assignment
 
-	if a.etiketten.Len() == 1 && a.etiketten.Any().Equals(&groupingPrefix.Etikett) {
+	if a.etiketten.Len() == 1 && a.etiketten.Any().Equals(groupingPrefix.Etikett) {
 		na = a
 	} else {
 		na = newAssignment(a.Depth() + 1)

@@ -96,7 +96,7 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) Equals(
 		return false
 	}
 
-	if !a.Objekte.Equals(&b.Objekte) {
+	if !a.Objekte.Equals(b.Objekte) {
 		return false
 	}
 

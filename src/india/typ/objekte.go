@@ -21,7 +21,7 @@ func (o Objekte) Reset(o1 *Objekte) {
 	}
 }
 
-func (o Objekte) Equals(o1 *Objekte) bool {
+func (o Objekte) Equals(o1 Objekte) bool {
 	if !o.Sha.Equals(o1.Sha) {
 		return false
 	}

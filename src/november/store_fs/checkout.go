@@ -53,7 +53,7 @@ func (s Store) shouldCheckOut(
 	cz zettel_checked_out.Zettel,
 ) (ok bool) {
 	switch {
-	case cz.Internal.Objekte.Equals(&cz.External.Objekte):
+	case cz.Internal.Objekte.Equals(cz.External.Objekte):
 		cz.State = zettel_checked_out.StateJustCheckedOutButSame
 
 	case options.Force || cz.State == zettel_checked_out.StateEmpty:

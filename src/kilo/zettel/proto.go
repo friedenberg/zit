@@ -39,7 +39,7 @@ func (pz *ProtoZettel) AddToFlagSet(f *flag.FlagSet) {
 func (pz ProtoZettel) Equals(z Objekte) (ok bool) {
 	var okTyp, okEt, okBez bool
 
-	if !pz.Typ.IsEmpty() && pz.Typ.Equals(&z.Typ) {
+	if !pz.Typ.IsEmpty() && pz.Typ.Equals(z.Typ) {
 		okTyp = true
 	}
 
@@ -67,7 +67,7 @@ func (pz ProtoZettel) Make() (z *Objekte) {
 }
 
 func (pz ProtoZettel) Apply(z *Objekte) (ok bool) {
-	if z.Typ.IsEmpty() && !pz.Typ.IsEmpty() && !z.Typ.Equals(&pz.Typ) {
+	if z.Typ.IsEmpty() && !pz.Typ.IsEmpty() && !z.Typ.Equals(pz.Typ) {
 		ok = true
 		z.Typ = pz.Typ
 	}
