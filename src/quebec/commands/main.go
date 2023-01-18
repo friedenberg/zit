@@ -76,7 +76,7 @@ func Run(args []string) (exitStatus int) {
 		return
 	}
 
-	defer errors.Deferred(&err, dc.Close)
+	defer errors.DeferredCloser(&err, dc)
 
 	cmdArgs := cmd.FlagSet.Args()
 

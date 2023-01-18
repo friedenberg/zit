@@ -158,7 +158,11 @@ func (i *indexAbbr) AbbreviateSha(s gattung.IdLike) (abbr string, err error) {
 		return
 	}
 
-	abbr = i.indexAbbrEncodableTridexes.Shas.Abbreviate(s.String())
+	abbr = s.String()
+
+	if i.GetKonfig().PrintAbbreviatedShas {
+		abbr = i.indexAbbrEncodableTridexes.Shas.Abbreviate(abbr)
+	}
 
 	return
 }
@@ -185,20 +189,23 @@ func (i *indexAbbr) AbbreviateHinweis(h gattung.IdMitKorper) (v string, err erro
 		return
 	}
 
-	var kopf, schwanz string
+	kopf := h.Kopf()
+	schwanz := h.Schwanz()
 
-	kopf = i.indexAbbrEncodableTridexes.HinweisKopfen.Abbreviate(h.Kopf())
-	schwanz = i.indexAbbrEncodableTridexes.HinweisSchwanzen.Abbreviate(h.Schwanz())
+	if i.GetKonfig().PrintAbbreviatedHinweisen {
+		kopf = i.indexAbbrEncodableTridexes.HinweisKopfen.Abbreviate(h.Kopf())
+		schwanz = i.indexAbbrEncodableTridexes.HinweisSchwanzen.Abbreviate(h.Schwanz())
 
-	if kopf == "" || schwanz == "" {
-		err = errors.Errorf("abbreviated kopf would be empty for %s", h)
-		errors.Log().PrintDebug(i.indexAbbrEncodableTridexes.HinweisKopfen)
-		return
-	}
+		if kopf == "" || schwanz == "" {
+			err = errors.Errorf("abbreviated kopf would be empty for %s", h)
+			errors.Log().PrintDebug(i.indexAbbrEncodableTridexes.HinweisKopfen)
+			return
+		}
 
-	if schwanz == "" {
-		err = errors.Errorf("abbreviated schwanz would be empty for %s", h)
-		return
+		if schwanz == "" {
+			err = errors.Errorf("abbreviated schwanz would be empty for %s", h)
+			return
+		}
 	}
 
 	v = fmt.Sprintf("%s/%s", kopf, schwanz)

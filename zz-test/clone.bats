@@ -65,11 +65,14 @@ function clone { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-  # TODO P0 fix issue with non-deterministic sha abbreviations
-	run zit clone -all -include-history -gattung zettel,typ "$wd1"
+	run zit clone \
+		-abbreviate-shas=false -abbreviate-hinweisen=false \
+		-all -include-history -gattung zettel,typ "$wd1"
+
+	assert_success
 	assert_output --partial '(updated) [!md@e1d34e9ec6d4f741d0566dbf6683d3644c3b6b3b27f718a6c09668a906c7df51]'
-	assert_output --partial '(updated) [konfig@e]'
-	assert_output --partial '(updated) [!md@e1]'
-	assert_output --partial '(updated) [konfig@e1d6]'
-	assert_output --partial '    (new) [one/uno@3 !md "wow"]'
+	assert_output --partial '(updated) [konfig@e1d64a20fd2ecdb4c85ad5cbfba792404daf8d236477e21deb378aa591776a0f]'
+	assert_output --partial '(updated) [!md@e1d34e9ec6d4f741d0566dbf6683d3644c3b6b3b27f718a6c09668a906c7df51]'
+	assert_output --partial '(updated) [konfig@e1d64a20fd2ecdb4c85ad5cbfba792404daf8d236477e21deb378aa591776a0f]'
+	assert_output --partial '    (new) [one/uno@37d3869e9b1711f009eabf69a2bf294cfd785f5b1c7463cba77d11d5f81f5e09 !md "wow"]'
 }

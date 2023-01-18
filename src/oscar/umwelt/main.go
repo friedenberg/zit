@@ -32,8 +32,9 @@ type Umwelt struct {
 	outIsTty bool
 	errIsTty bool
 
-	standort standort.Standort
-	konfig   konfig.Compiled
+	standort    standort.Standort
+	erworbenCli erworben.Cli
+	konfig      konfig.Compiled
 
 	storesInitialized     bool
 	lock                  *file_lock.Lock
@@ -50,6 +51,7 @@ func Make(kCli erworben.Cli) (u *Umwelt, err error) {
 		out:                     os.Stdout,
 		err:                     os.Stderr,
 		zettelVerzeichnissePool: collections.MakePool[zettel.Transacted](),
+		erworbenCli:             kCli,
 	}
 
 	if files.IsTty(u.in) {
@@ -64,16 +66,16 @@ func Make(kCli erworben.Cli) (u *Umwelt, err error) {
 		u.errIsTty = true
 	}
 
-	err = u.Initialize(kCli)
+	err = u.Initialize()
 
 	return
 }
 
 func (u *Umwelt) Reset() (err error) {
-	return u.Initialize(u.Konfig().Cli())
+	return u.Initialize()
 }
 
-func (u *Umwelt) Initialize(kCli erworben.Cli) (err error) {
+func (u *Umwelt) Initialize() (err error) {
 	if err = u.Flush(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -83,18 +85,18 @@ func (u *Umwelt) Initialize(kCli erworben.Cli) (err error) {
 
 	errors.TodoP4("find a better place for this")
 	{
-		if kCli.Verbose {
+		if u.erworbenCli.Verbose {
 			errors.SetVerbose()
 		} else {
 			log.SetOutput(ioutil.Discard)
 		}
 
-		if kCli.Todo {
+		if u.erworbenCli.Todo {
 			errors.SetTodoOn()
 		}
 
 		standortOptions := standort.Options{
-			BasePath: kCli.BasePath,
+			BasePath: u.erworbenCli.BasePath,
 		}
 
 		if standortOptions.BasePath == "" {
@@ -132,7 +134,7 @@ func (u *Umwelt) Initialize(kCli erworben.Cli) (err error) {
 
 		if k, err = konfig.Make(
 			u.standort,
-			kCli,
+			u.erworbenCli,
 		); err != nil {
 			err = errors.Wrap(err)
 			return

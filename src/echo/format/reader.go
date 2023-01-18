@@ -7,6 +7,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/collections"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type readerFrom[T any] struct {
@@ -31,7 +32,7 @@ func MakeReaderFrom[T any](
 func ReadSep(
 	delim byte,
 	r1 io.Reader,
-	rffs ...FuncSet,
+	rffs ...schnittstellen.FuncSetString,
 ) (n int64, err error) {
 	r := bufio.NewReader(r1)
 	i := 0
@@ -88,7 +89,7 @@ func ReadSep(
 
 func ReadLines(
 	r1 io.Reader,
-	rffs ...FuncReadLine,
+	rffs ...schnittstellen.FuncSetString,
 ) (n int64, err error) {
 	r := bufio.NewReader(r1)
 	i := 0
@@ -151,8 +152,8 @@ func ReadLines(
 }
 
 func MakeLineReaderKeyValues(
-	dict map[string]FuncReadLine,
-) FuncReadLine {
+	dict map[string]schnittstellen.FuncSetString,
+) schnittstellen.FuncSetString {
 	si, _ := errors.MakeStackInfo(1)
 
 	return func(line string) (err error) {
@@ -166,7 +167,7 @@ func MakeLineReaderKeyValues(
 		key := line[:loc]
 		value := line[loc+1:]
 
-		var reader FuncReadLine
+		var reader schnittstellen.FuncSetString
 		ok := false
 
 		if reader, ok = dict[key]; !ok {
@@ -187,8 +188,8 @@ func MakeLineReaderKeyValues(
 
 func MakeLineReaderKeyValue(
 	key string,
-	valueReader FuncReadLine,
-) FuncReadLine {
+	valueReader schnittstellen.FuncSetString,
+) schnittstellen.FuncSetString {
 	return func(line string) (err error) {
 		loc := strings.Index(line, " ")
 
@@ -217,8 +218,8 @@ func MakeLineReaderKeyValue(
 }
 
 func MakeLineReaderRepeat(
-	in FuncReadLine,
-) FuncReadLine {
+	in schnittstellen.FuncSetString,
+) schnittstellen.FuncSetString {
 	return func(line string) (err error) {
 		if err = in(line); err != nil {
 			if errors.Is(err, collections.ErrStopIteration) {
@@ -234,8 +235,8 @@ func MakeLineReaderRepeat(
 }
 
 func MakeLineReaderIgnoreErrors(
-	in FuncReadLine,
-) FuncReadLine {
+	in schnittstellen.FuncSetString,
+) schnittstellen.FuncSetString {
 	return func(line string) (err error) {
 		in(line)
 
@@ -243,7 +244,7 @@ func MakeLineReaderIgnoreErrors(
 	}
 }
 
-func MakeLineReaderNop() FuncReadLine {
+func MakeLineReaderNop() schnittstellen.FuncSetString {
 	return func(line string) (err error) {
 		return
 	}

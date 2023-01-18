@@ -2,6 +2,7 @@ package store_objekten
 
 import (
 	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/juliett/konfig"
 	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
@@ -22,6 +23,7 @@ type writeCloserFactory interface {
 }
 
 type ioFactory interface {
+	konfig.Getter
 	schnittstellen.AkteIOFactory
 	readCloserFactory
 	writeCloserFactory

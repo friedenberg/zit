@@ -14,8 +14,6 @@ type Format[T gattung.Element, T1 gattung.ElementPtr[T]] interface {
 	gattung.FormatWriter[T, T1]
 }
 
-type FuncSet = gattung.FuncSetString
-type FuncReadLine = gattung.FuncSetString
 type FuncReader func(io.Reader) (int64, error)
 type FuncReaderFormat[T any] func(io.Reader, *T) (int64, error)
 type FuncWriterElement[T any] func(io.Writer, *T) (int64, error)

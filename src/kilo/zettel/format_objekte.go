@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/format"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 func (z Objekte) ObjekteSha() (s sha.Sha, err error) {
@@ -82,7 +83,7 @@ func (f *FormatObjekte) Parse(
 		r,
 		format.MakeLineReaderRepeat(
 			format.MakeLineReaderKeyValues(
-				map[string]format.FuncReadLine{
+				map[string]schnittstellen.FuncSetString{
 					gattung.Akte.String():        z.Akte.Set,
 					gattung.Typ.String():         typLineReader,
 					gattung.AkteTyp.String():     typLineReader,

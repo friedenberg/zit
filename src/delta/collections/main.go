@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 //   _____
@@ -80,7 +81,7 @@ type ValueSetElementPtr[E gattung.Element] interface {
 	Setter
 }
 
-type FuncSetString = gattung.FuncSetString
+type FuncSetString = schnittstellen.FuncSetString
 
 type Setter interface {
 	Set(string) error

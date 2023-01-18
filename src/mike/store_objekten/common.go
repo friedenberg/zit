@@ -44,11 +44,19 @@ func (s common) AddSkuToBestandsaufnahme(sk sku.SkuLike, as sha.Sha) {
 	)
 }
 
+func (s common) GetKonfig() konfig.Compiled {
+	return *s.konfig
+}
+
 func (s common) Konfig() konfig.Compiled {
 	return *s.konfig
 }
 
 func (s common) KonfigPtr() *konfig.Compiled {
+	return s.konfig
+}
+
+func (s common) GetKonfigPtr() *konfig.Compiled {
 	return s.konfig
 }
 

@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/echo/format"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type Metadatei struct {
@@ -37,7 +38,7 @@ func (m *Metadatei) ReadFrom(r1 io.Reader) (n int64, err error) {
 		r,
 		format.MakeLineReaderRepeat(
 			format.MakeLineReaderKeyValues(
-				map[string]format.FuncReadLine{
+				map[string]schnittstellen.FuncSetString{
 					"%": format.MakeLineReaderNop(),
 					"-": mes.StringAdder(),
 					"!": m.Typ.Set,
