@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/angeboren"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/gattungen"
@@ -17,6 +18,7 @@ import (
 )
 
 type Clone struct {
+	Einleitung umwelt.Einleitung
 	GattungSet gattungen.MutableSet
 	All        bool
 }
@@ -27,6 +29,9 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &Clone{
 				GattungSet: gattungen.MakeMutableSet(gattung.Zettel),
+				Einleitung: umwelt.Einleitung{
+					Angeboren: angeboren.Default(),
+				},
 			}
 
 			gsvs := collections.MutableValueSet2[gattung.Gattung, *gattung.Gattung]{
@@ -36,13 +41,14 @@ func init() {
 
 			f.Var(gsvs, "gattung", "Gattung")
 			f.BoolVar(&c.All, "all", false, "pull all Objekten")
+			c.Einleitung.AddToFlags(f)
 
 			return c
 		},
 	)
 }
 
-func (c Clone) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
+func (c Clone) ProtoIdSet(_ *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 	is = id_set.MakeProtoIdSet()
 
 	if c.GattungSet.Contains(gattung.Zettel) {
@@ -52,21 +58,9 @@ func (c Clone) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 			},
 			id_set.ProtoId{
 				MutableId: &hinweis.Hinweis{},
-				Expand: func(v string) (out string, err error) {
-					var h hinweis.Hinweis
-					h, err = u.StoreObjekten().Abbr().ExpandHinweisString(v)
-					out = h.String()
-					return
-				},
 			},
 			id_set.ProtoId{
 				MutableId: &kennung.Etikett{},
-				Expand: func(v string) (out string, err error) {
-					var e kennung.Etikett
-					e, err = u.StoreObjekten().Abbr().ExpandEtikettString(v)
-					out = e.String()
-					return
-				},
 			},
 			id_set.ProtoId{
 				MutableId: &kennung.Typ{},
@@ -111,10 +105,15 @@ func (c Clone) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			errors.Log().Print("-all is set but arguments passed in. Ignore -all.")
 		}
 	} else if !c.All {
-		err = errors.Normalf("Refusing to pull all unless -all is set.")
+		err = errors.Normalf("Refusing to clone all unless -all is set.")
 		return
 	} else {
 		args = []string{}
+	}
+
+	if err = u.Einleitung(c.Einleitung); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	ps := c.ProtoIdSet(u)

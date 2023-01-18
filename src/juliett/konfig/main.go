@@ -194,7 +194,12 @@ func (kc *compiled) recompile() (err error) {
 				kc.ExtensionsToTypen[fe] = ct.Sku.Kennung.String()
 			}
 
-			kc.applyExpandedTyp(ct)
+			if ct == nil {
+				errors.Todo("determine why any Typen might be nil")
+				return
+			}
+
+			kc.applyExpandedTyp(*ct)
 
 			return
 		},
@@ -375,7 +380,7 @@ func (k *compiled) AddEtikett(
 	return
 }
 
-func (c *compiled) applyExpandedTyp(ct *typ.Transacted) {
+func (c *compiled) applyExpandedTyp(ct typ.Transacted) {
 	expandedActual := c.GetSortedTypenExpanded(ct.Sku.Kennung.String())
 
 	for _, ex := range expandedActual {

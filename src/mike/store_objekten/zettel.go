@@ -71,8 +71,12 @@ func makeZettelStore(
 	}
 
 	if s.hinweisen, err = hinweisen.New(s.common.Standort.DirZit()); err != nil {
-		err = errors.Wrap(err)
-		return
+		if errors.IsNotExist(err) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	if s.verzeichnisseSchwanzen, err = makeVerzeichnisseSchwanzen(

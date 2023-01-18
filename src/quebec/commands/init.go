@@ -22,10 +22,7 @@ func init() {
 				},
 			}
 
-			f.BoolVar(&c.Einleitung.DisableAge, "disable-age", false, "")
-			f.StringVar(&c.Einleitung.Yin, "yin", "", "File containing list of Kennung")
-			f.StringVar(&c.Einleitung.Yang, "yang", "", "File containing list of Kennung")
-			c.Einleitung.Angeboren.AddToFlags(f)
+			c.Einleitung.AddToFlags(f)
 
 			return c
 		},

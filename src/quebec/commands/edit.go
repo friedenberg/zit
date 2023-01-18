@@ -5,6 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
+	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/ts"
@@ -107,10 +108,15 @@ func (c Edit) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 			Build(),
 	}
 
-	files := checkoutResults.ToSliceFilesZettelen()
+	fs := checkoutResults.ToSliceFilesZettelen()
 
-	if _, err = openVimOp.Run(u, files...); err != nil {
-		err = errors.Wrap(err)
+	if _, err = openVimOp.Run(u, fs...); err != nil {
+		if errors.Is(err, files.ErrEmptyFileList) {
+			err = errors.Normalf("nothing to open in vim")
+		} else {
+			err = errors.Wrap(err)
+		}
+
 		return
 	}
 
@@ -124,7 +130,7 @@ func (c Edit) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 		OptionsReadExternal: store_fs.OptionsReadExternal{},
 	}
 
-	fs := checkoutResults.ToSliceFilesZettelen()
+	fs = checkoutResults.ToSliceFilesZettelen()
 
 	var possible cwd_files.CwdFiles
 

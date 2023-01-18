@@ -3,6 +3,7 @@ package umwelt
 import (
 	"bufio"
 	"encoding/gob"
+	"flag"
 	"io"
 	"os"
 	"path"
@@ -21,6 +22,13 @@ type Einleitung struct {
 	Yin        string
 	Yang       string
 	Angeboren  angeboren.Konfig
+}
+
+func (e *Einleitung) AddToFlags(f *flag.FlagSet) {
+	f.BoolVar(&e.DisableAge, "disable-age", false, "")
+	f.StringVar(&e.Yin, "yin", "", "File containing list of Kennung")
+	f.StringVar(&e.Yang, "yang", "", "File containing list of Kennung")
+	e.Angeboren.AddToFlags(f)
 }
 
 func (u *Umwelt) Einleitung(e Einleitung) (err error) {
@@ -86,6 +94,7 @@ func (u *Umwelt) Einleitung(e Einleitung) (err error) {
 		return
 	}
 
+	errors.TodoP2("determine if this should be an Einleitung option")
 	if err = initDefaultTypAndKonfig(u); err != nil {
 		err = errors.Wrap(err)
 		return

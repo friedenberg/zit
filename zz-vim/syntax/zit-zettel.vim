@@ -6,19 +6,30 @@ endif
 
 let zettel = expand("%:r")
 
+let g:markdown_syntax_conceal = 0
+
 if zettel != ""
   let zettelTypSyntax = system("zit show -format typ-vim-syntax-type " . zettel)
 
-  if zettelTypSyntax != ""
-    if zettelTypSyntax == "markdown"
-      let g:markdown_syntax_conceal = 0
-    endif
-
-    exec "source " . $VIMRUNTIME . "/syntax/" . zettelTypSyntax . ".vim"
-    " TODO-P3
-    " exec "source " . $VIMRUNTIME . "/ftplugin/" . zettelTypSyntax . ".vim"
-  else
+  if zettelTypSyntax == ""
     echom "Zettel Typ has no vim syntax set"
+    zettelTypSyntax = "markdown"
+  endif
+
+  let syntaxFile = $VIMRUNTIME . "/syntax/" . zettelTypSyntax . ".vim"
+  let ftpluginFile = $VIMRUNTIME . "/ftplugin/" . zettelTypSyntax . ".vim"
+
+  if filereadable(syntaxFile)
+    exec "source " . syntaxFile
+    " TODO-P3
+    " exec "source " . ftpluginFile
+  else
+    let syntaxFile = $VIMRUNTIME . "/syntax/markdown.vim"
+    let ftpluginFile = $VIMRUNTIME . "/ftplugin/markdown.vim"
+
+    exec "source " . syntaxFile
+    " TODO-P3
+    " exec "source " . ftpluginFile
   endif
 endif
 

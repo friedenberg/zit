@@ -31,12 +31,7 @@ func (c OpenVim) Run(
 	}
 
 	if err = files.OpenVimWithArgs(vimArgs, args...); err != nil {
-		if errors.Is(err, files.ErrEmptyFileList{}) {
-			err = errors.Normal(errors.Wrapf(err, "nothing to open in vim"))
-		} else {
-			err = errors.Wrap(err)
-		}
-
+		err = errors.Wrap(err)
 		return
 	}
 
