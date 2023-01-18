@@ -3,7 +3,7 @@ package age_io
 import (
 	"fmt"
 
-	"github.com/friedenberg/zit/src/foxtrot/sha"
+	"github.com/friedenberg/zit/src/bravo/sha"
 )
 
 type ErrAlreadyExists struct {

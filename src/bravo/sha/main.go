@@ -21,6 +21,10 @@ type PathComponents interface {
 	PathComponents() []string
 }
 
+type ShaLike interface {
+	GetSha() Sha
+}
+
 type Sha struct {
 	value string
 }

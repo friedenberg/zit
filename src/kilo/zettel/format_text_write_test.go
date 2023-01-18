@@ -7,9 +7,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/test_logz"
 	"github.com/friedenberg/zit/src/foxtrot/bezeichnung"
-	"github.com/friedenberg/zit/src/foxtrot/sha"
 	"github.com/friedenberg/zit/src/foxtrot/test_metadatei_io"
 	"github.com/friedenberg/zit/src/golf/standort"
 )

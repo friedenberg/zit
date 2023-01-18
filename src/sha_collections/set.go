@@ -1,4 +1,4 @@
-package sha
+package sha_collections
 
 import (
 	"crypto/sha256"
@@ -6,20 +6,21 @@ import (
 	"sort"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/delta/collections"
 )
 
-type Set = collections.ValueSet[Sha, *Sha]
-type MutableSet = collections.MutableValueSet[Sha, *Sha]
+type Set = collections.ValueSet[sha.Sha, *sha.Sha]
+type MutableSet = collections.MutableValueSet[sha.Sha, *sha.Sha]
 
-func MakeMutableSet(es ...Sha) (s MutableSet) {
+func MakeMutableSet(es ...sha.Sha) (s MutableSet) {
 	return MutableSet(collections.MakeMutableValueSet(es...))
 }
 
 func MakeMutableSetStrings(vs ...string) (s MutableSet, err error) {
-	var s1 collections.MutableValueSet[Sha, *Sha]
+	var s1 collections.MutableValueSet[sha.Sha, *sha.Sha]
 
-	if s1, err = collections.MakeMutableValueSetStrings[Sha, *Sha](vs...); err != nil {
+	if s1, err = collections.MakeMutableValueSetStrings[sha.Sha, *sha.Sha](vs...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -29,13 +30,13 @@ func MakeMutableSetStrings(vs ...string) (s MutableSet, err error) {
 	return
 }
 
-func ShaFromSet(s collections.SetLike[Sha]) Sha {
+func ShaFromSet(s collections.SetLike[sha.Sha]) sha.Sha {
 	hash := sha256.New()
 
-	elements := make([]Sha, 0, s.Len())
+	elements := make([]sha.Sha, 0, s.Len())
 
 	s.Each(
-		func(s Sha) (err error) {
+		func(s sha.Sha) (err error) {
 			elements = append(elements, s)
 			return
 		},
@@ -52,5 +53,5 @@ func ShaFromSet(s collections.SetLike[Sha]) Sha {
 		}
 	}
 
-	return FromHash(hash)
+	return sha.FromHash(hash)
 }

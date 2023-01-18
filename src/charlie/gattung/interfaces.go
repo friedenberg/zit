@@ -15,9 +15,7 @@ type GattungLike interface {
 	GetGattung() Gattung
 }
 
-type ShaLike interface {
-	GetSha() sha.Sha
-}
+type ShaLike = sha.ShaLike
 
 type IdLike interface {
 	fmt.Stringer

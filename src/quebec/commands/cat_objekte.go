@@ -5,10 +5,11 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/delta/collections"
-	"github.com/friedenberg/zit/src/foxtrot/sha"
 	"github.com/friedenberg/zit/src/golf/id_set"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
+	"github.com/friedenberg/zit/src/sha_collections"
 )
 
 type CatObjekte struct {
@@ -43,12 +44,18 @@ func (c CatObjekte) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 	return
 }
 
-func (c CatObjekte) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
+func (c CatObjekte) RunWithIds(
+	u *umwelt.Umwelt,
+	ids id_set.Set,
+) (err error) {
 	shas := ids.Shas.Copy()
 	return c.akten(u, shas)
 }
 
-func (c CatObjekte) akten(u *umwelt.Umwelt, shas sha.Set) (err error) {
+func (c CatObjekte) akten(
+	u *umwelt.Umwelt,
+	shas sha_collections.Set,
+) (err error) {
 	//TODO-P3 refactor into reusable
 	akteWriter := collections.MakeSyncSerializer(
 		func(rc io.ReadCloser) (err error) {

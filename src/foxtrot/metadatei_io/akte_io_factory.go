@@ -7,9 +7,8 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/gattung"
-
-	"github.com/friedenberg/zit/src/foxtrot/sha"
 )
 
 type nopAkteFactory struct{}

@@ -4,17 +4,18 @@ import (
 	"fmt"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/foxtrot/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/sha"
 	"github.com/friedenberg/zit/src/golf/hinweis"
 	"github.com/friedenberg/zit/src/golf/ts"
+	"github.com/friedenberg/zit/src/sha_collections"
 )
 
 // TODO-P4 move to kennung
 // TODO-P3 rewrite
 type Set struct {
-	Shas       sha.MutableSet
+	Shas       sha_collections.MutableSet
 	Etiketten  kennung.EtikettMutableSet
 	Hinweisen  hinweis.MutableSet
 	Typen      kennung.TypMutableSet
@@ -26,7 +27,7 @@ type Set struct {
 func Make(c int) Set {
 	return Set{
 		Timestamps: ts.MakeMutableSet(),
-		Shas:       sha.MakeMutableSet(),
+		Shas:       sha_collections.MakeMutableSet(),
 		Etiketten:  kennung.MakeEtikettMutableSet(),
 		Hinweisen:  hinweis.MakeMutableSet(),
 		Typen:      kennung.MakeTypMutableSet(),
