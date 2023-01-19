@@ -18,3 +18,11 @@ type ResetWither[T any] interface {
 	Ptr[T]
 	ResetWith(T)
 }
+
+type Keyer[T any] interface {
+	Key(T) string
+}
+
+type KeyPtrer[T any, T1 Ptr[T]] interface {
+	Key(T1) string
+}

@@ -1,17 +1,16 @@
 package collections
 
 import (
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type setPrivate[T any, T1 schnittstellen.Ptr[T]] struct {
 	Elements map[string]T1
-	gattung.Keyer[T, T1]
+	schnittstellen.KeyPtrer[T, T1]
 }
 
 func setPrivateFromSetLike[T any, T1 schnittstellen.Ptr[T]](
-	keyer gattung.Keyer[T, T1],
+	keyer schnittstellen.KeyPtrer[T, T1],
 	s1 SetLike[T1],
 ) (s setPrivate[T, T1]) {
 	l := 0
@@ -21,7 +20,7 @@ func setPrivateFromSetLike[T any, T1 schnittstellen.Ptr[T]](
 	}
 
 	s = setPrivate[T, T1]{
-		Keyer:    keyer,
+		KeyPtrer: keyer,
 		Elements: make(map[string]T1, l),
 	}
 
@@ -36,11 +35,11 @@ func setPrivateFromSetLike[T any, T1 schnittstellen.Ptr[T]](
 }
 
 func setPrivateFromSlice[T any, T1 schnittstellen.Ptr[T]](
-	keyer gattung.Keyer[T, T1],
+	keyer schnittstellen.KeyPtrer[T, T1],
 	es ...T1,
 ) (s setPrivate[T, T1]) {
 	s = setPrivate[T, T1]{
-		Keyer:    keyer,
+		KeyPtrer: keyer,
 		Elements: make(map[string]T1, len(es)),
 	}
 

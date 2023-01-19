@@ -5,7 +5,6 @@ import (
 	"encoding/gob"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
@@ -14,7 +13,7 @@ type Set2[T any, T1 schnittstellen.Ptr[T]] struct {
 }
 
 func Set2FromSlice[T any, T1 schnittstellen.Ptr[T]](
-	keyer gattung.Keyer[T, T1],
+	keyer schnittstellen.KeyPtrer[T, T1],
 	es ...T1,
 ) (s Set2[T, T1]) {
 	s.private = setPrivateFromSlice(keyer, es...)
@@ -23,7 +22,7 @@ func Set2FromSlice[T any, T1 schnittstellen.Ptr[T]](
 }
 
 func Set2FromSetLike[T any, T1 schnittstellen.Ptr[T]](
-	keyer gattung.Keyer[T, T1],
+	keyer schnittstellen.KeyPtrer[T, T1],
 	s1 SetLike[T1],
 ) (s Set2[T, T1]) {
 	s.private = setPrivateFromSetLike(keyer, s1)
