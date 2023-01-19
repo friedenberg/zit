@@ -1,7 +1,7 @@
 package zettel
 
 import (
-	"github.com/friedenberg/zit/src/schnittstellen"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
 type ObjekteParserContext struct {

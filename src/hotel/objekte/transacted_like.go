@@ -1,9 +1,9 @@
 package objekte
 
 import (
-	"github.com/friedenberg/zit/src/delta/collections"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/golf/sku"
-	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type TransactedLike interface {

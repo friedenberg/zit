@@ -2,7 +2,7 @@ package sku
 
 import (
 	"github.com/friedenberg/zit/src/bravo/int_value"
-	"github.com/friedenberg/zit/src/foxtrot/ts"
+	"github.com/friedenberg/zit/src/echo/ts"
 )
 
 type Verzeichnisse struct {

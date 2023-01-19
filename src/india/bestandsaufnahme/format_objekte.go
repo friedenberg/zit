@@ -4,7 +4,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/echo/format"
+	"github.com/friedenberg/zit/src/delta/format"
 )
 
 type formatObjekte struct {

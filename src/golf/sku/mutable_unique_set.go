@@ -3,7 +3,7 @@ package sku
 import (
 	"encoding/gob"
 
-	"github.com/friedenberg/zit/src/delta/collections"
+	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
 type MutableSetUnique = collections.MutableSet[SkuLike]

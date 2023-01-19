@@ -3,11 +3,11 @@ package zettel_checked_out
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/echo/format"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/delta/format"
+	"github.com/friedenberg/zit/src/echo/standort"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
-	"github.com/friedenberg/zit/src/foxtrot/standort"
 	"github.com/friedenberg/zit/src/kilo/zettel"
-	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 // (same|changed) [path@sha !typ "bez"]

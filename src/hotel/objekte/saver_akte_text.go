@@ -2,8 +2,8 @@ package objekte
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 // TODO-P3 rename to AkteSaver

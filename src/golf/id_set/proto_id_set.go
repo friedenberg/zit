@@ -2,7 +2,7 @@ package id_set
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/schnittstellen"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
 type ProtoIdSet struct {

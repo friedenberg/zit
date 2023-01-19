@@ -3,11 +3,11 @@ package etikett
 import (
 	"io"
 
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/echo/format"
-	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/standort"
-	"github.com/friedenberg/zit/src/schnittstellen"
+	"github.com/friedenberg/zit/src/delta/format"
+	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/echo/standort"
 )
 
 func MakeCliFormat(

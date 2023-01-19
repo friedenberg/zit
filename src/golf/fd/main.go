@@ -11,7 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/foxtrot/ts"
+	"github.com/friedenberg/zit/src/echo/ts"
 )
 
 type FD struct {

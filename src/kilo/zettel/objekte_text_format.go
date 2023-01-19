@@ -1,8 +1,8 @@
 package zettel
 
 import (
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/india/erworben"
-	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type objekteTextFormat struct {

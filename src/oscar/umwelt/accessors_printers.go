@@ -1,8 +1,8 @@
 package umwelt
 
 import (
-	"github.com/friedenberg/zit/src/delta/collections"
-	"github.com/friedenberg/zit/src/echo/format"
+	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/golf/fd"
 	"github.com/friedenberg/zit/src/india/erworben"
 	"github.com/friedenberg/zit/src/india/etikett"

@@ -1,6 +1,6 @@
 package hinweis
 
-import "github.com/friedenberg/zit/src/delta/collections"
+import "github.com/friedenberg/zit/src/charlie/collections"
 
 type MutableSet = collections.MutableValueSet[Hinweis, *Hinweis]
 

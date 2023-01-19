@@ -1,7 +1,7 @@
 package sku
 
 import (
-	"github.com/friedenberg/zit/src/delta/collections"
+	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
 type Sku2Heap = collections.Heap[Sku2]

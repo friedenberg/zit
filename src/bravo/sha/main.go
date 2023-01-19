@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/schnittstellen"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
 const (

@@ -2,13 +2,13 @@ package bestandsaufnahme
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/delta/collections"
-	"github.com/friedenberg/zit/src/foxtrot/standort"
+	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/echo/standort"
 	"github.com/friedenberg/zit/src/hotel/objekte"
-	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type Store interface {

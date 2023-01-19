@@ -3,10 +3,10 @@ package organize_text
 import (
 	"flag"
 
-	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/juliett/konfig"
 	zettel_pkg "github.com/friedenberg/zit/src/kilo/zettel"
-	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type Options struct {

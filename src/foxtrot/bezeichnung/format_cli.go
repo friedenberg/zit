@@ -3,7 +3,7 @@ package bezeichnung
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/echo/format"
+	"github.com/friedenberg/zit/src/delta/format"
 )
 
 func MakeCliFormat(

@@ -1,10 +1,10 @@
 package bestandsaufnahme
 
 import (
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/foxtrot/ts"
-	"github.com/friedenberg/zit/src/schnittstellen"
+	"github.com/friedenberg/zit/src/echo/ts"
 )
 
 type Objekte struct {

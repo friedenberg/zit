@@ -3,9 +3,9 @@ package zettel_external
 import (
 	"sync"
 
-	"github.com/friedenberg/zit/src/delta/collections"
+	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
-	"github.com/friedenberg/zit/src/foxtrot/ts"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 

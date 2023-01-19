@@ -1,8 +1,9 @@
 package umwelt
 
 import (
-	"github.com/friedenberg/zit/src/echo/format"
-	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/delta/format"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/bezeichnung"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/golf/fd"
@@ -12,7 +13,6 @@ import (
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/mike/zettel_checked_out"
 	"github.com/friedenberg/zit/src/november/store_fs"
-	"github.com/friedenberg/zit/src/schnittstellen"
 	"github.com/friedenberg/zit/src/sha_cli_format"
 )
 

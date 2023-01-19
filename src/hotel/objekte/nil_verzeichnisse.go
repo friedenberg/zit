@@ -1,6 +1,6 @@
 package objekte
 
-import "github.com/friedenberg/zit/src/schnittstellen"
+import "github.com/friedenberg/zit/src/alfa/schnittstellen"
 
 type NilVerzeichnisse[T schnittstellen.Objekte[T]] struct{}
 

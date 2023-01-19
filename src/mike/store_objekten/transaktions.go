@@ -5,9 +5,9 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/delta/collections"
-	"github.com/friedenberg/zit/src/delta/id"
-	"github.com/friedenberg/zit/src/foxtrot/ts"
+	"github.com/friedenberg/zit/src/bravo/id"
+	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/golf/transaktion"
 )
 

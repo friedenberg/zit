@@ -7,11 +7,11 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/kilo/zettel"
-	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 func (i Zettelen) PageForHinweis(h hinweis.Hinweis) (n int, err error) {

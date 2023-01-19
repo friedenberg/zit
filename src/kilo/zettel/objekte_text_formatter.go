@@ -7,15 +7,15 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/script_config"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/delta/metadatei_io"
-	"github.com/friedenberg/zit/src/echo/format"
-	"github.com/friedenberg/zit/src/foxtrot/standort"
+	"github.com/friedenberg/zit/src/charlie/metadatei_io"
+	"github.com/friedenberg/zit/src/delta/format"
+	"github.com/friedenberg/zit/src/echo/standort"
 	"github.com/friedenberg/zit/src/india/erworben"
 	"github.com/friedenberg/zit/src/india/typ"
-	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 const MetadateiBoundary = metadatei_io.Boundary

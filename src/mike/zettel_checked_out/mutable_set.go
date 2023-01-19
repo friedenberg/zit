@@ -1,7 +1,7 @@
 package zettel_checked_out
 
 import (
-	"github.com/friedenberg/zit/src/delta/collections"
+	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/india/zettel_external"
 )
 

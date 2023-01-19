@@ -3,9 +3,9 @@ package umwelt
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/delta/collections"
-	"github.com/friedenberg/zit/src/foxtrot/standort"
-	"github.com/friedenberg/zit/src/foxtrot/ts"
+	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/echo/standort"
+	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/juliett/konfig"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/mike/store_objekten"

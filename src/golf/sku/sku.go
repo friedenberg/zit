@@ -5,12 +5,12 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/delta/collections"
-	"github.com/friedenberg/zit/src/echo/format"
-	"github.com/friedenberg/zit/src/foxtrot/ts"
-	"github.com/friedenberg/zit/src/schnittstellen"
+	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/delta/format"
+	"github.com/friedenberg/zit/src/echo/ts"
 )
 
 type Sku struct {

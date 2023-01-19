@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
 type External[T kennung.KennungLike[T], T1 kennung.KennungLikePtr[T]] struct {

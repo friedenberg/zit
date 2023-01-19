@@ -3,9 +3,9 @@ package sku
 import (
 	"fmt"
 
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/int_value"
-	"github.com/friedenberg/zit/src/foxtrot/ts"
-	"github.com/friedenberg/zit/src/schnittstellen"
+	"github.com/friedenberg/zit/src/echo/ts"
 )
 
 type Mutter [2]ts.Time

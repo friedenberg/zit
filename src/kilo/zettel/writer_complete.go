@@ -5,7 +5,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/delta/collections"
+	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
 type WriterComplete struct {

@@ -1,7 +1,7 @@
 package transaktion
 
 import (
-	"github.com/friedenberg/zit/src/foxtrot/ts"
+	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/golf/sku"
 )
 
