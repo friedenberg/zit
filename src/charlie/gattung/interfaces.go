@@ -5,37 +5,12 @@ import (
 )
 
 type FuncAbbrId func(schnittstellen.Value) (string, error)
-type FuncAbbrIdMitKorper func(IdMitKorper) (string, error)
+type FuncAbbrIdMitKorper func(schnittstellen.Korper) (string, error)
 
 type ShaLike = schnittstellen.Sha
 
-type IdMitKorper interface {
-	schnittstellen.Value
-	Kopf() string
-	Schwanz() string
-}
-
 type Keyer[T any, T1 schnittstellen.Ptr[T]] interface {
 	Key(T1) string
-}
-
-//   ___    _            _   _  __ _
-//  |_ _|__| | ___ _ __ | |_(_)/ _(_) ___ _ __
-//   | |/ _` |/ _ \ '_ \| __| | |_| |/ _ \ '__|
-//   | | (_| |  __/ | | | |_| |  _| |  __/ |
-//  |___\__,_|\___|_| |_|\__|_|_| |_|\___|_|
-//
-
-// TODO-P2 rename to ObjekteKennung
-type Identifier[T any] interface {
-	schnittstellen.GattungGetter
-	schnittstellen.Equatable[T]
-	schnittstellen.IdLike
-}
-
-type IdentifierPtr[T schnittstellen.Value] interface {
-	schnittstellen.ValuePtr[T]
-	schnittstellen.Resetable[T]
 }
 
 //   ____  _                     _

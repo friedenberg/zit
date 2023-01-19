@@ -184,7 +184,7 @@ func (i *indexAbbr) ExpandShaString(st string) (s sha.Sha, err error) {
 	return
 }
 
-func (i *indexAbbr) AbbreviateHinweis(h gattung.IdMitKorper) (v string, err error) {
+func (i *indexAbbr) AbbreviateHinweis(h schnittstellen.Korper) (v string, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return

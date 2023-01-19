@@ -11,12 +11,12 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/golf/id_set"
 	"github.com/friedenberg/zit/src/india/erworben"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type Exec struct {
@@ -100,7 +100,7 @@ func (c Exec) getZettel(
 		return
 	}
 
-	var idd gattung.IdMitKorper
+	var idd schnittstellen.Korper
 	ok := false
 
 	if idd, ok = is.AnyShaOrHinweis(); !ok {

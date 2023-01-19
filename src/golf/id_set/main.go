@@ -5,7 +5,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/ts"
@@ -78,8 +77,8 @@ func (s Set) Len() int {
 	return s.Shas.Len() + s.Etiketten.Len() + s.Hinweisen.Len() + s.Typen.Len() + s.Timestamps.Len() + k
 }
 
-func (s Set) AnyShasOrHinweisen() (ids []gattung.IdMitKorper) {
-	ids = make([]gattung.IdMitKorper, 0, s.Shas.Len()+s.Hinweisen.Len())
+func (s Set) AnyShasOrHinweisen() (ids []schnittstellen.Korper) {
+	ids = make([]schnittstellen.Korper, 0, s.Shas.Len()+s.Hinweisen.Len())
 
 	s.Shas.Each(
 		func(sh sha.Sha) (err error) {
@@ -100,7 +99,7 @@ func (s Set) AnyShasOrHinweisen() (ids []gattung.IdMitKorper) {
 	return
 }
 
-func (s Set) AnyShaOrHinweis() (i1 gattung.IdMitKorper, ok bool) {
+func (s Set) AnyShaOrHinweis() (i1 schnittstellen.Korper, ok bool) {
 	ids := s.AnyShasOrHinweisen()
 
 	if len(ids) > 0 {

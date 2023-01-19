@@ -15,6 +15,7 @@ type IdLike interface {
 }
 
 type Id[T Value] interface {
+	Value
 	GattungGetter
 	Equatable[T]
 }
@@ -22,4 +23,5 @@ type Id[T Value] interface {
 type IdPtr[T Value] interface {
 	Id[T]
 	ValuePtr[T]
+	Resetable[T]
 }

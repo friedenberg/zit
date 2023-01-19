@@ -25,8 +25,8 @@ type AkteStorer[T any] interface {
 type TransactedInflator[
 	T schnittstellen.Objekte[T],
 	T1 schnittstellen.ObjektePtr[T],
-	T2 gattung.Identifier[T2],
-	T3 gattung.IdentifierPtr[T2],
+	T2 schnittstellen.Id[T2],
+	T3 schnittstellen.IdPtr[T2],
 	T4 gattung.Verzeichnisse[T],
 	T5 gattung.VerzeichnissePtr[T4, T],
 ] interface {
@@ -39,8 +39,8 @@ type TransactedInflator[
 type transactedInflator[
 	T schnittstellen.Objekte[T],
 	T1 schnittstellen.ObjektePtr[T],
-	T2 gattung.Identifier[T2],
-	T3 gattung.IdentifierPtr[T2],
+	T2 schnittstellen.Id[T2],
+	T3 schnittstellen.IdPtr[T2],
 	T4 gattung.Verzeichnisse[T],
 	T5 gattung.VerzeichnissePtr[T4, T],
 ] struct {
@@ -54,8 +54,8 @@ type transactedInflator[
 func MakeTransactedInflator[
 	T schnittstellen.Objekte[T],
 	T1 schnittstellen.ObjektePtr[T],
-	T2 gattung.Identifier[T2],
-	T3 gattung.IdentifierPtr[T2],
+	T2 schnittstellen.Id[T2],
+	T3 schnittstellen.IdPtr[T2],
 	T4 gattung.Verzeichnisse[T],
 	T5 gattung.VerzeichnissePtr[T4, T],
 ](

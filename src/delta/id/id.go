@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
@@ -21,12 +20,12 @@ type TypedId interface {
 // 	return path.Join(pc...)
 // }
 
-func Path(i gattung.IdMitKorper, pc ...string) string {
+func Path(i schnittstellen.Korper, pc ...string) string {
 	pc = append(pc, i.Kopf(), i.Schwanz())
 	return path.Join(pc...)
 }
 
-func MakeDirIfNecessary(i gattung.IdMitKorper, pc ...string) (p string, err error) {
+func MakeDirIfNecessary(i schnittstellen.Korper, pc ...string) (p string, err error) {
 	p = Path(i, pc...)
 	dir := path.Dir(p)
 
