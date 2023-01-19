@@ -3,10 +3,10 @@ package konfig
 import (
 	"encoding/gob"
 
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/india/etikett"
 	"github.com/friedenberg/zit/src/india/typ"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 func init() {
@@ -14,14 +14,20 @@ func init() {
 	gob.RegisterName("etikettSet", makeCompiledEtikettSet(nil))
 }
 
-type set[E gattung.Transacted[E], EPtr gattung.TransactedPtr[E]] struct {
+type set[
+	E schnittstellen.Transacted[E],
+	EPtr schnittstellen.TransactedPtr[E],
+] struct {
 	collections.Set2[E, EPtr]
 }
 
 type etikettSet = set[etikett.Transacted, *etikett.Transacted]
 
 func makeCompiledEtikettSetFromSlice(s1 []*etikett.Transacted) (s etikettSet) {
-	s.Set2 = collections.Set2FromSlice[etikett.Transacted, *etikett.Transacted](s, s1...)
+	s.Set2 = collections.Set2FromSlice[
+		etikett.Transacted,
+		*etikett.Transacted,
+	](s, s1...)
 
 	return
 }

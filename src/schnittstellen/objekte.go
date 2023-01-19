@@ -29,3 +29,15 @@ type VerzeichnissePtr[T any, T1 Objekte[T1]] interface {
 	Ptr[T]
 	ResetWithObjekte(T1)
 }
+
+type Transacted[T any] interface {
+	Stored
+	GetKennungString() string
+}
+
+type TransactedPtr[T any] interface {
+	Transacted[T]
+	Ptr[T]
+	Resetable[T]
+	StoredPtr
+}

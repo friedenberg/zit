@@ -14,15 +14,3 @@ type Keyer[T any, T1 schnittstellen.Ptr[T]] interface {
 //    | || | | (_| | | | \__ \ (_| | (__| ||  __/ (_| |
 //    |_||_|  \__,_|_| |_|___/\__,_|\___|\__\___|\__,_|
 //
-
-type Transacted[T any] interface {
-	schnittstellen.Stored
-	GetKennungString() string
-}
-
-type TransactedPtr[T any] interface {
-	Transacted[T]
-	schnittstellen.Ptr[T]
-	schnittstellen.Resetable[T]
-	schnittstellen.StoredPtr
-}
