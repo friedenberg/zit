@@ -71,7 +71,7 @@ func (z Objekte) IsEmpty() bool {
 func (z *Objekte) Reset() {
 	z.Akte = sha.Sha{}
 	z.Typ = kennung.Typ{}
-	z.Bezeichnung = bezeichnung.Make("")
+	z.Bezeichnung.Reset()
 	z.Etiketten = kennung.MakeEtikettSet()
 }
 

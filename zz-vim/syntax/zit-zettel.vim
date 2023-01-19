@@ -9,11 +9,11 @@ let zettel = expand("%:r")
 let g:markdown_syntax_conceal = 0
 
 if zettel != ""
-  let zettelTypSyntax = system("zit show -format typ-vim-syntax-type " . zettel)
+  let zettelTypSyntax = system("zit show -include-cwd -format typ-vim-syntax-type " . zettel)
 
   if zettelTypSyntax == ""
     echom "Zettel Typ has no vim syntax set"
-    zettelTypSyntax = "markdown"
+    let zettelTypSyntax = "markdown"
   endif
 
   let syntaxFile = $VIMRUNTIME . "/syntax/" . zettelTypSyntax . ".vim"

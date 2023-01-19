@@ -42,7 +42,7 @@ func Make(
 	a age.Age,
 	k *konfig.Compiled,
 	st standort.Standort,
-	p *collections.Pool[zettel.Transacted],
+	p *collections.Pool[zettel.Transacted, *zettel.Transacted],
 ) (s *Store, err error) {
 	s = &Store{
 		common: common{

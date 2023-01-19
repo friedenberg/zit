@@ -36,6 +36,10 @@ func (a Bezeichnung) WasSet() bool {
 	return a.wasSet
 }
 
+func (a *Bezeichnung) Reset() {
+	a.value = ""
+}
+
 func (a Bezeichnung) IsEmpty() bool {
 	return a.value == ""
 }

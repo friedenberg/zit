@@ -51,7 +51,7 @@ type AkteFormat = schnittstellen.Format[
 type store struct {
 	standort standort.Standort
 	oaf      schnittstellen.ObjekteAkteFactory
-	pool     *collections.Pool[Objekte]
+	pool     *collections.Pool[Objekte, *Objekte]
 	ObjekteFormat
 	AkteFormat
 	ObjekteInflator

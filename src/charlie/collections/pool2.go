@@ -7,21 +7,16 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
-type pool2[T any, TPtr schnittstellen.Ptr[T]] struct {
+type pool2[T any, TPtr schnittstellen.Resetable[T]] struct {
 	inner *sync.Pool
 }
 
-func MakePool2[T any, TPtr schnittstellen.Ptr[T]]() *pool2[T, TPtr] {
+func MakePool2[T any, TPtr schnittstellen.Resetable[T]]() *pool2[T, TPtr] {
 	return &pool2[T, TPtr]{
 		inner: &sync.Pool{
 			New: func() interface{} {
 				o := new(T)
-
-				ii := interface{}(o)
-
-				if r, ok := ii.(Resettable[TPtr]); ok {
-					r.Reset(nil)
-				}
+				TPtr(o).Reset()
 
 				return o
 			},
@@ -63,12 +58,7 @@ func (ip pool2[T, TPtr]) Put(i TPtr) (err error) {
 		return
 	}
 
-	ii := interface{}(i)
-
-	if r, ok := ii.(Resettable[TPtr]); ok {
-		r.Reset(nil)
-	}
-
+	i.Reset()
 	ip.inner.Put(i)
 
 	return
