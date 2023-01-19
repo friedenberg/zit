@@ -9,8 +9,8 @@ import (
 
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/test_logz"
+	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
-	"github.com/friedenberg/zit/src/echo/standort"
 	"github.com/friedenberg/zit/src/echo/test_metadatei_io"
 )
 
