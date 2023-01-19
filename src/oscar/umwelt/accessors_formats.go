@@ -26,11 +26,11 @@ func (u *Umwelt) FormatColorWriter() format.FuncColorWriter {
 
 func (u *Umwelt) FormatSha(
 	a schnittstellen.FuncAbbreviateValue,
-) format.FormatWriterFunc[schnittstellen.Sha] {
+) schnittstellen.FuncWriterFormat[schnittstellen.Sha] {
 	return sha_cli_format.MakeCliFormat(u.FormatColorWriter(), a)
 }
 
-func (u *Umwelt) FormatHinweis() format.FormatWriterFunc[hinweis.Hinweis] {
+func (u *Umwelt) FormatHinweis() schnittstellen.FuncWriterFormat[hinweis.Hinweis] {
 	var a schnittstellen.FuncAbbreviateKorper
 
 	if u.konfig.PrintAbbreviatedHinweisen {
@@ -45,21 +45,21 @@ func (u *Umwelt) FormatHinweis() format.FormatWriterFunc[hinweis.Hinweis] {
 	)
 }
 
-func (u *Umwelt) FormatBezeichnung() format.FormatWriterFunc[bezeichnung.Bezeichnung] {
+func (u *Umwelt) FormatBezeichnung() schnittstellen.FuncWriterFormat[bezeichnung.Bezeichnung] {
 	return bezeichnung.MakeCliFormat(u.FormatColorWriter())
 }
 
-func (u *Umwelt) FormatTyp() format.FormatWriterFunc[kennung.Typ] {
+func (u *Umwelt) FormatTyp() schnittstellen.FuncWriterFormat[kennung.Typ] {
 	return typ.MakeCliFormat(u.FormatColorWriter())
 }
 
-func (u *Umwelt) FormatEtikett() format.FormatWriterFunc[kennung.Etikett] {
+func (u *Umwelt) FormatEtikett() schnittstellen.FuncWriterFormat[kennung.Etikett] {
 	return etikett.MakeCliFormat(u.FormatColorWriter())
 }
 
 func (u *Umwelt) FormatTypTransacted(
 	verb string,
-) format.FormatWriterFunc[typ.Transacted] {
+) schnittstellen.FuncWriterFormat[typ.Transacted] {
 	return typ.MakeCliFormatTransacted(
 		u.Standort(),
 		u.FormatColorWriter(),
@@ -71,7 +71,7 @@ func (u *Umwelt) FormatTypTransacted(
 
 func (u *Umwelt) FormatEtikettTransacted(
 	verb string,
-) format.FormatWriterFunc[etikett.Transacted] {
+) schnittstellen.FuncWriterFormat[etikett.Transacted] {
 	return etikett.MakeCliFormatTransacted(
 		u.Standort(),
 		u.FormatColorWriter(),
@@ -81,7 +81,7 @@ func (u *Umwelt) FormatEtikettTransacted(
 	)
 }
 
-func (u *Umwelt) FormatTypCheckedOut() format.FormatWriterFunc[typ.External] {
+func (u *Umwelt) FormatTypCheckedOut() schnittstellen.FuncWriterFormat[typ.External] {
 	return typ.MakeCliFormatExternal(
 		u.Standort(),
 		u.FormatColorWriter(),
@@ -90,7 +90,7 @@ func (u *Umwelt) FormatTypCheckedOut() format.FormatWriterFunc[typ.External] {
 	)
 }
 
-func (u *Umwelt) FormatZettel() format.FormatWriterFunc[zettel.Objekte] {
+func (u *Umwelt) FormatZettel() schnittstellen.FuncWriterFormat[zettel.Objekte] {
 	return zettel.MakeCliFormat(
 		u.FormatBezeichnung(),
 		format.MakeFormatStringer[kennung.EtikettSet](),
@@ -98,7 +98,7 @@ func (u *Umwelt) FormatZettel() format.FormatWriterFunc[zettel.Objekte] {
 	)
 }
 
-func (u *Umwelt) FormatZettelExternal() format.FormatWriterFunc[zettel_external.Zettel] {
+func (u *Umwelt) FormatZettelExternal() schnittstellen.FuncWriterFormat[zettel_external.Zettel] {
 	return zettel_external.MakeCliFormat(
 		u.Standort(),
 		u.FormatColorWriter(),
@@ -108,14 +108,14 @@ func (u *Umwelt) FormatZettelExternal() format.FormatWriterFunc[zettel_external.
 	)
 }
 
-func (u *Umwelt) FormatZettelExternalFD() format.FormatWriterFunc[fd.FD] {
+func (u *Umwelt) FormatZettelExternalFD() schnittstellen.FuncWriterFormat[fd.FD] {
 	return zettel_external.MakeCliFormatFD(
 		u.Standort(),
 		u.FormatColorWriter(),
 	)
 }
 
-func (u *Umwelt) FormatZettelCheckedOut() format.FormatWriterFunc[zettel_checked_out.Zettel] {
+func (u *Umwelt) FormatZettelCheckedOut() schnittstellen.FuncWriterFormat[zettel_checked_out.Zettel] {
 	return zettel_checked_out.MakeCliFormat(
 		u.Standort(),
 		u.FormatColorWriter(),
@@ -125,7 +125,7 @@ func (u *Umwelt) FormatZettelCheckedOut() format.FormatWriterFunc[zettel_checked
 	)
 }
 
-func (u *Umwelt) FormatZettelTransacted() format.FormatWriterFunc[zettel.Transacted] {
+func (u *Umwelt) FormatZettelTransacted() schnittstellen.FuncWriterFormat[zettel.Transacted] {
 	return zettel.MakeCliFormatTransacted(
 		u.FormatHinweis(),
 		u.FormatSha(u.StoreObjekten().Abbr().AbbreviateSha),
@@ -133,14 +133,14 @@ func (u *Umwelt) FormatZettelTransacted() format.FormatWriterFunc[zettel.Transac
 	)
 }
 
-func (u *Umwelt) FormatZettelTransactedDelta(verb string) format.FormatWriterFunc[zettel.Transacted] {
+func (u *Umwelt) FormatZettelTransactedDelta(verb string) schnittstellen.FuncWriterFormat[zettel.Transacted] {
 	return zettel.MakeCliFormatTransactedDelta(
 		verb,
 		u.FormatZettelTransacted(),
 	)
 }
 
-func (u *Umwelt) FormatFileNotRecognized() format.FormatWriterFunc[fd.FD] {
+func (u *Umwelt) FormatFileNotRecognized() schnittstellen.FuncWriterFormat[fd.FD] {
 	return store_fs.MakeCliFormatNotRecognized(
 		u.FormatColorWriter(),
 		u.Standort(),
@@ -148,7 +148,7 @@ func (u *Umwelt) FormatFileNotRecognized() format.FormatWriterFunc[fd.FD] {
 	)
 }
 
-func (u *Umwelt) FormatFileRecognized() format.FormatWriterFunc[store_fs.FileRecognized] {
+func (u *Umwelt) FormatFileRecognized() schnittstellen.FuncWriterFormat[store_fs.FileRecognized] {
 	return store_fs.MakeCliFormatRecognized(
 		u.FormatColorWriter(),
 		u.Standort(),
@@ -157,14 +157,14 @@ func (u *Umwelt) FormatFileRecognized() format.FormatWriterFunc[store_fs.FileRec
 	)
 }
 
-func (u *Umwelt) FormatDirDeleted() format.FormatWriterFunc[store_fs.Dir] {
+func (u *Umwelt) FormatDirDeleted() schnittstellen.FuncWriterFormat[store_fs.Dir] {
 	return store_fs.MakeCliFormatDirDeleted(
 		u.FormatColorWriter(),
 		u.Standort(),
 	)
 }
 
-func (u *Umwelt) FormatFDDeleted() format.FormatWriterFunc[fd.FD] {
+func (u *Umwelt) FormatFDDeleted() schnittstellen.FuncWriterFormat[fd.FD] {
 	return store_fs.MakeCliFormatFDDeleted(
 		u.FormatColorWriter(),
 		u.Standort(),

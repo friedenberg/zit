@@ -5,33 +5,24 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
-type FuncReader func(io.Reader) (int64, error)
-type FuncReaderFormat[T any] func(io.Reader, *T) (int64, error)
-type FuncWriterElement[T any] func(io.Writer, *T) (int64, error)
-type FuncWriter = WriterFunc
-
-// TODO rename to Func-prefix
-type WriterFunc func(io.Writer) (int64, error)
-type FormatWriterFunc[T any] func(io.Writer, T) (int64, error)
-
-// type FormatWriterFunc[T any] func(io.Writer, *T) (int64, error)
-type FuncColorWriter func(WriterFunc, ColorType) WriterFunc
+type FuncColorWriter func(schnittstellen.FuncWriter, ColorType) schnittstellen.FuncWriter
 
 func MakeWriter[T any](
-	wff FormatWriterFunc[T],
+	wff schnittstellen.FuncWriterFormat[T],
 	e T,
-) WriterFunc {
+) schnittstellen.FuncWriter {
 	return func(w io.Writer) (int64, error) {
 		return wff(w, e)
 	}
 }
 
 func MakeWriterPtr[T any](
-	wff FormatWriterFunc[*T],
+	wff schnittstellen.FuncWriterFormat[*T],
 	e *T,
-) WriterFunc {
+) schnittstellen.FuncWriter {
 	return func(w io.Writer) (int64, error) {
 		return wff(w, e)
 	}
@@ -40,7 +31,7 @@ func MakeWriterPtr[T any](
 func MakeFormatString(
 	f string,
 	vs ...interface{},
-) WriterFunc {
+) schnittstellen.FuncWriter {
 	return func(w io.Writer) (n int64, err error) {
 		var n1 int
 
@@ -58,7 +49,7 @@ func MakeFormatString(
 
 func MakeStringer(
 	v fmt.Stringer,
-) WriterFunc {
+) schnittstellen.FuncWriter {
 	return func(w io.Writer) (n int64, err error) {
 		var n1 int
 
@@ -74,7 +65,7 @@ func MakeStringer(
 	}
 }
 
-func MakeFormatStringer[T fmt.Stringer]() FormatWriterFunc[T] {
+func MakeFormatStringer[T fmt.Stringer]() schnittstellen.FuncWriterFormat[T] {
 	return func(w io.Writer, e T) (n int64, err error) {
 		var n1 int
 

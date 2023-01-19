@@ -11,7 +11,7 @@ import (
 )
 
 type readerFrom[T any] struct {
-	rf FuncReaderFormat[T]
+	rf schnittstellen.FuncReaderFormat[T]
 	e  *T
 }
 
@@ -20,7 +20,7 @@ func (rf readerFrom[T]) ReadFrom(r io.Reader) (n int64, err error) {
 }
 
 func MakeReaderFrom[T any](
-	rf FuncReaderFormat[T],
+	rf schnittstellen.FuncReaderFormat[T],
 	e *T,
 ) io.ReaderFrom {
 	return readerFrom[T]{

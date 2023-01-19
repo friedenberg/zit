@@ -16,10 +16,10 @@ import (
 func MakeCliFormat(
 	s standort.Standort,
 	cw format.FuncColorWriter,
-	hf format.FormatWriterFunc[hinweis.Hinweis],
-	sf format.FormatWriterFunc[schnittstellen.Sha],
-	zf format.FormatWriterFunc[zettel.Objekte],
-) format.FormatWriterFunc[Zettel] {
+	hf schnittstellen.FuncWriterFormat[hinweis.Hinweis],
+	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
+	zf schnittstellen.FuncWriterFormat[zettel.Objekte],
+) schnittstellen.FuncWriterFormat[Zettel] {
 	return func(w io.Writer, z Zettel) (n int64, err error) {
 		switch {
 		case z.AkteFD.Path != "" && z.ZettelFD.Path != "":
@@ -76,7 +76,7 @@ func MakeCliFormat(
 func MakeCliFormatFD(
 	s standort.Standort,
 	cw format.FuncColorWriter,
-) format.FormatWriterFunc[fd.FD] {
+) schnittstellen.FuncWriterFormat[fd.FD] {
 	return func(w io.Writer, fd fd.FD) (n int64, err error) {
 		return format.Write(
 			w,

@@ -3,12 +3,13 @@ package bezeichnung
 import (
 	"io"
 
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/delta/format"
 )
 
 func MakeCliFormat(
 	cw format.FuncColorWriter,
-) format.FormatWriterFunc[Bezeichnung] {
+) schnittstellen.FuncWriterFormat[Bezeichnung] {
 	return func(w io.Writer, b1 Bezeichnung) (n int64, err error) {
 		b := b1.value
 

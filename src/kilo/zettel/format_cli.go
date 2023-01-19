@@ -13,12 +13,12 @@ import (
 
 // !typ "bez"
 func MakeCliFormat(
-	bf format.FormatWriterFunc[bezeichnung.Bezeichnung],
-	ef format.FormatWriterFunc[kennung.EtikettSet],
-	tf format.FormatWriterFunc[kennung.Typ],
-) format.FormatWriterFunc[Objekte] {
+	bf schnittstellen.FuncWriterFormat[bezeichnung.Bezeichnung],
+	ef schnittstellen.FuncWriterFormat[kennung.EtikettSet],
+	tf schnittstellen.FuncWriterFormat[kennung.Typ],
+) schnittstellen.FuncWriterFormat[Objekte] {
 	return func(w io.Writer, z Objekte) (n int64, err error) {
-		var lastWriter format.WriterFunc
+		var lastWriter schnittstellen.FuncWriter
 
 		if z.Bezeichnung.IsEmpty() {
 			lastWriter = format.MakeWriter(ef, z.Etiketten)
@@ -37,10 +37,10 @@ func MakeCliFormat(
 
 // [kopf/schwanz@sha !typ]
 func MakeCliFormatTransacted(
-	hf format.FormatWriterFunc[hinweis.Hinweis],
-	sf format.FormatWriterFunc[schnittstellen.Sha],
-	zf format.FormatWriterFunc[Objekte],
-) format.FormatWriterFunc[Transacted] {
+	hf schnittstellen.FuncWriterFormat[hinweis.Hinweis],
+	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
+	zf schnittstellen.FuncWriterFormat[Objekte],
+) schnittstellen.FuncWriterFormat[Transacted] {
 	return func(w io.Writer, z Transacted) (n int64, err error) {
 		return format.Write(
 			w,
@@ -58,8 +58,8 @@ func MakeCliFormatTransacted(
 // (new|unchanged|updated|archived) [kopf/schwanz@sha !typ]
 func MakeCliFormatTransactedDelta(
 	verb string,
-	ztf format.FormatWriterFunc[Transacted],
-) format.FormatWriterFunc[Transacted] {
+	ztf schnittstellen.FuncWriterFormat[Transacted],
+) schnittstellen.FuncWriterFormat[Transacted] {
 	return func(w io.Writer, z Transacted) (n int64, err error) {
 		return format.Write(
 			w,

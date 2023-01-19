@@ -3,6 +3,7 @@ package store_fs
 import (
 	"io"
 
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/echo/standort"
 	"github.com/friedenberg/zit/src/golf/fd"
@@ -20,7 +21,7 @@ func (d Dir) String() string {
 func MakeCliFormatDirDeleted(
 	cw format.FuncColorWriter,
 	s standort.Standort,
-) format.FormatWriterFunc[Dir] {
+) schnittstellen.FuncWriterFormat[Dir] {
 	return func(w io.Writer, d Dir) (n int64, err error) {
 		return format.Write(
 			w,
@@ -36,8 +37,8 @@ func MakeCliFormatDirDeleted(
 func MakeCliFormatFDDeleted(
 	cw format.FuncColorWriter,
 	s standort.Standort,
-	fdw format.FormatWriterFunc[fd.FD],
-) format.FormatWriterFunc[fd.FD] {
+	fdw schnittstellen.FuncWriterFormat[fd.FD],
+) schnittstellen.FuncWriterFormat[fd.FD] {
 	return func(w io.Writer, fd fd.FD) (n int64, err error) {
 		return format.Write(
 			w,

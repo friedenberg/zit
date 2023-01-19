@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
@@ -53,7 +54,7 @@ import (
 
 func Write(
 	w io.Writer,
-	wffs ...WriterFunc,
+	wffs ...schnittstellen.FuncWriter,
 ) (n int64, err error) {
 	for _, wf := range wffs {
 		var n1 int64
@@ -71,7 +72,7 @@ func Write(
 
 func WriteLines(
 	w1 io.Writer,
-	wffs ...WriterFunc,
+	wffs ...schnittstellen.FuncWriter,
 ) (n int64, err error) {
 	w := bufio.NewWriter(w1)
 	defer errors.DeferredFlusher(&err, w)
@@ -104,7 +105,7 @@ func WriteLines(
 // TODO rename
 func MakeWriterTo[T any](
 	w io.Writer,
-	wf FormatWriterFunc[T],
+	wf schnittstellen.FuncWriterFormat[T],
 ) func(T) error {
 	return func(e T) (err error) {
 		if _, err = wf(w, e); err != nil {
@@ -118,7 +119,7 @@ func MakeWriterTo[T any](
 
 func MakeWriterToWithNewLines[T any](
 	w1 io.Writer,
-	wf FormatWriterFunc[T],
+	wf schnittstellen.FuncWriterFormat[T],
 ) func(*T) error {
 	w := bufio.NewWriter(w1)
 

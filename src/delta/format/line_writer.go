@@ -6,16 +6,17 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
 type LineWriter struct {
 	lastWasNewline bool
-	elements       []FuncWriter
+	elements       []schnittstellen.FuncWriter
 }
 
 func NewLineWriter() *LineWriter {
 	w := &LineWriter{
-		elements: make([]FuncWriter, 0),
+		elements: make([]schnittstellen.FuncWriter, 0),
 	}
 
 	return w

@@ -4,10 +4,11 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
 type writerTo[T any] struct {
-	wf FuncWriterElement[T]
+	wf schnittstellen.FuncWriterElement[T]
 	e  *T
 }
 
@@ -21,7 +22,7 @@ func (wt *writerTo[T]) WriteTo(w io.Writer) (n int64, err error) {
 }
 
 func MakeWriterTo2[T any](
-	wf FuncWriterElement[T],
+	wf schnittstellen.FuncWriterElement[T],
 	e *T,
 ) *writerTo[T] {
 	return &writerTo[T]{

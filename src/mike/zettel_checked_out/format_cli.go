@@ -15,10 +15,10 @@ import (
 func MakeCliFormat(
 	s standort.Standort,
 	cw format.FuncColorWriter,
-	hf format.FormatWriterFunc[hinweis.Hinweis],
-	sf format.FormatWriterFunc[schnittstellen.Sha],
-	zf format.FormatWriterFunc[zettel.Objekte],
-) format.FormatWriterFunc[Zettel] {
+	hf schnittstellen.FuncWriterFormat[hinweis.Hinweis],
+	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
+	zf schnittstellen.FuncWriterFormat[zettel.Objekte],
+) schnittstellen.FuncWriterFormat[Zettel] {
 	wzef := makeWriterFuncZettel(
 		s, cw, hf, sf, zf,
 	)
@@ -57,10 +57,10 @@ func MakeCliFormat(
 func makeWriterFuncZettel(
 	s standort.Standort,
 	cw format.FuncColorWriter,
-	hf format.FormatWriterFunc[hinweis.Hinweis],
-	sf format.FormatWriterFunc[schnittstellen.Sha],
-	zf format.FormatWriterFunc[zettel.Objekte],
-) format.FormatWriterFunc[Zettel] {
+	hf schnittstellen.FuncWriterFormat[hinweis.Hinweis],
+	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
+	zf schnittstellen.FuncWriterFormat[zettel.Objekte],
+) schnittstellen.FuncWriterFormat[Zettel] {
 	return func(w io.Writer, z Zettel) (n int64, err error) {
 		diff := format.StringChanged
 
@@ -85,10 +85,10 @@ func makeWriterFuncZettel(
 func makeWriterFuncAkte(
 	s standort.Standort,
 	cw format.FuncColorWriter,
-	hf format.FormatWriterFunc[hinweis.Hinweis],
-	sf format.FormatWriterFunc[schnittstellen.Sha],
-	zf format.FormatWriterFunc[zettel.Objekte],
-) format.FormatWriterFunc[Zettel] {
+	hf schnittstellen.FuncWriterFormat[hinweis.Hinweis],
+	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
+	zf schnittstellen.FuncWriterFormat[zettel.Objekte],
+) schnittstellen.FuncWriterFormat[Zettel] {
 	return func(w io.Writer, z Zettel) (n int64, err error) {
 		diff := format.StringChanged
 

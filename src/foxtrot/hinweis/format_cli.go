@@ -14,7 +14,7 @@ func MakeCliFormat(
 	a schnittstellen.FuncAbbreviateKorper,
 	maxKopf int,
 	maxSchwanz int,
-) format.FormatWriterFunc[Hinweis] {
+) schnittstellen.FuncWriterFormat[Hinweis] {
 	return func(w io.Writer, h Hinweis) (n int64, err error) {
 		if a != nil {
 			var v string

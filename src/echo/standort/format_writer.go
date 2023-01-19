@@ -5,12 +5,12 @@ import (
 	"path/filepath"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/delta/format"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
 func (s Standort) MakeWriterRelativePath(
 	p string,
-) format.WriterFunc {
+) schnittstellen.FuncWriter {
 	return func(w io.Writer) (n int64, err error) {
 		var n1 int
 

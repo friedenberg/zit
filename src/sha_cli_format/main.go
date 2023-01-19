@@ -12,7 +12,7 @@ import (
 func MakeCliFormat(
 	cw format.FuncColorWriter,
 	a schnittstellen.FuncAbbreviateValue,
-) format.FormatWriterFunc[schnittstellen.Sha] {
+) schnittstellen.FuncWriterFormat[schnittstellen.Sha] {
 	return func(w io.Writer, s schnittstellen.Sha) (n int64, err error) {
 		v := s.String()
 

@@ -16,8 +16,8 @@ import (
 func MakeCliFormatNotRecognized(
 	cw format.FuncColorWriter,
 	s standort.Standort,
-	sf format.FormatWriterFunc[schnittstellen.Sha],
-) format.FormatWriterFunc[fd.FD] {
+	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
+) schnittstellen.FuncWriterFormat[fd.FD] {
 	return func(w io.Writer, fu fd.FD) (n int64, err error) {
 		return format.Write(
 			w,
@@ -42,9 +42,9 @@ type FileRecognized struct {
 func MakeCliFormatRecognized(
 	cw format.FuncColorWriter,
 	s standort.Standort,
-	sf format.FormatWriterFunc[schnittstellen.Sha],
-	znf format.FormatWriterFunc[zettel.Objekte],
-) format.FormatWriterFunc[FileRecognized] {
+	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
+	znf schnittstellen.FuncWriterFormat[zettel.Objekte],
+) schnittstellen.FuncWriterFormat[FileRecognized] {
 	return func(w io.Writer, zr FileRecognized) (n int64, err error) {
 		return format.Write(
 			w,

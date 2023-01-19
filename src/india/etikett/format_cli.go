@@ -12,7 +12,7 @@ import (
 
 func MakeCliFormat(
 	cw format.FuncColorWriter,
-) format.FormatWriterFunc[kennung.Etikett] {
+) schnittstellen.FuncWriterFormat[kennung.Etikett] {
 	return func(w io.Writer, t kennung.Etikett) (n int64, err error) {
 		v := t.String()
 
@@ -28,9 +28,9 @@ func MakeCliFormat(
 func MakeCliFormatExternal(
 	s standort.Standort,
 	cw format.FuncColorWriter,
-	sf format.FormatWriterFunc[sha.Sha],
-	tf format.FormatWriterFunc[kennung.Etikett],
-) format.FormatWriterFunc[External] {
+	sf schnittstellen.FuncWriterFormat[sha.Sha],
+	tf schnittstellen.FuncWriterFormat[kennung.Etikett],
+) schnittstellen.FuncWriterFormat[External] {
 	return func(w io.Writer, t External) (n int64, err error) {
 		return format.Write(
 			w,
@@ -50,10 +50,10 @@ func MakeCliFormatExternal(
 func MakeCliFormatTransacted(
 	s standort.Standort,
 	cw format.FuncColorWriter,
-	sf format.FormatWriterFunc[schnittstellen.Sha],
-	tf format.FormatWriterFunc[kennung.Etikett],
+	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
+	tf schnittstellen.FuncWriterFormat[kennung.Etikett],
 	verb string,
-) format.FormatWriterFunc[Transacted] {
+) schnittstellen.FuncWriterFormat[Transacted] {
 	return func(w io.Writer, t Transacted) (n int64, err error) {
 		return format.Write(
 			w,

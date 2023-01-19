@@ -1,6 +1,10 @@
 package format
 
-import "io"
+import (
+	"io"
+
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+)
 
 type color string
 type ColorType color
@@ -25,16 +29,16 @@ const (
 )
 
 func MakeFormatWriterNoopColor(
-	wf WriterFunc,
+	wf schnittstellen.FuncWriter,
 	c ColorType,
-) WriterFunc {
+) schnittstellen.FuncWriter {
 	return wf
 }
 
 func MakeFormatWriterWithColor(
-	wf WriterFunc,
+	wf schnittstellen.FuncWriter,
 	c ColorType,
-) WriterFunc {
+) schnittstellen.FuncWriter {
 	return func(w io.Writer) (n int64, err error) {
 		return Write(
 			w,

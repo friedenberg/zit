@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
 const (
@@ -27,7 +28,7 @@ const (
 
 func MakeFormatStringRightAlignedParen(
 	f string,
-) WriterFunc {
+) schnittstellen.FuncWriter {
 	return func(w io.Writer) (n int64, err error) {
 		f = fmt.Sprintf("(%s) ", f)
 
@@ -54,7 +55,7 @@ func MakeFormatStringRightAlignedParen(
 func MakeWriterFormatStringIndentedHeader(
 	cw FuncColorWriter,
 	indentString string,
-) FormatWriterFunc[string] {
+) schnittstellen.FuncWriterFormat[string] {
 	return func(w io.Writer, v string) (n int64, err error) {
 		return Write(
 			w,
