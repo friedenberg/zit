@@ -5,15 +5,15 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/bravo/alfred"
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/kilo/zettel"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 func (w *Writer) zettelToItem(
 	z *zettel.Transacted,
-	ha gattung.FuncAbbrIdMitKorper,
+	ha schnittstellen.FuncAbbreviateKorper,
 ) (a *alfred.Item) {
 	a = w.alfredWriter.Get()
 

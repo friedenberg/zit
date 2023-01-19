@@ -5,18 +5,18 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/alfred"
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	"github.com/friedenberg/zit/src/kilo/zettel"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type Writer struct {
 	alfredWriter *alfred.Writer
-	Abbr         gattung.FuncAbbrIdMitKorper
+	Abbr         schnittstellen.FuncAbbreviateKorper
 }
 
-func New(out io.Writer, ha gattung.FuncAbbrIdMitKorper) (w *Writer, err error) {
+func New(out io.Writer, ha schnittstellen.FuncAbbreviateKorper) (w *Writer, err error) {
 	var aw *alfred.Writer
 
 	if aw, err = alfred.NewWriter(out); err != nil {

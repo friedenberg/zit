@@ -24,24 +24,25 @@ type Verzeichnisse struct {
 	// Hidden bool
 }
 
-func (z *Verzeichnisse) ResetWithObjekte(z1 *Objekte) {
-	if z1 != nil {
-		z.wasPopulated = true
-		z.EtikettenExpandedSorted = kennung.Expanded(z1.Etiketten).SortedString()
-		z.EtikettenSorted = z1.Etiketten.SortedString()
-	} else {
-		z.wasPopulated = false
-		z.EtikettenExpandedSorted = []string{}
-		z.EtikettenSorted = []string{}
-	}
+func (z *Verzeichnisse) ResetWithObjekte(z1 Objekte) {
+	z.wasPopulated = true
+
+	z.EtikettenExpandedSorted = kennung.Expanded(z1.Etiketten).SortedString()
+	z.EtikettenSorted = z1.Etiketten.SortedString()
 }
 
-func (z *Verzeichnisse) Reset(z1 *Verzeichnisse) {
-	z.ResetWithObjekte(nil)
+func (z *Verzeichnisse) Reset() {
+	z.wasPopulated = false
 
-	if z1 == nil {
-		return
-	}
+	z.EtikettenExpandedSorted = []string{}
+	z.EtikettenSorted = []string{}
+
+	z.EtikettenExpandedSorted = z.EtikettenExpandedSorted[:0]
+	z.EtikettenSorted = z.EtikettenExpandedSorted[:0]
+}
+
+func (z *Verzeichnisse) ResetWith(z1 Verzeichnisse) {
+	z.wasPopulated = true
 
 	z.EtikettenExpandedSorted = append(
 		z.EtikettenExpandedSorted,

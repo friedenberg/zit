@@ -2,14 +2,14 @@ package id_set
 
 import (
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type Element interface {
-	gattung.Stored
+	schnittstellen.Stored
 	AkteEtiketten() kennung.EtikettSet
 	AkteTyp() kennung.Typ
 	Hinweis() hinweis.Hinweis

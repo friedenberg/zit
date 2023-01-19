@@ -4,14 +4,14 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/format"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 // kopf/schwanz
 func MakeCliFormat(
 	cw format.FuncColorWriter,
-	a gattung.FuncAbbrIdMitKorper,
+	a schnittstellen.FuncAbbreviateKorper,
 	maxKopf int,
 	maxSchwanz int,
 ) format.FormatWriterFunc[Hinweis] {

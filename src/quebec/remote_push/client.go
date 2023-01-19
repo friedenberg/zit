@@ -91,7 +91,7 @@ func (c client) SendNeededSkus(filter id_set.Filter) (err error) {
 
 func (c *client) ObjekteWriter(
 	g schnittstellen.GattungGetter,
-	sh gattung.ShaLike,
+	sh schnittstellen.Sha,
 ) (rc sha.ReadCloser, err error) {
 	var d remote_conn.Dialogue
 

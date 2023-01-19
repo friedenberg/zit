@@ -361,7 +361,7 @@ func (s *typStore) Inherit(t *typ.Transacted) (err error) {
 
 func (s *typStore) reindexOne(
 	sk sku.DataIdentity,
-) (o gattung.Stored, err error) {
+) (o schnittstellen.Stored, err error) {
 	var te *typ.Transacted
 	defer s.pool.Put(te)
 

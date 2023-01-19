@@ -3,7 +3,6 @@ package objekte
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/schnittstellen"
@@ -27,8 +26,8 @@ type TransactedInflator[
 	T1 schnittstellen.ObjektePtr[T],
 	T2 schnittstellen.Id[T2],
 	T3 schnittstellen.IdPtr[T2],
-	T4 gattung.Verzeichnisse[T],
-	T5 gattung.VerzeichnissePtr[T4, T],
+	T4 any,
+	T5 schnittstellen.VerzeichnissePtr[T4, T],
 ] interface {
 	InflateFromSku(sku.Sku) (*Transacted[T, T1, T2, T3, T4, T5], error)
 	InflateFromSku2(sku.Sku2) (*Transacted[T, T1, T2, T3, T4, T5], error)
@@ -41,8 +40,8 @@ type transactedInflator[
 	T1 schnittstellen.ObjektePtr[T],
 	T2 schnittstellen.Id[T2],
 	T3 schnittstellen.IdPtr[T2],
-	T4 gattung.Verzeichnisse[T],
-	T5 gattung.VerzeichnissePtr[T4, T],
+	T4 any,
+	T5 schnittstellen.VerzeichnissePtr[T4, T],
 ] struct {
 	of            schnittstellen.ObjekteIOFactory
 	af            schnittstellen.AkteIOFactory
@@ -56,8 +55,8 @@ func MakeTransactedInflator[
 	T1 schnittstellen.ObjektePtr[T],
 	T2 schnittstellen.Id[T2],
 	T3 schnittstellen.IdPtr[T2],
-	T4 gattung.Verzeichnisse[T],
-	T5 gattung.VerzeichnissePtr[T4, T],
+	T4 any,
+	T5 schnittstellen.VerzeichnissePtr[T4, T],
 ](
 	of schnittstellen.ObjekteIOFactory,
 	af schnittstellen.AkteIOFactory,

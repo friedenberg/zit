@@ -3,15 +3,15 @@ package organize_text
 import (
 	"flag"
 
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/juliett/konfig"
 	zettel_pkg "github.com/friedenberg/zit/src/kilo/zettel"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 type Options struct {
 	Konfig konfig.Compiled
-	Abbr   gattung.FuncAbbrIdMitKorper
+	Abbr   schnittstellen.FuncAbbreviateKorper
 
 	RootEtiketten     kennung.EtikettSet
 	Typ               kennung.Typ

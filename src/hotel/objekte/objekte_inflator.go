@@ -3,7 +3,6 @@ package objekte
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/schnittstellen"
@@ -12,8 +11,8 @@ import (
 type ObjekteInflator[
 	T schnittstellen.Objekte[T],
 	T1 schnittstellen.ObjektePtr[T],
-	T4 gattung.Verzeichnisse[T],
-	T5 gattung.VerzeichnissePtr[T4, T],
+	T4 any,
+	T5 schnittstellen.VerzeichnissePtr[T4, T],
 ] interface {
 	InflateObjekteFromSku(sku.Sku) (T1, error)
 }
@@ -21,8 +20,8 @@ type ObjekteInflator[
 type objekteInflator[
 	T schnittstellen.Objekte[T],
 	T1 schnittstellen.ObjektePtr[T],
-	T2 gattung.Verzeichnisse[T],
-	T3 gattung.VerzeichnissePtr[T2, T],
+	T2 any,
+	T3 schnittstellen.VerzeichnissePtr[T2, T],
 ] struct {
 	or            schnittstellen.ObjekteReaderFactory
 	ar            schnittstellen.AkteReaderFactory
@@ -34,8 +33,8 @@ type objekteInflator[
 func MakeObjekteInflator[
 	T schnittstellen.Objekte[T],
 	T1 schnittstellen.ObjektePtr[T],
-	T2 gattung.Verzeichnisse[T],
-	T3 gattung.VerzeichnissePtr[T2, T],
+	T2 any,
+	T3 schnittstellen.VerzeichnissePtr[T2, T],
 ](
 	or schnittstellen.ObjekteReaderFactory,
 	ar schnittstellen.AkteReaderFactory,

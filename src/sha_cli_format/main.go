@@ -4,7 +4,6 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/format"
 	"github.com/friedenberg/zit/src/schnittstellen"
 )
@@ -12,7 +11,7 @@ import (
 // sha
 func MakeCliFormat(
 	cw format.FuncColorWriter,
-	a gattung.FuncAbbrId,
+	a schnittstellen.FuncAbbreviateValue,
 ) format.FormatWriterFunc[schnittstellen.Sha] {
 	return func(w io.Writer, s schnittstellen.Sha) (n int64, err error) {
 		v := s.String()

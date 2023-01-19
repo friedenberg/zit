@@ -12,3 +12,20 @@ type ObjektePtr[T any] interface {
 	Resetable[T]
 	SetAkteSha(Sha)
 }
+
+type Stored interface {
+	GattungGetter
+	GetAkteSha() Sha
+	GetObjekteSha() Sha
+}
+
+type StoredPtr interface {
+	Stored
+	SetAkteSha(Sha)
+	SetObjekteSha(AkteReaderFactory, string) error
+}
+
+type VerzeichnissePtr[T any, T1 Objekte[T1]] interface {
+	Ptr[T]
+	ResetWithObjekte(T1)
+}

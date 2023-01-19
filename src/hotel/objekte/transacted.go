@@ -3,7 +3,6 @@ package objekte
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/schnittstellen"
 )
@@ -13,8 +12,8 @@ type Transacted[
 	T1 schnittstellen.ObjektePtr[T],
 	T2 schnittstellen.Id[T2],
 	T3 schnittstellen.IdPtr[T2],
-	T4 gattung.Verzeichnisse[T],
-	T5 gattung.VerzeichnissePtr[T4, T],
+	T4 any,
+	T5 schnittstellen.VerzeichnissePtr[T4, T],
 ] struct {
 	Objekte       T
 	Verzeichnisse T4
@@ -160,7 +159,7 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) GetKennungString() string {
 }
 
 func (a *Transacted[T, T1, T2, T3, T4, T5]) GenerateVerzeichnisse() {
-	T5(&a.Verzeichnisse).ResetWithObjekte(&a.Objekte)
+	T5(&a.Verzeichnisse).ResetWithObjekte(a.Objekte)
 }
 
 func (a *Transacted[T, T1, T2, T3, T4, T5]) Reset() {

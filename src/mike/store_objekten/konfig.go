@@ -3,7 +3,6 @@ package store_objekten
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/delta/id"
 	"github.com/friedenberg/zit/src/echo/age_io"
@@ -252,7 +251,7 @@ func (s konfigStore) AllInChain() (c []*erworben.Transacted, err error) {
 
 func (s *konfigStore) reindexOne(
 	sk sku.DataIdentity,
-) (o gattung.Stored, err error) {
+) (o schnittstellen.Stored, err error) {
 	var te *erworben.Transacted
 	defer s.pool.Put(te)
 

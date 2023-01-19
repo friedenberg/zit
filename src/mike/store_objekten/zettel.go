@@ -515,7 +515,7 @@ func (s *zettelStore) Inherit(tz *zettel.Transacted) (err error) {
 
 func (s *zettelStore) reindexOne(
 	sk sku.DataIdentity,
-) (o gattung.Stored, err error) {
+) (o schnittstellen.Stored, err error) {
 	var tz *zettel.Transacted
 	defer s.pool.Put(tz)
 

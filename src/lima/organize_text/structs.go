@@ -6,11 +6,11 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/foxtrot/bezeichnung"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
 	zettel_pkg "github.com/friedenberg/zit/src/kilo/zettel"
+	"github.com/friedenberg/zit/src/schnittstellen"
 )
 
 //   _____    _   _       _
@@ -27,7 +27,7 @@ type zettel struct {
 
 func makeZettel(
 	named *zettel_pkg.Transacted,
-	ha gattung.FuncAbbrIdMitKorper,
+	ha schnittstellen.FuncAbbreviateKorper,
 ) (z zettel, err error) {
 	h := *named.Kennung()
 

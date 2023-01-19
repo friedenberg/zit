@@ -9,7 +9,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/tridex"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/hinweis"
@@ -130,7 +129,7 @@ func (i *indexAbbr) readIfNecessary() (err error) {
 	return
 }
 
-func (i *indexAbbr) addStoredAbbreviation(o gattung.Stored) (err error) {
+func (i *indexAbbr) addStoredAbbreviation(o schnittstellen.Stored) (err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return

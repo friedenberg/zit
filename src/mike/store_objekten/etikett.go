@@ -3,7 +3,6 @@ package store_objekten
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/collections"
 	"github.com/friedenberg/zit/src/echo/age_io"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -230,7 +229,7 @@ func (s etikettStore) AllInChain(k kennung.Etikett) (c []*etikett.Transacted, er
 
 func (s *etikettStore) reindexOne(
 	sk sku.DataIdentity,
-) (o gattung.Stored, err error) {
+) (o schnittstellen.Stored, err error) {
 	var te *etikett.Transacted
 	defer s.pool.Put(te)
 

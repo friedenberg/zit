@@ -382,7 +382,7 @@ func (s *Store) getReindexFunc() func(sku.DataIdentity) error {
 			return
 		}
 
-		var o gattung.Stored
+		var o schnittstellen.Stored
 
 		if o, err = st.reindexOne(sk); err != nil {
 			err = errors.Wrapf(err, "Sku %s", sk)

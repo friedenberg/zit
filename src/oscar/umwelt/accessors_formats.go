@@ -1,7 +1,6 @@
 package umwelt
 
 import (
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/format"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/bezeichnung"
@@ -26,13 +25,13 @@ func (u *Umwelt) FormatColorWriter() format.FuncColorWriter {
 }
 
 func (u *Umwelt) FormatSha(
-	a gattung.FuncAbbrId,
+	a schnittstellen.FuncAbbreviateValue,
 ) format.FormatWriterFunc[schnittstellen.Sha] {
 	return sha_cli_format.MakeCliFormat(u.FormatColorWriter(), a)
 }
 
 func (u *Umwelt) FormatHinweis() format.FormatWriterFunc[hinweis.Hinweis] {
-	var a gattung.FuncAbbrIdMitKorper
+	var a schnittstellen.FuncAbbreviateKorper
 
 	if u.konfig.PrintAbbreviatedHinweisen {
 		a = u.StoreObjekten().Abbr().AbbreviateHinweis
