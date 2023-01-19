@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/golf/fd"
+	"github.com/friedenberg/zit/src/foxtrot/fd"
 )
 
 func MakeFile(dir string, p string) (ut fd.FD, err error) {

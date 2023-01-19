@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/metadatei_io"
 	"github.com/friedenberg/zit/src/delta/format"
-	"github.com/friedenberg/zit/src/india/erworben"
+	"github.com/friedenberg/zit/src/hotel/erworben"
 )
 
 type objekteTextParser struct {

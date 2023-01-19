@@ -1,7 +1,7 @@
 package store_fs
 
 import (
-	"github.com/friedenberg/zit/src/foxtrot/hinweis"
+	"github.com/friedenberg/zit/src/echo/hinweis"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 

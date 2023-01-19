@@ -2,7 +2,7 @@ package store_objekten
 
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/golf/sku"
+	"github.com/friedenberg/zit/src/foxtrot/sku"
 )
 
 type GattungStore interface {

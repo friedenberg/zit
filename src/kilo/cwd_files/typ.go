@@ -6,9 +6,9 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/golf/fd"
-	"github.com/friedenberg/zit/src/golf/sku"
-	"github.com/friedenberg/zit/src/india/typ"
+	"github.com/friedenberg/zit/src/foxtrot/fd"
+	"github.com/friedenberg/zit/src/foxtrot/sku"
+	"github.com/friedenberg/zit/src/hotel/typ"
 )
 
 func (c *CwdFiles) tryTyp(fi os.FileInfo) (err error) {

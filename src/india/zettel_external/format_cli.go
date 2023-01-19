@@ -5,9 +5,9 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/delta/format"
+	"github.com/friedenberg/zit/src/echo/hinweis"
 	"github.com/friedenberg/zit/src/echo/standort"
-	"github.com/friedenberg/zit/src/foxtrot/hinweis"
-	"github.com/friedenberg/zit/src/golf/fd"
+	"github.com/friedenberg/zit/src/foxtrot/fd"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 

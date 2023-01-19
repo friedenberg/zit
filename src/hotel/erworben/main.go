@@ -5,7 +5,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/hotel/objekte"
+	"github.com/friedenberg/zit/src/golf/objekte"
 )
 
 type Transacted = objekte.Transacted[

@@ -13,8 +13,8 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/age"
-	"github.com/friedenberg/zit/src/india/erworben"
-	"github.com/friedenberg/zit/src/india/typ"
+	"github.com/friedenberg/zit/src/hotel/erworben"
+	"github.com/friedenberg/zit/src/hotel/typ"
 )
 
 type Einleitung struct {

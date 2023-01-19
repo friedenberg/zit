@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/hotel/objekte"
+	"github.com/friedenberg/zit/src/golf/objekte"
 )
 
 type FormatterValue struct {

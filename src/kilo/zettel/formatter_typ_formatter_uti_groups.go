@@ -4,8 +4,8 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/india/typ"
-	"github.com/friedenberg/zit/src/juliett/konfig"
+	"github.com/friedenberg/zit/src/hotel/typ"
+	"github.com/friedenberg/zit/src/india/konfig"
 )
 
 type formatterTypFormatterUTIGroups struct {

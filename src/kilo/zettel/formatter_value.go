@@ -11,8 +11,8 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/collections_coding"
 	"github.com/friedenberg/zit/src/echo/standort"
-	"github.com/friedenberg/zit/src/india/typ"
-	"github.com/friedenberg/zit/src/juliett/konfig"
+	"github.com/friedenberg/zit/src/hotel/typ"
+	"github.com/friedenberg/zit/src/india/konfig"
 )
 
 type FormatterValue struct {

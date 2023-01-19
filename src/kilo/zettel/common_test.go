@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/bravo/test_logz"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/test_metadatei_io"
+	"github.com/friedenberg/zit/src/echo/test_metadatei_io"
 )
 
 type inlineTypChecker struct {

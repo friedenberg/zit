@@ -14,10 +14,10 @@ import (
 	"github.com/friedenberg/zit/src/delta/age_io"
 	"github.com/friedenberg/zit/src/echo/standort"
 	"github.com/friedenberg/zit/src/echo/ts"
-	"github.com/friedenberg/zit/src/golf/sku"
+	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/transaktion"
-	"github.com/friedenberg/zit/src/india/bestandsaufnahme"
-	"github.com/friedenberg/zit/src/juliett/konfig"
+	"github.com/friedenberg/zit/src/hotel/bestandsaufnahme"
+	"github.com/friedenberg/zit/src/india/konfig"
 )
 
 // TODO-P3 move to own package

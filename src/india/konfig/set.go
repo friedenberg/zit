@@ -5,8 +5,8 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/india/etikett"
-	"github.com/friedenberg/zit/src/india/typ"
+	"github.com/friedenberg/zit/src/hotel/etikett"
+	"github.com/friedenberg/zit/src/hotel/typ"
 )
 
 func init() {

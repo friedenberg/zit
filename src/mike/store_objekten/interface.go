@@ -3,7 +3,7 @@ package store_objekten
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/juliett/konfig"
+	"github.com/friedenberg/zit/src/india/konfig"
 )
 
 type LockSmith interface {

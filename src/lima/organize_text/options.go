@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/juliett/konfig"
+	"github.com/friedenberg/zit/src/india/konfig"
 	zettel_pkg "github.com/friedenberg/zit/src/kilo/zettel"
 )
 

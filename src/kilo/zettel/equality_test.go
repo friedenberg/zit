@@ -6,7 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/bravo/test_logz"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/bezeichnung"
+	"github.com/friedenberg/zit/src/echo/bezeichnung"
 )
 
 func TestMakeEtiketten(t1 *testing.T) {

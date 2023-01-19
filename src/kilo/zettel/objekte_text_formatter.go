@@ -14,8 +14,8 @@ import (
 	"github.com/friedenberg/zit/src/charlie/metadatei_io"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/echo/standort"
-	"github.com/friedenberg/zit/src/india/erworben"
-	"github.com/friedenberg/zit/src/india/typ"
+	"github.com/friedenberg/zit/src/hotel/erworben"
+	"github.com/friedenberg/zit/src/hotel/typ"
 )
 
 const MetadateiBoundary = metadatei_io.Boundary

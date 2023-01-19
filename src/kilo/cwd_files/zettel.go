@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/foxtrot/hinweis"
-	"github.com/friedenberg/zit/src/golf/fd"
+	"github.com/friedenberg/zit/src/echo/hinweis"
+	"github.com/friedenberg/zit/src/foxtrot/fd"
 )
 
 type CwdZettel struct {

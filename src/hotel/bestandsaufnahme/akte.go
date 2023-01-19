@@ -1,7 +1,7 @@
 package bestandsaufnahme
 
 import (
-	"github.com/friedenberg/zit/src/golf/sku"
+	"github.com/friedenberg/zit/src/foxtrot/sku"
 )
 
 type Akte struct {

@@ -3,7 +3,7 @@ package remote_pull
 import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/golf/id_set"
+	"github.com/friedenberg/zit/src/foxtrot/id_set"
 )
 
 type messageRequestSkus struct {
