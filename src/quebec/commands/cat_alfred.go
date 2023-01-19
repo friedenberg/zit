@@ -12,9 +12,9 @@ import (
 	"github.com/friedenberg/zit/src/echo/hinweis"
 	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/foxtrot/id_set"
-	"github.com/friedenberg/zit/src/kilo/zettel"
-	"github.com/friedenberg/zit/src/mike/alfred"
-	"github.com/friedenberg/zit/src/oscar/umwelt"
+	"github.com/friedenberg/zit/src/juliett/zettel"
+	"github.com/friedenberg/zit/src/kilo/alfred"
+	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
 type CatAlfred struct {

@@ -5,9 +5,9 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/oscar/umwelt"
-	"github.com/friedenberg/zit/src/papa/remote_conn"
-	"github.com/friedenberg/zit/src/quebec/remote_pull"
+	"github.com/friedenberg/zit/src/november/umwelt"
+	"github.com/friedenberg/zit/src/oscar/remote_conn"
+	"github.com/friedenberg/zit/src/papa/remote_pull"
 )
 
 type Listen struct {

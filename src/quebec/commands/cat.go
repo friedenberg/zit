@@ -11,8 +11,8 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/id_set"
-	"github.com/friedenberg/zit/src/kilo/zettel"
-	"github.com/friedenberg/zit/src/oscar/umwelt"
+	"github.com/friedenberg/zit/src/juliett/zettel"
+	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
 // TODO-P3 examine removing cat entirely

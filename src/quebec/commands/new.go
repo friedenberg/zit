@@ -8,12 +8,12 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/kilo/cwd_files"
-	"github.com/friedenberg/zit/src/kilo/zettel"
-	"github.com/friedenberg/zit/src/mike/zettel_checked_out"
-	"github.com/friedenberg/zit/src/november/store_fs"
-	"github.com/friedenberg/zit/src/oscar/umwelt"
-	"github.com/friedenberg/zit/src/papa/user_ops"
+	"github.com/friedenberg/zit/src/juliett/cwd_files"
+	"github.com/friedenberg/zit/src/juliett/zettel"
+	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
+	"github.com/friedenberg/zit/src/mike/store_fs"
+	"github.com/friedenberg/zit/src/november/umwelt"
+	"github.com/friedenberg/zit/src/oscar/user_ops"
 )
 
 type New struct {

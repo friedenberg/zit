@@ -12,8 +12,8 @@ import (
 	"github.com/friedenberg/zit/src/echo/hinweis"
 	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/foxtrot/id_set"
-	"github.com/friedenberg/zit/src/oscar/umwelt"
-	"github.com/friedenberg/zit/src/quebec/remote_pull"
+	"github.com/friedenberg/zit/src/november/umwelt"
+	"github.com/friedenberg/zit/src/papa/remote_pull"
 )
 
 type Pull struct {

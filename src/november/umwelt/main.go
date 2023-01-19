@@ -1,0 +1,237 @@
+package umwelt
+
+import (
+	"io/ioutil"
+	"log"
+	"os"
+
+	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/charlie/age"
+	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/charlie/file_lock"
+	"github.com/friedenberg/zit/src/delta/format"
+	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/echo/standort"
+	"github.com/friedenberg/zit/src/echo/ts"
+	"github.com/friedenberg/zit/src/hotel/erworben"
+	"github.com/friedenberg/zit/src/india/konfig"
+	"github.com/friedenberg/zit/src/juliett/zettel"
+	"github.com/friedenberg/zit/src/lima/store_objekten"
+	"github.com/friedenberg/zit/src/mike/store_fs"
+)
+
+type Umwelt struct {
+	sonnenaufgang ts.Time
+
+	in  *os.File
+	out *os.File
+	err *os.File
+
+	inIsTty  bool
+	outIsTty bool
+	errIsTty bool
+
+	standort    standort.Standort
+	erworbenCli erworben.Cli
+	konfig      konfig.Compiled
+
+	storesInitialized     bool
+	lock                  *file_lock.Lock
+	storeObjekten         *store_objekten.Store
+	age                   *age.Age
+	storeWorkingDirectory *store_fs.Store
+
+	zettelVerzeichnissePool *collections.Pool[zettel.Transacted]
+}
+
+func Make(kCli erworben.Cli) (u *Umwelt, err error) {
+	u = &Umwelt{
+		in:                      os.Stdin,
+		out:                     os.Stdout,
+		err:                     os.Stderr,
+		zettelVerzeichnissePool: collections.MakePool[zettel.Transacted](),
+		erworbenCli:             kCli,
+	}
+
+	if files.IsTty(u.in) {
+		u.inIsTty = true
+	}
+
+	if files.IsTty(u.out) {
+		u.outIsTty = true
+	}
+
+	if files.IsTty(u.err) {
+		u.errIsTty = true
+	}
+
+	err = u.Initialize()
+
+	return
+}
+
+func (u *Umwelt) Reset() (err error) {
+	return u.Initialize()
+}
+
+func (u *Umwelt) Initialize() (err error) {
+	if err = u.Flush(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	u.sonnenaufgang = ts.Now()
+
+	errors.TodoP4("find a better place for this")
+	{
+		if u.erworbenCli.Verbose {
+			errors.SetVerbose()
+		} else {
+			log.SetOutput(ioutil.Discard)
+		}
+
+		if u.erworbenCli.Todo {
+			errors.SetTodoOn()
+		}
+
+		standortOptions := standort.Options{
+			BasePath: u.erworbenCli.BasePath,
+		}
+
+		if standortOptions.BasePath == "" {
+			if standortOptions.BasePath, err = os.Getwd(); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+
+		if u.standort, err = standort.Make(standortOptions); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	{
+		fa := u.standort.FileAge()
+
+		if files.Exists(fa) {
+			if u.age, err = age.Make(fa); err != nil {
+				errors.Wrap(err)
+				return
+			}
+		} else {
+			u.age = &age.Age{}
+			// if u.age, err = age.MakeDefaultTest(); err != nil {
+			// 	errors.Wrap(err)
+			// 	return
+			// }
+		}
+	}
+
+	{
+		var k *konfig.Compiled
+
+		if k, err = konfig.Make(
+			u.standort,
+			u.erworbenCli,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		u.konfig = *k
+	}
+
+	u.lock = file_lock.New(u.standort.DirZit("Lock"))
+
+	// for _, rb := range u.konfig.Transacted.Objekte.Akte.Recipients {
+	// 	if err = u.age.AddBech32PivYubikeyEC256(rb); err != nil {
+	// 		errors.Wrap(err)
+	// 		return
+	// 	}
+	// }
+
+	if u.storeObjekten, err = store_objekten.Make(
+		u.lock,
+		*u.age,
+		u.KonfigPtr(),
+		u.standort,
+		u.zettelVerzeichnissePool,
+	); err != nil {
+		err = errors.Wrapf(err, "failed to initialize zettel meta store")
+		return
+	}
+
+	errors.Log().Print("initing checkout store")
+	if u.storeWorkingDirectory, err = store_fs.New(
+		u.Sonnenaufgang(),
+		u.Konfig(),
+		u.standort,
+		u.storeObjekten,
+	); err != nil {
+		errors.Log().Print(err)
+		err = errors.Wrap(err)
+		return
+	}
+
+	errors.Log().Print("done initing checkout store")
+
+	u.storeObjekten.Zettel().SetLogWriter(
+		u.ZettelTransactedLogPrinters(),
+	)
+
+	u.storeObjekten.Konfig().SetLogWriter(
+		store_objekten.KonfigLogWriter{
+			Updated:   u.PrinterKonfigTransacted(format.StringUpdated),
+			Unchanged: u.PrinterKonfigTransacted(format.StringUnchanged),
+		},
+	)
+
+	u.storeObjekten.Typ().SetLogWriter(
+		store_objekten.TypLogWriter{
+			New:       u.PrinterTypTransacted(format.StringUpdated),
+			Updated:   u.PrinterTypTransacted(format.StringUpdated),
+			Unchanged: u.PrinterTypTransacted(format.StringUnchanged),
+			Archived:  u.PrinterTypTransacted(format.StringArchived),
+		},
+	)
+
+	u.storeObjekten.Etikett().SetLogWriter(
+		store_objekten.EtikettLogWriter{
+			New:       u.PrinterEtikettTransacted(format.StringUpdated),
+			Updated:   u.PrinterEtikettTransacted(format.StringUpdated),
+			Unchanged: u.PrinterEtikettTransacted(format.StringUnchanged),
+		},
+	)
+
+	u.storeWorkingDirectory.SetZettelExternalLogPrinter(
+		u.PrinterZettelExternal(),
+	)
+
+	u.storesInitialized = true
+
+	return
+}
+
+// TODO-P2 remove this
+func (u Umwelt) DefaultEtiketten() (etiketten kennung.EtikettSet, err error) {
+	metiketten := kennung.MakeEtikettMutableSet()
+
+	sa := metiketten.StringAdder()
+
+	for _, e := range u.konfig.EtikettenToAddToNew {
+		if err = sa(e); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	etiketten = metiketten.Copy()
+
+	return
+}
+
+func (u Umwelt) Flush() error {
+	return u.age.Close()
+}

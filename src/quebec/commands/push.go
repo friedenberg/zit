@@ -10,8 +10,8 @@ import (
 	"github.com/friedenberg/zit/src/echo/hinweis"
 	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/foxtrot/id_set"
-	"github.com/friedenberg/zit/src/oscar/umwelt"
-	"github.com/friedenberg/zit/src/quebec/remote_push"
+	"github.com/friedenberg/zit/src/november/umwelt"
+	"github.com/friedenberg/zit/src/papa/remote_push"
 )
 
 type Push struct {

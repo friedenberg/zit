@@ -4,12 +4,12 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/kilo/cwd_files"
-	"github.com/friedenberg/zit/src/mike/store_objekten"
-	"github.com/friedenberg/zit/src/mike/zettel_checked_out"
-	"github.com/friedenberg/zit/src/november/store_fs"
-	"github.com/friedenberg/zit/src/oscar/umwelt"
-	"github.com/friedenberg/zit/src/papa/user_ops"
+	"github.com/friedenberg/zit/src/juliett/cwd_files"
+	"github.com/friedenberg/zit/src/lima/store_objekten"
+	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
+	"github.com/friedenberg/zit/src/mike/store_fs"
+	"github.com/friedenberg/zit/src/november/umwelt"
+	"github.com/friedenberg/zit/src/oscar/user_ops"
 )
 
 type Status struct {
