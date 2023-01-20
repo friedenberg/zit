@@ -64,7 +64,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	typKonfig := u.Konfig().GetTyp(zt.Objekte.Typ)
+	typKonfig := u.Konfig().GetApproximatedTyp(zt.Objekte.Typ)
 
 	var akteFormatter script_config.ScriptConfig
 
@@ -74,14 +74,14 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		ok := false
 
 		if c.UTIGroup != "" {
-			if g, ok := typKonfig.Objekte.Akte.FormatterUTIGroups[c.UTIGroup]; ok {
+			if g, ok := typKonfig.Unwrap().Objekte.Akte.FormatterUTIGroups[c.UTIGroup]; ok {
 				if ft, ok := g.Map()[formatId]; ok {
 					actualFormatId = ft
 				}
 			}
 		}
 
-		f, ok = typKonfig.Objekte.Akte.Formatters[actualFormatId]
+		f, ok = typKonfig.Unwrap().Objekte.Akte.Formatters[actualFormatId]
 
 		if ok {
 			akteFormatter = f.ScriptConfig

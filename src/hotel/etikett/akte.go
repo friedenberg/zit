@@ -5,5 +5,5 @@ type Akte struct {
 	Hide            bool `toml:"hide"`
 }
 
-func (ct *Akte) Merge(ct2 *Akte) {
+func (ct *Akte) Merge(ct2 Akte) {
 }

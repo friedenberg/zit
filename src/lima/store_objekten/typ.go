@@ -326,17 +326,15 @@ func (s typStore) ReadAll(
 func (s typStore) ReadOne(
 	k *kennung.Typ,
 ) (tt *typ.Transacted, err error) {
-	tt = s.common.Konfig().GetTyp(*k)
+	at := s.common.Konfig().GetApproximatedTyp(*k)
 
-	if tt == nil {
+	if at == nil {
 		err = errors.Wrap(ErrNotFound{Id: k})
 		return
 	}
 
-	return
-}
+	tt = at.Unwrap()
 
-func (s typStore) AllInChain(k kennung.Typ) (c []*typ.Transacted, err error) {
 	return
 }
 
@@ -346,7 +344,9 @@ func (s *typStore) Inherit(t *typ.Transacted) (err error) {
 	s.common.Bestandsaufnahme.Akte.Skus.Push(t.Sku.Sku2())
 	s.common.Transaktion.Skus.Add(&t.Sku)
 
-	if old := s.common.Konfig().GetTyp(t.Sku.Kennung); old == nil || old.Less(*t) {
+	old := s.common.Konfig().GetApproximatedTyp(t.Sku.Kennung).Unwrap()
+
+	if old == nil || old.Less(*t) {
 		s.common.KonfigPtr().AddTyp(t)
 	}
 

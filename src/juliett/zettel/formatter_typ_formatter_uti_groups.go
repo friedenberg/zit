@@ -26,13 +26,13 @@ func (e formatterTypFormatterUTIGroups) Format(
 ) (n int64, err error) {
 	e1 := typ.MakeFormatterFormatterUTIGroups()
 
-	ct := e.erworben.GetTyp(c.Zettel.Typ)
+	ct := e.erworben.GetApproximatedTyp(c.Zettel.Typ)
 
 	if ct == nil {
 		return
 	}
 
-	if n, err = e1.Format(w, ct); err != nil {
+	if n, err = e1.Format(w, ct.Unwrap()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

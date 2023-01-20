@@ -15,13 +15,13 @@ func (z *Objekte) ApplyKonfig(k konfig.Compiled) (err error) {
 	normalized := kennung.WithRemovedCommonPrefixes(z.Etiketten)
 	z.Etiketten = normalized
 
-	tk := k.GetTyp(z.Typ)
+	tk := k.GetApproximatedTyp(z.Typ)
 
 	if tk == nil {
 		return
 	}
 
-	for e, r := range tk.Objekte.Akte.EtikettenRules {
+	for e, r := range tk.Unwrap().Objekte.Akte.EtikettenRules {
 		var e1 kennung.Etikett
 
 		if e1, err = kennung.MakeEtikett(e); err != nil {

@@ -4,6 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/etikett_rule"
 	"github.com/friedenberg/zit/src/bravo/script_config"
+	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
 type Akte struct {
@@ -24,10 +25,11 @@ func (a *Akte) Reset() {
 	a.FileExtension = ""
 	a.ExecCommand = nil
 	a.VimSyntaxType = ""
-	a.FormatterUTIGroups = make(map[string]FormatterUTIGroup)
-	a.Formatters = make(map[string]script_config.ScriptConfigWithUTI)
-	a.Actions = make(map[string]script_config.ScriptConfig)
-	a.EtikettenRules = make(map[string]etikett_rule.Rule)
+
+	a.FormatterUTIGroups = collections.ResetMap(a.FormatterUTIGroups)
+	a.Formatters = collections.ResetMap(a.Formatters)
+	a.Actions = collections.ResetMap(a.Actions)
+	a.EtikettenRules = collections.ResetMap(a.EtikettenRules)
 }
 
 func (a *Akte) ResetWith(b Akte) {
@@ -79,7 +81,7 @@ func (a *Akte) Equals(b *Akte) bool {
 			return false
 		}
 
-		if !v.Equals(&v1) {
+		if !v.Equals(v1) {
 			return false
 		}
 	}
@@ -91,7 +93,7 @@ func (a *Akte) Equals(b *Akte) bool {
 			return false
 		}
 
-		if !v.Equals(&v1) {
+		if !v.Equals(v1) {
 			return false
 		}
 	}
@@ -103,7 +105,7 @@ func (a *Akte) Equals(b *Akte) bool {
 			return false
 		}
 
-		if !v.Equals(&v1) {
+		if !v.Equals(v1) {
 			return false
 		}
 	}
@@ -168,7 +170,7 @@ func (a *Akte) Apply(b *Akte) {
 	}
 }
 
-func (a *Akte) Merge(b *Akte) {
+func (a *Akte) Merge(b Akte) {
 	if b.InlineAkte {
 		a.InlineAkte = true
 	}
@@ -177,7 +179,9 @@ func (a *Akte) Merge(b *Akte) {
 		a.FileExtension = b.FileExtension
 	}
 
-	a.ExecCommand.Merge(b.ExecCommand)
+	if b.ExecCommand != nil {
+		a.ExecCommand.Merge(*b.ExecCommand)
+	}
 
 	for k, v := range b.EtikettenRules {
 		a.EtikettenRules[k] = v
@@ -189,7 +193,7 @@ func (a *Akte) Merge(b *Akte) {
 		if !ok {
 			sc = v
 		} else {
-			sc.Merge(&v)
+			sc.Merge(v)
 		}
 
 		a.Actions[k] = sc
@@ -201,7 +205,7 @@ func (a *Akte) Merge(b *Akte) {
 		if !ok {
 			sc = v
 		} else {
-			sc.Merge(&v)
+			sc.Merge(v)
 		}
 
 		a.Formatters[k] = sc
@@ -213,7 +217,7 @@ func (a *Akte) Merge(b *Akte) {
 		if !ok {
 			sc = v
 		} else {
-			sc.Merge(&v)
+			sc.Merge(v)
 		}
 
 		a.FormatterUTIGroups[k] = sc

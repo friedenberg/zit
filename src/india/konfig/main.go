@@ -169,7 +169,7 @@ func (kc *compiled) recompile() (err error) {
 				kc.EtikettenToAddToNew = append(kc.EtikettenToAddToNew, tn)
 			}
 
-			kc.applyExpandedEtikett(ct)
+			// kc.applyExpandedEtikett(ct)
 
 			return
 		},
@@ -199,7 +199,7 @@ func (kc *compiled) recompile() (err error) {
 				return
 			}
 
-			kc.applyExpandedTyp(*ct)
+			// kc.applyExpandedTyp(*ct)
 
 			return
 		},
@@ -251,9 +251,19 @@ func (c compiled) GetZettelFileExtension() string {
 }
 
 // TODO-P3 merge all the below
-func (c compiled) GetSortedTypenExpanded(v string) (expandedActual []*typ.Transacted) {
-	expandedMaybe := collections.MakeMutableValueSet[collections.StringValue, *collections.StringValue]()
-	sa := collections.MakeFuncSetString[collections.StringValue, *collections.StringValue](expandedMaybe)
+func (c compiled) GetSortedTypenExpanded(
+	v string,
+) (expandedActual []*typ.Transacted) {
+	expandedMaybe := collections.MakeMutableValueSet[
+		collections.StringValue,
+		*collections.StringValue,
+	]()
+
+	sa := collections.MakeFuncSetString[
+		collections.StringValue,
+		*collections.StringValue,
+	](expandedMaybe)
+
 	typExpander.Expand(sa, v)
 	expandedActual = make([]*typ.Transacted, 0)
 
@@ -308,22 +318,30 @@ func (c compiled) GetSortedEtikettenExpanded(
 }
 
 func (kc compiled) IsInlineTyp(k kennung.Typ) (isInline bool) {
-	tc := kc.GetTyp(k)
+	tc := kc.GetApproximatedTyp(k)
 
 	if tc == nil {
 		return
 	}
 
-	isInline = tc.Objekte.Akte.InlineAkte
+	isInline = tc.ApproximatedOrActual().Objekte.Akte.InlineAkte
 
 	return
 }
 
-func (kc compiled) GetTyp(k kennung.Typ) (ct *typ.Transacted) {
+// Returns the exactly matching Typ, or if it doesn't exist, returns the parent
+// Typ or nil. (Parent Typ for `md-gdoc` would be `md`.)
+func (kc compiled) GetApproximatedTyp(k kennung.Typ) (ct *ApproximatedTyp) {
 	expandedActual := kc.GetSortedTypenExpanded(k.String())
 
 	if len(expandedActual) > 0 {
-		ct = expandedActual[0]
+		ct = &ApproximatedTyp{
+			typ: *expandedActual[0],
+		}
+
+		if ct.typ.Sku.Kennung.Equals(k) {
+			ct.isActual = true
+		}
 	}
 
 	return
@@ -384,7 +402,7 @@ func (c *compiled) applyExpandedTyp(ct typ.Transacted) {
 	expandedActual := c.GetSortedTypenExpanded(ct.Sku.Kennung.String())
 
 	for _, ex := range expandedActual {
-		ct.Objekte.Akte.Merge(&ex.Objekte.Akte)
+		ct.Objekte.Akte.Merge(ex.Objekte.Akte)
 	}
 }
 
@@ -392,6 +410,6 @@ func (c *compiled) applyExpandedEtikett(ct *etikett.Transacted) {
 	expandedActual := c.GetSortedEtikettenExpanded(ct.Sku.Kennung.String())
 
 	for _, ex := range expandedActual {
-		ct.Objekte.Akte.Merge(&ex.Objekte.Akte)
+		ct.Objekte.Akte.Merge(ex.Objekte.Akte)
 	}
 }

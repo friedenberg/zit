@@ -119,14 +119,14 @@ func (c Exec) getZettel(
 
 	typ := tz.Objekte.Typ
 
-	typKonfig := u.Konfig().GetTyp(typ)
+	typKonfig := u.Konfig().GetApproximatedTyp(typ)
 
 	if typKonfig == nil {
 		err = errors.Normal(errors.Errorf("Typ does not have an exec-command set: %s", typ))
 		return
 	}
 
-	executor = typKonfig.Objekte.Akte.ExecCommand
+	executor = typKonfig.Unwrap().Objekte.Akte.ExecCommand
 
 	if ar, err = u.StoreObjekten().AkteReader(tz.Objekte.Akte); err != nil {
 		err = errors.Wrap(err)

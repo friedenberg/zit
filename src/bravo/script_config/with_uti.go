@@ -5,11 +5,7 @@ type ScriptConfigWithUTI struct {
 	UTI string `toml:"uti"`
 }
 
-func (a *ScriptConfigWithUTI) Equals(b *ScriptConfigWithUTI) bool {
-	if b == nil {
-		return false
-	}
-
+func (a *ScriptConfigWithUTI) Equals(b ScriptConfigWithUTI) bool {
 	if a.UTI != b.UTI {
 		return false
 	}
@@ -17,14 +13,10 @@ func (a *ScriptConfigWithUTI) Equals(b *ScriptConfigWithUTI) bool {
 	return true
 }
 
-func (s *ScriptConfigWithUTI) Merge(s2 *ScriptConfigWithUTI) {
-	if s2 == nil {
-		return
-	}
-
+func (s *ScriptConfigWithUTI) Merge(s2 ScriptConfigWithUTI) {
 	if s2.UTI != "" {
 		s.UTI = s2.UTI
 	}
 
-	s.ScriptConfig.Merge(&s2.ScriptConfig)
+	s.ScriptConfig.Merge(s2.ScriptConfig)
 }

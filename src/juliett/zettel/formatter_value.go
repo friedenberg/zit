@@ -11,7 +11,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/collections_coding"
-	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/india/konfig"
 )
 
@@ -87,13 +86,16 @@ func (fv *FormatterValue) FuncFormatter(
 
 	case "typ-vim-syntax-type":
 		return func(o *Transacted) (err error) {
-			var t *typ.Transacted
+			var t *konfig.ApproximatedTyp
 
-			if t = k.GetTyp(o.Objekte.Typ); t == nil {
+			if t = k.GetApproximatedTyp(o.Objekte.Typ); t == nil {
 				return
 			}
 
-			if _, err = io.WriteString(out, t.Objekte.Akte.VimSyntaxType); err != nil {
+			if _, err = io.WriteString(
+				out,
+				t.Unwrap().Objekte.Akte.VimSyntaxType,
+			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
