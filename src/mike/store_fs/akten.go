@@ -17,6 +17,8 @@ import (
 )
 
 func (s Store) ReadExternalZettelFromAktePath(p string) (cz zettel_checked_out.Zettel, err error) {
+  errors.TodoP3("use cache")
+
 	if p, err = filepath.Abs(p); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -47,9 +49,11 @@ func (s Store) ReadExternalZettelFromAktePath(p string) (cz zettel_checked_out.Z
 		}
 	}
 
-	cz.Internal = *zt
+	if zt != nil {
+		cz.Internal = *zt
+	}
 
-	//TODO-P4 capture this as a function
+	errors.TodoP4("capture this as a function")
 	cz.External.Objekte = cz.Internal.Objekte
 	cz.External.Sku.ObjekteSha = cz.Internal.Sku.ObjekteSha
 	cz.External.Sku.Kennung = cz.Internal.Sku.Kennung
@@ -61,7 +65,7 @@ func (s Store) ReadExternalZettelFromAktePath(p string) (cz zettel_checked_out.Z
 		return
 	}
 
-	//TODO-P2 add mod time
+	errors.TodoP2("add mod time")
 	cz.External.AkteFD.Path = p
 	cz.External.Objekte.Akte = akteSha
 	// cz.Matches.Akten, _ = s.storeObjekten.ReadAkteSha(akteSha)
@@ -72,6 +76,8 @@ func (s Store) ReadExternalZettelFromAktePath(p string) (cz zettel_checked_out.Z
 }
 
 func (s Store) AkteShaFromPath(p string) (sh sha.Sha, err error) {
+  errors.TodoP3("use cache")
+
 	var aw age_io.Writer
 
 	if aw, err = s.storeObjekten.AkteWriter(); err != nil {

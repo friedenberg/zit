@@ -46,7 +46,7 @@ function! ZitTypActionMenu()
 endfunction
 
 function! ZitCopyFormattersMenu()
-  let l:rawItems = systemlist("zit show -format typ-formatter-uti-groups " . expand("%:r"))
+  let l:rawItems = systemlist("zit show -include-cwd -format typ-formatter-uti-groups " . expand("%:r") . " | sort")
   let l:processedItems = []
   let l:items = []
 
@@ -76,8 +76,9 @@ function! ZitCopyFormattersMenu()
       call add(l:cmd_args_list, l:uti)
       let l:cmd_sub_args = [
             \ "zit", "format-zettel", "-include-cwd", "-mode akte",
-            \ "-uti-group", l:uti_group,
-            \ l:uti, expand("%:r"),
+            \ "-uti-group", l:uti_group, l:uti,
+            \ expand("%:r"),
+            \ "2>/dev/null",
             \ ]
 
       call add(l:cmd_args_list, "<(" . join(l:cmd_sub_args, " ") . ")")

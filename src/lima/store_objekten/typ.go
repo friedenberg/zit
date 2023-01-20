@@ -326,6 +326,7 @@ func (s typStore) ReadAll(
 func (s typStore) ReadOne(
 	k *kennung.Typ,
 ) (tt *typ.Transacted, err error) {
+	errors.TodoP3("add support for working directory")
 	at := s.common.Konfig().GetApproximatedTyp(*k)
 
 	if at == nil {

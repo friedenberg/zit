@@ -139,6 +139,8 @@ func (c EditTyp) makeTempTypFiles(
 	u *umwelt.Umwelt,
 	tks collections.ValueSet[kennung.Typ, *kennung.Typ],
 ) (ps []string, err error) {
+  errors.TodoP3("add support for working directory")
+
 	ps = make([]string, 0, tks.Len())
 
 	var tempDir string
