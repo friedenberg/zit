@@ -164,6 +164,9 @@ func (op Server) skusForFilter(
 	if err = method(
 		gattungen.MakeSet(msg.GattungSlice...),
 		collections.MakeChain(
+			collections.MakeFuncTransformer[*zettel.Transacted, objekte.TransactedLike](
+				zettel.MakeWriterKonfig(op.umwelt.Konfig()),
+			),
 			zettel.WriterIds{Filter: msg.Filter}.WriteTransactedLike,
 			func(tl objekte.TransactedLike) (err error) {
 				sk := tl.GetSku2()

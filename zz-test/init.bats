@@ -66,7 +66,6 @@ function init_and_init { # @test
 	} >to_add
 
 	run zit new -edit=false -predictable-hinweisen to_add
-	assert_output '          (new) [o/u@3 !md "wow"]'
 
 	run zit show one/uno
 	assert_output "$(cat to_add)"

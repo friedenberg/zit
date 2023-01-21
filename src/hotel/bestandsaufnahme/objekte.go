@@ -29,6 +29,10 @@ func (o *Objekte) SetAkteSha(v schnittstellen.Sha) {
 	o.AkteSha = sha.Make(v)
 }
 
+func (a Objekte) Less(b Objekte) bool {
+	return a.Tai.Less(b.Tai)
+}
+
 func (a Objekte) Equals(b Objekte) bool {
 	if !a.Akte.Equals(&b.Akte) {
 		return false

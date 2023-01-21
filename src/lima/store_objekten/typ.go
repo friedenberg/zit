@@ -149,7 +149,7 @@ func (s typStore) CreateOrUpdate(
 		Sku: sku.Transacted[kennung.Typ, *kennung.Typ]{
 			Kennung: *tk,
 			Verzeichnisse: sku.Verzeichnisse{
-				Schwanz: s.common.Transaktion.Time,
+				Schwanz: s.common.GetTransaktion().Time,
 			},
 		},
 	}
@@ -159,7 +159,7 @@ func (s typStore) CreateOrUpdate(
 		tt.Sku.Kopf = mutter.Sku.Kopf
 		tt.Sku.Mutter[0] = mutter.Sku.Schwanz
 	} else {
-		tt.Sku.Kopf = s.common.Transaktion.Time
+		tt.Sku.Kopf = s.common.GetTransaktion().Time
 	}
 
 	fo := objekte.MakeFormat[typ.Objekte, *typ.Objekte]()
@@ -168,7 +168,7 @@ func (s typStore) CreateOrUpdate(
 
 	mo := age_io.MoveOptions{
 		Age:                      s.common.Age,
-		FinalPath:                s.common.Standort.DirObjektenTypen(),
+		FinalPath:                s.common.GetStandort().DirObjektenTypen(),
 		GenerateFinalPathFromSha: true,
 	}
 
@@ -197,7 +197,7 @@ func (s typStore) CreateOrUpdate(
 		return
 	}
 
-	s.common.Transaktion.Skus.Add(&tt.Sku)
+	s.common.GetTransaktion().Skus.Add(&tt.Sku)
 	s.common.KonfigPtr().AddTyp(tt)
 
 	if mutter == nil {
@@ -329,7 +329,7 @@ func (s typStore) ReadOne(
 	errors.TodoP3("add support for working directory")
 	at := s.common.Konfig().GetApproximatedTyp(*k)
 
-	if at == nil {
+	if !at.HasValue() {
 		err = errors.Wrap(ErrNotFound{Id: k})
 		return
 	}
@@ -340,12 +340,15 @@ func (s typStore) ReadOne(
 }
 
 func (s *typStore) Inherit(t *typ.Transacted) (err error) {
+	if t == nil {
+		panic("trying to inherit nil Typ")
+	}
+
 	errors.Log().Printf("inheriting %s", t.Sku.ObjekteSha)
 
-	s.common.Bestandsaufnahme.Akte.Skus.Push(t.Sku.Sku2())
-	s.common.Transaktion.Skus.Add(&t.Sku)
-
-	old := s.common.Konfig().GetApproximatedTyp(t.Sku.Kennung).Unwrap()
+	s.common.GetBestandsaufnahme().Akte.Skus.Push(t.Sku.Sku2())
+	s.common.GetTransaktion().Skus.Add(&t.Sku)
+	old := s.common.Konfig().GetApproximatedTyp(t.Sku.Kennung).ActualOrNil()
 
 	if old == nil || old.Less(*t) {
 		s.common.KonfigPtr().AddTyp(t)

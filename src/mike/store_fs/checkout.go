@@ -131,7 +131,7 @@ func (s *Store) CheckoutOne(
 
 		var fe string
 
-		if ty != nil {
+		if ty.HasValue() {
 			fe = ty.Unwrap().Objekte.Akte.FileExtension
 		}
 

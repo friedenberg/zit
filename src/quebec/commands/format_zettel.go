@@ -68,9 +68,9 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	var akteFormatter script_config.ScriptConfig
 
-	if typKonfig != nil {
+	if typKonfig.HasValue() {
 		actualFormatId := formatId
-		var f script_config.ScriptConfigWithUTI
+		var f script_config.WithOutputFormat
 		ok := false
 
 		if c.UTIGroup != "" {

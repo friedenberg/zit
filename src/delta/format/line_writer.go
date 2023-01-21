@@ -14,6 +14,8 @@ type LineWriter struct {
 	elements       []schnittstellen.FuncWriter
 }
 
+var MakeLineWriter = NewLineWriter
+
 func NewLineWriter() *LineWriter {
 	w := &LineWriter{
 		elements: make([]schnittstellen.FuncWriter, 0),

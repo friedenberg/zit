@@ -70,11 +70,13 @@ func MakeDirNameWriterIgnoringHidden(
 	}
 }
 
-// TODO-P3 support ErrStopIteration
 func ReadDirNamesLevel2(
 	wf func(string) error,
 	p string,
 ) (err error) {
+	errors.TodoP3("support ErrStopIteration")
+	errors.TodoP2("support concurrency")
+
 	wfLevel2 := func(p2 string) (err error) {
 		return wf(p2)
 	}

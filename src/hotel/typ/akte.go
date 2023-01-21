@@ -13,11 +13,10 @@ type Akte struct {
 	ExecCommand   *script_config.ScriptConfig `toml:"exec-command,omitempty"`
 	VimSyntaxType string                      `toml:"vim-syntax-type"`
 	//TODO-P4 rename to uti-groups
-	FormatterUTIGroups map[string]FormatterUTIGroup `toml:"formatter-uti-groups"`
-	//TODO remove WithUTI
-	Formatters     map[string]script_config.ScriptConfigWithUTI `toml:"formatters,omitempty"`
-	Actions        map[string]script_config.ScriptConfig        `toml:"actions,omitempty"`
-	EtikettenRules map[string]etikett_rule.Rule                 `toml:"etiketten-rules,omitempty"`
+	FormatterUTIGroups map[string]FormatterUTIGroup              `toml:"formatter-uti-groups"`
+	Formatters         map[string]script_config.WithOutputFormat `toml:"formatters,omitempty"`
+	Actions            map[string]script_config.ScriptConfig     `toml:"actions,omitempty"`
+	EtikettenRules     map[string]etikett_rule.Rule              `toml:"etiketten-rules,omitempty"`
 }
 
 func (a *Akte) Reset() {

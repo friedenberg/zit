@@ -70,7 +70,9 @@ func makeZettelStore(
 		),
 	}
 
-	if s.hinweisen, err = hinweisen.New(s.common.Standort.DirZit()); err != nil {
+	if s.hinweisen, err = hinweisen.New(
+		s.common.GetStandort().DirZit(),
+	); err != nil {
 		if errors.IsNotExist(err) {
 			err = nil
 		} else {
@@ -89,7 +91,7 @@ func makeZettelStore(
 
 	if s.verzeichnisseAll, err = store_verzeichnisse.MakeZettelen(
 		s.common.Konfig(),
-		s.common.Standort.DirVerzeichnisseZettelenNeue(),
+		s.common.GetStandort().DirVerzeichnisseZettelenNeue(),
 		s.common,
 		p,
 		nil,
@@ -102,14 +104,14 @@ func makeZettelStore(
 		s.common.Konfig(),
 		s.common,
 		s.hinweisen,
-		s.common.Standort.DirVerzeichnisse("Kennung"),
+		s.common.GetStandort().DirVerzeichnisse("Kennung"),
 	); err != nil {
 		err = errors.Wrapf(err, "failed to init kennung index")
 		return
 	}
 
 	if s.indexEtiketten, err = newIndexEtiketten(
-		s.common.Standort.FileVerzeichnisseEtiketten(),
+		s.common.GetStandort().FileVerzeichnisseEtiketten(),
 		s.common,
 	); err != nil {
 		err = errors.Wrapf(err, "failed to init zettel index")
@@ -435,7 +437,7 @@ func (s *zettelStore) addZettelToTransaktion(
 	if tz, err = s.transactedWithHead(
 		*zo,
 		*zk,
-		&s.common.Transaktion,
+		s.common.GetTransaktion(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -444,7 +446,8 @@ func (s *zettelStore) addZettelToTransaktion(
 	tz.Sku.Kennung = *zk
 	tz.Sku.ObjekteSha = *zs
 
-	s.common.Transaktion.Skus.Add(&tz.Sku)
+	s.common.GetTransaktion().Skus.Add(&tz.Sku)
+	s.common.AddSku(tz)
 
 	return
 }
@@ -496,8 +499,8 @@ func (s *zettelStore) Inherit(tz *zettel.Transacted) (err error) {
 		return
 	}
 
-	s.common.Bestandsaufnahme.Akte.Skus.Push(tz.Sku.Sku2())
-	s.common.Transaktion.Skus.Add(&tz.Sku)
+	s.common.GetBestandsaufnahme().Akte.Skus.Push(tz.Sku.Sku2())
+	s.common.GetTransaktion().Skus.Add(&tz.Sku)
 
 	if err = s.writeNamedZettelToIndex(tz); err != nil {
 		err = errors.Wrap(err)

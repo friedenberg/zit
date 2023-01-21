@@ -152,9 +152,9 @@ func (c *client) makeAndProcessOneSkuWithFilter(
 	errMulti errors.Multi,
 ) {
 	defer func() {
-		if r := recover(); r != nil {
-			errMulti.Add(errors.Errorf("panicked during process one sku: %s", r))
-		}
+		// if r := recover(); r != nil {
+		// 	errMulti.Add(errors.Errorf("panicked during process one sku: %s", r))
+		// }
 
 		<-c.chFilterSkuTickets
 

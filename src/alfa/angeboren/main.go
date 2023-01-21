@@ -15,5 +15,5 @@ func Default() Konfig {
 }
 
 func (k *Konfig) AddToFlags(f *flag.FlagSet) {
-	f.BoolVar(&k.UseBestandsaufnahme, "use-bestandsaufnahme", false, "use bestandsaufnahme")
+	f.BoolVar(&k.UseBestandsaufnahme, "use-bestandsaufnahme", k.UseBestandsaufnahme, "use bestandsaufnahme")
 }

@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/transaktion"
-	"github.com/friedenberg/zit/src/hotel/typ"
+	"github.com/friedenberg/zit/src/hotel/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
@@ -31,6 +31,45 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		errors.Err().Print("ignoring arguments")
 	}
 
+	method := c.runWithTransaktion
+
+	if u.Konfig().UseBestandsaufnahme {
+		method = c.runWithBestandsaufnahm
+	}
+
+	if err = method(u); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (c Last) runWithBestandsaufnahm(u *umwelt.Umwelt) (err error) {
+	s := u.StoreObjekten()
+
+	var b *bestandsaufnahme.Objekte
+
+	if b, err = s.Bestandsaufnahme().ReadLast(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	errors.TodoP3("support log line format for skus")
+	if err = b.Akte.Skus.Each(
+		func(o sku.Sku2) (err error) {
+			errors.Out().Print(o)
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (c Last) runWithTransaktion(u *umwelt.Umwelt) (err error) {
 	s := u.StoreObjekten()
 
 	var transaktion *transaktion.Transaktion
@@ -40,25 +79,10 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
+	errors.TodoP3("support log line format for skus")
 	if err = transaktion.Skus.Each(
 		func(o sku.SkuLike) (err error) {
-			switch o.GetGattung() {
-			case gattung.Typ:
-				var te *typ.Transacted
-
-				if te, err = u.StoreObjekten().Typ().InflateFromDataIdentity(
-					o,
-				); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				u.PrinterTypTransacted("test")(te)
-
-			default:
-				errors.Out().Print(o)
-			}
-
+			errors.Out().Print(o)
 			return
 		},
 	); err != nil {

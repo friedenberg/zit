@@ -15,6 +15,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/age_io"
 	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
+	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/hotel/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/india/konfig"
@@ -25,16 +26,21 @@ type common struct {
 	LockSmith        LockSmith
 	Age              age.Age
 	konfig           *konfig.Compiled
-	Standort         standort.Standort
-	Transaktion      transaktion.Transaktion
-	Bestandsaufnahme *bestandsaufnahme.Objekte
+	standort         standort.Standort
+	transaktion      transaktion.Transaktion
+	bestandsaufnahme *bestandsaufnahme.Objekte
 	Abbr             *indexAbbr
 
 	bestandsaufnahmeStore bestandsaufnahme.Store
 }
 
+func (s common) AddSku(t objekte.TransactedLike) {
+	s.GetBestandsaufnahme().Akte.Skus.Add(t.GetSku2())
+	// s.GetTransaktion().Skus.Add(t.GetSku2())
+}
+
 func (s common) AddSkuToBestandsaufnahme(sk sku.SkuLike, as sha.Sha) {
-	s.Bestandsaufnahme.Akte.Skus.Push(
+	s.GetBestandsaufnahme().Akte.Skus.Push(
 		sku.Sku2{
 			Gattung:    gattung.Make(sk.GetGattung()),
 			Tai:        ts.TaiFromTimeWithIndex(sk.GetTime(), sk.GetTransactionIndex().Int()),
@@ -43,6 +49,22 @@ func (s common) AddSkuToBestandsaufnahme(sk sku.SkuLike, as sha.Sha) {
 			AkteSha:    as,
 		},
 	)
+}
+
+func (s common) Bestandsaufnahme() bestandsaufnahme.Store {
+	return s.bestandsaufnahmeStore
+}
+
+func (s *common) GetBestandsaufnahme() *bestandsaufnahme.Objekte {
+	return s.bestandsaufnahme
+}
+
+func (s *common) GetTransaktion() *transaktion.Transaktion {
+	return &s.transaktion
+}
+
+func (s common) GetStandort() standort.Standort {
+	return s.standort
 }
 
 func (s common) GetKonfig() konfig.Compiled {
@@ -67,7 +89,7 @@ func (s common) ObjekteReader(
 ) (rc sha.ReadCloser, err error) {
 	var p string
 
-	if p, err = s.Standort.DirObjektenGattung(g); err != nil {
+	if p, err = s.GetStandort().DirObjektenGattung(g); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -91,7 +113,7 @@ func (s common) ObjekteWriter(
 ) (wc sha.WriteCloser, err error) {
 	var p string
 
-	if p, err = s.Standort.DirObjektenGattung(g); err != nil {
+	if p, err = s.GetStandort().DirObjektenGattung(g); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -154,7 +176,7 @@ func (s common) AkteWriter() (w sha.WriteCloser, err error) {
 
 	mo := age_io.MoveOptions{
 		Age:                      s.Age,
-		FinalPath:                s.Standort.DirObjektenAkten(),
+		FinalPath:                s.GetStandort().DirObjektenAkten(),
 		GenerateFinalPathFromSha: true,
 		LockFile:                 true,
 	}
@@ -175,7 +197,7 @@ func (s common) AkteReader(sh sha.ShaLike) (r sha.ReadCloser, err error) {
 		return
 	}
 
-	p := id.Path(sh.GetSha(), s.Standort.DirObjektenAkten())
+	p := id.Path(sh.GetSha(), s.GetStandort().DirObjektenAkten())
 
 	o := age_io.FileReadOptions{
 		Age:  s.Age,

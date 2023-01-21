@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/collections_coding"
+	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/india/konfig"
 )
 
@@ -26,6 +27,7 @@ func (f *FormatterValue) Set(v string) (err error) {
 	v1 := strings.TrimSpace(strings.ToLower(v))
 	switch v1 {
 	case
+		"formatters",
 		"typ-vim-syntax-type",
 		"typ",
 		"typ-formatter-uti-groups",
@@ -74,6 +76,34 @@ func (fv *FormatterValue) FuncFormatter(
 	case "log":
 		return logFunc
 
+	case "formatters":
+		return func(o *Transacted) (err error) {
+			t := k.GetApproximatedTyp(o.Objekte.Typ)
+
+			if !t.HasValue() {
+				return
+			}
+
+			tt := t.ActualOrNil()
+
+			lw := format.MakeLineWriter()
+
+			for fn, f := range tt.Objekte.Akte.Formatters {
+				if f.FileExtension != "" {
+					lw.WriteFormat("%s %s", fn, f.FileExtension)
+				} else {
+					lw.WriteFormat("%s", fn)
+				}
+			}
+
+			if _, err = lw.WriteTo(out); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+
 	case "typ":
 		return func(o *Transacted) (err error) {
 			if _, err = io.WriteString(out, o.Objekte.Typ.String()); err != nil {
@@ -86,9 +116,9 @@ func (fv *FormatterValue) FuncFormatter(
 
 	case "typ-vim-syntax-type":
 		return func(o *Transacted) (err error) {
-			var t *konfig.ApproximatedTyp
+			var t konfig.ApproximatedTyp
 
-			if t = k.GetApproximatedTyp(o.Objekte.Typ); t == nil {
+			if t = k.GetApproximatedTyp(o.Objekte.Typ); !t.HasValue() {
 				return
 			}
 

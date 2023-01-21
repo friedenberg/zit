@@ -1,8 +1,7 @@
 
-if exists("b:current_syntax")
-  finish
-endif
-
+" if exists("b:current_syntax")
+"   finish
+" endif
 
 let zettel = expand("%:r")
 
@@ -19,23 +18,28 @@ if zettel != ""
   let syntaxFile = $VIMRUNTIME . "/syntax/" . zettelTypSyntax . ".vim"
   let ftpluginFile = $VIMRUNTIME . "/ftplugin/" . zettelTypSyntax . ".vim"
 
-  if filereadable(syntaxFile)
-    exec "source " . syntaxFile
-    " TODO-P3
-    " exec "source " . ftpluginFile
-  else
-    let syntaxFile = $VIMRUNTIME . "/syntax/markdown.vim"
-    let ftpluginFile = $VIMRUNTIME . "/ftplugin/markdown.vim"
+  execute "syntax include @akte" "syntax/" .. zettelTypSyntax .. ".vim"
+  " if filereadable(syntaxFile)
+  "   exec "source " . syntaxFile
+  "   " TODO-P3
+  "   " exec "source " . ftpluginFile
+  " else
+  "   let syntaxFile = $VIMRUNTIME . "/syntax/markdown.vim"
+  "   let ftpluginFile = $VIMRUNTIME . "/ftplugin/markdown.vim"
 
-    exec "source " . syntaxFile
-    " TODO-P3
-    " exec "source " . ftpluginFile
-  endif
+  "   exec "source " . syntaxFile
+  "   " TODO-P3
+  "   " exec "source " . ftpluginFile
+  " endif
 endif
 
 " syn case match
+"
+syn region zitAkte start=// end=// contains=@akte
 
-syn region zitMetadatei start=/\v%^---$/ end=/\v^---$/ contains=zitMetadateiBezeichnungRegion,zitMetadateiEtikettRegion,zitMetadateiAkteRegion
+syn region zitMetadatei start=/\v%^---$/ end=/\v^---$/ 
+      \ contains=zitMetadateiBezeichnungRegion,zitMetadateiEtikettRegion,zitMetadateiAkteRegion
+      \ nextgroup=zitAkte
 
 syn match zitMetadateiBezeichnung /\v[^\n]+/ contained
 syn match zitMetadateiBezeichnungPrefix /\v^# / contained nextgroup=zitMetadateiBezeichnung

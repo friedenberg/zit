@@ -313,7 +313,7 @@ function can_update_akte { # @test
 	} >"$new_akte"
 
 	run zit checkin-akte "${cmd_zit_def[@]}" -new-etiketten et3 one/uno "$new_akte"
-	assert_output '      (updated) [o/u@6b !md "bez"]'
+	assert_output '      (updated) [o/u@6 !md "bez"]'
 
 	# then
 	{
@@ -481,7 +481,7 @@ function checkouts_dont_overwrite { # @test
 	cat "$expected" >"one/uno.zettel"
 
 	run zit checkout "${cmd_zit_def[@]}" one/uno
-	assert_output '  (checked out) [one/uno.zettel@63 !md "bez"]'
+	assert_output '  (checked out) [one/uno.zettel@6 !md "bez"]'
 
 	run cat one/uno.zettel
 	assert_output "$(cat "$expected")"

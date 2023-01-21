@@ -28,7 +28,7 @@ func (e formatterTypFormatterUTIGroups) Format(
 
 	ct := e.erworben.GetApproximatedTyp(c.Zettel.Typ)
 
-	if ct == nil {
+	if !ct.HasValue() {
 		return
 	}
 

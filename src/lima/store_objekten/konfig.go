@@ -108,7 +108,7 @@ func (s konfigStore) Update(
 
 	mo := age_io.MoveOptions{
 		Age:                      s.common.Age,
-		FinalPath:                s.common.Standort.DirObjektenKonfig(),
+		FinalPath:                s.common.GetStandort().DirObjektenKonfig(),
 		GenerateFinalPathFromSha: true,
 	}
 
@@ -134,7 +134,7 @@ func (s konfigStore) Update(
 		Objekte: *ko,
 		Sku: sku.Transacted[kennung.Konfig, *kennung.Konfig]{
 			Verzeichnisse: sku.Verzeichnisse{
-				Schwanz: s.common.Transaktion.Time,
+				Schwanz: s.common.GetTransaktion().Time,
 			},
 		},
 	}
@@ -144,7 +144,7 @@ func (s konfigStore) Update(
 		kt.Sku.Kopf = mutter.Sku.Kopf
 		kt.Sku.Mutter[0] = mutter.Sku.Schwanz
 	} else {
-		kt.Sku.Kopf = s.common.Transaktion.Time
+		kt.Sku.Kopf = s.common.GetTransaktion().Time
 	}
 
 	fo := objekte.MakeFormat[erworben.Objekte, *erworben.Objekte]()
@@ -167,7 +167,7 @@ func (s konfigStore) Update(
 		return
 	}
 
-	s.common.Transaktion.Skus.Add(&kt.Sku)
+	s.common.GetTransaktion().Skus.Add(&kt.Sku)
 	s.common.KonfigPtr().SetTransacted(kt)
 
 	if err = s.common.Abbr.addStoredAbbreviation(kt); err != nil {
@@ -196,7 +196,7 @@ func (s konfigStore) Read() (tt *erworben.Transacted, err error) {
 			var r sha.ReadCloser
 
 			if r, err = s.common.ReadCloserObjekten(
-				id.Path(tt.Sku.ObjekteSha, s.common.Standort.DirObjektenKonfig()),
+				id.Path(tt.Sku.ObjekteSha, s.common.GetStandort().DirObjektenKonfig()),
 			); err != nil {
 				if errors.IsNotExist(err) {
 					err = nil
@@ -221,7 +221,7 @@ func (s konfigStore) Read() (tt *erworben.Transacted, err error) {
 			var r sha.ReadCloser
 
 			if r, err = s.common.ReadCloserObjekten(
-				id.Path(tt.Objekte.Sha, s.common.Standort.DirObjektenAkten()),
+				id.Path(tt.Objekte.Sha, s.common.GetStandort().DirObjektenAkten()),
 			); err != nil {
 				if errors.IsNotExist(err) {
 					err = errors.Wrap(ErrNotFound{})

@@ -17,7 +17,7 @@ func (z *Objekte) ApplyKonfig(k konfig.Compiled) (err error) {
 
 	tk := k.GetApproximatedTyp(z.Typ)
 
-	if tk == nil {
+	if !tk.HasValue() {
 		return
 	}
 

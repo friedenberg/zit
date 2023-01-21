@@ -23,18 +23,20 @@ function! GetZitOrganizeFold(lnum)
   endif
 endfunction
 
+" TODO refactor into common
 function! GfOrganize()
-  let l:h = trim(system("zit expand-hinweis " . expand("<cfile>")))
+  let l:cfile = expand("<cfile>")
+  let l:expanded = trim(system("zit expand-hinweis " .. l:cfile))
 
-  if !filereadable(l:h)
-    echo system("zit checkout -mode both " . l:h)
+  if !filereadable(l:expanded .. ".zettel")
+    echom trim(system("zit checkout -mode both " .. l:expanded))
   endif
 
-  " TODO dynamically source zettel file extension
-  let l:f = l:h . ".zettel"
-
-  execute 'tabedit' l:f
+  " let l:cmd = 'tabedit ' .. fnameescape(l:expanded .. ".zettel")
+  execute 'tabedit' fnameescape(l:expanded .. ".zettel")
 endfunction
 
-noremap gf :call GfOrganize()<CR>
+" <buffer> restricts this remap to the buffer in which it was defined
+" https://learnvimscriptthehardway.stevelosh.com/chapters/11.html
+noremap <buffer> gf :call GfOrganize()<CR>
 

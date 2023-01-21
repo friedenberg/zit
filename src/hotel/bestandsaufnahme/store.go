@@ -1,6 +1,8 @@
 package bestandsaufnahme
 
 import (
+	"sync"
+
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
@@ -16,9 +18,9 @@ type Store interface {
 	ObjekteSaver
 	AkteTextSaver
 	Create(*Objekte) (schnittstellen.Sha, error)
+	ReadLast() (*Objekte, error)
 	ReadOne(sha.Sha) (*Objekte, error)
 	ReadAll(collections.WriterFunc[*Objekte]) error
-	// errors.Flusher
 }
 
 type ObjekteSaver = objekte.ObjekteSaver[
@@ -160,6 +162,33 @@ func (s *store) ReadOne(sh sha.Sha) (o *Objekte, err error) {
 	defer errors.DeferredCloser(&err, ar)
 
 	if _, err = s.AkteFormat.Parse(ar, o); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *store) ReadLast() (max *Objekte, err error) {
+	l := &sync.Mutex{}
+
+	if err = s.ReadAll(
+		func(b *Objekte) (err error) {
+			l.Lock()
+			defer l.Unlock()
+
+			if max == nil || max.Less(*b) {
+				if max != nil {
+					errors.TodoP3("repool max")
+				}
+
+				max = b
+				err = collections.ErrDoNotRepool
+			}
+
+			return
+		},
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

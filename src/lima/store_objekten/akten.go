@@ -29,7 +29,7 @@ func (s Store) ReadAllAktenShas(w collections.WriterFunc[sha.Sha]) (err error) {
 
 	if err = files.ReadDirNamesLevel2(
 		files.MakeDirNameWriterIgnoringHidden(wf),
-		s.common.Standort.DirObjektenAkten(),
+		s.common.GetStandort().DirObjektenAkten(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -43,7 +43,7 @@ func (s Store) AkteExists(sh sha.Sha) (err error) {
 		return
 	}
 
-	p := id.Path(sh, s.common.Standort.DirObjektenAkten())
+	p := id.Path(sh, s.common.GetStandort().DirObjektenAkten())
 	ok := files.Exists(p)
 
 	if !ok {

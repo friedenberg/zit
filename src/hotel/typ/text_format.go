@@ -83,7 +83,7 @@ func (f TextFormat) ReadFormat(r io.Reader, t *Objekte) (n int64, err error) {
 		}
 
 		if t.Akte.Formatters == nil {
-			t.Akte.Formatters = make(map[string]script_config.ScriptConfigWithUTI)
+			t.Akte.Formatters = make(map[string]script_config.WithOutputFormat)
 		}
 
 		if t.Akte.EtikettenRules == nil {

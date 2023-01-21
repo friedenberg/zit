@@ -130,7 +130,7 @@ func (s etikettStore) CreateOrUpdate(
 		Sku: sku.Transacted[kennung.Etikett, *kennung.Etikett]{
 			Kennung: *tk,
 			Verzeichnisse: sku.Verzeichnisse{
-				Schwanz: s.common.Transaktion.Time,
+				Schwanz: s.common.GetTransaktion().Time,
 			},
 		},
 	}
@@ -140,7 +140,7 @@ func (s etikettStore) CreateOrUpdate(
 		tt.Sku.Kopf = mutter.Sku.Kopf
 		tt.Sku.Mutter[0] = mutter.Sku.Schwanz
 	} else {
-		tt.Sku.Kopf = s.common.Transaktion.Time
+		tt.Sku.Kopf = s.common.GetTransaktion().Time
 	}
 
 	fo := objekte.MakeFormat[etikett.Objekte, *etikett.Objekte]()
@@ -149,7 +149,7 @@ func (s etikettStore) CreateOrUpdate(
 
 	mo := age_io.MoveOptions{
 		Age:                      s.common.Age,
-		FinalPath:                s.common.Standort.DirObjektenEtiketten(),
+		FinalPath:                s.common.GetStandort().DirObjektenEtiketten(),
 		GenerateFinalPathFromSha: true,
 	}
 
@@ -178,7 +178,7 @@ func (s etikettStore) CreateOrUpdate(
 		return
 	}
 
-	s.common.Transaktion.Skus.Add(&tt.Sku)
+	s.common.GetTransaktion().Skus.Add(&tt.Sku)
 	s.common.KonfigPtr().AddEtikett(tt)
 
 	if mutter == nil {

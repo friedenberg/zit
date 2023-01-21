@@ -14,7 +14,7 @@ func Default() (t *Objekte, k *kennung.Typ) {
 		Akte: Akte{
 			InlineAkte:     true,
 			FileExtension:  "md",
-			Formatters:     make(map[string]script_config.ScriptConfigWithUTI),
+			Formatters:     make(map[string]script_config.WithOutputFormat),
 			Actions:        make(map[string]script_config.ScriptConfig),
 			EtikettenRules: make(map[string]etikett_rule.Rule),
 		},

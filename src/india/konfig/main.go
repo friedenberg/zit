@@ -320,7 +320,7 @@ func (c compiled) GetSortedEtikettenExpanded(
 func (kc compiled) IsInlineTyp(k kennung.Typ) (isInline bool) {
 	tc := kc.GetApproximatedTyp(k)
 
-	if tc == nil {
+	if !tc.HasValue() {
 		return
 	}
 
@@ -331,13 +331,12 @@ func (kc compiled) IsInlineTyp(k kennung.Typ) (isInline bool) {
 
 // Returns the exactly matching Typ, or if it doesn't exist, returns the parent
 // Typ or nil. (Parent Typ for `md-gdoc` would be `md`.)
-func (kc compiled) GetApproximatedTyp(k kennung.Typ) (ct *ApproximatedTyp) {
+func (kc compiled) GetApproximatedTyp(k kennung.Typ) (ct ApproximatedTyp) {
 	expandedActual := kc.GetSortedTypenExpanded(k.String())
 
 	if len(expandedActual) > 0 {
-		ct = &ApproximatedTyp{
-			typ: *expandedActual[0],
-		}
+		ct.hasValue = true
+		ct.typ = *expandedActual[0]
 
 		if ct.typ.Sku.Kennung.Equals(k) {
 			ct.isActual = true

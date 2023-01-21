@@ -121,7 +121,7 @@ func (c Exec) getZettel(
 
 	typKonfig := u.Konfig().GetApproximatedTyp(typ)
 
-	if typKonfig == nil {
+	if !typKonfig.HasValue() {
 		err = errors.Normal(errors.Errorf("Typ does not have an exec-command set: %s", typ))
 		return
 	}

@@ -49,7 +49,7 @@ func Make(
 			LockSmith: lockSmith,
 			Age:       a,
 			konfig:    k,
-			Standort:  st,
+			standort:  st,
 		},
 	}
 
@@ -66,8 +66,8 @@ func Make(
 		t.MoveForwardIota()
 	}
 
-	s.common.Transaktion = transaktion.MakeTransaktion(t)
-	s.common.Bestandsaufnahme = &bestandsaufnahme.Objekte{
+	s.common.transaktion = transaktion.MakeTransaktion(t)
+	s.common.bestandsaufnahme = &bestandsaufnahme.Objekte{
 		Tai: ta,
 		Akte: bestandsaufnahme.Akte{
 			Skus: sku.MakeSku2Heap(),
@@ -103,7 +103,7 @@ func Make(
 	}
 
 	if s.bestandsaufnahmeStore, err = bestandsaufnahme.MakeStore(
-		s.common.Standort,
+		s.common.GetStandort(),
 		&s.common,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -193,7 +193,7 @@ func (s *Store) Konfig() KonfigStore {
 }
 
 func (s *Store) CurrentTransaktionTime() ts.Time {
-	return s.common.Transaktion.Time
+	return s.common.GetTransaktion().Time
 }
 
 func (s Store) RevertTransaktion(
@@ -280,14 +280,17 @@ func (s Store) Flush() (err error) {
 		return
 	}
 
-	if _, err = s.bestandsaufnahmeStore.Create(s.common.Bestandsaufnahme); err != nil {
+	errors.Log().Printf("saving Bestandsaufnahme")
+	if _, err = s.bestandsaufnahmeStore.Create(s.common.GetBestandsaufnahme()); err != nil {
 		if errors.Is(err, bestandsaufnahme.ErrEmpty) {
+			errors.Log().Printf("Bestandsaufnahme was empty")
 			err = nil
 		} else {
 			err = errors.Wrap(err)
 			return
 		}
 	}
+	errors.Log().Printf("done saving Bestandsaufnahme")
 
 	//TODO-P2 add Bestandsaufnahme to Transaktion
 
@@ -407,7 +410,7 @@ func (s *Store) Reindex() (err error) {
 		return
 	}
 
-	if err = s.common.Standort.ResetVerzeichnisse(); err != nil {
+	if err = s.common.GetStandort().ResetVerzeichnisse(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

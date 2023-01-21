@@ -55,7 +55,7 @@ func (s common) ReadAllTransaktions(
 
 			return
 		},
-		s.Standort.DirObjektenTransaktion(),
+		s.GetStandort().DirObjektenTransaktion(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -65,7 +65,7 @@ func (s common) ReadAllTransaktions(
 }
 
 func (s common) TransaktionPath(t ts.Time) (p string) {
-	p = id.Path(t, s.Standort.DirObjektenTransaktion())
+	p = id.Path(t, s.GetStandort().DirObjektenTransaktion())
 
 	return
 }
@@ -97,18 +97,21 @@ func (s common) readTransaktion(p string) (t *transaktion.Transaktion, err error
 }
 
 func (s common) writeTransaktion() (err error) {
-	if s.Transaktion.Skus.Len() == 0 {
+	if s.GetTransaktion().Skus.Len() == 0 {
 		errors.Log().Print("not writing Transaktion as there aren't any Objekten")
 		return
 	}
 
-	errors.Log().Printf("writing Transaktion with %d Objekten", s.Transaktion.Skus.Len())
+	errors.Log().Printf(
+		"writing Transaktion with %d Objekten",
+		s.GetTransaktion().Skus.Len(),
+	)
 
 	var p string
 
 	if p, err = id.MakeDirIfNecessary(
-		s.Transaktion.Time,
-		s.Standort.DirObjektenTransaktion(),
+		s.GetTransaktion().Time,
+		s.GetStandort().DirObjektenTransaktion(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -123,7 +126,7 @@ func (s common) writeTransaktion() (err error) {
 
 	defer errors.Deferred(&err, w.Close)
 
-	f := transaktion.Writer{Transaktion: s.Transaktion}
+	f := transaktion.Writer{Transaktion: *s.GetTransaktion()}
 
 	if _, err = f.WriteTo(w); err != nil {
 		err = errors.Wrap(err)
