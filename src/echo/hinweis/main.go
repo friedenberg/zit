@@ -167,6 +167,8 @@ func (h *Hinweis) Set(v string) (err error) {
 		v,
 	)
 
+	v = strings.TrimSuffix(v, ".zettel")
+
 	parts := strings.Split(v, "/")
 
 	count := len(parts)

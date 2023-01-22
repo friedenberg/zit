@@ -17,7 +17,7 @@ import (
 )
 
 func (s Store) ReadExternalZettelFromAktePath(p string) (cz zettel_checked_out.Zettel, err error) {
-  errors.TodoP3("use cache")
+	errors.TodoP3("use cache")
 
 	if p, err = filepath.Abs(p); err != nil {
 		err = errors.Wrap(err)
@@ -76,7 +76,7 @@ func (s Store) ReadExternalZettelFromAktePath(p string) (cz zettel_checked_out.Z
 }
 
 func (s Store) AkteShaFromPath(p string) (sh sha.Sha, err error) {
-  errors.TodoP3("use cache")
+	errors.TodoP3("use cache")
 
 	var aw age_io.Writer
 

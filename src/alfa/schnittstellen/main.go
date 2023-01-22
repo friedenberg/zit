@@ -4,12 +4,12 @@ type Ptr[T any] interface {
 	*T
 }
 
-//TODO-P4 rename to Equaller
+// TODO-P4 rename to Equaller
 type Equatable[T any] interface {
 	Equals(T) bool
 }
 
-//TODO-P4 rename to Resetter
+// TODO-P4 rename to Resetter
 type Resetable[T any] interface {
 	Ptr[T]
 	ResetWith(T)

@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"syscall"
 
+	"github.com/friedenberg/zit/src/alfa/angeboren"
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
@@ -16,7 +17,9 @@ type Listener interface {
 	Listen() error
 }
 
-type MessageHiSoldier struct{}
+type MessageHiSoldier struct {
+	Angeboren angeboren.KonfigLike
+}
 
 type SoldierDialogueChanElement struct {
 	Dialogue
@@ -25,6 +28,7 @@ type SoldierDialogueChanElement struct {
 }
 
 type StageSoldier struct {
+	Angeboren                 angeboren.Getter
 	listener                  *net.UnixListener
 	chStopWaitingForDialogues chan struct{}
 	chDialogue                chan SoldierDialogueChanElement
@@ -48,6 +52,7 @@ func MakeStageSoldier(u *umwelt.Umwelt) (
 	err error,
 ) {
 	s = &StageSoldier{
+		Angeboren:                 u.Konfig(),
 		chStopWaitingForDialogues: make(chan struct{}),
 		handlers:                  make(map[DialogueType]func(Dialogue) error),
 	}
@@ -211,6 +216,7 @@ func (s *StageSoldier) awaitRegisteredDialogueHandlers(errMulti errors.Multi) {
 
 func (s *StageSoldier) AwaitDialogue() (out SoldierDialogueChanElement) {
 	if out.Dialogue, out.MessageHiCommander, out.error = makeDialogueListen(
+		s.Angeboren,
 		&s.stage,
 		s.listener,
 	); out.error != nil {

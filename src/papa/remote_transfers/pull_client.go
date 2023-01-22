@@ -1,4 +1,4 @@
-package remote_pull
+package remote_transfers
 
 import (
 	"net"
@@ -17,13 +17,10 @@ import (
 	"github.com/friedenberg/zit/src/oscar/remote_conn"
 )
 
-const (
-	concurrentSkuFilterJobLimit = 100
-)
-
+// TODO-P3 move to sku package
 type FuncSku func(sku.Sku2) error
 
-type Client interface {
+type PullClient interface {
 	SkusFromFilter(id_set.Filter, gattungen.Set, FuncSku) error
 	PullSkus(id_set.Filter, gattungen.Set) error
 	schnittstellen.ObjekteReaderFactory
@@ -36,13 +33,17 @@ type client struct {
 	stage              *remote_conn.StageCommander
 	chDone             chan struct{}
 	chFilterSkuTickets chan struct{}
+	common
 }
 
-func MakeClient(u *umwelt.Umwelt, from string) (c *client, err error) {
+func MakePullClient(u *umwelt.Umwelt, from string) (c *client, err error) {
 	c = &client{
 		umwelt:             u,
 		chDone:             make(chan struct{}),
 		chFilterSkuTickets: make(chan struct{}, concurrentSkuFilterJobLimit),
+		common: common{
+			Umwelt: u,
+		},
 	}
 
 	if c.stage, err = remote_conn.MakeStageCommander(
@@ -51,6 +52,14 @@ func MakeClient(u *umwelt.Umwelt, from string) (c *client, err error) {
 		"pull",
 	); err != nil {
 		err = errors.Wrap(err)
+		return
+	}
+
+	theirVersion := c.stage.MainDialogue().GetAngeboren().GetStoreVersion()
+	ourVersion := u.Konfig().GetAngeboren().GetStoreVersion()
+
+	if ourVersion.Less(theirVersion) {
+		err = errors.Normal(ErrPullRemoteHasHigherVersion)
 		return
 	}
 

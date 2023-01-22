@@ -9,6 +9,8 @@ import (
 
 type ProtoId struct {
 	schnittstellen.Setter
+	//TODO-P2 change this to Transform and add suffix stripping for file
+	//extensions in call sites
 	Expand func(string) (string, error)
 }
 

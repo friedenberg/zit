@@ -11,6 +11,7 @@ import (
 	"sync"
 	"syscall"
 
+	"github.com/friedenberg/zit/src/alfa/angeboren"
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -19,9 +20,11 @@ import (
 type MessageHiCommander struct {
 	DialogueType
 	CliKonfig erworben.Cli
+	Angeboren angeboren.KonfigLike
 }
 
 type StageCommander struct {
+	Angeboren           angeboren.Getter
 	remoteActorCmd      *exec.Cmd
 	konfigCli           erworben.Cli
 	wg                  *sync.WaitGroup
@@ -76,6 +79,7 @@ func MakeStageCommander(
 	command string,
 ) (s *StageCommander, err error) {
 	s = &StageCommander{
+		Angeboren:           u.Konfig(),
 		wg:                  &sync.WaitGroup{},
 		konfigCli:           u.Konfig().Cli(),
 		chRemoteCommandDone: make(chan struct{}),
@@ -159,6 +163,7 @@ func (s *StageCommander) StartDialogue(t DialogueType) (d Dialogue, err error) {
 	msgOurHi := MessageHiCommander{
 		DialogueType: d.Type(),
 		CliKonfig:    s.konfigCli,
+		Angeboren:    s.Angeboren.GetAngeboren(),
 	}
 
 	if err = d.Send(msgOurHi); err != nil {
@@ -172,6 +177,8 @@ func (s *StageCommander) StartDialogue(t DialogueType) (d Dialogue, err error) {
 		err = errors.Wrap(err)
 		return
 	}
+
+	d.Angeboren = msgTheirHi.Angeboren
 
 	return
 }

@@ -25,3 +25,8 @@ type IdPtr[T Value] interface {
 	ValuePtr[T]
 	Resetable[T]
 }
+
+type Lessor[T any] interface {
+	Less(T) bool
+}
+

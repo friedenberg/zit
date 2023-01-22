@@ -12,7 +12,7 @@ type ApproximatedTyp struct {
 }
 
 func (a ApproximatedTyp) HasValue() bool {
-  return a.hasValue
+	return a.hasValue
 }
 
 func (a ApproximatedTyp) ActualOrNil() (actual *typ.Transacted) {

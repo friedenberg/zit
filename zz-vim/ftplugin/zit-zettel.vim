@@ -117,6 +117,7 @@ function! ZitPreview()
           \ ]
 
     call system(join(l:cmd_args_list, " "))
+    echom l:tempfile
     call system("qlmanage -p "..l:tempfile..">/dev/null 2>&1 &")
   endfunc
 

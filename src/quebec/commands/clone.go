@@ -14,7 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/foxtrot/id_set"
 	"github.com/friedenberg/zit/src/november/umwelt"
-	"github.com/friedenberg/zit/src/papa/remote_pull"
+	"github.com/friedenberg/zit/src/papa/remote_transfers"
 )
 
 type Clone struct {
@@ -137,9 +137,9 @@ func (c Clone) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	defer errors.Deferred(&err, u.Unlock)
 
-	var client remote_pull.Client
+	var client remote_transfers.PullClient
 
-	if client, err = remote_pull.MakeClient(u, from); err != nil {
+	if client, err = remote_transfers.MakePullClient(u, from); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

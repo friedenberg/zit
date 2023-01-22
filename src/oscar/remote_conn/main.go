@@ -5,18 +5,25 @@ import (
 	"net"
 	"syscall"
 
+	"github.com/friedenberg/zit/src/alfa/angeboren"
 	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
 type Dialogue struct {
-	typ   DialogueType
-	conn  *net.UnixConn
-	stage *stage
-	dec   *gob.Decoder
-	enc   *gob.Encoder
+	Angeboren angeboren.KonfigLike
+	typ       DialogueType
+	conn      *net.UnixConn
+	stage     *stage
+	dec       *gob.Decoder
+	enc       *gob.Encoder
+}
+
+func (d Dialogue) GetAngeboren() angeboren.KonfigLike {
+	return d.Angeboren
 }
 
 func makeDialogueListen(
+	a angeboren.Getter,
 	s *stage,
 	l *net.UnixListener,
 ) (d Dialogue, msg MessageHiCommander, err error) {
@@ -35,7 +42,9 @@ func makeDialogueListen(
 	d.enc = gob.NewEncoder(d.conn)
 	d.dec = gob.NewDecoder(d.conn)
 
-	msgOurHi := MessageHiSoldier{}
+	msgOurHi := MessageHiSoldier{
+		Angeboren: a.GetAngeboren(),
+	}
 
 	if err = d.Send(msgOurHi); err != nil {
 		err = errors.Wrap(err)
@@ -49,6 +58,7 @@ func makeDialogueListen(
 		return
 	}
 
+	d.Angeboren = msg.Angeboren
 	d.typ = msg.DialogueType
 
 	return

@@ -1,4 +1,4 @@
-package remote_pull
+package remote_transfers
 
 import (
 	"io"
@@ -13,15 +13,15 @@ import (
 	"github.com/friedenberg/zit/src/oscar/remote_conn"
 )
 
-type Server struct {
+type PullServer struct {
 	umwelt *umwelt.Umwelt
 	stage  *remote_conn.StageSoldier
 }
 
-func MakeServer(
+func MakePullServer(
 	u *umwelt.Umwelt,
-) (s Server, err error) {
-	s = Server{
+) (s PullServer, err error) {
+	s = PullServer{
 		umwelt: u,
 	}
 
@@ -35,7 +35,7 @@ func MakeServer(
 	return
 }
 
-func (op Server) Listen() (err error) {
+func (op PullServer) Listen() (err error) {
 	if err = op.stage.Listen(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -44,7 +44,7 @@ func (op Server) Listen() (err error) {
 	return
 }
 
-func (op Server) addToSoldierStage() {
+func (op PullServer) addToSoldierStage() {
 	op.stage.RegisterHandler(
 		remote_conn.DialogueTypeSkusForFilter,
 		op.skusForFilter,
@@ -61,7 +61,7 @@ func (op Server) addToSoldierStage() {
 	)
 }
 
-func (op Server) akteReaderForSha(
+func (op PullServer) akteReaderForSha(
 	d remote_conn.Dialogue,
 ) (err error) {
 	defer errors.DeferredCloser(&err, d)
@@ -72,6 +72,8 @@ func (op Server) akteReaderForSha(
 		err = errors.Wrap(err)
 		return
 	}
+
+  //TODO-P0 rest is common
 
 	errors.Log().Printf("received sha: %s", sh)
 
@@ -96,7 +98,7 @@ func (op Server) akteReaderForSha(
 	return
 }
 
-func (op Server) objekteReaderForSku(
+func (op PullServer) objekteReaderForSku(
 	d remote_conn.Dialogue,
 ) (err error) {
 	defer errors.DeferredCloser(&err, d)
@@ -107,6 +109,8 @@ func (op Server) objekteReaderForSku(
 		err = errors.Wrap(err)
 		return
 	}
+
+  //TODO-P0 rest is common
 
 	errors.Log().Printf("received request: %#v", msg)
 
@@ -134,7 +138,7 @@ func (op Server) objekteReaderForSku(
 	return
 }
 
-func (op Server) skusForFilter(
+func (op PullServer) skusForFilter(
 	d remote_conn.Dialogue,
 ) (err error) {
 	defer errors.DeferredCloser(&err, d)

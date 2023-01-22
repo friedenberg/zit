@@ -1,4 +1,4 @@
-package remote_pull
+package remote_transfers
 
 import (
 	"github.com/friedenberg/zit/src/bravo/gattung"

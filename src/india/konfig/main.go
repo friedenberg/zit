@@ -139,6 +139,10 @@ func (kc *Compiled) loadKonfigErworben(s standort.Standort) (err error) {
 	return
 }
 
+func (kc Compiled) GetAngeboren() pkg_angeboren.KonfigLike {
+	return kc.angeboren
+}
+
 func (kc Compiled) Cli() erworben.Cli {
 	return kc.cli
 }

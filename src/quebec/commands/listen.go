@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/november/umwelt"
 	"github.com/friedenberg/zit/src/oscar/remote_conn"
-	"github.com/friedenberg/zit/src/papa/remote_pull"
+	"github.com/friedenberg/zit/src/papa/remote_transfers"
 )
 
 type Listen struct {
@@ -35,7 +35,7 @@ func (c Listen) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	switch strings.ToLower(strings.TrimSpace(command)) {
 	case "pull":
-		if l, err = remote_pull.MakeServer(u); err != nil {
+		if l, err = remote_transfers.MakePullServer(u); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

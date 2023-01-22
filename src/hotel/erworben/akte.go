@@ -7,7 +7,6 @@ type Akte struct {
 	RemoteScripts  map[string]RemoteScript               `toml:"remote-scripts"`
 	Recipients     []string                              `toml:"recipients"`
 	Actions        map[string]script_config.ScriptConfig `toml:"actions,omitempty"`
-	StoreVersion   string                                `toml:"store-version,omitempty"`
 }
 
 func (a *Akte) Reset() {
@@ -16,7 +15,6 @@ func (a *Akte) Reset() {
 	//TODO-P4 should reuse
 	a.Recipients = make([]string, 0)
 	a.Actions = make(map[string]script_config.ScriptConfig)
-	a.StoreVersion = ""
 }
 
 func (a *Akte) ResetWith(b Akte) {
@@ -25,5 +23,4 @@ func (a *Akte) ResetWith(b Akte) {
 	a.RemoteScripts = b.RemoteScripts
 	a.Recipients = b.Recipients
 	a.Actions = b.Actions
-	a.StoreVersion = b.StoreVersion
 }
