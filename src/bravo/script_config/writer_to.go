@@ -46,8 +46,8 @@ func MakeWriterTo(
 		}
 	}
 
-	//TODO-P2 move to constructor?
-	wt.cmd.Stderr = os.Stdout
+	errors.TodoP2("determine how stderr and env should be handled")
+	wt.cmd.Stderr = os.Stderr
 	wt.cmd.Env = envCollapsed
 
 	return
