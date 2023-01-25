@@ -28,6 +28,7 @@ type StoreUtil interface {
 	CommitTransacted(objekte.TransactedLike) error
 	GetBestandsaufnahmeStore() bestandsaufnahme.Store
 	GetTransaktionStore() TransaktionStore
+	GetAbbrStore() AbbrStore
 }
 
 // TODO-P3 move to own package
@@ -76,6 +77,10 @@ func (s *common) GetTransaktionStore() TransaktionStore {
 
 func (s *common) GetBestandsaufnahmeStore() bestandsaufnahme.Store {
 	return s.bestandsaufnahmeStore
+}
+
+func (s *common) GetAbbrStore() AbbrStore {
+	return s.Abbr
 }
 
 func (s common) GetStandort() standort.Standort {

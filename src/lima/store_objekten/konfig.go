@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/delta/age_io"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
@@ -42,7 +41,7 @@ type KonfigAkteTextSaver = objekte_store.AkteTextSaver[
 ]
 
 type konfigStore struct {
-	common *common
+	StoreUtil
 
 	pool collections.PoolLike[erworben.Transacted]
 
@@ -58,13 +57,13 @@ func (s *konfigStore) SetLogWriter(
 }
 
 func makeKonfigStore(
-	sa *common,
+	sa StoreUtil,
 ) (s *konfigStore, err error) {
 	pool := collections.MakePool[erworben.Transacted]()
 
 	s = &konfigStore{
-		common: sa,
-		pool:   pool,
+		StoreUtil: sa,
+		pool:      pool,
 		KonfigInflator: objekte_store.MakeTransactedInflator[
 			erworben.Objekte,
 			*erworben.Objekte,
@@ -100,25 +99,19 @@ func (s konfigStore) Flush() (err error) {
 func (s konfigStore) Update(
 	ko *erworben.Objekte,
 ) (kt *erworben.Transacted, err error) {
-	if !s.common.LockSmith.IsAcquired() {
+	if !s.StoreUtil.GetLockSmith().IsAcquired() {
 		err = errors.Wrap(objekte_store.ErrLockRequired{Operation: "update konfig"})
 		return
 	}
 
-	var w *age_io.Mover
+	var ow sha.WriteCloser
 
-	mo := age_io.MoveOptions{
-		Age:                      s.common.Age,
-		FinalPath:                s.common.GetStandort().DirObjektenKonfig(),
-		GenerateFinalPathFromSha: true,
-	}
-
-	if w, err = age_io.NewMover(mo); err != nil {
+	if ow, err = s.StoreUtil.ObjekteWriter(gattung.Konfig); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.Deferred(&err, w.Close)
+	defer errors.DeferredCloser(&err, ow)
 
 	var mutter *erworben.Transacted
 
@@ -135,7 +128,7 @@ func (s konfigStore) Update(
 		Objekte: *ko,
 		Sku: sku.Transacted[kennung.Konfig, *kennung.Konfig]{
 			Verzeichnisse: sku.Verzeichnisse{
-				Schwanz: s.common.GetTransaktion().Time,
+				Schwanz: s.StoreUtil.GetTime(),
 			},
 		},
 	}
@@ -145,17 +138,17 @@ func (s konfigStore) Update(
 		kt.Sku.Kopf = mutter.Sku.Kopf
 		kt.Sku.Mutter[0] = mutter.Sku.Schwanz
 	} else {
-		kt.Sku.Kopf = s.common.GetTransaktion().Time
+		kt.Sku.Kopf = s.StoreUtil.GetTime()
 	}
 
 	fo := objekte.MakeFormat[erworben.Objekte, *erworben.Objekte]()
 
-	if _, err = fo.Format(w, &kt.Objekte); err != nil {
+	if _, err = fo.Format(ow, &kt.Objekte); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	kt.Sku.ObjekteSha = sha.Make(w.Sha())
+	kt.Sku.ObjekteSha = sha.Make(ow.Sha())
 
 	if mutter != nil && kt.GetObjekteSha().Equals(mutter.GetObjekteSha()) {
 		kt = mutter
@@ -168,10 +161,10 @@ func (s konfigStore) Update(
 		return
 	}
 
-	s.common.GetTransaktion().Skus.Add(&kt.Sku)
-	s.common.GetKonfigPtr().SetTransacted(kt)
+	s.StoreUtil.CommitTransacted(kt)
+	s.StoreUtil.GetKonfigPtr().SetTransacted(kt)
 
-	if err = s.common.Abbr.addStoredAbbreviation(kt); err != nil {
+	if err = s.StoreUtil.GetAbbrStore().addStoredAbbreviation(kt); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -186,9 +179,9 @@ func (s konfigStore) Update(
 
 func (s konfigStore) Read() (tt *erworben.Transacted, err error) {
 	tt = &erworben.Transacted{
-		Sku: s.common.GetKonfig().Sku,
+		Sku: s.StoreUtil.GetKonfig().Sku,
 		Objekte: erworben.Objekte{
-			Akte: s.common.GetKonfig().Akte,
+			Akte: s.StoreUtil.GetKonfig().Akte,
 		},
 	}
 
@@ -196,7 +189,7 @@ func (s konfigStore) Read() (tt *erworben.Transacted, err error) {
 		{
 			var r sha.ReadCloser
 
-			if r, err = s.common.ObjekteReader(
+			if r, err = s.StoreUtil.ObjekteReader(
 				gattung.Konfig,
 				tt.Sku.ObjekteSha,
 			); err != nil {
@@ -222,7 +215,7 @@ func (s konfigStore) Read() (tt *erworben.Transacted, err error) {
 		{
 			var r sha.ReadCloser
 
-			if r, err = s.common.ObjekteReader(
+			if r, err = s.StoreUtil.ObjekteReader(
 				gattung.Konfig,
 				tt.Objekte.Sha,
 			); err != nil {
@@ -236,7 +229,7 @@ func (s konfigStore) Read() (tt *erworben.Transacted, err error) {
 
 			defer errors.Deferred(&err, r.Close)
 
-			fo := erworben.MakeFormatText(s.common)
+			fo := erworben.MakeFormatText(s.StoreUtil)
 
 			if _, err = fo.Parse(r, &tt.Objekte); err != nil {
 				err = errors.Wrap(err)
@@ -265,7 +258,7 @@ func (s *konfigStore) reindexOne(
 
 	o = te
 
-	s.common.GetKonfigPtr().SetTransacted(te)
+	s.StoreUtil.GetKonfigPtr().SetTransacted(te)
 	s.KonfigLogWriter.Updated(te)
 
 	return

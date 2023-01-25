@@ -16,6 +16,10 @@ import (
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
+type AbbrStore interface {
+	addStoredAbbreviation(schnittstellen.Stored) error
+}
+
 type indexAbbrEncodableTridexes struct {
 	Shas             *tridex.Tridex
 	HinweisKopfen    *tridex.Tridex
