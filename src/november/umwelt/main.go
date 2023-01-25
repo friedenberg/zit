@@ -39,6 +39,7 @@ type Umwelt struct {
 
 	storesInitialized     bool
 	lock                  *file_lock.Lock
+	storeUtil             store_util.StoreUtil
 	storeObjekten         *store_objekten.Store
 	age                   *age.Age
 	storeWorkingDirectory *store_fs.Store
@@ -153,9 +154,7 @@ func (u *Umwelt) Initialize() (err error) {
 	// 	}
 	// }
 
-	var su store_util.StoreUtil
-
-	if su, err = store_util.MakeStoreUtil(
+	if u.storeUtil, err = store_util.MakeStoreUtil(
 		u.lock,
 		*u.age,
 		u.KonfigPtr(),
@@ -166,7 +165,7 @@ func (u *Umwelt) Initialize() (err error) {
 	}
 
 	if u.storeObjekten, err = store_objekten.Make(
-		su,
+    u.storeUtil,
 		u.zettelVerzeichnissePool,
 	); err != nil {
 		err = errors.Wrapf(err, "failed to initialize zettel meta store")

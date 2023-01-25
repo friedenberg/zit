@@ -13,7 +13,7 @@ import (
 type verzeichnisseSchwanzen struct {
 	headers [store_verzeichnisse.PageCount]*zettel.Schwanzen
 	*store_verzeichnisse.Zettelen
-	store_util.StoreUtil
+	su store_util.StoreUtil
 }
 
 func makeVerzeichnisseSchwanzen(
@@ -21,7 +21,7 @@ func makeVerzeichnisseSchwanzen(
 	p *collections.Pool[zettel.Transacted, *zettel.Transacted],
 ) (s *verzeichnisseSchwanzen, err error) {
 	s = &verzeichnisseSchwanzen{
-		StoreUtil: sa,
+		su: sa,
 	}
 
 	for i := range s.headers {
@@ -29,9 +29,9 @@ func makeVerzeichnisseSchwanzen(
 	}
 
 	s.Zettelen, err = store_verzeichnisse.MakeZettelen(
-		s.StoreUtil.GetKonfig(),
-		s.StoreUtil.GetStandort().DirVerzeichnisseZettelenNeueSchwanzen(),
-		s.StoreUtil,
+		s.su.GetKonfig(),
+		s.su.GetStandort().DirVerzeichnisseZettelenNeueSchwanzen(),
+		s.su,
 		p,
 		s,
 	)

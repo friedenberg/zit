@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/hinweisen"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/transaktion"
@@ -28,7 +29,6 @@ type zettelStore struct {
 
 	*indexKennung
 	hinweisen *hinweisen.Hinweisen
-	*indexEtiketten
 
 	verzeichnisseSchwanzen *verzeichnisseSchwanzen
 	verzeichnisseAll       *store_verzeichnisse.Zettelen
@@ -111,14 +111,6 @@ func makeZettelStore(
 		return
 	}
 
-	if s.indexEtiketten, err = newIndexEtiketten(
-		s.StoreUtil.GetStandort().FileVerzeichnisseEtiketten(),
-		s.StoreUtil,
-	); err != nil {
-		err = errors.Wrapf(err, "failed to init zettel index")
-		return
-	}
-
 	return
 }
 
@@ -134,11 +126,6 @@ func (s *zettelStore) Flush() (err error) {
 
 	if err = s.verzeichnisseAll.Flush(); err != nil {
 		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.indexEtiketten.Flush(); err != nil {
-		err = errors.Wrapf(err, "failed to flush new zettel index")
 		return
 	}
 
@@ -313,7 +300,7 @@ func (s *zettelStore) Create(
 		return
 	}
 
-	if err = s.indexEtiketten.add(tz.Objekte.Etiketten); err != nil {
+	if err = s.StoreUtil.GetKennungIndex().Add(tz.Objekte.Etiketten); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -387,7 +374,14 @@ func (s *zettelStore) Update(
 		return
 	}
 
-	if err = s.indexEtiketten.addZettelWithOptionalMutter(tz, mutter); err != nil {
+	e1 := tz.Objekte.Etiketten
+	e2 := kennung.MakeEtikettSet()
+
+	if mutter != nil {
+		e2 = mutter.Objekte.Etiketten
+	}
+
+	if err = s.StoreUtil.GetKennungIndex().AddEtikettSet(e1, e2); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -558,7 +552,14 @@ func (s *zettelStore) reindexOne(
 		}
 	}
 
-	if err = s.indexEtiketten.addZettelWithOptionalMutter(tz, mutter); err != nil {
+	e1 := tz.Objekte.Etiketten
+	e2 := kennung.MakeEtikettSet()
+
+	if mutter != nil {
+		e2 = mutter.Objekte.Etiketten
+	}
+
+	if err = s.StoreUtil.GetKennungIndex().AddEtikettSet(e1, e2); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

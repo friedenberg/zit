@@ -1,4 +1,4 @@
-package store_objekten
+package kennung
 
 import (
 	"bufio"
@@ -7,38 +7,43 @@ import (
 	"sort"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/juliett/zettel"
-	"github.com/friedenberg/zit/src/kilo/store_util"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
-type indexEtiketten struct {
+type Index interface {
+	errors.Flusher
+	GetAllEtiketten() ([]Etikett, error)
+	AddEtikettSet(to EtikettSet, from EtikettSet) (err error)
+	Add(s EtikettSet) (err error)
+}
+
+type index struct {
 	path string
-	store_util.StoreUtilVerzeichnisse
-	etiketten  map[kennung.Etikett]int64
+	schnittstellen.VerzeichnisseFactory
+	etiketten  map[Etikett]int64
 	didRead    bool
 	hasChanges bool
 }
 
 type row struct {
-	kennung.Etikett
+	Etikett
 	count int64
 }
 
-func newIndexEtiketten(
+func MakeIndex(
 	p string,
-	f store_util.StoreUtilVerzeichnisse,
-) (i *indexEtiketten, err error) {
-	i = &indexEtiketten{
-		path:                   p,
-		StoreUtilVerzeichnisse: f,
-		etiketten:              make(map[kennung.Etikett]int64),
+	vf schnittstellen.VerzeichnisseFactory,
+) (i *index, err error) {
+	i = &index{
+		path:                 p,
+		VerzeichnisseFactory: vf,
+		etiketten:            make(map[Etikett]int64),
 	}
 
 	return
 }
 
-func (i *indexEtiketten) Flush() (err error) {
+func (i *index) Flush() (err error) {
 	if !i.hasChanges {
 		errors.Log().Print("no changes")
 		return
@@ -74,7 +79,7 @@ func (i *indexEtiketten) Flush() (err error) {
 	return
 }
 
-func (i *indexEtiketten) readIfNecessary() (err error) {
+func (i *index) readIfNecessary() (err error) {
 	if i.didRead {
 		return
 	}
@@ -117,34 +122,25 @@ func (i *indexEtiketten) readIfNecessary() (err error) {
 	return
 }
 
-func (i *indexEtiketten) addZettelWithOptionalMutter(
-	z *zettel.Transacted,
-	zMutter *zettel.Transacted,
+func (i *index) AddEtikettSet(
+	to EtikettSet,
+	from EtikettSet,
 ) (err error) {
-	zEtiketten := z.Objekte.Etiketten
+	d := MakeSetEtikettDelta(
+		from,
+		to,
+	)
 
-	if zMutter != nil {
-		d := kennung.MakeSetEtikettDelta(
-			zMutter.Objekte.Etiketten,
-			zEtiketten,
-		)
-
-		if err = i.processDelta(d); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	} else {
-		if err = i.add(zEtiketten); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if err = i.processDelta(d); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return
 }
 
-func (i *indexEtiketten) processDelta(d kennung.EtikettDelta) (err error) {
-	if err = i.add(d.Added); err != nil {
+func (i *index) processDelta(d EtikettDelta) (err error) {
+	if err = i.Add(d.Added); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -157,7 +153,7 @@ func (i *indexEtiketten) processDelta(d kennung.EtikettDelta) (err error) {
 	return
 }
 
-func (i *indexEtiketten) add(s kennung.EtikettSet) (err error) {
+func (i *index) Add(s EtikettSet) (err error) {
 	if s.Len() == 0 {
 		errors.Log().Print("no etiketten to add")
 		return
@@ -182,7 +178,7 @@ func (i *indexEtiketten) add(s kennung.EtikettSet) (err error) {
 	return
 }
 
-func (i *indexEtiketten) del(s kennung.EtikettSet) (err error) {
+func (i *index) del(s EtikettSet) (err error) {
 	if s.Len() == 0 {
 		errors.Log().Print("no etiketten to delete")
 		return
@@ -217,13 +213,13 @@ func (i *indexEtiketten) del(s kennung.EtikettSet) (err error) {
 	return
 }
 
-func (i *indexEtiketten) allEtiketten() (es []kennung.Etikett, err error) {
+func (i *index) GetAllEtiketten() (es []Etikett, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	es = make([]kennung.Etikett, len(i.etiketten))
+	es = make([]Etikett, len(i.etiketten))
 
 	n := 0
 

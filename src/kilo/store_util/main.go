@@ -12,6 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/age_io"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
@@ -27,6 +28,7 @@ type StoreUtilVerzeichnisse interface {
 }
 
 type StoreUtil interface {
+	errors.Flusher
 	StoreUtilVerzeichnisse
 	schnittstellen.LockSmithGetter
 	konfig.PtrGetter
@@ -39,6 +41,7 @@ type StoreUtil interface {
 	GetBestandsaufnahme() *bestandsaufnahme.Objekte
 	GetTransaktionStore() TransaktionStore
 	GetAbbrStore() AbbrStore
+	GetKennungIndex() kennung.Index
 }
 
 // TODO-P3 move to own package
@@ -52,6 +55,7 @@ type common struct {
 	Abbr             *indexAbbr
 
 	bestandsaufnahmeStore bestandsaufnahme.Store
+	kennungIndex          kennung.Index
 }
 
 func MakeStoreUtil(
@@ -104,6 +108,14 @@ func MakeStoreUtil(
 		return
 	}
 
+	if c.kennungIndex, err = kennung.MakeIndex(
+		c.GetStandort().FileVerzeichnisseEtiketten(),
+		c,
+	); err != nil {
+		err = errors.Wrapf(err, "failed to init zettel index")
+		return
+	}
+
 	return
 }
 
@@ -126,10 +138,6 @@ func (s common) CommitTransacted(t objekte.TransactedLike) (err error) {
 	return
 }
 
-func (s common) Bestandsaufnahme() bestandsaufnahme.Store {
-	return s.bestandsaufnahmeStore
-}
-
 func (s *common) GetBestandsaufnahme() *bestandsaufnahme.Objekte {
 	return s.bestandsaufnahme
 }
@@ -148,6 +156,10 @@ func (s *common) GetBestandsaufnahmeStore() bestandsaufnahme.Store {
 
 func (s *common) GetAbbrStore() AbbrStore {
 	return s.Abbr
+}
+
+func (s *common) GetKennungIndex() kennung.Index {
+	return s.kennungIndex
 }
 
 func (s common) GetStandort() standort.Standort {

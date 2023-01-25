@@ -81,7 +81,7 @@ func (c commandWithIds) Complete(u *umwelt.Umwelt, args ...string) (err error) {
 	if ps.Contains(&kennung.Etikett{}) {
 		var ea []kennung.Etikett
 
-		if ea, err = u.StoreObjekten().Etiketten(); err != nil {
+		if ea, err = u.StoreObjekten().GetKennungIndex().GetAllEtiketten(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

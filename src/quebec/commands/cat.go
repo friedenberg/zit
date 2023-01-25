@@ -66,7 +66,7 @@ func (c Cat) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 func (c Cat) etiketten(u *umwelt.Umwelt) (err error) {
 	var ea []kennung.Etikett
 
-	if ea, err = u.StoreObjekten().Etiketten(); err != nil {
+	if ea, err = u.StoreObjekten().GetKennungIndex().GetAllEtiketten(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -16,6 +16,11 @@ func (u *Umwelt) Lock() (err error) {
 
 func (u *Umwelt) Unlock() (err error) {
 	if u.storesInitialized {
+		if err = u.storeUtil.Flush(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 		if err = u.storeObjekten.Flush(); err != nil {
 			err = errors.Wrap(err)
 			return

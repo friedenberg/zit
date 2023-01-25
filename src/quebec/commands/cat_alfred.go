@@ -134,7 +134,7 @@ func (c CatAlfred) catEtiketten(
 
 	var err error
 
-	if ea, err = u.StoreObjekten().Etiketten(); err != nil {
+	if ea, err = u.StoreObjekten().GetKennungIndex().GetAllEtiketten(); err != nil {
 		aw.WriteError(err)
 		return
 	}
