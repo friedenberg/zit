@@ -9,6 +9,7 @@ import (
 type TransactedLike interface {
 	GetAkteSha() schnittstellen.Sha
 	GetSku2() sku.Sku2
+	GetSku() sku.Sku
 }
 
 type FuncReaderTransacted[T TransactedLike] func(collections.WriterFunc[T]) error

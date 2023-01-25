@@ -74,7 +74,7 @@ function can_update_akte { # @test
 	} >"$new_akte"
 
 	run zit checkin-akte "${cmd_zit_def[@]}" -new-etiketten et3 one/uno "$new_akte"
-	assert_output '      (updated) [o/u@6 !md "bez"]'
+	assert_output '      (updated) [o/u@6b !md "bez"]'
 
 	# then
 	{

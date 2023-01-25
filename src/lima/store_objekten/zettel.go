@@ -446,8 +446,7 @@ func (s *zettelStore) addZettelToTransaktion(
 	tz.Sku.Kennung = *zk
 	tz.Sku.ObjekteSha = *zs
 
-	s.common.GetTransaktion().Skus.Add(&tz.Sku)
-	s.common.AddSku(tz)
+	s.common.AddSku(tz.GetSku2(), &tz.Sku)
 
 	return
 }

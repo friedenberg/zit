@@ -20,16 +20,6 @@ type AkteWriterFactory interface {
 	AkteWriter() (ShaWriteCloser, error)
 }
 
-type ObjekteAkteReaderFactory interface {
-	ObjekteReaderFactory
-	AkteReaderFactory
-}
-
-type ObjekteAkteWriterFactory interface {
-	ObjekteWriterFactory
-	AkteWriterFactory
-}
-
 type FuncAkteReader func(ShaGetter) (ShaReadCloser, error)
 type FuncAkteWriter func() (ShaWriteCloser, error)
 

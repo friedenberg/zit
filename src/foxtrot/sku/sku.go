@@ -98,6 +98,10 @@ func (a Sku) Equals(b *Sku) (ok bool) {
 	return true
 }
 
+func (s Sku) GetKey() string {
+	return s.String()
+}
+
 func (s Sku) String() string {
 	return fmt.Sprintf(
 		"%s %s %s %s %s",

@@ -15,7 +15,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/age_io"
 	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
-	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/hotel/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/india/konfig"
@@ -34,9 +33,17 @@ type common struct {
 	bestandsaufnahmeStore bestandsaufnahme.Store
 }
 
-func (s common) AddSku(t objekte.TransactedLike) {
-	s.GetBestandsaufnahme().Akte.Skus.Add(t.GetSku2())
-	// s.GetTransaktion().Skus.Add(t.GetSku2())
+func (s common) GetTime() ts.Time {
+	return s.transaktion.Time
+}
+
+func (s common) GetTai() ts.Tai {
+	return s.bestandsaufnahme.Tai
+}
+
+func (s common) AddSku(sku2 sku.Sku2, skuLike sku.SkuLike) {
+	s.GetBestandsaufnahme().Akte.Skus.Add(sku2)
+	s.GetTransaktion().Skus.Add(skuLike)
 }
 
 func (s common) AddSkuToBestandsaufnahme(sk sku.SkuLike, as sha.Sha) {

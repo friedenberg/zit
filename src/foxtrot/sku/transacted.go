@@ -128,6 +128,13 @@ func (a Transacted[T, T1]) GetTime() ts.Time {
 	return a.Schwanz
 }
 
+func (a Transacted[T, T1]) GetTai() ts.Tai {
+	return ts.TaiFromTimeWithIndex(
+		a.GetTime(),
+		a.GetTransactionIndex().Int(),
+	)
+}
+
 func (a *Transacted[T, T1]) Sku() Sku {
 	return Sku{
 		Time:       ts.TimeWithIndex(a.GetTime(), a.GetTransactionIndex().Int()),
@@ -140,10 +147,7 @@ func (a *Transacted[T, T1]) Sku() Sku {
 
 func (a *Transacted[T, T1]) Sku2() Sku2 {
 	return Sku2{
-		Tai: ts.TaiFromTimeWithIndex(
-			a.GetTime(),
-			a.GetTransactionIndex().Int(),
-		),
+		Tai:        a.GetTai(),
 		Gattung:    gattung.Make(a.GetGattung()),
 		Kennung:    collections.MakeStringValue(a.Kennung.String()),
 		ObjekteSha: a.ObjekteSha,
