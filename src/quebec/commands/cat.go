@@ -194,7 +194,8 @@ func (c Cat) zettelen(u *umwelt.Umwelt) (err error) {
 //}
 
 func (c Cat) akten(u *umwelt.Umwelt, ids id_set.Set) (err error) {
-	if err = u.StoreObjekten().ReadAllAktenShas(
+	if err = u.Standort().ReadAllShasForGattung(
+		gattung.Akte,
 		func(s sha.Sha) (err error) {
 			_, err = fmt.Fprintln(u.Out(), s)
 			return

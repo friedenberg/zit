@@ -3,7 +3,7 @@ package store_objekten
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/id"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/age_io"
@@ -195,8 +195,9 @@ func (s konfigStore) Read() (tt *erworben.Transacted, err error) {
 		{
 			var r sha.ReadCloser
 
-			if r, err = s.common.ReadCloserObjekten(
-				id.Path(tt.Sku.ObjekteSha, s.common.GetStandort().DirObjektenKonfig()),
+			if r, err = s.common.ObjekteReader(
+				gattung.Konfig,
+				tt.Sku.ObjekteSha,
 			); err != nil {
 				if errors.IsNotExist(err) {
 					err = nil
@@ -220,8 +221,9 @@ func (s konfigStore) Read() (tt *erworben.Transacted, err error) {
 		{
 			var r sha.ReadCloser
 
-			if r, err = s.common.ReadCloserObjekten(
-				id.Path(tt.Objekte.Sha, s.common.GetStandort().DirObjektenAkten()),
+			if r, err = s.common.ObjekteReader(
+				gattung.Konfig,
+				tt.Objekte.Sha,
 			); err != nil {
 				if errors.IsNotExist(err) {
 					err = errors.Wrap(ErrNotFound{})

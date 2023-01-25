@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/sha_collections"
@@ -70,7 +71,8 @@ func (c CatObjekte) akten(
 		},
 	)
 
-	if err = u.StoreObjekten().ReadAllAktenShas(
+	if err = u.Standort().ReadAllShasForGattung(
+		gattung.Akte,
 		collections.MakeChain(
 			shas.WriterContainer(collections.ErrStopIteration),
 			func(sb sha.Sha) (err error) {

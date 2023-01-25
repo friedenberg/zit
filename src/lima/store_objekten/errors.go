@@ -8,11 +8,11 @@ import (
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
-type stringId string
+// type stringId string
 
-func (s stringId) String() string {
-	return string(s)
-}
+// func (s stringId) String() string {
+// 	return string(s)
+// }
 
 type ErrLockRequired struct {
 	Operation string

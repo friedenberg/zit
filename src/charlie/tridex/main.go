@@ -299,6 +299,8 @@ func (n node) Abbreviate(v string, loc int) string {
 	}
 }
 
+//TODO-P2 add Each and EachPtr methods
+
 func (t Tridex) GobEncode() (by []byte, err error) {
 	bu := &bytes.Buffer{}
 	enc := gob.NewEncoder(bu)

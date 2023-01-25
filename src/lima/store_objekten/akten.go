@@ -9,36 +9,9 @@ import (
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
-// TODO-P2 move to Standort
-func (s Store) ReadAllAktenShas(w collections.WriterFunc[sha.Sha]) (err error) {
-	wf := func(p string) (err error) {
-		var sh sha.Sha
-
-		if sh, err = sha.MakeShaFromPath(p); err != nil {
-			err = errors.Wrapf(err, "Path: %s", p)
-			return
-		}
-
-		if err = w(sh); err != nil {
-			err = errors.Wrapf(err, "Sha: %s", sh)
-			return
-		}
-
-		return
-	}
-
-	if err = files.ReadDirNamesLevel2(
-		files.MakeDirNameWriterIgnoringHidden(wf),
-		s.common.GetStandort().DirObjektenAkten(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
 func (s Store) AkteExists(sh sha.Sha) (err error) {
+  errors.TodoP3("decide what to do with this method")
+
 	if sh.IsNull() {
 		return
 	}

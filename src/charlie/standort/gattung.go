@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/id"
 	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
 // TODO-P4 switch to gattung-matched directories
@@ -14,6 +15,9 @@ func (s Standort) DirObjektenGattung(
 	g schnittstellen.GattungGetter,
 ) (p string, err error) {
 	switch g.GetGattung() {
+	case gattung.Akte:
+		p = s.DirObjektenAkten()
+
 	case gattung.Konfig:
 		p = s.DirObjektenKonfig()
 
@@ -96,4 +100,66 @@ func (s Standort) DirObjektenTransaktion() string {
 
 func (s Standort) DirObjektenAkten() string {
 	return s.DirObjekten("Akten")
+}
+
+func (s Standort) ReadAllLevel2Files(
+	p string,
+	w collections.WriterFunc[string],
+) (err error) {
+	if err = files.ReadDirNamesLevel2(
+		files.MakeDirNameWriterIgnoringHidden(w),
+		p,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s Standort) ReadAllShas(
+	p string,
+	w collections.WriterFunc[sha.Sha],
+) (err error) {
+	wf := func(p string) (err error) {
+		var sh sha.Sha
+
+		if sh, err = sha.MakeShaFromPath(p); err != nil {
+			err = errors.Wrapf(err, "Path: %s", p)
+			return
+		}
+
+		if err = w(sh); err != nil {
+			err = errors.Wrapf(err, "Sha: %s", sh)
+			return
+		}
+
+		return
+	}
+
+	if err = s.ReadAllLevel2Files(p, wf); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s Standort) ReadAllShasForGattung(
+	g schnittstellen.GattungGetter,
+	w collections.WriterFunc[sha.Sha],
+) (err error) {
+	var p string
+
+	if p, err = s.DirObjektenGattung(g); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.ReadAllShas(p, w); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
