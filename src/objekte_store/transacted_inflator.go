@@ -1,4 +1,4 @@
-package objekte
+package objekte_store
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
+	"github.com/friedenberg/zit/src/golf/objekte"
 )
 
 type TransactedDataIdentityInflator[T any] interface {
@@ -29,9 +30,9 @@ type TransactedInflator[
 	T4 any,
 	T5 schnittstellen.VerzeichnissePtr[T4, T],
 ] interface {
-	InflateFromSku(sku.Sku) (*Transacted[T, T1, T2, T3, T4, T5], error)
-	InflateFromSku2(sku.Sku2) (*Transacted[T, T1, T2, T3, T4, T5], error)
-	InflatorStorer[*Transacted[T, T1, T2, T3, T4, T5]]
+	InflateFromSku(sku.Sku) (*objekte.Transacted[T, T1, T2, T3, T4, T5], error)
+	InflateFromSku2(sku.Sku2) (*objekte.Transacted[T, T1, T2, T3, T4, T5], error)
+	InflatorStorer[*objekte.Transacted[T, T1, T2, T3, T4, T5]]
 	InflateFromDataIdentityAndStore(sku.DataIdentity) error
 }
 
@@ -47,7 +48,7 @@ type transactedInflator[
 	af            schnittstellen.AkteIOFactory
 	objekteFormat schnittstellen.Format[T, T1]
 	akteFormat    schnittstellen.Format[T, T1]
-	pool          collections.PoolLike[Transacted[T, T1, T2, T3, T4, T5]]
+	pool          collections.PoolLike[objekte.Transacted[T, T1, T2, T3, T4, T5]]
 }
 
 func MakeTransactedInflator[
@@ -62,10 +63,10 @@ func MakeTransactedInflator[
 	af schnittstellen.AkteIOFactory,
 	objekteFormat schnittstellen.Format[T, T1],
 	akteFormat schnittstellen.Format[T, T1],
-	pool collections.PoolLike[Transacted[T, T1, T2, T3, T4, T5]],
+	pool collections.PoolLike[objekte.Transacted[T, T1, T2, T3, T4, T5]],
 ) *transactedInflator[T, T1, T2, T3, T4, T5] {
 	if objekteFormat == nil {
-		objekteFormat = MakeFormat[T, T1]()
+		objekteFormat = objekte.MakeFormat[T, T1]()
 	}
 
 	return &transactedInflator[T, T1, T2, T3, T4, T5]{
@@ -79,9 +80,9 @@ func MakeTransactedInflator[
 
 func (h *transactedInflator[T, T1, T2, T3, T4, T5]) InflateFromSku2(
 	o sku.Sku2,
-) (t *Transacted[T, T1, T2, T3, T4, T5], err error) {
+) (t *objekte.Transacted[T, T1, T2, T3, T4, T5], err error) {
 	if h.pool == nil {
-		t = new(Transacted[T, T1, T2, T3, T4, T5])
+		t = new(objekte.Transacted[T, T1, T2, T3, T4, T5])
 	} else {
 		t = h.pool.Get()
 	}
@@ -124,9 +125,9 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) InflateFromSku2(
 
 func (h *transactedInflator[T, T1, T2, T3, T4, T5]) InflateFromSku(
 	o sku.Sku,
-) (t *Transacted[T, T1, T2, T3, T4, T5], err error) {
+) (t *objekte.Transacted[T, T1, T2, T3, T4, T5], err error) {
 	if h.pool == nil {
-		t = new(Transacted[T, T1, T2, T3, T4, T5])
+		t = new(objekte.Transacted[T, T1, T2, T3, T4, T5])
 	} else {
 		t = h.pool.Get()
 	}
@@ -169,9 +170,9 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) InflateFromSku(
 
 func (h *transactedInflator[T, T1, T2, T3, T4, T5]) InflateFromDataIdentity(
 	o sku.DataIdentity,
-) (t *Transacted[T, T1, T2, T3, T4, T5], err error) {
+) (t *objekte.Transacted[T, T1, T2, T3, T4, T5], err error) {
 	if h.pool == nil {
-		t = new(Transacted[T, T1, T2, T3, T4, T5])
+		t = new(objekte.Transacted[T, T1, T2, T3, T4, T5])
 	} else {
 		t = h.pool.Get()
 	}
@@ -195,7 +196,7 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) InflateFromDataIdentity(
 }
 
 func (h *transactedInflator[T, T1, T2, T3, T4, T5]) StoreAkte(
-	t *Transacted[T, T1, T2, T3, T4, T5],
+	t *objekte.Transacted[T, T1, T2, T3, T4, T5],
 ) (err error) {
 	var aw sha.WriteCloser
 
@@ -218,7 +219,7 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) StoreAkte(
 }
 
 func (h *transactedInflator[T, T1, T2, T3, T4, T5]) StoreObjekte(
-	t *Transacted[T, T1, T2, T3, T4, T5],
+	t *objekte.Transacted[T, T1, T2, T3, T4, T5],
 ) (err error) {
 	var ow sha.WriteCloser
 
@@ -243,7 +244,7 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) StoreObjekte(
 func (h *transactedInflator[T, T1, T2, T3, T4, T5]) InflateFromDataIdentityAndStore(
 	o sku.DataIdentity,
 ) (err error) {
-	var t *Transacted[T, T1, T2, T3, T4, T5]
+	var t *objekte.Transacted[T, T1, T2, T3, T4, T5]
 
 	if t, err = h.InflateFromDataIdentity(o); err != nil {
 		err = errors.Wrap(err)
@@ -260,7 +261,7 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) InflateFromDataIdentityAndSt
 
 func (h *transactedInflator[T, T1, T2, T3, T4, T5]) readObjekte(
 	sk sku.DataIdentity,
-	t *Transacted[T, T1, T2, T3, T4, T5],
+	t *objekte.Transacted[T, T1, T2, T3, T4, T5],
 ) (err error) {
 	if sk.GetObjekteSha().IsNull() {
 		return
@@ -300,7 +301,7 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) readObjekte(
 }
 
 func (h *transactedInflator[T, T1, T2, T3, T4, T5]) readAkte(
-	t *Transacted[T, T1, T2, T3, T4, T5],
+	t *objekte.Transacted[T, T1, T2, T3, T4, T5],
 ) (err error) {
 	if h.akteFormat == nil {
 		return

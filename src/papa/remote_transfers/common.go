@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/november/umwelt"
+	"github.com/friedenberg/zit/src/objekte_store"
 )
 
 type common struct {
@@ -19,10 +20,10 @@ type common struct {
 func (c common) GetInheritorZettel(
 	orf schnittstellen.ObjekteReaderFactory,
 	arf schnittstellen.AkteReaderFactory,
-) objekte.TransactedInheritor {
+) objekte_store.TransactedInheritor {
 	p := collections.MakePool2[zettel.Transacted, *zettel.Transacted]()
 
-	inflator := objekte.MakeTransactedInflator[
+	inflator := objekte_store.MakeTransactedInflator[
 		zettel.Objekte,
 		*zettel.Objekte,
 		hinweis.Hinweis,
@@ -45,7 +46,7 @@ func (c common) GetInheritorZettel(
 		p,
 	)
 
-	return objekte.MakeTransactedInheritor[zettel.Transacted, *zettel.Transacted](
+	return objekte_store.MakeTransactedInheritor[zettel.Transacted, *zettel.Transacted](
 		inflator,
 		c.StoreObjekten().Zettel(),
 		p,
@@ -55,11 +56,11 @@ func (c common) GetInheritorZettel(
 func (c common) GetInheritorTyp(
 	orf schnittstellen.ObjekteReaderFactory,
 	arf schnittstellen.AkteReaderFactory,
-) objekte.TransactedInheritor {
+) objekte_store.TransactedInheritor {
 	errors.TodoP0("fix issues with typ skus being delivered with empty data")
 	p := collections.MakePool2[typ.Transacted, *typ.Transacted]()
 
-	inflator := objekte.MakeTransactedInflator[
+	inflator := objekte_store.MakeTransactedInflator[
 		typ.Objekte,
 		*typ.Objekte,
 		kennung.Typ,
@@ -80,7 +81,7 @@ func (c common) GetInheritorTyp(
 		p,
 	)
 
-	return objekte.MakeTransactedInheritor[typ.Transacted, *typ.Transacted](
+	return objekte_store.MakeTransactedInheritor[typ.Transacted, *typ.Transacted](
 		inflator,
 		c.StoreObjekten().Typ(),
 		p,

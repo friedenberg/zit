@@ -1,4 +1,4 @@
-package objekte
+package objekte_store
 
 import (
 	"github.com/friedenberg/zit/src/charlie/collections"

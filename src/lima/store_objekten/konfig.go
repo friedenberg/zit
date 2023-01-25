@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/hotel/erworben"
+	"github.com/friedenberg/zit/src/objekte_store"
 )
 
 type KonfigStore interface {
@@ -20,11 +21,11 @@ type KonfigStore interface {
 	Read() (*erworben.Transacted, error)
 	Update(*erworben.Objekte) (*erworben.Transacted, error)
 
-	objekte.TransactedLogger[*erworben.Transacted]
-	objekte.AkteTextSaver[erworben.Objekte, *erworben.Objekte]
+	objekte_store.TransactedLogger[*erworben.Transacted]
+	objekte_store.AkteTextSaver[erworben.Objekte, *erworben.Objekte]
 }
 
-type KonfigInflator = objekte.TransactedInflator[
+type KonfigInflator = objekte_store.TransactedInflator[
 	erworben.Objekte,
 	*erworben.Objekte,
 	kennung.Konfig,
@@ -33,9 +34,9 @@ type KonfigInflator = objekte.TransactedInflator[
 	*objekte.NilVerzeichnisse[erworben.Objekte],
 ]
 
-type KonfigLogWriter = objekte.LogWriter[*erworben.Transacted]
+type KonfigLogWriter = objekte_store.LogWriter[*erworben.Transacted]
 
-type KonfigAkteTextSaver = objekte.AkteTextSaver[
+type KonfigAkteTextSaver = objekte_store.AkteTextSaver[
 	erworben.Objekte,
 	*erworben.Objekte,
 ]
@@ -64,7 +65,7 @@ func makeKonfigStore(
 	s = &konfigStore{
 		common: sa,
 		pool:   pool,
-		KonfigInflator: objekte.MakeTransactedInflator[
+		KonfigInflator: objekte_store.MakeTransactedInflator[
 			erworben.Objekte,
 			*erworben.Objekte,
 			kennung.Konfig,
@@ -80,7 +81,7 @@ func makeKonfigStore(
 			),
 			pool,
 		),
-		KonfigAkteTextSaver: objekte.MakeAkteTextSaver[
+		KonfigAkteTextSaver: objekte_store.MakeAkteTextSaver[
 			erworben.Objekte,
 			*erworben.Objekte,
 		](

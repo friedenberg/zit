@@ -12,10 +12,10 @@ import (
 	"github.com/friedenberg/zit/src/charlie/hinweisen"
 	"github.com/friedenberg/zit/src/echo/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
-	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/store_verzeichnisse"
+	"github.com/friedenberg/zit/src/objekte_store"
 )
 
 type zettelStore struct {
@@ -32,7 +32,7 @@ type zettelStore struct {
 	verzeichnisseSchwanzen *verzeichnisseSchwanzen
 	verzeichnisseAll       *store_verzeichnisse.Zettelen
 
-	objekte.TransactedInflator[
+	objekte_store.TransactedInflator[
 		zettel.Objekte,
 		*zettel.Objekte,
 		hinweis.Hinweis,
@@ -52,7 +52,7 @@ func makeZettelStore(
 		common:      sa,
 		pool:        p,
 		protoZettel: zettel.MakeProtoZettel(sa.Konfig()),
-		TransactedInflator: objekte.MakeTransactedInflator[
+		TransactedInflator: objekte_store.MakeTransactedInflator[
 			zettel.Objekte,
 			*zettel.Objekte,
 			hinweis.Hinweis,

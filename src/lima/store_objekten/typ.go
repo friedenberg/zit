@@ -14,32 +14,33 @@ import (
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/hotel/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/hotel/typ"
+	"github.com/friedenberg/zit/src/objekte_store"
 )
 
 type TypStore interface {
 	reindexer
 	GattungStore
 
-	objekte.Inheritor[*typ.Transacted]
-	objekte.TransactedLogger[*typ.Transacted]
+	objekte_store.Inheritor[*typ.Transacted]
+	objekte_store.TransactedLogger[*typ.Transacted]
 
-	objekte.AkteTextSaver[
+	objekte_store.AkteTextSaver[
 		typ.Objekte,
 		*typ.Objekte,
 	]
 
-	objekte.TransactedReader[
+	objekte_store.TransactedReader[
 		*kennung.Typ,
 		*typ.Transacted,
 	]
 
-	objekte.CreateOrUpdater[
+	objekte_store.CreateOrUpdater[
 		*typ.Objekte,
 		*kennung.Typ,
 		*typ.Transacted,
 	]
 
-	objekte.TransactedInflator[
+	objekte_store.TransactedInflator[
 		typ.Objekte,
 		*typ.Objekte,
 		kennung.Typ,
@@ -49,7 +50,7 @@ type TypStore interface {
 	]
 }
 
-type TypInflator = objekte.TransactedInflator[
+type TypInflator = objekte_store.TransactedInflator[
 	typ.Objekte,
 	*typ.Objekte,
 	kennung.Typ,
@@ -58,9 +59,9 @@ type TypInflator = objekte.TransactedInflator[
 	*objekte.NilVerzeichnisse[typ.Objekte],
 ]
 
-type TypLogWriter = objekte.LogWriter[*typ.Transacted]
+type TypLogWriter = objekte_store.LogWriter[*typ.Transacted]
 
-type TypAkteTextSaver = objekte.AkteTextSaver[
+type TypAkteTextSaver = objekte_store.AkteTextSaver[
 	typ.Objekte,
 	*typ.Objekte,
 ]
@@ -89,7 +90,7 @@ func makeTypStore(
 	s = &typStore{
 		common: sa,
 		pool:   pool,
-		TypInflator: objekte.MakeTransactedInflator[
+		TypInflator: objekte_store.MakeTransactedInflator[
 			typ.Objekte,
 			*typ.Objekte,
 			kennung.Typ,
@@ -105,7 +106,7 @@ func makeTypStore(
 			),
 			pool,
 		),
-		TypAkteTextSaver: objekte.MakeAkteTextSaver[
+		TypAkteTextSaver: objekte_store.MakeAkteTextSaver[
 			typ.Objekte,
 			*typ.Objekte,
 		](

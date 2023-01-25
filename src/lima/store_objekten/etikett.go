@@ -10,27 +10,28 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/hotel/etikett"
+	"github.com/friedenberg/zit/src/objekte_store"
 )
 
 type EtikettStore interface {
 	reindexer
 	GattungStore
 
-	objekte.TransactedLogger[*etikett.Transacted]
+	objekte_store.TransactedLogger[*etikett.Transacted]
 
-	objekte.TransactedReader[
+	objekte_store.TransactedReader[
 		*kennung.Etikett,
 		*etikett.Transacted,
 	]
 
-	objekte.CreateOrUpdater[
+	objekte_store.CreateOrUpdater[
 		*etikett.Objekte,
 		*kennung.Etikett,
 		*etikett.Transacted,
 	]
 }
 
-type EtikettInflator = objekte.TransactedInflator[
+type EtikettInflator = objekte_store.TransactedInflator[
 	etikett.Objekte,
 	*etikett.Objekte,
 	kennung.Etikett,
@@ -39,9 +40,9 @@ type EtikettInflator = objekte.TransactedInflator[
 	*objekte.NilVerzeichnisse[etikett.Objekte],
 ]
 
-type EtikettLogWriter = objekte.LogWriter[*etikett.Transacted]
+type EtikettLogWriter = objekte_store.LogWriter[*etikett.Transacted]
 
-type EtikettAkteTextSaver = objekte.AkteTextSaver[
+type EtikettAkteTextSaver = objekte_store.AkteTextSaver[
 	etikett.Objekte,
 	*etikett.Objekte,
 ]
@@ -70,7 +71,7 @@ func makeEtikettStore(
 	s = &etikettStore{
 		common: sa,
 		pool:   pool,
-		EtikettInflator: objekte.MakeTransactedInflator[
+		EtikettInflator: objekte_store.MakeTransactedInflator[
 			etikett.Objekte,
 			*etikett.Objekte,
 			kennung.Etikett,
@@ -86,7 +87,7 @@ func makeEtikettStore(
 			),
 			pool,
 		),
-		EtikettAkteTextSaver: objekte.MakeAkteTextSaver[
+		EtikettAkteTextSaver: objekte_store.MakeAkteTextSaver[
 			etikett.Objekte,
 			*etikett.Objekte,
 		](

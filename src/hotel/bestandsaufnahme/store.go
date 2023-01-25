@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/golf/objekte"
+	"github.com/friedenberg/zit/src/objekte_store"
 )
 
 type Store interface {
@@ -23,17 +24,17 @@ type Store interface {
 	ReadAll(collections.WriterFunc[*Objekte]) error
 }
 
-type ObjekteSaver = objekte.ObjekteSaver[
+type ObjekteSaver = objekte_store.ObjekteSaver[
 	Objekte,
 	*Objekte,
 ]
 
-type AkteTextSaver = objekte.AkteTextSaver[
+type AkteTextSaver = objekte_store.AkteTextSaver[
 	Objekte,
 	*Objekte,
 ]
 
-type ObjekteInflator = objekte.ObjekteInflator[
+type ObjekteInflator = objekte_store.ObjekteInflator[
 	Objekte,
 	*Objekte,
 	objekte.NilVerzeichnisse[Objekte],
@@ -75,7 +76,7 @@ func MakeStore(
 		pool:          p,
 		ObjekteFormat: of,
 		AkteFormat:    af,
-		ObjekteInflator: objekte.MakeObjekteInflator[
+		ObjekteInflator: objekte_store.MakeObjekteInflator[
 			Objekte,
 			*Objekte,
 			objekte.NilVerzeichnisse[Objekte],
@@ -87,11 +88,11 @@ func MakeStore(
 			af,
 			p,
 		),
-		ObjekteSaver: objekte.MakeObjekteSaver[
+		ObjekteSaver: objekte_store.MakeObjekteSaver[
 			Objekte,
 			*Objekte,
 		](oaf, of),
-		AkteTextSaver: objekte.MakeAkteTextSaver[
+		AkteTextSaver: objekte_store.MakeAkteTextSaver[
 			Objekte,
 			*Objekte,
 		](oaf, af),

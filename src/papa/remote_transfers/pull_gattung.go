@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/foxtrot/id_set"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
-	"github.com/friedenberg/zit/src/golf/objekte"
+	"github.com/friedenberg/zit/src/objekte_store"
 )
 
 func (c *client) PullSkus(
@@ -14,7 +14,7 @@ func (c *client) PullSkus(
 	gattungSet gattungen.Set,
 ) (err error) {
 	errors.TodoP0("implement etikett and akte")
-	gattungInheritors := map[gattung.Gattung]objekte.TransactedInheritor{
+	gattungInheritors := map[gattung.Gattung]objekte_store.TransactedInheritor{
 		gattung.Zettel: c.GetInheritorZettel(c, c),
 		gattung.Typ:    c.GetInheritorTyp(c, c),
 	}
@@ -23,7 +23,7 @@ func (c *client) PullSkus(
 		filter,
 		gattungSet,
 		func(sk sku.Sku2) (err error) {
-			var el objekte.TransactedInheritor
+			var el objekte_store.TransactedInheritor
 			ok := false
 
 			if el, ok = gattungInheritors[sk.Gattung]; !ok {

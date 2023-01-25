@@ -1,4 +1,4 @@
-package objekte
+package objekte_store
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
+	"github.com/friedenberg/zit/src/golf/objekte"
 )
 
 type ObjekteInflator[
@@ -43,7 +44,7 @@ func MakeObjekteInflator[
 	pool collections.PoolLike[T],
 ) *objekteInflator[T, T1, T2, T3] {
 	if objekteParser == nil {
-		objekteParser = MakeFormat[T, T1]()
+		objekteParser = objekte.MakeFormat[T, T1]()
 	}
 
 	return &objekteInflator[T, T1, T2, T3]{
