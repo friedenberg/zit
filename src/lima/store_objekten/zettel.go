@@ -19,7 +19,7 @@ import (
 )
 
 type zettelStore struct {
-	common *common
+	StoreUtil
 
 	protoZettel zettel.ProtoZettel
 
@@ -45,11 +45,11 @@ type zettelStore struct {
 }
 
 func makeZettelStore(
-	sa *common,
+	sa StoreUtil,
 	p *collections.Pool[zettel.Transacted, *zettel.Transacted],
 ) (s *zettelStore, err error) {
 	s = &zettelStore{
-		common:      sa,
+		StoreUtil:   sa,
 		pool:        p,
 		protoZettel: zettel.MakeProtoZettel(sa.GetKonfig()),
 		TransactedInflator: objekte_store.MakeTransactedInflator[
@@ -71,7 +71,7 @@ func makeZettelStore(
 	}
 
 	if s.hinweisen, err = hinweisen.New(
-		s.common.GetStandort().DirZit(),
+		s.StoreUtil.GetStandort().DirZit(),
 	); err != nil {
 		if errors.IsNotExist(err) {
 			err = nil
@@ -82,7 +82,7 @@ func makeZettelStore(
 	}
 
 	if s.verzeichnisseSchwanzen, err = makeVerzeichnisseSchwanzen(
-		s.common,
+		s.StoreUtil,
 		p,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -90,9 +90,9 @@ func makeZettelStore(
 	}
 
 	if s.verzeichnisseAll, err = store_verzeichnisse.MakeZettelen(
-		s.common.GetKonfig(),
-		s.common.GetStandort().DirVerzeichnisseZettelenNeue(),
-		s.common,
+		s.StoreUtil.GetKonfig(),
+		s.StoreUtil.GetStandort().DirVerzeichnisseZettelenNeue(),
+		s.StoreUtil,
 		p,
 		nil,
 	); err != nil {
@@ -101,18 +101,18 @@ func makeZettelStore(
 	}
 
 	if s.indexKennung, err = newIndexKennung(
-		s.common.GetKonfig(),
-		s.common,
+		s.StoreUtil.GetKonfig(),
+		s.StoreUtil,
 		s.hinweisen,
-		s.common.GetStandort().DirVerzeichnisse("Kennung"),
+		s.StoreUtil.GetStandort().DirVerzeichnisse("Kennung"),
 	); err != nil {
 		err = errors.Wrapf(err, "failed to init kennung index")
 		return
 	}
 
 	if s.indexEtiketten, err = newIndexEtiketten(
-		s.common.GetStandort().FileVerzeichnisseEtiketten(),
-		s.common,
+		s.StoreUtil.GetStandort().FileVerzeichnisseEtiketten(),
+		s.StoreUtil,
 	); err != nil {
 		err = errors.Wrapf(err, "failed to init zettel index")
 		return
@@ -160,7 +160,7 @@ func (s zettelStore) WriteZettelObjekte(z zettel.Objekte) (sh sha.Sha, err error
 
 	var wc sha.WriteCloser
 
-	if wc, err = s.common.ObjekteWriter(gattung.Zettel); err != nil {
+	if wc, err = s.StoreUtil.ObjekteWriter(gattung.Zettel); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -188,7 +188,7 @@ func (s *zettelStore) writeNamedZettelToIndex(
 ) (err error) {
 	errors.Log().Print("writing to index")
 
-	if !s.common.LockSmith.IsAcquired() {
+	if !s.StoreUtil.GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{
 			Operation: "write named zettel to index",
 		}
@@ -218,7 +218,7 @@ func (s *zettelStore) writeNamedZettelToIndex(
 		}
 	}
 
-	if err = s.common.Abbr.addStoredAbbreviation(tz); err != nil {
+	if err = s.StoreUtil.GetAbbrStore().addStoredAbbreviation(tz); err != nil {
 		err = errors.Wrapf(err, "failed to write zettel to index: %s", tz.Sku)
 		return
 	}
@@ -258,7 +258,7 @@ func (i *zettelStore) ReadAll(
 func (s *zettelStore) Create(
 	in zettel.Objekte,
 ) (tz *zettel.Transacted, err error) {
-	if !s.common.LockSmith.IsAcquired() {
+	if !s.StoreUtil.GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{
 			Operation: "create",
 		}
@@ -273,7 +273,7 @@ func (s *zettelStore) Create(
 
 	s.protoZettel.Apply(&in)
 
-	if err = in.ApplyKonfig(s.common.GetKonfig()); err != nil {
+	if err = in.ApplyKonfig(s.StoreUtil.GetKonfig()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -332,7 +332,7 @@ func (s *zettelStore) Update(
 ) (tz *zettel.Transacted, err error) {
 	errors.TodoP2("support dry run")
 
-	if !s.common.LockSmith.IsAcquired() {
+	if !s.StoreUtil.GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{
 			Operation: "update",
 		}
@@ -340,7 +340,7 @@ func (s *zettelStore) Update(
 		return
 	}
 
-	if err = z.ApplyKonfig(s.common.GetKonfig()); err != nil {
+	if err = z.ApplyKonfig(s.StoreUtil.GetKonfig()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -437,7 +437,7 @@ func (s *zettelStore) addZettelToTransaktion(
 	if tz, err = s.transactedWithHead(
 		*zo,
 		*zk,
-		s.common.GetTransaktion(),
+		s.StoreUtil.GetTransaktionStore().GetTransaktion(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -446,7 +446,7 @@ func (s *zettelStore) addZettelToTransaktion(
 	tz.Sku.Kennung = *zk
 	tz.Sku.ObjekteSha = *zs
 
-	s.common.CommitTransacted(tz)
+	s.StoreUtil.CommitTransacted(tz)
 
 	return
 }
@@ -498,8 +498,7 @@ func (s *zettelStore) Inherit(tz *zettel.Transacted) (err error) {
 		return
 	}
 
-	s.common.GetBestandsaufnahme().Akte.Skus.Push(tz.Sku.Sku2())
-	s.common.GetTransaktion().Skus.Add(&tz.Sku)
+	s.StoreUtil.CommitTransacted(tz)
 
 	if err = s.writeNamedZettelToIndex(tz); err != nil {
 		err = errors.Wrap(err)

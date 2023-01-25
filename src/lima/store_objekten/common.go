@@ -24,6 +24,7 @@ type StoreUtil interface {
 	konfig.PtrGetter
 	standort.Getter
 	schnittstellen.ObjekteAkteFactory
+	ioFactory
 	ts.Clock
 	CommitTransacted(objekte.TransactedLike) error
 	GetBestandsaufnahmeStore() bestandsaufnahme.Store
