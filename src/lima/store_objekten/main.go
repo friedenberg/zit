@@ -3,14 +3,10 @@ package store_objekten
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/hinweis"
-	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/golf/transaktion"
@@ -18,12 +14,11 @@ import (
 	"github.com/friedenberg/zit/src/hotel/etikett"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/hotel/typ"
-	"github.com/friedenberg/zit/src/india/konfig"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
 type Store struct {
-	common
+	StoreUtil
 
 	zettelStore  *zettelStore
 	typStore     TypStore
@@ -39,74 +34,29 @@ type Store struct {
 }
 
 func Make(
-	lockSmith schnittstellen.LockSmith,
-	a age.Age,
-	k *konfig.Compiled,
-	st standort.Standort,
+	su StoreUtil,
 	p *collections.Pool[zettel.Transacted, *zettel.Transacted],
 ) (s *Store, err error) {
 	s = &Store{
-		common: common{
-			LockSmith: lockSmith,
-			Age:       a,
-			konfig:    k,
-			standort:  st,
-		},
+		StoreUtil: su,
 	}
 
-	t := ts.Now()
-	ta := ts.NowTai()
-
-	for {
-		p := s.TransaktionPath(t)
-
-		if !files.Exists(p) {
-			break
-		}
-
-		t.MoveForwardIota()
-	}
-
-	s.common.transaktion = transaktion.MakeTransaktion(t)
-	s.common.bestandsaufnahme = &bestandsaufnahme.Objekte{
-		Tai: ta,
-		Akte: bestandsaufnahme.Akte{
-			Skus: sku.MakeSku2Heap(),
-		},
-	}
-
-	if s.common.Abbr, err = newIndexAbbr(
-		&s.common,
-		st.DirVerzeichnisse("Abbr"),
-	); err != nil {
-		err = errors.Wrapf(err, "failed to init abbr index")
-		return
-	}
-
-	if s.zettelStore, err = makeZettelStore(&s.common, p); err != nil {
+	if s.zettelStore, err = makeZettelStore(s.StoreUtil, p); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if s.typStore, err = makeTypStore(&s.common); err != nil {
+	if s.typStore, err = makeTypStore(s.StoreUtil); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if s.etikettStore, err = makeEtikettStore(&s.common); err != nil {
+	if s.etikettStore, err = makeEtikettStore(s.StoreUtil); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if s.konfigStore, err = makeKonfigStore(&s.common); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if s.bestandsaufnahmeStore, err = bestandsaufnahme.MakeStore(
-		s.common.GetStandort(),
-		&s.common,
-	); err != nil {
+	if s.konfigStore, err = makeKonfigStore(s.StoreUtil); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -173,10 +123,6 @@ func Make(
 	return
 }
 
-func (s *Store) Abbr() *indexAbbr {
-	return s.common.Abbr
-}
-
 func (s *Store) Zettel() *zettelStore {
 	return s.zettelStore
 }
@@ -193,16 +139,12 @@ func (s *Store) Konfig() KonfigStore {
 	return s.konfigStore
 }
 
-func (s *Store) CurrentTransaktionTime() ts.Time {
-	return s.common.GetTransaktion().Time
-}
-
 func (s Store) RevertTransaktion(
 	t *transaktion.Transaktion,
 ) (tzs zettel.MutableSet, err error) {
-	errors.TodoP0("implement")
+	errors.TodoP0("implement for Bestandsaufnahme")
 
-	if !s.common.LockSmith.IsAcquired() {
+	if !s.StoreUtil.GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{
 			Operation: "revert",
 		}
@@ -269,7 +211,7 @@ func (s Store) RevertTransaktion(
 }
 
 func (s Store) Flush() (err error) {
-	if !s.common.LockSmith.IsAcquired() {
+	if !s.GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{
 			Operation: "flush",
 		}
@@ -277,12 +219,14 @@ func (s Store) Flush() (err error) {
 		return
 	}
 
-	if s.common.GetKonfig().DryRun {
+	if s.GetKonfig().DryRun {
 		return
 	}
 
 	errors.Log().Printf("saving Bestandsaufnahme")
-	if _, err = s.bestandsaufnahmeStore.Create(s.common.GetBestandsaufnahme()); err != nil {
+	if _, err = s.GetBestandsaufnahmeStore().Create(
+		s.StoreUtil.GetBestandsaufnahme(),
+	); err != nil {
 		if errors.Is(err, bestandsaufnahme.ErrEmpty) {
 			errors.Log().Printf("Bestandsaufnahme was empty")
 			err = nil
@@ -293,9 +237,7 @@ func (s Store) Flush() (err error) {
 	}
 	errors.Log().Printf("done saving Bestandsaufnahme")
 
-	//TODO-P2 add Bestandsaufnahme to Transaktion
-
-	if err = s.writeTransaktion(); err != nil {
+	if err = s.StoreUtil.GetTransaktionStore().writeTransaktion(); err != nil {
 		err = errors.Wrapf(err, "failed to write transaction")
 		return
 	}
@@ -307,7 +249,7 @@ func (s Store) Flush() (err error) {
 		}
 	}
 
-	if err = s.common.Abbr.Flush(); err != nil {
+	if err = s.GetAbbrStore().Flush(); err != nil {
 		errors.Err().Print(err)
 		err = errors.Wrapf(err, "failed to flush abbr index")
 		return
@@ -393,7 +335,7 @@ func (s *Store) getReindexFunc() func(sku.DataIdentity) error {
 			return
 		}
 
-		if err = s.common.Abbr.addStoredAbbreviation(o); err != nil {
+		if err = s.GetAbbrStore().addStoredAbbreviation(o); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -403,7 +345,7 @@ func (s *Store) getReindexFunc() func(sku.DataIdentity) error {
 }
 
 func (s *Store) Reindex() (err error) {
-	if !s.common.LockSmith.IsAcquired() {
+	if !s.GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{
 			Operation: "reindex",
 		}
@@ -411,7 +353,7 @@ func (s *Store) Reindex() (err error) {
 		return
 	}
 
-	if err = s.common.GetStandort().ResetVerzeichnisse(); err != nil {
+	if err = s.StoreUtil.GetStandort().ResetVerzeichnisse(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -424,7 +366,7 @@ func (s *Store) Reindex() (err error) {
 
 	f1 := s.getReindexFunc()
 
-	if s.common.GetKonfig().UseBestandsaufnahme {
+	if s.StoreUtil.GetKonfig().UseBestandsaufnahme {
 		f := func(t *bestandsaufnahme.Objekte) (err error) {
 			if err = t.Akte.Skus.Each(
 				func(sk sku.Sku2) (err error) {
@@ -443,7 +385,7 @@ func (s *Store) Reindex() (err error) {
 			return
 		}
 
-		if err = s.bestandsaufnahmeStore.ReadAll(f); err != nil {
+		if err = s.GetBestandsaufnahmeStore().ReadAll(f); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -470,7 +412,7 @@ func (s *Store) Reindex() (err error) {
 			return
 		}
 
-		if err = s.ReadAllTransaktions(f); err != nil {
+		if err = s.GetTransaktionStore().ReadAllTransaktions(f); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

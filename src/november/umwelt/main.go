@@ -152,11 +152,20 @@ func (u *Umwelt) Initialize() (err error) {
 	// 	}
 	// }
 
-	if u.storeObjekten, err = store_objekten.Make(
+	var su store_objekten.StoreUtil
+
+	if su, err = store_objekten.MakeStoreUtil(
 		u.lock,
 		*u.age,
 		u.KonfigPtr(),
 		u.standort,
+	); err != nil {
+		err = errors.Wrapf(err, "failed to initialize store util")
+		return
+	}
+
+	if u.storeObjekten, err = store_objekten.Make(
+		su,
 		u.zettelVerzeichnissePool,
 	); err != nil {
 		err = errors.Wrapf(err, "failed to initialize zettel meta store")

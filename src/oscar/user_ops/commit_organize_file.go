@@ -46,7 +46,7 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 	addOrGetToZettelToUpdate := func(hString string) (z zettelToUpdate, err error) {
 		var h hinweis.Hinweis
 
-		if h, err = store.Abbr().ExpandHinweisString(hString); err != nil {
+		if h, err = store.GetAbbrStore().ExpandHinweisString(hString); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

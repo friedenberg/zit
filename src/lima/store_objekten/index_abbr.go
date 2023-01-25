@@ -17,7 +17,13 @@ import (
 )
 
 type AbbrStore interface {
+	ExpandShaString(string) (sha.Sha, error)
+	ExpandEtikettString(string) (kennung.Etikett, error)
+	ExpandHinweisString(string) (hinweis.Hinweis, error)
+	AbbreviateSha(schnittstellen.Value) (string, error)
+	AbbreviateHinweis(schnittstellen.Korper) (string, error)
 	addStoredAbbreviation(schnittstellen.Stored) error
+	errors.Flusher
 }
 
 type indexAbbrEncodableTridexes struct {

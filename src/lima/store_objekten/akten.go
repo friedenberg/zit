@@ -16,7 +16,7 @@ func (s Store) AkteExists(sh sha.Sha) (err error) {
 		return
 	}
 
-	p := id.Path(sh, s.common.GetStandort().DirObjektenAkten())
+	p := id.Path(sh, s.StoreUtil.GetStandort().DirObjektenAkten())
 	ok := files.Exists(p)
 
 	if !ok {

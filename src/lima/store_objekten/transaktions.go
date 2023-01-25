@@ -13,9 +13,12 @@ import (
 )
 
 type TransaktionStore interface {
+	TransaktionPath(ts.Time) string
+	ReadTransaktion(ts.Time) (*transaktion.Transaktion, error)
 	ReadLastTransaktion() (*transaktion.Transaktion, error)
 	GetTransaktion() *transaktion.Transaktion
 	ReadAllTransaktions(collections.WriterFunc[*transaktion.Transaktion]) error
+	writeTransaktion() error
 }
 
 func (s *common) GetTransaktion() *transaktion.Transaktion {

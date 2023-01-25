@@ -11,7 +11,7 @@ type GetHinweisenFromArgs struct {
 }
 
 func (u GetHinweisenFromArgs) RunOne(v string) (h hinweis.Hinweis, err error) {
-	if h, err = u.StoreObjekten().Abbr().ExpandHinweisString(v); err != nil {
+	if h, err = u.StoreObjekten().GetAbbrStore().ExpandHinweisString(v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -22,7 +22,7 @@ func (u GetHinweisenFromArgs) RunOne(v string) (h hinweis.Hinweis, err error) {
 func (u GetHinweisenFromArgs) RunMany(vs ...string) (hs []hinweis.Hinweis, err error) {
 	hs = make([]hinweis.Hinweis, len(vs))
 
-	for i, _ := range hs {
+	for i := range hs {
 		if hs[i], err = u.RunOne(vs[i]); err != nil {
 			err = errors.Wrap(err)
 			return

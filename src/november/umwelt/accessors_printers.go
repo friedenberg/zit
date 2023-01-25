@@ -20,7 +20,7 @@ func (u *Umwelt) PrinterKonfigTransacted(
 		u.Out(),
 		erworben.MakeCliFormatTransacted(
 			u.FormatColorWriter(),
-			u.FormatSha(u.StoreObjekten().Abbr().AbbreviateSha),
+			u.FormatSha(u.StoreObjekten().GetAbbrStore().AbbreviateSha),
 			verb,
 		),
 	)

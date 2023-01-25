@@ -33,7 +33,7 @@ func (c Log) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 			Setter: &hinweis.Hinweis{},
 			Expand: func(v string) (out string, err error) {
 				var h hinweis.Hinweis
-				h, err = u.StoreObjekten().Abbr().ExpandHinweisString(v)
+				h, err = u.StoreObjekten().GetAbbrStore().ExpandHinweisString(v)
 				out = h.String()
 				return
 			},

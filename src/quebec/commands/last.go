@@ -50,7 +50,7 @@ func (c Last) runWithBestandsaufnahm(u *umwelt.Umwelt) (err error) {
 
 	var b *bestandsaufnahme.Objekte
 
-	if b, err = s.Bestandsaufnahme().ReadLast(); err != nil {
+	if b, err = s.GetBestandsaufnahmeStore().ReadLast(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -74,7 +74,7 @@ func (c Last) runWithTransaktion(u *umwelt.Umwelt) (err error) {
 
 	var transaktion *transaktion.Transaktion
 
-	if transaktion, err = s.ReadLastTransaktion(); err != nil {
+	if transaktion, err = s.GetTransaktionStore().ReadLastTransaktion(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

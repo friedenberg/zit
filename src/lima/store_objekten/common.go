@@ -6,12 +6,14 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/id"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/age_io"
 	"github.com/friedenberg/zit/src/echo/ts"
+	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/hotel/bestandsaufnahme"
@@ -28,6 +30,7 @@ type StoreUtil interface {
 	ts.Clock
 	CommitTransacted(objekte.TransactedLike) error
 	GetBestandsaufnahmeStore() bestandsaufnahme.Store
+	GetBestandsaufnahme() *bestandsaufnahme.Objekte
 	GetTransaktionStore() TransaktionStore
 	GetAbbrStore() AbbrStore
 }
@@ -43,6 +46,59 @@ type common struct {
 	Abbr             *indexAbbr
 
 	bestandsaufnahmeStore bestandsaufnahme.Store
+}
+
+func MakeStoreUtil(
+	lockSmith schnittstellen.LockSmith,
+	a age.Age,
+	k *konfig.Compiled,
+	st standort.Standort,
+) (c *common, err error) {
+	c = &common{
+		LockSmith: lockSmith,
+		Age:       a,
+		konfig:    k,
+		standort:  st,
+	}
+
+	t := ts.Now()
+	ta := ts.NowTai()
+
+	for {
+		p := c.GetTransaktionStore().TransaktionPath(t)
+
+		if !files.Exists(p) {
+			break
+		}
+
+		t.MoveForwardIota()
+	}
+
+	c.transaktion = transaktion.MakeTransaktion(t)
+	c.bestandsaufnahme = &bestandsaufnahme.Objekte{
+		Tai: ta,
+		Akte: bestandsaufnahme.Akte{
+			Skus: sku.MakeSku2Heap(),
+		},
+	}
+
+	if c.Abbr, err = newIndexAbbr(
+		c,
+		st.DirVerzeichnisse("Abbr"),
+	); err != nil {
+		err = errors.Wrapf(err, "failed to init abbr index")
+		return
+	}
+
+	if c.bestandsaufnahmeStore, err = bestandsaufnahme.MakeStore(
+		c.GetStandort(),
+		c,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (s common) GetLockSmith() schnittstellen.LockSmith {

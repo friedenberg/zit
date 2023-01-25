@@ -70,7 +70,7 @@ func (c Show) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 				Setter: &hinweis.Hinweis{},
 				Expand: func(v string) (out string, err error) {
 					var h hinweis.Hinweis
-					h, err = u.StoreObjekten().Abbr().ExpandHinweisString(v)
+					h, err = u.StoreObjekten().GetAbbrStore().ExpandHinweisString(v)
 					out = h.String()
 					return
 				},
@@ -79,7 +79,7 @@ func (c Show) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 				Setter: &kennung.Etikett{},
 				Expand: func(v string) (out string, err error) {
 					var e kennung.Etikett
-					e, err = u.StoreObjekten().Abbr().ExpandEtikettString(v)
+					e, err = u.StoreObjekten().GetAbbrStore().ExpandEtikettString(v)
 					out = e.String()
 					return
 				},
@@ -303,7 +303,9 @@ func (c Show) showTransaktions(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 		func(is ts.Time) (err error) {
 			var t *transaktion.Transaktion
 
-			if t, err = u.StoreObjekten().ReadTransaktion(is); err != nil {
+			if t, err = u.StoreObjekten().GetTransaktionStore().ReadTransaktion(
+				is,
+			); err != nil {
 				errors.PrintErrf("error: %s", err)
 				return
 			}

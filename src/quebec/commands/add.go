@@ -72,7 +72,7 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	options := organize_text.MakeOptions()
-	options.Abbr = u.StoreObjekten().Abbr().AbbreviateHinweis
+	options.Abbr = u.StoreObjekten().GetAbbrStore().AbbreviateHinweis
 	options.RootEtiketten = c.Etiketten
 	options.Transacted = zettelsFromAkteResults
 

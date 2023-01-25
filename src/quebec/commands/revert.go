@@ -36,12 +36,14 @@ func (c Revert) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	s := u.StoreObjekten()
 
 	if timestamps.Len() == 1 {
-		if transaktion, err = s.ReadTransaktion(timestamps.Any()); err != nil {
+		if transaktion, err = s.GetTransaktionStore().ReadTransaktion(
+			timestamps.Any(),
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	} else {
-		if transaktion, err = s.ReadLastTransaktion(); err != nil {
+		if transaktion, err = s.GetTransaktionStore().ReadLastTransaktion(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
