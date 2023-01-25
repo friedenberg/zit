@@ -15,10 +15,11 @@ import (
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/juliett/zettel"
+	"github.com/friedenberg/zit/src/store_util"
 )
 
 type Store struct {
-	StoreUtil
+	store_util.StoreUtil
 
 	zettelStore  *zettelStore
 	typStore     TypStore
@@ -34,7 +35,7 @@ type Store struct {
 }
 
 func Make(
-	su StoreUtil,
+	su store_util.StoreUtil,
 	p *collections.Pool[zettel.Transacted, *zettel.Transacted],
 ) (s *Store, err error) {
 	s = &Store{
@@ -237,7 +238,7 @@ func (s Store) Flush() (err error) {
 	}
 	errors.Log().Printf("done saving Bestandsaufnahme")
 
-	if err = s.StoreUtil.GetTransaktionStore().writeTransaktion(); err != nil {
+	if err = s.StoreUtil.GetTransaktionStore().WriteTransaktion(); err != nil {
 		err = errors.Wrapf(err, "failed to write transaction")
 		return
 	}
@@ -335,7 +336,7 @@ func (s *Store) getReindexFunc() func(sku.DataIdentity) error {
 			return
 		}
 
-		if err = s.GetAbbrStore().addStoredAbbreviation(o); err != nil {
+		if err = s.GetAbbrStore().AddStoredAbbreviation(o); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

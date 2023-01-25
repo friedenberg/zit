@@ -7,16 +7,17 @@ import (
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/store_verzeichnisse"
+	"github.com/friedenberg/zit/src/store_util"
 )
 
 type verzeichnisseSchwanzen struct {
 	headers [store_verzeichnisse.PageCount]*zettel.Schwanzen
 	*store_verzeichnisse.Zettelen
-	StoreUtil
+	store_util.StoreUtil
 }
 
 func makeVerzeichnisseSchwanzen(
-	sa StoreUtil,
+	sa store_util.StoreUtil,
 	p *collections.Pool[zettel.Transacted, *zettel.Transacted],
 ) (s *verzeichnisseSchwanzen, err error) {
 	s = &verzeichnisseSchwanzen{

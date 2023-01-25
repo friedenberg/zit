@@ -1,4 +1,4 @@
-package store_objekten
+package store_util
 
 import (
 	"bytes"
@@ -20,15 +20,21 @@ import (
 	"github.com/friedenberg/zit/src/india/konfig"
 )
 
-type StoreUtil interface {
-	schnittstellen.LockSmithGetter
-	konfig.Getter
-	konfig.PtrGetter
+type StoreUtilVerzeichnisse interface {
 	standort.Getter
+	konfig.Getter
+	schnittstellen.VerzeichnisseFactory
+}
+
+type StoreUtil interface {
+	StoreUtilVerzeichnisse
+	schnittstellen.LockSmithGetter
+	konfig.PtrGetter
 	schnittstellen.ObjekteAkteFactory
-	ioFactory
 	ts.Clock
+
 	CommitTransacted(objekte.TransactedLike) error
+
 	GetBestandsaufnahmeStore() bestandsaufnahme.Store
 	GetBestandsaufnahme() *bestandsaufnahme.Objekte
 	GetTransaktionStore() TransaktionStore
@@ -126,6 +132,10 @@ func (s common) Bestandsaufnahme() bestandsaufnahme.Store {
 
 func (s *common) GetBestandsaufnahme() *bestandsaufnahme.Objekte {
 	return s.bestandsaufnahme
+}
+
+func (s *common) GetTransaktion() *transaktion.Transaktion {
+	return &s.transaktion
 }
 
 func (s *common) GetTransaktionStore() TransaktionStore {

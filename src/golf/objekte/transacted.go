@@ -108,7 +108,7 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) GetObjekte() (o T) {
 }
 
 func (a Transacted[T, T1, T2, T3, T4, T5]) GetSkuLike() (sk sku.SkuLike) {
-  return a.Sku
+	return a.Sku
 }
 
 func (a Transacted[T, T1, T2, T3, T4, T5]) GetSku() (sk sku.Sku) {

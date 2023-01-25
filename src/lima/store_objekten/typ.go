@@ -13,6 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/hotel/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/hotel/typ"
+	"github.com/friedenberg/zit/src/store_util"
 )
 
 type TypStore interface {
@@ -70,7 +71,7 @@ type TypAkteTextSaver = objekte_store.AkteTextSaver[
 ]
 
 type typStore struct {
-	StoreUtil
+	store_util.StoreUtil
 
 	pool collections.PoolLike[typ.Transacted]
 
@@ -92,13 +93,13 @@ func (s *typStore) SetLogWriter(
 }
 
 func makeTypStore(
-	sa StoreUtil,
+	sa store_util.StoreUtil,
 ) (s *typStore, err error) {
 	pool := collections.MakePool[typ.Transacted]()
 
 	s = &typStore{
 		StoreUtil: sa,
-		pool:      pool,
+		pool:                 pool,
 		TypInflator: objekte_store.MakeTransactedInflator[
 			typ.Objekte,
 			*typ.Objekte,

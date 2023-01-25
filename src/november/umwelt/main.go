@@ -19,6 +19,7 @@ import (
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/lima/store_objekten"
 	"github.com/friedenberg/zit/src/mike/store_fs"
+	"github.com/friedenberg/zit/src/store_util"
 )
 
 type Umwelt struct {
@@ -152,9 +153,9 @@ func (u *Umwelt) Initialize() (err error) {
 	// 	}
 	// }
 
-	var su store_objekten.StoreUtil
+	var su store_util.StoreUtil
 
-	if su, err = store_objekten.MakeStoreUtil(
+	if su, err = store_util.MakeStoreUtil(
 		u.lock,
 		*u.age,
 		u.KonfigPtr(),

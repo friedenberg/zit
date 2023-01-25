@@ -1,4 +1,4 @@
-package store_objekten
+package store_util
 
 import (
 	"io"
@@ -18,11 +18,7 @@ type TransaktionStore interface {
 	ReadLastTransaktion() (*transaktion.Transaktion, error)
 	GetTransaktion() *transaktion.Transaktion
 	ReadAllTransaktions(collections.WriterFunc[*transaktion.Transaktion]) error
-	writeTransaktion() error
-}
-
-func (s *common) GetTransaktion() *transaktion.Transaktion {
-	return &s.transaktion
+	WriteTransaktion() error
 }
 
 func (s common) ReadLastTransaktion() (t *transaktion.Transaktion, err error) {
@@ -110,7 +106,7 @@ func (s common) readTransaktion(p string) (t *transaktion.Transaktion, err error
 	return
 }
 
-func (s common) writeTransaktion() (err error) {
+func (s common) WriteTransaktion() (err error) {
 	if s.GetTransaktion().Skus.Len() == 0 {
 		errors.Log().Print("not writing Transaktion as there aren't any Objekten")
 		return

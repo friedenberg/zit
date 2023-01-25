@@ -13,6 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/hinweisen"
 	"github.com/friedenberg/zit/src/echo/hinweis"
 	"github.com/friedenberg/zit/src/india/konfig"
+	"github.com/friedenberg/zit/src/store_util"
 )
 
 type encodedKennung struct {
@@ -20,7 +21,7 @@ type encodedKennung struct {
 }
 
 type indexKennung struct {
-	ioFactory
+	store_util.StoreUtilVerzeichnisse
 
 	lock *sync.RWMutex
 	path string
@@ -37,16 +38,16 @@ type indexKennung struct {
 
 func newIndexKennung(
 	k konfig.Compiled,
-	ioFactory ioFactory,
+	ioFactory store_util.StoreUtilVerzeichnisse,
 	oldHinweisenStore *hinweisen.Hinweisen,
 	p string,
 ) (i *indexKennung, err error) {
 	i = &indexKennung{
-		lock:               &sync.RWMutex{},
-		path:               p,
-		nonRandomSelection: k.PredictableHinweisen,
-		oldHinweisenStore:  oldHinweisenStore,
-		ioFactory:          ioFactory,
+		lock:                   &sync.RWMutex{},
+		path:                   p,
+		nonRandomSelection:     k.PredictableHinweisen,
+		oldHinweisenStore:      oldHinweisenStore,
+		StoreUtilVerzeichnisse: ioFactory,
 		encodedKennung: encodedKennung{
 			AvailableKennung: make(map[int]bool),
 		},

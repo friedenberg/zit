@@ -9,6 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/hotel/etikett"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
+	"github.com/friedenberg/zit/src/store_util"
 )
 
 type EtikettStore interface {
@@ -51,7 +52,7 @@ type EtikettAkteTextSaver = objekte_store.AkteTextSaver[
 ]
 
 type etikettStore struct {
-	StoreUtil
+	store_util.StoreUtil
 
 	pool collections.PoolLike[etikett.Transacted]
 
@@ -73,7 +74,7 @@ func (s *etikettStore) SetLogWriter(
 }
 
 func makeEtikettStore(
-	sa StoreUtil,
+	sa store_util.StoreUtil,
 ) (s *etikettStore, err error) {
 	pool := collections.MakePool[etikett.Transacted]()
 

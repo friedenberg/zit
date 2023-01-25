@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
+	"github.com/friedenberg/zit/src/store_util"
 )
 
 type KonfigStore interface {
@@ -41,7 +42,7 @@ type KonfigAkteTextSaver = objekte_store.AkteTextSaver[
 ]
 
 type konfigStore struct {
-	StoreUtil
+	store_util.StoreUtil
 
 	pool collections.PoolLike[erworben.Transacted]
 
@@ -57,7 +58,7 @@ func (s *konfigStore) SetLogWriter(
 }
 
 func makeKonfigStore(
-	sa StoreUtil,
+	sa store_util.StoreUtil,
 ) (s *konfigStore, err error) {
 	pool := collections.MakePool[erworben.Transacted]()
 
@@ -164,7 +165,7 @@ func (s konfigStore) Update(
 	s.StoreUtil.CommitTransacted(kt)
 	s.StoreUtil.GetKonfigPtr().SetTransacted(kt)
 
-	if err = s.StoreUtil.GetAbbrStore().addStoredAbbreviation(kt); err != nil {
+	if err = s.StoreUtil.GetAbbrStore().AddStoredAbbreviation(kt); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

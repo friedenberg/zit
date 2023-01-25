@@ -16,10 +16,11 @@ import (
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/store_verzeichnisse"
+	"github.com/friedenberg/zit/src/store_util"
 )
 
 type zettelStore struct {
-	StoreUtil
+	store_util.StoreUtil
 
 	protoZettel zettel.ProtoZettel
 
@@ -45,7 +46,7 @@ type zettelStore struct {
 }
 
 func makeZettelStore(
-	sa StoreUtil,
+	sa store_util.StoreUtil,
 	p *collections.Pool[zettel.Transacted, *zettel.Transacted],
 ) (s *zettelStore, err error) {
 	s = &zettelStore{
@@ -218,7 +219,7 @@ func (s *zettelStore) writeNamedZettelToIndex(
 		}
 	}
 
-	if err = s.StoreUtil.GetAbbrStore().addStoredAbbreviation(tz); err != nil {
+	if err = s.StoreUtil.GetAbbrStore().AddStoredAbbreviation(tz); err != nil {
 		err = errors.Wrapf(err, "failed to write zettel to index: %s", tz.Sku)
 		return
 	}

@@ -1,4 +1,4 @@
-package store_objekten
+package store_util
 
 import (
 	"bufio"
@@ -22,7 +22,7 @@ type AbbrStore interface {
 	ExpandHinweisString(string) (hinweis.Hinweis, error)
 	AbbreviateSha(schnittstellen.Value) (string, error)
 	AbbreviateHinweis(schnittstellen.Korper) (string, error)
-	addStoredAbbreviation(schnittstellen.Stored) error
+	AddStoredAbbreviation(schnittstellen.Stored) error
 	errors.Flusher
 }
 
@@ -35,7 +35,7 @@ type indexAbbrEncodableTridexes struct {
 
 type indexAbbr struct {
 	lock sync.Locker
-	ioFactory
+	StoreUtilVerzeichnisse
 
 	path string
 
@@ -46,13 +46,13 @@ type indexAbbr struct {
 }
 
 func newIndexAbbr(
-	ioFactory ioFactory,
+	suv StoreUtilVerzeichnisse,
 	p string,
 ) (i *indexAbbr, err error) {
 	i = &indexAbbr{
-		lock:      &sync.Mutex{},
-		path:      p,
-		ioFactory: ioFactory,
+		lock:                   &sync.Mutex{},
+		path:                   p,
+		StoreUtilVerzeichnisse: suv,
 		indexAbbrEncodableTridexes: indexAbbrEncodableTridexes{
 			Shas:             tridex.Make(),
 			HinweisKopfen:    tridex.Make(),
@@ -139,7 +139,7 @@ func (i *indexAbbr) readIfNecessary() (err error) {
 	return
 }
 
-func (i *indexAbbr) addStoredAbbreviation(o schnittstellen.Stored) (err error) {
+func (i *indexAbbr) AddStoredAbbreviation(o schnittstellen.Stored) (err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return

@@ -9,11 +9,12 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/juliett/zettel"
+	"github.com/friedenberg/zit/src/store_util"
 )
 
 type indexEtiketten struct {
 	path string
-	ioFactory
+	store_util.StoreUtilVerzeichnisse
 	etiketten  map[kennung.Etikett]int64
 	didRead    bool
 	hasChanges bool
@@ -26,12 +27,12 @@ type row struct {
 
 func newIndexEtiketten(
 	p string,
-	f ioFactory,
+	f store_util.StoreUtilVerzeichnisse,
 ) (i *indexEtiketten, err error) {
 	i = &indexEtiketten{
-		path:      p,
-		ioFactory: f,
-		etiketten: make(map[kennung.Etikett]int64),
+		path:                   p,
+		StoreUtilVerzeichnisse: f,
+		etiketten:              make(map[kennung.Etikett]int64),
 	}
 
 	return
@@ -226,7 +227,7 @@ func (i *indexEtiketten) allEtiketten() (es []kennung.Etikett, err error) {
 
 	n := 0
 
-	for e, _ := range i.etiketten {
+	for e := range i.etiketten {
 		es[n] = e
 		n++
 	}
