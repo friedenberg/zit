@@ -17,9 +17,9 @@ import (
 	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/india/konfig"
 	"github.com/friedenberg/zit/src/juliett/zettel"
+	"github.com/friedenberg/zit/src/kilo/store_util"
 	"github.com/friedenberg/zit/src/lima/store_objekten"
 	"github.com/friedenberg/zit/src/mike/store_fs"
-	"github.com/friedenberg/zit/src/store_util"
 )
 
 type Umwelt struct {

@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/juliett/zettel"
-	"github.com/friedenberg/zit/src/store_util"
+	"github.com/friedenberg/zit/src/kilo/store_util"
 )
 
 type indexEtiketten struct {

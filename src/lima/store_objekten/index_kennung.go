@@ -13,7 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/hinweisen"
 	"github.com/friedenberg/zit/src/echo/hinweis"
 	"github.com/friedenberg/zit/src/india/konfig"
-	"github.com/friedenberg/zit/src/store_util"
+	"github.com/friedenberg/zit/src/kilo/store_util"
 )
 
 type encodedKennung struct {

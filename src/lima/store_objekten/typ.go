@@ -13,7 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/hotel/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/hotel/typ"
-	"github.com/friedenberg/zit/src/store_util"
+	"github.com/friedenberg/zit/src/kilo/store_util"
 )
 
 type TypStore interface {
@@ -99,7 +99,7 @@ func makeTypStore(
 
 	s = &typStore{
 		StoreUtil: sa,
-		pool:                 pool,
+		pool:      pool,
 		TypInflator: objekte_store.MakeTransactedInflator[
 			typ.Objekte,
 			*typ.Objekte,
