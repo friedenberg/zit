@@ -10,12 +10,37 @@ type TransactedLogger[
 	SetLogWriter(LogWriter[T])
 }
 
-type Reader[
+type LastReader[
+	V any,
+] interface {
+	ReadLast() (V, error)
+}
+
+type OneReader[
 	K any,
 	V any,
 ] interface {
 	ReadOne(K) (V, error)
+}
+
+type AllReader[
+	V any,
+] interface {
+	ReadAll(collections.WriterFunc[V]) error
+}
+
+type SchwanzenReader[
+	V any,
+] interface {
 	ReadAllSchwanzen(collections.WriterFunc[V]) error
+}
+
+type Reader[
+	K any,
+	V any,
+] interface {
+	OneReader[K, V]
+	SchwanzenReader[V]
 }
 
 type TransactedReader[
@@ -23,7 +48,7 @@ type TransactedReader[
 	V any,
 ] interface {
 	Reader[K, V]
-	ReadAll(collections.WriterFunc[V]) error
+	AllReader[V]
 }
 
 type CreateOrUpdater[

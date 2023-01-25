@@ -19,9 +19,9 @@ type Store interface {
 	ObjekteSaver
 	AkteTextSaver
 	Create(*Objekte) (schnittstellen.Sha, error)
-	ReadLast() (*Objekte, error)
-	ReadOne(sha.Sha) (*Objekte, error)
-	ReadAll(collections.WriterFunc[*Objekte]) error
+	objekte_store.LastReader[*Objekte]
+	objekte_store.OneReader[schnittstellen.Sha, *Objekte]
+	objekte_store.AllReader[*Objekte]
 }
 
 type ObjekteSaver = objekte_store.ObjekteSaver[
@@ -136,7 +136,7 @@ func (s *store) readOnePath(p string) (o *Objekte, err error) {
 	return
 }
 
-func (s *store) ReadOne(sh sha.Sha) (o *Objekte, err error) {
+func (s *store) ReadOne(sh schnittstellen.Sha) (o *Objekte, err error) {
 	var or sha.ReadCloser
 
 	if or, err = s.oaf.ObjekteReader(gattung.Bestandsaufnahme, sh); err != nil {

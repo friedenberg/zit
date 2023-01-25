@@ -70,7 +70,7 @@ type TypAkteTextSaver = objekte_store.AkteTextSaver[
 ]
 
 type typStore struct {
-	common *common
+	StoreUtil
 
 	pool collections.PoolLike[typ.Transacted]
 
@@ -92,13 +92,13 @@ func (s *typStore) SetLogWriter(
 }
 
 func makeTypStore(
-	sa *common,
+	sa StoreUtil,
 ) (s *typStore, err error) {
 	pool := collections.MakePool[typ.Transacted]()
 
 	s = &typStore{
-		common: sa,
-		pool:   pool,
+		StoreUtil: sa,
+		pool:      pool,
 		TypInflator: objekte_store.MakeTransactedInflator[
 			typ.Objekte,
 			*typ.Objekte,
@@ -125,15 +125,15 @@ func makeTypStore(
 	}
 
 	newOrUpdated := func(t *typ.Transacted) (err error) {
-		s.common.CommitTransacted(t)
-		s.common.GetKonfigPtr().AddTyp(t)
+		s.StoreUtil.CommitTransacted(t)
+		s.StoreUtil.GetKonfigPtr().AddTyp(t)
 
 		return
 	}
 
 	s.CreateOrUpdater = objekte_store.MakeCreateOrUpdate(
 		sa,
-		sa.LockSmith,
+		sa.GetLockSmith(),
 		sa,
 		TypTransactedReader(s),
 		objekte_store.CreateOrUpdateDelegate[*typ.Transacted]{
@@ -170,7 +170,7 @@ func (s typStore) Flush() (err error) {
 func (s typStore) ReadAllSchwanzen(
 	f collections.WriterFunc[*typ.Transacted],
 ) (err error) {
-	if err = s.common.konfig.Typen.Each(f); err != nil {
+	if err = s.StoreUtil.GetKonfig().Typen.Each(f); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -181,7 +181,7 @@ func (s typStore) ReadAllSchwanzen(
 func (s typStore) ReadAll(
 	f collections.WriterFunc[*typ.Transacted],
 ) (err error) {
-	if s.common.GetKonfig().UseBestandsaufnahme {
+	if s.StoreUtil.GetKonfig().UseBestandsaufnahme {
 		f1 := func(t *bestandsaufnahme.Objekte) (err error) {
 			if err = t.Akte.Skus.Each(
 				func(sk sku.Sku2) (err error) {
@@ -220,12 +220,12 @@ func (s typStore) ReadAll(
 			return
 		}
 
-		if err = s.common.bestandsaufnahmeStore.ReadAll(f1); err != nil {
+		if err = s.StoreUtil.GetBestandsaufnahmeStore().ReadAll(f1); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	} else {
-		if err = s.common.ReadAllTransaktions(
+		if err = s.StoreUtil.GetTransaktionStore().ReadAllTransaktions(
 			func(t *transaktion.Transaktion) (err error) {
 				if err = t.Skus.Each(
 					func(o sku.SkuLike) (err error) {
@@ -278,7 +278,7 @@ func (s typStore) ReadOne(
 	k *kennung.Typ,
 ) (tt *typ.Transacted, err error) {
 	errors.TodoP3("add support for working directory")
-	at := s.common.GetKonfig().GetApproximatedTyp(*k)
+	at := s.StoreUtil.GetKonfig().GetApproximatedTyp(*k)
 
 	if !at.HasValue() {
 		err = errors.Wrap(objekte_store.ErrNotFound{Id: k})
@@ -297,12 +297,11 @@ func (s *typStore) Inherit(t *typ.Transacted) (err error) {
 
 	errors.Log().Printf("inheriting %s", t.Sku.ObjekteSha)
 
-	s.common.GetBestandsaufnahme().Akte.Skus.Push(t.Sku.Sku2())
-	s.common.GetTransaktion().Skus.Add(&t.Sku)
-	old := s.common.GetKonfig().GetApproximatedTyp(t.Sku.Kennung).ActualOrNil()
+	s.StoreUtil.CommitTransacted(t)
+	old := s.StoreUtil.GetKonfig().GetApproximatedTyp(t.Sku.Kennung).ActualOrNil()
 
 	if old == nil || old.Less(*t) {
-		s.common.GetKonfigPtr().AddTyp(t)
+		s.StoreUtil.GetKonfigPtr().AddTyp(t)
 	}
 
 	if t.IsNew() {
@@ -332,7 +331,7 @@ func (s *typStore) reindexOne(
 
 	o = te
 
-	s.common.GetKonfigPtr().AddTyp(te)
+	s.StoreUtil.GetKonfigPtr().AddTyp(te)
 
 	if te.IsNew() {
 		s.TypLogWriter.New(te)

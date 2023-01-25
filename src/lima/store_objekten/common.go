@@ -26,6 +26,8 @@ type StoreUtil interface {
 	schnittstellen.ObjekteAkteFactory
 	ts.Clock
 	CommitTransacted(objekte.TransactedLike) error
+	GetBestandsaufnahmeStore() bestandsaufnahme.Store
+	GetTransaktionStore() TransaktionStore
 }
 
 // TODO-P3 move to own package
@@ -55,7 +57,7 @@ func (s common) GetTai() ts.Tai {
 
 func (s common) CommitTransacted(t objekte.TransactedLike) (err error) {
 	s.GetBestandsaufnahme().Akte.Skus.Add(t.GetSku2())
-	s.GetTransaktion().Skus.Add(t.GetSkuLike())
+	s.GetTransaktionStore().GetTransaktion().Skus.Add(t.GetSkuLike())
 
 	return
 }
@@ -68,8 +70,12 @@ func (s *common) GetBestandsaufnahme() *bestandsaufnahme.Objekte {
 	return s.bestandsaufnahme
 }
 
-func (s *common) GetTransaktion() *transaktion.Transaktion {
-	return &s.transaktion
+func (s *common) GetTransaktionStore() TransaktionStore {
+	return s
+}
+
+func (s *common) GetBestandsaufnahmeStore() bestandsaufnahme.Store {
+	return s.bestandsaufnahmeStore
 }
 
 func (s common) GetStandort() standort.Standort {

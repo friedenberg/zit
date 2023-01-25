@@ -12,6 +12,16 @@ import (
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 )
 
+type TransaktionStore interface {
+	ReadLastTransaktion() (*transaktion.Transaktion, error)
+	GetTransaktion() *transaktion.Transaktion
+	ReadAllTransaktions(collections.WriterFunc[*transaktion.Transaktion]) error
+}
+
+func (s *common) GetTransaktion() *transaktion.Transaktion {
+	return &s.transaktion
+}
+
 func (s common) ReadLastTransaktion() (t *transaktion.Transaktion, err error) {
 	if err = s.ReadAllTransaktions(
 		collections.MakeSyncSerializer(
