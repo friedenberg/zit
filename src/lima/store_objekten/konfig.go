@@ -101,7 +101,7 @@ func (s konfigStore) Update(
 	ko *erworben.Objekte,
 ) (kt *erworben.Transacted, err error) {
 	if !s.common.LockSmith.IsAcquired() {
-		err = errors.Wrap(ErrLockRequired{Operation: "update konfig"})
+		err = errors.Wrap(objekte_store.ErrLockRequired{Operation: "update konfig"})
 		return
 	}
 
@@ -123,7 +123,7 @@ func (s konfigStore) Update(
 	var mutter *erworben.Transacted
 
 	if mutter, err = s.Read(); err != nil {
-		if errors.Is(err, ErrNotFound{}) {
+		if errors.Is(err, objekte_store.ErrNotFound{}) {
 			err = nil
 		} else {
 			err = errors.Wrap(err)
@@ -227,7 +227,7 @@ func (s konfigStore) Read() (tt *erworben.Transacted, err error) {
 				tt.Objekte.Sha,
 			); err != nil {
 				if errors.IsNotExist(err) {
-					err = errors.Wrap(ErrNotFound{})
+					err = errors.Wrap(objekte_store.ErrNotFound{})
 				} else {
 					err = errors.Wrap(err)
 				}

@@ -11,8 +11,8 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/delta/age_io"
 	"github.com/friedenberg/zit/src/echo/hinweis"
+	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/juliett/zettel"
-	"github.com/friedenberg/zit/src/lima/store_objekten"
 	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
 )
 
@@ -41,7 +41,7 @@ func (s Store) ReadExternalZettelFromAktePath(p string) (cz zettel_checked_out.Z
 	if zt, err = s.storeObjekten.Zettel().ReadOne(
 		cz.External.Sku.Kennung,
 	); err != nil {
-		if errors.Is(err, store_objekten.ErrNotFound{}) {
+		if errors.Is(err, objekte_store.ErrNotFound{}) {
 			err = nil
 		} else {
 			err = errors.Wrap(err)

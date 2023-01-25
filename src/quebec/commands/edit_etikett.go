@@ -15,7 +15,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/id_set"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/hotel/etikett"
-	"github.com/friedenberg/zit/src/lima/store_objekten"
+	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/november/umwelt"
 	"github.com/friedenberg/zit/src/oscar/user_ops"
 )
@@ -151,7 +151,7 @@ func (c EditEtikett) makeTempEtikettFiles(
 			var tt *etikett.Transacted
 
 			if tt, err = u.StoreObjekten().Etikett().ReadOne(&tk); err != nil {
-				if errors.Is(err, store_objekten.ErrNotFound{}) {
+				if errors.Is(err, objekte_store.ErrNotFound{}) {
 					err = nil
 					tt = &etikett.Transacted{
 						Sku: sku.Transacted[kennung.Etikett, *kennung.Etikett]{

@@ -9,6 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/golf/transaktion"
+	"github.com/friedenberg/zit/src/hotel/objekte_store"
 )
 
 func (s common) ReadLastTransaktion() (t *transaktion.Transaktion, err error) {
@@ -30,7 +31,7 @@ func (s common) ReadLastTransaktion() (t *transaktion.Transaktion, err error) {
 	}
 
 	if t == nil {
-		err = errors.Wrap(ErrNotFound{})
+		err = errors.Wrap(objekte_store.ErrNotFound{})
 	}
 
 	return

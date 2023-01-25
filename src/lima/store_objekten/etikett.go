@@ -108,7 +108,7 @@ func (s etikettStore) CreateOrUpdate(
 	tk *kennung.Etikett,
 ) (tt *etikett.Transacted, err error) {
 	if !s.common.LockSmith.IsAcquired() {
-		err = ErrLockRequired{
+		err = objekte_store.ErrLockRequired{
 			Operation: "create or update etikett",
 		}
 
@@ -118,7 +118,7 @@ func (s etikettStore) CreateOrUpdate(
 	var mutter *etikett.Transacted
 
 	if mutter, err = s.ReadOne(tk); err != nil {
-		if errors.Is(err, ErrNotFound{}) {
+		if errors.Is(err, objekte_store.ErrNotFound{}) {
 			err = nil
 		} else {
 			err = errors.Wrap(err)
@@ -203,7 +203,7 @@ func (s etikettStore) ReadOne(
 	tt = s.common.Konfig().GetEtikett(*k)
 
 	if tt == nil {
-		err = errors.Wrap(ErrNotFound{Id: k})
+		err = errors.Wrap(objekte_store.ErrNotFound{Id: k})
 		return
 	}
 

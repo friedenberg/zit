@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/juliett/cwd_files"
 	"github.com/friedenberg/zit/src/lima/store_objekten"
 	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
@@ -104,7 +105,7 @@ func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
 		case err == nil:
 			fallthrough
 
-		case errors.Is(err, store_objekten.ErrNotFound{}):
+		case errors.Is(err, objekte_store.ErrNotFound{}):
 			err = s.PrinterFileNotRecognized()(&ua)
 
 		case errors.Is(err, store_objekten.ErrAkteExists{}):

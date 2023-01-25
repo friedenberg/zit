@@ -14,8 +14,8 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/fd"
 	"github.com/friedenberg/zit/src/foxtrot/id_set"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
+	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/hotel/typ"
-	"github.com/friedenberg/zit/src/lima/store_objekten"
 	"github.com/friedenberg/zit/src/november/umwelt"
 	"github.com/friedenberg/zit/src/oscar/user_ops"
 )
@@ -157,7 +157,7 @@ func (c EditTyp) makeTempTypFiles(
 			var tt *typ.Transacted
 
 			if tt, err = u.StoreObjekten().Typ().ReadOne(&tk); err != nil {
-				if errors.Is(err, store_objekten.ErrNotFound{}) {
+				if errors.Is(err, objekte_store.ErrNotFound{}) {
 					err = nil
 					tt = &typ.Transacted{
 						Sku: sku.Transacted[kennung.Typ, *kennung.Typ]{

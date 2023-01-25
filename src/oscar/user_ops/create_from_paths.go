@@ -9,9 +9,9 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/foxtrot/fd"
+	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/zettel_external"
-	"github.com/friedenberg/zit/src/lima/store_objekten"
 	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
@@ -270,7 +270,7 @@ func (c CreateFromPaths) zettelsFromPath(
 func (c CreateFromPaths) handleStoreError(z zettel_checked_out.Zettel, f string, in error) {
 	var err error
 
-	var lostError store_objekten.VerlorenAndGefundenError
+	var lostError objekte_store.VerlorenAndGefundenError
 	var normalError errors.StackTracer
 
 	if errors.As(in, &lostError) {

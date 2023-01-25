@@ -127,7 +127,7 @@ func (s typStore) CreateOrUpdate(
 	tk *kennung.Typ,
 ) (tt *typ.Transacted, err error) {
 	if !s.common.LockSmith.IsAcquired() {
-		err = ErrLockRequired{
+		err = objekte_store.ErrLockRequired{
 			Operation: "create or update typ",
 		}
 
@@ -137,7 +137,7 @@ func (s typStore) CreateOrUpdate(
 	var mutter *typ.Transacted
 
 	if mutter, err = s.ReadOne(tk); err != nil {
-		if errors.Is(err, ErrNotFound{}) {
+		if errors.Is(err, objekte_store.ErrNotFound{}) {
 			err = nil
 		} else {
 			err = errors.Wrap(err)
@@ -331,7 +331,7 @@ func (s typStore) ReadOne(
 	at := s.common.Konfig().GetApproximatedTyp(*k)
 
 	if !at.HasValue() {
-		err = errors.Wrap(ErrNotFound{Id: k})
+		err = errors.Wrap(objekte_store.ErrNotFound{Id: k})
 		return
 	}
 

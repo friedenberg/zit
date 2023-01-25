@@ -189,7 +189,7 @@ func (s *zettelStore) writeNamedZettelToIndex(
 	errors.Log().Print("writing to index")
 
 	if !s.common.LockSmith.IsAcquired() {
-		err = ErrLockRequired{
+		err = objekte_store.ErrLockRequired{
 			Operation: "write named zettel to index",
 		}
 
@@ -259,7 +259,7 @@ func (s *zettelStore) Create(
 	in zettel.Objekte,
 ) (tz *zettel.Transacted, err error) {
 	if !s.common.LockSmith.IsAcquired() {
-		err = ErrLockRequired{
+		err = objekte_store.ErrLockRequired{
 			Operation: "create",
 		}
 
@@ -333,7 +333,7 @@ func (s *zettelStore) Update(
 	errors.TodoP2("support dry run")
 
 	if !s.common.LockSmith.IsAcquired() {
-		err = ErrLockRequired{
+		err = objekte_store.ErrLockRequired{
 			Operation: "update",
 		}
 
@@ -478,7 +478,7 @@ func (s *zettelStore) transactedWithHead(
 		tz.Sku.Mutter[0] = previous.Sku.Schwanz
 		tz.Sku.Kopf = previous.Sku.Kopf
 	} else {
-		if errors.Is(err, ErrNotFound{}) {
+		if errors.Is(err, objekte_store.ErrNotFound{}) {
 			err = nil
 		} else {
 			err = errors.Wrap(err)

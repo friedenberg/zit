@@ -1,11 +1,20 @@
-package objekte
+package objekte_store
 
-//func CreateOrUpdate(
+//func CreateOrUpdate[
+//	T schnittstellen.Objekte[T],
+//	T1 schnittstellen.ObjektePtr[T],
+//	T2 schnittstellen.Id[T2],
+//	T3 schnittstellen.IdPtr[T2],
+//	T4 any,
+//	T5 schnittstellen.VerzeichnissePtr[T4, T],
+//  T6 objekte.Transacted[T, T1, T2, T3, T4, T5]
+//  T7 *objekte.Transacted[T, T1, T2, T3, T4, T5]
+//](
 //	ls schnittstellen.LockSmith,
-//	to *typ.Objekte,
-//	tk *kennung.Typ,
-//) (tt *typ.Transacted, err error) {
-//	if !s.common.LockSmith.IsAcquired() {
+//	to T1,
+//	tk T3,
+//) (tt T7, err error) {
+//	if !ls.IsAcquired() {
 //		err = ErrLockRequired{
 //			Operation: "create or update typ",
 //		}
@@ -13,7 +22,7 @@ package objekte
 //		return
 //	}
 
-//	var mutter *typ.Transacted
+//	var mutter *T7
 
 //	if mutter, err = s.ReadOne(tk); err != nil {
 //		if errors.Is(err, ErrNotFound{}) {
@@ -26,7 +35,7 @@ package objekte
 
 //	tt = &typ.Transacted{
 //		Objekte: *to,
-//		Sku: sku.Transacted[kennung.Typ, *kennung.Typ]{
+//		Sku: sku.Transacted[T2, T3]{
 //			Kennung: *tk,
 //			Verzeichnisse: sku.Verzeichnisse{
 //				Schwanz: s.common.GetTransaktion().Time,
@@ -42,7 +51,7 @@ package objekte
 //		tt.Sku.Kopf = s.common.GetTransaktion().Time
 //	}
 
-//	fo := objekte.MakeFormat[typ.Objekte, *typ.Objekte]()
+//	fo := objekte.MakeFormat[T, T1]()
 
 //	var w *age_io.Mover
 

@@ -16,6 +16,7 @@ import (
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/hotel/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/hotel/etikett"
+	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/india/konfig"
 	"github.com/friedenberg/zit/src/juliett/zettel"
@@ -202,7 +203,7 @@ func (s Store) RevertTransaktion(
 	errors.TodoP0("implement")
 
 	if !s.common.LockSmith.IsAcquired() {
-		err = ErrLockRequired{
+		err = objekte_store.ErrLockRequired{
 			Operation: "revert",
 		}
 
@@ -269,7 +270,7 @@ func (s Store) RevertTransaktion(
 
 func (s Store) Flush() (err error) {
 	if !s.common.LockSmith.IsAcquired() {
-		err = ErrLockRequired{
+		err = objekte_store.ErrLockRequired{
 			Operation: "flush",
 		}
 
@@ -403,7 +404,7 @@ func (s *Store) getReindexFunc() func(sku.DataIdentity) error {
 
 func (s *Store) Reindex() (err error) {
 	if !s.common.LockSmith.IsAcquired() {
-		err = ErrLockRequired{
+		err = objekte_store.ErrLockRequired{
 			Operation: "reindex",
 		}
 

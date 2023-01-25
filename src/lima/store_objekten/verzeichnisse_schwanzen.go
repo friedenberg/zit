@@ -4,6 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/echo/hinweis"
+	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/store_verzeichnisse"
 )
@@ -76,7 +77,7 @@ func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 	}
 
 	if found == nil {
-		err = ErrNotFound{Id: h}
+		err = objekte_store.ErrNotFound{Id: h}
 		return
 	}
 
