@@ -29,4 +29,3 @@ type IdPtr[T Value] interface {
 type Lessor[T any] interface {
 	Less(T) bool
 }
-

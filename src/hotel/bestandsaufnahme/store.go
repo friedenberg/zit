@@ -11,7 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/golf/objekte"
-	"github.com/friedenberg/zit/src/objekte_store"
+	"github.com/friedenberg/zit/src/hotel/objekte_store"
 )
 
 type Store interface {

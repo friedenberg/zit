@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/echo/hinweis"
-	"github.com/friedenberg/zit/src/objekte_store"
+	"github.com/friedenberg/zit/src/hotel/objekte_store"
 )
 
 // !typ "bez"

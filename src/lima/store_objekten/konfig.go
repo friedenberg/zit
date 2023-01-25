@@ -11,7 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/hotel/erworben"
-	"github.com/friedenberg/zit/src/objekte_store"
+	"github.com/friedenberg/zit/src/hotel/objekte_store"
 )
 
 type KonfigStore interface {

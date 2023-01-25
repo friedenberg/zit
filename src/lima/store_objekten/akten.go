@@ -10,7 +10,7 @@ import (
 )
 
 func (s Store) AkteExists(sh sha.Sha) (err error) {
-  errors.TodoP3("decide what to do with this method")
+	errors.TodoP3("decide what to do with this method")
 
 	if sh.IsNull() {
 		return
