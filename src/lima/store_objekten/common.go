@@ -23,7 +23,7 @@ import (
 
 // TODO-P3 move to own package
 type common struct {
-	LockSmith        LockSmith
+	LockSmith        schnittstellen.LockSmith
 	Age              age.Age
 	konfig           *konfig.Compiled
 	standort         standort.Standort

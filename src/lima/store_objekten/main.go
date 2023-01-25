@@ -38,7 +38,7 @@ type Store struct {
 }
 
 func Make(
-	lockSmith LockSmith,
+	lockSmith schnittstellen.LockSmith,
 	a age.Age,
 	k *konfig.Compiled,
 	st standort.Standort,

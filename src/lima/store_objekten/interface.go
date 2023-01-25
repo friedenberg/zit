@@ -6,10 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/india/konfig"
 )
 
-type LockSmith interface {
-	IsAcquired() bool
-}
-
 type ioFactory interface {
 	konfig.Getter
 	schnittstellen.AkteIOFactory
