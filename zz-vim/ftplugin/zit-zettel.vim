@@ -1,4 +1,5 @@
 
+" TODO-P3 use https://github.com/suy/vim-context-commentstring
 let &l:equalprg = "zit format-zettel -include-cwd %:r"
 let &l:comments = "fb:*,fb:-,fb:+,n:>"
 let &l:commentstring = "<!--%s-->"

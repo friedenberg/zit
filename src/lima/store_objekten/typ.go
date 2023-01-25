@@ -125,8 +125,8 @@ func makeTypStore(
 	}
 
 	newOrUpdated := func(t *typ.Transacted) (err error) {
-		s.common.AddSku(t.GetSku2(), &t.Sku)
-		s.common.KonfigPtr().AddTyp(t)
+		s.common.CommitTransacted(t)
+		s.common.GetKonfigPtr().AddTyp(t)
 
 		return
 	}
@@ -181,7 +181,7 @@ func (s typStore) ReadAllSchwanzen(
 func (s typStore) ReadAll(
 	f collections.WriterFunc[*typ.Transacted],
 ) (err error) {
-	if s.common.Konfig().UseBestandsaufnahme {
+	if s.common.GetKonfig().UseBestandsaufnahme {
 		f1 := func(t *bestandsaufnahme.Objekte) (err error) {
 			if err = t.Akte.Skus.Each(
 				func(sk sku.Sku2) (err error) {
@@ -278,7 +278,7 @@ func (s typStore) ReadOne(
 	k *kennung.Typ,
 ) (tt *typ.Transacted, err error) {
 	errors.TodoP3("add support for working directory")
-	at := s.common.Konfig().GetApproximatedTyp(*k)
+	at := s.common.GetKonfig().GetApproximatedTyp(*k)
 
 	if !at.HasValue() {
 		err = errors.Wrap(objekte_store.ErrNotFound{Id: k})
@@ -299,10 +299,10 @@ func (s *typStore) Inherit(t *typ.Transacted) (err error) {
 
 	s.common.GetBestandsaufnahme().Akte.Skus.Push(t.Sku.Sku2())
 	s.common.GetTransaktion().Skus.Add(&t.Sku)
-	old := s.common.Konfig().GetApproximatedTyp(t.Sku.Kennung).ActualOrNil()
+	old := s.common.GetKonfig().GetApproximatedTyp(t.Sku.Kennung).ActualOrNil()
 
 	if old == nil || old.Less(*t) {
-		s.common.KonfigPtr().AddTyp(t)
+		s.common.GetKonfigPtr().AddTyp(t)
 	}
 
 	if t.IsNew() {
@@ -332,7 +332,7 @@ func (s *typStore) reindexOne(
 
 	o = te
 
-	s.common.KonfigPtr().AddTyp(te)
+	s.common.GetKonfigPtr().AddTyp(te)
 
 	if te.IsNew() {
 		s.TypLogWriter.New(te)

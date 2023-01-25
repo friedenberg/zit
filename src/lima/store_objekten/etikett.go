@@ -51,7 +51,7 @@ type EtikettAkteTextSaver = objekte_store.AkteTextSaver[
 ]
 
 type etikettStore struct {
-	common *common
+	StoreUtil
 
 	pool collections.PoolLike[etikett.Transacted]
 
@@ -73,13 +73,13 @@ func (s *etikettStore) SetLogWriter(
 }
 
 func makeEtikettStore(
-	sa *common,
+	sa StoreUtil,
 ) (s *etikettStore, err error) {
 	pool := collections.MakePool[etikett.Transacted]()
 
 	s = &etikettStore{
-		common: sa,
-		pool:   pool,
+		StoreUtil: sa,
+		pool:      pool,
 		EtikettInflator: objekte_store.MakeTransactedInflator[
 			etikett.Objekte,
 			*etikett.Objekte,
@@ -106,15 +106,15 @@ func makeEtikettStore(
 	}
 
 	newOrUpdated := func(t *etikett.Transacted) (err error) {
-		s.common.AddSku(t.GetSku2(), &t.Sku)
-		s.common.KonfigPtr().AddEtikett(t)
+		s.StoreUtil.CommitTransacted(t)
+		s.StoreUtil.GetKonfigPtr().AddEtikett(t)
 
 		return
 	}
 
 	s.CreateOrUpdater = objekte_store.MakeCreateOrUpdate(
 		sa,
-		sa.LockSmith,
+		sa.GetLockSmith(),
 		sa,
 		EtikettTransactedReader(s),
 		objekte_store.CreateOrUpdateDelegate[*etikett.Transacted]{
@@ -150,7 +150,7 @@ func (s etikettStore) Flush() (err error) {
 func (s etikettStore) ReadOne(
 	k *kennung.Etikett,
 ) (tt *etikett.Transacted, err error) {
-	tt = s.common.Konfig().GetEtikett(*k)
+	tt = s.StoreUtil.GetKonfig().GetEtikett(*k)
 
 	if tt == nil {
 		err = errors.Wrap(objekte_store.ErrNotFound{Id: k})
@@ -187,7 +187,7 @@ func (s *etikettStore) reindexOne(
 
 	o = te
 
-	s.common.KonfigPtr().AddEtikett(te)
+	s.StoreUtil.GetKonfigPtr().AddEtikett(te)
 
 	if te.IsNew() {
 		s.EtikettLogWriter.New(te)

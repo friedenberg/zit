@@ -169,7 +169,7 @@ func (s konfigStore) Update(
 	}
 
 	s.common.GetTransaktion().Skus.Add(&kt.Sku)
-	s.common.KonfigPtr().SetTransacted(kt)
+	s.common.GetKonfigPtr().SetTransacted(kt)
 
 	if err = s.common.Abbr.addStoredAbbreviation(kt); err != nil {
 		err = errors.Wrap(err)
@@ -186,9 +186,9 @@ func (s konfigStore) Update(
 
 func (s konfigStore) Read() (tt *erworben.Transacted, err error) {
 	tt = &erworben.Transacted{
-		Sku: s.common.Konfig().Sku,
+		Sku: s.common.GetKonfig().Sku,
 		Objekte: erworben.Objekte{
-			Akte: s.common.Konfig().Akte,
+			Akte: s.common.GetKonfig().Akte,
 		},
 	}
 
@@ -265,7 +265,7 @@ func (s *konfigStore) reindexOne(
 
 	o = te
 
-	s.common.KonfigPtr().SetTransacted(te)
+	s.common.GetKonfigPtr().SetTransacted(te)
 	s.KonfigLogWriter.Updated(te)
 
 	return

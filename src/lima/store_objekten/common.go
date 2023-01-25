@@ -6,19 +6,27 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/id"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/age"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/age_io"
 	"github.com/friedenberg/zit/src/echo/ts"
-	"github.com/friedenberg/zit/src/foxtrot/sku"
+	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/hotel/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/india/konfig"
 )
+
+type StoreUtil interface {
+	schnittstellen.LockSmithGetter
+	konfig.Getter
+	konfig.PtrGetter
+	standort.Getter
+	schnittstellen.ObjekteAkteFactory
+	ts.Clock
+	CommitTransacted(objekte.TransactedLike) error
+}
 
 // TODO-P3 move to own package
 type common struct {
@@ -33,6 +41,10 @@ type common struct {
 	bestandsaufnahmeStore bestandsaufnahme.Store
 }
 
+func (s common) GetLockSmith() schnittstellen.LockSmith {
+	return s.LockSmith
+}
+
 func (s common) GetTime() ts.Time {
 	return s.transaktion.Time
 }
@@ -41,21 +53,11 @@ func (s common) GetTai() ts.Tai {
 	return s.bestandsaufnahme.Tai
 }
 
-func (s common) AddSku(sku2 sku.Sku2, skuLike sku.SkuLike) {
-	s.GetBestandsaufnahme().Akte.Skus.Add(sku2)
-	s.GetTransaktion().Skus.Add(skuLike)
-}
+func (s common) CommitTransacted(t objekte.TransactedLike) (err error) {
+	s.GetBestandsaufnahme().Akte.Skus.Add(t.GetSku2())
+	s.GetTransaktion().Skus.Add(t.GetSkuLike())
 
-func (s common) AddSkuToBestandsaufnahme(sk sku.SkuLike, as sha.Sha) {
-	s.GetBestandsaufnahme().Akte.Skus.Push(
-		sku.Sku2{
-			Gattung:    gattung.Make(sk.GetGattung()),
-			Tai:        ts.TaiFromTimeWithIndex(sk.GetTime(), sk.GetTransactionIndex().Int()),
-			Kennung:    collections.MakeStringValue(sk.GetId().String()),
-			ObjekteSha: sha.Make(sk.GetObjekteSha()),
-			AkteSha:    as,
-		},
-	)
+	return
 }
 
 func (s common) Bestandsaufnahme() bestandsaufnahme.Store {
@@ -76,14 +78,6 @@ func (s common) GetStandort() standort.Standort {
 
 func (s common) GetKonfig() konfig.Compiled {
 	return *s.konfig
-}
-
-func (s common) Konfig() konfig.Compiled {
-	return *s.konfig
-}
-
-func (s common) KonfigPtr() *konfig.Compiled {
-	return s.konfig
 }
 
 func (s common) GetKonfigPtr() *konfig.Compiled {

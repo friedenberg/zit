@@ -277,7 +277,7 @@ func (s Store) Flush() (err error) {
 		return
 	}
 
-	if s.common.Konfig().DryRun {
+	if s.common.GetKonfig().DryRun {
 		return
 	}
 
@@ -424,7 +424,7 @@ func (s *Store) Reindex() (err error) {
 
 	f1 := s.getReindexFunc()
 
-	if s.common.Konfig().UseBestandsaufnahme {
+	if s.common.GetKonfig().UseBestandsaufnahme {
 		f := func(t *bestandsaufnahme.Objekte) (err error) {
 			if err = t.Akte.Skus.Each(
 				func(sk sku.Sku2) (err error) {

@@ -23,14 +23,18 @@ type DataIdentity interface {
 
 type SkuLike interface {
 	DataIdentity
-	SetTimeAndFields(ts.Time, ...string) error
-	SetFromSku(Sku) error
 
 	GetKey() string
 
 	GetMutter() Mutter
-	SetTransactionIndex(int)
 	GetTransactionIndex() int_value.IntValue
 	GetKopf() ts.Time
 	GetSchwanz() ts.Time
+}
+
+type SkuLikePtr interface {
+	SkuLike
+	SetTimeAndFields(ts.Time, ...string) error
+	SetFromSku(Sku) error
+	SetTransactionIndex(int)
 }

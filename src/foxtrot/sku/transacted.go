@@ -89,7 +89,7 @@ func (t *Transacted[T, T1]) SetFromSku(sk Sku) (err error) {
 // }
 
 // TODO-P2 include sku versions
-func MakeSkuTransacted(t ts.Time, line string) (out SkuLike, err error) {
+func MakeSkuTransacted(t ts.Time, line string) (out SkuLikePtr, err error) {
 	fields := strings.Fields(line)
 	var g gattung.Gattung
 

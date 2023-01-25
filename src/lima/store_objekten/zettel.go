@@ -51,7 +51,7 @@ func makeZettelStore(
 	s = &zettelStore{
 		common:      sa,
 		pool:        p,
-		protoZettel: zettel.MakeProtoZettel(sa.Konfig()),
+		protoZettel: zettel.MakeProtoZettel(sa.GetKonfig()),
 		TransactedInflator: objekte_store.MakeTransactedInflator[
 			zettel.Objekte,
 			*zettel.Objekte,
@@ -90,7 +90,7 @@ func makeZettelStore(
 	}
 
 	if s.verzeichnisseAll, err = store_verzeichnisse.MakeZettelen(
-		s.common.Konfig(),
+		s.common.GetKonfig(),
 		s.common.GetStandort().DirVerzeichnisseZettelenNeue(),
 		s.common,
 		p,
@@ -101,7 +101,7 @@ func makeZettelStore(
 	}
 
 	if s.indexKennung, err = newIndexKennung(
-		s.common.Konfig(),
+		s.common.GetKonfig(),
 		s.common,
 		s.hinweisen,
 		s.common.GetStandort().DirVerzeichnisse("Kennung"),
@@ -273,7 +273,7 @@ func (s *zettelStore) Create(
 
 	s.protoZettel.Apply(&in)
 
-	if err = in.ApplyKonfig(s.common.Konfig()); err != nil {
+	if err = in.ApplyKonfig(s.common.GetKonfig()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -340,7 +340,7 @@ func (s *zettelStore) Update(
 		return
 	}
 
-	if err = z.ApplyKonfig(s.common.Konfig()); err != nil {
+	if err = z.ApplyKonfig(s.common.GetKonfig()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -446,7 +446,7 @@ func (s *zettelStore) addZettelToTransaktion(
 	tz.Sku.Kennung = *zk
 	tz.Sku.ObjekteSha = *zs
 
-	s.common.AddSku(tz.GetSku2(), &tz.Sku)
+	s.common.CommitTransacted(tz)
 
 	return
 }

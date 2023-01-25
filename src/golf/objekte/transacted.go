@@ -106,6 +106,11 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) GetObjekte() (o T) {
 	o = a.Objekte
 	return
 }
+
+func (a Transacted[T, T1, T2, T3, T4, T5]) GetSkuLike() (sk sku.SkuLike) {
+  return a.Sku
+}
+
 func (a Transacted[T, T1, T2, T3, T4, T5]) GetSku() (sk sku.Sku) {
 	sk = a.Sku.Sku()
 	errors.TodoP2("make certain akte sha is in sku")
