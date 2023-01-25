@@ -1,6 +1,8 @@
 package objekte_store
 
 import (
+	"fmt"
+
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
@@ -60,7 +62,7 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdate(
 ) (transactedPtr *objekte.Transacted[T, T1, T2, T3, T4, T5], err error) {
 	if !cou.ls.IsAcquired() {
 		err = ErrLockRequired{
-			Operation: "create or update typ",
+			Operation: fmt.Sprintf("create or update %s", kennungPtr.GetGattung()),
 		}
 
 		return

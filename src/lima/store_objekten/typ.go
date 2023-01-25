@@ -77,6 +77,7 @@ type typStore struct {
 	TypInflator
 	TypAkteTextSaver
 	TypLogWriter
+
 	objekte_store.CreateOrUpdater[
 		*typ.Objekte,
 		*kennung.Typ,
