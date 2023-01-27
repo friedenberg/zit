@@ -53,7 +53,7 @@ type ZettelStore interface {
 
 	WriteZettelObjekte(z zettel.Objekte) (sh sha.Sha, err error)
 
-	GetIndexKennung() *indexKennung
+	GetIndexKennung() kennung.OldKennungIndex
 }
 
 type zettelStore struct {
@@ -63,8 +63,8 @@ type zettelStore struct {
 
 	logWriter zettel.LogWriter
 
-	*indexKennung
-	hinweisen *hinweisen.Hinweisen
+	indexKennung kennung.OldKennungIndex
+	hinweisen    *hinweisen.Hinweisen
 
 	verzeichnisseSchwanzen *verzeichnisseSchwanzen
 	verzeichnisseAll       *store_verzeichnisse.Zettelen
@@ -137,7 +137,7 @@ func makeZettelStore(
 		return
 	}
 
-	if s.indexKennung, err = newIndexKennung(
+	if s.indexKennung, err = kennung.MakeOldKennungIndex(
 		s.StoreUtil.GetKonfig(),
 		s.StoreUtil,
 		s.hinweisen,
@@ -154,7 +154,7 @@ func (s *zettelStore) Hinweisen() *hinweisen.Hinweisen {
 	return s.hinweisen
 }
 
-func (s *zettelStore) GetIndexKennung() *indexKennung {
+func (s *zettelStore) GetIndexKennung() kennung.OldKennungIndex {
 	return s.indexKennung
 }
 
@@ -236,7 +236,7 @@ func (s *zettelStore) writeNamedZettelToIndex(
 		return
 	}
 
-	if err = s.indexKennung.addHinweis(tz.Sku.Kennung); err != nil {
+	if err = s.indexKennung.AddHinweis(tz.Sku.Kennung); err != nil {
 		if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
 			errors.Log().Printf("kennung does not contain value: %s", err)
 			err = nil
@@ -321,7 +321,7 @@ func (s *zettelStore) Create(
 
 	var ken kennung.Hinweis
 
-	if ken, err = s.indexKennung.createHinweis(); err != nil {
+	if ken, err = s.indexKennung.CreateHinweis(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
