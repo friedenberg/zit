@@ -25,16 +25,18 @@ func (s Store) AkteExists(sh sha.Sha) (err error) {
 
 	set := zettel.MakeMutableSetUnique(0)
 
-	if err = s.zettelStore.verzeichnisseAll.ReadMany(
-		func(z *zettel.Transacted) (err error) {
-			if !z.Objekte.Akte.Equals(sh) {
-				err = collections.ErrStopIteration
-				return
-			}
+	if err = s.Zettel().ReadAll(
+		collections.MakeChain(
+			func(z *zettel.Transacted) (err error) {
+				if !z.Objekte.Akte.Equals(sh) {
+					err = collections.ErrStopIteration
+					return
+				}
 
-			return
-		},
-		set.AddAndDoNotRepool,
+				return
+			},
+			set.AddAndDoNotRepool,
+		),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

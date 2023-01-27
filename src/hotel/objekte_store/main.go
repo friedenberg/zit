@@ -59,9 +59,17 @@ type CreateOrUpdater[
 	CreateOrUpdate(O, K) (V, error)
 }
 
-type Updater[
+type Creator[
 	O any,
 	V any,
 ] interface {
-	Update(O) (V, error)
+	Create(O) (V, error)
+}
+
+type Updater[
+	O any,
+	K any,
+	V any,
+] interface {
+	Update(O, K) (V, error)
 }

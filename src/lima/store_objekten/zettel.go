@@ -2,7 +2,6 @@ package store_objekten
 
 import (
 	"reflect"
-	"sort"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
@@ -19,6 +18,44 @@ import (
 	"github.com/friedenberg/zit/src/kilo/store_util"
 	"github.com/friedenberg/zit/src/kilo/store_verzeichnisse"
 )
+
+type ZettelStore interface {
+	reindexer
+	GattungStore
+
+	objekte_store.Inheritor[*zettel.Transacted]
+	objekte_store.TransactedLogger[*zettel.Transacted]
+
+	objekte_store.TransactedReader[
+		schnittstellen.Value,
+		*zettel.Transacted,
+	]
+
+	objekte_store.Creator[
+		zettel.Objekte,
+		*zettel.Transacted,
+	]
+
+	objekte_store.Updater[
+		*zettel.Objekte,
+		*hinweis.Hinweis,
+		// schnittstellen.Value,
+		*zettel.Transacted,
+	]
+
+	objekte_store.TransactedInflator[
+		zettel.Objekte,
+		*zettel.Objekte,
+		hinweis.Hinweis,
+		*hinweis.Hinweis,
+		zettel.Verzeichnisse,
+		*zettel.Verzeichnisse,
+	]
+
+	WriteZettelObjekte(z zettel.Objekte) (sh sha.Sha, err error)
+
+	GetIndexKennung() *indexKennung
+}
 
 type zettelStore struct {
 	store_util.StoreUtil
@@ -116,6 +153,10 @@ func makeZettelStore(
 
 func (s *zettelStore) Hinweisen() *hinweisen.Hinweisen {
 	return s.hinweisen
+}
+
+func (s *zettelStore) GetIndexKennung() *indexKennung {
+	return s.indexKennung
 }
 
 func (s *zettelStore) Flush() (err error) {
@@ -394,33 +435,33 @@ func (s *zettelStore) Update(
 	return
 }
 
-func (s zettelStore) AllInChain(h hinweis.Hinweis) (c []*zettel.Transacted, err error) {
-	mst := zettel.MakeMutableSetUnique(0)
+// func (s zettelStore) AllInChain(h hinweis.Hinweis) (c []*zettel.Transacted, err error) {
+// 	mst := zettel.MakeMutableSetUnique(0)
 
-	if err = s.verzeichnisseAll.ReadMany(
-		func(z *zettel.Transacted) (err error) {
-			if !z.Sku.Kennung.Equals(h) {
-				err = collections.ErrStopIteration
-				return
-			}
+// 	if err = s.verzeichnisseAll.ReadMany(
+// 		func(z *zettel.Transacted) (err error) {
+// 			if !z.Sku.Kennung.Equals(h) {
+// 				err = collections.ErrStopIteration
+// 				return
+// 			}
 
-			return
-		},
-		mst.AddAndDoNotRepool,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+// 			return
+// 		},
+// 		mst.AddAndDoNotRepool,
+// 	); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	c = mst.Elements()
+// 	c = mst.Elements()
 
-	sort.Slice(
-		c,
-		func(i, j int) bool { return c[i].Sku.Less(&c[j].Sku) },
-	)
+// 	sort.Slice(
+// 		c,
+// 		func(i, j int) bool { return c[i].Sku.Less(&c[j].Sku) },
+// 	)
 
-	return
-}
+// 	return
+// }
 
 func (s *zettelStore) addZettelToTransaktion(
 	zo *zettel.Objekte,

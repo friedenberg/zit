@@ -10,10 +10,9 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/coordinates"
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/hinweisen"
 	"github.com/friedenberg/zit/src/echo/hinweis"
-	"github.com/friedenberg/zit/src/india/konfig"
-	"github.com/friedenberg/zit/src/kilo/store_util"
 )
 
 type encodedKennung struct {
@@ -21,7 +20,7 @@ type encodedKennung struct {
 }
 
 type indexKennung struct {
-	store_util.StoreUtilVerzeichnisse
+	su schnittstellen.VerzeichnisseFactory
 
 	lock *sync.RWMutex
 	path string
@@ -37,17 +36,17 @@ type indexKennung struct {
 }
 
 func newIndexKennung(
-	k konfig.Compiled,
-	ioFactory store_util.StoreUtilVerzeichnisse,
+	k schnittstellen.Konfig,
+	su schnittstellen.VerzeichnisseFactory,
 	oldHinweisenStore *hinweisen.Hinweisen,
 	p string,
 ) (i *indexKennung, err error) {
 	i = &indexKennung{
-		lock:                   &sync.RWMutex{},
-		path:                   p,
-		nonRandomSelection:     k.PredictableHinweisen,
-		oldHinweisenStore:      oldHinweisenStore,
-		StoreUtilVerzeichnisse: ioFactory,
+		lock:               &sync.RWMutex{},
+		path:               p,
+		nonRandomSelection: k.UsePredictableHinweisen(),
+		oldHinweisenStore:  oldHinweisenStore,
+		su:                 su,
 		encodedKennung: encodedKennung{
 			AvailableKennung: make(map[int]bool),
 		},
@@ -69,7 +68,7 @@ func (i *indexKennung) Flush() (err error) {
 
 	var w1 io.WriteCloser
 
-	if w1, err = i.WriteCloserVerzeichnisse(i.path); err != nil {
+	if w1, err = i.su.WriteCloserVerzeichnisse(i.path); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -109,7 +108,7 @@ func (i *indexKennung) readIfNecessary() (err error) {
 
 	var r1 io.ReadCloser
 
-	if r1, err = i.ReadCloserVerzeichnisse(i.path); err != nil {
+	if r1, err = i.su.ReadCloserVerzeichnisse(i.path); err != nil {
 		if errors.IsNotExist(err) {
 			err = nil
 		} else {

@@ -57,3 +57,7 @@ func (c *Cli) AddToFlags(f *flag.FlagSet) {
 func DefaultCli() (c Cli) {
 	return
 }
+
+func (c Cli) UsePredictableHinweisen() bool {
+	return c.PredictableHinweisen
+}

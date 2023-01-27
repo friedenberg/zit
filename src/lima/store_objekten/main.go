@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/gattungen"
-	"github.com/friedenberg/zit/src/echo/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/golf/transaktion"
@@ -21,7 +20,7 @@ import (
 type Store struct {
 	store_util.StoreUtil
 
-	zettelStore  *zettelStore
+	zettelStore  ZettelStore
 	typStore     TypStore
 	etikettStore EtikettStore
 	konfigStore  KonfigStore
@@ -124,7 +123,7 @@ func Make(
 	return
 }
 
-func (s *Store) Zettel() *zettelStore {
+func (s *Store) Zettel() ZettelStore {
 	return s.zettelStore
 }
 
@@ -153,60 +152,60 @@ func (s Store) RevertTransaktion(
 		return
 	}
 
-	tzs = zettel.MakeMutableSetUnique(t.Skus.Len())
+	//tzs = zettel.MakeMutableSetUnique(t.Skus.Len())
 
-	t.Skus.Each(
-		func(o sku.SkuLike) (err error) {
-			var h *hinweis.Hinweis
-			ok := false
+	//t.Skus.Each(
+	//	func(o sku.SkuLike) (err error) {
+	//		var h *hinweis.Hinweis
+	//		ok := false
 
-			if h, ok = o.GetId().(*hinweis.Hinweis); !ok {
-				//TODO
-				return
-			}
+	//		if h, ok = o.GetId().(*hinweis.Hinweis); !ok {
+	//			//TODO
+	//			return
+	//		}
 
-			if !o.GetMutter()[1].IsZero() {
-				err = errors.Errorf("merge reverts are not yet supported: %s", o)
-				return
-			}
+	//		if !o.GetMutter()[1].IsZero() {
+	//			err = errors.Errorf("merge reverts are not yet supported: %s", o)
+	//			return
+	//		}
 
-			errors.Log().Print(o)
+	//		errors.Log().Print(o)
 
-			var chain []*zettel.Transacted
+	//		var chain []*zettel.Transacted
 
-			if chain, err = s.zettelStore.AllInChain(*h); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+	//		if chain, err = s.zettelStore.AllInChain(*h); err != nil {
+	//			err = errors.Wrap(err)
+	//			return
+	//		}
 
-			var tz *zettel.Transacted
+	//		var tz *zettel.Transacted
 
-			for _, someTz := range chain {
-				errors.Log().Print(someTz)
-				if someTz.Sku.Schwanz == o.GetMutter()[0] {
-					tz = someTz
-					break
-				}
-			}
+	//		for _, someTz := range chain {
+	//			errors.Log().Print(someTz)
+	//			if someTz.Sku.Schwanz == o.GetMutter()[0] {
+	//				tz = someTz
+	//				break
+	//			}
+	//		}
 
-			if tz.Sku.ObjekteSha.IsNull() {
-				err = errors.Errorf("zettel not found in index!: %#v", o)
-				return
-			}
+	//		if tz.Sku.ObjekteSha.IsNull() {
+	//			err = errors.Errorf("zettel not found in index!: %#v", o)
+	//			return
+	//		}
 
-			if tz, err = s.zettelStore.Update(
-				&tz.Objekte,
-				&tz.Sku.Kennung,
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+	//		if tz, err = s.zettelStore.Update(
+	//			&tz.Objekte,
+	//			&tz.Sku.Kennung,
+	//		); err != nil {
+	//			err = errors.Wrap(err)
+	//			return
+	//		}
 
-			tzs.Add(tz)
+	//		tzs.Add(tz)
 
-			return
-		},
-	)
+	//		return
+	//	},
+	//)
 
 	return
 }
@@ -360,7 +359,7 @@ func (s *Store) Reindex() (err error) {
 	}
 
 	//TODO-P3 move to zettelStore
-	if err = s.zettelStore.indexKennung.reset(); err != nil {
+	if err = s.zettelStore.GetIndexKennung().reset(); err != nil {
 		err = errors.Wrapf(err, "failed to reset index kennung")
 		return
 	}
