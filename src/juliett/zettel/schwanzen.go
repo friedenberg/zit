@@ -8,20 +8,20 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/echo/hinweis"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 )
 
 type Schwanzen struct {
 	lock      *sync.RWMutex
-	hinweisen map[hinweis.Hinweis]sku.Transacted[hinweis.Hinweis, *hinweis.Hinweis]
+	hinweisen map[kennung.Hinweis]sku.Transacted[kennung.Hinweis, *kennung.Hinweis]
 }
 
 func MakeSchwanzen() *Schwanzen {
 	return &Schwanzen{
 		lock:      &sync.RWMutex{},
-		hinweisen: make(map[hinweis.Hinweis]sku.Transacted[hinweis.Hinweis, *hinweis.Hinweis]),
+		hinweisen: make(map[kennung.Hinweis]sku.Transacted[kennung.Hinweis, *kennung.Hinweis]),
 	}
 }
 
@@ -29,7 +29,7 @@ func (zws *Schwanzen) Less(zt *Transacted) (ok bool) {
 	zws.lock.RLock()
 	defer zws.lock.RUnlock()
 
-	var t sku.Transacted[hinweis.Hinweis, *hinweis.Hinweis]
+	var t sku.Transacted[kennung.Hinweis, *kennung.Hinweis]
 
 	t, ok = zws.hinweisen[zt.Sku.Kennung]
 
@@ -44,11 +44,11 @@ func (zws *Schwanzen) Less(zt *Transacted) (ok bool) {
 	return
 }
 
-func (zws *Schwanzen) Get(h hinweis.Hinweis) (t ts.Time, ok bool) {
+func (zws *Schwanzen) Get(h kennung.Hinweis) (t ts.Time, ok bool) {
 	zws.lock.RLock()
 	defer zws.lock.RUnlock()
 
-	var o sku.Transacted[hinweis.Hinweis, *hinweis.Hinweis]
+	var o sku.Transacted[kennung.Hinweis, *kennung.Hinweis]
 
 	o, ok = zws.hinweisen[h]
 
@@ -93,7 +93,7 @@ func (zws *Schwanzen) ReadFrom(r1 io.Reader) (n int64, err error) {
 
 	dec := gob.NewDecoder(r)
 
-	m := make(map[hinweis.Hinweis]Sku)
+	m := make(map[kennung.Hinweis]Sku)
 
 	if err = dec.Decode(&m); err != nil {
 		if errors.IsEOF(err) {

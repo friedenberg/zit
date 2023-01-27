@@ -2,7 +2,7 @@ package user_ops
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/echo/hinweis"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/zettel_external"
 	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
@@ -17,13 +17,13 @@ type Checkin struct {
 }
 
 type CheckinResults struct {
-	Zettelen map[hinweis.Hinweis]zettel_checked_out.Zettel
+	Zettelen map[kennung.Hinweis]zettel_checked_out.Zettel
 }
 
 func (c Checkin) Run(
 	zettelen ...zettel_external.Zettel,
 ) (results CheckinResults, err error) {
-	results.Zettelen = make(map[hinweis.Hinweis]zettel_checked_out.Zettel)
+	results.Zettelen = make(map[kennung.Hinweis]zettel_checked_out.Zettel)
 
 	if err = c.Lock(); err != nil {
 		err = errors.Wrap(err)

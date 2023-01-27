@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/echo/hinweis"
 	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/foxtrot/id_set"
 	"github.com/friedenberg/zit/src/hotel/typ"
@@ -41,9 +40,9 @@ func (c commandWithIds) getIdProtoSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 				Setter: &sha.Sha{},
 			},
 			id_set.ProtoId{
-				Setter: &hinweis.Hinweis{},
+				Setter: &kennung.Hinweis{},
 				Expand: func(v string) (out string, err error) {
-					var h hinweis.Hinweis
+					var h kennung.Hinweis
 					h, err = u.StoreObjekten().GetAbbrStore().ExpandHinweisString(v)
 					out = h.String()
 					return
@@ -64,7 +63,7 @@ func (c commandWithIds) getIdProtoSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 func (c commandWithIds) Complete(u *umwelt.Umwelt, args ...string) (err error) {
 	ps := c.getIdProtoSet(u)
 
-	if ps.Contains(&hinweis.Hinweis{}) {
+	if ps.Contains(&kennung.Hinweis{}) {
 		func() {
 			zw := zettel.MakeWriterComplete(os.Stdout)
 			defer errors.Deferred(&err, zw.Close)

@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/script_config"
-	"github.com/friedenberg/zit/src/echo/hinweis"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -35,7 +35,7 @@ func init() {
 
 func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	formatId := "text"
-	var h hinweis.Hinweis
+	var h kennung.Hinweis
 
 	switch len(args) {
 	case 1:

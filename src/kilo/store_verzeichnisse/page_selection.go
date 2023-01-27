@@ -10,11 +10,10 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/echo/hinweis"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
-func (i Zettelen) PageForHinweis(h hinweis.Hinweis) (n int, err error) {
+func (i Zettelen) PageForHinweis(h kennung.Hinweis) (n int, err error) {
 	s := h.GetSha()
 	return i.PageForSha(s)
 }

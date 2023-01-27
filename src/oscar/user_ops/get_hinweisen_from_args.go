@@ -2,7 +2,7 @@ package user_ops
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/echo/hinweis"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
@@ -10,7 +10,7 @@ type GetHinweisenFromArgs struct {
 	*umwelt.Umwelt
 }
 
-func (u GetHinweisenFromArgs) RunOne(v string) (h hinweis.Hinweis, err error) {
+func (u GetHinweisenFromArgs) RunOne(v string) (h kennung.Hinweis, err error) {
 	if h, err = u.StoreObjekten().GetAbbrStore().ExpandHinweisString(v); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -19,8 +19,8 @@ func (u GetHinweisenFromArgs) RunOne(v string) (h hinweis.Hinweis, err error) {
 	return
 }
 
-func (u GetHinweisenFromArgs) RunMany(vs ...string) (hs []hinweis.Hinweis, err error) {
-	hs = make([]hinweis.Hinweis, len(vs))
+func (u GetHinweisenFromArgs) RunMany(vs ...string) (hs []kennung.Hinweis, err error) {
+	hs = make([]kennung.Hinweis, len(vs))
 
 	for i := range hs {
 		if hs[i], err = u.RunOne(vs[i]); err != nil {

@@ -11,7 +11,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/echo/hinweis"
 	"github.com/friedenberg/zit/src/echo/ts"
 )
 
@@ -100,7 +99,7 @@ func MakeSkuTransacted(t ts.Time, line string) (out SkuLikePtr, err error) {
 
 	switch g {
 	case gattung.Zettel:
-		out = &Transacted[hinweis.Hinweis, *hinweis.Hinweis]{}
+		out = &Transacted[kennung.Hinweis, *kennung.Hinweis]{}
 
 	case gattung.Typ:
 		out = &Transacted[kennung.Typ, *kennung.Typ]{}

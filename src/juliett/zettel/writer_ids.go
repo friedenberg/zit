@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/echo/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/id_set"
 	"github.com/friedenberg/zit/src/golf/objekte"
 )
@@ -40,7 +39,7 @@ func (z zettelFilterable) GetGattung() schnittstellen.Gattung {
 	return gattung.Zettel
 }
 
-func (z zettelFilterable) Hinweis() hinweis.Hinweis {
+func (z zettelFilterable) Hinweis() kennung.Hinweis {
 	return z.Sku.Kennung
 }
 

@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
-	"github.com/friedenberg/zit/src/echo/hinweis"
 )
 
 func TestMain(m *testing.M) {
@@ -19,7 +18,7 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-func makeHinweis(t *testing.T, v string) (h hinweis.Hinweis) {
+func makeHinweis(t *testing.T, v string) (h kennung.Hinweis) {
 	var err error
 
 	if err = h.Set(v); err != nil {

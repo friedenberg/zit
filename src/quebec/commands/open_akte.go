@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/exec"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/id"
-	"github.com/friedenberg/zit/src/echo/hinweis"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/id_set"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -33,9 +33,9 @@ func init() {
 func (c OpenAkte) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 	is = id_set.MakeProtoIdSet(
 		id_set.ProtoId{
-			Setter: &hinweis.Hinweis{},
+			Setter: &kennung.Hinweis{},
 			Expand: func(v string) (out string, err error) {
-				var h hinweis.Hinweis
+				var h kennung.Hinweis
 				h, err = u.StoreObjekten().GetAbbrStore().ExpandHinweisString(v)
 				out = h.String()
 				return
@@ -58,7 +58,7 @@ func (c OpenAkte) RunWithIds(store *umwelt.Umwelt, is id_set.Set) (err error) {
 	}
 
 	for i, h := range hins.Elements() {
-		func(h hinweis.Hinweis) {
+		func(h kennung.Hinweis) {
 			var tz *zettel.Transacted
 
 			if tz, err = store.StoreObjekten().Zettel().ReadOne(h); err != nil {

@@ -4,7 +4,7 @@ import (
 	"sync"
 
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/echo/hinweis"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
@@ -15,8 +15,8 @@ type MutableMatchSet struct {
 	Stored                    MutableSet
 	Akten                     MutableSet
 	Matched                   MutableSet
-	MatchedHinweisen          hinweis.MutableSet
-	MatchedHinweisenSchwanzen map[hinweis.Hinweis]ts.Time
+	MatchedHinweisen          kennung.HinweisMutableSet
+	MatchedHinweisenSchwanzen map[kennung.Hinweis]ts.Time
 }
 
 func MakeMutableMatchSet(in MutableSet) (out MutableMatchSet) {
@@ -26,8 +26,8 @@ func MakeMutableMatchSet(in MutableSet) (out MutableMatchSet) {
 		Stored:                    MakeMutableSetUniqueStored(),
 		Akten:                     MakeMutableSetUniqueAkte(),
 		Matched:                   MakeMutableSetUniqueFD(),
-		MatchedHinweisen:          hinweis.MakeMutableSet(),
-		MatchedHinweisenSchwanzen: make(map[hinweis.Hinweis]ts.Time),
+		MatchedHinweisen:          kennung.MakeHinweisMutableSet(),
+		MatchedHinweisenSchwanzen: make(map[kennung.Hinweis]ts.Time),
 	}
 
 	in.Each(out.Stored.Add)

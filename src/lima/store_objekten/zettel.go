@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/hinweisen"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/echo/hinweis"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
@@ -38,7 +37,7 @@ type ZettelStore interface {
 
 	objekte_store.Updater[
 		*zettel.Objekte,
-		*hinweis.Hinweis,
+		*kennung.Hinweis,
 		// schnittstellen.Value,
 		*zettel.Transacted,
 	]
@@ -46,8 +45,8 @@ type ZettelStore interface {
 	objekte_store.TransactedInflator[
 		zettel.Objekte,
 		*zettel.Objekte,
-		hinweis.Hinweis,
-		*hinweis.Hinweis,
+		kennung.Hinweis,
+		*kennung.Hinweis,
 		zettel.Verzeichnisse,
 		*zettel.Verzeichnisse,
 	]
@@ -73,8 +72,8 @@ type zettelStore struct {
 	objekte_store.TransactedInflator[
 		zettel.Objekte,
 		*zettel.Objekte,
-		hinweis.Hinweis,
-		*hinweis.Hinweis,
+		kennung.Hinweis,
+		*kennung.Hinweis,
 		zettel.Verzeichnisse,
 		*zettel.Verzeichnisse,
 	]
@@ -93,8 +92,8 @@ func makeZettelStore(
 		TransactedInflator: objekte_store.MakeTransactedInflator[
 			zettel.Objekte,
 			*zettel.Objekte,
-			hinweis.Hinweis,
-			*hinweis.Hinweis,
+			kennung.Hinweis,
+			*kennung.Hinweis,
 			zettel.Verzeichnisse,
 			*zettel.Verzeichnisse,
 		](
@@ -259,7 +258,7 @@ func (s zettelStore) ReadOne(
 	i schnittstellen.Value,
 ) (tz *zettel.Transacted, err error) {
 	switch tid := i.(type) {
-	case hinweis.Hinweis:
+	case kennung.Hinweis:
 		if tz, err = s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(tid); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -320,7 +319,7 @@ func (s *zettelStore) Create(
 		return
 	}
 
-	var ken hinweis.Hinweis
+	var ken kennung.Hinweis
 
 	if ken, err = s.indexKennung.createHinweis(); err != nil {
 		err = errors.Wrap(err)
@@ -357,7 +356,7 @@ func (s *zettelStore) Create(
 
 func (s *zettelStore) Update(
 	z *zettel.Objekte,
-	h *hinweis.Hinweis,
+	h *kennung.Hinweis,
 ) (tz *zettel.Transacted, err error) {
 	errors.TodoP2("support dry run")
 
@@ -466,7 +465,7 @@ func (s *zettelStore) Update(
 func (s *zettelStore) addZettelToTransaktion(
 	zo *zettel.Objekte,
 	zs *sha.Sha,
-	zk *hinweis.Hinweis,
+	zk *kennung.Hinweis,
 ) (tz *zettel.Transacted, err error) {
 	errors.Log().Printf("adding zettel to transaktion: %s", zk)
 
@@ -493,12 +492,12 @@ func (s *zettelStore) addZettelToTransaktion(
 // in the arguments
 func (s *zettelStore) transactedWithHead(
 	z zettel.Objekte,
-	h hinweis.Hinweis,
+	h kennung.Hinweis,
 	t *transaktion.Transaktion,
 ) (tz *zettel.Transacted, err error) {
 	tz = &zettel.Transacted{
 		Objekte: z,
-		Sku: sku.Transacted[hinweis.Hinweis, *hinweis.Hinweis]{
+		Sku: sku.Transacted[kennung.Hinweis, *kennung.Hinweis]{
 			Kennung: h,
 			Verzeichnisse: sku.Verzeichnisse{
 				Kopf:    t.Time,

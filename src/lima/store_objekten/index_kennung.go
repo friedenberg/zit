@@ -12,7 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/hinweisen"
-	"github.com/friedenberg/zit/src/echo/hinweis"
+	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
 type encodedKennung struct {
@@ -167,7 +167,7 @@ func (i *indexKennung) reset() (err error) {
 	return
 }
 
-func (i *indexKennung) addHinweis(h hinweis.Hinweis) (err error) {
+func (i *indexKennung) addHinweis(h kennung.Hinweis) (err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -205,7 +205,7 @@ func (i *indexKennung) addHinweis(h hinweis.Hinweis) (err error) {
 	return
 }
 
-func (i *indexKennung) createHinweis() (h hinweis.Hinweis, err error) {
+func (i *indexKennung) createHinweis() (h kennung.Hinweis, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -263,11 +263,11 @@ func (i *indexKennung) createHinweis() (h hinweis.Hinweis, err error) {
 	return i.makeHinweisButDontStore(m)
 }
 
-func (i *indexKennung) makeHinweisButDontStore(j int) (h hinweis.Hinweis, err error) {
+func (i *indexKennung) makeHinweisButDontStore(j int) (h kennung.Hinweis, err error) {
 	k := &coordinates.Kennung{}
 	k.SetInt(coordinates.Int(j))
 
-	h, err = hinweis.New(
+	h, err = kennung.NewHinweis(
 		k.Id(),
 		i.oldHinweisenStore.Left(),
 		i.oldHinweisenStore.Right(),
@@ -281,7 +281,7 @@ func (i *indexKennung) makeHinweisButDontStore(j int) (h hinweis.Hinweis, err er
 	return
 }
 
-func (i *indexKennung) PeekHinweisen(m int) (hs []hinweis.Hinweis, err error) {
+func (i *indexKennung) PeekHinweisen(m int) (hs []kennung.Hinweis, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -291,14 +291,14 @@ func (i *indexKennung) PeekHinweisen(m int) (hs []hinweis.Hinweis, err error) {
 		m = len(i.AvailableKennung)
 	}
 
-	hs = make([]hinweis.Hinweis, 0, m)
+	hs = make([]kennung.Hinweis, 0, m)
 	j := 0
 
 	for n := range i.AvailableKennung {
 		k := &coordinates.Kennung{}
 		k.SetInt(coordinates.Int(n))
 
-		var h hinweis.Hinweis
+		var h kennung.Hinweis
 
 		if h, err = i.makeHinweisButDontStore(n); err != nil {
 			err = errors.Wrap(err)

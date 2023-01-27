@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/echo/hinweis"
 	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/foxtrot/id_set"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -44,9 +43,9 @@ func (c Push) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 				Setter: &sha.Sha{},
 			},
 			id_set.ProtoId{
-				Setter: &hinweis.Hinweis{},
+				Setter: &kennung.Hinweis{},
 				Expand: func(v string) (out string, err error) {
-					var h hinweis.Hinweis
+					var h kennung.Hinweis
 					h, err = u.StoreObjekten().GetAbbrStore().ExpandHinweisString(v)
 					out = h.String()
 					return

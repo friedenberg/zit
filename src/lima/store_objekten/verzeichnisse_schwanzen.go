@@ -3,7 +3,7 @@ package store_objekten
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/echo/hinweis"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/store_util"
@@ -40,7 +40,7 @@ func makeVerzeichnisseSchwanzen(
 }
 
 func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
-	h hinweis.Hinweis,
+	h kennung.Hinweis,
 ) (tz *zettel.Transacted, err error) {
 	var n int
 

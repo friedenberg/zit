@@ -6,17 +6,17 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/echo/hinweis"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/fd"
 )
 
 type CwdZettel struct {
-	hinweis.Hinweis
+	kennung.Hinweis
 	Zettel, Akte fd.FD
 }
 
 func (c *CwdFiles) tryZettel(d string, a string, p string) (err error) {
-	var h hinweis.Hinweis
+	var h kennung.Hinweis
 
 	kopf := filepath.Base(d)
 
@@ -44,7 +44,7 @@ func (c *CwdFiles) tryZettel(d string, a string, p string) (err error) {
 	return
 }
 
-func (c CwdFiles) hinweisFromPath(p string) (h hinweis.Hinweis, err error) {
+func (c CwdFiles) hinweisFromPath(p string) (h kennung.Hinweis, err error) {
 	parts := strings.Split(p, string(filepath.Separator))
 
 	switch len(parts) {

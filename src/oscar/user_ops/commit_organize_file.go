@@ -3,7 +3,6 @@ package user_ops
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/echo/hinweis"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/organize_text"
 	"github.com/friedenberg/zit/src/lima/changes"
@@ -38,13 +37,13 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 
 	type zettelToUpdate struct {
 		objekte zettel.Objekte
-		kennung hinweis.Hinweis
+		kennung kennung.Hinweis
 	}
 
 	toUpdate := make(map[string]zettelToUpdate)
 
 	addOrGetToZettelToUpdate := func(hString string) (z zettelToUpdate, err error) {
-		var h hinweis.Hinweis
+		var h kennung.Hinweis
 
 		if h, err = store.GetAbbrStore().ExpandHinweisString(hString); err != nil {
 			err = errors.Wrap(err)

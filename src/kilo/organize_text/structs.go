@@ -8,8 +8,8 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
-	"github.com/friedenberg/zit/src/echo/hinweis"
 	zettel_pkg "github.com/friedenberg/zit/src/juliett/zettel"
 )
 
@@ -21,7 +21,7 @@ import (
 //
 
 type zettel struct {
-	hinweis.Hinweis
+	kennung.Hinweis
 	bezeichnung.Bezeichnung
 }
 

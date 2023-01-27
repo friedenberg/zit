@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/echo/hinweis"
 	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/foxtrot/id_set"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -57,7 +56,7 @@ func (c Clone) ProtoIdSet(_ *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 				Setter: &sha.Sha{},
 			},
 			id_set.ProtoId{
-				Setter: &hinweis.Hinweis{},
+				Setter: &kennung.Hinweis{},
 			},
 			id_set.ProtoId{
 				Setter: &kennung.Etikett{},

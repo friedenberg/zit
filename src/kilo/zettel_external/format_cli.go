@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/format"
-	"github.com/friedenberg/zit/src/echo/hinweis"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/fd"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
@@ -16,7 +16,7 @@ import (
 func MakeCliFormat(
 	s standort.Standort,
 	cw format.FuncColorWriter,
-	hf schnittstellen.FuncWriterFormat[hinweis.Hinweis],
+	hf schnittstellen.FuncWriterFormat[kennung.Hinweis],
 	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
 	zf schnittstellen.FuncWriterFormat[zettel.Objekte],
 ) schnittstellen.FuncWriterFormat[Zettel] {

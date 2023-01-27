@@ -11,7 +11,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/echo/hinweis"
 	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/foxtrot/id_set"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
@@ -67,9 +66,9 @@ func (c Show) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 				Setter: &sha.Sha{},
 			},
 			id_set.ProtoId{
-				Setter: &hinweis.Hinweis{},
+				Setter: &kennung.Hinweis{},
 				Expand: func(v string) (out string, err error) {
-					var h hinweis.Hinweis
+					var h kennung.Hinweis
 					h, err = u.StoreObjekten().GetAbbrStore().ExpandHinweisString(v)
 					out = h.String()
 					return
@@ -222,7 +221,7 @@ func (c Show) showZettels(
 
 	if u.Konfig().IncludeHistory {
 		method = u.StoreWorkingDirectory().ReadManyHistory
-		hinweisen := hinweis.MakeMutableSet()
+		hinweisen := kennung.MakeHinweisMutableSet()
 
 		if err = u.StoreObjekten().Zettel().ReadAllSchwanzen(
 			collections.MakeChain(

@@ -1,4 +1,4 @@
-package hinweis
+package kennung
 
 import (
 	"crypto/sha256"
@@ -26,7 +26,7 @@ type Provider interface {
 	Hinweis(i coordinates.Int) (string, error)
 }
 
-func NewEmpty() (h Hinweis) {
+func NewHinweisEmpty() (h Hinweis) {
 	h = Hinweis{}
 
 	return
@@ -34,7 +34,7 @@ func NewEmpty() (h Hinweis) {
 
 //TODO is this really necessary?;w
 
-func New(i coordinates.Int, pl Provider, pr Provider) (h Hinweis, err error) {
+func NewHinweis(i coordinates.Int, pl Provider, pr Provider) (h Hinweis, err error) {
 	k := coordinates.Kennung{}
 	k.SetInt(i)
 
@@ -52,10 +52,10 @@ func New(i coordinates.Int, pl Provider, pr Provider) (h Hinweis, err error) {
 		return
 	}
 
-	return MakeKopfUndSchwanz(l, r)
+	return MakeHinweisKopfUndSchwanz(l, r)
 }
 
-func MakeKopfUndSchwanz(kopf, schwanz string) (h Hinweis, err error) {
+func MakeHinweisKopfUndSchwanz(kopf, schwanz string) (h Hinweis, err error) {
 	kopf = strings.TrimSpace(kopf)
 	schwanz = strings.TrimSpace(schwanz)
 
@@ -79,7 +79,7 @@ func MakeKopfUndSchwanz(kopf, schwanz string) (h Hinweis, err error) {
 	return
 }
 
-func Make(v string) (h Hinweis, err error) {
+func MakeHinweis(v string) (h Hinweis, err error) {
 	h = Hinweis{}
 
 	if err = h.Set(v); err != nil {
@@ -208,4 +208,32 @@ func (h *Hinweis) ResetWith(h1 Hinweis) {
 
 func (h Hinweis) GetGattung() schnittstellen.Gattung {
 	return gattung.Zettel
+}
+
+func (s Hinweis) MarshalBinary() (text []byte, err error) {
+	text = []byte(s.String())
+
+	return
+}
+
+func (s *Hinweis) UnmarshalBinary(text []byte) (err error) {
+	if err = s.Set(string(text)); err != nil {
+		return
+	}
+
+	return
+}
+
+func (s Hinweis) MarshalText() (text []byte, err error) {
+	text = []byte(s.String())
+
+	return
+}
+
+func (s *Hinweis) UnmarshalText(text []byte) (err error) {
+	if err = s.Set(string(text)); err != nil {
+		return
+	}
+
+	return
 }

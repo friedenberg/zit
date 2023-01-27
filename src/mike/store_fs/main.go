@@ -13,7 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/hinweisen"
 	"github.com/friedenberg/zit/src/charlie/standort"
-	"github.com/friedenberg/zit/src/echo/hinweis"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/foxtrot/fd"
 	"github.com/friedenberg/zit/src/india/konfig"
@@ -130,7 +130,7 @@ func (s Store) MakeExternalZettelFromZettel(p string) (ez zettel_external.Zettel
 
 	head, tail := id.HeadTailFromFileName(p)
 
-	if ez.Sku.Kennung, err = hinweis.Make(head + "/" + tail); err != nil {
+	if ez.Sku.Kennung, err = kennung.MakeHinweis(head + "/" + tail); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -226,7 +226,7 @@ func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 // ReadOne
 // ReadMany
 // ReadManyHistory
-func (s *Store) ReadOne(h hinweis.Hinweis) (zt *zettel.Transacted, err error) {
+func (s *Store) ReadOne(h kennung.Hinweis) (zt *zettel.Transacted, err error) {
 	if zt, err = s.storeObjekten.Zettel().ReadOne(h); err != nil {
 		err = errors.Wrap(err)
 		return

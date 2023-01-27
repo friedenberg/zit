@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/script_value"
-	"github.com/friedenberg/zit/src/echo/hinweis"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/id_set"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
@@ -88,8 +88,8 @@ func (op FilterZettelsWithScript) Run() (err error) {
 
 func (op FilterZettelsWithScript) runGetHinweisen(
 	r io.Reader,
-) (chDone <-chan hinweis.Set, chErr <-chan error) {
-	doneBoth := make(chan hinweis.Set)
+) (chDone <-chan kennung.HinweisSet, chErr <-chan error) {
+	doneBoth := make(chan kennung.HinweisSet)
 	chDone = doneBoth
 
 	errBoth := make(chan error)
@@ -98,7 +98,7 @@ func (op FilterZettelsWithScript) runGetHinweisen(
 	go func() {
 		is := id_set.MakeProtoIdSet(
 			id_set.ProtoId{
-				Setter: &hinweis.Hinweis{},
+				Setter: &kennung.Hinweis{},
 			},
 		)
 

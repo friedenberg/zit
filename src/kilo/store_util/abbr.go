@@ -12,14 +12,13 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/tridex"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/echo/hinweis"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
 type AbbrStore interface {
 	ExpandShaString(string) (sha.Sha, error)
 	ExpandEtikettString(string) (kennung.Etikett, error)
-	ExpandHinweisString(string) (hinweis.Hinweis, error)
+	ExpandHinweisString(string) (kennung.Hinweis, error)
 	AbbreviateSha(schnittstellen.Value) (string, error)
 	AbbreviateHinweis(schnittstellen.Korper) (string, error)
 	AddStoredAbbreviation(schnittstellen.Stored) error
@@ -223,12 +222,12 @@ func (i *indexAbbr) AbbreviateHinweis(h schnittstellen.Korper) (v string, err er
 	return
 }
 
-func (i *indexAbbr) ExpandHinweisString(s string) (h hinweis.Hinweis, err error) {
+func (i *indexAbbr) ExpandHinweisString(s string) (h kennung.Hinweis, err error) {
 	errors.Log().Print(s)
 
-	var ha hinweis.Hinweis
+	var ha kennung.Hinweis
 
-	if ha, err = hinweis.Make(s); err != nil {
+	if ha, err = kennung.MakeHinweis(s); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -236,7 +235,7 @@ func (i *indexAbbr) ExpandHinweisString(s string) (h hinweis.Hinweis, err error)
 	return i.ExpandHinweis(ha)
 }
 
-func (i *indexAbbr) ExpandHinweis(hAbbr hinweis.Hinweis) (h hinweis.Hinweis, err error) {
+func (i *indexAbbr) ExpandHinweis(hAbbr kennung.Hinweis) (h kennung.Hinweis, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -245,7 +244,7 @@ func (i *indexAbbr) ExpandHinweis(hAbbr hinweis.Hinweis) (h hinweis.Hinweis, err
 	kopf := i.indexAbbrEncodableTridexes.HinweisKopfen.Expand(hAbbr.Kopf())
 	schwanz := i.indexAbbrEncodableTridexes.HinweisSchwanzen.Expand(hAbbr.Schwanz())
 
-	if h, err = hinweis.MakeKopfUndSchwanz(kopf, schwanz); err != nil {
+	if h, err = kennung.MakeHinweisKopfUndSchwanz(kopf, schwanz); err != nil {
 		err = errors.Wrapf(err, "{Abbreviated: '%s'}", hAbbr)
 		return
 	}

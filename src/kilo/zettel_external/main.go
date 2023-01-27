@@ -4,13 +4,13 @@ import (
 	"fmt"
 
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/echo/hinweis"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/fd"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
-type Sku = sku.External[hinweis.Hinweis, *hinweis.Hinweis]
+type Sku = sku.External[kennung.Hinweis, *kennung.Hinweis]
 
 // TODO-P3 rename to External?
 type Zettel struct {

@@ -2,7 +2,7 @@ package zettel
 
 import (
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/echo/hinweis"
+	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
 type MutableSet struct {
@@ -61,8 +61,8 @@ func (s MutableSet) ToSetPrefixVerzeichnisse() (b SetPrefixVerzeichnisse) {
 	return
 }
 
-func (s MutableSet) ToSliceHinweisen() (b []hinweis.Hinweis) {
-	b = make([]hinweis.Hinweis, 0, s.Len())
+func (s MutableSet) ToSliceHinweisen() (b []kennung.Hinweis) {
+	b = make([]kennung.Hinweis, 0, s.Len())
 
 	s.Each(
 		func(z *Transacted) (err error) {

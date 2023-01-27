@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/alfred"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/echo/hinweis"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
@@ -98,7 +97,7 @@ func (w *Writer) errorToItem(err error) (a *alfred.Item) {
 	return
 }
 
-func (w *Writer) hinweisToItem(e hinweis.Hinweis) (a *alfred.Item) {
+func (w *Writer) hinweisToItem(e kennung.Hinweis) (a *alfred.Item) {
 	a = w.alfredWriter.Get()
 
 	a.Title = e.String()

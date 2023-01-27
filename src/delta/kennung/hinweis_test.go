@@ -1,18 +1,10 @@
-package hinweis
+package kennung
 
 import (
-	"os"
 	"testing"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/test_logz"
 )
-
-func TestMain(m *testing.M) {
-	errors.SetTesting()
-	code := m.Run()
-	os.Exit(code)
-}
 
 func TestMake(t1 *testing.T) {
 	t := test_logz.T{T: t1}
@@ -39,7 +31,7 @@ func TestMakeKopfUndScwhanz(t1 *testing.T) {
 	var sut Hinweis
 	var err error
 
-	if sut, err = MakeKopfUndSchwanz(k, s); err != nil {
+	if sut, err = MakeHinweisKopfUndSchwanz(k, s); err != nil {
 		t.Errorf("expected no error but got: '%s'", err)
 	}
 

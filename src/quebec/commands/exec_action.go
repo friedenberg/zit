@@ -8,7 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/script_config"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/echo/hinweis"
 	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/foxtrot/id_set"
 	"github.com/friedenberg/zit/src/juliett/zettel"
@@ -40,9 +39,9 @@ func (c ExecAction) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 			Setter: &kennung.Konfig{},
 		},
 		id_set.ProtoId{
-			Setter: &hinweis.Hinweis{},
+			Setter: &kennung.Hinweis{},
 			Expand: func(v string) (out string, err error) {
-				var h hinweis.Hinweis
+				var h kennung.Hinweis
 				h, err = u.StoreObjekten().GetAbbrStore().ExpandHinweisString(v)
 				out = h.String()
 				return
@@ -93,7 +92,7 @@ func (c ExecAction) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 		},
 	}
 
-	hinweisen := hinweis.MakeMutableSet()
+	hinweisen := kennung.MakeHinweisMutableSet()
 
 	if err = u.StoreWorkingDirectory().ReadMany(
 		collections.MakeChain(
@@ -122,7 +121,7 @@ func (c ExecAction) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 func (c ExecAction) runAction(
 	u *umwelt.Umwelt,
 	sc script_config.ScriptConfig,
-	hinweisen hinweis.MutableSet,
+	hinweisen kennung.HinweisMutableSet,
 ) (err error) {
 	var wt io.WriterTo
 

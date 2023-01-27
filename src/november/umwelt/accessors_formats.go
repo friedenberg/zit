@@ -5,7 +5,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
-	"github.com/friedenberg/zit/src/echo/hinweis"
 	"github.com/friedenberg/zit/src/echo/sha_cli_format"
 	"github.com/friedenberg/zit/src/foxtrot/fd"
 	"github.com/friedenberg/zit/src/hotel/etikett"
@@ -30,14 +29,14 @@ func (u *Umwelt) FormatSha(
 	return sha_cli_format.MakeCliFormat(u.FormatColorWriter(), a)
 }
 
-func (u *Umwelt) FormatHinweis() schnittstellen.FuncWriterFormat[hinweis.Hinweis] {
+func (u *Umwelt) FormatHinweis() schnittstellen.FuncWriterFormat[kennung.Hinweis] {
 	var a schnittstellen.FuncAbbreviateKorper
 
 	if u.konfig.PrintAbbreviatedHinweisen {
 		a = u.StoreObjekten().GetAbbrStore().AbbreviateHinweis
 	}
 
-	return hinweis.MakeCliFormat(
+	return kennung.MakeHinweisCliFormat(
 		u.FormatColorWriter(),
 		a,
 		0,

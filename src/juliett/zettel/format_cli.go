@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
-	"github.com/friedenberg/zit/src/echo/hinweis"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 )
 
@@ -37,7 +36,7 @@ func MakeCliFormat(
 
 // [kopf/schwanz@sha !typ]
 func MakeCliFormatTransacted(
-	hf schnittstellen.FuncWriterFormat[hinweis.Hinweis],
+	hf schnittstellen.FuncWriterFormat[kennung.Hinweis],
 	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
 	zf schnittstellen.FuncWriterFormat[Objekte],
 ) schnittstellen.FuncWriterFormat[Transacted] {

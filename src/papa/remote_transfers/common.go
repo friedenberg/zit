@@ -5,7 +5,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/echo/hinweis"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/hotel/typ"
@@ -26,8 +25,8 @@ func (c common) GetInheritorZettel(
 	inflator := objekte_store.MakeTransactedInflator[
 		zettel.Objekte,
 		*zettel.Objekte,
-		hinweis.Hinweis,
-		*hinweis.Hinweis,
+		kennung.Hinweis,
+		*kennung.Hinweis,
 		zettel.Verzeichnisse,
 		*zettel.Verzeichnisse,
 	](

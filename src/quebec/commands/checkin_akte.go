@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/echo/hinweis"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
@@ -42,7 +41,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	type externalAktePair struct {
-		hinweis.Hinweis
+		kennung.Hinweis
 		path string
 	}
 
@@ -53,7 +52,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		hs := args[i*2]
 		ap := args[(i*2)+1]
 
-		if p.Hinweis, err = hinweis.Make(hs); err != nil {
+		if p.Hinweis, err = kennung.MakeHinweis(hs); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

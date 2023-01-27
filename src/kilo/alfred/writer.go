@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/alfred"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/echo/hinweis"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
@@ -45,7 +44,7 @@ func (w *Writer) WriteEtikett(e kennung.Etikett) (n int, err error) {
 	return
 }
 
-func (w *Writer) WriteHinweis(e hinweis.Hinweis) (n int, err error) {
+func (w *Writer) WriteHinweis(e kennung.Hinweis) (n int, err error) {
 	item := w.hinweisToItem(e)
 	w.alfredWriter.WriteItem(item)
 	return

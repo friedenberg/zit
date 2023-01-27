@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/id"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/delta/age_io"
-	"github.com/friedenberg/zit/src/echo/hinweis"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
@@ -31,7 +31,7 @@ func (s Store) ReadExternalZettelFromAktePath(p string) (cz zettel_checked_out.Z
 
 	head, tail := id.HeadTailFromFileName(p)
 
-	if cz.External.Sku.Kennung, err = hinweis.Make(head + "/" + tail); err != nil {
+	if cz.External.Sku.Kennung, err = kennung.MakeHinweis(head + "/" + tail); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

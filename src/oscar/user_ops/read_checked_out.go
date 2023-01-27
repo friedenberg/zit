@@ -4,7 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/hinweisen"
-	"github.com/friedenberg/zit/src/echo/hinweis"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/juliett/cwd_files"
 	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
 	"github.com/friedenberg/zit/src/mike/store_fs"
@@ -18,11 +18,11 @@ type ReadCheckedOut struct {
 }
 
 type ReadCheckedOutResults struct {
-	Zettelen map[hinweis.Hinweis]zettel_checked_out.Zettel
+	Zettelen map[kennung.Hinweis]zettel_checked_out.Zettel
 }
 
 func (op ReadCheckedOut) RunOneHinweis(
-	h hinweis.Hinweis,
+	h kennung.Hinweis,
 ) (zettel zettel_checked_out.Zettel, err error) {
 	return op.RunOneString(h.String())
 }

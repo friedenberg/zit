@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/test_logz"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/echo/hinweis"
 	"github.com/friedenberg/zit/src/echo/ts"
 )
 
@@ -22,7 +21,7 @@ func TestMakeProtoIdSet(t1 *testing.T) {
 
 	sut := MakeProtoIdSet(
 		ProtoId{
-			Setter: &hinweis.Hinweis{},
+			Setter: &kennung.Hinweis{},
 		},
 		ProtoId{
 			Setter: &kennung.Etikett{},
@@ -41,7 +40,7 @@ func TestMakeProtoIdSet(t1 *testing.T) {
 		t.Errorf("expected %d but got %d", eLen, sut.Len())
 	}
 
-	if !sut.Contains(&hinweis.Hinweis{}) {
+	if !sut.Contains(&kennung.Hinweis{}) {
 		t.Errorf("expected sut to contain hinweis, but did not")
 	}
 

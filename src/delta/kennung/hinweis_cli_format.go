@@ -1,4 +1,4 @@
-package hinweis
+package kennung
 
 import (
 	"io"
@@ -9,7 +9,7 @@ import (
 )
 
 // kopf/schwanz
-func MakeCliFormat(
+func MakeHinweisCliFormat(
 	cw format.FuncColorWriter,
 	a schnittstellen.FuncAbbreviateKorper,
 	maxKopf int,

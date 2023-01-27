@@ -8,7 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/delta/sha_collections"
-	"github.com/friedenberg/zit/src/echo/hinweis"
 	"github.com/friedenberg/zit/src/echo/ts"
 )
 
@@ -17,7 +16,7 @@ import (
 type Set struct {
 	Shas       sha_collections.MutableSet
 	Etiketten  kennung.EtikettMutableSet
-	Hinweisen  hinweis.MutableSet
+	Hinweisen  kennung.HinweisMutableSet
 	Typen      kennung.TypMutableSet
 	Timestamps ts.MutableSet
 	HasKonfig  bool
@@ -29,7 +28,7 @@ func Make(c int) Set {
 		Timestamps: ts.MakeMutableSet(),
 		Shas:       sha_collections.MakeMutableSet(),
 		Etiketten:  kennung.MakeEtikettMutableSet(),
-		Hinweisen:  hinweis.MakeMutableSet(),
+		Hinweisen:  kennung.MakeHinweisMutableSet(),
 		Typen:      kennung.MakeTypMutableSet(),
 		ids:        make([]schnittstellen.Value, 0, c),
 	}
@@ -44,7 +43,7 @@ func (s *Set) Add(ids ...schnittstellen.Value) {
 		case sha.Sha:
 			s.Shas.Add(it)
 
-		case hinweis.Hinweis:
+		case kennung.Hinweis:
 			s.Hinweisen.Add(it)
 
 		case kennung.Typ:
@@ -89,7 +88,7 @@ func (s Set) AnyShasOrHinweisen() (ids []schnittstellen.Korper) {
 	)
 
 	s.Hinweisen.Each(
-		func(h hinweis.Hinweis) (err error) {
+		func(h kennung.Hinweis) (err error) {
 			ids = append(ids, h)
 
 			return
