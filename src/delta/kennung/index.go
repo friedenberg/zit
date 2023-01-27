@@ -8,13 +8,24 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/charlie/hinweisen"
 )
 
 type Index interface {
 	errors.Flusher
+	schnittstellen.Resetter
 	GetAllEtiketten() ([]Etikett, error)
 	AddEtikettSet(to EtikettSet, from EtikettSet) (err error)
 	Add(s EtikettSet) (err error)
+	AddHinweis(Hinweis) error
+	CreateHinweis() (Hinweis, error)
+	PeekHinweisen(int) ([]Hinweis, error)
+}
+
+type Standort interface {
+	hinweisen.ProviderStandort
+	FileVerzeichnisseEtiketten() string
+	FileVerzeichnisseKennung() string
 }
 
 type index struct {
@@ -23,6 +34,8 @@ type index struct {
 	etiketten  map[Etikett]int64
 	didRead    bool
 	hasChanges bool
+
+	oldIndex *oldIndex
 }
 
 type row struct {
@@ -31,19 +44,34 @@ type row struct {
 }
 
 func MakeIndex(
-	p string,
+	k schnittstellen.Konfig,
+	s Standort,
 	vf schnittstellen.VerzeichnisseFactory,
 ) (i *index, err error) {
 	i = &index{
-		path:                 p,
+		path:                 s.FileVerzeichnisseEtiketten(),
 		VerzeichnisseFactory: vf,
 		etiketten:            make(map[Etikett]int64),
+	}
+
+	if i.oldIndex, err = MakeOldKennungIndex(
+		k,
+		s,
+		vf,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return
 }
 
 func (i *index) Flush() (err error) {
+	if err = i.oldIndex.Flush(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if !i.hasChanges {
 		errors.Log().Print("no changes")
 		return
@@ -234,6 +262,42 @@ func (i *index) GetAllEtiketten() (es []Etikett, err error) {
 			return es[i].String() < es[j].String()
 		},
 	)
+
+	return
+}
+
+func (i *index) Reset() (err error) {
+	if err = i.oldIndex.Reset(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (i *index) AddHinweis(h Hinweis) (err error) {
+	if err = i.oldIndex.AddHinweis(h); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (i *index) CreateHinweis() (h Hinweis, err error) {
+	if h, err = i.oldIndex.CreateHinweis(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (i *index) PeekHinweisen(n int) (hs []Hinweis, err error) {
+	if hs, err = i.oldIndex.PeekHinweisen(n); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }

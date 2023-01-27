@@ -138,6 +138,14 @@ func (s Standort) FileVerzeichnisseEtiketten() string {
 	return s.DirVerzeichnisse("Etiketten")
 }
 
+func (s Standort) FileVerzeichnisseKennung() string {
+	return s.DirVerzeichnisse("Kennung")
+}
+
+func (s Standort) DirKennung() string {
+	return s.DirZit("Kennung")
+}
+
 func (s Standort) ResetVerzeichnisse() (err error) {
 	if err = os.RemoveAll(s.DirVerzeichnisse()); err != nil {
 		err = errors.Wrapf(err, "failed to remove verzeichnisse dir")

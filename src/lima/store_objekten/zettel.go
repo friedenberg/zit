@@ -52,8 +52,6 @@ type ZettelStore interface {
 	]
 
 	WriteZettelObjekte(z zettel.Objekte) (sh sha.Sha, err error)
-
-	GetIndexKennung() kennung.OldKennungIndex
 }
 
 type zettelStore struct {
@@ -62,9 +60,6 @@ type zettelStore struct {
 	protoZettel zettel.ProtoZettel
 
 	logWriter zettel.LogWriter
-
-	indexKennung kennung.OldKennungIndex
-	hinweisen    *hinweisen.Hinweisen
 
 	verzeichnisseSchwanzen *verzeichnisseSchwanzen
 	verzeichnisseAll       *store_verzeichnisse.Zettelen
@@ -107,17 +102,6 @@ func makeZettelStore(
 		),
 	}
 
-	if s.hinweisen, err = hinweisen.New(
-		s.StoreUtil.GetStandort().DirZit(),
-	); err != nil {
-		if errors.IsNotExist(err) {
-			err = nil
-		} else {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
 	if s.verzeichnisseSchwanzen, err = makeVerzeichnisseSchwanzen(
 		s.StoreUtil,
 		p,
@@ -137,25 +121,7 @@ func makeZettelStore(
 		return
 	}
 
-	if s.indexKennung, err = kennung.MakeOldKennungIndex(
-		s.StoreUtil.GetKonfig(),
-		s.StoreUtil,
-		s.hinweisen,
-		s.StoreUtil.GetStandort().DirVerzeichnisse("Kennung"),
-	); err != nil {
-		err = errors.Wrapf(err, "failed to init kennung index")
-		return
-	}
-
 	return
-}
-
-func (s *zettelStore) Hinweisen() *hinweisen.Hinweisen {
-	return s.hinweisen
-}
-
-func (s *zettelStore) GetIndexKennung() kennung.OldKennungIndex {
-	return s.indexKennung
 }
 
 func (s *zettelStore) Flush() (err error) {
@@ -166,11 +132,6 @@ func (s *zettelStore) Flush() (err error) {
 
 	if err = s.verzeichnisseAll.Flush(); err != nil {
 		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.indexKennung.Flush(); err != nil {
-		err = errors.Wrapf(err, "failed to flush new kennung index")
 		return
 	}
 
@@ -236,7 +197,7 @@ func (s *zettelStore) writeNamedZettelToIndex(
 		return
 	}
 
-	if err = s.indexKennung.AddHinweis(tz.Sku.Kennung); err != nil {
+	if err = s.StoreUtil.GetKennungIndex().AddHinweis(tz.Sku.Kennung); err != nil {
 		if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
 			errors.Log().Printf("kennung does not contain value: %s", err)
 			err = nil
@@ -321,7 +282,7 @@ func (s *zettelStore) Create(
 
 	var ken kennung.Hinweis
 
-	if ken, err = s.indexKennung.CreateHinweis(); err != nil {
+	if ken, err = s.StoreUtil.GetKennungIndex().CreateHinweis(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

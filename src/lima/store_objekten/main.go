@@ -358,8 +358,7 @@ func (s *Store) Reindex() (err error) {
 		return
 	}
 
-	//TODO-P3 move to zettelStore
-	if err = s.zettelStore.GetIndexKennung().Reset(); err != nil {
+	if err = s.StoreUtil.GetKennungIndex().Reset(); err != nil {
 		err = errors.Wrapf(err, "failed to reset index kennung")
 		return
 	}

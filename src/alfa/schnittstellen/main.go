@@ -9,6 +9,10 @@ type Equatable[T any] interface {
 	Equals(T) bool
 }
 
+type Resetter interface {
+	Reset() error
+}
+
 // TODO-P4 rename to Resetter
 type Resetable[T any] interface {
 	Ptr[T]

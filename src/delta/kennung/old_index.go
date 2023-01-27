@@ -14,15 +14,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/hinweisen"
 )
 
-type OldKennungIndex interface {
-	errors.Flusher
-	Reset() error
-
-	AddHinweis(Hinweis) error
-	CreateHinweis() (Hinweis, error)
-	PeekHinweisen(int) ([]Hinweis, error)
-}
-
 type encodedKennung struct {
 	AvailableKennung map[int]bool
 }
@@ -45,19 +36,27 @@ type oldIndex struct {
 
 func MakeOldKennungIndex(
 	k schnittstellen.Konfig,
+	s Standort,
 	su schnittstellen.VerzeichnisseFactory,
-	oldHinweisenStore *hinweisen.Hinweisen,
-	p string,
 ) (i *oldIndex, err error) {
 	i = &oldIndex{
 		lock:               &sync.RWMutex{},
-		path:               p,
+		path:               s.FileVerzeichnisseKennung(),
 		nonRandomSelection: k.UsePredictableHinweisen(),
-		oldHinweisenStore:  oldHinweisenStore,
 		su:                 su,
 		encodedKennung: encodedKennung{
 			AvailableKennung: make(map[int]bool),
 		},
+	}
+
+	if i.oldHinweisenStore, err = hinweisen.New(s); err != nil {
+		if errors.IsNotExist(err) {
+			errors.TodoP4("determine which layer handles no-create kasten")
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return

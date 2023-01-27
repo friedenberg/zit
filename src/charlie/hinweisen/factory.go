@@ -9,9 +9,13 @@ import (
 )
 
 const (
-	FilePathKennungYin  = "Kennung/Yin"
-	FilePathKennungYang = "Kennung/Yang"
+	FilePathKennungYin  = "Yin"
+	FilePathKennungYang = "Yang"
 )
+
+type ProviderStandort interface {
+  DirKennung() string
+}
 
 type Hinweisen struct {
 	sync.Locker
@@ -20,9 +24,9 @@ type Hinweisen struct {
 	counter coordinates.Int
 }
 
-func New(basePath string) (f *Hinweisen, err error) {
-	providerPathYin := path.Join(basePath, FilePathKennungYin)
-	providerPathYang := path.Join(basePath, FilePathKennungYang)
+func New(ps ProviderStandort) (f *Hinweisen, err error) {
+	providerPathYin := path.Join(ps.DirKennung(), FilePathKennungYin)
+	providerPathYang := path.Join(ps.DirKennung(), FilePathKennungYang)
 
 	f = &Hinweisen{
 		Locker: &sync.Mutex{},

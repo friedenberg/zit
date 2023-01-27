@@ -33,9 +33,8 @@ func (e *Einleitung) AddToFlags(f *flag.FlagSet) {
 
 func (u *Umwelt) Einleitung(e Einleitung) (err error) {
 	s := u.Standort()
-	base := s.DirZit()
 
-	mkdirAll(base, "Kennung")
+	mkdirAll(s.DirKennung())
 
 	if err = readAndTransferLines(e.Yin, s.DirZit("Kennung", "Yin")); err != nil {
 		err = errors.Wrap(err)
@@ -66,7 +65,6 @@ func (u *Umwelt) Einleitung(e Einleitung) (err error) {
 	mkdirAll(s.DirVerzeichnisse())
 	mkdirAll(s.DirVerlorenUndGefunden())
 
-	mkdirAll(s.DirKennung())
 	writeFile(s.DirZit("Kennung", "Counter"), "0")
 
 	if !e.DisableAge {

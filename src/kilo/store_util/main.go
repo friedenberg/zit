@@ -109,7 +109,8 @@ func MakeStoreUtil(
 	}
 
 	if c.kennungIndex, err = kennung.MakeIndex(
-		c.GetStandort().FileVerzeichnisseEtiketten(),
+		c.GetKonfig(),
+		c.GetStandort(),
 		c,
 	); err != nil {
 		err = errors.Wrapf(err, "failed to init zettel index")
