@@ -3,6 +3,7 @@ package zettel_external
 import (
 	"sync"
 
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/ts"
@@ -61,7 +62,7 @@ func (s MutableMatchSet) Match(z *zettel.Transacted) (err error) {
 	// through this function _before_ the function has matched on a historical
 	// akte or stored sha. In that case, the zettel would accidentally be
 	// reverted.
-	// TODO-P2 solve for the above
+	errors.TodoP2("fix history erasure on zettel match")
 	if okStored || okAkte || (okHinweis && okSchwanz) {
 		s.lock.Lock()
 		defer s.lock.Unlock()

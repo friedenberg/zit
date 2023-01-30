@@ -5,6 +5,7 @@ ag_print_matching() (
 	shift
 
 	ag "$query" \
+    --go \
 		--only-matching \
 		--no-file \
 		--no-color \
@@ -18,6 +19,7 @@ ag_print_matching_with_file() (
 	shift
 
 	ag "$query" \
+    --go \
 		--no-number \
 		--no-color \
 		--no-group \
@@ -27,12 +29,12 @@ ag_print_matching_with_file() (
 
 print_matches() (
 	path="$1"
-	ag_print_matching 'github.com/friedenberg/zit/src/\w+' "$path"
+	ag_print_matching 'github.com/friedenberg/zit/src/[\w/]+' "$path" | sort -u
 )
 
 print_basenames() (
 	while IFS= read -r; do
-		basename "$REPLY"
+    echo "${REPLY#github.com/friedenberg/zit/src/}"
 	done
 )
 
@@ -49,9 +51,7 @@ export -f print_final
 print_package_locations() (
 	loc="$1"
 	while IFS= read -r; do
-		ag_print_matching_with_file \
-			"\\bgithub.com/friedenberg/zit/src/$REPLY/\\w+\\b" \
-			"$loc" </dev/null |
+		ag_print_matching_with_file "$REPLY" "$loc" </dev/null |
 			tr -d ' ' |
 			sed -e 's#github.com/friedenberg/zit/##g; s/"//g' |
 			xargs -L2 bash -c 'print_final "$@"' "$REPLY" |
@@ -61,6 +61,6 @@ print_package_locations() (
 
 print_matches "$1" |
 	print_basenames |
-	sort -u |
 	print_package_locations "$1" |
+  sort -u |
   tail

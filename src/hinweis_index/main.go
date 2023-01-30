@@ -26,7 +26,7 @@ func MakeIndex(
 	su schnittstellen.VerzeichnisseFactory,
 ) (i HinweisIndex, err error) {
 	switch v := k.GetStoreVersion().Int(); {
-	case v >= 4:
+	case v >= 1:
 		if i, err = hinweis_index_v1.MakeIndex(
 			k,
 			s,
