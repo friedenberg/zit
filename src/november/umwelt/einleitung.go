@@ -65,8 +65,6 @@ func (u *Umwelt) Einleitung(e Einleitung) (err error) {
 	mkdirAll(s.DirVerzeichnisse())
 	mkdirAll(s.DirVerlorenUndGefunden())
 
-	writeFile(s.DirZit("Kennung", "Counter"), "0")
-
 	if !e.DisableAge {
 		if _, err = age.Generate(s.FileAge()); err != nil {
 			//If the Age file exists, don't do anything and continue init

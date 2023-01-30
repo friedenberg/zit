@@ -22,14 +22,16 @@ func init() {
 type Konfig struct {
 	StoreVersion          storeVersion
 	UseBestandsaufnahme   bool
+	NewHinweisIndex       bool
 	UseKonfigErworbenFile bool
 }
 
 func Default() Konfig {
 	return Konfig{
-		StoreVersion:          storeVersion(int_value.IntValue(0)),
+		StoreVersion:          storeVersion(int_value.IntValue(1)),
 		UseBestandsaufnahme:   true,
 		UseKonfigErworbenFile: true,
+		NewHinweisIndex:       true,
 	}
 }
 
@@ -39,4 +41,5 @@ func (k Konfig) GetStoreVersion() StoreVersion {
 
 func (k *Konfig) AddToFlags(f *flag.FlagSet) {
 	f.BoolVar(&k.UseBestandsaufnahme, "use-bestandsaufnahme", k.UseBestandsaufnahme, "use bestandsaufnahme")
+	f.BoolVar(&k.NewHinweisIndex, "use-new-hinweis-index", k.NewHinweisIndex, "use new hinweis index")
 }

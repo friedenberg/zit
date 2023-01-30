@@ -6,8 +6,8 @@ import (
 	"strconv"
 )
 
-type Int = uint64
-type Float = float64
+type Int = uint32
+type Float = float32
 
 type Kennung struct {
 	Left, Right Int
@@ -26,7 +26,7 @@ func Extrema(n Int) Kennung {
 }
 
 func (p *Kennung) SetCoordinates(left, right string) (err error) {
-	l, err := strconv.ParseUint(left, 10, 64)
+	l, err := strconv.ParseUint(left, 10, 32)
 
 	if err != nil {
 		return
@@ -38,26 +38,26 @@ func (p *Kennung) SetCoordinates(left, right string) (err error) {
 		return
 	}
 
-	p.Left = l
-	p.Right = r
+	p.Left = Int(l)
+	p.Right = Int(r)
 
 	return
 }
 
 func (p *Kennung) Set(id string) (err error) {
-	i, err := strconv.ParseUint(id, 10, 64)
+	i, err := strconv.ParseUint(id, 10, 32)
 
 	if err != nil {
 		return
 	}
 
-	p.SetInt(i)
+	p.SetInt(Int(i))
 
 	return
 }
 
 func (p *Kennung) SetInt(id Int) {
-	n := math.Round(math.Sqrt(Float(id) * 2))
+	n := math.Round(math.Sqrt(float64(id * 2)))
 	ext := Extrema(Int(n))
 
 	p.Left = id - ext.Left

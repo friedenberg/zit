@@ -106,6 +106,18 @@ func TestBitset5Equals(t1 *testing.T) {
 	}
 }
 
+func TestBitset6MakeOn(t1 *testing.T) {
+	t := test_logz.T{T: t1}
+
+	sut := MakeBitsetOn(20)
+
+	for i := 0; i < 20; i++ {
+		if !sut.Get(i) {
+			t.Errorf("expected bit to be on: %d", i)
+		}
+	}
+}
+
 func BenchmarkAdd(b *testing.B) {
 	sut := MakeBitset(int(b.N))
 

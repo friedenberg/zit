@@ -4,7 +4,6 @@ import (
 	"path"
 	"sync"
 
-	"github.com/friedenberg/zit/src/alfa/coordinates"
 	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
@@ -14,14 +13,13 @@ const (
 )
 
 type ProviderStandort interface {
-  DirKennung() string
+	DirKennung() string
 }
 
 type Hinweisen struct {
 	sync.Locker
-	yin     provider
-	yang    provider
-	counter coordinates.Int
+	yin  provider
+	yang provider
 }
 
 func New(ps ProviderStandort) (f *Hinweisen, err error) {

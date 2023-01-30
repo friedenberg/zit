@@ -2,6 +2,7 @@ package collections
 
 import (
 	"encoding/binary"
+	"math/bits"
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -16,9 +17,13 @@ type Bitset interface {
 	Len() int
 	Cap() int
 	Get(int) bool
+	CountOn() int
+	CountOff() int
+	Each(WriterFunc[int]) error
 
 	Add(int)
 	Del(int)
+	DelIfPresent(int)
 	set(int, bool)
 }
 
@@ -29,13 +34,25 @@ const (
 	bytesPerInt = intSize / 4
 )
 
+// TODO-P4 consider using ranges
 type bitset struct {
-	slice []uint32
-	lock  *sync.Mutex
+	slice   []uint32
+	countOn int
+	lock    *sync.Mutex
 }
 
 func MakeBitset(n int) Bitset {
 	return makeBitset(n)
+}
+
+func MakeBitsetOn(n int) Bitset {
+	b := makeBitset(n)
+
+	for i := range b.slice {
+		b.slice[i] = ^uint32(0)
+	}
+
+	return b
 }
 
 func makeBitset(n int) (bs *bitset) {
@@ -65,13 +82,56 @@ func (b bitset) Len() int {
 	return b.len()
 }
 
+func (b bitset) CountOn() int {
+	b.lock.Lock()
+	defer b.lock.Unlock()
+
+	return b.countOn
+}
+
+func (b bitset) CountOff() int {
+	b.lock.Lock()
+	defer b.lock.Unlock()
+
+	return b.len() - b.countOn
+}
+
+func (b bitset) get(idx int) bool {
+	pos := idx / intSize
+	j := uint32(idx % intSize)
+	return (b.slice[pos] & (uint32(1) << j)) != 0
+}
+
 func (b bitset) Get(idx int) bool {
 	b.lock.Lock()
 	defer b.lock.Unlock()
 
-	pos := idx / intSize
-	j := uint32(idx % intSize)
-	return (b.slice[pos] & (uint32(1) << j)) != 0
+	return b.get(idx)
+}
+
+func (b bitset) Each(f WriterFunc[int]) (err error) {
+	errors.TodoP4("measure and improve performance if necessary")
+
+	b.lock.Lock()
+	defer b.lock.Unlock()
+
+	for i := 0; i < b.len(); i++ {
+		if !b.get(i) {
+			continue
+		}
+
+		if err = f(i); err != nil {
+			if IsStopIteration(err) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+			}
+
+			return
+		}
+	}
+
+	return
 }
 
 func (a bitset) Equals(b Bitset) bool {
@@ -79,13 +139,13 @@ func (a bitset) Equals(b Bitset) bool {
 	defer a.lock.Unlock()
 
 	errors.TodoP4("should lock b beyond len call")
-	if b.Len() != a.len() {
-		return false
-	}
-
 	if bb, ok := b.(*bitset); ok {
 		bb.lock.Lock()
 		defer bb.lock.Unlock()
+
+		if bb.len() != a.len() {
+			return false
+		}
 
 		for i, av := range a.slice {
 			if bb.slice[i] != av {
@@ -94,6 +154,10 @@ func (a bitset) Equals(b Bitset) bool {
 		}
 	} else {
 		errors.TodoP4("improve performance of this")
+		if bb.Len() != a.len() {
+			return false
+		}
+
 		for i := 0; i < a.Len(); i++ {
 			if a.Get(i) != b.Get(i) {
 				return false
@@ -108,6 +172,7 @@ func (b *bitset) Add(idx int) {
 	b.lock.Lock()
 	defer b.lock.Unlock()
 
+	b.countOn += 1
 	b.set(idx, true)
 }
 
@@ -115,6 +180,23 @@ func (b *bitset) Del(idx int) {
 	b.lock.Lock()
 	defer b.lock.Unlock()
 
+	b.countOn -= 1
+	b.set(idx, false)
+}
+
+func (b *bitset) DelIfPresent(idx int) {
+	b.lock.Lock()
+	defer b.lock.Unlock()
+
+	if b.len() < idx {
+		return
+	}
+
+	if !b.get(idx) {
+		return
+	}
+
+	b.countOn -= 1
 	b.set(idx, false)
 }
 
@@ -164,7 +246,9 @@ func (b *bitset) UnmarshalBinary(bs []byte) (err error) {
 	b.lock = &sync.Mutex{}
 
 	for i := range b.slice {
-		b.slice[i] = binary.BigEndian.Uint32(bs[bytesPerInt*i:])
+		n := binary.BigEndian.Uint32(bs[bytesPerInt*i:])
+		b.countOn = bits.OnesCount32(n)
+		b.slice[i] = n
 	}
 
 	return

@@ -14,9 +14,11 @@ import (
 type Index interface {
 	errors.Flusher
 	schnittstellen.Resetter
+
 	GetAllEtiketten() ([]Etikett, error)
 	AddEtikettSet(to EtikettSet, from EtikettSet) (err error)
 	Add(s EtikettSet) (err error)
+
 	AddHinweis(Hinweis) error
 	CreateHinweis() (Hinweis, error)
 	PeekHinweisen(int) ([]Hinweis, error)
@@ -26,6 +28,7 @@ type Standort interface {
 	hinweisen.ProviderStandort
 	FileVerzeichnisseEtiketten() string
 	FileVerzeichnisseKennung() string
+	FileVerzeichnisseHinweis() string
 }
 
 type index struct {
@@ -35,7 +38,10 @@ type index struct {
 	didRead    bool
 	hasChanges bool
 
-	oldIndex *oldIndex
+	oldIndex     *oldIndex
+	hinweisIndex *hinweisIndex
+
+	useNewHinweisIndex bool
 }
 
 type row struct {
@@ -50,6 +56,7 @@ func MakeIndex(
 ) (i *index, err error) {
 	i = &index{
 		path:                 s.FileVerzeichnisseEtiketten(),
+		useNewHinweisIndex:   k.UseNewHinweisIndex(),
 		VerzeichnisseFactory: vf,
 		etiketten:            make(map[Etikett]int64),
 	}
@@ -63,13 +70,29 @@ func MakeIndex(
 		return
 	}
 
+	if i.hinweisIndex, err = makeHinweisIndex(
+		k,
+		s,
+		vf,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	return
 }
 
 func (i *index) Flush() (err error) {
-	if err = i.oldIndex.Flush(); err != nil {
-		err = errors.Wrap(err)
-		return
+	if i.useNewHinweisIndex {
+		if err = i.hinweisIndex.Flush(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		if err = i.oldIndex.Flush(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	if !i.hasChanges {
@@ -267,36 +290,65 @@ func (i *index) GetAllEtiketten() (es []Etikett, err error) {
 }
 
 func (i *index) Reset() (err error) {
-	if err = i.oldIndex.Reset(); err != nil {
-		err = errors.Wrap(err)
-		return
+	if i.useNewHinweisIndex {
+		if err = i.hinweisIndex.Reset(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+	} else {
+		if err = i.oldIndex.Reset(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return
 }
 
 func (i *index) AddHinweis(h Hinweis) (err error) {
-	if err = i.oldIndex.AddHinweis(h); err != nil {
-		err = errors.Wrap(err)
-		return
+	if i.useNewHinweisIndex {
+		if err = i.hinweisIndex.AddHinweis(h); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		if err = i.oldIndex.AddHinweis(h); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return
 }
 
 func (i *index) CreateHinweis() (h Hinweis, err error) {
-	if h, err = i.oldIndex.CreateHinweis(); err != nil {
-		err = errors.Wrap(err)
-		return
+	if i.useNewHinweisIndex {
+		if h, err = i.hinweisIndex.CreateHinweis(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		if h, err = i.oldIndex.CreateHinweis(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return
 }
 
 func (i *index) PeekHinweisen(n int) (hs []Hinweis, err error) {
-	if hs, err = i.oldIndex.PeekHinweisen(n); err != nil {
-		err = errors.Wrap(err)
-		return
+	if i.useNewHinweisIndex {
+		if hs, err = i.hinweisIndex.PeekHinweisen(n); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		if hs, err = i.oldIndex.PeekHinweisen(n); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return
