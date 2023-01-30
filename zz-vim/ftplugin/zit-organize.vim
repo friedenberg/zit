@@ -8,18 +8,42 @@ let &l:equalprg = "zit format-organize -metadatei-header %"
 let &l:foldmethod = "expr"
 let &l:foldexpr = "GetZitOrganizeFold(v:lnum)"
 
+set foldtext=MyFoldText()
+function MyFoldText()
+  let line = getline(v:foldstart)
+  let prefix = "+" . v:folddashes . " " . (v:foldend - v:foldstart) . " lines: "
+  let sub = substitute(line, '/\*\|\*/\|{{{\d\=', '', 'g')
+  let subTrimmed = sub[len(prefix):]
+  return prefix . subTrimmed
+endfunction
+
+function! GetPreviousHeaderLineFoldLevel(lnum)
+  let current = a:lnum - 1
+
+  while current >= 0
+    let v = getline(current)
+
+    if v =~? '\v^\s*#'
+      return count(v, "#")
+    endif
+
+    let current -= 1
+  endwhile
+
+  return -1
+endfunction
+
 " TODO implement against new organize syntax
 function! GetZitOrganizeFold(lnum)
-  if getline(a:lnum) =~? '\v^\s*$'
-    return '-1'
-  endif
+  let l = getline(a:lnum)
 
-  let this_indent = indent(a:lnum)
+  " let this_indent = indent(a:lnum)
+  let this_indent = count(l, "#")
 
-  if getline(a:lnum) =~? '\v^\s*#'
-    return '>' . (this_indent + 1)
+  if l =~? '\v^\s*#'
+    return '>' . this_indent
   else
-    return this_indent + 1
+    return GetPreviousHeaderLineFoldLevel(a:lnum)
   endif
 endfunction
 

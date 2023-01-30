@@ -255,10 +255,10 @@ func (s *zettelStore) Create(
 		return
 	}
 
-	if in.IsEmpty() || s.protoZettel.Equals(in) {
-		err = errors.Normalf("zettel is empty")
-		return
-	}
+	// if in.IsEmpty() || s.protoZettel.Equals(in) {
+	// 	err = errors.Normalf("zettel is empty")
+	// 	return
+	// }
 
 	s.protoZettel.Apply(&in)
 
