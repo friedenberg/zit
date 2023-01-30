@@ -4,8 +4,8 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	hinweis_index_v0 "github.com/friedenberg/zit/src/hinweis_index/v0"
-	hinweis_index_v1 "github.com/friedenberg/zit/src/hinweis_index/v1"
+	hinweis_index_v0 "github.com/friedenberg/zit/src/echo/hinweis_index/v0"
+	hinweis_index_v1 "github.com/friedenberg/zit/src/echo/hinweis_index/v1"
 )
 
 type HinweisStore interface {
