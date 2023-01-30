@@ -9,6 +9,10 @@ type Equatable[T any] interface {
 	Equals(T) bool
 }
 
+type Flusher interface {
+	Flush() error
+}
+
 type Resetter interface {
 	Reset() error
 }

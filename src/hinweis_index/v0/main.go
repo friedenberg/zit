@@ -1,4 +1,4 @@
-package kennung
+package hinweis_index
 
 import (
 	"bufio"
@@ -11,17 +11,21 @@ import (
 	"github.com/friedenberg/zit/src/alfa/coordinates"
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/hinweisen"
+	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
-type hinweisIndex struct {
+type encodedKennung struct {
+	AvailableKennung map[int]bool
+}
+
+type oldIndex struct {
 	su schnittstellen.VerzeichnisseFactory
 
 	lock *sync.RWMutex
 	path string
 
-	bitset collections.Bitset
+	encodedKennung
 
 	oldHinweisenStore *hinweisen.Hinweisen
 
@@ -31,17 +35,19 @@ type hinweisIndex struct {
 	nonRandomSelection bool
 }
 
-func makeHinweisIndex(
+func MakeIndex(
 	k schnittstellen.Konfig,
-	s Standort,
+	s schnittstellen.Standort,
 	su schnittstellen.VerzeichnisseFactory,
-) (i *hinweisIndex, err error) {
-	i = &hinweisIndex{
+) (i *oldIndex, err error) {
+	i = &oldIndex{
 		lock:               &sync.RWMutex{},
-		path:               s.FileVerzeichnisseHinweis(),
+		path:               s.FileVerzeichnisseKennung(),
 		nonRandomSelection: k.UsePredictableHinweisen(),
 		su:                 su,
-		bitset:             collections.MakeBitset(0),
+		encodedKennung: encodedKennung{
+			AvailableKennung: make(map[int]bool),
+		},
 	}
 
 	if i.oldHinweisenStore, err = hinweisen.New(s); err != nil {
@@ -57,7 +63,7 @@ func makeHinweisIndex(
 	return
 }
 
-func (i *hinweisIndex) Flush() (err error) {
+func (i *oldIndex) Flush() (err error) {
 	i.lock.RLock()
 
 	if !i.hasChanges {
@@ -83,7 +89,7 @@ func (i *hinweisIndex) Flush() (err error) {
 
 	enc := gob.NewEncoder(w)
 
-	if err = enc.Encode(i.bitset); err != nil {
+	if err = enc.Encode(i.encodedKennung); err != nil {
 		err = errors.Wrapf(err, "failed to write encoded kennung")
 		return
 	}
@@ -91,7 +97,7 @@ func (i *hinweisIndex) Flush() (err error) {
 	return
 }
 
-func (i *hinweisIndex) readIfNecessary() (err error) {
+func (i *oldIndex) readIfNecessary() (err error) {
 	i.lock.RLock()
 
 	if i.didRead {
@@ -126,7 +132,7 @@ func (i *hinweisIndex) readIfNecessary() (err error) {
 
 	dec := gob.NewDecoder(r)
 
-	if err = dec.Decode(i.bitset); err != nil {
+	if err = dec.Decode(&i.encodedKennung); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -134,7 +140,7 @@ func (i *hinweisIndex) readIfNecessary() (err error) {
 	return
 }
 
-func (i *hinweisIndex) Reset() (err error) {
+func (i *oldIndex) Reset() (err error) {
 	lMax := i.oldHinweisenStore.Left().Len() - 1
 	rMax := i.oldHinweisenStore.Right().Len() - 1
 
@@ -148,14 +154,28 @@ func (i *hinweisIndex) Reset() (err error) {
 		return
 	}
 
-	i.bitset = collections.MakeBitsetOn(lMax * rMax)
+	i.AvailableKennung = make(map[int]bool, lMax*rMax)
+
+	for l := 0; l <= lMax; l++ {
+		for r := 0; r <= rMax; r++ {
+			k := &coordinates.Kennung{
+				Left:  coordinates.Int(l),
+				Right: coordinates.Int(r),
+			}
+
+			errors.Log().Print(k)
+
+			n := int(k.Id())
+			i.AvailableKennung[n] = true
+		}
+	}
 
 	i.hasChanges = true
 
 	return
 }
 
-func (i *hinweisIndex) AddHinweis(h Hinweis) (err error) {
+func (i *oldIndex) AddHinweis(h kennung.Hinweis) (err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -184,82 +204,78 @@ func (i *hinweisIndex) AddHinweis(h Hinweis) (err error) {
 	i.lock.Lock()
 	defer i.lock.Unlock()
 
-	i.bitset.DelIfPresent(int(n))
+	if _, ok := i.AvailableKennung[int(n)]; ok {
+		delete(i.AvailableKennung, int(n))
+	}
 
 	i.hasChanges = true
 
 	return
 }
 
-func (i *hinweisIndex) CreateHinweis() (h Hinweis, err error) {
+func (i *oldIndex) CreateHinweis() (h kennung.Hinweis, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if i.bitset.CountOn() == 0 {
+	if len(i.AvailableKennung) == 0 {
 		err = errors.Errorf("no available kennung")
 		return
 	}
 
 	rand.Seed(time.Now().UnixNano())
 
-	if i.bitset.CountOn() == 0 {
+	if len(i.AvailableKennung) == 0 {
 		err = errors.Wrap(hinweisen.ErrHinweisenExhausted{})
 		return
 	}
 
 	ri := 0
 
-	if i.bitset.CountOn() > 1 {
-		ri = rand.Intn(i.bitset.CountOn() - 1)
+	if len(i.AvailableKennung) > 1 {
+		ri = rand.Intn(len(i.AvailableKennung) - 1)
 	}
 
 	m := 0
 	j := 0
 
-	if err = i.bitset.Each(
-		func(n int) (err error) {
-			if i.nonRandomSelection {
-				if m == 0 {
-					m = n
-					return
-				}
-
-				if n > m {
-					return
-				}
-
+	for n := range i.AvailableKennung {
+		if i.nonRandomSelection {
+			if m == 0 {
 				m = n
-			} else {
-				j++
-				m = n
-
-				if j == ri {
-					err = collections.ErrStopIteration
-					return
-				}
+				continue
 			}
 
-			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+			if n > m {
+				continue
+			}
+
+			m = n
+		} else {
+			j++
+			m = n
+
+			if j == ri {
+				break
+			}
+		}
 	}
 
-	i.bitset.DelIfPresent(int(m))
+	if _, ok := i.AvailableKennung[int(m)]; ok {
+		delete(i.AvailableKennung, int(m))
+	}
 
 	i.hasChanges = true
 
 	return i.makeHinweisButDontStore(m)
 }
 
-func (i *hinweisIndex) makeHinweisButDontStore(j int) (h Hinweis, err error) {
+func (i *oldIndex) makeHinweisButDontStore(j int) (h kennung.Hinweis, err error) {
 	k := &coordinates.Kennung{}
 	k.SetInt(coordinates.Int(j))
 
-	h, err = NewHinweis(
+	h, err = kennung.NewHinweis(
 		k.Id(),
 		i.oldHinweisenStore.Left(),
 		i.oldHinweisenStore.Right(),
@@ -273,45 +289,37 @@ func (i *hinweisIndex) makeHinweisButDontStore(j int) (h Hinweis, err error) {
 	return
 }
 
-func (i *hinweisIndex) PeekHinweisen(m int) (hs []Hinweis, err error) {
+func (i *oldIndex) PeekHinweisen(m int) (hs []kennung.Hinweis, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if m > i.bitset.CountOn() || m == 0 {
-		m = i.bitset.CountOn()
+	if m > len(i.AvailableKennung) || m == 0 {
+		m = len(i.AvailableKennung)
 	}
 
-	hs = make([]Hinweis, 0, m)
+	hs = make([]kennung.Hinweis, 0, m)
 	j := 0
 
-	if err = i.bitset.Each(
-		func(n int) (err error) {
-			k := &coordinates.Kennung{}
-			k.SetInt(coordinates.Int(n))
+	for n := range i.AvailableKennung {
+		k := &coordinates.Kennung{}
+		k.SetInt(coordinates.Int(n))
 
-			var h Hinweis
+		var h kennung.Hinweis
 
-			if h, err = i.makeHinweisButDontStore(n); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			hs = append(hs, h)
-
-			j++
-
-			if j == m {
-				err = collections.ErrStopIteration
-				return
-			}
-
+		if h, err = i.makeHinweisButDontStore(n); err != nil {
+			err = errors.Wrap(err)
 			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+		}
+
+		hs = append(hs, h)
+
+		j++
+
+		if j == m {
+			break
+		}
 	}
 
 	return

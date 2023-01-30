@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
 const (
@@ -12,17 +13,13 @@ const (
 	FilePathKennungYang = "Yang"
 )
 
-type ProviderStandort interface {
-	DirKennung() string
-}
-
 type Hinweisen struct {
 	sync.Locker
 	yin  provider
 	yang provider
 }
 
-func New(ps ProviderStandort) (f *Hinweisen, err error) {
+func New(ps schnittstellen.Standort) (f *Hinweisen, err error) {
 	providerPathYin := path.Join(ps.DirKennung(), FilePathKennungYin)
 	providerPathYang := path.Join(ps.DirKennung(), FilePathKennungYang)
 

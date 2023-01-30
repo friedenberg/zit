@@ -12,13 +12,13 @@ import (
 	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/age_io"
-	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/india/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/india/konfig"
+	"github.com/friedenberg/zit/src/kennung_index"
 )
 
 type StoreUtilVerzeichnisse interface {
@@ -41,7 +41,7 @@ type StoreUtil interface {
 	GetBestandsaufnahme() *bestandsaufnahme.Objekte
 	GetTransaktionStore() TransaktionStore
 	GetAbbrStore() AbbrStore
-	GetKennungIndex() kennung.Index
+	GetKennungIndex() kennung_index.Index
 }
 
 // TODO-P3 move to own package
@@ -55,7 +55,7 @@ type common struct {
 	Abbr             *indexAbbr
 
 	bestandsaufnahmeStore bestandsaufnahme.Store
-	kennungIndex          kennung.Index
+	kennungIndex          kennung_index.Index
 }
 
 func MakeStoreUtil(
@@ -108,7 +108,7 @@ func MakeStoreUtil(
 		return
 	}
 
-	if c.kennungIndex, err = kennung.MakeIndex(
+	if c.kennungIndex, err = kennung_index.MakeIndex(
 		c.GetKonfig(),
 		c.GetStandort(),
 		c,
@@ -159,7 +159,7 @@ func (s *common) GetAbbrStore() AbbrStore {
 	return s.Abbr
 }
 
-func (s *common) GetKennungIndex() kennung.Index {
+func (s *common) GetKennungIndex() kennung_index.Index {
 	return s.kennungIndex
 }
 

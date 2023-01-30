@@ -1,4 +1,4 @@
-package kennung
+package kennung_index
 
 import (
 	"bufio"
@@ -8,91 +8,75 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/hinweisen"
+	"github.com/friedenberg/zit/src/delta/kennung"
+	hinweis_index_v0 "github.com/friedenberg/zit/src/hinweis_index/v0"
+	hinweis_index_v1 "github.com/friedenberg/zit/src/hinweis_index/v1"
 )
 
 type Index interface {
-	errors.Flusher
+	schnittstellen.Flusher
 	schnittstellen.Resetter
 
-	GetAllEtiketten() ([]Etikett, error)
-	AddEtikettSet(to EtikettSet, from EtikettSet) (err error)
-	Add(s EtikettSet) (err error)
+	GetAllEtiketten() ([]kennung.Etikett, error)
+	AddEtikettSet(to kennung.EtikettSet, from kennung.EtikettSet) (err error)
+	Add(s kennung.EtikettSet) (err error)
 
-	AddHinweis(Hinweis) error
-	CreateHinweis() (Hinweis, error)
-	PeekHinweisen(int) ([]Hinweis, error)
-}
-
-type Standort interface {
-	hinweisen.ProviderStandort
-	FileVerzeichnisseEtiketten() string
-	FileVerzeichnisseKennung() string
-	FileVerzeichnisseHinweis() string
+	HinweisIndex
 }
 
 type index struct {
 	path string
 	schnittstellen.VerzeichnisseFactory
-	etiketten  map[Etikett]int64
+	etiketten  map[kennung.Etikett]int64
 	didRead    bool
 	hasChanges bool
 
-	oldIndex     *oldIndex
-	hinweisIndex *hinweisIndex
-
-	useNewHinweisIndex bool
+	hinweisIndex HinweisIndex
 }
 
 type row struct {
-	Etikett
+	kennung.Etikett
 	count int64
 }
 
 func MakeIndex(
 	k schnittstellen.Konfig,
-	s Standort,
+	s schnittstellen.Standort,
 	vf schnittstellen.VerzeichnisseFactory,
 ) (i *index, err error) {
 	i = &index{
 		path:                 s.FileVerzeichnisseEtiketten(),
-		useNewHinweisIndex:   k.UseNewHinweisIndex(),
 		VerzeichnisseFactory: vf,
-		etiketten:            make(map[Etikett]int64),
+		etiketten:            make(map[kennung.Etikett]int64),
 	}
 
-	if i.oldIndex, err = MakeOldKennungIndex(
-		k,
-		s,
-		vf,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if i.hinweisIndex, err = makeHinweisIndex(
-		k,
-		s,
-		vf,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+	if k.UseNewHinweisIndex() {
+		if i.hinweisIndex, err = hinweis_index_v1.MakeIndex(
+			k,
+			s,
+			vf,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		if i.hinweisIndex, err = hinweis_index_v0.MakeIndex(
+			k,
+			s,
+			vf,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return
 }
 
 func (i *index) Flush() (err error) {
-	if i.useNewHinweisIndex {
-		if err = i.hinweisIndex.Flush(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	} else {
-		if err = i.oldIndex.Flush(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if err = i.hinweisIndex.Flush(); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	if !i.hasChanges {
@@ -174,10 +158,10 @@ func (i *index) readIfNecessary() (err error) {
 }
 
 func (i *index) AddEtikettSet(
-	to EtikettSet,
-	from EtikettSet,
+	to kennung.EtikettSet,
+	from kennung.EtikettSet,
 ) (err error) {
-	d := MakeSetEtikettDelta(
+	d := kennung.MakeSetEtikettDelta(
 		from,
 		to,
 	)
@@ -190,7 +174,7 @@ func (i *index) AddEtikettSet(
 	return
 }
 
-func (i *index) processDelta(d EtikettDelta) (err error) {
+func (i *index) processDelta(d kennung.EtikettDelta) (err error) {
 	if err = i.Add(d.Added); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -204,7 +188,7 @@ func (i *index) processDelta(d EtikettDelta) (err error) {
 	return
 }
 
-func (i *index) Add(s EtikettSet) (err error) {
+func (i *index) Add(s kennung.EtikettSet) (err error) {
 	if s.Len() == 0 {
 		errors.Log().Print("no etiketten to add")
 		return
@@ -229,7 +213,7 @@ func (i *index) Add(s EtikettSet) (err error) {
 	return
 }
 
-func (i *index) del(s EtikettSet) (err error) {
+func (i *index) del(s kennung.EtikettSet) (err error) {
 	if s.Len() == 0 {
 		errors.Log().Print("no etiketten to delete")
 		return
@@ -264,13 +248,13 @@ func (i *index) del(s EtikettSet) (err error) {
 	return
 }
 
-func (i *index) GetAllEtiketten() (es []Etikett, err error) {
+func (i *index) GetAllEtiketten() (es []kennung.Etikett, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	es = make([]Etikett, len(i.etiketten))
+	es = make([]kennung.Etikett, len(i.etiketten))
 
 	n := 0
 
@@ -290,65 +274,36 @@ func (i *index) GetAllEtiketten() (es []Etikett, err error) {
 }
 
 func (i *index) Reset() (err error) {
-	if i.useNewHinweisIndex {
-		if err = i.hinweisIndex.Reset(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	} else {
-		if err = i.oldIndex.Reset(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if err = i.hinweisIndex.Reset(); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return
 }
 
-func (i *index) AddHinweis(h Hinweis) (err error) {
-	if i.useNewHinweisIndex {
-		if err = i.hinweisIndex.AddHinweis(h); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	} else {
-		if err = i.oldIndex.AddHinweis(h); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+func (i *index) AddHinweis(h kennung.Hinweis) (err error) {
+	if err = i.hinweisIndex.AddHinweis(h); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return
 }
 
-func (i *index) CreateHinweis() (h Hinweis, err error) {
-	if i.useNewHinweisIndex {
-		if h, err = i.hinweisIndex.CreateHinweis(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	} else {
-		if h, err = i.oldIndex.CreateHinweis(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+func (i *index) CreateHinweis() (h kennung.Hinweis, err error) {
+	if h, err = i.hinweisIndex.CreateHinweis(); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return
 }
 
-func (i *index) PeekHinweisen(n int) (hs []Hinweis, err error) {
-	if i.useNewHinweisIndex {
-		if hs, err = i.hinweisIndex.PeekHinweisen(n); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	} else {
-		if hs, err = i.oldIndex.PeekHinweisen(n); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+func (i *index) PeekHinweisen(n int) (hs []kennung.Hinweis, err error) {
+	if hs, err = i.hinweisIndex.PeekHinweisen(n); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return
