@@ -219,7 +219,7 @@ func (i *hinweisIndex) CreateHinweis() (h kennung.Hinweis, err error) {
 	m := 0
 	j := 0
 
-	if err = i.bitset.Each(
+	if err = i.bitset.EachOff(
 		func(n int) (err error) {
 			if i.nonRandomSelection {
 				if m == 0 {
@@ -260,14 +260,12 @@ func (i *hinweisIndex) makeHinweisButDontStore(j int) (h kennung.Hinweis, err er
 	k := &coordinates.Kennung{}
 	k.SetInt(coordinates.Int(j))
 
-	h, err = kennung.NewHinweis(
+	if h, err = kennung.NewHinweis(
 		k.Id(),
 		i.oldHinweisenStore.Left(),
 		i.oldHinweisenStore.Right(),
-	)
-
-	if err != nil {
-		err = errors.Wrapf(err, "trying to make hinweis for %s", k)
+	); err != nil {
+		err = errors.Wrapf(err, "trying to make hinweis for %s, %d", k, j)
 		return
 	}
 
@@ -287,15 +285,16 @@ func (i *hinweisIndex) PeekHinweisen(m int) (hs []kennung.Hinweis, err error) {
 	hs = make([]kennung.Hinweis, 0, m)
 	j := 0
 
-	if err = i.bitset.Each(
+	if err = i.bitset.EachOff(
 		func(n int) (err error) {
-			k := &coordinates.Kennung{}
+      n +=1
+      k := &coordinates.Kennung{}
 			k.SetInt(coordinates.Int(n))
 
 			var h kennung.Hinweis
 
 			if h, err = i.makeHinweisButDontStore(n); err != nil {
-				err = errors.Wrap(err)
+				err = errors.Wrapf(err, "# %d", n)
 				return
 			}
 

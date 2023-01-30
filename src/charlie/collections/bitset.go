@@ -20,6 +20,7 @@ type Bitset interface {
 	CountOn() int
 	CountOff() int
 	Each(WriterFunc[int]) error
+	EachOff(WriterFunc[int]) error
 
 	Add(int)
 	Del(int)
@@ -48,9 +49,22 @@ func MakeBitset(n int) Bitset {
 func MakeBitsetOn(n int) Bitset {
 	b := makeBitset(n)
 
+	if n == 0 {
+		return b
+	}
+
 	for i := range b.slice {
 		b.slice[i] = ^uint32(0)
 	}
+
+	last := n / intSize
+	lastBitsOn := (n % intSize)
+
+  b.slice[last] = 0
+
+  for i := 0; i < lastBitsOn; i++ {
+		b.slice[last] |= (uint32(1) << i)
+  }
 
 	return b
 }
@@ -107,6 +121,31 @@ func (b bitset) Get(idx int) bool {
 	defer b.lock.Unlock()
 
 	return b.get(idx)
+}
+
+func (b bitset) EachOff(f WriterFunc[int]) (err error) {
+	errors.TodoP4("measure and improve performance if necessary")
+
+	b.lock.Lock()
+	defer b.lock.Unlock()
+
+	for i := 0; i < b.len(); i++ {
+		if b.get(i) {
+			continue
+		}
+
+		if err = f(i); err != nil {
+			if IsStopIteration(err) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+			}
+
+			return
+		}
+	}
+
+	return
 }
 
 func (b bitset) Each(f WriterFunc[int]) (err error) {

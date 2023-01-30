@@ -116,6 +116,41 @@ func TestBitset6MakeOn(t1 *testing.T) {
 			t.Errorf("expected bit to be on: %d", i)
 		}
 	}
+
+	if sut.Get(21) {
+		t.Errorf("expected bit outside range to be off")
+	}
+}
+
+func TestBitset7Each(t1 *testing.T) {
+	t := test_logz.T{T: t1}
+
+  m := 200
+	sut := MakeBitsetOn(m)
+
+	i := 0
+
+	if err := sut.Each(
+		func(j int) (err error) {
+			if j > m {
+				t.Errorf("expected to iterate to %d but only got %d", m, j)
+			}
+
+			if j != i {
+				t.Errorf("expected %d but got %d", i, j)
+			}
+
+			i++
+
+			return
+		},
+	); err != nil {
+		t.Errorf("expected no error but got %s", err)
+	}
+
+	if i != m {
+		t.Errorf("expected to iterate to %d but only got %d", m, i)
+	}
 }
 
 func BenchmarkAdd(b *testing.B) {
