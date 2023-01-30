@@ -9,8 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	hinweis_index_v0 "github.com/friedenberg/zit/src/hinweis_index/v0"
-	hinweis_index_v1 "github.com/friedenberg/zit/src/hinweis_index/v1"
+	"github.com/friedenberg/zit/src/hinweis_index"
 )
 
 type Index interface {
@@ -21,7 +20,7 @@ type Index interface {
 	AddEtikettSet(to kennung.EtikettSet, from kennung.EtikettSet) (err error)
 	Add(s kennung.EtikettSet) (err error)
 
-	HinweisIndex
+	hinweis_index.HinweisIndex
 }
 
 type index struct {
@@ -31,7 +30,7 @@ type index struct {
 	didRead    bool
 	hasChanges bool
 
-	hinweisIndex HinweisIndex
+	hinweisIndex hinweis_index.HinweisIndex
 }
 
 type row struct {
@@ -50,24 +49,13 @@ func MakeIndex(
 		etiketten:            make(map[kennung.Etikett]int64),
 	}
 
-	if k.UseNewHinweisIndex() {
-		if i.hinweisIndex, err = hinweis_index_v1.MakeIndex(
-			k,
-			s,
-			vf,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	} else {
-		if i.hinweisIndex, err = hinweis_index_v0.MakeIndex(
-			k,
-			s,
-			vf,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if i.hinweisIndex, err = hinweis_index.MakeIndex(
+		k,
+		s,
+		vf,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

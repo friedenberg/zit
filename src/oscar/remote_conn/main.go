@@ -5,12 +5,12 @@ import (
 	"net"
 	"syscall"
 
-	"github.com/friedenberg/zit/src/alfa/angeboren"
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
 type Dialogue struct {
-	Angeboren angeboren.KonfigLike
+	Angeboren schnittstellen.Angeboren
 	typ       DialogueType
 	conn      *net.UnixConn
 	stage     *stage
@@ -18,12 +18,12 @@ type Dialogue struct {
 	enc       *gob.Encoder
 }
 
-func (d Dialogue) GetAngeboren() angeboren.KonfigLike {
+func (d Dialogue) GetAngeboren() schnittstellen.Angeboren {
 	return d.Angeboren
 }
 
 func makeDialogueListen(
-	a angeboren.Getter,
+	a schnittstellen.AngeborenGetter,
 	s *stage,
 	l *net.UnixListener,
 ) (d Dialogue, msg MessageHiCommander, err error) {

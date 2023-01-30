@@ -11,8 +11,8 @@ import (
 	"sync"
 	"syscall"
 
-	"github.com/friedenberg/zit/src/alfa/angeboren"
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
@@ -20,11 +20,11 @@ import (
 type MessageHiCommander struct {
 	DialogueType
 	CliKonfig erworben.Cli
-	Angeboren angeboren.KonfigLike
+	Angeboren schnittstellen.Angeboren
 }
 
 type StageCommander struct {
-	Angeboren           angeboren.Getter
+	Angeboren           schnittstellen.AngeborenGetter
 	remoteActorCmd      *exec.Cmd
 	konfigCli           erworben.Cli
 	wg                  *sync.WaitGroup

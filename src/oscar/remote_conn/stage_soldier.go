@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"syscall"
 
-	"github.com/friedenberg/zit/src/alfa/angeboren"
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
@@ -18,7 +18,7 @@ type Listener interface {
 }
 
 type MessageHiSoldier struct {
-	Angeboren angeboren.KonfigLike
+	Angeboren schnittstellen.Angeboren
 }
 
 type SoldierDialogueChanElement struct {
@@ -28,7 +28,7 @@ type SoldierDialogueChanElement struct {
 }
 
 type StageSoldier struct {
-	Angeboren                 angeboren.Getter
+	Angeboren                 schnittstellen.AngeborenGetter
 	listener                  *net.UnixListener
 	chStopWaitingForDialogues chan struct{}
 	chDialogue                chan SoldierDialogueChanElement

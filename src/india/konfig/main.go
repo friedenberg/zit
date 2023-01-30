@@ -8,6 +8,7 @@ import (
 
 	pkg_angeboren "github.com/friedenberg/zit/src/alfa/angeboren"
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/standort"
@@ -139,7 +140,7 @@ func (kc *Compiled) loadKonfigErworben(s standort.Standort) (err error) {
 	return
 }
 
-func (kc Compiled) GetAngeboren() pkg_angeboren.KonfigLike {
+func (kc Compiled) GetAngeboren() schnittstellen.Angeboren {
 	return kc.angeboren
 }
 
