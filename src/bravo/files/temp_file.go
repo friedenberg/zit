@@ -15,10 +15,10 @@ func TempDir() (d string, err error) {
 	return
 }
 
-func TempFile() (f *os.File, err error) {
+func TempFile(d string) (f *os.File, err error) {
 	openFilesGuardInstance.Lock()
 
-	if f, err = ioutil.TempFile("", ""); err != nil {
+	if f, err = ioutil.TempFile(d, ""); err != nil {
 		openFilesGuardInstance.Unlock()
 	}
 

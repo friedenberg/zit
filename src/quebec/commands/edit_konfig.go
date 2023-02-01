@@ -94,7 +94,7 @@ func (c EditKonfig) makeTempKonfigFile(
 
 	var f *os.File
 
-	if f, err = files.TempFile(); err != nil {
+	if f, err = u.Standort().FileTempLocal(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

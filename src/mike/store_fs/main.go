@@ -75,7 +75,7 @@ func (s Store) IndexFilePath() string {
 func (s Store) flushToTemp() (tfp string, err error) {
 	var f *os.File
 
-	if f, err = files.TempFile(); err != nil {
+	if f, err = files.TempFile(s.Standort.DirTempLocal()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

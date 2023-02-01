@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 	"net"
-	"os"
 	"path/filepath"
 	"syscall"
 
@@ -59,7 +58,7 @@ func MakeStageSoldier(u *umwelt.Umwelt) (
 
 	var d string
 
-	if d, err = os.MkdirTemp("", ""); err != nil {
+	if d, err = u.Standort().DirTempOS(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

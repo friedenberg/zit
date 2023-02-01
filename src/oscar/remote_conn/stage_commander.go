@@ -7,6 +7,7 @@ import (
 	"net"
 	"os"
 	"os/exec"
+	"os/signal"
 	"strings"
 	"sync"
 	"syscall"
@@ -78,6 +79,23 @@ func MakeStageCommander(
 	from string,
 	command string,
 ) (s *StageCommander, err error) {
+	if from == "" {
+		err = errors.Errorf("empty from")
+		return
+	}
+
+	sigs := make(chan os.Signal, 1)
+
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		<-sigs
+
+		if s.MainDialogue().conn != nil {
+			s.MainDialogue().Close()
+		}
+	}()
+
 	s = &StageCommander{
 		Angeboren:           u.Konfig(),
 		wg:                  &sync.WaitGroup{},
@@ -114,8 +132,9 @@ func MakeStageCommander(
 
 	rb := bufio.NewReader(r)
 
+	//TODO-P2 make it possible to output and check for path simulataneously
 	if s.sockPath, err = rb.ReadString('\n'); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "Cmd: %s", s.remoteActorCmd.String())
 		return
 	}
 
