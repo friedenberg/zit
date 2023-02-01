@@ -38,8 +38,8 @@ func (sk *Sku2) Set(line string) (err error) {
 	if _, err = format.ReadSep(
 		' ',
 		r,
-		sk.Gattung.Set,
 		sk.Tai.Set,
+		sk.Gattung.Set,
 		sk.Kennung.Set,
 		sk.ObjekteSha.Set,
 		sk.AkteSha.Set,
@@ -121,8 +121,8 @@ func (a Sku2) Equals(b *Sku2) (ok bool) {
 func (s Sku2) String() string {
 	return fmt.Sprintf(
 		"%s %s %s %s %s",
-		s.Gattung,
 		s.Tai,
+		s.Gattung,
 		s.Kennung,
 		s.ObjekteSha,
 		s.AkteSha,

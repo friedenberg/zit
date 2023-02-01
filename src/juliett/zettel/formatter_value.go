@@ -12,6 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/collections_coding"
 	"github.com/friedenberg/zit/src/delta/format"
+	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/india/konfig"
 )
 
@@ -40,6 +41,9 @@ func (f *FormatterValue) Set(v string) (err error) {
 		"toml",
 		"action-names",
 		"hinweis-akte",
+		"sku-transacted",
+		"sku",
+		"sku2",
 		"debug":
 		f.string = v1
 
@@ -74,9 +78,29 @@ func (fv *FormatterValue) FuncFormatter(
 	errors.TodoP2("convert to verzeichnisse")
 
 	switch fv.string {
-	case "debug":
+	case "sku-transacted":
 		return func(z *Transacted) (err error) {
-			errors.Err().PrintDebug(z)
+			_, err = fmt.Fprintln(out, sku.String(z.Sku))
+			return
+		}
+
+	case "sku":
+		return func(z *Transacted) (err error) {
+			_, err = fmt.Fprintln(out, z.GetSku().String())
+			return
+		}
+
+	case "sku2":
+		return func(z *Transacted) (err error) {
+			_, err = fmt.Fprintln(out, z.GetSku2().String())
+			return
+		}
+
+	case "debug":
+		dp := errors.MakePrinter(out)
+
+		return func(z *Transacted) (err error) {
+			dp.PrintDebug(z)
 			return
 		}
 

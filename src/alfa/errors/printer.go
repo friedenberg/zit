@@ -28,7 +28,7 @@ func init() {
 }
 
 type printer struct {
-	f             *os.File
+	f             io.Writer
 	includesStack bool
 	on            bool
 }
@@ -43,6 +43,13 @@ func Err() printer {
 
 func Log() printer {
 	return log
+}
+
+func MakePrinter(o io.Writer) *printer {
+	return &printer{
+		f:  o,
+		on: true,
+	}
 }
 
 func (p printer) PrintDebug(vs ...interface{}) (err error) {
