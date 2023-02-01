@@ -58,7 +58,7 @@ func WriterFuncNegate[T any](wf WriterFunc[T]) WriterFunc[T] {
 
 		switch {
 		case err == nil:
-			err = ErrStopIteration
+			err = MakeErrStopIteration()
 
 		case IsStopIteration(err):
 			err = nil
@@ -74,7 +74,7 @@ func (s1 Set[T]) Subtract(s2 Set[T]) (out Set[T]) {
 	defer s3.close()
 
 	s1.Chain(
-		WriterFuncNegate(s2.WriterContainer(ErrStopIteration)),
+		WriterFuncNegate(s2.WriterContainer(MakeErrStopIteration())),
 		s3.add,
 	)
 
@@ -90,7 +90,7 @@ func (s1 Set[T]) Intersection(s2 SetLike[T]) (s3 MutableSetLike[T]) {
 	}
 
 	s1.Chain(
-		s22.WriterContainer(ErrStopIteration),
+		s22.WriterContainer(MakeErrStopIteration()),
 		s3.Add,
 	)
 
@@ -134,7 +134,7 @@ func (s Set[T]) Any() (e T) {
 	s.Each(
 		func(e1 T) (err error) {
 			e = e1
-			return ErrStopIteration
+			return MakeErrStopIteration()
 		},
 	)
 

@@ -29,7 +29,7 @@ func (s Store) AkteExists(sh sha.Sha) (err error) {
 		collections.MakeChain(
 			func(z *zettel.Transacted) (err error) {
 				if !z.Objekte.Akte.Equals(sh) {
-					err = collections.ErrStopIteration
+					err = collections.MakeErrStopIteration()
 					return
 				}
 

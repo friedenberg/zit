@@ -83,7 +83,7 @@ func (es MutableValueSet[T, T1]) RemovePrefixes(needle T) {
 	es.Chain(
 		func(e T) (err error) {
 			if !strings.HasPrefix(e.String(), needle.String()) {
-				err = ErrStopIteration
+				err = MakeErrStopIteration()
 			}
 
 			return

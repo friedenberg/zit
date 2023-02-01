@@ -27,7 +27,8 @@ type Verzeichnisse struct {
 func (z *Verzeichnisse) ResetWithObjekte(z1 Objekte) {
 	z.wasPopulated = true
 
-	z.EtikettenExpandedSorted = kennung.Expanded(z1.Etiketten).SortedString()
+	ex := kennung.Expanded(z1.Etiketten, kennung.ExpanderAll)
+	z.EtikettenExpandedSorted = ex.SortedString()
 	z.EtikettenSorted = z1.Etiketten.SortedString()
 }
 
@@ -42,17 +43,14 @@ func (z *Verzeichnisse) Reset() {
 }
 
 func (z *Verzeichnisse) ResetWith(z1 Verzeichnisse) {
+	errors.TodoP4("improve performance by reusing slices")
 	z.wasPopulated = true
 
-	z.EtikettenExpandedSorted = append(
-		z.EtikettenExpandedSorted,
-		z1.EtikettenExpandedSorted...,
-	)
+	z.EtikettenExpandedSorted = make([]string, len(z1.EtikettenExpandedSorted))
+	copy(z.EtikettenExpandedSorted, z1.EtikettenExpandedSorted)
 
-	z.EtikettenSorted = append(
-		z.EtikettenSorted,
-		z1.EtikettenSorted...,
-	)
+	z.EtikettenSorted = make([]string, len(z1.EtikettenSorted))
+	copy(z.EtikettenSorted, z1.EtikettenSorted)
 }
 
 type writerGobEncoder struct {
@@ -82,7 +80,7 @@ func MakeWriterKonfig(
 		for _, p := range z.Verzeichnisse.EtikettenSorted {
 			for _, t := range k.EtikettenHidden {
 				if strings.HasPrefix(p, t) {
-					err = collections.ErrStopIteration
+					err = collections.MakeErrStopIteration()
 					return
 				}
 			}

@@ -45,6 +45,10 @@ func SetVerbose() {
 	log_package.Print("verbose")
 }
 
+func IsVerbose() bool {
+  return verbose
+}
+
 func SetTesting() {
 	SetVerbose()
 	isTest = true

@@ -59,6 +59,10 @@ func WithRemovedCommonPrefixes(s EtikettSet) (s2 EtikettSet) {
 func Expanded(s EtikettSet, exes ...Expander) (out EtikettSet) {
 	s1 := MakeEtikettMutableSet()
 
+  if len(exes) == 0 {
+    exes = []Expander{ExpanderAll}
+  }
+
 	for _, e := range s.Elements() {
 		e.Expanded(exes...).Each(s1.Add)
 	}

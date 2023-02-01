@@ -89,7 +89,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 			if zsc, err = u.StoreWorkingDirectory().Checkout(
 				options,
-				zts.WriterContainer(collections.ErrStopIteration),
+				zts.WriterContainer(collections.MakeErrStopIteration()),
 			); err != nil {
 				err = errors.Wrap(err)
 				return

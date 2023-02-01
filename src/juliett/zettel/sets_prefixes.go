@@ -74,7 +74,7 @@ func (s *SetPrefixVerzeichnisse) addPair(e kennung.Etikett, z Transacted) {
 func (a SetPrefixVerzeichnisse) Each(f func(kennung.Etikett, MutableSet) error) (err error) {
 	for e, ssz := range a.innerMap {
 		if err = f(e, ssz); err != nil {
-			if errors.Is(err, collections.ErrStopIteration) {
+			if collections.IsStopIteration(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)

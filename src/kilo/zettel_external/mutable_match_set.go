@@ -80,7 +80,7 @@ func (s MutableMatchSet) Match(z *zettel.Transacted) (err error) {
 		return
 	}
 
-	err = collections.ErrStopIteration
+	err = collections.MakeErrStopIteration()
 
 	return
 }

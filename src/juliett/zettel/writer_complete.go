@@ -46,7 +46,7 @@ func MakeWriterComplete(w io.Writer) WriterComplete {
 func (w *WriterComplete) WriteZettelVerzeichnisse(z *Transacted) (err error) {
 	select {
 	case <-w.chDone:
-		err = collections.ErrStopIteration
+		err = collections.MakeErrStopIteration()
 
 	case w.chTransacted <- *z:
 	}

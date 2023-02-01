@@ -61,12 +61,12 @@ func (zp *Page) setState(v State) {
 
 func (zp *Page) Add(z *zettel.Transacted) (err error) {
 	if z == nil {
-		err = errors.Errorf("trying to add nil zettel.Verzeichnisse")
+		err = errors.Errorf("trying to add nil zettel")
 		return
 	}
 
 	if err = zp.flushFilter(z); err != nil {
-		if errors.Is(err, collections.ErrStopIteration) {
+		if collections.IsStopIteration(err) {
 			errors.Log().Printf("eliding %s", z.Kennung())
 			err = nil
 		} else {
@@ -76,13 +76,11 @@ func (zp *Page) Add(z *zettel.Transacted) (err error) {
 		return
 	}
 
-	if z == nil {
-		err = errors.Errorf("trying to add nil zettel.Zettel")
-		return
-	}
+	zp.Lock()
+	defer zp.Unlock()
 
 	zp.added.Add(*z)
-	zp.setState(StateChanged)
+	zp.State = StateChanged
 
 	return
 }
@@ -91,6 +89,9 @@ func (zp *Page) Flush() (err error) {
 	if zp.getState() < StateChanged {
 		return
 	}
+
+	zp.Lock()
+	defer zp.Unlock()
 
 	errors.Log().Printf("flushing page: %s", zp.path)
 
@@ -154,7 +155,10 @@ func (zp *Page) WriteZettelenTo(
 		}
 	}
 
-	if _, err = zp.Copy(r1, w); err != nil {
+	if _, err = zp.Copy(
+		r1,
+		w,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -217,6 +221,9 @@ func (zp *Page) Copy(
 		zp.added.Restore()
 	}()
 
+	errors.TodoP0("fix issue with heap getting out of whack")
+	zp.added.Fix()
+
 	for {
 		var tz *zettel.Transacted
 
@@ -232,6 +239,8 @@ func (zp *Page) Copy(
 			}
 		}
 
+		errors.Log().Printf("decoded: %s", tz.GetSku2())
+
 	LOOP:
 		for {
 			peeked, ok := zp.added.PeekPtr()
@@ -241,11 +250,16 @@ func (zp *Page) Copy(
 				break LOOP
 
 			case peeked.Equals(tz):
-				zp.added.PopAndSave()
-				break
+				errors.Log().Printf("peeked equals: %s", peeked.GetSku2())
+				zp.added.Pop()
+				continue
 
 			case !peeked.Less(*tz):
+				errors.Log().Printf("peeked greater than: %s", peeked.GetSku2())
 				break LOOP
+
+			default:
+				errors.Log().Printf("peeked less: %s", peeked.GetSku2())
 			}
 
 			popped, _ := zp.added.PopAndSave()
@@ -272,6 +286,8 @@ func (zp *Page) Copy(
 		}
 	}
 
+	var last *zettel.Transacted
+
 	for {
 		popped, ok := zp.added.PopAndSave()
 
@@ -279,8 +295,32 @@ func (zp *Page) Copy(
 			break
 		}
 
+		if last == nil {
+			l := popped
+			last = &l
+		} else if popped.GetSku2().Less(last.GetSku2()) {
+			err = errors.Errorf(
+				"last time is greater than current! last: %s, current: %s, page: %d, less: %v, sku less: %v, sku2 less: %v",
+				last.GetSku2(),
+				popped.GetSku2(),
+				zp.pageId.index,
+				popped.Less(*last),
+				popped.GetSku().Less(last.GetSku()),
+				popped.GetSku2().Less(last.GetSku2()),
+			)
+			return
+		}
+
+		errors.Log().Printf(
+			"page: %d post: %s time sku: %s time sku2: %s",
+			zp.pageId.index,
+			popped.GetSku2(),
+			popped.Sku.GetTime(),
+			popped.GetSku2().GetTime(),
+		)
+
 		if err = w(&popped); err != nil {
-			if errors.Is(err, collections.ErrStopIteration) {
+			if collections.IsStopIteration(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)

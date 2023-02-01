@@ -12,11 +12,10 @@ import (
 )
 
 type Objekte struct {
-	Akte          sha.Sha
-	Typ           kennung.Typ
-	Bezeichnung   bezeichnung.Bezeichnung
-	Etiketten     kennung.EtikettSet
-	Verzeichnisse Verzeichnisse
+	Akte        sha.Sha
+	Typ         kennung.Typ
+	Bezeichnung bezeichnung.Bezeichnung
+	Etiketten   kennung.EtikettSet
 }
 
 func (z Objekte) GetGattung() schnittstellen.Gattung {

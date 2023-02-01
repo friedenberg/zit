@@ -67,7 +67,7 @@ LOOP:
 	ty.Each(
 		func(t kennung.Typ) (err error) {
 			if okTyp = t.Includes(e.AkteTyp()); okTyp {
-				err = collections.ErrStopIteration
+				err = collections.MakeErrStopIteration()
 			}
 
 			return
@@ -97,7 +97,7 @@ LOOP:
 	}
 
 	if !ok {
-		err = collections.ErrStopIteration
+		err = collections.MakeErrStopIteration()
 	}
 
 	return

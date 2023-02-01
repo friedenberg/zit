@@ -5,6 +5,12 @@ import (
 	"fmt"
 )
 
+func WrapN(n int, in error) (err errer) {
+	se, _ := newStackWrapError(1 + n)
+	err = wrapf(se, in, "")
+	return
+}
+
 func Wrap(in error) (err errer) {
 	se, _ := newStackWrapError(1)
 	err = wrapf(se, in, "")

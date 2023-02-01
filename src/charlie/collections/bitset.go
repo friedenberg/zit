@@ -60,11 +60,11 @@ func MakeBitsetOn(n int) Bitset {
 	last := n / intSize
 	lastBitsOn := (n % intSize)
 
-  b.slice[last] = 0
+	b.slice[last] = 0
 
-  for i := 0; i < lastBitsOn; i++ {
+	for i := 0; i < lastBitsOn; i++ {
 		b.slice[last] |= (uint32(1) << i)
-  }
+	}
 
 	return b
 }

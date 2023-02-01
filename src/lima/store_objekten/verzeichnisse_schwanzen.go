@@ -42,12 +42,15 @@ func makeVerzeichnisseSchwanzen(
 func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 	h kennung.Hinweis,
 ) (tz *zettel.Transacted, err error) {
+	errors.TodoP0("add support for reading hinweis schwanzen while reindexing without clobbering")
 	var n int
 
 	if n, err = s.Zettelen.PageForHinweis(h); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	errors.Log().Printf("searching page %d", n)
 
 	var found *zettel.Transacted
 	pool := s.Zettelen.Pool()
@@ -60,7 +63,7 @@ func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 
 		found = zv
 
-		err = collections.ErrStopIteration
+		err = collections.MakeErrStopIteration()
 
 		return
 	}

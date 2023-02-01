@@ -15,7 +15,7 @@ func MakeChain[T any](wfs ...WriterFunc[T]) WriterFunc[T] {
 			case err == nil:
 				continue
 
-			case errors.Is(err, ErrStopIteration):
+			case IsStopIteration(err):
 				err = nil
 				return
 

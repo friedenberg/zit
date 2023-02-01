@@ -125,7 +125,7 @@ func TestBitset6MakeOn(t1 *testing.T) {
 func TestBitset7Each(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-  m := 200
+	m := 200
 	sut := MakeBitsetOn(m)
 
 	i := 0

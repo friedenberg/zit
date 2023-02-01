@@ -81,6 +81,10 @@ func (zt Transacted[T, T1, T2, T3, T4, T5]) IsNew() bool {
 func (a Transacted[T, T1, T2, T3, T4, T5]) Less(
 	b Transacted[T, T1, T2, T3, T4, T5],
 ) bool {
+	if a.Sku.GetTime().Equals(b.Sku.GetTime()) {
+		return a.Sku.TransactionIndex.Less(b.Sku.TransactionIndex)
+	}
+
 	return a.Sku.GetTime().Less(b.Sku.GetTime())
 }
 
@@ -169,14 +173,10 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) GetKennungString() string {
 	return a.Sku.Kennung.String()
 }
 
-func (a *Transacted[T, T1, T2, T3, T4, T5]) GenerateVerzeichnisse() {
-	T5(&a.Verzeichnisse).ResetWithObjekte(a.Objekte)
-}
-
 func (a *Transacted[T, T1, T2, T3, T4, T5]) Reset() {
 	a.Sku.Reset()
 	T1(&a.Objekte).Reset()
-	a.GenerateVerzeichnisse()
+	T5(&a.Verzeichnisse).Reset()
 }
 
 func (a *Transacted[T, T1, T2, T3, T4, T5]) ResetWith(
@@ -184,5 +184,5 @@ func (a *Transacted[T, T1, T2, T3, T4, T5]) ResetWith(
 ) {
 	a.Sku.ResetWith(b.Sku)
 	T1(&a.Objekte).ResetWith(b.Objekte)
-	a.GenerateVerzeichnisse()
+	T5(&a.Verzeichnisse).ResetWithObjekte(a.Objekte)
 }

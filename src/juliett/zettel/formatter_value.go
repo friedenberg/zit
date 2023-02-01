@@ -39,7 +39,8 @@ func (f *FormatterValue) Set(v string) (err error) {
 		"json",
 		"toml",
 		"action-names",
-		"hinweis-akte":
+		"hinweis-akte",
+		"debug":
 		f.string = v1
 
 	default:
@@ -73,6 +74,12 @@ func (fv *FormatterValue) FuncFormatter(
 	errors.TodoP2("convert to verzeichnisse")
 
 	switch fv.string {
+	case "debug":
+		return func(z *Transacted) (err error) {
+			errors.Err().PrintDebug(z)
+			return
+		}
+
 	case "log":
 		return logFunc
 
@@ -172,7 +179,6 @@ func (fv *FormatterValue) FuncFormatter(
 				err = errors.Wrapf(err, "Hinweis: %s", o.Sku.Kennung)
 
 				if errors.IsNotExist(err) {
-					errors.Err().Print(err)
 					err = nil
 				} else {
 					return

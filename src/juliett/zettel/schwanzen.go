@@ -66,6 +66,7 @@ func (zws *Schwanzen) Set(z *Transacted) (ok bool) {
 	t1, _ := zws.hinweisen[h]
 
 	if t1.Less(&o) {
+		errors.Log().Printf("updating schwanzen %s -> %s", t1, o)
 		zws.hinweisen[h] = o
 		ok = true
 	} else if t1.Equals(&o) {
@@ -81,7 +82,7 @@ func (zws *Schwanzen) WriteZettelTransacted(
 	z *Transacted,
 ) (err error) {
 	if ok := zws.Set(z); !ok {
-		err = collections.ErrStopIteration
+		err = collections.MakeErrStopIteration()
 		return
 	}
 

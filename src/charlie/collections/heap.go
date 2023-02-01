@@ -48,7 +48,7 @@ func (h *heapPrivate[T]) Pop() any {
 }
 
 func (a heapPrivate[T]) Copy() (b heapPrivate[T]) {
-	b = heapPrivate[T](make([]T, 0, a.Len()))
+	b = heapPrivate[T](make([]T, a.Len()))
 	copy(b, a)
 	return
 }
@@ -232,7 +232,14 @@ func (a Heap[T]) Each(f WriterFunc[T]) (err error) {
 	return
 }
 
-func (a Heap[T]) Sorted() (b heapPrivate[T]) {
+func (a *Heap[T]) Fix() {
+	a.l.Lock()
+	defer a.l.Unlock()
+
+	heap.Init(&a.h)
+}
+
+func (a *Heap[T]) Sorted() (b heapPrivate[T]) {
 	a.l.Lock()
 	defer a.l.Unlock()
 

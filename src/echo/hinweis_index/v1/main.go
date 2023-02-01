@@ -237,7 +237,7 @@ func (i *hinweisIndex) CreateHinweis() (h kennung.Hinweis, err error) {
 				m = n
 
 				if j == ri {
-					err = collections.ErrStopIteration
+					err = collections.MakeErrStopIteration()
 					return
 				}
 			}
@@ -287,8 +287,8 @@ func (i *hinweisIndex) PeekHinweisen(m int) (hs []kennung.Hinweis, err error) {
 
 	if err = i.bitset.EachOff(
 		func(n int) (err error) {
-      n +=1
-      k := &coordinates.Kennung{}
+			n += 1
+			k := &coordinates.Kennung{}
 			k.SetInt(coordinates.Int(n))
 
 			var h kennung.Hinweis
@@ -303,7 +303,7 @@ func (i *hinweisIndex) PeekHinweisen(m int) (hs []kennung.Hinweis, err error) {
 			j++
 
 			if j == m {
-				err = collections.ErrStopIteration
+				err = collections.MakeErrStopIteration()
 				return
 			}
 

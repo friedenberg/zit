@@ -74,7 +74,7 @@ func (c CatObjekte) akten(
 	if err = u.Standort().ReadAllShasForGattung(
 		gattung.Akte,
 		collections.MakeChain(
-			shas.WriterContainer(collections.ErrStopIteration),
+			shas.WriterContainer(collections.MakeErrStopIteration()),
 			func(sb sha.Sha) (err error) {
 				var r io.ReadCloser
 

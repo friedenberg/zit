@@ -235,7 +235,12 @@ func (s zettelStore) ReadOne(
 func (i *zettelStore) ReadAllSchwanzen(
 	w collections.WriterFunc[*zettel.Transacted],
 ) (err error) {
-	return i.verzeichnisseSchwanzen.ReadMany(w)
+	return i.verzeichnisseSchwanzen.ReadMany(
+		func(z *zettel.Transacted) (err error) {
+			errors.Log().Printf("reading %s", z.GetSku2())
+			return w(z)
+		},
+	)
 }
 
 func (i *zettelStore) ReadAll(
@@ -467,21 +472,7 @@ func (s *zettelStore) transactedWithHead(
 		},
 	}
 
-	var previous *zettel.Transacted
-
-	if previous, err = s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(h); err == nil {
-		tz.Sku.Mutter[0] = previous.Sku.Schwanz
-		tz.Sku.Kopf = previous.Sku.Kopf
-	} else {
-		if errors.Is(err, objekte_store.ErrNotFound{}) {
-			err = nil
-		} else {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	tz.GenerateVerzeichnisse()
+	tz.Verzeichnisse.ResetWithObjekte(tz.Objekte)
 
 	return
 }
@@ -528,39 +519,22 @@ func (s *zettelStore) reindexOne(
 
 	o = tz
 
-	var mutter *zettel.Transacted
-
-	if mutter1, err := s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(
-		tz.Sku.Kennung,
-	); err == nil {
-		mutter = mutter1
-	}
-
 	if err = s.writeNamedZettelToIndex(tz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if mutter == nil {
-		if err = s.logWriter.New(tz); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	} else {
-		if err = s.logWriter.Updated(tz); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if err = s.logWriter.New(tz); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
-	e1 := tz.Objekte.Etiketten
 	e2 := kennung.MakeEtikettSet()
 
-	if mutter != nil {
-		e2 = mutter.Objekte.Etiketten
-	}
-
-	if err = s.StoreUtil.GetKennungIndex().AddEtikettSet(e1, e2); err != nil {
+	if err = s.StoreUtil.GetKennungIndex().AddEtikettSet(
+		tz.Objekte.Etiketten,
+		e2,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

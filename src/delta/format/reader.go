@@ -80,7 +80,7 @@ func ReadSep(
 		}
 	}
 
-	if last != nil && !errors.Is(last, collections.ErrStopIteration) {
+	if last != nil && !collections.IsStopIteration(last) {
 		err = last
 	}
 
@@ -144,7 +144,7 @@ func ReadLines(
 		}
 	}
 
-	if last != nil && !errors.Is(last, collections.ErrStopIteration) {
+	if last != nil && !collections.IsStopIteration(last) {
 		err = last
 	}
 
@@ -180,7 +180,7 @@ func MakeLineReaderKeyValues(
 			return
 		}
 
-		err = collections.ErrStopIteration
+		err = collections.MakeErrStopIteration()
 
 		return
 	}
@@ -211,7 +211,7 @@ func MakeLineReaderKeyValue(
 			return
 		}
 
-		err = collections.ErrStopIteration
+		err = collections.MakeErrStopIteration()
 
 		return
 	}
@@ -222,7 +222,7 @@ func MakeLineReaderRepeat(
 ) schnittstellen.FuncSetString {
 	return func(line string) (err error) {
 		if err = in(line); err != nil {
-			if errors.Is(err, collections.ErrStopIteration) {
+			if collections.IsStopIteration(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)

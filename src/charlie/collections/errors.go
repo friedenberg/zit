@@ -5,13 +5,26 @@ import (
 )
 
 var (
-	ErrStopIteration = errors.New("stop iteration")
+	errStopIteration = errors.New("stop iteration")
 	ErrNilPointer    = errors.New("nil pointer")
 	ErrDoNotRepool   = errors.New("do not repool")
 )
 
+func MakeErrStopIteration() error {
+	if errors.IsVerbose() {
+		return errors.WrapN(2, errStopIteration)
+	} else {
+		return errStopIteration
+	}
+}
+
 func IsStopIteration(err error) bool {
-	return errors.Is(err, ErrStopIteration)
+	if errors.Is(err, errStopIteration) {
+		errors.Log().Printf("stopped iteration at %s", err)
+		return true
+	}
+
+	return false
 }
 
 func IsDoNotRepool(err error) bool {

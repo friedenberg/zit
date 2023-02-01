@@ -98,7 +98,7 @@ func (es set[T]) add(e T) (err error) {
 func (s set[T]) EachKey(wf WriterFuncKey) (err error) {
 	for v := range s.inner {
 		if err = wf(v); err != nil {
-			if errors.Is(err, ErrStopIteration) {
+			if errors.Is(err, MakeErrStopIteration()) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)
@@ -114,7 +114,7 @@ func (s set[T]) EachKey(wf WriterFuncKey) (err error) {
 func (s set[T]) Each(wf WriterFunc[T]) (err error) {
 	for _, v := range s.inner {
 		if err = wf(v); err != nil {
-			if errors.Is(err, ErrStopIteration) {
+			if errors.Is(err, MakeErrStopIteration()) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)
@@ -130,7 +130,7 @@ func (s set[T]) Each(wf WriterFunc[T]) (err error) {
 func (s set[T]) EachPtr(wf WriterFunc[*T]) (err error) {
 	for _, v := range s.inner {
 		if err = wf(&v); err != nil {
-			if errors.Is(err, ErrStopIteration) {
+			if errors.Is(err, MakeErrStopIteration()) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)

@@ -311,7 +311,7 @@ func (s *Store) ReadMany(
 				z.Objekte = ze.Objekte
 				z.Sku.ObjekteSha = ze.Sku.ObjekteSha //TODO-P1 determine what else in sku is needed
 
-				z.GenerateVerzeichnisse()
+				z.Verzeichnisse.ResetWithObjekte(z.Objekte)
 
 				if err = w1(z); err != nil {
 					err = errors.Wrap(err)
@@ -394,7 +394,7 @@ func (s *Store) ReadManyHistory(
 					}
 
 					zt.Sku.Schwanz = s.sonnenaufgang
-					zt.GenerateVerzeichnisse()
+					zt.Verzeichnisse.ResetWithObjekte(zt.Objekte)
 
 					if err = w(zt); err != nil {
 						err = errors.Wrap(err)

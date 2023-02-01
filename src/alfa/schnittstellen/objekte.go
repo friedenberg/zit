@@ -26,7 +26,7 @@ type StoredPtr interface {
 }
 
 type VerzeichnissePtr[T any, T1 Objekte[T1]] interface {
-	Ptr[T]
+	Resetable[T]
 	ResetWithObjekte(T1)
 }
 

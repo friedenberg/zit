@@ -210,7 +210,7 @@ func (c Show) showZettels(
 	ids id_set.Set,
 	fv collections.WriterFunc[*zettel.Transacted],
 ) (err error) {
-	filter := zettel.WriterIds{
+	idFilter := zettel.WriterIds{
 		Filter: id_set.Filter{
 			AllowEmpty: c.All,
 			Set:        ids,
@@ -218,14 +218,18 @@ func (c Show) showZettels(
 	}.WriteZettelTransacted
 
 	method := u.StoreWorkingDirectory().ReadMany
+	// method := u.StoreObjekten().Zettel().ReadAll
+
+	filter := idFilter
 
 	if u.Konfig().IncludeHistory {
 		method = u.StoreWorkingDirectory().ReadManyHistory
+		// method = u.StoreObjekten().Zettel().ReadAll
 		hinweisen := kennung.MakeHinweisMutableSet()
 
 		if err = u.StoreObjekten().Zettel().ReadAllSchwanzen(
 			collections.MakeChain(
-				filter,
+				idFilter,
 				func(o *zettel.Transacted) (err error) {
 					return hinweisen.Add(o.Sku.Kennung)
 				},
@@ -235,17 +239,28 @@ func (c Show) showZettels(
 			return
 		}
 
-		hContainer := hinweisen.WriterContainer(collections.ErrStopIteration)
+		hContainer := hinweisen.WriterContainer(collections.MakeErrStopIteration())
 
 		filter = func(o *zettel.Transacted) (err error) {
-			return hContainer(o.Sku.Kennung)
+			err = hContainer(o.Sku.Kennung)
+
+			if collections.IsStopIteration(err) {
+				err = idFilter(o)
+			}
+
+			return
 		}
 	}
 
 	f1 := collections.MakeSyncSerializer(fv)
+	errors.Log().Printf("%v", filter)
 
 	if err = method(
 		collections.MakeChain(
+			func(z *zettel.Transacted) (err error) {
+				errors.Log().Printf("processing zettel: %s", z.Sku)
+				return
+			},
 			filter,
 			f1,
 		),

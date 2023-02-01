@@ -81,7 +81,7 @@ func (a Sku) GetAkteSha() schnittstellen.Sha {
 	return a.AkteSha
 }
 
-func (a Sku) Less(b *Sku) (ok bool) {
+func (a Sku) Less(b Sku) (ok bool) {
 	if a.Time.Less(b.Time) {
 		ok = true
 		return
