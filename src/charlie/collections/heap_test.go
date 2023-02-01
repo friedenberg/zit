@@ -55,7 +55,7 @@ func TestSaveAndRestore(t1 *testing.T) {
 				t.Fatalf("expected pop and save to return an element but got nothing")
 			}
 
-			if !el.Equals(&ex) {
+			if !el.Equals(ex) {
 				t.Fatalf("expected pop and save to return %s but got %s", ex, el)
 			}
 		}
@@ -71,7 +71,7 @@ func TestSaveAndRestore(t1 *testing.T) {
 			t.Fatalf("expected pop and save to return an element but got nothing. Idx: %d", i)
 		}
 
-		if !el.Equals(&ex) {
+		if !el.Equals(ex) {
 			t.Fatalf("expected pop and save to return %s but got %s", ex, el)
 		}
 	}

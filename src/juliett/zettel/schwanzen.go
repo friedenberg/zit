@@ -69,7 +69,7 @@ func (zws *Schwanzen) Set(z *Transacted) (ok bool) {
 		errors.Log().Printf("updating schwanzen %s -> %s", t1, o)
 		zws.hinweisen[h] = o
 		ok = true
-	} else if t1.Equals(&o) {
+	} else if t1.Equals(o) {
 		ok = true
 	} else {
 		ok = false

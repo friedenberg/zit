@@ -249,7 +249,7 @@ func (zp *Page) Copy(
 			case !ok:
 				break LOOP
 
-			case peeked.Equals(tz):
+			case peeked.Equals(*tz):
 				errors.Log().Printf("peeked equals: %s", peeked.GetSku2())
 				zp.added.Pop()
 				continue

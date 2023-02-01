@@ -89,13 +89,9 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) Less(
 }
 
 func (a Transacted[T, T1, T2, T3, T4, T5]) Equals(
-	b *Transacted[T, T1, T2, T3, T4, T5],
+	b Transacted[T, T1, T2, T3, T4, T5],
 ) bool {
-	if b == nil {
-		return false
-	}
-
-	if !a.Sku.Equals(&b.Sku) {
+	if !a.Sku.Equals(b.Sku) {
 		return false
 	}
 

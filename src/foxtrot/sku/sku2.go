@@ -106,12 +106,8 @@ func (a Sku2) Less(b Sku2) (ok bool) {
 	return
 }
 
-func (a Sku2) Equals(b *Sku2) (ok bool) {
-	if b == nil {
-		return false
-	}
-
-	if a != *b {
+func (a Sku2) Equals(b Sku2) (ok bool) {
+	if a != b {
 		return false
 	}
 

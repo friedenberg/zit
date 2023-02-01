@@ -10,7 +10,7 @@ import (
 )
 
 type HeapElement[T any] interface {
-	Equaler[T]
+	schnittstellen.Equatable[T]
 	Lessor[T]
 }
 
@@ -176,7 +176,7 @@ func (a Heap[T]) Equals(b Heap[T]) bool {
 	}
 
 	for i, av := range a.h {
-		if b.h[i].Equals(&av) {
+		if b.h[i].Equals(av) {
 			return false
 		}
 	}

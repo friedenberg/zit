@@ -194,8 +194,8 @@ func (a Transacted[T, T1]) Less(b *Transacted[T, T1]) (ok bool) {
 	return
 }
 
-func (a Transacted[T, T1]) Equals(b *Transacted[T, T1]) (ok bool) {
-	if !a.TransactionIndex.Equals(&b.TransactionIndex) {
+func (a Transacted[T, T1]) Equals(b Transacted[T, T1]) (ok bool) {
+	if !a.TransactionIndex.Equals(b.TransactionIndex) {
 		return
 	}
 
