@@ -12,10 +12,12 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/tridex"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
 type AbbrStore interface {
+	HinweisExists(kennung.Hinweis) error
 	ExpandShaString(string) (sha.Sha, error)
 	ExpandEtikettString(string) (kennung.Etikett, error)
 	ExpandHinweisString(string) (kennung.Hinweis, error)
@@ -47,7 +49,7 @@ type indexAbbr struct {
 func newIndexAbbr(
 	suv StoreUtilVerzeichnisse,
 	p string,
-) (i *indexAbbr, err error) {
+) (i AbbrStore, err error) {
 	i = &indexAbbr{
 		lock:                   &sync.Mutex{},
 		path:                   p,
@@ -186,6 +188,25 @@ func (i *indexAbbr) ExpandShaString(st string) (s sha.Sha, err error) {
 
 	if err = s.Set(expanded); err != nil {
 		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (i *indexAbbr) HinweisExists(h kennung.Hinweis) (err error) {
+	if err = i.readIfNecessary(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if !i.indexAbbrEncodableTridexes.HinweisKopfen.ContainsExactly(h.Kopf()) {
+		err = objekte_store.ErrNotFound{Id: h}
+		return
+	}
+
+	if !i.indexAbbrEncodableTridexes.HinweisSchwanzen.ContainsExactly(h.Schwanz()) {
+		err = objekte_store.ErrNotFound{Id: h}
 		return
 	}
 

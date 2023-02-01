@@ -2,6 +2,8 @@ package objekte_store
 
 import (
 	"fmt"
+
+	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
 type ErrLockRequired struct {
@@ -18,6 +20,11 @@ func (e ErrLockRequired) Error() string {
 		"lock required for operation: %q",
 		e.Operation,
 	)
+}
+
+func IsNotFound(err error) (ok bool) {
+	ok = errors.Is(err, ErrNotFound{})
+	return
 }
 
 type ErrNotFound struct {

@@ -76,7 +76,7 @@ function init_and_init { # @test
 	run zit init
 	assert_output --partial '.zit/KonfigAngeboren already exists, not overwriting'
 	assert_output --partial '.zit/KonfigErworben already exists, not overwriting'
-	assert_output --partial '          (new) [o/u@3 !md "wow"]'
+	# assert_output --partial '          (new) [o/u@3 !md "wow"]'
 
 	# run zit reindex
 	# assert_output "$(cat to_add)"

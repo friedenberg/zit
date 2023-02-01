@@ -52,7 +52,7 @@ type common struct {
 	standort         standort.Standort
 	transaktion      transaktion.Transaktion
 	bestandsaufnahme *bestandsaufnahme.Objekte
-	Abbr             *indexAbbr
+	Abbr             AbbrStore
 
 	bestandsaufnahmeStore bestandsaufnahme.Store
 	kennungIndex          kennung_index.Index

@@ -487,13 +487,14 @@ func (s *zettelStore) Inherit(tz *zettel.Transacted) (err error) {
 
 	s.StoreUtil.CommitTransacted(tz)
 
+	errExists := s.StoreUtil.GetAbbrStore().HinweisExists(tz.Sku.Kennung)
+
 	if err = s.writeNamedZettelToIndex(tz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	//TODO-P3 use right verb
-	if err = s.logWriter.New(tz); err != nil {
+	if err = s.logWriter.NewOrUpdated(errExists)(tz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -518,13 +519,14 @@ func (s *zettelStore) reindexOne(
 	}
 
 	o = tz
+	errExists := s.StoreUtil.GetAbbrStore().HinweisExists(tz.Sku.Kennung)
 
 	if err = s.writeNamedZettelToIndex(tz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = s.logWriter.New(tz); err != nil {
+	if err = s.logWriter.NewOrUpdated(errExists)(tz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
