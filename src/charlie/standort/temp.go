@@ -6,6 +6,15 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
+func (s Standort) ResetTemp() (err error) {
+	if err = os.RemoveAll(s.DirTempLocal()); err != nil {
+		err = errors.Wrapf(err, "failed to remove temp local")
+		return
+	}
+
+	return
+}
+
 func (s Standort) DirTempOS() (d string, err error) {
 	if d, err = os.MkdirTemp("", ""); err != nil {
 		err = errors.Wrap(err)

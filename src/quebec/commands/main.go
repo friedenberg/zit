@@ -115,5 +115,12 @@ func Run(args []string) (exitStatus int) {
 		}
 	}
 
+	if err == nil {
+		if err = u.Standort().ResetTemp(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
 	return
 }
