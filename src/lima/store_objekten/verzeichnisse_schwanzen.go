@@ -75,7 +75,7 @@ func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 		return
 	}
 
-	if err = p.WriteZettelenTo(w); err != nil {
+	if _, err = p.Copy(w); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

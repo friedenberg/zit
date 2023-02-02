@@ -14,7 +14,7 @@ import (
 )
 
 type Page struct {
-	sync.Locker
+	lock *sync.Mutex
 	pageId
 	ioFactory
 	pool        *collections.Pool[zettel.Transacted, *zettel.Transacted]
@@ -36,7 +36,7 @@ func makeZettelenPage(
 	}
 
 	p = &Page{
-		Locker:      &sync.Mutex{},
+		lock:        &sync.Mutex{},
 		ioFactory:   iof,
 		pageId:      pid,
 		pool:        pool,
@@ -45,18 +45,6 @@ func makeZettelenPage(
 	}
 
 	return
-}
-
-func (zp *Page) getState() State {
-	zp.Lock()
-	defer zp.Unlock()
-	return zp.State
-}
-
-func (zp *Page) setState(v State) {
-	zp.Lock()
-	defer zp.Unlock()
-	zp.State = v
 }
 
 func (zp *Page) Add(z *zettel.Transacted) (err error) {
@@ -76,8 +64,8 @@ func (zp *Page) Add(z *zettel.Transacted) (err error) {
 		return
 	}
 
-	zp.Lock()
-	defer zp.Unlock()
+	zp.lock.Lock()
+	defer zp.lock.Unlock()
 
 	zp.added.Add(*z)
 	zp.State = StateChanged
@@ -86,12 +74,12 @@ func (zp *Page) Add(z *zettel.Transacted) (err error) {
 }
 
 func (zp *Page) Flush() (err error) {
-	if zp.getState() < StateChanged {
+	zp.lock.Lock()
+	defer zp.lock.Unlock()
+
+	if zp.State < StateChanged {
 		return
 	}
-
-	zp.Lock()
-	defer zp.Unlock()
 
 	errors.Log().Printf("flushing page: %s", zp.path)
 
@@ -102,22 +90,13 @@ func (zp *Page) Flush() (err error) {
 		return
 	}
 
-	defer errors.Deferred(&err, w.Close)
+	defer errors.DeferredCloser(&err, w)
 
 	w1 := bufio.NewWriter(w)
 
-	defer errors.Deferred(&err, w1.Flush)
+	defer errors.DeferredFlusher(&err, w1)
 
-	if mpr, ok := zp.ioFactory.(PageHeader); ok {
-		wt := mpr.PageHeaderWriterTo(zp.index)
-
-		if _, err = wt.WriteTo(w1); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	if _, err = zp.WriteTo(w1); err != nil {
+	if _, err = zp.writeTo(w1); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -127,92 +106,23 @@ func (zp *Page) Flush() (err error) {
 	return
 }
 
-func (zp *Page) WriteZettelenTo(
-	w collections.WriterFunc[*zettel.Transacted],
-) (err error) {
-	var r io.ReadCloser
-
-	if r, err = zp.ReadCloserVerzeichnisse(zp.path); err != nil {
-		if errors.IsNotExist(err) {
-			r = ioutil.NopCloser(bytes.NewReader(nil))
-			err = nil
-		} else {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	defer errors.Deferred(&err, r.Close)
-
-	r1 := bufio.NewReader(r)
-
-	if mpr, ok := zp.ioFactory.(PageHeader); ok {
-		rf := mpr.PageHeaderReaderFrom(zp.index)
-
-		if _, err = rf.ReadFrom(r1); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	if _, err = zp.Copy(
-		r1,
-		w,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (zp *Page) ReadJustHeader() (err error) {
-	var rf io.ReaderFrom
-
-	if mpr, ok := zp.ioFactory.(PageHeader); ok {
-		rf = mpr.PageHeaderReaderFrom(zp.index)
-	} else {
-		return
-	}
-
-	state := zp.getState()
-	if state <= StateReadHeader {
-		errors.Log().Printf("already read %s", zp.path)
-		return
-	} else {
-		errors.Log().Printf("reading: %s", zp.path)
-	}
-
-	var r io.ReadCloser
-
-	if r, err = zp.ReadCloserVerzeichnisse(zp.path); err != nil {
-		if errors.IsNotExist(err) {
-			err = nil
-		} else {
-			err = errors.Wrap(err)
-		}
-
-		return
-	}
-
-	defer errors.Deferred(&err, r.Close)
-
-	r1 := bufio.NewReader(r)
-
-	if _, err = rf.ReadFrom(r1); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	zp.setState(StateReadHeader)
-
-	return
-}
-
-func (zp *Page) Copy(
-	r1 io.Reader,
+func (zp *Page) copy(
 	w collections.WriterFunc[*zettel.Transacted],
 ) (n int64, err error) {
+	var r1 io.ReadCloser
+
+	if r1, err = zp.ReadCloserVerzeichnisse(zp.path); err != nil {
+		if errors.IsNotExist(err) {
+			r1 = ioutil.NopCloser(bytes.NewReader(nil))
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	defer errors.DeferredCloser(&err, r1)
+
 	r := bufio.NewReader(r1)
 
 	dec := gob.NewDecoder(r)
@@ -333,12 +243,11 @@ func (zp *Page) Copy(
 	return
 }
 
-func (zp *Page) WriteTo(w1 io.Writer) (n int64, err error) {
+func (zp *Page) writeTo(w1 io.Writer) (n int64, err error) {
 	w := bufio.NewWriter(w1)
+	defer errors.DeferredFlusher(&err, w)
 
-	defer errors.Deferred(&err, w.Flush)
-
-	if err = zp.WriteZettelenTo(
+	if n, err = zp.copy(
 		collections.MakeChain(
 			zp.flushFilter,
 			zettel.MakeWriterGobEncoder(w).WriteZettelVerzeichnisse,
@@ -349,4 +258,32 @@ func (zp *Page) WriteTo(w1 io.Writer) (n int64, err error) {
 	}
 
 	return
+}
+
+func (zp *Page) Copy(
+	w collections.WriterFunc[*zettel.Transacted],
+) (n int64, err error) {
+	acquired := zp.lock.TryLock()
+
+	if !acquired {
+		err = MakeErrConcurrentPageAccess()
+		return
+	}
+
+	defer zp.lock.Unlock()
+
+	return zp.copy(w)
+}
+
+func (zp *Page) WriteTo(w1 io.Writer) (n int64, err error) {
+	acquired := zp.lock.TryLock()
+
+	if !acquired {
+		err = MakeErrConcurrentPageAccess()
+		return
+	}
+
+	defer zp.lock.Unlock()
+
+	return zp.writeTo(w1)
 }

@@ -54,6 +54,7 @@ func MakeZettelen(
 }
 
 func (i Zettelen) Pool() *collections.Pool[zettel.Transacted, *zettel.Transacted] {
+	errors.TodoP4("rename to GetPool")
 	return i.pool
 }
 
@@ -166,7 +167,7 @@ func (i *Zettelen) ReadMany(
 
 				var err1 error
 
-				if err1 = p.WriteZettelenTo(w); err1 != nil {
+				if _, err1 = p.Copy(w); err1 != nil {
 					if isDone() {
 						break
 					}

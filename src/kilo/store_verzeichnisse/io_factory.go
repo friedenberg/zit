@@ -1,8 +1,6 @@
 package store_verzeichnisse
 
 import (
-	"io"
-
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/juliett/zettel"
@@ -18,11 +16,6 @@ type writeCloserFactory interface {
 
 type ZettelTransactedWriterGetter interface {
 	ZettelTransactedWriter(int) collections.WriterFunc[*zettel.Transacted]
-}
-
-type PageHeader interface {
-	PageHeaderReaderFrom(int) io.ReaderFrom
-	PageHeaderWriterTo(int) io.WriterTo
 }
 
 type ioFactory interface {
