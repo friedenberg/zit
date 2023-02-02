@@ -8,11 +8,11 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/kennung_index"
 	"github.com/friedenberg/zit/src/india/konfig"
 )
 
 func init() {
-	errors.TodoP0("add typen expanded sorted")
 	errors.TodoP0("add hidden")
 }
 
@@ -21,6 +21,7 @@ type Verzeichnisse struct {
 	// Etiketten               tridex.Tridex
 	EtikettenExpandedSorted []string
 	EtikettenSorted         []string
+	Typ                     kennung_index.TypVerzeichnisse
 	// Hidden bool
 }
 
@@ -30,6 +31,8 @@ func (z *Verzeichnisse) ResetWithObjekte(z1 Objekte) {
 	ex := kennung.Expanded(z1.Etiketten, kennung.ExpanderAll)
 	z.EtikettenExpandedSorted = ex.SortedString()
 	z.EtikettenSorted = z1.Etiketten.SortedString()
+
+	z.Typ.ResetWithTyp(z1.Typ)
 }
 
 func (z *Verzeichnisse) Reset() {
@@ -40,6 +43,8 @@ func (z *Verzeichnisse) Reset() {
 
 	z.EtikettenExpandedSorted = z.EtikettenExpandedSorted[:0]
 	z.EtikettenSorted = z.EtikettenExpandedSorted[:0]
+
+	z.Typ.Reset()
 }
 
 func (z *Verzeichnisse) ResetWith(z1 Verzeichnisse) {
@@ -51,8 +56,11 @@ func (z *Verzeichnisse) ResetWith(z1 Verzeichnisse) {
 
 	z.EtikettenSorted = make([]string, len(z1.EtikettenSorted))
 	copy(z.EtikettenSorted, z1.EtikettenSorted)
+
+	z.Typ.ResetWith(z1.Typ)
 }
 
+// TODO-P1 remove and make transform func in collections
 type writerGobEncoder struct {
 	enc *gob.Encoder
 }

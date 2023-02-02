@@ -42,6 +42,7 @@ func (w *Writer) zettelToItem(
 	mb.AddMatches(z.Objekte.Bezeichnung.String())
 	mb.AddMatches(z.Objekte.Typ.String())
 	mb.AddMatches(z.Verzeichnisse.EtikettenExpandedSorted...)
+	mb.AddMatches(z.Verzeichnisse.Typ.Expanded...)
 
 	// if ha != nil {
 	// 	var h hinweis.Hinweis
