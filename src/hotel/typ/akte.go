@@ -9,6 +9,7 @@ import (
 
 type Akte struct {
 	InlineAkte    bool                        `toml:"inline-akte,omitempty"`
+	Archived      bool                        `toml:"archived,omitempty"`
 	FileExtension string                      `toml:"file-extension,omitempty"`
 	ExecCommand   *script_config.ScriptConfig `toml:"exec-command,omitempty"`
 	VimSyntaxType string                      `toml:"vim-syntax-type"`
@@ -20,6 +21,7 @@ type Akte struct {
 }
 
 func (a *Akte) Reset() {
+	a.Archived = false
 	a.InlineAkte = true
 	a.FileExtension = ""
 	a.ExecCommand = nil
@@ -33,6 +35,7 @@ func (a *Akte) Reset() {
 
 func (a *Akte) ResetWith(b Akte) {
 	a.InlineAkte = b.InlineAkte
+	a.Archived = b.Archived
 	a.FileExtension = b.FileExtension
 	a.ExecCommand = b.ExecCommand
 	a.VimSyntaxType = b.VimSyntaxType
@@ -44,8 +47,8 @@ func (a *Akte) ResetWith(b Akte) {
 	a.EtikettenRules = b.EtikettenRules
 }
 
-func (a *Akte) Equals(b *Akte) bool {
-	if b == nil || a == nil {
+func (a Akte) Equals(b Akte) bool {
+	if a.Archived != b.Archived {
 		return false
 	}
 
@@ -132,7 +135,8 @@ func (a *Akte) Equals(b *Akte) bool {
 	return true
 }
 
-func (a *Akte) Apply(b *Akte) {
+func (a *Akte) Apply(b Akte) {
+	a.Archived = b.Archived
 	a.InlineAkte = b.InlineAkte
 	a.FileExtension = b.FileExtension
 

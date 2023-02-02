@@ -365,57 +365,61 @@ func (s *Store) Reindex() (err error) {
 
 	f1 := s.getReindexFunc()
 
-	if s.StoreUtil.GetKonfig().UseBestandsaufnahme {
-		f := func(t *bestandsaufnahme.Objekte) (err error) {
-			if err = t.Akte.Skus.Each(
-				func(sk sku.Sku2) (err error) {
-					return f1(sk)
-				},
-			); err != nil {
-				err = errors.Wrapf(
-					err,
-					"Bestandsaufnahme: %s",
-					t.Tai,
-				)
+	// if s.StoreUtil.GetKonfig().UseBestandsaufnahme {
+	// } else {
+	f := func(t *transaktion.Transaktion) (err error) {
+		errors.Out().Printf("%s/%s: %s", t.Time.Kopf(), t.Time.Schwanz(), t.Time)
 
-				return
-			}
+		if err = t.Skus.Each(
+			func(sk sku.SkuLike) (err error) {
+				return f1(sk)
+			},
+		); err != nil {
+			err = errors.Wrapf(
+				err,
+				"Transaktion: %s/%s: %s",
+				t.Time.Kopf(),
+				t.Time.Schwanz(),
+				t.Time,
+			)
 
 			return
 		}
 
-		if err = s.GetBestandsaufnahmeStore().ReadAll(f); err != nil {
+		return
+	}
+
+	if err = s.GetTransaktionStore().ReadAllTransaktions(f); err != nil {
+		if errors.IsNotExist(err) {
+			err = nil
+		} else {
 			err = errors.Wrap(err)
 			return
 		}
-	} else {
-		f := func(t *transaktion.Transaktion) (err error) {
-			errors.Out().Printf("%s/%s: %s", t.Time.Kopf(), t.Time.Schwanz(), t.Time)
+	}
 
-			if err = t.Skus.Each(
-				func(sk sku.SkuLike) (err error) {
-					return f1(sk)
-				},
-			); err != nil {
-				err = errors.Wrapf(
-					err,
-					"Transaktion: %s/%s: %s",
-					t.Time.Kopf(),
-					t.Time.Schwanz(),
-					t.Time,
-				)
+	// }
 
-				return
-			}
+	f2 := func(t *bestandsaufnahme.Objekte) (err error) {
+		if err = t.Akte.Skus.Each(
+			func(sk sku.Sku2) (err error) {
+				return f1(sk)
+			},
+		); err != nil {
+			err = errors.Wrapf(
+				err,
+				"Bestandsaufnahme: %s",
+				t.Tai,
+			)
 
 			return
 		}
 
-		if err = s.GetTransaktionStore().ReadAllTransaktions(f); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+		return
+	}
 
+	if err = s.GetBestandsaufnahmeStore().ReadAll(f2); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 

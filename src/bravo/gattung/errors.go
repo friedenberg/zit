@@ -10,6 +10,19 @@ var (
 	ErrNoAbbreviation     = errors.New("no abbreviation")
 )
 
+type ErrUnrecognizedGattung struct {
+  string
+}
+
+func (e ErrUnrecognizedGattung) Is(target error) (ok bool) {
+	_, ok = target.(ErrUnrecognizedGattung)
+	return
+}
+
+func (e ErrUnrecognizedGattung) Error() string {
+	return fmt.Sprintf("unknown gattung: %q", e.string)
+}
+
 type ErrWrongType struct {
 	ExpectedType, ActualType Gattung
 }

@@ -44,7 +44,30 @@ func (sk *Sku2) Set(line string) (err error) {
 		sk.ObjekteSha.Set,
 		sk.AkteSha.Set,
 	); err != nil {
-		err = errors.Wrap(err)
+		if errors.Is(err, gattung.ErrUnrecognizedGattung{}) {
+			err = sk.setOld(line)
+		} else {
+			err = errors.Wrapf(err, "Sku2: %s", line)
+		}
+
+		return
+	}
+
+	return
+}
+func (sk *Sku2) setOld(line string) (err error) {
+	r := strings.NewReader(line)
+
+	if _, err = format.ReadSep(
+		' ',
+		r,
+		sk.Gattung.Set,
+		sk.Tai.Set,
+		sk.Kennung.Set,
+		sk.ObjekteSha.Set,
+		sk.AkteSha.Set,
+	); err != nil {
+		err = errors.Wrapf(err, "Sku2: %s", line)
 		return
 	}
 

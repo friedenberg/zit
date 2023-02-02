@@ -6,9 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/ts"
@@ -22,17 +20,16 @@ import (
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
-type Show struct {
+type Diff struct {
 	GattungSet gattungen.MutableSet
 	Format     string
-	All        bool
 }
 
 func init() {
 	registerCommand(
-		"show",
+		"diff",
 		func(f *flag.FlagSet) Command {
-			c := &Show{
+			c := &Diff{
 				GattungSet: gattungen.MakeMutableSet(gattung.Zettel),
 			}
 
@@ -43,7 +40,6 @@ func init() {
 
 			f.Var(gsvs, "gattung", "Gattung")
 			f.StringVar(&c.Format, "format", "text", "format")
-			f.BoolVar(&c.All, "all", false, "show all Objekten")
 
 			cwi := commandWithIds{
 				CommandWithIds: c,
@@ -57,7 +53,7 @@ func init() {
 	)
 }
 
-func (c Show) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
+func (c Diff) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 	is = id_set.MakeProtoIdSet()
 
 	if c.GattungSet.Contains(gattung.Zettel) {
@@ -65,9 +61,9 @@ func (c Show) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 			id_set.ProtoId{
 				Setter: kennung.MakeSigil(kennung.SigilNone),
 			},
-			id_set.ProtoId{
-				Setter: &sha.Sha{},
-			},
+			// id_set.ProtoId{
+			// 	Setter: &sha.Sha{},
+			// },
 			id_set.ProtoId{
 				Setter: &kennung.Hinweis{},
 				Expand: func(v string) (out string, err error) {
@@ -89,9 +85,9 @@ func (c Show) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 			id_set.ProtoId{
 				Setter: &kennung.Typ{},
 			},
-			id_set.ProtoId{
-				Setter: &ts.Time{},
-			},
+			// id_set.ProtoId{
+			// 	Setter: &ts.Time{},
+			// },
 		)
 	}
 
@@ -114,13 +110,13 @@ func (c Show) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 	return
 }
 
-func (c Show) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
+func (c Diff) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	if err = c.GattungSet.Each(
 		func(g gattung.Gattung) (err error) {
 			switch g {
 
-			case gattung.Akte:
-				return c.showAkten(u, ids)
+			// case gattung.Akte:
+			// 	return c.showAkten(u, ids)
 
 			case gattung.Zettel:
 				var fv zettel.FormatterValue
@@ -141,59 +137,59 @@ func (c Show) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 					),
 				)
 
-			case gattung.Transaktion:
-				return c.showTransaktions(u, ids)
+			// case gattung.Transaktion:
+			// 	return c.showTransaktions(u, ids)
 
-			case gattung.Typ:
-				var ev typ.FormatterValue
+			// case gattung.Typ:
+			// 	var ev typ.FormatterValue
 
-				if err = ev.Set(c.Format); err != nil {
-					err = errors.Normal(err)
-					return
-				}
+			// 	if err = ev.Set(c.Format); err != nil {
+			// 		err = errors.Normal(err)
+			// 		return
+			// 	}
 
-				return c.showTypen(
-					u,
-					ids,
-					ev.FuncFormatter(
-						u.Out(),
-						u.StoreObjekten(),
-						u.PrinterTypTransacted(format.StringNew),
-					),
-				)
+			// 	return c.showTypen(
+			// 		u,
+			// 		ids,
+			// 		ev.FuncFormatter(
+			// 			u.Out(),
+			// 			u.StoreObjekten(),
+			// 			u.PrinterTypTransacted(format.StringNew),
+			// 		),
+			// 	)
 
-			case gattung.Etikett:
-				var ev etikett.FormatterValue
+			// case gattung.Etikett:
+			// 	var ev etikett.FormatterValue
 
-				if err = ev.Set(c.Format); err != nil {
-					err = errors.Normal(err)
-					return
-				}
+			// 	if err = ev.Set(c.Format); err != nil {
+			// 		err = errors.Normal(err)
+			// 		return
+			// 	}
 
-				return c.showEtiketten(
-					u,
-					ids,
-					ev.FuncFormatter(
-						u.Out(),
-						u.StoreObjekten(),
-					),
-				)
+			// 	return c.showEtiketten(
+			// 		u,
+			// 		ids,
+			// 		ev.FuncFormatter(
+			// 			u.Out(),
+			// 			u.StoreObjekten(),
+			// 		),
+			// 	)
 
-			case gattung.Konfig:
-				var ev erworben.FormatterValue
+			// case gattung.Konfig:
+			// 	var ev erworben.FormatterValue
 
-				if err = ev.Set(c.Format); err != nil {
-					err = errors.Normal(err)
-					return
-				}
+			// 	if err = ev.Set(c.Format); err != nil {
+			// 		err = errors.Normal(err)
+			// 		return
+			// 	}
 
-				return c.showKonfig(
-					u,
-					ev.FuncFormatter(
-						u.Out(),
-						u.StoreObjekten(),
-					),
-				)
+			// 	return c.showKonfig(
+			// 		u,
+			// 		ev.FuncFormatter(
+			// 			u.Out(),
+			// 			u.StoreObjekten(),
+			// 		),
+			// 	)
 
 			default:
 				err = errors.Errorf("unsupported Gattung: %s", g)
@@ -208,15 +204,14 @@ func (c Show) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	return
 }
 
-func (c Show) showZettels(
+func (c Diff) showZettels(
 	u *umwelt.Umwelt,
 	ids id_set.Set,
 	fv collections.WriterFunc[*zettel.Transacted],
 ) (err error) {
 	idFilter := zettel.WriterIds{
 		Filter: id_set.Filter{
-			AllowEmpty: c.All,
-			Set:        ids,
+			Set: ids,
 		},
 	}.WriteZettelTransacted
 
@@ -276,7 +271,7 @@ func (c Show) showZettels(
 }
 
 // TODO-P3 support All
-func (c Show) showAkten(u *umwelt.Umwelt, ids id_set.Set) (err error) {
+func (c Diff) showAkten(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	zettels := make([]*zettel.Transacted, ids.Len())
 
 	for i, is := range ids.AnyShasOrHinweisen() {
@@ -315,7 +310,7 @@ func (c Show) showAkten(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 }
 
 // TODO-P3 support All
-func (c Show) showTransaktions(u *umwelt.Umwelt, ids id_set.Set) (err error) {
+func (c Diff) showTransaktions(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	ids.Timestamps.Copy().Each(
 		func(is ts.Time) (err error) {
 			var t *transaktion.Transaktion
@@ -343,7 +338,7 @@ func (c Show) showTransaktions(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	return
 }
 
-func (c Show) showTypen(
+func (c Diff) showTypen(
 	u *umwelt.Umwelt,
 	ids id_set.Set,
 	f collections.WriterFunc[*typ.Transacted],
@@ -361,8 +356,8 @@ func (c Show) showTypen(
 	if err = method(
 		func(t *typ.Transacted) (err error) {
 			switch {
-			case c.All:
-				fallthrough
+			// case c.All:
+			// 	fallthrough
 
 			case typen.Contains(t.Sku.Kennung):
 				if err = f1(t); err != nil {
@@ -382,7 +377,7 @@ func (c Show) showTypen(
 }
 
 // TODO-P3 support All
-func (c Show) showEtiketten(
+func (c Diff) showEtiketten(
 	u *umwelt.Umwelt,
 	ids id_set.Set,
 	f collections.WriterFunc[*etikett.Transacted],
@@ -415,7 +410,7 @@ func (c Show) showEtiketten(
 	return
 }
 
-func (c Show) showKonfig(
+func (c Diff) showKonfig(
 	u *umwelt.Umwelt,
 	f collections.WriterFunc[*erworben.Transacted],
 ) (err error) {

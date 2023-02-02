@@ -5,9 +5,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/foxtrot/kennung_index"
-	"github.com/friedenberg/zit/src/india/konfig"
 )
 
 func init() {
@@ -55,25 +53,4 @@ func MakeWriterGobEncoder(w io.Writer) writerGobEncoder {
 
 func (w writerGobEncoder) WriteZettelVerzeichnisse(z *Transacted) (err error) {
 	return w.enc.Encode(z)
-}
-
-func MakeWriterKonfig(
-	k konfig.Compiled,
-) collections.WriterFunc[*Transacted] {
-	errors.TodoP3("add efficient parsing of hiding tags")
-
-	if k.IncludeHidden {
-		return collections.MakeWriterNoop[*Transacted]()
-	}
-
-	return func(z *Transacted) (err error) {
-		for _, t := range k.EtikettenHidden {
-			if z.Verzeichnisse.Etiketten.Tridex.Contains(t) {
-				err = collections.MakeErrStopIteration()
-				return
-			}
-		}
-
-		return
-	}
 }

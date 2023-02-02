@@ -26,7 +26,7 @@ func (o Objekte) Equals(o1 Objekte) bool {
 		return false
 	}
 
-	if !o.Akte.Equals(&o1.Akte) {
+	if !o.Akte.Equals(o1.Akte) {
 		return false
 	}
 

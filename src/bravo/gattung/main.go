@@ -139,7 +139,7 @@ func (g *Gattung) Set(v string) (err error) {
 		*g = Bestandsaufnahme
 
 	default:
-		err = errors.Errorf("unknown gattung: %q", v1)
+		err = errors.Wrap(ErrUnrecognizedGattung{string: v1})
 		return
 	}
 

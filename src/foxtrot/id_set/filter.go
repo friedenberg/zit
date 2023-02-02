@@ -22,6 +22,10 @@ type Filter struct {
 
 // TODO-P4 improve the performance of this query
 func (f Filter) Include(e Element) (err error) {
+	if f.Set.Sigil.Contains(kennung.SigilAll) {
+		return
+	}
+
 	ok := false
 
 	//TODO-P3 pull into static

@@ -20,6 +20,7 @@ type Set struct {
 	Typen      kennung.TypMutableSet
 	Timestamps ts.MutableSet
 	HasKonfig  bool
+	Sigil      kennung.Sigil
 	ids        []schnittstellen.Value
 }
 
@@ -54,6 +55,9 @@ func (s *Set) Add(ids ...schnittstellen.Value) {
 
 		case kennung.Konfig:
 			s.HasKonfig = true
+
+		case kennung.Sigil:
+			s.Sigil.Add(it)
 
 		default:
 			s.ids = append(s.ids, it)
