@@ -3,7 +3,6 @@ package zettel
 import (
 	"encoding/gob"
 	"io"
-	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/collections"
@@ -68,12 +67,10 @@ func MakeWriterKonfig(
 	}
 
 	return func(z *Transacted) (err error) {
-		for _, p := range z.Verzeichnisse.Etiketten.Sorted {
-			for _, t := range k.EtikettenHidden {
-				if strings.HasPrefix(p, t) {
-					err = collections.MakeErrStopIteration()
-					return
-				}
+		for _, t := range k.EtikettenHidden {
+			if z.Verzeichnisse.Etiketten.Tridex.Contains(t) {
+				err = collections.MakeErrStopIteration()
+				return
 			}
 		}
 

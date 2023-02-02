@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/gob"
 	"encoding/json"
+	"sort"
 	"strings"
 	"sync"
 
@@ -12,6 +13,7 @@ import (
 
 // TODO-P4 make generic
 // TODO-P4 recycle nodes
+// TODO-P4 confirm JSON structure is correct
 type Tridex struct {
 	lock *sync.RWMutex
 	root node
@@ -34,7 +36,12 @@ func Make(vs ...string) (t *Tridex) {
 		},
 	}
 
-	for _, v := range vs {
+	vs1 := make([]string, len(vs))
+	copy(vs1, vs)
+
+	sort.Slice(vs1, func(i, j int) bool { return len(vs1[i]) > len(vs1[j]) })
+
+	for _, v := range vs1 {
 		t.Add(v)
 	}
 

@@ -376,6 +376,60 @@ func TestRemove(t1 *testing.T) {
 	}
 }
 
+// func TestStructure(t1 *testing.T) {
+// 	t := t(test_logz.T{T: t1})
+
+//   els := []string{
+//     "0",
+//     "12",
+//     "12-22",
+//     "1_day",
+//     "2022",
+//     "2022-12-22",
+//     "22",
+//     "chore",
+//     "pom",
+//     "pom-0",
+//     "urgency",
+//     "urgency-1_day",
+//     "w",
+//     "w-2022",
+//     "w-2022-12",
+//     "w-2022-12-22",
+//   }
+
+// 	makeSut := func() *Tridex {
+// 		return Make(els...)
+// 	}
+
+// 	elements := []string{
+// 		"12",
+// 		"121",
+// 		"127",
+// 		"128",
+// 		"123456",
+// 		"654321",
+// 	}
+
+// 	for i, e := range elements {
+// 		sut := makeSut()
+
+// 		t.assertCount(sut, len(elements))
+
+// 		sut.Remove(e)
+
+// 		t.assertCount(sut, len(elements)-1)
+
+// 		for j, e1 := range elements {
+// 			if j == i {
+// 				t.assertNotContainsExactly(sut, e1)
+// 			} else {
+// 				t.assertContainsExactly(sut, e1)
+// 			}
+// 		}
+// 	}
+// }
+
 // func TestShas(t *testing.T) {
 // 	sut := Make(
 // 		"7a2be8c643edd96b0cce2a1be32de30967a6db1f362047b954401458dd530f",
