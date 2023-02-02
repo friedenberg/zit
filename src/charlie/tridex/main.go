@@ -6,9 +6,12 @@ import (
 	"encoding/json"
 	"strings"
 	"sync"
+
+	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
 // TODO-P4 make generic
+// TODO-P4 recycle nodes
 type Tridex struct {
 	lock *sync.RWMutex
 	root node
@@ -34,6 +37,21 @@ func Make(vs ...string) (t *Tridex) {
 	for _, v := range vs {
 		t.Add(v)
 	}
+
+	return
+}
+
+func (a *Tridex) Copy() (b *Tridex) {
+	errors.TodoP4("improve the performance of this")
+	errors.TodoP4("collections-copy")
+	errors.TodoP4("collections-reset")
+	errors.TodoP4("collections-recycle")
+
+	a.lock.RLock()
+	defer a.lock.RUnlock()
+
+	*b = *a
+	b.root = b.root.Copy()
 
 	return
 }
@@ -98,6 +116,16 @@ func (t *Tridex) Add(v string) {
 	t.root.Add(v)
 }
 
+func (a *node) Copy() (b node) {
+	b = *a
+
+	for i, c := range b.Children {
+		b.Children[i] = c.Copy()
+	}
+
+	return
+}
+
 func (n *node) Add(v string) {
 	if len(v) == 0 {
 		n.IncludesTerminus = true
@@ -132,7 +160,6 @@ func (n *node) Add(v string) {
 }
 
 func (n *node) Remove(v string) {
-
 	if v == "" {
 		n.Count -= 1
 		n.IncludesTerminus = false

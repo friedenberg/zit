@@ -22,13 +22,13 @@ func (w *Writer) zettelToItem(
 		a.Title = z.Kennung().String()
 		a.Subtitle = fmt.Sprintf(
 			"%s",
-			strings.Join(z.Verzeichnisse.EtikettenSorted, ", "),
+			strings.Join(z.Verzeichnisse.Etiketten.Sorted, ", "),
 		)
 	} else {
 		a.Subtitle = fmt.Sprintf(
 			"%s: %s",
 			z.Kennung().String(),
-			strings.Join(z.Verzeichnisse.EtikettenSorted, ", "),
+			strings.Join(z.Verzeichnisse.Etiketten.Sorted, ", "),
 		)
 	}
 
@@ -41,7 +41,7 @@ func (w *Writer) zettelToItem(
 	mb.AddMatches(z.Kennung().Schwanz())
 	mb.AddMatches(z.Objekte.Bezeichnung.String())
 	mb.AddMatches(z.Objekte.Typ.String())
-	mb.AddMatches(z.Verzeichnisse.EtikettenExpandedSorted...)
+	mb.AddMatches(z.Verzeichnisse.Etiketten.SortedExpanded...)
 	mb.AddMatches(z.Verzeichnisse.Typ.Expanded...)
 
 	// if ha != nil {
