@@ -1,7 +1,6 @@
 package konfig
 
 import (
-	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/hotel/typ"
 )
 
@@ -28,14 +27,5 @@ func (a ApproximatedTyp) ApproximatedOrActual() *typ.Transacted {
 		return nil
 	}
 
-	return &a.typ
-}
-
-func (a ApproximatedTyp) Unwrap() *typ.Transacted {
-	if !a.hasValue {
-		return nil
-	}
-
-	errors.TodoP0("replace with ApproximatedOrActual")
 	return &a.typ
 }

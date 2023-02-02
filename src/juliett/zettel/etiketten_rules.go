@@ -21,7 +21,13 @@ func (z *Objekte) ApplyKonfig(k konfig.Compiled) (err error) {
 		return
 	}
 
-	for e, r := range tk.Unwrap().Objekte.Akte.EtikettenRules {
+	t := tk.ApproximatedOrActual()
+
+	if t == nil {
+		return
+	}
+
+	for e, r := range t.Objekte.Akte.EtikettenRules {
 		var e1 kennung.Etikett
 
 		if e1, err = kennung.MakeEtikett(e); err != nil {

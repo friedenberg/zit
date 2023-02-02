@@ -118,10 +118,10 @@ func (c Make) getZettel(
 
 	typ := tz.Objekte.Typ
 
-	typKonfig := u.Konfig().GetApproximatedTyp(typ)
+	typKonfig := u.Konfig().GetApproximatedTyp(typ).ApproximatedOrActual()
 
-	if typKonfig.HasValue() {
-		executor = typKonfig.Unwrap().Objekte.Akte.ExecCommand
+	if typKonfig != nil {
+		executor = typKonfig.Objekte.Akte.ExecCommand
 	} else {
 		err = errors.Normal(errors.Errorf("Typ does not have an exec-command set: %s", typ))
 		return

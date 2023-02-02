@@ -42,7 +42,6 @@ func makeVerzeichnisseSchwanzen(
 func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 	h kennung.Hinweis,
 ) (tz *zettel.Transacted, err error) {
-	errors.TodoP0("add support for reading hinweis schwanzen while reindexing without clobbering")
 	var n int
 
 	if n, err = s.Zettelen.PageForHinweis(h); err != nil {

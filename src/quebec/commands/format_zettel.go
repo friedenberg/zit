@@ -64,24 +64,24 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	typKonfig := u.Konfig().GetApproximatedTyp(zt.Objekte.Typ)
+	typKonfig := u.Konfig().GetApproximatedTyp(zt.Objekte.Typ).ApproximatedOrActual()
 
 	var akteFormatter script_config.ScriptConfig
 
-	if typKonfig.HasValue() {
+	if typKonfig != nil {
 		actualFormatId := formatId
 		var f script_config.WithOutputFormat
 		ok := false
 
 		if c.UTIGroup != "" {
-			if g, ok := typKonfig.Unwrap().Objekte.Akte.FormatterUTIGroups[c.UTIGroup]; ok {
+			if g, ok := typKonfig.Objekte.Akte.FormatterUTIGroups[c.UTIGroup]; ok {
 				if ft, ok := g.Map()[formatId]; ok {
 					actualFormatId = ft
 				}
 			}
 		}
 
-		f, ok = typKonfig.Unwrap().Objekte.Akte.Formatters[actualFormatId]
+		f, ok = typKonfig.Objekte.Akte.Formatters[actualFormatId]
 
 		if ok {
 			akteFormatter = f.ScriptConfig

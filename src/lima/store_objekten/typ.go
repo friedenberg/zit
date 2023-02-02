@@ -279,14 +279,13 @@ func (s typStore) ReadOne(
 	k *kennung.Typ,
 ) (tt *typ.Transacted, err error) {
 	errors.TodoP3("add support for working directory")
-	at := s.StoreUtil.GetKonfig().GetApproximatedTyp(*k)
+	errors.TodoP3("inherited-typen-etiketten")
+	tt = s.StoreUtil.GetKonfig().GetApproximatedTyp(*k).ActualOrNil()
 
-	if !at.HasValue() {
+	if tt == nil {
 		err = errors.Wrap(objekte_store.ErrNotFound{Id: k})
 		return
 	}
-
-	tt = at.Unwrap()
 
 	return
 }

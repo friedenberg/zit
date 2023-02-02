@@ -31,12 +31,13 @@ func (e formatterTypActionNames) Format(
 	e1 := typ.MakeFormatterActionNames()
 
 	ct := e.erworben.GetApproximatedTyp(c.Zettel.Typ)
+	t := ct.ApproximatedOrActual()
 
-	if !ct.HasValue() {
+	if t == nil {
 		return
 	}
 
-	if n, err = e1.Format(w, ct.Unwrap()); err != nil {
+	if n, err = e1.Format(w, t); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

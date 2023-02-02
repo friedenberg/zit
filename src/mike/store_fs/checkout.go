@@ -127,12 +127,12 @@ func (s *Store) CheckoutOne(
 	if !inlineAkte && options.CheckoutMode.IncludesAkte() {
 		t := sz.Objekte.Typ
 
-		ty := s.erworben.GetApproximatedTyp(t)
+		ty := s.erworben.GetApproximatedTyp(t).ApproximatedOrActual()
 
 		var fe string
 
-		if ty.HasValue() {
-			fe = ty.Unwrap().Objekte.Akte.FileExtension
+		if ty != nil {
+			fe = ty.Objekte.Akte.FileExtension
 		}
 
 		if fe == "" {
