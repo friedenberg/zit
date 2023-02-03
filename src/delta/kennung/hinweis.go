@@ -32,6 +32,8 @@ func NewHinweisEmpty() (h Hinweis) {
 	return
 }
 
+//TODO-P0 merge into Kennung
+
 //TODO is this really necessary?;w
 
 func NewHinweis(i coordinates.Int, pl Provider, pr Provider) (h Hinweis, err error) {
@@ -86,6 +88,11 @@ func MakeHinweis(v string) (h Hinweis, err error) {
 		return
 	}
 
+	return
+}
+
+func (a Hinweis) GetSigil() (s Sigil) {
+	errors.TodoP4("remove")
 	return
 }
 

@@ -232,7 +232,7 @@ func (s *Store) ReadOne(h kennung.Hinweis) (zt *zettel.Transacted, err error) {
 		return
 	}
 
-	if !s.erworben.IncludeCwd {
+	if !h.GetSigil().IncludesCwd() && !s.erworben.IncludeCwd {
 		return
 	}
 

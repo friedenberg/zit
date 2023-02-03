@@ -25,6 +25,7 @@ type KennungLikePtr[T schnittstellen.Value] interface {
 
 type Kennung[T KennungLike[T], T1 KennungLikePtr[T]] struct {
 	value T
+	sigil Sigil
 }
 
 func makeKennung[T KennungLike[T], T1 KennungLikePtr[T]](
@@ -67,7 +68,34 @@ func (e *Kennung[T, T1]) Set(v string) (err error) {
 		return
 	}
 
+	nonSigil := strings.FieldsFunc(
+		v3,
+		func(c rune) (ok bool) {
+			_, ok = sigilMap[c]
+			return
+		},
+	)
+
+	if len(nonSigil) != 1 {
+		err = errors.Errorf("invalid sigil format: %q", nonSigil)
+		return
+	}
+
+	sigil := nonSigil[0][len(v3):]
+	v3 = nonSigil[0]
+
+	if sigil != "" {
+		if err = e.sigil.Set(sigil); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
 	return T1(&e.value).Set(v3)
+}
+
+func (e Kennung[T, T1]) GetSigil() Sigil {
+	return e.sigil
 }
 
 func (e Kennung[T, T1]) Len() int {
@@ -89,14 +117,16 @@ func (a Kennung[T, T1]) Contains(b Kennung[T, T1]) bool {
 func (a Kennung[T, T1]) Reset() {
 	var a1 T
 	a.value = a1
+	a.sigil = SigilNone
 }
 
 func (a Kennung[T, T1]) ResetWith(b Kennung[T, T1]) {
 	a.value = b.value
+	a.sigil = b.sigil
 }
 
 func (a Kennung[T, T1]) Equals(b Kennung[T, T1]) bool {
-	return a.value.Equals(b.value)
+	return a.value.Equals(b.value) && a.sigil.Equals(b.sigil)
 }
 
 func (a Kennung[T, T1]) Less(b Kennung[T, T1]) bool {
