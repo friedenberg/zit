@@ -65,6 +65,13 @@ func (op ReadCheckedOut) RunMany(
 			}
 		}
 
+		defer func() {
+			if e := recover(); e != nil {
+				errors.Err().Printf("Path: %s", p)
+        panic(e)
+			}
+		}()
+
 		if checked_out, err = readFunc(); err != nil {
 			//TODO-P3 decide if error handling like this is ok
 			if errors.Is(err, hinweisen.ErrDoesNotExist{}) {

@@ -162,8 +162,7 @@ func (c CatAlfred) catZettelen(
 			wk,
 			zettel.WriterIds{
 				Filter: id_set.Filter{
-					Set:        ids,
-					AllowEmpty: true,
+					Set: ids,
 				},
 			}.WriteZettelTransacted,
 			aw.WriteZettelVerzeichnisse,

@@ -19,7 +19,6 @@ import (
 type Clone struct {
 	Einleitung umwelt.Einleitung
 	GattungSet gattungen.MutableSet
-	All        bool
 }
 
 func init() {
@@ -39,7 +38,6 @@ func init() {
 			}
 
 			f.Var(gsvs, "gattung", "Gattung")
-			f.BoolVar(&c.All, "all", false, "pull all Objekten")
 			c.Einleitung.AddToFlags(f)
 
 			return c
@@ -99,15 +97,9 @@ func (c Clone) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	if len(args) > 1 {
 		args = args[1:]
-
-		if c.All {
-			errors.Log().Print("-all is set but arguments passed in. Ignore -all.")
-		}
-	} else if !c.All {
-		err = errors.Normalf("Refusing to clone all unless -all is set.")
-		return
 	} else {
-		args = []string{}
+		err = errors.Normalf("Nothing to clone.")
+		return
 	}
 
 	if err = u.Einleitung(c.Einleitung); err != nil {
@@ -125,8 +117,7 @@ func (c Clone) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	filter := id_set.Filter{
-		AllowEmpty: c.All,
-		Set:        ids,
+		Set: ids,
 	}
 
 	if err = u.Lock(); err != nil {

@@ -15,7 +15,6 @@ import (
 
 type Push struct {
 	gattung.Gattung
-	All bool
 }
 
 func init() {
@@ -27,7 +26,6 @@ func init() {
 			}
 
 			f.Var(&c.Gattung, "gattung", "Gattung")
-			f.BoolVar(&c.All, "all", false, "push all Objekten")
 
 			return c
 		},
@@ -96,15 +94,9 @@ func (c Push) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	if len(args) > 1 {
 		args = args[1:]
-
-		if c.All {
-			errors.Log().Print("-all is set but arguments passed in. Ignore -all.")
-		}
-	} else if !c.All {
-		err = errors.Normalf("Refusing to push all unless -all is set.")
-		return
 	} else {
-		args = []string{}
+		err = errors.Normalf("Nothing to push.")
+		return
 	}
 
 	ps := c.ProtoIdSet(u)
@@ -117,8 +109,7 @@ func (c Push) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	filter := id_set.Filter{
-		AllowEmpty: c.All,
-		Set:        ids,
+		Set: ids,
 	}
 
 	if err = u.Lock(); err != nil {

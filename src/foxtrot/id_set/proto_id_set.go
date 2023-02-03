@@ -3,10 +3,12 @@ package id_set
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
 type ProtoIdSet struct {
-	types []protoId
+	types  []protoId
+	always []protoId
 }
 
 func MakeProtoIdSet(types ...ProtoId) (ps ProtoIdSet) {
@@ -14,6 +16,14 @@ func MakeProtoIdSet(types ...ProtoId) (ps ProtoIdSet) {
 
 	for _, t := range types {
 		ps.Add(t)
+	}
+
+	ps.always = []protoId{
+		makeProtoId(
+			ProtoId{
+				Setter: kennung.MakeSigil(kennung.SigilNone),
+			},
+		),
 	}
 
 	return
@@ -47,11 +57,28 @@ func (ps ProtoIdSet) Contains(i schnittstellen.Setter) (ok bool) {
 		}
 	}
 
+	for _, i1 := range ps.always {
+		if i1.Type == i2.Type {
+			ok = true
+			break
+		}
+	}
+
 	return
 }
 
 func (ps ProtoIdSet) MakeOne(v string) (i schnittstellen.Value, err error) {
 	for _, t := range ps.types {
+		if i, err = t.Make(v); err == nil {
+			break
+		}
+	}
+
+	if i != nil && err == nil {
+		return
+	}
+
+	for _, t := range ps.always {
 		if i, err = t.Make(v); err == nil {
 			break
 		}

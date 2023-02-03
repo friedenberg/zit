@@ -89,7 +89,7 @@ function pull { # @test
 
 	cd "$wd1" || exit 1
 
-	run zit pull -abbreviate-hinweisen=false -all "$wd"
+	run zit pull -abbreviate-hinweisen=false "$wd" !
 	assert_output '          (new) [one/uno@11 !md "to_add.md"]'
 
 	run zit show one/uno
@@ -100,6 +100,6 @@ function pull { # @test
 	run zit show one/uno
 	assert_output "$(cat "$expected")"
 
-	run zit pull -abbreviate-hinweisen=false -all "$wd"
+	run zit pull -abbreviate-hinweisen=false "$wd" !
 	assert_output ''
 }

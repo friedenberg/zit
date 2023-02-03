@@ -25,7 +25,6 @@ import (
 type Show struct {
 	GattungSet gattungen.MutableSet
 	Format     string
-	All        bool
 }
 
 func init() {
@@ -43,7 +42,6 @@ func init() {
 
 			f.Var(gsvs, "gattung", "Gattung")
 			f.StringVar(&c.Format, "format", "text", "format")
-			f.BoolVar(&c.All, "all", false, "show all Objekten")
 
 			cwi := commandWithIds{
 				CommandWithIds: c,
@@ -62,9 +60,6 @@ func (c Show) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 
 	if c.GattungSet.Contains(gattung.Zettel) {
 		is.AddMany(
-			id_set.ProtoId{
-				Setter: kennung.MakeSigil(kennung.SigilNone),
-			},
 			id_set.ProtoId{
 				Setter: &sha.Sha{},
 			},
@@ -215,8 +210,7 @@ func (c Show) showZettels(
 ) (err error) {
 	idFilter := zettel.WriterIds{
 		Filter: id_set.Filter{
-			AllowEmpty: c.All,
-			Set:        ids,
+			Set: ids,
 		},
 	}.WriteZettelTransacted
 
@@ -354,14 +348,14 @@ func (c Show) showTypen(
 
 	method := u.StoreObjekten().Typ().ReadAllSchwanzen
 
-	if u.Konfig().IncludeHistory {
+	if ids.Sigil.IncludesHistory() {
 		method = u.StoreObjekten().Typ().ReadAll
 	}
 
 	if err = method(
 		func(t *typ.Transacted) (err error) {
 			switch {
-			case c.All:
+			case ids.Sigil.IncludesAll():
 				fallthrough
 
 			case typen.Contains(t.Sku.Kennung):

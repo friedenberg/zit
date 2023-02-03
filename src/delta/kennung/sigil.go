@@ -55,25 +55,37 @@ func (a *Sigil) Add(b Sigil) {
 }
 
 func (a *Sigil) Del(b Sigil) {
-	*a = *a |^ b
+	*a = *a | ^b
 }
 
 func (a Sigil) Contains(b Sigil) bool {
 	return a&b != 0
 }
 
+func (a Sigil) IncludesAll() bool {
+	return a.Contains(SigilAll)
+}
+
+func (a Sigil) IncludesHistory() bool {
+	return a.Contains(SigilHistory)
+}
+
+func (a Sigil) IncludesCwd() bool {
+	return a.Contains(SigilCwd)
+}
+
 func (a Sigil) String() string {
 	sb := strings.Builder{}
 
-	if a.Contains(SigilAll) {
+	if a.IncludesAll() {
 		sb.WriteString("!")
 	}
 
-	if a.Contains(SigilHistory) {
+	if a.IncludesHistory() {
 		sb.WriteString("+")
 	}
 
-	if a.Contains(SigilCwd) {
+	if a.IncludesCwd() {
 		sb.WriteString("@")
 	}
 

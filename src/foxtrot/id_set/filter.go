@@ -15,9 +15,8 @@ type Element interface {
 }
 
 type Filter struct {
-	Set        Set
-	AllowEmpty bool
-	Or         bool
+	Set Set
+	Or  bool
 }
 
 // TODO-P4 improve the performance of this query
@@ -87,9 +86,6 @@ LOOP:
 	isEmpty := !needsHin && !needsTyp && !needsEt && !needsSha
 
 	switch {
-	case isEmpty && f.AllowEmpty:
-		ok = true
-
 	case isEmpty:
 		ok = false
 
