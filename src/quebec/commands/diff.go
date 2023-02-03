@@ -220,7 +220,7 @@ func (c Diff) showZettels(
 
 	filter := idFilter
 
-	if u.Konfig().IncludeHistory {
+	if ids.Sigil.IncludesHistory() {
 		method = u.StoreWorkingDirectory().ReadManyHistory
 		// method = u.StoreObjekten().Zettel().ReadAll
 		hinweisen := kennung.MakeHinweisMutableSet()
@@ -349,7 +349,7 @@ func (c Diff) showTypen(
 
 	method := u.StoreObjekten().Typ().ReadAllSchwanzen
 
-	if u.Konfig().IncludeHistory {
+	if ids.Sigil.IncludesHistory() {
 		method = u.StoreObjekten().Typ().ReadAll
 	}
 

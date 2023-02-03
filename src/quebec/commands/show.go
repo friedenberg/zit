@@ -219,7 +219,7 @@ func (c Show) showZettels(
 
 	filter := idFilter
 
-	if u.Konfig().IncludeHistory {
+	if ids.Sigil.IncludesHistory() {
 		method = u.StoreWorkingDirectory().ReadManyHistory
 		// method = u.StoreObjekten().Zettel().ReadAll
 		hinweisen := kennung.MakeHinweisMutableSet()

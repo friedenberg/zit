@@ -115,6 +115,7 @@ func (c client) SkusFromFilter(
 	msg := messageRequestSkus{
 		Filter:       ids,
 		GattungSlice: gattungSet.Elements(),
+		Sigil:        ids.Set.Sigil,
 	}
 
 	if err = d.Send(msg); err != nil {

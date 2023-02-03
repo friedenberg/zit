@@ -161,7 +161,7 @@ func (op PullServer) skusForFilter(
 
 	method := op.umwelt.StoreObjekten().ReadAllSchwanzen
 
-	if op.umwelt.Konfig().IncludeHistory {
+	if msg.Sigil.IncludesHistory() {
 		method = op.umwelt.StoreObjekten().ReadAll
 	}
 
