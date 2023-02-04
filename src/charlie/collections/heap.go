@@ -236,114 +236,102 @@ func (a Heap[T, T1]) Each(f WriterFunc[T]) (err error) {
 	return
 }
 
-// func (a *Heap[T]) MergeStream(
-//   read func() (T, error),
-//   write WriterFunc[T],
-// ) (err error) {
-// 	defer func() {
-// 		a.Restore()
-// 	}()
+func (a *Heap[T, T1]) MergeStream(
+	read func() (T1, error),
+	write WriterFunc[T1],
+) (err error) {
+	defer func() {
+		a.Restore()
+	}()
 
-// 	for {
-// 		var e T
+	for {
+		var e T1
 
-//     if e, err = read(); err != nil {
-// 			if errors.IsEOF(err) {
-// 				err = nil
-// 				break
-// 			} else {
-// 				err = errors.Wrap(err)
-// 				return
-// 			}
-//     }
+		if e, err = read(); err != nil {
+			if IsStopIteration(err) {
+				err = nil
+				break
+			} else {
+				err = errors.Wrap(err)
+				return
+			}
+		}
 
-// 	LOOP:
-// 		for {
-// 			peeked, ok := a.PeekPtr()
+	LOOP:
+		for {
+			peeked, ok := a.Peek()
 
-// 			switch {
-// 			case !ok:
-// 				break LOOP
+			switch {
+			case !ok:
+				break LOOP
 
-// 			case peeked.Equals(e):
-// 				a.Pop()
-// 				continue
+			case peeked.Equals(*e):
+				a.Pop()
+				continue
 
-// 			case !peeked.Less(e):
-// 				break LOOP
+			case !peeked.Less(*e):
+				break LOOP
 
-// 			default:
-// 			}
+			default:
+			}
 
-// 			popped, _ := a.PopAndSave()
+			popped, _ := a.PopAndSave()
 
-// 			if err = write(&popped); err != nil {
-// 				if collections.IsStopIteration(err) {
-// 					err = nil
-// 				} else {
-// 					err = errors.Wrap(err)
-// 				}
+			if err = write(popped); err != nil {
+				if IsStopIteration(err) {
+					err = nil
+				} else {
+					err = errors.Wrap(err)
+				}
 
-// 				return
-// 			}
-// 		}
+				return
+			}
+		}
 
-// 		if err = w(tz); err != nil {
-// 			if collections.IsStopIteration(err) {
-// 				err = nil
-// 			} else {
-// 				err = errors.Wrap(err)
-// 			}
+		if err = write(e); err != nil {
+			if IsStopIteration(err) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+			}
 
-// 			return
-// 		}
-// 	}
+			return
+		}
+	}
 
-// 	var last *zettel.Transacted
+	var last T1
 
-// 	for {
-// 		popped, ok := zp.added.PopAndSave()
+	for {
+		popped, ok := a.PopAndSave()
 
-// 		if !ok {
-// 			break
-// 		}
+		if !ok {
+			break
+		}
 
-// 		if last == nil {
-// 			l := popped
-// 			last = &l
-// 		} else if popped.GetSku2().Less(last.GetSku2()) {
-// 			err = errors.Errorf(
-// 				"last time is greater than current! last: %s, current: %s, page: %d, less: %v, sku less: %v, sku2 less: %v",
-// 				last.GetSku2(),
-// 				popped.GetSku2(),
-// 				zp.pageId.index,
-// 				popped.Less(*last),
-// 				popped.GetSku().Less(last.GetSku()),
-// 				popped.GetSku2().Less(last.GetSku2()),
-// 			)
-// 			return
-// 		}
+		if last == nil {
+			last = popped
+		} else if popped.Less(*last) {
+			err = errors.Errorf(
+				"last is greater than current! last: %v, current: %v",
+				last,
+				popped,
+			)
+			return
+		}
 
-// 		errors.Log().Printf(
-// 			"page: %d post: %s time sku: %s time sku2: %s",
-// 			zp.pageId.index,
-// 			popped.GetSku2(),
-// 			popped.Sku.GetTime(),
-// 			popped.GetSku2().GetTime(),
-// 		)
+		if err = write(popped); err != nil {
+			if IsStopIteration(err) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+			}
 
-// 		if err = w(&popped); err != nil {
-// 			if collections.IsStopIteration(err) {
-// 				err = nil
-// 			} else {
-// 				err = errors.Wrap(err)
-// 			}
+			return
+		}
+	}
 
-// 			return
-// 		}
-// 	}
-// 	return
-// }
+	return
+}
 
 func (a *Heap[T, T1]) Fix() {
 	a.l.Lock()

@@ -44,6 +44,8 @@ func makeZettelenPage(
 		flushFilter: flushFilter,
 	}
 
+	p.added.SetPool(p.pool)
+
 	return
 }
 
@@ -127,116 +129,25 @@ func (zp *Page) copy(
 
 	dec := gob.NewDecoder(r)
 
-	defer func() {
-		zp.added.Restore()
-	}()
+	if err = zp.added.MergeStream(
+		func() (tz *zettel.Transacted, err error) {
+			tz = zp.pool.Get()
 
-	errors.TodoP0("fix issue with heap getting out of whack")
-	// zp.added.Fix()
-
-	for {
-		var tz *zettel.Transacted
-
-		tz = zp.pool.Get()
-
-		if err = dec.Decode(tz); err != nil {
-			if errors.IsEOF(err) {
-				err = nil
-				break
-			} else {
-				err = errors.Wrap(err)
-				return
-			}
-		}
-
-		errors.Log().Printf("decoded: %s", tz.GetSku2())
-
-	LOOP:
-		for {
-			peeked, ok := zp.added.Peek()
-
-			switch {
-			case !ok:
-				break LOOP
-
-			case peeked.Equals(*tz):
-				errors.Log().Printf("peeked equals: %s", peeked.GetSku2())
-				zp.added.Pop()
-				continue
-
-			case !peeked.Less(*tz):
-				errors.Log().Printf("peeked greater than: %s", peeked.GetSku2())
-				break LOOP
-
-			default:
-				errors.Log().Printf("peeked less: %s", peeked.GetSku2())
-			}
-
-			popped, _ := zp.added.PopAndSave()
-
-			if err = w(popped); err != nil {
-				if collections.IsStopIteration(err) {
-					err = nil
+			if err = dec.Decode(tz); err != nil {
+				if errors.IsEOF(err) {
+					err = collections.MakeErrStopIteration()
 				} else {
 					err = errors.Wrap(err)
+					return
 				}
-
-				return
-			}
-		}
-
-		if err = w(tz); err != nil {
-			if collections.IsStopIteration(err) {
-				err = nil
-			} else {
-				err = errors.Wrap(err)
 			}
 
 			return
-		}
-	}
-
-	var last *zettel.Transacted
-
-	for {
-		popped, ok := zp.added.PopAndSave()
-
-		if !ok {
-			break
-		}
-
-		if last == nil {
-			last = popped
-		} else if popped.GetSku2().Less(last.GetSku2()) {
-			err = errors.Errorf(
-				"last time is greater than current! last: %s, current: %s, page: %d, less: %v, sku less: %v, sku2 less: %v",
-				last.GetSku2(),
-				popped.GetSku2(),
-				zp.pageId.index,
-				popped.Less(*last),
-				popped.GetSku().Less(last.GetSku()),
-				popped.GetSku2().Less(last.GetSku2()),
-			)
-			return
-		}
-
-		errors.Log().Printf(
-			"page: %d post: %s time sku: %s time sku2: %s",
-			zp.pageId.index,
-			popped.GetSku2(),
-			popped.Sku.GetTime(),
-			popped.GetSku2().GetTime(),
-		)
-
-		if err = w(popped); err != nil {
-			if collections.IsStopIteration(err) {
-				err = nil
-			} else {
-				err = errors.Wrap(err)
-			}
-
-			return
-		}
+		},
+		w,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return
