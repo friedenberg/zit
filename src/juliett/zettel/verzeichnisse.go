@@ -52,5 +52,12 @@ func MakeWriterGobEncoder(w io.Writer) writerGobEncoder {
 }
 
 func (w writerGobEncoder) WriteZettelVerzeichnisse(z *Transacted) (err error) {
-	return w.enc.Encode(z)
+	if err = w.enc.Encode(z); err != nil {
+		err = errors.Wrap(err)
+    errors.Err().Printf("decode error: %s", err)
+		errors.TodoP0("make sure Verzeichnisse flush prints errors")
+		return
+	}
+
+	return
 }

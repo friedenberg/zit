@@ -91,7 +91,12 @@ func (e *Kennung[T, T1]) Set(v string) (err error) {
 		}
 	}
 
-	return T1(&e.value).Set(v3)
+	if err = T1(&e.value).Set(v3); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (e Kennung[T, T1]) GetSigil() Sigil {
@@ -114,13 +119,13 @@ func (a Kennung[T, T1]) Contains(b Kennung[T, T1]) bool {
 	return strings.HasPrefix(a.value.String(), b.value.String())
 }
 
-func (a Kennung[T, T1]) Reset() {
+func (a *Kennung[T, T1]) Reset() {
 	var a1 T
 	a.value = a1
 	a.sigil = SigilNone
 }
 
-func (a Kennung[T, T1]) ResetWith(b Kennung[T, T1]) {
+func (a *Kennung[T, T1]) ResetWith(b Kennung[T, T1]) {
 	a.value = b.value
 	a.sigil = b.sigil
 }

@@ -1,24 +1,18 @@
 package kennung
 
 import (
-	"crypto/sha256"
-	"encoding/gob"
 	"fmt"
-	"io"
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/coordinates"
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/bravo/sha"
 )
 
-func init() {
-	gob.RegisterName("Hinweis", Hinweis{})
-}
+type Hinweis = MitKorper[hinweis, *hinweis]
 
-type Hinweis struct {
+type hinweis struct {
 	left, right string
 }
 
@@ -31,8 +25,6 @@ func NewHinweisEmpty() (h Hinweis) {
 
 	return
 }
-
-//TODO-P0 merge into Kennung
 
 //TODO is this really necessary?;w
 
@@ -91,12 +83,7 @@ func MakeHinweis(v string) (h Hinweis, err error) {
 	return
 }
 
-func (a Hinweis) GetSigil() (s Sigil) {
-	errors.TodoP4("remove")
-	return
-}
-
-func (a Hinweis) Equals(b Hinweis) bool {
+func (a hinweis) Equals(b hinweis) bool {
 	if a.left != b.left {
 		return false
 	}
@@ -108,59 +95,24 @@ func (a Hinweis) Equals(b Hinweis) bool {
 	return true
 }
 
-func (h Hinweis) Kopf() string {
+func (h hinweis) Kopf() string {
 	return h.left
 }
 
-func (h Hinweis) Schwanz() string {
+func (h hinweis) Schwanz() string {
 	return h.right
 }
 
-func (h Hinweis) String() string {
-	return fmt.Sprintf("%s/%s", h.left, h.right)
+func (h hinweis) String() string {
+	v := fmt.Sprintf("%s/%s", h.left, h.right)
+	return v
 }
 
-func (h Hinweis) GetSha() schnittstellen.Sha {
-	hash := sha256.New()
-	sr := strings.NewReader(h.String())
-
-	if _, err := io.Copy(hash, sr); err != nil {
-		errors.PanicIfError(err)
-	}
-
-	return sha.FromHash(hash)
-}
-
-func (h Hinweis) AlignedParts(kopf, schwanz int) (string, string) {
-	parts := h.Parts()
-
-	diffKopf := kopf - len(parts[0])
-	if diffKopf > 0 {
-		parts[0] = strings.Repeat(" ", diffKopf) + parts[0]
-	}
-
-	diffSchwanz := schwanz - len(parts[1])
-	if diffSchwanz > 0 {
-		parts[1] = parts[1] + strings.Repeat(" ", diffSchwanz)
-	}
-
-	return parts[0], parts[1]
-}
-
-func (h Hinweis) Aligned(kopf, schwanz int) string {
-	p1, p2 := h.AlignedParts(kopf, schwanz)
-	return fmt.Sprintf("%s/%s", p1, p2)
-}
-
-func (h Hinweis) Parts() [2]string {
-	return [2]string{h.Kopf(), h.Schwanz()}
-}
-
-func (i Hinweis) Less(j Hinweis) bool {
+func (i hinweis) Less(j hinweis) bool {
 	return i.String() < j.String()
 }
 
-func (h *Hinweis) Set(v string) (err error) {
+func (h *hinweis) Set(v string) (err error) {
 	v = strings.TrimSpace(v)
 	v = strings.ToLower(v)
 	v = strings.Map(
@@ -203,44 +155,16 @@ func (h *Hinweis) Set(v string) (err error) {
 	return
 }
 
-func (h *Hinweis) Reset() {
+func (h *hinweis) Reset() {
 	h.left = ""
 	h.right = ""
 }
 
-func (h *Hinweis) ResetWith(h1 Hinweis) {
+func (h *hinweis) ResetWith(h1 hinweis) {
 	h.left = h1.left
 	h.right = h1.right
 }
 
-func (h Hinweis) GetGattung() schnittstellen.Gattung {
+func (h hinweis) GetGattung() schnittstellen.Gattung {
 	return gattung.Zettel
-}
-
-func (s Hinweis) MarshalBinary() (text []byte, err error) {
-	text = []byte(s.String())
-
-	return
-}
-
-func (s *Hinweis) UnmarshalBinary(text []byte) (err error) {
-	if err = s.Set(string(text)); err != nil {
-		return
-	}
-
-	return
-}
-
-func (s Hinweis) MarshalText() (text []byte, err error) {
-	text = []byte(s.String())
-
-	return
-}
-
-func (s *Hinweis) UnmarshalText(text []byte) (err error) {
-	if err = s.Set(string(text)); err != nil {
-		return
-	}
-
-	return
 }
