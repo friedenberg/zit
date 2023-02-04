@@ -138,7 +138,7 @@ func (a Kennung[T, T1]) Less(b Kennung[T, T1]) bool {
 	return a.value.String() < b.value.String()
 }
 
-func (a Kennung[T, T1]) LeftSubtract(b Kennung[T, T1]) (c Kennung[T, T1], err error) {
+func (a *Kennung[T, T1]) LeftSubtract(b Kennung[T, T1]) (c Kennung[T, T1], err error) {
 	c.value = *T1(new(T))
 
 	if err = c.Set(strings.TrimPrefix(a.String(), b.String())); err != nil {

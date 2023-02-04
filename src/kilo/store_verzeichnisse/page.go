@@ -132,7 +132,7 @@ func (zp *Page) copy(
 	}()
 
 	errors.TodoP0("fix issue with heap getting out of whack")
-	zp.added.Fix()
+	// zp.added.Fix()
 
 	for {
 		var tz *zettel.Transacted
@@ -153,7 +153,7 @@ func (zp *Page) copy(
 
 	LOOP:
 		for {
-			peeked, ok := zp.added.PeekPtr()
+			peeked, ok := zp.added.Peek()
 
 			switch {
 			case !ok:
@@ -174,7 +174,7 @@ func (zp *Page) copy(
 
 			popped, _ := zp.added.PopAndSave()
 
-			if err = w(&popped); err != nil {
+			if err = w(popped); err != nil {
 				if collections.IsStopIteration(err) {
 					err = nil
 				} else {
@@ -206,8 +206,7 @@ func (zp *Page) copy(
 		}
 
 		if last == nil {
-			l := popped
-			last = &l
+			last = popped
 		} else if popped.GetSku2().Less(last.GetSku2()) {
 			err = errors.Errorf(
 				"last time is greater than current! last: %s, current: %s, page: %d, less: %v, sku less: %v, sku2 less: %v",
@@ -229,7 +228,7 @@ func (zp *Page) copy(
 			popped.GetSku2().GetTime(),
 		)
 
-		if err = w(&popped); err != nil {
+		if err = w(popped); err != nil {
 			if collections.IsStopIteration(err) {
 				err = nil
 			} else {

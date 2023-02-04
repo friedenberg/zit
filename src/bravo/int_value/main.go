@@ -27,6 +27,10 @@ func (iv *IntValue) Reset() {
 	*iv = IntValue(0)
 }
 
+func (iv *IntValue) ResetWith(b IntValue) {
+	iv.SetInt(b.Int())
+}
+
 func (iv *IntValue) SetInt(i int) {
 	*iv = IntValue(i)
 }

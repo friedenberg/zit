@@ -74,14 +74,18 @@ func (sk *Sku2) setOld(line string) (err error) {
 	return
 }
 
-func (a *Sku2) Reset(b *Sku2) {
-	if b == nil {
-		a.ObjekteSha = sha.Sha{}
-		a.AkteSha = sha.Sha{}
-	} else {
-		a.ObjekteSha = b.ObjekteSha
-		a.AkteSha = b.AkteSha
-	}
+func (a *Sku2) ResetWith(b Sku2) {
+  errors.TodoP4("should these be more ResetWith calls?")
+	a.Gattung = b.Gattung
+	a.Tai = b.Tai
+	a.Kennung = b.Kennung
+	a.ObjekteSha = b.ObjekteSha
+	a.AkteSha = b.AkteSha
+}
+
+func (a *Sku2) Reset() {
+	a.ObjekteSha = sha.Sha{}
+	a.AkteSha = sha.Sha{}
 }
 
 func (a Sku2) GetTai() ts.Tai {
