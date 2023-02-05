@@ -31,7 +31,7 @@ func (c ZettelFromExternalAkte) Run(
 		return
 	}
 
-	defer c.Unlock()
+	defer errors.Deferred(&err, c.Unlock)
 
 	toCreate := zettel_external.MakeMutableSetUniqueAkte()
 	toDelete := zettel_external.MakeMutableSetUniqueFD()

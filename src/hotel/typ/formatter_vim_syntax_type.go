@@ -20,9 +20,9 @@ func (f formatterVimSyntaxType) Format(
 ) (n int64, err error) {
 	var n1 int
 
-	if n1, err = io.WriteString(
+	if n1, err = fmt.Fprintln(
 		w,
-		fmt.Sprintf("%s\n", ct.Objekte.Akte.VimSyntaxType),
+		ct.Objekte.Akte.VimSyntaxType,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

@@ -70,6 +70,13 @@ func (s Set) String() string {
 	return fmt.Sprintf("%#v", s.ids)
 }
 
+func (s Set) OnlySingleHinweis() (h kennung.Hinweis, ok bool) {
+	h = s.Hinweisen.Any()
+	ok = s.Len() == 1 && s.Hinweisen.Len() == 1 && !h.GetSigil().IncludesHistory()
+
+	return
+}
+
 func (s Set) Len() int {
 	k := 0
 

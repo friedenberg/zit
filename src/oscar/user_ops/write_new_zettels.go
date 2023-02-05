@@ -23,7 +23,7 @@ func (c WriteNewZettels) RunMany(
 		return
 	}
 
-	defer c.Unlock()
+	defer errors.Deferred(&err, c.Unlock)
 
 	results = zettel_checked_out.MakeMutableSetUnique(count)
 
@@ -50,7 +50,7 @@ func (c WriteNewZettels) RunOne(
 		return
 	}
 
-	defer c.Unlock()
+	defer errors.Deferred(&err, c.Unlock)
 
 	return c.runOneAlreadyLocked(z)
 }

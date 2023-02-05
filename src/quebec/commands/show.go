@@ -125,7 +125,7 @@ func (c Show) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 					return
 				}
 
-				return c.showZettels(
+				return c.showOneOrMoreZettels(
 					u,
 					ids,
 					fv.FuncFormatterVerzeichnisse(
@@ -203,7 +203,47 @@ func (c Show) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	return
 }
 
-func (c Show) showZettels(
+func (c Show) showOneOrMoreZettels(
+	u *umwelt.Umwelt,
+	ids id_set.Set,
+	fv collections.WriterFunc[*zettel.Transacted],
+) (err error) {
+	if h, ok := ids.OnlySingleHinweis(); ok {
+		if err = c.showOneZettel(u, h, fv); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		if err = c.showManyZettels(u, ids, fv); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
+func (c Show) showOneZettel(
+	u *umwelt.Umwelt,
+	h kennung.Hinweis,
+	fv collections.WriterFunc[*zettel.Transacted],
+) (err error) {
+	var z *zettel.Transacted
+
+	if z, err = u.StoreWorkingDirectory().ReadOne(h); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = fv(z); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (c Show) showManyZettels(
 	u *umwelt.Umwelt,
 	ids id_set.Set,
 	fv collections.WriterFunc[*zettel.Transacted],
@@ -215,13 +255,11 @@ func (c Show) showZettels(
 	}.WriteZettelTransacted
 
 	method := u.StoreWorkingDirectory().ReadMany
-	// method := u.StoreObjekten().Zettel().ReadAll
 
 	filter := idFilter
 
 	if ids.Sigil.IncludesHistory() {
 		method = u.StoreWorkingDirectory().ReadManyHistory
-		// method = u.StoreObjekten().Zettel().ReadAll
 		hinweisen := kennung.MakeHinweisMutableSet()
 
 		if err = u.StoreObjekten().Zettel().ReadAllSchwanzen(
@@ -250,14 +288,9 @@ func (c Show) showZettels(
 	}
 
 	f1 := collections.MakeSyncSerializer(fv)
-	errors.Log().Printf("%v", filter)
 
 	if err = method(
 		collections.MakeChain(
-			func(z *zettel.Transacted) (err error) {
-				errors.Log().Printf("processing zettel: %s", z.Sku)
-				return
-			},
 			filter,
 			f1,
 		),

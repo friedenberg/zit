@@ -31,7 +31,6 @@ func (u *Umwelt) Unlock() (err error) {
 			return
 		}
 
-		//TODO include recompile
 		if err = u.KonfigPtr().Flush(u.Standort()); err != nil {
 			err = errors.Wrap(err)
 			return

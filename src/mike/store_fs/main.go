@@ -243,7 +243,12 @@ func (s *Store) ReadOne(h kennung.Hinweis) (zt *zettel.Transacted, err error) {
 		s.Standort.Cwd(),
 		fmt.Sprintf("%s.%s", h, s.erworben.FileExtensions.Zettel),
 	); err != nil {
-		err = errors.Wrap(err)
+		if errors.IsNotExist(err) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+		}
+
 		return
 	}
 

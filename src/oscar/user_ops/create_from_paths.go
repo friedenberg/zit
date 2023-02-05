@@ -66,7 +66,7 @@ func (c CreateFromPaths) Run(
 		return
 	}
 
-	defer c.Unlock()
+	defer errors.Deferred(&err, c.Unlock)
 
 	if c.Dedupe {
 		matcher := zettel_external.MakeMutableMatchSet(toCreate)

@@ -8,15 +8,16 @@ let zettel = expand("%:r")
 let g:markdown_syntax_conceal = 0
 
 if zettel != ""
-  let zettelTypSyntax = system("zit show -include-cwd -format typ-vim-syntax-type " . zettel)
+  let cmdFormat = "zit show -include-cwd -format typ-vim-syntax-type "
+  let zettelTypSyntax = trim(system(cmdFormat . zettel))
 
   if zettelTypSyntax == ""
     echom "Zettel Typ has no vim syntax set"
     let zettelTypSyntax = "markdown"
   endif
 
-  let syntaxFile = $VIMRUNTIME . "/syntax/" . zettelTypSyntax . ".vim"
-  let ftpluginFile = $VIMRUNTIME . "/ftplugin/" . zettelTypSyntax . ".vim"
+  " let syntaxFile = $VIMRUNTIME . "/syntax/" . zettelTypSyntax . ".vim"
+  " let ftpluginFile = $VIMRUNTIME . "/ftplugin/" . zettelTypSyntax . ".vim"
 
   execute "syntax include @akte" "syntax/" .. zettelTypSyntax .. ".vim"
   " if filereadable(syntaxFile)

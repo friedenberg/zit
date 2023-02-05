@@ -154,7 +154,7 @@ func (fv *FormatterValue) FuncFormatter(
 				return
 			}
 
-			if _, err = io.WriteString(
+			if _, err = fmt.Fprintln(
 				out,
 				t.Objekte.Akte.VimSyntaxType,
 			); err != nil {

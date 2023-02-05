@@ -30,7 +30,7 @@ func (c Checkin) Run(
 		return
 	}
 
-	defer c.Unlock()
+	defer errors.Deferred(&err, c.Unlock)
 
 	for _, z := range zettelen {
 		var tz *zettel.Transacted
