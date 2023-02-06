@@ -68,7 +68,7 @@ func (op ReadCheckedOut) RunMany(
 		defer func() {
 			if e := recover(); e != nil {
 				errors.Err().Printf("Path: %s", p)
-        panic(e)
+				panic(e)
 			}
 		}()
 

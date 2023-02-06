@@ -180,7 +180,7 @@ func (a *Transacted[T, T1]) ResetWith(b Transacted[T, T1]) {
 	a.TransactionIndex.SetInt(b.TransactionIndex.Int())
 }
 
-func (a Transacted[T, T1]) Less(b *Transacted[T, T1]) (ok bool) {
+func (a Transacted[T, T1]) Less(b Transacted[T, T1]) (ok bool) {
 	if a.Schwanz.Less(b.Schwanz) {
 		ok = true
 		return

@@ -10,18 +10,20 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/ts"
-	"github.com/friedenberg/zit/src/foxtrot/sku"
+	"github.com/friedenberg/zit/src/foxtrot/kennung_index"
 )
 
 type Schwanzen struct {
-	lock      *sync.RWMutex
-	hinweisen map[kennung.Hinweis]sku.Transacted[kennung.Hinweis, *kennung.Hinweis]
+	lock         *sync.RWMutex
+	hinweisen    map[kennung.Hinweis]Transacted
+	etikettIndex kennung_index.EtikettIndex
 }
 
-func MakeSchwanzen() *Schwanzen {
+func MakeSchwanzen(ei kennung_index.EtikettIndex) *Schwanzen {
 	return &Schwanzen{
-		lock:      &sync.RWMutex{},
-		hinweisen: make(map[kennung.Hinweis]sku.Transacted[kennung.Hinweis, *kennung.Hinweis]),
+		lock:         &sync.RWMutex{},
+		hinweisen:    make(map[kennung.Hinweis]Transacted),
+		etikettIndex: ei,
 	}
 }
 
@@ -29,15 +31,13 @@ func (zws *Schwanzen) Less(zt *Transacted) (ok bool) {
 	zws.lock.RLock()
 	defer zws.lock.RUnlock()
 
-	var t sku.Transacted[kennung.Hinweis, *kennung.Hinweis]
-
-	t, ok = zws.hinweisen[zt.Sku.Kennung]
+	t, ok := zws.hinweisen[zt.Sku.Kennung]
 
 	switch {
 	case !ok:
 		fallthrough
 
-	case zt.Sku.Less(&t):
+	case zt.Less(t):
 		ok = true
 	}
 
@@ -48,11 +48,12 @@ func (zws *Schwanzen) Get(h kennung.Hinweis) (t ts.Time, ok bool) {
 	zws.lock.RLock()
 	defer zws.lock.RUnlock()
 
-	var o sku.Transacted[kennung.Hinweis, *kennung.Hinweis]
+	o, ok := zws.hinweisen[h]
 
-	o, ok = zws.hinweisen[h]
-
-	t = o.Schwanz
+	if ok {
+		errors.TodoP4("switch to GetTime()")
+		t = o.Sku.Schwanz
+	}
 
 	return
 }
@@ -62,16 +63,24 @@ func (zws *Schwanzen) Set(z *Transacted) (ok bool) {
 	defer zws.lock.Unlock()
 
 	h := z.Sku.Kennung
-	o := z.Sku
-	t1, _ := zws.hinweisen[h]
+	t1, found := zws.hinweisen[h]
 
-	if t1.Less(&o) {
-		errors.Log().Printf("updating schwanzen %s -> %s", t1, o)
-		zws.hinweisen[h] = o
+	switch {
+	case !found:
+		zws.hinweisen[h] = *z
 		ok = true
-	} else if t1.Equals(o) {
+
+	case t1.Less(*z):
+		zws.hinweisen[h] = *z
 		ok = true
-	} else {
+
+		errors.TodoP4("determine if comparing zettels rather than sku is ok")
+	case t1.Sku.Equals(z.Sku):
+		zws.etikettIndex.Add(z.Objekte.Etiketten)
+		ok = true
+
+	default:
+		zws.etikettIndex.AddEtikettSet(t1.Objekte.Etiketten, z.Objekte.Etiketten)
 		ok = false
 	}
 
@@ -94,7 +103,7 @@ func (zws *Schwanzen) ReadFrom(r1 io.Reader) (n int64, err error) {
 
 	dec := gob.NewDecoder(r)
 
-	m := make(map[kennung.Hinweis]Sku)
+	m := make(map[kennung.Hinweis]Transacted)
 
 	if err = dec.Decode(&m); err != nil {
 		if errors.IsEOF(err) {

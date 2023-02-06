@@ -9,9 +9,9 @@ type LogWriter[
 }
 
 func (l LogWriter[T]) NewOrUpdated(err error) collections.WriterFunc[T] {
-  if IsNotFound(err) {
-    return l.New
-  } else {
-    return l.Updated
-  }
+	if IsNotFound(err) {
+		return l.New
+	} else {
+		return l.Updated
+	}
 }

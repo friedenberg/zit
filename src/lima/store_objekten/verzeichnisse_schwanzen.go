@@ -25,7 +25,7 @@ func makeVerzeichnisseSchwanzen(
 	}
 
 	for i := range s.headers {
-		s.headers[i] = zettel.MakeSchwanzen()
+		s.headers[i] = zettel.MakeSchwanzen(sa.GetKennungIndex())
 	}
 
 	s.Zettelen, err = store_verzeichnisse.MakeZettelen(
@@ -35,6 +35,20 @@ func makeVerzeichnisseSchwanzen(
 		p,
 		s,
 	)
+
+	return
+}
+
+func (s *verzeichnisseSchwanzen) Flush() (err error) {
+	if err = s.Zettelen.Flush(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.su.GetKennungIndex().Flush(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }

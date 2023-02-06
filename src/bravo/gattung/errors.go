@@ -11,7 +11,7 @@ var (
 )
 
 type ErrUnrecognizedGattung struct {
-  string
+	string
 }
 
 func (e ErrUnrecognizedGattung) Is(target error) (ok bool) {

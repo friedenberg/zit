@@ -380,18 +380,6 @@ func (s *zettelStore) Update(
 		return
 	}
 
-	e1 := tz.Objekte.Etiketten
-	e2 := kennung.MakeEtikettSet()
-
-	if mutter != nil {
-		e2 = mutter.Objekte.Etiketten
-	}
-
-	if err = s.StoreUtil.GetKennungIndex().AddEtikettSet(e1, e2); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	if err = s.logWriter.Updated(tz); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -527,16 +515,6 @@ func (s *zettelStore) reindexOne(
 	}
 
 	if err = s.logWriter.NewOrUpdated(errExists)(tz); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	e2 := kennung.MakeEtikettSet()
-
-	if err = s.StoreUtil.GetKennungIndex().AddEtikettSet(
-		tz.Objekte.Etiketten,
-		e2,
-	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

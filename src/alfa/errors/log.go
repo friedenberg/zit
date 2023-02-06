@@ -46,7 +46,7 @@ func SetVerbose() {
 }
 
 func IsVerbose() bool {
-  return verbose
+	return verbose
 }
 
 func SetTesting() {

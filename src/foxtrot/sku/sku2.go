@@ -75,7 +75,7 @@ func (sk *Sku2) setOld(line string) (err error) {
 }
 
 func (a *Sku2) ResetWith(b Sku2) {
-  errors.TodoP4("should these be more ResetWith calls?")
+	errors.TodoP4("should these be more ResetWith calls?")
 	a.Gattung = b.Gattung
 	a.Tai = b.Tai
 	a.Kennung = b.Kennung

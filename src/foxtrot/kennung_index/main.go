@@ -12,13 +12,17 @@ import (
 	"github.com/friedenberg/zit/src/echo/hinweis_index"
 )
 
+type EtikettIndex interface {
+	GetAllEtiketten() ([]kennung.Etikett, error)
+	AddEtikettSet(to kennung.EtikettSet, from kennung.EtikettSet) (err error)
+	Add(s kennung.EtikettSet) (err error)
+}
+
 type Index interface {
 	schnittstellen.Flusher
 	schnittstellen.Resetter
 
-	GetAllEtiketten() ([]kennung.Etikett, error)
-	AddEtikettSet(to kennung.EtikettSet, from kennung.EtikettSet) (err error)
-	Add(s kennung.EtikettSet) (err error)
+	EtikettIndex
 
 	hinweis_index.HinweisIndex
 }
