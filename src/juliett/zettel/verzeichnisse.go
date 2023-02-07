@@ -6,7 +6,7 @@ import (
 )
 
 func init() {
-	errors.TodoP0("add hidden")
+	errors.TodoP4("add hidden")
 }
 
 type Verzeichnisse struct {

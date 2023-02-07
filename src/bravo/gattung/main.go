@@ -24,8 +24,9 @@ const (
 	Kennung
 	Bestandsaufnahme
 	AkteTyp
+  Kasten
 
-	MaxGattung = AkteTyp
+	MaxGattung = Kasten
 )
 
 func All() (out []Gattung) {
@@ -96,6 +97,9 @@ func (g Gattung) String() string {
 	case Bestandsaufnahme:
 		return "Bestandsaufnahme"
 
+	case Kasten:
+		return "Kasten"
+
 	default:
 		return "Unknown"
 	}
@@ -137,6 +141,9 @@ func (g *Gattung) Set(v string) (err error) {
 
 	case "bestandsaufnahme":
 		*g = Bestandsaufnahme
+
+	case "kasten":
+		*g = Kasten
 
 	default:
 		err = errors.Wrap(ErrUnrecognizedGattung{string: v1})

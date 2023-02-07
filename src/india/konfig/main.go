@@ -17,6 +17,7 @@ import (
 	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/hotel/etikett"
 	"github.com/friedenberg/zit/src/hotel/typ"
+	"github.com/friedenberg/zit/src/kasten"
 )
 
 var (
@@ -58,6 +59,9 @@ type compiled struct {
 	ExtensionsToTypen map[string]string
 	DefaultTyp        typ.Transacted
 	Typen             typSet
+
+	//Kasten
+	Kisten kastenSet
 }
 
 func Make(
@@ -351,6 +355,11 @@ func (kc compiled) GetApproximatedTyp(k kennung.Typ) (ct ApproximatedTyp) {
 	return
 }
 
+func (kc compiled) GetKasten(k kennung.Kasten) (ct *kasten.Transacted) {
+	ct, _ = kc.Kisten.Get(k.String())
+	return
+}
+
 func (kc compiled) GetEtikett(k kennung.Etikett) (ct *etikett.Transacted) {
 	expandedActual := kc.GetSortedEtikettenExpanded(k.String())
 
@@ -367,6 +376,17 @@ func (k *compiled) SetTransacted(
 	k.hasChanges = true
 	k.Sku = kt.Sku
 	k.Akte = kt.Objekte.Akte
+}
+
+func (k *compiled) AddKasten(
+	kt *kasten.Transacted,
+) {
+	k.hasChanges = true
+	m := k.Kisten.Elements()
+	m = append(m, kt)
+	k.Kisten = makeCompiledKastenSetFromSlice(m)
+
+	return
 }
 
 func (k *compiled) AddTyp(

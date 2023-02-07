@@ -20,6 +20,13 @@ func MakeFormatText(arf schnittstellen.AkteIOFactory) *TextFormat {
 	}
 }
 
+func MakeFormatTextIgnoreTomlErrors(arf schnittstellen.AkteIOFactory) *TextFormat {
+	return &TextFormat{
+		arf:              arf,
+		ignoreTomlErrors: true,
+	}
+}
+
 func (f TextFormat) Parse(r io.Reader, t *Objekte) (n int64, err error) {
 	return f.ReadFormat(r, t)
 }
