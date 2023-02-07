@@ -11,31 +11,49 @@ ifeq ($(origin .RECIPEPREFIX), undefined)
 endif
 .RECIPEPREFIX = >
 
-.PHONY: build watch exclude bats_tests unit_tests go_vet graph_dependencies install;
+.PHONY: build watch exclude graph_dependencies install;
 
-# build: install unit_tests go_vet graph_dependencies;
-build: install unit_tests go_vet;
+build: install;
+
+install: tests_fast
+> go install ./.
+
+deploy: tests_slower
+> go install ./.
+.PHONY: deploy;
 
 go_generate:
 > go generate ./...
-.PHONY: go_generate
+.PHONY: go_generate;
 
 go_build: go_generate
 > go build -o build/zit ./.
+.PHONY: go_build;
 
 go_vet: go_build
 > go vet ./...
+.PHONY: go_vet;
 
-unit_tests:
+tests_unit:
 > go test -timeout 5s ./...
 
-install: go_vet unit_tests bats_tests
-> go install ./.
+tests_fast: go_vet tests_unit;
+.PHONY: tests_fast;
 
-bats_tests: go_build
+tests_bats: go_build
 > if [[ ! -f build_options/skip_bats_tests ]]; then
 >   bats --jobs 8 zz-test/*.bats
 > fi
+.PHONY: tests_bats;
+
+tests_slow: tests_fast tests_bats;
+.PHONY: tests_slow;
+
+tests_bats_migration: go_build;
+.PHONY: tests_bats_migration;
+
+tests_slower: tests_fast tests_slow tests_bats_migration;
+.PHONY: tests_slower;
 
 graph_dependencies:
 > ./bin/graph_dependencies

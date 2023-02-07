@@ -8,11 +8,15 @@ if [[ -d build_options ]]; then
 fi
 
 #TODO pause mr-build-and-watch and then resume after
+cmd_make=make
+
 if command -v gmake 2>&1 >/dev/null ; then
-  gmake
+  cmd_make=gmake
 else
   make
 fi
+
+$cmd_make deploy
 
 go clean -cache -fuzzcache
 git add .
