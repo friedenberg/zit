@@ -44,15 +44,14 @@ tests_fast: go_vet tests_unit;
 
 .PHONY: tests_bats
 tests_bats: go_build
-> if [[ ! -f build_options/skip_bats_tests ]]; then
->   bats --jobs 8 zz-test/*.bats
-> fi
+> bats --jobs 8 zz-tests_bats/*.bats
 
 .PHONY: tests_slow
 tests_slow: tests_fast tests_bats;
 
 .PHONY: tests_bats_migration
-tests_bats_migration: go_build;
+tests_bats_migration: go_build
+> bats --jobs 8 zz-tests_bats/migration/*.bats
 
 .PHONY: tests_slower
 tests_slower: tests_fast tests_slow tests_bats_migration;
