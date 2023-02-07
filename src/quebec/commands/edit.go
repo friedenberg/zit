@@ -6,8 +6,9 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/juliett/cwd_files"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
@@ -40,35 +41,13 @@ func init() {
 	)
 }
 
-func (c Edit) ProtoIdSet(u *umwelt.Umwelt) (is kennung.ProtoIdSet) {
-	is = kennung.MakeProtoIdSet(
-		kennung.ProtoId{
-			Setter: &kennung.Hinweis{},
-			Expand: func(v string) (out string, err error) {
-				var h kennung.Hinweis
-				h, err = u.StoreObjekten().GetAbbrStore().ExpandHinweisString(v)
-				out = h.String()
-				return
-			},
-		},
-		kennung.ProtoId{
-			Setter: &kennung.Etikett{},
-			Expand: func(v string) (out string, err error) {
-				var e kennung.Etikett
-				e, err = u.StoreObjekten().GetAbbrStore().ExpandEtikettString(v)
-				out = e.String()
-				return
-			},
-		},
-		kennung.ProtoId{
-			Setter: &kennung.Typ{},
-		},
-		kennung.ProtoId{
-			Setter: &ts.Time{},
-		},
+func (c Edit) CompletionGattung() gattungen.Set {
+	return gattungen.MakeSet(
+		gattung.Etikett,
+		gattung.Zettel,
+		gattung.Typ,
+		gattung.Kasten,
 	)
-
-	return
 }
 
 func (c Edit) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {

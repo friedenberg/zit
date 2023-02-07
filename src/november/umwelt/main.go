@@ -7,6 +7,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/file_lock"
@@ -251,4 +252,29 @@ func (u Umwelt) DefaultEtiketten() (etiketten kennung.EtikettSet, err error) {
 
 func (u Umwelt) Flush() error {
 	return u.age.Close()
+}
+
+func (u *Umwelt) MakeIdSet() kennung.Set {
+	return kennung.MakeSetWithExpanders(
+		func(v string) (out string, err error) {
+			var s sha.Sha
+			s, err = u.StoreObjekten().GetAbbrStore().ExpandShaString(v)
+			out = s.String()
+			return
+		},
+		func(v string) (out string, err error) {
+			var e kennung.Etikett
+			e, err = u.StoreObjekten().GetAbbrStore().ExpandEtikettString(v)
+			out = e.String()
+			return
+		},
+		func(v string) (out string, err error) {
+			var h kennung.Hinweis
+			h, err = u.StoreObjekten().GetAbbrStore().ExpandHinweisString(v)
+			out = h.String()
+			return
+		},
+		nil, //typExpander func(string) (string, error),
+		nil, //kastenExpander func(string) (string, error),
+	)
 }

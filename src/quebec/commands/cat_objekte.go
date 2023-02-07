@@ -29,22 +29,6 @@ func init() {
 	)
 }
 
-func (c CatObjekte) ProtoIdSet(u *umwelt.Umwelt) (is kennung.ProtoIdSet) {
-	is = kennung.MakeProtoIdSet(
-		kennung.ProtoId{
-			Setter: &sha.Sha{},
-			Expand: func(v string) (out string, err error) {
-				var s sha.Sha
-				s, err = u.StoreObjekten().GetAbbrStore().ExpandShaString(v)
-				out = s.String()
-				return
-			},
-		},
-	)
-
-	return
-}
-
 func (c CatObjekte) RunWithIds(
 	u *umwelt.Umwelt,
 	ids kennung.Set,

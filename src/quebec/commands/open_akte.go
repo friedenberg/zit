@@ -9,7 +9,9 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/exec"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/id"
+	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -29,20 +31,13 @@ func init() {
 	)
 }
 
-func (c OpenAkte) ProtoIdSet(u *umwelt.Umwelt) (is kennung.ProtoIdSet) {
-	is = kennung.MakeProtoIdSet(
-		kennung.ProtoId{
-			Setter: &kennung.Hinweis{},
-			Expand: func(v string) (out string, err error) {
-				var h kennung.Hinweis
-				h, err = u.StoreObjekten().GetAbbrStore().ExpandHinweisString(v)
-				out = h.String()
-				return
-			},
-		},
+func (c OpenAkte) CompletionGattung() gattungen.Set {
+	return gattungen.MakeSet(
+		gattung.Zettel,
+		gattung.Etikett,
+		gattung.Typ,
+		gattung.Bestandsaufnahme,
 	)
-
-	return
 }
 
 func (c OpenAkte) RunWithIds(store *umwelt.Umwelt, is kennung.Set) (err error) {

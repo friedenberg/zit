@@ -9,7 +9,9 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/fd"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
@@ -33,14 +35,10 @@ func init() {
 	)
 }
 
-func (c EditKasten) ProtoIdSet(u *umwelt.Umwelt) (is kennung.ProtoIdSet) {
-	is = kennung.MakeProtoIdSet(
-		kennung.ProtoId{
-			Setter: &kennung.Kasten{},
-		},
+func (c EditKasten) CompletionGattung() gattungen.Set {
+	return gattungen.MakeSet(
+		gattung.Kasten,
 	)
-
-	return
 }
 
 func (c EditKasten) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {

@@ -6,7 +6,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/gattungen"
@@ -54,58 +53,14 @@ func init() {
 	)
 }
 
-func (c Show) ProtoIdSet(u *umwelt.Umwelt) (is kennung.ProtoIdSet) {
-	is = kennung.MakeProtoIdSet()
-
-	if c.GattungSet.Contains(gattung.Zettel) {
-		is.AddMany(
-			kennung.ProtoId{
-				Setter: &sha.Sha{},
-			},
-			kennung.ProtoId{
-				Setter: &kennung.Hinweis{},
-				Expand: func(v string) (out string, err error) {
-					var h kennung.Hinweis
-					h, err = u.StoreObjekten().GetAbbrStore().ExpandHinweisString(v)
-					out = h.String()
-					return
-				},
-			},
-			kennung.ProtoId{
-				Setter: &kennung.Etikett{},
-				Expand: func(v string) (out string, err error) {
-					var e kennung.Etikett
-					e, err = u.StoreObjekten().GetAbbrStore().ExpandEtikettString(v)
-					out = e.String()
-					return
-				},
-			},
-			kennung.ProtoId{
-				Setter: &kennung.Typ{},
-			},
-			kennung.ProtoId{
-				Setter: &ts.Time{},
-			},
-		)
-	}
-
-	if c.GattungSet.Contains(gattung.Typ) {
-		is.AddMany(
-			kennung.ProtoId{
-				Setter: &kennung.Typ{},
-			},
-		)
-	}
-
-	if c.GattungSet.Contains(gattung.Transaktion) {
-		is.AddMany(
-			kennung.ProtoId{
-				Setter: &ts.Time{},
-			},
-		)
-	}
-
-	return
+func (c Show) CompletionGattung() gattungen.Set {
+	return gattungen.MakeSet(
+		gattung.Zettel,
+		gattung.Etikett,
+		gattung.Typ,
+		gattung.Bestandsaufnahme,
+		gattung.Kasten,
+	)
 }
 
 func (c Show) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {

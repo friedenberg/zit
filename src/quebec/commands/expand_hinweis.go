@@ -4,6 +4,8 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
@@ -22,20 +24,10 @@ func init() {
 	)
 }
 
-func (c ExpandHinweis) ProtoIdSet(u *umwelt.Umwelt) (is kennung.ProtoIdSet) {
-	is = kennung.MakeProtoIdSet(
-		kennung.ProtoId{
-			Setter: &kennung.Hinweis{},
-			Expand: func(v string) (out string, err error) {
-				var h kennung.Hinweis
-				h, err = u.StoreObjekten().GetAbbrStore().ExpandHinweisString(v)
-				out = h.String()
-				return
-			},
-		},
+func (c ExpandHinweis) CompletionGattung() gattungen.Set {
+	return gattungen.MakeSet(
+		gattung.Zettel,
 	)
-
-	return
 }
 
 func (c ExpandHinweis) RunWithIds(s *umwelt.Umwelt, ids kennung.Set) (err error) {

@@ -6,11 +6,9 @@ import (
 	"github.com/friedenberg/zit/src/alfa/angeboren"
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/november/umwelt"
 	"github.com/friedenberg/zit/src/papa/remote_transfers"
 )
@@ -44,46 +42,13 @@ func init() {
 	)
 }
 
-func (c Clone) ProtoIdSet(_ *umwelt.Umwelt) (is kennung.ProtoIdSet) {
-	is = kennung.MakeProtoIdSet()
-
-	if c.GattungSet.Contains(gattung.Zettel) {
-		is.AddMany(
-			kennung.ProtoId{
-				Setter: &sha.Sha{},
-			},
-			kennung.ProtoId{
-				Setter: &kennung.Hinweis{},
-			},
-			kennung.ProtoId{
-				Setter: &kennung.Etikett{},
-			},
-			kennung.ProtoId{
-				Setter: &kennung.Typ{},
-			},
-			kennung.ProtoId{
-				Setter: &ts.Time{},
-			},
-		)
-	}
-
-	if c.GattungSet.Contains(gattung.Typ) {
-		is.AddMany(
-			kennung.ProtoId{
-				Setter: &kennung.Typ{},
-			},
-		)
-	}
-
-	if c.GattungSet.Contains(gattung.Transaktion) {
-		is.AddMany(
-			kennung.ProtoId{
-				Setter: &ts.Time{},
-			},
-		)
-	}
-
-	return
+func (c Clone) CompletionGattung() gattungen.Set {
+	return gattungen.MakeSet(
+		gattung.Etikett,
+		gattung.Zettel,
+		gattung.Typ,
+		gattung.Kasten,
+	)
 }
 
 func (c Clone) Run(u *umwelt.Umwelt, args ...string) (err error) {
@@ -106,11 +71,9 @@ func (c Clone) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	ps := c.ProtoIdSet(u)
+	ids := u.MakeIdSet()
 
-	var ids kennung.Set
-
-	if ids, err = ps.Make(args...); err != nil {
+	if err = ids.SetMany(args...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -5,9 +5,8 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/november/umwelt"
 	"github.com/friedenberg/zit/src/papa/remote_push"
 )
@@ -31,56 +30,14 @@ func init() {
 	)
 }
 
-func (c Push) ProtoIdSet(u *umwelt.Umwelt) (is kennung.ProtoIdSet) {
-	switch c.Gattung {
-
-	default:
-		is = kennung.MakeProtoIdSet(
-			kennung.ProtoId{
-				Setter: &sha.Sha{},
-			},
-			kennung.ProtoId{
-				Setter: &kennung.Hinweis{},
-				Expand: func(v string) (out string, err error) {
-					var h kennung.Hinweis
-					h, err = u.StoreObjekten().GetAbbrStore().ExpandHinweisString(v)
-					out = h.String()
-					return
-				},
-			},
-			kennung.ProtoId{
-				Setter: &kennung.Etikett{},
-				Expand: func(v string) (out string, err error) {
-					var e kennung.Etikett
-					e, err = u.StoreObjekten().GetAbbrStore().ExpandEtikettString(v)
-					out = e.String()
-					return
-				},
-			},
-			kennung.ProtoId{
-				Setter: &kennung.Typ{},
-			},
-			kennung.ProtoId{
-				Setter: &ts.Time{},
-			},
-		)
-
-	case gattung.Typ:
-		is = kennung.MakeProtoIdSet(
-			kennung.ProtoId{
-				Setter: &kennung.Typ{},
-			},
-		)
-
-	case gattung.Transaktion:
-		is = kennung.MakeProtoIdSet(
-			kennung.ProtoId{
-				Setter: &ts.Time{},
-			},
-		)
-	}
-
-	return
+func (c Push) CompletionGattung() gattungen.Set {
+	return gattungen.MakeSet(
+		gattung.Zettel,
+		gattung.Etikett,
+		gattung.Typ,
+		gattung.Bestandsaufnahme,
+		gattung.Kasten,
+	)
 }
 
 func (c Push) Run(u *umwelt.Umwelt, args ...string) (err error) {
@@ -98,11 +55,9 @@ func (c Push) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	ps := c.ProtoIdSet(u)
+	ids := u.MakeIdSet()
 
-	var ids kennung.Set
-
-	if ids, err = ps.Make(args...); err != nil {
+	if err = ids.SetMany(args...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

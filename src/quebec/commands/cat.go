@@ -9,6 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -34,6 +35,14 @@ func init() {
 
 			return commandWithIds{c}
 		},
+	)
+}
+
+func (c Cat) CompletionGattung() gattungen.Set {
+	return gattungen.MakeSet(
+		gattung.Etikett,
+		gattung.Zettel,
+		gattung.Typ,
 	)
 }
 
