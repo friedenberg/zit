@@ -60,6 +60,7 @@ func (c commandWithIds) getIdProtoSet(u *umwelt.Umwelt) (is kennung.ProtoIdSet) 
 }
 
 func (c commandWithIds) Complete(u *umwelt.Umwelt, args ...string) (err error) {
+	errors.TodoP0("implement")
 	ps := c.getIdProtoSet(u)
 
 	if ps.Contains(&kennung.Hinweis{}) {
@@ -128,11 +129,30 @@ func (c commandWithIds) Complete(u *umwelt.Umwelt, args ...string) (err error) {
 }
 
 func (c commandWithIds) Run(u *umwelt.Umwelt, args ...string) (err error) {
-	ps := c.getIdProtoSet(u)
+	ids := kennung.MakeSetWithExpanders(
+		func(v string) (out string, err error) {
+			var s sha.Sha
+			s, err = u.StoreObjekten().GetAbbrStore().ExpandShaString(v)
+			out = s.String()
+			return
+		},
+		func(v string) (out string, err error) {
+			var e kennung.Etikett
+			e, err = u.StoreObjekten().GetAbbrStore().ExpandEtikettString(v)
+			out = e.String()
+			return
+		},
+		func(v string) (out string, err error) {
+			var h kennung.Hinweis
+			h, err = u.StoreObjekten().GetAbbrStore().ExpandHinweisString(v)
+			out = h.String()
+			return
+		},
+		nil, //typExpander func(string) (string, error),
+		nil, //kastenExpander func(string) (string, error),
+	)
 
-	var ids kennung.Set
-
-	if ids, err = ps.Make(args...); err != nil {
+	if err = ids.SetMany(args...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

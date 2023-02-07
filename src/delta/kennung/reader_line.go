@@ -14,7 +14,7 @@ type ReaderLine struct {
 }
 
 func (rl *ReaderLine) ReadFrom(r1 io.Reader) (n int64, err error) {
-	rl.Set = Make(0)
+	rl.Set = MakeSet()
 	r := bufio.NewReader(r1)
 
 	for {

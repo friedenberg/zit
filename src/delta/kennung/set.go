@@ -1,30 +1,38 @@
 package kennung
 
 import (
-	"fmt"
-
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/sha_collections"
 	"github.com/friedenberg/zit/src/echo/ts"
 )
 
-// TODO-P4 move to kennung
 // TODO-P3 rewrite
 type Set struct {
-	Shas       sha_collections.MutableSet
-	Etiketten  EtikettMutableSet
-	Hinweisen  HinweisMutableSet
-	Typen      TypMutableSet
+	shaExpander func(string) (string, error)
+	Shas        sha_collections.MutableSet
+
+	etikettExpander func(string) (string, error)
+	Etiketten       EtikettMutableSet
+
+	hinweisExpander func(string) (string, error)
+	Hinweisen       HinweisMutableSet
+
+	typExpander func(string) (string, error)
+	Typen       TypMutableSet
+
 	Timestamps ts.MutableSet
-	Kisten     KastenMutableSet
-	HasKonfig  bool
-	Sigil      Sigil
-	ids        []schnittstellen.Value
+
+	kastenExpander func(string) (string, error)
+	Kisten         KastenMutableSet
+
+	HasKonfig bool
+	Sigil     Sigil
 }
 
-func Make(c int) Set {
+func MakeSet() Set {
 	return Set{
 		Timestamps: ts.MakeMutableSet(),
 		Shas:       sha_collections.MakeMutableSet(),
@@ -32,11 +40,102 @@ func Make(c int) Set {
 		Hinweisen:  MakeHinweisMutableSet(),
 		Typen:      MakeTypMutableSet(),
 		Kisten:     MakeKastenMutableSet(),
-		ids:        make([]schnittstellen.Value, 0, c),
 	}
 }
 
-func (s *Set) Add(ids ...schnittstellen.Value) {
+func MakeSetWithExpanders(
+	shaExpander func(string) (string, error),
+	etikettExpander func(string) (string, error),
+	hinweisExpander func(string) (string, error),
+	typExpander func(string) (string, error),
+	kastenExpander func(string) (string, error),
+) Set {
+	errors.TodoP0("implement")
+	return Set{
+		shaExpander:     shaExpander,
+		Shas:            sha_collections.MakeMutableSet(),
+		etikettExpander: etikettExpander,
+		Etiketten:       MakeEtikettMutableSet(),
+		hinweisExpander: hinweisExpander,
+		Hinweisen:       MakeHinweisMutableSet(),
+		typExpander:     typExpander,
+		Typen:           MakeTypMutableSet(),
+		kastenExpander:  kastenExpander,
+		Kisten:          MakeKastenMutableSet(),
+		Timestamps:      ts.MakeMutableSet(),
+	}
+}
+
+func (s *Set) SetMany(vs ...string) (err error) {
+	for _, v := range vs {
+		if err = s.Set(v); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
+func (s *Set) Set(v string) (err error) {
+	if err = collections.ExpandAndAddString[sha.Sha, *sha.Sha](
+		s.Shas,
+		s.shaExpander,
+		v,
+	); err == nil {
+		return
+	}
+
+	if err = collections.AddString[ts.Time, *ts.Time](s.Timestamps, v); err == nil {
+		return
+	}
+
+	if err = (Konfig{}).Set(v); err == nil {
+		return
+	}
+
+	if err = collections.ExpandAndAddString[Hinweis, *Hinweis](
+		s.Hinweisen,
+		s.hinweisExpander,
+		v,
+	); err == nil {
+		return
+	}
+
+	if err = collections.ExpandAndAddString[Etikett, *Etikett](
+		s.Etiketten,
+		s.etikettExpander,
+		v,
+	); err == nil {
+		return
+	}
+
+	if err = collections.ExpandAndAddString[Typ, *Typ](
+		s.Typen,
+		s.typExpander,
+		v,
+	); err == nil {
+		return
+	}
+
+	if err = collections.ExpandAndAddString[Kasten, *Kasten](
+		s.Kisten,
+		s.kastenExpander,
+		v,
+	); err == nil {
+		return
+	}
+
+	if err = s.Sigil.Set(v); err == nil {
+		return
+	}
+
+	err = errors.Wrap(ErrInvalid)
+
+	return
+}
+
+func (s *Set) Add(ids ...schnittstellen.Value) (err error) {
 	for _, i := range ids {
 		switch it := i.(type) {
 		case Etikett:
@@ -64,14 +163,17 @@ func (s *Set) Add(ids ...schnittstellen.Value) {
 			s.Sigil.Add(it)
 
 		default:
-			s.ids = append(s.ids, it)
+			err = errors.Errorf("unknown kennung: %s", it)
+			return
 		}
 	}
+
+	return
 }
 
 func (s Set) String() string {
 	errors.TodoP4("improve the string creation method")
-	return fmt.Sprintf("%#v", s.ids)
+	return ""
 }
 
 func (s Set) OnlySingleHinweis() (h Hinweis, ok bool) {

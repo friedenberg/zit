@@ -37,6 +37,30 @@ func AddString[E any, EPtr schnittstellen.SetterPtr[E]](
 	return
 }
 
+func ExpandAndAddString[E any, EPtr schnittstellen.SetterPtr[E]](
+	c Adder[E],
+	expander func(string) (string, error),
+	v string,
+) (err error) {
+	if expander != nil {
+		v1 := v
+
+		if v1, err = expander(v); err != nil {
+			err = nil
+			v1 = v
+		}
+
+		v = v1
+	}
+
+	if err = AddString[E, EPtr](c, v); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 type AddGetKeyer[E Lessor[E]] interface {
 	Adder[E]
 	Get(string) (E, bool)

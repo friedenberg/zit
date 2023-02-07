@@ -96,7 +96,7 @@ func (ps ProtoIdSet) MakeOne(v string) (i schnittstellen.Value, err error) {
 }
 
 func (ps ProtoIdSet) Make(vs ...string) (s Set, err error) {
-	s = Make(len(vs))
+	s = MakeSet()
 
 	for _, v := range vs {
 		var i schnittstellen.Value
