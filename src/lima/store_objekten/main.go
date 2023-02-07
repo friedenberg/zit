@@ -14,6 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/india/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/juliett/zettel"
+	"github.com/friedenberg/zit/src/kasten"
 	"github.com/friedenberg/zit/src/kilo/store_util"
 )
 
@@ -24,6 +25,7 @@ type Store struct {
 	typStore     TypStore
 	etikettStore EtikettStore
 	konfigStore  KonfigStore
+	kastenStore  KastenStore
 
 	//Gattungen
 	gattungStores     map[schnittstellen.Gattung]GattungStore
@@ -61,11 +63,17 @@ func Make(
 		return
 	}
 
+	if s.kastenStore, err = makeKastenStore(s.StoreUtil); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	s.gattungStores = map[schnittstellen.Gattung]GattungStore{
 		gattung.Zettel:  s.zettelStore,
 		gattung.Typ:     s.typStore,
 		gattung.Etikett: s.etikettStore,
 		gattung.Konfig:  s.konfigStore,
+		gattung.Kasten:  s.kastenStore,
 	}
 
 	s.readers = map[schnittstellen.Gattung]objekte.FuncReaderTransactedLike{
@@ -77,6 +85,9 @@ func Make(
 		),
 		gattung.Etikett: objekte.MakeApplyTransactedLike[*etikett.Transacted](
 			s.etikettStore.ReadAllSchwanzen,
+		),
+		gattung.Kasten: objekte.MakeApplyTransactedLike[*kasten.Transacted](
+			s.kastenStore.ReadAllSchwanzen,
 		),
 		// gattung.Konfig:           objekte.MakeApplyTransactedLike[*konfig.Transacted](
 		// s.konfigStore.ReadAllSchwanzen,
@@ -95,6 +106,9 @@ func Make(
 		),
 		gattung.Etikett: objekte.MakeApplyTransactedLike[*etikett.Transacted](
 			s.etikettStore.ReadAll,
+		),
+		gattung.Kasten: objekte.MakeApplyTransactedLike[*kasten.Transacted](
+			s.kastenStore.ReadAll,
 		),
 		// gattung.Konfig:           objekte.MakeApplyTransactedLike[*konfig.Transacted](
 		// s.konfigStore.ReadAllSchwanzen,
@@ -137,6 +151,10 @@ func (s *Store) Etikett() EtikettStore {
 
 func (s *Store) Konfig() KonfigStore {
 	return s.konfigStore
+}
+
+func (s *Store) Kasten() KastenStore {
+	return s.kastenStore
 }
 
 func (s Store) RevertTransaktion(

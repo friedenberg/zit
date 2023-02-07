@@ -33,6 +33,9 @@ func (s Standort) DirObjektenGattung(
 	case gattung.Bestandsaufnahme:
 		p = s.DirObjektenBestandsaufnahme()
 
+	case gattung.Kasten:
+		p = s.DirObjektenKasten()
+
 	default:
 		err = gattung.ErrUnsupportedGattung
 		err = errors.Wrapf(err, "Gattung: %s", g)
@@ -80,6 +83,10 @@ func (s Standort) DirObjektenZettelen() string {
 
 func (s Standort) DirObjektenBestandsaufnahme() string {
 	return s.DirObjekten("Bestandsaufnahme")
+}
+
+func (s Standort) DirObjektenKasten() string {
+	return s.DirObjekten("Kasten")
 }
 
 func (s Standort) DirObjektenKonfig() string {

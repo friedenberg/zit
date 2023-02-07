@@ -18,6 +18,7 @@ type Set struct {
 	Hinweisen  HinweisMutableSet
 	Typen      TypMutableSet
 	Timestamps ts.MutableSet
+	Kisten     KastenMutableSet
 	HasKonfig  bool
 	Sigil      Sigil
 	ids        []schnittstellen.Value
@@ -30,6 +31,7 @@ func Make(c int) Set {
 		Etiketten:  MakeEtikettMutableSet(),
 		Hinweisen:  MakeHinweisMutableSet(),
 		Typen:      MakeTypMutableSet(),
+		Kisten:     MakeKastenMutableSet(),
 		ids:        make([]schnittstellen.Value, 0, c),
 	}
 }
@@ -51,6 +53,9 @@ func (s *Set) Add(ids ...schnittstellen.Value) {
 
 		case ts.Time:
 			s.Timestamps.Add(it)
+
+		case Kasten:
+			s.Kisten.Add(it)
 
 		case Konfig:
 			s.HasKonfig = true
@@ -83,7 +88,7 @@ func (s Set) Len() int {
 		k = 1
 	}
 
-	return s.Shas.Len() + s.Etiketten.Len() + s.Hinweisen.Len() + s.Typen.Len() + s.Timestamps.Len() + k
+	return s.Kisten.Len() + s.Shas.Len() + s.Etiketten.Len() + s.Hinweisen.Len() + s.Typen.Len() + s.Timestamps.Len() + k
 }
 
 func (s Set) AnyShasOrHinweisen() (ids []schnittstellen.Korper) {

@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/hotel/etikett"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/juliett/zettel"
+	"github.com/friedenberg/zit/src/kasten"
 	"github.com/friedenberg/zit/src/kilo/zettel_external"
 	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
 	"github.com/friedenberg/zit/src/mike/store_fs"
@@ -42,6 +43,15 @@ func (u *Umwelt) PrinterEtikettTransacted(
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
 		u.FormatEtikettTransacted(verb),
+	)
+}
+
+func (u *Umwelt) PrinterKastenTransacted(
+	verb string,
+) collections.WriterFunc[*kasten.Transacted] {
+	return format.MakeWriterToWithNewLines(
+		u.Out(),
+		u.FormatKastenTransacted(verb),
 	)
 }
 

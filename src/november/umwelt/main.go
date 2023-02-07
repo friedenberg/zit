@@ -214,6 +214,14 @@ func (u *Umwelt) Initialize() (err error) {
 		},
 	)
 
+	u.storeObjekten.Kasten().SetLogWriter(
+		store_objekten.KastenLogWriter{
+			New:       u.PrinterKastenTransacted(format.StringUpdated),
+			Updated:   u.PrinterKastenTransacted(format.StringUpdated),
+			Unchanged: u.PrinterKastenTransacted(format.StringUnchanged),
+		},
+	)
+
 	u.storeWorkingDirectory.SetZettelExternalLogPrinter(
 		u.PrinterZettelExternal(),
 	)

@@ -1,13 +1,13 @@
 package kasten
 
-import "net/url"
+import "github.com/friedenberg/zit/src/uri"
 
 type Akte struct {
-	Uri url.URL `toml:"uri"`
+	Uri uri.Uri `toml:"uri"`
 }
 
 func (a *Akte) Reset() {
-	a.Uri = url.URL{}
+	a.Uri = uri.Uri{}
 }
 
 func (a *Akte) ResetWith(b Akte) {

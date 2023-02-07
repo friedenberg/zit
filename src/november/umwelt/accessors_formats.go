@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/hotel/etikett"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/juliett/zettel"
+	"github.com/friedenberg/zit/src/kasten"
 	"github.com/friedenberg/zit/src/kilo/zettel_external"
 	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
 	"github.com/friedenberg/zit/src/mike/store_fs"
@@ -56,6 +57,10 @@ func (u *Umwelt) FormatEtikett() schnittstellen.FuncWriterFormat[kennung.Etikett
 	return etikett.MakeCliFormat(u.FormatColorWriter())
 }
 
+func (u *Umwelt) FormatKasten() schnittstellen.FuncWriterFormat[kennung.Kasten] {
+	return kasten.MakeCliFormat(u.FormatColorWriter())
+}
+
 func (u *Umwelt) FormatTypTransacted(
 	verb string,
 ) schnittstellen.FuncWriterFormat[typ.Transacted] {
@@ -76,6 +81,18 @@ func (u *Umwelt) FormatEtikettTransacted(
 		u.FormatColorWriter(),
 		u.FormatSha(u.StoreObjekten().GetAbbrStore().AbbreviateSha),
 		u.FormatEtikett(),
+		verb,
+	)
+}
+
+func (u *Umwelt) FormatKastenTransacted(
+	verb string,
+) schnittstellen.FuncWriterFormat[kasten.Transacted] {
+	return kasten.MakeCliFormatTransacted(
+		u.Standort(),
+		u.FormatColorWriter(),
+		u.FormatSha(u.StoreObjekten().GetAbbrStore().AbbreviateSha),
+		u.FormatKasten(),
 		verb,
 	)
 }
