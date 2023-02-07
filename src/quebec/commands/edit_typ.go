@@ -12,7 +12,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/fd"
-	"github.com/friedenberg/zit/src/foxtrot/id_set"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/hotel/typ"
@@ -37,9 +36,9 @@ func init() {
 	)
 }
 
-func (c EditTyp) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
-	is = id_set.MakeProtoIdSet(
-		id_set.ProtoId{
+func (c EditTyp) ProtoIdSet(u *umwelt.Umwelt) (is kennung.ProtoIdSet) {
+	is = kennung.MakeProtoIdSet(
+		kennung.ProtoId{
 			Setter: &kennung.Typ{},
 		},
 	)
@@ -47,7 +46,7 @@ func (c EditTyp) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 	return
 }
 
-func (c EditTyp) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
+func (c EditTyp) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 	tks := ids.Typen.Copy()
 
 	switch {

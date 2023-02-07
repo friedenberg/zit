@@ -1,4 +1,4 @@
-package id_set
+package kennung
 
 import (
 	"bufio"

@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/ts"
-	"github.com/friedenberg/zit/src/foxtrot/id_set"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/hotel/erworben"
@@ -53,18 +52,18 @@ func init() {
 	)
 }
 
-func (c Diff) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
-	is = id_set.MakeProtoIdSet()
+func (c Diff) ProtoIdSet(u *umwelt.Umwelt) (is kennung.ProtoIdSet) {
+	is = kennung.MakeProtoIdSet()
 
 	if c.GattungSet.Contains(gattung.Zettel) {
 		is.AddMany(
-			id_set.ProtoId{
+			kennung.ProtoId{
 				Setter: kennung.MakeSigil(kennung.SigilNone),
 			},
 			// id_set.ProtoId{
 			// 	Setter: &sha.Sha{},
 			// },
-			id_set.ProtoId{
+			kennung.ProtoId{
 				Setter: &kennung.Hinweis{},
 				Expand: func(v string) (out string, err error) {
 					var h kennung.Hinweis
@@ -73,7 +72,7 @@ func (c Diff) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 					return
 				},
 			},
-			id_set.ProtoId{
+			kennung.ProtoId{
 				Setter: &kennung.Etikett{},
 				Expand: func(v string) (out string, err error) {
 					var e kennung.Etikett
@@ -82,7 +81,7 @@ func (c Diff) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 					return
 				},
 			},
-			id_set.ProtoId{
+			kennung.ProtoId{
 				Setter: &kennung.Typ{},
 			},
 			// id_set.ProtoId{
@@ -93,7 +92,7 @@ func (c Diff) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 
 	if c.GattungSet.Contains(gattung.Typ) {
 		is.AddMany(
-			id_set.ProtoId{
+			kennung.ProtoId{
 				Setter: &kennung.Typ{},
 			},
 		)
@@ -101,7 +100,7 @@ func (c Diff) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 
 	if c.GattungSet.Contains(gattung.Transaktion) {
 		is.AddMany(
-			id_set.ProtoId{
+			kennung.ProtoId{
 				Setter: &ts.Time{},
 			},
 		)
@@ -110,7 +109,7 @@ func (c Diff) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 	return
 }
 
-func (c Diff) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
+func (c Diff) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 	if err = c.GattungSet.Each(
 		func(g gattung.Gattung) (err error) {
 			switch g {
@@ -206,11 +205,11 @@ func (c Diff) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 func (c Diff) showZettels(
 	u *umwelt.Umwelt,
-	ids id_set.Set,
+	ids kennung.Set,
 	fv collections.WriterFunc[*zettel.Transacted],
 ) (err error) {
 	idFilter := zettel.WriterIds{
-		Filter: id_set.Filter{
+		Filter: kennung.Filter{
 			Set: ids,
 		},
 	}.WriteZettelTransacted
@@ -271,7 +270,7 @@ func (c Diff) showZettels(
 }
 
 // TODO-P3 support All
-func (c Diff) showAkten(u *umwelt.Umwelt, ids id_set.Set) (err error) {
+func (c Diff) showAkten(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 	zettels := make([]*zettel.Transacted, ids.Len())
 
 	for i, is := range ids.AnyShasOrHinweisen() {
@@ -310,7 +309,7 @@ func (c Diff) showAkten(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 }
 
 // TODO-P3 support All
-func (c Diff) showTransaktions(u *umwelt.Umwelt, ids id_set.Set) (err error) {
+func (c Diff) showTransaktions(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 	ids.Timestamps.Copy().Each(
 		func(is ts.Time) (err error) {
 			var t *transaktion.Transaktion
@@ -340,7 +339,7 @@ func (c Diff) showTransaktions(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 func (c Diff) showTypen(
 	u *umwelt.Umwelt,
-	ids id_set.Set,
+	ids kennung.Set,
 	f collections.WriterFunc[*typ.Transacted],
 ) (err error) {
 	f1 := collections.MakeSyncSerializer(f)
@@ -379,7 +378,7 @@ func (c Diff) showTypen(
 // TODO-P3 support All
 func (c Diff) showEtiketten(
 	u *umwelt.Umwelt,
-	ids id_set.Set,
+	ids kennung.Set,
 	f collections.WriterFunc[*etikett.Transacted],
 ) (err error) {
 	f1 := collections.MakeSyncSerializer(f)

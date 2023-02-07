@@ -8,7 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/ts"
-	"github.com/friedenberg/zit/src/foxtrot/id_set"
 	"github.com/friedenberg/zit/src/juliett/cwd_files"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
@@ -41,9 +40,9 @@ func init() {
 	)
 }
 
-func (c Edit) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
-	is = id_set.MakeProtoIdSet(
-		id_set.ProtoId{
+func (c Edit) ProtoIdSet(u *umwelt.Umwelt) (is kennung.ProtoIdSet) {
+	is = kennung.MakeProtoIdSet(
+		kennung.ProtoId{
 			Setter: &kennung.Hinweis{},
 			Expand: func(v string) (out string, err error) {
 				var h kennung.Hinweis
@@ -52,7 +51,7 @@ func (c Edit) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 				return
 			},
 		},
-		id_set.ProtoId{
+		kennung.ProtoId{
 			Setter: &kennung.Etikett{},
 			Expand: func(v string) (out string, err error) {
 				var e kennung.Etikett
@@ -61,10 +60,10 @@ func (c Edit) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 				return
 			},
 		},
-		id_set.ProtoId{
+		kennung.ProtoId{
 			Setter: &kennung.Typ{},
 		},
-		id_set.ProtoId{
+		kennung.ProtoId{
 			Setter: &ts.Time{},
 		},
 	)
@@ -72,7 +71,7 @@ func (c Edit) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 	return
 }
 
-func (c Edit) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
+func (c Edit) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 	checkoutOptions := store_fs.CheckoutOptions{
 		CheckoutMode: c.CheckoutMode,
 	}
@@ -80,7 +79,7 @@ func (c Edit) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	var checkoutResults zettel_checked_out.MutableSet
 
 	query := zettel.WriterIds{
-		Filter: id_set.Filter{
+		Filter: kennung.Filter{
 			Set: ids,
 			Or:  c.Or,
 		},

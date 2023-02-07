@@ -4,13 +4,13 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/delta/gattungen"
-	"github.com/friedenberg/zit/src/foxtrot/id_set"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 )
 
 func (c *client) PullSkus(
-	filter id_set.Filter,
+	filter kennung.Filter,
 	gattungSet gattungen.Set,
 ) (err error) {
 	errors.TodoP0("implement etikett and akte")

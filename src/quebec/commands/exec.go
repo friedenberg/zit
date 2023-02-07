@@ -13,7 +13,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/id_set"
 	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -78,11 +77,11 @@ func (c Exec) getZettel(
 	executor erworben.RemoteScript,
 	err error,
 ) {
-	ps := id_set.MakeProtoIdSet(
-		id_set.ProtoId{
+	ps := kennung.MakeProtoIdSet(
+		kennung.ProtoId{
 			Setter: &sha.Sha{},
 		},
-		id_set.ProtoId{
+		kennung.ProtoId{
 			Setter: &kennung.Hinweis{},
 			Expand: func(v string) (out string, err error) {
 				var h kennung.Hinweis
@@ -93,7 +92,7 @@ func (c Exec) getZettel(
 		},
 	)
 
-	var is id_set.Set
+	var is kennung.Set
 
 	if is, err = ps.Make(hString); err != nil {
 		err = errors.Wrap(err)

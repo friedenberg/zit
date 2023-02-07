@@ -12,7 +12,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/ts"
-	"github.com/friedenberg/zit/src/foxtrot/id_set"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/hotel/erworben"
@@ -55,15 +54,15 @@ func init() {
 	)
 }
 
-func (c Show) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
-	is = id_set.MakeProtoIdSet()
+func (c Show) ProtoIdSet(u *umwelt.Umwelt) (is kennung.ProtoIdSet) {
+	is = kennung.MakeProtoIdSet()
 
 	if c.GattungSet.Contains(gattung.Zettel) {
 		is.AddMany(
-			id_set.ProtoId{
+			kennung.ProtoId{
 				Setter: &sha.Sha{},
 			},
-			id_set.ProtoId{
+			kennung.ProtoId{
 				Setter: &kennung.Hinweis{},
 				Expand: func(v string) (out string, err error) {
 					var h kennung.Hinweis
@@ -72,7 +71,7 @@ func (c Show) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 					return
 				},
 			},
-			id_set.ProtoId{
+			kennung.ProtoId{
 				Setter: &kennung.Etikett{},
 				Expand: func(v string) (out string, err error) {
 					var e kennung.Etikett
@@ -81,10 +80,10 @@ func (c Show) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 					return
 				},
 			},
-			id_set.ProtoId{
+			kennung.ProtoId{
 				Setter: &kennung.Typ{},
 			},
-			id_set.ProtoId{
+			kennung.ProtoId{
 				Setter: &ts.Time{},
 			},
 		)
@@ -92,7 +91,7 @@ func (c Show) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 
 	if c.GattungSet.Contains(gattung.Typ) {
 		is.AddMany(
-			id_set.ProtoId{
+			kennung.ProtoId{
 				Setter: &kennung.Typ{},
 			},
 		)
@@ -100,7 +99,7 @@ func (c Show) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 
 	if c.GattungSet.Contains(gattung.Transaktion) {
 		is.AddMany(
-			id_set.ProtoId{
+			kennung.ProtoId{
 				Setter: &ts.Time{},
 			},
 		)
@@ -109,7 +108,7 @@ func (c Show) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 	return
 }
 
-func (c Show) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
+func (c Show) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 	if err = c.GattungSet.Each(
 		func(g gattung.Gattung) (err error) {
 			switch g {
@@ -205,7 +204,7 @@ func (c Show) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 func (c Show) showOneOrMoreZettels(
 	u *umwelt.Umwelt,
-	ids id_set.Set,
+	ids kennung.Set,
 	fv collections.WriterFunc[*zettel.Transacted],
 ) (err error) {
 	if h, ok := ids.OnlySingleHinweis(); ok {
@@ -245,11 +244,11 @@ func (c Show) showOneZettel(
 
 func (c Show) showManyZettels(
 	u *umwelt.Umwelt,
-	ids id_set.Set,
+	ids kennung.Set,
 	fv collections.WriterFunc[*zettel.Transacted],
 ) (err error) {
 	idFilter := zettel.WriterIds{
-		Filter: id_set.Filter{
+		Filter: kennung.Filter{
 			Set: ids,
 		},
 	}.WriteZettelTransacted
@@ -303,7 +302,7 @@ func (c Show) showManyZettels(
 }
 
 // TODO-P3 support All
-func (c Show) showAkten(u *umwelt.Umwelt, ids id_set.Set) (err error) {
+func (c Show) showAkten(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 	zettels := make([]*zettel.Transacted, ids.Len())
 
 	for i, is := range ids.AnyShasOrHinweisen() {
@@ -342,7 +341,7 @@ func (c Show) showAkten(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 }
 
 // TODO-P3 support All
-func (c Show) showTransaktions(u *umwelt.Umwelt, ids id_set.Set) (err error) {
+func (c Show) showTransaktions(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 	ids.Timestamps.Copy().Each(
 		func(is ts.Time) (err error) {
 			var t *transaktion.Transaktion
@@ -372,7 +371,7 @@ func (c Show) showTransaktions(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 func (c Show) showTypen(
 	u *umwelt.Umwelt,
-	ids id_set.Set,
+	ids kennung.Set,
 	f collections.WriterFunc[*typ.Transacted],
 ) (err error) {
 	f1 := collections.MakeSyncSerializer(f)
@@ -411,7 +410,7 @@ func (c Show) showTypen(
 // TODO-P3 support All
 func (c Show) showEtiketten(
 	u *umwelt.Umwelt,
-	ids id_set.Set,
+	ids kennung.Set,
 	f collections.WriterFunc[*etikett.Transacted],
 ) (err error) {
 	f1 := collections.MakeSyncSerializer(f)

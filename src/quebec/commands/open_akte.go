@@ -11,7 +11,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/id"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/id_set"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
@@ -30,9 +29,9 @@ func init() {
 	)
 }
 
-func (c OpenAkte) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
-	is = id_set.MakeProtoIdSet(
-		id_set.ProtoId{
+func (c OpenAkte) ProtoIdSet(u *umwelt.Umwelt) (is kennung.ProtoIdSet) {
+	is = kennung.MakeProtoIdSet(
+		kennung.ProtoId{
 			Setter: &kennung.Hinweis{},
 			Expand: func(v string) (out string, err error) {
 				var h kennung.Hinweis
@@ -46,7 +45,7 @@ func (c OpenAkte) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 	return
 }
 
-func (c OpenAkte) RunWithIds(store *umwelt.Umwelt, is id_set.Set) (err error) {
+func (c OpenAkte) RunWithIds(store *umwelt.Umwelt, is kennung.Set) (err error) {
 	hins := is.Hinweisen.Copy()
 	paths := make([]string, hins.Len())
 

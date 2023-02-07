@@ -13,7 +13,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/ts"
-	"github.com/friedenberg/zit/src/foxtrot/id_set"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/organize_text"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -87,9 +86,9 @@ func init() {
 	)
 }
 
-func (c Organize) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
-	is = id_set.MakeProtoIdSet(
-		id_set.ProtoId{
+func (c Organize) ProtoIdSet(u *umwelt.Umwelt) (is kennung.ProtoIdSet) {
+	is = kennung.MakeProtoIdSet(
+		kennung.ProtoId{
 			Setter: &kennung.Etikett{},
 			Expand: func(v string) (out string, err error) {
 				var e kennung.Etikett
@@ -98,7 +97,7 @@ func (c Organize) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 				return
 			},
 		},
-		id_set.ProtoId{
+		kennung.ProtoId{
 			Setter: &kennung.Hinweis{},
 			Expand: func(v string) (out string, err error) {
 				var h kennung.Hinweis
@@ -107,10 +106,10 @@ func (c Organize) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 				return
 			},
 		},
-		id_set.ProtoId{
+		kennung.ProtoId{
 			Setter: &kennung.Typ{},
 		},
-		id_set.ProtoId{
+		kennung.ProtoId{
 			Setter: &ts.Time{},
 		},
 	)
@@ -118,7 +117,7 @@ func (c Organize) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 	return
 }
 
-func (c *Organize) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
+func (c *Organize) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 	c.Options.Konfig = u.Konfig()
 	c.Options.Abbr = u.StoreObjekten().GetAbbrStore().AbbreviateHinweis
 
@@ -146,7 +145,7 @@ func (c *Organize) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	getResults := zettel.MakeMutableSetUnique(0)
 
 	query := zettel.WriterIds{
-		Filter: id_set.Filter{
+		Filter: kennung.Filter{
 			Set: ids,
 			Or:  c.Or,
 		},

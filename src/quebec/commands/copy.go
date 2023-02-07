@@ -5,7 +5,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/id_set"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
@@ -25,9 +24,9 @@ func init() {
 	)
 }
 
-func (c Copy) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
-	is = id_set.MakeProtoIdSet(
-		id_set.ProtoId{
+func (c Copy) ProtoIdSet(u *umwelt.Umwelt) (is kennung.ProtoIdSet) {
+	is = kennung.MakeProtoIdSet(
+		kennung.ProtoId{
 			Setter: &kennung.Hinweis{},
 			Expand: func(v string) (out string, err error) {
 				var h kennung.Hinweis
@@ -41,7 +40,7 @@ func (c Copy) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 	return
 }
 
-func (c Copy) RunWithIds(s *umwelt.Umwelt, ids id_set.Set) (err error) {
+func (c Copy) RunWithIds(s *umwelt.Umwelt, ids kennung.Set) (err error) {
 	hins := ids.Hinweisen.Copy()
 
 	zettels := make([]*zettel.Transacted, hins.Len())

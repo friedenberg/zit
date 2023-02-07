@@ -4,13 +4,12 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/id_set"
 )
 
-type SetPrefixNamed map[kennung.Etikett]collections.MutableSet[id_set.Element]
+type SetPrefixNamed map[kennung.Etikett]collections.MutableSet[kennung.Element]
 
 type SetPrefixNamedSegments struct {
-	Ungrouped collections.MutableSet[id_set.Element]
+	Ungrouped collections.MutableSet[kennung.Element]
 	Grouped   *SetPrefixNamed
 }
 
@@ -20,9 +19,9 @@ func NewSetPrefixNamed() *SetPrefixNamed {
 	return &s
 }
 
-func makeMutableZettelLikeSet() collections.MutableSet[id_set.Element] {
+func makeMutableZettelLikeSet() collections.MutableSet[kennung.Element] {
 	return collections.MakeMutableSet(
-		func(e id_set.Element) string {
+		func(e kennung.Element) string {
 			if e == nil {
 				return ""
 			}
@@ -33,7 +32,7 @@ func makeMutableZettelLikeSet() collections.MutableSet[id_set.Element] {
 }
 
 // this splits on right-expanded
-func (s *SetPrefixNamed) Add(z id_set.Element) {
+func (s *SetPrefixNamed) Add(z kennung.Element) {
 	es := kennung.Expanded(z.AkteEtiketten(), kennung.ExpanderRight)
 
 	for _, e := range es.Elements() {
@@ -41,7 +40,7 @@ func (s *SetPrefixNamed) Add(z id_set.Element) {
 	}
 }
 
-func (s *SetPrefixNamed) addPair(e kennung.Etikett, z id_set.Element) {
+func (s *SetPrefixNamed) addPair(e kennung.Etikett, z kennung.Element) {
 	existing, ok := (*s)[e]
 
 	if !ok {
@@ -61,7 +60,7 @@ func (a SetPrefixNamed) Subset(e kennung.Etikett) (out SetPrefixNamedSegments) {
 
 	for e1, zSet := range a {
 		zSet.Each(
-			func(z id_set.Element) (err error) {
+			func(z kennung.Element) (err error) {
 				intersection := z.AkteEtiketten().IntersectPrefixes(kennung.MakeEtikettSet(e))
 				errors.Log().Printf("%s yields %s", e1, intersection)
 
@@ -81,12 +80,12 @@ func (a SetPrefixNamed) Subset(e kennung.Etikett) (out SetPrefixNamedSegments) {
 	return
 }
 
-func (s SetPrefixNamed) ToSetNamed() (out collections.MutableSet[id_set.Element]) {
+func (s SetPrefixNamed) ToSetNamed() (out collections.MutableSet[kennung.Element]) {
 	out = makeMutableZettelLikeSet()
 
 	for _, zs := range s {
 		zs.Each(
-			func(z id_set.Element) (err error) {
+			func(z kennung.Element) (err error) {
 				out.Add(z)
 
 				return

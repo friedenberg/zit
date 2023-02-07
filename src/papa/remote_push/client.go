@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/foxtrot/id_set"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/november/umwelt"
 	"github.com/friedenberg/zit/src/oscar/remote_conn"
 )
@@ -18,7 +18,7 @@ const (
 )
 
 type Client interface {
-	SendNeededSkus(id_set.Filter) error
+	SendNeededSkus(kennung.Filter) error
 	Close() error
 }
 
@@ -66,7 +66,7 @@ func (c client) Close() (err error) {
 }
 
 // TODO-P0
-func (c client) SendNeededSkus(filter id_set.Filter) (err error) {
+func (c client) SendNeededSkus(filter kennung.Filter) (err error) {
 	// var d remote_conn.Dialogue
 
 	// if d, err = c.stage.StartDialogue(

@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/ts"
-	"github.com/friedenberg/zit/src/foxtrot/id_set"
 	"github.com/friedenberg/zit/src/november/umwelt"
 	"github.com/friedenberg/zit/src/papa/remote_transfers"
 )
@@ -39,15 +38,15 @@ func init() {
 	)
 }
 
-func (c Pull) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
-	is = id_set.MakeProtoIdSet()
+func (c Pull) ProtoIdSet(u *umwelt.Umwelt) (is kennung.ProtoIdSet) {
+	is = kennung.MakeProtoIdSet()
 
 	if c.GattungSet.Contains(gattung.Zettel) {
 		is.AddMany(
-			id_set.ProtoId{
+			kennung.ProtoId{
 				Setter: &sha.Sha{},
 			},
-			id_set.ProtoId{
+			kennung.ProtoId{
 				Setter: &kennung.Hinweis{},
 				Expand: func(v string) (out string, err error) {
 					var h kennung.Hinweis
@@ -56,7 +55,7 @@ func (c Pull) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 					return
 				},
 			},
-			id_set.ProtoId{
+			kennung.ProtoId{
 				Setter: &kennung.Etikett{},
 				Expand: func(v string) (out string, err error) {
 					var e kennung.Etikett
@@ -65,10 +64,10 @@ func (c Pull) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 					return
 				},
 			},
-			id_set.ProtoId{
+			kennung.ProtoId{
 				Setter: &kennung.Typ{},
 			},
-			id_set.ProtoId{
+			kennung.ProtoId{
 				Setter: &ts.Time{},
 			},
 		)
@@ -76,7 +75,7 @@ func (c Pull) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 
 	if c.GattungSet.Contains(gattung.Typ) {
 		is.AddMany(
-			id_set.ProtoId{
+			kennung.ProtoId{
 				Setter: &kennung.Typ{},
 			},
 		)
@@ -84,7 +83,7 @@ func (c Pull) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 
 	if c.GattungSet.Contains(gattung.Transaktion) {
 		is.AddMany(
-			id_set.ProtoId{
+			kennung.ProtoId{
 				Setter: &ts.Time{},
 			},
 		)
@@ -110,14 +109,14 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	ps := c.ProtoIdSet(u)
 
-	var ids id_set.Set
+	var ids kennung.Set
 
 	if ids, err = ps.Make(args...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	filter := id_set.Filter{
+	filter := kennung.Filter{
 		Set: ids,
 	}
 

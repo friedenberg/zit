@@ -11,7 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/gattungen"
-	"github.com/friedenberg/zit/src/foxtrot/id_set"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/november/umwelt"
 	"github.com/friedenberg/zit/src/oscar/remote_conn"
@@ -21,8 +21,8 @@ import (
 type FuncSku func(sku.Sku2) error
 
 type PullClient interface {
-	SkusFromFilter(id_set.Filter, gattungen.Set, FuncSku) error
-	PullSkus(id_set.Filter, gattungen.Set) error
+	SkusFromFilter(kennung.Filter, gattungen.Set, FuncSku) error
+	PullSkus(kennung.Filter, gattungen.Set) error
 	schnittstellen.ObjekteReaderFactory
 	schnittstellen.AkteReaderFactory
 	Close() error
@@ -85,7 +85,7 @@ func (c client) Close() (err error) {
 }
 
 func (c client) SkusFromFilter(
-	ids id_set.Filter,
+	ids kennung.Filter,
 	gattungSet gattungen.Set,
 	f FuncSku,
 ) (err error) {

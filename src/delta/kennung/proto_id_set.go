@@ -1,9 +1,8 @@
-package id_set
+package kennung
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
 type ProtoIdSet struct {
@@ -21,7 +20,7 @@ func MakeProtoIdSet(types ...ProtoId) (ps ProtoIdSet) {
 	ps.always = []protoId{
 		makeProtoId(
 			ProtoId{
-				Setter: kennung.MakeSigil(kennung.SigilNone),
+				Setter: MakeSigil(SigilNone),
 			},
 		),
 	}

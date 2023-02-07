@@ -8,26 +8,25 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/ts"
-	"github.com/friedenberg/zit/src/foxtrot/id_set"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
 type CommandWithIds interface {
-	RunWithIds(store *umwelt.Umwelt, ids id_set.Set) error
+	RunWithIds(store *umwelt.Umwelt, ids kennung.Set) error
 }
 
 type CommandWithIdsAndProtoSet interface {
 	CommandWithIds
-	ProtoIdSet(*umwelt.Umwelt) id_set.ProtoIdSet
+	ProtoIdSet(*umwelt.Umwelt) kennung.ProtoIdSet
 }
 
 type commandWithIds struct {
 	CommandWithIds
 }
 
-func (c commandWithIds) getIdProtoSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
+func (c commandWithIds) getIdProtoSet(u *umwelt.Umwelt) (is kennung.ProtoIdSet) {
 	tid, hasCustomProtoSet := c.CommandWithIds.(CommandWithIdsAndProtoSet)
 
 	switch {
@@ -35,11 +34,11 @@ func (c commandWithIds) getIdProtoSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 		is = tid.ProtoIdSet(u)
 
 	default:
-		is = id_set.MakeProtoIdSet(
-			id_set.ProtoId{
+		is = kennung.MakeProtoIdSet(
+			kennung.ProtoId{
 				Setter: &sha.Sha{},
 			},
-			id_set.ProtoId{
+			kennung.ProtoId{
 				Setter: &kennung.Hinweis{},
 				Expand: func(v string) (out string, err error) {
 					var h kennung.Hinweis
@@ -48,10 +47,10 @@ func (c commandWithIds) getIdProtoSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 					return
 				},
 			},
-			id_set.ProtoId{
+			kennung.ProtoId{
 				Setter: &kennung.Typ{},
 			},
-			id_set.ProtoId{
+			kennung.ProtoId{
 				Setter: &ts.Time{},
 			},
 		)
@@ -131,7 +130,7 @@ func (c commandWithIds) Complete(u *umwelt.Umwelt, args ...string) (err error) {
 func (c commandWithIds) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	ps := c.getIdProtoSet(u)
 
-	var ids id_set.Set
+	var ids kennung.Set
 
 	if ids, err = ps.Make(args...); err != nil {
 		err = errors.Wrap(err)

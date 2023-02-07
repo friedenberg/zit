@@ -8,7 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/id_set"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
@@ -96,13 +95,13 @@ func (op FilterZettelsWithScript) runGetHinweisen(
 	chErr = errBoth
 
 	go func() {
-		is := id_set.MakeProtoIdSet(
-			id_set.ProtoId{
+		is := kennung.MakeProtoIdSet(
+			kennung.ProtoId{
 				Setter: &kennung.Hinweis{},
 			},
 		)
 
-		irl := id_set.ReaderLine{ProtoIdSet: is}
+		irl := kennung.ReaderLine{ProtoIdSet: is}
 
 		if _, err := irl.ReadFrom(r); err != nil {
 			err = errors.Wrap(err)

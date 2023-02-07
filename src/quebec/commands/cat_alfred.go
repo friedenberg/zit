@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/ts"
-	"github.com/friedenberg/zit/src/foxtrot/id_set"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/alfred"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -38,12 +37,12 @@ func init() {
 	)
 }
 
-func (c CatAlfred) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
-	is = id_set.MakeProtoIdSet(
-		id_set.ProtoId{
+func (c CatAlfred) ProtoIdSet(u *umwelt.Umwelt) (is kennung.ProtoIdSet) {
+	is = kennung.MakeProtoIdSet(
+		kennung.ProtoId{
 			Setter: &kennung.Konfig{},
 		},
-		id_set.ProtoId{
+		kennung.ProtoId{
 			Setter: &kennung.Hinweis{},
 			Expand: func(v string) (out string, err error) {
 				var h kennung.Hinweis
@@ -52,7 +51,7 @@ func (c CatAlfred) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 				return
 			},
 		},
-		id_set.ProtoId{
+		kennung.ProtoId{
 			Setter: &kennung.Etikett{},
 			Expand: func(v string) (out string, err error) {
 				var e kennung.Etikett
@@ -61,10 +60,10 @@ func (c CatAlfred) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 				return
 			},
 		},
-		id_set.ProtoId{
+		kennung.ProtoId{
 			Setter: &kennung.Typ{},
 		},
-		id_set.ProtoId{
+		kennung.ProtoId{
 			Setter: &ts.Time{},
 		},
 	)
@@ -72,7 +71,7 @@ func (c CatAlfred) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 	return
 }
 
-func (c CatAlfred) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
+func (c CatAlfred) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 	//this command does its own error handling
 	wo := bufio.NewWriter(u.Out())
 	defer errors.Deferred(&err, wo.Flush)
@@ -121,7 +120,7 @@ func (c CatAlfred) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 
 func (c CatAlfred) catEtiketten(
 	u *umwelt.Umwelt,
-	ids id_set.Set,
+	ids kennung.Set,
 	aw *alfred.Writer,
 	wg *sync.WaitGroup,
 ) {
@@ -145,7 +144,7 @@ func (c CatAlfred) catEtiketten(
 
 func (c CatAlfred) catZettelen(
 	u *umwelt.Umwelt,
-	ids id_set.Set,
+	ids kennung.Set,
 	aw *alfred.Writer,
 	wg *sync.WaitGroup,
 ) {
@@ -161,7 +160,7 @@ func (c CatAlfred) catZettelen(
 		collections.MakeChain(
 			wk,
 			zettel.WriterIds{
-				Filter: id_set.Filter{
+				Filter: kennung.Filter{
 					Set: ids,
 				},
 			}.WriteZettelTransacted,

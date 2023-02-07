@@ -8,8 +8,8 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/delta/sha_collections"
-	"github.com/friedenberg/zit/src/foxtrot/id_set"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
@@ -29,9 +29,9 @@ func init() {
 	)
 }
 
-func (c CatObjekte) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
-	is = id_set.MakeProtoIdSet(
-		id_set.ProtoId{
+func (c CatObjekte) ProtoIdSet(u *umwelt.Umwelt) (is kennung.ProtoIdSet) {
+	is = kennung.MakeProtoIdSet(
+		kennung.ProtoId{
 			Setter: &sha.Sha{},
 			Expand: func(v string) (out string, err error) {
 				var s sha.Sha
@@ -47,7 +47,7 @@ func (c CatObjekte) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 
 func (c CatObjekte) RunWithIds(
 	u *umwelt.Umwelt,
-	ids id_set.Set,
+	ids kennung.Set,
 ) (err error) {
 	shas := ids.Shas.Copy()
 	return c.akten(u, shas)

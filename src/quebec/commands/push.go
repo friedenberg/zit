@@ -8,7 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/ts"
-	"github.com/friedenberg/zit/src/foxtrot/id_set"
 	"github.com/friedenberg/zit/src/november/umwelt"
 	"github.com/friedenberg/zit/src/papa/remote_push"
 )
@@ -32,15 +31,15 @@ func init() {
 	)
 }
 
-func (c Push) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
+func (c Push) ProtoIdSet(u *umwelt.Umwelt) (is kennung.ProtoIdSet) {
 	switch c.Gattung {
 
 	default:
-		is = id_set.MakeProtoIdSet(
-			id_set.ProtoId{
+		is = kennung.MakeProtoIdSet(
+			kennung.ProtoId{
 				Setter: &sha.Sha{},
 			},
-			id_set.ProtoId{
+			kennung.ProtoId{
 				Setter: &kennung.Hinweis{},
 				Expand: func(v string) (out string, err error) {
 					var h kennung.Hinweis
@@ -49,7 +48,7 @@ func (c Push) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 					return
 				},
 			},
-			id_set.ProtoId{
+			kennung.ProtoId{
 				Setter: &kennung.Etikett{},
 				Expand: func(v string) (out string, err error) {
 					var e kennung.Etikett
@@ -58,24 +57,24 @@ func (c Push) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 					return
 				},
 			},
-			id_set.ProtoId{
+			kennung.ProtoId{
 				Setter: &kennung.Typ{},
 			},
-			id_set.ProtoId{
+			kennung.ProtoId{
 				Setter: &ts.Time{},
 			},
 		)
 
 	case gattung.Typ:
-		is = id_set.MakeProtoIdSet(
-			id_set.ProtoId{
+		is = kennung.MakeProtoIdSet(
+			kennung.ProtoId{
 				Setter: &kennung.Typ{},
 			},
 		)
 
 	case gattung.Transaktion:
-		is = id_set.MakeProtoIdSet(
-			id_set.ProtoId{
+		is = kennung.MakeProtoIdSet(
+			kennung.ProtoId{
 				Setter: &ts.Time{},
 			},
 		)
@@ -101,14 +100,14 @@ func (c Push) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	ps := c.ProtoIdSet(u)
 
-	var ids id_set.Set
+	var ids kennung.Set
 
 	if ids, err = ps.Make(args...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	filter := id_set.Filter{
+	filter := kennung.Filter{
 		Set: ids,
 	}
 

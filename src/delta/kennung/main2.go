@@ -1,4 +1,4 @@
-package id_set
+package kennung
 
 import (
 	"fmt"
@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/delta/sha_collections"
 	"github.com/friedenberg/zit/src/echo/ts"
 )
@@ -15,12 +14,12 @@ import (
 // TODO-P3 rewrite
 type Set struct {
 	Shas       sha_collections.MutableSet
-	Etiketten  kennung.EtikettMutableSet
-	Hinweisen  kennung.HinweisMutableSet
-	Typen      kennung.TypMutableSet
+	Etiketten  EtikettMutableSet
+	Hinweisen  HinweisMutableSet
+	Typen      TypMutableSet
 	Timestamps ts.MutableSet
 	HasKonfig  bool
-	Sigil      kennung.Sigil
+	Sigil      Sigil
 	ids        []schnittstellen.Value
 }
 
@@ -28,9 +27,9 @@ func Make(c int) Set {
 	return Set{
 		Timestamps: ts.MakeMutableSet(),
 		Shas:       sha_collections.MakeMutableSet(),
-		Etiketten:  kennung.MakeEtikettMutableSet(),
-		Hinweisen:  kennung.MakeHinweisMutableSet(),
-		Typen:      kennung.MakeTypMutableSet(),
+		Etiketten:  MakeEtikettMutableSet(),
+		Hinweisen:  MakeHinweisMutableSet(),
+		Typen:      MakeTypMutableSet(),
 		ids:        make([]schnittstellen.Value, 0, c),
 	}
 }
@@ -38,25 +37,25 @@ func Make(c int) Set {
 func (s *Set) Add(ids ...schnittstellen.Value) {
 	for _, i := range ids {
 		switch it := i.(type) {
-		case kennung.Etikett:
+		case Etikett:
 			s.Etiketten.Add(it)
 
 		case sha.Sha:
 			s.Shas.Add(it)
 
-		case kennung.Hinweis:
+		case Hinweis:
 			s.Hinweisen.Add(it)
 
-		case kennung.Typ:
+		case Typ:
 			s.Typen.Add(it)
 
 		case ts.Time:
 			s.Timestamps.Add(it)
 
-		case kennung.Konfig:
+		case Konfig:
 			s.HasKonfig = true
 
-		case kennung.Sigil:
+		case Sigil:
 			s.Sigil.Add(it)
 
 		default:
@@ -70,7 +69,7 @@ func (s Set) String() string {
 	return fmt.Sprintf("%#v", s.ids)
 }
 
-func (s Set) OnlySingleHinweis() (h kennung.Hinweis, ok bool) {
+func (s Set) OnlySingleHinweis() (h Hinweis, ok bool) {
 	h = s.Hinweisen.Any()
 	ok = s.Len() == 1 && s.Hinweisen.Len() == 1 && !h.GetSigil().IncludesHistory()
 
@@ -99,7 +98,7 @@ func (s Set) AnyShasOrHinweisen() (ids []schnittstellen.Korper) {
 	)
 
 	s.Hinweisen.Each(
-		func(h kennung.Hinweis) (err error) {
+		func(h Hinweis) (err error) {
 			ids = append(ids, h)
 
 			return

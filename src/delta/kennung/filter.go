@@ -1,17 +1,16 @@
-package id_set
+package kennung
 
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
 type Element interface {
 	schnittstellen.Stored
-	AkteEtiketten() kennung.EtikettSet
-	AkteTyp() kennung.Typ
-	Hinweis() kennung.Hinweis
+	AkteEtiketten() EtikettSet
+	AkteTyp() Typ
+	Hinweis() Hinweis
 }
 
 type Filter struct {
@@ -21,7 +20,7 @@ type Filter struct {
 
 // TODO-P4 improve the performance of this query
 func (f Filter) Include(e Element) (err error) {
-	if f.Set.Sigil.Contains(kennung.SigilAll) {
+	if f.Set.Sigil.Contains(SigilAll) {
 		return
 	}
 
@@ -31,7 +30,7 @@ func (f Filter) Include(e Element) (err error) {
 	needsEt := f.Set.Etiketten.Len() > 0
 	okEt := false
 
-	expanded := kennung.Expanded(e.AkteEtiketten(), kennung.ExpanderRight)
+	expanded := Expanded(e.AkteEtiketten(), ExpanderRight)
 
 LOOP:
 	//TODO-P3 pull into static
@@ -68,7 +67,7 @@ LOOP:
 	okTyp := false
 
 	ty.Each(
-		func(t kennung.Typ) (err error) {
+		func(t Typ) (err error) {
 			if okTyp = t.Includes(e.AkteTyp()); okTyp {
 				err = collections.MakeErrStopIteration()
 			}

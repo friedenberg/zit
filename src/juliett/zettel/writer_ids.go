@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/id_set"
 	"github.com/friedenberg/zit/src/golf/objekte"
 )
 
@@ -15,7 +14,7 @@ func init() {
 }
 
 type WriterIds struct {
-	Filter id_set.Filter
+	Filter kennung.Filter
 }
 
 func (w WriterIds) WriteTransactedLike(maybeZ objekte.TransactedLike) (err error) {

@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/ts"
-	"github.com/friedenberg/zit/src/foxtrot/id_set"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
@@ -33,12 +32,12 @@ func init() {
 	)
 }
 
-func (c ExecAction) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
-	is = id_set.MakeProtoIdSet(
-		id_set.ProtoId{
+func (c ExecAction) ProtoIdSet(u *umwelt.Umwelt) (is kennung.ProtoIdSet) {
+	is = kennung.MakeProtoIdSet(
+		kennung.ProtoId{
 			Setter: &kennung.Konfig{},
 		},
-		id_set.ProtoId{
+		kennung.ProtoId{
 			Setter: &kennung.Hinweis{},
 			Expand: func(v string) (out string, err error) {
 				var h kennung.Hinweis
@@ -47,7 +46,7 @@ func (c ExecAction) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 				return
 			},
 		},
-		id_set.ProtoId{
+		kennung.ProtoId{
 			Setter: &kennung.Etikett{},
 			Expand: func(v string) (out string, err error) {
 				var e kennung.Etikett
@@ -56,10 +55,10 @@ func (c ExecAction) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 				return
 			},
 		},
-		id_set.ProtoId{
+		kennung.ProtoId{
 			Setter: &kennung.Typ{},
 		},
-		id_set.ProtoId{
+		kennung.ProtoId{
 			Setter: &ts.Time{},
 		},
 	)
@@ -67,7 +66,7 @@ func (c ExecAction) ProtoIdSet(u *umwelt.Umwelt) (is id_set.ProtoIdSet) {
 	return
 }
 
-func (c ExecAction) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
+func (c ExecAction) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 	if !c.Action.WasSet() {
 		err = errors.Normal(errors.Errorf("Action must be provided"))
 		return
@@ -86,7 +85,7 @@ func (c ExecAction) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
 	}
 
 	query := zettel.WriterIds{
-		Filter: id_set.Filter{
+		Filter: kennung.Filter{
 			Set: ids,
 			// Or:  c.Or,
 		},

@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/script_value"
-	"github.com/friedenberg/zit/src/foxtrot/id_set"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/organize_text"
 	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
@@ -157,7 +157,7 @@ func (c Add) openAktenIfNecessary(
 	}
 
 	hs := zettels.ToSliceHinweisen()
-	ids := id_set.Make(len(hs))
+	ids := kennung.Make(len(hs))
 
 	for _, h := range hs {
 		ids.Add(h)
@@ -170,7 +170,7 @@ func (c Add) openAktenIfNecessary(
 	var checkoutResults zettel_checked_out.MutableSet
 
 	query := zettel.WriterIds{
-		Filter: id_set.Filter{
+		Filter: kennung.Filter{
 			Set: ids,
 		},
 	}

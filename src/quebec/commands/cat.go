@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/id_set"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
@@ -39,7 +38,7 @@ func init() {
 }
 
 // TODO-P3 move to types as args
-func (c Cat) RunWithIds(u *umwelt.Umwelt, ids id_set.Set) (err error) {
+func (c Cat) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 	switch c.Gattung {
 	case gattung.Etikett:
 		err = c.etiketten(u)
@@ -193,7 +192,7 @@ func (c Cat) zettelen(u *umwelt.Umwelt) (err error) {
 //	return
 //}
 
-func (c Cat) akten(u *umwelt.Umwelt, ids id_set.Set) (err error) {
+func (c Cat) akten(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 	if err = u.Standort().ReadAllShasForGattung(
 		gattung.Akte,
 		func(s sha.Sha) (err error) {

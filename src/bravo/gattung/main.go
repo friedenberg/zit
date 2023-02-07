@@ -24,7 +24,7 @@ const (
 	Kennung
 	Bestandsaufnahme
 	AkteTyp
-  Kasten
+	Kasten
 
 	MaxGattung = Kasten
 )
