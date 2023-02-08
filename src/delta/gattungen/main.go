@@ -1,6 +1,9 @@
 package gattungen
 
 import (
+	"strings"
+
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/collections"
 )
@@ -24,4 +27,33 @@ func MakeMutableSet(gs ...gattung.Gattung) MutableSet {
 		},
 		gs...,
 	)
+}
+
+// type Setter struct{
+//   MutableSet
+//   append bool
+// }
+
+// func (v Setter) String() string {
+//   return v.MutableSet.String()
+// }
+
+// func (v *Setter) Set(v string) (err error) {
+//   return
+// }
+
+func GattungFromString(v string) (s Set, err error) {
+	parts := strings.Split(v, ",")
+	partsGattung := make([]gattung.Gattung, len(parts))
+
+	for i, v := range parts {
+		if err = partsGattung[i].Set(v); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	s = MakeSet(partsGattung...)
+
+	return
 }

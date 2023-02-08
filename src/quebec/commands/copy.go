@@ -24,22 +24,6 @@ func init() {
 	)
 }
 
-func (c Copy) ProtoIdSet(u *umwelt.Umwelt) (is kennung.ProtoIdSet) {
-	is = kennung.MakeProtoIdSet(
-		kennung.ProtoId{
-			Setter: &kennung.Hinweis{},
-			Expand: func(v string) (out string, err error) {
-				var h kennung.Hinweis
-				h, err = u.StoreObjekten().GetAbbrStore().ExpandHinweisString(v)
-				out = h.String()
-				return
-			},
-		},
-	)
-
-	return
-}
-
 func (c Copy) RunWithIds(s *umwelt.Umwelt, ids kennung.Set) (err error) {
 	hins := ids.Hinweisen.Copy()
 

@@ -95,13 +95,7 @@ func (op FilterZettelsWithScript) runGetHinweisen(
 	chErr = errBoth
 
 	go func() {
-		is := kennung.MakeProtoIdSet(
-			kennung.ProtoId{
-				Setter: &kennung.Hinweis{},
-			},
-		)
-
-		irl := kennung.ReaderLine{ProtoIdSet: is}
+		irl := kennung.ReaderLine{}
 
 		if _, err := irl.ReadFrom(r); err != nil {
 			err = errors.Wrap(err)

@@ -20,7 +20,7 @@ type Filter struct {
 
 // TODO-P4 improve the performance of this query
 func (f Filter) Include(e Element) (err error) {
-	if f.Set.Sigil.Contains(SigilAll) {
+	if f.Set.Sigil.IncludesSchwanzen() {
 		return
 	}
 

@@ -7,9 +7,7 @@ import (
 )
 
 type messageRequestSkus struct {
-	Filter       kennung.Filter
-	GattungSlice []gattung.Gattung
-	Sigil        kennung.Sigil
+	MetaSet       kennung.MetaSet
 }
 
 type messageRequestObjekteData struct {

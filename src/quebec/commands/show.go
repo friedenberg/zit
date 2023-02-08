@@ -21,33 +21,19 @@ import (
 )
 
 type Show struct {
-	GattungSet gattungen.MutableSet
-	Format     string
+	Format string
 }
 
 func init() {
 	registerCommand(
 		"show",
 		func(f *flag.FlagSet) Command {
-			c := &Show{
-				GattungSet: gattungen.MakeMutableSet(gattung.Zettel),
-			}
+			c := &Show{}
 
-			gsvs := collections.MutableValueSet2[gattung.Gattung, *gattung.Gattung]{
-				MutableSetLike: &c.GattungSet,
-				SetterPolicy:   collections.SetterPolicyReset,
-			}
-
-			f.Var(gsvs, "gattung", "Gattung")
 			f.StringVar(&c.Format, "format", "text", "format")
 
-			cwi := commandWithIds{
-				CommandWithIds: c,
-			}
-
-			return CommandV2{
-				Command:        cwi,
-				WithCompletion: cwi,
+			return commandWithQuery{
+				CommandWithQuery: c,
 			}
 		},
 	)
@@ -63,9 +49,9 @@ func (c Show) CompletionGattung() gattungen.Set {
 	)
 }
 
-func (c Show) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
-	if err = c.GattungSet.Each(
-		func(g gattung.Gattung) (err error) {
+func (c Show) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
+	if err = ms.All(
+		func(g gattung.Gattung, ids kennung.Set) (err error) {
 			switch g {
 
 			case gattung.Akte:
@@ -342,7 +328,7 @@ func (c Show) showTypen(
 	if err = method(
 		func(t *typ.Transacted) (err error) {
 			switch {
-			case ids.Sigil.IncludesAll():
+			case ids.Sigil.IncludesSchwanzen():
 				fallthrough
 
 			case typen.Contains(t.Sku.Kennung):

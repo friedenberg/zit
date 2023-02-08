@@ -63,6 +63,7 @@ func (g Gattung) GetGattungString() string {
 }
 
 func (g Gattung) String() string {
+  errors.TodoP0("determine of some of these gattung should be goodbyed")
 	switch g {
 	case Akte:
 		return "Akte"
@@ -106,47 +107,47 @@ func (g Gattung) String() string {
 }
 
 func (g *Gattung) Set(v string) (err error) {
-	v1 := strings.ToLower(v)
+	v = strings.TrimSpace(strings.ToLower(v))
 
-	switch v1 {
-	case "akte":
+	switch {
+	case v == "akte":
 		*g = Akte
 
-	case "typ":
+	case strings.HasPrefix("typ", v):
 		*g = Typ
 
-	case "aktetyp":
+	case v == "aktetyp":
 		*g = Typ
 
-	case "etikett":
+	case strings.HasPrefix("etikett", v):
 		*g = Etikett
 
-	case "zettel":
+	case strings.HasPrefix("zettel", v):
 		*g = Zettel
 
-	case "bezeichnung":
+	case v == "bezeichnung":
 		*g = Bezeichnung
 
-	case "hinweis":
+	case v == "hinweis":
 		*g = Hinweis
 
-	case "transaktion":
+	case v == "transaktion":
 		*g = Transaktion
 
-	case "konfig":
+	case v == "konfig":
 		*g = Konfig
 
-	case "kennung":
+	case v == "kennung":
 		*g = Kennung
 
-	case "bestandsaufnahme":
+	case strings.HasPrefix("bestandsaufnahme", v):
 		*g = Bestandsaufnahme
 
-	case "kasten":
+	case strings.HasPrefix("kasten", v):
 		*g = Kasten
 
 	default:
-		err = errors.Wrap(ErrUnrecognizedGattung{string: v1})
+		err = errors.Wrap(ErrUnrecognizedGattung{string: v})
 		return
 	}
 

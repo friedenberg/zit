@@ -91,10 +91,6 @@ func (mk MitKorper[T, T1]) GetSha() sha.Sha {
 	return (Kennung[T, T1])(mk).GetSha()
 }
 
-func (mk MitKorper[T, T1]) GetSigil() Sigil {
-	return (Kennung[T, T1])(mk).GetSigil()
-}
-
 func (t MitKorper[T, T1]) GobEncode() (by []byte, err error) {
 	return (Kennung[T, T1])(t).GobEncode()
 }

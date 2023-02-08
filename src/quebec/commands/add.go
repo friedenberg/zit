@@ -157,7 +157,7 @@ func (c Add) openAktenIfNecessary(
 	}
 
 	hs := zettels.ToSliceHinweisen()
-	ids := kennung.MakeSet()
+	ids := u.MakeIdSet()
 
 	for _, h := range hs {
 		ids.Add(h)

@@ -24,6 +24,7 @@ type ZettelStore interface {
 
 	objekte_store.Inheritor[*zettel.Transacted]
 	objekte_store.TransactedLogger[*zettel.Transacted]
+	objekte_store.Querier[*zettel.Transacted]
 
 	objekte_store.TransactedReader[
 		schnittstellen.Value,
@@ -213,6 +214,32 @@ func (s *zettelStore) writeNamedZettelToIndex(
 	}
 
 	return
+}
+
+func (s zettelStore) MethodForSigil(
+	sigil kennung.Sigil,
+) func(collections.WriterFunc[*zettel.Transacted]) error {
+	if sigil.IncludesHistory() {
+		return s.ReadAll
+	} else {
+		return s.ReadAllSchwanzen
+	}
+}
+
+func (s zettelStore) Query(
+	ids kennung.Set,
+	f collections.WriterFunc[*zettel.Transacted],
+) (err error) {
+	return s.MethodForSigil(ids.Sigil)(
+		collections.MakeChain(
+			zettel.WriterIds{
+				Filter: kennung.Filter{
+					Set: ids,
+				},
+			}.WriteZettelTransacted,
+			f,
+		),
+	)
 }
 
 func (s zettelStore) ReadOne(

@@ -3,15 +3,13 @@ package remote_transfers
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 )
 
 func (c *client) PullSkus(
-	filter kennung.Filter,
-	gattungSet gattungen.Set,
+	ids kennung.MetaSet,
 ) (err error) {
 	errors.TodoP0("implement etikett and akte")
 	gattungInheritors := map[gattung.Gattung]objekte_store.TransactedInheritor{
@@ -20,8 +18,7 @@ func (c *client) PullSkus(
 	}
 
 	if err = c.SkusFromFilter(
-		filter,
-		gattungSet,
+		ids,
 		func(sk sku.Sku2) (err error) {
 			var el objekte_store.TransactedInheritor
 			ok := false

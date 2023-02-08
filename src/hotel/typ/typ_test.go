@@ -10,7 +10,7 @@ func TestAkteExt(t *testing.T) {
 	var e kennung.Typ
 	var err error
 
-	if err = e.Set(".md"); err != nil {
+	if err = e.Set("!md"); err != nil {
 		t.Fatalf("%s", err)
 	}
 

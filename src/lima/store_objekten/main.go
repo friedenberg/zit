@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/gattungen"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/golf/transaktion"
@@ -32,6 +33,7 @@ type Store struct {
 	reindexers        map[schnittstellen.Gattung]reindexer
 	flushers          map[schnittstellen.Gattung]errors.Flusher
 	readers           map[schnittstellen.Gattung]objekte.FuncReaderTransactedLike
+	queriers          map[schnittstellen.Gattung]objekte.FuncQuerierTransactedLike
 	transactedReaders map[schnittstellen.Gattung]objekte.FuncReaderTransactedLike
 }
 
@@ -74,6 +76,28 @@ func Make(
 		gattung.Etikett: s.etikettStore,
 		gattung.Konfig:  s.konfigStore,
 		gattung.Kasten:  s.kastenStore,
+	}
+
+  errors.TodoP0("implement for other gattung")
+	s.queriers = map[schnittstellen.Gattung]objekte.FuncQuerierTransactedLike{
+		gattung.Zettel: objekte.MakeApplyQueryTransactedLike[*zettel.Transacted](
+			s.zettelStore.Query,
+		),
+		// gattung.Typ: objekte.MakeApplyTransactedLike[*typ.Transacted](
+		// 	s.typStore.ReadAllSchwanzen,
+		// ),
+		// gattung.Etikett: objekte.MakeApplyTransactedLike[*etikett.Transacted](
+		// 	s.etikettStore.ReadAllSchwanzen,
+		// ),
+		// gattung.Kasten: objekte.MakeApplyTransactedLike[*kasten.Transacted](
+		// 	s.kastenStore.ReadAllSchwanzen,
+		// ),
+		// gattung.Konfig:           objekte.MakeApplyTransactedLike[*konfig.Transacted](
+		// s.konfigStore.ReadAllSchwanzen,
+		// ),
+		// gattung.Bestandsaufnahme: objekte.MakeApplyTransactedLike[*bestandsaufnahme.Objekte](
+		// 	s.bestandsaufnahmeStore.ReadAll,
+		// ),
 	}
 
 	s.readers = map[schnittstellen.Gattung]objekte.FuncReaderTransactedLike{
@@ -270,6 +294,33 @@ func (s Store) Flush() (err error) {
 	if err = s.GetAbbrStore().Flush(); err != nil {
 		errors.Err().Print(err)
 		err = errors.Wrapf(err, "failed to flush abbr index")
+		return
+	}
+
+	return
+}
+
+func (s *Store) Query(
+	ms kennung.MetaSet,
+	f collections.WriterFunc[objekte.TransactedLike],
+) (err error) {
+	if err = ms.All(
+		func(g gattung.Gattung, ids kennung.Set) (err error) {
+			r, ok := s.queriers[g]
+
+			if !ok {
+				return
+			}
+
+			if err = r(ids, f); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 

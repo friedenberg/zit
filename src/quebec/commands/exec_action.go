@@ -8,7 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/script_config"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
@@ -30,40 +29,6 @@ func init() {
 			}
 		},
 	)
-}
-
-func (c ExecAction) ProtoIdSet(u *umwelt.Umwelt) (is kennung.ProtoIdSet) {
-	is = kennung.MakeProtoIdSet(
-		kennung.ProtoId{
-			Setter: &kennung.Konfig{},
-		},
-		kennung.ProtoId{
-			Setter: &kennung.Hinweis{},
-			Expand: func(v string) (out string, err error) {
-				var h kennung.Hinweis
-				h, err = u.StoreObjekten().GetAbbrStore().ExpandHinweisString(v)
-				out = h.String()
-				return
-			},
-		},
-		kennung.ProtoId{
-			Setter: &kennung.Etikett{},
-			Expand: func(v string) (out string, err error) {
-				var e kennung.Etikett
-				e, err = u.StoreObjekten().GetAbbrStore().ExpandEtikettString(v)
-				out = e.String()
-				return
-			},
-		},
-		kennung.ProtoId{
-			Setter: &kennung.Typ{},
-		},
-		kennung.ProtoId{
-			Setter: &ts.Time{},
-		},
-	)
-
-	return
 }
 
 func (c ExecAction) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {

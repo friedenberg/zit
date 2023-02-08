@@ -5,16 +5,15 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
 type ReaderLine struct {
-	ProtoIdSet
 	Set
 }
 
 func (rl *ReaderLine) ReadFrom(r1 io.Reader) (n int64, err error) {
-	rl.Set = MakeSet()
+	errors.TodoP4("add expanders")
+	rl.Set = MakeSet(Expanders{})
 	r := bufio.NewReader(r1)
 
 	for {
@@ -40,13 +39,9 @@ func (rl *ReaderLine) ReadFrom(r1 io.Reader) (n int64, err error) {
 			continue
 		}
 
-		var i schnittstellen.Value
-
-		if i, err = rl.ProtoIdSet.MakeOne(line); err != nil {
+		if err = rl.Set.Set(line); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
-
-		rl.Set.Add(i)
 	}
 }

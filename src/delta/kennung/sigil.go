@@ -12,19 +12,25 @@ import (
 type Sigil int
 
 const (
-	SigilNone = Sigil(iota)
-	SigilAll  = Sigil(1 << iota)
+	SigilNone      = Sigil(iota)
+	SigilSchwanzen = Sigil(1 << iota)
 	SigilHistory
 	SigilCwd
 )
 
 var (
 	sigilMap = map[rune]Sigil{
-		'!': SigilAll,
+		':': SigilNone,
+		'@': SigilSchwanzen,
 		'+': SigilHistory,
-		'@': SigilCwd,
+		'.': SigilCwd,
 	}
 )
+
+func SigilFieldFunc(c rune) (ok bool) {
+	_, ok = sigilMap[c]
+	return
+}
 
 func MakeSigil(v Sigil) (s *Sigil) {
 	s1 := Sigil(v)
@@ -62,8 +68,8 @@ func (a Sigil) Contains(b Sigil) bool {
 	return a&b != 0
 }
 
-func (a Sigil) IncludesAll() bool {
-	return a.Contains(SigilAll)
+func (a Sigil) IncludesSchwanzen() bool {
+	return a.Contains(SigilSchwanzen)
 }
 
 func (a Sigil) IncludesHistory() bool {
@@ -76,9 +82,12 @@ func (a Sigil) IncludesCwd() bool {
 
 func (a Sigil) String() string {
 	sb := strings.Builder{}
+	errors.TodoP0("use sigil map")
 
-	if a.IncludesAll() {
-		sb.WriteString("!")
+	sb.WriteString(":")
+
+	if a.IncludesSchwanzen() {
+		sb.WriteString("@")
 	}
 
 	if a.IncludesHistory() {
@@ -86,7 +95,7 @@ func (a Sigil) String() string {
 	}
 
 	if a.IncludesCwd() {
-		sb.WriteString("@")
+		sb.WriteString(".")
 	}
 
 	return sb.String()
@@ -104,12 +113,10 @@ func (i *Sigil) Set(v string) (err error) {
 	}
 
 	for _, v1 := range els {
-		switch v1 {
-		case '!', '+', '@':
+		if _, ok := sigilMap[v1]; ok {
 			i.Add(sigilMap[v1])
-
-		default:
-			err = errors.Errorf("not a sigil")
+		} else {
+			err = errors.Wrap(errInvalidSigil(v))
 			return
 		}
 	}

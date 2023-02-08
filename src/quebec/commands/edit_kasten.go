@@ -45,16 +45,16 @@ func (c EditKasten) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 	tks := ids.Kisten.Copy()
 
 	switch {
-	case tks.Len() == 0 && !ids.Sigil.IncludesAll():
+	case tks.Len() == 0 && !ids.Sigil.IncludesSchwanzen():
 		err = errors.Normalf("No Kisten specified for editing. To edit all, use -all.")
 		return
 
-	case ids.Sigil.IncludesAll() && tks.Len() > 0:
+	case ids.Sigil.IncludesSchwanzen() && tks.Len() > 0:
 		errors.Err().Print("Ignoring arguments because -all is set.")
 
 		fallthrough
 
-	case ids.Sigil.IncludesAll():
+	case ids.Sigil.IncludesSchwanzen():
 		mtks := collections.MakeMutableValueSet[kennung.Kasten, *kennung.Kasten]()
 
 		u.Konfig().Kisten.Each(

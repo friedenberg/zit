@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -21,8 +20,8 @@ import (
 type FuncSku func(sku.Sku2) error
 
 type PullClient interface {
-	SkusFromFilter(kennung.Filter, gattungen.Set, FuncSku) error
-	PullSkus(kennung.Filter, gattungen.Set) error
+	SkusFromFilter(kennung.MetaSet, FuncSku) error
+	PullSkus(kennung.MetaSet) error
 	schnittstellen.ObjekteReaderFactory
 	schnittstellen.AkteReaderFactory
 	Close() error
@@ -85,8 +84,7 @@ func (c client) Close() (err error) {
 }
 
 func (c client) SkusFromFilter(
-	ids kennung.Filter,
-	gattungSet gattungen.Set,
+	ids kennung.MetaSet,
 	f FuncSku,
 ) (err error) {
 	var d remote_conn.Dialogue
@@ -113,9 +111,7 @@ func (c client) SkusFromFilter(
 	}()
 
 	msg := messageRequestSkus{
-		Filter:       ids,
-		GattungSlice: gattungSet.Elements(),
-		Sigil:        ids.Set.Sigil,
+		MetaSet: ids,
 	}
 
 	if err = d.Send(msg); err != nil {

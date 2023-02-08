@@ -52,63 +52,6 @@ func init() {
 	)
 }
 
-func (c Diff) ProtoIdSet(u *umwelt.Umwelt) (is kennung.ProtoIdSet) {
-	is = kennung.MakeProtoIdSet()
-
-	if c.GattungSet.Contains(gattung.Zettel) {
-		is.AddMany(
-			kennung.ProtoId{
-				Setter: kennung.MakeSigil(kennung.SigilNone),
-			},
-			// id_set.ProtoId{
-			// 	Setter: &sha.Sha{},
-			// },
-			kennung.ProtoId{
-				Setter: &kennung.Hinweis{},
-				Expand: func(v string) (out string, err error) {
-					var h kennung.Hinweis
-					h, err = u.StoreObjekten().GetAbbrStore().ExpandHinweisString(v)
-					out = h.String()
-					return
-				},
-			},
-			kennung.ProtoId{
-				Setter: &kennung.Etikett{},
-				Expand: func(v string) (out string, err error) {
-					var e kennung.Etikett
-					e, err = u.StoreObjekten().GetAbbrStore().ExpandEtikettString(v)
-					out = e.String()
-					return
-				},
-			},
-			kennung.ProtoId{
-				Setter: &kennung.Typ{},
-			},
-			// id_set.ProtoId{
-			// 	Setter: &ts.Time{},
-			// },
-		)
-	}
-
-	if c.GattungSet.Contains(gattung.Typ) {
-		is.AddMany(
-			kennung.ProtoId{
-				Setter: &kennung.Typ{},
-			},
-		)
-	}
-
-	if c.GattungSet.Contains(gattung.Transaktion) {
-		is.AddMany(
-			kennung.ProtoId{
-				Setter: &ts.Time{},
-			},
-		)
-	}
-
-	return
-}
-
 func (c Diff) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 	if err = c.GattungSet.Each(
 		func(g gattung.Gattung) (err error) {

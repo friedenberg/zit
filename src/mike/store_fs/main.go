@@ -227,12 +227,13 @@ func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 // ReadMany
 // ReadManyHistory
 func (s *Store) ReadOne(h kennung.Hinweis) (zt *zettel.Transacted, err error) {
+	errors.TodoP0("include cwd sigil")
 	if zt, err = s.storeObjekten.Zettel().ReadOne(h); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if !h.GetSigil().IncludesCwd() && !s.erworben.IncludeCwd {
+	if !s.erworben.IncludeCwd {
 		return
 	}
 

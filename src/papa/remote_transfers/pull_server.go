@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -159,19 +158,12 @@ func (op PullServer) skusForFilter(
 		return
 	}
 
-	method := op.umwelt.StoreObjekten().ReadAllSchwanzen
-
-	if msg.Sigil.IncludesHistory() {
-		method = op.umwelt.StoreObjekten().ReadAll
-	}
-
-	if err = method(
-		gattungen.MakeSet(msg.GattungSlice...),
+	if err = op.umwelt.StoreObjekten().Query(
+		msg.MetaSet,
 		collections.MakeChain(
 			collections.MakeFuncTransformer[*zettel.Transacted, objekte.TransactedLike](
 				zettel.MakeWriterKonfig(op.umwelt.Konfig()),
 			),
-			zettel.WriterIds{Filter: msg.Filter}.WriteTransactedLike,
 			func(tl objekte.TransactedLike) (err error) {
 				sk := tl.GetSku2()
 

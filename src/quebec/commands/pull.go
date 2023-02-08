@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/gattungen"
-	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/november/umwelt"
 	"github.com/friedenberg/zit/src/papa/remote_transfers"
 )
@@ -61,15 +60,11 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	ids := u.MakeIdSet()
+	ids := u.MakeMetaIdSet()
 
 	if err = ids.SetMany(args...); err != nil {
 		err = errors.Wrap(err)
 		return
-	}
-
-	filter := kennung.Filter{
-		Set: ids,
 	}
 
 	if err = u.Lock(); err != nil {
@@ -88,7 +83,7 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	defer errors.DeferredCloser(&err, client)
 
-	if err = client.PullSkus(filter, c.GattungSet.Copy()); err != nil {
+	if err = client.PullSkus(ids); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

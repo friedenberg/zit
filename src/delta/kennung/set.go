@@ -9,60 +9,33 @@ import (
 	"github.com/friedenberg/zit/src/echo/ts"
 )
 
-// TODO-P3 rewrite
-type Set struct {
-	shaExpander func(string) (string, error)
-	Shas        sha_collections.MutableSet
-
-	etikettExpander func(string) (string, error)
-	Etiketten       EtikettMutableSet
-
-	hinweisExpander func(string) (string, error)
-	Hinweisen       HinweisMutableSet
-
-	typExpander func(string) (string, error)
-	Typen       TypMutableSet
-
-	Timestamps ts.MutableSet
-
-	kastenExpander func(string) (string, error)
-	Kisten         KastenMutableSet
-
-	HasKonfig bool
-	Sigil     Sigil
+type Expanders struct {
+	Sha, Etikett, Hinweis, Typ, Kasten func(string) (string, error)
 }
 
-func MakeSet() Set {
+type Set struct {
+	expanders  Expanders
+	Shas       sha_collections.MutableSet
+	Etiketten  EtikettMutableSet
+	Hinweisen  HinweisMutableSet
+	Typen      TypMutableSet
+	Timestamps ts.MutableSet
+	Kisten     KastenMutableSet
+	HasKonfig  bool
+	Sigil      Sigil
+}
+
+func MakeSet(
+	ex Expanders,
+) Set {
 	return Set{
-		Timestamps: ts.MakeMutableSet(),
+		expanders:  ex,
 		Shas:       sha_collections.MakeMutableSet(),
 		Etiketten:  MakeEtikettMutableSet(),
 		Hinweisen:  MakeHinweisMutableSet(),
 		Typen:      MakeTypMutableSet(),
 		Kisten:     MakeKastenMutableSet(),
-	}
-}
-
-func MakeSetWithExpanders(
-	shaExpander func(string) (string, error),
-	etikettExpander func(string) (string, error),
-	hinweisExpander func(string) (string, error),
-	typExpander func(string) (string, error),
-	kastenExpander func(string) (string, error),
-) Set {
-	errors.TodoP0("implement")
-	return Set{
-		shaExpander:     shaExpander,
-		Shas:            sha_collections.MakeMutableSet(),
-		etikettExpander: etikettExpander,
-		Etiketten:       MakeEtikettMutableSet(),
-		hinweisExpander: hinweisExpander,
-		Hinweisen:       MakeHinweisMutableSet(),
-		typExpander:     typExpander,
-		Typen:           MakeTypMutableSet(),
-		kastenExpander:  kastenExpander,
-		Kisten:          MakeKastenMutableSet(),
-		Timestamps:      ts.MakeMutableSet(),
+		Timestamps: ts.MakeMutableSet(),
 	}
 }
 
@@ -80,7 +53,7 @@ func (s *Set) SetMany(vs ...string) (err error) {
 func (s *Set) Set(v string) (err error) {
 	if err = collections.ExpandAndAddString[sha.Sha, *sha.Sha](
 		s.Shas,
-		s.shaExpander,
+		s.expanders.Sha,
 		v,
 	); err == nil {
 		return
@@ -96,7 +69,7 @@ func (s *Set) Set(v string) (err error) {
 
 	if err = collections.ExpandAndAddString[Hinweis, *Hinweis](
 		s.Hinweisen,
-		s.hinweisExpander,
+		s.expanders.Hinweis,
 		v,
 	); err == nil {
 		return
@@ -104,7 +77,7 @@ func (s *Set) Set(v string) (err error) {
 
 	if err = collections.ExpandAndAddString[Etikett, *Etikett](
 		s.Etiketten,
-		s.etikettExpander,
+		s.expanders.Etikett,
 		v,
 	); err == nil {
 		return
@@ -112,7 +85,7 @@ func (s *Set) Set(v string) (err error) {
 
 	if err = collections.ExpandAndAddString[Typ, *Typ](
 		s.Typen,
-		s.typExpander,
+		s.expanders.Typ,
 		v,
 	); err == nil {
 		return
@@ -120,7 +93,7 @@ func (s *Set) Set(v string) (err error) {
 
 	if err = collections.ExpandAndAddString[Kasten, *Kasten](
 		s.Kisten,
-		s.kastenExpander,
+		s.expanders.Kasten,
 		v,
 	); err == nil {
 		return
@@ -130,7 +103,7 @@ func (s *Set) Set(v string) (err error) {
 		return
 	}
 
-	err = errors.Wrap(ErrInvalid)
+	err = errors.Wrap(errInvalidKennung(v))
 
 	return
 }
@@ -178,7 +151,7 @@ func (s Set) String() string {
 
 func (s Set) OnlySingleHinweis() (h Hinweis, ok bool) {
 	h = s.Hinweisen.Any()
-	ok = s.Len() == 1 && s.Hinweisen.Len() == 1 && !h.GetSigil().IncludesHistory()
+	ok = s.Len() == 1 && s.Hinweisen.Len() == 1 && !s.Sigil.IncludesHistory()
 
 	return
 }

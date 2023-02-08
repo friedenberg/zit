@@ -11,8 +11,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -77,24 +75,9 @@ func (c Exec) getZettel(
 	executor erworben.RemoteScript,
 	err error,
 ) {
-	ps := kennung.MakeProtoIdSet(
-		kennung.ProtoId{
-			Setter: &sha.Sha{},
-		},
-		kennung.ProtoId{
-			Setter: &kennung.Hinweis{},
-			Expand: func(v string) (out string, err error) {
-				var h kennung.Hinweis
-				h, err = u.StoreObjekten().GetAbbrStore().ExpandHinweisString(v)
-				out = h.String()
-				return
-			},
-		},
-	)
+	is := u.MakeIdSet()
 
-	var is kennung.Set
-
-	if is, err = ps.Make(hString); err != nil {
+	if err = is.Set(hString); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

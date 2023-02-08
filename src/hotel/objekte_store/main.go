@@ -2,6 +2,7 @@ package objekte_store
 
 import (
 	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
 type TransactedLogger[
@@ -49,6 +50,12 @@ type TransactedReader[
 ] interface {
 	Reader[K, V]
 	AllReader[V]
+}
+
+type Querier[
+	V any,
+] interface {
+	Query(kennung.Set, collections.WriterFunc[V]) error
 }
 
 type CreateOrUpdater[
