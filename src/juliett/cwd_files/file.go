@@ -5,11 +5,11 @@ import (
 	"path/filepath"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/foxtrot/fd"
+	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
-func MakeFile(dir string, p string) (ut fd.FD, err error) {
-	ut = fd.FD{}
+func MakeFile(dir string, p string) (ut kennung.FD, err error) {
+	ut = kennung.FD{}
 
 	p = path.Join(dir, p)
 

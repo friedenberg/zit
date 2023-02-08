@@ -78,7 +78,7 @@ func Make(
 		gattung.Kasten:  s.kastenStore,
 	}
 
-  errors.TodoP0("implement for other gattung")
+	errors.TodoP0("implement for other gattung")
 	s.queriers = map[schnittstellen.Gattung]objekte.FuncQuerierTransactedLike{
 		gattung.Zettel: objekte.MakeApplyQueryTransactedLike[*zettel.Transacted](
 			s.zettelStore.Query,

@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/fd"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 )
 
@@ -23,7 +22,7 @@ func (_ ExternalKeyer) Key(e *External) string {
 type External struct {
 	Objekte Objekte
 	Sku     sku.External[kennung.Etikett, *kennung.Etikett]
-	FD      fd.FD
+	FD      kennung.FD
 }
 
 func (e External) GetGattung() gattung.Gattung {

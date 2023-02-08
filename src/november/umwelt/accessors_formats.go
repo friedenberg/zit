@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/echo/sha_cli_format"
-	"github.com/friedenberg/zit/src/foxtrot/fd"
 	"github.com/friedenberg/zit/src/hotel/etikett"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/juliett/zettel"
@@ -124,7 +123,7 @@ func (u *Umwelt) FormatZettelExternal() schnittstellen.FuncWriterFormat[zettel_e
 	)
 }
 
-func (u *Umwelt) FormatZettelExternalFD() schnittstellen.FuncWriterFormat[fd.FD] {
+func (u *Umwelt) FormatZettelExternalFD() schnittstellen.FuncWriterFormat[kennung.FD] {
 	return zettel_external.MakeCliFormatFD(
 		u.Standort(),
 		u.FormatColorWriter(),
@@ -156,7 +155,7 @@ func (u *Umwelt) FormatZettelTransactedDelta(verb string) schnittstellen.FuncWri
 	)
 }
 
-func (u *Umwelt) FormatFileNotRecognized() schnittstellen.FuncWriterFormat[fd.FD] {
+func (u *Umwelt) FormatFileNotRecognized() schnittstellen.FuncWriterFormat[kennung.FD] {
 	return store_fs.MakeCliFormatNotRecognized(
 		u.FormatColorWriter(),
 		u.Standort(),
@@ -180,7 +179,7 @@ func (u *Umwelt) FormatDirDeleted() schnittstellen.FuncWriterFormat[store_fs.Dir
 	)
 }
 
-func (u *Umwelt) FormatFDDeleted() schnittstellen.FuncWriterFormat[fd.FD] {
+func (u *Umwelt) FormatFDDeleted() schnittstellen.FuncWriterFormat[kennung.FD] {
 	return store_fs.MakeCliFormatFDDeleted(
 		u.FormatColorWriter(),
 		u.Standort(),

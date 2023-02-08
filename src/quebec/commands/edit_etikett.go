@@ -13,7 +13,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/fd"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/hotel/etikett"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
@@ -210,9 +209,9 @@ func (c EditEtikett) readTempEtikettFiles(
 
 			defer errors.Deferred(&err, f.Close)
 
-			var fdee fd.FD
+			var fdee kennung.FD
 
-			if fdee, err = fd.File(f); err != nil {
+			if fdee, err = kennung.File(f); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

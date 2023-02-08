@@ -4,7 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/foxtrot/fd"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 )
 
@@ -31,7 +31,7 @@ type External[
 ] struct {
 	Objekte T
 	Sku     sku.External[T2, T3]
-	FD      fd.FD
+	FD      kennung.FD
 }
 
 func (e External[T, T1, T2, T3]) GetGattung() schnittstellen.Gattung {

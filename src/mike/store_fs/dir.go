@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/format"
-	"github.com/friedenberg/zit/src/foxtrot/fd"
+	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
 type Dir struct {
@@ -37,9 +37,9 @@ func MakeCliFormatDirDeleted(
 func MakeCliFormatFDDeleted(
 	cw format.FuncColorWriter,
 	s standort.Standort,
-	fdw schnittstellen.FuncWriterFormat[fd.FD],
-) schnittstellen.FuncWriterFormat[fd.FD] {
-	return func(w io.Writer, fd fd.FD) (n int64, err error) {
+	fdw schnittstellen.FuncWriterFormat[kennung.FD],
+) schnittstellen.FuncWriterFormat[kennung.FD] {
+	return func(w io.Writer, fd kennung.FD) (n int64, err error) {
 		return format.Write(
 			w,
 			format.MakeFormatStringRightAlignedParen(format.StringDeleted),

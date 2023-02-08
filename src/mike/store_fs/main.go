@@ -15,7 +15,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/ts"
-	"github.com/friedenberg/zit/src/foxtrot/fd"
 	"github.com/friedenberg/zit/src/india/konfig"
 	"github.com/friedenberg/zit/src/juliett/cwd_files"
 	"github.com/friedenberg/zit/src/juliett/zettel"
@@ -308,7 +307,7 @@ func (s *Store) ReadMany(
 		w = func(z *zettel.Transacted) (err error) {
 			//TODO-P2 akte fd?
 			ze := zettel_external.Zettel{
-				ZettelFD: fd.FD{
+				ZettelFD: kennung.FD{
 					Path: z.Sku.Kennung.String(),
 				},
 			}

@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/script_value"
-	"github.com/friedenberg/zit/src/foxtrot/fd"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/zettel_external"
@@ -254,7 +254,7 @@ func (c CreateFromPaths) zettelsFromPath(
 
 	wf(
 		&zettel_external.Zettel{
-			ZettelFD: fd.FD{
+			ZettelFD: kennung.FD{
 				Path: p,
 			},
 			Sku: zettel_external.Sku{

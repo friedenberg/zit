@@ -8,7 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/fd"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/hotel/typ"
 )
@@ -19,7 +18,7 @@ func (s *Store) CheckinTyp(p string) (t *typ.Transacted, err error) {
 
 func (s *Store) WriteTyp(t *typ.Transacted) (te *typ.External, err error) {
 	te = &typ.External{
-		FD: fd.FD{
+		FD: kennung.FD{
 			Path: fmt.Sprintf("%s.%s", t.Kennung(), s.erworben.FileExtensions.Typ),
 		},
 		//TODO-P2 move to central place

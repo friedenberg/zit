@@ -6,7 +6,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/fd"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/hotel/typ"
 )
@@ -14,7 +13,7 @@ import (
 func (c *CwdFiles) tryTyp(fi os.FileInfo) (err error) {
 	var h kennung.Typ
 
-	fd := fd.FileInfo(fi)
+	fd := kennung.FileInfo(fi)
 	pathMinusExt := strings.ToLower(fd.FileNameSansExt())
 
 	if err = h.Set(pathMinusExt); err != nil {

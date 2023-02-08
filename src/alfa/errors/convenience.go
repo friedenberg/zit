@@ -60,13 +60,13 @@ func Join(es ...error) error {
 		return es[0]
 
 	default:
-    err := MakeMulti(es...)
+		err := MakeMulti(es...)
 
-    if err.Empty() {
-      return nil
-    } else {
-      return err
-    }
+		if err.Empty() {
+			return nil
+		} else {
+			return err
+		}
 	}
 }
 

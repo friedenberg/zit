@@ -3,7 +3,7 @@ package umwelt
 import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/format"
-	"github.com/friedenberg/zit/src/foxtrot/fd"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/hotel/etikett"
 	"github.com/friedenberg/zit/src/hotel/typ"
@@ -110,7 +110,7 @@ func (u *Umwelt) PrinterZettelCheckedOutFresh() collections.WriterFunc[*zettel_c
 	)
 }
 
-func (u *Umwelt) PrinterFileNotRecognized() collections.WriterFunc[*fd.FD] {
+func (u *Umwelt) PrinterFileNotRecognized() collections.WriterFunc[*kennung.FD] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
 		u.FormatFileNotRecognized(),
@@ -131,7 +131,7 @@ func (u *Umwelt) PrinterPathDeleted() collections.WriterFunc[*store_fs.Dir] {
 	)
 }
 
-func (u *Umwelt) PrinterFDDeleted() collections.WriterFunc[*fd.FD] {
+func (u *Umwelt) PrinterFDDeleted() collections.WriterFunc[*kennung.FD] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
 		u.FormatFDDeleted(),

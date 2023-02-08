@@ -63,7 +63,7 @@ func (g Gattung) GetGattungString() string {
 }
 
 func (g Gattung) String() string {
-  errors.TodoP0("determine of some of these gattung should be goodbyed")
+	errors.TodoP0("determine of some of these gattung should be goodbyed")
 	switch g {
 	case Akte:
 		return "Akte"

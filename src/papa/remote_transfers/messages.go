@@ -7,7 +7,7 @@ import (
 )
 
 type messageRequestSkus struct {
-	MetaSet       kennung.MetaSet
+	MetaSet kennung.MetaSet
 }
 
 type messageRequestObjekteData struct {

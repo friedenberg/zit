@@ -8,7 +8,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/foxtrot/fd"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/india/konfig"
 )
@@ -18,7 +18,7 @@ type CwdFiles struct {
 	dir              string
 	Zettelen         map[string]CwdZettel
 	Typen            map[string]*typ.External
-	UnsureAkten      []fd.FD
+	UnsureAkten      []kennung.FD
 	EmptyDirectories []string
 }
 
@@ -38,7 +38,7 @@ func makeCwdFiles(erworben konfig.Compiled, dir string) (fs CwdFiles) {
 		dir:              dir,
 		Typen:            make(map[string]*typ.External, 0),
 		Zettelen:         make(map[string]CwdZettel, 0),
-		UnsureAkten:      make([]fd.FD, 0),
+		UnsureAkten:      make([]kennung.FD, 0),
 		EmptyDirectories: make([]string, 0),
 	}
 
@@ -191,7 +191,7 @@ func (fs *CwdFiles) readFirstLevelFile(a string) (err error) {
 		}
 
 	default:
-		var ut fd.FD
+		var ut kennung.FD
 
 		if ut, err = MakeFile(fs.dir, a); err != nil {
 			err = errors.Wrap(err)

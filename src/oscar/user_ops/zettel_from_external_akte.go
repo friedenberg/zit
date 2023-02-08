@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/script_value"
-	"github.com/friedenberg/zit/src/foxtrot/fd"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/zettel_external"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -41,7 +41,7 @@ func (c ZettelFromExternalAkte) Run(
 	for _, arg := range args {
 		var z *zettel_external.Zettel
 
-		akteFD := fd.FD{
+		akteFD := kennung.FD{
 			Path: arg,
 		}
 
@@ -150,7 +150,7 @@ func (c ZettelFromExternalAkte) Run(
 }
 
 func (c ZettelFromExternalAkte) zettelForAkte(
-	akteFD fd.FD,
+	akteFD kennung.FD,
 ) (z *zettel_external.Zettel, err error) {
 	z = &zettel_external.Zettel{
 		AkteFD: akteFD,

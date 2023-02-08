@@ -5,7 +5,6 @@ import (
 
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/fd"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
@@ -16,8 +15,8 @@ type Sku = sku.External[kennung.Hinweis, *kennung.Hinweis]
 type Zettel struct {
 	Objekte  zettel.Objekte
 	Sku      Sku
-	ZettelFD fd.FD
-	AkteFD   fd.FD
+	ZettelFD kennung.FD
+	AkteFD   kennung.FD
 }
 
 func (e Zettel) GetObjekteSha() sha.Sha {

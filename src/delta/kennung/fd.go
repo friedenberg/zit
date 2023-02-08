@@ -1,4 +1,4 @@
-package fd
+package kennung
 
 import (
 	"crypto/sha256"

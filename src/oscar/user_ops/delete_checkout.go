@@ -4,7 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/foxtrot/fd"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/zettel_external"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -18,8 +18,8 @@ func (c DeleteCheckout) Run(
 	zes zettel_external.MutableSet,
 ) (err error) {
 	zesToDelete := zettel_external.MakeMutableSetUniqueFD()
-	filesToDelete := collections.MakeMutableSet[*fd.FD](
-		func(e *fd.FD) string {
+	filesToDelete := collections.MakeMutableSet[*kennung.FD](
+		func(e *kennung.FD) string {
 			if e == nil {
 				return ""
 			}
@@ -65,7 +65,7 @@ func (c DeleteCheckout) Run(
 	fs := make([]string, 0, filesToDelete.Len())
 
 	filesToDelete.Each(
-		func(e *fd.FD) (err error) {
+		func(e *kennung.FD) (err error) {
 			fs = append(fs, e.Path)
 			return
 		},
