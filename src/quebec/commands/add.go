@@ -41,12 +41,13 @@ func init() {
 			f.BoolVar(&c.Organize, "organize", false, "")
 			c.ProtoZettel.AddToFlagSet(f)
 
-			return c
+			errors.TodoP2("add support for restricted query to specific gattung")
+			return commandWithQuery{CommandWithQuery: c}
 		},
 	)
 }
 
-func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
+func (c Add) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
 	zettelsFromAkteOp := user_ops.ZettelFromExternalAkte{
 		Umwelt:      u,
 		ProtoZettel: c.ProtoZettel,
@@ -57,7 +58,7 @@ func (c Add) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	var zettelsFromAkteResults zettel.MutableSet
 
-	if zettelsFromAkteResults, err = zettelsFromAkteOp.Run(args...); err != nil {
+	if zettelsFromAkteResults, err = zettelsFromAkteOp.Run(ms); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

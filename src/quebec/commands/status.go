@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
-	"github.com/friedenberg/zit/src/juliett/cwd_files"
+	"github.com/friedenberg/zit/src/juliett/cwd"
 	"github.com/friedenberg/zit/src/lima/store_objekten"
 	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
 	"github.com/friedenberg/zit/src/mike/store_fs"
@@ -28,7 +28,7 @@ func init() {
 }
 
 func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
-	var possible cwd_files.CwdFiles
+	var possible cwd.CwdFiles
 
 	switch {
 	case len(args) > 0:
@@ -36,7 +36,7 @@ func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
 		fallthrough
 
 	default:
-		if possible, err = cwd_files.MakeCwdFilesAll(
+		if possible, err = cwd.MakeCwdFilesAll(
 			s.Konfig(),
 			s.Standort().Cwd(),
 		); err != nil {

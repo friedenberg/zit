@@ -4,7 +4,7 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/juliett/cwd_files"
+	"github.com/friedenberg/zit/src/juliett/cwd"
 	"github.com/friedenberg/zit/src/kilo/zettel_external"
 	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
 	"github.com/friedenberg/zit/src/mike/store_fs"
@@ -37,7 +37,7 @@ func (c Checkin) Run(
 	s *umwelt.Umwelt,
 	args ...string,
 ) (err error) {
-	var pz cwd_files.CwdFiles
+	var pz cwd.CwdFiles
 
 	switch {
 	case c.All && len(args) > 0:
@@ -45,13 +45,13 @@ func (c Checkin) Run(
 		fallthrough
 
 	case c.All:
-		if pz, err = cwd_files.MakeCwdFilesAll(s.Konfig(), s.Standort().Cwd()); err != nil {
+		if pz, err = cwd.MakeCwdFilesAll(s.Konfig(), s.Standort().Cwd()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	default:
-		if pz, err = cwd_files.MakeCwdFilesExactly(
+		if pz, err = cwd.MakeCwdFilesExactly(
 			s.Konfig(),
 			s.Standort().Cwd(),
 			args...,

@@ -1,4 +1,4 @@
-package cwd_files
+package cwd
 
 import (
 	"path"

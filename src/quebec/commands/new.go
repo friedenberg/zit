@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/juliett/cwd_files"
+	"github.com/friedenberg/zit/src/juliett/cwd"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
 	"github.com/friedenberg/zit/src/mike/store_fs"
@@ -169,9 +169,9 @@ func (c New) editZettels(
 
 	fs := zsc.ToSliceFilesZettelen()
 
-	var cwdFiles cwd_files.CwdFiles
+	var cwdFiles cwd.CwdFiles
 
-	if cwdFiles, err = cwd_files.MakeCwdFilesExactly(u.Konfig(), u.Standort().Cwd(), fs...); err != nil {
+	if cwdFiles, err = cwd.MakeCwdFilesExactly(u.Konfig(), u.Standort().Cwd(), fs...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

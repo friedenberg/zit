@@ -24,7 +24,7 @@ type ZettelFromExternalAkte struct {
 }
 
 func (c ZettelFromExternalAkte) Run(
-	args ...string,
+	ms kennung.MetaSet,
 ) (results zettel.MutableSet, err error) {
 	if err = c.Lock(); err != nil {
 		err = errors.Wrap(err)
@@ -36,25 +36,30 @@ func (c ZettelFromExternalAkte) Run(
 	toCreate := zettel_external.MakeMutableSetUniqueAkte()
 	toDelete := zettel_external.MakeMutableSetUniqueFD()
 
-	results = zettel.MakeMutableSetHinweis(len(args))
+	fds := ms.GetFDs()
 
-	for _, arg := range args {
-		var z *zettel_external.Zettel
+	results = zettel.MakeMutableSetHinweis(fds.Len())
 
-		akteFD := kennung.FD{
-			Path: arg,
-		}
+	if err = fds.Each(
+		func(fd kennung.FD) (err error) {
+			var z *zettel_external.Zettel
 
-		if z, err = c.zettelForAkte(akteFD); err != nil {
-			err = errors.Wrap(err)
+			if z, err = c.zettelForAkte(fd); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			toCreate.Add(z)
+
+			if c.Delete {
+				toDelete.Add(z)
+			}
+
 			return
-		}
-
-		toCreate.Add(z)
-
-		if c.Delete {
-			toDelete.Add(z)
-		}
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	if c.Dedupe {

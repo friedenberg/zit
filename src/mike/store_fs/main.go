@@ -16,7 +16,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/india/konfig"
-	"github.com/friedenberg/zit/src/juliett/cwd_files"
+	"github.com/friedenberg/zit/src/juliett/cwd"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/zettel_external"
 	"github.com/friedenberg/zit/src/lima/store_objekten"
@@ -236,9 +236,9 @@ func (s *Store) ReadOne(h kennung.Hinweis) (zt *zettel.Transacted, err error) {
 		return
 	}
 
-	var pz cwd_files.CwdFiles
+	var pz cwd.CwdFiles
 
-	if pz, err = cwd_files.MakeCwdFilesExactly(
+	if pz, err = cwd.MakeCwdFilesExactly(
 		s.erworben,
 		s.Standort.Cwd(),
 		fmt.Sprintf("%s.%s", h, s.erworben.FileExtensions.Zettel),
@@ -256,7 +256,7 @@ func (s *Store) ReadOne(h kennung.Hinweis) (zt *zettel.Transacted, err error) {
 
 	var readFunc func() (zettel_checked_out.Zettel, error)
 
-	var p cwd_files.CwdZettel
+	var p cwd.CwdZettel
 
 	for _, p1 := range pz.Zettelen {
 		p = p1
@@ -351,9 +351,9 @@ func (s *Store) ReadManyHistory(
 		queries = append(
 			queries,
 			func(w collections.WriterFunc[*zettel.Transacted]) (err error) {
-				var pz cwd_files.CwdFiles
+				var pz cwd.CwdFiles
 
-				if pz, err = cwd_files.MakeCwdFilesAll(s.erworben, s.Standort.Cwd()); err != nil {
+				if pz, err = cwd.MakeCwdFilesAll(s.erworben, s.Standort.Cwd()); err != nil {
 					err = errors.Wrap(err)
 					return
 				}

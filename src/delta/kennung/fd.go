@@ -1,15 +1,12 @@
 package kennung
 
 import (
-	"crypto/sha256"
-	"io"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/echo/ts"
 )
@@ -45,29 +42,37 @@ func FileInfo(fi os.FileInfo) FD {
 	}
 }
 
-// TODO-P4 move this somewhere that prevents redundant reading
 func (fd *FD) Set(v string) (err error) {
-	fd.Path = v
+	var fi os.FileInfo
 
-	hash := sha256.New()
-
-	var f *os.File
-
-	if f, err = files.Open(fd.Path); err != nil {
+	if fi, err = os.Stat(v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.Deferred(&err, f.Close)
-
-	if _, err = io.Copy(hash, f); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	fd.Sha = sha.FromHash(hash)
+	*fd = FileInfo(fi)
 
 	return
+	// errors.TodoP0("move this and cache")
+	// hash := sha256.New()
+
+	// var f *os.File
+
+	// if f, err = files.Open(fd.Path); err != nil {
+	// err = errors.Wrap(err)
+	// return
+	// }
+
+	// defer errors.Deferred(&err, f.Close)
+
+	// if _, err = io.Copy(hash, f); err != nil {
+	// err = errors.Wrap(err)
+	// return
+	// }
+
+	// fd.Sha = sha.FromHash(hash)
+
+	// return
 }
 
 //TODO-P4 add formatter

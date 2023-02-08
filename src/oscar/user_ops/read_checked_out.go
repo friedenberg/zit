@@ -5,7 +5,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/hinweisen"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/juliett/cwd_files"
+	"github.com/friedenberg/zit/src/juliett/cwd"
 	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
 	"github.com/friedenberg/zit/src/mike/store_fs"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -39,7 +39,7 @@ func (op ReadCheckedOut) RunOneString(
 }
 
 func (op ReadCheckedOut) RunMany(
-	possible cwd_files.CwdFiles,
+	possible cwd.CwdFiles,
 	w collections.WriterFunc[*zettel_checked_out.Zettel],
 ) (err error) {
 	for _, p := range possible.Zettelen {

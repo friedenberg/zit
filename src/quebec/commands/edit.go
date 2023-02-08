@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/juliett/cwd_files"
+	"github.com/friedenberg/zit/src/juliett/cwd"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
 	"github.com/friedenberg/zit/src/mike/store_fs"
@@ -109,9 +109,9 @@ func (c Edit) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 
 	fs = checkoutResults.ToSliceFilesZettelen()
 
-	var possible cwd_files.CwdFiles
+	var possible cwd.CwdFiles
 
-	if possible, err = cwd_files.MakeCwdFilesExactly(
+	if possible, err = cwd.MakeCwdFilesExactly(
 		u.Konfig(),
 		u.Standort().Cwd(),
 		fs...,

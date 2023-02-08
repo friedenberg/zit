@@ -15,6 +15,8 @@ func init() {
 }
 
 type MetaSet interface {
+	Get(g gattung.Gattung) (s Set, ok bool)
+	GetFDs() (s FDSet)
 	Set(string) error
 	SetMany(...string) error
 	All(f func(gattung.Gattung, Set) error) error
@@ -23,6 +25,7 @@ type MetaSet interface {
 type metaSet struct {
 	expanders      Expanders
 	defaultGattung gattung.Gattung
+	fds            FDMutableSet
 	Gattung        map[gattung.Gattung]Set
 }
 
@@ -30,6 +33,7 @@ func MakeMetaSet(ex Expanders, dg gattung.Gattung) *metaSet {
 	return &metaSet{
 		expanders:      ex,
 		defaultGattung: dg,
+		fds:            MakeFDMutableSet(),
 		Gattung:        make(map[gattung.Gattung]Set),
 	}
 }
@@ -46,6 +50,15 @@ func (s *metaSet) SetMany(vs ...string) (err error) {
 }
 
 func (ms *metaSet) Set(v string) (err error) {
+	if err = collections.AddString[FD, *FD](
+		ms.fds,
+		v,
+	); err == nil {
+		return
+	}
+
+	err = nil
+
 	sbs := [3]*strings.Builder{
 		{},
 		{},
@@ -118,6 +131,16 @@ func (ms *metaSet) Set(v string) (err error) {
 		return
 	}
 
+	return
+}
+
+func (ms metaSet) GetFDs() (s FDSet) {
+	s = ms.fds.Copy()
+	return
+}
+
+func (ms metaSet) Get(g gattung.Gattung) (s Set, ok bool) {
+	s, ok = ms.Gattung[g]
 	return
 }
 
