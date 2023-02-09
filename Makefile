@@ -6,7 +6,9 @@ SHELL := bash
 MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
 MAKEFLAGS += --output-sync=target
-MAKEFLAGS := --jobs=$(shell nproc)
+n_prc := $(shell nproc)
+MAKEFLAGS := --jobs=$(n_prc)
+cmd_bats := bats --jobs $(n_prc)
 
 
 ifeq ($(origin .RECIPEPREFIX), undefined)
@@ -47,14 +49,14 @@ tests_fast: go_vet tests_unit;
 
 .PHONY: tests_bats
 tests_bats: go_build
-> bats --jobs 8 zz-tests_bats/*.bats
+> $(cmd_bats) zz-tests_bats/*.bats
 
 .PHONY: tests_slow
 tests_slow: tests_fast tests_bats;
 
 .PHONY: tests_bats_migration
 tests_bats_migration: go_build
-> bats --jobs 8 zz-tests_bats/migration/*.bats
+> $(cmd_bats) zz-tests_bats/migration/*.bats
 
 .PHONY: tests_slower
 tests_slower: tests_fast tests_slow tests_bats_migration;
