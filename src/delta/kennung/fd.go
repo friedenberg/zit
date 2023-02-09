@@ -51,6 +51,7 @@ func (fd *FD) Set(v string) (err error) {
 	}
 
 	*fd = FileInfo(fi)
+	fd.Path = filepath.Clean(v)
 
 	return
 	// errors.TodoP0("move this and cache")

@@ -8,6 +8,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/india/konfig"
@@ -56,11 +57,42 @@ func MakeCwdFilesAll(
 
 func MakeCwdFilesExactly(
 	k konfig.Compiled,
-	dir string, files ...string,
+	dir string,
+	files ...string,
 ) (fs CwdFiles, err error) {
 	fs = makeCwdFiles(k, dir)
 	err = fs.readInputFiles(files...)
 	return
+}
+
+func MakeCwdFilesMetaSet(
+	k konfig.Compiled,
+	dir string,
+	ms kennung.MetaSet,
+) (fs CwdFiles, err error) {
+	isZettel, ok := ms.Get(gattung.Zettel)
+
+	switch {
+	case ok && isZettel.Sigil.IncludesSchwanzen() && isZettel.Len() > 0:
+		errors.Err().Print("Ignoring query because -all is set")
+		fallthrough
+
+	case ok && isZettel.Sigil.IncludesSchwanzen():
+		return MakeCwdFilesAll(k, dir)
+
+	default:
+		fds := ms.GetFDs()
+		files := make([]string, 0, fds.Len())
+
+		fds.Each(
+			func(fd kennung.FD) (err error) {
+				files = append(files, fd.String())
+				return
+			},
+		)
+
+		return MakeCwdFilesExactly(k, dir, files...)
+	}
 }
 
 func (fs *CwdFiles) readInputFiles(args ...string) (err error) {

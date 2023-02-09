@@ -28,9 +28,9 @@ type Add struct {
 }
 
 func init() {
-	registerCommand(
+	registerCommandWithQuery(
 		"add",
-		func(f *flag.FlagSet) Command {
+		func(f *flag.FlagSet) CommandWithQuery {
 			c := &Add{
 				ProtoZettel: zettel.MakeEmptyProtoZettel(),
 			}
@@ -42,7 +42,7 @@ func init() {
 			c.ProtoZettel.AddToFlagSet(f)
 
 			errors.TodoP2("add support for restricted query to specific gattung")
-			return commandWithQuery{CommandWithQuery: c}
+			return c
 		},
 	)
 }

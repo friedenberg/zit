@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/juliett/cwd"
 	"github.com/friedenberg/zit/src/kilo/zettel_external"
 	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
@@ -15,50 +16,35 @@ import (
 type Checkin struct {
 	Delete     bool
 	IgnoreAkte bool
-	All        bool
 }
 
 func init() {
-	registerCommand(
+	registerCommandWithQuery(
 		"checkin",
-		func(f *flag.FlagSet) Command {
+		func(f *flag.FlagSet) CommandWithQuery {
 			c := &Checkin{}
 
 			f.BoolVar(&c.Delete, "delete", false, "the checked-out file")
 			f.BoolVar(&c.IgnoreAkte, "ignore-akte", false, "do not change the akte")
-			f.BoolVar(&c.All, "all", false, "")
 
 			return c
 		},
 	)
 }
 
-func (c Checkin) Run(
+func (c Checkin) RunWithQuery(
 	s *umwelt.Umwelt,
-	args ...string,
+	ms kennung.MetaSet,
 ) (err error) {
 	var pz cwd.CwdFiles
 
-	switch {
-	case c.All && len(args) > 0:
-		errors.PrintErrf("Ignoring args because -all is set")
-		fallthrough
-
-	case c.All:
-		if pz, err = cwd.MakeCwdFilesAll(s.Konfig(), s.Standort().Cwd()); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	default:
-		if pz, err = cwd.MakeCwdFilesExactly(
-			s.Konfig(),
-			s.Standort().Cwd(),
-			args...,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if pz, err = cwd.MakeCwdFilesMetaSet(
+		s.Konfig(),
+		s.Standort().Cwd(),
+		ms,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	readOp := user_ops.ReadCheckedOut{

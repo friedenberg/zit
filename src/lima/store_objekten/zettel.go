@@ -232,6 +232,7 @@ func (s zettelStore) Query(
 ) (err error) {
 	return s.MethodForSigil(ids.Sigil)(
 		collections.MakeChain(
+			zettel.MakeWriterKonfig(s.StoreUtil.GetKonfig()),
 			zettel.WriterIds{
 				Filter: kennung.Filter{
 					Set: ids,

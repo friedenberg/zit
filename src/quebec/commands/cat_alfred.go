@@ -3,36 +3,26 @@ package commands
 import (
 	"bufio"
 	"flag"
-	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/alfred"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
 type CatAlfred struct {
-	Type gattung.Gattung
 	Command
 }
 
 func init() {
-	registerCommand(
+	registerCommandWithQuery(
 		"cat-alfred",
-		func(f *flag.FlagSet) Command {
-			c := &CatAlfred{
-				Type: gattung.Unknown,
-			}
+		func(f *flag.FlagSet) CommandWithQuery {
+			c := &CatAlfred{}
 
-			f.Var(&c.Type, "type", "ObjekteType")
-
-			return commandWithIds{
-				CommandWithIds: c,
-			}
+			return c
 		},
 	)
 }
@@ -45,7 +35,7 @@ func (c CatAlfred) CompletionGattung() gattungen.Set {
 	)
 }
 
-func (c CatAlfred) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
+func (c CatAlfred) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
 	//this command does its own error handling
 	wo := bufio.NewWriter(u.Out())
 	defer errors.Deferred(&err, wo.Flush)
@@ -62,32 +52,22 @@ func (c CatAlfred) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 
 	defer errors.Deferred(&err, aw.Close)
 
-	wg := &sync.WaitGroup{}
+	if err = ms.All(
+		func(g gattung.Gattung, ids kennung.Set) (err error) {
+			switch g {
+			case gattung.Etikett:
+				c.catEtiketten(u, ids, aw)
 
-	switch c.Type {
-	case gattung.Etikett:
-		wg.Add(1)
-		go c.catEtiketten(u, ids, aw, wg)
+			case gattung.Zettel:
+				c.catZettelen(u, ids, aw)
+			}
 
-	case gattung.Akte:
-		wg.Add(1)
-		go c.catZettelen(u, ids, aw, wg)
-
-	case gattung.Zettel:
-		wg.Add(1)
-		go c.catZettelen(u, ids, aw, wg)
-
-	case gattung.Hinweis:
-		wg.Add(1)
-		go c.catZettelen(u, ids, aw, wg)
-
-	default:
-		wg.Add(2)
-		go c.catEtiketten(u, ids, aw, wg)
-		go c.catZettelen(u, ids, aw, wg)
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
-
-	wg.Wait()
 
 	return
 }
@@ -96,12 +76,7 @@ func (c CatAlfred) catEtiketten(
 	u *umwelt.Umwelt,
 	ids kennung.Set,
 	aw *alfred.Writer,
-	wg *sync.WaitGroup,
 ) {
-	if wg != nil {
-		defer wg.Done()
-	}
-
 	var ea []kennung.Etikett
 
 	var err error
@@ -120,26 +95,12 @@ func (c CatAlfred) catZettelen(
 	u *umwelt.Umwelt,
 	ids kennung.Set,
 	aw *alfred.Writer,
-	wg *sync.WaitGroup,
 ) {
-	if wg != nil {
-		defer wg.Done()
-	}
-
-	wk := zettel.MakeWriterKonfig(u.Konfig())
-
 	var err error
 
-	if err = u.StoreObjekten().Zettel().ReadAllSchwanzen(
-		collections.MakeChain(
-			wk,
-			zettel.WriterIds{
-				Filter: kennung.Filter{
-					Set: ids,
-				},
-			}.WriteZettelTransacted,
-			aw.WriteZettelVerzeichnisse,
-		),
+	if err = u.StoreObjekten().Zettel().Query(
+		ids,
+		aw.WriteZettelVerzeichnisse,
 	); err != nil {
 		aw.WriteError(err)
 		return
