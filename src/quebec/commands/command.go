@@ -79,3 +79,23 @@ func registerCommandWithQuery(n string, makeFunc func(*flag.FlagSet) CommandWith
 
 	return
 }
+
+func registerCommandWithHinweis(
+	n string,
+	makeFunc func(*flag.FlagSet) CommandWithHinweis,
+) {
+	f := flag.NewFlagSet(n, flag.ExitOnError)
+
+	c := makeFunc(f)
+
+	if _, ok := commands[n]; ok {
+		panic("command added more than once: " + n)
+	}
+
+	commands[n] = command{
+		Command: commandWithHinweis{CommandWithHinweis: c},
+		FlagSet: f,
+	}
+
+	return
+}

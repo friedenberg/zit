@@ -18,25 +18,21 @@ import (
 )
 
 type Edit struct {
-	Or bool
 	//TODO-P3 add force
 	store_fs.CheckoutMode
 }
 
 func init() {
-	registerCommand(
+	registerCommandWithQuery(
 		"edit",
-		func(f *flag.FlagSet) Command {
+		func(f *flag.FlagSet) CommandWithQuery {
 			c := &Edit{
 				CheckoutMode: store_fs.CheckoutModeZettelOnly,
 			}
 
-			f.BoolVar(&c.Or, "or", false, "allow optional criteria instead of required")
 			f.Var(&c.CheckoutMode, "mode", "mode for checking out the zettel")
 
-			return commandWithIds{
-				CommandWithIds: c,
-			}
+			return c
 		},
 	)
 }
@@ -50,9 +46,16 @@ func (c Edit) CompletionGattung() gattungen.Set {
 	)
 }
 
-func (c Edit) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
+func (c Edit) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
 	checkoutOptions := store_fs.CheckoutOptions{
 		CheckoutMode: c.CheckoutMode,
+	}
+
+	errors.TodoP1("support other gattung")
+	ids, ok := ms.Get(gattung.Zettel)
+
+	if !ok {
+		return
 	}
 
 	var checkoutResults zettel_checked_out.MutableSet
@@ -60,7 +63,6 @@ func (c Edit) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 	query := zettel.WriterIds{
 		Filter: kennung.Filter{
 			Set: ids,
-			Or:  c.Or,
 		},
 	}
 

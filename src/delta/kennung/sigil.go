@@ -69,7 +69,7 @@ func (a Sigil) Contains(b Sigil) bool {
 }
 
 func (a Sigil) IncludesSchwanzen() bool {
-	return a.Contains(SigilSchwanzen)
+	return a.Contains(SigilSchwanzen) || a.Contains(SigilHistory)
 }
 
 func (a Sigil) IncludesHistory() bool {

@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/angeboren"
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/november/umwelt"
 	"github.com/friedenberg/zit/src/papa/remote_transfers"
@@ -14,7 +13,6 @@ import (
 
 type Clone struct {
 	Einleitung umwelt.Einleitung
-	GattungSet gattungen.MutableSet
 }
 
 func init() {
@@ -22,18 +20,11 @@ func init() {
 		"clone",
 		func(f *flag.FlagSet) Command {
 			c := &Clone{
-				GattungSet: gattungen.MakeMutableSet(gattung.Zettel),
 				Einleitung: umwelt.Einleitung{
 					Angeboren: angeboren.Default(),
 				},
 			}
 
-			gsvs := collections.MutableValueSet2[gattung.Gattung, *gattung.Gattung]{
-				MutableSetLike: &c.GattungSet,
-				SetterPolicy:   collections.SetterPolicyReset,
-			}
-
-			f.Var(gsvs, "gattung", "Gattung")
 			c.Einleitung.AddToFlags(f)
 
 			return c

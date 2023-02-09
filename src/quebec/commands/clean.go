@@ -6,6 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/juliett/cwd"
 	"github.com/friedenberg/zit/src/kilo/zettel_external"
 	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
@@ -18,9 +19,9 @@ type Clean struct {
 }
 
 func init() {
-	registerCommand(
+	registerCommandWithQuery(
 		"clean",
-		func(f *flag.FlagSet) Command {
+		func(f *flag.FlagSet) CommandWithQuery {
 			c := &Clean{}
 
 			return c
@@ -28,25 +29,19 @@ func init() {
 	)
 }
 
-func (c Clean) Run(
+func (c Clean) RunWithQuery(
 	s *umwelt.Umwelt,
-	args ...string,
+	ms kennung.MetaSet,
 ) (err error) {
 	var possible cwd.CwdFiles
 
-	switch {
-	case len(args) > 0:
-		errors.PrintErrf("Ignoring args")
-		fallthrough
-
-	default:
-		if possible, err = cwd.MakeCwdFilesAll(
-			s.Konfig(),
-			s.Standort().Cwd(),
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if possible, err = cwd.MakeCwdFilesMetaSet(
+		s.Konfig(),
+		s.Standort().Cwd(),
+		ms,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	optionsReadExternal := store_fs.OptionsReadExternal{}

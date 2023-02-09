@@ -18,9 +18,9 @@ type FormatZettel struct {
 }
 
 func init() {
-	registerCommand(
+	registerCommandWithHinweis(
 		"format-zettel",
-		func(f *flag.FlagSet) Command {
+		func(f *flag.FlagSet) CommandWithHinweis {
 			c := &FormatZettel{
 				Mode: zettel_checked_out.ModeZettelAndAkte,
 			}
@@ -33,29 +33,11 @@ func init() {
 	)
 }
 
-func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
+func (c *FormatZettel) RunWithHinweis(
+	u *umwelt.Umwelt,
+	h kennung.Hinweis,
+) (err error) {
 	formatId := "text"
-	var h kennung.Hinweis
-
-	switch len(args) {
-	case 1:
-		if err = h.Set(args[0]); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	case 2:
-		formatId = args[0]
-
-		if err = h.Set(args[1]); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	default:
-		err = errors.Errorf("expected one or two input arguments, but got %d", len(args))
-		return
-	}
 
 	var zt *zettel.Transacted
 
