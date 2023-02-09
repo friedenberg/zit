@@ -5,6 +5,9 @@ SHELL := bash
 .DELETE_ON_ERROR:
 MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
+MAKEFLAGS += --output-sync=target
+MAKEFLAGS := --jobs=$(shell nproc)
+
 
 ifeq ($(origin .RECIPEPREFIX), undefined)
   $(error This Make does not support .RECIPEPREFIX. Please use GNU Make 4.0 or later)
@@ -32,7 +35,7 @@ go_build: go_generate
 > go build -o build/zit ./.
 
 .PHONY: go_vet
-go_vet: go_build
+go_vet:
 > go vet ./...
 
 .PHONY: tests_unit

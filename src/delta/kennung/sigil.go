@@ -16,6 +16,7 @@ const (
 	SigilSchwanzen = Sigil(1 << iota)
 	SigilHistory
 	SigilCwd
+	SigilHidden
 )
 
 var (
@@ -24,6 +25,7 @@ var (
 		'@': SigilSchwanzen,
 		'+': SigilHistory,
 		'.': SigilCwd,
+		'?': SigilHidden,
 	}
 )
 
@@ -80,6 +82,10 @@ func (a Sigil) IncludesCwd() bool {
 	return a.Contains(SigilCwd)
 }
 
+func (a Sigil) IncludesHidden() bool {
+	return a.Contains(SigilHidden)
+}
+
 func (a Sigil) String() string {
 	sb := strings.Builder{}
 	errors.TodoP0("use sigil map")
@@ -98,6 +104,10 @@ func (a Sigil) String() string {
 		sb.WriteString(".")
 	}
 
+	if a.IncludesHidden() {
+		sb.WriteString("?")
+	}
+
 	return sb.String()
 }
 
@@ -106,11 +116,6 @@ func (i *Sigil) Set(v string) (err error) {
 	v = strings.ToLower(v)
 
 	els := []rune(v)
-
-	if len(els) > 3 {
-		err = errors.Errorf("not a sigil, too long")
-		return
-	}
 
 	for _, v1 := range els {
 		if _, ok := sigilMap[v1]; ok {

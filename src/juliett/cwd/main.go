@@ -73,11 +73,11 @@ func MakeCwdFilesMetaSet(
 	isZettel, ok := ms.Get(gattung.Zettel)
 
 	switch {
-	case ok && isZettel.Sigil.IncludesSchwanzen() && isZettel.Len() > 0:
+	case ok && isZettel.Sigil.IncludesCwd() && isZettel.Len() > 0:
 		errors.Err().Print("Ignoring query because -all is set")
 		fallthrough
 
-	case ok && isZettel.Sigil.IncludesSchwanzen():
+	case ok && isZettel.Sigil.IncludesCwd():
 		return MakeCwdFilesAll(k, dir)
 
 	default:

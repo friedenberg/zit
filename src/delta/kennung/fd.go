@@ -50,6 +50,11 @@ func (fd *FD) Set(v string) (err error) {
 		return
 	}
 
+  if fi.IsDir() {
+    err = errors.Errorf("%s is a directory", v)
+    return
+  }
+
 	*fd = FileInfo(fi)
 	fd.Path = filepath.Clean(v)
 

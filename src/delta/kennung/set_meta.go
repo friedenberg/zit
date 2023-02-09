@@ -30,6 +30,7 @@ type metaSet struct {
 }
 
 func MakeMetaSet(ex Expanders, dg gattung.Gattung) *metaSet {
+  errors.TodoP2("support allowed sigils")
 	return &metaSet{
 		expanders:      ex,
 		defaultGattung: dg,
