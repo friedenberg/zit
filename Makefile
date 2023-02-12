@@ -6,7 +6,7 @@ SHELL := bash
 MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
 MAKEFLAGS += --output-sync=target
-n_prc := $(shell nproc)
+n_prc := $(shell sysctl -n hw.logicalcpu)
 MAKEFLAGS := --jobs=$(n_prc)
 cmd_bats := bats --jobs $(n_prc)
 
