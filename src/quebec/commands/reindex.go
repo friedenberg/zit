@@ -7,8 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
-type Reindex struct {
-}
+type Reindex struct{}
 
 func init() {
 	registerCommand(

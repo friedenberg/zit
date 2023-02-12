@@ -24,7 +24,7 @@ func setPrivateFromSetLike[T any, T1 schnittstellen.Ptr[T]](
 		Elements: make(map[string]T1, l),
 	}
 
-	//confirms that the key function supports nil pointers properly
+	// confirms that the key function supports nil pointers properly
 	s.Key(nil)
 
 	if s1 != nil {
@@ -43,7 +43,7 @@ func setPrivateFromSlice[T any, T1 schnittstellen.Ptr[T]](
 		Elements: make(map[string]T1, len(es)),
 	}
 
-	//confirms that the key function supports nil pointers properly
+	// confirms that the key function supports nil pointers properly
 	s.Key(nil)
 
 	for _, e := range es {

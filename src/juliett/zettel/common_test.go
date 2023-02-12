@@ -48,7 +48,6 @@ func readFormat(
 		strings.NewReader(contents),
 		&c,
 	)
-
 	if err != nil {
 		t.Fatalf("failed to read zettel format: %s", err)
 	}

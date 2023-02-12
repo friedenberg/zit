@@ -41,6 +41,5 @@ func (em EntryMap) Set(p string, e Entry) {
 }
 
 func (em EntryMap) Get(p string) (e Entry, ok bool) {
-
 	return
 }

@@ -18,39 +18,52 @@ setup() {
 	export output
 }
 
-cmd_zit_def=(
-	# -abbreviate-hinweisen=false
-	-predictable-hinweisen
-	-print-typen=false
-)
-
-function complete_show { # @test
-	skip
+function can_update_akte { # @test
+	# setup
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run_zit_init_disable_age
+	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	assert_success
 
 	expected="$(mktemp)"
 	{
-		echo "---"
-		echo "# wow"
-		echo "- ok"
-		echo "! md"
-		echo "---"
+		echo ---
+		echo "# bez"
+		echo - et1
+		echo - et2
+		echo ! md
+		echo ---
+		echo
+		echo the body
 	} >"$expected"
 
-	run zit new "${cmd_zit_def[@]}" -edit=false -predictable-hinweisen -bezeichnung wow -etiketten ok
-	assert_output '[o/u@5 "wow"] (created)'
+	run_zit new -edit=false "$expected"
+	assert_output '[one/uno@18df16846a2f8bbce5f03e1041baff978a049aabd169ab9adac387867fe1706c !md "bez"]'
 
-	run zit show "${cmd_zit_def[@]}" one/uno
+	run_zit show one/uno
 	assert_output "$(cat "$expected")"
 
+	# when
+	new_akte="$(mktemp)"
 	{
-		echo "one/uno	Zettel: !md wow"
-		echo "ok	Etikett"
+		echo the body but new
+	} >"$new_akte"
+
+	run_zit checkin-akte -new-etiketten et3 one/uno "$new_akte"
+	assert_output '[one/uno@6b4905e7d7a5185f73db1e27448663fa38b3aca11d62e1dc33ecb066653791b7 !md "bez"]'
+
+	# then
+	{
+		echo ---
+		echo "# bez"
+		echo - et3
+		echo ! md
+		echo ---
+		echo
+		echo the body but new
 	} >"$expected"
 
-	run zit show -complete
+	run_zit show one/uno
 	assert_output "$(cat "$expected")"
 }

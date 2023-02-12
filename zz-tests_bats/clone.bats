@@ -3,6 +3,7 @@
 setup() {
 	load 'test_helper/bats-support/load'
 	load 'test_helper/bats-assert/load'
+	load 'common.bash'
 	# ... the remaining setup is unchanged
 
 	# get the containing directory of this file
@@ -17,27 +18,8 @@ setup() {
 	export output
 }
 
-cat_yin() (
-	echo "one"
-	echo "two"
-	echo "three"
-	echo "four"
-	echo "five"
-	echo "six"
-)
-
-cat_yang() (
-	echo "uno"
-	echo "dos"
-	echo "tres"
-	echo "quatro"
-	echo "cinco"
-	echo "seis"
-)
-
 function bootstrap {
-	run zit init -yin <(cat_yin) -yang <(cat_yang)
-	assert_success
+	run_zit_init
 
 	{
 		echo "---"
@@ -49,8 +31,8 @@ function bootstrap {
 		echo "body"
 	} >to_add
 
-	run zit new -edit=false -predictable-hinweisen to_add
-	assert_output '          (new) [o/u@3 !md "wow"]'
+	run_zit new -edit=false to_add
+	assert_output '[one/uno@37d3869e9b1711f009eabf69a2bf294cfd785f5b1c7463cba77d11d5f81f5e09 !md "wow"]'
 
 	run zit show one/uno
 	assert_output "$(cat to_add)"
@@ -65,13 +47,12 @@ function clone { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run zit clone \
-		-abbreviate-shas=false -abbreviate-hinweisen=false \
+	run_zit clone \
 		"$wd1" :+zettel,typ
 
 	assert_success
-	assert_output --partial '(updated) [!md@eaa85e80de6d1129a21365a8ce2a49ca752457d10932a7d73001b4ebded302c7]'
-	assert_output --partial '(updated) [konfig@e1d64a20fd2ecdb4c85ad5cbfba792404daf8d236477e21deb378aa591776a0f]'
-	assert_output --partial '(updated) [konfig@e1d64a20fd2ecdb4c85ad5cbfba792404daf8d236477e21deb378aa591776a0f]'
-	assert_output --partial '    (new) [one/uno@37d3869e9b1711f009eabf69a2bf294cfd785f5b1c7463cba77d11d5f81f5e09 !md "wow"]'
+	assert_output --partial '[!md@eaa85e80de6d1129a21365a8ce2a49ca752457d10932a7d73001b4ebded302c7]'
+	assert_output --partial '[konfig@e1d64a20fd2ecdb4c85ad5cbfba792404daf8d236477e21deb378aa591776a0f]'
+	assert_output --partial '[konfig@e1d64a20fd2ecdb4c85ad5cbfba792404daf8d236477e21deb378aa591776a0f]'
+	assert_output --partial '[one/uno@37d3869e9b1711f009eabf69a2bf294cfd785f5b1c7463cba77d11d5f81f5e09 !md "wow"]'
 }

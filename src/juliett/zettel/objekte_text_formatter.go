@@ -134,7 +134,8 @@ func (f objekteTextFormatter) Format(
 
 func (f objekteTextFormatter) writeToExternalAkte(
 	w1 io.Writer,
-	c *ObjekteFormatterContext) (n int64, err error) {
+	c *ObjekteFormatterContext,
+) (n int64, err error) {
 	w := format.NewLineWriter()
 
 	w.WriteLines(

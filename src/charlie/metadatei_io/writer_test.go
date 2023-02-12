@@ -12,8 +12,7 @@ func TestWriter1(t1 *testing.T) {
 		T: t1,
 	}
 
-	expectedOut :=
-		`---
+	expectedOut := `---
 metadatei
 ---
 
@@ -39,8 +38,7 @@ func TestWriter2(t1 *testing.T) {
 		T: t1,
 	}
 
-	expectedOut :=
-		`---
+	expectedOut := `---
 metadatei
 ---
 `
@@ -63,8 +61,7 @@ func TestWriter3(t1 *testing.T) {
 		T: t1,
 	}
 
-	expectedOut :=
-		`akte
+	expectedOut := `akte
 `
 
 	out := &strings.Builder{}

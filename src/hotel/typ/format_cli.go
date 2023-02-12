@@ -52,12 +52,10 @@ func MakeCliFormatTransacted(
 	cw format.FuncColorWriter,
 	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
 	tf schnittstellen.FuncWriterFormat[kennung.Typ],
-	verb string,
 ) schnittstellen.FuncWriterFormat[Transacted] {
 	return func(w io.Writer, t Transacted) (n int64, err error) {
 		return format.Write(
 			w,
-			format.MakeFormatStringRightAlignedParen(verb),
 			format.MakeFormatString("["),
 			cw(format.MakeWriter(tf, *t.Kennung()), format.ColorTypePointer),
 			format.MakeFormatString("@"),

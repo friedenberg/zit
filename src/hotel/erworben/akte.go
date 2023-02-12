@@ -12,14 +12,14 @@ type Akte struct {
 func (a *Akte) Reset() {
 	a.FileExtensions.Reset()
 	a.RemoteScripts = make(map[string]RemoteScript)
-	//TODO-P4 should reuse
+	// TODO-P4 should reuse
 	a.Recipients = make([]string, 0)
 	a.Actions = make(map[string]script_config.ScriptConfig)
 }
 
 func (a *Akte) ResetWith(b Akte) {
 	a.FileExtensions.Reset()
-	//TODO-P4 should copy
+	// TODO-P4 should copy
 	a.RemoteScripts = b.RemoteScripts
 	a.Recipients = b.Recipients
 	a.Actions = b.Actions

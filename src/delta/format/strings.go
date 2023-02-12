@@ -22,15 +22,16 @@ const (
 	StringUnrecognized = "unrecognized"
 	// StringHeaderIndent = "=============== "
 	StringHeaderIndent = "                "
-	//TODO-P4 use reflection?
+	// TODO-P4 use reflection?
 	LenStringMax = len(StringUnrecognized) + 4
 )
 
-func MakeFormatStringRightAlignedParen(
+func MakeFormatStringRightAligned(
 	f string,
+	args ...any,
 ) schnittstellen.FuncWriter {
 	return func(w io.Writer) (n int64, err error) {
-		f = fmt.Sprintf("(%s) ", f)
+		f = fmt.Sprintf(f, args...)
 
 		diff := LenStringMax - len(f)
 
@@ -50,6 +51,12 @@ func MakeFormatStringRightAlignedParen(
 
 		return
 	}
+}
+
+func MakeFormatStringRightAlignedParen(
+	f string,
+) schnittstellen.FuncWriter {
+	return MakeFormatStringRightAligned("(%s) ", f)
 }
 
 func MakeWriterFormatStringIndentedHeader(

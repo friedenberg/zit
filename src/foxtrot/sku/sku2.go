@@ -55,6 +55,7 @@ func (sk *Sku2) Set(line string) (err error) {
 
 	return
 }
+
 func (sk *Sku2) setOld(line string) (err error) {
 	r := strings.NewReader(line)
 

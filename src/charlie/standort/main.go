@@ -156,17 +156,17 @@ func (s Standort) ResetVerzeichnisse() (err error) {
 		return
 	}
 
-	if err = os.MkdirAll(s.DirVerzeichnisse(), os.ModeDir|0755); err != nil {
+	if err = os.MkdirAll(s.DirVerzeichnisse(), os.ModeDir|0o755); err != nil {
 		err = errors.Wrapf(err, "failed to make verzeichnisse dir")
 		return
 	}
 
-	if err = os.MkdirAll(s.DirVerzeichnisseZettelenNeue(), os.ModeDir|0755); err != nil {
+	if err = os.MkdirAll(s.DirVerzeichnisseZettelenNeue(), os.ModeDir|0o755); err != nil {
 		err = errors.Wrapf(err, "failed to make verzeichnisse dir")
 		return
 	}
 
-	if err = os.MkdirAll(s.DirVerzeichnisseZettelenNeueSchwanzen(), os.ModeDir|0755); err != nil {
+	if err = os.MkdirAll(s.DirVerzeichnisseZettelenNeueSchwanzen(), os.ModeDir|0o755); err != nil {
 		err = errors.Wrapf(err, "failed to make verzeichnisse dir")
 		return
 	}

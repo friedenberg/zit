@@ -13,7 +13,7 @@ func TestNormalize(t *testing.T) {
 	}
 
 	testEntries := map[string]testEntry{
-		"removes all": testEntry{
+		"removes all": {
 			ac: MakeEtikettSet(
 				MustEtikett("project-2021-zit"),
 				MustEtikett("project-2021-zit-test"),
@@ -26,7 +26,7 @@ func TestNormalize(t *testing.T) {
 				MustEtikett("project-archive-task-done"),
 			),
 		},
-		"removes non": testEntry{
+		"removes non": {
 			ac: MakeEtikettSet(
 				MustEtikett("project-2021-zit"),
 				MustEtikett("project-2021-zit-test"),
@@ -39,7 +39,7 @@ func TestNormalize(t *testing.T) {
 				MustEtikett("zz-archive-task-done"),
 			),
 		},
-		"removes right order": testEntry{
+		"removes right order": {
 			ac: MakeEtikettSet(
 				MustEtikett("priority"),
 				MustEtikett("priority-1"),
@@ -77,7 +77,7 @@ func TestRemovePrefixes(t *testing.T) {
 	}
 
 	testEntries := map[string]testEntry{
-		"removes all": testEntry{
+		"removes all": {
 			ac: MakeEtikettSet(
 				MustEtikett("project-2021-zit"),
 				MustEtikett("project-2021-zit-test"),
@@ -87,7 +87,7 @@ func TestRemovePrefixes(t *testing.T) {
 			ex:     MakeEtikettSet(),
 			prefix: "project",
 		},
-		"removes non": testEntry{
+		"removes non": {
 			ac: MakeEtikettSet(
 				MustEtikett("project-2021-zit"),
 				MustEtikett("project-2021-zit-test"),
@@ -102,7 +102,7 @@ func TestRemovePrefixes(t *testing.T) {
 			),
 			prefix: "xx",
 		},
-		"removes one": testEntry{
+		"removes one": {
 			ac: MakeEtikettSet(
 				MustEtikett("project-2021-zit"),
 				MustEtikett("project-2021-zit-test"),
@@ -116,7 +116,7 @@ func TestRemovePrefixes(t *testing.T) {
 			),
 			prefix: "zz",
 		},
-		"removes most": testEntry{
+		"removes most": {
 			ac: MakeEtikettSet(
 				MustEtikett("project-2021-zit"),
 				MustEtikett("project-2021-zit-test"),

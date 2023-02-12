@@ -43,7 +43,7 @@ func (c Checkin) Run(
 			return
 		}
 
-		//TODO: add states to checkin process to indicate results of update call
+		// TODO: add states to checkin process to indicate results of update call
 		// stdprinter.Outf("%s (unchanged)", tz.Named)
 
 		results.Zettelen[tz.Sku.Kennung] = zettel_checked_out.Zettel{

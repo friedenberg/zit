@@ -6,8 +6,10 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
-type color string
-type ColorType color
+type (
+	color     string
+	ColorType color
+)
 
 const (
 	colorReset          = "\u001b[0m"

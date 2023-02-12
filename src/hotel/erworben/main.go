@@ -18,7 +18,7 @@ type Transacted = objekte.Transacted[
 ]
 
 type Objekte struct {
-	//TODO-P3 rename to AkteSha
+	// TODO-P3 rename to AkteSha
 	Sha  sha.Sha
 	Akte Akte
 }

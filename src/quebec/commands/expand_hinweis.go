@@ -10,8 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
-type ExpandHinweis struct {
-}
+type ExpandHinweis struct{}
 
 func init() {
 	registerCommand(

@@ -3,6 +3,7 @@
 setup() {
 	load 'test_helper/bats-support/load'
 	load 'test_helper/bats-assert/load'
+	load 'common.bash'
 	# ... the remaining setup is unchanged
 
 	# get the containing directory of this file
@@ -17,23 +18,11 @@ setup() {
 	export output
 }
 
-cat_yin() (
-	echo "one"
-	echo "two"
-	echo "three"
-)
-
-cat_yang() (
-	echo "uno"
-	echo "dos"
-	echo "tres"
-)
-
 function format_organize_right_align { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	run_zit_init_disable_age
 
 	to_add="$(mktemp)"
 	{
@@ -56,7 +45,7 @@ function format_organize_right_align { # @test
 		echo
 	} >"$expected"
 
-	run zit format-organize -prefix-joints=true -refine "$to_add"
+	run_zit format-organize -prefix-joints=true -refine "$to_add"
 	assert_output "$(cat "$expected")"
 }
 
@@ -65,7 +54,7 @@ function format_organize_left_align { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	run_zit_init_disable_age
 
 	to_add="$(mktemp)"
 	{
@@ -88,6 +77,6 @@ function format_organize_left_align { # @test
 		echo
 	} >"$expected"
 
-	run zit format-organize -prefix-joints=true -refine -right-align=false "$to_add"
+	run_zit format-organize -prefix-joints=true -refine -right-align=false "$to_add"
 	assert_output "$(cat "$expected")"
 }

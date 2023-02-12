@@ -3,6 +3,7 @@
 setup() {
 	load 'test_helper/bats-support/load'
 	load 'test_helper/bats-assert/load'
+	load 'common.bash'
 	# ... the remaining setup is unchanged
 
 	# get the containing directory of this file
@@ -16,18 +17,6 @@ setup() {
 	# for shellcheck SC2154
 	export output
 }
-
-cat_yin() (
-	echo "one"
-	echo "two"
-	echo "three"
-)
-
-cat_yang() (
-	echo "uno"
-	echo "dos"
-	echo "tres"
-)
 
 cat_organize() (
 	echo ''
@@ -69,7 +58,7 @@ function outputs_organize_one_etikett { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
-	run zit format-organize -prefix-joints=true -refine=true <(cat_organize)
+	run_zit_init_disable_age
+	run_zit format-organize -prefix-joints=true -refine=true <(cat_organize)
 	assert_output "$(cat_organize)"
 }

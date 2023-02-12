@@ -2,13 +2,15 @@ package remote_conn
 
 import "sync"
 
-var ticketDeficit int
-var ticketDeficitLock sync.Locker
-var chConnectionTickets chan struct{}
+var (
+	ticketDeficit       int
+	ticketDeficitLock   sync.Locker
+	chConnectionTickets chan struct{}
+)
 
 func init() {
-	//200 causes errors
-	//150 sometimes causes errors
+	// 200 causes errors
+	// 150 sometimes causes errors
 	// chConnectionTickets = make(chan struct{}, 150)
 	ticketDeficitLock = &sync.Mutex{}
 	chConnectionTickets = make(chan struct{})

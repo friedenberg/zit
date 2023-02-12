@@ -12,8 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/oscar/user_ops"
 )
 
-type EditKonfig struct {
-}
+type EditKonfig struct{}
 
 func init() {
 	registerCommand(
@@ -130,7 +129,7 @@ func (c EditKonfig) readTempKonfigFile(
 
 	k = &erworben.Objekte{}
 
-	//TODO-P3 offer option to edit again
+	// TODO-P3 offer option to edit again
 	if _, err = format.Parse(f, k); err != nil {
 		err = errors.Wrap(err)
 		return

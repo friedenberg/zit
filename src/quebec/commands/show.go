@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/ts"
@@ -93,7 +92,7 @@ func (c Show) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
 					ev.FuncFormatter(
 						u.Out(),
 						u.StoreObjekten(),
-						u.PrinterTypTransacted(format.StringNew),
+						u.PrinterTypTransacted(),
 					),
 				)
 

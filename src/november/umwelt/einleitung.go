@@ -67,7 +67,7 @@ func (u *Umwelt) Einleitung(e Einleitung) (err error) {
 
 	if !e.DisableAge {
 		if _, err = age.Generate(s.FileAge()); err != nil {
-			//If the Age file exists, don't do anything and continue init
+			// If the Age file exists, don't do anything and continue init
 			if errors.Is(err, os.ErrExist) {
 				err = nil
 			} else {
@@ -173,7 +173,7 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 }
 
 func mkdirAll(elements ...string) {
-	err := os.MkdirAll(path.Join(elements...), os.ModeDir|0755)
+	err := os.MkdirAll(path.Join(elements...), os.ModeDir|0o755)
 	errors.PanicIfError(err)
 }
 
@@ -244,7 +244,7 @@ func readAndTransferLines(in, out string) (err error) {
 			return
 		}
 
-		//TODO-P2 sterilize line
+		// TODO-P2 sterilize line
 		w.WriteString(l)
 	}
 

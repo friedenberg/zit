@@ -16,8 +16,7 @@ func TestWriter1(t *testing.T) {
 	w.WriteFormats("%s", "three")
 
 	sb := &strings.Builder{}
-	expected :=
-		`one
+	expected := `one
 two
 three
 `

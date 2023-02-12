@@ -50,10 +50,10 @@ func (fd *FD) Set(v string) (err error) {
 		return
 	}
 
-  if fi.IsDir() {
-    err = errors.Errorf("%s is a directory", v)
-    return
-  }
+	if fi.IsDir() {
+		err = errors.Errorf("%s is a directory", v)
+		return
+	}
 
 	*fd = FileInfo(fi)
 	fd.Path = filepath.Clean(v)
@@ -81,7 +81,7 @@ func (fd *FD) Set(v string) (err error) {
 	// return
 }
 
-//TODO-P4 add formatter
+// TODO-P4 add formatter
 // func (ut File) String() string {
 // 	return fmt.Sprintf("[%s %s]", ut.Path, ut.Sha)
 // }

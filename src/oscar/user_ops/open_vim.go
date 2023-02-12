@@ -10,8 +10,7 @@ type OpenVim struct {
 	Options []string
 }
 
-type OpenVimResults struct {
-}
+type OpenVimResults struct{}
 
 func (c OpenVim) Run(
 	u *umwelt.Umwelt,

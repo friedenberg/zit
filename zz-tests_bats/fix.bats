@@ -3,6 +3,7 @@
 setup() {
 	load 'test_helper/bats-support/load'
 	load 'test_helper/bats-assert/load'
+	load 'common.bash'
 	# ... the remaining setup is unchanged
 
 	# get the containing directory of this file
@@ -17,37 +18,12 @@ setup() {
 	export output
 }
 
-cat_yin() (
-	echo "one"
-	echo "two"
-	echo "three"
-	echo "four"
-	echo "five"
-	echo "six"
-)
-
-cat_yang() (
-	echo "uno"
-	echo "dos"
-	echo "tres"
-	echo "quatro"
-	echo "cinco"
-	echo "seis"
-)
-
-cmd_zit_def=(
-	-abbreviate-hinweisen=true
-	-predictable-hinweisen
-	-print-typen=false
-)
-
 function can_update_akte { # @test
 	# setup
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run zit init "${cmd_zit_def[@]}" -disable-age -yin <(cat_yin) -yang <(cat_yang)
-	assert_success
+	run_zit_init_disable_age
 
 	expected="$(mktemp)"
 	{
@@ -61,10 +37,10 @@ function can_update_akte { # @test
 		echo the body
 	} >"$expected"
 
-	run zit new "${cmd_zit_def[@]}" -edit=false -predictable-hinweisen "$expected"
-	assert_output '          (new) [o/u@18 !md "bez"]'
+	run_zit new -edit=false "$expected"
+	assert_output '[one/uno@18df16846a2f8bbce5f03e1041baff978a049aabd169ab9adac387867fe1706c !md "bez"]'
 
-	run zit show "${cmd_zit_def[@]}" one/uno
+	run_zit show one/uno
 	assert_output "$(cat "$expected")"
 
 	# when
@@ -73,8 +49,8 @@ function can_update_akte { # @test
 		echo the body but new
 	} >"$new_akte"
 
-	run zit checkin-akte "${cmd_zit_def[@]}" -new-etiketten et3 one/uno "$new_akte"
-	assert_output '      (updated) [o/u@6 !md "bez"]'
+	run_zit checkin-akte -new-etiketten et3 one/uno "$new_akte"
+	assert_output '[one/uno@6b4905e7d7a5185f73db1e27448663fa38b3aca11d62e1dc33ecb066653791b7 !md "bez"]'
 
 	# then
 	{
@@ -87,6 +63,6 @@ function can_update_akte { # @test
 		echo the body but new
 	} >"$expected"
 
-	run zit show "${cmd_zit_def[@]}" one/uno
+	run_zit show one/uno
 	assert_output "$(cat "$expected")"
 }

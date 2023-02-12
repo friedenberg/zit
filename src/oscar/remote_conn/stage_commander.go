@@ -38,7 +38,7 @@ func (s StageCommander) ChanRemoteCommandDone() <-chan struct{} {
 }
 
 func (s StageCommander) Close() (err error) {
-	//TODO-P3 determine if this is the right place
+	// TODO-P3 determine if this is the right place
 	if err = s.MainDialogue().Close(); err != nil {
 		if errors.IsErrno(err, syscall.EPIPE) {
 			err = nil
@@ -132,7 +132,7 @@ func MakeStageCommander(
 
 	rb := bufio.NewReader(r)
 
-	//TODO-P2 make it possible to output and check for path simulataneously
+	// TODO-P2 make it possible to output and check for path simulataneously
 	if s.sockPath, err = rb.ReadString('\n'); err != nil {
 		err = errors.Wrapf(err, "Cmd: %s", s.remoteActorCmd.String())
 		return

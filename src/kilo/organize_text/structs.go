@@ -85,7 +85,7 @@ func (z *zettel) Set(v string) (err error) {
 		return
 	}
 
-	//no bezeichnung
+	// no bezeichnung
 	if idx+2 > len(remaining)-1 {
 		return
 	}

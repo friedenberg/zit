@@ -12,7 +12,8 @@ import (
 )
 
 const (
-	Epoch = 1660007128
+	Epoch          = 1660007128
+	FormatDateTime = "06-01-02 15:04:05"
 )
 
 type Time struct {
@@ -42,6 +43,10 @@ func TimeWithIndex(t1 Time, n int) (t2 Time) {
 
 func (t *Time) MoveForwardIota() {
 	t.time = t.time.Add(tyme.Second)
+}
+
+func (t Time) Format(f string) string {
+	return t.time.Format(f)
 }
 
 func (t Time) String() string {

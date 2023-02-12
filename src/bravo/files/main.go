@@ -71,7 +71,7 @@ func (g *openFilesGuard) UnlockN(n int) {
 }
 
 func CreateExclusiveWriteOnly(p string) (f *os.File, err error) {
-	if f, err = os.OpenFile(p, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0666); err != nil {
+	if f, err = os.OpenFile(p, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o666); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -115,7 +115,7 @@ func OpenExclusiveWriteOnlyTruncate(s string) (f *os.File, err error) {
 	if f, err = os.OpenFile(
 		s,
 		os.O_WRONLY|os.O_EXCL|os.O_TRUNC,
-		0666,
+		0o666,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -127,7 +127,7 @@ func OpenExclusiveWriteOnlyTruncate(s string) (f *os.File, err error) {
 func OpenExclusiveReadOnly(s string) (f *os.File, err error) {
 	openFilesGuardInstance.Lock()
 
-	if f, err = os.OpenFile(s, os.O_RDONLY|os.O_EXCL, 0666); err != nil {
+	if f, err = os.OpenFile(s, os.O_RDONLY|os.O_EXCL, 0o666); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -138,7 +138,7 @@ func OpenExclusiveReadOnly(s string) (f *os.File, err error) {
 func OpenExclusiveWriteOnly(s string) (f *os.File, err error) {
 	openFilesGuardInstance.Lock()
 
-	if f, err = os.OpenFile(s, os.O_WRONLY|os.O_EXCL, 0666); err != nil {
+	if f, err = os.OpenFile(s, os.O_WRONLY|os.O_EXCL, 0o666); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -42,7 +42,7 @@ func (c *FormatText) Parse(r1 io.Reader, k *Objekte) (n int64, err error) {
 		td := toml.NewDecoder(pr)
 		td.DisallowUnknownFields()
 
-		//TODO-P4 fix issue with wrap not adding stack
+		// TODO-P4 fix issue with wrap not adding stack
 		if err = td.Decode(&k.Akte); err != nil {
 			if errors.IsEOF(err) {
 				err = nil

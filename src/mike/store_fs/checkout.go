@@ -95,7 +95,7 @@ func (s *Store) CheckoutOne(
 		}
 
 		if !s.shouldCheckOut(options, cz) {
-			//TODO-P2 handle fs state
+			// TODO-P2 handle fs state
 			if err = s.zettelExternalLogPrinter(&cz.External); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -108,7 +108,7 @@ func (s *Store) CheckoutOne(
 	inlineAkte := s.erworben.IsInlineTyp(sz.Objekte.Typ)
 
 	cz = zettel_checked_out.Zettel{
-		//TODO-P2 check diff with fs if already exists
+		// TODO-P2 check diff with fs if already exists
 		State:    zettel_checked_out.StateJustCheckedOut,
 		Internal: sz,
 		External: zettel_external.Zettel{

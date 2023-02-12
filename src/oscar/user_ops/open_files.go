@@ -6,8 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
-type OpenFiles struct {
-}
+type OpenFiles struct{}
 
 func (c OpenFiles) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	if len(args) == 0 {

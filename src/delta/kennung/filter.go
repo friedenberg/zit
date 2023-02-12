@@ -26,14 +26,14 @@ func (f Filter) Include(e Element) (err error) {
 
 	ok := false
 
-	//TODO-P3 pull into static
+	// TODO-P3 pull into static
 	needsEt := f.Set.Etiketten.Len() > 0
 	okEt := false
 
 	expanded := Expanded(e.AkteEtiketten(), ExpanderRight)
 
 LOOP:
-	//TODO-P3 pull into static
+	// TODO-P3 pull into static
 	for _, e := range f.Set.Etiketten.Copy().Sorted() {
 		okEt = expanded.Contains(e)
 
@@ -49,7 +49,7 @@ LOOP:
 		}
 	}
 
-	//TODO-P2 make static
+	// TODO-P2 make static
 	shas := f.Set.Shas.Copy()
 	needsSha := shas.Len() > 0
 	okSha := false

@@ -1,9 +1,11 @@
 package umwelt
 
 import (
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/hotel/etikett"
 	"github.com/friedenberg/zit/src/hotel/typ"
@@ -14,50 +16,61 @@ import (
 	"github.com/friedenberg/zit/src/mike/store_fs"
 )
 
-func (u *Umwelt) PrinterKonfigTransacted(
-	verb string,
-) collections.WriterFunc[*erworben.Transacted] {
+func wrapWithTimePrefixerIfNecessary[T sku.DataIdentityGetter](
+	k schnittstellen.Konfig,
+	f schnittstellen.FuncWriterFormat[T],
+) schnittstellen.FuncWriterFormat[T] {
+	if k.UsePrintTime() {
+		return sku.MakeTimePrefixWriter(f)
+	} else {
+		return f
+	}
+}
+
+func (u *Umwelt) PrinterKonfigTransacted() collections.WriterFunc[*erworben.Transacted] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
-		erworben.MakeCliFormatTransacted(
-			u.FormatColorWriter(),
-			u.FormatSha(u.StoreObjekten().GetAbbrStore().AbbreviateSha),
-			verb,
+		wrapWithTimePrefixerIfNecessary(
+			u.Konfig(),
+			erworben.MakeCliFormatTransacted(
+				u.FormatColorWriter(),
+				u.FormatSha(u.StoreObjekten().GetAbbrStore().AbbreviateSha),
+			),
 		),
 	)
 }
 
-// TODO-P4 move away from passed-in verbs
-func (u *Umwelt) PrinterTypTransacted(
-	verb string,
-) collections.WriterFunc[*typ.Transacted] {
+func (u *Umwelt) PrinterTypTransacted() collections.WriterFunc[*typ.Transacted] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
-		u.FormatTypTransacted(verb),
+		wrapWithTimePrefixerIfNecessary(
+			u.Konfig(),
+			u.FormatTypTransacted(),
+		),
 	)
 }
 
-func (u *Umwelt) PrinterEtikettTransacted(
-	verb string,
-) collections.WriterFunc[*etikett.Transacted] {
+func (u *Umwelt) PrinterEtikettTransacted() collections.WriterFunc[*etikett.Transacted] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
-		u.FormatEtikettTransacted(verb),
+		wrapWithTimePrefixerIfNecessary(
+			u.Konfig(),
+			u.FormatEtikettTransacted(),
+		),
 	)
 }
 
-func (u *Umwelt) PrinterKastenTransacted(
-	verb string,
-) collections.WriterFunc[*kasten.Transacted] {
+func (u *Umwelt) PrinterKastenTransacted() collections.WriterFunc[*kasten.Transacted] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
-		u.FormatKastenTransacted(verb),
+		wrapWithTimePrefixerIfNecessary(
+			u.Konfig(),
+			u.FormatKastenTransacted(),
+		),
 	)
 }
 
-func (u *Umwelt) PrinterTypCheckedOut(
-	verb string,
-) collections.WriterFunc[*typ.External] {
+func (u *Umwelt) PrinterTypCheckedOut() collections.WriterFunc[*typ.External] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
 		u.FormatTypCheckedOut(),
@@ -66,26 +79,30 @@ func (u *Umwelt) PrinterTypCheckedOut(
 
 func (u *Umwelt) ZettelTransactedLogPrinters() zettel.LogWriter {
 	return zettel.LogWriter{
-		New:       u.PrinterZettelTransactedDelta(format.StringNew),
-		Updated:   u.PrinterZettelTransactedDelta(format.StringUpdated),
-		Unchanged: u.PrinterZettelTransactedDelta(format.StringUnchanged),
-		Archived:  u.PrinterZettelTransactedDelta(format.StringArchived),
+		New:       u.PrinterZettelTransactedDelta(),
+		Updated:   u.PrinterZettelTransactedDelta(),
+		Unchanged: u.PrinterZettelTransactedDelta(),
+		Archived:  u.PrinterZettelTransactedDelta(),
 	}
 }
 
 func (u *Umwelt) PrinterZettelTransacted() collections.WriterFunc[*zettel.Transacted] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
-		u.FormatZettelTransacted(),
+		wrapWithTimePrefixerIfNecessary(
+			u.Konfig(),
+			u.FormatZettelTransacted(),
+		),
 	)
 }
 
-func (u *Umwelt) PrinterZettelTransactedDelta(
-	verb string,
-) collections.WriterFunc[*zettel.Transacted] {
+func (u *Umwelt) PrinterZettelTransactedDelta() collections.WriterFunc[*zettel.Transacted] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
-		u.FormatZettelTransactedDelta(verb),
+		wrapWithTimePrefixerIfNecessary(
+			u.Konfig(),
+			u.FormatZettelTransactedDelta(),
+		),
 	)
 }
 

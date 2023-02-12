@@ -28,7 +28,7 @@ type Store struct {
 	konfigStore  KonfigStore
 	kastenStore  KastenStore
 
-	//Gattungen
+	// Gattungen
 	gattungStores     map[schnittstellen.Gattung]GattungStore
 	reindexers        map[schnittstellen.Gattung]reindexer
 	flushers          map[schnittstellen.Gattung]errors.Flusher
@@ -194,9 +194,9 @@ func (s Store) RevertTransaktion(
 		return
 	}
 
-	//tzs = zettel.MakeMutableSetUnique(t.Skus.Len())
+	// tzs = zettel.MakeMutableSetUnique(t.Skus.Len())
 
-	//t.Skus.Each(
+	// t.Skus.Each(
 	//	func(o sku.SkuLike) (err error) {
 	//		var h *hinweis.Hinweis
 	//		ok := false

@@ -20,9 +20,7 @@ import (
 	"github.com/friedenberg/zit/src/kasten"
 )
 
-var (
-	typExpander kennung.Expander
-)
+var typExpander kennung.Expander
 
 func init() {
 	typExpander = kennung.MakeExpanderRight(`-`)
@@ -50,17 +48,17 @@ type compiled struct {
 
 	erworben.Akte
 
-	//Etiketten
+	// Etiketten
 	EtikettenHidden     []string
 	EtikettenToAddToNew []string
 	Etiketten           etikettSet
 
-	//Typen
+	// Typen
 	ExtensionsToTypen map[string]string
 	DefaultTyp        typ.Transacted
 	Typen             typSet
 
-	//Kasten
+	// Kasten
 	Kisten kastenSet
 }
 

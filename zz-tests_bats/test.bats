@@ -3,6 +3,7 @@
 setup() {
 	load 'test_helper/bats-support/load'
 	load 'test_helper/bats-assert/load'
+	load 'common.bash'
 	# ... the remaining setup is unchanged
 
 	# get the containing directory of this file
@@ -17,28 +18,6 @@ setup() {
 	export output
 }
 
-cat_yin() (
-	echo "one"
-	echo "two"
-	echo "three"
-)
-
-cat_yang() (
-	echo "uno"
-	echo "dos"
-	echo "tres"
-)
-
-cmd_zit_def=(
-	# -abbreviate-hinweisen=false
-	-predictable-hinweisen
-	-print-typen=false
-)
-
-function can_run_zit { # @test
-	run zit
-}
-
 function provides_help_with_no_params { # @test
 	run zit
 	assert_output --partial 'No subcommand provided.'
@@ -48,8 +27,7 @@ function can_initialize_without_age { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run zit init "${cmd_zit_def[@]}" -disable-age -yin <(cat_yin) -yang <(cat_yang)
-	assert_success
+	run_zit_init_disable_age
 
 	[ -d .zit/ ]
 	[ ! -f .zit/AgeIdentity ]
@@ -59,7 +37,7 @@ function can_initialize_with_age { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run zit init "${cmd_zit_def[@]}" -yin <(cat_yin) -yang <(cat_yang)
+	run zit init -yin <(cat_yin) -yang <(cat_yang)
 	assert_success
 
 	[ -d .zit/ ]
@@ -70,8 +48,7 @@ function can_new_zettel_file { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run zit init "${cmd_zit_def[@]}" -disable-age -yin <(cat_yin) -yang <(cat_yang)
-	assert_success
+	run_zit_init_disable_age
 
 	to_add="$(mktemp)"
 	{
@@ -82,10 +59,10 @@ function can_new_zettel_file { # @test
 		echo "---"
 	} >"$to_add"
 
-	run zit new "${cmd_zit_def[@]}" -edit=false -predictable-hinweisen "$to_add"
-	assert_output '          (new) [o/u@9 !md "wow"]'
+	run_zit new -edit=false "$to_add"
+	assert_output '[one/uno@9a638e2b183562da6d3c634d5a3841d64bc337c9cf79f8fffa0d0194659bc564 !md "wow"]'
 
-	run zit show "${cmd_zit_def[@]}" one/uno
+	run_zit show one/uno
 	assert_output "$(cat "$to_add")"
 }
 
@@ -93,8 +70,7 @@ function can_new_zettel { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run zit init "${cmd_zit_def[@]}" -disable-age -yin <(cat_yin) -yang <(cat_yang)
-	assert_success
+	run_zit_init_disable_age
 
 	expected="$(mktemp)"
 	{
@@ -105,10 +81,10 @@ function can_new_zettel { # @test
 		echo "---"
 	} >"$expected"
 
-	run zit new "${cmd_zit_def[@]}" -edit=false -predictable-hinweisen -bezeichnung wow -etiketten ok
-	assert_output '          (new) [o/u@9 !md "wow"]'
+	run_zit new -edit=false -bezeichnung wow -etiketten ok
+	assert_output '[one/uno@9a638e2b183562da6d3c634d5a3841d64bc337c9cf79f8fffa0d0194659bc564 !md "wow"]'
 
-	run zit show "${cmd_zit_def[@]}" one/uno
+	run_zit show one/uno
 	assert_output "$(cat "$expected")"
 }
 
@@ -116,8 +92,7 @@ function can_checkout_and_checkin { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run zit init "${cmd_zit_def[@]}" -disable-age -yin <(cat_yin) -yang <(cat_yang)
-	assert_success
+	run_zit_init_disable_age
 
 	to_add="$(mktemp)"
 	{
@@ -127,11 +102,11 @@ function can_checkout_and_checkin { # @test
 		echo "---"
 	} >"$to_add"
 
-	run zit new "${cmd_zit_def[@]}" -edit=false -predictable-hinweisen "$to_add"
-	assert_output '          (new) [o/u@9 !md "wow"]'
+	run_zit new -edit=false "$to_add"
+	assert_output '[one/uno@9a638e2b183562da6d3c634d5a3841d64bc337c9cf79f8fffa0d0194659bc564 !md "wow"]'
 
-	run zit checkout "${cmd_zit_def[@]}" one/uno
-	assert_output '  (checked out) [one/uno.zettel@9 !md "wow"]'
+	run_zit checkout one/uno
+	assert_output '  (checked out) [one/uno.zettel@9a638e2b183562da6d3c634d5a3841d64bc337c9cf79f8fffa0d0194659bc564 !md "wow"]'
 
 	{
 		echo "---"
@@ -142,9 +117,9 @@ function can_checkout_and_checkin { # @test
 		echo "content"
 	} >"one/uno.zettel"
 
-	run zit checkin "${cmd_zit_def[@]}" one/uno.zettel
+	run_zit checkin one/uno.zettel
 	#TODO fix missing typ
-	assert_output '      (updated) [o/u@14 ! "wow"]'
+	assert_output '[one/uno@14d2d788146303057462fbf3d181a3c8c3397ebc238c07970b206b5db6203a3a ! "wow"]'
 }
 
 function can_checkout_via_etiketten { # @test
@@ -152,8 +127,7 @@ function can_checkout_via_etiketten { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run zit init "${cmd_zit_def[@]}" -disable-age -yin <(cat_yin) -yang <(cat_yang)
-	assert_success
+	run_zit_init_disable_age
 
 	to_add="$(mktemp)"
 	{
@@ -163,10 +137,10 @@ function can_checkout_via_etiketten { # @test
 		echo "---"
 	} >"$to_add"
 
-	run zit new "${cmd_zit_def[@]}" -edit=false "$to_add"
+	run_zit new -edit=false "$to_add"
 	assert_output --partial '[one/uno '
 
-	run zit checkout "${cmd_zit_def[@]}" -etiketten ok
+	run_zit checkout -etiketten ok
 	assert_output --partial '[one/uno '
 	assert_output --partial '(checked out)'
 }
@@ -176,8 +150,7 @@ function can_output_organize { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run zit init "${cmd_zit_def[@]}" -disable-age -yin <(cat_yin) -yang <(cat_yang)
-	assert_success
+	run_zit_init_disable_age
 
 	to_add="$(mktemp)"
 	{
@@ -187,7 +160,7 @@ function can_output_organize { # @test
 		echo "---"
 	} >"$to_add"
 
-	run zit new "${cmd_zit_def[@]}" -edit=false "$to_add"
+	run_zit new -edit=false "$to_add"
 	assert_output --partial '[one/uno '
 
 	expected_organize="$(mktemp)"
@@ -198,7 +171,7 @@ function can_output_organize { # @test
 		echo "- [one/uno] wow"
 	} >"$expected_organize"
 
-	run zit organize "${cmd_zit_def[@]}" ok <"$(tty)"
+	run_zit organize ok <"$(tty)"
 	assert_output "$(cat "$expected_organize")"
 
 	{
@@ -208,7 +181,7 @@ function can_output_organize { # @test
 		echo "- [one/uno] wow"
 	} >"$expected_organize"
 
-	run zit organize "${cmd_zit_def[@]}" ok <"$expected_organize"
+	run_zit organize ok <"$expected_organize"
 
 	expected_zettel="$(mktemp)"
 	{
@@ -218,7 +191,7 @@ function can_output_organize { # @test
 		echo "---"
 	} >"$expected_zettel"
 
-	run zit show "${cmd_zit_def[@]}" one/uno
+	run_zit show one/uno
 	assert_output "$(cat "$expected_zettel")"
 }
 
@@ -227,8 +200,7 @@ function hides_hidden_etiketten_from_organize { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run zit init "${cmd_zit_def[@]}" -disable-age -yin <(cat_yin) -yang <(cat_yang)
-	assert_success
+	run_zit_init_disable_age
 
 	{
 		echo "[tags.zz-archive]"
@@ -245,7 +217,7 @@ function hides_hidden_etiketten_from_organize { # @test
 		echo ---
 	} >"$to_add"
 
-	run zit new "${cmd_zit_def[@]}" -edit=false "$to_add"
+	run_zit new -edit=false "$to_add"
 	assert_output --partial '[one/uno '
 
 	expected_organize="$(mktemp)"
@@ -255,7 +227,7 @@ function hides_hidden_etiketten_from_organize { # @test
 		echo
 	} >"$expected_organize"
 
-	run zit organize "${cmd_zit_def[@]}" project-2021-zit
+	run_zit organize project-2021-zit
 	assert_output "$(cat "$expected_organize")"
 }
 
@@ -263,8 +235,7 @@ function can_new_zettel_with_metadatei { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run zit init "${cmd_zit_def[@]}" -disable-age -yin <(cat_yin) -yang <(cat_yang)
-	assert_success
+	run_zit_init_disable_age
 
 	expected="$(mktemp)"
 	{
@@ -276,58 +247,8 @@ function can_new_zettel_with_metadatei { # @test
 		echo ---
 	} >"$expected"
 
-	run zit new "${cmd_zit_def[@]}" -edit=false -predictable-hinweisen -bezeichnung bez -etiketten et1,et2
-	assert_output '          (new) [o/u@2 !md "bez"]'
-}
-
-function can_update_akte { # @test
-	# setup
-	wd="$(mktemp -d)"
-	cd "$wd" || exit 1
-
-	run zit init "${cmd_zit_def[@]}" -disable-age -yin <(cat_yin) -yang <(cat_yang)
-	assert_success
-
-	expected="$(mktemp)"
-	{
-		echo ---
-		echo "# bez"
-		echo - et1
-		echo - et2
-		echo ! md
-		echo ---
-		echo
-		echo the body
-	} >"$expected"
-
-	run zit new "${cmd_zit_def[@]}" -edit=false -predictable-hinweisen "$expected"
-	assert_output '          (new) [o/u@18 !md "bez"]'
-
-	run zit show "${cmd_zit_def[@]}" one/uno
-	assert_output "$(cat "$expected")"
-
-	# when
-	new_akte="$(mktemp)"
-	{
-		echo the body but new
-	} >"$new_akte"
-
-	run zit checkin-akte "${cmd_zit_def[@]}" -new-etiketten et3 one/uno "$new_akte"
-	assert_output '      (updated) [o/u@6 !md "bez"]'
-
-	# then
-	{
-		echo ---
-		echo "# bez"
-		echo - et3
-		echo ! md
-		echo ---
-		echo
-		echo the body but new
-	} >"$expected"
-
-	run zit show "${cmd_zit_def[@]}" one/uno
-	assert_output "$(cat "$expected")"
+	run_zit new -edit=false -bezeichnung bez -etiketten et1,et2
+	assert_output '[one/uno@22bfa88b3975bc7cad702c2c7f262d5a754d9ad7423b96b134c6bbc1fbd88aea !md "bez"]'
 }
 
 function can_duplicate_zettel_content { # @test
@@ -338,8 +259,7 @@ function can_duplicate_zettel_content { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run zit init "${cmd_zit_def[@]}" -disable-age -yin <(cat_yin) -yang <(cat_yang)
-	assert_success
+	run_zit_init_disable_age
 
 	expected="$(mktemp)"
 	{
@@ -353,17 +273,17 @@ function can_duplicate_zettel_content { # @test
 		echo the body
 	} >"$expected"
 
-	run zit new "${cmd_zit_def[@]}" -edit=false "$expected"
+	run_zit new -edit=false "$expected"
 	assert_output ''
 
-	run zit new "${cmd_zit_def[@]}" -edit=false "$expected"
+	run_zit new -edit=false "$expected"
 	assert_output ''
 
 	# when
-	run zit show "${cmd_zit_def[@]}" one/uno
+	run_zit show one/uno
 	assert_output ''
 
-	run zit show "${cmd_zit_def[@]}" two/dos
+	run_zit show two/dos
 	assert_output ''
 }
 
@@ -372,8 +292,7 @@ function indexes_are_implicitly_correct { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run zit init "${cmd_zit_def[@]}" -disable-age -yin <(cat_yin) -yang <(cat_yang)
-	assert_success
+	run_zit_init_disable_age
 
 	expected="$(mktemp)"
 	{
@@ -387,15 +306,15 @@ function indexes_are_implicitly_correct { # @test
 		echo the body
 	} >"$expected"
 
-	run zit new "${cmd_zit_def[@]}" -edit=false -predictable-hinweisen "$expected"
-	assert_output '          (new) [o/u@18 !md "bez"]'
+	run_zit new -edit=false "$expected"
+	assert_output '[one/uno@18df16846a2f8bbce5f03e1041baff978a049aabd169ab9adac387867fe1706c !md "bez"]'
 
 	{
 		echo et1
 		echo et2
 	} >"$expected"
 
-	run zit cat "${cmd_zit_def[@]}" -gattung etikett
+	run_zit cat -gattung etikett
 	assert_output "$(cat "$expected")"
 
 	{
@@ -403,7 +322,7 @@ function indexes_are_implicitly_correct { # @test
 	} >"$expected"
 
 	#TODO
-	# run zit cat "${cmd_zit_def[@]}" -gattung hinweis
+	# run_zit cat -gattung hinweis
 	# assert_output --partial "$(cat "$expected")"
 
 	{
@@ -418,15 +337,15 @@ function indexes_are_implicitly_correct { # @test
 
 	mkdir -p one
 	cp "$expected" "one/uno.zettel"
-	run zit checkin -verbose "${cmd_zit_def[@]}" -delete "one/uno.zettel"
-	assert_output --partial '      (updated) [o/u@5 !md "bez"]'
+	run_zit checkin -delete "one/uno.zettel"
+	assert_output --partial '[one/uno@50bedb194bbd829d5d5d11de711a58b8486954a481ae43b4d1a8c4bd7f1f1370 !md "bez"]'
 	assert_output --partial '      (deleted) [one/uno.zettel]'
 
 	{
 		echo et1
 	} >"$expected"
 
-	run zit cat "${cmd_zit_def[@]}" -gattung etikett
+	run_zit cat -gattung etikett
 	assert_output "$(cat "$expected")"
 
 	{
@@ -434,7 +353,7 @@ function indexes_are_implicitly_correct { # @test
 	} >"$expected"
 
 	#TODO
-	# run zit cat "${cmd_zit_def[@]}" -gattung hinweis
+	# run_zit cat -gattung hinweis
 	# assert_output --partial "$(cat "$expected")"
 }
 
@@ -443,7 +362,7 @@ function checkouts_dont_overwrite { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run zit init "${cmd_zit_def[@]}" -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	run_zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
 	assert_success
 
 	expected="$(mktemp)"
@@ -458,11 +377,11 @@ function checkouts_dont_overwrite { # @test
 		echo the body
 	} >"$expected"
 
-	run zit new "${cmd_zit_def[@]}" -edit=false -predictable-hinweisen "$expected"
-	assert_output '          (new) [o/u@18 !md "bez"]'
+	run_zit new -edit=false "$expected"
+	assert_output '[one/uno@18df16846a2f8bbce5f03e1041baff978a049aabd169ab9adac387867fe1706c !md "bez"]'
 
-	run zit checkout "${cmd_zit_def[@]}" one/uno
-	assert_output '  (checked out) [one/uno.zettel@18 !md "bez"]'
+	run_zit checkout one/uno
+	assert_output '  (checked out) [one/uno.zettel@18df16846a2f8bbce5f03e1041baff978a049aabd169ab9adac387867fe1706c !md "bez"]'
 
 	run cat one/uno.zettel
 	assert_output "$(cat "$expected")"
@@ -480,8 +399,8 @@ function checkouts_dont_overwrite { # @test
 
 	cat "$expected" >"one/uno.zettel"
 
-	run zit checkout "${cmd_zit_def[@]}" one/uno
-	assert_output '  (checked out) [one/uno.zettel@6 !md "bez"]'
+	run_zit checkout one/uno
+	assert_output '  (checked out) [one/uno.zettel@63b65ad24c58d43d363f8074a5513e5cf71337cc132f452095a779b933cfee15 !md "bez"]'
 
 	run cat one/uno.zettel
 	assert_output "$(cat "$expected")"

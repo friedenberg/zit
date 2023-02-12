@@ -55,7 +55,7 @@ func ChangesFrom(a1, b1 *organize_text.Text) (c1 Changes, err error) {
 
 		for _, e1 := range es1.Elements() {
 			if a.Named.Contains(h, e1) {
-				//zettel had etikett previously
+				// zettel had etikett previously
 			} else {
 				c.Added = append(
 					c.Added,

@@ -10,8 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
-type PeekHinweisen struct {
-}
+type PeekHinweisen struct{}
 
 func init() {
 	registerCommand(

@@ -7,8 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/format"
 )
 
-type formatObjekte struct {
-}
+type formatObjekte struct{}
 
 func MakeFormatObjekte() *formatObjekte {
 	return &formatObjekte{}

@@ -10,8 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/papa/remote_transfers"
 )
 
-type Listen struct {
-}
+type Listen struct{}
 
 func init() {
 	registerCommand(

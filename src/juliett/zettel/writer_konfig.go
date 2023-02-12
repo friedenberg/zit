@@ -11,6 +11,7 @@ import (
 func MakeWriterKonfig(
 	k konfig.Compiled,
 ) collections.WriterFunc[*Transacted] {
+	errors.TodoP0("switch to sigils")
 	errors.TodoP3("add efficient parsing of hiding tags")
 
 	if k.IncludeHidden {

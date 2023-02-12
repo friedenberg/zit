@@ -10,8 +10,10 @@ import (
 )
 
 // TODO-P4 remove
-type ReadCloser = schnittstellen.ShaReadCloser
-type WriteCloser = schnittstellen.ShaWriteCloser
+type (
+	ReadCloser  = schnittstellen.ShaReadCloser
+	WriteCloser = schnittstellen.ShaWriteCloser
+)
 
 type readCloser struct {
 	tee  io.Reader
@@ -68,7 +70,7 @@ func (src *readCloser) setupTee() {
 }
 
 func (r readCloser) WriteTo(w io.Writer) (n int64, err error) {
-	//TODO-P3 determine why something in the copy returns an EOF
+	// TODO-P3 determine why something in the copy returns an EOF
 	if n, err = io.Copy(w, r.tee); err != nil {
 		if errors.IsEOF(err) {
 			err = nil

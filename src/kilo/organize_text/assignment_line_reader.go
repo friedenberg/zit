@@ -175,7 +175,7 @@ func (ar *assignmentLineReader) readOneHeading(l line) (err error) {
 	} else if depth == ar.currentAssignment.depth {
 		newAssignment, err = ar.readOneHeadingEqualDepth(depth, currentEtiketten)
 	} else {
-		//always use currentEtiketten.depth + 1 because it corrects movements
+		// always use currentEtiketten.depth + 1 because it corrects movements
 		newAssignment, err = ar.readOneHeadingGreaterDepth(depth, currentEtiketten)
 	}
 

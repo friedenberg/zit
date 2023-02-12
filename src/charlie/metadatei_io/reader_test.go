@@ -13,8 +13,7 @@ func Test1(t1 *testing.T) {
 		T: t1,
 	}
 
-	in :=
-		`---
+	in := `---
 metadatei
 ---
 
@@ -63,8 +62,7 @@ func Test2(t1 *testing.T) {
 		T: t1,
 	}
 
-	in :=
-		`---
+	in := `---
 metadatei
 ---
 `

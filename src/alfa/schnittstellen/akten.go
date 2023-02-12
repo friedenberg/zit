@@ -20,8 +20,10 @@ type AkteWriterFactory interface {
 	AkteWriter() (ShaWriteCloser, error)
 }
 
-type FuncAkteReader func(ShaGetter) (ShaReadCloser, error)
-type FuncAkteWriter func() (ShaWriteCloser, error)
+type (
+	FuncAkteReader func(ShaGetter) (ShaReadCloser, error)
+	FuncAkteWriter func() (ShaWriteCloser, error)
+)
 
 type bespokeAkteReadWriterFactory struct {
 	AkteReaderFactory

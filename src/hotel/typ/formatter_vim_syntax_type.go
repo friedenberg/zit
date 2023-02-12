@@ -7,8 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
-type formatterVimSyntaxType struct {
-}
+type formatterVimSyntaxType struct{}
 
 func MakeFormatterVimSyntaxType() *formatterVimSyntaxType {
 	return &formatterVimSyntaxType{}

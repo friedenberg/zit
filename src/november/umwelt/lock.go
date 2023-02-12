@@ -37,8 +37,8 @@ func (u *Umwelt) Unlock() (err error) {
 		}
 	}
 
-	//explicitly do not unlock if there was an error to encourage user interaction
-	//and manual recovery
+	// explicitly do not unlock if there was an error to encourage user interaction
+	// and manual recovery
 	if err = u.lock.Unlock(); err != nil {
 		err = errors.Wrap(err)
 		return

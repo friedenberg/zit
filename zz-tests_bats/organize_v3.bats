@@ -3,6 +3,7 @@
 setup() {
 	load 'test_helper/bats-support/load'
 	load 'test_helper/bats-assert/load'
+	load 'common.bash'
 	# ... the remaining setup is unchanged
 
 	# get the containing directory of this file
@@ -17,43 +18,7 @@ setup() {
 	export output
 }
 
-cat_yin() (
-	echo "one"
-	echo "two"
-	echo "three"
-)
-
-cat_yang() (
-	echo "uno"
-	echo "dos"
-	echo "tres"
-)
-
-cmd_zit_def=(
-	# -abbreviate-hinweisen=false
-	-predictable-hinweisen
-	-print-typen=false
-)
-
-cmd_zit_new=(
-	zit
-	new
-	"${cmd_zit_def[@]}"
-)
-
-cmd_zit_organize=(
-	zit
-	organize
-	-right-align=false
-	-refine=true
-	-metadatei-header=false
-	"${cmd_zit_def[@]}"
-)
-
-cmd_zit_organize_v3=(
-	zit
-	organize
-	"${cmd_zit_def[@]}"
+cmd_def_organize_v3=(
 	-prefix-joints=true
 	-metadatei-header=false
 	-refine=true
@@ -75,8 +40,8 @@ function outputs_organize_one_etikett { # @test
 		echo "---"
 	} >"$to_add"
 
-	run "${cmd_zit_new[@]}" -edit=false "$to_add"
-	assert_output '          (new) [o/u@9 !md "wow"]'
+	run_zit new -edit=false "$to_add"
+	assert_output '[one/uno@9a638e2b183562da6d3c634d5a3841d64bc337c9cf79f8fffa0d0194659bc564 !md "wow"]'
 
 	run zit expand-hinweis o/u
 	assert_output 'one/uno'
@@ -84,12 +49,12 @@ function outputs_organize_one_etikett { # @test
 	expected_organize="$(mktemp)"
 	{
 		echo
-		echo "      # ok"
+		echo "          # ok"
 		echo
-		echo "- [o/u] wow"
+		echo "- [one/uno] wow"
 	} >"$expected_organize"
 
-	run "${cmd_zit_organize_v3[@]}" -mode output-only ok
+	run_zit organize "${cmd_def_organize_v3[@]}" -mode output-only ok
 	assert_output "$(cat "$expected_organize")"
 }
 
@@ -109,18 +74,18 @@ function outputs_organize_two_etiketten { # @test
 		echo "---"
 	} >"$to_add"
 
-	run "${cmd_zit_new[@]}" -edit=false "$to_add"
-	assert_output '          (new) [o/u@f !md "wow"]'
+	run_zit new -edit=false "$to_add"
+	assert_output '[one/uno@f0be3e8072724eee5ea5022db397e20deb739d151abef61d37ed386207e32092 !md "wow"]'
 
 	expected_organize="$(mktemp)"
 	{
 		echo
-		echo "      # brown, ok"
+		echo "          # brown, ok"
 		echo
-		echo "- [o/u] wow"
+		echo "- [one/uno] wow"
 	} >"$expected_organize"
 
-	run "${cmd_zit_organize_v3[@]}" -mode output-only ok brown
+	run_zit organize "${cmd_def_organize_v3[@]}" -mode output-only ok brown
 	assert_output "$(cat "$expected_organize")"
 
 	{
@@ -131,7 +96,7 @@ function outputs_organize_two_etiketten { # @test
 		echo
 	} >"$expected_organize"
 
-	run "${cmd_zit_organize_v3[@]}" -verbose -mode commit-directly ok brown <"$expected_organize"
+	run_zit organize "${cmd_def_organize_v3[@]}" -verbose -mode commit-directly ok brown <"$expected_organize"
 
 	expected_zettel="$(mktemp)"
 	{
@@ -163,26 +128,26 @@ function outputs_organize_one_etiketten_group_by_one { # @test
 		echo "---"
 	} >"$to_add"
 
-	run "${cmd_zit_new[@]}" -edit=false "$to_add"
-	assert_output '          (new) [o/u@2 !md "wow"]'
+	run_zit new -edit=false "$to_add"
+	assert_output '[one/uno@2df585d527ed7e18b3a9346079335509272f5a197b6a2d864e1b80df5ba627bf !md "wow"]'
 
 	expected_organize="$(mktemp)"
 	{
 		echo
-		echo "      # task"
+		echo "          # task"
 		echo
-		echo "     ## priority"
+		echo "         ## priority"
 		echo
-		echo "    ###         -1"
+		echo "        ###         -1"
 		echo
-		echo "- [o/u] wow"
+		echo "- [one/uno] wow"
 		echo
-		echo "    ###         -2"
+		echo "        ###         -2"
 		echo
-		echo "- [o/u] wow"
+		echo "- [one/uno] wow"
 	} >"$expected_organize"
 
-	run "${cmd_zit_organize_v3[@]}" -mode output-only -group-by priority task
+	run_zit organize "${cmd_def_organize_v3[@]}" -mode output-only -group-by priority task
 	assert_output "$(cat "$expected_organize")"
 }
 
@@ -202,8 +167,8 @@ function outputs_organize_two_zettels_one_etiketten_group_by_one { # @test
 		echo "---"
 	} >"$to_add"
 
-	run "${cmd_zit_new[@]}" -edit=false "$to_add"
-	assert_output '          (new) [o/u@b !md "one/uno"]'
+	run_zit new -edit=false "$to_add"
+	assert_output '[one/uno@b28b69e2e325ca2c7d0144a5d4db6523c2f241958229678ac39a9c5a200386bc !md "one/uno"]'
 
 	to_add="$(mktemp)"
 	{
@@ -215,26 +180,26 @@ function outputs_organize_two_zettels_one_etiketten_group_by_one { # @test
 		echo "---"
 	} >"$to_add"
 
-	run "${cmd_zit_new[@]}" -edit=false "$to_add"
-	assert_output '          (new) [o/d@2 !md "two/dos"]'
+	run_zit new -edit=false "$to_add"
+	assert_output '[one/dos@2720ade68463c806a1aca98df4325e1904a357c6194bf3a8bc981091890aaeed !md "two/dos"]'
 
 	expected_organize="$(mktemp)"
 	{
 		echo
-		echo "      # task"
+		echo "          # task"
 		echo
-		echo "     ## priority"
+		echo "         ## priority"
 		echo
-		echo "    ###         -1"
+		echo "        ###         -1"
 		echo
-		echo "- [o/u] one/uno"
+		echo "- [one/uno] one/uno"
 		echo
-		echo "    ###         -2"
+		echo "        ###         -2"
 		echo
-		echo "- [o/d] two/dos"
+		echo "- [one/dos] two/dos"
 	} >"$expected_organize"
 
-	run "${cmd_zit_organize_v3[@]}" -mode output-only -group-by priority task
+	run_zit organize "${cmd_def_organize_v3[@]}" -mode output-only -group-by priority task
 	assert_output "$(cat "$expected_organize")"
 }
 
@@ -256,7 +221,7 @@ function outputs_organize_one_etiketten_group_by_two { # @test
 		echo "---"
 	} >"$to_add"
 
-	run "${cmd_zit_new[@]}" -edit=false "$to_add"
+	run_zit new -edit=false "$to_add"
 
 	to_add="$(mktemp)"
 	{
@@ -269,7 +234,7 @@ function outputs_organize_one_etiketten_group_by_two { # @test
 		echo "---"
 	} >"$to_add"
 
-	run "${cmd_zit_new[@]}" -edit=false "$to_add"
+	run_zit new -edit=false "$to_add"
 
 	expected_organize="$(mktemp)"
 	{
@@ -289,7 +254,7 @@ function outputs_organize_one_etiketten_group_by_two { # @test
 		echo "- [o/u] one/uno"
 	} >"$expected_organize"
 
-	run "${cmd_zit_organize_v3[@]}" -mode output-only -group-by priority,w task
+	run_zit organize "${cmd_def_organize_v3[@]}" -mode output-only -group-by priority,w task
 	assert_output "$(cat "$expected_organize")"
 }
 
@@ -310,7 +275,7 @@ function commits_organize_one_etiketten_group_by_two { # @test
 		echo "---"
 	} >"$to_add"
 
-	run "${cmd_zit_new[@]}" -edit=false "$to_add"
+	run_zit new -edit=false "$to_add"
 
 	to_add="$(mktemp)"
 	{
@@ -323,7 +288,7 @@ function commits_organize_one_etiketten_group_by_two { # @test
 		echo "---"
 	} >"$to_add"
 
-	run "${cmd_zit_new[@]}" -edit=false "$to_add"
+	run_zit new -edit=false "$to_add"
 
 	to_add="$(mktemp)"
 	{
@@ -336,7 +301,7 @@ function commits_organize_one_etiketten_group_by_two { # @test
 		echo "---"
 	} >"$to_add"
 
-	run "${cmd_zit_new[@]}" -edit=false "$to_add"
+	run_zit new -edit=false "$to_add"
 
 	expected_organize="$(mktemp)"
 	{
@@ -359,7 +324,7 @@ function commits_organize_one_etiketten_group_by_two { # @test
 		echo "- [two/uno] 3"
 	} >"$expected_organize"
 
-	run "${cmd_zit_organize[@]}" -mode commit-directly -group-by priority,w task <"$expected_organize"
+	run_zit organize "${cmd_def_organize_v3[@]}" -mode commit-directly -group-by priority,w task <"$expected_organize"
 	echo "$output"
 
 	to_add="$(mktemp)"
@@ -407,7 +372,7 @@ function commits_organize_one_etiketten_group_by_two_new_zettels { # @test
 		echo "---"
 	} >"$to_add"
 
-	run "${cmd_zit_new[@]}" -edit=false "$to_add"
+	run_zit new -edit=false "$to_add"
 
 	expected="$(mktemp)"
 	{
@@ -437,7 +402,7 @@ function commits_organize_one_etiketten_group_by_two_new_zettels { # @test
 		echo "---"
 	} >"$to_add"
 
-	run "${cmd_zit_new[@]}" -edit=false "$to_add"
+	run_zit new -edit=false "$to_add"
 
 	{
 		echo priority-1
@@ -460,7 +425,7 @@ function commits_organize_one_etiketten_group_by_two_new_zettels { # @test
 		echo "---"
 	} >"$to_add"
 
-	run "${cmd_zit_new[@]}" -edit=false "$to_add"
+	run_zit new -edit=false "$to_add"
 
 	{
 		echo priority-1
@@ -488,7 +453,7 @@ function commits_organize_one_etiketten_group_by_two_new_zettels { # @test
 		echo "- [two/uno] 3"
 	} >"$expected_organize"
 
-	run "${cmd_zit_organize[@]}" -mode commit-directly -group-by priority,w task <"$expected_organize"
+	run_zit organize "${cmd_def_organize_v3[@]}" -mode commit-directly -group-by priority,w task <"$expected_organize"
 
 	to_add="$(mktemp)"
 	{
@@ -551,8 +516,8 @@ function commits_no_changes { # @test
 		echo "---"
 	} >"$one"
 
-	run "${cmd_zit_new[@]}" -edit=false "$one"
-	assert_output '          (new) [o/u@11 !md "one/uno"]'
+	run_zit new -edit=false "$one"
+	assert_output '[one/uno@112894f9e6c0b4eb6d39f70482312303870c85123f393d4ebb5a6b1118980d39 !md "one/uno"]'
 
 	two="$(mktemp)"
 	{
@@ -565,8 +530,8 @@ function commits_no_changes { # @test
 		echo "---"
 	} >"$two"
 
-	run "${cmd_zit_new[@]}" -edit=false "$two"
-	assert_output '          (new) [o/d@1f !md "two/dos"]'
+	run_zit new -edit=false "$two"
+	assert_output '[one/dos@1fe2b8f15cd9ec231a5d82a5f2317bfa090ec46e8d879e623083caaac28d46aa !md "two/dos"]'
 
 	three="$(mktemp)"
 	{
@@ -579,8 +544,8 @@ function commits_no_changes { # @test
 		echo "---"
 	} >"$three"
 
-	run "${cmd_zit_new[@]}" -edit=false "$three"
-	assert_output '          (new) [t/u@16 !md "3"]'
+	run_zit new -edit=false "$three"
+	assert_output '[two/uno@168dbe89748356f7a3d229cab256a82e94106541e0af94a8695bf17f7a661241 !md "3"]'
 
 	expected_organize="$(mktemp)"
 	{
@@ -591,17 +556,17 @@ function commits_no_changes { # @test
 		echo
 		echo "  ### w-2022-07-06"
 		echo
-		echo "  - [t/u] 3"
-		echo "  - [o/d] two/dos"
+		echo "  - [two/uno] 3"
+		echo "  - [one/dos] two/dos"
 		echo
 		echo "  ### w-2022-07-07"
 		echo
-		echo "  - [o/u] one/uno"
+		echo "  - [one/uno] one/uno"
 		echo
 	} >"$expected_organize"
 
-	# run "${cmd_zit_organize[@]}" -prefix-joints=false -mode output-only -group-by priority,w task
-	run "${cmd_zit_organize[@]}" -mode commit-directly -group-by priority,w task <"$expected_organize"
+	# run_zit organize "${cmd_def_organize_v3[@]}" -prefix-joints=false -mode output-only -group-by priority,w task
+	run_zit organize "${cmd_def_organize_v3[@]}" -mode commit-directly -group-by priority,w task <"$expected_organize"
 	# assert_output "$(cat "$expected_organize")"
 	assert_output "no changes"
 
@@ -633,7 +598,7 @@ function commits_dependent_leaf { # @test
 		echo "---"
 	} >"$one"
 
-	run "${cmd_zit_new[@]}" -edit=false "$one"
+	run_zit new -edit=false "$one"
 	assert_success
 
 	two="$(mktemp)"
@@ -647,7 +612,7 @@ function commits_dependent_leaf { # @test
 		echo "---"
 	} >"$two"
 
-	run "${cmd_zit_new[@]}" -edit=false "$two"
+	run_zit new -edit=false "$two"
 	assert_success
 
 	three="$(mktemp)"
@@ -661,7 +626,7 @@ function commits_dependent_leaf { # @test
 		echo "---"
 	} >"$three"
 
-	run "${cmd_zit_new[@]}" -edit=false "$three"
+	run_zit new -edit=false "$three"
 	assert_success
 
 	expected_organize="$(mktemp)"
@@ -677,7 +642,7 @@ function commits_dependent_leaf { # @test
 		echo "###"
 	} >"$expected_organize"
 
-	run "${cmd_zit_organize[@]}" -verbose -mode commit-directly -group-by priority,w task <"$expected_organize"
+	run_zit organize "${cmd_def_organize_v3[@]}" -verbose -mode commit-directly -group-by priority,w task <"$expected_organize"
 	assert_success
 
 	one="$(mktemp)"
@@ -738,7 +703,7 @@ function zettels_in_correct_places { # @test
 		echo "---"
 	} >"$one"
 
-	run "${cmd_zit_new[@]}" -edit=false "$one"
+	run_zit new -edit=false "$one"
 
 	expected_organize="$(mktemp)"
 	{
@@ -748,7 +713,7 @@ function zettels_in_correct_places { # @test
 		echo "- [one/uno] jabra coral usb_a-to-usb_c cable"
 	} >"$expected_organize"
 
-	run "${cmd_zit_organize[@]}" -mode output-only -group-by inventory \
+	run_zit organize "${cmd_def_organize_v3[@]}" -mode output-only -group-by inventory \
 		inventory-pipe_shelves-atheist_shoes_box-jabra_yellow_box_2
 
 	assert_output "$(cat "$expected_organize")"
@@ -769,14 +734,14 @@ function etiketten_correct { # @test
 		echo "- zettel bez"
 	} >"$first_organize"
 
-	run "${cmd_zit_organize[@]}" -mode commit-directly <"$first_organize"
+	run_zit organize "${cmd_def_organize_v3[@]}" -mode commit-directly <"$first_organize"
 
 	expected_etiketten="$(mktemp)"
 	{
 		echo test1-wow
 	} >"$expected_etiketten"
 
-	run zit cat -gattung etikett
+	run_zit cat -gattung etikett
 	assert_output "$(cat "$expected_etiketten")"
 
 	mkdir -p one
@@ -787,15 +752,15 @@ function etiketten_correct { # @test
 		echo "---"
 	} >"one/uno.zettel"
 
-	run zit checkin "${cmd_zit_def[@]}" one/uno.zettel
-	assert_output '      (updated) [o/u@4 !md test4]'
+	run_zit checkin one/uno.zettel
+	assert_output '[one/uno@434ac2ce37a09162b08a9840ab91d659eec30ab12a7221bde122d35dcd530cc3 !md test4]'
 
 	expected_etiketten="$(mktemp)"
 	{
 		echo test4
 	} >"$expected_etiketten"
 
-	run zit cat -gattung etikett
+	run_zit cat -gattung etikett
 	assert_output "$(cat "$expected_etiketten")"
 
 	mkdir -p one
@@ -807,8 +772,8 @@ function etiketten_correct { # @test
 		echo "---"
 	} >"one/uno.zettel"
 
-	run zit checkin "${cmd_zit_def[@]}" one/uno.zettel
-	assert_output '      (updated) [o/u@1a !md test1-ok, test4]'
+	run_zit checkin one/uno.zettel
+	assert_output '[one/uno@1ab80dc811d62eb98745b665436b97e77461cd219d49390d16e64b0d79074516 !md test1-ok, test4]'
 
 	expected_etiketten="$(mktemp)"
 	{

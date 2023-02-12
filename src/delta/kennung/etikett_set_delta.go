@@ -10,9 +10,9 @@ func MakeSetEtikettDelta(s1, s2 EtikettSet) (d EtikettDelta) {
 
 	for _, e := range s2.Elements() {
 		if s1.Contains(e) {
-			//zettel had etikett previously
+			// zettel had etikett previously
 		} else {
-			//zettel did not have etikett previously
+			// zettel did not have etikett previously
 			added.Add(e)
 		}
 

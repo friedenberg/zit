@@ -10,8 +10,10 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
-type Set = collections.ValueSet[sha.Sha, *sha.Sha]
-type MutableSet = collections.MutableValueSet[sha.Sha, *sha.Sha]
+type (
+	Set        = collections.ValueSet[sha.Sha, *sha.Sha]
+	MutableSet = collections.MutableValueSet[sha.Sha, *sha.Sha]
+)
 
 func MakeMutableSet(es ...sha.Sha) (s MutableSet) {
 	return MutableSet(collections.MakeMutableValueSet(es...))

@@ -15,4 +15,5 @@ type Angeboren interface {
 type Konfig interface {
 	Angeboren
 	UsePredictableHinweisen() bool
+	UsePrintTime() bool
 }

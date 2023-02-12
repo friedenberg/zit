@@ -5,7 +5,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/juliett/zettel"
@@ -68,7 +67,7 @@ func (c Revert) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 		return
 	}
 
-	zts.Each(u.PrinterZettelTransactedDelta(format.StringUpdated))
+	zts.Each(u.PrinterZettelTransactedDelta())
 
 	return
 }

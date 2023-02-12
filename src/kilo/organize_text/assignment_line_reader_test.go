@@ -40,8 +40,7 @@ func makeBez(t *testing.T, v string) (b bezeichnung.Bezeichnung) {
 
 func TestAssignmentLineReaderOneHeadingNoZettels(t1 *testing.T) {
 	t := test_logz.T{T: t1}
-	input :=
-		`# wow
+	input := `# wow
     `
 
 	sr := strings.NewReader(input)
@@ -75,8 +74,7 @@ func TestAssignmentLineReaderOneHeadingNoZettels(t1 *testing.T) {
 func TestAssignmentLineReader2Heading2Zettels(t *testing.T) {
 	t1 := test_logz.T{T: t}
 
-	input :=
-		`# wow
+	input := `# wow
 
     - [one/wow] uno
     - [dos/wow] two/wow
@@ -127,8 +125,7 @@ func TestAssignmentLineReader2Heading2Zettels(t *testing.T) {
 func TestAssignmentLineReader1_1Heading2_2Zettels(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-	input :=
-		`# wow
+	input := `# wow
 
     ## sub-wow
 
@@ -201,8 +198,7 @@ func TestAssignmentLineReader1_1Heading2_2Zettels(t1 *testing.T) {
 func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 	t1 := test_logz.T{T: t}
 
-	input :=
-		`# wow
+	input := `# wow
 
     - [one/wow] uno
     - [dos/wow] two/wow
@@ -306,8 +302,7 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 	t1 := test_logz.T{T: t}
 
-	input :=
-		`
+	input := `
     - [one/wow] uno
     - [dos/wow] two/wow
 
@@ -402,8 +397,7 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 func TestAssignmentLineReaderBigCheese(t *testing.T) {
 	t1 := test_logz.T{T: t}
 
-	input :=
-		`# task
+	input := `# task
     - [one/wow] uno
     - [two/wow] dos/wow
     ## priority-1

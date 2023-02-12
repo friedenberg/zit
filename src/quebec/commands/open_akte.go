@@ -17,8 +17,7 @@ import (
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
-type OpenAkte struct {
-}
+type OpenAkte struct{}
 
 func init() {
 	registerCommand(
@@ -45,7 +44,6 @@ func (c OpenAkte) RunWithIds(store *umwelt.Umwelt, is kennung.Set) (err error) {
 	paths := make([]string, hins.Len())
 
 	dir, err := ioutil.TempDir("", "")
-
 	if err != nil {
 		err = errors.Wrap(err)
 		return
@@ -104,7 +102,6 @@ func (c OpenAkte) RunWithIds(store *umwelt.Umwelt, is kennung.Set) (err error) {
 	)
 
 	output, err := cmd.CombinedOutput()
-
 	if err != nil {
 		err = errors.Errorf("opening files ('%q'): %s", paths, output)
 		return

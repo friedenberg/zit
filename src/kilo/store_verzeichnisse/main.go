@@ -11,8 +11,10 @@ import (
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
-const DigitWidth = 2
-const PageCount = 1 << (DigitWidth * 4)
+const (
+	DigitWidth = 2
+	PageCount  = 1 << (DigitWidth * 4)
+)
 
 type Zettelen struct {
 	erworben konfig.Compiled
@@ -188,7 +190,6 @@ func (i *Zettelen) ReadMany(
 
 				break
 			}
-
 		}(n, p, ch)
 	}
 

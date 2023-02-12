@@ -30,7 +30,7 @@ func makeDialogueListen(
 	d.stage = s
 
 	if d.conn, err = l.AcceptUnix(); err != nil {
-		//TODO-P2 determine what errors accept can throw
+		// TODO-P2 determine what errors accept can throw
 		if errors.IsErrno(err, syscall.ENODATA) || true {
 			panic(errors.Wrapf(err, "ErrorExact: %#v", err))
 		} else {
@@ -72,9 +72,9 @@ func makeDialogueDial(
 	d.typ = t
 
 	for {
-		//TODO-P2 timeout
+		// TODO-P2 timeout
 		if d.conn, err = net.DialUnix("unix", nil, s.address); err != nil {
-			//TODO-P5 why is the hex 0x3d which is ENODATA in docs?
+			// TODO-P5 why is the hex 0x3d which is ENODATA in docs?
 			if errors.IsErrno(err, syscall.ECONNREFUSED) {
 				WaitForConnectionLicense()
 				continue

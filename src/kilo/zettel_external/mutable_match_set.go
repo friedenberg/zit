@@ -74,7 +74,7 @@ func (s MutableMatchSet) Match(z *zettel.Transacted) (err error) {
 		s.Original.Del(stored)
 		s.Original.Del(akte)
 
-		//Only one is necessary
+		// Only one is necessary
 		s.Matched.Add(akte)
 
 		return

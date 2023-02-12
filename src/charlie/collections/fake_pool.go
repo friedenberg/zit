@@ -2,8 +2,7 @@ package collections
 
 import "github.com/friedenberg/zit/src/alfa/schnittstellen"
 
-type fakePool[T any, TPtr schnittstellen.Resetable[T]] struct {
-}
+type fakePool[T any, TPtr schnittstellen.Resetable[T]] struct{}
 
 func MakeFakePool[T any, TPtr schnittstellen.Resetable[T]]() *fakePool[T, TPtr] {
 	return &fakePool[T, TPtr]{}

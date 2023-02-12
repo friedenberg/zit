@@ -30,7 +30,8 @@ func MakeObjekteTextParser(
 
 func (f objekteTextParser) Parse(
 	r io.Reader,
-	c *ObjekteParserContext) (n int64, err error) {
+	c *ObjekteParserContext,
+) (n int64, err error) {
 	state := MakeTextMetadateiParser(
 		f.AkteFactory,
 	)

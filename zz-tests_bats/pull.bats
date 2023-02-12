@@ -3,6 +3,7 @@
 setup() {
 	load 'test_helper/bats-support/load'
 	load 'test_helper/bats-assert/load'
+	load 'common.bash'
 	# ... the remaining setup is unchanged
 
 	# get the containing directory of this file
@@ -17,53 +18,19 @@ setup() {
 	export output
 }
 
-cat_yin() (
-	echo "one"
-	echo "two"
-	echo "three"
-	echo "four"
-	echo "five"
-	echo "six"
-)
-
-cat_yang() (
-	echo "uno"
-	echo "dos"
-	echo "tres"
-	echo "quatro"
-	echo "cinco"
-	echo "seis"
-)
-
-# cmd_zit_def=(
-# 	-abbreviate-hinweisen=false
-# 	-predictable-hinweisen
-# 	-print-typen=false
-# )
-
-# cmd_zit_add=(
-# 	zit
-# 	add
-# 	"${cmd_zit_def[@]}"
-# )
-
 function pull { # @test
 	wd="$(mktemp -d)"
 
 	(
 		cd "$wd" || exit 1
-
-		run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
-		assert_success
+		run_zit_init_disable_age
 	)
 
 	wd1="$(mktemp -d)"
 
 	(
 		cd "$wd1" || exit 1
-
-		run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
-		assert_success
+		run_zit_init_disable_age
 	)
 
 	cd "$wd" || exit 1
@@ -79,27 +46,25 @@ function pull { # @test
 		echo 'test file'
 	} >"$expected"
 
-	run zit new \
-		-predictable-hinweisen \
-		-abbreviate-hinweisen=false \
+	run_zit new \
 		-edit=false \
 		"$expected"
 
-	assert_output --partial '          (new) [one/uno@11 !md "to_add.md"]'
+	assert_output '[one/uno@11327fbe60cabd2a9eabf4a37d541cf04b539f913945897efe9bab1e30784781 !md "to_add.md"]'
 
 	cd "$wd1" || exit 1
 
-	run zit pull -abbreviate-hinweisen=false "$wd" @
-	assert_output '          (new) [one/uno@11 !md "to_add.md"]'
+	run_zit pull "$wd" @
+	assert_output '[one/uno@11327fbe60cabd2a9eabf4a37d541cf04b539f913945897efe9bab1e30784781 !md "to_add.md"]'
 
-	run zit show one/uno
+	run_zit show one/uno
 	assert_output "$(cat "$expected")"
 
 	cd "$wd" || exit 1
 
-	run zit show one/uno
+	run_zit show one/uno
 	assert_output "$(cat "$expected")"
 
-	run zit pull -abbreviate-hinweisen=false "$wd" @
+	run_zit pull "$wd" @
 	assert_output ''
 }

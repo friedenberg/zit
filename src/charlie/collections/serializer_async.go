@@ -17,9 +17,8 @@ func MakeAsyncSerializer[T any](wf WriterFunc[T]) AsyncSerializer[T] {
 		}()
 
 		for e := range chE {
-			//TODO what how error
+			// TODO what how error
 			err := wf(e)
-
 			if err != nil {
 				chError <- err
 			}

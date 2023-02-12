@@ -6,9 +6,7 @@ import (
 	"os"
 )
 
-var (
-	out, err, log printer
-)
+var out, err, log printer
 
 func init() {
 	out = printer{
@@ -140,7 +138,7 @@ func (p printer) Caller(i int, f string, vs ...interface{}) {
 	st, _ := MakeStackInfo(i + 1)
 
 	vs = append([]interface{}{st}, vs...)
-	//TODO-P4 strip trailing newline and add back
+	// TODO-P4 strip trailing newline and add back
 	io.WriteString(p.f, fmt.Sprintf("%s"+f+"\n", vs...))
 }
 

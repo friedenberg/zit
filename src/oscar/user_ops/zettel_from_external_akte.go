@@ -131,7 +131,7 @@ func (c ZettelFromExternalAkte) Run(
 
 	err = toDelete.Each(
 		func(z *zettel_external.Zettel) (err error) {
-			//TODO-P4 move to checkout store
+			// TODO-P4 move to checkout store
 			if err = os.Remove(z.AkteFD.Path); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -139,7 +139,7 @@ func (c ZettelFromExternalAkte) Run(
 
 			pathRel := c.Standort().RelToCwdOrSame(z.AkteFD.Path)
 
-			//TODO-P4 move to printer
+			// TODO-P4 move to printer
 			errors.Out().Printf("[%s] (deleted)", pathRel)
 
 			return
@@ -192,7 +192,7 @@ func (c ZettelFromExternalAkte) zettelForAkte(
 	z.Objekte.Reset()
 	z.Objekte.Akte = sha.Make(akteWriter.Sha())
 
-	//TODO-P4 move to protozettel
+	// TODO-P4 move to protozettel
 	if err = z.Objekte.Bezeichnung.Set(
 		path.Base(akteFD.Path),
 	); err != nil {
@@ -200,7 +200,7 @@ func (c ZettelFromExternalAkte) zettelForAkte(
 		return
 	}
 
-	//TODO-P4 use konfig
+	// TODO-P4 use konfig
 	ext := akteFD.Ext()
 
 	if ext != "" {

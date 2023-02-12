@@ -56,7 +56,7 @@ func ReadSep(
 		line = strings.TrimSuffix(rawLine, string([]byte{delim}))
 
 		if len(rffs) == i {
-			//TODO add line
+			// TODO add line
 			err = errors.Errorf("ran out of read line funcs before fully consuming reader")
 
 			if last != nil {
@@ -125,7 +125,7 @@ func ReadLines(
 		}
 
 		if len(rffs) == i {
-			//TODO add line
+			// TODO add line
 			err = errors.Errorf("ran out of read line funcs before fully consuming reader")
 
 			if last != nil {

@@ -10,8 +10,7 @@ import (
 type nopAkteFormat[
 	T schnittstellen.Objekte[T],
 	T1 schnittstellen.ObjektePtr[T],
-] struct {
-}
+] struct{}
 
 func MakeNopAkteFormat[
 	T schnittstellen.Objekte[T],

@@ -16,8 +16,10 @@ import (
 type WriterFunc[T any] func(T) error
 
 // type WriterFuncFuncPooled[T any] func(PoolLike[T]) WriterFunc[*T]
-type WriterFuncWithKey[T any] func(string, T) error
-type WriterFuncKey func(string) error
+type (
+	WriterFuncWithKey[T any] func(string, T) error
+	WriterFuncKey            func(string) error
+)
 
 //   ____             _
 //  |  _ \ ___   ___ | |___

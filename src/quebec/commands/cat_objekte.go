@@ -13,8 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
-type CatObjekte struct {
-}
+type CatObjekte struct{}
 
 func init() {
 	registerCommand(
@@ -41,7 +40,7 @@ func (c CatObjekte) akten(
 	u *umwelt.Umwelt,
 	shas sha_collections.Set,
 ) (err error) {
-	//TODO-P3 refactor into reusable
+	// TODO-P3 refactor into reusable
 	akteWriter := collections.MakeSyncSerializer(
 		func(rc io.ReadCloser) (err error) {
 			defer errors.Deferred(&err, rc.Close)

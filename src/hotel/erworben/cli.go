@@ -27,6 +27,7 @@ type Cli struct {
 	PrintNewShaSyntax                bool
 	PrintIncludeTypen                bool
 	PrintIncludeBezeichnungen        bool
+	PrintTime                        bool
 }
 
 func (c *Cli) AddToFlags(f *flag.FlagSet) {
@@ -50,6 +51,7 @@ func (c *Cli) AddToFlags(f *flag.FlagSet) {
 	f.BoolVar(&c.PrintAbbreviatedShas, "abbreviate-shas", true, "")
 	f.BoolVar(&c.PrintAbbreviatedHinweisen, "abbreviate-hinweisen", true, "")
 	f.BoolVar(&c.PrintIncludeBezeichnungen, "print-bezeichnungen", true, "")
+	f.BoolVar(&c.PrintTime, "print-time", true, "")
 }
 
 func DefaultCli() (c Cli) {
@@ -58,4 +60,8 @@ func DefaultCli() (c Cli) {
 
 func (c Cli) UsePredictableHinweisen() bool {
 	return c.PredictableHinweisen
+}
+
+func (c Cli) UsePrintTime() bool {
+	return c.PrintTime
 }

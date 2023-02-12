@@ -99,7 +99,7 @@ func (n node) Contains(v string) bool {
 }
 
 func (n node) Any() byte {
-	for c, _ := range n.Children {
+	for c := range n.Children {
 		return c
 	}
 

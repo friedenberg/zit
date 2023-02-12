@@ -15,8 +15,7 @@ import (
 	"github.com/friedenberg/zit/src/oscar/user_ops"
 )
 
-type Clean struct {
-}
+type Clean struct{}
 
 func init() {
 	registerCommandWithQuery(
@@ -85,7 +84,7 @@ func (c Clean) RunWithQuery(
 		},
 	)
 
-	//TODO rewrite in verzeichnisseAll
+	// TODO rewrite in verzeichnisseAll
 	// for _, ua := range possible.UnsureAkten {
 	// 	var szt zettel_transacted.Set
 

@@ -146,7 +146,7 @@ func (s *zettelStore) SetLogWriter(
 }
 
 func (s zettelStore) WriteZettelObjekte(z zettel.Objekte) (sh sha.Sha, err error) {
-	//no lock required
+	// no lock required
 
 	var wc sha.WriteCloser
 
@@ -307,7 +307,7 @@ func (s *zettelStore) Create(
 		return
 	}
 
-	//If the zettel exists, short circuit and return that
+	// If the zettel exists, short circuit and return that
 	if tz2, err2 := s.ReadOne(shaObj); err2 == nil {
 		tz = tz2
 		return
@@ -527,7 +527,7 @@ func (s *zettelStore) reindexOne(
 	errors.Log().Printf("reindexing: %#v", o)
 
 	if tz, err = s.InflateFromDataIdentity(sk); err != nil {
-		//TODO-P2 decide on how to handle format errors
+		// TODO-P2 decide on how to handle format errors
 		errors.Err().Print(err)
 		err = nil
 		// err = errors.Wrap(err)

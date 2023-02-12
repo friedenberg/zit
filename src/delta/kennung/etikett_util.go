@@ -60,17 +60,17 @@ func BinarySearchForRuneInEtikettenSortedStringSlice(
 
 		switch {
 		case midVal > needle:
-			//search left
+			// search left
 			hi = idx - 1
 			continue
 
 		case midVal == needle:
-			//found
+			// found
 			ok = true
 			return
 
 		case midVal < needle:
-			//search right
+			// search right
 			low = idx + 1
 			continue
 		}

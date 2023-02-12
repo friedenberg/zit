@@ -3,6 +3,7 @@
 setup() {
 	load 'test_helper/bats-support/load'
 	load 'test_helper/bats-assert/load'
+	load 'common.bash'
 	# ... the remaining setup is unchanged
 
 	# get the containing directory of this file
@@ -17,34 +18,15 @@ setup() {
 	export output
 }
 
-cat_yin() (
-	echo "one"
-	echo "two"
-	echo "three"
-	echo "four"
-	echo "five"
-	echo "six"
-)
-
-cat_yang() (
-	echo "uno"
-	echo "dos"
-	echo "tres"
-	echo "quatro"
-	echo "cinco"
-	echo "seis"
-)
-
 function init_and_deinit { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
-	assert_success
+	run_zit_init_disable_age
 
 	[[ -f .zit/KonfigAngeboren ]]
 
-	run zit deinit
+	run_zit deinit
 	assert_success
 }
 
@@ -52,8 +34,7 @@ function init_and_init { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run zit init -yin <(cat_yin) -yang <(cat_yang)
-	assert_success
+	run_zit_init
 
 	{
 		echo "---"
@@ -65,24 +46,17 @@ function init_and_init { # @test
 		echo "body"
 	} >to_add
 
-	run zit new -edit=false -predictable-hinweisen to_add
+	run_zit new -edit=false to_add
 
-	run zit show one/uno
+	run_zit show one/uno
 	assert_output "$(cat to_add)"
 
-	run zit init -yin <(cat_yin) -yang <(cat_yang)
+	run_zit init -yin <(cat_yin) -yang <(cat_yang)
 	assert_failure
 
-	run zit init
+	run_zit init
 	assert_output --partial '.zit/KonfigAngeboren already exists, not overwriting'
 	assert_output --partial '.zit/KonfigErworben already exists, not overwriting'
-	# assert_output --partial '          (new) [o/u@3 !md "wow"]'
-
-	# run zit reindex
-	# assert_output "$(cat to_add)"
-
-	# 	run tree .zit
-	# 	assert_output "$(cat to_add)"
 
 	run zit show one/uno
 	assert_output "$(cat to_add)"

@@ -21,12 +21,12 @@ func makeStringValues(vs ...string) (out []StringValue) {
 func assertSet(t test_logz.T, sut Set[StringValue], vals []StringValue) {
 	t.Helper()
 
-	//Len() int
+	// Len() int
 	if sut.Len() != len(vals) {
 		t.Fatalf("expected len %d but got %d", len(vals), sut.Len())
 	}
 
-	//Key(T) string
+	// Key(T) string
 	{
 		v := "wow"
 		k := sut.Key(MakeStringValue(v))

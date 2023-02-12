@@ -3,7 +3,7 @@ package schnittstellen
 import "io"
 
 type Sha interface {
-	//TODO
+	// TODO
 	// GetHashBytes() []byte
 	Korper
 	GetShaString() string
@@ -28,5 +28,7 @@ type ShaWriteCloser interface {
 	Sha() Sha
 }
 
-type FuncShaReadCloser func(Sha) (ShaReadCloser, error)
-type FuncShaWriteCloser func(Sha) (ShaWriteCloser, error)
+type (
+	FuncShaReadCloser  func(Sha) (ShaReadCloser, error)
+	FuncShaWriteCloser func(Sha) (ShaWriteCloser, error)
+)

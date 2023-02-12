@@ -14,11 +14,15 @@ type TransactedLike interface {
 	GetSkuLike() sku.SkuLike
 }
 
-type FuncReaderTransacted[T TransactedLike] func(collections.WriterFunc[T]) error
-type FuncReaderTransactedLike func(collections.WriterFunc[TransactedLike]) error
+type (
+	FuncReaderTransacted[T TransactedLike] func(collections.WriterFunc[T]) error
+	FuncReaderTransactedLike               func(collections.WriterFunc[TransactedLike]) error
+)
 
-type FuncQuerierTransacted[T TransactedLike] func(kennung.Set, collections.WriterFunc[T]) error
-type FuncQuerierTransactedLike func(kennung.Set, collections.WriterFunc[TransactedLike]) error
+type (
+	FuncQuerierTransacted[T TransactedLike] func(kennung.Set, collections.WriterFunc[T]) error
+	FuncQuerierTransactedLike               func(kennung.Set, collections.WriterFunc[TransactedLike]) error
+)
 
 func MakeApplyQueryTransactedLike[T TransactedLike](
 	fat FuncQuerierTransacted[T],

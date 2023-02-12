@@ -15,6 +15,13 @@ import (
 	"github.com/friedenberg/zit/src/mike/store_fs"
 )
 
+//                                                    _
+//    ___ ___  _ __ ___  _ __   ___  _ __   ___ _ __ | |_ ___
+//   / __/ _ \| '_ ` _ \| '_ \ / _ \| '_ \ / _ \ '_ \| __/ __|
+//  | (_| (_) | | | | | | |_) | (_) | | | |  __/ | | | |_\__ \
+//   \___\___/|_| |_| |_| .__/ \___/|_| |_|\___|_| |_|\__|___/
+//                      |_|
+
 func (u *Umwelt) FormatColorWriter() format.FuncColorWriter {
 	if u.outIsTty {
 		return format.MakeFormatWriterWithColor
@@ -56,43 +63,41 @@ func (u *Umwelt) FormatEtikett() schnittstellen.FuncWriterFormat[kennung.Etikett
 	return etikett.MakeCliFormat(u.FormatColorWriter())
 }
 
+//    ___  _     _      _    _
+//   / _ \| |__ (_) ___| | _| |_ ___ _ __
+//  | | | | '_ \| |/ _ \ |/ / __/ _ \ '_ \
+//  | |_| | |_) | |  __/   <| ||  __/ | | |
+//   \___/|_.__// |\___|_|\_\\__\___|_| |_|
+//            |__/
+
 func (u *Umwelt) FormatKasten() schnittstellen.FuncWriterFormat[kennung.Kasten] {
 	return kasten.MakeCliFormat(u.FormatColorWriter())
 }
 
-func (u *Umwelt) FormatTypTransacted(
-	verb string,
-) schnittstellen.FuncWriterFormat[typ.Transacted] {
+func (u *Umwelt) FormatTypTransacted() schnittstellen.FuncWriterFormat[typ.Transacted] {
 	return typ.MakeCliFormatTransacted(
 		u.Standort(),
 		u.FormatColorWriter(),
 		u.FormatSha(u.StoreObjekten().GetAbbrStore().AbbreviateSha),
 		u.FormatTyp(),
-		verb,
 	)
 }
 
-func (u *Umwelt) FormatEtikettTransacted(
-	verb string,
-) schnittstellen.FuncWriterFormat[etikett.Transacted] {
+func (u *Umwelt) FormatEtikettTransacted() schnittstellen.FuncWriterFormat[etikett.Transacted] {
 	return etikett.MakeCliFormatTransacted(
 		u.Standort(),
 		u.FormatColorWriter(),
 		u.FormatSha(u.StoreObjekten().GetAbbrStore().AbbreviateSha),
 		u.FormatEtikett(),
-		verb,
 	)
 }
 
-func (u *Umwelt) FormatKastenTransacted(
-	verb string,
-) schnittstellen.FuncWriterFormat[kasten.Transacted] {
+func (u *Umwelt) FormatKastenTransacted() schnittstellen.FuncWriterFormat[kasten.Transacted] {
 	return kasten.MakeCliFormatTransacted(
 		u.Standort(),
 		u.FormatColorWriter(),
 		u.FormatSha(u.StoreObjekten().GetAbbrStore().AbbreviateSha),
 		u.FormatKasten(),
-		verb,
 	)
 }
 
@@ -148,9 +153,8 @@ func (u *Umwelt) FormatZettelTransacted() schnittstellen.FuncWriterFormat[zettel
 	)
 }
 
-func (u *Umwelt) FormatZettelTransactedDelta(verb string) schnittstellen.FuncWriterFormat[zettel.Transacted] {
+func (u *Umwelt) FormatZettelTransactedDelta() schnittstellen.FuncWriterFormat[zettel.Transacted] {
 	return zettel.MakeCliFormatTransactedDelta(
-		verb,
 		u.FormatZettelTransacted(),
 	)
 }

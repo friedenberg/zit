@@ -268,7 +268,7 @@ func (fs *CwdFiles) readSecondLevelFile(d string, a string) (err error) {
 	case fs.erworben.FileExtensions.Zettel:
 		fallthrough
 
-		//Zettel-Akten can have any extension, and so default is Zettel
+		// Zettel-Akten can have any extension, and so default is Zettel
 	default:
 		if err = fs.tryZettel(d, a, p); err != nil {
 			err = errors.Wrap(err)

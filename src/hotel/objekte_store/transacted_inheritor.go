@@ -21,8 +21,7 @@ type Inheritor[T any] interface {
 	Inherit(T) error
 }
 
-type heritableElement interface {
-}
+type heritableElement interface{}
 
 type heritableElementPtr[T any] interface {
 	schnittstellen.Ptr[T]

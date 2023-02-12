@@ -216,7 +216,6 @@ func (c *client) ObjekteReader(
 func (c client) AkteReader(
 	sh sha.ShaLike,
 ) (rc sha.ReadCloser, err error) {
-
 	var d remote_conn.Dialogue
 
 	if d, err = c.stage.StartDialogue(

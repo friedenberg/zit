@@ -59,7 +59,7 @@ func (f Format[T, T1]) Parse(
 		loc := strings.Index(line, " ")
 
 		if line == "" {
-			//TODO this should be cleaned up
+			// TODO this should be cleaned up
 		}
 
 		var g gattung.Gattung
@@ -130,7 +130,7 @@ func (f Format[T, T1]) Format(
 
 	w := format.NewLineWriter()
 
-	//TODO-P4 use new format methods
+	// TODO-P4 use new format methods
 	w.WriteFormat("%s", o.GetGattung())
 	w.WriteFormat("%s %s", gattung.Akte, o.GetAkteSha())
 

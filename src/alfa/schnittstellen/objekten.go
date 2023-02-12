@@ -20,8 +20,10 @@ type ObjekteWriterFactory interface {
 	ObjekteWriter(GattungGetter) (ShaWriteCloser, error)
 }
 
-type FuncObjekteReader func(GattungGetter, ShaGetter) (ShaReadCloser, error)
-type FuncObjekteWriter func(GattungGetter) (ShaWriteCloser, error)
+type (
+	FuncObjekteReader func(GattungGetter, ShaGetter) (ShaReadCloser, error)
+	FuncObjekteWriter func(GattungGetter) (ShaWriteCloser, error)
+)
 
 type bespokeObjekteReadWriterFactory struct {
 	ObjekteReaderFactory

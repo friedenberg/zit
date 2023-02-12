@@ -49,7 +49,6 @@ func writeFormat(
 ) (out string) {
 	hash := sha256.New()
 	_, err := io.Copy(hash, strings.NewReader(akteBody))
-
 	if err != nil {
 		t.Fatalf("%s", err)
 	}

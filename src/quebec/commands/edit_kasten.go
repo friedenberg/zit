@@ -20,8 +20,7 @@ import (
 	"github.com/friedenberg/zit/src/oscar/user_ops"
 )
 
-type EditKasten struct {
-}
+type EditKasten struct{}
 
 func init() {
 	registerCommand(
@@ -223,7 +222,7 @@ func (c EditKasten) readTempKastenFiles(
 				FD: fdee,
 			}
 
-			//TODO-P2 offer option to edit again
+			// TODO-P2 offer option to edit again
 			if _, err = formatText.Parse(f, &te.Objekte); err != nil {
 				err = errors.Wrap(err)
 				return

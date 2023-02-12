@@ -13,8 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/oscar/user_ops"
 )
 
-type Status struct {
-}
+type Status struct{}
 
 func init() {
 	registerCommand(
@@ -72,7 +71,7 @@ func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
 			return
 		}
 
-		if err = s.PrinterTypCheckedOut("same")(p); err != nil {
+		if err = s.PrinterTypCheckedOut()(p); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -85,7 +84,7 @@ func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	//TODO-P4 use right mode
+	// TODO-P4 use right mode
 	if err = readResultsSet.Each(s.PrinterZettelCheckedOut()); err != nil {
 		err = errors.Wrap(err)
 		return

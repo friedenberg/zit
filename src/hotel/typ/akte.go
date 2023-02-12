@@ -13,7 +13,7 @@ type Akte struct {
 	FileExtension string                      `toml:"file-extension,omitempty"`
 	ExecCommand   *script_config.ScriptConfig `toml:"exec-command,omitempty"`
 	VimSyntaxType string                      `toml:"vim-syntax-type"`
-	//TODO-P4 rename to uti-groups
+	// TODO-P4 rename to uti-groups
 	FormatterUTIGroups map[string]FormatterUTIGroup              `toml:"formatter-uti-groups"`
 	Formatters         map[string]script_config.WithOutputFormat `toml:"formatters,omitempty"`
 	Actions            map[string]script_config.ScriptConfig     `toml:"actions,omitempty"`

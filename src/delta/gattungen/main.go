@@ -8,8 +8,10 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
-type Set = collections.Set[gattung.Gattung]
-type MutableSet = collections.MutableSet[gattung.Gattung]
+type (
+	Set        = collections.Set[gattung.Gattung]
+	MutableSet = collections.MutableSet[gattung.Gattung]
+)
 
 func MakeSet(gs ...gattung.Gattung) Set {
 	return collections.MakeSet[gattung.Gattung](

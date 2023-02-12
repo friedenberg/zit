@@ -6,8 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
-type Test struct {
-}
+type Test struct{}
 
 func init() {
 	registerCommand(

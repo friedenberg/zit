@@ -5,9 +5,7 @@ import (
 	"os"
 )
 
-var (
-	todo todoPrinter
-)
+var todo todoPrinter
 
 func init() {
 	todo = todoPrinter{

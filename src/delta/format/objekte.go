@@ -31,8 +31,7 @@ type KeyValuer interface {
 	KeyValueSetter
 }
 
-type KeyValues struct {
-}
+type KeyValues struct{}
 
 func MakeKeyValues() *KeyValues {
 	return &KeyValues{}

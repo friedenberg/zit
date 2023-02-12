@@ -78,7 +78,7 @@ func (op Server) GetNeededSkus(
 	out := make([]sku.Sku, 0)
 
 	for _, sk := range in {
-		//TODO-P2 support other Gattung
+		// TODO-P2 support other Gattung
 		if sk.Gattung != gattung.Zettel {
 			continue
 		}
@@ -90,8 +90,8 @@ func (op Server) GetNeededSkus(
 
 		errors.Log().Printf("need objekte: %s", sk.ObjekteSha)
 
-		//TODO-P1 check for akte sha
-		//TODO-P1 write akte
+		// TODO-P1 check for akte sha
+		// TODO-P1 write akte
 
 		out = append(out, sk)
 	}

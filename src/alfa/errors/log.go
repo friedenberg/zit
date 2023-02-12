@@ -23,10 +23,12 @@ type Logger interface {
 	// SetPrefix(prefix string)
 }
 
-var cwd string
-var isTest bool
-var verbose bool
-var maxCallDepth int
+var (
+	cwd          string
+	isTest       bool
+	verbose      bool
+	maxCallDepth int
+)
 
 func init() {
 	var err error

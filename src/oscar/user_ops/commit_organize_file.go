@@ -13,8 +13,7 @@ type CommitOrganizeFile struct {
 	*umwelt.Umwelt
 }
 
-type CommitOrganizeFileResults struct {
-}
+type CommitOrganizeFileResults struct{}
 
 func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganizeFileResults, err error) {
 	store := c.StoreObjekten()

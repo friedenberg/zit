@@ -16,8 +16,7 @@ import (
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
-type Exec struct {
-}
+type Exec struct{}
 
 func init() {
 	registerCommand(
@@ -129,7 +128,7 @@ func (c Exec) makeFifoPipe(tz zettel.Transacted) (p string, err error) {
 
 	p = path.Join(d, h.Schwanz()+"."+tz.Objekte.Typ.String())
 
-	if err = syscall.Mknod(p, syscall.S_IFIFO|0666, 0); err != nil {
+	if err = syscall.Mknod(p, syscall.S_IFIFO|0o666, 0); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -174,7 +173,7 @@ func (c Exec) feedPipe(
 	defer wg.Done()
 	var pipeFileWriter *os.File
 
-	if pipeFileWriter, err = os.OpenFile(p, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0777); err != nil {
+	if pipeFileWriter, err = os.OpenFile(p, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0o777); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

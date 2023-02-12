@@ -18,7 +18,7 @@ import (
 // TODO-P3 examine removing cat entirely
 type Cat struct {
 	gattung.Gattung
-	//Specific to Gattung
+	// Specific to Gattung
 	Format string
 }
 
@@ -135,7 +135,7 @@ func (c Cat) zettelen(u *umwelt.Umwelt) (err error) {
 	return
 }
 
-//func (c CatObjekte) akten(store *umwelt.Umwelt, ids id_set.Set) (err error) {
+// func (c CatObjekte) akten(store *umwelt.Umwelt, ids id_set.Set) (err error) {
 //	type akteToWrite struct {
 //		io.ReadCloser
 //		*zettel_named.Zettel

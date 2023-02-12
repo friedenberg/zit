@@ -7,8 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
-type formatterFormatterUTIGroups struct {
-}
+type formatterFormatterUTIGroups struct{}
 
 func MakeFormatterFormatterUTIGroups() *formatterFormatterUTIGroups {
 	return &formatterFormatterUTIGroups{}

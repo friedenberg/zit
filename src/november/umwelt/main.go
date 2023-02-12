@@ -13,7 +13,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/file_lock"
 	"github.com/friedenberg/zit/src/charlie/standort"
-	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/hotel/erworben"
@@ -194,33 +193,33 @@ func (u *Umwelt) Initialize() (err error) {
 
 	u.storeObjekten.Konfig().SetLogWriter(
 		store_objekten.KonfigLogWriter{
-			Updated:   u.PrinterKonfigTransacted(format.StringUpdated),
-			Unchanged: u.PrinterKonfigTransacted(format.StringUnchanged),
+			Updated:   u.PrinterKonfigTransacted(),
+			Unchanged: u.PrinterKonfigTransacted(),
 		},
 	)
 
 	u.storeObjekten.Typ().SetLogWriter(
 		store_objekten.TypLogWriter{
-			New:       u.PrinterTypTransacted(format.StringUpdated),
-			Updated:   u.PrinterTypTransacted(format.StringUpdated),
-			Unchanged: u.PrinterTypTransacted(format.StringUnchanged),
-			Archived:  u.PrinterTypTransacted(format.StringArchived),
+			New:       u.PrinterTypTransacted(),
+			Updated:   u.PrinterTypTransacted(),
+			Unchanged: u.PrinterTypTransacted(),
+			Archived:  u.PrinterTypTransacted(),
 		},
 	)
 
 	u.storeObjekten.Etikett().SetLogWriter(
 		store_objekten.EtikettLogWriter{
-			New:       u.PrinterEtikettTransacted(format.StringUpdated),
-			Updated:   u.PrinterEtikettTransacted(format.StringUpdated),
-			Unchanged: u.PrinterEtikettTransacted(format.StringUnchanged),
+			New:       u.PrinterEtikettTransacted(),
+			Updated:   u.PrinterEtikettTransacted(),
+			Unchanged: u.PrinterEtikettTransacted(),
 		},
 	)
 
 	u.storeObjekten.Kasten().SetLogWriter(
 		store_objekten.KastenLogWriter{
-			New:       u.PrinterKastenTransacted(format.StringUpdated),
-			Updated:   u.PrinterKastenTransacted(format.StringUpdated),
-			Unchanged: u.PrinterKastenTransacted(format.StringUnchanged),
+			New:       u.PrinterKastenTransacted(),
+			Updated:   u.PrinterKastenTransacted(),
+			Unchanged: u.PrinterKastenTransacted(),
 		},
 	)
 

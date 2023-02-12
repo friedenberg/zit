@@ -29,7 +29,7 @@ func MakeDirIfNecessary(i schnittstellen.Korper, pc ...string) (p string, err er
 	p = Path(i, pc...)
 	dir := path.Dir(p)
 
-	if err = os.MkdirAll(dir, os.ModeDir|0755); err != nil {
+	if err = os.MkdirAll(dir, os.ModeDir|0o755); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

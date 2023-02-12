@@ -20,9 +20,7 @@ type command struct {
 	*flag.FlagSet
 }
 
-var (
-	commands = map[string]command{}
-)
+var commands = map[string]command{}
 
 func Commands() map[string]command {
 	return commands

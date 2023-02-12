@@ -112,7 +112,7 @@ func (c *client) ObjekteWriter(
 		return
 	}
 
-	//TODO-P0 copy objekte data
+	// TODO-P0 copy objekte data
 
 	return
 }
@@ -134,7 +134,7 @@ func (c client) AkteWriter(
 		return
 	}
 
-	//TODO-P0 copy akte data
+	// TODO-P0 copy akte data
 
 	return
 }

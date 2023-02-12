@@ -11,8 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 )
 
-type formatAkte struct {
-}
+type formatAkte struct{}
 
 func MakeFormatAkte() *formatAkte {
 	return &formatAkte{}

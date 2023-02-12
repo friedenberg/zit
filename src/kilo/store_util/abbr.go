@@ -295,7 +295,7 @@ func (i *indexAbbr) ExpandEtikett(eAbbr kennung.Etikett) (e kennung.Etikett, err
 	ex := i.indexAbbrEncodableTridexes.Etiketten.Expand(eAbbr.String())
 
 	if ex == "" {
-		//TODO should try to use the expansion if possible
+		// TODO should try to use the expansion if possible
 		ex = eAbbr.String()
 	}
 

@@ -107,7 +107,6 @@ func (a *Age) Close() error {
 	for _, i := range a.identities {
 		if c, ok := i.(io.Closer); ok {
 			err := c.Close()
-
 			if err != nil {
 				return err
 			}

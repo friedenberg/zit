@@ -2,6 +2,4 @@ package bestandsaufnahme
 
 import "errors"
 
-var (
-	ErrEmpty = errors.New("empty")
-)
+var ErrEmpty = errors.New("empty")

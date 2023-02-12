@@ -15,8 +15,7 @@ func (e ErrDoesNotExist) Is(target error) bool {
 	return ok
 }
 
-type ErrHinweisenExhausted struct {
-}
+type ErrHinweisenExhausted struct{}
 
 func (e ErrHinweisenExhausted) Error() string {
 	return "hinweisen exhausted"

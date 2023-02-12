@@ -29,8 +29,8 @@ type CreateFromPaths struct {
 func (c CreateFromPaths) Run(
 	args ...string,
 ) (results collections.MutableSet[*zettel.Transacted], err error) {
-	//TODO support different modes of de-duplication
-	//TODO support merging of duplicated akten
+	// TODO support different modes of de-duplication
+	// TODO support merging of duplicated akten
 	toCreate := zettel_external.MakeMutableSetUniqueFD()
 	toDelete := zettel_external.MakeMutableSetUniqueFD()
 
@@ -120,7 +120,7 @@ func (c CreateFromPaths) Run(
 			var zt *zettel.Transacted
 
 			if zt, err = c.StoreObjekten().Zettel().Create(z.Objekte); err != nil {
-				//TODO add file for error handling
+				// TODO add file for error handling
 				c.handleStoreError(cz, "", err)
 				err = nil
 				return
@@ -133,7 +133,7 @@ func (c CreateFromPaths) Run(
 					&cz.Internal.Objekte,
 					&cz.Internal.Sku.Kennung,
 				); err != nil {
-					//TODO add file for error handling
+					// TODO add file for error handling
 					c.handleStoreError(cz, "", err)
 					err = nil
 					return
@@ -142,7 +142,7 @@ func (c CreateFromPaths) Run(
 				cz.Internal = *zt
 			}
 
-			//TODO get matches
+			// TODO get matches
 			cz.DetermineState()
 
 			zv := &zettel.Transacted{}
@@ -162,7 +162,7 @@ func (c CreateFromPaths) Run(
 
 	err = toDelete.Each(
 		func(z *zettel_external.Zettel) (err error) {
-			//TODO move to checkout store
+			// TODO move to checkout store
 			if err = os.Remove(z.ZettelFD.Path); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -170,7 +170,7 @@ func (c CreateFromPaths) Run(
 
 			pathRel := c.Standort().RelToCwdOrSame(z.ZettelFD.Path)
 
-			//TODO move to printer
+			// TODO move to printer
 			errors.Out().Printf("[%s] (deleted)", pathRel)
 
 			return
@@ -209,9 +209,9 @@ func (c CreateFromPaths) zettelsFromPath(
 	}
 
 	for _, e := range errors.Split(ctx.Errors) {
-		//var errAkteInlineAndFilePath zettel.ErrHasInlineAkteAndFilePath
+		// var errAkteInlineAndFilePath zettel.ErrHasInlineAkteAndFilePath
 
-		//if errors.As(e, &errAkteInlineAndFilePath) {
+		// if errors.As(e, &errAkteInlineAndFilePath) {
 		//	var z1 zettel.Zettel
 
 		//	if z1, err = errAkteInlineAndFilePath.Recover(); err != nil {

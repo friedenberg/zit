@@ -56,13 +56,11 @@ func MakeCliFormatTransacted(
 
 // (new|unchanged|updated|archived) [kopf/schwanz@sha !typ]
 func MakeCliFormatTransactedDelta(
-	verb string,
 	ztf schnittstellen.FuncWriterFormat[Transacted],
 ) schnittstellen.FuncWriterFormat[Transacted] {
 	return func(w io.Writer, z Transacted) (n int64, err error) {
 		return format.Write(
 			w,
-			format.MakeFormatStringRightAlignedParen(verb),
 			format.MakeWriter(ztf, z),
 		)
 	}

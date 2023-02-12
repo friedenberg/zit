@@ -134,7 +134,7 @@ func (s konfigStore) Update(
 		},
 	}
 
-	//TODO-P3 refactor into reusable
+	// TODO-P3 refactor into reusable
 	if mutter != nil {
 		kt.Sku.Kopf = mutter.Sku.Kopf
 		kt.Sku.Mutter[0] = mutter.Sku.Schwanz

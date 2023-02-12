@@ -36,7 +36,7 @@ func (c CatAlfred) CompletionGattung() gattungen.Set {
 }
 
 func (c CatAlfred) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
-	//this command does its own error handling
+	// this command does its own error handling
 	wo := bufio.NewWriter(u.Out())
 	defer errors.Deferred(&err, wo.Flush)
 

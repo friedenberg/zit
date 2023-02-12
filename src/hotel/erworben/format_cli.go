@@ -11,12 +11,10 @@ import (
 func MakeCliFormatTransacted(
 	cw format.FuncColorWriter,
 	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
-	verb string,
 ) schnittstellen.FuncWriterFormat[Transacted] {
 	return func(w io.Writer, kt Transacted) (n int64, err error) {
 		return format.Write(
 			w,
-			format.MakeFormatStringRightAlignedParen(verb),
 			format.MakeFormatString("["),
 			cw(format.MakeFormatString("%s", kt.Kennung()), format.ColorTypePointer),
 			format.MakeFormatString("@"),

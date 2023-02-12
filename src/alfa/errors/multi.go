@@ -33,7 +33,7 @@ func MakeMulti(errs ...error) (em *multi) {
 	return
 }
 
-//TODO-P4 determine why this didn't work
+// TODO-P4 determine why this didn't work
 // func (e *multi) Combine(
 // 	err *error,
 // ) {

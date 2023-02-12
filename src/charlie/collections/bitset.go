@@ -29,8 +29,8 @@ type Bitset interface {
 }
 
 const (
-	//For compatibility with 32 bit systems
-	//storageInt = uint32
+	// For compatibility with 32 bit systems
+	// storageInt = uint32
 	intSize     = 32
 	bytesPerInt = intSize / 4
 )

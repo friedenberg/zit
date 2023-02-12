@@ -27,7 +27,6 @@ func assertListHasElement(t test_logz.T, list []string, exIdx int, el rune) {
 }
 
 func TestBinarySearch(t1 *testing.T) {
-
 	list1 := []string{
 		"123",
 		"2234",
@@ -44,27 +43,27 @@ func TestBinarySearch(t1 *testing.T) {
 	}
 
 	testCases := []tc{
-		tc{
+		{
 			list:  list1,
 			exIdx: 0,
 			char:  '1',
 		},
-		tc{
+		{
 			list:  list1,
 			exIdx: 1,
 			char:  '2',
 		},
-		tc{
+		{
 			list:  list1,
 			exIdx: 2,
 			char:  '3',
 		},
-		tc{
+		{
 			list:  list1,
 			exIdx: 3,
 			char:  '4',
 		},
-		tc{
+		{
 			list:  list1,
 			exIdx: 4,
 			char:  '5',

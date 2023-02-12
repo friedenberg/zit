@@ -18,7 +18,7 @@ import (
 )
 
 type Edit struct {
-	//TODO-P3 add force
+	// TODO-P3 add force
 	store_fs.CheckoutMode
 }
 

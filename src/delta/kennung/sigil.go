@@ -17,20 +17,30 @@ const (
 	SigilHistory
 	SigilCwd
 	SigilHidden
+
+	SigilMax = SigilHidden
 )
 
 var (
-	sigilMap = map[rune]Sigil{
+	mapRuneToSigil = map[rune]Sigil{
 		':': SigilNone,
 		'@': SigilSchwanzen,
 		'+': SigilHistory,
 		'.': SigilCwd,
 		'?': SigilHidden,
 	}
+
+	mapSigilToRune = map[Sigil]rune{
+		SigilNone:      ':',
+		SigilSchwanzen: '@',
+		SigilHistory:   '+',
+		SigilCwd:       '.',
+		SigilHidden:    '?',
+	}
 )
 
 func SigilFieldFunc(c rune) (ok bool) {
-	_, ok = sigilMap[c]
+	_, ok = mapRuneToSigil[c]
 	return
 }
 
@@ -92,20 +102,11 @@ func (a Sigil) String() string {
 
 	sb.WriteString(":")
 
-	if a.IncludesSchwanzen() {
-		sb.WriteString("@")
-	}
-
-	if a.IncludesHistory() {
-		sb.WriteString("+")
-	}
-
-	if a.IncludesCwd() {
-		sb.WriteString(".")
-	}
-
-	if a.IncludesHidden() {
-		sb.WriteString("?")
+	for s := SigilNone; s <= SigilMax; s++ {
+		if a.Contains(s) {
+			r := mapSigilToRune[s]
+			sb.WriteRune(r)
+		}
 	}
 
 	return sb.String()
@@ -118,8 +119,8 @@ func (i *Sigil) Set(v string) (err error) {
 	els := []rune(v)
 
 	for _, v1 := range els {
-		if _, ok := sigilMap[v1]; ok {
-			i.Add(sigilMap[v1])
+		if _, ok := mapRuneToSigil[v1]; ok {
+			i.Add(mapRuneToSigil[v1])
 		} else {
 			err = errors.Wrap(errInvalidSigil(v))
 			return

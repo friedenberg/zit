@@ -73,7 +73,7 @@ func (si StackInfo) String() string {
 		filename = si.relFilename
 	}
 
-	//TODO-P3 determine if si.line is ever not valid
+	// TODO-P3 determine if si.line is ever not valid
 	return fmt.Sprintf("%s%s:%d: ", testPrefix, filename, si.line)
 }
 

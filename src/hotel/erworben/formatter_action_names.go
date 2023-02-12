@@ -8,8 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/script_config"
 )
 
-type formatterActionNames struct {
-}
+type formatterActionNames struct{}
 
 func MakeFormatterActionNames() *formatterActionNames {
 	return &formatterActionNames{}

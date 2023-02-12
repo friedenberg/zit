@@ -7,8 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
-type formatterActionNames struct {
-}
+type formatterActionNames struct{}
 
 func MakeFormatterActionNames() *formatterActionNames {
 	return &formatterActionNames{}

@@ -35,7 +35,7 @@ func DeleteFilesAndDirs(args ...string) (err error) {
 		dirs[filepath.Dir(abs)] = true
 	}
 
-	for d, _ := range dirs {
+	for d := range dirs {
 		var contents []string
 
 		if contents, err = ReadDirNames(d); err != nil {

@@ -139,9 +139,9 @@ func (s Store) MakeExternalZettelFromZettel(p string) (ez zettel_external.Zettel
 
 func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 	if !files.Exists(ez.ZettelFD.Path) {
-		//if the path does not have an extension, try looking for a file with that
-		//extension
-		//TODO-P4 modify this to use globs
+		// if the path does not have an extension, try looking for a file with that
+		// extension
+		// TODO-P4 modify this to use globs
 		if filepath.Ext(ez.ZettelFD.Path) == "" {
 			ez.ZettelFD.Path = ez.ZettelFD.Path + s.erworben.GetZettelFileExtension()
 			return s.readZettelFromFile(ez)
@@ -275,7 +275,7 @@ func (s *Store) ReadOne(h kennung.Hinweis) (zt *zettel.Transacted, err error) {
 		}
 
 	default:
-		//TODO-P3 validate that the zettel file points to the akte in the metadatei
+		// TODO-P3 validate that the zettel file points to the akte in the metadatei
 		readFunc = func() (zettel_checked_out.Zettel, error) {
 			return s.Read(p.Zettel.Path)
 		}
@@ -305,7 +305,7 @@ func (s *Store) ReadMany(
 
 	if s.erworben.IncludeCwd {
 		w = func(z *zettel.Transacted) (err error) {
-			//TODO-P2 akte fd?
+			// TODO-P2 akte fd?
 			ze := zettel_external.Zettel{
 				ZettelFD: kennung.FD{
 					Path: z.Sku.Kennung.String(),
@@ -314,7 +314,7 @@ func (s *Store) ReadMany(
 
 			if err1 := s.readZettelFromFile(&ze); err1 == nil {
 				z.Objekte = ze.Objekte
-				z.Sku.ObjekteSha = ze.Sku.ObjekteSha //TODO-P1 determine what else in sku is needed
+				z.Sku.ObjekteSha = ze.Sku.ObjekteSha // TODO-P1 determine what else in sku is needed
 
 				z.Verzeichnisse.ResetWithObjekte(z.Objekte)
 
@@ -375,14 +375,14 @@ func (s *Store) ReadManyHistory(
 						}
 
 					default:
-						//TODO-P3 validate that the zettel file points to the akte in the metadatei
+						// TODO-P3 validate that the zettel file points to the akte in the metadatei
 						readFunc = func() (zettel_checked_out.Zettel, error) {
 							return s.Read(p.Zettel.Path)
 						}
 					}
 
 					if checked_out, err = readFunc(); err != nil {
-						//TODO-P3 decide if error handling like this is ok
+						// TODO-P3 decide if error handling like this is ok
 						if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
 							errors.Err().Printf("external zettel does not exist: %s", p)
 						} else {
@@ -451,7 +451,7 @@ func (s *Store) Read(p string) (cz zettel_checked_out.Zettel, err error) {
 	cz.DetermineState()
 
 	if cz.State > zettel_checked_out.StateExistsAndSame {
-		//TODO-P4 rewrite with verzeichnisseAll
+		// TODO-P4 rewrite with verzeichnisseAll
 		// exSha := cz.External.Sku.Sha
 		// cz.Matches.Zettelen, _ = s.storeObjekten.ReadZettelSha(exSha)
 		// cz.Matches.Zettelen, _ = cz.Matches.Zettelen.Filter(nil, filter)

@@ -228,7 +228,7 @@ func (c EditTyp) readTempTypFiles(
 			FD: fdee,
 		}
 
-		//TODO offer option to edit again
+		// TODO offer option to edit again
 		if _, err = formatText.ReadFormat(f, &te.Objekte); err != nil {
 			err = errors.Wrap(err)
 			return

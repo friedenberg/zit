@@ -3,6 +3,7 @@
 setup() {
 	load 'test_helper/bats-support/load'
 	load 'test_helper/bats-assert/load'
+	load 'common.bash'
 	# ... the remaining setup is unchanged
 
 	# get the containing directory of this file
@@ -17,36 +18,6 @@ setup() {
 	export output
 }
 
-cat_yin() (
-	echo "one"
-	echo "two"
-	echo "three"
-	echo "four"
-	echo "five"
-	echo "six"
-)
-
-cat_yang() (
-	echo "uno"
-	echo "dos"
-	echo "tres"
-	echo "quatro"
-	echo "cinco"
-	echo "seis"
-)
-
-# cmd_zit_def=(
-# 	-abbreviate-hinweisen=false
-# 	-predictable-hinweisen
-# 	-print-typen=false
-# )
-
-# cmd_zit_add=(
-# 	zit
-# 	add
-# 	"${cmd_zit_def[@]}"
-# )
-
 function add { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
@@ -59,16 +30,14 @@ function add { # @test
 		echo test file
 	} >"$f"
 
-	run zit add \
-		-abbreviate-hinweisen=false \
-		-predictable-hinweisen \
+	run_zit add \
 		-dedupe \
 		-delete \
 		-etiketten zz-inbox-2022-11-14 \
 		"$f"
 
-	assert_output --partial '          (new) [one/uno@4 !md "to_add.md"]'
-	assert_output --partial '      (updated) [one/uno@11 !md "to_add.md"]'
+	assert_output --partial '[one/uno@45e1f5fbfe972f697f4f4f4b77a21f6395e4cf3a1f0ca16d34a675e447ab3778 !md "to_add.md"]'
+	assert_output --partial '[one/uno@11327fbe60cabd2a9eabf4a37d541cf04b539f913945897efe9bab1e30784781 !md "to_add.md"]'
 	assert_output --partial '[to_add.md] (deleted)'
 }
 
@@ -84,15 +53,14 @@ function add_1 { # @test
 		echo test file
 	} >"$f"
 
-	run zit add \
-		-predictable-hinweisen \
+	run_zit add \
 		-dedupe \
 		-delete \
 		-etiketten zz-inbox-2022-11-14 \
 		"$f"
 
-	assert_output --partial '          (new) [o/u@4 !md "to_add.md"]'
-	assert_output --partial '      (updated) [o/u@11 !md "to_add.md"]'
+	assert_output --partial '[one/uno@45e1f5fbfe972f697f4f4f4b77a21f6395e4cf3a1f0ca16d34a675e447ab3778 !md "to_add.md"]'
+	assert_output --partial '[one/uno@11327fbe60cabd2a9eabf4a37d541cf04b539f913945897efe9bab1e30784781 !md "to_add.md"]'
 	assert_output --partial '[to_add.md] (deleted)'
 }
 
@@ -109,8 +77,7 @@ function add_dedupe_1 { # @test
 		echo test file
 	} >"$f"
 
-	run zit add \
-		-predictable-hinweisen \
+	run run_zit add \
 		-dedupe \
 		-etiketten zz-inbox-2022-11-14 \
 		"$f"

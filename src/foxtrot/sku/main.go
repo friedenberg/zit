@@ -18,7 +18,7 @@ type DataIdentity interface {
 	schnittstellen.GattungGetter
 	GetObjekteSha() schnittstellen.Sha
 	GetAkteSha() schnittstellen.Sha
-	//TODO-P1 add GetAkteSha
+	// TODO-P1 add GetAkteSha
 }
 
 type SkuLike interface {

@@ -65,7 +65,7 @@ func (t *Transacted[T, T1, T2, T3, T4, T5]) SetObjekteSha(
 		return
 	}
 
-	//TODO-P3 provide opportunity for Objekte to bootstrap from arf
+	// TODO-P3 provide opportunity for Objekte to bootstrap from arf
 
 	return
 }
@@ -125,6 +125,14 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) GetSku2() (sk sku.Sku2) {
 	return
 }
 
+func (a Transacted[T, T1, T2, T3, T4, T5]) GetDataIdentity() (di sku.DataIdentity) {
+	sk := a.Sku.Sku2()
+	errors.TodoP2("make certain akte sha is in sku")
+	sk.AkteSha = sha.Make(a.GetAkteSha())
+	di = sk
+	return
+}
+
 func (a *Transacted[T, T1, T2, T3, T4, T5]) SetDataIdentity(
 	o sku.DataIdentity,
 ) (err error) {
@@ -157,7 +165,7 @@ func (a *Transacted[T, T1, T2, T3, T4, T5]) SetSkuLike(
 	a.Sku.Kennung = h
 	a.Sku.ObjekteSha = sha.Make(o.GetObjekteSha())
 	a.Sku.TransactionIndex = o.GetTransactionIndex()
-	//TODO-P3 fix sku kopf and schwanz
+	// TODO-P3 fix sku kopf and schwanz
 	// a.Sku.Kopf = t
 	a.Sku.Schwanz = o.GetTime()
 	a.Sku.Mutter = o.GetMutter()

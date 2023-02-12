@@ -57,8 +57,8 @@ func (l *Lock) Unlock() (err error) {
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
 
-	//TODO-P4 determine if there's some way for error.Deferred to correctly log
-	//the location of this
+	// TODO-P4 determine if there's some way for error.Deferred to correctly log
+	// the location of this
 	errors.Log().Caller(2, "unlocking "+l.Path())
 	if err = files.Close(l.f); err != nil {
 		err = errors.Wrap(err)
