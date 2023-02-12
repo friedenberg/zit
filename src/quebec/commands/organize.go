@@ -4,13 +4,14 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/script_value"
+	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/organize_text"
@@ -21,47 +22,9 @@ import (
 type Organize struct {
 	Or bool
 	organize_text.Options
-	Mode organizeMode
+	Mode organize_text.Mode
 
 	Filter script_value.ScriptValue
-}
-
-type organizeMode int
-
-const (
-	organizeModeInteractive = organizeMode(iota)
-	organizeModeCommitDirectly
-	organizeModeOutputOnly
-	organizeModeUnknown = -1
-)
-
-func (m *organizeMode) Set(v string) (err error) {
-	switch strings.ToLower(v) {
-	case "interactive":
-		*m = organizeModeInteractive
-	case "commit-directly":
-		*m = organizeModeCommitDirectly
-	case "output-only":
-		*m = organizeModeOutputOnly
-	default:
-		*m = organizeModeUnknown
-		err = errors.Errorf("unsupported mode: %s", v)
-	}
-
-	return
-}
-
-func (m organizeMode) String() string {
-	switch m {
-	case organizeModeInteractive:
-		return "interactive"
-	case organizeModeCommitDirectly:
-		return "commit-directly"
-	case organizeModeOutputOnly:
-		return "output-only"
-	default:
-		return "unknown"
-	}
 }
 
 func init() {
@@ -82,6 +45,14 @@ func init() {
 				CommandWithIds: c,
 			}
 		},
+	)
+}
+
+func (c *Organize) CompletionGattung() gattungen.Set {
+	return gattungen.MakeSet(
+		gattung.Zettel,
+		gattung.Etikett,
+		gattung.Typ,
 	)
 }
 
@@ -143,7 +114,7 @@ func (c *Organize) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 	createOrganizeFileOp.Transacted = getResults
 
 	switch c.Mode {
-	case organizeModeCommitDirectly:
+	case organize_text.ModeCommitDirectly:
 		errors.Log().Print("neither stdin or stdout is a tty")
 		errors.Log().Print("generate organize, read from stdin, commit")
 
@@ -191,14 +162,14 @@ func (c *Organize) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 			return
 		}
 
-	case organizeModeOutputOnly:
+	case organize_text.ModeOutputOnly:
 		errors.Log().Print("generate organize file and write to stdout")
 		if _, err = createOrganizeFileOp.RunAndWrite(getResults, os.Stdout); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case organizeModeInteractive:
+	case organize_text.ModeInteractive:
 		errors.Log().Print("generate temp file, write organize, open vim to edit, commit results")
 		var createOrganizeFileResults *organize_text.Text
 

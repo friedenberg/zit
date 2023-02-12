@@ -1,6 +1,7 @@
 package zettel_checked_out
 
 import (
+	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/zettel_external"
 )
@@ -9,6 +10,14 @@ type Zettel struct {
 	Internal zettel.Transacted
 	External zettel_external.Zettel
 	State
+}
+
+func (z Zettel) GetInternal() objekte.TransactedLike {
+	return z.Internal
+}
+
+func (z Zettel) GetExternal() objekte.ExternalLike {
+	return z.External
 }
 
 func (c *Zettel) DetermineState() {

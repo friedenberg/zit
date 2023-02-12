@@ -3,12 +3,40 @@ package store_fs
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/id"
 	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/zettel_external"
 	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
 )
+
+func (s *Store) CheckoutQuery(
+	options CheckoutOptions,
+	ms kennung.MetaSet,
+	f collections.WriterFunc[objekte.CheckedOutLike],
+) (err error) {
+	if err = s.storeObjekten.Query(
+		ms,
+		func(t objekte.TransactedLike) (err error) {
+			var co objekte.CheckedOutLike
+
+			if co, err = s.checkoutOneGeneric(options, t); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return f(co)
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
 
 func (s *Store) Checkout(
 	options CheckoutOptions,
@@ -73,6 +101,21 @@ func (s Store) filenameForZettelTransacted(
 	}
 
 	filename = originalFilename + s.erworben.GetZettelFileExtension()
+
+	return
+}
+
+func (s *Store) checkoutOneGeneric(
+	options CheckoutOptions,
+	t objekte.TransactedLike,
+) (co objekte.CheckedOutLike, err error) {
+	switch tt := t.(type) {
+	case zettel.Transacted:
+		return s.CheckoutOne(options, tt)
+
+	default:
+		err = errors.Wrap(gattung.ErrUnsupportedGattung)
+	}
 
 	return
 }

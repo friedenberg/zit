@@ -19,6 +19,14 @@ type Zettel struct {
 	AkteFD   kennung.FD
 }
 
+func (e Zettel) GetObjekteFD() kennung.FD {
+	return e.ZettelFD
+}
+
+func (e Zettel) GetAkteFD() kennung.FD {
+	return e.AkteFD
+}
+
 func (e Zettel) GetObjekteSha() sha.Sha {
 	return e.Sku.ObjekteSha
 }

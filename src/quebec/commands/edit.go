@@ -9,6 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/juliett/cwd"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
@@ -47,15 +48,36 @@ func (c Edit) CompletionGattung() gattungen.Set {
 }
 
 func (c Edit) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
-	checkoutOptions := store_fs.CheckoutOptions{
-		CheckoutMode: c.CheckoutMode,
-	}
-
-	errors.TodoP1("support other gattung")
 	ids, ok := ms.Get(gattung.Zettel)
 
 	if !ok {
 		return
+	}
+
+	return c.editZettels(u, ids)
+}
+
+func (c Edit) runWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
+	checkoutOptions := store_fs.CheckoutOptions{
+		CheckoutMode: c.CheckoutMode,
+	}
+
+	if err = u.StoreWorkingDirectory().CheckoutQuery(
+		checkoutOptions,
+		ms,
+		func(co objekte.CheckedOutLike) (err error) {
+			return
+		},
+	); err != nil {
+		return
+	}
+
+	return
+}
+
+func (c Edit) editZettels(u *umwelt.Umwelt, ids kennung.Set) (err error) {
+	checkoutOptions := store_fs.CheckoutOptions{
+		CheckoutMode: c.CheckoutMode,
 	}
 
 	var checkoutResults zettel_checked_out.MutableSet
