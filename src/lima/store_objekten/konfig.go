@@ -44,7 +44,7 @@ type KonfigAkteTextSaver = objekte_store.AkteTextSaver[
 type konfigStore struct {
 	store_util.StoreUtil
 
-	pool collections.PoolLike[erworben.Transacted]
+	pool schnittstellen.Pool[erworben.Transacted, *erworben.Transacted]
 
 	KonfigInflator
 	KonfigAkteTextSaver

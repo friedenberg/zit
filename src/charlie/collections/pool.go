@@ -7,17 +7,16 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
-// TODO-P4 switch to interface
-type Pool[T any, T1 schnittstellen.Resetable[T]] struct {
+type pool[T any, TPtr schnittstellen.Resetable[T]] struct {
 	inner *sync.Pool
 }
 
-func MakePool[T any, T1 schnittstellen.Resetable[T]]() *Pool[T, T1] {
-	return &Pool[T, T1]{
+func MakePool[T any, TPtr schnittstellen.Resetable[T]]() *pool[T, TPtr] {
+	return &pool[T, TPtr]{
 		inner: &sync.Pool{
 			New: func() interface{} {
 				o := new(T)
-				T1(o).Reset()
+				TPtr(o).Reset()
 
 				return o
 			},
@@ -25,7 +24,7 @@ func MakePool[T any, T1 schnittstellen.Resetable[T]]() *Pool[T, T1] {
 	}
 }
 
-func (p Pool[T, T1]) Apply(f schnittstellen.FuncIter[T1], e T1) (err error) {
+func (p pool[T, TPtr]) Apply(f schnittstellen.FuncIter[T], e T) (err error) {
 	err = f(e)
 
 	switch {
@@ -36,7 +35,7 @@ func (p Pool[T, T1]) Apply(f schnittstellen.FuncIter[T1], e T1) (err error) {
 
 	case IsStopIteration(err):
 		err = nil
-		p.Put(e)
+		p.Put(&e)
 
 	case err != nil:
 		err = errors.Wrap(err)
@@ -44,17 +43,17 @@ func (p Pool[T, T1]) Apply(f schnittstellen.FuncIter[T1], e T1) (err error) {
 		fallthrough
 
 	default:
-		p.Put(e)
+		p.Put(&e)
 	}
 
 	return
 }
 
-func (ip Pool[T, T1]) Get() T1 {
-	return ip.inner.Get().(T1)
+func (ip pool[T, TPtr]) Get() TPtr {
+	return ip.inner.Get().(TPtr)
 }
 
-func (ip Pool[T, T1]) Put(i T1) (err error) {
+func (ip pool[T, TPtr]) Put(i TPtr) (err error) {
 	if i == nil {
 		return
 	}

@@ -72,7 +72,7 @@ type KastenAkteTextSaver = objekte_store.AkteTextSaver[
 type kastenStore struct {
 	store_util.StoreUtil
 
-	pool collections.PoolLike[kasten.Transacted]
+	pool schnittstellen.Pool[kasten.Transacted, *kasten.Transacted]
 
 	KastenInflator
 	KastenAkteTextSaver

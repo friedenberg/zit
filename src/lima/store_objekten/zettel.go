@@ -74,12 +74,12 @@ type zettelStore struct {
 		*zettel.Verzeichnisse,
 	]
 
-	pool *collections.Pool[zettel.Transacted, *zettel.Transacted]
+	pool schnittstellen.Pool[zettel.Transacted, *zettel.Transacted]
 }
 
 func makeZettelStore(
 	sa store_util.StoreUtil,
-	p *collections.Pool[zettel.Transacted, *zettel.Transacted],
+	p schnittstellen.Pool[zettel.Transacted, *zettel.Transacted],
 ) (s *zettelStore, err error) {
 	s = &zettelStore{
 		StoreUtil:   sa,

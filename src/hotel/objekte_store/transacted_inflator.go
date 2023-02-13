@@ -4,7 +4,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 )
@@ -48,7 +47,10 @@ type transactedInflator[
 	af            schnittstellen.AkteIOFactory
 	objekteFormat schnittstellen.Format[T, T1]
 	akteFormat    schnittstellen.Format[T, T1]
-	pool          collections.PoolLike[objekte.Transacted[T, T1, T2, T3, T4, T5]]
+	pool          schnittstellen.Pool[
+		objekte.Transacted[T, T1, T2, T3, T4, T5],
+		*objekte.Transacted[T, T1, T2, T3, T4, T5],
+	]
 }
 
 func MakeTransactedInflator[
@@ -63,7 +65,10 @@ func MakeTransactedInflator[
 	af schnittstellen.AkteIOFactory,
 	objekteFormat schnittstellen.Format[T, T1],
 	akteFormat schnittstellen.Format[T, T1],
-	pool collections.PoolLike[objekte.Transacted[T, T1, T2, T3, T4, T5]],
+	pool schnittstellen.Pool[
+		objekte.Transacted[T, T1, T2, T3, T4, T5],
+		*objekte.Transacted[T, T1, T2, T3, T4, T5],
+	],
 ) *transactedInflator[T, T1, T2, T3, T4, T5] {
 	if objekteFormat == nil {
 		objekteFormat = objekte.MakeFormat[T, T1]()

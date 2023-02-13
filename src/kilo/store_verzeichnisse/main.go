@@ -20,7 +20,7 @@ const (
 type Zettelen struct {
 	erworben konfig.Compiled
 	path     string
-	pool     *collections.Pool[zettel.Transacted, *zettel.Transacted]
+	pool     schnittstellen.Pool[zettel.Transacted, *zettel.Transacted]
 	ioFactory
 	pages [PageCount]*Page
 }
@@ -34,7 +34,7 @@ func MakeZettelen(
 	k konfig.Compiled,
 	dir string,
 	f ioFactory,
-	p *collections.Pool[zettel.Transacted, *zettel.Transacted],
+	p schnittstellen.Pool[zettel.Transacted, *zettel.Transacted],
 	fff ZettelTransactedWriterGetter,
 ) (i *Zettelen, err error) {
 	i = &Zettelen{
@@ -56,7 +56,7 @@ func MakeZettelen(
 	return
 }
 
-func (i Zettelen) Pool() *collections.Pool[zettel.Transacted, *zettel.Transacted] {
+func (i Zettelen) Pool() schnittstellen.Pool[zettel.Transacted, *zettel.Transacted] {
 	errors.TodoP4("rename to GetPool")
 	return i.pool
 }

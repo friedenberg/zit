@@ -54,7 +54,7 @@ type EtikettAkteTextSaver = objekte_store.AkteTextSaver[
 type etikettStore struct {
 	store_util.StoreUtil
 
-	pool collections.PoolLike[etikett.Transacted]
+	pool schnittstellen.Pool[etikett.Transacted, *etikett.Transacted]
 
 	EtikettInflator
 	EtikettAkteTextSaver

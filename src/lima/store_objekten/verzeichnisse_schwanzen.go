@@ -19,7 +19,7 @@ type verzeichnisseSchwanzen struct {
 
 func makeVerzeichnisseSchwanzen(
 	sa store_util.StoreUtil,
-	p *collections.Pool[zettel.Transacted, *zettel.Transacted],
+	p schnittstellen.Pool[zettel.Transacted, *zettel.Transacted],
 ) (s *verzeichnisseSchwanzen, err error) {
 	s = &verzeichnisseSchwanzen{
 		su: sa,

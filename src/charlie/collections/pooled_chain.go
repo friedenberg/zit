@@ -5,12 +5,11 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
-// TODO-P4 migrate to single writerfunc
-func MakePooledChain[T any](
-	p PoolLike[T],
-	wfs ...schnittstellen.FuncIter[*T],
-) schnittstellen.FuncIter[*T] {
-	return func(e *T) (err error) {
+func MakePooledChain[T any, TPtr schnittstellen.Ptr[T]](
+	p schnittstellen.Pool[T, TPtr],
+	wfs ...schnittstellen.FuncIter[TPtr],
+) schnittstellen.FuncIter[TPtr] {
+	return func(e TPtr) (err error) {
 		for _, w := range wfs {
 			err = w(e)
 

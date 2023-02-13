@@ -4,7 +4,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 )
@@ -28,7 +27,7 @@ type objekteInflator[
 	ar            schnittstellen.AkteReaderFactory
 	objekteParser schnittstellen.Parser[T, T1]
 	akteParser    schnittstellen.Parser[T, T1]
-	pool          collections.PoolLike[T]
+	pool          schnittstellen.Pool[T, T1]
 }
 
 func MakeObjekteInflator[
@@ -41,7 +40,7 @@ func MakeObjekteInflator[
 	ar schnittstellen.AkteReaderFactory,
 	objekteParser schnittstellen.Parser[T, T1],
 	akteParser schnittstellen.Parser[T, T1],
-	pool collections.PoolLike[T],
+	pool schnittstellen.Pool[T, T1],
 ) *objekteInflator[T, T1, T2, T3] {
 	if objekteParser == nil {
 		objekteParser = objekte.MakeFormat[T, T1]()

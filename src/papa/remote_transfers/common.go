@@ -20,7 +20,7 @@ func (c common) GetInheritorZettel(
 	orf schnittstellen.ObjekteReaderFactory,
 	arf schnittstellen.AkteReaderFactory,
 ) objekte_store.TransactedInheritor {
-	p := collections.MakePool2[zettel.Transacted, *zettel.Transacted]()
+	p := collections.MakePool[zettel.Transacted, *zettel.Transacted]()
 
 	inflator := objekte_store.MakeTransactedInflator[
 		zettel.Objekte,
@@ -57,7 +57,7 @@ func (c common) GetInheritorTyp(
 	arf schnittstellen.AkteReaderFactory,
 ) objekte_store.TransactedInheritor {
 	errors.TodoP0("fix issues with typ skus being delivered with empty data")
-	p := collections.MakePool2[typ.Transacted, *typ.Transacted]()
+	p := collections.MakePool[typ.Transacted, *typ.Transacted]()
 
 	inflator := objekte_store.MakeTransactedInflator[
 		typ.Objekte,

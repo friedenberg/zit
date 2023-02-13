@@ -3,7 +3,7 @@ package umwelt
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/india/konfig"
@@ -48,6 +48,6 @@ func (u *Umwelt) StoreWorkingDirectory() *store_fs.Store {
 	return u.storeWorkingDirectory
 }
 
-func (u *Umwelt) ZettelVerzeichnissePool() *collections.Pool[zettel.Transacted, *zettel.Transacted] {
+func (u *Umwelt) ZettelVerzeichnissePool() schnittstellen.Pool[zettel.Transacted, *zettel.Transacted] {
 	return u.zettelVerzeichnissePool
 }

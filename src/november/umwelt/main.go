@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
@@ -45,7 +46,7 @@ type Umwelt struct {
 	age                   *age.Age
 	storeWorkingDirectory *store_fs.Store
 
-	zettelVerzeichnissePool *collections.Pool[zettel.Transacted, *zettel.Transacted]
+	zettelVerzeichnissePool schnittstellen.Pool[zettel.Transacted, *zettel.Transacted]
 }
 
 func Make(kCli erworben.Cli) (u *Umwelt, err error) {

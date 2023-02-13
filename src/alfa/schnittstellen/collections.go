@@ -59,11 +59,11 @@ type StringAdder interface {
 	AddString(string) error
 }
 
-type ValueSetLike[T flag.Value] interface {
+type ValueSet[T flag.Value] interface {
 	Strings() []string
 	Set[T]
 }
 
-type MutableValueSetLike[T flag.Value] interface {
+type MutableValueSet[T flag.Value] interface {
 	MutableSet[T]
 }

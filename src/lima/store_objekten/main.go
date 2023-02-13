@@ -4,7 +4,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
@@ -39,7 +38,7 @@ type Store struct {
 
 func Make(
 	su store_util.StoreUtil,
-	p *collections.Pool[zettel.Transacted, *zettel.Transacted],
+	p schnittstellen.Pool[zettel.Transacted, *zettel.Transacted],
 ) (s *Store, err error) {
 	s = &Store{
 		StoreUtil: su,

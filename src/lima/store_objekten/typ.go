@@ -73,7 +73,7 @@ type TypAkteTextSaver = objekte_store.AkteTextSaver[
 type typStore struct {
 	store_util.StoreUtil
 
-	pool collections.PoolLike[typ.Transacted]
+	pool schnittstellen.Pool[typ.Transacted, *typ.Transacted]
 
 	TypInflator
 	TypAkteTextSaver
