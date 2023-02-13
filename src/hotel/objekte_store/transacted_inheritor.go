@@ -30,13 +30,13 @@ type heritableElementPtr[T any] interface {
 type transactedInheritor[T heritableElement, TPtr heritableElementPtr[T]] struct {
 	inflatorStorer InflatorStorer[TPtr]
 	inheritor      Inheritor[TPtr]
-	pool           collections.Pool2Like[T, TPtr]
+	pool           schnittstellen.Pool[T, TPtr]
 }
 
 func MakeTransactedInheritor[T heritableElement, TPtr heritableElementPtr[T]](
 	inflatorStorer InflatorStorer[TPtr],
 	inheritor Inheritor[TPtr],
-	pool collections.Pool2Like[T, TPtr],
+	pool schnittstellen.Pool[T, TPtr],
 ) *transactedInheritor[T, TPtr] {
 	return &transactedInheritor[T, TPtr]{
 		inflatorStorer: inflatorStorer,

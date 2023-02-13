@@ -80,13 +80,13 @@ func MakeHeapFromSlice[T HeapElement[T], T1 HeapElementPtr[T]](
 }
 
 type Heap[T HeapElement[T], T1 HeapElementPtr[T]] struct {
-	p Pool2Like[T, T1]
+	p schnittstellen.Pool[T, T1]
 	l *sync.Mutex
 	h heapPrivate[T]
 	s int
 }
 
-func (h *Heap[T, T1]) SetPool(p Pool2Like[T, T1]) {
+func (h *Heap[T, T1]) SetPool(p schnittstellen.Pool[T, T1]) {
 	if p == nil {
 		p = MakeFakePool[T, T1]()
 	}

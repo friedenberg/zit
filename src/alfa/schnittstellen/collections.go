@@ -27,6 +27,11 @@ type MutableSetLike[T any] interface {
 	Reset(SetLike[T])
 }
 
+type Pool[T any, TPtr Ptr[T]] interface {
+	Get() TPtr
+	Put(i TPtr) (err error)
+}
+
 //  __     __    _              ____       _
 //  \ \   / /_ _| |_   _  ___  / ___|  ___| |_ ___
 //   \ \ / / _` | | | | |/ _ \ \___ \ / _ \ __/ __|
