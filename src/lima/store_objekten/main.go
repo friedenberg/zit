@@ -392,7 +392,7 @@ func (s *Store) getReindexFunc() func(sku.DataIdentity) error {
 		g := sk.GetGattung()
 
 		if st, ok = s.reindexers[g]; !ok {
-			err = errors.Wrapf(gattung.ErrUnsupportedGattung, "Gattung: %s", g)
+			err = gattung.MakeErrUnsupportedGattung(g)
 			return
 		}
 

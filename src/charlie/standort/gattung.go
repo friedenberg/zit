@@ -36,8 +36,7 @@ func (s Standort) DirObjektenGattung(
 		p = s.DirObjektenKasten()
 
 	default:
-		err = gattung.ErrUnsupportedGattung
-		err = errors.Wrapf(err, "Gattung: %s", g)
+		err = gattung.MakeErrUnsupportedGattung(g)
 		return
 	}
 

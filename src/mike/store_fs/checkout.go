@@ -111,11 +111,11 @@ func (s *Store) checkoutOneGeneric(
 	t objekte.TransactedLike,
 ) (co objekte.CheckedOutLike, err error) {
 	switch tt := t.(type) {
-	case zettel.Transacted:
-		return s.CheckoutOne(options, tt)
+	case *zettel.Transacted:
+		return s.CheckoutOne(options, *tt)
 
 	default:
-		err = errors.Wrap(gattung.ErrUnsupportedGattung)
+		err = gattung.MakeErrUnsupportedGattung(tt.GetSku2())
 	}
 
 	return
@@ -133,7 +133,7 @@ func (s *Store) CheckoutOne(
 	}
 
 	if files.Exists(filename) {
-		if cz, err = s.Read(filename); err != nil {
+		if cz, err = s.readOneFS(filename); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

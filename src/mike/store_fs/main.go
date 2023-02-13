@@ -419,7 +419,7 @@ func (s *Store) ReadManyHistory(
 	)
 }
 
-func (s *Store) Read(p string) (cz zettel_checked_out.Zettel, err error) {
+func (s *Store) readOneFS(p string) (cz zettel_checked_out.Zettel, err error) {
 	if cz.External, err = s.MakeExternalZettelFromZettel(p); err != nil {
 		err = errors.Wrapf(err, "%s", p)
 		return
@@ -432,6 +432,15 @@ func (s *Store) Read(p string) (cz zettel_checked_out.Zettel, err error) {
 			err = errors.Wrapf(err, "%s", p)
 			return
 		}
+	}
+
+	return
+}
+
+func (s *Store) Read(p string) (cz zettel_checked_out.Zettel, err error) {
+  if cz, err = s.readOneFS(p); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	var zt *zettel.Transacted

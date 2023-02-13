@@ -1,14 +1,34 @@
 package gattung
 
 import (
-	"errors"
 	"fmt"
+
+	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
-var (
-	ErrUnsupportedGattung = errors.New("unsupported gattung")
-	ErrNoAbbreviation     = errors.New("no abbreviation")
-)
+var ErrNoAbbreviation = errors.New("no abbreviation")
+
+func MakeErrUnsupportedGattung(g schnittstellen.GattungGetter) error {
+	return errors.WrapN(1, errUnsupportedGattung{Gattung: g.GetGattung()})
+}
+
+func IsErrUnsupportedGattung(err error) bool {
+	return errors.Is(err, errUnsupportedGattung{Gattung: Unknown})
+}
+
+type errUnsupportedGattung struct {
+	schnittstellen.Gattung
+}
+
+func (e errUnsupportedGattung) Is(target error) (ok bool) {
+	_, ok = target.(errUnsupportedGattung)
+	return
+}
+
+func (e errUnsupportedGattung) Error() string {
+	return fmt.Sprintf("unsupported gattung: %q", e.Gattung)
+}
 
 type ErrUnrecognizedGattung struct {
 	string

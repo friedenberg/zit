@@ -50,7 +50,7 @@ func (u *Umwelt) Einleitung(e Einleitung) (err error) {
 		var d string
 
 		if d, err = s.DirObjektenGattung(g); err != nil {
-			if errors.Is(err, gattung.ErrUnsupportedGattung) {
+			if gattung.IsErrUnsupportedGattung(err) {
 				err = nil
 				continue
 			} else {

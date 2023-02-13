@@ -230,6 +230,7 @@ func (s zettelStore) Query(
 	ids kennung.Set,
 	f schnittstellen.FuncIter[*zettel.Transacted],
 ) (err error) {
+  errors.TodoP1("generate optimized query here")
 	return s.MethodForSigil(ids.Sigil)(
 		collections.MakeChain(
 			zettel.MakeWriterKonfig(s.StoreUtil.GetKonfig()),

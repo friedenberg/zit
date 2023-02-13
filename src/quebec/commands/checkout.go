@@ -4,9 +4,8 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/juliett/zettel"
+	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/mike/store_fs"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
@@ -40,21 +39,12 @@ func (c Checkout) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error)
 		CheckoutMode: c.CheckoutMode,
 	}
 
-	ids, ok := ms.Get(gattung.Zettel)
-
-	if !ok {
-		return
-	}
-
-	query := zettel.WriterIds{
-		Filter: kennung.Filter{
-			Set: ids,
-		},
-	}
-
-	if _, err = u.StoreWorkingDirectory().Checkout(
+	if err = u.StoreWorkingDirectory().CheckoutQuery(
 		options,
-		query.WriteZettelTransacted,
+		ms,
+		func(co objekte.CheckedOutLike) (err error) {
+			return
+		},
 	); err != nil {
 		err = errors.Wrap(err)
 		return
