@@ -86,7 +86,7 @@ func (s1 Set[T]) Subtract(s2 Set[T]) (out Set[T]) {
 
 func (s1 Set[T]) Intersection(
 	s2 schnittstellen.Set[T],
-) (s3 schnittstellen.MutableSetLike[T]) {
+) (s3 schnittstellen.MutableSet[T]) {
 	s3 = MakeMutableSet[T](s1.Key)
 	s22 := Set[T]{
 		Set: s2,

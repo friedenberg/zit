@@ -4,12 +4,12 @@ import "github.com/friedenberg/zit/src/alfa/schnittstellen"
 
 type MutableSet[T any] struct {
 	setAlias[T]
-	schnittstellen.MutableSetLike[T]
+	schnittstellen.MutableSet[T]
 }
 
 func MakeMutableSet[T any](kf KeyFunc[T], es ...T) (out MutableSet[T]) {
-	out.MutableSetLike = makeMutableSet(kf, es...)
-	out.setAlias = setAlias[T]{Set: Set[T]{Set: out.MutableSetLike}}
+	out.MutableSet = makeMutableSet(kf, es...)
+	out.setAlias = setAlias[T]{Set: Set[T]{Set: out.MutableSet}}
 
 	return
 }

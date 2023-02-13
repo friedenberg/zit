@@ -24,8 +24,8 @@ func init() {
 			}
 
 			gsvs := collections.MutableValueSet2[gattung.Gattung, *gattung.Gattung]{
-				MutableSetLike: &c.GattungSet,
-				SetterPolicy:   collections.SetterPolicyReset,
+				MutableSet:   &c.GattungSet,
+				SetterPolicy: collections.SetterPolicyReset,
 			}
 
 			f.Var(gsvs, "gattung", "Gattung")

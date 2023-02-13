@@ -13,7 +13,7 @@ import (
 )
 
 type FilterZettelsWithScript struct {
-	Set    schnittstellen.MutableSetLike[*zettel.Transacted]
+	Set    schnittstellen.MutableSet[*zettel.Transacted]
 	Filter script_value.ScriptValue
 }
 

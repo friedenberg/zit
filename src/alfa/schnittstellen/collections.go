@@ -19,7 +19,7 @@ type Set[T any] interface {
 	EachKey(FuncIterKey) error
 }
 
-type MutableSetLike[T any] interface {
+type MutableSet[T any] interface {
 	Set[T]
 	Add(T) error
 	Del(T) error
@@ -65,5 +65,5 @@ type ValueSetLike[T flag.Value] interface {
 }
 
 type MutableValueSetLike[T flag.Value] interface {
-	MutableSetLike[T]
+	MutableSet[T]
 }

@@ -6,12 +6,12 @@ import (
 )
 
 type MutableSet struct {
-	schnittstellen.MutableSetLike[*Zettel]
+	schnittstellen.MutableSet[*Zettel]
 }
 
 func MakeMutableSet(kf collections.KeyFunc[*Zettel], zs ...*Zettel) MutableSet {
 	return MutableSet{
-		MutableSetLike: collections.MakeMutableSet[*Zettel](kf, zs...),
+		MutableSet: collections.MakeMutableSet[*Zettel](kf, zs...),
 	}
 }
 
