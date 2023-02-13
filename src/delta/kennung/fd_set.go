@@ -10,9 +10,9 @@ func MakeFDSet(ts ...FD) FDSet {
 	)
 }
 
-type FDMutableSet = collections.MutableValueSet[FD, *FD]
+type MutableFDSet = collections.MutableValueSet[FD, *FD]
 
-func MakeFDMutableSet(ts ...FD) FDMutableSet {
+func MakeMutableFDSet(ts ...FD) MutableFDSet {
 	return collections.MakeMutableValueSet[FD, *FD](
 		ts...,
 	)

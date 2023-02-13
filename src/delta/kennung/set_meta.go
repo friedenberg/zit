@@ -25,7 +25,7 @@ type MetaSet interface {
 type metaSet struct {
 	expanders      Expanders
 	defaultGattung gattung.Gattung
-	fds            FDMutableSet
+	fds            MutableFDSet
 	Gattung        map[gattung.Gattung]Set
 }
 
@@ -34,7 +34,7 @@ func MakeMetaSet(ex Expanders, dg gattung.Gattung) *metaSet {
 	return &metaSet{
 		expanders:      ex,
 		defaultGattung: dg,
-		fds:            MakeFDMutableSet(),
+		fds:            MakeMutableFDSet(),
 		Gattung:        make(map[gattung.Gattung]Set),
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/gattungen"
@@ -145,7 +146,7 @@ func (c Show) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
 func (c Show) showOneOrMoreZettels(
 	u *umwelt.Umwelt,
 	ids kennung.Set,
-	fv collections.WriterFunc[*zettel.Transacted],
+	fv schnittstellen.FuncIter[*zettel.Transacted],
 ) (err error) {
 	if h, ok := ids.OnlySingleHinweis(); ok {
 		if err = c.showOneZettel(u, h, fv); err != nil {
@@ -165,7 +166,7 @@ func (c Show) showOneOrMoreZettels(
 func (c Show) showOneZettel(
 	u *umwelt.Umwelt,
 	h kennung.Hinweis,
-	fv collections.WriterFunc[*zettel.Transacted],
+	fv schnittstellen.FuncIter[*zettel.Transacted],
 ) (err error) {
 	var z *zettel.Transacted
 
@@ -185,7 +186,7 @@ func (c Show) showOneZettel(
 func (c Show) showManyZettels(
 	u *umwelt.Umwelt,
 	ids kennung.Set,
-	fv collections.WriterFunc[*zettel.Transacted],
+	fv schnittstellen.FuncIter[*zettel.Transacted],
 ) (err error) {
 	idFilter := zettel.WriterIds{
 		Filter: kennung.Filter{
@@ -312,7 +313,7 @@ func (c Show) showTransaktions(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 func (c Show) showTypen(
 	u *umwelt.Umwelt,
 	ids kennung.Set,
-	f collections.WriterFunc[*typ.Transacted],
+	f schnittstellen.FuncIter[*typ.Transacted],
 ) (err error) {
 	f1 := collections.MakeSyncSerializer(f)
 
@@ -351,7 +352,7 @@ func (c Show) showTypen(
 func (c Show) showEtiketten(
 	u *umwelt.Umwelt,
 	ids kennung.Set,
-	f collections.WriterFunc[*etikett.Transacted],
+	f schnittstellen.FuncIter[*etikett.Transacted],
 ) (err error) {
 	f1 := collections.MakeSyncSerializer(f)
 
@@ -383,7 +384,7 @@ func (c Show) showEtiketten(
 
 func (c Show) showKonfig(
 	u *umwelt.Umwelt,
-	f collections.WriterFunc[*erworben.Transacted],
+	f schnittstellen.FuncIter[*erworben.Transacted],
 ) (err error) {
 	f1 := collections.MakeSyncSerializer(f)
 

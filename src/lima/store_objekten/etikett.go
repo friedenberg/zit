@@ -162,14 +162,14 @@ func (s etikettStore) ReadOne(
 }
 
 func (s etikettStore) ReadAllSchwanzen(
-	f collections.WriterFunc[*etikett.Transacted],
+	f schnittstellen.FuncIter[*etikett.Transacted],
 ) (err error) {
 	errors.TodoP2("implement")
 	return
 }
 
 func (s etikettStore) ReadAll(
-	f collections.WriterFunc[*etikett.Transacted],
+	f schnittstellen.FuncIter[*etikett.Transacted],
 ) (err error) {
 	errors.TodoP2("implement")
 	return

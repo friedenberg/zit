@@ -6,16 +6,15 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 )
 
 type CreateOrUpdateDelegate[T any] struct {
-	New       collections.WriterFunc[T]
-	Updated   collections.WriterFunc[T]
-	Unchanged collections.WriterFunc[T]
+	New       schnittstellen.FuncIter[T]
+	Updated   schnittstellen.FuncIter[T]
+	Unchanged schnittstellen.FuncIter[T]
 }
 
 type createOrUpdate[

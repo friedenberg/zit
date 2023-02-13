@@ -1,7 +1,7 @@
 package objekte_store
 
 import (
-	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
@@ -27,13 +27,13 @@ type OneReader[
 type AllReader[
 	V any,
 ] interface {
-	ReadAll(collections.WriterFunc[V]) error
+	ReadAll(schnittstellen.FuncIter[V]) error
 }
 
 type SchwanzenReader[
 	V any,
 ] interface {
-	ReadAllSchwanzen(collections.WriterFunc[V]) error
+	ReadAllSchwanzen(schnittstellen.FuncIter[V]) error
 }
 
 type Reader[
@@ -55,7 +55,7 @@ type TransactedReader[
 type Querier[
 	V any,
 ] interface {
-	Query(kennung.Set, collections.WriterFunc[V]) error
+	Query(kennung.Set, schnittstellen.FuncIter[V]) error
 }
 
 type CreateOrUpdater[

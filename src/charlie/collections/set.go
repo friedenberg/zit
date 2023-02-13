@@ -2,10 +2,11 @@ package collections
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
 type Set[T any] struct {
-	SetLike[T]
+	schnittstellen.SetLike[T]
 }
 
 func MakeSet[T any](kf KeyFunc[T], es ...T) (out Set[T]) {
@@ -33,7 +34,7 @@ func (s1 Set[T]) MutableCopy() (s2 MutableSet[T]) {
 	return
 }
 
-func (s Set[T]) WriterContainer(sigil error) WriterFunc[T] {
+func (s Set[T]) WriterContainer(sigil error) schnittstellen.FuncIter[T] {
 	return func(e T) (err error) {
 		k := s.Key(e)
 
@@ -52,7 +53,7 @@ func (s Set[T]) WriterContainer(sigil error) WriterFunc[T] {
 	}
 }
 
-func WriterFuncNegate[T any](wf WriterFunc[T]) WriterFunc[T] {
+func WriterFuncNegate[T any](wf schnittstellen.FuncIter[T]) schnittstellen.FuncIter[T] {
 	return func(e T) (err error) {
 		err = wf(e)
 
@@ -83,7 +84,9 @@ func (s1 Set[T]) Subtract(s2 Set[T]) (out Set[T]) {
 	return
 }
 
-func (s1 Set[T]) Intersection(s2 SetLike[T]) (s3 MutableSetLike[T]) {
+func (s1 Set[T]) Intersection(
+	s2 schnittstellen.SetLike[T],
+) (s3 schnittstellen.MutableSetLike[T]) {
 	s3 = MakeMutableSet[T](s1.Key)
 	s22 := Set[T]{
 		SetLike: s2,
@@ -97,7 +100,7 @@ func (s1 Set[T]) Intersection(s2 SetLike[T]) (s3 MutableSetLike[T]) {
 	return
 }
 
-func (s1 Set[T]) Chain(fs ...WriterFunc[T]) error {
+func (s1 Set[T]) Chain(fs ...schnittstellen.FuncIter[T]) error {
 	return s1.Each(
 		func(e T) (err error) {
 			for _, f := range fs {
@@ -141,7 +144,7 @@ func (s Set[T]) Any() (e T) {
 	return
 }
 
-func (s Set[T]) All(f WriterFunc[T]) (ok bool) {
+func (s Set[T]) All(f schnittstellen.FuncIter[T]) (ok bool) {
 	err := s.Each(
 		func(e T) (err error) {
 			return f(e)
@@ -151,7 +154,7 @@ func (s Set[T]) All(f WriterFunc[T]) (ok bool) {
 	return err == nil
 }
 
-func (a Set[T]) Equals(b SetLike[T]) (ok bool) {
+func (a Set[T]) Equals(b schnittstellen.SetLike[T]) (ok bool) {
 	if a.Len() != b.Len() {
 		return
 	}

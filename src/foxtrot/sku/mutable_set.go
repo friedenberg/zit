@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
@@ -58,7 +59,7 @@ func (os MutableSet) Get(k string) []SkuLike {
 }
 
 func (os MutableSet) Each(
-	w collections.WriterFunc[SkuLike],
+	w schnittstellen.FuncIter[SkuLike],
 ) (err error) {
 	os.lock.RLock()
 	defer os.lock.RUnlock()

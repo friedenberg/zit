@@ -6,6 +6,7 @@ import (
 	"syscall"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
@@ -97,7 +98,7 @@ func (c Cat) etiketten(u *umwelt.Umwelt) (err error) {
 
 func (c Cat) zettelWriter(
 	u *umwelt.Umwelt,
-) collections.WriterFunc[*zettel.Objekte] {
+) schnittstellen.FuncIter[*zettel.Objekte] {
 	switch c.Format {
 	case "json":
 		return zettel.MakeSerializedFormatWriter(

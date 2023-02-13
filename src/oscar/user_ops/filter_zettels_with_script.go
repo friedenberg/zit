@@ -5,6 +5,7 @@ import (
 	"os/exec"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/delta/kennung"
@@ -12,7 +13,7 @@ import (
 )
 
 type FilterZettelsWithScript struct {
-	Set    collections.MutableSetLike[*zettel.Transacted]
+	Set    schnittstellen.MutableSetLike[*zettel.Transacted]
 	Filter script_value.ScriptValue
 }
 

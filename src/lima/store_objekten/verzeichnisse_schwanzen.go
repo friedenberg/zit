@@ -2,6 +2,7 @@ package store_objekten
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
@@ -106,6 +107,6 @@ func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 
 func (s *verzeichnisseSchwanzen) ZettelTransactedWriter(
 	n int,
-) collections.WriterFunc[*zettel.Transacted] {
+) schnittstellen.FuncIter[*zettel.Transacted] {
 	return s.headers[n].WriteZettelTransacted
 }

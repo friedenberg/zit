@@ -8,7 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/collections_coding"
 	"github.com/friedenberg/zit/src/delta/format"
@@ -60,8 +59,8 @@ func (fv *FormatterValue) FuncFormatterVerzeichnisse(
 	out io.Writer,
 	af schnittstellen.AkteIOFactory,
 	k konfig.Compiled,
-	logFunc collections.WriterFunc[*Transacted],
-) collections.WriterFunc[*Transacted] {
+	logFunc schnittstellen.FuncIter[*Transacted],
+) schnittstellen.FuncIter[*Transacted] {
 	return fv.FuncFormatter(
 		out,
 		af,
@@ -74,8 +73,8 @@ func (fv *FormatterValue) FuncFormatter(
 	out io.Writer,
 	af schnittstellen.AkteIOFactory,
 	k konfig.Compiled,
-	logFunc collections.WriterFunc[*Transacted],
-) collections.WriterFunc[*Transacted] {
+	logFunc schnittstellen.FuncIter[*Transacted],
+) schnittstellen.FuncIter[*Transacted] {
 	errors.TodoP2("convert to verzeichnisse")
 
 	switch fv.string {

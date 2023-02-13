@@ -11,7 +11,7 @@ func MakeFuncSetString[
 	E any,
 	EPtr schnittstellen.SetterPtr[E],
 ](
-	c Adder[E],
+	c schnittstellen.Adder[E],
 ) schnittstellen.FuncSetString {
 	return func(v string) (err error) {
 		return AddString[E, EPtr](c, v)
@@ -19,7 +19,7 @@ func MakeFuncSetString[
 }
 
 func AddString[E any, EPtr schnittstellen.SetterPtr[E]](
-	c Adder[E],
+	c schnittstellen.Adder[E],
 	v string,
 ) (err error) {
 	var e E
@@ -38,7 +38,7 @@ func AddString[E any, EPtr schnittstellen.SetterPtr[E]](
 }
 
 func ExpandAndAddString[E any, EPtr schnittstellen.SetterPtr[E]](
-	c Adder[E],
+	c schnittstellen.Adder[E],
 	expander func(string) (string, error),
 	v string,
 ) (err error) {
@@ -61,13 +61,13 @@ func ExpandAndAddString[E any, EPtr schnittstellen.SetterPtr[E]](
 	return
 }
 
-type AddGetKeyer[E Lessor[E]] interface {
-	Adder[E]
+type AddGetKeyer[E schnittstellen.Lessor[E]] interface {
+	schnittstellen.Adder[E]
 	Get(string) (E, bool)
 	Key(E) string
 }
 
-func AddIfGreater[E Lessor[E]](
+func AddIfGreater[E schnittstellen.Lessor[E]](
 	c AddGetKeyer[E],
 	e E,
 ) (ok bool) {
@@ -82,7 +82,7 @@ func AddIfGreater[E Lessor[E]](
 }
 
 func String[E schnittstellen.Value](
-	c EachPtrer[E],
+	c schnittstellen.EachPtrer[E],
 ) string {
 	errors.TodoP1("implement")
 	return ""

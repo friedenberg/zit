@@ -3,7 +3,7 @@ package collections
 import "github.com/friedenberg/zit/src/alfa/schnittstellen"
 
 type ValueSet2[E schnittstellen.Value] struct {
-	SetLike[E]
+	schnittstellen.SetLike[E]
 }
 
 func (v ValueSet2[E]) String() string {

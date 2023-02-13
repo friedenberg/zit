@@ -2,7 +2,6 @@ package objekte
 
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 )
@@ -15,19 +14,19 @@ type TransactedLike interface {
 }
 
 type (
-	FuncReaderTransacted[T TransactedLike] func(collections.WriterFunc[T]) error
-	FuncReaderTransactedLike               func(collections.WriterFunc[TransactedLike]) error
+	FuncReaderTransacted[T TransactedLike] func(schnittstellen.FuncIter[T]) error
+	FuncReaderTransactedLike               func(schnittstellen.FuncIter[TransactedLike]) error
 )
 
 type (
-	FuncQuerierTransacted[T TransactedLike] func(kennung.Set, collections.WriterFunc[T]) error
-	FuncQuerierTransactedLike               func(kennung.Set, collections.WriterFunc[TransactedLike]) error
+	FuncQuerierTransacted[T TransactedLike] func(kennung.Set, schnittstellen.FuncIter[T]) error
+	FuncQuerierTransactedLike               func(kennung.Set, schnittstellen.FuncIter[TransactedLike]) error
 )
 
 func MakeApplyQueryTransactedLike[T TransactedLike](
 	fat FuncQuerierTransacted[T],
 ) FuncQuerierTransactedLike {
-	return func(ids kennung.Set, fatl collections.WriterFunc[TransactedLike]) (err error) {
+	return func(ids kennung.Set, fatl schnittstellen.FuncIter[TransactedLike]) (err error) {
 		return fat(
 			ids,
 			func(e T) (err error) {
@@ -40,7 +39,7 @@ func MakeApplyQueryTransactedLike[T TransactedLike](
 func MakeApplyTransactedLike[T TransactedLike](
 	fat FuncReaderTransacted[T],
 ) FuncReaderTransactedLike {
-	return func(fatl collections.WriterFunc[TransactedLike]) (err error) {
+	return func(fatl schnittstellen.FuncIter[TransactedLike]) (err error) {
 		return fat(
 			func(e T) (err error) {
 				return fatl(e)

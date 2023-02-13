@@ -1,11 +1,12 @@
 package zettel_external
 
 import (
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
 type MutableSet struct {
-	collections.MutableSetLike[*Zettel]
+	schnittstellen.MutableSetLike[*Zettel]
 }
 
 func MakeMutableSet(kf collections.KeyFunc[*Zettel], zs ...*Zettel) MutableSet {

@@ -24,7 +24,7 @@ func MakePool2[T any, TPtr schnittstellen.Resetable[T]]() *pool2[T, TPtr] {
 	}
 }
 
-func (p pool2[T, TPtr]) Apply(f WriterFunc[T], e T) (err error) {
+func (p pool2[T, TPtr]) Apply(f schnittstellen.FuncIter[T], e T) (err error) {
 	err = f(e)
 
 	switch {

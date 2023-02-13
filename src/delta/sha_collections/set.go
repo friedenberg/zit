@@ -6,6 +6,7 @@ import (
 	"sort"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
 )
@@ -32,7 +33,7 @@ func MakeMutableSetStrings(vs ...string) (s MutableSet, err error) {
 	return
 }
 
-func ShaFromSet(s collections.SetLike[sha.Sha]) sha.Sha {
+func ShaFromSet(s schnittstellen.SetLike[sha.Sha]) sha.Sha {
 	hash := sha256.New()
 
 	elements := make([]sha.Sha, 0, s.Len())

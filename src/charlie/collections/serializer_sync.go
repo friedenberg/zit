@@ -4,9 +4,12 @@ import (
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
-func MakeSyncSerializer[T any](wf WriterFunc[T]) WriterFunc[T] {
+func MakeSyncSerializer[T any](
+	wf schnittstellen.FuncIter[T],
+) schnittstellen.FuncIter[T] {
 	l := &sync.Mutex{}
 
 	return func(e T) (err error) {

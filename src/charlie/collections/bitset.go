@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
 const (
@@ -19,8 +20,8 @@ type Bitset interface {
 	Get(int) bool
 	CountOn() int
 	CountOff() int
-	Each(WriterFunc[int]) error
-	EachOff(WriterFunc[int]) error
+	Each(schnittstellen.FuncIter[int]) error
+	EachOff(schnittstellen.FuncIter[int]) error
 
 	Add(int)
 	Del(int)
@@ -123,7 +124,7 @@ func (b bitset) Get(idx int) bool {
 	return b.get(idx)
 }
 
-func (b bitset) EachOff(f WriterFunc[int]) (err error) {
+func (b bitset) EachOff(f schnittstellen.FuncIter[int]) (err error) {
 	errors.TodoP4("measure and improve performance if necessary")
 
 	b.lock.Lock()
@@ -148,7 +149,7 @@ func (b bitset) EachOff(f WriterFunc[int]) (err error) {
 	return
 }
 
-func (b bitset) Each(f WriterFunc[int]) (err error) {
+func (b bitset) Each(f schnittstellen.FuncIter[int]) (err error) {
 	errors.TodoP4("measure and improve performance if necessary")
 
 	b.lock.Lock()

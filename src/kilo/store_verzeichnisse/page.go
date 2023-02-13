@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
@@ -19,7 +20,7 @@ type Page struct {
 	ioFactory
 	pool        *collections.Pool[zettel.Transacted, *zettel.Transacted]
 	added       zettel.HeapTransacted
-	flushFilter collections.WriterFunc[*zettel.Transacted]
+	flushFilter schnittstellen.FuncIter[*zettel.Transacted]
 	State
 }
 
@@ -109,7 +110,7 @@ func (zp *Page) Flush() (err error) {
 }
 
 func (zp *Page) copy(
-	w collections.WriterFunc[*zettel.Transacted],
+	w schnittstellen.FuncIter[*zettel.Transacted],
 ) (n int64, err error) {
 	var r1 io.ReadCloser
 
@@ -171,7 +172,7 @@ func (zp *Page) writeTo(w1 io.Writer) (n int64, err error) {
 }
 
 func (zp *Page) Copy(
-	w collections.WriterFunc[*zettel.Transacted],
+	w schnittstellen.FuncIter[*zettel.Transacted],
 ) (n int64, err error) {
 	acquired := zp.lock.TryLock()
 

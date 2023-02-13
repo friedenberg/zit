@@ -1,8 +1,10 @@
 package collections
 
+import "github.com/friedenberg/zit/src/alfa/schnittstellen"
+
 type MutableSet[T any] struct {
 	setAlias[T]
-	MutableSetLike[T]
+	schnittstellen.MutableSetLike[T]
 }
 
 func MakeMutableSet[T any](kf KeyFunc[T], es ...T) (out MutableSet[T]) {

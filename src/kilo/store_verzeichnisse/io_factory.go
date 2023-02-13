@@ -1,8 +1,8 @@
 package store_verzeichnisse
 
 import (
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
@@ -15,7 +15,7 @@ type writeCloserFactory interface {
 }
 
 type ZettelTransactedWriterGetter interface {
-	ZettelTransactedWriter(int) collections.WriterFunc[*zettel.Transacted]
+	ZettelTransactedWriter(int) schnittstellen.FuncIter[*zettel.Transacted]
 }
 
 type ioFactory interface {

@@ -14,7 +14,7 @@ func MakeSerializedFormatWriter(
 	out io.Writer,
 	arf schnittstellen.AkteReaderFactory,
 	k konfig.Compiled,
-) collections.WriterFunc[*Objekte] {
+) schnittstellen.FuncIter[*Objekte] {
 	errors.TodoP3("rename to MakeSingleplexedFormatWriter")
 
 	wf := func(z *Objekte) (err error) {

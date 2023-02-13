@@ -3,7 +3,7 @@ package sku
 import (
 	"fmt"
 
-	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/delta/format"
 )
 
@@ -22,7 +22,7 @@ func String(o SkuLike) (str string) {
 
 func MakeWriterLineFormat(
 	lf *format.LineWriter,
-) collections.WriterFunc[SkuLike] {
+) schnittstellen.FuncIter[SkuLike] {
 	return func(o SkuLike) (err error) {
 		lf.WriteFormat("%s", String(o))
 

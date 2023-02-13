@@ -2,7 +2,6 @@ package umwelt
 
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
@@ -27,7 +26,7 @@ func wrapWithTimePrefixerIfNecessary[T sku.DataIdentityGetter](
 	}
 }
 
-func (u *Umwelt) PrinterKonfigTransacted() collections.WriterFunc[*erworben.Transacted] {
+func (u *Umwelt) PrinterKonfigTransacted() schnittstellen.FuncIter[*erworben.Transacted] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
 		wrapWithTimePrefixerIfNecessary(
@@ -40,7 +39,7 @@ func (u *Umwelt) PrinterKonfigTransacted() collections.WriterFunc[*erworben.Tran
 	)
 }
 
-func (u *Umwelt) PrinterTypTransacted() collections.WriterFunc[*typ.Transacted] {
+func (u *Umwelt) PrinterTypTransacted() schnittstellen.FuncIter[*typ.Transacted] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
 		wrapWithTimePrefixerIfNecessary(
@@ -50,7 +49,7 @@ func (u *Umwelt) PrinterTypTransacted() collections.WriterFunc[*typ.Transacted] 
 	)
 }
 
-func (u *Umwelt) PrinterEtikettTransacted() collections.WriterFunc[*etikett.Transacted] {
+func (u *Umwelt) PrinterEtikettTransacted() schnittstellen.FuncIter[*etikett.Transacted] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
 		wrapWithTimePrefixerIfNecessary(
@@ -60,7 +59,7 @@ func (u *Umwelt) PrinterEtikettTransacted() collections.WriterFunc[*etikett.Tran
 	)
 }
 
-func (u *Umwelt) PrinterKastenTransacted() collections.WriterFunc[*kasten.Transacted] {
+func (u *Umwelt) PrinterKastenTransacted() schnittstellen.FuncIter[*kasten.Transacted] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
 		wrapWithTimePrefixerIfNecessary(
@@ -70,7 +69,7 @@ func (u *Umwelt) PrinterKastenTransacted() collections.WriterFunc[*kasten.Transa
 	)
 }
 
-func (u *Umwelt) PrinterTypCheckedOut() collections.WriterFunc[*typ.External] {
+func (u *Umwelt) PrinterTypCheckedOut() schnittstellen.FuncIter[*typ.External] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
 		u.FormatTypCheckedOut(),
@@ -86,7 +85,7 @@ func (u *Umwelt) ZettelTransactedLogPrinters() zettel.LogWriter {
 	}
 }
 
-func (u *Umwelt) PrinterZettelTransacted() collections.WriterFunc[*zettel.Transacted] {
+func (u *Umwelt) PrinterZettelTransacted() schnittstellen.FuncIter[*zettel.Transacted] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
 		wrapWithTimePrefixerIfNecessary(
@@ -96,7 +95,7 @@ func (u *Umwelt) PrinterZettelTransacted() collections.WriterFunc[*zettel.Transa
 	)
 }
 
-func (u *Umwelt) PrinterZettelTransactedDelta() collections.WriterFunc[*zettel.Transacted] {
+func (u *Umwelt) PrinterZettelTransactedDelta() schnittstellen.FuncIter[*zettel.Transacted] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
 		wrapWithTimePrefixerIfNecessary(
@@ -106,56 +105,56 @@ func (u *Umwelt) PrinterZettelTransactedDelta() collections.WriterFunc[*zettel.T
 	)
 }
 
-func (u *Umwelt) PrinterZettelExternal() collections.WriterFunc[*zettel_external.Zettel] {
+func (u *Umwelt) PrinterZettelExternal() schnittstellen.FuncIter[*zettel_external.Zettel] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
 		u.FormatZettelExternal(),
 	)
 }
 
-func (u *Umwelt) PrinterZettelCheckedOut() collections.WriterFunc[*zettel_checked_out.Zettel] {
+func (u *Umwelt) PrinterZettelCheckedOut() schnittstellen.FuncIter[*zettel_checked_out.Zettel] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
 		u.FormatZettelCheckedOut(),
 	)
 }
 
-func (u *Umwelt) PrinterZettelCheckedOutFresh() collections.WriterFunc[*zettel_checked_out.Zettel] {
+func (u *Umwelt) PrinterZettelCheckedOutFresh() schnittstellen.FuncIter[*zettel_checked_out.Zettel] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
 		u.FormatZettelCheckedOut(),
 	)
 }
 
-func (u *Umwelt) PrinterFileNotRecognized() collections.WriterFunc[*kennung.FD] {
+func (u *Umwelt) PrinterFileNotRecognized() schnittstellen.FuncIter[*kennung.FD] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
 		u.FormatFileNotRecognized(),
 	)
 }
 
-func (u *Umwelt) PrinterFileRecognized() collections.WriterFunc[*store_fs.FileRecognized] {
+func (u *Umwelt) PrinterFileRecognized() schnittstellen.FuncIter[*store_fs.FileRecognized] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
 		u.FormatFileRecognized(),
 	)
 }
 
-func (u *Umwelt) PrinterPathDeleted() collections.WriterFunc[*store_fs.Dir] {
+func (u *Umwelt) PrinterPathDeleted() schnittstellen.FuncIter[*store_fs.Dir] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
 		u.FormatDirDeleted(),
 	)
 }
 
-func (u *Umwelt) PrinterFDDeleted() collections.WriterFunc[*kennung.FD] {
+func (u *Umwelt) PrinterFDDeleted() schnittstellen.FuncIter[*kennung.FD] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
 		u.FormatFDDeleted(),
 	)
 }
 
-func (u *Umwelt) PrinterHeader() collections.WriterFunc[*string] {
+func (u *Umwelt) PrinterHeader() schnittstellen.FuncIter[*string] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
 		format.MakeWriterFormatStringIndentedHeader(

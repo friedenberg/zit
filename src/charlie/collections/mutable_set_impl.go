@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
 type mutableSet[T any] struct {
@@ -61,7 +62,7 @@ func (es mutableSet[T]) Del(e T) (err error) {
 	return
 }
 
-func (a mutableSet[T]) Reset(b SetLike[T]) {
+func (a mutableSet[T]) Reset(b schnittstellen.SetLike[T]) {
 	a.Each(a.Del)
 
 	if b != nil {

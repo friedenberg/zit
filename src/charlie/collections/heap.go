@@ -11,7 +11,7 @@ import (
 
 type HeapElement[T any] interface {
 	schnittstellen.Equatable[T]
-	Lessor[T]
+	schnittstellen.Lessor[T]
 }
 
 type HeapElementPtr[T any] interface {
@@ -20,7 +20,7 @@ type HeapElementPtr[T any] interface {
 	schnittstellen.Ptr[T]
 }
 
-type heapPrivate[T Lessor[T]] []T
+type heapPrivate[T schnittstellen.Lessor[T]] []T
 
 func (h heapPrivate[T]) Len() int {
 	return len(h)
@@ -198,7 +198,7 @@ func (a Heap[T, T1]) Copy() Heap[T, T1] {
 	}
 }
 
-func (a Heap[T, T1]) EachPtr(f WriterFunc[T1]) (err error) {
+func (a Heap[T, T1]) EachPtr(f schnittstellen.FuncIter[T1]) (err error) {
 	a.l.Lock()
 	defer a.l.Unlock()
 
@@ -217,7 +217,7 @@ func (a Heap[T, T1]) EachPtr(f WriterFunc[T1]) (err error) {
 	return
 }
 
-func (a Heap[T, T1]) Each(f WriterFunc[T]) (err error) {
+func (a Heap[T, T1]) Each(f schnittstellen.FuncIter[T]) (err error) {
 	a.l.Lock()
 	defer a.l.Unlock()
 
@@ -238,7 +238,7 @@ func (a Heap[T, T1]) Each(f WriterFunc[T]) (err error) {
 
 func (a *Heap[T, T1]) MergeStream(
 	read func() (T1, error),
-	write WriterFunc[T1],
+	write schnittstellen.FuncIter[T1],
 ) (err error) {
 	defer func() {
 		a.Restore()

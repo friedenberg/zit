@@ -197,7 +197,7 @@ func (s *store) ReadLast() (max *Objekte, err error) {
 	return
 }
 
-func (s *store) ReadAll(f collections.WriterFunc[*Objekte]) (err error) {
+func (s *store) ReadAll(f schnittstellen.FuncIter[*Objekte]) (err error) {
 	if err = files.ReadDirNamesLevel2(
 		func(p string) (err error) {
 			var o *Objekte

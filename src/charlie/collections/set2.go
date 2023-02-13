@@ -23,7 +23,7 @@ func Set2FromSlice[T any, T1 schnittstellen.Ptr[T]](
 
 func Set2FromSetLike[T any, T1 schnittstellen.Ptr[T]](
 	keyer schnittstellen.KeyPtrer[T, T1],
-	s1 SetLike[T1],
+	s1 schnittstellen.SetLike[T1],
 ) (s Set2[T, T1]) {
 	s.private = setPrivateFromSetLike(keyer, s1)
 
@@ -58,7 +58,7 @@ func (s Set2[T, T1]) Contains(e T1) (ok bool) {
 	return s.ContainsKey(s.private.Key(e))
 }
 
-func (s Set2[T, T1]) EachKey(wf WriterFuncKey) (err error) {
+func (s Set2[T, T1]) EachKey(wf schnittstellen.FuncIterKey) (err error) {
 	for v := range s.private.Elements {
 		if err = wf(v); err != nil {
 			if IsStopIteration(err) {
@@ -74,7 +74,7 @@ func (s Set2[T, T1]) EachKey(wf WriterFuncKey) (err error) {
 	return
 }
 
-func (s Set2[T, T1]) Each(wf WriterFunc[T1]) (err error) {
+func (s Set2[T, T1]) Each(wf schnittstellen.FuncIter[T1]) (err error) {
 	for _, v := range s.private.Elements {
 		if err = wf(v); err != nil {
 			if IsStopIteration(err) {
@@ -90,7 +90,7 @@ func (s Set2[T, T1]) Each(wf WriterFunc[T1]) (err error) {
 	return
 }
 
-func (s Set2[T, T1]) EachPtr(wf WriterFunc[T]) (err error) {
+func (s Set2[T, T1]) EachPtr(wf schnittstellen.FuncIter[T]) (err error) {
 	for _, v := range s.private.Elements {
 		if err = wf(*v); err != nil {
 			if IsStopIteration(err) {

@@ -6,7 +6,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/golf/objekte"
 )
 
@@ -35,7 +34,7 @@ func (f *FormatterValue) Set(v string) (err error) {
 func (f *FormatterValue) FuncFormatter(
 	out io.Writer,
 	af schnittstellen.AkteIOFactory,
-) collections.WriterFunc[*Transacted] {
+) schnittstellen.FuncIter[*Transacted] {
 	switch f.string {
 	case "objekte":
 		f := objekte.MakeFormat[Objekte, *Objekte]()

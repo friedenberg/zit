@@ -1,12 +1,16 @@
 package collections
 
+import "github.com/friedenberg/zit/src/alfa/schnittstellen"
+
 type AsyncSerializer[T any] struct {
 	chError <-chan error
 	chE     chan<- T
 	chDone  <-chan struct{}
 }
 
-func MakeAsyncSerializer[T any](wf WriterFunc[T]) AsyncSerializer[T] {
+func MakeAsyncSerializer[T any](
+	wf schnittstellen.FuncIter[T],
+) AsyncSerializer[T] {
 	chError := make(chan error)
 	chE := make(chan T)
 	chDone := make(chan struct{})

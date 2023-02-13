@@ -4,6 +4,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/id"
 	"github.com/friedenberg/zit/src/charlie/collections"
@@ -17,7 +18,7 @@ type TransaktionStore interface {
 	ReadTransaktion(ts.Time) (*transaktion.Transaktion, error)
 	ReadLastTransaktion() (*transaktion.Transaktion, error)
 	GetTransaktion() *transaktion.Transaktion
-	ReadAllTransaktions(collections.WriterFunc[*transaktion.Transaktion]) error
+	ReadAllTransaktions(schnittstellen.FuncIter[*transaktion.Transaktion]) error
 	WriteTransaktion() error
 }
 
@@ -47,7 +48,7 @@ func (s common) ReadLastTransaktion() (t *transaktion.Transaktion, err error) {
 }
 
 func (s common) ReadAllTransaktions(
-	f collections.WriterFunc[*transaktion.Transaktion],
+	f schnittstellen.FuncIter[*transaktion.Transaktion],
 ) (err error) {
 	if err = files.ReadDirNamesLevel2(
 		func(p string) (err error) {

@@ -168,7 +168,7 @@ func (s kastenStore) Flush() (err error) {
 
 // TODO-P3
 func (s kastenStore) ReadAllSchwanzen(
-	f collections.WriterFunc[*kasten.Transacted],
+	f schnittstellen.FuncIter[*kasten.Transacted],
 ) (err error) {
 	if err = s.StoreUtil.GetKonfig().Kisten.Each(f); err != nil {
 		err = errors.Wrap(err)
@@ -179,7 +179,7 @@ func (s kastenStore) ReadAllSchwanzen(
 }
 
 func (s kastenStore) ReadAll(
-	f collections.WriterFunc[*kasten.Transacted],
+	f schnittstellen.FuncIter[*kasten.Transacted],
 ) (err error) {
 	if s.StoreUtil.GetKonfig().UseBestandsaufnahme {
 		f1 := func(t *bestandsaufnahme.Objekte) (err error) {

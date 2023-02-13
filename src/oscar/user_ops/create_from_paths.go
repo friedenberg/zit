@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/script_value"
@@ -188,7 +189,7 @@ func (c CreateFromPaths) Run(
 // TODO migrate this to use store_working_directory
 func (c CreateFromPaths) zettelsFromPath(
 	p string,
-	wf collections.WriterFunc[*zettel_external.Zettel],
+	wf schnittstellen.FuncIter[*zettel_external.Zettel],
 ) (err error) {
 	var r io.Reader
 

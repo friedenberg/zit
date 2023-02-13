@@ -2,25 +2,26 @@ package collections
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
-func MakeWriterDoNotRepool[T any]() WriterFunc[*T] {
+func MakeWriterDoNotRepool[T any]() schnittstellen.FuncIter[*T] {
 	return func(e *T) (err error) {
 		err = ErrDoNotRepool
 		return
 	}
 }
 
-func MakeWriterNoop[T any]() WriterFunc[T] {
+func MakeWriterNoop[T any]() schnittstellen.FuncIter[T] {
 	return func(e T) (err error) {
 		return
 	}
 }
 
 func MakeTryFinally[T any](
-	try WriterFunc[T],
-	finally WriterFunc[T],
-) WriterFunc[T] {
+	try schnittstellen.FuncIter[T],
+	finally schnittstellen.FuncIter[T],
+) schnittstellen.FuncIter[T] {
 	return func(e T) (err error) {
 		defer func() {
 			err1 := finally(e)

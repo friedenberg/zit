@@ -2,6 +2,7 @@ package store_fs
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/id"
@@ -16,7 +17,7 @@ import (
 func (s *Store) CheckoutQuery(
 	options CheckoutOptions,
 	ms kennung.MetaSet,
-	f collections.WriterFunc[objekte.CheckedOutLike],
+	f schnittstellen.FuncIter[objekte.CheckedOutLike],
 ) (err error) {
 	if err = s.storeObjekten.Query(
 		ms,
@@ -40,7 +41,7 @@ func (s *Store) CheckoutQuery(
 
 func (s *Store) Checkout(
 	options CheckoutOptions,
-	ztw collections.WriterFunc[*zettel.Transacted],
+	ztw schnittstellen.FuncIter[*zettel.Transacted],
 ) (zcs zettel_checked_out.MutableSet, err error) {
 	zcs = zettel_checked_out.MakeMutableSetUnique(0)
 	zts := zettel.MakeMutableSetUnique(0)

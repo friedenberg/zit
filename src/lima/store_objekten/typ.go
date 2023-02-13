@@ -169,7 +169,7 @@ func (s typStore) Flush() (err error) {
 
 // TODO-P3
 func (s typStore) ReadAllSchwanzen(
-	f collections.WriterFunc[*typ.Transacted],
+	f schnittstellen.FuncIter[*typ.Transacted],
 ) (err error) {
 	if err = s.StoreUtil.GetKonfig().Typen.Each(f); err != nil {
 		err = errors.Wrap(err)
@@ -180,7 +180,7 @@ func (s typStore) ReadAllSchwanzen(
 }
 
 func (s typStore) ReadAll(
-	f collections.WriterFunc[*typ.Transacted],
+	f schnittstellen.FuncIter[*typ.Transacted],
 ) (err error) {
 	if s.StoreUtil.GetKonfig().UseBestandsaufnahme {
 		f1 := func(t *bestandsaufnahme.Objekte) (err error) {

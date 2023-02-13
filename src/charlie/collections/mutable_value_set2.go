@@ -18,7 +18,7 @@ type MutableValueSet2[
 	E schnittstellen.Value,
 	EPtr schnittstellen.ValuePtr[E],
 ] struct {
-	MutableSetLike[E]
+	schnittstellen.MutableSetLike[E]
 	SetterPolicy
 }
 

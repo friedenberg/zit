@@ -218,7 +218,7 @@ func (s *zettelStore) writeNamedZettelToIndex(
 
 func (s zettelStore) MethodForSigil(
 	sigil kennung.Sigil,
-) func(collections.WriterFunc[*zettel.Transacted]) error {
+) func(schnittstellen.FuncIter[*zettel.Transacted]) error {
 	if sigil.IncludesHistory() {
 		return s.ReadAll
 	} else {
@@ -228,7 +228,7 @@ func (s zettelStore) MethodForSigil(
 
 func (s zettelStore) Query(
 	ids kennung.Set,
-	f collections.WriterFunc[*zettel.Transacted],
+	f schnittstellen.FuncIter[*zettel.Transacted],
 ) (err error) {
 	return s.MethodForSigil(ids.Sigil)(
 		collections.MakeChain(
@@ -261,7 +261,7 @@ func (s zettelStore) ReadOne(
 }
 
 func (i *zettelStore) ReadAllSchwanzen(
-	w collections.WriterFunc[*zettel.Transacted],
+	w schnittstellen.FuncIter[*zettel.Transacted],
 ) (err error) {
 	return i.verzeichnisseSchwanzen.ReadMany(
 		func(z *zettel.Transacted) (err error) {
@@ -272,7 +272,7 @@ func (i *zettelStore) ReadAllSchwanzen(
 }
 
 func (i *zettelStore) ReadAll(
-	w collections.WriterFunc[*zettel.Transacted],
+	w schnittstellen.FuncIter[*zettel.Transacted],
 ) (err error) {
 	return i.verzeichnisseAll.ReadMany(w)
 }

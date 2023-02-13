@@ -6,7 +6,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/collections_coding"
 	"github.com/friedenberg/zit/src/golf/objekte"
 )
@@ -36,8 +35,8 @@ func (f *FormatterValue) Set(v string) (err error) {
 func (f *FormatterValue) FuncFormatter(
 	out io.Writer,
 	af schnittstellen.AkteIOFactory,
-	logFunc collections.WriterFunc[*Transacted],
-) collections.WriterFunc[*Transacted] {
+	logFunc schnittstellen.FuncIter[*Transacted],
+) schnittstellen.FuncIter[*Transacted] {
 	switch f.string {
 	case "log":
 		return logFunc

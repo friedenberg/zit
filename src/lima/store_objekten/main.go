@@ -302,7 +302,7 @@ func (s Store) Flush() (err error) {
 
 func (s *Store) Query(
 	ms kennung.MetaSet,
-	f collections.WriterFunc[objekte.TransactedLike],
+	f schnittstellen.FuncIter[objekte.TransactedLike],
 ) (err error) {
 	if err = ms.All(
 		func(g gattung.Gattung, ids kennung.Set) (err error) {
@@ -329,7 +329,7 @@ func (s *Store) Query(
 
 func (s *Store) ReadAllSchwanzen(
 	gs gattungen.Set,
-	f collections.WriterFunc[objekte.TransactedLike],
+	f schnittstellen.FuncIter[objekte.TransactedLike],
 ) (err error) {
 	chErr := make(chan error, gs.Len())
 
@@ -358,7 +358,7 @@ func (s *Store) ReadAllSchwanzen(
 
 func (s *Store) ReadAll(
 	gs gattungen.Set,
-	f collections.WriterFunc[objekte.TransactedLike],
+	f schnittstellen.FuncIter[objekte.TransactedLike],
 ) (err error) {
 	chErr := make(chan error, gs.Len())
 

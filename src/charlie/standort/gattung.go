@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/id"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
 // TODO-P4 switch to gattung-matched directories
@@ -111,7 +110,7 @@ func (s Standort) DirObjektenAkten() string {
 
 func (s Standort) ReadAllLevel2Files(
 	p string,
-	w collections.WriterFunc[string],
+	w schnittstellen.FuncIter[string],
 ) (err error) {
 	if err = files.ReadDirNamesLevel2(
 		files.MakeDirNameWriterIgnoringHidden(w),
@@ -126,7 +125,7 @@ func (s Standort) ReadAllLevel2Files(
 
 func (s Standort) ReadAllShas(
 	p string,
-	w collections.WriterFunc[sha.Sha],
+	w schnittstellen.FuncIter[sha.Sha],
 ) (err error) {
 	wf := func(p string) (err error) {
 		var sh sha.Sha
@@ -154,7 +153,7 @@ func (s Standort) ReadAllShas(
 
 func (s Standort) ReadAllShasForGattung(
 	g schnittstellen.GattungGetter,
-	w collections.WriterFunc[sha.Sha],
+	w schnittstellen.FuncIter[sha.Sha],
 ) (err error) {
 	var p string
 

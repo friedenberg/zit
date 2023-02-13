@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/id"
 	"github.com/friedenberg/zit/src/charlie/collections"
@@ -32,7 +33,7 @@ type Store struct {
 
 	storeObjekten *store_objekten.Store
 
-	zettelExternalLogPrinter collections.WriterFunc[*zettel_external.Zettel]
+	zettelExternalLogPrinter schnittstellen.FuncIter[*zettel_external.Zettel]
 
 	entries      map[string]Entry
 	indexWasRead bool
@@ -61,7 +62,7 @@ func New(
 }
 
 func (s *Store) SetZettelExternalLogPrinter(
-	zelw collections.WriterFunc[*zettel_external.Zettel],
+	zelw schnittstellen.FuncIter[*zettel_external.Zettel],
 ) {
 	s.zettelExternalLogPrinter = zelw
 }
@@ -299,7 +300,7 @@ func (s *Store) ReadOne(h kennung.Hinweis) (zt *zettel.Transacted, err error) {
 }
 
 func (s *Store) ReadMany(
-	w1 collections.WriterFunc[*zettel.Transacted],
+	w1 schnittstellen.FuncIter[*zettel.Transacted],
 ) (err error) {
 	w := w1
 
@@ -341,16 +342,16 @@ func (s *Store) ReadMany(
 }
 
 func (s *Store) ReadManyHistory(
-	w collections.WriterFunc[*zettel.Transacted],
+	w schnittstellen.FuncIter[*zettel.Transacted],
 ) (err error) {
-	queries := []func(collections.WriterFunc[*zettel.Transacted]) error{
+	queries := []func(schnittstellen.FuncIter[*zettel.Transacted]) error{
 		s.storeObjekten.Zettel().ReadAll,
 	}
 
 	if s.erworben.IncludeCwd {
 		queries = append(
 			queries,
-			func(w collections.WriterFunc[*zettel.Transacted]) (err error) {
+			func(w schnittstellen.FuncIter[*zettel.Transacted]) (err error) {
 				var pz cwd.CwdFiles
 
 				if pz, err = cwd.MakeCwdFilesAll(s.erworben, s.Standort.Cwd()); err != nil {

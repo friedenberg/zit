@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/india/konfig"
 	"github.com/friedenberg/zit/src/juliett/zettel"
@@ -129,7 +130,7 @@ func (i *Zettelen) GetPageIndexKeyValue(
 }
 
 func (i *Zettelen) ReadMany(
-	ws ...collections.WriterFunc[*zettel.Transacted],
+	ws ...schnittstellen.FuncIter[*zettel.Transacted],
 ) (err error) {
 	errors.TodoP3("switch to single writer and force callers to make chains")
 

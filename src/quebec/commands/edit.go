@@ -62,15 +62,86 @@ func (c Edit) runWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
 		CheckoutMode: c.CheckoutMode,
 	}
 
+	akten := kennung.MakeMutableFDSet()
+	objekten := kennung.MakeMutableFDSet()
+
 	if err = u.StoreWorkingDirectory().CheckoutQuery(
 		checkoutOptions,
 		ms,
 		func(co objekte.CheckedOutLike) (err error) {
+			e := co.GetExternal()
+
+			akten.Add(e.GetAkteFD())
+			objekten.Add(e.GetObjekteFD())
+
 			return
 		},
 	); err != nil {
 		return
 	}
+
+	if err = (user_ops.OpenFiles{}).Run(u, akten.Strings()...); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	openVimOp := user_ops.OpenVim{
+		Options: vim_cli_options_builder.New().
+			WithCursorLocation(2, 3).
+			WithInsertMode().
+			Build(),
+	}
+
+	if _, err = openVimOp.Run(u, objekten.Strings()...); err != nil {
+		if errors.Is(err, files.ErrEmptyFileList) {
+			err = errors.Normalf("nothing to open in vim")
+		} else {
+			err = errors.Wrap(err)
+		}
+
+		return
+	}
+
+	if err = u.Reset(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	// readOp := user_ops.ReadCheckedOut{
+	// 	Umwelt:              u,
+	// 	OptionsReadExternal: store_fs.OptionsReadExternal{},
+	// }
+
+	files := objekten.Strings()
+	files = append(files, akten.Strings()...)
+
+	// var possible cwd.CwdFiles
+
+	if _, err = cwd.MakeCwdFilesExactly(
+		u.Konfig(),
+		u.Standort().Cwd(),
+		files...,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	// if err = readOp.RunMany(possible, readResults.Add); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
+
+	// zettels := readResults.ToSliceZettelsExternal()
+
+	// checkinOp := user_ops.Checkin{
+	// 	Umwelt:              u,
+	// 	OptionsReadExternal: store_fs.OptionsReadExternal{},
+	// }
+
+	// if _, err = checkinOp.Run(zettels...); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
 
 	return
 }

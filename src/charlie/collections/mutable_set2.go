@@ -23,7 +23,7 @@ func MutableSet2FromSlice[T any, T1 schnittstellen.Ptr[T]](
 
 func MutableSet2FromSetLike[T any, T1 schnittstellen.Ptr[T]](
 	keyer schnittstellen.KeyPtrer[T, T1],
-	s1 SetLike[T1],
+	s1 schnittstellen.SetLike[T1],
 ) (s MutableSet2[T, T1]) {
 	s.private = setPrivateFromSetLike(keyer, s1)
 
@@ -53,7 +53,7 @@ func (s MutableSet2[T, T1]) Contains(e T1) (ok bool) {
 	return s.ContainsKey(s.private.Key(e))
 }
 
-func (s MutableSet2[T, T1]) EachKey(wf WriterFuncKey) (err error) {
+func (s MutableSet2[T, T1]) EachKey(wf schnittstellen.FuncIterKey) (err error) {
 	for v := range s.private.Elements {
 		if err = wf(v); err != nil {
 			if IsStopIteration(err) {
@@ -69,7 +69,7 @@ func (s MutableSet2[T, T1]) EachKey(wf WriterFuncKey) (err error) {
 	return
 }
 
-func (s MutableSet2[T, T1]) Each(wf WriterFunc[T1]) (err error) {
+func (s MutableSet2[T, T1]) Each(wf schnittstellen.FuncIter[T1]) (err error) {
 	for _, v := range s.private.Elements {
 		if err = wf(v); err != nil {
 			if IsStopIteration(err) {

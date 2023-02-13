@@ -4,13 +4,14 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/india/konfig"
 )
 
 func MakeWriterKonfig(
 	k konfig.Compiled,
-) collections.WriterFunc[*Transacted] {
+) schnittstellen.FuncIter[*Transacted] {
 	errors.TodoP0("switch to sigils")
 	errors.TodoP3("add efficient parsing of hiding tags")
 

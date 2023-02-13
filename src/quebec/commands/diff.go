@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/gattungen"
@@ -149,7 +150,7 @@ func (c Diff) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 func (c Diff) showZettels(
 	u *umwelt.Umwelt,
 	ids kennung.Set,
-	fv collections.WriterFunc[*zettel.Transacted],
+	fv schnittstellen.FuncIter[*zettel.Transacted],
 ) (err error) {
 	idFilter := zettel.WriterIds{
 		Filter: kennung.Filter{
@@ -283,7 +284,7 @@ func (c Diff) showTransaktions(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 func (c Diff) showTypen(
 	u *umwelt.Umwelt,
 	ids kennung.Set,
-	f collections.WriterFunc[*typ.Transacted],
+	f schnittstellen.FuncIter[*typ.Transacted],
 ) (err error) {
 	f1 := collections.MakeSyncSerializer(f)
 
@@ -322,7 +323,7 @@ func (c Diff) showTypen(
 func (c Diff) showEtiketten(
 	u *umwelt.Umwelt,
 	ids kennung.Set,
-	f collections.WriterFunc[*etikett.Transacted],
+	f schnittstellen.FuncIter[*etikett.Transacted],
 ) (err error) {
 	f1 := collections.MakeSyncSerializer(f)
 
@@ -354,7 +355,7 @@ func (c Diff) showEtiketten(
 
 func (c Diff) showKonfig(
 	u *umwelt.Umwelt,
-	f collections.WriterFunc[*erworben.Transacted],
+	f schnittstellen.FuncIter[*erworben.Transacted],
 ) (err error) {
 	f1 := collections.MakeSyncSerializer(f)
 

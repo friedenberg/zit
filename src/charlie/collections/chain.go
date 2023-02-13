@@ -4,9 +4,10 @@ import (
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
-func MakeChain[T any](wfs ...WriterFunc[T]) WriterFunc[T] {
+func MakeChain[T any](wfs ...schnittstellen.FuncIter[T]) schnittstellen.FuncIter[T] {
 	return func(e T) (err error) {
 		for _, w := range wfs {
 			err = w(e)
@@ -30,15 +31,15 @@ func MakeChain[T any](wfs ...WriterFunc[T]) WriterFunc[T] {
 }
 
 func Multiplex[T any](
-	e WriterFunc[T],
-	producers ...func(WriterFunc[T]) error,
+	e schnittstellen.FuncIter[T],
+	producers ...func(schnittstellen.FuncIter[T]) error,
 ) (err error) {
 	ch := make(chan error, len(producers))
 	wg := &sync.WaitGroup{}
 	wg.Add(len(producers))
 
 	for _, p := range producers {
-		go func(p func(WriterFunc[T]) error, ch chan<- error) {
+		go func(p func(schnittstellen.FuncIter[T]) error, ch chan<- error) {
 			var err error
 
 			defer func() {
