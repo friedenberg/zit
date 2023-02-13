@@ -36,3 +36,11 @@ type Keyer[T any] interface {
 type KeyPtrer[T any, T1 Ptr[T]] interface {
 	Key(T1) string
 }
+
+type ImmutableCloner[T any] interface {
+	ImmutableClone() T
+}
+
+type MutableCloner[T any] interface {
+	MutableClone() T
+}

@@ -143,3 +143,19 @@ func (s set[T]) EachPtr(wf schnittstellen.FuncIter[*T]) (err error) {
 
 	return
 }
+
+func (a set[T]) ImmutableClone() schnittstellen.Set[T] {
+	c := makeSet(a.Key)
+	c.open()
+	defer c.close()
+
+	a.Each(c.add)
+
+	return c
+}
+
+func (a set[T]) MutableClone() schnittstellen.MutableSet[T] {
+	c := makeMutableSet(a.Key)
+	a.Each(c.Add)
+	return c
+}

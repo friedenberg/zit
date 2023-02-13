@@ -69,3 +69,11 @@ func (a mutableSet[T]) Reset(b schnittstellen.Set[T]) {
 		b.Each(a.Add)
 	}
 }
+
+func (a mutableSet[T]) ImmutableClone() schnittstellen.Set[T] {
+	return a.set.ImmutableClone()
+}
+
+func (a mutableSet[T]) MutableClone() schnittstellen.MutableSet[T] {
+	return a.set.MutableClone()
+}

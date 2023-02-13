@@ -17,6 +17,8 @@ type Set[T any] interface {
 	Each(FuncIter[T]) error
 	EachPtr(FuncIter[*T]) error
 	EachKey(FuncIterKey) error
+	ImmutableCloner[Set[T]]
+	MutableCloner[MutableSet[T]]
 }
 
 type MutableSet[T any] interface {
