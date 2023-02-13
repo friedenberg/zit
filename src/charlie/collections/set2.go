@@ -23,7 +23,7 @@ func Set2FromSlice[T any, T1 schnittstellen.Ptr[T]](
 
 func Set2FromSetLike[T any, T1 schnittstellen.Ptr[T]](
 	keyer schnittstellen.KeyPtrer[T, T1],
-	s1 schnittstellen.SetLike[T1],
+	s1 schnittstellen.Set[T1],
 ) (s Set2[T, T1]) {
 	s.private = setPrivateFromSetLike(keyer, s1)
 

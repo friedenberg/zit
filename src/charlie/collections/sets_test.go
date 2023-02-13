@@ -142,7 +142,7 @@ func TestSet(t1 *testing.T) {
 			vals...,
 		)
 
-		assertSet(t, Set[StringValue]{SetLike: sut}, vals)
+		assertSet(t, Set[StringValue]{Set: sut}, vals)
 	}
 
 	{
@@ -156,7 +156,7 @@ func TestSet(t1 *testing.T) {
 			vals...,
 		)
 
-		assertSet(t, Set[StringValue]{SetLike: sut}, vals)
+		assertSet(t, Set[StringValue]{Set: sut}, vals)
 	}
 
 	{
@@ -170,6 +170,6 @@ func TestSet(t1 *testing.T) {
 			vals...,
 		)
 
-		assertSet(t, Set[StringValue]{SetLike: sut}, vals)
+		assertSet(t, Set[StringValue]{Set: sut}, vals)
 	}
 }

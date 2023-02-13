@@ -122,7 +122,7 @@ func (es MutableValueSet[T, T1]) SortedString() (out []string) {
 }
 
 func (s MutableValueSet[T, T1]) String() string {
-	if s.SetLike == nil || s.Len() == 0 {
+	if s.Len() == 0 {
 		return ""
 	}
 

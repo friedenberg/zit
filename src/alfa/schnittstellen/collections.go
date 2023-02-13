@@ -8,7 +8,7 @@ type (
 	FuncIterWithKey[T any] func(string, T) error
 )
 
-type SetLike[T any] interface {
+type Set[T any] interface {
 	Len() int
 	Key(T) string
 	Get(string) (T, bool)
@@ -20,11 +20,11 @@ type SetLike[T any] interface {
 }
 
 type MutableSetLike[T any] interface {
-	SetLike[T]
+	Set[T]
 	Add(T) error
 	Del(T) error
 	DelKey(string) error
-	Reset(SetLike[T])
+	Reset(Set[T])
 }
 
 type Pool[T any, TPtr Ptr[T]] interface {
@@ -61,7 +61,7 @@ type StringAdder interface {
 
 type ValueSetLike[T flag.Value] interface {
 	Strings() []string
-	SetLike[T]
+	Set[T]
 }
 
 type MutableValueSetLike[T flag.Value] interface {

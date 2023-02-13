@@ -180,7 +180,7 @@ func (es ValueSet[T, T1]) Description() string {
 }
 
 func (s ValueSet[T, T1]) String() string {
-	if s.SetLike == nil || s.Len() == 0 {
+	if s.Len() == 0 {
 		return ""
 	}
 

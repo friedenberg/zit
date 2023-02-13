@@ -62,7 +62,7 @@ func (es mutableSet[T]) Del(e T) (err error) {
 	return
 }
 
-func (a mutableSet[T]) Reset(b schnittstellen.SetLike[T]) {
+func (a mutableSet[T]) Reset(b schnittstellen.Set[T]) {
 	a.Each(a.Del)
 
 	if b != nil {

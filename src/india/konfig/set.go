@@ -26,7 +26,7 @@ type set[
 type kastenSet = set[kasten.Transacted, *kasten.Transacted]
 
 func makeCompiledKastenSet(
-	s1 schnittstellen.SetLike[*kasten.Transacted],
+	s1 schnittstellen.Set[*kasten.Transacted],
 ) (s kastenSet) {
 	s.Set2 = collections.Set2FromSetLike[kasten.Transacted, *kasten.Transacted](s, s1)
 
@@ -54,7 +54,7 @@ func makeCompiledEtikettSetFromSlice(s1 []*etikett.Transacted) (s etikettSet) {
 }
 
 func makeCompiledEtikettSet(
-	s1 schnittstellen.SetLike[*etikett.Transacted],
+	s1 schnittstellen.Set[*etikett.Transacted],
 ) (s etikettSet) {
 	s.Set2 = collections.Set2FromSetLike[etikett.Transacted, *etikett.Transacted](s, s1)
 
@@ -69,7 +69,7 @@ func makeCompiledTypSetFromSlice(s1 []*typ.Transacted) (s typSet) {
 	return
 }
 
-func makeCompiledTypSet(s1 schnittstellen.SetLike[*typ.Transacted]) (s typSet) {
+func makeCompiledTypSet(s1 schnittstellen.Set[*typ.Transacted]) (s typSet) {
 	s.Set2 = collections.Set2FromSetLike[typ.Transacted, *typ.Transacted](s, s1)
 
 	return

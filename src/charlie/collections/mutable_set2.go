@@ -23,7 +23,7 @@ func MutableSet2FromSlice[T any, T1 schnittstellen.Ptr[T]](
 
 func MutableSet2FromSetLike[T any, T1 schnittstellen.Ptr[T]](
 	keyer schnittstellen.KeyPtrer[T, T1],
-	s1 schnittstellen.SetLike[T1],
+	s1 schnittstellen.Set[T1],
 ) (s MutableSet2[T, T1]) {
 	s.private = setPrivateFromSetLike(keyer, s1)
 

@@ -9,7 +9,7 @@ type MutableSet[T any] struct {
 
 func MakeMutableSet[T any](kf KeyFunc[T], es ...T) (out MutableSet[T]) {
 	out.MutableSetLike = makeMutableSet(kf, es...)
-	out.setAlias = setAlias[T]{Set: Set[T]{SetLike: out.MutableSetLike}}
+	out.setAlias = setAlias[T]{Set: Set[T]{Set: out.MutableSetLike}}
 
 	return
 }

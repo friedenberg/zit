@@ -11,7 +11,7 @@ type setPrivate[T any, T1 schnittstellen.Ptr[T]] struct {
 
 func setPrivateFromSetLike[T any, T1 schnittstellen.Ptr[T]](
 	keyer schnittstellen.KeyPtrer[T, T1],
-	s1 schnittstellen.SetLike[T1],
+	s1 schnittstellen.Set[T1],
 ) (s setPrivate[T, T1]) {
 	l := 0
 

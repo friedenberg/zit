@@ -33,7 +33,7 @@ func MakeMutableSetStrings(vs ...string) (s MutableSet, err error) {
 	return
 }
 
-func ShaFromSet(s schnittstellen.SetLike[sha.Sha]) sha.Sha {
+func ShaFromSet(s schnittstellen.Set[sha.Sha]) sha.Sha {
 	hash := sha256.New()
 
 	elements := make([]sha.Sha, 0, s.Len())

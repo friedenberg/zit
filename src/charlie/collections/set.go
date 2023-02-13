@@ -6,11 +6,11 @@ import (
 )
 
 type Set[T any] struct {
-	schnittstellen.SetLike[T]
+	schnittstellen.Set[T]
 }
 
 func MakeSet[T any](kf KeyFunc[T], es ...T) (out Set[T]) {
-	out.SetLike = makeSet(kf, es...)
+	out.Set = makeSet(kf, es...)
 
 	return
 }
@@ -22,7 +22,7 @@ func (s1 Set[T]) Copy() (out Set[T]) {
 
 	s1.Each(s2.add)
 
-	out.SetLike = s2
+	out.Set = s2
 
 	return
 }
@@ -79,17 +79,17 @@ func (s1 Set[T]) Subtract(s2 Set[T]) (out Set[T]) {
 		s3.add,
 	)
 
-	out.SetLike = s3
+	out.Set = s3
 
 	return
 }
 
 func (s1 Set[T]) Intersection(
-	s2 schnittstellen.SetLike[T],
+	s2 schnittstellen.Set[T],
 ) (s3 schnittstellen.MutableSetLike[T]) {
 	s3 = MakeMutableSet[T](s1.Key)
 	s22 := Set[T]{
-		SetLike: s2,
+		Set: s2,
 	}
 
 	s1.Chain(
@@ -154,12 +154,12 @@ func (s Set[T]) All(f schnittstellen.FuncIter[T]) (ok bool) {
 	return err == nil
 }
 
-func (a Set[T]) Equals(b schnittstellen.SetLike[T]) (ok bool) {
+func (a Set[T]) Equals(b schnittstellen.Set[T]) (ok bool) {
 	if a.Len() != b.Len() {
 		return
 	}
 
-	ok = a.All(Set[T]{SetLike: b}.WriterContainer(ErrNotFound{}))
+	ok = a.All(Set[T]{Set: b}.WriterContainer(ErrNotFound{}))
 
 	return
 }
