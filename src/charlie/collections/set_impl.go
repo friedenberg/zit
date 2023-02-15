@@ -1,6 +1,8 @@
 package collections
 
 import (
+	"bytes"
+	"encoding/gob"
 	"fmt"
 	"reflect"
 
@@ -8,17 +10,13 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
-type set[T any] struct {
-	keyFunc func(T) string
-	closed  bool
-	inner   map[string]T
+type set[T schnittstellen.ValueLike] struct {
+	keyFunc    func(T) string
+	closed     bool
+	elementMap map[string]T
 }
 
-type setAlias[T any] struct {
-	Set[T]
-}
-
-func makeSet[T any](kf KeyFunc[T], es ...T) (s set[T]) {
+func makeSet[T schnittstellen.ValueLike](kf KeyFunc[T], es ...T) (s *set[T]) {
 	t := *new(T)
 	// Required because interface types do not properly get handled by
 	// `reflect.TypeOf`
@@ -35,8 +33,11 @@ func makeSet[T any](kf KeyFunc[T], es ...T) (s set[T]) {
 		}
 	}
 
-	s.keyFunc = kf
-	s.inner = make(map[string]T, len(es))
+	s = &set[T]{
+		keyFunc:    kf,
+		elementMap: make(map[string]T, len(es)),
+	}
+
 	s.open()
 	defer s.close()
 
@@ -44,7 +45,7 @@ func makeSet[T any](kf KeyFunc[T], es ...T) (s set[T]) {
 		s.add(e)
 	}
 
-	return
+	return s
 }
 
 func (s *set[T]) open() {
@@ -56,19 +57,51 @@ func (s *set[T]) close() {
 }
 
 func (s set[T]) Len() int {
-	if s.inner == nil {
+	if s.elementMap == nil {
 		return 0
 	}
 
-	return len(s.inner)
+	return len(s.elementMap)
+}
+
+func (a set[T]) Equals(b schnittstellen.Set[T]) bool {
+	if b == nil {
+		return false
+	}
+
+	if a.Len() != b.Len() {
+		return false
+	}
+
+	for k, va := range a.elementMap {
+		vb, ok := b.Get(k)
+
+		if !ok || !va.EqualsAny(vb) {
+			return false
+		}
+	}
+
+	return true
 }
 
 func (s set[T]) Key(e T) string {
-	return s.keyFunc(e)
+	if s.keyFunc == nil {
+		return e.String()
+	} else {
+		return s.keyFunc(e)
+	}
 }
 
 func (s set[T]) Get(k string) (e T, ok bool) {
-	e, ok = s.inner[k]
+	e, ok = s.elementMap[k]
+	return
+}
+
+func (s set[T]) Any() (e T) {
+	for _, e1 := range s.elementMap {
+		return e1
+	}
+
 	return
 }
 
@@ -77,7 +110,7 @@ func (s set[T]) ContainsKey(k string) (ok bool) {
 		return
 	}
 
-	_, ok = s.inner[k]
+	_, ok = s.elementMap[k]
 
 	return
 }
@@ -91,13 +124,13 @@ func (es set[T]) add(e T) (err error) {
 		panic(fmt.Sprintf("trying to add %T to closed set", e))
 	}
 
-	es.inner[es.Key(e)] = e
+	es.elementMap[es.Key(e)] = e
 
 	return
 }
 
 func (s set[T]) EachKey(wf schnittstellen.FuncIterKey) (err error) {
-	for v := range s.inner {
+	for v := range s.elementMap {
 		if err = wf(v); err != nil {
 			if errors.Is(err, MakeErrStopIteration()) {
 				err = nil
@@ -112,8 +145,18 @@ func (s set[T]) EachKey(wf schnittstellen.FuncIterKey) (err error) {
 	return
 }
 
+func (s set[T]) Elements() (out []T) {
+	out = make([]T, 0, s.Len())
+
+	for _, v := range s.elementMap {
+		out = append(out, v)
+	}
+
+	return
+}
+
 func (s set[T]) Each(wf schnittstellen.FuncIter[T]) (err error) {
-	for _, v := range s.inner {
+	for _, v := range s.elementMap {
 		if err = wf(v); err != nil {
 			if errors.Is(err, MakeErrStopIteration()) {
 				err = nil
@@ -129,7 +172,7 @@ func (s set[T]) Each(wf schnittstellen.FuncIter[T]) (err error) {
 }
 
 func (s set[T]) EachPtr(wf schnittstellen.FuncIter[*T]) (err error) {
-	for _, v := range s.inner {
+	for _, v := range s.elementMap {
 		if err = wf(&v); err != nil {
 			if errors.Is(err, MakeErrStopIteration()) {
 				err = nil
@@ -155,7 +198,33 @@ func (a set[T]) ImmutableClone() schnittstellen.Set[T] {
 }
 
 func (a set[T]) MutableClone() schnittstellen.MutableSet[T] {
-	c := makeMutableSet(a.Key)
+	c := MakeMutableSet(a.Key)
 	a.Each(c.Add)
 	return c
+}
+
+func (s set[T]) MarshalBinary() (bs []byte, err error) {
+	b := bytes.NewBuffer(bs)
+	enc := gob.NewEncoder(b)
+
+	if err = enc.Encode(s.elementMap); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	bs = b.Bytes()
+
+	return
+}
+
+func (s *set[T]) UnmarshalBinary(bs []byte) (err error) {
+	b := bytes.NewBuffer(bs)
+	dec := gob.NewDecoder(b)
+
+	if err = dec.Decode(&s.elementMap); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }

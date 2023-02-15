@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/friedenberg/zit/src/bravo/test_logz"
+	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 )
@@ -37,14 +38,14 @@ func TestMakeEtiketten(t1 *testing.T) {
 		}
 	}
 
-	sut2 := sut.Copy()
+	sut2 := sut.ImmutableClone()
 
 	if sut2.Len() != 3 {
 		t.Fatalf("expected len 3 but got %d", sut2.Len())
 	}
 
 	{
-		ac := sut.SortedString()
+		ac := collections.SortedStrings(sut)
 
 		if !reflect.DeepEqual(ac, vs) {
 			t.Fatalf("expected %q but got %q", vs, ac)
@@ -53,7 +54,7 @@ func TestMakeEtiketten(t1 *testing.T) {
 
 	{
 		ex := "tag1, tag2, tag3"
-		ac := sut.String()
+		ac := collections.StringCommaSeparated(sut)
 
 		if ac != ex {
 			t.Fatalf("expected %q but got %q", ex, ac)
@@ -62,7 +63,7 @@ func TestMakeEtiketten(t1 *testing.T) {
 
 	{
 		ex := "tag1, tag2, tag3"
-		ac := sut.Copy().String()
+		ac := collections.StringCommaSeparated(sut.ImmutableClone())
 
 		if ac != ex {
 			t.Fatalf("expected %q but got %q", ex, ac)
@@ -79,7 +80,7 @@ func TestEqualitySelf(t1 *testing.T) {
 			"tag1",
 			"tag2",
 			"tag3",
-		).Copy(),
+		).ImmutableClone(),
 		Typ: makeAkteExt(t, "text/plain"),
 	}
 
@@ -97,7 +98,7 @@ func TestEqualityNotSelf(t1 *testing.T) {
 			"tag1",
 			"tag2",
 			"tag3",
-		).Copy(),
+		).ImmutableClone(),
 		Typ: makeAkteExt(t, "text/plain"),
 	}
 
@@ -107,7 +108,7 @@ func TestEqualityNotSelf(t1 *testing.T) {
 			"tag1",
 			"tag2",
 			"tag3",
-		).Copy(),
+		).ImmutableClone(),
 		Typ: makeAkteExt(t, "text/plain"),
 	}
 

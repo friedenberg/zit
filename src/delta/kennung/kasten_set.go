@@ -1,19 +1,29 @@
 package kennung
 
-import "github.com/friedenberg/zit/src/charlie/collections"
+import (
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/charlie/collections"
+)
 
-type KastenSet = collections.ValueSet[Kasten, *Kasten]
+func init() {
+	collections.RegisterGob[Kasten]()
+}
+
+type (
+	KastenSet        = schnittstellen.Set[Kasten]
+	KastenMutableSet = schnittstellen.MutableSet[Kasten]
+)
 
 func MakeKastenSet(ts ...Kasten) KastenSet {
-	return collections.MakeValueSet[Kasten, *Kasten](
+	return collections.MakeSet[Kasten](
+		(Kasten).String,
 		ts...,
 	)
 }
 
-type KastenMutableSet = collections.MutableValueSet[Kasten, *Kasten]
-
 func MakeKastenMutableSet(ts ...Kasten) KastenMutableSet {
-	return collections.MakeMutableValueSet[Kasten, *Kasten](
+	return collections.MakeMutableSet[Kasten](
+		(Kasten).String,
 		ts...,
 	)
 }

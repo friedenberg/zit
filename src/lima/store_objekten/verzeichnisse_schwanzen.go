@@ -67,15 +67,14 @@ func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 	errors.Log().Printf("searching page %d", n)
 
 	var found *zettel.Transacted
-	pool := s.Zettelen.Pool()
 
 	w := func(zv *zettel.Transacted) (err error) {
 		if !zv.Sku.Kennung.Equals(h) {
-			pool.Put(zv)
 			return
 		}
 
-		found = zv
+		found = &zettel.Transacted{}
+		found.ResetWith(*zv)
 
 		err = collections.MakeErrStopIteration()
 
@@ -100,7 +99,7 @@ func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 	}
 
 	tz = found
-	tz.Objekte.Etiketten = tz.Objekte.Etiketten.Copy()
+	tz.Objekte.Etiketten = tz.Objekte.Etiketten.ImmutableClone()
 
 	return
 }

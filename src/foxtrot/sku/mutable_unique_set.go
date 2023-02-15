@@ -3,10 +3,11 @@ package sku
 import (
 	"encoding/gob"
 
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
-type MutableSetUnique = collections.MutableSet[SkuLike]
+type MutableSetUnique = schnittstellen.MutableSet[SkuLike]
 
 func init() {
 	gob.Register(

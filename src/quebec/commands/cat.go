@@ -244,7 +244,7 @@ func (c Cat) hinweisen(u *umwelt.Umwelt) (err error) {
 }
 
 func (c Cat) typen(u *umwelt.Umwelt) (err error) {
-	typen := collections.MakeMutableValueSet[kennung.Typ, *kennung.Typ]()
+	typen := collections.MakeMutableSetStringer[kennung.Typ]()
 
 	if err = u.StoreObjekten().Zettel().ReadAllSchwanzen(
 		func(z *zettel.Transacted) (err error) {
@@ -257,7 +257,7 @@ func (c Cat) typen(u *umwelt.Umwelt) (err error) {
 		return
 	}
 
-	sortedTypen := typen.Copy().SortedString()
+	sortedTypen := collections.SortedStrings[kennung.Typ](typen)
 
 	for _, t := range sortedTypen {
 		errors.Out().Print(t)

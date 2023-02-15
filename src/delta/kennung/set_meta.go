@@ -24,17 +24,17 @@ type MetaSet interface {
 
 type metaSet struct {
 	expanders      Expanders
-	defaultGattung gattung.Gattung
-	fds            MutableFDSet
+	DefaultGattung gattung.Gattung
+	FDs            MutableFDSet
 	Gattung        map[gattung.Gattung]Set
 }
 
-func MakeMetaSet(ex Expanders, dg gattung.Gattung) *metaSet {
+func MakeMetaSet(ex Expanders, dg gattung.Gattung) MetaSet {
 	errors.TodoP2("support allowed sigils")
 	return &metaSet{
 		expanders:      ex,
-		defaultGattung: dg,
-		fds:            MakeMutableFDSet(),
+		DefaultGattung: dg,
+		FDs:            MakeMutableFDSet(),
 		Gattung:        make(map[gattung.Gattung]Set),
 	}
 }
@@ -52,7 +52,7 @@ func (s *metaSet) SetMany(vs ...string) (err error) {
 
 func (ms *metaSet) Set(v string) (err error) {
 	if err = collections.AddString[FD, *FD](
-		ms.fds,
+		ms.FDs,
 		v,
 	); err == nil {
 		return
@@ -104,7 +104,7 @@ func (ms *metaSet) Set(v string) (err error) {
 			return
 		}
 	} else {
-		gs = gattungen.MakeSet(ms.defaultGattung)
+		gs = gattungen.MakeSet(ms.DefaultGattung)
 	}
 
 	if err = gs.Each(
@@ -136,7 +136,7 @@ func (ms *metaSet) Set(v string) (err error) {
 }
 
 func (ms metaSet) GetFDs() (s FDSet) {
-	s = ms.fds.Copy()
+	s = ms.FDs.ImmutableClone()
 	return
 }
 
@@ -176,3 +176,32 @@ func (ms metaSet) All(f func(gattung.Gattung, Set) error) (err error) {
 
 	return
 }
+
+// func (s metaSet) MarshalBinary() (bs []byte, err error) {
+// 	b := bytes.NewBuffer(bs)
+// 	enc := gob.NewEncoder(b)
+
+// 	if err = enc.Encode(s.Gattung); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
+
+// 	bs = b.Bytes()
+
+// 	return
+// }
+
+// func (s *metaSet) UnmarshalBinary(bs []byte) (err error) {
+// 	err = errors.New("wow")
+// 	return
+
+// 	// 	b := bytes.NewBuffer(bs)
+// 	// 	dec := gob.NewDecoder(b)
+
+// 	// 	if err = dec.Decode(&s.Gattung); err != nil {
+// 	// 		err = errors.Wrap(err)
+// 	// 		return
+// 	// 	}
+
+// 	// return
+// }

@@ -21,9 +21,10 @@ const (
 	StringCheckedOut   = "checked out"
 	StringUnrecognized = "unrecognized"
 	// StringHeaderIndent = "=============== "
-	StringHeaderIndent = "                "
+	StringHeaderIndent   = "                "
+	StringFormatDateTime = "06-01-02 15:04:05"
 	// TODO-P4 use reflection?
-	LenStringMax = len(StringUnrecognized) + 4
+	LenStringMax = len(StringFormatDateTime) + 4
 )
 
 func MakeFormatStringRightAligned(

@@ -51,7 +51,7 @@ func (f FormatObjekte) Format(
 	w.WriteFormat("%s %s", gattung.Typ, z.Typ)
 	w.WriteFormat("%s %s", gattung.Bezeichnung, z.Bezeichnung)
 
-	for _, e := range z.Etiketten.Sorted() {
+	for _, e := range collections.SortedValues(z.Etiketten) {
 		w.WriteFormat("%s %s", gattung.Etikett, e)
 	}
 
@@ -101,7 +101,7 @@ func (f *FormatObjekte) Parse(
 		return
 	}
 
-	z.Etiketten = etiketten.Copy()
+	z.Etiketten = etiketten.ImmutableClone()
 
 	return
 }

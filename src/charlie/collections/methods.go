@@ -2,6 +2,7 @@ package collections
 
 import (
 	"sort"
+	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
@@ -15,6 +16,20 @@ func MakeFuncSetString[
 ) schnittstellen.FuncSetString {
 	return func(v string) (err error) {
 		return AddString[E, EPtr](c, v)
+	}
+}
+
+func AddClone[E any, EPtr interface {
+	*E
+	ResetWithPtr(*E)
+}](
+	c schnittstellen.Adder[EPtr],
+) schnittstellen.FuncIter[EPtr] {
+	return func(e EPtr) (err error) {
+		var e1 E
+		EPtr(&e1).ResetWithPtr((*E)(e))
+		c.Add(&e1)
+		return
 	}
 }
 
@@ -81,11 +96,64 @@ func AddIfGreater[E schnittstellen.Lessor[E]](
 	return
 }
 
-func String[E schnittstellen.Value](
-	c schnittstellen.EachPtrer[E],
+func SortedValues[E schnittstellen.Value[E]](
+	c schnittstellen.Set[E],
+) (out []E) {
+	out = c.Elements()
+
+	sort.Slice(out, func(i, j int) bool { return out[i].String() < out[j].String() })
+
+	return
+}
+
+func Strings[E schnittstellen.ValueLike](
+	c schnittstellen.Set[E],
+) (out []string) {
+	out = make([]string, 0, c.Len())
+
+	c.Each(
+		func(e E) (err error) {
+			out = append(out, e.String())
+			return
+		},
+	)
+
+	return
+}
+
+func SortedStrings[E schnittstellen.ValueLike](
+	c schnittstellen.Set[E],
+) (out []string) {
+	out = Strings(c)
+
+	sort.Strings(out)
+
+	return
+}
+
+func StringCommaSeparated[E schnittstellen.Value[E]](
+	c schnittstellen.Set[E],
 ) string {
-	errors.TodoP1("implement")
-	return ""
+	if c == nil {
+		return ""
+	}
+
+	sorted := SortedStrings[E](c)
+
+	sb := &strings.Builder{}
+	first := true
+
+	for _, e1 := range sorted {
+		if !first {
+			sb.WriteString(", ")
+		}
+
+		sb.WriteString(e1)
+
+		first = false
+	}
+
+	return sb.String()
 }
 
 func ReverseSortable(s sort.Interface) {

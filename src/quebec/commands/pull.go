@@ -5,30 +5,18 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/november/umwelt"
 	"github.com/friedenberg/zit/src/papa/remote_transfers"
 )
 
-type Pull struct {
-	GattungSet gattungen.MutableSet
-}
+type Pull struct{}
 
 func init() {
 	registerCommand(
 		"pull",
 		func(f *flag.FlagSet) Command {
-			c := &Pull{
-				GattungSet: gattungen.MakeMutableSet(gattung.Zettel),
-			}
-
-			gsvs := collections.MutableValueSet2[gattung.Gattung, *gattung.Gattung]{
-				MutableSet:   &c.GattungSet,
-				SetterPolicy: collections.SetterPolicyReset,
-			}
-
-			f.Var(gsvs, "gattung", "Gattung")
+			c := &Pull{}
 
 			return c
 		},

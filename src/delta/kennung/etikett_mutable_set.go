@@ -3,20 +3,28 @@ package kennung
 import (
 	"strings"
 
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
-type EtikettMutableSet = collections.MutableValueSet[Etikett, *Etikett]
+type EtikettMutableSet = schnittstellen.MutableSet[Etikett]
 
 func MakeEtikettMutableSet(hs ...Etikett) EtikettMutableSet {
-	return EtikettMutableSet(collections.MakeMutableValueSet[Etikett, *Etikett](hs...))
+	return EtikettMutableSet(
+		collections.MakeMutableSet[Etikett](
+			(Etikett).String,
+			hs...,
+		),
+	)
 }
 
 func AddNormalized(es EtikettMutableSet, e Etikett) {
 	e.Expanded(ExpanderRight).Each(es.Add)
 	es.Add(e)
 
-	es.Reset(WithRemovedCommonPrefixes(es.Copy()))
+	c := es.ImmutableClone()
+	es.Reset()
+	WithRemovedCommonPrefixes(c).Each(es.Add)
 }
 
 func RemovePrefixes(es EtikettMutableSet, needle Etikett) {
@@ -38,7 +46,7 @@ func Withdraw(s1 EtikettMutableSet, e Etikett) (s2 EtikettSet) {
 	}
 
 	s3.Each(s1.Del)
-	s2 = s3.Copy()
+	s2 = s3.ImmutableClone()
 
 	return
 }

@@ -1,6 +1,8 @@
 package schnittstellen
 
-import "flag"
+import (
+	"flag"
+)
 
 type (
 	FuncIter[T any]        func(T) error
@@ -9,9 +11,11 @@ type (
 )
 
 type Set[T any] interface {
+	Equatable[Set[T]]
 	Len() int
 	Key(T) string
 	Get(string) (T, bool)
+	Any() T
 	ContainsKey(string) bool
 	Contains(T) bool
 	Each(FuncIter[T]) error
@@ -19,6 +23,7 @@ type Set[T any] interface {
 	EachKey(FuncIterKey) error
 	ImmutableCloner[Set[T]]
 	MutableCloner[MutableSet[T]]
+	Elements() []T
 }
 
 type MutableSet[T any] interface {
@@ -26,7 +31,8 @@ type MutableSet[T any] interface {
 	Add(T) error
 	Del(T) error
 	DelKey(string) error
-	Reset(Set[T])
+	Resetter2
+	// ResetWither[MutableSet[T]]
 }
 
 type Pool[T any, TPtr Ptr[T]] interface {

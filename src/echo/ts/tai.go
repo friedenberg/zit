@@ -10,6 +10,7 @@ import (
 	chai "github.com/brandondube/tai"
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/format"
+	"github.com/friedenberg/zit/src/values"
 )
 
 type tai = chai.TAI
@@ -148,11 +149,11 @@ func (t *Tai) UnmarshalBinary(text []byte) (err error) {
 	return
 }
 
-func (t Tai) Equals(t1 *Tai) bool {
-	if t1 == nil {
-		return false
-	}
+func (a Tai) EqualsAny(b any) bool {
+	return values.Equals(a, b)
+}
 
+func (t Tai) Equals(t1 Tai) bool {
 	if !t.tai.Eq(t1.tai) {
 		return false
 	}

@@ -17,6 +17,10 @@ type Resetter interface {
 	Reset() error
 }
 
+type Resetter2 interface {
+	Reset()
+}
+
 // TODO-P4 rename to Resetter
 type Resetable[T any] interface {
 	Ptr[T]
@@ -27,6 +31,10 @@ type Resetable[T any] interface {
 type ResetWither[T any] interface {
 	Ptr[T]
 	ResetWith(T)
+}
+
+type ResetWithPtr[T Ptr[T]] interface {
+	ResetWithPtr(T)
 }
 
 type Keyer[T any] interface {

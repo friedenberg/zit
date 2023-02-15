@@ -2,14 +2,15 @@ package zettel
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
-type SetPrefixNamed map[kennung.Etikett]collections.MutableSet[kennung.Element]
+type SetPrefixNamed map[kennung.Etikett]schnittstellen.MutableSet[kennung.Element]
 
 type SetPrefixNamedSegments struct {
-	Ungrouped collections.MutableSet[kennung.Element]
+	Ungrouped schnittstellen.MutableSet[kennung.Element]
 	Grouped   *SetPrefixNamed
 }
 
@@ -19,7 +20,7 @@ func NewSetPrefixNamed() *SetPrefixNamed {
 	return &s
 }
 
-func makeMutableZettelLikeSet() collections.MutableSet[kennung.Element] {
+func makeMutableZettelLikeSet() schnittstellen.MutableSet[kennung.Element] {
 	return collections.MakeMutableSet(
 		func(e kennung.Element) string {
 			if e == nil {
@@ -61,7 +62,7 @@ func (a SetPrefixNamed) Subset(e kennung.Etikett) (out SetPrefixNamedSegments) {
 	for e1, zSet := range a {
 		zSet.Each(
 			func(z kennung.Element) (err error) {
-				intersection := z.AkteEtiketten().IntersectPrefixes(kennung.MakeEtikettSet(e))
+				intersection := kennung.IntersectPrefixes(z.AkteEtiketten(), kennung.MakeEtikettSet(e))
 				errors.Log().Printf("%s yields %s", e1, intersection)
 
 				if intersection.Len() > 0 {
@@ -80,7 +81,7 @@ func (a SetPrefixNamed) Subset(e kennung.Etikett) (out SetPrefixNamedSegments) {
 	return
 }
 
-func (s SetPrefixNamed) ToSetNamed() (out collections.MutableSet[kennung.Element]) {
+func (s SetPrefixNamed) ToSetNamed() (out schnittstellen.MutableSet[kennung.Element]) {
 	out = makeMutableZettelLikeSet()
 
 	for _, zs := range s {

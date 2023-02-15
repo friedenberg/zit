@@ -5,9 +5,10 @@ import "io"
 type Sha interface {
 	// TODO
 	// GetHashBytes() []byte
+	ValueLike
 	Korper
 	GetShaString() string
-	Equals(Sha) bool
+	EqualsSha(Sha) bool
 	IsNull() bool
 	ShaGetter
 }

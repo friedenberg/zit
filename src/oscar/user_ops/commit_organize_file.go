@@ -74,9 +74,9 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 			return
 		}
 
-		mes := z.objekte.Etiketten.MutableCopy()
+		mes := z.objekte.Etiketten.MutableClone()
 		mes.Add(e)
-		z.objekte.Etiketten = mes.Copy()
+		z.objekte.Etiketten = mes.ImmutableClone()
 		toUpdate[z.kennung.String()] = z
 
 		errors.Err().Printf("Added etikett '%s' to zettel '%s'", e, z.kennung)
@@ -92,9 +92,9 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 			return
 		}
 
-		mes := z.objekte.Etiketten.MutableCopy()
-		mes.RemovePrefixes(e)
-		z.objekte.Etiketten = mes.Copy()
+		mes := z.objekte.Etiketten.MutableClone()
+		kennung.RemovePrefixes(mes, e)
+		z.objekte.Etiketten = mes.ImmutableClone()
 
 		toUpdate[z.kennung.String()] = z
 
@@ -153,7 +153,7 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 		etts := n.Etiketten
 
 		z := zettel.Objekte{
-			Etiketten: etts.Copy(),
+			Etiketten: etts.ImmutableClone(),
 			Typ:       b.Metadatei.Typ,
 		}
 

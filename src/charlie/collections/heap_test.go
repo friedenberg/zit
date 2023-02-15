@@ -4,19 +4,19 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/friedenberg/zit/src/bravo/int_value"
 	"github.com/friedenberg/zit/src/bravo/test_logz"
+	"github.com/friedenberg/zit/src/values"
 )
 
 func TestReset(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-	els := []int_value.IntValue{
-		int_value.Make(1),
-		int_value.Make(0),
-		int_value.Make(3),
-		int_value.Make(4),
-		int_value.Make(2),
+	els := []values.Int{
+		values.MakeInt(1),
+		values.MakeInt(0),
+		values.MakeInt(3),
+		values.MakeInt(4),
+		values.MakeInt(2),
 	}
 
 	sut := MakeHeapFromSlice(els)
@@ -35,12 +35,12 @@ func TestReset(t1 *testing.T) {
 func TestSaveAndRestore(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-	els := []int_value.IntValue{
-		int_value.Make(1),
-		int_value.Make(0),
-		int_value.Make(3),
-		int_value.Make(4),
-		int_value.Make(2),
+	els := []values.Int{
+		values.MakeInt(1),
+		values.MakeInt(0),
+		values.MakeInt(3),
+		values.MakeInt(4),
+		values.MakeInt(2),
 	}
 
 	sut := MakeHeapFromSlice(els)
@@ -49,7 +49,7 @@ func TestSaveAndRestore(t1 *testing.T) {
 		defer sut.Restore()
 		for i := 0; i < 5; i++ {
 			el, ok := sut.PopAndSave()
-			ex := int_value.Make(i)
+			ex := values.MakeInt(i)
 
 			if !ok {
 				t.Fatalf("expected pop and save to return an element but got nothing")
@@ -65,7 +65,7 @@ func TestSaveAndRestore(t1 *testing.T) {
 
 	for i := 0; i < 5; i++ {
 		el, ok := sut.Pop()
-		ex := int_value.Make(i)
+		ex := values.MakeInt(i)
 
 		if !ok {
 			t.Fatalf("expected pop and save to return an element but got nothing. Idx: %d", i)
@@ -80,26 +80,26 @@ func TestSaveAndRestore(t1 *testing.T) {
 func Test3Sorted(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-	els := []int_value.IntValue{
-		int_value.Make(1),
-		int_value.Make(0),
-		int_value.Make(3),
-		int_value.Make(4),
-		int_value.Make(2),
+	els := []values.Int{
+		values.MakeInt(1),
+		values.MakeInt(0),
+		values.MakeInt(3),
+		values.MakeInt(4),
+		values.MakeInt(2),
 	}
 
 	sut := MakeHeapFromSlice(els)
 	sorted := sut.Sorted()
 
-	expected := []int_value.IntValue{
-		int_value.Make(0),
-		int_value.Make(1),
-		int_value.Make(2),
-		int_value.Make(3),
-		int_value.Make(4),
+	expected := []values.Int{
+		values.MakeInt(0),
+		values.MakeInt(1),
+		values.MakeInt(2),
+		values.MakeInt(3),
+		values.MakeInt(4),
 	}
 
-	if !reflect.DeepEqual([]int_value.IntValue(sorted), expected) {
+	if !reflect.DeepEqual([]values.Int(sorted), expected) {
 		t.Fatalf("expected %#v but got %#v", expected, sorted)
 	}
 }

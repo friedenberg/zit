@@ -29,7 +29,7 @@ func init() {
 }
 
 func (c Revert) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
-	timestamps := ids.Timestamps.Copy()
+	timestamps := ids.Timestamps.ImmutableClone()
 	var transaktion *transaktion.Transaktion
 
 	s := u.StoreObjekten()

@@ -104,7 +104,7 @@ func (op FilterZettelsWithScript) runGetHinweisen(
 			return
 		}
 
-		doneBoth <- irl.Set.Hinweisen.Copy()
+		doneBoth <- irl.Set.Hinweisen.ImmutableClone()
 	}()
 
 	return

@@ -235,18 +235,18 @@ func (u *Umwelt) Initialize() (err error) {
 
 // TODO-P2 remove this
 func (u Umwelt) DefaultEtiketten() (etiketten kennung.EtikettSet, err error) {
-	metiketten := kennung.MakeEtikettMutableSet()
-
-	sa := metiketten.StringAdder()
+	f := collections.MakeFlagCommas[kennung.Etikett](
+		collections.SetterPolicyAppend,
+	)
 
 	for _, e := range u.konfig.EtikettenToAddToNew {
-		if err = sa(e); err != nil {
+		if err = f.Set(e); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	etiketten = metiketten.Copy()
+	etiketten = f.GetSet()
 
 	return
 }

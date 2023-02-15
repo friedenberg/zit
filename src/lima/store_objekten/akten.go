@@ -35,7 +35,7 @@ func (s Store) AkteExists(sh sha.Sha) (err error) {
 
 				return
 			},
-			set.AddAndDoNotRepool,
+			collections.AddClone[zettel.Transacted, *zettel.Transacted](set),
 		),
 	); err != nil {
 		err = errors.Wrap(err)

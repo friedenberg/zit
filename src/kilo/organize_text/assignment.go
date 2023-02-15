@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
@@ -11,9 +12,9 @@ import (
 type assignment struct {
 	isRoot    bool
 	depth     int
-	etiketten kennung.EtikettSet
-	named     collections.MutableValueSet[zettel, *zettel]
-	unnamed   collections.MutableValueSet[newZettel, *newZettel]
+	etiketten schnittstellen.Set[kennung.Etikett]
+	named     schnittstellen.MutableSet[zettel]
+	unnamed   schnittstellen.MutableSet[newZettel]
 	children  []*assignment
 	parent    *assignment
 }
@@ -22,8 +23,8 @@ func newAssignment(d int) *assignment {
 	return &assignment{
 		depth:     d,
 		etiketten: kennung.MakeEtikettSet(),
-		named:     collections.MakeMutableValueSet[zettel](),
-		unnamed:   collections.MakeMutableValueSet[newZettel](),
+		named:     collections.MakeMutableSetStringer[zettel](),
+		unnamed:   collections.MakeMutableSetStringer[newZettel](),
 		children:  make([]*assignment, 0),
 	}
 }
@@ -97,7 +98,7 @@ func (a assignment) String() (s string) {
 		s = a.parent.String() + "."
 	}
 
-	return s + a.etiketten.String()
+	return s + collections.StringCommaSeparated(a.etiketten)
 }
 
 func (a *assignment) addChild(c *assignment) {
@@ -211,7 +212,7 @@ func (a *assignment) expandedEtiketten() (es kennung.EtikettSet, err error) {
 	es = kennung.MakeEtikettSet()
 
 	if a.etiketten.Len() != 1 || a.parent == nil {
-		es = a.etiketten.Copy()
+		es = a.etiketten.ImmutableClone()
 		return
 	} else {
 		e := a.etiketten.Any()

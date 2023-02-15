@@ -1,12 +1,13 @@
 package zettel
 
 import (
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
 type MutableSet struct {
-	collections.MutableSet[*Transacted]
+	schnittstellen.MutableSet[*Transacted]
 }
 
 func MakeMutableSetUnique(c int) MutableSet {

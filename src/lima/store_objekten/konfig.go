@@ -151,7 +151,7 @@ func (s konfigStore) Update(
 
 	kt.Sku.ObjekteSha = sha.Make(ow.Sha())
 
-	if mutter != nil && kt.GetObjekteSha().Equals(mutter.GetObjekteSha()) {
+	if mutter != nil && kt.GetObjekteSha().EqualsSha(mutter.GetObjekteSha()) {
 		kt = mutter
 
 		if err = s.KonfigLogWriter.Unchanged(kt); err != nil {

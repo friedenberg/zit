@@ -29,7 +29,7 @@ type CreateFromPaths struct {
 
 func (c CreateFromPaths) Run(
 	args ...string,
-) (results collections.MutableSet[*zettel.Transacted], err error) {
+) (results schnittstellen.MutableSet[*zettel.Transacted], err error) {
 	// TODO support different modes of de-duplication
 	// TODO support merging of duplicated akten
 	toCreate := zettel_external.MakeMutableSetUniqueFD()
@@ -75,7 +75,7 @@ func (c CreateFromPaths) Run(
 		if err = c.StoreObjekten().Zettel().ReadAll(
 			collections.MakeChain(
 				matcher.Match,
-				results.AddAndDoNotRepool,
+				collections.AddClone[zettel.Transacted, *zettel.Transacted](results),
 			),
 		); err != nil {
 			err = errors.Wrap(err)

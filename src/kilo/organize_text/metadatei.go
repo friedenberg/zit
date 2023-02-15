@@ -6,6 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
@@ -40,7 +41,10 @@ func (m *Metadatei) ReadFrom(r1 io.Reader) (n int64, err error) {
 			format.MakeLineReaderKeyValues(
 				map[string]schnittstellen.FuncSetString{
 					"%": format.MakeLineReaderNop(),
-					"-": mes.StringAdder(),
+					"-": collections.MakeFuncSetString[
+						kennung.Etikett,
+						*kennung.Etikett,
+					](mes),
 					"!": m.Typ.Set,
 				},
 			),
@@ -50,7 +54,7 @@ func (m *Metadatei) ReadFrom(r1 io.Reader) (n int64, err error) {
 		return
 	}
 
-	m.EtikettSet = mes.Copy()
+	m.EtikettSet = mes.ImmutableClone()
 
 	return
 }
@@ -58,7 +62,7 @@ func (m *Metadatei) ReadFrom(r1 io.Reader) (n int64, err error) {
 func (m Metadatei) WriteTo(w1 io.Writer) (n int64, err error) {
 	w := format.NewLineWriter()
 
-	for _, e := range m.EtikettSet.SortedString() {
+	for _, e := range collections.SortedStrings(m.EtikettSet) {
 		w.WriteFormat("- %s", e)
 	}
 

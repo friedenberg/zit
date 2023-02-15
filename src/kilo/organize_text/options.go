@@ -2,51 +2,75 @@ package organize_text
 
 import (
 	"flag"
+	"sync"
 
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/india/konfig"
 	zettel_pkg "github.com/friedenberg/zit/src/juliett/zettel"
 )
 
+type Flags struct {
+	Options
+
+	once           *sync.Once
+	ExtraEtiketten collections.Flag[kennung.Etikett, *kennung.Etikett]
+}
+
 type Options struct {
+	wasMade bool
+
 	Konfig konfig.Compiled
 	Abbr   schnittstellen.FuncAbbreviateKorper
 
-	RootEtiketten     kennung.EtikettSet
+	RootEtiketten     schnittstellen.Set[kennung.Etikett]
 	Typ               kennung.Typ
 	GroupingEtiketten kennung.Slice
-	ExtraEtiketten    kennung.EtikettSet
+	ExtraEtiketten    schnittstellen.Set[kennung.Etikett]
 	Transacted        zettel_pkg.MutableSet
 
 	UsePrefixJoints        bool
 	UseRightAlignedIndents bool
 	UseRefiner             bool
 	UseMetadateiHeader     bool
-
-	wasMade bool
 }
 
-func MakeOptions() Options {
-	return Options{
-		wasMade:           true,
-		RootEtiketten:     kennung.MakeEtikettSet(),
-		GroupingEtiketten: kennung.MakeSlice(),
-		ExtraEtiketten:    kennung.MakeEtikettSet(),
-		Transacted:        zettel_pkg.MakeMutableSetHinweis(0),
+func MakeFlags() Flags {
+	return Flags{
+		once:           &sync.Once{},
+		ExtraEtiketten: collections.MakeFlagCommas[kennung.Etikett](collections.SetterPolicyAppend),
+
+		Options: Options{
+			wasMade:           true,
+			GroupingEtiketten: kennung.MakeSlice(),
+			Transacted:        zettel_pkg.MakeMutableSetHinweis(0),
+		},
 	}
 }
 
-func (o *Options) AddToFlagSet(f *flag.FlagSet) {
+func (o *Flags) AddToFlagSet(f *flag.FlagSet) {
 	f.Var(&o.GroupingEtiketten, "group-by", "etikett prefixes to group zettels")
-	f.Var(&o.ExtraEtiketten, "extras", "etiketten to always add to the organize text")
+	f.Var(o.ExtraEtiketten, "extras", "etiketten to always add to the organize text")
 	f.BoolVar(&o.UsePrefixJoints, "prefix-joints", true, "split etiketten around hyphens")
 	f.BoolVar(&o.UseRightAlignedIndents, "right-align", true, "right-align etiketten")
 	f.BoolVar(&o.UseRefiner, "refine", true, "refine the organize tree")
 	f.BoolVar(&o.UseMetadateiHeader, "metadatei-header", true, "metadatei header")
 }
 
+func (o *Flags) GetOptions() Options {
+	o.once.Do(
+		func() {
+			o.Options.ExtraEtiketten = o.ExtraEtiketten.GetSet()
+		},
+	)
+
+	return o.Options
+}
+
 func (o Options) assignmentTreeConstructor() *AssignmentTreeConstructor {
+	errors.TodoP2("improve")
 	if !o.Konfig.PrintAbbreviatedHinweisen {
 		o.Abbr = nil
 	}

@@ -12,6 +12,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/values"
 )
 
 const (
@@ -164,7 +165,15 @@ func (s Sha) Schwanz() string {
 	return s.String()[2:]
 }
 
-func (a Sha) Equals(b schnittstellen.Sha) bool {
+func (a Sha) EqualsAny(b any) bool {
+	return values.Equals(a, b)
+}
+
+func (a Sha) EqualsSha(b schnittstellen.Sha) bool {
+	return a.GetShaString() == b.GetShaString()
+}
+
+func (a Sha) Equals(b Sha) bool {
 	return a.GetShaString() == b.GetShaString()
 }
 

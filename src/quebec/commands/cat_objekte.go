@@ -32,7 +32,7 @@ func (c CatObjekte) RunWithIds(
 	u *umwelt.Umwelt,
 	ids kennung.Set,
 ) (err error) {
-	shas := ids.Shas.Copy()
+	shas := ids.Shas.ImmutableClone()
 	return c.akten(u, shas)
 }
 
@@ -57,7 +57,7 @@ func (c CatObjekte) akten(
 	if err = u.Standort().ReadAllShasForGattung(
 		gattung.Akte,
 		collections.MakeChain(
-			shas.WriterContainer(collections.MakeErrStopIteration()),
+			collections.WriterContainer(shas, collections.MakeErrStopIteration()),
 			func(sb sha.Sha) (err error) {
 				var r io.ReadCloser
 

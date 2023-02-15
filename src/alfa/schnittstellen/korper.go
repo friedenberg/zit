@@ -1,9 +1,8 @@
 package schnittstellen
 
-import "fmt"
-
 type Korper interface {
-	fmt.Stringer
+	Element
+	Stringer
 	Kopf() string
 	Schwanz() string
 }

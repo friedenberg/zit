@@ -2,6 +2,7 @@ package kennung_index
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
@@ -11,7 +12,7 @@ type TypVerzeichnisse struct {
 
 func (z *TypVerzeichnisse) ResetWithTyp(t kennung.Typ) {
 	ex := t.Expanded(kennung.ExpanderAll)
-	z.Expanded = ex.SortedString()
+	z.Expanded = collections.SortedStrings(ex)
 }
 
 func (z *TypVerzeichnisse) Reset() {

@@ -7,12 +7,17 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/values"
 )
 
 type Konfig struct{}
 
 func (a Konfig) GetGattung() schnittstellen.Gattung {
 	return gattung.Konfig
+}
+
+func (a Konfig) EqualsAny(b any) bool {
+	return values.Equals(a, b)
 }
 
 func (a Konfig) Equals(b Konfig) bool {

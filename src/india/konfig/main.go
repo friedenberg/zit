@@ -18,6 +18,7 @@ import (
 	"github.com/friedenberg/zit/src/hotel/etikett"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/kasten"
+	"github.com/friedenberg/zit/src/values"
 )
 
 var typExpander kennung.Expander
@@ -261,21 +262,18 @@ func (c compiled) GetZettelFileExtension() string {
 func (c compiled) GetSortedTypenExpanded(
 	v string,
 ) (expandedActual []*typ.Transacted) {
-	expandedMaybe := collections.MakeMutableValueSet[
-		collections.StringValue,
-		*collections.StringValue,
-	]()
+	expandedMaybe := collections.MakeMutableSetStringer[values.String]()
 
 	sa := collections.MakeFuncSetString[
-		collections.StringValue,
-		*collections.StringValue,
+		values.String,
+		*values.String,
 	](expandedMaybe)
 
 	typExpander.Expand(sa, v)
 	expandedActual = make([]*typ.Transacted, 0)
 
 	expandedMaybe.Each(
-		func(v collections.StringValue) (err error) {
+		func(v values.String) (err error) {
 			ct, ok := c.Typen.Get(v.String())
 
 			if !ok {
@@ -298,13 +296,13 @@ func (c compiled) GetSortedTypenExpanded(
 func (c compiled) GetSortedEtikettenExpanded(
 	v string,
 ) (expandedActual []*etikett.Transacted) {
-	expandedMaybe := collections.MakeMutableValueSet[collections.StringValue, *collections.StringValue]()
-	sa := collections.MakeFuncSetString[collections.StringValue, *collections.StringValue](expandedMaybe)
+	expandedMaybe := collections.MakeMutableSetStringer[values.String]()
+	sa := collections.MakeFuncSetString[values.String, *values.String](expandedMaybe)
 	typExpander.Expand(sa, v)
 	expandedActual = make([]*etikett.Transacted, 0)
 
 	expandedMaybe.Each(
-		func(v collections.StringValue) (err error) {
+		func(v values.String) (err error) {
 			ct, ok := c.Etiketten.Get(v.String())
 
 			if !ok {

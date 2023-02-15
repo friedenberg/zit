@@ -7,6 +7,7 @@ import (
 	"path"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/gattung"
@@ -44,7 +45,7 @@ func (c EditTyp) CompletionGattung() gattungen.Set {
 }
 
 func (c EditTyp) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
-	tks := ids.Typen.Copy()
+	tks := ids.Typen.ImmutableClone()
 
 	switch {
 	case tks.Len() == 0 && !c.All:
@@ -57,7 +58,7 @@ func (c EditTyp) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 		fallthrough
 
 	case c.All:
-		mtks := collections.MakeMutableValueSet[kennung.Typ, *kennung.Typ]()
+		mtks := collections.MakeMutableSetStringer[kennung.Typ]()
 
 		u.Konfig().Typen.Each(
 			func(tt *typ.Transacted) (err error) {
@@ -65,7 +66,7 @@ func (c EditTyp) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 			},
 		)
 
-		tks = mtks.Copy()
+		tks = mtks.ImmutableClone()
 	}
 
 	var ps []string
@@ -93,7 +94,7 @@ func (c EditTyp) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 		return
 	}
 
-	var tes collections.Set[*typ.External]
+	var tes schnittstellen.Set[*typ.External]
 
 	if tes, err = c.readTempTypFiles(u, ps); err != nil {
 		err = errors.Wrap(err)
@@ -133,7 +134,7 @@ func (c EditTyp) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 
 func (c EditTyp) makeTempTypFiles(
 	u *umwelt.Umwelt,
-	tks collections.ValueSet[kennung.Typ, *kennung.Typ],
+	tks schnittstellen.Set[kennung.Typ],
 ) (ps []string, err error) {
 	errors.TodoP3("add support for working directory")
 
@@ -197,7 +198,7 @@ func (c EditTyp) makeTempTypFiles(
 func (c EditTyp) readTempTypFiles(
 	u *umwelt.Umwelt,
 	ps []string,
-) (out collections.Set[*typ.External], err error) {
+) (out schnittstellen.Set[*typ.External], err error) {
 	ts := collections.MakeMutableSet[*typ.External](
 		typ.ExternalKeyer{}.Key,
 	)
@@ -246,7 +247,7 @@ func (c EditTyp) readTempTypFiles(
 		}
 	}
 
-	out = ts.Copy()
+	out = ts.ImmutableClone()
 
 	return
 }

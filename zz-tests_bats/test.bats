@@ -106,7 +106,7 @@ function can_checkout_and_checkin { # @test
 	assert_output '[one/uno@9a638e2b183562da6d3c634d5a3841d64bc337c9cf79f8fffa0d0194659bc564 !md "wow"]'
 
 	run_zit checkout one/uno
-	assert_output '  (checked out) [one/uno.zettel@9a638e2b183562da6d3c634d5a3841d64bc337c9cf79f8fffa0d0194659bc564 !md "wow"]'
+	assert_output '       (checked out) [one/uno.zettel@9a638e2b183562da6d3c634d5a3841d64bc337c9cf79f8fffa0d0194659bc564 !md "wow"]'
 
 	{
 		echo "---"
@@ -140,7 +140,7 @@ function can_checkout_via_etiketten { # @test
 	assert_output '[one/uno@9a638e2b183562da6d3c634d5a3841d64bc337c9cf79f8fffa0d0194659bc564 !md "wow"]'
 
 	run_zit checkout -- -ok@z
-	assert_output '  (checked out) [one/uno.zettel@9a638e2b183562da6d3c634d5a3841d64bc337c9cf79f8fffa0d0194659bc564 !md "wow"]'
+	assert_output '       (checked out) [one/uno.zettel@9a638e2b183562da6d3c634d5a3841d64bc337c9cf79f8fffa0d0194659bc564 !md "wow"]'
 }
 
 function can_output_organize { # @test
@@ -379,7 +379,7 @@ function checkouts_dont_overwrite { # @test
 	assert_output '[one/uno@18df16846a2f8bbce5f03e1041baff978a049aabd169ab9adac387867fe1706c !md "bez"]'
 
 	run_zit checkout one/uno
-	assert_output '  (checked out) [one/uno.zettel@18df16846a2f8bbce5f03e1041baff978a049aabd169ab9adac387867fe1706c !md "bez"]'
+	assert_output '       (checked out) [one/uno.zettel@18df16846a2f8bbce5f03e1041baff978a049aabd169ab9adac387867fe1706c !md "bez"]'
 
 	run cat one/uno.zettel
 	assert_output "$(cat "$expected")"
@@ -398,7 +398,7 @@ function checkouts_dont_overwrite { # @test
 	cat "$expected" >"one/uno.zettel"
 
 	run_zit checkout one/uno@z
-	assert_output '  (checked out) [one/uno.zettel@63b65ad24c58d43d363f8074a5513e5cf71337cc132f452095a779b933cfee15 !md "bez"]'
+	assert_output '       (checked out) [one/uno.zettel@63b65ad24c58d43d363f8074a5513e5cf71337cc132f452095a779b933cfee15 !md "bez"]'
 
 	run cat one/uno.zettel
 	assert_output "$(cat "$expected")"

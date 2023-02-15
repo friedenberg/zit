@@ -5,6 +5,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
+	"github.com/friedenberg/zit/src/values"
 )
 
 type Transacted[
@@ -88,6 +89,10 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) Less(
 	return a.Sku.GetTime().Less(b.Sku.GetTime())
 }
 
+func (a Transacted[T, T1, T2, T3, T4, T5]) EqualsAny(b any) bool {
+	return values.Equals(a, b)
+}
+
 func (a Transacted[T, T1, T2, T3, T4, T5]) Equals(
 	b Transacted[T, T1, T2, T3, T4, T5],
 ) bool {
@@ -109,6 +114,10 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) GetObjekte() (o T) {
 
 func (a Transacted[T, T1, T2, T3, T4, T5]) GetSkuLike() (sk sku.SkuLike) {
 	return a.Sku
+}
+
+func (a Transacted[T, T1, T2, T3, T4, T5]) String() string {
+	return a.GetSku2().String()
 }
 
 func (a Transacted[T, T1, T2, T3, T4, T5]) GetSku() (sk sku.Sku) {
@@ -181,6 +190,14 @@ func (a *Transacted[T, T1, T2, T3, T4, T5]) Reset() {
 	a.Sku.Reset()
 	T1(&a.Objekte).Reset()
 	T5(&a.Verzeichnisse).Reset()
+}
+
+func (a *Transacted[T, T1, T2, T3, T4, T5]) ResetWithPtr(
+	b *Transacted[T, T1, T2, T3, T4, T5],
+) {
+	a.Sku.ResetWith(b.Sku)
+	T1(&a.Objekte).ResetWith(b.Objekte)
+	T5(&a.Verzeichnisse).ResetWithObjekte(a.Objekte)
 }
 
 func (a *Transacted[T, T1, T2, T3, T4, T5]) ResetWith(

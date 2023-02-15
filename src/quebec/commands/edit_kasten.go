@@ -7,6 +7,7 @@ import (
 	"path"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/gattung"
@@ -40,7 +41,7 @@ func (c EditKasten) CompletionGattung() gattungen.Set {
 }
 
 func (c EditKasten) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
-	tks := ids.Kisten.Copy()
+	tks := ids.Kisten.ImmutableClone()
 
 	switch {
 	case tks.Len() == 0 && !ids.Sigil.IncludesSchwanzen():
@@ -53,7 +54,7 @@ func (c EditKasten) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 		fallthrough
 
 	case ids.Sigil.IncludesSchwanzen():
-		mtks := collections.MakeMutableValueSet[kennung.Kasten, *kennung.Kasten]()
+		mtks := collections.MakeMutableSetStringer[kennung.Kasten]()
 
 		u.Konfig().Kisten.Each(
 			func(tt *kasten.Transacted) (err error) {
@@ -61,7 +62,7 @@ func (c EditKasten) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 			},
 		)
 
-		tks = mtks.Copy()
+		tks = mtks.ImmutableClone()
 	}
 
 	var ps []string
@@ -89,7 +90,7 @@ func (c EditKasten) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 		return
 	}
 
-	var tes collections.Set[*kasten.External]
+	var tes schnittstellen.Set[*kasten.External]
 
 	if tes, err = c.readTempKastenFiles(u, ps); err != nil {
 		err = errors.Wrap(err)
@@ -125,7 +126,7 @@ func (c EditKasten) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 
 func (c EditKasten) makeTempKastenFiles(
 	u *umwelt.Umwelt,
-	tks collections.ValueSet[kennung.Kasten, *kennung.Kasten],
+	tks schnittstellen.Set[kennung.Kasten],
 ) (ps []string, err error) {
 	ps = make([]string, 0, tks.Len())
 
@@ -190,7 +191,7 @@ func (c EditKasten) makeTempKastenFiles(
 func (c EditKasten) readTempKastenFiles(
 	u *umwelt.Umwelt,
 	ps []string,
-) (out collections.Set[*kasten.External], err error) {
+) (out schnittstellen.Set[*kasten.External], err error) {
 	ts := collections.MakeMutableSet[*kasten.External](
 		kasten.ExternalKeyer{}.Key,
 	)
@@ -232,7 +233,7 @@ func (c EditKasten) readTempKastenFiles(
 		}()
 	}
 
-	out = ts.Copy()
+	out = ts.ImmutableClone()
 
 	return
 }

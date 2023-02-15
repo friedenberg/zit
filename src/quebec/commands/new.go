@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/script_value"
@@ -75,7 +76,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			return
 		}
 	} else {
-		var zts collections.MutableSet[*zettel.Transacted]
+		var zts schnittstellen.MutableSet[*zettel.Transacted]
 
 		if zts, err = c.readExistingFilesAsZettels(u, f, args...); err != nil {
 			err = errors.Wrap(err)
@@ -89,7 +90,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 			if zsc, err = u.StoreWorkingDirectory().Checkout(
 				options,
-				zts.WriterContainer(collections.MakeErrStopIteration()),
+				collections.WriterContainer[*zettel.Transacted](zts, collections.MakeErrStopIteration()),
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -111,7 +112,7 @@ func (c New) readExistingFilesAsZettels(
 	u *umwelt.Umwelt,
 	f zettel.ObjekteParser,
 	args ...string,
-) (zts collections.MutableSet[*zettel.Transacted], err error) {
+) (zts schnittstellen.MutableSet[*zettel.Transacted], err error) {
 	opCreateFromPath := user_ops.CreateFromPaths{
 		Umwelt:      u,
 		Format:      f,
@@ -146,9 +147,9 @@ func (c New) writeNewZettels(
 		return
 	}
 
-	mes := c.Etiketten.MutableCopy()
+	mes := c.Etiketten.MutableClone()
 	defaultEtiketten.Each(mes.Add)
-	c.Etiketten = mes.Copy()
+	c.Etiketten = mes.ImmutableClone()
 
 	if zsc, err = emptyOp.RunMany(c.ProtoZettel, c.Count); err != nil {
 		err = errors.Wrap(err)

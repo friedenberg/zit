@@ -57,7 +57,7 @@ func (z *Objekte) applyGoldenChild(
 		return
 	}
 
-	mes := z.Etiketten.MutableCopy()
+	mes := z.Etiketten.MutableClone()
 
 	prefixes := kennung.Withdraw(mes, e).Elements()
 
@@ -78,7 +78,7 @@ func (z *Objekte) applyGoldenChild(
 	sort.Slice(prefixes, sortFunc)
 
 	mes.Add(prefixes[0])
-	z.Etiketten = mes.Copy()
+	z.Etiketten = mes.ImmutableClone()
 
 	return
 }

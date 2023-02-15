@@ -103,7 +103,7 @@ func TestAssignmentLineReader2Heading2Zettels(t *testing.T) {
 	}
 
 	{
-		expected := collections.MakeMutableValueSet[zettel, *zettel]()
+		expected := collections.MakeMutableSetStringer[zettel]()
 		expected.Add(zettel{
 			Hinweis:     makeHinweis(t, "one/wow"),
 			Bezeichnung: makeBez(t, "uno"),
@@ -176,7 +176,7 @@ func TestAssignmentLineReader1_1Heading2_2Zettels(t1 *testing.T) {
 	}
 
 	{
-		expected := collections.MakeMutableValueSet[zettel, *zettel]()
+		expected := collections.MakeMutableSetStringer[zettel]()
 		expected.Add(zettel{
 			Hinweis:     makeHinweis(t1, "one/wow"),
 			Bezeichnung: makeBez(t1, "uno"),
@@ -190,7 +190,7 @@ func TestAssignmentLineReader1_1Heading2_2Zettels(t1 *testing.T) {
 		actual := sub.root.children[0].children[0].named
 
 		if !actual.Equals(expected) {
-			t1.Errorf("\nexpected: %v\n  actual: %v", expected, actual)
+			t1.Errorf("\nexpected: %q\n  actual: %q", expected, actual)
 		}
 	}
 }
@@ -261,7 +261,7 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 	}
 
 	{
-		expected := collections.MakeMutableValueSet[zettel, *zettel]()
+		expected := collections.MakeMutableSetStringer[zettel]()
 		expected.Add(zettel{
 			Hinweis:     makeHinweis(t, "one/wow"),
 			Bezeichnung: makeBez(t, "uno"),
@@ -280,7 +280,7 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 	}
 
 	{
-		expected := collections.MakeMutableValueSet[zettel, *zettel]()
+		expected := collections.MakeMutableSetStringer[zettel]()
 		expected.Add(zettel{
 			Hinweis:     makeHinweis(t, "one/wow"),
 			Bezeichnung: makeBez(t, "uno"),
@@ -356,7 +356,7 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 	}
 
 	{
-		expected := collections.MakeMutableValueSet[zettel, *zettel]()
+		expected := collections.MakeMutableSetStringer[zettel]()
 		expected.Add(zettel{
 			Hinweis:     makeHinweis(t, "four/wow"),
 			Bezeichnung: makeBez(t, "quatro"),
@@ -375,7 +375,7 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 	}
 
 	{
-		expected := collections.MakeMutableValueSet[zettel, *zettel]()
+		expected := collections.MakeMutableSetStringer[zettel]()
 		expected.Add(zettel{
 			Hinweis:     makeHinweis(t, "one/wow"),
 			Bezeichnung: makeBez(t, "uno"),
@@ -436,7 +436,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 	// - [one/wow] uno
 	// - [two/wow] dos/wow
 	{
-		expected := collections.MakeMutableValueSet[zettel, *zettel]()
+		expected := collections.MakeMutableSetStringer[zettel]()
 		expected.Add(zettel{
 			Hinweis:     makeHinweis(t, "one/wow"),
 			Bezeichnung: makeBez(t, "uno"),
@@ -483,7 +483,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 
 	// - [three/wow] tres
 	{
-		expected := collections.MakeMutableValueSet[zettel, *zettel]()
+		expected := collections.MakeMutableSetStringer[zettel]()
 		expected.Add(zettel{
 			Hinweis:     makeHinweis(t, "three/wow"),
 			Bezeichnung: makeBez(t, "tres"),
@@ -498,7 +498,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 	// ##
 	// - [four/wow] quatro
 	{
-		expected := collections.MakeMutableValueSet[zettel, *zettel]()
+		expected := collections.MakeMutableSetStringer[zettel]()
 		expected.Add(zettel{
 			Hinweis:     makeHinweis(t, "four/wow"),
 			Bezeichnung: makeBez(t, "quatro"),
@@ -515,7 +515,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 	// - [six/wow] seis
 	// `
 	{
-		expected := collections.MakeMutableValueSet[zettel, *zettel]()
+		expected := collections.MakeMutableSetStringer[zettel]()
 		expected.Add(zettel{
 			Hinweis:     makeHinweis(t, "five/wow"),
 			Bezeichnung: makeBez(t, "cinco"),

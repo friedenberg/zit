@@ -12,7 +12,7 @@ import (
 )
 
 type FormatOrganize struct {
-	organize_text.Options
+	organize_text.Flags
 }
 
 func init() {
@@ -20,10 +20,10 @@ func init() {
 		"format-organize",
 		func(f *flag.FlagSet) Command {
 			c := &FormatOrganize{
-				Options: organize_text.MakeOptions(),
+				Flags: organize_text.MakeFlags(),
 			}
 
-			c.Options.AddToFlagSet(f)
+			c.Flags.AddToFlagSet(f)
 
 			return c
 		},
@@ -59,7 +59,7 @@ func (c *FormatOrganize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	ot.Options = c.Options
+	ot.Options = c.Flags.GetOptions()
 
 	if err = ot.Refine(); err != nil {
 		err = errors.Wrap(err)

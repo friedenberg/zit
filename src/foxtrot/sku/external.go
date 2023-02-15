@@ -13,6 +13,10 @@ type External[T kennung.KennungLike[T], T1 kennung.KennungLikePtr[T]] struct {
 	ObjekteSha sha.Sha
 }
 
+func (a External[T, T1]) String() string {
+	return a.GetKey()
+}
+
 func (a *External[T, T1]) Transacted() (b Transacted[T, T1]) {
 	b = Transacted[T, T1]{
 		Kennung:    a.Kennung,
@@ -35,7 +39,7 @@ func (a *External[T, T1]) ResetWith(b *External[T, T1]) {
 	T1(&a.Kennung).ResetWith(b.Kennung)
 }
 
-func (a External[T, T1]) Equals(b *External[T, T1]) (ok bool) {
+func (a External[T, T1]) Equals(b External[T, T1]) (ok bool) {
 	if a.Kennung.Equals(b.Kennung) {
 		return
 	}

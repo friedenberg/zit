@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/script_config"
 	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/metadatei_io"
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/format"
@@ -143,7 +144,7 @@ func (f objekteTextFormatter) writeToExternalAkte(
 		fmt.Sprintf("# %s", c.Zettel.Bezeichnung),
 	)
 
-	for _, e := range c.Zettel.Etiketten.Sorted() {
+	for _, e := range collections.SortedValues(c.Zettel.Etiketten) {
 		w.WriteFormat("- %s", e)
 	}
 

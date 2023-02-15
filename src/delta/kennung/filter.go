@@ -7,6 +7,7 @@ import (
 )
 
 type Element interface {
+	schnittstellen.ValueLike
 	schnittstellen.Stored
 	AkteEtiketten() EtikettSet
 	AkteTyp() Typ
@@ -34,7 +35,7 @@ func (f Filter) Include(e Element) (err error) {
 
 LOOP:
 	// TODO-P3 pull into static
-	for _, e := range f.Set.Etiketten.Copy().Sorted() {
+	for _, e := range collections.SortedValues(f.Set.Etiketten.ImmutableClone()) {
 		okEt = expanded.Contains(e)
 
 		switch {
@@ -50,7 +51,7 @@ LOOP:
 	}
 
 	// TODO-P2 make static
-	shas := f.Set.Shas.Copy()
+	shas := f.Set.Shas.ImmutableClone()
 	needsSha := shas.Len() > 0
 	okSha := false
 
@@ -62,7 +63,7 @@ LOOP:
 		okSha = true
 	}
 
-	ty := f.Set.Typen.Copy()
+	ty := f.Set.Typen.ImmutableClone()
 	needsTyp := ty.Len() > 0
 	okTyp := false
 
@@ -76,7 +77,7 @@ LOOP:
 		},
 	)
 
-	hinweisen := f.Set.Hinweisen.Copy()
+	hinweisen := f.Set.Hinweisen.ImmutableClone()
 	needsHin := hinweisen.Len() > 0
 	okHin := false || hinweisen.Len() == 0
 

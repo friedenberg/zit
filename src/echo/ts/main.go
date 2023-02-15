@@ -9,11 +9,13 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/delta/format"
+	"github.com/friedenberg/zit/src/values"
 )
 
 const (
 	Epoch          = 1660007128
-	FormatDateTime = "06-01-02 15:04:05"
+	FormatDateTime = format.StringFormatDateTime
 )
 
 type Time struct {
@@ -46,7 +48,7 @@ func (t *Time) MoveForwardIota() {
 }
 
 func (t Time) Format(f string) string {
-	return t.time.Format(f)
+	return t.time.Local().Format(f)
 }
 
 func (t Time) String() string {
@@ -112,6 +114,10 @@ func (t *Time) UnmarshalText(text []byte) (err error) {
 	}
 
 	return
+}
+
+func (t Time) EqualsAny(t1 any) bool {
+	return values.Equals(t, t1)
 }
 
 func (t Time) Equals(t1 Time) bool {

@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/int_value"
 	"github.com/friedenberg/zit/src/echo/ts"
+	"github.com/friedenberg/zit/src/values"
 )
 
 type Mutter [2]ts.Time
@@ -13,6 +13,7 @@ type Mutter [2]ts.Time
 type IdLike = fmt.Stringer
 
 type DataIdentity interface {
+	schnittstellen.ValueLike
 	GetTime() ts.Time
 	GetId() IdLike
 	schnittstellen.GattungGetter
@@ -27,7 +28,7 @@ type SkuLike interface {
 	GetKey() string
 
 	GetMutter() Mutter
-	GetTransactionIndex() int_value.IntValue
+	GetTransactionIndex() values.Int
 	GetKopf() ts.Time
 	GetSchwanz() ts.Time
 }

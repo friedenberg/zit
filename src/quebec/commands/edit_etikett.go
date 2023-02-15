@@ -7,6 +7,7 @@ import (
 	"path"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/gattung"
@@ -44,7 +45,7 @@ func (c EditEtikett) CompletionGattung() gattungen.Set {
 }
 
 func (c EditEtikett) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
-	tks := ids.Etiketten.Copy()
+	tks := ids.Etiketten.ImmutableClone()
 
 	switch {
 	case tks.Len() == 0 && !c.All:
@@ -57,7 +58,7 @@ func (c EditEtikett) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 		fallthrough
 
 	case c.All:
-		mtks := collections.MakeMutableValueSet[kennung.Etikett, *kennung.Etikett]()
+		mtks := collections.MakeMutableSetStringer[kennung.Etikett]()
 
 		u.Konfig().Etiketten.Each(
 			func(tt *etikett.Transacted) (err error) {
@@ -65,7 +66,7 @@ func (c EditEtikett) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 			},
 		)
 
-		tks = mtks.Copy()
+		tks = mtks.ImmutableClone()
 	}
 
 	var ps []string
@@ -93,7 +94,7 @@ func (c EditEtikett) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 		return
 	}
 
-	var tes collections.Set[*etikett.External]
+	var tes schnittstellen.Set[*etikett.External]
 
 	if tes, err = c.readTempEtikettFiles(u, ps); err != nil {
 		err = errors.Wrap(err)
@@ -129,7 +130,7 @@ func (c EditEtikett) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 
 func (c EditEtikett) makeTempEtikettFiles(
 	u *umwelt.Umwelt,
-	tks collections.ValueSet[kennung.Etikett, *kennung.Etikett],
+	tks schnittstellen.Set[kennung.Etikett],
 ) (ps []string, err error) {
 	ps = make([]string, 0, tks.Len())
 
@@ -191,7 +192,7 @@ func (c EditEtikett) makeTempEtikettFiles(
 func (c EditEtikett) readTempEtikettFiles(
 	u *umwelt.Umwelt,
 	ps []string,
-) (out collections.Set[*etikett.External], err error) {
+) (out schnittstellen.Set[*etikett.External], err error) {
 	ts := collections.MakeMutableSet[*etikett.External](
 		etikett.ExternalKeyer{}.Key,
 	)
@@ -233,7 +234,7 @@ func (c EditEtikett) readTempEtikettFiles(
 		}()
 	}
 
-	out = ts.Copy()
+	out = ts.ImmutableClone()
 
 	return
 }

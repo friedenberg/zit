@@ -41,7 +41,7 @@ go_vet:
 > go vet ./...
 
 .PHONY: tests_unit
-tests_unit:
+tests_unit: go_generate
 > go test -timeout 5s ./...
 
 .PHONY: tests_fast

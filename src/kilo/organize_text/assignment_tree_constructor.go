@@ -4,6 +4,7 @@ import (
 	"sort"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	zettel_pkg "github.com/friedenberg/zit/src/juliett/zettel"
 )
@@ -160,7 +161,9 @@ func (atc AssignmentTreeConstructor) makeChildren(
 	)
 
 	sort.Slice(parent.children, func(i, j int) bool {
-		return parent.children[i].etiketten.String() < parent.children[j].etiketten.String()
+		vi := collections.StringCommaSeparated(parent.children[i].etiketten)
+		vj := collections.StringCommaSeparated(parent.children[j].etiketten)
+		return vi < vj
 	})
 
 	return

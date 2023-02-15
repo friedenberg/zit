@@ -114,7 +114,7 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdate(
 
 	transactedPtr.Sku.ObjekteSha = sha.Make(ow.Sha())
 
-	if mutter != nil && transactedPtr.GetObjekteSha().Equals(mutter.GetObjekteSha()) {
+	if mutter != nil && transactedPtr.GetObjekteSha().EqualsSha(mutter.GetObjekteSha()) {
 		transactedPtr = mutter
 
 		if err = cou.delegate.Unchanged(transactedPtr); err != nil {

@@ -5,6 +5,7 @@ import (
 	"io"
 	"net"
 	"path/filepath"
+	"runtime/debug"
 	"syscall"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -170,7 +171,7 @@ func (s *StageSoldier) awaitRegisteredDialogueHandlers(errMulti errors.Multi) {
 			defer func() {
 				if e := recover(); e != nil {
 					if err, ok := e.(error); ok {
-						errMulti.Add(err)
+						errMulti.Add(errors.Wrapf(err, "%s", debug.Stack()))
 					} else {
 						panic(e)
 					}

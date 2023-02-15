@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/values"
 )
 
 const EtikettRegexString = `^[-a-z0-9_/]+$`
@@ -50,6 +51,10 @@ func (e *etikett) ResetWith(e1 etikett) {
 
 func (e *etikett) Reset() {
 	*e = etikett("")
+}
+
+func (a etikett) EqualsAny(b any) bool {
+	return values.Equals(a, b)
 }
 
 func (a etikett) Equals(b etikett) bool {

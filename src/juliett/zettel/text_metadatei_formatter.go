@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/format"
 )
 
@@ -29,7 +30,7 @@ func (f *TextMetadateiFormatter) Format(w1 io.Writer, m *Metadatei) (n int64, er
 		)
 	}
 
-	for _, e := range m.Etiketten.Sorted() {
+	for _, e := range collections.SortedValues(m.Etiketten) {
 		errors.TodoP3("determine how to handle this")
 
 		if e.IsEmpty() {

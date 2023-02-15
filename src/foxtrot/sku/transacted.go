@@ -7,11 +7,10 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/bravo/int_value"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/ts"
+	"github.com/friedenberg/zit/src/values"
 )
 
 type SkuLikeOld interface {
@@ -123,6 +122,10 @@ func MakeSkuTransacted(t ts.Time, line string) (out SkuLikePtr, err error) {
 	return
 }
 
+func (a Transacted[T, T1]) String() string {
+	return String(a)
+}
+
 func (a Transacted[T, T1]) GetTime() ts.Time {
 	return a.Schwanz
 }
@@ -138,7 +141,7 @@ func (a *Transacted[T, T1]) Sku() Sku {
 	return Sku{
 		Time:       ts.TimeWithIndex(a.GetTime(), a.GetTransactionIndex().Int()),
 		Gattung:    gattung.Make(a.GetGattung()),
-		Kennung:    collections.MakeStringValue(a.Kennung.String()),
+		Kennung:    values.MakeString(a.Kennung.String()),
 		ObjekteSha: a.ObjekteSha,
 		AkteSha:    a.AkteSha,
 	}
@@ -148,7 +151,7 @@ func (a *Transacted[T, T1]) Sku2() Sku2 {
 	return Sku2{
 		Tai:        a.GetTai(),
 		Gattung:    gattung.Make(a.GetGattung()),
-		Kennung:    collections.MakeStringValue(a.Kennung.String()),
+		Kennung:    values.MakeString(a.Kennung.String()),
 		ObjekteSha: a.ObjekteSha,
 		AkteSha:    a.AkteSha,
 	}
@@ -192,6 +195,10 @@ func (a Transacted[T, T1]) Less(b Transacted[T, T1]) (ok bool) {
 	}
 
 	return
+}
+
+func (a Transacted[T, T1]) EqualsAny(b any) (ok bool) {
+	return values.Equals(a, b)
 }
 
 func (a Transacted[T, T1]) Equals(b Transacted[T, T1]) (ok bool) {
@@ -275,7 +282,7 @@ func (s Transacted[T, T1]) GetAkteSha() schnittstellen.Sha {
 	return s.AkteSha
 }
 
-func (s Transacted[T, T1]) GetTransactionIndex() int_value.IntValue {
+func (s Transacted[T, T1]) GetTransactionIndex() values.Int {
 	return s.TransactionIndex
 }
 

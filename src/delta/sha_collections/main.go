@@ -12,23 +12,23 @@ import (
 )
 
 type (
-	Set        = collections.ValueSet[sha.Sha, *sha.Sha]
-	MutableSet = collections.MutableValueSet[sha.Sha, *sha.Sha]
+	Set        = schnittstellen.Set[sha.Sha]
+	MutableSet = schnittstellen.MutableSet[sha.Sha]
 )
 
+func init() {
+	collections.RegisterGob[sha.Sha]()
+}
+
 func MakeMutableSet(es ...sha.Sha) (s MutableSet) {
-	return MutableSet(collections.MakeMutableValueSet(es...))
+	return collections.MakeMutableSetStringer(es...)
 }
 
 func MakeMutableSetStrings(vs ...string) (s MutableSet, err error) {
-	var s1 collections.MutableValueSet[sha.Sha, *sha.Sha]
+	f := collections.MakeFlagCommas[sha.Sha, *sha.Sha](collections.SetterPolicyReset)
 
-	if s1, err = collections.MakeMutableValueSetStrings[sha.Sha, *sha.Sha](vs...); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	s = MutableSet(s1)
+	err = f.SetMany(vs...)
+	s = f.GetMutableSet()
 
 	return
 }

@@ -5,7 +5,7 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/int_value"
+	"github.com/friedenberg/zit/src/values"
 )
 
 func init() {
@@ -20,7 +20,7 @@ type Konfig struct {
 
 func Default() Konfig {
 	return Konfig{
-		StoreVersion:          storeVersion(int_value.IntValue(1)),
+		StoreVersion:          storeVersion(values.Int(1)),
 		UseBestandsaufnahme:   true,
 		UseKonfigErworbenFile: true,
 	}

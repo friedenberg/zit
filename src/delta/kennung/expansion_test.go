@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/friedenberg/zit/src/bravo/test_logz"
+	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
 func stringSliceEquals(a, b []string) bool {
@@ -75,7 +76,7 @@ func TestExpansionAll(t1 *testing.T) {
 		"this-is-a-tag",
 	}
 
-	actual := ex.SortedString()
+	actual := collections.SortedStrings(ex)
 
 	if !stringSliceEquals(actual, expected) {
 		t.Errorf(
@@ -96,7 +97,7 @@ func TestExpansionRight(t *testing.T) {
 		"this-is-a-tag",
 	}
 
-	actual := ex.SortedString()
+	actual := collections.SortedStrings(ex)
 
 	if !stringSliceEquals(actual, expected) {
 		t.Errorf(

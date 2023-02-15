@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 )
@@ -78,14 +79,14 @@ func (z *Objekte) ResetWith(z1 Objekte) {
 	z.Akte = z1.Akte
 	z.Typ = z1.Typ
 	z.Bezeichnung = z1.Bezeichnung
-	z.Etiketten = z1.Etiketten.Copy()
+	z.Etiketten = z1.Etiketten.ImmutableClone()
 }
 
 func (z Objekte) Description() (d string) {
 	d = z.Bezeichnung.String()
 
 	if strings.TrimSpace(d) == "" {
-		d = z.Etiketten.Description()
+		d = collections.StringCommaSeparated(z.Etiketten)
 	}
 
 	return

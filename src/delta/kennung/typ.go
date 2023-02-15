@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/values"
 )
 
 type Typ = Kennung[typ, *typ]
@@ -37,6 +38,10 @@ func (e *typ) Reset() {
 
 func (e *typ) ResetWith(e1 typ) {
 	*e = e1
+}
+
+func (a typ) EqualsAny(b any) bool {
+	return values.Equals(a, b)
 }
 
 func (a typ) Equals(b typ) bool {

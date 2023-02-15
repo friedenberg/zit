@@ -2,7 +2,8 @@ package schnittstellen
 
 type (
 	FuncSetString        func(string) error
-	FuncAbbreviateValue  func(Value) (string, error)
+	FuncString[T any]    func(T) string
+	FuncAbbreviateValue  func(ValueLike) (string, error)
 	FuncAbbreviateKorper func(Korper) (string, error)
 )
 

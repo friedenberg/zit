@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -27,7 +28,14 @@ func init() {
 			}
 
 			f.BoolVar(&c.Delete, "delete", false, "the checked-out file")
-			f.Var(&c.NewEtiketten, "new-etiketten", "comma-separated etiketten (will replace existing Etiketten)")
+			f.Var(
+				collections.MakeFlagCommasFromExisting(
+					collections.SetterPolicyAppend,
+					&c.NewEtiketten,
+				),
+				"new-etiketten",
+				"comma-separated etiketten (will replace existing Etiketten)",
+			)
 
 			return c
 		},

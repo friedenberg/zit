@@ -7,9 +7,11 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/values"
 )
 
 type MitKorperLike[T any] interface {
+	schnittstellen.Value[T]
 	KennungLike[T]
 	Kopf() string
 	Schwanz() string
@@ -65,6 +67,10 @@ func (mk *MitKorper[T, T1]) Set(v string) (err error) {
 	}
 
 	return
+}
+
+func (mk MitKorper[T, T1]) EqualsAny(b any) bool {
+	return values.Equals(mk, b)
 }
 
 func (mk MitKorper[T, T1]) Equals(b MitKorper[T, T1]) bool {

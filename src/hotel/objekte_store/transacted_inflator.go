@@ -290,7 +290,7 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) readObjekte(
 
 	t.Sku.ObjekteSha = sha.Make(r.Sha())
 
-	if !t.Sku.ObjekteSha.Equals(sk.GetObjekteSha()) {
+	if !t.Sku.ObjekteSha.EqualsSha(sk.GetObjekteSha()) {
 		errors.Todo(
 			"objekte sha mismatch for %s! expected %s but got %s.\nObjekte: %v",
 			sk.GetGattung(),

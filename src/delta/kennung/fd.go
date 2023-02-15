@@ -9,12 +9,33 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/echo/ts"
+	"github.com/friedenberg/zit/src/values"
 )
 
 type FD struct {
 	Path    string
 	ModTime ts.Time
 	Sha     sha.Sha
+}
+
+func (a FD) EqualsAny(b any) bool {
+	return values.Equals(a, b)
+}
+
+func (a FD) Equals(b FD) bool {
+	if a.Path != b.Path {
+		return false
+	}
+
+	if !a.ModTime.Equals(b.ModTime) {
+		return false
+	}
+
+	if !a.Sha.Equals(b.Sha) {
+		return false
+	}
+
+	return true
 }
 
 func File(f *os.File) (fd FD, err error) {

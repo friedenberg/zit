@@ -1,58 +1,20 @@
 package typ
 
 import (
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/sku"
+	"github.com/friedenberg/zit/src/golf/objekte"
 )
 
-type ExternalKeyer struct{}
+type ExternalKeyer = objekte.ExternalKeyer[
+	Objekte,
+	*Objekte,
+	kennung.Typ,
+	*kennung.Typ,
+]
 
-func (_ ExternalKeyer) Key(e *External) string {
-	if e == nil {
-		return ""
-	}
-
-	return e.Sku.Kennung.String()
-}
-
-type External struct {
-	Objekte Objekte
-	Sku     sku.External[kennung.Typ, *kennung.Typ]
-	FD      kennung.FD
-}
-
-func (e External) GetGattung() gattung.Gattung {
-	return gattung.Typ
-}
-
-func (e External) GetObjekteSha() sha.Sha {
-	return e.Sku.ObjekteSha
-}
-
-func (e External) GetAkteSha() sha.Sha {
-	return e.Objekte.Sha
-}
-
-func (e *External) SetAkteSha(v sha.Sha) {
-	e.Objekte.Sha = v
-}
-
-func (e External) ObjekteSha() sha.Sha {
-	return e.Objekte.Sha
-}
-
-func (e *External) SetObjekteSha(
-	arf schnittstellen.AkteReaderFactory,
-	v string,
-) (err error) {
-	if err = e.Sku.ObjekteSha.Set(v); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
+type External = objekte.External[
+	Objekte,
+	*Objekte,
+	kennung.Typ,
+	*kennung.Typ,
+]

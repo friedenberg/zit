@@ -3,6 +3,7 @@ package remote_conn
 import (
 	"encoding/gob"
 	"net"
+	"runtime/debug"
 	"syscall"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -127,8 +128,14 @@ func (s Dialogue) Type() DialogueType {
 }
 
 func (s Dialogue) Send(e any) (err error) {
-	// errors.Log().Printf("%s sending %T:%v", s.Type(), e, e)
-	// defer errors.Log().Printf("%s sent %T:%v", s.Type(), e, e)
+	defer func() {
+		if r := recover(); r != nil {
+			err = errors.MakeMulti(
+				err,
+				errors.Errorf("panicked during message send: %s\n%s", r, debug.Stack()),
+			)
+		}
+	}()
 
 	if err = s.enc.Encode(e); err != nil {
 		if errors.IsEOF(err) {
@@ -143,8 +150,14 @@ func (s Dialogue) Send(e any) (err error) {
 }
 
 func (s Dialogue) Receive(e any) (err error) {
-	// errors.Log().Printf("%s receiving %T:%v", s.Type(), e, e)
-	// defer errors.Log().Printf("%s received %T:%v", s.Type(), e, e)
+	defer func() {
+		if r := recover(); r != nil {
+			err = errors.MakeMulti(
+				err,
+				errors.Errorf("panicked during message receive: %s\n%s", r, debug.Stack()),
+			)
+		}
+	}()
 
 	if err = s.dec.Decode(e); err != nil {
 		if errors.IsEOF(err) {

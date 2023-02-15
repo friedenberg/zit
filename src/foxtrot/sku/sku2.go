@@ -8,9 +8,9 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/echo/ts"
+	"github.com/friedenberg/zit/src/values"
 )
 
 type Sku2 struct {
@@ -18,7 +18,7 @@ type Sku2 struct {
 
 	Tai ts.Tai
 
-	Kennung    collections.StringValue
+	Kennung    values.String
 	ObjekteSha sha.Sha
 	AkteSha    sha.Sha
 }
@@ -132,6 +132,10 @@ func (a Sku2) Less(b Sku2) (ok bool) {
 	}
 
 	return
+}
+
+func (a Sku2) EqualsAny(b any) (ok bool) {
+	return values.Equals(a, b)
 }
 
 func (a Sku2) Equals(b Sku2) (ok bool) {

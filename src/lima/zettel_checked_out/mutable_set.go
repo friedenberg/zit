@@ -1,12 +1,13 @@
 package zettel_checked_out
 
 import (
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/kilo/zettel_external"
 )
 
 type MutableSet struct {
-	collections.MutableSet[*Zettel]
+	schnittstellen.MutableSet[*Zettel]
 }
 
 func MakeMutableSetUnique(c int) MutableSet {

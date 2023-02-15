@@ -6,6 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/alfred"
+	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
@@ -80,7 +81,7 @@ func (w *Writer) etikettToItem(e kennung.Etikett) (a *alfred.Item) {
 	mb := alfred.NewMatchBuilder()
 
 	mb.AddMatches(a.Title)
-	mb.AddMatches(e.Expanded().Strings()...)
+	mb.AddMatches(collections.Strings(e.Expanded())...)
 
 	a.Match = mb.String()
 

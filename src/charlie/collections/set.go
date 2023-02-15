@@ -5,36 +5,15 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
-type Set[T any] struct {
-	schnittstellen.Set[T]
+func MakeSet[T schnittstellen.ValueLike](kf KeyFunc[T], es ...T) schnittstellen.Set[T] {
+	return makeSet(kf, es...)
 }
 
-func MakeSet[T any](kf KeyFunc[T], es ...T) (out Set[T]) {
-	out.Set = makeSet(kf, es...)
-
-	return
+func MakeSetStringer[T schnittstellen.ValueLike](es ...T) schnittstellen.Set[T] {
+	return makeSet((T).String, es...)
 }
 
-func (s1 Set[T]) Copy() (out Set[T]) {
-	s2 := makeSet[T](s1.Key)
-	s2.open()
-	defer s2.close()
-
-	s1.Each(s2.add)
-
-	out.Set = s2
-
-	return
-}
-
-func (s1 Set[T]) MutableCopy() (s2 MutableSet[T]) {
-	s2 = MakeMutableSet[T](s1.Key)
-	s1.Each(s2.Add)
-
-	return
-}
-
-func (s Set[T]) WriterContainer(sigil error) schnittstellen.FuncIter[T] {
+func WriterContainer[T schnittstellen.Element](s schnittstellen.Set[T], sigil error) schnittstellen.FuncIter[T] {
 	return func(e T) (err error) {
 		k := s.Key(e)
 
@@ -53,123 +32,123 @@ func (s Set[T]) WriterContainer(sigil error) schnittstellen.FuncIter[T] {
 	}
 }
 
-func WriterFuncNegate[T any](wf schnittstellen.FuncIter[T]) schnittstellen.FuncIter[T] {
-	return func(e T) (err error) {
-		err = wf(e)
+// func WriterFuncNegate[T any](wf schnittstellen.FuncIter[T]) schnittstellen.FuncIter[T] {
+// 	return func(e T) (err error) {
+// 		err = wf(e)
 
-		switch {
-		case err == nil:
-			err = MakeErrStopIteration()
+// 		switch {
+// 		case err == nil:
+// 			err = MakeErrStopIteration()
 
-		case IsStopIteration(err):
-			err = nil
-		}
+// 		case IsStopIteration(err):
+// 			err = nil
+// 		}
 
-		return
-	}
-}
+// 		return
+// 	}
+// }
 
-func (s1 Set[T]) Subtract(s2 Set[T]) (out Set[T]) {
-	s3 := makeSet[T](s1.Key)
-	s3.open()
-	defer s3.close()
+// func (s1 Set[T]) Subtract(s2 Set[T]) (out Set[T]) {
+// 	s3 := makeSet[T](s1.Key)
+// 	s3.open()
+// 	defer s3.close()
 
-	s1.Chain(
-		WriterFuncNegate(s2.WriterContainer(MakeErrStopIteration())),
-		s3.add,
-	)
+// 	s1.Chain(
+// 		WriterFuncNegate(s2.WriterContainer(MakeErrStopIteration())),
+// 		s3.add,
+// 	)
 
-	out.Set = s3
+// 	out.Set = s3
 
-	return
-}
+// 	return
+// }
 
-func (s1 Set[T]) Intersection(
-	s2 schnittstellen.Set[T],
-) (s3 schnittstellen.MutableSet[T]) {
-	s3 = MakeMutableSet[T](s1.Key)
-	s22 := Set[T]{
-		Set: s2,
-	}
+// func (s1 Set[T]) Intersection(
+// 	s2 schnittstellen.Set[T],
+// ) (s3 schnittstellen.MutableSet[T]) {
+// 	s3 = MakeMutableSet[T](s1.Key)
+// 	s22 := Set[T]{
+// 		Set: s2,
+// 	}
 
-	s1.Chain(
-		s22.WriterContainer(MakeErrStopIteration()),
-		s3.Add,
-	)
+// 	s1.Chain(
+// 		s22.WriterContainer(MakeErrStopIteration()),
+// 		s3.Add,
+// 	)
 
-	return
-}
+// 	return
+// }
 
-func (s1 Set[T]) Chain(fs ...schnittstellen.FuncIter[T]) error {
-	return s1.Each(
-		func(e T) (err error) {
-			for _, f := range fs {
-				if err = f(e); err != nil {
-					if IsStopIteration(err) {
-						err = nil
-					} else {
-						err = errors.Wrap(err)
-					}
+// func (s1 Set[T]) Chain(fs ...schnittstellen.FuncIter[T]) error {
+// 	return s1.Each(
+// 		func(e T) (err error) {
+// 			for _, f := range fs {
+// 				if err = f(e); err != nil {
+// 					if IsStopIteration(err) {
+// 						err = nil
+// 					} else {
+// 						err = errors.Wrap(err)
+// 					}
 
-					return
-				}
-			}
+// 					return
+// 				}
+// 			}
 
-			return
-		},
-	)
-}
+// 			return
+// 		},
+// 	)
+// }
 
-func (s Set[T]) Elements() (out []T) {
-	out = make([]T, 0, s.Len())
+// func (s Set[T]) Elements() (out []T) {
+// 	out = make([]T, 0, s.Len())
 
-	s.Each(
-		func(e T) (err error) {
-			out = append(out, e)
-			return
-		},
-	)
+// 	s.Each(
+// 		func(e T) (err error) {
+// 			out = append(out, e)
+// 			return
+// 		},
+// 	)
 
-	return
-}
+// 	return
+// }
 
-func (s Set[T]) Any() (e T) {
-	s.Each(
-		func(e1 T) (err error) {
-			e = e1
-			return MakeErrStopIteration()
-		},
-	)
+// func (s Set[T]) Any() (e T) {
+// 	s.Each(
+// 		func(e1 T) (err error) {
+// 			e = e1
+// 			return MakeErrStopIteration()
+// 		},
+// 	)
 
-	return
-}
+// 	return
+// }
 
-func (s Set[T]) All(f schnittstellen.FuncIter[T]) (ok bool) {
-	err := s.Each(
-		func(e T) (err error) {
-			return f(e)
-		},
-	)
+// func (s Set[T]) All(f schnittstellen.FuncIter[T]) (ok bool) {
+// 	err := s.Each(
+// 		func(e T) (err error) {
+// 			return f(e)
+// 		},
+// 	)
 
-	return err == nil
-}
+// 	return err == nil
+// }
 
-func (a Set[T]) Equals(b schnittstellen.Set[T]) (ok bool) {
-	if a.Len() != b.Len() {
-		return
-	}
+// func (a Set[T]) Equals(b schnittstellen.Set[T]) (ok bool) {
+// 	if a.Len() != b.Len() {
+// 		return
+// 	}
 
-	ok = a.All(Set[T]{Set: b}.WriterContainer(ErrNotFound{}))
+// 	ok = a.All(Set[T]{Set: b}.WriterContainer(ErrNotFound{}))
 
-	return
-}
+// 	return
+// }
 
-func (outer Set[T]) ContainsSet(inner Set[T]) (ok bool) {
-	if outer.Len() < inner.Len() {
-		return
-	}
+// func (outer Set[T]) ContainsSet(inner Set[T]) (ok bool) {
+// 	if outer.Len() < inner.Len() {
+// 		return
+// 	}
 
-	ok = inner.All(outer.WriterContainer(ErrNotFound{}))
+// 	ok = inner.All(outer.WriterContainer(ErrNotFound{}))
 
-	return
-}
+// 	return
+// }

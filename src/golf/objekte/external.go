@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
+	"github.com/friedenberg/zit/src/values"
 )
 
 type ExternalKeyer[
@@ -32,6 +33,30 @@ type External[
 	Objekte T
 	Sku     sku.External[T2, T3]
 	FD      kennung.FD
+}
+
+func (a External[T, T1, T2, T3]) String() string {
+	return a.Sku.String()
+}
+
+func (a External[T, T1, T2, T3]) EqualsAny(b any) bool {
+	return values.Equals(a, b)
+}
+
+func (a External[T, T1, T2, T3]) Equals(b External[T, T1, T2, T3]) bool {
+	if !a.Objekte.Equals(b.Objekte) {
+		return false
+	}
+
+	if !a.Sku.Equals(b.Sku) {
+		return false
+	}
+
+	if !a.FD.Equals(b.FD) {
+		return false
+	}
+
+	return true
 }
 
 func (e External[T, T1, T2, T3]) GetGattung() schnittstellen.Gattung {

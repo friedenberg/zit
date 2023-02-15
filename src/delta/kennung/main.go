@@ -10,15 +10,16 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/values"
 )
 
 type KennungLike[T any] interface {
 	schnittstellen.GattungGetter
-	schnittstellen.Value
+	schnittstellen.Value[T]
 	schnittstellen.Equatable[T]
 }
 
-type KennungLikePtr[T schnittstellen.Value] interface {
+type KennungLikePtr[T schnittstellen.Value[T]] interface {
 	schnittstellen.ValuePtr[T]
 	schnittstellen.Resetable[T]
 }
@@ -100,6 +101,10 @@ func (a *Kennung[T, T1]) ResetWith(b Kennung[T, T1]) {
 	a.value = b.value
 }
 
+func (a Kennung[T, T1]) EqualsAny(b any) bool {
+	return values.Equals(a, b)
+}
+
 func (a Kennung[T, T1]) Equals(b Kennung[T, T1]) bool {
 	return a.value.Equals(b.value)
 }
@@ -125,14 +130,16 @@ func (a Kennung[T, T1]) IsEmpty() bool {
 
 func (e Kennung[T, T1]) Expanded(
 	exes ...Expander,
-) (out collections.ValueSet[Kennung[T, T1], *Kennung[T, T1]]) {
-	expanded := collections.MakeMutableValueSet[Kennung[T, T1], *Kennung[T, T1]]()
+) (out schnittstellen.Set[Kennung[T, T1]]) {
+	expanded := collections.MakeMutableSet[Kennung[T, T1]](
+		(Kennung[T, T1]).String,
+	)
 
 	for _, ex := range exes {
 		ex.Expand(collections.MakeFuncSetString[Kennung[T, T1], *Kennung[T, T1]](expanded), e.String())
 	}
 
-	out = expanded.Copy()
+	out = expanded.ImmutableClone()
 
 	return
 }

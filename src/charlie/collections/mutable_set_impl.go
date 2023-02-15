@@ -1,26 +1,42 @@
 package collections
 
 import (
+	"bytes"
+	"encoding/gob"
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
-type mutableSet[T any] struct {
+type mutableSet[T schnittstellen.ValueLike] struct {
 	set[T]
 	lock sync.Locker
 }
 
-func makeMutableSet[T any](kf KeyFunc[T], es ...T) (ms mutableSet[T]) {
-	ms = mutableSet[T]{
-		set:  makeSet(kf, es...),
+func MakeMutableSetStringer[T schnittstellen.ValueLike](
+	es ...T,
+) schnittstellen.MutableSet[T] {
+	return MakeMutableSet(
+		(T).String,
+		es...,
+	)
+}
+
+func MakeMutableSet[T schnittstellen.ValueLike](
+	kf KeyFunc[T],
+	es ...T,
+) schnittstellen.MutableSet[T] {
+	s := makeSet(kf, es...)
+
+	ms := &mutableSet[T]{
+		set:  *s,
 		lock: &sync.Mutex{},
 	}
 
 	ms.set.open()
 
-	return
+	return ms
 }
 
 func (es mutableSet[T]) Add(e T) (err error) {
@@ -48,7 +64,7 @@ func (es mutableSet[T]) DelKey(k string) (err error) {
 	es.lock.Lock()
 	defer es.lock.Unlock()
 
-	delete(es.set.inner, k)
+	delete(es.set.elementMap, k)
 
 	return
 }
@@ -62,12 +78,8 @@ func (es mutableSet[T]) Del(e T) (err error) {
 	return
 }
 
-func (a mutableSet[T]) Reset(b schnittstellen.Set[T]) {
+func (a mutableSet[T]) Reset() {
 	a.Each(a.Del)
-
-	if b != nil {
-		b.Each(a.Add)
-	}
 }
 
 func (a mutableSet[T]) ImmutableClone() schnittstellen.Set[T] {
@@ -76,4 +88,30 @@ func (a mutableSet[T]) ImmutableClone() schnittstellen.Set[T] {
 
 func (a mutableSet[T]) MutableClone() schnittstellen.MutableSet[T] {
 	return a.set.MutableClone()
+}
+
+func (s mutableSet[T]) MarshalBinary() (bs []byte, err error) {
+	b := bytes.NewBuffer(bs)
+	enc := gob.NewEncoder(b)
+
+	if err = enc.Encode(s.set.elementMap); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	bs = b.Bytes()
+
+	return
+}
+
+func (s *mutableSet[T]) UnmarshalBinary(bs []byte) (err error) {
+	b := bytes.NewBuffer(bs)
+	dec := gob.NewDecoder(b)
+
+	if err = dec.Decode(&s.set.elementMap); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }

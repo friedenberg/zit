@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/friedenberg/zit/src/bravo/test_logz"
+	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
 func TestNormalize(t *testing.T) {
@@ -158,7 +159,7 @@ func TestExpandedRight(t *testing.T) {
 		"zz-archive-task-done",
 	}
 
-	actual := ex.SortedString()
+	actual := collections.SortedStrings(ex)
 
 	if !stringSliceEquals(actual, expected) {
 		t.Errorf(
@@ -175,13 +176,13 @@ func TestPrefixIntersection(t *testing.T) {
 		MustEtikett("zz-archive-task-done"),
 	)
 
-	ex := s.IntersectPrefixes(MakeEtikettSet(MustEtikett("project")))
+	ex := IntersectPrefixes(s, MakeEtikettSet(MustEtikett("project")))
 
 	expected := []string{
 		"project-2021-zit",
 	}
 
-	actual := ex.SortedString()
+	actual := collections.SortedStrings(ex)
 
 	if !stringSliceEquals(actual, expected) {
 		t.Errorf(

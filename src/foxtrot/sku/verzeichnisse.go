@@ -1,13 +1,13 @@
 package sku
 
 import (
-	"github.com/friedenberg/zit/src/bravo/int_value"
 	"github.com/friedenberg/zit/src/echo/ts"
+	"github.com/friedenberg/zit/src/values"
 )
 
 type Verzeichnisse struct {
 	Mutter           Mutter
-	TransactionIndex int_value.IntValue
+	TransactionIndex values.Int
 	Kopf, Schwanz    ts.Time
 }
 

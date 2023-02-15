@@ -21,7 +21,7 @@ import (
 
 type Organize struct {
 	Or bool
-	organize_text.Options
+	organize_text.Flags
 	Mode organize_text.Mode
 
 	Filter script_value.ScriptValue
@@ -32,14 +32,14 @@ func init() {
 		"organize",
 		func(f *flag.FlagSet) Command {
 			c := &Organize{
-				Options: organize_text.MakeOptions(),
+				Flags: organize_text.MakeFlags(),
 			}
 
 			f.BoolVar(&c.Or, "or", false, "allow optional criteria instead of required")
 			f.Var(&c.Filter, "filter", "a script to run for each file to transform it the standard zettel format")
 			f.Var(&c.Mode, "mode", "mode used for handling stdin and stdout")
 
-			c.Options.AddToFlagSet(f)
+			c.Flags.AddToFlagSet(f)
 
 			return commandWithIds{
 				CommandWithIds: c,
@@ -62,12 +62,12 @@ func (c *Organize) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
 		Umwelt:  u,
-		Options: c.Options,
+		Options: c.Flags.GetOptions(),
 	}
 
-	createOrganizeFileOp.RootEtiketten = ids.Etiketten.Copy()
+	createOrganizeFileOp.RootEtiketten = ids.Etiketten.ImmutableClone()
 
-	typen := ids.Typen.Copy()
+	typen := ids.Typen.ImmutableClone()
 
 	switch typen.Len() {
 	case 0:
@@ -94,7 +94,7 @@ func (c *Organize) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 		collections.MakeChain(
 			zettel.MakeWriterKonfig(u.Konfig()),
 			query.WriteZettelTransacted,
-			getResults.AddAndDoNotRepool,
+			collections.AddClone[zettel.Transacted, *zettel.Transacted](getResults),
 		),
 	); err != nil {
 		err = errors.Wrap(err)

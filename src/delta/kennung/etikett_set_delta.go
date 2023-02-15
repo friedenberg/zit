@@ -6,7 +6,7 @@ type EtikettDelta struct {
 
 func MakeSetEtikettDelta(s1, s2 EtikettSet) (d EtikettDelta) {
 	added := MakeEtikettMutableSet()
-	removed := s1.MutableCopy()
+	removed := s1.MutableClone()
 
 	for _, e := range s2.Elements() {
 		if s1.Contains(e) {
@@ -19,8 +19,8 @@ func MakeSetEtikettDelta(s1, s2 EtikettSet) (d EtikettDelta) {
 		removed.Del(e)
 	}
 
-	d.Added = added.Copy()
-	d.Removed = removed.Copy()
+	d.Added = added.ImmutableClone()
+	d.Removed = removed.ImmutableClone()
 
 	return
 }

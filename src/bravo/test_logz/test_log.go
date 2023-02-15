@@ -24,6 +24,17 @@ type T struct {
 	Skip int
 }
 
+func (t T) NotEqual(a, b any) {
+	format := "\nexpected: %v\n  actual: %v"
+	args := []any{a, b}
+
+	errors.SetTesting()
+	si, _ := MakeStackInfo(t.Skip + 1)
+	args = append([]interface{}{si}, args...)
+	os.Stderr.WriteString(fmt.Sprintf("%s"+format+"\n", args...))
+	t.Fail()
+}
+
 func (t T) Errorf(format string, args ...interface{}) {
 	errors.SetTesting()
 	si, _ := MakeStackInfo(t.Skip + 1)

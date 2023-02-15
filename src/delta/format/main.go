@@ -65,11 +65,13 @@ func MakeStringer(
 	}
 }
 
-func MakeFormatStringer[T fmt.Stringer]() schnittstellen.FuncWriterFormat[T] {
-	return func(w io.Writer, e T) (n int64, err error) {
+func MakeFormatStringer[T schnittstellen.ValueLike](
+	sf schnittstellen.FuncString[schnittstellen.Set[T]],
+) schnittstellen.FuncWriterFormat[schnittstellen.Set[T]] {
+	return func(w io.Writer, e schnittstellen.Set[T]) (n int64, err error) {
 		var n1 int
 
-		if n1, err = io.WriteString(w, e.String()); err != nil {
+		if n1, err = io.WriteString(w, sf(e)); err != nil {
 			n = int64(n1)
 			err = errors.Wrap(err)
 			return

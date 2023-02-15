@@ -8,9 +8,9 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/echo/ts"
+	"github.com/friedenberg/zit/src/values"
 )
 
 type Sku struct {
@@ -18,7 +18,7 @@ type Sku struct {
 
 	Time ts.Time
 
-	Kennung    collections.StringValue
+	Kennung    values.String
 	ObjekteSha sha.Sha
 	AkteSha    sha.Sha
 }
@@ -90,8 +90,12 @@ func (a Sku) Less(b Sku) (ok bool) {
 	return
 }
 
-func (a Sku) Equals(b *Sku) (ok bool) {
-	if a != *b {
+func (a Sku) EqualsAny(b any) (ok bool) {
+	return values.Equals(a, b)
+}
+
+func (a Sku) Equals(b Sku) (ok bool) {
+	if a != b {
 		return false
 	}
 

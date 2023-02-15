@@ -108,7 +108,7 @@ func (s *Set) Set(v string) (err error) {
 	return
 }
 
-func (s *Set) Add(ids ...schnittstellen.Value) (err error) {
+func (s *Set) Add(ids ...schnittstellen.Element) (err error) {
 	for _, i := range ids {
 		switch it := i.(type) {
 		case Etikett:

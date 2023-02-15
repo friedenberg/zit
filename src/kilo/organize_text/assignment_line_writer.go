@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/format"
 )
 
@@ -42,7 +43,7 @@ func (av assignmentLineWriter) writeNormal(a *assignment) (err error) {
 				"%s%s %s",
 				tab_prefix,
 				strings.Repeat("#", a.Depth()),
-				a.etiketten,
+				collections.StringCommaSeparated(a.etiketten),
 			),
 		)
 		av.WriteExactlyOneEmpty()
@@ -98,7 +99,7 @@ func (av assignmentLineWriter) writeRightAligned(a *assignment) (err error) {
 				tab_prefix[len(sharps)-1:],
 				sharps,
 				alignmentSpacing,
-				a.etiketten,
+				collections.StringCommaSeparated(a.etiketten),
 			),
 		)
 		av.WriteExactlyOneEmpty()

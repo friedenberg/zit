@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/india/konfig"
@@ -33,7 +34,14 @@ func MakeEmptyProtoZettel() ProtoZettel {
 func (pz *ProtoZettel) AddToFlagSet(f *flag.FlagSet) {
 	f.Var(&pz.Typ, "typ", "the Typ to use for created or updated Zettelen")
 	f.Var(&pz.Bezeichnung, "bezeichnung", "the Bezeichnung to use for created or updated Zettelen")
-	f.Var(&pz.Etiketten, "etiketten", "the Etiketten to use for created or updated Zttelen")
+	f.Var(
+		collections.MakeFlagCommasFromExisting(
+			collections.SetterPolicyAppend,
+			&pz.Etiketten,
+		),
+		"etiketten",
+		"the Etiketten to use for created or updated Zttelen",
+	)
 }
 
 func (pz ProtoZettel) Equals(z Objekte) (ok bool) {
@@ -81,9 +89,9 @@ func (pz ProtoZettel) Apply(z *Objekte) (ok bool) {
 		ok = true
 	}
 
-	mes := z.Etiketten.MutableCopy()
+	mes := z.Etiketten.MutableClone()
 	pz.Etiketten.Each(mes.Add)
-	z.Etiketten = mes.Copy()
+	z.Etiketten = mes.ImmutableClone()
 
 	return
 }

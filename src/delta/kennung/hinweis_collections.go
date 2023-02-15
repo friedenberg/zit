@@ -1,12 +1,19 @@
 package kennung
 
-import "github.com/friedenberg/zit/src/charlie/collections"
+import (
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/charlie/collections"
+)
+
+func init() {
+	collections.RegisterGob[Hinweis]()
+}
 
 type (
-	HinweisSet        = collections.ValueSet[Hinweis, *Hinweis]
-	HinweisMutableSet = collections.MutableValueSet[Hinweis, *Hinweis]
+	HinweisSet        = schnittstellen.Set[Hinweis]
+	HinweisMutableSet = schnittstellen.MutableSet[Hinweis]
 )
 
 func MakeHinweisMutableSet(hs ...Hinweis) HinweisMutableSet {
-	return HinweisMutableSet(collections.MakeMutableValueSet[Hinweis, *Hinweis](hs...))
+	return HinweisMutableSet(collections.MakeMutableSet[Hinweis]((Hinweis).String, hs...))
 }

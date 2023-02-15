@@ -50,7 +50,7 @@ func (s *Store) Checkout(
 		collections.MakeChain(
 			zettel.MakeWriterKonfig(s.erworben),
 			ztw,
-			zts.AddAndDoNotRepool,
+			collections.AddClone[zettel.Transacted, *zettel.Transacted](zts),
 		),
 	); err != nil {
 		err = errors.Wrap(err)

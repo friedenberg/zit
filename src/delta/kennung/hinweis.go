@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/values"
 )
 
 type Hinweis = MitKorper[hinweis, *hinweis]
@@ -80,6 +81,10 @@ func MakeHinweis(v string) (h Hinweis, err error) {
 	}
 
 	return
+}
+
+func (a hinweis) EqualsAny(b any) bool {
+	return values.Equals(a, b)
 }
 
 func (a hinweis) Equals(b hinweis) bool {

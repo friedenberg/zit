@@ -142,15 +142,6 @@ func (op PullServer) skusForFilter(
 ) (err error) {
 	defer errors.DeferredCloser(&err, d)
 
-	defer func() {
-		if r := recover(); r != nil {
-			err = errors.MakeMulti(
-				err,
-				errors.Errorf("panicked during toml decoding: %s", r),
-			)
-		}
-	}()
-
 	var msg messageRequestSkus
 
 	if err = d.Receive(&msg); err != nil {

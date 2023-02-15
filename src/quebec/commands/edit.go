@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte"
@@ -80,7 +81,10 @@ func (c Edit) runWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
 		return
 	}
 
-	if err = (user_ops.OpenFiles{}).Run(u, akten.Strings()...); err != nil {
+	objektenFiles := collections.Strings[kennung.FD](objekten)
+	aktenFiles := collections.Strings[kennung.FD](akten)
+
+	if err = (user_ops.OpenFiles{}).Run(u, aktenFiles...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -92,7 +96,7 @@ func (c Edit) runWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
 			Build(),
 	}
 
-	if _, err = openVimOp.Run(u, objekten.Strings()...); err != nil {
+	if _, err = openVimOp.Run(u, objektenFiles...); err != nil {
 		if errors.Is(err, files.ErrEmptyFileList) {
 			err = errors.Normalf("nothing to open in vim")
 		} else {
@@ -112,15 +116,15 @@ func (c Edit) runWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
 	// 	OptionsReadExternal: store_fs.OptionsReadExternal{},
 	// }
 
-	files := objekten.Strings()
-	files = append(files, akten.Strings()...)
-
 	// var possible cwd.CwdFiles
+
+	filez := append([]string{}, objektenFiles...)
+	filez = append(filez, aktenFiles...)
 
 	if _, err = cwd.MakeCwdFilesExactly(
 		u.Konfig(),
 		u.Standort().Cwd(),
-		files...,
+		filez...,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

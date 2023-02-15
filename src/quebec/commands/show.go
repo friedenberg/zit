@@ -214,7 +214,10 @@ func (c Show) showManyZettels(
 			return
 		}
 
-		hContainer := hinweisen.WriterContainer(collections.MakeErrStopIteration())
+		hContainer := collections.WriterContainer[kennung.Hinweis](
+			hinweisen,
+			collections.MakeErrStopIteration(),
+		)
 
 		filter = func(o *zettel.Transacted) (err error) {
 			err = hContainer(o.Sku.Kennung)
@@ -283,7 +286,7 @@ func (c Show) showAkten(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 
 // TODO-P3 support All
 func (c Show) showTransaktions(u *umwelt.Umwelt, ids kennung.Set) (err error) {
-	ids.Timestamps.Copy().Each(
+	ids.Timestamps.ImmutableClone().Each(
 		func(is ts.Time) (err error) {
 			var t *transaktion.Transaktion
 
@@ -317,7 +320,7 @@ func (c Show) showTypen(
 ) (err error) {
 	f1 := collections.MakeSyncSerializer(f)
 
-	typen := ids.Typen.MutableCopy()
+	typen := ids.Typen.MutableClone()
 
 	method := u.StoreObjekten().Typ().ReadAllSchwanzen
 
@@ -356,7 +359,7 @@ func (c Show) showEtiketten(
 ) (err error) {
 	f1 := collections.MakeSyncSerializer(f)
 
-	etiketten := ids.Etiketten.Copy().MutableCopy()
+	etiketten := ids.Etiketten.MutableClone()
 	if err = etiketten.EachPtr(
 		collections.MakeChain(
 			func(t *kennung.Etikett) (err error) {

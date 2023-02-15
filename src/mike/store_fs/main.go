@@ -438,7 +438,7 @@ func (s *Store) readOneFS(p string) (cz zettel_checked_out.Zettel, err error) {
 }
 
 func (s *Store) Read(p string) (cz zettel_checked_out.Zettel, err error) {
-  if cz, err = s.readOneFS(p); err != nil {
+	if cz, err = s.readOneFS(p); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

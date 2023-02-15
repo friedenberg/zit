@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
@@ -67,7 +68,7 @@ func (in *Text) ToCompareMap() (out CompareMap, err error) {
 }
 
 func (a *assignment) addToCompareMap(m Metadatei, es kennung.EtikettSet, out *CompareMap) (err error) {
-	mes := es.MutableCopy()
+	mes := es.MutableClone()
 
 	var es1 kennung.EtikettSet
 
@@ -77,11 +78,11 @@ func (a *assignment) addToCompareMap(m Metadatei, es kennung.EtikettSet, out *Co
 	}
 
 	es1.Each(mes.Add)
-	es = mes.Copy()
+	es = mes.ImmutableClone()
 
 	a.named.Each(
 		func(z zettel) (err error) {
-			for _, e := range es.Sorted() {
+			for _, e := range collections.SortedValues(es) {
 				out.Named.Add(z.Hinweis.String(), e)
 			}
 
@@ -96,7 +97,7 @@ func (a *assignment) addToCompareMap(m Metadatei, es kennung.EtikettSet, out *Co
 
 	a.unnamed.Each(
 		func(z newZettel) (err error) {
-			for _, e := range es.Sorted() {
+			for _, e := range collections.SortedValues(es) {
 				out.Unnamed.Add(z.Bezeichnung.String(), e)
 			}
 

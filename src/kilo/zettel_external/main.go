@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/juliett/zettel"
+	"github.com/friedenberg/zit/src/values"
 )
 
 type Sku = sku.External[kennung.Hinweis, *kennung.Hinweis]
@@ -17,6 +18,30 @@ type Zettel struct {
 	Sku      Sku
 	ZettelFD kennung.FD
 	AkteFD   kennung.FD
+}
+
+func (a Zettel) EqualsAny(b any) bool {
+	return values.Equals(a, b)
+}
+
+func (a Zettel) Equals(b Zettel) bool {
+	if !a.Objekte.Equals(b.Objekte) {
+		return false
+	}
+
+	if !a.Sku.Equals(b.Sku) {
+		return false
+	}
+
+	if !a.ZettelFD.Equals(b.ZettelFD) {
+		return false
+	}
+
+	if !a.AkteFD.Equals(b.AkteFD) {
+		return false
+	}
+
+	return true
 }
 
 func (e Zettel) GetObjekteFD() kennung.FD {

@@ -7,10 +7,10 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	zettel_pkg "github.com/friedenberg/zit/src/juliett/zettel"
+	"github.com/friedenberg/zit/src/values"
 )
 
 //   _____    _   _       _
@@ -52,6 +52,22 @@ func makeZettel(
 	}
 
 	return
+}
+
+func (a zettel) EqualsAny(b any) bool {
+	return values.Equals(a, b)
+}
+
+func (a zettel) Equals(b zettel) bool {
+	if !a.Hinweis.Equals(b.Hinweis) {
+		return false
+	}
+
+	if !a.Bezeichnung.Equals(b.Bezeichnung) {
+		return false
+	}
+
+	return true
 }
 
 func (z zettel) String() string {
@@ -101,7 +117,7 @@ func (z *zettel) Set(v string) (err error) {
 }
 
 func sortZettelSet(
-	s collections.MutableValueSet[zettel, *zettel],
+	s schnittstellen.MutableSet[zettel],
 ) (out []zettel) {
 	out = s.Elements()
 
@@ -127,6 +143,18 @@ type newZettel struct {
 	bezeichnung.Bezeichnung
 }
 
+func (a newZettel) EqualsAny(b any) bool {
+	return values.Equals(a, b)
+}
+
+func (a newZettel) Equals(b newZettel) bool {
+	if !a.Bezeichnung.Equals(b.Bezeichnung) {
+		return false
+	}
+
+	return true
+}
+
 func (z *newZettel) Set(v string) (err error) {
 	remaining := v
 
@@ -146,7 +174,7 @@ func (z *newZettel) Set(v string) (err error) {
 }
 
 func sortNewZettelSet(
-	s collections.MutableValueSet[newZettel, *newZettel],
+	s schnittstellen.MutableSet[newZettel],
 ) (sorted []newZettel) {
 	sorted = s.Elements()
 

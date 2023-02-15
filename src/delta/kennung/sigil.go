@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/values"
 )
 
 type Sigil int
@@ -52,6 +53,10 @@ func MakeSigil(v Sigil) (s *Sigil) {
 
 func (a Sigil) GetGattung() schnittstellen.Gattung {
 	return gattung.Unknown
+}
+
+func (a Sigil) EqualsAny(b any) bool {
+	return values.Equals(a, b)
 }
 
 func (a Sigil) Equals(b Sigil) bool {

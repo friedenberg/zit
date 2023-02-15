@@ -1,22 +1,28 @@
 package kennung
 
-import "testing"
+import (
+	"testing"
 
-func TestAddNormalized(t *testing.T) {
+	"github.com/friedenberg/zit/src/bravo/test_logz"
+)
+
+func TestAddNormalized(t1 *testing.T) {
+	t := test_logz.T{T: t1}
+
 	sut := MakeEtikettMutableSet(
 		MustEtikett("project-2021-zit-test"),
 		MustEtikett("project-2021-zit-ewwwwww"),
 		MustEtikett("zz-archive-task-done"),
 	)
 
-	sutEx := sut.MutableCopy()
+	sutEx := sut.ImmutableClone()
 
 	toAdd := MustEtikett("project-2021-zit")
 
 	AddNormalized(sut, toAdd)
 
 	if !sut.Equals(sutEx) {
-		t.Errorf("expected %v, but got %v", sutEx, sut)
+		t.NotEqual(sutEx, sut)
 	}
 }
 

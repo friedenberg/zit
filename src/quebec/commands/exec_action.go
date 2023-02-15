@@ -10,10 +10,11 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/november/umwelt"
+	"github.com/friedenberg/zit/src/values"
 )
 
 type ExecAction struct {
-	Action collections.StringValue
+	Action values.String
 }
 
 func init() {
@@ -94,7 +95,7 @@ func (c ExecAction) runAction(
 		map[string]string{
 			"ZIT_BIN": u.Standort().Executable(),
 		},
-		hinweisen.Strings()...,
+		collections.Strings[kennung.Hinweis](hinweisen)...,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

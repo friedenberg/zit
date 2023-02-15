@@ -72,14 +72,14 @@ func (c Add) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
 		return
 	}
 
-	options := organize_text.MakeOptions()
-	options.Abbr = u.StoreObjekten().GetAbbrStore().AbbreviateHinweis
-	options.RootEtiketten = c.Etiketten
-	options.Transacted = zettelsFromAkteResults
+	otFlags := organize_text.MakeFlags()
+	otFlags.Abbr = u.StoreObjekten().GetAbbrStore().AbbreviateHinweis
+	otFlags.RootEtiketten = c.Etiketten
+	otFlags.Transacted = zettelsFromAkteResults
 
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
 		Umwelt:  u,
-		Options: options,
+		Options: otFlags.GetOptions(),
 	}
 
 	var createOrganizeFileResults *organize_text.Text

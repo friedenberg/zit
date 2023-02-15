@@ -2,6 +2,7 @@ package umwelt
 
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
@@ -113,7 +114,9 @@ func (u *Umwelt) FormatTypCheckedOut() schnittstellen.FuncWriterFormat[typ.Exter
 func (u *Umwelt) FormatZettel() schnittstellen.FuncWriterFormat[zettel.Objekte] {
 	return zettel.MakeCliFormat(
 		u.FormatBezeichnung(),
-		format.MakeFormatStringer[kennung.EtikettSet](),
+		format.MakeFormatStringer[kennung.Etikett](
+			collections.StringCommaSeparated[kennung.Etikett],
+		),
 		u.FormatTyp(),
 	)
 }

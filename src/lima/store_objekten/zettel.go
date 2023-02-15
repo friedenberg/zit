@@ -27,7 +27,7 @@ type ZettelStore interface {
 	objekte_store.Querier[*zettel.Transacted]
 
 	objekte_store.TransactedReader[
-		schnittstellen.Value,
+		schnittstellen.ValueLike,
 		*zettel.Transacted,
 	]
 
@@ -230,7 +230,7 @@ func (s zettelStore) Query(
 	ids kennung.Set,
 	f schnittstellen.FuncIter[*zettel.Transacted],
 ) (err error) {
-  errors.TodoP1("generate optimized query here")
+	errors.TodoP1("generate optimized query here")
 	return s.MethodForSigil(ids.Sigil)(
 		collections.MakeChain(
 			zettel.MakeWriterKonfig(s.StoreUtil.GetKonfig()),
@@ -245,7 +245,7 @@ func (s zettelStore) Query(
 }
 
 func (s zettelStore) ReadOne(
-	i schnittstellen.Value,
+	i schnittstellen.ValueLike,
 ) (tz *zettel.Transacted, err error) {
 	switch tid := i.(type) {
 	case kennung.Hinweis:

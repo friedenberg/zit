@@ -2,6 +2,7 @@ package kennung_index
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/tridex"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
@@ -14,9 +15,9 @@ type EtikettenVerzeichnisse struct {
 
 func (z *EtikettenVerzeichnisse) ResetWithEtikettSet(es kennung.EtikettSet) {
 	ex := kennung.Expanded(es, kennung.ExpanderAll)
-	z.Tridex = tridex.Make(ex.SortedString()...)
-	z.SortedExpanded = ex.SortedString()
-	z.Sorted = es.SortedString()
+	z.Tridex = tridex.Make(collections.SortedStrings(ex)...)
+	z.SortedExpanded = collections.SortedStrings(ex)
+	z.Sorted = collections.SortedStrings(es)
 }
 
 func (z *EtikettenVerzeichnisse) Reset() {

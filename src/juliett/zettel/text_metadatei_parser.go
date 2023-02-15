@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
@@ -38,7 +39,7 @@ func (f *textMetadateiParser) ReadFormat(r1 io.Reader, z *Objekte) (n int64, err
 	etiketten := kennung.MakeEtikettMutableSet()
 
 	defer func() {
-		z.Etiketten = etiketten.Copy()
+		z.Etiketten = etiketten.ImmutableClone()
 	}()
 
 	r := bufio.NewReader(r1)
@@ -50,7 +51,10 @@ func (f *textMetadateiParser) ReadFormat(r1 io.Reader, z *Objekte) (n int64, err
 				map[string]schnittstellen.FuncSetString{
 					"#": z.Bezeichnung.Set,
 					"%": format.MakeLineReaderNop(),
-					"-": etiketten.StringAdder(),
+					"-": collections.MakeFuncSetString[
+						kennung.Etikett,
+						*kennung.Etikett,
+					](etiketten),
 					"!": func(v string) (err error) {
 						return f.readTyp(z, v)
 					},

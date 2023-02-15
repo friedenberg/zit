@@ -1,26 +1,36 @@
 package schnittstellen
 
-type Value interface {
-	Stringer
+type Element interface {
+	EqualsAny(any) bool
 }
 
-type ValuePtr[T Value] interface {
+type ValueLike interface {
+	Stringer
+	Element
+}
+
+type Value[T any] interface {
+	ValueLike
+	Equatable[T]
+}
+
+type ValuePtr[T any] interface {
+	Value[T]
 	Ptr[T]
 	Setter
 }
 
 type IdLike interface {
 	GattungGetter
-	Value
+	ValueLike
 }
 
-type Id[T Value] interface {
-	Value
+type Id[T any] interface {
+	Value[T]
 	GattungGetter
-	Equatable[T]
 }
 
-type IdPtr[T Value] interface {
+type IdPtr[T any] interface {
 	Id[T]
 	ValuePtr[T]
 	Resetable[T]

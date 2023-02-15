@@ -5,20 +5,22 @@ import (
 	"sort"
 	"testing"
 
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/test_logz"
+	"github.com/friedenberg/zit/src/values"
 )
 
-func makeStringValues(vs ...string) (out []StringValue) {
-	out = make([]StringValue, len(vs))
+func makeStringValues(vs ...string) (out []values.String) {
+	out = make([]values.String, len(vs))
 
 	for i, v := range vs {
-		out[i] = MakeStringValue(v)
+		out[i] = values.MakeString(v)
 	}
 
 	return
 }
 
-func assertSet(t test_logz.T, sut Set[StringValue], vals []StringValue) {
+func assertSet(t test_logz.T, sut schnittstellen.Set[values.String], vals []values.String) {
 	t.Helper()
 
 	// Len() int
@@ -29,7 +31,7 @@ func assertSet(t test_logz.T, sut Set[StringValue], vals []StringValue) {
 	// Key(T) string
 	{
 		v := "wow"
-		k := sut.Key(MakeStringValue(v))
+		k := sut.Key(values.MakeString(v))
 
 		if k != v {
 			t.Fatalf("expected key %s but got %s", v, k)
@@ -82,7 +84,7 @@ func assertSet(t test_logz.T, sut Set[StringValue], vals []StringValue) {
 
 	// Copy
 	{
-		sutCopy := sut.Copy()
+		sutCopy := sut.ImmutableClone()
 
 		if !sut.Equals(sutCopy) {
 			t.Fatalf("expected copy to equal original")
@@ -91,13 +93,13 @@ func assertSet(t test_logz.T, sut Set[StringValue], vals []StringValue) {
 
 	// MutableCopy
 	{
-		sutCopy := sut.MutableCopy()
+		sutCopy := sut.MutableClone()
 
 		if !sut.Equals(sutCopy) {
 			t.Fatalf("expected mutable copy to equal original")
 		}
 
-		sutCopy.Reset(nil)
+		sutCopy.Reset()
 
 		if sut.Equals(sutCopy) {
 			t.Fatalf("expected reset mutable copy to not equal original")
@@ -118,8 +120,8 @@ func TestSet(t1 *testing.T) {
 			"3 three",
 		)
 
-		sut := MakeSet[StringValue](
-			func(v StringValue) string {
+		sut := MakeSet[values.String](
+			func(v values.String) string {
 				return v.String()
 			},
 			vals...,
@@ -135,14 +137,14 @@ func TestSet(t1 *testing.T) {
 			"3 three",
 		)
 
-		sut := MakeMutableSet[StringValue](
-			func(v StringValue) string {
+		sut := MakeMutableSet[values.String](
+			func(v values.String) string {
 				return v.String()
 			},
 			vals...,
 		)
 
-		assertSet(t, Set[StringValue]{Set: sut}, vals)
+		assertSet(t, sut, vals)
 	}
 
 	{
@@ -152,11 +154,12 @@ func TestSet(t1 *testing.T) {
 			"3 three",
 		)
 
-		sut := MakeValueSet[StringValue](
+		sut := MakeSet[values.String](
+			(values.String).String,
 			vals...,
 		)
 
-		assertSet(t, Set[StringValue]{Set: sut}, vals)
+		assertSet(t, sut, vals)
 	}
 
 	{
@@ -166,10 +169,11 @@ func TestSet(t1 *testing.T) {
 			"3 three",
 		)
 
-		sut := MakeMutableValueSet[StringValue](
+		sut := MakeMutableSet[values.String](
+			(values.String).String,
 			vals...,
 		)
 
-		assertSet(t, Set[StringValue]{Set: sut}, vals)
+		assertSet(t, sut, vals)
 	}
 }

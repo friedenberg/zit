@@ -21,7 +21,7 @@ type AbbrStore interface {
 	ExpandShaString(string) (sha.Sha, error)
 	ExpandEtikettString(string) (kennung.Etikett, error)
 	ExpandHinweisString(string) (kennung.Hinweis, error)
-	AbbreviateSha(schnittstellen.Value) (string, error)
+	AbbreviateSha(schnittstellen.ValueLike) (string, error)
 	AbbreviateHinweis(schnittstellen.Korper) (string, error)
 	AddStoredAbbreviation(schnittstellen.Stored) error
 	errors.Flusher
@@ -163,7 +163,7 @@ func (i *indexAbbr) AddStoredAbbreviation(o schnittstellen.Stored) (err error) {
 	return
 }
 
-func (i *indexAbbr) AbbreviateSha(s schnittstellen.Value) (abbr string, err error) {
+func (i *indexAbbr) AbbreviateSha(s schnittstellen.ValueLike) (abbr string, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return

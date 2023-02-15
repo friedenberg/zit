@@ -68,7 +68,7 @@ func (c ZettelFromExternalAkte) Run(
 		if err = c.StoreObjekten().Zettel().ReadAll(
 			collections.MakeChain(
 				matcher.Match,
-				results.AddAndDoNotRepool,
+				collections.AddClone[zettel.Transacted, *zettel.Transacted](results),
 			),
 		); err != nil {
 			err = errors.Wrap(err)
