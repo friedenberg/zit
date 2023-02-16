@@ -4,14 +4,11 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/juliett/zettel"
-	"github.com/friedenberg/zit/src/kilo/zettel_external"
 	"github.com/friedenberg/zit/src/values"
 )
 
 type Zettel struct {
-	Internal zettel.Transacted
-	External zettel_external.Zettel
-	State    objekte.CheckedOutState
+	zettel.CheckedOut
 }
 
 func (sz Zettel) String() string {
@@ -23,14 +20,6 @@ func (sz Zettel) String() string {
 		sz.Internal.Sku.Kennung,
 		sz.Internal.Sku.ObjekteSha,
 	)
-}
-
-func (z Zettel) GetInternal() objekte.TransactedLike {
-	return z.Internal
-}
-
-func (z Zettel) GetExternal() objekte.ExternalLike {
-	return z.External
 }
 
 func (a Zettel) EqualsAny(b any) bool {
@@ -55,11 +44,11 @@ func (a Zettel) Equals(b Zettel) bool {
 
 func (c *Zettel) DetermineState() {
 	if c.Internal.Sku.ObjekteSha.IsNull() {
-		if c.External.ExternalPathAndSha() == "" {
-			c.State = objekte.CheckedOutStateEmpty
-		} else {
-			c.State = objekte.CheckedOutStateUntracked
-		}
+		// if c.External.ExternalPathAndSha() == "" {
+		// 	c.State = objekte.CheckedOutStateEmpty
+		// } else {
+		// 	c.State = objekte.CheckedOutStateUntracked
+		// }
 	} else if c.Internal.Sku.ObjekteSha.Equals(c.External.Sku.ObjekteSha) {
 		c.State = objekte.CheckedOutStateExistsAndSame
 	} else if c.External.Sku.ObjekteSha.IsNull() {

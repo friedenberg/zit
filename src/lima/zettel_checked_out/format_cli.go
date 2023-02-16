@@ -29,7 +29,7 @@ func MakeCliFormat(
 
 	return func(w io.Writer, z Zettel) (n int64, err error) {
 		switch {
-		case z.External.AkteFD.Path != "" && z.External.ZettelFD.Path != "":
+		case z.External.AkteFD.Path != "" && z.External.FD.Path != "":
 			return format.Write(
 				w,
 				format.MakeWriter(wzef, z),
@@ -43,7 +43,7 @@ func MakeCliFormat(
 				format.MakeWriter(waef, z),
 			)
 
-		case z.External.ZettelFD.Path != "":
+		case z.External.FD.Path != "":
 			return format.Write(
 				w,
 				format.MakeWriter(wzef, z),
@@ -72,7 +72,7 @@ func makeWriterFuncZettel(
 			w,
 			format.MakeFormatStringRightAlignedParen(diff),
 			format.MakeFormatString("["),
-			cw(s.MakeWriterRelativePath(z.External.ZettelFD.Path), format.ColorTypePointer),
+			cw(s.MakeWriterRelativePath(z.External.FD.Path), format.ColorTypePointer),
 			format.MakeFormatString("@"),
 			format.MakeWriter(sf, z.External.GetObjekteSha().GetSha()),
 			format.MakeFormatString(" "),

@@ -26,6 +26,11 @@ type CheckedOut[
 ] struct {
 	Internal Transacted[T, T1, T2, T3, T4, T5]
 	External External[T, T1, T2, T3]
+	State    CheckedOutState
+}
+
+func (co CheckedOut[T, T1, T2, T3, T4, T5]) GetState() CheckedOutState {
+	return co.State
 }
 
 func (co CheckedOut[T, T1, T2, T3, T4, T5]) GetInternal() TransactedLike {

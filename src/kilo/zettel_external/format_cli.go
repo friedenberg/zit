@@ -18,15 +18,15 @@ func MakeCliFormat(
 	hf schnittstellen.FuncWriterFormat[kennung.Hinweis],
 	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
 	zf schnittstellen.FuncWriterFormat[zettel.Objekte],
-) schnittstellen.FuncWriterFormat[Zettel] {
-	return func(w io.Writer, z Zettel) (n int64, err error) {
+) schnittstellen.FuncWriterFormat[zettel.External] {
+	return func(w io.Writer, z zettel.External) (n int64, err error) {
 		switch {
-		case z.AkteFD.Path != "" && z.ZettelFD.Path != "":
+		case z.AkteFD.Path != "" && z.FD.Path != "":
 			return format.Write(
 				w,
 				format.MakeFormatStringRightAlignedParen(format.StringCheckedOut),
 				format.MakeFormatString("["),
-				cw(s.MakeWriterRelativePath(z.ZettelFD.Path), format.ColorTypePointer),
+				cw(s.MakeWriterRelativePath(z.FD.Path), format.ColorTypePointer),
 				format.MakeFormatString("@"),
 				format.MakeWriter(sf, z.GetObjekteSha().GetSha()),
 				format.MakeFormatString(" "),
@@ -53,12 +53,12 @@ func MakeCliFormat(
 				format.MakeFormatString("]"),
 			)
 
-		case z.ZettelFD.Path != "":
+		case z.FD.Path != "":
 			return format.Write(
 				w,
 				format.MakeFormatStringRightAlignedParen(format.StringCheckedOut),
 				format.MakeFormatString("["),
-				cw(s.MakeWriterRelativePath(z.ZettelFD.Path), format.ColorTypePointer),
+				cw(s.MakeWriterRelativePath(z.FD.Path), format.ColorTypePointer),
 				format.MakeFormatString("@"),
 				format.MakeWriter(sf, z.GetObjekteSha().GetSha()),
 				format.MakeFormatString(" "),

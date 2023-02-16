@@ -4,7 +4,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/juliett/zettel"
-	"github.com/friedenberg/zit/src/kilo/zettel_external"
 	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
 	"github.com/friedenberg/zit/src/mike/store_fs"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -21,7 +20,7 @@ type CheckinResults struct {
 }
 
 func (c Checkin) Run(
-	zettelen ...zettel_external.Zettel,
+	zettelen ...zettel.External,
 ) (results CheckinResults, err error) {
 	results.Zettelen = make(map[kennung.Hinweis]zettel_checked_out.Zettel)
 
@@ -47,8 +46,10 @@ func (c Checkin) Run(
 		// stdprinter.Outf("%s (unchanged)", tz.Named)
 
 		results.Zettelen[tz.Sku.Kennung] = zettel_checked_out.Zettel{
-			Internal: *tz,
-			External: z,
+			CheckedOut: zettel.CheckedOut{
+				Internal: *tz,
+				External: z,
+			},
 		}
 	}
 

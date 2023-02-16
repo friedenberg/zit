@@ -42,7 +42,7 @@ func (c ZettelFromExternalAkte) Run(
 
 	if err = fds.Each(
 		func(fd kennung.FD) (err error) {
-			var z *zettel_external.Zettel
+			var z *zettel.External
 
 			if z, err = c.zettelForAkte(fd); err != nil {
 				err = errors.Wrap(err)
@@ -96,7 +96,7 @@ func (c ZettelFromExternalAkte) Run(
 	}
 
 	err = toCreate.Each(
-		func(z *zettel_external.Zettel) (err error) {
+		func(z *zettel.External) (err error) {
 			if z.Objekte.IsEmpty() {
 				return
 			}
@@ -130,7 +130,7 @@ func (c ZettelFromExternalAkte) Run(
 	}
 
 	err = toDelete.Each(
-		func(z *zettel_external.Zettel) (err error) {
+		func(z *zettel.External) (err error) {
 			// TODO-P4 move to checkout store
 			if err = os.Remove(z.AkteFD.Path); err != nil {
 				err = errors.Wrap(err)
@@ -156,8 +156,8 @@ func (c ZettelFromExternalAkte) Run(
 
 func (c ZettelFromExternalAkte) zettelForAkte(
 	akteFD kennung.FD,
-) (z *zettel_external.Zettel, err error) {
-	z = &zettel_external.Zettel{
+) (z *zettel.External, err error) {
+	z = &zettel.External{
 		AkteFD: akteFD,
 	}
 

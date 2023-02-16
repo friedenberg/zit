@@ -3,7 +3,7 @@ package zettel_checked_out
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/kilo/zettel_external"
+	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
 type MutableSet struct {
@@ -45,8 +45,8 @@ func MakeMutableSetHinweisZettel(c int) MutableSet {
 	}
 }
 
-func (s MutableSet) ToSliceZettelsExternal() (out []zettel_external.Zettel) {
-	out = make([]zettel_external.Zettel, 0, s.Len())
+func (s MutableSet) ToSliceZettelsExternal() (out []zettel.External) {
+	out = make([]zettel.External, 0, s.Len())
 
 	s.Each(
 		func(z *Zettel) (err error) {
@@ -63,7 +63,7 @@ func (s MutableSet) ToSliceFilesZettelen() (out []string) {
 
 	s.Each(
 		func(z *Zettel) (err error) {
-			p := z.External.ZettelFD.Path
+			p := z.External.FD.Path
 
 			if p != "" {
 				out = append(out, p)

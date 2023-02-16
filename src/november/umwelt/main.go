@@ -23,6 +23,7 @@ import (
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/store_util"
 	"github.com/friedenberg/zit/src/lima/store_objekten"
+	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
 	"github.com/friedenberg/zit/src/mike/store_fs"
 )
 
@@ -226,20 +227,26 @@ func (u *Umwelt) Initialize() (err error) {
 		},
 	)
 
-	u.storeWorkingDirectory.SetZettelExternalLogPrinter(
-		u.PrinterZettelExternal(),
-	)
-
 	u.storeWorkingDirectory.SetCheckedOutLogPrinter(
 		func(co objekte.CheckedOutLike) (err error) {
 			sk2 := co.GetInternal().GetSku2()
 
-			_, err = fmt.Fprintf(
-				u.Out(),
-				"(checked out) [%s.%s]\n",
-				sk2.Kennung,
-				sk2.Gattung,
-			)
+			switch sk2.Gattung {
+			case gattung.Zettel:
+				coz := co.(*zettel_checked_out.Zettel)
+				return u.PrinterZettelExternal()(&coz.External)
+
+			case gattung.Typ:
+				fallthrough
+
+			default:
+				_, err = fmt.Fprintf(
+					u.Out(),
+					"(checked out) [%s.%s]\n",
+					sk2.Kennung,
+					sk2.Gattung,
+				)
+			}
 
 			return
 		},

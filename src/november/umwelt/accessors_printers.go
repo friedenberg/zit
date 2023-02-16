@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kasten"
-	"github.com/friedenberg/zit/src/kilo/zettel_external"
 	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
 	"github.com/friedenberg/zit/src/mike/store_fs"
 )
@@ -105,7 +104,7 @@ func (u *Umwelt) PrinterZettelTransactedDelta() schnittstellen.FuncIter[*zettel.
 	)
 }
 
-func (u *Umwelt) PrinterZettelExternal() schnittstellen.FuncIter[*zettel_external.Zettel] {
+func (u *Umwelt) PrinterZettelExternal() schnittstellen.FuncIter[*zettel.External] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
 		u.FormatZettelExternal(),

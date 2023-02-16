@@ -123,7 +123,9 @@ func (s Store) Flush() (err error) {
 	return
 }
 
-func (s Store) MakeExternalZettelFromZettel(p string) (ez zettel_external.Zettel, err error) {
+func (s Store) MakeExternalZettelFromZettel(
+	p string,
+) (ez zettel.External, err error) {
 	if p, err = filepath.Abs(p); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -134,7 +136,7 @@ func (s Store) MakeExternalZettelFromZettel(p string) (ez zettel_external.Zettel
 		return
 	}
 
-	ez.ZettelFD.Path = p
+	ez.FD.Path = p
 
 	head, tail := id.HeadTailFromFileName(p)
 
@@ -146,13 +148,13 @@ func (s Store) MakeExternalZettelFromZettel(p string) (ez zettel_external.Zettel
 	return
 }
 
-func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
-	if !files.Exists(ez.ZettelFD.Path) {
+func (s Store) readZettelFromFile(ez *zettel.External) (err error) {
+	if !files.Exists(ez.FD.Path) {
 		// if the path does not have an extension, try looking for a file with that
 		// extension
 		// TODO-P4 modify this to use globs
-		if filepath.Ext(ez.ZettelFD.Path) == "" {
-			ez.ZettelFD.Path = ez.ZettelFD.Path + s.erworben.GetZettelFileExtension()
+		if filepath.Ext(ez.FD.Path) == "" {
+			ez.FD.Path = ez.FD.Path + s.erworben.GetZettelFileExtension()
 			return s.readZettelFromFile(ez)
 		}
 
@@ -165,7 +167,7 @@ func (s Store) readZettelFromFile(ez *zettel_external.Zettel) (err error) {
 
 	var f *os.File
 
-	if f, err = files.Open(ez.ZettelFD.Path); err != nil {
+	if f, err = files.Open(ez.FD.Path); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -315,8 +317,8 @@ func (s *Store) ReadMany(
 	if s.erworben.IncludeCwd {
 		w = func(z *zettel.Transacted) (err error) {
 			// TODO-P2 akte fd?
-			ze := zettel_external.Zettel{
-				ZettelFD: kennung.FD{
+			ze := zettel.External{
+				FD: kennung.FD{
 					Path: z.Sku.Kennung.String(),
 				},
 			}

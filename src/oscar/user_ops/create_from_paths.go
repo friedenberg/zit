@@ -38,7 +38,7 @@ func (c CreateFromPaths) Run(
 	for _, arg := range args {
 		if err = c.zettelsFromPath(
 			arg,
-			func(z *zettel_external.Zettel) (err error) {
+			func(z *zettel.External) (err error) {
 				toCreate.Add(z)
 				if c.Delete {
 					toDelete.Add(z)
@@ -109,9 +109,11 @@ func (c CreateFromPaths) Run(
 	)
 
 	err = toCreate.Each(
-		func(z *zettel_external.Zettel) (err error) {
+		func(z *zettel.External) (err error) {
 			cz := zettel_checked_out.Zettel{
-				External: *z,
+				CheckedOut: zettel.CheckedOut{
+					External: *z,
+				},
 			}
 
 			if z.Objekte.IsEmpty() {
@@ -162,14 +164,14 @@ func (c CreateFromPaths) Run(
 	}
 
 	err = toDelete.Each(
-		func(z *zettel_external.Zettel) (err error) {
+		func(z *zettel.External) (err error) {
 			// TODO move to checkout store
-			if err = os.Remove(z.ZettelFD.Path); err != nil {
+			if err = os.Remove(z.FD.Path); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			pathRel := c.Standort().RelToCwdOrSame(z.ZettelFD.Path)
+			pathRel := c.Standort().RelToCwdOrSame(z.FD.Path)
 
 			// TODO move to printer
 			errors.Out().Printf("[%s] (deleted)", pathRel)
@@ -189,7 +191,7 @@ func (c CreateFromPaths) Run(
 // TODO migrate this to use store_working_directory
 func (c CreateFromPaths) zettelsFromPath(
 	p string,
-	wf schnittstellen.FuncIter[*zettel_external.Zettel],
+	wf schnittstellen.FuncIter[*zettel.External],
 ) (err error) {
 	var r io.Reader
 
@@ -228,7 +230,7 @@ func (c CreateFromPaths) zettelsFromPath(
 		//	}
 
 		//	wf(
-		//		&zettel_external.Zettel{
+		//		&zettel.External{
 		//			ZettelFD: fd.FD{
 		//				Path: p,
 		//			},
@@ -254,8 +256,8 @@ func (c CreateFromPaths) zettelsFromPath(
 	}
 
 	wf(
-		&zettel_external.Zettel{
-			ZettelFD: kennung.FD{
+		&zettel.External{
+			FD: kennung.FD{
 				Path: p,
 			},
 			Sku: zettel_external.Sku{

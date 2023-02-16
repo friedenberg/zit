@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/juliett/cwd"
+	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/zettel_external"
 	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
 	"github.com/friedenberg/zit/src/mike/store_fs"
@@ -64,7 +65,7 @@ func (c Checkin) RunWithQuery(
 		OptionsReadExternal: readOp.OptionsReadExternal,
 	}
 
-	zettels := make([]zettel_external.Zettel, 0, readResults.Len())
+	zettels := make([]zettel.External, 0, readResults.Len())
 
 	err = readResults.Each(
 		func(zco *zettel_checked_out.Zettel) (err error) {

@@ -151,7 +151,7 @@ func (s *Store) CheckoutOne(
 
 		if !s.shouldCheckOut(options, cz) {
 			// TODO-P2 handle fs state
-			if err = s.zettelExternalLogPrinter(&cz.External); err != nil {
+			if err = s.checkedOutLogPrinter(&cz); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -164,19 +164,21 @@ func (s *Store) CheckoutOne(
 
 	cz = zettel_checked_out.Zettel{
 		// TODO-P2 check diff with fs if already exists
-		State:    objekte.CheckedOutStateJustCheckedOut,
-		Internal: sz,
-		External: zettel_external.Zettel{
-			Objekte: sz.Objekte,
-			Sku: zettel_external.Sku{
-				ObjekteSha: sz.Sku.ObjekteSha,
-				Kennung:    sz.Sku.Kennung,
+		CheckedOut: zettel.CheckedOut{
+			State:    objekte.CheckedOutStateJustCheckedOut,
+			Internal: sz,
+			External: zettel.External{
+				Objekte: sz.Objekte,
+				Sku: zettel_external.Sku{
+					ObjekteSha: sz.Sku.ObjekteSha,
+					Kennung:    sz.Sku.Kennung,
+				},
 			},
 		},
 	}
 
 	if options.CheckoutMode.IncludesZettel() {
-		cz.External.ZettelFD.Path = filename
+		cz.External.FD.Path = filename
 	}
 
 	if !inlineAkte && options.CheckoutMode.IncludesAkte() {
@@ -207,7 +209,7 @@ func (s *Store) CheckoutOne(
 		return
 	}
 
-	if err = s.zettelExternalLogPrinter(&cz.External); err != nil {
+	if err = s.checkedOutLogPrinter(&cz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -3,20 +3,24 @@ package zettel_external
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
 type MutableSet struct {
-	schnittstellen.MutableSet[*Zettel]
+	schnittstellen.MutableSet[*zettel.External]
 }
 
-func MakeMutableSet(kf collections.KeyFunc[*Zettel], zs ...*Zettel) MutableSet {
+func MakeMutableSet(
+	kf collections.KeyFunc[*zettel.External],
+	zs ...*zettel.External,
+) MutableSet {
 	return MutableSet{
-		MutableSet: collections.MakeMutableSet[*Zettel](kf, zs...),
+		MutableSet: collections.MakeMutableSet[*zettel.External](kf, zs...),
 	}
 }
 
-func MakeMutableSetUniqueHinweis(zs ...*Zettel) MutableSet {
-	kf := func(z *Zettel) string {
+func MakeMutableSetUniqueHinweis(zs ...*zettel.External) MutableSet {
+	kf := func(z *zettel.External) string {
 		if z == nil {
 			return ""
 		}
@@ -27,8 +31,8 @@ func MakeMutableSetUniqueHinweis(zs ...*Zettel) MutableSet {
 	return MakeMutableSet(kf, zs...)
 }
 
-func MakeMutableSetUniqueFD(zs ...*Zettel) MutableSet {
-	kf := func(z *Zettel) string {
+func MakeMutableSetUniqueFD(zs ...*zettel.External) MutableSet {
+	kf := func(z *zettel.External) string {
 		if z == nil {
 			return ""
 		}
@@ -39,8 +43,8 @@ func MakeMutableSetUniqueFD(zs ...*Zettel) MutableSet {
 	return MakeMutableSet(kf, zs...)
 }
 
-func MakeMutableSetUniqueStored(zs ...*Zettel) MutableSet {
-	kf := func(z *Zettel) string {
+func MakeMutableSetUniqueStored(zs ...*zettel.External) MutableSet {
+	kf := func(z *zettel.External) string {
 		if z == nil {
 			return ""
 		}
@@ -55,8 +59,8 @@ func MakeMutableSetUniqueStored(zs ...*Zettel) MutableSet {
 	return MakeMutableSet(kf, zs...)
 }
 
-func MakeMutableSetUniqueAkte(zs ...*Zettel) MutableSet {
-	kf := func(z *Zettel) string {
+func MakeMutableSetUniqueAkte(zs ...*zettel.External) MutableSet {
+	kf := func(z *zettel.External) string {
 		if z == nil {
 			return ""
 		}

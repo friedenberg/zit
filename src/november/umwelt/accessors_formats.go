@@ -121,7 +121,7 @@ func (u *Umwelt) FormatZettel() schnittstellen.FuncWriterFormat[zettel.Objekte] 
 	)
 }
 
-func (u *Umwelt) FormatZettelExternal() schnittstellen.FuncWriterFormat[zettel_external.Zettel] {
+func (u *Umwelt) FormatZettelExternal() schnittstellen.FuncWriterFormat[zettel.External] {
 	return zettel_external.MakeCliFormat(
 		u.Standort(),
 		u.FormatColorWriter(),

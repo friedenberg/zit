@@ -29,7 +29,7 @@ func (c DeleteCheckout) Run(
 	)
 
 	if err = zes.Each(
-		func(external *zettel_external.Zettel) (err error) {
+		func(external *zettel.External) (err error) {
 			var internal *zettel.Transacted
 
 			if internal, err = c.StoreObjekten().Zettel().ReadOne(
@@ -49,7 +49,7 @@ func (c DeleteCheckout) Run(
 			}
 
 			zesToDelete.Add(external)
-			filesToDelete.Add(&external.ZettelFD)
+			filesToDelete.Add(&external.FD)
 
 			if external.AkteFD.Path != "" {
 				filesToDelete.Add(&external.AkteFD)

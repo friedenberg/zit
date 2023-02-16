@@ -23,3 +23,19 @@ type Transacted = objekte.Transacted[
 	Verzeichnisse,
 	*Verzeichnisse,
 ]
+
+type External = objekte.External[
+	Objekte,
+	*Objekte,
+	kennung.Hinweis,
+	*kennung.Hinweis,
+]
+
+type CheckedOut = objekte.CheckedOut[
+	Objekte,
+	*Objekte,
+	kennung.Hinweis,
+	*kennung.Hinweis,
+	Verzeichnisse,
+	*Verzeichnisse,
+]
