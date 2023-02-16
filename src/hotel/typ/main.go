@@ -13,3 +13,26 @@ type Transacted = objekte.Transacted[
 	objekte.NilVerzeichnisse[Objekte],
 	*objekte.NilVerzeichnisse[Objekte],
 ]
+
+type ExternalKeyer = objekte.ExternalKeyer[
+	Objekte,
+	*Objekte,
+	kennung.Typ,
+	*kennung.Typ,
+]
+
+type External = objekte.External[
+	Objekte,
+	*Objekte,
+	kennung.Typ,
+	*kennung.Typ,
+]
+
+type CheckedOut = objekte.CheckedOut[
+	Objekte,
+	*Objekte,
+	kennung.Typ,
+	*kennung.Typ,
+	objekte.NilVerzeichnisse[Objekte],
+	*objekte.NilVerzeichnisse[Objekte],
+]

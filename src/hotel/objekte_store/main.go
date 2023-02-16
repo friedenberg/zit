@@ -53,8 +53,10 @@ type TransactedReader[
 }
 
 type Querier[
+  K any,
 	V any,
 ] interface {
+  TransactedReader[K, V]
 	Query(kennung.Set, schnittstellen.FuncIter[V]) error
 }
 

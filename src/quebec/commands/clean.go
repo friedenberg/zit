@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/juliett/cwd"
 	"github.com/friedenberg/zit/src/kilo/zettel_external"
 	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
@@ -66,7 +67,7 @@ func (c Clean) RunWithQuery(
 
 	readResults.Each(
 		func(zco *zettel_checked_out.Zettel) (err error) {
-			if zco.State != zettel_checked_out.StateExistsAndSame {
+			if zco.State != objekte.CheckedOutStateExistsAndSame {
 				return
 			}
 

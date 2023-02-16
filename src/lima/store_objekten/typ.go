@@ -28,7 +28,7 @@ type TypStore interface {
 		*typ.Objekte,
 	]
 
-	objekte_store.TransactedReader[
+	objekte_store.Querier[
 		*kennung.Typ,
 		*typ.Transacted,
 	]
@@ -165,6 +165,25 @@ func makeTypStore(
 
 func (s typStore) Flush() (err error) {
 	return
+}
+
+func (s *typStore) Query(
+	ids kennung.Set,
+	f schnittstellen.FuncIter[*typ.Transacted],
+) (err error) {
+	errors.TodoP1("generate optimized query here")
+	return objekte_store.MethodForSigil[
+		*kennung.Typ,
+		*typ.Transacted,
+	](s, ids.Sigil)(
+		collections.MakeChain(
+			func(t *typ.Transacted) (err error) {
+				errors.TodoP0("implement filtering")
+				return
+			},
+			f,
+		),
+	)
 }
 
 // TODO-P3

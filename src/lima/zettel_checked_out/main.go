@@ -11,7 +11,7 @@ import (
 type Zettel struct {
 	Internal zettel.Transacted
 	External zettel_external.Zettel
-	State
+	State    objekte.CheckedOutState
 }
 
 func (sz Zettel) String() string {
@@ -56,15 +56,15 @@ func (a Zettel) Equals(b Zettel) bool {
 func (c *Zettel) DetermineState() {
 	if c.Internal.Sku.ObjekteSha.IsNull() {
 		if c.External.ExternalPathAndSha() == "" {
-			c.State = StateEmpty
+			c.State = objekte.CheckedOutStateEmpty
 		} else {
-			c.State = StateUntracked
+			c.State = objekte.CheckedOutStateUntracked
 		}
 	} else if c.Internal.Sku.ObjekteSha.Equals(c.External.Sku.ObjekteSha) {
-		c.State = StateExistsAndSame
+		c.State = objekte.CheckedOutStateExistsAndSame
 	} else if c.External.Sku.ObjekteSha.IsNull() {
-		c.State = StateEmpty
+		c.State = objekte.CheckedOutStateEmpty
 	} else {
-		c.State = StateExistsAndDifferent
+		c.State = objekte.CheckedOutStateExistsAndDifferent
 	}
 }

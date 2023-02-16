@@ -16,6 +16,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/ts"
+	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/india/konfig"
 	"github.com/friedenberg/zit/src/juliett/cwd"
 	"github.com/friedenberg/zit/src/juliett/zettel"
@@ -34,6 +35,7 @@ type Store struct {
 	storeObjekten *store_objekten.Store
 
 	zettelExternalLogPrinter schnittstellen.FuncIter[*zettel_external.Zettel]
+	checkedOutLogPrinter     schnittstellen.FuncIter[objekte.CheckedOutLike]
 
 	entries      map[string]Entry
 	indexWasRead bool
@@ -59,6 +61,12 @@ func New(
 	}
 
 	return
+}
+
+func (s *Store) SetCheckedOutLogPrinter(
+	zelw schnittstellen.FuncIter[objekte.CheckedOutLike],
+) {
+	s.checkedOutLogPrinter = zelw
 }
 
 func (s *Store) SetZettelExternalLogPrinter(
@@ -460,7 +468,7 @@ func (s *Store) Read(p string) (cz zettel_checked_out.Zettel, err error) {
 	cz.Internal = *zt
 	cz.DetermineState()
 
-	if cz.State > zettel_checked_out.StateExistsAndSame {
+	if cz.State > objekte.CheckedOutStateExistsAndSame {
 		// TODO-P4 rewrite with verzeichnisseAll
 		// exSha := cz.External.Sku.Sha
 		// cz.Matches.Zettelen, _ = s.storeObjekten.ReadZettelSha(exSha)

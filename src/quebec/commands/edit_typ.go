@@ -2,9 +2,7 @@ package commands
 
 import (
 	"flag"
-	"fmt"
 	"os"
-	"path"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
@@ -15,7 +13,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
-	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/november/umwelt"
 	"github.com/friedenberg/zit/src/oscar/user_ops"
@@ -71,7 +68,7 @@ func (c EditTyp) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 
 	var ps []string
 
-	if ps, err = c.makeTempTypFiles(u, tks); err != nil {
+	if ps, err = u.StoreWorkingDirectory().MakeTempTypFiles(tks); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -121,69 +118,6 @@ func (c EditTyp) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 			}
 
 			u.KonfigPtr().AddTyp(tt)
-
-			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (c EditTyp) makeTempTypFiles(
-	u *umwelt.Umwelt,
-	tks schnittstellen.Set[kennung.Typ],
-) (ps []string, err error) {
-	errors.TodoP3("add support for working directory")
-
-	ps = make([]string, 0, tks.Len())
-
-	var tempDir string
-
-	if tempDir, err = u.Standort().DirTempOS(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	format := typ.MakeFormatText(u.StoreObjekten())
-
-	if err = tks.Each(
-		func(tk kennung.Typ) (err error) {
-			var tt *typ.Transacted
-
-			if tt, err = u.StoreObjekten().Typ().ReadOne(&tk); err != nil {
-				if errors.Is(err, objekte_store.ErrNotFound{}) {
-					err = nil
-					tt = &typ.Transacted{
-						Sku: sku.Transacted[kennung.Typ, *kennung.Typ]{
-							Kennung: tk,
-						},
-					}
-				} else {
-					err = errors.Wrap(err)
-					return
-				}
-			}
-
-			var f *os.File
-
-			if f, err = files.CreateExclusiveWriteOnly(
-				path.Join(tempDir, fmt.Sprintf("%s.%s", tk.String(), u.Konfig().FileExtensions.Typ)),
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			defer errors.Deferred(&err, f.Close)
-
-			ps = append(ps, f.Name())
-
-			if _, err = format.WriteFormat(f, &tt.Objekte); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
 
 			return
 		},

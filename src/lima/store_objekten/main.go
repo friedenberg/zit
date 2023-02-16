@@ -82,6 +82,9 @@ func Make(
 		gattung.Zettel: objekte.MakeApplyQueryTransactedLike[*zettel.Transacted](
 			s.zettelStore.Query,
 		),
+		gattung.Typ: objekte.MakeApplyQueryTransactedLike[*typ.Transacted](
+			s.typStore.Query,
+		),
 		// gattung.Typ: objekte.MakeApplyTransactedLike[*typ.Transacted](
 		// 	s.typStore.ReadAllSchwanzen,
 		// ),

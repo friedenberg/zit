@@ -24,9 +24,8 @@ type ZettelStore interface {
 
 	objekte_store.Inheritor[*zettel.Transacted]
 	objekte_store.TransactedLogger[*zettel.Transacted]
-	objekte_store.Querier[*zettel.Transacted]
 
-	objekte_store.TransactedReader[
+	objekte_store.Querier[
 		schnittstellen.ValueLike,
 		*zettel.Transacted,
 	]
@@ -216,22 +215,15 @@ func (s *zettelStore) writeNamedZettelToIndex(
 	return
 }
 
-func (s zettelStore) MethodForSigil(
-	sigil kennung.Sigil,
-) func(schnittstellen.FuncIter[*zettel.Transacted]) error {
-	if sigil.IncludesHistory() {
-		return s.ReadAll
-	} else {
-		return s.ReadAllSchwanzen
-	}
-}
-
-func (s zettelStore) Query(
+func (s *zettelStore) Query(
 	ids kennung.Set,
 	f schnittstellen.FuncIter[*zettel.Transacted],
 ) (err error) {
 	errors.TodoP1("generate optimized query here")
-	return s.MethodForSigil(ids.Sigil)(
+	return objekte_store.MethodForSigil[
+		schnittstellen.ValueLike,
+		*zettel.Transacted,
+	](s, ids.Sigil)(
 		collections.MakeChain(
 			zettel.MakeWriterKonfig(s.StoreUtil.GetKonfig()),
 			zettel.WriterIds{

@@ -1,6 +1,7 @@
 package umwelt
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -16,6 +17,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/ts"
+	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/india/konfig"
 	"github.com/friedenberg/zit/src/juliett/zettel"
@@ -226,6 +228,21 @@ func (u *Umwelt) Initialize() (err error) {
 
 	u.storeWorkingDirectory.SetZettelExternalLogPrinter(
 		u.PrinterZettelExternal(),
+	)
+
+	u.storeWorkingDirectory.SetCheckedOutLogPrinter(
+		func(co objekte.CheckedOutLike) (err error) {
+			sk2 := co.GetInternal().GetSku2()
+
+			_, err = fmt.Fprintf(
+				u.Out(),
+				"(checked out) [%s.%s]\n",
+				sk2.Kennung,
+				sk2.Gattung,
+			)
+
+			return
+		},
 	)
 
 	u.storesInitialized = true
