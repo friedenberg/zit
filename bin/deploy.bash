@@ -1,5 +1,7 @@
 #! /usr/bin/env bash -e
 
+git pull --rebase
+
 #TODO pause mr-build-and-watch and then resume after
 cmd_make=make
 
