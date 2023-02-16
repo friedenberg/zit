@@ -102,8 +102,8 @@ func (u *Umwelt) FormatKastenTransacted() schnittstellen.FuncWriterFormat[kasten
 	)
 }
 
-func (u *Umwelt) FormatTypCheckedOut() schnittstellen.FuncWriterFormat[typ.External] {
-	return typ.MakeCliFormatExternal(
+func (u *Umwelt) FormatTypCheckedOut() schnittstellen.FuncWriterFormat[typ.CheckedOut] {
+	return typ.MakeCliFormatCheckedOut(
 		u.Standort(),
 		u.FormatColorWriter(),
 		u.FormatSha(u.StoreObjekten().GetAbbrStore().AbbreviateSha),

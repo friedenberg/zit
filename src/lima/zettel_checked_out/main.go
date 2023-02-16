@@ -2,7 +2,6 @@ package zettel_checked_out
 
 import (
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/values"
 )
@@ -40,20 +39,4 @@ func (a Zettel) Equals(b Zettel) bool {
 	}
 
 	return true
-}
-
-func (c *Zettel) DetermineState() {
-	if c.Internal.Sku.ObjekteSha.IsNull() {
-		// if c.External.ExternalPathAndSha() == "" {
-		// 	c.State = objekte.CheckedOutStateEmpty
-		// } else {
-		// 	c.State = objekte.CheckedOutStateUntracked
-		// }
-	} else if c.Internal.Sku.ObjekteSha.Equals(c.External.Sku.ObjekteSha) {
-		c.State = objekte.CheckedOutStateExistsAndSame
-	} else if c.External.Sku.ObjekteSha.IsNull() {
-		c.State = objekte.CheckedOutStateEmpty
-	} else {
-		c.State = objekte.CheckedOutStateExistsAndDifferent
-	}
 }

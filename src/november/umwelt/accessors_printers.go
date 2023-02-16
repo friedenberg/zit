@@ -68,7 +68,7 @@ func (u *Umwelt) PrinterKastenTransacted() schnittstellen.FuncIter[*kasten.Trans
 	)
 }
 
-func (u *Umwelt) PrinterTypCheckedOut() schnittstellen.FuncIter[*typ.External] {
+func (u *Umwelt) PrinterTypCheckedOut() schnittstellen.FuncIter[*typ.CheckedOut] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
 		u.FormatTypCheckedOut(),

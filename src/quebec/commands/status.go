@@ -5,6 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
+	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/juliett/cwd"
 	"github.com/friedenberg/zit/src/lima/store_objekten"
 	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
@@ -66,12 +67,25 @@ func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	for _, p := range possible.Typen {
-		if err = s.StoreWorkingDirectory().ReadTyp(p); err != nil {
+		tcp := &typ.CheckedOut{
+			External: *p,
+		}
+
+		var tt *typ.Transacted
+
+		if tt, err = s.StoreObjekten().Typ().ReadOne(&p.Sku.Kennung); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		tcp.Internal = *tt
+
+		if err = s.StoreWorkingDirectory().ReadTyp(&tcp.External); err != nil {
 			err = errors.Wrapf(err, "Path: %s", p.FD)
 			return
 		}
 
-		if err = s.PrinterTypCheckedOut()(p); err != nil {
+		if err = s.PrinterTypCheckedOut()(tcp); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

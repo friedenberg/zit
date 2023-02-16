@@ -25,22 +25,28 @@ func MakeCliFormat(
 }
 
 // [typ.typ@sha !typ]
-func MakeCliFormatExternal(
+func MakeCliFormatCheckedOut(
 	s standort.Standort,
 	cw format.FuncColorWriter,
 	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
 	tf schnittstellen.FuncWriterFormat[kennung.Typ],
-) schnittstellen.FuncWriterFormat[External] {
-	return func(w io.Writer, t External) (n int64, err error) {
+) schnittstellen.FuncWriterFormat[CheckedOut] {
+	return func(w io.Writer, t CheckedOut) (n int64, err error) {
+		diff := format.StringChanged
+
+		if t.Internal.Sku.ObjekteSha.Equals(t.External.Sku.ObjekteSha) {
+			diff = format.StringSame
+		}
+
 		return format.Write(
 			w,
-			format.MakeFormatStringRightAlignedParen(""),
+			format.MakeFormatStringRightAlignedParen(diff),
 			format.MakeFormatString("["),
-			cw(s.MakeWriterRelativePath(t.FD.Path), format.ColorTypePointer),
+			cw(s.MakeWriterRelativePath(t.External.FD.Path), format.ColorTypePointer),
 			format.MakeFormatString("@"),
-			format.MakeWriter(sf, t.GetObjekteSha().GetSha()),
+			format.MakeWriter(sf, t.External.GetObjekteSha().GetSha()),
 			format.MakeFormatString(" "),
-			format.MakeWriter(tf, t.Sku.Kennung),
+			format.MakeWriter(tf, t.External.Sku.Kennung),
 			format.MakeFormatString("]"),
 		)
 	}
