@@ -9,11 +9,8 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/juliett/cwd"
-	"github.com/friedenberg/zit/src/juliett/zettel"
-	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
 	"github.com/friedenberg/zit/src/mike/store_fs"
 	"github.com/friedenberg/zit/src/november/umwelt"
-	"github.com/friedenberg/zit/src/oscar/user_ops"
 )
 
 type Clean struct{}
@@ -44,46 +41,75 @@ func (c Clean) RunWithQuery(
 		return
 	}
 
-	optionsReadExternal := store_fs.OptionsReadExternal{}
-
-	readResults := zettel_checked_out.MakeMutableSetUnique(0)
-
-	readOp := user_ops.ReadCheckedOut{
-		Umwelt:              s,
-		OptionsReadExternal: optionsReadExternal,
-	}
-
-	if err = readOp.RunMany(possible, readResults.Add); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	toDelete := make([]zettel.External, 0, readResults.Len())
-	filesToDelete := make([]string, 0, readResults.Len()+len(possible.EmptyDirectories))
+	toDelete := make([]objekte.ExternalLike, 0)
+	filesToDelete := make([]string, 0)
 
 	for _, d := range possible.EmptyDirectories {
 		filesToDelete = append(filesToDelete, d)
 	}
 
-	readResults.Each(
-		func(zco *zettel_checked_out.Zettel) (err error) {
-			if zco.State != objekte.CheckedOutStateExistsAndSame {
+	if err = s.StoreWorkingDirectory().ReadFiles(
+		possible,
+		func(co objekte.CheckedOutLike) (err error) {
+			if co.GetState() != objekte.CheckedOutStateExistsAndSame {
 				return
 			}
 
-			toDelete = append(toDelete, zco.External)
+			e := co.GetExternal()
 
-			if zco.External.FD.Path != "" {
-				filesToDelete = append(filesToDelete, zco.External.FD.Path)
+			toDelete = append(toDelete, e)
+
+			if ofd := e.GetObjekteFD(); ofd.Path != "" {
+				filesToDelete = append(filesToDelete, ofd.Path)
 			}
 
-			if zco.External.AkteFD.Path != "" {
-				filesToDelete = append(filesToDelete, zco.External.AkteFD.Path)
+			if afd := e.GetObjekteFD(); afd.Path != "" {
+				filesToDelete = append(filesToDelete, afd.Path)
 			}
 
 			return
 		},
-	)
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	// optionsReadExternal := store_fs.OptionsReadExternal{}
+
+	// readResults := zettel_checked_out.MakeMutableSetUnique(0)
+
+	// readOp := user_ops.ReadCheckedOut{
+	// 	Umwelt:              s,
+	// 	OptionsReadExternal: optionsReadExternal,
+	// }
+
+	// if err = readOp.RunMany(possible, readResults.Add); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
+
+	// toDelete := make([]zettel.External, 0, readResults.Len())
+	// filesToDelete := make([]string, 0, readResults.Len()+len(possible.EmptyDirectories))
+
+	// readResults.Each(
+	// 	func(zco *zettel_checked_out.Zettel) (err error) {
+	// 		if zco.State != objekte.CheckedOutStateExistsAndSame {
+	// 			return
+	// 		}
+
+	// 		toDelete = append(toDelete, zco.External)
+
+	// 		if zco.External.FD.Path != "" {
+	// 			filesToDelete = append(filesToDelete, zco.External.FD.Path)
+	// 		}
+
+	// 		if zco.External.AkteFD.Path != "" {
+	// 			filesToDelete = append(filesToDelete, zco.External.AkteFD.Path)
+	// 		}
+
+	// 		return
+	// 	},
+	// )
 
 	// TODO rewrite in verzeichnisseAll
 	// for _, ua := range possible.UnsureAkten {

@@ -7,6 +7,7 @@ import (
 )
 
 type Multi interface {
+	error
 	Add(error)
 	Empty() bool
 }
@@ -74,37 +75,35 @@ func (e *multi) merge(err multi) {
 }
 
 func (e *multi) Add(err error) {
-	// if err == nil {
-	// 	panic("trying to add nil error")
-	// }
+	if err == nil {
+		return
+	}
 
-	if err != nil {
-		if e == nil {
-			// panic("trying to add to nil multi error")
-			e = MakeMulti(err)
-			return
+	if e == nil {
+		// panic("trying to add to nil multi error")
+		e = MakeMulti(err)
+		return
+	}
+
+	switch e1 := Unwrap(err).(type) {
+	case multi:
+		e.merge(e1)
+
+	case *multi:
+		e.merge(*e1)
+
+	default:
+		e.lock.Lock()
+
+		l := len(e.slice)
+
+		e.slice = append(e.slice, err)
+
+		if len(e.slice) > l && l == 0 {
+			close(e.chOnErr)
 		}
 
-		switch e1 := Unwrap(err).(type) {
-		case multi:
-			e.merge(e1)
-
-		case *multi:
-			e.merge(*e1)
-
-		default:
-			e.lock.Lock()
-
-			l := len(e.slice)
-
-			e.slice = append(e.slice, err)
-
-			if len(e.slice) > l && l == 0 {
-				close(e.chOnErr)
-			}
-
-			e.lock.Unlock()
-		}
+		e.lock.Unlock()
 	}
 }
 

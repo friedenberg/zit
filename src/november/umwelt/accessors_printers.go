@@ -1,10 +1,14 @@
 package umwelt
 
 import (
+	"fmt"
+
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
+	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/hotel/etikett"
 	"github.com/friedenberg/zit/src/hotel/typ"
@@ -161,4 +165,62 @@ func (u *Umwelt) PrinterHeader() schnittstellen.FuncIter[*string] {
 			format.StringHeaderIndent,
 		),
 	)
+}
+
+func (u *Umwelt) PrinterJustCheckedOutLike() schnittstellen.FuncIter[objekte.CheckedOutLike] {
+	pzco := u.PrinterZettelExternal()
+	ptco := u.PrinterTypCheckedOut()
+
+	return func(co objekte.CheckedOutLike) (err error) {
+		sk2 := co.GetInternal().GetSku2()
+
+		switch sk2.Gattung {
+		case gattung.Zettel:
+			coz := co.(*zettel_checked_out.Zettel)
+			return pzco(&coz.External)
+
+		case gattung.Typ:
+			coz := co.(*typ.CheckedOut)
+			return ptco(coz)
+
+		default:
+			_, err = fmt.Fprintf(
+				u.Out(),
+				"(checked out) [%s.%s]\n",
+				sk2.Kennung,
+				sk2.Gattung,
+			)
+		}
+
+		return
+	}
+}
+
+func (u *Umwelt) PrinterCheckedOutLike() schnittstellen.FuncIter[objekte.CheckedOutLike] {
+	pzco := u.PrinterZettelCheckedOut()
+	ptco := u.PrinterTypCheckedOut()
+
+	return func(co objekte.CheckedOutLike) (err error) {
+		sk2 := co.GetInternal().GetSku2()
+
+		switch sk2.Gattung {
+		case gattung.Zettel:
+			coz := co.(*zettel_checked_out.Zettel)
+			return pzco(coz)
+
+		case gattung.Typ:
+			coz := co.(*typ.CheckedOut)
+			return ptco(coz)
+
+		default:
+			_, err = fmt.Fprintf(
+				u.Out(),
+				"(checked out) [%s.%s]\n",
+				sk2.Kennung,
+				sk2.Gattung,
+			)
+		}
+
+		return
+	}
 }

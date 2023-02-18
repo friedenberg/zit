@@ -17,6 +17,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/golf/objekte"
+	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/india/konfig"
 	"github.com/friedenberg/zit/src/juliett/cwd"
 	"github.com/friedenberg/zit/src/juliett/zettel"
@@ -267,7 +268,7 @@ func (s *Store) ReadOne(h kennung.Hinweis) (zt *zettel.Transacted, err error) {
 
 	var readFunc func() (zettel_checked_out.Zettel, error)
 
-	var p cwd.CwdZettel
+	var p *zettel.External
 
 	for _, p1 := range pz.Zettelen {
 		p = p1
@@ -275,20 +276,20 @@ func (s *Store) ReadOne(h kennung.Hinweis) (zt *zettel.Transacted, err error) {
 	}
 
 	switch {
-	case p.Akte.Path == "":
+	case p.AkteFD.Path == "":
 		readFunc = func() (zettel_checked_out.Zettel, error) {
-			return s.Read(p.Zettel.Path)
+			return s.Read(p.FD.Path)
 		}
 
-	case p.Zettel.Path == "":
+	case p.FD.Path == "":
 		readFunc = func() (zettel_checked_out.Zettel, error) {
-			return s.ReadExternalZettelFromAktePath(p.Akte.Path)
+			return s.ReadExternalZettelFromAktePath(p.AkteFD.Path)
 		}
 
 	default:
 		// TODO-P3 validate that the zettel file points to the akte in the metadatei
 		readFunc = func() (zettel_checked_out.Zettel, error) {
-			return s.Read(p.Zettel.Path)
+			return s.Read(p.FD.Path)
 		}
 	}
 
@@ -375,20 +376,20 @@ func (s *Store) ReadManyHistory(
 					var readFunc func() (zettel_checked_out.Zettel, error)
 
 					switch {
-					case p.Akte.Path == "":
+					case p.AkteFD.Path == "":
 						readFunc = func() (zettel_checked_out.Zettel, error) {
-							return s.Read(p.Zettel.Path)
+							return s.Read(p.FD.Path)
 						}
 
-					case p.Zettel.Path == "":
+					case p.FD.Path == "":
 						readFunc = func() (zettel_checked_out.Zettel, error) {
-							return s.ReadExternalZettelFromAktePath(p.Akte.Path)
+							return s.ReadExternalZettelFromAktePath(p.AkteFD.Path)
 						}
 
 					default:
 						// TODO-P3 validate that the zettel file points to the akte in the metadatei
 						readFunc = func() (zettel_checked_out.Zettel, error) {
-							return s.Read(p.Zettel.Path)
+							return s.Read(p.FD.Path)
 						}
 					}
 
@@ -427,6 +428,96 @@ func (s *Store) ReadManyHistory(
 		w,
 		queries...,
 	)
+}
+
+func (s *Store) ReadFiles(
+	fs cwd.CwdFiles,
+	f schnittstellen.FuncIter[objekte.CheckedOutLike],
+) (err error) {
+	var ms kennung.MetaSet
+
+	if ms, err = fs.GetMetaSet(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.storeObjekten.Query(
+		ms,
+		func(e objekte.TransactedLike) (err error) {
+			switch et := e.(type) {
+			case *zettel.Transacted:
+				var zco zettel.CheckedOut
+				ok := false
+
+				if zco.External, ok = fs.GetZettelExternal(et.Sku.Kennung); !ok {
+					return errors.Errorf(
+						"cwd zettel was matched in query but not in cwd.CwdFiles: %s",
+						et.Sku.Kennung,
+					)
+				}
+
+				if err = s.readZettelFromFile(&zco.External); err != nil {
+					if errors.IsNotExist(err) {
+						return errors.Errorf(
+							"cwd zettel was matched in query but not in cwd.CwdFiles: %s",
+							et.Sku.Kennung,
+						)
+					} else {
+						err = errors.Wrap(err)
+						return
+					}
+				}
+
+				zco.Internal = *et
+
+				zco.DetermineState()
+
+				if err = f(&zettel_checked_out.Zettel{CheckedOut: zco}); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+			case *typ.Transacted:
+				var tco typ.CheckedOut
+				ok := false
+
+				if tco.External, ok = fs.GetTypExternal(et.Sku.Kennung); !ok {
+					return errors.Errorf(
+						"cwd typ was matched in query but not in cwd.CwdFiles: %s",
+						et.Sku.Kennung,
+					)
+				}
+
+				if s.ReadTyp(&tco.External); err != nil {
+					if errors.IsNotExist(err) {
+						return errors.Errorf(
+							"cwd zettel was matched in query but not in cwd.CwdFiles: %s",
+							et.Sku.Kennung,
+						)
+					} else {
+						err = errors.Wrap(err)
+						return
+					}
+				}
+
+				tco.Internal = *et
+
+				tco.DetermineState()
+
+				if err = f(&tco); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			}
+
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (s *Store) readOneFS(p string) (cz zettel_checked_out.Zettel, err error) {

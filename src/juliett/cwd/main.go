@@ -7,27 +7,99 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/india/konfig"
+	"github.com/friedenberg/zit/src/iter"
+	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
 type CwdFiles struct {
 	erworben         konfig.Compiled
 	dir              string
-	Zettelen         map[string]CwdZettel
-	Typen            map[string]*typ.External
+	Zettelen         map[kennung.Hinweis]*zettel.External
+	Typen            map[kennung.Typ]*typ.External
 	UnsureAkten      []kennung.FD
 	EmptyDirectories []string
+}
+
+func (fs CwdFiles) GetMetaSet() (ms kennung.MetaSet, err error) {
+	ms = kennung.MakeMetaSet(kennung.Expanders{}, gattung.Zettel)
+
+	for _, z := range fs.Zettelen {
+		ms.Add(z.Sku.Kennung, kennung.SigilNone)
+	}
+
+	for _, t := range fs.Typen {
+		ms.Add(t.Sku.Kennung, kennung.SigilNone)
+	}
+
+	return
+}
+
+func (fs CwdFiles) GetZettelExternal(
+	h kennung.Hinweis,
+) (ze zettel.External, ok bool) {
+	var ze1 *zettel.External
+	ze1, ok = fs.Zettelen[h]
+
+	if ok {
+		ze = *ze1
+	}
+
+	return
+}
+
+func (fs CwdFiles) GetTypExternal(
+	k kennung.Typ,
+) (ze typ.External, ok bool) {
+	var ze1 *typ.External
+	ze1, ok = fs.Typen[k]
+
+	if ok {
+		ze = *ze1
+	}
+
+	return
+}
+
+func (fs CwdFiles) All(
+	f schnittstellen.FuncIter[objekte.ExternalLike],
+) (err error) {
+	wg := iter.MakeErrorWaitGroup()
+
+	for _, z := range fs.Zettelen {
+		if wg.Do(
+			func() error {
+				return f(z)
+			},
+		) {
+			break
+		}
+	}
+
+	for _, t := range fs.Typen {
+		if wg.Do(
+			func() error {
+				return f(t)
+			},
+		) {
+			break
+		}
+	}
+
+	return wg.GetError()
 }
 
 func (fs CwdFiles) ZettelFiles() (out []string) {
 	out = make([]string, 0, len(fs.Zettelen))
 
 	for _, z := range fs.Zettelen {
-		out = append(out, z.Zettel.Path)
+		out = append(out, z.FD.Path)
 	}
 
 	return
@@ -37,8 +109,8 @@ func makeCwdFiles(erworben konfig.Compiled, dir string) (fs CwdFiles) {
 	fs = CwdFiles{
 		erworben:         erworben,
 		dir:              dir,
-		Typen:            make(map[string]*typ.External, 0),
-		Zettelen:         make(map[string]CwdZettel, 0),
+		Typen:            make(map[kennung.Typ]*typ.External, 0),
+		Zettelen:         make(map[kennung.Hinweis]*zettel.External, 0),
 		UnsureAkten:      make([]kennung.FD, 0),
 		EmptyDirectories: make([]string, 0),
 	}
@@ -192,6 +264,7 @@ func (fs *CwdFiles) readAll() (err error) {
 }
 
 func (c CwdFiles) Len() int {
+	errors.TodoP0("fix this")
 	return len(c.Zettelen)
 }
 

@@ -178,7 +178,11 @@ func (s *typStore) Query(
 	](s, ids.Sigil)(
 		collections.MakeChain(
 			func(t *typ.Transacted) (err error) {
-				errors.TodoP0("implement filtering")
+				if !ids.Typen.Contains(t.Sku.Kennung) {
+					err = collections.MakeErrStopIteration()
+					return
+				}
+
 				return
 			},
 			f,

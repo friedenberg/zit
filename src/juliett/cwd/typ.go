@@ -25,7 +25,7 @@ func (c *CwdFiles) tryTyp(fi os.FileInfo) (err error) {
 
 	ok := false
 
-	if t, ok = c.Typen[pathMinusExt]; !ok {
+	if t, ok = c.Typen[h]; !ok {
 		t = &typ.External{
 			Sku: sku.External[kennung.Typ, *kennung.Typ]{
 				Kennung: h,
@@ -34,7 +34,7 @@ func (c *CwdFiles) tryTyp(fi os.FileInfo) (err error) {
 	}
 
 	t.FD = fd
-	c.Typen[h.String()] = t
+	c.Typen[h] = t
 
 	return
 }

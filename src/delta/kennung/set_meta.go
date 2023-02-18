@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/gattungen"
@@ -15,6 +16,7 @@ func init() {
 }
 
 type MetaSet interface {
+	Add(schnittstellen.IdLike, Sigil) error
 	Get(g gattung.Gattung) (s Set, ok bool)
 	GetFDs() (s FDSet)
 	Set(string) error
@@ -131,6 +133,30 @@ func (ms *metaSet) Set(v string) (err error) {
 		err = errors.Wrap(err)
 		return
 	}
+
+	return
+}
+
+func (ms *metaSet) Add(
+	id schnittstellen.IdLike,
+	sigil Sigil,
+) (err error) {
+	g := gattung.Make(id.GetGattung())
+
+	var ids Set
+	ok := false
+
+	if ids, ok = ms.Gattung[g]; !ok {
+		ids = MakeSet(ms.expanders)
+		ids.Sigil = sigil
+	}
+
+	if err = ids.Add(id); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	ms.Gattung[g] = ids
 
 	return
 }

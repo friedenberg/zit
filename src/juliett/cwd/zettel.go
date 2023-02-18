@@ -7,6 +7,8 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/sku"
+	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
 type CwdZettel struct {
@@ -24,21 +26,25 @@ func (c *CwdFiles) tryZettel(d string, a string, p string) (err error) {
 		return
 	}
 
-	var zcw CwdZettel
+	var zcw *zettel.External
 	ok := false
 
-	if zcw, ok = c.Zettelen[h.String()]; !ok {
-		zcw.Hinweis = h
+	if zcw, ok = c.Zettelen[h]; !ok {
+		zcw = &zettel.External{
+			Sku: sku.External[kennung.Hinweis, *kennung.Hinweis]{
+				Kennung: h,
+			},
+		}
 	}
 
 	errors.TodoP3("read zettels")
 	if path.Ext(a) == c.erworben.GetZettelFileExtension() {
-		zcw.Zettel.Path = p
+		zcw.FD.Path = p
 	} else {
-		zcw.Akte.Path = p
+		zcw.AkteFD.Path = p
 	}
 
-	c.Zettelen[h.String()] = zcw
+	c.Zettelen[h] = zcw
 
 	return
 }

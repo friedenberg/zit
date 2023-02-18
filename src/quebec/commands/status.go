@@ -4,14 +4,12 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
-	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/juliett/cwd"
 	"github.com/friedenberg/zit/src/lima/store_objekten"
-	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
 	"github.com/friedenberg/zit/src/mike/store_fs"
 	"github.com/friedenberg/zit/src/november/umwelt"
-	"github.com/friedenberg/zit/src/oscar/user_ops"
 )
 
 type Status struct{}
@@ -45,66 +43,24 @@ func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
 		}
 	}
 
-	options := store_fs.OptionsReadExternal{}
+	pcol := s.PrinterCheckedOutLike()
 
-	readOp := user_ops.ReadCheckedOut{
-		Umwelt:              s,
-		OptionsReadExternal: options,
-	}
+	if err = s.StoreWorkingDirectory().ReadFiles(
+		possible,
+		func(co objekte.CheckedOutLike) (err error) {
+			if err = pcol(co); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 
-	readResultsSet := zettel_checked_out.MakeMutableSetUnique(0)
-
-	if err = readOp.RunMany(possible, readResultsSet.Add); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	v := "Typen"
-
-	if err = s.PrinterHeader()(&v); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	for _, p := range possible.Typen {
-		tcp := &typ.CheckedOut{
-			External: *p,
-		}
-
-		var tt *typ.Transacted
-
-		if tt, err = s.StoreObjekten().Typ().ReadOne(&p.Sku.Kennung); err != nil {
-			err = errors.Wrap(err)
 			return
-		}
-
-		tcp.Internal = *tt
-
-		if err = s.StoreWorkingDirectory().ReadTyp(&tcp.External); err != nil {
-			err = errors.Wrapf(err, "Path: %s", p.FD)
-			return
-		}
-
-		if err = s.PrinterTypCheckedOut()(tcp); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	v = "Zettelen"
-
-	if err = s.PrinterHeader()(&v); err != nil {
+		},
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	// TODO-P4 use right mode
-	if err = readResultsSet.Each(s.PrinterZettelCheckedOut()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	v = "Akten"
+	v := "Akten"
 
 	if err = s.PrinterHeader()(&v); err != nil {
 		err = errors.Wrap(err)

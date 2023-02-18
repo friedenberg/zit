@@ -48,20 +48,22 @@ func (op ReadCheckedOut) RunMany(
 		var readFunc func() (zettel_checked_out.Zettel, error)
 
 		switch {
-		case p.Akte.Path == "":
+		case p.AkteFD.Path == "":
 			readFunc = func() (zettel_checked_out.Zettel, error) {
-				return op.StoreWorkingDirectory().Read(p.Zettel.Path)
+				return op.StoreWorkingDirectory().Read(p.FD.Path)
 			}
 
-		case p.Zettel.Path == "":
+		case p.FD.Path == "":
 			readFunc = func() (zettel_checked_out.Zettel, error) {
-				return op.StoreWorkingDirectory().ReadExternalZettelFromAktePath(p.Akte.Path)
+				return op.StoreWorkingDirectory().ReadExternalZettelFromAktePath(
+					p.AkteFD.Path,
+				)
 			}
 
 		default:
 			// TODO-P3 validate that the zettel file points to the akte in the metadatei
 			readFunc = func() (zettel_checked_out.Zettel, error) {
-				return op.StoreWorkingDirectory().Read(p.Zettel.Path)
+				return op.StoreWorkingDirectory().Read(p.FD.Path)
 			}
 		}
 
