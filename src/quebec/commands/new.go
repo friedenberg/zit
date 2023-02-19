@@ -208,8 +208,7 @@ func (c New) editZettels(
 	}
 
 	checkinOp := user_ops.Checkin{
-		Umwelt:              u,
-		OptionsReadExternal: readOp.OptionsReadExternal,
+		Umwelt: u,
 	}
 
 	zsle := zslc.ToSliceZettelsExternal()

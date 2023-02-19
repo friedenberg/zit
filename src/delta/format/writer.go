@@ -117,6 +117,33 @@ func MakeWriterTo[T any](
 	}
 }
 
+func MakeWriterToWithNewLines2[T any](
+	w1 io.Writer,
+	wf schnittstellen.FuncWriterFormat[T],
+) func(T) error {
+	w := bufio.NewWriter(w1)
+
+	return collections.MakeSyncSerializer(
+		func(e T) (err error) {
+			errors.TodoP3("modify flushing behavior based on w1 being a TTY")
+			defer errors.DeferredFlusher(&err, w)
+
+			if _, err = wf(w, e); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if _, err = io.WriteString(w, "\n"); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+	)
+}
+
+// TODO-P0 deprecate
 func MakeWriterToWithNewLines[T any](
 	w1 io.Writer,
 	wf schnittstellen.FuncWriterFormat[T],

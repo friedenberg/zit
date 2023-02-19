@@ -3,6 +3,7 @@ package objekte_store
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/golf/objekte"
 )
 
 type TransactedLogger[
@@ -53,19 +54,11 @@ type TransactedReader[
 }
 
 type Querier[
-  K any,
-	V any,
-] interface {
-  TransactedReader[K, V]
-	Query(kennung.Set, schnittstellen.FuncIter[V]) error
-}
-
-type CreateOrUpdater[
-	O any,
 	K any,
 	V any,
 ] interface {
-	CreateOrUpdate(O, K) (V, error)
+	TransactedReader[K, V]
+	Query(kennung.Set, schnittstellen.FuncIter[V]) error
 }
 
 type Creator[
@@ -81,4 +74,19 @@ type Updater[
 	V any,
 ] interface {
 	Update(O, K) (V, error)
+}
+
+type Updater2[
+	CO objekte.CheckedOutLike,
+	T objekte.TransactedLike,
+] interface {
+	Update2(CO) (T, error)
+}
+
+type CreateOrUpdater[
+	O any,
+	K any,
+	V any,
+] interface {
+	CreateOrUpdate(O, K) (V, error)
 }

@@ -5,14 +5,12 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
-	"github.com/friedenberg/zit/src/mike/store_fs"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
 // TODO-P4 move to store_fs
 type Checkin struct {
 	*umwelt.Umwelt
-	store_fs.OptionsReadExternal
 }
 
 type CheckinResults struct {

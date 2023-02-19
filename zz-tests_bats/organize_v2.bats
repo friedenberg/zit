@@ -765,7 +765,7 @@ function etiketten_correct { # @test
 		echo "---"
 	} >"one/uno.zettel"
 
-	run zit checkin "${cmd_zit_def[@]}" one/uno.zettel
+	run_zit checkin "${cmd_zit_def[@]}" one/uno.zettel
 	#TODO-P1 fix typ
 	assert_output '[one/uno@dc8d9d8e200a9c2f75e375bdfa267f30605f89229d4be70796800479c01ceede ! test4]'
 

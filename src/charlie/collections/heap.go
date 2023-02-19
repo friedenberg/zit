@@ -193,6 +193,7 @@ func (a Heap[T, T1]) Copy() Heap[T, T1] {
 	defer a.l.Unlock()
 
 	return Heap[T, T1]{
+		p: a.p,
 		l: &sync.Mutex{},
 		h: a.h.Copy(),
 	}

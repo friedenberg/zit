@@ -2,7 +2,9 @@ package umwelt
 
 import (
 	"fmt"
+	"io"
 
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/delta/format"
@@ -98,6 +100,30 @@ func (u *Umwelt) PrinterZettelTransacted() schnittstellen.FuncIter[*zettel.Trans
 	)
 }
 
+func (u *Umwelt) PrinterTransactedLike() schnittstellen.FuncIter[objekte.TransactedLike] {
+	z := u.FormatZettelTransacted()
+
+	return format.MakeWriterToWithNewLines2(
+		u.Out(),
+		wrapWithTimePrefixerIfNecessary[objekte.TransactedLike](
+			u.Konfig(),
+			func(out io.Writer, tl objekte.TransactedLike) (n int64, err error) {
+				switch atl := tl.(type) {
+				case zettel.Transacted:
+					return z(out, atl)
+
+				case *zettel.Transacted:
+					return z(out, *atl)
+
+				default:
+					errors.Todo("implement")
+					return
+				}
+			},
+		),
+	)
+}
+
 func (u *Umwelt) PrinterZettelTransactedDelta() schnittstellen.FuncIter[*zettel.Transacted] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
@@ -140,13 +166,6 @@ func (u *Umwelt) PrinterFileRecognized() schnittstellen.FuncIter[*store_fs.FileR
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
 		u.FormatFileRecognized(),
-	)
-}
-
-func (u *Umwelt) PrinterPathDeleted() schnittstellen.FuncIter[*store_fs.Dir] {
-	return format.MakeWriterToWithNewLines(
-		u.Out(),
-		u.FormatDirDeleted(),
 	)
 }
 

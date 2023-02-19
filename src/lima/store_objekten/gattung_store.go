@@ -8,5 +8,6 @@ import (
 type GattungStore interface{}
 
 type reindexer interface {
+	// updateExternal(objekte.External) error
 	reindexOne(sku.DataIdentity) (schnittstellen.Stored, error)
 }

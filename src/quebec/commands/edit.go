@@ -229,8 +229,7 @@ func (c Edit) editZettels(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 	zettels := readResults.ToSliceZettelsExternal()
 
 	checkinOp := user_ops.Checkin{
-		Umwelt:              u,
-		OptionsReadExternal: store_fs.OptionsReadExternal{},
+		Umwelt: u,
 	}
 
 	if _, err = checkinOp.Run(zettels...); err != nil {

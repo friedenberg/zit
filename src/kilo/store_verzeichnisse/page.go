@@ -50,6 +50,31 @@ func makeZettelenPage(
 	return
 }
 
+func (zp *Page) doTryLock() (ok bool) {
+	errors.Log().Caller(1, "acquiring lock: %d", zp.pageId.index)
+	ok = zp.lock.TryLock()
+
+	if ok {
+		errors.Log().Caller(1, "acquired lock: %d", zp.pageId.index)
+	} else {
+		errors.Log().Caller(1, "failed to acquire lock: %d", zp.pageId.index)
+	}
+
+	return
+}
+
+func (zp *Page) doLock() {
+	errors.Log().Caller(1, "acquiring lock: %d", zp.pageId.index)
+	zp.lock.Lock()
+	errors.Log().Caller(1, "acquired lock: %d", zp.pageId.index)
+}
+
+func (zp *Page) doUnlock() {
+	errors.Log().Caller(1, "releasing lock: %d", zp.pageId.index)
+	zp.lock.Unlock()
+	errors.Log().Caller(1, "released lock: %d", zp.pageId.index)
+}
+
 func (zp *Page) Add(z *zettel.Transacted) (err error) {
 	if z == nil {
 		err = errors.Errorf("trying to add nil zettel")
@@ -67,8 +92,16 @@ func (zp *Page) Add(z *zettel.Transacted) (err error) {
 		return
 	}
 
-	zp.lock.Lock()
-	defer zp.lock.Unlock()
+	// do not lock as checking operations perform additions while reading from
+	// indexes
+	// acquired := zp.doTryLock()
+
+	// if !acquired {
+	// 	err = MakeErrConcurrentPageAccess()
+	// 	return
+	// }
+
+	// defer zp.doUnlock()
 
 	zp.added.Add(*z)
 	zp.State = StateChanged
@@ -77,8 +110,14 @@ func (zp *Page) Add(z *zettel.Transacted) (err error) {
 }
 
 func (zp *Page) Flush() (err error) {
-	zp.lock.Lock()
-	defer zp.lock.Unlock()
+	acquired := zp.doTryLock()
+
+	if !acquired {
+		err = MakeErrConcurrentPageAccess()
+		return
+	}
+
+	defer zp.doUnlock()
 
 	if zp.State < StateChanged {
 		return
@@ -130,7 +169,10 @@ func (zp *Page) copy(
 
 	dec := gob.NewDecoder(r)
 
-	if err = zp.added.MergeStream(
+  errors.TodoP3("determine performance of this")
+	added := zp.added.Copy()
+
+	if err = added.MergeStream(
 		func() (tz *zettel.Transacted, err error) {
 			tz = zp.pool.Get()
 
@@ -174,27 +216,27 @@ func (zp *Page) writeTo(w1 io.Writer) (n int64, err error) {
 func (zp *Page) Copy(
 	w schnittstellen.FuncIter[*zettel.Transacted],
 ) (n int64, err error) {
-	acquired := zp.lock.TryLock()
+	acquired := zp.doTryLock()
 
 	if !acquired {
 		err = MakeErrConcurrentPageAccess()
 		return
 	}
 
-	defer zp.lock.Unlock()
+	defer zp.doUnlock()
 
 	return zp.copy(w)
 }
 
 func (zp *Page) WriteTo(w1 io.Writer) (n int64, err error) {
-	acquired := zp.lock.TryLock()
+	acquired := zp.doTryLock()
 
 	if !acquired {
 		err = MakeErrConcurrentPageAccess()
 		return
 	}
 
-	defer zp.lock.Unlock()
+	defer zp.doUnlock()
 
 	return zp.writeTo(w1)
 }

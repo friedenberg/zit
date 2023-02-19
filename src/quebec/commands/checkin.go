@@ -5,11 +5,9 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/juliett/cwd"
-	"github.com/friedenberg/zit/src/juliett/zettel"
-	"github.com/friedenberg/zit/src/kilo/zettel_external"
 	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
-	"github.com/friedenberg/zit/src/mike/store_fs"
 	"github.com/friedenberg/zit/src/november/umwelt"
 	"github.com/friedenberg/zit/src/oscar/user_ops"
 )
@@ -34,68 +32,75 @@ func init() {
 }
 
 func (c Checkin) RunWithQuery(
-	s *umwelt.Umwelt,
+	u *umwelt.Umwelt,
 	ms kennung.MetaSet,
 ) (err error) {
 	var pz cwd.CwdFiles
+	fds := kennung.MakeMutableFDSet()
 
 	if pz, err = cwd.MakeCwdFilesMetaSet(
-		s.Konfig(),
-		s.Standort().Cwd(),
+		u.Konfig(),
+		u.Standort().Cwd(),
 		ms,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	readOp := user_ops.ReadCheckedOut{
-		Umwelt:              s,
-		OptionsReadExternal: store_fs.OptionsReadExternal{},
-	}
+	// ptl := u.PrinterTransactedLike()
 
-	readResults := zettel_checked_out.MakeMutableSetUnique(0)
+	u.Lock()
+	defer errors.Deferred(&err, u.Unlock)
 
-	if err = readOp.RunMany(pz, readResults.Add); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	if err = u.StoreWorkingDirectory().ReadFiles(
+		pz,
+		func(co objekte.CheckedOutLike) (err error) {
+			// var tl objekte.TransactedLike
 
-	checkinOp := user_ops.Checkin{
-		Umwelt:              s,
-		OptionsReadExternal: readOp.OptionsReadExternal,
-	}
+			switch aco := co.(type) {
+			case zettel_checked_out.Zettel:
+				if _, err = u.StoreObjekten().Zettel().Update2(
+					aco,
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
 
-	zettels := make([]zettel.External, 0, readResults.Len())
+			case *zettel_checked_out.Zettel:
+				if _, err = u.StoreObjekten().Zettel().Update2(
+					*aco,
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
 
-	err = readResults.Each(
-		func(zco *zettel_checked_out.Zettel) (err error) {
-			zettels = append(zettels, zco.External)
+			default:
+				errors.Todo("implement")
+				return
+			}
+
+			e := co.GetExternal()
+			fds.Add(e.GetObjekteFD())
+			fds.Add(e.GetAkteFD())
+
 			return
 		},
-	)
-
-	if _, err = checkinOp.Run(zettels...); err != nil {
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if c.Delete {
-		deleteOp := user_ops.DeleteCheckout{
-			Umwelt: s,
-		}
+	if !c.Delete {
+		return
+	}
 
-		external := zettel_external.MakeMutableSetUniqueFD()
+	deleteOp := user_ops.DeleteCheckout{
+		Umwelt: u,
+	}
 
-		err = readResults.Each(
-			func(zco *zettel_checked_out.Zettel) (err error) {
-				return external.Add(&zco.External)
-			},
-		)
-
-		if err = deleteOp.Run(external); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if err = deleteOp.Run(fds); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

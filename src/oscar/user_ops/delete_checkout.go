@@ -1,12 +1,12 @@
 package user_ops
 
 import (
+	"os"
+	"path/filepath"
+
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/juliett/zettel"
-	"github.com/friedenberg/zit/src/kilo/zettel_external"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
@@ -15,68 +15,32 @@ type DeleteCheckout struct {
 }
 
 func (c DeleteCheckout) Run(
-	zes zettel_external.MutableSet,
+	fs schnittstellen.Set[kennung.FD],
 ) (err error) {
-	zesToDelete := zettel_external.MakeMutableSetUniqueFD()
-	filesToDelete := collections.MakeMutableSet[*kennung.FD](
-		func(e *kennung.FD) string {
-			if e == nil {
-				return ""
-			}
+	p := c.PrinterFDDeleted()
 
-			return e.Path
-		},
-	)
-
-	if err = zes.Each(
-		func(external *zettel.External) (err error) {
-			var internal *zettel.Transacted
-
-			if internal, err = c.StoreObjekten().Zettel().ReadOne(
-				external.Sku.Kennung,
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			// TODO-P1 add a safety check?
-			if !internal.Objekte.Equals(external.Objekte) {
-				// TODO-P2 move to printer
-				errors.Out().Printf("[%s] (checkout different!)", external.Sku.Kennung)
-				errors.Out().Printf("Internal %v", internal.Objekte)
-				errors.Out().Printf("External %v", external.Objekte)
-				return
-			}
-
-			zesToDelete.Add(external)
-			filesToDelete.Add(&external.FD)
-
-			if external.AkteFD.Path != "" {
-				filesToDelete.Add(&external.AkteFD)
-			}
-
-			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+	if c.Konfig().DryRun {
+		return fs.EachPtr(p)
 	}
 
-	fs := make([]string, 0, filesToDelete.Len())
+	return fs.Each(
+		func(fd kennung.FD) (err error) {
+			path := fd.String()
 
-	filesToDelete.Each(
-		func(e *kennung.FD) (err error) {
-			fs = append(fs, e.Path)
-			return
+			if pRel, pErr := filepath.Rel(c.Standort().Cwd(), fd.String()); pErr == nil {
+				path = pRel
+			}
+
+			if err = os.Remove(path); err != nil {
+				if errors.IsNotExist(err) {
+					err = nil
+				} else {
+					err = errors.Wrap(err)
+					return
+				}
+			}
+
+			return p(&fd)
 		},
 	)
-
-	if err = files.DeleteFilesAndDirs(fs...); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	filesToDelete.Each(c.PrinterFDDeleted())
-
-	return
 }

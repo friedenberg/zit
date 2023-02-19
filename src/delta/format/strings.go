@@ -19,6 +19,7 @@ const (
 	StringUnchanged    = "unchanged"
 	StringRecognized   = "recognized"
 	StringCheckedOut   = "checked out"
+	StringWouldDelete  = "would delete"
 	StringUnrecognized = "unrecognized"
 	// StringHeaderIndent = "=============== "
 	StringHeaderIndent   = "                "

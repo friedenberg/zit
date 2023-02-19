@@ -131,7 +131,7 @@ func (u *Umwelt) FormatZettelExternal() schnittstellen.FuncWriterFormat[zettel.E
 	)
 }
 
-func (u *Umwelt) FormatZettelExternalFD() schnittstellen.FuncWriterFormat[kennung.FD] {
+func (u *Umwelt) FormatExternalFD() schnittstellen.FuncWriterFormat[kennung.FD] {
 	return zettel_external.MakeCliFormatFD(
 		u.Standort(),
 		u.FormatColorWriter(),
@@ -179,17 +179,11 @@ func (u *Umwelt) FormatFileRecognized() schnittstellen.FuncWriterFormat[store_fs
 	)
 }
 
-func (u *Umwelt) FormatDirDeleted() schnittstellen.FuncWriterFormat[store_fs.Dir] {
-	return store_fs.MakeCliFormatDirDeleted(
-		u.FormatColorWriter(),
-		u.Standort(),
-	)
-}
-
 func (u *Umwelt) FormatFDDeleted() schnittstellen.FuncWriterFormat[kennung.FD] {
 	return store_fs.MakeCliFormatFDDeleted(
+		u.Konfig().DryRun,
 		u.FormatColorWriter(),
 		u.Standort(),
-		u.FormatZettelExternalFD(),
+		u.FormatExternalFD(),
 	)
 }

@@ -9,40 +9,23 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
-type Dir struct {
-	Path string
-}
-
-func (d Dir) String() string {
-	return d.Path
-}
-
-// (deleted) [dir/]
-func MakeCliFormatDirDeleted(
-	cw format.FuncColorWriter,
-	s standort.Standort,
-) schnittstellen.FuncWriterFormat[Dir] {
-	return func(w io.Writer, d Dir) (n int64, err error) {
-		return format.Write(
-			w,
-			format.MakeFormatStringRightAlignedParen(format.StringDeleted),
-			format.MakeFormatString("["),
-			cw(format.MakeFormatString(d.Path), format.ColorTypePointer),
-			format.MakeFormatString("]"),
-		)
-	}
-}
-
 // (deleted) [fd/]
 func MakeCliFormatFDDeleted(
+	dryRun bool,
 	cw format.FuncColorWriter,
 	s standort.Standort,
 	fdw schnittstellen.FuncWriterFormat[kennung.FD],
 ) schnittstellen.FuncWriterFormat[kennung.FD] {
+	prefix := format.StringDeleted
+
+	if dryRun {
+		prefix = format.StringWouldDelete
+	}
+
 	return func(w io.Writer, fd kennung.FD) (n int64, err error) {
 		return format.Write(
 			w,
-			format.MakeFormatStringRightAlignedParen(format.StringDeleted),
+			format.MakeFormatStringRightAlignedParen(prefix),
 			format.MakeWriter(fdw, fd),
 		)
 	}

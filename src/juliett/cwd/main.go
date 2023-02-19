@@ -24,7 +24,7 @@ type CwdFiles struct {
 	Zettelen         map[kennung.Hinweis]*zettel.External
 	Typen            map[kennung.Typ]*typ.External
 	UnsureAkten      []kennung.FD
-	EmptyDirectories []string
+	EmptyDirectories []kennung.FD
 }
 
 func (fs CwdFiles) GetMetaSet() (ms kennung.MetaSet, err error) {
@@ -112,7 +112,7 @@ func makeCwdFiles(erworben konfig.Compiled, dir string) (fs CwdFiles) {
 		Typen:            make(map[kennung.Typ]*typ.External, 0),
 		Zettelen:         make(map[kennung.Hinweis]*zettel.External, 0),
 		UnsureAkten:      make([]kennung.FD, 0),
-		EmptyDirectories: make([]string, 0),
+		EmptyDirectories: make([]kennung.FD, 0),
 	}
 
 	return
@@ -233,6 +233,8 @@ func (fs *CwdFiles) readAll() (err error) {
 			return
 		}
 
+		fd := kennung.FileInfo(fi)
+
 		if fi.Mode().IsDir() {
 			var dirs2 []string
 
@@ -242,7 +244,7 @@ func (fs *CwdFiles) readAll() (err error) {
 			}
 
 			if len(dirs2) == 0 {
-				fs.EmptyDirectories = append(fs.EmptyDirectories, d2)
+				fs.EmptyDirectories = append(fs.EmptyDirectories, fd)
 			}
 
 			for _, a := range dirs2 {

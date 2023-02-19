@@ -5,7 +5,27 @@ import (
 	"path/filepath"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
+
+func DeleteFilesAndDirsSet(
+	fs schnittstellen.Set[schnittstellen.Stringer],
+) (err error) {
+	return fs.Each(
+		func(f schnittstellen.Stringer) (err error) {
+			if err = os.Remove(f.String()); err != nil {
+				if errors.IsNotExist(err) {
+					err = nil
+				} else {
+					err = errors.Wrap(err)
+					return
+				}
+			}
+
+			return
+		},
+	)
+}
 
 func DeleteFilesAndDirs(args ...string) (err error) {
 	dirs := make(map[string]bool)

@@ -11,11 +11,13 @@ import (
 	"github.com/friedenberg/zit/src/charlie/hinweisen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
+	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/store_util"
 	"github.com/friedenberg/zit/src/kilo/store_verzeichnisse"
+	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
 )
 
 type ZettelStore interface {
@@ -32,6 +34,11 @@ type ZettelStore interface {
 
 	objekte_store.Creator[
 		zettel.Objekte,
+		*zettel.Transacted,
+	]
+
+	objekte_store.Updater2[
+		zettel_checked_out.Zettel,
 		*zettel.Transacted,
 	]
 
@@ -334,6 +341,71 @@ func (s *zettelStore) Create(
 
 	errors.TodoP2("assert no changes")
 	if err = s.logWriter.New(tz); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *zettelStore) updateExternal(
+	co objekte.ExternalLike,
+) (tl objekte.TransactedLike, err error) {
+	ze := co.(*zettel.External)
+	return s.Update(&ze.Objekte, &ze.Sku.Kennung)
+}
+
+func (s *zettelStore) Update2(
+	co zettel_checked_out.Zettel,
+) (t *zettel.Transacted, err error) {
+	errors.TodoP2("support dry run")
+
+	if !s.StoreUtil.GetLockSmith().IsAcquired() {
+		err = objekte_store.ErrLockRequired{
+			Operation: "update",
+		}
+
+		return
+	}
+
+	if err = co.External.Objekte.ApplyKonfig(s.StoreUtil.GetKonfig()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	var shaObj sha.Sha
+
+	if shaObj, err = s.WriteZettelObjekte(co.External.Objekte); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if shaObj.Equals(co.Internal.Sku.ObjekteSha) {
+		t = &co.Internal
+
+		if err = s.logWriter.Unchanged(t); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+	}
+
+	if t, err = s.addZettelToTransaktion(
+		&co.External.Objekte,
+		&shaObj,
+		&co.External.Sku.Kennung,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.writeNamedZettelToIndex(t); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.logWriter.Updated(t); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -13,6 +13,7 @@ import (
 )
 
 type FD struct {
+	IsDir   bool
 	Path    string
 	ModTime ts.Time
 	Sha     sha.Sha
@@ -58,6 +59,7 @@ func File(f *os.File) (fd FD, err error) {
 
 func FileInfo(fi os.FileInfo) FD {
 	return FD{
+		IsDir:   fi.IsDir(),
 		Path:    fi.Name(),
 		ModTime: ts.Tyme(fi.ModTime()),
 	}
