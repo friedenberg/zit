@@ -195,25 +195,9 @@ func (c New) editZettels(
 		return
 	}
 
-	readOp := user_ops.ReadCheckedOut{
-		Umwelt:              u,
-		OptionsReadExternal: store_fs.OptionsReadExternal{},
-	}
+	checkinOp := user_ops.Checkin{}
 
-	zslc := zettel_checked_out.MakeMutableSetUnique(0)
-
-	if err = readOp.RunMany(cwdFiles, zslc.Add); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	checkinOp := user_ops.Checkin{
-		Umwelt: u,
-	}
-
-	zsle := zslc.ToSliceZettelsExternal()
-
-	if _, err = checkinOp.Run(zsle...); err != nil {
+	if err = checkinOp.Run(u, cwdFiles); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

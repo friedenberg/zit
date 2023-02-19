@@ -3,52 +3,74 @@ package user_ops
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/juliett/zettel"
+	"github.com/friedenberg/zit/src/golf/objekte"
+	"github.com/friedenberg/zit/src/juliett/cwd"
 	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
-// TODO-P4 move to store_fs
 type Checkin struct {
-	*umwelt.Umwelt
-}
-
-type CheckinResults struct {
-	Zettelen map[kennung.Hinweis]zettel_checked_out.Zettel
+	Delete bool
 }
 
 func (c Checkin) Run(
-	zettelen ...zettel.External,
-) (results CheckinResults, err error) {
-	results.Zettelen = make(map[kennung.Hinweis]zettel_checked_out.Zettel)
+	u *umwelt.Umwelt,
+	pz cwd.CwdFiles,
+) (err error) {
+	fds := kennung.MakeMutableFDSet()
 
-	if err = c.Lock(); err != nil {
+	u.Lock()
+	defer errors.Deferred(&err, u.Unlock)
+
+	if err = u.StoreWorkingDirectory().ReadFiles(
+		pz,
+		func(co objekte.CheckedOutLike) (err error) {
+			// var tl objekte.TransactedLike
+
+			switch aco := co.(type) {
+			case zettel_checked_out.Zettel:
+				if _, err = u.StoreObjekten().Zettel().Update2(
+					aco,
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+			case *zettel_checked_out.Zettel:
+				if _, err = u.StoreObjekten().Zettel().Update2(
+					*aco,
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+			default:
+				errors.Todo("implement")
+				return
+			}
+
+			e := co.GetExternal()
+			fds.Add(e.GetObjekteFD())
+			fds.Add(e.GetAkteFD())
+
+			return
+		},
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.Deferred(&err, c.Unlock)
+	if !c.Delete {
+		return
+	}
 
-	for _, z := range zettelen {
-		var tz *zettel.Transacted
+	deleteOp := DeleteCheckout{
+		Umwelt: u,
+	}
 
-		if tz, err = c.StoreObjekten().Zettel().Update(
-			&z.Objekte,
-			&z.Sku.Kennung,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		// TODO: add states to checkin process to indicate results of update call
-		// stdprinter.Outf("%s (unchanged)", tz.Named)
-
-		results.Zettelen[tz.Sku.Kennung] = zettel_checked_out.Zettel{
-			CheckedOut: zettel.CheckedOut{
-				Internal: *tz,
-				External: z,
-			},
-		}
+	if err = deleteOp.Run(fds); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return
