@@ -21,6 +21,7 @@ import (
 
 type Edit struct {
 	// TODO-P3 add force
+	Delete bool
 	store_fs.CheckoutMode
 }
 
@@ -32,6 +33,7 @@ func init() {
 				CheckoutMode: store_fs.CheckoutModeZettelOnly,
 			}
 
+			f.BoolVar(&c.Delete, "delete", false, "delete the zettel and akte after successful checkin")
 			f.Var(&c.CheckoutMode, "mode", "mode for checking out the zettel")
 
 			return c
@@ -214,7 +216,9 @@ func (c Edit) editZettels(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 		return
 	}
 
-	checkinOp := user_ops.Checkin{}
+	checkinOp := user_ops.Checkin{
+		Delete: c.Delete,
+	}
 
 	if err = checkinOp.Run(u, possible); err != nil {
 		err = errors.Wrap(err)
