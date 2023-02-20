@@ -63,7 +63,7 @@ func (s MutableSet) ToSliceFilesZettelen() (out []string) {
 
 	s.Each(
 		func(z *Zettel) (err error) {
-			p := z.External.FD.Path
+			p := z.External.GetObjekteFD().Path
 
 			if p != "" {
 				out = append(out, p)
@@ -81,7 +81,7 @@ func (s MutableSet) ToSliceFilesAkten() (out []string) {
 
 	s.Each(
 		func(z *Zettel) (err error) {
-			p := z.External.AkteFD.Path
+			p := z.External.GetAkteFD().Path
 
 			if p != "" {
 				out = append(out, p)

@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/zettel_external"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -133,12 +134,12 @@ func (c ZettelFromExternalAkte) Run(
 	err = toDelete.Each(
 		func(z *zettel.External) (err error) {
 			// TODO-P4 move to checkout store
-			if err = os.Remove(z.AkteFD.Path); err != nil {
+			if err = os.Remove(z.GetAkteFD().Path); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			pathRel := c.Standort().RelToCwdOrSame(z.AkteFD.Path)
+			pathRel := c.Standort().RelToCwdOrSame(z.GetAkteFD().Path)
 
 			// TODO-P4 move to printer
 			errors.Out().Printf("[%s] (deleted)", pathRel)
@@ -159,7 +160,9 @@ func (c ZettelFromExternalAkte) zettelForAkte(
 	akteFD kennung.FD,
 ) (z *zettel.External, err error) {
 	z = &zettel.External{
-		AkteFD: akteFD,
+		Sku: sku.External[kennung.Hinweis, *kennung.Hinweis]{
+			AkteFD: akteFD,
+		},
 	}
 
 	var r io.Reader

@@ -11,6 +11,8 @@ type External[T kennung.KennungLike[T], T1 kennung.KennungLikePtr[T]] struct {
 	Kennung    T
 	AkteSha    sha.Sha
 	ObjekteSha sha.Sha
+	ObjekteFD  kennung.FD
+	AkteFD     kennung.FD
 }
 
 func (a External[T, T1]) String() string {

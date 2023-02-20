@@ -153,12 +153,12 @@ func (s *Store) CheckoutOne(
 		if !s.shouldCheckOut(options, cz) {
 			// TODO-P2 handle fs state
 			if err = s.checkedOutLogPrinter(&cz); err != nil {
-				if errors.IsExist(err) {
-					err = nil
-				} else {
-					err = errors.Wrap(err)
-					return
-				}
+				// if errors.IsExist(err) {
+				// 	err = nil
+				// } else {
+				err = errors.Wrap(err)
+				return
+				// }
 			}
 
 			return
@@ -183,7 +183,7 @@ func (s *Store) CheckoutOne(
 	}
 
 	if options.CheckoutMode.IncludesZettel() {
-		cz.External.FD.Path = filename
+		cz.External.Sku.ObjekteFD.Path = filename
 	}
 
 	if !inlineAkte && options.CheckoutMode.IncludesAkte() {
@@ -201,7 +201,7 @@ func (s *Store) CheckoutOne(
 			fe = t.String()
 		}
 
-		cz.External.AkteFD.Path = originalFilename + "." + fe
+		cz.External.Sku.AkteFD.Path = originalFilename + "." + fe
 	}
 
 	e := zettel_external.MakeFileEncoder(
@@ -250,14 +250,21 @@ func (s *Store) CheckoutOneTyp(
 
 	var f *os.File
 
-	if f, err = files.CreateExclusiveWriteOnly(
-		path.Join(
-			s.Cwd(),
-			fmt.Sprintf("%s.%s", tk.Sku.Kennung, s.erworben.FileExtensions.Typ),
-		),
-	); err != nil {
+	p := path.Join(
+		s.Cwd(),
+		fmt.Sprintf("%s.%s", tk.Sku.Kennung, s.erworben.FileExtensions.Typ),
+	)
+
+	if f, err = files.CreateExclusiveWriteOnly(p); err != nil {
 		if errors.IsExist(err) {
 			err = nil
+
+			if co.External, err = s.ReadTypFromFile(p); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			co.External.Sku.Kennung = tk.Sku.Kennung
 		} else {
 			err = errors.Wrap(err)
 		}
@@ -267,7 +274,7 @@ func (s *Store) CheckoutOneTyp(
 
 	defer errors.DeferredCloser(&err, f)
 
-	if co.External.FD, err = kennung.File(f); err != nil {
+	if co.External.Sku.ObjekteFD, err = kennung.File(f); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

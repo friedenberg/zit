@@ -99,7 +99,7 @@ func (fs CwdFiles) ZettelFiles() (out []string) {
 	out = make([]string, 0, len(fs.Zettelen))
 
 	for _, z := range fs.Zettelen {
-		out = append(out, z.FD.Path)
+		out = append(out, z.GetObjekteFD().Path)
 	}
 
 	return

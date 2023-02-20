@@ -42,7 +42,7 @@ func MakeCliFormatCheckedOut(
 			w,
 			format.MakeFormatStringRightAlignedParen(diff),
 			format.MakeFormatString("["),
-			cw(s.MakeWriterRelativePath(t.External.FD.Path), format.ColorTypePointer),
+			cw(s.MakeWriterRelativePath(t.External.GetObjekteFD().Path), format.ColorTypePointer),
 			format.MakeFormatString("@"),
 			format.MakeWriter(sf, t.External.GetObjekteSha().GetSha()),
 			format.MakeFormatString(" "),

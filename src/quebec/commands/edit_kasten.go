@@ -218,9 +218,9 @@ func (c EditKasten) readTempKastenFiles(
 
 			te := &kasten.External{
 				Sku: sku.External[kennung.Kasten, *kennung.Kasten]{
-					Kennung: kennung.MustKasten(fdee.FileNameSansExt()),
+					Kennung:   kennung.MustKasten(fdee.FileNameSansExt()),
+					ObjekteFD: fdee,
 				},
-				FD: fdee,
 			}
 
 			// TODO-P2 offer option to edit again

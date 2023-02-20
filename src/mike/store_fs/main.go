@@ -16,6 +16,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/ts"
+	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/india/konfig"
@@ -137,7 +138,7 @@ func (s Store) MakeExternalZettelFromZettel(
 		return
 	}
 
-	ez.FD.Path = p
+	ez.Sku.ObjekteFD.Path = p
 
 	head, tail := id.HeadTailFromFileName(p)
 
@@ -150,12 +151,12 @@ func (s Store) MakeExternalZettelFromZettel(
 }
 
 func (s Store) readZettelFromFile(ez *zettel.External) (err error) {
-	if !files.Exists(ez.FD.Path) {
+	if !files.Exists(ez.GetObjekteFD().Path) {
 		// if the path does not have an extension, try looking for a file with that
 		// extension
 		// TODO-P4 modify this to use globs
-		if filepath.Ext(ez.FD.Path) == "" {
-			ez.FD.Path = ez.FD.Path + s.erworben.GetZettelFileExtension()
+		if filepath.Ext(ez.GetObjekteFD().Path) == "" {
+			ez.Sku.ObjekteFD.Path = ez.GetObjekteFD().Path + s.erworben.GetZettelFileExtension()
 			return s.readZettelFromFile(ez)
 		}
 
@@ -168,7 +169,7 @@ func (s Store) readZettelFromFile(ez *zettel.External) (err error) {
 
 	var f *os.File
 
-	if f, err = files.Open(ez.FD.Path); err != nil {
+	if f, err = files.Open(ez.GetObjekteFD().Path); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -188,7 +189,7 @@ func (s Store) readZettelFromFile(ez *zettel.External) (err error) {
 	}
 
 	ez.Objekte = c.Zettel
-	ez.AkteFD.Path = c.AktePath
+	ez.Sku.AkteFD.Path = c.AktePath
 
 	unrecoverableErrors := errors.MakeMulti()
 
@@ -276,20 +277,20 @@ func (s *Store) ReadOne(h kennung.Hinweis) (zt *zettel.Transacted, err error) {
 	}
 
 	switch {
-	case p.AkteFD.Path == "":
+	case p.GetAkteFD().Path == "":
 		readFunc = func() (zettel_checked_out.Zettel, error) {
-			return s.Read(p.FD.Path)
+			return s.Read(p.GetObjekteFD().Path)
 		}
 
-	case p.FD.Path == "":
+	case p.GetObjekteFD().Path == "":
 		readFunc = func() (zettel_checked_out.Zettel, error) {
-			return s.ReadExternalZettelFromAktePath(p.AkteFD.Path)
+			return s.ReadExternalZettelFromAktePath(p.GetAkteFD().Path)
 		}
 
 	default:
 		// TODO-P3 validate that the zettel file points to the akte in the metadatei
 		readFunc = func() (zettel_checked_out.Zettel, error) {
-			return s.Read(p.FD.Path)
+			return s.Read(p.GetObjekteFD().Path)
 		}
 	}
 
@@ -319,8 +320,10 @@ func (s *Store) ReadMany(
 		w = func(z *zettel.Transacted) (err error) {
 			// TODO-P2 akte fd?
 			ze := zettel.External{
-				FD: kennung.FD{
-					Path: z.Sku.Kennung.String(),
+				Sku: sku.External[kennung.Hinweis, *kennung.Hinweis]{
+					ObjekteFD: kennung.FD{
+						Path: z.Sku.Kennung.String(),
+					},
 				},
 			}
 
@@ -376,20 +379,20 @@ func (s *Store) ReadManyHistory(
 					var readFunc func() (zettel_checked_out.Zettel, error)
 
 					switch {
-					case p.AkteFD.Path == "":
+					case p.GetAkteFD().Path == "":
 						readFunc = func() (zettel_checked_out.Zettel, error) {
-							return s.Read(p.FD.Path)
+							return s.Read(p.GetObjekteFD().Path)
 						}
 
-					case p.FD.Path == "":
+					case p.GetObjekteFD().Path == "":
 						readFunc = func() (zettel_checked_out.Zettel, error) {
-							return s.ReadExternalZettelFromAktePath(p.AkteFD.Path)
+							return s.ReadExternalZettelFromAktePath(p.GetAkteFD().Path)
 						}
 
 					default:
 						// TODO-P3 validate that the zettel file points to the akte in the metadatei
 						readFunc = func() (zettel_checked_out.Zettel, error) {
-							return s.Read(p.FD.Path)
+							return s.Read(p.GetObjekteFD().Path)
 						}
 					}
 

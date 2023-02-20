@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/zettel_external"
@@ -167,12 +168,12 @@ func (c CreateFromPaths) Run(
 	err = toDelete.Each(
 		func(z *zettel.External) (err error) {
 			// TODO move to checkout store
-			if err = os.Remove(z.FD.Path); err != nil {
+			if err = os.Remove(z.GetObjekteFD().Path); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			pathRel := c.Standort().RelToCwdOrSame(z.FD.Path)
+			pathRel := c.Standort().RelToCwdOrSame(z.GetObjekteFD().Path)
 
 			// TODO move to printer
 			errors.Out().Printf("[%s] (deleted)", pathRel)
@@ -258,10 +259,10 @@ func (c CreateFromPaths) zettelsFromPath(
 
 	wf(
 		&zettel.External{
-			FD: kennung.FD{
-				Path: p,
-			},
-			Sku: zettel_external.Sku{
+			Sku: sku.External[kennung.Hinweis, *kennung.Hinweis]{
+				ObjekteFD: kennung.FD{
+					Path: p,
+				},
 				ObjekteSha: s,
 			},
 			Objekte: ctx.Zettel,

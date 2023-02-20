@@ -36,7 +36,7 @@ func MakeCliFormatExternal(
 			w,
 			format.MakeFormatStringRightAlignedParen(""),
 			format.MakeFormatString("["),
-			cw(s.MakeWriterRelativePath(t.FD.Path), format.ColorTypePointer),
+			cw(s.MakeWriterRelativePath(t.GetObjekteFD().Path), format.ColorTypePointer),
 			format.MakeFormatString("@"),
 			format.MakeWriter(sf, t.GetObjekteSha()),
 			format.MakeFormatString(" "),

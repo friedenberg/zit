@@ -21,12 +21,12 @@ func MakeCliFormat(
 ) schnittstellen.FuncWriterFormat[zettel.External] {
 	return func(w io.Writer, z zettel.External) (n int64, err error) {
 		switch {
-		case z.AkteFD.Path != "" && z.FD.Path != "":
+		case z.GetAkteFD().Path != "" && z.GetObjekteFD().Path != "":
 			return format.Write(
 				w,
 				format.MakeFormatStringRightAlignedParen(format.StringCheckedOut),
 				format.MakeFormatString("["),
-				cw(s.MakeWriterRelativePath(z.FD.Path), format.ColorTypePointer),
+				cw(s.MakeWriterRelativePath(z.GetObjekteFD().Path), format.ColorTypePointer),
 				format.MakeFormatString("@"),
 				format.MakeWriter(sf, z.GetObjekteSha().GetSha()),
 				format.MakeFormatString(" "),
@@ -34,18 +34,18 @@ func MakeCliFormat(
 				format.MakeFormatString("]\n"),
 				format.MakeFormatStringRightAlignedParen(""),
 				format.MakeFormatString("["),
-				cw(s.MakeWriterRelativePath(z.AkteFD.Path), format.ColorTypePointer),
+				cw(s.MakeWriterRelativePath(z.GetAkteFD().Path), format.ColorTypePointer),
 				format.MakeFormatString("@"),
 				format.MakeWriter(sf, z.Objekte.Akte.GetSha()),
 				format.MakeFormatString("]"),
 			)
 
-		case z.AkteFD.Path != "":
+		case z.GetAkteFD().Path != "":
 			return format.Write(
 				w,
 				format.MakeFormatStringRightAlignedParen(format.StringCheckedOut),
 				format.MakeFormatString("["),
-				cw(s.MakeWriterRelativePath(z.AkteFD.Path), format.ColorTypePointer),
+				cw(s.MakeWriterRelativePath(z.GetAkteFD().Path), format.ColorTypePointer),
 				format.MakeFormatString("@"),
 				format.MakeWriter(sf, z.Objekte.Akte.GetSha()),
 				format.MakeFormatString(" "),
@@ -53,12 +53,12 @@ func MakeCliFormat(
 				format.MakeFormatString("]"),
 			)
 
-		case z.FD.Path != "":
+		case z.GetObjekteFD().Path != "":
 			return format.Write(
 				w,
 				format.MakeFormatStringRightAlignedParen(format.StringCheckedOut),
 				format.MakeFormatString("["),
-				cw(s.MakeWriterRelativePath(z.FD.Path), format.ColorTypePointer),
+				cw(s.MakeWriterRelativePath(z.GetObjekteFD().Path), format.ColorTypePointer),
 				format.MakeFormatString("@"),
 				format.MakeWriter(sf, z.GetObjekteSha().GetSha()),
 				format.MakeFormatString(" "),

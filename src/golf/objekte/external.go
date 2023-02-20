@@ -32,8 +32,6 @@ type External[
 ] struct {
 	Objekte T
 	Sku     sku.External[T2, T3]
-	FD      kennung.FD // TODO-P1 rename to ObjekteFD
-	AkteFD  kennung.FD
 }
 
 func (a External[T, T1, T2, T3]) String() string {
@@ -53,10 +51,6 @@ func (a External[T, T1, T2, T3]) Equals(b External[T, T1, T2, T3]) bool {
 		return false
 	}
 
-	if !a.FD.Equals(b.FD) {
-		return false
-	}
-
 	return true
 }
 
@@ -65,11 +59,11 @@ func (e External[T, T1, T2, T3]) GetGattung() schnittstellen.Gattung {
 }
 
 func (e External[T, T1, T2, T3]) GetObjekteFD() kennung.FD {
-	return e.FD
+	return e.Sku.ObjekteFD
 }
 
 func (e External[T, T1, T2, T3]) GetAkteFD() kennung.FD {
-	return e.AkteFD
+	return e.Sku.AkteFD
 }
 
 func (e External[T, T1, T2, T3]) GetObjekteSha() sha.Sha {

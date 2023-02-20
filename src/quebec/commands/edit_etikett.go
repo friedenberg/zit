@@ -219,9 +219,9 @@ func (c EditEtikett) readTempEtikettFiles(
 
 			te := &etikett.External{
 				Sku: sku.External[kennung.Etikett, *kennung.Etikett]{
-					Kennung: kennung.MustEtikett(fdee.FileNameSansExt()),
+					Kennung:   kennung.MustEtikett(fdee.FileNameSansExt()),
+					ObjekteFD: fdee,
 				},
-				FD: fdee,
 			}
 
 			// TODO-P2 offer option to edit again

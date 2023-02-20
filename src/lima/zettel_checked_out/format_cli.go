@@ -29,7 +29,7 @@ func MakeCliFormat(
 
 	return func(w io.Writer, z Zettel) (n int64, err error) {
 		switch {
-		case z.External.AkteFD.Path != "" && z.External.FD.Path != "":
+		case z.External.Sku.AkteFD.Path != "" && z.External.Sku.ObjekteFD.Path != "":
 			return format.Write(
 				w,
 				format.MakeWriter(wzef, z),
@@ -37,13 +37,13 @@ func MakeCliFormat(
 				format.MakeWriter(waef, z),
 			)
 
-		case z.External.AkteFD.Path != "":
+		case z.External.Sku.AkteFD.Path != "":
 			return format.Write(
 				w,
 				format.MakeWriter(waef, z),
 			)
 
-		case z.External.FD.Path != "":
+		case z.External.Sku.ObjekteFD.Path != "":
 			return format.Write(
 				w,
 				format.MakeWriter(wzef, z),
@@ -72,7 +72,7 @@ func makeWriterFuncZettel(
 			w,
 			format.MakeFormatStringRightAlignedParen(diff),
 			format.MakeFormatString("["),
-			cw(s.MakeWriterRelativePath(z.External.FD.Path), format.ColorTypePointer),
+			cw(s.MakeWriterRelativePath(z.External.GetObjekteFD().Path), format.ColorTypePointer),
 			format.MakeFormatString("@"),
 			format.MakeWriter(sf, z.External.GetObjekteSha().GetSha()),
 			format.MakeFormatString(" "),
@@ -100,7 +100,7 @@ func makeWriterFuncAkte(
 			w,
 			format.MakeFormatStringRightAlignedParen(diff),
 			format.MakeFormatString("["),
-			cw(s.MakeWriterRelativePath(z.External.AkteFD.Path), format.ColorTypePointer),
+			cw(s.MakeWriterRelativePath(z.External.GetAkteFD().Path), format.ColorTypePointer),
 			format.MakeFormatString("@"),
 			format.MakeWriter(sf, z.External.Objekte.Akte.GetSha()),
 			format.MakeFormatString("]"),

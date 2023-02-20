@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/delta/kennung"
@@ -22,21 +21,23 @@ func (s *Store) WriteTyp(t *typ.Transacted) (te *typ.CheckedOut, err error) {
 	te = &typ.CheckedOut{
 		Internal: *t,
 		External: typ.External{
-			FD: kennung.FD{
-				Path: fmt.Sprintf("%s.%s", t.Kennung(), s.erworben.FileExtensions.Typ),
-			},
-			// TODO-P2 move to central place
-			Objekte: t.Objekte,
 			Sku: sku.External[kennung.Typ, *kennung.Typ]{
 				ObjekteSha: sha.Make(t.GetObjekteSha()),
 				Kennung:    t.Sku.Kennung,
+				ObjekteFD: kennung.FD{
+					Path: fmt.Sprintf("%s.%s", t.Kennung(), s.erworben.FileExtensions.Typ),
+				},
 			},
+			// TODO-P2 move to central place
+			Objekte: t.Objekte,
 		},
 	}
 
 	var f *os.File
 
-	if f, err = files.CreateExclusiveWriteOnly(te.External.FD.Path); err != nil {
+	if f, err = files.CreateExclusiveWriteOnly(
+		te.External.GetObjekteFD().Path,
+	); err != nil {
 		if errors.IsExist(err) {
 			err = s.ReadTyp(&te.External)
 		} else {
@@ -58,28 +59,31 @@ func (s *Store) WriteTyp(t *typ.Transacted) (te *typ.CheckedOut, err error) {
 	return
 }
 
-func (s *Store) ReadTyp(t *typ.External) (err error) {
+func (s *Store) ReadTypFromFile(p string) (t typ.External, err error) {
 	format := typ.MakeFormatText(s.storeObjekten)
 
 	ops := objekte_store.MakeParseSaver[
 		typ.Objekte,
 		*typ.Objekte,
+		kennung.Typ,
+		*kennung.Typ,
 	](
 		s.storeObjekten,
 		s.storeObjekten,
 		format,
 	)
 
-	var objekteSha schnittstellen.Sha
-
-	if t.Objekte, objekteSha, err = ops.ParseAndSaveAkteAndObjekte(
-		t.FD.Path,
+	if t.Objekte, t.Sku, err = ops.ParseAndSaveAkteAndObjekte(
+		p,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	t.Sku.ObjekteSha = objekteSha.(sha.Sha)
+	return
+}
 
+func (s *Store) ReadTyp(t *typ.External) (err error) {
+	*t, err = s.ReadTypFromFile(t.GetObjekteFD().Path)
 	return
 }

@@ -7,19 +7,24 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 )
 
 type ParseSaver[
 	T schnittstellen.Objekte[T],
 	T1 schnittstellen.ObjektePtr[T],
+	T2 schnittstellen.Id[T2],
+	T3 schnittstellen.IdPtr[T2],
 ] interface {
-	ParseAndSaveAkteAndObjekte(string) (T, schnittstellen.Sha, error)
+	ParseAndSaveAkteAndObjekte(string) (T, sku.External[T2, T3], error)
 }
 
 type objekteParseSaver[
 	T schnittstellen.Objekte[T],
 	T1 schnittstellen.ObjektePtr[T],
+	T2 schnittstellen.Id[T2],
+	T3 schnittstellen.IdPtr[T2],
 ] struct {
 	awf          schnittstellen.AkteWriterFactory
 	akteParser   schnittstellen.Parser[T, T1]
@@ -29,12 +34,14 @@ type objekteParseSaver[
 func MakeParseSaver[
 	T schnittstellen.Objekte[T],
 	T1 schnittstellen.ObjektePtr[T],
+	T2 schnittstellen.Id[T2],
+	T3 schnittstellen.IdPtr[T2],
 ](
 	owf schnittstellen.ObjekteWriterFactory,
 	awf schnittstellen.AkteWriterFactory,
 	akteParser schnittstellen.Parser[T, T1],
-) *objekteParseSaver[T, T1] {
-	return &objekteParseSaver[T, T1]{
+) *objekteParseSaver[T, T1, T2, T3] {
+	return &objekteParseSaver[T, T1, T2, T3]{
 		awf:        awf,
 		akteParser: akteParser,
 		objekteSaver: MakeObjekteSaver[T, T1](
@@ -44,15 +51,17 @@ func MakeParseSaver[
 	}
 }
 
-func (h *objekteParseSaver[T, T1]) ParseAndSaveAkteAndObjekte(
+func (h *objekteParseSaver[T, T1, T2, T3]) ParseAndSaveAkteAndObjekte(
 	p string,
-) (o T, sh schnittstellen.Sha, err error) {
+) (o T, sk sku.External[T2, T3], err error) {
 	var f *os.File
 
 	if f, err = files.OpenExclusiveReadOnly(p); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	errors.TodoP0("populate sku.AkteSha and ObjekteSha")
 
 	r := sha.MakeReadCloser(f)
 
@@ -65,15 +74,19 @@ func (h *objekteParseSaver[T, T1]) ParseAndSaveAkteAndObjekte(
 
 	T1(&o).SetAkteSha(r.Sha())
 
+	var sh schnittstellen.Sha
+
 	if sh, err = h.objekteSaver.SaveObjekte(&o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
+	sk.ObjekteSha = sha.Make(sh)
+
 	return
 }
 
-func (h *objekteParseSaver[T, T1]) readAkte(
+func (h *objekteParseSaver[T, T1, T2, T3]) readAkte(
 	r sha.ReadCloser,
 	o T1,
 ) (err error) {
