@@ -12,7 +12,6 @@ import (
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/juliett/cwd"
 	"github.com/friedenberg/zit/src/juliett/zettel"
-	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
 	"github.com/friedenberg/zit/src/mike/store_fs"
 	"github.com/friedenberg/zit/src/november/umwelt"
 	"github.com/friedenberg/zit/src/oscar/user_ops"
@@ -69,7 +68,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		nil,
 	)
 
-	var zsc zettel_checked_out.MutableSet
+	var zsc zettel.MutableSetCheckedOut
 
 	if len(args) == 0 {
 		if zsc, err = c.writeNewZettels(u, f); err != nil {
@@ -134,7 +133,7 @@ func (c New) readExistingFilesAsZettels(
 func (c New) writeNewZettels(
 	u *umwelt.Umwelt,
 	f zettel.ObjekteFormatter,
-) (zsc zettel_checked_out.MutableSet, err error) {
+) (zsc zettel.MutableSetCheckedOut, err error) {
 	emptyOp := user_ops.WriteNewZettels{
 		Umwelt:          u,
 		CheckOut:        c.Edit,
@@ -162,14 +161,14 @@ func (c New) writeNewZettels(
 
 func (c New) editZettels(
 	u *umwelt.Umwelt,
-	zsc zettel_checked_out.MutableSet,
+	zsc zettel.MutableSetCheckedOut,
 ) (err error) {
 	if !c.Edit {
 		errors.Log().Print("edit set to false, not editing")
 		return
 	}
 
-	fs := zettel_checked_out.ToSliceFilesZettelen(zsc)
+	fs := zettel.ToSliceFilesZettelen(zsc)
 
 	var cwdFiles cwd.CwdFiles
 

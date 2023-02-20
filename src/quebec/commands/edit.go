@@ -13,7 +13,6 @@ import (
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/juliett/cwd"
 	"github.com/friedenberg/zit/src/juliett/zettel"
-	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
 	"github.com/friedenberg/zit/src/mike/store_fs"
 	"github.com/friedenberg/zit/src/november/umwelt"
 	"github.com/friedenberg/zit/src/oscar/user_ops"
@@ -140,7 +139,7 @@ func (c Edit) editZettels(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 		CheckoutMode: c.CheckoutMode,
 	}
 
-	var checkoutResults zettel_checked_out.MutableSet
+	var checkoutResults zettel.MutableSetCheckedOut
 
 	query := zettel.WriterIds{
 		Filter: kennung.Filter{
@@ -156,7 +155,10 @@ func (c Edit) editZettels(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 		return
 	}
 
-	if err = (user_ops.OpenFiles{}).Run(u, zettel_checked_out.ToSliceFilesAkten(checkoutResults)...); err != nil {
+	if err = (user_ops.OpenFiles{}).Run(
+		u,
+		zettel.ToSliceFilesAkten(checkoutResults)...,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -169,7 +171,7 @@ func (c Edit) editZettels(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 			Build(),
 	}
 
-	fs := zettel_checked_out.ToSliceFilesZettelen(checkoutResults)
+	fs := zettel.ToSliceFilesZettelen(checkoutResults)
 
 	if _, err = openVimOp.Run(u, fs...); err != nil {
 		if errors.Is(err, files.ErrEmptyFileList) {
@@ -186,7 +188,7 @@ func (c Edit) editZettels(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 		return
 	}
 
-	fs = zettel_checked_out.ToSliceFilesZettelen(checkoutResults)
+	fs = zettel.ToSliceFilesZettelen(checkoutResults)
 
 	var possible cwd.CwdFiles
 

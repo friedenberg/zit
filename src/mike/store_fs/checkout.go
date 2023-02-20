@@ -50,8 +50,8 @@ func (s *Store) CheckoutQuery(
 func (s *Store) Checkout(
 	options CheckoutOptions,
 	ztw schnittstellen.FuncIter[*zettel.Transacted],
-) (zcs zettel_checked_out.MutableSet, err error) {
-	zcs = zettel_checked_out.MakeMutableSetUnique(0)
+) (zcs zettel.MutableSetCheckedOut, err error) {
+	zcs = zettel.MakeMutableSetCheckedOutUnique(0)
 	zts := zettel.MakeMutableSetUnique(0)
 
 	if err = s.storeObjekten.Zettel().ReadAllSchwanzen(

@@ -139,7 +139,7 @@ func (u *Umwelt) FormatExternalFD() schnittstellen.FuncWriterFormat[kennung.FD] 
 }
 
 func (u *Umwelt) FormatZettelCheckedOut() schnittstellen.FuncWriterFormat[zettel_checked_out.Zettel] {
-	return zettel_checked_out.MakeCliFormat(
+	return zettel.MakeCliFormatCheckedOut(
 		u.Standort(),
 		u.FormatColorWriter(),
 		u.FormatHinweis(),

@@ -1,4 +1,4 @@
-package zettel_checked_out
+package zettel
 
 import (
 	"io"
@@ -7,18 +7,17 @@ import (
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
 // (same|changed) [path@sha !typ "bez"]
 // (same|changed) [path.akte_ext@sha]
-func MakeCliFormat(
+func MakeCliFormatCheckedOut(
 	s standort.Standort,
 	cw format.FuncColorWriter,
 	hf schnittstellen.FuncWriterFormat[kennung.Hinweis],
 	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
-	zf schnittstellen.FuncWriterFormat[zettel.Objekte],
-) schnittstellen.FuncWriterFormat[Zettel] {
+	zf schnittstellen.FuncWriterFormat[Objekte],
+) schnittstellen.FuncWriterFormat[CheckedOut] {
 	wzef := makeWriterFuncZettel(
 		s, cw, hf, sf, zf,
 	)
@@ -27,7 +26,7 @@ func MakeCliFormat(
 		s, cw, hf, sf, zf,
 	)
 
-	return func(w io.Writer, z Zettel) (n int64, err error) {
+	return func(w io.Writer, z CheckedOut) (n int64, err error) {
 		switch {
 		case z.External.Sku.AkteFD.Path != "" && z.External.Sku.ObjekteFD.Path != "":
 			return format.Write(
@@ -59,9 +58,9 @@ func makeWriterFuncZettel(
 	cw format.FuncColorWriter,
 	hf schnittstellen.FuncWriterFormat[kennung.Hinweis],
 	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
-	zf schnittstellen.FuncWriterFormat[zettel.Objekte],
-) schnittstellen.FuncWriterFormat[Zettel] {
-	return func(w io.Writer, z Zettel) (n int64, err error) {
+	zf schnittstellen.FuncWriterFormat[Objekte],
+) schnittstellen.FuncWriterFormat[CheckedOut] {
+	return func(w io.Writer, z CheckedOut) (n int64, err error) {
 		diff := format.StringChanged
 
 		if z.Internal.Sku.ObjekteSha.Equals(z.External.Sku.ObjekteSha) {
@@ -87,9 +86,9 @@ func makeWriterFuncAkte(
 	cw format.FuncColorWriter,
 	hf schnittstellen.FuncWriterFormat[kennung.Hinweis],
 	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
-	zf schnittstellen.FuncWriterFormat[zettel.Objekte],
-) schnittstellen.FuncWriterFormat[Zettel] {
-	return func(w io.Writer, z Zettel) (n int64, err error) {
+	zf schnittstellen.FuncWriterFormat[Objekte],
+) schnittstellen.FuncWriterFormat[CheckedOut] {
+	return func(w io.Writer, z CheckedOut) (n int64, err error) {
 		diff := format.StringChanged
 
 		if z.Internal.Objekte.Akte.Equals(z.External.Objekte.Akte) {
