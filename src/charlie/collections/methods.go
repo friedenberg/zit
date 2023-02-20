@@ -96,6 +96,22 @@ func AddIfGreater[E schnittstellen.Lessor[E]](
 	return
 }
 
+func DerivedValues[E schnittstellen.Value[E], F any](
+	c schnittstellen.Set[E],
+	f func(E) F,
+) (out []F) {
+	out = make([]F, 0, c.Len())
+
+	c.Each(
+		func(e E) (err error) {
+			out = append(out, f(e))
+			return
+		},
+	)
+
+	return
+}
+
 func SortedValues[E schnittstellen.Value[E]](
 	c schnittstellen.Set[E],
 ) (out []E) {

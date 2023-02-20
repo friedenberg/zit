@@ -1,7 +1,10 @@
 package objekte
 
 import (
+	"fmt"
+
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/values"
 )
 
 type CheckedOutState int
@@ -50,4 +53,26 @@ func (co CheckedOut[T, T1, T2, T3, T4, T5]) GetInternal() TransactedLike {
 
 func (co CheckedOut[T, T1, T2, T3, T4, T5]) GetExternal() ExternalLike {
 	return co.External
+}
+
+func (a CheckedOut[T, T1, T2, T3, T4, T5]) EqualsAny(b any) bool {
+	return values.Equals(a, b)
+}
+
+func (a CheckedOut[T, T1, T2, T3, T4, T5]) String() string {
+	return fmt.Sprintf("%s %s", a.Internal.Sku, a.External.Sku)
+}
+
+func (a CheckedOut[T, T1, T2, T3, T4, T5]) Equals(
+	b CheckedOut[T, T1, T2, T3, T4, T5],
+) bool {
+	if !a.Internal.Equals(b.Internal) {
+		return false
+	}
+
+	if !a.External.Equals(b.External) {
+		return false
+	}
+
+	return true
 }

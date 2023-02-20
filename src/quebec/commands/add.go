@@ -186,7 +186,7 @@ func (c Add) openAktenIfNecessary(
 
 	openOp := user_ops.OpenFiles{}
 
-	if err = openOp.Run(u, checkoutResults.ToSliceFilesAkten()...); err != nil {
+	if err = openOp.Run(u, zettel_checked_out.ToSliceFilesAkten(checkoutResults)...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

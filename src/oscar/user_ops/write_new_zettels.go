@@ -36,7 +36,7 @@ func (c WriteNewZettels) RunMany(
 			return
 		}
 
-		results.Add(&cz)
+		results.Add(cz)
 	}
 
 	return

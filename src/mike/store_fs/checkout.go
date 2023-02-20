@@ -74,7 +74,7 @@ func (s *Store) Checkout(
 				return
 			}
 
-			zcs.Add(&zc)
+			zcs.Add(zc)
 			return
 		},
 	); err != nil {
@@ -167,17 +167,15 @@ func (s *Store) CheckoutOne(
 
 	inlineAkte := s.erworben.IsInlineTyp(sz.Objekte.Typ)
 
-	cz = zettel_checked_out.Zettel{
+	cz = zettel.CheckedOut{
 		// TODO-P2 check diff with fs if already exists
-		CheckedOut: zettel.CheckedOut{
-			State:    objekte.CheckedOutStateJustCheckedOut,
-			Internal: sz,
-			External: zettel.External{
-				Objekte: sz.Objekte,
-				Sku: zettel_external.Sku{
-					ObjekteSha: sz.Sku.ObjekteSha,
-					Kennung:    sz.Sku.Kennung,
-				},
+		State:    objekte.CheckedOutStateJustCheckedOut,
+		Internal: sz,
+		External: zettel.External{
+			Objekte: sz.Objekte,
+			Sku: zettel_external.Sku{
+				ObjekteSha: sz.Sku.ObjekteSha,
+				Kennung:    sz.Sku.Kennung,
 			},
 		},
 	}

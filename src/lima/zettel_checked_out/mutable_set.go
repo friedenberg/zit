@@ -6,90 +6,57 @@ import (
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
-type MutableSet struct {
-	schnittstellen.MutableSet[*Zettel]
-}
+type (
+	Set        = schnittstellen.Set[Zettel]
+	MutableSet = schnittstellen.MutableSet[Zettel]
+)
 
 func MakeMutableSetUnique(c int) MutableSet {
-	return MutableSet{
-		MutableSet: collections.MakeMutableSet(
-			func(sz *Zettel) string {
-				if sz == nil {
-					return ""
-				}
-
-				return collections.MakeKey(
-					sz.Internal.Sku.Kopf,
-					sz.Internal.Sku.Mutter[0],
-					sz.Internal.Sku.Mutter[1],
-					sz.Internal.Sku.Schwanz,
-					sz.Internal.Sku.Kennung,
-					sz.Internal.Sku.ObjekteSha,
-				)
-			},
-		),
-	}
+	return collections.MakeMutableSet(
+		func(sz Zettel) string {
+			return collections.MakeKey(
+				sz.Internal.Sku.Kopf,
+				sz.Internal.Sku.Mutter[0],
+				sz.Internal.Sku.Mutter[1],
+				sz.Internal.Sku.Schwanz,
+				sz.Internal.Sku.Kennung,
+				sz.Internal.Sku.ObjekteSha,
+			)
+		},
+	)
 }
 
 func MakeMutableSetHinweisZettel(c int) MutableSet {
-	return MutableSet{
-		MutableSet: collections.MakeMutableSet(
-			func(sz *Zettel) string {
-				if sz == nil {
-					return ""
-				}
-
-				return collections.MakeKey(sz.Internal.Sku.Kennung)
-			},
-		),
-	}
-}
-
-func (s MutableSet) ToSliceZettelsExternal() (out []zettel.External) {
-	out = make([]zettel.External, 0, s.Len())
-
-	s.Each(
-		func(z *Zettel) (err error) {
-			out = append(out, z.External)
-			return
+	return collections.MakeMutableSet(
+		func(sz Zettel) string {
+			return collections.MakeKey(sz.Internal.Sku.Kennung)
 		},
 	)
-
-	return
 }
 
-func (s MutableSet) ToSliceFilesZettelen() (out []string) {
-	out = make([]string, 0, s.Len())
-
-	s.Each(
-		func(z *Zettel) (err error) {
-			p := z.External.GetObjekteFD().Path
-
-			if p != "" {
-				out = append(out, p)
-			}
-
-			return
+func ToSliceZettelsExternal(s Set) (out []zettel.External) {
+	return collections.DerivedValues[Zettel, zettel.External](
+		s,
+		func(z Zettel) zettel.External {
+			return z.External
 		},
 	)
-
-	return
 }
 
-func (s MutableSet) ToSliceFilesAkten() (out []string) {
-	out = make([]string, 0, s.Len())
-
-	s.Each(
-		func(z *Zettel) (err error) {
-			p := z.External.GetAkteFD().Path
-
-			if p != "" {
-				out = append(out, p)
-			}
-
-			return
+func ToSliceFilesZettelen(s Set) (out []string) {
+	return collections.DerivedValues[Zettel, string](
+		s,
+		func(z Zettel) string {
+			return z.External.GetObjekteFD().Path
 		},
 	)
+}
 
-	return
+func ToSliceFilesAkten(s Set) (out []string) {
+	return collections.DerivedValues[Zettel, string](
+		s,
+		func(z Zettel) string {
+			return z.External.GetAkteFD().Path
+		},
+	)
 }

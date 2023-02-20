@@ -156,7 +156,7 @@ func (c Edit) editZettels(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 		return
 	}
 
-	if err = (user_ops.OpenFiles{}).Run(u, checkoutResults.ToSliceFilesAkten()...); err != nil {
+	if err = (user_ops.OpenFiles{}).Run(u, zettel_checked_out.ToSliceFilesAkten(checkoutResults)...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -169,7 +169,7 @@ func (c Edit) editZettels(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 			Build(),
 	}
 
-	fs := checkoutResults.ToSliceFilesZettelen()
+	fs := zettel_checked_out.ToSliceFilesZettelen(checkoutResults)
 
 	if _, err = openVimOp.Run(u, fs...); err != nil {
 		if errors.Is(err, files.ErrEmptyFileList) {
@@ -186,7 +186,7 @@ func (c Edit) editZettels(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 		return
 	}
 
-	fs = checkoutResults.ToSliceFilesZettelen()
+	fs = zettel_checked_out.ToSliceFilesZettelen(checkoutResults)
 
 	var possible cwd.CwdFiles
 

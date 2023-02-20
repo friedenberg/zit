@@ -112,10 +112,8 @@ func (c CreateFromPaths) Run(
 
 	err = toCreate.Each(
 		func(z *zettel.External) (err error) {
-			cz := zettel_checked_out.Zettel{
-				CheckedOut: zettel.CheckedOut{
-					External: *z,
-				},
+			cz := zettel.CheckedOut{
+				External: *z,
 			}
 
 			if z.Objekte.IsEmpty() {

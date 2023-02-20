@@ -168,7 +168,7 @@ func (c New) editZettels(
 		return
 	}
 
-	fs := zsc.ToSliceFilesZettelen()
+	fs := zettel_checked_out.ToSliceFilesZettelen(zsc)
 
 	var cwdFiles cwd.CwdFiles
 

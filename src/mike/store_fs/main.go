@@ -475,7 +475,7 @@ func (s *Store) ReadFiles(
 
 				zco.DetermineState()
 
-				if err = f(&zettel_checked_out.Zettel{CheckedOut: zco}); err != nil {
+				if err = f(&zco); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
