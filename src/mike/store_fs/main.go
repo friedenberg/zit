@@ -11,7 +11,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/id"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/hinweisen"
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/kennung"
@@ -19,6 +18,7 @@ import (
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/india/konfig"
+	"github.com/friedenberg/zit/src/iter"
 	"github.com/friedenberg/zit/src/juliett/cwd"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/zettel_external"
@@ -424,7 +424,7 @@ func (s *Store) ReadManyHistory(
 		)
 	}
 
-	return collections.Multiplex(
+	return iter.Multiplex(
 		w,
 		queries...,
 	)

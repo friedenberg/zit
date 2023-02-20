@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/golf/objekte"
+	"github.com/friedenberg/zit/src/iter"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/november/umwelt"
 	"github.com/friedenberg/zit/src/oscar/remote_conn"
@@ -151,7 +152,7 @@ func (op PullServer) skusForFilter(
 
 	if err = op.umwelt.StoreObjekten().Query(
 		msg.MetaSet,
-		collections.MakeChain(
+		iter.MakeChain(
 			collections.MakeFuncTransformer[*zettel.Transacted, objekte.TransactedLike](
 				zettel.MakeWriterKonfig(op.umwelt.Konfig()),
 			),

@@ -15,6 +15,7 @@ import (
 	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/hotel/etikett"
 	"github.com/friedenberg/zit/src/hotel/typ"
+	"github.com/friedenberg/zit/src/iter"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
@@ -152,7 +153,7 @@ func (c Diff) showZettels(
 		hinweisen := kennung.MakeHinweisMutableSet()
 
 		if err = u.StoreObjekten().Zettel().ReadAllSchwanzen(
-			collections.MakeChain(
+			iter.MakeChain(
 				idFilter,
 				func(o *zettel.Transacted) (err error) {
 					return hinweisen.Add(o.Sku.Kennung)
@@ -180,7 +181,7 @@ func (c Diff) showZettels(
 	errors.Log().Printf("%v", filter)
 
 	if err = method(
-		collections.MakeChain(
+		iter.MakeChain(
 			func(z *zettel.Transacted) (err error) {
 				errors.Log().Printf("processing zettel: %s", z.Sku)
 				return
@@ -312,7 +313,7 @@ func (c Diff) showEtiketten(
 
 	etiketten := ids.Etiketten.MutableClone()
 	if err = etiketten.EachPtr(
-		collections.MakeChain(
+		iter.MakeChain(
 			func(t *kennung.Etikett) (err error) {
 				ty := u.Konfig().GetEtikett(*t)
 

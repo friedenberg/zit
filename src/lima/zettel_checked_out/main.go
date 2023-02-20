@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/values"
 )
 
-//TODO-P0 remove
+// TODO-P0 remove
 type Zettel struct {
 	zettel.CheckedOut
 }

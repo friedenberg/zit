@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/iter"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
@@ -169,7 +170,7 @@ func (zp *Page) copy(
 
 	dec := gob.NewDecoder(r)
 
-  errors.TodoP3("determine performance of this")
+	errors.TodoP3("determine performance of this")
 	added := zp.added.Copy()
 
 	if err = added.MergeStream(
@@ -201,7 +202,7 @@ func (zp *Page) writeTo(w1 io.Writer) (n int64, err error) {
 	defer errors.DeferredFlusher(&err, w)
 
 	if n, err = zp.copy(
-		collections.MakeChain(
+		iter.MakeChain(
 			zp.flushFilter,
 			zettel.MakeWriterGobEncoder(w).WriteZettelVerzeichnisse,
 		),

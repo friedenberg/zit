@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/id"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/iter"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
@@ -26,7 +27,7 @@ func (s Store) AkteExists(sh sha.Sha) (err error) {
 	set := zettel.MakeMutableSetUnique(0)
 
 	if err = s.Zettel().ReadAll(
-		collections.MakeChain(
+		iter.MakeChain(
 			func(z *zettel.Transacted) (err error) {
 				if !z.Objekte.Akte.Equals(sh) {
 					err = collections.MakeErrStopIteration()

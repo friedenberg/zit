@@ -2,30 +2,15 @@ package collections
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/iter"
 )
 
 var (
-	errStopIteration = errors.New("stop iteration")
-	ErrNilPointer    = errors.New("nil pointer")
-	ErrDoNotRepool   = errors.New("do not repool")
+	ErrNilPointer        = errors.New("nil pointer")
+	ErrDoNotRepool       = errors.New("do not repool")
+	MakeErrStopIteration = iter.MakeErrStopIteration
+	IsStopIteration      = iter.IsStopIteration
 )
-
-func MakeErrStopIteration() error {
-	if errors.IsVerbose() {
-		return errors.WrapN(2, errStopIteration)
-	} else {
-		return errStopIteration
-	}
-}
-
-func IsStopIteration(err error) bool {
-	if errors.Is(err, errStopIteration) {
-		errors.Log().Printf("stopped iteration at %s", err)
-		return true
-	}
-
-	return false
-}
 
 func IsDoNotRepool(err error) bool {
 	return errors.Is(err, ErrDoNotRepool)

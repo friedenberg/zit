@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
+	"github.com/friedenberg/zit/src/iter"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/zettel_external"
 	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
@@ -73,7 +74,7 @@ func (c CreateFromPaths) Run(
 		matcher := zettel_external.MakeMutableMatchSet(toCreate)
 
 		if err = c.StoreObjekten().Zettel().ReadAll(
-			collections.MakeChain(
+			iter.MakeChain(
 				matcher.Match,
 				collections.AddClone[zettel.Transacted, *zettel.Transacted](results),
 			),

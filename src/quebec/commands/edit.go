@@ -132,23 +132,6 @@ func (c Edit) runWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
 		return
 	}
 
-	// if err = readOp.RunMany(possible, readResults.Add); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
-
-	// zettels := readResults.ToSliceZettelsExternal()
-
-	// checkinOp := user_ops.Checkin{
-	// 	Umwelt:              u,
-	// 	OptionsReadExternal: store_fs.OptionsReadExternal{},
-	// }
-
-	// if _, err = checkinOp.Run(zettels...); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
-
 	return
 }
 

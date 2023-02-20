@@ -1,4 +1,4 @@
-package collections
+package iter
 
 import (
 	"sync"
@@ -10,6 +10,10 @@ import (
 func MakeChain[T any](wfs ...schnittstellen.FuncIter[T]) schnittstellen.FuncIter[T] {
 	return func(e T) (err error) {
 		for _, w := range wfs {
+			if w == nil {
+				continue
+			}
+
 			err = w(e)
 
 			switch {

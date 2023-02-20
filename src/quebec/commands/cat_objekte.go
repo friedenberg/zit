@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/delta/sha_collections"
+	"github.com/friedenberg/zit/src/iter"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
@@ -56,7 +57,7 @@ func (c CatObjekte) akten(
 
 	if err = u.Standort().ReadAllShasForGattung(
 		gattung.Akte,
-		collections.MakeChain(
+		iter.MakeChain(
 			collections.WriterContainer(shas, collections.MakeErrStopIteration()),
 			func(sb sha.Sha) (err error) {
 				var r io.ReadCloser

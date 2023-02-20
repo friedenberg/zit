@@ -7,13 +7,13 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/hinweisen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
+	"github.com/friedenberg/zit/src/iter"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/store_util"
 	"github.com/friedenberg/zit/src/kilo/store_verzeichnisse"
@@ -231,7 +231,7 @@ func (s *zettelStore) Query(
 		schnittstellen.ValueLike,
 		*zettel.Transacted,
 	](s, ids.Sigil)(
-		collections.MakeChain(
+		iter.MakeChain(
 			zettel.MakeWriterKonfig(s.StoreUtil.GetKonfig()),
 			zettel.WriterIds{
 				Filter: kennung.Filter{

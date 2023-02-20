@@ -199,8 +199,8 @@ func (u *Umwelt) PrinterJustCheckedOutLike() schnittstellen.FuncIter[objekte.Che
 			return pzco(&coz.External)
 
 		case gattung.Typ:
-			coz := co.(*typ.CheckedOut)
-			return ptco(coz)
+			coz := co.(typ.CheckedOut)
+			return ptco(&coz)
 
 		default:
 			_, err = fmt.Fprintf(

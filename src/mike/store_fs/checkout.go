@@ -16,6 +16,7 @@ import (
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/hotel/typ"
+	"github.com/friedenberg/zit/src/iter"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/zettel_external"
 	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
@@ -54,7 +55,7 @@ func (s *Store) Checkout(
 	zts := zettel.MakeMutableSetUnique(0)
 
 	if err = s.storeObjekten.Zettel().ReadAllSchwanzen(
-		collections.MakeChain(
+		iter.MakeChain(
 			zettel.MakeWriterKonfig(s.erworben),
 			ztw,
 			collections.AddClone[zettel.Transacted, *zettel.Transacted](zts),
@@ -152,8 +153,12 @@ func (s *Store) CheckoutOne(
 		if !s.shouldCheckOut(options, cz) {
 			// TODO-P2 handle fs state
 			if err = s.checkedOutLogPrinter(&cz); err != nil {
-				err = errors.Wrap(err)
-				return
+				if errors.IsExist(err) {
+					err = nil
+				} else {
+					err = errors.Wrap(err)
+					return
+				}
 			}
 
 			return
@@ -251,7 +256,12 @@ func (s *Store) CheckoutOneTyp(
 			fmt.Sprintf("%s.%s", tk.Sku.Kennung, s.erworben.FileExtensions.Typ),
 		),
 	); err != nil {
-		err = errors.Wrap(err)
+		if errors.IsExist(err) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+		}
+
 		return
 	}
 

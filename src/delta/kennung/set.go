@@ -1,12 +1,15 @@
 package kennung
 
 import (
+	"strings"
+
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/sha_collections"
 	"github.com/friedenberg/zit/src/echo/ts"
+	"github.com/friedenberg/zit/src/iter"
 )
 
 type Expanders struct {
@@ -146,7 +149,20 @@ func (s *Set) Add(ids ...schnittstellen.Element) (err error) {
 
 func (s Set) String() string {
 	errors.TodoP4("improve the string creation method")
-	return ""
+	sb := &strings.Builder{}
+
+	s.Shas.Each(iter.AddString[sha.Sha](sb))
+	s.Etiketten.Each(iter.AddString[Etikett](sb))
+	s.Hinweisen.Each(iter.AddString[Hinweis](sb))
+	s.Typen.Each(iter.AddString[Typ](sb))
+	s.Timestamps.Each(iter.AddString[ts.Time](sb))
+	s.Kisten.Each(iter.AddString[Kasten](sb))
+
+	if s.HasKonfig {
+		sb.WriteString("konfig")
+	}
+
+	return sb.String()
 }
 
 func (s Set) OnlySingleHinweis() (h Hinweis, ok bool) {

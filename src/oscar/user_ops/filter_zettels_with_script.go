@@ -9,6 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/iter"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
@@ -62,7 +63,7 @@ func (op FilterZettelsWithScript) Run() (err error) {
 
 		errors.Log().Printf("%#v", hinweisen)
 		op.Set.Each(
-			collections.MakeChain(
+			iter.MakeChain(
 				func(z *zettel.Transacted) (err error) {
 					ok := hinweisen.Contains(z.Sku.Kennung)
 

@@ -13,6 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/india/bestandsaufnahme"
+	"github.com/friedenberg/zit/src/iter"
 	"github.com/friedenberg/zit/src/kilo/store_util"
 )
 
@@ -172,21 +173,24 @@ func (s *typStore) Query(
 	f schnittstellen.FuncIter[*typ.Transacted],
 ) (err error) {
 	errors.TodoP1("generate optimized query here")
+	var i schnittstellen.FuncIter[*typ.Transacted]
+
+	if ids.Typen.Len() != 0 {
+		i = func(t *typ.Transacted) (err error) {
+			if !ids.Typen.Contains(t.Sku.Kennung) {
+				err = collections.MakeErrStopIteration()
+				return
+			}
+
+			return
+		}
+	}
+
 	return objekte_store.MethodForSigil[
 		*kennung.Typ,
 		*typ.Transacted,
 	](s, ids.Sigil)(
-		collections.MakeChain(
-			func(t *typ.Transacted) (err error) {
-				if !ids.Typen.Contains(t.Sku.Kennung) {
-					err = collections.MakeErrStopIteration()
-					return
-				}
-
-				return
-			},
-			f,
-		),
+		iter.MakeChain(i, f),
 	)
 }
 

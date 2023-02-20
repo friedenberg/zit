@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/script_config"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/iter"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/november/umwelt"
 	"github.com/friedenberg/zit/src/values"
@@ -60,7 +61,7 @@ func (c ExecAction) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 	hinweisen := kennung.MakeHinweisMutableSet()
 
 	if err = u.StoreWorkingDirectory().ReadMany(
-		collections.MakeChain(
+		iter.MakeChain(
 			query.WriteZettelTransacted,
 			func(z *zettel.Transacted) (err error) {
 				return hinweisen.Add(z.Sku.Kennung)

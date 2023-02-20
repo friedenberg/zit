@@ -13,6 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/iter"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/organize_text"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -91,7 +92,7 @@ func (c *Organize) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 	}
 
 	if err = u.StoreObjekten().Zettel().ReadAllSchwanzen(
-		collections.MakeChain(
+		iter.MakeChain(
 			zettel.MakeWriterKonfig(u.Konfig()),
 			query.WriteZettelTransacted,
 			collections.AddClone[zettel.Transacted, *zettel.Transacted](getResults),
