@@ -3,12 +3,17 @@ package store_objekten
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/alfa/toml"
+	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
+	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/hotel/etikett"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
+	"github.com/friedenberg/zit/src/india/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/kilo/store_util"
 )
 
@@ -18,7 +23,7 @@ type EtikettStore interface {
 
 	objekte_store.TransactedLogger[*etikett.Transacted]
 
-	objekte_store.TransactedReader[
+	objekte_store.Querier[
 		*kennung.Etikett,
 		*etikett.Transacted,
 	]
@@ -148,6 +153,32 @@ func (s etikettStore) Flush() (err error) {
 	return
 }
 
+func (s *etikettStore) Query(
+	ids kennung.Set,
+	f schnittstellen.FuncIter[*etikett.Transacted],
+) (err error) {
+	errors.TodoP1("generate optimized query here")
+	var i schnittstellen.FuncIter[*etikett.Transacted]
+
+	if ids.Etiketten.Len() != 0 {
+		i = func(t *etikett.Transacted) (err error) {
+			if !ids.Etiketten.Contains(t.Sku.Kennung) {
+				err = collections.MakeErrStopIteration()
+				return
+			}
+
+			return
+		}
+	}
+
+	return objekte_store.MethodForSigil[
+		*kennung.Etikett,
+		*etikett.Transacted,
+	](s, ids.Sigil)(
+		iter.MakeChain(i, f),
+	)
+}
+
 func (s etikettStore) ReadOne(
 	k *kennung.Etikett,
 ) (tt *etikett.Transacted, err error) {
@@ -164,14 +195,107 @@ func (s etikettStore) ReadOne(
 func (s etikettStore) ReadAllSchwanzen(
 	f schnittstellen.FuncIter[*etikett.Transacted],
 ) (err error) {
-	errors.TodoP2("implement")
+	if err = s.StoreUtil.GetKonfig().Etiketten.Each(f); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	return
 }
 
 func (s etikettStore) ReadAll(
 	f schnittstellen.FuncIter[*etikett.Transacted],
 ) (err error) {
-	errors.TodoP2("implement")
+	if s.StoreUtil.GetKonfig().UseBestandsaufnahme {
+		f1 := func(t *bestandsaufnahme.Objekte) (err error) {
+			if err = t.Akte.Skus.Each(
+				func(sk sku.Sku2) (err error) {
+					if sk.GetGattung() != gattung.Etikett {
+						return
+					}
+
+					var te *etikett.Transacted
+
+					if te, err = s.InflateFromDataIdentity(sk); err != nil {
+						if errors.Is(err, toml.Error{}) {
+							err = nil
+						} else {
+							err = errors.Wrap(err)
+							return
+						}
+					}
+
+					if err = f(te); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+
+					return
+				},
+			); err != nil {
+				err = errors.Wrapf(
+					err,
+					"Bestandsaufnahme: %s",
+					t.Tai,
+				)
+
+				return
+			}
+
+			return
+		}
+
+		if err = s.StoreUtil.GetBestandsaufnahmeStore().ReadAll(f1); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		if err = s.StoreUtil.GetTransaktionStore().ReadAllTransaktions(
+			func(t *transaktion.Transaktion) (err error) {
+				if err = t.Skus.Each(
+					func(o sku.SkuLike) (err error) {
+						if o.GetGattung() != gattung.Etikett {
+							return
+						}
+
+						var te *etikett.Transacted
+
+						if te, err = s.InflateFromDataIdentity(o); err != nil {
+							if errors.Is(err, toml.Error{}) {
+								err = nil
+							} else {
+								err = errors.Wrap(err)
+								return
+							}
+						}
+
+						if err = f(te); err != nil {
+							err = errors.Wrap(err)
+							return
+						}
+
+						return
+					},
+				); err != nil {
+					err = errors.Wrapf(
+						err,
+						"Transaktion: %s/%s: %s",
+						t.Time.Kopf(),
+						t.Time.Schwanz(),
+						t.Time,
+					)
+
+					return
+				}
+
+				return
+			},
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
 	return
 }
 

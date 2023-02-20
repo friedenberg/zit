@@ -5,7 +5,7 @@ type FileExtensions struct {
 	Organize string `toml:"organize"`
 	Typ      string `toml:"typ"`
 	Etikett  string `toml:"etikett"`
-	Kasten   string `toml:"etikett"`
+	Kasten   string `toml:"kasten"`
 }
 
 func (a *FileExtensions) Reset() {

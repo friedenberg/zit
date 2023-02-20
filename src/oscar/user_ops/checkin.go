@@ -45,7 +45,7 @@ func (c Checkin) Run(
 				}
 
 			default:
-				errors.Todo("implement")
+				err = errors.Implement()
 				return
 			}
 

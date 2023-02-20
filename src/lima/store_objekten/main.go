@@ -85,6 +85,9 @@ func Make(
 		gattung.Typ: objekte.MakeApplyQueryTransactedLike[*typ.Transacted](
 			s.typStore.Query,
 		),
+		gattung.Etikett: objekte.MakeApplyQueryTransactedLike[*etikett.Transacted](
+			s.etikettStore.Query,
+		),
 		// gattung.Typ: objekte.MakeApplyTransactedLike[*typ.Transacted](
 		// 	s.typStore.ReadAllSchwanzen,
 		// ),
@@ -186,15 +189,16 @@ func (s *Store) Kasten() KastenStore {
 func (s Store) RevertTransaktion(
 	t *transaktion.Transaktion,
 ) (tzs zettel.MutableSet, err error) {
-	errors.TodoP0("implement for Bestandsaufnahme")
+	err = errors.Implement()
+	return
 
-	if !s.StoreUtil.GetLockSmith().IsAcquired() {
-		err = objekte_store.ErrLockRequired{
-			Operation: "revert",
-		}
+	// if !s.StoreUtil.GetLockSmith().IsAcquired() {
+	// 	err = objekte_store.ErrLockRequired{
+	// 		Operation: "revert",
+	// 	}
 
-		return
-	}
+	// 	return
+	// }
 
 	// tzs = zettel.MakeMutableSetUnique(t.Skus.Len())
 
@@ -251,7 +255,7 @@ func (s Store) RevertTransaktion(
 	//	},
 	//)
 
-	return
+	// return
 }
 
 func (s Store) Flush() (err error) {

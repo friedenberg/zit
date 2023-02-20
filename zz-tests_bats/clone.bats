@@ -52,7 +52,6 @@ function clone { # @test
 
 	assert_success
 	assert_output --partial '[!md@eaa85e80de6d1129a21365a8ce2a49ca752457d10932a7d73001b4ebded302c7]'
-	assert_output --partial '[konfig@e1d64a20fd2ecdb4c85ad5cbfba792404daf8d236477e21deb378aa591776a0f]'
-	assert_output --partial '[konfig@e1d64a20fd2ecdb4c85ad5cbfba792404daf8d236477e21deb378aa591776a0f]'
+	assert_output --partial '[konfig@7633ddede5e2acbc3fb490417c0504790a94ea8cd726e4f9156115a8fa61173e]'
 	assert_output --partial '[one/uno@37d3869e9b1711f009eabf69a2bf294cfd785f5b1c7463cba77d11d5f81f5e09 !md "wow"]'
 }

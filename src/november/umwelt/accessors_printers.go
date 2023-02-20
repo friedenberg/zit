@@ -115,7 +115,7 @@ func (u *Umwelt) PrinterTransactedLike() schnittstellen.FuncIter[objekte.Transac
 					return z(out, *atl)
 
 				default:
-					errors.Todo("implement")
+					err = errors.Implement()
 					return
 				}
 			},

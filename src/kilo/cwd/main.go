@@ -13,6 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte"
+	"github.com/friedenberg/zit/src/hotel/etikett"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/india/konfig"
 	"github.com/friedenberg/zit/src/juliett/zettel"
@@ -23,6 +24,7 @@ type CwdFiles struct {
 	dir              string
 	Zettelen         map[kennung.Hinweis]*zettel.External
 	Typen            map[kennung.Typ]*typ.External
+	Etiketten        map[kennung.Etikett]*etikett.External
 	UnsureAkten      []kennung.FD
 	EmptyDirectories []kennung.FD
 }
@@ -38,6 +40,10 @@ func (fs CwdFiles) GetMetaSet() (ms kennung.MetaSet, err error) {
 		ms.Add(t.Sku.Kennung, kennung.SigilNone)
 	}
 
+	for _, t := range fs.Etiketten {
+		ms.Add(t.Sku.Kennung, kennung.SigilNone)
+	}
+
 	return
 }
 
@@ -46,6 +52,19 @@ func (fs CwdFiles) GetZettelExternal(
 ) (ze zettel.External, ok bool) {
 	var ze1 *zettel.External
 	ze1, ok = fs.Zettelen[h]
+
+	if ok {
+		ze = *ze1
+	}
+
+	return
+}
+
+func (fs CwdFiles) GetEtikettExternal(
+	k kennung.Etikett,
+) (ze etikett.External, ok bool) {
+	var ze1 *etikett.External
+	ze1, ok = fs.Etiketten[k]
 
 	if ok {
 		ze = *ze1
@@ -92,6 +111,16 @@ func (fs CwdFiles) All(
 		}
 	}
 
+	for _, t := range fs.Etiketten {
+		if wg.Do(
+			func() error {
+				return f(t)
+			},
+		) {
+			break
+		}
+	}
+
 	return wg.GetError()
 }
 
@@ -110,6 +139,7 @@ func makeCwdFiles(erworben konfig.Compiled, dir string) (fs CwdFiles) {
 		erworben:         erworben,
 		dir:              dir,
 		Typen:            make(map[kennung.Typ]*typ.External, 0),
+		Etiketten:        make(map[kennung.Etikett]*etikett.External, 0),
 		Zettelen:         make(map[kennung.Hinweis]*zettel.External, 0),
 		UnsureAkten:      make([]kennung.FD, 0),
 		EmptyDirectories: make([]kennung.FD, 0),
@@ -291,6 +321,12 @@ func (fs *CwdFiles) readFirstLevelFile(a string) (err error) {
 	ext = strings.TrimSpace(ext)
 
 	switch strings.TrimPrefix(ext, ".") {
+	case fs.erworben.FileExtensions.Etikett:
+		if err = fs.tryEtikett(fi); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 	case fs.erworben.FileExtensions.Typ:
 		if err = fs.tryTyp(fi); err != nil {
 			err = errors.Wrap(err)

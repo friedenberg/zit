@@ -17,6 +17,29 @@ type Transacted = objekte.Transacted[
 	*objekte.NilVerzeichnisse[Objekte],
 ]
 
+type ExternalKeyer = objekte.ExternalKeyer[
+	Objekte,
+	*Objekte,
+	kennung.Etikett,
+	*kennung.Etikett,
+]
+
+type External = objekte.External[
+	Objekte,
+	*Objekte,
+	kennung.Etikett,
+	*kennung.Etikett,
+]
+
+type CheckedOut = objekte.CheckedOut[
+	Objekte,
+	*Objekte,
+	kennung.Etikett,
+	*kennung.Etikett,
+	objekte.NilVerzeichnisse[Objekte],
+	*objekte.NilVerzeichnisse[Objekte],
+]
+
 type Objekte struct {
 	Sha  sha.Sha
 	Akte Akte

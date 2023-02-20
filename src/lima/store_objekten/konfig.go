@@ -221,15 +221,15 @@ func (s konfigStore) Read() (tt *erworben.Transacted, err error) {
 				tt.Objekte.Sha,
 			); err != nil {
 				if errors.IsNotExist(err) {
-					// err = errors.Wrap(objekte_store.ErrNotFound{})
 					err = nil
 				} else {
 					err = errors.Wrap(err)
-					return
 				}
+
+				return
 			}
 
-			defer errors.Deferred(&err, r.Close)
+			defer errors.DeferredCloser(&err, r)
 
 			fo := erworben.MakeFormatText(s.StoreUtil)
 

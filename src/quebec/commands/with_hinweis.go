@@ -15,7 +15,7 @@ type commandWithHinweis struct {
 }
 
 func (c commandWithHinweis) Complete(u *umwelt.Umwelt, args ...string) (err error) {
-	errors.TodoP0("implement")
+	err = errors.Implement()
 	return
 }
 

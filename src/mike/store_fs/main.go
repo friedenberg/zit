@@ -18,6 +18,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
+	"github.com/friedenberg/zit/src/hotel/etikett"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/india/konfig"
 	"github.com/friedenberg/zit/src/juliett/zettel"
@@ -510,6 +511,41 @@ func (s *Store) ReadFiles(
 					err = errors.Wrap(err)
 					return
 				}
+
+			case *etikett.Transacted:
+				var tco etikett.CheckedOut
+				ok := false
+
+				if tco.External, ok = fs.GetEtikettExternal(et.Sku.Kennung); !ok {
+					return errors.Errorf(
+						"cwd typ was matched in query but not in cwd.CwdFiles: %s",
+						et.Sku.Kennung,
+					)
+				}
+
+				if s.ReadEtikett(&tco.External); err != nil {
+					if errors.IsNotExist(err) {
+						return errors.Errorf(
+							"cwd zettel was matched in query but not in cwd.CwdFiles: %s",
+							et.Sku.Kennung,
+						)
+					} else {
+						err = errors.Wrap(err)
+						return
+					}
+				}
+
+				tco.Internal = *et
+
+				tco.DetermineState()
+
+				if err = f(&tco); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+			default:
+				err = errors.Implement()
 			}
 
 			return
