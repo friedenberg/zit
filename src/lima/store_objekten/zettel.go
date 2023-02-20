@@ -17,7 +17,6 @@ import (
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/store_util"
 	"github.com/friedenberg/zit/src/kilo/store_verzeichnisse"
-	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
 )
 
 type ZettelStore interface {
@@ -38,7 +37,7 @@ type ZettelStore interface {
 	]
 
 	objekte_store.Updater2[
-		zettel_checked_out.Zettel,
+		zettel.CheckedOut,
 		*zettel.Transacted,
 	]
 
@@ -356,7 +355,7 @@ func (s *zettelStore) updateExternal(
 }
 
 func (s *zettelStore) Update2(
-	co zettel_checked_out.Zettel,
+	co zettel.CheckedOut,
 ) (t *zettel.Transacted, err error) {
 	errors.TodoP2("support dry run")
 

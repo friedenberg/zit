@@ -5,8 +5,8 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/hinweisen"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/juliett/cwd"
-	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
+	"github.com/friedenberg/zit/src/juliett/zettel"
+	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/mike/store_fs"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
@@ -18,18 +18,18 @@ type ReadCheckedOut struct {
 }
 
 type ReadCheckedOutResults struct {
-	Zettelen map[kennung.Hinweis]zettel_checked_out.Zettel
+	Zettelen map[kennung.Hinweis]zettel.CheckedOut
 }
 
 func (op ReadCheckedOut) RunOneHinweis(
 	h kennung.Hinweis,
-) (zettel zettel_checked_out.Zettel, err error) {
+) (zettel zettel.CheckedOut, err error) {
 	return op.RunOneString(h.String())
 }
 
 func (op ReadCheckedOut) RunOneString(
 	p string,
-) (zettel zettel_checked_out.Zettel, err error) {
+) (zettel zettel.CheckedOut, err error) {
 	if zettel, err = op.StoreWorkingDirectory().Read(p); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -40,21 +40,21 @@ func (op ReadCheckedOut) RunOneString(
 
 func (op ReadCheckedOut) RunMany(
 	possible cwd.CwdFiles,
-	w schnittstellen.FuncIter[*zettel_checked_out.Zettel],
+	w schnittstellen.FuncIter[*zettel.CheckedOut],
 ) (err error) {
 	for _, p := range possible.Zettelen {
-		var checked_out zettel_checked_out.Zettel
+		var checked_out zettel.CheckedOut
 
-		var readFunc func() (zettel_checked_out.Zettel, error)
+		var readFunc func() (zettel.CheckedOut, error)
 
 		switch {
 		case p.GetAkteFD().Path == "":
-			readFunc = func() (zettel_checked_out.Zettel, error) {
+			readFunc = func() (zettel.CheckedOut, error) {
 				return op.StoreWorkingDirectory().Read(p.GetObjekteFD().Path)
 			}
 
 		case p.GetObjekteFD().Path == "":
-			readFunc = func() (zettel_checked_out.Zettel, error) {
+			readFunc = func() (zettel.CheckedOut, error) {
 				return op.StoreWorkingDirectory().ReadExternalZettelFromAktePath(
 					p.GetAkteFD().Path,
 				)
@@ -62,7 +62,7 @@ func (op ReadCheckedOut) RunMany(
 
 		default:
 			// TODO-P3 validate that the zettel file points to the akte in the metadatei
-			readFunc = func() (zettel_checked_out.Zettel, error) {
+			readFunc = func() (zettel.CheckedOut, error) {
 				return op.StoreWorkingDirectory().Read(p.GetObjekteFD().Path)
 			}
 		}

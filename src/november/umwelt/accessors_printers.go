@@ -16,7 +16,6 @@ import (
 	"github.com/friedenberg/zit/src/hotel/kasten"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/juliett/zettel"
-	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
 	"github.com/friedenberg/zit/src/mike/store_fs"
 )
 
@@ -141,14 +140,14 @@ func (u *Umwelt) PrinterZettelExternal() schnittstellen.FuncIter[*zettel.Externa
 	)
 }
 
-func (u *Umwelt) PrinterZettelCheckedOut() schnittstellen.FuncIter[*zettel_checked_out.Zettel] {
+func (u *Umwelt) PrinterZettelCheckedOut() schnittstellen.FuncIter[*zettel.CheckedOut] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
 		u.FormatZettelCheckedOut(),
 	)
 }
 
-func (u *Umwelt) PrinterZettelCheckedOutFresh() schnittstellen.FuncIter[*zettel_checked_out.Zettel] {
+func (u *Umwelt) PrinterZettelCheckedOutFresh() schnittstellen.FuncIter[*zettel.CheckedOut] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
 		u.FormatZettelCheckedOut(),
@@ -195,7 +194,7 @@ func (u *Umwelt) PrinterJustCheckedOutLike() schnittstellen.FuncIter[objekte.Che
 
 		switch sk2.Gattung {
 		case gattung.Zettel:
-			coz := co.(*zettel_checked_out.Zettel)
+			coz := co.(*zettel.CheckedOut)
 			return pzco(&coz.External)
 
 		case gattung.Typ:
@@ -224,7 +223,7 @@ func (u *Umwelt) PrinterCheckedOutLike() schnittstellen.FuncIter[objekte.Checked
 
 		switch sk2.Gattung {
 		case gattung.Zettel:
-			coz := co.(*zettel_checked_out.Zettel)
+			coz := co.(*zettel.CheckedOut)
 			return pzco(coz)
 
 		case gattung.Typ:

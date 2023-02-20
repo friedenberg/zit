@@ -12,7 +12,6 @@ import (
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/zettel_external"
-	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
 	"github.com/friedenberg/zit/src/mike/store_fs"
 )
 
@@ -138,7 +137,7 @@ func (u *Umwelt) FormatExternalFD() schnittstellen.FuncWriterFormat[kennung.FD] 
 	)
 }
 
-func (u *Umwelt) FormatZettelCheckedOut() schnittstellen.FuncWriterFormat[zettel_checked_out.Zettel] {
+func (u *Umwelt) FormatZettelCheckedOut() schnittstellen.FuncWriterFormat[zettel.CheckedOut] {
 	return zettel.MakeCliFormatCheckedOut(
 		u.Standort(),
 		u.FormatColorWriter(),

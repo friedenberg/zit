@@ -19,7 +19,6 @@ import (
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/zettel_external"
-	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
 )
 
 func (s *Store) CheckoutQuery(
@@ -67,7 +66,7 @@ func (s *Store) Checkout(
 
 	if err = zts.Each(
 		func(zt *zettel.Transacted) (err error) {
-			var zc zettel_checked_out.Zettel
+			var zc zettel.CheckedOut
 
 			if zc, err = s.CheckoutOne(options, *zt); err != nil {
 				err = errors.Wrap(err)
@@ -87,7 +86,7 @@ func (s *Store) Checkout(
 
 func (s Store) shouldCheckOut(
 	options CheckoutOptions,
-	cz zettel_checked_out.Zettel,
+	cz zettel.CheckedOut,
 ) (ok bool) {
 	switch {
 	case cz.Internal.Objekte.Equals(cz.External.Objekte):
@@ -136,7 +135,7 @@ func (s *Store) checkoutOneGeneric(
 func (s *Store) CheckoutOne(
 	options CheckoutOptions,
 	sz zettel.Transacted,
-) (cz zettel_checked_out.Zettel, err error) {
+) (cz zettel.CheckedOut, err error) {
 	var originalFilename, filename string
 
 	if originalFilename, filename, err = s.filenameForZettelTransacted(options, sz); err != nil {

@@ -13,10 +13,11 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/juliett/zettel"
-	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
 )
 
-func (s Store) ReadExternalZettelFromAktePath(p string) (cz zettel_checked_out.Zettel, err error) {
+func (s Store) ReadExternalZettelFromAktePath(
+	p string,
+) (cz zettel.CheckedOut, err error) {
 	errors.TodoP3("use cache")
 
 	if p, err = filepath.Abs(p); err != nil {

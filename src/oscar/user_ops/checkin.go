@@ -4,8 +4,8 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte"
-	"github.com/friedenberg/zit/src/juliett/cwd"
-	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
+	"github.com/friedenberg/zit/src/juliett/zettel"
+	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
@@ -28,7 +28,7 @@ func (c Checkin) Run(
 			// var tl objekte.TransactedLike
 
 			switch aco := co.(type) {
-			case zettel_checked_out.Zettel:
+			case zettel.CheckedOut:
 				if _, err = u.StoreObjekten().Zettel().Update2(
 					aco,
 				); err != nil {
@@ -36,7 +36,7 @@ func (c Checkin) Run(
 					return
 				}
 
-			case *zettel_checked_out.Zettel:
+			case *zettel.CheckedOut:
 				if _, err = u.StoreObjekten().Zettel().Update2(
 					*aco,
 				); err != nil {
