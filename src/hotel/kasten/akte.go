@@ -1,6 +1,6 @@
 package kasten
 
-import "github.com/friedenberg/zit/src/uri"
+import "github.com/friedenberg/zit/src/bravo/uri"
 
 type Akte struct {
 	Uri uri.Uri `toml:"uri"`
