@@ -9,6 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/organize_text"
 	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
@@ -165,7 +166,7 @@ func (c Add) openAktenIfNecessary(
 	}
 
 	options := store_fs.CheckoutOptions{
-		CheckoutMode: store_fs.CheckoutModeAkteOnly,
+		CheckoutMode: objekte.CheckoutModeAkteOnly,
 	}
 
 	var checkoutResults zettel_checked_out.MutableSet

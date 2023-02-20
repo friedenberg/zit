@@ -6,15 +6,15 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/script_config"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/juliett/zettel"
-	"github.com/friedenberg/zit/src/lima/zettel_checked_out"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
 type FormatZettel struct {
 	Format   string
 	UTIGroup string
-	Mode     zettel_checked_out.Mode
+	Mode     objekte.CheckoutMode
 }
 
 func init() {
@@ -22,7 +22,7 @@ func init() {
 		"format-zettel",
 		func(f *flag.FlagSet) Command {
 			c := &FormatZettel{
-				Mode: zettel_checked_out.ModeZettelAndAkte,
+				Mode: objekte.CheckoutModeObjekteAndAkte,
 			}
 
 			f.Var(&c.Mode, "mode", "zettel, akte, or both")
@@ -98,7 +98,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	var format zettel.ObjekteFormatter
 
-	if c.Mode.IncludesZettel() {
+	if c.Mode.IncludesObjekte() {
 		format = zettel.MakeObjekteTextFormatterIncludeAkte(
 			u.Standort(),
 			u.Konfig(),

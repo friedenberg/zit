@@ -21,8 +21,8 @@ import (
 
 type Edit struct {
 	// TODO-P3 add force
-	Delete bool
-	store_fs.CheckoutMode
+	Delete       bool
+	CheckoutMode objekte.CheckoutMode
 }
 
 func init() {
@@ -30,7 +30,7 @@ func init() {
 		"edit",
 		func(f *flag.FlagSet) CommandWithQuery {
 			c := &Edit{
-				CheckoutMode: store_fs.CheckoutModeZettelOnly,
+				CheckoutMode: objekte.CheckoutModeObjekteOnly,
 			}
 
 			f.BoolVar(&c.Delete, "delete", false, "delete the zettel and akte after successful checkin")

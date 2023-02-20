@@ -180,7 +180,7 @@ func (s *Store) CheckoutOne(
 		},
 	}
 
-	if options.CheckoutMode.IncludesZettel() {
+	if options.CheckoutMode.IncludesObjekte() {
 		cz.External.Sku.ObjekteFD.Path = filename
 	}
 

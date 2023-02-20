@@ -11,8 +11,8 @@ import (
 )
 
 type Checkout struct {
-	store_fs.CheckoutMode
-	Force bool
+	CheckoutMode objekte.CheckoutMode
+	Force        bool
 }
 
 func init() {
