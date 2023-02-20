@@ -1,8 +1,8 @@
 package sku
 
 import (
+	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/echo/ts"
-	"github.com/friedenberg/zit/src/values"
 )
 
 type Verzeichnisse struct {

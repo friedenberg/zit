@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/values"
+	"github.com/friedenberg/zit/src/bravo/values"
 )
 
 const EtikettRegexString = `^[-a-z0-9_/]+$`

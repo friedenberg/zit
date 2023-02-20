@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/values"
+	"github.com/friedenberg/zit/src/bravo/values"
 )
 
 type CheckedOutState int

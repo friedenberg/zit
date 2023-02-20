@@ -7,10 +7,10 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	zettel_pkg "github.com/friedenberg/zit/src/juliett/zettel"
-	"github.com/friedenberg/zit/src/values"
 )
 
 //   _____    _   _       _

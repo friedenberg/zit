@@ -7,7 +7,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/test_logz"
-	"github.com/friedenberg/zit/src/values"
+	"github.com/friedenberg/zit/src/bravo/values"
 )
 
 func makeStringValues(vs ...string) (out []values.String) {

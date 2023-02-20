@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/friedenberg/zit/src/bravo/test_logz"
-	"github.com/friedenberg/zit/src/values"
+	"github.com/friedenberg/zit/src/bravo/values"
 )
 
 func TestReset(t1 *testing.T) {

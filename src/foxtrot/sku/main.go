@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/echo/ts"
-	"github.com/friedenberg/zit/src/values"
 )
 
 type Mutter [2]ts.Time

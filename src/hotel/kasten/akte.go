@@ -1,13 +1,13 @@
 package kasten
 
-import "github.com/friedenberg/zit/src/bravo/uri"
+import "github.com/friedenberg/zit/src/bravo/values"
 
 type Akte struct {
-	Uri uri.Uri `toml:"uri"`
+	Uri values.Uri `toml:"uri"`
 }
 
 func (a *Akte) Reset() {
-	a.Uri = uri.Uri{}
+	a.Uri = values.Uri{}
 }
 
 func (a *Akte) ResetWith(b Akte) {

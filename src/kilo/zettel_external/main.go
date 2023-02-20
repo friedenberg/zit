@@ -4,10 +4,10 @@ import (
 	"fmt"
 
 	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/juliett/zettel"
-	"github.com/friedenberg/zit/src/values"
 )
 
 type Sku = sku.External[kennung.Hinweis, *kennung.Hinweis]
