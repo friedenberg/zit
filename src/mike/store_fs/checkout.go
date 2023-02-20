@@ -246,7 +246,7 @@ func (s *Store) CheckoutOneTyp(
 	// }
 
 	co.Internal = tk
-	errors.TodoP0("external")
+	co.External.Sku = tk.Sku.GetExternal()
 
 	var f *os.File
 

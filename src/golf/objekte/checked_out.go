@@ -31,11 +31,6 @@ type CheckedOut[
 
 func (c *CheckedOut[T, T1, T2, T3, T4, T5]) DetermineState() {
 	if c.Internal.Sku.ObjekteSha.IsNull() {
-		// if c.External.ExternalPathAndSha() == "" {
-		// 	c.State = objekte.CheckedOutStateEmpty
-		// } else {
-		// 	c.State = objekte.CheckedOutStateUntracked
-		// }
 	} else if c.Internal.Sku.ObjekteSha.Equals(c.External.Sku.ObjekteSha) {
 		c.State = CheckedOutStateExistsAndSame
 	} else if c.External.Sku.ObjekteSha.IsNull() {

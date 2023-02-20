@@ -3,20 +3,31 @@ package sku
 import (
 	"fmt"
 
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
 type External[T kennung.KennungLike[T], T1 kennung.KennungLikePtr[T]] struct {
 	Kennung    T
-	AkteSha    sha.Sha
 	ObjekteSha sha.Sha
+	AkteSha    sha.Sha
 	ObjekteFD  kennung.FD
 	AkteFD     kennung.FD
 }
 
 func (a External[T, T1]) String() string {
-	return a.GetKey()
+	return fmt.Sprintf(
+		". %s %s %s %s",
+		a.Kennung.GetGattung(),
+		a.Kennung,
+		a.ObjekteSha,
+		a.AkteSha,
+	)
+}
+
+func (a External[T, T1]) GetAkteSha() schnittstellen.Sha {
+	return a.AkteSha
 }
 
 func (a *External[T, T1]) Transacted() (b Transacted[T, T1]) {

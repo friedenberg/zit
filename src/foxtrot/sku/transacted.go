@@ -147,6 +147,14 @@ func (a *Transacted[T, T1]) Sku() Sku {
 	}
 }
 
+func (a Transacted[T, T1]) GetExternal() External[T, T1] {
+	return External[T, T1]{
+		Kennung:    a.Kennung,
+		AkteSha:    a.AkteSha,
+		ObjekteSha: a.ObjekteSha,
+	}
+}
+
 func (a *Transacted[T, T1]) Sku2() Sku2 {
 	return Sku2{
 		Tai:        a.GetTai(),

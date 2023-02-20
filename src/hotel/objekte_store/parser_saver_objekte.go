@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 )
@@ -57,6 +58,11 @@ func (h *objekteParseSaver[T, T1, T2, T3]) ParseAndSaveAkteAndObjekte(
 	var f *os.File
 
 	if f, err = files.OpenExclusiveReadOnly(p); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if sk.ObjekteFD, err = kennung.File(f); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
