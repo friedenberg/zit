@@ -76,6 +76,11 @@ func (e *etikett) Set(v string) (err error) {
 	return
 }
 
+func SansPrefix(a Etikett) (b Etikett) {
+	b = MustEtikett(strings.TrimPrefix(a.String(), "-"))
+	return
+}
+
 func IsDependentLeaf(a Etikett) (has bool) {
 	has = strings.HasPrefix(strings.TrimSpace(a.String()), "-")
 	return

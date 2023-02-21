@@ -96,6 +96,21 @@ func AddIfGreater[E schnittstellen.Lessor[E]](
 	return
 }
 
+func Map[E schnittstellen.Value[E], F schnittstellen.Value[F]](
+	in schnittstellen.Set[E],
+	tr schnittstellen.FuncTransform[E, F],
+) (out schnittstellen.MutableSet[F]) {
+	out = MakeMutableSetStringer[F]()
+
+	in.Each(
+		func(e E) (err error) {
+			return out.Add(tr(e))
+		},
+	)
+
+	return
+}
+
 func DerivedValues[E schnittstellen.Value[E], F any](
 	c schnittstellen.Set[E],
 	f func(E) F,

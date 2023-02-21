@@ -5,9 +5,10 @@ import (
 )
 
 type (
-	FuncIter[T any]        func(T) error
-	FuncIterKey            func(string) error
-	FuncIterWithKey[T any] func(string, T) error
+	FuncIter[T any]              func(T) error
+	FuncTransform[T any, T1 any] func(T) T1
+	FuncIterKey                  func(string) error
+	FuncIterWithKey[T any]       func(string, T) error
 )
 
 type Set[T any] interface {

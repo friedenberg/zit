@@ -10,9 +10,8 @@ n_prc := $(shell sysctl -n hw.logicalcpu)
 MAKEFLAGS := --jobs=$(n_prc)
 cmd_bats := bats --jobs $(n_prc)
 
-
 ifeq ($(origin .RECIPEPREFIX), undefined)
-  $(error This Make does not support .RECIPEPREFIX. Please use GNU Make 4.0 or later)
+				$(error This Make does not support .RECIPEPREFIX. Please use GNU Make 4.0 or later)
 endif
 .RECIPEPREFIX = >
 
@@ -21,45 +20,48 @@ endif
 build: install;
 
 .PHONY: install
-install: tests_fast
+install: build/tests_fast
 > go install ./.
 
 .PHONY: deploy
-deploy: tests_slower
+deploy: build/tests_slower
 > go install ./.
 
-.PHONY: go_generate
-go_generate:
-> go generate ./...
+files_go := $(shell find src -type f)
 
-.PHONY: go_build
-go_build: go_generate
+build/go_generate: $(files_go)
+> go generate ./...
+> touch "$@"
+
+build/zit: build/go_generate $(files_go)
 > go build -o build/zit ./.
 
-.PHONY: go_vet
-go_vet:
+build/go_vet:
 > go vet ./...
+> touch "$@"
 
-.PHONY: tests_unit
-tests_unit: go_generate
+build/tests_unit: build/go_generate
 > go test -timeout 5s ./...
+> touch "$@"
 
-.PHONY: tests_fast
-tests_fast: go_vet tests_unit;
+build/tests_fast: build/go_vet build/tests_unit
+> touch "$@"
 
-.PHONY: tests_bats
-tests_bats: go_build
+files_tests_bats := $(shell find zz-tests_bats -type f)
+
+build/tests_bats: build/zit $(files_tests_bats)
 > $(cmd_bats) zz-tests_bats/*.bats
+> touch "$@"
 
-.PHONY: tests_slow
-tests_slow: tests_fast tests_bats;
+build/tests_slow: build/tests_fast build/tests_bats
+> touch "$@"
 
-.PHONY: tests_bats_migration
-tests_bats_migration: go_build
+build/tests_bats_migration: build/zit
 > $(cmd_bats) zz-tests_bats/migration/*.bats
+> touch "$@"
 
-.PHONY: tests_slower
-tests_slower: tests_fast tests_slow tests_bats_migration;
+build/tests_slower: build/tests_fast build/tests_slow build/tests_bats_migration;
+> touch "$@"
 
 graph_dependencies:
 > ./bin/graph_dependencies

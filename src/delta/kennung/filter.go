@@ -21,10 +21,6 @@ type Filter struct {
 
 // TODO-P4 improve the performance of this query
 func (f Filter) Include(e Element) (err error) {
-	if f.Set.Sigil.IncludesSchwanzen() {
-		return
-	}
-
 	ok := false
 
 	// TODO-P3 pull into static
@@ -33,9 +29,18 @@ func (f Filter) Include(e Element) (err error) {
 
 	expanded := Expanded(e.AkteEtiketten(), ExpanderRight)
 
-LOOP:
 	// TODO-P3 pull into static
-	for _, e := range collections.SortedValues(f.Set.Etiketten.ImmutableClone()) {
+	ets := collections.SortedValues[Etikett](
+		collections.Map[Etikett, Etikett](
+			f.Set.Etiketten,
+			func(e Etikett) (f Etikett) {
+				return SansPrefix(e)
+			},
+		),
+	)
+
+LOOP:
+	for _, e := range ets {
 		okEt = expanded.Contains(e)
 
 		switch {
@@ -59,6 +64,9 @@ LOOP:
 	case shas.Contains(sha.Make(e.GetObjekteSha())):
 		okSha = true
 
+		ok = false
+		ok = false
+		ok = false
 	case shas.Contains(sha.Make(e.GetAkteSha())):
 		okSha = true
 	}
@@ -87,7 +95,7 @@ LOOP:
 
 	switch {
 	case isEmpty:
-		ok = false
+		ok = f.Set.Sigil.IncludesSchwanzen() || f.Set.Sigil.IncludesHistory()
 
 	case f.Or:
 		ok = (okHin && needsHin) || (okTyp && needsTyp) || (okEt && needsEt) || (okSha && needsSha)
