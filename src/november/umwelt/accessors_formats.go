@@ -74,21 +74,21 @@ func (u *Umwelt) FormatKasten() schnittstellen.FuncWriterFormat[kennung.Kasten] 
 	return kasten.MakeCliFormat(u.FormatColorWriter())
 }
 
-func (u *Umwelt) FormatTypTransacted() schnittstellen.FuncWriterFormat[typ.Transacted] {
-	return typ.MakeCliFormatTransacted(
-		u.Standort(),
-		u.FormatColorWriter(),
-		u.FormatSha(u.StoreObjekten().GetAbbrStore().AbbreviateSha),
-		u.FormatTyp(),
-	)
-}
-
 func (u *Umwelt) FormatEtikettTransacted() schnittstellen.FuncWriterFormat[etikett.Transacted] {
 	return etikett.MakeCliFormatTransacted(
 		u.Standort(),
 		u.FormatColorWriter(),
 		u.FormatSha(u.StoreObjekten().GetAbbrStore().AbbreviateSha),
 		u.FormatEtikett(),
+	)
+}
+
+func (u *Umwelt) FormatTypTransacted() schnittstellen.FuncWriterFormat[typ.Transacted] {
+	return typ.MakeCliFormatTransacted(
+		u.Standort(),
+		u.FormatColorWriter(),
+		u.FormatSha(u.StoreObjekten().GetAbbrStore().AbbreviateSha),
+		u.FormatTyp(),
 	)
 }
 
@@ -107,6 +107,15 @@ func (u *Umwelt) FormatTypCheckedOut() schnittstellen.FuncWriterFormat[typ.Check
 		u.FormatColorWriter(),
 		u.FormatSha(u.StoreObjekten().GetAbbrStore().AbbreviateSha),
 		u.FormatTyp(),
+	)
+}
+
+func (u *Umwelt) FormatEtikettCheckedOut() schnittstellen.FuncWriterFormat[etikett.CheckedOut] {
+	return etikett.MakeCliFormatCheckedOut(
+		u.Standort(),
+		u.FormatColorWriter(),
+		u.FormatSha(u.StoreObjekten().GetAbbrStore().AbbreviateSha),
+		u.FormatEtikett(),
 	)
 }
 

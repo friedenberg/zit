@@ -80,6 +80,13 @@ func (u *Umwelt) PrinterTypCheckedOut() schnittstellen.FuncIter[*typ.CheckedOut]
 	)
 }
 
+func (u *Umwelt) PrinterEtikettCheckedOut() schnittstellen.FuncIter[*etikett.CheckedOut] {
+	return format.MakeWriterToWithNewLines(
+		u.Out(),
+		u.FormatEtikettCheckedOut(),
+	)
+}
+
 func (u *Umwelt) ZettelTransactedLogPrinters() zettel.LogWriter {
 	return zettel.LogWriter{
 		New:       u.PrinterZettelTransactedDelta(),
@@ -188,6 +195,7 @@ func (u *Umwelt) PrinterHeader() schnittstellen.FuncIter[*string] {
 func (u *Umwelt) PrinterJustCheckedOutLike() schnittstellen.FuncIter[objekte.CheckedOutLike] {
 	pzco := u.PrinterZettelExternal()
 	ptco := u.PrinterTypCheckedOut()
+	peco := u.PrinterEtikettCheckedOut()
 
 	return func(co objekte.CheckedOutLike) (err error) {
 		sk2 := co.GetInternal().GetSku2()
@@ -200,6 +208,10 @@ func (u *Umwelt) PrinterJustCheckedOutLike() schnittstellen.FuncIter[objekte.Che
 		case gattung.Typ:
 			coz := co.(typ.CheckedOut)
 			return ptco(&coz)
+
+		case gattung.Etikett:
+			coz := co.(*etikett.CheckedOut)
+			return peco(coz)
 
 		default:
 			_, err = fmt.Fprintf(
@@ -217,6 +229,7 @@ func (u *Umwelt) PrinterJustCheckedOutLike() schnittstellen.FuncIter[objekte.Che
 func (u *Umwelt) PrinterCheckedOutLike() schnittstellen.FuncIter[objekte.CheckedOutLike] {
 	pzco := u.PrinterZettelCheckedOut()
 	ptco := u.PrinterTypCheckedOut()
+	peco := u.PrinterEtikettCheckedOut()
 
 	return func(co objekte.CheckedOutLike) (err error) {
 		sk2 := co.GetInternal().GetSku2()
@@ -229,6 +242,10 @@ func (u *Umwelt) PrinterCheckedOutLike() schnittstellen.FuncIter[objekte.Checked
 		case gattung.Typ:
 			coz := co.(*typ.CheckedOut)
 			return ptco(coz)
+
+		case gattung.Etikett:
+			coz := co.(*etikett.CheckedOut)
+			return peco(coz)
 
 		default:
 			_, err = fmt.Fprintf(
