@@ -15,9 +15,9 @@ import (
 type Status struct{}
 
 func init() {
-	registerCommand(
+	registerCommandWithCwdQuery(
 		"status",
-		func(f *flag.FlagSet) Command {
+		func(f *flag.FlagSet) CommandWithCwdQuery {
 			c := &Status{}
 
 			return c
@@ -25,27 +25,13 @@ func init() {
 	)
 }
 
-func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
-	var possible cwd.CwdFiles
+func (c Status) RunWithCwdQuery(
+	u *umwelt.Umwelt,
+	possible cwd.CwdFiles,
+) (err error) {
+	pcol := u.PrinterCheckedOutLike()
 
-	switch {
-	case len(args) > 0:
-		errors.PrintErrf("Ignoring args")
-		fallthrough
-
-	default:
-		if possible, err = cwd.MakeCwdFilesAll(
-			s.Konfig(),
-			s.Standort().Cwd(),
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	pcol := s.PrinterCheckedOutLike()
-
-	if err = s.StoreWorkingDirectory().ReadFiles(
+	if err = u.StoreWorkingDirectory().ReadFiles(
 		possible,
 		func(co objekte.CheckedOutLike) (err error) {
 			if err = pcol(co); err != nil {
@@ -62,20 +48,20 @@ func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
 
 	v := "Akten"
 
-	if err = s.PrinterHeader()(&v); err != nil {
+	if err = u.PrinterHeader()(&v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	for _, ua := range possible.UnsureAkten {
-		err = s.StoreObjekten().AkteExists(ua.Sha)
+		err = u.StoreObjekten().AkteExists(ua.Sha)
 
 		switch {
 		case err == nil:
 			fallthrough
 
 		case errors.Is(err, objekte_store.ErrNotFound{}):
-			err = s.PrinterFileNotRecognized()(&ua)
+			err = u.PrinterFileNotRecognized()(&ua)
 
 		case errors.Is(err, store_objekten.ErrAkteExists{}):
 			err1 := err.(store_objekten.ErrAkteExists)
@@ -84,7 +70,7 @@ func (c Status) Run(s *umwelt.Umwelt, args ...string) (err error) {
 				Recognized: err1.MutableSet,
 			}
 
-			err = s.PrinterFileRecognized()(&fr)
+			err = u.PrinterFileRecognized()(&fr)
 
 		default:
 			err = errors.Wrapf(err, "%s", ua)

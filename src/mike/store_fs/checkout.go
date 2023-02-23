@@ -69,7 +69,7 @@ func (s *Store) Checkout(
 		func(zt *zettel.Transacted) (err error) {
 			var zc zettel.CheckedOut
 
-			if zc, err = s.CheckoutOne(options, *zt); err != nil {
+			if zc, err = s.CheckoutOneZettel(options, *zt); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -120,7 +120,7 @@ func (s *Store) checkoutOneGeneric(
 ) (co objekte.CheckedOutLike, err error) {
 	switch tt := t.(type) {
 	case *zettel.Transacted:
-		return s.CheckoutOne(options, *tt)
+		return s.CheckoutOneZettel(options, *tt)
 
 	case *typ.Transacted:
 		co, err = s.CheckoutOneTyp(options, *tt)
@@ -139,7 +139,7 @@ func (s *Store) checkoutOneGeneric(
 	return
 }
 
-func (s *Store) CheckoutOne(
+func (s *Store) CheckoutOneZettel(
 	options CheckoutOptions,
 	sz zettel.Transacted,
 ) (cz zettel.CheckedOut, err error) {
@@ -151,7 +151,7 @@ func (s *Store) CheckoutOne(
 	}
 
 	if files.Exists(filename) {
-		if cz, err = s.readOneFS(filename); err != nil {
+		if cz, err = s.ReadOneZettel(sz); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

@@ -5,6 +5,7 @@ import (
 	"encoding/gob"
 	"io"
 	"sort"
+	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
@@ -33,6 +34,7 @@ type index struct {
 	etiketten  map[kennung.Etikett]int64
 	didRead    bool
 	hasChanges bool
+	lock       *sync.RWMutex
 
 	hinweisIndex hinweis_index.HinweisIndex
 }
@@ -51,6 +53,7 @@ func MakeIndex(
 		path:                 s.FileVerzeichnisseEtiketten(),
 		VerzeichnisseFactory: vf,
 		etiketten:            make(map[kennung.Etikett]int64),
+		lock:                 &sync.RWMutex{},
 	}
 
 	if i.hinweisIndex, err = hinweis_index.MakeIndex(
@@ -158,6 +161,9 @@ func (i *index) AddEtikettSet(
 		to,
 	)
 
+  i.lock.Lock()
+  defer i.lock.Unlock()
+
 	if err = i.processDelta(d); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -167,7 +173,7 @@ func (i *index) AddEtikettSet(
 }
 
 func (i *index) processDelta(d kennung.EtikettDelta) (err error) {
-	if err = i.Add(d.Added); err != nil {
+	if err = i.add(d.Added); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -181,6 +187,13 @@ func (i *index) processDelta(d kennung.EtikettDelta) (err error) {
 }
 
 func (i *index) Add(s kennung.EtikettSet) (err error) {
+  i.lock.Lock()
+  defer i.lock.Unlock()
+
+	return i.add(s)
+}
+
+func (i *index) add(s kennung.EtikettSet) (err error) {
 	if s.Len() == 0 {
 		errors.Log().Print("no etiketten to add")
 		return
@@ -241,6 +254,9 @@ func (i *index) del(s kennung.EtikettSet) (err error) {
 }
 
 func (i *index) GetAllEtiketten() (es []kennung.Etikett, err error) {
+  i.lock.Lock()
+  defer i.lock.Unlock()
+
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return

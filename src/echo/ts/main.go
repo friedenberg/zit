@@ -7,6 +7,7 @@ import (
 	"strings"
 	tyme "time"
 
+	chai "github.com/brandondube/tai"
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/values"
@@ -122,6 +123,16 @@ func (t Time) EqualsAny(t1 any) bool {
 
 func (t Time) Equals(t1 Time) bool {
 	return t.Unix() == t1.Unix()
+}
+
+func (a Time) EqualsSansIndex(b Time) bool {
+	a1 := chai.FromTime(a.time)
+	a1.Asec = 0
+
+	b1 := chai.FromTime(b.time)
+	b1.Asec = 0
+
+	return a1.Eq(b1)
 }
 
 func (t Time) Less(t1 Time) bool {

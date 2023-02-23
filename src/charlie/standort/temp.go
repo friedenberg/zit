@@ -1,7 +1,11 @@
 package standort
 
 import (
+	"math/rand"
 	"os"
+	"path"
+	"strconv"
+	"syscall"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 )
@@ -42,6 +46,25 @@ func (s Standort) FileTempLocal() (f *os.File, err error) {
 		err = errors.Wrap(err)
 		return
 	}
+
+	return
+}
+
+func (s Standort) FifoPipe() (p string, err error) {
+	p = path.Join(
+		s.DirTempLocal(),
+		strconv.Itoa(rand.Int()),
+	)
+
+	if err = syscall.Mknod(p, syscall.S_IFIFO|0o666, 0); err != nil {
+    err = errors.Wrapf(err, "Path: %s", p)
+		return
+	}
+
+	// if err = os.Remove(p); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
 
 	return
 }

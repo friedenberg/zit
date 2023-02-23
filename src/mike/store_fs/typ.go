@@ -13,10 +13,6 @@ import (
 	"github.com/friedenberg/zit/src/hotel/typ"
 )
 
-func (s *Store) CheckinTyp(p string) (t *typ.Transacted, err error) {
-	return
-}
-
 func (s *Store) WriteTyp(t *typ.Transacted) (te *typ.CheckedOut, err error) {
 	te = &typ.CheckedOut{
 		Internal: *t,

@@ -15,8 +15,10 @@ import (
 )
 
 type fileEncoder struct {
-	arf schnittstellen.AkteReaderFactory
-	ic  typ.InlineChecker
+	mode int
+	perm os.FileMode
+	arf  schnittstellen.AkteReaderFactory
+	ic   typ.InlineChecker
 }
 
 func MakeFileEncoder(
@@ -24,13 +26,35 @@ func MakeFileEncoder(
 	ic typ.InlineChecker,
 ) fileEncoder {
 	return fileEncoder{
-		arf: arf,
-		ic:  ic,
+		mode: os.O_WRONLY | os.O_CREATE | os.O_EXCL | os.O_APPEND,
+		perm: 0o666,
+		arf:  arf,
+		ic:   ic,
 	}
 }
 
-func (e *fileEncoder) Encode(z *zettel.External) (err error) {
-	inline := e.ic.IsInlineTyp(z.Objekte.Typ)
+func MakeFileEncoderJustOpen(
+	arf schnittstellen.AkteReaderFactory,
+	ic typ.InlineChecker,
+) fileEncoder {
+	return fileEncoder{
+		mode: os.O_WRONLY | os.O_EXCL | os.O_APPEND,
+		perm: 0o666,
+		arf:  arf,
+		ic:   ic,
+	}
+}
+
+func (e *fileEncoder) openOrCreate(p string) (*os.File, error) {
+	return files.OpenFile(p, e.mode, e.perm)
+}
+
+func (e *fileEncoder) EncodeObjekte(
+	z *zettel.Objekte,
+	objektePath string,
+	aktePath string,
+) (err error) {
+	inline := e.ic.IsInlineTyp(z.Typ)
 
 	mtw := zettel.TextMetadateiFormatter{
 		IncludeAkteSha: !inline,
@@ -38,29 +62,29 @@ func (e *fileEncoder) Encode(z *zettel.External) (err error) {
 
 	var ar sha.ReadCloser
 
-	if ar, err = e.arf.AkteReader(z.Objekte.Akte); err != nil {
+	if ar, err = e.arf.AkteReader(z.Akte); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.Deferred(&err, ar.Close)
+	defer errors.DeferredCloser(&err, ar)
 
 	mw := metadatei_io.Writer{
 		Metadatei: format.MakeWriterTo2(
 			mtw.Format,
 			&zettel.Metadatei{
-				Objekte:  z.Objekte,
-				AktePath: z.GetAkteFD().Path,
+				Objekte:  *z,
+				AktePath: aktePath,
 			},
 		),
 	}
 
 	switch {
-	case z.GetAkteFD().Path != "" && z.GetObjekteFD().Path != "":
+	case aktePath != "" && objektePath != "":
 		var fAkte, fZettel *os.File
 
-		if fAkte, err = files.CreateExclusiveWriteOnly(
-			z.GetAkteFD().Path,
+		if fAkte, err = e.openOrCreate(
+			aktePath,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -68,8 +92,8 @@ func (e *fileEncoder) Encode(z *zettel.External) (err error) {
 
 		defer errors.Deferred(&err, fAkte.Close)
 
-		if fZettel, err = files.CreateExclusiveWriteOnly(
-			z.GetObjekteFD().Path,
+		if fZettel, err = e.openOrCreate(
+			objektePath,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -87,11 +111,11 @@ func (e *fileEncoder) Encode(z *zettel.External) (err error) {
 			return
 		}
 
-	case z.GetAkteFD().Path != "":
+	case aktePath != "":
 		var fAkte *os.File
 
-		if fAkte, err = files.CreateExclusiveWriteOnly(
-			z.GetAkteFD().Path,
+		if fAkte, err = e.openOrCreate(
+			aktePath,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -104,15 +128,15 @@ func (e *fileEncoder) Encode(z *zettel.External) (err error) {
 			return
 		}
 
-	case z.GetObjekteFD().Path != "":
+	case objektePath != "":
 		if inline {
 			mw.Akte = ar
 		}
 
 		var fZettel *os.File
 
-		if fZettel, err = files.CreateExclusiveWriteOnly(
-			z.GetObjekteFD().Path,
+		if fZettel, err = e.openOrCreate(
+			objektePath,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -127,4 +151,12 @@ func (e *fileEncoder) Encode(z *zettel.External) (err error) {
 	}
 
 	return
+}
+
+func (e *fileEncoder) Encode(z *zettel.External) (err error) {
+	return e.EncodeObjekte(
+		&z.Objekte,
+		z.GetObjekteFD().Path,
+		z.GetAkteFD().Path,
+	)
 }

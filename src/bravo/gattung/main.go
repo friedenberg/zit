@@ -40,6 +40,10 @@ func All() (out []Gattung) {
 	return
 }
 
+func Must(g schnittstellen.Gattung) Gattung {
+	return g.(Gattung)
+}
+
 func Make(g schnittstellen.Gattung) Gattung {
 	return g.(Gattung)
 }

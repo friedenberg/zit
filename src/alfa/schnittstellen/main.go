@@ -1,5 +1,7 @@
 package schnittstellen
 
+type FuncError func() error
+
 type Ptr[T any] interface {
 	*T
 }

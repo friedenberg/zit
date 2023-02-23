@@ -14,9 +14,9 @@ import (
 type Clean struct{}
 
 func init() {
-	registerCommandWithQuery(
+	registerCommandWithCwdQuery(
 		"clean",
-		func(f *flag.FlagSet) CommandWithQuery {
+		func(f *flag.FlagSet) CommandWithCwdQuery {
 			c := &Clean{}
 
 			return c
@@ -24,21 +24,10 @@ func init() {
 	)
 }
 
-func (c Clean) RunWithQuery(
+func (c Clean) RunWithCwdQuery(
 	s *umwelt.Umwelt,
-	ms kennung.MetaSet,
+	possible cwd.CwdFiles,
 ) (err error) {
-	var possible cwd.CwdFiles
-
-	if possible, err = cwd.MakeCwdFilesMetaSet(
-		s.Konfig(),
-		s.Standort().Cwd(),
-		ms,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	fds := kennung.MakeMutableFDSet()
 
 	for _, d := range possible.EmptyDirectories {

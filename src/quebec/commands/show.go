@@ -150,7 +150,7 @@ func (c Show) showOneOrMoreZettels(
 	fv schnittstellen.FuncIter[*zettel.Transacted],
 ) (err error) {
 	if h, ok := ids.OnlySingleHinweis(); ok {
-		if err = c.showOneZettel(u, h, fv); err != nil {
+		if err = c.showOneZettel(u, h, ids.Sigil, fv); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -167,13 +167,21 @@ func (c Show) showOneOrMoreZettels(
 func (c Show) showOneZettel(
 	u *umwelt.Umwelt,
 	h kennung.Hinweis,
+	s kennung.Sigil,
 	fv schnittstellen.FuncIter[*zettel.Transacted],
 ) (err error) {
 	var z *zettel.Transacted
 
-	if z, err = u.StoreWorkingDirectory().ReadOne(h); err != nil {
-		err = errors.Wrap(err)
-		return
+	if s.IncludesCwd() {
+		if z, err = u.StoreWorkingDirectory().ReadOne(h); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		if z, err = u.StoreObjekten().Zettel().ReadOne(h); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	if err = fv(z); err != nil {
@@ -189,55 +197,11 @@ func (c Show) showManyZettels(
 	ids kennung.Set,
 	fv schnittstellen.FuncIter[*zettel.Transacted],
 ) (err error) {
-	idFilter := zettel.WriterIds{
-		Filter: kennung.Filter{
-			Set: ids,
-		},
-	}.WriteZettelTransacted
-
-	method := u.StoreWorkingDirectory().ReadMany
-
-	filter := idFilter
-
-	if ids.Sigil.IncludesHistory() {
-		method = u.StoreWorkingDirectory().ReadManyHistory
-		hinweisen := kennung.MakeHinweisMutableSet()
-
-		if err = u.StoreObjekten().Zettel().ReadAllSchwanzen(
-			iter.MakeChain(
-				idFilter,
-				func(o *zettel.Transacted) (err error) {
-					return hinweisen.Add(o.Sku.Kennung)
-				},
-			),
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		hContainer := collections.WriterContainer[kennung.Hinweis](
-			hinweisen,
-			collections.MakeErrStopIteration(),
-		)
-
-		filter = func(o *zettel.Transacted) (err error) {
-			err = hContainer(o.Sku.Kennung)
-
-			if collections.IsStopIteration(err) {
-				err = idFilter(o)
-			}
-
-			return
-		}
-	}
-
 	f1 := collections.MakeSyncSerializer(fv)
 
-	if err = method(
-		iter.MakeChain(
-			filter,
-			f1,
-		),
+	if err = u.StoreObjekten().Zettel().Query(
+		ids,
+		f1,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

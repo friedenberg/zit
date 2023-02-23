@@ -8,10 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/echo/ts"
 )
 
-type DataIdentityGetter interface {
-	GetDataIdentity() DataIdentity
-}
-
 func MakeTimePrefixWriter[T DataIdentityGetter](
 	f schnittstellen.FuncWriterFormat[T],
 ) schnittstellen.FuncWriterFormat[T] {

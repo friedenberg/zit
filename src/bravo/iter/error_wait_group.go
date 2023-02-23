@@ -4,19 +4,22 @@ import (
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
 type ErrorWaitGroup interface {
-	Do(func() error) bool
+	Do(schnittstellen.FuncError) bool
+	DoAfter(schnittstellen.FuncError)
 	Wait()
 	GetError() error
 }
 
 func MakeErrorWaitGroup() ErrorWaitGroup {
 	wg := &errorWaitGroup{
-		lock:   &sync.RWMutex{},
-		chDone: make(chan struct{}),
-		err:    errors.MakeMulti(),
+		lock:    &sync.RWMutex{},
+		chDone:  make(chan struct{}),
+		err:     errors.MakeMulti(),
+		doAfter: make([]schnittstellen.FuncError, 0),
 	}
 
 	return wg
@@ -27,19 +30,28 @@ type errorWaitGroup struct {
 	waitingFor int
 	chDone     chan struct{}
 	err        errors.Multi
+	doAfter    []schnittstellen.FuncError
 }
 
 func (wg *errorWaitGroup) GetError() (err error) {
 	wg.Wait()
 
-	if !wg.err.Empty() {
-		err = wg.err
+	me := errors.MakeMulti(wg.err)
+
+	defer func() {
+		if !me.Empty() {
+			err = me
+		}
+	}()
+
+	for i := len(wg.doAfter) - 1; i >= 0; i-- {
+		me.Add(wg.doAfter[i]())
 	}
 
 	return
 }
 
-func (wg *errorWaitGroup) Do(f func() error) (d bool) {
+func (wg *errorWaitGroup) Do(f schnittstellen.FuncError) (d bool) {
 	wg.lock.Lock()
 	defer wg.lock.Unlock()
 
@@ -54,6 +66,15 @@ func (wg *errorWaitGroup) Do(f func() error) (d bool) {
 	}()
 
 	return false
+}
+
+func (wg *errorWaitGroup) DoAfter(f schnittstellen.FuncError) {
+	wg.lock.Lock()
+	defer wg.lock.Unlock()
+
+	wg.doAfter = append(wg.doAfter, f)
+
+	return
 }
 
 func (wg *errorWaitGroup) doneWith(err error) {

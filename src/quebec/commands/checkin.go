@@ -4,7 +4,6 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/november/umwelt"
 	"github.com/friedenberg/zit/src/oscar/user_ops"
@@ -16,9 +15,9 @@ type Checkin struct {
 }
 
 func init() {
-	registerCommandWithQuery(
+	registerCommandWithCwdQuery(
 		"checkin",
-		func(f *flag.FlagSet) CommandWithQuery {
+		func(f *flag.FlagSet) CommandWithCwdQuery {
 			c := &Checkin{}
 
 			f.BoolVar(&c.Delete, "delete", false, "the checked-out file")
@@ -29,21 +28,10 @@ func init() {
 	)
 }
 
-func (c Checkin) RunWithQuery(
+func (c Checkin) RunWithCwdQuery(
 	u *umwelt.Umwelt,
-	ms kennung.MetaSet,
+	pz cwd.CwdFiles,
 ) (err error) {
-	var pz cwd.CwdFiles
-
-	if pz, err = cwd.MakeCwdFilesMetaSet(
-		u.Konfig(),
-		u.Standort().Cwd(),
-		ms,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	op := user_ops.Checkin{
 		Delete: c.Delete,
 	}

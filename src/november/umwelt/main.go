@@ -114,6 +114,14 @@ func (u *Umwelt) Initialize() (err error) {
 			err = errors.Wrap(err)
 			return
 		}
+
+		if err = os.MkdirAll(
+			u.standort.DirTempLocal(),
+			os.ModeDir|0o755,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	{
