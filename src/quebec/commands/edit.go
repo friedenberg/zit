@@ -155,10 +155,14 @@ func (c Edit) editZettels(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 		return
 	}
 
-	if err = (user_ops.OpenFiles{}).Run(
-		u,
-		zettel.ToSliceFilesAkten(checkoutResults)...,
-	); err != nil {
+	var filesAkten []string
+
+	if filesAkten, err = zettel.ToSliceFilesAkten(checkoutResults); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = (user_ops.OpenFiles{}).Run(u, filesAkten...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -171,9 +175,14 @@ func (c Edit) editZettels(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 			Build(),
 	}
 
-	fs := zettel.ToSliceFilesZettelen(checkoutResults)
+	var filesZettelen []string
 
-	if _, err = openVimOp.Run(u, fs...); err != nil {
+	if filesZettelen, err = zettel.ToSliceFilesZettelen(checkoutResults); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if _, err = openVimOp.Run(u, filesZettelen...); err != nil {
 		if errors.Is(err, files.ErrEmptyFileList) {
 			err = errors.Normalf("nothing to open in vim")
 		} else {
@@ -188,14 +197,12 @@ func (c Edit) editZettels(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 		return
 	}
 
-	fs = zettel.ToSliceFilesZettelen(checkoutResults)
-
 	var possible cwd.CwdFiles
 
 	if possible, err = cwd.MakeCwdFilesExactly(
 		u.Konfig(),
 		u.Standort().Cwd(),
-		fs...,
+		filesZettelen...,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

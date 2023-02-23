@@ -99,30 +99,61 @@ func AddIfGreater[E schnittstellen.Lessor[E]](
 func Map[E schnittstellen.Value[E], F schnittstellen.Value[F]](
 	in schnittstellen.Set[E],
 	tr schnittstellen.FuncTransform[E, F],
-) (out schnittstellen.MutableSet[F]) {
+) (out schnittstellen.MutableSet[F], err error) {
 	out = MakeMutableSetStringer[F]()
 
-	in.Each(
+	if err = in.Each(
 		func(e E) (err error) {
-			return out.Add(tr(e))
+			var e1 F
+
+			if e1, err = tr(e); err != nil {
+				if IsStopIteration(err) {
+					err = nil
+				} else {
+					err = errors.Wrap(err)
+				}
+
+				return
+			}
+
+			return out.Add(e1)
 		},
-	)
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }
 
 func DerivedValues[E schnittstellen.Value[E], F any](
 	c schnittstellen.Set[E],
-	f func(E) F,
-) (out []F) {
+	f schnittstellen.FuncTransform[E, F],
+) (out []F, err error) {
 	out = make([]F, 0, c.Len())
 
-	c.Each(
+	if err = c.Each(
 		func(e E) (err error) {
-			out = append(out, f(e))
+			var e1 F
+
+			if e1, err = f(e); err != nil {
+				if IsStopIteration(err) {
+					err = nil
+				} else {
+					err = errors.Wrap(err)
+				}
+
+				return
+			}
+
+			out = append(out, e1)
+
 			return
 		},
-	)
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }

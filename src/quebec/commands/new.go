@@ -168,11 +168,20 @@ func (c New) editZettels(
 		return
 	}
 
-	fs := zettel.ToSliceFilesZettelen(zsc)
+	var filesZettelen []string
+
+	if filesZettelen, err = zettel.ToSliceFilesZettelen(zsc); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	var cwdFiles cwd.CwdFiles
 
-	if cwdFiles, err = cwd.MakeCwdFilesExactly(u.Konfig(), u.Standort().Cwd(), fs...); err != nil {
+	if cwdFiles, err = cwd.MakeCwdFilesExactly(
+		u.Konfig(),
+		u.Standort().Cwd(),
+		filesZettelen...,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

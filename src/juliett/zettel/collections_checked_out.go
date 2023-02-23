@@ -33,29 +33,44 @@ func MakeMutableSetCheckedOutHinweisZettel(c int) MutableSetCheckedOut {
 	)
 }
 
-func ToSliceZettelsExternal(s SetCheckedOut) (out []External) {
+func ToSliceZettelsExternal(s SetCheckedOut) (out []External, err error) {
 	return collections.DerivedValues[CheckedOut, External](
 		s,
-		func(z CheckedOut) External {
-			return z.External
+		func(z CheckedOut) (e External, err error) {
+			e = z.External
+			return
 		},
 	)
 }
 
-func ToSliceFilesZettelen(s SetCheckedOut) (out []string) {
+func ToSliceFilesZettelen(s SetCheckedOut) (out []string, err error) {
 	return collections.DerivedValues[CheckedOut, string](
 		s,
-		func(z CheckedOut) string {
-			return z.External.GetObjekteFD().Path
+		func(z CheckedOut) (e string, err error) {
+			e = z.External.GetObjekteFD().Path
+
+			if e == "" {
+				err = collections.MakeErrStopIteration()
+				return
+			}
+
+			return
 		},
 	)
 }
 
-func ToSliceFilesAkten(s SetCheckedOut) (out []string) {
+func ToSliceFilesAkten(s SetCheckedOut) (out []string, err error) {
 	return collections.DerivedValues[CheckedOut, string](
 		s,
-		func(z CheckedOut) string {
-			return z.External.GetAkteFD().Path
+		func(z CheckedOut) (e string, err error) {
+			e = z.External.GetAkteFD().Path
+
+			if e == "" {
+				err = collections.MakeErrStopIteration()
+				return
+			}
+
+			return
 		},
 	)
 }

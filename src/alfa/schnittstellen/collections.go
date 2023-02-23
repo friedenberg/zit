@@ -6,7 +6,7 @@ import (
 
 type (
 	FuncIter[T any]              func(T) error
-	FuncTransform[T any, T1 any] func(T) T1
+	FuncTransform[T any, T1 any] func(T) (T1, error)
 	FuncIterKey                  func(string) error
 	FuncIterWithKey[T any]       func(string, T) error
 )

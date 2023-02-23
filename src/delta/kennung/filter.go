@@ -1,6 +1,7 @@
 package kennung
 
 import (
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
@@ -30,14 +31,25 @@ func (f Filter) Include(e Element) (err error) {
 	expanded := Expanded(e.AkteEtiketten(), ExpanderRight)
 
 	// TODO-P3 pull into static
-	ets := collections.SortedValues[Etikett](
-		collections.Map[Etikett, Etikett](
-			f.Set.Etiketten,
-			func(e Etikett) (f Etikett) {
-				return SansPrefix(e)
-			},
-		),
-	)
+	var etSetSansPrefix schnittstellen.Set[Etikett]
+	if etSetSansPrefix, err = collections.Map[Etikett, Etikett](
+		f.Set.Etiketten,
+		func(e Etikett) (f Etikett, err error) {
+			if e.String() == "" {
+				err = collections.MakeErrStopIteration()
+				return
+			}
+
+			f = SansPrefix(e)
+
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	ets := collections.SortedValues[Etikett](etSetSansPrefix)
 
 LOOP:
 	for _, e := range ets {
