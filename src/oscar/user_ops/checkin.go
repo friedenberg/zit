@@ -4,6 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte"
+	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -39,6 +40,14 @@ func (c Checkin) Run(
 			case *zettel.CheckedOut:
 				if _, err = u.StoreObjekten().Zettel().Update2(
 					*aco,
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+			case *typ.CheckedOut:
+				if _, err = u.StoreObjekten().Typ().CreateOrUpdate2(
+					aco,
 				); err != nil {
 					err = errors.Wrap(err)
 					return

@@ -112,6 +112,7 @@ func (c Show) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
 					ev.FuncFormatter(
 						u.Out(),
 						u.StoreObjekten(),
+						u.PrinterEtikettTransacted(),
 					),
 				)
 

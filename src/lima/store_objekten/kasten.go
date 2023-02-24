@@ -36,6 +36,7 @@ type KastenStore interface {
 		*kasten.Objekte,
 		*kennung.Kasten,
 		*kasten.Transacted,
+		*kasten.CheckedOut,
 	]
 
 	objekte_store.TransactedInflator[
@@ -82,6 +83,7 @@ type kastenStore struct {
 		*kasten.Objekte,
 		*kennung.Kasten,
 		*kasten.Transacted,
+		*kasten.CheckedOut,
 	]
 }
 

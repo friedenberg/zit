@@ -1,7 +1,8 @@
 #! /bin/bash -e
 
+dir_base="$(realpath "$(dirname "$0")")"
 v="$(zit store-version)"
-d="zz-test/fixtures/v$v"
+d="$dir_base/v$v"
 
 if [[ -d "$d" ]]; then
   chflags -R nouchg "$d"
@@ -11,7 +12,7 @@ fi
 mkdir -p "$d"
 
 pushd "$d"
-zit init -yin ../yin -yang ../yang -disable-age
+zit init -yin "$dir_base/yin" -yang "$dir_base/yang" -disable-age
 
 zit new -predictable-hinweisen -edit=false - <<EOM
 ---
@@ -47,4 +48,4 @@ cat > one/uno.zettel <<EOM
 last time
 EOM
 
-zit checkin -delete -all
+zit checkin -delete .

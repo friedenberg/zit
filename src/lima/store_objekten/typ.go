@@ -38,6 +38,7 @@ type TypStore interface {
 		*typ.Objekte,
 		*kennung.Typ,
 		*typ.Transacted,
+		*typ.CheckedOut,
 	]
 
 	objekte_store.TransactedInflator[
@@ -84,6 +85,7 @@ type typStore struct {
 		*typ.Objekte,
 		*kennung.Typ,
 		*typ.Transacted,
+		*typ.CheckedOut,
 	]
 }
 

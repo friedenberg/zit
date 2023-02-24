@@ -21,7 +21,7 @@ func (f FormatterValue) String() string {
 func (f *FormatterValue) Set(v string) (err error) {
 	v1 := strings.TrimSpace(strings.ToLower(v))
 	switch v1 {
-	case "text", "objekte", "json":
+	case "log", "text", "objekte", "json":
 		f.string = v1
 
 	default:
@@ -35,8 +35,12 @@ func (f *FormatterValue) Set(v string) (err error) {
 func (f *FormatterValue) FuncFormatter(
 	out io.Writer,
 	af schnittstellen.AkteIOFactory,
+	logFunc schnittstellen.FuncIter[*Transacted],
 ) schnittstellen.FuncIter[*Transacted] {
 	switch f.string {
+	case "log":
+		return logFunc
+
 	case "objekte":
 		f := objekte.MakeFormat[Objekte, *Objekte]()
 

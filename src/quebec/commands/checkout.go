@@ -36,6 +36,7 @@ func init() {
 
 func (c Checkout) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
 	options := store_fs.CheckoutOptions{
+		Force:        c.Force,
 		CheckoutMode: c.CheckoutMode,
 	}
 

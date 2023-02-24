@@ -32,6 +32,7 @@ type EtikettStore interface {
 		*etikett.Objekte,
 		*kennung.Etikett,
 		*etikett.Transacted,
+		*etikett.CheckedOut,
 	]
 }
 
@@ -69,6 +70,7 @@ type etikettStore struct {
 		*etikett.Objekte,
 		*kennung.Etikett,
 		*etikett.Transacted,
+		*etikett.CheckedOut,
 	]
 }
 

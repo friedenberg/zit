@@ -87,6 +87,8 @@ type CreateOrUpdater[
 	O any,
 	K any,
 	V any,
+	CO any,
 ] interface {
 	CreateOrUpdate(O, K) (V, error)
+	CreateOrUpdate2(CO) (V, error)
 }
