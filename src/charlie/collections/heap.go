@@ -267,7 +267,6 @@ func (a *Heap[T, T1]) MergeStream(
 				break LOOP
 
 			case peeked.Equals(*e):
-        errors.Err().Printf("was equal: %s", e)
 				a.Pop()
 				continue
 
@@ -312,8 +311,8 @@ func (a *Heap[T, T1]) MergeStream(
 
 		if last == nil {
 			last = popped
-    } else if popped.Equals(*last) {
-      continue
+		} else if popped.Equals(*last) {
+			continue
 		} else if popped.Less(*last) {
 			err = errors.Errorf(
 				"last is greater than current! last: %v, current: %v",
