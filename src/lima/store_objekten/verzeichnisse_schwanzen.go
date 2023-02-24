@@ -104,8 +104,8 @@ func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 	return
 }
 
-func (s *verzeichnisseSchwanzen) ZettelTransactedWriter(
+func (s *verzeichnisseSchwanzen) GetVerzeichnissePageDelegate(
 	n int,
-) schnittstellen.FuncIter[*zettel.Transacted] {
-	return s.headers[n].WriteZettelTransacted
+) store_verzeichnisse.PageDelegate {
+	return s.headers[n]
 }

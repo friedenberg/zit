@@ -20,9 +20,9 @@ import (
 )
 
 type CwdFiles struct {
-	erworben         konfig.Compiled
-	dir              string
-  //TODO turn into schnittstellen.Set
+	erworben konfig.Compiled
+	dir      string
+	// TODO turn into schnittstellen.Set
 	Zettelen         map[kennung.Hinweis]*zettel.External
 	Typen            map[kennung.Typ]*typ.External
 	Etiketten        map[kennung.Etikett]*etikett.External
@@ -176,11 +176,7 @@ func MakeCwdFilesMetaSet(
 	isZettel, ok := ms.Get(gattung.Zettel)
 
 	switch {
-	case ok && isZettel.Sigil.IncludesCwd() && isZettel.Len() > 0:
-		errors.Err().Print("Ignoring query because -all is set")
-		fallthrough
-
-	case ok && isZettel.Sigil.IncludesCwd():
+	case ok && isZettel.Sigil.IncludesCwd() && isZettel.Len() == 0:
 		return MakeCwdFilesAll(k, dir)
 
 	default:

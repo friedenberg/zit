@@ -21,6 +21,7 @@ type Page struct {
 	ioFactory
 	pool        schnittstellen.Pool[zettel.Transacted, *zettel.Transacted]
 	added       zettel.HeapTransacted
+	addFilter   schnittstellen.FuncIter[*zettel.Transacted]
 	flushFilter schnittstellen.FuncIter[*zettel.Transacted]
 	State
 }
@@ -29,12 +30,16 @@ func makeZettelenPage(
 	iof ioFactory,
 	pid pageId,
 	pool schnittstellen.Pool[zettel.Transacted, *zettel.Transacted],
-	fff ZettelTransactedWriterGetter,
+	fff PageDelegateGetter,
 ) (p *Page) {
 	flushFilter := collections.MakeWriterNoop[*zettel.Transacted]()
+	addFilter := collections.MakeWriterNoop[*zettel.Transacted]()
 
 	if fff != nil {
-		flushFilter = fff.ZettelTransactedWriter(pid.index)
+		d := fff.GetVerzeichnissePageDelegate(pid.index)
+
+		addFilter = d.ShouldAddVerzeichnisse
+		flushFilter = d.ShouldFlushVerzeichnisse
 	}
 
 	p = &Page{
@@ -44,6 +49,7 @@ func makeZettelenPage(
 		pool:        pool,
 		added:       zettel.MakeHeapTransacted(),
 		flushFilter: flushFilter,
+		addFilter:   addFilter,
 	}
 
 	p.added.SetPool(p.pool)
@@ -82,7 +88,7 @@ func (zp *Page) Add(z *zettel.Transacted) (err error) {
 		return
 	}
 
-	if err = zp.flushFilter(z); err != nil {
+	if err = zp.addFilter(z); err != nil {
 		if collections.IsStopIteration(err) {
 			errors.Log().Printf("eliding %s", z.Kennung())
 			err = nil

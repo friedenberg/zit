@@ -1,9 +1,6 @@
 package zettel
 
 import (
-	"bufio"
-	"encoding/gob"
-	"io"
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -52,13 +49,13 @@ func (zws *Schwanzen) Get(h kennung.Hinweis) (t ts.Time, ok bool) {
 
 	if ok {
 		errors.TodoP4("switch to GetTime()")
-		t = o.Sku.Schwanz
+		t = o.Sku.GetTime()
 	}
 
 	return
 }
 
-func (zws *Schwanzen) Set(z *Transacted) (ok bool) {
+func (zws *Schwanzen) Set(z *Transacted, flush bool) (ok bool) {
 	zws.lock.Lock()
 	defer zws.lock.Unlock()
 
@@ -67,30 +64,28 @@ func (zws *Schwanzen) Set(z *Transacted) (ok bool) {
 
 	switch {
 	case !found:
-		zws.hinweisen[h] = *z
-		ok = true
+		fallthrough
 
 	case t1.Less(*z):
 		zws.hinweisen[h] = *z
 		ok = true
 
-		errors.TodoP4("determine if comparing zettels rather than sku is ok")
 	case t1.Sku.Equals(z.Sku):
 		zws.etikettIndex.Add(z.Objekte.Etiketten)
-		ok = true
+
+		ok = flush
 
 	default:
 		zws.etikettIndex.AddEtikettSet(t1.Objekte.Etiketten, z.Objekte.Etiketten)
-		ok = false
 	}
 
 	return
 }
 
-func (zws *Schwanzen) WriteZettelTransacted(
+func (zws *Schwanzen) ShouldAddVerzeichnisse(
 	z *Transacted,
 ) (err error) {
-	if ok := zws.Set(z); !ok {
+	if ok := zws.Set(z, false); !ok {
 		err = collections.MakeErrStopIteration()
 		return
 	}
@@ -98,43 +93,11 @@ func (zws *Schwanzen) WriteZettelTransacted(
 	return
 }
 
-func (zws *Schwanzen) ReadFrom(r1 io.Reader) (n int64, err error) {
-	r := bufio.NewReader(r1)
-
-	dec := gob.NewDecoder(r)
-
-	m := make(map[kennung.Hinweis]Transacted)
-
-	if err = dec.Decode(&m); err != nil {
-		if errors.IsEOF(err) {
-			err = nil
-		} else {
-			err = errors.Wrap(err)
-		}
-
-		return
-	}
-
-	zws.lock.Lock()
-	defer zws.lock.Unlock()
-
-	zws.hinweisen = m
-
-	return
-}
-
-func (zws Schwanzen) WriteTo(w1 io.Writer) (n int64, err error) {
-	zws.lock.RLock()
-	defer zws.lock.RUnlock()
-
-	w := bufio.NewWriter(w1)
-
-	defer errors.Deferred(&err, w.Flush)
-
-	enc := gob.NewEncoder(w)
-
-	if err = enc.Encode(zws.hinweisen); err != nil {
-		err = errors.Wrapf(err, "failed to write page index")
+func (zws *Schwanzen) ShouldFlushVerzeichnisse(
+	z *Transacted,
+) (err error) {
+	if ok := zws.Set(z, true); !ok {
+		err = collections.MakeErrStopIteration()
 		return
 	}
 

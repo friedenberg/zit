@@ -35,7 +35,7 @@ func MakeZettelen(
 	dir string,
 	f ioFactory,
 	p schnittstellen.Pool[zettel.Transacted, *zettel.Transacted],
-	fff ZettelTransactedWriterGetter,
+	fff PageDelegateGetter,
 ) (i *Zettelen, err error) {
 	i = &Zettelen{
 		erworben:  k,

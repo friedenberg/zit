@@ -262,12 +262,7 @@ func (s zettelStore) ReadOne(
 func (i *zettelStore) ReadAllSchwanzen(
 	w schnittstellen.FuncIter[*zettel.Transacted],
 ) (err error) {
-	return i.verzeichnisseSchwanzen.ReadMany(
-		func(z *zettel.Transacted) (err error) {
-			errors.Log().Printf("reading %s", z.GetSku2())
-			return w(z)
-		},
-	)
+	return i.verzeichnisseSchwanzen.ReadMany(w)
 }
 
 func (i *zettelStore) ReadAll(
