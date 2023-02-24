@@ -5,55 +5,30 @@ setup() {
 
 	# for shellcheck SC2154
 	export output
+
+	version="v$(zit store-version)"
+	cp -r "$DIR/migration/$version" "$BATS_TEST_TMPDIR"
+	cd "$BATS_TEST_TMPDIR/$version" || exit 1
 }
 
-function pull { # @test
-	wd="$(mktemp -d)"
+teardown() {
+	chflags -R nouchg "$BATS_TEST_TMPDIR/$version"
+}
 
-	(
-		cd "$wd" || exit 1
-		run_zit_init_disable_age
-	)
+function checkout_simple_all { # @test
+	run_zit checkout @z,t,e
+	assert_output --partial '              (same) [md.typ@eaa85e80de6d1129a21365a8ce2a49ca752457d10932a7d73001b4ebded302c7 !md]'
+	assert_output --partial '       (checked out) [one/dos.zettel@c6b9d095358b8b26a99e90496d916ba92a99e9b75c705165df5f6d353a949ea9 !md "wow ok again"]'
+	assert_output --partial '       (checked out) [one/uno.zettel@d47c552a5299f392948258d7959fc7cf94843316a21c8ea12854ed84a8c06367 !md "wow the first"]'
+}
 
-	wd1="$(mktemp -d)"
+function checkout_simple_zettel { # @test
+	run_zit checkout @
+	assert_output --partial '       (checked out) [one/dos.zettel@c6b9d095358b8b26a99e90496d916ba92a99e9b75c705165df5f6d353a949ea9 !md "wow ok again"]'
+	assert_output --partial '       (checked out) [one/uno.zettel@d47c552a5299f392948258d7959fc7cf94843316a21c8ea12854ed84a8c06367 !md "wow the first"]'
+}
 
-	(
-		cd "$wd1" || exit 1
-		run_zit_init_disable_age
-	)
-
-	cd "$wd" || exit 1
-
-	expected="$(mktemp)"
-	{
-		echo '---'
-		echo '# to_add.md'
-		echo '- zz-inbox-2022-11-14'
-		echo '! md'
-		echo '---'
-		echo ''
-		echo 'test file'
-	} >"$expected"
-
-	run_zit new \
-		-edit=false \
-		"$expected"
-
-	assert_output '[one/uno@11327fbe60cabd2a9eabf4a37d541cf04b539f913945897efe9bab1e30784781 !md "to_add.md"]'
-
-	cd "$wd1" || exit 1
-
-	run_zit pull "$wd" @
-	assert_output '[one/uno@11327fbe60cabd2a9eabf4a37d541cf04b539f913945897efe9bab1e30784781 !md "to_add.md"]'
-
-	run_zit show one/uno
-	assert_output "$(cat "$expected")"
-
-	cd "$wd" || exit 1
-
-	run_zit show one/uno
-	assert_output "$(cat "$expected")"
-
-	run_zit pull "$wd" @
-	assert_output ''
+function checkout_simple_typ { # @test
+	run_zit checkout @t
+	assert_output --partial '              (same) [md.typ@eaa85e80de6d1129a21365a8ce2a49ca752457d10932a7d73001b4ebded302c7 !md]'
 }

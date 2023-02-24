@@ -5,24 +5,22 @@ setup() {
 
 	# for shellcheck SC2154
 	export output
+
+	version="v$(zit store-version)"
+	cp -r "$DIR/$version" "$BATS_TEST_TMPDIR"
+	cd "$BATS_TEST_TMPDIR/$version" || exit 1
+}
+
+teardown() {
+	chflags -R nouchg "$BATS_TEST_TMPDIR/$version"
 }
 
 function init_and_deinit { # @test
-	wd="$(mktemp -d)"
-	version="v$(zit store-version)"
-	cp -r "$DIR/$version" "$wd"
-	cd "$wd/$version" || exit 1
-
 	run_zit status
 	assert_success
 }
 
 function validate_contents { # @test
-	wd="$(mktemp -d)"
-	version="v$(zit store-version)"
-	cp -r "$DIR/$version" "$wd"
-	cd "$wd/$version" || exit 1
-
 	run_zit show -format log +:z,e,t
 	assert_output --partial '[one/uno@797cbdf8448a2ea167534e762a5025f5a3e9857e1dd06a3b746d3819d922f5ce !md "wow ok"]'
 	assert_output --partial '[one/uno@d47c552a5299f392948258d7959fc7cf94843316a21c8ea12854ed84a8c06367 !md "wow the first"]'
