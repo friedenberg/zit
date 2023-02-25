@@ -218,8 +218,10 @@ func (c EditKasten) readTempKastenFiles(
 
 			te := &kasten.External{
 				Sku: sku.External[kennung.Kasten, *kennung.Kasten]{
-					Kennung:   kennung.MustKasten(fdee.FileNameSansExt()),
-					ObjekteFD: fdee,
+					Kennung: kennung.MustKasten(fdee.FileNameSansExt()),
+					FDs: sku.ExternalFDs{
+						Objekte: fdee,
+					},
 				},
 			}
 

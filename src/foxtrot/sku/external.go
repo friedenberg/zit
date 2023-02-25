@@ -8,12 +8,16 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
+type ExternalFDs struct {
+	Objekte kennung.FD
+	Akte    kennung.FD
+}
+
 type External[T kennung.KennungLike[T], T1 kennung.KennungLikePtr[T]] struct {
 	Kennung    T
 	ObjekteSha sha.Sha
 	AkteSha    sha.Sha
-	ObjekteFD  kennung.FD
-	AkteFD     kennung.FD
+	FDs        ExternalFDs
 }
 
 func (a External[T, T1]) String() string {

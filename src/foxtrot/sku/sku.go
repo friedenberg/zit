@@ -95,9 +95,9 @@ func (a Sku) EqualsAny(b any) (ok bool) {
 }
 
 func (a Sku) Equals(b Sku) (ok bool) {
-  if a.Time.Equals(b.Time) {
-    errors.Err().Printf("time match: %s", a)
-  }
+	if a.Time.Equals(b.Time) {
+		errors.Err().Printf("time match: %s", a)
+	}
 
 	if a != b {
 		return false

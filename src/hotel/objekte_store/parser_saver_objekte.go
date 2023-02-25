@@ -62,7 +62,7 @@ func (h *objekteParseSaver[T, T1, T2, T3]) ParseAndSaveAkteAndObjekte(
 		return
 	}
 
-	if sk.ObjekteFD, err = kennung.File(f); err != nil {
+	if sk.FDs.Objekte, err = kennung.File(f); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

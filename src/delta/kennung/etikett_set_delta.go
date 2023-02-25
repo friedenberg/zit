@@ -1,6 +1,6 @@
 package kennung
 
-//TODO make generic and move to collections
+// TODO make generic and move to collections
 type EtikettDelta struct {
 	Added, Removed EtikettSet
 }

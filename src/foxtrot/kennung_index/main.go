@@ -161,8 +161,8 @@ func (i *index) AddEtikettSet(
 		to,
 	)
 
-  i.lock.Lock()
-  defer i.lock.Unlock()
+	i.lock.Lock()
+	defer i.lock.Unlock()
 
 	if err = i.processDelta(d); err != nil {
 		err = errors.Wrap(err)
@@ -187,8 +187,8 @@ func (i *index) processDelta(d kennung.EtikettDelta) (err error) {
 }
 
 func (i *index) Add(s kennung.EtikettSet) (err error) {
-  i.lock.Lock()
-  defer i.lock.Unlock()
+	i.lock.Lock()
+	defer i.lock.Unlock()
 
 	return i.add(s)
 }
@@ -254,8 +254,8 @@ func (i *index) del(s kennung.EtikettSet) (err error) {
 }
 
 func (i *index) GetAllEtiketten() (es []kennung.Etikett, err error) {
-  i.lock.Lock()
-  defer i.lock.Unlock()
+	i.lock.Lock()
+	defer i.lock.Unlock()
 
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)

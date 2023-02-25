@@ -76,11 +76,11 @@ type Updater[
 	Update(O, K) (V, error)
 }
 
-type Updater2[
+type CheckedOutUpdater[
 	CO objekte.CheckedOutLike,
 	T objekte.TransactedLike,
 ] interface {
-	Update2(CO) (T, error)
+	UpdateCheckedOut(CO) (T, error)
 }
 
 type CreateOrUpdater[
@@ -90,5 +90,5 @@ type CreateOrUpdater[
 	CO any,
 ] interface {
 	CreateOrUpdate(O, K) (V, error)
-	CreateOrUpdate2(CO) (V, error)
+	CreateOrUpdateCheckedOut(CO) (V, error)
 }

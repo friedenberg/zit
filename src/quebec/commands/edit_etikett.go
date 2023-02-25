@@ -219,8 +219,10 @@ func (c EditEtikett) readTempEtikettFiles(
 
 			te := &etikett.External{
 				Sku: sku.External[kennung.Etikett, *kennung.Etikett]{
-					Kennung:   kennung.MustEtikett(fdee.FileNameSansExt()),
-					ObjekteFD: fdee,
+					Kennung: kennung.MustEtikett(fdee.FileNameSansExt()),
+					FDs: sku.ExternalFDs{
+						Objekte: fdee,
+					},
 				},
 			}
 

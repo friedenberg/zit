@@ -23,9 +23,12 @@ type CwdFiles struct {
 	erworben konfig.Compiled
 	dir      string
 	// TODO turn into schnittstellen.Set
-	Zettelen         map[kennung.Hinweis]*zettel.External
-	Typen            map[kennung.Typ]*typ.External
-	Etiketten        map[kennung.Etikett]*etikett.External
+	Zettelen  map[kennung.Hinweis]*zettel.External
+	Typen     map[kennung.Typ]*typ.External
+	Etiketten map[kennung.Etikett]*etikett.External
+	// Zettelen         map[kennung.Hinweis]sku.ExternalFDs
+	// Typen            map[kennung.Typ]sku.ExternalFDs
+	// Etiketten        map[kennung.Etikett]sku.ExternalFDs
 	UnsureAkten      []kennung.FD
 	EmptyDirectories []kennung.FD
 }

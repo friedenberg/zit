@@ -33,7 +33,7 @@ func (c *CwdFiles) tryTyp(fi os.FileInfo) (err error) {
 		}
 	}
 
-	t.Sku.ObjekteFD = fd
+	t.Sku.FDs.Objekte = fd
 	c.Typen[h] = t
 
 	return

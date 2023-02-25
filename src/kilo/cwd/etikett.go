@@ -33,7 +33,7 @@ func (c *CwdFiles) tryEtikett(fi os.FileInfo) (err error) {
 		}
 	}
 
-	t.Sku.ObjekteFD = fd
+	t.Sku.FDs.Objekte = fd
 	c.Etiketten[h] = t
 
 	return

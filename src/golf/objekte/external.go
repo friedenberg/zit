@@ -59,11 +59,11 @@ func (e External[T, T1, T2, T3]) GetGattung() schnittstellen.Gattung {
 }
 
 func (e External[T, T1, T2, T3]) GetObjekteFD() kennung.FD {
-	return e.Sku.ObjekteFD
+	return e.Sku.FDs.Objekte
 }
 
 func (e External[T, T1, T2, T3]) GetAkteFD() kennung.FD {
-	return e.Sku.AkteFD
+	return e.Sku.FDs.Akte
 }
 
 func (e External[T, T1, T2, T3]) GetObjekteSha() sha.Sha {

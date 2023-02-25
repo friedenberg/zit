@@ -187,7 +187,7 @@ func (s *Store) CheckoutOneZettel(
 	}
 
 	if options.CheckoutMode.IncludesObjekte() {
-		cz.External.Sku.ObjekteFD.Path = filename
+		cz.External.Sku.FDs.Objekte.Path = filename
 	}
 
 	if !inlineAkte && options.CheckoutMode.IncludesAkte() {
@@ -205,7 +205,7 @@ func (s *Store) CheckoutOneZettel(
 			fe = t.String()
 		}
 
-		cz.External.Sku.AkteFD.Path = originalFilename + "." + fe
+		cz.External.Sku.FDs.Akte.Path = originalFilename + "." + fe
 	}
 
 	e := zettel_external.MakeFileEncoder(
@@ -260,7 +260,7 @@ func (s *Store) CheckoutOneEtikett(
 
 	defer errors.DeferredCloser(&err, f)
 
-	if co.External.Sku.ObjekteFD, err = kennung.File(f); err != nil {
+	if co.External.Sku.FDs.Objekte, err = kennung.File(f); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -307,7 +307,7 @@ func (s *Store) CheckoutOneTyp(
 
 	defer errors.DeferredCloser(&err, f)
 
-	if co.External.Sku.ObjekteFD, err = kennung.File(f); err != nil {
+	if co.External.Sku.FDs.Objekte, err = kennung.File(f); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -57,7 +57,7 @@ func (s Standort) FifoPipe() (p string, err error) {
 	)
 
 	if err = syscall.Mknod(p, syscall.S_IFIFO|0o666, 0); err != nil {
-    err = errors.Wrapf(err, "Path: %s", p)
+		err = errors.Wrapf(err, "Path: %s", p)
 		return
 	}
 

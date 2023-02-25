@@ -161,7 +161,9 @@ func (c ZettelFromExternalAkte) zettelForAkte(
 ) (z *zettel.External, err error) {
 	z = &zettel.External{
 		Sku: sku.External[kennung.Hinweis, *kennung.Hinweis]{
-			AkteFD: akteFD,
+			FDs: sku.ExternalFDs{
+				Akte: akteFD,
+			},
 		},
 	}
 

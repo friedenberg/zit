@@ -30,7 +30,7 @@ func (c Checkin) Run(
 
 			switch aco := co.(type) {
 			case zettel.CheckedOut:
-				if _, err = u.StoreObjekten().Zettel().Update2(
+				if _, err = u.StoreObjekten().Zettel().UpdateCheckedOut(
 					aco,
 				); err != nil {
 					err = errors.Wrap(err)
@@ -38,7 +38,7 @@ func (c Checkin) Run(
 				}
 
 			case *zettel.CheckedOut:
-				if _, err = u.StoreObjekten().Zettel().Update2(
+				if _, err = u.StoreObjekten().Zettel().UpdateCheckedOut(
 					*aco,
 				); err != nil {
 					err = errors.Wrap(err)
@@ -46,7 +46,7 @@ func (c Checkin) Run(
 				}
 
 			case *typ.CheckedOut:
-				if _, err = u.StoreObjekten().Typ().CreateOrUpdate2(
+				if _, err = u.StoreObjekten().Typ().CreateOrUpdateCheckedOut(
 					aco,
 				); err != nil {
 					err = errors.Wrap(err)

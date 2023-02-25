@@ -158,8 +158,10 @@ func (c EditTyp) readTempTypFiles(
 
 		te := &typ.External{
 			Sku: sku.External[kennung.Typ, *kennung.Typ]{
-				Kennung:   kennung.MustTyp(fdee.FileNameSansExt()),
-				ObjekteFD: fdee,
+				Kennung: kennung.MustTyp(fdee.FileNameSansExt()),
+				FDs: sku.ExternalFDs{
+					Objekte: fdee,
+				},
 			},
 		}
 

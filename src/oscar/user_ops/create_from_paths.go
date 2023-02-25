@@ -257,8 +257,10 @@ func (c CreateFromPaths) zettelsFromPath(
 	wf(
 		&zettel.External{
 			Sku: sku.External[kennung.Hinweis, *kennung.Hinweis]{
-				ObjekteFD: kennung.FD{
-					Path: p,
+				FDs: sku.ExternalFDs{
+					Objekte: kennung.FD{
+						Path: p,
+					},
 				},
 				ObjekteSha: s,
 			},

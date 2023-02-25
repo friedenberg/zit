@@ -20,8 +20,10 @@ func (s *Store) WriteTyp(t *typ.Transacted) (te *typ.CheckedOut, err error) {
 			Sku: sku.External[kennung.Typ, *kennung.Typ]{
 				ObjekteSha: sha.Make(t.GetObjekteSha()),
 				Kennung:    t.Sku.Kennung,
-				ObjekteFD: kennung.FD{
-					Path: fmt.Sprintf("%s.%s", t.Kennung(), s.erworben.FileExtensions.Typ),
+				FDs: sku.ExternalFDs{
+					Objekte: kennung.FD{
+						Path: fmt.Sprintf("%s.%s", t.Kennung(), s.erworben.FileExtensions.Typ),
+					},
 				},
 			},
 			// TODO-P2 move to central place

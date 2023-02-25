@@ -28,7 +28,7 @@ func MakeCliFormatCheckedOut(
 
 	return func(w io.Writer, z CheckedOut) (n int64, err error) {
 		switch {
-		case z.External.Sku.AkteFD.Path != "" && z.External.Sku.ObjekteFD.Path != "":
+		case z.External.Sku.FDs.Akte.Path != "" && z.External.Sku.FDs.Objekte.Path != "":
 			return format.Write(
 				w,
 				format.MakeWriter(wzef, z),
@@ -36,13 +36,13 @@ func MakeCliFormatCheckedOut(
 				format.MakeWriter(waef, z),
 			)
 
-		case z.External.Sku.AkteFD.Path != "":
+		case z.External.Sku.FDs.Akte.Path != "":
 			return format.Write(
 				w,
 				format.MakeWriter(waef, z),
 			)
 
-		case z.External.Sku.ObjekteFD.Path != "":
+		case z.External.Sku.FDs.Objekte.Path != "":
 			return format.Write(
 				w,
 				format.MakeWriter(wzef, z),

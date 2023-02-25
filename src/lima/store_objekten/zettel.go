@@ -36,7 +36,7 @@ type ZettelStore interface {
 		*zettel.Transacted,
 	]
 
-	objekte_store.Updater2[
+	objekte_store.CheckedOutUpdater[
 		zettel.CheckedOut,
 		*zettel.Transacted,
 	]
@@ -349,7 +349,7 @@ func (s *zettelStore) updateExternal(
 	return s.Update(&ze.Objekte, &ze.Sku.Kennung)
 }
 
-func (s *zettelStore) Update2(
+func (s *zettelStore) UpdateCheckedOut(
 	co zettel.CheckedOut,
 ) (t *zettel.Transacted, err error) {
 	errors.TodoP2("support dry run")

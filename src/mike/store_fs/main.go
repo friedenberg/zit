@@ -138,7 +138,7 @@ func (s Store) MakeExternalZettelFromZettel(
 		return
 	}
 
-	ez.Sku.ObjekteFD.Path = p
+	ez.Sku.FDs.Objekte.Path = p
 
 	head, tail := id.HeadTailFromFileName(p)
 
@@ -156,7 +156,7 @@ func (s Store) readZettelFromFile(ez *zettel.External) (err error) {
 		// extension
 		// TODO-P4 modify this to use globs
 		if filepath.Ext(ez.GetObjekteFD().Path) == "" {
-			ez.Sku.ObjekteFD.Path = ez.GetObjekteFD().Path + s.erworben.GetZettelFileExtension()
+			ez.Sku.FDs.Objekte.Path = ez.GetObjekteFD().Path + s.erworben.GetZettelFileExtension()
 			return s.readZettelFromFile(ez)
 		}
 
@@ -189,7 +189,7 @@ func (s Store) readZettelFromFile(ez *zettel.External) (err error) {
 	}
 
 	ez.Objekte = c.Zettel
-	ez.Sku.AkteFD.Path = c.AktePath
+	ez.Sku.FDs.Akte.Path = c.AktePath
 
 	unrecoverableErrors := errors.MakeMulti()
 
@@ -321,8 +321,10 @@ func (s *Store) ReadMany(
 			// TODO-P2 akte fd?
 			ze := zettel.External{
 				Sku: sku.External[kennung.Hinweis, *kennung.Hinweis]{
-					ObjekteFD: kennung.FD{
-						Path: z.Sku.Kennung.String(),
+					FDs: sku.ExternalFDs{
+						Objekte: kennung.FD{
+							Path: z.Sku.Kennung.String(),
+						},
 					},
 				},
 			}
