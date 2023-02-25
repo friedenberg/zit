@@ -8,10 +8,12 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/hotel/etikett"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/juliett/zettel"
+	"github.com/friedenberg/zit/src/kilo/cwd"
 )
 
 func (s *Store) FileExtensionForGattung(
@@ -116,7 +118,16 @@ func (s *Store) ReadOneEtikett(
 
 	p := s.PathForTransactedLike(tk)
 
-	if co.External, err = s.ReadEtikettFromFile(p); err != nil {
+	if co.External, err = s.ReadEtikett(
+		cwd.Etikett{
+			Kennung: tk.Sku.Kennung,
+			FDs: sku.ExternalFDs{
+				Objekte: kennung.FD{
+					Path: p,
+				},
+			},
+		},
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -134,7 +145,16 @@ func (s *Store) ReadOneTyp(
 
 	p := s.PathForTransactedLike(tk)
 
-	if co.External, err = s.ReadTypFromFile(p); err != nil {
+	if co.External, err = s.ReadTyp(
+		cwd.Typ{
+			Kennung: tk.Sku.Kennung,
+			FDs: sku.ExternalFDs{
+				Objekte: kennung.FD{
+					Path: p,
+				},
+			},
+		},
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

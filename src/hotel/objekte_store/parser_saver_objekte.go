@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 )
@@ -18,7 +17,7 @@ type ParseSaver[
 	T2 schnittstellen.Id[T2],
 	T3 schnittstellen.IdPtr[T2],
 ] interface {
-	ParseAndSaveAkteAndObjekte(string) (T, sku.External[T2, T3], error)
+	ParseAndSaveAkteAndObjekte(sku.ExternalMaybe[T2, T3]) (T, sku.External[T2, T3], error)
 }
 
 type objekteParseSaver[
@@ -53,19 +52,18 @@ func MakeParseSaver[
 }
 
 func (h *objekteParseSaver[T, T1, T2, T3]) ParseAndSaveAkteAndObjekte(
-	p string,
+	sem sku.ExternalMaybe[T2, T3],
 ) (o T, sk sku.External[T2, T3], err error) {
 	var f *os.File
 
-	if f, err = files.OpenExclusiveReadOnly(p); err != nil {
+	errors.TodoP2("support akte")
+	if f, err = files.OpenExclusiveReadOnly(sem.FDs.Objekte.Path); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if sk.FDs.Objekte, err = kennung.File(f); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	sk.FDs = sem.FDs
+	sk.Kennung = sem.Kennung
 
 	errors.TodoP0("populate sku.AkteSha and ObjekteSha")
 

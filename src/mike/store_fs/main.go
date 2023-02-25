@@ -502,10 +502,7 @@ func (s *Store) ReadFiles(
 					)
 				}
 
-				tco.External.Sku.FDs = te.FDs
-				tco.External.Sku.Kennung = te.Kennung
-
-				if s.ReadTyp(&tco.External); err != nil {
+				if tco.External, err = s.ReadTyp(te); err != nil {
 					if errors.IsNotExist(err) {
 						return errors.Errorf(
 							"cwd zettel was matched in query but not in cwd.CwdFiles: %s",
@@ -518,6 +515,7 @@ func (s *Store) ReadFiles(
 				}
 
 				tco.Internal = *et
+				errors.Err().Caller(0, "%s", tco)
 
 				tco.DetermineState()
 
@@ -539,10 +537,7 @@ func (s *Store) ReadFiles(
 					)
 				}
 
-				tco.External.Sku.FDs = te.FDs
-				tco.External.Sku.Kennung = te.Kennung
-
-				if s.ReadEtikett(&tco.External); err != nil {
+				if tco.External, err = s.ReadEtikett(te); err != nil {
 					if errors.IsNotExist(err) {
 						return errors.Errorf(
 							"cwd zettel was matched in query but not in cwd.CwdFiles: %s",

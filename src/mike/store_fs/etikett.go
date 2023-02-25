@@ -5,9 +5,10 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/hotel/etikett"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
+	"github.com/friedenberg/zit/src/kilo/cwd"
 )
 
-func (s *Store) ReadEtikettFromFile(p string) (t etikett.External, err error) {
+func (s *Store) ReadEtikett(sem cwd.Etikett) (t etikett.External, err error) {
 	format := etikett.MakeFormatText(s.storeObjekten)
 
 	ops := objekte_store.MakeParseSaver[
@@ -22,16 +23,11 @@ func (s *Store) ReadEtikettFromFile(p string) (t etikett.External, err error) {
 	)
 
 	if t.Objekte, t.Sku, err = ops.ParseAndSaveAkteAndObjekte(
-		p,
+		sem,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	return
-}
-
-func (s *Store) ReadEtikett(t *etikett.External) (err error) {
-	*t, err = s.ReadEtikettFromFile(t.GetObjekteFD().Path)
 	return
 }

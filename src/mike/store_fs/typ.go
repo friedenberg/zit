@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/hotel/typ"
+	"github.com/friedenberg/zit/src/kilo/cwd"
 )
 
 func (s *Store) WriteTyp(t *typ.Transacted) (te *typ.CheckedOut, err error) {
@@ -33,11 +34,20 @@ func (s *Store) WriteTyp(t *typ.Transacted) (te *typ.CheckedOut, err error) {
 
 	var f *os.File
 
-	if f, err = files.CreateExclusiveWriteOnly(
-		te.External.GetObjekteFD().Path,
-	); err != nil {
+	p := te.External.GetObjekteFD().Path
+
+	if f, err = files.CreateExclusiveWriteOnly(p); err != nil {
 		if errors.IsExist(err) {
-			err = s.ReadTyp(&te.External)
+			te.External, err = s.ReadTyp(
+				cwd.Typ{
+					Kennung: t.Sku.Kennung,
+					FDs: sku.ExternalFDs{
+						Objekte: kennung.FD{
+							Path: p,
+						},
+					},
+				},
+			)
 		} else {
 			err = errors.Wrap(err)
 		}
@@ -57,7 +67,7 @@ func (s *Store) WriteTyp(t *typ.Transacted) (te *typ.CheckedOut, err error) {
 	return
 }
 
-func (s *Store) ReadTypFromFile(p string) (t typ.External, err error) {
+func (s *Store) ReadTyp(sem cwd.Typ) (t typ.External, err error) {
 	format := typ.MakeFormatText(s.storeObjekten)
 
 	ops := objekte_store.MakeParseSaver[
@@ -72,16 +82,11 @@ func (s *Store) ReadTypFromFile(p string) (t typ.External, err error) {
 	)
 
 	if t.Objekte, t.Sku, err = ops.ParseAndSaveAkteAndObjekte(
-		p,
+		sem,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	return
-}
-
-func (s *Store) ReadTyp(t *typ.External) (err error) {
-	*t, err = s.ReadTypFromFile(t.GetObjekteFD().Path)
 	return
 }

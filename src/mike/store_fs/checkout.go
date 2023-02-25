@@ -19,6 +19,7 @@ import (
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/juliett/zettel"
+	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/kilo/zettel_external"
 )
 
@@ -245,7 +246,16 @@ func (s *Store) CheckoutOneEtikett(
 
 	if f, err = files.CreateExclusiveWriteOnly(p); err != nil {
 		if errors.IsExist(err) {
-			if co.External, err = s.ReadEtikettFromFile(p); err != nil {
+			if co.External, err = s.ReadEtikett(
+				cwd.Etikett{
+					Kennung: tk.Sku.Kennung,
+					FDs: sku.ExternalFDs{
+						Objekte: kennung.FD{
+							Path: p,
+						},
+					},
+				},
+			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -292,7 +302,16 @@ func (s *Store) CheckoutOneTyp(
 
 	if f, err = files.CreateExclusiveWriteOnly(p); err != nil {
 		if errors.IsExist(err) {
-			if co.External, err = s.ReadTypFromFile(p); err != nil {
+			if co.External, err = s.ReadTyp(
+				cwd.Typ{
+					Kennung: tk.Sku.Kennung,
+					FDs: sku.ExternalFDs{
+						Objekte: kennung.FD{
+							Path: p,
+						},
+					},
+				},
+			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
