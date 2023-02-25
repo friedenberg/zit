@@ -51,6 +51,30 @@ func (wg *errorWaitGroup) GetError() (err error) {
 	return
 }
 
+func ErrorWaitGroupApply[T any](
+	wg ErrorWaitGroup,
+	s schnittstellen.Set[T],
+	f schnittstellen.FuncIter[T],
+) (d bool) {
+	if err := s.Each(
+		func(e T) (err error) {
+			if wg.Do(
+				func() error {
+					return f(e)
+				},
+			) {
+				err = MakeErrStopIteration()
+			}
+
+			return
+		},
+	); err != nil {
+		d = true
+	}
+
+	return
+}
+
 func (wg *errorWaitGroup) Do(f schnittstellen.FuncError) (d bool) {
 	wg.lock.Lock()
 	defer wg.lock.Unlock()

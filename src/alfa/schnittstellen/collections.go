@@ -11,9 +11,14 @@ type (
 	FuncIterWithKey[T any]       func(string, T) error
 )
 
-type Set[T any] interface {
-	Equatable[Set[T]]
+type Lenner interface {
 	Len() int
+}
+
+type Set[T any] interface {
+	Lenner
+
+	Equatable[Set[T]]
 	Key(T) string
 	Get(string) (T, bool)
 	Any() T
@@ -22,9 +27,10 @@ type Set[T any] interface {
 	Each(FuncIter[T]) error
 	EachPtr(FuncIter[*T]) error
 	EachKey(FuncIterKey) error
+	Elements() []T
+
 	ImmutableCloner[Set[T]]
 	MutableCloner[MutableSet[T]]
-	Elements() []T
 }
 
 type MutableSet[T any] interface {

@@ -8,13 +8,9 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
-	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
-type CwdZettel struct {
-	kennung.Hinweis
-	Zettel, Akte kennung.FD
-}
+type Zettel = sku.ExternalMaybe[kennung.Hinweis, *kennung.Hinweis]
 
 func (c *CwdFiles) tryZettel(d string, a string, p string) (err error) {
 	var h kennung.Hinweis
@@ -26,27 +22,16 @@ func (c *CwdFiles) tryZettel(d string, a string, p string) (err error) {
 		return
 	}
 
-	var zcw *zettel.External
-	ok := false
+	t, _ := c.Zettelen.Get(h.String())
+	t.Kennung = h
 
-	if zcw, ok = c.Zettelen[h]; !ok {
-		zcw = &zettel.External{
-			Sku: sku.External[kennung.Hinweis, *kennung.Hinweis]{
-				Kennung: h,
-			},
-		}
-	}
-
-	errors.TodoP3("read zettels")
 	if path.Ext(a) == c.erworben.GetZettelFileExtension() {
-		zcw.Sku.FDs.Objekte.Path = p
+		t.FDs.Objekte.Path = p
 	} else {
-		zcw.Sku.FDs.Akte.Path = p
+		t.FDs.Akte.Path = p
 	}
 
-	c.Zettelen[h] = zcw
-
-	return
+	return c.Zettelen.Add(t)
 }
 
 func (c CwdFiles) hinweisFromPath(p string) (h kennung.Hinweis, err error) {

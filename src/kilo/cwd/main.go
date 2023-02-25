@@ -11,24 +11,18 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/golf/objekte"
-	"github.com/friedenberg/zit/src/hotel/etikett"
-	"github.com/friedenberg/zit/src/hotel/typ"
+	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/india/konfig"
-	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
 type CwdFiles struct {
-	erworben konfig.Compiled
-	dir      string
-	// TODO turn into schnittstellen.Set
-	Zettelen  map[kennung.Hinweis]*zettel.External
-	Typen     map[kennung.Typ]*typ.External
-	Etiketten map[kennung.Etikett]*etikett.External
-	// Zettelen         map[kennung.Hinweis]sku.ExternalFDs
-	// Typen            map[kennung.Typ]sku.ExternalFDs
-	// Etiketten        map[kennung.Etikett]sku.ExternalFDs
+	erworben         konfig.Compiled
+	dir              string
+	Zettelen         schnittstellen.MutableSet[Zettel]
+	Typen            schnittstellen.MutableSet[Typ]
+	Etiketten        schnittstellen.MutableSet[Etikett]
 	UnsureAkten      []kennung.FD
 	EmptyDirectories []kennung.FD
 }
@@ -36,104 +30,97 @@ type CwdFiles struct {
 func (fs CwdFiles) GetMetaSet() (ms kennung.MetaSet, err error) {
 	ms = kennung.MakeMetaSet(kennung.Expanders{}, gattung.Zettel)
 
-	for _, z := range fs.Zettelen {
-		ms.Add(z.Sku.Kennung, kennung.SigilNone)
+	if err = fs.Zettelen.Each(
+		func(z Zettel) (err error) {
+			return ms.Add(z.Kennung, kennung.SigilNone)
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
-	for _, t := range fs.Typen {
-		ms.Add(t.Sku.Kennung, kennung.SigilNone)
+	if err = fs.Typen.Each(
+		func(z Typ) (err error) {
+			return ms.Add(z.Kennung, kennung.SigilNone)
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
-	for _, t := range fs.Etiketten {
-		ms.Add(t.Sku.Kennung, kennung.SigilNone)
+	if err = fs.Etiketten.Each(
+		func(z Etikett) (err error) {
+			return ms.Add(z.Kennung, kennung.SigilNone)
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return
 }
 
-func (fs CwdFiles) GetZettelExternal(
+func (fs CwdFiles) GetZettel(
 	h kennung.Hinweis,
-) (ze zettel.External, ok bool) {
-	var ze1 *zettel.External
-	ze1, ok = fs.Zettelen[h]
-
-	if ok {
-		ze = *ze1
-	}
-
+) (z Zettel, ok bool) {
+	z, ok = fs.Zettelen.Get(h.String())
 	return
 }
 
-func (fs CwdFiles) GetEtikettExternal(
+func (fs CwdFiles) GetEtikett(
 	k kennung.Etikett,
-) (ze etikett.External, ok bool) {
-	var ze1 *etikett.External
-	ze1, ok = fs.Etiketten[k]
-
-	if ok {
-		ze = *ze1
-	}
-
+) (e Etikett, ok bool) {
+	e, ok = fs.Etiketten.Get(k.String())
 	return
 }
 
-func (fs CwdFiles) GetTypExternal(
+func (fs CwdFiles) GetTyp(
 	k kennung.Typ,
-) (ze typ.External, ok bool) {
-	var ze1 *typ.External
-	ze1, ok = fs.Typen[k]
-
-	if ok {
-		ze = *ze1
-	}
-
+) (t Typ, ok bool) {
+	t, ok = fs.Typen.Get(k.String())
 	return
 }
 
 func (fs CwdFiles) All(
-	f schnittstellen.FuncIter[objekte.ExternalLike],
+	f schnittstellen.FuncIter[sku.ExternalMaybeLike],
 ) (err error) {
 	wg := iter.MakeErrorWaitGroup()
 
-	for _, z := range fs.Zettelen {
-		if wg.Do(
-			func() error {
-				return f(z)
-			},
-		) {
-			break
-		}
-	}
+	iter.ErrorWaitGroupApply[Zettel](
+		wg,
+		fs.Zettelen,
+		func(e Zettel) (err error) {
+			return f(e)
+		},
+	)
 
-	for _, t := range fs.Typen {
-		if wg.Do(
-			func() error {
-				return f(t)
-			},
-		) {
-			break
-		}
-	}
+	iter.ErrorWaitGroupApply[Typ](
+		wg,
+		fs.Typen,
+		func(e Typ) (err error) {
+			return f(e)
+		},
+	)
 
-	for _, t := range fs.Etiketten {
-		if wg.Do(
-			func() error {
-				return f(t)
-			},
-		) {
-			break
-		}
-	}
+	iter.ErrorWaitGroupApply[Etikett](
+		wg,
+		fs.Etiketten,
+		func(e Etikett) (err error) {
+			return f(e)
+		},
+	)
 
 	return wg.GetError()
 }
 
-func (fs CwdFiles) ZettelFiles() (out []string) {
-	out = make([]string, 0, len(fs.Zettelen))
-
-	for _, z := range fs.Zettelen {
-		out = append(out, z.GetObjekteFD().Path)
-	}
+func (fs CwdFiles) ZettelFiles() (out []string, err error) {
+	out, err = collections.DerivedValues[Zettel, string](
+		fs.Zettelen,
+		func(z Zettel) (p string, err error) {
+			p = z.GetObjekteFD().Path
+			return
+		},
+	)
 
 	return
 }
@@ -142,9 +129,9 @@ func makeCwdFiles(erworben konfig.Compiled, dir string) (fs CwdFiles) {
 	fs = CwdFiles{
 		erworben:         erworben,
 		dir:              dir,
-		Typen:            make(map[kennung.Typ]*typ.External, 0),
-		Etiketten:        make(map[kennung.Etikett]*etikett.External, 0),
-		Zettelen:         make(map[kennung.Hinweis]*zettel.External, 0),
+		Typen:            collections.MakeMutableSetStringer[Typ](),
+		Zettelen:         collections.MakeMutableSetStringer[Zettel](),
+		Etiketten:        collections.MakeMutableSetStringer[Etikett](),
 		UnsureAkten:      make([]kennung.FD, 0),
 		EmptyDirectories: make([]kennung.FD, 0),
 	}
@@ -296,8 +283,11 @@ func (fs *CwdFiles) readAll() (err error) {
 }
 
 func (c CwdFiles) Len() int {
-	errors.TodoP0("fix this")
-	return len(c.Zettelen)
+	return collections.Len(
+		c.Zettelen,
+		c.Typen,
+		c.Etiketten,
+	)
 }
 
 func (fs *CwdFiles) readFirstLevelFile(a string) (err error) {

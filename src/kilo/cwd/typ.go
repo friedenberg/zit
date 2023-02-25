@@ -7,8 +7,9 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
-	"github.com/friedenberg/zit/src/hotel/typ"
 )
+
+type Typ = sku.ExternalMaybe[kennung.Typ, *kennung.Typ]
 
 func (c *CwdFiles) tryTyp(fi os.FileInfo) (err error) {
 	var h kennung.Typ
@@ -21,20 +22,9 @@ func (c *CwdFiles) tryTyp(fi os.FileInfo) (err error) {
 		return
 	}
 
-	var t *typ.External
+	t, _ := c.Typen.Get(h.String())
 
-	ok := false
-
-	if t, ok = c.Typen[h]; !ok {
-		t = &typ.External{
-			Sku: sku.External[kennung.Typ, *kennung.Typ]{
-				Kennung: h,
-			},
-		}
-	}
-
-	t.Sku.FDs.Objekte = fd
-	c.Typen[h] = t
-
-	return
+	t.Kennung = h
+	t.FDs.Objekte = fd
+	return c.Typen.Add(t)
 }

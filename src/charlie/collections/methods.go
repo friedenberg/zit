@@ -19,6 +19,14 @@ func MakeFuncSetString[
 	}
 }
 
+func Len(cs ...schnittstellen.Lenner) (n int) {
+	for _, c := range cs {
+		n += c.Len()
+	}
+
+	return
+}
+
 func AddClone[E any, EPtr interface {
 	*E
 	ResetWithPtr(*E)

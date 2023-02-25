@@ -194,7 +194,14 @@ func (c New) editZettels(
 			Build(),
 	}
 
-	if _, err = openVimOp.Run(u, cwdFiles.ZettelFiles()...); err != nil {
+	var fs []string
+
+	if fs, err = cwdFiles.ZettelFiles(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if _, err = openVimOp.Run(u, fs...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

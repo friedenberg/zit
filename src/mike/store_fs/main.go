@@ -269,12 +269,7 @@ func (s *Store) ReadOne(h kennung.Hinweis) (zt *zettel.Transacted, err error) {
 
 	var readFunc func() (zettel.CheckedOut, error)
 
-	var p *zettel.External
-
-	for _, p1 := range pz.Zettelen {
-		p = p1
-		break
-	}
+	p := pz.Zettelen.Any()
 
 	switch {
 	case p.GetAkteFD().Path == "":
@@ -375,53 +370,60 @@ func (s *Store) ReadManyHistory(
 					return
 				}
 
-				for _, p := range pz.Zettelen {
-					var checked_out zettel.CheckedOut
+				if err = pz.Zettelen.Each(
+					func(p cwd.Zettel) (err error) {
+						var checked_out zettel.CheckedOut
 
-					var readFunc func() (zettel.CheckedOut, error)
+						var readFunc func() (zettel.CheckedOut, error)
 
-					switch {
-					case p.GetAkteFD().Path == "":
-						readFunc = func() (zettel.CheckedOut, error) {
-							return s.Read(p.GetObjekteFD().Path)
+						switch {
+						case p.GetAkteFD().Path == "":
+							readFunc = func() (zettel.CheckedOut, error) {
+								return s.Read(p.GetObjekteFD().Path)
+							}
+
+						case p.GetObjekteFD().Path == "":
+							readFunc = func() (zettel.CheckedOut, error) {
+								return s.ReadExternalZettelFromAktePath(p.GetAkteFD().Path)
+							}
+
+						default:
+							// TODO-P3 validate that the zettel file points to the akte in the metadatei
+							readFunc = func() (zettel.CheckedOut, error) {
+								return s.Read(p.GetObjekteFD().Path)
+							}
 						}
 
-					case p.GetObjekteFD().Path == "":
-						readFunc = func() (zettel.CheckedOut, error) {
-							return s.ReadExternalZettelFromAktePath(p.GetAkteFD().Path)
+						if checked_out, err = readFunc(); err != nil {
+							// TODO-P3 decide if error handling like this is ok
+							if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
+								errors.Err().Printf("external zettel does not exist: %s", p)
+							} else {
+								errors.Err().Print(err)
+							}
+
+							err = nil
+							return
 						}
 
-					default:
-						// TODO-P3 validate that the zettel file points to the akte in the metadatei
-						readFunc = func() (zettel.CheckedOut, error) {
-							return s.Read(p.GetObjekteFD().Path)
-						}
-					}
-
-					if checked_out, err = readFunc(); err != nil {
-						// TODO-P3 decide if error handling like this is ok
-						if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
-							errors.Err().Printf("external zettel does not exist: %s", p)
-						} else {
-							errors.Err().Print(err)
+						zt := &zettel.Transacted{
+							Sku:     checked_out.External.Sku.Transacted(),
+							Objekte: checked_out.External.Objekte,
 						}
 
-						err = nil
-						continue
-					}
+						zt.Sku.Schwanz = s.sonnenaufgang
+						zt.Verzeichnisse.ResetWithObjekte(zt.Objekte)
 
-					zt := &zettel.Transacted{
-						Sku:     checked_out.External.Sku.Transacted(),
-						Objekte: checked_out.External.Objekte,
-					}
+						if err = w(zt); err != nil {
+							err = errors.Wrap(err)
+							return
+						}
 
-					zt.Sku.Schwanz = s.sonnenaufgang
-					zt.Verzeichnisse.ResetWithObjekte(zt.Objekte)
-
-					if err = w(zt); err != nil {
-						err = errors.Wrap(err)
 						return
-					}
+					},
+				); err != nil {
+					err = errors.Wrap(err)
+					return
 				}
 
 				return
@@ -454,12 +456,17 @@ func (s *Store) ReadFiles(
 				var zco zettel.CheckedOut
 				ok := false
 
-				if zco.External, ok = fs.GetZettelExternal(et.Sku.Kennung); !ok {
+				var ze cwd.Zettel
+
+				if ze, ok = fs.GetZettel(et.Sku.Kennung); !ok {
 					return errors.Errorf(
 						"cwd zettel was matched in query but not in cwd.CwdFiles: %s",
 						et.Sku.Kennung,
 					)
 				}
+
+				zco.External.Sku.FDs = ze.FDs
+				zco.External.Sku.Kennung = ze.Kennung
 
 				if err = s.readZettelFromFile(&zco.External); err != nil {
 					if errors.IsNotExist(err) {
@@ -486,12 +493,17 @@ func (s *Store) ReadFiles(
 				var tco typ.CheckedOut
 				ok := false
 
-				if tco.External, ok = fs.GetTypExternal(et.Sku.Kennung); !ok {
+				var te cwd.Typ
+
+				if te, ok = fs.GetTyp(et.Sku.Kennung); !ok {
 					return errors.Errorf(
 						"cwd typ was matched in query but not in cwd.CwdFiles: %s",
 						et.Sku.Kennung,
 					)
 				}
+
+				tco.External.Sku.FDs = te.FDs
+				tco.External.Sku.Kennung = te.Kennung
 
 				if s.ReadTyp(&tco.External); err != nil {
 					if errors.IsNotExist(err) {
@@ -518,12 +530,17 @@ func (s *Store) ReadFiles(
 				var tco etikett.CheckedOut
 				ok := false
 
-				if tco.External, ok = fs.GetEtikettExternal(et.Sku.Kennung); !ok {
+				var te cwd.Etikett
+
+				if te, ok = fs.GetEtikett(et.Sku.Kennung); !ok {
 					return errors.Errorf(
 						"cwd typ was matched in query but not in cwd.CwdFiles: %s",
 						et.Sku.Kennung,
 					)
 				}
+
+				tco.External.Sku.FDs = te.FDs
+				tco.External.Sku.Kennung = te.Kennung
 
 				if s.ReadEtikett(&tco.External); err != nil {
 					if errors.IsNotExist(err) {

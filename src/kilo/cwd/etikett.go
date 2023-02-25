@@ -7,8 +7,9 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
-	"github.com/friedenberg/zit/src/hotel/etikett"
 )
+
+type Etikett = sku.ExternalMaybe[kennung.Etikett, *kennung.Etikett]
 
 func (c *CwdFiles) tryEtikett(fi os.FileInfo) (err error) {
 	var h kennung.Etikett
@@ -21,20 +22,9 @@ func (c *CwdFiles) tryEtikett(fi os.FileInfo) (err error) {
 		return
 	}
 
-	var t *etikett.External
+	t, _ := c.Etiketten.Get(h.String())
 
-	ok := false
-
-	if t, ok = c.Etiketten[h]; !ok {
-		t = &etikett.External{
-			Sku: sku.External[kennung.Etikett, *kennung.Etikett]{
-				Kennung: h,
-			},
-		}
-	}
-
-	t.Sku.FDs.Objekte = fd
-	c.Etiketten[h] = t
-
-	return
+	t.Kennung = h
+	t.FDs.Objekte = fd
+	return c.Etiketten.Add(t)
 }

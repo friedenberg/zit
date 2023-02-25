@@ -42,54 +42,61 @@ func (op ReadCheckedOut) RunMany(
 	possible cwd.CwdFiles,
 	w schnittstellen.FuncIter[*zettel.CheckedOut],
 ) (err error) {
-	for _, p := range possible.Zettelen {
-		var checked_out zettel.CheckedOut
+	if err = possible.Zettelen.Each(
+		func(p cwd.Zettel) (err error) {
+			var checked_out zettel.CheckedOut
 
-		var readFunc func() (zettel.CheckedOut, error)
+			var readFunc func() (zettel.CheckedOut, error)
 
-		switch {
-		case p.GetAkteFD().Path == "":
-			readFunc = func() (zettel.CheckedOut, error) {
-				return op.StoreWorkingDirectory().Read(p.GetObjekteFD().Path)
+			switch {
+			case p.GetAkteFD().Path == "":
+				readFunc = func() (zettel.CheckedOut, error) {
+					return op.StoreWorkingDirectory().Read(p.GetObjekteFD().Path)
+				}
+
+			case p.GetObjekteFD().Path == "":
+				readFunc = func() (zettel.CheckedOut, error) {
+					return op.StoreWorkingDirectory().ReadExternalZettelFromAktePath(
+						p.GetAkteFD().Path,
+					)
+				}
+
+			default:
+				// TODO-P3 validate that the zettel file points to the akte in the metadatei
+				readFunc = func() (zettel.CheckedOut, error) {
+					return op.StoreWorkingDirectory().Read(p.GetObjekteFD().Path)
+				}
 			}
 
-		case p.GetObjekteFD().Path == "":
-			readFunc = func() (zettel.CheckedOut, error) {
-				return op.StoreWorkingDirectory().ReadExternalZettelFromAktePath(
-					p.GetAkteFD().Path,
-				)
+			defer func() {
+				if e := recover(); e != nil {
+					errors.Err().Printf("Path: %s", p)
+					panic(e)
+				}
+			}()
+
+			if checked_out, err = readFunc(); err != nil {
+				// TODO-P3 decide if error handling like this is ok
+				if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
+					errors.Err().Printf("external zettel does not exist: %s", p)
+				} else {
+					errors.Err().Print(err)
+				}
+
+				err = nil
+				return
 			}
 
-		default:
-			// TODO-P3 validate that the zettel file points to the akte in the metadatei
-			readFunc = func() (zettel.CheckedOut, error) {
-				return op.StoreWorkingDirectory().Read(p.GetObjekteFD().Path)
-			}
-		}
-
-		defer func() {
-			if e := recover(); e != nil {
-				errors.Err().Printf("Path: %s", p)
-				panic(e)
-			}
-		}()
-
-		if checked_out, err = readFunc(); err != nil {
-			// TODO-P3 decide if error handling like this is ok
-			if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
-				errors.Err().Printf("external zettel does not exist: %s", p)
-			} else {
-				errors.Err().Print(err)
+			if err = w(&checked_out); err != nil {
+				err = errors.Wrap(err)
+				return
 			}
 
-			err = nil
-			continue
-		}
-
-		if err = w(&checked_out); err != nil {
-			err = errors.Wrap(err)
 			return
-		}
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return
