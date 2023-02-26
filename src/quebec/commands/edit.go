@@ -56,7 +56,7 @@ func (c Edit) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
 		return
 	}
 
-	return c.editZettels(u, ids)
+	return c.editZettels(u, ms, ids)
 }
 
 func (c Edit) runWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
@@ -134,7 +134,12 @@ func (c Edit) runWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
 	return
 }
 
-func (c Edit) editZettels(u *umwelt.Umwelt, ids kennung.Set) (err error) {
+// TODO improve this
+func (c Edit) editZettels(
+	u *umwelt.Umwelt,
+	ms kennung.MetaSet,
+	ids kennung.Set,
+) (err error) {
 	checkoutOptions := store_fs.CheckoutOptions{
 		CheckoutMode: c.CheckoutMode,
 	}
@@ -212,7 +217,7 @@ func (c Edit) editZettels(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 		Delete: c.Delete,
 	}
 
-	if err = checkinOp.Run(u, possible); err != nil {
+	if err = checkinOp.Run(u, ms, possible); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

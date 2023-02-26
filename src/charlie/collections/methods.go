@@ -19,6 +19,19 @@ func MakeFuncSetString[
 	}
 }
 
+// func ContainsKey(
+// 	id schnittstellen.Stringer,
+// 	cs ...schnittstellen.ContainsKeyer,
+// ) (ok bool) {
+// 	for _, c := range cs {
+// 		if c.ContainsKey(id.String()) {
+// 			return true
+// 		}
+// 	}
+
+// 	return false
+// }
+
 func Len(cs ...schnittstellen.Lenner) (n int) {
 	for _, c := range cs {
 		n += c.Len()

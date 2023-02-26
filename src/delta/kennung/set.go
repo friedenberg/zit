@@ -165,6 +165,37 @@ func (s Set) String() string {
 	return sb.String()
 }
 
+func (s Set) Contains(id schnittstellen.Stringer) bool {
+	switch idt := id.(type) {
+	case sha.Sha:
+		return s.Shas.Contains(idt)
+
+	case Etikett:
+		return s.Etiketten.Contains(idt)
+
+	case Typ:
+		return s.Typen.Contains(idt)
+
+	case *Hinweis:
+		return s.Hinweisen.Contains(*idt)
+
+	case Hinweis:
+		return s.Hinweisen.Contains(idt)
+
+	case ts.Time:
+		return s.Timestamps.Contains(idt)
+
+	case Kasten:
+		return s.Kisten.Contains(idt)
+
+	case Konfig:
+		return true
+
+	default:
+		return false
+	}
+}
+
 func (s Set) OnlySingleHinweis() (h Hinweis, ok bool) {
 	h = s.Hinweisen.Any()
 	ok = s.Len() == 1 && s.Hinweisen.Len() == 1 && !s.Sigil.IncludesHistory()

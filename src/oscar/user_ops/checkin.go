@@ -2,6 +2,7 @@ package user_ops
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/hotel/typ"
@@ -16,6 +17,7 @@ type Checkin struct {
 
 func (c Checkin) Run(
 	u *umwelt.Umwelt,
+	ms kennung.MetaSet,
 	pz cwd.CwdFiles,
 ) (err error) {
 	fds := kennung.MakeMutableFDSet()
@@ -25,45 +27,48 @@ func (c Checkin) Run(
 
 	if err = u.StoreWorkingDirectory().ReadFiles(
 		pz,
-		func(co objekte.CheckedOutLike) (err error) {
-			// var tl objekte.TransactedLike
+		iter.MakeChain(
+			objekte.MakeFilterFromMetaSet(ms),
+			func(co objekte.CheckedOutLike) (err error) {
+				// var tl objekte.TransactedLike
 
-			switch aco := co.(type) {
-			case zettel.CheckedOut:
-				if _, err = u.StoreObjekten().Zettel().UpdateCheckedOut(
-					aco,
-				); err != nil {
-					err = errors.Wrap(err)
+				switch aco := co.(type) {
+				case zettel.CheckedOut:
+					if _, err = u.StoreObjekten().Zettel().UpdateCheckedOut(
+						aco,
+					); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+
+				case *zettel.CheckedOut:
+					if _, err = u.StoreObjekten().Zettel().UpdateCheckedOut(
+						*aco,
+					); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+
+				case *typ.CheckedOut:
+					if _, err = u.StoreObjekten().Typ().CreateOrUpdateCheckedOut(
+						aco,
+					); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+
+				default:
+					err = errors.Implement()
 					return
 				}
 
-			case *zettel.CheckedOut:
-				if _, err = u.StoreObjekten().Zettel().UpdateCheckedOut(
-					*aco,
-				); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
+				e := co.GetExternal()
+				fds.Add(e.GetObjekteFD())
+				fds.Add(e.GetAkteFD())
 
-			case *typ.CheckedOut:
-				if _, err = u.StoreObjekten().Typ().CreateOrUpdateCheckedOut(
-					aco,
-				); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-			default:
-				err = errors.Implement()
 				return
-			}
-
-			e := co.GetExternal()
-			fds.Add(e.GetObjekteFD())
-			fds.Add(e.GetAkteFD())
-
-			return
-		},
+			},
+		),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

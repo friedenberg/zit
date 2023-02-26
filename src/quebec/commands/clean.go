@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/kilo/cwd"
@@ -26,6 +27,7 @@ func init() {
 
 func (c Clean) RunWithCwdQuery(
 	s *umwelt.Umwelt,
+	ms kennung.MetaSet,
 	possible cwd.CwdFiles,
 ) (err error) {
 	fds := kennung.MakeMutableFDSet()
@@ -36,18 +38,21 @@ func (c Clean) RunWithCwdQuery(
 
 	if err = s.StoreWorkingDirectory().ReadFiles(
 		possible,
-		func(co objekte.CheckedOutLike) (err error) {
-			if co.GetState() != objekte.CheckedOutStateExistsAndSame {
+		iter.MakeChain(
+			objekte.MakeFilterFromMetaSet(ms),
+			func(co objekte.CheckedOutLike) (err error) {
+				if co.GetState() != objekte.CheckedOutStateExistsAndSame {
+					return
+				}
+
+				e := co.GetExternal()
+
+				fds.Add(e.GetObjekteFD())
+				fds.Add(e.GetAkteFD())
+
 				return
-			}
-
-			e := co.GetExternal()
-
-			fds.Add(e.GetObjekteFD())
-			fds.Add(e.GetAkteFD())
-
-			return
-		},
+			},
+		),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

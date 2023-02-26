@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/november/umwelt"
 	"github.com/friedenberg/zit/src/oscar/user_ops"
@@ -30,13 +31,14 @@ func init() {
 
 func (c Checkin) RunWithCwdQuery(
 	u *umwelt.Umwelt,
+	ms kennung.MetaSet,
 	pz cwd.CwdFiles,
 ) (err error) {
 	op := user_ops.Checkin{
 		Delete: c.Delete,
 	}
 
-	if err = op.Run(u, pz); err != nil {
+	if err = op.Run(u, ms, pz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

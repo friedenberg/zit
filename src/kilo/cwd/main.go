@@ -18,11 +18,13 @@ import (
 )
 
 type CwdFiles struct {
-	erworben         konfig.Compiled
-	dir              string
-	Zettelen         schnittstellen.MutableSet[Zettel]
-	Typen            schnittstellen.MutableSet[Typ]
-	Etiketten        schnittstellen.MutableSet[Etikett]
+	erworben konfig.Compiled
+	dir      string
+	// TODO make private
+	Zettelen  schnittstellen.MutableSet[Zettel]
+	Typen     schnittstellen.MutableSet[Typ]
+	Etiketten schnittstellen.MutableSet[Etikett]
+	// TODO make set
 	UnsureAkten      []kennung.FD
 	EmptyDirectories []kennung.FD
 }
@@ -156,32 +158,6 @@ func MakeCwdFilesExactly(
 	fs = makeCwdFiles(k, dir)
 	err = fs.readInputFiles(files...)
 	return
-}
-
-func MakeCwdFilesMetaSet(
-	k konfig.Compiled,
-	dir string,
-	ms kennung.MetaSet,
-) (fs CwdFiles, err error) {
-	isZettel, ok := ms.Get(gattung.Zettel)
-
-	switch {
-	case ok && isZettel.Sigil.IncludesCwd() && isZettel.Len() == 0:
-		return MakeCwdFilesAll(k, dir)
-
-	default:
-		fds := ms.GetFDs()
-		files := make([]string, 0, fds.Len())
-
-		fds.Each(
-			func(fd kennung.FD) (err error) {
-				files = append(files, fd.String())
-				return
-			},
-		)
-
-		return MakeCwdFilesExactly(k, dir, files...)
-	}
 }
 
 func (fs *CwdFiles) readInputFiles(args ...string) (err error) {

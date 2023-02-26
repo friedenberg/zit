@@ -515,7 +515,6 @@ func (s *Store) ReadFiles(
 				}
 
 				tco.Internal = *et
-				errors.Err().Caller(0, "%s", tco)
 
 				tco.DetermineState()
 

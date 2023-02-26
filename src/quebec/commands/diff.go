@@ -19,9 +19,9 @@ import (
 type Diff struct{}
 
 func init() {
-	registerCommandWithQuery(
+	registerCommandWithCwdQuery(
 		"diff",
-		func(f *flag.FlagSet) CommandWithQuery {
+		func(f *flag.FlagSet) CommandWithCwdQuery {
 			c := &Diff{}
 
 			return c
@@ -29,18 +29,11 @@ func init() {
 	)
 }
 
-func (c Diff) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
-	var cwdFiles cwd.CwdFiles
-
-	if cwdFiles, err = cwd.MakeCwdFilesMetaSet(
-		u.Konfig(),
-		u.Standort().Cwd(),
-		ms,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
+func (c Diff) RunWithCwdQuery(
+	u *umwelt.Umwelt,
+	ms kennung.MetaSet,
+	cwdFiles cwd.CwdFiles,
+) (err error) {
 	e := zettel_external.MakeFileEncoderJustOpen(
 		u.StoreObjekten(),
 		u.Konfig(),
@@ -48,69 +41,72 @@ func (c Diff) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
 
 	if err = u.StoreWorkingDirectory().ReadFiles(
 		cwdFiles,
-		func(co objekte.CheckedOutLike) (err error) {
-			var zco *zettel.CheckedOut
-			ok := false
+		iter.MakeChain(
+			objekte.MakeFilterFromMetaSet(ms),
+			func(co objekte.CheckedOutLike) (err error) {
+				var zco *zettel.CheckedOut
+				ok := false
 
-			if zco, ok = co.(*zettel.CheckedOut); !ok {
-				return
-			}
+				if zco, ok = co.(*zettel.CheckedOut); !ok {
+					return
+				}
 
-			var pFifo string
+				var pFifo string
 
-			if pFifo, err = u.Standort().FifoPipe(); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+				if pFifo, err = u.Standort().FifoPipe(); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
 
-			wg := iter.MakeErrorWaitGroup()
+				wg := iter.MakeErrorWaitGroup()
 
-			wg.DoAfter(
-				func() (err error) {
-					return os.Remove(pFifo)
-				},
-			)
+				wg.DoAfter(
+					func() (err error) {
+						return os.Remove(pFifo)
+					},
+				)
 
-			wg.Do(
-				func() error {
-					return e.EncodeObjekte(
-						&zco.Internal.Objekte,
-						pFifo,
-						"",
-					)
-				},
-			)
+				wg.Do(
+					func() error {
+						return e.EncodeObjekte(
+							&zco.Internal.Objekte,
+							pFifo,
+							"",
+						)
+					},
+				)
 
-			cmd := exec.Command(
-				"diff",
-				"--color=always",
-				"-u",
-				"--label", fmt.Sprintf("%s@zettel", zco.Internal.Sku.Kennung),
-				pFifo,
-				co.GetExternal().GetObjekteFD().Path,
-			)
+				cmd := exec.Command(
+					"diff",
+					"--color=always",
+					"-u",
+					"--label", fmt.Sprintf("%s@zettel", zco.Internal.Sku.Kennung),
+					pFifo,
+					co.GetExternal().GetObjekteFD().Path,
+				)
 
-			cmd.Stdout = u.Out()
-			cmd.Stderr = u.Err()
+				cmd.Stdout = u.Out()
+				cmd.Stderr = u.Err()
 
-			wg.Do(
-				func() (err error) {
-					if err = cmd.Run(); err != nil {
-						if cmd.ProcessState.ExitCode() == 1 {
-							err = nil
-						} else {
-							err = errors.Wrap(err)
+				wg.Do(
+					func() (err error) {
+						if err = cmd.Run(); err != nil {
+							if cmd.ProcessState.ExitCode() == 1 {
+								err = nil
+							} else {
+								err = errors.Wrap(err)
+							}
+
+							return
 						}
 
 						return
-					}
+					},
+				)
 
-					return
-				},
-			)
-
-			return wg.GetError()
-		},
+				return wg.GetError()
+			},
+		),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

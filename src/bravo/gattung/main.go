@@ -108,6 +108,10 @@ func (g Gattung) String() string {
 	}
 }
 
+func hasPrefixOrEquals(v, p string) bool {
+	return strings.HasPrefix(v, p) || v == p
+}
+
 func (g *Gattung) Set(v string) (err error) {
 	v = strings.TrimSpace(strings.ToLower(v))
 
@@ -115,16 +119,16 @@ func (g *Gattung) Set(v string) (err error) {
 	case v == "akte":
 		*g = Akte
 
-	case strings.HasPrefix("typ", v):
+	case hasPrefixOrEquals("typ", v):
 		*g = Typ
 
 	case v == "aktetyp":
 		*g = Typ
 
-	case strings.HasPrefix("etikett", v):
+	case hasPrefixOrEquals("etikett", v):
 		*g = Etikett
 
-	case strings.HasPrefix("zettel", v):
+	case hasPrefixOrEquals("zettel", v):
 		*g = Zettel
 
 	case v == "bezeichnung":
@@ -142,10 +146,10 @@ func (g *Gattung) Set(v string) (err error) {
 	case v == "kennung":
 		*g = Kennung
 
-	case strings.HasPrefix("bestandsaufnahme", v):
+	case hasPrefixOrEquals("bestandsaufnahme", v):
 		*g = Bestandsaufnahme
 
-	case strings.HasPrefix("kasten", v):
+	case hasPrefixOrEquals("kasten", v):
 		*g = Kasten
 
 	default:

@@ -15,14 +15,18 @@ type Lenner interface {
 	Len() int
 }
 
+type ContainsKeyer interface {
+	ContainsKey(string) bool
+}
+
 type Set[T any] interface {
 	Lenner
+	ContainsKeyer
 
 	Equatable[Set[T]]
 	Key(T) string
 	Get(string) (T, bool)
 	Any() T
-	ContainsKey(string) bool
 	Contains(T) bool
 	Each(FuncIter[T]) error
 	EachPtr(FuncIter[*T]) error

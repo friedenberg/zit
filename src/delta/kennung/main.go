@@ -13,6 +13,11 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
+type IdLike interface {
+	schnittstellen.GattungGetter
+	schnittstellen.Stringer
+}
+
 type KennungLike[T any] interface {
 	schnittstellen.GattungGetter
 	schnittstellen.Value[T]

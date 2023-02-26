@@ -99,7 +99,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	if c.Edit {
-		if err = c.editZettels(u, zsc); err != nil {
+		if err = c.editZettels(u, u.MakeMetaIdSet(), zsc); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -161,6 +161,7 @@ func (c New) writeNewZettels(
 
 func (c New) editZettels(
 	u *umwelt.Umwelt,
+	ms kennung.MetaSet,
 	zsc zettel.MutableSetCheckedOut,
 ) (err error) {
 	if !c.Edit {
@@ -213,7 +214,7 @@ func (c New) editZettels(
 
 	checkinOp := user_ops.Checkin{}
 
-	if err = checkinOp.Run(u, cwdFiles); err != nil {
+	if err = checkinOp.Run(u, ms, cwdFiles); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

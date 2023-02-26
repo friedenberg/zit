@@ -13,6 +13,7 @@ import (
 )
 
 type FD struct {
+	// TODO make all of these private and expose as methods
 	IsDir   bool
 	Path    string
 	ModTime ts.Time
@@ -73,13 +74,12 @@ func (fd *FD) Set(v string) (err error) {
 		return
 	}
 
-	if fi.IsDir() {
-		err = errors.Errorf("%s is a directory", v)
+	*fd = FileInfo(fi)
+
+	if fd.Path, err = filepath.Abs(v); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
-
-	*fd = FileInfo(fi)
-	fd.Path = filepath.Clean(v)
 
 	return
 	// errors.TodoP0("move this and cache")

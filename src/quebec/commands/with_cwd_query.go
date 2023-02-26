@@ -14,7 +14,11 @@ import (
 )
 
 type CommandWithCwdQuery interface {
-	RunWithCwdQuery(store *umwelt.Umwelt, cwdFiles cwd.CwdFiles) error
+	RunWithCwdQuery(
+		store *umwelt.Umwelt,
+		ms kennung.MetaSet,
+		cwdFiles cwd.CwdFiles,
+	) error
 }
 
 type commandWithCwdQuery struct {
@@ -104,16 +108,15 @@ func (c commandWithCwdQuery) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	var cwdFiles cwd.CwdFiles
 
-	if cwdFiles, err = cwd.MakeCwdFilesMetaSet(
+	if cwdFiles, err = cwd.MakeCwdFilesAll(
 		u.Konfig(),
 		u.Standort().Cwd(),
-		ids,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = c.RunWithCwdQuery(u, cwdFiles); err != nil {
+	if err = c.RunWithCwdQuery(u, ids, cwdFiles); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

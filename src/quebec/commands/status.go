@@ -4,6 +4,8 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/kilo/cwd"
@@ -27,20 +29,24 @@ func init() {
 
 func (c Status) RunWithCwdQuery(
 	u *umwelt.Umwelt,
+	ms kennung.MetaSet,
 	possible cwd.CwdFiles,
 ) (err error) {
 	pcol := u.PrinterCheckedOutLike()
 
 	if err = u.StoreWorkingDirectory().ReadFiles(
 		possible,
-		func(co objekte.CheckedOutLike) (err error) {
-			if err = pcol(co); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+		iter.MakeChain(
+			objekte.MakeFilterFromMetaSet(ms),
+			func(co objekte.CheckedOutLike) (err error) {
+				if err = pcol(co); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
 
-			return
-		},
+				return
+			},
+		),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
