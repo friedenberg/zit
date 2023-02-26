@@ -53,14 +53,18 @@ func (s *metaSet) SetMany(vs ...string) (err error) {
 }
 
 func (ms *metaSet) Set(v string) (err error) {
-	if err = collections.AddString[FD, *FD](
-		ms.FDs,
-		v,
-	); err == nil {
-		return
-	}
+  v = strings.TrimSpace(v)
 
-	err = nil
+	if v != "." {
+		if err = collections.AddString[FD, *FD](
+			ms.FDs,
+			v,
+		); err == nil {
+			return
+		}
+
+		err = nil
+	}
 
 	sbs := [3]*strings.Builder{
 		{},
