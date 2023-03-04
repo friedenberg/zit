@@ -25,19 +25,29 @@ type MetaSet interface {
 }
 
 type metaSet struct {
-	expanders      Expanders
-	DefaultGattung gattung.Gattung
-	FDs            MutableFDSet
-	Gattung        map[gattung.Gattung]Set
+	expanders        Expanders
+	FDs              MutableFDSet
+	DefaultGattungen gattungen.Set
+	Gattung          map[gattung.Gattung]Set
 }
 
-func MakeMetaSet(ex Expanders, dg gattung.Gattung) MetaSet {
+func MakeMetaSet(ex Expanders, dg gattungen.Set) MetaSet {
 	errors.TodoP2("support allowed sigils")
 	return &metaSet{
-		expanders:      ex,
-		DefaultGattung: dg,
-		FDs:            MakeMutableFDSet(),
-		Gattung:        make(map[gattung.Gattung]Set),
+		expanders:        ex,
+		DefaultGattungen: dg.MutableClone(),
+		FDs:              MakeMutableFDSet(),
+		Gattung:          make(map[gattung.Gattung]Set),
+	}
+}
+
+func MakeMetaSetAll(ex Expanders) MetaSet {
+	errors.TodoP2("support allowed sigils")
+	return &metaSet{
+		expanders:        ex,
+		DefaultGattungen: gattungen.MakeSet(gattung.All()...),
+		FDs:              MakeMutableFDSet(),
+		Gattung:          make(map[gattung.Gattung]Set),
 	}
 }
 
@@ -53,7 +63,7 @@ func (s *metaSet) SetMany(vs ...string) (err error) {
 }
 
 func (ms *metaSet) Set(v string) (err error) {
-  v = strings.TrimSpace(v)
+	v = strings.TrimSpace(v)
 
 	if v != "." {
 		if err = collections.AddString[FD, *FD](
@@ -110,7 +120,7 @@ func (ms *metaSet) Set(v string) (err error) {
 			return
 		}
 	} else {
-		gs = gattungen.MakeSet(ms.DefaultGattung)
+		gs = ms.DefaultGattungen.ImmutableClone()
 	}
 
 	if err = gs.Each(

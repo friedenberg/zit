@@ -3,6 +3,7 @@ package commands
 import (
 	"flag"
 
+	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
@@ -61,7 +62,10 @@ func registerCommandSansUmwelt(n string, makeFunc func(*flag.FlagSet) Command) {
 	return
 }
 
-func registerCommandWithCwdQuery(n string, makeFunc func(*flag.FlagSet) CommandWithCwdQuery) {
+func registerCommandWithCwdQuery(
+	n string,
+	makeFunc func(*flag.FlagSet) CommandWithCwdQuery,
+) {
 	f := flag.NewFlagSet(n, flag.ExitOnError)
 
 	c := makeFunc(f)
@@ -78,6 +82,30 @@ func registerCommandWithCwdQuery(n string, makeFunc func(*flag.FlagSet) CommandW
 	return
 }
 
+func registerCommandWithCwdQueryDefaultGattungen(
+	n string,
+	defaultGattungen gattungen.Set,
+	makeFunc func(*flag.FlagSet) CommandWithCwdQuery,
+) {
+	f := flag.NewFlagSet(n, flag.ExitOnError)
+
+	c := makeFunc(f)
+
+	if _, ok := commands[n]; ok {
+		panic("command added more than once: " + n)
+	}
+
+	commands[n] = command{
+		Command: commandWithCwdQuery{
+			CommandWithCwdQuery: c,
+			defaultGattungen:    defaultGattungen,
+		},
+		FlagSet: f,
+	}
+
+	return
+}
+
 func registerCommandWithQuery(n string, makeFunc func(*flag.FlagSet) CommandWithQuery) {
 	f := flag.NewFlagSet(n, flag.ExitOnError)
 
@@ -88,7 +116,9 @@ func registerCommandWithQuery(n string, makeFunc func(*flag.FlagSet) CommandWith
 	}
 
 	commands[n] = command{
-		Command: commandWithQuery{CommandWithQuery: c},
+		Command: commandWithQuery{
+			CommandWithQuery: c,
+		},
 		FlagSet: f,
 	}
 

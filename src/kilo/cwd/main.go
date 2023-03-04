@@ -12,6 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/india/konfig"
@@ -30,7 +31,7 @@ type CwdFiles struct {
 }
 
 func (fs CwdFiles) GetMetaSet() (ms kennung.MetaSet, err error) {
-	ms = kennung.MakeMetaSet(kennung.Expanders{}, gattung.Zettel)
+	ms = kennung.MakeMetaSet(kennung.Expanders{}, gattungen.MakeSet(gattung.Zettel))
 
 	if err = fs.Zettelen.Each(
 		func(z Zettel) (err error) {

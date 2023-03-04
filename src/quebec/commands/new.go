@@ -99,7 +99,11 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	if c.Edit {
-		if err = c.editZettels(u, u.MakeMetaIdSet(), zsc); err != nil {
+		if err = c.editZettels(
+			u,
+			u.MakeMetaIdSet(nil),
+			zsc,
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

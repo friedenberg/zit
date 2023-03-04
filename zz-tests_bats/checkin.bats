@@ -7,8 +7,8 @@ setup() {
 	export output
 
 	version="v$(zit store-version)"
-	cp -r "$DIR/migration/$version" "$BATS_TEST_TMPDIR"
-	cd "$BATS_TEST_TMPDIR/$version" || exit 1
+	copy_from_version "$DIR" "$version"
+
 	run_zit checkout @z,t,e
 
 	cat >one/uno.zettel <<-EOM
@@ -35,7 +35,7 @@ setup() {
 }
 
 teardown() {
-	chflags -R nouchg "$BATS_TEST_TMPDIR/$version"
+	rm_from_version "$version"
 }
 
 function checkin_simple_one_zettel { # @test

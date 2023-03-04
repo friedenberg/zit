@@ -7,6 +7,7 @@ import (
 
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/test_logz"
+	"github.com/friedenberg/zit/src/delta/gattungen"
 )
 
 func TestMetaSetGob(t1 *testing.T) {
@@ -19,7 +20,9 @@ func TestMetaSetGob(t1 *testing.T) {
 	{
 		sut := MakeMetaSet(
 			Expanders{},
-			gattung.Zettel,
+			gattungen.MakeSet(
+				gattung.Zettel,
+			),
 		)
 
 		if err := sut.Set("one/uno@zettel"); err != nil {

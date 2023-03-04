@@ -48,7 +48,7 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	ids := u.MakeMetaIdSet()
+	ids := u.MakeMetaIdSet(c.CompletionGattung())
 
 	if err = ids.SetMany(args...); err != nil {
 		err = errors.Wrap(err)

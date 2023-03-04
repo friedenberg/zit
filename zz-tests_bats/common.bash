@@ -11,8 +11,8 @@ DIR="$(cd "$(dirname "$BATS_TEST_FILENAME")" >/dev/null 2>&1 && pwd)"
 PATH="$DIR/../build:$PATH"
 
 {
-  pushd "$BATS_CWD" >/dev/null 2>&1
-  make build/zit
+	pushd "$BATS_CWD" >/dev/null 2>&1
+	make build/zit >/dev/null 2>&1
 }
 
 cat_yin() (
@@ -40,6 +40,18 @@ cmd_zit_def=(
 	-print-typen=false
 	-print-time=false
 )
+
+function copy_from_version {
+	DIR="$1"
+	version="${2:-v$(zit store-version)}"
+	cp -r "$DIR/migration/$version" "$BATS_TEST_TMPDIR"
+	cd "$BATS_TEST_TMPDIR/$version" || exit 1
+}
+
+function rm_from_version {
+	version="${2:-v$(zit store-version)}"
+	chflags -R nouchg "$BATS_TEST_TMPDIR/$version"
+}
 
 function run_zit {
 	cmd="$1"

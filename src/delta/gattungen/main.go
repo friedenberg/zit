@@ -9,6 +9,10 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
+func init() {
+	collections.RegisterGob[gattung.Gattung]()
+}
+
 type (
 	Set        = schnittstellen.Set[gattung.Gattung]
 	MutableSet = schnittstellen.MutableSet[gattung.Gattung]

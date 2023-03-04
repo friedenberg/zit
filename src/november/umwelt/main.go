@@ -14,6 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/file_lock"
 	"github.com/friedenberg/zit/src/charlie/standort"
+	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/hotel/erworben"
@@ -263,7 +264,11 @@ func (u Umwelt) Flush() error {
 	return u.age.Close()
 }
 
-func (u *Umwelt) MakeMetaIdSet() kennung.MetaSet {
+func (u *Umwelt) MakeMetaIdSet(dg gattungen.Set) kennung.MetaSet {
+	if dg == nil {
+		dg = gattungen.MakeSet(gattung.Zettel)
+	}
+
 	return kennung.MakeMetaSet(
 		kennung.Expanders{
 			Sha: func(v string) (out string, err error) {
@@ -285,7 +290,7 @@ func (u *Umwelt) MakeMetaIdSet() kennung.MetaSet {
 				return
 			},
 		},
-		gattung.Zettel,
+		dg,
 	)
 }
 

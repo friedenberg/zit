@@ -94,7 +94,8 @@ func (c commandWithQuery) Complete(u *umwelt.Umwelt, args ...string) (err error)
 }
 
 func (c commandWithQuery) Run(u *umwelt.Umwelt, args ...string) (err error) {
-	ids := u.MakeMetaIdSet()
+	errors.TodoP2("support gattungen")
+	ids := u.MakeMetaIdSet(nil)
 
 	if err = ids.SetMany(args...); err != nil {
 		err = errors.Wrap(err)
