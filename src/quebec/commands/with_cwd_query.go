@@ -6,7 +6,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/juliett/zettel"
@@ -23,7 +22,6 @@ type CommandWithCwdQuery interface {
 }
 
 type commandWithCwdQuery struct {
-	defaultGattungen gattungen.Set
 	CommandWithCwdQuery
 }
 
@@ -101,7 +99,7 @@ func (c commandWithCwdQuery) Complete(u *umwelt.Umwelt, args ...string) (err err
 }
 
 func (c commandWithCwdQuery) Run(u *umwelt.Umwelt, args ...string) (err error) {
-	ids := u.MakeMetaIdSet(c.defaultGattungen)
+	ids := u.MakeMetaIdSetDefault()
 
 	if err = ids.SetMany(args...); err != nil {
 		err = errors.Wrap(err)

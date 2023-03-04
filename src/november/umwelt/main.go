@@ -264,57 +264,48 @@ func (u Umwelt) Flush() error {
 	return u.age.Close()
 }
 
+func (u *Umwelt) MakeKennungExpanders() kennung.Expanders {
+	return kennung.Expanders{
+		Sha: func(v string) (out string, err error) {
+			var s sha.Sha
+			s, err = u.StoreObjekten().GetAbbrStore().ExpandShaString(v)
+			out = s.String()
+			return
+		},
+		Etikett: func(v string) (out string, err error) {
+			var e kennung.Etikett
+			e, err = u.StoreObjekten().GetAbbrStore().ExpandEtikettString(v)
+			out = e.String()
+			return
+		},
+		Hinweis: func(v string) (out string, err error) {
+			var h kennung.Hinweis
+			h, err = u.StoreObjekten().GetAbbrStore().ExpandHinweisString(v)
+			out = h.String()
+			return
+		},
+	}
+}
+
 func (u *Umwelt) MakeMetaIdSet(dg gattungen.Set) kennung.MetaSet {
 	if dg == nil {
 		dg = gattungen.MakeSet(gattung.Zettel)
 	}
 
 	return kennung.MakeMetaSet(
-		kennung.Expanders{
-			Sha: func(v string) (out string, err error) {
-				var s sha.Sha
-				s, err = u.StoreObjekten().GetAbbrStore().ExpandShaString(v)
-				out = s.String()
-				return
-			},
-			Etikett: func(v string) (out string, err error) {
-				var e kennung.Etikett
-				e, err = u.StoreObjekten().GetAbbrStore().ExpandEtikettString(v)
-				out = e.String()
-				return
-			},
-			Hinweis: func(v string) (out string, err error) {
-				var h kennung.Hinweis
-				h, err = u.StoreObjekten().GetAbbrStore().ExpandHinweisString(v)
-				out = h.String()
-				return
-			},
-		},
+		u.MakeKennungExpanders(),
 		dg,
+	)
+}
+
+func (u *Umwelt) MakeMetaIdSetDefault() kennung.MetaSet {
+	return kennung.MakeMetaSetAll(
+		u.MakeKennungExpanders(),
 	)
 }
 
 func (u *Umwelt) MakeIdSet() kennung.Set {
 	return kennung.MakeSet(
-		kennung.Expanders{
-			Sha: func(v string) (out string, err error) {
-				var s sha.Sha
-				s, err = u.StoreObjekten().GetAbbrStore().ExpandShaString(v)
-				out = s.String()
-				return
-			},
-			Etikett: func(v string) (out string, err error) {
-				var e kennung.Etikett
-				e, err = u.StoreObjekten().GetAbbrStore().ExpandEtikettString(v)
-				out = e.String()
-				return
-			},
-			Hinweis: func(v string) (out string, err error) {
-				var h kennung.Hinweis
-				h, err = u.StoreObjekten().GetAbbrStore().ExpandHinweisString(v)
-				out = h.String()
-				return
-			},
-		},
+		u.MakeKennungExpanders(),
 	)
 }

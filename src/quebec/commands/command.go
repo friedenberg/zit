@@ -3,7 +3,6 @@ package commands
 import (
 	"flag"
 
-	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
@@ -76,30 +75,6 @@ func registerCommandWithCwdQuery(
 
 	commands[n] = command{
 		Command: commandWithCwdQuery{CommandWithCwdQuery: c},
-		FlagSet: f,
-	}
-
-	return
-}
-
-func registerCommandWithCwdQueryDefaultGattungen(
-	n string,
-	defaultGattungen gattungen.Set,
-	makeFunc func(*flag.FlagSet) CommandWithCwdQuery,
-) {
-	f := flag.NewFlagSet(n, flag.ExitOnError)
-
-	c := makeFunc(f)
-
-	if _, ok := commands[n]; ok {
-		panic("command added more than once: " + n)
-	}
-
-	commands[n] = command{
-		Command: commandWithCwdQuery{
-			CommandWithCwdQuery: c,
-			defaultGattungen:    defaultGattungen,
-		},
 		FlagSet: f,
 	}
 
