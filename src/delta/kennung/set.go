@@ -15,11 +15,10 @@ import (
 type Expanders struct {
 	Sha, Etikett, Hinweis, Typ, Kasten func(string) (string, error)
 }
-
 type Set struct {
 	expanders  Expanders
 	Shas       sha_collections.MutableSet
-	Etiketten  EtikettMutableSet
+	Etiketten  MutableQuerySet[Etikett, *Etikett]
 	Hinweisen  HinweisMutableSet
 	Typen      TypMutableSet
 	Timestamps ts.MutableSet
@@ -34,7 +33,7 @@ func MakeSet(
 	return Set{
 		expanders:  ex,
 		Shas:       sha_collections.MakeMutableSet(),
-		Etiketten:  MakeEtikettMutableSet(),
+		Etiketten:  MakeMutableQuerySet[Etikett, *Etikett](ex.Etikett, nil, nil),
 		Hinweisen:  MakeHinweisMutableSet(),
 		Typen:      MakeTypMutableSet(),
 		Kisten:     MakeKastenMutableSet(),
@@ -78,11 +77,7 @@ func (s *Set) Set(v string) (err error) {
 		return
 	}
 
-	if err = collections.ExpandAndAddString[Etikett, *Etikett](
-		s.Etiketten,
-		s.expanders.Etikett,
-		v,
-	); err == nil {
+	if err = s.Etiketten.AddString(v); err == nil {
 		return
 	}
 
@@ -115,7 +110,7 @@ func (s *Set) Add(ids ...schnittstellen.Element) (err error) {
 	for _, i := range ids {
 		switch it := i.(type) {
 		case Etikett:
-			s.Etiketten.Add(it)
+			s.Etiketten.AddInclude(it)
 
 		case sha.Sha:
 			s.Shas.Add(it)
@@ -152,7 +147,8 @@ func (s Set) String() string {
 	sb := &strings.Builder{}
 
 	s.Shas.Each(iter.AddString[sha.Sha](sb))
-	s.Etiketten.Each(iter.AddString[Etikett](sb))
+	errors.TodoP0("include exclude")
+	s.Etiketten.GetIncludes().Each(iter.AddString[Etikett](sb))
 	s.Hinweisen.Each(iter.AddString[Hinweis](sb))
 	s.Typen.Each(iter.AddString[Typ](sb))
 	s.Timestamps.Each(iter.AddString[ts.Time](sb))
@@ -210,7 +206,14 @@ func (s Set) Len() int {
 		k = 1
 	}
 
-	return s.Kisten.Len() + s.Shas.Len() + s.Etiketten.Len() + s.Hinweisen.Len() + s.Typen.Len() + s.Timestamps.Len() + k
+	return collections.Len(
+		s.Kisten,
+		s.Shas,
+		s.Etiketten,
+		s.Hinweisen,
+		s.Typen,
+		s.Timestamps,
+	) + k
 }
 
 func (s Set) AnyShasOrHinweisen() (ids []schnittstellen.Korper) {

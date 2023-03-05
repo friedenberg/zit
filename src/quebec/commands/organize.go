@@ -66,7 +66,7 @@ func (c *Organize) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 		Options: c.Flags.GetOptions(),
 	}
 
-	createOrganizeFileOp.RootEtiketten = ids.Etiketten.ImmutableClone()
+	createOrganizeFileOp.RootEtiketten = ids.Etiketten.GetIncludes()
 
 	typen := ids.Typen.ImmutableClone()
 

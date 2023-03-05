@@ -25,7 +25,7 @@ func (f Filter) Include(e Element) (err error) {
 	ok := false
 
 	// TODO-P3 pull into static
-	needsEt := f.Set.Etiketten.Len() > 0
+	needsEt := f.Set.Etiketten.GetIncludes().Len() > 0
 	okEt := false
 
 	expanded := Expanded(e.AkteEtiketten(), ExpanderRight)
@@ -33,7 +33,7 @@ func (f Filter) Include(e Element) (err error) {
 	// TODO-P3 pull into static
 	var etSetSansPrefix schnittstellen.Set[Etikett]
 	if etSetSansPrefix, err = collections.Map[Etikett, Etikett](
-		f.Set.Etiketten,
+		f.Set.Etiketten.GetIncludes(),
 		func(e Etikett) (f Etikett, err error) {
 			if e.String() == "" {
 				err = collections.MakeErrStopIteration()

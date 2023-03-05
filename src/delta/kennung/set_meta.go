@@ -15,6 +15,7 @@ func init() {
 	gob.Register(&metaSet{})
 }
 
+//TODO rename to QueryGattungGroup
 type MetaSet interface {
 	Add(schnittstellen.IdLike, Sigil) error
 	Get(g gattung.Gattung) (s Set, ok bool)

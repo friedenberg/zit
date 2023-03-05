@@ -326,7 +326,7 @@ func (c Show) showEtiketten(
 	f1 := collections.MakeSyncSerializer(f)
 
 	etiketten := ids.Etiketten.MutableClone()
-	if err = etiketten.EachPtr(
+	if err = etiketten.GetIncludes().EachPtr(
 		iter.MakeChain(
 			func(t *kennung.Etikett) (err error) {
 				ty := u.Konfig().GetEtikett(*t)

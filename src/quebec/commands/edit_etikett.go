@@ -45,7 +45,7 @@ func (c EditEtikett) CompletionGattung() gattungen.Set {
 }
 
 func (c EditEtikett) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
-	tks := ids.Etiketten.ImmutableClone()
+	tks := ids.Etiketten.GetIncludes()
 
 	switch {
 	case tks.Len() == 0 && !c.All:
