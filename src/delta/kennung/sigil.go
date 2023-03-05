@@ -103,7 +103,6 @@ func (a Sigil) IncludesHidden() bool {
 
 func (a Sigil) String() string {
 	sb := strings.Builder{}
-	errors.TodoP0("use sigil map")
 
 	sb.WriteString(":")
 
