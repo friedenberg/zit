@@ -21,7 +21,7 @@ func MakeWriterKonfig(
 
 	return func(z *Transacted) (err error) {
 		for _, p := range z.Verzeichnisse.Etiketten.Sorted {
-			for _, t := range k.EtikettenHidden {
+			for _, t := range k.EtikettenHiddenStringsSlice {
 				if strings.HasPrefix(p, t) {
 					err = collections.MakeErrStopIteration()
 					return

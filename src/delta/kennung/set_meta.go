@@ -140,7 +140,13 @@ func (ms *metaSet) Set(v string) (err error) {
 			ok := false
 
 			if ids, ok = ms.Gattung[g]; !ok {
-				ids = MakeSet(ms.expanders, ms.Etiketten)
+				def := ms.Etiketten
+
+				if sigil.IncludesHistory() {
+					def = nil
+				}
+
+				ids = MakeSet(ms.expanders, def)
 				ids.Sigil = sigil
 			}
 
@@ -172,7 +178,13 @@ func (ms *metaSet) Add(
 	ok := false
 
 	if ids, ok = ms.Gattung[g]; !ok {
-		ids = MakeSet(ms.expanders, ms.Etiketten)
+		def := ms.Etiketten
+
+		if sigil.IncludesHistory() {
+			def = nil
+		}
+
+		ids = MakeSet(ms.expanders, def)
 		ids.Sigil = sigil
 	}
 

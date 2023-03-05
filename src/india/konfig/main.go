@@ -50,9 +50,10 @@ type compiled struct {
 	erworben.Akte
 
 	// Etiketten
-	EtikettenHidden     []string
-	EtikettenToAddToNew []string
-	Etiketten           etikettSet
+	EtikettenHidden             schnittstellen.Set[kennung.Etikett]
+	EtikettenHiddenStringsSlice []string
+	EtikettenToAddToNew         []string
+	Etiketten                   etikettSet
 
 	// Typen
 	ExtensionsToTypen map[string]string
@@ -80,7 +81,12 @@ func Make(
 	}
 
 	if err = c.loadKonfigErworben(s); err != nil {
-		err = errors.Wrap(err)
+		if errors.IsNotExist(err) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+		}
+
 		return
 	}
 
@@ -164,14 +170,21 @@ func (kc *Compiled) SetCliFromCommander(k erworben.Cli) {
 func (kc *compiled) recompile() (err error) {
 	kc.hasChanges = true
 
+	etikettenHidden := collections.MakeMutableSetStringer[kennung.Etikett]()
+
 	if err = kc.Etiketten.Each(
 		func(ct *etikett.Transacted) (err error) {
-			tn := ct.Sku.Kennung.String()
+			k := ct.Sku.Kennung
+			tn := k.String()
 			tv := ct.Objekte.Akte
 
 			switch {
 			case tv.Hide:
-				kc.EtikettenHidden = append(kc.EtikettenHidden, tn)
+				etikettenHidden.Add(k)
+				kc.EtikettenHiddenStringsSlice = append(
+					kc.EtikettenHiddenStringsSlice,
+					tn,
+				)
 
 			case tv.AddToNewZettels:
 				kc.EtikettenToAddToNew = append(kc.EtikettenToAddToNew, tn)
@@ -186,8 +199,8 @@ func (kc *compiled) recompile() (err error) {
 		return
 	}
 
-	sort.Slice(kc.EtikettenHidden, func(i, j int) bool {
-		return kc.EtikettenHidden[i] < kc.EtikettenHidden[j]
+	sort.Slice(kc.EtikettenHiddenStringsSlice, func(i, j int) bool {
+		return kc.EtikettenHiddenStringsSlice[i] < kc.EtikettenHiddenStringsSlice[j]
 	})
 
 	sort.Slice(kc.EtikettenToAddToNew, func(i, j int) bool {
@@ -215,6 +228,8 @@ func (kc *compiled) recompile() (err error) {
 		err = errors.Wrap(err)
 		return
 	}
+
+	kc.EtikettenHidden = etikettenHidden.ImmutableClone()
 
 	return
 }

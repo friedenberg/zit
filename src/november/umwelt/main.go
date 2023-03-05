@@ -264,6 +264,14 @@ func (u Umwelt) Flush() error {
 	return u.age.Close()
 }
 
+func (u *Umwelt) MakeKennungQueryHidden() kennung.QuerySet[kennung.Etikett, *kennung.Etikett] {
+	return kennung.MakeQuerySet[kennung.Etikett, *kennung.Etikett](
+		u.MakeKennungExpanders().Etikett,
+		nil,
+		u.Konfig().EtikettenHidden,
+	)
+}
+
 func (u *Umwelt) MakeKennungExpanders() kennung.Expanders {
 	return kennung.Expanders{
 		Sha: func(v string) (out string, err error) {
@@ -302,7 +310,7 @@ func (u *Umwelt) MakeMetaIdSet(dg gattungen.Set) kennung.MetaSet {
 func (u *Umwelt) MakeMetaIdSetDefault() kennung.MetaSet {
 	return kennung.MakeMetaSetAll(
 		u.MakeKennungExpanders(),
-		nil,
+		u.MakeKennungQueryHidden(),
 	)
 }
 
