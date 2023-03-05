@@ -11,6 +11,7 @@ type TransactedLike interface {
 	GetSku2() sku.Sku2
 	GetSku() sku.Sku
 	GetSkuLike() sku.SkuLike
+	kennung.MatchableGetter
 	sku.DataIdentityGetter
 }
 

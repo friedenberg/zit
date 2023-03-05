@@ -8,16 +8,27 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
+const QueryNegationOperator rune = '^'
+
 func init() {
 	registerQuerySetGob[Etikett, *Etikett]()
 }
 
-func registerQuerySetGob[T KennungLike[T], TPtr KennungLikePtr[T]]() {
+func registerQuerySetGob[T QueryKennung[T], TPtr QueryKennungPtr[T]]() {
 	gob.Register(querySet[T, TPtr]{})
 	gob.Register(mutableQuerySet[T, TPtr]{})
 }
 
-type QuerySet[T KennungLike[T], TPtr KennungLikePtr[T]] interface {
+type QueryKennung[T any] interface {
+	KennungLike[T]
+	QueryPrefixer
+}
+
+type QueryKennungPtr[T QueryKennung[T]] interface {
+	KennungLikePtr[T]
+}
+
+type QuerySet[T QueryKennung[T], TPtr QueryKennungPtr[T]] interface {
 	schnittstellen.Lenner
 	schnittstellen.Stringer
 	Contains(T) bool
@@ -27,7 +38,7 @@ type QuerySet[T KennungLike[T], TPtr KennungLikePtr[T]] interface {
 	schnittstellen.MutableCloner[MutableQuerySet[T, TPtr]]
 }
 
-type MutableQuerySet[T KennungLike[T], TPtr KennungLikePtr[T]] interface {
+type MutableQuerySet[T QueryKennung[T], TPtr QueryKennungPtr[T]] interface {
 	QuerySet[T, TPtr]
 	AddString(string) error
 	AddInclude(T) error
@@ -35,7 +46,7 @@ type MutableQuerySet[T KennungLike[T], TPtr KennungLikePtr[T]] interface {
 	// schnittstellen.Adder[T]
 }
 
-func MakeMutableQuerySet[T KennungLike[T], TPtr KennungLikePtr[T]](
+func MakeMutableQuerySet[T QueryKennung[T], TPtr QueryKennungPtr[T]](
 	ex func(string) (string, error),
 	inc schnittstellen.Set[T],
 	exc schnittstellen.Set[T],
@@ -55,7 +66,7 @@ func MakeMutableQuerySet[T KennungLike[T], TPtr KennungLikePtr[T]](
 	}
 }
 
-func MakeQuerySet[T KennungLike[T], TPtr KennungLikePtr[T]](
+func MakeQuerySet[T QueryKennung[T], TPtr QueryKennungPtr[T]](
 	ex func(string) (string, error),
 	inc schnittstellen.Set[T],
 	exc schnittstellen.Set[T],
@@ -75,13 +86,13 @@ func MakeQuerySet[T KennungLike[T], TPtr KennungLikePtr[T]](
 	}
 }
 
-type querySet[T KennungLike[T], TPtr KennungLikePtr[T]] struct {
+type querySet[T QueryKennung[T], TPtr QueryKennungPtr[T]] struct {
 	Expander func(string) (string, error)
 	Include  schnittstellen.Set[T]
 	Exclude  schnittstellen.Set[T]
 }
 
-type mutableQuerySet[T KennungLike[T], TPtr KennungLikePtr[T]] struct {
+type mutableQuerySet[T QueryKennung[T], TPtr QueryKennungPtr[T]] struct {
 	Expander func(string) (string, error)
 	Include  schnittstellen.MutableSet[T]
 	Exclude  schnittstellen.MutableSet[T]
@@ -125,11 +136,19 @@ func (kqs mutableQuerySet[T, TPtr]) Len() int {
 //
 
 func (kqs querySet[T, TPtr]) Contains(e T) bool {
-	return kqs.Include.Contains(e) && !kqs.Exclude.Contains(e)
+	if kqs.Include.Len() == 0 {
+		return !kqs.Exclude.Contains(e)
+	} else {
+		return kqs.Include.Contains(e) && !kqs.Exclude.Contains(e)
+	}
 }
 
 func (kqs mutableQuerySet[T, TPtr]) Contains(e T) bool {
-	return kqs.Include.Contains(e) && !kqs.Exclude.Contains(e)
+	if kqs.Include.Len() == 0 {
+		return !kqs.Exclude.Contains(e)
+	} else {
+		return kqs.Include.Contains(e) && !kqs.Exclude.Contains(e)
+	}
 }
 
 func (kqs querySet[T, TPtr]) GetIncludes() schnittstellen.Set[T] {
@@ -184,9 +203,16 @@ func (kqs mutableQuerySet[T, TPtr]) AddString(v string) (err error) {
 	col := kqs.Include
 	v = strings.TrimSpace(v)
 
-	if len(v) > 0 && v[0] == '!' {
+	if len(v) > 0 && []rune(v)[0] == QueryNegationOperator {
 		v = v[1:]
 		col = kqs.Exclude
+	}
+
+	var e T
+	p := e.GetQueryPrefix()
+
+	if len(v) > 0 && []rune(v)[0] == p {
+		v = v[1:]
 	}
 
 	err = collections.ExpandAndAddString[T, TPtr](

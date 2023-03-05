@@ -19,6 +19,14 @@ type Objekte struct {
 	Etiketten   kennung.EtikettSet
 }
 
+func (z Objekte) GetTyp() *kennung.Typ {
+	return &z.Typ
+}
+
+func (z Objekte) GetEtiketten() *schnittstellen.Set[kennung.Etikett] {
+	return &z.Etiketten
+}
+
 func (z Objekte) GetGattung() schnittstellen.Gattung {
 	return gattung.Zettel
 }

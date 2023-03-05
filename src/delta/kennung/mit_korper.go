@@ -19,6 +19,10 @@ type MitKorperLike[T any] interface {
 
 type MitKorper[T MitKorperLike[T], T1 KennungLikePtr[T]] Kennung[T, T1]
 
+func (e MitKorper[T, T1]) GetQueryPrefix() (r rune) {
+	return
+}
+
 func (mk MitKorper[T, T1]) AlignedParts(kopf, schwanz int) (string, string) {
 	parts := mk.Parts()
 

@@ -15,6 +15,7 @@ import (
 type Expanders struct {
 	Sha, Etikett, Hinweis, Typ, Kasten func(string) (string, error)
 }
+
 type Set struct {
 	expanders  Expanders
 	Shas       sha_collections.MutableSet
@@ -159,6 +160,40 @@ func (s Set) String() string {
 	}
 
 	return sb.String()
+}
+
+func (s Set) ContainsMatchable(m Matchable) bool {
+	if es := m.GetEtiketten(); es != nil && !iter.Any(
+		*es,
+		s.Etiketten.Contains,
+	) {
+		return false
+	}
+
+	if t := m.GetTyp(); t != nil && s.Typen.Len() > 0 && !s.Typen.Contains(*t) {
+		return false
+	}
+
+	il := m.GetIdLike()
+
+	switch id := il.(type) {
+	case Typ:
+		if s.Typen.Len() > 0 && !s.Typen.Contains(id) {
+			return false
+		}
+
+	case Etikett:
+		if s.Etiketten.Len() > 0 && !s.Etiketten.Contains(id) {
+			return false
+		}
+
+	case Hinweis:
+		if s.Hinweisen.Len() > 0 && !s.Hinweisen.Contains(id) {
+			return false
+		}
+	}
+
+	return true
 }
 
 func (s Set) Contains(id schnittstellen.Stringer) bool {

@@ -34,6 +34,29 @@ type External[
 	Sku     sku.External[T2, T3]
 }
 
+func (a External[T, T1, T2, T3]) GetMatchable() (ol kennung.Matchable) {
+	ok := false
+	o := any(a.Objekte)
+
+	var eg kennung.EtikettenGetter
+
+	if eg, ok = o.(kennung.EtikettenGetter); !ok {
+		eg = nil
+	}
+
+	var tg kennung.TypGetter
+
+	if tg, ok = o.(kennung.TypGetter); !ok {
+		tg = nil
+	}
+
+	return kennung.MakeMatchable(eg, tg, a)
+}
+
+func (a External[T, T1, T2, T3]) GetIdLike() kennung.IdLike {
+	return a.Sku.Kennung
+}
+
 func (a External[T, T1, T2, T3]) String() string {
 	return a.Sku.String()
 }

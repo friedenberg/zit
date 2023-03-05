@@ -10,6 +10,10 @@ import (
 	"github.com/friedenberg/zit/src/bravo/values"
 )
 
+func init() {
+	register(Etikett{})
+}
+
 const EtikettRegexString = `^[-a-z0-9_/]+$`
 
 var EtikettRegex *regexp.Regexp
@@ -40,6 +44,10 @@ func MakeEtikett(v string) (e Etikett, err error) {
 }
 
 type etikett string
+
+func (e etikett) GetQueryPrefix() rune {
+	return '-'
+}
 
 func (e etikett) GetGattung() schnittstellen.Gattung {
 	return gattung.Etikett

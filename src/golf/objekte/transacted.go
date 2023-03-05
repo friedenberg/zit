@@ -5,6 +5,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/values"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 )
 
@@ -110,6 +111,29 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) Equals(
 func (a Transacted[T, T1, T2, T3, T4, T5]) GetObjekte() (o T) {
 	o = a.Objekte
 	return
+}
+
+func (a Transacted[T, T1, T2, T3, T4, T5]) GetMatchable() (ol kennung.Matchable) {
+	ok := false
+	o := any(a.Objekte)
+
+	var eg kennung.EtikettenGetter
+
+	if eg, ok = o.(kennung.EtikettenGetter); !ok {
+		eg = nil
+	}
+
+	var tg kennung.TypGetter
+
+	if tg, ok = o.(kennung.TypGetter); !ok {
+		tg = nil
+	}
+
+	return kennung.MakeMatchable(eg, tg, a)
+}
+
+func (a Transacted[T, T1, T2, T3, T4, T5]) GetIdLike() (il kennung.IdLike) {
+	return a.Sku.Kennung
 }
 
 func (a Transacted[T, T1, T2, T3, T4, T5]) GetSkuLike() (sk sku.SkuLike) {

@@ -13,6 +13,10 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
+type QueryPrefixer interface {
+	GetQueryPrefix() rune
+}
+
 type IdLike interface {
 	schnittstellen.GattungGetter
 	schnittstellen.Stringer
@@ -40,6 +44,14 @@ func makeKennung[T KennungLike[T], T1 KennungLikePtr[T]](
 
 	if err = k.Set(v); err != nil {
 		err = errors.Wrap(err)
+	}
+
+	return
+}
+
+func (e Kennung[T, T1]) GetQueryPrefix() (r rune) {
+	if qp, ok := any(e.value).(QueryPrefixer); ok {
+		r = qp.GetQueryPrefix()
 	}
 
 	return

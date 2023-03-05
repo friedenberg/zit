@@ -14,6 +14,7 @@ setup() {
 	cat >one/uno.zettel <<-EOM
 		---
 		# wildly different
+		- etikett-one
 		! md
 		---
 
@@ -23,6 +24,7 @@ setup() {
 	cat >one/dos.zettel <<-EOM
 		---
 		# dos wildly different
+		- etikett-two
 		! md
 		---
 
@@ -40,14 +42,19 @@ teardown() {
 
 function checkin_simple_one_zettel { # @test
 	run_zit checkin one/uno.zettel
-	assert_output '[one/uno@6e82467623a2aef20ec4c2207300d6c2adbc2711ad57a92d38f90946135a661d !md "wildly different"]'
+	assert_output '[one/uno@689c6787364899defa77461ff6a3f454ca667654653f86d5d44f2826950ff4f9 !md "wildly different"]'
+}
+
+function checkin_complex_zettel_etikett_negation { # @test
+	run_zit checkin ^-etikett-two.z
+	assert_output '[one/uno@689c6787364899defa77461ff6a3f454ca667654653f86d5d44f2826950ff4f9 !md "wildly different"]'
 }
 
 function checkin_simple_all { # @test
-	run_zit checkin .z,t,e
+	run_zit checkin .
 	assert_output --partial '[!md@0966bffa92f9391ec0874fe0bd5ed77b9ceddc45e36a866c71a3ccbb31711a71]'
-	assert_output --partial '[one/uno@6e82467623a2aef20ec4c2207300d6c2adbc2711ad57a92d38f90946135a661d !md "wildly different"]'
-	assert_output --partial '[one/dos@f69dde187bd082e8366587d2a55d2c7d44a892250acc9748d1aa62b87f0304e2 !md "dos wildly different"]'
+	assert_output --partial '[one/uno@689c6787364899defa77461ff6a3f454ca667654653f86d5d44f2826950ff4f9 !md "wildly different"]'
+	assert_output --partial '[one/dos@30edfed4c016580f5b69a2709b8e5ae01c2b504b8826bf2d04e6c1ecd6bb3268 !md "dos wildly different"]'
 }
 
 function checkin_simple_typ { # @test
