@@ -31,7 +31,11 @@ type CwdFiles struct {
 }
 
 func (fs CwdFiles) GetMetaSet() (ms kennung.MetaSet, err error) {
-	ms = kennung.MakeMetaSet(kennung.Expanders{}, gattungen.MakeSet(gattung.Zettel))
+	ms = kennung.MakeMetaSet(
+		kennung.Expanders{},
+		nil,
+		gattungen.MakeSet(gattung.Zettel),
+	)
 
 	if err = fs.Zettelen.Each(
 		func(z Zettel) (err error) {

@@ -13,7 +13,7 @@ type ReaderLine struct {
 
 func (rl *ReaderLine) ReadFrom(r1 io.Reader) (n int64, err error) {
 	errors.TodoP4("add expanders")
-	rl.Set = MakeSet(Expanders{})
+	rl.Set = MakeSet(Expanders{}, nil)
 	r := bufio.NewReader(r1)
 
 	for {

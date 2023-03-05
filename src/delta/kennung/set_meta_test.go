@@ -20,6 +20,7 @@ func TestMetaSetGob(t1 *testing.T) {
 	{
 		sut := MakeMetaSet(
 			Expanders{},
+			nil,
 			gattungen.MakeSet(
 				gattung.Zettel,
 			),

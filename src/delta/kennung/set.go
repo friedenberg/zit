@@ -12,10 +12,6 @@ import (
 	"github.com/friedenberg/zit/src/echo/ts"
 )
 
-type Expanders struct {
-	Sha, Etikett, Hinweis, Typ, Kasten func(string) (string, error)
-}
-
 type Set struct {
 	expanders  Expanders
 	Shas       sha_collections.MutableSet
@@ -30,11 +26,16 @@ type Set struct {
 
 func MakeSet(
 	ex Expanders,
+	etiketten QuerySet[Etikett, *Etikett],
 ) Set {
+	if etiketten == nil {
+		etiketten = MakeQuerySet[Etikett, *Etikett](ex.Etikett, nil, nil)
+	}
+
 	return Set{
 		expanders:  ex,
 		Shas:       sha_collections.MakeMutableSet(),
-		Etiketten:  MakeMutableQuerySet[Etikett, *Etikett](ex.Etikett, nil, nil),
+		Etiketten:  etiketten.MutableClone(),
 		Hinweisen:  MakeHinweisMutableSet(),
 		Typen:      MakeTypMutableSet(),
 		Kisten:     MakeKastenMutableSet(),

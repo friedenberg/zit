@@ -15,7 +15,7 @@ func init() {
 	gob.Register(&metaSet{})
 }
 
-//TODO rename to QueryGattungGroup
+// TODO rename to QueryGattungGroup
 type MetaSet interface {
 	Add(schnittstellen.IdLike, Sigil) error
 	Get(g gattung.Gattung) (s Set, ok bool)
@@ -27,25 +27,35 @@ type MetaSet interface {
 
 type metaSet struct {
 	expanders        Expanders
+	Etiketten        QuerySet[Etikett, *Etikett]
 	FDs              MutableFDSet
 	DefaultGattungen gattungen.Set
 	Gattung          map[gattung.Gattung]Set
 }
 
-func MakeMetaSet(ex Expanders, dg gattungen.Set) MetaSet {
+func MakeMetaSet(
+	ex Expanders,
+	etikett QuerySet[Etikett, *Etikett],
+	dg gattungen.Set,
+) MetaSet {
 	errors.TodoP2("support allowed sigils")
 	return &metaSet{
 		expanders:        ex,
+		Etiketten:        etikett,
 		DefaultGattungen: dg.MutableClone(),
 		FDs:              MakeMutableFDSet(),
 		Gattung:          make(map[gattung.Gattung]Set),
 	}
 }
 
-func MakeMetaSetAll(ex Expanders) MetaSet {
+func MakeMetaSetAll(
+	ex Expanders,
+	etikett QuerySet[Etikett, *Etikett],
+) MetaSet {
 	errors.TodoP2("support allowed sigils")
 	return &metaSet{
 		expanders:        ex,
+		Etiketten:        etikett,
 		DefaultGattungen: gattungen.MakeSet(gattung.All()...),
 		FDs:              MakeMutableFDSet(),
 		Gattung:          make(map[gattung.Gattung]Set),
@@ -130,7 +140,7 @@ func (ms *metaSet) Set(v string) (err error) {
 			ok := false
 
 			if ids, ok = ms.Gattung[g]; !ok {
-				ids = MakeSet(ms.expanders)
+				ids = MakeSet(ms.expanders, ms.Etiketten)
 				ids.Sigil = sigil
 			}
 
@@ -162,7 +172,7 @@ func (ms *metaSet) Add(
 	ok := false
 
 	if ids, ok = ms.Gattung[g]; !ok {
-		ids = MakeSet(ms.expanders)
+		ids = MakeSet(ms.expanders, ms.Etiketten)
 		ids.Sigil = sigil
 	}
 
