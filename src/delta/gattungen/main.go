@@ -51,3 +51,18 @@ func GattungFromString(v string) (s Set, err error) {
 
 	return
 }
+
+func GattungOrUnknownFromString(v string) (s Set) {
+	parts := strings.Split(v, ",")
+	partsGattung := make([]gattung.Gattung, len(parts))
+
+	for i, v := range parts {
+    if err := partsGattung[i].Set(v); err != nil {
+      partsGattung[i] = gattung.Unknown
+		}
+	}
+
+	s = MakeSet(partsGattung...)
+
+	return
+}

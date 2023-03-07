@@ -18,7 +18,7 @@ func MakeErrStopIteration() error {
 
 func IsStopIteration(err error) bool {
 	if errors.Is(err, errStopIteration) {
-		errors.Log().Printf("stopped iteration at %s", err)
+		// errors.Log().Printf("stopped iteration at %s", err)
 		return true
 	}
 

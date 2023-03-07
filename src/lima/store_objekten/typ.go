@@ -188,7 +188,7 @@ func (s *typStore) Query(
 		}
 	}
 
-	return objekte_store.MethodForSigil[
+	return objekte_store.QueryMethodForSigil[
 		*kennung.Typ,
 		*typ.Transacted,
 	](s, ids.Sigil)(

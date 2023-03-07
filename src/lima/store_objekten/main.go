@@ -318,6 +318,8 @@ func (s *Store) Query(
 				return
 			}
 
+			// errors.Err().Printf("query: %s -> %s", g, ids)
+
 			if err = r(ids, f); err != nil {
 				err = errors.Wrap(err)
 				return

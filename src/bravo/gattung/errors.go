@@ -30,17 +30,23 @@ func (e errUnsupportedGattung) Error() string {
 	return fmt.Sprintf("unsupported gattung: %q", e.Gattung)
 }
 
-type ErrUnrecognizedGattung struct {
-	string
+func MakeErrUnrecognizedGattung(v string) errUnrecognizedGattung {
+	return errUnrecognizedGattung(v)
 }
 
-func (e ErrUnrecognizedGattung) Is(target error) (ok bool) {
-	_, ok = target.(ErrUnrecognizedGattung)
+func IsErrUnrecognizedGattung(err error) bool {
+	return errors.Is(err, errUnrecognizedGattung(""))
+}
+
+type errUnrecognizedGattung string
+
+func (e errUnrecognizedGattung) Is(target error) (ok bool) {
+	_, ok = target.(errUnrecognizedGattung)
 	return
 }
 
-func (e ErrUnrecognizedGattung) Error() string {
-	return fmt.Sprintf("unknown gattung: %q", e.string)
+func (e errUnrecognizedGattung) Error() string {
+	return fmt.Sprintf("unknown gattung: %q", string(e))
 }
 
 type ErrWrongType struct {

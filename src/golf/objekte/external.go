@@ -34,26 +34,49 @@ type External[
 	Sku     sku.External[T2, T3]
 }
 
-func (a External[T, T1, T2, T3]) GetMatchable() (ol kennung.Matchable) {
+func (a External[T, T1, T2, T3]) GetEtiketten() kennung.EtikettSet {
+	egs := []any{
+		a.Objekte,
+	}
+
+	for _, o := range egs {
+		if eg, ok := o.(kennung.EtikettenGetter); ok {
+			return eg.GetEtiketten()
+		}
+	}
+
+	return kennung.MakeEtikettSet()
+}
+
+func (a External[T, T1, T2, T3]) GetEtikettenExpanded() kennung.EtikettSet {
+	egs := []any{
+		a.Objekte,
+	}
+
+	for _, o := range egs {
+		if eg, ok := o.(kennung.EtikettenExpandedGetter); ok {
+			return eg.GetEtikettenExpanded()
+		}
+	}
+
+	return kennung.Expanded(a.GetEtiketten())
+}
+
+func (a External[T, T1, T2, T3]) GetTyp() kennung.Typ {
 	ok := false
 	o := any(a.Objekte)
-
-	var eg kennung.EtikettenGetter
-
-	if eg, ok = o.(kennung.EtikettenGetter); !ok {
-		eg = nil
-	}
 
 	var tg kennung.TypGetter
 
 	if tg, ok = o.(kennung.TypGetter); !ok {
 		tg = nil
+		return kennung.MustTyp(a.GetGattung().GetGattungString())
 	}
 
-	return kennung.MakeMatchable(eg, tg, a)
+	return tg.GetTyp()
 }
 
-func (a External[T, T1, T2, T3]) GetIdLike() kennung.IdLike {
+func (a External[T, T1, T2, T3]) GetIdLike() (il kennung.IdLike) {
 	return a.Sku.Kennung
 }
 
@@ -89,11 +112,11 @@ func (e External[T, T1, T2, T3]) GetAkteFD() kennung.FD {
 	return e.Sku.FDs.Akte
 }
 
-func (e External[T, T1, T2, T3]) GetObjekteSha() sha.Sha {
+func (e External[T, T1, T2, T3]) GetObjekteSha() schnittstellen.Sha {
 	return e.Sku.ObjekteSha
 }
 
-func (e External[T, T1, T2, T3]) GetAkteSha() sha.Sha {
+func (e External[T, T1, T2, T3]) GetAkteSha() schnittstellen.Sha {
 	return e.Sku.AkteSha
 }
 

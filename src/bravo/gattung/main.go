@@ -40,12 +40,20 @@ func All() (out []Gattung) {
 	return
 }
 
-func Must(g schnittstellen.Gattung) Gattung {
-	return g.(Gattung)
+func Must(g schnittstellen.GattungGetter) Gattung {
+	return g.GetGattung().(Gattung)
 }
 
 func Make(g schnittstellen.Gattung) Gattung {
-	return g.(Gattung)
+	return Must(g)
+}
+
+func MakeOrUnknown(v string) (g Gattung) {
+	if err := g.Set(v); err != nil {
+		g = Unknown
+	}
+
+	return
 }
 
 func (g Gattung) GetGattung() schnittstellen.Gattung {
@@ -153,7 +161,7 @@ func (g *Gattung) Set(v string) (err error) {
 		*g = Kasten
 
 	default:
-		err = errors.Wrap(ErrUnrecognizedGattung{string: v})
+		err = errors.Wrap(MakeErrUnrecognizedGattung(v))
 		return
 	}
 

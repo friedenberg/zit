@@ -18,7 +18,7 @@ func (c CreateOrganizeFile) RunAndWrite(
 	zettels zettel.MutableSet,
 	w io.WriteCloser,
 ) (results *organize_text.Text, err error) {
-	defer errors.Deferred(&err, w.Close)
+	defer errors.DeferredCloser(&err, w)
 
 	if results, err = c.Run(zettels); err != nil {
 		err = errors.Wrap(err)

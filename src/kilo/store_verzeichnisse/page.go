@@ -58,28 +58,21 @@ func makeZettelenPage(
 }
 
 func (zp *Page) doTryLock() (ok bool) {
-	errors.Log().Caller(1, "acquiring lock: %d", zp.pageId.index)
 	ok = zp.lock.TryLock()
 
 	if ok {
-		errors.Log().Caller(1, "acquired lock: %d", zp.pageId.index)
 	} else {
-		errors.Log().Caller(1, "failed to acquire lock: %d", zp.pageId.index)
 	}
 
 	return
 }
 
 func (zp *Page) doLock() {
-	errors.Log().Caller(1, "acquiring lock: %d", zp.pageId.index)
 	zp.lock.Lock()
-	errors.Log().Caller(1, "acquired lock: %d", zp.pageId.index)
 }
 
 func (zp *Page) doUnlock() {
-	errors.Log().Caller(1, "releasing lock: %d", zp.pageId.index)
 	zp.lock.Unlock()
-	errors.Log().Caller(1, "released lock: %d", zp.pageId.index)
 }
 
 func (zp *Page) Add(z *zettel.Transacted) (err error) {

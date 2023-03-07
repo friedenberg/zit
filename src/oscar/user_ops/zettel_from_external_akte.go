@@ -6,6 +6,7 @@ import (
 	"path"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
@@ -38,9 +39,17 @@ func (c ZettelFromExternalAkte) Run(
 	toCreate := zettel_external.MakeMutableSetUniqueAkte()
 	toDelete := zettel_external.MakeMutableSetUniqueFD()
 
-	fds := ms.GetFDs()
+	results = zettel.MakeMutableSetHinweis(0)
 
-	results = zettel.MakeMutableSetHinweis(fds.Len())
+	ok := false
+	var ids kennung.Set
+
+	// gattung.Unknown represents unknown akten
+	if ids, ok = ms.Get(gattung.Unknown); !ok {
+		return
+	}
+
+	fds := ids.FDs.ImmutableClone()
 
 	if err = fds.Each(
 		func(fd kennung.FD) (err error) {

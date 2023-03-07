@@ -2,9 +2,11 @@ package kennung
 
 import (
 	"encoding/gob"
+	"fmt"
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
@@ -32,6 +34,7 @@ type QuerySet[T QueryKennung[T], TPtr QueryKennungPtr[T]] interface {
 	schnittstellen.Lenner
 	schnittstellen.Stringer
 	Contains(T) bool
+	ContainsAgainst(schnittstellen.Set[T]) bool
 	GetIncludes() schnittstellen.Set[T]
 	GetExcludes() schnittstellen.Set[T]
 	schnittstellen.ImmutableCloner[QuerySet[T, TPtr]]
@@ -81,8 +84,8 @@ func MakeQuerySet[T QueryKennung[T], TPtr QueryKennungPtr[T]](
 
 	return querySet[T, TPtr]{
 		Expander: ex,
-		Include:  inc,
-		Exclude:  exc,
+		Include:  inc.ImmutableClone(),
+		Exclude:  exc.ImmutableClone(),
 	}
 }
 
@@ -106,11 +109,49 @@ type mutableQuerySet[T QueryKennung[T], TPtr QueryKennungPtr[T]] struct {
 //                          |___/
 
 func (kqs querySet[T, TPtr]) String() string {
-	return ""
+	sb := &strings.Builder{}
+
+	var e T
+	p := e.GetQueryPrefix()
+
+	kqs.Include.Each(
+		func(e T) (err error) {
+			sb.WriteString(fmt.Sprintf("%c%s ", p, e))
+			return
+		},
+	)
+
+	kqs.Exclude.Each(
+		func(e T) (err error) {
+			sb.WriteString(fmt.Sprintf("%c%c%s ", QueryNegationOperator, p, e))
+			return
+		},
+	)
+
+	return sb.String()
 }
 
 func (kqs mutableQuerySet[T, TPtr]) String() string {
-	return ""
+	sb := &strings.Builder{}
+
+	var e T
+	p := e.GetQueryPrefix()
+
+	kqs.Include.Each(
+		func(e T) (err error) {
+			sb.WriteString(fmt.Sprintf("%c%s ", p, e))
+			return
+		},
+	)
+
+	kqs.Exclude.Each(
+		func(e T) (err error) {
+			sb.WriteString(fmt.Sprintf("%c%c%s ", QueryNegationOperator, p, e))
+			return
+		},
+	)
+
+	return sb.String()
 }
 
 //   _
@@ -134,6 +175,40 @@ func (kqs mutableQuerySet[T, TPtr]) Len() int {
 //  | |__| (_) | | | | || (_| | | | | \__ \  __/ |
 //   \____\___/|_| |_|\__\__,_|_|_| |_|___/\___|_|
 //
+
+func (kqs querySet[T, TPtr]) ContainsAgainst(els schnittstellen.Set[T]) bool {
+	if els == nil {
+		return true
+	}
+
+	if els.Len() == 0 {
+		return true
+	}
+
+	if (kqs.Include.Len() == 0 || iter.Any(els, kqs.Include.Contains)) &&
+		(kqs.Exclude.Len() == 0 || !iter.Any(els, kqs.Exclude.Contains)) {
+		return true
+	}
+
+	return false
+}
+
+func (kqs mutableQuerySet[T, TPtr]) ContainsAgainst(els schnittstellen.Set[T]) bool {
+	if els == nil {
+		return true
+	}
+
+	if els.Len() == 0 {
+		return true
+	}
+
+	if (kqs.Include.Len() == 0 || iter.Any(els, kqs.Include.Contains)) &&
+		(kqs.Exclude.Len() == 0 || !iter.Any(els, kqs.Exclude.Contains)) {
+		return true
+	}
+
+	return false
+}
 
 func (kqs querySet[T, TPtr]) Contains(e T) bool {
 	if kqs.Include.Len() == 0 {

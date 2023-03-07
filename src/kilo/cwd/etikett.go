@@ -13,8 +13,13 @@ type Etikett = sku.ExternalMaybe[kennung.Etikett, *kennung.Etikett]
 
 func (c *CwdFiles) tryEtikett(fi os.FileInfo) (err error) {
 	var h kennung.Etikett
+	var fd kennung.FD
 
-	fd := kennung.FileInfo(fi)
+	if fd, err = kennung.FileInfo(fi); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	pathMinusExt := strings.ToLower(fd.FileNameSansExt())
 
 	if err = h.Set(pathMinusExt); err != nil {

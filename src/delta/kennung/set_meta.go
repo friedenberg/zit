@@ -2,6 +2,7 @@ package kennung
 
 import (
 	"encoding/gob"
+	"fmt"
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -19,47 +20,63 @@ func init() {
 type MetaSet interface {
 	Add(schnittstellen.IdLike, Sigil) error
 	Get(g gattung.Gattung) (s Set, ok bool)
-	GetFDs() (s FDSet)
+	AddFDs(FDSet) error
 	Set(string) error
 	SetMany(...string) error
 	All(f func(gattung.Gattung, Set) error) error
 }
 
 type metaSet struct {
-	expanders        Expanders
-	Etiketten        QuerySet[Etikett, *Etikett]
-	FDs              MutableFDSet
-	DefaultGattungen gattungen.Set
-	Gattung          map[gattung.Gattung]Set
+	cwd                 Matcher
+	fileExtensionGetter schnittstellen.FileExtensionGetter
+	expanders           Expanders
+	Etiketten           QuerySet[Etikett, *Etikett]
+	DefaultGattungen    gattungen.Set
+	Gattung             map[gattung.Gattung]Set
 }
 
 func MakeMetaSet(
+	cwd Matcher,
 	ex Expanders,
 	etikett QuerySet[Etikett, *Etikett],
+	feg schnittstellen.FileExtensionGetter,
 	dg gattungen.Set,
 ) MetaSet {
-	errors.TodoP2("support allowed sigils")
 	return &metaSet{
-		expanders:        ex,
-		Etiketten:        etikett,
-		DefaultGattungen: dg.MutableClone(),
-		FDs:              MakeMutableFDSet(),
-		Gattung:          make(map[gattung.Gattung]Set),
+		cwd:                 cwd,
+		fileExtensionGetter: feg,
+		expanders:           ex,
+		Etiketten:           etikett,
+		DefaultGattungen:    dg.MutableClone(),
+		Gattung:             make(map[gattung.Gattung]Set),
 	}
 }
 
 func MakeMetaSetAll(
+	cwd Matcher,
 	ex Expanders,
 	etikett QuerySet[Etikett, *Etikett],
+	feg schnittstellen.FileExtensionGetter,
 ) MetaSet {
 	errors.TodoP2("support allowed sigils")
 	return &metaSet{
-		expanders:        ex,
-		Etiketten:        etikett,
-		DefaultGattungen: gattungen.MakeSet(gattung.All()...),
-		FDs:              MakeMutableFDSet(),
-		Gattung:          make(map[gattung.Gattung]Set),
+		cwd:                 cwd,
+		fileExtensionGetter: feg,
+		expanders:           ex,
+		Etiketten:           etikett,
+		DefaultGattungen:    gattungen.MakeSet(gattung.All()...),
+		Gattung:             make(map[gattung.Gattung]Set),
 	}
+}
+
+func (s metaSet) String() string {
+	sb := &strings.Builder{}
+
+	for g, ids := range s.Gattung {
+		sb.WriteString(fmt.Sprintf("%s%s", ids, g))
+	}
+
+	return sb.String()
 }
 
 func (s *metaSet) SetMany(vs ...string) (err error) {
@@ -76,16 +93,17 @@ func (s *metaSet) SetMany(vs ...string) (err error) {
 func (ms *metaSet) Set(v string) (err error) {
 	v = strings.TrimSpace(v)
 
-	if v != "." {
-		if err = collections.AddString[FD, *FD](
-			ms.FDs,
-			v,
-		); err == nil {
-			return
-		}
+	// if v != "." {
+	// 	if err = collections.AddString[FD, *FD](
+	// 		ms.FDs,
+	// 		v,
+	// 	); err == nil {
+	// 		ms.Gattung = make(map[gattung.Gattung]Set)
+	// 		return
+	// 	}
 
-		err = nil
-	}
+	// 	err = nil
+	// }
 
 	sbs := [3]*strings.Builder{
 		{},
@@ -127,7 +145,30 @@ func (ms *metaSet) Set(v string) (err error) {
 
 	if after != "" {
 		if gs, err = gattungen.GattungFromString(after); err != nil {
-			err = errors.Wrap(err)
+			if gattung.IsErrUnrecognizedGattung(err) {
+				err = nil
+
+				var ids Set
+				ok := false
+
+				if ids, ok = ms.Gattung[gattung.Unknown]; !ok {
+					ids = MakeSet(ms.cwd, ms.expanders, ms.Etiketten)
+				}
+
+				if err = collections.AddString[FD, *FD](
+					ids.FDs,
+					v,
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				ms.Gattung[gattung.Unknown] = ids
+
+			} else {
+				err = errors.Wrap(err)
+			}
+
 			return
 		}
 	} else {
@@ -142,11 +183,11 @@ func (ms *metaSet) Set(v string) (err error) {
 			if ids, ok = ms.Gattung[g]; !ok {
 				def := ms.Etiketten
 
-				if sigil.IncludesHistory() {
+				if sigil.IncludesHidden() {
 					def = nil
 				}
 
-				ids = MakeSet(ms.expanders, def)
+				ids = MakeSet(ms.cwd, ms.expanders, def)
 				ids.Sigil = sigil
 			}
 
@@ -180,11 +221,11 @@ func (ms *metaSet) Add(
 	if ids, ok = ms.Gattung[g]; !ok {
 		def := ms.Etiketten
 
-		if sigil.IncludesHistory() {
+		if sigil.IncludesHidden() {
 			def = nil
 		}
 
-		ids = MakeSet(ms.expanders, def)
+		ids = MakeSet(ms.cwd, ms.expanders, def)
 		ids.Sigil = sigil
 	}
 
@@ -198,14 +239,35 @@ func (ms *metaSet) Add(
 	return
 }
 
-func (ms metaSet) GetFDs() (s FDSet) {
-	s = ms.FDs.ImmutableClone()
-	return
-}
-
 func (ms metaSet) Get(g gattung.Gattung) (s Set, ok bool) {
 	s, ok = ms.Gattung[g]
 	return
+}
+
+func (ms metaSet) addFDs(fd FD) (err error) {
+	ext := fd.ExtSansDot()
+
+	g := gattung.MakeOrUnknown(ext)
+
+	ok := false
+	var ids Set
+
+	if ids, ok = ms.Gattung[g]; !ok {
+		ids = MakeSet(ms.cwd, ms.expanders, ms.Etiketten)
+	}
+
+	if err = ids.Add(fd); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	ms.Gattung[g] = ids
+
+	return
+}
+
+func (ms metaSet) AddFDs(fds FDSet) (err error) {
+	return fds.Each(ms.addFDs)
 }
 
 // Runs in parallel

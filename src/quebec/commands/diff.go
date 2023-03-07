@@ -41,6 +41,7 @@ func (c Diff) RunWithCwdQuery(
 
 	if err = u.StoreWorkingDirectory().ReadFiles(
 		cwdFiles,
+		ms,
 		iter.MakeChain(
 			objekte.MakeFilterFromMetaSet(ms),
 			func(co objekte.CheckedOutLike) (err error) {

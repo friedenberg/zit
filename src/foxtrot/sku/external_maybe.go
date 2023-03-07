@@ -7,8 +7,7 @@ import (
 
 type ExternalMaybeLike interface {
 	GetId() IdLike
-	GetObjekteFD() kennung.FD
-	GetAkteFD() kennung.FD
+	kennung.FDPairGetter
 }
 
 type ExternalFDs struct {

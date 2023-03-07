@@ -13,6 +13,7 @@ import (
 )
 
 type Set struct {
+	cwd        Matcher
 	expanders  Expanders
 	Shas       sha_collections.MutableSet
 	Etiketten  MutableQuerySet[Etikett, *Etikett]
@@ -20,11 +21,13 @@ type Set struct {
 	Typen      TypMutableSet
 	Timestamps ts.MutableSet
 	Kisten     KastenMutableSet
+	FDs        MutableFDSet
 	HasKonfig  bool
 	Sigil      Sigil
 }
 
 func MakeSet(
+	cwd Matcher,
 	ex Expanders,
 	etiketten QuerySet[Etikett, *Etikett],
 ) Set {
@@ -33,6 +36,7 @@ func MakeSet(
 	}
 
 	return Set{
+		cwd:        cwd,
 		expanders:  ex,
 		Shas:       sha_collections.MakeMutableSet(),
 		Etiketten:  etiketten.MutableClone(),
@@ -40,6 +44,7 @@ func MakeSet(
 		Typen:      MakeTypMutableSet(),
 		Kisten:     MakeKastenMutableSet(),
 		Timestamps: ts.MakeMutableSet(),
+		FDs:        MakeMutableFDSet(),
 	}
 }
 
@@ -55,6 +60,13 @@ func (s *Set) SetMany(vs ...string) (err error) {
 }
 
 func (s *Set) Set(v string) (err error) {
+	if err = collections.AddString[FD, *FD](
+		s.FDs,
+		v,
+	); err == nil {
+		return
+	}
+
 	if err = collections.ExpandAndAddString[sha.Sha, *sha.Sha](
 		s.Shas,
 		s.expanders.Sha,
@@ -135,6 +147,9 @@ func (s *Set) Add(ids ...schnittstellen.Element) (err error) {
 		case Sigil:
 			s.Sigil.Add(it)
 
+		case FD:
+			s.FDs.Add(it)
+
 		default:
 			err = errors.Errorf("unknown kennung: %s", it)
 			return
@@ -149,29 +164,37 @@ func (s Set) String() string {
 	sb := &strings.Builder{}
 
 	s.Shas.Each(iter.AddString[sha.Sha](sb))
-	errors.TodoP0("include exclude")
-	s.Etiketten.GetIncludes().Each(iter.AddString[Etikett](sb))
+	sb.WriteString(s.Etiketten.String())
+	sb.WriteString(" ")
 	s.Hinweisen.Each(iter.AddString[Hinweis](sb))
 	s.Typen.Each(iter.AddString[Typ](sb))
 	s.Timestamps.Each(iter.AddString[ts.Time](sb))
 	s.Kisten.Each(iter.AddString[Kasten](sb))
+	s.FDs.Each(iter.AddString[FD](sb))
 
 	if s.HasKonfig {
 		sb.WriteString("konfig")
 	}
 
+	sb.WriteString(s.Sigil.String())
+
 	return sb.String()
 }
 
 func (s Set) ContainsMatchable(m Matchable) bool {
-	if es := m.GetEtiketten(); es != nil && !iter.Any(
-		*es,
-		s.Etiketten.Contains,
-	) {
+	if s.cwd != nil && !s.cwd.ContainsMatchable(m) {
 		return false
 	}
 
-	if t := m.GetTyp(); t != nil && s.Typen.Len() > 0 && !s.Typen.Contains(*t) {
+	if s.FDs.Len() > 0 && !FDSetContainsPair(s.FDs, m) {
+		return false
+	}
+
+	if es := m.GetEtikettenExpanded(); !s.Etiketten.ContainsAgainst(es) {
+		return false
+	}
+
+	if t := m.GetTyp(); s.Typen.Len() > 0 && !s.Typen.Contains(t) {
 		return false
 	}
 
@@ -219,6 +242,9 @@ func (s Set) Contains(id schnittstellen.Stringer) bool {
 
 	case Kasten:
 		return s.Kisten.Contains(idt)
+
+	case FD:
+		return s.FDs.Contains(idt)
 
 	case Konfig:
 		return true

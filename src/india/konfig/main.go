@@ -257,7 +257,7 @@ func (kc *Compiled) Flush(s standort.Standort) (err error) {
 		return
 	}
 
-	defer errors.Deferred(&err, f.Close)
+	defer errors.DeferredCloser(&err, f)
 
 	dec := gob.NewEncoder(f)
 

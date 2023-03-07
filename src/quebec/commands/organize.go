@@ -84,17 +84,9 @@ func (c *Organize) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 
 	getResults := zettel.MakeMutableSetUnique(0)
 
-	query := zettel.WriterIds{
-		Filter: kennung.Filter{
-			Set: ids,
-			Or:  c.Or,
-		},
-	}
-
 	if err = u.StoreObjekten().Zettel().ReadAllSchwanzen(
 		iter.MakeChain(
-			zettel.MakeWriterKonfig(u.Konfig()),
-			query.WriteZettelTransacted,
+			kennung.MakeMatcherFuncIter[*zettel.Transacted](ids),
 			collections.AddClone[zettel.Transacted, *zettel.Transacted](getResults),
 		),
 	); err != nil {

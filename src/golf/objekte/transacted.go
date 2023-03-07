@@ -113,23 +113,48 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) GetObjekte() (o T) {
 	return
 }
 
-func (a Transacted[T, T1, T2, T3, T4, T5]) GetMatchable() (ol kennung.Matchable) {
+func (a Transacted[T, T1, T2, T3, T4, T5]) GetEtiketten() kennung.EtikettSet {
+	egs := []any{
+		a.Verzeichnisse,
+		a.Objekte,
+	}
+
+	for _, o := range egs {
+		if eg, ok := o.(kennung.EtikettenGetter); ok {
+			return eg.GetEtiketten()
+		}
+	}
+
+	return kennung.MakeEtikettSet()
+}
+
+func (a Transacted[T, T1, T2, T3, T4, T5]) GetEtikettenExpanded() kennung.EtikettSet {
+	egs := []any{
+		a.Verzeichnisse,
+		a.Objekte,
+	}
+
+	for _, o := range egs {
+		if eg, ok := o.(kennung.EtikettenExpandedGetter); ok {
+			return eg.GetEtikettenExpanded()
+		}
+	}
+
+	return kennung.Expanded(a.GetEtiketten())
+}
+
+func (a Transacted[T, T1, T2, T3, T4, T5]) GetTyp() kennung.Typ {
 	ok := false
 	o := any(a.Objekte)
-
-	var eg kennung.EtikettenGetter
-
-	if eg, ok = o.(kennung.EtikettenGetter); !ok {
-		eg = nil
-	}
 
 	var tg kennung.TypGetter
 
 	if tg, ok = o.(kennung.TypGetter); !ok {
 		tg = nil
+		return kennung.MustTyp(a.GetGattung().GetGattungString())
 	}
 
-	return kennung.MakeMatchable(eg, tg, a)
+	return tg.GetTyp()
 }
 
 func (a Transacted[T, T1, T2, T3, T4, T5]) GetIdLike() (il kennung.IdLike) {

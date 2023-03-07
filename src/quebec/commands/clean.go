@@ -38,6 +38,7 @@ func (c Clean) RunWithCwdQuery(
 
 	if err = s.StoreWorkingDirectory().ReadFiles(
 		possible,
+		ms,
 		iter.MakeChain(
 			objekte.MakeFilterFromMetaSet(ms),
 			func(co objekte.CheckedOutLike) (err error) {

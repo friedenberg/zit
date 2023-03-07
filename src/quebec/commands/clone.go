@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/delta/gattungen"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/november/umwelt"
 	"github.com/friedenberg/zit/src/papa/remote_transfers"
 )
@@ -61,7 +62,7 @@ func (c Clone) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	ids := u.MakeMetaIdSet(c.CompletionGattung())
+	ids := u.MakeMetaIdSet(kennung.MakeMatcherAlways(), c.CompletionGattung())
 
 	if err = ids.SetMany(args...); err != nil {
 		err = errors.Wrap(err)

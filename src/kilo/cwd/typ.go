@@ -13,8 +13,13 @@ type Typ = sku.ExternalMaybe[kennung.Typ, *kennung.Typ]
 
 func (c *CwdFiles) tryTyp(fi os.FileInfo) (err error) {
 	var h kennung.Typ
+	var fd kennung.FD
 
-	fd := kennung.FileInfo(fi)
+	if fd, err = kennung.FileInfo(fi); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	pathMinusExt := strings.ToLower(fd.FileNameSansExt())
 
 	if err = h.Set(pathMinusExt); err != nil {

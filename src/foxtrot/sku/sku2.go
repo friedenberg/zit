@@ -44,7 +44,7 @@ func (sk *Sku2) Set(line string) (err error) {
 		sk.ObjekteSha.Set,
 		sk.AkteSha.Set,
 	); err != nil {
-		if errors.Is(err, gattung.ErrUnrecognizedGattung{}) {
+		if gattung.IsErrUnrecognizedGattung(err) {
 			err = sk.setOld(line)
 		} else {
 			err = errors.Wrapf(err, "Sku2: %s", line)

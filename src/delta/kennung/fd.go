@@ -12,6 +12,19 @@ import (
 	"github.com/friedenberg/zit/src/echo/ts"
 )
 
+type ObjekteFDGetter interface {
+	GetObjekteFD() FD
+}
+
+type AkteFDGetter interface {
+	GetAkteFD() FD
+}
+
+type FDPairGetter interface {
+	ObjekteFDGetter
+	AkteFDGetter
+}
+
 type FD struct {
 	// TODO make all of these private and expose as methods
 	IsDir   bool
@@ -53,17 +66,27 @@ func File(f *os.File) (fd FD, err error) {
 		return
 	}
 
-	fd = FileInfo(fi)
+	if fd, err = FileInfo(fi); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }
 
-func FileInfo(fi os.FileInfo) FD {
-	return FD{
+func FileInfo(fi os.FileInfo) (fd FD, err error) {
+	fd = FD{
 		IsDir:   fi.IsDir(),
 		Path:    fi.Name(),
 		ModTime: ts.Tyme(fi.ModTime()),
 	}
+
+	if fd.Path, err = filepath.Abs(fd.Path); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (fd *FD) Set(v string) (err error) {
@@ -74,9 +97,7 @@ func (fd *FD) Set(v string) (err error) {
 		return
 	}
 
-	*fd = FileInfo(fi)
-
-	if fd.Path, err = filepath.Abs(v); err != nil {
+	if *fd, err = FileInfo(fi); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

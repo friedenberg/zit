@@ -7,10 +7,10 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
-type SetPrefixNamed map[kennung.Etikett]schnittstellen.MutableSet[kennung.Element]
+type SetPrefixNamed map[kennung.Etikett]schnittstellen.MutableSet[kennung.Matchable]
 
 type SetPrefixNamedSegments struct {
-	Ungrouped schnittstellen.MutableSet[kennung.Element]
+	Ungrouped schnittstellen.MutableSet[kennung.Matchable]
 	Grouped   *SetPrefixNamed
 }
 
@@ -20,28 +20,28 @@ func NewSetPrefixNamed() *SetPrefixNamed {
 	return &s
 }
 
-func makeMutableZettelLikeSet() schnittstellen.MutableSet[kennung.Element] {
+func makeMutableZettelLikeSet() schnittstellen.MutableSet[kennung.Matchable] {
 	return collections.MakeMutableSet(
-		func(e kennung.Element) string {
+		func(e kennung.Matchable) string {
 			if e == nil {
 				return ""
 			}
 
-			return e.Hinweis().String()
+			return e.GetIdLike().String()
 		},
 	)
 }
 
 // this splits on right-expanded
-func (s *SetPrefixNamed) Add(z kennung.Element) {
-	es := kennung.Expanded(z.AkteEtiketten(), kennung.ExpanderRight)
+func (s *SetPrefixNamed) Add(z kennung.Matchable) {
+	es := kennung.Expanded(z.GetEtiketten(), kennung.ExpanderRight)
 
 	for _, e := range es.Elements() {
 		s.addPair(e, z)
 	}
 }
 
-func (s *SetPrefixNamed) addPair(e kennung.Etikett, z kennung.Element) {
+func (s *SetPrefixNamed) addPair(e kennung.Etikett, z kennung.Matchable) {
 	existing, ok := (*s)[e]
 
 	if !ok {
@@ -61,8 +61,12 @@ func (a SetPrefixNamed) Subset(e kennung.Etikett) (out SetPrefixNamedSegments) {
 
 	for e1, zSet := range a {
 		zSet.Each(
-			func(z kennung.Element) (err error) {
-				intersection := kennung.IntersectPrefixes(z.AkteEtiketten(), kennung.MakeEtikettSet(e))
+			func(z kennung.Matchable) (err error) {
+				intersection := kennung.IntersectPrefixes(
+					z.GetEtiketten(),
+					kennung.MakeEtikettSet(e),
+				)
+
 				errors.Log().Printf("%s yields %s", e1, intersection)
 
 				if intersection.Len() > 0 {
@@ -81,12 +85,12 @@ func (a SetPrefixNamed) Subset(e kennung.Etikett) (out SetPrefixNamedSegments) {
 	return
 }
 
-func (s SetPrefixNamed) ToSetNamed() (out schnittstellen.MutableSet[kennung.Element]) {
+func (s SetPrefixNamed) ToSetNamed() (out schnittstellen.MutableSet[kennung.Matchable]) {
 	out = makeMutableZettelLikeSet()
 
 	for _, zs := range s {
 		zs.Each(
-			func(z kennung.Element) (err error) {
+			func(z kennung.Matchable) (err error) {
 				out.Add(z)
 
 				return

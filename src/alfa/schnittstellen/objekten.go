@@ -1,5 +1,14 @@
 package schnittstellen
 
+type FileExtensionGetter interface {
+  GetFileExtensionForGattung(Gattung) string
+	GetFileExtensionZettel() string
+	GetFileExtensionOrganize() string
+	GetFileExtensionTyp() string
+	GetFileExtensionEtikett() string
+	GetFileExtensionKasten() string
+}
+
 //    ___  _     _      _    _       ___ ___
 //   / _ \| |__ (_) ___| | _| |_ ___|_ _/ _ \
 //  | | | | '_ \| |/ _ \ |/ / __/ _ \| | | | |

@@ -173,7 +173,7 @@ func (s *etikettStore) Query(
 		}
 	}
 
-	return objekte_store.MethodForSigil[
+	return objekte_store.QueryMethodForSigil[
 		*kennung.Etikett,
 		*etikett.Transacted,
 	](s, ids.Sigil)(

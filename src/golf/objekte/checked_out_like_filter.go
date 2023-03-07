@@ -15,16 +15,10 @@ func MakeFilterFromMetaSet(
 		return collections.MakeWriterNoop[CheckedOutLike]()
 	}
 
-	fds := ms.GetFDs()
-
 	return func(col CheckedOutLike) (err error) {
-		e := col.GetExternal()
+		internal := col.GetInternal()
 
-		if fds.Contains(e.GetObjekteFD()) || fds.Contains(e.GetAkteFD()) {
-			return
-		}
-
-		g := gattung.Must(col.GetInternal().GetDataIdentity().GetGattung())
+		g := gattung.Must(internal.GetDataIdentity().GetGattung())
 
 		var ids kennung.Set
 		ok := false
@@ -41,9 +35,9 @@ func MakeFilterFromMetaSet(
 		var matchable kennung.Matchable
 
 		if ids.Sigil.IncludesCwd() {
-			matchable = col.GetExternal().GetMatchable()
+			matchable = col.GetExternal()
 		} else {
-			matchable = col.GetInternal().GetMatchable()
+			matchable = internal
 		}
 
 		if matchable != nil {
@@ -52,7 +46,7 @@ func MakeFilterFromMetaSet(
 				return
 			}
 		} else {
-			id := col.GetInternal().GetSkuLike().GetId()
+			id := internal.GetSkuLike().GetId()
 
 			if ids.Contains(id) {
 				return

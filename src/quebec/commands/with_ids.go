@@ -99,7 +99,7 @@ func (c commandWithIds) Complete(u *umwelt.Umwelt, args ...string) (err error) {
 }
 
 func (c commandWithIds) Run(u *umwelt.Umwelt, args ...string) (err error) {
-	ids := u.MakeIdSet()
+	ids := u.MakeIdSet(nil)
 
 	if err = ids.SetMany(args...); err != nil {
 		err = errors.Wrap(err)

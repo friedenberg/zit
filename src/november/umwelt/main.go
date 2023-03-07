@@ -264,12 +264,14 @@ func (u Umwelt) Flush() error {
 	return u.age.Close()
 }
 
-func (u *Umwelt) MakeKennungQueryHidden() kennung.QuerySet[kennung.Etikett, *kennung.Etikett] {
-	return kennung.MakeQuerySet[kennung.Etikett, *kennung.Etikett](
+func (u *Umwelt) MakeKennungQueryHidden() (out kennung.QuerySet[kennung.Etikett, *kennung.Etikett]) {
+	out = kennung.MakeQuerySet[kennung.Etikett, *kennung.Etikett](
 		u.MakeKennungExpanders().Etikett,
 		nil,
 		u.Konfig().EtikettenHidden,
 	)
+
+	return
 }
 
 func (u *Umwelt) MakeKennungExpanders() kennung.Expanders {
@@ -295,27 +297,41 @@ func (u *Umwelt) MakeKennungExpanders() kennung.Expanders {
 	}
 }
 
-func (u *Umwelt) MakeMetaIdSet(dg gattungen.Set) kennung.MetaSet {
+func (u *Umwelt) MakeMetaIdSet(
+	cwd kennung.Matcher,
+	dg gattungen.Set,
+) kennung.MetaSet {
 	if dg == nil {
 		dg = gattungen.MakeSet(gattung.Zettel)
 	}
 
 	return kennung.MakeMetaSet(
+		cwd,
 		u.MakeKennungExpanders(),
 		nil,
+		u.Konfig().FileExtensions,
 		dg,
 	)
 }
 
-func (u *Umwelt) MakeMetaIdSetDefault() kennung.MetaSet {
-	return kennung.MakeMetaSetAll(
+func (u *Umwelt) MakeMetaIdSetDefault(
+	cwd kennung.Matcher,
+) (out kennung.MetaSet) {
+	out = kennung.MakeMetaSetAll(
+		cwd,
 		u.MakeKennungExpanders(),
 		u.MakeKennungQueryHidden(),
+		u.Konfig().FileExtensions,
 	)
+
+	return
 }
 
-func (u *Umwelt) MakeIdSet() kennung.Set {
+func (u *Umwelt) MakeIdSet(
+	cwd kennung.Matcher,
+) kennung.Set {
 	return kennung.MakeSet(
+		cwd,
 		u.MakeKennungExpanders(),
 		nil,
 	)

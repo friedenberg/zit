@@ -226,17 +226,12 @@ func (s *zettelStore) Query(
 	f schnittstellen.FuncIter[*zettel.Transacted],
 ) (err error) {
 	errors.TodoP1("generate optimized query here")
-	return objekte_store.MethodForSigil[
+	return objekte_store.QueryMethodForSigil[
 		schnittstellen.ValueLike,
 		*zettel.Transacted,
 	](s, ids.Sigil)(
 		iter.MakeChain(
-			zettel.MakeWriterKonfig(s.StoreUtil.GetKonfig()),
-			zettel.WriterIds{
-				Filter: kennung.Filter{
-					Set: ids,
-				},
-			}.WriteZettelTransacted,
+			kennung.MakeMatcherFuncIter[*zettel.Transacted](ids),
 			f,
 		),
 	)

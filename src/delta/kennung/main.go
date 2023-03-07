@@ -17,10 +17,7 @@ type QueryPrefixer interface {
 	GetQueryPrefix() rune
 }
 
-type IdLike interface {
-	schnittstellen.GattungGetter
-	schnittstellen.Stringer
-}
+type IdLike = schnittstellen.IdLike
 
 type KennungLike[T any] interface {
 	schnittstellen.GattungGetter

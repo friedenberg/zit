@@ -27,6 +27,7 @@ func (c Checkin) Run(
 
 	if err = u.StoreWorkingDirectory().ReadFiles(
 		pz,
+		ms,
 		iter.MakeChain(
 			objekte.MakeFilterFromMetaSet(ms),
 			func(co objekte.CheckedOutLike) (err error) {

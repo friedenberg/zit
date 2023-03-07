@@ -1,11 +1,57 @@
 package erworben
 
+import (
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/gattung"
+)
+
 type FileExtensions struct {
 	Zettel   string `toml:"zettel"`
 	Organize string `toml:"organize"`
 	Typ      string `toml:"typ"`
 	Etikett  string `toml:"etikett"`
 	Kasten   string `toml:"kasten"`
+}
+
+func (a FileExtensions) GetFileExtensionForGattung(g1 schnittstellen.Gattung) string {
+	g := gattung.Must(g1)
+
+	switch g {
+	case gattung.Zettel:
+		return a.GetFileExtensionZettel()
+
+	case gattung.Typ:
+		return a.GetFileExtensionTyp()
+
+	case gattung.Etikett:
+		return a.GetFileExtensionEtikett()
+
+	case gattung.Kasten:
+		return a.GetFileExtensionKasten()
+
+	default:
+		return ""
+	}
+}
+
+func (a FileExtensions) GetFileExtensionZettel() string {
+	return a.Zettel
+}
+
+func (a FileExtensions) GetFileExtensionOrganize() string {
+	return a.Organize
+}
+
+func (a FileExtensions) GetFileExtensionTyp() string {
+	return a.Typ
+}
+
+func (a FileExtensions) GetFileExtensionEtikett() string {
+	return a.Etikett
+}
+
+func (a FileExtensions) GetFileExtensionKasten() string {
+	return a.Kasten
 }
 
 func (a *FileExtensions) Reset() {

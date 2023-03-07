@@ -101,7 +101,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	if c.Edit {
 		if err = c.editZettels(
 			u,
-			u.MakeMetaIdSet(nil),
+			u.MakeMetaIdSet(kennung.MakeMatcherAlways(), nil),
 			zsc,
 		); err != nil {
 			err = errors.Wrap(err)

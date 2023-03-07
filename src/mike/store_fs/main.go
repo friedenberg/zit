@@ -439,130 +439,114 @@ func (s *Store) ReadManyHistory(
 
 func (s *Store) ReadFiles(
 	fs cwd.CwdFiles,
+	ms kennung.MetaSet,
 	f schnittstellen.FuncIter[objekte.CheckedOutLike],
 ) (err error) {
-	var ms kennung.MetaSet
-
-	if ms, err = fs.GetMetaSet(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	if err = s.storeObjekten.Query(
 		ms,
-		func(e objekte.TransactedLike) (err error) {
-			switch et := e.(type) {
-			case *zettel.Transacted:
-				var zco zettel.CheckedOut
-				ok := false
+		iter.MakeChain(
+			func(e objekte.TransactedLike) (err error) {
+				switch et := e.(type) {
+				case *zettel.Transacted:
+					var zco zettel.CheckedOut
+					ok := false
 
-				var ze cwd.Zettel
+					var ze cwd.Zettel
 
-				if ze, ok = fs.GetZettel(et.Sku.Kennung); !ok {
-					return errors.Errorf(
-						"cwd zettel was matched in query but not in cwd.CwdFiles: %s",
-						et.Sku.Kennung,
-					)
-				}
+					if ze, ok = fs.GetZettel(et.Sku.Kennung); !ok {
+						err = iter.MakeErrStopIteration()
+						return
+					}
 
-				zco.External.Sku.FDs = ze.FDs
-				zco.External.Sku.Kennung = ze.Kennung
+					zco.External.Sku.FDs = ze.FDs
+					zco.External.Sku.Kennung = ze.Kennung
 
-				if err = s.readZettelFromFile(&zco.External); err != nil {
-					if errors.IsNotExist(err) {
-						return errors.Errorf(
-							"cwd zettel was matched in query but not in cwd.CwdFiles: %s",
-							et.Sku.Kennung,
-						)
-					} else {
+					if err = s.readZettelFromFile(&zco.External); err != nil {
+						if errors.IsNotExist(err) {
+							err = iter.MakeErrStopIteration()
+						} else {
+							err = errors.Wrap(err)
+						}
+
+						return
+					}
+
+					zco.Internal = *et
+
+					zco.DetermineState()
+
+					if err = f(&zco); err != nil {
 						err = errors.Wrap(err)
 						return
 					}
-				}
 
-				zco.Internal = *et
+				case *typ.Transacted:
+					var tco typ.CheckedOut
+					ok := false
 
-				zco.DetermineState()
+					var te cwd.Typ
 
-				if err = f(&zco); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
+					if te, ok = fs.GetTyp(et.Sku.Kennung); !ok {
+						err = iter.MakeErrStopIteration()
+						return
+					}
 
-			case *typ.Transacted:
-				var tco typ.CheckedOut
-				ok := false
+					if tco.External, err = s.ReadTyp(te); err != nil {
+						if errors.IsNotExist(err) {
+							err = iter.MakeErrStopIteration()
+						} else {
+							err = errors.Wrap(err)
+						}
 
-				var te cwd.Typ
+						return
+					}
 
-				if te, ok = fs.GetTyp(et.Sku.Kennung); !ok {
-					return errors.Errorf(
-						"cwd typ was matched in query but not in cwd.CwdFiles: %s",
-						et.Sku.Kennung,
-					)
-				}
+					tco.Internal = *et
 
-				if tco.External, err = s.ReadTyp(te); err != nil {
-					if errors.IsNotExist(err) {
-						return errors.Errorf(
-							"cwd zettel was matched in query but not in cwd.CwdFiles: %s",
-							et.Sku.Kennung,
-						)
-					} else {
+					tco.DetermineState()
+
+					if err = f(&tco); err != nil {
 						err = errors.Wrap(err)
 						return
 					}
-				}
 
-				tco.Internal = *et
+				case *etikett.Transacted:
+					var tco etikett.CheckedOut
+					ok := false
 
-				tco.DetermineState()
+					var te cwd.Etikett
 
-				if err = f(&tco); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
+					if te, ok = fs.GetEtikett(et.Sku.Kennung); !ok {
+						err = iter.MakeErrStopIteration()
+						return
+					}
 
-			case *etikett.Transacted:
-				var tco etikett.CheckedOut
-				ok := false
+					if tco.External, err = s.ReadEtikett(te); err != nil {
+						if errors.IsNotExist(err) {
+							err = iter.MakeErrStopIteration()
+						} else {
+							err = errors.Wrap(err)
+						}
 
-				var te cwd.Etikett
+						return
+					}
 
-				if te, ok = fs.GetEtikett(et.Sku.Kennung); !ok {
-					return errors.Errorf(
-						"cwd typ was matched in query but not in cwd.CwdFiles: %s",
-						et.Sku.Kennung,
-					)
-				}
+					tco.Internal = *et
 
-				if tco.External, err = s.ReadEtikett(te); err != nil {
-					if errors.IsNotExist(err) {
-						return errors.Errorf(
-							"cwd zettel was matched in query but not in cwd.CwdFiles: %s",
-							et.Sku.Kennung,
-						)
-					} else {
+					tco.DetermineState()
+
+					if err = f(&tco); err != nil {
 						err = errors.Wrap(err)
 						return
 					}
+
+				default:
+					err = errors.Implement()
 				}
 
-				tco.Internal = *et
-
-				tco.DetermineState()
-
-				if err = f(&tco); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-			default:
-				err = errors.Implement()
-			}
-
-			return
-		},
+				return
+			},
+		),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

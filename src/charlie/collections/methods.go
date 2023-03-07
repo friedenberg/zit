@@ -214,8 +214,9 @@ func SortedStrings[E schnittstellen.ValueLike](
 	return
 }
 
-func StringCommaSeparated[E schnittstellen.Value[E]](
+func StringDelimiterSeparated[E schnittstellen.Value[E]](
 	c schnittstellen.Set[E],
+	d string,
 ) string {
 	if c == nil {
 		return ""
@@ -228,7 +229,7 @@ func StringCommaSeparated[E schnittstellen.Value[E]](
 
 	for _, e1 := range sorted {
 		if !first {
-			sb.WriteString(", ")
+			sb.WriteString(d)
 		}
 
 		sb.WriteString(e1)
@@ -237,6 +238,12 @@ func StringCommaSeparated[E schnittstellen.Value[E]](
 	}
 
 	return sb.String()
+}
+
+func StringCommaSeparated[E schnittstellen.Value[E]](
+	c schnittstellen.Set[E],
+) string {
+	return StringDelimiterSeparated(c, ", ")
 }
 
 func ReverseSortable(s sort.Interface) {

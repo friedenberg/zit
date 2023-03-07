@@ -11,6 +11,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -74,7 +75,7 @@ func (c Exec) getZettel(
 	executor erworben.RemoteScript,
 	err error,
 ) {
-	is := u.MakeIdSet()
+	is := u.MakeIdSet(kennung.MakeMatcherAlways())
 
 	if err = is.Set(hString); err != nil {
 		err = errors.Wrap(err)

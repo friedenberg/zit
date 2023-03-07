@@ -7,28 +7,20 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
-type Element interface {
-	schnittstellen.ValueLike
-	schnittstellen.Stored
-	AkteEtiketten() EtikettSet
-	AkteTyp() Typ
-	Hinweis() Hinweis
-}
-
 type Filter struct {
 	Set Set
 	Or  bool
 }
 
 // TODO-P4 improve the performance of this query
-func (f Filter) Include(e Element) (err error) {
+func (f Filter) Include(e Matchable) (err error) {
 	ok := false
 
 	// TODO-P3 pull into static
 	needsEt := f.Set.Etiketten.GetIncludes().Len() > 0
 	okEt := false
 
-	expanded := Expanded(e.AkteEtiketten(), ExpanderRight)
+	expanded := e.GetEtikettenExpanded()
 
 	// TODO-P3 pull into static
 	var etSetSansPrefix schnittstellen.Set[Etikett]
@@ -87,9 +79,11 @@ LOOP:
 	needsTyp := ty.Len() > 0
 	okTyp := false
 
+	typ := e.GetTyp()
+
 	ty.Each(
 		func(t Typ) (err error) {
-			if okTyp = t.Includes(e.AkteTyp()); okTyp {
+			if okTyp = t.Includes(typ); okTyp {
 				err = collections.MakeErrStopIteration()
 			}
 
@@ -101,7 +95,7 @@ LOOP:
 	needsHin := hinweisen.Len() > 0
 	okHin := false || hinweisen.Len() == 0
 
-	okHin = hinweisen.Contains(e.Hinweis())
+	okHin = hinweisen.ContainsKey(e.GetIdLike().String())
 
 	isEmpty := !needsHin && !needsTyp && !needsEt && !needsSha
 

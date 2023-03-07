@@ -99,19 +99,19 @@ func (c commandWithCwdQuery) Complete(u *umwelt.Umwelt, args ...string) (err err
 }
 
 func (c commandWithCwdQuery) Run(u *umwelt.Umwelt, args ...string) (err error) {
-	ids := u.MakeMetaIdSetDefault()
-
-	if err = ids.SetMany(args...); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	var cwdFiles cwd.CwdFiles
 
 	if cwdFiles, err = cwd.MakeCwdFilesAll(
 		u.Konfig(),
 		u.Standort().Cwd(),
 	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	ids := u.MakeMetaIdSetDefault(cwdFiles)
+
+	if err = ids.SetMany(args...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

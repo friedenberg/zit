@@ -12,7 +12,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/india/konfig"
@@ -30,41 +29,31 @@ type CwdFiles struct {
 	EmptyDirectories []kennung.FD
 }
 
-func (fs CwdFiles) GetMetaSet() (ms kennung.MetaSet, err error) {
-	ms = kennung.MakeMetaSet(
-		kennung.Expanders{},
-		nil,
-		gattungen.MakeSet(gattung.Zettel),
-	)
+func (fs CwdFiles) ContainsMatchable(m kennung.Matchable) bool {
+	g := gattung.Must(m)
 
-	if err = fs.Zettelen.Each(
-		func(z Zettel) (err error) {
-			return ms.Add(z.Kennung, kennung.SigilNone)
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+	switch g {
+	case gattung.Zettel:
+		return fs.Zettelen.ContainsKey(m.GetIdLike().String())
+
+	case gattung.Typ:
+		return fs.Typen.ContainsKey(m.GetIdLike().String())
+
+	case gattung.Etikett:
+		return fs.Etiketten.ContainsKey(m.GetIdLike().String())
 	}
 
-	if err = fs.Typen.Each(
-		func(z Typ) (err error) {
-			return ms.Add(z.Kennung, kennung.SigilNone)
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	return true
+}
 
-	if err = fs.Etiketten.Each(
-		func(z Etikett) (err error) {
-			return ms.Add(z.Kennung, kennung.SigilNone)
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+func (fs CwdFiles) GetFDs() schnittstellen.Set[kennung.FD] {
+	fds := kennung.MakeMutableFDSet()
 
-	return
+	kennung.FDSetAddPairs[Zettel](fs.Zettelen, fds)
+	kennung.FDSetAddPairs[Typ](fs.Typen, fds)
+	kennung.FDSetAddPairs[Etikett](fs.Etiketten, fds)
+
+	return fds
 }
 
 func (fs CwdFiles) GetZettel(
@@ -231,7 +220,12 @@ func (fs *CwdFiles) readAll() (err error) {
 			return
 		}
 
-		fd := kennung.FileInfo(fi)
+		var fd kennung.FD
+
+		if fd, err = kennung.FileInfo(fi); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
 		if fi.Mode().IsDir() {
 			var dirs2 []string
