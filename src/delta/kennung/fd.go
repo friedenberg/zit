@@ -53,6 +53,27 @@ func (a FD) Equals(b FD) bool {
 	return true
 }
 
+func FDFromPath(p string) (fd FD, err error) {
+	if p == "" {
+		err = errors.Errorf("nil file desriptor")
+		return
+	}
+
+	var fi os.FileInfo
+
+	if fi, err = os.Stat(p); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if fd, err = FileInfo(fi, path.Dir(p)); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func File(f *os.File) (fd FD, err error) {
 	if f == nil {
 		err = errors.Errorf("nil file desriptor")
@@ -66,7 +87,7 @@ func File(f *os.File) (fd FD, err error) {
 		return
 	}
 
-	if fd, err = FileInfo(fi); err != nil {
+	if fd, err = FileInfo(fi, path.Dir(f.Name())); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -74,14 +95,13 @@ func File(f *os.File) (fd FD, err error) {
 	return
 }
 
-func FileInfo(fi os.FileInfo) (fd FD, err error) {
+func FileInfo(fi os.FileInfo, dir string) (fd FD, err error) {
 	fd = FD{
 		IsDir:   fi.IsDir(),
-		Path:    fi.Name(),
 		ModTime: ts.Tyme(fi.ModTime()),
 	}
 
-	if fd.Path, err = filepath.Abs(fd.Path); err != nil {
+	if fd.Path, err = filepath.Abs(path.Join(dir, fi.Name())); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -97,7 +117,7 @@ func (fd *FD) Set(v string) (err error) {
 		return
 	}
 
-	if *fd, err = FileInfo(fi); err != nil {
+	if *fd, err = FileInfo(fi, path.Dir(v)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -158,4 +178,38 @@ func (f FD) IsEmpty() bool {
 	// }
 
 	return false
+}
+
+func (f FD) Hinweis() (h Hinweis, err error) {
+	parts := strings.Split(f.Path, string(filepath.Separator))
+
+	switch len(parts) {
+	case 0:
+		fallthrough
+
+	case 1:
+		err = errors.Errorf("not enough parts: %q", parts)
+		return
+
+	default:
+		parts = parts[len(parts)-2:]
+	case 2:
+		break
+	}
+
+	p := strings.Join(parts, string(filepath.Separator))
+
+	p1 := p
+	ext := path.Ext(p)
+
+	if len(ext) != 0 {
+		p1 = p[:len(p)-len(ext)]
+	}
+
+	if err = h.Set(p1); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }

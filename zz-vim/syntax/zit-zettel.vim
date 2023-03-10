@@ -3,13 +3,16 @@
 "   finish
 " endif
 
-let zettel = expand("%:r")
+let zettel = expand("%")
+echom zettel
 
 let g:markdown_syntax_conceal = 0
 
 if zettel != ""
-  let cmdFormat = "zit show -include-cwd -format typ-vim-syntax-type "
-  let zettelTypSyntax = trim(system(cmdFormat . zettel))
+  let cmdFormat = "zit show -format typ-vim-syntax-type " . zettel
+  let zettelTypSyntax = trim(system(cmdFormat))
+  echom cmdFormat
+  echom zettelTypSyntax
 
   if zettelTypSyntax == ""
     echom "Zettel Typ has no vim syntax set"
@@ -19,7 +22,7 @@ if zettel != ""
   " let syntaxFile = $VIMRUNTIME . "/syntax/" . zettelTypSyntax . ".vim"
   " let ftpluginFile = $VIMRUNTIME . "/ftplugin/" . zettelTypSyntax . ".vim"
 
-  execute "syntax include @akte" "syntax/" .. zettelTypSyntax .. ".vim"
+  execute "syntax include @akte" "syntax/" . zettelTypSyntax . ".vim"
   " if filereadable(syntaxFile)
   "   exec "source " . syntaxFile
   "   " TODO-P3

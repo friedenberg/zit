@@ -495,7 +495,7 @@ func (s *Store) ReadFiles(
 						if errors.IsNotExist(err) {
 							err = iter.MakeErrStopIteration()
 						} else {
-							err = errors.Wrap(err)
+              err = errors.Wrapf(err, "CwdTyp: %#v", te)
 						}
 
 						return

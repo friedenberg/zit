@@ -150,12 +150,15 @@ func (c Show) showOneOrMoreZettels(
 	ids kennung.Set,
 	fv schnittstellen.FuncIter[*zettel.Transacted],
 ) (err error) {
+	// errors.Err().Printf("ids: %s", ids)
 	if h, ok := ids.OnlySingleHinweis(); ok {
+		// errors.Err().Printf("only one")
 		if err = c.showOneZettel(u, h, ids.Sigil, fv); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	} else {
+		// errors.Err().Printf("many")
 		if err = c.showManyZettels(u, ids, fv); err != nil {
 			err = errors.Wrap(err)
 			return

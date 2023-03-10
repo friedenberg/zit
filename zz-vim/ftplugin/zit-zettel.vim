@@ -32,7 +32,7 @@ function! ZitAction()
     endif
 
     let l:val = substitute(l:items[a:result-1], '\t.*$', '', '')
-    execute("!zit exec-action -action " . l:val .  " " . expand("%:r"))
+    execute("!zit exec-action -action " . l:val .  " " . expand("%:r") .".")
   endfunc
 
   if len(l:items) == 0
@@ -74,7 +74,7 @@ function! ZitMakeUTIGroupCommand(uti_group, cmd_args_unprocessed_list)
 endfunction
 
 function! ZitGetUTIGroups()
-  let l:rawItems = sort(systemlist("zit show -include-cwd -format typ-formatter-uti-groups " . expand("%:r")))
+  let l:rawItems = sort(systemlist("zit show -include-cwd -format typ-formatter-uti-groups " . expand("%:r") ."."))
   let l:processedItems = []
   let l:items = []
 

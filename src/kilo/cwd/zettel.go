@@ -13,11 +13,18 @@ import (
 type Zettel = sku.ExternalMaybe[kennung.Hinweis, *kennung.Hinweis]
 
 func (c *CwdFiles) tryZettel(d string, a string, p string) (err error) {
+	// kopf := filepath.Base(d)
+
+	var fd kennung.FD
+
+	if fd, err = kennung.FDFromPath(p); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	var h kennung.Hinweis
 
-	kopf := filepath.Base(d)
-
-	if h, err = c.hinweisFromPath(path.Join(kopf, a)); err != nil {
+	if h, err = fd.Hinweis(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -47,6 +54,7 @@ func (c CwdFiles) hinweisFromPath(p string) (h kennung.Hinweis, err error) {
 
 	default:
 		parts = parts[len(parts)-2:]
+
 	case 2:
 		break
 	}

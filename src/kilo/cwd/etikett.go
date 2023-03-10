@@ -11,11 +11,11 @@ import (
 
 type Etikett = sku.ExternalMaybe[kennung.Etikett, *kennung.Etikett]
 
-func (c *CwdFiles) tryEtikett(fi os.FileInfo) (err error) {
+func (c *CwdFiles) tryEtikett(fi os.FileInfo, dir string) (err error) {
 	var h kennung.Etikett
 	var fd kennung.FD
 
-	if fd, err = kennung.FileInfo(fi); err != nil {
+	if fd, err = kennung.FileInfo(fi, dir); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

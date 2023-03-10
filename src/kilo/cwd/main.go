@@ -222,7 +222,7 @@ func (fs *CwdFiles) readAll() (err error) {
 
 		var fd kennung.FD
 
-		if fd, err = kennung.FileInfo(fi); err != nil {
+		if fd, err = kennung.FileInfo(fi, d); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -287,13 +287,13 @@ func (fs *CwdFiles) readFirstLevelFile(a string) (err error) {
 
 	switch strings.TrimPrefix(ext, ".") {
 	case fs.erworben.FileExtensions.Etikett:
-		if err = fs.tryEtikett(fi); err != nil {
+		if err = fs.tryEtikett(fi, fs.dir); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case fs.erworben.FileExtensions.Typ:
-		if err = fs.tryTyp(fi); err != nil {
+		if err = fs.tryTyp(fi, fs.dir); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -336,7 +336,7 @@ func (fs *CwdFiles) readSecondLevelFile(d string, a string) (err error) {
 
 	switch strings.TrimPrefix(ext, ".") {
 	case fs.erworben.FileExtensions.Typ:
-		if err = fs.tryTyp(fi); err != nil {
+		if err = fs.tryTyp(fi, d); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

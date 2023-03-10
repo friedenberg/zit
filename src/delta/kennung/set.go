@@ -255,8 +255,25 @@ func (s Set) Contains(id schnittstellen.Stringer) bool {
 }
 
 func (s Set) OnlySingleHinweis() (h Hinweis, ok bool) {
-	h = s.Hinweisen.Any()
-	ok = s.Len() == 1 && s.Hinweisen.Len() == 1 && !s.Sigil.IncludesHistory()
+	if s.Len() != 1 {
+		return
+	}
+
+	if s.Sigil.IncludesHistory() {
+		return
+	}
+
+	switch {
+	case s.Hinweisen.Len() == 1:
+		ok = true
+		h = s.Hinweisen.Any()
+
+	case s.FDs.Len() == 1:
+		var err error
+
+		h, err = s.FDs.Any().Hinweis()
+		ok = err == nil
+	}
 
 	return
 }
