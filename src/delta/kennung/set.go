@@ -272,7 +272,10 @@ func (s Set) OnlySingleHinweis() (h Hinweis, ok bool) {
 		var err error
 
 		h, err = s.FDs.Any().Hinweis()
+		errors.Err().Printf("Hinweis Error: %s", err)
 		ok = err == nil
+
+	default:
 	}
 
 	return

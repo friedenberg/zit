@@ -14,7 +14,7 @@ func init() {
 	register(Etikett{})
 }
 
-const EtikettRegexString = `^[-a-z0-9_/]+$`
+const EtikettRegexString = `^[-a-z0-9_]+$`
 
 var EtikettRegex *regexp.Regexp
 
