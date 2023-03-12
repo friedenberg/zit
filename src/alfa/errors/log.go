@@ -42,6 +42,7 @@ func init() {
 
 func SetVerbose() {
 	printerLog.on = true
+	printerDebug.on = true
 	verbose = true
 	log_package.SetFlags(log_package.LstdFlags | log_package.Lshortfile | log_package.Lmicroseconds)
 	log_package.Print("verbose")

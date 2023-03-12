@@ -33,6 +33,7 @@ setup() {
 
 	cat >md.typ <<-EOM
 		inline-akte = false
+		vim-syntax-type = "test"
 	EOM
 }
 
@@ -52,12 +53,15 @@ function checkin_complex_zettel_etikett_negation { # @test
 
 function checkin_simple_all { # @test
 	run_zit checkin .
-	assert_output --partial '[!md@0966bffa92f9391ec0874fe0bd5ed77b9ceddc45e36a866c71a3ccbb31711a71]'
+	assert_output --partial '[!md@72d654e3c7f4e820df18c721177dfad38fe831d10bca6dcb33b7cad5dc335357]'
 	assert_output --partial '[one/uno@689c6787364899defa77461ff6a3f454ca667654653f86d5d44f2826950ff4f9 !md "wildly different"]'
 	assert_output --partial '[one/dos@30edfed4c016580f5b69a2709b8e5ae01c2b504b8826bf2d04e6c1ecd6bb3268 !md "dos wildly different"]'
 }
 
 function checkin_simple_typ { # @test
 	run_zit checkin .t
-	assert_output '[!md@0966bffa92f9391ec0874fe0bd5ed77b9ceddc45e36a866c71a3ccbb31711a71]'
+	assert_output '[!md@72d654e3c7f4e820df18c721177dfad38fe831d10bca6dcb33b7cad5dc335357]'
+
+	run_zit show -format vim-syntax-type !md.typ
+	assert_output 'test'
 }

@@ -31,10 +31,6 @@ func MakeFormatTextIgnoreTomlErrors(arf schnittstellen.AkteIOFactory) *TextForma
 }
 
 func (f TextFormat) Parse(r io.Reader, t *Objekte) (n int64, err error) {
-	return f.ReadFormat(r, t)
-}
-
-func (f TextFormat) ReadFormat(r io.Reader, t *Objekte) (n int64, err error) {
 	var aw sha.WriteCloser
 
 	if aw, err = f.arf.AkteWriter(); err != nil {
@@ -42,7 +38,7 @@ func (f TextFormat) ReadFormat(r io.Reader, t *Objekte) (n int64, err error) {
 		return
 	}
 
-	defer errors.Deferred(&err, aw.Close)
+	defer errors.DeferredCloser(&err, aw)
 
 	pr, pw := io.Pipe()
 	td := toml.NewDecoder(pr)
@@ -118,10 +114,6 @@ func (f TextFormat) ReadFormat(r io.Reader, t *Objekte) (n int64, err error) {
 }
 
 func (f TextFormat) Format(w io.Writer, t *Objekte) (n int64, err error) {
-	return f.WriteFormat(w, t)
-}
-
-func (f TextFormat) WriteFormat(w io.Writer, t *Objekte) (n int64, err error) {
 	var ar sha.ReadCloser
 
 	if ar, err = f.arf.AkteReader(t.Sha); err != nil {
@@ -134,7 +126,7 @@ func (f TextFormat) WriteFormat(w io.Writer, t *Objekte) (n int64, err error) {
 		return
 	}
 
-	defer errors.Deferred(&err, ar.Close)
+	defer errors.DeferredCloser(&err, ar)
 
 	if n, err = io.Copy(w, ar); err != nil {
 		err = errors.Wrap(err)

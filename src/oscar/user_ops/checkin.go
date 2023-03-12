@@ -34,14 +34,6 @@ func (c Checkin) Run(
 				// var tl objekte.TransactedLike
 
 				switch aco := co.(type) {
-				case zettel.CheckedOut:
-					if _, err = u.StoreObjekten().Zettel().UpdateCheckedOut(
-						aco,
-					); err != nil {
-						err = errors.Wrap(err)
-						return
-					}
-
 				case *zettel.CheckedOut:
 					if _, err = u.StoreObjekten().Zettel().UpdateCheckedOut(
 						*aco,
@@ -51,12 +43,16 @@ func (c Checkin) Run(
 					}
 
 				case *typ.CheckedOut:
-					if _, err = u.StoreObjekten().Typ().CreateOrUpdateCheckedOut(
+					var tt *typ.Transacted
+
+					if tt, err = u.StoreObjekten().Typ().CreateOrUpdateCheckedOut(
 						aco,
 					); err != nil {
 						err = errors.Wrap(err)
 						return
 					}
+
+					u.KonfigPtr().AddTyp(tt)
 
 				default:
 					err = errors.Implement()

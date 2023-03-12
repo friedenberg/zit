@@ -15,6 +15,7 @@ type Standort struct {
 }
 
 func Make(o Options) (s Standort, err error) {
+	errors.TodoP3("add 'touched' which can get deleted / cleaned")
 	if err = o.Validate(); err != nil {
 		err = errors.Wrap(err)
 		return

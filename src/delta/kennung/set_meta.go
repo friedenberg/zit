@@ -217,7 +217,6 @@ func (ms *metaSet) Set(v string) (err error) {
 			}
 
 			ms.Gattung[g] = ids
-			errors.Log().Printf("ids: %#v", ids)
 
 			return
 		},

@@ -59,7 +59,7 @@ func (s *Store) WriteTyp(t *typ.Transacted) (te *typ.CheckedOut, err error) {
 
 	format := typ.MakeFormatText(s.storeObjekten)
 
-	if _, err = format.WriteFormat(f, &te.External.Objekte); err != nil {
+	if _, err = format.Format(f, &te.External.Objekte); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

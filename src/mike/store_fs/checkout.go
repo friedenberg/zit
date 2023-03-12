@@ -331,7 +331,7 @@ func (s *Store) CheckoutOneTyp(
 		return
 	}
 
-	if _, err = format.WriteFormat(f, &tk.Objekte); err != nil {
+	if _, err = format.Format(f, &tk.Objekte); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -382,7 +382,7 @@ func (s *Store) MakeTempTypFiles(
 
 			ps = append(ps, f.Name())
 
-			if _, err = format.WriteFormat(f, &tt.Objekte); err != nil {
+			if _, err = format.Format(f, &tt.Objekte); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
