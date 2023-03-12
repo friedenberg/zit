@@ -19,6 +19,18 @@ import (
 	"github.com/friedenberg/zit/src/mike/store_fs"
 )
 
+func wrapWithCheckedOutState[T objekte.CheckedOutLike](
+	f schnittstellen.FuncWriterFormat[T],
+) schnittstellen.FuncWriterFormat[T] {
+	return func(w io.Writer, e T) (n int64, err error) {
+		return format.Write(
+			w,
+			format.MakeFormatStringRightAlignedParen(e.GetState().String()),
+			format.MakeWriter(f, e),
+		)
+	}
+}
+
 func wrapWithTimePrefixerIfNecessary[T sku.DataIdentityGetter](
 	k schnittstellen.Konfig,
 	f schnittstellen.FuncWriterFormat[T],
@@ -83,7 +95,9 @@ func (u *Umwelt) PrinterTypCheckedOut() schnittstellen.FuncIter[*typ.CheckedOut]
 func (u *Umwelt) PrinterEtikettCheckedOut() schnittstellen.FuncIter[*etikett.CheckedOut] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
-		u.FormatEtikettCheckedOut(),
+		wrapWithCheckedOutState(
+			u.FormatEtikettCheckedOut(),
+		),
 	)
 }
 

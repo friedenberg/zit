@@ -53,35 +53,38 @@ func (c Status) RunWithCwdQuery(
 		return
 	}
 
-	v := "Akten"
+	if len(possible.UnsureAkten) != 0 {
 
-	if err = u.PrinterHeader()(&v); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+		v := "Akten"
 
-	for _, ua := range possible.UnsureAkten {
-		err = u.StoreObjekten().AkteExists(ua.Sha)
-
-		switch {
-		case err == nil:
-			fallthrough
-
-		case errors.Is(err, objekte_store.ErrNotFound{}):
-			err = u.PrinterFileNotRecognized()(&ua)
-
-		case errors.Is(err, store_objekten.ErrAkteExists{}):
-			err1 := err.(store_objekten.ErrAkteExists)
-			fr := store_fs.FileRecognized{
-				FD:         ua,
-				Recognized: err1.MutableSet,
-			}
-
-			err = u.PrinterFileRecognized()(&fr)
-
-		default:
-			err = errors.Wrapf(err, "%s", ua)
+		if err = u.PrinterHeader()(&v); err != nil {
+			err = errors.Wrap(err)
 			return
+		}
+
+		for _, ua := range possible.UnsureAkten {
+			err = u.StoreObjekten().AkteExists(ua.Sha)
+
+			switch {
+			case err == nil:
+				fallthrough
+
+			case errors.Is(err, objekte_store.ErrNotFound{}):
+				err = u.PrinterFileNotRecognized()(&ua)
+
+			case errors.Is(err, store_objekten.ErrAkteExists{}):
+				err1 := err.(store_objekten.ErrAkteExists)
+				fr := store_fs.FileRecognized{
+					FD:         ua,
+					Recognized: err1.MutableSet,
+				}
+
+				err = u.PrinterFileRecognized()(&fr)
+
+			default:
+				err = errors.Wrapf(err, "%s", ua)
+				return
+			}
 		}
 	}
 

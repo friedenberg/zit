@@ -18,12 +18,17 @@ import (
 
 type AbbrStore interface {
 	HinweisExists(kennung.Hinweis) error
-	ExpandShaString(string) (sha.Sha, error)
-	ExpandEtikettString(string) (kennung.Etikett, error)
 	ExpandHinweisString(string) (kennung.Hinweis, error)
-	AbbreviateSha(schnittstellen.ValueLike) (string, error)
 	AbbreviateHinweis(schnittstellen.Korper) (string, error)
+
+	ExpandShaString(string) (sha.Sha, error)
+	AbbreviateSha(schnittstellen.ValueLike) (string, error)
+
+	ExpandEtikettString(string) (kennung.Etikett, error)
+	EtikettExists(kennung.Etikett) error
+
 	AddStoredAbbreviation(schnittstellen.Stored) error
+
 	errors.Flusher
 }
 
@@ -207,6 +212,20 @@ func (i *indexAbbr) HinweisExists(h kennung.Hinweis) (err error) {
 
 	if !i.indexAbbrEncodableTridexes.HinweisSchwanzen.ContainsExactly(h.Schwanz()) {
 		err = objekte_store.ErrNotFound{Id: h}
+		return
+	}
+
+	return
+}
+
+func (i *indexAbbr) EtikettExists(e kennung.Etikett) (err error) {
+	if err = i.readIfNecessary(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if !i.indexAbbrEncodableTridexes.Etiketten.ContainsExactly(e.String()) {
+		err = objekte_store.ErrNotFound{Id: e}
 		return
 	}
 

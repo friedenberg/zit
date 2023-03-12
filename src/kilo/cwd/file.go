@@ -6,9 +6,11 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/todo"
 )
 
 func MakeFile(dir string, p string) (ut kennung.FD, err error) {
+	todo.Remove()
 	ut = kennung.FD{}
 
 	p = path.Join(dir, p)

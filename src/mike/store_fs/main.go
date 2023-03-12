@@ -25,6 +25,7 @@ import (
 	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/kilo/zettel_external"
 	"github.com/friedenberg/zit/src/lima/store_objekten"
+	"github.com/friedenberg/zit/src/todo"
 )
 
 type Store struct {
@@ -525,7 +526,7 @@ func (s *Store) ReadFiles(
 						if errors.IsNotExist(err) {
 							err = iter.MakeErrStopIteration()
 						} else {
-							err = errors.Wrap(err)
+							err = errors.Wrapf(err, "CwdEtikett: %#v", te)
 						}
 
 						return
@@ -546,6 +547,56 @@ func (s *Store) ReadFiles(
 
 				return
 			},
+		),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = fs.EachCreatableMatchable(
+		iter.MakeChain(
+			func(ilg kennung.IdLikeGetter) (err error) {
+				switch il := ilg.(type) {
+				case cwd.Typ:
+					todo.Implement()
+
+				case cwd.Etikett:
+					if err = s.storeObjekten.GetAbbrStore().EtikettExists(
+						il.Kennung,
+					); err == nil {
+						err = iter.MakeErrStopIteration()
+						return
+					}
+
+					err = nil
+
+					var tco etikett.CheckedOut
+
+					if tco.External, err = s.ReadEtikett(il); err != nil {
+						if errors.IsNotExist(err) {
+							err = iter.MakeErrStopIteration()
+						} else {
+							err = errors.Wrapf(err, "CwdEtikett: %#v", il)
+						}
+
+						return
+					}
+
+					tco.State = objekte.CheckedOutStateUntracked
+
+					if err = f(&tco); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+
+				default:
+					err = errors.Errorf("unsupported id like: %T", il)
+				}
+
+				return
+			},
+			// func(ilg sku.IdLikeGetter) (err error) {
+			// },
 		),
 	); err != nil {
 		err = errors.Wrap(err)

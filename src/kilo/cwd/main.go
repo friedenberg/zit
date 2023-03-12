@@ -15,6 +15,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/india/konfig"
+	"github.com/friedenberg/zit/src/todo"
 )
 
 type CwdFiles struct {
@@ -27,6 +28,32 @@ type CwdFiles struct {
 	// TODO make set
 	UnsureAkten      []kennung.FD
 	EmptyDirectories []kennung.FD
+}
+
+func (fs CwdFiles) EachCreatableMatchable(
+	m schnittstellen.FuncIter[kennung.IdLikeGetter],
+) (err error) {
+	todo.Parallelize()
+
+	if err = fs.Typen.Each(
+		func(e Typ) (err error) {
+			return m(e)
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = fs.Etiketten.Each(
+		func(e Etikett) (err error) {
+			return m(e)
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (fs CwdFiles) ContainsMatchable(m kennung.Matchable) bool {

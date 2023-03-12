@@ -5,6 +5,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte"
+	"github.com/friedenberg/zit/src/hotel/etikett"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/cwd"
@@ -53,6 +54,18 @@ func (c Checkin) Run(
 					}
 
 					u.KonfigPtr().AddTyp(tt)
+
+				case *etikett.CheckedOut:
+					var tt *etikett.Transacted
+
+					if tt, err = u.StoreObjekten().Etikett().CreateOrUpdateCheckedOut(
+						aco,
+					); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+
+					u.KonfigPtr().AddEtikett(tt)
 
 				default:
 					err = errors.Implement()

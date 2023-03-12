@@ -7,18 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/values"
 )
 
-type CheckedOutState int
-
-const (
-	CheckedOutStateNotCheckedOut = CheckedOutState(iota)
-	CheckedOutStateEmpty
-	CheckedOutStateJustCheckedOut
-	CheckedOutStateJustCheckedOutButSame
-	CheckedOutStateExistsAndSame
-	CheckedOutStateExistsAndDifferent
-	CheckedOutStateUntracked
-)
-
 type CheckedOut[
 	T schnittstellen.Objekte[T],
 	T1 schnittstellen.ObjektePtr[T],
@@ -34,6 +22,7 @@ type CheckedOut[
 
 func (c *CheckedOut[T, T1, T2, T3, T4, T5]) DetermineState() {
 	if c.Internal.Sku.ObjekteSha.IsNull() {
+		c.State = CheckedOutStateUntracked
 	} else if c.Internal.Sku.ObjekteSha.Equals(c.External.Sku.ObjekteSha) {
 		c.State = CheckedOutStateExistsAndSame
 	} else if c.External.Sku.ObjekteSha.IsNull() {

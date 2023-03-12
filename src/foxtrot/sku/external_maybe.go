@@ -1,12 +1,13 @@
 package sku
 
 import (
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
 type ExternalMaybeLike interface {
-	GetId() IdLike
+	IdLikeGetter
 	kennung.FDPairGetter
 }
 
@@ -56,7 +57,11 @@ func (a ExternalMaybe[T, T1]) Equals(b ExternalMaybe[T, T1]) bool {
 	return true
 }
 
-func (e ExternalMaybe[T, T1]) GetId() IdLike {
+func (e ExternalMaybe[T, T1]) GetId() schnittstellen.IdLike {
+	return e.Kennung
+}
+
+func (e ExternalMaybe[T, T1]) GetIdLike() schnittstellen.IdLike {
 	return e.Kennung
 }
 

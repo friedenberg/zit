@@ -12,6 +12,10 @@ type Mutter [2]ts.Time
 
 type IdLike = fmt.Stringer
 
+type IdLikeGetter interface {
+	GetId() schnittstellen.IdLike
+}
+
 type DataIdentity interface {
 	schnittstellen.ValueLike
 	GetTime() ts.Time

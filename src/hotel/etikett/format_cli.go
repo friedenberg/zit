@@ -31,15 +31,15 @@ func MakeCliFormatCheckedOut(
 	tf schnittstellen.FuncWriterFormat[kennung.Etikett],
 ) schnittstellen.FuncWriterFormat[CheckedOut] {
 	return func(w io.Writer, t CheckedOut) (n int64, err error) {
-		diff := format.StringChanged
+		// diff := format.StringChanged
 
-		if t.Internal.Sku.ObjekteSha.Equals(t.External.Sku.ObjekteSha) {
-			diff = format.StringSame
-		}
+		// if t.Internal.Sku.ObjekteSha.Equals(t.External.Sku.ObjekteSha) {
+		// 	diff = format.StringSame
+		// }
 
 		return format.Write(
 			w,
-			format.MakeFormatStringRightAlignedParen(diff),
+			// format.MakeFormatStringRightAlignedParen(diff),
 			format.MakeFormatString("["),
 			cw(s.MakeWriterRelativePath(t.External.GetObjekteFD().Path), format.ColorTypePointer),
 			format.MakeFormatString("@"),
