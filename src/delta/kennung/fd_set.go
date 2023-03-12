@@ -29,16 +29,16 @@ func MakeMutableFDSet(ts ...FD) MutableFDSet {
 }
 
 func FDSetAddPairs[T FDPairGetter](
-  in schnittstellen.Set[T], 
-  out schnittstellen.MutableSet[FD],
+	in schnittstellen.Set[T],
+	out schnittstellen.MutableSet[FD],
 ) (err error) {
-  return in.Each(
-    func (e T) (err error) {
-      out.Add(e.GetObjekteFD())
-      out.Add(e.GetAkteFD())
-      return
-    },
-  )
+	return in.Each(
+		func(e T) (err error) {
+			out.Add(e.GetObjekteFD())
+			out.Add(e.GetAkteFD())
+			return
+		},
+	)
 }
 
 func FDSetContainsPair(s FDSet, maybeFDs Matchable) (ok bool) {

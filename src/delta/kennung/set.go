@@ -148,7 +148,9 @@ func (s *Set) Add(ids ...schnittstellen.Element) (err error) {
 			s.Sigil.Add(it)
 
 		case FD:
-			s.FDs.Add(it)
+			if il, err := it.GetIdLike(); err == nil {
+				s.Add(il)
+			}
 
 		default:
 			err = errors.Errorf("unknown kennung: %s", it)
@@ -186,9 +188,9 @@ func (s Set) ContainsMatchable(m Matchable) bool {
 		return false
 	}
 
-	if s.FDs.Len() > 0 && !FDSetContainsPair(s.FDs, m) {
-		return false
-	}
+	// if s.FDs.Len() > 0 && !FDSetContainsPair(s.FDs, m) {
+	// 	return false
+	// }
 
 	if es := m.GetEtikettenExpanded(); !s.Etiketten.ContainsAgainst(es) {
 		return false
@@ -215,6 +217,9 @@ func (s Set) ContainsMatchable(m Matchable) bool {
 		if s.Hinweisen.Len() > 0 && !s.Hinweisen.Contains(id) {
 			return false
 		}
+
+	default:
+		panic(errors.Errorf("unsupported it type: %T, %s", il, il))
 	}
 
 	return true
@@ -271,8 +276,7 @@ func (s Set) OnlySingleHinweis() (h Hinweis, ok bool) {
 	case s.FDs.Len() == 1:
 		var err error
 
-		h, err = s.FDs.Any().Hinweis()
-		errors.Err().Printf("Hinweis Error: %s", err)
+		h, err = s.FDs.Any().GetHinweis()
 		ok = err == nil
 
 	default:
@@ -295,6 +299,7 @@ func (s Set) Len() int {
 		s.Hinweisen,
 		s.Typen,
 		s.Timestamps,
+		s.FDs,
 	) + k
 }
 

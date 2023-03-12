@@ -180,7 +180,22 @@ func (f FD) IsEmpty() bool {
 	return false
 }
 
-func (f FD) Hinweis() (h Hinweis, err error) {
+func (f FD) GetIdLike() (il IdLike, err error) {
+	var h Hinweis
+
+	if h, err = f.GetHinweis(); err == nil {
+		il = h
+		return
+	}
+
+	errors.TodoP0("implement Typ and Etikett")
+
+	err = errors.Errorf("not an id")
+
+	return
+}
+
+func (f FD) GetHinweis() (h Hinweis, err error) {
 	parts := strings.Split(f.Path, string(filepath.Separator))
 
 	switch len(parts) {

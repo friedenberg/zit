@@ -191,7 +191,25 @@ func (ms *metaSet) Set(v string) (err error) {
 				ids.Sigil = sigil
 			}
 
-			if before != "" {
+			switch {
+			case before == "":
+				break
+
+			case ids.Sigil.IncludesCwd():
+				fp := fmt.Sprintf("%s.%s", before, after)
+
+				var fd FD
+
+				if fd, err = FDFromPath(fp); err == nil {
+					ids.Add(fd)
+					break
+				}
+
+				err = nil
+
+				fallthrough
+
+			default:
 				if err = ids.Set(before); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -199,6 +217,8 @@ func (ms *metaSet) Set(v string) (err error) {
 			}
 
 			ms.Gattung[g] = ids
+			errors.Log().Printf("ids: %#v", ids)
+
 			return
 		},
 	); err != nil {

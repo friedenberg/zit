@@ -24,7 +24,7 @@ func (c *CwdFiles) tryZettel(d string, a string, p string) (err error) {
 
 	var h kennung.Hinweis
 
-	if h, err = fd.Hinweis(); err != nil {
+	if h, err = fd.GetHinweis(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
