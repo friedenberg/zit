@@ -14,7 +14,7 @@ import (
 )
 
 type QueryPrefixer interface {
-	GetQueryPrefix() rune
+	GetQueryPrefix() string
 }
 
 type IdLike = schnittstellen.IdLike
@@ -46,9 +46,9 @@ func makeKennung[T KennungLike[T], T1 KennungLikePtr[T]](
 	return
 }
 
-func (e Kennung[T, T1]) GetQueryPrefix() (r rune) {
+func (e Kennung[T, T1]) GetQueryPrefix() (pre string) {
 	if qp, ok := any(e.value).(QueryPrefixer); ok {
-		r = qp.GetQueryPrefix()
+		pre = qp.GetQueryPrefix()
 	}
 
 	return

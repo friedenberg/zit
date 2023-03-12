@@ -11,13 +11,13 @@ var (
 	registerOnce        sync.Once
 	registryLock        *sync.Mutex
 	registryGattung     map[gattung.Gattung]IdLike
-	registryQueryPrefix map[rune]IdLike
+	registryQueryPrefix map[string]IdLike
 )
 
 func once() {
 	registryLock = &sync.Mutex{}
 	registryGattung = make(map[gattung.Gattung]IdLike)
-	registryQueryPrefix = make(map[rune]IdLike)
+	registryQueryPrefix = make(map[string]IdLike)
 }
 
 func register(id IdLike) {
@@ -49,7 +49,7 @@ func register(id IdLike) {
 		if id1, ok := registryQueryPrefix[p]; ok {
 			panic(
 				errors.Errorf(
-					"prefix '%c' has two registrations: %s (old), %s (new)",
+					"prefix '%s' has two registrations: %s (old), %s (new)",
 					p,
 					id1,
 					id,

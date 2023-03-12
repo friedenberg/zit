@@ -116,14 +116,14 @@ func (kqs querySet[T, TPtr]) String() string {
 
 	kqs.Include.Each(
 		func(e T) (err error) {
-			sb.WriteString(fmt.Sprintf("%c%s ", p, e))
+			sb.WriteString(fmt.Sprintf("%s%s ", p, e))
 			return
 		},
 	)
 
 	kqs.Exclude.Each(
 		func(e T) (err error) {
-			sb.WriteString(fmt.Sprintf("%c%c%s ", QueryNegationOperator, p, e))
+			sb.WriteString(fmt.Sprintf("%c%s%s ", QueryNegationOperator, p, e))
 			return
 		},
 	)
@@ -139,14 +139,14 @@ func (kqs mutableQuerySet[T, TPtr]) String() string {
 
 	kqs.Include.Each(
 		func(e T) (err error) {
-			sb.WriteString(fmt.Sprintf("%c%s ", p, e))
+			sb.WriteString(fmt.Sprintf("%s%s ", p, e))
 			return
 		},
 	)
 
 	kqs.Exclude.Each(
 		func(e T) (err error) {
-			sb.WriteString(fmt.Sprintf("%c%c%s ", QueryNegationOperator, p, e))
+			sb.WriteString(fmt.Sprintf("%c%s%s ", QueryNegationOperator, p, e))
 			return
 		},
 	)
@@ -286,7 +286,7 @@ func (kqs mutableQuerySet[T, TPtr]) AddString(v string) (err error) {
 	var e T
 	p := e.GetQueryPrefix()
 
-	if len(v) > 0 && []rune(v)[0] == p {
+	if len(v) > 0 && v[:len(p)] == p {
 		v = v[1:]
 	}
 

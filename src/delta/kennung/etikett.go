@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/bravo/values"
 )
 
@@ -46,9 +45,8 @@ func MakeEtikett(v string) (e Etikett, err error) {
 
 type etikett string
 
-func (e etikett) GetQueryPrefix() rune {
-	todo.Change("switch to string instead of rune")
-	return '-'
+func (e etikett) GetQueryPrefix() string {
+	return "-"
 }
 
 func (e etikett) GetGattung() schnittstellen.Gattung {
