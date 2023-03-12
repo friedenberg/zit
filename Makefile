@@ -27,7 +27,7 @@ install: build/tests_fast
 deploy: build/tests_slower
 > go install ./.
 
-files_go_generate := $(shell ag 'go:generate' -l)
+files_go_generate := $(shell ag 'go:generate' -l src/)
 
 build/go_generate: $(files_go_generate)
 > go generate ./...
@@ -64,6 +64,9 @@ build/tests_bats_migration: build/zit
 
 build/tests_slower: build/tests_fast build/tests_slow build/tests_bats_migration;
 > touch "$@"
+
+build/deploy: build/tests_slower
+> [[ "$$(($$(ag "log.Debug" -l src/ | wc -l)))" = 0 ]]
 
 graph_dependencies:
 > ./bin/graph_dependencies
