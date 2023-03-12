@@ -1,7 +1,7 @@
 package schnittstellen
 
 type FileExtensionGetter interface {
-  GetFileExtensionForGattung(Gattung) string
+	GetFileExtensionForGattung(Gattung) string
 	GetFileExtensionZettel() string
 	GetFileExtensionOrganize() string
 	GetFileExtensionTyp() string

@@ -1,5 +1,5 @@
 package schnittstellen
 
 type IncludesHistory interface {
-  IncludesHistory() bool
+	IncludesHistory() bool
 }
