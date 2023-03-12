@@ -56,8 +56,19 @@ func (e kasten) String() string {
 	return string(e)
 }
 
+// func (e etikett) GetQueryPrefix() string {
+// 	return "//"
+// }
+
 func (e *kasten) Set(v string) (err error) {
 	v = strings.TrimSpace(strings.Trim(v, ".! "))
+
+	if !strings.HasPrefix(v, "//") {
+		err = errors.Errorf("kasten missing '//' prefix: %s", v)
+		return
+	}
+
+	v = strings.TrimPrefix(v, "//")
 
 	if !EtikettRegex.Match([]byte(v)) {
 		err = errors.Errorf("not a valid kasten: '%s'", v)
