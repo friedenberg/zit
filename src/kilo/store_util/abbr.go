@@ -228,7 +228,6 @@ func (i *indexAbbr) AbbreviateHinweis(h schnittstellen.Korper) (v string, err er
 
 		if kopf == "" || schwanz == "" {
 			err = errors.Errorf("abbreviated kopf would be empty for %s", h)
-			errors.Log().PrintDebug(i.indexAbbrEncodableTridexes.HinweisKopfen)
 			return
 		}
 

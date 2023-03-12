@@ -6,101 +6,149 @@ import (
 	"os"
 )
 
-var out, err, log printer
+type ProdPrinter interface {
+	Print(v ...interface{}) error
+	Printf(format string, v ...interface{}) error
+}
+
+type DevPrinter interface {
+	ProdPrinter
+	Caller(i int, f string, vs ...interface{})
+	FunctionName(skip int)
+}
+
+var (
+	printerOut, printerErr   prodPrinter
+	printerLog, printerDebug devPrinter
+)
 
 func init() {
-	out = printer{
+	printerOut = prodPrinter{
 		f:  os.Stdout,
 		on: true,
 	}
 
-	err = printer{
+	printerErr = prodPrinter{
 		f:  os.Stderr,
 		on: true,
 	}
 
-	log = printer{
+	printerLog = devPrinter{
+		prodPrinter: prodPrinter{
+			f: os.Stderr,
+		},
 		includesStack: true,
-		f:             os.Stderr,
+	}
+
+	printerDebug = devPrinter{
+		prodPrinter: prodPrinter{
+			f: os.Stderr,
+		},
+		includesStack: true,
 	}
 }
 
-type printer struct {
-	f             io.Writer
+type prodPrinter struct {
+	f  io.Writer
+	on bool
+}
+
+type devPrinter struct {
+	prodPrinter
 	includesStack bool
-	on            bool
 }
 
-func Out() printer {
-	return out
+func Out() ProdPrinter {
+	return printerOut
 }
 
-func Err() printer {
-	return err
+func Err() ProdPrinter {
+	return printerErr
 }
 
-func Log() printer {
-	return log
+func Log() DevPrinter {
+	return printerLog
 }
 
-func MakePrinter(o io.Writer) *printer {
-	return &printer{
-		f:  o,
-		on: true,
-	}
+func Debug() DevPrinter {
+	return printerDebug
 }
 
-func (p printer) PrintDebug(vs ...interface{}) (err error) {
+// func MakePrinter(o io.Writer) *printer {
+// 	return &printer{
+// 		f:  o,
+// 		on: true,
+// 	}
+// }
+
+// func (p printer) PrintDebug(vs ...interface{}) (err error) {
+// 	if !p.on {
+// 		return
+// 	}
+
+// 	si, _ := MakeStackInfo(1)
+
+// 	for _, v := range vs {
+// 		if _, err = fmt.Fprintf(
+// 			p.f,
+// 			"%s%#v\n",
+// 			si,
+// 			v,
+// 		); err != nil {
+// 			err = Wrap(err)
+// 			return
+// 		}
+// 	}
+
+// 	return
+// }
+
+func (p prodPrinter) Print(a ...interface{}) (err error) {
 	if !p.on {
 		return
-	}
-
-	si, _ := MakeStackInfo(1)
-
-	for _, v := range vs {
-		if _, err = fmt.Fprintf(
-			p.f,
-			"%s%#v\n",
-			si,
-			v,
-		); err != nil {
-			err = Wrap(err)
-			return
-		}
-	}
-
-	return
-}
-
-func (p printer) Print(a ...interface{}) (err error) {
-	if !p.on {
-		return
-	}
-
-	args := []interface{}{}
-
-	if p.includesStack {
-		si, _ := MakeStackInfo(1)
-		args = []interface{}{si}
 	}
 
 	_, err = fmt.Fprintln(
 		p.f,
-		append(args, a...)...,
+		a...,
 	)
 
 	return
 }
 
-func (p printer) printf(depth int, f string, a ...interface{}) (err error) {
+func (p devPrinter) Print(a ...interface{}) (err error) {
 	if !p.on {
 		return
 	}
 
 	if p.includesStack {
-		si, _ := MakeStackInfo(1 + depth)
-		f = "%s" + f
+		si, _ := MakeStackInfo(1)
 		a = append([]interface{}{si}, a...)
+	}
+
+	return p.prodPrinter.Print(a...)
+}
+
+func (p prodPrinter) printfStack(depth int, f string, a ...interface{}) (err error) {
+	if !p.on {
+		return
+	}
+
+	si, _ := MakeStackInfo(1 + depth)
+	f = "%s" + f
+	a = append([]interface{}{si}, a...)
+
+	_, err = fmt.Fprintln(
+		p.f,
+		fmt.Sprintf(f, a...),
+	)
+
+	return
+}
+
+func (p prodPrinter) Printf(f string, a ...interface{}) (err error) {
+	if !p.on {
+		return
 	}
 
 	_, err = fmt.Fprintln(
@@ -111,7 +159,7 @@ func (p printer) printf(depth int, f string, a ...interface{}) (err error) {
 	return
 }
 
-func (p printer) Printf(f string, a ...interface{}) (err error) {
+func (p devPrinter) Printf(f string, a ...interface{}) (err error) {
 	if !p.on {
 		return
 	}
@@ -122,15 +170,10 @@ func (p printer) Printf(f string, a ...interface{}) (err error) {
 		a = append([]interface{}{si}, a...)
 	}
 
-	_, err = fmt.Fprintln(
-		p.f,
-		fmt.Sprintf(f, a...),
-	)
-
-	return
+	return p.prodPrinter.Printf(f, a...)
 }
 
-func (p printer) Caller(i int, f string, vs ...interface{}) {
+func (p devPrinter) Caller(i int, f string, vs ...interface{}) {
 	if !p.on {
 		return
 	}
@@ -142,13 +185,13 @@ func (p printer) Caller(i int, f string, vs ...interface{}) {
 	io.WriteString(p.f, fmt.Sprintf("%s"+f+"\n", vs...))
 }
 
-func (p printer) CallerNonEmpty(i int, v interface{}) {
+func (p devPrinter) CallerNonEmpty(i int, v interface{}) {
 	if v != nil {
 		p.Caller(i+1, "%s", v)
 	}
 }
 
-func (p printer) FunctionName(skip int) {
+func (p devPrinter) FunctionName(skip int) {
 	if !p.on {
 		return
 	}

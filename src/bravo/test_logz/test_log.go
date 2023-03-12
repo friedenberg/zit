@@ -11,7 +11,6 @@ import (
 var (
 	Print         = errors.Log().Print
 	Printf        = errors.Log().Printf
-	PrintDebug    = errors.Log().PrintDebug
 	MakeStackInfo = errors.MakeStackInfo
 )
 

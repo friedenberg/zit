@@ -97,10 +97,8 @@ func (fv *FormatterValue) FuncFormatter(
 		}
 
 	case "debug":
-		dp := errors.MakePrinter(out)
-
 		return func(z *Transacted) (err error) {
-			dp.PrintDebug(z)
+			errors.Out().Printf("%#v", z)
 			return
 		}
 

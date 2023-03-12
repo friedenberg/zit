@@ -103,7 +103,7 @@ func (f *FormatterValue) FuncFormatter(
 
 	case "debug":
 		return func(o *Transacted) (err error) {
-			errors.Err().PrintDebug(o)
+			errors.Out().Printf("%#v", o)
 
 			return
 		}

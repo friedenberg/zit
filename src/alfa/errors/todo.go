@@ -9,7 +9,9 @@ var todo todoPrinter
 
 func init() {
 	todo = todoPrinter{
-		f:             os.Stderr,
+		prodPrinter: prodPrinter{
+			f: os.Stderr,
+		},
 		includesStack: true,
 	}
 }
@@ -18,7 +20,7 @@ func SetTodoOn() {
 	todo.on = true
 }
 
-type todoPrinter printer
+type todoPrinter devPrinter
 
 //go:generate stringer -type=Priority
 type Priority int
@@ -33,7 +35,7 @@ const (
 )
 
 func Todo(f string, a ...interface{}) (err error) {
-	return Err().printf(1, "TODO: "+f, a...)
+	return printerErr.printfStack(1, "TODO: "+f, a...)
 }
 
 func TodoP0(f string, a ...interface{}) (err error) {
