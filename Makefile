@@ -27,20 +27,22 @@ install: build/tests_fast
 deploy: build/tests_slower
 > go install ./.
 
-files_go := $(shell find src -type f)
+files_go_generate := $(shell ag 'go:generate' -l)
 
-build/go_generate: $(files_go)
+build/go_generate: $(files_go_generate)
 > go generate ./...
 > touch "$@"
+
+files_go := $(shell find src -type f)
 
 build/zit: build/go_generate $(files_go)
 > go build -o build/zit ./.
 
-build/go_vet:
+build/go_vet: $(files_go)
 > go vet ./...
 > touch "$@"
 
-build/tests_unit: build/go_generate
+build/tests_unit: $(files_go) build/go_generate
 > go test -timeout 5s ./...
 > touch "$@"
 
