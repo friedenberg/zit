@@ -5,3 +5,8 @@ type CheckedOutLike interface {
 	GetExternal() ExternalLike   // TODO-P0 rename to GetExternalLike
 	GetState() CheckedOutState
 }
+
+type CheckedOutLikePtr interface {
+	CheckedOutLike
+	DetermineState()
+}

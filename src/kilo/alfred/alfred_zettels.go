@@ -81,7 +81,7 @@ func (w *Writer) etikettToItem(e kennung.Etikett) (a *alfred.Item) {
 	mb := alfred.NewMatchBuilder()
 
 	mb.AddMatches(a.Title)
-	mb.AddMatches(collections.Strings(e.Expanded())...)
+	mb.AddMatches(collections.Strings(kennung.ExpandOne(e))...)
 
 	a.Match = mb.String()
 

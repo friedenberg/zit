@@ -31,7 +31,7 @@ func (s *Store) CheckoutQuery(
 	if err = s.storeObjekten.Query(
 		ms,
 		func(t objekte.TransactedLike) (err error) {
-			var co objekte.CheckedOutLike
+			var co objekte.CheckedOutLikePtr
 
 			if co, err = s.checkoutOneGeneric(options, t); err != nil {
 				err = errors.Wrap(err)
@@ -118,24 +118,31 @@ func (s Store) filenameForZettelTransacted(
 func (s *Store) checkoutOneGeneric(
 	options CheckoutOptions,
 	t objekte.TransactedLike,
-) (co objekte.CheckedOutLike, err error) {
+) (cop objekte.CheckedOutLikePtr, err error) {
 	switch tt := t.(type) {
 	case *zettel.Transacted:
-		return s.CheckoutOneZettel(options, *tt)
+		var co zettel.CheckedOut
+		co, err = s.CheckoutOneZettel(options, *tt)
+		cop = &co
 
 	case *typ.Transacted:
+		var co typ.CheckedOut
 		co, err = s.CheckoutOneTyp(options, *tt)
-		s.checkedOutLogPrinter(co)
+		cop = &co
 
 	case *etikett.Transacted:
+		var co etikett.CheckedOut
 		co, err = s.CheckoutOneEtikett(options, *tt)
-		s.checkedOutLogPrinter(co)
+		cop = &co
 
 	default:
 		// err = errors.Implement()
 		err = gattung.MakeErrUnsupportedGattung(tt.GetSku2())
 		return
 	}
+
+	cop.DetermineState()
+	s.checkedOutLogPrinter(cop)
 
 	return
 }
@@ -158,16 +165,6 @@ func (s *Store) CheckoutOneZettel(
 		}
 
 		if !s.shouldCheckOut(options, cz) {
-			// TODO-P2 handle fs state
-			if err = s.checkedOutLogPrinter(&cz); err != nil {
-				// if errors.IsExist(err) {
-				// 	err = nil
-				// } else {
-				err = errors.Wrap(err)
-				return
-				// }
-			}
-
 			return
 		}
 	}
@@ -215,11 +212,6 @@ func (s *Store) CheckoutOneZettel(
 	)
 
 	if err = e.Encode(&cz.External); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.checkedOutLogPrinter(&cz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

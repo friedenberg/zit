@@ -12,7 +12,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/id"
 	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/hinweisen"
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/kennung"
@@ -558,7 +557,33 @@ func (s *Store) ReadFiles(
 			func(ilg kennung.IdLikeGetter) (err error) {
 				switch il := ilg.(type) {
 				case cwd.Typ:
-					todo.Implement()
+					if err = s.storeObjekten.GetAbbrStore().TypExists(
+						il.Kennung,
+					); err == nil {
+						err = iter.MakeErrStopIteration()
+						return
+					}
+
+					err = nil
+
+					var tco typ.CheckedOut
+
+					if tco.External, err = s.ReadTyp(il); err != nil {
+						if errors.IsNotExist(err) {
+							err = iter.MakeErrStopIteration()
+						} else {
+							err = errors.Wrapf(err, "CwdEtikett: %#v", il)
+						}
+
+						return
+					}
+
+					tco.State = objekte.CheckedOutStateUntracked
+
+					if err = f(&tco); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
 
 				case cwd.Etikett:
 					if err = s.storeObjekten.GetAbbrStore().EtikettExists(

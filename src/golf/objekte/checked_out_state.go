@@ -1,5 +1,9 @@
 package objekte
 
+import (
+	"fmt"
+)
+
 type CheckedOutState int
 
 const (
@@ -13,8 +17,12 @@ const (
 )
 
 func (s CheckedOutState) String() string {
+
 	switch s {
-	case CheckedOutStateExistsAndSame, CheckedOutStateJustCheckedOutButSame:
+	case CheckedOutStateJustCheckedOutButSame:
+		return "checked out"
+
+	case CheckedOutStateExistsAndSame:
 		return "same"
 
 	case CheckedOutStateExistsAndDifferent:
@@ -24,6 +32,6 @@ func (s CheckedOutState) String() string {
 		return "untracked"
 
 	default:
-		return "unknown"
+		return fmt.Sprintf("unknown: %#v", s)
 	}
 }

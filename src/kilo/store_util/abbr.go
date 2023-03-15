@@ -27,6 +27,9 @@ type AbbrStore interface {
 	ExpandEtikettString(string) (kennung.Etikett, error)
 	EtikettExists(kennung.Etikett) error
 
+	ExpandTypString(string) (kennung.Typ, error)
+	TypExists(kennung.Typ) error
+
 	AddStoredAbbreviation(schnittstellen.Stored) error
 
 	errors.Flusher
@@ -37,6 +40,7 @@ type indexAbbrEncodableTridexes struct {
 	HinweisKopfen    *tridex.Tridex
 	HinweisSchwanzen *tridex.Tridex
 	Etiketten        *tridex.Tridex
+	Typen            *tridex.Tridex
 }
 
 type indexAbbr struct {
@@ -64,6 +68,7 @@ func newIndexAbbr(
 			HinweisKopfen:    tridex.Make(),
 			HinweisSchwanzen: tridex.Make(),
 			Etiketten:        tridex.Make(),
+			Typen:            tridex.Make(),
 		},
 	}
 
@@ -160,8 +165,28 @@ func (i *indexAbbr) AddStoredAbbreviation(o schnittstellen.Stored) (err error) {
 		i.indexAbbrEncodableTridexes.HinweisKopfen.Add(z.Kennung().Kopf())
 		i.indexAbbrEncodableTridexes.HinweisSchwanzen.Add(z.Kennung().Schwanz())
 
-		for _, e := range kennung.Expanded(z.Objekte.Etiketten, kennung.ExpanderRight).Elements() {
-			i.indexAbbrEncodableTridexes.Etiketten.Add(e.String())
+		expanded := kennung.Expanded(z.Objekte.Etiketten, kennung.ExpanderRight)
+
+		if err = expanded.Each(
+			func(e kennung.Etikett) (err error) {
+				i.indexAbbrEncodableTridexes.Etiketten.Add(e.String())
+				return
+			},
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		expandedTypen := kennung.ExpandOne(z.Objekte.Typ, kennung.ExpanderRight)
+
+		if err = expandedTypen.Each(
+			func(e kennung.Typ) (err error) {
+				i.indexAbbrEncodableTridexes.Typen.Add(e.String())
+				return
+			},
+		); err != nil {
+			err = errors.Wrap(err)
+			return
 		}
 	}
 
@@ -291,15 +316,57 @@ func (i *indexAbbr) ExpandHinweis(hAbbr kennung.Hinweis) (h kennung.Hinweis, err
 	return
 }
 
-func (i *indexAbbr) ExpandEtikettString(s string) (e kennung.Etikett, err error) {
-	errors.Log().Print(s)
+func (i *indexAbbr) ExpandTypString(s string) (t kennung.Typ, err error) {
+	if t, err = kennung.MakeTyp(s); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
+	return i.ExpandTyp(t)
+}
+
+func (i *indexAbbr) TypExists(t kennung.Typ) (err error) {
+	if err = i.readIfNecessary(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if !i.indexAbbrEncodableTridexes.Typen.ContainsExactly(t.String()) {
+		err = objekte_store.ErrNotFound{Id: t}
+		return
+	}
+
+	return
+}
+
+func (i *indexAbbr) ExpandEtikettString(s string) (e kennung.Etikett, err error) {
 	if e, err = kennung.MakeEtikett(s); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	return i.ExpandEtikett(e)
+}
+
+func (i *indexAbbr) ExpandTyp(eAbbr kennung.Typ) (e kennung.Typ, err error) {
+	if err = i.readIfNecessary(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	ex := i.indexAbbrEncodableTridexes.Typen.Expand(eAbbr.String())
+
+	if ex == "" {
+		// TODO should try to use the expansion if possible
+		ex = eAbbr.String()
+	}
+
+	if err = e.Set(ex); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (i *indexAbbr) ExpandEtikett(eAbbr kennung.Etikett) (e kennung.Etikett, err error) {

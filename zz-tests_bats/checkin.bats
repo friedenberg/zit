@@ -57,10 +57,12 @@ function checkin_complex_zettel_etikett_negation { # @test
 
 function checkin_simple_all { # @test
 	run_zit checkin .
-	assert_output --partial '[!md@72d654e3c7f4e820df18c721177dfad38fe831d10bca6dcb33b7cad5dc335357]'
-	assert_output --partial '[one/uno@689c6787364899defa77461ff6a3f454ca667654653f86d5d44f2826950ff4f9 !md "wildly different"]'
-	assert_output --partial '[one/dos@30edfed4c016580f5b69a2709b8e5ae01c2b504b8826bf2d04e6c1ecd6bb3268 !md "dos wildly different"]'
-	assert_output --partial '[-zz-archive@cba019d4f889027a3485e56dd2080c7ba0fa1e27499c24b7ec08ad80ef55da9d]'
+	assert_output_unsorted - <<-EOM
+		[!md@72d654e3c7f4e820df18c721177dfad38fe831d10bca6dcb33b7cad5dc335357]
+		[one/uno@689c6787364899defa77461ff6a3f454ca667654653f86d5d44f2826950ff4f9 !md "wildly different"]
+		[one/dos@30edfed4c016580f5b69a2709b8e5ae01c2b504b8826bf2d04e6c1ecd6bb3268 !md "dos wildly different"]
+		[-zz-archive@cba019d4f889027a3485e56dd2080c7ba0fa1e27499c24b7ec08ad80ef55da9d]
+	EOM
 }
 
 function checkin_simple_typ { # @test
@@ -75,6 +77,6 @@ function checkin_simple_etikett { # @test
 	run_zit checkin .e
 	assert_output '[-zz-archive@cba019d4f889027a3485e56dd2080c7ba0fa1e27499c24b7ec08ad80ef55da9d]'
 
-	# run_zit show -format vim-syntax-type !md.typ
-	# assert_output 'test'
+	run_zit show -format text -- -zz-archive.e
+	assert_output 'hide = true'
 }

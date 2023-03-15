@@ -3,6 +3,7 @@ package kennung
 import (
 	"strings"
 
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
@@ -82,15 +83,27 @@ func WithRemovedCommonPrefixes(s EtikettSet) (s2 EtikettSet) {
 	return
 }
 
-func Expanded(s EtikettSet, exes ...Expander) (out EtikettSet) {
-	s1 := MakeEtikettMutableSet()
+func expandOne[T KennungLike[T], TPtr KennungLikePtr[T]](
+	k T,
+	ex Expander,
+	acc schnittstellen.MutableSet[T],
+) {
+	f := collections.MakeFuncSetString[T, TPtr](acc)
+	ex.Expand(f, k.String())
+}
+
+func ExpandOne[T KennungLike[T], TPtr KennungLikePtr[T]](
+	k T,
+	exes ...Expander,
+) (out schnittstellen.Set[T]) {
+	s1 := collections.MakeMutableSetStringer[T]()
 
 	if len(exes) == 0 {
 		exes = []Expander{ExpanderAll}
 	}
 
-	for _, e := range s.Elements() {
-		e.Expanded(exes...).Each(s1.Add)
+	for _, ex := range exes {
+		expandOne[T, TPtr](k, ex, s1)
 	}
 
 	out = s1.ImmutableClone()
@@ -98,8 +111,37 @@ func Expanded(s EtikettSet, exes ...Expander) (out EtikettSet) {
 	return
 }
 
+func ExpandMany[T KennungLike[T], TPtr KennungLikePtr[T]](
+	ks schnittstellen.Set[T],
+	exes ...Expander,
+) (out schnittstellen.Set[T]) {
+	s1 := collections.MakeMutableSetStringer[T]()
+
+	if len(exes) == 0 {
+		exes = []Expander{ExpanderAll}
+	}
+
+	ks.Each(
+		func(k T) (err error) {
+			for _, ex := range exes {
+				expandOne[T, TPtr](k, ex, s1)
+			}
+
+			return
+		},
+	)
+
+	out = s1.ImmutableClone()
+
+	return
+}
+
+func Expanded(s EtikettSet, exes ...Expander) (out EtikettSet) {
+	return ExpandMany[Etikett, *Etikett](s, exes...)
+}
+
 func AddNormalized(es EtikettMutableSet, e Etikett) {
-	e.Expanded(ExpanderRight).Each(es.Add)
+	ExpandOne(e, ExpanderRight).Each(es.Add)
 	es.Add(e)
 
 	c := es.ImmutableClone()

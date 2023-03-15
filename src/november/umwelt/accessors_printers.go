@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
@@ -88,7 +89,9 @@ func (u *Umwelt) PrinterKastenTransacted() schnittstellen.FuncIter[*kasten.Trans
 func (u *Umwelt) PrinterTypCheckedOut() schnittstellen.FuncIter[*typ.CheckedOut] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
-		u.FormatTypCheckedOut(),
+		wrapWithCheckedOutState(
+			u.FormatTypCheckedOut(),
+		),
 	)
 }
 
@@ -220,14 +223,15 @@ func (u *Umwelt) PrinterJustCheckedOutLike() schnittstellen.FuncIter[objekte.Che
 			return pzco(&coz.External)
 
 		case gattung.Typ:
-			coz := co.(typ.CheckedOut)
-			return ptco(&coz)
+			coz := co.(*typ.CheckedOut)
+			return ptco(coz)
 
 		case gattung.Etikett:
 			coz := co.(*etikett.CheckedOut)
 			return peco(coz)
 
 		default:
+			todo.Implement()
 			_, err = fmt.Fprintf(
 				u.Out(),
 				"(checked out) [%s.%s]\n",

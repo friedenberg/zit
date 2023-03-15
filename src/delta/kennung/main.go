@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/values"
-	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
 type QueryPrefixer interface {
@@ -140,22 +139,6 @@ func (a *Kennung[T, T1]) LeftSubtract(b Kennung[T, T1]) (c Kennung[T, T1], err e
 
 func (a Kennung[T, T1]) IsEmpty() bool {
 	return a.Len() == 0
-}
-
-func (e Kennung[T, T1]) Expanded(
-	exes ...Expander,
-) (out schnittstellen.Set[Kennung[T, T1]]) {
-	expanded := collections.MakeMutableSet[Kennung[T, T1]](
-		(Kennung[T, T1]).String,
-	)
-
-	for _, ex := range exes {
-		ex.Expand(collections.MakeFuncSetString[Kennung[T, T1], *Kennung[T, T1]](expanded), e.String())
-	}
-
-	out = expanded.ImmutableClone()
-
-	return
 }
 
 func (t Kennung[T, T1]) MarshalText() (text []byte, err error) {
