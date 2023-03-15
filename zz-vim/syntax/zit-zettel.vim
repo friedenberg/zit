@@ -11,8 +11,6 @@ let g:markdown_syntax_conceal = 0
 if zettel != ""
   let cmdFormat = "zit show -format typ-vim-syntax-type " . zettel
   let zettelTypSyntax = trim(system(cmdFormat))
-  echom cmdFormat
-  echom zettelTypSyntax
 
   if zettelTypSyntax == ""
     echom "Zettel Typ has no vim syntax set"

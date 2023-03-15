@@ -158,41 +158,45 @@ assert_output_unsorted() {
     expected="${1-}"
   fi
 
-  expected="$(echo -n "$expected" | sort)"
-  output="$(echo -n "$expected" | sort)"
+  local expected_sorted output_sorted
+  expected_sorted="$(echo -n "$expected" | sort)"
+  output_sorted="$(echo -n "$output" | sort)"
+  # echo "$expected_sorted" >&2
+  # echo "$output_sorted" >&2
+  # fail
 
   # Matching.
   if (( is_mode_nonempty )); then
-    if [ -z "$output" ]; then
+    if [ -z "$output_sorted" ]; then
       echo 'expected non-empty output, but output was empty' \
       | batslib_decorate 'no output' \
       | fail
     fi
   elif (( is_mode_regexp )); then
-    if [[ '' =~ $expected ]] || (( $? == 2 )); then
-      echo "Invalid extended regular expression: \`$expected'" \
+    if [[ '' =~ $expected_sorted ]] || (( $? == 2 )); then
+      echo "Invalid extended regular expression: \`$expected_sorted'" \
       | batslib_decorate 'ERROR: assert_output_unsorted' \
       | fail
-    elif ! [[ $output =~ $expected ]]; then
+    elif ! [[ $output_sorted =~ $expected_sorted ]]; then
       batslib_print_kv_single_or_multi 6 \
-      'regexp'  "$expected" \
-      'output' "$output" \
+      'regexp'  "$expected_sorted" \
+      'output' "$output_sorted" \
       | batslib_decorate 'regular expression does not match output' \
       | fail
     fi
   elif (( is_mode_partial )); then
-    if [[ $output != *"$expected"* ]]; then
+    if [[ $output_sorted != *"$expected_sorted"* ]]; then
       batslib_print_kv_single_or_multi 9 \
-      'substring' "$expected" \
-      'output'    "$output" \
+      'substring' "$expected_sorted" \
+      'output'    "$output_sorted" \
       | batslib_decorate 'output does not contain substring' \
       | fail
     fi
   else
-    if [[ $output != "$expected" ]]; then
+    if [[ $output_sorted != "$expected_sorted" ]]; then
       batslib_print_kv_single_or_multi 8 \
-      'expected' "$expected" \
-      'actual'   "$output" \
+      'expected' "$expected_sorted" \
+      'actual'   "$output_sorted" \
       | batslib_decorate 'output differs' \
       | fail
     fi
