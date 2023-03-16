@@ -151,7 +151,13 @@ func (fd *FD) Set(v string) (err error) {
 // }
 
 func (f FD) String() string {
-	return f.Path
+	p := filepath.Clean(f.Path)
+
+	if f.IsDir {
+		return p + string(filepath.Separator)
+	} else {
+		return p
+	}
 }
 
 func (e FD) Ext() string {

@@ -61,15 +61,8 @@ func makeWriterFuncZettel(
 	zf schnittstellen.FuncWriterFormat[Objekte],
 ) schnittstellen.FuncWriterFormat[CheckedOut] {
 	return func(w io.Writer, z CheckedOut) (n int64, err error) {
-		diff := format.StringChanged
-
-		if z.Internal.Sku.ObjekteSha.Equals(z.External.Sku.ObjekteSha) {
-			diff = format.StringSame
-		}
-
 		return format.Write(
 			w,
-			format.MakeFormatStringRightAlignedParen(diff),
 			format.MakeFormatString("["),
 			cw(s.MakeWriterRelativePath(z.External.GetObjekteFD().Path), format.ColorTypePointer),
 			format.MakeFormatString("@"),
@@ -89,15 +82,8 @@ func makeWriterFuncAkte(
 	zf schnittstellen.FuncWriterFormat[Objekte],
 ) schnittstellen.FuncWriterFormat[CheckedOut] {
 	return func(w io.Writer, z CheckedOut) (n int64, err error) {
-		diff := format.StringChanged
-
-		if z.Internal.Objekte.Akte.Equals(z.External.Objekte.Akte) {
-			diff = format.StringSame
-		}
-
 		return format.Write(
 			w,
-			format.MakeFormatStringRightAlignedParen(diff),
 			format.MakeFormatString("["),
 			cw(s.MakeWriterRelativePath(z.External.GetAkteFD().Path), format.ColorTypePointer),
 			format.MakeFormatString("@"),

@@ -26,7 +26,7 @@ func ReadDirNames(ps ...string) (names []string, err error) {
 		return
 	}
 
-	defer Close(d)
+	defer errors.DeferredCloser(&err, d)
 
 	if names, err = d.Readdirnames(0); err != nil {
 		err = errors.Wrap(err)

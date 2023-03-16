@@ -167,7 +167,9 @@ func (u *Umwelt) PrinterZettelExternal() schnittstellen.FuncIter[*zettel.Externa
 func (u *Umwelt) PrinterZettelCheckedOut() schnittstellen.FuncIter[*zettel.CheckedOut] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
-		u.FormatZettelCheckedOut(),
+		wrapWithCheckedOutState(
+			u.FormatZettelCheckedOut(),
+		),
 	)
 }
 

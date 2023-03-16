@@ -249,7 +249,7 @@ func (fs *CwdFiles) readAll() (err error) {
 
 		var fd kennung.FD
 
-		if fd, err = kennung.FileInfo(fi, d); err != nil {
+		if fd, err = kennung.FileInfo(fi, fs.dir); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
