@@ -11,6 +11,7 @@ import (
 func MakeFilterFromMetaSet(
 	ms kennung.MetaSet,
 ) schnittstellen.FuncIter[CheckedOutLike] {
+
 	if ms == nil {
 		return collections.MakeWriterNoop[CheckedOutLike]()
 	}

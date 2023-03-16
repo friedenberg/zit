@@ -4,7 +4,6 @@
 " endif
 
 let zettel = expand("%")
-echom zettel
 
 let g:markdown_syntax_conceal = 0
 

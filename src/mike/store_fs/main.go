@@ -446,6 +446,7 @@ func (s *Store) ReadFiles(
 		ms,
 		iter.MakeChain(
 			func(e objekte.TransactedLike) (err error) {
+
 				switch et := e.(type) {
 				case *zettel.Transacted:
 					var zco zettel.CheckedOut

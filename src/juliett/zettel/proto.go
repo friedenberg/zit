@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
@@ -16,13 +17,15 @@ type ProtoZettel struct {
 	Etiketten   kennung.EtikettSet
 }
 
-func MakeProtoZettel(k konfig.Compiled) ProtoZettel {
+func MakeProtoZettel(k konfig.Compiled) (p ProtoZettel) {
 	errors.TodoP1("modify konfig to keep etiketten set")
 
-	return ProtoZettel{
-		Typ:       k.DefaultTyp.Sku.Kennung,
-		Etiketten: kennung.MakeEtikettSet(),
-	}
+	p.Typ = k.DefaultTyp.Sku.Kennung
+
+	todo.Decide("should this be set to default etiketten?")
+	p.Etiketten = kennung.MakeEtikettSet()
+
+	return
 }
 
 func MakeEmptyProtoZettel() ProtoZettel {

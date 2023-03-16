@@ -6,6 +6,14 @@ func Change(_ string) {
 	errors.TodoP0("start logging this")
 }
 
+func Decide(_ string) {
+	errors.TodoP0("start logging this")
+}
+
+func Refactor(_ string) {
+	errors.TodoP0("start logging this")
+}
+
 func Parallelize() {
 	errors.TodoP0("start logging this")
 }

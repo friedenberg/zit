@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/hinweisen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
@@ -226,6 +227,7 @@ func (s *zettelStore) Query(
 	f schnittstellen.FuncIter[*zettel.Transacted],
 ) (err error) {
 	errors.TodoP1("generate optimized query here")
+	todo.Refactor("make type conversion func in iter package")
 	return objekte_store.QueryMethodForSigil[
 		schnittstellen.ValueLike,
 		*zettel.Transacted,

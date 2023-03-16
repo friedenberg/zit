@@ -81,7 +81,7 @@ func (s metaSet) String() string {
 
 func (s *metaSet) SetMany(vs ...string) (err error) {
 	for _, v := range vs {
-		if err = s.Set(v); err != nil {
+		if err = s.set(v); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -91,6 +91,10 @@ func (s *metaSet) SetMany(vs ...string) (err error) {
 }
 
 func (ms *metaSet) Set(v string) (err error) {
+	return ms.set(v)
+}
+
+func (ms *metaSet) set(v string) (err error) {
 	v = strings.TrimSpace(v)
 
 	// if v != "." {

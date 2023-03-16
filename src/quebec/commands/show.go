@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
@@ -51,6 +52,8 @@ func (c Show) CompletionGattung() gattungen.Set {
 }
 
 func (c Show) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
+	todo.Change("switch this to interfaces and type switches and combine log, debug, and objekte formats")
+
 	if err = ms.All(
 		func(g gattung.Gattung, ids kennung.Set) (err error) {
 			switch g {

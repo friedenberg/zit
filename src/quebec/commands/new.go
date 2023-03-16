@@ -6,8 +6,11 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
+	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/script_value"
+	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/juliett/zettel"
@@ -18,11 +21,12 @@ import (
 )
 
 type New struct {
-	Edit   bool
-	Delete bool
-	Dedupe bool
-	Count  int
-	Filter script_value.ScriptValue
+	Edit      bool
+	Delete    bool
+	Dedupe    bool
+	Count     int
+	PrintOnly bool
+	Filter    script_value.ScriptValue
 
 	zettel.ProtoZettel
 }
@@ -99,9 +103,20 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	if c.Edit {
+		ms := u.MakeMetaIdSet(
+			kennung.MakeMatcherAlways(),
+			gattungen.MakeSet(gattung.Zettel),
+		)
+
+		todo.Refactor("make this more stable by not using string query")
+		if err = ms.Set("@.zettel"); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 		if err = c.editZettels(
 			u,
-			u.MakeMetaIdSet(kennung.MakeMatcherAlways(), nil),
+			ms,
 			zsc,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -212,6 +227,15 @@ func (c New) editZettels(
 	}
 
 	if err = u.Reset(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if cwdFiles, err = cwd.MakeCwdFilesExactly(
+		u.Konfig(),
+		u.Standort().Cwd(),
+		filesZettelen...,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

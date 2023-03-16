@@ -20,7 +20,7 @@ func (f FormatterValue) String() string {
 func (f *FormatterValue) Set(v string) (err error) {
 	v1 := strings.TrimSpace(strings.ToLower(v))
 	switch v1 {
-	case "text", "objekte":
+	case "text", "objekte", "debug":
 		f.string = v1
 
 	default:
@@ -36,6 +36,13 @@ func (f *FormatterValue) FuncFormatter(
 	af schnittstellen.AkteIOFactory,
 ) schnittstellen.FuncIter[*Transacted] {
 	switch f.string {
+	case "debug":
+		return func(o *Transacted) (err error) {
+			errors.Out().Printf("%#v", o)
+
+			return
+		}
+
 	case "objekte":
 		f := objekte.MakeFormat[Objekte, *Objekte]()
 

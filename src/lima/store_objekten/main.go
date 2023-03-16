@@ -4,6 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
@@ -310,6 +311,7 @@ func (s *Store) Query(
 	ms kennung.MetaSet,
 	f schnittstellen.FuncIter[objekte.TransactedLike],
 ) (err error) {
+	log.Log().Printf("running query: %s", ms)
 	if err = ms.All(
 		func(g gattung.Gattung, ids kennung.Set) (err error) {
 			r, ok := s.queriers[g]
