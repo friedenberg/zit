@@ -40,6 +40,22 @@ func All() (out []Gattung) {
 	return
 }
 
+func TrueGattung() (out []Gattung) {
+	out = make([]Gattung, 0, MaxGattung-1)
+
+	for i := Unknown + 1; i <= MaxGattung; i++ {
+		g := Gattung(i)
+
+		if !g.IsTrueGattung() {
+			continue
+		}
+
+		out = append(out, g)
+	}
+
+	return
+}
+
 func Must(g schnittstellen.GattungGetter) Gattung {
 	return g.GetGattung().(Gattung)
 }
@@ -70,6 +86,16 @@ func (a Gattung) Equals(b Gattung) bool {
 
 func (g Gattung) GetGattungString() string {
 	return g.String()
+}
+
+func (g Gattung) IsTrueGattung() bool {
+	switch g {
+	case Typ, AkteTyp, Etikett, Zettel, Konfig, Kasten:
+		return true
+
+	default:
+		return false
+	}
 }
 
 func (g Gattung) String() string {

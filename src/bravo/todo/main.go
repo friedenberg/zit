@@ -18,8 +18,9 @@ func Parallelize() {
 	errors.TodoP0("start logging this")
 }
 
-func Implement() {
+func Implement() (err error) {
 	errors.TodoP0("start logging this")
+	return errors.Implement()
 }
 
 func Remove() {

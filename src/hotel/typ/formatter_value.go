@@ -6,7 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/delta/collections_coding"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/golf/objekte"
 )
 
@@ -21,11 +21,11 @@ func (f FormatterValue) String() string {
 func (f *FormatterValue) Set(v string) (err error) {
 	v1 := strings.TrimSpace(strings.ToLower(v))
 	switch v1 {
-	case "log", "text", "objekte", "json", "action-names", "debug", "vim-syntax-type":
+	case "text", "objekte", "action-names", "vim-syntax-type":
 		f.string = v1
 
 	default:
-		err = errors.Errorf("unsupported format type: %s", v)
+		err = objekte.MakeErrUnsupportedFormatterValue(v1, gattung.Typ)
 		return
 	}
 
@@ -35,12 +35,8 @@ func (f *FormatterValue) Set(v string) (err error) {
 func (f *FormatterValue) FuncFormatter(
 	out io.Writer,
 	af schnittstellen.AkteIOFactory,
-	logFunc schnittstellen.FuncIter[*Transacted],
 ) schnittstellen.FuncIter[*Transacted] {
 	switch f.string {
-	case "log":
-		return logFunc
-
 	case "objekte":
 		f := objekte.MakeFormat[Objekte, *Objekte]()
 
@@ -58,18 +54,6 @@ func (f *FormatterValue) FuncFormatter(
 
 		return func(o *Transacted) (err error) {
 			if _, err = f.Format(out, &o.Objekte); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		}
-
-	case "json":
-		f := collections_coding.MakeEncoderJson[Transacted](out)
-
-		return func(o *Transacted) (err error) {
-			if _, err = f.Encode(o); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -101,16 +85,10 @@ func (f *FormatterValue) FuncFormatter(
 			return
 		}
 
-	case "debug":
-		return func(o *Transacted) (err error) {
-			errors.Out().Printf("%#v", o)
-
-			return
-		}
-
 	default:
 		return func(_ *Transacted) (err error) {
-			return errors.Errorf("unsupported format for typen: %s", f.string)
+			err = objekte.MakeErrUnsupportedFormatterValue(f.string, gattung.Typ)
+			return
 		}
 	}
 }

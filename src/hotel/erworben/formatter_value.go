@@ -6,6 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/golf/objekte"
 )
 
@@ -20,11 +21,11 @@ func (f FormatterValue) String() string {
 func (f *FormatterValue) Set(v string) (err error) {
 	v1 := strings.TrimSpace(strings.ToLower(v))
 	switch v1 {
-	case "text", "objekte", "debug":
+	case "text", "objekte":
 		f.string = v1
 
 	default:
-		err = errors.Errorf("unsupported format type: %s", v)
+		err = objekte.MakeErrUnsupportedFormatterValue(v1, gattung.Konfig)
 		return
 	}
 
@@ -36,13 +37,6 @@ func (f *FormatterValue) FuncFormatter(
 	af schnittstellen.AkteIOFactory,
 ) schnittstellen.FuncIter[*Transacted] {
 	switch f.string {
-	case "debug":
-		return func(o *Transacted) (err error) {
-			errors.Out().Printf("%#v", o)
-
-			return
-		}
-
 	case "objekte":
 		f := objekte.MakeFormat[Objekte, *Objekte]()
 
@@ -69,7 +63,8 @@ func (f *FormatterValue) FuncFormatter(
 
 	default:
 		return func(_ *Transacted) (err error) {
-			return errors.Errorf("unsupported format for typen: %s", f.string)
+			err = objekte.MakeErrUnsupportedFormatterValue(f.string, gattung.Konfig)
+			return
 		}
 	}
 }

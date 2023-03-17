@@ -22,3 +22,14 @@ func MakeFuncIterNoOp[T any]() schnittstellen.FuncIter[T] {
 		return
 	}
 }
+
+// func MakeFuncIter[IN any, OUT any](m Matcher) schnittstellen.FuncIter[T] {
+// 	return func(e T) (err error) {
+// 		if !m.ContainsMatchable(e) {
+// 			err = iter.MakeErrStopIteration()
+// 			return
+// 		}
+
+// 		return
+// 	}
+// }

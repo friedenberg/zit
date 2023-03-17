@@ -2,7 +2,6 @@ package commands
 
 import (
 	"flag"
-	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
@@ -14,6 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
+	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/hotel/etikett"
@@ -51,15 +51,42 @@ func (c Show) CompletionGattung() gattungen.Set {
 	)
 }
 
+func (c Show) runGenericObjekteFormatterValue(
+	u *umwelt.Umwelt,
+	ms kennung.MetaSet,
+	objekteFormatterValue objekte.FormatterValue,
+) (err error) {
+	f := collections.MakeSyncSerializer(
+		objekteFormatterValue.GetFuncFormatter(
+			u.Out(),
+			u.StoreObjekten(),
+			u.Konfig(),
+			u.PrinterTransactedLike(),
+		),
+	)
+
+	if err = u.StoreObjekten().Query(ms, f); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (c Show) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
 	todo.Change("switch this to interfaces and type switches and combine log, debug, and objekte formats")
+
+	objekteFormatterValue := objekte.FormatterValue{}
+
+	if err = objekteFormatterValue.Set(c.Format); err == nil {
+		return c.runGenericObjekteFormatterValue(u, ms, objekteFormatterValue)
+	}
+
+	err = nil
 
 	if err = ms.All(
 		func(g gattung.Gattung, ids kennung.Set) (err error) {
 			switch g {
-
-			case gattung.Akte:
-				return c.showAkten(u, ids)
 
 			case gattung.Zettel:
 				var fv zettel.FormatterValue
@@ -97,7 +124,6 @@ func (c Show) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
 					ev.FuncFormatter(
 						u.Out(),
 						u.StoreObjekten(),
-						u.PrinterTypTransacted(),
 					),
 				)
 
@@ -115,7 +141,6 @@ func (c Show) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
 					ev.FuncFormatter(
 						u.Out(),
 						u.StoreObjekten(),
-						u.PrinterEtikettTransacted(),
 					),
 				)
 
@@ -212,45 +237,6 @@ func (c Show) showManyZettels(
 	); err != nil {
 		err = errors.Wrap(err)
 		return
-	}
-
-	return
-}
-
-// TODO-P3 support All
-func (c Show) showAkten(u *umwelt.Umwelt, ids kennung.Set) (err error) {
-	zettels := make([]*zettel.Transacted, ids.Len())
-
-	for i, is := range ids.AnyShasOrHinweisen() {
-		var tz *zettel.Transacted
-
-		if tz, err = u.StoreObjekten().Zettel().ReadOne(is); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		zettels[i] = tz
-	}
-
-	var ar io.ReadCloser
-
-	for _, named := range zettels {
-		if ar, err = u.StoreObjekten().AkteReader(named.Objekte.Akte); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if ar == nil {
-			err = errors.Errorf("akte reader is nil")
-			return
-		}
-
-		defer errors.Deferred(&err, ar.Close)
-
-		if _, err = io.Copy(u.Out(), ar); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
 	}
 
 	return

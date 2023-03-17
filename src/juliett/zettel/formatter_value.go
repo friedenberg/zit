@@ -7,11 +7,11 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/standort"
-	"github.com/friedenberg/zit/src/delta/collections_coding"
 	"github.com/friedenberg/zit/src/delta/format"
-	"github.com/friedenberg/zit/src/foxtrot/sku"
+	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/india/konfig"
 )
@@ -32,23 +32,16 @@ func (f *FormatterValue) Set(v string) (err error) {
 		"typ-vim-syntax-type",
 		"typ",
 		"typ-formatter-uti-groups",
-		"log",
-		"akte",
 		"hinweis-text",
 		"text",
 		"objekte",
-		"json",
 		"toml",
 		"action-names",
-		"hinweis-akte",
-		"sku-transacted",
-		"sku",
-		"sku2",
-		"debug":
+		"hinweis-akte":
 		f.string = v1
 
 	default:
-		err = errors.Errorf("unsupported format type: %s", v)
+		err = objekte.MakeErrUnsupportedFormatterValue(v, gattung.Zettel)
 		return
 	}
 
@@ -65,7 +58,6 @@ func (fv *FormatterValue) FuncFormatterVerzeichnisse(
 		out,
 		af,
 		k,
-		logFunc,
 	)
 }
 
@@ -73,38 +65,10 @@ func (fv *FormatterValue) FuncFormatter(
 	out io.Writer,
 	af schnittstellen.AkteIOFactory,
 	k konfig.Compiled,
-	logFunc schnittstellen.FuncIter[*Transacted],
 ) schnittstellen.FuncIter[*Transacted] {
 	errors.TodoP2("convert to verzeichnisse")
 
 	switch fv.string {
-	case "sku-transacted":
-		return func(z *Transacted) (err error) {
-			_, err = fmt.Fprintln(out, sku.String(z.Sku))
-			return
-		}
-
-	case "sku":
-		return func(z *Transacted) (err error) {
-			_, err = fmt.Fprintln(out, z.GetSku().String())
-			return
-		}
-
-	case "sku2":
-		return func(z *Transacted) (err error) {
-			_, err = fmt.Fprintln(out, z.GetSku2().String())
-			return
-		}
-
-	case "debug":
-		return func(z *Transacted) (err error) {
-			errors.Out().Printf("%#v", z)
-			return
-		}
-
-	case "log":
-		return logFunc
-
 	case "formatters":
 		return func(o *Transacted) (err error) {
 			t := k.GetApproximatedTyp(o.Objekte.Typ)
@@ -210,37 +174,6 @@ func (fv *FormatterValue) FuncFormatter(
 			return
 		}
 
-	case "json":
-		f := collections_coding.MakeEncoderJson[Transacted](out)
-
-		return func(o *Transacted) (err error) {
-			if _, err = f.Encode(o); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		}
-
-	case "akte":
-		return func(o *Transacted) (err error) {
-			var r sha.ReadCloser
-
-			if r, err = af.AkteReader(o.Objekte.Akte); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			defer errors.Deferred(&err, r.Close)
-
-			if _, err = io.Copy(out, r); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		}
-
 	case "toml":
 		errors.TodoP3("limit to only zettels supporting toml")
 		return func(o *Transacted) (err error) {
@@ -321,7 +254,8 @@ func (fv *FormatterValue) FuncFormatter(
 
 	default:
 		return func(_ *Transacted) (err error) {
-			return errors.Errorf("unsupported format for typen: %s", fv.string)
+			err = objekte.MakeErrUnsupportedFormatterValue(fv.string, gattung.Zettel)
+			return
 		}
 	}
 }
