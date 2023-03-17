@@ -161,7 +161,7 @@ func (c Show) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
 				)
 
 			default:
-				err = errors.Errorf("unsupported Gattung: %s", g)
+				err = gattung.MakeErrUnsupportedGattung(g)
 				return
 			}
 		},
