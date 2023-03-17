@@ -12,13 +12,17 @@ import (
 	"github.com/friedenberg/zit/src/oscar/user_ops"
 )
 
-type Clean struct{}
+type Clean struct {
+	force bool
+}
 
 func init() {
 	registerCommandWithCwdQuery(
 		"clean",
 		func(f *flag.FlagSet) CommandWithCwdQuery {
 			c := &Clean{}
+
+			f.BoolVar(&c.force, "force", false, "remove objekten in working directory even if they have changes")
 
 			return c
 		},
@@ -42,7 +46,7 @@ func (c Clean) RunWithCwdQuery(
 		iter.MakeChain(
 			objekte.MakeFilterFromMetaSet(ms),
 			func(co objekte.CheckedOutLike) (err error) {
-				if co.GetState() != objekte.CheckedOutStateExistsAndSame {
+				if co.GetState() != objekte.CheckedOutStateExistsAndSame && !c.force {
 					return
 				}
 

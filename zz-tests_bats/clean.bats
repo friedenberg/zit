@@ -25,6 +25,120 @@ function clean_all { # @test
 		           (deleted) [one]
 	EOM
 
-	run find . -type d ! -ipath './.zit*'
+	run find . -maxdepth 2 ! -ipath './.zit*'
+	assert_output '.'
+}
+
+function clean_zettels { # @test
+	run_zit clean .z
+	assert_output_unsorted - <<-EOM
+		           (deleted) [one/dos.zettel]
+		           (deleted) [one/uno.zettel]
+		           (deleted) [one]
+	EOM
+
+	run find . -maxdepth 2 ! -ipath './.zit*'
+	assert_output_unsorted - <<-EOM
+		.
+		./md.typ
+	EOM
+}
+
+function clean_all_dirty_wd { # @test
+	cat >one/uno.zettel <<-EOM
+		---
+		# wildly different
+		- etikett-one
+		! md
+		---
+
+		newest body
+	EOM
+
+	cat >one/dos.zettel <<-EOM
+		---
+		# dos wildly different
+		- etikett-two
+		! md
+		---
+
+		dos newest body
+	EOM
+
+	cat >md.typ <<-EOM
+		inline-akte = false
+		vim-syntax-type = "test"
+	EOM
+
+	cat >da-new.typ <<-EOM
+		inline-akte = true
+		vim-syntax-type = "da-new"
+	EOM
+
+	cat >zz-archive.etikett <<-EOM
+		hide = true
+	EOM
+
+	run_zit clean .
+	assert_output ''
+
+	run find . -maxdepth 2 ! -ipath './.zit*'
+	assert_output_unsorted - <<-EOM
+		.
+		./md.typ
+		./one
+		./one/uno.zettel
+		./one/dos.zettel
+		./da-new.typ
+		./zz-archive.etikett
+	EOM
+}
+
+function clean_all_force_dirty_wd { # @test
+	cat >one/uno.zettel <<-EOM
+		---
+		# wildly different
+		- etikett-one
+		! md
+		---
+
+		newest body
+	EOM
+
+	cat >one/dos.zettel <<-EOM
+		---
+		# dos wildly different
+		- etikett-two
+		! md
+		---
+
+		dos newest body
+	EOM
+
+	cat >md.typ <<-EOM
+		inline-akte = false
+		vim-syntax-type = "test"
+	EOM
+
+	cat >da-new.typ <<-EOM
+		inline-akte = true
+		vim-syntax-type = "da-new"
+	EOM
+
+	cat >zz-archive.etikett <<-EOM
+		hide = true
+	EOM
+
+	run_zit clean -force .
+	assert_output_unsorted - <<-EOM
+		           (deleted) [da-new.typ]
+		           (deleted) [md.typ]
+		           (deleted) [one/dos.zettel]
+		           (deleted) [one/uno.zettel]
+		           (deleted) [one]
+		           (deleted) [zz-archive.etikett]
+	EOM
+
+	run find . -maxdepth 2 ! -ipath './.zit*'
 	assert_output '.'
 }
