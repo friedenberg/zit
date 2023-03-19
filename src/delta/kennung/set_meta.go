@@ -18,7 +18,6 @@ func init() {
 
 // TODO rename to QueryGattungGroup
 type MetaSet interface {
-	Add(schnittstellen.IdLike, Sigil) error
 	Get(g gattung.Gattung) (s Set, ok bool)
 	AddFDs(FDSet) error
 	Set(string) error
@@ -222,30 +221,6 @@ func (ms *metaSet) set(v string) (err error) {
 		err = errors.Wrap(err)
 		return
 	}
-
-	return
-}
-
-func (ms *metaSet) Add(
-	id schnittstellen.IdLike,
-	sigil Sigil,
-) (err error) {
-	g := gattung.Make(id.GetGattung())
-
-	var ids Set
-	ok := false
-
-	if ids, ok = ms.Gattung[g]; !ok {
-		ids = ms.MakeSet()
-		ids.Sigil = sigil
-	}
-
-	if err = ids.Add(id); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	ms.Gattung[g] = ids
 
 	return
 }
