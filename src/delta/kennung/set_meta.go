@@ -19,7 +19,6 @@ func init() {
 // TODO rename to QueryGattungGroup
 type MetaSet interface {
 	Get(g gattung.Gattung) (s Set, ok bool)
-	AddFDs(FDSet) error
 	Set(string) error
 	SetMany(...string) error
 	All(f func(gattung.Gattung, Set) error) error
@@ -232,32 +231,6 @@ func (ms metaSet) Get(g gattung.Gattung) (s Set, ok bool) {
 
 func (ms metaSet) MakeSet() Set {
 	return MakeSet(ms.cwd, ms.expanders, ms.Hidden)
-}
-
-func (ms metaSet) addFDs(fd FD) (err error) {
-	ext := fd.ExtSansDot()
-
-	g := gattung.MakeOrUnknown(ext)
-
-	ok := false
-	var ids Set
-
-	if ids, ok = ms.Gattung[g]; !ok {
-		ids = ms.MakeSet()
-	}
-
-	if err = ids.Add(fd); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	ms.Gattung[g] = ids
-
-	return
-}
-
-func (ms metaSet) AddFDs(fds FDSet) (err error) {
-	return fds.Each(ms.addFDs)
 }
 
 // Runs in parallel
