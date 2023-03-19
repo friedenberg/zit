@@ -19,7 +19,8 @@ func init() {
 // TODO rename to QueryGattungGroup
 type MetaSet interface {
 	Get(g gattung.Gattung) (s Matcher, ok bool)
-	GetIds(g gattung.Gattung) (s Set, ok bool)
+	AddFD(fd FD) error
+	GetFDs() schnittstellen.Set[FD]
 	Set(string) error
 	SetMany(...string) error
 	All(f func(gattung.Gattung, Set) error) error
@@ -32,6 +33,7 @@ type metaSet struct {
 	Hidden              Matcher
 	DefaultGattungen    gattungen.Set
 	Gattung             map[gattung.Gattung]Set
+	FDs                 schnittstellen.MutableSet[FD]
 }
 
 func MakeMetaSet(
@@ -48,6 +50,7 @@ func MakeMetaSet(
 		Hidden:              hidden,
 		DefaultGattungen:    dg.MutableClone(),
 		Gattung:             make(map[gattung.Gattung]Set),
+		FDs:                 collections.MakeMutableSetStringer[FD](),
 	}
 }
 
@@ -151,22 +154,13 @@ func (ms *metaSet) set(v string) (err error) {
 			if gattung.IsErrUnrecognizedGattung(err) {
 				err = nil
 
-				var ids Set
-				ok := false
-
-				if ids, ok = ms.Gattung[gattung.Unknown]; !ok {
-					ids = ms.MakeSet()
-				}
-
 				if err = collections.AddString[FD, *FD](
-					ids.FDs,
+					ms.FDs,
 					v,
 				); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
-
-				ms.Gattung[gattung.Unknown] = ids
 
 			} else {
 				err = errors.Wrap(err)
@@ -230,9 +224,12 @@ func (ms metaSet) Get(g gattung.Gattung) (s Matcher, ok bool) {
 	return
 }
 
-func (ms metaSet) GetIds(g gattung.Gattung) (s Set, ok bool) {
-	s, ok = ms.Gattung[g]
-	return
+func (ms metaSet) AddFD(fd FD) (err error) {
+	return ms.FDs.Add(fd)
+}
+
+func (ms metaSet) GetFDs() schnittstellen.Set[FD] {
+	return ms.FDs
 }
 
 func (ms metaSet) MakeSet() Set {

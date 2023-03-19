@@ -6,7 +6,6 @@ import (
 	"path"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
@@ -41,15 +40,7 @@ func (c ZettelFromExternalAkte) Run(
 
 	results = zettel.MakeMutableSetHinweis(0)
 
-	ok := false
-	var ids kennung.Set
-
-	// gattung.Unknown represents unknown akten
-	if ids, ok = ms.GetIds(gattung.Unknown); !ok {
-		return
-	}
-
-	fds := ids.FDs.ImmutableClone()
+	fds := ms.GetFDs()
 
 	if err = fds.Each(
 		func(fd kennung.FD) (err error) {
