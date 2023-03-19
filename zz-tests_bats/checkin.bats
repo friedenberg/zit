@@ -78,6 +78,6 @@ function checkin_simple_etikett { # @test
 	run_zit checkin .e
 	assert_output '[-zz-archive@cba019d4f889027a3485e56dd2080c7ba0fa1e27499c24b7ec08ad80ef55da9d]'
 
-	run_zit show -format text -- -zz-archive.e
+	run_zit show -format text zz-archive.e
 	assert_output 'hide = true'
 }

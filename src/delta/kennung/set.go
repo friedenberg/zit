@@ -5,6 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
@@ -197,11 +198,23 @@ func (s Set) ContainsMatchable(m Matchable) bool {
 		return false
 	}
 
-	if es := m.GetEtikettenExpanded(); !s.Etiketten.ContainsAgainst(es) {
+	g := gattung.Must(m.GetGattung())
+
+	es := m.GetEtikettenExpanded()
+	containsEtts := s.Etiketten.ContainsAgainst(es)
+
+	if !containsEtts && g != gattung.Etikett {
 		return false
 	}
 
-	if t := m.GetTyp(); s.Typen.Len() > 0 && !s.Typen.Contains(t) {
+	// Only Zettels have Typs, so only filter against them in that case
+	if g == gattung.Zettel {
+		if t := m.GetTyp(); s.Typen.Len() > 0 && !s.Typen.Contains(t) {
+			return false
+		}
+		// If this is a strict Hinweis match, do not permit this to match anything
+		// other than Zettels
+	} else if s.Len() > 0 && s.Hinweisen.Len() == s.Len() {
 		return false
 	}
 
@@ -230,39 +243,39 @@ func (s Set) ContainsMatchable(m Matchable) bool {
 	return true
 }
 
-func (s Set) Contains(id schnittstellen.Stringer) bool {
-	switch idt := id.(type) {
-	case sha.Sha:
-		return s.Shas.Contains(idt)
+// func (s Set) Contains(id schnittstellen.Stringer) bool {
+// 	switch idt := id.(type) {
+// 	case sha.Sha:
+// 		return s.Shas.Contains(idt)
 
-	case Etikett:
-		return s.Etiketten.Contains(idt)
+// 	case Etikett:
+// 		return s.Etiketten.Contains(idt)
 
-	case Typ:
-		return s.Typen.Contains(idt)
+// 	case Typ:
+// 		return s.Typen.Contains(idt)
 
-	case *Hinweis:
-		return s.Hinweisen.Contains(*idt)
+// 	case *Hinweis:
+// 		return s.Hinweisen.Contains(*idt)
 
-	case Hinweis:
-		return s.Hinweisen.Contains(idt)
+// 	case Hinweis:
+// 		return s.Hinweisen.Contains(idt)
 
-	case ts.Time:
-		return s.Timestamps.Contains(idt)
+// 	case ts.Time:
+// 		return s.Timestamps.Contains(idt)
 
-	case Kasten:
-		return s.Kisten.Contains(idt)
+// 	case Kasten:
+// 		return s.Kisten.Contains(idt)
 
-	case FD:
-		return s.FDs.Contains(idt)
+// 	case FD:
+// 		return s.FDs.Contains(idt)
 
-	case Konfig:
-		return true
+// 	case Konfig:
+// 		return true
 
-	default:
-		return false
-	}
-}
+// 	default:
+// 		return false
+// 	}
+// }
 
 func (s Set) OnlySingleHinweis() (h Hinweis, ok bool) {
 	if s.Len() != 1 {
@@ -288,10 +301,6 @@ func (s Set) OnlySingleHinweis() (h Hinweis, ok bool) {
 	}
 
 	return
-}
-
-func (s Set) IncludesCwd() bool {
-	return s.Sigil.IncludesCwd()
 }
 
 func (s Set) Len() int {

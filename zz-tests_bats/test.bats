@@ -51,7 +51,7 @@ function can_new_zettel_file { # @test
 	run_zit new -edit=false "$to_add"
 	assert_output '[one/uno@9a638e2b183562da6d3c634d5a3841d64bc337c9cf79f8fffa0d0194659bc564 !md "wow"]'
 
-	run_zit show one/uno
+	run_zit show one/uno:z
 	assert_output "$(cat "$to_add")"
 }
 
@@ -73,7 +73,7 @@ function can_new_zettel { # @test
 	run_zit new -edit=false -bezeichnung wow -etiketten ok
 	assert_output '[one/uno@9a638e2b183562da6d3c634d5a3841d64bc337c9cf79f8fffa0d0194659bc564 !md "wow"]'
 
-	run_zit show one/uno
+	run_zit show one/uno:z
 	assert_output "$(cat "$expected")"
 }
 

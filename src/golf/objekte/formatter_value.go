@@ -46,7 +46,7 @@ func (f *FormatterValue) Set(v string) (err error) {
 	return
 }
 
-func (fv *FormatterValue) GetFuncFormatter(
+func (fv *FormatterValue) MakeFormatterObjekte(
 	out io.Writer,
 	af schnittstellen.AkteReaderFactory,
 	k schnittstellen.Konfig,

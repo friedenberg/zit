@@ -30,7 +30,7 @@ function can_update_akte { # @test
 	run_zit new -edit=false "$expected"
 	assert_output '[one/uno@18df16846a2f8bbce5f03e1041baff978a049aabd169ab9adac387867fe1706c !md "bez"]'
 
-	run_zit show one/uno
+	run_zit show one/uno:z
 	assert_output "$(cat "$expected")"
 
 	# when
@@ -53,6 +53,6 @@ function can_update_akte { # @test
 		echo the body but new
 	} >"$expected"
 
-	run_zit show one/uno
+	run_zit show one/uno:z
 	assert_output "$(cat "$expected")"
 }

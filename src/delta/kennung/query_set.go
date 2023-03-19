@@ -150,12 +150,8 @@ func (kqs querySet[T, TPtr]) ContainsAgainst(els schnittstellen.Set[T]) bool {
 }
 
 func (kqs mutableQuerySet[T, TPtr]) ContainsAgainst(els schnittstellen.Set[T]) bool {
-	if els == nil {
-		return true
-	}
-
-	if els.Len() == 0 {
-		return true
+	if els == nil || els.Len() == 0 {
+		return kqs.Include.Len() == 0
 	}
 
 	if (kqs.Include.Len() == 0 || iter.Any(els, kqs.Include.Contains)) &&

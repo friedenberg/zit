@@ -5,7 +5,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/alfa/toml"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
@@ -156,29 +155,13 @@ func (s etikettStore) Flush() (err error) {
 }
 
 func (s *etikettStore) Query(
-	ids kennung.Set,
+	m kennung.Matcher,
 	f schnittstellen.FuncIter[*etikett.Transacted],
 ) (err error) {
-	errors.TodoP1("generate optimized query here")
-	var i schnittstellen.FuncIter[*etikett.Transacted]
-
-	if ids.Etiketten.Len() != 0 {
-		i = func(t *etikett.Transacted) (err error) {
-			if !ids.Etiketten.Contains(t.Sku.Kennung) {
-				err = collections.MakeErrStopIteration()
-				return
-			}
-
-			return
-		}
-	}
-
-	return objekte_store.QueryMethodForSigil[
+	return objekte_store.QueryMethodForMatcher[
 		*kennung.Etikett,
 		*etikett.Transacted,
-	](s, ids.Sigil)(
-		iter.MakeChain(i, f),
-	)
+	](s, m, f)
 }
 
 func (s etikettStore) ReadOne(

@@ -52,7 +52,6 @@ func (fv *FormatterValue) FuncFormatterVerzeichnisse(
 	out io.Writer,
 	af schnittstellen.AkteIOFactory,
 	k konfig.Compiled,
-	logFunc schnittstellen.FuncIter[*Transacted],
 ) schnittstellen.FuncIter[*Transacted] {
 	return fv.FuncFormatter(
 		out,

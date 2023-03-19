@@ -23,7 +23,7 @@ type MetaSet interface {
 	GetFDs() schnittstellen.Set[FD]
 	Set(string) error
 	SetMany(...string) error
-	All(f func(gattung.Gattung, Set) error) error
+	All(f func(gattung.Gattung, Matcher) error) error
 }
 
 type metaSet struct {
@@ -237,7 +237,7 @@ func (ms metaSet) MakeSet() Set {
 }
 
 // Runs in parallel
-func (ms metaSet) All(f func(gattung.Gattung, Set) error) (err error) {
+func (ms metaSet) All(f func(gattung.Gattung, Matcher) error) (err error) {
 	errors.TodoP0("lock")
 	chErr := make(chan error, len(ms.Gattung))
 

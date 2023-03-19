@@ -36,7 +36,7 @@ function outputs_organize_one_etikett { # @test
 	run_zit show one/uno
 	assert_output "$(cat "$to_add")"
 
-	run_zit show ok
+	run_zit show ok:z
 	assert_output "$(cat "$to_add")"
 
 	run_zit expand-hinweis o/u
@@ -81,7 +81,7 @@ function outputs_organize_two_etiketten { # @test
 		echo "- [one/uno] wow"
 	} >"$expected_organize"
 
-	run zit show "${cmd_zit_def[@]}" ok brown
+	run zit show "${cmd_zit_def[@]}" ok:z brown:z
 	assert_output "$(cat "$to_add")"
 
 	run_zit organize "${cmd_def_organize[@]}" -mode output-only ok brown
@@ -113,10 +113,10 @@ function outputs_organize_two_etiketten { # @test
 		echo "---"
 	} >"$expected_zettel"
 
-	run zit show brown
+	run zit show brown:z
 	assert_output ""
 
-	run zit show ok
+	run zit show ok:z
 	assert_output "$(cat "$expected_zettel")"
 
 	run zit show one/uno

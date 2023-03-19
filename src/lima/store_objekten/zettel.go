@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/hinweisen"
@@ -223,20 +222,14 @@ func (s *zettelStore) writeNamedZettelToIndex(
 }
 
 func (s *zettelStore) Query(
-	ids kennung.Set,
+	m kennung.Matcher,
 	f schnittstellen.FuncIter[*zettel.Transacted],
 ) (err error) {
-	errors.TodoP1("generate optimized query here")
 	todo.Refactor("make type conversion func in iter package")
-	return objekte_store.QueryMethodForSigil[
+	return objekte_store.QueryMethodForMatcher[
 		schnittstellen.ValueLike,
 		*zettel.Transacted,
-	](s, ids.Sigil)(
-		iter.MakeChain(
-			kennung.MakeMatcherFuncIter[*zettel.Transacted](ids),
-			f,
-		),
-	)
+	](s, m, f)
 }
 
 func (s zettelStore) ReadOne(

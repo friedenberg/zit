@@ -61,13 +61,13 @@ func (c CatAlfred) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error
 	defer errors.DeferredCloser(&err, aw)
 
 	if err = ms.All(
-		func(g gattung.Gattung, ids kennung.Set) (err error) {
+		func(g gattung.Gattung, m kennung.Matcher) (err error) {
 			switch g {
 			case gattung.Etikett:
-				c.catEtiketten(u, ids, aw)
+				c.catEtiketten(u, m, aw)
 
 			case gattung.Zettel:
-				c.catZettelen(u, ids, aw)
+				c.catZettelen(u, m, aw)
 			}
 
 			return
@@ -82,7 +82,7 @@ func (c CatAlfred) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error
 
 func (c CatAlfred) catEtiketten(
 	u *umwelt.Umwelt,
-	ids kennung.Set,
+	m kennung.Matcher,
 	aw *alfred.Writer,
 ) {
 	var ea []kennung.Etikett
@@ -101,13 +101,13 @@ func (c CatAlfred) catEtiketten(
 
 func (c CatAlfred) catZettelen(
 	u *umwelt.Umwelt,
-	ids kennung.Set,
+	m kennung.Matcher,
 	aw *alfred.Writer,
 ) {
 	var err error
 
 	if err = u.StoreObjekten().Zettel().Query(
-		ids,
+		m,
 		aw.WriteZettelVerzeichnisse,
 	); err != nil {
 		aw.WriteError(err)

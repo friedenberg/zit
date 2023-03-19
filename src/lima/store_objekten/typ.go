@@ -5,7 +5,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/alfa/toml"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
@@ -171,29 +170,13 @@ func (s typStore) Flush() (err error) {
 }
 
 func (s *typStore) Query(
-	ids kennung.Set,
+	m kennung.Matcher,
 	f schnittstellen.FuncIter[*typ.Transacted],
 ) (err error) {
-	errors.TodoP1("generate optimized query here")
-	var i schnittstellen.FuncIter[*typ.Transacted]
-
-	if ids.Typen.Len() != 0 {
-		i = func(t *typ.Transacted) (err error) {
-			if !ids.Typen.Contains(t.Sku.Kennung) {
-				err = collections.MakeErrStopIteration()
-				return
-			}
-
-			return
-		}
-	}
-
-	return objekte_store.QueryMethodForSigil[
+	return objekte_store.QueryMethodForMatcher[
 		*kennung.Typ,
 		*typ.Transacted,
-	](s, ids.Sigil)(
-		iter.MakeChain(i, f),
-	)
+	](s, m, f)
 }
 
 // TODO-P3

@@ -21,14 +21,14 @@ type (
 )
 
 type (
-	FuncQuerierTransacted[T TransactedLike] func(kennung.Set, schnittstellen.FuncIter[T]) error
-	FuncQuerierTransactedLike               func(kennung.Set, schnittstellen.FuncIter[TransactedLike]) error
+	FuncQuerierTransacted[T TransactedLike] func(kennung.Matcher, schnittstellen.FuncIter[T]) error
+	FuncQuerierTransactedLike               func(kennung.Matcher, schnittstellen.FuncIter[TransactedLike]) error
 )
 
 func MakeApplyQueryTransactedLike[T TransactedLike](
 	fat FuncQuerierTransacted[T],
 ) FuncQuerierTransactedLike {
-	return func(ids kennung.Set, fatl schnittstellen.FuncIter[TransactedLike]) (err error) {
+	return func(ids kennung.Matcher, fatl schnittstellen.FuncIter[TransactedLike]) (err error) {
 		return fat(
 			ids,
 			func(e T) (err error) {

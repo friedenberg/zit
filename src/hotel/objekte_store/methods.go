@@ -2,6 +2,8 @@ package objekte_store
 
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
 type Query interface {
@@ -12,13 +14,21 @@ type Query interface {
 	// ContainsMatchable(kennung.Matchable) bool
 }
 
-func QueryMethodForSigil[K any, T any](
+func QueryMethodForMatcher[K any, T kennung.Matchable](
 	reader Querier[K, T],
-	sigil schnittstellen.IncludesHistory,
-) func(schnittstellen.FuncIter[T]) error {
-	if sigil.IncludesHistory() {
-		return reader.ReadAll
-	} else {
-		return reader.ReadAllSchwanzen
+	m kennung.Matcher,
+	f schnittstellen.FuncIter[T],
+) (err error) {
+	out := reader.ReadAllSchwanzen
+
+	if sg, ok := m.(schnittstellen.SigilGetter); ok && sg.GetSigil().IncludesHistory() {
+		out = reader.ReadAll
 	}
+
+	return out(
+		iter.MakeChain(
+			kennung.MakeMatcherFuncIter[T](m),
+			f,
+		),
+	)
 }

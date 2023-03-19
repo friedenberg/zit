@@ -58,7 +58,7 @@ type Querier[
 	V any,
 ] interface {
 	TransactedReader[K, V]
-	Query(kennung.Set, schnittstellen.FuncIter[V]) error
+	Query(kennung.Matcher, schnittstellen.FuncIter[V]) error
 }
 
 type Creator[
