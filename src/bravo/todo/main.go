@@ -20,6 +20,10 @@ func Parallelize() {
 	errors.TodoP0("start logging this")
 }
 
+func Optimize() {
+	errors.TodoP0("start logging this")
+}
+
 func Implement() (err error) {
 	errors.TodoP0("start logging this")
 	return errors.WrapN(1, errNotImplemented)
