@@ -59,16 +59,6 @@ func (c Edit) DefaultGattungen() gattungen.Set {
 }
 
 func (c Edit) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
-	ids, ok := ms.Get(gattung.Zettel)
-
-	if !ok {
-		return
-	}
-
-	return c.editZettels(u, ms, ids)
-}
-
-func (c Edit) runWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
 	checkoutOptions := store_fs.CheckoutOptions{
 		CheckoutMode: c.CheckoutMode,
 	}
@@ -147,23 +137,25 @@ func (c Edit) runWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
 func (c Edit) editZettels(
 	u *umwelt.Umwelt,
 	ms kennung.MetaSet,
-	ids kennung.Set,
 ) (err error) {
 	checkoutOptions := store_fs.CheckoutOptions{
 		CheckoutMode: c.CheckoutMode,
 	}
 
-	var checkoutResults zettel.MutableSetCheckedOut
+	checkoutResults := zettel.MakeMutableSetCheckedOutHinweisZettel(0)
 
-	query := zettel.WriterIds{
-		Filter: kennung.Filter{
-			Set: ids,
-		},
-	}
-
-	if checkoutResults, err = u.StoreWorkingDirectory().Checkout(
+	if err = u.StoreWorkingDirectory().CheckoutQuery(
 		checkoutOptions,
-		query.WriteZettelTransacted,
+		ms,
+		func(col objekte.CheckedOutLike) (err error) {
+			z, ok := col.(*zettel.CheckedOut)
+
+			if !ok {
+				return
+			}
+
+			return checkoutResults.Add(*z)
+		},
 	); err != nil {
 		err = errors.Wrap(err)
 		return

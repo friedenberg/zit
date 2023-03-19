@@ -13,9 +13,8 @@ import (
 type Sigil int
 
 const (
-	SigilNone      = Sigil(iota)
-	SigilSchwanzen = Sigil(1 << iota)
-	SigilHistory
+	SigilSchwanzen = Sigil(iota)
+	SigilHistory   = Sigil(1 << iota)
 	SigilCwd
 	SigilHidden
 
@@ -24,16 +23,14 @@ const (
 
 var (
 	mapRuneToSigil = map[rune]Sigil{
-		':': SigilNone,
-		'@': SigilSchwanzen,
+		'@': SigilSchwanzen, // TODO switch to `:`
 		'+': SigilHistory,
 		'.': SigilCwd,
 		'?': SigilHidden,
 	}
 
 	mapSigilToRune = map[Sigil]rune{
-		SigilNone:      ':',
-		SigilSchwanzen: '@',
+		SigilSchwanzen: '@', // TODO switch to `:`
 		SigilHistory:   '+',
 		SigilCwd:       '.',
 		SigilHidden:    '?',
@@ -64,7 +61,7 @@ func (a Sigil) Equals(b Sigil) bool {
 }
 
 func (a *Sigil) Reset() {
-	*a = SigilNone
+	*a = SigilSchwanzen
 	return
 }
 
@@ -83,6 +80,10 @@ func (a *Sigil) Del(b Sigil) {
 
 func (a Sigil) Contains(b Sigil) bool {
 	return a&b != 0
+}
+
+func (a Sigil) GetSigil() schnittstellen.Sigil {
+	return a
 }
 
 func (a Sigil) IncludesSchwanzen() bool {
@@ -104,9 +105,7 @@ func (a Sigil) IncludesHidden() bool {
 func (a Sigil) String() string {
 	sb := strings.Builder{}
 
-	sb.WriteString(":")
-
-	for s := SigilNone; s <= SigilMax; s++ {
+	for s := SigilSchwanzen; s <= SigilMax; s++ {
 		if a.Contains(s) {
 			r := mapSigilToRune[s]
 			sb.WriteRune(r)

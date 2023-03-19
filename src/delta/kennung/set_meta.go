@@ -18,7 +18,8 @@ func init() {
 
 // TODO rename to QueryGattungGroup
 type MetaSet interface {
-	Get(g gattung.Gattung) (s Set, ok bool)
+	Get(g gattung.Gattung) (s Matcher, ok bool)
+	GetIds(g gattung.Gattung) (s Set, ok bool)
 	Set(string) error
 	SetMany(...string) error
 	All(f func(gattung.Gattung, Set) error) error
@@ -224,7 +225,12 @@ func (ms *metaSet) set(v string) (err error) {
 	return
 }
 
-func (ms metaSet) Get(g gattung.Gattung) (s Set, ok bool) {
+func (ms metaSet) Get(g gattung.Gattung) (s Matcher, ok bool) {
+	s, ok = ms.Gattung[g]
+	return
+}
+
+func (ms metaSet) GetIds(g gattung.Gattung) (s Set, ok bool) {
 	s, ok = ms.Gattung[g]
 	return
 }

@@ -11,49 +11,27 @@ import (
 func MakeFilterFromMetaSet(
 	ms kennung.MetaSet,
 ) schnittstellen.FuncIter[CheckedOutLike] {
-
 	if ms == nil {
 		return collections.MakeWriterNoop[CheckedOutLike]()
 	}
 
 	return func(col CheckedOutLike) (err error) {
 		internal := col.GetInternal()
+		external := col.GetExternal()
 
 		g := gattung.Must(internal.GetDataIdentity().GetGattung())
 
-		var ids kennung.Set
+		var matcher kennung.Matcher
 		ok := false
 
-		if ids, ok = ms.Get(g); !ok {
+		if matcher, ok = ms.Get(g); !ok {
 			err = iter.MakeErrStopIteration()
 			return
 		}
 
-		if ids.Sigil.IncludesCwd() && ids.Len() == 0 {
-			return
-		}
-
-		var matchable kennung.Matchable
-
-		if ids.Sigil.IncludesCwd() {
-			matchable = col.GetExternal()
-		} else {
-			matchable = internal
-		}
-
-		if matchable != nil {
-			if !ids.ContainsMatchable(matchable) {
-				err = iter.MakeErrStopIteration()
-				return
-			}
-		} else {
-			id := internal.GetSkuLike().GetId()
-
-			if ids.Contains(id) {
-				return
-			}
-
+		if !matcher.ContainsMatchable(external) {
 			err = iter.MakeErrStopIteration()
+			return
 		}
 
 		return

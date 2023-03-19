@@ -45,7 +45,7 @@ func (c ZettelFromExternalAkte) Run(
 	var ids kennung.Set
 
 	// gattung.Unknown represents unknown akten
-	if ids, ok = ms.Get(gattung.Unknown); !ok {
+	if ids, ok = ms.GetIds(gattung.Unknown); !ok {
 		return
 	}
 

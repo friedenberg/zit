@@ -15,7 +15,9 @@ func init() {
 }
 
 type Matcher interface {
+	// schnittstellen.SigilGetter
 	ContainsMatchable(Matchable) bool
+	// ContainsId(schnittstellen.Stringer) bool
 }
 
 type MatcherMutable interface {

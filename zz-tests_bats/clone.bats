@@ -37,7 +37,7 @@ function clone { # @test
 	cd "$wd" || exit 1
 
 	run_zit clone \
-		"$wd1" :+zettel,typ
+		"$wd1" +zettel,typ
 
 	assert_success
 	assert_output --partial '[!md@eaa85e80de6d1129a21365a8ce2a49ca752457d10932a7d73001b4ebded302c7]'

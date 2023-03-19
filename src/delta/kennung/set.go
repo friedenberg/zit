@@ -290,6 +290,10 @@ func (s Set) OnlySingleHinweis() (h Hinweis, ok bool) {
 	return
 }
 
+func (s Set) IncludesCwd() bool {
+	return s.Sigil.IncludesCwd()
+}
+
 func (s Set) Len() int {
 	k := 0
 
