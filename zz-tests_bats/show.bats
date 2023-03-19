@@ -64,6 +64,34 @@ function show_simple_one_zettel { # @test
 	EOM
 }
 
+function show_history_one_zettel { # @test
+	run_zit show -format log one/uno+z
+	assert_output_unsorted - <<-EOM
+		[one/uno@797cbdf8448a2ea167534e762a5025f5a3e9857e1dd06a3b746d3819d922f5ce !md "wow ok"]
+		[one/uno@d47c552a5299f392948258d7959fc7cf94843316a21c8ea12854ed84a8c06367 !md "wow the first"]
+	EOM
+
+	run_zit show one/uno+z
+	assert_output_unsorted - <<-EOM
+		---
+		# wow ok
+		- tag-1
+		- tag-2
+		! md
+		---
+
+		this is the body aiiiiight
+		---
+		# wow the first
+		- tag-3
+		- tag-4
+		! md
+		---
+
+		last time
+	EOM
+}
+
 function show_zettel_etikett { # @test
 	run_zit show -format log tag-3.z
 	assert_output_unsorted - <<-EOM

@@ -321,6 +321,10 @@ func (s Set) Len() int {
 	) + k
 }
 
+func (s Set) GetSigil() schnittstellen.Sigil {
+	return s.Sigil
+}
+
 func (s Set) AnyShasOrHinweisen() (ids []schnittstellen.Korper) {
 	ids = make([]schnittstellen.Korper, 0, s.Shas.Len()+s.Hinweisen.Len())
 
