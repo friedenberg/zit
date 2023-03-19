@@ -43,7 +43,7 @@ function pull { # @test
 
 	cd "$wd1" || exit 1
 
-	run_zit pull "$wd" @
+	run_zit pull "$wd" :
 	assert_output '[one/uno@11327fbe60cabd2a9eabf4a37d541cf04b539f913945897efe9bab1e30784781 !md "to_add.md"]'
 
 	run_zit show one/uno
@@ -54,6 +54,6 @@ function pull { # @test
 	run_zit show one/uno
 	assert_output "$(cat "$expected")"
 
-	run_zit pull "$wd" @
+	run_zit pull "$wd" :
 	assert_output ''
 }

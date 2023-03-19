@@ -23,14 +23,14 @@ const (
 
 var (
 	mapRuneToSigil = map[rune]Sigil{
-		'@': SigilSchwanzen, // TODO switch to `:`
+		':': SigilSchwanzen,
 		'+': SigilHistory,
 		'.': SigilCwd,
 		'?': SigilHidden,
 	}
 
 	mapSigilToRune = map[Sigil]rune{
-		SigilSchwanzen: '@', // TODO switch to `:`
+		SigilSchwanzen: ':',
 		SigilHistory:   '+',
 		SigilCwd:       '.',
 		SigilHidden:    '?',

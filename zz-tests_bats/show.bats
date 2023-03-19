@@ -93,14 +93,14 @@ function show_complex_zettel_etikett_negation { # @test
 }
 
 function show_simple_all { # @test
-	run_zit show -format log @z,t
+	run_zit show -format log :z,t
 	assert_output_unsorted - <<-EOM
 		[!md@eaa85e80de6d1129a21365a8ce2a49ca752457d10932a7d73001b4ebded302c7]
 		[one/uno@d47c552a5299f392948258d7959fc7cf94843316a21c8ea12854ed84a8c06367 !md "wow the first"]
 		[one/dos@c6b9d095358b8b26a99e90496d916ba92a99e9b75c705165df5f6d353a949ea9 !md "wow ok again"]
 	EOM
 
-	run_zit show -format akte @z,t
+	run_zit show -format akte :z,t
 	assert_output_unsorted - <<-EOM
 		file-extension = 'md'
 		inline-akte = true
@@ -109,7 +109,7 @@ function show_simple_all { # @test
 		vim-syntax-type = 'markdown'
 	EOM
 
-	run_zit show -format sku2 @z,t
+	run_zit show -format sku2 :z,t
 	assert_output_unsorted - <<-EOM
 		2057838301.803584 Typ md eaa85e80de6d1129a21365a8ce2a49ca752457d10932a7d73001b4ebded302c7 102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384
 		2057838301.857055 Zettel one/dos c6b9d095358b8b26a99e90496d916ba92a99e9b75c705165df5f6d353a949ea9 2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24

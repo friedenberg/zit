@@ -129,7 +129,7 @@ function can_checkout_via_etiketten { # @test
 	run_zit new -edit=false "$to_add"
 	assert_output '[one/uno@9a638e2b183562da6d3c634d5a3841d64bc337c9cf79f8fffa0d0194659bc564 !md "wow"]'
 
-	run_zit checkout -- -ok@z
+	run_zit checkout -- ok:z
 	assert_output '       (checked out) [one/uno.zettel@9a638e2b183562da6d3c634d5a3841d64bc337c9cf79f8fffa0d0194659bc564 !md "wow"]'
 }
 
@@ -387,7 +387,7 @@ function checkouts_dont_overwrite { # @test
 
 	cat "$expected" >"one/uno.zettel"
 
-	run_zit checkout one/uno@z
+	run_zit checkout one/uno:z
 	assert_output '       (checked out) [one/uno.zettel@63b65ad24c58d43d363f8074a5513e5cf71337cc132f452095a779b933cfee15 !md "bez"]'
 
 	run cat one/uno.zettel

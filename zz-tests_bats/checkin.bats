@@ -9,7 +9,7 @@ setup() {
 	version="v$(zit store-version)"
 	copy_from_version "$DIR" "$version"
 
-	run_zit checkout @z,t,e
+	run_zit checkout :z,t,e
 
 	cat >one/uno.zettel <<-EOM
 		---
