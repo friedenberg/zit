@@ -1,11 +1,14 @@
 package kasten
 
-import "github.com/friedenberg/zit/src/charlie/tridex"
+import (
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/charlie/tridex"
+)
 
 type Verzeichnisse struct {
 	wasPopulated bool
-	Akten        *tridex.Tridex
-	Objekten     *tridex.Tridex
+	Akten        schnittstellen.MutableTridex
+	Objekten     schnittstellen.MutableTridex
 }
 
 func (z *Verzeichnisse) ResetWithObjekte(z1 Objekte) {
@@ -20,6 +23,6 @@ func (z *Verzeichnisse) Reset() {
 
 func (z *Verzeichnisse) ResetWith(z1 Verzeichnisse) {
 	z.wasPopulated = true
-	z.Akten = z1.Akten.Copy()
-	z.Objekten = z1.Objekten.Copy()
+	z.Akten = z1.Akten.MutableClone()
+	z.Objekten = z1.Objekten.MutableClone()
 }

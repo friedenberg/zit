@@ -7,7 +7,9 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/script_value"
+	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/juliett/zettel"
@@ -44,6 +46,12 @@ func init() {
 			errors.TodoP2("add support for restricted query to specific gattung")
 			return c
 		},
+	)
+}
+
+func (c Add) DefaultGattungen() gattungen.Set {
+	return gattungen.MakeSet(
+		gattung.Zettel,
 	)
 }
 

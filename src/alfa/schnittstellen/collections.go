@@ -19,7 +19,7 @@ type ContainsKeyer interface {
 	ContainsKey(string) bool
 }
 
-type Set[T any] interface {
+type SetLike[T any] interface {
 	Lenner
 	ContainsKeyer
 
@@ -32,19 +32,63 @@ type Set[T any] interface {
 	EachPtr(FuncIter[*T]) error
 	EachKey(FuncIterKey) error
 	Elements() []T
+}
 
+type MutableSetLike[T any] interface {
+	SetLike[T]
+	Add(T) error
+	Del(T) error
+	DelKey(string) error
+}
+
+type Set[T any] interface {
+	SetLike[T]
 	ImmutableCloner[Set[T]]
 	MutableCloner[MutableSet[T]]
 }
 
 type MutableSet[T any] interface {
 	Set[T]
-	Add(T) error
-	Del(T) error
-	DelKey(string) error
+	MutableSetLike[T]
 	Resetter2
-	// ResetWither[MutableSet[T]]
 }
+
+type TridexLike interface {
+	Lenner
+	ContainsAbbreviation(string) bool
+	ContainsExpansion(string) bool
+	Abbreviate(string) string
+	Expand(string) string
+}
+
+type MutableTridexLike interface {
+	TridexLike
+	Add(string)
+	Remove(string)
+}
+
+type Tridex interface {
+	TridexLike
+	// ImmutableCloner[TridexLike]
+	MutableCloner[MutableTridex]
+}
+
+type MutableTridex interface {
+	Tridex
+	Add(string)
+	Remove(string)
+}
+
+// type Tridex interface {
+//   TridexLike
+// 	// ImmutableCloner[Tridex]
+// 	MutableCloner[MutableTridex]
+// }
+
+// type MutableTridex interface {
+// 	MutableTridexLike
+// 	MutableCloner[Tridex]
+// }
 
 type Pool[T any, TPtr Ptr[T]] interface {
 	Get() TPtr

@@ -6,6 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/juliett/zettel"
@@ -19,6 +20,7 @@ type CommandWithCwdQuery interface {
 		ms kennung.MetaSet,
 		cwdFiles cwd.CwdFiles,
 	) error
+	DefaultGattungen() gattungen.Set
 }
 
 type commandWithCwdQuery struct {
@@ -109,7 +111,7 @@ func (c commandWithCwdQuery) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	ids := u.MakeMetaIdSetDefault(cwdFiles)
+	ids := u.MakeMetaIdSet(cwdFiles, c.DefaultGattungen())
 
 	if err = ids.SetMany(args...); err != nil {
 		err = errors.Wrap(err)

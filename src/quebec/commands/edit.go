@@ -49,6 +49,15 @@ func (c Edit) CompletionGattung() gattungen.Set {
 	)
 }
 
+func (c Edit) DefaultGattungen() gattungen.Set {
+	return gattungen.MakeSet(
+		gattung.Etikett,
+		gattung.Zettel,
+		gattung.Typ,
+		// gattung.Kasten,
+	)
+}
+
 func (c Edit) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
 	ids, ok := ms.Get(gattung.Zettel)
 

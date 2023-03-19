@@ -4,6 +4,8 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/mike/store_fs"
@@ -31,6 +33,12 @@ func init() {
 
 			return c
 		},
+	)
+}
+
+func (c Checkout) DefaultGattungen() gattungen.Set {
+	return gattungen.MakeSet(
+		gattung.Zettel,
 	)
 }
 

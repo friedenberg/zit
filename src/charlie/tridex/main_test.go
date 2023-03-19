@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/test_logz"
 )
 
@@ -18,32 +19,32 @@ func TestMain(m *testing.M) {
 
 type t test_logz.T
 
-func (t t) assertCount(sut *Tridex, d int) {
-	if sut.Count() != d {
-		t.Fatalf("expected count %d but got %d", d, sut.Count())
+func (t t) assertLen(sut schnittstellen.Tridex, d int) {
+	if sut.Len() != d {
+		t.Fatalf("expected count %d but got %d", d, sut.Len())
 	}
 }
 
-func (t t) assertNotContains(sut *Tridex, v string) {
-	if sut.Contains(v) {
+func (t t) assertNotContains(sut schnittstellen.Tridex, v string) {
+	if sut.ContainsAbbreviation(v) {
 		t.Fatalf("expected to not contain %q", v)
 	}
 }
 
-func (t t) assertContains(sut *Tridex, v string) {
-	if !sut.Contains(v) {
+func (t t) assertContains(sut schnittstellen.Tridex, v string) {
+	if !sut.ContainsAbbreviation(v) {
 		t.Fatalf("expected to contain %q", v)
 	}
 }
 
-func (t t) assertContainsExactly(sut *Tridex, v string) {
-	if !sut.ContainsExactly(v) {
+func (t t) assertContainsExpansion(sut schnittstellen.Tridex, v string) {
+	if !sut.ContainsExpansion(v) {
 		t.Fatalf("expected to contain exactly %q", v)
 	}
 }
 
-func (t t) assertNotContainsExactly(sut *Tridex, v string) {
-	if sut.ContainsExactly(v) {
+func (t t) assertNotContainsExpansion(sut schnittstellen.Tridex, v string) {
+	if sut.ContainsExpansion(v) {
 		t.Fatalf("expected not to contain exactly %q", v)
 	}
 }
@@ -64,7 +65,7 @@ func TestContains(t1 *testing.T) {
 	}
 
 	for _, e := range expectedContains {
-		if !sut.ContainsExactly(e) {
+		if !sut.ContainsExpansion(e) {
 			t.Errorf("expected %v to contain %s", sut, e)
 		}
 	}
@@ -86,43 +87,43 @@ func TestContains(t1 *testing.T) {
 	}
 
 	for _, e := range expectedNotContains {
-		if sut.ContainsExactly(e) {
+		if sut.ContainsExpansion(e) {
 			t.Errorf("expected %v to not contain %s", sut, e)
 		}
 	}
 }
 
-func TestCount(t1 *testing.T) {
+func TestLen(t1 *testing.T) {
 	t := t(test_logz.T{T: t1})
 
 	sut := Make("one")
-	t.assertCount(sut, 1)
+	t.assertLen(sut, 1)
 	t.assertContains(sut, "o")
 	t.assertContains(sut, "on")
 	t.assertContains(sut, "one")
-	t.assertContainsExactly(sut, "one")
+	t.assertContainsExpansion(sut, "one")
 
 	sut.Add("two")
-	t.assertCount(sut, 2)
+	t.assertLen(sut, 2)
 	t.assertContains(sut, "o")
 	t.assertContains(sut, "on")
 	t.assertContains(sut, "one")
-	t.assertContainsExactly(sut, "one")
+	t.assertContainsExpansion(sut, "one")
 	t.assertContains(sut, "t")
 	t.assertContains(sut, "tw")
 	t.assertContains(sut, "two")
-	t.assertContainsExactly(sut, "two")
+	t.assertContainsExpansion(sut, "two")
 
 	sut.Add("three")
-	t.assertCount(sut, 3)
+	t.assertLen(sut, 3)
 	t.assertContains(sut, "o")
 	t.assertContains(sut, "on")
 	t.assertContains(sut, "one")
-	t.assertContainsExactly(sut, "one")
+	t.assertContainsExpansion(sut, "one")
 	t.assertContains(sut, "t")
 	t.assertContains(sut, "tw")
 	t.assertContains(sut, "two")
-	t.assertContainsExactly(sut, "two")
+	t.assertContainsExpansion(sut, "two")
 	t.assertContains(sut, "t")
 	t.assertContains(sut, "th")
 	t.assertContains(sut, "thr")
@@ -130,44 +131,44 @@ func TestCount(t1 *testing.T) {
 	t.assertContains(sut, "three")
 
 	sut.Remove("one")
-	t.assertCount(sut, 2)
-	t.assertNotContainsExactly(sut, "one")
+	t.assertLen(sut, 2)
+	t.assertNotContainsExpansion(sut, "one")
 	t.assertNotContains(sut, "o")
 	t.assertNotContains(sut, "on")
 	t.assertNotContains(sut, "one")
 
 	sut.Remove("three")
-	t.assertCount(sut, 1)
-	t.assertNotContainsExactly(sut, "three")
+	t.assertLen(sut, 1)
+	t.assertNotContainsExpansion(sut, "three")
 	t.assertNotContains(sut, "th")
 	t.assertNotContains(sut, "thr")
 	t.assertNotContains(sut, "thre")
 	t.assertNotContains(sut, "three")
 
 	sut.Remove("two")
-	t.assertCount(sut, 0)
-	t.assertNotContainsExactly(sut, "two")
+	t.assertLen(sut, 0)
+	t.assertNotContainsExpansion(sut, "two")
 
 	sut.Add("1")
 	sut.Add("12")
 	sut.Add("123")
 	sut.Add("1234")
-	t.assertCount(sut, 4)
-	t.assertContainsExactly(sut, "1")
-	t.assertContainsExactly(sut, "12")
-	t.assertContainsExactly(sut, "123")
-	t.assertContainsExactly(sut, "1234")
+	t.assertLen(sut, 4)
+	t.assertContainsExpansion(sut, "1")
+	t.assertContainsExpansion(sut, "12")
+	t.assertContainsExpansion(sut, "123")
+	t.assertContainsExpansion(sut, "1234")
 	t.assertContains(sut, "1")
 	t.assertContains(sut, "12")
 	t.assertContains(sut, "123")
 	t.assertContains(sut, "1234")
 
 	sut.Remove("1")
-	t.assertCount(sut, 3)
-	t.assertNotContainsExactly(sut, "1")
-	t.assertContainsExactly(sut, "12")
-	t.assertContainsExactly(sut, "123")
-	t.assertContainsExactly(sut, "1234")
+	t.assertLen(sut, 3)
+	t.assertNotContainsExpansion(sut, "1")
+	t.assertContainsExpansion(sut, "12")
+	t.assertContainsExpansion(sut, "123")
+	t.assertContainsExpansion(sut, "1234")
 	t.assertContains(sut, "1")
 	t.assertContains(sut, "12")
 	t.assertContains(sut, "123")
@@ -317,7 +318,7 @@ func TestExpand(t1 *testing.T) {
 
 func TestDoesNotContainPrefix(t1 *testing.T) {
 	t := t(test_logz.T{T: t1})
-	makeSut := func() *Tridex {
+	makeSut := func() schnittstellen.MutableTridex {
 		return Make(
 			"121",
 			"127",
@@ -330,14 +331,14 @@ func TestDoesNotContainPrefix(t1 *testing.T) {
 	sut := makeSut()
 	e1 := "12"
 
-	t.assertNotContainsExactly(sut, e1)
+	t.assertNotContainsExpansion(sut, e1)
 	t.assertContains(sut, e1)
 }
 
 func TestRemove(t1 *testing.T) {
 	t := t(test_logz.T{T: t1})
 
-	makeSut := func() *Tridex {
+	makeSut := func() schnittstellen.MutableTridex {
 		return Make(
 			"12",
 			"121",
@@ -360,17 +361,17 @@ func TestRemove(t1 *testing.T) {
 	for i, e := range elements {
 		sut := makeSut()
 
-		t.assertCount(sut, len(elements))
+		t.assertLen(sut, len(elements))
 
 		sut.Remove(e)
 
-		t.assertCount(sut, len(elements)-1)
+		t.assertLen(sut, len(elements)-1)
 
 		for j, e1 := range elements {
 			if j == i {
-				t.assertNotContainsExactly(sut, e1)
+				t.assertNotContainsExpansion(sut, e1)
 			} else {
-				t.assertContainsExactly(sut, e1)
+				t.assertContainsExpansion(sut, e1)
 			}
 		}
 	}
@@ -398,7 +399,7 @@ func TestRemove(t1 *testing.T) {
 //     "w-2022-12-22",
 //   }
 
-// 	makeSut := func() *Tridex {
+// 	makeSut := func() schnittstellen.Tridex {
 // 		return Make(els...)
 // 	}
 
@@ -414,17 +415,17 @@ func TestRemove(t1 *testing.T) {
 // 	for i, e := range elements {
 // 		sut := makeSut()
 
-// 		t.assertCount(sut, len(elements))
+// 		t.assertLen(sut, len(elements))
 
 // 		sut.Remove(e)
 
-// 		t.assertCount(sut, len(elements)-1)
+// 		t.assertLen(sut, len(elements)-1)
 
 // 		for j, e1 := range elements {
 // 			if j == i {
-// 				t.assertNotContainsExactly(sut, e1)
+// 				t.assertNotContainsExpansion(sut, e1)
 // 			} else {
-// 				t.assertContainsExactly(sut, e1)
+// 				t.assertContainsExpansion(sut, e1)
 // 			}
 // 		}
 // 	}

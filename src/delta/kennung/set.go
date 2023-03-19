@@ -24,27 +24,30 @@ type Set struct {
 	FDs        MutableFDSet
 	HasKonfig  bool
 	Sigil      Sigil
+
+	hidden Matcher
 }
 
 func MakeSet(
 	cwd Matcher,
 	ex Expanders,
-	etiketten QuerySet[Etikett, *Etikett],
+	hidden Matcher,
 ) Set {
-	if etiketten == nil {
-		etiketten = MakeQuerySet[Etikett, *Etikett](ex.Etikett, nil, nil)
+	if hidden == nil {
+		hidden = MakeMatcherNever()
 	}
 
 	return Set{
 		cwd:        cwd,
 		expanders:  ex,
 		Shas:       sha_collections.MakeMutableSet(),
-		Etiketten:  etiketten.MutableClone(),
+		Etiketten:  MakeMutableQuerySet[Etikett, *Etikett](ex.Etikett, nil, nil),
 		Hinweisen:  MakeHinweisMutableSet(),
 		Typen:      MakeTypMutableSet(),
 		Kisten:     MakeKastenMutableSet(),
 		Timestamps: ts.MakeMutableSet(),
 		FDs:        MakeMutableFDSet(),
+		hidden:     hidden,
 	}
 }
 
@@ -188,9 +191,11 @@ func (s Set) ContainsMatchable(m Matchable) bool {
 		return false
 	}
 
-	// if s.FDs.Len() > 0 && !FDSetContainsPair(s.FDs, m) {
-	// 	return false
-	// }
+	if !s.Sigil.IncludesHidden() &&
+		s.hidden != nil &&
+		s.hidden.ContainsMatchable(m) {
+		return false
+	}
 
 	if es := m.GetEtikettenExpanded(); !s.Etiketten.ContainsAgainst(es) {
 		return false

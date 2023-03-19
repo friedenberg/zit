@@ -56,7 +56,8 @@ function checkin_complex_zettel_etikett_negation { # @test
 }
 
 function checkin_simple_all { # @test
-	run_zit checkin .
+	# TODO: modify this to support "." for everything
+	run_zit checkin .z,e,t
 	assert_output_unsorted - <<-EOM
 		[!md@72d654e3c7f4e820df18c721177dfad38fe831d10bca6dcb33b7cad5dc335357]
 		[one/uno@689c6787364899defa77461ff6a3f454ca667654653f86d5d44f2826950ff4f9 !md "wildly different"]

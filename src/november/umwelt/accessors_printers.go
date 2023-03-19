@@ -125,6 +125,7 @@ func (u *Umwelt) PrinterZettelTransacted() schnittstellen.FuncIter[*zettel.Trans
 func (u *Umwelt) PrinterTransactedLike() schnittstellen.FuncIter[objekte.TransactedLike] {
 	z := u.FormatZettelTransacted()
 	t := u.FormatTypTransacted()
+	e := u.FormatEtikettTransacted()
 
 	return format.MakeWriterToWithNewLines2(
 		u.Out(),
@@ -137,6 +138,9 @@ func (u *Umwelt) PrinterTransactedLike() schnittstellen.FuncIter[objekte.Transac
 
 				case *typ.Transacted:
 					return t(out, *atl)
+
+				case *etikett.Transacted:
+					return e(out, *atl)
 
 				default:
 					err = todo.Implement()

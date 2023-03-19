@@ -274,6 +274,10 @@ func (u *Umwelt) MakeKennungQueryHidden() (out kennung.QuerySet[kennung.Etikett,
 	return
 }
 
+func (u *Umwelt) MakeKennungHidden() kennung.Matcher {
+	return kennung.MakeMatcherEtiketten(u.Konfig().EtikettenHidden)
+}
+
 func (u *Umwelt) MakeKennungExpanders() kennung.Expanders {
 	return kennung.Expanders{
 		Sha: func(v string) (out string, err error) {
@@ -308,23 +312,10 @@ func (u *Umwelt) MakeMetaIdSet(
 	return kennung.MakeMetaSet(
 		cwd,
 		u.MakeKennungExpanders(),
-		nil,
+		u.MakeKennungHidden(),
 		u.Konfig().FileExtensions,
 		dg,
 	)
-}
-
-func (u *Umwelt) MakeMetaIdSetDefault(
-	cwd kennung.Matcher,
-) (out kennung.MetaSet) {
-	out = kennung.MakeMetaSetAll(
-		cwd,
-		u.MakeKennungExpanders(),
-		u.MakeKennungQueryHidden(),
-		u.Konfig().FileExtensions,
-	)
-
-	return
 }
 
 func (u *Umwelt) MakeIdSet(

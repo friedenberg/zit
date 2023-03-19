@@ -2,6 +2,8 @@ package todo
 
 import "github.com/friedenberg/zit/src/alfa/errors"
 
+var errNotImplemented = errors.New("not implemented")
+
 func Change(_ string) {
 	errors.TodoP0("start logging this")
 }
@@ -20,7 +22,7 @@ func Parallelize() {
 
 func Implement() (err error) {
 	errors.TodoP0("start logging this")
-	return errors.Implement()
+	return errors.WrapN(1, errNotImplemented)
 }
 
 func Remove() {

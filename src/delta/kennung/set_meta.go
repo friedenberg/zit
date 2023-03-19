@@ -30,7 +30,7 @@ type metaSet struct {
 	cwd                 Matcher
 	fileExtensionGetter schnittstellen.FileExtensionGetter
 	expanders           Expanders
-	Etiketten           QuerySet[Etikett, *Etikett]
+	Hidden              Matcher
 	DefaultGattungen    gattungen.Set
 	Gattung             map[gattung.Gattung]Set
 }
@@ -38,7 +38,7 @@ type metaSet struct {
 func MakeMetaSet(
 	cwd Matcher,
 	ex Expanders,
-	etikett QuerySet[Etikett, *Etikett],
+	hidden Matcher,
 	feg schnittstellen.FileExtensionGetter,
 	dg gattungen.Set,
 ) MetaSet {
@@ -46,7 +46,7 @@ func MakeMetaSet(
 		cwd:                 cwd,
 		fileExtensionGetter: feg,
 		expanders:           ex,
-		Etiketten:           etikett,
+		Hidden:              hidden,
 		DefaultGattungen:    dg.MutableClone(),
 		Gattung:             make(map[gattung.Gattung]Set),
 	}
@@ -55,7 +55,7 @@ func MakeMetaSet(
 func MakeMetaSetAll(
 	cwd Matcher,
 	ex Expanders,
-	etikett QuerySet[Etikett, *Etikett],
+	hidden Matcher,
 	feg schnittstellen.FileExtensionGetter,
 ) MetaSet {
 	errors.TodoP2("support allowed sigils")
@@ -63,8 +63,8 @@ func MakeMetaSetAll(
 		cwd:                 cwd,
 		fileExtensionGetter: feg,
 		expanders:           ex,
-		Etiketten:           etikett,
-		DefaultGattungen:    gattungen.MakeSet(gattung.All()...),
+		Hidden:              hidden,
+		DefaultGattungen:    gattungen.MakeSet(gattung.TrueGattung()...),
 		Gattung:             make(map[gattung.Gattung]Set),
 	}
 }
@@ -156,7 +156,7 @@ func (ms *metaSet) set(v string) (err error) {
 				ok := false
 
 				if ids, ok = ms.Gattung[gattung.Unknown]; !ok {
-					ids = MakeSet(ms.cwd, ms.expanders, ms.Etiketten)
+					ids = ms.MakeSet()
 				}
 
 				if err = collections.AddString[FD, *FD](
@@ -185,13 +185,7 @@ func (ms *metaSet) set(v string) (err error) {
 			ok := false
 
 			if ids, ok = ms.Gattung[g]; !ok {
-				def := ms.Etiketten
-
-				if sigil.IncludesHidden() {
-					def = nil
-				}
-
-				ids = MakeSet(ms.cwd, ms.expanders, def)
+				ids = ms.MakeSet()
 				ids.Sigil = sigil
 			}
 
@@ -242,13 +236,7 @@ func (ms *metaSet) Add(
 	ok := false
 
 	if ids, ok = ms.Gattung[g]; !ok {
-		def := ms.Etiketten
-
-		if sigil.IncludesHidden() {
-			def = nil
-		}
-
-		ids = MakeSet(ms.cwd, ms.expanders, def)
+		ids = ms.MakeSet()
 		ids.Sigil = sigil
 	}
 
@@ -267,6 +255,10 @@ func (ms metaSet) Get(g gattung.Gattung) (s Set, ok bool) {
 	return
 }
 
+func (ms metaSet) MakeSet() Set {
+	return MakeSet(ms.cwd, ms.expanders, ms.Hidden)
+}
+
 func (ms metaSet) addFDs(fd FD) (err error) {
 	ext := fd.ExtSansDot()
 
@@ -276,7 +268,7 @@ func (ms metaSet) addFDs(fd FD) (err error) {
 	var ids Set
 
 	if ids, ok = ms.Gattung[g]; !ok {
-		ids = MakeSet(ms.cwd, ms.expanders, ms.Etiketten)
+		ids = ms.MakeSet()
 	}
 
 	if err = ids.Add(fd); err != nil {

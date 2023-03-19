@@ -1,6 +1,6 @@
 #! /bin/bash -xe
 
-dir_base="$(dirname "$0")"
+dir_base="$(realpath "$(dirname "$0")")"
 make build/zit
 zit="$(realpath build/zit)"
 v="$("$zit" store-version)"
@@ -50,4 +50,4 @@ cat > one/uno.zettel <<EOM
 last time
 EOM
 
-"$zit" checkin -delete .
+"$zit" checkin -delete one/uno.zettel

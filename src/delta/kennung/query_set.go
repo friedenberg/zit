@@ -19,6 +19,7 @@ func init() {
 func registerQuerySetGob[T QueryKennung[T], TPtr QueryKennungPtr[T]]() {
 	gob.Register(querySet[T, TPtr]{})
 	gob.Register(mutableQuerySet[T, TPtr]{})
+	collections.RegisterGobTridexSet[T]()
 }
 
 type QueryKennung[T any] interface {
@@ -46,7 +47,6 @@ type MutableQuerySet[T QueryKennung[T], TPtr QueryKennungPtr[T]] interface {
 	AddString(string) error
 	AddInclude(T) error
 	AddExclude(T) error
-	// schnittstellen.Adder[T]
 }
 
 func MakeMutableQuerySet[T QueryKennung[T], TPtr QueryKennungPtr[T]](
@@ -64,8 +64,8 @@ func MakeMutableQuerySet[T QueryKennung[T], TPtr QueryKennungPtr[T]](
 
 	return mutableQuerySet[T, TPtr]{
 		Expander: ex,
-		Include:  inc.MutableClone(),
-		Exclude:  exc.MutableClone(),
+		Include:  collections.MakeMutableTridexSet[T](inc.Elements()...),
+		Exclude:  collections.MakeMutableTridexSet[T](exc.Elements()...),
 	}
 }
 
@@ -74,31 +74,19 @@ func MakeQuerySet[T QueryKennung[T], TPtr QueryKennungPtr[T]](
 	inc schnittstellen.Set[T],
 	exc schnittstellen.Set[T],
 ) QuerySet[T, TPtr] {
-	if inc == nil {
-		inc = collections.MakeSetStringer[T]()
-	}
-
-	if exc == nil {
-		exc = collections.MakeSetStringer[T]()
-	}
-
 	return querySet[T, TPtr]{
-		Expander: ex,
-		Include:  inc.ImmutableClone(),
-		Exclude:  exc.ImmutableClone(),
+		set: MakeMutableQuerySet[T, TPtr](ex, inc, exc),
 	}
 }
 
 type querySet[T QueryKennung[T], TPtr QueryKennungPtr[T]] struct {
-	Expander func(string) (string, error)
-	Include  schnittstellen.Set[T]
-	Exclude  schnittstellen.Set[T]
+	set MutableQuerySet[T, TPtr]
 }
 
 type mutableQuerySet[T QueryKennung[T], TPtr QueryKennungPtr[T]] struct {
 	Expander func(string) (string, error)
-	Include  schnittstellen.MutableSet[T]
-	Exclude  schnittstellen.MutableSet[T]
+	Include  collections.MutableTridexSet[T]
+	Exclude  collections.MutableTridexSet[T]
 }
 
 //   ____  _        _
@@ -109,26 +97,7 @@ type mutableQuerySet[T QueryKennung[T], TPtr QueryKennungPtr[T]] struct {
 //                          |___/
 
 func (kqs querySet[T, TPtr]) String() string {
-	sb := &strings.Builder{}
-
-	var e T
-	p := e.GetQueryPrefix()
-
-	kqs.Include.Each(
-		func(e T) (err error) {
-			sb.WriteString(fmt.Sprintf("%s%s ", p, e))
-			return
-		},
-	)
-
-	kqs.Exclude.Each(
-		func(e T) (err error) {
-			sb.WriteString(fmt.Sprintf("%c%s%s ", QueryNegationOperator, p, e))
-			return
-		},
-	)
-
-	return sb.String()
+	return kqs.set.String()
 }
 
 func (kqs mutableQuerySet[T, TPtr]) String() string {
@@ -162,7 +131,7 @@ func (kqs mutableQuerySet[T, TPtr]) String() string {
 //
 
 func (kqs querySet[T, TPtr]) Len() int {
-	return collections.Len(kqs.Include, kqs.Exclude)
+	return kqs.set.Len()
 }
 
 func (kqs mutableQuerySet[T, TPtr]) Len() int {
@@ -177,20 +146,7 @@ func (kqs mutableQuerySet[T, TPtr]) Len() int {
 //
 
 func (kqs querySet[T, TPtr]) ContainsAgainst(els schnittstellen.Set[T]) bool {
-	if els == nil {
-		return true
-	}
-
-	if els.Len() == 0 {
-		return true
-	}
-
-	if (kqs.Include.Len() == 0 || iter.Any(els, kqs.Include.Contains)) &&
-		(kqs.Exclude.Len() == 0 || !iter.Any(els, kqs.Exclude.Contains)) {
-		return true
-	}
-
-	return false
+	return kqs.set.ContainsAgainst(els)
 }
 
 func (kqs mutableQuerySet[T, TPtr]) ContainsAgainst(els schnittstellen.Set[T]) bool {
@@ -211,11 +167,7 @@ func (kqs mutableQuerySet[T, TPtr]) ContainsAgainst(els schnittstellen.Set[T]) b
 }
 
 func (kqs querySet[T, TPtr]) Contains(e T) bool {
-	if kqs.Include.Len() == 0 {
-		return !kqs.Exclude.Contains(e)
-	} else {
-		return kqs.Include.Contains(e) && !kqs.Exclude.Contains(e)
-	}
+	return kqs.set.Contains(e)
 }
 
 func (kqs mutableQuerySet[T, TPtr]) Contains(e T) bool {
@@ -227,42 +179,32 @@ func (kqs mutableQuerySet[T, TPtr]) Contains(e T) bool {
 }
 
 func (kqs querySet[T, TPtr]) GetIncludes() schnittstellen.Set[T] {
-	return kqs.Include
+	return kqs.set.GetIncludes()
 }
 
 func (kqs querySet[T, TPtr]) GetExcludes() schnittstellen.Set[T] {
-	return kqs.Exclude
+	return kqs.set.GetExcludes()
 }
 
 func (kqs mutableQuerySet[T, TPtr]) GetIncludes() schnittstellen.Set[T] {
-	return kqs.Include
+	return kqs.Include.GetSet()
 }
 
 func (kqs mutableQuerySet[T, TPtr]) GetExcludes() schnittstellen.Set[T] {
-	return kqs.Exclude
+	return kqs.Exclude.GetSet()
 }
 
 func (kqs querySet[T, TPtr]) ImmutableClone() QuerySet[T, TPtr] {
-	return querySet[T, TPtr]{
-		Expander: kqs.Expander,
-		Include:  kqs.Include,
-		Exclude:  kqs.Exclude,
-	}
+	return kqs.set.ImmutableClone()
 }
 
 func (kqs querySet[T, TPtr]) MutableClone() MutableQuerySet[T, TPtr] {
-	return mutableQuerySet[T, TPtr]{
-		Expander: kqs.Expander,
-		Include:  kqs.Include.MutableClone(),
-		Exclude:  kqs.Exclude.MutableClone(),
-	}
+	return kqs.set.MutableClone()
 }
 
 func (kqs mutableQuerySet[T, TPtr]) ImmutableClone() QuerySet[T, TPtr] {
 	return querySet[T, TPtr]{
-		Expander: kqs.Expander,
-		Include:  kqs.Include,
-		Exclude:  kqs.Exclude,
+		set: kqs.MutableClone(),
 	}
 }
 

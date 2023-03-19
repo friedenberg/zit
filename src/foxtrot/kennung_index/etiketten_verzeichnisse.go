@@ -9,7 +9,7 @@ import (
 )
 
 type EtikettenVerzeichnisse struct {
-	Tridex         *tridex.Tridex
+	Tridex         schnittstellen.MutableTridex
 	Etiketten      schnittstellen.Set[kennung.Etikett]
 	Expanded       schnittstellen.Set[kennung.Etikett]
 	SortedExpanded []string
@@ -47,7 +47,7 @@ func (z *EtikettenVerzeichnisse) Reset() {
 func (z *EtikettenVerzeichnisse) ResetWith(z1 EtikettenVerzeichnisse) {
 	errors.TodoP4("improve performance by reusing slices")
 
-	z.Tridex = z1.Tridex.Copy()
+	z.Tridex = z1.Tridex.MutableClone()
 
 	z.Etiketten = z1.Etiketten.ImmutableClone()
 	z.Expanded = z1.Expanded.ImmutableClone()

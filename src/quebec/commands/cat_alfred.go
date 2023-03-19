@@ -35,6 +35,14 @@ func (c CatAlfred) CompletionGattung() gattungen.Set {
 	)
 }
 
+func (c CatAlfred) DefaultGattungen() gattungen.Set {
+	return gattungen.MakeSet(
+		gattung.Etikett,
+		gattung.Zettel,
+		gattung.Typ,
+	)
+}
+
 func (c CatAlfred) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
 	// this command does its own error handling
 	wo := bufio.NewWriter(u.Out())

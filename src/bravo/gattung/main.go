@@ -90,7 +90,7 @@ func (g Gattung) GetGattungString() string {
 
 func (g Gattung) IsTrueGattung() bool {
 	switch g {
-	case Typ, AkteTyp, Etikett, Zettel, Konfig, Kasten:
+	case Typ, Etikett, Zettel, Konfig, Kasten:
 		return true
 
 	default:

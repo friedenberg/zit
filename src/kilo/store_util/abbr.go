@@ -36,11 +36,11 @@ type AbbrStore interface {
 }
 
 type indexAbbrEncodableTridexes struct {
-	Shas             *tridex.Tridex
-	HinweisKopfen    *tridex.Tridex
-	HinweisSchwanzen *tridex.Tridex
-	Etiketten        *tridex.Tridex
-	Typen            *tridex.Tridex
+	Shas             schnittstellen.MutableTridex
+	HinweisKopfen    schnittstellen.MutableTridex
+	HinweisSchwanzen schnittstellen.MutableTridex
+	Etiketten        schnittstellen.MutableTridex
+	Typen            schnittstellen.MutableTridex
 }
 
 type indexAbbr struct {
@@ -230,12 +230,12 @@ func (i *indexAbbr) HinweisExists(h kennung.Hinweis) (err error) {
 		return
 	}
 
-	if !i.indexAbbrEncodableTridexes.HinweisKopfen.ContainsExactly(h.Kopf()) {
+	if !i.indexAbbrEncodableTridexes.HinweisKopfen.ContainsExpansion(h.Kopf()) {
 		err = objekte_store.ErrNotFound{Id: h}
 		return
 	}
 
-	if !i.indexAbbrEncodableTridexes.HinweisSchwanzen.ContainsExactly(h.Schwanz()) {
+	if !i.indexAbbrEncodableTridexes.HinweisSchwanzen.ContainsExpansion(h.Schwanz()) {
 		err = objekte_store.ErrNotFound{Id: h}
 		return
 	}
@@ -249,7 +249,7 @@ func (i *indexAbbr) EtikettExists(e kennung.Etikett) (err error) {
 		return
 	}
 
-	if !i.indexAbbrEncodableTridexes.Etiketten.ContainsExactly(e.String()) {
+	if !i.indexAbbrEncodableTridexes.Etiketten.ContainsExpansion(e.String()) {
 		err = objekte_store.ErrNotFound{Id: e}
 		return
 	}
@@ -331,7 +331,7 @@ func (i *indexAbbr) TypExists(t kennung.Typ) (err error) {
 		return
 	}
 
-	if !i.indexAbbrEncodableTridexes.Typen.ContainsExactly(t.String()) {
+	if !i.indexAbbrEncodableTridexes.Typen.ContainsExpansion(t.String()) {
 		err = objekte_store.ErrNotFound{Id: t}
 		return
 	}

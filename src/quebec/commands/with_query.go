@@ -6,6 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/juliett/zettel"
@@ -14,6 +15,7 @@ import (
 
 type CommandWithQuery interface {
 	RunWithQuery(store *umwelt.Umwelt, ids kennung.MetaSet) error
+	DefaultGattungen() gattungen.Set
 }
 
 type commandWithQuery struct {
@@ -94,8 +96,7 @@ func (c commandWithQuery) Complete(u *umwelt.Umwelt, args ...string) (err error)
 }
 
 func (c commandWithQuery) Run(u *umwelt.Umwelt, args ...string) (err error) {
-	errors.TodoP2("support gattungen")
-	ids := u.MakeMetaIdSet(nil, nil)
+	ids := u.MakeMetaIdSet(nil, c.DefaultGattungen())
 
 	if err = ids.SetMany(args...); err != nil {
 		err = errors.Wrap(err)

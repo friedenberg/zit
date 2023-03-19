@@ -49,6 +49,16 @@ func (a String) WasSet() bool {
 	return a.wasSet
 }
 
+func (a *String) Reset() {
+	a.wasSet = false
+	a.string = ""
+}
+
+func (a *String) ResetWith(b String) {
+	a.wasSet = true
+	a.string = b.string
+}
+
 func (s String) MarshalBinary() (text []byte, err error) {
 	text = []byte(s.String())
 

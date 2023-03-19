@@ -51,6 +51,16 @@ func (c Show) CompletionGattung() gattungen.Set {
 	)
 }
 
+func (c Show) DefaultGattungen() gattungen.Set {
+	return gattungen.MakeSet(
+		gattung.Zettel,
+		gattung.Etikett,
+		gattung.Typ,
+		// gattung.Bestandsaufnahme,
+		gattung.Kasten,
+	)
+}
+
 func (c Show) runGenericObjekteFormatterValue(
 	u *umwelt.Umwelt,
 	ms kennung.MetaSet,
@@ -87,6 +97,9 @@ func (c Show) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
 	if err = ms.All(
 		func(g gattung.Gattung, ids kennung.Set) (err error) {
 			switch g {
+			case gattung.Kasten:
+				todo.Implement()
+				return
 
 			case gattung.Zettel:
 				var fv zettel.FormatterValue

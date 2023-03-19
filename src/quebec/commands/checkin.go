@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -27,6 +28,10 @@ func init() {
 			return c
 		},
 	)
+}
+
+func (c Checkin) DefaultGattungen() gattungen.Set {
+	return gattungen.MakeSet()
 }
 
 func (c Checkin) RunWithCwdQuery(

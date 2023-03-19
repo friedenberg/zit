@@ -7,17 +7,15 @@ func AnyOrTrueEmpty[T any](c schnittstellen.Set[T], f func(T) bool) bool {
 		return true
 	}
 
-	err := c.Each(
-		func(e T) (err error) {
-			if f(e) {
-				err = errTrue
-			}
+	return Any(c, f)
+}
 
-			return
-		},
-	)
+func AnyOrFalseEmpty[T any](c schnittstellen.Set[T], f func(T) bool) bool {
+	if c.Len() == 0 {
+		return false
+	}
 
-	return IsErrTrue(err)
+	return Any(c, f)
 }
 
 func Any[T any](c schnittstellen.Set[T], f func(T) bool) bool {
