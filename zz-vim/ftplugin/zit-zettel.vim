@@ -74,7 +74,7 @@ function! ZitMakeUTIGroupCommand(uti_group, cmd_args_unprocessed_list)
 endfunction
 
 function! ZitGetUTIGroups()
-  let l:rawItems = sort(systemlist("zit show -include-cwd -format typ-formatter-uti-groups " . expand("%:r") ."."))
+  let l:rawItems = sort(systemlist("zit show -format typ-formatter-uti-groups " . expand("%")))
   let l:processedItems = []
   let l:items = []
 
@@ -89,11 +89,11 @@ function! ZitGetUTIGroups()
 endfunction
 
 function! ZitGetActionNames()
-  return sort(systemlist("zit show -format action-names " .. expand("%:r")))
+  return sort(systemlist("zit show -format action-names " .. expand("%")))
 endfunction
 
 function! ZitGetFormats()
-  return sort(systemlist("zit show -format formatters " .. expand("%:r")))
+  return sort(systemlist("zit show -format formatters " .. expand("%")))
 endfunction
 
 function! ZitPreview()

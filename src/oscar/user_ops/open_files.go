@@ -13,8 +13,6 @@ func (c OpenFiles) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	errors.Err().Printf("files %#v", args)
-
 	if err = files.OpenFiles(args...); err != nil {
 		err = errors.Wrapf(err, "%q", args)
 		return

@@ -109,7 +109,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		)
 
 		todo.Refactor("make this more stable by not using string query")
-		if err = ms.Set("@.zettel"); err != nil {
+		if err = ms.Set(".zettel"); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
