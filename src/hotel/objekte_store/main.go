@@ -25,6 +25,13 @@ type OneReader[
 	ReadOne(K) (V, error)
 }
 
+type CwdReader[
+	CWD any,
+	V any,
+] interface {
+	ReadOneCwd(CWD) (V, error)
+}
+
 type AllReader[
 	V any,
 ] interface {

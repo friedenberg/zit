@@ -17,30 +17,7 @@ import (
 )
 
 type TypStore interface {
-	reindexer
-	GattungStore
-
-	objekte_store.Inheritor[*typ.Transacted]
-	objekte_store.TransactedLogger[*typ.Transacted]
-
-	objekte_store.AkteTextSaver[
-		typ.Objekte,
-		*typ.Objekte,
-	]
-
-	objekte_store.Querier[
-		*kennung.Typ,
-		*typ.Transacted,
-	]
-
-	objekte_store.CreateOrUpdater[
-		*typ.Objekte,
-		*kennung.Typ,
-		*typ.Transacted,
-		*typ.CheckedOut,
-	]
-
-	objekte_store.TransactedInflator[
+	commonStore[
 		typ.Objekte,
 		*typ.Objekte,
 		kennung.Typ,
