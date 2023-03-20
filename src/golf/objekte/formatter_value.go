@@ -25,6 +25,7 @@ func (f *FormatterValue) Set(v string) (err error) {
 	v1 := strings.TrimSpace(strings.ToLower(v))
 	switch v1 {
 	case
+		"kennung",
 		"akte",
 		"debug",
 		"etiketten",
@@ -53,6 +54,12 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 	logFunc schnittstellen.FuncIter[TransactedLike],
 ) schnittstellen.FuncIter[TransactedLike] {
 	switch fv.string {
+	case "kennung":
+		return func(e TransactedLike) (err error) {
+			_, err = fmt.Fprintln(out, e.GetDataIdentity().GetId())
+			return
+		}
+
 	case "sku-transacted":
 		return func(e TransactedLike) (err error) {
 			_, err = fmt.Fprintln(out, e.GetSku())

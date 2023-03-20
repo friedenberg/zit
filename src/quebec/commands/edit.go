@@ -11,7 +11,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte"
-	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/mike/store_fs"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -72,12 +71,18 @@ func (c Edit) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
 		func(co objekte.CheckedOutLike) (err error) {
 			e := co.GetExternal()
 
-			akten.Add(e.GetAkteFD())
-			objekten.Add(e.GetObjekteFD())
+			if afd := e.GetAkteFD(); afd.String() != "." {
+				akten.Add(afd)
+			}
+
+			if ofd := e.GetObjekteFD(); ofd.String() != "." {
+				objekten.Add(ofd)
+			}
 
 			return
 		},
 	); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -111,17 +116,12 @@ func (c Edit) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
 		return
 	}
 
-	// readOp := user_ops.ReadCheckedOut{
-	// 	Umwelt:              u,
-	// 	OptionsReadExternal: store_fs.OptionsReadExternal{},
-	// }
-
-	// var possible cwd.CwdFiles
-
 	filez := append([]string{}, objektenFiles...)
 	filez = append(filez, aktenFiles...)
 
-	if _, err = cwd.MakeCwdFilesExactly(
+	var cwdFiles cwd.CwdFiles
+
+	if cwdFiles, err = cwd.MakeCwdFilesExactly(
 		u.Konfig(),
 		u.Standort().Cwd(),
 		filez...,
@@ -130,95 +130,11 @@ func (c Edit) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
 		return
 	}
 
-	return
-}
-
-// TODO improve this
-func (c Edit) editZettels(
-	u *umwelt.Umwelt,
-	ms kennung.MetaSet,
-) (err error) {
-	checkoutOptions := store_fs.CheckoutOptions{
-		CheckoutMode: c.CheckoutMode,
-	}
-
-	checkoutResults := zettel.MakeMutableSetCheckedOutHinweisZettel(0)
-
-	if err = u.StoreWorkingDirectory().CheckoutQuery(
-		checkoutOptions,
-		ms,
-		func(col objekte.CheckedOutLike) (err error) {
-			z, ok := col.(*zettel.CheckedOut)
-
-			if !ok {
-				return
-			}
-
-			return checkoutResults.Add(*z)
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	var filesAkten []string
-
-	if filesAkten, err = zettel.ToSliceFilesAkten(checkoutResults); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = (user_ops.OpenFiles{}).Run(u, filesAkten...); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	openVimOp := user_ops.OpenVim{
-		Options: vim_cli_options_builder.New().
-			WithCursorLocation(2, 3).
-			WithFileType("zit-zettel").
-			WithInsertMode().
-			Build(),
-	}
-
-	var filesZettelen []string
-
-	if filesZettelen, err = zettel.ToSliceFilesZettelen(checkoutResults); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if _, err = openVimOp.Run(u, filesZettelen...); err != nil {
-		if errors.Is(err, files.ErrEmptyFileList) {
-			err = errors.Normalf("nothing to open in vim")
-		} else {
-			err = errors.Wrap(err)
-		}
-
-		return
-	}
-
-	if err = u.Reset(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	var possible cwd.CwdFiles
-
-	if possible, err = cwd.MakeCwdFilesExactly(
-		u.Konfig(),
-		u.Standort().Cwd(),
-		filesZettelen...,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	checkinOp := user_ops.Checkin{
+	op := user_ops.Checkin{
 		Delete: c.Delete,
 	}
 
-	if err = checkinOp.Run(u, ms, possible); err != nil {
+	if err = op.Run(u, ms, cwdFiles); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
