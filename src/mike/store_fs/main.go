@@ -445,6 +445,18 @@ func (s *Store) ReadFiles(
 	ms kennung.MetaSet,
 	f schnittstellen.FuncIter[objekte.CheckedOutLike],
 ) (err error) {
+	etikettEMGR := objekte_store.MakeExternalMaybeGetterReader[
+		etikett.Objekte,
+		*etikett.Objekte,
+		kennung.Etikett,
+		*kennung.Etikett,
+		objekte.NilVerzeichnisse[etikett.Objekte],
+		*objekte.NilVerzeichnisse[etikett.Objekte],
+	](
+		fs.GetEtikett,
+		s.storeObjekten.Etikett(),
+	)
+
 	typEMGR := objekte_store.MakeExternalMaybeGetterReader[
 		typ.Objekte,
 		*typ.Objekte,
@@ -498,28 +510,10 @@ func (s *Store) ReadFiles(
 					}
 
 				case *etikett.Transacted:
-					var tco etikett.CheckedOut
-					ok := false
-
-					var te cwd.Etikett
-
-					if te, ok = fs.GetEtikett(et.Sku.Kennung); !ok {
-						err = iter.MakeErrStopIteration()
+					if col, err = etikettEMGR.ReadOne(*et); err != nil {
+						err = errors.Wrap(err)
 						return
 					}
-
-					if tco.External, err = s.storeObjekten.Etikett().ReadOneExternal(te); err != nil {
-						if errors.IsNotExist(err) {
-							err = iter.MakeErrStopIteration()
-						} else {
-							err = errors.Wrapf(err, "CwdEtikett: %#v", te)
-						}
-
-						return
-					}
-
-					tco.Internal = *et
-					col = &tco
 
 				default:
 					err = errors.Implement()
