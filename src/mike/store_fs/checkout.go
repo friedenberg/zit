@@ -238,7 +238,7 @@ func (s *Store) CheckoutOneEtikett(
 
 	if f, err = files.CreateExclusiveWriteOnly(p); err != nil {
 		if errors.IsExist(err) {
-			if co.External, err = s.ReadEtikett(
+			if co.External, err = s.storeObjekten.Etikett().ReadOneExternal(
 				cwd.Etikett{
 					Kennung: tk.Sku.Kennung,
 					FDs: sku.ExternalFDs{

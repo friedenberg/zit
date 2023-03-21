@@ -118,7 +118,7 @@ func (s *Store) ReadOneEtikett(
 
 	p := s.PathForTransactedLike(tk)
 
-	if co.External, err = s.ReadEtikett(
+	if co.External, err = s.storeObjekten.Etikett().ReadOneExternal(
 		cwd.Etikett{
 			Kennung: tk.Sku.Kennung,
 			FDs: sku.ExternalFDs{

@@ -1,6 +1,7 @@
 package store_objekten
 
 import (
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
@@ -68,6 +69,11 @@ type CommonStoreBase[
 		V,
 		VPtr,
 	]]
+
+	objekte_store.ExternalReader[
+		sku.ExternalMaybe[K, KPtr],
+		objekte.External[O, OPtr, K, KPtr],
+	]
 }
 
 type CommonStore[
@@ -150,6 +156,13 @@ type commonStore[
 		OPtr,
 	]
 
+	objekte_store.ParseSaver[
+		O,
+		OPtr,
+		K,
+		KPtr,
+	]
+
 	objekte_store.TransactedReader[KPtr,
 		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
 	]
@@ -213,6 +226,16 @@ func makeCommonStore[
 			akteFormatter,
 		),
 		TransactedReader: tr,
+		ParseSaver: objekte_store.MakeParseSaver[
+			O,
+			OPtr,
+			K,
+			KPtr,
+		](
+			sa,
+			sa,
+			textFormat,
+		),
 	}
 
 	return
@@ -232,4 +255,17 @@ func (s *commonStore[O, OPtr, K, KPtr, V, VPtr]) Query(
 		KPtr,
 		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
 	](s, m, f)
+}
+
+func (s *commonStore[O, OPtr, K, KPtr, V, VPtr]) ReadOneExternal(
+	e sku.ExternalMaybe[K, KPtr],
+) (t objekte.External[O, OPtr, K, KPtr], err error) {
+	if t.Objekte, t.Sku, err = s.ParseAndSaveAkteAndObjekte(
+		e,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
