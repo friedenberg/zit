@@ -32,21 +32,7 @@ type EtikettTransactedReader = objekte_store.TransactedReader[
 	*etikett.Transacted,
 ]
 
-type EtikettInflator = objekte_store.TransactedInflator[
-	etikett.Objekte,
-	*etikett.Objekte,
-	kennung.Etikett,
-	*kennung.Etikett,
-	objekte.NilVerzeichnisse[etikett.Objekte],
-	*objekte.NilVerzeichnisse[etikett.Objekte],
-]
-
 type EtikettLogWriter = objekte_store.LogWriter[*etikett.Transacted]
-
-type EtikettAkteTextSaver = objekte_store.AkteTextSaver[
-	etikett.Objekte,
-	*etikett.Objekte,
-]
 
 type etikettStore struct {
 	*commonStore[
@@ -58,8 +44,6 @@ type etikettStore struct {
 		*objekte.NilVerzeichnisse[etikett.Objekte],
 	]
 
-	EtikettInflator
-	EtikettAkteTextSaver
 	EtikettLogWriter
 
 	objekte_store.CreateOrUpdater[

@@ -5,7 +5,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/alfa/toml"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
@@ -27,15 +26,6 @@ type TypStore interface {
 	]
 }
 
-type TypInflator = objekte_store.TransactedInflator[
-	typ.Objekte,
-	*typ.Objekte,
-	kennung.Typ,
-	*kennung.Typ,
-	objekte.NilVerzeichnisse[typ.Objekte],
-	*objekte.NilVerzeichnisse[typ.Objekte],
-]
-
 type TypTransactedReader = objekte_store.TransactedReader[
 	*kennung.Typ,
 	*typ.Transacted,
@@ -43,18 +33,16 @@ type TypTransactedReader = objekte_store.TransactedReader[
 
 type TypLogWriter = objekte_store.LogWriter[*typ.Transacted]
 
-type TypAkteTextSaver = objekte_store.AkteTextSaver[
-	typ.Objekte,
-	*typ.Objekte,
-]
-
 type typStore struct {
-	store_util.StoreUtil
+	*commonStore[
+		typ.Objekte,
+		*typ.Objekte,
+		kennung.Typ,
+		*kennung.Typ,
+		objekte.NilVerzeichnisse[typ.Objekte],
+		*objekte.NilVerzeichnisse[typ.Objekte],
+	]
 
-	pool schnittstellen.Pool[typ.Transacted, *typ.Transacted]
-
-	TypInflator
-	TypAkteTextSaver
 	TypLogWriter
 
 	objekte_store.CreateOrUpdater[
@@ -74,34 +62,25 @@ func (s *typStore) SetLogWriter(
 func makeTypStore(
 	sa store_util.StoreUtil,
 ) (s *typStore, err error) {
-	pool := collections.MakePool[typ.Transacted]()
+	s = &typStore{}
 
-	s = &typStore{
-		StoreUtil: sa,
-		pool:      pool,
-		TypInflator: objekte_store.MakeTransactedInflator[
-			typ.Objekte,
-			*typ.Objekte,
-			kennung.Typ,
-			*kennung.Typ,
-			objekte.NilVerzeichnisse[typ.Objekte],
-			*objekte.NilVerzeichnisse[typ.Objekte],
-		](
-			sa,
-			sa,
-			nil,
-			schnittstellen.Format[typ.Objekte, *typ.Objekte](
-				typ.MakeFormatTextIgnoreTomlErrors(sa),
-			),
-			pool,
-		),
-		TypAkteTextSaver: objekte_store.MakeAkteTextSaver[
-			typ.Objekte,
-			*typ.Objekte,
-		](
-			sa,
-			&typ.FormatterAkteTextToml{},
-		),
+	s.commonStore, err = makeCommonStore[
+		typ.Objekte,
+		*typ.Objekte,
+		kennung.Typ,
+		*kennung.Typ,
+		objekte.NilVerzeichnisse[typ.Objekte],
+		*objekte.NilVerzeichnisse[typ.Objekte],
+	](
+		sa,
+		s,
+		typ.MakeFormatTextIgnoreTomlErrors(sa),
+		&typ.FormatterAkteTextToml{},
+	)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	newOrUpdated := func(t *typ.Transacted) (err error) {
@@ -144,16 +123,6 @@ func makeTypStore(
 
 func (s typStore) Flush() (err error) {
 	return
-}
-
-func (s *typStore) Query(
-	m kennung.Matcher,
-	f schnittstellen.FuncIter[*typ.Transacted],
-) (err error) {
-	return objekte_store.QueryMethodForMatcher[
-		*kennung.Typ,
-		*typ.Transacted,
-	](s, m, f)
 }
 
 // TODO-P3
