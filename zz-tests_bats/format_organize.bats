@@ -12,6 +12,7 @@ function format_organize_right_align { # @test
 	cd "$wd" || exit 1
 
 	run_zit_init_disable_age
+	assert_success
 
 	to_add="$(mktemp)"
 	{
@@ -35,6 +36,7 @@ function format_organize_right_align { # @test
 	} >"$expected"
 
 	run_zit format-organize -prefix-joints=true -refine "$to_add"
+	assert_success
 	assert_output "$(cat "$expected")"
 }
 
@@ -44,6 +46,7 @@ function format_organize_left_align { # @test
 	cd "$wd" || exit 1
 
 	run_zit_init_disable_age
+	assert_success
 
 	to_add="$(mktemp)"
 	{
@@ -67,5 +70,6 @@ function format_organize_left_align { # @test
 	} >"$expected"
 
 	run_zit format-organize -prefix-joints=true -refine -right-align=false "$to_add"
+	assert_success
 	assert_output "$(cat "$expected")"
 }

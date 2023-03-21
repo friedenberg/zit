@@ -21,9 +21,11 @@ function bootstrap {
 	} >to_add
 
 	run_zit new -edit=false to_add
+	assert_success
 	assert_output '[one/uno@37d3869e9b1711f009eabf69a2bf294cfd785f5b1c7463cba77d11d5f81f5e09 !md "wow"]'
 
-	run zit show one/uno
+	run_zit show one/uno
+	assert_success
 	assert_output "$(cat to_add)"
 }
 

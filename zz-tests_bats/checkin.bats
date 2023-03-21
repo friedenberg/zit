@@ -10,6 +10,7 @@ setup() {
 	copy_from_version "$DIR" "$version"
 
 	run_zit checkout :z,t,e
+	assert_success
 
 	cat >one/uno.zettel <<-EOM
 		---
@@ -47,17 +48,20 @@ teardown() {
 
 function checkin_simple_one_zettel { # @test
 	run_zit checkin one/uno.zettel
+	assert_success
 	assert_output '[one/uno@689c6787364899defa77461ff6a3f454ca667654653f86d5d44f2826950ff4f9 !md "wildly different"]'
 }
 
 function checkin_complex_zettel_etikett_negation { # @test
 	run_zit checkin ^-etikett-two.z
+	assert_success
 	assert_output '[one/uno@689c6787364899defa77461ff6a3f454ca667654653f86d5d44f2826950ff4f9 !md "wildly different"]'
 }
 
 function checkin_simple_all { # @test
 	# TODO: modify this to support "." for everything
 	run_zit checkin .z,e,t
+	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md@72d654e3c7f4e820df18c721177dfad38fe831d10bca6dcb33b7cad5dc335357]
 		[one/uno@689c6787364899defa77461ff6a3f454ca667654653f86d5d44f2826950ff4f9 !md "wildly different"]
@@ -68,16 +72,20 @@ function checkin_simple_all { # @test
 
 function checkin_simple_typ { # @test
 	run_zit checkin .t
+	assert_success
 	assert_output '[!md@72d654e3c7f4e820df18c721177dfad38fe831d10bca6dcb33b7cad5dc335357]'
 
 	run_zit show -format vim-syntax-type !md.typ
+	assert_success
 	assert_output 'test'
 }
 
 function checkin_simple_etikett { # @test
 	run_zit checkin .e
+	assert_success
 	assert_output '[-zz-archive@cba019d4f889027a3485e56dd2080c7ba0fa1e27499c24b7ec08ad80ef55da9d]'
 
 	run_zit show -format text zz-archive.e
+	assert_success
 	assert_output 'hide = true'
 }

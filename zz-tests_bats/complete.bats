@@ -19,6 +19,7 @@ function complete_show { # @test
 	cd "$wd" || exit 1
 
 	run_zit_init_disable_age
+	assert_success
 
 	expected="$(mktemp)"
 	{
@@ -29,10 +30,12 @@ function complete_show { # @test
 		echo "---"
 	} >"$expected"
 
-	run zit new "${cmd_zit_def[@]}" -edit=false -predictable-hinweisen -bezeichnung wow -etiketten ok
+	run_zit new "${cmd_zit_def[@]}" -edit=false -predictable-hinweisen -bezeichnung wow -etiketten ok
+	assert_success
 	assert_output '[o/u@5 "wow"] (created)'
 
-	run zit show "${cmd_zit_def[@]}" one/uno
+	run_zit show "${cmd_zit_def[@]}" one/uno
+	assert_success
 	assert_output "$(cat "$expected")"
 
 	{
@@ -40,6 +43,7 @@ function complete_show { # @test
 		echo "ok	Etikett"
 	} >"$expected"
 
-	run zit show -complete
+	run_zit show -complete
+	assert_success
 	assert_output "$(cat "$expected")"
 }

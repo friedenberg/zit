@@ -13,6 +13,7 @@ function pull { # @test
 	(
 		cd "$wd" || exit 1
 		run_zit_init_disable_age
+		assert_success
 	)
 
 	wd1="$(mktemp -d)"
@@ -20,6 +21,7 @@ function pull { # @test
 	(
 		cd "$wd1" || exit 1
 		run_zit_init_disable_age
+		assert_success
 	)
 
 	cd "$wd" || exit 1
@@ -39,21 +41,26 @@ function pull { # @test
 		-edit=false \
 		"$expected"
 
+	assert_success
 	assert_output '[one/uno@11327fbe60cabd2a9eabf4a37d541cf04b539f913945897efe9bab1e30784781 !md "to_add.md"]'
 
 	cd "$wd1" || exit 1
 
 	run_zit pull "$wd" :
+	assert_success
 	assert_output '[one/uno@11327fbe60cabd2a9eabf4a37d541cf04b539f913945897efe9bab1e30784781 !md "to_add.md"]'
 
 	run_zit show one/uno:z
+	assert_success
 	assert_output "$(cat "$expected")"
 
 	cd "$wd" || exit 1
 
 	run_zit show one/uno:z
+	assert_success
 	assert_output "$(cat "$expected")"
 
 	run_zit pull "$wd" :
+	assert_success
 	assert_output ''
 }

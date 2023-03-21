@@ -28,9 +28,11 @@ function can_update_akte { # @test
 	} >"$expected"
 
 	run_zit new -edit=false "$expected"
+	assert_success
 	assert_output '[one/uno@18df16846a2f8bbce5f03e1041baff978a049aabd169ab9adac387867fe1706c !md "bez"]'
 
 	run_zit show one/uno:z
+	assert_success
 	assert_output "$(cat "$expected")"
 
 	# when
@@ -40,6 +42,7 @@ function can_update_akte { # @test
 	} >"$new_akte"
 
 	run_zit checkin-akte -new-etiketten et3 one/uno "$new_akte"
+	assert_success
 	assert_output '[one/uno@6b4905e7d7a5185f73db1e27448663fa38b3aca11d62e1dc33ecb066653791b7 !md "bez"]'
 
 	# then
@@ -54,5 +57,6 @@ function can_update_akte { # @test
 	} >"$expected"
 
 	run_zit show one/uno:z
+	assert_success
 	assert_output "$(cat "$expected")"
 }

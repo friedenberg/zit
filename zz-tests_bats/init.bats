@@ -12,6 +12,7 @@ function init_and_deinit { # @test
 	cd "$wd" || exit 1
 
 	run_zit_init_disable_age
+	assert_success
 
 	[[ -f .zit/KonfigAngeboren ]]
 
@@ -24,6 +25,7 @@ function init_and_init { # @test
 	cd "$wd" || exit 1
 
 	run_zit_init
+	assert_success
 
 	{
 		echo "---"
@@ -36,8 +38,10 @@ function init_and_init { # @test
 	} >to_add
 
 	run_zit new -edit=false to_add
+	assert_success
 
 	run_zit show one/uno
+	assert_success
 	assert_output "$(cat to_add)"
 
 	run_zit init -yin <(cat_yin) -yang <(cat_yang)
@@ -49,5 +53,6 @@ function init_and_init { # @test
 	assert_output --partial '.zit/KonfigErworben already exists, not overwriting'
 
 	run zit show one/uno
+	assert_success
 	assert_output "$(cat to_add)"
 }

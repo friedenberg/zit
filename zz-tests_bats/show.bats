@@ -52,6 +52,7 @@ teardown() {
 
 function show_simple_one_zettel { # @test
 	run_zit show one/uno.zettel
+	assert_success
 	assert_output - <<-EOM
 		---
 		# wow the first
@@ -66,12 +67,14 @@ function show_simple_one_zettel { # @test
 
 function show_history_one_zettel { # @test
 	run_zit show -format log one/uno+z
+	assert_success
 	assert_output_unsorted - <<-EOM
 		[one/uno@797cbdf8448a2ea167534e762a5025f5a3e9857e1dd06a3b746d3819d922f5ce !md "wow ok"]
 		[one/uno@d47c552a5299f392948258d7959fc7cf94843316a21c8ea12854ed84a8c06367 !md "wow the first"]
 	EOM
 
 	run_zit show one/uno+z
+	assert_success
 	assert_output_unsorted - <<-EOM
 		---
 		# wow ok
@@ -94,18 +97,21 @@ function show_history_one_zettel { # @test
 
 function show_zettel_etikett { # @test
 	run_zit show -format log tag-3.z
+	assert_success
 	assert_output_unsorted - <<-EOM
 		[one/uno@d47c552a5299f392948258d7959fc7cf94843316a21c8ea12854ed84a8c06367 !md "wow the first"]
 		[one/dos@c6b9d095358b8b26a99e90496d916ba92a99e9b75c705165df5f6d353a949ea9 !md "wow ok again"]
 	EOM
 
 	run_zit show -format akte -- -tag-3.z
+	assert_success
 	assert_output_unsorted - <<-EOM
 		last time
 		not another one
 	EOM
 
 	run_zit show -format sku2 -- -tag-3.z
+	assert_success
 	assert_output_unsorted - <<-EOM
 		2057838301.857055 Zettel one/dos c6b9d095358b8b26a99e90496d916ba92a99e9b75c705165df5f6d353a949ea9 2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24
 		2057838301.888328 Zettel one/uno d47c552a5299f392948258d7959fc7cf94843316a21c8ea12854ed84a8c06367 11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11
@@ -114,6 +120,7 @@ function show_zettel_etikett { # @test
 
 function show_complex_zettel_etikett_negation { # @test
 	run_zit show -format log ^-etikett-two.z
+	assert_success
 	assert_output_unsorted - <<-EOM
 		[one/uno@d47c552a5299f392948258d7959fc7cf94843316a21c8ea12854ed84a8c06367 !md "wow the first"]
 		[one/dos@c6b9d095358b8b26a99e90496d916ba92a99e9b75c705165df5f6d353a949ea9 !md "wow ok again"]
@@ -122,6 +129,7 @@ function show_complex_zettel_etikett_negation { # @test
 
 function show_simple_all { # @test
 	run_zit show -format log :z,t
+	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md@eaa85e80de6d1129a21365a8ce2a49ca752457d10932a7d73001b4ebded302c7]
 		[one/uno@d47c552a5299f392948258d7959fc7cf94843316a21c8ea12854ed84a8c06367 !md "wow the first"]
@@ -129,6 +137,7 @@ function show_simple_all { # @test
 	EOM
 
 	run_zit show -format akte :z,t
+	assert_success
 	assert_output_unsorted - <<-EOM
 		file-extension = 'md'
 		inline-akte = true
@@ -138,6 +147,7 @@ function show_simple_all { # @test
 	EOM
 
 	run_zit show -format sku2 :z,t
+	assert_success
 	assert_output_unsorted - <<-EOM
 		2057838301.803584 Typ md eaa85e80de6d1129a21365a8ce2a49ca752457d10932a7d73001b4ebded302c7 102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384
 		2057838301.857055 Zettel one/dos c6b9d095358b8b26a99e90496d916ba92a99e9b75c705165df5f6d353a949ea9 2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24

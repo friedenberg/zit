@@ -18,6 +18,7 @@ teardown() {
 
 function clean_all { # @test
 	run_zit clean .
+	assert_success
 	assert_output_unsorted - <<-EOM
 		           (deleted) [md.typ]
 		           (deleted) [one/dos.zettel]
@@ -31,6 +32,7 @@ function clean_all { # @test
 
 function clean_zettels { # @test
 	run_zit clean .z
+	assert_success
 	assert_output_unsorted - <<-EOM
 		           (deleted) [one/dos.zettel]
 		           (deleted) [one/uno.zettel]
@@ -38,6 +40,7 @@ function clean_zettels { # @test
 	EOM
 
 	run find . -maxdepth 2 ! -ipath './.zit*'
+	assert_success
 	assert_output_unsorted - <<-EOM
 		.
 		./md.typ
@@ -80,9 +83,11 @@ function clean_all_dirty_wd { # @test
 	EOM
 
 	run_zit clean .
+	assert_success
 	assert_output ''
 
 	run find . -maxdepth 2 ! -ipath './.zit*'
+	assert_success
 	assert_output_unsorted - <<-EOM
 		.
 		./md.typ
@@ -130,6 +135,7 @@ function clean_all_force_dirty_wd { # @test
 	EOM
 
 	run_zit clean -force .
+	assert_success
 	assert_output_unsorted - <<-EOM
 		           (deleted) [da-new.typ]
 		           (deleted) [md.typ]
@@ -140,5 +146,6 @@ function clean_all_force_dirty_wd { # @test
 	EOM
 
 	run find . -maxdepth 2 ! -ipath './.zit*'
+	assert_success
 	assert_output '.'
 }

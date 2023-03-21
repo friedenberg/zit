@@ -25,6 +25,7 @@ function add { # @test
 		-etiketten zz-inbox-2022-11-14 \
 		"$f"
 
+	assert_success
 	assert_output --partial '[one/uno@45e1f5fbfe972f697f4f4f4b77a21f6395e4cf3a1f0ca16d34a675e447ab3778 !md "to_add.md"]'
 	assert_output --partial '[one/uno@11327fbe60cabd2a9eabf4a37d541cf04b539f913945897efe9bab1e30784781 !md "to_add.md"]'
 	assert_output --partial '[to_add.md] (deleted)'
@@ -48,6 +49,7 @@ function add_1 { # @test
 		-etiketten zz-inbox-2022-11-14 \
 		"$f"
 
+	assert_success
 	assert_output --partial '[one/uno@45e1f5fbfe972f697f4f4f4b77a21f6395e4cf3a1f0ca16d34a675e447ab3778 !md "to_add.md"]'
 	assert_output --partial '[one/uno@11327fbe60cabd2a9eabf4a37d541cf04b539f913945897efe9bab1e30784781 !md "to_add.md"]'
 	assert_output --partial '[to_add.md] (deleted)'
@@ -71,12 +73,14 @@ function add_dedupe_1 { # @test
 		-etiketten zz-inbox-2022-11-14 \
 		"$f"
 
+	assert_success
 	assert_output --partial '          (new) [o/u@b !md "to_add.md"]'
 	assert_output --partial '      (updated) [o/u@d !md "to_add.md"]'
 	# assert_output --partial '[to_add.md] (deleted)'
 
 	run zit checkout o/u
 	#TODO-P2 fix race condition
+	assert_success
 	assert_output '  (checked out) [one/uno.zettel@d !md "to_add.md"]'
 
 	{
@@ -90,6 +94,7 @@ function add_dedupe_1 { # @test
 	} >one/uno.zettel
 
 	run zit checkin -delete one/uno.zettel
+	assert_success
 	assert_output --partial '      (updated) [o/u@a !md "new title"]'
 	assert_output --partial '      (deleted) [one/uno.zettel]'
 
@@ -113,5 +118,6 @@ function add_dedupe_1 { # @test
 
 	run zit show o/u
 	#TODO-P2 fix race condition
+	assert_success
 	assert_output "$(cat expected)"
 }
