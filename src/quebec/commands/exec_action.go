@@ -5,10 +5,11 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/script_config"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -19,21 +20,25 @@ type ExecAction struct {
 }
 
 func init() {
-	registerCommand(
+	registerCommandWithQuery(
 		"exec-action",
-		func(f *flag.FlagSet) Command {
+		func(f *flag.FlagSet) CommandWithQuery {
 			c := &ExecAction{}
 
 			f.Var(&c.Action, "action", "which Konfig action to execute")
 
-			return commandWithIds{
-				CommandWithIds: c,
-			}
+			return c
 		},
 	)
 }
 
-func (c ExecAction) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
+func (c ExecAction) DefaultGattungen() gattungen.Set {
+	return gattungen.MakeSet(
+		gattung.Zettel,
+	)
+}
+
+func (c ExecAction) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
 	if !c.Action.WasSet() {
 		err = errors.Normal(errors.Errorf("Action must be provided"))
 		return
@@ -51,22 +56,19 @@ func (c ExecAction) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
 		return
 	}
 
-	query := zettel.WriterIds{
-		Filter: kennung.Filter{
-			Set: ids,
-			// Or:  c.Or,
-		},
+	zids, ok := ms.Get(gattung.Zettel)
+
+	if !ok {
+		return
 	}
 
 	hinweisen := kennung.MakeHinweisMutableSet()
 
-	if err = u.StoreWorkingDirectory().ReadMany(
-		iter.MakeChain(
-			query.WriteZettelTransacted,
-			func(z *zettel.Transacted) (err error) {
-				return hinweisen.Add(z.Sku.Kennung)
-			},
-		),
+	if err = u.StoreObjekten().Zettel().Query(
+		zids,
+		func(z *zettel.Transacted) (err error) {
+			return hinweisen.Add(z.Sku.Kennung)
+		},
 	); err != nil {
 		err = errors.Wrap(err)
 		return

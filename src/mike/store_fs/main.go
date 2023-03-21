@@ -16,7 +16,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/ts"
-	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/hotel/etikett"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
@@ -175,7 +174,7 @@ func (s Store) readZettelFromFile(ez *zettel.External) (err error) {
 		return
 	}
 
-	defer errors.Deferred(&err, f.Close)
+	defer errors.DeferredCloser(&err, f)
 
 	if _, err = s.format.Parse(f, &c); err != nil {
 		err = errors.Wrapf(err, "%s", f.Name())
@@ -307,137 +306,6 @@ func (s *Store) ReadOne(h kennung.Hinweis) (zt *zettel.Transacted, err error) {
 	zt.Sku.Schwanz = s.sonnenaufgang
 
 	return
-}
-
-func (s *Store) ReadMany(
-	w1 schnittstellen.FuncIter[*zettel.Transacted],
-) (err error) {
-	w := w1
-
-	if s.erworben.IncludeCwd {
-		w = func(z *zettel.Transacted) (err error) {
-			// TODO-P2 akte fd?
-			ze := zettel.External{
-				Sku: sku.External[kennung.Hinweis, *kennung.Hinweis]{
-					FDs: sku.ExternalFDs{
-						Objekte: kennung.FD{
-							Path: z.Sku.Kennung.String(),
-						},
-					},
-				},
-			}
-
-			if err1 := s.readZettelFromFile(&ze); err1 == nil {
-				z.Objekte = ze.Objekte
-				z.Sku.ObjekteSha = ze.Sku.ObjekteSha // TODO-P1 determine what else in sku is needed
-
-				z.Verzeichnisse.ResetWithObjekte(z.Objekte)
-
-				if err = w1(z); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				return
-			}
-
-			if err = w1(z); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		}
-	}
-
-	return s.storeObjekten.Zettel().ReadAllSchwanzen(
-		w,
-	)
-}
-
-func (s *Store) ReadManyHistory(
-	w schnittstellen.FuncIter[*zettel.Transacted],
-) (err error) {
-	queries := []func(schnittstellen.FuncIter[*zettel.Transacted]) error{
-		s.storeObjekten.Zettel().ReadAll,
-	}
-
-	if s.erworben.IncludeCwd {
-		queries = append(
-			queries,
-			func(w schnittstellen.FuncIter[*zettel.Transacted]) (err error) {
-				var pz cwd.CwdFiles
-
-				if pz, err = cwd.MakeCwdFilesAll(s.erworben, s.Standort.Cwd()); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				if err = pz.Zettelen.Each(
-					func(p cwd.Zettel) (err error) {
-						var checked_out zettel.CheckedOut
-
-						var readFunc func() (zettel.CheckedOut, error)
-
-						switch {
-						case p.GetAkteFD().Path == "":
-							readFunc = func() (zettel.CheckedOut, error) {
-								return s.Read(p.GetObjekteFD().Path)
-							}
-
-						case p.GetObjekteFD().Path == "":
-							readFunc = func() (zettel.CheckedOut, error) {
-								return s.ReadExternalZettelFromAktePath(p.GetAkteFD().Path)
-							}
-
-						default:
-							// TODO-P3 validate that the zettel file points to the akte in the metadatei
-							readFunc = func() (zettel.CheckedOut, error) {
-								return s.Read(p.GetObjekteFD().Path)
-							}
-						}
-
-						if checked_out, err = readFunc(); err != nil {
-							// TODO-P3 decide if error handling like this is ok
-							if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
-								errors.Err().Printf("external zettel does not exist: %s", p)
-							} else {
-								errors.Err().Print(err)
-							}
-
-							err = nil
-							return
-						}
-
-						zt := &zettel.Transacted{
-							Sku:     checked_out.External.Sku.Transacted(),
-							Objekte: checked_out.External.Objekte,
-						}
-
-						zt.Sku.Schwanz = s.sonnenaufgang
-						zt.Verzeichnisse.ResetWithObjekte(zt.Objekte)
-
-						if err = w(zt); err != nil {
-							err = errors.Wrap(err)
-							return
-						}
-
-						return
-					},
-				); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				return
-			},
-		)
-	}
-
-	return iter.Multiplex(
-		w,
-		queries...,
-	)
 }
 
 func (s *Store) ReadFiles(
