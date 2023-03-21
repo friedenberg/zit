@@ -31,8 +31,6 @@ type TypTransactedReader = objekte_store.TransactedReader[
 	*typ.Transacted,
 ]
 
-type TypLogWriter = objekte_store.LogWriter[*typ.Transacted]
-
 type typStore struct {
 	*commonStore[
 		typ.Objekte,
@@ -43,20 +41,12 @@ type typStore struct {
 		*objekte.NilVerzeichnisse[typ.Objekte],
 	]
 
-	TypLogWriter
-
 	objekte_store.CreateOrUpdater[
 		*typ.Objekte,
 		*kennung.Typ,
 		*typ.Transacted,
 		*typ.CheckedOut,
 	]
-}
-
-func (s *typStore) SetLogWriter(
-	tlw TypLogWriter,
-) {
-	s.TypLogWriter = tlw
 }
 
 func makeTypStore(
@@ -102,7 +92,7 @@ func makeTypStore(
 					return
 				}
 
-				return s.TypLogWriter.New(t)
+				return s.LogWriter.New(t)
 			},
 			Updated: func(t *typ.Transacted) (err error) {
 				if err = newOrUpdated(t); err != nil {
@@ -110,10 +100,10 @@ func makeTypStore(
 					return
 				}
 
-				return s.TypLogWriter.Updated(t)
+				return s.LogWriter.Updated(t)
 			},
 			Unchanged: func(t *typ.Transacted) (err error) {
-				return s.TypLogWriter.Unchanged(t)
+				return s.LogWriter.Unchanged(t)
 			},
 		},
 	)
@@ -263,9 +253,9 @@ func (s *typStore) Inherit(t *typ.Transacted) (err error) {
 	}
 
 	if t.IsNew() {
-		s.TypLogWriter.New(t)
+		s.LogWriter.New(t)
 	} else {
-		s.TypLogWriter.Updated(t)
+		s.LogWriter.Updated(t)
 	}
 
 	return
@@ -292,9 +282,9 @@ func (s *typStore) reindexOne(
 	s.StoreUtil.GetKonfigPtr().AddTyp(te)
 
 	if te.IsNew() {
-		s.TypLogWriter.New(te)
+		s.LogWriter.New(te)
 	} else {
-		s.TypLogWriter.Updated(te)
+		s.LogWriter.Updated(te)
 	}
 
 	return

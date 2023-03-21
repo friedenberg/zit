@@ -5,7 +5,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/alfa/toml"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/transaktion"
@@ -16,29 +15,7 @@ import (
 )
 
 type KastenStore interface {
-	reindexer
-
-	objekte_store.Inheritor[*kasten.Transacted]
-	objekte_store.TransactedLogger[*kasten.Transacted]
-
-	objekte_store.AkteTextSaver[
-		kasten.Objekte,
-		*kasten.Objekte,
-	]
-
-	objekte_store.TransactedReader[
-		*kennung.Kasten,
-		*kasten.Transacted,
-	]
-
-	objekte_store.CreateOrUpdater[
-		*kasten.Objekte,
-		*kennung.Kasten,
-		*kasten.Transacted,
-		*kasten.CheckedOut,
-	]
-
-	objekte_store.TransactedInflator[
+	CommonStore[
 		kasten.Objekte,
 		*kasten.Objekte,
 		kennung.Kasten,
@@ -48,35 +25,20 @@ type KastenStore interface {
 	]
 }
 
-type KastenInflator = objekte_store.TransactedInflator[
-	kasten.Objekte,
-	*kasten.Objekte,
-	kennung.Kasten,
-	*kennung.Kasten,
-	kasten.Verzeichnisse,
-	*kasten.Verzeichnisse,
-]
-
 type KastenTransactedReader = objekte_store.TransactedReader[
 	*kennung.Kasten,
 	*kasten.Transacted,
 ]
 
-type KastenLogWriter = objekte_store.LogWriter[*kasten.Transacted]
-
-type KastenAkteTextSaver = objekte_store.AkteTextSaver[
-	kasten.Objekte,
-	*kasten.Objekte,
-]
-
 type kastenStore struct {
-	store_util.StoreUtil
-
-	pool schnittstellen.Pool[kasten.Transacted, *kasten.Transacted]
-
-	KastenInflator
-	KastenAkteTextSaver
-	KastenLogWriter
+	*commonStore[
+		kasten.Objekte,
+		*kasten.Objekte,
+		kennung.Kasten,
+		*kennung.Kasten,
+		kasten.Verzeichnisse,
+		*kasten.Verzeichnisse,
+	]
 
 	objekte_store.CreateOrUpdater[
 		*kasten.Objekte,
@@ -86,43 +48,28 @@ type kastenStore struct {
 	]
 }
 
-func (s *kastenStore) SetLogWriter(
-	tlw KastenLogWriter,
-) {
-	s.KastenLogWriter = tlw
-}
-
 func makeKastenStore(
 	sa store_util.StoreUtil,
 ) (s *kastenStore, err error) {
-	pool := collections.MakePool[kasten.Transacted]()
+	s = &kastenStore{}
 
-	s = &kastenStore{
-		StoreUtil: sa,
-		pool:      pool,
-		KastenInflator: objekte_store.MakeTransactedInflator[
-			kasten.Objekte,
-			*kasten.Objekte,
-			kennung.Kasten,
-			*kennung.Kasten,
-			kasten.Verzeichnisse,
-			*kasten.Verzeichnisse,
-		](
-			sa,
-			sa,
-			nil,
-			schnittstellen.Format[kasten.Objekte, *kasten.Objekte](
-				kasten.MakeFormatTextIgnoreTomlErrors(sa),
-			),
-			pool,
-		),
-		KastenAkteTextSaver: objekte_store.MakeAkteTextSaver[
-			kasten.Objekte,
-			*kasten.Objekte,
-		](
-			sa,
-			&kasten.FormatterAkteTextToml{},
-		),
+	s.commonStore, err = makeCommonStore[
+		kasten.Objekte,
+		*kasten.Objekte,
+		kennung.Kasten,
+		*kennung.Kasten,
+		kasten.Verzeichnisse,
+		*kasten.Verzeichnisse,
+	](
+		sa,
+		s,
+		kasten.MakeFormatTextIgnoreTomlErrors(sa),
+		&kasten.FormatterAkteTextToml{},
+	)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	newOrUpdated := func(t *kasten.Transacted) (err error) {
@@ -144,7 +91,7 @@ func makeKastenStore(
 					return
 				}
 
-				return s.KastenLogWriter.New(t)
+				return s.LogWriter.New(t)
 			},
 			Updated: func(t *kasten.Transacted) (err error) {
 				if err = newOrUpdated(t); err != nil {
@@ -152,10 +99,10 @@ func makeKastenStore(
 					return
 				}
 
-				return s.KastenLogWriter.Updated(t)
+				return s.LogWriter.Updated(t)
 			},
 			Unchanged: func(t *kasten.Transacted) (err error) {
-				return s.KastenLogWriter.Unchanged(t)
+				return s.LogWriter.Unchanged(t)
 			},
 		},
 	)
@@ -305,9 +252,9 @@ func (s *kastenStore) Inherit(t *kasten.Transacted) (err error) {
 	}
 
 	if t.IsNew() {
-		s.KastenLogWriter.New(t)
+		s.LogWriter.New(t)
 	} else {
-		s.KastenLogWriter.Updated(t)
+		s.LogWriter.Updated(t)
 	}
 
 	return
@@ -334,9 +281,9 @@ func (s *kastenStore) reindexOne(
 	s.StoreUtil.GetKonfigPtr().AddKasten(te)
 
 	if te.IsNew() {
-		s.KastenLogWriter.New(te)
+		s.LogWriter.New(te)
 	} else {
-		s.KastenLogWriter.Updated(te)
+		s.LogWriter.Updated(te)
 	}
 
 	return

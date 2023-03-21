@@ -18,6 +18,10 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/hotel/erworben"
+	"github.com/friedenberg/zit/src/hotel/etikett"
+	"github.com/friedenberg/zit/src/hotel/kasten"
+	"github.com/friedenberg/zit/src/hotel/objekte_store"
+	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/india/konfig"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/store_util"
@@ -209,7 +213,7 @@ func (u *Umwelt) Initialize() (err error) {
 	)
 
 	u.storeObjekten.Typ().SetLogWriter(
-		store_objekten.TypLogWriter{
+		objekte_store.LogWriter[*typ.Transacted]{
 			New:       u.PrinterTypTransacted(),
 			Updated:   u.PrinterTypTransacted(),
 			Unchanged: u.PrinterTypTransacted(),
@@ -218,7 +222,7 @@ func (u *Umwelt) Initialize() (err error) {
 	)
 
 	u.storeObjekten.Etikett().SetLogWriter(
-		store_objekten.EtikettLogWriter{
+		objekte_store.LogWriter[*etikett.Transacted]{
 			New:       u.PrinterEtikettTransacted(),
 			Updated:   u.PrinterEtikettTransacted(),
 			Unchanged: u.PrinterEtikettTransacted(),
@@ -226,7 +230,7 @@ func (u *Umwelt) Initialize() (err error) {
 	)
 
 	u.storeObjekten.Kasten().SetLogWriter(
-		store_objekten.KastenLogWriter{
+		objekte_store.LogWriter[*kasten.Transacted]{
 			New:       u.PrinterKastenTransacted(),
 			Updated:   u.PrinterKastenTransacted(),
 			Unchanged: u.PrinterKastenTransacted(),

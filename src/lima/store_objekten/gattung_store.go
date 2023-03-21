@@ -135,6 +135,8 @@ type commonStore[
 	objekte_store.TransactedReader[KPtr,
 		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
 	]
+
+	objekte_store.LogWriter[*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]]
 }
 
 func makeCommonStore[
@@ -195,6 +197,12 @@ func makeCommonStore[
 	}
 
 	return
+}
+
+func (s *commonStore[O, OPtr, K, KPtr, V, VPtr]) SetLogWriter(
+	lw objekte_store.LogWriter[*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]],
+) {
+	s.LogWriter = lw
 }
 
 func (s *commonStore[O, OPtr, K, KPtr, V, VPtr]) Query(

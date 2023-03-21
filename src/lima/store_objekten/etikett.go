@@ -44,20 +44,12 @@ type etikettStore struct {
 		*objekte.NilVerzeichnisse[etikett.Objekte],
 	]
 
-	EtikettLogWriter
-
 	objekte_store.CreateOrUpdater[
 		*etikett.Objekte,
 		*kennung.Etikett,
 		*etikett.Transacted,
 		*etikett.CheckedOut,
 	]
-}
-
-func (s *etikettStore) SetLogWriter(
-	tlw EtikettLogWriter,
-) {
-	s.EtikettLogWriter = tlw
 }
 
 func makeEtikettStore(
@@ -103,7 +95,7 @@ func makeEtikettStore(
 					return
 				}
 
-				return s.EtikettLogWriter.New(t)
+				return s.LogWriter.New(t)
 			},
 			Updated: func(t *etikett.Transacted) (err error) {
 				if err = newOrUpdated(t); err != nil {
@@ -111,10 +103,10 @@ func makeEtikettStore(
 					return
 				}
 
-				return s.EtikettLogWriter.Updated(t)
+				return s.LogWriter.Updated(t)
 			},
 			Unchanged: func(t *etikett.Transacted) (err error) {
-				return s.EtikettLogWriter.Unchanged(t)
+				return s.LogWriter.Unchanged(t)
 			},
 		},
 	)
@@ -262,9 +254,9 @@ func (s *etikettStore) Inherit(t *etikett.Transacted) (err error) {
 	}
 
 	if t.IsNew() {
-		s.EtikettLogWriter.New(t)
+		s.LogWriter.New(t)
 	} else {
-		s.EtikettLogWriter.Updated(t)
+		s.LogWriter.Updated(t)
 	}
 
 	return
@@ -286,9 +278,9 @@ func (s *etikettStore) reindexOne(
 	s.StoreUtil.GetKonfigPtr().AddEtikett(te)
 
 	if te.IsNew() {
-		s.EtikettLogWriter.New(te)
+		s.LogWriter.New(te)
 	} else {
-		s.EtikettLogWriter.Updated(te)
+		s.LogWriter.Updated(te)
 	}
 
 	return
