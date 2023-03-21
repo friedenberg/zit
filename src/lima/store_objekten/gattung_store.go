@@ -117,6 +117,17 @@ type commonStore[
 			VERZEICHNISSEPtr,
 		],
 	]
+
+	TextFormat schnittstellen.Format[OBJEKTE, OBJEKTEPtr]
+
+	Inflator objekte_store.TransactedInflator[
+		OBJEKTE,
+		OBJEKTEPtr,
+		KENNUNG,
+		KENNUNGPtr,
+		VERZEICHNISSE,
+		VERZEICHNISSEPtr,
+	]
 }
 
 func makeCommonStore[
@@ -128,6 +139,7 @@ func makeCommonStore[
 	VERZEICHNISSEPtr schnittstellen.VerzeichnissePtr[VERZEICHNISSE, OBJEKTE],
 ](
 	sa store_util.StoreUtil,
+	textFormat schnittstellen.Format[OBJEKTE, OBJEKTEPtr],
 ) (s *commonStore[OBJEKTE, OBJEKTEPtr, KENNUNG, KENNUNGPtr, VERZEICHNISSE, VERZEICHNISSEPtr], err error) {
 	pool := collections.MakePool[objekte.Transacted[
 		OBJEKTE,
@@ -146,8 +158,24 @@ func makeCommonStore[
 		VERZEICHNISSE,
 		VERZEICHNISSEPtr,
 	]{
-		StoreUtil: sa,
-		pool:      pool,
+		StoreUtil:  sa,
+		pool:       pool,
+		TextFormat: textFormat,
+		Inflator: objekte_store.MakeTransactedInflator[
+			OBJEKTE,
+			OBJEKTEPtr,
+			KENNUNG,
+			KENNUNGPtr,
+			VERZEICHNISSE,
+			VERZEICHNISSEPtr,
+		](
+			sa,
+			sa,
+			nil,
+			textFormat,
+			pool,
+		),
 	}
+
 	return
 }

@@ -86,7 +86,10 @@ func makeEtikettStore(
 		*kennung.Etikett,
 		objekte.NilVerzeichnisse[etikett.Objekte],
 		*objekte.NilVerzeichnisse[etikett.Objekte],
-	](sa)
+	](
+		sa,
+		etikett.MakeFormatText(sa),
+	)
 	if err != nil {
 		err = errors.Wrap(err)
 		return
@@ -94,22 +97,6 @@ func makeEtikettStore(
 
 	s = &etikettStore{
 		commonStore: cs,
-		EtikettInflator: objekte_store.MakeTransactedInflator[
-			etikett.Objekte,
-			*etikett.Objekte,
-			kennung.Etikett,
-			*kennung.Etikett,
-			objekte.NilVerzeichnisse[etikett.Objekte],
-			*objekte.NilVerzeichnisse[etikett.Objekte],
-		](
-			sa,
-			sa,
-			nil,
-			schnittstellen.Format[etikett.Objekte, *etikett.Objekte](
-				etikett.MakeFormatText(sa),
-			),
-			cs.pool,
-		),
 		EtikettAkteTextSaver: objekte_store.MakeAkteTextSaver[
 			etikett.Objekte,
 			*etikett.Objekte,
