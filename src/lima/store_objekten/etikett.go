@@ -79,7 +79,9 @@ func (s *etikettStore) SetLogWriter(
 func makeEtikettStore(
 	sa store_util.StoreUtil,
 ) (s *etikettStore, err error) {
-	cs, err := makeCommonStore[
+	s = &etikettStore{}
+
+	s.commonStore, err = makeCommonStore[
 		etikett.Objekte,
 		*etikett.Objekte,
 		kennung.Etikett,
@@ -88,22 +90,14 @@ func makeEtikettStore(
 		*objekte.NilVerzeichnisse[etikett.Objekte],
 	](
 		sa,
+		s,
 		etikett.MakeFormatText(sa),
+		&etikett.FormatterAkteTextToml{},
 	)
+
 	if err != nil {
 		err = errors.Wrap(err)
 		return
-	}
-
-	s = &etikettStore{
-		commonStore: cs,
-		EtikettAkteTextSaver: objekte_store.MakeAkteTextSaver[
-			etikett.Objekte,
-			*etikett.Objekte,
-		](
-			sa,
-			&etikett.FormatterAkteTextToml{},
-		),
 	}
 
 	newOrUpdated := func(t *etikett.Transacted) (err error) {
@@ -146,16 +140,6 @@ func makeEtikettStore(
 
 func (s etikettStore) Flush() (err error) {
 	return
-}
-
-func (s *etikettStore) Query(
-	m kennung.Matcher,
-	f schnittstellen.FuncIter[*etikett.Transacted],
-) (err error) {
-	return objekte_store.QueryMethodForMatcher[
-		*kennung.Etikett,
-		*etikett.Transacted,
-	](s, m, f)
 }
 
 func (s etikettStore) ReadOne(

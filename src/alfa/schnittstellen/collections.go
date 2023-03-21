@@ -90,7 +90,14 @@ type MutableTridex interface {
 // 	MutableCloner[Tridex]
 // }
 
-type Pool[T any, TPtr Ptr[T]] interface {
+type Poolable[T any] interface{}
+
+type PoolablePtr[T any] interface {
+	Ptr[T]
+	Resetable[T]
+}
+
+type Pool[T Poolable[T], TPtr PoolablePtr[T]] interface {
 	Get() TPtr
 	Put(i TPtr) (err error)
 }

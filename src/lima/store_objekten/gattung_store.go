@@ -3,6 +3,7 @@ package store_objekten
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
@@ -15,159 +16,167 @@ type reindexer interface {
 }
 
 type CommonStore[
-	OBJEKTE schnittstellen.Objekte[OBJEKTE],
-	OBJEKTEPtr schnittstellen.ObjektePtr[OBJEKTE],
-	KENNUNG schnittstellen.Id[KENNUNG],
-	KENNUNGPtr schnittstellen.IdPtr[KENNUNG],
-	VERZEICHNISSE any,
-	VERZEICHNISSEPtr schnittstellen.VerzeichnissePtr[VERZEICHNISSE, OBJEKTE],
+	O schnittstellen.Objekte[O],
+	OPtr schnittstellen.ObjektePtr[O],
+	K schnittstellen.Id[K],
+	KPtr schnittstellen.IdPtr[K],
+	V any,
+	VPtr schnittstellen.VerzeichnissePtr[V, O],
 ] interface {
 	reindexer
 
 	objekte_store.TransactedLogger[*objekte.Transacted[
-		OBJEKTE,
-		OBJEKTEPtr,
-		KENNUNG,
-		KENNUNGPtr,
-		VERZEICHNISSE,
-		VERZEICHNISSEPtr,
+		O,
+		OPtr,
+		K,
+		KPtr,
+		V,
+		VPtr,
 	]]
 
 	objekte_store.Querier[
-		KENNUNGPtr,
+		KPtr,
 		*objekte.Transacted[
-			OBJEKTE,
-			OBJEKTEPtr,
-			KENNUNG,
-			KENNUNGPtr,
-			VERZEICHNISSE,
-			VERZEICHNISSEPtr,
+			O,
+			OPtr,
+			K,
+			KPtr,
+			V,
+			VPtr,
 		],
 	]
 
 	objekte_store.AkteTextSaver[
-		OBJEKTE,
-		OBJEKTEPtr,
+		O,
+		OPtr,
 	]
 
 	objekte_store.CreateOrUpdater[
-		OBJEKTEPtr,
-		KENNUNGPtr,
+		OPtr,
+		KPtr,
 		*objekte.Transacted[
-			OBJEKTE,
-			OBJEKTEPtr,
-			KENNUNG,
-			KENNUNGPtr,
-			VERZEICHNISSE,
-			VERZEICHNISSEPtr,
+			O,
+			OPtr,
+			K,
+			KPtr,
+			V,
+			VPtr,
 		],
 		*objekte.CheckedOut[
-			OBJEKTE,
-			OBJEKTEPtr,
-			KENNUNG,
-			KENNUNGPtr,
-			VERZEICHNISSE,
-			VERZEICHNISSEPtr,
+			O,
+			OPtr,
+			K,
+			KPtr,
+			V,
+			VPtr,
 		],
 	]
 
 	objekte_store.TransactedInflator[
-		OBJEKTE,
-		OBJEKTEPtr,
-		KENNUNG,
-		KENNUNGPtr,
-		VERZEICHNISSE,
-		VERZEICHNISSEPtr,
+		O,
+		OPtr,
+		K,
+		KPtr,
+		V,
+		VPtr,
 	]
 
 	objekte_store.Inheritor[*objekte.Transacted[
-		OBJEKTE,
-		OBJEKTEPtr,
-		KENNUNG,
-		KENNUNGPtr,
-		VERZEICHNISSE,
-		VERZEICHNISSEPtr,
+		O,
+		OPtr,
+		K,
+		KPtr,
+		V,
+		VPtr,
 	]]
 }
 
+type transacted[T any] interface {
+	schnittstellen.Poolable[T]
+}
+
+type transactedPtr[T any] interface {
+	schnittstellen.PoolablePtr[T]
+}
+
 type commonStore[
-	OBJEKTE schnittstellen.Objekte[OBJEKTE],
-	OBJEKTEPtr schnittstellen.ObjektePtr[OBJEKTE],
-	KENNUNG schnittstellen.Id[KENNUNG],
-	KENNUNGPtr schnittstellen.IdPtr[KENNUNG],
-	VERZEICHNISSE any,
-	VERZEICHNISSEPtr schnittstellen.VerzeichnissePtr[VERZEICHNISSE, OBJEKTE],
+	O schnittstellen.Objekte[O],
+	OPtr schnittstellen.ObjektePtr[O],
+	K schnittstellen.Id[K],
+	KPtr schnittstellen.IdPtr[K],
+	V any,
+	VPtr schnittstellen.VerzeichnissePtr[V, O],
 ] struct {
+	// type T objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]
+	// type TPtr *objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]
+
 	store_util.StoreUtil
 	pool schnittstellen.Pool[
-		objekte.Transacted[
-			OBJEKTE,
-			OBJEKTEPtr,
-			KENNUNG,
-			KENNUNGPtr,
-			VERZEICHNISSE,
-			VERZEICHNISSEPtr,
-		],
-		*objekte.Transacted[
-			OBJEKTE,
-			OBJEKTEPtr,
-			KENNUNG,
-			KENNUNGPtr,
-			VERZEICHNISSE,
-			VERZEICHNISSEPtr,
-		],
+		objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
+		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
 	]
 
-	TextFormat schnittstellen.Format[OBJEKTE, OBJEKTEPtr]
+	TextFormat schnittstellen.Format[O, OPtr]
 
-	Inflator objekte_store.TransactedInflator[
-		OBJEKTE,
-		OBJEKTEPtr,
-		KENNUNG,
-		KENNUNGPtr,
-		VERZEICHNISSE,
-		VERZEICHNISSEPtr,
+	objekte_store.TransactedInflator[
+		O,
+		OPtr,
+		K,
+		KPtr,
+		V,
+		VPtr,
+	]
+
+	objekte_store.AkteTextSaver[
+		O,
+		OPtr,
+	]
+
+	objekte_store.TransactedReader[KPtr,
+		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
 	]
 }
 
 func makeCommonStore[
-	OBJEKTE schnittstellen.Objekte[OBJEKTE],
-	OBJEKTEPtr schnittstellen.ObjektePtr[OBJEKTE],
-	KENNUNG schnittstellen.Id[KENNUNG],
-	KENNUNGPtr schnittstellen.IdPtr[KENNUNG],
-	VERZEICHNISSE any,
-	VERZEICHNISSEPtr schnittstellen.VerzeichnissePtr[VERZEICHNISSE, OBJEKTE],
+	O schnittstellen.Objekte[O],
+	OPtr schnittstellen.ObjektePtr[O],
+	K schnittstellen.Id[K],
+	KPtr schnittstellen.IdPtr[K],
+	V any,
+	VPtr schnittstellen.VerzeichnissePtr[V, O],
 ](
 	sa store_util.StoreUtil,
-	textFormat schnittstellen.Format[OBJEKTE, OBJEKTEPtr],
-) (s *commonStore[OBJEKTE, OBJEKTEPtr, KENNUNG, KENNUNGPtr, VERZEICHNISSE, VERZEICHNISSEPtr], err error) {
-	pool := collections.MakePool[objekte.Transacted[
-		OBJEKTE,
-		OBJEKTEPtr,
-		KENNUNG,
-		KENNUNGPtr,
-		VERZEICHNISSE,
-		VERZEICHNISSEPtr,
-	]]()
+	tr objekte_store.TransactedReader[KPtr,
+		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]],
+	textFormat schnittstellen.Format[O, OPtr],
+	akteFormatter schnittstellen.Formatter[O, OPtr],
+) (s *commonStore[O, OPtr, K, KPtr, V, VPtr], err error) {
+	// type T objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]
+	// type TPtr *objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]
+
+	pool := collections.MakePool[
+		objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
+		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
+	]()
 
 	s = &commonStore[
-		OBJEKTE,
-		OBJEKTEPtr,
-		KENNUNG,
-		KENNUNGPtr,
-		VERZEICHNISSE,
-		VERZEICHNISSEPtr,
+		O,
+		OPtr,
+		K,
+		KPtr,
+		V,
+		VPtr,
 	]{
 		StoreUtil:  sa,
 		pool:       pool,
 		TextFormat: textFormat,
-		Inflator: objekte_store.MakeTransactedInflator[
-			OBJEKTE,
-			OBJEKTEPtr,
-			KENNUNG,
-			KENNUNGPtr,
-			VERZEICHNISSE,
-			VERZEICHNISSEPtr,
+		TransactedInflator: objekte_store.MakeTransactedInflator[
+			O,
+			OPtr,
+			K,
+			KPtr,
+			V,
+			VPtr,
 		](
 			sa,
 			sa,
@@ -175,7 +184,25 @@ func makeCommonStore[
 			textFormat,
 			pool,
 		),
+		AkteTextSaver: objekte_store.MakeAkteTextSaver[
+			O,
+			OPtr,
+		](
+			sa,
+			akteFormatter,
+		),
+		TransactedReader: tr,
 	}
 
 	return
+}
+
+func (s *commonStore[O, OPtr, K, KPtr, V, VPtr]) Query(
+	m kennung.Matcher,
+	f schnittstellen.FuncIter[*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]],
+) (err error) {
+	return objekte_store.QueryMethodForMatcher[
+		KPtr,
+		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
+	](s, m, f)
 }

@@ -24,7 +24,7 @@ type Inheritor[T any] interface {
 type heritableElement interface{}
 
 type heritableElementPtr[T any] interface {
-	schnittstellen.Ptr[T]
+	schnittstellen.PoolablePtr[T]
 }
 
 type transactedInheritor[T heritableElement, TPtr heritableElementPtr[T]] struct {

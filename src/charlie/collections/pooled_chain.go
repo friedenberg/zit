@@ -5,7 +5,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
-func MakePooledChain[T any, TPtr schnittstellen.Ptr[T]](
+func MakePooledChain[T schnittstellen.Poolable[T], TPtr schnittstellen.PoolablePtr[T]](
 	p schnittstellen.Pool[T, TPtr],
 	wfs ...schnittstellen.FuncIter[TPtr],
 ) schnittstellen.FuncIter[TPtr] {
