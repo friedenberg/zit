@@ -37,10 +37,14 @@ func MakeParseSaver[
 	T2 schnittstellen.Id[T2],
 	T3 schnittstellen.IdPtr[T2],
 ](
-	owf schnittstellen.ObjekteWriterFactory,
-	awf schnittstellen.AkteWriterFactory,
+	owf schnittstellen.ObjekteIOFactory,
+	awf schnittstellen.AkteIOFactory,
 	akteParser schnittstellen.Parser[T, T1],
 ) *objekteParseSaver[T, T1, T2, T3] {
+	if akteParser == nil {
+		akteParser = MakeNopAkteFormat[T, T1](awf)
+	}
+
 	return &objekteParseSaver[T, T1, T2, T3]{
 		awf:        awf,
 		akteParser: akteParser,

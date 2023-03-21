@@ -19,6 +19,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/hotel/etikett"
+	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/india/konfig"
 	"github.com/friedenberg/zit/src/juliett/zettel"
@@ -444,6 +445,18 @@ func (s *Store) ReadFiles(
 	ms kennung.MetaSet,
 	f schnittstellen.FuncIter[objekte.CheckedOutLike],
 ) (err error) {
+	typEMGR := objekte_store.MakeExternalMaybeGetterReader[
+		typ.Objekte,
+		*typ.Objekte,
+		kennung.Typ,
+		*kennung.Typ,
+		objekte.NilVerzeichnisse[typ.Objekte],
+		*objekte.NilVerzeichnisse[typ.Objekte],
+	](
+		fs.GetTyp,
+		s.storeObjekten.Typ(),
+	)
+
 	if err = s.storeObjekten.Query(
 		ms,
 		iter.MakeChain(
@@ -479,28 +492,10 @@ func (s *Store) ReadFiles(
 					col = &zco
 
 				case *typ.Transacted:
-					var tco typ.CheckedOut
-					ok := false
-
-					var te cwd.Typ
-
-					if te, ok = fs.GetTyp(et.Sku.Kennung); !ok {
-						err = iter.MakeErrStopIteration()
+					if col, err = typEMGR.ReadOne(*et); err != nil {
+						err = errors.Wrap(err)
 						return
 					}
-
-					if tco.External, err = s.storeObjekten.Typ().ReadOneExternal(te); err != nil {
-						if errors.IsNotExist(err) {
-							err = iter.MakeErrStopIteration()
-						} else {
-							err = errors.Wrapf(err, "CwdTyp: %#v", te)
-						}
-
-						return
-					}
-
-					tco.Internal = *et
-					col = &tco
 
 				case *etikett.Transacted:
 					var tco etikett.CheckedOut
