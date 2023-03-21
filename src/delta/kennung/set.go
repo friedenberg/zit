@@ -357,3 +357,11 @@ func (s Set) AnyShaOrHinweis() (i1 schnittstellen.Korper, ok bool) {
 
 	return
 }
+
+func (s Set) AnyHinweis() (i1 Hinweis, ok bool) {
+	if ok = s.Hinweisen.Len() == 1; ok {
+		i1 = s.Hinweisen.Any()
+	}
+
+	return
+}

@@ -32,8 +32,6 @@ type EtikettTransactedReader = objekte_store.TransactedReader[
 	*etikett.Transacted,
 ]
 
-type EtikettLogWriter = objekte_store.LogWriter[*etikett.Transacted]
-
 type etikettStore struct {
 	*commonStore[
 		etikett.Objekte,
@@ -67,6 +65,7 @@ func makeEtikettStore(
 	](
 		sa,
 		s,
+		nil,
 		etikett.MakeFormatText(sa),
 		&etikett.FormatterAkteTextToml{},
 	)

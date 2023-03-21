@@ -10,7 +10,6 @@ import (
 	"syscall"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/juliett/zettel"
@@ -82,17 +81,19 @@ func (c Exec) getZettel(
 		return
 	}
 
-	var idd schnittstellen.Korper
+	var idd kennung.Hinweis
 	ok := false
 
-	if idd, ok = is.AnyShaOrHinweis(); !ok {
+	if idd, ok = is.AnyHinweis(); !ok {
 		err = errors.Errorf("unsupported id: %s", is)
 		return
 	}
 
 	var zt *zettel.Transacted
 
-	if zt, err = u.StoreObjekten().Zettel().ReadOne(idd); err != nil {
+	if zt, err = u.StoreObjekten().Zettel().ReadOne(
+		&idd,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

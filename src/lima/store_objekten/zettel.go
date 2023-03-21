@@ -1,8 +1,6 @@
 package store_objekten
 
 import (
-	"reflect"
-
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
@@ -20,14 +18,13 @@ import (
 )
 
 type ZettelStore interface {
-	reindexer
-
-	objekte_store.Inheritor[*zettel.Transacted]
-	objekte_store.TransactedLogger[*zettel.Transacted]
-
-	objekte_store.Querier[
-		schnittstellen.ValueLike,
-		*zettel.Transacted,
+	CommonStoreBase[
+		zettel.Objekte,
+		*zettel.Objekte,
+		kennung.Hinweis,
+		*kennung.Hinweis,
+		zettel.Verzeichnisse,
+		*zettel.Verzeichnisse,
 	]
 
 	objekte_store.Creator[
@@ -47,29 +44,11 @@ type ZettelStore interface {
 		*zettel.Transacted,
 	]
 
-	objekte_store.TransactedInflator[
-		zettel.Objekte,
-		*zettel.Objekte,
-		kennung.Hinweis,
-		*kennung.Hinweis,
-		zettel.Verzeichnisse,
-		*zettel.Verzeichnisse,
-	]
-
 	WriteZettelObjekte(z zettel.Objekte) (sh sha.Sha, err error)
 }
 
 type zettelStore struct {
-	store_util.StoreUtil
-
-	protoZettel zettel.ProtoZettel
-
-	logWriter zettel.LogWriter
-
-	verzeichnisseSchwanzen *verzeichnisseSchwanzen
-	verzeichnisseAll       *store_verzeichnisse.Zettelen
-
-	objekte_store.TransactedInflator[
+	*commonStore[
 		zettel.Objekte,
 		*zettel.Objekte,
 		kennung.Hinweis,
@@ -78,7 +57,10 @@ type zettelStore struct {
 		*zettel.Verzeichnisse,
 	]
 
-	pool schnittstellen.Pool[zettel.Transacted, *zettel.Transacted]
+	protoZettel zettel.ProtoZettel
+
+	verzeichnisseSchwanzen *verzeichnisseSchwanzen
+	verzeichnisseAll       *store_verzeichnisse.Zettelen
 }
 
 func makeZettelStore(
@@ -86,25 +68,29 @@ func makeZettelStore(
 	p schnittstellen.Pool[zettel.Transacted, *zettel.Transacted],
 ) (s *zettelStore, err error) {
 	s = &zettelStore{
-		StoreUtil:   sa,
-		pool:        p,
 		protoZettel: zettel.MakeProtoZettel(sa.GetKonfig()),
-		TransactedInflator: objekte_store.MakeTransactedInflator[
-			zettel.Objekte,
-			*zettel.Objekte,
-			kennung.Hinweis,
-			*kennung.Hinweis,
-			zettel.Verzeichnisse,
-			*zettel.Verzeichnisse,
-		](
-			sa,
-			sa,
-			&zettel.FormatObjekte{
-				IgnoreTypErrors: true,
-			},
-			nil,
-			p,
-		),
+	}
+
+	s.commonStore, err = makeCommonStore[
+		zettel.Objekte,
+		*zettel.Objekte,
+		kennung.Hinweis,
+		*kennung.Hinweis,
+		zettel.Verzeichnisse,
+		*zettel.Verzeichnisse,
+	](
+		sa,
+		s,
+		&zettel.FormatObjekte{
+			IgnoreTypErrors: true,
+		},
+		nil,
+		nil,
+	)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	if s.verzeichnisseSchwanzen, err = makeVerzeichnisseSchwanzen(
@@ -141,12 +127,6 @@ func (s *zettelStore) Flush() (err error) {
 	}
 
 	return
-}
-
-func (s *zettelStore) SetLogWriter(
-	ztlw zettel.LogWriter,
-) {
-	s.logWriter = ztlw
 }
 
 func (s zettelStore) WriteZettelObjekte(z zettel.Objekte) (sh sha.Sha, err error) {
@@ -220,29 +200,12 @@ func (s *zettelStore) writeNamedZettelToIndex(
 	return
 }
 
-func (s *zettelStore) Query(
-	m kennung.Matcher,
-	f schnittstellen.FuncIter[*zettel.Transacted],
-) (err error) {
-	todo.Refactor("make type conversion func in iter package")
-	return objekte_store.QueryMethodForMatcher[
-		schnittstellen.ValueLike,
-		*zettel.Transacted,
-	](s, m, f)
-}
-
 func (s zettelStore) ReadOne(
-	i schnittstellen.ValueLike,
+	i *kennung.Hinweis,
 ) (tz *zettel.Transacted, err error) {
-	switch tid := i.(type) {
-	case kennung.Hinweis:
-		if tz, err = s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(tid); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	default:
-		err = errors.Errorf("unsupported identifier: %s, %#v", i, reflect.ValueOf(i))
+	if tz, err = s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(*i); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return
@@ -291,10 +254,11 @@ func (s *zettelStore) Create(
 	}
 
 	// If the zettel exists, short circuit and return that
-	if tz2, err2 := s.ReadOne(shaObj); err2 == nil {
-		tz = tz2
-		return
-	}
+	todo.Implement()
+	// if tz2, err2 := s.ReadOne(shaObj); err2 == nil {
+	// 	tz = tz2
+	// 	return
+	// }
 
 	var ken kennung.Hinweis
 
@@ -323,7 +287,7 @@ func (s *zettelStore) Create(
 	}
 
 	errors.TodoP2("assert no changes")
-	if err = s.logWriter.New(tz); err != nil {
+	if err = s.LogWriter.New(tz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -366,7 +330,7 @@ func (s *zettelStore) UpdateCheckedOut(
 	if shaObj.Equals(co.Internal.Sku.ObjekteSha) {
 		t = &co.Internal
 
-		if err = s.logWriter.Unchanged(t); err != nil {
+		if err = s.LogWriter.Unchanged(t); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -388,7 +352,7 @@ func (s *zettelStore) UpdateCheckedOut(
 		return
 	}
 
-	if err = s.logWriter.Updated(t); err != nil {
+	if err = s.LogWriter.Updated(t); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -434,7 +398,7 @@ func (s *zettelStore) Update(
 	if shaObj.Equals(mutter.Sku.ObjekteSha) {
 		tz = mutter
 
-		if err = s.logWriter.Unchanged(tz); err != nil {
+		if err = s.LogWriter.Unchanged(tz); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -456,7 +420,7 @@ func (s *zettelStore) Update(
 		return
 	}
 
-	if err = s.logWriter.Updated(tz); err != nil {
+	if err = s.LogWriter.Updated(tz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -558,7 +522,7 @@ func (s *zettelStore) Inherit(tz *zettel.Transacted) (err error) {
 		return
 	}
 
-	if err = s.logWriter.NewOrUpdated(errExists)(tz); err != nil {
+	if err = s.LogWriter.NewOrUpdated(errExists)(tz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -590,7 +554,7 @@ func (s *zettelStore) reindexOne(
 		return
 	}
 
-	if err = s.logWriter.NewOrUpdated(errExists)(tz); err != nil {
+	if err = s.LogWriter.NewOrUpdated(errExists)(tz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

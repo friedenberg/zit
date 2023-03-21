@@ -15,7 +15,7 @@ type reindexer interface {
 	reindexOne(sku.DataIdentity) (schnittstellen.Stored, error)
 }
 
-type CommonStore[
+type CommonStoreBase[
 	O schnittstellen.Objekte[O],
 	OPtr schnittstellen.ObjektePtr[O],
 	K schnittstellen.Id[K],
@@ -51,6 +51,42 @@ type CommonStore[
 		OPtr,
 	]
 
+	objekte_store.TransactedInflator[
+		O,
+		OPtr,
+		K,
+		KPtr,
+		V,
+		VPtr,
+	]
+
+	objekte_store.Inheritor[*objekte.Transacted[
+		O,
+		OPtr,
+		K,
+		KPtr,
+		V,
+		VPtr,
+	]]
+}
+
+type CommonStore[
+	O schnittstellen.Objekte[O],
+	OPtr schnittstellen.ObjektePtr[O],
+	K schnittstellen.Id[K],
+	KPtr schnittstellen.IdPtr[K],
+	V any,
+	VPtr schnittstellen.VerzeichnissePtr[V, O],
+] interface {
+	CommonStoreBase[
+		O,
+		OPtr,
+		K,
+		KPtr,
+		V,
+		VPtr,
+	]
+
 	objekte_store.CreateOrUpdater[
 		OPtr,
 		KPtr,
@@ -71,24 +107,6 @@ type CommonStore[
 			VPtr,
 		],
 	]
-
-	objekte_store.TransactedInflator[
-		O,
-		OPtr,
-		K,
-		KPtr,
-		V,
-		VPtr,
-	]
-
-	objekte_store.Inheritor[*objekte.Transacted[
-		O,
-		OPtr,
-		K,
-		KPtr,
-		V,
-		VPtr,
-	]]
 }
 
 type transacted[T any] interface {
@@ -150,6 +168,7 @@ func makeCommonStore[
 	sa store_util.StoreUtil,
 	tr objekte_store.TransactedReader[KPtr,
 		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]],
+	objekteFormat schnittstellen.Format[O, OPtr],
 	textFormat schnittstellen.Format[O, OPtr],
 	akteFormatter schnittstellen.Formatter[O, OPtr],
 ) (s *commonStore[O, OPtr, K, KPtr, V, VPtr], err error) {
@@ -182,7 +201,7 @@ func makeCommonStore[
 		](
 			sa,
 			sa,
-			nil,
+			objekteFormat,
 			textFormat,
 			pool,
 		),

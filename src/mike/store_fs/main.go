@@ -213,7 +213,9 @@ func (s Store) readZettelFromFile(ez *zettel.External) (err error) {
 		if errors.As(e, &err1) {
 			var mutter *zettel.Transacted
 
-			if mutter, err = s.storeObjekten.Zettel().ReadOne(ez.Sku.Kennung); err != nil {
+			if mutter, err = s.storeObjekten.Zettel().ReadOne(
+				&ez.Sku.Kennung,
+			); err != nil {
 				unrecoverableErrors.Add(errors.Wrap(err))
 				continue
 			}
@@ -240,7 +242,7 @@ func (s Store) readZettelFromFile(ez *zettel.External) (err error) {
 // ReadManyHistory
 func (s *Store) ReadOne(h kennung.Hinweis) (zt *zettel.Transacted, err error) {
 	errors.TodoP0("include cwd sigil")
-	if zt, err = s.storeObjekten.Zettel().ReadOne(h); err != nil {
+	if zt, err = s.storeObjekten.Zettel().ReadOne(&h); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -446,7 +448,6 @@ func (s *Store) ReadFiles(
 		ms,
 		iter.MakeChain(
 			func(e objekte.TransactedLike) (err error) {
-
 				switch et := e.(type) {
 				case *zettel.Transacted:
 					var zco zettel.CheckedOut
@@ -659,7 +660,7 @@ func (s *Store) Read(p string) (cz zettel.CheckedOut, err error) {
 	var zt *zettel.Transacted
 
 	if zt, err = s.storeObjekten.Zettel().ReadOne(
-		cz.External.Sku.Kennung,
+		&cz.External.Sku.Kennung,
 	); err != nil {
 		// if errors.Is(err, store_objekten.ErrNotFound{}) {
 		// 	err = nil

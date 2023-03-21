@@ -63,6 +63,7 @@ func makeKastenStore(
 	](
 		sa,
 		s,
+		nil,
 		kasten.MakeFormatTextIgnoreTomlErrors(sa),
 		&kasten.FormatterAkteTextToml{},
 	)

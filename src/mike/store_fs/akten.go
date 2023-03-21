@@ -40,7 +40,7 @@ func (s Store) ReadExternalZettelFromAktePath(
 	var zt *zettel.Transacted
 
 	if zt, err = s.storeObjekten.Zettel().ReadOne(
-		cz.External.Sku.Kennung,
+		&cz.External.Sku.Kennung,
 	); err != nil {
 		if errors.Is(err, objekte_store.ErrNotFound{}) {
 			err = nil
