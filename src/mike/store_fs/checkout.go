@@ -294,7 +294,7 @@ func (s *Store) CheckoutOneTyp(
 
 	if f, err = files.CreateExclusiveWriteOnly(p); err != nil {
 		if errors.IsExist(err) {
-			if co.External, err = s.ReadTyp(
+			if co.External, err = s.storeObjekten.Typ().ReadOneExternal(
 				cwd.Typ{
 					Kennung: tk.Sku.Kennung,
 					FDs: sku.ExternalFDs{

@@ -1,67 +1,54 @@
 package store_fs
 
-import (
-	"fmt"
-	"os"
+// func (s *Store) WriteEtikett(t *etikett.Transacted) (te *etikett.CheckedOut, err error) {
+// 	te = &etikett.CheckedOut{
+// 		Internal: *t,
+// 		External: etikett.External{
+// 			Sku: sku.External[kennung.Etikett, *kennung.Etikett]{
+// 				ObjekteSha: sha.Make(t.GetObjekteSha()),
+// 				Kennung:    t.Sku.Kennung,
+// 				FDs: sku.ExternalFDs{
+// 					Objekte: kennung.FD{
+// 						Path: fmt.Sprintf("%s.%s", t.Kennung(), s.erworben.FileExtensions.Etikett),
+// 					},
+// 				},
+// 			},
+// 			// TODO-P2 move to central place
+// 			Objekte: t.Objekte,
+// 		},
+// 	}
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/sku"
-	"github.com/friedenberg/zit/src/hotel/etikett"
-	"github.com/friedenberg/zit/src/kilo/cwd"
-)
+// 	var f *os.File
 
-func (s *Store) WriteEtikett(t *etikett.Transacted) (te *etikett.CheckedOut, err error) {
-	te = &etikett.CheckedOut{
-		Internal: *t,
-		External: etikett.External{
-			Sku: sku.External[kennung.Etikett, *kennung.Etikett]{
-				ObjekteSha: sha.Make(t.GetObjekteSha()),
-				Kennung:    t.Sku.Kennung,
-				FDs: sku.ExternalFDs{
-					Objekte: kennung.FD{
-						Path: fmt.Sprintf("%s.%s", t.Kennung(), s.erworben.FileExtensions.Etikett),
-					},
-				},
-			},
-			// TODO-P2 move to central place
-			Objekte: t.Objekte,
-		},
-	}
+// 	p := te.External.GetObjekteFD().Path
 
-	var f *os.File
+// 	if f, err = files.CreateExclusiveWriteOnly(p); err != nil {
+// 		if errors.IsExist(err) {
+// 			te.External, err = s.storeObjekten.Etikett().ReadOneExternal(
+// 				cwd.Etikett{
+// 					Kennung: t.Sku.Kennung,
+// 					FDs: sku.ExternalFDs{
+// 						Objekte: kennung.FD{
+// 							Path: p,
+// 						},
+// 					},
+// 				},
+// 			)
+// 		} else {
+// 			err = errors.Wrap(err)
+// 		}
 
-	p := te.External.GetObjekteFD().Path
+// 		return
+// 	}
 
-	if f, err = files.CreateExclusiveWriteOnly(p); err != nil {
-		if errors.IsExist(err) {
-			te.External, err = s.storeObjekten.Etikett().ReadOneExternal(
-				cwd.Etikett{
-					Kennung: t.Sku.Kennung,
-					FDs: sku.ExternalFDs{
-						Objekte: kennung.FD{
-							Path: p,
-						},
-					},
-				},
-			)
-		} else {
-			err = errors.Wrap(err)
-		}
+// 	defer errors.Deferred(&err, f.Close)
 
-		return
-	}
+// 	format := etikett.MakeFormatText(s.storeObjekten)
 
-	defer errors.Deferred(&err, f.Close)
+// 	if _, err = format.Format(f, &te.External.Objekte); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	format := etikett.MakeFormatText(s.storeObjekten)
-
-	if _, err = format.Format(f, &te.External.Objekte); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
+// 	return
+// }

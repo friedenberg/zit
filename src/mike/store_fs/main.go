@@ -448,6 +448,8 @@ func (s *Store) ReadFiles(
 		ms,
 		iter.MakeChain(
 			func(e objekte.TransactedLike) (err error) {
+				var col objekte.CheckedOutLikePtr
+
 				switch et := e.(type) {
 				case *zettel.Transacted:
 					var zco zettel.CheckedOut
@@ -474,13 +476,7 @@ func (s *Store) ReadFiles(
 					}
 
 					zco.Internal = *et
-
-					zco.DetermineState()
-
-					if err = f(&zco); err != nil {
-						err = errors.Wrap(err)
-						return
-					}
+					col = &zco
 
 				case *typ.Transacted:
 					var tco typ.CheckedOut
@@ -493,7 +489,7 @@ func (s *Store) ReadFiles(
 						return
 					}
 
-					if tco.External, err = s.ReadTyp(te); err != nil {
+					if tco.External, err = s.storeObjekten.Typ().ReadOneExternal(te); err != nil {
 						if errors.IsNotExist(err) {
 							err = iter.MakeErrStopIteration()
 						} else {
@@ -504,13 +500,7 @@ func (s *Store) ReadFiles(
 					}
 
 					tco.Internal = *et
-
-					tco.DetermineState()
-
-					if err = f(&tco); err != nil {
-						err = errors.Wrap(err)
-						return
-					}
+					col = &tco
 
 				case *etikett.Transacted:
 					var tco etikett.CheckedOut
@@ -534,16 +524,18 @@ func (s *Store) ReadFiles(
 					}
 
 					tco.Internal = *et
-
-					tco.DetermineState()
-
-					if err = f(&tco); err != nil {
-						err = errors.Wrap(err)
-						return
-					}
+					col = &tco
 
 				default:
 					err = errors.Implement()
+					return
+				}
+
+				col.DetermineState()
+
+				if err = f(col); err != nil {
+					err = errors.Wrap(err)
+					return
 				}
 
 				return
@@ -570,7 +562,7 @@ func (s *Store) ReadFiles(
 
 					var tco typ.CheckedOut
 
-					if tco.External, err = s.ReadTyp(il); err != nil {
+					if tco.External, err = s.storeObjekten.Typ().ReadOneExternal(il); err != nil {
 						if errors.IsNotExist(err) {
 							err = iter.MakeErrStopIteration()
 						} else {

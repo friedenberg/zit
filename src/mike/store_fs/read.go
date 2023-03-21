@@ -145,7 +145,7 @@ func (s *Store) ReadOneTyp(
 
 	p := s.PathForTransactedLike(tk)
 
-	if co.External, err = s.ReadTyp(
+	if co.External, err = s.storeObjekten.Typ().ReadOneExternal(
 		cwd.Typ{
 			Kennung: tk.Sku.Kennung,
 			FDs: sku.ExternalFDs{
