@@ -21,7 +21,6 @@ import (
 
 type ZettelStore interface {
 	reindexer
-	GattungStore
 
 	objekte_store.Inheritor[*zettel.Transacted]
 	objekte_store.TransactedLogger[*zettel.Transacted]

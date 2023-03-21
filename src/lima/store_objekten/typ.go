@@ -17,7 +17,7 @@ import (
 )
 
 type TypStore interface {
-	commonStore[
+	CommonStore[
 		typ.Objekte,
 		*typ.Objekte,
 		kennung.Typ,

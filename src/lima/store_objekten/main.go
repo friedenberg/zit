@@ -28,7 +28,7 @@ type Store struct {
 	kastenStore  KastenStore
 
 	// Gattungen
-	gattungStores     map[schnittstellen.Gattung]GattungStore
+	gattungStores     map[schnittstellen.Gattung]any
 	reindexers        map[schnittstellen.Gattung]reindexer
 	flushers          map[schnittstellen.Gattung]errors.Flusher
 	readers           map[schnittstellen.Gattung]objekte.FuncReaderTransactedLike
@@ -69,7 +69,7 @@ func Make(
 		return
 	}
 
-	s.gattungStores = map[schnittstellen.Gattung]GattungStore{
+	s.gattungStores = map[schnittstellen.Gattung]any{
 		gattung.Zettel:  s.zettelStore,
 		gattung.Typ:     s.typStore,
 		gattung.Etikett: s.etikettStore,

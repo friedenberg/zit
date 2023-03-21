@@ -17,7 +17,6 @@ import (
 
 type KastenStore interface {
 	reindexer
-	GattungStore
 
 	objekte_store.Inheritor[*kasten.Transacted]
 	objekte_store.TransactedLogger[*kasten.Transacted]

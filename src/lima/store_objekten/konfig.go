@@ -16,7 +16,6 @@ import (
 
 type KonfigStore interface {
 	reindexer
-	GattungStore
 
 	Read() (*erworben.Transacted, error)
 	Update(*erworben.Objekte) (*erworben.Transacted, error)

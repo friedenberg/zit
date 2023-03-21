@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/toml"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/todo"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
@@ -18,7 +17,7 @@ import (
 )
 
 type EtikettStore interface {
-	commonStore[
+	CommonStore[
 		etikett.Objekte,
 		*etikett.Objekte,
 		kennung.Etikett,
@@ -50,9 +49,14 @@ type EtikettAkteTextSaver = objekte_store.AkteTextSaver[
 ]
 
 type etikettStore struct {
-	store_util.StoreUtil
-
-	pool schnittstellen.Pool[etikett.Transacted, *etikett.Transacted]
+	*commonStore[
+		etikett.Objekte,
+		*etikett.Objekte,
+		kennung.Etikett,
+		*kennung.Etikett,
+		objekte.NilVerzeichnisse[etikett.Objekte],
+		*objekte.NilVerzeichnisse[etikett.Objekte],
+	]
 
 	EtikettInflator
 	EtikettAkteTextSaver
@@ -75,11 +79,21 @@ func (s *etikettStore) SetLogWriter(
 func makeEtikettStore(
 	sa store_util.StoreUtil,
 ) (s *etikettStore, err error) {
-	pool := collections.MakePool[etikett.Transacted]()
+	cs, err := makeCommonStore[
+		etikett.Objekte,
+		*etikett.Objekte,
+		kennung.Etikett,
+		*kennung.Etikett,
+		objekte.NilVerzeichnisse[etikett.Objekte],
+		*objekte.NilVerzeichnisse[etikett.Objekte],
+	](sa)
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	s = &etikettStore{
-		StoreUtil: sa,
-		pool:      pool,
+		commonStore: cs,
 		EtikettInflator: objekte_store.MakeTransactedInflator[
 			etikett.Objekte,
 			*etikett.Objekte,
@@ -94,7 +108,7 @@ func makeEtikettStore(
 			schnittstellen.Format[etikett.Objekte, *etikett.Objekte](
 				etikett.MakeFormatText(sa),
 			),
-			pool,
+			cs.pool,
 		),
 		EtikettAkteTextSaver: objekte_store.MakeAkteTextSaver[
 			etikett.Objekte,
