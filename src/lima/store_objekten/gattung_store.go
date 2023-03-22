@@ -123,7 +123,7 @@ type transactedPtr[T any] interface {
 	schnittstellen.PoolablePtr[T]
 }
 
-type commonStore[
+type commonStoreBase[
 	O schnittstellen.Objekte[O],
 	OPtr schnittstellen.ObjektePtr[O],
 	K schnittstellen.Id[K],
@@ -139,8 +139,6 @@ type commonStore[
 		objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
 		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
 	]
-
-	TextFormat schnittstellen.Format[O, OPtr]
 
 	objekte_store.TransactedInflator[
 		O,
@@ -168,6 +166,72 @@ type commonStore[
 	]
 
 	objekte_store.LogWriter[*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]]
+}
+
+type commonStore[
+	O schnittstellen.Objekte[O],
+	OPtr schnittstellen.ObjektePtr[O],
+	K schnittstellen.Id[K],
+	KPtr schnittstellen.IdPtr[K],
+	V any,
+	VPtr schnittstellen.VerzeichnissePtr[V, O],
+] struct {
+	commonStoreBase[O, OPtr, K, KPtr, V, VPtr]
+	TextFormat schnittstellen.Format[O, OPtr]
+	objekte_store.ParseSaver[O, OPtr, K, KPtr]
+}
+
+func makeCommonStoreBase[
+	O schnittstellen.Objekte[O],
+	OPtr schnittstellen.ObjektePtr[O],
+	K schnittstellen.Id[K],
+	KPtr schnittstellen.IdPtr[K],
+	V any,
+	VPtr schnittstellen.VerzeichnissePtr[V, O],
+](
+	sa store_util.StoreUtil,
+	tr objekte_store.TransactedReader[KPtr,
+		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]],
+	objekteFormat schnittstellen.Format[O, OPtr],
+	textFormat schnittstellen.Format[O, OPtr],
+	akteFormatter schnittstellen.Formatter[O, OPtr],
+) (s *commonStoreBase[O, OPtr, K, KPtr, V, VPtr], err error) {
+	// type T objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]
+	// type TPtr *objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]
+
+	pool := collections.MakePool[
+		objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
+		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
+	]()
+
+	s = &commonStoreBase[O, OPtr, K, KPtr, V, VPtr]{
+		StoreUtil: sa,
+		pool:      pool,
+		TransactedInflator: objekte_store.MakeTransactedInflator[
+			O,
+			OPtr,
+			K,
+			KPtr,
+			V,
+			VPtr,
+		](
+			sa,
+			sa,
+			objekteFormat,
+			textFormat,
+			pool,
+		),
+		AkteTextSaver: objekte_store.MakeAkteTextSaver[
+			O,
+			OPtr,
+		](
+			sa,
+			akteFormatter,
+		),
+		TransactedReader: tr,
+	}
+
+	return
 }
 
 func makeCommonStore[
@@ -201,31 +265,33 @@ func makeCommonStore[
 		V,
 		VPtr,
 	]{
-		StoreUtil:  sa,
-		pool:       pool,
+		commonStoreBase: commonStoreBase[O, OPtr, K, KPtr, V, VPtr]{
+			StoreUtil: sa,
+			pool:      pool,
+			TransactedInflator: objekte_store.MakeTransactedInflator[
+				O,
+				OPtr,
+				K,
+				KPtr,
+				V,
+				VPtr,
+			](
+				sa,
+				sa,
+				objekteFormat,
+				textFormat,
+				pool,
+			),
+			AkteTextSaver: objekte_store.MakeAkteTextSaver[
+				O,
+				OPtr,
+			](
+				sa,
+				akteFormatter,
+			),
+			TransactedReader: tr,
+		},
 		TextFormat: textFormat,
-		TransactedInflator: objekte_store.MakeTransactedInflator[
-			O,
-			OPtr,
-			K,
-			KPtr,
-			V,
-			VPtr,
-		](
-			sa,
-			sa,
-			objekteFormat,
-			textFormat,
-			pool,
-		),
-		AkteTextSaver: objekte_store.MakeAkteTextSaver[
-			O,
-			OPtr,
-		](
-			sa,
-			akteFormatter,
-		),
-		TransactedReader: tr,
 		ParseSaver: objekte_store.MakeParseSaver[
 			O,
 			OPtr,
@@ -241,13 +307,13 @@ func makeCommonStore[
 	return
 }
 
-func (s *commonStore[O, OPtr, K, KPtr, V, VPtr]) SetLogWriter(
+func (s *commonStoreBase[O, OPtr, K, KPtr, V, VPtr]) SetLogWriter(
 	lw objekte_store.LogWriter[*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]],
 ) {
 	s.LogWriter = lw
 }
 
-func (s *commonStore[O, OPtr, K, KPtr, V, VPtr]) Query(
+func (s *commonStoreBase[O, OPtr, K, KPtr, V, VPtr]) Query(
 	m kennung.Matcher,
 	f schnittstellen.FuncIter[*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]],
 ) (err error) {

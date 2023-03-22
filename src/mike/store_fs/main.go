@@ -313,6 +313,19 @@ func (s *Store) ReadFiles(
 	ms kennung.MetaSet,
 	f schnittstellen.FuncIter[objekte.CheckedOutLike],
 ) (err error) {
+	// zettelEMGR := objekte_store.MakeExternalMaybeGetterReader[
+	_ = objekte_store.MakeExternalMaybeGetterReader[
+		zettel.Objekte,
+		*zettel.Objekte,
+		kennung.Hinweis,
+		*kennung.Hinweis,
+		zettel.Verzeichnisse,
+		*zettel.Verzeichnisse,
+	](
+		fs.GetZettel,
+		s.storeObjekten.Zettel(),
+	)
+
 	etikettEMGR := objekte_store.MakeExternalMaybeGetterReader[
 		etikett.Objekte,
 		*etikett.Objekte,
@@ -345,6 +358,10 @@ func (s *Store) ReadFiles(
 
 				switch et := e.(type) {
 				case *zettel.Transacted:
+					// if col, err = zettelEMGR.ReadOne(*et); err != nil {
+					// 	err = errors.Wrap(err)
+					// 	return
+					// }
 					var zco zettel.CheckedOut
 					ok := false
 
