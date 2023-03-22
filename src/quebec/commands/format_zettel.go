@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/juliett/zettel"
+	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
@@ -57,11 +58,38 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	var zt *zettel.Transacted
+	var cwdFiles cwd.CwdFiles
 
-	if zt, err = u.StoreWorkingDirectory().ReadOne(h); err != nil {
+	if cwdFiles, err = cwd.MakeCwdFilesAll(
+		u.Konfig(),
+		u.Standort().Cwd(),
+	); err != nil {
 		err = errors.Wrap(err)
 		return
+	}
+
+	var zt *zettel.Transacted
+
+	if e, ok := cwdFiles.GetZettel(h); ok {
+		var ze zettel.External
+
+		if ze, err = u.StoreObjekten().Zettel().ReadOneExternal(e); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		zt = &zettel.Transacted{
+			Objekte: ze.Objekte,
+		}
+
+		zt.Sku.Kennung = ze.Sku.Kennung
+		zt.Sku.ObjekteSha = ze.Sku.ObjekteSha
+		zt.Sku.AkteSha = ze.Sku.AkteSha
+	} else {
+		if zt, err = u.StoreObjekten().Zettel().ReadOne(&h); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	typKonfig := u.Konfig().GetApproximatedTyp(zt.Objekte.Typ).ApproximatedOrActual()

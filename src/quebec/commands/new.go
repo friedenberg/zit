@@ -88,7 +88,18 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		}
 
 		if c.Edit {
+			var cwdFiles cwd.CwdFiles
+
+			if cwdFiles, err = cwd.MakeCwdFilesAll(
+				u.Konfig(),
+				u.Standort().Cwd(),
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
 			options := store_fs.CheckoutOptions{
+				Cwd:          cwdFiles,
 				CheckoutMode: objekte.CheckoutModeObjekteAndAkte,
 			}
 
@@ -153,10 +164,22 @@ func (c New) writeNewZettels(
 	u *umwelt.Umwelt,
 	f zettel.ObjekteFormatter,
 ) (zsc zettel.MutableSetCheckedOut, err error) {
+	var cwdFiles cwd.CwdFiles
+
+	if cwdFiles, err = cwd.MakeCwdFilesAll(
+		u.Konfig(),
+		u.Standort().Cwd(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	emptyOp := user_ops.WriteNewZettels{
-		Umwelt:          u,
-		CheckOut:        c.Edit,
-		CheckoutOptions: store_fs.CheckoutOptions{},
+		Umwelt:   u,
+		CheckOut: c.Edit,
+		CheckoutOptions: store_fs.CheckoutOptions{
+			Cwd: cwdFiles,
+		},
 	}
 
 	var defaultEtiketten kennung.EtikettSet

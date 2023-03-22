@@ -24,9 +24,9 @@ type Edit struct {
 }
 
 func init() {
-	registerCommandWithQuery(
+	registerCommandWithCwdQuery(
 		"edit",
-		func(f *flag.FlagSet) CommandWithQuery {
+		func(f *flag.FlagSet) CommandWithCwdQuery {
 			c := &Edit{
 				CheckoutMode: objekte.CheckoutModeObjekteOnly,
 			}
@@ -58,8 +58,13 @@ func (c Edit) DefaultGattungen() gattungen.Set {
 	)
 }
 
-func (c Edit) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
-	checkoutOptions := store_fs.CheckoutOptions{
+func (c Edit) RunWithCwdQuery(
+	u *umwelt.Umwelt,
+	ms kennung.MetaSet,
+	pz cwd.CwdFiles,
+) (err error) {
+	options := store_fs.CheckoutOptions{
+		Cwd:          pz,
 		CheckoutMode: c.CheckoutMode,
 	}
 
@@ -67,7 +72,7 @@ func (c Edit) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
 	objekten := kennung.MakeMutableFDSet()
 
 	if err = u.StoreWorkingDirectory().CheckoutQuery(
-		checkoutOptions,
+		options,
 		ms,
 		func(co objekte.CheckedOutLike) (err error) {
 			e := co.GetExternal()

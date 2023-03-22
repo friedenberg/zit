@@ -151,6 +151,8 @@ func (s *Store) CheckoutOneZettel(
 	options CheckoutOptions,
 	sz zettel.Transacted,
 ) (cz zettel.CheckedOut, err error) {
+	cz.Internal = sz
+
 	var originalFilename, filename string
 
 	if originalFilename, filename, err = s.filenameForZettelTransacted(options, sz); err != nil {
@@ -159,10 +161,20 @@ func (s *Store) CheckoutOneZettel(
 	}
 
 	if files.Exists(filename) {
-		if cz, err = s.ReadOneZettel(sz); err != nil {
+		var e cwd.Zettel
+		ok := false
+
+		if e, ok = options.Cwd.GetZettel(sz.Sku.Kennung); !ok {
+			err = errors.Errorf("file at %s not recognized as zettel: %s", filename, sz)
+			return
+		}
+
+		if cz.External, err = s.storeObjekten.Zettel().ReadOneExternal(e); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
+
+		cz.DetermineState()
 
 		if !s.shouldCheckOut(options, cz) {
 			return
@@ -171,16 +183,12 @@ func (s *Store) CheckoutOneZettel(
 
 	inlineAkte := s.erworben.IsInlineTyp(sz.Objekte.Typ)
 
-	cz = zettel.CheckedOut{
-		// TODO-P2 check diff with fs if already exists
-		State:    objekte.CheckedOutStateJustCheckedOut,
-		Internal: sz,
-		External: zettel.External{
-			Objekte: sz.Objekte,
-			Sku: zettel_external.Sku{
-				ObjekteSha: sz.Sku.ObjekteSha,
-				Kennung:    sz.Sku.Kennung,
-			},
+	cz.State = objekte.CheckedOutStateJustCheckedOut
+	cz.External = zettel.External{
+		Objekte: sz.Objekte,
+		Sku: zettel_external.Sku{
+			ObjekteSha: sz.Sku.ObjekteSha,
+			Kennung:    sz.Sku.Kennung,
 		},
 	}
 
@@ -331,6 +339,7 @@ func (s *Store) CheckoutOneTyp(
 	return
 }
 
+// TODO discard
 func (s *Store) MakeTempTypFiles(
 	tks schnittstellen.Set[kennung.Typ],
 ) (ps []string, err error) {

@@ -8,13 +8,13 @@ import (
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte"
+	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/mike/store_fs"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
 type Checkout struct {
-	CheckoutMode objekte.CheckoutMode
-	Force        bool
+	store_fs.CheckoutOptions
 }
 
 func init() {
@@ -23,13 +23,7 @@ func init() {
 		func(f *flag.FlagSet) CommandWithQuery {
 			c := &Checkout{}
 
-			f.Var(&c.CheckoutMode, "mode", "mode for checking out the zettel")
-			f.BoolVar(
-				&c.Force,
-				"force",
-				false,
-				"force update checked out zettels, even if they will overwrite existing checkouts",
-			)
+			c.CheckoutOptions.AddToFlagSet(f)
 
 			return c
 		},
@@ -42,14 +36,24 @@ func (c Checkout) DefaultGattungen() gattungen.Set {
 	)
 }
 
-func (c Checkout) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
-	options := store_fs.CheckoutOptions{
-		Force:        c.Force,
-		CheckoutMode: c.CheckoutMode,
+func (c Checkout) RunWithQuery(
+	u *umwelt.Umwelt,
+	ms kennung.MetaSet,
+) (err error) {
+	var cwdFiles cwd.CwdFiles
+
+	if cwdFiles, err = cwd.MakeCwdFilesAll(
+		u.Konfig(),
+		u.Standort().Cwd(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
+	c.CheckoutOptions.Cwd = cwdFiles
+
 	if err = u.StoreWorkingDirectory().CheckoutQuery(
-		options,
+		c.CheckoutOptions,
 		ms,
 		func(co objekte.CheckedOutLike) (err error) {
 			return

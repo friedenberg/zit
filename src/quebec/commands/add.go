@@ -13,6 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/juliett/zettel"
+	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/kilo/organize_text"
 	"github.com/friedenberg/zit/src/mike/store_fs"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -30,9 +31,9 @@ type Add struct {
 }
 
 func init() {
-	registerCommandWithQuery(
+	registerCommandWithCwdQuery(
 		"add",
-		func(f *flag.FlagSet) CommandWithQuery {
+		func(f *flag.FlagSet) CommandWithCwdQuery {
 			c := &Add{
 				ProtoZettel: zettel.MakeEmptyProtoZettel(),
 			}
@@ -55,7 +56,11 @@ func (c Add) DefaultGattungen() gattungen.Set {
 	)
 }
 
-func (c Add) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
+func (c Add) RunWithCwdQuery(
+	u *umwelt.Umwelt,
+	ms kennung.MetaSet,
+	pz cwd.CwdFiles,
+) (err error) {
 	zettelsFromAkteOp := user_ops.ZettelFromExternalAkte{
 		Umwelt:      u,
 		ProtoZettel: c.ProtoZettel,
@@ -71,7 +76,7 @@ func (c Add) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
 		return
 	}
 
-	if err = c.openAktenIfNecessary(u, zettelsFromAkteResults); err != nil {
+	if err = c.openAktenIfNecessary(u, zettelsFromAkteResults, pz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -160,6 +165,7 @@ func (c Add) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
 func (c Add) openAktenIfNecessary(
 	u *umwelt.Umwelt,
 	zettels zettel.MutableSet,
+	cwd cwd.CwdFiles,
 ) (err error) {
 	if !c.OpenAkten {
 		return
@@ -173,6 +179,7 @@ func (c Add) openAktenIfNecessary(
 	}
 
 	options := store_fs.CheckoutOptions{
+		Cwd:          cwd,
 		CheckoutMode: objekte.CheckoutModeAkteOnly,
 	}
 
