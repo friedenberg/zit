@@ -1,14 +1,10 @@
 package store_fs
 
 import (
-	"bufio"
-	"fmt"
-	"os"
 	"path"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/kennung"
@@ -35,10 +31,6 @@ type Store struct {
 
 	zettelExternalLogPrinter schnittstellen.FuncIter[*zettel_external.Zettel]
 	checkedOutLogPrinter     schnittstellen.FuncIter[objekte.CheckedOutLike]
-
-	entries      map[string]Entry
-	indexWasRead bool
-	hasChanges   bool
 }
 
 func New(
@@ -56,7 +48,6 @@ func New(
 			nil,
 		),
 		storeObjekten: storeObjekten,
-		entries:       make(map[string]Entry),
 	}
 
 	return
@@ -79,46 +70,7 @@ func (s Store) IndexFilePath() string {
 	return path.Join(s.Cwd(), ".ZitCheckoutStoreIndex")
 }
 
-func (s Store) flushToTemp() (tfp string, err error) {
-	var f *os.File
-
-	if f, err = files.TempFile(s.Standort.DirTempLocal()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	tfp = f.Name()
-
-	defer errors.Deferred(&err, f.Close)
-
-	w := bufio.NewWriter(f)
-	defer errors.Deferred(&err, w.Flush)
-
-	for p, e := range s.entries {
-		out := fmt.Sprintf("%s %s\n", p, e)
-		errors.Log().Printf("flushing zettel: %q", out)
-		w.WriteString(fmt.Sprint(out))
-	}
-
-	return
-}
-
 func (s Store) Flush() (err error) {
-	if s.hasChanges {
-		var tfp string
-
-		if tfp, err = s.flushToTemp(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		errors.Log().Printf("renaming %s to %s", tfp, s.IndexFilePath())
-		if err = os.Rename(tfp, s.IndexFilePath()); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
 	return
 }
 
