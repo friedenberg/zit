@@ -44,28 +44,20 @@ func (c Checkin) Run(
 					}
 
 				case *typ.CheckedOut:
-					var tt *typ.Transacted
-
-					if tt, err = u.StoreObjekten().Typ().CreateOrUpdateCheckedOut(
+					if _, err = u.StoreObjekten().Typ().CreateOrUpdateCheckedOut(
 						aco,
 					); err != nil {
 						err = errors.Wrap(err)
 						return
 					}
-
-					u.KonfigPtr().AddTyp(tt)
 
 				case *etikett.CheckedOut:
-					var tt *etikett.Transacted
-
-					if tt, err = u.StoreObjekten().Etikett().CreateOrUpdateCheckedOut(
+					if _, err = u.StoreObjekten().Etikett().CreateOrUpdateCheckedOut(
 						aco,
 					); err != nil {
 						err = errors.Wrap(err)
 						return
 					}
-
-					u.KonfigPtr().AddEtikett(tt)
 
 				default:
 					err = errors.Implement()
