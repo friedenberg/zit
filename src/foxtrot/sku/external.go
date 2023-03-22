@@ -5,6 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
@@ -49,6 +50,14 @@ func (a *External[T, T1]) Reset() {
 func (a *External[T, T1]) ResetWith(b *External[T, T1]) {
 	a.ObjekteSha = b.ObjekteSha
 	a.AkteSha = b.AkteSha
+	T1(&a.Kennung).ResetWith(b.Kennung)
+}
+
+func (a *External[T, T1]) ResetWithExternalMaybe(b ExternalMaybe[T, T1]) {
+	todo.Change("use this in other places")
+	a.ObjekteSha = sha.Sha{}
+	a.AkteSha = sha.Sha{}
+	a.FDs = b.FDs
 	T1(&a.Kennung).ResetWith(b.Kennung)
 }
 

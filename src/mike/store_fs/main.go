@@ -313,8 +313,7 @@ func (s *Store) ReadFiles(
 	ms kennung.MetaSet,
 	f schnittstellen.FuncIter[objekte.CheckedOutLike],
 ) (err error) {
-	// zettelEMGR := objekte_store.MakeExternalMaybeGetterReader[
-	_ = objekte_store.MakeExternalMaybeGetterReader[
+	zettelEMGR := objekte_store.MakeExternalMaybeGetterReader[
 		zettel.Objekte,
 		*zettel.Objekte,
 		kennung.Hinweis,
@@ -358,35 +357,35 @@ func (s *Store) ReadFiles(
 
 				switch et := e.(type) {
 				case *zettel.Transacted:
-					// if col, err = zettelEMGR.ReadOne(*et); err != nil {
-					// 	err = errors.Wrap(err)
+					if col, err = zettelEMGR.ReadOne(*et); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+					// var zco zettel.CheckedOut
+					// ok := false
+
+					// var ze cwd.Zettel
+
+					// if ze, ok = fs.GetZettel(et.Sku.Kennung); !ok {
+					// 	err = iter.MakeErrStopIteration()
 					// 	return
 					// }
-					var zco zettel.CheckedOut
-					ok := false
 
-					var ze cwd.Zettel
+					// zco.External.Sku.FDs = ze.FDs
+					// zco.External.Sku.Kennung = ze.Kennung
 
-					if ze, ok = fs.GetZettel(et.Sku.Kennung); !ok {
-						err = iter.MakeErrStopIteration()
-						return
-					}
+					// if err = s.readZettelFromFile(&zco.External); err != nil {
+					// 	if errors.IsNotExist(err) {
+					// 		err = iter.MakeErrStopIteration()
+					// 	} else {
+					// 		err = errors.Wrap(err)
+					// 	}
 
-					zco.External.Sku.FDs = ze.FDs
-					zco.External.Sku.Kennung = ze.Kennung
+					// 	return
+					// }
 
-					if err = s.readZettelFromFile(&zco.External); err != nil {
-						if errors.IsNotExist(err) {
-							err = iter.MakeErrStopIteration()
-						} else {
-							err = errors.Wrap(err)
-						}
-
-						return
-					}
-
-					zco.Internal = *et
-					col = &zco
+					// zco.Internal = *et
+					// col = &zco
 
 				case *typ.Transacted:
 					if col, err = typEMGR.ReadOne(*et); err != nil {

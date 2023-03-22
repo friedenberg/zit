@@ -1,8 +1,11 @@
 package store_objekten
 
 import (
+	"os"
+
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/todo"
@@ -13,6 +16,7 @@ import (
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/juliett/zettel"
+	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/kilo/store_util"
 	"github.com/friedenberg/zit/src/kilo/store_verzeichnisse"
 )
@@ -57,6 +61,7 @@ type zettelStore struct {
 		*zettel.Verzeichnisse,
 	]
 
+	format      zettel.ObjekteFormat
 	protoZettel zettel.ProtoZettel
 
 	verzeichnisseSchwanzen *verzeichnisseSchwanzen
@@ -69,6 +74,10 @@ func makeZettelStore(
 ) (s *zettelStore, err error) {
 	s = &zettelStore{
 		protoZettel: zettel.MakeProtoZettel(sa.GetKonfig()),
+		format: zettel.MakeObjekteTextFormat(
+			sa,
+			nil,
+		),
 	}
 
 	s.commonStore, err = makeCommonStore[
@@ -194,6 +203,71 @@ func (s *zettelStore) writeNamedZettelToIndex(
 
 	if err = s.StoreUtil.GetAbbrStore().AddStoredAbbreviation(tz); err != nil {
 		err = errors.Wrapf(err, "failed to write zettel to index: %s", tz.Sku)
+		return
+	}
+
+	return
+}
+
+func (s *zettelStore) ReadOneExternal(
+	e cwd.Zettel,
+) (ez zettel.External, err error) {
+	// support akte
+	todo.Implement()
+
+	ez.Sku.ResetWithExternalMaybe(e)
+
+	c := zettel.ObjekteParserContext{}
+
+	var f *os.File
+
+	if f, err = files.Open(ez.GetObjekteFD().Path); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.DeferredCloser(&err, f)
+
+	if _, err = s.format.Parse(f, &c); err != nil {
+		err = errors.Wrapf(err, "%s", f.Name())
+		return
+	}
+
+	if ez.Sku.ObjekteSha, err = s.WriteZettelObjekte(
+		c.Zettel,
+	); err != nil {
+		err = errors.Wrapf(err, "%s", f.Name())
+		return
+	}
+
+	ez.Objekte = c.Zettel
+	ez.Sku.FDs.Akte.Path = c.AktePath
+
+	unrecoverableErrors := errors.MakeMulti()
+
+	for _, e := range errors.Split(c.Errors) {
+		var err1 zettel.ErrHasInvalidAkteShaOrFilePath
+
+		if errors.As(e, &err1) {
+			var mutter *zettel.Transacted
+
+			if mutter, err = s.ReadOne(
+				&ez.Sku.Kennung,
+			); err != nil {
+				unrecoverableErrors.Add(errors.Wrap(err))
+				continue
+			}
+
+			ez.Objekte.Akte = mutter.Objekte.Akte
+
+			continue
+		}
+
+		unrecoverableErrors.Add(e)
+	}
+
+	if !unrecoverableErrors.Empty() {
+		err = errors.Wrap(unrecoverableErrors)
 		return
 	}
 
