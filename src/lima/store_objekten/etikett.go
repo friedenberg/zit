@@ -5,7 +5,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/alfa/toml"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
@@ -243,52 +242,6 @@ func (s etikettStore) ReadAll(
 			err = errors.Wrap(err)
 			return
 		}
-	}
-
-	return
-}
-
-func (s *etikettStore) Inherit(t *etikett.Transacted) (err error) {
-	if t == nil {
-		panic("trying to inherit nil Etikett")
-	}
-
-	errors.Log().Printf("inheriting %s", t.Sku.ObjekteSha)
-
-	s.StoreUtil.CommitTransacted(t)
-	todo.Decide("")
-	old := s.StoreUtil.GetKonfig().GetEtikett(t.Sku.Kennung)
-
-	if old == nil || old.Less(*t) {
-		s.StoreUtil.GetKonfigPtr().AddEtikett(t)
-	}
-
-	if t.IsNew() {
-		s.LogWriter.New(t)
-	} else {
-		s.LogWriter.Updated(t)
-	}
-
-	return
-}
-
-func (s *etikettStore) reindexOne(
-	sk sku.DataIdentity,
-) (o schnittstellen.Stored, err error) {
-	var te *etikett.Transacted
-	defer s.pool.Put(te)
-
-	if te, err = s.InflateFromDataIdentity(sk); err != nil {
-		errors.Wrap(err)
-		return
-	}
-
-	o = te
-
-	if te.IsNew() {
-		s.LogWriter.New(te)
-	} else {
-		s.LogWriter.Updated(te)
 	}
 
 	return

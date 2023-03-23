@@ -248,26 +248,3 @@ func (s kastenStore) ReadOne(
 
 	return
 }
-
-func (s *kastenStore) Inherit(t *kasten.Transacted) (err error) {
-	if t == nil {
-		panic("trying to inherit nil Kasten")
-	}
-
-	errors.Log().Printf("inheriting %s", t.Sku.ObjekteSha)
-
-	s.StoreUtil.CommitTransacted(t)
-	old := s.StoreUtil.GetKonfig().GetKasten(t.Sku.Kennung)
-
-	if old == nil || old.Less(*t) {
-		s.StoreUtil.GetKonfigPtr().AddKasten(t)
-	}
-
-	if t.IsNew() {
-		s.LogWriter.New(t)
-	} else {
-		s.LogWriter.Updated(t)
-	}
-
-	return
-}
