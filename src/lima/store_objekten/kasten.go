@@ -61,6 +61,7 @@ func makeKastenStore(
 		kasten.Verzeichnisse,
 		*kasten.Verzeichnisse,
 	](
+		s,
 		sa,
 		s,
 		nil,
@@ -112,6 +113,16 @@ func makeKastenStore(
 }
 
 func (s kastenStore) Flush() (err error) {
+	return
+}
+
+func (s kastenStore) addOne(t *kasten.Transacted) (err error) {
+	s.StoreUtil.GetKonfigPtr().AddKasten(t)
+	return
+}
+
+func (s kastenStore) updateOne(t *kasten.Transacted) (err error) {
+	s.StoreUtil.GetKonfigPtr().AddKasten(t)
 	return
 }
 
@@ -256,35 +267,6 @@ func (s *kastenStore) Inherit(t *kasten.Transacted) (err error) {
 		s.LogWriter.New(t)
 	} else {
 		s.LogWriter.Updated(t)
-	}
-
-	return
-}
-
-func (s *kastenStore) reindexOne(
-	sk sku.DataIdentity,
-) (o schnittstellen.Stored, err error) {
-	var te *kasten.Transacted
-	defer s.pool.Put(te)
-
-	if te, err = s.InflateFromDataIdentity(sk); err != nil {
-		if errors.Is(err, toml.Error{}) {
-			err = nil
-			return
-		} else {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	o = te
-
-	s.StoreUtil.GetKonfigPtr().AddKasten(te)
-
-	if te.IsNew() {
-		s.LogWriter.New(te)
-	} else {
-		s.LogWriter.Updated(te)
 	}
 
 	return

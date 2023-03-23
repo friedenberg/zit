@@ -62,6 +62,7 @@ func makeTypStore(
 		objekte.NilVerzeichnisse[typ.Objekte],
 		*objekte.NilVerzeichnisse[typ.Objekte],
 	](
+		s,
 		sa,
 		s,
 		nil,
@@ -113,6 +114,16 @@ func makeTypStore(
 }
 
 func (s typStore) Flush() (err error) {
+	return
+}
+
+func (s typStore) addOne(t *typ.Transacted) (err error) {
+	s.StoreUtil.GetKonfigPtr().AddTyp(t)
+	return
+}
+
+func (s typStore) updateOne(t *typ.Transacted) (err error) {
+	s.StoreUtil.GetKonfigPtr().AddTyp(t)
 	return
 }
 
@@ -257,35 +268,6 @@ func (s *typStore) Inherit(t *typ.Transacted) (err error) {
 		s.LogWriter.New(t)
 	} else {
 		s.LogWriter.Updated(t)
-	}
-
-	return
-}
-
-func (s *typStore) reindexOne(
-	sk sku.DataIdentity,
-) (o schnittstellen.Stored, err error) {
-	var te *typ.Transacted
-	defer s.pool.Put(te)
-
-	if te, err = s.InflateFromDataIdentity(sk); err != nil {
-		if errors.Is(err, toml.Error{}) {
-			err = nil
-			return
-		} else {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	o = te
-
-	s.StoreUtil.GetKonfigPtr().AddTyp(te)
-
-	if te.IsNew() {
-		s.LogWriter.New(te)
-	} else {
-		s.LogWriter.Updated(te)
 	}
 
 	return

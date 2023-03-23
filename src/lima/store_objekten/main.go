@@ -405,7 +405,7 @@ func (s *Store) getReindexFunc() func(sku.DataIdentity) error {
 
 		var o schnittstellen.Stored
 
-		if o, err = st.reindexOne(sk); err != nil {
+		if o, err = st.ReindexOne(sk); err != nil {
 			err = errors.Wrapf(err, "Sku %s", sk)
 			return
 		}

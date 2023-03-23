@@ -96,6 +96,16 @@ func (s konfigStore) Flush() (err error) {
 	return
 }
 
+func (s konfigStore) addOne(t *erworben.Transacted) (err error) {
+	s.StoreUtil.GetKonfigPtr().SetTransacted(t)
+	return
+}
+
+func (s konfigStore) updateOne(t *erworben.Transacted) (err error) {
+	s.StoreUtil.GetKonfigPtr().SetTransacted(t)
+	return
+}
+
 func (s konfigStore) Update(
 	ko *erworben.Objekte,
 ) (kt *erworben.Transacted, err error) {
@@ -246,7 +256,7 @@ func (s konfigStore) AllInChain() (c []*erworben.Transacted, err error) {
 	return
 }
 
-func (s *konfigStore) reindexOne(
+func (s *konfigStore) ReindexOne(
 	sk sku.DataIdentity,
 ) (o schnittstellen.Stored, err error) {
 	var te *erworben.Transacted
@@ -259,7 +269,6 @@ func (s *konfigStore) reindexOne(
 
 	o = te
 
-	s.StoreUtil.GetKonfigPtr().SetTransacted(te)
 	s.KonfigLogWriter.Updated(te)
 
 	return

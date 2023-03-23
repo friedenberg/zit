@@ -63,6 +63,7 @@ func makeEtikettStore(
 		objekte.NilVerzeichnisse[etikett.Objekte],
 		*objekte.NilVerzeichnisse[etikett.Objekte],
 	](
+		s,
 		sa,
 		s,
 		nil,
@@ -114,6 +115,16 @@ func makeEtikettStore(
 }
 
 func (s etikettStore) Flush() (err error) {
+	return
+}
+
+func (s etikettStore) addOne(t *etikett.Transacted) (err error) {
+	s.StoreUtil.GetKonfigPtr().AddEtikett(t)
+	return
+}
+
+func (s etikettStore) updateOne(t *etikett.Transacted) (err error) {
+	s.StoreUtil.GetKonfigPtr().AddEtikett(t)
 	return
 }
 
@@ -273,8 +284,6 @@ func (s *etikettStore) reindexOne(
 	}
 
 	o = te
-
-	s.StoreUtil.GetKonfigPtr().AddEtikett(te)
 
 	if te.IsNew() {
 		s.LogWriter.New(te)

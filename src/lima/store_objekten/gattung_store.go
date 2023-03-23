@@ -3,6 +3,7 @@ package store_objekten
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/alfa/toml"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
@@ -13,7 +14,7 @@ import (
 
 type reindexer interface {
 	// updateExternal(objekte.External) error
-	reindexOne(sku.DataIdentity) (schnittstellen.Stored, error)
+	ReindexOne(sku.DataIdentity) (schnittstellen.Stored, error)
 }
 
 type CommonStoreBase[
@@ -115,6 +116,18 @@ type CommonStore[
 	]
 }
 
+type commonStoreDelegate[
+	O schnittstellen.Objekte[O],
+	OPtr schnittstellen.ObjektePtr[O],
+	K schnittstellen.Id[K],
+	KPtr schnittstellen.IdPtr[K],
+	V any,
+	VPtr schnittstellen.VerzeichnissePtr[V, O],
+] interface {
+	addOne(*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]) error
+	updateOne(*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]) error
+}
+
 type transacted[T any] interface {
 	schnittstellen.Poolable[T]
 }
@@ -131,8 +144,7 @@ type commonStoreBase[
 	V any,
 	VPtr schnittstellen.VerzeichnissePtr[V, O],
 ] struct {
-	// type T objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]
-	// type TPtr *objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]
+	commonStoreDelegate[O, OPtr, K, KPtr, V, VPtr]
 
 	store_util.StoreUtil
 	pool schnittstellen.Pool[
@@ -189,6 +201,7 @@ func makeCommonStoreBase[
 	V any,
 	VPtr schnittstellen.VerzeichnissePtr[V, O],
 ](
+	delegate commonStoreDelegate[O, OPtr, K, KPtr, V, VPtr],
 	sa store_util.StoreUtil,
 	tr objekte_store.TransactedReader[KPtr,
 		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]],
@@ -205,8 +218,9 @@ func makeCommonStoreBase[
 	]()
 
 	s = &commonStoreBase[O, OPtr, K, KPtr, V, VPtr]{
-		StoreUtil: sa,
-		pool:      pool,
+		commonStoreDelegate: delegate,
+		StoreUtil:           sa,
+		pool:                pool,
 		TransactedInflator: objekte_store.MakeTransactedInflator[
 			O,
 			OPtr,
@@ -242,6 +256,7 @@ func makeCommonStore[
 	V any,
 	VPtr schnittstellen.VerzeichnissePtr[V, O],
 ](
+	delegate commonStoreDelegate[O, OPtr, K, KPtr, V, VPtr],
 	sa store_util.StoreUtil,
 	tr objekte_store.TransactedReader[KPtr,
 		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]],
@@ -266,8 +281,9 @@ func makeCommonStore[
 		VPtr,
 	]{
 		commonStoreBase: commonStoreBase[O, OPtr, K, KPtr, V, VPtr]{
-			StoreUtil: sa,
-			pool:      pool,
+			commonStoreDelegate: delegate,
+			StoreUtil:           sa,
+			pool:                pool,
 			TransactedInflator: objekte_store.MakeTransactedInflator[
 				O,
 				OPtr,
@@ -331,6 +347,40 @@ func (s *commonStore[O, OPtr, K, KPtr, V, VPtr]) ReadOneExternal(
 	); err != nil {
 		err = errors.Wrap(err)
 		return
+	}
+
+	return
+}
+
+func (s *commonStoreBase[O, OPtr, K, KPtr, V, VPtr]) ReindexOne(
+	sk sku.DataIdentity,
+) (o schnittstellen.Stored, err error) {
+	var t *objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]
+
+	if t, err = s.InflateFromDataIdentity(sk); err != nil {
+		if errors.Is(err, toml.Error{}) {
+			err = nil
+			return
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	o = t
+
+	if t.IsNew() {
+		s.LogWriter.New(t)
+		if err = s.addOne(t); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		s.LogWriter.Updated(t)
+		if err = s.updateOne(t); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return

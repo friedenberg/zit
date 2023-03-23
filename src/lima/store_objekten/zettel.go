@@ -88,6 +88,7 @@ func makeZettelStore(
 		zettel.Verzeichnisse,
 		*zettel.Verzeichnisse,
 	](
+		s,
 		sa,
 		s,
 		&zettel.FormatObjekte{
@@ -604,7 +605,7 @@ func (s *zettelStore) Inherit(tz *zettel.Transacted) (err error) {
 	return
 }
 
-func (s *zettelStore) reindexOne(
+func (s *zettelStore) ReindexOne(
 	sk sku.DataIdentity,
 ) (o schnittstellen.Stored, err error) {
 	var tz *zettel.Transacted
