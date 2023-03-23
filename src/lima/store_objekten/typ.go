@@ -250,25 +250,25 @@ func (s typStore) ReadOne(
 	return
 }
 
-func (s *typStore) Inherit(t *typ.Transacted) (err error) {
-	if t == nil {
-		panic("trying to inherit nil Typ")
-	}
+// func (s *typStore) Inherit(t *typ.Transacted) (err error) {
+// 	if t == nil {
+// 		panic("trying to inherit nil Typ")
+// 	}
 
-	errors.Log().Printf("inheriting %s", t.Sku.ObjekteSha)
+// 	errors.Log().Printf("inheriting %s", t.Sku.ObjekteSha)
 
-	s.StoreUtil.CommitTransacted(t)
-	old := s.StoreUtil.GetKonfig().GetApproximatedTyp(t.Sku.Kennung).ActualOrNil()
+// 	s.StoreUtil.CommitTransacted(t)
+// 	old := s.StoreUtil.GetKonfig().GetApproximatedTyp(t.Sku.Kennung).ActualOrNil()
 
-	if old == nil || old.Less(*t) {
-		s.StoreUtil.GetKonfigPtr().AddTyp(t)
-	}
+// 	if old == nil || old.Less(*t) {
+// 		s.StoreUtil.GetKonfigPtr().AddTyp(t)
+// 	}
 
-	if t.IsNew() {
-		s.LogWriter.New(t)
-	} else {
-		s.LogWriter.Updated(t)
-	}
+// 	if t.IsNew() {
+// 		s.LogWriter.New(t)
+// 	} else {
+// 		s.LogWriter.Updated(t)
+// 	}
 
-	return
-}
+// 	return
+// }

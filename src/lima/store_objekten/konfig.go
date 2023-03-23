@@ -252,10 +252,6 @@ func (s konfigStore) Read() (tt *erworben.Transacted, err error) {
 	return
 }
 
-func (s konfigStore) AllInChain() (c []*erworben.Transacted, err error) {
-	return
-}
-
 func (s *konfigStore) ReindexOne(
 	sk sku.DataIdentity,
 ) (o schnittstellen.Stored, err error) {

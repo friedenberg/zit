@@ -385,3 +385,30 @@ func (s *commonStoreBase[O, OPtr, K, KPtr, V, VPtr]) ReindexOne(
 
 	return
 }
+
+func (s *commonStoreBase[O, OPtr, K, KPtr, V, VPtr]) Inherit(
+	t *objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
+) (err error) {
+	if t == nil {
+		err = errors.Errorf("trying to inherit nil %T", t)
+		return
+	}
+
+	errors.Log().Printf("inheriting %s", t.Sku.ObjekteSha)
+
+	s.StoreUtil.CommitTransacted(t)
+
+	old, _ := s.ReadOne(&t.Sku.Kennung)
+
+	if old == nil || old.Less(*t) {
+		s.addOne(t)
+	}
+
+	if t.IsNew() {
+		s.LogWriter.New(t)
+	} else {
+		s.LogWriter.Updated(t)
+	}
+
+	return
+}
