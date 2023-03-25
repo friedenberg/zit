@@ -24,6 +24,7 @@ type CwdFiles struct {
 	// TODO make private
 	Zettelen  schnittstellen.MutableSet[Zettel]
 	Typen     schnittstellen.MutableSet[Typ]
+	Kisten    schnittstellen.MutableSet[Kasten]
 	Etiketten schnittstellen.MutableSet[Etikett]
 	// TODO make set
 	UnsureAkten      []kennung.FD
@@ -125,6 +126,14 @@ func (fs CwdFiles) All(
 		},
 	)
 
+	iter.ErrorWaitGroupApply[Kasten](
+		wg,
+		fs.Kisten,
+		func(e Kasten) (err error) {
+			return f(e)
+		},
+	)
+
 	iter.ErrorWaitGroupApply[Etikett](
 		wg,
 		fs.Etiketten,
@@ -152,6 +161,7 @@ func makeCwdFiles(erworben konfig.Compiled, dir string) (fs CwdFiles) {
 	fs = CwdFiles{
 		erworben:         erworben,
 		dir:              dir,
+		Kisten:           collections.MakeMutableSetStringer[Kasten](),
 		Typen:            collections.MakeMutableSetStringer[Typ](),
 		Zettelen:         collections.MakeMutableSetStringer[Zettel](),
 		Etiketten:        collections.MakeMutableSetStringer[Etikett](),
@@ -288,6 +298,7 @@ func (c CwdFiles) Len() int {
 	return collections.Len(
 		c.Zettelen,
 		c.Typen,
+		c.Kisten,
 		c.Etiketten,
 	)
 }
@@ -315,6 +326,12 @@ func (fs *CwdFiles) readFirstLevelFile(a string) (err error) {
 	switch strings.TrimPrefix(ext, ".") {
 	case fs.erworben.FileExtensions.Etikett:
 		if err = fs.tryEtikett(fi, fs.dir); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+	case fs.erworben.FileExtensions.Kasten:
+		if err = fs.tryKasten(fi, fs.dir); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -362,12 +379,6 @@ func (fs *CwdFiles) readSecondLevelFile(d string, a string) (err error) {
 	ext = strings.TrimSpace(ext)
 
 	switch strings.TrimPrefix(ext, ".") {
-	case fs.erworben.FileExtensions.Typ:
-		if err = fs.tryTyp(fi, d); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
 	case fs.erworben.FileExtensions.Zettel:
 		fallthrough
 
