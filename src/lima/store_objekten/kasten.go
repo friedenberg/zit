@@ -7,12 +7,20 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
+	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/hotel/kasten"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/india/bestandsaufnahme"
+	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/kilo/store_util"
 )
+
+type CheckoutOptions struct {
+	Cwd          cwd.CwdFiles
+	Force        bool
+	CheckoutMode objekte.CheckoutMode
+}
 
 type KastenStore interface {
 	CommonStore[

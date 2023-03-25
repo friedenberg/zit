@@ -16,7 +16,6 @@ import (
 	"github.com/friedenberg/zit/src/india/konfig"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/cwd"
-	"github.com/friedenberg/zit/src/kilo/zettel_external"
 	"github.com/friedenberg/zit/src/lima/store_objekten"
 )
 
@@ -29,8 +28,7 @@ type Store struct {
 
 	storeObjekten *store_objekten.Store
 
-	zettelExternalLogPrinter schnittstellen.FuncIter[*zettel_external.Zettel]
-	checkedOutLogPrinter     schnittstellen.FuncIter[objekte.CheckedOutLike]
+	checkedOutLogPrinter schnittstellen.FuncIter[objekte.CheckedOutLike]
 }
 
 func New(
@@ -57,12 +55,6 @@ func (s *Store) SetCheckedOutLogPrinter(
 	zelw schnittstellen.FuncIter[objekte.CheckedOutLike],
 ) {
 	s.checkedOutLogPrinter = zelw
-}
-
-func (s *Store) SetZettelExternalLogPrinter(
-	zelw schnittstellen.FuncIter[*zettel_external.Zettel],
-) {
-	s.zettelExternalLogPrinter = zelw
 }
 
 // TODO-P3 move to standort

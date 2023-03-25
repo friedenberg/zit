@@ -1,9 +1,15 @@
 package store_objekten
 
 import (
+	"fmt"
+	"os"
+	"path"
+
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/alfa/toml"
+	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
@@ -26,6 +32,11 @@ type CommonStoreBase[
 	VPtr schnittstellen.VerzeichnissePtr[V, O],
 ] interface {
 	reindexer
+
+	CheckoutOne(
+		CheckoutOptions,
+		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
+	) (*objekte.CheckedOut[O, OPtr, K, KPtr, V, VPtr], error)
 
 	objekte_store.TransactedLogger[*objekte.Transacted[
 		O,
@@ -147,6 +158,9 @@ type commonStoreBase[
 	commonStoreDelegate[O, OPtr, K, KPtr, V, VPtr]
 
 	store_util.StoreUtil
+
+	ObjekteFormat schnittstellen.Format[O, OPtr]
+
 	pool schnittstellen.Pool[
 		objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
 		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
@@ -217,10 +231,15 @@ func makeCommonStoreBase[
 		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
 	]()
 
+	if objekteFormat == nil {
+		objekteFormat = objekte.MakeFormat[O, OPtr]()
+	}
+
 	s = &commonStoreBase[O, OPtr, K, KPtr, V, VPtr]{
 		commonStoreDelegate: delegate,
 		StoreUtil:           sa,
 		pool:                pool,
+		ObjekteFormat:       objekteFormat,
 		TransactedInflator: objekte_store.MakeTransactedInflator[
 			O,
 			OPtr,
@@ -272,6 +291,10 @@ func makeCommonStore[
 		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
 	]()
 
+	if objekteFormat == nil {
+		objekteFormat = objekte.MakeFormat[O, OPtr]()
+	}
+
 	s = &commonStore[
 		O,
 		OPtr,
@@ -284,6 +307,7 @@ func makeCommonStore[
 			commonStoreDelegate: delegate,
 			StoreUtil:           sa,
 			pool:                pool,
+			ObjekteFormat:       objekteFormat,
 			TransactedInflator: objekte_store.MakeTransactedInflator[
 				O,
 				OPtr,
@@ -408,6 +432,66 @@ func (s *commonStoreBase[O, OPtr, K, KPtr, V, VPtr]) Inherit(
 		s.LogWriter.New(t)
 	} else {
 		s.LogWriter.Updated(t)
+	}
+
+	return
+}
+
+func (s *commonStore[O, OPtr, K, KPtr, V, VPtr]) CheckoutOne(
+	options CheckoutOptions,
+	t *objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
+) (co *objekte.CheckedOut[O, OPtr, K, KPtr, V, VPtr], err error) {
+	todo.Change("add pool")
+	co = &objekte.CheckedOut[O, OPtr, K, KPtr, V, VPtr]{}
+
+	co.Internal = *t
+	co.External.Sku = t.Sku.GetExternal()
+
+	var f *os.File
+
+	p := path.Join(
+		s.StoreUtil.GetStandort().Cwd(),
+		fmt.Sprintf(
+			"%s.%s",
+			t.Sku.Kennung,
+			s.StoreUtil.GetKonfig().FileExtensions.GetFileExtensionForGattung(t),
+		),
+	)
+
+	if f, err = files.CreateExclusiveWriteOnly(p); err != nil {
+		if errors.IsExist(err) {
+			if co.External, err = s.ReadOneExternal(
+				sku.ExternalMaybe[K, KPtr]{
+					Kennung: t.Sku.Kennung,
+					FDs: sku.ExternalFDs{
+						Objekte: kennung.FD{
+							Path: p,
+						},
+					},
+				},
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			co.External.Sku.Kennung = t.Sku.Kennung
+		} else {
+			err = errors.Wrap(err)
+		}
+
+		return
+	}
+
+	defer errors.DeferredCloser(&err, f)
+
+	if co.External.Sku.FDs.Objekte, err = kennung.File(f); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if _, err = s.TextFormat.Format(f, &t.Objekte); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

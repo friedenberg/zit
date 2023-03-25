@@ -13,7 +13,9 @@ type FileExtensions struct {
 	Kasten   string `toml:"kasten"`
 }
 
-func (a FileExtensions) GetFileExtensionForGattung(g1 schnittstellen.Gattung) string {
+func (a FileExtensions) GetFileExtensionForGattung(
+	g1 schnittstellen.GattungGetter,
+) string {
 	g := gattung.Must(g1)
 
 	switch g {

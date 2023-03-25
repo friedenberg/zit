@@ -5,26 +5,13 @@ import (
 	"path"
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/golf/objekte"
 )
 
 func (s *Store) FileExtensionForGattung(
 	gg schnittstellen.GattungGetter,
 ) string {
-	switch gattung.Must(gg.GetGattung()) {
-	case gattung.Zettel:
-		return s.erworben.FileExtensions.Zettel
-
-	case gattung.Etikett:
-		return s.erworben.FileExtensions.Etikett
-
-	case gattung.Typ:
-		return s.erworben.FileExtensions.Etikett
-
-	default:
-		return "unknown_gattung"
-	}
+	return s.erworben.FileExtensions.GetFileExtensionForGattung(gg)
 }
 
 func (s *Store) PathForTransactedLike(tl objekte.TransactedLike) string {

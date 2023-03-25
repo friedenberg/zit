@@ -11,7 +11,13 @@ setup() {
 
 	run_zit checkout :z,t,e
 	assert_success
+}
 
+teardown() {
+	rm_from_version "$version"
+}
+
+function dirty_one_uno() {
 	cat >one/uno.zettel <<-EOM
 		---
 		# wildly different
@@ -21,7 +27,9 @@ setup() {
 
 		newest body
 	EOM
+}
 
+function dirty_one_dos() {
 	cat >one/dos.zettel <<-EOM
 		---
 		# dos wildly different
@@ -31,27 +39,37 @@ setup() {
 
 		dos newest body
 	EOM
+}
 
+function dirty_md_typ() {
 	cat >md.typ <<-EOM
 		inline-akte = false
 		vim-syntax-type = "test"
 	EOM
+}
 
+function dirty_da_new_typ() {
 	cat >da-new.typ <<-EOM
 		inline-akte = true
 		vim-syntax-type = "da-new"
 	EOM
+}
 
+function dirty_zz_archive_etikett() {
 	cat >zz-archive.etikett <<-EOM
 		hide = true
 	EOM
 }
 
-teardown() {
-	rm_from_version "$version"
-}
-
 function status_simple_one_zettel { # @test
+	run_zit status one/uno.zettel
+	assert_success
+	assert_output - <<-EOM
+		              (same) [one/uno.zettel@d47c552a5299f392948258d7959fc7cf94843316a21c8ea12854ed84a8c06367 !md "wow the first"]
+	EOM
+
+	dirty_one_uno
+
 	run_zit status one/uno.zettel
 	assert_success
 	assert_output - <<-EOM
@@ -60,6 +78,16 @@ function status_simple_one_zettel { # @test
 }
 
 function status_zettelen_typ { # @test
+	run_zit status !md.z
+	assert_success
+	assert_output_unsorted - <<-EOM
+		              (same) [one/dos.zettel@c6b9d095358b8b26a99e90496d916ba92a99e9b75c705165df5f6d353a949ea9 !md "wow ok again"]
+		              (same) [one/uno.zettel@d47c552a5299f392948258d7959fc7cf94843316a21c8ea12854ed84a8c06367 !md "wow the first"]
+	EOM
+
+	dirty_one_uno
+	dirty_one_dos
+
 	run_zit status !md.z
 	assert_success
 	assert_output_unsorted - <<-EOM
@@ -72,11 +100,36 @@ function status_complex_zettel_etikett_negation { # @test
 	run_zit status ^-etikett-two.z
 	assert_success
 	assert_output_unsorted - <<-EOM
+		              (same) [one/uno.zettel@d47c552a5299f392948258d7959fc7cf94843316a21c8ea12854ed84a8c06367 !md "wow the first"]
+		              (same) [one/dos.zettel@c6b9d095358b8b26a99e90496d916ba92a99e9b75c705165df5f6d353a949ea9 !md "wow ok again"]
+	EOM
+
+	dirty_one_uno
+
+	run_zit status ^-etikett-two.z
+	assert_success
+	assert_output_unsorted - <<-EOM
+		              (same) [one/dos.zettel@c6b9d095358b8b26a99e90496d916ba92a99e9b75c705165df5f6d353a949ea9 !md "wow ok again"]
 		           (changed) [one/uno.zettel@689c6787364899defa77461ff6a3f454ca667654653f86d5d44f2826950ff4f9 !md "wildly different"]
 	EOM
 }
 
 function status_simple_all { # @test
+	run_zit status .
+	assert_success
+	#TODO why is md.typ diff
+	assert_output_unsorted - <<-EOM
+		              (same) [one/dos.zettel@c6b9d095358b8b26a99e90496d916ba92a99e9b75c705165df5f6d353a949ea9 !md "wow ok again"]
+		              (same) [one/uno.zettel@d47c552a5299f392948258d7959fc7cf94843316a21c8ea12854ed84a8c06367 !md "wow the first"]
+		              (same) [md.typ@eaa85e80de6d1129a21365a8ce2a49ca752457d10932a7d73001b4ebded302c7 !md]
+	EOM
+
+	dirty_one_uno
+	dirty_one_dos
+	dirty_md_typ
+	dirty_zz_archive_etikett
+	dirty_da_new_typ
+
 	run_zit status .
 	assert_success
 	assert_output_unsorted - <<-EOM
@@ -92,12 +145,27 @@ function status_simple_typ { # @test
 	run_zit status .t
 	assert_success
 	assert_output_unsorted - <<-EOM
+		              (same) [md.typ@eaa85e80de6d1129a21365a8ce2a49ca752457d10932a7d73001b4ebded302c7 !md]
+	EOM
+
+	dirty_md_typ
+	dirty_da_new_typ
+
+	run_zit status .t
+	assert_success
+	assert_output_unsorted - <<-EOM
 		           (changed) [md.typ@72d654e3c7f4e820df18c721177dfad38fe831d10bca6dcb33b7cad5dc335357 !md]
 		         (untracked) [da-new.typ@0ed0c5d77f38816283174202947f71460a455e81b43348bf7808e2b2d81ad120 !da-new]
 	EOM
 }
 
 function status_simple_etikett { # @test
+	run_zit status .e
+	assert_success
+	assert_output ''
+
+	dirty_zz_archive_etikett
+
 	run_zit status .e
 	assert_success
 	assert_output - <<-EOM
