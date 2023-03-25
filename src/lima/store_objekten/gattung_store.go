@@ -20,7 +20,7 @@ import (
 
 type reindexer interface {
 	// updateExternal(objekte.External) error
-	ReindexOne(sku.DataIdentity) (schnittstellen.Stored, error)
+	ReindexOne(sku.DataIdentity) (kennung.Matchable, error)
 }
 
 type CommonStoreBase[
@@ -378,7 +378,7 @@ func (s *commonStore[O, OPtr, K, KPtr, V, VPtr]) ReadOneExternal(
 
 func (s *commonStoreBase[O, OPtr, K, KPtr, V, VPtr]) ReindexOne(
 	sk sku.DataIdentity,
-) (o schnittstellen.Stored, err error) {
+) (o kennung.Matchable, err error) {
 	var t *objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]
 
 	if t, err = s.InflateFromDataIdentity(sk); err != nil {

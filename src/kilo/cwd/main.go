@@ -91,6 +91,13 @@ func (fs CwdFiles) GetZettel(
 	return
 }
 
+func (fs CwdFiles) GetKasten(
+	h kennung.Kasten,
+) (z Kasten, ok bool) {
+	z, ok = fs.Kisten.Get(h.String())
+	return
+}
+
 func (fs CwdFiles) GetEtikett(
 	k kennung.Etikett,
 ) (e Etikett, ok bool) {

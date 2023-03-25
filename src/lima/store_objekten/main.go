@@ -403,7 +403,7 @@ func (s *Store) getReindexFunc() func(sku.DataIdentity) error {
 			return
 		}
 
-		var o schnittstellen.Stored
+		var o kennung.Matchable
 
 		if o, err = st.ReindexOne(sk); err != nil {
 			err = errors.Wrapf(err, "Sku %s", sk)

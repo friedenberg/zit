@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/hotel/etikett"
+	"github.com/friedenberg/zit/src/hotel/kasten"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/india/konfig"
@@ -179,6 +180,18 @@ func (s *Store) ReadFiles(
 		s.storeObjekten.Typ(),
 	)
 
+	kastenEMGR := objekte_store.MakeExternalMaybeGetterReader[
+		kasten.Objekte,
+		*kasten.Objekte,
+		kennung.Kasten,
+		*kennung.Kasten,
+		kasten.Verzeichnisse,
+		*kasten.Verzeichnisse,
+	](
+		fs.GetKasten,
+		s.storeObjekten.Kasten(),
+	)
+
 	if err = s.storeObjekten.Query(
 		ms,
 		iter.MakeChain(
@@ -194,6 +207,12 @@ func (s *Store) ReadFiles(
 
 				case *typ.Transacted:
 					if col, err = typEMGR.ReadOne(*et); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+
+				case *kasten.Transacted:
+					if col, err = kastenEMGR.ReadOne(*et); err != nil {
 						err = errors.Wrap(err)
 						return
 					}
@@ -228,6 +247,35 @@ func (s *Store) ReadFiles(
 		iter.MakeChain(
 			func(ilg kennung.IdLikeGetter) (err error) {
 				switch il := ilg.(type) {
+				case cwd.Kasten:
+					if err = s.storeObjekten.GetAbbrStore().KastenExists(
+						il.Kennung,
+					); err == nil {
+						err = iter.MakeErrStopIteration()
+						return
+					}
+
+					err = nil
+
+					var tco kasten.CheckedOut
+
+					if tco.External, err = s.storeObjekten.Kasten().ReadOneExternal(il); err != nil {
+						if errors.IsNotExist(err) {
+							err = iter.MakeErrStopIteration()
+						} else {
+							err = errors.Wrapf(err, "CwdEtikett: %#v", il)
+						}
+
+						return
+					}
+
+					tco.State = objekte.CheckedOutStateUntracked
+
+					if err = f(&tco); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+
 				case cwd.Typ:
 					if err = s.storeObjekten.GetAbbrStore().TypExists(
 						il.Kennung,

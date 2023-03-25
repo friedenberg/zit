@@ -1,6 +1,7 @@
 package kennung
 
 import (
+	"regexp"
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -10,6 +11,14 @@ import (
 )
 
 type Kasten = Kennung[kasten, *kasten]
+
+const KastenRegexString = `^(//)?[-a-z0-9_]+$`
+
+var KastenRegex *regexp.Regexp
+
+func init() {
+	KastenRegex = regexp.MustCompile(KastenRegexString)
+}
 
 func MustKasten(v string) (e Kasten) {
 	var err error
@@ -61,16 +70,9 @@ func (e kasten) String() string {
 // }
 
 func (e *kasten) Set(v string) (err error) {
-	v = strings.TrimSpace(strings.Trim(v, ".! "))
-
-	if !strings.HasPrefix(v, "//") {
-		err = errors.Errorf("kasten missing '//' prefix: %s", v)
-		return
-	}
-
 	v = strings.TrimPrefix(v, "//")
 
-	if !EtikettRegex.Match([]byte(v)) {
+	if !KastenRegex.Match([]byte(v)) {
 		err = errors.Errorf("not a valid kasten: '%s'", v)
 		return
 	}

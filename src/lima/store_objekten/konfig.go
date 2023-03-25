@@ -254,7 +254,7 @@ func (s konfigStore) Read() (tt *erworben.Transacted, err error) {
 
 func (s *konfigStore) ReindexOne(
 	sk sku.DataIdentity,
-) (o schnittstellen.Stored, err error) {
+) (o kennung.Matchable, err error) {
 	var te *erworben.Transacted
 	defer s.pool.Put(te)
 

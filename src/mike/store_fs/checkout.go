@@ -1,10 +1,6 @@
 package store_fs
 
 import (
-	"fmt"
-	"os"
-	"path"
-
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
@@ -13,10 +9,9 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/hotel/etikett"
-	"github.com/friedenberg/zit/src/hotel/objekte_store"
+	"github.com/friedenberg/zit/src/hotel/kasten"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/cwd"
@@ -126,6 +121,9 @@ func (s *Store) checkoutOneGeneric(
 		co, err = s.CheckoutOneZettel(options, *tt)
 		cop = &co
 
+	case *kasten.Transacted:
+		cop, err = s.storeObjekten.Kasten().CheckoutOne(store_objekten.CheckoutOptions(options), tt)
+
 	case *typ.Transacted:
 		cop, err = s.storeObjekten.Typ().CheckoutOne(store_objekten.CheckoutOptions(options), tt)
 
@@ -217,177 +215,6 @@ func (s *Store) CheckoutOneZettel(
 	)
 
 	if err = e.Encode(&cz.External); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-// func (s *Store) CheckoutOneEtikett(
-// 	options CheckoutOptions,
-// 	tk etikett.Transacted,
-// ) (co etikett.CheckedOut, err error) {
-// 	errors.TodoP1("extract format dependency")
-// 	format := etikett.MakeFormatText(s.storeObjekten)
-
-// 	co.Internal = tk
-// 	co.External.Sku = tk.Sku.GetExternal()
-
-// 	var f *os.File
-
-// 	p := path.Join(
-// 		s.Cwd(),
-// 		fmt.Sprintf("%s.%s", tk.Sku.Kennung, s.erworben.FileExtensions.Etikett),
-// 	)
-
-// 	if f, err = files.CreateExclusiveWriteOnly(p); err != nil {
-// 		if errors.IsExist(err) {
-// 			if co.External, err = s.storeObjekten.Etikett().ReadOneExternal(
-// 				cwd.Etikett{
-// 					Kennung: tk.Sku.Kennung,
-// 					FDs: sku.ExternalFDs{
-// 						Objekte: kennung.FD{
-// 							Path: p,
-// 						},
-// 					},
-// 				},
-// 			); err != nil {
-// 				err = errors.Wrap(err)
-// 				return
-// 			}
-
-// 			co.External.Sku.Kennung = tk.Sku.Kennung
-// 		} else {
-// 			err = errors.Wrap(err)
-// 		}
-
-// 		return
-// 	}
-
-// 	defer errors.DeferredCloser(&err, f)
-
-// 	if co.External.Sku.FDs.Objekte, err = kennung.File(f); err != nil {
-// 		err = errors.Wrap(err)
-// 		return
-// 	}
-
-// 	if _, err = format.Format(f, &tk.Objekte); err != nil {
-// 		err = errors.Wrap(err)
-// 		return
-// 	}
-
-// 	return
-// }
-
-// func (s *Store) CheckoutOneTyp(
-// 	options CheckoutOptions,
-// 	tk typ.Transacted,
-// ) (co typ.CheckedOut, err error) {
-// 	errors.TodoP1("extract format dependency")
-// 	format := typ.MakeFormatText(s.storeObjekten)
-
-// 	co.Internal = tk
-// 	co.External.Sku = tk.Sku.GetExternal()
-
-// 	var f *os.File
-
-// 	p := path.Join(
-// 		s.Cwd(),
-// 		fmt.Sprintf("%s.%s", tk.Sku.Kennung, s.erworben.FileExtensions.Typ),
-// 	)
-
-// 	if f, err = files.CreateExclusiveWriteOnly(p); err != nil {
-// 		if errors.IsExist(err) {
-// 			if co.External, err = s.storeObjekten.Typ().ReadOneExternal(
-// 				cwd.Typ{
-// 					Kennung: tk.Sku.Kennung,
-// 					FDs: sku.ExternalFDs{
-// 						Objekte: kennung.FD{
-// 							Path: p,
-// 						},
-// 					},
-// 				},
-// 			); err != nil {
-// 				err = errors.Wrap(err)
-// 				return
-// 			}
-
-// 			co.External.Sku.Kennung = tk.Sku.Kennung
-// 		} else {
-// 			err = errors.Wrap(err)
-// 		}
-
-// 		return
-// 	}
-
-// 	defer errors.DeferredCloser(&err, f)
-
-// 	if co.External.Sku.FDs.Objekte, err = kennung.File(f); err != nil {
-// 		err = errors.Wrap(err)
-// 		return
-// 	}
-
-// 	if _, err = format.Format(f, &tk.Objekte); err != nil {
-// 		err = errors.Wrap(err)
-// 		return
-// 	}
-
-// 	return
-// }
-
-// TODO discard
-func (s *Store) MakeTempTypFiles(
-	tks schnittstellen.Set[kennung.Typ],
-) (ps []string, err error) {
-	errors.TodoP3("add support for working directory")
-
-	ps = make([]string, 0, tks.Len())
-
-	format := typ.MakeFormatText(s.storeObjekten)
-
-	if err = tks.Each(
-		func(tk kennung.Typ) (err error) {
-			var tt *typ.Transacted
-
-			if tt, err = s.storeObjekten.Typ().ReadOne(&tk); err != nil {
-				if errors.Is(err, objekte_store.ErrNotFound{}) {
-					err = nil
-					tt = &typ.Transacted{
-						Sku: sku.Transacted[kennung.Typ, *kennung.Typ]{
-							Kennung: tk,
-						},
-					}
-				} else {
-					err = errors.Wrap(err)
-					return
-				}
-			}
-
-			var f *os.File
-
-			if f, err = files.CreateExclusiveWriteOnly(
-				path.Join(
-					s.Cwd(),
-					fmt.Sprintf("%s.%s", tk.String(), s.erworben.FileExtensions.Typ),
-				),
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			defer errors.Deferred(&err, f.Close)
-
-			ps = append(ps, f.Name())
-
-			if _, err = format.Format(f, &tt.Objekte); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		},
-	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
