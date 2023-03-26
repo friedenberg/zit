@@ -23,6 +23,27 @@ func MakeCliFormat(
 	}
 }
 
+// [id.kasten@sha]
+func MakeCliFormatCheckedOut(
+	s standort.Standort,
+	cw format.FuncColorWriter,
+	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
+	tf schnittstellen.FuncWriterFormat[kennung.Kasten],
+) schnittstellen.FuncWriterFormat[CheckedOut] {
+	return func(w io.Writer, t CheckedOut) (n int64, err error) {
+		return format.Write(
+			w,
+			format.MakeFormatString("["),
+			cw(s.MakeWriterRelativePath(t.External.GetObjekteFD().Path), format.ColorTypePointer),
+			format.MakeFormatString("@"),
+			format.MakeWriter(sf, t.External.GetObjekteSha().GetSha()),
+			format.MakeFormatString(" "),
+			format.MakeWriter(tf, t.External.Sku.Kennung),
+			format.MakeFormatString("]"),
+		)
+	}
+}
+
 // [kasten.kasten@sha ]
 func MakeCliFormatExternal(
 	s standort.Standort,

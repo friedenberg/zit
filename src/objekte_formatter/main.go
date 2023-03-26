@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/hotel/etikett"
+	"github.com/friedenberg/zit/src/hotel/kasten"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/india/konfig"
 	"github.com/friedenberg/zit/src/juliett/zettel"
@@ -101,6 +102,22 @@ func MakeFormatter(
 
 		f.formatters[gattung.Etikett] = makeFuncFormatter(
 			ev.FuncFormatter(
+				out,
+				af,
+			),
+		)
+	}
+
+	if _, ok := ms.Get(gattung.Kasten); ok {
+		var kv kasten.FormatterValue
+
+		if err = kv.Set(v); err != nil {
+			err = errors.Normal(err)
+			return
+		}
+
+		f.formatters[gattung.Kasten] = makeFuncFormatter(
+			kv.FuncFormatter(
 				out,
 				af,
 			),

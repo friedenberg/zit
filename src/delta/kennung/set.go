@@ -221,6 +221,8 @@ func (s Set) ContainsMatchable(m Matchable) bool {
 	il := m.GetIdLike()
 
 	switch id := il.(type) {
+	case Kasten:
+
 	case Typ:
 		if s.Typen.Len() > 0 && !s.Typen.Contains(id) {
 			return false

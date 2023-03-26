@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/hotel/etikett"
+	"github.com/friedenberg/zit/src/hotel/kasten"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/cwd"
@@ -38,6 +39,14 @@ func (c Checkin) Run(
 				case *zettel.CheckedOut:
 					if _, err = u.StoreObjekten().Zettel().UpdateCheckedOut(
 						*aco,
+					); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+
+				case *kasten.CheckedOut:
+					if _, err = u.StoreObjekten().Kasten().CreateOrUpdateCheckedOut(
+						aco,
 					); err != nil {
 						err = errors.Wrap(err)
 						return

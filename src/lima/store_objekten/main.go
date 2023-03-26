@@ -88,15 +88,9 @@ func Make(
 		gattung.Etikett: objekte.MakeApplyQueryTransactedLike[*etikett.Transacted](
 			s.etikettStore.Query,
 		),
-		// gattung.Typ: objekte.MakeApplyTransactedLike[*typ.Transacted](
-		// 	s.typStore.ReadAllSchwanzen,
-		// ),
-		// gattung.Etikett: objekte.MakeApplyTransactedLike[*etikett.Transacted](
-		// 	s.etikettStore.ReadAllSchwanzen,
-		// ),
-		// gattung.Kasten: objekte.MakeApplyTransactedLike[*kasten.Transacted](
-		// 	s.kastenStore.ReadAllSchwanzen,
-		// ),
+		gattung.Kasten: objekte.MakeApplyQueryTransactedLike[*kasten.Transacted](
+			s.kastenStore.Query,
+		),
 		// gattung.Konfig:           objekte.MakeApplyTransactedLike[*konfig.Transacted](
 		// s.konfigStore.ReadAllSchwanzen,
 		// ),

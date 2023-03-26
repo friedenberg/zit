@@ -94,6 +94,15 @@ func (u *Umwelt) PrinterTypCheckedOut() schnittstellen.FuncIter[*typ.CheckedOut]
 	)
 }
 
+func (u *Umwelt) PrinterKastenCheckedOut() schnittstellen.FuncIter[*kasten.CheckedOut] {
+	return format.MakeWriterToWithNewLines(
+		u.Out(),
+		wrapWithCheckedOutState(
+			u.FormatKastenCheckedOut(),
+		),
+	)
+}
+
 func (u *Umwelt) PrinterEtikettCheckedOut() schnittstellen.FuncIter[*etikett.CheckedOut] {
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
@@ -126,6 +135,7 @@ func (u *Umwelt) PrinterTransactedLike() schnittstellen.FuncIter[objekte.Transac
 	z := u.FormatZettelTransacted()
 	t := u.FormatTypTransacted()
 	e := u.FormatEtikettTransacted()
+	k := u.FormatKastenTransacted()
 
 	return format.MakeWriterToWithNewLines2(
 		u.Out(),
@@ -141,6 +151,9 @@ func (u *Umwelt) PrinterTransactedLike() schnittstellen.FuncIter[objekte.Transac
 
 				case *etikett.Transacted:
 					return e(out, *atl)
+
+				case *kasten.Transacted:
+					return k(out, *atl)
 
 				default:
 					err = todo.Implement()
@@ -254,6 +267,7 @@ func (u *Umwelt) PrinterCheckedOutLike() schnittstellen.FuncIter[objekte.Checked
 	pzco := u.PrinterZettelCheckedOut()
 	ptco := u.PrinterTypCheckedOut()
 	peco := u.PrinterEtikettCheckedOut()
+	pkco := u.PrinterKastenCheckedOut()
 
 	return func(co objekte.CheckedOutLike) (err error) {
 		sk2 := co.GetInternal().GetSku2()
@@ -270,6 +284,10 @@ func (u *Umwelt) PrinterCheckedOutLike() schnittstellen.FuncIter[objekte.Checked
 		case gattung.Etikett:
 			coz := co.(*etikett.CheckedOut)
 			return peco(coz)
+
+		case gattung.Kasten:
+			coz := co.(*kasten.CheckedOut)
+			return pkco(coz)
 
 		default:
 			_, err = fmt.Fprintf(

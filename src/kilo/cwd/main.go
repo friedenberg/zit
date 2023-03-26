@@ -54,6 +54,15 @@ func (fs CwdFiles) EachCreatableMatchable(
 		return
 	}
 
+	if err = fs.Kisten.Each(
+		func(e Kasten) (err error) {
+			return m(e)
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	return
 }
 
@@ -69,6 +78,9 @@ func (fs CwdFiles) ContainsMatchable(m kennung.Matchable) bool {
 
 	case gattung.Etikett:
 		return fs.Etiketten.ContainsKey(m.GetIdLike().String())
+
+	case gattung.Kasten:
+		return fs.Kisten.ContainsKey(m.GetIdLike().String())
 	}
 
 	return true
