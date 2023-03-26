@@ -17,7 +17,7 @@ func MakeCliFormat(
 
 		return format.Write(
 			w,
-			format.MakeFormatString("!"),
+			format.MakeFormatString("//"),
 			cw(format.MakeFormatString("%s", v), format.ColorTypeType),
 		)
 	}
