@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/ohio"
 )
 
 type Reader struct {
@@ -26,7 +27,7 @@ func (mr *Reader) ReadFrom(r1 io.Reader) (n int64, err error) {
 		return
 	}
 
-	var metadatei, akte pipedReaderFrom
+	var metadatei, akte ohio.PipedReaderFrom
 	var state readerState
 
 	isEOF := false
@@ -72,14 +73,14 @@ LINE_READ_LOOP:
 
 			state += 1
 
-			metadatei = makePipedReaderFrom(mr.Metadatei)
+			metadatei = ohio.MakePipedReaderFrom(mr.Metadatei)
 
 		case readerStateFirstBoundary:
 			if line == Boundary {
-				msg := metadatei.Close()
+				_, err = metadatei.Close()
 
-				if msg.err != nil {
-					err = errors.Wrapf(msg.err, "metadatei read failed")
+				if err != nil {
+					err = errors.Wrapf(err, "metadatei read failed")
 					return
 				}
 
@@ -87,7 +88,7 @@ LINE_READ_LOOP:
 				break
 			}
 
-			if _, err = metadatei.PipeWriter.Write([]byte(rawLine)); err != nil {
+			if _, err = metadatei.Write([]byte(rawLine)); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -101,16 +102,16 @@ LINE_READ_LOOP:
 		}
 	}
 
-	akte = makePipedReaderFrom(mr.Akte)
+	akte = ohio.MakePipedReaderFrom(mr.Akte)
 
 	var n1 int64
-	n1, err = r.WriteTo(akte.PipeWriter)
+	n1, err = r.WriteTo(akte)
 	n += n1
 
-	msg := akte.Close()
+	_, err = akte.Close()
 
-	if msg.err != nil {
-		err = errors.Wrapf(msg.err, "akte read failed")
+	if err != nil {
+		err = errors.Wrapf(err, "akte read failed")
 		return
 	}
 

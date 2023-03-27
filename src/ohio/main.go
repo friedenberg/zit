@@ -1,10 +1,15 @@
-package metadatei_io
+package ohio
 
 import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 )
+
+type PipedReaderFrom interface {
+	Close() (n int64, err error)
+	io.Writer
+}
 
 type pipedReaderFrom struct {
 	*io.PipeWriter
@@ -16,7 +21,9 @@ type readFromDone struct {
 	err error
 }
 
-func makePipedReaderFrom(r io.ReaderFrom) (p pipedReaderFrom) {
+func MakePipedReaderFrom(r io.ReaderFrom) PipedReaderFrom {
+	var p pipedReaderFrom
+
 	var pr *io.PipeReader
 	pr, p.PipeWriter = io.Pipe()
 	p.ch = make(chan readFromDone)
@@ -32,13 +39,15 @@ func makePipedReaderFrom(r io.ReaderFrom) (p pipedReaderFrom) {
 		p.ch <- msg
 	}()
 
-	return
+	return p
 }
 
-func (p pipedReaderFrom) Close() (out readFromDone) {
+func (p pipedReaderFrom) Close() (n int64, err error) {
 	if p.PipeWriter != nil {
 		p.PipeWriter.Close()
-		out = <-p.ch
+		out := <-p.ch
+		n = out.n
+		err = out.err
 	}
 
 	return
