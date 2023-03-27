@@ -22,17 +22,6 @@ type Transacted[
 	Sku           sku.Transacted[T2, T3]
 }
 
-func (t Transacted[T, T1, T2, T3, T4, T5]) Stored() *Stored[T, T1, T2, T3] {
-	return &Stored[T, T1, T2, T3]{
-		Objekte: t.Objekte,
-		Sku: sku.External[T2, T3]{
-			ObjekteSha: t.Sku.ObjekteSha,
-			AkteSha:    t.Sku.AkteSha,
-			Kennung:    t.Sku.Kennung,
-		},
-	}
-}
-
 func (t Transacted[T, T1, T2, T3, T4, T5]) Kennung() T3 {
 	return &t.Sku.Kennung
 }

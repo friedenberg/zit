@@ -50,7 +50,7 @@ func SubtractPrefix(s1 EtikettSet, e Etikett) (s2 EtikettSet) {
 }
 
 func Description(s EtikettSet) string {
-	return collections.StringCommaSeparated(s)
+	return collections.StringCommaSeparated[Etikett](s)
 }
 
 func WithRemovedCommonPrefixes(s EtikettSet) (s2 EtikettSet) {

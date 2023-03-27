@@ -161,8 +161,8 @@ func (atc AssignmentTreeConstructor) makeChildren(
 	)
 
 	sort.Slice(parent.children, func(i, j int) bool {
-		vi := collections.StringCommaSeparated(parent.children[i].etiketten)
-		vj := collections.StringCommaSeparated(parent.children[j].etiketten)
+		vi := collections.StringCommaSeparated[kennung.Etikett](parent.children[i].etiketten)
+		vj := collections.StringCommaSeparated[kennung.Etikett](parent.children[j].etiketten)
 		return vi < vj
 	})
 

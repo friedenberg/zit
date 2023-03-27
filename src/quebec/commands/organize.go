@@ -29,9 +29,9 @@ type Organize struct {
 }
 
 func init() {
-	registerCommand(
+	registerCommandWithQuery(
 		"organize",
-		func(f *flag.FlagSet) Command {
+		func(f *flag.FlagSet) CommandWithQuery {
 			c := &Organize{
 				Flags: organize_text.MakeFlags(),
 			}
@@ -42,10 +42,14 @@ func init() {
 
 			c.Flags.AddToFlagSet(f)
 
-			return commandWithIds{
-				CommandWithIds: c,
-			}
+			return c
 		},
+	)
+}
+
+func (c *Organize) DefaultGattungen() gattungen.Set {
+	return gattungen.MakeSet(
+		gattung.Zettel,
 	)
 }
 
@@ -57,13 +61,19 @@ func (c *Organize) CompletionGattung() gattungen.Set {
 	)
 }
 
-func (c *Organize) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
+func (c *Organize) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
 	c.Options.Konfig = u.Konfig()
 	c.Options.Abbr = u.StoreObjekten().GetAbbrStore().AbbreviateHinweis
 
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
 		Umwelt:  u,
 		Options: c.Flags.GetOptions(),
+	}
+
+	ids, ok := ms.GetSet(gattung.Zettel)
+
+	if !ok {
+		ids = ms.MakeSet()
 	}
 
 	createOrganizeFileOp.RootEtiketten = ids.Etiketten.GetIncludes()

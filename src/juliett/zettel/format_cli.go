@@ -13,14 +13,14 @@ import (
 // !typ "bez"
 func MakeCliFormat(
 	bf schnittstellen.FuncWriterFormat[bezeichnung.Bezeichnung],
-	ef schnittstellen.FuncWriterFormat[kennung.EtikettSet],
+	ef schnittstellen.FuncWriterFormat[schnittstellen.SetLike[kennung.Etikett]],
 	tf schnittstellen.FuncWriterFormat[kennung.Typ],
 ) schnittstellen.FuncWriterFormat[Objekte] {
 	return func(w io.Writer, z Objekte) (n int64, err error) {
 		var lastWriter schnittstellen.FuncWriter
 
 		if z.Bezeichnung.IsEmpty() {
-			lastWriter = format.MakeWriter(ef, z.Etiketten)
+			lastWriter = format.MakeWriter(ef, schnittstellen.SetLike[kennung.Etikett](z.Etiketten))
 		} else {
 			lastWriter = format.MakeWriter(bf, z.Bezeichnung)
 		}

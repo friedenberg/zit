@@ -45,7 +45,7 @@ func TestMakeEtiketten(t1 *testing.T) {
 	}
 
 	{
-		ac := collections.SortedStrings(sut)
+		ac := collections.SortedStrings[kennung.Etikett](sut)
 
 		if !reflect.DeepEqual(ac, vs) {
 			t.Fatalf("expected %q but got %q", vs, ac)
@@ -54,7 +54,7 @@ func TestMakeEtiketten(t1 *testing.T) {
 
 	{
 		ex := "tag1, tag2, tag3"
-		ac := collections.StringCommaSeparated(sut)
+		ac := collections.StringCommaSeparated[kennung.Etikett](sut)
 
 		if ac != ex {
 			t.Fatalf("expected %q but got %q", ex, ac)
@@ -63,7 +63,7 @@ func TestMakeEtiketten(t1 *testing.T) {
 
 	{
 		ex := "tag1, tag2, tag3"
-		ac := collections.StringCommaSeparated(sut.ImmutableClone())
+		ac := collections.StringCommaSeparated[kennung.Etikett](sut.ImmutableClone())
 
 		if ac != ex {
 			t.Fatalf("expected %q but got %q", ex, ac)

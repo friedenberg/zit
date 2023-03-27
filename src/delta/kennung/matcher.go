@@ -89,9 +89,10 @@ type matcherEtiketten struct {
 	schnittstellen.MutableSet[Etikett]
 }
 
-func (f matcherEtiketten) ContainsMatchable(m Matchable) bool {
+func (f matcherEtiketten) ContainsMatchable(m Matchable) (ok bool) {
 	todo.Optimize()
-	return iter.AnyOrFalseEmpty[Etikett](f, m.GetEtiketten().Contains)
+	ok = iter.AnyOrFalseEmpty[Etikett](f, m.GetEtikettenExpanded().Contains)
+	return
 }
 
 func MakeMatcherFuncIter[T Matchable](m Matcher) schnittstellen.FuncIter[T] {

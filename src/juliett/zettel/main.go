@@ -6,13 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/golf/objekte"
 )
 
-type Stored = objekte.Stored[
-	Objekte,
-	*Objekte,
-	kennung.Hinweis,
-	*kennung.Hinweis,
-]
-
 type Sku = sku.Transacted[kennung.Hinweis, *kennung.Hinweis]
 
 type Transacted = objekte.Transacted[

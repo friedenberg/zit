@@ -159,7 +159,7 @@ func TestExpandedRight(t *testing.T) {
 		"zz-archive-task-done",
 	}
 
-	actual := collections.SortedStrings(ex)
+	actual := collections.SortedStrings[Etikett](ex)
 
 	if !stringSliceEquals(actual, expected) {
 		t.Errorf(
@@ -182,7 +182,7 @@ func TestPrefixIntersection(t *testing.T) {
 		"project-2021-zit",
 	}
 
-	actual := collections.SortedStrings(ex)
+	actual := collections.SortedStrings[Etikett](ex)
 
 	if !stringSliceEquals(actual, expected) {
 		t.Errorf(

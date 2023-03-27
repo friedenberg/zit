@@ -62,7 +62,7 @@ func (m *Metadatei) ReadFrom(r1 io.Reader) (n int64, err error) {
 func (m Metadatei) WriteTo(w1 io.Writer) (n int64, err error) {
 	w := format.NewLineWriter()
 
-	for _, e := range collections.SortedStrings(m.EtikettSet) {
+	for _, e := range collections.SortedStrings[kennung.Etikett](m.EtikettSet) {
 		w.WriteFormat("- %s", e)
 	}
 

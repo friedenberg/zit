@@ -98,7 +98,7 @@ func (a assignment) String() (s string) {
 		s = a.parent.String() + "."
 	}
 
-	return s + collections.StringCommaSeparated(a.etiketten)
+	return s + collections.StringCommaSeparated[kennung.Etikett](a.etiketten)
 }
 
 func (a *assignment) addChild(c *assignment) {

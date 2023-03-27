@@ -186,8 +186,8 @@ func (atc *Refiner) Refine(a *assignment) (err error) {
 	}
 
 	sort.Slice(a.children, func(i, j int) bool {
-		vi := collections.StringCommaSeparated(a.children[i].etiketten)
-		vj := collections.StringCommaSeparated(a.children[j].etiketten)
+		vi := collections.StringCommaSeparated[kennung.Etikett](a.children[i].etiketten)
+		vj := collections.StringCommaSeparated[kennung.Etikett](a.children[j].etiketten)
 		return vi < vj
 	})
 

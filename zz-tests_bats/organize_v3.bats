@@ -755,6 +755,7 @@ function zettels_in_correct_places { # @test
 
 	run_zit organize "${cmd_def_organize_v3[@]}" -mode output-only -group-by inventory \
 		inventory-pipe_shelves-atheist_shoes_box-jabra_yellow_box_2
+	assert_success
 
 	assert_output "$(cat "$expected_organize")"
 }
@@ -775,6 +776,7 @@ function etiketten_correct { # @test
 	} >"$first_organize"
 
 	run_zit organize "${cmd_def_organize_v3[@]}" -mode commit-directly <"$first_organize"
+	assert_success
 
 	expected_etiketten="$(mktemp)"
 	{
@@ -782,6 +784,7 @@ function etiketten_correct { # @test
 	} >"$expected_etiketten"
 
 	run_zit cat -gattung etikett
+	assert_success
 	assert_output "$(cat "$expected_etiketten")"
 
 	mkdir -p one
@@ -793,6 +796,7 @@ function etiketten_correct { # @test
 	} >"one/uno.zettel"
 
 	run_zit checkin one/uno.zettel
+	assert_success
 	assert_output '[one/uno@434ac2ce37a09162b08a9840ab91d659eec30ab12a7221bde122d35dcd530cc3 !md test4]'
 
 	expected_etiketten="$(mktemp)"

@@ -66,9 +66,9 @@ func MakeStringer(
 }
 
 func MakeFormatStringer[T schnittstellen.ValueLike](
-	sf schnittstellen.FuncString[schnittstellen.Set[T]],
-) schnittstellen.FuncWriterFormat[schnittstellen.Set[T]] {
-	return func(w io.Writer, e schnittstellen.Set[T]) (n int64, err error) {
+	sf schnittstellen.FuncString[schnittstellen.SetLike[T]],
+) schnittstellen.FuncWriterFormat[schnittstellen.SetLike[T]] {
+	return func(w io.Writer, e schnittstellen.SetLike[T]) (n int64, err error) {
 		var n1 int
 
 		if n1, err = io.WriteString(w, sf(e)); err != nil {

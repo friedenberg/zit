@@ -12,7 +12,7 @@ type TypVerzeichnisse struct {
 
 func (z *TypVerzeichnisse) ResetWithTyp(t kennung.Typ) {
 	ex := kennung.ExpandOne(t, kennung.ExpanderAll)
-	z.Expanded = collections.SortedStrings(ex)
+	z.Expanded = collections.SortedStrings[kennung.Typ](ex)
 }
 
 func (z *TypVerzeichnisse) Reset() {

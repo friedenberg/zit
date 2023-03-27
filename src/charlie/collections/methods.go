@@ -190,7 +190,7 @@ func SortedValues[E schnittstellen.Value[E]](
 }
 
 func Strings[E schnittstellen.ValueLike](
-	c schnittstellen.Set[E],
+	c schnittstellen.SetLike[E],
 ) (out []string) {
 	out = make([]string, 0, c.Len())
 
@@ -205,7 +205,7 @@ func Strings[E schnittstellen.ValueLike](
 }
 
 func SortedStrings[E schnittstellen.ValueLike](
-	c schnittstellen.Set[E],
+	c schnittstellen.SetLike[E],
 ) (out []string) {
 	out = Strings(c)
 
@@ -215,7 +215,7 @@ func SortedStrings[E schnittstellen.ValueLike](
 }
 
 func StringDelimiterSeparated[E schnittstellen.Value[E]](
-	c schnittstellen.Set[E],
+	c schnittstellen.SetLike[E],
 	d string,
 ) string {
 	if c == nil {
@@ -241,7 +241,7 @@ func StringDelimiterSeparated[E schnittstellen.Value[E]](
 }
 
 func StringCommaSeparated[E schnittstellen.Value[E]](
-	c schnittstellen.Set[E],
+	c schnittstellen.SetLike[E],
 ) string {
 	return StringDelimiterSeparated(c, ", ")
 }

@@ -268,18 +268,9 @@ func (u Umwelt) Flush() error {
 	return u.age.Close()
 }
 
-func (u *Umwelt) MakeKennungQueryHidden() (out kennung.QuerySet[kennung.Etikett, *kennung.Etikett]) {
-	out = kennung.MakeQuerySet[kennung.Etikett, *kennung.Etikett](
-		u.MakeKennungExpanders().Etikett,
-		nil,
-		u.Konfig().EtikettenHidden,
-	)
-
+func (u *Umwelt) MakeKennungHidden() (h kennung.Matcher) {
+	h = kennung.MakeMatcherEtiketten(u.Konfig().EtikettenHidden)
 	return
-}
-
-func (u *Umwelt) MakeKennungHidden() kennung.Matcher {
-	return kennung.MakeMatcherEtiketten(u.Konfig().EtikettenHidden)
 }
 
 func (u *Umwelt) MakeKennungExpanders() kennung.Expanders {
@@ -313,10 +304,12 @@ func (u *Umwelt) MakeMetaIdSet(
 		dg = gattungen.MakeSet(gattung.Zettel)
 	}
 
+	exc := u.MakeKennungHidden()
+
 	return kennung.MakeMetaSet(
 		cwd,
 		u.MakeKennungExpanders(),
-		u.MakeKennungHidden(),
+		exc,
 		u.Konfig().FileExtensions,
 		dg,
 	)

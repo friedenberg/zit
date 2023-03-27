@@ -1,50 +1,29 @@
-package zettel
+package metadatei
 
 import (
 	"strings"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 )
 
-type Objekte struct {
-	Akte        sha.Sha
-	Typ         kennung.Typ
+type Metadatei struct {
 	Bezeichnung bezeichnung.Bezeichnung
 	Etiketten   kennung.EtikettSet
+	Typ         kennung.Typ
 }
 
-func (z Objekte) GetTyp() kennung.Typ {
+func (z Metadatei) GetTyp() kennung.Typ {
 	return z.Typ
 }
 
-func (z Objekte) GetEtiketten() schnittstellen.Set[kennung.Etikett] {
+func (z Metadatei) GetEtiketten() schnittstellen.Set[kennung.Etikett] {
 	return z.Etiketten.ImmutableClone()
 }
 
-func (z Objekte) GetGattung() schnittstellen.Gattung {
-	return gattung.Zettel
-}
-
-func (z Objekte) GetAkteSha() schnittstellen.Sha {
-	return z.Akte
-}
-
-func (z *Objekte) SetAkteSha(v schnittstellen.Sha) {
-	z.Akte = sha.Make(v)
-}
-
-func (z Objekte) Equals(z1 Objekte) bool {
-	errors.TodoP4("figure out why this doesn't always work for `status`")
-	if !z.Akte.Equals(z1.Akte) {
-		return false
-	}
-
+func (z Metadatei) Equals(z1 Metadatei) bool {
 	if !z.Typ.Equals(z1.Typ) {
 		return false
 	}
@@ -60,7 +39,7 @@ func (z Objekte) Equals(z1 Objekte) bool {
 	return true
 }
 
-func (z Objekte) IsEmpty() bool {
+func (z Metadatei) IsEmpty() bool {
 	if strings.TrimSpace(z.Bezeichnung.String()) != "" {
 		return false
 	}
@@ -69,28 +48,22 @@ func (z Objekte) IsEmpty() bool {
 		return false
 	}
 
-	if !z.Akte.IsNull() {
-		return false
-	}
-
 	return true
 }
 
-func (z *Objekte) Reset() {
-	z.Akte = sha.Sha{}
+func (z *Metadatei) Reset() {
 	z.Typ = kennung.Typ{}
 	z.Bezeichnung.Reset()
 	z.Etiketten = kennung.MakeEtikettSet()
 }
 
-func (z *Objekte) ResetWith(z1 Objekte) {
-	z.Akte = z1.Akte
+func (z *Metadatei) ResetWith(z1 Metadatei) {
 	z.Typ = z1.Typ
 	z.Bezeichnung = z1.Bezeichnung
 	z.Etiketten = z1.Etiketten.ImmutableClone()
 }
 
-func (z Objekte) Description() (d string) {
+func (z Metadatei) Description() (d string) {
 	d = z.Bezeichnung.String()
 
 	if strings.TrimSpace(d) == "" {

@@ -154,8 +154,18 @@ func (kqs mutableQuerySet[T, TPtr]) ContainsAgainst(els schnittstellen.Set[T]) b
 		return kqs.Include.Len() == 0
 	}
 
-	if (kqs.Include.Len() == 0 || iter.Any(els, kqs.Include.Contains)) &&
-		(kqs.Exclude.Len() == 0 || !iter.Any(els, kqs.Exclude.Contains)) {
+	includeTridexContains := func(e T) (ok bool) {
+		ok = kqs.Include.ContainsExpansion(e.String())
+		return
+	}
+
+	excludeTridexContains := func(e T) (ok bool) {
+		ok = kqs.Exclude.ContainsExpansion(e.String())
+		return
+	}
+
+	if (kqs.Include.Len() == 0 || iter.Any(els, includeTridexContains)) &&
+		(kqs.Exclude.Len() == 0 || !iter.Any(els, excludeTridexContains)) {
 		return true
 	}
 

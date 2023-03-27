@@ -76,7 +76,7 @@ func TestExpansionAll(t1 *testing.T) {
 		"this-is-a-tag",
 	}
 
-	actual := collections.SortedStrings(ex)
+	actual := collections.SortedStrings[Etikett](ex)
 
 	if !stringSliceEquals(actual, expected) {
 		t.Errorf(
@@ -97,7 +97,7 @@ func TestExpansionRight(t *testing.T) {
 		"this-is-a-tag",
 	}
 
-	actual := collections.SortedStrings(ex)
+	actual := collections.SortedStrings[Etikett](ex)
 
 	if !stringSliceEquals(actual, expected) {
 		t.Errorf(
