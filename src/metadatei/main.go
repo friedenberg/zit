@@ -39,18 +39,6 @@ func (z Metadatei) Equals(z1 Metadatei) bool {
 	return true
 }
 
-func (z Metadatei) IsEmpty() bool {
-	if strings.TrimSpace(z.Bezeichnung.String()) != "" {
-		return false
-	}
-
-	if z.Etiketten.Len() > 0 {
-		return false
-	}
-
-	return true
-}
-
 func (z *Metadatei) Reset() {
 	z.Typ = kennung.Typ{}
 	z.Bezeichnung.Reset()

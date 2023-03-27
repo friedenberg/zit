@@ -1,6 +1,7 @@
 package sha
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"hash"
 	"io"
@@ -119,4 +120,53 @@ func (nrc nopReadCloser) WriteTo(w io.Writer) (n int64, err error) {
 
 func (nrc nopReadCloser) Sha() schnittstellen.Sha {
 	return Sha{}
+}
+
+type nopAkteFactory struct{}
+
+func NopAkteFactory() schnittstellen.AkteIOFactory {
+	return nopAkteFactory{}
+}
+
+func (_ nopAkteFactory) AkteWriter() (WriteCloser, error) {
+	return NewNopWriter(), nil
+}
+
+func (_ nopAkteFactory) AkteReader(s ShaLike) (ReadCloser, error) {
+	return MakeNopReadCloser(io.NopCloser(bytes.NewBuffer(nil))), nil
+}
+
+type nopWriter struct {
+	hash hash.Hash
+}
+
+func NewNopWriter() (w *nopWriter) {
+	w = &nopWriter{
+		hash: sha256.New(),
+	}
+
+	return
+}
+
+func (w *nopWriter) ReadFrom(r io.Reader) (n int64, err error) {
+	if n, err = io.Copy(w.hash, r); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (w *nopWriter) Write(p []byte) (n int, err error) {
+	return w.hash.Write(p)
+}
+
+func (w *nopWriter) Close() (err error) {
+	return
+}
+
+func (w *nopWriter) Sha() (s schnittstellen.Sha) {
+	s = FromHash(w.hash)
+
+	return
 }
