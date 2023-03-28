@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 )
@@ -241,6 +242,11 @@ func (ms metaSet) GetFDs() schnittstellen.Set[FD] {
 
 func (ms metaSet) MakeSet() Set {
 	return MakeSet(ms.cwd, ms.expanders, ms.Hidden)
+}
+
+func (s metaSet) ContainsMatchable(m Matchable) bool {
+	todo.Implement()
+	return false
 }
 
 // Runs in parallel

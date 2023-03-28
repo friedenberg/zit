@@ -187,14 +187,44 @@ func (s Set) String() string {
 	return sb.String()
 }
 
+func (s Set) excludeCwd(m Matchable) (ok bool) {
+	if !s.Sigil.IncludesCwd() {
+		return
+	}
+
+	if s.cwd == nil {
+		return
+	}
+
+	if !s.cwd.ContainsMatchable(m) {
+		ok = true
+	}
+
+	return
+}
+
+func (s Set) excludeSigil(m Matchable) (ok bool) {
+	if s.Sigil.IncludesHidden() {
+		return
+	}
+
+	if s.hidden == nil {
+		return
+	}
+
+	if s.hidden.ContainsMatchable(m) {
+		ok = true
+	}
+
+	return
+}
+
 func (s Set) ContainsMatchable(m Matchable) bool {
-	if s.cwd != nil && !s.cwd.ContainsMatchable(m) {
+	if s.excludeCwd(m) {
 		return false
 	}
 
-	if !s.Sigil.IncludesHidden() &&
-		s.hidden != nil &&
-		s.hidden.ContainsMatchable(m) {
+	if s.excludeSigil(m) {
 		return false
 	}
 
