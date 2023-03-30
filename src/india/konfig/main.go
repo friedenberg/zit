@@ -40,6 +40,14 @@ func (a *Compiled) ResetWithInner(b compiled) {
 	a.compiled = b
 }
 
+func (a Compiled) GetErworben() erworben.Akte {
+	return a.Akte
+}
+
+func (a *Compiled) GetErworbenPtr() *erworben.Akte {
+	return &a.Akte
+}
+
 type cli = erworben.Cli
 
 type compiled struct {
@@ -57,7 +65,7 @@ type compiled struct {
 
 	// Typen
 	ExtensionsToTypen map[string]string
-	DefaultTyp        typ.Transacted
+	DefaultTyp        typ.Transacted //deprecated
 	Typen             typSet
 
 	// Kasten

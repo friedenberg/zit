@@ -1,3 +1,4 @@
+DefaultTyp = 'md'
 recipients = []
 
 [file-extensions]

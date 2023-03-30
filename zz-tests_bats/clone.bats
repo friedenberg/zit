@@ -42,7 +42,11 @@ function clone { # @test
 		"$wd1" +zettel,typ
 
 	assert_success
-	assert_output --partial '[!md@eaa85e80de6d1129a21365a8ce2a49ca752457d10932a7d73001b4ebded302c7]'
-	assert_output --partial '[konfig@7633ddede5e2acbc3fb490417c0504790a94ea8cd726e4f9156115a8fa61173e]'
-	assert_output --partial '[one/uno@37d3869e9b1711f009eabf69a2bf294cfd785f5b1c7463cba77d11d5f81f5e09 !md "wow"]'
+	assert_output_unsorted - <<-EOM
+		[!md@eaa85e80de6d1129a21365a8ce2a49ca752457d10932a7d73001b4ebded302c7]
+		[!md@eaa85e80de6d1129a21365a8ce2a49ca752457d10932a7d73001b4ebded302c7]
+		[konfig@7a09788554068a2e1012fe0fbd152bb8d24cd95e15407af4b28e753f151e6534]
+		[konfig@7a09788554068a2e1012fe0fbd152bb8d24cd95e15407af4b28e753f151e6534]
+		[one/uno@37d3869e9b1711f009eabf69a2bf294cfd785f5b1c7463cba77d11d5f81f5e09 !md "wow"]
+	EOM
 }
