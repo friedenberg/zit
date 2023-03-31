@@ -17,12 +17,12 @@ import (
 type fileEncoder struct {
 	mode int
 	perm os.FileMode
-	arf  schnittstellen.AkteReaderFactory
+	arf  schnittstellen.AkteIOFactory
 	ic   typ.InlineChecker
 }
 
 func MakeFileEncoder(
-	arf schnittstellen.AkteReaderFactory,
+	arf schnittstellen.AkteIOFactory,
 	ic typ.InlineChecker,
 ) fileEncoder {
 	return fileEncoder{
@@ -34,7 +34,7 @@ func MakeFileEncoder(
 }
 
 func MakeFileEncoderJustOpen(
-	arf schnittstellen.AkteReaderFactory,
+	arf schnittstellen.AkteIOFactory,
 	ic typ.InlineChecker,
 ) fileEncoder {
 	return fileEncoder{
@@ -45,8 +45,21 @@ func MakeFileEncoderJustOpen(
 	}
 }
 
-func (e *fileEncoder) openOrCreate(p string) (*os.File, error) {
-	return files.OpenFile(p, e.mode, e.perm)
+func (e *fileEncoder) openOrCreate(p string) (f *os.File, err error) {
+	if f, err = files.OpenFile(p, e.mode, e.perm); err != nil {
+		if errors.IsExist(err) {
+			var err2 error
+
+			if f, err2 = files.OpenExclusiveReadOnly(p); err2 != nil {
+				err = errors.Wrap(err2)
+			}
+		} else {
+			err = errors.Wrap(err)
+		}
+		return
+	}
+
+	return
 }
 
 func (e *fileEncoder) EncodeObjekte(
@@ -69,28 +82,52 @@ func (e *fileEncoder) EncodeObjekte(
 
 	defer errors.DeferredCloser(&err, ar)
 
+	meta := &zettel.Metadatei{
+		Objekte:  *z,
+		AktePath: aktePath,
+	}
 	mw := metadatei_io.Writer{
-		Metadatei: format.MakeWriterTo2(
-			mtw.Format,
-			&zettel.Metadatei{
-				Objekte:  *z,
-				AktePath: aktePath,
-			},
-		),
+		Metadatei: format.MakeWriterTo2(mtw.Format, meta),
 	}
 
 	switch {
 	case aktePath != "" && objektePath != "":
 		var fAkte, fZettel *os.File
 
-		if fAkte, err = e.openOrCreate(
-			aktePath,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+		{
+			if fAkte, err = e.openOrCreate(
+				aktePath,
+			); err != nil {
+				if errors.IsExist(err) {
+					var aw sha.WriteCloser
 
-		defer errors.Deferred(&err, fAkte.Close)
+					if aw, err = e.arf.AkteWriter(); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+
+					defer errors.DeferredCloser(&err, aw)
+
+					if _, err = io.Copy(aw, fAkte); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+
+					meta.Objekte.Akte = sha.Make(aw.Sha())
+
+				} else {
+					err = errors.Wrap(err)
+					return
+				}
+			} else {
+				defer errors.DeferredCloser(&err, fAkte)
+
+				if _, err = io.Copy(fAkte, ar); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			}
+		}
 
 		if fZettel, err = e.openOrCreate(
 			objektePath,
@@ -99,14 +136,9 @@ func (e *fileEncoder) EncodeObjekte(
 			return
 		}
 
-		defer errors.Deferred(&err, fZettel.Close)
+		defer errors.DeferredCloser(&err, fZettel)
 
 		if _, err = mw.WriteTo(fZettel); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if _, err = io.Copy(fAkte, ar); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
