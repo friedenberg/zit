@@ -71,6 +71,40 @@ function add_1 { # @test
 	EOM
 }
 
+function add_2 { # @test
+	wd="$(mktemp -d)"
+	cd "$wd" || exit 1
+
+	run_zit_init_disable_age
+	assert_success
+
+	f=to_add.md
+	{
+		echo test file
+	} >"$f"
+
+	f2=to_add2.md
+	{
+		echo test file 2
+	} >"$f2"
+
+	run_zit add \
+		-dedupe \
+		-delete \
+		-etiketten zz-inbox-2022-11-14 \
+		"$f" "$f2"
+
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[one/uno@8f8aa93ce3cb3da0e5eddb2c9556fe37980d0aaf58f2760de451a93ce337b0c2 !md "to_add"]
+		[one/uno@8f8aa93ce3cb3da0e5eddb2c9556fe37980d0aaf58f2760de451a93ce337b0c2 !md "to_add"]
+		[one/dos@02425f5295479fc80efd565abe728696072de2422958209ef32ffb39427d80a1 !md "to_add2"]
+		[one/dos@02425f5295479fc80efd565abe728696072de2422958209ef32ffb39427d80a1 !md "to_add2"]
+		[to_add.md] (deleted)
+		[to_add2.md] (deleted)
+	EOM
+}
+
 function add_dedupe_1 { # @test
 	skip
 	wd="$(mktemp -d)"
