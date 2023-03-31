@@ -68,6 +68,8 @@ func (pz ProtoZettel) Equals(z Objekte) (ok bool) {
 }
 
 func (pz ProtoZettel) Make() (z *Objekte) {
+	todo.Change("add typ")
+	todo.Change("add Bezeichnung")
 	z = &Objekte{
 		Etiketten: kennung.MakeEtikettSet(),
 	}
@@ -90,6 +92,39 @@ func (pz ProtoZettel) Apply(z *Objekte) (ok bool) {
 
 	if pz.Etiketten.Len() > 0 {
 		ok = true
+	}
+
+	mes := z.Etiketten.MutableClone()
+	pz.Etiketten.Each(mes.Add)
+	z.Etiketten = mes.ImmutableClone()
+
+	return
+}
+
+func (pz ProtoZettel) ApplyWithAkteFD(z *Objekte, akteFD kennung.FD) (err error) {
+	if z.Typ.IsEmpty() && !pz.Typ.IsEmpty() && !z.Typ.Equals(pz.Typ) {
+		z.Typ = pz.Typ
+	} else {
+		// TODO-P4 use konfig
+		ext := akteFD.Ext()
+
+		if ext != "" {
+			if err = z.Typ.Set(akteFD.Ext()); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+	}
+
+	bez := akteFD.FileNameSansExt()
+
+	if pz.Bezeichnung.WasSet() && !z.Bezeichnung.Equals(pz.Bezeichnung) {
+		bez = pz.Bezeichnung.String()
+	}
+
+	if err = z.Bezeichnung.Set(bez); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	mes := z.Etiketten.MutableClone()

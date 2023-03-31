@@ -3,7 +3,6 @@ package user_ops
 import (
 	"io"
 	"os"
-	"path"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/iter"
@@ -198,23 +197,7 @@ func (c ZettelFromExternalAkte) zettelForAkte(
 	z.Objekte.Reset()
 	z.Objekte.Akte = sha.Make(akteWriter.Sha())
 
-	// TODO-P4 move to protozettel
-	if err = z.Objekte.Bezeichnung.Set(
-		path.Base(akteFD.Path),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	// TODO-P4 use konfig
-	ext := akteFD.Ext()
-
-	if ext != "" {
-		if err = z.Objekte.Typ.Set(akteFD.Ext()); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
+	c.ProtoZettel.ApplyWithAkteFD(&z.Objekte, akteFD)
 
 	return
 }

@@ -26,9 +26,23 @@ function add { # @test
 		"$f"
 
 	assert_success
-	assert_output --partial '[one/uno@45e1f5fbfe972f697f4f4f4b77a21f6395e4cf3a1f0ca16d34a675e447ab3778 !md "to_add.md"]'
-	assert_output --partial '[one/uno@11327fbe60cabd2a9eabf4a37d541cf04b539f913945897efe9bab1e30784781 !md "to_add.md"]'
-	assert_output --partial '[to_add.md] (deleted)'
+	assert_output - <<-EOM
+		[one/uno@8f8aa93ce3cb3da0e5eddb2c9556fe37980d0aaf58f2760de451a93ce337b0c2 !md "to_add"]
+		[one/uno@8f8aa93ce3cb3da0e5eddb2c9556fe37980d0aaf58f2760de451a93ce337b0c2 !md "to_add"]
+		[to_add.md] (deleted)
+	EOM
+
+	run_zit show one/uno
+	assert_success
+	assert_output - <<-EOM
+		---
+		# to_add
+		- zz-inbox-2022-11-14
+		! md
+		---
+
+		test file
+	EOM
 }
 
 function add_1 { # @test
@@ -50,9 +64,11 @@ function add_1 { # @test
 		"$f"
 
 	assert_success
-	assert_output --partial '[one/uno@45e1f5fbfe972f697f4f4f4b77a21f6395e4cf3a1f0ca16d34a675e447ab3778 !md "to_add.md"]'
-	assert_output --partial '[one/uno@11327fbe60cabd2a9eabf4a37d541cf04b539f913945897efe9bab1e30784781 !md "to_add.md"]'
-	assert_output --partial '[to_add.md] (deleted)'
+	assert_output - <<-EOM
+		[one/uno@8f8aa93ce3cb3da0e5eddb2c9556fe37980d0aaf58f2760de451a93ce337b0c2 !md "to_add"]
+		[one/uno@8f8aa93ce3cb3da0e5eddb2c9556fe37980d0aaf58f2760de451a93ce337b0c2 !md "to_add"]
+		[to_add.md] (deleted)
+	EOM
 }
 
 function add_dedupe_1 { # @test
