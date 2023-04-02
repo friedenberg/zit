@@ -23,3 +23,16 @@ func Default() (t *Objekte, k *kennung.Typ) {
 
 	return
 }
+
+func MakeObjekte() (t *Objekte) {
+
+	t = &Objekte{
+		Akte: Akte{
+			Formatters:     make(map[string]script_config.WithOutputFormat),
+			Actions:        make(map[string]script_config.ScriptConfig),
+			EtikettenRules: make(map[string]etikett_rule.Rule),
+		},
+	}
+
+	return
+}

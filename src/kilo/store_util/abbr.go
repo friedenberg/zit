@@ -19,6 +19,7 @@ import (
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
+// TODO make generic
 type AbbrStore interface {
 	HinweisExists(kennung.Hinweis) error
 	ExpandHinweisString(string) (kennung.Hinweis, error)
@@ -36,7 +37,7 @@ type AbbrStore interface {
 	ExpandKastenString(string) (kennung.Kasten, error)
 	KastenExists(kennung.Kasten) error
 
-	AddStoredAbbreviation(kennung.Matchable) error
+	AddMatchable(kennung.Matchable) error
 
 	errors.Flusher
 }
@@ -158,7 +159,7 @@ func (i *indexAbbr) readIfNecessary() (err error) {
 	return
 }
 
-func (i *indexAbbr) AddStoredAbbreviation(o kennung.Matchable) (err error) {
+func (i *indexAbbr) AddMatchable(o kennung.Matchable) (err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -169,49 +170,19 @@ func (i *indexAbbr) AddStoredAbbreviation(o kennung.Matchable) (err error) {
 	i.indexAbbrEncodableTridexes.Shas.Add(o.GetAkteSha().String())
 	i.indexAbbrEncodableTridexes.Shas.Add(o.GetObjekteSha().String())
 
-	var etikettenExpanded schnittstellen.Set[kennung.Etikett]
-	var typenExpanded schnittstellen.Set[kennung.Typ]
-
 	switch to := o.(type) {
 	case *zettel.Transacted:
 		i.indexAbbrEncodableTridexes.HinweisKopfen.Add(to.Kennung().Kopf())
 		i.indexAbbrEncodableTridexes.HinweisSchwanzen.Add(to.Kennung().Schwanz())
 
-		etikettenExpanded = to.GetEtikettenExpanded()
-		typenExpanded = kennung.ExpandOne(to.Objekte.Typ, kennung.ExpanderRight)
-
 	case *typ.Transacted:
-		typenExpanded = kennung.ExpandOne(to.Sku.Kennung, kennung.ExpanderRight)
+		i.indexAbbrEncodableTridexes.Typen.Add(to.Sku.Kennung.String())
 
 	case *etikett.Transacted:
-		etikettenExpanded = kennung.ExpandOne(to.Sku.Kennung, kennung.ExpanderRight)
+		i.indexAbbrEncodableTridexes.Etiketten.Add(to.Sku.Kennung.String())
 
 	case *kasten.Transacted:
 		i.indexAbbrEncodableTridexes.Kisten.Add(to.Sku.Kennung.String())
-	}
-
-	if etikettenExpanded != nil {
-		if err = etikettenExpanded.Each(
-			func(e kennung.Etikett) (err error) {
-				i.indexAbbrEncodableTridexes.Etiketten.Add(e.String())
-				return
-			},
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	if typenExpanded != nil {
-		if err = typenExpanded.Each(
-			func(e kennung.Typ) (err error) {
-				i.indexAbbrEncodableTridexes.Typen.Add(e.String())
-				return
-			},
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
 	}
 
 	return

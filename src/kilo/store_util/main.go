@@ -12,6 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/age_io"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/foxtrot/kennung_index"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
@@ -42,6 +43,9 @@ type StoreUtil interface {
 	GetTransaktionStore() TransaktionStore
 	GetAbbrStore() AbbrStore
 	GetKennungIndex() kennung_index.Index
+
+	SetMatchableAdder(kennung.MatchableAdder)
+	kennung.MatchableAdder
 }
 
 // TODO-P3 move to own package
@@ -56,6 +60,8 @@ type common struct {
 
 	bestandsaufnahmeStore bestandsaufnahme.Store
 	kennungIndex          kennung_index.Index
+
+	kennung.MatchableAdder
 }
 
 func MakeStoreUtil(
@@ -173,6 +179,10 @@ func (s common) GetKonfig() konfig.Compiled {
 
 func (s common) GetKonfigPtr() *konfig.Compiled {
 	return s.konfig
+}
+
+func (s *common) SetMatchableAdder(ma kennung.MatchableAdder) {
+	s.MatchableAdder = ma
 }
 
 func (s common) ObjekteReader(

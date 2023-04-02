@@ -33,3 +33,7 @@ type Matchable interface {
 type MatchableGetter interface {
 	GetMatchable() Matchable
 }
+
+type MatchableAdder interface {
+	AddMatchable(Matchable) error
+}

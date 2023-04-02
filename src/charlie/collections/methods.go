@@ -179,6 +179,17 @@ func DerivedValues[E schnittstellen.Value[E], F any](
 	return
 }
 
+func SortedValuesBy[E schnittstellen.Value[E]](
+	c schnittstellen.Set[E],
+	sf func(E, E) bool,
+) (out []E) {
+	out = c.Elements()
+
+	sort.Slice(out, func(i, j int) bool { return sf(out[i], out[j]) })
+
+	return
+}
+
 func SortedValues[E schnittstellen.Value[E]](
 	c schnittstellen.Set[E],
 ) (out []E) {

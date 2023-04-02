@@ -39,28 +39,22 @@ func (c ZettelFromExternalAkte) Run(
 
 	results = zettel.MakeMutableSetHinweis(0)
 
-	fds := ms.GetFDs()
+	fds := collections.SortedValues(ms.GetFDs())
 
-	if err = fds.Each(
-		func(fd kennung.FD) (err error) {
-			var z *zettel.External
+	for _, fd := range fds {
+		var z *zettel.External
 
-			if z, err = c.zettelForAkte(fd); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			toCreate.Add(z)
-
-			if c.Delete {
-				toDelete.Add(z)
-			}
-
+		if z, err = c.zettelForAkte(fd); err != nil {
+			err = errors.Wrap(err)
 			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+		}
+
+		toCreate.Add(z)
+
+		if c.Delete {
+			toDelete.Add(z)
+		}
+
 	}
 
 	if c.Dedupe {

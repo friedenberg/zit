@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/bravo/todo"
 )
 
 type FormatterValue struct {
@@ -23,20 +22,19 @@ func (f FormatterValue) String() string {
 
 func (f *FormatterValue) Set(v string) (err error) {
 	v1 := strings.TrimSpace(strings.ToLower(v))
+
 	switch v1 {
 	case
+		//TODO-P3 add text, objekte, toml, json
 		"kennung",
 		"akte",
 		"debug",
 		"etiketten",
 		"json",
 		"log",
-		// "objekte",
 		"sku",
 		"sku-transacted",
-		"sku2",
-		// "text",
-		"toml":
+		"sku2":
 		f.string = v1
 
 	default:
@@ -98,10 +96,6 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 
 	// 		return
 	// 	}
-
-	case "text":
-		todo.Implement()
-
 	case "json":
 		enc := json.NewEncoder(out)
 
@@ -132,10 +126,6 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 
 			return
 		}
-
-		// case "toml":
-		// 	todo.Implement()
-
 	}
 
 	return func(e TransactedLike) (err error) {

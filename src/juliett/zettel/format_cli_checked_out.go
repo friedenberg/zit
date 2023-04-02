@@ -4,6 +4,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
@@ -82,6 +83,7 @@ func makeWriterFuncAkte(
 	zf schnittstellen.FuncWriterFormat[Objekte],
 ) schnittstellen.FuncWriterFormat[CheckedOut] {
 	return func(w io.Writer, z CheckedOut) (n int64, err error) {
+		todo.Change("refactor to support proper spacing")
 		return format.Write(
 			w,
 			format.MakeFormatString("["),

@@ -31,7 +31,10 @@ function outputs_organize_one_etikett { # @test
 
 	run_zit new -edit=false "$to_add"
 	assert_success
-	assert_output '[one/uno@9a638e2b183562da6d3c634d5a3841d64bc337c9cf79f8fffa0d0194659bc564 !md "wow"]'
+	assert_output - <<-EOM
+		[-ok@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[one/uno@9a638e2b183562da6d3c634d5a3841d64bc337c9cf79f8fffa0d0194659bc564 !md "wow"]
+	EOM
 
 	run zit expand-hinweis o/u
 	assert_success
@@ -69,7 +72,11 @@ function outputs_organize_two_etiketten { # @test
 
 	run_zit new -edit=false "$to_add"
 	assert_success
-	assert_output '[one/uno@f0be3e8072724eee5ea5022db397e20deb739d151abef61d37ed386207e32092 !md "wow"]'
+	assert_output_unsorted - <<-EOM
+		[-brown@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-ok@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[one/uno@f0be3e8072724eee5ea5022db397e20deb739d151abef61d37ed386207e32092 !md "wow"]
+	EOM
 
 	expected_organize="$(mktemp)"
 	{
@@ -128,7 +135,14 @@ function outputs_organize_one_etiketten_group_by_one { # @test
 
 	run_zit new -edit=false "$to_add"
 	assert_success
-	assert_output '[one/uno@2df585d527ed7e18b3a9346079335509272f5a197b6a2d864e1b80df5ba627bf !md "wow"]'
+	assert_output_unsorted - <<-EOM
+		[-task@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-priority@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-priority-1@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-priority@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-priority-2@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[one/uno@2df585d527ed7e18b3a9346079335509272f5a197b6a2d864e1b80df5ba627bf !md "wow"]
+	EOM
 
 	expected_organize="$(mktemp)"
 	{
@@ -170,7 +184,12 @@ function outputs_organize_two_zettels_one_etiketten_group_by_one { # @test
 
 	run_zit new -edit=false "$to_add"
 	assert_success
-	assert_output '[one/uno@b28b69e2e325ca2c7d0144a5d4db6523c2f241958229678ac39a9c5a200386bc !md "one/uno"]'
+	assert_output_unsorted - <<-EOM
+		[-priority@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-priority-1@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-task@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[one/uno@b28b69e2e325ca2c7d0144a5d4db6523c2f241958229678ac39a9c5a200386bc !md "one/uno"]
+	EOM
 
 	to_add="$(mktemp)"
 	{
@@ -184,7 +203,12 @@ function outputs_organize_two_zettels_one_etiketten_group_by_one { # @test
 
 	run_zit new -edit=false "$to_add"
 	assert_success
-	assert_output '[one/dos@2720ade68463c806a1aca98df4325e1904a357c6194bf3a8bc981091890aaeed !md "two/dos"]'
+	assert_output_unsorted - <<-EOM
+		[-priority@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-priority-2@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-task@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[one/dos@2720ade68463c806a1aca98df4325e1904a357c6194bf3a8bc981091890aaeed !md "two/dos"]
+	EOM
 
 	expected_organize="$(mktemp)"
 	{
@@ -548,7 +572,16 @@ function commits_no_changes { # @test
 
 	run_zit new -edit=false "$one"
 	assert_success
-	assert_output '[one/uno@112894f9e6c0b4eb6d39f70482312303870c85123f393d4ebb5a6b1118980d39 !md "one/uno"]'
+	assert_output_unsorted - <<-EOM
+		[-w@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-w-2022@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-w-2022-07@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-w-2022-07-07@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-priority@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-priority-1@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-task@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[one/uno@112894f9e6c0b4eb6d39f70482312303870c85123f393d4ebb5a6b1118980d39 !md "one/uno"]
+	EOM
 
 	two="$(mktemp)"
 	{
@@ -563,7 +596,16 @@ function commits_no_changes { # @test
 
 	run_zit new -edit=false "$two"
 	assert_success
-	assert_output '[one/dos@1fe2b8f15cd9ec231a5d82a5f2317bfa090ec46e8d879e623083caaac28d46aa !md "two/dos"]'
+	assert_output_unsorted - <<-EOM
+		[-w@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-w-2022@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-w-2022-07@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-w-2022-07-06@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-priority@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-priority-1@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-task@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[one/dos@1fe2b8f15cd9ec231a5d82a5f2317bfa090ec46e8d879e623083caaac28d46aa !md "two/dos"]
+	EOM
 
 	three="$(mktemp)"
 	{
@@ -578,7 +620,16 @@ function commits_no_changes { # @test
 
 	run_zit new -edit=false "$three"
 	assert_success
-	assert_output '[two/uno@168dbe89748356f7a3d229cab256a82e94106541e0af94a8695bf17f7a661241 !md "3"]'
+	assert_output_unsorted - <<-EOM
+		[-priority@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-priority-1@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-task@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-w@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-w-2022@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-w-2022-07@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-w-2022-07-06@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[two/uno@168dbe89748356f7a3d229cab256a82e94106541e0af94a8695bf17f7a661241 !md "3"]
+	EOM
 
 	expected_organize="$(mktemp)"
 	{
@@ -797,7 +848,10 @@ function etiketten_correct { # @test
 
 	run_zit checkin one/uno.zettel
 	assert_success
-	assert_output '[one/uno@434ac2ce37a09162b08a9840ab91d659eec30ab12a7221bde122d35dcd530cc3 !md test4]'
+	assert_output - <<-EOM
+		[-test4@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[one/uno@434ac2ce37a09162b08a9840ab91d659eec30ab12a7221bde122d35dcd530cc3 !md test4]
+	EOM
 
 	expected_etiketten="$(mktemp)"
 	{
@@ -817,7 +871,12 @@ function etiketten_correct { # @test
 	} >"one/uno.zettel"
 
 	run_zit checkin one/uno.zettel
-	assert_output '[one/uno@1ab80dc811d62eb98745b665436b97e77461cd219d49390d16e64b0d79074516 !md test1-ok, test4]'
+	assert_output_unsorted - <<-EOM
+		[-test1@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-test1-ok@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-test4@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[one/uno@1ab80dc811d62eb98745b665436b97e77461cd219d49390d16e64b0d79074516 !md test1-ok, test4]
+	EOM
 
 	expected_etiketten="$(mktemp)"
 	{

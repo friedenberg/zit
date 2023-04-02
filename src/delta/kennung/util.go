@@ -86,10 +86,34 @@ func WithRemovedCommonPrefixes(s EtikettSet) (s2 EtikettSet) {
 func expandOne[T KennungLike[T], TPtr KennungLikePtr[T]](
 	k T,
 	ex Expander,
-	acc schnittstellen.MutableSet[T],
+	acc schnittstellen.Adder[T],
 ) {
 	f := collections.MakeFuncSetString[T, TPtr](acc)
 	ex.Expand(f, k.String())
+}
+
+func ExpandOneSlice[T KennungLike[T], TPtr KennungLikePtr[T]](
+	k T,
+	exes ...Expander,
+) (out []T) {
+	s1 := collections.MakeMutableSetStringer[T]()
+
+	if len(exes) == 0 {
+		exes = []Expander{ExpanderAll}
+	}
+
+	for _, ex := range exes {
+		expandOne[T, TPtr](k, ex, s1)
+	}
+
+	out = collections.SortedValuesBy[T](
+		s1,
+		func(a, b T) bool {
+			return len(a.String()) < len(b.String())
+		},
+	)
+
+	return
 }
 
 func ExpandOne[T KennungLike[T], TPtr KennungLikePtr[T]](

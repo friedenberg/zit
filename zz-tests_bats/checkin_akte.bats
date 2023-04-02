@@ -29,7 +29,11 @@ function can_update_akte { # @test
 
 	run_zit new -edit=false "$expected"
 	assert_success
-	assert_output '[one/uno@18df16846a2f8bbce5f03e1041baff978a049aabd169ab9adac387867fe1706c !md "bez"]'
+	assert_output_unsorted - <<-EOM
+		[-et1@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-et2@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[one/uno@18df16846a2f8bbce5f03e1041baff978a049aabd169ab9adac387867fe1706c !md "bez"]
+	EOM
 
 	run_zit show one/uno:z
 	assert_success
@@ -43,7 +47,10 @@ function can_update_akte { # @test
 
 	run_zit checkin-akte -new-etiketten et3 one/uno "$new_akte"
 	assert_success
-	assert_output '[one/uno@6b4905e7d7a5185f73db1e27448663fa38b3aca11d62e1dc33ecb066653791b7 !md "bez"]'
+	assert_output - <<-EOM
+		[-et3@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[one/uno@6b4905e7d7a5185f73db1e27448663fa38b3aca11d62e1dc33ecb066653791b7 !md "bez"]
+	EOM
 
 	# then
 	{

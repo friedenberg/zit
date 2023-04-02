@@ -4,6 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
@@ -43,6 +44,8 @@ func Make(
 	s = &Store{
 		StoreUtil: su,
 	}
+
+	su.SetMatchableAdder(s)
 
 	if s.zettelStore, err = makeZettelStore(s.StoreUtil, p); err != nil {
 		err = errors.Wrap(err)
@@ -404,13 +407,102 @@ func (s *Store) getReindexFunc() func(sku.DataIdentity) error {
 			return
 		}
 
-		if err = s.GetAbbrStore().AddStoredAbbreviation(o); err != nil {
+		if err = s.AddMatchable(o); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 		return
 	}
+}
+
+func (s *Store) addTyp(
+	t kennung.Typ,
+) (err error) {
+	typenExpanded := kennung.ExpandOneSlice(t, kennung.ExpanderRight)
+
+	for _, t := range typenExpanded {
+		if err = s.GetAbbrStore().TypExists(t); err == nil {
+			return
+		}
+
+		err = nil
+
+		if _, err = s.Typ().CreateOrUpdate(
+			typ.MakeObjekte(),
+			&t,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
+func (s *Store) addEtikett(
+	e kennung.Etikett,
+) (err error) {
+	etikettenExpanded := kennung.ExpandOneSlice(e, kennung.ExpanderRight)
+
+	for _, e1 := range etikettenExpanded {
+		if err = s.GetAbbrStore().EtikettExists(e1); err == nil {
+			return
+		}
+
+		err = nil
+
+		if _, err = s.Etikett().CreateOrUpdate(
+			etikett.MakeObjekte(),
+			&e1,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+func (s *Store) addMatchableTypAndEtikettenIfNecessary(
+	m kennung.Matchable,
+) (err error) {
+	//TODO support other true gattung
+	if !gattung.Zettel.EqualsAny(m.GetGattung()) {
+		return
+	}
+
+	t := m.GetTyp()
+
+	if err = s.addTyp(t); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	es := collections.SortedValues[kennung.Etikett](m.GetEtiketten())
+
+	for _, e := range es {
+		if err = s.addEtikett(e); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+
+}
+
+func (s *Store) AddMatchable(m kennung.Matchable) (err error) {
+	if err = s.addMatchableTypAndEtikettenIfNecessary(m); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.GetAbbrStore().AddMatchable(m); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (s *Store) Reindex() (err error) {

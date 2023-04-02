@@ -53,7 +53,10 @@ function can_new_zettel_file { # @test
 
 	run_zit new -edit=false "$to_add"
 	assert_success
-	assert_output '[one/uno@9a638e2b183562da6d3c634d5a3841d64bc337c9cf79f8fffa0d0194659bc564 !md "wow"]'
+	assert_output - <<-EOM
+		[-ok@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[one/uno@9a638e2b183562da6d3c634d5a3841d64bc337c9cf79f8fffa0d0194659bc564 !md "wow"]
+	EOM
 
 	run_zit show one/uno:z
 	assert_success
@@ -78,7 +81,10 @@ function can_new_zettel { # @test
 
 	run_zit new -edit=false -bezeichnung wow -etiketten ok
 	assert_success
-	assert_output '[one/uno@9a638e2b183562da6d3c634d5a3841d64bc337c9cf79f8fffa0d0194659bc564 !md "wow"]'
+	assert_output - <<-EOM
+		[-ok@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[one/uno@9a638e2b183562da6d3c634d5a3841d64bc337c9cf79f8fffa0d0194659bc564 !md "wow"]
+	EOM
 
 	run_zit show one/uno:z
 	assert_success
@@ -102,7 +108,10 @@ function can_checkout_and_checkin { # @test
 
 	run_zit new -edit=false "$to_add"
 	assert_success
-	assert_output '[one/uno@9a638e2b183562da6d3c634d5a3841d64bc337c9cf79f8fffa0d0194659bc564 !md "wow"]'
+	assert_output - <<-EOM
+		[-ok@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[one/uno@9a638e2b183562da6d3c634d5a3841d64bc337c9cf79f8fffa0d0194659bc564 !md "wow"]
+	EOM
 
 	run_zit checkout one/uno
 	assert_success
@@ -121,7 +130,10 @@ function can_checkout_and_checkin { # @test
 	assert_success
 	# run_zit diff .
 	#TODO fix missing typ
-	assert_output '[one/uno@14d2d788146303057462fbf3d181a3c8c3397ebc238c07970b206b5db6203a3a ! "wow"]'
+	assert_output - <<-EOM
+		[-ok@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[one/uno@14d2d788146303057462fbf3d181a3c8c3397ebc238c07970b206b5db6203a3a ! "wow"]
+	EOM
 }
 
 function can_checkout_via_etiketten { # @test
@@ -141,7 +153,10 @@ function can_checkout_via_etiketten { # @test
 
 	run_zit new -edit=false "$to_add"
 	assert_success
-	assert_output '[one/uno@9a638e2b183562da6d3c634d5a3841d64bc337c9cf79f8fffa0d0194659bc564 !md "wow"]'
+	assert_output - <<-EOM
+		[-ok@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[one/uno@9a638e2b183562da6d3c634d5a3841d64bc337c9cf79f8fffa0d0194659bc564 !md "wow"]
+	EOM
 
 	run_zit checkout -- ok:z
 	assert_success
@@ -261,7 +276,11 @@ function can_new_zettel_with_metadatei { # @test
 
 	run_zit new -edit=false -bezeichnung bez -etiketten et1,et2
 	assert_success
-	assert_output '[one/uno@22bfa88b3975bc7cad702c2c7f262d5a754d9ad7423b96b134c6bbc1fbd88aea !md "bez"]'
+	assert_output_unsorted - <<-EOM
+		[-et1@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-et2@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[one/uno@22bfa88b3975bc7cad702c2c7f262d5a754d9ad7423b96b134c6bbc1fbd88aea !md "bez"]
+	EOM
 }
 
 function can_duplicate_zettel_content { # @test
@@ -327,7 +346,11 @@ function indexes_are_implicitly_correct { # @test
 
 	run_zit new -edit=false "$expected"
 	assert_success
-	assert_output '[one/uno@18df16846a2f8bbce5f03e1041baff978a049aabd169ab9adac387867fe1706c !md "bez"]'
+	assert_output_unsorted - <<-EOM
+		[-et1@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-et2@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[one/uno@18df16846a2f8bbce5f03e1041baff978a049aabd169ab9adac387867fe1706c !md "bez"]
+	EOM
 
 	{
 		echo et1
@@ -402,7 +425,11 @@ function checkouts_dont_overwrite { # @test
 
 	run_zit new -edit=false "$expected"
 	assert_success
-	assert_output '[one/uno@18df16846a2f8bbce5f03e1041baff978a049aabd169ab9adac387867fe1706c !md "bez"]'
+	assert_output - <<-EOM
+		[-et1@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-et2@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[one/uno@18df16846a2f8bbce5f03e1041baff978a049aabd169ab9adac387867fe1706c !md "bez"]
+	EOM
 
 	run_zit checkout one/uno
 	assert_success

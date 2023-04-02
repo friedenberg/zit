@@ -202,7 +202,7 @@ func (s *zettelStore) writeNamedZettelToIndex(
 		}
 	}
 
-	if err = s.StoreUtil.GetAbbrStore().AddStoredAbbreviation(tz); err != nil {
+	if err = s.StoreUtil.AddMatchable(tz); err != nil {
 		err = errors.Wrapf(err, "failed to write zettel to index: %s", tz.Sku)
 		return
 	}

@@ -41,7 +41,7 @@ type SetLike[T any] interface {
 
 type MutableSetLike[T any] interface {
 	SetLike[T]
-	Add(T) error
+	Adder[T]
 	Del(T) error
 	DelKey(string) error
 }
