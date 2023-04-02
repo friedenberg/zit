@@ -35,6 +35,8 @@ type Store struct {
 	readers           map[schnittstellen.Gattung]objekte.FuncReaderTransactedLike
 	queriers          map[schnittstellen.Gattung]objekte.FuncQuerierTransactedLike
 	transactedReaders map[schnittstellen.Gattung]objekte.FuncReaderTransactedLike
+
+	isReindexing bool
 }
 
 func Make(
@@ -466,6 +468,10 @@ func (s *Store) addEtikett(
 func (s *Store) addMatchableTypAndEtikettenIfNecessary(
 	m kennung.Matchable,
 ) (err error) {
+	if s.isReindexing {
+		return
+	}
+
 	//TODO support other true gattung
 	if !gattung.Zettel.EqualsAny(m.GetGattung()) {
 		return
@@ -513,6 +519,11 @@ func (s *Store) Reindex() (err error) {
 
 		return
 	}
+
+	s.isReindexing = true
+	defer func() {
+		s.isReindexing = false
+	}()
 
 	if err = s.StoreUtil.GetStandort().ResetVerzeichnisse(); err != nil {
 		err = errors.Wrap(err)
