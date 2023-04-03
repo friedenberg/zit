@@ -645,6 +645,11 @@ func (s *zettelStore) ReindexOne(
 		return
 	}
 
+	if err = s.StoreUtil.GetAbbrStore().AddMatchable(tz); err != nil {
+		err = errors.Wrapf(err, "failed to write zettel to index: %s", tz.Sku)
+		return
+	}
+
 	if err = s.LogWriter.NewOrUpdated(errExists)(tz); err != nil {
 		err = errors.Wrap(err)
 		return
