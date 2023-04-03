@@ -409,7 +409,7 @@ func (s *Store) getReindexFunc() func(sku.DataIdentity) error {
 			return
 		}
 
-		if err = s.AddMatchable(o); err != nil {
+		if err = s.GetAbbrStore().AddMatchable(o); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -425,7 +425,7 @@ func (s *Store) addTyp(
 
 	for _, t := range typenExpanded {
 		if err = s.GetAbbrStore().TypExists(t); err == nil {
-			return
+			continue
 		}
 
 		err = nil
@@ -449,7 +449,7 @@ func (s *Store) addEtikett(
 
 	for _, e1 := range etikettenExpanded {
 		if err = s.GetAbbrStore().EtikettExists(e1); err == nil {
-			return
+			continue
 		}
 
 		err = nil
@@ -465,14 +465,11 @@ func (s *Store) addEtikett(
 
 	return
 }
+
 func (s *Store) addMatchableTypAndEtikettenIfNecessary(
 	m kennung.Matchable,
 ) (err error) {
-	if s.isReindexing {
-		return
-	}
-
-	//TODO support other true gattung
+	// TODO support other true gattung
 	if !gattung.Zettel.EqualsAny(m.GetGattung()) {
 		return
 	}
@@ -494,7 +491,6 @@ func (s *Store) addMatchableTypAndEtikettenIfNecessary(
 	}
 
 	return
-
 }
 
 func (s *Store) AddMatchable(m kennung.Matchable) (err error) {

@@ -108,6 +108,7 @@ func makeEtikettStore(
 				return s.LogWriter.Unchanged(t)
 			},
 		},
+		sa.GetAbbrStore(),
 	)
 
 	return

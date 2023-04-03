@@ -3,6 +3,7 @@ package user_ops
 import (
 	"io"
 	"os"
+	"sort"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/iter"
@@ -54,7 +55,6 @@ func (c ZettelFromExternalAkte) Run(
 		if c.Delete {
 			toDelete.Add(z)
 		}
-
 	}
 
 	if c.Dedupe {
@@ -90,34 +90,39 @@ func (c ZettelFromExternalAkte) Run(
 		return
 	}
 
-	err = toCreate.Each(
-		func(z *zettel.External) (err error) {
-			if z.Objekte.IsEmpty() {
-				return
-			}
+	sortedToCreated := toCreate.Elements()
 
-			var tz *zettel.Transacted
+	sort.Slice(
+		sortedToCreated,
+		func(i, j int) bool {
+			return sortedToCreated[i].GetAkteFD().String() < sortedToCreated[j].GetAkteFD().String()
+		},
+	)
 
-			if tz, err = c.StoreObjekten().Zettel().Create(z.Objekte); err != nil {
+	for _, z := range sortedToCreated {
+		if z.Objekte.IsEmpty() {
+			return
+		}
+
+		var tz *zettel.Transacted
+
+		if tz, err = c.StoreObjekten().Zettel().Create(z.Objekte); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if c.ProtoZettel.Apply(&tz.Objekte) {
+			if tz, err = c.StoreObjekten().Zettel().Update(
+				&tz.Objekte,
+				&tz.Sku.Kennung,
+			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
+		}
 
-			if c.ProtoZettel.Apply(&tz.Objekte) {
-				if tz, err = c.StoreObjekten().Zettel().Update(
-					&tz.Objekte,
-					&tz.Sku.Kennung,
-				); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-			}
-
-			results.Add(tz)
-
-			return
-		},
-	)
+		results.Add(tz)
+	}
 
 	if err != nil {
 		err = errors.Wrap(err)

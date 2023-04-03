@@ -60,6 +60,7 @@ type MutableSet[T any] interface {
 
 type TridexLike interface {
 	Lenner
+	EachString(FuncIter[string]) error
 	ContainsAbbreviation(string) bool
 	ContainsExpansion(string) bool
 	Abbreviate(string) string

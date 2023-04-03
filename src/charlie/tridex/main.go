@@ -8,6 +8,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/iter"
 )
 
 func init() {
@@ -134,7 +135,24 @@ func (t *Tridex) Add(v string) {
 	t.Root.Add(v)
 }
 
-// // TODO-P2 add Each and EachPtr methods
+func (t *Tridex) EachString(f schnittstellen.FuncIter[string]) (err error) {
+	t.lock.Lock()
+	defer t.lock.Unlock()
+
+	if err = t.Root.Each(f, ""); err != nil {
+		if iter.IsStopIteration(err) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+		}
+
+		return
+	}
+
+	return
+}
+
+// TODO-P2 add Each and EachPtr methods
 // func (t Tridex) GobEncode() (by []byte, err error) {
 // 	bu := &bytes.Buffer{}
 // 	enc := gob.NewEncoder(bu)

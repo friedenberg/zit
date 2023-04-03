@@ -53,6 +53,7 @@ type indexAbbrEncodableTridexes struct {
 
 type indexAbbr struct {
 	lock sync.Locker
+	once *sync.Once
 	StoreUtilVerzeichnisse
 
 	path string
@@ -69,6 +70,7 @@ func newIndexAbbr(
 ) (i AbbrStore, err error) {
 	i = &indexAbbr{
 		lock:                   &sync.Mutex{},
+		once:                   &sync.Once{},
 		path:                   p,
 		StoreUtilVerzeichnisse: suv,
 		indexAbbrEncodableTridexes: indexAbbrEncodableTridexes{
@@ -117,44 +119,43 @@ func (i *indexAbbr) Flush() (err error) {
 }
 
 func (i *indexAbbr) readIfNecessary() (err error) {
-	i.lock.Lock()
-	defer i.lock.Unlock()
+	i.once.Do(
+		func() {
+			if i.didRead {
+				return
+			}
 
-	if i.didRead {
-		return
-	}
+			errors.Log().Print("reading")
 
-	errors.Log().Print("reading")
+			i.didRead = true
 
-	i.didRead = true
+			var r1 io.ReadCloser
 
-	var r1 io.ReadCloser
+			if r1, err = i.ReadCloserVerzeichnisse(i.path); err != nil {
+				if errors.IsNotExist(err) {
+					err = nil
+				} else {
+					err = errors.Wrap(err)
+				}
 
-	if r1, err = i.ReadCloserVerzeichnisse(i.path); err != nil {
-		if errors.IsNotExist(err) {
-			err = nil
-		} else {
-			err = errors.Wrap(err)
-		}
+				return
+			}
 
-		return
-	}
+			defer errors.Deferred(&err, r1.Close)
 
-	defer errors.Deferred(&err, r1.Close)
+			r := bufio.NewReader(r1)
 
-	r := bufio.NewReader(r1)
+			dec := gob.NewDecoder(r)
 
-	dec := gob.NewDecoder(r)
+			errors.Log().Print("starting decode")
 
-	errors.Log().Print("starting decode")
-
-	if err = dec.Decode(&i.indexAbbrEncodableTridexes); err != nil {
-		errors.Log().Print("finished decode unsuccessfully")
-		err = errors.Wrap(err)
-		return
-	}
-
-	errors.Log().Print("finished decode successfully")
+			if err = dec.Decode(&i.indexAbbrEncodableTridexes); err != nil {
+				errors.Log().Print("finished decode unsuccessfully")
+				err = errors.Wrap(err)
+				return
+			}
+		},
+	)
 
 	return
 }
@@ -183,6 +184,10 @@ func (i *indexAbbr) AddMatchable(o kennung.Matchable) (err error) {
 
 	case *kasten.Transacted:
 		i.indexAbbrEncodableTridexes.Kisten.Add(to.Sku.Kennung.String())
+
+		// default:
+		// 	err = errors.Errorf("unsupported objekte: %T", to)
+		// 	return
 	}
 
 	return
@@ -265,7 +270,7 @@ func (i *indexAbbr) AbbreviateHinweis(h schnittstellen.Korper) (v string, err er
 		kopf = i.indexAbbrEncodableTridexes.HinweisKopfen.Abbreviate(h.Kopf())
 		schwanz = i.indexAbbrEncodableTridexes.HinweisSchwanzen.Abbreviate(h.Schwanz())
 
-		if kopf == "" || schwanz == "" {
+		if kopf == "" {
 			err = errors.Errorf("abbreviated kopf would be empty for %s", h)
 			return
 		}

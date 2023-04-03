@@ -95,6 +95,10 @@ func (ms mutableTridexSet[T]) DelKey(v string) (err error) {
 	return
 }
 
+func (ms mutableTridexSet[T]) EachString(f schnittstellen.FuncIter[string]) (err error) {
+	return ms.TR.EachString(f)
+}
+
 func (ms mutableTridexSet[T]) Each(f schnittstellen.FuncIter[T]) (err error) {
 	return ms.MS.Each(f)
 }

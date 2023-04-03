@@ -202,11 +202,6 @@ func (s *zettelStore) writeNamedZettelToIndex(
 		}
 	}
 
-	if err = s.StoreUtil.AddMatchable(tz); err != nil {
-		err = errors.Wrapf(err, "failed to write zettel to index: %s", tz.Sku)
-		return
-	}
-
 	return
 }
 
@@ -361,6 +356,11 @@ func (s *zettelStore) Create(
 		return
 	}
 
+	if err = s.StoreUtil.AddMatchable(tz); err != nil {
+		err = errors.Wrapf(err, "failed to write zettel to index: %s", tz.Sku)
+		return
+	}
+
 	errors.TodoP2("assert no changes")
 	if err = s.LogWriter.New(tz); err != nil {
 		err = errors.Wrap(err)
@@ -427,6 +427,11 @@ func (s *zettelStore) UpdateCheckedOut(
 
 	if err = s.writeNamedZettelToIndex(t); err != nil {
 		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.StoreUtil.AddMatchable(t); err != nil {
+		err = errors.Wrapf(err, "failed to write zettel to index: %s", t.Sku)
 		return
 	}
 
@@ -498,6 +503,11 @@ func (s *zettelStore) Update(
 
 	if err = s.writeNamedZettelToIndex(tz); err != nil {
 		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.StoreUtil.AddMatchable(tz); err != nil {
+		err = errors.Wrapf(err, "failed to write zettel to index: %s", tz.Sku)
 		return
 	}
 

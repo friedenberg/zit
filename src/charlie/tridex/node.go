@@ -1,6 +1,10 @@
 package tridex
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+)
 
 func (n *node) Add(v string) {
 	if len(v) == 0 {
@@ -207,6 +211,28 @@ func (a *node) Copy() (b node) {
 
 	for i, c := range b.Children {
 		b.Children[i] = c.Copy()
+	}
+
+	return
+}
+
+func (n *node) Each(f schnittstellen.FuncIter[string], acc string) (err error) {
+	if n.Value != "" {
+		if err = f(acc + n.Value); err != nil {
+			return
+		}
+	}
+
+	if n.IncludesTerminus {
+		if err = f(acc); err != nil {
+			return
+		}
+	}
+
+	for r, c := range n.Children {
+		if err = c.Each(f, acc+string(r)); err != nil {
+			return
+		}
 	}
 
 	return

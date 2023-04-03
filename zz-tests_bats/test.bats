@@ -131,7 +131,6 @@ function can_checkout_and_checkin { # @test
 	# run_zit diff .
 	#TODO fix missing typ
 	assert_output - <<-EOM
-		[-ok@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
 		[one/uno@14d2d788146303057462fbf3d181a3c8c3397ebc238c07970b206b5db6203a3a ! "wow"]
 	EOM
 }

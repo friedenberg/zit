@@ -1,7 +1,10 @@
 package tridex
 
 import (
+	"fmt"
 	"os"
+	"reflect"
+	"sort"
 	"testing"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -374,6 +377,64 @@ func TestRemove(t1 *testing.T) {
 				t.assertContainsExpansion(sut, e1)
 			}
 		}
+	}
+}
+
+func TestEachString(t1 *testing.T) {
+	testCases := [][]string{
+		{
+			"12",
+			"121",
+			"127",
+			"128",
+			"123456",
+			"654321",
+		},
+		{
+			"zz-archive",
+			"zz-archive-recycle",
+			"zz-archive-duplicate",
+		},
+		{
+			"person-john",
+			"person-eric",
+			"zz-archive",
+			"zz-archive-recycle",
+			"zz-archive-duplicate",
+		},
+	}
+
+	for i, tc := range testCases {
+		t1.Run(
+			fmt.Sprintf("test # %d", i),
+			func(t1 *testing.T) {
+				t := t(test_logz.T{T: t1})
+
+				expected := tc
+
+				sut := Make(expected...)
+
+				actual := make([]string, 0)
+
+				err := sut.EachString(
+					func(e string) (err error) {
+						actual = append(actual, e)
+						return
+					},
+				)
+
+				sort.Strings(expected)
+				sort.Strings(actual)
+
+				if !reflect.DeepEqual(expected, actual) {
+					t.Errorf("expected %v, but got %v", expected, actual)
+				}
+
+				if err != nil {
+					t.Errorf("expected no error but got %s", err)
+				}
+			},
+		)
 	}
 }
 

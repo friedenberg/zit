@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
@@ -25,11 +26,12 @@ type createOrUpdate[
 	T4 any,
 	T5 schnittstellen.VerzeichnissePtr[T4, T],
 ] struct {
-	clock    ts.Clock
-	ls       schnittstellen.LockSmith
-	oaf      schnittstellen.ObjekteAkteWriterFactory
-	reader   TransactedReader[T3, *objekte.Transacted[T, T1, T2, T3, T4, T5]]
-	delegate CreateOrUpdateDelegate[*objekte.Transacted[T, T1, T2, T3, T4, T5]]
+	clock          ts.Clock
+	ls             schnittstellen.LockSmith
+	oaf            schnittstellen.ObjekteAkteWriterFactory
+	reader         TransactedReader[T3, *objekte.Transacted[T, T1, T2, T3, T4, T5]]
+	delegate       CreateOrUpdateDelegate[*objekte.Transacted[T, T1, T2, T3, T4, T5]]
+	matchableAdder kennung.MatchableAdder
 }
 
 func MakeCreateOrUpdate[
@@ -45,13 +47,15 @@ func MakeCreateOrUpdate[
 	oaf schnittstellen.ObjekteAkteWriterFactory,
 	reader TransactedReader[T3, *objekte.Transacted[T, T1, T2, T3, T4, T5]],
 	delegate CreateOrUpdateDelegate[*objekte.Transacted[T, T1, T2, T3, T4, T5]],
+	ma kennung.MatchableAdder,
 ) (cou *createOrUpdate[T, T1, T2, T3, T4, T5]) {
 	return &createOrUpdate[T, T1, T2, T3, T4, T5]{
-		clock:    clock,
-		ls:       ls,
-		oaf:      oaf,
-		reader:   reader,
-		delegate: delegate,
+		clock:          clock,
+		ls:             ls,
+		oaf:            oaf,
+		reader:         reader,
+		delegate:       delegate,
+		matchableAdder: ma,
 	}
 }
 
@@ -105,6 +109,11 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdateCheckedOut(
 			return
 		}
 
+		return
+	}
+
+	if err = cou.matchableAdder.AddMatchable(transactedPtr); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -185,6 +194,11 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdate(
 			return
 		}
 
+		return
+	}
+
+	if err = cou.matchableAdder.AddMatchable(transactedPtr); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 

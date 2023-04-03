@@ -116,7 +116,6 @@ function outputs_organize_two_etiketten { # @test
 	assert_success
 	assert_output - <<-EOM
 		Removed etikett 'brown' from zettel 'one/uno'
-		[-ok@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
 		[one/uno@9a638e2b183562da6d3c634d5a3841d64bc337c9cf79f8fffa0d0194659bc564 !md "wow"]
 	EOM
 
@@ -161,10 +160,9 @@ function outputs_organize_one_etiketten_group_by_one { # @test
 	run_zit new -edit=false "$to_add"
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[-priority@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
 		[-priority-1@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
-		[-priority@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
 		[-priority-2@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-priority@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
 		[-task@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
 		[one/uno@2df585d527ed7e18b3a9346079335509272f5a197b6a2d864e1b80df5ba627bf !md "wow"]
 	EOM
@@ -225,9 +223,7 @@ function outputs_organize_two_zettels_one_etiketten_group_by_one { # @test
 
 	run_zit new -edit=false "$to_add"
 	assert_success
-	assert_output_unsorted - <<-EOM
-		[-task@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
-		[-priority@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+	assert_output - <<-EOM
 		[-priority-2@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
 		[one/dos@2720ade68463c806a1aca98df4325e1904a357c6194bf3a8bc981091890aaeed !md "two/dos"]
 	EOM
@@ -352,14 +348,8 @@ function commits_organize_one_etiketten_group_by_two { # @test
 
 	run_zit new -edit=false "$to_add"
 	assert_success
-	assert_output_unsorted - <<-EOM
-		[-task@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
-		[-w@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
-		[-w-2022@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
-		[-w-2022-07@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+	assert_output - <<-EOM
 		[-w-2022-07-06@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
-		[-priority@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
-		[-priority-1@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
 		[one/dos@1fe2b8f15cd9ec231a5d82a5f2317bfa090ec46e8d879e623083caaac28d46aa !md "two/dos"]
 	EOM
 
@@ -376,14 +366,7 @@ function commits_organize_one_etiketten_group_by_two { # @test
 
 	run_zit new -edit=false "$to_add"
 	assert_success
-	assert_output_unsorted - <<-EOM
-		[-priority@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
-		[-priority-1@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
-		[-task@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
-		[-w@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
-		[-w-2022@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
-		[-w-2022-07@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
-		[-w-2022-07-06@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+	assert_output - <<-EOM
 		[two/uno@168dbe89748356f7a3d229cab256a82e94106541e0af94a8695bf17f7a661241 !md "3"]
 	EOM
 
@@ -867,9 +850,7 @@ function etiketten_correct { # @test
 
 	run zit checkin "${cmd_zit_def[@]}" one/uno.zettel
 	assert_output - <<-EOM
-		[-test1@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
 		[-test1-ok@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
-		[-test4@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
 		[one/uno@9153182e2be5871aba88bb75f5a317e3f8dd73f8b2040bca4ac446679d17ef18 ! test1-ok, test4]
 	EOM
 

@@ -18,26 +18,55 @@ type StackInfo struct {
 	filename    string
 	relFilename string
 	line        int
-	depth       int
-	pc          uintptr
+}
+
+func MakeStackInfos(depth, count int) (si []StackInfo) {
+	pcs := make([]uintptr, count)
+
+	n := runtime.Callers(depth + 1, pcs)
+
+	if n <= 0 {
+		return
+	}
+
+	frames := runtime.CallersFrames(pcs)
+
+	for {
+		frame, more := frames.Next()
+
+		si = append(si, makeStackInfoFromFrame(frame))
+
+		if !more {
+			break
+		}
+	}
+
+	return
+}
+
+func makeStackInfoFromFrame(frame runtime.Frame) (si StackInfo) {
+	si.filename = filepath.Clean(frame.File)
+	si.line = frame.Line
+	si.function = frame.Function
+	si.pakkage, si.function = getPackageAndFunctionName(si.function)
+
+	si.relFilename, _ = filepath.Rel(cwd, si.filename)
+
+	return
 }
 
 func MakeStackInfo(d int) (si StackInfo, ok bool) {
-	si.depth = d
-	si.pc, si.filename, si.line, ok = runtime.Caller(d + 1)
+	var pc uintptr
+	pc, _, _, ok = runtime.Caller(d + 1)
 
 	if !ok {
 		return
 	}
 
-	si.filename = filepath.Clean(si.filename)
-	frames := runtime.CallersFrames([]uintptr{si.pc})
+	frames := runtime.CallersFrames([]uintptr{pc})
 
 	frame, _ := frames.Next()
-	si.function = frame.Function
-	si.pakkage, si.function = getPackageAndFunctionName(si.function)
-
-	si.relFilename, _ = filepath.Rel(cwd, si.filename)
+	si = makeStackInfoFromFrame(frame)
 
 	return
 }

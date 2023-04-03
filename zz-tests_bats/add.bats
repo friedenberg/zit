@@ -107,19 +107,14 @@ function add_2 { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[-zz-inbox-2022-11-14@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
-		[-zz-inbox-2022-11-14@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
-		[-zz-inbox-2022-11@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
 		[-zz-inbox-2022-11@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
 		[-zz-inbox-2022@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
-		[-zz-inbox-2022@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
-		[-zz-inbox@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
 		[-zz-inbox@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
 		[-zz@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
-		[-zz@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
-		[one/uno@8f8aa93ce3cb3da0e5eddb2c9556fe37980d0aaf58f2760de451a93ce337b0c2 !md "to_add"]
-		[one/uno@8f8aa93ce3cb3da0e5eddb2c9556fe37980d0aaf58f2760de451a93ce337b0c2 !md "to_add"]
 		[one/dos@02425f5295479fc80efd565abe728696072de2422958209ef32ffb39427d80a1 !md "to_add2"]
 		[one/dos@02425f5295479fc80efd565abe728696072de2422958209ef32ffb39427d80a1 !md "to_add2"]
+		[one/uno@8f8aa93ce3cb3da0e5eddb2c9556fe37980d0aaf58f2760de451a93ce337b0c2 !md "to_add"]
+		[one/uno@8f8aa93ce3cb3da0e5eddb2c9556fe37980d0aaf58f2760de451a93ce337b0c2 !md "to_add"]
 		[to_add.md] (deleted)
 		[to_add2.md] (deleted)
 	EOM

@@ -107,6 +107,7 @@ func makeKastenStore(
 				return s.LogWriter.Unchanged(t)
 			},
 		},
+		sa.GetAbbrStore(),
 	)
 
 	return
