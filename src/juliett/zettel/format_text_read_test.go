@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/test_logz"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/echo/test_metadatei_io"
+	"github.com/friedenberg/zit/src/metadatei"
 )
 
 func makeTestTextFormat(af *test_metadatei_io.AkteIOFactory) ObjekteFormat {
@@ -39,12 +40,14 @@ func TestReadWithoutAkte(t1 *testing.T) {
 	)
 
 	expected := Objekte{
-		Bezeichnung: bezeichnung.Make("the title"),
-		Etiketten: makeEtiketten(t,
-			"tag1",
-			"tag2",
-			"tag3",
-		),
+		Metadatei: metadatei.Metadatei{
+			Bezeichnung: bezeichnung.Make("the title"),
+			Etiketten: makeEtiketten(t,
+				"tag1",
+				"tag2",
+				"tag3",
+			),
+		},
 		Typ: makeAkteExt(t, "md"),
 	}
 
@@ -78,12 +81,14 @@ func TestReadWithoutAkteWithMultilineBezeichnung(t1 *testing.T) {
 	)
 
 	expected := Objekte{
-		Bezeichnung: bezeichnung.Make("the title continues"),
-		Etiketten: makeEtiketten(t,
-			"tag1",
-			"tag2",
-			"tag3",
-		),
+		Metadatei: metadatei.Metadatei{
+			Bezeichnung: bezeichnung.Make("the title continues"),
+			Etiketten: makeEtiketten(t,
+				"tag1",
+				"tag2",
+				"tag3",
+			),
+		},
 		Typ: makeAkteExt(t, "md"),
 	}
 
@@ -123,13 +128,15 @@ the body
 	)
 
 	expected := Objekte{
-		Akte:        sha.Must("036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064"),
-		Bezeichnung: bezeichnung.Make("the title"),
-		Etiketten: makeEtiketten(t,
-			"tag1",
-			"tag2",
-			"tag3",
-		),
+		Akte: sha.Must("036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064"),
+		Metadatei: metadatei.Metadatei{
+			Bezeichnung: bezeichnung.Make("the title"),
+			Etiketten: makeEtiketten(t,
+				"tag1",
+				"tag2",
+				"tag3",
+			),
+		},
 		Typ: makeAkteExt(t, "md"),
 	}
 

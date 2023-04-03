@@ -12,6 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/echo/test_metadatei_io"
+	"github.com/friedenberg/zit/src/metadatei"
 )
 
 type noopCloser struct {
@@ -77,12 +78,14 @@ func TestWriteWithoutAkte(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
 	z := Objekte{
-		Bezeichnung: bezeichnung.Make("the title"),
-		Etiketten: makeEtiketten(t,
-			"tag1",
-			"tag2",
-			"tag3",
-		),
+		Metadatei: metadatei.Metadatei{
+			Bezeichnung: bezeichnung.Make("the title"),
+			Etiketten: makeEtiketten(t,
+				"tag1",
+				"tag2",
+				"tag3",
+			),
+		},
 		Typ: makeAkteExt(t, "md"),
 	}
 
@@ -119,12 +122,14 @@ func TestWriteWithInlineAkte(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
 	z := Objekte{
-		Bezeichnung: bezeichnung.Make("the title"),
-		Etiketten: makeEtiketten(t,
-			"tag1",
-			"tag2",
-			"tag3",
-		),
+		Metadatei: metadatei.Metadatei{
+			Bezeichnung: bezeichnung.Make("the title"),
+			Etiketten: makeEtiketten(t,
+				"tag1",
+				"tag2",
+				"tag3",
+			),
+		},
 		Typ: makeAkteExt(t, "md"),
 	}
 

@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
+	"github.com/friedenberg/zit/src/metadatei"
 )
 
 func TestMakeEtiketten(t1 *testing.T) {
@@ -75,12 +76,14 @@ func TestEqualitySelf(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
 	text := Objekte{
-		Bezeichnung: bezeichnung.Make("the title"),
-		Etiketten: makeEtiketten(t,
-			"tag1",
-			"tag2",
-			"tag3",
-		).ImmutableClone(),
+		Metadatei: metadatei.Metadatei{
+			Bezeichnung: bezeichnung.Make("the title"),
+			Etiketten: makeEtiketten(t,
+				"tag1",
+				"tag2",
+				"tag3",
+			).ImmutableClone(),
+		},
 		Typ: makeAkteExt(t, "text"),
 	}
 
@@ -93,22 +96,26 @@ func TestEqualityNotSelf(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
 	text := Objekte{
-		Bezeichnung: bezeichnung.Make("the title"),
-		Etiketten: makeEtiketten(t,
-			"tag1",
-			"tag2",
-			"tag3",
-		).ImmutableClone(),
+		Metadatei: metadatei.Metadatei{
+			Bezeichnung: bezeichnung.Make("the title"),
+			Etiketten: makeEtiketten(t,
+				"tag1",
+				"tag2",
+				"tag3",
+			).ImmutableClone(),
+		},
 		Typ: makeAkteExt(t, "text"),
 	}
 
 	text1 := Objekte{
-		Bezeichnung: bezeichnung.Make("the title"),
-		Etiketten: makeEtiketten(t,
-			"tag1",
-			"tag2",
-			"tag3",
-		).ImmutableClone(),
+		Metadatei: metadatei.Metadatei{
+			Bezeichnung: bezeichnung.Make("the title"),
+			Etiketten: makeEtiketten(t,
+				"tag1",
+				"tag2",
+				"tag3",
+			).ImmutableClone(),
+		},
 		Typ: makeAkteExt(t, "text"),
 	}
 

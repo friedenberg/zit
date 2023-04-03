@@ -99,7 +99,7 @@ func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 	}
 
 	tz = found
-	tz.Objekte.Etiketten = tz.Objekte.Etiketten.ImmutableClone()
+	tz.Objekte.Metadatei.Etiketten = tz.Objekte.Metadatei.Etiketten.ImmutableClone()
 
 	return
 }

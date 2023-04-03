@@ -39,7 +39,7 @@ func (f *textMetadateiParser) ReadFormat(r1 io.Reader, z *Objekte) (n int64, err
 	etiketten := kennung.MakeEtikettMutableSet()
 
 	defer func() {
-		z.Etiketten = etiketten.ImmutableClone()
+		z.Metadatei.Etiketten = etiketten.ImmutableClone()
 	}()
 
 	r := bufio.NewReader(r1)
@@ -49,7 +49,7 @@ func (f *textMetadateiParser) ReadFormat(r1 io.Reader, z *Objekte) (n int64, err
 		format.MakeLineReaderRepeat(
 			format.MakeLineReaderKeyValues(
 				map[string]schnittstellen.FuncSetString{
-					"#": z.Bezeichnung.Set,
+					"#": z.Metadatei.Bezeichnung.Set,
 					"%": format.MakeLineReaderNop(),
 					"-": collections.MakeFuncSetString[
 						kennung.Etikett,

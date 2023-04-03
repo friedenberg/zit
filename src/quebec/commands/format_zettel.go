@@ -142,7 +142,10 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		)
 	}
 
-	if err = zt.Objekte.ApplyKonfig(u.Konfig()); err != nil {
+	if err = u.Konfig().ApplyToMetadatei(
+		&zt.Objekte.Metadatei,
+		zt.Objekte.Typ,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

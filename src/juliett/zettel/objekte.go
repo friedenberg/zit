@@ -1,22 +1,18 @@
 package zettel
 
 import (
-	"strings"
-
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/echo/bezeichnung"
+	"github.com/friedenberg/zit/src/metadatei"
 )
 
 type Objekte struct {
-	Akte        sha.Sha
-	Typ         kennung.Typ
-	Bezeichnung bezeichnung.Bezeichnung
-	Etiketten   kennung.EtikettSet
+	Akte      sha.Sha
+	Typ       kennung.Typ
+	Metadatei metadatei.Metadatei
 }
 
 func (z Objekte) GetTyp() kennung.Typ {
@@ -24,7 +20,7 @@ func (z Objekte) GetTyp() kennung.Typ {
 }
 
 func (z Objekte) GetEtiketten() schnittstellen.Set[kennung.Etikett] {
-	return z.Etiketten.ImmutableClone()
+	return z.Metadatei.GetEtiketten()
 }
 
 func (z Objekte) GetGattung() schnittstellen.Gattung {
@@ -49,11 +45,7 @@ func (z Objekte) Equals(z1 Objekte) bool {
 		return false
 	}
 
-	if !z.Bezeichnung.Equals(z1.Bezeichnung) {
-		return false
-	}
-
-	if !z.Etiketten.Equals(z1.Etiketten) {
+	if !z.Metadatei.Equals(z1.Metadatei) {
 		return false
 	}
 
@@ -61,11 +53,7 @@ func (z Objekte) Equals(z1 Objekte) bool {
 }
 
 func (z Objekte) IsEmpty() bool {
-	if strings.TrimSpace(z.Bezeichnung.String()) != "" {
-		return false
-	}
-
-	if z.Etiketten.Len() > 0 {
+	if !z.Metadatei.IsEmpty() {
 		return false
 	}
 
@@ -79,23 +67,11 @@ func (z Objekte) IsEmpty() bool {
 func (z *Objekte) Reset() {
 	z.Akte = sha.Sha{}
 	z.Typ = kennung.Typ{}
-	z.Bezeichnung.Reset()
-	z.Etiketten = kennung.MakeEtikettSet()
+	z.Metadatei.Reset()
 }
 
 func (z *Objekte) ResetWith(z1 Objekte) {
 	z.Akte = z1.Akte
 	z.Typ = z1.Typ
-	z.Bezeichnung = z1.Bezeichnung
-	z.Etiketten = z1.Etiketten.ImmutableClone()
-}
-
-func (z Objekte) Description() (d string) {
-	d = z.Bezeichnung.String()
-
-	if strings.TrimSpace(d) == "" {
-		d = collections.StringCommaSeparated[kennung.Etikett](z.Etiketten)
-	}
-
-	return
+	z.Metadatei.ResetWith(z1.Metadatei)
 }

@@ -43,6 +43,8 @@ func init() {
 	printerDebug = devPrinter{
 		prodPrinter: prodPrinter{
 			f: os.Stderr,
+			// TODO determine thru compilation
+			on: true,
 		},
 		includesStack: true,
 	}

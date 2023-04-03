@@ -17,7 +17,7 @@ func (w *Writer) zettelToItem(
 ) (a *alfred.Item) {
 	a = w.alfredWriter.Get()
 
-	a.Title = z.Objekte.Bezeichnung.String()
+	a.Title = z.Objekte.Metadatei.Bezeichnung.String()
 
 	if a.Title == "" {
 		a.Title = z.Kennung().String()
@@ -40,7 +40,7 @@ func (w *Writer) zettelToItem(
 	mb.AddMatches(z.Kennung().String())
 	mb.AddMatches(z.Kennung().Kopf())
 	mb.AddMatches(z.Kennung().Schwanz())
-	mb.AddMatches(z.Objekte.Bezeichnung.String())
+	mb.AddMatches(z.Objekte.Metadatei.Bezeichnung.String())
 	mb.AddMatches(z.Objekte.Typ.String())
 	mb.AddMatches(z.Verzeichnisse.Etiketten.SortedExpanded...)
 	mb.AddMatches(z.Verzeichnisse.Typ.Expanded...)

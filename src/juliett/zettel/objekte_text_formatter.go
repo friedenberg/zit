@@ -141,10 +141,10 @@ func (f objekteTextFormatter) writeToExternalAkte(
 
 	w.WriteLines(
 		MetadateiBoundary,
-		fmt.Sprintf("# %s", c.Zettel.Bezeichnung),
+		fmt.Sprintf("# %s", c.Zettel.Metadatei.Bezeichnung),
 	)
 
-	for _, e := range collections.SortedValues(c.Zettel.Etiketten) {
+	for _, e := range collections.SortedValues(c.Zettel.Metadatei.Etiketten) {
 		w.WriteFormat("- %s", e)
 	}
 

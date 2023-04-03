@@ -456,3 +456,4 @@ func (c *compiled) applyExpandedEtikett(ct *etikett.Transacted) {
 		ct.Objekte.Akte.Merge(ex.Objekte.Akte)
 	}
 }
+

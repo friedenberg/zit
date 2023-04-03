@@ -33,7 +33,7 @@ func MakeWriterComplete(w io.Writer) WriterComplete {
 			s.wBuf.WriteString("\tZettel: !")
 			s.wBuf.WriteString(z.Objekte.Typ.String())
 			s.wBuf.WriteString(" ")
-			s.wBuf.WriteString(z.Objekte.Bezeichnung.String())
+			s.wBuf.WriteString(z.Objekte.Metadatei.Bezeichnung.String())
 			s.wBuf.WriteString("\n")
 		}
 

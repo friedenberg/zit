@@ -27,7 +27,7 @@ func (s SetPrefixVerzeichnisse) Len() int {
 
 // this splits on right-expanded
 func (s *SetPrefixVerzeichnisse) Add(z Transacted) {
-	es := kennung.Expanded(z.Objekte.Etiketten, kennung.ExpanderRight)
+	es := kennung.Expanded(z.Objekte.Metadatei.Etiketten, kennung.ExpanderRight)
 
 	if es.Len() == 0 {
 		es = kennung.MakeEtikettSet(kennung.Etikett{})
@@ -116,7 +116,10 @@ func (a SetPrefixVerzeichnisse) Subset(e kennung.Etikett) (out SetPrefixVerzeich
 
 		zSet.Each(
 			func(z *Transacted) (err error) {
-				intersection := kennung.IntersectPrefixes(z.Objekte.Etiketten, kennung.MakeEtikettSet(e))
+				intersection := kennung.IntersectPrefixes(
+					z.Objekte.Metadatei.Etiketten,
+					kennung.MakeEtikettSet(e),
+				)
 				errors.Log().Printf("%s yields %s", e1, intersection)
 
 				if intersection.Len() > 0 {

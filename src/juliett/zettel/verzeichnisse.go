@@ -29,7 +29,7 @@ func (z Verzeichnisse) GetEtikettenExpanded() schnittstellen.Set[kennung.Etikett
 func (z *Verzeichnisse) ResetWithObjekte(z1 Objekte) {
 	z.wasPopulated = true
 
-	z.Etiketten.ResetWithEtikettSet(z1.Etiketten)
+	z.Etiketten.ResetWithEtikettSet(z1.Metadatei.Etiketten)
 	z.Typ.ResetWithTyp(z1.Typ)
 }
 

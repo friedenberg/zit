@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/organize_text"
 	"github.com/friedenberg/zit/src/lima/changes"
+	"github.com/friedenberg/zit/src/metadatei"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
@@ -74,9 +75,9 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 			return
 		}
 
-		mes := z.objekte.Etiketten.MutableClone()
+		mes := z.objekte.Metadatei.Etiketten.MutableClone()
 		mes.Add(e)
-		z.objekte.Etiketten = mes.ImmutableClone()
+		z.objekte.Metadatei.Etiketten = mes.ImmutableClone()
 		toUpdate[z.kennung.String()] = z
 
 		errors.Err().Printf("Added etikett '%s' to zettel '%s'", e, z.kennung)
@@ -92,9 +93,9 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 			return
 		}
 
-		mes := z.objekte.Etiketten.MutableClone()
+		mes := z.objekte.Metadatei.Etiketten.MutableClone()
 		kennung.RemovePrefixes(mes, e)
-		z.objekte.Etiketten = mes.ImmutableClone()
+		z.objekte.Metadatei.Etiketten = mes.ImmutableClone()
 
 		toUpdate[z.kennung.String()] = z
 
@@ -153,11 +154,13 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 		etts := n.Etiketten
 
 		z := zettel.Objekte{
-			Etiketten: etts.ImmutableClone(),
-			Typ:       b.Metadatei.Typ,
+			Metadatei: metadatei.Metadatei{
+				Etiketten: etts.ImmutableClone(),
+			},
+			Typ: b.Metadatei.Typ,
 		}
 
-		if err = z.Bezeichnung.Set(bez); err != nil {
+		if err = z.Metadatei.Bezeichnung.Set(bez); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -172,7 +175,7 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 		}
 
 		if c.Konfig().DryRun {
-			errors.Out().Printf("[%s] (would create)", z.Bezeichnung)
+			errors.Out().Printf("[%s] (would create)", z.Metadatei.Bezeichnung)
 			continue
 		}
 

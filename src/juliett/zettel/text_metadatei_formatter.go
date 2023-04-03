@@ -24,13 +24,13 @@ func (f *TextMetadateiFormatter) Format(w1 io.Writer, m *Metadatei) (n int64, er
 
 	w := format.NewLineWriter()
 
-	if m.Bezeichnung.String() != "" || !f.DoNotWriteEmptyBezeichnung {
+	if m.Metadatei.Bezeichnung.String() != "" || !f.DoNotWriteEmptyBezeichnung {
 		w.WriteLines(
-			fmt.Sprintf("# %s", m.Bezeichnung),
+			fmt.Sprintf("# %s", m.Metadatei.Bezeichnung),
 		)
 	}
 
-	for _, e := range collections.SortedValues(m.Etiketten) {
+	for _, e := range collections.SortedValues(m.Metadatei.Etiketten) {
 		errors.TodoP3("determine how to handle this")
 
 		if e.IsEmpty() {

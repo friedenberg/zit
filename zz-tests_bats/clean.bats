@@ -24,6 +24,11 @@ function clean_all { # @test
 		           (deleted) [one/dos.zettel]
 		           (deleted) [one/uno.zettel]
 		           (deleted) [one]
+		           (deleted) [tag-1.etikett]
+		           (deleted) [tag-2.etikett]
+		           (deleted) [tag-3.etikett]
+		           (deleted) [tag-4.etikett]
+		           (deleted) [tag.etikett]
 	EOM
 
 	run find . -maxdepth 2 ! -ipath './.zit*'
@@ -44,6 +49,11 @@ function clean_zettels { # @test
 	assert_output_unsorted - <<-EOM
 		.
 		./md.typ
+		./tag-1.etikett
+		./tag-2.etikett
+		./tag-3.etikett
+		./tag-4.etikett
+		./tag.etikett
 	EOM
 }
 
@@ -84,7 +94,13 @@ function clean_all_dirty_wd { # @test
 
 	run_zit clean .
 	assert_success
-	assert_output ''
+	assert_output_unsorted - <<-EOM
+		           (deleted) [tag-3.etikett]
+		           (deleted) [tag-4.etikett]
+		           (deleted) [tag.etikett]
+		           (deleted) [tag-1.etikett]
+		           (deleted) [tag-2.etikett]
+	EOM
 
 	run find . -maxdepth 2 ! -ipath './.zit*'
 	assert_success
@@ -142,6 +158,11 @@ function clean_all_force_dirty_wd { # @test
 		           (deleted) [one/dos.zettel]
 		           (deleted) [one/uno.zettel]
 		           (deleted) [one]
+		           (deleted) [tag-1.etikett]
+		           (deleted) [tag-2.etikett]
+		           (deleted) [tag-3.etikett]
+		           (deleted) [tag-4.etikett]
+		           (deleted) [tag.etikett]
 		           (deleted) [zz-archive.etikett]
 	EOM
 

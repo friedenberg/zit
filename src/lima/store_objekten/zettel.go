@@ -316,7 +316,7 @@ func (s *zettelStore) Create(
 
 	s.protoZettel.Apply(&in)
 
-	if err = in.ApplyKonfig(s.StoreUtil.GetKonfig()); err != nil {
+	if err = s.StoreUtil.GetKonfig().ApplyToMetadatei(&in.Metadatei, in.Typ); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -356,7 +356,7 @@ func (s *zettelStore) Create(
 		return
 	}
 
-	if err = s.StoreUtil.GetKennungIndex().Add(tz.Objekte.Etiketten); err != nil {
+	if err = s.StoreUtil.GetKennungIndex().Add(tz.Objekte.Metadatei.Etiketten); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -390,7 +390,10 @@ func (s *zettelStore) UpdateCheckedOut(
 		return
 	}
 
-	if err = co.External.Objekte.ApplyKonfig(s.StoreUtil.GetKonfig()); err != nil {
+	if err = s.StoreUtil.GetKonfig().ApplyToMetadatei(
+		&co.External.Objekte.Metadatei,
+		co.External.Objekte.Typ,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -449,7 +452,10 @@ func (s *zettelStore) Update(
 		return
 	}
 
-	if err = z.ApplyKonfig(s.StoreUtil.GetKonfig()); err != nil {
+	if err = s.StoreUtil.GetKonfig().ApplyToMetadatei(
+		&z.Metadatei,
+		z.Typ,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

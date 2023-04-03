@@ -132,7 +132,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		}
 
 		if c.NewEtiketten.Len() > 0 {
-			zettels[i].Objekte.Etiketten = c.NewEtiketten
+			zettels[i].Objekte.Metadatei.Etiketten = c.NewEtiketten
 		}
 	}
 

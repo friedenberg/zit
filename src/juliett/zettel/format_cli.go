@@ -19,10 +19,10 @@ func MakeCliFormat(
 	return func(w io.Writer, z Objekte) (n int64, err error) {
 		var lastWriter schnittstellen.FuncWriter
 
-		if z.Bezeichnung.IsEmpty() {
-			lastWriter = format.MakeWriter(ef, schnittstellen.SetLike[kennung.Etikett](z.Etiketten))
+		if z.Metadatei.Bezeichnung.IsEmpty() {
+			lastWriter = format.MakeWriter(ef, schnittstellen.SetLike[kennung.Etikett](z.Metadatei.Etiketten))
 		} else {
-			lastWriter = format.MakeWriter(bf, z.Bezeichnung)
+			lastWriter = format.MakeWriter(bf, z.Metadatei.Bezeichnung)
 		}
 
 		return format.Write(

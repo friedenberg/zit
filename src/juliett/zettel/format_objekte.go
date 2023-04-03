@@ -49,9 +49,9 @@ func (f FormatObjekte) Format(
 
 	w.WriteFormat("%s %s", gattung.Akte, z.Akte)
 	w.WriteFormat("%s %s", gattung.Typ, z.Typ)
-	w.WriteFormat("%s %s", gattung.Bezeichnung, z.Bezeichnung)
+	w.WriteFormat("%s %s", gattung.Bezeichnung, z.Metadatei.Bezeichnung)
 
-	for _, e := range collections.SortedValues(z.Etiketten) {
+	for _, e := range collections.SortedValues(z.Metadatei.Etiketten) {
 		w.WriteFormat("%s %s", gattung.Etikett, e)
 	}
 
@@ -87,21 +87,21 @@ func (f *FormatObjekte) Parse(
 					gattung.Akte.String():        z.Akte.Set,
 					gattung.Typ.String():         typLineReader,
 					gattung.AkteTyp.String():     typLineReader,
-					gattung.Bezeichnung.String(): z.Bezeichnung.Set,
+					gattung.Bezeichnung.String(): z.Metadatei.Bezeichnung.Set,
 					gattung.Etikett.String():     esa,
 				},
 			),
 		),
 		// format.MakeLineReaderKeyValue(gattung.Akte.String(), z.Akte.Set),
 		// format.MakeLineReaderKeyValue(gattung.Typ.String(), typLineReader),
-		// format.MakeLineReaderKeyValue(gattung.Bezeichnung.String(), z.Bezeichnung.Set),
+		// format.MakeLineReaderKeyValue(gattung.Bezeichnung.String(), z.Metadatei.Bezeichnung.Set),
 		// format.MakeLineReaderKeyValue(gattung.Etikett.String(), etiketten.AddString),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	z.Etiketten = etiketten.ImmutableClone()
+	z.Metadatei.Etiketten = etiketten.ImmutableClone()
 
 	return
 }

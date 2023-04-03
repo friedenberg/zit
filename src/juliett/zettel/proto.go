@@ -9,6 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/india/konfig"
+	"github.com/friedenberg/zit/src/metadatei"
 )
 
 type ProtoZettel struct {
@@ -54,11 +55,11 @@ func (pz ProtoZettel) Equals(z Objekte) (ok bool) {
 		okTyp = true
 	}
 
-	if pz.Etiketten.Len() > 0 && pz.Etiketten.Equals(z.Etiketten) {
+	if pz.Etiketten.Len() > 0 && pz.Etiketten.Equals(z.Metadatei.Etiketten) {
 		okEt = true
 	}
 
-	if !pz.Bezeichnung.WasSet() || pz.Bezeichnung.Equals(z.Bezeichnung) {
+	if !pz.Bezeichnung.WasSet() || pz.Bezeichnung.Equals(z.Metadatei.Bezeichnung) {
 		okBez = true
 	}
 
@@ -71,7 +72,9 @@ func (pz ProtoZettel) Make() (z *Objekte) {
 	todo.Change("add typ")
 	todo.Change("add Bezeichnung")
 	z = &Objekte{
-		Etiketten: kennung.MakeEtikettSet(),
+		Metadatei: metadatei.Metadatei{
+			Etiketten: kennung.MakeEtikettSet(),
+		},
 	}
 
 	pz.Apply(z)
@@ -85,18 +88,18 @@ func (pz ProtoZettel) Apply(z *Objekte) (ok bool) {
 		z.Typ = pz.Typ
 	}
 
-	if pz.Bezeichnung.WasSet() && !z.Bezeichnung.Equals(pz.Bezeichnung) {
+	if pz.Bezeichnung.WasSet() && !z.Metadatei.Bezeichnung.Equals(pz.Bezeichnung) {
 		ok = true
-		z.Bezeichnung = pz.Bezeichnung
+		z.Metadatei.Bezeichnung = pz.Bezeichnung
 	}
 
 	if pz.Etiketten.Len() > 0 {
 		ok = true
 	}
 
-	mes := z.Etiketten.MutableClone()
+	mes := z.Metadatei.Etiketten.MutableClone()
 	pz.Etiketten.Each(mes.Add)
-	z.Etiketten = mes.ImmutableClone()
+	z.Metadatei.Etiketten = mes.ImmutableClone()
 
 	return
 }
@@ -118,18 +121,18 @@ func (pz ProtoZettel) ApplyWithAkteFD(z *Objekte, akteFD kennung.FD) (err error)
 
 	bez := akteFD.FileNameSansExt()
 
-	if pz.Bezeichnung.WasSet() && !z.Bezeichnung.Equals(pz.Bezeichnung) {
+	if pz.Bezeichnung.WasSet() && !z.Metadatei.Bezeichnung.Equals(pz.Bezeichnung) {
 		bez = pz.Bezeichnung.String()
 	}
 
-	if err = z.Bezeichnung.Set(bez); err != nil {
+	if err = z.Metadatei.Bezeichnung.Set(bez); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	mes := z.Etiketten.MutableClone()
+	mes := z.Metadatei.Etiketten.MutableClone()
 	pz.Etiketten.Each(mes.Add)
-	z.Etiketten = mes.ImmutableClone()
+	z.Metadatei.Etiketten = mes.ImmutableClone()
 
 	return
 }
