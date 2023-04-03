@@ -9,8 +9,8 @@ import (
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte"
+	"github.com/friedenberg/zit/src/kilo/objekte_formatter"
 	"github.com/friedenberg/zit/src/november/umwelt"
-	"github.com/friedenberg/zit/src/objekte_formatter"
 )
 
 type Show struct {

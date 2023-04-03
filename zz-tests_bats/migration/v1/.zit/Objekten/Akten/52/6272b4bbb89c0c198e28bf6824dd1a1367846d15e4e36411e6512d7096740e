@@ -1,0 +1,8 @@
+recipients = []
+
+[file-extensions]
+zettel = 'zettel'
+organize = 'md'
+typ = 'typ'
+etikett = 'etikett'
+kasten = 'kasten'
