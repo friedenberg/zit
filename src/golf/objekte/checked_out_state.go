@@ -17,7 +17,6 @@ const (
 )
 
 func (s CheckedOutState) String() string {
-
 	switch s {
 	case CheckedOutStateJustCheckedOutButSame:
 		return "checked out"

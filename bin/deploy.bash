@@ -33,3 +33,4 @@ if [[ "$(git status --porcelain=v1 2>/dev/null | wc -l)" -gt 0 ]]; then
 fi
 
 git push
+make install

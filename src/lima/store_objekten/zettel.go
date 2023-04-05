@@ -1,6 +1,7 @@
 package store_objekten
 
 import (
+	"io"
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -216,16 +217,73 @@ func (s *zettelStore) ReadOneExternal(
 		return
 	}
 
+	ez.Sku.ResetWithExternalMaybe(e)
+
 	switch m {
 	case sku.CheckoutModeAkteOnly:
-		// support akte
-		todo.Implement()
-		errors.Err().Printf("unsupported checkout mode: akte only")
+		if err = s.readOneExternalAkte(&ez, t); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+	case sku.CheckoutModeObjekteOnly, sku.CheckoutModeObjekteAndAkte:
+		if err = s.readOneExternalObjekte(&ez, t); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
+func (s *zettelStore) readOneExternalAkte(
+	ez *zettel.External,
+	t *zettel.Transacted,
+) (err error) {
+	ez.Objekte = t.Objekte
+
+	var aw sha.WriteCloser
+
+	if aw, err = s.StoreUtil.AkteWriter(); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
-	ez.Sku.ResetWithExternalMaybe(e)
+	defer errors.DeferredCloser(&err, aw)
 
+	var f *os.File
+
+	if f, err = files.OpenExclusiveReadOnly(
+		ez.GetAkteFD().Path,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.DeferredCloser(&err, f)
+
+	if _, err = io.Copy(aw, f); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	sh := sha.Make(aw.Sha())
+	ez.Objekte.Akte = sh
+
+	if ez.Sku.ObjekteSha, err = s.WriteZettelObjekte(
+		ez.Objekte,
+	); err != nil {
+		err = errors.Wrapf(err, "%s", f.Name())
+		return
+	}
+
+	return
+}
+
+func (s *zettelStore) readOneExternalObjekte(
+	ez *zettel.External,
+	t *zettel.Transacted,
+) (err error) {
 	c := zettel.ObjekteParserContext{}
 
 	var f *os.File

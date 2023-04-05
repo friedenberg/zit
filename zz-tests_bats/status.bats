@@ -109,13 +109,11 @@ function status_zettel_akte_checkout { # @test
 		       (checked out) [two/uno.txt@aeb82efa111ccb5b8c5ca351f12d8b2f8e76d8d7bd0ecebf2efaaa1581d19400 !txt "the new zettel"]
 	EOM
 
-  # TODO
-	# run_zit status .z
-	# assert_success
-	# assert_output - <<-EOM
-	# 	              (same) [one/dos.zettel@c6b9d095358b8b26a99e90496d916ba92a99e9b75c705165df5f6d353a949ea9 !md "wow ok again"]
-	# 	              (same) [one/uno.zettel@d47c552a5299f392948258d7959fc7cf94843316a21c8ea12854ed84a8c06367 !md "wow the first"]
-	# EOM
+	run_zit status .z
+	assert_success
+	assert_output - <<-EOM
+		              (same) [two/uno.txt@aeb82efa111ccb5b8c5ca351f12d8b2f8e76d8d7bd0ecebf2efaaa1581d19400]
+	EOM
 }
 
 function status_zettelen_typ { # @test
