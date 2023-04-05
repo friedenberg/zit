@@ -207,9 +207,22 @@ func (s *zettelStore) writeNamedZettelToIndex(
 
 func (s *zettelStore) ReadOneExternal(
 	e cwd.Zettel,
+	t *zettel.Transacted,
 ) (ez zettel.External, err error) {
-	// support akte
-	todo.Implement()
+	var m sku.CheckoutMode
+
+	if m, err = e.GetCheckoutMode(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	switch m {
+	case sku.CheckoutModeAkteOnly:
+		// support akte
+		todo.Implement()
+		errors.Err().Printf("unsupported checkout mode: akte only")
+		return
+	}
 
 	ez.Sku.ResetWithExternalMaybe(e)
 

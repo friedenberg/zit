@@ -27,9 +27,10 @@ type OneReader[
 
 type ExternalReader[
 	E any,
+  T any,
 	V any,
 ] interface {
-	ReadOneExternal(E) (V, error)
+	ReadOneExternal(E, T) (V, error)
 }
 
 type AllReader[

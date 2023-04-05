@@ -7,6 +7,10 @@ setup() {
 	export output
 }
 
+teardown() {
+	rm_from_version
+}
+
 cmd_def_organize=(
 	"${cmd_zit_def[@]}"
 	-right-align=false
@@ -250,12 +254,8 @@ function outputs_organize_two_zettels_one_etiketten_group_by_one { # @test
 }
 
 function outputs_organize_one_etiketten_group_by_two { # @test
-	skip
-	wd="$(mktemp -d)"
-	cd "$wd" || exit 1
-
-	run_zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
-	assert_success
+	cd "$BATS_TEST_TMPDIR" || exit 1
+	run_zit_init_disable_age
 
 	to_add="$(mktemp)"
 	{
@@ -283,27 +283,28 @@ function outputs_organize_one_etiketten_group_by_two { # @test
 	run_zit new -edit=false "$to_add"
 	assert_success
 
-	expected_organize="$(mktemp)"
-	{
-		echo
-		echo "# task"
-		echo
-		echo " ## priority-1"
-		echo
-		echo "  ### w-2022-07"
-		echo
-		echo "   #### -06"
-		echo
-		echo "   - [one/dos] two/dos"
-		echo
-		echo "   #### -07"
-		echo
-		echo "   - [one/uno] one/uno"
-	} >"$expected_organize"
-
 	run_zit organize "${cmd_def_organize[@]}" -mode output-only -group-by priority,w task
 	assert_success
-	assert_output "$(cat "$expected_organize")"
+	assert_output - <<-EOM
+
+		# task
+
+		 ## priority
+
+		  ### -1
+
+		   #### w
+
+		    ##### -2022-07
+
+		     ###### -06
+
+		     - [one/dos] two/dos
+
+		     ###### -07
+
+		     - [one/uno] one/uno
+	EOM
 }
 
 function commits_organize_one_etiketten_group_by_two { # @test
@@ -763,11 +764,8 @@ function commits_dependent_leaf { # @test
 }
 
 function zettels_in_correct_places { # @test
-	skip
-	wd="$(mktemp -d)"
-	cd "$wd" || exit 1
-
-	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	cd "$BATS_TEST_TMPDIR" || exit 1
+	run_zit_init_disable_age
 
 	one="$(mktemp)"
 	{
@@ -779,18 +777,19 @@ function zettels_in_correct_places { # @test
 
 	run_zit new -edit=false "$one"
 
-	expected_organize="$(mktemp)"
-	{
-		echo
-		echo "# inventory-pipe_shelves-atheist_shoes_box-jabra_yellow_box_2"
-		echo
-		echo "- [one/uno] jabra coral usb_a-to-usb_c cable"
-	} >"$expected_organize"
-
 	run_zit organize "${cmd_def_organize[@]}" -mode output-only -group-by inventory \
 		inventory-pipe_shelves-atheist_shoes_box-jabra_yellow_box_2
 
-	assert_output "$(cat "$expected_organize")"
+	assert_output - <<-EOM
+
+		# inventory-pipe_shelves-atheist_shoes_box-jabra_yellow_box_2
+
+		 ## inventory
+
+		  ### -pipe_shelves-atheist_shoes_box-jabra_yellow_box_2
+
+		  - [one/uno] jabra coral usb_a-to-usb_c cable
+	EOM
 }
 
 function etiketten_correct { # @test

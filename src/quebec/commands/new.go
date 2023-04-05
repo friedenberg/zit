@@ -12,7 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/golf/objekte"
+	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/mike/store_fs"
@@ -100,7 +100,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 			options := store_fs.CheckoutOptions{
 				Cwd:          cwdFiles,
-				CheckoutMode: objekte.CheckoutModeObjekteAndAkte,
+				CheckoutMode: sku.CheckoutModeObjekteAndAkte,
 			}
 
 			if zsc, err = u.StoreWorkingDirectory().Checkout(

@@ -1,6 +1,7 @@
 package sku
 
 import (
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/delta/kennung"
@@ -9,6 +10,7 @@ import (
 type ExternalMaybeLike interface {
 	IdLikeGetter
 	kennung.FDPairGetter
+	CheckoutModeGetter
 }
 
 type ExternalFDs struct {
@@ -71,4 +73,24 @@ func (e ExternalMaybe[T, T1]) GetObjekteFD() kennung.FD {
 
 func (e ExternalMaybe[T, T1]) GetAkteFD() kennung.FD {
 	return e.FDs.Akte
+}
+
+func (e ExternalMaybe[T, T1]) GetCheckoutMode() (m CheckoutMode, err error) {
+	switch {
+	case !e.FDs.Objekte.IsEmpty() && !e.FDs.Akte.IsEmpty():
+		m = CheckoutModeObjekteAndAkte
+
+	case !e.FDs.Akte.IsEmpty():
+		m = CheckoutModeAkteOnly
+
+	case !e.FDs.Objekte.IsEmpty():
+		m = CheckoutModeObjekteOnly
+
+	default:
+		err = MakeErrInvalidCheckoutMode(
+			errors.Errorf("all FD's are empty"),
+		)
+	}
+
+	return
 }

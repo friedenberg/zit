@@ -1,5 +1,17 @@
 #! /usr/bin/env bash -e
 
+if [[ "$(($(ag skip zz-tests_bats/ -l | wc -l)))" -gt 0 ]]; then
+	echo "The following tests have skips and so the deploy cannot go forward" >&2
+	ag skip zz-tests_bats/ -l
+  exit 1
+fi
+
+if [[ "$(($(ag "log.Debug" -l src/ | wc -l)))" -gt 0 ]]; then
+	echo "The following files have debug logs and so the deploy cannot go forward" >&2
+	ag "log.Debug" -l src/
+  exit 1
+fi
+
 git pull --rebase
 
 #TODO pause mr-build-and-watch and then resume after
@@ -11,7 +23,7 @@ else
 	make
 fi
 
-$cmd_make deploy
+$cmd_make build/deploy
 
 go clean -cache -fuzzcache
 git add .

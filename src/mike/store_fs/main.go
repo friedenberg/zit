@@ -259,7 +259,10 @@ func (s *Store) ReadFiles(
 
 					var tco kasten.CheckedOut
 
-					if tco.External, err = s.storeObjekten.Kasten().ReadOneExternal(il); err != nil {
+					if tco.External, err = s.storeObjekten.Kasten().ReadOneExternal(
+						il,
+						nil,
+					); err != nil {
 						if errors.IsNotExist(err) {
 							err = iter.MakeErrStopIteration()
 						} else {
@@ -288,7 +291,10 @@ func (s *Store) ReadFiles(
 
 					var tco typ.CheckedOut
 
-					if tco.External, err = s.storeObjekten.Typ().ReadOneExternal(il); err != nil {
+					if tco.External, err = s.storeObjekten.Typ().ReadOneExternal(
+						il,
+						nil,
+					); err != nil {
 						if errors.IsNotExist(err) {
 							err = iter.MakeErrStopIteration()
 						} else {
@@ -319,6 +325,7 @@ func (s *Store) ReadFiles(
 
 					if tco.External, err = s.storeObjekten.Etikett().ReadOneExternal(
 						il,
+						nil,
 					); err != nil {
 						if errors.IsNotExist(err) {
 							err = iter.MakeErrStopIteration()

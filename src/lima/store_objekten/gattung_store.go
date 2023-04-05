@@ -84,6 +84,7 @@ type CommonStoreBase[
 
 	objekte_store.ExternalReader[
 		sku.ExternalMaybe[K, KPtr],
+		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
 		objekte.External[O, OPtr, K, KPtr],
 	]
 }
@@ -364,10 +365,13 @@ func (s *commonStoreBase[O, OPtr, K, KPtr, V, VPtr]) Query(
 }
 
 func (s *commonStore[O, OPtr, K, KPtr, V, VPtr]) ReadOneExternal(
-	e sku.ExternalMaybe[K, KPtr],
-) (t objekte.External[O, OPtr, K, KPtr], err error) {
-	if t.Objekte, t.Sku, err = s.ParseAndSaveAkteAndObjekte(
-		e,
+	em sku.ExternalMaybe[K, KPtr],
+	t *objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
+) (e objekte.External[O, OPtr, K, KPtr], err error) {
+	// support akte
+	todo.Implement()
+	if e.Objekte, e.Sku, err = s.ParseAndSaveAkteAndObjekte(
+		em,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -469,6 +473,7 @@ func (s *commonStore[O, OPtr, K, KPtr, V, VPtr]) CheckoutOne(
 						},
 					},
 				},
+				t,
 			); err != nil {
 				err = errors.Wrap(err)
 				return

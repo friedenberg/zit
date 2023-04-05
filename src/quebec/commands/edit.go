@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/mike/store_fs"
@@ -28,7 +29,7 @@ func init() {
 		"edit",
 		func(f *flag.FlagSet) CommandWithCwdQuery {
 			c := &Edit{
-				CheckoutMode: objekte.CheckoutModeObjekteOnly,
+				CheckoutMode: sku.CheckoutModeObjekteOnly,
 			}
 
 			f.BoolVar(&c.Delete, "delete", false, "delete the zettel and akte after successful checkin")

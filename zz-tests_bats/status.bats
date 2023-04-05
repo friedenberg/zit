@@ -17,6 +17,26 @@ teardown() {
 	rm_from_version "$version"
 }
 
+function dirty_new_zettel() {
+	run_zit new -edit=false - <<-EOM
+		---
+		# the new zettel
+		- etikett-one
+		! txt
+		---
+
+		with a different typ
+	EOM
+
+	assert_success
+	assert_output --partial - <<-EOM
+		[!txt@9166da1cf49228407b118594dc6d3e17a9d4e66fdd121f763e46190fdc154850]
+		[-etikett@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-etikett-one@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[two/uno@2e844ebe1018e2071c6f2b6b37a9ea2c1bd69e391d89f54aa4256228a1d49db0 !txt "the new zettel"]
+	EOM
+}
+
 function dirty_one_uno() {
 	cat >one/uno.zettel <<-EOM
 		---
@@ -75,6 +95,27 @@ function status_simple_one_zettel { # @test
 	assert_output - <<-EOM
 		           (changed) [one/uno.zettel@689c6787364899defa77461ff6a3f454ca667654653f86d5d44f2826950ff4f9 !md "wildly different"]
 	EOM
+}
+
+function status_zettel_akte_checkout { # @test
+	run_zit clean .
+	assert_success
+
+	dirty_new_zettel
+
+	run_zit checkout -mode akte two/uno
+	assert_success
+	assert_output - <<-EOM
+		       (checked out) [two/uno.txt@aeb82efa111ccb5b8c5ca351f12d8b2f8e76d8d7bd0ecebf2efaaa1581d19400 !txt "the new zettel"]
+	EOM
+
+  # TODO
+	# run_zit status .z
+	# assert_success
+	# assert_output - <<-EOM
+	# 	              (same) [one/dos.zettel@c6b9d095358b8b26a99e90496d916ba92a99e9b75c705165df5f6d353a949ea9 !md "wow ok again"]
+	# 	              (same) [one/uno.zettel@d47c552a5299f392948258d7959fc7cf94843316a21c8ea12854ed84a8c06367 !md "wow the first"]
+	# EOM
 }
 
 function status_zettelen_typ { # @test

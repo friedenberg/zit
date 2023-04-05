@@ -164,7 +164,10 @@ func (s *Store) CheckoutOneZettel(
 			return
 		}
 
-		if cz.External, err = s.storeObjekten.Zettel().ReadOneExternal(e); err != nil {
+		if cz.External, err = s.storeObjekten.Zettel().ReadOneExternal(
+			e,
+			&sz,
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -191,7 +194,8 @@ func (s *Store) CheckoutOneZettel(
 		cz.External.Sku.FDs.Objekte.Path = filename
 	}
 
-	if !inlineAkte && options.CheckoutMode.IncludesAkte() {
+	if (!inlineAkte || !options.CheckoutMode.IncludesObjekte()) &&
+		options.CheckoutMode.IncludesAkte() {
 		t := sz.Objekte.Typ
 
 		ty := s.erworben.GetApproximatedTyp(t).ApproximatedOrActual()

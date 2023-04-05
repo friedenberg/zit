@@ -65,8 +65,7 @@ build/tests_bats_migration: build/zit
 build/tests_slower: build/tests_fast build/tests_slow build/tests_bats_migration;
 > touch "$@"
 
-build/deploy: build/tests_slower
-> [[ "$$(($$(ag "log.Debug" -l src/ | wc -l)))" = 0 ]]
+build/deploy: build/tests_slower;
 
 graph_dependencies:
 > ./bin/graph_dependencies

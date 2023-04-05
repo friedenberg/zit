@@ -121,11 +121,10 @@ function add_2 { # @test
 }
 
 function add_dedupe_1 { # @test
-	skip
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	run_zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
 	assert_success
 
 	f=to_add.md
@@ -133,20 +132,28 @@ function add_dedupe_1 { # @test
 		echo test file
 	} >"$f"
 
-	run run_zit add \
+	run_zit add \
 		-dedupe \
 		-etiketten zz-inbox-2022-11-14 \
 		"$f"
 
 	assert_success
-	assert_output --partial '          (new) [o/u@b !md "to_add.md"]'
-	assert_output --partial '      (updated) [o/u@d !md "to_add.md"]'
-	# assert_output --partial '[to_add.md] (deleted)'
+	assert_output - <<-EOM
+		[-zz@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-zz-inbox@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-zz-inbox-2022@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-zz-inbox-2022-11@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-zz-inbox-2022-11-14@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[one/uno@8f8aa93ce3cb3da0e5eddb2c9556fe37980d0aaf58f2760de451a93ce337b0c2 !md "to_add"]
+		[one/uno@8f8aa93ce3cb3da0e5eddb2c9556fe37980d0aaf58f2760de451a93ce337b0c2 !md "to_add"]
+	EOM
 
-	run zit checkout o/u
+	run_zit checkout o/u
 	#TODO-P2 fix race condition
 	assert_success
-	assert_output '  (checked out) [one/uno.zettel@d !md "to_add.md"]'
+	assert_output - <<-EOM
+		       (checked out) [one/uno.zettel@8f8aa93ce3cb3da0e5eddb2c9556fe37980d0aaf58f2760de451a93ce337b0c2 !md "to_add"]
+	EOM
 
 	{
 		echo '---'
@@ -158,10 +165,15 @@ function add_dedupe_1 { # @test
 		echo 'test file'
 	} >one/uno.zettel
 
-	run zit checkin -delete one/uno.zettel
+	run_zit checkin -delete one/uno.zettel
 	assert_success
-	assert_output --partial '      (updated) [o/u@a !md "new title"]'
-	assert_output --partial '      (deleted) [one/uno.zettel]'
+	assert_output - <<-EOM
+		[-new@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-new-tag@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[one/uno@d4853a453015235e41b9513f7e70d91b1a28212f9bd342daf5024b84f35d209f !md "new title"]
+		           (deleted) [one/uno.zettel]
+		           (deleted) [one]
+	EOM
 
 	run zit add \
 		-predictable-hinweisen \
@@ -170,19 +182,17 @@ function add_dedupe_1 { # @test
 		-etiketten new-etikett-2 \
 		"$f"
 
-	{
-		echo '---'
-		echo '# new title'
-		echo '- new-etikett-2'
-		echo '- new-tag'
-		echo '! md'
-		echo '---'
-		echo ''
-		echo 'test file'
-	} >expected
-
 	run zit show o/u
 	#TODO-P2 fix race condition
 	assert_success
-	assert_output "$(cat expected)"
+	assert_output - <<-EOM
+		---
+		# new title
+		- new-etikett-2
+		- new-tag
+		! md
+		---
+
+		test file
+	EOM
 }

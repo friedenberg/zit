@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/script_config"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/cwd"
@@ -23,7 +24,7 @@ func init() {
 		"format-zettel",
 		func(f *flag.FlagSet) Command {
 			c := &FormatZettel{
-				Mode: objekte.CheckoutModeObjekteAndAkte,
+				Mode: sku.CheckoutModeObjekteAndAkte,
 			}
 
 			f.Var(&c.Mode, "mode", "zettel, akte, or both")
@@ -73,7 +74,10 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	if e, ok := cwdFiles.GetZettel(h); ok {
 		var ze zettel.External
 
-		if ze, err = u.StoreObjekten().Zettel().ReadOneExternal(e); err != nil {
+		if ze, err = u.StoreObjekten().Zettel().ReadOneExternal(
+			e,
+			nil,
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

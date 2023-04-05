@@ -30,7 +30,9 @@ type externalMaybeGetterReader[
 	VPtr schnittstellen.VerzeichnissePtr[V, O],
 ] struct {
 	getter func(K) (sku.ExternalMaybe[K, KPtr], bool)
-	ExternalReader[sku.ExternalMaybe[K, KPtr], objekte.External[O, OPtr, K, KPtr]]
+	ExternalReader[sku.ExternalMaybe[K, KPtr],
+		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
+		objekte.External[O, OPtr, K, KPtr]]
 }
 
 func MakeExternalMaybeGetterReader[
@@ -44,6 +46,7 @@ func MakeExternalMaybeGetterReader[
 	getter func(K) (sku.ExternalMaybe[K, KPtr], bool),
 	er ExternalReader[
 		sku.ExternalMaybe[K, KPtr],
+		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
 		objekte.External[O, OPtr, K, KPtr],
 	],
 ) ExternalMaybeGetterReader[O, OPtr, K, KPtr, V, VPtr] {
@@ -76,7 +79,7 @@ func (emgr externalMaybeGetterReader[O, OPtr, K, KPtr, V, VPtr]) ReadOne(
 		return
 	}
 
-	if co.External, err = emgr.ReadOneExternal(e); err != nil {
+	if co.External, err = emgr.ReadOneExternal(e, &i); err != nil {
 		if errors.IsNotExist(err) {
 			err = iter.MakeErrStopIteration()
 		} else {
