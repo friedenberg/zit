@@ -249,7 +249,9 @@ func (c CreateFromPaths) zettelsFromPath(
 
 	var s sha.Sha
 
-	if s, err = ctx.Zettel.ObjekteSha(); err != nil {
+	if s, err = c.StoreObjekten().Zettel().WriteZettelObjekte(
+		ctx.Zettel,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -2,41 +2,19 @@ package zettel
 
 import (
 	"bufio"
-	"crypto/sha256"
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
-func (z Objekte) ObjekteSha() (s sha.Sha, err error) {
-	errors.TodoP1("remove this")
-
-	hash := sha256.New()
-
-	o := FormatObjekte{}
-
-	c := ObjekteFormatterContext{
-		Zettel: z,
-	}
-
-	if _, err = o.Format(hash, &c.Zettel); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	s = sha.FromHash(hash)
-
-	return
-}
-
 type FormatObjekte struct {
-	IgnoreTypErrors bool
+	IgnoreTypErrors   bool
+	EnforceFieldOrder bool
 }
 
 func (f FormatObjekte) Format(
@@ -77,10 +55,11 @@ func (f *FormatObjekte) Parse(
 		typLineReader = format.MakeLineReaderIgnoreErrors(typLineReader)
 	}
 
-	esa := collections.MakeFuncSetString[kennung.Etikett, *kennung.Etikett](etiketten)
+	esa := collections.MakeFuncSetString[kennung.Etikett, *kennung.Etikett](
+		etiketten,
+	)
 
-	if n, err = format.ReadLines(
-		r,
+	lineReaders := []schnittstellen.FuncSetString{
 		format.MakeLineReaderRepeat(
 			format.MakeLineReaderKeyValues(
 				map[string]schnittstellen.FuncSetString{
@@ -92,11 +71,18 @@ func (f *FormatObjekte) Parse(
 				},
 			),
 		),
-		// format.MakeLineReaderKeyValue(gattung.Akte.String(), z.Akte.Set),
-		// format.MakeLineReaderKeyValue(gattung.Typ.String(), typLineReader),
-		// format.MakeLineReaderKeyValue(gattung.Bezeichnung.String(), z.Metadatei.Bezeichnung.Set),
-		// format.MakeLineReaderKeyValue(gattung.Etikett.String(), etiketten.AddString),
-	); err != nil {
+	}
+
+	if f.EnforceFieldOrder {
+		lineReaders = []schnittstellen.FuncSetString{
+			format.MakeLineReaderKeyValue(gattung.Akte.String(), z.Akte.Set),
+			format.MakeLineReaderKeyValue(gattung.Typ.String(), typLineReader),
+			format.MakeLineReaderKeyValue(gattung.Bezeichnung.String(), z.Metadatei.Bezeichnung.Set),
+			format.MakeLineReaderKeyValue(gattung.Etikett.String(), esa),
+		}
+	}
+
+	if n, err = format.ReadLines(r, lineReaders...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

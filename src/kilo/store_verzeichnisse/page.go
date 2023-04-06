@@ -200,10 +200,14 @@ func (zp *Page) writeTo(w1 io.Writer) (n int64, err error) {
 	w := bufio.NewWriter(w1)
 	defer errors.DeferredFlusher(&err, w)
 
+	enc := gob.NewEncoder(w)
+
 	if n, err = zp.copy(
 		iter.MakeChain(
 			zp.flushFilter,
-			zettel.MakeWriterGobEncoder(w).WriteZettelVerzeichnisse,
+			func(z *zettel.Transacted) (err error) {
+				return enc.Encode(z)
+			},
 		),
 	); err != nil {
 		err = errors.Wrap(err)
