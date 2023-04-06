@@ -8,8 +8,8 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/india/konfig"
-	"github.com/friedenberg/zit/src/metadatei"
 )
 
 type ProtoZettel struct {

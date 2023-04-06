@@ -18,16 +18,14 @@ type Show struct {
 }
 
 func init() {
-	registerCommand(
+	registerCommandWithQuery(
 		"show",
-		func(f *flag.FlagSet) Command {
+		func(f *flag.FlagSet) CommandWithQuery {
 			c := &Show{}
 
 			f.StringVar(&c.Format, "format", "text", "format")
 
-			return commandWithQuery{
-				CommandWithQuery: c,
-			}
+			return c
 		},
 	)
 }

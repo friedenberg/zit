@@ -3,10 +3,10 @@ package user_ops
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/organize_text"
 	"github.com/friedenberg/zit/src/lima/changes"
-	"github.com/friedenberg/zit/src/metadatei"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 

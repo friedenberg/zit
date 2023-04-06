@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/metadatei"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
 
 type Objekte struct {

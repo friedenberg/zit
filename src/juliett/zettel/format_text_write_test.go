@@ -12,7 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/echo/test_metadatei_io"
-	"github.com/friedenberg/zit/src/metadatei"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
 
 type noopCloser struct {

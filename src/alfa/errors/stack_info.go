@@ -23,7 +23,7 @@ type StackInfo struct {
 func MakeStackInfos(depth, count int) (si []StackInfo) {
 	pcs := make([]uintptr, count)
 
-	n := runtime.Callers(depth + 1, pcs)
+	n := runtime.Callers(depth+1, pcs)
 
 	if n <= 0 {
 		return

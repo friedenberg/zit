@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
-	"github.com/friedenberg/zit/src/metadatei"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
 
 func TestMakeEtiketten(t1 *testing.T) {

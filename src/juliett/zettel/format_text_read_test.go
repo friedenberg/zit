@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/test_logz"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/echo/test_metadatei_io"
-	"github.com/friedenberg/zit/src/metadatei"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
 
 func makeTestTextFormat(af *test_metadatei_io.AkteIOFactory) ObjekteFormat {
