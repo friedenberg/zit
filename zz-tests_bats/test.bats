@@ -162,7 +162,6 @@ function can_checkout_via_etiketten { # @test
 	assert_output '       (checked out) [one/uno.zettel@9a638e2b183562da6d3c634d5a3841d64bc337c9cf79f8fffa0d0194659bc564 !md "wow"]'
 }
 
-
 function can_new_zettel_with_metadatei { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
@@ -222,7 +221,7 @@ function indexes_are_implicitly_correct { # @test
 		echo et2
 	} >"$expected"
 
-	run_zit cat -gattung etikett
+	run_zit cat-etiketten-schwanzen
 	assert_success
 	assert_output "$(cat "$expected")"
 
@@ -255,7 +254,7 @@ function indexes_are_implicitly_correct { # @test
 		echo et1
 	} >"$expected"
 
-	run_zit cat -gattung etikett
+	run_zit cat-etiketten-schwanzen
 	assert_success
 	assert_output "$(cat "$expected")"
 

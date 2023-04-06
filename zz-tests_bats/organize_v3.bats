@@ -363,7 +363,7 @@ function commits_organize_one_etiketten_group_by_two_new_zettels { # @test
 		echo w-2022-07-07
 	} >"$expected"
 
-	run_zit cat -gattung etikett
+	run_zit cat-etiketten-schwanzen
 	assert_success
 	assert_output "$(cat "$expected")"
 
@@ -395,7 +395,7 @@ function commits_organize_one_etiketten_group_by_two_new_zettels { # @test
 		echo w-2022-07-07
 	} >"$expected"
 
-	run_zit cat -gattung etikett
+	run_zit cat-etiketten-schwanzen
 	assert_success
 	assert_output "$(cat "$expected")"
 
@@ -420,7 +420,7 @@ function commits_organize_one_etiketten_group_by_two_new_zettels { # @test
 		echo w-2022-07-07
 	} >"$expected"
 
-	run_zit cat -gattung etikett
+	run_zit cat-etiketten-schwanzen
 	assert_success
 	assert_output "$(cat "$expected")"
 
@@ -490,7 +490,7 @@ function commits_organize_one_etiketten_group_by_two_new_zettels { # @test
 	} >"$expected"
 
 	# TODO
-	# run zit cat -gattung etikett
+	# run zit cat-etiketten-schwanzen
 	# assert_output "$(cat "$expected")"
 }
 
@@ -762,7 +762,7 @@ function etiketten_correct { # @test
 		echo test1-wow
 	} >"$expected_etiketten"
 
-	run_zit cat -gattung etikett
+	run_zit cat-etiketten-schwanzen
 	assert_success
 	assert_output "$(cat "$expected_etiketten")"
 
@@ -786,7 +786,7 @@ function etiketten_correct { # @test
 		echo test4
 	} >"$expected_etiketten"
 
-	run_zit cat -gattung etikett
+	run_zit cat-etiketten-schwanzen
 	assert_output "$(cat "$expected_etiketten")"
 
 	mkdir -p one
@@ -810,6 +810,6 @@ function etiketten_correct { # @test
 		echo test4
 	} >"$expected_etiketten"
 
-	run zit cat -gattung etikett
+	run zit cat-etiketten-schwanzen
 	assert_output "$(cat "$expected_etiketten")"
 }

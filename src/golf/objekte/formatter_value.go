@@ -25,9 +25,10 @@ func (f *FormatterValue) Set(v string) (err error) {
 
 	switch v1 {
 	case
-		//TODO-P3 add text, objekte, toml, json
+		// TODO-P3 add text, objekte, toml, json
 		"kennung",
 		"akte",
+		"akte-sha",
 		"debug",
 		"etiketten",
 		"json",
@@ -120,6 +121,16 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 			defer errors.DeferredCloser(&err, r)
 
 			if _, err = io.Copy(out, r); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+
+	case "akte-sha":
+		return func(o TransactedLike) (err error) {
+			if _, err = fmt.Fprintln(out, o.GetAkteSha()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

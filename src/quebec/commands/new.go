@@ -189,9 +189,9 @@ func (c New) writeNewZettels(
 		return
 	}
 
-	mes := c.Etiketten.MutableClone()
+	mes := c.Metadatei.Etiketten.MutableClone()
 	defaultEtiketten.Each(mes.Add)
-	c.Etiketten = mes.ImmutableClone()
+	c.Metadatei.Etiketten = mes.ImmutableClone()
 
 	if zsc, err = emptyOp.RunMany(c.ProtoZettel, c.Count); err != nil {
 		err = errors.Wrap(err)

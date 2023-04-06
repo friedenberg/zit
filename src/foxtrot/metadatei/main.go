@@ -1,6 +1,7 @@
 package metadatei
 
 import (
+	"flag"
 	"sort"
 	"strings"
 
@@ -14,6 +15,18 @@ import (
 type Metadatei struct {
 	Bezeichnung bezeichnung.Bezeichnung
 	Etiketten   kennung.EtikettSet
+}
+
+func (m *Metadatei) AddToFlagSet(f *flag.FlagSet) {
+	f.Var(&m.Bezeichnung, "bezeichnung", "the Bezeichnung to use for created or updated Zettelen")
+	f.Var(
+		collections.MakeFlagCommasFromExisting(
+			collections.SetterPolicyAppend,
+			&m.Etiketten,
+		),
+		"etiketten",
+		"the Etiketten to use for created or updated Zttelen",
+	)
 }
 
 func (z Metadatei) IsEmpty() bool {
@@ -32,16 +45,20 @@ func (z Metadatei) GetEtiketten() schnittstellen.Set[kennung.Etikett] {
 	return z.Etiketten.ImmutableClone()
 }
 
-func (z Metadatei) Equals(z1 Metadatei) bool {
-	if !z.Bezeichnung.Equals(z1.Bezeichnung) {
-		return false
+func (pz Metadatei) Equals(z1 Metadatei) (ok bool) {
+	var okEt, okBez bool
+
+	if pz.Etiketten.Len() > 0 && pz.Etiketten.Equals(z1.Etiketten) {
+		okEt = true
 	}
 
-	if !z.Etiketten.Equals(z1.Etiketten) {
-		return false
+	if !pz.Bezeichnung.WasSet() || pz.Bezeichnung.Equals(z1.Bezeichnung) {
+		okBez = true
 	}
 
-	return true
+	ok = okBez && okEt
+
+	return
 }
 
 func (z *Metadatei) Reset() {

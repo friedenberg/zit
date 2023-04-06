@@ -87,7 +87,7 @@ func (c Add) RunWithCwdQuery(
 
 	otFlags := organize_text.MakeFlags()
 	otFlags.Abbr = u.StoreObjekten().GetAbbrStore().AbbreviateHinweis
-	otFlags.RootEtiketten = c.Etiketten
+	otFlags.RootEtiketten = c.Metadatei.Etiketten
 	otFlags.Transacted = zettelsFromAkteResults
 
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
