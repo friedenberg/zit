@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte"
@@ -60,15 +61,8 @@ func (c Status) RunWithCwdQuery(
 	}
 
 	if len(possible.UnsureAkten) != 0 {
-
-		v := "Akten"
-
-		if err = u.PrinterHeader()(&v); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
 		for _, ua := range possible.UnsureAkten {
+			todo.Optimize()
 			err = u.StoreObjekten().AkteExists(ua.Sha)
 
 			switch {

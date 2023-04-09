@@ -45,6 +45,7 @@ func (c Checkout) RunWithQuery(
 	if cwdFiles, err = cwd.MakeCwdFilesAll(
 		u.Konfig(),
 		u.Standort().Cwd(),
+		u.StoreObjekten(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

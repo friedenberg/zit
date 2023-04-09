@@ -45,7 +45,7 @@ func (h *akteTextSaver[T, T1]) SaveAkteText(
 		return
 	}
 
-	defer errors.Deferred(&err, w.Close)
+	defer errors.DeferredCloser(&err, w)
 
 	if n, err = h.akteFormatter.Format(w, o); err != nil {
 		err = errors.Wrap(err)

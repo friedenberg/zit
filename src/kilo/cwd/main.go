@@ -19,8 +19,9 @@ import (
 )
 
 type CwdFiles struct {
-	erworben konfig.Compiled
-	dir      string
+	akteWriterFactory schnittstellen.AkteWriterFactory
+	erworben          konfig.Compiled
+	dir               string
 	// TODO make private
 	Zettelen  schnittstellen.MutableSet[Zettel]
 	Typen     schnittstellen.MutableSet[Typ]
@@ -176,16 +177,21 @@ func (fs CwdFiles) ZettelFiles() (out []string, err error) {
 	return
 }
 
-func makeCwdFiles(erworben konfig.Compiled, dir string) (fs CwdFiles) {
+func makeCwdFiles(
+	erworben konfig.Compiled,
+	dir string,
+	awf schnittstellen.AkteWriterFactory,
+) (fs CwdFiles) {
 	fs = CwdFiles{
-		erworben:         erworben,
-		dir:              dir,
-		Kisten:           collections.MakeMutableSetStringer[Kasten](),
-		Typen:            collections.MakeMutableSetStringer[Typ](),
-		Zettelen:         collections.MakeMutableSetStringer[Zettel](),
-		Etiketten:        collections.MakeMutableSetStringer[Etikett](),
-		UnsureAkten:      make([]kennung.FD, 0),
-		EmptyDirectories: make([]kennung.FD, 0),
+		akteWriterFactory: awf,
+		erworben:          erworben,
+		dir:               dir,
+		Kisten:            collections.MakeMutableSetStringer[Kasten](),
+		Typen:             collections.MakeMutableSetStringer[Typ](),
+		Zettelen:          collections.MakeMutableSetStringer[Zettel](),
+		Etiketten:         collections.MakeMutableSetStringer[Etikett](),
+		UnsureAkten:       make([]kennung.FD, 0),
+		EmptyDirectories:  make([]kennung.FD, 0),
 	}
 
 	return
@@ -194,8 +200,9 @@ func makeCwdFiles(erworben konfig.Compiled, dir string) (fs CwdFiles) {
 func MakeCwdFilesAll(
 	k konfig.Compiled,
 	dir string,
+	awf schnittstellen.AkteWriterFactory,
 ) (fs CwdFiles, err error) {
-	fs = makeCwdFiles(k, dir)
+	fs = makeCwdFiles(k, dir, awf)
 	err = fs.readAll()
 	return
 }
@@ -203,9 +210,10 @@ func MakeCwdFilesAll(
 func MakeCwdFilesExactly(
 	k konfig.Compiled,
 	dir string,
+	awf schnittstellen.AkteWriterFactory,
 	files ...string,
 ) (fs CwdFiles, err error) {
-	fs = makeCwdFiles(k, dir)
+	fs = makeCwdFiles(k, dir, awf)
 	err = fs.readInputFiles(files...)
 	return
 }
@@ -364,7 +372,7 @@ func (fs *CwdFiles) readFirstLevelFile(a string) (err error) {
 	default:
 		var ut kennung.FD
 
-		if ut, err = MakeFile(fs.dir, a); err != nil {
+		if ut, err = MakeFile(fs.dir, a, fs.akteWriterFactory); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

@@ -93,6 +93,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			if cwdFiles, err = cwd.MakeCwdFilesAll(
 				u.Konfig(),
 				u.Standort().Cwd(),
+				u.StoreObjekten(),
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -169,6 +170,7 @@ func (c New) writeNewZettels(
 	if cwdFiles, err = cwd.MakeCwdFilesAll(
 		u.Konfig(),
 		u.Standort().Cwd(),
+		u.StoreObjekten(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -223,6 +225,7 @@ func (c New) editZettels(
 	if cwdFiles, err = cwd.MakeCwdFilesExactly(
 		u.Konfig(),
 		u.Standort().Cwd(),
+		u.StoreObjekten(),
 		filesZettelen...,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -257,6 +260,7 @@ func (c New) editZettels(
 	if cwdFiles, err = cwd.MakeCwdFilesExactly(
 		u.Konfig(),
 		u.Standort().Cwd(),
+		u.StoreObjekten(),
 		filesZettelen...,
 	); err != nil {
 		err = errors.Wrap(err)
