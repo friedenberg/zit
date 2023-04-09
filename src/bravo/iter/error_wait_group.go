@@ -105,6 +105,8 @@ func (wg *errorWaitGroup) doneWith(err error) {
 	wg.lock.Lock()
 	defer wg.lock.Unlock()
 
+	previouslyWaitingForNeedsClose := wg.waitingFor > 0
+
 	if err != nil {
 		wg.err.Add(err)
 		wg.waitingFor = 0
@@ -112,7 +114,7 @@ func (wg *errorWaitGroup) doneWith(err error) {
 		wg.waitingFor--
 	}
 
-	if wg.waitingFor == 0 {
+	if wg.waitingFor == 0 && previouslyWaitingForNeedsClose {
 		close(wg.chDone)
 	}
 }
