@@ -161,6 +161,7 @@ func (u *Umwelt) FormatZettelCheckedOut() schnittstellen.FuncWriterFormat[zettel
 		u.FormatColorWriter(),
 		u.FormatHinweis(),
 		u.FormatSha(u.StoreObjekten().GetAbbrStore().AbbreviateSha),
+		// u.FormatTyp(),
 		u.FormatZettel(),
 	)
 }
@@ -192,7 +193,7 @@ func (u *Umwelt) FormatFileRecognized() schnittstellen.FuncWriterFormat[store_fs
 		u.FormatColorWriter(),
 		u.Standort(),
 		u.FormatSha(u.StoreObjekten().GetAbbrStore().AbbreviateSha),
-		u.FormatZettel(),
+		u.FormatZettelTransacted(),
 	)
 }
 

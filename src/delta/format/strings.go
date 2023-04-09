@@ -4,28 +4,28 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
 const (
-	StringNew          = "new"
-	StringSame         = "same"
-	StringChanged      = "changed"
-	StringDeleted      = "deleted"
-	StringUpdated      = "updated"
-	StringArchived     = "archived"
-	StringUnchanged    = "unchanged"
-	StringRecognized   = "recognized"
-	StringCheckedOut   = "checked out"
-	StringWouldDelete  = "would delete"
-	StringUnrecognized = "unrecognized"
-	// StringHeaderIndent = "=============== "
-	StringHeaderIndent   = "                "
+	StringDRArrow        = "↳"
+	StringNew            = "new"
+	StringSame           = "same"
+	StringChanged        = "changed"
+	StringDeleted        = "deleted"
+	StringUpdated        = "updated"
+	StringArchived       = "archived"
+	StringUnchanged      = "unchanged"
+	StringRecognized     = "recognized"
+	StringCheckedOut     = "checked out"
+	StringWouldDelete    = "would delete"
+	StringUnrecognized   = "unrecognized"
 	StringFormatDateTime = "06-01-02 15:04:05"
-	// TODO-P4 use reflection?
-	LenStringMax = len(StringFormatDateTime) + 4
+	StringIndent         = "                 "
+	LenStringMax         = len(StringIndent) // TODO-P4 use reflection?
 )
 
 func MakeFormatStringRightAligned(
@@ -33,9 +33,9 @@ func MakeFormatStringRightAligned(
 	args ...any,
 ) schnittstellen.FuncWriter {
 	return func(w io.Writer) (n int64, err error) {
-		f = fmt.Sprintf(f, args...)
+		f = fmt.Sprintf(f+" ", args...)
 
-		diff := LenStringMax - len(f)
+		diff := LenStringMax + 1 - utf8.RuneCountInString(f)
 
 		if diff > 0 {
 			f = strings.Repeat(" ", diff) + f
@@ -53,12 +53,6 @@ func MakeFormatStringRightAligned(
 
 		return
 	}
-}
-
-func MakeFormatStringRightAlignedParen(
-	f string,
-) schnittstellen.FuncWriter {
-	return MakeFormatStringRightAligned("(%s) ", f)
 }
 
 func MakeWriterFormatStringIndentedHeader(

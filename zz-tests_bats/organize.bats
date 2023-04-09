@@ -20,7 +20,7 @@ function hides_hidden_etiketten_from_organize { # @test
 	assert_success
 	assert_output - <<-EOM
 		[-zz-archive@cba019d4f889027a3485e56dd2080c7ba0fa1e27499c24b7ec08ad80ef55da9d]
-		           (deleted) [zz-archive.etikett]
+		          deleted [zz-archive.etikett]
 	EOM
 
 	to_add="$(mktemp)"

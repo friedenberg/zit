@@ -25,7 +25,7 @@ func wrapWithCheckedOutState[T objekte.CheckedOutLike](
 	return func(w io.Writer, e T) (n int64, err error) {
 		return format.Write(
 			w,
-			format.MakeFormatStringRightAlignedParen(e.GetState().String()),
+			format.MakeFormatStringRightAligned(e.GetState().String()),
 			format.MakeWriter(f, e),
 		)
 	}
@@ -223,7 +223,7 @@ func (u *Umwelt) PrinterHeader() schnittstellen.FuncIter[*string] {
 		u.Out(),
 		format.MakeWriterFormatStringIndentedHeader(
 			u.FormatColorWriter(),
-			format.StringHeaderIndent,
+			format.StringIndent,
 		),
 	)
 }

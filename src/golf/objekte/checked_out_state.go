@@ -14,6 +14,7 @@ const (
 	CheckedOutStateExistsAndSame
 	CheckedOutStateExistsAndDifferent
 	CheckedOutStateUntracked
+	CheckedOutStateRecognized
 )
 
 func (s CheckedOutState) String() string {
@@ -29,6 +30,9 @@ func (s CheckedOutState) String() string {
 
 	case CheckedOutStateUntracked:
 		return "untracked"
+
+	case CheckedOutStateRecognized:
+		return "recognized"
 
 	default:
 		return fmt.Sprintf("unknown: %#v", s)

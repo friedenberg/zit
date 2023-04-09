@@ -54,7 +54,7 @@ func MakeCliFormatExternal(
 	return func(w io.Writer, t External) (n int64, err error) {
 		return format.Write(
 			w,
-			format.MakeFormatStringRightAlignedParen(""),
+			format.MakeFormatStringRightAligned(""),
 			format.MakeFormatString("["),
 			cw(s.MakeWriterRelativePath(t.GetObjekteFD().Path), format.ColorTypePointer),
 			format.MakeFormatString("@"),

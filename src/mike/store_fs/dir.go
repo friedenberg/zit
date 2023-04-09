@@ -25,7 +25,7 @@ func MakeCliFormatFDDeleted(
 	return func(w io.Writer, fd kennung.FD) (n int64, err error) {
 		return format.Write(
 			w,
-			format.MakeFormatStringRightAlignedParen(prefix),
+			format.MakeFormatStringRightAligned(prefix),
 			format.MakeWriter(fdw, fd),
 		)
 	}

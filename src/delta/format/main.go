@@ -19,6 +19,21 @@ func MakeWriter[T any](
 	}
 }
 
+func MakeWriterOr[A schnittstellen.Stringer, B schnittstellen.Stringer](
+	wffA schnittstellen.FuncWriterFormat[A],
+	eA A,
+	wffB schnittstellen.FuncWriterFormat[B],
+	eB B,
+) schnittstellen.FuncWriter {
+	return func(w io.Writer) (int64, error) {
+		if eA.String() == "" {
+			return wffB(w, eB)
+		} else {
+			return wffA(w, eA)
+		}
+	}
+}
+
 func MakeWriterPtr[T any](
 	wff schnittstellen.FuncWriterFormat[*T],
 	e *T,

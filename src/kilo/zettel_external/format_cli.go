@@ -24,7 +24,7 @@ func MakeCliFormat(
 		case z.GetAkteFD().Path != "" && z.GetObjekteFD().Path != "":
 			return format.Write(
 				w,
-				format.MakeFormatStringRightAlignedParen(format.StringCheckedOut),
+				format.MakeFormatStringRightAligned(format.StringCheckedOut),
 				format.MakeFormatString("["),
 				cw(s.MakeWriterRelativePath(z.GetObjekteFD().Path), format.ColorTypePointer),
 				format.MakeFormatString("@"),
@@ -32,7 +32,7 @@ func MakeCliFormat(
 				format.MakeFormatString(" "),
 				format.MakeWriter(zf, z.Objekte),
 				format.MakeFormatString("]\n"),
-				format.MakeFormatStringRightAlignedParen(""),
+				format.MakeFormatStringRightAligned(""),
 				format.MakeFormatString("["),
 				cw(s.MakeWriterRelativePath(z.GetAkteFD().Path), format.ColorTypePointer),
 				format.MakeFormatString("@"),
@@ -43,7 +43,7 @@ func MakeCliFormat(
 		case z.GetAkteFD().Path != "":
 			return format.Write(
 				w,
-				format.MakeFormatStringRightAlignedParen(format.StringCheckedOut),
+				format.MakeFormatStringRightAligned(format.StringCheckedOut),
 				format.MakeFormatString("["),
 				cw(s.MakeWriterRelativePath(z.GetAkteFD().Path), format.ColorTypePointer),
 				format.MakeFormatString("@"),
@@ -56,7 +56,7 @@ func MakeCliFormat(
 		case z.GetObjekteFD().Path != "":
 			return format.Write(
 				w,
-				format.MakeFormatStringRightAlignedParen(format.StringCheckedOut),
+				format.MakeFormatStringRightAligned(format.StringCheckedOut),
 				format.MakeFormatString("["),
 				cw(s.MakeWriterRelativePath(z.GetObjekteFD().Path), format.ColorTypePointer),
 				format.MakeFormatString("@"),

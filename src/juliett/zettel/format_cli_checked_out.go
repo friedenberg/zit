@@ -28,29 +28,19 @@ func MakeCliFormatCheckedOut(
 	)
 
 	return func(w io.Writer, z CheckedOut) (n int64, err error) {
-		switch {
-		case z.External.Sku.FDs.Akte.Path != "" && z.External.Sku.FDs.Objekte.Path != "":
+		if z.External.Sku.FDs.Akte.Path == "" {
+			return format.Write(
+				w,
+				format.MakeWriter(wzef, z),
+			)
+		} else {
 			return format.Write(
 				w,
 				format.MakeWriter(wzef, z),
 				format.MakeFormatString("\n"),
 				format.MakeWriter(waef, z),
 			)
-
-		case z.External.Sku.FDs.Akte.Path != "":
-			return format.Write(
-				w,
-				format.MakeWriter(waef, z),
-			)
-
-		case z.External.Sku.FDs.Objekte.Path != "":
-			return format.Write(
-				w,
-				format.MakeWriter(wzef, z),
-			)
 		}
-
-		return
 	}
 }
 
@@ -65,7 +55,13 @@ func makeWriterFuncZettel(
 		return format.Write(
 			w,
 			format.MakeFormatString("["),
-			cw(s.MakeWriterRelativePath(z.External.GetObjekteFD().Path), format.ColorTypePointer),
+			cw(
+				s.MakeWriterRelativePathOr(
+					z.External.GetObjekteFD().Path,
+					format.MakeWriter(hf, z.External.Sku.Kennung),
+				),
+				format.ColorTypePointer,
+			),
 			format.MakeFormatString("@"),
 			format.MakeWriter(sf, z.External.GetObjekteSha().GetSha()),
 			format.MakeFormatString(" "),
@@ -86,6 +82,7 @@ func makeWriterFuncAkte(
 		todo.Change("refactor to support proper spacing")
 		return format.Write(
 			w,
+			format.MakeFormatStringRightAligned("%s", format.StringDRArrow),
 			format.MakeFormatString("["),
 			cw(s.MakeWriterRelativePath(z.External.GetAkteFD().Path), format.ColorTypePointer),
 			format.MakeFormatString("@"),

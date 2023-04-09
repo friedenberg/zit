@@ -6,14 +6,13 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/bravo/todo"
+	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
-	"github.com/friedenberg/zit/src/hotel/objekte_store"
+	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/cwd"
-	"github.com/friedenberg/zit/src/lima/store_objekten"
-	"github.com/friedenberg/zit/src/mike/store_fs"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
@@ -60,32 +59,41 @@ func (c Status) RunWithCwdQuery(
 		return
 	}
 
-	if len(possible.UnsureAkten) != 0 {
-		for _, ua := range possible.UnsureAkten {
-			todo.Optimize()
-			err = u.StoreObjekten().AkteExists(ua.Sha)
+	p := u.PrinterCheckedOutLike()
 
-			switch {
-			case err == nil:
-				fallthrough
+	if err = u.StoreObjekten().ReadAllMatchingAkten(
+		possible.UnsureAkten,
+		func(fd kennung.FD, z *zettel.Transacted) (err error) {
+			if z == nil {
+				err = u.PrinterFileNotRecognized()(&fd)
+			} else {
+				os := sha.Make(z.GetObjekteSha())
+				as := sha.Make(z.GetAkteSha())
 
-			case errors.Is(err, objekte_store.ErrNotFound{}):
-				err = u.PrinterFileNotRecognized()(&ua)
-
-			case errors.Is(err, store_objekten.ErrAkteExists{}):
-				err1 := err.(store_objekten.ErrAkteExists)
-				fr := store_fs.FileRecognized{
-					FD:         ua,
-					Recognized: err1.MutableSet,
+				fr := &zettel.CheckedOut{
+					State:    objekte.CheckedOutStateRecognized,
+					Internal: *z,
+					External: zettel.External{
+						Objekte: z.Objekte,
+						Sku: sku.External[kennung.Hinweis, *kennung.Hinweis]{
+							Kennung:    z.Sku.Kennung,
+							ObjekteSha: os,
+							AkteSha:    as,
+							FDs: sku.ExternalFDs{
+								Akte: fd,
+							},
+						},
+					},
 				}
 
-				err = u.PrinterFileRecognized()(&fr)
-
-			default:
-				err = errors.Wrapf(err, "%s", ua)
-				return
+				err = p(fr)
 			}
-		}
+
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

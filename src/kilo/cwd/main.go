@@ -28,7 +28,7 @@ type CwdFiles struct {
 	Kisten    schnittstellen.MutableSet[Kasten]
 	Etiketten schnittstellen.MutableSet[Etikett]
 	// TODO make set
-	UnsureAkten      []kennung.FD
+	UnsureAkten      schnittstellen.MutableSet[kennung.FD]
 	EmptyDirectories []kennung.FD
 }
 
@@ -190,7 +190,7 @@ func makeCwdFiles(
 		Typen:             collections.MakeMutableSetStringer[Typ](),
 		Zettelen:          collections.MakeMutableSetStringer[Zettel](),
 		Etiketten:         collections.MakeMutableSetStringer[Etikett](),
-		UnsureAkten:       make([]kennung.FD, 0),
+		UnsureAkten:       collections.MakeMutableSetStringer[kennung.FD](),
 		EmptyDirectories:  make([]kennung.FD, 0),
 	}
 
@@ -377,7 +377,7 @@ func (fs *CwdFiles) readFirstLevelFile(a string) (err error) {
 			return
 		}
 
-		fs.UnsureAkten = append(fs.UnsureAkten, ut)
+		err = fs.UnsureAkten.Add(ut)
 	}
 
 	return

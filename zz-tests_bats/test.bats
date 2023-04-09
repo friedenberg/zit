@@ -159,7 +159,7 @@ function can_checkout_via_etiketten { # @test
 
 	run_zit checkout -- ok:z
 	assert_success
-	assert_output '       (checked out) [one/uno.zettel@9a638e2b183562da6d3c634d5a3841d64bc337c9cf79f8fffa0d0194659bc564 !md "wow"]'
+	assert_output '      checked out [one/uno.zettel@9a638e2b183562da6d3c634d5a3841d64bc337c9cf79f8fffa0d0194659bc564 !md "wow"]'
 }
 
 function can_new_zettel_with_metadatei { # @test
@@ -248,7 +248,7 @@ function indexes_are_implicitly_correct { # @test
 	run_zit checkin -delete "one/uno.zettel"
 	assert_success
 	assert_output --partial '[one/uno@50bedb194bbd829d5d5d11de711a58b8486954a481ae43b4d1a8c4bd7f1f1370 !md "bez"]'
-	assert_output --partial '      (deleted) [one/uno.zettel]'
+	assert_output --partial '     deleted [one/uno.zettel]'
 
 	{
 		echo et1
@@ -297,7 +297,7 @@ function checkouts_dont_overwrite { # @test
 
 	run_zit checkout one/uno
 	assert_success
-	assert_output '       (checked out) [one/uno.zettel@18df16846a2f8bbce5f03e1041baff978a049aabd169ab9adac387867fe1706c !md "bez"]'
+	assert_output '      checked out [one/uno.zettel@18df16846a2f8bbce5f03e1041baff978a049aabd169ab9adac387867fe1706c !md "bez"]'
 
 	run cat one/uno.zettel
 	assert_success
@@ -318,7 +318,7 @@ function checkouts_dont_overwrite { # @test
 
 	run_zit checkout one/uno:z
 	assert_success
-	assert_output '       (checked out) [one/uno.zettel@63b65ad24c58d43d363f8074a5513e5cf71337cc132f452095a779b933cfee15 !md "bez"]'
+	assert_output '      checked out [one/uno.zettel@63b65ad24c58d43d363f8074a5513e5cf71337cc132f452095a779b933cfee15 !md "bez"]'
 
 	run cat one/uno.zettel
 	assert_success

@@ -152,7 +152,7 @@ function add_dedupe_1 { # @test
 	#TODO-P2 fix race condition
 	assert_success
 	assert_output - <<-EOM
-		       (checked out) [one/uno.zettel@8f8aa93ce3cb3da0e5eddb2c9556fe37980d0aaf58f2760de451a93ce337b0c2 !md "to_add"]
+		      checked out [one/uno.zettel@8f8aa93ce3cb3da0e5eddb2c9556fe37980d0aaf58f2760de451a93ce337b0c2 !md "to_add"]
 	EOM
 
 	{
@@ -171,8 +171,8 @@ function add_dedupe_1 { # @test
 		[-new@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
 		[-new-tag@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
 		[one/uno@d4853a453015235e41b9513f7e70d91b1a28212f9bd342daf5024b84f35d209f !md "new title"]
-		           (deleted) [one/uno.zettel]
-		           (deleted) [one]
+		          deleted [one/uno.zettel]
+		          deleted [one]
 	EOM
 
 	run zit add \
