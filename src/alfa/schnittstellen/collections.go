@@ -16,11 +16,15 @@ type Lenner interface {
 }
 
 type Iterable[T any] interface {
-	Lenner
 	// EqualsIterable(Iterable[T]) bool
 	Any() T
 	Each(FuncIter[T]) error
 	EachPtr(FuncIter[*T]) error
+}
+
+type Collection[T any] interface {
+	Lenner
+	Iterable[T]
 }
 
 type ContainsKeyer interface {
@@ -28,7 +32,7 @@ type ContainsKeyer interface {
 }
 
 type SetLike[T any] interface {
-	Iterable[T]
+	Collection[T]
 	ContainsKeyer
 
 	Equatable[Set[T]]

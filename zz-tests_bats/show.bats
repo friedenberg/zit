@@ -82,6 +82,41 @@ function show_zettel_etikett { # @test
 	EOM
 }
 
+function show_zettel_etikett_complex { # @test
+	run_zit checkout o/u
+	assert_success
+
+	cat >one/uno.zettel <<-EOM
+		---
+		# wow the first
+		- tag-3
+		- tag-5
+		! md
+		---
+
+		last time
+	EOM
+	run_zit checkin -delete one/uno.zettel
+
+	run_zit show -format log tag-3.z tag-5.z
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[one/uno@c3232cc6a4122368757d0af489e471e138eab3133ff9107372f33eaf0e284190 !md "wow the first"]
+	EOM
+
+	run_zit show -format akte tag-3.z tag-5.z
+	assert_success
+	assert_output_unsorted - <<-EOM
+		last time
+	EOM
+
+	run_zit show -format sku2 tag-3.z tag-5.z
+	assert_success
+	assert_output_unsorted --partial - <<-EOM
+		Zettel one/uno c3232cc6a4122368757d0af489e471e138eab3133ff9107372f33eaf0e284190 11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11
+	EOM
+}
+
 function show_complex_zettel_etikett_negation { # @test
 	run_zit show -format log ^-etikett-two.z
 	assert_success

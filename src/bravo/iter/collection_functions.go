@@ -2,7 +2,7 @@ package iter
 
 import "github.com/friedenberg/zit/src/alfa/schnittstellen"
 
-func AnyOrTrueEmpty[T any](c schnittstellen.Set[T], f func(T) bool) bool {
+func AnyOrTrueEmpty[T any](c schnittstellen.Collection[T], f func(T) bool) bool {
 	if c.Len() == 0 {
 		return true
 	}
@@ -10,7 +10,7 @@ func AnyOrTrueEmpty[T any](c schnittstellen.Set[T], f func(T) bool) bool {
 	return Any(c, f)
 }
 
-func AnyOrFalseEmpty[T any](c schnittstellen.Set[T], f func(T) bool) bool {
+func AnyOrFalseEmpty[T any](c schnittstellen.Collection[T], f func(T) bool) bool {
 	if c.Len() == 0 {
 		return false
 	}
@@ -18,7 +18,7 @@ func AnyOrFalseEmpty[T any](c schnittstellen.Set[T], f func(T) bool) bool {
 	return Any(c, f)
 }
 
-func Any[T any](c schnittstellen.Set[T], f func(T) bool) bool {
+func Any[T any](c schnittstellen.Collection[T], f func(T) bool) bool {
 	err := c.Each(
 		func(e T) (err error) {
 			if f(e) {
@@ -32,7 +32,7 @@ func Any[T any](c schnittstellen.Set[T], f func(T) bool) bool {
 	return IsErrTrue(err)
 }
 
-func All[T any](c schnittstellen.Set[T], f func(T) bool) bool {
+func All[T any](c schnittstellen.Collection[T], f func(T) bool) bool {
 	err := c.Each(
 		func(e T) (err error) {
 			if !f(e) {

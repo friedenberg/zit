@@ -7,6 +7,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
@@ -154,8 +155,11 @@ func (kqs mutableQuerySet[T, TPtr]) ContainsAgainst(els schnittstellen.Set[T]) b
 		return kqs.Include.Len() == 0
 	}
 
-	includeTridexContains := func(e T) (ok bool) {
-		ok = kqs.Include.ContainsExpansion(e.String())
+	expanded := ExpandMany[T, TPtr](els, ExpanderRight)
+
+	todo.Optimize()
+	includeTridexContains := func() (ok bool) {
+		ok = iter.All[T](kqs.Include, expanded.Contains)
 		return
 	}
 
@@ -164,8 +168,8 @@ func (kqs mutableQuerySet[T, TPtr]) ContainsAgainst(els schnittstellen.Set[T]) b
 		return
 	}
 
-	if (kqs.Include.Len() == 0 || iter.Any(els, includeTridexContains)) &&
-		(kqs.Exclude.Len() == 0 || !iter.Any(els, excludeTridexContains)) {
+	if (kqs.Include.Len() == 0 || includeTridexContains()) &&
+		(kqs.Exclude.Len() == 0 || !iter.Any[T](els, excludeTridexContains)) {
 		return true
 	}
 
