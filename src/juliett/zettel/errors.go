@@ -26,39 +26,6 @@ func (e ErrHasInlineAkteAndFilePath) Error() string {
 	)
 }
 
-// func (e ErrHasInlineAkteAndFilePath) Recover() (z Objekte, err error) {
-// 	if e.AkteWriterFactory == nil {
-// 		err = errors.Errorf("akte writer factory is nil")
-// 		return
-// 	}
-
-// 	var akteWriter sha.WriteCloser
-
-// 	if akteWriter, err = e.AkteWriter(); err != nil {
-// 		err = errors.Wrap(err)
-// 		return
-// 	}
-
-// 	var f *os.File
-
-// 	if f, err = files.Open(e.FilePath); err != nil {
-// 		err = errors.Wrap(err)
-// 		return
-// 	}
-
-// 	defer files.Close(f)
-
-// 	if _, err = io.Copy(akteWriter, f); err != nil {
-// 		err = errors.Wrap(err)
-// 		return
-// 	}
-
-// 	z = e.Objekte
-// 	z.Akte = akteWriter.Sha()
-
-// 	return
-// }
-
 type ErrHasInvalidAkteShaOrFilePath struct {
 	Value string
 }

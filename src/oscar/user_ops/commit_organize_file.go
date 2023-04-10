@@ -141,7 +141,7 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 				return
 			}
 
-			z.objekte.Typ = b.Metadatei.Typ
+			z.objekte.Metadatei.Typ = b.Metadatei.Typ
 
 			toUpdate[z.kennung.String()] = z
 
@@ -156,8 +156,8 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 		z := zettel.Objekte{
 			Metadatei: metadatei.Metadatei{
 				Etiketten: etts.ImmutableClone(),
+				Typ:       b.Metadatei.Typ,
 			},
-			Typ: b.Metadatei.Typ,
 		}
 
 		if err = z.Metadatei.Bezeichnung.Set(bez); err != nil {
@@ -165,8 +165,8 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 			return
 		}
 
-		if z.Typ.IsEmpty() {
-			if err = z.Typ.Set(
+		if z.GetTyp().IsEmpty() {
+			if err = z.Metadatei.Typ.Set(
 				c.Konfig().DefaultTyp.Sku.Kennung.String(),
 			); err != nil {
 				err = errors.Wrap(err)

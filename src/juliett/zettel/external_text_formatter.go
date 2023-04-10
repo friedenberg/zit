@@ -77,7 +77,7 @@ func (f externalTextFormatter) Format(
 	w io.Writer,
 	c *External,
 ) (n int64, err error) {
-	inline := f.InlineChecker.IsInlineTyp(c.Objekte.Typ)
+	inline := f.InlineChecker.IsInlineTyp(c.Objekte.GetTyp())
 
 	var mtw io.WriterTo
 

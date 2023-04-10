@@ -33,16 +33,6 @@ func MakeMutableSetCheckedOutHinweisZettel(c int) MutableSetCheckedOut {
 	)
 }
 
-func ToSliceZettelsExternal(s SetCheckedOut) (out []External, err error) {
-	return collections.DerivedValues[CheckedOut, External](
-		s,
-		func(z CheckedOut) (e External, err error) {
-			e = z.External
-			return
-		},
-	)
-}
-
 func ToSliceFilesZettelen(s SetCheckedOut) (out []string, err error) {
 	return collections.DerivedValues[CheckedOut, string](
 		s,

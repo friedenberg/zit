@@ -67,7 +67,7 @@ func (e *fileEncoder) EncodeObjekte(
 	objektePath string,
 	aktePath string,
 ) (err error) {
-	inline := e.ic.IsInlineTyp(z.Typ)
+	inline := e.ic.IsInlineTyp(z.GetTyp())
 
 	mtw := zettel.TextMetadateiFormatter{
 		IncludeAkteSha: !inline,

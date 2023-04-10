@@ -76,7 +76,7 @@ function show_zettel_etikett { # @test
 
 	run_zit show -format sku2 -- -tag-3.z
 	assert_success
-	assert_output_unsorted - <<-EOM
+	assert_output_cut -d' ' -f2- -- --sort - <<-EOM
 		2059300268.968327 Zettel one/dos c6b9d095358b8b26a99e90496d916ba92a99e9b75c705165df5f6d353a949ea9 2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24
 		2059300269.066914 Zettel one/uno d47c552a5299f392948258d7959fc7cf94843316a21c8ea12854ed84a8c06367 11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11
 	EOM
@@ -147,7 +147,7 @@ function show_simple_all { # @test
 
 	run_zit show -format sku2 :z,t
 	assert_success
-	assert_output_unsorted - <<-EOM
+	assert_output_cut -d' ' -f2- -- --sort - <<-EOM
 		2059300268.824939 Typ md eaa85e80de6d1129a21365a8ce2a49ca752457d10932a7d73001b4ebded302c7 102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384
 		2059300268.968327 Zettel one/dos c6b9d095358b8b26a99e90496d916ba92a99e9b75c705165df5f6d353a949ea9 2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24
 		2059300269.066914 Zettel one/uno d47c552a5299f392948258d7959fc7cf94843316a21c8ea12854ed84a8c06367 11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11

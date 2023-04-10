@@ -85,8 +85,8 @@ func TestWriteWithoutAkte(t1 *testing.T) {
 				"tag2",
 				"tag3",
 			),
+			Typ: makeAkteExt(t, "md"),
 		},
-		Typ: makeAkteExt(t, "md"),
 	}
 
 	af := test_metadatei_io.FixtureFactoryReadWriteCloser(
@@ -129,8 +129,8 @@ func TestWriteWithInlineAkte(t1 *testing.T) {
 				"tag2",
 				"tag3",
 			),
+			Typ: makeAkteExt(t, "md"),
 		},
-		Typ: makeAkteExt(t, "md"),
 	}
 
 	af := test_metadatei_io.FixtureFactoryReadWriteCloser(

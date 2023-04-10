@@ -78,7 +78,7 @@ func (f objekteTextFormatter) Format(
 	w io.Writer,
 	c *ObjekteFormatterContext,
 ) (n int64, err error) {
-	inline := f.InlineChecker.IsInlineTyp(c.Zettel.Typ)
+	inline := f.InlineChecker.IsInlineTyp(c.Zettel.GetTyp())
 
 	var mtw io.WriterTo
 

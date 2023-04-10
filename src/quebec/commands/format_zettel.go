@@ -97,7 +97,9 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		}
 	}
 
-	typKonfig := u.Konfig().GetApproximatedTyp(zt.Objekte.Typ).ApproximatedOrActual()
+	typKonfig := u.Konfig().GetApproximatedTyp(
+		zt.Objekte.GetTyp(),
+	).ApproximatedOrActual()
 
 	var akteFormatter script_config.ScriptConfig
 
@@ -122,7 +124,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			err = errors.Normalf(
 				"format '%s' for Typ '%s' not found",
 				actualFormatId,
-				zt.Objekte.Typ,
+				zt.Objekte.GetTyp(),
 			)
 
 			return
@@ -149,7 +151,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	if err = u.Konfig().ApplyToMetadatei(
 		&zt.Objekte.Metadatei,
-		zt.Objekte.Typ,
+		zt.Objekte.GetTyp(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -157,9 +159,10 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	ctx := zettel.ObjekteFormatterContext{
 		Zettel:      zt.Objekte,
-		IncludeAkte: u.Konfig().IsInlineTyp(zt.Objekte.Typ) && c.Mode.IncludesAkte(),
+		IncludeAkte: u.Konfig().IsInlineTyp(zt.Objekte.GetTyp()) && c.Mode.IncludesAkte(),
 	}
 
+	// TODO use cat or just write to stdout if no script instead of erroring
 	if _, err = format.Format(u.Out(), &ctx); err != nil {
 		err = errors.Wrap(err)
 		return

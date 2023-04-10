@@ -100,7 +100,7 @@ func (c Exec) getZettel(
 
 	tz = *zt
 
-	typ := tz.Objekte.Typ
+	typ := tz.Objekte.GetTyp()
 
 	typKonfig := u.Konfig().GetApproximatedTyp(typ).ApproximatedOrActual()
 
@@ -128,7 +128,7 @@ func (c Exec) makeFifoPipe(tz zettel.Transacted) (p string, err error) {
 		return
 	}
 
-	p = path.Join(d, h.Schwanz()+"."+tz.Objekte.Typ.String())
+	p = path.Join(d, h.Schwanz()+"."+tz.Objekte.GetTyp().String())
 
 	if err = syscall.Mknod(p, syscall.S_IFIFO|0o666, 0); err != nil {
 		err = errors.Wrap(err)

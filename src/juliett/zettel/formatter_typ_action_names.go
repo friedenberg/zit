@@ -30,7 +30,7 @@ func (e formatterTypActionNames) Format(
 ) (n int64, err error) {
 	e1 := typ.MakeFormatterActionNames()
 
-	ct := e.erworben.GetApproximatedTyp(c.Zettel.Typ)
+	ct := e.erworben.GetApproximatedTyp(c.Zettel.GetTyp())
 	t := ct.ApproximatedOrActual()
 
 	if t == nil {

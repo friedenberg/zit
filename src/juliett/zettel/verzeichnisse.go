@@ -30,7 +30,7 @@ func (z *Verzeichnisse) ResetWithObjekte(z1 Objekte) {
 	z.wasPopulated = true
 
 	z.Etiketten.ResetWithEtikettSet(z1.Metadatei.Etiketten)
-	z.Typ.ResetWithTyp(z1.Typ)
+	z.Typ.ResetWithTyp(z1.GetTyp())
 }
 
 func (z *Verzeichnisse) Reset() {

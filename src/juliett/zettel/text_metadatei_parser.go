@@ -84,7 +84,7 @@ func (f *textMetadateiParser) readTyp(
 	//! <path>.<typ ext>
 	switch {
 	case files.Exists(desc):
-		if err = z.Typ.Set(tail); err != nil {
+		if err = z.Metadatei.Typ.Set(tail); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -105,12 +105,13 @@ func (f *textMetadateiParser) readTyp(
 
 		var fi *os.File
 
+		// TODO use more limited open setting
 		if fi, err = os.Open(desc); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		defer errors.Deferred(&err, fi.Close)
+		defer errors.DeferredCloser(&err, fi)
 
 		if _, err = io.Copy(akteWriter, fi); err != nil {
 			err = errors.Wrap(err)
@@ -131,7 +132,7 @@ func (f *textMetadateiParser) readTyp(
 			return
 		}
 
-		if err = z.Typ.Set(tail); err != nil {
+		if err = z.Metadatei.Typ.Set(tail); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -148,7 +149,7 @@ func (f *textMetadateiParser) readTyp(
 
 	//! <typ ext>
 	default:
-		if err = z.Typ.Set(head); err != nil {
+		if err = z.Metadatei.Typ.Set(head); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

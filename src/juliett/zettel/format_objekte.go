@@ -26,7 +26,7 @@ func (f FormatObjekte) Format(
 	w := format.NewLineWriter()
 
 	w.WriteFormat("%s %s", gattung.Akte, z.Akte)
-	w.WriteFormat("%s %s", gattung.Typ, z.Typ)
+	w.WriteFormat("%s %s", gattung.Typ, z.GetTyp())
 	w.WriteFormat("%s %s", gattung.Bezeichnung, z.Metadatei.Bezeichnung)
 
 	for _, e := range collections.SortedValues(z.Metadatei.Etiketten) {
@@ -49,7 +49,7 @@ func (f *FormatObjekte) Parse(
 
 	r := bufio.NewReader(r1)
 
-	typLineReader := z.Typ.Set
+	typLineReader := z.Metadatei.Typ.Set
 
 	if f.IgnoreTypErrors {
 		typLineReader = format.MakeLineReaderIgnoreErrors(typLineReader)

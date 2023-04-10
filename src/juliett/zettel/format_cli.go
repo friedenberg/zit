@@ -27,7 +27,7 @@ func MakeCliFormat(
 
 		return format.Write(
 			w,
-			format.MakeWriter(tf, z.Typ),
+			format.MakeWriter(tf, z.GetTyp()),
 			format.MakeFormatString(" "),
 			lastWriter,
 		)

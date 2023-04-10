@@ -15,6 +15,7 @@ import (
 type Metadatei struct {
 	Bezeichnung bezeichnung.Bezeichnung
 	Etiketten   kennung.EtikettSet
+	Typ         kennung.Typ
 }
 
 func (m *Metadatei) AddToFlagSet(f *flag.FlagSet) {
@@ -38,6 +39,10 @@ func (z Metadatei) IsEmpty() bool {
 		return false
 	}
 
+	if !z.Typ.IsEmpty() {
+		return false
+	}
+
 	return true
 }
 
@@ -45,30 +50,32 @@ func (z Metadatei) GetEtiketten() schnittstellen.Set[kennung.Etikett] {
 	return z.Etiketten.ImmutableClone()
 }
 
-func (pz Metadatei) Equals(z1 Metadatei) (ok bool) {
-	var okEt, okBez bool
-
-	if pz.Etiketten.Len() > 0 && pz.Etiketten.Equals(z1.Etiketten) {
-		okEt = true
+func (pz Metadatei) Equals(z1 Metadatei) bool {
+	if !pz.Typ.Equals(z1.Typ) {
+		return false
 	}
 
-	if !pz.Bezeichnung.WasSet() || pz.Bezeichnung.Equals(z1.Bezeichnung) {
-		okBez = true
+	if !pz.Etiketten.Equals(z1.Etiketten) {
+		return false
 	}
 
-	ok = okBez && okEt
+	if !pz.Bezeichnung.Equals(z1.Bezeichnung) {
+		return false
+	}
 
-	return
+	return true
 }
 
 func (z *Metadatei) Reset() {
 	z.Bezeichnung.Reset()
 	z.Etiketten = kennung.MakeEtikettSet()
+	z.Typ = kennung.Typ{}
 }
 
 func (z *Metadatei) ResetWith(z1 Metadatei) {
 	z.Bezeichnung = z1.Bezeichnung
 	z.Etiketten = z1.Etiketten.ImmutableClone()
+	z.Typ = z1.Typ
 }
 
 func (z Metadatei) Description() (d string) {

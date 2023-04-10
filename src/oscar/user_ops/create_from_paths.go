@@ -109,14 +109,14 @@ func (c CreateFromPaths) Run(
 		},
 	)
 
-	err = toCreate.Each(
+	if err = toCreate.Each(
 		func(z *zettel.External) (err error) {
-			cz := zettel.CheckedOut{
-				External: *z,
-			}
-
 			if z.Objekte.IsEmpty() {
 				return
+			}
+
+			cz := zettel.CheckedOut{
+				External: *z,
 			}
 
 			var zt *zettel.Transacted
@@ -155,14 +155,12 @@ func (c CreateFromPaths) Run(
 
 			return
 		},
-	)
-
-	if err != nil {
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	err = toDelete.Each(
+	if err = toDelete.Each(
 		func(z *zettel.External) (err error) {
 			// TODO move to checkout store
 			if err = os.Remove(z.GetObjekteFD().Path); err != nil {
@@ -177,9 +175,7 @@ func (c CreateFromPaths) Run(
 
 			return
 		},
-	)
-
-	if err != nil {
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

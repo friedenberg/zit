@@ -69,7 +69,7 @@ func (c OpenAkte) RunWithIds(store *umwelt.Umwelt, is kennung.Set) (err error) {
 				return
 			}
 
-			filename = filename + "." + tz.Objekte.Typ.String()
+			filename = filename + "." + tz.Objekte.GetTyp().String()
 
 			if f, err = files.Create(filename); err != nil {
 				err = errors.Wrap(err)

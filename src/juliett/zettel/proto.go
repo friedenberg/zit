@@ -11,14 +11,13 @@ import (
 )
 
 type ProtoZettel struct {
-	Typ       kennung.Typ
 	Metadatei metadatei.Metadatei
 }
 
 func MakeProtoZettel(k konfig.Compiled) (p ProtoZettel) {
 	errors.TodoP1("modify konfig to keep etiketten set")
 
-	p.Typ = k.GetErworben().DefaultTyp
+	p.Metadatei.Typ = k.GetErworben().DefaultTyp
 
 	todo.Decide("should this be set to default etiketten?")
 	p.Metadatei.Etiketten = kennung.MakeEtikettSet()
@@ -35,14 +34,14 @@ func MakeEmptyProtoZettel() ProtoZettel {
 }
 
 func (pz *ProtoZettel) AddToFlagSet(f *flag.FlagSet) {
-	f.Var(&pz.Typ, "typ", "the Typ to use for created or updated Zettelen")
 	pz.Metadatei.AddToFlagSet(f)
 }
 
 func (pz ProtoZettel) Equals(z Objekte) (ok bool) {
 	var okTyp, okMet bool
 
-	if !pz.Typ.IsEmpty() && pz.Typ.Equals(z.Typ) {
+	if !pz.Metadatei.Typ.IsEmpty() &&
+		pz.Metadatei.Typ.Equals(z.GetTyp()) {
 		okTyp = true
 	}
 
@@ -70,9 +69,11 @@ func (pz ProtoZettel) Make() (z *Objekte) {
 }
 
 func (pz ProtoZettel) Apply(z *Objekte) (ok bool) {
-	if z.Typ.IsEmpty() && !pz.Typ.IsEmpty() && !z.Typ.Equals(pz.Typ) {
+	if z.GetTyp().IsEmpty() &&
+		!pz.Metadatei.Typ.IsEmpty() &&
+		!z.GetTyp().Equals(pz.Metadatei.Typ) {
 		ok = true
-		z.Typ = pz.Typ
+		z.Metadatei.Typ = pz.Metadatei.Typ
 	}
 
 	if pz.Metadatei.Bezeichnung.WasSet() &&
@@ -93,14 +94,16 @@ func (pz ProtoZettel) Apply(z *Objekte) (ok bool) {
 }
 
 func (pz ProtoZettel) ApplyWithAkteFD(z *Objekte, akteFD kennung.FD) (err error) {
-	if z.Typ.IsEmpty() && !pz.Typ.IsEmpty() && !z.Typ.Equals(pz.Typ) {
-		z.Typ = pz.Typ
+	if z.GetTyp().IsEmpty() &&
+		!pz.Metadatei.Typ.IsEmpty() &&
+		!z.GetTyp().Equals(pz.Metadatei.Typ) {
+		z.Metadatei.Typ = pz.Metadatei.Typ
 	} else {
 		// TODO-P4 use konfig
 		ext := akteFD.Ext()
 
 		if ext != "" {
-			if err = z.Typ.Set(akteFD.Ext()); err != nil {
+			if err = z.Metadatei.Typ.Set(akteFD.Ext()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

@@ -83,8 +83,8 @@ func TestEqualitySelf(t1 *testing.T) {
 				"tag2",
 				"tag3",
 			).ImmutableClone(),
+			Typ: makeAkteExt(t, "text"),
 		},
-		Typ: makeAkteExt(t, "text"),
 	}
 
 	if !text.Equals(text) {
@@ -103,8 +103,8 @@ func TestEqualityNotSelf(t1 *testing.T) {
 				"tag2",
 				"tag3",
 			).ImmutableClone(),
+			Typ: makeAkteExt(t, "text"),
 		},
-		Typ: makeAkteExt(t, "text"),
 	}
 
 	text1 := Objekte{
@@ -115,8 +115,8 @@ func TestEqualityNotSelf(t1 *testing.T) {
 				"tag2",
 				"tag3",
 			).ImmutableClone(),
+			Typ: makeAkteExt(t, "text"),
 		},
-		Typ: makeAkteExt(t, "text"),
 	}
 
 	if !text.Equals(text1) {

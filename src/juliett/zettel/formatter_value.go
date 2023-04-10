@@ -70,7 +70,7 @@ func (fv *FormatterValue) FuncFormatter(
 	switch fv.string {
 	case "formatters":
 		return func(o *Transacted) (err error) {
-			t := k.GetApproximatedTyp(o.Objekte.Typ)
+			t := k.GetApproximatedTyp(o.Objekte.GetTyp())
 
 			if !t.HasValue() {
 				return
@@ -98,7 +98,7 @@ func (fv *FormatterValue) FuncFormatter(
 
 	case "typ":
 		return func(o *Transacted) (err error) {
-			if _, err = io.WriteString(out, o.Objekte.Typ.String()); err != nil {
+			if _, err = io.WriteString(out, o.Objekte.GetTyp().String()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -110,7 +110,9 @@ func (fv *FormatterValue) FuncFormatter(
 		return func(o *Transacted) (err error) {
 			var t *typ.Transacted
 
-			if t = k.GetApproximatedTyp(o.Objekte.Typ).ApproximatedOrActual(); t == nil {
+			if t = k.GetApproximatedTyp(
+				o.Objekte.GetTyp(),
+			).ApproximatedOrActual(); t == nil {
 				return
 			}
 
@@ -227,23 +229,6 @@ func (fv *FormatterValue) FuncFormatter(
 			}
 
 			if _, err = f.Format(out, c); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		}
-
-	case "hinweis-akte":
-		return func(o *Transacted) (err error) {
-			errors.TodoP3("convert into an option")
-			if o.Objekte.Akte.IsNull() {
-				return
-			}
-
-			if _, err = io.WriteString(
-				out, fmt.Sprintf("%s %s\n", o.Sku.Kennung, o.Objekte.Akte),
-			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

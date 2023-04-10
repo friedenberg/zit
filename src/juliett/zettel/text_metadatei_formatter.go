@@ -48,12 +48,12 @@ func (f *TextMetadateiFormatter) Format(w1 io.Writer, m *Metadatei) (n int64, er
 
 	case f.IncludeAkteSha:
 		w.WriteLines(
-			fmt.Sprintf("! %s.%s", m.Akte, m.Typ),
+			fmt.Sprintf("! %s.%s", m.Akte, m.GetTyp()),
 		)
 
 	default:
 		w.WriteLines(
-			fmt.Sprintf("! %s", m.Typ),
+			fmt.Sprintf("! %s", m.GetTyp()),
 		)
 	}
 

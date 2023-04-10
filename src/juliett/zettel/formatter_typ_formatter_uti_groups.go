@@ -26,7 +26,7 @@ func (e formatterTypFormatterUTIGroups) Format(
 ) (n int64, err error) {
 	e1 := typ.MakeFormatterFormatterUTIGroups()
 
-	ct := e.erworben.GetApproximatedTyp(c.Zettel.Typ).ApproximatedOrActual()
+	ct := e.erworben.GetApproximatedTyp(c.Zettel.GetTyp()).ApproximatedOrActual()
 
 	if ct == nil {
 		return

@@ -27,6 +27,7 @@ func (f *FormatterValue) Set(v string) (err error) {
 	case
 		// TODO-P3 add text, objekte, toml, json
 		"kennung",
+		"kennung-akte-sha",
 		"akte",
 		"akte-sha",
 		"debug",
@@ -53,6 +54,29 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 	logFunc schnittstellen.FuncIter[TransactedLike],
 ) schnittstellen.FuncIter[TransactedLike] {
 	switch fv.string {
+	case "kennung-akte-akte":
+		return func(tl TransactedLike) (err error) {
+			errors.TodoP3("convert into an option")
+
+			sh := tl.GetAkteSha()
+
+			if sh.IsNull() {
+				return
+			}
+
+			if _, err = fmt.Fprintf(
+				out,
+				"%s %s\n",
+				tl.GetDataIdentity().GetId(),
+				sh,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+
 	case "kennung":
 		return func(e TransactedLike) (err error) {
 			_, err = fmt.Fprintln(out, e.GetDataIdentity().GetId())

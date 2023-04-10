@@ -47,8 +47,8 @@ func TestReadWithoutAkte(t1 *testing.T) {
 				"tag2",
 				"tag3",
 			),
+			Typ: makeAkteExt(t, "md"),
 		},
-		Typ: makeAkteExt(t, "md"),
 	}
 
 	if !actual.Equals(expected) {
@@ -88,8 +88,8 @@ func TestReadWithoutAkteWithMultilineBezeichnung(t1 *testing.T) {
 				"tag2",
 				"tag3",
 			),
+			Typ: makeAkteExt(t, "md"),
 		},
-		Typ: makeAkteExt(t, "md"),
 	}
 
 	if !actual.Equals(expected) {
@@ -136,8 +136,8 @@ the body
 				"tag2",
 				"tag3",
 			),
+			Typ: makeAkteExt(t, "md"),
 		},
-		Typ: makeAkteExt(t, "md"),
 	}
 
 	if !actual.Equals(expected) {

@@ -11,12 +11,11 @@ import (
 
 type Objekte struct {
 	Akte      sha.Sha
-	Typ       kennung.Typ
 	Metadatei metadatei.Metadatei
 }
 
 func (z Objekte) GetTyp() kennung.Typ {
-	return z.Typ
+	return z.Metadatei.Typ
 }
 
 func (z Objekte) GetEtiketten() schnittstellen.Set[kennung.Etikett] {
@@ -41,10 +40,6 @@ func (z Objekte) Equals(z1 Objekte) bool {
 		return false
 	}
 
-	if !z.Typ.Equals(z1.Typ) {
-		return false
-	}
-
 	if !z.Metadatei.Equals(z1.Metadatei) {
 		return false
 	}
@@ -66,12 +61,10 @@ func (z Objekte) IsEmpty() bool {
 
 func (z *Objekte) Reset() {
 	z.Akte = sha.Sha{}
-	z.Typ = kennung.Typ{}
 	z.Metadatei.Reset()
 }
 
 func (z *Objekte) ResetWith(z1 Objekte) {
 	z.Akte = z1.Akte
-	z.Typ = z1.Typ
 	z.Metadatei.ResetWith(z1.Metadatei)
 }

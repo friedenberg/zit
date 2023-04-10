@@ -41,7 +41,7 @@ func (w *Writer) zettelToItem(
 	mb.AddMatches(z.Kennung().Kopf())
 	mb.AddMatches(z.Kennung().Schwanz())
 	mb.AddMatches(z.Objekte.Metadatei.Bezeichnung.String())
-	mb.AddMatches(z.Objekte.Typ.String())
+	mb.AddMatches(z.Objekte.GetTyp().String())
 	mb.AddMatches(z.Verzeichnisse.Etiketten.SortedExpanded...)
 	mb.AddMatches(z.Verzeichnisse.Typ.Expanded...)
 

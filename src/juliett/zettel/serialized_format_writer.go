@@ -20,7 +20,7 @@ func MakeSerializedFormatWriter(
 	wf := func(z *Objekte) (err error) {
 		c := ObjekteFormatterContext{
 			Zettel:      *z,
-			IncludeAkte: k.IsInlineTyp(z.Typ),
+			IncludeAkte: k.IsInlineTyp(z.GetTyp()),
 		}
 
 		if _, err = f.Format(out, &c); err != nil {
