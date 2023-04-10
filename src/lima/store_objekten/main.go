@@ -4,6 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
@@ -430,6 +431,7 @@ func (s *Store) addTyp(
 
 		err = nil
 
+		todo.Change("support inheritance")
 		if _, err = s.Typ().CreateOrUpdate(
 			typ.MakeObjekte(),
 			&t,
@@ -454,6 +456,7 @@ func (s *Store) addEtikett(
 
 		err = nil
 
+		todo.Change("support inheritance")
 		if _, err = s.Etikett().CreateOrUpdate(
 			etikett.MakeObjekte(),
 			&e1,
