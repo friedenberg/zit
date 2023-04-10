@@ -13,7 +13,7 @@ PATH="$BATS_CWD/build:$PATH"
 
 {
 	pushd "$BATS_CWD" >/dev/null 2>&1
-	gmake build/zit
+	gmake build/zit || exit 1
 }
 
 cat_yin() (
