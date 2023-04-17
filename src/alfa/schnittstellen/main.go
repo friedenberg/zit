@@ -46,4 +46,3 @@ type Keyer[T any] interface {
 type KeyPtrer[T any, T1 Ptr[T]] interface {
 	Key(T1) string
 }
-

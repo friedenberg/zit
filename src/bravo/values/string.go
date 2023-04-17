@@ -1,5 +1,7 @@
 package values
 
+import "github.com/friedenberg/zit/src/alfa/errors"
+
 type String struct {
 	wasSet bool
 	string
@@ -16,6 +18,15 @@ func (sv *String) Set(v string) (err error) {
 	*sv = String{
 		wasSet: true,
 		string: v,
+	}
+
+	return
+}
+
+func (sv String) Match(v string) (err error) {
+	if sv.string != v {
+		err = errors.Normalf("expected %q but got %q", sv.string, v)
+		return
 	}
 
 	return

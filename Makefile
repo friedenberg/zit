@@ -42,8 +42,14 @@ build/go_vet: $(files_go)
 > go vet ./...
 > touch "$@"
 
+dirs_go_unit := $(shell find src -mindepth 2 -maxdepth 2 -type d)
+
 build/tests_unit: $(files_go) build/go_generate
-> go test -timeout 5s ./...
+> $(HOME)/.vim/ftplugin/go-test.bash $(dirs_go_unit)
+> touch "$@"
+
+build/tests_unit_foxtrot_metadatei: src/foxtrot/metadatei/*
+> $(HOME)/.vim/ftplugin/go-test.bash '$(dir $<)'
 > touch "$@"
 
 build/tests_fast: build/go_vet build/tests_unit

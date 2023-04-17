@@ -2,29 +2,7 @@ package zettel
 
 import (
 	"fmt"
-
-	"github.com/friedenberg/zit/src/bravo/sha"
 )
-
-type externalFile struct {
-	Sha  sha.Sha
-	Path string
-}
-
-type ErrHasInlineAkteAndFilePath struct {
-	External  externalFile
-	InlineSha sha.Sha
-	Objekte
-}
-
-func (e ErrHasInlineAkteAndFilePath) Error() string {
-	return fmt.Sprintf(
-		"zettel text has both inline akte and filepath: \nexternal path: %s\nexternal sha: %s\ninline sha: %s",
-		e.External.Path,
-		e.External.Sha,
-		e.InlineSha,
-	)
-}
 
 type ErrHasInvalidAkteShaOrFilePath struct {
 	Value string

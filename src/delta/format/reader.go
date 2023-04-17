@@ -1,154 +1,65 @@
 package format
 
 import (
-	"bufio"
-	"io"
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
-type readerFrom[T any] struct {
-	rf schnittstellen.FuncReaderFormat[T]
-	e  *T
-}
-
-func (rf readerFrom[T]) ReadFrom(r io.Reader) (n int64, err error) {
-	return rf.rf(r, rf.e)
-}
-
-func MakeReaderFrom[T any](
-	rf schnittstellen.FuncReaderFormat[T],
-	e *T,
-) io.ReaderFrom {
-	return readerFrom[T]{
-		rf: rf,
-		e:  e,
-	}
-}
-
-func ReadSep(
-	delim byte,
-	r1 io.Reader,
+func MakeLineReaderIterateStrict(
 	rffs ...schnittstellen.FuncSetString,
-) (n int64, err error) {
-	r := bufio.NewReader(r1)
-	i := 0
+) schnittstellen.FuncSetString {
+	si, _ := errors.MakeStackInfo(1)
+	var i int64
 
-	var last error
-
-	for {
-		var rawLine, line string
-
-		rawLine, err = r.ReadString(delim)
-		n += int64(len(rawLine))
-
-		if err != nil && !errors.IsEOF(err) {
-			err = errors.Wrap(err)
-			return
-		}
-
-		isEof := errors.IsEOF(err)
-		err = nil
-
-		line = strings.TrimSuffix(rawLine, string([]byte{delim}))
-
-		if len(rffs) == i {
-			// TODO add line
-			err = errors.Errorf("ran out of read line funcs before fully consuming reader")
-
-			if last != nil {
-				err = errors.MakeMulti(err, last)
-			}
+	return func(v string) (err error) {
+		if int64(len(rffs))-1 < i {
+			err = errors.Wrap(&ErrExhaustedFuncSetStringersLine{
+				error:  err,
+				string: v,
+			})
 
 			return
 		}
 
-		frl := rffs[i]
-
-		if err = frl(line); err != nil {
-			last = err
-			err = nil
+		if err = rffs[i](v); err != nil {
+			err = si.Wrapf(err, "Value: %s", v)
+			return
 		}
 
 		i++
 
-		if isEof {
-			break
-		}
+		return
 	}
-
-	if last != nil && !collections.IsStopIteration(last) {
-		err = last
-	}
-
-	return
 }
 
-func ReadLines(
-	r1 io.Reader,
+func MakeLineReaderIterate(
 	rffs ...schnittstellen.FuncSetString,
-) (n int64, err error) {
-	r := bufio.NewReader(r1)
-	i := 0
+) schnittstellen.FuncSetString {
+	si, _ := errors.MakeStackInfo(1)
+	var i int64
 
-	var last error
+	return func(v string) (err error) {
+		for {
+			if int64(len(rffs))-1 < i {
+				err = errors.Wrap(&ErrExhaustedFuncSetStringersLine{
+					error:  err,
+					string: v,
+				})
 
-	isEOF := false
+				return
+			}
 
-	for {
-		if isEOF {
-			break
-		}
-
-		var rawLine, line string
-
-		rawLine, err = r.ReadString('\n')
-		n += int64(len(rawLine))
-
-		if err != nil && !errors.IsEOF(err) {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if errors.IsEOF(err) {
-			isEOF = true
-			err = nil
-		}
-
-		line = strings.TrimSuffix(rawLine, "\n")
-
-		if line == "" {
-			continue
-		}
-
-		if len(rffs) == i {
-			// TODO add line
-			err = errors.Errorf("ran out of read line funcs before fully consuming reader")
-
-			if last != nil {
-				err = errors.MakeMulti(err, last)
+			if err = rffs[i](v); err != nil {
+				i++
+				err = si.Wrapf(err, "Value: %s", v)
+				continue
 			}
 
 			return
 		}
-
-		frl := rffs[i]
-
-		if err = frl(line); err != nil {
-			last = err
-			err = nil
-			i++
-		}
 	}
-
-	if last != nil && !collections.IsStopIteration(last) {
-		err = last
-	}
-
-	return
 }
 
 func MakeLineReaderKeyValues(
@@ -180,8 +91,6 @@ func MakeLineReaderKeyValues(
 			return
 		}
 
-		err = collections.MakeErrStopIteration()
-
 		return
 	}
 }
@@ -202,16 +111,17 @@ func MakeLineReaderKeyValue(
 		value := line[loc+1:]
 
 		if keyActual != key {
-			err = errors.Errorf("expected key %q but got %q", key, keyActual)
+			err = errors.Wrap(&ErrExhaustedFuncSetStringersLine{
+				string: value,
+			})
+
 			return
 		}
 
 		if err = valueReader(value); err != nil {
-			err = errors.Errorf("%s: %q", err, value)
+			err = errors.Wrap(err)
 			return
 		}
-
-		err = collections.MakeErrStopIteration()
 
 		return
 	}
@@ -222,12 +132,12 @@ func MakeLineReaderRepeat(
 ) schnittstellen.FuncSetString {
 	return func(line string) (err error) {
 		if err = in(line); err != nil {
-			if collections.IsStopIteration(err) {
-				err = nil
-			} else {
-				err = errors.Wrap(err)
-				return
-			}
+			err = errors.Wrap(&ErrExhaustedFuncSetStringersLine{
+				error:  err,
+				string: line,
+			})
+
+			return
 		}
 
 		return

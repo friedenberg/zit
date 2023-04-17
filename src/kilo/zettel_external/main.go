@@ -64,7 +64,7 @@ func (e Zettel) ExternalPathAndSha() string {
 	if !e.ZettelFD.IsEmpty() {
 		return fmt.Sprintf("[%s %s]", e.ZettelFD.Path, e.Sku.ObjekteSha)
 	} else if !e.AkteFD.IsEmpty() {
-		return fmt.Sprintf("[%s %s]", e.AkteFD.Path, e.Objekte.Akte)
+		return fmt.Sprintf("[%s %s]", e.AkteFD.Path, e.Objekte.Metadatei.AkteSha)
 	} else {
 		return ""
 	}

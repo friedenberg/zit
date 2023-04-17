@@ -75,7 +75,7 @@ func (e *fileEncoder) EncodeObjekte(
 
 	var ar sha.ReadCloser
 
-	if ar, err = e.arf.AkteReader(z.Akte); err != nil {
+	if ar, err = e.arf.AkteReader(z.Metadatei.AkteSha); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -113,7 +113,7 @@ func (e *fileEncoder) EncodeObjekte(
 						return
 					}
 
-					meta.Objekte.Akte = sha.Make(aw.Sha())
+					meta.Objekte.Metadatei.AkteSha = sha.Make(aw.Sha())
 
 				} else {
 					err = errors.Wrap(err)

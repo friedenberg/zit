@@ -25,7 +25,7 @@ func (f FormatObjekte) Format(
 
 	w := format.NewLineWriter()
 
-	w.WriteFormat("%s %s", gattung.Akte, z.Akte)
+	w.WriteFormat("%s %s", gattung.Akte, z.Metadatei.AkteSha)
 	w.WriteFormat("%s %s", gattung.Typ, z.GetTyp())
 	w.WriteFormat("%s %s", gattung.Bezeichnung, z.Metadatei.Bezeichnung)
 
@@ -59,30 +59,28 @@ func (f *FormatObjekte) Parse(
 		etiketten,
 	)
 
-	lineReaders := []schnittstellen.FuncSetString{
-		format.MakeLineReaderRepeat(
-			format.MakeLineReaderKeyValues(
-				map[string]schnittstellen.FuncSetString{
-					gattung.Akte.String():        z.Akte.Set,
-					gattung.Typ.String():         typLineReader,
-					gattung.AkteTyp.String():     typLineReader,
-					gattung.Bezeichnung.String(): z.Metadatei.Bezeichnung.Set,
-					gattung.Etikett.String():     esa,
-				},
-			),
+	lineReaders := format.MakeLineReaderRepeat(
+		format.MakeLineReaderKeyValues(
+			map[string]schnittstellen.FuncSetString{
+				gattung.Akte.String():        z.Metadatei.AkteSha.Set,
+				gattung.Typ.String():         typLineReader,
+				gattung.AkteTyp.String():     typLineReader,
+				gattung.Bezeichnung.String(): z.Metadatei.Bezeichnung.Set,
+				gattung.Etikett.String():     esa,
+			},
 		),
-	}
+	)
 
 	if f.EnforceFieldOrder {
-		lineReaders = []schnittstellen.FuncSetString{
-			format.MakeLineReaderKeyValue(gattung.Akte.String(), z.Akte.Set),
+		lineReaders = format.MakeLineReaderIterateStrict(
+			format.MakeLineReaderKeyValue(gattung.Akte.String(), z.Metadatei.AkteSha.Set),
 			format.MakeLineReaderKeyValue(gattung.Typ.String(), typLineReader),
 			format.MakeLineReaderKeyValue(gattung.Bezeichnung.String(), z.Metadatei.Bezeichnung.Set),
 			format.MakeLineReaderKeyValue(gattung.Etikett.String(), esa),
-		}
+		)
 	}
 
-	if n, err = format.ReadLines(r, lineReaders...); err != nil {
+	if n, err = format.ReadLines(r, lineReaders); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

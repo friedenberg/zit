@@ -128,8 +128,8 @@ the body
 	)
 
 	expected := Objekte{
-		Akte: sha.Must("036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064"),
 		Metadatei: metadatei.Metadatei{
+			AkteSha:     sha.Must("036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064"),
 			Bezeichnung: bezeichnung.Make("the title"),
 			Etiketten: makeEtiketten(t,
 				"tag1",

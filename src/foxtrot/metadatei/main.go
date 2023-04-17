@@ -7,12 +7,14 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/etikett_rule"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 )
 
 type Metadatei struct {
+	AkteSha     sha.Sha
 	Bezeichnung bezeichnung.Bezeichnung
 	Etiketten   kennung.EtikettSet
 	Typ         kennung.Typ
@@ -28,9 +30,14 @@ func (m *Metadatei) AddToFlagSet(f *flag.FlagSet) {
 		"etiketten",
 		"the Etiketten to use for created or updated Zttelen",
 	)
+	// TODO add typ
 }
 
 func (z Metadatei) IsEmpty() bool {
+	if !z.AkteSha.IsNull() {
+		return false
+	}
+
 	if !z.Bezeichnung.IsEmpty() {
 		return false
 	}
@@ -46,11 +53,35 @@ func (z Metadatei) IsEmpty() bool {
 	return true
 }
 
+func (z *Metadatei) SetBezeichnung(b bezeichnung.Bezeichnung) {
+	z.Bezeichnung = b
+}
+
+func (z *Metadatei) SetEtiketten(e schnittstellen.Set[kennung.Etikett]) {
+	z.Etiketten = e
+}
+
+func (z *Metadatei) SetTyp(t kennung.Typ) {
+	z.Typ = t
+}
+
+func (z Metadatei) GetBezeichnung() bezeichnung.Bezeichnung {
+	return z.Bezeichnung
+}
+
 func (z Metadatei) GetEtiketten() schnittstellen.Set[kennung.Etikett] {
 	return z.Etiketten.ImmutableClone()
 }
 
+func (z Metadatei) GetTyp() kennung.Typ {
+	return z.Typ
+}
+
 func (pz Metadatei) Equals(z1 Metadatei) bool {
+	if !pz.AkteSha.Equals(z1.AkteSha) {
+		return false
+	}
+
 	if !pz.Typ.Equals(z1.Typ) {
 		return false
 	}
@@ -67,12 +98,14 @@ func (pz Metadatei) Equals(z1 Metadatei) bool {
 }
 
 func (z *Metadatei) Reset() {
+	z.AkteSha.Reset()
 	z.Bezeichnung.Reset()
 	z.Etiketten = kennung.MakeEtikettSet()
 	z.Typ = kennung.Typ{}
 }
 
 func (z *Metadatei) ResetWith(z1 Metadatei) {
+	z.AkteSha = z1.AkteSha
 	z.Bezeichnung = z1.Bezeichnung
 	z.Etiketten = z1.Etiketten.ImmutableClone()
 	z.Typ = z1.Typ

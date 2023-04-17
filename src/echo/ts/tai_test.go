@@ -25,8 +25,14 @@ func TestTaiSet(t1 *testing.T) {
 
 	var sut Tai
 
-	if err := sut.Set(in); err != nil {
+	var err error
+
+	if err = sut.Set(in); err != nil {
 		t.Fatalf("failed to parse value into tai: %q. %s", in, err)
+	}
+
+	if err != nil {
+		t.Fatalf("expected no error but got %s", err)
 	}
 
 	if sut.tai.Sec != inSec {
@@ -48,8 +54,14 @@ func TestTaiSet2(t1 *testing.T) {
 
 	var sut Tai
 
-	if err := sut.Set(in); err != nil {
+	var err error
+
+	if err = sut.Set(in); err != nil {
 		t.Fatalf("failed to parse value into tai: %q. %s", in, err)
+	}
+
+	if err != nil {
+		t.Fatalf("expected no error but got %s", err)
 	}
 
 	if sut.tai.Sec != inSec {

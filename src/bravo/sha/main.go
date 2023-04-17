@@ -16,7 +16,9 @@ import (
 )
 
 const (
+	// TODO remove
 	ShaNull = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+	Null    = ShaNull
 )
 
 type PathComponents interface {
@@ -175,6 +177,10 @@ func (a Sha) EqualsSha(b schnittstellen.Sha) bool {
 
 func (a Sha) Equals(b Sha) bool {
 	return a.GetShaString() == b.GetShaString()
+}
+
+func (s *Sha) Reset() {
+	s.value = Null
 }
 
 func (s Sha) Path(pc ...string) string {

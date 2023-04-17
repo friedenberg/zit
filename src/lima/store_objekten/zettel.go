@@ -268,7 +268,7 @@ func (s *zettelStore) readOneExternalAkte(
 	}
 
 	sh := sha.Make(aw.Sha())
-	ez.Objekte.Akte = sh
+	ez.Objekte.Metadatei.AkteSha = sh
 
 	if ez.Sku.ObjekteSha, err = s.WriteZettelObjekte(
 		ez.Objekte,
@@ -325,7 +325,7 @@ func (s *zettelStore) readOneExternalObjekte(
 				continue
 			}
 
-			ez.Objekte.Akte = mutter.Objekte.Akte
+			ez.Objekte.Metadatei.AkteSha = mutter.Objekte.Metadatei.AkteSha
 
 			continue
 		}

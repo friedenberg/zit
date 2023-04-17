@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/metadatei_io"
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/format"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/hotel/typ"
 )
@@ -23,7 +24,7 @@ type externalTextFormatter struct {
 	IncludeAkte      bool
 	ExcludeMetadatei bool
 
-	objekteTextParser
+	metadateiTextParser metadatei.TextParser
 }
 
 func MakeExternalTextFormatterExcludeMetadatei(
@@ -39,7 +40,7 @@ func MakeExternalTextFormatterExcludeMetadatei(
 		AkteFormatter:    akteFormatter,
 		IncludeAkte:      true,
 		ExcludeMetadatei: true,
-		objekteTextParser: MakeObjekteTextParser(
+		metadateiTextParser: metadatei.MakeTextParser(
 			akteFactory,
 			akteFormatter,
 		),
@@ -96,7 +97,7 @@ func (f externalTextFormatter) Format(
 	var ar sha.ReadCloser
 
 	if inline {
-		if ar, err = f.AkteFactory.AkteReader(c.Objekte.Akte); err != nil {
+		if ar, err = f.AkteFactory.AkteReader(c.Objekte.Metadatei.AkteSha); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

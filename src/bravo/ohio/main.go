@@ -30,6 +30,7 @@ func MakePipedReaderFrom(r io.ReaderFrom) PipedReaderFrom {
 
 	go func() {
 		var msg readFromDone
+
 		if msg.n, msg.err = r.ReadFrom(pr); msg.err != nil {
 			if !errors.IsEOF(msg.err) {
 				pr.CloseWithError(msg.err)
@@ -43,12 +44,14 @@ func MakePipedReaderFrom(r io.ReaderFrom) PipedReaderFrom {
 }
 
 func (p pipedReaderFrom) Close() (n int64, err error) {
-	if p.PipeWriter != nil {
-		p.PipeWriter.Close()
-		out := <-p.ch
-		n = out.n
-		err = out.err
+	if p.PipeWriter == nil {
+		return
 	}
+
+	p.PipeWriter.Close()
+	out := <-p.ch
+	n = out.n
+	err = out.err
 
 	return
 }

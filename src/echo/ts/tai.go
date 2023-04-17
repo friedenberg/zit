@@ -1,7 +1,6 @@
 package ts
 
 import (
-	"bufio"
 	"fmt"
 	"math"
 	"strconv"
@@ -63,45 +62,47 @@ func (t Tai) String() string {
 
 func (t *Tai) Set(v string) (err error) {
 	t.wasSet = true
-	r := bufio.NewReader(strings.NewReader(v))
 
-	if _, err = format.ReadSep(
+	r := format.MakeDelimReaderConsumeEmpty(
 		'.',
-		r,
-		func(v string) (err error) {
-			v = strings.TrimSpace(v)
+		format.MakeLineReaderIterateStrict(
+			func(v string) (err error) {
+				v = strings.TrimSpace(v)
 
-			if v == "" {
+				if v == "" {
+					return
+				}
+
+				if t.tai.Sec, err = strconv.ParseInt(v, 10, 64); err != nil {
+					err = errors.Wrapf(err, "failed to parse Sec time: %s", v)
+					return
+				}
+
 				return
-			}
+			},
+			func(v string) (err error) {
+				v = strings.TrimSpace(v)
+				v = strings.TrimRight(v, "0")
 
-			if t.tai.Sec, err = strconv.ParseInt(v, 10, 64); err != nil {
-				err = errors.Wrapf(err, "failed to parse Sec time: %s", v)
+				if v == "" {
+					return
+				}
+
+				var pre int64
+
+				if pre, err = strconv.ParseInt(v, 10, 64); err != nil {
+					err = errors.Wrapf(err, "failed to parse Asec time: %s", v)
+					return
+				}
+
+				t.tai.Asec = pre * int64(math.Pow10(18-len(v)))
+
 				return
-			}
+			},
+		),
+	)
 
-			return
-		},
-		func(v string) (err error) {
-			v = strings.TrimSpace(v)
-			v = strings.TrimRight(v, "0")
-
-			if v == "" {
-				return
-			}
-
-			var pre int64
-
-			if pre, err = strconv.ParseInt(v, 10, 64); err != nil {
-				err = errors.Wrapf(err, "failed to parse Asec time: %s", v)
-				return
-			}
-
-			t.tai.Asec = pre * int64(math.Pow10(18-len(v)))
-
-			return
-		},
-	); err != nil {
+	if _, err = r.ReadFrom(strings.NewReader(v)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

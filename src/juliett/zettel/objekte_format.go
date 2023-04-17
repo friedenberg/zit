@@ -2,6 +2,8 @@ package zettel
 
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
 
 type ObjekteParserContext struct {
@@ -16,10 +18,7 @@ type ObjekteFormatterContext struct {
 	ExternalAktePath string
 }
 
-type ObjekteParser = schnittstellen.Parser[
-	ObjekteParserContext,
-	*ObjekteParserContext,
-]
+type ObjekteParser = schnittstellen.ParserInterface[metadatei.ParserContext]
 
 type ObjekteFormatter = schnittstellen.Formatter[
 	ObjekteFormatterContext,
@@ -29,4 +28,15 @@ type ObjekteFormatter = schnittstellen.Formatter[
 type ObjekteFormat interface {
 	ObjekteParser
 	ObjekteFormatter
+}
+
+func (c *ObjekteParserContext) GetMetadateiPtr() *metadatei.Metadatei {
+	return &c.Zettel.Metadatei
+}
+
+func (c *ObjekteParserContext) SetAkteFD(fd kennung.FD) (err error) {
+	// TODO read into akte writer?
+	c.AktePath = fd.Path
+	c.Zettel.Metadatei.AkteSha = fd.Sha
+	return
 }

@@ -35,12 +35,12 @@ func makeAkteExt(t test_logz.T, v string) (es kennung.Typ) {
 }
 
 func readFormat(
-	t test_logz.T,
+	t1 test_logz.T,
 	f ObjekteFormat,
 	af *test_metadatei_io.AkteIOFactory,
 	contents string,
 ) (z Objekte, a string) {
-	t.Helper()
+	t := t1.Skip(1)
 
 	c := ObjekteParserContext{}
 
@@ -48,6 +48,7 @@ func readFormat(
 		strings.NewReader(contents),
 		&c,
 	)
+
 	if err != nil {
 		t.Fatalf("failed to read zettel format: %s", err)
 	}

@@ -187,7 +187,7 @@ func (fv *FormatterValue) FuncFormatter(
 
 			var r sha.ReadCloser
 
-			if r, err = af.AkteReader(o.Objekte.Akte); err != nil {
+			if r, err = af.AkteReader(o.Objekte.Metadatei.AkteSha); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

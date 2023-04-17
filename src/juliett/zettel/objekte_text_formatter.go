@@ -97,7 +97,7 @@ func (f objekteTextFormatter) Format(
 	var ar sha.ReadCloser
 
 	if inline {
-		if ar, err = f.AkteFactory.AkteReader(c.Zettel.Akte); err != nil {
+		if ar, err = f.AkteFactory.AkteReader(c.Zettel.Metadatei.AkteSha); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -174,7 +174,7 @@ func (f objekteTextFormatter) writeToExternalAkte(
 		return
 	}
 
-	if ar, err = f.AkteFactory.AkteReader(c.Zettel.Akte); err != nil {
+	if ar, err = f.AkteFactory.AkteReader(c.Zettel.Metadatei.AkteSha); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

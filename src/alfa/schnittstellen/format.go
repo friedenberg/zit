@@ -21,11 +21,24 @@ type Parser[T any, T1 Ptr[T]] interface {
 	Parse(io.Reader, T1) (int64, error)
 }
 
+type ParserInterface[T any] interface {
+	Parse(io.Reader, T) (int64, error)
+}
+
 type Formatter[T any, T1 Ptr[T]] interface {
 	Format(io.Writer, T1) (int64, error)
+}
+
+type FormatterInterface[T any] interface {
+	Format(io.Writer, T) (int64, error)
 }
 
 type Format[T any, T1 Ptr[T]] interface {
 	Parser[T, T1]
 	Formatter[T, T1]
+}
+
+type FormatInterface[T any] interface {
+	ParserInterface[T]
+	FormatterInterface[T]
 }

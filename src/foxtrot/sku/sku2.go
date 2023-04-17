@@ -38,11 +38,13 @@ func (sk *Sku2) Set(line string) (err error) {
 	if _, err = format.ReadSep(
 		' ',
 		r,
-		sk.Tai.Set,
-		sk.Gattung.Set,
-		sk.Kennung.Set,
-		sk.ObjekteSha.Set,
-		sk.AkteSha.Set,
+		format.MakeLineReaderIterateStrict(
+			sk.Tai.Set,
+			sk.Gattung.Set,
+			sk.Kennung.Set,
+			sk.ObjekteSha.Set,
+			sk.AkteSha.Set,
+		),
 	); err != nil {
 		if gattung.IsErrUnrecognizedGattung(err) {
 			err = sk.setOld(line)
@@ -62,11 +64,13 @@ func (sk *Sku2) setOld(line string) (err error) {
 	if _, err = format.ReadSep(
 		' ',
 		r,
-		sk.Gattung.Set,
-		sk.Tai.Set,
-		sk.Kennung.Set,
-		sk.ObjekteSha.Set,
-		sk.AkteSha.Set,
+		format.MakeLineReaderIterateStrict(
+			sk.Gattung.Set,
+			sk.Tai.Set,
+			sk.Kennung.Set,
+			sk.ObjekteSha.Set,
+			sk.AkteSha.Set,
+		),
 	); err != nil {
 		err = errors.Wrapf(err, "Sku2: %s", line)
 		return

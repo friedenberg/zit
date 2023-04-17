@@ -6,14 +6,16 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/ohio"
+	"github.com/friedenberg/zit/src/bravo/ohio"
 )
 
 type Reader struct {
+	// TODO add delimiter
 	RequireMetadatei bool
 	Metadatei, Akte  io.ReaderFrom
 }
 
+// TODO add constructors and remove public fields
 func (mr *Reader) ReadFrom(r1 io.Reader) (n int64, err error) {
 	r := bufio.NewReader(r1)
 

@@ -38,11 +38,13 @@ func (sk *Sku) Set(line string) (err error) {
 	if _, err = format.ReadSep(
 		' ',
 		r,
-		sk.Gattung.Set,
-		sk.Time.Set,
-		sk.Kennung.Set,
-		sk.ObjekteSha.Set,
-		sk.AkteSha.Set,
+		format.MakeLineReaderIterateStrict(
+			sk.Gattung.Set,
+			sk.Time.Set,
+			sk.Kennung.Set,
+			sk.ObjekteSha.Set,
+			sk.AkteSha.Set,
+		),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

@@ -61,7 +61,7 @@ func writeFormat(
 		t.Fatalf("%s", err)
 	}
 
-	z.Akte = akteSha
+	z.Metadatei.AkteSha = akteSha
 
 	sb := &strings.Builder{}
 

@@ -2,11 +2,12 @@ package zettel
 
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/erworben"
 )
 
 type objekteTextFormat struct {
-	objekteTextParser
+	metadatei.TextParser
 	objekteTextFormatter
 }
 
@@ -15,7 +16,7 @@ func MakeObjekteTextFormat(
 	akteFormatter erworben.RemoteScript,
 ) *objekteTextFormat {
 	return &objekteTextFormat{
-		objekteTextParser: MakeObjekteTextParser(
+		TextParser: metadatei.MakeTextParser(
 			akteFactory,
 			akteFormatter,
 		),

@@ -36,7 +36,7 @@ func (s Store) ReadAllMatchingAkten(
 
 				return
 			},
-			//TODO handle files with the same sha
+			// TODO handle files with the same sha
 			fds.Add,
 		),
 	); err != nil {
@@ -48,7 +48,7 @@ func (s Store) ReadAllMatchingAkten(
 
 	if err = s.Zettel().ReadAll(
 		func(z *zettel.Transacted) (err error) {
-			fd, ok := fds.Get(z.Objekte.Akte.String())
+			fd, ok := fds.Get(z.Objekte.Metadatei.AkteSha.String())
 
 			if !ok {
 				return

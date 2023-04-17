@@ -16,8 +16,10 @@ func MakeFormatObjekte() *formatObjekte {
 func (f *formatObjekte) Parse(r io.Reader, o *Objekte) (n int64, err error) {
 	if n, err = format.ReadLines(
 		r,
-		format.MakeLineReaderKeyValue("Tai", o.Tai.Set),
-		format.MakeLineReaderKeyValue("Akte", o.AkteSha.Set),
+		format.MakeLineReaderIterateStrict(
+			format.MakeLineReaderKeyValue("Tai", o.Tai.Set),
+			format.MakeLineReaderKeyValue("Akte", o.AkteSha.Set),
+		),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
