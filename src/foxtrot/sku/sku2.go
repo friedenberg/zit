@@ -46,11 +46,12 @@ func (sk *Sku2) Set(line string) (err error) {
 			sk.AkteSha.Set,
 		),
 	); err != nil {
-		if gattung.IsErrUnrecognizedGattung(err) {
-			err = sk.setOld(line)
-		} else {
-			err = errors.Wrapf(err, "Sku2: %s", line)
+		if err1 := sk.setOld(line); err1 != nil {
+			err = errors.MakeMulti(err, err1)
+			return
 		}
+
+		err = nil
 
 		return
 	}
