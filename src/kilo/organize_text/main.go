@@ -4,9 +4,9 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/metadatei_io"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
 
 type Text struct {
@@ -76,7 +76,7 @@ func (t *Text) Refine() (err error) {
 func (t *Text) ReadFrom(r io.Reader) (n int64, err error) {
 	r1 := &assignmentLineReader{}
 
-	mr := metadatei_io.Reader{
+	mr := metadatei.Reader{
 		Metadatei: &t.Metadatei,
 		Akte:      r1,
 	}
@@ -107,7 +107,7 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 		return
 	}
 
-	mw := metadatei_io.Writer{
+	mw := metadatei.Writer{
 		Akte: lw,
 	}
 

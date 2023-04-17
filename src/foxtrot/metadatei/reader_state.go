@@ -1,4 +1,4 @@
-package metadatei_io
+package metadatei
 
 type readerState int
 

@@ -8,8 +8,8 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/metadatei_io"
 	"github.com/friedenberg/zit/src/delta/format"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
@@ -86,7 +86,7 @@ func (e *fileEncoder) EncodeObjekte(
 		Objekte:  *z,
 		AktePath: aktePath,
 	}
-	mw := metadatei_io.Writer{
+	mw := metadatei.Writer{
 		Metadatei: format.MakeWriterTo2(mtw.Format, meta),
 	}
 

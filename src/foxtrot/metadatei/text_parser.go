@@ -11,7 +11,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/script_config"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/charlie/metadatei_io"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
@@ -89,7 +88,7 @@ func (f textParser) Parse(
 
 	defer errors.DeferredCloser(&err, akteWriter)
 
-	mr := metadatei_io.Reader{
+	mr := Reader{
 		RequireMetadatei: true,
 		Metadatei:        lr,
 		Akte:             akteWriter,

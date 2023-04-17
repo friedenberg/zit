@@ -2,6 +2,7 @@ package metadatei
 
 import (
 	"flag"
+	"io"
 	"sort"
 	"strings"
 
@@ -12,6 +13,15 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 )
+
+const (
+	Boundary = "---"
+)
+
+type MetadateiWriterTo interface {
+	io.WriterTo
+	HasMetadateiContent() bool
+}
 
 type Metadatei struct {
 	AkteSha     sha.Sha

@@ -12,14 +12,14 @@ import (
 	"github.com/friedenberg/zit/src/bravo/script_config"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/charlie/metadatei_io"
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/format"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/hotel/typ"
 )
 
-const MetadateiBoundary = metadatei_io.Boundary
+const MetadateiBoundary = metadatei.Boundary
 
 type objekteTextFormatter struct {
 	standort         standort.Standort
@@ -120,7 +120,7 @@ func (f objekteTextFormatter) Format(
 		}
 	}
 
-	mw := metadatei_io.Writer{
+	mw := metadatei.Writer{
 		Metadatei: mtw,
 		Akte:      wt,
 	}

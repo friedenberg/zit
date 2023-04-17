@@ -1,4 +1,4 @@
-package metadatei_io
+package metadatei
 
 import (
 	"bytes"
