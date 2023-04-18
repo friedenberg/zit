@@ -12,9 +12,9 @@ import (
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
+	"github.com/friedenberg/zit/src/golf/persisted_metadatei_format"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/kilo/store_util"
 )
@@ -195,7 +195,7 @@ type commonStoreBase[
 
 	objekte_store.LogWriter[*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]]
 
-	persistentMetadateiFormat metadatei.PersistedFormat
+	persistentMetadateiFormat persisted_metadatei_format.V0
 }
 
 type commonStore[
@@ -254,7 +254,7 @@ func makeCommonStoreBase[
 		](
 			sa,
 			sa,
-			metadatei.PersistedFormat{},
+			persisted_metadatei_format.V0{},
 			textFormat,
 			pool,
 		),
@@ -266,7 +266,7 @@ func makeCommonStoreBase[
 			akteFormatter,
 		),
 		TransactedReader:          tr,
-		persistentMetadateiFormat: metadatei.PersistedFormat{},
+		persistentMetadateiFormat: persisted_metadatei_format.V0{},
 	}
 
 	return
@@ -323,7 +323,7 @@ func makeCommonStore[
 			](
 				sa,
 				sa,
-				metadatei.PersistedFormat{},
+				persisted_metadatei_format.V0{},
 				textFormat,
 				pool,
 			),

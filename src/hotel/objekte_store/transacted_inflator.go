@@ -4,9 +4,9 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
+	"github.com/friedenberg/zit/src/golf/persisted_metadatei_format"
 )
 
 type TransactedDataIdentityInflator[T any] interface {
@@ -46,7 +46,7 @@ type transactedInflator[
 ] struct {
 	of                        schnittstellen.ObjekteIOFactory
 	af                        schnittstellen.AkteIOFactory
-	persistentMetadateiFormat metadatei.PersistedFormat
+	persistentMetadateiFormat persisted_metadatei_format.V0
 	akteFormat                schnittstellen.Format[T, T1]
 	pool                      schnittstellen.Pool[
 		objekte.Transacted[T, T1, T2, T3, T4, T5],
@@ -64,7 +64,7 @@ func MakeTransactedInflator[
 ](
 	of schnittstellen.ObjekteIOFactory,
 	af schnittstellen.AkteIOFactory,
-	persistentMetadateiFormat metadatei.PersistedFormat,
+	persistentMetadateiFormat persisted_metadatei_format.V0,
 	akteFormat schnittstellen.Format[T, T1],
 	pool schnittstellen.Pool[
 		objekte.Transacted[T, T1, T2, T3, T4, T5],

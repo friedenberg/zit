@@ -1,4 +1,4 @@
-package metadatei
+package persisted_metadatei_format
 
 import (
 	"bufio"
@@ -12,14 +12,11 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
-type PersistedFormat struct {
-	IgnoreTypErrors   bool
-	EnforceFieldOrder bool
-}
+type V0 struct{}
 
-func (f PersistedFormat) Format(
+func (f V0) Format(
 	w1 io.Writer,
-	c PersistentFormatterContext,
+	c FormatterContext,
 ) (n int64, err error) {
 	m := c.GetMetadatei()
 	w := format.NewLineWriter()
@@ -40,9 +37,9 @@ func (f PersistedFormat) Format(
 	return
 }
 
-func (f *PersistedFormat) Parse(
+func (f V0) Parse(
 	r1 io.Reader,
-	c PersistentParserContext,
+	c ParserContext,
 ) (n int64, err error) {
 	m := c.GetMetadatei()
 
@@ -50,11 +47,7 @@ func (f *PersistedFormat) Parse(
 
 	r := bufio.NewReader(r1)
 
-	typLineReader := m.Typ.Set
-
-	if f.IgnoreTypErrors || true {
-		typLineReader = format.MakeLineReaderIgnoreErrors(typLineReader)
-	}
+	typLineReader := format.MakeLineReaderIgnoreErrors(m.Typ.Set)
 
 	esa := collections.MakeFuncSetString[kennung.Etikett, *kennung.Etikett](
 		etiketten,
@@ -62,30 +55,20 @@ func (f *PersistedFormat) Parse(
 
 	var g gattung.Gattung
 
-	lineReaders := format.MakeLineReaderIterate(
-		g.Set,
-		format.MakeLineReaderKeyValues(
-			map[string]schnittstellen.FuncSetString{
-				gattung.Akte.String():        m.AkteSha.Set,
-				gattung.Typ.String():         typLineReader,
-				gattung.AkteTyp.String():     typLineReader,
-				gattung.Bezeichnung.String(): m.Bezeichnung.Set,
-				gattung.Etikett.String():     esa,
-			},
+	lr := format.MakeLineReaderConsumeEmpty(
+		format.MakeLineReaderIterate(
+			g.Set,
+			format.MakeLineReaderKeyValues(
+				map[string]schnittstellen.FuncSetString{
+					gattung.Akte.String():        m.AkteSha.Set,
+					gattung.Typ.String():         typLineReader,
+					gattung.AkteTyp.String():     typLineReader,
+					gattung.Bezeichnung.String(): m.Bezeichnung.Set,
+					gattung.Etikett.String():     esa,
+				},
+			),
 		),
 	)
-
-	if f.EnforceFieldOrder {
-		lineReaders = format.MakeLineReaderIterateStrict(
-			g.Set, // will this work?
-			format.MakeLineReaderKeyValue(gattung.Akte.String(), m.AkteSha.Set),
-			format.MakeLineReaderKeyValue(gattung.Typ.String(), typLineReader),
-			format.MakeLineReaderKeyValue(gattung.Bezeichnung.String(), m.Bezeichnung.Set),
-			format.MakeLineReaderKeyValue(gattung.Etikett.String(), esa),
-		)
-	}
-
-	lr := format.MakeLineReaderConsumeEmpty(lineReaders)
 
 	if n, err = lr.ReadFrom(r); err != nil {
 		err = errors.Wrap(err)
