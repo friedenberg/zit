@@ -21,6 +21,10 @@ func (f V0) Format(
 	m := c.GetMetadatei()
 	w := format.NewLineWriter()
 
+	if !m.Tai.IsZero() {
+		w.WriteFormat("Tai %s", m.Tai)
+	}
+
 	w.WriteFormat("%s %s", gattung.Akte, m.AkteSha)
 	w.WriteFormat("%s %s", gattung.Typ, m.GetTyp())
 	w.WriteFormat("%s %s", gattung.Bezeichnung, m.Bezeichnung)
@@ -60,6 +64,7 @@ func (f V0) Parse(
 			g.Set,
 			format.MakeLineReaderKeyValues(
 				map[string]schnittstellen.FuncSetString{
+					"Tai":                        m.Tai.Set,
 					gattung.Akte.String():        m.AkteSha.Set,
 					gattung.Typ.String():         typLineReader,
 					gattung.AkteTyp.String():     typLineReader,

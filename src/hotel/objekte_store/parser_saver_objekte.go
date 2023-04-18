@@ -9,6 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
+	"github.com/friedenberg/zit/src/golf/persisted_metadatei_format"
 )
 
 type ParseSaver[
@@ -40,9 +41,14 @@ func MakeParseSaver[
 	owf schnittstellen.ObjekteIOFactory,
 	awf schnittstellen.AkteIOFactory,
 	akteParser schnittstellen.Parser[T, T1],
+	pmf persisted_metadatei_format.Format,
 ) *objekteParseSaver[T, T1, T2, T3] {
 	if akteParser == nil {
 		akteParser = MakeNopAkteFormat[T, T1](awf)
+	}
+
+	if pmf == nil {
+		panic("persisted_metadatei_format.Format was nil")
 	}
 
 	return &objekteParseSaver[T, T1, T2, T3]{
@@ -50,7 +56,7 @@ func MakeParseSaver[
 		akteParser: akteParser,
 		objekteSaver: MakeObjekteSaver[T, T1](
 			owf,
-			objekte.Format[T, T1]{},
+			pmf,
 		),
 	}
 }

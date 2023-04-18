@@ -64,7 +64,6 @@ func makeKastenStore(
 		s,
 		sa,
 		s,
-		nil,
 		kasten.MakeFormatTextIgnoreTomlErrors(sa),
 		&kasten.FormatterAkteTextToml{},
 	)
@@ -108,6 +107,7 @@ func makeKastenStore(
 			},
 		},
 		sa.GetAbbrStore(),
+		sa.GetPersistentMetadateiFormat(),
 	)
 
 	return

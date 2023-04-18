@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
+	"github.com/friedenberg/zit/src/golf/persisted_metadatei_format"
 )
 
 type CreateOrUpdateDelegate[T any] struct {
@@ -26,12 +27,13 @@ type createOrUpdate[
 	T4 any,
 	T5 schnittstellen.VerzeichnissePtr[T4, T],
 ] struct {
-	clock          ts.Clock
-	ls             schnittstellen.LockSmith
-	oaf            schnittstellen.ObjekteAkteWriterFactory
-	reader         TransactedReader[T3, *objekte.Transacted[T, T1, T2, T3, T4, T5]]
-	delegate       CreateOrUpdateDelegate[*objekte.Transacted[T, T1, T2, T3, T4, T5]]
-	matchableAdder kennung.MatchableAdder
+	clock                     ts.Clock
+	ls                        schnittstellen.LockSmith
+	oaf                       schnittstellen.ObjekteAkteWriterFactory
+	reader                    TransactedReader[T3, *objekte.Transacted[T, T1, T2, T3, T4, T5]]
+	delegate                  CreateOrUpdateDelegate[*objekte.Transacted[T, T1, T2, T3, T4, T5]]
+	matchableAdder            kennung.MatchableAdder
+	persistentMetadateiFormat persisted_metadatei_format.Format
 }
 
 func MakeCreateOrUpdate[
@@ -48,14 +50,20 @@ func MakeCreateOrUpdate[
 	reader TransactedReader[T3, *objekte.Transacted[T, T1, T2, T3, T4, T5]],
 	delegate CreateOrUpdateDelegate[*objekte.Transacted[T, T1, T2, T3, T4, T5]],
 	ma kennung.MatchableAdder,
+	pmf persisted_metadatei_format.Format,
 ) (cou *createOrUpdate[T, T1, T2, T3, T4, T5]) {
+	if pmf == nil {
+		panic("nil persisted_metadatei_format.Format")
+	}
+
 	return &createOrUpdate[T, T1, T2, T3, T4, T5]{
-		clock:          clock,
-		ls:             ls,
-		oaf:            oaf,
-		reader:         reader,
-		delegate:       delegate,
-		matchableAdder: ma,
+		clock:                     clock,
+		ls:                        ls,
+		oaf:                       oaf,
+		reader:                    reader,
+		delegate:                  delegate,
+		matchableAdder:            ma,
+		persistentMetadateiFormat: pmf,
 	}
 }
 
@@ -83,8 +91,6 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdateCheckedOut(
 		},
 	}
 
-	fo := objekte.MakeFormat[T, T1]()
-
 	var ow sha.WriteCloser
 
 	if ow, err = cou.oaf.ObjekteWriter(kennungPtr.GetGattung()); err != nil {
@@ -94,7 +100,10 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdateCheckedOut(
 
 	defer errors.DeferredCloser(&err, ow)
 
-	if _, err = fo.Format(ow, &transactedPtr.Objekte); err != nil {
+	if _, err = cou.persistentMetadateiFormat.Format(
+		ow,
+		transactedPtr.Objekte,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -166,8 +175,6 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdate(
 		// transactedPtr.Sku.Kopf = s.common.GetTransaktion().Time
 	}
 
-	fo := objekte.MakeFormat[T, T1]()
-
 	var ow sha.WriteCloser
 
 	if ow, err = cou.oaf.ObjekteWriter(kennungPtr.GetGattung()); err != nil {
@@ -177,7 +184,10 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdate(
 
 	defer errors.DeferredCloser(&err, ow)
 
-	if _, err = fo.Format(ow, &transactedPtr.Objekte); err != nil {
+	if _, err = cou.persistentMetadateiFormat.Format(
+		ow,
+		transactedPtr.Objekte,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

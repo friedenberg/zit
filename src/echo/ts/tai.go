@@ -121,6 +121,17 @@ func (t *Tai) Set(v string) (err error) {
 // 	return sha.FromHash(hash)
 // }
 
+func (t Tai) IsZero() (ok bool) {
+	ok = (t.tai.Sec == 0 && t.tai.Asec == 0) || t.wasSet
+	return
+}
+
+func (t *Tai) Reset() {
+	t.tai.Sec = 0
+	t.tai.Asec = 0
+	t.wasSet = false
+}
+
 func (t Tai) MarshalText() (text []byte, err error) {
 	errors.Err().Printf(t.String())
 	text = []byte(t.String())

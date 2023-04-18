@@ -30,9 +30,9 @@ function dirty_new_zettel() {
 
 	assert_success
 	assert_output --partial - <<-EOM
-		[!txt@9166da1cf49228407b118594dc6d3e17a9d4e66fdd121f763e46190fdc154850]
-		[-etikett@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
-		[-etikett-one@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[!txt@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-etikett-one@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
 		[two/uno@2e844ebe1018e2071c6f2b6b37a9ea2c1bd69e391d89f54aa4256228a1d49db0 !txt "the new zettel"]
 	EOM
 }
@@ -159,14 +159,14 @@ function status_simple_all { # @test
 	assert_success
 	#TODO why is fix issue with untracked appear
 	assert_output_unsorted - <<-EOM
-		             same [md.typ@eaa85e80de6d1129a21365a8ce2a49ca752457d10932a7d73001b4ebded302c7 !md]
+		             same [md.typ@b986c1d21fcfb7f0fe11ae960236e3471b4001029a9e631d16899643922b2d15 !md]
 		             same [one/dos.zettel@c6b9d095358b8b26a99e90496d916ba92a99e9b75c705165df5f6d353a949ea9 !md "wow ok again"]
 		             same [one/uno.zettel@d47c552a5299f392948258d7959fc7cf94843316a21c8ea12854ed84a8c06367 !md "wow the first"]
-		             same [tag-1.etikett@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0 -tag-1]
-		             same [tag-2.etikett@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0 -tag-2]
-		             same [tag-3.etikett@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0 -tag-3]
-		             same [tag-4.etikett@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0 -tag-4]
-		             same [tag.etikett@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0 -tag]
+		             same [tag-1.etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249 -tag-1]
+		             same [tag-2.etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249 -tag-2]
+		             same [tag-3.etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249 -tag-3]
+		             same [tag-4.etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249 -tag-4]
+		             same [tag.etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249 -tag]
 	EOM
 
 	dirty_one_uno
@@ -178,16 +178,16 @@ function status_simple_all { # @test
 	run_zit status .
 	assert_success
 	assert_output_unsorted - <<-EOM
-		             same [tag-1.etikett@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0 -tag-1]
-		             same [tag-2.etikett@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0 -tag-2]
-		             same [tag-3.etikett@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0 -tag-3]
-		             same [tag-4.etikett@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0 -tag-4]
-		             same [tag.etikett@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0 -tag]
-		          changed [md.typ@72d654e3c7f4e820df18c721177dfad38fe831d10bca6dcb33b7cad5dc335357 !md]
+		             same [tag-1.etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249 -tag-1]
+		             same [tag-2.etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249 -tag-2]
+		             same [tag-3.etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249 -tag-3]
+		             same [tag-4.etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249 -tag-4]
+		             same [tag.etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249 -tag]
+		          changed [md.typ@acbfc0e07b1be4bf1b12020d8316fe9629518b015041b7120db5a9f2012c84fa !md]
 		          changed [one/dos.zettel@30edfed4c016580f5b69a2709b8e5ae01c2b504b8826bf2d04e6c1ecd6bb3268 !md "dos wildly different"]
 		          changed [one/uno.zettel@689c6787364899defa77461ff6a3f454ca667654653f86d5d44f2826950ff4f9 !md "wildly different"]
-		        untracked [da-new.typ@0ed0c5d77f38816283174202947f71460a455e81b43348bf7808e2b2d81ad120 !da-new]
-		        untracked [zz-archive.etikett@cba019d4f889027a3485e56dd2080c7ba0fa1e27499c24b7ec08ad80ef55da9d -zz-archive]
+		        untracked [da-new.typ@97c5ec233de522a564d1a6d43ea992b4f92d2bfa439762215b5da85780a4f529 !da-new]
+		        untracked [zz-archive.etikett@0b7afc0b23d2f265b64bc184728d540cbadd0df54a2ae719e9757bcf17d8548a -zz-archive]
 	EOM
 }
 
@@ -195,7 +195,7 @@ function status_simple_typ { # @test
 	run_zit status .t
 	assert_success
 	assert_output_unsorted - <<-EOM
-		             same [md.typ@eaa85e80de6d1129a21365a8ce2a49ca752457d10932a7d73001b4ebded302c7 !md]
+		             same [md.typ@b986c1d21fcfb7f0fe11ae960236e3471b4001029a9e631d16899643922b2d15 !md]
 	EOM
 
 	dirty_md_typ
@@ -204,8 +204,8 @@ function status_simple_typ { # @test
 	run_zit status .t
 	assert_success
 	assert_output_unsorted - <<-EOM
-		          changed [md.typ@72d654e3c7f4e820df18c721177dfad38fe831d10bca6dcb33b7cad5dc335357 !md]
-		        untracked [da-new.typ@0ed0c5d77f38816283174202947f71460a455e81b43348bf7808e2b2d81ad120 !da-new]
+		          changed [md.typ@acbfc0e07b1be4bf1b12020d8316fe9629518b015041b7120db5a9f2012c84fa !md]
+		        untracked [da-new.typ@97c5ec233de522a564d1a6d43ea992b4f92d2bfa439762215b5da85780a4f529 !da-new]
 	EOM
 }
 
@@ -213,11 +213,11 @@ function status_simple_etikett { # @test
 	run_zit status .e
 	assert_success
 	assert_output_unsorted - <<-EOM
-		             same [tag-1.etikett@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0 -tag-1]
-		             same [tag-2.etikett@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0 -tag-2]
-		             same [tag-3.etikett@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0 -tag-3]
-		             same [tag-4.etikett@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0 -tag-4]
-		             same [tag.etikett@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0 -tag]
+		             same [tag-1.etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249 -tag-1]
+		             same [tag-2.etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249 -tag-2]
+		             same [tag-3.etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249 -tag-3]
+		             same [tag-4.etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249 -tag-4]
+		             same [tag.etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249 -tag]
 	EOM
 
 	dirty_zz_archive_etikett
@@ -225,11 +225,11 @@ function status_simple_etikett { # @test
 	run_zit status .e
 	assert_success
 	assert_output_unsorted - <<-EOM
-		             same [tag-1.etikett@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0 -tag-1]
-		             same [tag-2.etikett@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0 -tag-2]
-		             same [tag-3.etikett@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0 -tag-3]
-		             same [tag-4.etikett@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0 -tag-4]
-		             same [tag.etikett@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0 -tag]
-		        untracked [zz-archive.etikett@cba019d4f889027a3485e56dd2080c7ba0fa1e27499c24b7ec08ad80ef55da9d -zz-archive]
+		             same [tag-1.etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249 -tag-1]
+		             same [tag-2.etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249 -tag-2]
+		             same [tag-3.etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249 -tag-3]
+		             same [tag-4.etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249 -tag-4]
+		             same [tag.etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249 -tag]
+		        untracked [zz-archive.etikett@0b7afc0b23d2f265b64bc184728d540cbadd0df54a2ae719e9757bcf17d8548a -zz-archive]
 	EOM
 }

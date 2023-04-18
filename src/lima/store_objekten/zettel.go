@@ -94,7 +94,6 @@ func makeZettelStore(
 		s,
 		nil,
 		nil,
-		nil,
 	)
 
 	if err != nil {
@@ -150,7 +149,7 @@ func (s zettelStore) WriteZettelObjekte(z zettel.Objekte) (sh sha.Sha, err error
 
 	defer errors.DeferredCloser(&err, wc)
 
-	if _, err = s.persistentMetadateiFormat.Format(wc, z); err != nil {
+	if _, err = s.StoreUtil.GetPersistentMetadateiFormat().Format(wc, z); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

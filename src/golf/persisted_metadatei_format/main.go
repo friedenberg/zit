@@ -14,6 +14,9 @@ type (
 		Format(io.Writer, FormatterContext) (int64, error)
 		Parse(io.Reader, ParserContext) (int64, error)
 	}
+	Getter interface {
+		GetPersistentMetadateiFormat() Format
+	}
 )
 
 func FormatForVersion(v schnittstellen.StoreVersion) Format {

@@ -12,10 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
-type V1 struct {
-	IgnoreTypErrors   bool
-	EnforceFieldOrder bool
-}
+type V1 struct{}
 
 func (f V1) Format(
 	w1 io.Writer,
@@ -23,6 +20,10 @@ func (f V1) Format(
 ) (n int64, err error) {
 	m := c.GetMetadatei()
 	w := format.NewLineWriter()
+
+	if !m.Tai.IsZero() {
+		w.WriteFormat("Tai %s", m.Tai)
+	}
 
 	w.WriteFormat("%s %s", gattung.Akte, m.AkteSha)
 	w.WriteFormat("%s %s", gattung.Typ, m.GetTyp())
@@ -52,10 +53,7 @@ func (f V1) Parse(
 
 	typLineReader := m.Typ.Set
 
-	// TODO split persisted format into versions
-	if f.IgnoreTypErrors || true {
-		typLineReader = format.MakeLineReaderIgnoreErrors(typLineReader)
-	}
+	typLineReader = format.MakeLineReaderIgnoreErrors(typLineReader)
 
 	esa := collections.MakeFuncSetString[kennung.Etikett, *kennung.Etikett](
 		etiketten,
@@ -67,6 +65,7 @@ func (f V1) Parse(
 		g.Set,
 		format.MakeLineReaderKeyValues(
 			map[string]schnittstellen.FuncSetString{
+				"Tai":                        m.Tai.Set,
 				gattung.Akte.String():        m.AkteSha.Set,
 				gattung.Typ.String():         typLineReader,
 				gattung.AkteTyp.String():     typLineReader,
@@ -75,16 +74,6 @@ func (f V1) Parse(
 			},
 		),
 	)
-
-	if f.EnforceFieldOrder {
-		lineReaders = format.MakeLineReaderIterateStrict(
-			g.Set, // will this work?
-			format.MakeLineReaderKeyValue(gattung.Akte.String(), m.AkteSha.Set),
-			format.MakeLineReaderKeyValue(gattung.Typ.String(), typLineReader),
-			format.MakeLineReaderKeyValue(gattung.Bezeichnung.String(), m.Bezeichnung.Set),
-			format.MakeLineReaderKeyValue(gattung.Etikett.String(), esa),
-		)
-	}
 
 	lr := format.MakeLineReaderConsumeEmpty(lineReaders)
 

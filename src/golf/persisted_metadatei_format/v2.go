@@ -20,12 +20,18 @@ func (f V2) Format(
 	m := c.GetMetadatei()
 	w := format.NewLineWriter()
 
+	if !m.Tai.IsZero() {
+		w.WriteFormat("Tai %s", m.Tai)
+	}
+
 	w.WriteFormat("%s %s", gattung.Akte, m.AkteSha)
 	w.WriteFormat("%s %s", gattung.Typ, m.GetTyp())
 	w.WriteFormat("%s %s", gattung.Bezeichnung, m.Bezeichnung)
 
-	for _, e := range collections.SortedValues(m.Etiketten) {
-		w.WriteFormat("%s %s", gattung.Etikett, e)
+	if m.Etiketten != nil {
+		for _, e := range collections.SortedValues(m.Etiketten) {
+			w.WriteFormat("%s %s", gattung.Etikett, e)
+		}
 	}
 
 	if n, err = w.WriteTo(w1); err != nil {
@@ -48,8 +54,12 @@ func (f V2) Parse(
 
 	lr := format.MakeLineReaderConsumeEmpty(
 		format.MakeLineReaderIterate(
+			format.MakeLineReaderKeyValue("Tai", m.Tai.Set),
 			format.MakeLineReaderKeyValue(gattung.Akte.String(), m.AkteSha.Set),
-			format.MakeLineReaderKeyValue(gattung.Typ.String(), m.Typ.Set),
+			format.MakeLineReaderKeyValue(
+				gattung.Typ.String(),
+				format.MakeLineReaderIgnoreErrors(m.Typ.Set),
+			),
 			format.MakeLineReaderKeyValue(gattung.Bezeichnung.String(), m.Bezeichnung.Set),
 			format.MakeLineReaderKeyValue(
 				gattung.Etikett.String(),

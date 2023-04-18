@@ -65,7 +65,6 @@ func makeTypStore(
 		s,
 		sa,
 		s,
-		nil,
 		typ.MakeFormatTextIgnoreTomlErrors(sa),
 		&typ.FormatterAkteTextToml{},
 	)
@@ -109,6 +108,7 @@ func makeTypStore(
 			},
 		},
 		sa.GetAbbrStore(),
+		sa.GetPersistentMetadateiFormat(),
 	)
 
 	return

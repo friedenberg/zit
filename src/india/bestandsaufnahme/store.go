@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/golf/objekte"
+	"github.com/friedenberg/zit/src/golf/persisted_metadatei_format"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 )
 
@@ -52,10 +53,10 @@ type AkteFormat = schnittstellen.Format[
 ]
 
 type store struct {
-	standort standort.Standort
-	oaf      schnittstellen.ObjekteAkteFactory
-	pool     schnittstellen.Pool[Objekte, *Objekte]
-	ObjekteFormat
+	standort                  standort.Standort
+	oaf                       schnittstellen.ObjekteAkteFactory
+	pool                      schnittstellen.Pool[Objekte, *Objekte]
+	persistentMetadateiFormat persisted_metadatei_format.Format
 	AkteFormat
 	ObjekteInflator
 	ObjekteSaver
@@ -65,17 +66,17 @@ type store struct {
 func MakeStore(
 	standort standort.Standort,
 	oaf schnittstellen.ObjekteAkteFactory,
+	pmf persisted_metadatei_format.Format,
 ) (s *store, err error) {
 	p := collections.MakePool[Objekte]()
-	of := MakeFormatObjekte()
 	af := MakeFormatAkte()
 
 	s = &store{
-		standort:      standort,
-		oaf:           oaf,
-		pool:          p,
-		ObjekteFormat: of,
-		AkteFormat:    af,
+		standort:                  standort,
+		oaf:                       oaf,
+		pool:                      p,
+		persistentMetadateiFormat: pmf,
+		AkteFormat:                af,
 		ObjekteInflator: objekte_store.MakeObjekteInflator[
 			Objekte,
 			*Objekte,
@@ -84,14 +85,14 @@ func MakeStore(
 		](
 			oaf,
 			oaf,
-			of,
+			pmf,
 			af,
 			p,
 		),
 		ObjekteSaver: objekte_store.MakeObjekteSaver[
 			Objekte,
 			*Objekte,
-		](oaf, of),
+		](oaf, pmf),
 		AkteTextSaver: objekte_store.MakeAkteTextSaver[
 			Objekte,
 			*Objekte,
@@ -148,7 +149,7 @@ func (s *store) ReadOne(sh schnittstellen.Sha) (o *Objekte, err error) {
 
 	o = s.pool.Get()
 
-	if _, err = s.ObjekteFormat.Parse(or, o); err != nil {
+	if _, err = s.persistentMetadateiFormat.Parse(or, o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

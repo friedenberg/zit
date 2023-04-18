@@ -18,12 +18,12 @@ function checkout_simple_all { # @test
 	run_zit checkout :z,t,e
 	assert_success
 	assert_output_unsorted - <<-EOM
-		             same [md.typ@eaa85e80de6d1129a21365a8ce2a49ca752457d10932a7d73001b4ebded302c7 !md]
-		             same [tag-1.etikett@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0 -tag-1]
-		             same [tag-2.etikett@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0 -tag-2]
-		             same [tag-3.etikett@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0 -tag-3]
-		             same [tag-4.etikett@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0 -tag-4]
-		             same [tag.etikett@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0 -tag]
+		             same [md.typ@b986c1d21fcfb7f0fe11ae960236e3471b4001029a9e631d16899643922b2d15 !md]
+		             same [tag-1.etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249 -tag-1]
+		             same [tag-2.etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249 -tag-2]
+		             same [tag-3.etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249 -tag-3]
+		             same [tag-4.etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249 -tag-4]
+		             same [tag.etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249 -tag]
 		      checked out [one/dos.zettel@c6b9d095358b8b26a99e90496d916ba92a99e9b75c705165df5f6d353a949ea9 !md "wow ok again"]
 		      checked out [one/uno.zettel@d47c552a5299f392948258d7959fc7cf94843316a21c8ea12854ed84a8c06367 !md "wow the first"]
 	EOM
@@ -59,5 +59,7 @@ function checkout_zettel_several { # @test
 function checkout_simple_typ { # @test
 	run_zit checkout :t
 	assert_success
-	assert_output '             same [md.typ@eaa85e80de6d1129a21365a8ce2a49ca752457d10932a7d73001b4ebded302c7 !md]'
+	assert_output_unsorted - <<-EOM
+		             same [md.typ@b986c1d21fcfb7f0fe11ae960236e3471b4001029a9e631d16899643922b2d15 !md]
+	EOM
 }

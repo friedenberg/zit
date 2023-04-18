@@ -37,18 +37,6 @@ func (f *FormatterValue) FuncFormatter(
 	af schnittstellen.AkteIOFactory,
 ) schnittstellen.FuncIter[*Transacted] {
 	switch f.string {
-	case "objekte":
-		f := objekte.MakeFormat[Objekte, *Objekte]()
-
-		return func(o *Transacted) (err error) {
-			if _, err = f.Format(out, &o.Objekte); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		}
-
 	case "text":
 		f := MakeFormatText(af)
 

@@ -26,11 +26,11 @@ function add { # @test
 
 	assert_success
 	assert_output - <<-EOM
-		[-zz@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
-		[-zz-inbox@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
-		[-zz-inbox-2022@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
-		[-zz-inbox-2022-11@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
-		[-zz-inbox-2022-11-14@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-zz@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-zz-inbox@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-zz-inbox-2022@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-zz-inbox-2022-11@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-zz-inbox-2022-11-14@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
 		[one/uno@8f8aa93ce3cb3da0e5eddb2c9556fe37980d0aaf58f2760de451a93ce337b0c2 !md "to_add"]
 		[one/uno@8f8aa93ce3cb3da0e5eddb2c9556fe37980d0aaf58f2760de451a93ce337b0c2 !md "to_add"]
 		[to_add.md] (deleted)
@@ -69,11 +69,11 @@ function add_1 { # @test
 
 	assert_success
 	assert_output - <<-EOM
-		[-zz@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
-		[-zz-inbox@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
-		[-zz-inbox-2022@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
-		[-zz-inbox-2022-11@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
-		[-zz-inbox-2022-11-14@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-zz@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-zz-inbox@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-zz-inbox-2022@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-zz-inbox-2022-11@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-zz-inbox-2022-11-14@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
 		[one/uno@8f8aa93ce3cb3da0e5eddb2c9556fe37980d0aaf58f2760de451a93ce337b0c2 !md "to_add"]
 		[one/uno@8f8aa93ce3cb3da0e5eddb2c9556fe37980d0aaf58f2760de451a93ce337b0c2 !md "to_add"]
 		[to_add.md] (deleted)
@@ -105,11 +105,11 @@ function add_2 { # @test
 
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[-zz-inbox-2022-11-14@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
-		[-zz-inbox-2022-11@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
-		[-zz-inbox-2022@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
-		[-zz-inbox@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
-		[-zz@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-zz-inbox-2022-11-14@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-zz-inbox-2022-11@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-zz-inbox-2022@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-zz-inbox@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-zz@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
 		[one/dos@02425f5295479fc80efd565abe728696072de2422958209ef32ffb39427d80a1 !md "to_add2"]
 		[one/dos@02425f5295479fc80efd565abe728696072de2422958209ef32ffb39427d80a1 !md "to_add2"]
 		[one/uno@8f8aa93ce3cb3da0e5eddb2c9556fe37980d0aaf58f2760de451a93ce337b0c2 !md "to_add"]
@@ -138,11 +138,11 @@ function add_dedupe_1 { # @test
 
 	assert_success
 	assert_output - <<-EOM
-		[-zz@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
-		[-zz-inbox@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
-		[-zz-inbox-2022@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
-		[-zz-inbox-2022-11@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
-		[-zz-inbox-2022-11-14@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-zz@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-zz-inbox@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-zz-inbox-2022@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-zz-inbox-2022-11@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-zz-inbox-2022-11-14@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
 		[one/uno@8f8aa93ce3cb3da0e5eddb2c9556fe37980d0aaf58f2760de451a93ce337b0c2 !md "to_add"]
 		[one/uno@8f8aa93ce3cb3da0e5eddb2c9556fe37980d0aaf58f2760de451a93ce337b0c2 !md "to_add"]
 	EOM
@@ -167,8 +167,8 @@ function add_dedupe_1 { # @test
 	run_zit checkin -delete one/uno.zettel
 	assert_success
 	assert_output - <<-EOM
-		[-new@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
-		[-new-tag@5dbb297b5bde513be49fde397499eb89af8f5295f5137d75b52b015802b73ae0]
+		[-new@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-new-tag@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
 		[one/uno@d4853a453015235e41b9513f7e70d91b1a28212f9bd342daf5024b84f35d209f !md "new title"]
 		          deleted [one/uno.zettel]
 		          deleted [one]

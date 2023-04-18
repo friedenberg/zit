@@ -17,6 +17,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/kennung_index"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
+	"github.com/friedenberg/zit/src/golf/persisted_metadatei_format"
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/india/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/india/konfig"
@@ -46,17 +47,20 @@ type StoreUtil interface {
 
 	SetMatchableAdder(kennung.MatchableAdder)
 	kennung.MatchableAdder
+
+	persisted_metadatei_format.Getter
 }
 
 // TODO-P3 move to own package
 type common struct {
-	LockSmith        schnittstellen.LockSmith
-	Age              age.Age
-	konfig           *konfig.Compiled
-	standort         standort.Standort
-	transaktion      transaktion.Transaktion
-	bestandsaufnahme *bestandsaufnahme.Objekte
-	Abbr             AbbrStore
+	LockSmith                 schnittstellen.LockSmith
+	Age                       age.Age
+	konfig                    *konfig.Compiled
+	standort                  standort.Standort
+	transaktion               transaktion.Transaktion
+	bestandsaufnahme          *bestandsaufnahme.Objekte
+	Abbr                      AbbrStore
+	persistentMetadateiFormat persisted_metadatei_format.Format
 
 	bestandsaufnahmeStore bestandsaufnahme.Store
 	kennungIndex          kennung_index.Index
@@ -69,12 +73,14 @@ func MakeStoreUtil(
 	a age.Age,
 	k *konfig.Compiled,
 	st standort.Standort,
+	pmf persisted_metadatei_format.Format,
 ) (c *common, err error) {
 	c = &common{
-		LockSmith: lockSmith,
-		Age:       a,
-		konfig:    k,
-		standort:  st,
+		LockSmith:                 lockSmith,
+		Age:                       a,
+		konfig:                    k,
+		standort:                  st,
+		persistentMetadateiFormat: pmf,
 	}
 
 	t := ts.Now()
@@ -109,6 +115,7 @@ func MakeStoreUtil(
 	if c.bestandsaufnahmeStore, err = bestandsaufnahme.MakeStore(
 		c.GetStandort(),
 		c,
+		pmf,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -128,6 +135,10 @@ func MakeStoreUtil(
 
 func (s common) GetLockSmith() schnittstellen.LockSmith {
 	return s.LockSmith
+}
+
+func (s common) GetPersistentMetadateiFormat() persisted_metadatei_format.Format {
+	return s.persistentMetadateiFormat
 }
 
 func (s common) GetTime() ts.Time {

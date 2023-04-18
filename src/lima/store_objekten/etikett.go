@@ -65,7 +65,6 @@ func makeEtikettStore(
 		s,
 		sa,
 		s,
-		nil,
 		etikett.MakeFormatText(sa),
 		&etikett.FormatterAkteTextToml{},
 	)
@@ -109,6 +108,7 @@ func makeEtikettStore(
 			},
 		},
 		sa.GetAbbrStore(),
+		sa.GetPersistentMetadateiFormat(),
 	)
 
 	return

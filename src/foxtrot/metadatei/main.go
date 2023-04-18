@@ -13,6 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
+	"github.com/friedenberg/zit/src/echo/ts"
 )
 
 const (
@@ -30,6 +31,7 @@ type Metadatei struct {
 	Etiketten   kennung.EtikettSet
 	Gattung     gattung.Gattung
 	Typ         kennung.Typ
+	Tai         ts.Tai
 }
 
 func (m *Metadatei) AddToFlagSet(f *flag.FlagSet) {
@@ -59,6 +61,10 @@ func (z Metadatei) IsEmpty() bool {
 	}
 
 	if !z.Typ.IsEmpty() {
+		return false
+	}
+
+	if !z.Tai.IsZero() {
 		return false
 	}
 
@@ -110,6 +116,10 @@ func (pz Metadatei) Equals(z1 Metadatei) bool {
 		return false
 	}
 
+	if !pz.Tai.Equals(z1.Tai) {
+		return false
+	}
+
 	return true
 }
 
@@ -119,6 +129,7 @@ func (z *Metadatei) Reset() {
 	z.Etiketten = kennung.MakeEtikettSet()
 	z.Typ = kennung.Typ{}
 	z.Gattung = gattung.Unknown
+	z.Tai.Reset()
 }
 
 func (z *Metadatei) ResetWith(z1 Metadatei) {
@@ -127,6 +138,7 @@ func (z *Metadatei) ResetWith(z1 Metadatei) {
 	z.Etiketten = z1.Etiketten.ImmutableClone()
 	z.Typ = z1.Typ
 	z.Gattung = z1.Gattung
+	z.Tai = z1.Tai
 }
 
 func (z Metadatei) Description() (d string) {

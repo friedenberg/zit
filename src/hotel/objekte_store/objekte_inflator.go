@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
+	"github.com/friedenberg/zit/src/golf/persisted_metadatei_format"
 )
 
 type ObjekteInflator[
@@ -23,11 +24,11 @@ type objekteInflator[
 	T2 any,
 	T3 schnittstellen.VerzeichnissePtr[T2, T],
 ] struct {
-	or            schnittstellen.ObjekteReaderFactory
-	ar            schnittstellen.AkteReaderFactory
-	objekteParser schnittstellen.Parser[T, T1]
-	akteParser    schnittstellen.Parser[T, T1]
-	pool          schnittstellen.Pool[T, T1]
+	or                        schnittstellen.ObjekteReaderFactory
+	ar                        schnittstellen.AkteReaderFactory
+	persistentMetadateiFormat persisted_metadatei_format.Format
+	akteParser                schnittstellen.Parser[T, T1]
+	pool                      schnittstellen.Pool[T, T1]
 }
 
 func MakeObjekteInflator[
@@ -38,20 +39,16 @@ func MakeObjekteInflator[
 ](
 	or schnittstellen.ObjekteReaderFactory,
 	ar schnittstellen.AkteReaderFactory,
-	objekteParser schnittstellen.Parser[T, T1],
+	pmf persisted_metadatei_format.Format,
 	akteParser schnittstellen.Parser[T, T1],
 	pool schnittstellen.Pool[T, T1],
 ) *objekteInflator[T, T1, T2, T3] {
-	if objekteParser == nil {
-		objekteParser = objekte.MakeFormat[T, T1]()
-	}
-
 	return &objekteInflator[T, T1, T2, T3]{
-		or:            or,
-		ar:            ar,
-		objekteParser: objekteParser,
-		akteParser:    akteParser,
-		pool:          pool,
+		or:                        or,
+		ar:                        ar,
+		persistentMetadateiFormat: pmf,
+		akteParser:                akteParser,
+		pool:                      pool,
 	}
 }
 
@@ -98,7 +95,7 @@ func (h *objekteInflator[T, T1, T2, T3]) readObjekte(
 
 	var n int64
 
-	if n, err = h.objekteParser.Parse(r, o); err != nil {
+	if n, err = h.persistentMetadateiFormat.Parse(r, o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

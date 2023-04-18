@@ -161,8 +161,6 @@ type commonStoreBase[
 
 	store_util.StoreUtil
 
-	ObjekteFormat schnittstellen.Format[O, OPtr]
-
 	pool schnittstellen.Pool[
 		objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
 		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
@@ -195,7 +193,7 @@ type commonStoreBase[
 
 	objekte_store.LogWriter[*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]]
 
-	persistentMetadateiFormat persisted_metadatei_format.V0
+	persistentMetadateiFormat persisted_metadatei_format.Format
 }
 
 type commonStore[
@@ -223,7 +221,7 @@ func makeCommonStoreBase[
 	sa store_util.StoreUtil,
 	tr objekte_store.TransactedReader[KPtr,
 		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]],
-	objekteFormat schnittstellen.Format[O, OPtr],
+	pmf persisted_metadatei_format.Format,
 	textFormat schnittstellen.Format[O, OPtr],
 	akteFormatter schnittstellen.Formatter[O, OPtr],
 ) (s *commonStoreBase[O, OPtr, K, KPtr, V, VPtr], err error) {
@@ -235,15 +233,10 @@ func makeCommonStoreBase[
 		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
 	]()
 
-	if objekteFormat == nil {
-		objekteFormat = objekte.MakeFormat[O, OPtr]()
-	}
-
 	s = &commonStoreBase[O, OPtr, K, KPtr, V, VPtr]{
 		commonStoreDelegate: delegate,
 		StoreUtil:           sa,
 		pool:                pool,
-		ObjekteFormat:       objekteFormat,
 		TransactedInflator: objekte_store.MakeTransactedInflator[
 			O,
 			OPtr,
@@ -266,7 +259,7 @@ func makeCommonStoreBase[
 			akteFormatter,
 		),
 		TransactedReader:          tr,
-		persistentMetadateiFormat: persisted_metadatei_format.V0{},
+		persistentMetadateiFormat: pmf,
 	}
 
 	return
@@ -284,21 +277,13 @@ func makeCommonStore[
 	sa store_util.StoreUtil,
 	tr objekte_store.TransactedReader[KPtr,
 		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]],
-	objekteFormat schnittstellen.Format[O, OPtr],
 	textFormat schnittstellen.Format[O, OPtr],
 	akteFormatter schnittstellen.Formatter[O, OPtr],
 ) (s *commonStore[O, OPtr, K, KPtr, V, VPtr], err error) {
-	// type T objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]
-	// type TPtr *objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]
-
 	pool := collections.MakePool[
 		objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
 		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
 	]()
-
-	if objekteFormat == nil {
-		objekteFormat = objekte.MakeFormat[O, OPtr]()
-	}
 
 	s = &commonStore[
 		O,
@@ -312,7 +297,6 @@ func makeCommonStore[
 			commonStoreDelegate: delegate,
 			StoreUtil:           sa,
 			pool:                pool,
-			ObjekteFormat:       objekteFormat,
 			TransactedInflator: objekte_store.MakeTransactedInflator[
 				O,
 				OPtr,
@@ -346,6 +330,7 @@ func makeCommonStore[
 			sa,
 			sa,
 			textFormat,
+			sa.GetPersistentMetadateiFormat(),
 		),
 	}
 
