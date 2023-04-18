@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/format"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/india/konfig"
@@ -128,10 +129,10 @@ func (fv *FormatterValue) FuncFormatter(
 		}
 
 	case "objekte":
-		f := FormatObjekte{}
+		f := metadatei.PersistedFormat{}
 
 		return func(o *Transacted) (err error) {
-			if _, err = f.Format(out, &o.Objekte); err != nil {
+			if _, err = f.Format(out, o.Objekte); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

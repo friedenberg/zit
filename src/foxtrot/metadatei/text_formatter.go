@@ -5,16 +5,9 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/format"
 )
-
-type FormatterContext interface {
-	GetMetadatei() Metadatei
-	GetAktePath() string
-	GetAkteSha() schnittstellen.Sha
-}
 
 type TextFormatter struct {
 	DoNotWriteEmptyBezeichnung bool
@@ -23,7 +16,7 @@ type TextFormatter struct {
 
 func (f *TextFormatter) Format(
 	w1 io.Writer,
-	c FormatterContext,
+	c TextFormatterContext,
 ) (n int64, err error) {
 	w := format.NewLineWriter()
 	m := c.GetMetadatei()

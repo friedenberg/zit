@@ -1,4 +1,4 @@
-package zettel
+package metadatei
 
 import (
 	"bufio"
@@ -12,24 +12,23 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
-type FormatObjekte struct {
+type PersistedFormat struct {
 	IgnoreTypErrors   bool
 	EnforceFieldOrder bool
 }
 
-func (f FormatObjekte) Format(
+func (f PersistedFormat) Format(
 	w1 io.Writer,
-	z *Objekte,
+	c PersistentFormatterContext,
 ) (n int64, err error) {
-	errors.TodoP1("replace with objekte.Format")
-
+	m := c.GetMetadatei()
 	w := format.NewLineWriter()
 
-	w.WriteFormat("%s %s", gattung.Akte, z.Metadatei.AkteSha)
-	w.WriteFormat("%s %s", gattung.Typ, z.GetTyp())
-	w.WriteFormat("%s %s", gattung.Bezeichnung, z.Metadatei.Bezeichnung)
+	w.WriteFormat("%s %s", gattung.Akte, m.AkteSha)
+	w.WriteFormat("%s %s", gattung.Typ, m.GetTyp())
+	w.WriteFormat("%s %s", gattung.Bezeichnung, m.Bezeichnung)
 
-	for _, e := range collections.SortedValues(z.Metadatei.Etiketten) {
+	for _, e := range collections.SortedValues(m.Etiketten) {
 		w.WriteFormat("%s %s", gattung.Etikett, e)
 	}
 
@@ -41,15 +40,17 @@ func (f FormatObjekte) Format(
 	return
 }
 
-func (f *FormatObjekte) Parse(
+func (f *PersistedFormat) Parse(
 	r1 io.Reader,
-	z *Objekte,
+	c PersistentParserContext,
 ) (n int64, err error) {
+	m := c.GetMetadatei()
+
 	etiketten := kennung.MakeEtikettMutableSet()
 
 	r := bufio.NewReader(r1)
 
-	typLineReader := z.Metadatei.Typ.Set
+	typLineReader := m.Typ.Set
 
 	if f.IgnoreTypErrors {
 		typLineReader = format.MakeLineReaderIgnoreErrors(typLineReader)
@@ -59,13 +60,16 @@ func (f *FormatObjekte) Parse(
 		etiketten,
 	)
 
-	lineReaders := format.MakeLineReaderRepeat(
+	var g gattung.Gattung
+
+	lineReaders := format.MakeLineReaderIterate(
+		g.Set,
 		format.MakeLineReaderKeyValues(
 			map[string]schnittstellen.FuncSetString{
-				gattung.Akte.String():        z.Metadatei.AkteSha.Set,
+				gattung.Akte.String():        m.AkteSha.Set,
 				gattung.Typ.String():         typLineReader,
 				gattung.AkteTyp.String():     typLineReader,
-				gattung.Bezeichnung.String(): z.Metadatei.Bezeichnung.Set,
+				gattung.Bezeichnung.String(): m.Bezeichnung.Set,
 				gattung.Etikett.String():     esa,
 			},
 		),
@@ -73,19 +77,24 @@ func (f *FormatObjekte) Parse(
 
 	if f.EnforceFieldOrder {
 		lineReaders = format.MakeLineReaderIterateStrict(
-			format.MakeLineReaderKeyValue(gattung.Akte.String(), z.Metadatei.AkteSha.Set),
+			g.Set, // will this work?
+			format.MakeLineReaderKeyValue(gattung.Akte.String(), m.AkteSha.Set),
 			format.MakeLineReaderKeyValue(gattung.Typ.String(), typLineReader),
-			format.MakeLineReaderKeyValue(gattung.Bezeichnung.String(), z.Metadatei.Bezeichnung.Set),
+			format.MakeLineReaderKeyValue(gattung.Bezeichnung.String(), m.Bezeichnung.Set),
 			format.MakeLineReaderKeyValue(gattung.Etikett.String(), esa),
 		)
 	}
 
-	if n, err = format.ReadLines(r, lineReaders); err != nil {
+	lr := format.MakeLineReaderConsumeEmpty(lineReaders)
+
+	if n, err = lr.ReadFrom(r); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	z.Metadatei.Etiketten = etiketten.ImmutableClone()
+	m.Etiketten = etiketten.ImmutableClone()
+
+	c.SetMetadatei(m)
 
 	return
 }

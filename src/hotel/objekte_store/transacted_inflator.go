@@ -4,6 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 )
@@ -22,8 +23,8 @@ type AkteStorer[T any] interface {
 
 // TODO-P1 split into ObjekteInflator
 type TransactedInflator[
-	T schnittstellen.Objekte[T],
-	T1 schnittstellen.ObjektePtr[T],
+	T objekte.Objekte[T],
+	T1 objekte.ObjektePtr[T],
 	T2 schnittstellen.Id[T2],
 	T3 schnittstellen.IdPtr[T2],
 	T4 any,
@@ -36,26 +37,26 @@ type TransactedInflator[
 }
 
 type transactedInflator[
-	T schnittstellen.Objekte[T],
-	T1 schnittstellen.ObjektePtr[T],
+	T objekte.Objekte[T],
+	T1 objekte.ObjektePtr[T],
 	T2 schnittstellen.Id[T2],
 	T3 schnittstellen.IdPtr[T2],
 	T4 any,
 	T5 schnittstellen.VerzeichnissePtr[T4, T],
 ] struct {
-	of            schnittstellen.ObjekteIOFactory
-	af            schnittstellen.AkteIOFactory
-	objekteFormat schnittstellen.Format[T, T1]
-	akteFormat    schnittstellen.Format[T, T1]
-	pool          schnittstellen.Pool[
+	of                        schnittstellen.ObjekteIOFactory
+	af                        schnittstellen.AkteIOFactory
+	persistentMetadateiFormat metadatei.PersistedFormat
+	akteFormat                schnittstellen.Format[T, T1]
+	pool                      schnittstellen.Pool[
 		objekte.Transacted[T, T1, T2, T3, T4, T5],
 		*objekte.Transacted[T, T1, T2, T3, T4, T5],
 	]
 }
 
 func MakeTransactedInflator[
-	T schnittstellen.Objekte[T],
-	T1 schnittstellen.ObjektePtr[T],
+	T objekte.Objekte[T],
+	T1 objekte.ObjektePtr[T],
 	T2 schnittstellen.Id[T2],
 	T3 schnittstellen.IdPtr[T2],
 	T4 any,
@@ -63,23 +64,19 @@ func MakeTransactedInflator[
 ](
 	of schnittstellen.ObjekteIOFactory,
 	af schnittstellen.AkteIOFactory,
-	objekteFormat schnittstellen.Format[T, T1],
+	persistentMetadateiFormat metadatei.PersistedFormat,
 	akteFormat schnittstellen.Format[T, T1],
 	pool schnittstellen.Pool[
 		objekte.Transacted[T, T1, T2, T3, T4, T5],
 		*objekte.Transacted[T, T1, T2, T3, T4, T5],
 	],
 ) *transactedInflator[T, T1, T2, T3, T4, T5] {
-	if objekteFormat == nil {
-		objekteFormat = objekte.MakeFormat[T, T1]()
-	}
-
 	return &transactedInflator[T, T1, T2, T3, T4, T5]{
-		of:            of,
-		af:            af,
-		objekteFormat: objekteFormat,
-		akteFormat:    akteFormat,
-		pool:          pool,
+		of:                        of,
+		af:                        af,
+		persistentMetadateiFormat: persistentMetadateiFormat,
+		akteFormat:                akteFormat,
+		pool:                      pool,
 	}
 }
 
@@ -235,7 +232,10 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) StoreObjekte(
 
 	defer errors.DeferredCloser(&err, ow)
 
-	if _, err = h.objekteFormat.Format(ow, &t.Objekte); err != nil {
+	if _, err = h.persistentMetadateiFormat.Format(
+		ow,
+		t.Objekte,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -283,7 +283,7 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) readObjekte(
 
 	var n int64
 
-	if n, err = h.objekteFormat.Parse(r, &t.Objekte); err != nil {
+	if n, err = h.persistentMetadateiFormat.Parse(r, T1(&t.Objekte)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

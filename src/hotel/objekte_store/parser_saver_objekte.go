@@ -12,8 +12,8 @@ import (
 )
 
 type ParseSaver[
-	T schnittstellen.Objekte[T],
-	T1 schnittstellen.ObjektePtr[T],
+	T objekte.Objekte[T],
+	T1 objekte.ObjektePtr[T],
 	T2 schnittstellen.Id[T2],
 	T3 schnittstellen.IdPtr[T2],
 ] interface {
@@ -21,8 +21,8 @@ type ParseSaver[
 }
 
 type objekteParseSaver[
-	T schnittstellen.Objekte[T],
-	T1 schnittstellen.ObjektePtr[T],
+	T objekte.Objekte[T],
+	T1 objekte.ObjektePtr[T],
 	T2 schnittstellen.Id[T2],
 	T3 schnittstellen.IdPtr[T2],
 ] struct {
@@ -32,8 +32,8 @@ type objekteParseSaver[
 }
 
 func MakeParseSaver[
-	T schnittstellen.Objekte[T],
-	T1 schnittstellen.ObjektePtr[T],
+	T objekte.Objekte[T],
+	T1 objekte.ObjektePtr[T],
 	T2 schnittstellen.Id[T2],
 	T3 schnittstellen.IdPtr[T2],
 ](

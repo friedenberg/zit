@@ -10,8 +10,8 @@ import (
 )
 
 type Transacted[
-	T schnittstellen.Objekte[T],
-	T1 schnittstellen.ObjektePtr[T],
+	T Objekte[T],
+	T1 ObjektePtr[T],
 	T2 schnittstellen.Id[T2],
 	T3 schnittstellen.IdPtr[T2],
 	T4 any,
@@ -25,6 +25,14 @@ type Transacted[
 func (t Transacted[T, T1, T2, T3, T4, T5]) Kennung() T3 {
 	return &t.Sku.Kennung
 }
+
+// func (z Objekte) GetMetadatei() metadatei.Metadatei {
+// 	return z.Metadatei
+// }
+
+// func (z *Objekte) GetMetadateiPtr() *metadatei.Metadatei {
+// 	return &z.Metadatei
+// }
 
 func (t Transacted[T, T1, T2, T3, T4, T5]) GetAkteSha() schnittstellen.Sha {
 	return t.Objekte.GetAkteSha()

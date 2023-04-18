@@ -92,9 +92,7 @@ func makeZettelStore(
 		s,
 		sa,
 		s,
-		&zettel.FormatObjekte{
-			IgnoreTypErrors: true,
-		},
+		nil,
 		nil,
 		nil,
 	)
@@ -152,13 +150,7 @@ func (s zettelStore) WriteZettelObjekte(z zettel.Objekte) (sh sha.Sha, err error
 
 	defer errors.DeferredCloser(&err, wc)
 
-	c := zettel.ObjekteFormatterContext{
-		Zettel: z,
-	}
-
-	f := zettel.FormatObjekte{}
-
-	if _, err = f.Format(wc, &c.Zettel); err != nil {
+	if _, err = s.persistentMetadateiFormat.Format(wc, z); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

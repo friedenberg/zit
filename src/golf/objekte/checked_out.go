@@ -8,8 +8,8 @@ import (
 )
 
 type CheckedOut[
-	T schnittstellen.Objekte[T],
-	T1 schnittstellen.ObjektePtr[T],
+	T Objekte[T],
+	T1 ObjektePtr[T],
 	T2 schnittstellen.Id[T2],
 	T3 schnittstellen.IdPtr[T2],
 	T4 any,

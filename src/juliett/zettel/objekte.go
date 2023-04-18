@@ -21,8 +21,8 @@ func (z Objekte) GetMetadatei() metadatei.Metadatei {
 	return z.Metadatei
 }
 
-func (z *Objekte) GetMetadateiPtr() *metadatei.Metadatei {
-	return &z.Metadatei
+func (z *Objekte) SetMetadatei(m metadatei.Metadatei) {
+	z.Metadatei = m
 }
 
 func (z Objekte) GetTyp() kennung.Typ {

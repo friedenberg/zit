@@ -5,6 +5,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/hotel/typ"
@@ -38,9 +39,7 @@ func (c common) GetInheritorZettel(
 			arf,
 			c.StoreObjekten(),
 		),
-		&zettel.FormatObjekte{
-			IgnoreTypErrors: true,
-		},
+		metadatei.PersistedFormat{},
 		objekte.MakeNopAkteFormat[zettel.Objekte, *zettel.Objekte](),
 		p,
 	)
@@ -75,7 +74,7 @@ func (c common) GetInheritorTyp(
 			arf,
 			c.StoreObjekten(),
 		),
-		nil,
+		metadatei.PersistedFormat{},
 		typ.MakeFormatTextIgnoreTomlErrors(c.StoreObjekten()),
 		p,
 	)

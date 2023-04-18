@@ -15,13 +15,8 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
-type ParserContext interface {
-	GetMetadateiPtr() *Metadatei
-	SetAkteFD(kennung.FD) error
-}
-
 type TextParser interface {
-	Parse(io.Reader, ParserContext) (int64, error)
+	Parse(io.Reader, TextParserContext) (int64, error)
 }
 
 type textParser struct {
@@ -45,15 +40,16 @@ func MakeTextParser(
 
 func (f textParser) Parse(
 	r io.Reader,
-	c ParserContext,
+	c TextParserContext,
 ) (n int64, err error) {
-	m := c.GetMetadateiPtr()
+	m := c.GetMetadatei()
 	etiketten := kennung.MakeEtikettMutableSet()
 
 	var n1 int64
 
 	defer func() {
 		m.Etiketten = etiketten.ImmutableClone()
+		c.SetMetadatei(m)
 	}()
 
 	lr := format.MakeLineReaderConsumeEmpty(
@@ -67,7 +63,7 @@ func (f textParser) Parse(
 						*kennung.Etikett,
 					](etiketten),
 					"!": func(v string) (err error) {
-						return f.readTyp(c, v)
+						return f.readTyp(&m, v)
 					},
 				},
 			),
@@ -113,7 +109,7 @@ func (f textParser) Parse(
 
 	case !m.AkteSha.IsNull() && !inlineAkteSha.IsNull():
 		err = ErrHasInlineAkteAndFilePath{
-			Metadatei: *m,
+			Metadatei: m,
 		}
 
 		return
@@ -159,11 +155,9 @@ func (tp textParser) readExternalAkte(
 }
 
 func (f textParser) readTyp(
-	c ParserContext,
+	m *Metadatei,
 	desc string,
 ) (err error) {
-	m := c.GetMetadateiPtr()
-
 	if desc == "" {
 		return
 	}
@@ -187,11 +181,11 @@ func (f textParser) readTyp(
 			return
 		}
 
-		c.GetMetadateiPtr().AkteSha = externalAkteSha
+		m.AkteSha = externalAkteSha
 
 	//! <sha>.<typ ext>
 	case tail != "":
-		if err = f.setAkteSha(c, head); err != nil {
+		if err = f.setAkteSha(m, head); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -203,7 +197,7 @@ func (f textParser) readTyp(
 
 	//! <sha>
 	case tail == "":
-		if err = f.setAkteSha(c, head); err == nil {
+		if err = f.setAkteSha(m, head); err == nil {
 			return
 		}
 
@@ -223,7 +217,7 @@ func (f textParser) readTyp(
 }
 
 func (f textParser) setAkteSha(
-	c ParserContext,
+	m *Metadatei,
 	maybeSha string,
 ) (err error) {
 	var sh sha.Sha
@@ -233,7 +227,7 @@ func (f textParser) setAkteSha(
 		return
 	}
 
-	c.GetMetadateiPtr().AkteSha = sh
+	m.AkteSha = sh
 
 	return
 }

@@ -77,7 +77,8 @@ func (lr lineReader) ReadFrom(r1 io.Reader) (n int64, err error) {
 		var rawLine, line string
 
 		rawLine, err = r.ReadString(lr.delim)
-		n += int64(len(rawLine))
+		n1 := len(rawLine)
+		n += int64(n1)
 
 		if err != nil && !errors.IsEOF(err) {
 			err = errors.Wrap(err)
@@ -87,6 +88,10 @@ func (lr lineReader) ReadFrom(r1 io.Reader) (n int64, err error) {
 		if errors.IsEOF(err) {
 			isEOF = true
 			err = nil
+
+			if n1 == 0 {
+				break
+			}
 		}
 
 		line = strings.TrimSuffix(rawLine, string([]byte{lr.delim}))

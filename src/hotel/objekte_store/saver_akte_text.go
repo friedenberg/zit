@@ -4,27 +4,28 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/golf/objekte"
 )
 
 // TODO-P3 rename to AkteSaver
 type AkteTextSaver[
-	T schnittstellen.Objekte[T],
-	T1 schnittstellen.ObjektePtr[T],
+	T objekte.Objekte[T],
+	T1 objekte.ObjektePtr[T],
 ] interface {
 	SaveAkteText(T1) (int64, error)
 }
 
 type akteTextSaver[
-	T schnittstellen.Objekte[T],
-	T1 schnittstellen.ObjektePtr[T],
+	T objekte.Objekte[T],
+	T1 objekte.ObjektePtr[T],
 ] struct {
 	awf           schnittstellen.AkteWriterFactory
 	akteFormatter schnittstellen.Formatter[T, T1]
 }
 
 func MakeAkteTextSaver[
-	T schnittstellen.Objekte[T],
-	T1 schnittstellen.ObjektePtr[T],
+	T objekte.Objekte[T],
+	T1 objekte.ObjektePtr[T],
 ](
 	awf schnittstellen.AkteWriterFactory,
 	akteFormatter schnittstellen.Formatter[T, T1],

@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/hotel/erworben"
@@ -74,7 +75,7 @@ func makeKonfigStore(
 		](
 			sa,
 			sa,
-			nil,
+			metadatei.PersistedFormat{},
 			schnittstellen.Format[erworben.Objekte, *erworben.Objekte](
 				erworben.MakeFormatText(sa),
 			),

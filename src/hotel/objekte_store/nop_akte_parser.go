@@ -6,18 +6,19 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/golf/objekte"
 )
 
 type nopAkteParser[
-	O schnittstellen.Objekte[O],
-	OPtr schnittstellen.ObjektePtr[O],
+	O objekte.Objekte[O],
+	OPtr objekte.ObjektePtr[O],
 ] struct {
 	arf schnittstellen.AkteIOFactory
 }
 
 func MakeNopAkteFormat[
-	O schnittstellen.Objekte[O],
-	OPtr schnittstellen.ObjektePtr[O],
+	O objekte.Objekte[O],
+	OPtr objekte.ObjektePtr[O],
 ](arf schnittstellen.AkteIOFactory,
 ) *nopAkteParser[O, OPtr] {
 	return &nopAkteParser[O, OPtr]{

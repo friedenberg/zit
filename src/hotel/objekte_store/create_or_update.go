@@ -19,8 +19,8 @@ type CreateOrUpdateDelegate[T any] struct {
 }
 
 type createOrUpdate[
-	T schnittstellen.Objekte[T],
-	T1 schnittstellen.ObjektePtr[T],
+	T objekte.Objekte[T],
+	T1 objekte.ObjektePtr[T],
 	T2 schnittstellen.Id[T2],
 	T3 schnittstellen.IdPtr[T2],
 	T4 any,
@@ -35,8 +35,8 @@ type createOrUpdate[
 }
 
 func MakeCreateOrUpdate[
-	T schnittstellen.Objekte[T],
-	T1 schnittstellen.ObjektePtr[T],
+	T objekte.Objekte[T],
+	T1 objekte.ObjektePtr[T],
 	T2 schnittstellen.Id[T2],
 	T3 schnittstellen.IdPtr[T2],
 	T4 any,

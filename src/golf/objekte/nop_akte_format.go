@@ -4,17 +4,16 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
 type nopAkteFormat[
-	T schnittstellen.Objekte[T],
-	T1 schnittstellen.ObjektePtr[T],
+	T Objekte[T],
+	T1 ObjektePtr[T],
 ] struct{}
 
 func MakeNopAkteFormat[
-	T schnittstellen.Objekte[T],
-	T1 schnittstellen.ObjektePtr[T],
+	T Objekte[T],
+	T1 ObjektePtr[T],
 ]() nopAkteFormat[T, T1] {
 	return nopAkteFormat[T, T1]{}
 }

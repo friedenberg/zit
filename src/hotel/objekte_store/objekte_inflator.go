@@ -9,8 +9,8 @@ import (
 )
 
 type ObjekteInflator[
-	T schnittstellen.Objekte[T],
-	T1 schnittstellen.ObjektePtr[T],
+	T objekte.Objekte[T],
+	T1 objekte.ObjektePtr[T],
 	T4 any,
 	T5 schnittstellen.VerzeichnissePtr[T4, T],
 ] interface {
@@ -18,8 +18,8 @@ type ObjekteInflator[
 }
 
 type objekteInflator[
-	T schnittstellen.Objekte[T],
-	T1 schnittstellen.ObjektePtr[T],
+	T objekte.Objekte[T],
+	T1 objekte.ObjektePtr[T],
 	T2 any,
 	T3 schnittstellen.VerzeichnissePtr[T2, T],
 ] struct {
@@ -31,8 +31,8 @@ type objekteInflator[
 }
 
 func MakeObjekteInflator[
-	T schnittstellen.Objekte[T],
-	T1 schnittstellen.ObjektePtr[T],
+	T objekte.Objekte[T],
+	T1 objekte.ObjektePtr[T],
 	T2 any,
 	T3 schnittstellen.VerzeichnissePtr[T2, T],
 ](

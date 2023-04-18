@@ -9,8 +9,8 @@ import (
 )
 
 type ExternalMaybeGetterReader[
-	O schnittstellen.Objekte[O],
-	OPtr schnittstellen.ObjektePtr[O],
+	O objekte.Objekte[O],
+	OPtr objekte.ObjektePtr[O],
 	K schnittstellen.Id[K],
 	KPtr schnittstellen.IdPtr[K],
 	V any,
@@ -22,8 +22,8 @@ type ExternalMaybeGetterReader[
 }
 
 type externalMaybeGetterReader[
-	O schnittstellen.Objekte[O],
-	OPtr schnittstellen.ObjektePtr[O],
+	O objekte.Objekte[O],
+	OPtr objekte.ObjektePtr[O],
 	K schnittstellen.Id[K],
 	KPtr schnittstellen.IdPtr[K],
 	V any,
@@ -36,8 +36,8 @@ type externalMaybeGetterReader[
 }
 
 func MakeExternalMaybeGetterReader[
-	O schnittstellen.Objekte[O],
-	OPtr schnittstellen.ObjektePtr[O],
+	O objekte.Objekte[O],
+	OPtr objekte.ObjektePtr[O],
 	K schnittstellen.Id[K],
 	KPtr schnittstellen.IdPtr[K],
 	V any,

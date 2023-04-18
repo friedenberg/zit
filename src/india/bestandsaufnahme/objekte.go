@@ -4,13 +4,29 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/echo/ts"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
 
 type Objekte struct {
 	Tai     ts.Tai
 	Akte    Akte
 	AkteSha sha.Sha
+}
+
+func (a Objekte) GetMetadatei() metadatei.Metadatei {
+	return metadatei.Metadatei{
+		AkteSha: a.AkteSha,
+	}
+}
+
+func (a *Objekte) SetMetadatei(m metadatei.Metadatei) {
+	a.AkteSha = m.AkteSha
+}
+
+func (a Objekte) EqualsAny(b any) bool {
+	return values.Equals(a, b)
 }
 
 func (o Objekte) GetGattung() (g schnittstellen.Gattung) {

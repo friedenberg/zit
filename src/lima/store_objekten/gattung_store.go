@@ -12,6 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
@@ -24,8 +25,8 @@ type reindexer interface {
 }
 
 type CommonStoreBase[
-	O schnittstellen.Objekte[O],
-	OPtr schnittstellen.ObjektePtr[O],
+	O objekte.Objekte[O],
+	OPtr objekte.ObjektePtr[O],
 	K schnittstellen.Id[K],
 	KPtr schnittstellen.IdPtr[K],
 	V any,
@@ -90,8 +91,8 @@ type CommonStoreBase[
 }
 
 type CommonStore[
-	O schnittstellen.Objekte[O],
-	OPtr schnittstellen.ObjektePtr[O],
+	O objekte.Objekte[O],
+	OPtr objekte.ObjektePtr[O],
 	K schnittstellen.Id[K],
 	KPtr schnittstellen.IdPtr[K],
 	V any,
@@ -129,8 +130,8 @@ type CommonStore[
 }
 
 type commonStoreDelegate[
-	O schnittstellen.Objekte[O],
-	OPtr schnittstellen.ObjektePtr[O],
+	O objekte.Objekte[O],
+	OPtr objekte.ObjektePtr[O],
 	K schnittstellen.Id[K],
 	KPtr schnittstellen.IdPtr[K],
 	V any,
@@ -149,8 +150,8 @@ type transactedPtr[T any] interface {
 }
 
 type commonStoreBase[
-	O schnittstellen.Objekte[O],
-	OPtr schnittstellen.ObjektePtr[O],
+	O objekte.Objekte[O],
+	OPtr objekte.ObjektePtr[O],
 	K schnittstellen.Id[K],
 	KPtr schnittstellen.IdPtr[K],
 	V any,
@@ -193,11 +194,13 @@ type commonStoreBase[
 	]
 
 	objekte_store.LogWriter[*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]]
+
+	persistentMetadateiFormat metadatei.PersistedFormat
 }
 
 type commonStore[
-	O schnittstellen.Objekte[O],
-	OPtr schnittstellen.ObjektePtr[O],
+	O objekte.Objekte[O],
+	OPtr objekte.ObjektePtr[O],
 	K schnittstellen.Id[K],
 	KPtr schnittstellen.IdPtr[K],
 	V any,
@@ -209,8 +212,8 @@ type commonStore[
 }
 
 func makeCommonStoreBase[
-	O schnittstellen.Objekte[O],
-	OPtr schnittstellen.ObjektePtr[O],
+	O objekte.Objekte[O],
+	OPtr objekte.ObjektePtr[O],
 	K schnittstellen.Id[K],
 	KPtr schnittstellen.IdPtr[K],
 	V any,
@@ -251,7 +254,7 @@ func makeCommonStoreBase[
 		](
 			sa,
 			sa,
-			objekteFormat,
+			metadatei.PersistedFormat{},
 			textFormat,
 			pool,
 		),
@@ -262,15 +265,16 @@ func makeCommonStoreBase[
 			sa,
 			akteFormatter,
 		),
-		TransactedReader: tr,
+		TransactedReader:          tr,
+		persistentMetadateiFormat: metadatei.PersistedFormat{},
 	}
 
 	return
 }
 
 func makeCommonStore[
-	O schnittstellen.Objekte[O],
-	OPtr schnittstellen.ObjektePtr[O],
+	O objekte.Objekte[O],
+	OPtr objekte.ObjektePtr[O],
 	K schnittstellen.Id[K],
 	KPtr schnittstellen.IdPtr[K],
 	V any,
@@ -319,7 +323,7 @@ func makeCommonStore[
 			](
 				sa,
 				sa,
-				objekteFormat,
+				metadatei.PersistedFormat{},
 				textFormat,
 				pool,
 			),

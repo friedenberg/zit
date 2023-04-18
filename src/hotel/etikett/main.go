@@ -4,7 +4,9 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/golf/objekte"
 )
 
@@ -43,6 +45,20 @@ type CheckedOut = objekte.CheckedOut[
 type Objekte struct {
 	Sha  sha.Sha
 	Akte Akte
+}
+
+func (a Objekte) GetMetadatei() metadatei.Metadatei {
+	return metadatei.Metadatei{
+		AkteSha: a.Sha,
+	}
+}
+
+func (a *Objekte) SetMetadatei(m metadatei.Metadatei) {
+	a.Sha = m.AkteSha
+}
+
+func (a Objekte) EqualsAny(b any) bool {
+	return values.Equals(a, b)
 }
 
 func (_ Objekte) GetGattung() schnittstellen.Gattung {

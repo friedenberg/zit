@@ -18,7 +18,7 @@ type ObjekteFormatterContext struct {
 	ExternalAktePath string
 }
 
-type ObjekteParser = schnittstellen.ParserInterface[metadatei.ParserContext]
+type ObjekteParser = schnittstellen.ParserInterface[metadatei.TextParserContext]
 
 type ObjekteFormatter = schnittstellen.Formatter[
 	ObjekteFormatterContext,
@@ -30,8 +30,12 @@ type ObjekteFormat interface {
 	ObjekteFormatter
 }
 
-func (c *ObjekteParserContext) GetMetadateiPtr() *metadatei.Metadatei {
-	return &c.Zettel.Metadatei
+func (c *ObjekteParserContext) GetMetadatei() metadatei.Metadatei {
+	return c.Zettel.Metadatei
+}
+
+func (c *ObjekteParserContext) SetMetadatei(m metadatei.Metadatei) {
+	c.Zettel.Metadatei = m
 }
 
 func (c *ObjekteParserContext) SetAkteFD(fd kennung.FD) (err error) {
