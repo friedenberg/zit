@@ -29,8 +29,10 @@ func (f V1) Format(
 	w.WriteFormat("%s %s", gattung.Typ, m.GetTyp())
 	w.WriteFormat("%s %s", gattung.Bezeichnung, m.Bezeichnung)
 
-	for _, e := range collections.SortedValues(m.Etiketten) {
-		w.WriteFormat("%s %s", gattung.Etikett, e)
+	if m.Etiketten != nil {
+		for _, e := range collections.SortedValues(m.Etiketten) {
+			w.WriteFormat("%s %s", gattung.Etikett, e)
+		}
 	}
 
 	if n, err = w.WriteTo(w1); err != nil {
