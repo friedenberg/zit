@@ -20,7 +20,7 @@ type Konfig struct {
 
 func Default() Konfig {
 	return Konfig{
-		StoreVersion:          storeVersion(values.Int(1)),
+		StoreVersion:          storeVersion(values.Int(2)),
 		UseBestandsaufnahme:   true,
 		UseKonfigErworbenFile: true,
 	}
