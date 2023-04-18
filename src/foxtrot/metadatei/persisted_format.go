@@ -52,7 +52,7 @@ func (f *PersistedFormat) Parse(
 
 	typLineReader := m.Typ.Set
 
-	if f.IgnoreTypErrors {
+	if f.IgnoreTypErrors || true {
 		typLineReader = format.MakeLineReaderIgnoreErrors(typLineReader)
 	}
 
