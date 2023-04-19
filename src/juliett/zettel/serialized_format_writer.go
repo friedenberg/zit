@@ -14,12 +14,12 @@ func MakeSerializedFormatWriter(
 	out io.Writer,
 	arf schnittstellen.AkteReaderFactory,
 	k konfig.Compiled,
-) schnittstellen.FuncIter[*Objekte] {
+) schnittstellen.FuncIter[*Transacted] {
 	errors.TodoP3("rename to MakeSingleplexedFormatWriter")
 
-	wf := func(z *Objekte) (err error) {
+	wf := func(z *Transacted) (err error) {
 		c := ObjekteFormatterContext{
-			Zettel:      *z,
+			Zettel:      z.Objekte,
 			IncludeAkte: k.IsInlineTyp(z.GetTyp()),
 		}
 
