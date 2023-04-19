@@ -22,11 +22,13 @@ func MakeFormatterTypFormatterUTIGroups(
 
 func (e formatterTypFormatterUTIGroups) Format(
 	w io.Writer,
-	c ObjekteFormatterContext,
+	z *Transacted,
 ) (n int64, err error) {
 	e1 := typ.MakeFormatterFormatterUTIGroups()
 
-	ct := e.erworben.GetApproximatedTyp(c.Zettel.GetTyp()).ApproximatedOrActual()
+	ct := e.erworben.GetApproximatedTyp(
+		z.Objekte.Metadatei.GetTyp(),
+	).ApproximatedOrActual()
 
 	if ct == nil {
 		return
