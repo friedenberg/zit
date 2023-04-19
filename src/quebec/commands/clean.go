@@ -56,7 +56,7 @@ func (c Clean) RunWithCwdQuery(
 					return
 				}
 
-				e := co.GetExternal()
+				e := co.GetExternalLike()
 
 				fds.Add(e.GetObjekteFD())
 				fds.Add(e.GetAkteFD())

@@ -36,11 +36,11 @@ func (co CheckedOut[T, T1, T2, T3, T4, T5]) GetState() CheckedOutState {
 	return co.State
 }
 
-func (co CheckedOut[T, T1, T2, T3, T4, T5]) GetInternal() TransactedLike {
+func (co CheckedOut[T, T1, T2, T3, T4, T5]) GetInternalLike() TransactedLike {
 	return co.Internal
 }
 
-func (co CheckedOut[T, T1, T2, T3, T4, T5]) GetExternal() ExternalLike {
+func (co CheckedOut[T, T1, T2, T3, T4, T5]) GetExternalLike() ExternalLike {
 	return co.External
 }
 

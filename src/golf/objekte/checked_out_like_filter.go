@@ -16,8 +16,8 @@ func MakeFilterFromMetaSet(
 	}
 
 	return func(col CheckedOutLike) (err error) {
-		internal := col.GetInternal()
-		external := col.GetExternal()
+		internal := col.GetInternalLike()
+		external := col.GetExternalLike()
 
 		g := gattung.Must(internal.GetDataIdentity().GetGattung())
 

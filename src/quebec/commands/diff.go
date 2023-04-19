@@ -89,7 +89,7 @@ func (c Diff) RunWithCwdQuery(
 					"-u",
 					"--label", fmt.Sprintf("%s@zettel", zco.Internal.Sku.Kennung),
 					pFifo,
-					co.GetExternal().GetObjekteFD().Path,
+					co.GetExternalLike().GetObjekteFD().Path,
 				)
 
 				cmd.Stdout = u.Out()
