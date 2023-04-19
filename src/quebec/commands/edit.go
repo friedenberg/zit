@@ -21,7 +21,7 @@ import (
 type Edit struct {
 	// TODO-P3 add force
 	Delete       bool
-	CheckoutMode objekte.CheckoutMode
+	CheckoutMode sku.CheckoutMode
 }
 
 func init() {

@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/script_config"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
-	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -16,7 +15,7 @@ import (
 type FormatZettel struct {
 	Format   string
 	UTIGroup string
-	Mode     objekte.CheckoutMode
+	Mode     sku.CheckoutMode
 }
 
 func init() {
