@@ -224,12 +224,7 @@ func (fv *FormatterValue) FuncFormatter(
 		f := MakeFormatterTypActionNames(k, true)
 
 		return func(o *Transacted) (err error) {
-			c := ObjekteFormatterContext{
-				Zettel:      o.Objekte,
-				IncludeAkte: true,
-			}
-
-			if _, err = f.Format(out, c); err != nil {
+			if _, err = f.Format(out, o); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

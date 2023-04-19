@@ -26,11 +26,11 @@ func MakeFormatterTypActionNames(
 
 func (e formatterTypActionNames) Format(
 	w io.Writer,
-	c ObjekteFormatterContext,
+	z *Transacted,
 ) (n int64, err error) {
 	e1 := typ.MakeFormatterActionNames()
 
-	ct := e.erworben.GetApproximatedTyp(c.Zettel.GetTyp())
+	ct := e.erworben.GetApproximatedTyp(z.Objekte.Metadatei.GetTyp())
 	t := ct.ApproximatedOrActual()
 
 	if t == nil {
