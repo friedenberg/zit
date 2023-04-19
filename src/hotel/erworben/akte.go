@@ -8,7 +8,7 @@ import (
 type Akte struct {
 	DefaultTyp     kennung.Typ                           `toml:"default-typ"`
 	FileExtensions FileExtensions                        `toml:"file-extensions"`
-	RemoteScripts  map[string]RemoteScript               `toml:"remote-scripts"`
+	RemoteScripts  map[string]script_config.RemoteScript `toml:"remote-scripts"`
 	Recipients     []string                              `toml:"recipients"`
 	Actions        map[string]script_config.ScriptConfig `toml:"actions,omitempty"`
 }
@@ -16,7 +16,7 @@ type Akte struct {
 func (a *Akte) Reset() {
 	a.FileExtensions.Reset()
 	a.DefaultTyp = kennung.Typ{}
-	a.RemoteScripts = make(map[string]RemoteScript)
+	a.RemoteScripts = make(map[string]script_config.RemoteScript)
 	// TODO-P4 should reuse
 	a.Recipients = make([]string, 0)
 	a.Actions = make(map[string]script_config.ScriptConfig)

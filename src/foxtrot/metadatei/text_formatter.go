@@ -14,7 +14,7 @@ type TextFormatter struct {
 	IncludeAkteSha             bool
 }
 
-func (f *TextFormatter) Format(
+func (f TextFormatter) Format(
 	w1 io.Writer,
 	c TextFormatterContext,
 ) (n int64, err error) {

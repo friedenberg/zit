@@ -10,8 +10,8 @@ import (
 	"syscall"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/script_config"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
@@ -31,7 +31,7 @@ func init() {
 
 func (c Exec) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	var tz zettel.Transacted
-	var executor erworben.RemoteScript
+	var executor script_config.RemoteScript
 	var ar io.ReadCloser
 
 	if tz, ar, executor, err = c.getZettel(u, args[0]); err != nil {
@@ -71,7 +71,7 @@ func (c Exec) getZettel(
 ) (
 	tz zettel.Transacted,
 	ar io.ReadCloser,
-	executor erworben.RemoteScript,
+	executor script_config.RemoteScript,
 	err error,
 ) {
 	is := u.MakeIdSet(kennung.MakeMatcherAlways())
@@ -146,7 +146,7 @@ func (c Exec) makeFifoPipe(tz zettel.Transacted) (p string, err error) {
 }
 
 func (c Exec) makeCmd(
-	executor erworben.RemoteScript,
+	executor script_config.RemoteScript,
 	p string,
 	args ...string,
 ) (cmd *exec.Cmd, err error) {

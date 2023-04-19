@@ -1,4 +1,4 @@
-package zettel
+package objekte
 
 import (
 	"io"
@@ -9,13 +9,18 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/format"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
-	"github.com/friedenberg/zit/src/hotel/typ"
 )
 
-type externalTextFormatter struct {
+type externalTextFormat[
+	O Objekte[O],
+	OPtr ObjektePtr[O],
+	K schnittstellen.Id[K],
+	KPtr schnittstellen.IdPtr[K],
+] struct {
 	standort         standort.Standort
-	InlineChecker    typ.InlineChecker
+	InlineChecker    kennung.InlineTypChecker
 	AkteFactory      schnittstellen.AkteIOFactory
 	AkteFormatter    script_config.RemoteScript
 	TypError         error
@@ -25,13 +30,18 @@ type externalTextFormatter struct {
 	metadateiTextParser metadatei.TextParser
 }
 
-func MakeExternalTextFormatterExcludeMetadatei(
+func MakeExternalTextFormatExcludeMetadatei[
+	O Objekte[O],
+	OPtr ObjektePtr[O],
+	K schnittstellen.Id[K],
+	KPtr schnittstellen.IdPtr[K],
+](
 	standort standort.Standort,
-	inlineChecker typ.InlineChecker,
+	inlineChecker kennung.InlineTypChecker,
 	akteFactory schnittstellen.AkteIOFactory,
 	akteFormatter script_config.RemoteScript,
-) externalTextFormatter {
-	return externalTextFormatter{
+) externalTextFormat[O, OPtr, K, KPtr] {
+	return externalTextFormat[O, OPtr, K, KPtr]{
 		standort:         standort,
 		InlineChecker:    inlineChecker,
 		AkteFactory:      akteFactory,
@@ -45,13 +55,18 @@ func MakeExternalTextFormatterExcludeMetadatei(
 	}
 }
 
-func MakeExternalTextFormatterIncludeAkte(
+func MakeExternalTextFormatIncludeAkte[
+	O Objekte[O],
+	OPtr ObjektePtr[O],
+	K schnittstellen.Id[K],
+	KPtr schnittstellen.IdPtr[K],
+](
 	standort standort.Standort,
-	inlineChecker typ.InlineChecker,
+	inlineChecker kennung.InlineTypChecker,
 	akteFactory schnittstellen.AkteIOFactory,
 	akteFormatter script_config.RemoteScript,
-) externalTextFormatter {
-	return externalTextFormatter{
+) externalTextFormat[O, OPtr, K, KPtr] {
+	return externalTextFormat[O, OPtr, K, KPtr]{
 		standort:      standort,
 		InlineChecker: inlineChecker,
 		AkteFactory:   akteFactory,
@@ -60,34 +75,37 @@ func MakeExternalTextFormatterIncludeAkte(
 	}
 }
 
-func MakeExternalTextFormatterAkteShaOnly(
+func MakeExternalTextFormatAkteShaOnly[
+	O Objekte[O],
+	OPtr ObjektePtr[O],
+	K schnittstellen.Id[K],
+	KPtr schnittstellen.IdPtr[K],
+](
 	standort standort.Standort,
 	akteFactory schnittstellen.AkteIOFactory,
 	akteFormatter script_config.RemoteScript,
-) externalTextFormatter {
-	return externalTextFormatter{
+) externalTextFormat[O, OPtr, K, KPtr] {
+	return externalTextFormat[O, OPtr, K, KPtr]{
 		standort:      standort,
 		AkteFactory:   akteFactory,
 		AkteFormatter: akteFormatter,
 	}
 }
 
-func (f externalTextFormatter) Format(
+func (f externalTextFormat[O, OPtr, K, KPtr]) Format(
 	w io.Writer,
-	c *External,
+	c *External[O, OPtr, K, KPtr],
 ) (n int64, err error) {
-	inline := f.InlineChecker.IsInlineTyp(c.Objekte.GetTyp())
+	inline := f.InlineChecker.IsInlineTyp(c.Objekte.GetMetadatei().GetTyp())
 
 	var mtw io.WriterTo
 
 	if !f.ExcludeMetadatei {
-		mtw = format.MakeWriterTo2(
-			(&TextMetadateiFormatter{
+		mtw = format.MakeWriterToInterface[metadatei.TextFormatterContext](
+			(metadatei.TextFormatter{
 				IncludeAkteSha: !inline,
 			}).Format,
-			&Metadatei{
-				Objekte: c.Objekte,
-			},
+			c,
 		)
 	}
 
@@ -95,7 +113,9 @@ func (f externalTextFormatter) Format(
 	var ar sha.ReadCloser
 
 	if inline {
-		if ar, err = f.AkteFactory.AkteReader(c.Objekte.Metadatei.AkteSha); err != nil {
+		if ar, err = f.AkteFactory.AkteReader(
+			c.Objekte.GetMetadatei().AkteSha,
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

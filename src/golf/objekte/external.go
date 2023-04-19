@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 )
 
@@ -32,6 +33,14 @@ type External[
 ] struct {
 	Objekte T
 	Sku     sku.External[T2, T3]
+}
+
+func (a External[T, T1, T2, T3]) GetMetadatei() metadatei.Metadatei {
+	return a.Objekte.GetMetadatei()
+}
+
+func (a *External[T, T1, T2, T3]) SetMetadatei(m metadatei.Metadatei) {
+	T1(&a.Objekte).SetMetadatei(m)
 }
 
 func (a External[T, T1, T2, T3]) GetEtiketten() kennung.EtikettSet {
@@ -110,6 +119,10 @@ func (e External[T, T1, T2, T3]) GetObjekteFD() kennung.FD {
 
 func (e External[T, T1, T2, T3]) GetAkteFD() kennung.FD {
 	return e.Sku.FDs.Akte
+}
+
+func (e External[T, T1, T2, T3]) GetAktePath() string {
+	return e.Sku.FDs.Akte.Path
 }
 
 func (e External[T, T1, T2, T3]) GetObjekteSha() schnittstellen.Sha {

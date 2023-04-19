@@ -15,7 +15,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
-	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/hotel/typ"
 )
 
@@ -25,7 +24,7 @@ type objekteTextFormatter struct {
 	standort         standort.Standort
 	InlineChecker    typ.InlineChecker
 	AkteFactory      schnittstellen.AkteIOFactory
-	AkteFormatter    erworben.RemoteScript
+	AkteFormatter    script_config.RemoteScript
 	TypError         error
 	IncludeAkte      bool
 	ExcludeMetadatei bool
@@ -35,7 +34,7 @@ func MakeObjekteTextFormatterExcludeMetadatei(
 	standort standort.Standort,
 	inlineChecker typ.InlineChecker,
 	akteFactory schnittstellen.AkteIOFactory,
-	akteFormatter erworben.RemoteScript,
+	akteFormatter script_config.RemoteScript,
 ) objekteTextFormatter {
 	return objekteTextFormatter{
 		standort:         standort,
@@ -51,7 +50,7 @@ func MakeObjekteTextFormatterIncludeAkte(
 	standort standort.Standort,
 	inlineChecker typ.InlineChecker,
 	akteFactory schnittstellen.AkteIOFactory,
-	akteFormatter erworben.RemoteScript,
+	akteFormatter script_config.RemoteScript,
 ) objekteTextFormatter {
 	return objekteTextFormatter{
 		standort:      standort,
@@ -65,7 +64,7 @@ func MakeObjekteTextFormatterIncludeAkte(
 func MakeObjekteTextFormatterAkteShaOnly(
 	standort standort.Standort,
 	akteFactory schnittstellen.AkteIOFactory,
-	akteFormatter erworben.RemoteScript,
+	akteFormatter script_config.RemoteScript,
 ) objekteTextFormatter {
 	return objekteTextFormatter{
 		standort:      standort,

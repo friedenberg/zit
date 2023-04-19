@@ -9,7 +9,12 @@ import (
 	"github.com/friedenberg/zit/src/bravo/values"
 )
 
-type Typ = Kennung[typ, *typ]
+type (
+	Typ              = Kennung[typ, *typ]
+	InlineTypChecker interface {
+		IsInlineTyp(Typ) bool
+	}
+)
 
 func MustTyp(v string) (e Typ) {
 	var err error
