@@ -6,39 +6,15 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/echo/bezeichnung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 )
-
-// !typ "bez"
-func MakeCliFormat(
-	bf schnittstellen.FuncWriterFormat[bezeichnung.Bezeichnung],
-	ef schnittstellen.FuncWriterFormat[schnittstellen.SetLike[kennung.Etikett]],
-	tf schnittstellen.FuncWriterFormat[kennung.Typ],
-) schnittstellen.FuncWriterFormat[Objekte] {
-	return func(w io.Writer, z Objekte) (n int64, err error) {
-		var lastWriter schnittstellen.FuncWriter
-
-		if z.Metadatei.Bezeichnung.IsEmpty() {
-			lastWriter = format.MakeWriter(ef, schnittstellen.SetLike[kennung.Etikett](z.Metadatei.Etiketten))
-		} else {
-			lastWriter = format.MakeWriter(bf, z.Metadatei.Bezeichnung)
-		}
-
-		return format.Write(
-			w,
-			format.MakeWriter(tf, z.GetTyp()),
-			format.MakeFormatString(" "),
-			lastWriter,
-		)
-	}
-}
 
 // [kopf/schwanz@sha !typ]
 func MakeCliFormatTransacted(
 	hf schnittstellen.FuncWriterFormat[kennung.Hinweis],
 	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
-	zf schnittstellen.FuncWriterFormat[Objekte],
+	mf schnittstellen.FuncWriterFormat[metadatei.Metadatei],
 ) schnittstellen.FuncWriterFormat[Transacted] {
 	return func(w io.Writer, z Transacted) (n int64, err error) {
 		return format.Write(
@@ -48,7 +24,7 @@ func MakeCliFormatTransacted(
 			format.MakeFormatString("@"),
 			format.MakeWriter(sf, z.GetObjekteSha()),
 			format.MakeFormatString(" "),
-			format.MakeWriter[Objekte](zf, z.Objekte),
+			format.MakeWriter[metadatei.Metadatei](mf, z.Objekte.Metadatei),
 			format.MakeFormatString("]"),
 		)
 	}

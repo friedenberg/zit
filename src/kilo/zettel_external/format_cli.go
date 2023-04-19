@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
@@ -17,7 +18,7 @@ func MakeCliFormat(
 	cw format.FuncColorWriter,
 	hf schnittstellen.FuncWriterFormat[kennung.Hinweis],
 	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
-	zf schnittstellen.FuncWriterFormat[zettel.Objekte],
+	mf schnittstellen.FuncWriterFormat[metadatei.Metadatei],
 ) schnittstellen.FuncWriterFormat[zettel.External] {
 	return func(w io.Writer, z zettel.External) (n int64, err error) {
 		switch {
@@ -30,7 +31,7 @@ func MakeCliFormat(
 				format.MakeFormatString("@"),
 				format.MakeWriter(sf, z.GetObjekteSha().GetSha()),
 				format.MakeFormatString(" "),
-				format.MakeWriter(zf, z.Objekte),
+				format.MakeWriter(mf, z.Objekte.Metadatei),
 				format.MakeFormatString("]\n"),
 				format.MakeFormatStringRightAligned(""),
 				format.MakeFormatString("["),
@@ -49,7 +50,7 @@ func MakeCliFormat(
 				format.MakeFormatString("@"),
 				format.MakeWriter(sf, schnittstellen.Sha(z.Objekte.Metadatei.AkteSha)),
 				format.MakeFormatString(" "),
-				format.MakeWriter(zf, z.Objekte),
+				format.MakeWriter(mf, z.Objekte.Metadatei),
 				format.MakeFormatString("]"),
 			)
 
@@ -62,7 +63,7 @@ func MakeCliFormat(
 				format.MakeFormatString("@"),
 				format.MakeWriter(sf, z.GetObjekteSha().GetSha()),
 				format.MakeFormatString(" "),
-				format.MakeWriter(zf, z.Objekte),
+				format.MakeWriter(mf, z.Objekte.Metadatei),
 				format.MakeFormatString("]"),
 			)
 		}

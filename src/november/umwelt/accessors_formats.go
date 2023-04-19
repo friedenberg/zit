@@ -2,11 +2,13 @@ package umwelt
 
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/echo/sha_cli_format"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/etikett"
 	"github.com/friedenberg/zit/src/hotel/kasten"
 	"github.com/friedenberg/zit/src/hotel/typ"
@@ -128,8 +130,10 @@ func (u *Umwelt) FormatEtikettCheckedOut() schnittstellen.FuncWriterFormat[etike
 	)
 }
 
-func (u *Umwelt) FormatZettel() schnittstellen.FuncWriterFormat[zettel.Objekte] {
-	return zettel.MakeCliFormat(
+func (u *Umwelt) FormatMetadateiGattung(
+	g schnittstellen.GattungGetter,
+) schnittstellen.FuncWriterFormat[metadatei.Metadatei] {
+	return metadatei.MakeCliFormat(
 		u.FormatBezeichnung(),
 		format.MakeFormatStringer[kennung.Etikett](
 			collections.StringCommaSeparated[kennung.Etikett],
@@ -144,7 +148,7 @@ func (u *Umwelt) FormatZettelExternal() schnittstellen.FuncWriterFormat[zettel.E
 		u.FormatColorWriter(),
 		u.FormatHinweis(),
 		u.FormatSha(u.StoreObjekten().GetAbbrStore().AbbreviateSha),
-		u.FormatZettel(),
+		u.FormatMetadateiGattung(gattung.Zettel),
 	)
 }
 
@@ -162,7 +166,7 @@ func (u *Umwelt) FormatZettelCheckedOut() schnittstellen.FuncWriterFormat[zettel
 		u.FormatHinweis(),
 		u.FormatSha(u.StoreObjekten().GetAbbrStore().AbbreviateSha),
 		// u.FormatTyp(),
-		u.FormatZettel(),
+		u.FormatMetadateiGattung(gattung.Zettel),
 	)
 }
 
@@ -170,7 +174,7 @@ func (u *Umwelt) FormatZettelTransacted() schnittstellen.FuncWriterFormat[zettel
 	return zettel.MakeCliFormatTransacted(
 		u.FormatHinweis(),
 		u.FormatSha(u.StoreObjekten().GetAbbrStore().AbbreviateSha),
-		u.FormatZettel(),
+		u.FormatMetadateiGattung(gattung.Zettel),
 	)
 }
 

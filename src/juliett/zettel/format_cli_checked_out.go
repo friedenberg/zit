@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
 
 // (same|changed) [path@sha !typ "bez"]
@@ -17,14 +18,14 @@ func MakeCliFormatCheckedOut(
 	cw format.FuncColorWriter,
 	hf schnittstellen.FuncWriterFormat[kennung.Hinweis],
 	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
-	zf schnittstellen.FuncWriterFormat[Objekte],
+	mf schnittstellen.FuncWriterFormat[metadatei.Metadatei],
 ) schnittstellen.FuncWriterFormat[CheckedOut] {
 	wzef := makeWriterFuncZettel(
-		s, cw, hf, sf, zf,
+		s, cw, hf, sf, mf,
 	)
 
 	waef := makeWriterFuncAkte(
-		s, cw, hf, sf, zf,
+		s, cw, hf, sf, mf,
 	)
 
 	return func(w io.Writer, z CheckedOut) (n int64, err error) {
@@ -49,7 +50,7 @@ func makeWriterFuncZettel(
 	cw format.FuncColorWriter,
 	hf schnittstellen.FuncWriterFormat[kennung.Hinweis],
 	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
-	zf schnittstellen.FuncWriterFormat[Objekte],
+	mf schnittstellen.FuncWriterFormat[metadatei.Metadatei],
 ) schnittstellen.FuncWriterFormat[CheckedOut] {
 	return func(w io.Writer, z CheckedOut) (n int64, err error) {
 		return format.Write(
@@ -65,7 +66,7 @@ func makeWriterFuncZettel(
 			format.MakeFormatString("@"),
 			format.MakeWriter(sf, z.External.GetObjekteSha().GetSha()),
 			format.MakeFormatString(" "),
-			format.MakeWriter(zf, z.External.Objekte),
+			format.MakeWriter(mf, z.External.Objekte.Metadatei),
 			format.MakeFormatString("]"),
 		)
 	}
@@ -76,7 +77,7 @@ func makeWriterFuncAkte(
 	cw format.FuncColorWriter,
 	hf schnittstellen.FuncWriterFormat[kennung.Hinweis],
 	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
-	zf schnittstellen.FuncWriterFormat[Objekte],
+	mf schnittstellen.FuncWriterFormat[metadatei.Metadatei],
 ) schnittstellen.FuncWriterFormat[CheckedOut] {
 	return func(w io.Writer, z CheckedOut) (n int64, err error) {
 		todo.Change("refactor to support proper spacing")
