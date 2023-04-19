@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/golf/persisted_metadatei_format"
 )
 
 type FormatterValue struct {
@@ -26,6 +27,7 @@ func (f *FormatterValue) Set(v string) (err error) {
 	switch v1 {
 	case
 		// TODO-P3 add text, objekte, toml, json
+		"objekte",
 		"kennung",
 		"kennung-akte-sha",
 		"akte",
@@ -54,6 +56,17 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 	logFunc schnittstellen.FuncIter[TransactedLike],
 ) schnittstellen.FuncIter[TransactedLike] {
 	switch fv.string {
+	case "objekte":
+		f := persisted_metadatei_format.FormatForVersion(k.GetStoreVersion())
+
+		return func(tl TransactedLike) (err error) {
+			if _, err = f.Format(out, tl); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
 	case "kennung-akte-akte":
 		return func(tl TransactedLike) (err error) {
 			errors.TodoP3("convert into an option")

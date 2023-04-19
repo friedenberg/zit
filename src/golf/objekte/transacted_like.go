@@ -3,10 +3,12 @@ package objekte
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 )
 
 type TransactedLike interface {
+	metadatei.Getter
 	GetAkteSha() schnittstellen.Sha
 	GetSku2() sku.Sku2
 	GetSku() sku.Sku
