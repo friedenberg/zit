@@ -9,7 +9,6 @@ import (
 
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/test_logz"
-	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/echo/test_metadatei_io"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
@@ -44,7 +43,7 @@ func (arf akteReaderFactory) AkteReader(s sha.Sha) (r sha.ReadCloser, err error)
 func writeFormat(
 	t test_logz.T,
 	z Objekte,
-	f ObjekteFormatter,
+	f metadatei.TextFormatter,
 	includeAkte bool,
 	akteBody string,
 ) (out string) {
@@ -65,7 +64,7 @@ func writeFormat(
 
 	sb := &strings.Builder{}
 
-	if _, err := f.Format(sb, &ObjekteFormatterContext{Zettel: z}); err != nil {
+	if _, err := f.Format(sb, z); err != nil {
 		t.Errorf("%s", err)
 	}
 
@@ -95,9 +94,7 @@ func TestWriteWithoutAkte(t1 *testing.T) {
 		},
 	)
 
-	format := MakeObjekteTextFormatterIncludeAkte(
-		standort.Standort{},
-		inlineTypChecker{},
+	format := metadatei.MakeTextFormatterMetadateiOnly(
 		af,
 		nil,
 	)
@@ -139,9 +136,7 @@ func TestWriteWithInlineAkte(t1 *testing.T) {
 		},
 	)
 
-	format := MakeObjekteTextFormatterIncludeAkte(
-		standort.Standort{},
-		inlineTypChecker{answer: true},
+	format := metadatei.MakeTextFormatterMetadateiInlineAkte(
 		af,
 		nil,
 	)

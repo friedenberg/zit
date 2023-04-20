@@ -12,6 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/hinweisen"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/golf/transaktion"
@@ -62,7 +63,7 @@ type zettelStore struct {
 		*zettel.Verzeichnisse,
 	]
 
-	format      zettel.ObjekteFormat
+	format      metadatei.TextFormat
 	protoZettel zettel.ProtoZettel
 
 	verzeichnisseSchwanzen *verzeichnisseSchwanzen
@@ -275,8 +276,6 @@ func (s *zettelStore) readOneExternalObjekte(
 	ez *zettel.External,
 	t *zettel.Transacted,
 ) (err error) {
-	c := zettel.ObjekteParserContext{}
-
 	var f *os.File
 
 	if f, err = files.Open(ez.GetObjekteFD().Path); err != nil {
@@ -286,48 +285,50 @@ func (s *zettelStore) readOneExternalObjekte(
 
 	defer errors.DeferredCloser(&err, f)
 
-	if _, err = s.format.Parse(f, &c); err != nil {
+	if _, err = s.format.Parse(f, t); err != nil {
 		err = errors.Wrapf(err, "%s", f.Name())
 		return
 	}
 
 	if ez.Sku.ObjekteSha, err = s.WriteZettelObjekte(
-		c.Zettel,
+		t.Objekte,
 	); err != nil {
 		err = errors.Wrapf(err, "%s", f.Name())
 		return
 	}
 
-	ez.Objekte = c.Zettel
-	ez.Sku.FDs.Akte.Path = c.AktePath
+	ez.Objekte = t.Objekte
+	// TODO P0
+	// ez.Sku.FDs.Akte.Path = c.AktePath
 
-	unrecoverableErrors := errors.MakeMulti()
+	// unrecoverableErrors := errors.MakeMulti()
 
-	for _, e := range errors.Split(c.Errors) {
-		var err1 zettel.ErrHasInvalidAkteShaOrFilePath
+	// TODO
+	// for _, e := range errors.Split(c.Errors) {
+	// 	var err1 zettel.ErrHasInvalidAkteShaOrFilePath
 
-		if errors.As(e, &err1) {
-			var mutter *zettel.Transacted
+	// 	if errors.As(e, &err1) {
+	// 		var mutter *zettel.Transacted
 
-			if mutter, err = s.ReadOne(
-				&ez.Sku.Kennung,
-			); err != nil {
-				unrecoverableErrors.Add(errors.Wrap(err))
-				continue
-			}
+	// 		if mutter, err = s.ReadOne(
+	// 			&ez.Sku.Kennung,
+	// 		); err != nil {
+	// 			unrecoverableErrors.Add(errors.Wrap(err))
+	// 			continue
+	// 		}
 
-			ez.Objekte.Metadatei.AkteSha = mutter.Objekte.Metadatei.AkteSha
+	// 		ez.Objekte.Metadatei.AkteSha = mutter.Objekte.Metadatei.AkteSha
 
-			continue
-		}
+	// 		continue
+	// 	}
 
-		unrecoverableErrors.Add(e)
-	}
+	// 	unrecoverableErrors.Add(e)
+	// }
 
-	if !unrecoverableErrors.Empty() {
-		err = errors.Wrap(unrecoverableErrors)
-		return
-	}
+	// if !unrecoverableErrors.Empty() {
+	// 	err = errors.Wrap(unrecoverableErrors)
+	// 	return
+	// }
 
 	return
 }

@@ -41,7 +41,3 @@ func (e formatterTypFormatterUTIGroups) Format(
 
 	return
 }
-
-func (f *formatterTypFormatterUTIGroups) ReadFrom(c *ObjekteParserContext) (n int64, err error) {
-	return
-}

@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/script_config"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/cwd"
@@ -69,14 +70,14 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	var zt *zettel.Transacted
+	zt := &zettel.Transacted{}
 
 	if e, ok := cwdFiles.GetZettel(h); ok {
 		var ze zettel.External
 
 		if ze, err = u.StoreObjekten().Zettel().ReadOneExternal(
 			e,
-			nil,
+			zt,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -130,19 +131,15 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		}
 	}
 
-	var format zettel.ObjekteFormatter
+	var format metadatei.TextFormatter
 
 	if c.Mode.IncludesObjekte() {
-		format = zettel.MakeObjekteTextFormatterIncludeAkte(
-			u.Standort(),
-			u.Konfig(),
+		format = metadatei.MakeTextFormatterMetadateiInlineAkte(
 			u.StoreObjekten(),
 			akteFormatter,
 		)
 	} else {
-		format = zettel.MakeObjekteTextFormatterExcludeMetadatei(
-			u.Standort(),
-			u.Konfig(),
+		format = metadatei.MakeTextFormatterExcludeMetadatei(
 			u.StoreObjekten(),
 			akteFormatter,
 		)
@@ -156,13 +153,8 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	ctx := zettel.ObjekteFormatterContext{
-		Zettel:      zt.Objekte,
-		IncludeAkte: u.Konfig().IsInlineTyp(zt.Objekte.GetTyp()) && c.Mode.IncludesAkte(),
-	}
-
 	// TODO use cat or just write to stdout if no script instead of erroring
-	if _, err = format.Format(u.Out(), &ctx); err != nil {
+	if _, err = format.Format(u.Out(), zt); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

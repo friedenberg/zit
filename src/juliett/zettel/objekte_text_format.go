@@ -7,8 +7,8 @@ import (
 )
 
 type objekteTextFormat struct {
+	metadatei.TextFormatter
 	metadatei.TextParser
-	objekteTextFormatter
 }
 
 func MakeObjekteTextFormat(
@@ -20,8 +20,9 @@ func MakeObjekteTextFormat(
 			akteFactory,
 			akteFormatter,
 		),
-		objekteTextFormatter: objekteTextFormatter{
-			AkteFactory: akteFactory,
-		},
+		TextFormatter: metadatei.MakeTextFormatterMetadateiOnly(
+			akteFactory,
+			akteFormatter,
+		),
 	}
 }

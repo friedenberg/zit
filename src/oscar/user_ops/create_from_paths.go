@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/juliett/zettel"
@@ -20,7 +21,7 @@ import (
 
 type CreateFromPaths struct {
 	*umwelt.Umwelt
-	Format      zettel.ObjekteParser
+	Format      metadatei.TextParser
 	Filter      script_value.ScriptValue
 	ProtoZettel zettel.ProtoZettel
 	Delete      bool
@@ -199,54 +200,17 @@ func (c CreateFromPaths) zettelsFromPath(
 
 	defer c.Filter.Close()
 
-	ctx := zettel.ObjekteParserContext{}
+	var t zettel.Transacted
 
-	if _, err = c.Format.Parse(r, &ctx); err != nil {
+	if _, err = c.Format.Parse(r, &t); err != nil {
 		err = errors.Wrap(err)
 		return
-	}
-
-	for _, e := range errors.Split(ctx.Errors) {
-		// var errAkteInlineAndFilePath zettel.ErrHasInlineAkteAndFilePath
-
-		// if errors.As(e, &errAkteInlineAndFilePath) {
-		//	var z1 zettel.Zettel
-
-		//	if z1, err = errAkteInlineAndFilePath.Recover(); err != nil {
-		//		err = errors.Wrap(err)
-		//		return
-		//	}
-
-		//	var s sha.Sha
-
-		//	if s, err = z1.ObjekteSha(); err != nil {
-		//		err = errors.Wrap(err)
-		//		return
-		//	}
-
-		//	wf(
-		//		&zettel.External{
-		//			ZettelFD: fd.FD{
-		//				Path: p,
-		//			},
-		//			Objekte: z1,
-		//			Sku: zettel_external.Sku{
-		//				Sha: s,
-		//				//TODO
-		//				// Kennung: z.Sku.Kennung,
-		//			},
-		//		},
-		//	)
-		//} else {
-		err = errors.Errorf("unsupported recoverable error: %s", e)
-		return
-		// }
 	}
 
 	var s sha.Sha
 
 	if s, err = c.StoreObjekten().Zettel().WriteZettelObjekte(
-		ctx.Zettel,
+		t.Objekte,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -262,7 +226,7 @@ func (c CreateFromPaths) zettelsFromPath(
 				},
 				ObjekteSha: s,
 			},
-			Objekte: ctx.Zettel,
+			Objekte: t.Objekte,
 		},
 	)
 

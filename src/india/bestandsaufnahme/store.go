@@ -42,11 +42,6 @@ type ObjekteInflator = objekte_store.ObjekteInflator[
 	*objekte.NilVerzeichnisse[Objekte],
 ]
 
-type ObjekteFormat = schnittstellen.Format[
-	Objekte,
-	*Objekte,
-]
-
 type AkteFormat = schnittstellen.Format[
 	Objekte,
 	*Objekte,

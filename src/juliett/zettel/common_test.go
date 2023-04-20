@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/test_logz"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/test_metadatei_io"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
 
 type inlineTypChecker struct {
@@ -36,19 +37,18 @@ func makeAkteExt(t test_logz.T, v string) (es kennung.Typ) {
 
 func readFormat(
 	t1 test_logz.T,
-	f ObjekteFormat,
+	f metadatei.TextFormat,
 	af *test_metadatei_io.AkteIOFactory,
 	contents string,
 ) (z Objekte, a string) {
-	t := t1.Skip(1)
+	var zt Transacted
 
-	c := ObjekteParserContext{}
+	t := t1.Skip(1)
 
 	n, err := f.Parse(
 		strings.NewReader(contents),
-		&c,
+		&zt,
 	)
-
 	if err != nil {
 		t.Fatalf("failed to read zettel format: %s", err)
 	}
@@ -57,7 +57,7 @@ func readFormat(
 		t.Fatalf("expected to read %d but only read %d", len(contents), n)
 	}
 
-	z = c.Zettel
+	z = zt.Objekte
 	a = af.CurrentBufferString()
 
 	return

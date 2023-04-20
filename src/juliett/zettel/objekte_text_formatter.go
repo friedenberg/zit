@@ -1,208 +1,190 @@
 package zettel
 
-import (
-	"fmt"
-	"io"
-	"os"
-	"strings"
+// const MetadateiBoundary = metadatei.Boundary
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/bravo/script_config"
-	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/charlie/standort"
-	"github.com/friedenberg/zit/src/delta/format"
-	"github.com/friedenberg/zit/src/foxtrot/metadatei"
-	"github.com/friedenberg/zit/src/hotel/typ"
-)
+// type objekteTextFormatter struct {
+// 	standort         standort.Standort
+// 	InlineChecker    typ.InlineChecker
+// 	AkteFactory      schnittstellen.AkteIOFactory
+// 	AkteFormatter    script_config.RemoteScript
+// 	TypError         error
+// 	IncludeAkte      bool
+// 	ExcludeMetadatei bool
+// }
 
-const MetadateiBoundary = metadatei.Boundary
+// func MakeObjekteTextFormatterExcludeMetadatei(
+// 	standort standort.Standort,
+// 	inlineChecker typ.InlineChecker,
+// 	akteFactory schnittstellen.AkteIOFactory,
+// 	akteFormatter script_config.RemoteScript,
+// ) objekteTextFormatter {
+// 	return objekteTextFormatter{
+// 		standort:         standort,
+// 		InlineChecker:    inlineChecker,
+// 		AkteFactory:      akteFactory,
+// 		AkteFormatter:    akteFormatter,
+// 		IncludeAkte:      true,
+// 		ExcludeMetadatei: true,
+// 	}
+// }
 
-type objekteTextFormatter struct {
-	standort         standort.Standort
-	InlineChecker    typ.InlineChecker
-	AkteFactory      schnittstellen.AkteIOFactory
-	AkteFormatter    script_config.RemoteScript
-	TypError         error
-	IncludeAkte      bool
-	ExcludeMetadatei bool
-}
+// func MakeObjekteTextFormatterIncludeAkte(
+// 	standort standort.Standort,
+// 	inlineChecker typ.InlineChecker,
+// 	akteFactory schnittstellen.AkteIOFactory,
+// 	akteFormatter script_config.RemoteScript,
+// ) objekteTextFormatter {
+// 	return objekteTextFormatter{
+// 		standort:      standort,
+// 		InlineChecker: inlineChecker,
+// 		AkteFactory:   akteFactory,
+// 		AkteFormatter: akteFormatter,
+// 		IncludeAkte:   true,
+// 	}
+// }
 
-func MakeObjekteTextFormatterExcludeMetadatei(
-	standort standort.Standort,
-	inlineChecker typ.InlineChecker,
-	akteFactory schnittstellen.AkteIOFactory,
-	akteFormatter script_config.RemoteScript,
-) objekteTextFormatter {
-	return objekteTextFormatter{
-		standort:         standort,
-		InlineChecker:    inlineChecker,
-		AkteFactory:      akteFactory,
-		AkteFormatter:    akteFormatter,
-		IncludeAkte:      true,
-		ExcludeMetadatei: true,
-	}
-}
+// func MakeObjekteTextFormatterAkteShaOnly(
+// 	standort standort.Standort,
+// 	akteFactory schnittstellen.AkteIOFactory,
+// 	akteFormatter script_config.RemoteScript,
+// ) objekteTextFormatter {
+// 	return objekteTextFormatter{
+// 		standort:      standort,
+// 		AkteFactory:   akteFactory,
+// 		AkteFormatter: akteFormatter,
+// 	}
+// }
 
-func MakeObjekteTextFormatterIncludeAkte(
-	standort standort.Standort,
-	inlineChecker typ.InlineChecker,
-	akteFactory schnittstellen.AkteIOFactory,
-	akteFormatter script_config.RemoteScript,
-) objekteTextFormatter {
-	return objekteTextFormatter{
-		standort:      standort,
-		InlineChecker: inlineChecker,
-		AkteFactory:   akteFactory,
-		AkteFormatter: akteFormatter,
-		IncludeAkte:   true,
-	}
-}
+// func (f objekteTextFormatter) Format(
+// 	w io.Writer,
+// 	c *ObjekteFormatterContext,
+// ) (n int64, err error) {
+// 	inline := f.InlineChecker.IsInlineTyp(c.Zettel.GetTyp())
 
-func MakeObjekteTextFormatterAkteShaOnly(
-	standort standort.Standort,
-	akteFactory schnittstellen.AkteIOFactory,
-	akteFormatter script_config.RemoteScript,
-) objekteTextFormatter {
-	return objekteTextFormatter{
-		standort:      standort,
-		AkteFactory:   akteFactory,
-		AkteFormatter: akteFormatter,
-	}
-}
+// 	var mtw io.WriterTo
 
-func (f objekteTextFormatter) Format(
-	w io.Writer,
-	c *ObjekteFormatterContext,
-) (n int64, err error) {
-	inline := f.InlineChecker.IsInlineTyp(c.Zettel.GetTyp())
+// 	if !f.ExcludeMetadatei {
+// 		mtw = format.MakeWriterTo2(
+// 			(&TextMetadateiFormatter{
+// 				IncludeAkteSha: !inline,
+// 			}).Format,
+// 			&Metadatei{
+// 				Objekte: c.Zettel,
+// 			},
+// 		)
+// 	}
 
-	var mtw io.WriterTo
+// 	var wt io.WriterTo
+// 	var ar sha.ReadCloser
 
-	if !f.ExcludeMetadatei {
-		mtw = format.MakeWriterTo2(
-			(&TextMetadateiFormatter{
-				IncludeAkteSha: !inline,
-			}).Format,
-			&Metadatei{
-				Objekte: c.Zettel,
-			},
-		)
-	}
+// 	if inline {
+// 		if ar, err = f.AkteFactory.AkteReader(c.Zettel.Metadatei.AkteSha); err != nil {
+// 			err = errors.Wrap(err)
+// 			return
+// 		}
 
-	var wt io.WriterTo
-	var ar sha.ReadCloser
+// 		defer errors.Deferred(&err, ar.Close)
 
-	if inline {
-		if ar, err = f.AkteFactory.AkteReader(c.Zettel.Metadatei.AkteSha); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+// 		wt = ar
+// 	}
 
-		defer errors.Deferred(&err, ar.Close)
+// 	if f.AkteFormatter != nil {
+// 		if wt, err = script_config.MakeWriterToWithStdin(
+// 			f.AkteFormatter,
+// 			map[string]string{
+// 				"ZIT_BIN": f.standort.Executable(),
+// 			},
+// 			ar,
+// 		); err != nil {
+// 			err = errors.Wrap(err)
+// 			return
+// 		}
+// 	}
 
-		wt = ar
-	}
+// 	mw := metadatei.Writer{
+// 		Metadatei: mtw,
+// 		Akte:      wt,
+// 	}
 
-	if f.AkteFormatter != nil {
-		if wt, err = script_config.MakeWriterToWithStdin(
-			f.AkteFormatter,
-			map[string]string{
-				"ZIT_BIN": f.standort.Executable(),
-			},
-			ar,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
+// 	if n, err = mw.WriteTo(w); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	mw := metadatei.Writer{
-		Metadatei: mtw,
-		Akte:      wt,
-	}
+// 	return
+// }
 
-	if n, err = mw.WriteTo(w); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+// func (f objekteTextFormatter) writeToExternalAkte(
+// 	w1 io.Writer,
+// 	c *ObjekteFormatterContext,
+// ) (n int64, err error) {
+// 	w := format.NewLineWriter()
 
-	return
-}
+// 	w.WriteLines(
+// 		MetadateiBoundary,
+// 		fmt.Sprintf("# %s", c.Zettel.Metadatei.Bezeichnung),
+// 	)
 
-func (f objekteTextFormatter) writeToExternalAkte(
-	w1 io.Writer,
-	c *ObjekteFormatterContext,
-) (n int64, err error) {
-	w := format.NewLineWriter()
+// 	for _, e := range collections.SortedValues(c.Zettel.Metadatei.Etiketten) {
+// 		w.WriteFormat("- %s", e)
+// 	}
 
-	w.WriteLines(
-		MetadateiBoundary,
-		fmt.Sprintf("# %s", c.Zettel.Metadatei.Bezeichnung),
-	)
+// 	if strings.Index(c.ExternalAktePath, "\n") != -1 {
+// 		panic(errors.Errorf("ExternalAktePath contains newline: %q", c.ExternalAktePath))
+// 	}
 
-	for _, e := range collections.SortedValues(c.Zettel.Metadatei.Etiketten) {
-		w.WriteFormat("- %s", e)
-	}
+// 	w.WriteLines(
+// 		fmt.Sprintf("! %s", c.ExternalAktePath),
+// 	)
 
-	if strings.Index(c.ExternalAktePath, "\n") != -1 {
-		panic(errors.Errorf("ExternalAktePath contains newline: %q", c.ExternalAktePath))
-	}
+// 	w.WriteLines(
+// 		MetadateiBoundary,
+// 	)
 
-	w.WriteLines(
-		fmt.Sprintf("! %s", c.ExternalAktePath),
-	)
+// 	n, err = w.WriteTo(w1)
 
-	w.WriteLines(
-		MetadateiBoundary,
-	)
+// 	if err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	n, err = w.WriteTo(w1)
+// 	var ar io.ReadCloser
 
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+// 	if f.AkteFactory == nil {
+// 		err = errors.Errorf("akte reader factory is nil")
+// 		return
+// 	}
 
-	var ar io.ReadCloser
+// 	if ar, err = f.AkteFactory.AkteReader(c.Zettel.Metadatei.AkteSha); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	if f.AkteFactory == nil {
-		err = errors.Errorf("akte reader factory is nil")
-		return
-	}
+// 	if ar == nil {
+// 		err = errors.Errorf("akte reader is nil")
+// 		return
+// 	}
 
-	if ar, err = f.AkteFactory.AkteReader(c.Zettel.Metadatei.AkteSha); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+// 	defer errors.Deferred(&err, ar.Close)
 
-	if ar == nil {
-		err = errors.Errorf("akte reader is nil")
-		return
-	}
+// 	var file *os.File
 
-	defer errors.Deferred(&err, ar.Close)
+// 	if file, err = files.Create(c.ExternalAktePath); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	var file *os.File
+// 	defer errors.Deferred(&err, file.Close)
 
-	if file, err = files.Create(c.ExternalAktePath); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+// 	var n1 int64
 
-	defer errors.Deferred(&err, file.Close)
+// 	n1, err = io.Copy(file, ar)
+// 	n += n1
 
-	var n1 int64
+// 	if err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	n1, err = io.Copy(file, ar)
-	n += n1
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
+// 	return
+// }

@@ -1,6 +1,8 @@
 package bezeichnung
 
-import "strings"
+import (
+	"strings"
+)
 
 type Bezeichnung struct {
 	wasSet bool

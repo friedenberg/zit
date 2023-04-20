@@ -3,19 +3,33 @@ package metadatei
 import (
 	"fmt"
 
+	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
 type ErrHasInlineAkteAndFilePath struct {
-	Metadatei Metadatei
 	AkteFD    kennung.FD
+	InlineSha sha.Sha
 }
 
 func (e ErrHasInlineAkteAndFilePath) Error() string {
 	return fmt.Sprintf(
-		"zettel text has both inline akte and filepath: \nexternal path: %s\nexternal sha: %s\ninline sha: %s",
+		"text has inline akte and file: \nexternal path: %s\nexternal sha: %s\ninline sha: %s",
 		e.AkteFD.Path,
 		e.AkteFD.Sha,
-		e.Metadatei.AkteSha,
+		e.InlineSha,
+	)
+}
+
+type ErrHasInlineAkteAndMetadateiSha struct {
+	InlineSha    sha.Sha
+	MetadateiSha sha.Sha
+}
+
+func (e ErrHasInlineAkteAndMetadateiSha) Error() string {
+	return fmt.Sprintf(
+		"text has inline akte and metadatei sha: \ninline sha: %s\n metadatei sha: %s",
+		e.InlineSha,
+		e.MetadateiSha,
 	)
 }

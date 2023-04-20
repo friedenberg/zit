@@ -12,6 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/cwd"
@@ -141,7 +142,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 func (c New) readExistingFilesAsZettels(
 	u *umwelt.Umwelt,
-	f zettel.ObjekteParser,
+	f metadatei.TextParser,
 	args ...string,
 ) (zts schnittstellen.MutableSet[*zettel.Transacted], err error) {
 	opCreateFromPath := user_ops.CreateFromPaths{
@@ -163,7 +164,7 @@ func (c New) readExistingFilesAsZettels(
 
 func (c New) writeNewZettels(
 	u *umwelt.Umwelt,
-	f zettel.ObjekteFormatter,
+	f metadatei.TextFormatter,
 ) (zsc zettel.MutableSetCheckedOut, err error) {
 	var cwdFiles cwd.CwdFiles
 

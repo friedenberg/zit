@@ -1,34 +1,63 @@
 package metadatei
 
 import (
+	"io"
+
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
-type Getter interface {
-	GetMetadatei() Metadatei
-}
+type (
+	Getter interface {
+		GetMetadatei() Metadatei
+	}
 
-type Setter interface {
-	SetMetadatei(Metadatei)
-}
+	Setter interface {
+		SetMetadatei(Metadatei)
+	}
 
-type PersistentFormatterContext interface {
-	Getter
-	GetAkteSha() schnittstellen.Sha
-}
+	AktePathGetter interface {
+		GetAktePath() string
+	}
 
-type PersistentParserContext interface {
-	Getter
-	Setter
-}
+	AktePathSetter interface {
+		SetAkteFD(kennung.FD) error
+	}
 
-type TextFormatterContext interface {
-	PersistentFormatterContext
-	GetAktePath() string
-}
+	PersistentFormatterContext interface {
+		Getter
+		GetAkteSha() schnittstellen.Sha
+	}
 
-type TextParserContext interface {
-	PersistentParserContext
-	SetAkteFD(kennung.FD) error
-}
+	PersistentParserContext interface {
+		Getter
+		Setter
+	}
+
+	TextFormatterContext interface {
+		PersistentFormatterContext
+		// GetAktePath() string
+	}
+
+	TextParserContext interface {
+		PersistentParserContext
+	}
+
+	TextFormatOutput struct {
+		io.Writer
+		string
+	}
+
+	TextFormatter interface {
+		Format(io.Writer, TextFormatterContext) (int64, error)
+	}
+
+	TextParser interface {
+		Parse(io.Reader, TextParserContext) (int64, error)
+	}
+
+	TextFormat interface {
+		TextFormatter
+		TextParser
+	}
+)

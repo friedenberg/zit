@@ -9,8 +9,8 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/format"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/golf/persisted_metadatei_format"
 	"github.com/friedenberg/zit/src/hotel/typ"
@@ -141,9 +141,7 @@ func (fv *FormatterValue) FuncFormatter(
 		}
 
 	case "text", "hinweis-text":
-		f := MakeObjekteTextFormatterIncludeAkte(
-			standort.Standort{},
-			k,
+		f := metadatei.MakeTextFormatterMetadateiInlineAkte(
 			af,
 			nil,
 		)
@@ -159,11 +157,7 @@ func (fv *FormatterValue) FuncFormatter(
 				}
 			}
 
-			c := ObjekteFormatterContext{
-				Zettel: o.Objekte,
-			}
-
-			if _, err = f.Format(out, &c); err != nil {
+			if _, err = f.Format(out, o); err != nil {
 				err = errors.Wrapf(err, "Hinweis: %s", o.Sku.Kennung)
 
 				if errors.IsNotExist(err) {

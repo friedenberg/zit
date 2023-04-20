@@ -15,10 +15,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
-type TextParser interface {
-	Parse(io.Reader, TextParserContext) (int64, error)
-}
-
 type textParser struct {
 	awf schnittstellen.AkteWriterFactory
 	af  script_config.RemoteScript
@@ -43,6 +39,8 @@ func (f textParser) Parse(
 	c TextParserContext,
 ) (n int64, err error) {
 	m := c.GetMetadatei()
+	m.Reset()
+
 	etiketten := kennung.MakeEtikettMutableSet()
 
 	var n1 int64
@@ -51,6 +49,8 @@ func (f textParser) Parse(
 		m.Etiketten = etiketten.ImmutableClone()
 		c.SetMetadatei(m)
 	}()
+
+	var akteFD kennung.FD
 
 	lr := format.MakeLineReaderConsumeEmpty(
 		format.MakeLineReaderIterate(
@@ -63,7 +63,7 @@ func (f textParser) Parse(
 						*kennung.Etikett,
 					](etiketten),
 					"!": func(v string) (err error) {
-						return f.readTyp(&m, v)
+						return f.readTyp(&m, v, &akteFD)
 					},
 				},
 			),
@@ -107,9 +107,18 @@ func (f textParser) Parse(
 	case !m.AkteSha.IsNull() && inlineAkteSha.IsNull():
 		// noop
 
-	case !m.AkteSha.IsNull() && !inlineAkteSha.IsNull():
-		err = ErrHasInlineAkteAndFilePath{
-			Metadatei: m,
+	case !m.AkteSha.IsNull() && !inlineAkteSha.IsNull() &&
+		!m.AkteSha.Equals(inlineAkteSha):
+		if akteFD.Sha.IsNull() {
+			err = errors.Wrap(ErrHasInlineAkteAndMetadateiSha{
+				InlineSha:    inlineAkteSha,
+				MetadateiSha: m.AkteSha,
+			})
+		} else {
+			err = errors.Wrap(ErrHasInlineAkteAndFilePath{
+				AkteFD:    akteFD,
+				InlineSha: inlineAkteSha,
+			})
 		}
 
 		return
@@ -120,7 +129,7 @@ func (f textParser) Parse(
 
 func (tp textParser) readExternalAkte(
 	p string,
-) (sh sha.Sha, err error) {
+) (fd kennung.FD, err error) {
 	var f *os.File
 
 	if f, err = files.OpenExclusiveReadOnly(p); err != nil {
@@ -149,7 +158,8 @@ func (tp textParser) readExternalAkte(
 		return
 	}
 
-	sh = sha.Make(akteWriter.Sha())
+	fd.Path = p
+	fd.Sha = sha.Make(akteWriter.Sha())
 
 	return
 }
@@ -157,6 +167,7 @@ func (tp textParser) readExternalAkte(
 func (f textParser) readTyp(
 	m *Metadatei,
 	desc string,
+	akteFD *kennung.FD,
 ) (err error) {
 	if desc == "" {
 		return
@@ -165,7 +176,6 @@ func (f textParser) readTyp(
 	tail := path.Ext(desc)
 	head := desc[:len(desc)-len(tail)]
 
-	errors.TodoP3("handle akte descs that are invalid files")
 	//! <path>.<typ ext>
 	switch {
 	case files.Exists(desc):
@@ -174,14 +184,12 @@ func (f textParser) readTyp(
 			return
 		}
 
-		var externalAkteSha sha.Sha
-
-		if externalAkteSha, err = f.readExternalAkte(desc); err != nil {
+		if *akteFD, err = f.readExternalAkte(desc); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		m.AkteSha = externalAkteSha
+		m.AkteSha = akteFD.Sha
 
 	//! <sha>.<typ ext>
 	case tail != "":

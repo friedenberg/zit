@@ -55,7 +55,3 @@ func (e formatterTypActionNames) Format(
 
 	return
 }
-
-func (f *formatterTypActionNames) ReadFrom(c *ObjekteParserContext) (n int64, err error) {
-	return
-}

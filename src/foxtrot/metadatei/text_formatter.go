@@ -1,65 +1,56 @@
 package metadatei
 
-import (
-	"fmt"
-	"io"
+// type TextFormatter struct {
+// 	DoNotWriteEmptyBezeichnung bool
+// 	IncludeAkteSha             bool
+// }
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/delta/format"
-)
+// func (f TextFormatter) Format(
+// 	w1 io.Writer,
+// 	c TextFormatterContext,
+// ) (n int64, err error) {
+// 	w := format.NewLineWriter()
+// 	m := c.GetMetadatei()
 
-type TextFormatter struct {
-	DoNotWriteEmptyBezeichnung bool
-	IncludeAkteSha             bool
-}
+// 	if m.Bezeichnung.String() != "" || !f.DoNotWriteEmptyBezeichnung {
+// 		w.WriteLines(
+// 			fmt.Sprintf("# %s", m.Bezeichnung),
+// 		)
+// 	}
 
-func (f TextFormatter) Format(
-	w1 io.Writer,
-	c TextFormatterContext,
-) (n int64, err error) {
-	w := format.NewLineWriter()
-	m := c.GetMetadatei()
+// 	for _, e := range collections.SortedValues(m.Etiketten) {
+// 		if e.IsEmpty() {
+// 			continue
+// 		}
 
-	if m.Bezeichnung.String() != "" || !f.DoNotWriteEmptyBezeichnung {
-		w.WriteLines(
-			fmt.Sprintf("# %s", m.Bezeichnung),
-		)
-	}
+// 		w.WriteFormat("- %s", e)
+// 	}
 
-	for _, e := range collections.SortedValues(m.Etiketten) {
-		if e.IsEmpty() {
-			continue
-		}
+// 	ap := c.GetAktePath()
 
-		w.WriteFormat("- %s", e)
-	}
+// 	switch {
+// 	case ap != "":
+// 		w.WriteLines(
+// 			fmt.Sprintf("! %s", ap),
+// 		)
 
-	ap := c.GetAktePath()
+// 	case f.IncludeAkteSha:
+// 		sh := c.GetAkteSha()
 
-	switch {
-	case ap != "":
-		w.WriteLines(
-			fmt.Sprintf("! %s", ap),
-		)
+// 		w.WriteLines(
+// 			fmt.Sprintf("! %s.%s", sh, m.Typ),
+// 		)
 
-	case f.IncludeAkteSha:
-		sh := c.GetAkteSha()
+// 	default:
+// 		w.WriteLines(
+// 			fmt.Sprintf("! %s", m.Typ),
+// 		)
+// 	}
 
-		w.WriteLines(
-			fmt.Sprintf("! %s.%s", sh, m.Typ),
-		)
+// 	if n, err = w.WriteTo(w1); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	default:
-		w.WriteLines(
-			fmt.Sprintf("! %s", m.Typ),
-		)
-	}
-
-	if n, err = w.WriteTo(w1); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
+// 	return
+// }
