@@ -88,14 +88,18 @@ func (c Diff) RunWithCwdQuery(
 					func() (err error) {
 						var f *os.File
 
-						if f, err = files.OpenExclusiveReadOnly(pFifo); err != nil {
+						// TODO figure out why ReadOnly causes this to hang. Is it the wg?
+						if f, err = files.OpenExclusiveWriteOnly(pFifo); err != nil {
 							err = errors.Wrap(err)
 							return
 						}
 
 						defer errors.DeferredCloser(&err, f)
 
-						_, err = fInline.Format(f, zco.Internal)
+						if _, err = fInline.Format(f, zco.Internal); err != nil {
+							err = errors.Wrap(err)
+							return
+						}
 
 						return
 					},
