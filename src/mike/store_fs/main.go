@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/ts"
-	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/hotel/etikett"
 	"github.com/friedenberg/zit/src/hotel/kasten"
@@ -26,8 +25,6 @@ type Store struct {
 	erworben      konfig.Compiled
 	standort.Standort
 
-	format metadatei.TextFormat
-
 	storeObjekten *store_objekten.Store
 
 	checkedOutLogPrinter schnittstellen.FuncIter[objekte.CheckedOutLike]
@@ -43,10 +40,6 @@ func New(
 		sonnenaufgang: t,
 		erworben:      k,
 		Standort:      st,
-		format: zettel.MakeObjekteTextFormat(
-			storeObjekten,
-			nil,
-		),
 		storeObjekten: storeObjekten,
 	}
 

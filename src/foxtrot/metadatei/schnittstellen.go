@@ -55,9 +55,4 @@ type (
 	TextParser interface {
 		Parse(io.Reader, TextParserContext) (int64, error)
 	}
-
-	TextFormat interface {
-		TextFormatter
-		TextParser
-	}
 )

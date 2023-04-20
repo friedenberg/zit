@@ -68,10 +68,16 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	f := zettel.MakeObjekteTextFormat(
-		u.StoreObjekten(),
-		nil,
-	)
+	f := metadatei.TextFormat{
+		TextFormatter: metadatei.MakeTextFormatterMetadateiInlineAkte(
+			u.StoreObjekten(),
+			nil,
+		),
+		TextParser: metadatei.MakeTextParser(
+			u.StoreObjekten(),
+			nil,
+		),
+	}
 
 	var zsc zettel.MutableSetCheckedOut
 

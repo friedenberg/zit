@@ -63,7 +63,7 @@ type zettelStore struct {
 		*zettel.Verzeichnisse,
 	]
 
-	format      metadatei.TextFormat
+	textParser  metadatei.TextParser
 	protoZettel zettel.ProtoZettel
 
 	verzeichnisseSchwanzen *verzeichnisseSchwanzen
@@ -76,9 +76,9 @@ func makeZettelStore(
 ) (s *zettelStore, err error) {
 	s = &zettelStore{
 		protoZettel: zettel.MakeProtoZettel(sa.GetKonfig()),
-		format: zettel.MakeObjekteTextFormat(
+		textParser: metadatei.MakeTextParser(
 			sa,
-			nil,
+			nil, // TODO make akteFormatter
 		),
 	}
 
@@ -285,7 +285,7 @@ func (s *zettelStore) readOneExternalObjekte(
 
 	defer errors.DeferredCloser(&err, f)
 
-	if _, err = s.format.Parse(f, t); err != nil {
+	if _, err = s.textParser.Parse(f, t); err != nil {
 		err = errors.Wrapf(err, "%s", f.Name())
 		return
 	}
@@ -300,35 +300,6 @@ func (s *zettelStore) readOneExternalObjekte(
 	ez.Objekte = t.Objekte
 	// TODO P0
 	// ez.Sku.FDs.Akte.Path = c.AktePath
-
-	// unrecoverableErrors := errors.MakeMulti()
-
-	// TODO
-	// for _, e := range errors.Split(c.Errors) {
-	// 	var err1 zettel.ErrHasInvalidAkteShaOrFilePath
-
-	// 	if errors.As(e, &err1) {
-	// 		var mutter *zettel.Transacted
-
-	// 		if mutter, err = s.ReadOne(
-	// 			&ez.Sku.Kennung,
-	// 		); err != nil {
-	// 			unrecoverableErrors.Add(errors.Wrap(err))
-	// 			continue
-	// 		}
-
-	// 		ez.Objekte.Metadatei.AkteSha = mutter.Objekte.Metadatei.AkteSha
-
-	// 		continue
-	// 	}
-
-	// 	unrecoverableErrors.Add(e)
-	// }
-
-	// if !unrecoverableErrors.Empty() {
-	// 	err = errors.Wrap(unrecoverableErrors)
-	// 	return
-	// }
 
 	return
 }

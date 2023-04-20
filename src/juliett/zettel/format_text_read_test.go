@@ -17,7 +17,7 @@ func makeTestTextFormat(
 		af = test_metadatei_io.FixtureFactoryReadWriteCloser(nil)
 	}
 
-	return MakeObjekteTextFormat(
+	return metadatei.MakeTextFormat(
 		af,
 		nil,
 	)
