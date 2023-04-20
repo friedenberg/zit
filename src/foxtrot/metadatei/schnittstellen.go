@@ -3,7 +3,6 @@ package metadatei
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
@@ -26,7 +25,6 @@ type (
 
 	PersistentFormatterContext interface {
 		Getter
-		GetAkteSha() schnittstellen.Sha
 	}
 
 	PersistentParserContext interface {

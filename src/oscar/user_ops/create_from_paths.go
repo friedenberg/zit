@@ -21,7 +21,7 @@ import (
 
 type CreateFromPaths struct {
 	*umwelt.Umwelt
-	Format      metadatei.TextParser
+	TextParser  metadatei.TextParser
 	Filter      script_value.ScriptValue
 	ProtoZettel zettel.ProtoZettel
 	Delete      bool
@@ -185,7 +185,7 @@ func (c CreateFromPaths) Run(
 }
 
 // TODO migrate this to use store_working_directory
-func (c CreateFromPaths) zettelsFromPath(
+func (c *CreateFromPaths) zettelsFromPath(
 	p string,
 	wf schnittstellen.FuncIter[*zettel.External],
 ) (err error) {
@@ -198,11 +198,11 @@ func (c CreateFromPaths) zettelsFromPath(
 		return
 	}
 
-	defer c.Filter.Close()
+	defer errors.DeferredCloser(&err, &c.Filter)
 
 	var t zettel.Transacted
 
-	if _, err = c.Format.Parse(r, &t); err != nil {
+	if _, err = c.TextParser.Parse(r, &t); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

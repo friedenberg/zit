@@ -100,8 +100,9 @@ func (f textFormatterCommon) writeAkte(
 	c TextFormatterContext,
 ) (n int64, err error) {
 	var ar io.ReadCloser
+	m := c.GetMetadatei()
 
-	if ar, err = f.akteFactory.AkteReader(c.GetAkteSha()); err != nil {
+	if ar, err = f.akteFactory.AkteReader(m.AkteSha); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

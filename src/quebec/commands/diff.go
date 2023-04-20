@@ -7,14 +7,15 @@ import (
 	"os/exec"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/cwd"
-	"github.com/friedenberg/zit/src/kilo/zettel_external"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
@@ -40,10 +41,20 @@ func (c Diff) RunWithCwdQuery(
 	ms kennung.MetaSet,
 	cwdFiles cwd.CwdFiles,
 ) (err error) {
-	e := zettel_external.MakeFileEncoderJustOpen(
+	// e := zettel_external.MakeFileEncoderJustOpen(
+	// 	u.StoreObjekten(),
+	// 	u.Konfig(),
+	// )
+
+	fInline := metadatei.MakeTextFormatterMetadateiInlineAkte(
 		u.StoreObjekten(),
-		u.Konfig(),
+		nil,
 	)
+
+	// fMetadatei := metadatei.MakeTextFormatterMetadateiOnly(
+	// 	u.StoreObjekten(),
+	// 	nil,
+	// )
 
 	if err = u.StoreWorkingDirectory().ReadFiles(
 		cwdFiles,
@@ -74,12 +85,19 @@ func (c Diff) RunWithCwdQuery(
 				)
 
 				wg.Do(
-					func() error {
-						return e.EncodeObjekte(
-							&zco.Internal.Objekte,
-							pFifo,
-							"",
-						)
+					func() (err error) {
+						var f *os.File
+
+						if f, err = files.OpenExclusiveReadOnly(pFifo); err != nil {
+							err = errors.Wrap(err)
+							return
+						}
+
+						defer errors.DeferredCloser(&err, f)
+
+						_, err = fInline.Format(f, zco.Internal)
+
+						return
 					},
 				)
 

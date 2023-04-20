@@ -1,66 +1,57 @@
 package zettel
 
-import (
-	"fmt"
-	"io"
+// type Metadatei struct {
+// 	Objekte
+// 	AktePath string
+// }
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/delta/format"
-)
+// type TextMetadateiFormatter struct {
+// 	DoNotWriteEmptyBezeichnung bool
+// 	IncludeAkteSha             bool
+// }
 
-type Metadatei struct {
-	Objekte
-	AktePath string
-}
+// func (f *TextMetadateiFormatter) Format(w1 io.Writer, m *Metadatei) (n int64, err error) {
+// 	errors.TodoP3("turn *Objekte into an interface to allow zettel_external to use this")
 
-type TextMetadateiFormatter struct {
-	DoNotWriteEmptyBezeichnung bool
-	IncludeAkteSha             bool
-}
+// 	w := format.NewLineWriter()
 
-func (f *TextMetadateiFormatter) Format(w1 io.Writer, m *Metadatei) (n int64, err error) {
-	errors.TodoP3("turn *Objekte into an interface to allow zettel_external to use this")
+// 	if m.Metadatei.Bezeichnung.String() != "" || !f.DoNotWriteEmptyBezeichnung {
+// 		w.WriteLines(
+// 			fmt.Sprintf("# %s", m.Metadatei.Bezeichnung),
+// 		)
+// 	}
 
-	w := format.NewLineWriter()
+// 	for _, e := range collections.SortedValues(m.Metadatei.Etiketten) {
+// 		errors.TodoP3("determine how to handle this")
 
-	if m.Metadatei.Bezeichnung.String() != "" || !f.DoNotWriteEmptyBezeichnung {
-		w.WriteLines(
-			fmt.Sprintf("# %s", m.Metadatei.Bezeichnung),
-		)
-	}
+// 		if e.IsEmpty() {
+// 			continue
+// 		}
 
-	for _, e := range collections.SortedValues(m.Metadatei.Etiketten) {
-		errors.TodoP3("determine how to handle this")
+// 		w.WriteFormat("- %s", e)
+// 	}
 
-		if e.IsEmpty() {
-			continue
-		}
+// 	switch {
+// 	case m.AktePath != "":
+// 		w.WriteLines(
+// 			fmt.Sprintf("! %s", m.AktePath),
+// 		)
 
-		w.WriteFormat("- %s", e)
-	}
+// 	case f.IncludeAkteSha:
+// 		w.WriteLines(
+// 			fmt.Sprintf("! %s.%s", m.Metadatei.AkteSha, m.GetTyp()),
+// 		)
 
-	switch {
-	case m.AktePath != "":
-		w.WriteLines(
-			fmt.Sprintf("! %s", m.AktePath),
-		)
+// 	default:
+// 		w.WriteLines(
+// 			fmt.Sprintf("! %s", m.GetTyp()),
+// 		)
+// 	}
 
-	case f.IncludeAkteSha:
-		w.WriteLines(
-			fmt.Sprintf("! %s.%s", m.Metadatei.AkteSha, m.GetTyp()),
-		)
+// 	if n, err = w.WriteTo(w1); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	default:
-		w.WriteLines(
-			fmt.Sprintf("! %s", m.GetTyp()),
-		)
-	}
-
-	if n, err = w.WriteTo(w1); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
+// 	return
+// }

@@ -82,7 +82,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	var zsc zettel.MutableSetCheckedOut
 
 	if len(args) == 0 {
-		if zsc, err = c.writeNewZettels(u, f); err != nil {
+		if zsc, err = c.writeNewZettels(u); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -153,7 +153,7 @@ func (c New) readExistingFilesAsZettels(
 ) (zts schnittstellen.MutableSet[*zettel.Transacted], err error) {
 	opCreateFromPath := user_ops.CreateFromPaths{
 		Umwelt:      u,
-		Format:      f,
+		TextParser:  f,
 		Filter:      c.Filter,
 		Delete:      c.Delete,
 		Dedupe:      c.Dedupe,
@@ -170,7 +170,6 @@ func (c New) readExistingFilesAsZettels(
 
 func (c New) writeNewZettels(
 	u *umwelt.Umwelt,
-	f metadatei.TextFormatter,
 ) (zsc zettel.MutableSetCheckedOut, err error) {
 	var cwdFiles cwd.CwdFiles
 
