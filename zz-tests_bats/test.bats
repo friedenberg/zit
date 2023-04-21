@@ -272,8 +272,7 @@ function checkouts_dont_overwrite { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run_zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
-	assert_success
+	run_zit_init_disable_age
 
 	expected="$(mktemp)"
 	{

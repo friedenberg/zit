@@ -9,8 +9,8 @@ import (
 )
 
 type Objekte struct {
-	Sha  sha.Sha
-	Akte Akte
+	Sha sha.Sha `toml:"-"`
+	Akte
 }
 
 func (a Objekte) GetMetadatei() metadatei.Metadatei {

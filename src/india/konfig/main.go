@@ -65,7 +65,7 @@ type compiled struct {
 
 	// Typen
 	ExtensionsToTypen map[string]string
-	DefaultTyp        typ.Transacted //deprecated
+	DefaultTyp        typ.Transacted // deprecated
 	Typen             typSet
 
 	// Kasten
@@ -411,15 +411,15 @@ func (k *compiled) AddKasten(
 func (k *compiled) AddTyp(
 	ct *typ.Transacted,
 ) {
-	if ct.Objekte.Akte.Actions == nil {
-		errors.TodoP0("actions were nil: %s", ct.Sku)
-		return
-	}
+	// if ct.Objekte.Akte.Actions == nil {
+	// 	errors.TodoP0("actions were nil: %s", ct.Sku)
+	// 	return
+	// }
 
-	if ct.Objekte.Akte.EtikettenRules == nil {
-		errors.TodoP0("etiketten rules were nil: %s", ct.Sku)
-		return
-	}
+	// if ct.Objekte.Akte.EtikettenRules == nil {
+	// 	errors.TodoP0("etiketten rules were nil: %s", ct.Sku)
+	// 	return
+	// }
 
 	k.hasChanges = true
 	// collections.AddIfGreater(k.Typen, ct)

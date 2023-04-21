@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/golf/persisted_metadatei_format"
 )
 
@@ -38,6 +39,7 @@ func (f *FormatterValue) Set(v string) (err error) {
 		"log",
 		"sku",
 		"sku-transacted",
+		"text",
 		"sku2":
 		f.string = v1
 
@@ -56,6 +58,21 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 	logFunc schnittstellen.FuncIter[TransactedLike],
 ) schnittstellen.FuncIter[TransactedLike] {
 	switch fv.string {
+	case "text":
+		fInlineAkte := metadatei.MakeTextFormatterMetadateiInlineAkte(af, nil)
+		fOmitMetadatei := metadatei.MakeTextFormatterExcludeMetadatei(af, nil)
+		// f := MakeSavedAkteFormatter(af)
+
+		return func(tl TransactedLike) (err error) {
+			if tl.GetGattung() == gattung.Zettel {
+				_, err = fInlineAkte.Format(out, tl)
+			} else {
+				_, err = fOmitMetadatei.Format(out, tl)
+			}
+
+			return
+		}
+
 	case "objekte":
 		f := persisted_metadatei_format.FormatForVersion(k.GetStoreVersion())
 
@@ -67,6 +84,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 
 			return
 		}
+
 	case "kennung-akte-akte":
 		return func(tl TransactedLike) (err error) {
 			errors.TodoP3("convert into an option")

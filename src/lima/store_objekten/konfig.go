@@ -18,6 +18,7 @@ import (
 type KonfigStore interface {
 	reindexer
 
+	GetAkteFormat() objekte_store.AkteFormat[erworben.Objekte, *erworben.Objekte]
 	Read() (*erworben.Transacted, error)
 	Update(*erworben.Objekte) (*erworben.Transacted, error)
 
@@ -49,6 +50,12 @@ type konfigStore struct {
 	KonfigInflator
 	KonfigAkteTextSaver
 	KonfigLogWriter
+
+	akteFormat objekte_store.AkteFormat[erworben.Objekte, *erworben.Objekte]
+}
+
+func (s *konfigStore) GetAkteFormat() objekte_store.AkteFormat[erworben.Objekte, *erworben.Objekte] {
+	return s.akteFormat
 }
 
 func (s *konfigStore) SetLogWriter(
@@ -61,6 +68,12 @@ func makeKonfigStore(
 	sa store_util.StoreUtil,
 ) (s *konfigStore, err error) {
 	pool := collections.MakePool[erworben.Transacted]()
+
+	akteFormat := objekte_store.MakeAkteFormat[erworben.Objekte, *erworben.Objekte](
+		objekte.MakeTextParserIgnoreTomlErrors[erworben.Objekte](sa),
+		objekte.ParsedAkteTomlFormatter[erworben.Objekte]{},
+		sa,
+	)
 
 	s = &konfigStore{
 		StoreUtil: sa,
@@ -76,9 +89,7 @@ func makeKonfigStore(
 			sa,
 			sa,
 			persisted_metadatei_format.V0{},
-			schnittstellen.Format[erworben.Objekte, *erworben.Objekte](
-				erworben.MakeFormatText(sa),
-			),
+			akteFormat,
 			pool,
 		),
 		KonfigAkteTextSaver: objekte_store.MakeAkteTextSaver[
@@ -86,7 +97,7 @@ func makeKonfigStore(
 			*erworben.Objekte,
 		](
 			sa,
-			&erworben.FormatterAkteTextToml{},
+			akteFormat,
 		),
 	}
 
@@ -243,12 +254,16 @@ func (s konfigStore) Read() (tt *erworben.Transacted, err error) {
 
 			defer errors.DeferredCloser(&err, r)
 
-			fo := erworben.MakeFormatText(s.StoreUtil)
+			fo := s.akteFormat
 
-			if _, err = fo.Parse(r, &tt.Objekte); err != nil {
+			var sh schnittstellen.Sha
+
+			if sh, _, err = fo.ParseSaveAkte(r, &tt.Objekte); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
+
+			tt.SetAkteSha(sh)
 		}
 	}
 

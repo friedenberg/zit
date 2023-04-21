@@ -8,19 +8,19 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 )
 
-type akteFormatter struct {
+type savedAkteFormatter struct {
 	arf schnittstellen.AkteReaderFactory
 }
 
-func MakeAkteFormatter(
+func MakeSavedAkteFormatter(
 	akteReaderFactory schnittstellen.AkteReaderFactory,
-) AkteFormatter {
-	return akteFormatter{
+) savedAkteFormatter {
+	return savedAkteFormatter{
 		arf: akteReaderFactory,
 	}
 }
 
-func (f akteFormatter) FormatAkte(
+func (f savedAkteFormatter) FormatSavedAkte(
 	w io.Writer,
 	sh schnittstellen.Sha,
 ) (n int64, err error) {

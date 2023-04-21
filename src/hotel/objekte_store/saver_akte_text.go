@@ -12,15 +12,15 @@ type AkteTextSaver[
 	T objekte.Objekte[T],
 	T1 objekte.ObjektePtr[T],
 ] interface {
-	SaveAkteText(T1) (int64, error)
+	SaveAkteText(T) (schnittstellen.Sha, int64, error)
 }
 
 type akteTextSaver[
 	T objekte.Objekte[T],
 	T1 objekte.ObjektePtr[T],
 ] struct {
-	awf           schnittstellen.AkteWriterFactory
-	akteFormatter schnittstellen.Formatter[T, T1]
+	awf        schnittstellen.AkteWriterFactory
+	akteFormat AkteFormat[T, T1]
 }
 
 func MakeAkteTextSaver[
@@ -28,17 +28,17 @@ func MakeAkteTextSaver[
 	T1 objekte.ObjektePtr[T],
 ](
 	awf schnittstellen.AkteWriterFactory,
-	akteFormatter schnittstellen.Formatter[T, T1],
-) *akteTextSaver[T, T1] {
-	return &akteTextSaver[T, T1]{
-		awf:           awf,
-		akteFormatter: akteFormatter,
+	akteFormat AkteFormat[T, T1],
+) akteTextSaver[T, T1] {
+	return akteTextSaver[T, T1]{
+		awf:        awf,
+		akteFormat: akteFormat,
 	}
 }
 
-func (h *akteTextSaver[T, T1]) SaveAkteText(
-	o T1,
-) (n int64, err error) {
+func (h akteTextSaver[T, T1]) SaveAkteText(
+	o T,
+) (sh schnittstellen.Sha, n int64, err error) {
 	var w sha.WriteCloser
 
 	if w, err = h.awf.AkteWriter(); err != nil {
@@ -48,12 +48,12 @@ func (h *akteTextSaver[T, T1]) SaveAkteText(
 
 	defer errors.DeferredCloser(&err, w)
 
-	if n, err = h.akteFormatter.Format(w, o); err != nil {
+	if n, err = h.akteFormat.FormatParsedAkte(w, o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	o.SetAkteSha(w.Sha())
+	sh = sha.Make(w.Sha())
 
 	return
 }

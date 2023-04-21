@@ -108,7 +108,8 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdateCheckedOut(
 		return
 	}
 
-	transactedPtr.Sku.ObjekteSha = sha.Make(ow.Sha())
+	os := sha.Make(ow.Sha())
+	transactedPtr.Sku.ObjekteSha = os
 
 	if transactedPtr.GetObjekteSha().EqualsSha(co.Internal.GetObjekteSha()) {
 		transactedPtr = &co.Internal

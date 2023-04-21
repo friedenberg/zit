@@ -1,4 +1,4 @@
-package kasten
+package objekte
 
 import (
 	"io"
@@ -9,37 +9,47 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 )
 
-type TextFormat struct {
-	arf              schnittstellen.AkteIOFactory
+type tomlAkteParseSaver[
+	O Objekte[O],
+	OPtr ObjektePtr[O],
+] struct {
+	awf              schnittstellen.AkteWriterFactory
 	ignoreTomlErrors bool
 }
 
-func MakeFormatText(arf schnittstellen.AkteIOFactory) *TextFormat {
-	return &TextFormat{
-		arf: arf,
+func MakeTomlAkteParseSaver[
+	O Objekte[O],
+	OPtr ObjektePtr[O],
+](awf schnittstellen.AkteWriterFactory,
+) tomlAkteParseSaver[O, OPtr] {
+	return tomlAkteParseSaver[O, OPtr]{
+		awf: awf,
 	}
 }
 
-func MakeFormatTextIgnoreTomlErrors(arf schnittstellen.AkteIOFactory) *TextFormat {
-	return &TextFormat{
-		arf:              arf,
+func MakeTextParserIgnoreTomlErrors[
+	O Objekte[O],
+	OPtr ObjektePtr[O],
+](awf schnittstellen.AkteWriterFactory,
+) tomlAkteParseSaver[O, OPtr] {
+	return tomlAkteParseSaver[O, OPtr]{
+		awf:              awf,
 		ignoreTomlErrors: true,
 	}
 }
 
-func (f TextFormat) Parse(r io.Reader, t *Objekte) (n int64, err error) {
-	return f.ReadFormat(r, t)
-}
-
-func (f TextFormat) ReadFormat(r io.Reader, t *Objekte) (n int64, err error) {
+func (f tomlAkteParseSaver[O, OPtr]) ParseSaveAkte(
+	r io.Reader,
+	t OPtr,
+) (sh schnittstellen.Sha, n int64, err error) {
 	var aw sha.WriteCloser
 
-	if aw, err = f.arf.AkteWriter(); err != nil {
+	if aw, err = f.awf.AkteWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.Deferred(&err, aw.Close)
+	defer errors.DeferredCloser(&err, aw)
 
 	pr, pw := io.Pipe()
 	td := toml.NewDecoder(pr)
@@ -64,7 +74,7 @@ func (f TextFormat) ReadFormat(r io.Reader, t *Objekte) (n int64, err error) {
 			}
 		}()
 
-		if err = td.Decode(&t.Akte); err != nil {
+		if err = td.Decode(t); err != nil {
 			switch {
 			case !errors.IsEOF(err) && !f.ignoreTomlErrors:
 				err = errors.Wrap(toml.MakeError(err))
@@ -95,34 +105,7 @@ func (f TextFormat) ReadFormat(r io.Reader, t *Objekte) (n int64, err error) {
 		return
 	}
 
-	t.Sha = sha.Make(aw.Sha())
-
-	return
-}
-
-func (f TextFormat) Format(w io.Writer, t *Objekte) (n int64, err error) {
-	return f.WriteFormat(w, t)
-}
-
-func (f TextFormat) WriteFormat(w io.Writer, t *Objekte) (n int64, err error) {
-	var ar sha.ReadCloser
-
-	if ar, err = f.arf.AkteReader(t.Sha); err != nil {
-		if errors.IsNotExist(err) {
-			err = nil
-		} else {
-			err = errors.Wrap(err)
-		}
-
-		return
-	}
-
-	defer errors.Deferred(&err, ar.Close)
-
-	if n, err = io.Copy(w, ar); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	sh = aw.Sha()
 
 	return
 }

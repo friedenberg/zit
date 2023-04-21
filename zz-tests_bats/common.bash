@@ -70,4 +70,8 @@ function run_zit_init {
 function run_zit_init_disable_age {
 	run_zit init -yin <(cat_yin) -yang <(cat_yang) -disable-age
 	assert_success
+	assert_output - <<-EOM
+		[!md@b986c1d21fcfb7f0fe11ae960236e3471b4001029a9e631d16899643922b2d15]
+		[konfig@f6d3d0874fd9475c2b7ac150f366cd211d847a8676ccabc35111cb357fd0c3b9]
+	EOM
 }

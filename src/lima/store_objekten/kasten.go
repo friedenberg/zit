@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
+	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/hotel/kasten"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
@@ -64,8 +65,11 @@ func makeKastenStore(
 		s,
 		sa,
 		s,
-		kasten.MakeFormatTextIgnoreTomlErrors(sa),
-		&kasten.FormatterAkteTextToml{},
+		objekte_store.MakeAkteFormat[kasten.Objekte, *kasten.Objekte](
+			objekte.MakeTextParserIgnoreTomlErrors[kasten.Objekte](sa),
+			objekte.ParsedAkteTomlFormatter[kasten.Objekte]{},
+			sa,
+		),
 	)
 
 	if err != nil {

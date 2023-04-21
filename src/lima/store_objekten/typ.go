@@ -65,8 +65,11 @@ func makeTypStore(
 		s,
 		sa,
 		s,
-		typ.MakeFormatTextIgnoreTomlErrors(sa),
-		&typ.FormatterAkteTextToml{},
+		objekte_store.MakeAkteFormat[typ.Objekte, *typ.Objekte](
+			objekte.MakeTextParserIgnoreTomlErrors[typ.Objekte](sa),
+			objekte.ParsedAkteTomlFormatter[typ.Objekte]{},
+			sa,
+		),
 	)
 
 	if err != nil {

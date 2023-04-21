@@ -52,7 +52,7 @@ type store struct {
 	oaf                       schnittstellen.ObjekteAkteFactory
 	pool                      schnittstellen.Pool[Objekte, *Objekte]
 	persistentMetadateiFormat persisted_metadatei_format.Format
-	AkteFormat
+	formatAkte
 	ObjekteInflator
 	ObjekteSaver
 	AkteTextSaver
@@ -64,14 +64,14 @@ func MakeStore(
 	pmf persisted_metadatei_format.Format,
 ) (s *store, err error) {
 	p := collections.MakePool[Objekte]()
-	af := MakeFormatAkte()
+	af := formatAkte{}
 
 	s = &store{
 		standort:                  standort,
 		oaf:                       oaf,
 		pool:                      p,
 		persistentMetadateiFormat: pmf,
-		AkteFormat:                af,
+		formatAkte:                af,
 		ObjekteInflator: objekte_store.MakeObjekteInflator[
 			Objekte,
 			*Objekte,
@@ -91,7 +91,14 @@ func MakeStore(
 		AkteTextSaver: objekte_store.MakeAkteTextSaver[
 			Objekte,
 			*Objekte,
-		](oaf, af),
+		](
+			oaf,
+			objekte_store.MakeAkteFormat[Objekte, *Objekte](
+				objekte.MakeReaderAkteParseSaver[Objekte, *Objekte](oaf, af),
+				af,
+				oaf,
+			),
+		),
 	}
 
 	return
@@ -103,7 +110,7 @@ func (s *store) Create(o *Objekte) (sh schnittstellen.Sha, err error) {
 		return
 	}
 
-	if s.SaveAkteText(o); err != nil {
+	if s.SaveAkteText(*o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -158,7 +165,7 @@ func (s *store) ReadOne(sh schnittstellen.Sha) (o *Objekte, err error) {
 
 	defer errors.DeferredCloser(&err, ar)
 
-	if _, err = s.AkteFormat.Parse(ar, o); err != nil {
+	if _, err = s.formatAkte.Parse(ar, o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

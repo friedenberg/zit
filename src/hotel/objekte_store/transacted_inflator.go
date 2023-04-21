@@ -47,7 +47,7 @@ type transactedInflator[
 	of                        schnittstellen.ObjekteIOFactory
 	af                        schnittstellen.AkteIOFactory
 	persistentMetadateiFormat persisted_metadatei_format.V0
-	akteFormatter                schnittstellen.Format[T, T1]
+	akteFormat                objekte.AkteFormat[T, T1]
 	pool                      schnittstellen.Pool[
 		objekte.Transacted[T, T1, T2, T3, T4, T5],
 		*objekte.Transacted[T, T1, T2, T3, T4, T5],
@@ -65,7 +65,7 @@ func MakeTransactedInflator[
 	of schnittstellen.ObjekteIOFactory,
 	af schnittstellen.AkteIOFactory,
 	persistentMetadateiFormat persisted_metadatei_format.V0,
-	akteFormatter schnittstellen.Format[T, T1],
+	akteFormat objekte.AkteFormat[T, T1],
 	pool schnittstellen.Pool[
 		objekte.Transacted[T, T1, T2, T3, T4, T5],
 		*objekte.Transacted[T, T1, T2, T3, T4, T5],
@@ -75,7 +75,7 @@ func MakeTransactedInflator[
 		of:                        of,
 		af:                        af,
 		persistentMetadateiFormat: persistentMetadateiFormat,
-		akteFormatter:                akteFormatter,
+		akteFormat:                akteFormat,
 		pool:                      pool,
 	}
 }
@@ -209,7 +209,7 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) StoreAkte(
 
 	defer errors.DeferredCloser(&err, aw)
 
-	if _, err = h.akteFormatter.Format(aw, &t.Objekte); err != nil {
+	if _, err = h.akteFormat.FormatSavedAkte(aw, t.GetAkteSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -310,7 +310,7 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) readObjekte(
 func (h *transactedInflator[T, T1, T2, T3, T4, T5]) readAkte(
 	t *objekte.Transacted[T, T1, T2, T3, T4, T5],
 ) (err error) {
-	if h.akteFormatter == nil {
+	if h.akteFormat == nil {
 		return
 	}
 
@@ -327,14 +327,19 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) readAkte(
 
 	defer errors.DeferredCloser(&err, r)
 
-	var n int64
+	var (
+		n  int64
+		sh schnittstellen.Sha
+	)
 
-	if n, err = h.akteFormatter.Parse(r, &t.Objekte); err != nil {
+	if sh, n, err = h.akteFormat.ParseSaveAkte(r, &t.Objekte); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	errors.Log().Printf("parsed %d akte bytes", n)
+	t.SetAkteSha(sh)
+
+	errors.Log().Printf("parsed %d akte bytes: %s", n, sh)
 
 	return
 }

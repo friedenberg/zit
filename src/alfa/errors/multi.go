@@ -125,13 +125,23 @@ func (e multi) Errors() (out []error) {
 }
 
 func (e multi) Error() string {
+	e.lock.Lock()
+	defer e.lock.Unlock()
+
+	switch len(e.slice) {
+	case 0:
+		return ""
+
+	case 1:
+		return e.slice[0].Error()
+
+	default:
+	}
+
 	sb := &strings.Builder{}
 
 	sb.WriteString("# Multiple Errors")
 	sb.WriteString("\n")
-
-	e.lock.Lock()
-	defer e.lock.Unlock()
 
 	for i, err := range e.slice {
 		sb.WriteString(fmt.Sprintf("Error %d:\n", i+1))

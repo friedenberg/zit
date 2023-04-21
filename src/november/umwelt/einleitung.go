@@ -10,6 +10,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/angeboren"
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/age"
@@ -126,12 +127,16 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 	if _, err = u.StoreObjekten().Typ().ReadOne(defaultTypKennung); err != nil {
 		err = nil
 
-		if _, err = u.StoreObjekten().Typ().SaveAkteText(
-			defaultTyp,
+		var sh schnittstellen.Sha
+
+		if sh, _, err = u.StoreObjekten().Typ().SaveAkteText(
+			*defaultTyp,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
+
+		defaultTyp.SetAkteSha(sh)
 
 		var defaultTypTransacted *typ.Transacted
 
@@ -143,19 +148,22 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 			return
 		}
 
-		u.KonfigPtr().AddTyp(defaultTypTransacted)
 		u.KonfigPtr().DefaultTyp = *defaultTypTransacted
 	}
 
 	{
 		defaultKonfig := erworben.Default()
 
-		if _, err = u.StoreObjekten().Konfig().SaveAkteText(
-			defaultKonfig,
+		var sh schnittstellen.Sha
+
+		if sh, _, err = u.StoreObjekten().Konfig().SaveAkteText(
+			*defaultKonfig,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
+
+		defaultKonfig.SetAkteSha(sh)
 
 		var defaultKonfigTransacted *erworben.Transacted
 

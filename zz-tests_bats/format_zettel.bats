@@ -26,10 +26,15 @@ function format_simple { # @test
 		]
 	EOM
 
+	# run cat .zit/Objekten/Akten/*/*
+	# assert_output ''
+
 	run_zit checkin -delete .t
 	assert_success
-
-	run_zit show -format debug !md:t
+	assert_output - <<-EOM
+		[!md@f493a68ab71003dc5f1aaca8a2c5f90a013c868a77574b7e8f3dfb94f5c8cfd7]
+		          deleted [md.typ]
+	EOM
 
 	run_zit format-zettel one/uno
 	assert_success

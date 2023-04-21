@@ -84,7 +84,7 @@ func (op PullServer) akteReaderForSha(
 		return
 	}
 
-	defer errors.Deferred(&err, or.Close)
+	defer errors.DeferredCloser(&err, or)
 
 	var n int64
 

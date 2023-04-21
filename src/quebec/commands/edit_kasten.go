@@ -1,241 +1,220 @@
 package commands
 
-import (
-	"flag"
-	"fmt"
-	"os"
-	"path"
+// type EditKasten struct{}
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
-	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/delta/gattungen"
-	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/sku"
-	"github.com/friedenberg/zit/src/hotel/kasten"
-	"github.com/friedenberg/zit/src/hotel/objekte_store"
-	"github.com/friedenberg/zit/src/november/umwelt"
-	"github.com/friedenberg/zit/src/oscar/user_ops"
-)
+// func init() {
+// 	registerCommand(
+// 		"edit-kasten",
+// 		func(f *flag.FlagSet) Command {
+// 			c := &EditKasten{}
 
-type EditKasten struct{}
+// 			return commandWithIds{CommandWithIds: c}
+// 		},
+// 	)
+// }
 
-func init() {
-	registerCommand(
-		"edit-kasten",
-		func(f *flag.FlagSet) Command {
-			c := &EditKasten{}
+// func (c EditKasten) CompletionGattung() gattungen.Set {
+// 	return gattungen.MakeSet(
+// 		gattung.Kasten,
+// 	)
+// }
 
-			return commandWithIds{CommandWithIds: c}
-		},
-	)
-}
+// func (c EditKasten) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
+// 	tks := ids.Kisten.ImmutableClone()
 
-func (c EditKasten) CompletionGattung() gattungen.Set {
-	return gattungen.MakeSet(
-		gattung.Kasten,
-	)
-}
+// 	switch {
+// 	case tks.Len() == 0 && !ids.Sigil.IncludesSchwanzen():
+// 		err = errors.Normalf("No Kisten specified for editing. To edit all, use -all.")
+// 		return
 
-func (c EditKasten) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
-	tks := ids.Kisten.ImmutableClone()
+// 	case ids.Sigil.IncludesSchwanzen() && tks.Len() > 0:
+// 		errors.Err().Print("Ignoring arguments because -all is set.")
 
-	switch {
-	case tks.Len() == 0 && !ids.Sigil.IncludesSchwanzen():
-		err = errors.Normalf("No Kisten specified for editing. To edit all, use -all.")
-		return
+// 		fallthrough
 
-	case ids.Sigil.IncludesSchwanzen() && tks.Len() > 0:
-		errors.Err().Print("Ignoring arguments because -all is set.")
+// 	case ids.Sigil.IncludesSchwanzen():
+// 		mtks := collections.MakeMutableSetStringer[kennung.Kasten]()
 
-		fallthrough
+// 		u.Konfig().Kisten.Each(
+// 			func(tt *kasten.Transacted) (err error) {
+// 				return mtks.Add(tt.Sku.Kennung)
+// 			},
+// 		)
 
-	case ids.Sigil.IncludesSchwanzen():
-		mtks := collections.MakeMutableSetStringer[kennung.Kasten]()
+// 		tks = mtks.ImmutableClone()
+// 	}
 
-		u.Konfig().Kisten.Each(
-			func(tt *kasten.Transacted) (err error) {
-				return mtks.Add(tt.Sku.Kennung)
-			},
-		)
+// 	var ps []string
 
-		tks = mtks.ImmutableClone()
-	}
+// 	if ps, err = c.makeTempKastenFiles(u, tks); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	var ps []string
+// 	openVimOp := user_ops.OpenVim{
+// 		Options: vim_cli_options_builder.New().
+// 			WithCursorLocation(2, 3).
+// 			WithFileType("zit-kasten").
+// 			WithInsertMode().
+// 			Build(),
+// 	}
 
-	if ps, err = c.makeTempKastenFiles(u, tks); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+// 	if _, err = openVimOp.Run(u, ps...); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	openVimOp := user_ops.OpenVim{
-		Options: vim_cli_options_builder.New().
-			WithCursorLocation(2, 3).
-			WithFileType("zit-kasten").
-			WithInsertMode().
-			Build(),
-	}
+// 	if err = u.Reset(); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	if _, err = openVimOp.Run(u, ps...); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+// 	var tes schnittstellen.Set[*kasten.External]
 
-	if err = u.Reset(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+// 	if tes, err = c.readTempKastenFiles(u, ps); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	var tes schnittstellen.Set[*kasten.External]
+// 	if err = u.Lock(); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	if tes, err = c.readTempKastenFiles(u, ps); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+// 	defer errors.Deferred(&err, u.Unlock)
 
-	if err = u.Lock(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+// 	if err = tes.Each(
+// 		func(e *kasten.External) (err error) {
+// 			if _, err = u.StoreObjekten().Kasten().CreateOrUpdate(
+// 				&e.Objekte,
+// 				&e.Sku.Kennung,
+// 			); err != nil {
+// 				err = errors.Wrap(err)
+// 				return
+// 			}
 
-	defer errors.Deferred(&err, u.Unlock)
+// 			return
+// 		},
+// 	); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	if err = tes.Each(
-		func(e *kasten.External) (err error) {
-			if _, err = u.StoreObjekten().Kasten().CreateOrUpdate(
-				&e.Objekte,
-				&e.Sku.Kennung,
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+// 	return
+// }
 
-			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+// func (c EditKasten) makeTempKastenFiles(
+// 	u *umwelt.Umwelt,
+// 	tks schnittstellen.Set[kennung.Kasten],
+// ) (ps []string, err error) {
+// 	ps = make([]string, 0, tks.Len())
 
-	return
-}
+// 	var tempDir string
 
-func (c EditKasten) makeTempKastenFiles(
-	u *umwelt.Umwelt,
-	tks schnittstellen.Set[kennung.Kasten],
-) (ps []string, err error) {
-	ps = make([]string, 0, tks.Len())
+// 	if tempDir, err = u.Standort().DirTempOS(); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	var tempDir string
+// 	format := kasten.MakeFormatText(u.StoreObjekten())
 
-	if tempDir, err = u.Standort().DirTempOS(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+// 	if err = tks.Each(
+// 		func(tk kennung.Kasten) (err error) {
+// 			var tt *kasten.Transacted
 
-	format := kasten.MakeFormatText(u.StoreObjekten())
+// 			if tt, err = u.StoreObjekten().Kasten().ReadOne(&tk); err != nil {
+// 				if errors.Is(err, objekte_store.ErrNotFound{}) {
+// 					err = nil
+// 					tt = &kasten.Transacted{
+// 						Sku: sku.Transacted[kennung.Kasten, *kennung.Kasten]{
+// 							Kennung: tk,
+// 						},
+// 					}
+// 				} else {
+// 					err = errors.Wrap(err)
+// 					return
+// 				}
+// 			}
 
-	if err = tks.Each(
-		func(tk kennung.Kasten) (err error) {
-			var tt *kasten.Transacted
+// 			var f *os.File
 
-			if tt, err = u.StoreObjekten().Kasten().ReadOne(&tk); err != nil {
-				if errors.Is(err, objekte_store.ErrNotFound{}) {
-					err = nil
-					tt = &kasten.Transacted{
-						Sku: sku.Transacted[kennung.Kasten, *kennung.Kasten]{
-							Kennung: tk,
-						},
-					}
-				} else {
-					err = errors.Wrap(err)
-					return
-				}
-			}
+// 			if f, err = files.CreateExclusiveWriteOnly(
+// 				path.Join(
+// 					tempDir,
+// 					fmt.Sprintf("%s.%s", tk.String(), u.Konfig().FileExtensions.Kasten),
+// 				),
+// 			); err != nil {
+// 				err = errors.Wrap(err)
+// 				return
+// 			}
 
-			var f *os.File
+// 			defer errors.Deferred(&err, f.Close)
 
-			if f, err = files.CreateExclusiveWriteOnly(
-				path.Join(
-					tempDir,
-					fmt.Sprintf("%s.%s", tk.String(), u.Konfig().FileExtensions.Kasten),
-				),
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+// 			ps = append(ps, f.Name())
 
-			defer errors.Deferred(&err, f.Close)
+// 			if _, err = format.Format(f, &tt.Objekte); err != nil {
+// 				err = errors.Wrap(err)
+// 				return
+// 			}
 
-			ps = append(ps, f.Name())
+// 			return
+// 		},
+// 	); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-			if _, err = format.Format(f, &tt.Objekte); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+// 	return
+// }
 
-			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+// func (c EditKasten) readTempKastenFiles(
+// 	u *umwelt.Umwelt,
+// 	ps []string,
+// ) (out schnittstellen.Set[*kasten.External], err error) {
+// 	ts := collections.MakeMutableSet[*kasten.External](
+// 		kasten.ExternalKeyer{}.Key,
+// 	)
 
-	return
-}
+// 	formatText := kasten.MakeFormatText(u.StoreObjekten())
 
-func (c EditKasten) readTempKastenFiles(
-	u *umwelt.Umwelt,
-	ps []string,
-) (out schnittstellen.Set[*kasten.External], err error) {
-	ts := collections.MakeMutableSet[*kasten.External](
-		kasten.ExternalKeyer{}.Key,
-	)
+// 	for _, p := range ps {
+// 		func() {
+// 			var f *os.File
 
-	formatText := kasten.MakeFormatText(u.StoreObjekten())
+// 			if f, err = files.Open(p); err != nil {
+// 				err = errors.Wrap(err)
+// 				return
+// 			}
 
-	for _, p := range ps {
-		func() {
-			var f *os.File
+// 			defer errors.Deferred(&err, f.Close)
 
-			if f, err = files.Open(p); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+// 			var fdee kennung.FD
 
-			defer errors.Deferred(&err, f.Close)
+// 			if fdee, err = kennung.File(f); err != nil {
+// 				err = errors.Wrap(err)
+// 				return
+// 			}
 
-			var fdee kennung.FD
+// 			te := &kasten.External{
+// 				Sku: sku.External[kennung.Kasten, *kennung.Kasten]{
+// 					Kennung: kennung.MustKasten(fdee.FileNameSansExt()),
+// 					FDs: sku.ExternalFDs{
+// 						Objekte: fdee,
+// 					},
+// 				},
+// 			}
 
-			if fdee, err = kennung.File(f); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+// 			// TODO-P2 offer option to edit again
+// 			if _, err = formatText.Parse(f, &te.Objekte); err != nil {
+// 				err = errors.Wrap(err)
+// 				return
+// 			}
 
-			te := &kasten.External{
-				Sku: sku.External[kennung.Kasten, *kennung.Kasten]{
-					Kennung: kennung.MustKasten(fdee.FileNameSansExt()),
-					FDs: sku.ExternalFDs{
-						Objekte: fdee,
-					},
-				},
-			}
+// 			ts.Add(te)
+// 		}()
+// 	}
 
-			// TODO-P2 offer option to edit again
-			if _, err = formatText.Parse(f, &te.Objekte); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+// 	out = ts.ImmutableClone()
 
-			ts.Add(te)
-		}()
-	}
-
-	out = ts.ImmutableClone()
-
-	return
-}
+// 	return
+// }

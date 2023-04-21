@@ -93,6 +93,12 @@ function checkin_simple_typ { # @test
 		[!md@acbfc0e07b1be4bf1b12020d8316fe9629518b015041b7120db5a9f2012c84fa]
 	EOM
 
+	run_zit show -format log !md.t
+	assert_success
+	assert_output - <<-EOM
+		[!md@acbfc0e07b1be4bf1b12020d8316fe9629518b015041b7120db5a9f2012c84fa]
+	EOM
+
 	run_zit show -format vim-syntax-type !md.typ
 	assert_success
 	assert_output 'test'

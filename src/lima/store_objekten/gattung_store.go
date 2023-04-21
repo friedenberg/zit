@@ -205,7 +205,7 @@ type commonStore[
 	VPtr schnittstellen.VerzeichnissePtr[V, O],
 ] struct {
 	commonStoreBase[O, OPtr, K, KPtr, V, VPtr]
-	TextFormat schnittstellen.Format[O, OPtr]
+	AkteFormat objekte_store.AkteFormat[O, OPtr]
 	objekte_store.ParseSaver[O, OPtr, K, KPtr]
 }
 
@@ -222,8 +222,7 @@ func makeCommonStoreBase[
 	tr objekte_store.TransactedReader[KPtr,
 		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]],
 	pmf persisted_metadatei_format.Format,
-	textFormat schnittstellen.Format[O, OPtr],
-	akteFormatter schnittstellen.Formatter[O, OPtr],
+	akteFormat objekte_store.AkteFormat[O, OPtr],
 ) (s *commonStoreBase[O, OPtr, K, KPtr, V, VPtr], err error) {
 	// type T objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]
 	// type TPtr *objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]
@@ -248,7 +247,7 @@ func makeCommonStoreBase[
 			sa,
 			sa,
 			persisted_metadatei_format.V0{},
-			textFormat,
+			akteFormat,
 			pool,
 		),
 		AkteTextSaver: objekte_store.MakeAkteTextSaver[
@@ -256,7 +255,7 @@ func makeCommonStoreBase[
 			OPtr,
 		](
 			sa,
-			akteFormatter,
+			akteFormat,
 		),
 		TransactedReader:          tr,
 		persistentMetadateiFormat: pmf,
@@ -277,8 +276,7 @@ func makeCommonStore[
 	sa store_util.StoreUtil,
 	tr objekte_store.TransactedReader[KPtr,
 		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]],
-	textFormat schnittstellen.Format[O, OPtr],
-	akteFormatter schnittstellen.Formatter[O, OPtr],
+	akteFormat objekte_store.AkteFormat[O, OPtr],
 ) (s *commonStore[O, OPtr, K, KPtr, V, VPtr], err error) {
 	pool := collections.MakePool[
 		objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
@@ -308,7 +306,7 @@ func makeCommonStore[
 				sa,
 				sa,
 				persisted_metadatei_format.V0{},
-				textFormat,
+				akteFormat,
 				pool,
 			),
 			AkteTextSaver: objekte_store.MakeAkteTextSaver[
@@ -316,11 +314,11 @@ func makeCommonStore[
 				OPtr,
 			](
 				sa,
-				akteFormatter,
+				akteFormat,
 			),
 			TransactedReader: tr,
 		},
-		TextFormat: textFormat,
+		AkteFormat: akteFormat,
 		ParseSaver: objekte_store.MakeParseSaver[
 			O,
 			OPtr,
@@ -329,7 +327,7 @@ func makeCommonStore[
 		](
 			sa,
 			sa,
-			textFormat,
+			akteFormat,
 			sa.GetPersistentMetadateiFormat(),
 		),
 	}
@@ -483,7 +481,7 @@ func (s *commonStore[O, OPtr, K, KPtr, V, VPtr]) CheckoutOne(
 		return
 	}
 
-	if _, err = s.TextFormat.Format(f, &t.Objekte); err != nil {
+	if _, err = s.AkteFormat.Format(f, &t.Objekte); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

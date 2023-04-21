@@ -13,11 +13,7 @@ import (
 
 type formatAkte struct{}
 
-func MakeFormatAkte() *formatAkte {
-	return &formatAkte{}
-}
-
-func (f *formatAkte) Parse(r io.Reader, o *Objekte) (n int64, err error) {
+func (f formatAkte) Parse(r io.Reader, o *Objekte) (n int64, err error) {
 	if n, err = format.ReadLines(
 		r,
 		func(v string) (err error) {
@@ -31,7 +27,11 @@ func (f *formatAkte) Parse(r io.Reader, o *Objekte) (n int64, err error) {
 	return
 }
 
-func (f *formatAkte) Format(w io.Writer, o *Objekte) (n int64, err error) {
+func (f formatAkte) Format(w io.Writer, o Objekte) (n int64, err error) {
+	return f.FormatParsedAkte(w, o)
+}
+
+func (f formatAkte) FormatParsedAkte(w io.Writer, o Objekte) (n int64, err error) {
 	bw := bufio.NewWriter(w)
 	defer errors.DeferredFlusher(&err, bw)
 

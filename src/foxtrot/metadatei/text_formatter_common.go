@@ -47,12 +47,14 @@ func (f textFormatterCommon) writeCommonMetadateiFormat(
 		)
 	}
 
-	for _, e := range collections.SortedValues(m.Etiketten) {
-		if e.IsEmpty() {
-			continue
-		}
+	if m.Etiketten != nil {
+		for _, e := range collections.SortedValues(m.Etiketten) {
+			if e.IsEmpty() {
+				continue
+			}
 
-		w.WriteFormat("- %s", e)
+			w.WriteFormat("- %s", e)
+		}
 	}
 
 	if n, err = w.WriteTo(w1); err != nil {

@@ -102,7 +102,7 @@ func (c EditKonfig) makeTempKonfigFile(
 
 	p = f.Name()
 
-	format := erworben.MakeFormatText(u.StoreObjekten())
+	format := u.StoreObjekten().Konfig().GetAkteFormat()
 
 	if _, err = format.Format(f, &k.Objekte); err != nil {
 		err = errors.Wrap(err)
@@ -125,7 +125,7 @@ func (c EditKonfig) readTempKonfigFile(
 
 	defer errors.Deferred(&err, f.Close)
 
-	format := erworben.MakeFormatText(u.StoreObjekten())
+	format := u.StoreObjekten().Konfig().GetAkteFormat()
 
 	k = &erworben.Objekte{}
 

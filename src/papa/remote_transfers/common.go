@@ -40,7 +40,13 @@ func (c common) GetInheritorZettel(
 			c.StoreObjekten(),
 		),
 		persisted_metadatei_format.V0{},
-		objekte.MakeNopAkteFormat[zettel.Objekte, *zettel.Objekte](),
+		objekte_store.MakeAkteFormat[zettel.Objekte, *zettel.Objekte](
+			objekte.MakeNopAkteParseSaver[zettel.Objekte, *zettel.Objekte](
+				c.StoreObjekten(),
+			),
+			nil,
+			c.StoreObjekten(),
+		),
 		p,
 	)
 
@@ -75,7 +81,11 @@ func (c common) GetInheritorTyp(
 			c.StoreObjekten(),
 		),
 		persisted_metadatei_format.V0{},
-		typ.MakeFormatTextIgnoreTomlErrors(c.StoreObjekten()),
+		objekte_store.MakeAkteFormat[typ.Objekte, *typ.Objekte](
+			objekte.MakeTextParserIgnoreTomlErrors[typ.Objekte](c.StoreObjekten()),
+			objekte.ParsedAkteTomlFormatter[typ.Objekte]{},
+			c.StoreObjekten(),
+		),
 		p,
 	)
 
