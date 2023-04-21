@@ -50,7 +50,7 @@ type ZettelStore interface {
 		*zettel.Transacted,
 	]
 
-	WriteZettelObjekte(z zettel.Objekte) (sh sha.Sha, err error)
+	WriteZettelObjekte(z metadatei.Getter) (sh sha.Sha, err error)
 }
 
 type zettelStore struct {
@@ -138,7 +138,9 @@ func (s *zettelStore) Flush() (err error) {
 	return
 }
 
-func (s zettelStore) WriteZettelObjekte(z zettel.Objekte) (sh sha.Sha, err error) {
+func (s zettelStore) WriteZettelObjekte(
+	z metadatei.Getter,
+) (sh sha.Sha, err error) {
 	// no lock required
 
 	var wc sha.WriteCloser
@@ -150,7 +152,10 @@ func (s zettelStore) WriteZettelObjekte(z zettel.Objekte) (sh sha.Sha, err error
 
 	defer errors.DeferredCloser(&err, wc)
 
-	if _, err = s.StoreUtil.GetPersistentMetadateiFormat().Format(wc, z); err != nil {
+	if _, err = s.StoreUtil.GetPersistentMetadateiFormat().Format(
+		wc,
+		z,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
