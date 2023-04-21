@@ -65,7 +65,10 @@ func makeEtikettStore(
 		s,
 		sa,
 		s,
-		etikett.MakeFormatText(sa),
+		objekte_store.MakeAkteFormat[etikett.Objekte, *etikett.Objekte](
+			etikett.MakeTextParser(sa),
+			sa,
+		),
 		&etikett.FormatterAkteTextToml{},
 	)
 

@@ -10,17 +10,20 @@ import (
 )
 
 // TODO-P1 rename to TextFormat
-type FormatText struct {
+type textParser struct {
 	arf schnittstellen.AkteIOFactory
 }
 
-func MakeFormatText(arf schnittstellen.AkteIOFactory) *FormatText {
-	return &FormatText{
+func MakeTextParser(arf schnittstellen.AkteIOFactory) textParser {
+	return textParser{
 		arf: arf,
 	}
 }
 
-func (f FormatText) Parse(r io.Reader, t *Objekte) (n int64, err error) {
+func (f textParser) ParseSaveAkte(
+	r io.Reader,
+	t *Objekte,
+) (sh schnittstellen.Sha, n int64, err error) {
 	var aw sha.WriteCloser
 
 	if aw, err = f.arf.AkteWriter(); err != nil {
@@ -28,7 +31,7 @@ func (f FormatText) Parse(r io.Reader, t *Objekte) (n int64, err error) {
 		return
 	}
 
-	defer errors.Deferred(&err, aw.Close)
+	defer errors.DeferredCloser(&err, aw)
 
 	pr, pw := io.Pipe()
 	td := toml.NewDecoder(pr)
@@ -61,30 +64,17 @@ func (f FormatText) Parse(r io.Reader, t *Objekte) (n int64, err error) {
 
 	<-chDone
 
-	t.Sha = sha.Make(aw.Sha())
+	sh = sha.Make(aw.Sha())
 
 	return
 }
 
-func (f FormatText) Format(w io.Writer, t *Objekte) (n int64, err error) {
-	var ar sha.ReadCloser
+func (f textParser) Parse(r io.Reader, t *Objekte) (n int64, err error) {
+	var sh schnittstellen.Sha
 
-	if ar, err = f.arf.AkteReader(t.Sha); err != nil {
-		if errors.IsNotExist(err) {
-			err = nil
-		} else {
-			err = errors.Wrap(err)
-		}
+	sh, n, err = f.ParseSaveAkte(r, t)
 
-		return
-	}
-
-	defer errors.Deferred(&err, ar.Close)
-
-	if n, err = io.Copy(w, ar); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	t.Sha = sha.Make(sh)
 
 	return
 }

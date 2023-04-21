@@ -38,10 +38,10 @@ func (f *FormatterValue) FuncFormatter(
 ) schnittstellen.FuncIter[*Transacted] {
 	switch f.string {
 	case "text":
-		f := MakeFormatText(af)
+		f := objekte.MakeAkteFormatter(af)
 
 		return func(o *Transacted) (err error) {
-			if _, err = f.Format(out, &o.Objekte); err != nil {
+			if _, err = f.FormatAkte(out, o.GetAkteSha()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
