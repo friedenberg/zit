@@ -520,12 +520,27 @@ func (s *zettelStore) Update(
 		return
 	}
 
-	var shaObj sha.Sha
+	tr := s.StoreUtil.GetTransaktionStore().GetTransaktion()
 
-	if shaObj, err = s.WriteZettelObjekte(*z); err != nil {
+	tz = &zettel.Transacted{
+		Objekte: *z,
+		Sku: sku.Transacted[kennung.Hinweis, *kennung.Hinweis]{
+			Kennung: *h,
+			Verzeichnisse: sku.Verzeichnisse{
+				Kopf:    tr.Time,
+				Schwanz: tr.Time,
+			},
+		},
+	}
+
+	tz.Verzeichnisse.ResetWithObjekte(tz.Objekte)
+
+	if err = s.SaveObjekte(tz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	shaObj := sha.Make(tz.GetObjekteSha())
 
 	if shaObj.Equals(mutter.Sku.ObjekteSha) {
 		tz = mutter
