@@ -158,9 +158,9 @@ func (fv *FormatterValue) FuncFormatter(
 			}
 
 			if _, err = f.Format(
-        out,
-        o,
-      ); err != nil {
+				out,
+				o,
+			); err != nil {
 				err = errors.Wrapf(err, "Hinweis: %s", o.Sku.Kennung)
 
 				if errors.IsNotExist(err) {
