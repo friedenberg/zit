@@ -428,19 +428,7 @@ func (s *zettelStore) UpdateCheckedOut(
 		return
 	}
 
-	s.StoreUtil.CommitTransacted(t)
-
-	if err = s.writeNamedZettelToIndex(t); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.StoreUtil.AddMatchable(t); err != nil {
-		err = errors.Wrapf(err, "failed to write zettel to index: %s", t.Sku)
-		return
-	}
-
-	if err = s.LogWriter.Updated(t); err != nil {
+	if err = s.commitIndexMatchUpdate(t); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -479,22 +467,10 @@ func (s *zettelStore) Update(
 		return
 	}
 
-	tr := s.StoreUtil.GetTransaktionStore().GetTransaktion()
-
-	tz = &zettel.Transacted{
-		Objekte: *z,
-		Sku: sku.Transacted[kennung.Hinweis, *kennung.Hinweis]{
-			Kennung: *h,
-			Verzeichnisse: sku.Verzeichnisse{
-				Kopf:    tr.Time,
-				Schwanz: tr.Time,
-			},
-		},
-	}
-
-	tz.Verzeichnisse.ResetWithObjekte(tz.Objekte)
-
-	if err = s.SaveObjekte(tz); err != nil {
+	if tz, err = s.writeObjekte(
+		*z,
+		*h,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -512,6 +488,17 @@ func (s *zettelStore) Update(
 		return
 	}
 
+	if err = s.commitIndexMatchUpdate(tz); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *zettelStore) commitIndexMatchUpdate(
+	tz *zettel.Transacted,
+) (err error) {
 	s.StoreUtil.CommitTransacted(tz)
 
 	if err = s.writeNamedZettelToIndex(tz); err != nil {
@@ -528,15 +515,6 @@ func (s *zettelStore) Update(
 		err = errors.Wrap(err)
 		return
 	}
-
-	return
-}
-
-func (s *zettelStore) addZettelToTransaktion(
-	zo *zettel.Objekte,
-	zk *kennung.Hinweis,
-) (tz *zettel.Transacted, err error) {
-	errors.Log().Printf("adding zettel to transaktion: %s", zk)
 
 	return
 }
