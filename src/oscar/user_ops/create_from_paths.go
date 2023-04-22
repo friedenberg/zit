@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/delta/kennung"
@@ -207,28 +206,26 @@ func (c *CreateFromPaths) zettelsFromPath(
 		return
 	}
 
-	var s sha.Sha
+	ze := &zettel.External{
+		Sku: sku.External[kennung.Hinweis, *kennung.Hinweis]{
+			FDs: sku.ExternalFDs{
+				Objekte: kennung.FD{
+					Path: p,
+				},
+			},
+		},
+		Objekte: t.Objekte,
+	}
 
-	if s, err = c.StoreObjekten().Zettel().WriteZettelObjekte(
-		t.Objekte,
-	); err != nil {
+	if err = c.StoreObjekten().Zettel().SaveObjekte(ze); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	wf(
-		&zettel.External{
-			Sku: sku.External[kennung.Hinweis, *kennung.Hinweis]{
-				FDs: sku.ExternalFDs{
-					Objekte: kennung.FD{
-						Path: p,
-					},
-				},
-				ObjekteSha: s,
-			},
-			Objekte: t.Objekte,
-		},
-	)
+	if err = wf(ze); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }

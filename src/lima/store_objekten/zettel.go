@@ -48,8 +48,6 @@ type ZettelStore interface {
 		// schnittstellen.Value,
 		*zettel.Transacted,
 	]
-
-	WriteZettelObjekte(z metadatei.Getter) (sh sha.Sha, err error)
 }
 
 type zettelStore struct {
