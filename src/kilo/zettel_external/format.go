@@ -1,9 +1,12 @@
 package zettel_external
 
-import "github.com/friedenberg/zit/src/alfa/schnittstellen"
+import (
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/golf/objekte"
+)
 
 type (
-	Parser    = schnittstellen.Parser[Zettel, *Zettel]
+	Parser    = objekte.AkteParser[*Zettel]
 	Formatter = schnittstellen.Formatter[Zettel, *Zettel]
 )
 
