@@ -103,7 +103,7 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdateCheckedOut(
 
 	defer errors.DeferredCloser(&err, ow)
 
-	if _, err = cou.persistentMetadateiFormat.Format(
+	if _, err = cou.persistentMetadateiFormat.FormatPersistentMetadatei(
 		ow,
 		transactedPtr.Objekte,
 	); err != nil {
@@ -188,7 +188,7 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdate(
 
 	defer errors.DeferredCloser(&err, ow)
 
-	if _, err = cou.persistentMetadateiFormat.Format(
+	if _, err = cou.persistentMetadateiFormat.FormatPersistentMetadatei(
 		ow,
 		transactedPtr.Objekte,
 	); err != nil {

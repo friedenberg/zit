@@ -153,7 +153,7 @@ func (s *store) ReadOne(sh schnittstellen.Sha) (o *Objekte, err error) {
 
 	o = s.pool.Get()
 
-	if _, err = s.persistentMetadateiFormat.Parse(or, o); err != nil {
+	if _, err = s.persistentMetadateiFormat.ParsePersistentMetadatei(or, o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

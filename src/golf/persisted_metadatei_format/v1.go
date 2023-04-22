@@ -14,7 +14,7 @@ import (
 
 type v1 struct{}
 
-func (f v1) Format(
+func (f v1) FormatPersistentMetadatei(
 	w1 io.Writer,
 	c FormatterContext,
 ) (n int64, err error) {
@@ -43,7 +43,7 @@ func (f v1) Format(
 	return
 }
 
-func (f v1) Parse(
+func (f v1) ParsePersistentMetadatei(
 	r1 io.Reader,
 	c ParserContext,
 ) (n int64, err error) {

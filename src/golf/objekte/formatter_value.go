@@ -77,7 +77,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		f := persisted_metadatei_format.FormatForVersion(k.GetStoreVersion())
 
 		return func(tl TransactedLike) (err error) {
-			if _, err = f.Format(out, tl); err != nil {
+			if _, err = f.FormatPersistentMetadatei(out, tl); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

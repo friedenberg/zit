@@ -170,7 +170,7 @@ func (s konfigStore) Update(
 		kt.Sku.Kopf = s.StoreUtil.GetTime()
 	}
 
-	if _, err = s.StoreUtil.GetPersistentMetadateiFormat().Format(
+	if _, err = s.StoreUtil.GetPersistentMetadateiFormat().FormatPersistentMetadatei(
 		ow,
 		kt.Objekte,
 	); err != nil {
@@ -233,7 +233,7 @@ func (s konfigStore) Read() (tt *erworben.Transacted, err error) {
 
 			defer errors.Deferred(&err, r.Close)
 
-			if _, err = s.StoreUtil.GetPersistentMetadateiFormat().Parse(
+			if _, err = s.StoreUtil.GetPersistentMetadateiFormat().ParsePersistentMetadatei(
 				r,
 				&tt.Objekte,
 			); err != nil {

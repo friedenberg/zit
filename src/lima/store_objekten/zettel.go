@@ -152,7 +152,7 @@ func (s zettelStore) WriteZettelObjekte(
 
 	defer errors.DeferredCloser(&err, wc)
 
-	if _, err = s.StoreUtil.GetPersistentMetadateiFormat().Format(
+	if _, err = s.StoreUtil.GetPersistentMetadateiFormat().FormatPersistentMetadatei(
 		wc,
 		z,
 	); err != nil {

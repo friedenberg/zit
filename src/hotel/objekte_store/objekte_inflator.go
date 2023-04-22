@@ -95,7 +95,7 @@ func (h *objekteInflator[T, T1, T2, T3]) readObjekte(
 
 	var n int64
 
-	if n, err = h.persistentMetadateiFormat.Parse(r, o); err != nil {
+	if n, err = h.persistentMetadateiFormat.ParsePersistentMetadatei(r, o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

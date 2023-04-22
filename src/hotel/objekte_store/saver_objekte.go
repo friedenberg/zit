@@ -56,7 +56,7 @@ func (h *objekteSaver[T, T1]) SaveObjekte(
 
 	defer errors.Deferred(&err, w.Close)
 
-	if _, err = h.formatter.Format(w, o); err != nil {
+	if _, err = h.formatter.FormatPersistentMetadatei(w, o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

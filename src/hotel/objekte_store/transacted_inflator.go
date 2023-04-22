@@ -232,7 +232,7 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) StoreObjekte(
 
 	defer errors.DeferredCloser(&err, ow)
 
-	if _, err = h.persistentMetadateiFormat.Format(
+	if _, err = h.persistentMetadateiFormat.FormatPersistentMetadatei(
 		ow,
 		t.Objekte,
 	); err != nil {
@@ -283,7 +283,7 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) readObjekte(
 
 	var n int64
 
-	if n, err = h.persistentMetadateiFormat.Parse(r, T1(&t.Objekte)); err != nil {
+	if n, err = h.persistentMetadateiFormat.ParsePersistentMetadatei(r, T1(&t.Objekte)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
