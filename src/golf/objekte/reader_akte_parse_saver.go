@@ -13,7 +13,7 @@ type readerAkteParseSaver[
 	OPtr ObjektePtr[O],
 ] struct {
 	awf    schnittstellen.AkteWriterFactory
-	reader schnittstellen.Parser[O, OPtr]
+	parser AkteParser[OPtr]
 }
 
 func MakeReaderAkteParseSaver[
@@ -21,11 +21,11 @@ func MakeReaderAkteParseSaver[
 	OPtr ObjektePtr[O],
 ](
 	awf schnittstellen.AkteWriterFactory,
-	reader schnittstellen.Parser[O, OPtr],
+	parser AkteParser[OPtr],
 ) readerAkteParseSaver[O, OPtr] {
 	return readerAkteParseSaver[O, OPtr]{
 		awf:    awf,
-		reader: reader,
+		parser: parser,
 	}
 }
 
@@ -41,6 +41,8 @@ func (f readerAkteParseSaver[O, OPtr]) ParseSaveAkte(
 	}
 
 	defer errors.DeferredCloser(&err, aw)
+
+	var n1 int64
 
 	pr, pw := io.Pipe()
 
@@ -60,7 +62,7 @@ func (f readerAkteParseSaver[O, OPtr]) ParseSaveAkte(
 			}
 		}()
 
-		if _, err = f.reader.Parse(pr, t); err != nil {
+		if n1, err = f.parser.ParseAkte(pr, t); err != nil {
 			pr.CloseWithError(err)
 		}
 	}(pr)
@@ -74,6 +76,16 @@ func (f readerAkteParseSaver[O, OPtr]) ParseSaveAkte(
 
 	if err = pw.Close(); err != nil {
 		err = errors.Wrap(err)
+		return
+	}
+
+	if n != n1 {
+		err = errors.Errorf(
+			"parser read %d bytes while akte writer read %d",
+			n1,
+			n,
+		)
+
 		return
 	}
 

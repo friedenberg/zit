@@ -167,7 +167,7 @@ func (s *store) ReadOne(sh schnittstellen.Sha) (o *Objekte, err error) {
 
 	defer errors.DeferredCloser(&err, ar)
 
-	if _, err = s.formatAkte.Parse(ar, o); err != nil {
+	if _, err = s.formatAkte.ParseAkte(ar, o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

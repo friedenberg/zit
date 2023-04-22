@@ -13,7 +13,7 @@ import (
 
 type formatAkte struct{}
 
-func (f formatAkte) Parse(r io.Reader, o *Objekte) (n int64, err error) {
+func (f formatAkte) ParseAkte(r io.Reader, o *Objekte) (n int64, err error) {
 	if n, err = format.ReadLines(
 		r,
 		func(v string) (err error) {
