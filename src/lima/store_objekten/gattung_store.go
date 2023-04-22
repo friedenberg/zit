@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/todo"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
@@ -110,12 +109,27 @@ func makeCommonStore[
 		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]],
 	akteFormat objekte.AkteFormat[O, OPtr],
 ) (s *commonStore[O, OPtr, K, KPtr, V, VPtr], err error) {
-	pool := collections.MakePool[
-		objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
-		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
-	]()
+	// pool := collections.MakePool[
+	// 	objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
+	// 	*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
+	// ]()
 
 	of := sa.ObjekteReaderWriterFactory(gg)
+
+	csb, err := makeCommonStoreBase[O, OPtr, K, KPtr, V, VPtr](
+		gg,
+		delegate,
+		sa,
+		tr,
+		persisted_metadatei_format.FormatForVersion(
+			sa.GetKonfig().GetStoreVersion(),
+		),
+		akteFormat,
+	)
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	s = &commonStore[
 		O,
@@ -125,38 +139,8 @@ func makeCommonStore[
 		V,
 		VPtr,
 	]{
-		commonStoreBase: commonStoreBase[O, OPtr, K, KPtr, V, VPtr]{
-			GattungGetter:       gg,
-			ObjekteIOFactory:    of,
-			commonStoreDelegate: delegate,
-			StoreUtil:           sa,
-			pool:                pool,
-			TransactedInflator: objekte_store.MakeTransactedInflator[
-				O,
-				OPtr,
-				K,
-				KPtr,
-				V,
-				VPtr,
-			](
-				of,
-				sa,
-				persisted_metadatei_format.FormatForVersion(
-					sa.GetKonfig().GetStoreVersion(),
-				),
-				akteFormat,
-				pool,
-			),
-			AkteTextSaver: objekte_store.MakeAkteTextSaver[
-				O,
-				OPtr,
-			](
-				sa,
-				akteFormat,
-			),
-			TransactedReader: tr,
-		},
-		AkteFormat: akteFormat,
+		commonStoreBase: *csb,
+		AkteFormat:      akteFormat,
 		StoredParseSaver: objekte_store.MakeStoredParseSaver[O, OPtr, K, KPtr](
 			of,
 			sa,

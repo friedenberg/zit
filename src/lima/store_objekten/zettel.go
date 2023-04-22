@@ -97,6 +97,10 @@ func makeZettelStore(
 		nil,
 	)
 
+	if s.commonStore.ObjekteSaver == nil {
+		panic("ObjekteSaver is nil")
+	}
+
 	if err != nil {
 		err = errors.Wrap(err)
 		return
@@ -641,7 +645,7 @@ func (s *zettelStore) transactedWithHead(
 func (s *zettelStore) Inherit(tz *zettel.Transacted) (err error) {
 	errors.Log().Printf("inheriting %s", tz.Sku.ObjekteSha)
 
-	if _, err = s.WriteZettelObjekte(tz.Objekte); err != nil {
+	if err = s.SaveObjekte(tz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

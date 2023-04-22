@@ -52,7 +52,10 @@ func (c common) GetInheritorZettel(
 		p,
 	)
 
-	return objekte_store.MakeTransactedInheritor[zettel.Transacted, *zettel.Transacted](
+	return objekte_store.MakeTransactedInheritor[
+		zettel.Transacted,
+		*zettel.Transacted,
+	](
 		inflator,
 		c.StoreObjekten().Zettel(),
 		p,
