@@ -62,6 +62,7 @@ func makeEtikettStore(
 		objekte.NilVerzeichnisse[etikett.Objekte],
 		*objekte.NilVerzeichnisse[etikett.Objekte],
 	](
+		gattung.Etikett,
 		s,
 		sa,
 		s,
@@ -87,6 +88,7 @@ func makeEtikettStore(
 	s.CreateOrUpdater = objekte_store.MakeCreateOrUpdate(
 		sa,
 		sa.GetLockSmith(),
+		sa.ObjekteReaderWriterFactory(gattung.Etikett),
 		sa,
 		EtikettTransactedReader(s),
 		objekte_store.CreateOrUpdateDelegate[*etikett.Transacted]{

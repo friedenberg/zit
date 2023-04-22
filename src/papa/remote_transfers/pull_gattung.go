@@ -13,8 +13,8 @@ func (c *client) PullSkus(
 ) (err error) {
 	errors.TodoP0("implement etikett and akte")
 	gattungInheritors := map[gattung.Gattung]objekte_store.TransactedInheritor{
-		gattung.Zettel: c.GetInheritorZettel(c, c),
-		gattung.Typ:    c.GetInheritorTyp(c, c),
+		gattung.Zettel: c.GetInheritorZettel(c.ObjekteReaderFactory(gattung.Zettel), c),
+		gattung.Typ:    c.GetInheritorTyp(c.ObjekteReaderFactory(gattung.Typ), c),
 	}
 
 	if err = c.SkusFromFilter(

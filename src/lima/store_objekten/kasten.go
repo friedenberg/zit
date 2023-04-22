@@ -62,6 +62,7 @@ func makeKastenStore(
 		kasten.Verzeichnisse,
 		*kasten.Verzeichnisse,
 	](
+		gattung.Kasten,
 		s,
 		sa,
 		s,
@@ -87,6 +88,7 @@ func makeKastenStore(
 	s.CreateOrUpdater = objekte_store.MakeCreateOrUpdate(
 		sa,
 		sa.GetLockSmith(),
+		sa.ObjekteReaderWriterFactory(gattung.Kasten),
 		sa,
 		KastenTransactedReader(s),
 		objekte_store.CreateOrUpdateDelegate[*kasten.Transacted]{

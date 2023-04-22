@@ -86,7 +86,7 @@ func (h *objekteInflator[T, T1, T2, T3]) readObjekte(
 ) (err error) {
 	var r sha.ReadCloser
 
-	if r, err = h.or.ObjekteReader(sk, sk.GetObjekteSha()); err != nil {
+	if r, err = h.or.ObjekteReader(sk.GetObjekteSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

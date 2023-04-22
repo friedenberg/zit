@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/id"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/age"
@@ -34,7 +35,7 @@ type StoreUtil interface {
 	StoreUtilVerzeichnisse
 	schnittstellen.LockSmithGetter
 	konfig.PtrGetter
-	schnittstellen.ObjekteAkteFactory
+	schnittstellen.AkteIOFactory
 	ts.Clock
 
 	CommitTransacted(objekte.TransactedLike) error
@@ -49,6 +50,10 @@ type StoreUtil interface {
 	kennung.MatchableAdder
 
 	persisted_metadatei_format.Getter
+
+	ObjekteReaderWriterFactory(
+		schnittstellen.GattungGetter,
+	) schnittstellen.ObjekteIOFactory
 }
 
 // TODO-P3 move to own package
@@ -114,6 +119,7 @@ func MakeStoreUtil(
 
 	if c.bestandsaufnahmeStore, err = bestandsaufnahme.MakeStore(
 		c.GetStandort(),
+		c.ObjekteReaderWriterFactory(gattung.Bestandsaufnahme),
 		c,
 		pmf,
 	); err != nil {
@@ -196,7 +202,7 @@ func (s *common) SetMatchableAdder(ma kennung.MatchableAdder) {
 	s.MatchableAdder = ma
 }
 
-func (s common) ObjekteReader(
+func (s common) objekteReader(
 	g schnittstellen.GattungGetter,
 	sh sha.ShaLike,
 ) (rc sha.ReadCloser, err error) {
@@ -221,7 +227,7 @@ func (s common) ObjekteReader(
 	return
 }
 
-func (s common) ObjekteWriter(
+func (s common) objekteWriter(
 	g schnittstellen.GattungGetter,
 ) (wc sha.WriteCloser, err error) {
 	var p string

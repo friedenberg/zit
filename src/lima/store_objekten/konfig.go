@@ -45,6 +45,8 @@ type KonfigAkteTextSaver = objekte_store.AkteTextSaver[
 type konfigStore struct {
 	store_util.StoreUtil
 
+	schnittstellen.ObjekteIOFactory
+
 	pool schnittstellen.Pool[erworben.Transacted, *erworben.Transacted]
 
 	KonfigInflator
@@ -75,9 +77,12 @@ func makeKonfigStore(
 		sa,
 	)
 
+	of := sa.ObjekteReaderWriterFactory(gattung.Konfig)
+
 	s = &konfigStore{
-		StoreUtil: sa,
-		pool:      pool,
+		StoreUtil:        sa,
+		ObjekteIOFactory: of,
+		pool:             pool,
 		KonfigInflator: objekte_store.MakeTransactedInflator[
 			erworben.Objekte,
 			*erworben.Objekte,
@@ -86,7 +91,7 @@ func makeKonfigStore(
 			objekte.NilVerzeichnisse[erworben.Objekte],
 			*objekte.NilVerzeichnisse[erworben.Objekte],
 		](
-			sa,
+			of,
 			sa,
 			persisted_metadatei_format.V0{},
 			akteFormat,
@@ -128,7 +133,7 @@ func (s konfigStore) Update(
 
 	var ow sha.WriteCloser
 
-	if ow, err = s.StoreUtil.ObjekteWriter(gattung.Konfig); err != nil {
+	if ow, err = s.ObjekteIOFactory.ObjekteWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -212,8 +217,7 @@ func (s konfigStore) Read() (tt *erworben.Transacted, err error) {
 		{
 			var r sha.ReadCloser
 
-			if r, err = s.StoreUtil.ObjekteReader(
-				gattung.Konfig,
+			if r, err = s.ObjekteReader(
 				tt.Sku.ObjekteSha,
 			); err != nil {
 				if errors.IsNotExist(err) {
@@ -239,8 +243,7 @@ func (s konfigStore) Read() (tt *erworben.Transacted, err error) {
 		{
 			var r sha.ReadCloser
 
-			if r, err = s.StoreUtil.ObjekteReader(
-				gattung.Konfig,
+			if r, err = s.ObjekteReader(
 				tt.Objekte.Sha,
 			); err != nil {
 				if errors.IsNotExist(err) {

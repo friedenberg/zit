@@ -90,6 +90,7 @@ func makeZettelStore(
 		zettel.Verzeichnisse,
 		*zettel.Verzeichnisse,
 	](
+		gattung.Zettel,
 		s,
 		sa,
 		s,
@@ -144,7 +145,7 @@ func (s zettelStore) WriteZettelObjekte(
 
 	var wc sha.WriteCloser
 
-	if wc, err = s.StoreUtil.ObjekteWriter(gattung.Zettel); err != nil {
+	if wc, err = s.commonStore.ObjekteWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

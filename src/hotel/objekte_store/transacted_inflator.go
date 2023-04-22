@@ -225,7 +225,7 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) StoreObjekte(
 ) (err error) {
 	var ow sha.WriteCloser
 
-	if ow, err = h.of.ObjekteWriter(t.GetGattung()); err != nil {
+	if ow, err = h.of.ObjekteWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -274,7 +274,7 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) readObjekte(
 
 	var r sha.ReadCloser
 
-	if r, err = h.of.ObjekteReader(sk, sk.GetObjekteSha()); err != nil {
+	if r, err = h.of.ObjekteReader(sk.GetObjekteSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

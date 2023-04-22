@@ -62,6 +62,7 @@ func makeTypStore(
 		objekte.NilVerzeichnisse[typ.Objekte],
 		*objekte.NilVerzeichnisse[typ.Objekte],
 	](
+		gattung.Typ,
 		s,
 		sa,
 		s,
@@ -87,6 +88,7 @@ func makeTypStore(
 	s.CreateOrUpdater = objekte_store.MakeCreateOrUpdate(
 		sa,
 		sa.GetLockSmith(),
+		s.commonStore,
 		sa,
 		TypTransactedReader(s),
 		objekte_store.CreateOrUpdateDelegate[*typ.Transacted]{

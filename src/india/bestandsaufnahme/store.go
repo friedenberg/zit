@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/standort"
@@ -49,7 +48,8 @@ type AkteFormat = schnittstellen.Format[
 
 type store struct {
 	standort                  standort.Standort
-	oaf                       schnittstellen.ObjekteAkteFactory
+	of                        schnittstellen.ObjekteIOFactory
+	af                        schnittstellen.AkteIOFactory
 	pool                      schnittstellen.Pool[Objekte, *Objekte]
 	persistentMetadateiFormat persisted_metadatei_format.Format
 	formatAkte
@@ -60,43 +60,45 @@ type store struct {
 
 func MakeStore(
 	standort standort.Standort,
-	oaf schnittstellen.ObjekteAkteFactory,
+	of schnittstellen.ObjekteIOFactory,
+	af schnittstellen.AkteIOFactory,
 	pmf persisted_metadatei_format.Format,
 ) (s *store, err error) {
 	p := collections.MakePool[Objekte]()
-	af := formatAkte{}
+	fa := formatAkte{}
 
 	s = &store{
 		standort:                  standort,
-		oaf:                       oaf,
+		of:                        of,
+		af:                        af,
 		pool:                      p,
 		persistentMetadateiFormat: pmf,
-		formatAkte:                af,
+		formatAkte:                fa,
 		ObjekteInflator: objekte_store.MakeObjekteInflator[
 			Objekte,
 			*Objekte,
 			objekte.NilVerzeichnisse[Objekte],
 			*objekte.NilVerzeichnisse[Objekte],
 		](
-			oaf,
-			oaf,
-			pmf,
+			of,
 			af,
+			pmf,
+			fa,
 			p,
 		),
 		ObjekteSaver: objekte_store.MakeObjekteSaver[
 			Objekte,
 			*Objekte,
-		](oaf, pmf),
+		](of, pmf),
 		AkteTextSaver: objekte_store.MakeAkteTextSaver[
 			Objekte,
 			*Objekte,
 		](
-			oaf,
+			af,
 			objekte_store.MakeAkteFormat[Objekte, *Objekte](
-				objekte.MakeReaderAkteParseSaver[Objekte, *Objekte](oaf, af),
+				objekte.MakeReaderAkteParseSaver[Objekte, *Objekte](af, fa),
+				fa,
 				af,
-				oaf,
 			),
 		),
 	}
@@ -142,7 +144,7 @@ func (s *store) readOnePath(p string) (o *Objekte, err error) {
 func (s *store) ReadOne(sh schnittstellen.Sha) (o *Objekte, err error) {
 	var or sha.ReadCloser
 
-	if or, err = s.oaf.ObjekteReader(gattung.Bestandsaufnahme, sh); err != nil {
+	if or, err = s.of.ObjekteReader(sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -158,7 +160,7 @@ func (s *store) ReadOne(sh schnittstellen.Sha) (o *Objekte, err error) {
 
 	var ar sha.ReadCloser
 
-	if ar, err = s.oaf.AkteReader(o.AkteSha); err != nil {
+	if ar, err = s.af.AkteReader(o.AkteSha); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

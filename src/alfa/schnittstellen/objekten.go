@@ -22,16 +22,16 @@ type ObjekteIOFactory interface {
 }
 
 type ObjekteReaderFactory interface {
-	ObjekteReader(GattungGetter, ShaGetter) (ShaReadCloser, error)
+	ObjekteReader(ShaGetter) (ShaReadCloser, error)
 }
 
 type ObjekteWriterFactory interface {
-	ObjekteWriter(GattungGetter) (ShaWriteCloser, error)
+	ObjekteWriter() (ShaWriteCloser, error)
 }
 
 type (
-	FuncObjekteReader func(GattungGetter, ShaGetter) (ShaReadCloser, error)
-	FuncObjekteWriter func(GattungGetter) (ShaWriteCloser, error)
+	FuncObjekteReader func(ShaGetter) (ShaReadCloser, error)
+	FuncObjekteWriter func() (ShaWriteCloser, error)
 )
 
 type bespokeObjekteReadWriterFactory struct {
@@ -62,10 +62,9 @@ func MakeBespokeObjekteReadFactory(
 }
 
 func (b bespokeObjekteReadFactory) ObjekteReader(
-	g GattungGetter,
 	sh ShaGetter,
 ) (ShaReadCloser, error) {
-	return b.FuncObjekteReader(g, sh)
+	return b.FuncObjekteReader(sh)
 }
 
 type bespokeObjekteWriteFactory struct {
@@ -80,8 +79,6 @@ func MakeBespokeObjekteWriteFactory(
 	}
 }
 
-func (b bespokeObjekteWriteFactory) ObjekteWriter(
-	g GattungGetter,
-) (ShaWriteCloser, error) {
-	return b.FuncObjekteWriter(g)
+func (b bespokeObjekteWriteFactory) ObjekteWriter() (ShaWriteCloser, error) {
+	return b.FuncObjekteWriter()
 }

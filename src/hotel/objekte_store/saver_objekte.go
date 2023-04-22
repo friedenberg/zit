@@ -49,9 +49,7 @@ func (h *objekteSaver[T, T1]) SaveObjekte(
 ) (sh schnittstellen.Sha, err error) {
 	var w sha.WriteCloser
 
-	if w, err = h.writerFactory.ObjekteWriter(
-		o.GetGattung(),
-	); err != nil {
+	if w, err = h.writerFactory.ObjekteWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

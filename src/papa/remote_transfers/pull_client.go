@@ -22,8 +22,6 @@ type FuncSku func(sku.Sku2) error
 type PullClient interface {
 	SkusFromFilter(kennung.MetaSet, FuncSku) error
 	PullSkus(kennung.MetaSet) error
-	schnittstellen.ObjekteReaderFactory
-	schnittstellen.AkteReaderFactory
 	Close() error
 }
 

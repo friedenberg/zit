@@ -29,7 +29,8 @@ type createOrUpdate[
 ] struct {
 	clock                     ts.Clock
 	ls                        schnittstellen.LockSmith
-	oaf                       schnittstellen.ObjekteAkteWriterFactory
+	of                        schnittstellen.ObjekteWriterFactory
+	af                        schnittstellen.AkteWriterFactory
 	reader                    TransactedReader[T3, *objekte.Transacted[T, T1, T2, T3, T4, T5]]
 	delegate                  CreateOrUpdateDelegate[*objekte.Transacted[T, T1, T2, T3, T4, T5]]
 	matchableAdder            kennung.MatchableAdder
@@ -46,7 +47,8 @@ func MakeCreateOrUpdate[
 ](
 	clock ts.Clock,
 	ls schnittstellen.LockSmith,
-	oaf schnittstellen.ObjekteAkteWriterFactory,
+	of schnittstellen.ObjekteWriterFactory,
+	af schnittstellen.AkteWriterFactory,
 	reader TransactedReader[T3, *objekte.Transacted[T, T1, T2, T3, T4, T5]],
 	delegate CreateOrUpdateDelegate[*objekte.Transacted[T, T1, T2, T3, T4, T5]],
 	ma kennung.MatchableAdder,
@@ -59,7 +61,8 @@ func MakeCreateOrUpdate[
 	return &createOrUpdate[T, T1, T2, T3, T4, T5]{
 		clock:                     clock,
 		ls:                        ls,
-		oaf:                       oaf,
+		of:                        of,
+		af:                        af,
 		reader:                    reader,
 		delegate:                  delegate,
 		matchableAdder:            ma,
@@ -93,7 +96,7 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdateCheckedOut(
 
 	var ow sha.WriteCloser
 
-	if ow, err = cou.oaf.ObjekteWriter(kennungPtr.GetGattung()); err != nil {
+	if ow, err = cou.of.ObjekteWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -178,7 +181,7 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdate(
 
 	var ow sha.WriteCloser
 
-	if ow, err = cou.oaf.ObjekteWriter(kennungPtr.GetGattung()); err != nil {
+	if ow, err = cou.of.ObjekteWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

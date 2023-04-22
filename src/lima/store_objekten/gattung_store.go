@@ -88,6 +88,8 @@ type CommonStoreBase[
 		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
 		objekte.External[O, OPtr, K, KPtr],
 	]
+
+	schnittstellen.ObjekteIOFactory
 }
 
 type CommonStore[
@@ -157,6 +159,10 @@ type commonStoreBase[
 	V any,
 	VPtr schnittstellen.VerzeichnissePtr[V, O],
 ] struct {
+	schnittstellen.GattungGetter
+
+	schnittstellen.ObjekteIOFactory
+
 	commonStoreDelegate[O, OPtr, K, KPtr, V, VPtr]
 
 	store_util.StoreUtil
@@ -217,6 +223,7 @@ func makeCommonStoreBase[
 	V any,
 	VPtr schnittstellen.VerzeichnissePtr[V, O],
 ](
+	gg schnittstellen.GattungGetter,
 	delegate commonStoreDelegate[O, OPtr, K, KPtr, V, VPtr],
 	sa store_util.StoreUtil,
 	tr objekte_store.TransactedReader[KPtr,
@@ -232,7 +239,11 @@ func makeCommonStoreBase[
 		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
 	]()
 
+	of := sa.ObjekteReaderWriterFactory(gg)
+
 	s = &commonStoreBase[O, OPtr, K, KPtr, V, VPtr]{
+		GattungGetter:       gg,
+		ObjekteIOFactory:    of,
 		commonStoreDelegate: delegate,
 		StoreUtil:           sa,
 		pool:                pool,
@@ -244,7 +255,7 @@ func makeCommonStoreBase[
 			V,
 			VPtr,
 		](
-			sa,
+			of,
 			sa,
 			persisted_metadatei_format.V0{},
 			akteFormat,
@@ -272,6 +283,7 @@ func makeCommonStore[
 	V any,
 	VPtr schnittstellen.VerzeichnissePtr[V, O],
 ](
+	gg schnittstellen.GattungGetter,
 	delegate commonStoreDelegate[O, OPtr, K, KPtr, V, VPtr],
 	sa store_util.StoreUtil,
 	tr objekte_store.TransactedReader[KPtr,
@@ -283,6 +295,8 @@ func makeCommonStore[
 		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
 	]()
 
+	of := sa.ObjekteReaderWriterFactory(gg)
+
 	s = &commonStore[
 		O,
 		OPtr,
@@ -292,6 +306,8 @@ func makeCommonStore[
 		VPtr,
 	]{
 		commonStoreBase: commonStoreBase[O, OPtr, K, KPtr, V, VPtr]{
+			GattungGetter:       gg,
+			ObjekteIOFactory:    of,
 			commonStoreDelegate: delegate,
 			StoreUtil:           sa,
 			pool:                pool,
@@ -303,7 +319,7 @@ func makeCommonStore[
 				V,
 				VPtr,
 			](
-				sa,
+				of,
 				sa,
 				persisted_metadatei_format.V0{},
 				akteFormat,
@@ -325,7 +341,7 @@ func makeCommonStore[
 			K,
 			KPtr,
 		](
-			sa,
+			of,
 			sa,
 			akteFormat,
 			sa.GetPersistentMetadateiFormat(),

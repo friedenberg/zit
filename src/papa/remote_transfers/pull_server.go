@@ -114,17 +114,18 @@ func (op PullServer) objekteReaderForSku(
 
 	errors.Log().Printf("received request: %#v", msg)
 
+	orf := op.umwelt.StoreObjekten().ObjekteReaderWriterFactory(msg.Gattung)
+
 	var or io.ReadCloser
 
-	if or, err = op.umwelt.StoreObjekten().ObjekteReader(
-		msg.Gattung,
+	if or, err = orf.ObjekteReader(
 		msg.Sha,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.Deferred(&err, or.Close)
+	defer errors.DeferredCloser(&err, or)
 
 	var n int64
 

@@ -33,7 +33,7 @@ func (c common) GetInheritorZettel(
 	](
 		schnittstellen.MakeBespokeObjekteReadWriterFactory(
 			orf,
-			c.StoreObjekten(),
+			c.StoreObjekten().Zettel(),
 		),
 		schnittstellen.MakeBespokeAkteReadWriterFactory(
 			arf,
@@ -74,7 +74,7 @@ func (c common) GetInheritorTyp(
 	](
 		schnittstellen.MakeBespokeObjekteReadWriterFactory(
 			orf,
-			c.StoreObjekten(),
+			c.StoreObjekten().Typ(),
 		),
 		schnittstellen.MakeBespokeAkteReadWriterFactory(
 			arf,
