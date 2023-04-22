@@ -130,7 +130,7 @@ func (c EditKonfig) readTempKonfigFile(
 	k = &erworben.Objekte{}
 
 	// TODO-P3 offer option to edit again
-	if _, err = format.ParseAkte(f, k); err != nil {
+	if _, _, err = format.ParseSaveAkte(f, k); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -31,7 +31,7 @@ type storedParserSaver[
 	KPtr schnittstellen.IdPtr[K],
 ] struct {
 	awf          schnittstellen.AkteWriterFactory
-	akteParser   objekte.AkteParser[OPtr]
+	akteParser   objekte.AkteParseSaver[OPtr]
 	objekteSaver ObjekteSaver
 }
 
@@ -43,11 +43,11 @@ func MakeStoredParseSaver[
 ](
 	owf schnittstellen.ObjekteIOFactory,
 	awf schnittstellen.AkteIOFactory,
-	akteParser objekte.AkteParser[OPtr],
+	akteParser objekte.AkteParseSaver[OPtr],
 	pmf persisted_metadatei_format.Format,
 ) storedParserSaver[O, OPtr, K, KPtr] {
 	if akteParser == nil {
-		akteParser = MakeNopAkteFormat[O, OPtr](awf)
+		akteParser = objekte.MakeNopAkteParseSaver[O, OPtr](awf)
 	}
 
 	if pmf == nil {
@@ -83,12 +83,26 @@ func (h storedParserSaver[O, OPtr, K, KPtr]) ParseSaveStored(
 
 	defer errors.DeferredCloser(&err, r)
 
-	if _, err = h.readAkte(r, &t.Objekte); err != nil {
+	var akteSha schnittstellen.Sha
+
+	if akteSha, _, err = h.readAkte(r, &t.Objekte); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	t.SetAkteSha(sha.Make(r.Sha()))
+	readerSha := sha.Make(r.Sha())
+
+	if !readerSha.EqualsSha(akteSha) {
+		err = errors.Errorf(
+			"akte reader got %s but AkteParseSaver got %s",
+			readerSha,
+			akteSha,
+		)
+
+		return
+	}
+
+	t.SetAkteSha(readerSha)
 
 	if err = h.objekteSaver.SaveObjekte(t); err != nil {
 		err = errors.Wrap(err)
@@ -101,8 +115,8 @@ func (h storedParserSaver[O, OPtr, K, KPtr]) ParseSaveStored(
 func (h storedParserSaver[O, OPtr, K, KPtr]) readAkte(
 	r sha.ReadCloser,
 	o OPtr,
-) (n int64, err error) {
-	if n, err = h.akteParser.ParseAkte(r, o); err != nil {
+) (sh schnittstellen.Sha, n int64, err error) {
+	if sh, n, err = h.akteParser.ParseSaveAkte(r, o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

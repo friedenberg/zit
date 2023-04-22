@@ -60,7 +60,9 @@ func MakeStore(
 	pmf persisted_metadatei_format.Format,
 ) (s *store, err error) {
 	p := collections.MakePool[Objekte]()
-	fa := formatAkte{}
+	fa := formatAkte{
+		af: af,
+	}
 
 	s = &store{
 		standort:                  standort,
@@ -159,10 +161,14 @@ func (s *store) ReadOne(sh schnittstellen.Sha) (o *Objekte, err error) {
 
 	defer errors.DeferredCloser(&err, ar)
 
-	if _, err = s.formatAkte.ParseAkte(ar, o); err != nil {
+	var akteSha schnittstellen.Sha
+
+	if akteSha, _, err = s.formatAkte.ParseSaveAkte(ar, o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	o.SetAkteSha(akteSha)
 
 	return
 }

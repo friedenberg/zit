@@ -6,14 +6,32 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 )
 
-type formatAkte struct{}
+type formatAkte struct {
+	af schnittstellen.AkteIOFactory
+}
 
-func (f formatAkte) ParseAkte(r io.Reader, o *Objekte) (n int64, err error) {
+func (f formatAkte) ParseSaveAkte(
+	r1 io.Reader,
+	o *Objekte,
+) (sh schnittstellen.Sha, n int64, err error) {
+	var aw sha.WriteCloser
+
+	if aw, err = f.af.AkteWriter(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.DeferredCloser(&err, aw)
+
+	r := io.TeeReader(r1, aw)
+
 	if n, err = format.ReadLines(
 		r,
 		func(v string) (err error) {
@@ -23,6 +41,8 @@ func (f formatAkte) ParseAkte(r io.Reader, o *Objekte) (n int64, err error) {
 		err = errors.Wrap(err)
 		return
 	}
+
+	sh = aw.Sha()
 
 	return
 }

@@ -27,7 +27,7 @@ type objekteInflator[
 	or                        schnittstellen.ObjekteReaderFactory
 	ar                        schnittstellen.AkteReaderFactory
 	persistentMetadateiFormat persisted_metadatei_format.Format
-	akteParser                objekte.AkteParser[T1]
+	akteParser                objekte.AkteParseSaver[T1]
 	pool                      schnittstellen.Pool[T, T1]
 }
 
@@ -40,7 +40,7 @@ func MakeObjekteInflator[
 	or schnittstellen.ObjekteReaderFactory,
 	ar schnittstellen.AkteReaderFactory,
 	pmf persisted_metadatei_format.Format,
-	akteParser objekte.AkteParser[T1],
+	akteParser objekte.AkteParseSaver[T1],
 	pool schnittstellen.Pool[T, T1],
 ) *objekteInflator[T, T1, T2, T3] {
 	return &objekteInflator[T, T1, T2, T3]{
@@ -122,10 +122,23 @@ func (h *objekteInflator[T, T1, T2, T3]) readAkte(
 
 	defer errors.DeferredCloser(&err, r)
 
-	var n int64
+	var (
+		n   int64
+		sh1 schnittstellen.Sha
+	)
 
-	if n, err = h.akteParser.ParseAkte(r, o); err != nil {
+	if sh1, n, err = h.akteParser.ParseSaveAkte(r, o); err != nil {
 		err = errors.Wrap(err)
+		return
+	}
+
+	if !sh.EqualsSha(sh1) {
+		err = errors.Errorf(
+			"expected %s from AkteParseSaver, but got %s",
+			sh,
+			sh1,
+		)
+
 		return
 	}
 

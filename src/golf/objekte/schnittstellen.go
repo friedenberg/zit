@@ -15,9 +15,9 @@ type (
 	// 	GetAktePtr() APtr
 	// }
 
-	AkteParser[T any] interface {
-		ParseAkte(io.Reader, T) (int64, error)
-	}
+	// AkteParser[T any] interface {
+	// 	ParseAkte(io.Reader, T) (int64, error)
+	// }
 
 	SavedAkteFormatter interface {
 		FormatSavedAkte(io.Writer, schnittstellen.Sha) (int64, error)
@@ -32,7 +32,6 @@ type (
 	}
 
 	AkteFormat[T any, TPtr schnittstellen.Ptr[T]] interface {
-		AkteParser[TPtr]
 		SavedAkteFormatter
 		ParsedAkteFormatter[T]
 		AkteParseSaver[TPtr]
