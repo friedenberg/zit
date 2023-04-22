@@ -22,7 +22,7 @@ type Stored interface {
 type StoredPtr interface {
 	Stored
 	SetAkteSha(Sha)
-	SetObjekteSha(AkteReaderFactory, string) error
+	SetObjekteSha(Sha)
 }
 
 type VerzeichnissePtr[T any, T1 Objekte[T1]] interface {

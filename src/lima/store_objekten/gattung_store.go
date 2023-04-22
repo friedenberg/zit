@@ -92,7 +92,7 @@ type commonStore[
 ] struct {
 	commonStoreBase[O, OPtr, K, KPtr, V, VPtr]
 	AkteFormat objekte.AkteFormat[O, OPtr]
-	objekte_store.ParseSaver[O, OPtr, K, KPtr]
+	objekte_store.StoredParseSaver[O, OPtr, K, KPtr]
 }
 
 func makeCommonStore[
@@ -157,12 +157,7 @@ func makeCommonStore[
 			TransactedReader: tr,
 		},
 		AkteFormat: akteFormat,
-		ParseSaver: objekte_store.MakeParseSaver[
-			O,
-			OPtr,
-			K,
-			KPtr,
-		](
+		StoredParseSaver: objekte_store.MakeStoredParseSaver[O, OPtr, K, KPtr](
 			of,
 			sa,
 			akteFormat,
@@ -179,8 +174,9 @@ func (s *commonStore[O, OPtr, K, KPtr, V, VPtr]) ReadOneExternal(
 ) (e objekte.External[O, OPtr, K, KPtr], err error) {
 	// support akte
 	todo.Implement()
-	if e.Objekte, e.Sku, err = s.ParseAndSaveAkteAndObjekte(
+	if err = s.ParseSaveStored(
 		em,
+		&e,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

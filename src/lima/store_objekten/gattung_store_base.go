@@ -104,26 +104,11 @@ type commonStoreBase[
 		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
 	]
 
-	objekte_store.TransactedInflator[
-		O,
-		OPtr,
-		K,
-		KPtr,
-		V,
-		VPtr,
-	]
+	objekte_store.TransactedInflator[O, OPtr, K, KPtr, V, VPtr]
 
-	objekte_store.AkteTextSaver[
-		O,
-		OPtr,
-	]
+	objekte_store.AkteTextSaver[O, OPtr]
 
-	objekte_store.ParseSaver[
-		O,
-		OPtr,
-		K,
-		KPtr,
-	]
+	objekte_store.StoredParseSaver[O, OPtr, K, KPtr]
 
 	objekte_store.TransactedReader[KPtr,
 		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],

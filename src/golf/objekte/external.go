@@ -1,7 +1,6 @@
 package objekte
 
 import (
-	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/values"
@@ -133,8 +132,9 @@ func (e External[T, T1, T2, T3]) GetAkteSha() schnittstellen.Sha {
 	return e.Sku.AkteSha
 }
 
-func (e *External[T, T1, T2, T3]) SetAkteSha(v sha.Sha) {
-	e.Sku.ObjekteSha = v
+func (e *External[T, T1, T2, T3]) SetAkteSha(v schnittstellen.Sha) {
+	T1(&e.Objekte).SetAkteSha(v)
+	e.Sku.ObjekteSha = sha.Make(v)
 }
 
 func (e External[T, T1, T2, T3]) ObjekteSha() sha.Sha {
@@ -142,13 +142,7 @@ func (e External[T, T1, T2, T3]) ObjekteSha() sha.Sha {
 }
 
 func (e *External[T, T1, T2, T3]) SetObjekteSha(
-	arf schnittstellen.AkteReaderFactory,
-	v string,
-) (err error) {
-	if err = e.Sku.ObjekteSha.Set(v); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
+	sh schnittstellen.Sha,
+) {
+	e.Sku.ObjekteSha = sha.Make(sh)
 }

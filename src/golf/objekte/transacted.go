@@ -45,6 +45,7 @@ func (t *Transacted[T, T1, T2, T3, T4, T5]) SetAkteSha(
 	s schnittstellen.Sha,
 ) {
 	T1(&t.Objekte).SetAkteSha(s)
+	t.Sku.AkteSha = sha.Make(s)
 }
 
 func (t Transacted[T, T1, T2, T3, T4, T5]) GetObjekteSha() schnittstellen.Sha {
@@ -59,17 +60,9 @@ func (t Transacted[T, T1, T2, T3, T4, T5]) GetObjekteSha() schnittstellen.Sha {
 }
 
 func (t *Transacted[T, T1, T2, T3, T4, T5]) SetObjekteSha(
-	arf schnittstellen.AkteReaderFactory,
-	v string,
-) (err error) {
-	if err = t.Sku.ObjekteSha.Set(v); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	// TODO-P3 provide opportunity for Objekte to bootstrap from arf
-
-	return
+	sh schnittstellen.Sha,
+) {
+	t.Sku.ObjekteSha = sha.Make(sh)
 }
 
 func (t Transacted[T, T1, T2, T3, T4, T5]) GetGattung() schnittstellen.Gattung {
