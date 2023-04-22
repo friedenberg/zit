@@ -8,8 +8,8 @@ import (
 
 func (k compiled) ApplyToMetadatei(
 	m *metadatei.Metadatei,
-	t kennung.Typ,
 ) (err error) {
+	t := m.GetTyp()
 	normalized := kennung.WithRemovedCommonPrefixes(m.Etiketten)
 	m.Etiketten = normalized
 

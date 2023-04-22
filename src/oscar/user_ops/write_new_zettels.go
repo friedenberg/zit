@@ -58,10 +58,13 @@ func (c WriteNewZettels) runOneAlreadyLocked(
 	pz zettel.ProtoZettel,
 ) (result zettel.CheckedOut, err error) {
 	z := pz.Make()
+	o := zettel.Objekte{
+		Metadatei: *z,
+	}
 
 	var zt *zettel.Transacted
 
-	if zt, err = c.StoreObjekten().Zettel().Create(*z); err != nil {
+	if zt, err = c.StoreObjekten().Zettel().Create(o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

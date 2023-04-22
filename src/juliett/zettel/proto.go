@@ -37,7 +37,7 @@ func (pz *ProtoZettel) AddToFlagSet(f *flag.FlagSet) {
 	pz.Metadatei.AddToFlagSet(f)
 }
 
-func (pz ProtoZettel) Equals(z Objekte) (ok bool) {
+func (pz ProtoZettel) Equals(z metadatei.Metadatei) (ok bool) {
 	var okTyp, okMet bool
 
 	if !pz.Metadatei.Typ.IsEmpty() &&
@@ -45,7 +45,7 @@ func (pz ProtoZettel) Equals(z Objekte) (ok bool) {
 		okTyp = true
 	}
 
-	if pz.Metadatei.Equals(z.Metadatei) {
+	if pz.Metadatei.Equals(z) {
 		okMet = true
 	}
 
@@ -54,13 +54,11 @@ func (pz ProtoZettel) Equals(z Objekte) (ok bool) {
 	return
 }
 
-func (pz ProtoZettel) Make() (z *Objekte) {
+func (pz ProtoZettel) Make() (z *metadatei.Metadatei) {
 	todo.Change("add typ")
 	todo.Change("add Bezeichnung")
-	z = &Objekte{
-		Metadatei: metadatei.Metadatei{
-			Etiketten: kennung.MakeEtikettSet(),
-		},
+	z = &metadatei.Metadatei{
+		Etiketten: kennung.MakeEtikettSet(),
 	}
 
 	pz.Apply(z)
@@ -68,42 +66,45 @@ func (pz ProtoZettel) Make() (z *Objekte) {
 	return
 }
 
-func (pz ProtoZettel) Apply(z *Objekte) (ok bool) {
+func (pz ProtoZettel) Apply(z *metadatei.Metadatei) (ok bool) {
 	if z.GetTyp().IsEmpty() &&
 		!pz.Metadatei.Typ.IsEmpty() &&
 		!z.GetTyp().Equals(pz.Metadatei.Typ) {
 		ok = true
-		z.Metadatei.Typ = pz.Metadatei.Typ
+		z.Typ = pz.Metadatei.Typ
 	}
 
 	if pz.Metadatei.Bezeichnung.WasSet() &&
-		!z.Metadatei.Bezeichnung.Equals(pz.Metadatei.Bezeichnung) {
+		!z.Bezeichnung.Equals(pz.Metadatei.Bezeichnung) {
 		ok = true
-		z.Metadatei.Bezeichnung = pz.Metadatei.Bezeichnung
+		z.Bezeichnung = pz.Metadatei.Bezeichnung
 	}
 
 	if pz.Metadatei.Etiketten.Len() > 0 {
 		ok = true
 	}
 
-	mes := z.Metadatei.Etiketten.MutableClone()
+	mes := z.Etiketten.MutableClone()
 	pz.Metadatei.Etiketten.Each(mes.Add)
-	z.Metadatei.Etiketten = mes.ImmutableClone()
+	z.Etiketten = mes.ImmutableClone()
 
 	return
 }
 
-func (pz ProtoZettel) ApplyWithAkteFD(z *Objekte, akteFD kennung.FD) (err error) {
+func (pz ProtoZettel) ApplyWithAkteFD(
+	z *metadatei.Metadatei,
+	akteFD kennung.FD,
+) (err error) {
 	if z.GetTyp().IsEmpty() &&
 		!pz.Metadatei.Typ.IsEmpty() &&
 		!z.GetTyp().Equals(pz.Metadatei.Typ) {
-		z.Metadatei.Typ = pz.Metadatei.Typ
+		z.Typ = pz.Metadatei.Typ
 	} else {
 		// TODO-P4 use konfig
 		ext := akteFD.Ext()
 
 		if ext != "" {
-			if err = z.Metadatei.Typ.Set(akteFD.Ext()); err != nil {
+			if err = z.Typ.Set(akteFD.Ext()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -113,18 +114,18 @@ func (pz ProtoZettel) ApplyWithAkteFD(z *Objekte, akteFD kennung.FD) (err error)
 	bez := akteFD.FileNameSansExt()
 
 	if pz.Metadatei.Bezeichnung.WasSet() &&
-		!z.Metadatei.Bezeichnung.Equals(pz.Metadatei.Bezeichnung) {
+		!z.Bezeichnung.Equals(pz.Metadatei.Bezeichnung) {
 		bez = pz.Metadatei.Bezeichnung.String()
 	}
 
-	if err = z.Metadatei.Bezeichnung.Set(bez); err != nil {
+	if err = z.Bezeichnung.Set(bez); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	mes := z.Metadatei.Etiketten.MutableClone()
+	mes := z.Etiketten.MutableClone()
 	pz.Metadatei.Etiketten.Each(mes.Add)
-	z.Metadatei.Etiketten = mes.ImmutableClone()
+	z.Etiketten = mes.ImmutableClone()
 
 	return
 }

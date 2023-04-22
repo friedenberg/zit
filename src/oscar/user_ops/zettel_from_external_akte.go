@@ -73,7 +73,7 @@ func (c ZettelFromExternalAkte) Run(
 
 	if err = results.Each(
 		func(z *zettel.Transacted) (err error) {
-			if c.ProtoZettel.Apply(&z.Objekte) {
+			if c.ProtoZettel.Apply(&z.Objekte.Metadatei) {
 				if z, err = c.StoreObjekten().Zettel().Update(
 					&z.Objekte,
 					&z.Sku.Kennung,
@@ -111,7 +111,7 @@ func (c ZettelFromExternalAkte) Run(
 			return
 		}
 
-		if c.ProtoZettel.Apply(&tz.Objekte) {
+		if c.ProtoZettel.Apply(&tz.Objekte.Metadatei) {
 			if tz, err = c.StoreObjekten().Zettel().Update(
 				&tz.Objekte,
 				&tz.Sku.Kennung,
@@ -198,7 +198,10 @@ func (c ZettelFromExternalAkte) zettelForAkte(
 	z.Objekte.Metadatei.AkteSha = akteSha
 	z.Sku.AkteSha = akteSha
 
-	if err = c.ProtoZettel.ApplyWithAkteFD(&z.Objekte, akteFD); err != nil {
+	if err = c.ProtoZettel.ApplyWithAkteFD(
+		&z.Objekte.Metadatei,
+		akteFD,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
