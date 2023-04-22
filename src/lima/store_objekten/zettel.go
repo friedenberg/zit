@@ -348,25 +348,7 @@ func (s *zettelStore) Create(
 		return
 	}
 
-	s.StoreUtil.CommitTransacted(tz)
-
-	if err = s.writeNamedZettelToIndex(tz); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.StoreUtil.GetKennungIndex().Add(tz.Objekte.Metadatei.Etiketten); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.StoreUtil.AddMatchable(tz); err != nil {
-		err = errors.Wrapf(err, "failed to write zettel to index: %s", tz.Sku)
-		return
-	}
-
-	errors.TodoP2("assert no changes")
-	if err = s.LogWriter.New(tz); err != nil {
+	if err = s.commitIndexMatchUpdate(tz, true); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
