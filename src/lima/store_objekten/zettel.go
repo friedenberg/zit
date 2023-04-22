@@ -428,7 +428,7 @@ func (s *zettelStore) UpdateCheckedOut(
 		return
 	}
 
-	if err = s.commitIndexMatchUpdate(t); err != nil {
+	if err = s.commitIndexMatchUpdate(t, false); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -488,7 +488,7 @@ func (s *zettelStore) Update(
 		return
 	}
 
-	if err = s.commitIndexMatchUpdate(tz); err != nil {
+	if err = s.commitIndexMatchUpdate(tz, false); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -498,6 +498,7 @@ func (s *zettelStore) Update(
 
 func (s *zettelStore) commitIndexMatchUpdate(
 	tz *zettel.Transacted,
+	addEtikettenToIndex bool,
 ) (err error) {
 	s.StoreUtil.CommitTransacted(tz)
 
