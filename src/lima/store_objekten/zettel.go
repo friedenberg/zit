@@ -572,34 +572,6 @@ func (s *zettelStore) Update(
 	return
 }
 
-// func (s zettelStore) AllInChain(h hinweis.Hinweis) (c []*zettel.Transacted, err error) {
-// 	mst := zettel.MakeMutableSetUnique(0)
-
-// 	if err = s.verzeichnisseAll.ReadMany(
-// 		func(z *zettel.Transacted) (err error) {
-// 			if !z.Sku.Kennung.Equals(h) {
-// 				err = collections.ErrStopIteration
-// 				return
-// 			}
-
-// 			return
-// 		},
-// 		mst.AddAndDoNotRepool,
-// 	); err != nil {
-// 		err = errors.Wrap(err)
-// 		return
-// 	}
-
-// 	c = mst.Elements()
-
-// 	sort.Slice(
-// 		c,
-// 		func(i, j int) bool { return c[i].Sku.Less(&c[j].Sku) },
-// 	)
-
-// 	return
-// }
-
 func (s *zettelStore) addZettelToTransaktion(
 	zo *zettel.Objekte,
 	zs *sha.Sha,
