@@ -41,7 +41,7 @@ type ObjekteInflator = objekte_store.ObjekteInflator[
 	*objekte.NilVerzeichnisse[Objekte],
 ]
 
-type AkteFormat = objekte_store.AkteFormat[
+type AkteFormat = objekte.AkteFormat[
 	Objekte,
 	*Objekte,
 ]

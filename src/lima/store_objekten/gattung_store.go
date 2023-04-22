@@ -211,7 +211,7 @@ type commonStore[
 	VPtr schnittstellen.VerzeichnissePtr[V, O],
 ] struct {
 	commonStoreBase[O, OPtr, K, KPtr, V, VPtr]
-	AkteFormat objekte_store.AkteFormat[O, OPtr]
+	AkteFormat objekte.AkteFormat[O, OPtr]
 	objekte_store.ParseSaver[O, OPtr, K, KPtr]
 }
 
@@ -229,7 +229,7 @@ func makeCommonStoreBase[
 	tr objekte_store.TransactedReader[KPtr,
 		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]],
 	pmf persisted_metadatei_format.Format,
-	akteFormat objekte_store.AkteFormat[O, OPtr],
+	akteFormat objekte.AkteFormat[O, OPtr],
 ) (s *commonStoreBase[O, OPtr, K, KPtr, V, VPtr], err error) {
 	// type T objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]
 	// type TPtr *objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]
@@ -288,7 +288,7 @@ func makeCommonStore[
 	sa store_util.StoreUtil,
 	tr objekte_store.TransactedReader[KPtr,
 		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]],
-	akteFormat objekte_store.AkteFormat[O, OPtr],
+	akteFormat objekte.AkteFormat[O, OPtr],
 ) (s *commonStore[O, OPtr, K, KPtr, V, VPtr], err error) {
 	pool := collections.MakePool[
 		objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],

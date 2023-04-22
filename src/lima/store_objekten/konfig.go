@@ -18,7 +18,7 @@ import (
 type KonfigStore interface {
 	reindexer
 
-	GetAkteFormat() objekte_store.AkteFormat[erworben.Objekte, *erworben.Objekte]
+	GetAkteFormat() objekte.AkteFormat[erworben.Objekte, *erworben.Objekte]
 	Read() (*erworben.Transacted, error)
 	Update(*erworben.Objekte) (*erworben.Transacted, error)
 
@@ -53,10 +53,10 @@ type konfigStore struct {
 	KonfigAkteTextSaver
 	KonfigLogWriter
 
-	akteFormat objekte_store.AkteFormat[erworben.Objekte, *erworben.Objekte]
+	akteFormat objekte.AkteFormat[erworben.Objekte, *erworben.Objekte]
 }
 
-func (s *konfigStore) GetAkteFormat() objekte_store.AkteFormat[erworben.Objekte, *erworben.Objekte] {
+func (s *konfigStore) GetAkteFormat() objekte.AkteFormat[erworben.Objekte, *erworben.Objekte] {
 	return s.akteFormat
 }
 

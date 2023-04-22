@@ -8,16 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/golf/objekte"
 )
 
-type AkteFormat[
-	O objekte.Objekte[O],
-	OPtr objekte.ObjektePtr[O],
-] interface {
-	objekte.AkteParser[OPtr]
-	objekte.AkteParseSaver[OPtr]
-	objekte.SavedAkteFormatter
-	objekte.ParsedAkteFormatter[O]
-}
-
 type akteFormat[
 	O objekte.Objekte[O],
 	OPtr objekte.ObjektePtr[O],
@@ -34,7 +24,7 @@ func MakeAkteFormat[
 	akteParseSaver objekte.AkteParseSaver[OPtr],
 	parsedAkteFormatter objekte.ParsedAkteFormatter[O],
 	arf schnittstellen.AkteReaderFactory,
-) AkteFormat[O, OPtr] {
+) objekte.AkteFormat[O, OPtr] {
 	return akteFormat[O, OPtr]{
 		AkteParseSaver:      akteParseSaver,
 		ParsedAkteFormatter: parsedAkteFormatter,

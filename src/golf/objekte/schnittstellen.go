@@ -32,6 +32,7 @@ type (
 	}
 
 	AkteFormat[T any, TPtr schnittstellen.Ptr[T]] interface {
+		AkteParser[TPtr]
 		SavedAkteFormatter
 		ParsedAkteFormatter[T]
 		AkteParseSaver[TPtr]
