@@ -84,7 +84,7 @@ func MakeTextFormatterExcludeMetadatei(
 	}
 }
 
-func (f textFormatter) Format(
+func (f textFormatter) FormatMetadatei(
 	w io.Writer,
 	c TextFormatterContext,
 ) (n int64, err error) {

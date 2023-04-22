@@ -47,10 +47,10 @@ type (
 	}
 
 	TextFormatter interface {
-		Format(io.Writer, TextFormatterContext) (int64, error)
+		FormatMetadatei(io.Writer, TextFormatterContext) (int64, error)
 	}
 
 	TextParser interface {
-		Parse(io.Reader, TextParserContext) (int64, error)
+		ParseMetadatei(io.Reader, TextParserContext) (int64, error)
 	}
 )

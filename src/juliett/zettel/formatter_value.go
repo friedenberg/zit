@@ -157,7 +157,7 @@ func (fv *FormatterValue) FuncFormatter(
 				}
 			}
 
-			if _, err = f.Format(
+			if _, err = f.FormatMetadatei(
 				out,
 				o,
 			); err != nil {

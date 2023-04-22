@@ -290,7 +290,7 @@ func (s *zettelStore) readOneExternalObjekte(
 
 	defer errors.DeferredCloser(&err, f)
 
-	if _, err = s.textParser.Parse(f, t); err != nil {
+	if _, err = s.textParser.ParseMetadatei(f, t); err != nil {
 		err = errors.Wrapf(err, "%s", f.Name())
 		return
 	}

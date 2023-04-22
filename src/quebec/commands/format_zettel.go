@@ -154,7 +154,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	// TODO use cat or just write to stdout if no script instead of erroring
-	if _, err = format.Format(u.Out(), zt); err != nil {
+	if _, err = format.FormatMetadatei(u.Out(), zt); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

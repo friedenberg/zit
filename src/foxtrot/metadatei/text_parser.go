@@ -34,7 +34,7 @@ func MakeTextParser(
 	}
 }
 
-func (f textParser) Parse(
+func (f textParser) ParseMetadatei(
 	r io.Reader,
 	c TextParserContext,
 ) (n int64, err error) {

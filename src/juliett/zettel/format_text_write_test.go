@@ -64,7 +64,7 @@ func writeFormat(
 
 	sb := &strings.Builder{}
 
-	if _, err := f.Format(sb, z); err != nil {
+	if _, err := f.FormatMetadatei(sb, z); err != nil {
 		t.Errorf("%s", err)
 	}
 

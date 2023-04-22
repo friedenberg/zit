@@ -96,7 +96,7 @@ func (c Diff) RunWithCwdQuery(
 
 						defer errors.DeferredCloser(&err, f)
 
-						if _, err = fInline.Format(f, zco.Internal); err != nil {
+						if _, err = fInline.FormatMetadatei(f, zco.Internal); err != nil {
 							err = errors.Wrap(err)
 							return
 						}

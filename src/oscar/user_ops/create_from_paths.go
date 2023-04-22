@@ -202,7 +202,7 @@ func (c *CreateFromPaths) zettelsFromPath(
 
 	var t zettel.Transacted
 
-	if _, err = c.TextParser.Parse(r, &t); err != nil {
+	if _, err = c.TextParser.ParseMetadatei(r, &t); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

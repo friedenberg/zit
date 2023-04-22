@@ -129,7 +129,7 @@ func (e *fileEncoder) EncodeObjekte(
 
 		defer errors.DeferredCloser(&err, fZettel)
 
-		if _, err = mtw.Format(fZettel, z); err != nil {
+		if _, err = mtw.FormatMetadatei(fZettel, z); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -177,7 +177,7 @@ func (e *fileEncoder) EncodeObjekte(
 
 		defer errors.DeferredCloser(&err, fZettel)
 
-		if _, err = mtw.Format(fZettel, z); err != nil {
+		if _, err = mtw.FormatMetadatei(fZettel, z); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

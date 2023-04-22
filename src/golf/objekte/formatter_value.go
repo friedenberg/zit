@@ -65,9 +65,9 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 
 		return func(tl TransactedLike) (err error) {
 			if tl.GetGattung() == gattung.Zettel {
-				_, err = fInlineAkte.Format(out, tl)
+				_, err = fInlineAkte.FormatMetadatei(out, tl)
 			} else {
-				_, err = fOmitMetadatei.Format(out, tl)
+				_, err = fOmitMetadatei.FormatMetadatei(out, tl)
 			}
 
 			return
