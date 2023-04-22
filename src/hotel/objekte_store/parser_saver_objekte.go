@@ -28,7 +28,7 @@ type objekteParseSaver[
 	T3 schnittstellen.IdPtr[T2],
 ] struct {
 	awf          schnittstellen.AkteWriterFactory
-	akteParser   schnittstellen.Parser[T, T1]
+	akteParser   objekte.AkteParser[T1]
 	objekteSaver ObjekteSaver[T, T1]
 }
 
@@ -40,7 +40,7 @@ func MakeParseSaver[
 ](
 	owf schnittstellen.ObjekteIOFactory,
 	awf schnittstellen.AkteIOFactory,
-	akteParser schnittstellen.Parser[T, T1],
+	akteParser objekte.AkteParser[T1],
 	pmf persisted_metadatei_format.Format,
 ) *objekteParseSaver[T, T1, T2, T3] {
 	if akteParser == nil {
@@ -106,7 +106,7 @@ func (h *objekteParseSaver[T, T1, T2, T3]) readAkte(
 ) (err error) {
 	var n int64
 
-	if n, err = h.akteParser.Parse(r, o); err != nil {
+	if n, err = h.akteParser.ParseAkte(r, o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

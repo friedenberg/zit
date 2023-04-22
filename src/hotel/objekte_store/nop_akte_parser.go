@@ -26,7 +26,10 @@ func MakeNopAkteFormat[
 	}
 }
 
-func (f nopAkteParser[O, OPtr]) Parse(r io.Reader, t OPtr) (n int64, err error) {
+func (f nopAkteParser[O, OPtr]) ParseAkte(
+	r io.Reader,
+	t OPtr,
+) (n int64, err error) {
 	var aw sha.WriteCloser
 
 	if aw, err = f.arf.AkteWriter(); err != nil {

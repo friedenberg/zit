@@ -12,7 +12,7 @@ type AkteFormat[
 	O objekte.Objekte[O],
 	OPtr objekte.ObjektePtr[O],
 ] interface {
-	schnittstellen.Format[O, OPtr]
+	objekte.AkteParser[OPtr]
 	objekte.AkteParseSaver[OPtr]
 	objekte.SavedAkteFormatter
 	objekte.ParsedAkteFormatter[O]
@@ -42,11 +42,14 @@ func MakeAkteFormat[
 	}
 }
 
-func (af akteFormat[O, OPtr]) Format(w io.Writer, e OPtr) (int64, error) {
-	return af.FormatSavedAkte(w, e.GetAkteSha())
-}
+// func (af akteFormat[O, OPtr]) Format(w io.Writer, e OPtr) (int64, error) {
+// 	return af.FormatSavedAkte(w, e.GetAkteSha())
+// }
 
-func (af akteFormat[O, OPtr]) Parse(r io.Reader, e OPtr) (n int64, err error) {
+func (af akteFormat[O, OPtr]) ParseAkte(
+	r io.Reader,
+	e OPtr,
+) (n int64, err error) {
 	var sh schnittstellen.Sha
 
 	sh, n, err = af.ParseSaveAkte(r, e)

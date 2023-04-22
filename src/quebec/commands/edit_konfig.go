@@ -104,7 +104,7 @@ func (c EditKonfig) makeTempKonfigFile(
 
 	format := u.StoreObjekten().Konfig().GetAkteFormat()
 
-	if _, err = format.Format(f, &k.Objekte); err != nil {
+	if _, err = format.FormatSavedAkte(f, k.GetAkteSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -130,7 +130,7 @@ func (c EditKonfig) readTempKonfigFile(
 	k = &erworben.Objekte{}
 
 	// TODO-P3 offer option to edit again
-	if _, err = format.Parse(f, k); err != nil {
+	if _, err = format.ParseAkte(f, k); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

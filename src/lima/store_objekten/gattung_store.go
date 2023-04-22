@@ -497,7 +497,7 @@ func (s *commonStore[O, OPtr, K, KPtr, V, VPtr]) CheckoutOne(
 		return
 	}
 
-	if _, err = s.AkteFormat.Format(f, &t.Objekte); err != nil {
+	if _, err = s.AkteFormat.FormatSavedAkte(f, t.GetAkteSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
