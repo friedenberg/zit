@@ -441,12 +441,12 @@ func (s *zettelStore) UpdateCheckedOut(
 		return
 	}
 
-	var shaObj sha.Sha
-
-	if shaObj, err = s.WriteZettelObjekte(co.External.Objekte); err != nil {
+	if err = s.SaveObjekte(&co.External); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	shaObj := sha.Make(co.External.GetObjekteSha())
 
 	if shaObj.Equals(co.Internal.Sku.ObjekteSha) {
 		t = &co.Internal
