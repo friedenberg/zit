@@ -272,7 +272,7 @@ func (s Store) Flush() (err error) {
 	}
 
 	errors.Log().Printf("saving Bestandsaufnahme")
-	if _, err = s.GetBestandsaufnahmeStore().Create(
+	if err = s.GetBestandsaufnahmeStore().Create(
 		s.StoreUtil.GetBestandsaufnahme(),
 	); err != nil {
 		if errors.Is(err, bestandsaufnahme.ErrEmpty) {

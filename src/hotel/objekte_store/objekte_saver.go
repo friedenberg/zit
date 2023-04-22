@@ -8,28 +8,19 @@ import (
 	"github.com/friedenberg/zit/src/golf/persisted_metadatei_format"
 )
 
-type ObjekteSaver[
-	T objekte.Objekte[T],
-	T1 objekte.ObjektePtr[T],
-] interface {
-	SaveObjekte(T1) (schnittstellen.Sha, error)
+type ObjekteSaver2 interface {
+	SaveObjekte(objekte.StoredLikePtr) error
 }
 
-type objekteSaver[
-	T objekte.Objekte[T],
-	T1 objekte.ObjektePtr[T],
-] struct {
+type objekteSaver2 struct {
 	writerFactory schnittstellen.ObjekteWriterFactory
 	formatter     persisted_metadatei_format.Format
 }
 
-func MakeObjekteSaver[
-	T objekte.Objekte[T],
-	T1 objekte.ObjektePtr[T],
-](
+func MakeObjekteSaver2(
 	writerFactory schnittstellen.ObjekteWriterFactory,
 	pmf persisted_metadatei_format.Format,
-) *objekteSaver[T, T1] {
+) ObjekteSaver2 {
 	if writerFactory == nil {
 		panic("schnittstellen.ObjekteWriterFactory was nil")
 	}
@@ -38,15 +29,15 @@ func MakeObjekteSaver[
 		panic("persisted_metadatei_format.Format was nil")
 	}
 
-	return &objekteSaver[T, T1]{
+	return objekteSaver2{
 		writerFactory: writerFactory,
 		formatter:     pmf,
 	}
 }
 
-func (h *objekteSaver[T, T1]) SaveObjekte(
-	o T1,
-) (sh schnittstellen.Sha, err error) {
+func (h objekteSaver2) SaveObjekte(
+	tl objekte.StoredLikePtr,
+) (err error) {
 	var w sha.WriteCloser
 
 	if w, err = h.writerFactory.ObjekteWriter(); err != nil {
@@ -56,12 +47,14 @@ func (h *objekteSaver[T, T1]) SaveObjekte(
 
 	defer errors.DeferredCloser(&err, w)
 
-	if _, err = h.formatter.FormatPersistentMetadatei(w, o); err != nil {
+	if _, err = h.formatter.FormatPersistentMetadatei(w, tl); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	sh = w.Sha()
+	sh := sha.Make(w.Sha())
+
+	tl.SetObjekteSha(sh)
 
 	return
 }

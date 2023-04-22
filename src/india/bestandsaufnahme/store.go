@@ -16,18 +16,13 @@ import (
 
 type Store interface {
 	ObjekteInflator
-	ObjekteSaver
+	objekte_store.ObjekteSaver2
 	AkteTextSaver
-	Create(*Objekte) (schnittstellen.Sha, error)
+	Create(*Objekte) error
 	objekte_store.LastReader[*Objekte]
 	objekte_store.OneReader[schnittstellen.Sha, *Objekte]
 	objekte_store.AllReader[*Objekte]
 }
-
-type ObjekteSaver = objekte_store.ObjekteSaver[
-	Objekte,
-	*Objekte,
-]
 
 type AkteTextSaver = objekte_store.AkteTextSaver[
 	Objekte,
@@ -54,7 +49,7 @@ type store struct {
 	persistentMetadateiFormat persisted_metadatei_format.Format
 	formatAkte
 	ObjekteInflator
-	ObjekteSaver
+	objekte_store.ObjekteSaver2
 	AkteTextSaver
 }
 
@@ -86,10 +81,7 @@ func MakeStore(
 			fa,
 			p,
 		),
-		ObjekteSaver: objekte_store.MakeObjekteSaver[
-			Objekte,
-			*Objekte,
-		](of, pmf),
+		ObjekteSaver2: objekte_store.MakeObjekteSaver2(of, pmf),
 		AkteTextSaver: objekte_store.MakeAkteTextSaver[
 			Objekte,
 			*Objekte,
@@ -106,7 +98,7 @@ func MakeStore(
 	return
 }
 
-func (s *store) Create(o *Objekte) (sh schnittstellen.Sha, err error) {
+func (s *store) Create(o *Objekte) (err error) {
 	if o.Akte.Skus.Len() == 0 {
 		err = errors.Wrap(ErrEmpty)
 		return
@@ -117,7 +109,7 @@ func (s *store) Create(o *Objekte) (sh schnittstellen.Sha, err error) {
 		return
 	}
 
-	if sh, err = s.SaveObjekte(o); err != nil {
+	if err = s.SaveObjekte(o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

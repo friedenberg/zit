@@ -17,6 +17,22 @@ type TransactedLike interface {
 	sku.DataIdentityGetter
 }
 
+type StoredLikePtr interface {
+	metadatei.Getter
+	metadatei.Setter
+	GetAkteSha() schnittstellen.Sha
+	SetAkteSha(schnittstellen.Sha)
+	SetObjekteSha(schnittstellen.Sha)
+}
+
+// type TransactedLikePtr interface {
+// 	TransactedLike
+// 	metadatei.Setter
+// 	GetAkteSha() schnittstellen.Sha
+// 	SetAkteSha(schnittstellen.Sha)
+// 	SetObjekteSha(schnittstellen.Sha)
+// }
+
 type (
 	FuncReaderTransacted[T TransactedLike] func(schnittstellen.FuncIter[T]) error
 	FuncReaderTransactedLike               func(schnittstellen.FuncIter[TransactedLike]) error

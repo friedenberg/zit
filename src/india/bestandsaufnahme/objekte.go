@@ -10,9 +10,10 @@ import (
 )
 
 type Objekte struct {
-	Tai     ts.Tai
-	Akte    Akte
-	AkteSha sha.Sha
+	Tai        ts.Tai
+	Akte       Akte
+	AkteSha    sha.Sha
+	ObjekteSha sha.Sha
 }
 
 func (a Objekte) GetMetadatei() metadatei.Metadatei {
@@ -45,6 +46,10 @@ func (o *Objekte) SetAkteSha(v schnittstellen.Sha) {
 	o.AkteSha = sha.Make(v)
 }
 
+func (o *Objekte) SetObjekteSha(v schnittstellen.Sha) {
+	o.ObjekteSha = sha.Make(v)
+}
+
 func (a Objekte) Less(b Objekte) bool {
 	return a.Tai.Less(b.Tai)
 }
@@ -58,10 +63,15 @@ func (a Objekte) Equals(b Objekte) bool {
 		return false
 	}
 
+	if !a.ObjekteSha.Equals(b.ObjekteSha) {
+		return false
+	}
+
 	return true
 }
 
 func (a *Objekte) Reset() {
+	a.ObjekteSha = sha.Sha{}
 	a.AkteSha = sha.Sha{}
 	a.Tai = ts.Tai{}
 	a.Akte.Reset()
@@ -69,6 +79,7 @@ func (a *Objekte) Reset() {
 
 func (a *Objekte) ResetWith(b Objekte) {
 	a.Akte.ResetWith(b.Akte)
+	a.ObjekteSha = b.ObjekteSha
 	a.AkteSha = b.AkteSha
 	a.Tai = b.Tai
 }
