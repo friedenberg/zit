@@ -136,18 +136,21 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) GetEtikettenExpanded() kennung.Etiket
 	return kennung.Expanded(a.GetEtiketten())
 }
 
-func (a Transacted[T, T1, T2, T3, T4, T5]) GetTyp() kennung.Typ {
-	ok := false
-	o := any(a.Objekte)
-
-	var tg kennung.TypGetter
-
-	if tg, ok = o.(kennung.TypGetter); !ok {
-		tg = nil
-		return kennung.MustTyp(a.GetGattung().GetGattungString())
+func (a Transacted[T, T1, T2, T3, T4, T5]) GetTyp() (t kennung.Typ) {
+	tgs := []any{
+		a.Verzeichnisse,
+		a.Objekte,
+		a.GetMetadatei(),
 	}
 
-	return tg.GetTyp()
+	for _, o := range tgs {
+		if tg, ok := o.(kennung.TypGetter); ok {
+			t = tg.GetTyp()
+			return
+		}
+	}
+
+	return
 }
 
 func (a Transacted[T, T1, T2, T3, T4, T5]) GetIdLike() (il kennung.IdLike) {

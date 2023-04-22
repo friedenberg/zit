@@ -95,6 +95,10 @@ func (z Metadatei) GetBezeichnung() bezeichnung.Bezeichnung {
 }
 
 func (z Metadatei) GetEtiketten() schnittstellen.Set[kennung.Etikett] {
+	if z.Etiketten == nil {
+		return kennung.MakeEtikettSet()
+	}
+
 	return z.Etiketten.ImmutableClone()
 }
 
