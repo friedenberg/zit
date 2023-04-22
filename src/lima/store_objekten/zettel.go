@@ -296,14 +296,13 @@ func (s *zettelStore) readOneExternalObjekte(
 		return
 	}
 
-	if ez.Sku.ObjekteSha, err = s.WriteZettelObjekte(
-		t.Objekte,
-	); err != nil {
+	ez.Objekte = t.Objekte
+
+	if err = s.SaveObjekte(ez); err != nil {
 		err = errors.Wrapf(err, "%s", f.Name())
 		return
 	}
 
-	ez.Objekte = t.Objekte
 	// TODO P0
 	// ez.Sku.FDs.Akte.Path = c.AktePath
 
