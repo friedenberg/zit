@@ -420,14 +420,15 @@ func (s *zettelStore) UpdateCheckedOut(
 		return
 	}
 
-	if t, err = s.addZettelToTransaktion(
-		&co.External.Objekte,
-		&shaObj,
-		&co.External.Sku.Kennung,
+	if t, err = s.writeObjekte(
+		co.External.Objekte,
+		co.External.Sku.Kennung,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	s.StoreUtil.CommitTransacted(t)
 
 	if err = s.writeNamedZettelToIndex(t); err != nil {
 		err = errors.Wrap(err)
@@ -533,23 +534,9 @@ func (s *zettelStore) Update(
 
 func (s *zettelStore) addZettelToTransaktion(
 	zo *zettel.Objekte,
-	zs *sha.Sha,
 	zk *kennung.Hinweis,
 ) (tz *zettel.Transacted, err error) {
 	errors.Log().Printf("adding zettel to transaktion: %s", zk)
-
-	if tz, err = s.writeObjekte(
-		*zo,
-		*zk,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	tz.Sku.Kennung = *zk
-	tz.Sku.ObjekteSha = *zs
-
-	s.StoreUtil.CommitTransacted(tz)
 
 	return
 }
