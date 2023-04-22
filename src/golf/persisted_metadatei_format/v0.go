@@ -12,9 +12,9 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
-type V0 struct{}
+type v0 struct{}
 
-func (f V0) Format(
+func (f v0) Format(
 	w1 io.Writer,
 	c FormatterContext,
 ) (n int64, err error) {
@@ -43,7 +43,7 @@ func (f V0) Format(
 	return
 }
 
-func (f V0) Parse(
+func (f v0) Parse(
 	r1 io.Reader,
 	c ParserContext,
 ) (n int64, err error) {

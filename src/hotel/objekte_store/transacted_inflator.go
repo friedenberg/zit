@@ -46,7 +46,7 @@ type transactedInflator[
 ] struct {
 	of                        schnittstellen.ObjekteIOFactory
 	af                        schnittstellen.AkteIOFactory
-	persistentMetadateiFormat persisted_metadatei_format.V0
+	persistentMetadateiFormat persisted_metadatei_format.Format
 	akteFormat                objekte.AkteFormat[T, T1]
 	pool                      schnittstellen.Pool[
 		objekte.Transacted[T, T1, T2, T3, T4, T5],
@@ -64,7 +64,7 @@ func MakeTransactedInflator[
 ](
 	of schnittstellen.ObjekteIOFactory,
 	af schnittstellen.AkteIOFactory,
-	persistentMetadateiFormat persisted_metadatei_format.V0,
+	persistentMetadateiFormat persisted_metadatei_format.Format,
 	akteFormat objekte.AkteFormat[T, T1],
 	pool schnittstellen.Pool[
 		objekte.Transacted[T, T1, T2, T3, T4, T5],

@@ -257,7 +257,9 @@ func makeCommonStoreBase[
 		](
 			of,
 			sa,
-			persisted_metadatei_format.V0{},
+			persisted_metadatei_format.FormatForVersion(
+				sa.GetKonfig().GetStoreVersion(),
+			),
 			akteFormat,
 			pool,
 		),
@@ -321,7 +323,9 @@ func makeCommonStore[
 			](
 				of,
 				sa,
-				persisted_metadatei_format.V0{},
+				persisted_metadatei_format.FormatForVersion(
+					sa.GetKonfig().GetStoreVersion(),
+				),
 				akteFormat,
 				pool,
 			),

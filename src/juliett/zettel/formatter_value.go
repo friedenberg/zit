@@ -129,7 +129,7 @@ func (fv *FormatterValue) FuncFormatter(
 		}
 
 	case "objekte":
-		f := persisted_metadatei_format.V0{}
+		f := persisted_metadatei_format.FormatForVersion(k.GetStoreVersion())
 
 		return func(o *Transacted) (err error) {
 			if _, err = f.Format(out, o.Objekte); err != nil {

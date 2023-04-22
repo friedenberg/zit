@@ -22,12 +22,12 @@ type (
 func FormatForVersion(v schnittstellen.StoreVersion) Format {
 	switch v.Int() {
 	case 0:
-		return V0{}
+		return v0{}
 
 	case 1:
-		return V1{}
+		return v1{}
 
 	default:
-		return V2{}
+		return v2{}
 	}
 }
