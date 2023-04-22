@@ -359,13 +359,6 @@ func (s *zettelStore) Create(
 		return
 	}
 
-	var shaObj sha.Sha
-
-	if shaObj, err = s.WriteZettelObjekte(in); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	// If the zettel exists, short circuit and return that
 	todo.Implement()
 	// if tz2, err2 := s.ReadOne(shaObj); err2 == nil {
@@ -380,14 +373,12 @@ func (s *zettelStore) Create(
 		return
 	}
 
-	if tz, err = s.addZettelToTransaktion(
-		&in,
-		&shaObj,
-		&ken,
-	); err != nil {
+	if tz, err = s.writeObjekte(in, ken); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	s.StoreUtil.CommitTransacted(tz)
 
 	if err = s.writeNamedZettelToIndex(tz); err != nil {
 		err = errors.Wrap(err)
