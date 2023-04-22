@@ -268,9 +268,7 @@ func (s *zettelStore) readOneExternalAkte(
 	sh := sha.Make(aw.Sha())
 	ez.Objekte.Metadatei.AkteSha = sh
 
-	if ez.Sku.ObjekteSha, err = s.WriteZettelObjekte(
-		ez.Objekte,
-	); err != nil {
+	if err = s.SaveObjekte(ez); err != nil {
 		err = errors.Wrapf(err, "%s", f.Name())
 		return
 	}
