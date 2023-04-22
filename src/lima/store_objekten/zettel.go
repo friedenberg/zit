@@ -139,33 +139,6 @@ func (s *zettelStore) Flush() (err error) {
 	return
 }
 
-func (s zettelStore) WriteZettelObjekte(
-	z metadatei.Getter,
-) (sh sha.Sha, err error) {
-	// no lock required
-
-	var wc sha.WriteCloser
-
-	if wc, err = s.commonStore.ObjekteWriter(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, wc)
-
-	if _, err = s.StoreUtil.GetPersistentMetadateiFormat().FormatPersistentMetadatei(
-		wc,
-		z,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	sh = sha.Make(wc.Sha())
-
-	return
-}
-
 func (s *zettelStore) writeNamedZettelToIndex(
 	tz *zettel.Transacted,
 ) (err error) {
