@@ -15,7 +15,6 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
-	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/cwd"
@@ -553,14 +552,7 @@ func (s *zettelStore) Update(
 		return
 	}
 
-	if tz, err = s.addZettelToTransaktion(
-		z,
-		&shaObj,
-		h,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	s.StoreUtil.CommitTransacted(tz)
 
 	if err = s.writeNamedZettelToIndex(tz); err != nil {
 		err = errors.Wrap(err)
@@ -615,10 +607,9 @@ func (s *zettelStore) addZettelToTransaktion(
 ) (tz *zettel.Transacted, err error) {
 	errors.Log().Printf("adding zettel to transaktion: %s", zk)
 
-	if tz, err = s.transactedWithHead(
+	if tz, err = s.writeObjekte(
 		*zo,
 		*zk,
-		s.StoreUtil.GetTransaktionStore().GetTransaktion(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -632,15 +623,12 @@ func (s *zettelStore) addZettelToTransaktion(
 	return
 }
 
-// TODO-P1 modify this to not require immediate mutter
-// should only be called when moving forward through time, as there is a
-// dependency on the index being accurate for the immediate mutter of the zettel
-// in the arguments
-func (s *zettelStore) transactedWithHead(
+func (s *zettelStore) writeObjekte(
 	z zettel.Objekte,
 	h kennung.Hinweis,
-	t *transaktion.Transaktion,
 ) (tz *zettel.Transacted, err error) {
+	t := s.StoreUtil.GetTransaktionStore().GetTransaktion()
+
 	tz = &zettel.Transacted{
 		Objekte: z,
 		Sku: sku.Transacted[kennung.Hinweis, *kennung.Hinweis]{
@@ -650,6 +638,11 @@ func (s *zettelStore) transactedWithHead(
 				Schwanz: t.Time,
 			},
 		},
+	}
+
+	if err = s.SaveObjekte(tz); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	tz.Verzeichnisse.ResetWithObjekte(tz.Objekte)
