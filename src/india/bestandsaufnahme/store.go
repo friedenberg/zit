@@ -16,7 +16,7 @@ import (
 
 type Store interface {
 	ObjekteInflator
-	objekte_store.ObjekteSaver2
+	objekte_store.ObjekteSaver
 	AkteTextSaver
 	Create(*Objekte) error
 	objekte_store.LastReader[*Objekte]
@@ -49,7 +49,7 @@ type store struct {
 	persistentMetadateiFormat persisted_metadatei_format.Format
 	formatAkte
 	ObjekteInflator
-	objekte_store.ObjekteSaver2
+	objekte_store.ObjekteSaver
 	AkteTextSaver
 }
 
@@ -81,7 +81,7 @@ func MakeStore(
 			fa,
 			p,
 		),
-		ObjekteSaver2: objekte_store.MakeObjekteSaver2(of, pmf),
+		ObjekteSaver: objekte_store.MakeObjekteSaver(of, pmf),
 		AkteTextSaver: objekte_store.MakeAkteTextSaver[
 			Objekte,
 			*Objekte,

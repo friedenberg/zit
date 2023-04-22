@@ -8,19 +8,19 @@ import (
 	"github.com/friedenberg/zit/src/golf/persisted_metadatei_format"
 )
 
-type ObjekteSaver2 interface {
+type ObjekteSaver interface {
 	SaveObjekte(objekte.StoredLikePtr) error
 }
 
-type objekteSaver2 struct {
+type objekteSaver struct {
 	writerFactory schnittstellen.ObjekteWriterFactory
 	formatter     persisted_metadatei_format.Format
 }
 
-func MakeObjekteSaver2(
+func MakeObjekteSaver(
 	writerFactory schnittstellen.ObjekteWriterFactory,
 	pmf persisted_metadatei_format.Format,
-) ObjekteSaver2 {
+) ObjekteSaver {
 	if writerFactory == nil {
 		panic("schnittstellen.ObjekteWriterFactory was nil")
 	}
@@ -29,13 +29,13 @@ func MakeObjekteSaver2(
 		panic("persisted_metadatei_format.Format was nil")
 	}
 
-	return objekteSaver2{
+	return objekteSaver{
 		writerFactory: writerFactory,
 		formatter:     pmf,
 	}
 }
 
-func (h objekteSaver2) SaveObjekte(
+func (h objekteSaver) SaveObjekte(
 	tl objekte.StoredLikePtr,
 ) (err error) {
 	var w sha.WriteCloser

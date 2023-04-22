@@ -32,7 +32,7 @@ type storedParserSaver[
 ] struct {
 	awf          schnittstellen.AkteWriterFactory
 	akteParser   objekte.AkteParser[OPtr]
-	objekteSaver ObjekteSaver2
+	objekteSaver ObjekteSaver
 }
 
 func MakeStoredParseSaver[
@@ -57,7 +57,7 @@ func MakeStoredParseSaver[
 	return storedParserSaver[O, OPtr, K, KPtr]{
 		awf:        awf,
 		akteParser: akteParser,
-		objekteSaver: MakeObjekteSaver2(
+		objekteSaver: MakeObjekteSaver(
 			owf,
 			pmf,
 		),

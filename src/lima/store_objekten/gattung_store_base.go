@@ -80,7 +80,7 @@ type CommonStoreBase[
 
 	schnittstellen.ObjekteIOFactory
 
-	objekte_store.ObjekteSaver2
+	objekte_store.ObjekteSaver
 }
 
 type commonStoreBase[
@@ -118,7 +118,7 @@ type commonStoreBase[
 
 	persistentMetadateiFormat persisted_metadatei_format.Format
 
-	objekte_store.ObjekteSaver2
+	objekte_store.ObjekteSaver
 }
 
 func makeCommonStoreBase[
@@ -178,7 +178,7 @@ func makeCommonStoreBase[
 		),
 		TransactedReader:          tr,
 		persistentMetadateiFormat: pmf,
-		ObjekteSaver2: objekte_store.MakeObjekteSaver2(
+		ObjekteSaver: objekte_store.MakeObjekteSaver(
 			of,
 			pmf,
 		),
