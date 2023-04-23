@@ -230,6 +230,10 @@ func (a Transacted[T, T1]) Equals(b Transacted[T, T1]) (ok bool) {
 		return
 	}
 
+	if !a.AkteSha.Equals(b.AkteSha) {
+		return
+	}
+
 	return true
 }
 
