@@ -19,6 +19,7 @@ type Transacted[
 	T5 schnittstellen.VerzeichnissePtr[T4, T],
 ] struct {
 	Objekte       T
+	Metadatei     metadatei.Metadatei
 	Verzeichnisse T4
 	Sku           sku.Transacted[T2, T3]
 }
@@ -28,23 +29,33 @@ func (t Transacted[T, T1, T2, T3, T4, T5]) Kennung() T3 {
 }
 
 func (t Transacted[T, T1, T2, T3, T4, T5]) GetMetadatei() metadatei.Metadatei {
-	return t.Objekte.GetMetadatei()
+	if mg, ok := any(t.Objekte).(metadatei.Getter); ok {
+		return mg.GetMetadatei()
+	}
+
+	return t.Metadatei
 }
 
 func (t *Transacted[T, T1, T2, T3, T4, T5]) SetMetadatei(
 	m metadatei.Metadatei,
 ) {
-	T1(&t.Objekte).SetMetadatei(m)
+	if ms, ok := any(&t.Objekte).(metadatei.Setter); ok {
+		ms.SetMetadatei(m)
+	}
+
+	t.Metadatei = m
 }
 
 func (t Transacted[T, T1, T2, T3, T4, T5]) GetAkteSha() schnittstellen.Sha {
-	return t.Objekte.GetAkteSha()
+	return t.GetMetadatei().AkteSha
 }
 
 func (t *Transacted[T, T1, T2, T3, T4, T5]) SetAkteSha(
 	s schnittstellen.Sha,
 ) {
-	T1(&t.Objekte).SetAkteSha(s)
+	m := t.GetMetadatei()
+	m.AkteSha = sha.Make(s)
+	t.SetMetadatei(m)
 	t.Sku.AkteSha = sha.Make(s)
 }
 
@@ -90,6 +101,10 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) EqualsAny(b any) bool {
 func (a Transacted[T, T1, T2, T3, T4, T5]) Equals(
 	b Transacted[T, T1, T2, T3, T4, T5],
 ) bool {
+	if !a.Metadatei.Equals(b.Metadatei) {
+		return false
+	}
+
 	if !a.Sku.Equals(b.Sku) {
 		return false
 	}
@@ -233,6 +248,7 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) GetKennungString() string {
 }
 
 func (a *Transacted[T, T1, T2, T3, T4, T5]) Reset() {
+	a.Metadatei.Reset()
 	a.Sku.Reset()
 	T1(&a.Objekte).Reset()
 	T5(&a.Verzeichnisse).Reset()
@@ -249,6 +265,7 @@ func (a *Transacted[T, T1, T2, T3, T4, T5]) ResetWithPtr(
 func (a *Transacted[T, T1, T2, T3, T4, T5]) ResetWith(
 	b Transacted[T, T1, T2, T3, T4, T5],
 ) {
+	a.Metadatei.ResetWith(b.Metadatei)
 	a.Sku.ResetWith(b.Sku)
 	T1(&a.Objekte).ResetWith(b.Objekte)
 	T5(&a.Verzeichnisse).ResetWithObjekte(a.Objekte)

@@ -140,11 +140,10 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 			return
 		}
 
-		defaultTyp.SetAkteSha(sh)
-
-		if _, err = u.StoreObjekten().Typ().CreateOrUpdate(
+		if _, err = u.StoreObjekten().Typ().CreateOrUpdateAkte(
 			&defaultTyp,
 			&defaultTypKennung,
+			sh,
 		); err != nil {
 			err = errors.Wrap(err)
 			return

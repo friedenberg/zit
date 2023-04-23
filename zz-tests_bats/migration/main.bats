@@ -49,7 +49,7 @@ function migration_validate_history { # @test
 	EOM
 }
 
-function reindex { # @test
+function migration_reindex { # @test
 	run_zit reindex
 	assert_output_unsorted - <<-EOM
 		[!md@b986c1d21fcfb7f0fe11ae960236e3471b4001029a9e631d16899643922b2d15]

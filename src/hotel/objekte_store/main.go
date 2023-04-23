@@ -97,6 +97,7 @@ type CreateOrUpdater[
 	V any,
 	CO any,
 ] interface {
+	CreateOrUpdateAkte(O, K, schnittstellen.Sha) (V, error)
 	CreateOrUpdate(O, K) (V, error)
 	CreateOrUpdateCheckedOut(CO) (V, error)
 }

@@ -15,7 +15,6 @@ import (
 )
 
 type Store interface {
-	ObjekteInflator
 	objekte_store.ObjekteSaver
 	AkteTextSaver
 	Create(*Objekte) error
@@ -27,13 +26,6 @@ type Store interface {
 type AkteTextSaver = objekte_store.AkteTextSaver[
 	Objekte,
 	*Objekte,
-]
-
-type ObjekteInflator = objekte_store.ObjekteInflator[
-	Objekte,
-	*Objekte,
-	objekte.NilVerzeichnisse[Objekte],
-	*objekte.NilVerzeichnisse[Objekte],
 ]
 
 type AkteFormat = objekte.AkteFormat[
@@ -48,7 +40,6 @@ type store struct {
 	pool                      schnittstellen.Pool[Objekte, *Objekte]
 	persistentMetadateiFormat persisted_metadatei_format.Format
 	formatAkte
-	ObjekteInflator
 	objekte_store.ObjekteSaver
 	AkteTextSaver
 }
@@ -71,19 +62,7 @@ func MakeStore(
 		pool:                      p,
 		persistentMetadateiFormat: pmf,
 		formatAkte:                fa,
-		ObjekteInflator: objekte_store.MakeObjekteInflator[
-			Objekte,
-			*Objekte,
-			objekte.NilVerzeichnisse[Objekte],
-			*objekte.NilVerzeichnisse[Objekte],
-		](
-			of,
-			af,
-			pmf,
-			fa,
-			p,
-		),
-		ObjekteSaver: objekte_store.MakeObjekteSaver(of, pmf),
+		ObjekteSaver:              objekte_store.MakeObjekteSaver(of, pmf),
 		AkteTextSaver: objekte_store.MakeAkteTextSaver[
 			Objekte,
 			*Objekte,

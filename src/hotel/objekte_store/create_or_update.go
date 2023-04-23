@@ -105,7 +105,7 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdateCheckedOut(
 
 	if _, err = cou.persistentMetadateiFormat.FormatPersistentMetadatei(
 		ow,
-		transactedPtr.Objekte,
+		transactedPtr,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -190,7 +190,103 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdate(
 
 	if _, err = cou.persistentMetadateiFormat.FormatPersistentMetadatei(
 		ow,
-		transactedPtr.Objekte,
+		transactedPtr,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	transactedPtr.Sku.ObjekteSha = sha.Make(ow.Sha())
+
+	if mutter != nil &&
+		transactedPtr.Sku.Kennung.Equals(mutter.Sku.Kennung) &&
+		transactedPtr.GetObjekteSha().EqualsSha(mutter.GetObjekteSha()) {
+		transactedPtr = mutter
+
+		if err = cou.delegate.Unchanged(transactedPtr); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+	}
+
+	if err = cou.matchableAdder.AddMatchable(transactedPtr); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if mutter == nil {
+		if err = cou.delegate.New(transactedPtr); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		if err = cou.delegate.Updated(transactedPtr); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
+func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdateAkte(
+	objektePtr T1,
+	kennungPtr T3,
+	sh schnittstellen.Sha,
+) (transactedPtr *objekte.Transacted[T, T1, T2, T3, T4, T5], err error) {
+	if !cou.ls.IsAcquired() {
+		err = ErrLockRequired{
+			Operation: fmt.Sprintf("create or update %s", kennungPtr.GetGattung()),
+		}
+
+		return
+	}
+
+	var mutter *objekte.Transacted[T, T1, T2, T3, T4, T5]
+
+	if mutter, err = cou.reader.ReadOne(kennungPtr); err != nil {
+		if errors.Is(err, ErrNotFound{}) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	transactedPtr = &objekte.Transacted[T, T1, T2, T3, T4, T5]{
+		Objekte: *objektePtr,
+		Sku: sku.Transacted[T2, T3]{
+			Kennung: *kennungPtr,
+			Verzeichnisse: sku.Verzeichnisse{
+				Schwanz: cou.clock.GetTime(),
+			},
+		},
+	}
+
+	transactedPtr.SetAkteSha(sh)
+
+	if mutter != nil {
+		transactedPtr.Sku.Kopf = mutter.Sku.Kopf
+		transactedPtr.Sku.Mutter[0] = mutter.Sku.Schwanz
+	} else {
+		errors.TodoP4("determine if this is necessary any more")
+		// transactedPtr.Sku.Kopf = s.common.GetTransaktion().Time
+	}
+
+	var ow sha.WriteCloser
+
+	if ow, err = cou.of.ObjekteWriter(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.DeferredCloser(&err, ow)
+
+	if _, err = cou.persistentMetadateiFormat.FormatPersistentMetadatei(
+		ow,
+		transactedPtr,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

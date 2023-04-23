@@ -146,7 +146,13 @@ func (z *Metadatei) Reset() {
 func (z *Metadatei) ResetWith(z1 Metadatei) {
 	z.AkteSha = z1.AkteSha
 	z.Bezeichnung = z1.Bezeichnung
-	z.Etiketten = z1.Etiketten.ImmutableClone()
+
+	if z1.Etiketten == nil {
+		z.Etiketten = kennung.MakeEtikettSet()
+	} else {
+		z.Etiketten = z1.Etiketten.ImmutableClone()
+	}
+
 	z.Typ = z1.Typ
 	z.Gattung = z1.Gattung
 	z.Tai = z1.Tai

@@ -30,16 +30,25 @@ type External[
 	T2 schnittstellen.Id[T2],
 	T3 schnittstellen.IdPtr[T2],
 ] struct {
-	Objekte T
-	Sku     sku.External[T2, T3]
+	Objekte   T
+	Metadatei metadatei.Metadatei
+	Sku       sku.External[T2, T3]
 }
 
 func (a External[T, T1, T2, T3]) GetMetadatei() metadatei.Metadatei {
-	return a.Objekte.GetMetadatei()
+	if mg, ok := any(a.Objekte).(metadatei.Getter); ok {
+		return mg.GetMetadatei()
+	}
+
+	return a.Metadatei
 }
 
 func (a *External[T, T1, T2, T3]) SetMetadatei(m metadatei.Metadatei) {
-	T1(&a.Objekte).SetMetadatei(m)
+	if ms, ok := any(&a.Objekte).(metadatei.Setter); ok {
+		ms.SetMetadatei(m)
+	}
+
+	a.Metadatei = m
 }
 
 func (a External[T, T1, T2, T3]) GetEtiketten() kennung.EtikettSet {
@@ -139,7 +148,9 @@ func (e External[T, T1, T2, T3]) GetAkteSha() schnittstellen.Sha {
 }
 
 func (e *External[T, T1, T2, T3]) SetAkteSha(v schnittstellen.Sha) {
-	T1(&e.Objekte).SetAkteSha(v)
+	m := e.GetMetadatei()
+	m.AkteSha = sha.Make(v)
+	e.SetMetadatei(m)
 	e.Sku.ObjekteSha = sha.Make(v)
 }
 
