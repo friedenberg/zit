@@ -1,6 +1,12 @@
 package log
 
-import "github.com/friedenberg/zit/src/alfa/errors"
+import (
+	"log"
+
+	"github.com/friedenberg/zit/src/alfa/errors"
+)
+
+var SetOutput = log.SetOutput
 
 func Out() errors.ProdPrinter {
 	return errors.Out()

@@ -8,7 +8,7 @@ MAKEFLAGS += --no-builtin-rules
 MAKEFLAGS += --output-sync=target
 n_prc := $(shell sysctl -n hw.logicalcpu)
 MAKEFLAGS := --jobs=$(n_prc)
-cmd_bats := bats --jobs $(n_prc)
+cmd_bats := bats --tap --jobs $(n_prc)
 
 ifeq ($(origin .RECIPEPREFIX), undefined)
 				$(error This Make does not support .RECIPEPREFIX. Please use GNU Make 4.0 or later)
@@ -45,15 +45,11 @@ build/go_vet: $(files_go)
 dirs_go_unit := $(shell find src -mindepth 2 -iname '*_test.go' -print0 | xargs -0 dirname | sort -u)
 
 build/tests_unit: $(files_go) build/go_generate
-> $(HOME)/.vim/ftplugin/go-test.bash $(dirs_go_unit)
-> touch "$@"
-
-build/tests_unit_foxtrot_metadatei: src/foxtrot/metadatei/*
-> $(HOME)/.vim/ftplugin/go-test.bash '$(dir $<)'
+> @$(HOME)/.vim/ftplugin/go-test.bash $(dirs_go_unit)
 > touch "$@"
 
 build/tests_fast: build/go_vet build/tests_unit
-> touch "$@"
+> @touch "$@"
 
 files_tests_bats := $(shell find zz-tests_bats -type f)
 
