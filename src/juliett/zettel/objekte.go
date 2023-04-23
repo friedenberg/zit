@@ -24,10 +24,6 @@ func (z *Objekte) SetMetadatei(m metadatei.Metadatei) {
 	z.Metadatei = m
 }
 
-// func (z Objekte) GetTyp() kennung.Typ {
-// 	return z.Metadatei.Typ
-// }
-
 func (z Objekte) GetGattung() schnittstellen.Gattung {
 	return gattung.Zettel
 }
