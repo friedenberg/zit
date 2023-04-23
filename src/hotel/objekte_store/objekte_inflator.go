@@ -66,7 +66,7 @@ func (h *objekteInflator[T, T1, T2, T3]) InflateObjekteFromSku(
 		return
 	}
 
-	sh := o.GetAkteSha()
+	sh := sk.GetAkteSha()
 
 	if sh.IsNull() {
 		return
