@@ -2,10 +2,10 @@ package erworben
 
 import "github.com/friedenberg/zit/src/delta/kennung"
 
-func Default() (k *Objekte) {
-	k = &Objekte{
+func Default(defaultTyp kennung.Typ) (k Objekte) {
+	k = Objekte{
 		Akte: Akte{
-			DefaultTyp: kennung.MustTyp("md"),
+			DefaultTyp: defaultTyp,
 			FileExtensions: FileExtensions{
 				Typ:      "typ",
 				Zettel:   "zettel",

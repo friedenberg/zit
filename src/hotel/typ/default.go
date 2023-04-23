@@ -6,11 +6,10 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
-func Default() (t *Objekte, k *kennung.Typ) {
-	k1 := kennung.MustTyp("md")
-	k = &k1
+func Default() (t Objekte, k kennung.Typ) {
+	k = kennung.MustTyp("md")
 
-	t = &Objekte{
+	t = Objekte{
 		Akte: Akte{
 			InlineAkte:     true,
 			FileExtension:  "md",
@@ -25,7 +24,6 @@ func Default() (t *Objekte, k *kennung.Typ) {
 }
 
 func MakeObjekte() (t *Objekte) {
-
 	t = &Objekte{
 		Akte: Akte{
 			Formatters:     make(map[string]script_config.WithOutputFormat),

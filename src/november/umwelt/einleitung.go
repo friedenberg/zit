@@ -124,13 +124,17 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 
 	defaultTyp, defaultTypKennung := typ.Default()
 
-	if _, err = u.StoreObjekten().Typ().ReadOne(defaultTypKennung); err != nil {
+	// var defaultTypTransacted *typ.Transacted
+
+	if _, err = u.StoreObjekten().Typ().ReadOne(
+		&defaultTypKennung,
+	); err != nil {
 		err = nil
 
 		var sh schnittstellen.Sha
 
 		if sh, _, err = u.StoreObjekten().Typ().SaveAkteText(
-			*defaultTyp,
+			defaultTyp,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -138,26 +142,22 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 
 		defaultTyp.SetAkteSha(sh)
 
-		var defaultTypTransacted *typ.Transacted
-
-		if defaultTypTransacted, err = u.StoreObjekten().Typ().CreateOrUpdate(
-			defaultTyp,
-			defaultTypKennung,
+		if _, err = u.StoreObjekten().Typ().CreateOrUpdate(
+			&defaultTyp,
+			&defaultTypKennung,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
-
-		u.KonfigPtr().DefaultTyp = *defaultTypTransacted
 	}
 
 	{
-		defaultKonfig := erworben.Default()
+		defaultKonfig := erworben.Default(defaultTypKennung)
 
 		var sh schnittstellen.Sha
 
 		if sh, _, err = u.StoreObjekten().Konfig().SaveAkteText(
-			*defaultKonfig,
+			defaultKonfig,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -165,16 +165,12 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 
 		defaultKonfig.SetAkteSha(sh)
 
-		var defaultKonfigTransacted *erworben.Transacted
-
-		if defaultKonfigTransacted, err = u.StoreObjekten().Konfig().Update(
-			defaultKonfig,
+		if _, err = u.StoreObjekten().Konfig().Update(
+			&defaultKonfig,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
-
-		u.KonfigPtr().SetTransacted(defaultKonfigTransacted)
 	}
 
 	return

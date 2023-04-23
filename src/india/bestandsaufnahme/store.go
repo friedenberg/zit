@@ -106,10 +106,14 @@ func (s *store) Create(o *Objekte) (err error) {
 		return
 	}
 
-	if s.SaveAkteText(*o); err != nil {
+	var sh schnittstellen.Sha
+
+	if sh, _, err = s.SaveAkteText(*o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	o.SetAkteSha(sh)
 
 	if err = s.SaveObjekte(o); err != nil {
 		err = errors.Wrap(err)

@@ -154,15 +154,33 @@ function show_simple_all { # @test
 	EOM
 }
 
-function show_simple_typ { # @test
+function show_simple_typ_schwanzen { # @test
 	run_zit show -format log .t
 	assert_output_unsorted - <<-EOM
 		[!md@b986c1d21fcfb7f0fe11ae960236e3471b4001029a9e631d16899643922b2d15]
 	EOM
 }
 
-function show_simple_etikett { # @test
+function show_simple_typ_history { # @test
+	run_zit show -format log +t
+	assert_output_unsorted - <<-EOM
+		[!md@b986c1d21fcfb7f0fe11ae960236e3471b4001029a9e631d16899643922b2d15]
+	EOM
+}
+
+function show_simple_etikett_schwanzen { # @test
 	run_zit show -format log .e
+	assert_output_unsorted - <<-EOM
+		[-tag-2@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-tag-3@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-tag-4@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-tag@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-tag-1@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+	EOM
+}
+
+function show_simple_etikett_history { # @test
+	run_zit show -format log +e
 	assert_output_unsorted - <<-EOM
 		[-tag-2@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
 		[-tag-3@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]

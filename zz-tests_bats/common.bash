@@ -72,6 +72,8 @@ function run_zit_init_disable_age {
 	assert_success
 	assert_output - <<-EOM
 		[!md@b986c1d21fcfb7f0fe11ae960236e3471b4001029a9e631d16899643922b2d15]
-		[konfig@f6d3d0874fd9475c2b7ac150f366cd211d847a8676ccabc35111cb357fd0c3b9]
+		[konfig@62c02b6f59e6de576a3fcc1b89db6e85b75c2ff7820df3049a5b12f9db86d1f5]
+		[!md@b986c1d21fcfb7f0fe11ae960236e3471b4001029a9e631d16899643922b2d15]
+		[konfig@62c02b6f59e6de576a3fcc1b89db6e85b75c2ff7820df3049a5b12f9db86d1f5]
 	EOM
 }

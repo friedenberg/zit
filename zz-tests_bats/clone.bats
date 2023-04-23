@@ -47,7 +47,9 @@ function clone { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md@b986c1d21fcfb7f0fe11ae960236e3471b4001029a9e631d16899643922b2d15]
-		[konfig@f6d3d0874fd9475c2b7ac150f366cd211d847a8676ccabc35111cb357fd0c3b9]
+		[!md@b986c1d21fcfb7f0fe11ae960236e3471b4001029a9e631d16899643922b2d15]
+		[konfig@62c02b6f59e6de576a3fcc1b89db6e85b75c2ff7820df3049a5b12f9db86d1f5]
+		[konfig@62c02b6f59e6de576a3fcc1b89db6e85b75c2ff7820df3049a5b12f9db86d1f5]
 		[one/uno@37d3869e9b1711f009eabf69a2bf294cfd785f5b1c7463cba77d11d5f81f5e09 !md "wow"]
 	EOM
 }

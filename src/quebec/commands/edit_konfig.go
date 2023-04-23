@@ -98,7 +98,7 @@ func (c EditKonfig) makeTempKonfigFile(
 		return
 	}
 
-	defer errors.Deferred(&err, f.Close)
+	defer errors.DeferredCloser(&err, f)
 
 	p = f.Name()
 

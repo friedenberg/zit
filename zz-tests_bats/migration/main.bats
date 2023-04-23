@@ -7,20 +7,34 @@ setup() {
 	export output
 
 	version="v$(zit store-version)"
-	cp -r "$DIR/$version" "$BATS_TEST_TMPDIR"
-	cd "$BATS_TEST_TMPDIR/$version" || exit 1
+	copy_from_version "$DIR/../" "$version"
 }
 
 teardown() {
 	rm_from_version "$version"
 }
 
-function init_and_deinit { # @test
+function migration_status_empty { # @test
 	run_zit status
 	assert_success
+	assert_output ''
 }
 
-function validate_contents { # @test
+function migration_validate_schwanzen { # @test
+	run_zit show -format log :z,e,t
+	assert_output_unsorted - <<-EOM
+		[!md@b986c1d21fcfb7f0fe11ae960236e3471b4001029a9e631d16899643922b2d15]
+		[-tag-1@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-tag-2@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-tag-3@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-tag-4@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-tag@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[one/dos@c6b9d095358b8b26a99e90496d916ba92a99e9b75c705165df5f6d353a949ea9 !md "wow ok again"]
+		[one/uno@d47c552a5299f392948258d7959fc7cf94843316a21c8ea12854ed84a8c06367 !md "wow the first"]
+	EOM
+}
+
+function migration_validate_history { # @test
 	run_zit show -format log +z,e,t
 	assert_output_unsorted - <<-EOM
 		[!md@b986c1d21fcfb7f0fe11ae960236e3471b4001029a9e631d16899643922b2d15]

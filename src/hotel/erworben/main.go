@@ -21,8 +21,8 @@ type Transacted = objekte.Transacted[
 
 type Objekte struct {
 	// TODO-P3 rename to AkteSha
-	Sha  sha.Sha
-	Akte Akte
+	Sha sha.Sha `toml:"-"`
+	Akte
 }
 
 func (a Objekte) GetMetadatei() metadatei.Metadatei {

@@ -106,6 +106,7 @@ func makeKonfigStore(
 			sa,
 			akteFormat,
 		),
+		akteFormat: akteFormat,
 	}
 
 	return

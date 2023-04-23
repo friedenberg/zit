@@ -60,7 +60,9 @@ build/tests_bats: build/zit $(files_tests_bats)
 build/tests_slow: build/tests_fast build/tests_bats
 > touch "$@"
 
-build/tests_bats_migration: build/zit
+files_tests_bats_migration := $(shell find zz-tests_bats/migration)
+
+build/tests_bats_migration: build/zit $(files_tests_bats_migration)
 > $(cmd_bats) zz-tests_bats/migration/*.bats
 > touch "$@"
 
