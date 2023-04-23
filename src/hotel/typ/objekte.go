@@ -9,18 +9,16 @@ import (
 )
 
 type Objekte struct {
-	Sha sha.Sha `toml:"-"`
 	Akte
+	Metadatei metadatei.Metadatei `toml:"-"`
 }
 
 func (a Objekte) GetMetadatei() metadatei.Metadatei {
-	return metadatei.Metadatei{
-		AkteSha: a.Sha,
-	}
+	return a.Metadatei
 }
 
 func (a *Objekte) SetMetadatei(m metadatei.Metadatei) {
-	a.Sha = m.AkteSha
+	a.Metadatei = m
 }
 
 func (a Objekte) EqualsAny(b any) bool {
@@ -28,17 +26,17 @@ func (a Objekte) EqualsAny(b any) bool {
 }
 
 func (o Objekte) Reset() {
-	o.Sha = sha.Sha{}
 	o.Akte.Reset()
+	o.Metadatei.Reset()
 }
 
 func (o Objekte) ResetWith(o1 Objekte) {
-	o.Sha = o1.Sha
+	o.Metadatei.ResetWith(o1.Metadatei)
 	o.Akte.ResetWith(o1.Akte)
 }
 
 func (o Objekte) Equals(o1 Objekte) bool {
-	if !o.Sha.Equals(o1.Sha) {
+	if !o.Metadatei.Equals(o1.Metadatei) {
 		return false
 	}
 
@@ -54,9 +52,9 @@ func (o Objekte) GetGattung() schnittstellen.Gattung {
 }
 
 func (o Objekte) GetAkteSha() schnittstellen.Sha {
-	return o.Sha
+	return o.Metadatei.AkteSha
 }
 
 func (o *Objekte) SetAkteSha(v schnittstellen.Sha) {
-	o.Sha = sha.Make(v)
+	o.Metadatei.AkteSha = sha.Make(v)
 }
