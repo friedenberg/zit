@@ -29,10 +29,6 @@ func (z Objekte) GetTyp() kennung.Typ {
 	return z.Metadatei.Typ
 }
 
-func (z Objekte) GetEtiketten() schnittstellen.Set[kennung.Etikett] {
-	return z.Metadatei.GetEtiketten()
-}
-
 func (z Objekte) GetGattung() schnittstellen.Gattung {
 	return gattung.Zettel
 }

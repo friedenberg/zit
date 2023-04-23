@@ -44,7 +44,9 @@ func (a *External[T, T1, T2, T3]) SetMetadatei(m metadatei.Metadatei) {
 
 func (a External[T, T1, T2, T3]) GetEtiketten() kennung.EtikettSet {
 	egs := []any{
+		// a.Verzeichnisse,
 		a.Objekte,
+		a.GetMetadatei(),
 	}
 
 	for _, o := range egs {
@@ -59,6 +61,7 @@ func (a External[T, T1, T2, T3]) GetEtiketten() kennung.EtikettSet {
 func (a External[T, T1, T2, T3]) GetEtikettenExpanded() kennung.EtikettSet {
 	egs := []any{
 		a.Objekte,
+		a.GetMetadatei(),
 	}
 
 	for _, o := range egs {
