@@ -179,7 +179,7 @@ func (s *Store) CheckoutOneZettel(
 		}
 	}
 
-	inlineAkte := s.erworben.IsInlineTyp(sz.Objekte.GetTyp())
+	inlineAkte := s.erworben.IsInlineTyp(sz.GetTyp())
 
 	cz.State = objekte.CheckedOutStateJustCheckedOut
 	cz.External = zettel.External{
@@ -196,7 +196,7 @@ func (s *Store) CheckoutOneZettel(
 
 	if (!inlineAkte || !options.CheckoutMode.IncludesObjekte()) &&
 		options.CheckoutMode.IncludesAkte() {
-		t := sz.Objekte.GetTyp()
+		t := sz.GetTyp()
 
 		ty := s.erworben.GetApproximatedTyp(t).ApproximatedOrActual()
 

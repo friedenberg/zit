@@ -98,7 +98,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	typKonfig := u.Konfig().GetApproximatedTyp(
-		zt.Objekte.GetTyp(),
+		zt.GetTyp(),
 	).ApproximatedOrActual()
 
 	var akteFormatter script_config.ScriptConfig
@@ -124,7 +124,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			err = errors.Normalf(
 				"format '%s' for Typ '%s' not found",
 				actualFormatId,
-				zt.Objekte.GetTyp(),
+				zt.GetTyp(),
 			)
 
 			return

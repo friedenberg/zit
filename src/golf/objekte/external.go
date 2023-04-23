@@ -73,18 +73,21 @@ func (a External[T, T1, T2, T3]) GetEtikettenExpanded() kennung.EtikettSet {
 	return kennung.Expanded(a.GetEtiketten())
 }
 
-func (a External[T, T1, T2, T3]) GetTyp() kennung.Typ {
-	ok := false
-	o := any(a.Objekte)
-
-	var tg kennung.TypGetter
-
-	if tg, ok = o.(kennung.TypGetter); !ok {
-		tg = nil
-		return kennung.MustTyp(a.GetGattung().GetGattungString())
+func (a External[T, T1, T2, T3]) GetTyp() (t kennung.Typ) {
+	tgs := []any{
+		// a.Verzeichnisse,
+		a.Objekte,
+		a.GetMetadatei(),
 	}
 
-	return tg.GetTyp()
+	for _, o := range tgs {
+		if tg, ok := o.(kennung.TypGetter); ok {
+			t = tg.GetTyp()
+			return
+		}
+	}
+
+	return
 }
 
 func (a External[T, T1, T2, T3]) GetIdLike() (il kennung.IdLike) {

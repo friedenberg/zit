@@ -29,7 +29,7 @@ func MakeWriterKonfig(
 			}
 		}
 
-		t := k.GetApproximatedTyp(z.Objekte.GetTyp()).ApproximatedOrActual()
+		t := k.GetApproximatedTyp(z.GetTyp()).ApproximatedOrActual()
 
 		if t != nil && t.Objekte.Akte.Archived {
 			err = collections.MakeErrStopIteration()

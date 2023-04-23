@@ -71,7 +71,7 @@ func (fv *FormatterValue) FuncFormatter(
 	switch fv.string {
 	case "formatters":
 		return func(o *Transacted) (err error) {
-			t := k.GetApproximatedTyp(o.Objekte.GetTyp())
+			t := k.GetApproximatedTyp(o.GetTyp())
 
 			if !t.HasValue() {
 				return
@@ -99,7 +99,7 @@ func (fv *FormatterValue) FuncFormatter(
 
 	case "typ":
 		return func(o *Transacted) (err error) {
-			if _, err = io.WriteString(out, o.Objekte.GetTyp().String()); err != nil {
+			if _, err = io.WriteString(out, o.GetTyp().String()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -112,7 +112,7 @@ func (fv *FormatterValue) FuncFormatter(
 			var t *typ.Transacted
 
 			if t = k.GetApproximatedTyp(
-				o.Objekte.GetTyp(),
+				o.GetTyp(),
 			).ApproximatedOrActual(); t == nil {
 				return
 			}

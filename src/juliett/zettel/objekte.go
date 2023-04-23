@@ -5,7 +5,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
 
@@ -25,9 +24,9 @@ func (z *Objekte) SetMetadatei(m metadatei.Metadatei) {
 	z.Metadatei = m
 }
 
-func (z Objekte) GetTyp() kennung.Typ {
-	return z.Metadatei.Typ
-}
+// func (z Objekte) GetTyp() kennung.Typ {
+// 	return z.Metadatei.Typ
+// }
 
 func (z Objekte) GetGattung() schnittstellen.Gattung {
 	return gattung.Zettel

@@ -165,7 +165,7 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 			return
 		}
 
-		if z.GetTyp().IsEmpty() {
+		if z.Metadatei.GetTyp().IsEmpty() {
 			if err = z.Metadatei.Typ.Set(
 				c.Konfig().DefaultTyp.Sku.Kennung.String(),
 			); err != nil {
