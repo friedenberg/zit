@@ -384,6 +384,7 @@ func (s *zettelStore) UpdateCheckedOut(
 	}
 
 	m := co.External.GetMetadatei()
+	m.ResetWith(m)
 
 	if err = s.StoreUtil.GetKonfig().ApplyToMetadatei(&m); err != nil {
 		err = errors.Wrap(err)

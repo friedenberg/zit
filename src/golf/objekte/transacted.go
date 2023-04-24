@@ -259,6 +259,7 @@ func (a *Transacted[T, T1, T2, T3, T4, T5]) Reset() {
 	a.Sku.Reset()
 	T1(&a.Objekte).Reset()
 	T5(&a.Verzeichnisse).Reset()
+  AssertAkteShasMatch(a)
 }
 
 func (a *Transacted[T, T1, T2, T3, T4, T5]) ResetWithPtr(
@@ -267,6 +268,7 @@ func (a *Transacted[T, T1, T2, T3, T4, T5]) ResetWithPtr(
 	a.Sku.ResetWith(b.Sku)
 	T1(&a.Objekte).ResetWith(b.Objekte)
 	T5(&a.Verzeichnisse).ResetWithObjekteMetadateiGetter(a.Objekte, a)
+  AssertAkteShasMatch(a)
 }
 
 func (a *Transacted[T, T1, T2, T3, T4, T5]) ResetWith(
@@ -276,4 +278,5 @@ func (a *Transacted[T, T1, T2, T3, T4, T5]) ResetWith(
 	a.Sku.ResetWith(b.Sku)
 	T1(&a.Objekte).ResetWith(b.Objekte)
 	T5(&a.Verzeichnisse).ResetWithObjekteMetadateiGetter(a.Objekte, a)
+  AssertAkteShasMatch(a)
 }

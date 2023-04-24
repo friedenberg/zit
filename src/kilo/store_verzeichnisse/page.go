@@ -82,6 +82,8 @@ func (zp *Page) Add(z *zettel.Transacted) (err error) {
 		return
 	}
 
+	objekte.AssertAkteShasMatch(z)
+
 	if err = zp.addFilter(z); err != nil {
 		if collections.IsStopIteration(err) {
 			errors.Log().Printf("eliding %s", z.Kennung())
