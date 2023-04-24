@@ -23,11 +23,6 @@ type StoredPtr interface {
 	SetObjekteSha(Sha)
 }
 
-type VerzeichnissePtr[T any, T1 Objekte[T1]] interface {
-	Resetable[T]
-	ResetWithObjekte(T1)
-}
-
 type Transacted[T any] interface {
 	Stored
 	GetKennungString() string

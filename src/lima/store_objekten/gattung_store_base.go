@@ -19,7 +19,7 @@ type CommonStoreBase[
 	K schnittstellen.Id[K],
 	KPtr schnittstellen.IdPtr[K],
 	V any,
-	VPtr schnittstellen.VerzeichnissePtr[V, O],
+	VPtr objekte.VerzeichnissePtr[V, O],
 ] interface {
 	reindexer
 
@@ -89,7 +89,7 @@ type commonStoreBase[
 	K schnittstellen.Id[K],
 	KPtr schnittstellen.IdPtr[K],
 	V any,
-	VPtr schnittstellen.VerzeichnissePtr[V, O],
+	VPtr objekte.VerzeichnissePtr[V, O],
 ] struct {
 	schnittstellen.GattungGetter
 
@@ -127,7 +127,7 @@ func makeCommonStoreBase[
 	K schnittstellen.Id[K],
 	KPtr schnittstellen.IdPtr[K],
 	V any,
-	VPtr schnittstellen.VerzeichnissePtr[V, O],
+	VPtr objekte.VerzeichnissePtr[V, O],
 ](
 	gg schnittstellen.GattungGetter,
 	delegate commonStoreDelegate[O, OPtr, K, KPtr, V, VPtr],

@@ -28,7 +28,7 @@ type CommonStore[
 	K schnittstellen.Id[K],
 	KPtr schnittstellen.IdPtr[K],
 	V any,
-	VPtr schnittstellen.VerzeichnissePtr[V, O],
+	VPtr objekte.VerzeichnissePtr[V, O],
 ] interface {
 	CommonStoreBase[
 		O,
@@ -67,7 +67,7 @@ type commonStoreDelegate[
 	K schnittstellen.Id[K],
 	KPtr schnittstellen.IdPtr[K],
 	V any,
-	VPtr schnittstellen.VerzeichnissePtr[V, O],
+	VPtr objekte.VerzeichnissePtr[V, O],
 ] interface {
 	addOne(*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]) error
 	updateOne(*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]) error
@@ -87,7 +87,7 @@ type commonStore[
 	K schnittstellen.Id[K],
 	KPtr schnittstellen.IdPtr[K],
 	V any,
-	VPtr schnittstellen.VerzeichnissePtr[V, O],
+	VPtr objekte.VerzeichnissePtr[V, O],
 ] struct {
 	commonStoreBase[O, OPtr, K, KPtr, V, VPtr]
 	AkteFormat objekte.AkteFormat[O, OPtr]
@@ -100,7 +100,7 @@ func makeCommonStore[
 	K schnittstellen.Id[K],
 	KPtr schnittstellen.IdPtr[K],
 	V any,
-	VPtr schnittstellen.VerzeichnissePtr[V, O],
+	VPtr objekte.VerzeichnissePtr[V, O],
 ](
 	gg schnittstellen.GattungGetter,
 	delegate commonStoreDelegate[O, OPtr, K, KPtr, V, VPtr],

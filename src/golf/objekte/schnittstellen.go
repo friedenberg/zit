@@ -4,21 +4,10 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
 
 type (
-	// AkteGetter[A any] interface {
-	// 	GetAkte() A
-	// }
-
-	// AktePtrGetter[A any, APtr schnittstellen.Ptr[A]] interface {
-	// 	GetAktePtr() APtr
-	// }
-
-	// AkteParser[T any] interface {
-	// 	ParseAkte(io.Reader, T) (int64, error)
-	// }
-
 	SavedAkteFormatter interface {
 		FormatSavedAkte(io.Writer, schnittstellen.Sha) (int64, error)
 	}
@@ -35,5 +24,10 @@ type (
 		SavedAkteFormatter
 		ParsedAkteFormatter[T]
 		AkteParseSaver[TPtr]
+	}
+
+	VerzeichnissePtr[T any, T1 Objekte[T1]] interface {
+		schnittstellen.Resetable[T]
+		ResetWithObjekteMetadateiGetter(T1, metadatei.Getter)
 	}
 )

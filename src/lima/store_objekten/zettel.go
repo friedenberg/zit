@@ -527,7 +527,7 @@ func (s *zettelStore) writeObjekte(
 		return
 	}
 
-	tz.Verzeichnisse.ResetWithObjekte(tz.Objekte)
+	tz.Verzeichnisse.ResetWithObjekteMetadateiGetter(tz.Objekte, tz)
 
 	return
 }

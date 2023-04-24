@@ -14,7 +14,7 @@ type ExternalMaybeGetterReader[
 	K schnittstellen.Id[K],
 	KPtr schnittstellen.IdPtr[K],
 	V any,
-	VPtr schnittstellen.VerzeichnissePtr[V, O],
+	VPtr objekte.VerzeichnissePtr[V, O],
 ] interface {
 	ReadOne(
 		objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
@@ -27,7 +27,7 @@ type externalMaybeGetterReader[
 	K schnittstellen.Id[K],
 	KPtr schnittstellen.IdPtr[K],
 	V any,
-	VPtr schnittstellen.VerzeichnissePtr[V, O],
+	VPtr objekte.VerzeichnissePtr[V, O],
 ] struct {
 	getter func(K) (sku.ExternalMaybe[K, KPtr], bool)
 	ExternalReader[sku.ExternalMaybe[K, KPtr],
@@ -41,7 +41,7 @@ func MakeExternalMaybeGetterReader[
 	K schnittstellen.Id[K],
 	KPtr schnittstellen.IdPtr[K],
 	V any,
-	VPtr schnittstellen.VerzeichnissePtr[V, O],
+	VPtr objekte.VerzeichnissePtr[V, O],
 ](
 	getter func(K) (sku.ExternalMaybe[K, KPtr], bool),
 	er ExternalReader[

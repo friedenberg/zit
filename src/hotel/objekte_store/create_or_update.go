@@ -25,7 +25,7 @@ type createOrUpdate[
 	T2 schnittstellen.Id[T2],
 	T3 schnittstellen.IdPtr[T2],
 	T4 any,
-	T5 schnittstellen.VerzeichnissePtr[T4, T],
+	T5 objekte.VerzeichnissePtr[T4, T],
 ] struct {
 	clock                     ts.Clock
 	ls                        schnittstellen.LockSmith
@@ -43,7 +43,7 @@ func MakeCreateOrUpdate[
 	T2 schnittstellen.Id[T2],
 	T3 schnittstellen.IdPtr[T2],
 	T4 any,
-	T5 schnittstellen.VerzeichnissePtr[T4, T],
+	T5 objekte.VerzeichnissePtr[T4, T],
 ](
 	clock ts.Clock,
 	ls schnittstellen.LockSmith,

@@ -16,7 +16,7 @@ type Transacted[
 	T2 schnittstellen.Id[T2],
 	T3 schnittstellen.IdPtr[T2],
 	T4 any,
-	T5 schnittstellen.VerzeichnissePtr[T4, T],
+	T5 VerzeichnissePtr[T4, T],
 ] struct {
 	Objekte       T
 	Metadatei     metadatei.Metadatei
@@ -271,7 +271,7 @@ func (a *Transacted[T, T1, T2, T3, T4, T5]) ResetWithPtr(
 ) {
 	a.Sku.ResetWith(b.Sku)
 	T1(&a.Objekte).ResetWith(b.Objekte)
-	T5(&a.Verzeichnisse).ResetWithObjekte(a.Objekte)
+	T5(&a.Verzeichnisse).ResetWithObjekteMetadateiGetter(a.Objekte, a)
 }
 
 func (a *Transacted[T, T1, T2, T3, T4, T5]) ResetWith(
@@ -280,5 +280,5 @@ func (a *Transacted[T, T1, T2, T3, T4, T5]) ResetWith(
 	a.Metadatei.ResetWith(b.Metadatei)
 	a.Sku.ResetWith(b.Sku)
 	T1(&a.Objekte).ResetWith(b.Objekte)
-	T5(&a.Verzeichnisse).ResetWithObjekte(a.Objekte)
+	T5(&a.Verzeichnisse).ResetWithObjekteMetadateiGetter(a.Objekte, a)
 }

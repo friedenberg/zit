@@ -28,7 +28,7 @@ type TransactedInflator[
 	T2 schnittstellen.Id[T2],
 	T3 schnittstellen.IdPtr[T2],
 	T4 any,
-	T5 schnittstellen.VerzeichnissePtr[T4, T],
+	T5 objekte.VerzeichnissePtr[T4, T],
 ] interface {
 	InflateFromSku(sku.Sku) (*objekte.Transacted[T, T1, T2, T3, T4, T5], error)
 	InflateFromSku2(sku.Sku2) (*objekte.Transacted[T, T1, T2, T3, T4, T5], error)
@@ -42,7 +42,7 @@ type transactedInflator[
 	T2 schnittstellen.Id[T2],
 	T3 schnittstellen.IdPtr[T2],
 	T4 any,
-	T5 schnittstellen.VerzeichnissePtr[T4, T],
+	T5 objekte.VerzeichnissePtr[T4, T],
 ] struct {
 	of                        schnittstellen.ObjekteIOFactory
 	af                        schnittstellen.AkteIOFactory
@@ -60,7 +60,7 @@ func MakeTransactedInflator[
 	T2 schnittstellen.Id[T2],
 	T3 schnittstellen.IdPtr[T2],
 	T4 any,
-	T5 schnittstellen.VerzeichnissePtr[T4, T],
+	T5 objekte.VerzeichnissePtr[T4, T],
 ](
 	of schnittstellen.ObjekteIOFactory,
 	af schnittstellen.AkteIOFactory,
@@ -304,7 +304,7 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) readObjekte(
 	}
 
 	t.SetAkteSha(t.GetMetadatei().AkteSha)
-	T5(&t.Verzeichnisse).ResetWithObjekte(t.Objekte)
+	T5(&t.Verzeichnisse).ResetWithObjekteMetadateiGetter(t.Objekte, t)
 
 	errors.Log().Printf("parsed %d objekte bytes", n)
 

@@ -3,6 +3,7 @@ package kasten
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/tridex"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
 
 type Verzeichnisse struct {
@@ -11,7 +12,10 @@ type Verzeichnisse struct {
 	Objekten     schnittstellen.MutableTridex
 }
 
-func (z *Verzeichnisse) ResetWithObjekte(z1 Objekte) {
+func (z *Verzeichnisse) ResetWithObjekteMetadateiGetter(
+	z1 Objekte,
+	_ metadatei.Getter,
+) {
 	z.wasPopulated = true
 }
 
