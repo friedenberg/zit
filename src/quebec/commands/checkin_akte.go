@@ -121,10 +121,10 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 				return
 			}
 
-			zettels[i].Objekte.Metadatei.AkteSha = sha.Make(ow.Sha())
+			zettels[i].SetAkteSha(ow.Sha())
 
 		case shaError == nil:
-			zettels[i].Objekte.Metadatei.AkteSha = as
+			zettels[i].SetAkteSha(as)
 
 		default:
 			err = errors.Errorf("argument is neither sha nor path")

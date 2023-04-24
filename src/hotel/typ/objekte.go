@@ -3,7 +3,6 @@ package typ
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
@@ -49,12 +48,4 @@ func (o Objekte) Equals(o1 Objekte) bool {
 
 func (o Objekte) GetGattung() schnittstellen.Gattung {
 	return gattung.Typ
-}
-
-func (o Objekte) GetAkteSha() schnittstellen.Sha {
-	return o.Metadatei.AkteSha
-}
-
-func (o *Objekte) SetAkteSha(v schnittstellen.Sha) {
-	o.Metadatei.AkteSha = sha.Make(v)
 }

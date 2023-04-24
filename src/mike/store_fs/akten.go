@@ -68,7 +68,7 @@ func (s Store) ReadExternalZettelFromAktePath(
 
 	errors.TodoP2("add mod time")
 	cz.External.Sku.FDs.Akte.Path = p
-	cz.External.Objekte.Metadatei.AkteSha = akteSha
+	cz.External.SetAkteSha(akteSha)
 	// cz.Matches.Akten, _ = s.storeObjekten.ReadAkteSha(akteSha)
 
 	cz.DetermineState()

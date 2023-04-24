@@ -194,9 +194,7 @@ func (c ZettelFromExternalAkte) zettelForAkte(
 	}
 
 	z.Objekte.Reset()
-	akteSha := sha.Make(akteWriter.Sha())
-	z.Objekte.Metadatei.AkteSha = akteSha
-	z.Sku.AkteSha = akteSha
+	z.SetAkteSha(akteWriter.Sha())
 
 	if err = c.ProtoZettel.ApplyWithAkteFD(
 		&z.Objekte.Metadatei,

@@ -4,16 +4,11 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
 
 type Objekte struct {
 	Metadatei metadatei.Metadatei
-}
-
-func (z *Objekte) SetAkteSha(v schnittstellen.Sha) {
-	z.Metadatei.AkteSha = sha.Make(v)
 }
 
 func (z Objekte) GetMetadatei() metadatei.Metadatei {
@@ -26,10 +21,6 @@ func (z *Objekte) SetMetadatei(m metadatei.Metadatei) {
 
 func (z Objekte) GetGattung() schnittstellen.Gattung {
 	return gattung.Zettel
-}
-
-func (z Objekte) GetAkteSha() schnittstellen.Sha {
-	return z.Metadatei.AkteSha
 }
 
 func (z Objekte) Equals(z1 Objekte) bool {
