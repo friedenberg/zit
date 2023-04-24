@@ -7,8 +7,16 @@ import (
 )
 
 func (k compiled) ApplyToMetadatei(
-	m *metadatei.Metadatei,
+	ml metadatei.MetadateiLike,
 ) (err error) {
+	m := ml.GetMetadatei()
+
+	defer func() {
+		if err == nil {
+			ml.SetMetadatei(m)
+		}
+	}()
+
 	t := m.GetTyp()
 	normalized := kennung.WithRemovedCommonPrefixes(m.Etiketten)
 	m.Etiketten = normalized

@@ -48,7 +48,7 @@ func makeZettel(
 	errors.TodoP4("add bez in a better way")
 	z = zettel{
 		Hinweis:     h,
-		Bezeichnung: bezeichnung.Make(named.Objekte.Metadatei.Description()),
+		Bezeichnung: bezeichnung.Make(named.GetMetadatei().Description()),
 	}
 
 	return

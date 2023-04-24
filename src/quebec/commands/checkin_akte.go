@@ -132,7 +132,9 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		}
 
 		if c.NewEtiketten.Len() > 0 {
-			zettels[i].Objekte.Metadatei.Etiketten = c.NewEtiketten
+			m := zettels[i].GetMetadatei()
+			m.Etiketten = c.NewEtiketten
+			zettels[i].SetMetadatei(m)
 		}
 	}
 

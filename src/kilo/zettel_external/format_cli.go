@@ -31,7 +31,7 @@ func MakeCliFormat(
 				format.MakeFormatString("@"),
 				format.MakeWriter(sf, z.GetObjekteSha().GetSha()),
 				format.MakeFormatString(" "),
-				format.MakeWriter(mf, z.Objekte.Metadatei),
+				format.MakeWriter(mf, z.GetMetadatei()),
 				format.MakeFormatString("]\n"),
 				format.MakeFormatStringRightAligned(""),
 				format.MakeFormatString("["),
@@ -50,7 +50,7 @@ func MakeCliFormat(
 				format.MakeFormatString("@"),
 				format.MakeWriter(sf, schnittstellen.Sha(z.GetAkteSha())),
 				format.MakeFormatString(" "),
-				format.MakeWriter(mf, z.Objekte.Metadatei),
+				format.MakeWriter(mf, z.GetMetadatei()),
 				format.MakeFormatString("]"),
 			)
 
@@ -63,7 +63,7 @@ func MakeCliFormat(
 				format.MakeFormatString("@"),
 				format.MakeWriter(sf, z.GetObjekteSha().GetSha()),
 				format.MakeFormatString(" "),
-				format.MakeWriter(mf, z.Objekte.Metadatei),
+				format.MakeWriter(mf, z.GetMetadatei()),
 				format.MakeFormatString("]"),
 			)
 		}

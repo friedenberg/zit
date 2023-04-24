@@ -412,7 +412,7 @@ func (s *zettelStore) UpdateCheckedOut(
 		return
 	}
 
-	t.SetAkteSha(co.External.Objekte.Metadatei.AkteSha)
+	t.SetAkteSha(co.External.GetMetadatei().AkteSha)
 
 	if err = s.commitIndexMatchUpdate(t, false); err != nil {
 		err = errors.Wrap(err)

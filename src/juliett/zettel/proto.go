@@ -66,7 +66,9 @@ func (pz ProtoZettel) Make() (z *metadatei.Metadatei) {
 	return
 }
 
-func (pz ProtoZettel) Apply(z *metadatei.Metadatei) (ok bool) {
+func (pz ProtoZettel) Apply(ml metadatei.MetadateiLike) (ok bool) {
+	z := ml.GetMetadatei()
+
 	if z.GetTyp().IsEmpty() &&
 		!pz.Metadatei.Typ.IsEmpty() &&
 		!z.GetTyp().Equals(pz.Metadatei.Typ) {
@@ -88,13 +90,17 @@ func (pz ProtoZettel) Apply(z *metadatei.Metadatei) (ok bool) {
 	pz.Metadatei.Etiketten.Each(mes.Add)
 	z.Etiketten = mes.ImmutableClone()
 
+	ml.SetMetadatei(z)
+
 	return
 }
 
 func (pz ProtoZettel) ApplyWithAkteFD(
-	z *metadatei.Metadatei,
+	ml metadatei.MetadateiLike,
 	akteFD kennung.FD,
 ) (err error) {
+	z := ml.GetMetadatei()
+
 	if z.GetTyp().IsEmpty() &&
 		!pz.Metadatei.Typ.IsEmpty() &&
 		!z.GetTyp().Equals(pz.Metadatei.Typ) {
@@ -126,6 +132,8 @@ func (pz ProtoZettel) ApplyWithAkteFD(
 	mes := z.Etiketten.MutableClone()
 	pz.Metadatei.Etiketten.Each(mes.Add)
 	z.Etiketten = mes.ImmutableClone()
+
+	ml.SetMetadatei(z)
 
 	return
 }

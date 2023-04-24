@@ -72,14 +72,14 @@ func (zws *Schwanzen) Set(z *Transacted, flush bool) (ok bool) {
 		ok = true
 
 	case t1.Sku.Equals(z.Sku):
-		zws.etikettIndex.Add(z.Objekte.Metadatei.Etiketten)
+		zws.etikettIndex.Add(z.GetMetadatei().Etiketten)
 
 		ok = flush
 
 	default:
 		zws.etikettIndex.AddEtikettSet(
-			t1.Objekte.Metadatei.Etiketten,
-			z.Objekte.Metadatei.Etiketten,
+			t1.GetMetadatei().Etiketten,
+			z.GetMetadatei().Etiketten,
 		)
 	}
 

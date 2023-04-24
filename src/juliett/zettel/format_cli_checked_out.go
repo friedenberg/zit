@@ -66,7 +66,7 @@ func makeWriterFuncZettel(
 			format.MakeFormatString("@"),
 			format.MakeWriter(sf, z.External.GetObjekteSha().GetSha()),
 			format.MakeFormatString(" "),
-			format.MakeWriter(mf, z.External.Objekte.Metadatei),
+			format.MakeWriter(mf, z.External.GetMetadatei()),
 			format.MakeFormatString("]"),
 		)
 	}

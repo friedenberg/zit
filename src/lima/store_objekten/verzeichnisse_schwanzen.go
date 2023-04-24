@@ -56,7 +56,7 @@ func (s *verzeichnisseSchwanzen) Flush() (err error) {
 
 func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 	h kennung.Hinweis,
-) (tz *zettel.Transacted, err error) {
+) (found *zettel.Transacted, err error) {
 	var n int
 
 	if n, err = s.Zettelen.PageForHinweis(h); err != nil {
@@ -65,8 +65,6 @@ func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 	}
 
 	errors.Log().Printf("searching page %d", n)
-
-	var found *zettel.Transacted
 
 	w := func(zv *zettel.Transacted) (err error) {
 		if !zv.Sku.Kennung.Equals(h) {
@@ -97,9 +95,6 @@ func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 		err = objekte_store.ErrNotFound{Id: h}
 		return
 	}
-
-	tz = found
-	tz.Objekte.Metadatei.Etiketten = tz.Objekte.Metadatei.Etiketten.ImmutableClone()
 
 	return
 }

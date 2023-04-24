@@ -41,6 +41,14 @@ type Metadatei struct {
 	Tai         ts.Tai
 }
 
+func (m Metadatei) GetMetadatei() Metadatei {
+	return m
+}
+
+func (a *Metadatei) SetMetadatei(b Metadatei) {
+	*a = b
+}
+
 func (m *Metadatei) AddToFlagSet(f *flag.FlagSet) {
 	f.Var(&m.Bezeichnung, "bezeichnung", "the Bezeichnung to use for created or updated Zettelen")
 	f.Var(

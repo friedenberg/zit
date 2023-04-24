@@ -27,7 +27,7 @@ func (e formatterTypFormatterUTIGroups) Format(
 	e1 := typ.MakeFormatterFormatterUTIGroups()
 
 	ct := e.erworben.GetApproximatedTyp(
-		z.Objekte.Metadatei.GetTyp(),
+		z.GetMetadatei().GetTyp(),
 	).ApproximatedOrActual()
 
 	if ct == nil {

@@ -15,6 +15,11 @@ type (
 		SetMetadatei(Metadatei)
 	}
 
+	MetadateiLike interface {
+		Getter
+		Setter
+	}
+
 	AktePathGetter interface {
 		GetAktePath() string
 	}

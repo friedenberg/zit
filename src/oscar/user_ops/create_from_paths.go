@@ -91,7 +91,7 @@ func (c CreateFromPaths) Run(
 
 	err = results.Each(
 		func(z *zettel.Transacted) (err error) {
-			if c.ProtoZettel.Apply(&z.Objekte.Metadatei) {
+			if c.ProtoZettel.Apply(z) {
 				var zt *zettel.Transacted
 
 				if zt, err = c.StoreObjekten().Zettel().Update(
@@ -130,7 +130,7 @@ func (c CreateFromPaths) Run(
 
 			cz.Internal = *zt
 
-			if c.ProtoZettel.Apply(&cz.Internal.Objekte.Metadatei) {
+			if c.ProtoZettel.Apply(&cz.Internal) {
 				if zt, err = c.StoreObjekten().Zettel().Update(
 					&cz.Internal.Objekte,
 					&cz.Internal.Sku.Kennung,
