@@ -153,28 +153,28 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 		bez := n.Key
 		etts := n.Etiketten
 
-		z := zettel.Objekte{
-			Metadatei: metadatei.Metadatei{
-				Etiketten: etts.ImmutableClone(),
-				Typ:       b.Metadatei.Typ,
-			},
+		m := metadatei.Metadatei{
+			Etiketten: etts.ImmutableClone(),
+			Typ:       b.Metadatei.Typ,
 		}
 
-		if err = z.Metadatei.Bezeichnung.Set(bez); err != nil {
+		z := zettel.Objekte{}
+
+		if err = m.Bezeichnung.Set(bez); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if z.Metadatei.GetTyp().IsEmpty() {
-			z.Metadatei.Typ = c.Konfig().Akte.DefaultTyp
+		if m.GetTyp().IsEmpty() {
+			m.Typ = c.Konfig().Akte.DefaultTyp
 		}
 
 		if c.Konfig().DryRun {
-			errors.Out().Printf("[%s] (would create)", z.Metadatei.Bezeichnung)
+			errors.Out().Printf("[%s] (would create)", m.Bezeichnung)
 			continue
 		}
 
-		if _, err = store.Zettel().Create(z); err != nil {
+		if _, err = store.Zettel().Create(z, m); err != nil {
 			err = errors.Errorf("failed to create zettel: %s", err)
 			return
 		}
@@ -186,7 +186,7 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 			continue
 		}
 
-		if _, err = store.Zettel().Update(&z.objekte, &z.kennung); err != nil {
+		if _, err = store.Zettel().Update(&z.objekte, z.objekte, &z.kennung); err != nil {
 			errors.Err().Printf("failed to update zettel: %s", err)
 		}
 	}

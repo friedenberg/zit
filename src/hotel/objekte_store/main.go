@@ -3,6 +3,7 @@ package objekte_store
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/golf/objekte"
 )
 
@@ -73,7 +74,7 @@ type Creator[
 	O any,
 	V any,
 ] interface {
-	Create(O) (V, error)
+	Create(O, metadatei.Getter) (V, error)
 }
 
 type Updater[
@@ -81,7 +82,7 @@ type Updater[
 	K any,
 	V any,
 ] interface {
-	Update(O, K) (V, error)
+	Update(O, metadatei.Getter, K) (V, error)
 }
 
 type CheckedOutUpdater[

@@ -305,6 +305,7 @@ func (i *zettelStore) ReadAll(
 
 func (s *zettelStore) Create(
 	in zettel.Objekte,
+	mg metadatei.Getter,
 ) (tz *zettel.Transacted, err error) {
 	if !s.StoreUtil.GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{
@@ -319,11 +320,10 @@ func (s *zettelStore) Create(
 	// 	return
 	// }
 
-	s.protoZettel.Apply(&in.Metadatei)
+	m := mg.GetMetadatei()
+	s.protoZettel.Apply(&m)
 
-	if err = s.StoreUtil.GetKonfig().ApplyToMetadatei(
-		&in.Metadatei,
-	); err != nil {
+	if err = s.StoreUtil.GetKonfig().ApplyToMetadatei(&m); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -344,7 +344,7 @@ func (s *zettelStore) Create(
 
 	if tz, err = s.writeObjekte(
 		in,
-		in,
+		m,
 		ken,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -365,7 +365,7 @@ func (s *zettelStore) updateExternal(
 	co objekte.ExternalLike,
 ) (tl objekte.TransactedLike, err error) {
 	ze := co.(*zettel.External)
-	return s.Update(&ze.Objekte, &ze.Sku.Kennung)
+	return s.Update(&ze.Objekte, ze.GetMetadatei(), &ze.Sku.Kennung)
 }
 
 func (s *zettelStore) UpdateCheckedOut(
@@ -429,6 +429,7 @@ func (s *zettelStore) UpdateCheckedOut(
 
 func (s *zettelStore) Update(
 	z *zettel.Objekte,
+	mg metadatei.Getter,
 	h *kennung.Hinweis,
 ) (tz *zettel.Transacted, err error) {
 	errors.TodoP2("support dry run")
@@ -441,7 +442,9 @@ func (s *zettelStore) Update(
 		return
 	}
 
-	if err = s.StoreUtil.GetKonfig().ApplyToMetadatei(&z.Metadatei); err != nil {
+	m := mg.GetMetadatei()
+
+	if err = s.StoreUtil.GetKonfig().ApplyToMetadatei(&m); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -455,11 +458,7 @@ func (s *zettelStore) Update(
 		return
 	}
 
-	if tz, err = s.writeObjekte(
-		*z,
-		z,
-		*h,
-	); err != nil {
+	if tz, err = s.writeObjekte(*z, m, *h); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -516,6 +515,10 @@ func (s *zettelStore) writeObjekte(
 	mg metadatei.Getter,
 	h kennung.Hinweis,
 ) (tz *zettel.Transacted, err error) {
+	if mg == nil {
+		panic("metadatei.Getter was nil")
+	}
+
 	t := s.StoreUtil.GetTransaktionStore().GetTransaktion()
 
 	tz = &zettel.Transacted{
@@ -529,11 +532,7 @@ func (s *zettelStore) writeObjekte(
 		},
 	}
 
-	m := z.GetMetadatei()
-
-	if mg != nil {
-		m = mg.GetMetadatei()
-	}
+	m := mg.GetMetadatei()
 
 	tz.SetMetadatei(m)
 

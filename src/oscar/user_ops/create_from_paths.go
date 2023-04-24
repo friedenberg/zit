@@ -96,6 +96,7 @@ func (c CreateFromPaths) Run(
 
 				if zt, err = c.StoreObjekten().Zettel().Update(
 					&z.Objekte,
+					z,
 					&z.Sku.Kennung,
 				); err != nil {
 					err = errors.Wrap(err)
@@ -121,7 +122,7 @@ func (c CreateFromPaths) Run(
 
 			var zt *zettel.Transacted
 
-			if zt, err = c.StoreObjekten().Zettel().Create(z.Objekte); err != nil {
+			if zt, err = c.StoreObjekten().Zettel().Create(z.Objekte, z); err != nil {
 				// TODO add file for error handling
 				c.handleStoreError(cz, "", err)
 				err = nil
@@ -133,6 +134,7 @@ func (c CreateFromPaths) Run(
 			if c.ProtoZettel.Apply(&cz.Internal) {
 				if zt, err = c.StoreObjekten().Zettel().Update(
 					&cz.Internal.Objekte,
+					cz.Internal,
 					&cz.Internal.Sku.Kennung,
 				); err != nil {
 					// TODO add file for error handling
