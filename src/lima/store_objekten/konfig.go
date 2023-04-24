@@ -134,15 +134,6 @@ func (s konfigStore) Update(
 		return
 	}
 
-	var ow sha.WriteCloser
-
-	if ow, err = s.ObjekteIOFactory.ObjekteWriter(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, ow)
-
 	var mutter *erworben.Transacted
 
 	if mutter, err = s.Read(); err != nil {
@@ -154,6 +145,13 @@ func (s konfigStore) Update(
 		}
 	}
 
+	var akteSha schnittstellen.Sha
+
+	if akteSha, _, err = s.SaveAkteText(*ko); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	kt = &erworben.Transacted{
 		Objekte: *ko,
 		Sku: sku.Transacted[kennung.Konfig, *kennung.Konfig]{
@@ -163,6 +161,8 @@ func (s konfigStore) Update(
 		},
 	}
 
+	kt.SetAkteSha(akteSha)
+
 	// TODO-P3 refactor into reusable
 	if mutter != nil {
 		kt.Sku.Kopf = mutter.Sku.Kopf
@@ -171,9 +171,18 @@ func (s konfigStore) Update(
 		kt.Sku.Kopf = s.StoreUtil.GetTime()
 	}
 
+	var ow sha.WriteCloser
+
+	if ow, err = s.ObjekteIOFactory.ObjekteWriter(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.DeferredCloser(&err, ow)
+
 	if _, err = s.StoreUtil.GetPersistentMetadateiFormat().FormatPersistentMetadatei(
 		ow,
-		kt.Objekte,
+		kt,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

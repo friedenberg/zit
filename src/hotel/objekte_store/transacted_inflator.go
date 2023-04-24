@@ -303,6 +303,7 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) readObjekte(
 		)
 	}
 
+  t.SetAkteSha(t.GetMetadatei().AkteSha)
 	T5(&t.Verzeichnisse).ResetWithObjekte(t.Objekte)
 
 	errors.Log().Printf("parsed %d objekte bytes", n)

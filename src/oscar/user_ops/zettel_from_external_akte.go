@@ -154,7 +154,7 @@ func (c ZettelFromExternalAkte) Run(
 	return
 }
 
-func (c ZettelFromExternalAkte) zettelForAkte(
+func (c *ZettelFromExternalAkte) zettelForAkte(
 	akteFD kennung.FD,
 ) (z *zettel.External, err error) {
 	z = &zettel.External{
@@ -174,7 +174,7 @@ func (c ZettelFromExternalAkte) zettelForAkte(
 		return
 	}
 
-	defer c.Filter.Close()
+	defer errors.DeferredCloser(&err, &c.Filter)
 
 	var akteWriter sha.WriteCloser
 
@@ -194,7 +194,6 @@ func (c ZettelFromExternalAkte) zettelForAkte(
 	}
 
 	z.Objekte.Reset()
-	z.SetAkteSha(akteWriter.Sha())
 
 	if err = c.ProtoZettel.ApplyWithAkteFD(
 		&z.Objekte.Metadatei,
@@ -203,6 +202,8 @@ func (c ZettelFromExternalAkte) zettelForAkte(
 		err = errors.Wrap(err)
 		return
 	}
+
+	z.SetAkteSha(akteWriter.Sha())
 
 	return
 }

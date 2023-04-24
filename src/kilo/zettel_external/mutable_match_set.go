@@ -39,7 +39,7 @@ func MakeMutableMatchSet(in MutableSet) (out MutableMatchSet) {
 
 func (s MutableMatchSet) Match(z *zettel.Transacted) (err error) {
 	kStored := z.Sku.ObjekteSha.String()
-	kAkte := z.Objekte.Metadatei.AkteSha.String()
+	kAkte := z.GetAkteSha().String()
 
 	s.lock.RLock()
 	stored, okStored := s.Stored.Get(kStored)

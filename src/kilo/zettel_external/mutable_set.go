@@ -65,11 +65,11 @@ func MakeMutableSetUniqueAkte(zs ...*zettel.External) MutableSet {
 			return ""
 		}
 
-		if z.Objekte.Metadatei.AkteSha.IsNull() {
+		if z.GetAkteSha().IsNull() {
 			return ""
 		}
 
-		return z.Objekte.Metadatei.AkteSha.String()
+		return z.GetAkteSha().String()
 	}
 
 	return MakeMutableSet(kf, zs...)

@@ -70,7 +70,7 @@ func (e *fileEncoder) EncodeObjekte(
 
 	var ar sha.ReadCloser
 
-	if ar, err = e.arf.AkteReader(z.Objekte.Metadatei.AkteSha); err != nil {
+	if ar, err = e.arf.AkteReader(z.GetAkteSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

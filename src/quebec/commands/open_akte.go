@@ -58,7 +58,7 @@ func (c OpenAkte) RunWithIds(store *umwelt.Umwelt, is kennung.Set) (err error) {
 				return
 			}
 
-			shaAkte := tz.Objekte.Metadatei.AkteSha
+			shaAkte := tz.GetAkteSha()
 
 			var f *os.File
 

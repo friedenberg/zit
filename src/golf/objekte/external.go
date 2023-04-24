@@ -1,6 +1,7 @@
 package objekte
 
 import (
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/values"
@@ -46,6 +47,7 @@ func (a External[T, T1, T2, T3]) GetMetadatei() metadatei.Metadatei {
 func (a *External[T, T1, T2, T3]) SetMetadatei(m metadatei.Metadatei) {
 	if ms, ok := any(&a.Objekte).(metadatei.Setter); ok {
 		ms.SetMetadatei(m)
+		return
 	}
 
 	a.Metadatei = m
@@ -143,15 +145,27 @@ func (e External[T, T1, T2, T3]) GetObjekteSha() schnittstellen.Sha {
 	return e.Sku.ObjekteSha
 }
 
-func (e External[T, T1, T2, T3]) GetAkteSha() schnittstellen.Sha {
-	return e.Sku.AkteSha
+func (t External[T, T1, T2, T3]) GetAkteSha() schnittstellen.Sha {
+	shSku := t.Sku.AkteSha
+	shMetadatei := t.GetMetadatei().AkteSha
+
+	if !shSku.Equals(shMetadatei) {
+		panic(errors.Errorf(
+			"akte sha in sku was %s while akte sha in metadatei was %s",
+			shSku,
+			shMetadatei,
+		))
+	}
+
+	return shSku
 }
 
 func (e *External[T, T1, T2, T3]) SetAkteSha(v schnittstellen.Sha) {
+	sh := sha.Make(v)
 	m := e.GetMetadatei()
-	m.AkteSha = sha.Make(v)
+	m.AkteSha = sh
 	e.SetMetadatei(m)
-	e.Sku.ObjekteSha = sha.Make(v)
+	e.Sku.AkteSha = sh
 }
 
 func (e External[T, T1, T2, T3]) ObjekteSha() sha.Sha {

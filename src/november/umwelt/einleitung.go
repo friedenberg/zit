@@ -153,17 +153,6 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 	{
 		defaultKonfig := erworben.Default(defaultTypKennung)
 
-		var sh schnittstellen.Sha
-
-		if sh, _, err = u.StoreObjekten().Konfig().SaveAkteText(
-			defaultKonfig,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		defaultKonfig.SetAkteSha(sh)
-
 		if _, err = u.StoreObjekten().Konfig().Update(
 			&defaultKonfig,
 		); err != nil {

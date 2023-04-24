@@ -48,7 +48,7 @@ func (s Store) ReadAllMatchingAkten(
 
 	if err = s.Zettel().ReadAll(
 		func(z *zettel.Transacted) (err error) {
-			fd, ok := fds.Get(z.Objekte.Metadatei.AkteSha.String())
+			fd, ok := fds.Get(z.GetAkteSha().String())
 
 			if !ok {
 				return

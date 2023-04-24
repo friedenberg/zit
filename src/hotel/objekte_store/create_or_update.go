@@ -94,6 +94,8 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdateCheckedOut(
 		},
 	}
 
+	transactedPtr.SetAkteSha(transactedPtr.GetMetadatei().AkteSha)
+
 	var ow sha.WriteCloser
 
 	if ow, err = cou.of.ObjekteWriter(); err != nil {
@@ -178,6 +180,8 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdate(
 		errors.TodoP4("determine if this is necessary any more")
 		// transactedPtr.Sku.Kopf = s.common.GetTransaktion().Time
 	}
+
+	transactedPtr.SetAkteSha(transactedPtr.GetMetadatei().AkteSha)
 
 	var ow sha.WriteCloser
 

@@ -87,7 +87,7 @@ func makeWriterFuncAkte(
 			format.MakeFormatString("["),
 			cw(s.MakeWriterRelativePath(z.External.GetAkteFD().Path), format.ColorTypePointer),
 			format.MakeFormatString("@"),
-			format.MakeWriter(sf, z.External.Objekte.Metadatei.AkteSha.GetSha()),
+			format.MakeWriter(sf, z.External.GetAkteSha().GetSha()),
 			format.MakeFormatString("]"),
 		)
 	}

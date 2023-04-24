@@ -347,6 +347,8 @@ func (s *zettelStore) Create(
 		return
 	}
 
+	tz.SetAkteSha(in.Metadatei.AkteSha)
+
 	if err = s.commitIndexMatchUpdate(tz, true); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -410,6 +412,8 @@ func (s *zettelStore) UpdateCheckedOut(
 		return
 	}
 
+	t.SetAkteSha(co.External.Objekte.Metadatei.AkteSha)
+
 	if err = s.commitIndexMatchUpdate(t, false); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -453,6 +457,8 @@ func (s *zettelStore) Update(
 		err = errors.Wrap(err)
 		return
 	}
+
+	tz.SetAkteSha(z.Metadatei.AkteSha)
 
 	shaObj := sha.Make(tz.GetObjekteSha())
 
@@ -566,6 +572,8 @@ func (s *zettelStore) ReindexOne(
 		// err = errors.Wrap(err)
 		return
 	}
+
+	tz.SetAkteSha(tz.GetMetadatei().AkteSha)
 
 	o = tz
 	errExists := s.StoreUtil.GetAbbrStore().HinweisExists(tz.Sku.Kennung)

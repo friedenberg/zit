@@ -1,7 +1,6 @@
 package zettel
 
 import (
-	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
@@ -24,11 +23,6 @@ func (z Objekte) GetGattung() schnittstellen.Gattung {
 }
 
 func (z Objekte) Equals(z1 Objekte) bool {
-	errors.TodoP4("figure out why this doesn't always work for `status`")
-	if !z.Metadatei.AkteSha.Equals(z1.Metadatei.AkteSha) {
-		return false
-	}
-
 	if !z.Metadatei.Equals(z1.Metadatei) {
 		return false
 	}
