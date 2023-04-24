@@ -58,9 +58,7 @@ func (c WriteNewZettels) runOneAlreadyLocked(
 	pz zettel.ProtoZettel,
 ) (result zettel.CheckedOut, err error) {
 	z := pz.Make()
-	o := zettel.Objekte{
-		Metadatei: *z,
-	}
+	o := zettel.Objekte{}
 
 	var zt *zettel.Transacted
 

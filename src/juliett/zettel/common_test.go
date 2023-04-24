@@ -40,7 +40,7 @@ func readFormat(
 	f metadatei.TextFormat,
 	af *test_metadatei_io.AkteIOFactory,
 	contents string,
-) (z Objekte, a string) {
+) (z metadatei.Metadatei, a string) {
 	var zt Transacted
 
 	t := t1.Skip(1)
@@ -57,7 +57,7 @@ func readFormat(
 		t.Fatalf("expected to read %d but only read %d", len(contents), n)
 	}
 
-	z = zt.Objekte
+	z = zt.GetMetadatei()
 	a = af.CurrentBufferString()
 
 	return

@@ -42,7 +42,7 @@ func (arf akteReaderFactory) AkteReader(s sha.Sha) (r sha.ReadCloser, err error)
 
 func writeFormat(
 	t test_logz.T,
-	z Objekte,
+	m metadatei.Metadatei,
 	f metadatei.TextFormatter,
 	includeAkte bool,
 	akteBody string,
@@ -60,11 +60,11 @@ func writeFormat(
 		t.Fatalf("%s", err)
 	}
 
-	z.Metadatei.AkteSha = akteSha
+	m.AkteSha = akteSha
 
 	sb := &strings.Builder{}
 
-	if _, err := f.FormatMetadatei(sb, z); err != nil {
+	if _, err := f.FormatMetadatei(sb, m); err != nil {
 		t.Errorf("%s", err)
 	}
 
@@ -76,16 +76,14 @@ func writeFormat(
 func TestWriteWithoutAkte(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-	z := Objekte{
-		Metadatei: metadatei.Metadatei{
-			Bezeichnung: bezeichnung.Make("the title"),
-			Etiketten: makeEtiketten(t,
-				"tag1",
-				"tag2",
-				"tag3",
-			),
-			Typ: makeAkteExt(t, "md"),
-		},
+	z := metadatei.Metadatei{
+		Bezeichnung: bezeichnung.Make("the title"),
+		Etiketten: makeEtiketten(t,
+			"tag1",
+			"tag2",
+			"tag3",
+		),
+		Typ: makeAkteExt(t, "md"),
 	}
 
 	af := test_metadatei_io.FixtureFactoryReadWriteCloser(
@@ -118,16 +116,14 @@ func TestWriteWithoutAkte(t1 *testing.T) {
 func TestWriteWithInlineAkte(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-	z := Objekte{
-		Metadatei: metadatei.Metadatei{
-			Bezeichnung: bezeichnung.Make("the title"),
-			Etiketten: makeEtiketten(t,
-				"tag1",
-				"tag2",
-				"tag3",
-			),
-			Typ: makeAkteExt(t, "md"),
-		},
+	z := metadatei.Metadatei{
+		Bezeichnung: bezeichnung.Make("the title"),
+		Etiketten: makeEtiketten(t,
+			"tag1",
+			"tag2",
+			"tag3",
+		),
+		Typ: makeAkteExt(t, "md"),
 	}
 
 	af := test_metadatei_io.FixtureFactoryReadWriteCloser(

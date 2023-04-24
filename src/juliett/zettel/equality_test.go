@@ -75,16 +75,14 @@ func TestMakeEtiketten(t1 *testing.T) {
 func TestEqualitySelf(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-	text := Objekte{
-		Metadatei: metadatei.Metadatei{
-			Bezeichnung: bezeichnung.Make("the title"),
-			Etiketten: makeEtiketten(t,
-				"tag1",
-				"tag2",
-				"tag3",
-			).ImmutableClone(),
-			Typ: makeAkteExt(t, "text"),
-		},
+	text := metadatei.Metadatei{
+		Bezeichnung: bezeichnung.Make("the title"),
+		Etiketten: makeEtiketten(t,
+			"tag1",
+			"tag2",
+			"tag3",
+		).ImmutableClone(),
+		Typ: makeAkteExt(t, "text"),
 	}
 
 	if !text.Equals(text) {
@@ -95,28 +93,24 @@ func TestEqualitySelf(t1 *testing.T) {
 func TestEqualityNotSelf(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-	text := Objekte{
-		Metadatei: metadatei.Metadatei{
-			Bezeichnung: bezeichnung.Make("the title"),
-			Etiketten: makeEtiketten(t,
-				"tag1",
-				"tag2",
-				"tag3",
-			).ImmutableClone(),
-			Typ: makeAkteExt(t, "text"),
-		},
+	text := metadatei.Metadatei{
+		Bezeichnung: bezeichnung.Make("the title"),
+		Etiketten: makeEtiketten(t,
+			"tag1",
+			"tag2",
+			"tag3",
+		).ImmutableClone(),
+		Typ: makeAkteExt(t, "text"),
 	}
 
-	text1 := Objekte{
-		Metadatei: metadatei.Metadatei{
-			Bezeichnung: bezeichnung.Make("the title"),
-			Etiketten: makeEtiketten(t,
-				"tag1",
-				"tag2",
-				"tag3",
-			).ImmutableClone(),
-			Typ: makeAkteExt(t, "text"),
-		},
+	text1 := metadatei.Metadatei{
+		Bezeichnung: bezeichnung.Make("the title"),
+		Etiketten: makeEtiketten(t,
+			"tag1",
+			"tag2",
+			"tag3",
+		).ImmutableClone(),
+		Typ: makeAkteExt(t, "text"),
 	}
 
 	if !text.Equals(text1) {

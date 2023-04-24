@@ -36,8 +36,9 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 	}
 
 	type zettelToUpdate struct {
-		objekte zettel.Objekte
-		kennung kennung.Hinweis
+		metadatei metadatei.Metadatei
+		objekte   zettel.Objekte
+		kennung   kennung.Hinweis
 	}
 
 	toUpdate := make(map[string]zettelToUpdate)
@@ -62,6 +63,7 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 
 			z.objekte = tz.Objekte
 			z.kennung = tz.Sku.Kennung
+			z.metadatei = tz.GetMetadatei()
 		}
 
 		return
@@ -75,9 +77,10 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 			return
 		}
 
-		mes := z.objekte.Metadatei.Etiketten.MutableClone()
+		mes := z.metadatei.Etiketten.MutableClone()
 		mes.Add(e)
-		z.objekte.Metadatei.Etiketten = mes.ImmutableClone()
+		z.metadatei.Etiketten = mes.ImmutableClone()
+
 		toUpdate[z.kennung.String()] = z
 
 		errors.Err().Printf("Added etikett '%s' to zettel '%s'", e, z.kennung)
@@ -93,9 +96,9 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 			return
 		}
 
-		mes := z.objekte.Metadatei.Etiketten.MutableClone()
+		mes := z.metadatei.Etiketten.MutableClone()
 		kennung.RemovePrefixes(mes, e)
-		z.objekte.Metadatei.Etiketten = mes.ImmutableClone()
+		z.metadatei.Etiketten = mes.ImmutableClone()
 
 		toUpdate[z.kennung.String()] = z
 
@@ -141,7 +144,7 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 				return
 			}
 
-			z.objekte.Metadatei.Typ = b.Metadatei.Typ
+			z.metadatei.Typ = b.Metadatei.Typ
 
 			toUpdate[z.kennung.String()] = z
 
@@ -186,7 +189,11 @@ func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganiz
 			continue
 		}
 
-		if _, err = store.Zettel().Update(&z.objekte, z.objekte, &z.kennung); err != nil {
+		if _, err = store.Zettel().Update(
+			&z.objekte,
+			z.metadatei,
+			&z.kennung,
+		); err != nil {
 			errors.Err().Printf("failed to update zettel: %s", err)
 		}
 	}

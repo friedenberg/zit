@@ -41,16 +41,14 @@ func TestReadWithoutAkte(t1 *testing.T) {
 `,
 	)
 
-	expected := Objekte{
-		Metadatei: metadatei.Metadatei{
-			Bezeichnung: bezeichnung.Make("the title"),
-			Etiketten: makeEtiketten(t,
-				"tag1",
-				"tag2",
-				"tag3",
-			),
-			Typ: makeAkteExt(t, "md"),
-		},
+	expected := metadatei.Metadatei{
+		Bezeichnung: bezeichnung.Make("the title"),
+		Etiketten: makeEtiketten(t,
+			"tag1",
+			"tag2",
+			"tag3",
+		),
+		Typ: makeAkteExt(t, "md"),
 	}
 
 	if !actual.Equals(expected) {
@@ -82,16 +80,14 @@ func TestReadWithoutAkteWithMultilineBezeichnung(t1 *testing.T) {
 `,
 	)
 
-	expected := Objekte{
-		Metadatei: metadatei.Metadatei{
-			Bezeichnung: bezeichnung.Make("the title continues"),
-			Etiketten: makeEtiketten(t,
-				"tag1",
-				"tag2",
-				"tag3",
-			),
-			Typ: makeAkteExt(t, "md"),
-		},
+	expected := metadatei.Metadatei{
+		Bezeichnung: bezeichnung.Make("the title continues"),
+		Etiketten: makeEtiketten(t,
+			"tag1",
+			"tag2",
+			"tag3",
+		),
+		Typ: makeAkteExt(t, "md"),
 	}
 
 	if !actual.Equals(expected) {
@@ -129,17 +125,15 @@ the body
 `,
 	)
 
-	expected := Objekte{
-		Metadatei: metadatei.Metadatei{
-			AkteSha:     sha.Must("036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064"),
-			Bezeichnung: bezeichnung.Make("the title"),
-			Etiketten: makeEtiketten(t,
-				"tag1",
-				"tag2",
-				"tag3",
-			),
-			Typ: makeAkteExt(t, "md"),
-		},
+	expected := metadatei.Metadatei{
+		AkteSha:     sha.Must("036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064"),
+		Bezeichnung: bezeichnung.Make("the title"),
+		Etiketten: makeEtiketten(t,
+			"tag1",
+			"tag2",
+			"tag3",
+		),
+		Typ: makeAkteExt(t, "md"),
 	}
 
 	if !actual.Equals(expected) {
