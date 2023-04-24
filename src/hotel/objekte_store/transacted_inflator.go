@@ -140,6 +140,8 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) InflateFromSku(
 		return
 	}
 
+	objekte.AssertAkteShasMatch(t)
+
 	// TODO make generic
 	if t.Sku.Kennung.GetGattung() != o.Gattung {
 		err = errors.Errorf(
@@ -241,7 +243,7 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) StoreObjekte(
 	}
 
 	t.Sku.ObjekteSha = sha.Make(ow.Sha())
-	t.Sku.AkteSha = sha.Make(t.GetAkteSha())
+	t.SetAkteSha(t.GetAkteSha())
 
 	return
 }
@@ -303,7 +305,7 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) readObjekte(
 		)
 	}
 
-	t.SetAkteSha(t.GetMetadatei().AkteSha)
+	objekte.CorrectAkteSha(t, t)
 	T5(&t.Verzeichnisse).ResetWithObjekteMetadateiGetter(t.Objekte, t)
 
 	errors.Log().Printf("parsed %d objekte bytes", n)

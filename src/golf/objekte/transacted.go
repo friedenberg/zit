@@ -47,28 +47,23 @@ func (t *Transacted[T, T1, T2, T3, T4, T5]) SetMetadatei(
 	t.Metadatei = m
 }
 
+func (t Transacted[T, T1, T2, T3, T4, T5]) GetSkuAkteSha() schnittstellen.Sha {
+	return t.Sku.AkteSha
+}
+
 func (t Transacted[T, T1, T2, T3, T4, T5]) GetAkteSha() schnittstellen.Sha {
-	shSku := t.Sku.AkteSha
-	shMetadatei := t.GetMetadatei().AkteSha
-
-	if !shSku.Equals(shMetadatei) {
-		panic(errors.Errorf(
-			"akte sha in sku was %s while akte sha in metadatei was %s",
-			shSku,
-			shMetadatei,
-		))
-	}
-
-	return shSku
+	AssertAkteShasMatch(t)
+	return t.Sku.AkteSha
 }
 
 func (t *Transacted[T, T1, T2, T3, T4, T5]) SetAkteSha(
 	s schnittstellen.Sha,
 ) {
 	m := t.GetMetadatei()
-	m.AkteSha = sha.Make(s)
+	sh := sha.Make(s)
+	m.AkteSha = sh
 	t.SetMetadatei(m)
-	t.Sku.AkteSha = sha.Make(s)
+	t.Sku.AkteSha = sh
 }
 
 func (t Transacted[T, T1, T2, T3, T4, T5]) GetObjekteSha() schnittstellen.Sha {

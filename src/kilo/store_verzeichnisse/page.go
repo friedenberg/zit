@@ -12,6 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
@@ -184,6 +185,8 @@ func (zp *Page) copy(
 					return
 				}
 			}
+
+			objekte.AssertAkteShasMatch(tz)
 
 			return
 		},
