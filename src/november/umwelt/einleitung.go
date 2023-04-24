@@ -142,6 +142,7 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 
 		if _, err = u.StoreObjekten().Typ().CreateOrUpdateAkte(
 			&defaultTyp,
+			nil,
 			&defaultTypKennung,
 			sh,
 		); err != nil {

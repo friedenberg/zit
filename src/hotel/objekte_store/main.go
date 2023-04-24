@@ -98,7 +98,7 @@ type CreateOrUpdater[
 	V any,
 	CO any,
 ] interface {
-	CreateOrUpdateAkte(O, K, schnittstellen.Sha) (V, error)
-	CreateOrUpdate(O, K) (V, error)
+	CreateOrUpdateAkte(O, metadatei.Getter, K, schnittstellen.Sha) (V, error)
+	CreateOrUpdate(O, metadatei.Getter, K) (V, error)
 	CreateOrUpdateCheckedOut(CO) (V, error)
 }

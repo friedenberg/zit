@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/ts"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/golf/persisted_metadatei_format"
@@ -142,6 +143,7 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdateCheckedOut(
 
 func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdate(
 	objektePtr T1,
+	mg metadatei.Getter,
 	kennungPtr T3,
 ) (transactedPtr *objekte.Transacted[T, T1, T2, T3, T4, T5], err error) {
 	if !cou.ls.IsAcquired() {
@@ -163,8 +165,15 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdate(
 		}
 	}
 
+	var m metadatei.Metadatei
+
+	if mg != nil {
+		m = mg.GetMetadatei()
+	}
+
 	transactedPtr = &objekte.Transacted[T, T1, T2, T3, T4, T5]{
-		Objekte: *objektePtr,
+		Metadatei: m,
+		Objekte:   *objektePtr,
 		Sku: sku.Transacted[T2, T3]{
 			Kennung: *kennungPtr,
 			Verzeichnisse: sku.Verzeichnisse{
@@ -237,6 +246,7 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdate(
 
 func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdateAkte(
 	objektePtr T1,
+	mg metadatei.Getter,
 	kennungPtr T3,
 	sh schnittstellen.Sha,
 ) (transactedPtr *objekte.Transacted[T, T1, T2, T3, T4, T5], err error) {
@@ -259,8 +269,15 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdateAkte(
 		}
 	}
 
+	var m metadatei.Metadatei
+
+	if mg != nil {
+		m = mg.GetMetadatei()
+	}
+
 	transactedPtr = &objekte.Transacted[T, T1, T2, T3, T4, T5]{
-		Objekte: *objektePtr,
+		Metadatei: m,
+		Objekte:   *objektePtr,
 		Sku: sku.Transacted[T2, T3]{
 			Kennung: *kennungPtr,
 			Verzeichnisse: sku.Verzeichnisse{

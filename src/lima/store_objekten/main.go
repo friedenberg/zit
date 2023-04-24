@@ -434,6 +434,7 @@ func (s *Store) addTyp(
 		todo.Change("support inheritance")
 		if _, err = s.Typ().CreateOrUpdate(
 			typ.MakeObjekte(),
+			nil,
 			&t,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -459,6 +460,7 @@ func (s *Store) addEtikett(
 		todo.Change("support inheritance")
 		if _, err = s.Etikett().CreateOrUpdate(
 			etikett.MakeObjekte(),
+			nil,
 			&e1,
 		); err != nil {
 			err = errors.Wrap(err)
