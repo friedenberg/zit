@@ -190,7 +190,7 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdate(
 		// transactedPtr.Sku.Kopf = s.common.GetTransaktion().Time
 	}
 
-	objekte.CorrectAkteSha(transactedPtr, transactedPtr)
+	objekte.CorrectAkteShaWith(transactedPtr, transactedPtr)
 
 	var ow sha.WriteCloser
 

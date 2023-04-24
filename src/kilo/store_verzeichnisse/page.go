@@ -188,7 +188,7 @@ func (zp *Page) copy(
 				}
 			}
 
-			objekte.AssertAkteShasMatch(tz)
+			objekte.CorrectAkteSha(tz)
 
 			return
 		},

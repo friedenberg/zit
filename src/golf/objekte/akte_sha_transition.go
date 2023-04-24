@@ -19,6 +19,28 @@ type InNeedOfAkteShaCorrectionPtr interface {
 }
 
 func CorrectAkteSha(
+	inoa InNeedOfAkteShaCorrectionPtr,
+) {
+	if inoa == nil {
+		panic("InNeedOfAkteShaCorrection was nil")
+	}
+
+	shSku := inoa.GetSkuAkteSha()
+	shMetadatei := inoa.GetMetadatei().AkteSha
+
+	switch {
+	case !shSku.IsNull() && !shMetadatei.IsNull():
+		AssertAkteShasMatch(inoa)
+
+	case !shSku.IsNull():
+		inoa.SetAkteSha(shSku)
+
+	case !shMetadatei.IsNull():
+		inoa.SetAkteSha(shMetadatei)
+	}
+}
+
+func CorrectAkteShaWith(
 	inoasc InNeedOfAkteShaCorrectionPtr,
 	corrector metadatei.Getter,
 ) {

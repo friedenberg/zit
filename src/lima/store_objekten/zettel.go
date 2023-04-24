@@ -204,7 +204,7 @@ func (s *zettelStore) ReadOneExternal(
 		}
 	}
 
-	objekte.CorrectAkteSha(&ez, ez)
+	objekte.CorrectAkteShaWith(&ez, ez)
 
 	return
 }
@@ -353,7 +353,7 @@ func (s *zettelStore) Create(
 		return
 	}
 
-	objekte.CorrectAkteSha(tz, tz)
+	objekte.CorrectAkteShaWith(tz, tz)
 
 	if err = s.commitIndexMatchUpdate(tz, true); err != nil {
 		err = errors.Wrap(err)
@@ -420,7 +420,7 @@ func (s *zettelStore) UpdateCheckedOut(
 		return
 	}
 
-	objekte.CorrectAkteSha(t, co.External)
+	objekte.CorrectAkteShaWith(t, co.External)
 
 	if err = s.commitIndexMatchUpdate(t, false); err != nil {
 		err = errors.Wrap(err)
@@ -466,7 +466,7 @@ func (s *zettelStore) Update(
 		return
 	}
 
-	objekte.CorrectAkteSha(tz, tz)
+	objekte.CorrectAkteShaWith(tz, tz)
 
 	shaObj := sha.Make(tz.GetObjekteSha())
 
@@ -590,7 +590,7 @@ func (s *zettelStore) ReindexOne(
 		return
 	}
 
-	objekte.CorrectAkteSha(tz, tz)
+	objekte.CorrectAkteShaWith(tz, tz)
 
 	o = tz
 	errExists := s.StoreUtil.GetAbbrStore().HinweisExists(tz.Sku.Kennung)
