@@ -137,7 +137,7 @@ func (s *store) ReadOne(sh schnittstellen.Sha) (o *Objekte, err error) {
 
 	var ar sha.ReadCloser
 
-	if ar, err = s.af.AkteReader(o.AkteSha); err != nil {
+	if ar, err = s.af.AkteReader(o.GetAkteSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

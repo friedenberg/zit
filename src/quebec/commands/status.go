@@ -76,15 +76,16 @@ func (c Status) RunWithCwdQuery(
 					External: zettel.External{
 						Objekte: z.Objekte,
 						Sku: sku.External[kennung.Hinweis, *kennung.Hinweis]{
-							Kennung:    z.Sku.Kennung,
-							ObjekteSha: os,
-							AkteSha:    as,
+							Kennung: z.Sku.Kennung,
 							FDs: sku.ExternalFDs{
 								Akte: fd,
 							},
 						},
 					},
 				}
+
+				fr.External.SetAkteSha(as)
+				fr.External.Sku.ObjekteSha = os
 
 				err = p(fr)
 			}
