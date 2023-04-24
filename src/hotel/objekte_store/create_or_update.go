@@ -94,7 +94,7 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdateCheckedOut(
 		},
 	}
 
-	transactedPtr.SetAkteSha(transactedPtr.GetMetadatei().AkteSha)
+	transactedPtr.SetAkteSha(co.External.GetAkteSha())
 
 	var ow sha.WriteCloser
 
