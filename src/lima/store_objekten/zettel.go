@@ -342,7 +342,11 @@ func (s *zettelStore) Create(
 		return
 	}
 
-	if tz, err = s.writeObjekte(in, ken); err != nil {
+	if tz, err = s.writeObjekte(
+		in,
+		in,
+		ken,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -406,6 +410,7 @@ func (s *zettelStore) UpdateCheckedOut(
 
 	if t, err = s.writeObjekte(
 		co.External.Objekte,
+		co.External.GetMetadatei(),
 		co.External.Sku.Kennung,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -452,6 +457,7 @@ func (s *zettelStore) Update(
 
 	if tz, err = s.writeObjekte(
 		*z,
+		z,
 		*h,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -507,6 +513,7 @@ func (s *zettelStore) commitIndexMatchUpdate(
 
 func (s *zettelStore) writeObjekte(
 	z zettel.Objekte,
+	mg metadatei.Getter,
 	h kennung.Hinweis,
 ) (tz *zettel.Transacted, err error) {
 	t := s.StoreUtil.GetTransaktionStore().GetTransaktion()
@@ -522,12 +529,20 @@ func (s *zettelStore) writeObjekte(
 		},
 	}
 
+	m := z.GetMetadatei()
+
+	if mg != nil {
+		m = mg.GetMetadatei()
+	}
+
+	tz.SetMetadatei(m)
+
 	if err = s.SaveObjekte(tz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	tz.Verzeichnisse.ResetWithObjekteMetadateiGetter(tz.Objekte, tz)
+	tz.Verzeichnisse.ResetWithObjekteMetadateiGetter(tz.Objekte, m)
 
 	return
 }
