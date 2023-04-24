@@ -12,18 +12,16 @@ import (
 type Objekte struct {
 	Tai        ts.Tai
 	Akte       Akte
-	AkteSha    sha.Sha
 	ObjekteSha sha.Sha
+	Metadatei  metadatei.Metadatei
 }
 
 func (a Objekte) GetMetadatei() metadatei.Metadatei {
-	return metadatei.Metadatei{
-		AkteSha: a.AkteSha,
-	}
+	return a.Metadatei
 }
 
 func (a *Objekte) SetMetadatei(m metadatei.Metadatei) {
-	a.AkteSha = m.AkteSha
+	a.Metadatei = m
 }
 
 func (a Objekte) EqualsAny(b any) bool {
@@ -37,13 +35,13 @@ func (o Objekte) GetGattung() (g schnittstellen.Gattung) {
 }
 
 func (o Objekte) GetAkteSha() (v schnittstellen.Sha) {
-	v = o.AkteSha
+	v = o.Metadatei.AkteSha
 
 	return
 }
 
 func (o *Objekte) SetAkteSha(v schnittstellen.Sha) {
-	o.AkteSha = sha.Make(v)
+	o.Metadatei.AkteSha = sha.Make(v)
 }
 
 func (o *Objekte) SetObjekteSha(v schnittstellen.Sha) {
@@ -59,7 +57,7 @@ func (a Objekte) Equals(b Objekte) bool {
 		return false
 	}
 
-	if !a.AkteSha.Equals(b.AkteSha) {
+	if !a.Metadatei.Equals(b.Metadatei) {
 		return false
 	}
 
@@ -72,7 +70,7 @@ func (a Objekte) Equals(b Objekte) bool {
 
 func (a *Objekte) Reset() {
 	a.ObjekteSha = sha.Sha{}
-	a.AkteSha = sha.Sha{}
+	a.Metadatei.Reset()
 	a.Tai = ts.Tai{}
 	a.Akte.Reset()
 }
@@ -80,6 +78,6 @@ func (a *Objekte) Reset() {
 func (a *Objekte) ResetWith(b Objekte) {
 	a.Akte.ResetWith(b.Akte)
 	a.ObjekteSha = b.ObjekteSha
-	a.AkteSha = b.AkteSha
+	a.Metadatei = b.Metadatei
 	a.Tai = b.Tai
 }

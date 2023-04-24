@@ -18,7 +18,7 @@ func (f *formatObjekte) Parse(r io.Reader, o *Objekte) (n int64, err error) {
 		r,
 		format.MakeLineReaderIterateStrict(
 			format.MakeLineReaderKeyValue("Tai", o.Tai.Set),
-			format.MakeLineReaderKeyValue("Akte", o.AkteSha.Set),
+			format.MakeLineReaderKeyValue("Akte", o.Metadatei.AkteSha.Set),
 		),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -32,7 +32,7 @@ func (f *formatObjekte) Format(w io.Writer, o *Objekte) (n int64, err error) {
 	if n, err = format.WriteLines(
 		w,
 		format.MakeFormatString("Tai %s", o.Tai),
-		format.MakeFormatString("Akte %s", o.AkteSha),
+		format.MakeFormatString("Akte %s", o.Metadatei.AkteSha),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
