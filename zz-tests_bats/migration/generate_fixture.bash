@@ -1,10 +1,9 @@
-#! /bin/bash -xe
+#! /bin/bash -e
 
 dir_base="$(realpath "$(dirname "$0")")"
-make build/zit
 zit="$(realpath build/zit)"
 v="$("$zit" store-version)"
-d="$dir_base/v$v"
+d="${1:-$dir_base/v$v}"
 
 if [[ -d "$d" ]]; then
   chflags -R nouchg "$d"

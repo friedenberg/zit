@@ -57,6 +57,12 @@ build/tests_bats: build/zit $(files_tests_bats)
 > $(cmd_bats) zz-tests_bats/*.bats
 > touch "$@"
 
+files_tests_gen_fixture := $(shell find zz-tests_bats/migration)
+
+build/tests_gen_fixture: build/zit $(files_tests_gen_fixture)
+> ./zz-tests_bats/migration/generate_fixture.bash "$$(mktemp -d)"
+> touch "$@"
+
 build/tests_slow: build/tests_fast build/tests_bats
 > touch "$@"
 
@@ -66,13 +72,18 @@ build/tests_bats_migration: build/zit $(files_tests_bats_migration)
 > $(cmd_bats) zz-tests_bats/migration/*.bats
 > touch "$@"
 
-build/tests_slower: build/tests_fast build/tests_slow build/tests_bats_migration;
+build/tests_slower: build/tests_fast build/tests_slow build/tests_bats_migration build/tests_gen_fixture
 > touch "$@"
 
 build/deploy: build/tests_slower;
 
 graph_dependencies:
 > ./bin/graph_dependencies
+
+build/gen_fixture: build/zit $(files_tests_gen_fixture) build/zit
+> ./zz-tests_bats/migration/generate_fixture.bash
+> touch "$@"
+.PHONY: build/gen_fixture
 
 watch:
 > echo .
