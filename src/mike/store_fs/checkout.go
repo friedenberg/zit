@@ -179,6 +179,8 @@ func (s *Store) CheckoutOneZettel(
 		}
 	}
 
+	objekte.AssertAkteShasMatch(sz)
+
 	inlineAkte := s.erworben.IsInlineTyp(sz.GetTyp())
 
 	cz.State = objekte.CheckedOutStateJustCheckedOut
