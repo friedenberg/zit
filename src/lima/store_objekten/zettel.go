@@ -204,6 +204,8 @@ func (s *zettelStore) ReadOneExternal(
 		}
 	}
 
+	objekte.CorrectAkteSha(&ez, ez)
+
 	return
 }
 

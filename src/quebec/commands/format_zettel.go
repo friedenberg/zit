@@ -89,7 +89,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 		zt.Sku.Kennung = ze.Sku.Kennung
 		zt.Sku.ObjekteSha = ze.Sku.ObjekteSha
-		zt.Sku.AkteSha = ze.Sku.AkteSha
+		zt.SetAkteSha(ze.Sku.AkteSha)
 	} else {
 		if zt, err = u.StoreObjekten().Zettel().ReadOne(&h); err != nil {
 			err = errors.Wrap(err)
