@@ -351,7 +351,7 @@ func (s *zettelStore) Create(
 		return
 	}
 
-	tz.SetAkteSha(in.Metadatei.AkteSha)
+	tz.SetAkteSha(tz.GetMetadatei().AkteSha)
 
 	if err = s.commitIndexMatchUpdate(tz, true); err != nil {
 		err = errors.Wrap(err)
@@ -463,7 +463,7 @@ func (s *zettelStore) Update(
 		return
 	}
 
-	tz.SetAkteSha(z.Metadatei.AkteSha)
+	tz.SetAkteSha(tz.GetMetadatei().AkteSha)
 
 	shaObj := sha.Make(tz.GetObjekteSha())
 

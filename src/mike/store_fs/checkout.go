@@ -183,7 +183,8 @@ func (s *Store) CheckoutOneZettel(
 
 	cz.State = objekte.CheckedOutStateJustCheckedOut
 	cz.External = zettel.External{
-		Objekte: sz.Objekte,
+		Metadatei: sz.GetMetadatei(),
+		Objekte:   sz.Objekte,
 		Sku: zettel_external.Sku{
 			AkteSha:    sz.Sku.AkteSha,
 			ObjekteSha: sz.Sku.ObjekteSha,
