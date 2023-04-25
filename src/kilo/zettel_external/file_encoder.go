@@ -144,7 +144,7 @@ func (e *fileEncoder) EncodeObjekte(
 			return
 		}
 
-		defer errors.Deferred(&err, fAkte.Close)
+		defer errors.DeferredCloser(&err, fAkte)
 
 		if _, err = io.Copy(fAkte, ar); err != nil {
 			err = errors.Wrap(err)

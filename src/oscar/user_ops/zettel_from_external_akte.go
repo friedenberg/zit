@@ -199,6 +199,7 @@ func (c *ZettelFromExternalAkte) zettelForAkte(
 	}
 
 	z.Objekte.Reset()
+	z.Metadatei.Reset()
 
 	if err = c.ProtoZettel.ApplyWithAkteFD(z, akteFD); err != nil {
 		err = errors.Wrap(err)
