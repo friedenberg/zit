@@ -130,8 +130,7 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) GetObjekte() (o T) {
 
 func (a Transacted[T, T1, T2, T3, T4, T5]) GetEtiketten() kennung.EtikettSet {
 	egs := []any{
-		// a.Verzeichnisse,
-		a.Objekte,
+		a.Verzeichnisse,
 		a.GetMetadatei(),
 	}
 
@@ -147,7 +146,7 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) GetEtiketten() kennung.EtikettSet {
 func (a Transacted[T, T1, T2, T3, T4, T5]) GetEtikettenExpanded() kennung.EtikettSet {
 	egs := []any{
 		a.Verzeichnisse,
-		a.Objekte,
+		a.GetMetadatei(),
 	}
 
 	for _, o := range egs {
@@ -161,8 +160,7 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) GetEtikettenExpanded() kennung.Etiket
 
 func (a Transacted[T, T1, T2, T3, T4, T5]) GetTyp() (t kennung.Typ) {
 	tgs := []any{
-		// a.Verzeichnisse,
-		a.Objekte,
+		a.Verzeichnisse,
 		a.GetMetadatei(),
 	}
 
