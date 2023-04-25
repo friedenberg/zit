@@ -162,6 +162,7 @@ func (s konfigStore) Update(
 	}
 
 	kt.SetAkteSha(akteSha)
+	objekte.AssertAkteShasMatch(kt)
 
 	// TODO-P3 refactor into reusable
 	if mutter != nil {
@@ -189,8 +190,9 @@ func (s konfigStore) Update(
 	}
 
 	kt.Sku.ObjekteSha = sha.Make(ow.Sha())
+	mutterObjekteSha := mutter.GetObjekteSha()
 
-	if mutter != nil && kt.GetObjekteSha().EqualsSha(mutter.GetObjekteSha()) {
+	if mutter != nil && kt.GetObjekteSha().EqualsSha(mutterObjekteSha) {
 		kt = mutter
 
 		if err = s.KonfigLogWriter.Unchanged(kt); err != nil {
@@ -245,7 +247,7 @@ func (s konfigStore) Read() (tt *erworben.Transacted, err error) {
 
 			if _, err = s.StoreUtil.GetPersistentMetadateiFormat().ParsePersistentMetadatei(
 				r,
-				&tt.Objekte,
+				tt,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -256,7 +258,7 @@ func (s konfigStore) Read() (tt *erworben.Transacted, err error) {
 			var r sha.ReadCloser
 
 			if r, err = s.ObjekteReader(
-				tt.Objekte.Sha,
+				tt.GetObjekteSha(),
 			); err != nil {
 				if errors.IsNotExist(err) {
 					err = nil

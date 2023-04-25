@@ -89,7 +89,7 @@ func (s Store) shouldCheckOut(
 	cz zettel.CheckedOut,
 ) (ok bool) {
 	switch {
-	case cz.Internal.Objekte.Equals(cz.External.Objekte):
+	case cz.Internal.GetMetadatei().Equals(cz.External.GetMetadatei()):
 		cz.State = objekte.CheckedOutStateJustCheckedOutButSame
 
 	case options.Force || cz.State == objekte.CheckedOutStateEmpty:

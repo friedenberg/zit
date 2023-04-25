@@ -36,26 +36,16 @@ type External[
 }
 
 func (a External[T, T1, T2, T3]) GetMetadatei() metadatei.Metadatei {
-	if mg, ok := any(a.Objekte).(metadatei.Getter); ok {
-		return mg.GetMetadatei()
-	}
-
 	return a.Metadatei
 }
 
 func (a *External[T, T1, T2, T3]) SetMetadatei(m metadatei.Metadatei) {
-	if ms, ok := any(&a.Objekte).(metadatei.Setter); ok {
-		ms.SetMetadatei(m)
-		return
-	}
-
-	a.Metadatei = m
+	a.Metadatei.ResetWith(m)
 }
 
 func (a External[T, T1, T2, T3]) GetEtiketten() kennung.EtikettSet {
 	egs := []any{
 		// a.Verzeichnisse,
-		a.Objekte,
 		a.GetMetadatei(),
 	}
 
@@ -70,7 +60,7 @@ func (a External[T, T1, T2, T3]) GetEtiketten() kennung.EtikettSet {
 
 func (a External[T, T1, T2, T3]) GetEtikettenExpanded() kennung.EtikettSet {
 	egs := []any{
-		a.Objekte,
+		// a.Verzeichnisse,
 		a.GetMetadatei(),
 	}
 
@@ -157,8 +147,8 @@ func (e *External[T, T1, T2, T3]) SetAkteSha(v schnittstellen.Sha) {
 	sh := sha.Make(v)
 	m := e.GetMetadatei()
 	m.AkteSha = sh
-	e.SetMetadatei(m)
 	e.Sku.AkteSha = sh
+	e.SetMetadatei(m)
 }
 
 func (e External[T, T1, T2, T3]) ObjekteSha() sha.Sha {

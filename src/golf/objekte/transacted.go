@@ -39,12 +39,7 @@ func (t Transacted[T, T1, T2, T3, T4, T5]) GetMetadatei() metadatei.Metadatei {
 func (t *Transacted[T, T1, T2, T3, T4, T5]) SetMetadatei(
 	m metadatei.Metadatei,
 ) {
-	if ms, ok := any(&t.Objekte).(metadatei.Setter); ok {
-		ms.SetMetadatei(m)
-		return
-	}
-
-	t.Metadatei = m
+	t.Metadatei.ResetWith(m)
 }
 
 func (t Transacted[T, T1, T2, T3, T4, T5]) GetSkuAkteSha() schnittstellen.Sha {
@@ -62,8 +57,8 @@ func (t *Transacted[T, T1, T2, T3, T4, T5]) SetAkteSha(
 	m := t.GetMetadatei()
 	sh := sha.Make(s)
 	m.AkteSha = sh
-	t.SetMetadatei(m)
 	t.Sku.AkteSha = sh
+	t.SetMetadatei(m)
 }
 
 func (t Transacted[T, T1, T2, T3, T4, T5]) GetObjekteSha() schnittstellen.Sha {
@@ -130,7 +125,7 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) GetObjekte() (o T) {
 
 func (a Transacted[T, T1, T2, T3, T4, T5]) GetEtiketten() kennung.EtikettSet {
 	egs := []any{
-		a.Verzeichnisse,
+		// a.Verzeichnisse,
 		a.GetMetadatei(),
 	}
 
@@ -145,7 +140,7 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) GetEtiketten() kennung.EtikettSet {
 
 func (a Transacted[T, T1, T2, T3, T4, T5]) GetEtikettenExpanded() kennung.EtikettSet {
 	egs := []any{
-		a.Verzeichnisse,
+		// a.Verzeichnisse,
 		a.GetMetadatei(),
 	}
 
@@ -160,7 +155,7 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) GetEtikettenExpanded() kennung.Etiket
 
 func (a Transacted[T, T1, T2, T3, T4, T5]) GetTyp() (t kennung.Typ) {
 	tgs := []any{
-		a.Verzeichnisse,
+		// a.Verzeichnisse,
 		a.GetMetadatei(),
 	}
 
@@ -169,6 +164,10 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) GetTyp() (t kennung.Typ) {
 			t = tg.GetTyp()
 			return
 		}
+	}
+
+	if t.IsEmpty() {
+		panic("typ is empty")
 	}
 
 	return
@@ -263,6 +262,7 @@ func (a *Transacted[T, T1, T2, T3, T4, T5]) Reset() {
 func (a *Transacted[T, T1, T2, T3, T4, T5]) ResetWithPtr(
 	b *Transacted[T, T1, T2, T3, T4, T5],
 ) {
+	a.Metadatei.ResetWith(b.GetMetadatei())
 	a.Sku.ResetWith(b.Sku)
 	T1(&a.Objekte).ResetWith(b.Objekte)
 	T5(&a.Verzeichnisse).ResetWithObjekteMetadateiGetter(a.Objekte, a)

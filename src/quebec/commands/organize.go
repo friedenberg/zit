@@ -132,7 +132,10 @@ func (c *Organize) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error
 			return
 		}
 
-		if createOrganizeFileResults, err = createOrganizeFileOp.RunAndWrite(getResults, f); err != nil {
+		if createOrganizeFileResults, err = createOrganizeFileOp.RunAndWrite(
+			getResults,
+			f,
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

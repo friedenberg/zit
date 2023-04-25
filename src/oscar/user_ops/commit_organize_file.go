@@ -16,7 +16,9 @@ type CommitOrganizeFile struct {
 
 type CommitOrganizeFileResults struct{}
 
-func (c CommitOrganizeFile) Run(a, b *organize_text.Text) (results CommitOrganizeFileResults, err error) {
+func (c CommitOrganizeFile) Run(
+  a, b *organize_text.Text,
+) (results CommitOrganizeFileResults, err error) {
 	store := c.StoreObjekten()
 
 	var cs changes.Changes

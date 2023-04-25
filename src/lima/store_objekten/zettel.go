@@ -214,6 +214,7 @@ func (s *zettelStore) readOneExternalAkte(
 	t *zettel.Transacted,
 ) (err error) {
 	ez.Objekte = t.Objekte
+	ez.SetMetadatei(t.GetMetadatei())
 
 	var aw sha.WriteCloser
 
@@ -270,6 +271,7 @@ func (s *zettelStore) readOneExternalObjekte(
 	}
 
 	ez.Objekte = t.Objekte
+	ez.SetMetadatei(t.GetMetadatei())
 
 	if err = s.SaveObjekte(ez); err != nil {
 		err = errors.Wrapf(err, "%s", f.Name())

@@ -25,6 +25,10 @@ func (z EtikettenVerzeichnisse) GetEtikettenExpanded() schnittstellen.Set[kennun
 }
 
 func (z *EtikettenVerzeichnisse) ResetWithEtikettSet(es kennung.EtikettSet) {
+	if es == nil {
+		es = kennung.MakeEtikettSet()
+	}
+
 	ex := kennung.Expanded(es, kennung.ExpanderAll)
 	z.Tridex = tridex.Make(collections.SortedStrings[kennung.Etikett](ex)...)
 	z.Etiketten = es.ImmutableClone()

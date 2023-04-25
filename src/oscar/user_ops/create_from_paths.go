@@ -112,7 +112,7 @@ func (c CreateFromPaths) Run(
 
 	if err = toCreate.Each(
 		func(z *zettel.External) (err error) {
-			if z.Objekte.IsEmpty() {
+			if z.GetMetadatei().IsEmpty() {
 				return
 			}
 
@@ -201,13 +201,6 @@ func (c *CreateFromPaths) zettelsFromPath(
 
 	defer errors.DeferredCloser(&err, &c.Filter)
 
-	var t zettel.Transacted
-
-	if _, err = c.TextParser.ParseMetadatei(r, &t); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	ze := &zettel.External{
 		Sku: sku.External[kennung.Hinweis, *kennung.Hinweis]{
 			FDs: sku.ExternalFDs{
@@ -216,7 +209,11 @@ func (c *CreateFromPaths) zettelsFromPath(
 				},
 			},
 		},
-		Objekte: t.Objekte,
+	}
+
+	if _, err = c.TextParser.ParseMetadatei(r, ze); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	if err = c.StoreObjekten().Zettel().SaveObjekte(ze); err != nil {

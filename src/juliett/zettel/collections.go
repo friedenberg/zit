@@ -111,7 +111,7 @@ func (s SetPrefixVerzeichnisse) Len() int {
 
 // this splits on right-expanded
 func (s *SetPrefixVerzeichnisse) Add(z Transacted) {
-	es := kennung.Expanded(z.GetMetadatei().Etiketten, kennung.ExpanderRight)
+	es := kennung.Expanded(z.GetEtiketten(), kennung.ExpanderRight)
 
 	if es.Len() == 0 {
 		es = kennung.MakeEtikettSet(kennung.Etikett{})

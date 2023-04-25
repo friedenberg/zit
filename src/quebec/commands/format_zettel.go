@@ -87,6 +87,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			Objekte: ze.Objekte,
 		}
 
+		zt.SetMetadatei(ze.GetMetadatei())
 		zt.Sku.Kennung = ze.Sku.Kennung
 		zt.Sku.ObjekteSha = ze.Sku.ObjekteSha
 		zt.SetAkteSha(ze.Sku.AkteSha)
