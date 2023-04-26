@@ -6,15 +6,15 @@ import (
 )
 
 type ExternalKeyer = objekte.ExternalKeyer[
-	Objekte,
-	*Objekte,
+	Akte,
+	*Akte,
 	kennung.Kasten,
 	*kennung.Kasten,
 ]
 
 type External = objekte.External[
-	Objekte,
-	*Objekte,
+	Akte,
+	*Akte,
 	kennung.Kasten,
 	*kennung.Kasten,
 ]

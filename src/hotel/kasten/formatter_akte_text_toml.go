@@ -11,11 +11,11 @@ type FormatterAkteTextToml struct{}
 
 func (_ FormatterAkteTextToml) Format(
 	w io.Writer,
-	t *Objekte,
+	t *Akte,
 ) (n int64, err error) {
 	enc := toml.NewEncoder(w)
 
-	if err = enc.Encode(&t.Akte); err != nil {
+	if err = enc.Encode(&t); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

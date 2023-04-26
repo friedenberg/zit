@@ -1,9 +1,17 @@
 package kasten
 
-import "github.com/friedenberg/zit/src/bravo/values"
+import (
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/bravo/values"
+)
 
 type Akte struct {
 	Uri values.Uri `toml:"uri"`
+}
+
+func (_ Akte) GetGattung() schnittstellen.Gattung {
+	return gattung.Typ
 }
 
 func (a *Akte) Reset() {

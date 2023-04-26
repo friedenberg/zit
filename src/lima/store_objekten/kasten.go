@@ -17,8 +17,8 @@ import (
 
 type KastenStore interface {
 	CommonStore[
-		kasten.Objekte,
-		*kasten.Objekte,
+		kasten.Akte,
+		*kasten.Akte,
 		kennung.Kasten,
 		*kennung.Kasten,
 		kasten.Verzeichnisse,
@@ -33,8 +33,8 @@ type KastenTransactedReader = objekte_store.TransactedReader[
 
 type kastenStore struct {
 	*commonStore[
-		kasten.Objekte,
-		*kasten.Objekte,
+		kasten.Akte,
+		*kasten.Akte,
 		kennung.Kasten,
 		*kennung.Kasten,
 		kasten.Verzeichnisse,
@@ -42,7 +42,7 @@ type kastenStore struct {
 	]
 
 	objekte_store.CreateOrUpdater[
-		*kasten.Objekte,
+		*kasten.Akte,
 		*kennung.Kasten,
 		*kasten.Transacted,
 		*kasten.CheckedOut,
@@ -55,8 +55,8 @@ func makeKastenStore(
 	s = &kastenStore{}
 
 	s.commonStore, err = makeCommonStore[
-		kasten.Objekte,
-		*kasten.Objekte,
+		kasten.Akte,
+		*kasten.Akte,
 		kennung.Kasten,
 		*kennung.Kasten,
 		kasten.Verzeichnisse,
@@ -66,9 +66,9 @@ func makeKastenStore(
 		s,
 		sa,
 		s,
-		objekte_store.MakeAkteFormat[kasten.Objekte, *kasten.Objekte](
-			objekte.MakeTextParserIgnoreTomlErrors[kasten.Objekte](sa),
-			objekte.ParsedAkteTomlFormatter[kasten.Objekte]{},
+		objekte_store.MakeAkteFormat[kasten.Akte, *kasten.Akte](
+			objekte.MakeTextParserIgnoreTomlErrors[kasten.Akte](sa),
+			objekte.ParsedAkteTomlFormatter[kasten.Akte]{},
 			sa,
 		),
 	)

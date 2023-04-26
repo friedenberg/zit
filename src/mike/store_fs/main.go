@@ -175,8 +175,8 @@ func (s *Store) ReadFiles(
 	)
 
 	kastenEMGR := objekte_store.MakeExternalMaybeGetterReader[
-		kasten.Objekte,
-		*kasten.Objekte,
+		kasten.Akte,
+		*kasten.Akte,
 		kennung.Kasten,
 		*kennung.Kasten,
 		kasten.Verzeichnisse,

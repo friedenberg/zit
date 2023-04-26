@@ -6,8 +6,8 @@ import (
 )
 
 type Transacted = objekte.Transacted[
-	Objekte,
-	*Objekte,
+	Akte,
+	*Akte,
 	kennung.Kasten,
 	*kennung.Kasten,
 	Verzeichnisse,
@@ -15,8 +15,8 @@ type Transacted = objekte.Transacted[
 ]
 
 type CheckedOut = objekte.CheckedOut[
-	Objekte,
-	*Objekte,
+	Akte,
+	*Akte,
 	kennung.Kasten,
 	*kennung.Kasten,
 	Verzeichnisse,

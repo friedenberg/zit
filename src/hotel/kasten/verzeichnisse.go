@@ -13,7 +13,7 @@ type Verzeichnisse struct {
 }
 
 func (z *Verzeichnisse) ResetWithObjekteMetadateiGetter(
-	z1 Objekte,
+	z1 Akte,
 	_ metadatei.Getter,
 ) {
 	z.wasPopulated = true
