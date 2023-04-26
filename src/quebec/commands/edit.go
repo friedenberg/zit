@@ -5,12 +5,12 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
+	"github.com/friedenberg/zit/src/bravo/checkout_mode"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/mike/store_fs"
@@ -21,7 +21,7 @@ import (
 type Edit struct {
 	// TODO-P3 add force
 	Delete       bool
-	CheckoutMode sku.CheckoutMode
+	CheckoutMode checkout_mode.Mode
 }
 
 func init() {
@@ -29,7 +29,7 @@ func init() {
 		"edit",
 		func(f *flag.FlagSet) CommandWithCwdQuery {
 			c := &Edit{
-				CheckoutMode: sku.CheckoutModeObjekteOnly,
+				CheckoutMode: checkout_mode.ModeObjekteOnly,
 			}
 
 			f.BoolVar(&c.Delete, "delete", false, "delete the zettel and akte after successful checkin")

@@ -4,10 +4,10 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/checkout_mode"
 	"github.com/friedenberg/zit/src/bravo/script_config"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
-	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -16,7 +16,7 @@ import (
 type FormatZettel struct {
 	Format   string
 	UTIGroup string
-	Mode     sku.CheckoutMode
+	Mode     checkout_mode.Mode
 }
 
 func init() {
@@ -24,7 +24,7 @@ func init() {
 		"format-zettel",
 		func(f *flag.FlagSet) Command {
 			c := &FormatZettel{
-				Mode: sku.CheckoutModeObjekteAndAkte,
+				Mode: checkout_mode.ModeObjekteAndAkte,
 			}
 
 			f.Var(&c.Mode, "mode", "zettel, akte, or both")

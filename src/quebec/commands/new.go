@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
+	"github.com/friedenberg/zit/src/bravo/checkout_mode"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/collections"
@@ -13,7 +14,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
-	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/mike/store_fs"
@@ -108,7 +108,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 			options := store_fs.CheckoutOptions{
 				Cwd:          cwdFiles,
-				CheckoutMode: sku.CheckoutModeObjekteAndAkte,
+				CheckoutMode: checkout_mode.ModeObjekteAndAkte,
 			}
 
 			if zsc, err = u.StoreWorkingDirectory().Checkout(

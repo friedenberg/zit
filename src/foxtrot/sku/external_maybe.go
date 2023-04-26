@@ -3,6 +3,7 @@ package sku
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/checkout_mode"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
@@ -10,7 +11,7 @@ import (
 type ExternalMaybeLike interface {
 	IdLikeGetter
 	kennung.FDPairGetter
-	CheckoutModeGetter
+	checkout_mode.Getter
 }
 
 type ExternalFDs struct {
@@ -75,16 +76,16 @@ func (e ExternalMaybe[T, T1]) GetAkteFD() kennung.FD {
 	return e.FDs.Akte
 }
 
-func (e ExternalMaybe[T, T1]) GetCheckoutMode() (m CheckoutMode, err error) {
+func (e ExternalMaybe[T, T1]) GetCheckoutMode() (m checkout_mode.Mode, err error) {
 	switch {
 	case !e.FDs.Objekte.IsEmpty() && !e.FDs.Akte.IsEmpty():
-		m = CheckoutModeObjekteAndAkte
+		m = checkout_mode.ModeObjekteAndAkte
 
 	case !e.FDs.Akte.IsEmpty():
-		m = CheckoutModeAkteOnly
+		m = checkout_mode.ModeAkteOnly
 
 	case !e.FDs.Objekte.IsEmpty():
-		m = CheckoutModeObjekteOnly
+		m = checkout_mode.ModeObjekteOnly
 
 	default:
 		err = MakeErrInvalidCheckoutMode(

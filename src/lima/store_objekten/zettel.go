@@ -6,6 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/checkout_mode"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
@@ -181,7 +182,7 @@ func (s *zettelStore) ReadOneExternal(
 	e cwd.Zettel,
 	t *zettel.Transacted,
 ) (ez zettel.External, err error) {
-	var m sku.CheckoutMode
+	var m checkout_mode.Mode
 
 	if m, err = e.GetCheckoutMode(); err != nil {
 		err = errors.Wrap(err)
@@ -191,13 +192,13 @@ func (s *zettelStore) ReadOneExternal(
 	ez.Sku.ResetWithExternalMaybe(e)
 
 	switch m {
-	case sku.CheckoutModeAkteOnly:
+	case checkout_mode.ModeAkteOnly:
 		if err = s.readOneExternalAkte(&ez, t); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case sku.CheckoutModeObjekteOnly, sku.CheckoutModeObjekteAndAkte:
+	case checkout_mode.ModeObjekteOnly, checkout_mode.ModeObjekteAndAkte:
 		if err = s.readOneExternalObjekte(&ez, t); err != nil {
 			err = errors.Wrap(err)
 			return
