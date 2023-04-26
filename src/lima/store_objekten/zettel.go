@@ -265,21 +265,18 @@ func (s *zettelStore) readOneExternalObjekte(
 
 	defer errors.DeferredCloser(&err, f)
 
-	if _, err = s.textParser.ParseMetadatei(f, t); err != nil {
+	ez.Objekte.ResetWith(t.Objekte)
+	ez.Metadatei.ResetWith(t.Metadatei)
+
+	if _, err = s.textParser.ParseMetadatei(f, ez); err != nil {
 		err = errors.Wrapf(err, "%s", f.Name())
 		return
 	}
-
-	ez.Objekte = t.Objekte
-	ez.SetMetadatei(t.GetMetadatei())
 
 	if err = s.SaveObjekte(ez); err != nil {
 		err = errors.Wrapf(err, "%s", f.Name())
 		return
 	}
-
-	// TODO-P0
-	// ez.Sku.FDs.Akte.Path = c.AktePath
 
 	return
 }

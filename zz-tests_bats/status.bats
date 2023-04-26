@@ -37,6 +37,20 @@ function dirty_new_zettel() {
 	EOM
 }
 
+function dirty_existing_akte() {
+	cat >one/uno.zettel <<-EOM
+		---
+		# wildly different
+		- etikett-one
+		! one/uno.md
+		---
+	EOM
+
+	cat >one/uno.md <<-EOM
+		newest body but even newer
+	EOM
+}
+
 function dirty_one_uno() {
 	cat >one/uno.zettel <<-EOM
 		---
@@ -94,6 +108,23 @@ function status_simple_one_zettel { # @test
 	assert_success
 	assert_output - <<-EOM
 		          changed [one/uno.zettel@689c6787364899defa77461ff6a3f454ca667654653f86d5d44f2826950ff4f9 !md "wildly different"]
+	EOM
+}
+
+function status_simple_one_zettel_akte_separate { # @test
+	run_zit status one/uno.zettel
+	assert_success
+	assert_output - <<-EOM
+		             same [one/uno.zettel@d47c552a5299f392948258d7959fc7cf94843316a21c8ea12854ed84a8c06367 !md "wow the first"]
+	EOM
+
+	dirty_existing_akte
+
+	run_zit status one/uno.zettel
+	assert_success
+	assert_output - <<-EOM
+		          changed [one/uno.zettel@90322585cbd56e152c094f573eeb7bdfc9c392fcfb05186644e03f3c0b9eb7f4 !md "wildly different"]
+		                ↳ [one/uno.md@e5ef6f74b2707b17d8670e5678151d676655c685c43beaeb6e995c9d127fab85]
 	EOM
 }
 

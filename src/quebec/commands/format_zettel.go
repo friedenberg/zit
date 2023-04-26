@@ -87,7 +87,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			Objekte: ze.Objekte,
 		}
 
-    //TODO-P0 switch to methods on Transacted and External
+		//TODO-P0 switch to methods on Transacted and External
 		zt.SetMetadatei(ze.GetMetadatei())
 		zt.Sku.Kennung = ze.Sku.Kennung
 		zt.Sku.ObjekteSha = ze.Sku.ObjekteSha

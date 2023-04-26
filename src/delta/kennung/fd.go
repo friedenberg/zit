@@ -186,7 +186,7 @@ func (fd *FD) Set(v string) (err error) {
 	}
 
 	return
-	// errors.TodoP0("move this and cache")
+	// errors.TodoP2("move this and cache")
 	// hash := sha256.New()
 
 	// var f *os.File
@@ -257,7 +257,7 @@ func (f FD) GetIdLike() (il IdLike, err error) {
 		return
 	}
 
-	errors.TodoP0("implement Typ and Etikett")
+	errors.TodoP1("implement Typ and Etikett")
 
 	err = errors.Errorf("not an id")
 

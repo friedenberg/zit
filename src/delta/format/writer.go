@@ -117,7 +117,7 @@ func MakeWriterTo[T any](
 	}
 }
 
-func MakeWriterToWithNewLines2[T any](
+func MakeWriterToWithNewLines[T any](
 	w1 io.Writer,
 	wf schnittstellen.FuncWriterFormat[T],
 ) func(T) error {
@@ -143,8 +143,7 @@ func MakeWriterToWithNewLines2[T any](
 	)
 }
 
-// TODO-P0 deprecate
-func MakeWriterToWithNewLines[T any](
+func MakeWriterToWithNewLinesPtr[T any](
 	w1 io.Writer,
 	wf schnittstellen.FuncWriterFormat[T],
 ) func(*T) error {

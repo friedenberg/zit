@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/november/umwelt"
 	"github.com/friedenberg/zit/src/oscar/remote_conn"
@@ -65,8 +66,8 @@ func (c client) Close() (err error) {
 	return
 }
 
-// TODO-P0
 func (c client) SendNeededSkus(filter kennung.Filter) (err error) {
+	err = todo.Implement()
 	// var d remote_conn.Dialogue
 
 	// if d, err = c.stage.StartDialogue(
@@ -112,7 +113,7 @@ func (c *client) ObjekteWriter(
 		return
 	}
 
-	// TODO-P0 copy objekte data
+	// TODO-P1 copy objekte data
 
 	return
 }
@@ -134,7 +135,7 @@ func (c client) AkteWriter(
 		return
 	}
 
-	// TODO-P0 copy akte data
+	// TODO-P1 copy akte data
 
 	return
 }

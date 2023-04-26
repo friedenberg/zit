@@ -110,9 +110,9 @@ func (f textParser) ParseMetadatei(
 	} else if !akteFD.Sha.IsNull() {
 		if afs, ok := c.(kennung.AkteFDSetter); ok {
 			afs.SetAkteFD(akteFD)
-		} else {
-			m.AkteSha = akteFD.Sha
 		}
+
+		m.AkteSha = akteFD.Sha
 	}
 
 	switch {

@@ -73,7 +73,7 @@ func (op PullServer) akteReaderForSha(
 		return
 	}
 
-	// TODO-P0 rest is common
+	// TODO-P2 rest is common
 
 	errors.Log().Printf("received sha: %s", sh)
 
@@ -110,7 +110,7 @@ func (op PullServer) objekteReaderForSku(
 		return
 	}
 
-	// TODO-P0 rest is common
+	// TODO-P2 rest is common
 
 	errors.Log().Printf("received request: %#v", msg)
 
