@@ -9,5 +9,6 @@ type Objekte[T any] interface {
 
 type ObjektePtr[T any] interface {
 	schnittstellen.ObjektePtr[T]
+	schnittstellen.Resetable[T]
 	ObjektePtrLike
 }
