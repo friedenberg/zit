@@ -2,7 +2,6 @@ package metadatei
 
 import (
 	"io"
-	"os"
 	"path"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -48,6 +47,7 @@ func (f textParser) ParseMetadatei(
 	defer func() {
 		m.Etiketten = etiketten.ImmutableClone()
 		c.SetMetadatei(m)
+		c.SetAkteSha(m.AkteSha)
 	}()
 
 	var akteFD kennung.FD
@@ -100,6 +100,21 @@ func (f textParser) ParseMetadatei(
 
 	inlineAkteSha := sha.Make(akteWriter.Sha())
 
+	if !m.AkteSha.IsNull() && !akteFD.Sha.IsNull() {
+		err = errors.Wrap(ErrHasInlineAkteAndFilePath{
+			AkteFD:    akteFD,
+			InlineSha: inlineAkteSha,
+		})
+
+		return
+	} else if !akteFD.Sha.IsNull() {
+		if afs, ok := c.(kennung.AkteFDSetter); ok {
+			afs.SetAkteFD(akteFD)
+		} else {
+			m.AkteSha = akteFD.Sha
+		}
+	}
+
 	switch {
 	case m.AkteSha.IsNull() && !inlineAkteSha.IsNull():
 		m.AkteSha = inlineAkteSha
@@ -109,57 +124,13 @@ func (f textParser) ParseMetadatei(
 
 	case !m.AkteSha.IsNull() && !inlineAkteSha.IsNull() &&
 		!m.AkteSha.Equals(inlineAkteSha):
-		if akteFD.Sha.IsNull() {
-			err = errors.Wrap(ErrHasInlineAkteAndMetadateiSha{
-				InlineSha:    inlineAkteSha,
-				MetadateiSha: m.AkteSha,
-			})
-		} else {
-			err = errors.Wrap(ErrHasInlineAkteAndFilePath{
-				AkteFD:    akteFD,
-				InlineSha: inlineAkteSha,
-			})
-		}
+		err = errors.Wrap(ErrHasInlineAkteAndMetadateiSha{
+			InlineSha:    inlineAkteSha,
+			MetadateiSha: m.AkteSha,
+		})
 
 		return
 	}
-
-	return
-}
-
-func (tp textParser) readExternalAkte(
-	p string,
-) (fd kennung.FD, err error) {
-	var f *os.File
-
-	if f, err = files.OpenExclusiveReadOnly(p); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, f)
-
-	var akteWriter sha.WriteCloser
-
-	if akteWriter, err = tp.awf.AkteWriter(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if akteWriter == nil {
-		err = errors.Errorf("akte writer is nil")
-		return
-	}
-
-	defer errors.DeferredCloser(&err, akteWriter)
-
-	if _, err = io.Copy(akteWriter, f); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	fd.Path = p
-	fd.Sha = sha.Make(akteWriter.Sha())
 
 	return
 }
@@ -184,12 +155,13 @@ func (f textParser) readTyp(
 			return
 		}
 
-		if *akteFD, err = f.readExternalAkte(desc); err != nil {
+		if *akteFD, err = kennung.FDFromPathWithAkteWriterFactory(
+			desc,
+			f.awf,
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
-
-		m.AkteSha = akteFD.Sha
 
 	//! <sha>.<typ ext>
 	case tail != "":
