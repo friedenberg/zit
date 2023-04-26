@@ -412,12 +412,12 @@ func (k *compiled) AddTyp(
 	ct *typ.Transacted,
 ) {
 	// if ct.Objekte.Akte.Actions == nil {
-	// 	errors.TodoP0("actions were nil: %s", ct.Sku)
+	// 	errors.TodoP1("actions were nil: %s", ct.Sku)
 	// 	return
 	// }
 
 	// if ct.Objekte.Akte.EtikettenRules == nil {
-	// 	errors.TodoP0("etiketten rules were nil: %s", ct.Sku)
+	// 	errors.TodoP1("etiketten rules were nil: %s", ct.Sku)
 	// 	return
 	// }
 

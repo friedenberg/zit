@@ -66,7 +66,7 @@ func (c common) GetInheritorTyp(
 	orf schnittstellen.ObjekteReaderFactory,
 	arf schnittstellen.AkteReaderFactory,
 ) objekte_store.TransactedInheritor {
-	errors.TodoP0("fix issues with typ skus being delivered with empty data")
+	errors.TodoP1("fix issues with typ skus being delivered with empty data")
 	p := collections.MakePool[typ.Transacted, *typ.Transacted]()
 
 	inflator := objekte_store.MakeTransactedInflator[

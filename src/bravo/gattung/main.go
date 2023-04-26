@@ -99,7 +99,7 @@ func (g Gattung) IsTrueGattung() bool {
 }
 
 func (g Gattung) String() string {
-	errors.TodoP0("determine of some of these gattung should be goodbyed")
+	errors.TodoP1("move Bezeichnung, AkteTyp, Kennung, Transaktion, to another place")
 	switch g {
 	case Akte:
 		return "Akte"

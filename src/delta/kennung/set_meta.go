@@ -251,7 +251,7 @@ func (s metaSet) ContainsMatchable(m Matchable) bool {
 
 // Runs in parallel
 func (ms metaSet) All(f func(gattung.Gattung, Matcher) error) (err error) {
-	errors.TodoP0("lock")
+	errors.TodoP1("lock")
 	chErr := make(chan error, len(ms.Gattung))
 
 	for g, s := range ms.Gattung {

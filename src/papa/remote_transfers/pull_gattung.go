@@ -11,7 +11,7 @@ import (
 func (c *client) PullSkus(
 	ids kennung.MetaSet,
 ) (err error) {
-	errors.TodoP0("implement etikett and akte")
+	errors.TodoP1("implement etikett and akte")
 	gattungInheritors := map[gattung.Gattung]objekte_store.TransactedInheritor{
 		gattung.Zettel: c.GetInheritorZettel(c.ObjekteReaderFactory(gattung.Zettel), c),
 		gattung.Typ:    c.GetInheritorTyp(c.ObjekteReaderFactory(gattung.Typ), c),
