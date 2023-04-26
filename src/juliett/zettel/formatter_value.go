@@ -81,7 +81,7 @@ func (fv *FormatterValue) FuncFormatter(
 
 			lw := format.MakeLineWriter()
 
-			for fn, f := range tt.Akte.Akte.Formatters {
+			for fn, f := range tt.Akte.Formatters {
 				if f.FileExtension != "" {
 					lw.WriteFormat("%s %s", fn, f.FileExtension)
 				} else {
@@ -119,7 +119,7 @@ func (fv *FormatterValue) FuncFormatter(
 
 			if _, err = fmt.Fprintln(
 				out,
-				t.Akte.Akte.VimSyntaxType,
+				t.Akte.VimSyntaxType,
 			); err != nil {
 				err = errors.Wrap(err)
 				return

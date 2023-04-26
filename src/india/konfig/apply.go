@@ -33,7 +33,7 @@ func (k compiled) ApplyToMetadatei(
 		return
 	}
 
-	for e, r := range toa.Akte.Akte.EtikettenRules {
+	for e, r := range toa.Akte.EtikettenRules {
 		var e1 kennung.Etikett
 
 		if e1, err = kennung.MakeEtikett(e); err != nil {

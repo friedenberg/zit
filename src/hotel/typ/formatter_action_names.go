@@ -17,7 +17,7 @@ func (f formatterActionNames) Format(
 	w io.Writer,
 	ct *Transacted,
 ) (n int64, err error) {
-	for v, v1 := range ct.Akte.Akte.Actions {
+	for v, v1 := range ct.Akte.Actions {
 		var n1 int
 
 		if n1, err = io.WriteString(

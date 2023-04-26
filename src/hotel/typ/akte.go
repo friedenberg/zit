@@ -3,6 +3,8 @@ package typ
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/etikett_rule"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/script_config"
 	"github.com/friedenberg/zit/src/charlie/collections"
 )
@@ -18,6 +20,10 @@ type Akte struct {
 	Formatters         map[string]script_config.WithOutputFormat `toml:"formatters,omitempty"`
 	Actions            map[string]script_config.ScriptConfig     `toml:"actions,omitempty"`
 	EtikettenRules     map[string]etikett_rule.Rule              `toml:"etiketten-rules,omitempty"`
+}
+
+func (a Akte) GetGattung() schnittstellen.Gattung {
+	return gattung.Typ
 }
 
 func (a *Akte) Reset() {

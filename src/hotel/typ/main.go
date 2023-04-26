@@ -6,33 +6,33 @@ import (
 )
 
 type Transacted = objekte.Transacted[
-	Objekte,
-	*Objekte,
+	Akte,
+	*Akte,
 	kennung.Typ,
 	*kennung.Typ,
-	objekte.NilVerzeichnisse[Objekte],
-	*objekte.NilVerzeichnisse[Objekte],
+	objekte.NilVerzeichnisse[Akte],
+	*objekte.NilVerzeichnisse[Akte],
 ]
 
 type ExternalKeyer = objekte.ExternalKeyer[
-	Objekte,
-	*Objekte,
+	Akte,
+	*Akte,
 	kennung.Typ,
 	*kennung.Typ,
 ]
 
 type External = objekte.External[
-	Objekte,
-	*Objekte,
+	Akte,
+	*Akte,
 	kennung.Typ,
 	*kennung.Typ,
 ]
 
 type CheckedOut = objekte.CheckedOut[
-	Objekte,
-	*Objekte,
+	Akte,
+	*Akte,
 	kennung.Typ,
 	*kennung.Typ,
-	objekte.NilVerzeichnisse[Objekte],
-	*objekte.NilVerzeichnisse[Objekte],
+	objekte.NilVerzeichnisse[Akte],
+	*objekte.NilVerzeichnisse[Akte],
 ]

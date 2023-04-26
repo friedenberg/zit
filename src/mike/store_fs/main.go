@@ -163,12 +163,12 @@ func (s *Store) ReadFiles(
 	)
 
 	typEMGR := objekte_store.MakeExternalMaybeGetterReader[
-		typ.Objekte,
-		*typ.Objekte,
+		typ.Akte,
+		*typ.Akte,
 		kennung.Typ,
 		*kennung.Typ,
-		objekte.NilVerzeichnisse[typ.Objekte],
-		*objekte.NilVerzeichnisse[typ.Objekte],
+		objekte.NilVerzeichnisse[typ.Akte],
+		*objekte.NilVerzeichnisse[typ.Akte],
 	](
 		fs.GetTyp,
 		s.storeObjekten.Typ(),

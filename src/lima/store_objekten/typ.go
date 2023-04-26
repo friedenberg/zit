@@ -17,12 +17,12 @@ import (
 
 type TypStore interface {
 	CommonStore[
-		typ.Objekte,
-		*typ.Objekte,
+		typ.Akte,
+		*typ.Akte,
 		kennung.Typ,
 		*kennung.Typ,
-		objekte.NilVerzeichnisse[typ.Objekte],
-		*objekte.NilVerzeichnisse[typ.Objekte],
+		objekte.NilVerzeichnisse[typ.Akte],
+		*objekte.NilVerzeichnisse[typ.Akte],
 	]
 }
 
@@ -33,16 +33,16 @@ type TypTransactedReader = objekte_store.TransactedReader[
 
 type typStore struct {
 	*commonStore[
-		typ.Objekte,
-		*typ.Objekte,
+		typ.Akte,
+		*typ.Akte,
 		kennung.Typ,
 		*kennung.Typ,
-		objekte.NilVerzeichnisse[typ.Objekte],
-		*objekte.NilVerzeichnisse[typ.Objekte],
+		objekte.NilVerzeichnisse[typ.Akte],
+		*objekte.NilVerzeichnisse[typ.Akte],
 	]
 
 	objekte_store.CreateOrUpdater[
-		*typ.Objekte,
+		*typ.Akte,
 		*kennung.Typ,
 		*typ.Transacted,
 		*typ.CheckedOut,
@@ -55,20 +55,20 @@ func makeTypStore(
 	s = &typStore{}
 
 	s.commonStore, err = makeCommonStore[
-		typ.Objekte,
-		*typ.Objekte,
+		typ.Akte,
+		*typ.Akte,
 		kennung.Typ,
 		*kennung.Typ,
-		objekte.NilVerzeichnisse[typ.Objekte],
-		*objekte.NilVerzeichnisse[typ.Objekte],
+		objekte.NilVerzeichnisse[typ.Akte],
+		*objekte.NilVerzeichnisse[typ.Akte],
 	](
 		gattung.Typ,
 		s,
 		sa,
 		s,
-		objekte_store.MakeAkteFormat[typ.Objekte, *typ.Objekte](
-			objekte.MakeTextParserIgnoreTomlErrors[typ.Objekte](sa),
-			objekte.ParsedAkteTomlFormatter[typ.Objekte]{},
+		objekte_store.MakeAkteFormat[typ.Akte, *typ.Akte](
+			objekte.MakeTextParserIgnoreTomlErrors[typ.Akte](sa),
+			objekte.ParsedAkteTomlFormatter[typ.Akte]{},
 			sa,
 		),
 	)

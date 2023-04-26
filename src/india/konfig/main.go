@@ -217,7 +217,7 @@ func (kc *compiled) recompile() (err error) {
 
 	if err = kc.Typen.Each(
 		func(ct *typ.Transacted) (err error) {
-			fe := ct.Akte.Akte.FileExtension
+			fe := ct.Akte.FileExtension
 
 			if fe != "" {
 				kc.ExtensionsToTypen[fe] = ct.Sku.Kennung.String()
@@ -352,7 +352,7 @@ func (kc compiled) IsInlineTyp(k kennung.Typ) (isInline bool) {
 		return
 	}
 
-	isInline = tc.ApproximatedOrActual().Akte.Akte.InlineAkte
+	isInline = tc.ApproximatedOrActual().Akte.InlineAkte
 
 	return
 }
@@ -445,7 +445,7 @@ func (c *compiled) applyExpandedTyp(ct typ.Transacted) {
 	expandedActual := c.GetSortedTypenExpanded(ct.Sku.Kennung.String())
 
 	for _, ex := range expandedActual {
-		ct.Akte.Akte.Merge(ex.Akte.Akte)
+		ct.Akte.Merge(ex.Akte)
 	}
 }
 

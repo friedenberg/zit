@@ -111,14 +111,14 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		ok := false
 
 		if c.UTIGroup != "" {
-			if g, ok := typKonfig.Akte.Akte.FormatterUTIGroups[c.UTIGroup]; ok {
+			if g, ok := typKonfig.Akte.FormatterUTIGroups[c.UTIGroup]; ok {
 				if ft, ok := g.Map()[formatId]; ok {
 					actualFormatId = ft
 				}
 			}
 		}
 
-		f, ok = typKonfig.Akte.Akte.Formatters[actualFormatId]
+		f, ok = typKonfig.Akte.Formatters[actualFormatId]
 
 		if ok {
 			akteFormatter = f.ScriptConfig

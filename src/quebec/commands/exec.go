@@ -109,7 +109,7 @@ func (c Exec) getZettel(
 		return
 	}
 
-	executor = typKonfig.Akte.Akte.ExecCommand
+	executor = typKonfig.Akte.ExecCommand
 
 	if ar, err = u.StoreObjekten().AkteReader(
 		tz.GetAkteSha(),

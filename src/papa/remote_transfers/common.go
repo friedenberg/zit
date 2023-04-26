@@ -70,12 +70,12 @@ func (c common) GetInheritorTyp(
 	p := collections.MakePool[typ.Transacted, *typ.Transacted]()
 
 	inflator := objekte_store.MakeTransactedInflator[
-		typ.Objekte,
-		*typ.Objekte,
+		typ.Akte,
+		*typ.Akte,
 		kennung.Typ,
 		*kennung.Typ,
-		objekte.NilVerzeichnisse[typ.Objekte],
-		*objekte.NilVerzeichnisse[typ.Objekte],
+		objekte.NilVerzeichnisse[typ.Akte],
+		*objekte.NilVerzeichnisse[typ.Akte],
 	](
 		schnittstellen.MakeBespokeObjekteReadWriterFactory(
 			orf,
@@ -88,9 +88,9 @@ func (c common) GetInheritorTyp(
 		persisted_metadatei_format.FormatForVersion(
 			c.Konfig().GetStoreVersion(),
 		),
-		objekte_store.MakeAkteFormat[typ.Objekte, *typ.Objekte](
-			objekte.MakeTextParserIgnoreTomlErrors[typ.Objekte](c.StoreObjekten()),
-			objekte.ParsedAkteTomlFormatter[typ.Objekte]{},
+		objekte_store.MakeAkteFormat[typ.Akte, *typ.Akte](
+			objekte.MakeTextParserIgnoreTomlErrors[typ.Akte](c.StoreObjekten()),
+			objekte.ParsedAkteTomlFormatter[typ.Akte]{},
 			c.StoreObjekten(),
 		),
 		p,
