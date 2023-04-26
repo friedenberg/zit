@@ -79,8 +79,7 @@ func (e *fileEncoder) EncodeObjekte(
 
 	switch {
 	case aktePath != "" && objektePath != "":
-		// TODO P0 support akte path
-		mtw := metadatei.MakeTextFormatterMetadateiOnly(
+		mtw := metadatei.MakeTextFormatterMetadateiAktePath(
 			e.arf,
 			nil,
 		)

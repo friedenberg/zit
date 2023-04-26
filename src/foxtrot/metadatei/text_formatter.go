@@ -13,6 +13,30 @@ type textFormatter struct {
 	sequence []schnittstellen.FuncWriterElementInterface[TextFormatterContext]
 }
 
+func MakeTextFormatterMetadateiAktePath(
+	akteFactory schnittstellen.AkteReaderFactory,
+	akteFormatter script_config.RemoteScript,
+) textFormatter {
+	if akteFactory == nil {
+		panic("akte reader factory is nil")
+	}
+
+	common := textFormatterCommon{
+		akteFactory:   akteFactory,
+		akteFormatter: akteFormatter,
+	}
+
+	return textFormatter{
+		textFormatterCommon: common,
+		sequence: []schnittstellen.FuncWriterElementInterface[TextFormatterContext]{
+			common.writeBoundary,
+			common.writeCommonMetadateiFormat,
+			common.writePathTyp,
+			common.writeBoundary,
+		},
+	}
+}
+
 func MakeTextFormatterMetadateiOnly(
 	akteFactory schnittstellen.AkteReaderFactory,
 	akteFormatter script_config.RemoteScript,
