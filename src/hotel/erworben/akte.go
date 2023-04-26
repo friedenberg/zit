@@ -1,7 +1,12 @@
 package erworben
 
 import (
+	"reflect"
+
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/script_config"
+	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
@@ -11,6 +16,36 @@ type Akte struct {
 	RemoteScripts  map[string]script_config.RemoteScript `toml:"remote-scripts"`
 	Recipients     []string                              `toml:"recipients"`
 	Actions        map[string]script_config.ScriptConfig `toml:"actions,omitempty"`
+}
+
+func (_ Akte) GetGattung() schnittstellen.Gattung {
+	return gattung.Konfig
+}
+
+func (a Akte) Equals(b Akte) bool {
+	todo.Change("don't use reflection for equality")
+
+	if !a.DefaultTyp.Equals(b.DefaultTyp) {
+		return false
+	}
+
+	if !reflect.DeepEqual(a.FileExtensions, b.FileExtensions) {
+		return false
+	}
+
+	if !reflect.DeepEqual(a.RemoteScripts, b.RemoteScripts) {
+		return false
+	}
+
+	if !reflect.DeepEqual(a.Recipients, b.Recipients) {
+		return false
+	}
+
+	if !reflect.DeepEqual(a.Actions, b.Actions) {
+		return false
+	}
+
+	return true
 }
 
 func (a *Akte) Reset() {

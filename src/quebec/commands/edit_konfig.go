@@ -55,7 +55,7 @@ func (c EditKonfig) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	var k *erworben.Objekte
+	var k *erworben.Akte
 
 	if k, err = c.readTempKonfigFile(u, p); err != nil {
 		err = errors.Wrap(err)
@@ -115,7 +115,7 @@ func (c EditKonfig) makeTempKonfigFile(
 func (c EditKonfig) readTempKonfigFile(
 	u *umwelt.Umwelt,
 	p string,
-) (k *erworben.Objekte, err error) {
+) (k *erworben.Akte, err error) {
 	var f *os.File
 
 	if f, err = files.Open(p); err != nil {
@@ -127,7 +127,7 @@ func (c EditKonfig) readTempKonfigFile(
 
 	format := u.StoreObjekten().Konfig().GetAkteFormat()
 
-	k = &erworben.Objekte{}
+	k = &erworben.Akte{}
 
 	// TODO-P3 offer option to edit again
 	if _, _, err = format.ParseSaveAkte(f, k); err != nil {

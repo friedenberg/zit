@@ -18,28 +18,28 @@ import (
 type KonfigStore interface {
 	reindexer
 
-	GetAkteFormat() objekte.AkteFormat[erworben.Objekte, *erworben.Objekte]
+	GetAkteFormat() objekte.AkteFormat[erworben.Akte, *erworben.Akte]
 	Read() (*erworben.Transacted, error)
-	Update(*erworben.Objekte) (*erworben.Transacted, error)
+	Update(*erworben.Akte) (*erworben.Transacted, error)
 
 	objekte_store.TransactedLogger[*erworben.Transacted]
-	objekte_store.AkteTextSaver[erworben.Objekte, *erworben.Objekte]
+	objekte_store.AkteTextSaver[erworben.Akte, *erworben.Akte]
 }
 
 type KonfigInflator = objekte_store.TransactedInflator[
-	erworben.Objekte,
-	*erworben.Objekte,
+	erworben.Akte,
+	*erworben.Akte,
 	kennung.Konfig,
 	*kennung.Konfig,
-	objekte.NilVerzeichnisse[erworben.Objekte],
-	*objekte.NilVerzeichnisse[erworben.Objekte],
+	objekte.NilVerzeichnisse[erworben.Akte],
+	*objekte.NilVerzeichnisse[erworben.Akte],
 ]
 
 type KonfigLogWriter = objekte_store.LogWriter[*erworben.Transacted]
 
 type KonfigAkteTextSaver = objekte_store.AkteTextSaver[
-	erworben.Objekte,
-	*erworben.Objekte,
+	erworben.Akte,
+	*erworben.Akte,
 ]
 
 type konfigStore struct {
@@ -53,10 +53,10 @@ type konfigStore struct {
 	KonfigAkteTextSaver
 	KonfigLogWriter
 
-	akteFormat objekte.AkteFormat[erworben.Objekte, *erworben.Objekte]
+	akteFormat objekte.AkteFormat[erworben.Akte, *erworben.Akte]
 }
 
-func (s *konfigStore) GetAkteFormat() objekte.AkteFormat[erworben.Objekte, *erworben.Objekte] {
+func (s *konfigStore) GetAkteFormat() objekte.AkteFormat[erworben.Akte, *erworben.Akte] {
 	return s.akteFormat
 }
 
@@ -71,9 +71,9 @@ func makeKonfigStore(
 ) (s *konfigStore, err error) {
 	pool := collections.MakePool[erworben.Transacted]()
 
-	akteFormat := objekte_store.MakeAkteFormat[erworben.Objekte, *erworben.Objekte](
-		objekte.MakeTextParserIgnoreTomlErrors[erworben.Objekte](sa),
-		objekte.ParsedAkteTomlFormatter[erworben.Objekte]{},
+	akteFormat := objekte_store.MakeAkteFormat[erworben.Akte, *erworben.Akte](
+		objekte.MakeTextParserIgnoreTomlErrors[erworben.Akte](sa),
+		objekte.ParsedAkteTomlFormatter[erworben.Akte]{},
 		sa,
 	)
 
@@ -84,12 +84,12 @@ func makeKonfigStore(
 		ObjekteIOFactory: of,
 		pool:             pool,
 		KonfigInflator: objekte_store.MakeTransactedInflator[
-			erworben.Objekte,
-			*erworben.Objekte,
+			erworben.Akte,
+			*erworben.Akte,
 			kennung.Konfig,
 			*kennung.Konfig,
-			objekte.NilVerzeichnisse[erworben.Objekte],
-			*objekte.NilVerzeichnisse[erworben.Objekte],
+			objekte.NilVerzeichnisse[erworben.Akte],
+			*objekte.NilVerzeichnisse[erworben.Akte],
 		](
 			of,
 			sa,
@@ -100,8 +100,8 @@ func makeKonfigStore(
 			pool,
 		),
 		KonfigAkteTextSaver: objekte_store.MakeAkteTextSaver[
-			erworben.Objekte,
-			*erworben.Objekte,
+			erworben.Akte,
+			*erworben.Akte,
 		](
 			sa,
 			akteFormat,
@@ -127,7 +127,7 @@ func (s konfigStore) updateOne(t *erworben.Transacted) (err error) {
 }
 
 func (s konfigStore) Update(
-	ko *erworben.Objekte,
+	ko *erworben.Akte,
 ) (kt *erworben.Transacted, err error) {
 	if !s.StoreUtil.GetLockSmith().IsAcquired() {
 		err = errors.Wrap(objekte_store.ErrLockRequired{Operation: "update konfig"})
@@ -221,10 +221,8 @@ func (s konfigStore) Update(
 
 func (s konfigStore) Read() (tt *erworben.Transacted, err error) {
 	tt = &erworben.Transacted{
-		Sku: s.StoreUtil.GetKonfig().Sku,
-		Akte: erworben.Objekte{
-			Akte: s.StoreUtil.GetKonfig().Akte,
-		},
+		Sku:  s.StoreUtil.GetKonfig().Sku,
+		Akte: s.StoreUtil.GetKonfig().Akte,
 	}
 
 	if !tt.Sku.Schwanz.IsEmpty() {

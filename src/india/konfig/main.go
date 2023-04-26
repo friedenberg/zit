@@ -394,7 +394,7 @@ func (k *compiled) SetTransacted(
 ) {
 	k.hasChanges = true
 	k.Sku = kt.Sku
-	k.Akte = kt.Akte.Akte
+	k.Akte = kt.Akte
 }
 
 func (k *compiled) AddKasten(
