@@ -6,6 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/checkout_mode"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/script_config"
 	"github.com/friedenberg/zit/src/bravo/sha"
@@ -88,6 +89,17 @@ func (f textParser) ParseMetadatei(
 		RequireMetadatei: true,
 		Metadatei:        lr,
 		Akte:             akteWriter,
+	}
+
+	if cmg, ok := c.(checkout_mode.Getter); ok {
+		var checkoutMode checkout_mode.Mode
+
+		if checkoutMode, err = cmg.GetCheckoutMode(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		mr.RequireMetadatei = checkoutMode.IncludesObjekte()
 	}
 
 	if n, err = mr.ReadFrom(r); err != nil {
