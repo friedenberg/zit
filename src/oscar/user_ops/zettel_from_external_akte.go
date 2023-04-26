@@ -75,7 +75,7 @@ func (c ZettelFromExternalAkte) Run(
 		func(z *zettel.Transacted) (err error) {
 			if c.ProtoZettel.Apply(z) {
 				if z, err = c.StoreObjekten().Zettel().Update(
-					&z.Objekte,
+					&z.Akte,
 					z,
 					&z.Sku.Kennung,
 				); err != nil {
@@ -117,7 +117,7 @@ func (c ZettelFromExternalAkte) Run(
 
 		if c.ProtoZettel.Apply(tz) {
 			if tz, err = c.StoreObjekten().Zettel().Update(
-				&tz.Objekte,
+				&tz.Akte,
 				tz,
 				&tz.Sku.Kennung,
 			); err != nil {

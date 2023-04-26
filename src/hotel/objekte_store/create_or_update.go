@@ -86,7 +86,7 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdateCheckedOut(
 	}
 
 	transactedPtr = &objekte.Transacted[T, T1, T2, T3, T4, T5]{
-		Objekte: *objektePtr,
+		Akte: *objektePtr,
 		Sku: sku.Transacted[T2, T3]{
 			Kennung: *kennungPtr,
 			Verzeichnisse: sku.Verzeichnisse{
@@ -173,7 +173,7 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdate(
 
 	transactedPtr = &objekte.Transacted[T, T1, T2, T3, T4, T5]{
 		Metadatei: m,
-		Objekte:   *objektePtr,
+		Akte:   *objektePtr,
 		Sku: sku.Transacted[T2, T3]{
 			Kennung: *kennungPtr,
 			Verzeichnisse: sku.Verzeichnisse{
@@ -277,7 +277,7 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdateAkte(
 
 	transactedPtr = &objekte.Transacted[T, T1, T2, T3, T4, T5]{
 		Metadatei: m,
-		Objekte:   *objektePtr,
+		Akte:   *objektePtr,
 		Sku: sku.Transacted[T2, T3]{
 			Kennung: *kennungPtr,
 			Verzeichnisse: sku.Verzeichnisse{

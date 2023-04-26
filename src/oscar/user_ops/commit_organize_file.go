@@ -63,7 +63,7 @@ func (c CommitOrganizeFile) Run(
 				return
 			}
 
-			z.objekte = tz.Objekte
+			z.objekte = tz.Akte
 			z.kennung = tz.Sku.Kennung
 			z.metadatei = tz.GetMetadatei()
 		}

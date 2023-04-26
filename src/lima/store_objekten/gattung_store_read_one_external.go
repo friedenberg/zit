@@ -73,7 +73,7 @@ func (s *commonStore[O, OPtr, K, KPtr, V, VPtr]) readOneExternalAkte(
 	e *objekte.External[O, OPtr, K, KPtr],
 	t *objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
 ) (err error) {
-	e.Objekte = t.Objekte
+	e.Objekte = t.Akte
 	e.SetMetadatei(t.GetMetadatei())
 
 	var aw sha.WriteCloser
@@ -126,7 +126,7 @@ func (s *commonStore[O, OPtr, K, KPtr, V, VPtr]) readOneExternalObjekte(
 	defer errors.DeferredCloser(&err, f)
 
 	if t != nil {
-		OPtr(&e.Objekte).ResetWith(t.Objekte)
+		OPtr(&e.Objekte).ResetWith(t.Akte)
 		e.Metadatei.ResetWith(t.Metadatei)
 	}
 

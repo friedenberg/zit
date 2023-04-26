@@ -184,7 +184,7 @@ func (kc *compiled) recompile() (err error) {
 		func(ct *etikett.Transacted) (err error) {
 			k := ct.Sku.Kennung
 			tn := k.String()
-			tv := ct.Objekte.Akte
+			tv := ct.Akte.Akte
 
 			switch {
 			case tv.Hide:
@@ -217,7 +217,7 @@ func (kc *compiled) recompile() (err error) {
 
 	if err = kc.Typen.Each(
 		func(ct *typ.Transacted) (err error) {
-			fe := ct.Objekte.Akte.FileExtension
+			fe := ct.Akte.Akte.FileExtension
 
 			if fe != "" {
 				kc.ExtensionsToTypen[fe] = ct.Sku.Kennung.String()
@@ -352,7 +352,7 @@ func (kc compiled) IsInlineTyp(k kennung.Typ) (isInline bool) {
 		return
 	}
 
-	isInline = tc.ApproximatedOrActual().Objekte.Akte.InlineAkte
+	isInline = tc.ApproximatedOrActual().Akte.Akte.InlineAkte
 
 	return
 }
@@ -394,7 +394,7 @@ func (k *compiled) SetTransacted(
 ) {
 	k.hasChanges = true
 	k.Sku = kt.Sku
-	k.Akte = kt.Objekte.Akte
+	k.Akte = kt.Akte.Akte
 }
 
 func (k *compiled) AddKasten(
@@ -445,7 +445,7 @@ func (c *compiled) applyExpandedTyp(ct typ.Transacted) {
 	expandedActual := c.GetSortedTypenExpanded(ct.Sku.Kennung.String())
 
 	for _, ex := range expandedActual {
-		ct.Objekte.Akte.Merge(ex.Objekte.Akte)
+		ct.Akte.Akte.Merge(ex.Akte.Akte)
 	}
 }
 
@@ -453,6 +453,6 @@ func (c *compiled) applyExpandedEtikett(ct *etikett.Transacted) {
 	expandedActual := c.GetSortedEtikettenExpanded(ct.Sku.Kennung.String())
 
 	for _, ex := range expandedActual {
-		ct.Objekte.Akte.Merge(ex.Objekte.Akte)
+		ct.Akte.Akte.Merge(ex.Akte.Akte)
 	}
 }

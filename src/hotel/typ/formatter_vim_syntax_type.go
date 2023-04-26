@@ -21,7 +21,7 @@ func (f formatterVimSyntaxType) Format(
 
 	if n1, err = fmt.Fprintln(
 		w,
-		ct.Objekte.Akte.VimSyntaxType,
+		ct.Akte.Akte.VimSyntaxType,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

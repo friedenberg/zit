@@ -188,7 +188,7 @@ func (s *Store) CheckoutOneZettel(
 	cz.State = objekte.CheckedOutStateJustCheckedOut
 	cz.External = zettel.External{
 		Metadatei: sz.GetMetadatei(),
-		Objekte:   sz.Objekte,
+		Objekte:   sz.Akte,
 		Sku: sku.External[kennung.Hinweis, *kennung.Hinweis]{
 			AkteSha:    sha.Make(sz.GetAkteSha()),
 			ObjekteSha: sz.Sku.ObjekteSha,
@@ -209,7 +209,7 @@ func (s *Store) CheckoutOneZettel(
 		var fe string
 
 		if ty != nil {
-			fe = ty.Objekte.Akte.FileExtension
+			fe = ty.Akte.Akte.FileExtension
 		}
 
 		if fe == "" {

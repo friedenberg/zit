@@ -214,7 +214,7 @@ func (s *zettelStore) readOneExternalAkte(
 	ez *zettel.External,
 	t *zettel.Transacted,
 ) (err error) {
-	ez.Objekte = t.Objekte
+	ez.Objekte = t.Akte
 	ez.SetMetadatei(t.GetMetadatei())
 
 	var aw sha.WriteCloser
@@ -266,7 +266,7 @@ func (s *zettelStore) readOneExternalObjekte(
 
 	defer errors.DeferredCloser(&err, f)
 
-	ez.Objekte.ResetWith(t.Objekte)
+	ez.Objekte.ResetWith(t.Akte)
 	ez.Metadatei.ResetWith(t.Metadatei)
 
 	if _, err = s.textParser.ParseMetadatei(f, ez); err != nil {
@@ -525,7 +525,7 @@ func (s *zettelStore) writeObjekte(
 	t := s.StoreUtil.GetTransaktionStore().GetTransaktion()
 
 	tz = &zettel.Transacted{
-		Objekte: z,
+		Akte: z,
 		Sku: sku.Transacted[kennung.Hinweis, *kennung.Hinweis]{
 			Kennung: h,
 			Verzeichnisse: sku.Verzeichnisse{
@@ -544,7 +544,7 @@ func (s *zettelStore) writeObjekte(
 		return
 	}
 
-	tz.Verzeichnisse.ResetWithObjekteMetadateiGetter(tz.Objekte, m)
+	tz.Verzeichnisse.ResetWithObjekteMetadateiGetter(tz.Akte, m)
 
 	return
 }

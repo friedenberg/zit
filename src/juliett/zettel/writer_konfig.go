@@ -31,7 +31,7 @@ func MakeWriterKonfig(
 
 		t := k.GetApproximatedTyp(z.GetTyp()).ApproximatedOrActual()
 
-		if t != nil && t.Objekte.Akte.Archived {
+		if t != nil && t.Akte.Akte.Archived {
 			err = collections.MakeErrStopIteration()
 			return
 		}

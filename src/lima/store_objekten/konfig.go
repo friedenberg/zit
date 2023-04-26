@@ -153,7 +153,7 @@ func (s konfigStore) Update(
 	}
 
 	kt = &erworben.Transacted{
-		Objekte: *ko,
+		Akte: *ko,
 		Sku: sku.Transacted[kennung.Konfig, *kennung.Konfig]{
 			Verzeichnisse: sku.Verzeichnisse{
 				Schwanz: s.StoreUtil.GetTime(),
@@ -222,7 +222,7 @@ func (s konfigStore) Update(
 func (s konfigStore) Read() (tt *erworben.Transacted, err error) {
 	tt = &erworben.Transacted{
 		Sku: s.StoreUtil.GetKonfig().Sku,
-		Objekte: erworben.Objekte{
+		Akte: erworben.Objekte{
 			Akte: s.StoreUtil.GetKonfig().Akte,
 		},
 	}
@@ -275,7 +275,7 @@ func (s konfigStore) Read() (tt *erworben.Transacted, err error) {
 
 			var sh schnittstellen.Sha
 
-			if sh, _, err = fo.ParseSaveAkte(r, &tt.Objekte); err != nil {
+			if sh, _, err = fo.ParseSaveAkte(r, &tt.Akte); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

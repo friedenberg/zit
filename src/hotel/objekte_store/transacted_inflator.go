@@ -300,12 +300,12 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) readObjekte(
 			sk.GetGattung(),
 			sk.GetObjekteSha(),
 			t.Sku.ObjekteSha,
-			t.Objekte,
+			t.Akte,
 		)
 	}
 
 	objekte.CorrectAkteShaWith(t, t)
-	T5(&t.Verzeichnisse).ResetWithObjekteMetadateiGetter(t.Objekte, t)
+	T5(&t.Verzeichnisse).ResetWithObjekteMetadateiGetter(t.Akte, t)
 
 	errors.Log().Printf("parsed %d objekte bytes", n)
 
@@ -337,7 +337,7 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) readAkte(
 		sh schnittstellen.Sha
 	)
 
-	if sh, n, err = h.akteFormat.ParseSaveAkte(r, &t.Objekte); err != nil {
+	if sh, n, err = h.akteFormat.ParseSaveAkte(r, &t.Akte); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -18,7 +18,7 @@ type Transacted[
 	T4 any,
 	T5 VerzeichnissePtr[T4, T],
 ] struct {
-	Objekte       T
+	Akte          T
 	Metadatei     metadatei.Metadatei
 	Verzeichnisse T4
 	Sku           sku.Transacted[T2, T3]
@@ -110,7 +110,7 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) Equals(
 		return false
 	}
 
-	if !a.Objekte.Equals(b.Objekte) {
+	if !a.Akte.Equals(b.Akte) {
 		return false
 	}
 
@@ -118,7 +118,7 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) Equals(
 }
 
 func (a Transacted[T, T1, T2, T3, T4, T5]) GetObjekte() (o T) {
-	o = a.Objekte
+	o = a.Akte
 	return
 }
 
@@ -253,7 +253,7 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) GetKennungString() string {
 func (a *Transacted[T, T1, T2, T3, T4, T5]) Reset() {
 	a.Metadatei.Reset()
 	a.Sku.Reset()
-	T1(&a.Objekte).Reset()
+	T1(&a.Akte).Reset()
 	T5(&a.Verzeichnisse).Reset()
 	AssertAkteShasMatch(a)
 }
@@ -263,8 +263,8 @@ func (a *Transacted[T, T1, T2, T3, T4, T5]) ResetWithPtr(
 ) {
 	a.Metadatei.ResetWith(b.GetMetadatei())
 	a.Sku.ResetWith(b.Sku)
-	T1(&a.Objekte).ResetWith(b.Objekte)
-	T5(&a.Verzeichnisse).ResetWithObjekteMetadateiGetter(a.Objekte, a)
+	T1(&a.Akte).ResetWith(b.Akte)
+	T5(&a.Verzeichnisse).ResetWithObjekteMetadateiGetter(a.Akte, a)
 	AssertAkteShasMatch(a)
 }
 
@@ -273,7 +273,7 @@ func (a *Transacted[T, T1, T2, T3, T4, T5]) ResetWith(
 ) {
 	a.Metadatei.ResetWith(b.Metadatei)
 	a.Sku.ResetWith(b.Sku)
-	T1(&a.Objekte).ResetWith(b.Objekte)
-	T5(&a.Verzeichnisse).ResetWithObjekteMetadateiGetter(a.Objekte, a)
+	T1(&a.Akte).ResetWith(b.Akte)
+	T5(&a.Verzeichnisse).ResetWithObjekteMetadateiGetter(a.Akte, a)
 	AssertAkteShasMatch(a)
 }
