@@ -59,7 +59,7 @@ func (m *Metadatei) AddToFlagSet(f *flag.FlagSet) {
 		"etiketten",
 		"the Etiketten to use for created or updated Zttelen",
 	)
-	// TODO add typ
+	// TODO-P1 add typ
 }
 
 func (z Metadatei) IsEmpty() bool {

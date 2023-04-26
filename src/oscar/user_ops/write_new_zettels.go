@@ -26,7 +26,7 @@ func (c WriteNewZettels) RunMany(
 
 	results = zettel.MakeMutableSetCheckedOutUnique(count)
 
-	// TODO modify this to be run once
+	// TODO-P4 modify this to be run once
 	for i := 0; i < count; i++ {
 		var cz zettel.CheckedOut
 
@@ -70,7 +70,7 @@ func (c WriteNewZettels) runOneAlreadyLocked(
 	result.Internal = *zt
 
 	if c.CheckOut {
-		// TODO separate creation and checkout into two ops to allow for optimistic
+		// TODO-P4 separate creation and checkout into two ops to allow for optimistic
 		// unlocking
 		if result, err = c.StoreWorkingDirectory().CheckoutOneZettel(
 			c.CheckoutOptions,

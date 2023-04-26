@@ -17,7 +17,7 @@ func init() {
 	gob.Register(&metaSet{})
 }
 
-// TODO rename to QueryGattungGroup
+// TODO-P3 rename to QueryGattungGroup
 type MetaSet interface {
 	Get(g gattung.Gattung) (s Matcher, ok bool)
 	GetSet(g gattung.Gattung) (s Set, ok bool)

@@ -26,7 +26,7 @@ type FDPairGetter interface {
 }
 
 type FD struct {
-	// TODO make all of these private and expose as methods
+	// TODO-P2 make all of these private and expose as methods
 	IsDir   bool
 	Path    string
 	ModTime ts.Time

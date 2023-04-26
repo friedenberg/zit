@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
-// TODO make mutable / immutable?
+// TODO-P3 make mutable / immutable?
 type Slice []Etikett
 
 func MakeSlice(es ...Etikett) (s Slice) {

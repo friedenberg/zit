@@ -27,7 +27,7 @@ func NewHinweisEmpty() (h Hinweis) {
 	return
 }
 
-// TODO is this really necessary?;w
+// TODO-P3 is this really necessary?;w
 func NewHinweis(i coordinates.Int, pl Provider, pr Provider) (h Hinweis, err error) {
 	k := coordinates.Kennung{}
 	k.SetInt(i)

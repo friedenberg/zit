@@ -88,7 +88,7 @@ func (c Diff) RunWithCwdQuery(
 					func() (err error) {
 						var f *os.File
 
-						// TODO figure out why ReadOnly causes this to hang. Is it the wg?
+						// TODO-P1 figure out why ReadOnly causes this to hang. Is it the wg?
 						if f, err = files.OpenExclusiveWriteOnly(pFifo); err != nil {
 							err = errors.Wrap(err)
 							return

@@ -10,12 +10,12 @@ import (
 )
 
 type Reader struct {
-	// TODO add delimiter
+	// TODO-P4 add delimiter
 	RequireMetadatei bool
 	Metadatei, Akte  io.ReaderFrom
 }
 
-// TODO add constructors and remove public fields
+// TODO-P4 add constructors and remove public fields
 func (mr *Reader) ReadFrom(r1 io.Reader) (n int64, err error) {
 	r := bufio.NewReader(r1)
 
@@ -117,7 +117,7 @@ LINE_READ_LOOP:
 		return
 	}
 
-	// TODO handle errors
+	// TODO-P2 handle errors
 
 	return
 }

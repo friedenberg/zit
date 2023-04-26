@@ -22,12 +22,12 @@ type CwdFiles struct {
 	akteWriterFactory schnittstellen.AkteWriterFactory
 	erworben          konfig.Compiled
 	dir               string
-	// TODO make private
+	// TODO-P4 make private
 	Zettelen  schnittstellen.MutableSet[Zettel]
 	Typen     schnittstellen.MutableSet[Typ]
 	Kisten    schnittstellen.MutableSet[Kasten]
 	Etiketten schnittstellen.MutableSet[Etikett]
-	// TODO make set
+	// TODO-P4 make set
 	UnsureAkten      schnittstellen.MutableSet[kennung.FD]
 	EmptyDirectories []kennung.FD
 }

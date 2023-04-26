@@ -19,7 +19,7 @@ import (
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
-// TODO make generic
+// TODO-P4 make generic
 type AbbrStore interface {
 	HinweisExists(kennung.Hinweis) error
 	ExpandHinweisString(string) (kennung.Hinweis, error)
@@ -380,7 +380,7 @@ func (i *indexAbbr) ExpandKasten(eAbbr kennung.Kasten) (e kennung.Kasten, err er
 	ex := i.indexAbbrEncodableTridexes.Kisten.Expand(eAbbr.String())
 
 	if ex == "" {
-		// TODO should try to use the expansion if possible
+		// TODO-P4 should try to use the expansion if possible
 		ex = eAbbr.String()
 	}
 
@@ -401,7 +401,7 @@ func (i *indexAbbr) ExpandTyp(eAbbr kennung.Typ) (e kennung.Typ, err error) {
 	ex := i.indexAbbrEncodableTridexes.Typen.Expand(eAbbr.String())
 
 	if ex == "" {
-		// TODO should try to use the expansion if possible
+		// TODO-P4 should try to use the expansion if possible
 		ex = eAbbr.String()
 	}
 
@@ -424,7 +424,7 @@ func (i *indexAbbr) ExpandEtikett(eAbbr kennung.Etikett) (e kennung.Etikett, err
 	ex := i.indexAbbrEncodableTridexes.Etiketten.Expand(eAbbr.String())
 
 	if ex == "" {
-		// TODO should try to use the expansion if possible
+		// TODO-P4 should try to use the expansion if possible
 		ex = eAbbr.String()
 	}
 

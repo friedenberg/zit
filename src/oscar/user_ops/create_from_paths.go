@@ -31,8 +31,8 @@ type CreateFromPaths struct {
 func (c CreateFromPaths) Run(
 	args ...string,
 ) (results schnittstellen.MutableSet[*zettel.Transacted], err error) {
-	// TODO support different modes of de-duplication
-	// TODO support merging of duplicated akten
+	// TODO-P3 support different modes of de-duplication
+	// TODO-P3 support merging of duplicated akten
 	toCreate := zettel_external.MakeMutableSetUniqueFD()
 	toDelete := zettel_external.MakeMutableSetUniqueFD()
 
@@ -123,7 +123,7 @@ func (c CreateFromPaths) Run(
 			var zt *zettel.Transacted
 
 			if zt, err = c.StoreObjekten().Zettel().Create(z.Objekte, z); err != nil {
-				// TODO add file for error handling
+				// TODO-P2 add file for error handling
 				c.handleStoreError(cz, "", err)
 				err = nil
 				return
@@ -137,7 +137,7 @@ func (c CreateFromPaths) Run(
 					cz.Internal,
 					&cz.Internal.Sku.Kennung,
 				); err != nil {
-					// TODO add file for error handling
+					// TODO-P2 add file for error handling
 					c.handleStoreError(cz, "", err)
 					err = nil
 					return
@@ -146,7 +146,7 @@ func (c CreateFromPaths) Run(
 				cz.Internal = *zt
 			}
 
-			// TODO get matches
+			// TODO-P4 get matches
 			cz.DetermineState()
 
 			zv := &zettel.Transacted{}
@@ -164,7 +164,7 @@ func (c CreateFromPaths) Run(
 
 	if err = toDelete.Each(
 		func(z *zettel.External) (err error) {
-			// TODO move to checkout store
+			// TODO-P2 move to checkout store
 			if err = os.Remove(z.GetObjekteFD().Path); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -172,7 +172,7 @@ func (c CreateFromPaths) Run(
 
 			pathRel := c.Standort().RelToCwdOrSame(z.GetObjekteFD().Path)
 
-			// TODO move to printer
+			// TODO-P2 move to printer
 			errors.Out().Printf("[%s] (deleted)", pathRel)
 
 			return
@@ -185,7 +185,7 @@ func (c CreateFromPaths) Run(
 	return
 }
 
-// TODO migrate this to use store_working_directory
+// TODO-P1 migrate this to use store_working_directory
 func (c *CreateFromPaths) zettelsFromPath(
 	p string,
 	wf schnittstellen.FuncIter[*zettel.External],

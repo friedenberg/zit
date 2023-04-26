@@ -36,7 +36,7 @@ func (s Store) ReadAllMatchingAkten(
 
 				return
 			},
-			// TODO handle files with the same sha
+			// TODO-P2 handle files with the same sha
 			fds.Add,
 		),
 	); err != nil {

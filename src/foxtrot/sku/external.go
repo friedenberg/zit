@@ -12,7 +12,7 @@ import (
 type External[T kennung.KennungLike[T], T1 kennung.KennungLikePtr[T]] struct {
 	ObjekteSha sha.Sha
 	AkteSha    sha.Sha
-	// TODO turn in ExternalMaybe
+	// TODO-P4 turn in ExternalMaybe
 	Kennung T
 	FDs     ExternalFDs
 }

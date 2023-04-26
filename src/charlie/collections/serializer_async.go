@@ -21,7 +21,7 @@ func MakeAsyncSerializer[T any](
 		}()
 
 		for e := range chE {
-			// TODO what how error
+			// TODO-P1 what how error
 			err := wf(e)
 			if err != nil {
 				chError <- err

@@ -31,7 +31,7 @@ func WriteSeq[T any](
 	return
 }
 
-// TODO check performance of this
+// TODO-P4 check performance of this
 func WriteLine(w io.Writer, s string) (n int64, err error) {
 	var n1 int
 

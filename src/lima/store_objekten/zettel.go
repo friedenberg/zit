@@ -75,7 +75,7 @@ func makeZettelStore(
 		protoZettel: zettel.MakeProtoZettel(sa.GetKonfig()),
 		textParser: metadatei.MakeTextParser(
 			sa,
-			nil, // TODO make akteFormatter
+			nil, // TODO-P1 make akteFormatter
 		),
 	}
 
@@ -278,7 +278,7 @@ func (s *zettelStore) readOneExternalObjekte(
 		return
 	}
 
-	// TODO P0
+	// TODO-P0
 	// ez.Sku.FDs.Akte.Path = c.AktePath
 
 	return

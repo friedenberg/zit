@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/kennung_index"
 )
 
-// TODO move to collections
+// TODO-P3 move to collections
 type Schwanzen struct {
 	lock         *sync.RWMutex
 	hinweisen    map[kennung.Hinweis]Transacted

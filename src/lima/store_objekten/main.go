@@ -208,7 +208,7 @@ func (s Store) RevertTransaktion(
 	//		ok := false
 
 	//		if h, ok = o.GetId().(*hinweis.Hinweis); !ok {
-	//			//TODO
+	//			//TODO-P4
 	//			return
 	//		}
 
@@ -474,7 +474,7 @@ func (s *Store) addEtikett(
 func (s *Store) addMatchableTypAndEtikettenIfNecessary(
 	m kennung.Matchable,
 ) (err error) {
-	// TODO support other true gattung
+	// TODO-P2 support other true gattung
 	if !gattung.Zettel.EqualsAny(m.GetGattung()) {
 		return
 	}

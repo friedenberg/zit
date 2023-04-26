@@ -102,7 +102,7 @@ func WriteLines(
 	return
 }
 
-// TODO rename
+// TODO-P2 rename
 func MakeWriterTo[T any](
 	w io.Writer,
 	wf schnittstellen.FuncWriterFormat[T],

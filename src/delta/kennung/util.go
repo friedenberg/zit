@@ -175,7 +175,7 @@ func AddNormalized(es EtikettMutableSet, e Etikett) {
 
 func RemovePrefixes(es EtikettMutableSet, needle Etikett) {
 	for _, haystack := range es.Elements() {
-		// TODO make more efficient
+		// TODO-P2 make more efficient
 		if strings.HasPrefix(haystack.String(), needle.String()) {
 			es.Del(haystack)
 		}

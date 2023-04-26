@@ -87,6 +87,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			Objekte: ze.Objekte,
 		}
 
+    //TODO-P0 switch to methods on Transacted and External
 		zt.SetMetadatei(ze.GetMetadatei())
 		zt.Sku.Kennung = ze.Sku.Kennung
 		zt.Sku.ObjekteSha = ze.Sku.ObjekteSha
@@ -151,7 +152,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	// TODO use cat or just write to stdout if no script instead of erroring
+	// TODO-P1 use cat or just write to stdout if no script instead of erroring
 	if _, err = format.FormatMetadatei(u.Out(), zt); err != nil {
 		err = errors.Wrap(err)
 		return

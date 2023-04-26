@@ -50,7 +50,7 @@ func (w *Writer) open() (err error) {
 			errors.Log().Print("running")
 			if _ = w.writeItem(i); err != nil {
 				// err = errors.Wrap(err)
-				// TODO
+				// TODO-P4
 			}
 		}
 

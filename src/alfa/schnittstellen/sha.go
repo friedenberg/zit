@@ -3,7 +3,7 @@ package schnittstellen
 import "io"
 
 type Sha interface {
-	// TODO
+	// TODO-P3
 	// GetHashBytes() []byte
 	ValueLike
 	Korper
