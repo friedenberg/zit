@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/toml"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/golf/persisted_metadatei_format"
@@ -119,6 +120,8 @@ type commonStoreBase[
 	persistentMetadateiFormat persisted_metadatei_format.Format
 
 	objekte_store.ObjekteSaver
+
+	textParser metadatei.TextParser
 }
 
 func makeCommonStoreBase[
@@ -181,6 +184,10 @@ func makeCommonStoreBase[
 		ObjekteSaver: objekte_store.MakeObjekteSaver(
 			of,
 			pmf,
+		),
+		textParser: metadatei.MakeTextParser(
+			sa,
+			nil, // TODO-P1 make akteFormatter
 		),
 	}
 

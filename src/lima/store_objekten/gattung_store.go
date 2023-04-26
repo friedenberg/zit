@@ -152,23 +152,6 @@ func makeCommonStore[
 	return
 }
 
-func (s *commonStore[O, OPtr, K, KPtr, V, VPtr]) ReadOneExternal(
-	em sku.ExternalMaybe[K, KPtr],
-	t *objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
-) (e objekte.External[O, OPtr, K, KPtr], err error) {
-	// support akte
-	todo.Implement()
-	if err = s.ParseSaveStored(
-		em,
-		&e,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
 func (s *commonStore[O, OPtr, K, KPtr, V, VPtr]) CheckoutOne(
 	options CheckoutOptions,
 	t *objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
