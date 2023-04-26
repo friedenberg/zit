@@ -41,7 +41,7 @@ func readFormat(
 	af *test_metadatei_io.AkteIOFactory,
 	contents string,
 ) (z metadatei.Metadatei, a string) {
-	var zt Transacted
+	var zt External
 
 	t := t1.Skip(1)
 

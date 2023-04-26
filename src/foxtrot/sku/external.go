@@ -3,7 +3,9 @@ package sku
 import (
 	"fmt"
 
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/checkout_mode"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/delta/kennung"
@@ -75,4 +77,24 @@ func (a External[T, T1]) Equals(b External[T, T1]) (ok bool) {
 
 func (o External[T, T1]) GetKey() string {
 	return fmt.Sprintf("%s.%s", o.Kennung.GetGattung(), o.Kennung)
+}
+
+func (e External[T, T1]) GetCheckoutMode() (m checkout_mode.Mode, err error) {
+	switch {
+	case !e.FDs.Objekte.IsEmpty() && !e.FDs.Akte.IsEmpty():
+		m = checkout_mode.ModeObjekteAndAkte
+
+	case !e.FDs.Akte.IsEmpty():
+		m = checkout_mode.ModeAkteOnly
+
+	case !e.FDs.Objekte.IsEmpty():
+		m = checkout_mode.ModeObjekteOnly
+
+	default:
+		err = MakeErrInvalidCheckoutMode(
+			errors.Errorf("all FD's are empty"),
+		)
+	}
+
+	return
 }

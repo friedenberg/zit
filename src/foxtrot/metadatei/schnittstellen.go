@@ -4,6 +4,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/checkout_mode"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
@@ -49,6 +50,7 @@ type (
 
 	TextParserContext interface {
 		PersistentParserContext
+		checkout_mode.Getter
 		SetAkteSha(schnittstellen.Sha)
 	}
 

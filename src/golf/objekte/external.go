@@ -2,6 +2,7 @@ package objekte
 
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/checkout_mode"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/delta/kennung"
@@ -167,4 +168,8 @@ func (e *External[T, T1, T2, T3]) SetObjekteSha(
 	sh schnittstellen.Sha,
 ) {
 	e.Sku.ObjekteSha = sha.Make(sh)
+}
+
+func (e External[T, T1, T2, T3]) GetCheckoutMode() (checkout_mode.Mode, error) {
+	return e.Sku.GetCheckoutMode()
 }
