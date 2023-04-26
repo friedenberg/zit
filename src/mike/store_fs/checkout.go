@@ -188,7 +188,7 @@ func (s *Store) CheckoutOneZettel(
 	cz.State = objekte.CheckedOutStateJustCheckedOut
 	cz.External = zettel.External{
 		Metadatei: sz.GetMetadatei(),
-		Objekte:   sz.Akte,
+		Akte:   sz.Akte,
 		Sku: sku.External[kennung.Hinweis, *kennung.Hinweis]{
 			AkteSha:    sha.Make(sz.GetAkteSha()),
 			ObjekteSha: sz.Sku.ObjekteSha,

@@ -85,7 +85,7 @@ func (h storedParserSaver[O, OPtr, K, KPtr]) ParseSaveStored(
 
 	var akteSha schnittstellen.Sha
 
-	if akteSha, _, err = h.readAkte(r, &t.Objekte); err != nil {
+	if akteSha, _, err = h.readAkte(r, &t.Akte); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -214,7 +214,7 @@ func (s *zettelStore) readOneExternalAkte(
 	ez *zettel.External,
 	t *zettel.Transacted,
 ) (err error) {
-	ez.Objekte = t.Akte
+	ez.Akte = t.Akte
 	ez.SetMetadatei(t.GetMetadatei())
 
 	var aw sha.WriteCloser
@@ -266,7 +266,7 @@ func (s *zettelStore) readOneExternalObjekte(
 
 	defer errors.DeferredCloser(&err, f)
 
-	ez.Objekte.ResetWith(t.Akte)
+	ez.Akte.ResetWith(t.Akte)
 	ez.Metadatei.ResetWith(t.Metadatei)
 
 	if _, err = s.textParser.ParseMetadatei(f, ez); err != nil {
@@ -367,7 +367,7 @@ func (s *zettelStore) updateExternal(
 	co objekte.ExternalLike,
 ) (tl objekte.TransactedLike, err error) {
 	ze := co.(*zettel.External)
-	return s.Update(&ze.Objekte, ze.GetMetadatei(), &ze.Sku.Kennung)
+	return s.Update(&ze.Akte, ze.GetMetadatei(), &ze.Sku.Kennung)
 }
 
 func (s *zettelStore) UpdateCheckedOut(
@@ -412,7 +412,7 @@ func (s *zettelStore) UpdateCheckedOut(
 	}
 
 	if t, err = s.writeObjekte(
-		co.External.Objekte,
+		co.External.Akte,
 		co.External.GetMetadatei(),
 		co.External.Sku.Kennung,
 	); err != nil {

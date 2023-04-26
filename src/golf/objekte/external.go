@@ -31,7 +31,7 @@ type External[
 	T2 schnittstellen.Id[T2],
 	T3 schnittstellen.IdPtr[T2],
 ] struct {
-	Objekte   T
+	Akte      T
 	Metadatei metadatei.Metadatei
 	Sku       sku.External[T2, T3]
 }
@@ -82,7 +82,7 @@ func (a External[T, T1, T2, T3]) GetEtikettenExpanded() kennung.EtikettSet {
 func (a External[T, T1, T2, T3]) GetTyp() (t kennung.Typ) {
 	tgs := []any{
 		// a.Verzeichnisse,
-		a.Objekte,
+		a.Akte,
 		a.GetMetadatei(),
 	}
 
@@ -109,7 +109,7 @@ func (a External[T, T1, T2, T3]) EqualsAny(b any) bool {
 }
 
 func (a External[T, T1, T2, T3]) Equals(b External[T, T1, T2, T3]) bool {
-	if !a.Objekte.Equals(b.Objekte) {
+	if !a.Akte.Equals(b.Akte) {
 		return false
 	}
 

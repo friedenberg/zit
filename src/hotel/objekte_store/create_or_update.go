@@ -75,7 +75,7 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdateCheckedOut(
 	co *objekte.CheckedOut[T, T1, T2, T3, T4, T5],
 ) (transactedPtr *objekte.Transacted[T, T1, T2, T3, T4, T5], err error) {
 	kennungPtr := T3(&co.External.Sku.Kennung)
-	objektePtr := T1(&co.External.Objekte)
+	objektePtr := T1(&co.External.Akte)
 
 	if !cou.ls.IsAcquired() {
 		err = ErrLockRequired{
@@ -173,7 +173,7 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdate(
 
 	transactedPtr = &objekte.Transacted[T, T1, T2, T3, T4, T5]{
 		Metadatei: m,
-		Akte:   *objektePtr,
+		Akte:      *objektePtr,
 		Sku: sku.Transacted[T2, T3]{
 			Kennung: *kennungPtr,
 			Verzeichnisse: sku.Verzeichnisse{
@@ -277,7 +277,7 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdateAkte(
 
 	transactedPtr = &objekte.Transacted[T, T1, T2, T3, T4, T5]{
 		Metadatei: m,
-		Akte:   *objektePtr,
+		Akte:      *objektePtr,
 		Sku: sku.Transacted[T2, T3]{
 			Kennung: *kennungPtr,
 			Verzeichnisse: sku.Verzeichnisse{

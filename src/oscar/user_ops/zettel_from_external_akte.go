@@ -108,7 +108,7 @@ func (c ZettelFromExternalAkte) Run(
 		var tz *zettel.Transacted
 
 		if tz, err = c.StoreObjekten().Zettel().Create(
-			z.Objekte,
+			z.Akte,
 			z,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -198,7 +198,7 @@ func (c *ZettelFromExternalAkte) zettelForAkte(
 		return
 	}
 
-	z.Objekte.Reset()
+	z.Akte.Reset()
 	z.Metadatei.Reset()
 
 	if err = c.ProtoZettel.ApplyWithAkteFD(z, akteFD); err != nil {
