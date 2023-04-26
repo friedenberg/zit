@@ -29,17 +29,18 @@ func (t Transacted[T, T1, T2, T3, T4, T5]) Kennung() T3 {
 }
 
 func (t Transacted[T, T1, T2, T3, T4, T5]) GetMetadatei() metadatei.Metadatei {
-	if mg, ok := any(t.Objekte).(metadatei.Getter); ok {
-		return mg.GetMetadatei()
-	}
-
 	return t.Metadatei
+}
+
+func (t *Transacted[T, T1, T2, T3, T4, T5]) GetMetadateiPtr() *metadatei.Metadatei {
+	return &t.Metadatei
 }
 
 func (t *Transacted[T, T1, T2, T3, T4, T5]) SetMetadatei(
 	m metadatei.Metadatei,
 ) {
 	t.Metadatei.ResetWith(m)
+	t.SetAkteSha(m.AkteSha)
 }
 
 func (t Transacted[T, T1, T2, T3, T4, T5]) GetSkuAkteSha() schnittstellen.Sha {
@@ -54,11 +55,9 @@ func (t Transacted[T, T1, T2, T3, T4, T5]) GetAkteSha() schnittstellen.Sha {
 func (t *Transacted[T, T1, T2, T3, T4, T5]) SetAkteSha(
 	s schnittstellen.Sha,
 ) {
-	m := t.GetMetadatei()
 	sh := sha.Make(s)
-	m.AkteSha = sh
+	t.GetMetadateiPtr().AkteSha = sh
 	t.Sku.AkteSha = sh
-	t.SetMetadatei(m)
 }
 
 func (t Transacted[T, T1, T2, T3, T4, T5]) GetObjekteSha() schnittstellen.Sha {

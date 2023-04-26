@@ -39,8 +39,13 @@ func (a External[T, T1, T2, T3]) GetMetadatei() metadatei.Metadatei {
 	return a.Metadatei
 }
 
+func (a *External[T, T1, T2, T3]) GetMetadateiPtr() *metadatei.Metadatei {
+	return &a.Metadatei
+}
+
 func (a *External[T, T1, T2, T3]) SetMetadatei(m metadatei.Metadatei) {
 	a.Metadatei.ResetWith(m)
+	a.SetAkteSha(m.AkteSha)
 }
 
 func (a External[T, T1, T2, T3]) GetEtiketten() kennung.EtikettSet {
@@ -143,12 +148,15 @@ func (t External[T, T1, T2, T3]) GetAkteSha() schnittstellen.Sha {
 	return t.Sku.AkteSha
 }
 
+func (e *External[T, T1, T2, T3]) SetAkteFD(fd kennung.FD) {
+	e.Sku.FDs.Akte = fd
+	e.SetAkteSha(fd.Sha)
+}
+
 func (e *External[T, T1, T2, T3]) SetAkteSha(v schnittstellen.Sha) {
 	sh := sha.Make(v)
-	m := e.GetMetadatei()
-	m.AkteSha = sh
+	e.GetMetadateiPtr().AkteSha = sh
 	e.Sku.AkteSha = sh
-	e.SetMetadatei(m)
 }
 
 func (e External[T, T1, T2, T3]) ObjekteSha() sha.Sha {
