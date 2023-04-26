@@ -184,7 +184,7 @@ func (kc *compiled) recompile() (err error) {
 		func(ct *etikett.Transacted) (err error) {
 			k := ct.Sku.Kennung
 			tn := k.String()
-			tv := ct.Akte.Akte
+			tv := ct.Akte
 
 			switch {
 			case tv.Hide:
@@ -453,6 +453,6 @@ func (c *compiled) applyExpandedEtikett(ct *etikett.Transacted) {
 	expandedActual := c.GetSortedEtikettenExpanded(ct.Sku.Kennung.String())
 
 	for _, ex := range expandedActual {
-		ct.Akte.Akte.Merge(ex.Akte.Akte)
+		ct.Akte.Merge(ex.Akte)
 	}
 }

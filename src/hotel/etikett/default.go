@@ -1,7 +1,7 @@
 package etikett
 
-func MakeObjekte() (t *Objekte) {
-	t = &Objekte{}
+func MakeObjekte() (t *Akte) {
+	t = &Akte{}
 
 	return
 }

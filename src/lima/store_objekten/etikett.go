@@ -17,12 +17,12 @@ import (
 
 type EtikettStore interface {
 	CommonStore[
-		etikett.Objekte,
-		*etikett.Objekte,
+		etikett.Akte,
+		*etikett.Akte,
 		kennung.Etikett,
 		*kennung.Etikett,
-		objekte.NilVerzeichnisse[etikett.Objekte],
-		*objekte.NilVerzeichnisse[etikett.Objekte],
+		objekte.NilVerzeichnisse[etikett.Akte],
+		*objekte.NilVerzeichnisse[etikett.Akte],
 	]
 }
 
@@ -33,16 +33,16 @@ type EtikettTransactedReader = objekte_store.TransactedReader[
 
 type etikettStore struct {
 	*commonStore[
-		etikett.Objekte,
-		*etikett.Objekte,
+		etikett.Akte,
+		*etikett.Akte,
 		kennung.Etikett,
 		*kennung.Etikett,
-		objekte.NilVerzeichnisse[etikett.Objekte],
-		*objekte.NilVerzeichnisse[etikett.Objekte],
+		objekte.NilVerzeichnisse[etikett.Akte],
+		*objekte.NilVerzeichnisse[etikett.Akte],
 	]
 
 	objekte_store.CreateOrUpdater[
-		*etikett.Objekte,
+		*etikett.Akte,
 		*kennung.Etikett,
 		*etikett.Transacted,
 		*etikett.CheckedOut,
@@ -55,20 +55,20 @@ func makeEtikettStore(
 	s = &etikettStore{}
 
 	s.commonStore, err = makeCommonStore[
-		etikett.Objekte,
-		*etikett.Objekte,
+		etikett.Akte,
+		*etikett.Akte,
 		kennung.Etikett,
 		*kennung.Etikett,
-		objekte.NilVerzeichnisse[etikett.Objekte],
-		*objekte.NilVerzeichnisse[etikett.Objekte],
+		objekte.NilVerzeichnisse[etikett.Akte],
+		*objekte.NilVerzeichnisse[etikett.Akte],
 	](
 		gattung.Etikett,
 		s,
 		sa,
 		s,
-		objekte_store.MakeAkteFormat[etikett.Objekte, *etikett.Objekte](
-			objekte.MakeTextParserIgnoreTomlErrors[etikett.Objekte](sa),
-			objekte.ParsedAkteTomlFormatter[etikett.Objekte]{},
+		objekte_store.MakeAkteFormat[etikett.Akte, *etikett.Akte](
+			objekte.MakeTextParserIgnoreTomlErrors[etikett.Akte](sa),
+			objekte.ParsedAkteTomlFormatter[etikett.Akte]{},
 			sa,
 		),
 	)

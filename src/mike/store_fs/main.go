@@ -151,12 +151,12 @@ func (s *Store) ReadFiles(
 	)
 
 	etikettEMGR := objekte_store.MakeExternalMaybeGetterReader[
-		etikett.Objekte,
-		*etikett.Objekte,
+		etikett.Akte,
+		*etikett.Akte,
 		kennung.Etikett,
 		*kennung.Etikett,
-		objekte.NilVerzeichnisse[etikett.Objekte],
-		*objekte.NilVerzeichnisse[etikett.Objekte],
+		objekte.NilVerzeichnisse[etikett.Akte],
+		*objekte.NilVerzeichnisse[etikett.Akte],
 	](
 		fs.GetEtikett,
 		s.storeObjekten.Etikett(),
