@@ -14,6 +14,7 @@ type InNeedOfAkteShaCorrection interface {
 
 type InNeedOfAkteShaCorrectionPtr interface {
 	InNeedOfAkteShaCorrection
+	metadatei.GetterPtr
 	metadatei.Setter
 	SetAkteSha(schnittstellen.Sha)
 }
