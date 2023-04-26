@@ -1,29 +1,38 @@
 package kennung
 
 import (
+	"io"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/echo/ts"
 )
 
-type ObjekteFDGetter interface {
-	GetObjekteFD() FD
-}
+type (
+	ObjekteFDGetter interface {
+		GetObjekteFD() FD
+	}
 
-type AkteFDGetter interface {
-	GetAkteFD() FD
-}
+	AkteFDGetter interface {
+		GetAkteFD() FD
+	}
 
-type FDPairGetter interface {
-	ObjekteFDGetter
-	AkteFDGetter
-}
+	FDPairGetter interface {
+		ObjekteFDGetter
+		AkteFDGetter
+	}
+
+	AkteFDSetter interface {
+		SetAkteFD(FD)
+	}
+)
 
 type FD struct {
 	// TODO-P2 make all of these private and expose as methods
@@ -51,6 +60,60 @@ func (a FD) Equals(b FD) bool {
 	}
 
 	return true
+}
+
+func FDFromPathWithAkteWriterFactory(
+	p string,
+	awf schnittstellen.AkteWriterFactory,
+) (fd FD, err error) {
+	if p == "" {
+		err = errors.Errorf("empty path")
+		return
+	}
+
+	if awf == nil {
+		panic("schnittstellen.AkteWriterFactory is nil")
+	}
+
+	var f *os.File
+
+	if f, err = files.OpenExclusiveReadOnly(p); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.DeferredCloser(&err, f)
+
+	var akteWriter sha.WriteCloser
+
+	if akteWriter, err = awf.AkteWriter(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.DeferredCloser(&err, akteWriter)
+
+	if _, err = io.Copy(akteWriter, f); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	var fi os.FileInfo
+
+	if fi, err = f.Stat(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if fd, err = FileInfo(fi, path.Dir(p)); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	fd.Path = p
+	fd.Sha = sha.Make(akteWriter.Sha())
+
+	return
 }
 
 func FDFromPath(p string) (fd FD, err error) {

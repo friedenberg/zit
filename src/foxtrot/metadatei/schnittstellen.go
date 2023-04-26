@@ -3,12 +3,17 @@ package metadatei
 import (
 	"io"
 
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
 type (
 	Getter interface {
 		GetMetadatei() Metadatei
+	}
+
+	GetterPtr interface {
+		GetMetadateiPtr() *Metadatei
 	}
 
 	Setter interface {
@@ -44,6 +49,7 @@ type (
 
 	TextParserContext interface {
 		PersistentParserContext
+		SetAkteSha(schnittstellen.Sha)
 	}
 
 	TextFormatOutput struct {
