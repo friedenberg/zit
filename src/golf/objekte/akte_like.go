@@ -1,11 +1,11 @@
 package objekte
 
-type ObjekteLike interface {
+type AkteLike interface {
 	// kennung.Matchable
 	// metadatei.Getter
 }
 
-type ObjektePtrLike interface {
+type AktePtrLike interface {
 	// kennung.Matchable
 	// metadatei.Getter
 	// metadatei.Setter
