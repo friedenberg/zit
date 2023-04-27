@@ -191,10 +191,7 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) GetSku() (sk sku.Sku) {
 }
 
 func (a Transacted[T, T1, T2, T3, T4, T5]) GetDataIdentity() (di sku.DataIdentity) {
-	sk := a.Sku.Sku()
-	errors.TodoP2("make certain akte sha is in sku")
-	sk.AkteSha = sha.Make(a.GetAkteSha())
-	di = sk
+	di = a.GetSku()
 	return
 }
 
