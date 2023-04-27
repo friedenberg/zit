@@ -37,11 +37,15 @@ func (u *Umwelt) FormatColorWriter() format.FuncColorWriter {
 
 func (u *Umwelt) FormatIdLike() schnittstellen.FuncWriterFormat[kennung.IdLike] {
 	hf := u.FormatHinweis()
+	tf := u.FormatTyp()
 
 	return func(w io.Writer, v kennung.IdLike) (n int64, err error) {
 		switch vt := v.(type) {
 		case kennung.Hinweis:
 			return hf(w, vt)
+
+		case kennung.Typ:
+			return tf(w, vt)
 
 		default:
 			_, err = io.WriteString(w, fmt.Sprintf("%T", v))
