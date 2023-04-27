@@ -9,7 +9,7 @@ import (
 
 type CheckedOut[
 	T Akte[T],
-	T1 ObjektePtr[T],
+	T1 AktePtr[T],
 	T2 schnittstellen.Id[T2],
 	T3 schnittstellen.IdPtr[T2],
 	T4 any,

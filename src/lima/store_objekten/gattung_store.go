@@ -24,7 +24,7 @@ type reindexer interface {
 
 type CommonStore[
 	O objekte.Akte[O],
-	OPtr objekte.ObjektePtr[O],
+	OPtr objekte.AktePtr[O],
 	K schnittstellen.Id[K],
 	KPtr schnittstellen.IdPtr[K],
 	V any,
@@ -63,7 +63,7 @@ type CommonStore[
 
 type commonStoreDelegate[
 	O objekte.Akte[O],
-	OPtr objekte.ObjektePtr[O],
+	OPtr objekte.AktePtr[O],
 	K schnittstellen.Id[K],
 	KPtr schnittstellen.IdPtr[K],
 	V any,
@@ -83,7 +83,7 @@ type transactedPtr[T any] interface {
 
 type commonStore[
 	O objekte.Akte[O],
-	OPtr objekte.ObjektePtr[O],
+	OPtr objekte.AktePtr[O],
 	K schnittstellen.Id[K],
 	KPtr schnittstellen.IdPtr[K],
 	V any,
@@ -96,7 +96,7 @@ type commonStore[
 
 func makeCommonStore[
 	O objekte.Akte[O],
-	OPtr objekte.ObjektePtr[O],
+	OPtr objekte.AktePtr[O],
 	K schnittstellen.Id[K],
 	KPtr schnittstellen.IdPtr[K],
 	V any,

@@ -7,7 +7,7 @@ type Akte[T any] interface {
 	ObjekteLike
 }
 
-type ObjektePtr[T any] interface {
+type AktePtr[T any] interface {
 	schnittstellen.ObjektePtr[T]
 	schnittstellen.Resetable[T]
 	ObjektePtrLike

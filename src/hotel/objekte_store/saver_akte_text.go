@@ -10,14 +10,14 @@ import (
 // TODO-P3 rename to AkteSaver
 type AkteTextSaver[
 	T objekte.Akte[T],
-	T1 objekte.ObjektePtr[T],
+	T1 objekte.AktePtr[T],
 ] interface {
 	SaveAkteText(T) (schnittstellen.Sha, int64, error)
 }
 
 type akteTextSaver[
 	T objekte.Akte[T],
-	T1 objekte.ObjektePtr[T],
+	T1 objekte.AktePtr[T],
 ] struct {
 	awf        schnittstellen.AkteWriterFactory
 	akteFormat objekte.AkteFormat[T, T1]
@@ -25,7 +25,7 @@ type akteTextSaver[
 
 func MakeAkteTextSaver[
 	T objekte.Akte[T],
-	T1 objekte.ObjektePtr[T],
+	T1 objekte.AktePtr[T],
 ](
 	awf schnittstellen.AkteWriterFactory,
 	akteFormat objekte.AkteFormat[T, T1],

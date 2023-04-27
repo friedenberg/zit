@@ -14,7 +14,7 @@ import (
 
 type StoredParseSaver[
 	O objekte.Akte[O],
-	OPtr objekte.ObjektePtr[O],
+	OPtr objekte.AktePtr[O],
 	K schnittstellen.Id[K],
 	KPtr schnittstellen.IdPtr[K],
 ] interface {
@@ -26,7 +26,7 @@ type StoredParseSaver[
 
 type storedParserSaver[
 	O objekte.Akte[O],
-	OPtr objekte.ObjektePtr[O],
+	OPtr objekte.AktePtr[O],
 	K schnittstellen.Id[K],
 	KPtr schnittstellen.IdPtr[K],
 ] struct {
@@ -37,7 +37,7 @@ type storedParserSaver[
 
 func MakeStoredParseSaver[
 	O objekte.Akte[O],
-	OPtr objekte.ObjektePtr[O],
+	OPtr objekte.AktePtr[O],
 	K schnittstellen.Id[K],
 	KPtr schnittstellen.IdPtr[K],
 ](

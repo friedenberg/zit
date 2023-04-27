@@ -22,7 +22,7 @@ type CreateOrUpdateDelegate[T any] struct {
 
 type createOrUpdate[
 	T objekte.Akte[T],
-	T1 objekte.ObjektePtr[T],
+	T1 objekte.AktePtr[T],
 	T2 schnittstellen.Id[T2],
 	T3 schnittstellen.IdPtr[T2],
 	T4 any,
@@ -40,7 +40,7 @@ type createOrUpdate[
 
 func MakeCreateOrUpdate[
 	T objekte.Akte[T],
-	T1 objekte.ObjektePtr[T],
+	T1 objekte.AktePtr[T],
 	T2 schnittstellen.Id[T2],
 	T3 schnittstellen.IdPtr[T2],
 	T4 any,
