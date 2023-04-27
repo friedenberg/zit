@@ -30,7 +30,6 @@ type TransactedInflator[
 	T4 any,
 	T5 objekte.VerzeichnissePtr[T4, T],
 ] interface {
-	InflateFromSku(sku.Sku) (*objekte.Transacted[T, T1, T2, T3, T4, T5], error)
 	InflateFromSku2(sku.Sku2) (*objekte.Transacted[T, T1, T2, T3, T4, T5], error)
 	InflatorStorer[*objekte.Transacted[T, T1, T2, T3, T4, T5]]
 	InflateFromDataIdentityAndStore(sku.DataIdentity) error
@@ -90,57 +89,10 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) InflateFromSku2(
 	}
 
 	// TODO-P2 make generic
-	if err = t.Sku.SetFromSku2(o); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	// TODO-P2 make generic
-	if t.Sku.Kennung.GetGattung() != o.Gattung {
-		err = errors.Errorf(
-			"expected gattung %s but got %s",
-			t.Sku.Kennung.GetGattung(),
-			o.Gattung,
-		)
-		return
-	}
-
-	if err = T3(&t.Sku.Kennung).Set(o.Kennung.String()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	t.Sku.ObjekteSha = o.ObjekteSha
-
-	if err = h.readObjekte(o, t); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = h.readAkte(t); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (h *transactedInflator[T, T1, T2, T3, T4, T5]) InflateFromSku(
-	o sku.Sku,
-) (t *objekte.Transacted[T, T1, T2, T3, T4, T5], err error) {
-	if h.pool == nil {
-		t = new(objekte.Transacted[T, T1, T2, T3, T4, T5])
-	} else {
-		t = h.pool.Get()
-	}
-
-	// TODO-P2 make generic
 	if err = t.Sku.SetFromSku(o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	objekte.AssertAkteShasMatch(t)
 
 	// TODO-P2 make generic
 	if t.Sku.Kennung.GetGattung() != o.Gattung {

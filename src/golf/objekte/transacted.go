@@ -184,8 +184,8 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) String() string {
 	return a.GetSku2().String()
 }
 
-func (a Transacted[T, T1, T2, T3, T4, T5]) GetSku() (sk sku.Sku) {
-	sk = a.Sku.Sku()
+func (a Transacted[T, T1, T2, T3, T4, T5]) GetSku() (sk sku.Sku2) {
+	sk = a.Sku.Sku2()
 	errors.TodoP2("make certain akte sha is in sku")
 	sk.AkteSha = sha.Make(a.GetAkteSha())
 	return

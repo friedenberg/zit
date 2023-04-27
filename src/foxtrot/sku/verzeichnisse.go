@@ -11,11 +11,6 @@ type Verzeichnisse struct {
 	Kopf, Schwanz    ts.Time
 }
 
-func (v *Verzeichnisse) SetFromSku(s Sku) {
-	v.Kopf = s.GetTime()
-	v.Schwanz = s.GetTime()
-}
-
 func (v *Verzeichnisse) SetFromSku2(s Sku2) {
 	v.Kopf = s.GetTime()
 	v.Schwanz = s.GetTime()

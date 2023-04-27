@@ -74,7 +74,7 @@ function show_zettel_etikett { # @test
 		not another one
 	EOM
 
-	run_zit show -format sku2 -- -tag-3.z
+	run_zit show -format sku -- -tag-3.z
 	assert_success
 	assert_output_cut -d' ' -f2- -- --sort - <<-EOM
 		2059300268.968327 Zettel one/dos c6b9d095358b8b26a99e90496d916ba92a99e9b75c705165df5f6d353a949ea9 2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24
@@ -110,7 +110,7 @@ function show_zettel_etikett_complex { # @test
 		last time
 	EOM
 
-	run_zit show -format sku2 tag-3.z tag-5.z
+	run_zit show -format sku tag-3.z tag-5.z
 	assert_success
 	assert_output_unsorted --partial - <<-EOM
 		Zettel one/uno c3232cc6a4122368757d0af489e471e138eab3133ff9107372f33eaf0e284190 11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11
@@ -145,7 +145,7 @@ function show_simple_all { # @test
 		vim-syntax-type = 'markdown'
 	EOM
 
-	run_zit show -format sku2 :z,t
+	run_zit show -format sku :z,t
 	assert_success
 	assert_output_cut -d' ' -f2- -- --sort - <<-EOM
 		 Typ md b986c1d21fcfb7f0fe11ae960236e3471b4001029a9e631d16899643922b2d15 102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384

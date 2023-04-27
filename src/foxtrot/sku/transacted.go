@@ -27,7 +27,7 @@ type Transacted[T kennung.KennungLike[T], T1 kennung.KennungLikePtr[T]] struct {
 	Verzeichnisse
 }
 
-func (t *Transacted[T, T1]) SetFromSku2(sk Sku2) (err error) {
+func (t *Transacted[T, T1]) SetFromSku(sk Sku2) (err error) {
 	t.Schwanz = sk.GetTime()
 
 	if err = T1(&t.Kennung).Set(sk.Kennung.String()); err != nil {
@@ -39,22 +39,6 @@ func (t *Transacted[T, T1]) SetFromSku2(sk Sku2) (err error) {
 	t.AkteSha = sk.AkteSha
 
 	t.Verzeichnisse.SetFromSku2(sk)
-
-	return
-}
-
-func (t *Transacted[T, T1]) SetFromSku(sk Sku) (err error) {
-	t.Schwanz = sk.Time
-
-	if err = T1(&t.Kennung).Set(sk.Kennung.String()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	t.ObjekteSha = sk.ObjekteSha
-	t.AkteSha = sk.AkteSha
-
-	t.Verzeichnisse.SetFromSku(sk)
 
 	return
 }
@@ -135,16 +119,6 @@ func (a Transacted[T, T1]) GetTai() ts.Tai {
 		a.GetTime(),
 		a.GetTransactionIndex().Int(),
 	)
-}
-
-func (a *Transacted[T, T1]) Sku() Sku {
-	return Sku{
-		Time:       ts.TimeWithIndex(a.GetTime(), a.GetTransactionIndex().Int()),
-		Gattung:    gattung.Make(a.GetGattung()),
-		Kennung:    values.MakeString(a.Kennung.String()),
-		ObjekteSha: a.ObjekteSha,
-		AkteSha:    a.AkteSha,
-	}
 }
 
 func (a Transacted[T, T1]) GetExternal() External[T, T1] {

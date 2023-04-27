@@ -38,7 +38,6 @@ func (f *FormatterValue) Set(v string) (err error) {
 		"json",
 		"log",
 		"sku",
-		"sku-transacted",
 		"text",
 		"sku2":
 		f.string = v1
@@ -114,19 +113,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 			return
 		}
 
-	case "sku-transacted":
-		return func(e TransactedLike) (err error) {
-			_, err = fmt.Fprintln(out, e.GetSku())
-			return
-		}
-
 	case "sku":
-		return func(e TransactedLike) (err error) {
-			_, err = fmt.Fprintln(out, e.GetSku().String())
-			return
-		}
-
-	case "sku2":
 		return func(e TransactedLike) (err error) {
 			_, err = fmt.Fprintln(out, e.GetSku2().String())
 			return
