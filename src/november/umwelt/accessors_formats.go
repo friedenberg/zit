@@ -153,26 +153,38 @@ func (u *Umwelt) FormatEtikettCheckedOut() schnittstellen.FuncWriterFormat[etike
 	)
 }
 
-func (u *Umwelt) FormatMetadatei() schnittstellen.FuncWriterFormat[metadatei.GetterPtr] {
-	return metadatei.MakeCliFormat(
-		u.FormatBezeichnung(),
-		format.MakeFormatStringer[kennung.Etikett](
-			collections.StringCommaSeparated[kennung.Etikett],
-		),
-		u.FormatTyp(),
-	)
+func (u *Umwelt) FormatMetadatei(
+	includeType bool,
+) schnittstellen.FuncWriterFormat[metadatei.GetterPtr] {
+	if includeType {
+		return metadatei.MakeCliFormatIncludeTyp(
+			u.FormatBezeichnung(),
+			format.MakeFormatStringer[kennung.Etikett](
+				collections.StringCommaSeparated[kennung.Etikett],
+			),
+			u.FormatTyp(),
+		)
+	} else {
+		return metadatei.MakeCliFormatExcludeTyp(
+			u.FormatBezeichnung(),
+			format.MakeFormatStringer[kennung.Etikett](
+				collections.StringCommaSeparated[kennung.Etikett],
+			),
+			u.FormatTyp(),
+		)
+	}
 }
 
 func (u *Umwelt) FormatMetadateiGattung(
 	g schnittstellen.GattungGetter,
 ) schnittstellen.FuncWriterFormat[metadatei.GetterPtr] {
-	return metadatei.MakeCliFormat(
-		u.FormatBezeichnung(),
-		format.MakeFormatStringer[kennung.Etikett](
-			collections.StringCommaSeparated[kennung.Etikett],
-		),
-		u.FormatTyp(),
-	)
+	switch gattung.Make(g.GetGattung()) {
+	case gattung.Typ, gattung.Etikett:
+		return u.FormatMetadatei(false)
+
+	default:
+		return u.FormatMetadatei(true)
+	}
 }
 
 func (u *Umwelt) FormatZettelExternal() schnittstellen.FuncWriterFormat[zettel.External] {
@@ -203,11 +215,13 @@ func (u *Umwelt) FormatZettelCheckedOut() schnittstellen.FuncWriterFormat[zettel
 	)
 }
 
-func (u *Umwelt) FormatTransactedLike() schnittstellen.FuncWriterFormat[objekte.TransactedLikePtr] {
+func (u *Umwelt) FormatTransactedLike(
+	includeTyp bool,
+) schnittstellen.FuncWriterFormat[objekte.TransactedLikePtr] {
 	return objekte.MakeCliFormatTransactedLikePtr(
 		u.FormatIdLike(),
 		u.FormatSha(u.StoreObjekten().GetAbbrStore().AbbreviateSha),
-		u.FormatMetadatei(),
+		u.FormatMetadatei(includeTyp),
 	)
 }
 

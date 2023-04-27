@@ -15,16 +15,27 @@ func MakeCliFormatTransactedLikePtr(
 	mf schnittstellen.FuncWriterFormat[metadatei.GetterPtr],
 ) schnittstellen.FuncWriterFormat[TransactedLikePtr] {
 	return func(w io.Writer, z TransactedLikePtr) (n int64, err error) {
-		return format.Write(
-			w,
-			format.MakeFormatString("["),
-			format.MakeWriter(hf, z.GetKennung()),
-			format.MakeFormatString("@"),
-			format.MakeWriter(sf, z.GetObjekteSha()),
-			format.MakeFormatString(" "),
-			format.MakeWriter[metadatei.GetterPtr](mf, z),
-			format.MakeFormatString("]"),
-		)
+		if z.GetMetadateiPtr().UserInputIsEmpty() {
+			return format.Write(
+				w,
+				format.MakeFormatString("["),
+				format.MakeWriter(hf, z.GetKennung()),
+				format.MakeFormatString("@"),
+				format.MakeWriter(sf, z.GetObjekteSha()),
+				format.MakeFormatString("]"),
+			)
+		} else {
+			return format.Write(
+				w,
+				format.MakeFormatString("["),
+				format.MakeWriter(hf, z.GetKennung()),
+				format.MakeFormatString("@"),
+				format.MakeWriter(sf, z.GetObjekteSha()),
+				format.MakeFormatString(" "),
+				format.MakeWriter[metadatei.GetterPtr](mf, z),
+				format.MakeFormatString("]"),
+			)
+		}
 	}
 }
 

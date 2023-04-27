@@ -42,10 +42,6 @@ type (
 		Setter
 	}
 
-	CliFormatterContextIncludeTyp interface {
-		IncludeTypInCliFormatter() bool
-	}
-
 	TextFormatterContext interface {
 		PersistentFormatterContext
 		// GetAktePath() string

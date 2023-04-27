@@ -62,20 +62,28 @@ func (m *Metadatei) AddToFlagSet(f *flag.FlagSet) {
 	// TODO-P1 add typ
 }
 
+func (z Metadatei) UserInputIsEmpty() bool {
+	if !z.Bezeichnung.IsEmpty() {
+		return false
+	}
+
+	if z.Etiketten != nil && z.Etiketten.Len() > 0 {
+		return false
+	}
+
+	if !z.Typ.IsEmpty() {
+		return false
+	}
+
+	return true
+}
+
 func (z Metadatei) IsEmpty() bool {
 	if !z.AkteSha.IsNull() {
 		return false
 	}
 
-	if !z.Bezeichnung.IsEmpty() {
-		return false
-	}
-
-	if z.Etiketten.Len() > 0 {
-		return false
-	}
-
-	if !z.Typ.IsEmpty() {
+	if !z.UserInputIsEmpty() {
 		return false
 	}
 

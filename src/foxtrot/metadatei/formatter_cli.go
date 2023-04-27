@@ -10,7 +10,7 @@ import (
 )
 
 // !typ "bez"
-func MakeCliFormat(
+func MakeCliFormatExcludeTyp(
 	bf schnittstellen.FuncWriterFormat[bezeichnung.Bezeichnung],
 	ef schnittstellen.FuncWriterFormat[schnittstellen.SetLike[kennung.Etikett]],
 	tf schnittstellen.FuncWriterFormat[kennung.Typ],
@@ -25,22 +25,45 @@ func MakeCliFormat(
 				ef,
 				schnittstellen.SetLike[kennung.Etikett](m.Etiketten),
 			)
-		} else {
+		} else if !m.Bezeichnung.IsEmpty() {
 			lastWriter = format.MakeWriter(bf, m.Bezeichnung)
+		} else {
+			return
 		}
 
-		if mcfc, ok := z.(CliFormatterContextIncludeTyp); ok && !mcfc.IncludeTypInCliFormatter() {
-			return format.Write(
-				w,
-				lastWriter,
+		return format.Write(
+			w,
+			lastWriter,
+		)
+	}
+}
+
+func MakeCliFormatIncludeTyp(
+	bf schnittstellen.FuncWriterFormat[bezeichnung.Bezeichnung],
+	ef schnittstellen.FuncWriterFormat[schnittstellen.SetLike[kennung.Etikett]],
+	tf schnittstellen.FuncWriterFormat[kennung.Typ],
+) schnittstellen.FuncWriterFormat[GetterPtr] {
+	return func(w io.Writer, z GetterPtr) (n int64, err error) {
+		m := z.GetMetadateiPtr()
+
+		var lastWriter schnittstellen.FuncWriter
+
+		if m.Bezeichnung.IsEmpty() {
+			lastWriter = format.MakeWriter(
+				ef,
+				schnittstellen.SetLike[kennung.Etikett](m.Etiketten),
 			)
+		} else if !m.Bezeichnung.IsEmpty() {
+			lastWriter = format.MakeWriter(bf, m.Bezeichnung)
 		} else {
-			return format.Write(
-				w,
-				format.MakeWriter(tf, m.GetTyp()),
-				format.MakeFormatString(" "),
-				lastWriter,
-			)
+			return
 		}
+
+		return format.Write(
+			w,
+			format.MakeWriter(tf, m.GetTyp()),
+			format.MakeFormatString(" "),
+			lastWriter,
+		)
 	}
 }
