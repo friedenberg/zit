@@ -9,12 +9,12 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
 
-func MakeCliFormatTransactedLike(
+func MakeCliFormatTransactedLikePtr(
 	hf schnittstellen.FuncWriterFormat[kennung.IdLike],
 	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
-	mf schnittstellen.FuncWriterFormat[metadatei.Metadatei],
-) schnittstellen.FuncWriterFormat[TransactedLike] {
-	return func(w io.Writer, z TransactedLike) (n int64, err error) {
+	mf schnittstellen.FuncWriterFormat[metadatei.GetterPtr],
+) schnittstellen.FuncWriterFormat[TransactedLikePtr] {
+	return func(w io.Writer, z TransactedLikePtr) (n int64, err error) {
 		return format.Write(
 			w,
 			format.MakeFormatString("["),
@@ -22,7 +22,7 @@ func MakeCliFormatTransactedLike(
 			format.MakeFormatString("@"),
 			format.MakeWriter(sf, z.GetObjekteSha()),
 			format.MakeFormatString(" "),
-			format.MakeWriter[metadatei.Metadatei](mf, z.GetMetadatei()),
+			format.MakeWriter[metadatei.GetterPtr](mf, z),
 			format.MakeFormatString("]"),
 		)
 	}

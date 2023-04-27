@@ -28,7 +28,7 @@ func (s *Store) CheckoutQuery(
 ) (err error) {
 	if err = s.storeObjekten.Query(
 		ms,
-		func(t objekte.TransactedLike) (err error) {
+		func(t objekte.TransactedLikePtr) (err error) {
 			var co objekte.CheckedOutLikePtr
 
 			if co, err = s.checkoutOneGeneric(options, t); err != nil {

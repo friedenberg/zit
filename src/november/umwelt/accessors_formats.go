@@ -153,7 +153,7 @@ func (u *Umwelt) FormatEtikettCheckedOut() schnittstellen.FuncWriterFormat[etike
 	)
 }
 
-func (u *Umwelt) FormatMetadatei() schnittstellen.FuncWriterFormat[metadatei.Metadatei] {
+func (u *Umwelt) FormatMetadatei() schnittstellen.FuncWriterFormat[metadatei.GetterPtr] {
 	return metadatei.MakeCliFormat(
 		u.FormatBezeichnung(),
 		format.MakeFormatStringer[kennung.Etikett](
@@ -165,7 +165,7 @@ func (u *Umwelt) FormatMetadatei() schnittstellen.FuncWriterFormat[metadatei.Met
 
 func (u *Umwelt) FormatMetadateiGattung(
 	g schnittstellen.GattungGetter,
-) schnittstellen.FuncWriterFormat[metadatei.Metadatei] {
+) schnittstellen.FuncWriterFormat[metadatei.GetterPtr] {
 	return metadatei.MakeCliFormat(
 		u.FormatBezeichnung(),
 		format.MakeFormatStringer[kennung.Etikett](
@@ -203,8 +203,8 @@ func (u *Umwelt) FormatZettelCheckedOut() schnittstellen.FuncWriterFormat[zettel
 	)
 }
 
-func (u *Umwelt) FormatTransactedLike() schnittstellen.FuncWriterFormat[objekte.TransactedLike] {
-	return objekte.MakeCliFormatTransactedLike(
+func (u *Umwelt) FormatTransactedLike() schnittstellen.FuncWriterFormat[objekte.TransactedLikePtr] {
+	return objekte.MakeCliFormatTransactedLikePtr(
 		u.FormatIdLike(),
 		u.FormatSha(u.StoreObjekten().GetAbbrStore().AbbreviateSha),
 		u.FormatMetadatei(),

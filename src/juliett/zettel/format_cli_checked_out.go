@@ -18,7 +18,7 @@ func MakeCliFormatCheckedOut(
 	cw format.FuncColorWriter,
 	hf schnittstellen.FuncWriterFormat[kennung.Hinweis],
 	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
-	mf schnittstellen.FuncWriterFormat[metadatei.Metadatei],
+	mf schnittstellen.FuncWriterFormat[metadatei.GetterPtr],
 ) schnittstellen.FuncWriterFormat[CheckedOut] {
 	wzef := makeWriterFuncZettel(
 		s, cw, hf, sf, mf,
@@ -50,7 +50,7 @@ func makeWriterFuncZettel(
 	cw format.FuncColorWriter,
 	hf schnittstellen.FuncWriterFormat[kennung.Hinweis],
 	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
-	mf schnittstellen.FuncWriterFormat[metadatei.Metadatei],
+	mf schnittstellen.FuncWriterFormat[metadatei.GetterPtr],
 ) schnittstellen.FuncWriterFormat[CheckedOut] {
 	return func(w io.Writer, z CheckedOut) (n int64, err error) {
 		return format.Write(
@@ -66,7 +66,7 @@ func makeWriterFuncZettel(
 			format.MakeFormatString("@"),
 			format.MakeWriter(sf, z.External.GetObjekteSha().GetSha()),
 			format.MakeFormatString(" "),
-			format.MakeWriter(mf, z.External.GetMetadatei()),
+			format.MakeWriter[metadatei.GetterPtr](mf, &z.External),
 			format.MakeFormatString("]"),
 		)
 	}
@@ -77,7 +77,7 @@ func makeWriterFuncAkte(
 	cw format.FuncColorWriter,
 	hf schnittstellen.FuncWriterFormat[kennung.Hinweis],
 	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
-	mf schnittstellen.FuncWriterFormat[metadatei.Metadatei],
+	mf schnittstellen.FuncWriterFormat[metadatei.GetterPtr],
 ) schnittstellen.FuncWriterFormat[CheckedOut] {
 	return func(w io.Writer, z CheckedOut) (n int64, err error) {
 		todo.Change("refactor to support proper spacing")

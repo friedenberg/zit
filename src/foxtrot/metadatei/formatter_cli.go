@@ -14,22 +14,24 @@ func MakeCliFormat(
 	bf schnittstellen.FuncWriterFormat[bezeichnung.Bezeichnung],
 	ef schnittstellen.FuncWriterFormat[schnittstellen.SetLike[kennung.Etikett]],
 	tf schnittstellen.FuncWriterFormat[kennung.Typ],
-) schnittstellen.FuncWriterFormat[Metadatei] {
-	return func(w io.Writer, z Metadatei) (n int64, err error) {
+) schnittstellen.FuncWriterFormat[GetterPtr] {
+	return func(w io.Writer, z GetterPtr) (n int64, err error) {
+		m := z.GetMetadateiPtr()
+
 		var lastWriter schnittstellen.FuncWriter
 
-		if z.Bezeichnung.IsEmpty() {
+		if m.Bezeichnung.IsEmpty() {
 			lastWriter = format.MakeWriter(
 				ef,
-				schnittstellen.SetLike[kennung.Etikett](z.Etiketten),
+				schnittstellen.SetLike[kennung.Etikett](m.Etiketten),
 			)
 		} else {
-			lastWriter = format.MakeWriter(bf, z.Bezeichnung)
+			lastWriter = format.MakeWriter(bf, m.Bezeichnung)
 		}
 
 		return format.Write(
 			w,
-			format.MakeWriter(tf, z.GetTyp()),
+			format.MakeWriter(tf, m.GetTyp()),
 			format.MakeFormatString(" "),
 			lastWriter,
 		)

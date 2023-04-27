@@ -189,7 +189,7 @@ func (s *Store) ReadFiles(
 	if err = s.storeObjekten.Query(
 		ms,
 		iter.MakeChain(
-			func(e objekte.TransactedLike) (err error) {
+			func(e objekte.TransactedLikePtr) (err error) {
 				var col objekte.CheckedOutLikePtr
 
 				switch et := e.(type) {

@@ -13,14 +13,14 @@ import (
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
-type funcFormat = schnittstellen.FuncIter[objekte.TransactedLike]
+type funcFormat = schnittstellen.FuncIter[objekte.TransactedLikePtr]
 
 type FormatterFactory interface {
 	MakeFormatterObjekte(
 		out io.Writer,
 		af schnittstellen.AkteIOFactory,
 		k konfig.Compiled,
-		logFunc schnittstellen.FuncIter[objekte.TransactedLike],
+		logFunc schnittstellen.FuncIter[objekte.TransactedLikePtr],
 	) funcFormat
 }
 
@@ -31,7 +31,7 @@ type formatter struct {
 func makeFuncFormatter[T kennung.Matchable](
 	f schnittstellen.FuncIter[T],
 ) funcFormat {
-	return func(e objekte.TransactedLike) (err error) {
+	return func(e objekte.TransactedLikePtr) (err error) {
 		if e1, ok := e.(T); ok {
 			return f(e1)
 		}
@@ -143,7 +143,7 @@ func MakeFormatter(
 }
 
 func (f formatter) MakeFormatFunc() funcFormat {
-	return func(tl objekte.TransactedLike) (err error) {
+	return func(tl objekte.TransactedLikePtr) (err error) {
 		g := gattung.Must(tl.GetGattung())
 
 		if f1, ok := f.formatters[g]; ok {

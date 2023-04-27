@@ -131,7 +131,7 @@ func (u *Umwelt) PrinterZettelTransacted() schnittstellen.FuncIter[*zettel.Trans
 	)
 }
 
-func (u *Umwelt) PrinterTransactedLike() schnittstellen.FuncIter[objekte.TransactedLike] {
+func (u *Umwelt) PrinterTransactedLike() schnittstellen.FuncIter[objekte.TransactedLikePtr] {
 	op := u.FormatTransactedLike()
 	t := u.FormatTypTransacted()
 	e := u.FormatEtikettTransacted()
@@ -139,9 +139,9 @@ func (u *Umwelt) PrinterTransactedLike() schnittstellen.FuncIter[objekte.Transac
 
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
-		wrapWithTimePrefixerIfNecessary[objekte.TransactedLike](
+		wrapWithTimePrefixerIfNecessary[objekte.TransactedLikePtr](
 			u.Konfig(),
-			func(out io.Writer, tl objekte.TransactedLike) (n int64, err error) {
+			func(out io.Writer, tl objekte.TransactedLikePtr) (n int64, err error) {
 				switch atl := tl.(type) {
 				case *typ.Transacted:
 					return t(out, *atl)

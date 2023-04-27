@@ -17,6 +17,12 @@ type TransactedLike interface {
 	sku.DataIdentityGetter
 }
 
+type TransactedLikePtr interface {
+	TransactedLike
+	metadatei.GetterPtr
+	metadatei.Setter
+}
+
 type StoredLikePtr interface {
 	metadatei.Getter
 	metadatei.Setter
@@ -26,19 +32,23 @@ type StoredLikePtr interface {
 }
 
 type (
-	FuncReaderTransacted[T TransactedLike] func(schnittstellen.FuncIter[T]) error
-	FuncReaderTransactedLike               func(schnittstellen.FuncIter[TransactedLike]) error
+	FuncReaderTransacted[T TransactedLike]       func(schnittstellen.FuncIter[T]) error
+	FuncReaderTransactedPtr[T TransactedLikePtr] func(schnittstellen.FuncIter[T]) error
+	FuncReaderTransactedLike                     func(schnittstellen.FuncIter[TransactedLike]) error
+	FuncReaderTransactedLikePtr                  func(schnittstellen.FuncIter[TransactedLikePtr]) error
 )
 
 type (
-	FuncQuerierTransacted[T TransactedLike] func(kennung.Matcher, schnittstellen.FuncIter[T]) error
-	FuncQuerierTransactedLike               func(kennung.Matcher, schnittstellen.FuncIter[TransactedLike]) error
+	FuncQuerierTransacted[T TransactedLike]       func(kennung.Matcher, schnittstellen.FuncIter[T]) error
+	FuncQuerierTransactedPtr[T TransactedLikePtr] func(kennung.Matcher, schnittstellen.FuncIter[T]) error
+	FuncQuerierTransactedLike                     func(kennung.Matcher, schnittstellen.FuncIter[TransactedLike]) error
+	FuncQuerierTransactedLikePtr                  func(kennung.Matcher, schnittstellen.FuncIter[TransactedLikePtr]) error
 )
 
-func MakeApplyQueryTransactedLike[T TransactedLike](
-	fat FuncQuerierTransacted[T],
-) FuncQuerierTransactedLike {
-	return func(ids kennung.Matcher, fatl schnittstellen.FuncIter[TransactedLike]) (err error) {
+func MakeApplyQueryTransactedLikePtr[T TransactedLikePtr](
+	fat FuncQuerierTransactedPtr[T],
+) FuncQuerierTransactedLikePtr {
+	return func(ids kennung.Matcher, fatl schnittstellen.FuncIter[TransactedLikePtr]) (err error) {
 		return fat(
 			ids,
 			func(e T) (err error) {
@@ -48,10 +58,10 @@ func MakeApplyQueryTransactedLike[T TransactedLike](
 	}
 }
 
-func MakeApplyTransactedLike[T TransactedLike](
+func MakeApplyTransactedLikePtr[T TransactedLikePtr](
 	fat FuncReaderTransacted[T],
-) FuncReaderTransactedLike {
-	return func(fatl schnittstellen.FuncIter[TransactedLike]) (err error) {
+) FuncReaderTransactedLikePtr {
+	return func(fatl schnittstellen.FuncIter[TransactedLikePtr]) (err error) {
 		return fat(
 			func(e T) (err error) {
 				return fatl(e)

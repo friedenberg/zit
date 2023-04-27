@@ -14,7 +14,7 @@ import (
 func MakeCliFormatTransacted(
 	hf schnittstellen.FuncWriterFormat[kennung.Hinweis],
 	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
-	mf schnittstellen.FuncWriterFormat[metadatei.Metadatei],
+	mf schnittstellen.FuncWriterFormat[metadatei.GetterPtr],
 ) schnittstellen.FuncWriterFormat[Transacted] {
 	return func(w io.Writer, z Transacted) (n int64, err error) {
 		return format.Write(
@@ -24,7 +24,7 @@ func MakeCliFormatTransacted(
 			format.MakeFormatString("@"),
 			format.MakeWriter(sf, z.GetObjekteSha()),
 			format.MakeFormatString(" "),
-			format.MakeWriter[metadatei.Metadatei](mf, z.GetMetadatei()),
+			format.MakeWriter[metadatei.GetterPtr](mf, &z),
 			format.MakeFormatString("]"),
 		)
 	}

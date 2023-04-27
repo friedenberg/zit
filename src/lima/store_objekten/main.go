@@ -33,9 +33,9 @@ type Store struct {
 	gattungStores     map[schnittstellen.Gattung]any
 	reindexers        map[schnittstellen.Gattung]reindexer
 	flushers          map[schnittstellen.Gattung]errors.Flusher
-	readers           map[schnittstellen.Gattung]objekte.FuncReaderTransactedLike
-	queriers          map[schnittstellen.Gattung]objekte.FuncQuerierTransactedLike
-	transactedReaders map[schnittstellen.Gattung]objekte.FuncReaderTransactedLike
+	readers           map[schnittstellen.Gattung]objekte.FuncReaderTransactedLikePtr
+	queriers          map[schnittstellen.Gattung]objekte.FuncQuerierTransactedLikePtr
+	transactedReaders map[schnittstellen.Gattung]objekte.FuncReaderTransactedLikePtr
 
 	isReindexing bool
 }
@@ -84,65 +84,65 @@ func Make(
 	}
 
 	errors.TodoP1("implement for other gattung")
-	s.queriers = map[schnittstellen.Gattung]objekte.FuncQuerierTransactedLike{
-		gattung.Zettel: objekte.MakeApplyQueryTransactedLike[*zettel.Transacted](
+	s.queriers = map[schnittstellen.Gattung]objekte.FuncQuerierTransactedLikePtr{
+		gattung.Zettel: objekte.MakeApplyQueryTransactedLikePtr[*zettel.Transacted](
 			s.zettelStore.Query,
 		),
-		gattung.Typ: objekte.MakeApplyQueryTransactedLike[*typ.Transacted](
+		gattung.Typ: objekte.MakeApplyQueryTransactedLikePtr[*typ.Transacted](
 			s.typStore.Query,
 		),
-		gattung.Etikett: objekte.MakeApplyQueryTransactedLike[*etikett.Transacted](
+		gattung.Etikett: objekte.MakeApplyQueryTransactedLikePtr[*etikett.Transacted](
 			s.etikettStore.Query,
 		),
-		gattung.Kasten: objekte.MakeApplyQueryTransactedLike[*kasten.Transacted](
+		gattung.Kasten: objekte.MakeApplyQueryTransactedLikePtr[*kasten.Transacted](
 			s.kastenStore.Query,
 		),
-		// gattung.Konfig:           objekte.MakeApplyTransactedLike[*konfig.Transacted](
+		// gattung.Konfig:           objekte.MakeApplyTransactedLikePtr[*konfig.Transacted](
 		// s.konfigStore.ReadAllSchwanzen,
 		// ),
-		// gattung.Bestandsaufnahme: objekte.MakeApplyTransactedLike[*bestandsaufnahme.Objekte](
+		// gattung.Bestandsaufnahme: objekte.MakeApplyTransactedLikePtr[*bestandsaufnahme.Objekte](
 		// 	s.bestandsaufnahmeStore.ReadAll,
 		// ),
 	}
 
-	s.readers = map[schnittstellen.Gattung]objekte.FuncReaderTransactedLike{
-		gattung.Zettel: objekte.MakeApplyTransactedLike[*zettel.Transacted](
+	s.readers = map[schnittstellen.Gattung]objekte.FuncReaderTransactedLikePtr{
+		gattung.Zettel: objekte.MakeApplyTransactedLikePtr[*zettel.Transacted](
 			s.zettelStore.ReadAllSchwanzen,
 		),
-		gattung.Typ: objekte.MakeApplyTransactedLike[*typ.Transacted](
+		gattung.Typ: objekte.MakeApplyTransactedLikePtr[*typ.Transacted](
 			s.typStore.ReadAllSchwanzen,
 		),
-		gattung.Etikett: objekte.MakeApplyTransactedLike[*etikett.Transacted](
+		gattung.Etikett: objekte.MakeApplyTransactedLikePtr[*etikett.Transacted](
 			s.etikettStore.ReadAllSchwanzen,
 		),
-		gattung.Kasten: objekte.MakeApplyTransactedLike[*kasten.Transacted](
+		gattung.Kasten: objekte.MakeApplyTransactedLikePtr[*kasten.Transacted](
 			s.kastenStore.ReadAllSchwanzen,
 		),
-		// gattung.Konfig:           objekte.MakeApplyTransactedLike[*konfig.Transacted](
+		// gattung.Konfig:           objekte.MakeApplyTransactedLikePtr[*konfig.Transacted](
 		// s.konfigStore.ReadAllSchwanzen,
 		// ),
-		// gattung.Bestandsaufnahme: objekte.MakeApplyTransactedLike[*bestandsaufnahme.Objekte](
+		// gattung.Bestandsaufnahme: objekte.MakeApplyTransactedLikePtr[*bestandsaufnahme.Objekte](
 		// 	s.bestandsaufnahmeStore.ReadAll,
 		// ),
 	}
 
-	s.transactedReaders = map[schnittstellen.Gattung]objekte.FuncReaderTransactedLike{
-		gattung.Zettel: objekte.MakeApplyTransactedLike[*zettel.Transacted](
+	s.transactedReaders = map[schnittstellen.Gattung]objekte.FuncReaderTransactedLikePtr{
+		gattung.Zettel: objekte.MakeApplyTransactedLikePtr[*zettel.Transacted](
 			s.zettelStore.ReadAll,
 		),
-		gattung.Typ: objekte.MakeApplyTransactedLike[*typ.Transacted](
+		gattung.Typ: objekte.MakeApplyTransactedLikePtr[*typ.Transacted](
 			s.typStore.ReadAll,
 		),
-		gattung.Etikett: objekte.MakeApplyTransactedLike[*etikett.Transacted](
+		gattung.Etikett: objekte.MakeApplyTransactedLikePtr[*etikett.Transacted](
 			s.etikettStore.ReadAll,
 		),
-		gattung.Kasten: objekte.MakeApplyTransactedLike[*kasten.Transacted](
+		gattung.Kasten: objekte.MakeApplyTransactedLikePtr[*kasten.Transacted](
 			s.kastenStore.ReadAll,
 		),
-		// gattung.Konfig:           objekte.MakeApplyTransactedLike[*konfig.Transacted](
+		// gattung.Konfig:           objekte.MakeApplyTransactedLikePtr[*konfig.Transacted](
 		// s.konfigStore.ReadAllSchwanzen,
 		// ),
-		// gattung.Bestandsaufnahme: objekte.MakeApplyTransactedLike[*bestandsaufnahme.Objekte](
+		// gattung.Bestandsaufnahme: objekte.MakeApplyTransactedLikePtr[*bestandsaufnahme.Objekte](
 		// 	s.bestandsaufnahmeStore.ReadAll,
 		// ),
 	}
@@ -308,7 +308,7 @@ func (s Store) Flush() (err error) {
 
 func (s *Store) Query(
 	ms kennung.MetaSet,
-	f schnittstellen.FuncIter[objekte.TransactedLike],
+	f schnittstellen.FuncIter[objekte.TransactedLikePtr],
 ) (err error) {
 	if err = ms.All(
 		func(g gattung.Gattung, matcher kennung.Matcher) (err error) {
@@ -335,7 +335,7 @@ func (s *Store) Query(
 
 func (s *Store) ReadAllSchwanzen(
 	gs gattungen.Set,
-	f schnittstellen.FuncIter[objekte.TransactedLike],
+	f schnittstellen.FuncIter[objekte.TransactedLikePtr],
 ) (err error) {
 	chErr := make(chan error, gs.Len())
 
@@ -344,7 +344,7 @@ func (s *Store) ReadAllSchwanzen(
 			continue
 		}
 
-		go func(s1 objekte.FuncReaderTransactedLike) {
+		go func(s1 objekte.FuncReaderTransactedLikePtr) {
 			var subErr error
 
 			defer func() {
@@ -364,7 +364,7 @@ func (s *Store) ReadAllSchwanzen(
 
 func (s *Store) ReadAll(
 	gs gattungen.Set,
-	f schnittstellen.FuncIter[objekte.TransactedLike],
+	f schnittstellen.FuncIter[objekte.TransactedLikePtr],
 ) (err error) {
 	chErr := make(chan error, gs.Len())
 
@@ -373,7 +373,7 @@ func (s *Store) ReadAll(
 			continue
 		}
 
-		go func(s1 objekte.FuncReaderTransactedLike) {
+		go func(s1 objekte.FuncReaderTransactedLikePtr) {
 			var subErr error
 
 			defer func() {
