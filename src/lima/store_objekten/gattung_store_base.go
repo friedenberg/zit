@@ -15,7 +15,7 @@ import (
 )
 
 type CommonStoreBase[
-	O objekte.Objekte[O],
+	O objekte.Akte[O],
 	OPtr objekte.ObjektePtr[O],
 	K schnittstellen.Id[K],
 	KPtr schnittstellen.IdPtr[K],
@@ -85,7 +85,7 @@ type CommonStoreBase[
 }
 
 type commonStoreBase[
-	O objekte.Objekte[O],
+	O objekte.Akte[O],
 	OPtr objekte.ObjektePtr[O],
 	K schnittstellen.Id[K],
 	KPtr schnittstellen.IdPtr[K],
@@ -125,7 +125,7 @@ type commonStoreBase[
 }
 
 func makeCommonStoreBase[
-	O objekte.Objekte[O],
+	O objekte.Akte[O],
 	OPtr objekte.ObjektePtr[O],
 	K schnittstellen.Id[K],
 	KPtr schnittstellen.IdPtr[K],

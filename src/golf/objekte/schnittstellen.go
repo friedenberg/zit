@@ -26,7 +26,7 @@ type (
 		AkteParseSaver[TPtr]
 	}
 
-	VerzeichnissePtr[T any, T1 Objekte[T1]] interface {
+	VerzeichnissePtr[T any, T1 Akte[T1]] interface {
 		schnittstellen.Resetable[T]
 		ResetWithObjekteMetadateiGetter(T1, metadatei.Getter)
 	}

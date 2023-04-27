@@ -11,7 +11,7 @@ import (
 )
 
 type ExternalKeyer[
-	T Objekte[T],
+	T Akte[T],
 	T1 ObjektePtr[T],
 	T2 schnittstellen.Id[T2],
 	T3 schnittstellen.IdPtr[T2],
@@ -26,7 +26,7 @@ func (_ ExternalKeyer[T, T1, T2, T3]) Key(e *External[T, T1, T2, T3]) string {
 }
 
 type External[
-	T Objekte[T],
+	T Akte[T],
 	T1 ObjektePtr[T],
 	T2 schnittstellen.Id[T2],
 	T3 schnittstellen.IdPtr[T2],

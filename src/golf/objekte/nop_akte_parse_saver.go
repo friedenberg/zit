@@ -9,14 +9,14 @@ import (
 )
 
 type nopAkteParseSaver[
-	O Objekte[O],
+	O Akte[O],
 	OPtr ObjektePtr[O],
 ] struct {
 	awf schnittstellen.AkteWriterFactory
 }
 
 func MakeNopAkteParseSaver[
-	O Objekte[O],
+	O Akte[O],
 	OPtr ObjektePtr[O],
 ](awf schnittstellen.AkteWriterFactory,
 ) nopAkteParseSaver[O, OPtr] {

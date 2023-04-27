@@ -2,7 +2,7 @@ package objekte
 
 import "github.com/friedenberg/zit/src/foxtrot/metadatei"
 
-type NilVerzeichnisse[T Objekte[T]] struct{}
+type NilVerzeichnisse[T Akte[T]] struct{}
 
 func (_ NilVerzeichnisse[T]) ResetWithObjekteMetadateiGetter(
 	_ T,

@@ -10,7 +10,7 @@ import (
 )
 
 type tomlAkteParseSaver[
-	O Objekte[O],
+	O Akte[O],
 	OPtr ObjektePtr[O],
 ] struct {
 	awf              schnittstellen.AkteWriterFactory
@@ -18,7 +18,7 @@ type tomlAkteParseSaver[
 }
 
 func MakeTomlAkteParseSaver[
-	O Objekte[O],
+	O Akte[O],
 	OPtr ObjektePtr[O],
 ](awf schnittstellen.AkteWriterFactory,
 ) tomlAkteParseSaver[O, OPtr] {
@@ -28,7 +28,7 @@ func MakeTomlAkteParseSaver[
 }
 
 func MakeTextParserIgnoreTomlErrors[
-	O Objekte[O],
+	O Akte[O],
 	OPtr ObjektePtr[O],
 ](awf schnittstellen.AkteWriterFactory,
 ) tomlAkteParseSaver[O, OPtr] {

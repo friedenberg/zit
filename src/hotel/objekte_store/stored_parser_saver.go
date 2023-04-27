@@ -13,7 +13,7 @@ import (
 )
 
 type StoredParseSaver[
-	O objekte.Objekte[O],
+	O objekte.Akte[O],
 	OPtr objekte.ObjektePtr[O],
 	K schnittstellen.Id[K],
 	KPtr schnittstellen.IdPtr[K],
@@ -25,7 +25,7 @@ type StoredParseSaver[
 }
 
 type storedParserSaver[
-	O objekte.Objekte[O],
+	O objekte.Akte[O],
 	OPtr objekte.ObjektePtr[O],
 	K schnittstellen.Id[K],
 	KPtr schnittstellen.IdPtr[K],
@@ -36,7 +36,7 @@ type storedParserSaver[
 }
 
 func MakeStoredParseSaver[
-	O objekte.Objekte[O],
+	O objekte.Akte[O],
 	OPtr objekte.ObjektePtr[O],
 	K schnittstellen.Id[K],
 	KPtr schnittstellen.IdPtr[K],

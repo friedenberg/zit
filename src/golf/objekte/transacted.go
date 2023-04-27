@@ -11,7 +11,7 @@ import (
 )
 
 type Transacted[
-	T Objekte[T],
+	T Akte[T],
 	T1 ObjektePtr[T],
 	T2 schnittstellen.Id[T2],
 	T3 schnittstellen.IdPtr[T2],

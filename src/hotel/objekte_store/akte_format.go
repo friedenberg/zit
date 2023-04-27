@@ -9,7 +9,7 @@ import (
 )
 
 type akteFormat[
-	O objekte.Objekte[O],
+	O objekte.Akte[O],
 	OPtr objekte.ObjektePtr[O],
 ] struct {
 	objekte.AkteParseSaver[OPtr]
@@ -18,7 +18,7 @@ type akteFormat[
 }
 
 func MakeAkteFormat[
-	O objekte.Objekte[O],
+	O objekte.Akte[O],
 	OPtr objekte.ObjektePtr[O],
 ](
 	akteParseSaver objekte.AkteParseSaver[OPtr],

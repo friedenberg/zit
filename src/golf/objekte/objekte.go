@@ -2,7 +2,7 @@ package objekte
 
 import "github.com/friedenberg/zit/src/alfa/schnittstellen"
 
-type Objekte[T any] interface {
+type Akte[T any] interface {
 	schnittstellen.Objekte[T]
 	ObjekteLike
 }

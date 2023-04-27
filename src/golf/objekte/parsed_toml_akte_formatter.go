@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/toml"
 )
 
-type ParsedAkteTomlFormatter[O Objekte[O]] struct{}
+type ParsedAkteTomlFormatter[O Akte[O]] struct{}
 
 func (_ ParsedAkteTomlFormatter[O]) FormatParsedAkte(
 	w1 io.Writer,
