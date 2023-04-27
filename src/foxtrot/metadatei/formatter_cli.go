@@ -29,11 +29,18 @@ func MakeCliFormat(
 			lastWriter = format.MakeWriter(bf, m.Bezeichnung)
 		}
 
-		return format.Write(
-			w,
-			format.MakeWriter(tf, m.GetTyp()),
-			format.MakeFormatString(" "),
-			lastWriter,
-		)
+		if mcfc, ok := z.(CliFormatterContextIncludeTyp); ok && !mcfc.IncludeTypInCliFormatter() {
+			return format.Write(
+				w,
+				lastWriter,
+			)
+		} else {
+			return format.Write(
+				w,
+				format.MakeWriter(tf, m.GetTyp()),
+				format.MakeFormatString(" "),
+				lastWriter,
+			)
+		}
 	}
 }
