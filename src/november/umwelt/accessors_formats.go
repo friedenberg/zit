@@ -13,7 +13,6 @@ import (
 	"github.com/friedenberg/zit/src/hotel/kasten"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/juliett/zettel"
-	"github.com/friedenberg/zit/src/kilo/zettel_external"
 	"github.com/friedenberg/zit/src/mike/store_fs"
 )
 
@@ -143,7 +142,7 @@ func (u *Umwelt) FormatMetadateiGattung(
 }
 
 func (u *Umwelt) FormatZettelExternal() schnittstellen.FuncWriterFormat[zettel.External] {
-	return zettel_external.MakeCliFormat(
+	return zettel.MakeCliFormat(
 		u.Standort(),
 		u.FormatColorWriter(),
 		u.FormatHinweis(),
@@ -153,7 +152,7 @@ func (u *Umwelt) FormatZettelExternal() schnittstellen.FuncWriterFormat[zettel.E
 }
 
 func (u *Umwelt) FormatExternalFD() schnittstellen.FuncWriterFormat[kennung.FD] {
-	return zettel_external.MakeCliFormatFD(
+	return zettel.MakeCliFormatFD(
 		u.Standort(),
 		u.FormatColorWriter(),
 	)

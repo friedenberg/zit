@@ -1,4 +1,4 @@
-package zettel_external
+package zettel
 
 import (
 	"io"
@@ -8,7 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
-	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
 // [path@sha !typ "bez"]
@@ -19,8 +18,8 @@ func MakeCliFormat(
 	hf schnittstellen.FuncWriterFormat[kennung.Hinweis],
 	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
 	mf schnittstellen.FuncWriterFormat[metadatei.Metadatei],
-) schnittstellen.FuncWriterFormat[zettel.External] {
-	return func(w io.Writer, z zettel.External) (n int64, err error) {
+) schnittstellen.FuncWriterFormat[External] {
+	return func(w io.Writer, z External) (n int64, err error) {
 		switch {
 		case z.GetAkteFD().Path != "" && z.GetObjekteFD().Path != "":
 			return format.Write(
