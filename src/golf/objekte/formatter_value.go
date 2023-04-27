@@ -27,7 +27,7 @@ func (f *FormatterValue) Set(v string) (err error) {
 
 	switch v1 {
 	case
-		// TODO-P3 add text, objekte, toml, json
+		// TODO-P3 add toml
 		"objekte",
 		"kennung",
 		"kennung-akte-sha",

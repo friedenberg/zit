@@ -132,7 +132,8 @@ func (u *Umwelt) PrinterZettelTransacted() schnittstellen.FuncIter[*zettel.Trans
 }
 
 func (u *Umwelt) PrinterTransactedLike() schnittstellen.FuncIter[objekte.TransactedLike] {
-	z := u.FormatZettelTransacted()
+	op := u.FormatTransactedLike()
+	// z := u.FormatZettelTransacted()
 	t := u.FormatTypTransacted()
 	e := u.FormatEtikettTransacted()
 	k := u.FormatKastenTransacted()
@@ -144,7 +145,7 @@ func (u *Umwelt) PrinterTransactedLike() schnittstellen.FuncIter[objekte.Transac
 			func(out io.Writer, tl objekte.TransactedLike) (n int64, err error) {
 				switch atl := tl.(type) {
 				case *zettel.Transacted:
-					return z(out, *atl)
+					return op(out, tl)
 
 				case *typ.Transacted:
 					return t(out, *atl)

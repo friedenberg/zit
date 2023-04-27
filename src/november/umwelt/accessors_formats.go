@@ -1,6 +1,9 @@
 package umwelt
 
 import (
+	"fmt"
+	"io"
+
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/collections"
@@ -9,6 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/echo/sha_cli_format"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
+	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/hotel/etikett"
 	"github.com/friedenberg/zit/src/hotel/kasten"
 	"github.com/friedenberg/zit/src/hotel/typ"
@@ -28,6 +32,22 @@ func (u *Umwelt) FormatColorWriter() format.FuncColorWriter {
 		return format.MakeFormatWriterWithColor
 	} else {
 		return format.MakeFormatWriterNoopColor
+	}
+}
+
+func (u *Umwelt) FormatIdLike() schnittstellen.FuncWriterFormat[kennung.IdLike] {
+	hf := u.FormatHinweis()
+
+	return func(w io.Writer, v kennung.IdLike) (n int64, err error) {
+		switch vt := v.(type) {
+		case kennung.Hinweis:
+			return hf(w, vt)
+
+		default:
+			_, err = io.WriteString(w, fmt.Sprintf("%T", v))
+		}
+
+		return
 	}
 }
 
@@ -129,6 +149,16 @@ func (u *Umwelt) FormatEtikettCheckedOut() schnittstellen.FuncWriterFormat[etike
 	)
 }
 
+func (u *Umwelt) FormatMetadatei() schnittstellen.FuncWriterFormat[metadatei.Metadatei] {
+	return metadatei.MakeCliFormat(
+		u.FormatBezeichnung(),
+		format.MakeFormatStringer[kennung.Etikett](
+			collections.StringCommaSeparated[kennung.Etikett],
+		),
+		u.FormatTyp(),
+	)
+}
+
 func (u *Umwelt) FormatMetadateiGattung(
 	g schnittstellen.GattungGetter,
 ) schnittstellen.FuncWriterFormat[metadatei.Metadatei] {
@@ -166,6 +196,14 @@ func (u *Umwelt) FormatZettelCheckedOut() schnittstellen.FuncWriterFormat[zettel
 		u.FormatSha(u.StoreObjekten().GetAbbrStore().AbbreviateSha),
 		// u.FormatTyp(),
 		u.FormatMetadateiGattung(gattung.Zettel),
+	)
+}
+
+func (u *Umwelt) FormatTransactedLike() schnittstellen.FuncWriterFormat[objekte.TransactedLike] {
+	return objekte.MakeCliFormatTransactedLike(
+		u.FormatIdLike(),
+		u.FormatSha(u.StoreObjekten().GetAbbrStore().AbbreviateSha),
+		u.FormatMetadatei(),
 	)
 }
 

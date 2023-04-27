@@ -9,6 +9,7 @@ import (
 
 type TransactedLike interface {
 	metadatei.Getter
+	GetKennung() kennung.IdLike
 	GetAkteSha() schnittstellen.Sha
 	GetSku() sku.Sku
 	GetSkuLike() sku.SkuLike

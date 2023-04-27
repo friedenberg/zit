@@ -190,6 +190,10 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) GetSku() (sk sku.Sku) {
 	return
 }
 
+func (a Transacted[T, T1, T2, T3, T4, T5]) GetKennung() kennung.IdLike {
+	return a.Sku.Kennung
+}
+
 func (a Transacted[T, T1, T2, T3, T4, T5]) GetDataIdentity() (di sku.DataIdentity) {
 	di = a.GetSku()
 	return
