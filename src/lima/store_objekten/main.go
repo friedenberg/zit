@@ -575,7 +575,7 @@ func (s *Store) Reindex() (err error) {
 
 	f2 := func(t *bestandsaufnahme.Objekte) (err error) {
 		if err = t.Akte.Skus.Each(
-			func(sk sku.Sku2) (err error) {
+			func(sk sku.Sku) (err error) {
 				return f1(sk)
 			},
 		); err != nil {

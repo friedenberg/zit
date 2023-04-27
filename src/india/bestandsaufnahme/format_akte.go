@@ -35,7 +35,7 @@ func (f formatAkte) ParseSaveAkte(
 	if n, err = format.ReadLines(
 		r,
 		func(v string) (err error) {
-			return collections.AddString[sku.Sku2, *sku.Sku2](&o.Akte.Skus, v)
+			return collections.AddString[sku.Sku, *sku.Sku](&o.Akte.Skus, v)
 		},
 	); err != nil {
 		err = errors.Wrap(err)

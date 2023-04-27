@@ -4,8 +4,8 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
-type Sku2Heap = collections.Heap[Sku2, *Sku2]
+type Sku2Heap = collections.Heap[Sku, *Sku]
 
 func MakeSku2Heap() Sku2Heap {
-	return collections.MakeHeap[Sku2, *Sku2]()
+	return collections.MakeHeap[Sku, *Sku]()
 }

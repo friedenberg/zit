@@ -17,7 +17,7 @@ import (
 )
 
 // TODO-P3 move to sku package
-type FuncSku func(sku.Sku2) error
+type FuncSku func(sku.Sku) error
 
 type PullClient interface {
 	SkusFromFilter(kennung.MetaSet, FuncSku) error
@@ -122,7 +122,7 @@ func (c client) SkusFromFilter(
 			break
 		}
 
-		var sk sku.Sku2
+		var sk sku.Sku
 
 		if err = d.Receive(&sk); err != nil {
 			if errors.IsEOF(err) || errors.Is(err, net.ErrClosed) {
@@ -150,7 +150,7 @@ func (c client) SkusFromFilter(
 }
 
 func (c *client) makeAndProcessOneSkuWithFilter(
-	sk sku.Sku2,
+	sk sku.Sku,
 	f FuncSku,
 	wg *sync.WaitGroup,
 	errMulti errors.Multi,

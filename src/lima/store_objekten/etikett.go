@@ -163,7 +163,7 @@ func (s etikettStore) ReadAll(
 	if s.StoreUtil.GetKonfig().UseBestandsaufnahme {
 		f1 := func(t *bestandsaufnahme.Objekte) (err error) {
 			if err = t.Akte.Skus.Each(
-				func(sk sku.Sku2) (err error) {
+				func(sk sku.Sku) (err error) {
 					if sk.GetGattung() != gattung.Etikett {
 						return
 					}

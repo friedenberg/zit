@@ -13,7 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/ts"
 )
 
-type Sku2 struct {
+type Sku struct {
 	Gattung gattung.Gattung
 
 	Tai ts.Tai
@@ -23,7 +23,7 @@ type Sku2 struct {
 	AkteSha    sha.Sha
 }
 
-func MakeSku2(line string) (sk Sku2, err error) {
+func MakeSku2(line string) (sk Sku, err error) {
 	if err = sk.Set(line); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -32,7 +32,7 @@ func MakeSku2(line string) (sk Sku2, err error) {
 	return
 }
 
-func (sk *Sku2) Set(line string) (err error) {
+func (sk *Sku) Set(line string) (err error) {
 	r := strings.NewReader(line)
 
 	if _, err = format.ReadSep(
@@ -59,7 +59,7 @@ func (sk *Sku2) Set(line string) (err error) {
 	return
 }
 
-func (sk *Sku2) setOld(line string) (err error) {
+func (sk *Sku) setOld(line string) (err error) {
 	r := strings.NewReader(line)
 
 	if _, err = format.ReadSep(
@@ -80,7 +80,7 @@ func (sk *Sku2) setOld(line string) (err error) {
 	return
 }
 
-func (a *Sku2) ResetWith(b Sku2) {
+func (a *Sku) ResetWith(b Sku) {
 	errors.TodoP4("should these be more ResetWith calls?")
 	a.Gattung = b.Gattung
 	a.Tai = b.Tai
@@ -89,48 +89,48 @@ func (a *Sku2) ResetWith(b Sku2) {
 	a.AkteSha = b.AkteSha
 }
 
-func (a *Sku2) Reset() {
+func (a *Sku) Reset() {
 	a.ObjekteSha = sha.Sha{}
 	a.AkteSha = sha.Sha{}
 }
 
-func (a Sku2) GetTai() ts.Tai {
+func (a Sku) GetTai() ts.Tai {
 	return a.Tai
 }
 
-func (a Sku2) GetKopf() ts.Time {
+func (a Sku) GetKopf() ts.Time {
 	return a.Tai.AsTime()
 }
 
-func (a Sku2) GetSchwanz() ts.Time {
+func (a Sku) GetSchwanz() ts.Time {
 	return a.Tai.AsTime()
 }
 
-func (a Sku2) GetKey() string {
+func (a Sku) GetKey() string {
 	return a.String()
 }
 
-func (a Sku2) GetTime() ts.Time {
+func (a Sku) GetTime() ts.Time {
 	return a.Tai.AsTime()
 }
 
-func (a Sku2) GetId() IdLike {
+func (a Sku) GetId() IdLike {
 	return a.Kennung
 }
 
-func (a Sku2) GetGattung() schnittstellen.Gattung {
+func (a Sku) GetGattung() schnittstellen.Gattung {
 	return a.Gattung
 }
 
-func (a Sku2) GetObjekteSha() schnittstellen.Sha {
+func (a Sku) GetObjekteSha() schnittstellen.Sha {
 	return a.ObjekteSha
 }
 
-func (a Sku2) GetAkteSha() schnittstellen.Sha {
+func (a Sku) GetAkteSha() schnittstellen.Sha {
 	return a.AkteSha
 }
 
-func (a Sku2) Less(b Sku2) (ok bool) {
+func (a Sku) Less(b Sku) (ok bool) {
 	if a.Tai.Less(b.Tai) {
 		ok = true
 		return
@@ -139,11 +139,11 @@ func (a Sku2) Less(b Sku2) (ok bool) {
 	return
 }
 
-func (a Sku2) EqualsAny(b any) (ok bool) {
+func (a Sku) EqualsAny(b any) (ok bool) {
 	return values.Equals(a, b)
 }
 
-func (a Sku2) Equals(b Sku2) (ok bool) {
+func (a Sku) Equals(b Sku) (ok bool) {
 	if a != b {
 		return false
 	}
@@ -151,7 +151,7 @@ func (a Sku2) Equals(b Sku2) (ok bool) {
 	return true
 }
 
-func (s Sku2) String() string {
+func (s Sku) String() string {
 	return fmt.Sprintf(
 		"%s %s %s %s %s",
 		s.Tai,

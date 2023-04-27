@@ -30,7 +30,7 @@ type TransactedInflator[
 	T4 any,
 	T5 objekte.VerzeichnissePtr[T4, T],
 ] interface {
-	InflateFromSku2(sku.Sku2) (*objekte.Transacted[T, T1, T2, T3, T4, T5], error)
+	InflateFromSku2(sku.Sku) (*objekte.Transacted[T, T1, T2, T3, T4, T5], error)
 	InflatorStorer[*objekte.Transacted[T, T1, T2, T3, T4, T5]]
 	InflateFromDataIdentityAndStore(sku.DataIdentity) error
 }
@@ -80,7 +80,7 @@ func MakeTransactedInflator[
 }
 
 func (h *transactedInflator[T, T1, T2, T3, T4, T5]) InflateFromSku2(
-	o sku.Sku2,
+	o sku.Sku,
 ) (t *objekte.Transacted[T, T1, T2, T3, T4, T5], err error) {
 	if h.pool == nil {
 		t = new(objekte.Transacted[T, T1, T2, T3, T4, T5])

@@ -10,7 +10,7 @@ import (
 type TransactedLike interface {
 	metadatei.Getter
 	GetAkteSha() schnittstellen.Sha
-	GetSku2() sku.Sku2
+	GetSku2() sku.Sku
 	GetSkuLike() sku.SkuLike
 	kennung.Matchable
 	sku.DataIdentityGetter

@@ -64,7 +64,7 @@ func (c Last) runWithBestandsaufnahm(u *umwelt.Umwelt) (err error) {
 
 	errors.TodoP3("support log line format for skus")
 	if err = b.Akte.Skus.Each(
-		func(o sku.Sku2) (err error) {
+		func(o sku.Sku) (err error) {
 			errors.Out().Print(o)
 			return
 		},

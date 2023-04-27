@@ -41,6 +41,6 @@ type SkuLike interface {
 type SkuLikePtr interface {
 	SkuLike
 	SetTimeAndFields(ts.Time, ...string) error
-	SetFromSku(Sku2) error
+	SetFromSku(Sku) error
 	SetTransactionIndex(int)
 }
