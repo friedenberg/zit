@@ -115,7 +115,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 
 	case "sku":
 		return func(e TransactedLike) (err error) {
-			_, err = fmt.Fprintln(out, e.GetSku2().String())
+			_, err = fmt.Fprintln(out, e.GetSku().String())
 			return
 		}
 

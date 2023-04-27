@@ -234,7 +234,7 @@ func (u *Umwelt) PrinterJustCheckedOutLike() schnittstellen.FuncIter[objekte.Che
 	peco := u.PrinterEtikettCheckedOut()
 
 	return func(co objekte.CheckedOutLike) (err error) {
-		sk2 := co.GetInternalLike().GetSku2()
+		sk2 := co.GetInternalLike().GetSku()
 
 		switch sk2.Gattung {
 		case gattung.Zettel:
@@ -270,7 +270,7 @@ func (u *Umwelt) PrinterCheckedOutLike() schnittstellen.FuncIter[objekte.Checked
 	pkco := u.PrinterKastenCheckedOut()
 
 	return func(co objekte.CheckedOutLike) (err error) {
-		sk2 := co.GetInternalLike().GetSku2()
+		sk2 := co.GetInternalLike().GetSku()
 
 		switch sk2.Gattung {
 		case gattung.Zettel:

@@ -156,7 +156,7 @@ func (s common) GetTai() ts.Tai {
 }
 
 func (s common) CommitTransacted(t objekte.TransactedLike) (err error) {
-	s.GetBestandsaufnahme().Akte.Skus.Add(t.GetSku2())
+	s.GetBestandsaufnahme().Akte.Skus.Add(t.GetSku())
 	s.GetTransaktionStore().GetTransaktion().Skus.Add(t.GetSkuLike())
 
 	return

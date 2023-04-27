@@ -181,20 +181,12 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) GetSkuLike() (sk sku.SkuLike) {
 }
 
 func (a Transacted[T, T1, T2, T3, T4, T5]) String() string {
-	return a.GetSku2().String()
+	return a.GetSku().String()
 }
 
 func (a Transacted[T, T1, T2, T3, T4, T5]) GetSku() (sk sku.Sku) {
 	sk = a.Sku.Sku()
-	errors.TodoP2("make certain akte sha is in sku")
-	sk.AkteSha = sha.Make(a.GetAkteSha())
-	return
-}
-
-func (a Transacted[T, T1, T2, T3, T4, T5]) GetSku2() (sk sku.Sku) {
-	sk = a.Sku.Sku()
-	errors.TodoP2("make certain akte sha is in sku")
-	sk.AkteSha = sha.Make(a.GetAkteSha())
+	AssertAkteShasMatch(a)
 	return
 }
 
