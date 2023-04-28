@@ -7,7 +7,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
@@ -15,8 +14,7 @@ import (
 )
 
 type obj struct {
-	gattung.Gattung
-	Kennung kennung.Hinweis
+	Kennung kennung.IdLike
 	bezeichnung.Bezeichnung
 }
 
@@ -42,11 +40,45 @@ func makeObj(
 
 	errors.TodoP4("add bez in a better way")
 	z = obj{
-		Gattung:     gattung.Zettel,
 		Kennung:     h,
 		Bezeichnung: bezeichnung.Make(named.GetMetadatei().Description()),
 	}
 
+	return
+}
+
+func (a obj) Aligned(maxKopf, maxSchwanz int) (v string) {
+	if h, ok := a.Hinweis(); ok {
+		v = h.Aligned(maxKopf, maxSchwanz)
+	} else if a.Kennung != nil {
+		errors.TodoP1("implement alignment for non hinweis kennung")
+		v = a.Kennung.String()
+	} else {
+		panic("kennung was nil")
+	}
+
+	return
+}
+
+func (a obj) LenKopfUndSchwanz() (int, int) {
+	kopf, schwanz := a.KopfUndSchwanz()
+
+	return len(kopf), len(schwanz)
+}
+
+func (a obj) KopfUndSchwanz() (kopf, schwanz string) {
+	if h, ok := a.Hinweis(); ok {
+		kopf = h.Kopf()
+		schwanz = h.Schwanz()
+	} else {
+		schwanz = a.Kennung.String()
+	}
+
+	return
+}
+
+func (a obj) Hinweis() (h kennung.Hinweis, ok bool) {
+	h, ok = a.Kennung.(kennung.Hinweis)
 	return
 }
 
@@ -55,7 +87,7 @@ func (a obj) EqualsAny(b any) bool {
 }
 
 func (a obj) Equals(b obj) bool {
-	if !a.Kennung.Equals(b.Kennung) {
+	if a.Kennung.String() != b.Kennung.String() {
 		return false
 	}
 
@@ -64,6 +96,10 @@ func (a obj) Equals(b obj) bool {
 	}
 
 	return true
+}
+
+func (z obj) AlignedString(maxKopf, maxSchwanz int) string {
+	return fmt.Sprintf("- [%s] %s", z.Kennung, z.Bezeichnung)
 }
 
 func (z obj) String() string {
@@ -92,7 +128,9 @@ func (z *obj) Set(v string) (err error) {
 		return
 	}
 
-	if err = z.Kennung.Set(strings.TrimSpace(remaining[:idx])); err != nil {
+	if z.Kennung, err = kennung.Make(
+		strings.TrimSpace(remaining[:idx]),
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -119,7 +157,7 @@ func sortObjSet(
 
 	sort.Slice(out, func(i, j int) bool {
 		if out[i].Bezeichnung == out[j].Bezeichnung {
-			return out[i].Kennung.Less(out[j].Kennung)
+			return out[i].Kennung.String() < out[j].Kennung.String()
 		} else {
 			return out[i].Bezeichnung.Less(out[j].Bezeichnung)
 		}

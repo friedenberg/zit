@@ -33,6 +33,48 @@ type Kennung[T KennungLike[T], T1 KennungLikePtr[T]] struct {
 	value T
 }
 
+func Make(v string) (k IdLike, err error) {
+	{
+		var e Etikett
+
+		if err = e.Set(v); err == nil {
+			k = e
+			return
+		}
+	}
+
+	{
+		var t Typ
+
+		if err = t.Set(v); err == nil {
+			k = t
+			return
+		}
+	}
+
+	{
+		var ka Kasten
+
+		if err = ka.Set(v); err == nil {
+			k = ka
+			return
+		}
+	}
+
+	{
+		var h Hinweis
+
+		if err = h.Set(v); err == nil {
+			k = h
+			return
+		}
+	}
+
+	err = errors.Errorf("%q is not a valid Kennung", v)
+
+	return
+}
+
 func makeKennung[T KennungLike[T], T1 KennungLikePtr[T]](
 	v string,
 ) (k Kennung[T, T1], err error) {
