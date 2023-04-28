@@ -6,7 +6,6 @@ import (
 )
 
 type Verzeichnisse struct {
-	Mutter           Mutter
 	TransactionIndex values.Int
 	Kopf, Schwanz    ts.Time
 }

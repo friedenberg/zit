@@ -107,7 +107,7 @@ func MakeSkuTransacted(t ts.Time, line string) (out SkuLikePtr, err error) {
 }
 
 func (a Transacted[T, T1]) String() string {
-	return String(a)
+	return fmt.Sprintf("%s %s %s", a.Kennung, a.ObjekteSha, a.AkteSha)
 }
 
 func (a Transacted[T, T1]) GetTime() ts.Time {
@@ -148,8 +148,6 @@ func (a *Transacted[T, T1]) Reset() {
 	a.ObjekteSha = sha.Sha{}
 	a.AkteSha = sha.Sha{}
 	T1(&a.Kennung).Reset()
-	a.Mutter[0] = ts.Time{}
-	a.Mutter[1] = ts.Time{}
 	a.Schwanz = ts.Time{}
 	a.TransactionIndex.Reset()
 }
@@ -159,8 +157,6 @@ func (a *Transacted[T, T1]) ResetWith(b Transacted[T, T1]) {
 	a.ObjekteSha = b.ObjekteSha
 	a.AkteSha = b.AkteSha
 	T1(&a.Kennung).ResetWith(b.Kennung)
-	a.Mutter[0] = b.Mutter[0]
-	a.Mutter[1] = b.Mutter[1]
 	a.Schwanz = b.Schwanz
 	a.TransactionIndex.SetInt(b.TransactionIndex.Int())
 }
@@ -192,10 +188,6 @@ func (a Transacted[T, T1]) Equals(b Transacted[T, T1]) (ok bool) {
 		return
 	}
 
-	if a.Mutter != b.Mutter {
-		return
-	}
-
 	if a.Kennung.String() != b.Kennung.String() {
 		return
 	}
@@ -219,17 +211,11 @@ func (o *Transacted[T, T1]) SetTimeAndFields(t ts.Time, vs ...string) (err error
 		return
 	}
 
-	if err = o.Mutter[0].Set(vs[0]); err != nil {
-		err = errors.Wrapf(err, "failed to set mutter 0: %s", vs[0])
-		return
-	}
+	// Mutter[0] used to be here
 
 	vs = vs[1:]
 
-	if err = o.Mutter[1].Set(vs[0]); err != nil {
-		err = errors.Wrapf(err, "failed to set mutter 1: %s", vs[0])
-		return
-	}
+	// Mutter[1] used to be here
 
 	vs = vs[1:]
 
@@ -246,10 +232,6 @@ func (o *Transacted[T, T1]) SetTimeAndFields(t ts.Time, vs ...string) (err error
 	}
 
 	return
-}
-
-func (s Transacted[T, T1]) GetMutter() Mutter {
-	return s.Mutter
 }
 
 func (s Transacted[T, T1]) GetGattung() schnittstellen.Gattung {

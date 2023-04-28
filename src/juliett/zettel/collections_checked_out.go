@@ -15,8 +15,6 @@ func MakeMutableSetCheckedOutUnique(c int) MutableSetCheckedOut {
 		func(sz CheckedOut) string {
 			return collections.MakeKey(
 				sz.Internal.Sku.Kopf,
-				sz.Internal.Sku.Mutter[0],
-				sz.Internal.Sku.Mutter[1],
 				sz.Internal.Sku.Schwanz,
 				sz.Internal.Sku.Kennung,
 				sz.Internal.Sku.ObjekteSha,

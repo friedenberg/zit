@@ -234,7 +234,6 @@ func (a *Transacted[T, T1, T2, T3, T4, T5]) SetSkuLike(
 	// TODO-P3 fix sku kopf and schwanz
 	// a.Sku.Kopf = t
 	a.Sku.Schwanz = o.GetTime()
-	a.Sku.Mutter = o.GetMutter()
 
 	return
 }

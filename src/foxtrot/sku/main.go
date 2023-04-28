@@ -6,8 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/echo/ts"
 )
 
-type Mutter [2]ts.Time
-
 type IdLike = schnittstellen.Stringer
 
 type IdLikeGetter interface {
@@ -32,7 +30,6 @@ type SkuLike interface {
 
 	GetKey() string
 
-	GetMutter() Mutter
 	GetTransactionIndex() values.Int
 }
 

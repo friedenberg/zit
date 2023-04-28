@@ -184,7 +184,6 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdate(
 
 	if mutter != nil {
 		transactedPtr.Sku.Kopf = mutter.Sku.Kopf
-		transactedPtr.Sku.Mutter[0] = mutter.Sku.Schwanz
 	} else {
 		errors.TodoP4("determine if this is necessary any more")
 		// transactedPtr.Sku.Kopf = s.common.GetTransaktion().Time
@@ -290,7 +289,6 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdateAkte(
 
 	if mutter != nil {
 		transactedPtr.Sku.Kopf = mutter.Sku.Kopf
-		transactedPtr.Sku.Mutter[0] = mutter.Sku.Schwanz
 	} else {
 		errors.TodoP4("determine if this is necessary any more")
 		// transactedPtr.Sku.Kopf = s.common.GetTransaktion().Time
