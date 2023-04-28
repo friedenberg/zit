@@ -107,7 +107,6 @@ func (c Add) RunWithCwdQuery(
 	}
 
 	createOrganizeFileResults, err = createOrganizeFileOp.RunAndWrite(
-		zettelsFromAkteResults,
 		f,
 	)
 

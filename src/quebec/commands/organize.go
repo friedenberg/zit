@@ -133,7 +133,6 @@ func (c *Organize) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error
 		}
 
 		if createOrganizeFileResults, err = createOrganizeFileOp.RunAndWrite(
-			getResults,
 			f,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -170,7 +169,7 @@ func (c *Organize) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error
 
 	case organize_text.ModeOutputOnly:
 		errors.Log().Print("generate organize file and write to stdout")
-		if _, err = createOrganizeFileOp.RunAndWrite(getResults, os.Stdout); err != nil {
+		if _, err = createOrganizeFileOp.RunAndWrite(os.Stdout); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -188,7 +187,9 @@ func (c *Organize) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error
 			return
 		}
 
-		if createOrganizeFileResults, err = createOrganizeFileOp.RunAndWrite(getResults, f); err != nil {
+		if createOrganizeFileResults, err = createOrganizeFileOp.RunAndWrite(
+			f,
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
