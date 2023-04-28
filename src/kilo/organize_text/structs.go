@@ -7,6 +7,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
@@ -14,7 +15,8 @@ import (
 )
 
 type obj struct {
-	kennung.Hinweis
+	gattung.Gattung
+	Kennung kennung.Hinweis
 	bezeichnung.Bezeichnung
 }
 
@@ -40,7 +42,8 @@ func makeObj(
 
 	errors.TodoP4("add bez in a better way")
 	z = obj{
-		Hinweis:     h,
+		Gattung:     gattung.Zettel,
+		Kennung:     h,
 		Bezeichnung: bezeichnung.Make(named.GetMetadatei().Description()),
 	}
 
@@ -52,7 +55,7 @@ func (a obj) EqualsAny(b any) bool {
 }
 
 func (a obj) Equals(b obj) bool {
-	if !a.Hinweis.Equals(b.Hinweis) {
+	if !a.Kennung.Equals(b.Kennung) {
 		return false
 	}
 
@@ -64,7 +67,7 @@ func (a obj) Equals(b obj) bool {
 }
 
 func (z obj) String() string {
-	return fmt.Sprintf("- [%s] %s", z.Hinweis, z.Bezeichnung)
+	return fmt.Sprintf("- [%s] %s", z.Kennung, z.Bezeichnung)
 }
 
 func (z *obj) Set(v string) (err error) {
@@ -89,7 +92,7 @@ func (z *obj) Set(v string) (err error) {
 		return
 	}
 
-	if err = z.Hinweis.Set(strings.TrimSpace(remaining[:idx])); err != nil {
+	if err = z.Kennung.Set(strings.TrimSpace(remaining[:idx])); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -116,7 +119,7 @@ func sortObjSet(
 
 	sort.Slice(out, func(i, j int) bool {
 		if out[i].Bezeichnung == out[j].Bezeichnung {
-			return out[i].Hinweis.Less(out[j].Hinweis)
+			return out[i].Kennung.Less(out[j].Kennung)
 		} else {
 			return out[i].Bezeichnung.Less(out[j].Bezeichnung)
 		}
@@ -159,7 +162,7 @@ func (z *newObj) Set(v string) (err error) {
 	return
 }
 
-func sortNewZettelSet(
+func sortNewObjSet(
 	s schnittstellen.MutableSet[newObj],
 ) (sorted []newObj) {
 	sorted = s.Elements()

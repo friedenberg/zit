@@ -83,12 +83,12 @@ func (a *assignment) addToCompareMap(m Metadatei, es kennung.EtikettSet, out *Co
 	a.named.Each(
 		func(z obj) (err error) {
 			for _, e := range collections.SortedValues(es) {
-				out.Named.Add(z.Hinweis.String(), e)
+				out.Named.Add(z.Kennung.String(), e)
 			}
 
 			for _, e := range m.EtikettSet.Elements() {
 				errors.TodoP4("add typ")
-				out.Named.Add(z.Hinweis.String(), e)
+				out.Named.Add(z.Kennung.String(), e)
 			}
 
 			return

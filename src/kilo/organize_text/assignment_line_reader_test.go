@@ -105,12 +105,12 @@ func TestAssignmentLineReader2Heading2Zettels(t *testing.T) {
 	{
 		expected := collections.MakeMutableSetStringer[obj]()
 		expected.Add(obj{
-			Hinweis:     makeHinweis(t, "one/wow"),
+			Kennung:     makeHinweis(t, "one/wow"),
 			Bezeichnung: makeBez(t, "uno"),
 		})
 
 		expected.Add(obj{
-			Hinweis:     makeHinweis(t, "dos/wow"),
+			Kennung:     makeHinweis(t, "dos/wow"),
 			Bezeichnung: makeBez(t, "two/wow"),
 		})
 
@@ -178,12 +178,12 @@ func TestAssignmentLineReader1_1Heading2_2Zettels(t1 *testing.T) {
 	{
 		expected := collections.MakeMutableSetStringer[obj]()
 		expected.Add(obj{
-			Hinweis:     makeHinweis(t1, "one/wow"),
+			Kennung:     makeHinweis(t1, "one/wow"),
 			Bezeichnung: makeBez(t1, "uno"),
 		})
 
 		expected.Add(obj{
-			Hinweis:     makeHinweis(t1, "dos/wow"),
+			Kennung:     makeHinweis(t1, "dos/wow"),
 			Bezeichnung: makeBez(t1, "two/wow"),
 		})
 
@@ -263,12 +263,12 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 	{
 		expected := collections.MakeMutableSetStringer[obj]()
 		expected.Add(obj{
-			Hinweis:     makeHinweis(t, "one/wow"),
+			Kennung:     makeHinweis(t, "one/wow"),
 			Bezeichnung: makeBez(t, "uno"),
 		})
 
 		expected.Add(obj{
-			Hinweis:     makeHinweis(t, "dos/wow"),
+			Kennung:     makeHinweis(t, "dos/wow"),
 			Bezeichnung: makeBez(t, "two/wow"),
 		})
 
@@ -282,12 +282,12 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 	{
 		expected := collections.MakeMutableSetStringer[obj]()
 		expected.Add(obj{
-			Hinweis:     makeHinweis(t, "one/wow"),
+			Kennung:     makeHinweis(t, "one/wow"),
 			Bezeichnung: makeBez(t, "uno"),
 		})
 
 		expected.Add(obj{
-			Hinweis:     makeHinweis(t, "dos/wow"),
+			Kennung:     makeHinweis(t, "dos/wow"),
 			Bezeichnung: makeBez(t, "two/wow"),
 		})
 
@@ -358,12 +358,12 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 	{
 		expected := collections.MakeMutableSetStringer[obj]()
 		expected.Add(obj{
-			Hinweis:     makeHinweis(t, "four/wow"),
+			Kennung:     makeHinweis(t, "four/wow"),
 			Bezeichnung: makeBez(t, "quatro"),
 		})
 
 		expected.Add(obj{
-			Hinweis:     makeHinweis(t, "three/wow"),
+			Kennung:     makeHinweis(t, "three/wow"),
 			Bezeichnung: makeBez(t, "tres"),
 		})
 
@@ -377,12 +377,12 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 	{
 		expected := collections.MakeMutableSetStringer[obj]()
 		expected.Add(obj{
-			Hinweis:     makeHinweis(t, "one/wow"),
+			Kennung:     makeHinweis(t, "one/wow"),
 			Bezeichnung: makeBez(t, "uno"),
 		})
 
 		expected.Add(obj{
-			Hinweis:     makeHinweis(t, "dos/wow"),
+			Kennung:     makeHinweis(t, "dos/wow"),
 			Bezeichnung: makeBez(t, "two/wow"),
 		})
 
@@ -438,12 +438,12 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 	{
 		expected := collections.MakeMutableSetStringer[obj]()
 		expected.Add(obj{
-			Hinweis:     makeHinweis(t, "one/wow"),
+			Kennung:     makeHinweis(t, "one/wow"),
 			Bezeichnung: makeBez(t, "uno"),
 		})
 
 		expected.Add(obj{
-			Hinweis:     makeHinweis(t, "two/wow"),
+			Kennung:     makeHinweis(t, "two/wow"),
 			Bezeichnung: makeBez(t, "dos/wow"),
 		})
 
@@ -485,7 +485,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 	{
 		expected := collections.MakeMutableSetStringer[obj]()
 		expected.Add(obj{
-			Hinweis:     makeHinweis(t, "three/wow"),
+			Kennung:     makeHinweis(t, "three/wow"),
 			Bezeichnung: makeBez(t, "tres"),
 		})
 		actual := sub.root.children[0].children[0].children[0].named
@@ -500,7 +500,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 	{
 		expected := collections.MakeMutableSetStringer[obj]()
 		expected.Add(obj{
-			Hinweis:     makeHinweis(t, "four/wow"),
+			Kennung:     makeHinweis(t, "four/wow"),
 			Bezeichnung: makeBez(t, "quatro"),
 		})
 		actual := sub.root.children[0].children[0].named
@@ -517,11 +517,11 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 	{
 		expected := collections.MakeMutableSetStringer[obj]()
 		expected.Add(obj{
-			Hinweis:     makeHinweis(t, "five/wow"),
+			Kennung:     makeHinweis(t, "five/wow"),
 			Bezeichnung: makeBez(t, "cinco"),
 		})
 		expected.Add(obj{
-			Hinweis:     makeHinweis(t, "six/wow"),
+			Kennung:     makeHinweis(t, "six/wow"),
 			Bezeichnung: makeBez(t, "seis"),
 		})
 		actual := sub.root.children[0].children[1].named

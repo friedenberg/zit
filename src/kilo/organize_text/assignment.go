@@ -62,7 +62,7 @@ func (a assignment) AlignmentSpacing() int {
 func (a assignment) MaxKopfUndSchwanz() (kopf, schwanz int) {
 	a.named.Each(
 		func(z obj) (err error) {
-			parts := [2]string{z.Hinweis.Kopf(), z.Hinweis.Schwanz()}
+			parts := [2]string{z.Kennung.Kopf(), z.Kennung.Schwanz()}
 			zKopf := len(parts[0])
 			zSchwanz := len(parts[1])
 
