@@ -34,8 +34,6 @@ type SkuLike interface {
 
 	GetMutter() Mutter
 	GetTransactionIndex() values.Int
-	GetKopf() ts.Time
-	GetSchwanz() ts.Time
 }
 
 type SkuLikePtr interface {

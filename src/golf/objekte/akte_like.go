@@ -6,5 +6,4 @@ type (
 	AktePtrLike interface {
 		AkteLike
 	}
-
 )

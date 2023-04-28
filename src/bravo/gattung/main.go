@@ -193,3 +193,7 @@ func (g *Gattung) Set(v string) (err error) {
 
 	return
 }
+
+func (g *Gattung) Reset() {
+	*g = Unknown
+}

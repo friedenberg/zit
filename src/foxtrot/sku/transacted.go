@@ -272,14 +272,6 @@ func (s Transacted[T, T1]) GetTransactionIndex() values.Int {
 	return s.TransactionIndex
 }
 
-func (s Transacted[T, T1]) GetKopf() ts.Time {
-	return s.Kopf
-}
-
-func (s Transacted[T, T1]) GetSchwanz() ts.Time {
-	return s.Schwanz
-}
-
 func (o Transacted[T, T1]) GetKey() string {
 	return fmt.Sprintf("%s.%s", o.Kennung.GetGattung(), o.Kennung)
 }

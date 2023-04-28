@@ -14,22 +14,11 @@ import (
 )
 
 type Sku struct {
-	Gattung gattung.Gattung
-
-	Tai ts.Tai
-
+	Gattung    gattung.Gattung
+	Tai        ts.Tai
 	Kennung    values.String
 	ObjekteSha sha.Sha
 	AkteSha    sha.Sha
-}
-
-func MakeSku2(line string) (sk Sku, err error) {
-	if err = sk.Set(line); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
 }
 
 func (sk *Sku) Set(line string) (err error) {
@@ -90,20 +79,15 @@ func (a *Sku) ResetWith(b Sku) {
 }
 
 func (a *Sku) Reset() {
-	a.ObjekteSha = sha.Sha{}
-	a.AkteSha = sha.Sha{}
+	a.Gattung.Reset()
+	a.Tai.Reset()
+	a.Kennung.Reset()
+	a.ObjekteSha.Reset()
+	a.AkteSha.Reset()
 }
 
 func (a Sku) GetTai() ts.Tai {
 	return a.Tai
-}
-
-func (a Sku) GetKopf() ts.Time {
-	return a.Tai.AsTime()
-}
-
-func (a Sku) GetSchwanz() ts.Time {
-	return a.Tai.AsTime()
 }
 
 func (a Sku) GetKey() string {
