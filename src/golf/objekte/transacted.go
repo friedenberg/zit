@@ -82,7 +82,7 @@ func (t Transacted[T, T1, T2, T3, T4, T5]) GetGattung() schnittstellen.Gattung {
 }
 
 func (zt Transacted[T, T1, T2, T3, T4, T5]) IsNew() bool {
-	return zt.Sku.Kopf == zt.Sku.Schwanz && zt.Sku.TransactionIndex == 0
+	return zt.Sku.Kopf.Equals(zt.Sku.Schwanz)
 }
 
 func (a Transacted[T, T1, T2, T3, T4, T5]) Less(
