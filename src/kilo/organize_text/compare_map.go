@@ -81,7 +81,7 @@ func (a *assignment) addToCompareMap(m Metadatei, es kennung.EtikettSet, out *Co
 	es = mes.ImmutableClone()
 
 	a.named.Each(
-		func(z zettel) (err error) {
+		func(z obj) (err error) {
 			for _, e := range collections.SortedValues(es) {
 				out.Named.Add(z.Hinweis.String(), e)
 			}
@@ -96,7 +96,7 @@ func (a *assignment) addToCompareMap(m Metadatei, es kennung.EtikettSet, out *Co
 	)
 
 	a.unnamed.Each(
-		func(z newZettel) (err error) {
+		func(z newObj) (err error) {
 			for _, e := range collections.SortedValues(es) {
 				out.Unnamed.Add(z.Bezeichnung.String(), e)
 			}

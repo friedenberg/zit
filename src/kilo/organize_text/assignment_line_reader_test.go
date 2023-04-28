@@ -103,13 +103,13 @@ func TestAssignmentLineReader2Heading2Zettels(t *testing.T) {
 	}
 
 	{
-		expected := collections.MakeMutableSetStringer[zettel]()
-		expected.Add(zettel{
+		expected := collections.MakeMutableSetStringer[obj]()
+		expected.Add(obj{
 			Hinweis:     makeHinweis(t, "one/wow"),
 			Bezeichnung: makeBez(t, "uno"),
 		})
 
-		expected.Add(zettel{
+		expected.Add(obj{
 			Hinweis:     makeHinweis(t, "dos/wow"),
 			Bezeichnung: makeBez(t, "two/wow"),
 		})
@@ -176,13 +176,13 @@ func TestAssignmentLineReader1_1Heading2_2Zettels(t1 *testing.T) {
 	}
 
 	{
-		expected := collections.MakeMutableSetStringer[zettel]()
-		expected.Add(zettel{
+		expected := collections.MakeMutableSetStringer[obj]()
+		expected.Add(obj{
 			Hinweis:     makeHinweis(t1, "one/wow"),
 			Bezeichnung: makeBez(t1, "uno"),
 		})
 
-		expected.Add(zettel{
+		expected.Add(obj{
 			Hinweis:     makeHinweis(t1, "dos/wow"),
 			Bezeichnung: makeBez(t1, "two/wow"),
 		})
@@ -261,13 +261,13 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 	}
 
 	{
-		expected := collections.MakeMutableSetStringer[zettel]()
-		expected.Add(zettel{
+		expected := collections.MakeMutableSetStringer[obj]()
+		expected.Add(obj{
 			Hinweis:     makeHinweis(t, "one/wow"),
 			Bezeichnung: makeBez(t, "uno"),
 		})
 
-		expected.Add(zettel{
+		expected.Add(obj{
 			Hinweis:     makeHinweis(t, "dos/wow"),
 			Bezeichnung: makeBez(t, "two/wow"),
 		})
@@ -280,13 +280,13 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 	}
 
 	{
-		expected := collections.MakeMutableSetStringer[zettel]()
-		expected.Add(zettel{
+		expected := collections.MakeMutableSetStringer[obj]()
+		expected.Add(obj{
 			Hinweis:     makeHinweis(t, "one/wow"),
 			Bezeichnung: makeBez(t, "uno"),
 		})
 
-		expected.Add(zettel{
+		expected.Add(obj{
 			Hinweis:     makeHinweis(t, "dos/wow"),
 			Bezeichnung: makeBez(t, "two/wow"),
 		})
@@ -356,13 +356,13 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 	}
 
 	{
-		expected := collections.MakeMutableSetStringer[zettel]()
-		expected.Add(zettel{
+		expected := collections.MakeMutableSetStringer[obj]()
+		expected.Add(obj{
 			Hinweis:     makeHinweis(t, "four/wow"),
 			Bezeichnung: makeBez(t, "quatro"),
 		})
 
-		expected.Add(zettel{
+		expected.Add(obj{
 			Hinweis:     makeHinweis(t, "three/wow"),
 			Bezeichnung: makeBez(t, "tres"),
 		})
@@ -375,13 +375,13 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 	}
 
 	{
-		expected := collections.MakeMutableSetStringer[zettel]()
-		expected.Add(zettel{
+		expected := collections.MakeMutableSetStringer[obj]()
+		expected.Add(obj{
 			Hinweis:     makeHinweis(t, "one/wow"),
 			Bezeichnung: makeBez(t, "uno"),
 		})
 
-		expected.Add(zettel{
+		expected.Add(obj{
 			Hinweis:     makeHinweis(t, "dos/wow"),
 			Bezeichnung: makeBez(t, "two/wow"),
 		})
@@ -436,13 +436,13 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 	// - [one/wow] uno
 	// - [two/wow] dos/wow
 	{
-		expected := collections.MakeMutableSetStringer[zettel]()
-		expected.Add(zettel{
+		expected := collections.MakeMutableSetStringer[obj]()
+		expected.Add(obj{
 			Hinweis:     makeHinweis(t, "one/wow"),
 			Bezeichnung: makeBez(t, "uno"),
 		})
 
-		expected.Add(zettel{
+		expected.Add(obj{
 			Hinweis:     makeHinweis(t, "two/wow"),
 			Bezeichnung: makeBez(t, "dos/wow"),
 		})
@@ -483,8 +483,8 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 
 	// - [three/wow] tres
 	{
-		expected := collections.MakeMutableSetStringer[zettel]()
-		expected.Add(zettel{
+		expected := collections.MakeMutableSetStringer[obj]()
+		expected.Add(obj{
 			Hinweis:     makeHinweis(t, "three/wow"),
 			Bezeichnung: makeBez(t, "tres"),
 		})
@@ -498,8 +498,8 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 	// ##
 	// - [four/wow] quatro
 	{
-		expected := collections.MakeMutableSetStringer[zettel]()
-		expected.Add(zettel{
+		expected := collections.MakeMutableSetStringer[obj]()
+		expected.Add(obj{
 			Hinweis:     makeHinweis(t, "four/wow"),
 			Bezeichnung: makeBez(t, "quatro"),
 		})
@@ -515,12 +515,12 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 	// - [six/wow] seis
 	// `
 	{
-		expected := collections.MakeMutableSetStringer[zettel]()
-		expected.Add(zettel{
+		expected := collections.MakeMutableSetStringer[obj]()
+		expected.Add(obj{
 			Hinweis:     makeHinweis(t, "five/wow"),
 			Bezeichnung: makeBez(t, "cinco"),
 		})
-		expected.Add(zettel{
+		expected.Add(obj{
 			Hinweis:     makeHinweis(t, "six/wow"),
 			Bezeichnung: makeBez(t, "seis"),
 		})

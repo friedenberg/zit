@@ -318,7 +318,7 @@ func (ar *assignmentLineReader) readOneHeadingGreaterDepth(
 func (ar *assignmentLineReader) readOneZettel(l line) (err error) {
 	// logz.Print("reading one zettel", l)
 
-	var z zettel
+	var z obj
 
 	if err = z.Set(l.String()); err == nil {
 		// logz.Print("added to named zettels")
@@ -337,7 +337,7 @@ func (ar *assignmentLineReader) readOneZettel(l line) (err error) {
 		return
 	}
 
-	var nz newZettel
+	var nz newObj
 
 	if err = nz.Set(l.String()); err == nil {
 		// logz.Print("added to unnamed zettels")

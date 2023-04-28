@@ -55,7 +55,7 @@ func (av assignmentLineWriter) writeNormal(a *assignment) (err error) {
 			fmt.Sprintf("%s- %s", tab_prefix, z.Bezeichnung))
 	}
 
-	for _, z := range sortZettelSet(a.named) {
+	for _, z := range sortObjSet(a.named) {
 		av.WriteLines(fmt.Sprintf("%s- [%s] %s", tab_prefix, z.Hinweis, z.Bezeichnung))
 	}
 
@@ -111,7 +111,7 @@ func (av assignmentLineWriter) writeRightAligned(a *assignment) (err error) {
 			fmt.Sprintf("- %s%s", tab_prefix, z.Bezeichnung))
 	}
 
-	for _, z := range sortZettelSet(a.named) {
+	for _, z := range sortObjSet(a.named) {
 		h := z.Hinweis.Aligned(av.maxKopf, av.maxScwhanz)
 		av.WriteLines(fmt.Sprintf("- [%s] %s", h, z.Bezeichnung))
 	}

@@ -13,8 +13,8 @@ type assignment struct {
 	isRoot    bool
 	depth     int
 	etiketten schnittstellen.Set[kennung.Etikett]
-	named     schnittstellen.MutableSet[zettel]
-	unnamed   schnittstellen.MutableSet[newZettel]
+	named     schnittstellen.MutableSet[obj]
+	unnamed   schnittstellen.MutableSet[newObj]
 	children  []*assignment
 	parent    *assignment
 }
@@ -23,8 +23,8 @@ func newAssignment(d int) *assignment {
 	return &assignment{
 		depth:     d,
 		etiketten: kennung.MakeEtikettSet(),
-		named:     collections.MakeMutableSetStringer[zettel](),
-		unnamed:   collections.MakeMutableSetStringer[newZettel](),
+		named:     collections.MakeMutableSetStringer[obj](),
+		unnamed:   collections.MakeMutableSetStringer[newObj](),
 		children:  make([]*assignment, 0),
 	}
 }
@@ -61,7 +61,7 @@ func (a assignment) AlignmentSpacing() int {
 
 func (a assignment) MaxKopfUndSchwanz() (kopf, schwanz int) {
 	a.named.Each(
-		func(z zettel) (err error) {
+		func(z obj) (err error) {
 			parts := [2]string{z.Hinweis.Kopf(), z.Hinweis.Schwanz()}
 			zKopf := len(parts[0])
 			zSchwanz := len(parts[1])

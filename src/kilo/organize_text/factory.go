@@ -68,9 +68,9 @@ func (atc Factory) makeChildren(
 
 		err = prefixSet.EachZettel(
 			func(e kennung.Etikett, tz zettel_pkg.Transacted) (err error) {
-				var z zettel
+				var z obj
 
-				if z, err = makeZettel(&tz, atc.Abbr); err != nil {
+				if z, err = makeObj(&tz, atc.Abbr); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -93,9 +93,9 @@ func (atc Factory) makeChildren(
 
 	err = segments.Ungrouped.Each(
 		func(tz *zettel_pkg.Transacted) (err error) {
-			var z zettel
+			var z obj
 
-			if z, err = makeZettel(tz, atc.Abbr); err != nil {
+			if z, err = makeObj(tz, atc.Abbr); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

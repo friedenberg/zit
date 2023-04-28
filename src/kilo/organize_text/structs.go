@@ -10,25 +10,18 @@ import (
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
-	zettel_pkg "github.com/friedenberg/zit/src/juliett/zettel"
+	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
-//   _____    _   _       _
-//  |__  /___| |_| |_ ___| |
-//    / // _ \ __| __/ _ \ |
-//   / /|  __/ |_| ||  __/ |
-//  /____\___|\__|\__\___|_|
-//
-
-type zettel struct {
+type obj struct {
 	kennung.Hinweis
 	bezeichnung.Bezeichnung
 }
 
-func makeZettel(
-	named *zettel_pkg.Transacted,
+func makeObj(
+	named *zettel.Transacted,
 	ha schnittstellen.FuncAbbreviateKorper,
-) (z zettel, err error) {
+) (z obj, err error) {
 	h := *named.Kennung()
 
 	if ha != nil {
@@ -46,7 +39,7 @@ func makeZettel(
 	}
 
 	errors.TodoP4("add bez in a better way")
-	z = zettel{
+	z = obj{
 		Hinweis:     h,
 		Bezeichnung: bezeichnung.Make(named.GetMetadatei().Description()),
 	}
@@ -54,11 +47,11 @@ func makeZettel(
 	return
 }
 
-func (a zettel) EqualsAny(b any) bool {
+func (a obj) EqualsAny(b any) bool {
 	return values.Equals(a, b)
 }
 
-func (a zettel) Equals(b zettel) bool {
+func (a obj) Equals(b obj) bool {
 	if !a.Hinweis.Equals(b.Hinweis) {
 		return false
 	}
@@ -70,11 +63,11 @@ func (a zettel) Equals(b zettel) bool {
 	return true
 }
 
-func (z zettel) String() string {
+func (z obj) String() string {
 	return fmt.Sprintf("- [%s] %s", z.Hinweis, z.Bezeichnung)
 }
 
-func (z *zettel) Set(v string) (err error) {
+func (z *obj) Set(v string) (err error) {
 	remaining := v
 
 	if len(remaining) < 3 {
@@ -116,9 +109,9 @@ func (z *zettel) Set(v string) (err error) {
 	return
 }
 
-func sortZettelSet(
-	s schnittstellen.MutableSet[zettel],
-) (out []zettel) {
+func sortObjSet(
+	s schnittstellen.MutableSet[obj],
+) (out []obj) {
 	out = s.Elements()
 
 	sort.Slice(out, func(i, j int) bool {
@@ -132,22 +125,15 @@ func sortZettelSet(
 	return
 }
 
-//   _   _                 _____    _   _       _
-//  | \ | | _____      __ |__  /___| |_| |_ ___| |
-//  |  \| |/ _ \ \ /\ / /   / // _ \ __| __/ _ \ |
-//  | |\  |  __/\ V  V /   / /|  __/ |_| ||  __/ |
-//  |_| \_|\___| \_/\_/   /____\___|\__|\__\___|_|
-//
-
-type newZettel struct {
+type newObj struct {
 	bezeichnung.Bezeichnung
 }
 
-func (a newZettel) EqualsAny(b any) bool {
+func (a newObj) EqualsAny(b any) bool {
 	return values.Equals(a, b)
 }
 
-func (a newZettel) Equals(b newZettel) bool {
+func (a newObj) Equals(b newObj) bool {
 	if !a.Bezeichnung.Equals(b.Bezeichnung) {
 		return false
 	}
@@ -155,7 +141,7 @@ func (a newZettel) Equals(b newZettel) bool {
 	return true
 }
 
-func (z *newZettel) Set(v string) (err error) {
+func (z *newObj) Set(v string) (err error) {
 	remaining := v
 
 	if remaining[:2] != "- " {
@@ -174,8 +160,8 @@ func (z *newZettel) Set(v string) (err error) {
 }
 
 func sortNewZettelSet(
-	s schnittstellen.MutableSet[newZettel],
-) (sorted []newZettel) {
+	s schnittstellen.MutableSet[newObj],
+) (sorted []newObj) {
 	sorted = s.Elements()
 
 	sort.Slice(sorted, func(i, j int) bool {
