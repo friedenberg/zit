@@ -21,10 +21,11 @@ type SkuLikeOld interface {
 // TODO-P3 examine adding objekte and akte shas to Skus
 // TODO-P2 move sku.Sku to sku.Transacted
 type Transacted[T kennung.KennungLike[T], T1 kennung.KennungLikePtr[T]] struct {
-	Kennung    T
-	ObjekteSha sha.Sha
-	AkteSha    sha.Sha
-	Verzeichnisse
+	Kennung          T
+	ObjekteSha       sha.Sha
+	AkteSha          sha.Sha
+	TransactionIndex values.Int
+	Kopf, Schwanz    ts.Time
 }
 
 func (t *Transacted[T, T1]) SetFromSku(sk Sku) (err error) {
@@ -38,7 +39,8 @@ func (t *Transacted[T, T1]) SetFromSku(sk Sku) (err error) {
 	t.ObjekteSha = sk.ObjekteSha
 	t.AkteSha = sk.AkteSha
 
-	t.Verzeichnisse.SetFromSku(sk)
+	t.Kopf = sk.GetTime()
+	t.Schwanz = sk.GetTime()
 
 	return
 }

@@ -528,10 +528,8 @@ func (s *zettelStore) writeObjekte(
 		Akte: z,
 		Sku: sku.Transacted[kennung.Hinweis, *kennung.Hinweis]{
 			Kennung: h,
-			Verzeichnisse: sku.Verzeichnisse{
-				Kopf:    t.Time,
-				Schwanz: t.Time,
-			},
+			Kopf:    t.Time,
+			Schwanz: t.Time,
 		},
 	}
 

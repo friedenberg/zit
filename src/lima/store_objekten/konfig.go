@@ -155,9 +155,7 @@ func (s konfigStore) Update(
 	kt = &erworben.Transacted{
 		Akte: *ko,
 		Sku: sku.Transacted[kennung.Konfig, *kennung.Konfig]{
-			Verzeichnisse: sku.Verzeichnisse{
-				Schwanz: s.StoreUtil.GetTime(),
-			},
+			Schwanz: s.StoreUtil.GetTime(),
 		},
 	}
 
