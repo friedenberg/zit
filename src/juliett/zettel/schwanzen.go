@@ -3,7 +3,6 @@ package zettel
 import (
 	"sync"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/ts"
@@ -42,15 +41,14 @@ func (zws *Schwanzen) Less(zt *Transacted) (ok bool) {
 	return
 }
 
-func (zws *Schwanzen) Get(h kennung.Hinweis) (t ts.Time, ok bool) {
+func (zws *Schwanzen) Get(h kennung.Hinweis) (t ts.Tai, ok bool) {
 	zws.lock.RLock()
 	defer zws.lock.RUnlock()
 
 	o, ok := zws.hinweisen[h]
 
 	if ok {
-		errors.TodoP4("switch to GetTime()")
-		t = o.Sku.GetTime()
+		t = o.Sku.GetTai()
 	}
 
 	return

@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 )
 
@@ -51,7 +52,10 @@ func (r *Reader) ReadFrom(r1 io.Reader) (n int64, err error) {
 		default:
 			var o sku.SkuLike
 
-			if o, err = sku.MakeSkuTransacted(r.Transaktion.Time, line); err != nil {
+			if o, err = sku.MakeSkuTransacted(
+				ts.TaiFromTime(r.Transaktion.Time),
+				line,
+			); err != nil {
 				err = errors.Wrapf(err, "failed to read line: %s", line)
 				return
 			}

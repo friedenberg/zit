@@ -16,7 +16,7 @@ func MakeTimePrefixWriter[T DataIdentityGetter](
 			w,
 			format.MakeFormatStringRightAligned(
 				"%s",
-				e.GetDataIdentity().GetTime().Format(ts.FormatDateTime),
+				e.GetDataIdentity().GetTai().Format(ts.FormatDateTime),
 			),
 			format.MakeWriter(f, e),
 		)

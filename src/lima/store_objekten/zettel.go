@@ -522,14 +522,14 @@ func (s *zettelStore) writeObjekte(
 		panic("metadatei.Getter was nil")
 	}
 
-	t := s.StoreUtil.GetTransaktionStore().GetTransaktion()
+	t := s.StoreUtil.GetTai()
 
 	tz = &zettel.Transacted{
 		Akte: z,
 		Sku: sku.Transacted[kennung.Hinweis, *kennung.Hinweis]{
 			Kennung: h,
-			Kopf:    t.Time,
-			Schwanz: t.Time,
+			Kopf:    t,
+			Schwanz: t,
 		},
 	}
 

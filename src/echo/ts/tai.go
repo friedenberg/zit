@@ -126,6 +126,11 @@ func (t Tai) IsZero() (ok bool) {
 	return
 }
 
+func (t Tai) IsEmpty() (ok bool) {
+	ok = t.IsZero()
+	return
+}
+
 func (t *Tai) Reset() {
 	t.tai.Sec = 0
 	t.tai.Asec = 0

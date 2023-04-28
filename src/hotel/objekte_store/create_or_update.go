@@ -89,7 +89,7 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdateCheckedOut(
 		Akte: *objektePtr,
 		Sku: sku.Transacted[T2, T3]{
 			Kennung: *kennungPtr,
-			Schwanz: cou.clock.GetTime(),
+			Schwanz: cou.clock.GetTai(),
 		},
 	}
 
@@ -174,7 +174,7 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdate(
 		Akte:      *objektePtr,
 		Sku: sku.Transacted[T2, T3]{
 			Kennung: *kennungPtr,
-			Schwanz: cou.clock.GetTime(),
+			Schwanz: cou.clock.GetTai(),
 		},
 	}
 
@@ -275,7 +275,7 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdateAkte(
 		Akte:      *objektePtr,
 		Sku: sku.Transacted[T2, T3]{
 			Kennung: *kennungPtr,
-			Schwanz: cou.clock.GetTime(),
+			Schwanz: cou.clock.GetTai(),
 		},
 	}
 

@@ -88,11 +88,7 @@ func (zt Transacted[T, T1, T2, T3, T4, T5]) IsNew() bool {
 func (a Transacted[T, T1, T2, T3, T4, T5]) Less(
 	b Transacted[T, T1, T2, T3, T4, T5],
 ) bool {
-	if a.Sku.GetTime().Equals(b.Sku.GetTime()) {
-		return a.Sku.TransactionIndex.Less(b.Sku.TransactionIndex)
-	}
-
-	return a.Sku.GetTime().Less(b.Sku.GetTime())
+	return a.Sku.GetTai().Less(b.Sku.GetTai())
 }
 
 func (a Transacted[T, T1, T2, T3, T4, T5]) EqualsAny(b any) bool {
@@ -212,7 +208,7 @@ func (a *Transacted[T, T1, T2, T3, T4, T5]) SetDataIdentity(
 	a.Sku.Kennung = h
 	a.Sku.ObjekteSha = sha.Make(o.GetObjekteSha())
 	a.Sku.AkteSha = sha.Make(o.GetAkteSha())
-	a.Sku.Schwanz = o.GetTime()
+	a.Sku.Schwanz = o.GetTai()
 
 	return
 }
@@ -233,7 +229,7 @@ func (a *Transacted[T, T1, T2, T3, T4, T5]) SetSkuLike(
 	a.Sku.TransactionIndex = o.GetTransactionIndex()
 	// TODO-P3 fix sku kopf and schwanz
 	// a.Sku.Kopf = t
-	a.Sku.Schwanz = o.GetTime()
+	a.Sku.Schwanz = o.GetTai()
 
 	return
 }

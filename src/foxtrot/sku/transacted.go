@@ -25,11 +25,11 @@ type Transacted[T kennung.KennungLike[T], T1 kennung.KennungLikePtr[T]] struct {
 	ObjekteSha       sha.Sha
 	AkteSha          sha.Sha
 	TransactionIndex values.Int
-	Kopf, Schwanz    ts.Time
+	Kopf, Schwanz    ts.Tai
 }
 
 func (t *Transacted[T, T1]) SetFromSku(sk Sku) (err error) {
-	t.Schwanz = sk.GetTime()
+	t.Schwanz = sk.GetTai()
 
 	if err = T1(&t.Kennung).Set(sk.Kennung.String()); err != nil {
 		err = errors.Wrap(err)
@@ -39,8 +39,8 @@ func (t *Transacted[T, T1]) SetFromSku(sk Sku) (err error) {
 	t.ObjekteSha = sk.ObjekteSha
 	t.AkteSha = sk.AkteSha
 
-	t.Kopf = sk.GetTime()
-	t.Schwanz = sk.GetTime()
+	t.Kopf = sk.GetTai()
+	t.Schwanz = sk.GetTai()
 
 	return
 }
@@ -73,7 +73,42 @@ func (t *Transacted[T, T1]) SetFromSku(sk Sku) (err error) {
 // }
 
 // TODO-P2 include sku versions
-func MakeSkuTransacted(t ts.Time, line string) (out SkuLikePtr, err error) {
+func MakeSkuTransactedFromTime(t ts.Tai, line string) (out SkuLikePtr, err error) {
+	fields := strings.Fields(line)
+	var g gattung.Gattung
+
+	if err = g.Set(fields[0]); err != nil {
+		err = errors.Wrapf(err, "failed to set type: %s", fields[0])
+		return
+	}
+
+	switch g {
+	case gattung.Zettel:
+		out = &Transacted[kennung.Hinweis, *kennung.Hinweis]{}
+
+	case gattung.Typ:
+		out = &Transacted[kennung.Typ, *kennung.Typ]{}
+
+	case gattung.Etikett:
+		out = &Transacted[kennung.Etikett, *kennung.Etikett]{}
+
+	case gattung.Konfig:
+		out = &Transacted[kennung.Konfig, *kennung.Konfig]{}
+
+	default:
+		err = errors.Errorf("unsupported gattung: %s", g)
+		return
+	}
+
+	if err = out.SetTimeAndFields(t, fields[1:]...); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func MakeSkuTransacted(t ts.Tai, line string) (out SkuLikePtr, err error) {
 	fields := strings.Fields(line)
 	var g gattung.Gattung
 
@@ -112,15 +147,8 @@ func (a Transacted[T, T1]) String() string {
 	return fmt.Sprintf("%s %s %s", a.Kennung, a.ObjekteSha, a.AkteSha)
 }
 
-func (a Transacted[T, T1]) GetTime() ts.Time {
-	return a.Schwanz
-}
-
 func (a Transacted[T, T1]) GetTai() ts.Tai {
-	return ts.TaiFromTimeWithIndex(
-		a.GetTime(),
-		a.GetTransactionIndex().Int(),
-	)
+	return a.Schwanz
 }
 
 func (a Transacted[T, T1]) GetExternal() External[T, T1] {
@@ -146,11 +174,11 @@ func (a *Transacted[T, T1]) SetTransactionIndex(i int) {
 }
 
 func (a *Transacted[T, T1]) Reset() {
-	a.Kopf = ts.Time{}
-	a.ObjekteSha = sha.Sha{}
-	a.AkteSha = sha.Sha{}
+	a.Kopf.Reset()
+	a.ObjekteSha.Reset()
+	a.AkteSha.Reset()
 	T1(&a.Kennung).Reset()
-	a.Schwanz = ts.Time{}
+	a.Schwanz.Reset()
 	a.TransactionIndex.Reset()
 }
 
@@ -205,7 +233,10 @@ func (a Transacted[T, T1]) Equals(b Transacted[T, T1]) (ok bool) {
 	return true
 }
 
-func (o *Transacted[T, T1]) SetTimeAndFields(t ts.Time, vs ...string) (err error) {
+func (o *Transacted[T, T1]) SetTimeAndFields(
+	t ts.Tai,
+	vs ...string,
+) (err error) {
 	o.Schwanz = t
 
 	if len(vs) != 4 {

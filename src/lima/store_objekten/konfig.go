@@ -155,7 +155,7 @@ func (s konfigStore) Update(
 	kt = &erworben.Transacted{
 		Akte: *ko,
 		Sku: sku.Transacted[kennung.Konfig, *kennung.Konfig]{
-			Schwanz: s.StoreUtil.GetTime(),
+			Schwanz: s.StoreUtil.GetTai(),
 		},
 	}
 
@@ -166,7 +166,7 @@ func (s konfigStore) Update(
 	if mutter != nil {
 		kt.Sku.Kopf = mutter.Sku.Kopf
 	} else {
-		kt.Sku.Kopf = s.StoreUtil.GetTime()
+		kt.Sku.Kopf = s.StoreUtil.GetTai()
 	}
 
 	var ow sha.WriteCloser

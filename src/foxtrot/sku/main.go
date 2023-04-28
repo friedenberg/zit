@@ -14,7 +14,7 @@ type IdLikeGetter interface {
 
 type DataIdentity interface {
 	schnittstellen.ValueLike
-	GetTime() ts.Time
+	GetTai() ts.Tai
 	GetId() IdLike
 	schnittstellen.GattungGetter
 	GetObjekteSha() schnittstellen.Sha
@@ -31,11 +31,12 @@ type SkuLike interface {
 	GetKey() string
 
 	GetTransactionIndex() values.Int
+	// Less(SkuLike) bool
 }
 
 type SkuLikePtr interface {
 	SkuLike
-	SetTimeAndFields(ts.Time, ...string) error
+	SetTimeAndFields(ts.Tai, ...string) error
 	SetFromSku(Sku) error
 	SetTransactionIndex(int)
 }

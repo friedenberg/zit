@@ -17,7 +17,7 @@ type MutableMatchSet struct {
 	Akten                     MutableSet
 	Matched                   MutableSet
 	MatchedHinweisen          kennung.HinweisMutableSet
-	MatchedHinweisenSchwanzen map[kennung.Hinweis]ts.Time
+	MatchedHinweisenSchwanzen map[kennung.Hinweis]ts.Tai
 }
 
 func MakeMutableMatchSet(in MutableSet) (out MutableMatchSet) {
@@ -28,7 +28,7 @@ func MakeMutableMatchSet(in MutableSet) (out MutableMatchSet) {
 		Akten:                     MakeMutableSetUniqueAkte(),
 		Matched:                   MakeMutableSetUniqueFD(),
 		MatchedHinweisen:          kennung.MakeHinweisMutableSet(),
-		MatchedHinweisenSchwanzen: make(map[kennung.Hinweis]ts.Time),
+		MatchedHinweisenSchwanzen: make(map[kennung.Hinweis]ts.Tai),
 	}
 
 	in.Each(out.Stored.Add)
