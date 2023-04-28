@@ -50,7 +50,7 @@ func (av assignmentLineWriter) writeNormal(a *assignment) (err error) {
 		av.WriteExactlyOneEmpty()
 	}
 
-	for _, z := range sortNewObjSet(a.unnamed) {
+	for _, z := range sortObjSet(a.unnamed) {
 		av.WriteLines(
 			fmt.Sprintf("%s- %s", tab_prefix, z.Bezeichnung))
 	}
@@ -106,7 +106,7 @@ func (av assignmentLineWriter) writeRightAligned(a *assignment) (err error) {
 		av.WriteExactlyOneEmpty()
 	}
 
-	for _, z := range sortNewObjSet(a.unnamed) {
+	for _, z := range sortObjSet(a.unnamed) {
 		av.WriteLines(
 			fmt.Sprintf("- %s%s", tab_prefix, z.Bezeichnung))
 	}

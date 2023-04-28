@@ -67,7 +67,11 @@ func (in *Text) ToCompareMap() (out CompareMap, err error) {
 	return
 }
 
-func (a *assignment) addToCompareMap(m Metadatei, es kennung.EtikettSet, out *CompareMap) (err error) {
+func (a *assignment) addToCompareMap(
+	m Metadatei,
+	es kennung.EtikettSet,
+	out *CompareMap,
+) (err error) {
 	mes := es.MutableClone()
 
 	var es1 kennung.EtikettSet
@@ -83,6 +87,10 @@ func (a *assignment) addToCompareMap(m Metadatei, es kennung.EtikettSet, out *Co
 	a.named.Each(
 		func(z obj) (err error) {
 			for _, e := range collections.SortedValues(es) {
+        if z.Kennung == nil {
+          panic(fmt.Sprintf("%s: Kennung is nil", z))
+        }
+
 				out.Named.Add(z.Kennung.String(), e)
 			}
 
@@ -96,7 +104,7 @@ func (a *assignment) addToCompareMap(m Metadatei, es kennung.EtikettSet, out *Co
 	)
 
 	a.unnamed.Each(
-		func(z newObj) (err error) {
+		func(z obj) (err error) {
 			for _, e := range collections.SortedValues(es) {
 				out.Unnamed.Add(z.Bezeichnung.String(), e)
 			}

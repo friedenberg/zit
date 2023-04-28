@@ -14,8 +14,9 @@ import (
 )
 
 type obj struct {
-	Kennung kennung.IdLike
-	bezeichnung.Bezeichnung
+	Kennung     kennung.IdLike
+	Bezeichnung bezeichnung.Bezeichnung
+	IsNew       bool
 }
 
 func makeObj(
@@ -106,7 +107,7 @@ func (z obj) String() string {
 	return fmt.Sprintf("- [%s] %s", z.Kennung, z.Bezeichnung)
 }
 
-func (z *obj) Set(v string) (err error) {
+func (z *obj) setExistingObj(v string) (err error) {
 	remaining := v
 
 	if len(remaining) < 3 {
@@ -150,39 +151,7 @@ func (z *obj) Set(v string) (err error) {
 	return
 }
 
-func sortObjSet(
-	s schnittstellen.MutableSet[obj],
-) (out []obj) {
-	out = s.Elements()
-
-	sort.Slice(out, func(i, j int) bool {
-		if out[i].Bezeichnung == out[j].Bezeichnung {
-			return out[i].Kennung.String() < out[j].Kennung.String()
-		} else {
-			return out[i].Bezeichnung.Less(out[j].Bezeichnung)
-		}
-	})
-
-	return
-}
-
-type newObj struct {
-	bezeichnung.Bezeichnung
-}
-
-func (a newObj) EqualsAny(b any) bool {
-	return values.Equals(a, b)
-}
-
-func (a newObj) Equals(b newObj) bool {
-	if !a.Bezeichnung.Equals(b.Bezeichnung) {
-		return false
-	}
-
-	return true
-}
-
-func (z *newObj) Set(v string) (err error) {
+func (z *obj) setNewObj(v string) (err error) {
 	remaining := v
 
 	if remaining[:2] != "- " {
@@ -197,16 +166,22 @@ func (z *newObj) Set(v string) (err error) {
 		return
 	}
 
+	z.IsNew = true
+
 	return
 }
 
-func sortNewObjSet(
-	s schnittstellen.MutableSet[newObj],
-) (sorted []newObj) {
-	sorted = s.Elements()
+func sortObjSet(
+	s schnittstellen.MutableSet[obj],
+) (out []obj) {
+	out = s.Elements()
 
-	sort.Slice(sorted, func(i, j int) bool {
-		return sorted[i].Bezeichnung.Less(sorted[j].Bezeichnung)
+	sort.Slice(out, func(i, j int) bool {
+		if out[i].Bezeichnung == out[j].Bezeichnung {
+			return out[i].Kennung.String() < out[j].Kennung.String()
+		} else {
+			return out[i].Bezeichnung.Less(out[j].Bezeichnung)
+		}
 	})
 
 	return

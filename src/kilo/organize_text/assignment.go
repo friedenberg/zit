@@ -14,7 +14,7 @@ type assignment struct {
 	depth     int
 	etiketten schnittstellen.Set[kennung.Etikett]
 	named     schnittstellen.MutableSet[obj]
-	unnamed   schnittstellen.MutableSet[newObj]
+	unnamed   schnittstellen.MutableSet[obj]
 	children  []*assignment
 	parent    *assignment
 }
@@ -24,7 +24,7 @@ func newAssignment(d int) *assignment {
 		depth:     d,
 		etiketten: kennung.MakeEtikettSet(),
 		named:     collections.MakeMutableSetStringer[obj](),
-		unnamed:   collections.MakeMutableSetStringer[newObj](),
+		unnamed:   collections.MakeMutableSetStringer[obj](),
 		children:  make([]*assignment, 0),
 	}
 }
