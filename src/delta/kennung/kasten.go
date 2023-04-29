@@ -10,8 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/values"
 )
 
-type Kasten = Kennung[kasten, *kasten]
-
 const KastenRegexString = `^(//)?[-a-z0-9_]+$`
 
 var KastenRegex *regexp.Regexp
@@ -21,9 +19,7 @@ func init() {
 }
 
 func MustKasten(v string) (e Kasten) {
-	var err error
-
-	if e, err = makeKennung[kasten, *kasten](v); err != nil {
+	if err := e.Set(v); err != nil {
 		errors.PanicIfError(err)
 	}
 
@@ -31,7 +27,7 @@ func MustKasten(v string) (e Kasten) {
 }
 
 func MakeKasten(v string) (e Kasten, err error) {
-	if e, err = makeKennung[kasten, *kasten](v); err != nil {
+	if err = e.Set(v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -39,45 +35,75 @@ func MakeKasten(v string) (e Kasten, err error) {
 	return
 }
 
-type kasten string
-
-func (e *kasten) Reset() {
-	*e = kasten("")
+type Kasten struct {
+	value string
 }
 
-func (e *kasten) ResetWith(e1 kasten) {
-	*e = e1
+func (e *Kasten) Reset() {
+	e.value = ""
 }
 
-func (a kasten) EqualsAny(b any) bool {
+func (e *Kasten) ResetWith(e1 Kasten) {
+	e.value = e1.value
+}
+
+func (a Kasten) EqualsAny(b any) bool {
 	return values.Equals(a, b)
 }
 
-func (a kasten) Equals(b kasten) bool {
-	return a == b
+func (a Kasten) Equals(b Kasten) bool {
+	return a.value == b.value
 }
 
-func (o kasten) GetGattung() schnittstellen.Gattung {
+func (o Kasten) GetGattung() schnittstellen.Gattung {
 	return gattung.Kasten
 }
 
-func (e kasten) String() string {
-	return string(e)
+func (k Kasten) String() string {
+	return k.value
 }
 
-// func (e etikett) GetQueryPrefix() string {
-// 	return "//"
-// }
+func (k Kasten) GetQueryPrefix() string {
+	return "//"
+}
 
-func (e *kasten) Set(v string) (err error) {
+func (e *Kasten) Set(v string) (err error) {
 	v = strings.TrimPrefix(v, "//")
 
 	if !KastenRegex.Match([]byte(v)) {
-		err = errors.Errorf("not a valid kasten: '%s'", v)
+		err = errors.Errorf("not a valid Kasten: '%s'", v)
 		return
 	}
 
-	*e = kasten(v)
+	e.value = v
+
+	return
+}
+
+func (t Kasten) MarshalText() (text []byte, err error) {
+	text = []byte(t.String())
+	return
+}
+
+func (t *Kasten) UnmarshalText(text []byte) (err error) {
+	if err = t.Set(string(text)); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (t Kasten) MarshalBinary() (text []byte, err error) {
+	text = []byte(t.String())
+	return
+}
+
+func (t *Kasten) UnmarshalBinary(text []byte) (err error) {
+	if err = t.Set(string(text)); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }
