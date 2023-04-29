@@ -1,6 +1,7 @@
 package kennung
 
 import (
+	"encoding/gob"
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -21,6 +22,7 @@ func once() {
 }
 
 func register(id IdLike) {
+	gob.Register(id)
 	registerOnce.Do(once)
 
 	registryLock.Lock()

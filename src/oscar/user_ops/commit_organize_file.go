@@ -170,7 +170,7 @@ func (c CommitOrganizeFile) Run(
 			return
 		}
 
-		if m.GetTyp().IsEmpty() {
+		if kennung.IsEmpty(m.GetTyp()) {
 			m.Typ = c.Konfig().Akte.DefaultTyp
 		}
 

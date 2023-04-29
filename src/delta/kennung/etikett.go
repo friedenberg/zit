@@ -1,9 +1,7 @@
 package kennung
 
 import (
-	"encoding/gob"
 	"regexp"
-	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
@@ -13,7 +11,6 @@ import (
 
 func init() {
 	register(Etikett{})
-	gob.Register(Etikett{})
 }
 
 const EtikettRegexString = `^[-a-z0-9_]+$`
@@ -111,20 +108,5 @@ func (t *Etikett) UnmarshalBinary(text []byte) (err error) {
 		return
 	}
 
-	return
-}
-
-func SansPrefix(a Etikett) (b Etikett) {
-	b = MustEtikett(strings.TrimPrefix(a.String(), "-"))
-	return
-}
-
-func IsDependentLeaf(a Etikett) (has bool) {
-	has = strings.HasPrefix(strings.TrimSpace(a.String()), "-")
-	return
-}
-
-func HasParentPrefix(a, b Etikett) (has bool) {
-	has = strings.HasPrefix(strings.TrimSpace(a.String()), b.String())
 	return
 }

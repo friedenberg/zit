@@ -26,10 +26,29 @@ func Contains[T schnittstellen.Stringer](a, b T) bool {
 	return strings.HasPrefix(a.String(), b.String())
 }
 
+func Includes[T schnittstellen.Stringer](a, b T) bool {
+	return Contains(b, a)
+}
+
 func Less[T schnittstellen.Stringer](a, b T) bool {
 	return a.String() < b.String()
 }
 
 func IsEmpty[T schnittstellen.Stringer](a T) bool {
 	return len(a.String()) == 0
+}
+
+func SansPrefix(a Etikett) (b Etikett) {
+	b = MustEtikett(strings.TrimPrefix(a.String(), "-"))
+	return
+}
+
+func IsDependentLeaf(a Etikett) (has bool) {
+	has = strings.HasPrefix(strings.TrimSpace(a.String()), "-")
+	return
+}
+
+func HasParentPrefix(a, b Etikett) (has bool) {
+	has = strings.HasPrefix(strings.TrimSpace(a.String()), b.String())
+	return
 }

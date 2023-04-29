@@ -71,7 +71,7 @@ func (z Metadatei) UserInputIsEmpty() bool {
 		return false
 	}
 
-	if !z.Typ.IsEmpty() {
+	if !kennung.IsEmpty(z.Typ) {
 		return false
 	}
 

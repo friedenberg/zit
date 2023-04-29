@@ -161,7 +161,7 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) GetTyp() (t kennung.Typ) {
 		}
 	}
 
-	if t.IsEmpty() {
+	if kennung.IsEmpty(t) {
 		panic("typ is empty")
 	}
 

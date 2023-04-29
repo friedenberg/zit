@@ -40,7 +40,7 @@ func (pz *ProtoZettel) AddToFlagSet(f *flag.FlagSet) {
 func (pz ProtoZettel) Equals(z metadatei.Metadatei) (ok bool) {
 	var okTyp, okMet bool
 
-	if !pz.Metadatei.Typ.IsEmpty() &&
+	if !kennung.IsEmpty(pz.Metadatei.Typ) &&
 		pz.Metadatei.Typ.Equals(z.GetTyp()) {
 		okTyp = true
 	}
@@ -69,8 +69,8 @@ func (pz ProtoZettel) Make() (z *metadatei.Metadatei) {
 func (pz ProtoZettel) Apply(ml metadatei.MetadateiLike) (ok bool) {
 	z := ml.GetMetadatei()
 
-	if z.GetTyp().IsEmpty() &&
-		!pz.Metadatei.Typ.IsEmpty() &&
+	if kennung.IsEmpty(z.GetTyp()) &&
+		!kennung.IsEmpty(pz.Metadatei.Typ) &&
 		!z.GetTyp().Equals(pz.Metadatei.Typ) {
 		ok = true
 		z.Typ = pz.Metadatei.Typ
@@ -101,8 +101,8 @@ func (pz ProtoZettel) ApplyWithAkteFD(
 ) (err error) {
 	z := ml.GetMetadatei()
 
-	if z.GetTyp().IsEmpty() &&
-		!pz.Metadatei.Typ.IsEmpty() &&
+	if kennung.IsEmpty(z.GetTyp()) &&
+		!kennung.IsEmpty(pz.Metadatei.Typ) &&
 		!z.GetTyp().Equals(pz.Metadatei.Typ) {
 		z.Typ = pz.Metadatei.Typ
 	} else {

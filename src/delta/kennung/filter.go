@@ -83,7 +83,7 @@ LOOP:
 
 	ty.Each(
 		func(t Typ) (err error) {
-			if okTyp = t.Includes(typ); okTyp {
+			if okTyp = Includes(t, typ); okTyp {
 				err = collections.MakeErrStopIteration()
 			}
 
