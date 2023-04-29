@@ -32,7 +32,10 @@ func (c CommitOrganizeFile) Run(
 
 	sameTyp := a.Metadatei.Typ.Equals(b.Metadatei.Typ)
 
-	if len(cs.Added) == 0 && len(cs.Removed) == 0 && len(cs.New) == 0 && sameTyp {
+	if len(cs.Added) == 0 &&
+		len(cs.Removed) == 0 &&
+		len(cs.New) == 0 &&
+		sameTyp {
 		errors.Err().Print("no changes")
 		return
 	}
