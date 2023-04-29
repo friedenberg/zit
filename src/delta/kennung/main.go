@@ -28,6 +28,11 @@ type KennungLikePtr[T schnittstellen.Value[T]] interface {
 	schnittstellen.Resetable[T]
 }
 
+type KennungPtr interface {
+	IdLike
+	schnittstellen.Resetter2
+}
+
 func Make(v string) (k IdLike, err error) {
 	{
 		var e Etikett
