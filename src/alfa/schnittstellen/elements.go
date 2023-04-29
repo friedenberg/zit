@@ -9,6 +9,11 @@ type ValueLike interface {
 	Element
 }
 
+type ValuePtrLike interface {
+	ValueLike
+	Setter
+}
+
 type Value[T any] interface {
 	ValueLike
 	Equatable[T]

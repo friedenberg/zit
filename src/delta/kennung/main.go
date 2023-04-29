@@ -17,12 +17,14 @@ type IdLike = schnittstellen.IdLike
 
 type KennungLike[T any] interface {
 	schnittstellen.GattungGetter
-	schnittstellen.Value[T]
+	schnittstellen.ValueLike
 	schnittstellen.Equatable[T]
 }
 
 type KennungLikePtr[T schnittstellen.Value[T]] interface {
-	schnittstellen.ValuePtr[T]
+	KennungLike[T]
+	schnittstellen.ValuePtrLike
+	schnittstellen.SetterPtr[T]
 	schnittstellen.Resetable[T]
 }
 
