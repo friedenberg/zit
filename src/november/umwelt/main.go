@@ -55,7 +55,7 @@ type Umwelt struct {
 	zettelVerzeichnissePool schnittstellen.Pool[zettel.Transacted, *zettel.Transacted]
 }
 
-func Make(kCli erworben.Cli) (u *Umwelt, err error) {
+func Make(kCli erworben.Cli, options Options) (u *Umwelt, err error) {
 	u = &Umwelt{
 		in:                      os.Stdin,
 		out:                     os.Stdout,
@@ -76,16 +76,16 @@ func Make(kCli erworben.Cli) (u *Umwelt, err error) {
 		u.errIsTty = true
 	}
 
-	err = u.Initialize()
+	err = u.Initialize(options)
 
 	return
 }
 
 func (u *Umwelt) Reset() (err error) {
-	return u.Initialize()
+	return u.Initialize(OptionsEmpty)
 }
 
-func (u *Umwelt) Initialize() (err error) {
+func (u *Umwelt) Initialize(options Options) (err error) {
 	if err = u.Flush(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -154,8 +154,12 @@ func (u *Umwelt) Initialize() (err error) {
 			u.standort,
 			u.erworbenCli,
 		); err != nil {
-			err = errors.Wrap(err)
-			return
+			if options.GetAllowKonfigReadError() {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+				return
+			}
 		}
 
 		u.konfig = *k

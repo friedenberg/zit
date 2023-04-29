@@ -234,7 +234,7 @@ func (a *assignment) expandedEtiketten() (es kennung.EtikettSet, err error) {
 
 			e1 := pe.Any()
 
-			if e1.IsEmpty() {
+			if kennung.IsEmpty(e1) {
 				err = errors.Errorf("parent etikett is empty")
 				return
 			}

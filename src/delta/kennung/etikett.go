@@ -1,6 +1,7 @@
 package kennung
 
 import (
+	"encoding/gob"
 	"regexp"
 	"strings"
 
@@ -12,6 +13,7 @@ import (
 
 func init() {
 	register(Etikett{})
+	gob.Register(Etikett{})
 }
 
 const EtikettRegexString = `^[-a-z0-9_]+$`
@@ -22,12 +24,14 @@ func init() {
 	EtikettRegex = regexp.MustCompile(EtikettRegexString)
 }
 
-type Etikett = Kennung[etikett, *etikett]
+type Etikett struct {
+	value string
+}
 
 func MustEtikett(v string) (e Etikett) {
 	var err error
 
-	if e, err = makeKennung[etikett, *etikett](v); err != nil {
+	if err = e.Set(v); err != nil {
 		errors.PanicIfError(err)
 	}
 
@@ -35,7 +39,7 @@ func MustEtikett(v string) (e Etikett) {
 }
 
 func MakeEtikett(v string) (e Etikett, err error) {
-	if e, err = makeKennung[etikett, *etikett](v); err != nil {
+	if err = e.Set(v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -43,43 +47,69 @@ func MakeEtikett(v string) (e Etikett, err error) {
 	return
 }
 
-type etikett string
-
-func (e etikett) GetQueryPrefix() string {
+func (e Etikett) GetQueryPrefix() string {
 	return "-"
 }
 
-func (e etikett) GetGattung() schnittstellen.Gattung {
+func (e Etikett) GetGattung() schnittstellen.Gattung {
 	return gattung.Etikett
 }
 
-func (e *etikett) ResetWith(e1 etikett) {
+func (e *Etikett) ResetWith(e1 Etikett) {
 	*e = e1
 }
 
-func (e *etikett) Reset() {
-	*e = etikett("")
+func (e *Etikett) Reset() {
+	e.value = ""
 }
 
-func (a etikett) EqualsAny(b any) bool {
+func (a Etikett) EqualsAny(b any) bool {
 	return values.Equals(a, b)
 }
 
-func (a etikett) Equals(b etikett) bool {
+func (a Etikett) Equals(b Etikett) bool {
 	return a == b
 }
 
-func (e etikett) String() string {
-	return string(e)
+func (e Etikett) String() string {
+	return e.value
 }
 
-func (e *etikett) Set(v string) (err error) {
+func (e *Etikett) Set(v string) (err error) {
 	if !EtikettRegex.Match([]byte(v)) {
 		err = errors.Errorf("not a valid etikett: '%s'", v)
 		return
 	}
 
-	*e = etikett(v)
+	e.value = v
+
+	return
+}
+
+func (t Etikett) MarshalText() (text []byte, err error) {
+	text = []byte(t.String())
+	return
+}
+
+func (t *Etikett) UnmarshalText(text []byte) (err error) {
+	if err = t.Set(string(text)); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (t Etikett) MarshalBinary() (text []byte, err error) {
+	text = []byte(t.String())
+	return
+}
+
+func (t *Etikett) UnmarshalBinary(text []byte) (err error) {
+	if err = t.Set(string(text)); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }

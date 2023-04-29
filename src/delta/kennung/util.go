@@ -35,7 +35,7 @@ func SubtractPrefix(s1 EtikettSet, e Etikett) (s2 EtikettSet) {
 	s3 := MakeEtikettMutableSet()
 
 	for _, e1 := range s1.Elements() {
-		e2, _ := e1.LeftSubtract(e)
+		e2, _ := LeftSubtract(e1, e)
 
 		if e2.String() == "" {
 			continue
@@ -67,10 +67,10 @@ func WithRemovedCommonPrefixes(s EtikettSet) (s2 EtikettSet) {
 		last := es[idxLast]
 
 		switch {
-		case last.Contains(e):
+		case Contains(last, e):
 			continue
 
-		case e.Contains(last):
+		case Contains(e, last):
 			es[idxLast] = e
 
 		default:
@@ -186,7 +186,7 @@ func Withdraw(s1 EtikettMutableSet, e Etikett) (s2 EtikettSet) {
 	s3 := MakeEtikettMutableSet()
 
 	for _, e1 := range s1.Elements() {
-		if e1.Contains(e) {
+		if Contains(e1, e) {
 			s3.Add(e1)
 		}
 	}

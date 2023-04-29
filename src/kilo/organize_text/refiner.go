@@ -38,7 +38,7 @@ func (atc *Refiner) shouldMergeIntoParent(a *assignment) bool {
 		return false
 	}
 
-	if a.etiketten.Len() == 1 && a.etiketten.Any().IsEmpty() {
+	if a.etiketten.Len() == 1 && kennung.IsEmpty(a.etiketten.Any()) {
 		errors.Log().Print("1 Etikett, and it's empty, merging")
 		return true
 	}
@@ -124,7 +124,7 @@ func (atc *Refiner) renameForPrefixJoint(a *assignment) (err error) {
 
 	var ls kennung.Etikett
 
-	if ls, err = aEtt.LeftSubtract(pEtt); err != nil {
+	if ls, err = kennung.LeftSubtract(aEtt, pEtt); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

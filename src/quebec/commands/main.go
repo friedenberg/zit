@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/debug"
-	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
@@ -82,8 +81,14 @@ func Run(args []string) (exitStatus int) {
 
 	var u *umwelt.Umwelt
 
-	if u, err = umwelt.Make(konfigCli); err != nil {
-		if errors.Is(err, standort.ErrNotInZitDir{}) && cmd.sansUmwelt {
+	options := umwelt.OptionsEmpty
+
+	if og, ok := cmd.Command.(umwelt.OptionsGetter); ok {
+		options = og.GetUmweltInitializeOptions()
+	}
+
+	if u, err = umwelt.Make(konfigCli, options); err != nil {
+		if cmd.sansUmwelt {
 			err = nil
 		} else {
 			err = errors.Wrap(err)

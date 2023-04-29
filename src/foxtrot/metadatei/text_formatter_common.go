@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/format"
+	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
 type textFormatterCommon struct {
@@ -49,7 +50,7 @@ func (f textFormatterCommon) writeCommonMetadateiFormat(
 
 	if m.Etiketten != nil {
 		for _, e := range collections.SortedValues(m.Etiketten) {
-			if e.IsEmpty() {
+			if kennung.IsEmpty(e) {
 				continue
 			}
 

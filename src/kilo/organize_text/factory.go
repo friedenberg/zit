@@ -135,7 +135,10 @@ func (atc Factory) makeChildren(
 
 					var ls kennung.Etikett
 
-					if ls, err = e.LeftSubtract(groupingEtiketten[0]); err != nil {
+					if ls, err = kennung.LeftSubtract(
+						e,
+						groupingEtiketten[0],
+					); err != nil {
 						err = errors.Wrap(err)
 						return
 					}

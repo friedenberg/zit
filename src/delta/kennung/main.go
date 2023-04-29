@@ -168,15 +168,10 @@ func (a Kennung[T, T1]) Less(b Kennung[T, T1]) bool {
 	return a.value.String() < b.value.String()
 }
 
-func (a *Kennung[T, T1]) LeftSubtract(b Kennung[T, T1]) (c Kennung[T, T1], err error) {
-	c.value = *T1(new(T))
-
-	if err = c.Set(strings.TrimPrefix(a.String(), b.String())); err != nil {
-		err = errors.Wrapf(err, "'%s' - '%s'", a, b)
-		return
-	}
-
-	return
+func (a *Kennung[T, T1]) LeftSubtract(
+	b Kennung[T, T1],
+) (c Kennung[T, T1], err error) {
+	return LeftSubtract[Kennung[T, T1], *Kennung[T, T1]](*a, b)
 }
 
 func (a Kennung[T, T1]) IsEmpty() bool {

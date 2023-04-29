@@ -209,10 +209,10 @@ func (z *Metadatei) ApplyGoldenChild(
 
 	switch mode {
 	case etikett_rule.RuleGoldenChildLowest:
-		sortFunc = func(i, j int) bool { return prefixes[j].Less(prefixes[i]) }
+		sortFunc = func(i, j int) bool { return kennung.Less(prefixes[j], prefixes[i]) }
 
 	case etikett_rule.RuleGoldenChildHighest:
-		sortFunc = func(i, j int) bool { return prefixes[i].Less(prefixes[j]) }
+		sortFunc = func(i, j int) bool { return kennung.Less(prefixes[i], prefixes[j]) }
 	}
 
 	sort.Slice(prefixes, sortFunc)

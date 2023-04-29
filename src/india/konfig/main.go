@@ -339,7 +339,7 @@ func (c compiled) GetSortedEtikettenExpanded(
 	)
 
 	sort.Slice(expandedActual, func(i, j int) bool {
-		return expandedActual[i].Sku.Kennung.Len() > expandedActual[j].Sku.Kennung.Len()
+		return len(expandedActual[i].Sku.Kennung.String()) > len(expandedActual[j].Sku.Kennung.String())
 	})
 
 	return

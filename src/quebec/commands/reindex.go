@@ -20,6 +20,10 @@ func init() {
 	)
 }
 
+func (c Reindex) GetUmweltInitializeOptions() umwelt.Options {
+	return umwelt.OptionsAllowKonfigReadError
+}
+
 func (c Reindex) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	if len(args) > 0 {
 		err = errors.Errorf("reindex does not support arguments")
