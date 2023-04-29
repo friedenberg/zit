@@ -50,7 +50,7 @@ func makeObj(
 
 func (a obj) Aligned(maxKopf, maxSchwanz int) (v string) {
 	if h, ok := a.Hinweis(); ok {
-		v = h.Aligned(maxKopf, maxSchwanz)
+		v = kennung.Aligned(h, maxKopf, maxSchwanz)
 	} else if a.Kennung != nil {
 		errors.TodoP1("implement alignment for non hinweis kennung")
 		v = a.Kennung.String()

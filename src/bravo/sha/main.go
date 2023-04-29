@@ -98,6 +98,10 @@ func FromString(s string) Sha {
 	return FromHash(hash)
 }
 
+func FromStringer(v schnittstellen.Stringer) Sha {
+	return FromString(v.String())
+}
+
 func FromHash(h hash.Hash) (s Sha) {
 	s = Sha{}
 	s.value = fmt.Sprintf("%x", h.Sum(nil))

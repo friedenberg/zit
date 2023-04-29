@@ -14,7 +14,7 @@ import (
 )
 
 func (i Zettelen) PageForHinweis(h kennung.Hinweis) (n int, err error) {
-	s := h.GetSha()
+	s := sha.FromStringer(h)
 	return i.PageForSha(s)
 }
 

@@ -1,11 +1,36 @@
 package kennung
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
+
+func AlignedParts[T schnittstellen.Korper](
+	id T,
+	lenKopf, lenSchwanz int,
+) (string, string) {
+	kopf := id.Kopf()
+	diffKopf := lenKopf - len(kopf)
+	if diffKopf > 0 {
+		kopf = strings.Repeat(" ", diffKopf) + kopf
+	}
+
+	schwanz := id.Schwanz()
+	diffSchwanz := lenSchwanz - len(schwanz)
+	if diffSchwanz > 0 {
+		schwanz = schwanz + strings.Repeat(" ", diffSchwanz)
+	}
+
+	return kopf, schwanz
+}
+
+func Aligned[T schnittstellen.Korper](id T, kopf, schwanz int) string {
+	p1, p2 := AlignedParts(id, kopf, schwanz)
+	return fmt.Sprintf("%s/%s", p1, p2)
+}
 
 func LeftSubtract[T schnittstellen.Stringer, TPtr schnittstellen.StringSetterPtr[T]](
 	a, b T,
@@ -32,6 +57,10 @@ func Includes[T schnittstellen.Stringer](a, b T) bool {
 
 func Less[T schnittstellen.Stringer](a, b T) bool {
 	return a.String() < b.String()
+}
+
+func LessLen[T schnittstellen.Stringer](a, b T) bool {
+	return len(a.String()) < len(b.String())
 }
 
 func IsEmpty[T schnittstellen.Stringer](a T) bool {

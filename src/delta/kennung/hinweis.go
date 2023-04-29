@@ -11,9 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/values"
 )
 
-type Hinweis = MitKorper[hinweis, *hinweis]
-
-type hinweis struct {
+type Hinweis struct {
 	left, right string
 }
 
@@ -83,11 +81,11 @@ func MakeHinweis(v string) (h Hinweis, err error) {
 	return
 }
 
-func (a hinweis) EqualsAny(b any) bool {
+func (a Hinweis) EqualsAny(b any) bool {
 	return values.Equals(a, b)
 }
 
-func (a hinweis) Equals(b hinweis) bool {
+func (a Hinweis) Equals(b Hinweis) bool {
 	if a.left != b.left {
 		return false
 	}
@@ -99,24 +97,24 @@ func (a hinweis) Equals(b hinweis) bool {
 	return true
 }
 
-func (h hinweis) Kopf() string {
+func (h Hinweis) Kopf() string {
 	return h.left
 }
 
-func (h hinweis) Schwanz() string {
+func (h Hinweis) Schwanz() string {
 	return h.right
 }
 
-func (h hinweis) String() string {
+func (h Hinweis) String() string {
 	v := fmt.Sprintf("%s/%s", h.left, h.right)
 	return v
 }
 
-func (i hinweis) Less(j hinweis) bool {
+func (i Hinweis) Less(j Hinweis) bool {
 	return i.String() < j.String()
 }
 
-func (h *hinweis) Set(v string) (err error) {
+func (h *Hinweis) Set(v string) (err error) {
 	v = strings.TrimSpace(v)
 	v = strings.ToLower(v)
 	v = strings.Map(
@@ -159,16 +157,44 @@ func (h *hinweis) Set(v string) (err error) {
 	return
 }
 
-func (h *hinweis) Reset() {
+func (h *Hinweis) Reset() {
 	h.left = ""
 	h.right = ""
 }
 
-func (h *hinweis) ResetWith(h1 hinweis) {
+func (h *Hinweis) ResetWith(h1 Hinweis) {
 	h.left = h1.left
 	h.right = h1.right
 }
 
-func (h hinweis) GetGattung() schnittstellen.Gattung {
+func (h Hinweis) GetGattung() schnittstellen.Gattung {
 	return gattung.Zettel
+}
+
+func (t Hinweis) MarshalText() (text []byte, err error) {
+	text = []byte(t.String())
+	return
+}
+
+func (t *Hinweis) UnmarshalText(text []byte) (err error) {
+	if err = t.Set(string(text)); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (t Hinweis) MarshalBinary() (text []byte, err error) {
+	text = []byte(t.String())
+	return
+}
+
+func (t *Hinweis) UnmarshalBinary(text []byte) (err error) {
+	if err = t.Set(string(text)); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }

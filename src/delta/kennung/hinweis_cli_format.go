@@ -34,7 +34,7 @@ func MakeHinweisCliFormat(
 			}
 		}
 
-		p1, p2 := h.AlignedParts(maxKopf, maxSchwanz)
+		p1, p2 := AlignedParts(h, maxKopf, maxSchwanz)
 
 		return format.Write(
 			w,
