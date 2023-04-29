@@ -1,15 +1,12 @@
 package kennung
 
 import (
-	"crypto/sha256"
-	"io"
+	"fmt"
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/bravo/values"
+	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
 type QueryPrefixer interface {
@@ -27,10 +24,6 @@ type KennungLike[T any] interface {
 type KennungLikePtr[T schnittstellen.Value[T]] interface {
 	schnittstellen.ValuePtr[T]
 	schnittstellen.Resetable[T]
-}
-
-type Kennung[T KennungLike[T], T1 KennungLikePtr[T]] struct {
-	value T
 }
 
 func Make(v string) (k IdLike, err error) {
@@ -75,133 +68,341 @@ func Make(v string) (k IdLike, err error) {
 	return
 }
 
-func makeKennung[T KennungLike[T], T1 KennungLikePtr[T]](
-	v string,
-) (k Kennung[T, T1], err error) {
-	k.value = *T1(new(T))
-
-	if err = k.Set(v); err != nil {
-		err = errors.Wrap(err)
+func AlignedParts[T schnittstellen.Korper](
+	id T,
+	lenKopf, lenSchwanz int,
+) (string, string) {
+	kopf := id.Kopf()
+	diffKopf := lenKopf - len(kopf)
+	if diffKopf > 0 {
+		kopf = strings.Repeat(" ", diffKopf) + kopf
 	}
 
-	return
-}
-
-func (e Kennung[T, T1]) GetQueryPrefix() (pre string) {
-	if qp, ok := any(e.value).(QueryPrefixer); ok {
-		pre = qp.GetQueryPrefix()
+	schwanz := id.Schwanz()
+	diffSchwanz := lenSchwanz - len(schwanz)
+	if diffSchwanz > 0 {
+		schwanz = schwanz + strings.Repeat(" ", diffSchwanz)
 	}
 
-	return
+	return kopf, schwanz
 }
 
-func (e Kennung[T, T1]) GetSha() sha.Sha {
-	hash := sha256.New()
-	sr := strings.NewReader(e.String())
-
-	if _, err := io.Copy(hash, sr); err != nil {
-		errors.PanicIfError(err)
-	}
-
-	return sha.FromHash(hash)
+func Aligned[T schnittstellen.Korper](id T, kopf, schwanz int) string {
+	p1, p2 := AlignedParts(id, kopf, schwanz)
+	return fmt.Sprintf("%s/%s", p1, p2)
 }
 
-func (e Kennung[T, T1]) GetGattung() schnittstellen.Gattung {
-	return e.value.GetGattung()
-}
-
-func (e Kennung[T, T1]) String() string {
-	return e.value.String()
-}
-
-func (e *Kennung[T, T1]) Set(v string) (err error) {
-	v1 := strings.ToLower(v)
-	v3 := strings.TrimSpace(v1)
-
-	if v3 == "" {
-		err = errors.Wrap(gattung.ErrEmptyKennung{})
-		return
-	}
-
-	if err = T1(&e.value).Set(v3); err != nil {
-		err = errors.Wrap(err)
+func LeftSubtract[T schnittstellen.Stringer, TPtr schnittstellen.StringSetterPtr[T]](
+	a, b T,
+) (c T, err error) {
+	if err = TPtr(&c).Set(strings.TrimPrefix(a.String(), b.String())); err != nil {
+		err = errors.Wrapf(err, "'%s' - '%s'", a, b)
 		return
 	}
 
 	return
 }
 
-func (e Kennung[T, T1]) Len() int {
-	return len(e.value.String())
-}
-
-func (a Kennung[T, T1]) Includes(b Kennung[T, T1]) bool {
-	return b.Contains(a)
-}
-
-func (a Kennung[T, T1]) Contains(b Kennung[T, T1]) bool {
-	if b.Len() > a.Len() {
+func Contains[T schnittstellen.Stringer](a, b T) bool {
+	if len(b.String()) > len(a.String()) {
 		return false
 	}
 
-	return strings.HasPrefix(a.value.String(), b.value.String())
+	return strings.HasPrefix(a.String(), b.String())
 }
 
-func (a *Kennung[T, T1]) Reset() {
-	var a1 T
-	a.value = a1
+func Includes[T schnittstellen.Stringer](a, b T) bool {
+	return Contains(b, a)
 }
 
-func (a *Kennung[T, T1]) ResetWith(b Kennung[T, T1]) {
-	a.value = b.value
+func Less[T schnittstellen.Stringer](a, b T) bool {
+	return a.String() < b.String()
 }
 
-func (a Kennung[T, T1]) EqualsAny(b any) bool {
-	return values.Equals(a, b)
+func LessLen[T schnittstellen.Stringer](a, b T) bool {
+	return len(a.String()) < len(b.String())
 }
 
-func (a Kennung[T, T1]) Equals(b Kennung[T, T1]) bool {
-	return a.value.Equals(b.value)
+func IsEmpty[T schnittstellen.Stringer](a T) bool {
+	return len(a.String()) == 0
 }
 
-func (a Kennung[T, T1]) Less(b Kennung[T, T1]) bool {
-	return a.value.String() < b.value.String()
-}
-
-func (a *Kennung[T, T1]) LeftSubtract(
-	b Kennung[T, T1],
-) (c Kennung[T, T1], err error) {
-	return LeftSubtract[Kennung[T, T1], *Kennung[T, T1]](*a, b)
-}
-
-func (a Kennung[T, T1]) IsEmpty() bool {
-	return a.Len() == 0
-}
-
-func (t Kennung[T, T1]) MarshalText() (text []byte, err error) {
-	text = []byte(t.String())
+func SansPrefix(a Etikett) (b Etikett) {
+	b = MustEtikett(strings.TrimPrefix(a.String(), "-"))
 	return
 }
 
-func (t *Kennung[T, T1]) UnmarshalText(text []byte) (err error) {
-	if err = t.Set(string(text)); err != nil {
-		err = errors.Wrap(err)
-		return
+func IsDependentLeaf(a Etikett) (has bool) {
+	has = strings.HasPrefix(strings.TrimSpace(a.String()), "-")
+	return
+}
+
+func HasParentPrefix(a, b Etikett) (has bool) {
+	has = strings.HasPrefix(strings.TrimSpace(a.String()), b.String())
+	return
+}
+
+func IntersectPrefixes(s1 EtikettSet, s2 EtikettSet) (s3 EtikettSet) {
+	s4 := MakeEtikettMutableSet()
+
+	for _, e1 := range s2.Elements() {
+		didAdd := false
+
+		for _, e := range s1.Elements() {
+			if strings.HasPrefix(e.String(), e1.String()) {
+				didAdd = true
+				s4.Add(e)
+			}
+		}
+
+		if !didAdd {
+			s3 = MakeEtikettMutableSet()
+			return
+		}
+	}
+
+	s3 = s4.ImmutableClone()
+
+	return
+}
+
+func SubtractPrefix(s1 EtikettSet, e Etikett) (s2 EtikettSet) {
+	s3 := MakeEtikettMutableSet()
+
+	for _, e1 := range s1.Elements() {
+		e2, _ := LeftSubtract(e1, e)
+
+		if e2.String() == "" {
+			continue
+		}
+
+		s3.Add(e2)
+	}
+
+	s2 = s3.ImmutableClone()
+
+	return
+}
+
+func Description(s EtikettSet) string {
+	return collections.StringCommaSeparated[Etikett](s)
+}
+
+func WithRemovedCommonPrefixes(s EtikettSet) (s2 EtikettSet) {
+	es1 := collections.SortedValues(s)
+	es := make([]Etikett, 0, len(es1))
+
+	for _, e := range es1 {
+		if len(es) == 0 {
+			es = append(es, e)
+			continue
+		}
+
+		idxLast := len(es) - 1
+		last := es[idxLast]
+
+		switch {
+		case Contains(last, e):
+			continue
+
+		case Contains(e, last):
+			es[idxLast] = e
+
+		default:
+			es = append(es, e)
+		}
+	}
+
+	s2 = MakeEtikettSet(es...)
+
+	return
+}
+
+func expandOne[T KennungLike[T], TPtr KennungLikePtr[T]](
+	k T,
+	ex Expander,
+	acc schnittstellen.Adder[T],
+) {
+	f := collections.MakeFuncSetString[T, TPtr](acc)
+	ex.Expand(f, k.String())
+}
+
+func ExpandOneSlice[T KennungLike[T], TPtr KennungLikePtr[T]](
+	k T,
+	exes ...Expander,
+) (out []T) {
+	s1 := collections.MakeMutableSetStringer[T]()
+
+	if len(exes) == 0 {
+		exes = []Expander{ExpanderAll}
+	}
+
+	for _, ex := range exes {
+		expandOne[T, TPtr](k, ex, s1)
+	}
+
+	out = collections.SortedValuesBy[T](
+		s1,
+		func(a, b T) bool {
+			return len(a.String()) < len(b.String())
+		},
+	)
+
+	return
+}
+
+func ExpandOne[T KennungLike[T], TPtr KennungLikePtr[T]](
+	k T,
+	exes ...Expander,
+) (out schnittstellen.Set[T]) {
+	s1 := collections.MakeMutableSetStringer[T]()
+
+	if len(exes) == 0 {
+		exes = []Expander{ExpanderAll}
+	}
+
+	for _, ex := range exes {
+		expandOne[T, TPtr](k, ex, s1)
+	}
+
+	out = s1.ImmutableClone()
+
+	return
+}
+
+func ExpandMany[T KennungLike[T], TPtr KennungLikePtr[T]](
+	ks schnittstellen.Set[T],
+	exes ...Expander,
+) (out schnittstellen.Set[T]) {
+	s1 := collections.MakeMutableSetStringer[T]()
+
+	if len(exes) == 0 {
+		exes = []Expander{ExpanderAll}
+	}
+
+	ks.Each(
+		func(k T) (err error) {
+			for _, ex := range exes {
+				expandOne[T, TPtr](k, ex, s1)
+			}
+
+			return
+		},
+	)
+
+	out = s1.ImmutableClone()
+
+	return
+}
+
+func Expanded(s EtikettSet, exes ...Expander) (out EtikettSet) {
+	return ExpandMany[Etikett, *Etikett](s, exes...)
+}
+
+func AddNormalized(es EtikettMutableSet, e Etikett) {
+	ExpandOne(e, ExpanderRight).Each(es.Add)
+	es.Add(e)
+
+	c := es.ImmutableClone()
+	es.Reset()
+	WithRemovedCommonPrefixes(c).Each(es.Add)
+}
+
+func RemovePrefixes(es EtikettMutableSet, needle Etikett) {
+	for _, haystack := range es.Elements() {
+		// TODO-P2 make more efficient
+		if strings.HasPrefix(haystack.String(), needle.String()) {
+			es.Del(haystack)
+		}
+	}
+}
+
+func Withdraw(s1 EtikettMutableSet, e Etikett) (s2 EtikettSet) {
+	s3 := MakeEtikettMutableSet()
+
+	for _, e1 := range s1.Elements() {
+		if Contains(e1, e) {
+			s3.Add(e1)
+		}
+	}
+
+	s3.Each(s1.Del)
+	s2 = s3.ImmutableClone()
+
+	return
+}
+
+func MatchTwoSortedEtikettStringSlices(a, b []string) (hasMatch bool) {
+	var longer, shorter []string
+
+	switch {
+	case len(a) < len(b):
+		shorter = a
+		longer = b
+
+	default:
+		shorter = b
+		longer = a
+	}
+
+	for _, v := range shorter {
+		c := rune(v[0])
+
+		var idx int
+		idx, hasMatch = BinarySearchForRuneInEtikettenSortedStringSlice(longer, c)
+		errors.Err().Print(idx, hasMatch)
+
+		switch {
+		case hasMatch:
+			return
+
+		case idx > len(longer)-1:
+			return
+		}
+
+		longer = longer[idx:]
 	}
 
 	return
 }
 
-func (t Kennung[T, T1]) GobEncode() (by []byte, err error) {
-	by = []byte(t.String())
-	return
-}
+func BinarySearchForRuneInEtikettenSortedStringSlice(
+	haystack []string,
+	needle rune,
+) (idx int, ok bool) {
+	var low, hi int
+	hi = len(haystack) - 1
 
-func (t *Kennung[T, T1]) GobDecode(b []byte) (err error) {
-	if err = t.Set(string(b)); err != nil {
-		err = errors.Wrap(err)
-		return
+	for {
+		idx = ((hi - low) / 2) + low
+		midValRaw := haystack[idx]
+
+		if midValRaw == "" {
+			return
+		}
+
+		midVal := rune(midValRaw[0])
+
+		if hi == low {
+			ok = midVal == needle
+			return
+		}
+
+		switch {
+		case midVal > needle:
+			// search left
+			hi = idx - 1
+			continue
+
+		case midVal == needle:
+			// found
+			ok = true
+			return
+
+		case midVal < needle:
+			// search right
+			low = idx + 1
+			continue
+		}
 	}
-
-	return
 }
