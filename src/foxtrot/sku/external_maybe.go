@@ -14,28 +14,10 @@ type ExternalMaybeLike interface {
 	checkout_mode.Getter
 }
 
-type ExternalFDs struct {
-	Objekte kennung.FD
-	Akte    kennung.FD
-}
-
-func (a ExternalFDs) EqualsAny(b any) bool {
-	return values.Equals(a, b)
-}
-
-func (a ExternalFDs) Equals(b ExternalFDs) bool {
-	if !a.Objekte.Equals(b.Objekte) {
-		return false
-	}
-
-	if !a.Akte.Equals(b.Akte) {
-		return false
-	}
-
-	return true
-}
-
-type ExternalMaybe[T kennung.KennungLike[T], T1 kennung.KennungLikePtr[T]] struct {
+type ExternalMaybe[
+	T kennung.KennungLike[T],
+	T1 kennung.KennungLikePtr[T],
+] struct {
 	Kennung T
 	FDs     ExternalFDs
 }
