@@ -40,15 +40,14 @@ func (c CommitOrganizeFile) Run(
 		return
 	}
 
-	type zettelToUpdate struct {
+	type objekteToUpdate struct {
 		metadatei metadatei.Metadatei
-		objekte   zettel.Objekte
 		kennung   kennung.Hinweis
 	}
 
-	toUpdate := make(map[string]zettelToUpdate)
+	toUpdate := make(map[string]objekteToUpdate)
 
-	addOrGetToZettelToUpdate := func(hString string) (z zettelToUpdate, err error) {
+	addOrGetToZettelToUpdate := func(hString string) (z objekteToUpdate, err error) {
 		var h kennung.Hinweis
 
 		if h, err = store.GetAbbrStore().ExpandHinweisString(hString); err != nil {
@@ -66,7 +65,6 @@ func (c CommitOrganizeFile) Run(
 				return
 			}
 
-			z.objekte = tz.Akte
 			z.kennung = tz.Sku.Kennung
 			z.metadatei = tz.GetMetadatei()
 		}
@@ -75,7 +73,7 @@ func (c CommitOrganizeFile) Run(
 	}
 
 	addEtikettToZettel := func(hString string, e kennung.Etikett) (err error) {
-		var z zettelToUpdate
+		var z objekteToUpdate
 
 		if z, err = addOrGetToZettelToUpdate(hString); err != nil {
 			err = errors.Wrap(err)
@@ -94,7 +92,7 @@ func (c CommitOrganizeFile) Run(
 	}
 
 	removeEtikettFromZettel := func(hString string, e kennung.Etikett) (err error) {
-		var z zettelToUpdate
+		var z objekteToUpdate
 
 		if z, err = addOrGetToZettelToUpdate(hString); err != nil {
 			err = errors.Wrap(err)
@@ -142,7 +140,7 @@ func (c CommitOrganizeFile) Run(
 
 	if !sameTyp {
 		for _, h := range cs.AllB {
-			var z zettelToUpdate
+			var z objekteToUpdate
 
 			if z, err = addOrGetToZettelToUpdate(h); err != nil {
 				err = errors.Wrap(err)
@@ -195,7 +193,7 @@ func (c CommitOrganizeFile) Run(
 		}
 
 		if _, err = store.Zettel().Update(
-			&z.objekte,
+			&zettel.Objekte{},
 			z.metadatei,
 			&z.kennung,
 		); err != nil {

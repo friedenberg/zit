@@ -2,6 +2,17 @@ package metadatei
 
 import "github.com/friedenberg/zit/src/delta/kennung"
 
+type WithKennungLike interface {
+	GetKennung() kennung.IdLike
+	Getter
+}
+
+type WithKennungPtrLike interface {
+	WithKennungLike
+	GetterPtr
+	Setter
+}
+
 type WithKennung struct {
 	Kennung   kennung.KennungPtr
 	Metadatei Metadatei

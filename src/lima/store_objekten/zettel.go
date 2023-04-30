@@ -363,6 +363,47 @@ func (s *zettelStore) Create(
 	return
 }
 
+func (s *zettelStore) UpdateManyMetadatei(
+	incoming schnittstellen.Set[metadatei.WithKennung],
+) (err error) {
+	if err = s.ReadAllSchwanzen(
+		func(zt *zettel.Transacted) (err error) {
+			ke := zt.GetKennung()
+
+			if !gattung.Must(ke.GetGattung()).Equals(gattung.Zettel) {
+				return
+			}
+
+			k := ke.String()
+
+			var mwk metadatei.WithKennung
+			ok := false
+
+			if mwk, ok = incoming.Get(k); !ok {
+				return
+			}
+
+			mwk.Metadatei.AkteSha = sha.Make(zt.GetAkteSha())
+
+			if _, err = s.Update(
+				&zt.Akte,
+				mwk,
+				mwk.Kennung.(*kennung.Hinweis),
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (s *zettelStore) updateExternal(
 	co objekte.ExternalLike,
 ) (tl objekte.TransactedLike, err error) {

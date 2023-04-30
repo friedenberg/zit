@@ -212,3 +212,8 @@ func (s *commonStore[O, OPtr, K, KPtr, V, VPtr]) CheckoutOne(
 
 	return
 }
+
+// func (s *commonStore[O, OPtr, K, KPtr, V, VPtr]) CreateOrUpdateManyMetadateiWithKennung(
+// 	incoming schnittstellen.Set[metadatei.WithKennung],
+// ) (err error) {
+// }

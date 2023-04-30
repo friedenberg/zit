@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/golf/transaktion"
@@ -306,31 +307,31 @@ func (s Store) Flush() (err error) {
 	return
 }
 
-// func (s *Store) CreateOrUpdateManyMetadateiWithKennung(
-//   sc
-// ) (err error) {
-// 	if err = ms.All(
-// 		func(g gattung.Gattung, matcher kennung.Matcher) (err error) {
-// 			r, ok := s.queriers[g]
+func (s *Store) CreateOrUpdateManyMetadateiWithKennung(
+	incoming schnittstellen.Set[metadatei.WithKennung],
+) (err error) {
+	// if err = ms.All(
+	// 	func(g gattung.Gattung, matcher kennung.Matcher) (err error) {
+	// 		r, ok := s.queriers[g]
 
-// 			if !ok {
-// 				return
-// 			}
+	// 		if !ok {
+	// 			return
+	// 		}
 
-// 			if err = r(matcher, f); err != nil {
-// 				err = errors.Wrap(err)
-// 				return
-// 			}
+	// 		if err = r(matcher, f); err != nil {
+	// 			err = errors.Wrap(err)
+	// 			return
+	// 		}
 
-// 			return
-// 		},
-// 	); err != nil {
-// 		err = errors.Wrap(err)
-// 		return
-// 	}
+	// 		return
+	// 	},
+	// ); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
 
-// 	return
-// }
+	return
+}
 
 func (s *Store) Query(
 	ms kennung.MetaSet,

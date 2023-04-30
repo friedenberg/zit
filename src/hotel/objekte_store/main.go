@@ -92,6 +92,12 @@ type CheckedOutUpdater[
 	UpdateCheckedOut(CO) (T, error)
 }
 
+type UpdaterManyMetadatei interface {
+	UpdateManyMetadatei(
+		schnittstellen.Set[metadatei.WithKennung],
+	) error
+}
+
 type CreateOrUpdater[
 	O any,
 	K any,
