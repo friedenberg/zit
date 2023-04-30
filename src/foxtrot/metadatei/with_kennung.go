@@ -1,6 +1,7 @@
 package metadatei
 
 import (
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
@@ -27,6 +28,10 @@ func (a WithKennung) String() string {
 
 func (a WithKennung) GetKennung() kennung.IdLike {
 	return a.Kennung
+}
+
+func (a WithKennung) GetGattung() schnittstellen.Gattung {
+	return a.Kennung.GetGattung()
 }
 
 func (a WithKennung) GetMetadatei() Metadatei {

@@ -40,13 +40,6 @@ type kastenStore struct {
 		kasten.Verzeichnisse,
 		*kasten.Verzeichnisse,
 	]
-
-	objekte_store.CreateOrUpdater[
-		*kasten.Akte,
-		*kennung.Kasten,
-		*kasten.Transacted,
-		*kasten.CheckedOut,
-	]
 }
 
 func makeKastenStore(
@@ -85,7 +78,7 @@ func makeKastenStore(
 		return
 	}
 
-	s.CreateOrUpdater = objekte_store.MakeCreateOrUpdate(
+	s.commonStore.CreateOrUpdater = objekte_store.MakeCreateOrUpdate(
 		sa,
 		sa.GetLockSmith(),
 		sa.ObjekteReaderWriterFactory(gattung.Kasten),

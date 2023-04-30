@@ -37,6 +37,7 @@ type Store struct {
 	readers           map[schnittstellen.Gattung]objekte.FuncReaderTransactedLikePtr
 	queriers          map[schnittstellen.Gattung]objekte.FuncQuerierTransactedLikePtr
 	transactedReaders map[schnittstellen.Gattung]objekte.FuncReaderTransactedLikePtr
+	metadateiUpdaters map[schnittstellen.Gattung]objekte_store.UpdaterManyMetadatei
 
 	isReindexing bool
 }
@@ -161,6 +162,14 @@ func Make(
 	for g, gs := range s.gattungStores {
 		if gs1, ok := gs.(reindexer); ok {
 			s.reindexers[g] = gs1
+		}
+	}
+
+	s.metadateiUpdaters = make(map[schnittstellen.Gattung]objekte_store.UpdaterManyMetadatei)
+
+	for g, gs := range s.gattungStores {
+		if gs1, ok := gs.(objekte_store.UpdaterManyMetadatei); ok {
+			s.metadateiUpdaters[g] = gs1
 		}
 	}
 
@@ -310,9 +319,12 @@ func (s Store) Flush() (err error) {
 func (s *Store) UpdateManyMetadatei(
 	incoming schnittstellen.Set[metadatei.WithKennung],
 ) (err error) {
-	if err = s.zettelStore.UpdateManyMetadatei(incoming); err != nil {
-		err = errors.Wrap(err)
-		return
+	todo.Optimize() // parallelize
+	for _, umm := range s.metadateiUpdaters {
+		if err = umm.UpdateManyMetadatei(incoming); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return

@@ -40,13 +40,6 @@ type etikettStore struct {
 		objekte.NilVerzeichnisse[etikett.Akte],
 		*objekte.NilVerzeichnisse[etikett.Akte],
 	]
-
-	objekte_store.CreateOrUpdater[
-		*etikett.Akte,
-		*kennung.Etikett,
-		*etikett.Transacted,
-		*etikett.CheckedOut,
-	]
 }
 
 func makeEtikettStore(
@@ -85,7 +78,7 @@ func makeEtikettStore(
 		return
 	}
 
-	s.CreateOrUpdater = objekte_store.MakeCreateOrUpdate(
+	s.commonStore.CreateOrUpdater = objekte_store.MakeCreateOrUpdate(
 		sa,
 		sa.GetLockSmith(),
 		sa.ObjekteReaderWriterFactory(gattung.Etikett),

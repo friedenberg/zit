@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/golf/persisted_metadatei_format"
@@ -92,6 +93,26 @@ type commonStore[
 	commonStoreBase[O, OPtr, K, KPtr, V, VPtr]
 	AkteFormat objekte.AkteFormat[O, OPtr]
 	objekte_store.StoredParseSaver[O, OPtr, K, KPtr]
+	objekte_store.CreateOrUpdater[
+		OPtr,
+		KPtr,
+		*objekte.Transacted[
+			O,
+			OPtr,
+			K,
+			KPtr,
+			V,
+			VPtr,
+		],
+		*objekte.CheckedOut[
+			O,
+			OPtr,
+			K,
+			KPtr,
+			V,
+			VPtr,
+		],
+	]
 }
 
 func makeCommonStore[
@@ -213,7 +234,48 @@ func (s *commonStore[O, OPtr, K, KPtr, V, VPtr]) CheckoutOne(
 	return
 }
 
-// func (s *commonStore[O, OPtr, K, KPtr, V, VPtr]) CreateOrUpdateManyMetadateiWithKennung(
-// 	incoming schnittstellen.Set[metadatei.WithKennung],
-// ) (err error) {
-// }
+func (s *commonStore[O, OPtr, K, KPtr, V, VPtr]) UpdateManyMetadatei(
+	incoming schnittstellen.Set[metadatei.WithKennung],
+) (err error) {
+	if !s.StoreUtil.GetLockSmith().IsAcquired() {
+		err = objekte_store.ErrLockRequired{
+			Operation: "update many metadatei",
+		}
+
+		return
+	}
+
+	if err = incoming.Each(
+		func(mwk metadatei.WithKennung) (err error) {
+			var ke KPtr
+			ok := false
+
+			if ke, ok = mwk.GetKennung().(KPtr); !ok {
+				return
+			}
+
+			var old *objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]
+
+			if old, err = s.ReadOne(ke); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if _, err = s.CreateOrUpdater.CreateOrUpdate(
+				&old.Akte,
+				mwk,
+				ke,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}

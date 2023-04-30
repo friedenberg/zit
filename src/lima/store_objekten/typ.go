@@ -40,13 +40,6 @@ type typStore struct {
 		objekte.NilVerzeichnisse[typ.Akte],
 		*objekte.NilVerzeichnisse[typ.Akte],
 	]
-
-	objekte_store.CreateOrUpdater[
-		*typ.Akte,
-		*kennung.Typ,
-		*typ.Transacted,
-		*typ.CheckedOut,
-	]
 }
 
 func makeTypStore(
@@ -85,7 +78,7 @@ func makeTypStore(
 		return
 	}
 
-	s.CreateOrUpdater = objekte_store.MakeCreateOrUpdate(
+	s.commonStore.CreateOrUpdater = objekte_store.MakeCreateOrUpdate(
 		sa,
 		sa.GetLockSmith(),
 		s.commonStore,
