@@ -122,7 +122,7 @@ func (c CreateFromPaths) Run(
 
 			var zt *zettel.Transacted
 
-			if zt, err = c.StoreObjekten().Zettel().Create(z.Akte, z); err != nil {
+			if zt, err = c.StoreObjekten().Zettel().Create(z); err != nil {
 				// TODO-P2 add file for error handling
 				c.handleStoreError(cz, "", err)
 				err = nil

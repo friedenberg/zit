@@ -71,10 +71,9 @@ type Querier[
 }
 
 type Creator[
-	O any,
 	V any,
 ] interface {
-	Create(O, metadatei.Getter) (V, error)
+	Create(metadatei.Getter) (V, error)
 }
 
 type Updater[

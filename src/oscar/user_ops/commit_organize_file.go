@@ -164,8 +164,6 @@ func (c CommitOrganizeFile) Run(
 			Typ:       b.Metadatei.Typ,
 		}
 
-		z := zettel.Objekte{}
-
 		if err = m.Bezeichnung.Set(bez); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -180,7 +178,7 @@ func (c CommitOrganizeFile) Run(
 			continue
 		}
 
-		if _, err = store.Zettel().Create(z, m); err != nil {
+		if _, err = store.Zettel().Create(m); err != nil {
 			err = errors.Errorf("failed to create zettel: %s", err)
 			return
 		}

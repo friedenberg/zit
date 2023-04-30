@@ -33,10 +33,7 @@ type ZettelStore interface {
 		*zettel.Verzeichnisse,
 	]
 
-	objekte_store.Creator[
-		zettel.Objekte,
-		*zettel.Transacted,
-	]
+	objekte_store.Creator[*zettel.Transacted]
 
 	objekte_store.CheckedOutUpdater[
 		zettel.CheckedOut,
@@ -308,7 +305,6 @@ func (i *zettelStore) ReadAll(
 }
 
 func (s *zettelStore) Create(
-	in zettel.Objekte,
 	mg metadatei.Getter,
 ) (tz *zettel.Transacted, err error) {
 	if !s.StoreUtil.GetLockSmith().IsAcquired() {
@@ -347,7 +343,6 @@ func (s *zettelStore) Create(
 	}
 
 	if tz, err = s.writeObjekte(
-		in,
 		m,
 		ken,
 	); err != nil {
@@ -463,7 +458,6 @@ func (s *zettelStore) UpdateCheckedOut(
 	}
 
 	if t, err = s.writeObjekte(
-		co.External.Akte,
 		co.External.GetMetadatei(),
 		co.External.Sku.Kennung,
 	); err != nil {
@@ -533,7 +527,7 @@ func (s *zettelStore) updateLockedWithMutter(
 		return
 	}
 
-	if tz, err = s.writeObjekte(zettel.Objekte{}, m, *h); err != nil {
+	if tz, err = s.writeObjekte(m, *h); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -586,7 +580,6 @@ func (s *zettelStore) commitIndexMatchUpdate(
 }
 
 func (s *zettelStore) writeObjekte(
-	z zettel.Objekte,
 	mg metadatei.Getter,
 	h kennung.Hinweis,
 ) (tz *zettel.Transacted, err error) {
@@ -597,7 +590,6 @@ func (s *zettelStore) writeObjekte(
 	t := s.StoreUtil.GetTai()
 
 	tz = &zettel.Transacted{
-		Akte: z,
 		Sku: sku.Transacted[kennung.Hinweis, *kennung.Hinweis]{
 			Kennung: h,
 			Kopf:    t,
