@@ -49,6 +49,8 @@ type ZettelStore interface {
 		// schnittstellen.Value,
 		*zettel.Transacted,
 	]
+
+	objekte_store.UpdaterManyMetadatei
 }
 
 type zettelStore struct {
@@ -366,6 +368,14 @@ func (s *zettelStore) Create(
 func (s *zettelStore) UpdateManyMetadatei(
 	incoming schnittstellen.Set[metadatei.WithKennung],
 ) (err error) {
+	if !s.StoreUtil.GetLockSmith().IsAcquired() {
+		err = objekte_store.ErrLockRequired{
+			Operation: "update many metadatei",
+		}
+
+		return
+	}
+
 	if err = s.ReadAllSchwanzen(
 		func(zt *zettel.Transacted) (err error) {
 			ke := zt.GetKennung()
@@ -385,10 +395,10 @@ func (s *zettelStore) UpdateManyMetadatei(
 
 			mwk.Metadatei.AkteSha = sha.Make(zt.GetAkteSha())
 
-			if _, err = s.Update(
-				&zt.Akte,
+			if _, err = s.updateLockedWithMutter(
 				mwk,
 				mwk.Kennung.(*kennung.Hinweis),
+				zt,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -486,13 +496,6 @@ func (s *zettelStore) Update(
 		return
 	}
 
-	m := mg.GetMetadatei()
-
-	if err = s.StoreUtil.GetKonfig().ApplyToMetadatei(&m); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	var mutter *zettel.Transacted
 
 	if mutter, err = s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(
@@ -502,7 +505,35 @@ func (s *zettelStore) Update(
 		return
 	}
 
-	if tz, err = s.writeObjekte(*z, m, *h); err != nil {
+	if tz, err = s.updateLockedWithMutter(
+		mg,
+		h,
+		mutter,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *zettelStore) updateLockedWithMutter(
+	mg metadatei.Getter,
+	h *kennung.Hinweis,
+	mutter *zettel.Transacted,
+) (tz *zettel.Transacted, err error) {
+	if mutter == nil {
+		panic("mutter was nil")
+	}
+
+	m := mg.GetMetadatei()
+
+	if err = s.StoreUtil.GetKonfig().ApplyToMetadatei(&m); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if tz, err = s.writeObjekte(zettel.Objekte{}, m, *h); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

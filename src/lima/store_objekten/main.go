@@ -307,28 +307,13 @@ func (s Store) Flush() (err error) {
 	return
 }
 
-func (s *Store) CreateOrUpdateManyMetadateiWithKennung(
+func (s *Store) UpdateManyMetadatei(
 	incoming schnittstellen.Set[metadatei.WithKennung],
 ) (err error) {
-	// if err = ms.All(
-	// 	func(g gattung.Gattung, matcher kennung.Matcher) (err error) {
-	// 		r, ok := s.queriers[g]
-
-	// 		if !ok {
-	// 			return
-	// 		}
-
-	// 		if err = r(matcher, f); err != nil {
-	// 			err = errors.Wrap(err)
-	// 			return
-	// 		}
-
-	// 		return
-	// 	},
-	// ); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
+	if err = s.zettelStore.UpdateManyMetadatei(incoming); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }

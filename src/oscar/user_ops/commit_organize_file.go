@@ -2,6 +2,7 @@ package user_ops
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/juliett/zettel"
@@ -40,14 +41,9 @@ func (c CommitOrganizeFile) Run(
 		return
 	}
 
-	type objekteToUpdate struct {
-		metadatei metadatei.Metadatei
-		kennung   kennung.Hinweis
-	}
+	toUpdate := collections.MakeMutableSetStringer[metadatei.WithKennung]()
 
-	toUpdate := make(map[string]objekteToUpdate)
-
-	addOrGetToZettelToUpdate := func(hString string) (z objekteToUpdate, err error) {
+	addOrGetToZettelToUpdate := func(hString string) (z metadatei.WithKennung, err error) {
 		var h kennung.Hinweis
 
 		if h, err = store.GetAbbrStore().ExpandHinweisString(hString); err != nil {
@@ -57,7 +53,7 @@ func (c CommitOrganizeFile) Run(
 
 		var ok bool
 
-		if z, ok = toUpdate[h.String()]; !ok {
+		if z, ok = toUpdate.Get(h.String()); !ok {
 			var tz *zettel.Transacted
 
 			if tz, err = store.Zettel().ReadOne(&h); err != nil {
@@ -65,47 +61,47 @@ func (c CommitOrganizeFile) Run(
 				return
 			}
 
-			z.kennung = tz.Sku.Kennung
-			z.metadatei = tz.GetMetadatei()
+			z.Kennung = &tz.Sku.Kennung
+			z.Metadatei = tz.GetMetadatei()
 		}
 
 		return
 	}
 
 	addEtikettToZettel := func(hString string, e kennung.Etikett) (err error) {
-		var z objekteToUpdate
+		var z metadatei.WithKennung
 
 		if z, err = addOrGetToZettelToUpdate(hString); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		mes := z.metadatei.Etiketten.MutableClone()
+		mes := z.Metadatei.Etiketten.MutableClone()
 		mes.Add(e)
-		z.metadatei.Etiketten = mes.ImmutableClone()
+		z.Metadatei.Etiketten = mes.ImmutableClone()
 
-		toUpdate[z.kennung.String()] = z
+		toUpdate.Add(z)
 
-		errors.Err().Printf("Added etikett '%s' to zettel '%s'", e, z.kennung)
+		errors.Err().Printf("Added etikett '%s' to zettel '%s'", e, z.Kennung)
 
 		return
 	}
 
 	removeEtikettFromZettel := func(hString string, e kennung.Etikett) (err error) {
-		var z objekteToUpdate
+		var z metadatei.WithKennung
 
 		if z, err = addOrGetToZettelToUpdate(hString); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		mes := z.metadatei.Etiketten.MutableClone()
+		mes := z.Metadatei.Etiketten.MutableClone()
 		kennung.RemovePrefixes(mes, e)
-		z.metadatei.Etiketten = mes.ImmutableClone()
+		z.Metadatei.Etiketten = mes.ImmutableClone()
 
-		toUpdate[z.kennung.String()] = z
+		toUpdate.Add(z)
 
-		errors.Err().Printf("Removed etikett '%s' from zettel '%s'", e, z.kennung)
+		errors.Err().Printf("Removed etikett '%s' from zettel '%s'", e, z.Kennung)
 
 		return
 	}
@@ -140,18 +136,22 @@ func (c CommitOrganizeFile) Run(
 
 	if !sameTyp {
 		for _, h := range cs.AllB {
-			var z objekteToUpdate
+			var z metadatei.WithKennung
 
 			if z, err = addOrGetToZettelToUpdate(h); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			z.metadatei.Typ = b.Metadatei.Typ
+			z.Metadatei.Typ = b.Metadatei.Typ
 
-			toUpdate[z.kennung.String()] = z
+			toUpdate.Add(z)
 
-			errors.Err().Printf("Switched to typ '%s' for zettel '%s'", b.Metadatei.Typ, z.kennung)
+			errors.Err().Printf(
+				"Switched to typ '%s' for zettel '%s'",
+				b.Metadatei.Typ,
+				z.Kennung,
+			)
 		}
 	}
 
@@ -186,19 +186,9 @@ func (c CommitOrganizeFile) Run(
 		}
 	}
 
-	for _, z := range toUpdate {
-		if c.Konfig().DryRun {
-			errors.Out().Printf("[%s] (would update)", z.kennung)
-			continue
-		}
-
-		if _, err = store.Zettel().Update(
-			&zettel.Objekte{},
-			z.metadatei,
-			&z.kennung,
-		); err != nil {
-			errors.Err().Printf("failed to update zettel: %s", err)
-		}
+	if err = store.UpdateManyMetadatei(toUpdate); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return
