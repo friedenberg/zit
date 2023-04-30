@@ -77,11 +77,10 @@ type Creator[
 }
 
 type Updater[
-	O any,
 	K any,
 	V any,
 ] interface {
-	Update(O, metadatei.Getter, K) (V, error)
+	Update(metadatei.Getter, K) (V, error)
 }
 
 type CheckedOutUpdater[
