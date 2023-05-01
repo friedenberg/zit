@@ -17,6 +17,7 @@ import (
 const (
 	Epoch          = 1660007128
 	FormatDateTime = format.StringFormatDateTime
+  FormatDateTai = "%y-%m-%d %H:%M"
 )
 
 type Time struct {
@@ -48,9 +49,9 @@ func (t *Time) MoveForwardIota() {
 	t.time = t.time.Add(tyme.Second)
 }
 
-func (t Time) Format(f string) string {
-	return t.time.Local().Format(f)
-}
+// func (t Time) Format(f string) string {
+// 	return t.time.Local().Format(f)
+// }
 
 func (t Time) String() string {
 	return strconv.FormatInt(t.Unix(), 10)

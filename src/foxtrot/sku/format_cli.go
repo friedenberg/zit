@@ -12,11 +12,13 @@ func MakeTimePrefixWriter[T DataIdentityGetter](
 	f schnittstellen.FuncWriterFormat[T],
 ) schnittstellen.FuncWriterFormat[T] {
 	return func(w io.Writer, e T) (n int64, err error) {
+		t := e.GetDataIdentity().GetTai()
+
 		return format.Write(
 			w,
 			format.MakeFormatStringRightAligned(
 				"%s",
-				e.GetDataIdentity().GetTai().Format(ts.FormatDateTime),
+				t.Format(ts.FormatDateTai),
 			),
 			format.MakeWriter(f, e),
 		)

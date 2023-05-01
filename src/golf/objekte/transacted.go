@@ -20,7 +20,7 @@ type Transacted[
 ] struct {
 	Akte          T
 	Metadatei     metadatei.Metadatei
-	Verzeichnisse T4
+	Verzeichnisse T4 `json:"-"`
 	Sku           sku.Transacted[T2, T3]
 }
 
