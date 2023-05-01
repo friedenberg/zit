@@ -90,7 +90,20 @@ func (c *Organize) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error
 	if err = u.StoreObjekten().Query(
 		ms,
 		func(tl objekte.TransactedLikePtr) (err error) {
-			return getResults.Add(tl.GetMetadateiWithKennung())
+			mwk := tl.GetMetadateiWithKennung()
+
+			if h, ok := mwk.Kennung.(*kennung.Hinweis); ok {
+				if *h, err = u.StoreObjekten().GetAbbrStore().ExpandHinweisString(
+					h.String(),
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				mwk.Kennung = h
+			}
+
+			return getResults.Add(mwk)
 		},
 	); err != nil {
 		err = errors.Wrap(err)

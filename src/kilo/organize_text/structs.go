@@ -31,39 +31,6 @@ func makeObj(
 	return
 }
 
-func abbreviateIfPossible(
-	in kennung.IdLike,
-	abbr schnittstellen.FuncAbbreviateKorper,
-) (out kennung.IdLike) {
-	out = in
-
-	if abbr == nil {
-		return
-	}
-
-	errors.TodoP1("implement abbreviations for all gattung")
-	mk, ok := in.(schnittstellen.Korper)
-
-	if !ok {
-		return
-	}
-
-	var h kennung.Hinweis
-
-	v, err := abbr(mk)
-	if err != nil {
-		return
-	}
-
-	if err = h.Set(v); err != nil {
-		return
-	}
-
-	out = h
-
-	return
-}
-
 func (a obj) Len() int {
 	return len(a.Kennung.String())
 }
