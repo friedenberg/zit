@@ -60,6 +60,10 @@ func (e Typ) String() string {
 	return e.value
 }
 
+func (t Typ) Parts() [3]string {
+	return [3]string{"", "!", t.value}
+}
+
 func (e *Typ) Set(v string) (err error) {
 	v = strings.TrimSpace(strings.Trim(v, ".! "))
 

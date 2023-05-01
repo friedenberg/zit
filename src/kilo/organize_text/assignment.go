@@ -59,6 +59,30 @@ func (a assignment) AlignmentSpacing() int {
 	return 0
 }
 
+func (a assignment) MaxLen() (m int) {
+	a.named.Each(
+		func(z obj) (err error) {
+			oM := z.Len()
+
+			if oM > m {
+				m = oM
+			}
+
+			return
+		},
+	)
+
+	for _, c := range a.children {
+		oM := c.MaxLen()
+
+		if oM > m {
+			m = oM
+		}
+	}
+
+	return
+}
+
 func (a assignment) MaxKopfUndSchwanz() (kopf, schwanz int) {
 	a.named.Each(
 		func(z obj) (err error) {
@@ -208,6 +232,10 @@ func (a *assignment) consume(b *assignment) (err error) {
 
 func (a *assignment) expandedEtiketten() (es kennung.EtikettSet, err error) {
 	es = kennung.MakeEtikettSet()
+
+	if a.etiketten == nil {
+		panic("etiketten are nil")
+	}
 
 	if a.etiketten.Len() != 1 || a.parent == nil {
 		es = a.etiketten.ImmutableClone()

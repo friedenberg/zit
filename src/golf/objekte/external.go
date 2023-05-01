@@ -13,8 +13,8 @@ import (
 type ExternalKeyer[
 	T Akte[T],
 	T1 AktePtr[T],
-	T2 schnittstellen.Id[T2],
-	T3 schnittstellen.IdPtr[T2],
+	T2 kennung.KennungLike[T2],
+	T3 kennung.KennungLikePtr[T2],
 ] struct{}
 
 func (_ ExternalKeyer[T, T1, T2, T3]) Key(e *External[T, T1, T2, T3]) string {
@@ -28,8 +28,8 @@ func (_ ExternalKeyer[T, T1, T2, T3]) Key(e *External[T, T1, T2, T3]) string {
 type External[
 	T Akte[T],
 	T1 AktePtr[T],
-	T2 schnittstellen.Id[T2],
-	T3 schnittstellen.IdPtr[T2],
+	T2 kennung.KennungLike[T2],
+	T3 kennung.KennungLikePtr[T2],
 ] struct {
 	Akte      T
 	Metadatei metadatei.Metadatei

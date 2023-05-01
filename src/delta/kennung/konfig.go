@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/values"
 )
 
@@ -36,6 +35,10 @@ func (i Konfig) String() string {
 	return "konfig"
 }
 
+func (k Konfig) Parts() [3]string {
+	return [3]string{"", "", "konfig"}
+}
+
 func (i Konfig) Set(v string) (err error) {
 	v = strings.TrimSpace(v)
 	v = strings.ToLower(v)
@@ -48,6 +51,30 @@ func (i Konfig) Set(v string) (err error) {
 	return
 }
 
-func (i Konfig) GetSha() sha.Sha {
-	return sha.FromString(i.String())
+func (t Konfig) MarshalText() (text []byte, err error) {
+	text = []byte(t.String())
+	return
+}
+
+func (t *Konfig) UnmarshalText(text []byte) (err error) {
+	if err = t.Set(string(text)); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (t Konfig) MarshalBinary() (text []byte, err error) {
+	text = []byte(t.String())
+	return
+}
+
+func (t *Konfig) UnmarshalBinary(text []byte) (err error) {
+	if err = t.Set(string(text)); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }

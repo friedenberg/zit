@@ -4,12 +4,12 @@ import (
 	"flag"
 	"sync"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
+	"github.com/friedenberg/zit/src/hotel/objekte_collections"
 	"github.com/friedenberg/zit/src/india/konfig"
-	zettel_pkg "github.com/friedenberg/zit/src/juliett/zettel"
 )
 
 type Flags struct {
@@ -23,13 +23,12 @@ type Options struct {
 	wasMade bool
 
 	Konfig konfig.Compiled
-	Abbr   schnittstellen.FuncAbbreviateKorper
 
 	RootEtiketten     schnittstellen.Set[kennung.Etikett]
 	Typ               kennung.Typ
 	GroupingEtiketten kennung.Slice
 	ExtraEtiketten    schnittstellen.Set[kennung.Etikett]
-	Transacted        zettel_pkg.MutableSet
+	Transacted        schnittstellen.Set[metadatei.WithKennung]
 
 	UsePrefixJoints        bool
 	UseRightAlignedIndents bool
@@ -45,7 +44,7 @@ func MakeFlags() Flags {
 		Options: Options{
 			wasMade:           true,
 			GroupingEtiketten: kennung.MakeSlice(),
-			Transacted:        zettel_pkg.MakeMutableSetHinweis(0),
+			Transacted:        objekte_collections.MakeMutableSetMetadateiWithKennung(),
 		},
 	}
 }
@@ -70,11 +69,6 @@ func (o *Flags) GetOptions() Options {
 }
 
 func (o Options) assignmentTreeConstructor() *AssignmentTreeConstructor {
-	errors.TodoP2("improve")
-	if !o.Konfig.PrintAbbreviatedHinweisen {
-		o.Abbr = nil
-	}
-
 	return &AssignmentTreeConstructor{
 		Options: o,
 	}

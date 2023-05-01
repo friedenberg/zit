@@ -6,7 +6,8 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	zettel_pkg "github.com/friedenberg/zit/src/juliett/zettel"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
+	"github.com/friedenberg/zit/src/hotel/objekte_collections"
 )
 
 type Factory struct {
@@ -24,7 +25,8 @@ func (atc *Factory) Make() (ot *Text, err error) {
 	ot.Metadatei.EtikettSet = atc.Options.RootEtiketten
 	ot.Metadatei.Typ = atc.Options.Typ
 
-	prefixSet := atc.Transacted.ToSetPrefixVerzeichnisse()
+	prefixSet := objekte_collections.MakeSetPrefixVerzeichnisse(0)
+	atc.Transacted.Each(prefixSet.Add)
 
 	for _, e := range atc.ExtraEtiketten.Elements() {
 		ee := newAssignment(ot.Depth() + 1)
@@ -33,7 +35,7 @@ func (atc *Factory) Make() (ot *Text, err error) {
 
 		segments := prefixSet.Subset(e)
 
-		var used zettel_pkg.MutableSet
+		var used objekte_collections.MutableSetMetadateiWithKennung
 
 		if used, err = atc.makeChildren(ee, segments.Grouped, kennung.MakeSlice(e)); err != nil {
 			err = errors.Wrap(err)
@@ -58,19 +60,19 @@ func (atc *Factory) Make() (ot *Text, err error) {
 
 func (atc Factory) makeChildren(
 	parent *assignment,
-	prefixSet zettel_pkg.SetPrefixVerzeichnisse,
+	prefixSet objekte_collections.SetPrefixVerzeichnisse,
 	groupingEtiketten kennung.Slice,
-) (used zettel_pkg.MutableSet, err error) {
-	used = zettel_pkg.MakeMutableSetUnique(0)
+) (used objekte_collections.MutableSetMetadateiWithKennung, err error) {
+	used = objekte_collections.MakeMutableSetMetadateiWithKennung()
 
 	if groupingEtiketten.Len() == 0 {
 		prefixSet.ToSet().Each(used.Add)
 
 		err = prefixSet.EachZettel(
-			func(e kennung.Etikett, tz zettel_pkg.Transacted) (err error) {
+			func(e kennung.Etikett, tz metadatei.WithKennung) (err error) {
 				var z obj
 
-				if z, err = makeObj(&tz, atc.Abbr); err != nil {
+				if z, err = makeObj(tz); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -92,10 +94,10 @@ func (atc Factory) makeChildren(
 	segments := prefixSet.Subset(groupingEtiketten[0])
 
 	err = segments.Ungrouped.Each(
-		func(tz *zettel_pkg.Transacted) (err error) {
+		func(tz metadatei.WithKennung) (err error) {
 			var z obj
 
-			if z, err = makeObj(tz, atc.Abbr); err != nil {
+			if z, err = makeObj(tz); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -111,7 +113,7 @@ func (atc Factory) makeChildren(
 	}
 
 	segments.Grouped.Each(
-		func(e kennung.Etikett, zs zettel_pkg.MutableSet) (err error) {
+		func(e kennung.Etikett, zs objekte_collections.MutableSetMetadateiWithKennung) (err error) {
 			if atc.UsePrefixJoints {
 				if parent.etiketten.Len() > 1 {
 				} else {
@@ -151,9 +153,11 @@ func (atc Factory) makeChildren(
 						nextGroupingEtiketten = groupingEtiketten[1:]
 					}
 
-					var usedChild zettel_pkg.MutableSet
+					var usedChild objekte_collections.MutableSetMetadateiWithKennung
 
-					usedChild, err = atc.makeChildren(child, zs.ToSetPrefixVerzeichnisse(), nextGroupingEtiketten)
+					psv := objekte_collections.MakeSetPrefixVerzeichnisse(0)
+					zs.Each(psv.Add)
+					usedChild, err = atc.makeChildren(child, psv, nextGroupingEtiketten)
 
 					if err != nil {
 						err = errors.Wrap(err)
@@ -174,9 +178,11 @@ func (atc Factory) makeChildren(
 					nextGroupingEtiketten = groupingEtiketten[1:]
 				}
 
-				var usedChild zettel_pkg.MutableSet
+				var usedChild objekte_collections.MutableSetMetadateiWithKennung
 
-				usedChild, err = atc.makeChildren(child, zs.ToSetPrefixVerzeichnisse(), nextGroupingEtiketten)
+				psv := objekte_collections.MakeSetPrefixVerzeichnisse(0)
+				zs.Each(psv.Add)
+				usedChild, err = atc.makeChildren(child, psv, nextGroupingEtiketten)
 
 				if err != nil {
 					err = errors.Wrap(err)

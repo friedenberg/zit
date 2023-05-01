@@ -34,7 +34,7 @@ func (c ReadOrganizeFile) RunWithFile(p string) (ot *organize_text.Text, err err
 
 func (c ReadOrganizeFile) Run() (ot *organize_text.Text, err error) {
 	otFlags := organize_text.MakeFlags()
-	otFlags.Abbr = c.Umwelt.StoreObjekten().GetAbbrStore().AbbreviateHinweis
+	// otFlags.Abbr = c.Umwelt.StoreObjekten().GetAbbrStore().AbbreviateHinweis
 
 	if ot, err = organize_text.New(otFlags.GetOptions()); err != nil {
 		err = errors.Wrap(err)

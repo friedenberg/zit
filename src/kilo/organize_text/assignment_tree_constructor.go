@@ -6,7 +6,8 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	zettel_pkg "github.com/friedenberg/zit/src/juliett/zettel"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
+	"github.com/friedenberg/zit/src/hotel/objekte_collections"
 )
 
 type AssignmentTreeConstructor struct {
@@ -20,7 +21,8 @@ func (atc *AssignmentTreeConstructor) Assignments() (roots []*assignment, err er
 	root.etiketten = atc.RootEtiketten
 	roots = append(roots, root)
 
-	prefixSet := atc.Transacted.ToSetPrefixVerzeichnisse()
+	prefixSet := objekte_collections.MakeSetPrefixVerzeichnisse(0)
+	atc.Transacted.Each(prefixSet.Add)
 
 	for _, e := range atc.ExtraEtiketten.Elements() {
 		errors.Err().Printf("making extras: %s", e)
@@ -42,15 +44,15 @@ func (atc *AssignmentTreeConstructor) Assignments() (roots []*assignment, err er
 
 func (atc AssignmentTreeConstructor) makeChildren(
 	parent *assignment,
-	prefixSet zettel_pkg.SetPrefixVerzeichnisse,
+	prefixSet objekte_collections.SetPrefixVerzeichnisse,
 	groupingEtiketten kennung.Slice,
 ) (err error) {
 	if groupingEtiketten.Len() == 0 {
 		err = prefixSet.EachZettel(
-			func(e kennung.Etikett, tz zettel_pkg.Transacted) (err error) {
+			func(e kennung.Etikett, tz metadatei.WithKennung) (err error) {
 				var z obj
 
-				if z, err = makeObj(&tz, atc.Abbr); err != nil {
+				if z, err = makeObj(tz); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -72,10 +74,10 @@ func (atc AssignmentTreeConstructor) makeChildren(
 	segments := prefixSet.Subset(groupingEtiketten[0])
 
 	err = segments.Ungrouped.Each(
-		func(tz *zettel_pkg.Transacted) (err error) {
+		func(tz metadatei.WithKennung) (err error) {
 			var z obj
 
-			if z, err = makeObj(tz, atc.Abbr); err != nil {
+			if z, err = makeObj(tz); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -91,9 +93,9 @@ func (atc AssignmentTreeConstructor) makeChildren(
 	}
 
 	segments.Grouped.Each(
-		func(e kennung.Etikett, zs zettel_pkg.MutableSet) (err error) {
+		func(e kennung.Etikett, zs objekte_collections.MutableSetMetadateiWithKennung) (err error) {
 			if atc.UsePrefixJoints {
-				if parent.etiketten.Len() > 1 {
+				if parent.etiketten != nil && parent.etiketten.Len() > 1 {
 				} else {
 					prefixJoint := kennung.MakeEtikettSet(groupingEtiketten[0])
 
@@ -128,7 +130,9 @@ func (atc AssignmentTreeConstructor) makeChildren(
 						nextGroupingEtiketten = groupingEtiketten[1:]
 					}
 
-					err = atc.makeChildren(child, zs.ToSetPrefixVerzeichnisse(), nextGroupingEtiketten)
+					psv := objekte_collections.MakeSetPrefixVerzeichnisse(0)
+					zs.Each(psv.Add)
+					err = atc.makeChildren(child, psv, nextGroupingEtiketten)
 
 					if err != nil {
 						err = errors.Wrap(err)
@@ -147,7 +151,9 @@ func (atc AssignmentTreeConstructor) makeChildren(
 					nextGroupingEtiketten = groupingEtiketten[1:]
 				}
 
-				err = atc.makeChildren(child, zs.ToSetPrefixVerzeichnisse(), nextGroupingEtiketten)
+				psv := objekte_collections.MakeSetPrefixVerzeichnisse(0)
+				zs.Each(psv.Add)
+				err = atc.makeChildren(child, psv, nextGroupingEtiketten)
 
 				if err != nil {
 					err = errors.Wrap(err)

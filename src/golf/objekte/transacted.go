@@ -13,8 +13,8 @@ import (
 type Transacted[
 	T Akte[T],
 	T1 AktePtr[T],
-	T2 schnittstellen.Id[T2],
-	T3 schnittstellen.IdPtr[T2],
+	T2 kennung.KennungLike[T2],
+	T3 kennung.KennungLikePtr[T2],
 	T4 any,
 	T5 VerzeichnissePtr[T4, T],
 ] struct {
@@ -163,6 +163,23 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) GetTyp() (t kennung.Typ) {
 
 	if kennung.IsEmpty(t) {
 		panic("typ is empty")
+	}
+
+	return
+}
+
+func (a *Transacted[T, T1, T2, T3, T4, T5]) GetMetadateiWithKennung() (m metadatei.WithKennung) {
+	var k2 T2
+
+	T3(&k2).ResetWith(a.Sku.Kennung)
+
+	m = metadatei.WithKennung{
+		Kennung:   T3(&k2),
+		Metadatei: a.GetMetadatei(),
+	}
+
+	if m.Metadatei.Etiketten == nil {
+		m.Metadatei.Etiketten = kennung.MakeEtikettSet()
 	}
 
 	return

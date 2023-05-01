@@ -59,7 +59,11 @@ func (in *Text) ToCompareMap() (out CompareMap, err error) {
 		Unnamed: make(SetKeyToEtiketten),
 	}
 
-	if err = in.assignment.addToCompareMap(in.Metadatei, kennung.MakeEtikettSet(), &out); err != nil {
+	if err = in.assignment.addToCompareMap(
+		in.Metadatei,
+		kennung.MakeEtikettSet(),
+		&out,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -87,9 +91,9 @@ func (a *assignment) addToCompareMap(
 	a.named.Each(
 		func(z obj) (err error) {
 			for _, e := range collections.SortedValues(es) {
-        if z.Kennung == nil {
-          panic(fmt.Sprintf("%s: Kennung is nil", z))
-        }
+				if z.Kennung == nil {
+					panic(fmt.Sprintf("%s: Kennung is nil", z))
+				}
 
 				out.Named.Add(z.Kennung.String(), e)
 			}

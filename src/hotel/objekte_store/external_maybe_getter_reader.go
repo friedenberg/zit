@@ -2,8 +2,8 @@ package objekte_store
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 )
@@ -11,8 +11,8 @@ import (
 type ExternalMaybeGetterReader[
 	O objekte.Akte[O],
 	OPtr objekte.AktePtr[O],
-	K schnittstellen.Id[K],
-	KPtr schnittstellen.IdPtr[K],
+	K kennung.KennungLike[K],
+	KPtr kennung.KennungLikePtr[K],
 	V any,
 	VPtr objekte.VerzeichnissePtr[V, O],
 ] interface {
@@ -24,8 +24,8 @@ type ExternalMaybeGetterReader[
 type externalMaybeGetterReader[
 	O objekte.Akte[O],
 	OPtr objekte.AktePtr[O],
-	K schnittstellen.Id[K],
-	KPtr schnittstellen.IdPtr[K],
+	K kennung.KennungLike[K],
+	KPtr kennung.KennungLikePtr[K],
 	V any,
 	VPtr objekte.VerzeichnissePtr[V, O],
 ] struct {
@@ -38,8 +38,8 @@ type externalMaybeGetterReader[
 func MakeExternalMaybeGetterReader[
 	O objekte.Akte[O],
 	OPtr objekte.AktePtr[O],
-	K schnittstellen.Id[K],
-	KPtr schnittstellen.IdPtr[K],
+	K kennung.KennungLike[K],
+	KPtr kennung.KennungLikePtr[K],
 	V any,
 	VPtr objekte.VerzeichnissePtr[V, O],
 ](
@@ -50,14 +50,7 @@ func MakeExternalMaybeGetterReader[
 		objekte.External[O, OPtr, K, KPtr],
 	],
 ) ExternalMaybeGetterReader[O, OPtr, K, KPtr, V, VPtr] {
-	return externalMaybeGetterReader[
-		O,
-		OPtr,
-		K,
-		KPtr,
-		V,
-		VPtr,
-	]{
+	return externalMaybeGetterReader[O, OPtr, K, KPtr, V, VPtr]{
 		getter:         getter,
 		ExternalReader: er,
 	}

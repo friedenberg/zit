@@ -34,13 +34,13 @@ func MakeHinweisCliFormat(
 			}
 		}
 
-		p1, p2 := AlignedParts(h, maxKopf, maxSchwanz)
+		p1, p2, p3 := AlignedParts(h, maxKopf, maxSchwanz)
 
 		return format.Write(
 			w,
 			cw(format.MakeFormatString("%s", p1), format.ColorTypePointer),
-			format.MakeFormatString("/"),
-			cw(format.MakeFormatString("%s", p2), format.ColorTypePointer),
+			format.MakeFormatString("%s", p2),
+			cw(format.MakeFormatString("%s", p3), format.ColorTypePointer),
 		)
 	}
 }

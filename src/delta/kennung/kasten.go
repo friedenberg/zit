@@ -63,6 +63,10 @@ func (k Kasten) String() string {
 	return k.value
 }
 
+func (k Kasten) Parts() [3]string {
+	return [3]string{"/", "/", k.value}
+}
+
 func (k Kasten) GetQueryPrefix() string {
 	return "//"
 }

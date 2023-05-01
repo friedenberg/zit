@@ -72,6 +72,10 @@ func (e Etikett) String() string {
 	return e.value
 }
 
+func (e Etikett) Parts() [3]string {
+  return [3]string{"", "-", e.value}
+}
+
 func (e *Etikett) Set(v string) (err error) {
 	if !EtikettRegex.Match([]byte(v)) {
 		err = errors.Errorf("not a valid etikett: '%s'", v)

@@ -1,6 +1,7 @@
 package kennung
 
 import (
+	"encoding"
 	"fmt"
 	"strings"
 
@@ -13,9 +14,22 @@ type QueryPrefixer interface {
 	GetQueryPrefix() string
 }
 
-type IdLike = schnittstellen.IdLike
+type IdLike interface {
+	schnittstellen.IdLike
+	encoding.TextMarshaler
+	encoding.BinaryMarshaler
+	Parts() [3]string
+}
+
+type KennungPtr interface {
+	IdLike
+	encoding.TextUnmarshaler
+	encoding.BinaryUnmarshaler
+	schnittstellen.Resetter2
+}
 
 type KennungLike[T any] interface {
+	IdLike
 	schnittstellen.GattungGetter
 	schnittstellen.ValueLike
 	schnittstellen.Equatable[T]
@@ -23,14 +37,10 @@ type KennungLike[T any] interface {
 
 type KennungLikePtr[T schnittstellen.Value[T]] interface {
 	KennungLike[T]
+	KennungPtr
 	schnittstellen.ValuePtrLike
 	schnittstellen.SetterPtr[T]
 	schnittstellen.Resetable[T]
-}
-
-type KennungPtr interface {
-	IdLike
-	schnittstellen.Resetter2
 }
 
 func Make(v string) (k IdLike, err error) {
@@ -75,28 +85,31 @@ func Make(v string) (k IdLike, err error) {
 	return
 }
 
-func AlignedParts[T schnittstellen.Korper](
-	id T,
-	lenKopf, lenSchwanz int,
-) (string, string) {
-	kopf := id.Kopf()
-	diffKopf := lenKopf - len(kopf)
-	if diffKopf > 0 {
-		kopf = strings.Repeat(" ", diffKopf) + kopf
+func AlignedParts(
+	id IdLike,
+	lenLeft, lenRight int,
+) (string, string, string) {
+	parts := id.Parts()
+	left := parts[0]
+	middle := parts[1]
+	right := parts[2]
+
+	diffLeft := lenLeft - len(left)
+	if diffLeft > 0 {
+		left = strings.Repeat(" ", diffLeft) + left
 	}
 
-	schwanz := id.Schwanz()
-	diffSchwanz := lenSchwanz - len(schwanz)
-	if diffSchwanz > 0 {
-		schwanz = schwanz + strings.Repeat(" ", diffSchwanz)
+	diffRight := lenRight - len(right)
+	if diffRight > 0 {
+		right = right + strings.Repeat(" ", diffRight)
 	}
 
-	return kopf, schwanz
+	return left, middle, right
 }
 
-func Aligned[T schnittstellen.Korper](id T, kopf, schwanz int) string {
-	p1, p2 := AlignedParts(id, kopf, schwanz)
-	return fmt.Sprintf("%s/%s", p1, p2)
+func Aligned(id IdLike, lenLeft, lenRight int) string {
+	left, middle, right := AlignedParts(id, lenLeft, lenRight)
+	return fmt.Sprintf("%s%s%s", left, middle, right)
 }
 
 func LeftSubtract[T schnittstellen.Stringer, TPtr schnittstellen.StringSetterPtr[T]](

@@ -12,38 +12,40 @@ teardown() {
 }
 
 cat_organize() (
-	echo ''
-	echo '- [ ach/vil    ] blah'
-	echo ''
-	echo '               # project'
-	echo ''
-	echo '              ##        -2021-zit'
-	echo ''
-	echo '             ###                 -22q1-uws-140'
-	echo ''
-	echo '            ####                              -moving'
-	echo ''
-	echo '- [  io/poliwr ] update billing addresses'
-	echo ''
-	echo '            ####                              -mvp-main_room'
-	echo ''
-	echo '- [prot/nidora ] Brainstorm where to place toolbox.md'
-	echo ''
-	echo '             ###                 -commands'
-	echo ''
-	echo '- [ tec/slowp  ] update output of commands to use new store'
-	echo '- [ mer/golb   ] use error types to generate specific exit status codes'
-	echo ''
-	echo '             ###                 -etiketten_and_organize'
-	echo ''
-	echo '- [  pe/mo     ] add etikett rule type for removing etiketts based on conditions'
-	echo '- [yttr/gole   ] use default etiketten with add'
-	echo ''
-	echo '             ###                 -init'
-	echo ''
-	echo '- [  ph/hitmonc] Add bats test for initing more than once.md'
-	echo '- [ rub/rap    ] add .exrc to init'
-	echo ''
+	cat - <<-EOM
+
+		- [ ach/vil    ] blah
+
+		               # project
+
+		              ##        -2021-zit
+
+		             ###                 -22q1-uws-140
+
+		            ####                              -moving
+
+		- [  io/poliwr ] update billing addresses
+
+		            ####                              -mvp-main_room
+
+		- [prot/nidora ] Brainstorm where to place toolbox.md
+
+		             ###                 -commands
+
+		- [ tec/slowp  ] update output of commands to use new store
+		- [ mer/golb   ] use error types to generate specific exit status codes
+
+		             ###                 -etiketten_and_organize
+
+		- [  pe/mo     ] add etikett rule type for removing etiketts based on conditions
+		- [yttr/gole   ] use default etiketten with add
+
+		             ###                 -init
+
+		- [  ph/hitmonc] Add bats test for initing more than once.md
+		- [ rub/rap    ] add .exrc to init
+
+	EOM
 )
 
 function outputs_organize_one_etikett { # @test

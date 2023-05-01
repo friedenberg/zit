@@ -110,6 +110,10 @@ func (h Hinweis) String() string {
 	return v
 }
 
+func (h Hinweis) Parts() [3]string {
+  return [3]string{h.left, "/", h.right}
+}
+
 func (i Hinweis) Less(j Hinweis) bool {
 	return i.String() < j.String()
 }

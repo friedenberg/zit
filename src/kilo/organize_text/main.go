@@ -92,12 +92,14 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 	lw := format.NewLineWriter()
 
 	kopf, scwhanz := ot.assignment.MaxKopfUndSchwanz()
+	l := ot.assignment.MaxLen()
 
 	aw := assignmentLineWriter{
 		LineWriter:           lw,
 		maxDepth:             ot.assignment.MaxDepth(),
 		maxKopf:              kopf,
-		maxScwhanz:           scwhanz,
+		maxSchwanz:           scwhanz,
+		maxLen:               l,
 		RightAlignedIndents:  ot.UseRightAlignedIndents,
 		OmitLeadingEmptyLine: ot.Options.UseMetadateiHeader && ot.Metadatei.HasMetadateiContent(),
 	}

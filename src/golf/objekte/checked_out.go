@@ -3,15 +3,15 @@ package objekte
 import (
 	"fmt"
 
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/values"
+	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
 type CheckedOut[
 	T Akte[T],
 	T1 AktePtr[T],
-	T2 schnittstellen.Id[T2],
-	T3 schnittstellen.IdPtr[T2],
+	T2 kennung.KennungLike[T2],
+	T3 kennung.KennungLikePtr[T2],
 	T4 any,
 	T5 VerzeichnissePtr[T4, T],
 ] struct {

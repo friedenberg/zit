@@ -9,12 +9,11 @@ import (
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/juliett/zettel"
+	"github.com/friedenberg/zit/src/golf/objekte"
+	"github.com/friedenberg/zit/src/hotel/objekte_collections"
 	"github.com/friedenberg/zit/src/kilo/organize_text"
 	"github.com/friedenberg/zit/src/november/umwelt"
 	"github.com/friedenberg/zit/src/oscar/user_ops"
@@ -63,22 +62,16 @@ func (c *Organize) CompletionGattung() gattungen.Set {
 
 func (c *Organize) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
 	c.Options.Konfig = u.Konfig()
-	c.Options.Abbr = u.StoreObjekten().GetAbbrStore().AbbreviateHinweis
+	// c.Options.Abbr = u.StoreObjekten().GetAbbrStore().AbbreviateHinweis
 
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
 		Umwelt:  u,
 		Options: c.Flags.GetOptions(),
 	}
 
-	ids, ok := ms.GetSet(gattung.Zettel)
+	createOrganizeFileOp.RootEtiketten = ms.GetEtiketten()
 
-	if !ok {
-		ids = ms.MakeSet()
-	}
-
-	createOrganizeFileOp.RootEtiketten = ids.Etiketten.GetIncludes()
-
-	typen := ids.Typen.ImmutableClone()
+	typen := ms.GetTypen()
 
 	switch typen.Len() {
 	case 0:
@@ -92,27 +85,27 @@ func (c *Organize) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error
 		return
 	}
 
-	getResults := zettel.MakeMutableSetUnique(0)
+	getResults := objekte_collections.MakeMutableSetMetadateiWithKennung()
 
-	if err = u.StoreObjekten().Zettel().ReadAllSchwanzen(
-		iter.MakeChain(
-			kennung.MakeMatcherFuncIter[*zettel.Transacted](ids),
-			collections.AddClone[zettel.Transacted, *zettel.Transacted](getResults),
-		),
+	if err = u.StoreObjekten().Query(
+		ms,
+		func(tl objekte.TransactedLikePtr) (err error) {
+			return getResults.Add(tl.GetMetadateiWithKennung())
+		},
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	filterOp := user_ops.FilterZettelsWithScript{
-		Set:    getResults,
-		Filter: c.Filter,
-	}
+	// filterOp := user_ops.FilterZettelsWithScript{
+	// 	Set:    getResults,
+	// 	Filter: c.Filter,
+	// }
 
-	if err = filterOp.Run(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	// if err = filterOp.Run(); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
 
 	createOrganizeFileOp.Transacted = getResults
 

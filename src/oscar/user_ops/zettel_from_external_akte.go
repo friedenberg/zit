@@ -106,9 +106,7 @@ func (c ZettelFromExternalAkte) Run(
 
 		var tz *zettel.Transacted
 
-		if tz, err = c.StoreObjekten().Zettel().Create(
-			z,
-		); err != nil {
+		if tz, err = c.StoreObjekten().Zettel().Create(z); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

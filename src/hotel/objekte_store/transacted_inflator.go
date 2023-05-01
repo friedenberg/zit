@@ -4,6 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/golf/persisted_metadatei_format"
@@ -25,8 +26,8 @@ type AkteStorer[T any] interface {
 type TransactedInflator[
 	T objekte.Akte[T],
 	T1 objekte.AktePtr[T],
-	T2 schnittstellen.Id[T2],
-	T3 schnittstellen.IdPtr[T2],
+	T2 kennung.KennungLike[T2],
+	T3 kennung.KennungLikePtr[T2],
 	T4 any,
 	T5 objekte.VerzeichnissePtr[T4, T],
 ] interface {
@@ -38,8 +39,8 @@ type TransactedInflator[
 type transactedInflator[
 	T objekte.Akte[T],
 	T1 objekte.AktePtr[T],
-	T2 schnittstellen.Id[T2],
-	T3 schnittstellen.IdPtr[T2],
+	T2 kennung.KennungLike[T2],
+	T3 kennung.KennungLikePtr[T2],
 	T4 any,
 	T5 objekte.VerzeichnissePtr[T4, T],
 ] struct {
@@ -56,8 +57,8 @@ type transactedInflator[
 func MakeTransactedInflator[
 	T objekte.Akte[T],
 	T1 objekte.AktePtr[T],
-	T2 schnittstellen.Id[T2],
-	T3 schnittstellen.IdPtr[T2],
+	T2 kennung.KennungLike[T2],
+	T3 kennung.KennungLikePtr[T2],
 	T4 any,
 	T5 objekte.VerzeichnissePtr[T4, T],
 ](

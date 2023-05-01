@@ -199,7 +199,7 @@ func (atc Refiner) applyPrefixJoints(a *assignment) (err error) {
 		return
 	}
 
-	if a.etiketten.Len() == 0 {
+	if a.etiketten == nil || a.etiketten.Len() == 0 {
 		return
 	}
 

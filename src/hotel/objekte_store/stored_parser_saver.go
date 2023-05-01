@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/golf/persisted_metadatei_format"
@@ -15,8 +16,8 @@ import (
 type StoredParseSaver[
 	O objekte.Akte[O],
 	OPtr objekte.AktePtr[O],
-	K schnittstellen.Id[K],
-	KPtr schnittstellen.IdPtr[K],
+	K kennung.KennungLike[K],
+	KPtr kennung.KennungLikePtr[K],
 ] interface {
 	ParseSaveStored(
 		sem sku.ExternalMaybe[K, KPtr],
@@ -27,8 +28,8 @@ type StoredParseSaver[
 type storedParserSaver[
 	O objekte.Akte[O],
 	OPtr objekte.AktePtr[O],
-	K schnittstellen.Id[K],
-	KPtr schnittstellen.IdPtr[K],
+	K kennung.KennungLike[K],
+	KPtr kennung.KennungLikePtr[K],
 ] struct {
 	awf          schnittstellen.AkteWriterFactory
 	akteParser   objekte.AkteParseSaver[OPtr]
@@ -38,8 +39,8 @@ type storedParserSaver[
 func MakeStoredParseSaver[
 	O objekte.Akte[O],
 	OPtr objekte.AktePtr[O],
-	K schnittstellen.Id[K],
-	KPtr schnittstellen.IdPtr[K],
+	K kennung.KennungLike[K],
+	KPtr kennung.KennungLikePtr[K],
 ](
 	owf schnittstellen.ObjekteIOFactory,
 	awf schnittstellen.AkteIOFactory,

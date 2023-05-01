@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
-	"github.com/friedenberg/zit/src/juliett/zettel"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
 
 type obj struct {
@@ -20,45 +20,52 @@ type obj struct {
 }
 
 func makeObj(
-	named *zettel.Transacted,
-	ha schnittstellen.FuncAbbreviateKorper,
+	named metadatei.WithKennung,
 ) (z obj, err error) {
-	h := *named.Kennung()
-
-	if ha != nil {
-		var v string
-
-		if v, err = ha(h); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = h.Set(v); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
 	errors.TodoP4("add bez in a better way")
 	z = obj{
-		Kennung:     h,
+		Kennung:     named.GetKennung(),
 		Bezeichnung: bezeichnung.Make(named.GetMetadatei().Description()),
 	}
 
 	return
 }
 
-func (a obj) Aligned(maxKopf, maxSchwanz int) (v string) {
-	if h, ok := a.Hinweis(); ok {
-		v = kennung.Aligned(h, maxKopf, maxSchwanz)
-	} else if a.Kennung != nil {
-		errors.TodoP1("implement alignment for non hinweis kennung")
-		v = a.Kennung.String()
-	} else {
-		panic("kennung was nil")
+func abbreviateIfPossible(
+	in kennung.IdLike,
+	abbr schnittstellen.FuncAbbreviateKorper,
+) (out kennung.IdLike) {
+	out = in
+
+	if abbr == nil {
+		return
 	}
 
+	errors.TodoP1("implement abbreviations for all gattung")
+	mk, ok := in.(schnittstellen.Korper)
+
+	if !ok {
+		return
+	}
+
+	var h kennung.Hinweis
+
+	v, err := abbr(mk)
+	if err != nil {
+		return
+	}
+
+	if err = h.Set(v); err != nil {
+		return
+	}
+
+	out = h
+
 	return
+}
+
+func (a obj) Len() int {
+	return len(a.Kennung.String())
 }
 
 func (a obj) LenKopfUndSchwanz() (int, int) {
@@ -68,18 +75,10 @@ func (a obj) LenKopfUndSchwanz() (int, int) {
 }
 
 func (a obj) KopfUndSchwanz() (kopf, schwanz string) {
-	if h, ok := a.Hinweis(); ok {
-		kopf = h.Kopf()
-		schwanz = h.Schwanz()
-	} else {
-		schwanz = a.Kennung.String()
-	}
+	parts := a.Kennung.Parts()
+	kopf = parts[0]
+	schwanz = parts[2]
 
-	return
-}
-
-func (a obj) Hinweis() (h kennung.Hinweis, ok bool) {
-	h, ok = a.Kennung.(kennung.Hinweis)
 	return
 }
 

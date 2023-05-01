@@ -21,6 +21,7 @@ type TransactedLikePtr interface {
 	TransactedLike
 	metadatei.GetterPtr
 	metadatei.Setter
+	GetMetadateiWithKennung() metadatei.WithKennung
 }
 
 type StoredLikePtr interface {

@@ -15,7 +15,8 @@ type assignmentLineWriter struct {
 	OmitLeadingEmptyLine bool
 	*format.LineWriter
 	maxDepth            int
-	maxKopf, maxScwhanz int
+	maxKopf, maxSchwanz int
+	maxLen              int
 }
 
 func (av assignmentLineWriter) write(a *assignment) (err error) {
@@ -75,13 +76,23 @@ func (av assignmentLineWriter) writeNormal(a *assignment) (err error) {
 func (av assignmentLineWriter) writeRightAligned(a *assignment) (err error) {
 	spaceCount := av.maxDepth
 
-	hinMaxWidth := av.maxKopf + av.maxScwhanz + 4
+	kopfUndSchwanz := av.maxKopf + av.maxSchwanz
+
+	hinMaxWidth := 4
+
+	extra := 0
+	if kopfUndSchwanz == av.maxLen {
+		hinMaxWidth += kopfUndSchwanz
+	} else {
+		hinMaxWidth += av.maxLen
+		extra = 1
+	}
 
 	if spaceCount < hinMaxWidth {
 		spaceCount = hinMaxWidth
 	}
 
-	tab_prefix := strings.Repeat(" ", hinMaxWidth)
+	tab_prefix := strings.Repeat(" ", spaceCount-extra)
 
 	if a.Depth() == 0 && !av.OmitLeadingEmptyLine {
 		av.WriteExactlyOneEmpty()
@@ -90,7 +101,7 @@ func (av assignmentLineWriter) writeRightAligned(a *assignment) (err error) {
 		return
 	}
 
-	if a.etiketten.Len() > 0 {
+	if a.etiketten != nil && a.etiketten.Len() > 0 {
 		sharps := strings.Repeat("#", a.Depth())
 		alignmentSpacing := strings.Repeat(" ", a.AlignmentSpacing())
 
@@ -112,7 +123,7 @@ func (av assignmentLineWriter) writeRightAligned(a *assignment) (err error) {
 	}
 
 	for _, z := range sortObjSet(a.named) {
-		h := z.Aligned(av.maxKopf, av.maxScwhanz)
+		h := kennung.Aligned(z.Kennung, av.maxKopf, av.maxSchwanz)
 		av.WriteLines(fmt.Sprintf("- [%s] %s", h, z.Bezeichnung))
 	}
 

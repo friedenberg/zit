@@ -17,8 +17,8 @@ import (
 type CommonStoreBase[
 	O objekte.Akte[O],
 	OPtr objekte.AktePtr[O],
-	K schnittstellen.Id[K],
-	KPtr schnittstellen.IdPtr[K],
+	K kennung.KennungLike[K],
+	KPtr kennung.KennungLikePtr[K],
 	V any,
 	VPtr objekte.VerzeichnissePtr[V, O],
 ] interface {
@@ -87,8 +87,8 @@ type CommonStoreBase[
 type commonStoreBase[
 	O objekte.Akte[O],
 	OPtr objekte.AktePtr[O],
-	K schnittstellen.Id[K],
-	KPtr schnittstellen.IdPtr[K],
+	K kennung.KennungLike[K],
+	KPtr kennung.KennungLikePtr[K],
 	V any,
 	VPtr objekte.VerzeichnissePtr[V, O],
 ] struct {
@@ -127,8 +127,8 @@ type commonStoreBase[
 func makeCommonStoreBase[
 	O objekte.Akte[O],
 	OPtr objekte.AktePtr[O],
-	K schnittstellen.Id[K],
-	KPtr schnittstellen.IdPtr[K],
+	K kennung.KennungLike[K],
+	KPtr kennung.KennungLikePtr[K],
 	V any,
 	VPtr objekte.VerzeichnissePtr[V, O],
 ](

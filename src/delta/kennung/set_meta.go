@@ -24,6 +24,8 @@ type MetaSet interface {
 	MakeSet() Set
 	AddFD(fd FD) error
 	GetFDs() schnittstellen.Set[FD]
+	GetEtiketten() schnittstellen.Set[Etikett]
+	GetTypen() schnittstellen.Set[Typ]
 	Set(string) error
 	SetMany(...string) error
 	All(f func(gattung.Gattung, Matcher) error) error
@@ -238,6 +240,26 @@ func (ms metaSet) AddFD(fd FD) (err error) {
 
 func (ms metaSet) GetFDs() schnittstellen.Set[FD] {
 	return ms.FDs
+}
+
+func (ms metaSet) GetEtiketten() schnittstellen.Set[Etikett] {
+	es := MakeEtikettMutableSet()
+
+	for _, s := range ms.Gattung {
+		s.Etiketten.GetIncludes().Each(es.Add)
+	}
+
+	return es
+}
+
+func (ms metaSet) GetTypen() schnittstellen.Set[Typ] {
+	es := MakeTypMutableSet()
+
+	for _, s := range ms.Gattung {
+		s.Typen.Each(es.Add)
+	}
+
+	return es
 }
 
 func (ms metaSet) MakeSet() Set {

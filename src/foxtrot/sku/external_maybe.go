@@ -46,7 +46,7 @@ func (e ExternalMaybe[T, T1]) GetId() schnittstellen.IdLike {
 	return e.Kennung
 }
 
-func (e ExternalMaybe[T, T1]) GetIdLike() schnittstellen.IdLike {
+func (e ExternalMaybe[T, T1]) GetIdLike() kennung.IdLike {
 	return e.Kennung
 }
 
