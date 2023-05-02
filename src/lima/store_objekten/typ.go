@@ -107,6 +107,7 @@ func makeTypStore(
 		},
 		sa.GetAbbrStore(),
 		sa.GetPersistentMetadateiFormat(),
+		sa,
 	)
 
 	return

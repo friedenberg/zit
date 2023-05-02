@@ -63,10 +63,10 @@ function organize_hides_hidden_etiketten_from_organize { # @test
 
 function organize_dry_run { # @test
 	expected_show="$(mktemp)"
-	run_zit show -format log :z,e,t >"$expected_show"
-	assert_success
+	# shellcheck disable=SC2154
+	zit show "${cmd_zit_def[@]}" -format log :z,e,t >"$expected_show"
 
-	run_zit organize -mode commit-directly :z,e,t <<-EOM
+	run_zit organize -dry-run -mode commit-directly :z,e,t <<-EOM
 		# new-etikett-for-all
 		- [   !md   ]
 		- [   -tag  ]
@@ -78,4 +78,8 @@ function organize_dry_run { # @test
 		- [one/uno  ] wow the first
 	EOM
 	assert_success
+
+	run_zit show -format log :z,e,t
+	assert_success
+	assert_output_unsorted "$(cat "$expected_show")"
 }

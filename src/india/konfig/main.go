@@ -243,7 +243,7 @@ func (kc *compiled) recompile() (err error) {
 }
 
 func (kc *Compiled) Flush(s standort.Standort) (err error) {
-	if !kc.hasChanges {
+	if !kc.hasChanges || kc.DryRun {
 		return
 	}
 

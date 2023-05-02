@@ -12,6 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/golf/persisted_metadatei_format"
+	"github.com/friedenberg/zit/src/india/konfig"
 )
 
 type CreateOrUpdateDelegate[T any] struct {
@@ -36,6 +37,7 @@ type createOrUpdate[
 	delegate                  CreateOrUpdateDelegate[*objekte.Transacted[T, T1, T2, T3, T4, T5]]
 	matchableAdder            kennung.MatchableAdder
 	persistentMetadateiFormat persisted_metadatei_format.Format
+	kg                        konfig.Getter
 }
 
 func MakeCreateOrUpdate[
@@ -54,6 +56,7 @@ func MakeCreateOrUpdate[
 	delegate CreateOrUpdateDelegate[*objekte.Transacted[T, T1, T2, T3, T4, T5]],
 	ma kennung.MatchableAdder,
 	pmf persisted_metadatei_format.Format,
+	kg konfig.Getter,
 ) (cou *createOrUpdate[T, T1, T2, T3, T4, T5]) {
 	if pmf == nil {
 		panic("nil persisted_metadatei_format.Format")

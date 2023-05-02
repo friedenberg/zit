@@ -107,6 +107,7 @@ func makeEtikettStore(
 		},
 		sa.GetAbbrStore(),
 		sa.GetPersistentMetadateiFormat(),
+		sa,
 	)
 
 	return

@@ -42,6 +42,8 @@ cmd_zit_def=(
 	-print-time=false
 )
 
+export cmd_zit_def
+
 function copy_from_version {
 	DIR="$1"
 	version="${2:-v$(zit store-version)}"

@@ -107,6 +107,7 @@ func makeKastenStore(
 		},
 		sa.GetAbbrStore(),
 		sa.GetPersistentMetadateiFormat(),
+		sa,
 	)
 
 	return
