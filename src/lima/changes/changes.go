@@ -1,69 +1,109 @@
 package changes
 
 import (
-	"sort"
-
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/kilo/organize_text"
 )
 
-type Change struct {
-	Etikett, Key string
-}
-
-type New struct {
-	Key       string
-	Etiketten kennung.EtikettMutableSet
-}
-
-type Changes struct {
-	Added   []Change
-	Removed []Change
-	New     []New
-	AllB    []string
+type Changes interface {
+	GetExisting() schnittstellen.Set[Change]
+	GetAdded() schnittstellen.Set[Change]
+	GetAllBKeys() schnittstellen.Set[values.String]
 }
 
 type changes struct {
-	Added   []Change
-	Removed []Change
-	New     map[string]kennung.EtikettMutableSet
-	AllB    []string
+	existing schnittstellen.MutableSet[Change]
+	added    schnittstellen.MutableSet[Change]
+	allB     schnittstellen.MutableSet[values.String]
 }
 
-func ChangesFrom(a1, b1 *organize_text.Text) (c1 Changes, err error) {
+func (c changes) GetExisting() schnittstellen.Set[Change] {
+	return c.existing
+}
+
+func (c changes) GetAdded() schnittstellen.Set[Change] {
+	return c.added
+}
+
+func (c changes) GetAllBKeys() schnittstellen.Set[values.String] {
+	return c.allB
+}
+
+func makeCompareMapFromOrganizeTextAndExpander(
+	in *organize_text.Text,
+	hinweis_expander func(string) (kennung.Hinweis, error),
+) (out organize_text.CompareMap, err error) {
+	var preExpansion organize_text.CompareMap
+
+	if preExpansion, err = in.ToCompareMap(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	out = organize_text.CompareMap{
+		Named:   make(organize_text.SetKeyToEtiketten),
+		Unnamed: preExpansion.Unnamed,
+	}
+
+	for h, v := range preExpansion.Named {
+		if h1, err := hinweis_expander(h); err == nil {
+			h = h1.String()
+		}
+
+		err = nil
+
+		out.Named[h] = v
+	}
+
+	return
+}
+
+func ChangesFrom(
+	a1, b1 *organize_text.Text,
+	hinweis_expander func(string) (kennung.Hinweis, error),
+) (c1 Changes, err error) {
 	var c changes
+	c1 = &c
 	var a, b organize_text.CompareMap
 
-	if a, err = a1.ToCompareMap(); err != nil {
+	if a, err = makeCompareMapFromOrganizeTextAndExpander(
+		a1,
+		hinweis_expander,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if b, err = b1.ToCompareMap(); err != nil {
+	if b, err = makeCompareMapFromOrganizeTextAndExpander(
+		b1,
+		hinweis_expander,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	c.Added = make([]Change, 0)
-	c.Removed = make([]Change, 0)
-	c.AllB = make([]string, 0, len(b.Named))
+	c.existing = collections.MakeMutableSetStringer[Change]()
+	c.added = collections.MakeMutableSetStringer[Change]()
+	c.allB = collections.MakeMutableSetStringer[values.String]()
 
 	for h, es1 := range b.Named {
-		c.AllB = append(c.AllB, h)
+		change := Change{
+			Key:     h,
+			added:   kennung.MakeEtikettMutableSet(),
+			removed: kennung.MakeEtikettMutableSet(),
+		}
+
+		c.allB.Add(values.MakeString(h))
 
 		for _, e1 := range es1.Elements() {
 			if a.Named.Contains(h, e1) {
 				// zettel had etikett previously
 			} else {
-				c.Added = append(
-					c.Added,
-					Change{
-						Etikett: e1.String(),
-						Key:     h,
-					},
-				)
+				change.added.Add(e1)
 			}
 
 			if es2, ok := a.Named[h]; ok {
@@ -71,78 +111,47 @@ func ChangesFrom(a1, b1 *organize_text.Text) (c1 Changes, err error) {
 				a.Named[h] = es2
 			}
 		}
+
+		c.existing.Add(change)
 	}
 
 	for h, es := range a.Named {
+		var change Change
+		ok := false
+
+		if change, ok = c.existing.Get(h); !ok {
+			change = Change{
+				Key:     h,
+				added:   kennung.MakeEtikettMutableSet(),
+				removed: kennung.MakeEtikettMutableSet(),
+			}
+		}
+
 		for _, e1 := range es.Elements() {
 			if e1.String() == "" {
 				err = errors.Errorf("empty etikett for %s", h)
 				return
 			}
 
-			c.Removed = append(
-				c.Removed,
-				Change{
-					Etikett: e1.String(),
-					Key:     h,
-				},
-			)
-		}
-	}
-
-	c.New = make(map[string]kennung.EtikettMutableSet)
-
-	addNew := func(bez, ett string) {
-		existing, ok := c.New[bez]
-
-		if !ok {
-			existing = kennung.MakeEtikettMutableSet()
+			change.removed.Add(e1)
 		}
 
-		collections.AddString[kennung.Etikett, *kennung.Etikett](existing, ett)
-		c.New[bez] = existing
+		c.existing.Add(change)
 	}
 
 	for h, es := range b.Unnamed {
-		for _, e := range es.Elements() {
-			addNew(h, e.String())
+		change := Change{
+			Key:     h,
+			added:   kennung.MakeEtikettMutableSet(),
+			removed: kennung.MakeEtikettMutableSet(),
 		}
+
+		for _, e := range es.Elements() {
+			change.added.Add(e)
+		}
+
+		c.added.Add(change)
 	}
-
-	c1 = c.toChanges()
-
-	return
-}
-
-func (c changes) toChanges() (c1 Changes) {
-	c1.Added = c.Added
-	c1.Removed = c.Removed
-	c1.AllB = c.AllB
-	c1.New = make([]New, 0, len(c1.New))
-
-	for h, e := range c.New {
-		c1.New = append(c1.New, New{Key: h, Etiketten: e})
-	}
-
-	sort.Slice(
-		c1.Added,
-		func(i, j int) bool { return c1.Added[i].Key < c1.Added[j].Key },
-	)
-
-	sort.Slice(
-		c1.Removed,
-		func(i, j int) bool { return c1.Removed[i].Key < c1.Removed[j].Key },
-	)
-
-	sort.Slice(
-		c1.AllB,
-		func(i, j int) bool { return c1.AllB[i] < c1.AllB[j] },
-	)
-
-	sort.Slice(
-		c1.New,
-		func(i, j int) bool { return c1.New[i].Key < c1.New[j].Key },
-	)
 
 	return
 }

@@ -119,7 +119,6 @@ function outputs_organize_two_etiketten { # @test
 	run_zit organize "${cmd_def_organize[@]}" -mode commit-directly ok brown <"$expected_organize"
 	assert_success
 	assert_output - <<-EOM
-		Removed etikett 'brown' from zettel 'one/uno'
 		[one/uno@9a638e2b183562da6d3c634d5a3841d64bc337c9cf79f8fffa0d0194659bc564 !md "wow"]
 	EOM
 

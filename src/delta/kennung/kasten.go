@@ -111,3 +111,11 @@ func (t *Kasten) UnmarshalBinary(text []byte) (err error) {
 
 	return
 }
+
+func (t Kasten) KennungClone() Kennung {
+	return t
+}
+
+func (t Kasten) KennungPtrClone() KennungPtr {
+	return &t
+}

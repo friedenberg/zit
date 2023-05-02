@@ -14,22 +14,24 @@ type QueryPrefixer interface {
 	GetQueryPrefix() string
 }
 
-type IdLike interface {
-	schnittstellen.IdLike
+type Kennung interface {
+	schnittstellen.Kennung
 	encoding.TextMarshaler
 	encoding.BinaryMarshaler
 	Parts() [3]string
+	KennungClone() Kennung
 }
 
 type KennungPtr interface {
-	IdLike
+	Kennung
 	encoding.TextUnmarshaler
 	encoding.BinaryUnmarshaler
 	schnittstellen.Resetter2
+	KennungPtrClone() KennungPtr
 }
 
 type KennungLike[T any] interface {
-	IdLike
+	Kennung
 	schnittstellen.GattungGetter
 	schnittstellen.ValueLike
 	schnittstellen.Equatable[T]
@@ -43,7 +45,7 @@ type KennungLikePtr[T schnittstellen.Value[T]] interface {
 	schnittstellen.Resetable[T]
 }
 
-func Make(v string) (k IdLike, err error) {
+func Make(v string) (k Kennung, err error) {
 	{
 		var e Etikett
 
@@ -86,7 +88,7 @@ func Make(v string) (k IdLike, err error) {
 }
 
 func AlignedParts(
-	id IdLike,
+	id Kennung,
 	lenLeft, lenRight int,
 ) (string, string, string) {
 	parts := id.Parts()
@@ -107,7 +109,7 @@ func AlignedParts(
 	return left, middle, right
 }
 
-func Aligned(id IdLike, lenLeft, lenRight int) string {
+func Aligned(id Kennung, lenLeft, lenRight int) string {
 	left, middle, right := AlignedParts(id, lenLeft, lenRight)
 	return fmt.Sprintf("%s%s%s", left, middle, right)
 }

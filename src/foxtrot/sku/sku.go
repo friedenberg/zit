@@ -98,7 +98,7 @@ func (a Sku) GetTime() ts.Time {
 	return a.Tai.AsTime()
 }
 
-func (a Sku) GetId() IdLike {
+func (a Sku) GetId() Kennung {
 	return a.Kennung
 }
 

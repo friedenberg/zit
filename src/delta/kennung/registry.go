@@ -11,17 +11,17 @@ import (
 var (
 	registerOnce        sync.Once
 	registryLock        *sync.Mutex
-	registryGattung     map[gattung.Gattung]IdLike
-	registryQueryPrefix map[string]IdLike
+	registryGattung     map[gattung.Gattung]Kennung
+	registryQueryPrefix map[string]Kennung
 )
 
 func once() {
 	registryLock = &sync.Mutex{}
-	registryGattung = make(map[gattung.Gattung]IdLike)
-	registryQueryPrefix = make(map[string]IdLike)
+	registryGattung = make(map[gattung.Gattung]Kennung)
+	registryQueryPrefix = make(map[string]Kennung)
 }
 
-func register(id IdLike) {
+func register(id Kennung) {
 	gob.Register(id)
 	registerOnce.Do(once)
 
@@ -29,7 +29,7 @@ func register(id IdLike) {
 	defer registryLock.Unlock()
 
 	ok := false
-	var id1 IdLike
+	var id1 Kennung
 	g := gattung.Must(id.GetGattung())
 
 	if id1, ok = registryGattung[g]; ok {

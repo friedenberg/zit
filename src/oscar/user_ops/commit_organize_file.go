@@ -2,9 +2,12 @@ package user_ops
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
+	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/organize_text"
 	"github.com/friedenberg/zit/src/lima/changes"
@@ -24,7 +27,11 @@ func (c CommitOrganizeFile) Run(
 
 	var cs changes.Changes
 
-	if cs, err = changes.ChangesFrom(a, b); err != nil {
+	if cs, err = changes.ChangesFrom(
+		a,
+		b,
+		store.GetAbbrStore().ExpandHinweisString,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -33,17 +40,9 @@ func (c CommitOrganizeFile) Run(
 
 	sameTyp := a.Metadatei.Typ.Equals(b.Metadatei.Typ)
 
-	if len(cs.Added) == 0 &&
-		len(cs.Removed) == 0 &&
-		len(cs.New) == 0 &&
-		sameTyp {
-		errors.Err().Print("no changes")
-		return
-	}
-
 	toUpdate := collections.MakeMutableSetStringer[metadatei.WithKennung]()
 
-	addOrGetToZettelToUpdate := func(hString string) (z metadatei.WithKennung, err error) {
+	_ = func(hString string) (z metadatei.WithKennung, err error) {
 		var h kennung.Hinweis
 
 		if h, err = store.GetAbbrStore().ExpandHinweisString(hString); err != nil {
@@ -68,120 +67,87 @@ func (c CommitOrganizeFile) Run(
 		return
 	}
 
-	addEtikettToZettel := func(hString string, e kennung.Etikett) (err error) {
-		var z metadatei.WithKennung
+	ms := c.Umwelt.MakeMetaIdSet(nil, gattungen.MakeSet(gattung.TrueGattung()...))
+	ms.Set(":z,e,t")
 
-		if z, err = addOrGetToZettelToUpdate(hString); err != nil {
-			err = errors.Wrap(err)
+	if err = store.Query(
+		ms,
+		func(tl objekte.TransactedLikePtr) (err error) {
+			var change changes.Change
+			ok := false
+			k := tl.GetKennungPtr()
+
+			if change, ok = cs.GetExisting().Get(k.String()); !ok {
+				return
+			}
+
+			if sameTyp && change.IsEmpty() {
+				return
+			}
+
+			m := tl.GetMetadatei()
+			mes := m.Etiketten.MutableClone()
+			change.GetRemoved().Each(mes.Del)
+			change.GetAdded().Each(mes.Add)
+			m.Etiketten = mes.ImmutableClone()
+
+			if !sameTyp {
+				m.Typ = b.Metadatei.Typ
+			}
+
+			mwk := metadatei.WithKennung{
+				Kennung:   k.KennungPtrClone(),
+				Metadatei: m,
+			}
+
+			// errors.Err().Printf("mwk: %s", mwk)
+
+			toUpdate.Add(mwk)
+
 			return
-		}
-
-		mes := z.Metadatei.Etiketten.MutableClone()
-		mes.Add(e)
-		z.Metadatei.Etiketten = mes.ImmutableClone()
-
-		toUpdate.Add(z)
-
-		errors.Err().Printf("Added etikett '%s' to zettel '%s'", e, z.Kennung)
-
+		},
+	); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
-	removeEtikettFromZettel := func(hString string, e kennung.Etikett) (err error) {
-		var z metadatei.WithKennung
+	if err = cs.GetAdded().Each(
+		func(change changes.Change) (err error) {
+			bez := change.Key
 
-		if z, err = addOrGetToZettelToUpdate(hString); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+			m := metadatei.Metadatei{
+				Etiketten: change.GetAdded().ImmutableClone(),
+				Typ:       b.Metadatei.Typ,
+			}
 
-		mes := z.Metadatei.Etiketten.MutableClone()
-		kennung.RemovePrefixes(mes, e)
-		z.Metadatei.Etiketten = mes.ImmutableClone()
-
-		toUpdate.Add(z)
-
-		errors.Err().Printf("Removed etikett '%s' from zettel '%s'", e, z.Kennung)
-
-		return
-	}
-
-	for _, c := range cs.Removed {
-		var e kennung.Etikett
-
-		if err = e.Set(c.Etikett); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = removeEtikettFromZettel(c.Key, e); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	for _, c := range cs.Added {
-		var e kennung.Etikett
-
-		if err = e.Set(c.Etikett); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = addEtikettToZettel(c.Key, e); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	if !sameTyp {
-		for _, h := range cs.AllB {
-			var z metadatei.WithKennung
-
-			if z, err = addOrGetToZettelToUpdate(h); err != nil {
+			if err = m.Bezeichnung.Set(bez); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			z.Metadatei.Typ = b.Metadatei.Typ
+			if kennung.IsEmpty(m.GetTyp()) {
+				m.Typ = c.Konfig().Akte.DefaultTyp
+			}
 
-			toUpdate.Add(z)
+			if c.Konfig().DryRun {
+				errors.Out().Printf("[%s] (would create)", m.Bezeichnung)
+				return
+			}
 
-			errors.Err().Printf(
-				"Switched to typ '%s' for zettel '%s'",
-				b.Metadatei.Typ,
-				z.Kennung,
-			)
-		}
+			if _, err = store.Zettel().Create(m); err != nil {
+				err = errors.Errorf("failed to create zettel: %s", err)
+				return
+			}
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
-	for _, n := range cs.New {
-		bez := n.Key
-		etts := n.Etiketten
-
-		m := metadatei.Metadatei{
-			Etiketten: etts.ImmutableClone(),
-			Typ:       b.Metadatei.Typ,
-		}
-
-		if err = m.Bezeichnung.Set(bez); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if kennung.IsEmpty(m.GetTyp()) {
-			m.Typ = c.Konfig().Akte.DefaultTyp
-		}
-
-		if c.Konfig().DryRun {
-			errors.Out().Printf("[%s] (would create)", m.Bezeichnung)
-			continue
-		}
-
-		if _, err = store.Zettel().Create(m); err != nil {
-			err = errors.Errorf("failed to create zettel: %s", err)
-			return
-		}
+	if toUpdate.Len() == 0 && cs.GetAdded().Len() == 0 {
+		errors.Err().Print("no changes")
+		return
 	}
 
 	if err = store.UpdateManyMetadatei(toUpdate); err != nil {

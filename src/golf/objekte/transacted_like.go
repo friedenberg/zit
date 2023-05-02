@@ -9,7 +9,7 @@ import (
 
 type TransactedLike interface {
 	metadatei.Getter
-	GetKennung() kennung.IdLike
+	GetKennung() kennung.Kennung
 	GetAkteSha() schnittstellen.Sha
 	GetSku() sku.Sku
 	GetSkuLike() sku.SkuLike
@@ -22,6 +22,7 @@ type TransactedLikePtr interface {
 	metadatei.GetterPtr
 	metadatei.Setter
 	GetMetadateiWithKennung() metadatei.WithKennung
+	GetKennungPtr() kennung.KennungPtr
 }
 
 type StoredLikePtr interface {

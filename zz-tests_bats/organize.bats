@@ -14,7 +14,7 @@ teardown() {
 	rm_from_version "$version"
 }
 
-function hides_hidden_etiketten_from_organize { # @test
+function organize_hides_hidden_etiketten_from_organize { # @test
 	echo "hide = true" >zz-archive.etikett
 	run_zit checkin -delete .e
 	assert_success
@@ -59,4 +59,23 @@ function hides_hidden_etiketten_from_organize { # @test
 		- project-2021-zit
 		---
 	EOM
+}
+
+function organize_dry_run { # @test
+	expected_show="$(mktemp)"
+	run_zit show -format log :z,e,t >"$expected_show"
+	assert_success
+
+	run_zit organize -mode commit-directly :z,e,t <<-EOM
+		# new-etikett-for-all
+		- [   !md   ]
+		- [   -tag  ]
+		- [   -tag-1]
+		- [   -tag-2]
+		- [   -tag-3]
+		- [   -tag-4]
+		- [one/dos  ] wow ok again
+		- [one/uno  ] wow the first
+	EOM
+	assert_success
 }

@@ -35,11 +35,11 @@ func (u *Umwelt) FormatColorWriter() format.FuncColorWriter {
 	}
 }
 
-func (u *Umwelt) FormatIdLike() schnittstellen.FuncWriterFormat[kennung.IdLike] {
+func (u *Umwelt) FormatIdLike() schnittstellen.FuncWriterFormat[kennung.Kennung] {
 	hf := u.FormatHinweis()
 	tf := u.FormatTyp()
 
-	return func(w io.Writer, v kennung.IdLike) (n int64, err error) {
+	return func(w io.Writer, v kennung.Kennung) (n int64, err error) {
 		switch vt := v.(type) {
 		case kennung.Hinweis:
 			return hf(w, vt)

@@ -73,7 +73,7 @@ func (e Etikett) String() string {
 }
 
 func (e Etikett) Parts() [3]string {
-  return [3]string{"", "-", e.value}
+	return [3]string{"", "-", e.value}
 }
 
 func (e *Etikett) Set(v string) (err error) {
@@ -113,4 +113,12 @@ func (t *Etikett) UnmarshalBinary(text []byte) (err error) {
 	}
 
 	return
+}
+
+func (t Etikett) KennungClone() Kennung {
+	return t
+}
+
+func (t Etikett) KennungPtrClone() KennungPtr {
+	return &t
 }

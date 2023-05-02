@@ -104,3 +104,11 @@ func (t *Typ) UnmarshalBinary(text []byte) (err error) {
 
 	return
 }
+
+func (t Typ) KennungClone() Kennung {
+	return t
+}
+
+func (t Typ) KennungPtrClone() KennungPtr {
+	return &t
+}

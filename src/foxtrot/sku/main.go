@@ -6,16 +6,16 @@ import (
 	"github.com/friedenberg/zit/src/echo/ts"
 )
 
-type IdLike = schnittstellen.Stringer
+type Kennung = schnittstellen.Stringer
 
 type IdLikeGetter interface {
-	GetId() schnittstellen.IdLike
+	GetId() schnittstellen.Kennung
 }
 
 type DataIdentity interface {
 	schnittstellen.ValueLike
 	GetTai() ts.Tai
-	GetId() IdLike
+	GetId() Kennung
 	schnittstellen.GattungGetter
 	GetObjekteSha() schnittstellen.Sha
 	GetAkteSha() schnittstellen.Sha

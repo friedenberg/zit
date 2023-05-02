@@ -10,7 +10,7 @@ import (
 )
 
 func MakeCliFormatTransactedLikePtr(
-	hf schnittstellen.FuncWriterFormat[kennung.IdLike],
+	hf schnittstellen.FuncWriterFormat[kennung.Kennung],
 	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
 	mf schnittstellen.FuncWriterFormat[metadatei.GetterPtr],
 ) schnittstellen.FuncWriterFormat[TransactedLikePtr] {

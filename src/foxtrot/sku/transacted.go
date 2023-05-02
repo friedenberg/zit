@@ -271,7 +271,7 @@ func (s Transacted[T, T1]) GetGattung() schnittstellen.Gattung {
 	return s.Kennung.GetGattung()
 }
 
-func (s Transacted[T, T1]) GetId() IdLike {
+func (s Transacted[T, T1]) GetId() Kennung {
 	return s.Kennung
 }
 

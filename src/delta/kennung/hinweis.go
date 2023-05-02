@@ -111,7 +111,7 @@ func (h Hinweis) String() string {
 }
 
 func (h Hinweis) Parts() [3]string {
-  return [3]string{h.left, "/", h.right}
+	return [3]string{h.left, "/", h.right}
 }
 
 func (i Hinweis) Less(j Hinweis) bool {
@@ -201,4 +201,12 @@ func (t *Hinweis) UnmarshalBinary(text []byte) (err error) {
 	}
 
 	return
+}
+
+func (t Hinweis) KennungClone() Kennung {
+	return t
+}
+
+func (t Hinweis) KennungPtrClone() KennungPtr {
+	return &t
 }

@@ -21,6 +21,11 @@ import (
 
 // TODO-P4 make generic
 type AbbrStore interface {
+	// KennungExists(kennung.KennungLike) error
+	// ExpandKennungString(string) (kennung.KennungLike, error)
+	// ExpandKennung(kennung.KennungLike) (kennung.KennungLike, error)
+	// AbbreviateKennung(kennung.KennungLike) (kennung.KennungLike, error)
+
 	HinweisExists(kennung.Hinweis) error
 	ExpandHinweisString(string) (kennung.Hinweis, error)
 	AbbreviateHinweis(schnittstellen.Korper) (string, error)

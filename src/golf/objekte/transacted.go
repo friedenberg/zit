@@ -185,7 +185,7 @@ func (a *Transacted[T, T1, T2, T3, T4, T5]) GetMetadateiWithKennung() (m metadat
 	return
 }
 
-func (a Transacted[T, T1, T2, T3, T4, T5]) GetIdLike() (il kennung.IdLike) {
+func (a Transacted[T, T1, T2, T3, T4, T5]) GetIdLike() (il kennung.Kennung) {
 	return a.Sku.Kennung
 }
 
@@ -203,8 +203,12 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) GetSku() (sk sku.Sku) {
 	return
 }
 
-func (a Transacted[T, T1, T2, T3, T4, T5]) GetKennung() kennung.IdLike {
+func (a Transacted[T, T1, T2, T3, T4, T5]) GetKennung() kennung.Kennung {
 	return a.Sku.Kennung
+}
+
+func (a *Transacted[T, T1, T2, T3, T4, T5]) GetKennungPtr() kennung.KennungPtr {
+	return T3(&a.Sku.Kennung)
 }
 
 func (a Transacted[T, T1, T2, T3, T4, T5]) GetDataIdentity() (di sku.DataIdentity) {

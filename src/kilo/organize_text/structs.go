@@ -14,7 +14,7 @@ import (
 )
 
 type obj struct {
-	Kennung     kennung.IdLike
+	Kennung     kennung.Kennung
 	Bezeichnung bezeichnung.Bezeichnung
 	IsNew       bool
 }

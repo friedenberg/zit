@@ -17,7 +17,7 @@ cmd_def_organize_v3=(
 	-refine=true
 )
 
-function outputs_organize_one_etikett { # @test
+function organize_v3_outputs_organize_one_etikett { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
@@ -57,7 +57,7 @@ function outputs_organize_one_etikett { # @test
 	assert_output "$(cat "$expected_organize")"
 }
 
-function outputs_organize_two_etiketten { # @test
+function organize_v3_outputs_organize_two_etiketten { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
@@ -102,8 +102,11 @@ function outputs_organize_two_etiketten { # @test
 		echo
 	} >"$expected_organize"
 
-	run_zit organize "${cmd_def_organize_v3[@]}" -verbose -mode commit-directly ok brown <"$expected_organize"
+	run_zit organize "${cmd_def_organize_v3[@]}" -mode commit-directly ok brown <"$expected_organize"
 	assert_success
+	assert_output - <<-EOM
+		[one/uno@9a638e2b183562da6d3c634d5a3841d64bc337c9cf79f8fffa0d0194659bc564 !md "wow"]
+	EOM
 
 	expected_zettel="$(mktemp)"
 	{
@@ -119,7 +122,7 @@ function outputs_organize_two_etiketten { # @test
 	assert_output "$(cat "$expected_zettel")"
 }
 
-function outputs_organize_one_etiketten_group_by_one { # @test
+function organize_v3_outputs_organize_one_etiketten_group_by_one { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
@@ -168,7 +171,7 @@ function outputs_organize_one_etiketten_group_by_one { # @test
 	assert_output "$(cat "$expected_organize")"
 }
 
-function outputs_organize_two_zettels_one_etiketten_group_by_one { # @test
+function organize_v3_outputs_organize_two_zettels_one_etiketten_group_by_one { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
@@ -232,7 +235,7 @@ function outputs_organize_two_zettels_one_etiketten_group_by_one { # @test
 	assert_output "$(cat "$expected_organize")"
 }
 
-function commits_organize_one_etiketten_group_by_two { # @test
+function organize_v3_commits_organize_one_etiketten_group_by_two { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
@@ -335,7 +338,7 @@ function commits_organize_one_etiketten_group_by_two { # @test
 	assert_output "$(cat "$to_add")"
 }
 
-function commits_organize_one_etiketten_group_by_two_new_zettels { # @test
+function organize_v3_commits_organize_one_etiketten_group_by_two_new_zettels { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
@@ -494,7 +497,7 @@ function commits_organize_one_etiketten_group_by_two_new_zettels { # @test
 	# assert_output "$(cat "$expected")"
 }
 
-function commits_no_changes { # @test
+function organize_v3_commits_no_changes { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
@@ -597,7 +600,7 @@ function commits_no_changes { # @test
 	assert_output "$(cat "$three")"
 }
 
-function commits_dependent_leaf { # @test
+function organize_v3_commits_dependent_leaf { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
@@ -708,7 +711,7 @@ function commits_dependent_leaf { # @test
 	assert_output "$(cat "$three")"
 }
 
-function zettels_in_correct_places { # @test
+function organize_v3_zettels_in_correct_places { # @test
 	cd "$BATS_TEST_TMPDIR" || exit 1
 	run_zit_init_disable_age
 
@@ -739,7 +742,7 @@ function zettels_in_correct_places { # @test
 	EOM
 }
 
-function etiketten_correct { # @test
+function organize_v3_etiketten_correct { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 

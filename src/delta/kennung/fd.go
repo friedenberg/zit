@@ -249,7 +249,7 @@ func (f FD) IsEmpty() bool {
 	return false
 }
 
-func (f FD) GetIdLike() (il IdLike, err error) {
+func (f FD) GetIdLike() (il Kennung, err error) {
 	var h Hinweis
 
 	if h, err = f.GetHinweis(); err == nil {

@@ -78,3 +78,11 @@ func (t *Konfig) UnmarshalBinary(text []byte) (err error) {
 
 	return
 }
+
+func (t Konfig) KennungClone() Kennung {
+	return t
+}
+
+func (t Konfig) KennungPtrClone() KennungPtr {
+	return &t
+}

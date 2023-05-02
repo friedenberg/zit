@@ -7,7 +7,7 @@ import (
 )
 
 type WithKennungLike interface {
-	GetKennung() kennung.IdLike
+	GetKennung() kennung.Kennung
 	Getter
 }
 
@@ -26,7 +26,7 @@ func (a WithKennung) String() string {
 	return a.Kennung.String()
 }
 
-func (a WithKennung) GetKennung() kennung.IdLike {
+func (a WithKennung) GetKennung() kennung.Kennung {
 	return a.Kennung
 }
 

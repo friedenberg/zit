@@ -17,7 +17,7 @@ type TypGetter interface {
 }
 
 type IdLikeGetter interface {
-	GetIdLike() IdLike
+	GetIdLike() Kennung
 }
 
 type Matchable interface {

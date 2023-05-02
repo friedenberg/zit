@@ -25,7 +25,7 @@ type ValuePtr[T any] interface {
 	Setter
 }
 
-type IdLike interface {
+type Kennung interface {
 	GattungGetter
 	ValueLike
 }
