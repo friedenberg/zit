@@ -212,7 +212,7 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 	)
 
 	u.storeObjekten.Konfig().SetLogWriter(
-		store_objekten.KonfigLogWriter{
+		objekte_store.LogWriter[*erworben.Transacted]{
 			Updated:   u.PrinterKonfigTransacted(),
 			Unchanged: u.PrinterKonfigTransacted(),
 		},

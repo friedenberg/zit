@@ -13,10 +13,25 @@ function init_and_deinit { # @test
 
 	run_zit_init_disable_age
 
-	[[ -f .zit/KonfigAngeboren ]]
+	run test -f .zit/KonfigAngeboren
+	assert_success
+
+	# run cat .zit/Objekten/Akten/c1/a8ed3cf288dd5d7ccdfd6b9c8052a925bc56be2ec97ed0bb345ab1d961c685
+	# assert_output wow
+	run_zit show -format log :konfig
+	assert_success
+	assert_output - <<-EOM
+		[konfig@62c02b6f59e6de576a3fcc1b89db6e85b75c2ff7820df3049a5b12f9db86d1f5]
+	EOM
 
 	run_zit deinit
 	assert_success
+	# assert_output wow
+
+	# run test ! -f .zit/KonfigAngeboren
+	# run ls .zit/
+	# assert_success
+	# assert_output wow
 }
 
 # function init_and_init { ## @test

@@ -100,8 +100,6 @@ func (c CommitOrganizeFile) Run(
 				Metadatei: m,
 			}
 
-			// errors.Err().Printf("mwk: %s", mwk)
-
 			toUpdate.Add(mwk)
 
 			return

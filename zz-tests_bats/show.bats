@@ -189,3 +189,10 @@ function show_simple_etikett_history { # @test
 		[-tag-1@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
 	EOM
 }
+
+function show_konfig { # @test
+	run_zit show -format log +konfig
+	assert_output_unsorted - <<-EOM
+		[konfig@62c02b6f59e6de576a3fcc1b89db6e85b75c2ff7820df3049a5b12f9db86d1f5]
+	EOM
+}

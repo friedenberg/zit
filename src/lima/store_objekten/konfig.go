@@ -3,55 +3,43 @@ package store_objekten
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/alfa/toml"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
-	"github.com/friedenberg/zit/src/golf/persisted_metadatei_format"
+	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
+	"github.com/friedenberg/zit/src/india/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/kilo/store_util"
 )
 
 type KonfigStore interface {
-	reindexer
-
 	GetAkteFormat() objekte.AkteFormat[erworben.Akte, *erworben.Akte]
-	Read() (*erworben.Transacted, error)
-	Update(*erworben.Akte) (*erworben.Transacted, error)
+	Update(*erworben.Akte, schnittstellen.Sha) (*erworben.Transacted, error)
 
-	objekte_store.TransactedLogger[*erworben.Transacted]
-	objekte_store.AkteTextSaver[erworben.Akte, *erworben.Akte]
+	CommonStoreBase[
+		erworben.Akte,
+		*erworben.Akte,
+		kennung.Konfig,
+		*kennung.Konfig,
+		objekte.NilVerzeichnisse[erworben.Akte],
+		*objekte.NilVerzeichnisse[erworben.Akte],
+	]
 }
 
-type KonfigInflator = objekte_store.TransactedInflator[
-	erworben.Akte,
-	*erworben.Akte,
-	kennung.Konfig,
-	*kennung.Konfig,
-	objekte.NilVerzeichnisse[erworben.Akte],
-	*objekte.NilVerzeichnisse[erworben.Akte],
-]
-
-type KonfigLogWriter = objekte_store.LogWriter[*erworben.Transacted]
-
-type KonfigAkteTextSaver = objekte_store.AkteTextSaver[
-	erworben.Akte,
-	*erworben.Akte,
-]
-
 type konfigStore struct {
-	store_util.StoreUtil
-
-	schnittstellen.ObjekteIOFactory
-
-	pool schnittstellen.Pool[erworben.Transacted, *erworben.Transacted]
-
-	KonfigInflator
-	KonfigAkteTextSaver
-	KonfigLogWriter
+	*commonStore[
+		erworben.Akte,
+		*erworben.Akte,
+		kennung.Konfig,
+		*kennung.Konfig,
+		objekte.NilVerzeichnisse[erworben.Akte],
+		*objekte.NilVerzeichnisse[erworben.Akte],
+	]
 
 	akteFormat objekte.AkteFormat[erworben.Akte, *erworben.Akte]
 }
@@ -60,54 +48,69 @@ func (s *konfigStore) GetAkteFormat() objekte.AkteFormat[erworben.Akte, *erworbe
 	return s.akteFormat
 }
 
-func (s *konfigStore) SetLogWriter(
-	tlw KonfigLogWriter,
-) {
-	s.KonfigLogWriter = tlw
-}
-
 func makeKonfigStore(
 	sa store_util.StoreUtil,
 ) (s *konfigStore, err error) {
-	pool := collections.MakePool[erworben.Transacted]()
+	s = &konfigStore{
+		akteFormat: objekte_store.MakeAkteFormat[erworben.Akte, *erworben.Akte](
+			objekte.MakeTextParserIgnoreTomlErrors[erworben.Akte](sa),
+			objekte.ParsedAkteTomlFormatter[erworben.Akte]{},
+			sa,
+		),
+	}
 
-	akteFormat := objekte_store.MakeAkteFormat[erworben.Akte, *erworben.Akte](
-		objekte.MakeTextParserIgnoreTomlErrors[erworben.Akte](sa),
-		objekte.ParsedAkteTomlFormatter[erworben.Akte]{},
+	s.commonStore, err = makeCommonStore[
+		erworben.Akte,
+		*erworben.Akte,
+		kennung.Konfig,
+		*kennung.Konfig,
+		objekte.NilVerzeichnisse[erworben.Akte],
+		*objekte.NilVerzeichnisse[erworben.Akte],
+	](
+		gattung.Konfig,
+		s,
 		sa,
+		s,
+		nil,
 	)
 
-	of := sa.ObjekteReaderWriterFactory(gattung.Konfig)
-
-	s = &konfigStore{
-		StoreUtil:        sa,
-		ObjekteIOFactory: of,
-		pool:             pool,
-		KonfigInflator: objekte_store.MakeTransactedInflator[
-			erworben.Akte,
-			*erworben.Akte,
-			kennung.Konfig,
-			*kennung.Konfig,
-			objekte.NilVerzeichnisse[erworben.Akte],
-			*objekte.NilVerzeichnisse[erworben.Akte],
-		](
-			of,
-			sa,
-			persisted_metadatei_format.FormatForVersion(
-				sa.GetKonfig().GetStoreVersion(),
-			),
-			akteFormat,
-			pool,
-		),
-		KonfigAkteTextSaver: objekte_store.MakeAkteTextSaver[
-			erworben.Akte,
-			*erworben.Akte,
-		](
-			sa,
-			akteFormat,
-		),
-		akteFormat: akteFormat,
+	if s.commonStore.ObjekteSaver == nil {
+		panic("ObjekteSaver is nil")
 	}
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	// of := sa.ObjekteReaderWriterFactory(gattung.Konfig)
+
+	// s = &konfigStore{
+	// 	KonfigInflator: objekte_store.MakeTransactedInflator[
+	// 		erworben.Akte,
+	// 		*erworben.Akte,
+	// 		kennung.Konfig,
+	// 		*kennung.Konfig,
+	// 		objekte.NilVerzeichnisse[erworben.Akte],
+	// 		*objekte.NilVerzeichnisse[erworben.Akte],
+	// 	](
+	// 		of,
+	// 		sa,
+	// 		persisted_metadatei_format.FormatForVersion(
+	// 			sa.GetKonfig().GetStoreVersion(),
+	// 		),
+	// 		akteFormat,
+	// 		pool,
+	// 	),
+	// 	KonfigAkteTextSaver: objekte_store.MakeAkteTextSaver[
+	// 		erworben.Akte,
+	// 		*erworben.Akte,
+	// 	](
+	// 		sa,
+	// 		akteFormat,
+	// 	),
+	// 	akteFormat: akteFormat,
+	// }
 
 	return
 }
@@ -128,6 +131,7 @@ func (s konfigStore) updateOne(t *erworben.Transacted) (err error) {
 
 func (s konfigStore) Update(
 	ko *erworben.Akte,
+	sh schnittstellen.Sha,
 ) (kt *erworben.Transacted, err error) {
 	if !s.StoreUtil.GetLockSmith().IsAcquired() {
 		err = errors.Wrap(objekte_store.ErrLockRequired{Operation: "update konfig"})
@@ -136,20 +140,13 @@ func (s konfigStore) Update(
 
 	var mutter *erworben.Transacted
 
-	if mutter, err = s.Read(); err != nil {
+	if mutter, err = s.ReadOne(&kennung.Konfig{}); err != nil {
 		if errors.Is(err, objekte_store.ErrNotFound{}) {
 			err = nil
 		} else {
 			err = errors.Wrap(err)
 			return
 		}
-	}
-
-	var akteSha schnittstellen.Sha
-
-	if akteSha, _, err = s.SaveAkteText(*ko); err != nil {
-		err = errors.Wrap(err)
-		return
 	}
 
 	kt = &erworben.Transacted{
@@ -159,8 +156,7 @@ func (s konfigStore) Update(
 		},
 	}
 
-	kt.SetAkteSha(akteSha)
-	objekte.AssertAkteShasMatch(kt)
+	kt.SetAkteSha(sh)
 
 	// TODO-P3 refactor into reusable
 	if mutter != nil {
@@ -192,7 +188,7 @@ func (s konfigStore) Update(
 	if mutter != nil && kt.GetObjekteSha().EqualsSha(mutterObjekteSha) {
 		kt = mutter
 
-		if err = s.KonfigLogWriter.Unchanged(kt); err != nil {
+		if err = s.LogWriter.Unchanged(kt); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -208,7 +204,7 @@ func (s konfigStore) Update(
 		return
 	}
 
-	if err = s.KonfigLogWriter.Updated(kt); err != nil {
+	if err = s.LogWriter.Updated(kt); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -216,10 +212,135 @@ func (s konfigStore) Update(
 	return
 }
 
-func (s konfigStore) Read() (tt *erworben.Transacted, err error) {
+func (i *konfigStore) ReadAllSchwanzen(
+	w schnittstellen.FuncIter[*erworben.Transacted],
+) (err error) {
+	var k *erworben.Transacted
+
+	if k, err = i.ReadOne(&kennung.Konfig{}); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	objekte.AssertAkteShasMatch(k)
+
+	if err = w(k); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *konfigStore) ReadAll(
+	w schnittstellen.FuncIter[*erworben.Transacted],
+) (err error) {
+	if s.StoreUtil.GetKonfig().UseBestandsaufnahme {
+		f1 := func(t *bestandsaufnahme.Objekte) (err error) {
+			if err = t.Akte.Skus.Each(
+				func(sk sku.Sku) (err error) {
+					if sk.GetGattung() != gattung.Konfig {
+						return
+					}
+
+					var te *erworben.Transacted
+
+					if te, err = s.InflateFromDataIdentity(sk); err != nil {
+						if errors.Is(err, toml.Error{}) {
+							err = nil
+						} else {
+							err = errors.Wrap(err)
+							return
+						}
+					}
+
+					objekte.AssertAkteShasMatch(te)
+
+					if err = w(te); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+
+					return
+				},
+			); err != nil {
+				err = errors.Wrapf(
+					err,
+					"Bestandsaufnahme: %s",
+					t.Tai,
+				)
+
+				return
+			}
+
+			return
+		}
+
+		if err = s.StoreUtil.GetBestandsaufnahmeStore().ReadAll(f1); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		if err = s.StoreUtil.GetTransaktionStore().ReadAllTransaktions(
+			func(t *transaktion.Transaktion) (err error) {
+				if err = t.Skus.Each(
+					func(o sku.SkuLike) (err error) {
+						if o.GetGattung() != gattung.Konfig {
+							return
+						}
+
+						var te *erworben.Transacted
+
+						if te, err = s.InflateFromDataIdentity(o); err != nil {
+							if errors.Is(err, toml.Error{}) {
+								err = nil
+							} else {
+								err = errors.Wrap(err)
+								return
+							}
+						}
+
+						objekte.AssertAkteShasMatch(te)
+
+						if err = w(te); err != nil {
+							err = errors.Wrap(err)
+							return
+						}
+
+						return
+					},
+				); err != nil {
+					err = errors.Wrapf(
+						err,
+						"Transaktion: %s/%s: %s",
+						t.Time.Kopf(),
+						t.Time.Schwanz(),
+						t.Time,
+					)
+
+					return
+				}
+
+				return
+			},
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
+func (s konfigStore) ReadOne(
+	_ *kennung.Konfig,
+) (tt *erworben.Transacted, err error) {
 	tt = &erworben.Transacted{
 		Sku:  s.StoreUtil.GetKonfig().Sku,
 		Akte: s.StoreUtil.GetKonfig().Akte,
+		Metadatei: metadatei.Metadatei{
+			AkteSha: sha.Make(s.StoreUtil.GetKonfig().Sku.GetAkteSha()),
+		},
 	}
 
 	if !tt.Sku.Schwanz.IsEmpty() {
@@ -286,7 +407,6 @@ func (s *konfigStore) ReindexOne(
 	sk sku.DataIdentity,
 ) (o kennung.Matchable, err error) {
 	var te *erworben.Transacted
-	defer s.pool.Put(te)
 
 	if te, err = s.InflateFromDataIdentity(sk); err != nil {
 		errors.Wrap(err)
@@ -295,7 +415,7 @@ func (s *konfigStore) ReindexOne(
 
 	o = te
 
-	s.KonfigLogWriter.Updated(te)
+	s.LogWriter.Updated(te)
 
 	return
 }

@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/golf/objekte"
+	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/hotel/etikett"
 	"github.com/friedenberg/zit/src/hotel/kasten"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
@@ -216,6 +217,10 @@ func (s *Store) ReadFiles(
 						err = errors.Wrap(err)
 						return
 					}
+
+				case *erworben.Transacted:
+					errors.TodoP1("implement checked out konfig?")
+					return
 
 				default:
 					err = errors.Implement()

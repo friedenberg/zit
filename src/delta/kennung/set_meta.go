@@ -212,6 +212,10 @@ func (ms *metaSet) set(v string) (err error) {
 				}
 			}
 
+			if g.Equals(gattung.Konfig) {
+				ids.HasKonfig = true
+			}
+
 			ms.Gattung[g] = ids
 
 			return

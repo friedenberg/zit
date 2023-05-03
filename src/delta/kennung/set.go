@@ -84,6 +84,7 @@ func (s *Set) Set(v string) (err error) {
 	}
 
 	if err = (Konfig{}).Set(v); err == nil {
+		s.HasKonfig = true
 		return
 	}
 
@@ -265,6 +266,11 @@ func (s Set) ContainsMatchable(m Matchable) bool {
 
 	case Hinweis:
 		if s.Hinweisen.Len() > 0 && !s.Hinweisen.Contains(id) {
+			return false
+		}
+
+	case Konfig:
+		if !s.HasKonfig {
 			return false
 		}
 

@@ -1,7 +1,6 @@
 package umwelt
 
 import (
-	"fmt"
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
@@ -13,6 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/sha_cli_format"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/golf/objekte"
+	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/hotel/etikett"
 	"github.com/friedenberg/zit/src/hotel/kasten"
 	"github.com/friedenberg/zit/src/hotel/typ"
@@ -38,6 +38,7 @@ func (u *Umwelt) FormatColorWriter() format.FuncColorWriter {
 func (u *Umwelt) FormatIdLike() schnittstellen.FuncWriterFormat[kennung.Kennung] {
 	hf := u.FormatHinweis()
 	tf := u.FormatTyp()
+	cw := u.FormatColorWriter()
 
 	return func(w io.Writer, v kennung.Kennung) (n int64, err error) {
 		switch vt := v.(type) {
@@ -48,10 +49,11 @@ func (u *Umwelt) FormatIdLike() schnittstellen.FuncWriterFormat[kennung.Kennung]
 			return tf(w, vt)
 
 		default:
-			_, err = io.WriteString(w, fmt.Sprintf("%T", v))
+			return format.Write(
+				w,
+				cw(format.MakeFormatString("%s", v), format.ColorTypePointer),
+			)
 		}
-
-		return
 	}
 }
 
@@ -114,6 +116,13 @@ func (u *Umwelt) FormatTypTransacted() schnittstellen.FuncWriterFormat[typ.Trans
 		u.FormatColorWriter(),
 		u.FormatSha(u.StoreObjekten().GetAbbrStore().AbbreviateSha),
 		u.FormatTyp(),
+	)
+}
+
+func (u *Umwelt) FormatKonfigTransacted() schnittstellen.FuncWriterFormat[erworben.Transacted] {
+	return erworben.MakeCliFormatTransacted(
+		u.FormatColorWriter(),
+		u.FormatSha(u.StoreObjekten().GetAbbrStore().AbbreviateSha),
 	)
 }
 

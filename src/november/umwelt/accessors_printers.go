@@ -136,6 +136,7 @@ func (u *Umwelt) PrinterTransactedLike() schnittstellen.FuncIter[objekte.Transac
 	opExcludeTyp := u.FormatTransactedLike(false)
 	e := u.FormatEtikettTransacted()
 	k := u.FormatKastenTransacted()
+	ko := u.FormatKonfigTransacted()
 
 	return format.MakeWriterToWithNewLines(
 		u.Out(),
@@ -148,6 +149,9 @@ func (u *Umwelt) PrinterTransactedLike() schnittstellen.FuncIter[objekte.Transac
 
 				case *kasten.Transacted:
 					return k(out, *atl)
+
+				case *erworben.Transacted:
+					return ko(out, *atl)
 
 				case *typ.Transacted:
 					return opExcludeTyp(out, tl)

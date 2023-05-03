@@ -12,6 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/golf/transaktion"
+	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/hotel/etikett"
 	"github.com/friedenberg/zit/src/hotel/kasten"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
@@ -99,9 +100,9 @@ func Make(
 		gattung.Kasten: objekte.MakeApplyQueryTransactedLikePtr[*kasten.Transacted](
 			s.kastenStore.Query,
 		),
-		// gattung.Konfig:           objekte.MakeApplyTransactedLikePtr[*konfig.Transacted](
-		// s.konfigStore.ReadAllSchwanzen,
-		// ),
+		gattung.Konfig: objekte.MakeApplyQueryTransactedLikePtr[*erworben.Transacted](
+			s.konfigStore.Query,
+		),
 		// gattung.Bestandsaufnahme: objekte.MakeApplyTransactedLikePtr[*bestandsaufnahme.Objekte](
 		// 	s.bestandsaufnahmeStore.ReadAll,
 		// ),
@@ -120,9 +121,9 @@ func Make(
 		gattung.Kasten: objekte.MakeApplyTransactedLikePtr[*kasten.Transacted](
 			s.kastenStore.ReadAllSchwanzen,
 		),
-		// gattung.Konfig:           objekte.MakeApplyTransactedLikePtr[*konfig.Transacted](
-		// s.konfigStore.ReadAllSchwanzen,
-		// ),
+		gattung.Konfig: objekte.MakeApplyTransactedLikePtr[*erworben.Transacted](
+			s.konfigStore.ReadAllSchwanzen,
+		),
 		// gattung.Bestandsaufnahme: objekte.MakeApplyTransactedLikePtr[*bestandsaufnahme.Objekte](
 		// 	s.bestandsaufnahmeStore.ReadAll,
 		// ),
@@ -141,9 +142,9 @@ func Make(
 		gattung.Kasten: objekte.MakeApplyTransactedLikePtr[*kasten.Transacted](
 			s.kastenStore.ReadAll,
 		),
-		// gattung.Konfig:           objekte.MakeApplyTransactedLikePtr[*konfig.Transacted](
-		// s.konfigStore.ReadAllSchwanzen,
-		// ),
+		gattung.Konfig: objekte.MakeApplyTransactedLikePtr[*erworben.Transacted](
+			s.konfigStore.ReadAll,
+		),
 		// gattung.Bestandsaufnahme: objekte.MakeApplyTransactedLikePtr[*bestandsaufnahme.Objekte](
 		// 	s.bestandsaufnahmeStore.ReadAll,
 		// ),

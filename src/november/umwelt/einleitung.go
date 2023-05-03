@@ -13,6 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/hotel/typ"
@@ -154,8 +155,27 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 	{
 		defaultKonfig := erworben.Default(defaultTypKennung)
 
+		f := u.StoreObjekten().Konfig().GetAkteFormat()
+
+		var aw sha.WriteCloser
+
+		if aw, err = u.StoreObjekten().AkteWriter(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		defer errors.DeferredCloser(&err, aw)
+
+		if _, err = f.FormatParsedAkte(aw, defaultKonfig); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		sh := sha.Make(aw.Sha())
+
 		if _, err = u.StoreObjekten().Konfig().Update(
 			&defaultKonfig,
+			sh,
 		); err != nil {
 			err = errors.Wrap(err)
 			return

@@ -5,8 +5,10 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/november/umwelt"
 	"github.com/friedenberg/zit/src/oscar/user_ops"
@@ -55,9 +57,12 @@ func (c EditKonfig) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	var k *erworben.Akte
+	var (
+		k  *erworben.Akte
+		sh schnittstellen.Sha
+	)
 
-	if k, err = c.readTempKonfigFile(u, p); err != nil {
+	if k, sh, err = c.readTempKonfigFile(u, p); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -71,7 +76,7 @@ func (c EditKonfig) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	var tt *erworben.Transacted
 
-	if tt, err = u.StoreObjekten().Konfig().Update(k); err != nil {
+	if tt, err = u.StoreObjekten().Konfig().Update(k, sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -86,7 +91,7 @@ func (c EditKonfig) makeTempKonfigFile(
 ) (p string, err error) {
 	var k *erworben.Transacted
 
-	if k, err = u.StoreObjekten().Konfig().Read(); err != nil {
+	if k, err = u.StoreObjekten().Konfig().ReadOne(&kennung.Konfig{}); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -115,7 +120,7 @@ func (c EditKonfig) makeTempKonfigFile(
 func (c EditKonfig) readTempKonfigFile(
 	u *umwelt.Umwelt,
 	p string,
-) (k *erworben.Akte, err error) {
+) (k *erworben.Akte, sh schnittstellen.Sha, err error) {
 	var f *os.File
 
 	if f, err = files.Open(p); err != nil {
@@ -123,14 +128,14 @@ func (c EditKonfig) readTempKonfigFile(
 		return
 	}
 
-	defer errors.Deferred(&err, f.Close)
+	defer errors.DeferredCloser(&err, f)
 
 	format := u.StoreObjekten().Konfig().GetAkteFormat()
 
 	k = &erworben.Akte{}
 
 	// TODO-P3 offer option to edit again
-	if _, _, err = format.ParseSaveAkte(f, k); err != nil {
+	if sh, _, err = format.ParseSaveAkte(f, k); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
