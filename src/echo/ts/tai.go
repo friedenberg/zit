@@ -41,7 +41,7 @@ func TaiFromTimeWithIndex(t1 Time, n int) (t2 Tai) {
 
 func (t Tai) AsTime() (t1 Time) {
 	if t.wasSet && !t.tai.Eq(tai{}) {
-		t1 = Time{time: t.tai.AsTime()}
+		t1 = Time{time: t.tai.AsTime().Local()}
 		errors.Log().Printf("non empty tai")
 	} else {
 		errors.Log().Printf("empty tai")
@@ -61,7 +61,7 @@ func (t Tai) String() string {
 }
 
 func (t Tai) Format(v string) string {
-	return t.tai.AsTime().Format(v)
+	return t.AsTime().Format(v)
 }
 
 func (t *Tai) Set(v string) (err error) {
