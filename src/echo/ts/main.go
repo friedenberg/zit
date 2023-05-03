@@ -17,7 +17,7 @@ import (
 const (
 	Epoch          = 1660007128
 	FormatDateTime = format.StringFormatDateTime
-	FormatDateTai  = "%y-%m-%d %H:%M"
+	// FormatDateTai  = "%y-%m-%d %H:%M"
 )
 
 type Time struct {

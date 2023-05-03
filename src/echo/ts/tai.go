@@ -60,6 +60,10 @@ func (t Tai) String() string {
 	return fmt.Sprintf("%s.%s", strconv.FormatInt(t.tai.Sec, 10), a)
 }
 
+func (t Tai) Format(v string) string {
+	return t.tai.AsTime().Format(v)
+}
+
 func (t *Tai) Set(v string) (err error) {
 	t.wasSet = true
 
