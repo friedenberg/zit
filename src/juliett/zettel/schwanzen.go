@@ -5,7 +5,6 @@ import (
 
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/foxtrot/kennung_index"
 )
 
@@ -41,7 +40,7 @@ func (zws *Schwanzen) Less(zt *Transacted) (ok bool) {
 	return
 }
 
-func (zws *Schwanzen) Get(h kennung.Hinweis) (t ts.Tai, ok bool) {
+func (zws *Schwanzen) Get(h kennung.Hinweis) (t kennung.Tai, ok bool) {
 	zws.lock.RLock()
 	defer zws.lock.RUnlock()
 

@@ -72,7 +72,7 @@ func makeKastenStore(
 	}
 
 	newOrUpdated := func(t *kasten.Transacted) (err error) {
-		s.StoreUtil.CommitTransacted(t)
+		s.StoreUtil.CommitUpdatedTransacted(t)
 		s.StoreUtil.GetKonfigPtr().AddKasten(t)
 
 		return

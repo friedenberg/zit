@@ -5,12 +5,12 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/values"
-	"github.com/friedenberg/zit/src/echo/ts"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
 
 type Objekte struct {
-	Tai        ts.Tai
+	Tai        kennung.Tai
 	Akte       Akte
 	ObjekteSha sha.Sha
 	Metadatei  metadatei.Metadatei
@@ -71,7 +71,7 @@ func (a Objekte) Equals(b Objekte) bool {
 func (a *Objekte) Reset() {
 	a.ObjekteSha = sha.Sha{}
 	a.Metadatei.Reset()
-	a.Tai = ts.Tai{}
+	a.Tai = kennung.Tai{}
 	a.Akte.Reset()
 }
 

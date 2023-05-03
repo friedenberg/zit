@@ -196,7 +196,7 @@ func (s konfigStore) Update(
 		return
 	}
 
-	s.StoreUtil.CommitTransacted(kt)
+	s.StoreUtil.CommitUpdatedTransacted(kt)
 	s.StoreUtil.GetKonfigPtr().SetTransacted(kt)
 
 	if err = s.StoreUtil.AddMatchable(kt); err != nil {

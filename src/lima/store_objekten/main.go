@@ -296,11 +296,6 @@ func (s Store) Flush() (err error) {
 	}
 	errors.Log().Printf("done saving Bestandsaufnahme")
 
-	if err = s.StoreUtil.GetTransaktionStore().WriteTransaktion(); err != nil {
-		err = errors.Wrapf(err, "failed to write transaction")
-		return
-	}
-
 	for _, fl := range s.flushers {
 		if err = fl.Flush(); err != nil {
 			err = errors.Wrap(err)

@@ -556,7 +556,7 @@ func (s *zettelStore) commitIndexMatchUpdate(
 	tz *zettel.Transacted,
 	addEtikettenToIndex bool,
 ) (err error) {
-	s.StoreUtil.CommitTransacted(tz)
+	s.StoreUtil.CommitUpdatedTransacted(tz)
 
 	if err = s.writeNamedZettelToIndex(tz); err != nil {
 		err = errors.Wrap(err)
@@ -616,7 +616,7 @@ func (s *zettelStore) Inherit(tz *zettel.Transacted) (err error) {
 		return
 	}
 
-	s.StoreUtil.CommitTransacted(tz)
+	s.StoreUtil.CommitTransacted2(tz)
 
 	errExists := s.StoreUtil.GetAbbrStore().HinweisExists(tz.Sku.Kennung)
 

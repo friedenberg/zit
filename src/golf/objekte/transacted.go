@@ -77,6 +77,10 @@ func (t *Transacted[T, T1, T2, T3, T4, T5]) SetObjekteSha(
 	t.Sku.ObjekteSha = sha.Make(sh)
 }
 
+func (t *Transacted[T, T1, T2, T3, T4, T5]) UpdateTaiTo(ta kennung.Tai) {
+	t.Sku.Schwanz = ta
+}
+
 func (t Transacted[T, T1, T2, T3, T4, T5]) GetGattung() schnittstellen.Gattung {
 	return t.Sku.Kennung.GetGattung()
 }

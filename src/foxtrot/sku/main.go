@@ -3,7 +3,7 @@ package sku
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/values"
-	"github.com/friedenberg/zit/src/echo/ts"
+	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
 type Kennung = schnittstellen.Stringer
@@ -14,7 +14,7 @@ type IdLikeGetter interface {
 
 type DataIdentity interface {
 	schnittstellen.ValueLike
-	GetTai() ts.Tai
+	GetTai() kennung.Tai
 	GetId() Kennung
 	schnittstellen.GattungGetter
 	GetObjekteSha() schnittstellen.Sha
@@ -36,7 +36,7 @@ type SkuLike interface {
 
 type SkuLikePtr interface {
 	SkuLike
-	SetTimeAndFields(ts.Tai, ...string) error
+	SetTimeAndFields(kennung.Tai, ...string) error
 	SetFromSku(Sku) error
 	SetTransactionIndex(int)
 }

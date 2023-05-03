@@ -5,14 +5,14 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/standort"
-	"github.com/friedenberg/zit/src/echo/ts"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/india/konfig"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/lima/store_objekten"
 	"github.com/friedenberg/zit/src/mike/store_fs"
 )
 
-func (u *Umwelt) Sonnenaufgang() ts.Time {
+func (u *Umwelt) Sonnenaufgang() kennung.Time {
 	return u.sonnenaufgang
 }
 

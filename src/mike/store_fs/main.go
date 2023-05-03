@@ -8,7 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/hotel/etikett"
@@ -22,7 +21,7 @@ import (
 )
 
 type Store struct {
-	sonnenaufgang ts.Time
+	sonnenaufgang kennung.Time
 	erworben      konfig.Compiled
 	standort.Standort
 
@@ -32,7 +31,7 @@ type Store struct {
 }
 
 func New(
-	t ts.Time,
+	t kennung.Time,
 	k konfig.Compiled,
 	st standort.Standort,
 	storeObjekten *store_objekten.Store,

@@ -14,7 +14,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/age_io"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/foxtrot/kennung_index"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
@@ -36,9 +35,10 @@ type StoreUtil interface {
 	schnittstellen.LockSmithGetter
 	konfig.PtrGetter
 	schnittstellen.AkteIOFactory
-	ts.Clock
+	kennung.Clock
 
-	CommitTransacted(objekte.TransactedLike) error
+	CommitTransacted2(objekte.TransactedLike) error
+	CommitUpdatedTransacted(objekte.TransactedLikePtr) error
 
 	GetBestandsaufnahmeStore() bestandsaufnahme.Store
 	GetBestandsaufnahme() *bestandsaufnahme.Objekte
@@ -88,8 +88,8 @@ func MakeStoreUtil(
 		persistentMetadateiFormat: pmf,
 	}
 
-	t := ts.Now()
-	ta := ts.NowTai()
+	t := kennung.Now()
+	ta := kennung.NowTai()
 
 	for {
 		p := c.GetTransaktionStore().TransaktionPath(t)
@@ -147,27 +147,39 @@ func (s common) GetPersistentMetadateiFormat() persisted_metadatei_format.Format
 	return s.persistentMetadateiFormat
 }
 
-func (s common) GetTime() ts.Time {
+func (s common) GetTime() kennung.Time {
 	return s.transaktion.Time
 }
 
-func (s common) GetTai() ts.Tai {
+func (s common) GetTai() kennung.Tai {
 	return s.bestandsaufnahme.Tai
 }
 
-func (s common) CommitTransacted(t objekte.TransactedLike) (err error) {
+func (s *common) CommitUpdatedTransacted(t objekte.TransactedLikePtr) (err error) {
+	ta := kennung.NowTai()
+	t.UpdateTaiTo(ta)
+
+	return s.CommitTransacted2(t)
+}
+
+func (s *common) CommitTransacted2(t objekte.TransactedLike) (err error) {
+	return s.CommitTransacted(t)
+}
+
+func (s *common) CommitTransacted(t objekte.TransactedLike) (err error) {
+	skuTai := t.GetSku().Tai
+
+	if skuTai.Equals(s.GetBestandsaufnahme().Tai) {
+		panic("sku Tai and Bestandsaufnahme are equal")
+	}
+
 	s.GetBestandsaufnahme().Akte.Skus.Add(t.GetSku())
-	s.GetTransaktionStore().GetTransaktion().Skus.Add(t.GetSkuLike())
 
 	return
 }
 
 func (s *common) GetBestandsaufnahme() *bestandsaufnahme.Objekte {
 	return s.bestandsaufnahme
-}
-
-func (s *common) GetTransaktion() *transaktion.Transaktion {
-	return &s.transaktion
 }
 
 func (s *common) GetTransaktionStore() TransaktionStore {

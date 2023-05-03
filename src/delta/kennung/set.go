@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/sha_collections"
-	"github.com/friedenberg/zit/src/echo/ts"
 )
 
 type Set struct {
@@ -20,7 +19,7 @@ type Set struct {
 	Etiketten  MutableQuerySet[Etikett, *Etikett]
 	Hinweisen  HinweisMutableSet
 	Typen      TypMutableSet
-	Timestamps ts.MutableSet
+	Timestamps schnittstellen.MutableSet[Time]
 	Kisten     KastenMutableSet
 	FDs        MutableFDSet
 	HasKonfig  bool
@@ -46,7 +45,7 @@ func MakeSet(
 		Hinweisen:  MakeHinweisMutableSet(),
 		Typen:      MakeTypMutableSet(),
 		Kisten:     MakeKastenMutableSet(),
-		Timestamps: ts.MakeMutableSet(),
+		Timestamps: collections.MakeMutableSetStringer[Time](),
 		FDs:        MakeMutableFDSet(),
 		hidden:     hidden,
 	}
@@ -79,7 +78,7 @@ func (s *Set) Set(v string) (err error) {
 		return
 	}
 
-	if err = collections.AddString[ts.Time, *ts.Time](s.Timestamps, v); err == nil {
+	if err = collections.AddString[Time, *Time](s.Timestamps, v); err == nil {
 		return
 	}
 
@@ -140,7 +139,7 @@ func (s *Set) Add(ids ...schnittstellen.Element) (err error) {
 		case Typ:
 			s.Typen.Add(it)
 
-		case ts.Time:
+		case Time:
 			s.Timestamps.Add(it)
 
 		case Kasten:
@@ -175,7 +174,7 @@ func (s Set) String() string {
 	sb.WriteString(" ")
 	s.Hinweisen.Each(iter.AddString[Hinweis](sb))
 	s.Typen.Each(iter.AddString[Typ](sb))
-	s.Timestamps.Each(iter.AddString[ts.Time](sb))
+	s.Timestamps.Each(iter.AddString[Time](sb))
 	s.Kisten.Each(iter.AddString[Kasten](sb))
 	s.FDs.Each(iter.AddString[FD](sb))
 

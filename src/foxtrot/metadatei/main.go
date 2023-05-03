@@ -14,7 +14,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
-	"github.com/friedenberg/zit/src/echo/ts"
 )
 
 var BoundaryStringValue values.String
@@ -38,7 +37,7 @@ type Metadatei struct {
 	Etiketten   kennung.EtikettSet
 	Gattung     gattung.Gattung
 	Typ         kennung.Typ
-	Tai         ts.Tai
+	Tai         kennung.Tai
 }
 
 func (m Metadatei) GetMetadatei() Metadatei {

@@ -12,7 +12,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/values"
-	"github.com/friedenberg/zit/src/echo/ts"
 )
 
 type (
@@ -38,7 +37,7 @@ type FD struct {
 	// TODO-P2 make all of these private and expose as methods
 	IsDir   bool
 	Path    string
-	ModTime ts.Time
+	ModTime Time
 	Sha     sha.Sha
 }
 
@@ -161,7 +160,7 @@ func File(f *os.File) (fd FD, err error) {
 func FileInfo(fi os.FileInfo, dir string) (fd FD, err error) {
 	fd = FD{
 		IsDir:   fi.IsDir(),
-		ModTime: ts.Tyme(fi.ModTime()),
+		ModTime: Tyme(fi.ModTime()),
 	}
 
 	if fd.Path, err = filepath.Abs(path.Join(dir, fi.Name())); err != nil {

@@ -1,4 +1,4 @@
-package ts
+package kennung
 
 type Clock interface {
 	GetTime() Time

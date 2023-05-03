@@ -16,7 +16,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/echo/ts"
 	"github.com/friedenberg/zit/src/golf/persisted_metadatei_format"
 	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/hotel/etikett"
@@ -31,7 +30,7 @@ import (
 )
 
 type Umwelt struct {
-	sonnenaufgang ts.Time
+	sonnenaufgang kennung.Time
 
 	in  *os.File
 	out *os.File
@@ -91,7 +90,7 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 		return
 	}
 
-	u.sonnenaufgang = ts.Now()
+	u.sonnenaufgang = kennung.Now()
 
 	errors.TodoP4("find a better place for this")
 	{

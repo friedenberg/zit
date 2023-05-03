@@ -72,7 +72,7 @@ func makeTypStore(
 	}
 
 	newOrUpdated := func(t *typ.Transacted) (err error) {
-		s.StoreUtil.CommitTransacted(t)
+		s.StoreUtil.CommitUpdatedTransacted(t)
 		s.StoreUtil.GetKonfigPtr().AddTyp(t)
 
 		return

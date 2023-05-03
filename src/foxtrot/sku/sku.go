@@ -10,12 +10,12 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/delta/format"
-	"github.com/friedenberg/zit/src/echo/ts"
+	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
 type Sku struct {
 	Gattung    gattung.Gattung
-	Tai        ts.Tai
+	Tai        kennung.Tai
 	Kennung    values.String
 	ObjekteSha sha.Sha
 	AkteSha    sha.Sha
@@ -86,7 +86,7 @@ func (a *Sku) Reset() {
 	a.AkteSha.Reset()
 }
 
-func (a Sku) GetTai() ts.Tai {
+func (a Sku) GetTai() kennung.Tai {
 	return a.Tai
 }
 
@@ -94,7 +94,7 @@ func (a Sku) GetKey() string {
 	return a.String()
 }
 
-func (a Sku) GetTime() ts.Time {
+func (a Sku) GetTime() kennung.Time {
 	return a.Tai.AsTime()
 }
 

@@ -10,12 +10,11 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/echo/ts"
 )
 
 type SkuLikeOld interface {
 	SkuLike
-	SetTimeAndFields(ts.Time, ...string) error
+	SetTimeAndFields(kennung.Time, ...string) error
 }
 
 // TODO-P3 examine adding objekte and akte shas to Skus
@@ -25,7 +24,7 @@ type Transacted[T kennung.KennungLike[T], T1 kennung.KennungLikePtr[T]] struct {
 	ObjekteSha       sha.Sha
 	AkteSha          sha.Sha
 	TransactionIndex values.Int
-	Kopf, Schwanz    ts.Tai
+	Kopf, Schwanz    kennung.Tai
 }
 
 func (t *Transacted[T, T1]) SetFromSku(sk Sku) (err error) {
@@ -73,7 +72,7 @@ func (t *Transacted[T, T1]) SetFromSku(sk Sku) (err error) {
 // }
 
 // TODO-P2 include sku versions
-func MakeSkuTransactedFromTime(t ts.Tai, line string) (out SkuLikePtr, err error) {
+func MakeSkuTransactedFromTime(t kennung.Tai, line string) (out SkuLikePtr, err error) {
 	fields := strings.Fields(line)
 	var g gattung.Gattung
 
@@ -108,7 +107,7 @@ func MakeSkuTransactedFromTime(t ts.Tai, line string) (out SkuLikePtr, err error
 	return
 }
 
-func MakeSkuTransacted(t ts.Tai, line string) (out SkuLikePtr, err error) {
+func MakeSkuTransacted(t kennung.Tai, line string) (out SkuLikePtr, err error) {
 	fields := strings.Fields(line)
 	var g gattung.Gattung
 
@@ -147,7 +146,7 @@ func (a Transacted[T, T1]) String() string {
 	return fmt.Sprintf("%s %s %s", a.Kennung, a.ObjekteSha, a.AkteSha)
 }
 
-func (a Transacted[T, T1]) GetTai() ts.Tai {
+func (a Transacted[T, T1]) GetTai() kennung.Tai {
 	return a.Schwanz
 }
 
@@ -234,7 +233,7 @@ func (a Transacted[T, T1]) Equals(b Transacted[T, T1]) (ok bool) {
 }
 
 func (o *Transacted[T, T1]) SetTimeAndFields(
-	t ts.Tai,
+	t kennung.Tai,
 	vs ...string,
 ) (err error) {
 	o.Schwanz = t

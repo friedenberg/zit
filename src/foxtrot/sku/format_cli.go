@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/delta/format"
-	"github.com/friedenberg/zit/src/echo/ts"
+	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
 func MakeTimePrefixWriter[T DataIdentityGetter](
@@ -18,7 +18,7 @@ func MakeTimePrefixWriter[T DataIdentityGetter](
 			w,
 			format.MakeFormatStringRightAligned(
 				"%s",
-				t.Format(ts.FormatDateTime),
+				t.Format(kennung.FormatDateTime),
 			),
 			format.MakeWriter(f, e),
 		)
