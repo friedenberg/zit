@@ -41,7 +41,7 @@ type StoreUtil interface {
 	CommitUpdatedTransacted(objekte.TransactedLikePtr) error
 
 	GetBestandsaufnahmeStore() bestandsaufnahme.Store
-	GetBestandsaufnahme() *bestandsaufnahme.Objekte
+	GetBestandsaufnahmeAkte() bestandsaufnahme.Akte
 	GetTransaktionStore() TransaktionStore
 	GetAbbrStore() AbbrStore
 	GetKennungIndex() kennung_index.Index
@@ -63,7 +63,7 @@ type common struct {
 	konfig                    *konfig.Compiled
 	standort                  standort.Standort
 	transaktion               transaktion.Transaktion
-	bestandsaufnahme          *bestandsaufnahme.Objekte
+	bestandsaufnahmeAkte      bestandsaufnahme.Akte
 	Abbr                      AbbrStore
 	persistentMetadateiFormat persisted_metadatei_format.Format
 
@@ -89,7 +89,6 @@ func MakeStoreUtil(
 	}
 
 	t := kennung.Now()
-	ta := kennung.NowTai()
 
 	for {
 		p := c.GetTransaktionStore().TransaktionPath(t)
@@ -102,11 +101,8 @@ func MakeStoreUtil(
 	}
 
 	c.transaktion = transaktion.MakeTransaktion(t)
-	c.bestandsaufnahme = &bestandsaufnahme.Objekte{
-		Tai: ta,
-		Akte: bestandsaufnahme.Akte{
-			Skus: sku.MakeSku2Heap(),
-		},
+	c.bestandsaufnahmeAkte = bestandsaufnahme.Akte{
+		Skus: sku.MakeSku2Heap(),
 	}
 
 	if c.Abbr, err = newIndexAbbr(
@@ -148,16 +144,16 @@ func (s common) GetPersistentMetadateiFormat() persisted_metadatei_format.Format
 }
 
 func (s common) GetTime() kennung.Time {
-	return s.transaktion.Time
+	return kennung.Now()
 }
 
 func (s common) GetTai() kennung.Tai {
-	return s.bestandsaufnahme.Tai
+	return kennung.NowTai()
 }
 
 func (s *common) CommitUpdatedTransacted(t objekte.TransactedLikePtr) (err error) {
 	ta := kennung.NowTai()
-	t.UpdateTaiTo(ta)
+	t.SetTai(ta)
 
 	return s.CommitTransacted2(t)
 }
@@ -167,19 +163,13 @@ func (s *common) CommitTransacted2(t objekte.TransactedLike) (err error) {
 }
 
 func (s *common) CommitTransacted(t objekte.TransactedLike) (err error) {
-	skuTai := t.GetSku().Tai
-
-	if skuTai.Equals(s.GetBestandsaufnahme().Tai) {
-		panic("sku Tai and Bestandsaufnahme are equal")
-	}
-
-	s.GetBestandsaufnahme().Akte.Skus.Add(t.GetSku())
+	s.bestandsaufnahmeAkte.Skus.Add(t.GetSku())
 
 	return
 }
 
-func (s *common) GetBestandsaufnahme() *bestandsaufnahme.Objekte {
-	return s.bestandsaufnahme
+func (s *common) GetBestandsaufnahmeAkte() bestandsaufnahme.Akte {
+	return s.bestandsaufnahmeAkte
 }
 
 func (s *common) GetTransaktionStore() TransaktionStore {

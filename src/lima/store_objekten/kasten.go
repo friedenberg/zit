@@ -143,7 +143,7 @@ func (s kastenStore) ReadAll(
 	f schnittstellen.FuncIter[*kasten.Transacted],
 ) (err error) {
 	if s.StoreUtil.GetKonfig().UseBestandsaufnahme {
-		f1 := func(t *bestandsaufnahme.Objekte) (err error) {
+		f1 := func(t *bestandsaufnahme.Transacted) (err error) {
 			if err = t.Akte.Skus.Each(
 				func(sk sku.Sku) (err error) {
 					if sk.GetGattung() != gattung.Kasten {
@@ -172,7 +172,7 @@ func (s kastenStore) ReadAll(
 				err = errors.Wrapf(
 					err,
 					"Bestandsaufnahme: %s",
-					t.Tai,
+					t.GetKennung(),
 				)
 
 				return

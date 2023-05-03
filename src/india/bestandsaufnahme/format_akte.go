@@ -19,7 +19,7 @@ type formatAkte struct {
 
 func (f formatAkte) ParseSaveAkte(
 	r1 io.Reader,
-	o *Objekte,
+	o *Akte,
 ) (sh schnittstellen.Sha, n int64, err error) {
 	var aw sha.WriteCloser
 
@@ -35,7 +35,7 @@ func (f formatAkte) ParseSaveAkte(
 	if n, err = format.ReadLines(
 		r,
 		func(v string) (err error) {
-			return collections.AddString[sku.Sku, *sku.Sku](&o.Akte.Skus, v)
+			return collections.AddString[sku.Sku, *sku.Sku](&o.Skus, v)
 		},
 	); err != nil {
 		err = errors.Wrap(err)
@@ -47,22 +47,22 @@ func (f formatAkte) ParseSaveAkte(
 	return
 }
 
-func (f formatAkte) Format(w io.Writer, o Objekte) (n int64, err error) {
+func (f formatAkte) Format(w io.Writer, o Akte) (n int64, err error) {
 	return f.FormatParsedAkte(w, o)
 }
 
-func (f formatAkte) FormatParsedAkte(w io.Writer, o Objekte) (n int64, err error) {
+func (f formatAkte) FormatParsedAkte(w io.Writer, o Akte) (n int64, err error) {
 	bw := bufio.NewWriter(w)
 	defer errors.DeferredFlusher(&err, bw)
 
 	defer func() {
-		o.Akte.Skus.Restore()
+		o.Skus.Restore()
 	}()
 
 	var n1 int
 
 	for {
-		sk, ok := o.Akte.Skus.PopAndSave()
+		sk, ok := o.Skus.PopAndSave()
 
 		if !ok {
 			break

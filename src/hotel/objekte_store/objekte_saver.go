@@ -10,6 +10,7 @@ import (
 
 type ObjekteSaver interface {
 	SaveObjekte(objekte.StoredLikePtr) error
+	SaveObjekteIncludeTai(objekte.StoredLikePtr) error
 }
 
 type objekteSaver struct {
@@ -48,6 +49,36 @@ func (h objekteSaver) SaveObjekte(
 	defer errors.DeferredCloser(&err, w)
 
 	if _, err = h.formatter.FormatPersistentMetadatei(w, tl); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	sh := sha.Make(w.Sha())
+
+	tl.SetObjekteSha(sh)
+
+	return
+}
+
+func (h objekteSaver) SaveObjekteIncludeTai(
+	tl objekte.StoredLikePtr,
+) (err error) {
+	var w sha.WriteCloser
+
+	if w, err = h.writerFactory.ObjekteWriter(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.DeferredCloser(&err, w)
+
+	if _, err = h.formatter.FormatPersistentMetadatei(
+		w,
+		persisted_metadatei_format.MakeFormatterContextIncludeTai(
+			tl,
+			true,
+		),
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

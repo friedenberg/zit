@@ -236,7 +236,7 @@ func (s *konfigStore) ReadAll(
 	w schnittstellen.FuncIter[*erworben.Transacted],
 ) (err error) {
 	if s.StoreUtil.GetKonfig().UseBestandsaufnahme {
-		f1 := func(t *bestandsaufnahme.Objekte) (err error) {
+		f1 := func(t *bestandsaufnahme.Transacted) (err error) {
 			if err = t.Akte.Skus.Each(
 				func(sk sku.Sku) (err error) {
 					if sk.GetGattung() != gattung.Konfig {
@@ -267,7 +267,7 @@ func (s *konfigStore) ReadAll(
 				err = errors.Wrapf(
 					err,
 					"Bestandsaufnahme: %s",
-					t.Tai,
+					t.GetKennung(),
 				)
 
 				return

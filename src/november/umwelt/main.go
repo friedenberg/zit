@@ -63,6 +63,8 @@ func Make(kCli erworben.Cli, options Options) (u *Umwelt, err error) {
 		erworbenCli:             kCli,
 	}
 
+	u.konfig.Reset()
+
 	if files.IsTty(u.in) {
 		u.inIsTty = true
 	}

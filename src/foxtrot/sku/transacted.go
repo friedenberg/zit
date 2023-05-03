@@ -44,69 +44,6 @@ func (t *Transacted[T, T1]) SetFromSku(sk Sku) (err error) {
 	return
 }
 
-// func TransactedFromSku(sk Sku) (out SkuLike, err error) {
-// 	switch sk.Gattung {
-// 	case gattung.Zettel:
-// 		out = &Transacted[hinweis.Hinweis, *hinweis.Hinweis]{}
-
-// 	case gattung.Typ:
-// 		out = &Transacted[kennung.Typ, *kennung.Typ]{}
-
-// 	case gattung.Etikett:
-// 		out = &Transacted[kennung.Etikett, *kennung.Etikett]{}
-
-// 	case gattung.Konfig:
-// 		out = &Transacted[kennung.Konfig, *kennung.Konfig]{}
-
-// 	default:
-// 		err = errors.Errorf("unsupported gattung: %s", sk.Gattung)
-// 		return
-// 	}
-
-// 	if err = out.SetFromSku(sk); err != nil {
-// 		err = errors.Wrap(err)
-// 		return
-// 	}
-
-// 	return
-// }
-
-// TODO-P2 include sku versions
-func MakeSkuTransactedFromTime(t kennung.Tai, line string) (out SkuLikePtr, err error) {
-	fields := strings.Fields(line)
-	var g gattung.Gattung
-
-	if err = g.Set(fields[0]); err != nil {
-		err = errors.Wrapf(err, "failed to set type: %s", fields[0])
-		return
-	}
-
-	switch g {
-	case gattung.Zettel:
-		out = &Transacted[kennung.Hinweis, *kennung.Hinweis]{}
-
-	case gattung.Typ:
-		out = &Transacted[kennung.Typ, *kennung.Typ]{}
-
-	case gattung.Etikett:
-		out = &Transacted[kennung.Etikett, *kennung.Etikett]{}
-
-	case gattung.Konfig:
-		out = &Transacted[kennung.Konfig, *kennung.Konfig]{}
-
-	default:
-		err = errors.Errorf("unsupported gattung: %s", g)
-		return
-	}
-
-	if err = out.SetTimeAndFields(t, fields[1:]...); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
 func MakeSkuTransacted(t kennung.Tai, line string) (out SkuLikePtr, err error) {
 	fields := strings.Fields(line)
 	var g gattung.Gattung

@@ -55,7 +55,7 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 func (c Last) runWithBestandsaufnahm(u *umwelt.Umwelt) (err error) {
 	s := u.StoreObjekten()
 
-	var b *bestandsaufnahme.Objekte
+	var b bestandsaufnahme.Transacted
 
 	if b, err = s.GetBestandsaufnahmeStore().ReadLast(); err != nil {
 		err = errors.Wrap(err)

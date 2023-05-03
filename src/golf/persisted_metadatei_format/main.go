@@ -9,11 +9,19 @@ import (
 
 type (
 	FormatterContext = metadatei.PersistentFormatterContext
-	ParserContext    = metadatei.PersistentParserContext
-	Format           interface {
+
+	FormatterContextIncludeTai interface {
+		FormatterContext
+		IncludeTai() bool
+	}
+
+	ParserContext = metadatei.PersistentParserContext
+
+	Format interface {
 		FormatPersistentMetadatei(io.Writer, FormatterContext) (int64, error)
 		ParsePersistentMetadatei(io.Reader, ParserContext) (int64, error)
 	}
+
 	Getter interface {
 		GetPersistentMetadateiFormat() Format
 	}

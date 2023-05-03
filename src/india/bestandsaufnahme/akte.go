@@ -1,6 +1,8 @@
 package bestandsaufnahme
 
 import (
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 )
 
@@ -14,7 +16,13 @@ func MakeAkte() *Akte {
 	}
 }
 
-func (a Akte) Equals(b *Akte) bool {
+func (a Akte) GetGattung() (g schnittstellen.Gattung) {
+	g = gattung.Bestandsaufnahme
+
+	return
+}
+
+func (a Akte) Equals(b Akte) bool {
 	if !a.Skus.Equals(b.Skus) {
 		return false
 	}

@@ -35,9 +35,10 @@ type Compiled struct {
 	angeboren
 }
 
-// TODO-P4 rename this
-func (a *Compiled) ResetWithInner(b compiled) {
-	a.compiled = b
+func (a *compiled) Reset() {
+	a.Typen = makeCompiledTypSetFromSlice(nil)
+	a.Etiketten = makeCompiledEtikettSetFromSlice(nil)
+	a.Kisten = makeCompiledKastenSetFromSlice(nil)
 }
 
 func (a Compiled) GetErworben() erworben.Akte {
@@ -82,6 +83,8 @@ func Make(
 			ExtensionsToTypen: make(map[string]string),
 		},
 	}
+
+	c.Reset()
 
 	if err = c.loadKonfigAngeboren(s); err != nil {
 		err = errors.Wrap(err)
@@ -398,18 +401,21 @@ func (k *compiled) SetTransacted(
 }
 
 func (k *compiled) AddKasten(
-	kt *kasten.Transacted,
+	b *kasten.Transacted,
 ) {
 	k.hasChanges = true
-	m := k.Kisten.Elements()
-	m = append(m, kt)
-	k.Kisten = makeCompiledKastenSetFromSlice(m)
+	a, ok := k.Kisten.Get(k.Kisten.Key(b))
+
+	if !ok || a.Less(*b) {
+		k.Kisten.Add(b)
+		return
+	}
 
 	return
 }
 
 func (k *compiled) AddTyp(
-	ct *typ.Transacted,
+	b *typ.Transacted,
 ) {
 	// if ct.Objekte.Akte.Actions == nil {
 	// 	errors.TodoP1("actions were nil: %s", ct.Sku)
@@ -422,21 +428,28 @@ func (k *compiled) AddTyp(
 	// }
 
 	k.hasChanges = true
-	// collections.AddIfGreater(k.Typen, ct)
-	m := k.Typen.Elements()
-	m = append(m, ct)
-	k.Typen = makeCompiledTypSetFromSlice(m)
+
+	a, ok := k.Typen.Get(k.Typen.Key(b))
+
+	if !ok || a.Less(*b) {
+		k.Typen.Add(b)
+		return
+	}
 
 	return
 }
 
 func (k *compiled) AddEtikett(
-	ct *etikett.Transacted,
+	b *etikett.Transacted,
 ) {
 	k.hasChanges = true
-	m := k.Etiketten.Elements()
-	m = append(m, ct)
-	k.Etiketten = makeCompiledEtikettSetFromSlice(m)
+
+	a, ok := k.Etiketten.Get(k.Etiketten.Key(b))
+
+	if !ok || a.Less(*b) {
+		k.Etiketten.Add(b)
+		return
+	}
 
 	return
 }

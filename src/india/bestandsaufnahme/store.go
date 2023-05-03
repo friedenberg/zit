@@ -1,6 +1,7 @@
 package bestandsaufnahme
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -9,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/standort"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/golf/persisted_metadatei_format"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
@@ -17,27 +19,27 @@ import (
 type Store interface {
 	objekte_store.ObjekteSaver
 	AkteTextSaver
-	Create(*Objekte) error
-	objekte_store.LastReader[*Objekte]
-	objekte_store.OneReader[schnittstellen.Sha, *Objekte]
-	objekte_store.AllReader[*Objekte]
+	Create(*Akte) error
+	objekte_store.LastReader[Transacted]
+	objekte_store.OneReader[schnittstellen.Sha, *Transacted]
+	objekte_store.AllReader[*Transacted]
 }
 
 type AkteTextSaver = objekte_store.AkteTextSaver[
-	Objekte,
-	*Objekte,
+	Akte,
+	*Akte,
 ]
 
 type AkteFormat = objekte.AkteFormat[
-	Objekte,
-	*Objekte,
+	Akte,
+	*Akte,
 ]
 
 type store struct {
 	standort                  standort.Standort
 	of                        schnittstellen.ObjekteIOFactory
 	af                        schnittstellen.AkteIOFactory
-	pool                      schnittstellen.Pool[Objekte, *Objekte]
+	pool                      schnittstellen.Pool[Akte, *Akte]
 	persistentMetadateiFormat persisted_metadatei_format.Format
 	formatAkte
 	objekte_store.ObjekteSaver
@@ -50,7 +52,7 @@ func MakeStore(
 	af schnittstellen.AkteIOFactory,
 	pmf persisted_metadatei_format.Format,
 ) (s *store, err error) {
-	p := collections.MakePool[Objekte]()
+	p := collections.MakePool[Akte]()
 	fa := formatAkte{
 		af: af,
 	}
@@ -64,12 +66,12 @@ func MakeStore(
 		formatAkte:                fa,
 		ObjekteSaver:              objekte_store.MakeObjekteSaver(of, pmf),
 		AkteTextSaver: objekte_store.MakeAkteTextSaver[
-			Objekte,
-			*Objekte,
+			Akte,
+			*Akte,
 		](
 			af,
-			objekte_store.MakeAkteFormat[Objekte, *Objekte](
-				objekte.MakeReaderAkteParseSaver[Objekte, *Objekte](af, fa),
+			objekte_store.MakeAkteFormat[Akte, *Akte](
+				objekte.MakeReaderAkteParseSaver[Akte, *Akte](af, fa),
 				fa,
 				af,
 			),
@@ -79,8 +81,8 @@ func MakeStore(
 	return
 }
 
-func (s *store) Create(o *Objekte) (err error) {
-	if o.Akte.Skus.Len() == 0 {
+func (s *store) Create(o *Akte) (err error) {
+	if o.Skus.Len() == 0 {
 		err = errors.Wrap(ErrEmpty)
 		return
 	}
@@ -92,9 +94,13 @@ func (s *store) Create(o *Objekte) (err error) {
 		return
 	}
 
-	o.SetAkteSha(sh)
+	t := &Transacted{}
+	t.Reset()
+	t.Akte = *o
+	t.SetAkteSha(sh)
+	t.SetTai(kennung.NowTai())
 
-	if err = s.SaveObjekte(o); err != nil {
+	if err = s.SaveObjekteIncludeTai(t); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -102,7 +108,7 @@ func (s *store) Create(o *Objekte) (err error) {
 	return
 }
 
-func (s *store) readOnePath(p string) (o *Objekte, err error) {
+func (s *store) readOnePath(p string) (o *Transacted, err error) {
 	var sh sha.Sha
 
 	if sh, err = sha.MakeShaFromPath(p); err != nil {
@@ -118,7 +124,7 @@ func (s *store) readOnePath(p string) (o *Objekte, err error) {
 	return
 }
 
-func (s *store) ReadOne(sh schnittstellen.Sha) (o *Objekte, err error) {
+func (s *store) ReadOne(sh schnittstellen.Sha) (o *Transacted, err error) {
 	var or sha.ReadCloser
 
 	if or, err = s.of.ObjekteReader(sh); err != nil {
@@ -128,9 +134,15 @@ func (s *store) ReadOne(sh schnittstellen.Sha) (o *Objekte, err error) {
 
 	defer errors.DeferredCloser(&err, or)
 
-	o = s.pool.Get()
+	o = &Transacted{}
+	o.Reset()
 
-	if _, err = s.persistentMetadateiFormat.ParsePersistentMetadatei(or, o); err != nil {
+	o.SetObjekteSha(sh)
+
+	if _, err = s.persistentMetadateiFormat.ParsePersistentMetadatei(
+		or,
+		o,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -146,7 +158,7 @@ func (s *store) ReadOne(sh schnittstellen.Sha) (o *Objekte, err error) {
 
 	var akteSha schnittstellen.Sha
 
-	if akteSha, _, err = s.formatAkte.ParseSaveAkte(ar, o); err != nil {
+	if akteSha, _, err = s.formatAkte.ParseSaveAkte(ar, &o.Akte); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -156,21 +168,17 @@ func (s *store) ReadOne(sh schnittstellen.Sha) (o *Objekte, err error) {
 	return
 }
 
-func (s *store) ReadLast() (max *Objekte, err error) {
+func (s *store) ReadLast() (max Transacted, err error) {
 	l := &sync.Mutex{}
 
 	if err = s.ReadAll(
-		func(b *Objekte) (err error) {
+		func(b *Transacted) (err error) {
 			l.Lock()
 			defer l.Unlock()
 
-			if max == nil || max.Less(*b) {
-				if max != nil {
-					errors.TodoP3("repool max")
-				}
-
-				max = b
-				err = collections.ErrDoNotRepool
+			if max.Less(*b) {
+				max.ResetWith(*b)
+				return
 			}
 
 			return
@@ -180,33 +188,26 @@ func (s *store) ReadLast() (max *Objekte, err error) {
 		return
 	}
 
+	if max.GetObjekteSha().IsNull() {
+		panic(fmt.Sprintf("did not find last Bestandsaufnahme: %#v", max.GetMetadatei()))
+	}
+
 	return
 }
 
-func (s *store) ReadAll(f schnittstellen.FuncIter[*Objekte]) (err error) {
+func (s *store) ReadAll(f schnittstellen.FuncIter[*Transacted]) (err error) {
 	if err = files.ReadDirNamesLevel2(
 		func(p string) (err error) {
-			var o *Objekte
+			var o *Transacted
 
 			if o, err = s.readOnePath(p); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			shouldRepool := true
-
 			if err = f(o); err != nil {
-				if collections.IsDoNotRepool(err) {
-					shouldRepool = false
-					err = nil
-				} else {
-					err = errors.Wrap(err)
-					return
-				}
-			}
-
-			if shouldRepool {
-				s.pool.Put(o)
+				err = errors.Wrap(err)
+				return
 			}
 
 			return

@@ -34,6 +34,10 @@ func (s MutableSet2[T, T1]) Len() int {
 	return len(s.private.Elements)
 }
 
+func (s MutableSet2[T, T1]) Add(e T1) (err error) {
+	return s.private.add(e)
+}
+
 func (s MutableSet2[T, T1]) Get(k string) (e T1, ok bool) {
 	e, ok = s.private.Elements[k]
 	return

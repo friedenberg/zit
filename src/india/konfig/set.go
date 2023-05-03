@@ -20,7 +20,7 @@ type set[
 	E schnittstellen.Transacted[E],
 	EPtr schnittstellen.TransactedPtr[E],
 ] struct {
-	collections.Set2[E, EPtr]
+	collections.MutableSet2[E, EPtr]
 }
 
 type kastenSet = set[kasten.Transacted, *kasten.Transacted]
@@ -28,13 +28,13 @@ type kastenSet = set[kasten.Transacted, *kasten.Transacted]
 func makeCompiledKastenSet(
 	s1 schnittstellen.Set[*kasten.Transacted],
 ) (s kastenSet) {
-	s.Set2 = collections.Set2FromSetLike[kasten.Transacted, *kasten.Transacted](s, s1)
+	s.MutableSet2 = collections.MutableSet2FromSetLike[kasten.Transacted, *kasten.Transacted](s, s1)
 
 	return
 }
 
 func makeCompiledKastenSetFromSlice(s1 []*kasten.Transacted) (s kastenSet) {
-	s.Set2 = collections.Set2FromSlice[
+	s.MutableSet2 = collections.MutableSet2FromSlice[
 		kasten.Transacted,
 		*kasten.Transacted,
 	](s, s1...)
@@ -45,7 +45,7 @@ func makeCompiledKastenSetFromSlice(s1 []*kasten.Transacted) (s kastenSet) {
 type etikettSet = set[etikett.Transacted, *etikett.Transacted]
 
 func makeCompiledEtikettSetFromSlice(s1 []*etikett.Transacted) (s etikettSet) {
-	s.Set2 = collections.Set2FromSlice[
+	s.MutableSet2 = collections.MutableSet2FromSlice[
 		etikett.Transacted,
 		*etikett.Transacted,
 	](s, s1...)
@@ -56,7 +56,7 @@ func makeCompiledEtikettSetFromSlice(s1 []*etikett.Transacted) (s etikettSet) {
 func makeCompiledEtikettSet(
 	s1 schnittstellen.Set[*etikett.Transacted],
 ) (s etikettSet) {
-	s.Set2 = collections.Set2FromSetLike[etikett.Transacted, *etikett.Transacted](s, s1)
+	s.MutableSet2 = collections.MutableSet2FromSetLike[etikett.Transacted, *etikett.Transacted](s, s1)
 
 	return
 }
@@ -64,13 +64,13 @@ func makeCompiledEtikettSet(
 type typSet = set[typ.Transacted, *typ.Transacted]
 
 func makeCompiledTypSetFromSlice(s1 []*typ.Transacted) (s typSet) {
-	s.Set2 = collections.Set2FromSlice[typ.Transacted, *typ.Transacted](s, s1...)
+	s.MutableSet2 = collections.MutableSet2FromSlice[typ.Transacted, *typ.Transacted](s, s1...)
 
 	return
 }
 
 func makeCompiledTypSet(s1 schnittstellen.Set[*typ.Transacted]) (s typSet) {
-	s.Set2 = collections.Set2FromSetLike[typ.Transacted, *typ.Transacted](s, s1)
+	s.MutableSet2 = collections.MutableSet2FromSetLike[typ.Transacted, *typ.Transacted](s, s1)
 
 	return
 }

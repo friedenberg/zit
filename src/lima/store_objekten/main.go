@@ -283,9 +283,8 @@ func (s Store) Flush() (err error) {
 	}
 
 	errors.Log().Printf("saving Bestandsaufnahme")
-	if err = s.GetBestandsaufnahmeStore().Create(
-		s.StoreUtil.GetBestandsaufnahme(),
-	); err != nil {
+	ba := s.StoreUtil.GetBestandsaufnahmeAkte()
+	if err = s.GetBestandsaufnahmeStore().Create(&ba); err != nil {
 		if errors.Is(err, bestandsaufnahme.ErrEmpty) {
 			errors.Log().Printf("Bestandsaufnahme was empty")
 			err = nil
@@ -593,7 +592,7 @@ func (s *Store) Reindex() (err error) {
 
 	// }
 
-	f2 := func(t *bestandsaufnahme.Objekte) (err error) {
+	f2 := func(t *bestandsaufnahme.Transacted) (err error) {
 		if err = t.Akte.Skus.Each(
 			func(sk sku.Sku) (err error) {
 				return f1(sk)
@@ -602,7 +601,7 @@ func (s *Store) Reindex() (err error) {
 			err = errors.Wrapf(
 				err,
 				"Bestandsaufnahme: %s",
-				t.Tai,
+				t.GetKennung(),
 			)
 
 			return

@@ -41,6 +41,7 @@ func (t *Transacted[T, T1, T2, T3, T4, T5]) SetMetadatei(
 ) {
 	t.Metadatei.ResetWith(m)
 	t.SetAkteSha(m.AkteSha)
+	t.SetTai(m.Tai)
 }
 
 func (t Transacted[T, T1, T2, T3, T4, T5]) GetSkuAkteSha() schnittstellen.Sha {
@@ -77,7 +78,23 @@ func (t *Transacted[T, T1, T2, T3, T4, T5]) SetObjekteSha(
 	t.Sku.ObjekteSha = sha.Make(sh)
 }
 
-func (t *Transacted[T, T1, T2, T3, T4, T5]) UpdateTaiTo(ta kennung.Tai) {
+func (t Transacted[T, T1, T2, T3, T4, T5]) GetTai() kennung.Tai {
+	taiSku := t.Sku.Schwanz
+	taiMetadatei := t.GetMetadatei().Tai
+
+	if !taiSku.Equals(taiMetadatei) {
+		panic(errors.Errorf(
+			"tai in sku was %s while tai in metadatei was %s",
+			taiSku,
+			taiMetadatei,
+		))
+	}
+
+	return taiMetadatei
+}
+
+func (t *Transacted[T, T1, T2, T3, T4, T5]) SetTai(ta kennung.Tai) {
+	t.Metadatei.Tai = ta
 	t.Sku.Schwanz = ta
 }
 
@@ -92,7 +109,7 @@ func (zt Transacted[T, T1, T2, T3, T4, T5]) IsNew() bool {
 func (a Transacted[T, T1, T2, T3, T4, T5]) Less(
 	b Transacted[T, T1, T2, T3, T4, T5],
 ) bool {
-	return a.Sku.GetTai().Less(b.Sku.GetTai())
+	return a.GetTai().Less(b.GetTai())
 }
 
 func (a Transacted[T, T1, T2, T3, T4, T5]) EqualsAny(b any) bool {

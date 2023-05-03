@@ -156,7 +156,7 @@ func (t *Tai) Set(v string) (err error) {
 // }
 
 func (t Tai) IsZero() (ok bool) {
-	ok = (t.tai.Sec == 0 && t.tai.Asec == 0) || t.wasSet
+	ok = (t.tai.Sec == 0 && t.tai.Asec == 0) || !t.wasSet
 	return
 }
 

@@ -155,7 +155,7 @@ func (s etikettStore) ReadAll(
 	f schnittstellen.FuncIter[*etikett.Transacted],
 ) (err error) {
 	if s.StoreUtil.GetKonfig().UseBestandsaufnahme {
-		f1 := func(t *bestandsaufnahme.Objekte) (err error) {
+		f1 := func(t *bestandsaufnahme.Transacted) (err error) {
 			if err = t.Akte.Skus.Each(
 				func(sk sku.Sku) (err error) {
 					if sk.GetGattung() != gattung.Etikett {
@@ -184,7 +184,7 @@ func (s etikettStore) ReadAll(
 				err = errors.Wrapf(
 					err,
 					"Bestandsaufnahme: %s",
-					t.Tai,
+					t.GetKennung(),
 				)
 
 				return

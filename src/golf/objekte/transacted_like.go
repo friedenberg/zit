@@ -23,7 +23,7 @@ type TransactedLikePtr interface {
 	metadatei.Setter
 	GetMetadateiWithKennung() metadatei.WithKennung
 	GetKennungPtr() kennung.KennungPtr
-	UpdateTaiTo(kennung.Tai)
+	SetTai(kennung.Tai)
 }
 
 type StoredLikePtr interface {
