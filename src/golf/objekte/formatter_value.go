@@ -32,6 +32,7 @@ func (f *FormatterValue) Set(v string) (err error) {
 		"kennung",
 		"kennung-akte-sha",
 		"akte",
+		"metadatei",
 		"akte-sha",
 		"debug",
 		"etiketten",
@@ -116,6 +117,12 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 	case "sku":
 		return func(e TransactedLikePtr) (err error) {
 			_, err = fmt.Fprintln(out, e.GetSku().String())
+			return
+		}
+
+	case "metadatei":
+		return func(e TransactedLikePtr) (err error) {
+			_, err = fmt.Fprintf(out, "%#v\n", e.GetMetadatei())
 			return
 		}
 

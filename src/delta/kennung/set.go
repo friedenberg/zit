@@ -233,10 +233,6 @@ func (s Set) ContainsMatchable(m Matchable) bool {
 	es := m.GetEtikettenExpanded()
 	containsEtts := s.Etiketten.ContainsAgainst(es)
 
-	if !containsEtts && g != gattung.Etikett {
-		return false
-	}
-
 	// Only Zettels have Typs, so only filter against them in that case
 	if g == gattung.Zettel {
 		if t := m.GetTyp(); s.Typen.Len() > 0 && !s.Typen.Contains(t) {
@@ -254,22 +250,22 @@ func (s Set) ContainsMatchable(m Matchable) bool {
 	case Kasten:
 
 	case Typ:
-		if s.Typen.Len() > 0 && !s.Typen.Contains(id) {
+		if s.Typen.Len() > 0 && !s.Typen.Contains(id) || !containsEtts {
 			return false
 		}
 
 	case Etikett:
-		if s.Etiketten.Len() > 0 && !s.Etiketten.Contains(id) {
+		if s.Etiketten.Len() > 0 && !s.Etiketten.Contains(id) && !containsEtts {
 			return false
 		}
 
 	case Hinweis:
-		if s.Hinweisen.Len() > 0 && !s.Hinweisen.Contains(id) {
+		if s.Hinweisen.Len() > 0 && !s.Hinweisen.Contains(id) || !containsEtts {
 			return false
 		}
 
 	case Konfig:
-		if !s.HasKonfig {
+		if !s.HasKonfig || !containsEtts {
 			return false
 		}
 

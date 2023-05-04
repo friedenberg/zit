@@ -141,6 +141,8 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) InflateFromDataIdentity(
 		return
 	}
 
+	t.GetTai()
+
 	if err = h.readObjekte(o, t); err != nil {
 		err = errors.Wrapf(err, "DataIdentity: %s", o)
 		return
