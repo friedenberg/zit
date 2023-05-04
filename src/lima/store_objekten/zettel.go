@@ -17,6 +17,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
+	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/kilo/store_util"
@@ -244,6 +245,26 @@ func (s *zettelStore) readOneExternalAkte(
 
 	if err = s.SaveObjekte(ez); err != nil {
 		err = errors.Wrapf(err, "%s", f.Name())
+		return
+	}
+
+	typKonfig := s.GetKonfig().GetApproximatedTyp(
+		t.GetTyp(),
+	).ApproximatedOrActual()
+
+	if typKonfig == nil {
+		err = errors.Errorf("typKonfig for zettel is nil: %s", t.GetKennung())
+		return
+	}
+
+	fe := typ.GetFileExtension(typKonfig)
+
+	if fe != ez.GetAkteFD().ExtSansDot() {
+		err = errors.Wrap(ErrExternalAkteExtensionMismatch{
+			Expected: fe,
+			Actual:   ez.GetAkteFD(),
+		})
+
 		return
 	}
 
