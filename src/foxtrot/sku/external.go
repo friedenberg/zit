@@ -33,6 +33,12 @@ func (a External[T, T1]) GetAkteSha() schnittstellen.Sha {
 	return a.AkteSha
 }
 
+func (a *External[T, T1]) SetAkteSha(v schnittstellen.Sha) {
+	sh := sha.Make(v)
+	a.AkteSha = sh
+	a.FDs.Akte.Sha = sh
+}
+
 func (a *External[T, T1]) Transacted() (b Transacted[T, T1]) {
 	b = Transacted[T, T1]{
 		Kennung:    a.Kennung,

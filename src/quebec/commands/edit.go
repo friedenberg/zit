@@ -62,10 +62,10 @@ func (c Edit) DefaultGattungen() gattungen.Set {
 func (c Edit) RunWithCwdQuery(
 	u *umwelt.Umwelt,
 	ms kennung.MetaSet,
-	pz cwd.CwdFiles,
+	pz *cwd.CwdFiles,
 ) (err error) {
 	options := store_fs.CheckoutOptions{
-		Cwd:          pz,
+		Cwd:          *pz,
 		CheckoutMode: c.CheckoutMode,
 	}
 
@@ -142,7 +142,7 @@ func (c Edit) RunWithCwdQuery(
 		Delete: c.Delete,
 	}
 
-	if err = op.Run(u, ms, cwdFiles); err != nil {
+	if err = op.Run(u, ms, &cwdFiles); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -134,7 +134,7 @@ func (s Store) Flush() (err error) {
 // }
 
 func (s *Store) ReadFiles(
-	fs cwd.CwdFiles,
+	fs *cwd.CwdFiles,
 	ms kennung.MetaSet,
 	f schnittstellen.FuncIter[objekte.CheckedOutLike],
 ) (err error) {
@@ -195,7 +195,15 @@ func (s *Store) ReadFiles(
 				switch et := e.(type) {
 				case *zettel.Transacted:
 					if col, err = zettelEMGR.ReadOne(*et); err != nil {
-						err = errors.Wrap(err)
+						var errAkte store_objekten.ErrExternalAkteExtensionMismatch
+
+						if errors.As(err, &errAkte) {
+							fs.MarkUnsureAkten(errAkte.Actual)
+							err = nil
+						} else {
+							err = errors.Wrap(err)
+						}
+
 						return
 					}
 

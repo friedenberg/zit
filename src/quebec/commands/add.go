@@ -60,7 +60,7 @@ func (c Add) DefaultGattungen() gattungen.Set {
 func (c Add) RunWithCwdQuery(
 	u *umwelt.Umwelt,
 	ms kennung.MetaSet,
-	pz cwd.CwdFiles,
+	pz *cwd.CwdFiles,
 ) (err error) {
 	zettelsFromAkteOp := user_ops.ZettelFromExternalAkte{
 		Umwelt:      u,
@@ -77,7 +77,7 @@ func (c Add) RunWithCwdQuery(
 		return
 	}
 
-	if err = c.openAktenIfNecessary(u, zettelsFromAkteResults, pz); err != nil {
+	if err = c.openAktenIfNecessary(u, zettelsFromAkteResults, *pz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

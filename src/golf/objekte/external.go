@@ -144,6 +144,10 @@ func (t External[T, T1, T2, T3]) GetSkuAkteSha() schnittstellen.Sha {
 	return t.Sku.AkteSha
 }
 
+func (t External[T, T1, T2, T3]) GetFDAkteSha() schnittstellen.Sha {
+	return t.Sku.FDs.Akte.Sha
+}
+
 func (t External[T, T1, T2, T3]) GetAkteSha() schnittstellen.Sha {
 	AssertAkteShasMatch(t)
 	return t.Sku.AkteSha
@@ -157,7 +161,7 @@ func (e *External[T, T1, T2, T3]) SetAkteFD(fd kennung.FD) {
 func (e *External[T, T1, T2, T3]) SetAkteSha(v schnittstellen.Sha) {
 	sh := sha.Make(v)
 	e.GetMetadateiPtr().AkteSha = sh
-	e.Sku.AkteSha = sh
+	e.Sku.SetAkteSha(sh)
 }
 
 func (e External[T, T1, T2, T3]) ObjekteSha() sha.Sha {

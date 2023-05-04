@@ -39,7 +39,7 @@ func (c Diff) DefaultGattungen() gattungen.Set {
 func (c Diff) RunWithCwdQuery(
 	u *umwelt.Umwelt,
 	ms kennung.MetaSet,
-	cwdFiles cwd.CwdFiles,
+	cwdFiles *cwd.CwdFiles,
 ) (err error) {
 	// e := zettel_external.MakeFileEncoderJustOpen(
 	// 	u.StoreObjekten(),

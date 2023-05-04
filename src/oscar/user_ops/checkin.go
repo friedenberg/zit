@@ -20,7 +20,7 @@ type Checkin struct {
 func (c Checkin) Run(
 	u *umwelt.Umwelt,
 	ms kennung.MetaSet,
-	pz cwd.CwdFiles,
+	pz *cwd.CwdFiles,
 ) (err error) {
 	fds := kennung.MakeMutableFDSet()
 

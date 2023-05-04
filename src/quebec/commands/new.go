@@ -275,7 +275,7 @@ func (c New) editZettels(
 
 	checkinOp := user_ops.Checkin{}
 
-	if err = checkinOp.Run(u, ms, cwdFiles); err != nil {
+	if err = checkinOp.Run(u, ms, &cwdFiles); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

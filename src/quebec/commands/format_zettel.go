@@ -5,6 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
+	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/bravo/script_config"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
@@ -70,7 +71,12 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	zt := &zettel.Transacted{}
+	var zt *zettel.Transacted
+
+	if zt, err = u.StoreObjekten().Zettel().ReadOne(&h); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if e, ok := cwdFiles.GetZettel(h); ok {
 		var ze zettel.External
@@ -83,20 +89,12 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			return
 		}
 
-		zt = &zettel.Transacted{
-			Akte: ze.Akte,
-		}
-
 		// TODO-P1 switch to methods on Transacted and External
+		zt.Akte = ze.Akte
 		zt.SetMetadatei(ze.GetMetadatei())
 		zt.Sku.Kennung = ze.Sku.Kennung
-		zt.Sku.ObjekteSha = ze.Sku.ObjekteSha
-		zt.SetAkteSha(ze.Sku.AkteSha)
-	} else {
-		if zt, err = u.StoreObjekten().Zettel().ReadOne(&h); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+		zt.SetObjekteSha(ze.GetObjekteSha())
+		zt.SetAkteSha(ze.GetAkteSha())
 	}
 
 	typKonfig := u.Konfig().GetApproximatedTyp(
@@ -131,6 +129,8 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 			return
 		}
+	} else {
+		log.Log().Printf("typ konfig was nil")
 	}
 
 	var format metadatei.TextFormatter

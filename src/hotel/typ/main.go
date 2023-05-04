@@ -36,3 +36,11 @@ type CheckedOut = objekte.CheckedOut[
 	objekte.NilVerzeichnisse[Akte],
 	*objekte.NilVerzeichnisse[Akte],
 ]
+
+func GetFileExtension(t *Transacted) string {
+	if t.Akte.FileExtension != "" {
+		return t.Akte.FileExtension
+	}
+
+	return t.GetKennung().String()
+}

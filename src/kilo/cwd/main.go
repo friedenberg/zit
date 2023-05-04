@@ -32,6 +32,10 @@ type CwdFiles struct {
 	EmptyDirectories []kennung.FD
 }
 
+func (fs *CwdFiles) MarkUnsureAkten(fd kennung.FD) {
+	fs.UnsureAkten.Add(fd)
+}
+
 func (fs CwdFiles) EachCreatableMatchable(
 	m schnittstellen.FuncIter[kennung.IdLikeGetter],
 ) (err error) {

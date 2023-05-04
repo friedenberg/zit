@@ -3,7 +3,9 @@ package store_objekten
 import (
 	"fmt"
 
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
@@ -23,4 +25,26 @@ func (e ErrAkteExists) Error() string {
 		e.Akte,
 		e.MutableSet,
 	)
+}
+
+type ErrExternalAkteExtensionMismatch struct {
+	Expected string
+	Actual   kennung.FD
+}
+
+func (e ErrExternalAkteExtensionMismatch) Is(target error) bool {
+	_, ok := target.(ErrExternalAkteExtensionMismatch)
+	return ok
+}
+
+func (e ErrExternalAkteExtensionMismatch) Error() string {
+	return fmt.Sprintf(
+		"expected extension %q but got %q",
+		e.Expected,
+		e.Actual,
+	)
+}
+
+func IsErrExternalAkteExtensionMismatch(err error) bool {
+	return errors.Is(err, ErrExternalAkteExtensionMismatch{})
 }

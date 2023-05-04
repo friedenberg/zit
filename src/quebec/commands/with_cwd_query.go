@@ -18,7 +18,7 @@ type CommandWithCwdQuery interface {
 	RunWithCwdQuery(
 		store *umwelt.Umwelt,
 		ms kennung.MetaSet,
-		cwdFiles cwd.CwdFiles,
+		cwdFiles *cwd.CwdFiles,
 	) error
 	DefaultGattungen() gattungen.Set
 }
@@ -119,7 +119,7 @@ func (c commandWithCwdQuery) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	if err = c.RunWithCwdQuery(u, ids, cwdFiles); err != nil {
+	if err = c.RunWithCwdQuery(u, ids, &cwdFiles); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

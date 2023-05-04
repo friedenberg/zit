@@ -37,7 +37,7 @@ func (c Checkin) DefaultGattungen() gattungen.Set {
 func (c Checkin) RunWithCwdQuery(
 	u *umwelt.Umwelt,
 	ms kennung.MetaSet,
-	pz cwd.CwdFiles,
+	pz *cwd.CwdFiles,
 ) (err error) {
 	op := user_ops.Checkin{
 		Delete: c.Delete,
