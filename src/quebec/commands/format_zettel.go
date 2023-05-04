@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/cwd"
+	"github.com/friedenberg/zit/src/lima/store_objekten"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
@@ -81,20 +82,24 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	if e, ok := cwdFiles.GetZettel(h); ok {
 		var ze zettel.External
 
-		if ze, err = u.StoreObjekten().Zettel().ReadOneExternal(
-			e,
-			zt,
-		); err != nil {
+		ze, err = u.StoreObjekten().Zettel().ReadOneExternal(e, zt)
+
+		switch {
+		case store_objekten.IsErrExternalAkteExtensionMismatch(err):
+			err = nil
+
+		case err != nil:
 			err = errors.Wrap(err)
 			return
-		}
 
-		// TODO-P1 switch to methods on Transacted and External
-		zt.Akte = ze.Akte
-		zt.SetMetadatei(ze.GetMetadatei())
-		zt.Sku.Kennung = ze.Sku.Kennung
-		zt.SetObjekteSha(ze.GetObjekteSha())
-		zt.SetAkteSha(ze.GetAkteSha())
+		default:
+			// TODO-P1 switch to methods on Transacted and External
+			zt.Akte = ze.Akte
+			zt.SetMetadatei(ze.GetMetadatei())
+			zt.Sku.Kennung = ze.Sku.Kennung
+			zt.SetObjekteSha(ze.GetObjekteSha())
+			zt.SetAkteSha(ze.GetAkteSha())
+		}
 	}
 
 	typKonfig := u.Konfig().GetApproximatedTyp(
