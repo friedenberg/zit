@@ -57,7 +57,11 @@ func (av assignmentLineWriter) writeNormal(a *assignment) (err error) {
 	}
 
 	for _, z := range sortObjSet(a.named) {
-		av.WriteLines(fmt.Sprintf("%s- [%s] %s", tab_prefix, z.Kennung, z.Bezeichnung))
+		if z.Bezeichnung.IsEmpty() {
+			av.WriteLines(fmt.Sprintf("%s- [%s]", tab_prefix, z.Kennung))
+		} else {
+			av.WriteLines(fmt.Sprintf("%s- [%s] %s", tab_prefix, z.Kennung, z.Bezeichnung))
+		}
 	}
 
 	if a.named.Len() > 0 || a.unnamed.Len() > 0 {
@@ -124,7 +128,11 @@ func (av assignmentLineWriter) writeRightAligned(a *assignment) (err error) {
 
 	for _, z := range sortObjSet(a.named) {
 		h := kennung.Aligned(z.Kennung, av.maxKopf, av.maxSchwanz)
-		av.WriteLines(fmt.Sprintf("- [%s] %s", h, z.Bezeichnung))
+		if z.Bezeichnung.IsEmpty() {
+			av.WriteLines(fmt.Sprintf("- [%s]", h))
+		} else {
+			av.WriteLines(fmt.Sprintf("- [%s] %s", h, z.Bezeichnung))
+		}
 	}
 
 	if a.named.Len() > 0 || a.unnamed.Len() > 0 {

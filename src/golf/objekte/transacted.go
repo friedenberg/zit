@@ -3,6 +3,7 @@ package objekte
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/delta/kennung"
@@ -82,15 +83,26 @@ func (t Transacted[T, T1, T2, T3, T4, T5]) GetTai() kennung.Tai {
 	taiSku := t.Sku.Schwanz
 	taiMetadatei := t.GetMetadatei().Tai
 
-	if !taiSku.Equals(taiMetadatei) {
-		panic(errors.Errorf(
-			"tai in sku was %s while tai in metadatei was %s",
-			taiSku,
-			taiMetadatei,
-		))
-	}
+	switch {
+	case !taiSku.IsZero() && !taiMetadatei.IsZero():
+		if !taiSku.Equals(taiMetadatei) {
+			panic(errors.Errorf(
+				"tai in sku was %s while tai in metadatei was %s",
+				taiSku,
+				taiMetadatei,
+			))
+		} else {
+			return taiMetadatei
+		}
 
-	return taiMetadatei
+	case !taiMetadatei.IsZero():
+		log.Log().Caller(1, "tai sku is missing while tai metadatei is %s", taiMetadatei)
+		return taiMetadatei
+
+	default:
+		log.Log().Caller(1, "tai metadatei is missing while tai sku is %s", taiSku)
+		return taiSku
+	}
 }
 
 func (t *Transacted[T, T1, T2, T3, T4, T5]) SetTai(ta kennung.Tai) {
@@ -250,7 +262,7 @@ func (a *Transacted[T, T1, T2, T3, T4, T5]) SetDataIdentity(
 	a.Sku.Kennung = h
 	a.Sku.ObjekteSha = sha.Make(o.GetObjekteSha())
 	a.Sku.AkteSha = sha.Make(o.GetAkteSha())
-	a.Sku.Schwanz = o.GetTai()
+	a.SetTai(o.GetTai())
 
 	return
 }
@@ -271,7 +283,7 @@ func (a *Transacted[T, T1, T2, T3, T4, T5]) SetSkuLike(
 	a.Sku.TransactionIndex = o.GetTransactionIndex()
 	// TODO-P3 fix sku kopf and schwanz
 	// a.Sku.Kopf = t
-	a.Sku.Schwanz = o.GetTai()
+	a.SetTai(o.GetTai())
 
 	return
 }

@@ -36,8 +36,6 @@ func (c CommitOrganizeFile) Run(
 		return
 	}
 
-	errors.Log().Printf("%#v", cs)
-
 	sameTyp := a.Metadatei.Typ.Equals(b.Metadatei.Typ)
 
 	toUpdate := collections.MakeMutableSetStringer[metadatei.WithKennung]()
@@ -68,6 +66,7 @@ func (c CommitOrganizeFile) Run(
 	}
 
 	ms := c.Umwelt.MakeMetaIdSet(nil, gattungen.MakeSet(gattung.TrueGattung()...))
+	errors.TodoP1("create query without syntax")
 	ms.Set(":z,e,t")
 
 	if err = store.Query(
@@ -77,7 +76,7 @@ func (c CommitOrganizeFile) Run(
 			ok := false
 			k := tl.GetKennungPtr()
 
-			if change, ok = cs.GetExisting().Get(k.String()); !ok {
+			if change, ok = cs.GetExisting().Get(kennung.FormattedString(k)); !ok {
 				return
 			}
 
@@ -86,7 +85,7 @@ func (c CommitOrganizeFile) Run(
 			}
 
 			m := tl.GetMetadatei()
-			mes := m.Etiketten.MutableClone()
+			mes := m.GetEtiketten().MutableClone()
 			change.GetRemoved().Each(mes.Del)
 			change.GetAdded().Each(mes.Add)
 			m.Etiketten = mes.ImmutableClone()

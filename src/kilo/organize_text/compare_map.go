@@ -95,12 +95,12 @@ func (a *assignment) addToCompareMap(
 					panic(fmt.Sprintf("%s: Kennung is nil", z))
 				}
 
-				out.Named.Add(z.Kennung.String(), e)
+				out.Named.Add(kennung.FormattedString(z.Kennung), e)
 			}
 
 			for _, e := range m.EtikettSet.Elements() {
 				errors.TodoP4("add typ")
-				out.Named.Add(z.Kennung.String(), e)
+				out.Named.Add(kennung.FormattedString(z.Kennung), e)
 			}
 
 			return

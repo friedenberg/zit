@@ -95,7 +95,7 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) InflateFromSku2(
 		return
 	}
 
-	t.SetTai(t.GetTai())
+	t.SetTai(o.GetTai())
 
 	// TODO-P2 make generic
 	if t.Sku.Kennung.GetGattung() != o.Gattung {

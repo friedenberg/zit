@@ -1,6 +1,8 @@
 package store_objekten
 
 import (
+	"sync"
+
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
@@ -41,6 +43,7 @@ type Store struct {
 	metadateiUpdaters map[schnittstellen.Gattung]objekte_store.UpdaterManyMetadatei
 
 	isReindexing bool
+	lock         sync.Locker
 }
 
 func Make(
@@ -48,6 +51,7 @@ func Make(
 	p schnittstellen.Pool[zettel.Transacted, *zettel.Transacted],
 ) (s *Store, err error) {
 	s = &Store{
+		lock:      &sync.Mutex{},
 		StoreUtil: su,
 	}
 
@@ -493,10 +497,13 @@ func (s *Store) addEtikett(
 func (s *Store) addMatchableTypAndEtikettenIfNecessary(
 	m kennung.Matchable,
 ) (err error) {
-	// TODO-P2 support other true gattung
-	if !gattung.Zettel.EqualsAny(m.GetGattung()) {
-		return
-	}
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
+	// // TODO-P2 support other true gattung
+	// if !gattung.Zettel.EqualsAny(m.GetGattung()) {
+	// 	return
+	// }
 
 	t := m.GetTyp()
 

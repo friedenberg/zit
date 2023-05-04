@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"sync"
 
 	pkg_angeboren "github.com/friedenberg/zit/src/alfa/angeboren"
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -36,6 +37,7 @@ type Compiled struct {
 }
 
 func (a *compiled) Reset() {
+	a.lock = &sync.Mutex{}
 	a.Typen = makeCompiledTypSetFromSlice(nil)
 	a.Etiketten = makeCompiledEtikettSetFromSlice(nil)
 	a.Kisten = makeCompiledKastenSetFromSlice(nil)
@@ -52,6 +54,8 @@ func (a *Compiled) GetErworbenPtr() *erworben.Akte {
 type cli = erworben.Cli
 
 type compiled struct {
+	lock sync.Locker
+
 	hasChanges bool
 
 	Sku sku.Transacted[kennung.Konfig, *kennung.Konfig]
@@ -403,12 +407,13 @@ func (k *compiled) SetTransacted(
 func (k *compiled) AddKasten(
 	b *kasten.Transacted,
 ) {
+	k.lock.Lock()
+	defer k.lock.Unlock()
 	k.hasChanges = true
 	a, ok := k.Kisten.Get(k.Kisten.Key(b))
 
 	if !ok || a.Less(*b) {
 		k.Kisten.Add(b)
-		return
 	}
 
 	return
@@ -417,23 +422,14 @@ func (k *compiled) AddKasten(
 func (k *compiled) AddTyp(
 	b *typ.Transacted,
 ) {
-	// if ct.Objekte.Akte.Actions == nil {
-	// 	errors.TodoP1("actions were nil: %s", ct.Sku)
-	// 	return
-	// }
-
-	// if ct.Objekte.Akte.EtikettenRules == nil {
-	// 	errors.TodoP1("etiketten rules were nil: %s", ct.Sku)
-	// 	return
-	// }
-
+	k.lock.Lock()
+	defer k.lock.Unlock()
 	k.hasChanges = true
 
 	a, ok := k.Typen.Get(k.Typen.Key(b))
 
 	if !ok || a.Less(*b) {
 		k.Typen.Add(b)
-		return
 	}
 
 	return
@@ -442,13 +438,14 @@ func (k *compiled) AddTyp(
 func (k *compiled) AddEtikett(
 	b *etikett.Transacted,
 ) {
+	k.lock.Lock()
+	defer k.lock.Unlock()
 	k.hasChanges = true
 
 	a, ok := k.Etiketten.Get(k.Etiketten.Key(b))
 
 	if !ok || a.Less(*b) {
 		k.Etiketten.Add(b)
-		return
 	}
 
 	return

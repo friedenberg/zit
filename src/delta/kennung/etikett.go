@@ -2,6 +2,7 @@ package kennung
 
 import (
 	"regexp"
+	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
@@ -73,7 +74,13 @@ func (e Etikett) String() string {
 }
 
 func (e Etikett) Parts() [3]string {
-	return [3]string{"", "-", e.value}
+	v := e.value
+
+	if strings.HasPrefix(v, "-") {
+		v = v[1:]
+	}
+
+	return [3]string{"", "-", v}
 }
 
 func (e *Etikett) Set(v string) (err error) {

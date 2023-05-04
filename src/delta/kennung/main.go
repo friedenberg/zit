@@ -87,6 +87,15 @@ func Make(v string) (k Kennung, err error) {
 	return
 }
 
+func FormattedString(k Kennung) string {
+	sb := &strings.Builder{}
+	parts := k.Parts()
+	sb.WriteString(parts[0])
+	sb.WriteString(parts[1])
+	sb.WriteString(parts[2])
+	return sb.String()
+}
+
 func AlignedParts(
 	id Kennung,
 	lenLeft, lenRight int,
