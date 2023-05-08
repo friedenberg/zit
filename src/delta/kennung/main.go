@@ -27,6 +27,7 @@ type KennungPtr interface {
 	encoding.TextUnmarshaler
 	encoding.BinaryUnmarshaler
 	schnittstellen.Resetter2
+	schnittstellen.Setter
 	KennungPtrClone() KennungPtr
 }
 
@@ -83,6 +84,32 @@ func Make(v string) (k Kennung, err error) {
 	}
 
 	err = errors.Errorf("%q is not a valid Kennung", v)
+
+	return
+}
+
+func SetQueryKennung(k KennungPtr, v string) (isNegated bool, err error) {
+	v = strings.TrimSpace(v)
+
+	if len(v) > 0 && []rune(v)[0] == QueryNegationOperator {
+		v = v[1:]
+		isNegated = true
+	}
+
+	var p string
+
+	if qp, ok := k.(QueryPrefixer); ok {
+		p = qp.GetQueryPrefix()
+	}
+
+	if len(v) > 0 && v[:len(p)] == p {
+		v = v[len(p):]
+	}
+
+	if err = k.Set(v); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }

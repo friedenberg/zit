@@ -13,7 +13,7 @@ import (
 )
 
 type ImplicitEtikettenGetter interface {
-	GetImplicitEtiketten(Matchable) schnittstellen.Set[Etikett]
+	GetImplicitEtiketten(Etikett) schnittstellen.Set[Etikett]
 }
 
 type Set struct {
@@ -100,7 +100,24 @@ func (s *Set) Set(v string) (err error) {
 		return
 	}
 
-	if err = s.Etiketten.AddString(v); err == nil {
+	var (
+		e         Etikett
+		isNegated bool
+	)
+
+	if isNegated, err = SetQueryKennung(&e, v); err == nil {
+		colMethod := s.Etiketten.AddInclude
+
+		if isNegated {
+			colMethod = s.Etiketten.AddExclude
+		}
+
+		if s.ImplicitEtikettenGetter != nil {
+			s.ImplicitEtikettenGetter.GetImplicitEtiketten(e).Each(colMethod)
+		}
+
+		colMethod(e)
+
 		return
 	}
 
@@ -237,11 +254,6 @@ func (s Set) ContainsMatchable(m Matchable) bool {
 
 	es := m.GetEtikettenExpanded()
 	containsEtts := s.Etiketten.ContainsAgainst(es)
-
-	if !containsEtts && s.ImplicitEtikettenGetter != nil {
-		esImp := s.ImplicitEtikettenGetter.GetImplicitEtiketten(m)
-		containsEtts = s.Etiketten.ContainsAgainst(esImp)
-	}
 
 	// Only Zettels have Typs, so only filter against them in that case
 	if g == gattung.Zettel {

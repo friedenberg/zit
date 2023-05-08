@@ -329,6 +329,22 @@ func (c compiled) GetSortedTypenExpanded(
 	return
 }
 
+func (c compiled) GetImplicitEtiketten(
+	e kennung.Etikett,
+) (out schnittstellen.Set[kennung.Etikett]) {
+	out = collections.MakeSetStringer[kennung.Etikett]()
+
+	ek, ok := c.Etiketten.Get(e.String())
+
+	if !ok {
+		return
+	}
+
+	out = ek.ImplicitEtiketten
+
+	return
+}
+
 func (c compiled) GetSortedEtikettenExpanded(
 	v string,
 ) (expandedActual []etikett.Transacted) {

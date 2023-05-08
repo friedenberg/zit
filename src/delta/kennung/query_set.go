@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/todo"
@@ -227,26 +228,23 @@ func (kqs mutableQuerySet[T, TPtr]) MutableClone() MutableQuerySet[T, TPtr] {
 }
 
 func (kqs mutableQuerySet[T, TPtr]) AddString(v string) (err error) {
-	col := kqs.Include
-	v = strings.TrimSpace(v)
-
-	if len(v) > 0 && []rune(v)[0] == QueryNegationOperator {
-		v = v[1:]
-		col = kqs.Exclude
-	}
-
-	var e T
-	p := e.GetQueryPrefix()
-
-	if len(v) > 0 && v[:len(p)] == p {
-		v = v[1:]
-	}
-
-	err = collections.ExpandAndAddString[T, TPtr](
-		col,
-		kqs.Expander,
-		v,
+	var (
+		e         T
+		isNegated bool
 	)
+
+	isNegated, err = SetQueryKennung(TPtr(&e), v)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if isNegated {
+		err = kqs.Exclude.Add(e)
+	} else {
+		err = kqs.Include.Add(e)
+	}
 
 	return
 }
