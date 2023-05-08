@@ -19,7 +19,7 @@ type ImplicitEtikettenGetter interface {
 type Set struct {
 	cwd                     Matcher
 	expanders               Expanders
-	ImplicitEtikettenGetter ImplicitEtikettenGetter
+	implicitEtikettenGetter ImplicitEtikettenGetter
 	Shas                    sha_collections.MutableSet
 	Etiketten               MutableQuerySet[Etikett, *Etikett]
 	Hinweisen               HinweisMutableSet
@@ -37,22 +37,24 @@ func MakeSet(
 	cwd Matcher,
 	ex Expanders,
 	hidden Matcher,
+	implicitEtikettenGetter ImplicitEtikettenGetter,
 ) Set {
 	if hidden == nil {
 		hidden = MakeMatcherNever()
 	}
 
 	return Set{
-		cwd:        cwd,
-		expanders:  ex,
-		Shas:       sha_collections.MakeMutableSet(),
-		Etiketten:  MakeMutableQuerySet[Etikett, *Etikett](ex.Etikett, nil, nil),
-		Hinweisen:  MakeHinweisMutableSet(),
-		Typen:      MakeTypMutableSet(),
-		Kisten:     MakeKastenMutableSet(),
-		Timestamps: collections.MakeMutableSetStringer[Time](),
-		FDs:        MakeMutableFDSet(),
-		hidden:     hidden,
+		cwd:                     cwd,
+		expanders:               ex,
+		implicitEtikettenGetter: implicitEtikettenGetter,
+		Shas:                    sha_collections.MakeMutableSet(),
+		Etiketten:               MakeMutableQuerySet[Etikett, *Etikett](ex.Etikett, nil, nil),
+		Hinweisen:               MakeHinweisMutableSet(),
+		Typen:                   MakeTypMutableSet(),
+		Kisten:                  MakeKastenMutableSet(),
+		Timestamps:              collections.MakeMutableSetStringer[Time](),
+		FDs:                     MakeMutableFDSet(),
+		hidden:                  hidden,
 	}
 }
 
@@ -112,8 +114,9 @@ func (s *Set) Set(v string) (err error) {
 			colMethod = s.Etiketten.AddExclude
 		}
 
-		if s.ImplicitEtikettenGetter != nil {
-			s.ImplicitEtikettenGetter.GetImplicitEtiketten(e).Each(colMethod)
+		if s.implicitEtikettenGetter != nil {
+			impl := s.implicitEtikettenGetter.GetImplicitEtiketten(e)
+			impl.Each(colMethod)
 		}
 
 		colMethod(e)

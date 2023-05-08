@@ -319,6 +319,7 @@ func (u *Umwelt) MakeMetaIdSet(
 		exc,
 		u.Konfig().FileExtensions,
 		dg,
+		u.Konfig(),
 	)
 }
 
@@ -329,5 +330,6 @@ func (u *Umwelt) MakeIdSet(
 		cwd,
 		u.MakeKennungExpanders(),
 		nil,
+		u.Konfig(),
 	)
 }

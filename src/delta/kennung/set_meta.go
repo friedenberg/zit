@@ -32,13 +32,14 @@ type MetaSet interface {
 }
 
 type metaSet struct {
-	cwd                 Matcher
-	fileExtensionGetter schnittstellen.FileExtensionGetter
-	expanders           Expanders
-	Hidden              Matcher
-	DefaultGattungen    gattungen.Set
-	Gattung             map[gattung.Gattung]Set
-	FDs                 schnittstellen.MutableSet[FD]
+	implicitEtikettenGetter ImplicitEtikettenGetter
+	cwd                     Matcher
+	fileExtensionGetter     schnittstellen.FileExtensionGetter
+	expanders               Expanders
+	Hidden                  Matcher
+	DefaultGattungen        gattungen.Set
+	Gattung                 map[gattung.Gattung]Set
+	FDs                     schnittstellen.MutableSet[FD]
 }
 
 func MakeMetaSet(
@@ -47,15 +48,17 @@ func MakeMetaSet(
 	hidden Matcher,
 	feg schnittstellen.FileExtensionGetter,
 	dg gattungen.Set,
+	implicitEtikettenGetter ImplicitEtikettenGetter,
 ) MetaSet {
 	return &metaSet{
-		cwd:                 cwd,
-		fileExtensionGetter: feg,
-		expanders:           ex,
-		Hidden:              hidden,
-		DefaultGattungen:    dg.MutableClone(),
-		Gattung:             make(map[gattung.Gattung]Set),
-		FDs:                 collections.MakeMutableSetStringer[FD](),
+		implicitEtikettenGetter: implicitEtikettenGetter,
+		cwd:                     cwd,
+		fileExtensionGetter:     feg,
+		expanders:               ex,
+		Hidden:                  hidden,
+		DefaultGattungen:        dg.MutableClone(),
+		Gattung:                 make(map[gattung.Gattung]Set),
+		FDs:                     collections.MakeMutableSetStringer[FD](),
 	}
 }
 
@@ -64,15 +67,17 @@ func MakeMetaSetAll(
 	ex Expanders,
 	hidden Matcher,
 	feg schnittstellen.FileExtensionGetter,
+	implicitEtikettenGetter ImplicitEtikettenGetter,
 ) MetaSet {
 	errors.TodoP2("support allowed sigils")
 	return &metaSet{
-		cwd:                 cwd,
-		fileExtensionGetter: feg,
-		expanders:           ex,
-		Hidden:              hidden,
-		DefaultGattungen:    gattungen.MakeSet(gattung.TrueGattung()...),
-		Gattung:             make(map[gattung.Gattung]Set),
+		implicitEtikettenGetter: implicitEtikettenGetter,
+		cwd:                     cwd,
+		fileExtensionGetter:     feg,
+		expanders:               ex,
+		Hidden:                  hidden,
+		DefaultGattungen:        gattungen.MakeSet(gattung.TrueGattung()...),
+		Gattung:                 make(map[gattung.Gattung]Set),
 	}
 }
 
@@ -267,7 +272,7 @@ func (ms metaSet) GetTypen() schnittstellen.Set[Typ] {
 }
 
 func (ms metaSet) MakeSet() Set {
-	return MakeSet(ms.cwd, ms.expanders, ms.Hidden)
+	return MakeSet(ms.cwd, ms.expanders, ms.Hidden, ms.implicitEtikettenGetter)
 }
 
 func (s metaSet) ContainsMatchable(m Matchable) bool {

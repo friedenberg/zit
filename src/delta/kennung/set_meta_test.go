@@ -26,6 +26,7 @@ func TestMetaSetGob(t1 *testing.T) {
 			gattungen.MakeSet(
 				gattung.Zettel,
 			),
+			nil,
 		)
 
 		if err := sut.Set("one/uno@zettel"); err != nil {

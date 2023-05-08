@@ -336,7 +336,7 @@ func (c compiled) GetImplicitEtiketten(
 
 	ek, ok := c.Etiketten.Get(e.String())
 
-	if !ok {
+	if !ok || ek.ImplicitEtiketten == nil {
 		return
 	}
 
