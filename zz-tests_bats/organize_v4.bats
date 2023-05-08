@@ -32,8 +32,8 @@ cat_organize() (
 
 		             ###                 -commands
 
-		- [ tec/slowp  ] update output of commands to use new store
 		- [ mer/golb   ] use error types to generate specific exit status codes
+		- [ tec/slowp  ] update output of commands to use new store
 
 		             ###                 -etiketten_and_organize
 
@@ -44,7 +44,6 @@ cat_organize() (
 
 		- [  ph/hitmonc] Add bats test for initing more than once.md
 		- [ rub/rap    ] add .exrc to init
-
 	EOM
 )
 
