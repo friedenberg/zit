@@ -78,8 +78,9 @@ func (es mutableSet[T]) Del(e T) (err error) {
 	return
 }
 
-func (a mutableSet[T]) Reset() {
+func (a *mutableSet[T]) Reset() {
 	a.Each(a.Del)
+	a.lock = &sync.Mutex{}
 }
 
 func (a mutableSet[T]) ImmutableClone() schnittstellen.Set[T] {
@@ -105,6 +106,8 @@ func (s mutableSet[T]) MarshalBinary() (bs []byte, err error) {
 }
 
 func (s *mutableSet[T]) UnmarshalBinary(bs []byte) (err error) {
+	s.Reset()
+
 	b := bytes.NewBuffer(bs)
 	dec := gob.NewDecoder(b)
 

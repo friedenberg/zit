@@ -10,6 +10,8 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/golf/persisted_metadatei_format"
 )
@@ -31,6 +33,7 @@ func (f *FormatterValue) Set(v string) (err error) {
 		"objekte",
 		"kennung",
 		"kennung-akte-sha",
+		"bezeichnung",
 		"akte",
 		"metadatei",
 		"akte-sha",
@@ -58,6 +61,30 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 	logFunc schnittstellen.FuncIter[TransactedLikePtr],
 ) schnittstellen.FuncIter[TransactedLikePtr] {
 	switch fv.string {
+	case "etiketten":
+		return func(tl TransactedLikePtr) (err error) {
+			if _, err = fmt.Fprintln(
+				out,
+				collections.StringCommaSeparated[kennung.Etikett](
+					tl.GetMetadatei().GetEtiketten(),
+				),
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+	case "bezeichnung":
+		return func(tl TransactedLikePtr) (err error) {
+			if _, err = fmt.Fprintln(out, tl.GetMetadatei().Bezeichnung); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+
 	case "text":
 		fInlineAkte := metadatei.MakeTextFormatterMetadateiInlineAkte(af, nil)
 		fOmitMetadatei := metadatei.MakeTextFormatterExcludeMetadatei(af, nil)
