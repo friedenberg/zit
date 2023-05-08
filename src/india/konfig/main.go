@@ -39,7 +39,7 @@ type Compiled struct {
 func (a *compiled) Reset() {
 	a.lock = &sync.Mutex{}
 	a.Typen = makeCompiledTypSetFromSlice(nil)
-	a.Etiketten = makeCompiledEtikettSetFromSlice(nil)
+	a.Etiketten = collections.MakeMutableSetStringer[ketikett]()
 	a.Kisten = makeCompiledKastenSetFromSlice(nil)
 }
 
@@ -66,7 +66,7 @@ type compiled struct {
 	EtikettenHidden             schnittstellen.Set[kennung.Etikett]
 	EtikettenHiddenStringsSlice []string
 	EtikettenToAddToNew         []string
-	Etiketten                   etikettSet
+	Etiketten                   schnittstellen.MutableSet[ketikett]
 
 	// Typen
 	ExtensionsToTypen map[string]string
@@ -188,7 +188,8 @@ func (kc *compiled) recompile() (err error) {
 	etikettenHidden := collections.MakeMutableSetStringer[kennung.Etikett]()
 
 	if err = kc.Etiketten.Each(
-		func(ct *etikett.Transacted) (err error) {
+		func(ke ketikett) (err error) {
+			ct := ke.Transacted
 			k := ct.Sku.Kennung
 			tn := k.String()
 			tv := ct.Akte
@@ -325,11 +326,11 @@ func (c compiled) GetSortedTypenExpanded(
 
 func (c compiled) GetSortedEtikettenExpanded(
 	v string,
-) (expandedActual []*etikett.Transacted) {
+) (expandedActual []etikett.Transacted) {
 	expandedMaybe := collections.MakeMutableSetStringer[values.String]()
 	sa := collections.MakeFuncSetString[values.String, *values.String](expandedMaybe)
 	typExpander.Expand(sa, v)
-	expandedActual = make([]*etikett.Transacted, 0)
+	expandedActual = make([]etikett.Transacted, 0)
 
 	expandedMaybe.Each(
 		func(v values.String) (err error) {
@@ -339,7 +340,7 @@ func (c compiled) GetSortedEtikettenExpanded(
 				return
 			}
 
-			expandedActual = append(expandedActual, ct)
+			expandedActual = append(expandedActual, ct.Transacted)
 
 			return
 		},
@@ -386,7 +387,7 @@ func (kc compiled) GetKasten(k kennung.Kasten) (ct *kasten.Transacted) {
 	return
 }
 
-func (kc compiled) GetEtikett(k kennung.Etikett) (ct *etikett.Transacted) {
+func (kc compiled) GetEtikett(k kennung.Etikett) (ct etikett.Transacted) {
 	expandedActual := kc.GetSortedEtikettenExpanded(k.String())
 
 	if len(expandedActual) > 0 {
@@ -435,16 +436,30 @@ func (k *compiled) AddTyp(
 	return
 }
 
+func (k compiled) EachEtikett(
+	f schnittstellen.FuncIter[*etikett.Transacted],
+) (err error) {
+	return k.Etiketten.Each(
+		func(ek ketikett) (err error) {
+			return f(&ek.Transacted)
+		},
+	)
+}
+
 func (k *compiled) AddEtikett(
-	b *etikett.Transacted,
+	b1 *etikett.Transacted,
 ) {
 	k.lock.Lock()
 	defer k.lock.Unlock()
 	k.hasChanges = true
 
-	a, ok := k.Etiketten.Get(k.Etiketten.Key(b))
+	b := ketikett{
+		Transacted: *b1,
+	}
 
-	if !ok || a.Less(*b) {
+	a, ok := k.Etiketten.Get(b.String())
+
+	if !ok || a.Less(b) {
 		k.Etiketten.Add(b)
 	}
 

@@ -130,7 +130,8 @@ func (s etikettStore) updateOne(t *etikett.Transacted) (err error) {
 func (s etikettStore) ReadOne(
 	k *kennung.Etikett,
 ) (tt *etikett.Transacted, err error) {
-	tt = s.StoreUtil.GetKonfig().GetEtikett(*k)
+	tt1 := s.StoreUtil.GetKonfig().GetEtikett(*k)
+	tt = &tt1
 
 	if tt == nil {
 		err = errors.Wrap(objekte_store.ErrNotFound{Id: k})
@@ -143,7 +144,7 @@ func (s etikettStore) ReadOne(
 func (s etikettStore) ReadAllSchwanzen(
 	f schnittstellen.FuncIter[*etikett.Transacted],
 ) (err error) {
-	if err = s.StoreUtil.GetKonfig().Etiketten.Each(f); err != nil {
+	if err = s.StoreUtil.GetKonfig().EachEtikett(f); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
