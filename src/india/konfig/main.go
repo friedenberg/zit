@@ -187,8 +187,8 @@ func (kc *compiled) recompile() (err error) {
 
 	etikettenHidden := collections.MakeMutableSetStringer[kennung.Etikett]()
 
-	if err = kc.Etiketten.Each(
-		func(ke ketikett) (err error) {
+	if err = kc.Etiketten.EachPtr(
+		func(ke *ketikett) (err error) {
 			ct := ke.Transacted
 			k := ct.Sku.Kennung
 			tn := k.String()
@@ -208,7 +208,12 @@ func (kc *compiled) recompile() (err error) {
 
 			// kc.applyExpandedEtikett(ct)
 
-			return
+			ke.ImplicitEtiketten = collections.MakeMutableSetStringer[kennung.Etikett]()
+
+			return kc.AccumulateImplicitEtiketten(
+				ke.Transacted.Sku.Kennung,
+				ke.ImplicitEtiketten,
+			)
 		},
 	); err != nil {
 		err = errors.Wrap(err)
@@ -444,6 +449,44 @@ func (k compiled) EachEtikett(
 			return f(&ek.Transacted)
 		},
 	)
+}
+
+func (k *compiled) AccumulateImplicitEtiketten(
+	e kennung.Etikett,
+	acc schnittstellen.MutableSet[kennung.Etikett],
+) (err error) {
+	ek, ok := k.Etiketten.Get(e.String())
+
+	if !ok {
+		return
+	}
+
+	if err = kennung.ExpandMany[kennung.Etikett](
+		ek.Transacted.GetMetadatei().GetEtiketten(),
+	).Each(
+		func(e1 kennung.Etikett) (err error) {
+			if acc.Contains(e1) {
+				return
+			}
+
+			if err = acc.Add(e1); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if err = k.AccumulateImplicitEtiketten(e1, acc); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (k *compiled) AddEtikett(

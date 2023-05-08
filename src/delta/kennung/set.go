@@ -12,18 +12,23 @@ import (
 	"github.com/friedenberg/zit/src/delta/sha_collections"
 )
 
+type ImplicitEtikettenGetter interface {
+	GetImplicitEtiketten(Matchable) schnittstellen.Set[Etikett]
+}
+
 type Set struct {
-	cwd        Matcher
-	expanders  Expanders
-	Shas       sha_collections.MutableSet
-	Etiketten  MutableQuerySet[Etikett, *Etikett]
-	Hinweisen  HinweisMutableSet
-	Typen      TypMutableSet
-	Timestamps schnittstellen.MutableSet[Time]
-	Kisten     KastenMutableSet
-	FDs        MutableFDSet
-	HasKonfig  bool
-	Sigil      Sigil
+	cwd                     Matcher
+	expanders               Expanders
+	ImplicitEtikettenGetter ImplicitEtikettenGetter
+	Shas                    sha_collections.MutableSet
+	Etiketten               MutableQuerySet[Etikett, *Etikett]
+	Hinweisen               HinweisMutableSet
+	Typen                   TypMutableSet
+	Timestamps              schnittstellen.MutableSet[Time]
+	Kisten                  KastenMutableSet
+	FDs                     MutableFDSet
+	HasKonfig               bool
+	Sigil                   Sigil
 
 	hidden Matcher
 }
@@ -232,6 +237,11 @@ func (s Set) ContainsMatchable(m Matchable) bool {
 
 	es := m.GetEtikettenExpanded()
 	containsEtts := s.Etiketten.ContainsAgainst(es)
+
+	if !containsEtts && s.ImplicitEtikettenGetter != nil {
+		esImp := s.ImplicitEtikettenGetter.GetImplicitEtiketten(m)
+		containsEtts = s.Etiketten.ContainsAgainst(esImp)
+	}
 
 	// Only Zettels have Typs, so only filter against them in that case
 	if g == gattung.Zettel {
