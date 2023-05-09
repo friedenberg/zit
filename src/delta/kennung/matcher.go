@@ -98,22 +98,34 @@ func (_ matcherNever) ContainsMatchable(_ Matchable) bool {
 //
 
 func MakeMatcherAnd(ms ...Matcher) matcherAnd {
-	return matcherAnd(ms)
+	return matcherAnd{
+		MatchOnEmpty: true,
+		Children:     ms,
+	}
 }
 
-type matcherAnd []Matcher
+func MakeMatcherAndDoNotMatchOnEmpty(ms ...Matcher) matcherAnd {
+	return matcherAnd{
+		Children: ms,
+	}
+}
+
+type matcherAnd struct {
+	MatchOnEmpty bool
+	Children     []Matcher
+}
 
 func (matcher *matcherAnd) Add(m Matcher) (err error) {
-	*matcher = append(*matcher, m)
+	matcher.Children = append(matcher.Children, m)
 	return
 }
 
 func (matcher matcherAnd) ContainsMatchable(matchable Matchable) bool {
-	if len(matcher) == 0 {
-		return true
+	if len(matcher.Children) == 0 {
+		return matcher.MatchOnEmpty
 	}
 
-	for _, m := range matcher {
+	for _, m := range matcher.Children {
 		if !m.ContainsMatchable(matchable) {
 			return false
 		}
@@ -123,7 +135,7 @@ func (matcher matcherAnd) ContainsMatchable(matchable Matchable) bool {
 }
 
 func (matcher matcherAnd) Each(f schnittstellen.FuncIter[Matcher]) (err error) {
-	for _, m := range matcher {
+	for _, m := range matcher.Children {
 		if err = f(m); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -141,22 +153,34 @@ func (matcher matcherAnd) Each(f schnittstellen.FuncIter[Matcher]) (err error) {
 //
 
 func MakeMatcherOr(ms ...Matcher) matcherOr {
-	return matcherOr(ms)
+	return matcherOr{
+		MatchOnEmpty: true,
+		Children:     ms,
+	}
 }
 
-type matcherOr []Matcher
+func MakeMatcherOrDoNotMatchOnEmpty(ms ...Matcher) matcherOr {
+	return matcherOr{
+		Children: ms,
+	}
+}
+
+type matcherOr struct {
+	MatchOnEmpty bool
+	Children     []Matcher
+}
 
 func (matcher *matcherOr) Add(m Matcher) (err error) {
-	*matcher = append(*matcher, m)
+	matcher.Children = append(matcher.Children, m)
 	return
 }
 
 func (matcher matcherOr) ContainsMatchable(matchable Matchable) bool {
-	if len(matcher) == 0 {
-		return true
+	if len(matcher.Children) == 0 {
+		return matcher.MatchOnEmpty
 	}
 
-	for _, m := range matcher {
+	for _, m := range matcher.Children {
 		if m.ContainsMatchable(matchable) {
 			return true
 		}
@@ -166,7 +190,7 @@ func (matcher matcherOr) ContainsMatchable(matchable Matchable) bool {
 }
 
 func (matcher matcherOr) Each(f schnittstellen.FuncIter[Matcher]) (err error) {
-	for _, m := range matcher {
+	for _, m := range matcher.Children {
 		if err = f(m); err != nil {
 			err = errors.Wrap(err)
 			return
