@@ -103,8 +103,9 @@ func MakeMatcherAnd(ms ...Matcher) matcherAnd {
 
 type matcherAnd []Matcher
 
-func (matcher *matcherAnd) Add(m Matcher) {
+func (matcher *matcherAnd) Add(m Matcher) (err error) {
 	*matcher = append(*matcher, m)
+	return
 }
 
 func (matcher matcherAnd) ContainsMatchable(matchable Matchable) bool {
@@ -145,8 +146,9 @@ func MakeMatcherOr(ms ...Matcher) matcherOr {
 
 type matcherOr []Matcher
 
-func (matcher *matcherOr) Add(m Matcher) {
+func (matcher *matcherOr) Add(m Matcher) (err error) {
 	*matcher = append(*matcher, m)
+	return
 }
 
 func (matcher matcherOr) ContainsMatchable(matchable Matchable) bool {
@@ -227,35 +229,4 @@ func MakeMatcherFuncIter[T Matchable](m Matcher) schnittstellen.FuncIter[T] {
 
 		return
 	}
-}
-
-//   _____ _   _ _        _   _
-//  | ____| |_(_) | _____| |_| |_
-//  |  _| | __| | |/ / _ \ __| __|
-//  | |___| |_| |   <  __/ |_| |_
-//  |_____|\__|_|_|\_\___|\__|\__|
-//
-
-func MakeMatcherEtikett(e Etikett) Matcher {
-	return matcherEtikett{Etikett: e}
-}
-
-type matcherEtikett struct {
-	Etikett
-}
-
-func (e matcherEtikett) ContainsMatchable(m Matchable) bool {
-	es := m.GetEtikettenExpanded()
-
-	if es.Contains(e.Etikett) {
-		return true
-	}
-
-	e1, ok := m.GetIdLike().(Etikett)
-
-	if ok && Contains(e1, e.Etikett) {
-		return true
-	}
-
-	return false
 }

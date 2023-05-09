@@ -83,6 +83,22 @@ func (e Etikett) Parts() [3]string {
 	return [3]string{"", "-", v}
 }
 
+func (e Etikett) ContainsMatchable(m Matchable) bool {
+	es := m.GetEtikettenExpanded()
+
+	if es.Contains(e) {
+		return true
+	}
+
+	e1, ok := m.GetIdLike().(Etikett)
+
+	if ok && Contains(e1, e) {
+		return true
+	}
+
+	return false
+}
+
 func (e *Etikett) Set(v string) (err error) {
 	if !EtikettRegex.Match([]byte(v)) {
 		err = errors.Errorf("not a valid etikett: '%s'", v)

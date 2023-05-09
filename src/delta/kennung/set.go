@@ -108,7 +108,7 @@ func (s *Set) Set(v string) (err error) {
 	)
 
 	if isNegated, err = SetQueryKennung(&e, v); err == nil {
-		m := MakeMatcherEtikett(e)
+		m := Matcher(e)
 
 		if isNegated {
 			m = MakeMatcherNegate(m)
@@ -153,7 +153,7 @@ func (s *Set) Add(ids ...schnittstellen.Element) (err error) {
 	for _, i := range ids {
 		switch it := i.(type) {
 		case Etikett:
-			s.Matcher.Add(MakeMatcherEtikett(it))
+			s.Matcher.Add(it)
 
 		case sha.Sha:
 			s.Shas.Add(it)

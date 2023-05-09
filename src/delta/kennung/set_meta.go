@@ -257,13 +257,13 @@ func (ms metaSet) GetEtiketten() schnittstellen.Set[Etikett] {
 	for _, s := range ms.Gattung {
 		VisitAllMatchers(
 			func(m Matcher) (err error) {
-				em, ok := m.(matcherEtikett)
+				e, ok := m.(Etikett)
 
 				if !ok {
 					return
 				}
 
-				return es.Add(em.Etikett)
+				return es.Add(e)
 			},
 			s.Matcher,
 		)
