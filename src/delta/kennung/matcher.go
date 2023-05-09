@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/bravo/todo"
 )
 
 func init() {
@@ -222,27 +221,6 @@ func (matcher matcherNegate) ContainsMatchable(matchable Matchable) bool {
 
 func (matcher matcherNegate) Each(f schnittstellen.FuncIter[Matcher]) error {
 	return f(matcher.Matcher)
-}
-
-//   _____ _   _ _        _   _
-//  | ____| |_(_) | _____| |_| |_ ___ _ __
-//  |  _| | __| | |/ / _ \ __| __/ _ \ '_ \
-//  | |___| |_| |   <  __/ |_| ||  __/ | | |
-//  |_____|\__|_|_|\_\___|\__|\__\___|_| |_|
-//
-
-func MakeMatcherEtiketten(es EtikettSet) Matcher {
-	return matcherEtiketten{es.MutableClone()}
-}
-
-type matcherEtiketten struct {
-	schnittstellen.MutableSet[Etikett]
-}
-
-func (f matcherEtiketten) ContainsMatchable(m Matchable) (ok bool) {
-	todo.Optimize()
-	ok = iter.AnyOrFalseEmpty[Etikett](f, m.GetEtikettenExpanded().Contains)
-	return
 }
 
 func MakeMatcherFuncIter[T Matchable](m Matcher) schnittstellen.FuncIter[T] {
