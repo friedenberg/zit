@@ -55,15 +55,11 @@ func (c Push) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	ids := u.MakeIdSet(kennung.MakeMatcherAlways())
+	ids := u.MakeMetaIdSet(kennung.MakeMatcherAlways(), nil)
 
 	if err = ids.SetMany(args...); err != nil {
 		err = errors.Wrap(err)
 		return
-	}
-
-	filter := kennung.Filter{
-		Set: ids,
 	}
 
 	if err = u.Lock(); err != nil {
@@ -80,7 +76,7 @@ func (c Push) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	if err = client.SendNeededSkus(filter); err != nil {
+	if err = client.SendNeededSkus(ids); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

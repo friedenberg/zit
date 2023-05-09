@@ -9,6 +9,8 @@ import (
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
@@ -177,12 +179,13 @@ func (c Add) openAktenIfNecessary(
 		return
 	}
 
-	hs := zettels.ToSliceHinweisen()
-	ids := u.MakeIdSet(kennung.MakeMatcherAlways())
+	hs := collections.MakeMutableSetStringer[kennung.Hinweis]()
 
-	for _, h := range hs {
-		ids.Add(h)
-	}
+	zettels.Each(
+		func(z *zettel.Transacted) (err error) {
+			return hs.Add(z.Sku.Kennung)
+		},
+	)
 
 	options := store_fs.CheckoutOptions{
 		Cwd:          cwd,
@@ -191,15 +194,15 @@ func (c Add) openAktenIfNecessary(
 
 	var checkoutResults zettel.MutableSetCheckedOut
 
-	query := zettel.WriterIds{
-		Filter: kennung.Filter{
-			Set: ids,
-		},
-	}
-
 	if checkoutResults, err = u.StoreWorkingDirectory().Checkout(
 		options,
-		query.WriteZettelTransacted,
+		func(z *zettel.Transacted) (err error) {
+			if !hs.Contains(z.Sku.Kennung) {
+				return iter.MakeErrStopIteration()
+			}
+
+			return
+		},
 	); err != nil {
 		err = errors.Wrap(err)
 		return

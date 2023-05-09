@@ -19,7 +19,7 @@ const (
 )
 
 type Client interface {
-	SendNeededSkus(kennung.Filter) error
+	SendNeededSkus(kennung.MetaSet) error
 	Close() error
 }
 
@@ -66,7 +66,7 @@ func (c client) Close() (err error) {
 	return
 }
 
-func (c client) SendNeededSkus(filter kennung.Filter) (err error) {
+func (c client) SendNeededSkus(filter kennung.MetaSet) (err error) {
 	err = todo.Implement()
 	// var d remote_conn.Dialogue
 
