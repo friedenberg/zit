@@ -21,7 +21,8 @@ type Set struct {
 	expanders               Expanders
 	implicitEtikettenGetter ImplicitEtikettenGetter
 	Shas                    sha_collections.MutableSet
-	Matcher                 matcherAnd
+	UserMatcher             matcherAnd
+	ActualMatcher           matcherAnd
 	Hinweisen               HinweisMutableSet
 	Typen                   TypMutableSet
 	Timestamps              schnittstellen.MutableSet[Time]
@@ -47,7 +48,8 @@ func MakeSet(
 		cwd:                     cwd,
 		expanders:               ex,
 		implicitEtikettenGetter: implicitEtikettenGetter,
-		Matcher:                 MakeMatcherAnd(),
+		UserMatcher:             MakeMatcherAnd(),
+		ActualMatcher:           MakeMatcherAnd(),
 		Shas:                    sha_collections.MakeMutableSet(),
 		Hinweisen:               MakeHinweisMutableSet(),
 		Typen:                   MakeTypMutableSet(),
@@ -108,18 +110,46 @@ func (s *Set) Set(v string) (err error) {
 	)
 
 	if isNegated, err = SetQueryKennung(&e, v); err == nil {
-		m := Matcher(e)
+		if s.implicitEtikettenGetter == nil {
+			m := Matcher(e)
 
-		if isNegated {
-			m = MakeMatcherNegate(m)
+			if isNegated {
+				m = MakeMatcherNegate(m)
+			}
+
+			s.UserMatcher.Add(m)
+			s.ActualMatcher.Add(m)
+		} else {
+			impl := s.implicitEtikettenGetter.GetImplicitEtiketten(e)
+
+			mo := MakeMatcherOr()
+
+			if err = impl.Each(
+				func(e Etikett) (err error) {
+					me := Matcher(e)
+
+					if isNegated {
+						me = MakeMatcherNegate(me)
+					}
+
+					return mo.Add(me)
+				},
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			m := Matcher(e)
+
+			if isNegated {
+				m = MakeMatcherNegate(m)
+			}
+
+			mo.Add(m)
+
+			s.UserMatcher.Add(m)
+			s.ActualMatcher.Add(mo)
 		}
-
-		s.Matcher.Add(m)
-
-		// if s.implicitEtikettenGetter != nil {
-		// 	impl := s.implicitEtikettenGetter.GetImplicitEtiketten(e)
-		// 	impl.Each(colMethod)
-		// }
 
 		return
 	}
@@ -153,7 +183,9 @@ func (s *Set) Add(ids ...schnittstellen.Element) (err error) {
 	for _, i := range ids {
 		switch it := i.(type) {
 		case Etikett:
-			s.Matcher.Add(it)
+			errors.TodoP1("determine if this should have implicit etiketten")
+			s.UserMatcher.Add(it)
+			s.ActualMatcher.Add(it)
 
 		case sha.Sha:
 			s.Shas.Add(it)
@@ -254,7 +286,7 @@ func (s Set) ContainsMatchable(m Matchable) bool {
 
 	g := gattung.Must(m.GetGattung())
 
-	if !s.Matcher.ContainsMatchable(m) {
+	if !s.ActualMatcher.ContainsMatchable(m) {
 		return false
 	}
 

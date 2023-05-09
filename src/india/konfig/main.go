@@ -372,6 +372,10 @@ func (kc compiled) GetKasten(k kennung.Kasten) (ct *kasten.Transacted) {
 func (k *compiled) SetTransacted(
 	kt *erworben.Transacted,
 ) {
+	if !k.Sku.Less(kt.Sku) {
+		return
+	}
+
 	k.hasChanges = true
 	k.Sku = kt.Sku
 	k.Akte = kt.Akte

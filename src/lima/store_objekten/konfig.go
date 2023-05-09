@@ -71,7 +71,7 @@ func makeKonfigStore(
 		s,
 		sa,
 		s,
-		nil,
+		s.akteFormat,
 	)
 
 	if s.commonStore.ObjekteSaver == nil {
@@ -82,35 +82,6 @@ func makeKonfigStore(
 		err = errors.Wrap(err)
 		return
 	}
-
-	// of := sa.ObjekteReaderWriterFactory(gattung.Konfig)
-
-	// s = &konfigStore{
-	// 	KonfigInflator: objekte_store.MakeTransactedInflator[
-	// 		erworben.Akte,
-	// 		*erworben.Akte,
-	// 		kennung.Konfig,
-	// 		*kennung.Konfig,
-	// 		objekte.NilVerzeichnisse[erworben.Akte],
-	// 		*objekte.NilVerzeichnisse[erworben.Akte],
-	// 	](
-	// 		of,
-	// 		sa,
-	// 		persisted_metadatei_format.FormatForVersion(
-	// 			sa.GetKonfig().GetStoreVersion(),
-	// 		),
-	// 		akteFormat,
-	// 		pool,
-	// 	),
-	// 	KonfigAkteTextSaver: objekte_store.MakeAkteTextSaver[
-	// 		erworben.Akte,
-	// 		*erworben.Akte,
-	// 	](
-	// 		sa,
-	// 		akteFormat,
-	// 	),
-	// 	akteFormat: akteFormat,
-	// }
 
 	return
 }
@@ -359,7 +330,7 @@ func (s konfigStore) ReadOne(
 				return
 			}
 
-			defer errors.Deferred(&err, r.Close)
+			defer errors.DeferredCloser(&err, r)
 
 			if _, err = s.StoreUtil.GetPersistentMetadateiFormat().ParsePersistentMetadatei(
 				r,
@@ -373,8 +344,8 @@ func (s konfigStore) ReadOne(
 		{
 			var r sha.ReadCloser
 
-			if r, err = s.ObjekteReader(
-				tt.GetObjekteSha(),
+			if r, err = s.AkteReader(
+				tt.GetAkteSha(),
 			); err != nil {
 				if errors.IsNotExist(err) {
 					err = nil
@@ -414,6 +385,11 @@ func (s *konfigStore) ReindexOne(
 	}
 
 	o = te
+
+	if err = s.updateOne(te); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	s.LogWriter.Updated(te)
 
