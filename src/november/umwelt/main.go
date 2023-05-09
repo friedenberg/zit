@@ -275,9 +275,17 @@ func (u Umwelt) Flush() error {
 	return u.age.Close()
 }
 
-func (u *Umwelt) MakeKennungHidden() (h kennung.Matcher) {
-	h = kennung.MakeMatcherEtiketten(u.Konfig().EtikettenHidden)
-	return
+func (u *Umwelt) MakeKennungHidden() kennung.Matcher {
+	h := kennung.MakeMatcherAndDoNotMatchOnEmpty()
+
+	u.Konfig().EtikettenHidden.Each(
+		func(e kennung.Etikett) (err error) {
+			h.Add(e)
+			return
+		},
+	)
+
+	return h
 }
 
 func (u *Umwelt) MakeKennungExpanders() kennung.Expanders {

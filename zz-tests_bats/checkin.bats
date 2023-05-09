@@ -85,7 +85,7 @@ function checkin_simple_all { # @test
 		[one/uno@689c6787364899defa77461ff6a3f454ca667654653f86d5d44f2826950ff4f9 !md "wildly different"]
 	EOM
 
-	run_zit show -format log :z,e,t
+	run_zit show -format log :?z,e,t
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md@acbfc0e07b1be4bf1b12020d8316fe9629518b015041b7120db5a9f2012c84fa]
@@ -173,7 +173,7 @@ function checkin_simple_etikett { # @test
 		Tai Etikett zz-archive 0b7afc0b23d2f265b64bc184728d540cbadd0df54a2ae719e9757bcf17d8548a b8cd0eaa1891284eafdf99d3acc2007a3d4396e8a7282335f707d99825388a93
 	EOM
 
-	run_zit show -format text zz-archive.e
+	run_zit show -format text zz-archive?.e
 	assert_success
 	assert_output 'hide = true'
 }

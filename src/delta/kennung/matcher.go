@@ -10,7 +10,8 @@ import (
 )
 
 func init() {
-	gob.Register(&matcherEtiketten{})
+	gob.Register(&matcherAnd{})
+	gob.Register(&matcherOr{})
 }
 
 type Matcher interface {
