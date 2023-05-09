@@ -4,10 +4,8 @@ import (
 	"encoding/gob"
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/todo"
-	"github.com/friedenberg/zit/src/delta/gattungen"
 )
 
 func init() {
@@ -15,29 +13,7 @@ func init() {
 }
 
 type Matcher interface {
-	// schnittstellen.SigilGetter
 	ContainsMatchable(Matchable) bool
-	// ContainsId(schnittstellen.Stringer) bool
-}
-
-type MatcherMutable interface {
-	Matcher
-	Add(schnittstellen.ValueLike, Sigil) error
-}
-
-type GattungMatcherMap map[gattung.Gattung]Matcher
-
-func MakeGattungMatcherMap(gs gattungen.Set, matcher Matcher) GattungMatcherMap {
-	m := make(GattungMatcherMap, gs.Len())
-
-	gs.Each(
-		func(g gattung.Gattung) (err error) {
-			m[g] = matcher
-			return
-		},
-	)
-
-	return m
 }
 
 //      _    _
@@ -74,6 +50,25 @@ func (_ matcherNever) ContainsMatchable(_ Matchable) bool {
 	return false
 }
 
+//   _   _                  _
+//  | \ | | ___  __ _  __ _| |_ ___
+//  |  \| |/ _ \/ _` |/ _` | __/ _ \
+//  | |\  |  __/ (_| | (_| | ||  __/
+//  |_| \_|\___|\__, |\__,_|\__\___|
+//              |___/
+
+func MakeMatcherNegate() Matcher {
+	return matcherNegate{}
+}
+
+type matcherNegate struct {
+	Matcher
+}
+
+func (matcher matcherNegate) ContainsMatchable(matchable Matchable) bool {
+	return !matcher.Matcher.ContainsMatchable(matchable)
+}
+
 //   _____ _   _ _        _   _
 //  | ____| |_(_) | _____| |_| |_ ___ _ __
 //  |  _| | __| | |/ / _ \ __| __/ _ \ '_ \
@@ -104,4 +99,35 @@ func MakeMatcherFuncIter[T Matchable](m Matcher) schnittstellen.FuncIter[T] {
 
 		return
 	}
+}
+
+//   _____ _   _ _        _   _
+//  | ____| |_(_) | _____| |_| |_
+//  |  _| | __| | |/ / _ \ __| __|
+//  | |___| |_| |   <  __/ |_| |_
+//  |_____|\__|_|_|\_\___|\__|\__|
+//
+
+func MakeMatcherEtikett(e Etikett) Matcher {
+	return matcherEtikett{Etikett: e}
+}
+
+type matcherEtikett struct {
+	Etikett
+}
+
+func (e matcherEtikett) ContainsMatchable(m Matchable) bool {
+	es := m.GetEtiketten()
+
+	if es.Contains(e.Etikett) {
+		return true
+	}
+
+	e1, ok := m.GetIdLike().(Etikett)
+
+	if ok && Contains(e1, e.Etikett) {
+		return true
+	}
+
+	return false
 }

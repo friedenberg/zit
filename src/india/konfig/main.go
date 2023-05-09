@@ -17,7 +17,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/hotel/erworben"
-	"github.com/friedenberg/zit/src/hotel/etikett"
 	"github.com/friedenberg/zit/src/hotel/kasten"
 	"github.com/friedenberg/zit/src/hotel/typ"
 )
@@ -40,6 +39,7 @@ func (a *compiled) Reset() {
 	a.lock = &sync.Mutex{}
 	a.Typen = makeCompiledTypSetFromSlice(nil)
 	a.Etiketten = collections.MakeMutableSetStringer[ketikett]()
+	a.ImplicitEtiketten = make(implicitEtikettenMap)
 	a.Kisten = makeCompiledKastenSetFromSlice(nil)
 }
 
@@ -67,6 +67,7 @@ type compiled struct {
 	EtikettenHiddenStringsSlice []string
 	EtikettenToAddToNew         []string
 	Etiketten                   schnittstellen.MutableSet[ketikett]
+	ImplicitEtiketten           implicitEtikettenMap
 
 	// Typen
 	ExtensionsToTypen map[string]string
@@ -185,48 +186,55 @@ func (kc *Compiled) SetCliFromCommander(k erworben.Cli) {
 func (kc *compiled) recompile() (err error) {
 	kc.hasChanges = true
 
-	etikettenHidden := collections.MakeMutableSetStringer[kennung.Etikett]()
+	{
+		kc.ImplicitEtiketten = make(implicitEtikettenMap)
+		etikettenHidden := collections.MakeMutableSetStringer[kennung.Etikett]()
 
-	if err = kc.Etiketten.EachPtr(
-		func(ke *ketikett) (err error) {
-			ct := ke.Transacted
-			k := ct.Sku.Kennung
-			tn := k.String()
-			tv := ct.Akte
+		if err = kc.Etiketten.EachPtr(
+			func(ke *ketikett) (err error) {
+				ct := ke.Transacted
+				k := ct.Sku.Kennung
+				tn := k.String()
+				tv := ct.Akte
 
-			switch {
-			case tv.Hide:
-				etikettenHidden.Add(k)
-				kc.EtikettenHiddenStringsSlice = append(
-					kc.EtikettenHiddenStringsSlice,
-					tn,
-				)
+				switch {
+				case tv.Hide:
+					etikettenHidden.Add(k)
+					kc.EtikettenHiddenStringsSlice = append(
+						kc.EtikettenHiddenStringsSlice,
+						tn,
+					)
 
-			case tv.AddToNewZettels:
-				kc.EtikettenToAddToNew = append(kc.EtikettenToAddToNew, tn)
-			}
+				case tv.AddToNewZettels:
+					kc.EtikettenToAddToNew = append(kc.EtikettenToAddToNew, tn)
+				}
 
-			// kc.applyExpandedEtikett(ct)
+				// kc.applyExpandedEtikett(ct)
 
-			ke.ImplicitEtiketten = collections.MakeMutableSetStringer[kennung.Etikett]()
+				if err = kc.AccumulateImplicitEtiketten(
+					ke.Transacted.Sku.Kennung,
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
 
-			return kc.AccumulateImplicitEtiketten(
-				ke.Transacted.Sku.Kennung,
-				ke.ImplicitEtiketten,
-			)
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+				return
+			},
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		sort.Slice(kc.EtikettenHiddenStringsSlice, func(i, j int) bool {
+			return kc.EtikettenHiddenStringsSlice[i] < kc.EtikettenHiddenStringsSlice[j]
+		})
+
+		sort.Slice(kc.EtikettenToAddToNew, func(i, j int) bool {
+			return kc.EtikettenToAddToNew[i] < kc.EtikettenToAddToNew[j]
+		})
+
+		kc.EtikettenHidden = etikettenHidden.ImmutableClone()
 	}
-
-	sort.Slice(kc.EtikettenHiddenStringsSlice, func(i, j int) bool {
-		return kc.EtikettenHiddenStringsSlice[i] < kc.EtikettenHiddenStringsSlice[j]
-	})
-
-	sort.Slice(kc.EtikettenToAddToNew, func(i, j int) bool {
-		return kc.EtikettenToAddToNew[i] < kc.EtikettenToAddToNew[j]
-	})
 
 	if err = kc.Typen.Each(
 		func(ct *typ.Transacted) (err error) {
@@ -249,8 +257,6 @@ func (kc *compiled) recompile() (err error) {
 		err = errors.Wrap(err)
 		return
 	}
-
-	kc.EtikettenHidden = etikettenHidden.ImmutableClone()
 
 	return
 }
@@ -329,51 +335,6 @@ func (c compiled) GetSortedTypenExpanded(
 	return
 }
 
-func (c compiled) GetImplicitEtiketten(
-	e kennung.Etikett,
-) (out schnittstellen.Set[kennung.Etikett]) {
-	out = collections.MakeSetStringer[kennung.Etikett]()
-
-	ek, ok := c.Etiketten.Get(e.String())
-
-	if !ok || ek.ImplicitEtiketten == nil {
-		return
-	}
-
-	out = ek.ImplicitEtiketten
-
-	return
-}
-
-func (c compiled) GetSortedEtikettenExpanded(
-	v string,
-) (expandedActual []etikett.Transacted) {
-	expandedMaybe := collections.MakeMutableSetStringer[values.String]()
-	sa := collections.MakeFuncSetString[values.String, *values.String](expandedMaybe)
-	typExpander.Expand(sa, v)
-	expandedActual = make([]etikett.Transacted, 0)
-
-	expandedMaybe.Each(
-		func(v values.String) (err error) {
-			ct, ok := c.Etiketten.Get(v.String())
-
-			if !ok {
-				return
-			}
-
-			expandedActual = append(expandedActual, ct.Transacted)
-
-			return
-		},
-	)
-
-	sort.Slice(expandedActual, func(i, j int) bool {
-		return len(expandedActual[i].Sku.Kennung.String()) > len(expandedActual[j].Sku.Kennung.String())
-	})
-
-	return
-}
-
 func (kc compiled) IsInlineTyp(k kennung.Typ) (isInline bool) {
 	tc := kc.GetApproximatedTyp(k)
 
@@ -405,16 +366,6 @@ func (kc compiled) GetApproximatedTyp(k kennung.Typ) (ct ApproximatedTyp) {
 
 func (kc compiled) GetKasten(k kennung.Kasten) (ct *kasten.Transacted) {
 	ct, _ = kc.Kisten.Get(k.String())
-	return
-}
-
-func (kc compiled) GetEtikett(k kennung.Etikett) (ct etikett.Transacted) {
-	expandedActual := kc.GetSortedEtikettenExpanded(k.String())
-
-	if len(expandedActual) > 0 {
-		ct = expandedActual[0]
-	}
-
 	return
 }
 
@@ -457,84 +408,8 @@ func (k *compiled) AddTyp(
 	return
 }
 
-func (k compiled) EachEtikett(
-	f schnittstellen.FuncIter[*etikett.Transacted],
-) (err error) {
-	return k.Etiketten.Each(
-		func(ek ketikett) (err error) {
-			return f(&ek.Transacted)
-		},
-	)
-}
-
-func (k *compiled) AccumulateImplicitEtiketten(
-	e kennung.Etikett,
-	acc schnittstellen.MutableSet[kennung.Etikett],
-) (err error) {
-	ek, ok := k.Etiketten.Get(e.String())
-
-	if !ok {
-		return
-	}
-
-	if err = kennung.ExpandMany[kennung.Etikett](
-		ek.Transacted.GetMetadatei().GetEtiketten(),
-	).Each(
-		func(e1 kennung.Etikett) (err error) {
-			if acc.Contains(e1) {
-				return
-			}
-
-			if err = acc.Add(e1); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			if err = k.AccumulateImplicitEtiketten(e1, acc); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (k *compiled) AddEtikett(
-	b1 *etikett.Transacted,
-) {
-	k.lock.Lock()
-	defer k.lock.Unlock()
-	k.hasChanges = true
-
-	b := ketikett{
-		Transacted: *b1,
-	}
-
-	a, ok := k.Etiketten.Get(b.String())
-
-	if !ok || a.Less(b) {
-		k.Etiketten.Add(b)
-	}
-
-	return
-}
-
 func (c *compiled) applyExpandedTyp(ct typ.Transacted) {
 	expandedActual := c.GetSortedTypenExpanded(ct.Sku.Kennung.String())
-
-	for _, ex := range expandedActual {
-		ct.Akte.Merge(ex.Akte)
-	}
-}
-
-func (c *compiled) applyExpandedEtikett(ct *etikett.Transacted) {
-	expandedActual := c.GetSortedEtikettenExpanded(ct.Sku.Kennung.String())
 
 	for _, ex := range expandedActual {
 		ct.Akte.Merge(ex.Akte)

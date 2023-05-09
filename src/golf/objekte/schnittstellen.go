@@ -4,10 +4,16 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
 
 type (
+	Konfig interface {
+		schnittstellen.Konfig
+		kennung.ImplicitEtikettenGetter
+	}
+
 	SavedAkteFormatter interface {
 		FormatSavedAkte(io.Writer, schnittstellen.Sha) (int64, error)
 	}

@@ -114,10 +114,10 @@ func (s *Set) Set(v string) (err error) {
 			colMethod = s.Etiketten.AddExclude
 		}
 
-		if s.implicitEtikettenGetter != nil {
-			impl := s.implicitEtikettenGetter.GetImplicitEtiketten(e)
-			impl.Each(colMethod)
-		}
+		// if s.implicitEtikettenGetter != nil {
+		// 	impl := s.implicitEtikettenGetter.GetImplicitEtiketten(e)
+		// 	impl.Each(colMethod)
+		// }
 
 		colMethod(e)
 

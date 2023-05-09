@@ -39,6 +39,7 @@ func (f *FormatterValue) Set(v string) (err error) {
 		"akte-sha",
 		"debug",
 		"etiketten",
+		"etiketten-implicit",
 		"json",
 		"log",
 		"sku",
@@ -57,10 +58,34 @@ func (f *FormatterValue) Set(v string) (err error) {
 func (fv *FormatterValue) MakeFormatterObjekte(
 	out io.Writer,
 	af schnittstellen.AkteReaderFactory,
-	k schnittstellen.Konfig,
+	k Konfig,
 	logFunc schnittstellen.FuncIter[TransactedLikePtr],
 ) schnittstellen.FuncIter[TransactedLikePtr] {
 	switch fv.string {
+	case "etiketten-implicit":
+		return func(tl TransactedLikePtr) (err error) {
+			ets := tl.GetMetadatei().GetEtiketten().MutableClone()
+
+			ets.Each(
+				func(e kennung.Etikett) (err error) {
+					impl := k.GetImplicitEtiketten(e)
+					return impl.Each(ets.Add)
+				},
+			)
+
+			if _, err = fmt.Fprintln(
+				out,
+				collections.StringCommaSeparated[kennung.Etikett](
+					ets,
+				),
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+
 	case "etiketten":
 		return func(tl TransactedLikePtr) (err error) {
 			if _, err = fmt.Fprintln(
