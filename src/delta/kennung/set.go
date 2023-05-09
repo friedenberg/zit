@@ -21,7 +21,7 @@ type Set struct {
 	expanders               Expanders
 	implicitEtikettenGetter ImplicitEtikettenGetter
 	Shas                    sha_collections.MutableSet
-	Matchers                []Matcher
+	Matcher                 matcherAnd
 	Hinweisen               HinweisMutableSet
 	Typen                   TypMutableSet
 	Timestamps              schnittstellen.MutableSet[Time]
@@ -47,7 +47,7 @@ func MakeSet(
 		cwd:                     cwd,
 		expanders:               ex,
 		implicitEtikettenGetter: implicitEtikettenGetter,
-		Matchers:                make([]Matcher, 0),
+		Matcher:                 MakeMatcherAnd(),
 		Shas:                    sha_collections.MakeMutableSet(),
 		Hinweisen:               MakeHinweisMutableSet(),
 		Typen:                   MakeTypMutableSet(),
@@ -114,7 +114,7 @@ func (s *Set) Set(v string) (err error) {
 			m = MakeMatcherNegate(m)
 		}
 
-		s.Matchers = append(s.Matchers, m)
+		s.Matcher.Add(m)
 
 		// if s.implicitEtikettenGetter != nil {
 		// 	impl := s.implicitEtikettenGetter.GetImplicitEtiketten(e)
@@ -153,7 +153,7 @@ func (s *Set) Add(ids ...schnittstellen.Element) (err error) {
 	for _, i := range ids {
 		switch it := i.(type) {
 		case Etikett:
-			s.Matchers = append(s.Matchers, MakeMatcherEtikett(it))
+			s.Matcher.Add(MakeMatcherEtikett(it))
 
 		case sha.Sha:
 			s.Shas.Add(it)
@@ -254,10 +254,8 @@ func (s Set) ContainsMatchable(m Matchable) bool {
 
 	g := gattung.Must(m.GetGattung())
 
-	for _, ma := range s.Matchers {
-		if !ma.ContainsMatchable(m) {
-			return false
-		}
+	if !s.Matcher.ContainsMatchable(m) {
+		return false
 	}
 
 	// Only Zettels have Typs, so only filter against them in that case

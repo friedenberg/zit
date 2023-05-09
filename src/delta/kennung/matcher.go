@@ -22,6 +22,11 @@ type MatcherParent interface {
 	Each(schnittstellen.FuncIter[Matcher]) error
 }
 
+type MatcherParentPtr interface {
+	MatcherParent
+	Add(Matcher) error
+}
+
 func VisitAllMatchers(
 	f schnittstellen.FuncIter[Matcher],
 	matchers ...Matcher,
@@ -83,6 +88,90 @@ type matcherNever struct{}
 
 func (_ matcherNever) ContainsMatchable(_ Matchable) bool {
 	return false
+}
+
+//      _              _
+//     / \   _ __   __| |
+//    / _ \ | '_ \ / _` |
+//   / ___ \| | | | (_| |
+//  /_/   \_\_| |_|\__,_|
+//
+
+func MakeMatcherAnd(ms ...Matcher) matcherAnd {
+	return matcherAnd(ms)
+}
+
+type matcherAnd []Matcher
+
+func (matcher *matcherAnd) Add(m Matcher) {
+	*matcher = append(*matcher, m)
+}
+
+func (matcher matcherAnd) ContainsMatchable(matchable Matchable) bool {
+	if len(matcher) == 0 {
+		return true
+	}
+
+	for _, m := range matcher {
+		if !m.ContainsMatchable(matchable) {
+			return false
+		}
+	}
+
+	return true
+}
+
+func (matcher matcherAnd) Each(f schnittstellen.FuncIter[Matcher]) (err error) {
+	for _, m := range matcher {
+		if err = f(m); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
+//    ___
+//   / _ \ _ __
+//  | | | | '__|
+//  | |_| | |
+//   \___/|_|
+//
+
+func MakeMatcherOr(ms ...Matcher) matcherOr {
+	return matcherOr(ms)
+}
+
+type matcherOr []Matcher
+
+func (matcher *matcherOr) Add(m Matcher) {
+	*matcher = append(*matcher, m)
+}
+
+func (matcher matcherOr) ContainsMatchable(matchable Matchable) bool {
+	if len(matcher) == 0 {
+		return true
+	}
+
+	for _, m := range matcher {
+		if m.ContainsMatchable(matchable) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (matcher matcherOr) Each(f schnittstellen.FuncIter[Matcher]) (err error) {
+	for _, m := range matcher {
+		if err = f(m); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
 }
 
 //   _   _                  _

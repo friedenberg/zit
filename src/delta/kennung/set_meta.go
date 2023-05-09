@@ -265,7 +265,7 @@ func (ms metaSet) GetEtiketten() schnittstellen.Set[Etikett] {
 
 				return es.Add(em.Etikett)
 			},
-			s.Matchers...,
+			s.Matcher,
 		)
 	}
 
