@@ -21,7 +21,7 @@ type Set struct {
 	expanders               Expanders
 	implicitEtikettenGetter ImplicitEtikettenGetter
 	Shas                    sha_collections.MutableSet
-	Etiketten               MutableQuerySet[Etikett, *Etikett]
+	Matchers                []Matcher
 	Hinweisen               HinweisMutableSet
 	Typen                   TypMutableSet
 	Timestamps              schnittstellen.MutableSet[Time]
@@ -47,8 +47,8 @@ func MakeSet(
 		cwd:                     cwd,
 		expanders:               ex,
 		implicitEtikettenGetter: implicitEtikettenGetter,
+		Matchers:                make([]Matcher, 0),
 		Shas:                    sha_collections.MakeMutableSet(),
-		Etiketten:               MakeMutableQuerySet[Etikett, *Etikett](ex.Etikett, nil, nil),
 		Hinweisen:               MakeHinweisMutableSet(),
 		Typen:                   MakeTypMutableSet(),
 		Kisten:                  MakeKastenMutableSet(),
@@ -108,18 +108,18 @@ func (s *Set) Set(v string) (err error) {
 	)
 
 	if isNegated, err = SetQueryKennung(&e, v); err == nil {
-		colMethod := s.Etiketten.AddInclude
+		m := MakeMatcherEtikett(e)
 
 		if isNegated {
-			colMethod = s.Etiketten.AddExclude
+			m = MakeMatcherNegate(m)
 		}
+
+		s.Matchers = append(s.Matchers, m)
 
 		// if s.implicitEtikettenGetter != nil {
 		// 	impl := s.implicitEtikettenGetter.GetImplicitEtiketten(e)
 		// 	impl.Each(colMethod)
 		// }
-
-		colMethod(e)
 
 		return
 	}
@@ -153,7 +153,7 @@ func (s *Set) Add(ids ...schnittstellen.Element) (err error) {
 	for _, i := range ids {
 		switch it := i.(type) {
 		case Etikett:
-			s.Etiketten.AddInclude(it)
+			s.Matchers = append(s.Matchers, MakeMatcherEtikett(it))
 
 		case sha.Sha:
 			s.Shas.Add(it)
@@ -194,9 +194,8 @@ func (s Set) String() string {
 	errors.TodoP4("improve the string creation method")
 	sb := &strings.Builder{}
 
+	errors.TodoP1("add Matchers")
 	s.Shas.Each(iter.AddString[sha.Sha](sb))
-	sb.WriteString(s.Etiketten.String())
-	sb.WriteString(" ")
 	s.Hinweisen.Each(iter.AddString[Hinweis](sb))
 	s.Typen.Each(iter.AddString[Typ](sb))
 	s.Timestamps.Each(iter.AddString[Time](sb))
@@ -255,8 +254,11 @@ func (s Set) ContainsMatchable(m Matchable) bool {
 
 	g := gattung.Must(m.GetGattung())
 
-	es := m.GetEtikettenExpanded()
-	containsEtts := s.Etiketten.ContainsAgainst(es)
+	for _, ma := range s.Matchers {
+		if !ma.ContainsMatchable(m) {
+			return false
+		}
+	}
 
 	// Only Zettels have Typs, so only filter against them in that case
 	if g == gattung.Zettel {
@@ -275,22 +277,20 @@ func (s Set) ContainsMatchable(m Matchable) bool {
 	case Kasten:
 
 	case Typ:
-		if s.Typen.Len() > 0 && !s.Typen.Contains(id) || !containsEtts {
+		if s.Typen.Len() > 0 && !s.Typen.Contains(id) {
 			return false
 		}
 
 	case Etikett:
-		if s.Etiketten.Len() > 0 && !s.Etiketten.Contains(id) && !containsEtts {
-			return false
-		}
+		// noop
 
 	case Hinweis:
-		if s.Hinweisen.Len() > 0 && !s.Hinweisen.Contains(id) || !containsEtts {
+		if s.Hinweisen.Len() > 0 && !s.Hinweisen.Contains(id) {
 			return false
 		}
 
 	case Konfig:
-		if !s.HasKonfig || !containsEtts {
+		if !s.HasKonfig {
 			return false
 		}
 
@@ -371,7 +371,6 @@ func (s Set) Len() int {
 	return collections.Len(
 		s.Kisten,
 		s.Shas,
-		s.Etiketten,
 		s.Hinweisen,
 		s.Typen,
 		s.Timestamps,

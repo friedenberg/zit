@@ -255,7 +255,18 @@ func (ms metaSet) GetEtiketten() schnittstellen.Set[Etikett] {
 	es := MakeEtikettMutableSet()
 
 	for _, s := range ms.Gattung {
-		s.Etiketten.GetIncludes().Each(es.Add)
+		VisitAllMatchers(
+			func(m Matcher) (err error) {
+				em, ok := m.(matcherEtikett)
+
+				if !ok {
+					return
+				}
+
+				return es.Add(em.Etikett)
+			},
+			s.Matchers...,
+		)
 	}
 
 	return es

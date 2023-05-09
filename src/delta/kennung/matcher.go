@@ -3,6 +3,7 @@ package kennung
 import (
 	"encoding/gob"
 
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/todo"
@@ -14,6 +15,40 @@ func init() {
 
 type Matcher interface {
 	ContainsMatchable(Matchable) bool
+	// schnittstellen.Stringer
+}
+
+type MatcherParent interface {
+	Each(schnittstellen.FuncIter[Matcher]) error
+}
+
+func VisitAllMatchers(
+	f schnittstellen.FuncIter[Matcher],
+	matchers ...Matcher,
+) (err error) {
+	for _, m := range matchers {
+		if err = f(m); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		mp, ok := m.(MatcherParent)
+
+		if !ok {
+			continue
+		}
+
+		if err = mp.Each(
+			func(m Matcher) (err error) {
+				return VisitAllMatchers(f, m)
+			},
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
 }
 
 //      _    _
@@ -57,8 +92,8 @@ func (_ matcherNever) ContainsMatchable(_ Matchable) bool {
 //  |_| \_|\___|\__, |\__,_|\__\___|
 //              |___/
 
-func MakeMatcherNegate() Matcher {
-	return matcherNegate{}
+func MakeMatcherNegate(m Matcher) Matcher {
+	return matcherNegate{Matcher: m}
 }
 
 type matcherNegate struct {
@@ -67,6 +102,10 @@ type matcherNegate struct {
 
 func (matcher matcherNegate) ContainsMatchable(matchable Matchable) bool {
 	return !matcher.Matcher.ContainsMatchable(matchable)
+}
+
+func (matcher matcherNegate) Each(f schnittstellen.FuncIter[Matcher]) error {
+	return f(matcher.Matcher)
 }
 
 //   _____ _   _ _        _   _
@@ -117,7 +156,7 @@ type matcherEtikett struct {
 }
 
 func (e matcherEtikett) ContainsMatchable(m Matchable) bool {
-	es := m.GetEtiketten()
+	es := m.GetEtikettenExpanded()
 
 	if es.Contains(e.Etikett) {
 		return true
