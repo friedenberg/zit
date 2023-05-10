@@ -10,6 +10,12 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
+const QueryNegationOperator rune = '^'
+
+type Expanders struct {
+	Sha, Etikett, Hinweis, Typ, Kasten func(string) (string, error)
+}
+
 type QueryPrefixer interface {
 	GetQueryPrefix() string
 }
