@@ -210,3 +210,27 @@ func (t Hinweis) KennungClone() Kennung {
 func (t Hinweis) KennungPtrClone() KennungPtr {
 	return &t
 }
+
+type matchType int
+
+const (
+	matchTypeEmpty = matchType(iota)
+	matchTypeStrictHinweis
+	matchTypeCompound
+)
+
+func (mt *matchType) AddExact(m Matcher) {
+	switch *mt {
+	case matchTypeCompound:
+		// noop
+	default:
+		*mt = matchTypeStrictHinweis
+	}
+}
+
+func (mt *matchType) AddNonExact(m Matcher) {
+	switch *mt {
+	default:
+		*mt = matchTypeCompound
+	}
+}

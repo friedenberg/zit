@@ -77,6 +77,28 @@ func (e *Typ) Set(v string) (err error) {
 	return
 }
 
+func (t Typ) ContainsMatchable(m Matchable) bool {
+  g := gattung.Make(m.GetGattung())
+
+  if g != gattung.Zettel {
+    return false
+  }
+
+	t1 := m.GetTyp()
+
+	if Contains(t1, t) {
+		return true
+	}
+
+	t2, ok := m.GetIdLike().(Typ)
+
+	if ok && Contains(t2, t) {
+		return true
+	}
+
+	return false
+}
+
 func (t Typ) MarshalText() (text []byte, err error) {
 	text = []byte(t.String())
 	return

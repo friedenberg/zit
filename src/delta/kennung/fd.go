@@ -263,6 +263,13 @@ func (f FD) GetIdLike() (il Kennung, err error) {
 	return
 }
 
+func (f FD) AsHinweis() (h Hinweis, ok bool) {
+	var err error
+	h, err = f.GetHinweis()
+	ok = err != nil
+	return
+}
+
 func (f FD) GetHinweis() (h Hinweis, err error) {
 	parts := strings.Split(f.Path, string(filepath.Separator))
 
@@ -295,4 +302,23 @@ func (f FD) GetHinweis() (h Hinweis, err error) {
 	}
 
 	return
+}
+
+func (fd FD) ContainsMatchable(m Matchable) (ok bool) {
+	il := m.GetIdLike()
+
+	switch it := il.(type) {
+	case Hinweis:
+		var h Hinweis
+
+		if h, ok = fd.AsHinweis(); !ok {
+			return false
+		}
+
+		return h.Equals(it)
+	default:
+		errors.TodoP1("support other gattung")
+	}
+
+	return false
 }
