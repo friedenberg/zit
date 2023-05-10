@@ -17,7 +17,6 @@ type ImplicitEtikettenGetter interface {
 }
 
 type Set struct {
-	cwd                     Matcher
 	expanders               Expanders
 	implicitEtikettenGetter ImplicitEtikettenGetter
 	Shas                    sha_collections.MutableSet
@@ -31,7 +30,8 @@ type Set struct {
 	HasKonfig               bool
 	Sigil                   Sigil
 
-	hidden matcherSigilHidden
+	cwd    matcherSigil
+	hidden matcherSigil
 }
 
 func MakeSet(
@@ -45,7 +45,6 @@ func MakeSet(
 	}
 
 	return Set{
-		cwd:                     cwd,
 		expanders:               ex,
 		implicitEtikettenGetter: implicitEtikettenGetter,
 		UserMatcher:             MakeMatcherAnd(),
@@ -56,7 +55,11 @@ func MakeSet(
 		Kisten:                  MakeKastenMutableSet(),
 		Timestamps:              collections.MakeMutableSetStringer[Time](),
 		FDs:                     MakeMutableFDSet(),
-		hidden:                  MakeMatcherSigilHidden(hidden),
+		cwd:                     MakeMatcherSigilMatchOnMissing(SigilCwd, cwd),
+		hidden: MakeMatcherSigil(
+			SigilHidden,
+			MakeMatcherNegate(hidden),
+		),
 	}
 }
 
@@ -244,24 +247,8 @@ func (s Set) String() string {
 	return sb.String()
 }
 
-func (s Set) excludeCwd(m Matchable) (ok bool) {
-	if !s.Sigil.IncludesCwd() {
-		return
-	}
-
-	if s.cwd == nil {
-		return
-	}
-
-	if !s.cwd.ContainsMatchable(m) {
-		ok = true
-	}
-
-	return
-}
-
 func (s Set) ContainsMatchable(m Matchable) bool {
-	if s.excludeCwd(m) {
+	if !s.cwd.ContainsMatchable(m) {
 		return false
 	}
 
@@ -336,43 +323,11 @@ func (s Set) Len() int {
 func (s *Set) AddSigil(v Sigil) {
 	s.Sigil.Add(v)
 	s.hidden.Sigil.Add(v)
+	s.cwd.Sigil.Add(v)
 }
 
 func (s Set) GetSigil() schnittstellen.Sigil {
 	return s.Sigil
-}
-
-func (s Set) AnyShasOrHinweisen() (ids []schnittstellen.Korper) {
-	ids = make([]schnittstellen.Korper, 0, s.Shas.Len()+s.Hinweisen.Len())
-
-	s.Shas.Each(
-		func(sh sha.Sha) (err error) {
-			ids = append(ids, sh)
-
-			return
-		},
-	)
-
-	s.Hinweisen.Each(
-		func(h Hinweis) (err error) {
-			ids = append(ids, h)
-
-			return
-		},
-	)
-
-	return
-}
-
-func (s Set) AnyShaOrHinweis() (i1 schnittstellen.Korper, ok bool) {
-	ids := s.AnyShasOrHinweisen()
-
-	if len(ids) > 0 {
-		i1 = ids[0]
-		ok = true
-	}
-
-	return
 }
 
 func (s Set) AnyHinweis() (i1 Hinweis, ok bool) {
