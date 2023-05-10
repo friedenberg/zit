@@ -136,3 +136,35 @@ func (i *Sigil) Set(v string) (err error) {
 func (i Sigil) GetSha() sha.Sha {
 	return sha.FromString(i.String())
 }
+
+//   __  __       _       _                 _   _ _     _     _
+//  |  \/  | __ _| |_ ___| |__   ___ _ __  | | | (_) __| | __| | ___ _ __
+//  | |\/| |/ _` | __/ __| '_ \ / _ \ '__| | |_| | |/ _` |/ _` |/ _ \ '_ \
+//  | |  | | (_| | || (__| | | |  __/ |    |  _  | | (_| | (_| |  __/ | | |
+//  |_|  |_|\__,_|\__\___|_| |_|\___|_|    |_| |_|_|\__,_|\__,_|\___|_| |_|
+//
+
+func MakeMatcherSigilHidden(m Matcher) matcherSigilHidden {
+	return matcherSigilHidden{Matcher: m}
+}
+
+type matcherSigilHidden struct {
+	Sigil
+	Matcher
+}
+
+func (matcher matcherSigilHidden) ContainsMatchable(matchable Matchable) bool {
+	if matcher.Sigil.IncludesHidden() {
+		return true
+	}
+
+	if matcher.Matcher == nil {
+		return true
+	}
+
+	return !matcher.Matcher.ContainsMatchable(matchable)
+}
+
+func (matcher matcherSigilHidden) Each(f schnittstellen.FuncIter[Matcher]) error {
+	return f(matcher.Matcher)
+}

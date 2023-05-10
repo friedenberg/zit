@@ -31,7 +31,7 @@ type Set struct {
 	HasKonfig               bool
 	Sigil                   Sigil
 
-	hidden Matcher
+	hidden matcherSigilHidden
 }
 
 func MakeSet(
@@ -56,7 +56,7 @@ func MakeSet(
 		Kisten:                  MakeKastenMutableSet(),
 		Timestamps:              collections.MakeMutableSetStringer[Time](),
 		FDs:                     MakeMutableFDSet(),
-		hidden:                  hidden,
+		hidden:                  MakeMatcherSigilHidden(hidden),
 	}
 }
 
@@ -260,28 +260,12 @@ func (s Set) excludeCwd(m Matchable) (ok bool) {
 	return
 }
 
-func (s Set) excludeSigil(m Matchable) (ok bool) {
-	if s.Sigil.IncludesHidden() {
-		return
-	}
-
-	if s.hidden == nil {
-		return
-	}
-
-	if s.hidden.ContainsMatchable(m) {
-		ok = true
-	}
-
-	return
-}
-
 func (s Set) ContainsMatchable(m Matchable) bool {
 	if s.excludeCwd(m) {
 		return false
 	}
 
-	if s.excludeSigil(m) {
+	if !s.hidden.ContainsMatchable(m) {
 		return false
 	}
 
@@ -332,66 +316,6 @@ func (s Set) ContainsMatchable(m Matchable) bool {
 	return true
 }
 
-// func (s Set) Contains(id schnittstellen.Stringer) bool {
-// 	switch idt := id.(type) {
-// 	case sha.Sha:
-// 		return s.Shas.Contains(idt)
-
-// 	case Etikett:
-// 		return s.Etiketten.Contains(idt)
-
-// 	case Typ:
-// 		return s.Typen.Contains(idt)
-
-// 	case *Hinweis:
-// 		return s.Hinweisen.Contains(*idt)
-
-// 	case Hinweis:
-// 		return s.Hinweisen.Contains(idt)
-
-// 	case ts.Time:
-// 		return s.Timestamps.Contains(idt)
-
-// 	case Kasten:
-// 		return s.Kisten.Contains(idt)
-
-// 	case FD:
-// 		return s.FDs.Contains(idt)
-
-// 	case Konfig:
-// 		return true
-
-// 	default:
-// 		return false
-// 	}
-// }
-
-func (s Set) OnlySingleHinweis() (h Hinweis, ok bool) {
-	if s.Len() != 1 {
-		return
-	}
-
-	if s.Sigil.IncludesHistory() {
-		return
-	}
-
-	switch {
-	case s.Hinweisen.Len() == 1:
-		ok = true
-		h = s.Hinweisen.Any()
-
-	case s.FDs.Len() == 1:
-		var err error
-
-		h, err = s.FDs.Any().GetHinweis()
-		ok = err == nil
-
-	default:
-	}
-
-	return
-}
-
 func (s Set) Len() int {
 	k := 0
 
@@ -411,6 +335,7 @@ func (s Set) Len() int {
 
 func (s *Set) AddSigil(v Sigil) {
 	s.Sigil.Add(v)
+	s.hidden.Sigil.Add(v)
 }
 
 func (s Set) GetSigil() schnittstellen.Sigil {
