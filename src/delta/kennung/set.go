@@ -171,6 +171,7 @@ func (s *Set) Set(v string) (err error) {
 	}
 
 	if err = s.Sigil.Set(v); err == nil {
+		s.AddSigil(s.Sigil)
 		return
 	}
 
@@ -206,7 +207,7 @@ func (s *Set) Add(ids ...schnittstellen.Element) (err error) {
 			s.HasKonfig = true
 
 		case Sigil:
-			s.Sigil.Add(it)
+			s.AddSigil(it)
 
 		case FD:
 			if il, err := it.GetIdLike(); err == nil {
@@ -406,6 +407,10 @@ func (s Set) Len() int {
 		s.Timestamps,
 		s.FDs,
 	) + k
+}
+
+func (s *Set) AddSigil(v Sigil) {
+	s.Sigil.Add(v)
 }
 
 func (s Set) GetSigil() schnittstellen.Sigil {

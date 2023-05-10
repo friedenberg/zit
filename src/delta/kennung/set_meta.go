@@ -189,7 +189,7 @@ func (ms *metaSet) set(v string) (err error) {
 
 			if ids, ok = ms.Gattung[g]; !ok {
 				ids = ms.MakeSet()
-				ids.Sigil = sigil
+				ids.AddSigil(sigil)
 			}
 
 			switch {
