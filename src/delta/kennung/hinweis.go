@@ -175,6 +175,23 @@ func (h Hinweis) GetGattung() schnittstellen.Gattung {
 	return gattung.Zettel
 }
 
+func (h Hinweis) ContainsMatchable(m Matchable) bool {
+	g := gattung.Make(m.GetGattung())
+
+	// Only Zettels have Hinweis, so only filter against them in that case
+	if g != gattung.Zettel {
+		return false
+	}
+
+	t1, ok := m.GetIdLike().(Hinweis)
+
+	if ok && h.Equals(t1) {
+		return true
+	}
+
+	return false
+}
+
 func (t Hinweis) MarshalText() (text []byte, err error) {
 	text = []byte(t.String())
 	return
