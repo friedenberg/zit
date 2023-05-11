@@ -22,7 +22,6 @@ type Set struct {
 	Shas                    sha_collections.MutableSet
 
 	Hinweisen HinweisMutableSet
-	FDs       MutableFDSet
 	Sigil     Sigil
 
 	UserMatcher   matcherAnd
@@ -48,7 +47,6 @@ func MakeSet(
 		ActualMatcher:           MakeMatcherAnd(),
 		Shas:                    sha_collections.MakeMutableSet(),
 		Hinweisen:               MakeHinweisMutableSet(),
-		FDs:                     MakeMutableFDSet(),
 		cwd:                     MakeMatcherSigilMatchOnMissing(SigilCwd, cwd),
 		hidden: MakeMatcherSigil(
 			SigilHidden,
@@ -69,11 +67,14 @@ func (s *Set) SetMany(vs ...string) (err error) {
 }
 
 func (s *Set) Set(v string) (err error) {
-	if err = collections.AddString[FD, *FD](
-		s.FDs,
-		v,
-	); err == nil {
-		return
+	{
+		var fd FD
+
+		if err = fd.Set(v); err == nil {
+			s.UserMatcher.Add(fd)
+			s.ActualMatcher.Add(fd)
+			return
+		}
 	}
 
 	if err = collections.ExpandAndAddString[sha.Sha, *sha.Sha](
@@ -232,7 +233,6 @@ func (s Set) String() string {
 	errors.TodoP1("add Matchers")
 	s.Shas.Each(iter.AddString[sha.Sha](sb))
 	s.Hinweisen.Each(iter.AddString[Hinweis](sb))
-	s.FDs.Each(iter.AddString[FD](sb))
 
 	sb.WriteString(s.Sigil.String())
 
@@ -282,7 +282,6 @@ func (s Set) Len() int {
 	return collections.Len(
 		s.Shas,
 		s.Hinweisen,
-		s.FDs,
 	) + ml
 }
 

@@ -2,15 +2,13 @@
 
 setup() {
 	load "$BATS_CWD/zz-tests_bats/common.bash"
+}
 
-	# for shellcheck SC2154
-	export output
+teardown() {
+	chflags_and_rm
 }
 
 function add { # @test
-	wd="$(mktemp -d)"
-	cd "$wd" || exit 1
-
 	run_zit_init_disable_age
 
 	f=to_add.md
@@ -50,11 +48,7 @@ function add { # @test
 }
 
 function add_1 { # @test
-	wd="$(mktemp -d)"
-	cd "$wd" || exit 1
-
-	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
-	assert_success
+	run_zit_init_disable_age
 
 	f=to_add.md
 	{

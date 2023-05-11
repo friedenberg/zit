@@ -316,6 +316,7 @@ func (fd FD) ContainsMatchable(m Matchable) (ok bool) {
 		}
 
 		return h.Equals(it)
+
 	default:
 		errors.TodoP1("support other gattung")
 	}
