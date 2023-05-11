@@ -138,6 +138,10 @@ func (t *Etikett) UnmarshalBinary(text []byte) (err error) {
 	return
 }
 
+func (t Etikett) KennungSansGattungClone() KennungSansGattung {
+	return t
+}
+
 func (t Etikett) KennungClone() Kennung {
 	return t
 }

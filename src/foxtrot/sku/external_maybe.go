@@ -42,7 +42,7 @@ func (a ExternalMaybe[T, T1]) Equals(b ExternalMaybe[T, T1]) bool {
 	return true
 }
 
-func (e ExternalMaybe[T, T1]) GetId() schnittstellen.Kennung {
+func (e ExternalMaybe[T, T1]) GetId() schnittstellen.ValueLike {
 	return e.Kennung
 }
 

@@ -220,6 +220,10 @@ func (t *Hinweis) UnmarshalBinary(text []byte) (err error) {
 	return
 }
 
+func (t Hinweis) KennungSansGattungClone() KennungSansGattung {
+	return t
+}
+
 func (t Hinweis) KennungClone() Kennung {
 	return t
 }

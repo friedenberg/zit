@@ -20,21 +20,32 @@ type QueryPrefixer interface {
 	GetQueryPrefix() string
 }
 
-type Kennung interface {
-	schnittstellen.Kennung
+type KennungSansGattung interface {
+	schnittstellen.ValueLike
 	encoding.TextMarshaler
 	encoding.BinaryMarshaler
 	Parts() [3]string
-	KennungClone() Kennung
 	Matcher
+	KennungSansGattungClone() KennungSansGattung
 }
 
-type KennungPtr interface {
-	Kennung
+type Kennung interface {
+	KennungSansGattung
+	schnittstellen.GattungGetter
+	KennungClone() Kennung
+}
+
+type KennungSansGattungPtr interface {
+	KennungSansGattung
 	encoding.TextUnmarshaler
 	encoding.BinaryUnmarshaler
 	schnittstellen.Resetter2
 	schnittstellen.Setter
+}
+
+type KennungPtr interface {
+	Kennung
+	KennungSansGattungPtr
 	KennungPtrClone() KennungPtr
 }
 
@@ -95,11 +106,12 @@ func Make(v string) (k Kennung, err error) {
 	return
 }
 
-func MakeMatcher[K KennungLike[K], KPtr KennungLikePtr[K]](
+func MakeMatcher(
+	k KennungPtr,
 	v string,
 	expander func(string) (string, error),
-) (k K, m Matcher, err error) {
-	m = KPtr(&k)
+) (m Matcher, err error) {
+	m = k
 	v = strings.TrimSpace(v)
 
 	if expander != nil {
@@ -115,7 +127,7 @@ func MakeMatcher[K KennungLike[K], KPtr KennungLikePtr[K]](
 
 	isNegated := false
 
-	if isNegated, err = SetQueryKennung(KPtr(&k), v); err != nil {
+	if isNegated, err = SetQueryKennung(k, v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -127,7 +139,10 @@ func MakeMatcher[K KennungLike[K], KPtr KennungLikePtr[K]](
 	return
 }
 
-func SetQueryKennung(k KennungPtr, v string) (isNegated bool, err error) {
+func SetQueryKennung(
+	k KennungSansGattungPtr,
+	v string,
+) (isNegated bool, err error) {
 	v = strings.TrimSpace(v)
 
 	if len(v) > 0 && []rune(v)[0] == QueryNegationOperator {

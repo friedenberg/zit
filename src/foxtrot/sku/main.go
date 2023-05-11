@@ -9,7 +9,7 @@ import (
 type Kennung = schnittstellen.Stringer
 
 type IdLikeGetter interface {
-	GetId() schnittstellen.Kennung
+	GetId() schnittstellen.ValueLike
 }
 
 type DataIdentity interface {

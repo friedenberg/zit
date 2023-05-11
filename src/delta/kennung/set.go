@@ -88,7 +88,7 @@ func (s *Set) Set(v string) (err error) {
 	{
 		var m Matcher
 
-		if _, m, err = MakeMatcher[Konfig](v, nil); err == nil {
+		if m, err = MakeMatcher(&Konfig{}, v, nil); err == nil {
 			s.UserMatcher.Add(m)
 			s.ActualMatcher.Add(m)
 			return
@@ -156,7 +156,7 @@ func (s *Set) Set(v string) (err error) {
 	{
 		var m Matcher
 
-		if _, m, err = MakeMatcher[Typ](v, s.expanders.Typ); err == nil {
+		if m, err = MakeMatcher(&Typ{}, v, s.expanders.Typ); err == nil {
 			s.UserMatcher.Add(m)
 			s.ActualMatcher.Add(m)
 			return
@@ -166,7 +166,7 @@ func (s *Set) Set(v string) (err error) {
 	{
 		var m Matcher
 
-		if _, m, err = MakeMatcher[Kasten](v, s.expanders.Kasten); err == nil {
+		if m, err = MakeMatcher(&Kasten{}, v, s.expanders.Kasten); err == nil {
 			s.UserMatcher.Add(m)
 			s.ActualMatcher.Add(m)
 			return

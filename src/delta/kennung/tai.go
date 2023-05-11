@@ -62,6 +62,10 @@ func (t Tai) GetGattung() schnittstellen.Gattung {
 	return gattung.Bestandsaufnahme
 }
 
+func (t Tai) KennungSansGattungClone() KennungSansGattung {
+	return t
+}
+
 func (t Tai) KennungClone() Kennung {
 	return t
 }
