@@ -323,3 +323,46 @@ func (fd FD) ContainsMatchable(m Matchable) (ok bool) {
 
 	return false
 }
+
+func (fd FD) KennungSansGattungClone() KennungSansGattung {
+	return fd
+}
+
+func (fd FD) Parts() [3]string {
+	return [3]string{"", "", fd.String()}
+}
+
+func (fd *FD) Reset() {
+	fd.IsDir = false
+	fd.Path = ""
+	fd.ModTime.Reset()
+	fd.Sha.Reset()
+}
+
+// func (t FD) MarshalText() (text []byte, err error) {
+// 	text = []byte(t.String())
+// 	return
+// }
+
+// func (t *FD) UnmarshalText(text []byte) (err error) {
+// 	if err = t.Set(string(text)); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
+
+// 	return
+// }
+
+// func (t FD) MarshalBinary() (text []byte, err error) {
+// 	text = []byte(t.String())
+// 	return
+// }
+
+// func (t *FD) UnmarshalBinary(text []byte) (err error) {
+// 	if err = t.Set(string(text)); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
+
+// 	return
+// }

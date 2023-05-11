@@ -68,11 +68,11 @@ func (s *Set) SetMany(vs ...string) (err error) {
 
 func (s *Set) Set(v string) (err error) {
 	{
-		var fd FD
+		var m Matcher
 
-		if err = fd.Set(v); err == nil {
-			s.UserMatcher.Add(fd)
-			s.ActualMatcher.Add(fd)
+		if m, err = MakeMatcher(&FD{}, v, nil); err == nil {
+			s.UserMatcher.Add(m)
+			s.ActualMatcher.Add(m)
 			return
 		}
 	}

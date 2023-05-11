@@ -162,6 +162,10 @@ func (t Time) Less(t1 Time) bool {
 	return t.Unix() < t1.Unix()
 }
 
+func (t *Time) Reset() {
+	t.time = tyme.Time{}
+}
+
 func (t Time) IsEmpty() bool {
 	return t.time.IsZero()
 }

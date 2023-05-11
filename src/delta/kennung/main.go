@@ -1,7 +1,6 @@
 package kennung
 
 import (
-	"encoding"
 	"fmt"
 	"strings"
 
@@ -22,8 +21,8 @@ type QueryPrefixer interface {
 
 type KennungSansGattung interface {
 	schnittstellen.ValueLike
-	encoding.TextMarshaler
-	encoding.BinaryMarshaler
+	// encoding.TextMarshaler
+	// encoding.BinaryMarshaler
 	Parts() [3]string
 	Matcher
 	KennungSansGattungClone() KennungSansGattung
@@ -37,8 +36,8 @@ type Kennung interface {
 
 type KennungSansGattungPtr interface {
 	KennungSansGattung
-	encoding.TextUnmarshaler
-	encoding.BinaryUnmarshaler
+	// encoding.TextUnmarshaler
+	// encoding.BinaryUnmarshaler
 	schnittstellen.Resetter2
 	schnittstellen.Setter
 }
@@ -107,7 +106,7 @@ func Make(v string) (k Kennung, err error) {
 }
 
 func MakeMatcher(
-	k KennungPtr,
+	k KennungSansGattungPtr,
 	v string,
 	expander func(string) (string, error),
 ) (m Matcher, err error) {
@@ -140,7 +139,7 @@ func MakeMatcher(
 }
 
 func SetQueryKennung(
-	k KennungSansGattungPtr,
+	k schnittstellen.Setter,
 	v string,
 ) (isNegated bool, err error) {
 	v = strings.TrimSpace(v)
