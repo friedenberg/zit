@@ -78,12 +78,14 @@ func (e *Typ) Set(v string) (err error) {
 }
 
 func (t Typ) ContainsMatchable(m Matchable) bool {
-  g := gattung.Make(m.GetGattung())
+	g := gattung.Make(m.GetGattung())
 
-	// Only Zettels have Typs, so only filter against them in that case
-  if g != gattung.Zettel {
-    return false
-  }
+	switch g {
+	case gattung.Zettel, gattung.Typ:
+		// noop
+	default:
+		return false
+	}
 
 	t1 := m.GetTyp()
 

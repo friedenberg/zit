@@ -273,10 +273,21 @@ func (ms metaSet) GetEtiketten() schnittstellen.Set[Etikett] {
 }
 
 func (ms metaSet) GetTypen() schnittstellen.Set[Typ] {
-	es := MakeTypMutableSet()
+	es := collections.MakeMutableSetStringer[Typ]()
 
 	for _, s := range ms.Gattung {
-		s.Typen.Each(es.Add)
+		VisitAllMatchers(
+			func(m Matcher) (err error) {
+				e, ok := m.(Typ)
+
+				if !ok {
+					return
+				}
+
+				return es.Add(e)
+			},
+			s.UserMatcher,
+		)
 	}
 
 	return es

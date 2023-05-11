@@ -26,6 +26,7 @@ type Kennung interface {
 	encoding.BinaryMarshaler
 	Parts() [3]string
 	KennungClone() Kennung
+	Matcher
 }
 
 type KennungPtr interface {
@@ -90,6 +91,38 @@ func Make(v string) (k Kennung, err error) {
 	}
 
 	err = errors.Errorf("%q is not a valid Kennung", v)
+
+	return
+}
+
+func MakeMatcher[K KennungLike[K], KPtr KennungLikePtr[K]](
+	v string,
+	expander func(string) (string, error),
+) (k K, m Matcher, err error) {
+	m = KPtr(&k)
+	v = strings.TrimSpace(v)
+
+	if expander != nil {
+		v1 := v
+
+		if v1, err = expander(v); err != nil {
+			err = nil
+			v1 = v
+		}
+
+		v = v1
+	}
+
+	isNegated := false
+
+	if isNegated, err = SetQueryKennung(KPtr(&k), v); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if isNegated {
+		m = MakeMatcherNegate(m)
+	}
 
 	return
 }

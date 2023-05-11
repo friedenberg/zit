@@ -23,7 +23,6 @@ type Set struct {
 	UserMatcher             matcherAnd
 	ActualMatcher           matcherAnd
 	Hinweisen               HinweisMutableSet
-	Typen                   TypMutableSet
 	Timestamps              schnittstellen.MutableSet[Time]
 	Kisten                  KastenMutableSet
 	FDs                     MutableFDSet
@@ -51,7 +50,6 @@ func MakeSet(
 		ActualMatcher:           MakeMatcherAnd(),
 		Shas:                    sha_collections.MakeMutableSet(),
 		Hinweisen:               MakeHinweisMutableSet(),
-		Typen:                   MakeTypMutableSet(),
 		Kisten:                  MakeKastenMutableSet(),
 		Timestamps:              collections.MakeMutableSetStringer[Time](),
 		FDs:                     MakeMutableFDSet(),
@@ -157,12 +155,14 @@ func (s *Set) Set(v string) (err error) {
 		return
 	}
 
-	if err = collections.ExpandAndAddString[Typ, *Typ](
-		s.Typen,
-		s.expanders.Typ,
-		v,
-	); err == nil {
-		return
+	{
+		var m Matcher
+
+		if _, m, err = MakeMatcher[Typ](v, s.expanders.Typ); err == nil {
+			s.UserMatcher.Add(m)
+			s.ActualMatcher.Add(m)
+			return
+		}
 	}
 
 	if err = collections.ExpandAndAddString[Kasten, *Kasten](
@@ -198,7 +198,8 @@ func (s *Set) Add(ids ...schnittstellen.Element) (err error) {
 			s.Hinweisen.Add(it)
 
 		case Typ:
-			s.Typen.Add(it)
+			s.UserMatcher.Add(it)
+			s.ActualMatcher.Add(it)
 
 		case Time:
 			s.Timestamps.Add(it)
@@ -233,7 +234,6 @@ func (s Set) String() string {
 	errors.TodoP1("add Matchers")
 	s.Shas.Each(iter.AddString[sha.Sha](sb))
 	s.Hinweisen.Each(iter.AddString[Hinweis](sb))
-	s.Typen.Each(iter.AddString[Typ](sb))
 	s.Timestamps.Each(iter.AddString[Time](sb))
 	s.Kisten.Each(iter.AddString[Kasten](sb))
 	s.FDs.Each(iter.AddString[FD](sb))
@@ -256,34 +256,20 @@ func (s Set) ContainsMatchable(m Matchable) bool {
 		return false
 	}
 
-	g := gattung.Must(m.GetGattung())
-
 	if !s.ActualMatcher.ContainsMatchable(m) {
 		return false
 	}
 
-	// Only Zettels have Typs, so only filter against them in that case
-	if g == gattung.Zettel {
-		if t := m.GetTyp(); s.Typen.Len() > 0 && !s.Typen.Contains(t) {
-			return false
-		}
-		// If this is a strict Hinweis match, do not permit this to match anything
-		// other than Zettels
-	} else if s.Len() > 0 && s.Hinweisen.Len() == s.Len() {
+	g := gattung.Must(m.GetGattung())
+
+	if g != gattung.Zettel && s.Len() > 0 && s.Hinweisen.Len() == s.Len() {
 		return false
 	}
 
 	il := m.GetIdLike()
 
 	switch id := il.(type) {
-	case Kasten:
-
-	case Typ:
-		if s.Typen.Len() > 0 && !s.Typen.Contains(id) {
-			return false
-		}
-
-	case Etikett:
+	case Typ, Etikett, Kasten:
 		// noop
 
 	case Hinweis:
@@ -314,7 +300,6 @@ func (s Set) Len() int {
 		s.Kisten,
 		s.Shas,
 		s.Hinweisen,
-		s.Typen,
 		s.Timestamps,
 		s.FDs,
 	) + k
