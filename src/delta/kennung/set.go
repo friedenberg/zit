@@ -7,9 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/delta/sha_collections"
 )
 
 type ImplicitEtikettenGetter interface {
@@ -19,7 +17,6 @@ type ImplicitEtikettenGetter interface {
 type Set struct {
 	expanders               Expanders
 	implicitEtikettenGetter ImplicitEtikettenGetter
-	Shas                    sha_collections.MutableSet
 
 	Hinweisen HinweisMutableSet
 	Sigil     Sigil
@@ -45,7 +42,6 @@ func MakeSet(
 		implicitEtikettenGetter: implicitEtikettenGetter,
 		UserMatcher:             MakeMatcherAnd(),
 		ActualMatcher:           MakeMatcherAnd(),
-		Shas:                    sha_collections.MakeMutableSet(),
 		Hinweisen:               MakeHinweisMutableSet(),
 		cwd:                     MakeMatcherSigilMatchOnMissing(SigilCwd, cwd),
 		hidden: MakeMatcherSigil(
@@ -77,12 +73,14 @@ func (s *Set) Set(v string) (err error) {
 		}
 	}
 
-	if err = collections.ExpandAndAddString[sha.Sha, *sha.Sha](
-		s.Shas,
-		s.expanders.Sha,
-		v,
-	); err == nil {
-		return
+	{
+		var m Matcher
+
+		if m, err = MakeMatcher(&Sha{}, v, s.expanders.Sha); err == nil {
+			s.UserMatcher.Add(m)
+			s.ActualMatcher.Add(m)
+			return
+		}
 	}
 
 	{
@@ -191,8 +189,9 @@ func (s *Set) Add(ids ...schnittstellen.Element) (err error) {
 			s.UserMatcher.Add(it)
 			s.ActualMatcher.Add(it)
 
-		case sha.Sha:
-			s.Shas.Add(it)
+		case Sha:
+			s.UserMatcher.Add(it)
+			s.ActualMatcher.Add(it)
 
 		case Hinweis:
 			s.Hinweisen.Add(it)
@@ -231,7 +230,6 @@ func (s Set) String() string {
 	sb := &strings.Builder{}
 
 	errors.TodoP1("add Matchers")
-	s.Shas.Each(iter.AddString[sha.Sha](sb))
 	s.Hinweisen.Each(iter.AddString[Hinweis](sb))
 
 	sb.WriteString(s.Sigil.String())
@@ -277,12 +275,11 @@ func (s Set) ContainsMatchable(m Matchable) bool {
 }
 
 func (s Set) Len() int {
-	ml := LenMatchers(s.UserMatcher)
+	return LenMatchers(s.UserMatcher) + s.Hinweisen.Len()
+}
 
-	return collections.Len(
-		s.Shas,
-		s.Hinweisen,
-	) + ml
+func (s Set) EachMatcher(f schnittstellen.FuncIter[Matcher]) (err error) {
+	return VisitAllMatchers(f, s.ActualMatcher)
 }
 
 func (s *Set) AddSigil(v Sigil) {

@@ -33,7 +33,23 @@ func (c CatObjekte) RunWithIds(
 	u *umwelt.Umwelt,
 	ids kennung.Set,
 ) (err error) {
-	shas := ids.Shas.ImmutableClone()
+	shas := collections.MakeMutableSetStringer[sha.Sha]()
+
+	if err = ids.EachMatcher(
+		func(m kennung.Matcher) (err error) {
+			sh, ok := m.(*kennung.Sha)
+
+			if !ok {
+				return
+			}
+
+			return shas.Add(sh.GetSha())
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	return c.akten(u, shas)
 }
 
@@ -44,7 +60,7 @@ func (c CatObjekte) akten(
 	// TODO-P3 refactor into reusable
 	akteWriter := collections.MakeSyncSerializer(
 		func(rc io.ReadCloser) (err error) {
-			defer errors.Deferred(&err, rc.Close)
+			defer errors.DeferredCloser(&err, rc)
 
 			if _, err = io.Copy(u.Out(), rc); err != nil {
 				err = errors.Wrap(err)
