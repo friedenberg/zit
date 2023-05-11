@@ -165,3 +165,7 @@ func (t Time) Less(t1 Time) bool {
 func (t Time) IsEmpty() bool {
 	return t.time.IsZero()
 }
+
+func (t Time) ContainsMatchable(m Matchable) bool {
+	return false
+}

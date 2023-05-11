@@ -27,6 +27,22 @@ type MatcherParentPtr interface {
 	Add(Matcher) error
 }
 
+func LenMatchers(
+	matchers ...Matcher,
+) (i int) {
+	inc := func(m Matcher) (err error) {
+		if _, ok := m.(Kennung); ok {
+			i++
+		}
+
+		return
+	}
+
+	VisitAllMatchers(inc, matchers...)
+
+	return
+}
+
 func VisitAllMatchers(
 	f schnittstellen.FuncIter[Matcher],
 	matchers ...Matcher,

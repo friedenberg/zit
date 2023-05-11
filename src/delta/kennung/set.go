@@ -21,11 +21,9 @@ type Set struct {
 	implicitEtikettenGetter ImplicitEtikettenGetter
 	Shas                    sha_collections.MutableSet
 
-	Hinweisen  HinweisMutableSet
-	Timestamps schnittstellen.MutableSet[Time]
-	Kisten     KastenMutableSet
-	FDs        MutableFDSet
-	Sigil      Sigil
+	Hinweisen HinweisMutableSet
+	FDs       MutableFDSet
+	Sigil     Sigil
 
 	UserMatcher   matcherAnd
 	ActualMatcher matcherAnd
@@ -50,8 +48,6 @@ func MakeSet(
 		ActualMatcher:           MakeMatcherAnd(),
 		Shas:                    sha_collections.MakeMutableSet(),
 		Hinweisen:               MakeHinweisMutableSet(),
-		Kisten:                  MakeKastenMutableSet(),
-		Timestamps:              collections.MakeMutableSetStringer[Time](),
 		FDs:                     MakeMutableFDSet(),
 		cwd:                     MakeMatcherSigilMatchOnMissing(SigilCwd, cwd),
 		hidden: MakeMatcherSigil(
@@ -85,10 +81,6 @@ func (s *Set) Set(v string) (err error) {
 		s.expanders.Sha,
 		v,
 	); err == nil {
-		return
-	}
-
-	if err = collections.AddString[Time, *Time](s.Timestamps, v); err == nil {
 		return
 	}
 
@@ -170,12 +162,14 @@ func (s *Set) Set(v string) (err error) {
 		}
 	}
 
-	if err = collections.ExpandAndAddString[Kasten, *Kasten](
-		s.Kisten,
-		s.expanders.Kasten,
-		v,
-	); err == nil {
-		return
+	{
+		var m Matcher
+
+		if _, m, err = MakeMatcher[Kasten](v, s.expanders.Kasten); err == nil {
+			s.UserMatcher.Add(m)
+			s.ActualMatcher.Add(m)
+			return
+		}
 	}
 
 	if err = s.Sigil.Set(v); err == nil {
@@ -206,11 +200,9 @@ func (s *Set) Add(ids ...schnittstellen.Element) (err error) {
 			s.UserMatcher.Add(it)
 			s.ActualMatcher.Add(it)
 
-		case Time:
-			s.Timestamps.Add(it)
-
 		case Kasten:
-			s.Kisten.Add(it)
+			s.UserMatcher.Add(it)
+			s.ActualMatcher.Add(it)
 
 		case Konfig:
 			s.UserMatcher.Add(it)
@@ -240,8 +232,6 @@ func (s Set) String() string {
 	errors.TodoP1("add Matchers")
 	s.Shas.Each(iter.AddString[sha.Sha](sb))
 	s.Hinweisen.Each(iter.AddString[Hinweis](sb))
-	s.Timestamps.Each(iter.AddString[Time](sb))
-	s.Kisten.Each(iter.AddString[Kasten](sb))
 	s.FDs.Each(iter.AddString[FD](sb))
 
 	sb.WriteString(s.Sigil.String())
@@ -287,13 +277,13 @@ func (s Set) ContainsMatchable(m Matchable) bool {
 }
 
 func (s Set) Len() int {
+	ml := LenMatchers(s.UserMatcher)
+
 	return collections.Len(
-		s.Kisten,
 		s.Shas,
 		s.Hinweisen,
-		s.Timestamps,
 		s.FDs,
-	)
+	) + ml
 }
 
 func (s *Set) AddSigil(v Sigil) {
