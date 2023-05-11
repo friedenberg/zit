@@ -20,17 +20,17 @@ type Set struct {
 	expanders               Expanders
 	implicitEtikettenGetter ImplicitEtikettenGetter
 	Shas                    sha_collections.MutableSet
-	UserMatcher             matcherAnd
-	ActualMatcher           matcherAnd
-	Hinweisen               HinweisMutableSet
-	Timestamps              schnittstellen.MutableSet[Time]
-	Kisten                  KastenMutableSet
-	FDs                     MutableFDSet
-	HasKonfig               bool
-	Sigil                   Sigil
 
-	cwd    matcherSigil
-	hidden matcherSigil
+	Hinweisen  HinweisMutableSet
+	Timestamps schnittstellen.MutableSet[Time]
+	Kisten     KastenMutableSet
+	FDs        MutableFDSet
+	Sigil      Sigil
+
+	UserMatcher   matcherAnd
+	ActualMatcher matcherAnd
+	cwd           matcherSigil
+	hidden        matcherSigil
 }
 
 func MakeSet(
@@ -92,9 +92,14 @@ func (s *Set) Set(v string) (err error) {
 		return
 	}
 
-	if err = (Konfig{}).Set(v); err == nil {
-		s.HasKonfig = true
-		return
+	{
+		var m Matcher
+
+		if _, m, err = MakeMatcher[Konfig](v, nil); err == nil {
+			s.UserMatcher.Add(m)
+			s.ActualMatcher.Add(m)
+			return
+		}
 	}
 
 	if err = collections.ExpandAndAddString[Hinweis, *Hinweis](
@@ -208,7 +213,8 @@ func (s *Set) Add(ids ...schnittstellen.Element) (err error) {
 			s.Kisten.Add(it)
 
 		case Konfig:
-			s.HasKonfig = true
+			s.UserMatcher.Add(it)
+			s.ActualMatcher.Add(it)
 
 		case Sigil:
 			s.AddSigil(it)
@@ -238,10 +244,6 @@ func (s Set) String() string {
 	s.Kisten.Each(iter.AddString[Kasten](sb))
 	s.FDs.Each(iter.AddString[FD](sb))
 
-	if s.HasKonfig {
-		sb.WriteString("konfig")
-	}
-
 	sb.WriteString(s.Sigil.String())
 
 	return sb.String()
@@ -269,16 +271,11 @@ func (s Set) ContainsMatchable(m Matchable) bool {
 	il := m.GetIdLike()
 
 	switch id := il.(type) {
-	case Typ, Etikett, Kasten:
+	case Typ, Etikett, Kasten, Konfig:
 		// noop
 
 	case Hinweis:
 		if s.Hinweisen.Len() > 0 && !s.Hinweisen.Contains(id) {
-			return false
-		}
-
-	case Konfig:
-		if !s.HasKonfig {
 			return false
 		}
 
@@ -290,19 +287,13 @@ func (s Set) ContainsMatchable(m Matchable) bool {
 }
 
 func (s Set) Len() int {
-	k := 0
-
-	if s.HasKonfig {
-		k = 1
-	}
-
 	return collections.Len(
 		s.Kisten,
 		s.Shas,
 		s.Hinweisen,
 		s.Timestamps,
 		s.FDs,
-	) + k
+	)
 }
 
 func (s *Set) AddSigil(v Sigil) {
