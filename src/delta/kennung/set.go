@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
@@ -18,13 +17,13 @@ type Set struct {
 	expanders               Expanders
 	implicitEtikettenGetter ImplicitEtikettenGetter
 
-	Hinweisen HinweisMutableSet
-	Sigil     Sigil
+	Sigil Sigil
 
 	UserMatcher   matcherAnd
 	ActualMatcher matcherAnd
 	cwd           matcherSigil
 	hidden        matcherSigil
+	Hinweisen     matcherOr
 }
 
 func MakeSet(
@@ -42,7 +41,7 @@ func MakeSet(
 		implicitEtikettenGetter: implicitEtikettenGetter,
 		UserMatcher:             MakeMatcherAnd(),
 		ActualMatcher:           MakeMatcherAnd(),
-		Hinweisen:               MakeHinweisMutableSet(),
+		Hinweisen:               MakeMatcherOr(),
 		cwd:                     MakeMatcherSigilMatchOnMissing(SigilCwd, cwd),
 		hidden: MakeMatcherSigil(
 			SigilHidden,
@@ -93,12 +92,13 @@ func (s *Set) Set(v string) (err error) {
 		}
 	}
 
-	if err = collections.ExpandAndAddString[Hinweis, *Hinweis](
-		s.Hinweisen,
-		s.expanders.Hinweis,
-		v,
-	); err == nil {
-		return
+	{
+		var m Matcher
+
+		if m, err = MakeMatcher(&Hinweis{}, v, s.expanders.Hinweis); err == nil {
+			s.Hinweisen.Add(m)
+			return
+		}
 	}
 
 	var (
@@ -230,8 +230,6 @@ func (s Set) String() string {
 	sb := &strings.Builder{}
 
 	errors.TodoP1("add Matchers")
-	s.Hinweisen.Each(iter.AddString[Hinweis](sb))
-
 	sb.WriteString(s.Sigil.String())
 
 	return sb.String()
@@ -258,12 +256,11 @@ func (s Set) ContainsMatchable(m Matchable) bool {
 
 	il := m.GetIdLike()
 
-	switch id := il.(type) {
+	switch il.(type) {
 	case Typ, Etikett, Kasten, Konfig:
-		// noop
 
 	case Hinweis:
-		if s.Hinweisen.Len() > 0 && !s.Hinweisen.Contains(id) {
+		if !s.Hinweisen.ContainsMatchable(m) {
 			return false
 		}
 
@@ -292,9 +289,29 @@ func (s Set) GetSigil() schnittstellen.Sigil {
 	return s.Sigil
 }
 
+func (s Set) GetHinweisen() schnittstellen.Set[Hinweis] {
+	hins := collections.MakeMutableSetStringer[Hinweis]()
+
+	VisitAllMatchers(
+		func(m Matcher) (err error) {
+			h, ok := m.(*Hinweis)
+
+			if !ok {
+				return
+			}
+
+			return hins.Add(*h)
+		},
+		s.Hinweisen,
+	)
+
+	return hins
+}
+
 func (s Set) AnyHinweis() (i1 Hinweis, ok bool) {
 	if ok = s.Hinweisen.Len() == 1; ok {
-		i1 = s.Hinweisen.Any()
+		hins := s.GetHinweisen()
+		i1 = hins.Any()
 	}
 
 	return

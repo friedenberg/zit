@@ -11,6 +11,10 @@ import (
 	"github.com/friedenberg/zit/src/bravo/values"
 )
 
+func init() {
+	register(Hinweis{})
+}
+
 type Hinweis struct {
 	left, right string
 }

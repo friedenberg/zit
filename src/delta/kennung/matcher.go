@@ -186,6 +186,10 @@ type matcherOr struct {
 	Children     []Matcher
 }
 
+func (matcher matcherOr) Len() int {
+	return len(matcher.Children)
+}
+
 func (matcher *matcherOr) Add(m Matcher) (err error) {
 	matcher.Children = append(matcher.Children, m)
 	return

@@ -40,7 +40,7 @@ func (c OpenAkte) CompletionGattung() gattungen.Set {
 }
 
 func (c OpenAkte) RunWithIds(store *umwelt.Umwelt, is kennung.Set) (err error) {
-	hins := is.Hinweisen.ImmutableClone()
+	hins := is.GetHinweisen()
 	paths := make([]string, hins.Len())
 
 	dir, err := ioutil.TempDir("", "")

@@ -30,7 +30,7 @@ func (c ExpandHinweis) CompletionGattung() gattungen.Set {
 }
 
 func (c ExpandHinweis) RunWithIds(s *umwelt.Umwelt, ids kennung.Set) (err error) {
-	hins := ids.Hinweisen.ImmutableClone()
+	hins := ids.GetHinweisen()
 
 	for _, h := range hins.Elements() {
 		errors.Out().Print(h)
