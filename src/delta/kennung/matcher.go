@@ -6,6 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/iter"
 )
 
@@ -321,6 +322,79 @@ func (matcher matcherNegate) ContainsMatchable(matchable Matchable) bool {
 
 func (matcher matcherNegate) Each(f schnittstellen.FuncIter[Matcher]) error {
 	return f(matcher.Child)
+}
+
+//    ____       _   _
+//   / ___| __ _| |_| |_ _   _ _ __   __ _
+//  | |  _ / _` | __| __| | | | '_ \ / _` |
+//  | |_| | (_| | |_| |_| |_| | | | | (_| |
+//   \____|\__,_|\__|\__|\__,_|_| |_|\__, |
+//                                   |___/
+
+func MakeMatcherGattung(m map[gattung.Gattung]Matcher) *matcherGattung {
+	if m == nil {
+		m = make(map[gattung.Gattung]Matcher)
+	}
+
+	return &matcherGattung{Children: m}
+}
+
+type matcherGattung struct {
+	Children map[gattung.Gattung]Matcher
+}
+
+func (m matcherGattung) Len() int {
+	return len(m.Children)
+}
+
+func (m *matcherGattung) Set(g gattung.Gattung, child Matcher) error {
+	m.Children[g] = child
+	return nil
+}
+
+func (m matcherGattung) String() string {
+	if m.Len() == 0 {
+		return ""
+	}
+
+	sb := &strings.Builder{}
+	hasAny := false
+
+	for g, child := range m.Children {
+		if hasAny == true {
+			sb.WriteString(" ")
+		}
+
+		sb.WriteString(child.String())
+		sb.WriteString(g.String())
+	}
+
+	return sb.String()
+}
+
+func (matcher matcherGattung) ContainsMatchable(matchable Matchable) bool {
+	g := gattung.Make(matchable.GetGattung())
+
+	m, ok := matcher.Children[g]
+
+	if !ok {
+		return false
+	}
+
+	return m.ContainsMatchable(matchable)
+}
+
+func (matcher matcherGattung) Each(
+	f schnittstellen.FuncIter[Matcher],
+) (err error) {
+	for _, m := range matcher.Children {
+		if err = f(m); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
 }
 
 func MakeMatcherFuncIter[T Matchable](m Matcher) schnittstellen.FuncIter[T] {
