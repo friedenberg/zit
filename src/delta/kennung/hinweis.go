@@ -30,11 +30,13 @@ func NewHinweisEmpty() (h Hinweis) {
 }
 
 // TODO-P3 is this really necessary?;w
-func NewHinweis(i coordinates.Int, pl Provider, pr Provider) (h Hinweis, err error) {
+func NewHinweis(
+	i coordinates.Int,
+	pl Provider,
+	pr Provider,
+) (h Hinweis, err error) {
 	k := coordinates.Kennung{}
 	k.SetInt(i)
-
-	h = Hinweis{}
 
 	var l, r string
 

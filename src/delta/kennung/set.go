@@ -19,11 +19,11 @@ type Set struct {
 
 	Sigil Sigil
 
-	UserMatcher   matcherAnd
-	ActualMatcher matcherAnd
+	UserMatcher   MatcherParentPtr
+	ActualMatcher MatcherParentPtr
 	cwd           matcherSigil
 	hidden        matcherSigil
-	Hinweisen     matcherOr
+	Hinweisen     MatcherParentPtr
 }
 
 func MakeSet(

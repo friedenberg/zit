@@ -71,6 +71,70 @@ func (fs CwdFiles) EachCreatableMatchable(
 	return
 }
 
+func (fs CwdFiles) String() (out string) {
+	if collections.Len(
+		fs.Zettelen,
+		fs.Typen,
+		fs.Kisten,
+		fs.Etiketten,
+		fs.UnsureAkten,
+	) == 0 {
+		return
+	}
+
+	sb := &strings.Builder{}
+	sb.WriteString("[")
+
+	hasOne := false
+
+	writeOneIfNecessary := func(v schnittstellen.Stringer) (err error) {
+		if hasOne {
+			sb.WriteString(",")
+		}
+
+		sb.WriteString(v.String())
+
+		hasOne = true
+
+		return
+	}
+
+	fs.Zettelen.Each(
+		func(z Zettel) (err error) {
+			return writeOneIfNecessary(z)
+		},
+	)
+
+	fs.Typen.Each(
+		func(z Typ) (err error) {
+			return writeOneIfNecessary(z)
+		},
+	)
+
+	fs.Etiketten.Each(
+		func(z Etikett) (err error) {
+			return writeOneIfNecessary(z)
+		},
+	)
+
+	fs.Kisten.Each(
+		func(z Kasten) (err error) {
+			return writeOneIfNecessary(z)
+		},
+	)
+
+	fs.UnsureAkten.Each(
+		func(z kennung.FD) (err error) {
+			return writeOneIfNecessary(z)
+		},
+	)
+
+	sb.WriteString("]")
+
+	out = sb.String()
+	return
+}
+
 func (fs CwdFiles) ContainsMatchable(m kennung.Matchable) bool {
 	g := gattung.Must(m)
 

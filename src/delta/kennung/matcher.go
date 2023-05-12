@@ -2,6 +2,7 @@ package kennung
 
 import (
 	"encoding/gob"
+	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
@@ -15,10 +16,13 @@ func init() {
 
 type Matcher interface {
 	ContainsMatchable(Matchable) bool
+	String() string
 	// schnittstellen.Stringer
 }
 
 type MatcherParent interface {
+	Matcher
+	Len() int
 	Each(schnittstellen.FuncIter[Matcher]) error
 }
 
@@ -85,6 +89,10 @@ func MakeMatcherAlways() Matcher {
 
 type matcherAlways struct{}
 
+func (_ matcherAlways) String() string {
+	return "ALWAYS"
+}
+
 func (_ matcherAlways) ContainsMatchable(_ Matchable) bool {
 	return true
 }
@@ -102,6 +110,10 @@ func MakeMatcherNever() Matcher {
 
 type matcherNever struct{}
 
+func (_ matcherNever) String() string {
+	return "NEVER"
+}
+
 func (_ matcherNever) ContainsMatchable(_ Matchable) bool {
 	return false
 }
@@ -113,15 +125,15 @@ func (_ matcherNever) ContainsMatchable(_ Matchable) bool {
 //  /_/   \_\_| |_|\__,_|
 //
 
-func MakeMatcherAnd(ms ...Matcher) matcherAnd {
-	return matcherAnd{
+func MakeMatcherAnd(ms ...Matcher) MatcherParentPtr {
+	return &matcherAnd{
 		MatchOnEmpty: true,
 		Children:     ms,
 	}
 }
 
-func MakeMatcherAndDoNotMatchOnEmpty(ms ...Matcher) matcherAnd {
-	return matcherAnd{
+func MakeMatcherAndDoNotMatchOnEmpty(ms ...Matcher) MatcherParentPtr {
+	return &matcherAnd{
 		Children: ms,
 	}
 }
@@ -131,9 +143,34 @@ type matcherAnd struct {
 	Children     []Matcher
 }
 
+func (matcher matcherAnd) Len() int {
+	return len(matcher.Children)
+}
+
 func (matcher *matcherAnd) Add(m Matcher) (err error) {
 	matcher.Children = append(matcher.Children, m)
 	return
+}
+
+func (matcher matcherAnd) String() string {
+	if matcher.Len() == 0 {
+		return ""
+	}
+
+	sb := &strings.Builder{}
+	sb.WriteString("[")
+
+	for i, m := range matcher.Children {
+		if i > 0 {
+			sb.WriteString(" ")
+		}
+
+		sb.WriteString(m.String())
+	}
+
+	sb.WriteString("]")
+
+	return sb.String()
 }
 
 func (matcher matcherAnd) ContainsMatchable(matchable Matchable) bool {
@@ -168,15 +205,15 @@ func (matcher matcherAnd) Each(f schnittstellen.FuncIter[Matcher]) (err error) {
 //   \___/|_|
 //
 
-func MakeMatcherOr(ms ...Matcher) matcherOr {
-	return matcherOr{
+func MakeMatcherOr(ms ...Matcher) MatcherParentPtr {
+	return &matcherOr{
 		MatchOnEmpty: true,
 		Children:     ms,
 	}
 }
 
-func MakeMatcherOrDoNotMatchOnEmpty(ms ...Matcher) matcherOr {
-	return matcherOr{
+func MakeMatcherOrDoNotMatchOnEmpty(ms ...Matcher) MatcherParentPtr {
+	return &matcherOr{
 		Children: ms,
 	}
 }
@@ -192,6 +229,28 @@ func (matcher matcherOr) Len() int {
 
 func (matcher *matcherOr) Add(m Matcher) (err error) {
 	matcher.Children = append(matcher.Children, m)
+	return
+}
+
+func (matcher matcherOr) String() (out string) {
+	if matcher.Len() == 0 {
+		return
+	}
+
+	sb := &strings.Builder{}
+	sb.WriteString("[")
+
+	for i, m := range matcher.Children {
+		if i > 0 {
+			sb.WriteString(",")
+		}
+
+		sb.WriteString(m.String())
+	}
+
+	sb.WriteString("]")
+
+	out = sb.String()
 	return
 }
 
@@ -227,20 +286,41 @@ func (matcher matcherOr) Each(f schnittstellen.FuncIter[Matcher]) (err error) {
 //  |_| \_|\___|\__, |\__,_|\__\___|
 //              |___/
 
-func MakeMatcherNegate(m Matcher) Matcher {
-	return matcherNegate{Matcher: m}
+func MakeMatcherNegate(m Matcher) MatcherParentPtr {
+	return &matcherNegate{Child: m}
 }
 
 type matcherNegate struct {
-	Matcher
+	Child Matcher
+}
+
+func (matcher matcherNegate) Len() int {
+	if matcher.Child == nil {
+		return 0
+	}
+
+	return 1
+}
+
+func (matcher *matcherNegate) Add(m Matcher) error {
+	matcher.Child = m
+	return nil
+}
+
+func (matcher matcherNegate) String() string {
+	if matcher.Child == nil {
+		return ""
+	}
+
+	return string(QueryNegationOperator) + matcher.Child.String()
 }
 
 func (matcher matcherNegate) ContainsMatchable(matchable Matchable) bool {
-	return !matcher.Matcher.ContainsMatchable(matchable)
+	return !matcher.Child.ContainsMatchable(matchable)
 }
 
 func (matcher matcherNegate) Each(f schnittstellen.FuncIter[Matcher]) error {
-	return f(matcher.Matcher)
+	return f(matcher.Child)
 }
 
 func MakeMatcherFuncIter[T Matchable](m Matcher) schnittstellen.FuncIter[T] {
