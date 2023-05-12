@@ -397,6 +397,84 @@ func (matcher matcherGattung) Each(
 	return
 }
 
+//   ___                 _____
+//  |_ _|_ __ ___  _ __ | ____|_  ___ __
+//   | || '_ ` _ \| '_ \|  _| \ \/ / '_ \
+//   | || | | | | | |_) | |___ >  <| |_) |
+//  |___|_| |_| |_| .__/|_____/_/\_\ .__/
+//                |_|              |_|
+
+func MakeMatcherImpExp(
+	imp Matcher,
+	exp MatcherParentPtr,
+) *matcherImpExp {
+	return &matcherImpExp{
+		Implicit: imp,
+		Explicit: exp,
+	}
+}
+
+type matcherImpExp struct {
+	Implicit Matcher
+	Explicit MatcherParentPtr
+}
+
+func (m matcherImpExp) Len() (i int) {
+	if m.Implicit != nil {
+		i++
+	}
+
+	if m.Explicit != nil && m.Explicit.Len() > 0 {
+		i++
+	}
+
+	return
+}
+
+func (m *matcherImpExp) Add(child Matcher) error {
+	return m.Explicit.Add(child)
+}
+
+func (m matcherImpExp) String() string {
+	if m.Explicit == nil {
+		return ""
+	}
+
+	return m.Explicit.String()
+}
+
+func (matcher matcherImpExp) ContainsMatchable(matchable Matchable) bool {
+	if matcher.Implicit != nil && !matcher.Implicit.ContainsMatchable(matchable) {
+		return false
+	}
+
+	if matcher.Explicit != nil && !matcher.Explicit.ContainsMatchable(matchable) {
+		return false
+	}
+
+	return true
+}
+
+func (matcher matcherImpExp) Each(
+	f schnittstellen.FuncIter[Matcher],
+) (err error) {
+	if matcher.Implicit != nil {
+		if err = f(matcher.Implicit); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	if matcher.Explicit != nil {
+		if err = f(matcher.Explicit); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
 func MakeMatcherFuncIter[T Matchable](m Matcher) schnittstellen.FuncIter[T] {
 	return func(e T) (err error) {
 		if !m.ContainsMatchable(e) {

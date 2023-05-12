@@ -19,11 +19,10 @@ type Set struct {
 
 	Sigil Sigil
 
-	UserMatcher   MatcherParentPtr
-	ActualMatcher MatcherParentPtr
-	cwd           matcherSigil
-	hidden        matcherSigil
-	Hinweisen     MatcherParentPtr
+	Matcher   MatcherParentPtr
+	cwd       matcherSigil
+	hidden    matcherSigil
+	Hinweisen MatcherParentPtr
 }
 
 func MakeSet(
@@ -39,8 +38,7 @@ func MakeSet(
 	return Set{
 		expanders:               ex,
 		implicitEtikettenGetter: implicitEtikettenGetter,
-		UserMatcher:             MakeMatcherAnd(),
-		ActualMatcher:           MakeMatcherAnd(),
+		Matcher:                 MakeMatcherAnd(),
 		Hinweisen:               MakeMatcherOr(),
 		cwd:                     MakeMatcherSigilMatchOnMissing(SigilCwd, cwd),
 		hidden: MakeMatcherSigil(
@@ -66,8 +64,7 @@ func (s *Set) Set(v string) (err error) {
 		var m Matcher
 
 		if m, err = MakeMatcher(&FD{}, v, nil); err == nil {
-			s.UserMatcher.Add(m)
-			s.ActualMatcher.Add(m)
+			s.Matcher.Add(m)
 			return
 		}
 	}
@@ -76,8 +73,7 @@ func (s *Set) Set(v string) (err error) {
 		var m Matcher
 
 		if m, err = MakeMatcher(&Sha{}, v, s.expanders.Sha); err == nil {
-			s.UserMatcher.Add(m)
-			s.ActualMatcher.Add(m)
+			s.Matcher.Add(m)
 			return
 		}
 	}
@@ -86,8 +82,7 @@ func (s *Set) Set(v string) (err error) {
 		var m Matcher
 
 		if m, err = MakeMatcher(&Konfig{}, v, nil); err == nil {
-			s.UserMatcher.Add(m)
-			s.ActualMatcher.Add(m)
+			s.Matcher.Add(m)
 			return
 		}
 	}
@@ -114,8 +109,7 @@ func (s *Set) Set(v string) (err error) {
 				m = MakeMatcherNegate(m)
 			}
 
-			s.UserMatcher.Add(m)
-			s.ActualMatcher.Add(m)
+			s.Matcher.Add(m)
 		} else {
 			impl := s.implicitEtikettenGetter.GetImplicitEtiketten(e)
 
@@ -144,8 +138,7 @@ func (s *Set) Set(v string) (err error) {
 
 			mo.Add(m)
 
-			s.UserMatcher.Add(m)
-			s.ActualMatcher.Add(mo)
+			s.Matcher.Add(m)
 		}
 
 		return
@@ -155,8 +148,7 @@ func (s *Set) Set(v string) (err error) {
 		var m Matcher
 
 		if m, err = MakeMatcher(&Typ{}, v, s.expanders.Typ); err == nil {
-			s.UserMatcher.Add(m)
-			s.ActualMatcher.Add(m)
+			s.Matcher.Add(m)
 			return
 		}
 	}
@@ -165,8 +157,7 @@ func (s *Set) Set(v string) (err error) {
 		var m Matcher
 
 		if m, err = MakeMatcher(&Kasten{}, v, s.expanders.Kasten); err == nil {
-			s.UserMatcher.Add(m)
-			s.ActualMatcher.Add(m)
+			s.Matcher.Add(m)
 			return
 		}
 	}
@@ -186,27 +177,22 @@ func (s *Set) Add(ids ...schnittstellen.Element) (err error) {
 		switch it := i.(type) {
 		case Etikett:
 			errors.TodoP1("determine if this should have implicit etiketten")
-			s.UserMatcher.Add(it)
-			s.ActualMatcher.Add(it)
+			s.Matcher.Add(it)
 
 		case Sha:
-			s.UserMatcher.Add(it)
-			s.ActualMatcher.Add(it)
+			s.Matcher.Add(it)
 
 		case Hinweis:
-			s.Hinweisen.Add(it)
+			s.Matcher.Add(it)
 
 		case Typ:
-			s.UserMatcher.Add(it)
-			s.ActualMatcher.Add(it)
+			s.Matcher.Add(it)
 
 		case Kasten:
-			s.UserMatcher.Add(it)
-			s.ActualMatcher.Add(it)
+			s.Matcher.Add(it)
 
 		case Konfig:
-			s.UserMatcher.Add(it)
-			s.ActualMatcher.Add(it)
+			s.Matcher.Add(it)
 
 		case Sigil:
 			s.AddSigil(it)
@@ -226,10 +212,31 @@ func (s *Set) Add(ids ...schnittstellen.Element) (err error) {
 }
 
 func (s Set) String() string {
-	errors.TodoP4("improve the string creation method")
 	sb := &strings.Builder{}
 
-	errors.TodoP1("add Matchers")
+	switch {
+	case collections.Len(s.Matcher, s.Hinweisen) == 0:
+		return s.Sigil.String()
+
+	case s.Matcher.Len() == 0:
+		sb.WriteString("[")
+		sb.WriteString(s.Hinweisen.String())
+		sb.WriteString("]")
+
+	case s.Hinweisen.Len() == 0:
+		sb.WriteString("[")
+		sb.WriteString(s.Matcher.String())
+		sb.WriteString("]")
+
+	default:
+		sb.WriteString("[")
+		sb.WriteString(s.Matcher.String())
+		sb.WriteString(",")
+		sb.WriteString(s.Hinweisen.String())
+		sb.WriteString("]")
+
+	}
+
 	sb.WriteString(s.Sigil.String())
 
 	return sb.String()
@@ -244,7 +251,7 @@ func (s Set) ContainsMatchable(m Matchable) bool {
 		return false
 	}
 
-	if !s.ActualMatcher.ContainsMatchable(m) {
+	if !s.Matcher.ContainsMatchable(m) {
 		return false
 	}
 
@@ -272,11 +279,11 @@ func (s Set) ContainsMatchable(m Matchable) bool {
 }
 
 func (s Set) Len() int {
-	return LenMatchers(s.UserMatcher) + s.Hinweisen.Len()
+	return LenMatchers(s.Matcher) + s.Hinweisen.Len()
 }
 
 func (s Set) EachMatcher(f schnittstellen.FuncIter[Matcher]) (err error) {
-	return VisitAllMatchers(f, s.ActualMatcher)
+	return VisitAllMatchers(f, s.Matcher)
 }
 
 func (s *Set) AddSigil(v Sigil) {

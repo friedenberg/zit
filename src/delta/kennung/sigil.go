@@ -107,7 +107,12 @@ func (a Sigil) String() string {
 
 	for s := SigilSchwanzen; s <= SigilMax; s++ {
 		if a.Contains(s) {
-			r := mapSigilToRune[s]
+			r, ok := mapSigilToRune[s]
+
+			if !ok {
+				continue
+			}
+
 			sb.WriteRune(r)
 		}
 	}

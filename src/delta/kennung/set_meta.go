@@ -84,7 +84,14 @@ func MakeMetaSetAll(
 func (s metaSet) String() string {
 	sb := &strings.Builder{}
 
+	hasAny := false
+
 	for g, ids := range s.Gattung {
+		if hasAny {
+			sb.WriteString(" ")
+		}
+
+		hasAny = true
 		sb.WriteString(fmt.Sprintf("%s%s", ids, g))
 	}
 
@@ -265,7 +272,7 @@ func (ms metaSet) GetEtiketten() schnittstellen.Set[Etikett] {
 
 				return es.Add(e)
 			},
-			s.UserMatcher,
+			s.Matcher,
 		)
 	}
 
@@ -286,7 +293,7 @@ func (ms metaSet) GetTypen() schnittstellen.Set[Typ] {
 
 				return es.Add(e)
 			},
-			s.UserMatcher,
+			s.Matcher,
 		)
 	}
 
