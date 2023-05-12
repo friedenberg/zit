@@ -335,6 +335,51 @@ func (matcher matcherNegate) Each(f schnittstellen.FuncIter[Matcher]) error {
 	return f(matcher.Child)
 }
 
+//   ___                 _ _      _ _
+//  |_ _|_ __ ___  _ __ | (_) ___(_) |_
+//   | || '_ ` _ \| '_ \| | |/ __| | __|
+//   | || | | | | | |_) | | | (__| | |_
+//  |___|_| |_| |_| .__/|_|_|\___|_|\__|
+//                |_|
+
+func MakeMatcherImplicit(m Matcher) MatcherParentPtr {
+	return &matcherImplicit{Child: m}
+}
+
+type matcherImplicit struct {
+	Child Matcher
+}
+
+func (matcher matcherImplicit) Len() int {
+	if matcher.Child == nil {
+		return 0
+	}
+
+	return 1
+}
+
+func (matcher *matcherImplicit) Add(m Matcher) error {
+	matcher.Child = m
+	return nil
+}
+
+func (matcher matcherImplicit) String() string {
+	if matcher.Child == nil {
+		return ""
+	}
+
+	return matcher.Child.String()
+}
+
+func (matcher matcherImplicit) ContainsMatchable(matchable Matchable) bool {
+	return matcher.Child.ContainsMatchable(matchable)
+}
+
+func (matcher matcherImplicit) Each(f schnittstellen.FuncIter[Matcher]) error {
+	return nil
+	// return f(matcher.Child)
+}
+
 //    ____       _   _
 //   / ___| __ _| |_| |_ _   _ _ __   __ _
 //  | |  _ / _` | __| __| | | | '_ \ / _` |

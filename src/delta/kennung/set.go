@@ -134,7 +134,7 @@ func (s *Set) Set(v string) (err error) {
 						me = MakeMatcherNegate(me)
 					}
 
-					return mo.Add(me)
+					return mo.Add(MakeMatcherImplicit(me))
 				},
 			); err != nil {
 				err = errors.Wrap(err)
