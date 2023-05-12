@@ -122,6 +122,10 @@ func (s *Set) Set(v string) (err error) {
 
 			mo := MakeMatcherOr()
 
+			if isNegated {
+				mo = MakeMatcherAnd()
+			}
+
 			if err = impl.Each(
 				func(e Etikett) (err error) {
 					me := Matcher(e)
@@ -145,7 +149,7 @@ func (s *Set) Set(v string) (err error) {
 
 			mo.Add(m)
 
-			s.Matcher.Add(m)
+			s.Matcher.Add(mo)
 		}
 
 		return
@@ -226,21 +230,21 @@ func (s Set) String() string {
 		return s.Sigil.String()
 
 	case s.Matcher.Len() == 0:
-		sb.WriteString("[")
+		sb.WriteString(QueryGroupOpenOperator)
 		sb.WriteString(s.Hinweisen.String())
-		sb.WriteString("]")
+		sb.WriteString(QueryGroupCloseOperator)
 
 	case s.Hinweisen.Len() == 0:
-		sb.WriteString("[")
+		sb.WriteString(QueryGroupOpenOperator)
 		sb.WriteString(s.Matcher.String())
-		sb.WriteString("]")
+		sb.WriteString(QueryGroupCloseOperator)
 
 	default:
-		sb.WriteString("[")
+		sb.WriteString(QueryGroupOpenOperator)
 		sb.WriteString(s.Matcher.String())
-		sb.WriteString(",")
+		sb.WriteString(QueryOrOperator)
 		sb.WriteString(s.Hinweisen.String())
-		sb.WriteString("]")
+		sb.WriteString(QueryGroupCloseOperator)
 
 	}
 

@@ -83,13 +83,13 @@ func (fs CwdFiles) String() (out string) {
 	}
 
 	sb := &strings.Builder{}
-	sb.WriteString("[")
+	sb.WriteString(kennung.QueryGroupOpenOperator)
 
 	hasOne := false
 
 	writeOneIfNecessary := func(v schnittstellen.Stringer) (err error) {
 		if hasOne {
-			sb.WriteString(",")
+			sb.WriteString(kennung.QueryOrOperator)
 		}
 
 		sb.WriteString(v.String())
@@ -129,7 +129,7 @@ func (fs CwdFiles) String() (out string) {
 		},
 	)
 
-	sb.WriteString("]")
+	sb.WriteString(kennung.QueryGroupCloseOperator)
 
 	out = sb.String()
 	return

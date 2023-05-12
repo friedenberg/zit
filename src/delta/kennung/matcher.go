@@ -10,6 +10,13 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 )
 
+const (
+	QueryOrOperator         = ", "
+	QueryAndOperator        = " "
+	QueryGroupOpenOperator  = "]"
+	QueryGroupCloseOperator = "["
+)
+
 func init() {
 	gob.Register(&matcherAnd{})
 	gob.Register(&matcherOr{})
@@ -163,17 +170,17 @@ func (matcher matcherAnd) String() string {
 	}
 
 	sb := &strings.Builder{}
-	sb.WriteString("[")
+	sb.WriteString(QueryGroupOpenOperator)
 
 	for i, m := range matcher.Children {
 		if i > 0 {
-			sb.WriteString(" ")
+			sb.WriteString(QueryAndOperator)
 		}
 
 		sb.WriteString(m.String())
 	}
 
-	sb.WriteString("]")
+	sb.WriteString(QueryGroupCloseOperator)
 
 	return sb.String()
 }
@@ -243,17 +250,17 @@ func (matcher matcherOr) String() (out string) {
 	}
 
 	sb := &strings.Builder{}
-	sb.WriteString("[")
+	sb.WriteString(QueryGroupOpenOperator)
 
 	for i, m := range matcher.Children {
 		if i > 0 {
-			sb.WriteString(",")
+			sb.WriteString(QueryOrOperator)
 		}
 
 		sb.WriteString(m.String())
 	}
 
-	sb.WriteString("]")
+	sb.WriteString(QueryGroupCloseOperator)
 
 	out = sb.String()
 	return
@@ -366,7 +373,7 @@ func (m matcherGattung) String() string {
 
 	for g, child := range m.Children {
 		if hasAny == true {
-			sb.WriteString(" ")
+			sb.WriteString(QueryAndOperator)
 		}
 
 		sb.WriteString(child.String())
@@ -458,8 +465,8 @@ func (matcher matcherImpExp) ContainsMatchable(matchable Matchable) bool {
 func (matcher matcherImpExp) Each(
 	f schnittstellen.FuncIter[Matcher],
 ) (err error) {
-  // consider using a flag class like "ImplicitMatcher" to mark Imp rather than
-  // breaking the rules of `Each`
+	// consider using a flag class like "ImplicitMatcher" to mark Imp rather than
+	// breaking the rules of `Each`
 	// if matcher.Implicit != nil {
 	// 	if err = f(matcher.Implicit); err != nil {
 	// 		err = errors.Wrap(err)
