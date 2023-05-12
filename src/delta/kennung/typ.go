@@ -89,7 +89,7 @@ func (t Typ) ContainsMatchable(m Matchable) bool {
 
 	t1 := m.GetTyp()
 
-	if Contains(t1, t) {
+	if ContainsWithoutUnderscoreSuffix(t1, t) {
 		return true
 	}
 

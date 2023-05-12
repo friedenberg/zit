@@ -92,7 +92,7 @@ func (e Etikett) ContainsMatchable(m Matchable) bool {
 
 	e1, ok := m.GetIdLike().(Etikett)
 
-	if ok && Contains(e1, e) {
+	if ok && ContainsWithoutUnderscoreSuffix(e1, e) {
 		return true
 	}
 

@@ -214,6 +214,29 @@ func LeftSubtract[T schnittstellen.Stringer, TPtr schnittstellen.StringSetterPtr
 	return
 }
 
+func ContainsWithoutUnderscoreSuffix[T schnittstellen.Stringer](a, b T) bool {
+	as := []rune(a.String())
+	bs := []rune(b.String())
+
+	if len(bs) > len(as) {
+		return false
+	}
+
+	if !strings.HasPrefix(a.String(), b.String()) {
+		return false
+	}
+
+	if len(bs) == len(as) {
+		return true
+	}
+
+	if as[len(bs)] == '_' {
+		return false
+	}
+
+	return true
+}
+
 func Contains[T schnittstellen.Stringer](a, b T) bool {
 	if len(b.String()) > len(a.String()) {
 		return false
