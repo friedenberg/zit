@@ -1,6 +1,7 @@
 package kennung
 
 import (
+	"encoding/gob"
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -9,6 +10,10 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/values"
 )
+
+func init() {
+	gob.Register(&matcherSigil{})
+}
 
 type Sigil int
 
@@ -87,7 +92,7 @@ func (a Sigil) GetSigil() schnittstellen.Sigil {
 }
 
 func (a Sigil) IncludesSchwanzen() bool {
-	return a.Contains(SigilSchwanzen) || a.Contains(SigilHistory)
+	return a.Contains(SigilSchwanzen) || a.Contains(SigilHistory) || a == 0
 }
 
 func (a Sigil) IncludesHistory() bool {
@@ -115,6 +120,10 @@ func (a Sigil) String() string {
 
 			sb.WriteRune(r)
 		}
+	}
+
+	if sb.Len() == 0 {
+		sb.WriteRune(mapSigilToRune[SigilSchwanzen])
 	}
 
 	return sb.String()
@@ -149,15 +158,20 @@ func (i Sigil) GetSha() sha.Sha {
 //  |_|  |_|\__,_|\__\___|_| |_|\___|_|    |_| |_|_|\__,_|\__,_|\___|_| |_|
 //
 
-func MakeMatcherSigil(s Sigil, m Matcher) matcherSigil {
-	return matcherSigil{
+type MatcherSigilPtr interface {
+	MatcherParentPtr
+	AddSigil(Sigil)
+}
+
+func MakeMatcherSigil(s Sigil, m Matcher) MatcherSigilPtr {
+	return &matcherSigil{
 		MatchSigil: s,
 		Matcher:    m,
 	}
 }
 
-func MakeMatcherSigilMatchOnMissing(s Sigil, m Matcher) matcherSigil {
-	return matcherSigil{
+func MakeMatcherSigilMatchOnMissing(s Sigil, m Matcher) MatcherSigilPtr {
+	return &matcherSigil{
 		MatchSigil:     s,
 		Matcher:        m,
 		MatchOnMissing: true,
@@ -169,6 +183,35 @@ type matcherSigil struct {
 	Sigil
 	Matcher
 	MatchOnMissing bool
+}
+
+func (m matcherSigil) Len() int {
+	if m.Matcher == nil {
+		return 0
+	}
+
+	return 1
+}
+
+func (m matcherSigil) String() string {
+	sb := &strings.Builder{}
+
+	if m.Matcher != nil {
+		sb.WriteString(m.Matcher.String())
+	}
+
+	sb.WriteString(m.Sigil.String())
+
+	return sb.String()
+}
+
+func (m *matcherSigil) AddSigil(v Sigil) {
+	m.Sigil.Add(v)
+}
+
+func (m *matcherSigil) Add(child Matcher) (err error) {
+	m.Matcher = child
+	return
 }
 
 func (matcher matcherSigil) ContainsMatchable(matchable Matchable) bool {

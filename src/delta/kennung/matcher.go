@@ -13,6 +13,10 @@ import (
 func init() {
 	gob.Register(&matcherAnd{})
 	gob.Register(&matcherOr{})
+	gob.Register(&matcherNegate{})
+	gob.Register(&matcherNever{})
+	gob.Register(&matcherAlways{})
+	gob.Register(&matcherImpExp{})
 }
 
 type Matcher interface {
@@ -420,10 +424,6 @@ type matcherImpExp struct {
 }
 
 func (m matcherImpExp) Len() (i int) {
-	if m.Implicit != nil {
-		i++
-	}
-
 	if m.Explicit != nil && m.Explicit.Len() > 0 {
 		i++
 	}
@@ -458,12 +458,14 @@ func (matcher matcherImpExp) ContainsMatchable(matchable Matchable) bool {
 func (matcher matcherImpExp) Each(
 	f schnittstellen.FuncIter[Matcher],
 ) (err error) {
-	if matcher.Implicit != nil {
-		if err = f(matcher.Implicit); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
+  // consider using a flag class like "ImplicitMatcher" to mark Imp rather than
+  // breaking the rules of `Each`
+	// if matcher.Implicit != nil {
+	// 	if err = f(matcher.Implicit); err != nil {
+	// 		err = errors.Wrap(err)
+	// 		return
+	// 	}
+	// }
 
 	if matcher.Explicit != nil {
 		if err = f(matcher.Explicit); err != nil {

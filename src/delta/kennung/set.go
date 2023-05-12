@@ -19,10 +19,10 @@ type Set struct {
 
 	Sigil Sigil
 
-	Matcher   MatcherParentPtr
-	cwd       matcherSigil
-	hidden    matcherSigil
-	Hinweisen MatcherParentPtr
+	MatcherHidden MatcherSigilPtr
+	MatcherCwd    MatcherSigilPtr
+	Hinweisen     MatcherParentPtr
+	Matcher       MatcherParentPtr
 }
 
 func MakeSet(
@@ -35,15 +35,22 @@ func MakeSet(
 		hidden = MakeMatcherNever()
 	}
 
+	sigilHidden := MakeMatcherSigil(
+		SigilHidden,
+		MakeMatcherNegate(hidden),
+	)
+
+	sigilCwd := MakeMatcherSigilMatchOnMissing(SigilCwd, cwd)
+
 	return Set{
 		expanders:               ex,
 		implicitEtikettenGetter: implicitEtikettenGetter,
-		Matcher:                 MakeMatcherAnd(),
 		Hinweisen:               MakeMatcherOr(),
-		cwd:                     MakeMatcherSigilMatchOnMissing(SigilCwd, cwd),
-		hidden: MakeMatcherSigil(
-			SigilHidden,
-			MakeMatcherNegate(hidden),
+		MatcherHidden:           sigilHidden,
+		MatcherCwd:              sigilCwd,
+		Matcher: MakeMatcherImpExp(
+			MakeMatcherAnd(sigilCwd, sigilHidden),
+			MakeMatcherAnd(),
 		),
 	}
 }
@@ -243,14 +250,6 @@ func (s Set) String() string {
 }
 
 func (s Set) ContainsMatchable(m Matchable) bool {
-	if !s.cwd.ContainsMatchable(m) {
-		return false
-	}
-
-	if !s.hidden.ContainsMatchable(m) {
-		return false
-	}
-
 	if !s.Matcher.ContainsMatchable(m) {
 		return false
 	}
@@ -288,8 +287,8 @@ func (s Set) EachMatcher(f schnittstellen.FuncIter[Matcher]) (err error) {
 
 func (s *Set) AddSigil(v Sigil) {
 	s.Sigil.Add(v)
-	s.hidden.Sigil.Add(v)
-	s.cwd.Sigil.Add(v)
+	s.MatcherHidden.AddSigil(v)
+	s.MatcherCwd.AddSigil(v)
 }
 
 func (s Set) GetSigil() schnittstellen.Sigil {
