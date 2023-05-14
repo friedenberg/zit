@@ -24,9 +24,7 @@ type Set struct {
 
 func MakeSet(
 	cwd Matcher,
-	ex Expanders,
 	hidden Matcher,
-	implicitEtikettenGetter ImplicitEtikettenGetter,
 ) Set {
 	if hidden == nil {
 		hidden = MakeMatcherNever()

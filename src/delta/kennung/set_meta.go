@@ -20,8 +20,6 @@ func init() {
 // TODO-P3 rename to QueryGattungGroup
 type MetaSet interface {
 	Get(g gattung.Gattung) (s Matcher, ok bool)
-	MakeSet() Set
-	AddFD(fd FD) error
 	GetFDs() schnittstellen.Set[FD]
 	GetEtiketten() schnittstellen.Set[Etikett]
 	GetTypen() schnittstellen.Set[Typ]
@@ -258,10 +256,6 @@ func (ms metaSet) Get(g gattung.Gattung) (s Matcher, ok bool) {
 	return
 }
 
-func (ms metaSet) AddFD(fd FD) (err error) {
-	return ms.FDs.Add(fd)
-}
-
 func (ms metaSet) GetFDs() schnittstellen.Set[FD] {
 	return ms.FDs
 }
@@ -309,7 +303,7 @@ func (ms metaSet) GetTypen() schnittstellen.Set[Typ] {
 }
 
 func (ms metaSet) MakeSet() Set {
-	return MakeSet(ms.cwd, ms.expanders, ms.Hidden, ms.implicitEtikettenGetter)
+	return MakeSet(ms.cwd, ms.Hidden)
 }
 
 func (s metaSet) ContainsMatchable(m Matchable) bool {
@@ -348,32 +342,3 @@ func (ms metaSet) All(f func(gattung.Gattung, Matcher) error) (err error) {
 
 	return
 }
-
-// func (s metaSet) MarshalBinary() (bs []byte, err error) {
-// 	b := bytes.NewBuffer(bs)
-// 	enc := gob.NewEncoder(b)
-
-// 	if err = enc.Encode(s.Gattung); err != nil {
-// 		err = errors.Wrap(err)
-// 		return
-// 	}
-
-// 	bs = b.Bytes()
-
-// 	return
-// }
-
-// func (s *metaSet) UnmarshalBinary(bs []byte) (err error) {
-// 	err = errors.New("wow")
-// 	return
-
-// 	// 	b := bytes.NewBuffer(bs)
-// 	// 	dec := gob.NewDecoder(b)
-
-// 	// 	if err = dec.Decode(&s.Gattung); err != nil {
-// 	// 		err = errors.Wrap(err)
-// 	// 		return
-// 	// 	}
-
-// 	// return
-// }

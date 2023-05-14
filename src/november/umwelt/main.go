@@ -336,8 +336,6 @@ func (u *Umwelt) MakeIdSet(
 ) kennung.Set {
 	return kennung.MakeSet(
 		cwd,
-		u.MakeKennungExpanders(),
 		nil,
-		u.Konfig(),
 	)
 }
