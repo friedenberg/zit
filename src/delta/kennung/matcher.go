@@ -404,7 +404,16 @@ func (m matcherGattung) Len() int {
 }
 
 func (m *matcherGattung) Set(g gattung.Gattung, child Matcher) error {
-	m.Children[g] = child
+	c1, ok := m.Children[g]
+
+	if ok && c1 != nil {
+		c1 = MakeMatcherAnd(c1, child)
+	} else {
+		c1 = child
+	}
+
+	m.Children[g] = c1
+
 	return nil
 }
 
