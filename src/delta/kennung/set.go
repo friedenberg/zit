@@ -14,9 +14,6 @@ type ImplicitEtikettenGetter interface {
 }
 
 type Set struct {
-	expanders               Expanders
-	implicitEtikettenGetter ImplicitEtikettenGetter
-
 	Sigil Sigil
 
 	MatcherHidden MatcherSigilPtr
@@ -43,11 +40,9 @@ func MakeSet(
 	sigilCwd := MakeMatcherSigilMatchOnMissing(SigilCwd, cwd)
 
 	return Set{
-		expanders:               ex,
-		implicitEtikettenGetter: implicitEtikettenGetter,
-		Hinweisen:               MakeMatcherOr(),
-		MatcherHidden:           sigilHidden,
-		MatcherCwd:              sigilCwd,
+		Hinweisen:     MakeMatcherOr(),
+		MatcherHidden: sigilHidden,
+		MatcherCwd:    sigilCwd,
 		Matcher: MakeMatcherImpExp(
 			MakeMatcherAnd(sigilCwd, sigilHidden),
 			MakeMatcherAnd(),
@@ -55,18 +50,23 @@ func MakeSet(
 	}
 }
 
-func (s *Set) SetMany(vs ...string) (err error) {
-	for _, v := range vs {
-		if err = s.Set(v); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
+// func (s *Set) SetMany(vs ...string) (err error) {
+// 	for _, v := range vs {
+// 		if err = s.Set(v); err != nil {
+// 			err = errors.Wrap(err)
+// 			return
+// 		}
+// 	}
 
-	return
-}
+// 	return
+// }
 
-func (s *Set) Set(v string) (err error) {
+func tryAddMatcher(
+	s *Set,
+	expanders Expanders,
+	implicitEtikettenGetter ImplicitEtikettenGetter,
+	v string,
+) (err error) {
 	{
 		var m Matcher
 
@@ -79,7 +79,7 @@ func (s *Set) Set(v string) (err error) {
 	{
 		var m Matcher
 
-		if m, err = MakeMatcher(&Sha{}, v, s.expanders.Sha); err == nil {
+		if m, err = MakeMatcher(&Sha{}, v, expanders.Sha); err == nil {
 			s.Matcher.Add(m)
 			return
 		}
@@ -97,7 +97,7 @@ func (s *Set) Set(v string) (err error) {
 	{
 		var m Matcher
 
-		if m, err = MakeMatcher(&Hinweis{}, v, s.expanders.Hinweis); err == nil {
+		if m, err = MakeMatcher(&Hinweis{}, v, expanders.Hinweis); err == nil {
 			s.Hinweisen.Add(m)
 			return
 		}
@@ -109,7 +109,7 @@ func (s *Set) Set(v string) (err error) {
 	)
 
 	if isNegated, err = SetQueryKennung(&e, v); err == nil {
-		if s.implicitEtikettenGetter == nil {
+		if implicitEtikettenGetter == nil {
 			m := Matcher(e)
 
 			if isNegated {
@@ -118,7 +118,7 @@ func (s *Set) Set(v string) (err error) {
 
 			s.Matcher.Add(m)
 		} else {
-			impl := s.implicitEtikettenGetter.GetImplicitEtiketten(e)
+			impl := implicitEtikettenGetter.GetImplicitEtiketten(e)
 
 			mo := MakeMatcherOr()
 
@@ -158,7 +158,7 @@ func (s *Set) Set(v string) (err error) {
 	{
 		var m Matcher
 
-		if m, err = MakeMatcher(&Typ{}, v, s.expanders.Typ); err == nil {
+		if m, err = MakeMatcher(&Typ{}, v, expanders.Typ); err == nil {
 			s.Matcher.Add(m)
 			return
 		}
@@ -167,7 +167,7 @@ func (s *Set) Set(v string) (err error) {
 	{
 		var m Matcher
 
-		if m, err = MakeMatcher(&Kasten{}, v, s.expanders.Kasten); err == nil {
+		if m, err = MakeMatcher(&Kasten{}, v, expanders.Kasten); err == nil {
 			s.Matcher.Add(m)
 			return
 		}

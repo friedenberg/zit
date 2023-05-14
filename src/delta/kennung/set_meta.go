@@ -35,12 +35,12 @@ type metaSet struct {
 	fileExtensionGetter     schnittstellen.FileExtensionGetter
 	expanders               Expanders
 
-	cwd                     Matcher
-	Hidden                  Matcher
+	cwd    Matcher
+	Hidden Matcher
 
-	DefaultGattungen        gattungen.Set
-	Gattung                 map[gattung.Gattung]Set
-	FDs                     schnittstellen.MutableSet[FD]
+	DefaultGattungen gattungen.Set
+	Gattung          map[gattung.Gattung]Set
+	FDs              schnittstellen.MutableSet[FD]
 }
 
 func MakeMetaSet(
@@ -207,7 +207,12 @@ func (ms *metaSet) set(v string) (err error) {
 				fallthrough
 
 			default:
-				if err = ids.Set(before); err != nil {
+				if err = tryAddMatcher(
+					&ids,
+					ms.expanders,
+					ms.implicitEtikettenGetter,
+					before,
+				); err != nil {
 					err = errors.Wrap(err)
 					return
 				}

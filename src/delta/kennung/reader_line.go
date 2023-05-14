@@ -1,47 +1,47 @@
 package kennung
 
-import (
-	"bufio"
-	"io"
+// type ReaderLine struct {
+// 	Set
+// 	Expanders               Expanders
+// 	ImplicitEtikettenGetter ImplicitEtikettenGetter
+// }
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-)
+// func (rl *ReaderLine) ReadFrom(r1 io.Reader) (n int64, err error) {
+// 	errors.TodoP4("add expanders")
+// 	rl.Set = MakeSet(nil, Expanders{}, nil, nil)
+// 	r := bufio.NewReader(r1)
 
-type ReaderLine struct {
-	Set
-}
+// 	for {
+// 		var line string
 
-func (rl *ReaderLine) ReadFrom(r1 io.Reader) (n int64, err error) {
-	errors.TodoP4("add expanders")
-	rl.Set = MakeSet(nil, Expanders{}, nil, nil)
-	r := bufio.NewReader(r1)
+// 		line, err = r.ReadString('\n')
+// 		n += int64(len(line))
 
-	for {
-		var line string
+// 		switch {
+// 		case err == nil:
+// 			break
 
-		line, err = r.ReadString('\n')
-		n += int64(len(line))
+// 		case errors.IsEOF(err):
+// 			err = nil
+// 			return
 
-		switch {
-		case err == nil:
-			break
+// 		default:
+// 			err = errors.Wrap(err)
+// 			return
+// 		}
 
-		case errors.IsEOF(err):
-			err = nil
-			return
+// 		if line == "" {
+// 			continue
+// 		}
 
-		default:
-			err = errors.Wrap(err)
-			return
-		}
-
-		if line == "" {
-			continue
-		}
-
-		if err = rl.Set.Set(line); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-}
+// 		if err = tryAddMatcher(
+// 			&rl.Set,
+// 			rl.Expanders,
+// 			rl.ImplicitEtikettenGetter,
+// 			line,
+// 		); err != nil {
+// 			err = errors.Wrap(err)
+// 			return
+// 		}
+// 	}
+// }

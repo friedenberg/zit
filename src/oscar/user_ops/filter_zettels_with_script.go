@@ -1,112 +1,103 @@
 package user_ops
 
-import (
-	"io"
-	"os/exec"
+// type FilterZettelsWithScript struct {
+// 	Set    schnittstellen.MutableSet[*zettel.Transacted]
+// 	Filter script_value.ScriptValue
+// 	Umwelt *umwelt.Umwelt
+// }
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/charlie/script_value"
-	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/juliett/zettel"
-)
+// func (op FilterZettelsWithScript) Run() (err error) {
+// 	if op.Filter.IsEmpty() {
+// 		errors.Log().Print("no filter")
+// 		return
+// 	}
 
-type FilterZettelsWithScript struct {
-	Set    schnittstellen.MutableSet[*zettel.Transacted]
-	Filter script_value.ScriptValue
-}
+// 	cmd := exec.Command(op.Filter.String())
 
-func (op FilterZettelsWithScript) Run() (err error) {
-	if op.Filter.IsEmpty() {
-		errors.Log().Print("no filter")
-		return
-	}
+// 	var w io.WriteCloser
 
-	cmd := exec.Command(op.Filter.String())
+// 	if w, err = cmd.StdinPipe(); err != nil {
+// 		errors.Wrap(err)
+// 		return
+// 	}
 
-	var w io.WriteCloser
+// 	var r io.Reader
 
-	if w, err = cmd.StdinPipe(); err != nil {
-		errors.Wrap(err)
-		return
-	}
+// 	if r, err = cmd.StdoutPipe(); err != nil {
+// 		errors.Wrap(err)
+// 		return
+// 	}
 
-	var r io.Reader
+// 	enc := zettel.MakeWriterJson(w)
 
-	if r, err = cmd.StdoutPipe(); err != nil {
-		errors.Wrap(err)
-		return
-	}
+// 	chDone, chErr := op.runGetHinweisen(r)
 
-	enc := zettel.MakeWriterJson(w)
+// 	if err = cmd.Start(); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	chDone, chErr := op.runGetHinweisen(r)
+// 	go func() {
+// 		defer w.Close()
+// 		op.Set.Each(enc.WriteZettelVerzeichnisse)
+// 	}()
 
-	if err = cmd.Start(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+// 	select {
+// 	case err = <-chErr:
+// 		err = errors.Wrap(err)
+// 		return
 
-	go func() {
-		defer w.Close()
-		op.Set.Each(enc.WriteZettelVerzeichnisse)
-	}()
+// 	case hinweisen := <-chDone:
 
-	select {
-	case err = <-chErr:
-		err = errors.Wrap(err)
-		return
+// 		errors.Log().Printf("%#v", hinweisen)
+// 		op.Set.Each(
+// 			iter.MakeChain(
+// 				func(z *zettel.Transacted) (err error) {
+// 					ok := hinweisen.Contains(z.Sku.Kennung)
 
-	case hinweisen := <-chDone:
+// 					if ok {
+// 						err = collections.MakeErrStopIteration()
+// 						return
+// 					}
 
-		errors.Log().Printf("%#v", hinweisen)
-		op.Set.Each(
-			iter.MakeChain(
-				func(z *zettel.Transacted) (err error) {
-					ok := hinweisen.Contains(z.Sku.Kennung)
+// 					return
+// 				},
+// 				op.Set.Del,
+// 			),
+// 		)
+// 	}
 
-					if ok {
-						err = collections.MakeErrStopIteration()
-						return
-					}
+// 	if err = cmd.Wait(); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-					return
-				},
-				op.Set.Del,
-			),
-		)
-	}
+// 	return
+// }
 
-	if err = cmd.Wait(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+// func (op FilterZettelsWithScript) runGetHinweisen(
+// 	r io.Reader,
+// ) (chDone <-chan kennung.HinweisSet, chErr <-chan error) {
+// 	doneBoth := make(chan kennung.HinweisSet)
+// 	chDone = doneBoth
 
-	return
-}
+// 	errBoth := make(chan error)
+// 	chErr = errBoth
 
-func (op FilterZettelsWithScript) runGetHinweisen(
-	r io.Reader,
-) (chDone <-chan kennung.HinweisSet, chErr <-chan error) {
-	doneBoth := make(chan kennung.HinweisSet)
-	chDone = doneBoth
+// 	go func() {
+// 		irl := kennung.ReaderLine{
+// 			Expanders:               op.Umwelt.MakeKennungExpanders(),
+// 			ImplicitEtikettenGetter: op.Umwelt,
+// 		}
 
-	errBoth := make(chan error)
-	chErr = errBoth
+// 		if _, err := irl.ReadFrom(r); err != nil {
+// 			err = errors.Wrap(err)
+// 			errBoth <- err
+// 			return
+// 		}
 
-	go func() {
-		irl := kennung.ReaderLine{}
+// 		doneBoth <- irl.Set.GetHinweisen()
+// 	}()
 
-		if _, err := irl.ReadFrom(r); err != nil {
-			err = errors.Wrap(err)
-			errBoth <- err
-			return
-		}
-
-		doneBoth <- irl.Set.GetHinweisen()
-	}()
-
-	return
-}
+// 	return
+// }
