@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/delta/sha_collections"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
@@ -22,32 +21,25 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &CatObjekte{}
 
-			return commandWithIds{
-				CommandWithIds: c,
-			}
+			return c
 		},
 	)
 }
 
-func (c CatObjekte) RunWithIds(
+func (c CatObjekte) Run(
 	u *umwelt.Umwelt,
-	ids kennung.Set,
+	args ...string,
 ) (err error) {
 	shas := collections.MakeMutableSetStringer[sha.Sha]()
 
-	if err = ids.EachMatcher(
-		func(m kennung.Matcher) (err error) {
-			sh, ok := m.(*kennung.Sha)
-
-			if !ok {
-				return
-			}
-
-			return shas.Add(sh.GetSha())
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+	for _, v := range args {
+		if err = collections.AddString[sha.Sha](
+			shas,
+			v,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return c.akten(u, shas)

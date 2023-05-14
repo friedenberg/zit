@@ -8,7 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/delta/gattungen"
-	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
@@ -20,7 +19,7 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &CatAkteShas{}
 
-			return commandWithIds{c}
+			return c
 		},
 	)
 }
@@ -31,7 +30,7 @@ func (c CatAkteShas) CompletionGattung() gattungen.Set {
 	)
 }
 
-func (c CatAkteShas) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
+func (c CatAkteShas) Run(u *umwelt.Umwelt, _ ...string) (err error) {
 	if err = u.Standort().ReadAllShasForGattung(
 		gattung.Akte,
 		func(s sha.Sha) (err error) {

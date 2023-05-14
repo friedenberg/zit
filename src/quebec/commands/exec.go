@@ -74,26 +74,16 @@ func (c Exec) getZettel(
 	executor script_config.RemoteScript,
 	err error,
 ) {
-	is := u.MakeIdSet(kennung.MakeMatcherAlways())
+	var h kennung.Hinweis
 
-	if err = is.Set(hString); err != nil {
+	if err = h.Set(hString); err != nil {
 		err = errors.Wrap(err)
-		return
-	}
-
-	var idd kennung.Hinweis
-	ok := false
-
-	if idd, ok = is.AnyHinweis(); !ok {
-		err = errors.Errorf("unsupported id: %s", is)
 		return
 	}
 
 	var zt *zettel.Transacted
 
-	if zt, err = u.StoreObjekten().Zettel().ReadOne(
-		&idd,
-	); err != nil {
+	if zt, err = u.StoreObjekten().Zettel().ReadOne(&h); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

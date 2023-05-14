@@ -5,8 +5,6 @@ import (
 	"syscall"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
@@ -19,18 +17,15 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &CatEtikettenSchwanzen{}
 
-			return commandWithIds{c}
+			return c
 		},
 	)
 }
 
-func (c CatEtikettenSchwanzen) CompletionGattung() gattungen.Set {
-	return gattungen.MakeSet(
-		gattung.Etikett,
-	)
-}
-
-func (c CatEtikettenSchwanzen) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
+func (c CatEtikettenSchwanzen) Run(
+	u *umwelt.Umwelt,
+	_ ...string,
+) (err error) {
 	var ea []kennung.Etikett
 
 	if ea, err = u.StoreObjekten().GetKennungIndex().GetAllEtiketten(); err != nil {

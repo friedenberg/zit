@@ -22,6 +22,10 @@ type commandWithQuery struct {
 	CommandWithQuery
 }
 
+type CompletionGattungGetter interface {
+	CompletionGattung() gattungen.Set
+}
+
 func (c commandWithQuery) Complete(u *umwelt.Umwelt, args ...string) (err error) {
 	var cgg CompletionGattungGetter
 	ok := false

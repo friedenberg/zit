@@ -4,8 +4,6 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
@@ -18,21 +16,24 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &ExpandHinweis{}
 
-			return commandWithIds{CommandWithIds: c}
+			return c
 		},
 	)
 }
 
-func (c ExpandHinweis) CompletionGattung() gattungen.Set {
-	return gattungen.MakeSet(
-		gattung.Zettel,
-	)
-}
+func (c ExpandHinweis) Run(u *umwelt.Umwelt, args ...string) (err error) {
+	for _, v := range args {
+		var h kennung.Hinweis
 
-func (c ExpandHinweis) RunWithIds(s *umwelt.Umwelt, ids kennung.Set) (err error) {
-	hins := ids.GetHinweisen()
+		h, err = u.StoreObjekten().GetAbbrStore().ExpandHinweisString(
+			v,
+		)
 
-	for _, h := range hins.Elements() {
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 		errors.Out().Print(h)
 	}
 

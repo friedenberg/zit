@@ -5,7 +5,6 @@ import (
 
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/todo"
-	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
@@ -19,14 +18,12 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &Revert{}
 
-			return commandWithIds{
-				CommandWithIds: c,
-			}
+			return c
 		},
 	)
 }
 
-func (c Revert) RunWithIds(u *umwelt.Umwelt, ids kennung.Set) (err error) {
+func (c Revert) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	return todo.Implement()
 	// timestamps := ids.Timestamps.ImmutableClone()
 	// var transaktion *transaktion.Transaktion
