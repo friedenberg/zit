@@ -20,7 +20,6 @@ func init() {
 // TODO-P3 rename to QueryGattungGroup
 type MetaSet interface {
 	Get(g gattung.Gattung) (s Matcher, ok bool)
-	GetSet(g gattung.Gattung) (s Set, ok bool)
 	MakeSet() Set
 	AddFD(fd FD) error
 	GetFDs() schnittstellen.Set[FD]
@@ -33,10 +32,12 @@ type MetaSet interface {
 
 type metaSet struct {
 	implicitEtikettenGetter ImplicitEtikettenGetter
-	cwd                     Matcher
 	fileExtensionGetter     schnittstellen.FileExtensionGetter
 	expanders               Expanders
+
+	cwd                     Matcher
 	Hidden                  Matcher
+
 	DefaultGattungen        gattungen.Set
 	Gattung                 map[gattung.Gattung]Set
 	FDs                     schnittstellen.MutableSet[FD]
@@ -115,18 +116,6 @@ func (ms *metaSet) Set(v string) (err error) {
 
 func (ms *metaSet) set(v string) (err error) {
 	v = strings.TrimSpace(v)
-
-	// if v != "." {
-	// 	if err = collections.AddString[FD, *FD](
-	// 		ms.FDs,
-	// 		v,
-	// 	); err == nil {
-	// 		ms.Gattung = make(map[gattung.Gattung]Set)
-	// 		return
-	// 	}
-
-	// 	err = nil
-	// }
 
 	sbs := [3]*strings.Builder{
 		{},
@@ -242,11 +231,25 @@ func (ms *metaSet) set(v string) (err error) {
 
 func (ms metaSet) Get(g gattung.Gattung) (s Matcher, ok bool) {
 	s, ok = ms.Gattung[g]
-	return
-}
 
-func (ms metaSet) GetSet(g gattung.Gattung) (s Set, ok bool) {
-	s, ok = ms.Gattung[g]
+	hidden := ms.Hidden
+
+	if hidden == nil {
+		hidden = MakeMatcherNever()
+	}
+
+	sigilHidden := MakeMatcherSigil(
+		SigilHidden,
+		MakeMatcherNegate(hidden),
+	)
+
+	sigilCwd := MakeMatcherSigilMatchOnMissing(SigilCwd, ms.cwd)
+
+	s = MakeMatcherImpExp(
+		MakeMatcherAnd(sigilCwd, sigilHidden),
+		MakeMatcherAnd(s),
+	)
+
 	return
 }
 
