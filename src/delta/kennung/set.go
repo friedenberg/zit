@@ -50,17 +50,6 @@ func MakeSet(
 	}
 }
 
-// func (s *Set) SetMany(vs ...string) (err error) {
-// 	for _, v := range vs {
-// 		if err = s.Set(v); err != nil {
-// 			err = errors.Wrap(err)
-// 			return
-// 		}
-// 	}
-
-// 	return
-// }
-
 func tryAddMatcher(
 	s *Set,
 	expanders Expanders,
