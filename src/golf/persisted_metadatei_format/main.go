@@ -17,9 +17,17 @@ type (
 
 	ParserContext = metadatei.PersistentParserContext
 
-	Format interface {
+	Formatter interface {
 		FormatPersistentMetadatei(io.Writer, FormatterContext) (int64, error)
+	}
+
+	Parser interface {
 		ParsePersistentMetadatei(io.Reader, ParserContext) (int64, error)
+	}
+
+	Format interface {
+		Formatter
+		Parser
 	}
 
 	Getter interface {
@@ -38,4 +46,11 @@ func FormatForVersion(v schnittstellen.StoreVersion) Format {
 	default:
 		return v2{}
 	}
+}
+
+func FormatForVersions(write, read schnittstellen.StoreVersion) Format {
+	return MakeBespoke(
+		FormatForVersion(write),
+		FormatForVersion(read),
+	)
 }

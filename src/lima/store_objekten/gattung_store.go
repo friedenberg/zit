@@ -135,6 +135,10 @@ func makeCommonStore[
 	// 	*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
 	// ]()
 
+	if delegate == nil {
+		panic("delegate was nil")
+	}
+
 	of := sa.ObjekteReaderWriterFactory(gg)
 
 	csb, err := makeCommonStoreBase[O, OPtr, K, KPtr, V, VPtr](

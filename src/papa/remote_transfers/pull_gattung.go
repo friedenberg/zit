@@ -2,7 +2,6 @@ package remote_transfers
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
@@ -12,10 +11,11 @@ func (c *client) PullSkus(
 	ids kennung.MetaSet,
 ) (err error) {
 	errors.TodoP1("implement etikett and akte")
-	gattungInheritors := map[gattung.Gattung]objekte_store.TransactedInheritor{
-		gattung.Zettel: c.GetInheritorZettel(c.ObjekteReaderFactory(gattung.Zettel), c),
-		gattung.Typ:    c.GetInheritorTyp(c.ObjekteReaderFactory(gattung.Typ), c),
-	}
+	gattungInheritors := c.StoreObjekten().GetGattungInheritors(
+		c,
+		c,
+		c.pmf,
+	)
 
 	if err = c.SkusFromFilter(
 		ids,

@@ -55,7 +55,12 @@ function pull { # @test
 
 	run_zit pull "$wd" :
 	assert_success
-	assert_output - <<-EOM
+	assert_output_unsorted - <<-EOM
+		[-zz-inbox-2022-11-14@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-zz@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-zz-inbox-2022@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-zz-inbox-2022-11@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-zz-inbox@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
 		[one/uno@11327fbe60cabd2a9eabf4a37d541cf04b539f913945897efe9bab1e30784781 !md "to_add.md"]
 	EOM
 

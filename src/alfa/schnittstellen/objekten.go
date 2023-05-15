@@ -29,6 +29,10 @@ type ObjekteWriterFactory interface {
 	ObjekteWriter() (ShaWriteCloser, error)
 }
 
+type ObjekteReaderFactoryGetter interface {
+	ObjekteReaderFactory(g GattungGetter) ObjekteReaderFactory
+}
+
 type (
 	FuncObjekteReader func(ShaGetter) (ShaReadCloser, error)
 	FuncObjekteWriter func() (ShaWriteCloser, error)

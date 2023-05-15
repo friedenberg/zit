@@ -13,6 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
+	"github.com/friedenberg/zit/src/golf/persisted_metadatei_format"
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/hotel/etikett"
@@ -34,7 +35,7 @@ type Store struct {
 	kastenStore  KastenStore
 
 	// Gattungen
-	gattungStores     map[schnittstellen.Gattung]any
+	gattungStores     map[schnittstellen.Gattung]gattungStoreLike
 	reindexers        map[schnittstellen.Gattung]reindexer
 	flushers          map[schnittstellen.Gattung]errors.Flusher
 	readers           map[schnittstellen.Gattung]objekte.FuncReaderTransactedLikePtr
@@ -82,7 +83,7 @@ func Make(
 		return
 	}
 
-	s.gattungStores = map[schnittstellen.Gattung]any{
+	s.gattungStores = map[schnittstellen.Gattung]gattungStoreLike{
 		gattung.Zettel:  s.zettelStore,
 		gattung.Typ:     s.typStore,
 		gattung.Etikett: s.etikettStore,
@@ -176,6 +177,22 @@ func Make(
 		if gs1, ok := gs.(objekte_store.UpdaterManyMetadatei); ok {
 			s.metadateiUpdaters[g] = gs1
 		}
+	}
+
+	return
+}
+
+func (s *Store) GetGattungInheritors(
+	ofg schnittstellen.ObjekteReaderFactoryGetter,
+	af schnittstellen.AkteReaderFactory,
+	pmf persisted_metadatei_format.Format,
+) (out map[gattung.Gattung]objekte_store.TransactedInheritor) {
+	out = make(map[gattung.Gattung]objekte_store.TransactedInheritor)
+
+	for g1, gs := range s.gattungStores {
+		g := gattung.Make(g1)
+		of := ofg.ObjekteReaderFactory(g)
+		out[g] = gs.GetInheritor(of, af, pmf)
 	}
 
 	return

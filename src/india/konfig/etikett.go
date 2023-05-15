@@ -157,6 +157,9 @@ func (kc compiled) GetEtikett(k kennung.Etikett) (ct etikett.Transacted) {
 func (c compiled) GetSortedEtikettenExpanded(
 	v string,
 ) (expandedActual []etikett.Transacted) {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+
 	expandedMaybe := collections.MakeMutableSetStringer[values.String]()
 	sa := collections.MakeFuncSetString[values.String, *values.String](expandedMaybe)
 	typExpander.Expand(sa, v)

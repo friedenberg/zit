@@ -98,6 +98,13 @@ func (s metaSet) String() string {
 }
 
 func (s *metaSet) SetMany(vs ...string) (err error) {
+	builder := MatcherBuilder{}
+
+	if _, err = builder.Build(vs...); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	for _, v := range vs {
 		if err = s.set(v); err != nil {
 			err = errors.Wrap(err)

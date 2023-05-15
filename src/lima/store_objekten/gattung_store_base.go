@@ -14,6 +14,17 @@ import (
 	"github.com/friedenberg/zit/src/kilo/store_util"
 )
 
+type gattungStoreLike interface {
+	reindexer
+	schnittstellen.ObjekteIOFactory
+	objekte_store.ObjekteSaver
+	GetInheritor(
+		schnittstellen.ObjekteReaderFactory,
+		schnittstellen.AkteReaderFactory,
+		persisted_metadatei_format.Format,
+	) objekte_store.TransactedInheritor
+}
+
 type CommonStoreBase[
 	O objekte.Akte[O],
 	OPtr objekte.AktePtr[O],
@@ -22,7 +33,7 @@ type CommonStoreBase[
 	V any,
 	VPtr objekte.VerzeichnissePtr[V, O],
 ] interface {
-	reindexer
+	gattungStoreLike
 
 	CheckoutOne(
 		CheckoutOptions,
@@ -78,10 +89,6 @@ type CommonStoreBase[
 		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
 		objekte.External[O, OPtr, K, KPtr],
 	]
-
-	schnittstellen.ObjekteIOFactory
-
-	objekte_store.ObjekteSaver
 }
 
 type commonStoreBase[
@@ -96,7 +103,7 @@ type commonStoreBase[
 
 	schnittstellen.ObjekteIOFactory
 
-	commonStoreDelegate[O, OPtr, K, KPtr, V, VPtr]
+	delegate commonStoreDelegate[O, OPtr, K, KPtr, V, VPtr]
 
 	store_util.StoreUtil
 
@@ -143,6 +150,10 @@ func makeCommonStoreBase[
 	// type T objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]
 	// type TPtr *objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]
 
+	if delegate == nil {
+		panic("delegate was nil")
+	}
+
 	pool := collections.MakePool[
 		objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
 		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
@@ -151,11 +162,11 @@ func makeCommonStoreBase[
 	of := sa.ObjekteReaderWriterFactory(gg)
 
 	s = &commonStoreBase[O, OPtr, K, KPtr, V, VPtr]{
-		GattungGetter:       gg,
-		ObjekteIOFactory:    of,
-		commonStoreDelegate: delegate,
-		StoreUtil:           sa,
-		pool:                pool,
+		GattungGetter:    gg,
+		ObjekteIOFactory: of,
+		delegate:         delegate,
+		StoreUtil:        sa,
+		pool:             pool,
 		TransactedInflator: objekte_store.MakeTransactedInflator[
 			O,
 			OPtr,
@@ -229,13 +240,13 @@ func (s *commonStoreBase[O, OPtr, K, KPtr, V, VPtr]) ReindexOne(
 
 	if t.IsNew() {
 		s.LogWriter.New(t)
-		if err = s.addOne(t); err != nil {
+		if err = s.delegate.addOne(t); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	} else {
 		s.LogWriter.Updated(t)
-		if err = s.updateOne(t); err != nil {
+		if err = s.delegate.updateOne(t); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -259,7 +270,7 @@ func (s *commonStoreBase[O, OPtr, K, KPtr, V, VPtr]) Inherit(
 	old, _ := s.ReadOne(&t.Sku.Kennung)
 
 	if old == nil || old.Less(*t) {
-		s.addOne(t)
+		s.delegate.addOne(t)
 	}
 
 	if t.IsNew() {
@@ -269,4 +280,43 @@ func (s *commonStoreBase[O, OPtr, K, KPtr, V, VPtr]) Inherit(
 	}
 
 	return
+}
+
+func (s *commonStoreBase[O, OPtr, K, KPtr, V, VPtr]) GetInheritor(
+	orf schnittstellen.ObjekteReaderFactory,
+	arf schnittstellen.AkteReaderFactory,
+	pmf persisted_metadatei_format.Format,
+) objekte_store.TransactedInheritor {
+	p := collections.MakePool[
+		objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
+		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
+	]()
+
+	inflator := objekte_store.MakeTransactedInflator[
+		O,
+		OPtr,
+		K,
+		KPtr,
+		V,
+		VPtr,
+	](
+		schnittstellen.MakeBespokeObjekteReadWriterFactory(orf, s),
+		schnittstellen.MakeBespokeAkteReadWriterFactory(arf, s),
+		pmf,
+		objekte_store.MakeAkteFormat[O, OPtr](
+			objekte.MakeNopAkteParseSaver[O, OPtr](s),
+			nil,
+			s,
+		),
+		p,
+	)
+
+	return objekte_store.MakeTransactedInheritor[
+		objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
+		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
+	](
+		inflator,
+		s,
+		p,
+	)
 }

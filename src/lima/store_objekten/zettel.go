@@ -138,6 +138,14 @@ func (s *zettelStore) Flush() (err error) {
 	return
 }
 
+func (s *zettelStore) addOne(t *zettel.Transacted) (err error) {
+	return s.writeNamedZettelToIndex(t)
+}
+
+func (s *zettelStore) updateOne(t *zettel.Transacted) (err error) {
+	return s.writeNamedZettelToIndex(t)
+}
+
 func (s *zettelStore) writeNamedZettelToIndex(
 	tz *zettel.Transacted,
 ) (err error) {

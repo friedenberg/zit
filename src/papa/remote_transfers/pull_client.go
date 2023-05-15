@@ -12,6 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
+	"github.com/friedenberg/zit/src/golf/persisted_metadatei_format"
 	"github.com/friedenberg/zit/src/november/umwelt"
 	"github.com/friedenberg/zit/src/oscar/remote_conn"
 )
@@ -59,6 +60,8 @@ func MakePullClient(u *umwelt.Umwelt, from string) (c *client, err error) {
 		err = errors.Normal(ErrPullRemoteHasHigherVersion)
 		return
 	}
+
+	c.pmf = persisted_metadatei_format.FormatForVersions(ourVersion, theirVersion)
 
 	return
 }
