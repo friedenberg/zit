@@ -265,6 +265,7 @@ func (s *commonStoreBase[O, OPtr, K, KPtr, V, VPtr]) Inherit(
 
 	errors.Log().Printf("inheriting %s", t.Sku.ObjekteSha)
 
+	s.StoreUtil.AddMatchable(t)
 	s.StoreUtil.CommitTransacted2(t)
 
 	old, _ := s.ReadOne(&t.Sku.Kennung)
