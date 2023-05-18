@@ -130,7 +130,7 @@ func TestBitset7Each(t1 *testing.T) {
 
 	i := 0
 
-	if err := sut.Each(
+	if err := sut.EachOn(
 		func(j int) (err error) {
 			if j > m {
 				t.Errorf("expected to iterate to %d but only got %d", m, j)

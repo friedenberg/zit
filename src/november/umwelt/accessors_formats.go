@@ -64,15 +64,9 @@ func (u *Umwelt) FormatSha(
 }
 
 func (u *Umwelt) FormatHinweis() schnittstellen.FuncWriterFormat[kennung.Hinweis] {
-	var a schnittstellen.FuncAbbreviateKorper
-
-	if u.konfig.PrintAbbreviatedHinweisen {
-		a = u.StoreObjekten().GetAbbrStore().AbbreviateHinweis
-	}
-
 	return kennung.MakeHinweisCliFormat(
 		u.FormatColorWriter(),
-		a,
+		u.StoreObjekten().GetAbbrStore().AbbreviateHinweis,
 		0,
 		0,
 	)

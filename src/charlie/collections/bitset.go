@@ -20,7 +20,7 @@ type Bitset interface {
 	Get(int) bool
 	CountOn() int
 	CountOff() int
-	Each(schnittstellen.FuncIter[int]) error
+	EachOn(schnittstellen.FuncIter[int]) error
 	EachOff(schnittstellen.FuncIter[int]) error
 
 	Add(int)
@@ -149,7 +149,7 @@ func (b bitset) EachOff(f schnittstellen.FuncIter[int]) (err error) {
 	return
 }
 
-func (b bitset) Each(f schnittstellen.FuncIter[int]) (err error) {
+func (b bitset) EachOn(f schnittstellen.FuncIter[int]) (err error) {
 	errors.TodoP4("measure and improve performance if necessary")
 
 	b.lock.Lock()

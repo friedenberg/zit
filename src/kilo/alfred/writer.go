@@ -4,7 +4,6 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/alfred"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/juliett/zettel"
@@ -12,10 +11,13 @@ import (
 
 type Writer struct {
 	alfredWriter *alfred.Writer
-	Abbr         schnittstellen.FuncAbbreviateKorper
+	Abbr         func(kennung.Hinweis) (string, error)
 }
 
-func New(out io.Writer, ha schnittstellen.FuncAbbreviateKorper) (w *Writer, err error) {
+func New(
+	out io.Writer,
+	ha func(kennung.Hinweis) (string, error),
+) (w *Writer, err error) {
 	var aw *alfred.Writer
 
 	if aw, err = alfred.NewWriter(out); err != nil {

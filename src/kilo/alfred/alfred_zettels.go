@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/alfred"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
@@ -13,7 +12,7 @@ import (
 
 func (w *Writer) zettelToItem(
 	z *zettel.Transacted,
-	ha schnittstellen.FuncAbbreviateKorper,
+	ha func(kennung.Hinweis) (string, error),
 ) (a *alfred.Item) {
 	a = w.alfredWriter.Get()
 

@@ -85,6 +85,9 @@ function show_zettel_etikett { # @test
 function show_zettel_etikett_complex { # @test
 	run_zit checkout o/u
 	assert_success
+	assert_output - <<-EOM
+		      checked out [one/uno.zettel@d47c552a5299f392948258d7959fc7cf94843316a21c8ea12854ed84a8c06367 !md "wow the first"]
+	EOM
 
 	cat >one/uno.zettel <<-EOM
 		---

@@ -143,7 +143,19 @@ func sortObjSet(
 	out = s.Elements()
 
 	sort.Slice(out, func(i, j int) bool {
-		return out[i].Kennung.String() < out[j].Kennung.String()
+		switch {
+		case out[i].Kennung != nil && out[j].Kennung != nil:
+			return out[i].Kennung.String() < out[j].Kennung.String()
+
+		case out[i].Kennung == nil:
+			return true
+
+		case out[j].Kennung == nil:
+			return false
+
+		default:
+			return out[i].Bezeichnung.String() < out[j].Bezeichnung.String()
+		}
 	})
 
 	return

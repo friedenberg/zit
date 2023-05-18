@@ -3,7 +3,6 @@ package store_util
 import (
 	"bufio"
 	"encoding/gob"
-	"fmt"
 	"io"
 	"sync"
 
@@ -21,14 +20,11 @@ import (
 
 // TODO-P4 make generic
 type AbbrStore interface {
-	// KennungExists(kennung.KennungLike) error
-	// ExpandKennungString(string) (kennung.KennungLike, error)
-	// ExpandKennung(kennung.KennungLike) (kennung.KennungLike, error)
-	// AbbreviateKennung(kennung.KennungLike) (kennung.KennungLike, error)
+	Hinweis() AbbrStoreGeneric[kennung.Hinweis]
 
 	HinweisExists(kennung.Hinweis) error
 	ExpandHinweisString(string) (kennung.Hinweis, error)
-	AbbreviateHinweis(schnittstellen.Korper) (string, error)
+	AbbreviateHinweis(kennung.Hinweis) (string, error)
 
 	ExpandShaString(string) (sha.Sha, error)
 	AbbreviateSha(schnittstellen.ValueLike) (string, error)
@@ -48,12 +44,11 @@ type AbbrStore interface {
 }
 
 type indexAbbrEncodableTridexes struct {
-	Shas             schnittstellen.MutableTridex
-	HinweisKopfen    schnittstellen.MutableTridex
-	HinweisSchwanzen schnittstellen.MutableTridex
-	Etiketten        schnittstellen.MutableTridex
-	Typen            schnittstellen.MutableTridex
-	Kisten           schnittstellen.MutableTridex
+	Shas      schnittstellen.MutableTridex
+	Hinweis   indexHinweis
+	Etiketten schnittstellen.MutableTridex
+	Typen     schnittstellen.MutableTridex
+	Kisten    schnittstellen.MutableTridex
 }
 
 type indexAbbr struct {
@@ -72,21 +67,25 @@ type indexAbbr struct {
 func newIndexAbbr(
 	suv StoreUtilVerzeichnisse,
 	p string,
-) (i AbbrStore, err error) {
+) (i *indexAbbr, err error) {
 	i = &indexAbbr{
 		lock:                   &sync.Mutex{},
 		once:                   &sync.Once{},
 		path:                   p,
 		StoreUtilVerzeichnisse: suv,
 		indexAbbrEncodableTridexes: indexAbbrEncodableTridexes{
-			Shas:             tridex.Make(),
-			HinweisKopfen:    tridex.Make(),
-			HinweisSchwanzen: tridex.Make(),
-			Etiketten:        tridex.Make(),
-			Typen:            tridex.Make(),
-			Kisten:           tridex.Make(),
+			Shas: tridex.Make(),
+			Hinweis: indexHinweis{
+				Kopfen:    tridex.Make(),
+				Schwanzen: tridex.Make(),
+			},
+			Etiketten: tridex.Make(),
+			Typen:     tridex.Make(),
+			Kisten:    tridex.Make(),
 		},
 	}
+
+	i.indexAbbrEncodableTridexes.Hinweis.readFunc = i.readIfNecessary
 
 	return
 }
@@ -178,8 +177,8 @@ func (i *indexAbbr) AddMatchable(o kennung.Matchable) (err error) {
 
 	switch to := o.(type) {
 	case *zettel.Transacted:
-		i.indexAbbrEncodableTridexes.HinweisKopfen.Add(to.Kennung().Kopf())
-		i.indexAbbrEncodableTridexes.HinweisSchwanzen.Add(to.Kennung().Schwanz())
+		i.indexAbbrEncodableTridexes.Hinweis.Kopfen.Add(to.Kennung().Kopf())
+		i.indexAbbrEncodableTridexes.Hinweis.Schwanzen.Add(to.Kennung().Schwanz())
 
 	case *typ.Transacted:
 		i.indexAbbrEncodableTridexes.Typen.Add(to.Sku.Kennung.String())
@@ -229,23 +228,20 @@ func (i *indexAbbr) ExpandShaString(st string) (s sha.Sha, err error) {
 	return
 }
 
-func (i *indexAbbr) HinweisExists(h kennung.Hinweis) (err error) {
-	if err = i.readIfNecessary(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+func (i *indexAbbr) Hinweis() (asg AbbrStoreGeneric[kennung.Hinweis]) {
+	asg = &i.indexAbbrEncodableTridexes.Hinweis
 
-	if !i.indexAbbrEncodableTridexes.HinweisKopfen.ContainsExpansion(h.Kopf()) {
-		err = objekte_store.ErrNotFound{Id: h}
-		return
-	}
-
-	if !i.indexAbbrEncodableTridexes.HinweisSchwanzen.ContainsExpansion(h.Schwanz()) {
-		err = objekte_store.ErrNotFound{Id: h}
-		return
+	if !i.GetKonfig().PrintAbbreviatedHinweisen {
+		asg = indexNoAbbr[kennung.Hinweis, *kennung.Hinweis]{
+			AbbrStoreGeneric: asg,
+		}
 	}
 
 	return
+}
+
+func (i *indexAbbr) HinweisExists(h kennung.Hinweis) (err error) {
+	return i.Hinweis().Exists(h)
 }
 
 func (i *indexAbbr) EtikettExists(e kennung.Etikett) (err error) {
@@ -262,63 +258,16 @@ func (i *indexAbbr) EtikettExists(e kennung.Etikett) (err error) {
 	return
 }
 
-func (i *indexAbbr) AbbreviateHinweis(h schnittstellen.Korper) (v string, err error) {
-	if err = i.readIfNecessary(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	kopf := h.Kopf()
-	schwanz := h.Schwanz()
-
-	if i.GetKonfig().PrintAbbreviatedHinweisen {
-		kopf = i.indexAbbrEncodableTridexes.HinweisKopfen.Abbreviate(h.Kopf())
-		schwanz = i.indexAbbrEncodableTridexes.HinweisSchwanzen.Abbreviate(h.Schwanz())
-
-		if kopf == "" {
-			err = errors.Errorf("abbreviated kopf would be empty for %s", h)
-			return
-		}
-
-		if schwanz == "" {
-			err = errors.Errorf("abbreviated schwanz would be empty for %s", h)
-			return
-		}
-	}
-
-	v = fmt.Sprintf("%s/%s", kopf, schwanz)
-
-	return
+func (i *indexAbbr) AbbreviateHinweis(h kennung.Hinweis) (v string, err error) {
+	return i.Hinweis().Abbreviate(h)
 }
 
 func (i *indexAbbr) ExpandHinweisString(s string) (h kennung.Hinweis, err error) {
-	errors.Log().Print(s)
-
-	var ha kennung.Hinweis
-
-	if ha, err = kennung.MakeHinweis(s); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return i.ExpandHinweis(ha)
+	return i.Hinweis().ExpandString(s)
 }
 
 func (i *indexAbbr) ExpandHinweis(hAbbr kennung.Hinweis) (h kennung.Hinweis, err error) {
-	if err = i.readIfNecessary(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	kopf := i.indexAbbrEncodableTridexes.HinweisKopfen.Expand(hAbbr.Kopf())
-	schwanz := i.indexAbbrEncodableTridexes.HinweisSchwanzen.Expand(hAbbr.Schwanz())
-
-	if h, err = kennung.MakeHinweisKopfUndSchwanz(kopf, schwanz); err != nil {
-		err = errors.Wrapf(err, "{Abbreviated: '%s'}", hAbbr)
-		return
-	}
-
-	return
+	return i.Hinweis().Expand(hAbbr)
 }
 
 func (i *indexAbbr) ExpandKastenString(s string) (t kennung.Kasten, err error) {

@@ -11,7 +11,7 @@ import (
 // kopf/schwanz
 func MakeHinweisCliFormat(
 	cw format.FuncColorWriter,
-	a schnittstellen.FuncAbbreviateKorper,
+	a func(Hinweis) (string, error),
 	maxKopf int,
 	maxSchwanz int,
 ) schnittstellen.FuncWriterFormat[Hinweis] {
