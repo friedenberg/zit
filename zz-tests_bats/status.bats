@@ -118,6 +118,39 @@ function status_simple_one_zettel_akte_separate { # @test
 		             same [one/uno.zettel@d47c552a5299f392948258d7959fc7cf94843316a21c8ea12854ed84a8c06367 !md "wow the first"]
 	EOM
 
+	rm one/uno.zettel
+
+	cat >one/uno.md <<-EOM
+		newest body but even newerests
+	EOM
+
+	run_zit status one/uno.zettel
+	assert_success
+	assert_output - <<-EOM
+		          changed [one/uno@d740e348fbe80354fe4a5f5930257c7d24ae279eef7b33544f3e31772ae3ccf6 !md "wow the first"]
+		                ↳ [one/uno.md@a958b1c8e2bc817fcb17292f6957c0dfc87c874dc33274f0c4f4efdcdd1429bb]
+	EOM
+}
+
+function status_simple_one_zettel_akte_only { # @test
+	run_zit clean one/uno.zettel
+	assert_success
+	assert_output - <<-EOM
+		          deleted [one/uno.zettel]
+	EOM
+
+	run_zit checkout -mode akte one/uno.zettel
+	assert_output - <<-EOM
+		      checked out [one/uno.md@11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first"]
+	EOM
+
+	run_zit status one/uno.zettel
+	assert_success
+	assert_output - <<-EOM
+		             same [one/uno@d47c552a5299f392948258d7959fc7cf94843316a21c8ea12854ed84a8c06367 !md "wow the first"]
+		                ↳ [one/uno.md@11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11]
+	EOM
+
 	dirty_existing_akte
 
 	run_zit status one/uno.zettel

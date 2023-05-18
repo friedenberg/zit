@@ -55,7 +55,6 @@ func (c Edit) DefaultGattungen() gattungen.Set {
 		gattung.Zettel,
 		gattung.Typ,
 		gattung.Kasten,
-		gattung.Konfig,
 	)
 }
 
