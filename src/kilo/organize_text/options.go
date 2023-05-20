@@ -30,6 +30,8 @@ type Options struct {
 	ExtraEtiketten    schnittstellen.Set[kennung.Etikett]
 	Transacted        schnittstellen.Set[metadatei.WithKennung]
 
+	Expanders kennung.Expanders
+
 	UsePrefixJoints        bool
 	UseRightAlignedIndents bool
 	UseRefiner             bool

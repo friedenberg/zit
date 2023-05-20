@@ -5,7 +5,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/format"
-	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
 
@@ -17,48 +16,13 @@ type Text struct {
 
 func New(options Options) (ot *Text, err error) {
 	if !options.wasMade {
-		panic("options no initialized")
+		panic("options not initialized")
 	}
 
 	if options.UseMetadateiHeader {
 		ot, err = options.Factory().Make()
 	} else {
-		ot, err = newWithoutMetadatei(options)
-	}
-
-	return
-}
-
-func newWithoutMetadatei(options Options) (ot *Text, err error) {
-	if !options.wasMade {
-		panic("options no initialized")
-	}
-
-	ot = &Text{
-		Options:    options,
-		assignment: newAssignment(0),
-		Metadatei: Metadatei{
-			EtikettSet: kennung.MakeEtikettSet(),
-		},
-	}
-
-	ot.assignment.isRoot = true
-
-	var as []*assignment
-	as, err = options.assignmentTreeConstructor().Assignments()
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	for _, a := range as {
-		ot.assignment.addChild(a)
-	}
-
-	if err = ot.Refine(); err != nil {
-		err = errors.Wrap(err)
-		return
+		ot, err = options.Factory().MakeWithoutMetadatei()
 	}
 
 	return
@@ -92,6 +56,7 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 	lw := format.NewLineWriter()
 
 	kopf, scwhanz := ot.assignment.MaxKopfUndSchwanz()
+
 	l := ot.assignment.MaxLen()
 
 	aw := assignmentLineWriter{

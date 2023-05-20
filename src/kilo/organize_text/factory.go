@@ -58,6 +58,41 @@ func (atc *Factory) Make() (ot *Text, err error) {
 	return
 }
 
+func (f Factory) MakeWithoutMetadatei() (ot *Text, err error) {
+	if !f.Options.wasMade {
+		panic("options no initialized")
+	}
+
+	ot = &Text{
+		Options:    f.Options,
+		assignment: newAssignment(0),
+		Metadatei: Metadatei{
+			EtikettSet: kennung.MakeEtikettSet(),
+		},
+	}
+
+	ot.assignment.isRoot = true
+
+	var as []*assignment
+	as, err = f.Options.assignmentTreeConstructor().Assignments()
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	for _, a := range as {
+		ot.assignment.addChild(a)
+	}
+
+	if err = ot.Refine(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (atc Factory) makeChildren(
 	parent *assignment,
 	prefixSet objekte_collections.SetPrefixVerzeichnisse,

@@ -13,12 +13,6 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
 
-type obj struct {
-	Kennung     kennung.Kennung
-	Bezeichnung bezeichnung.Bezeichnung
-	IsNew       bool
-}
-
 func makeObj(
 	named metadatei.WithKennung,
 ) (z obj, err error) {
@@ -29,6 +23,12 @@ func makeObj(
 	}
 
 	return
+}
+
+type obj struct {
+	Kennung     kennung.Kennung
+	Bezeichnung bezeichnung.Bezeichnung
+	IsNew       bool
 }
 
 func (a obj) Len() int {
@@ -63,10 +63,6 @@ func (a obj) Equals(b obj) bool {
 	}
 
 	return true
-}
-
-func (z obj) AlignedString(maxKopf, maxSchwanz int) string {
-	return fmt.Sprintf("- [%s] %s", z.Kennung, z.Bezeichnung)
 }
 
 func (z obj) String() string {
