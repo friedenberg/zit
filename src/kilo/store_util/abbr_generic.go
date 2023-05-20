@@ -17,8 +17,8 @@ type AbbrStoreGeneric[V any] interface {
 }
 
 type indexNoAbbr[
-	V kennung.KennungLike[V],
-	VPtr kennung.KennungLikePtr[V],
+	V schnittstellen.Stringer,
+	VPtr schnittstellen.SetterPtr[V],
 ] struct {
 	AbbrStoreGeneric[V]
 }
@@ -116,8 +116,8 @@ func (ih *indexHinweis) Abbreviate(h kennung.Hinweis) (v string, err error) {
 }
 
 type indexNotHinweis[
-	K kennung.KennungLike[K],
-	KPtr kennung.KennungLikePtr[K],
+	K schnittstellen.Stringer,
+	KPtr schnittstellen.SetterPtr[K],
 ] struct {
 	readFunc  func() error
 	Kennungen schnittstellen.MutableTridex

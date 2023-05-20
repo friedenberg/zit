@@ -292,7 +292,7 @@ func (u *Umwelt) MakeKennungExpanders() kennung.Expanders {
 	return kennung.Expanders{
 		Sha: func(v string) (out string, err error) {
 			var s sha.Sha
-			s, err = u.StoreObjekten().GetAbbrStore().ExpandShaString(v)
+			s, err = u.StoreObjekten().GetAbbrStore().Shas().ExpandString(v)
 			out = s.String()
 			return
 		},

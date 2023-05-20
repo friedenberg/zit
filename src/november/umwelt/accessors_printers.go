@@ -49,7 +49,7 @@ func (u *Umwelt) PrinterKonfigTransacted() schnittstellen.FuncIter[*erworben.Tra
 			u.Konfig(),
 			erworben.MakeCliFormatTransacted(
 				u.FormatColorWriter(),
-				u.FormatSha(u.StoreObjekten().GetAbbrStore().AbbreviateSha),
+				u.FormatSha(u.StoreObjekten().GetAbbrStore().Shas().Abbreviate),
 			),
 		),
 	)

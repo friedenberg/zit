@@ -22,9 +22,7 @@ import (
 type AbbrStore interface {
 	Hinweis() AbbrStoreGeneric[kennung.Hinweis]
 	Kisten() AbbrStoreGeneric[kennung.Kasten]
-
-	ExpandShaString(string) (sha.Sha, error)
-	AbbreviateSha(schnittstellen.ValueLike) (string, error)
+	Shas() AbbrStoreGeneric[sha.Sha]
 
 	ExpandEtikettString(string) (kennung.Etikett, error)
 	EtikettExists(kennung.Etikett) error
@@ -38,7 +36,7 @@ type AbbrStore interface {
 }
 
 type indexAbbrEncodableTridexes struct {
-	Shas      schnittstellen.MutableTridex
+	Shas      indexNotHinweis[sha.Sha, *sha.Sha]
 	Hinweis   indexHinweis
 	Etiketten schnittstellen.MutableTridex
 	Typen     schnittstellen.MutableTridex
@@ -68,7 +66,9 @@ func newIndexAbbr(
 		path:                   p,
 		StoreUtilVerzeichnisse: suv,
 		indexAbbrEncodableTridexes: indexAbbrEncodableTridexes{
-			Shas: tridex.Make(),
+			Shas: indexNotHinweis[sha.Sha, *sha.Sha]{
+				Kennungen: tridex.Make(),
+			},
 			Hinweis: indexHinweis{
 				Kopfen:    tridex.Make(),
 				Schwanzen: tridex.Make(),
@@ -83,6 +83,7 @@ func newIndexAbbr(
 
 	i.indexAbbrEncodableTridexes.Hinweis.readFunc = i.readIfNecessary
 	i.indexAbbrEncodableTridexes.Kisten.readFunc = i.readIfNecessary
+	i.indexAbbrEncodableTridexes.Shas.readFunc = i.readIfNecessary
 
 	return
 }
@@ -169,8 +170,8 @@ func (i *indexAbbr) AddMatchable(o kennung.Matchable) (err error) {
 
 	i.hasChanges = true
 
-	i.indexAbbrEncodableTridexes.Shas.Add(o.GetAkteSha().String())
-	i.indexAbbrEncodableTridexes.Shas.Add(o.GetObjekteSha().String())
+	i.indexAbbrEncodableTridexes.Shas.Kennungen.Add(o.GetAkteSha().String())
+	i.indexAbbrEncodableTridexes.Shas.Kennungen.Add(o.GetObjekteSha().String())
 
 	switch to := o.(type) {
 	case *zettel.Transacted:
@@ -194,37 +195,6 @@ func (i *indexAbbr) AddMatchable(o kennung.Matchable) (err error) {
 	return
 }
 
-func (i *indexAbbr) AbbreviateSha(s schnittstellen.ValueLike) (abbr string, err error) {
-	if err = i.readIfNecessary(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	abbr = s.String()
-
-	if i.GetKonfig().PrintAbbreviatedShas {
-		abbr = i.indexAbbrEncodableTridexes.Shas.Abbreviate(abbr)
-	}
-
-	return
-}
-
-func (i *indexAbbr) ExpandShaString(st string) (s sha.Sha, err error) {
-	if err = i.readIfNecessary(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	expanded := i.indexAbbrEncodableTridexes.Shas.Expand(st)
-
-	if err = s.Set(expanded); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
 func (i *indexAbbr) Hinweis() (asg AbbrStoreGeneric[kennung.Hinweis]) {
 	asg = &i.indexAbbrEncodableTridexes.Hinweis
 
@@ -240,11 +210,23 @@ func (i *indexAbbr) Hinweis() (asg AbbrStoreGeneric[kennung.Hinweis]) {
 func (i *indexAbbr) Kisten() (asg AbbrStoreGeneric[kennung.Kasten]) {
 	asg = &i.indexAbbrEncodableTridexes.Kisten
 
-	// if !i.GetKonfig().PrintAbbreviatedHinweisen {
-	// 	asg = indexNoAbbr[kennung.Kasten, *kennung.Kasten]{
-	// 		AbbrStoreGeneric: asg,
-	// 	}
-	// }
+	if !i.GetKonfig().PrintAbbreviatedKennungen {
+		asg = indexNoAbbr[kennung.Kasten, *kennung.Kasten]{
+			AbbrStoreGeneric: asg,
+		}
+	}
+
+	return
+}
+
+func (i *indexAbbr) Shas() (asg AbbrStoreGeneric[sha.Sha]) {
+	asg = &i.indexAbbrEncodableTridexes.Shas
+
+	if !i.GetKonfig().PrintAbbreviatedShas {
+		asg = indexNoAbbr[sha.Sha, *sha.Sha]{
+			AbbrStoreGeneric: asg,
+		}
+	}
 
 	return
 }

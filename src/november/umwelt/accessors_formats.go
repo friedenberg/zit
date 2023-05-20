@@ -5,11 +5,11 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
-	"github.com/friedenberg/zit/src/echo/sha_cli_format"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/hotel/erworben"
@@ -58,9 +58,9 @@ func (u *Umwelt) FormatIdLike() schnittstellen.FuncWriterFormat[kennung.Kennung]
 }
 
 func (u *Umwelt) FormatSha(
-	a schnittstellen.FuncAbbreviateValue,
+	a func(sha.Sha) (string, error),
 ) schnittstellen.FuncWriterFormat[schnittstellen.Sha] {
-	return sha_cli_format.MakeCliFormat(u.FormatColorWriter(), a)
+	return kennung.MakeShaCliFormat(u.FormatColorWriter(), a)
 }
 
 func (u *Umwelt) FormatHinweis() schnittstellen.FuncWriterFormat[kennung.Hinweis] {
@@ -99,7 +99,7 @@ func (u *Umwelt) FormatEtikettTransacted() schnittstellen.FuncWriterFormat[etike
 	return etikett.MakeCliFormatTransacted(
 		u.Standort(),
 		u.FormatColorWriter(),
-		u.FormatSha(u.StoreObjekten().GetAbbrStore().AbbreviateSha),
+		u.FormatSha(u.StoreObjekten().GetAbbrStore().Shas().Abbreviate),
 		u.FormatEtikett(),
 	)
 }
@@ -108,7 +108,7 @@ func (u *Umwelt) FormatTypTransacted() schnittstellen.FuncWriterFormat[typ.Trans
 	return typ.MakeCliFormatTransacted(
 		u.Standort(),
 		u.FormatColorWriter(),
-		u.FormatSha(u.StoreObjekten().GetAbbrStore().AbbreviateSha),
+		u.FormatSha(u.StoreObjekten().GetAbbrStore().Shas().Abbreviate),
 		u.FormatTyp(),
 	)
 }
@@ -116,7 +116,7 @@ func (u *Umwelt) FormatTypTransacted() schnittstellen.FuncWriterFormat[typ.Trans
 func (u *Umwelt) FormatKonfigTransacted() schnittstellen.FuncWriterFormat[erworben.Transacted] {
 	return erworben.MakeCliFormatTransacted(
 		u.FormatColorWriter(),
-		u.FormatSha(u.StoreObjekten().GetAbbrStore().AbbreviateSha),
+		u.FormatSha(u.StoreObjekten().GetAbbrStore().Shas().Abbreviate),
 	)
 }
 
@@ -124,7 +124,7 @@ func (u *Umwelt) FormatKastenTransacted() schnittstellen.FuncWriterFormat[kasten
 	return kasten.MakeCliFormatTransacted(
 		u.Standort(),
 		u.FormatColorWriter(),
-		u.FormatSha(u.StoreObjekten().GetAbbrStore().AbbreviateSha),
+		u.FormatSha(u.StoreObjekten().GetAbbrStore().Shas().Abbreviate),
 		u.FormatKasten(),
 	)
 }
@@ -133,7 +133,7 @@ func (u *Umwelt) FormatTypCheckedOut() schnittstellen.FuncWriterFormat[typ.Check
 	return typ.MakeCliFormatCheckedOut(
 		u.Standort(),
 		u.FormatColorWriter(),
-		u.FormatSha(u.StoreObjekten().GetAbbrStore().AbbreviateSha),
+		u.FormatSha(u.StoreObjekten().GetAbbrStore().Shas().Abbreviate),
 		u.FormatTyp(),
 	)
 }
@@ -142,7 +142,7 @@ func (u *Umwelt) FormatKastenCheckedOut() schnittstellen.FuncWriterFormat[kasten
 	return kasten.MakeCliFormatCheckedOut(
 		u.Standort(),
 		u.FormatColorWriter(),
-		u.FormatSha(u.StoreObjekten().GetAbbrStore().AbbreviateSha),
+		u.FormatSha(u.StoreObjekten().GetAbbrStore().Shas().Abbreviate),
 		u.FormatKasten(),
 	)
 }
@@ -151,7 +151,7 @@ func (u *Umwelt) FormatEtikettCheckedOut() schnittstellen.FuncWriterFormat[etike
 	return etikett.MakeCliFormatCheckedOut(
 		u.Standort(),
 		u.FormatColorWriter(),
-		u.FormatSha(u.StoreObjekten().GetAbbrStore().AbbreviateSha),
+		u.FormatSha(u.StoreObjekten().GetAbbrStore().Shas().Abbreviate),
 		u.FormatEtikett(),
 	)
 }
@@ -195,7 +195,7 @@ func (u *Umwelt) FormatZettelExternal() schnittstellen.FuncWriterFormat[zettel.E
 		u.Standort(),
 		u.FormatColorWriter(),
 		u.FormatHinweis(),
-		u.FormatSha(u.StoreObjekten().GetAbbrStore().AbbreviateSha),
+		u.FormatSha(u.StoreObjekten().GetAbbrStore().Shas().Abbreviate),
 		u.FormatMetadateiGattung(gattung.Zettel),
 	)
 }
@@ -212,7 +212,7 @@ func (u *Umwelt) FormatZettelCheckedOut() schnittstellen.FuncWriterFormat[zettel
 		u.Standort(),
 		u.FormatColorWriter(),
 		u.FormatHinweis(),
-		u.FormatSha(u.StoreObjekten().GetAbbrStore().AbbreviateSha),
+		u.FormatSha(u.StoreObjekten().GetAbbrStore().Shas().Abbreviate),
 		// u.FormatTyp(),
 		u.FormatMetadateiGattung(gattung.Zettel),
 	)
@@ -223,7 +223,7 @@ func (u *Umwelt) FormatTransactedLike(
 ) schnittstellen.FuncWriterFormat[objekte.TransactedLikePtr] {
 	return objekte.MakeCliFormatTransactedLikePtr(
 		u.FormatIdLike(),
-		u.FormatSha(u.StoreObjekten().GetAbbrStore().AbbreviateSha),
+		u.FormatSha(u.StoreObjekten().GetAbbrStore().Shas().Abbreviate),
 		u.FormatMetadatei(includeTyp),
 	)
 }
@@ -231,7 +231,7 @@ func (u *Umwelt) FormatTransactedLike(
 func (u *Umwelt) FormatZettelTransacted() schnittstellen.FuncWriterFormat[zettel.Transacted] {
 	return zettel.MakeCliFormatTransacted(
 		u.FormatHinweis(),
-		u.FormatSha(u.StoreObjekten().GetAbbrStore().AbbreviateSha),
+		u.FormatSha(u.StoreObjekten().GetAbbrStore().Shas().Abbreviate),
 		u.FormatMetadateiGattung(gattung.Zettel),
 	)
 }
@@ -246,7 +246,7 @@ func (u *Umwelt) FormatFileNotRecognized() schnittstellen.FuncWriterFormat[kennu
 	return store_fs.MakeCliFormatNotRecognized(
 		u.FormatColorWriter(),
 		u.Standort(),
-		u.FormatSha(u.StoreObjekten().GetAbbrStore().AbbreviateSha),
+		u.FormatSha(u.StoreObjekten().GetAbbrStore().Shas().Abbreviate),
 	)
 }
 
@@ -254,7 +254,7 @@ func (u *Umwelt) FormatFileRecognized() schnittstellen.FuncWriterFormat[store_fs
 	return store_fs.MakeCliFormatRecognized(
 		u.FormatColorWriter(),
 		u.Standort(),
-		u.FormatSha(u.StoreObjekten().GetAbbrStore().AbbreviateSha),
+		u.FormatSha(u.StoreObjekten().GetAbbrStore().Shas().Abbreviate),
 		u.FormatZettelTransacted(),
 	)
 }

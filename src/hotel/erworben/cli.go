@@ -23,6 +23,7 @@ type Cli struct {
 	PredictableHinweisen             bool
 	UseRightAlignedIndentsInOrganize bool
 	PrintAbbreviatedHinweisen        bool
+	PrintAbbreviatedKennungen        bool
 	PrintAbbreviatedShas             bool
 	PrintNewShaSyntax                bool
 	PrintIncludeTypen                bool
@@ -50,6 +51,7 @@ func (c *Cli) AddToFlags(f *flag.FlagSet) {
 	f.BoolVar(&c.PrintIncludeTypen, "print-typen", true, "")
 	f.BoolVar(&c.PrintAbbreviatedShas, "abbreviate-shas", true, "")
 	f.BoolVar(&c.PrintAbbreviatedHinweisen, "abbreviate-hinweisen", true, "")
+	f.BoolVar(&c.PrintAbbreviatedKennungen, "abbreviate-kennungen", true, "")
 	f.BoolVar(&c.PrintIncludeBezeichnungen, "print-bezeichnungen", true, "")
 	f.BoolVar(&c.PrintTime, "print-time", true, "")
 }

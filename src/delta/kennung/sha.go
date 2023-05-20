@@ -79,7 +79,7 @@ func (t Sha) ContainsMatchable(m Matchable) bool {
 }
 
 func (t Sha) GetSha() sha.Sha {
-  return t.value
+	return t.value
 }
 
 func (t Sha) MarshalText() (text []byte, err error) {

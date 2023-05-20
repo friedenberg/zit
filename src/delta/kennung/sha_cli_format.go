@@ -1,17 +1,18 @@
-package sha_cli_format
+package kennung
 
 import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/delta/format"
 )
 
 // sha
-func MakeCliFormat(
+func MakeShaCliFormat(
 	cw format.FuncColorWriter,
-	a schnittstellen.FuncAbbreviateValue,
+	a func(sha.Sha) (string, error),
 ) schnittstellen.FuncWriterFormat[schnittstellen.Sha] {
 	return func(w io.Writer, s schnittstellen.Sha) (n int64, err error) {
 		v := s.String()
@@ -19,7 +20,7 @@ func MakeCliFormat(
 		if a != nil {
 			var v1 string
 
-			if v1, err = a(s); err != nil {
+			if v1, err = a(sha.Make(s)); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
