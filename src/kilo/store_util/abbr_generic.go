@@ -114,3 +114,73 @@ func (ih *indexHinweis) Abbreviate(h kennung.Hinweis) (v string, err error) {
 
 	return
 }
+
+type indexNotHinweis[
+	K kennung.KennungLike[K],
+	KPtr kennung.KennungLikePtr[K],
+] struct {
+	readFunc  func() error
+	Kennungen schnittstellen.MutableTridex
+}
+
+func (ih *indexNotHinweis[K, KPtr]) Exists(k K) (err error) {
+	if err = ih.readFunc(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if !ih.Kennungen.ContainsExpansion(k.String()) {
+		err = objekte_store.ErrNotFound{Id: k}
+		return
+	}
+
+	return
+}
+
+func (ih *indexNotHinweis[K, KPtr]) ExpandString(s string) (k K, err error) {
+	if err = ih.readFunc(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = KPtr(&k).Set(s); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return ih.Expand(k)
+}
+
+func (ih *indexNotHinweis[K, KPtr]) Expand(
+	abbr K,
+) (exp K, err error) {
+	if err = ih.readFunc(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	ex := ih.Kennungen.Expand(abbr.String())
+
+	if ex == "" {
+		// TODO-P4 should try to use the expansion if possible
+		ex = abbr.String()
+	}
+
+	if err = KPtr(&exp).Set(ex); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (ih *indexNotHinweis[K, KPtr]) Abbreviate(k K) (v string, err error) {
+	if err = ih.readFunc(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	v = ih.Kennungen.Abbreviate(k.String())
+
+	return
+}

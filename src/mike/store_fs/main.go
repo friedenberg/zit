@@ -254,7 +254,7 @@ func (s *Store) ReadFiles(
 			func(ilg kennung.IdLikeGetter) (err error) {
 				switch il := ilg.(type) {
 				case cwd.Kasten:
-					if err = s.storeObjekten.GetAbbrStore().KastenExists(
+					if err = s.storeObjekten.GetAbbrStore().Kisten().Exists(
 						il.Kennung,
 					); err == nil {
 						err = iter.MakeErrStopIteration()
