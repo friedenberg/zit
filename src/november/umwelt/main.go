@@ -291,6 +291,8 @@ func (u *Umwelt) MakeKennungExpanders() kennung.Expanders {
 	return kennung.Expanders{
 		Sha:     u.StoreObjekten().GetAbbrStore().Shas().ExpandStringString,
 		Etikett: u.StoreObjekten().GetAbbrStore().Etiketten().ExpandStringString,
+		Typ:     u.StoreObjekten().GetAbbrStore().Typen().ExpandStringString,
+		Kasten:  u.StoreObjekten().GetAbbrStore().Kisten().ExpandStringString,
 		Hinweis: u.StoreObjekten().GetAbbrStore().Hinweis().ExpandStringString,
 	}
 }

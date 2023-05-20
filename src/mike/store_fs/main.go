@@ -286,7 +286,7 @@ func (s *Store) ReadFiles(
 					}
 
 				case cwd.Typ:
-					if err = s.storeObjekten.GetAbbrStore().TypExists(
+					if err = s.storeObjekten.GetAbbrStore().Typen().Exists(
 						il.Kennung,
 					); err == nil {
 						err = iter.MakeErrStopIteration()

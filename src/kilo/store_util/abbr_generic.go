@@ -9,12 +9,25 @@ import (
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 )
 
-type AbbrStoreGeneric[V any] interface {
+type AbbrStorePresenceGeneric[V any] interface {
 	Exists(V) error
+}
+
+type AbbrStoreGeneric[V any] interface {
+	AbbrStorePresenceGeneric[V]
 	ExpandStringString(string) (string, error)
 	ExpandString(string) (V, error)
 	Expand(V) (V, error)
 	Abbreviate(V) (string, error)
+}
+
+type AbbrStoreMutableGeneric[V any] interface {
+	Add(V) error
+}
+
+type AbbrStoreCompleteGeneric[V any] interface {
+	AbbrStoreGeneric[V]
+	AbbrStoreMutableGeneric[V]
 }
 
 type indexNoAbbr[
@@ -33,6 +46,12 @@ type indexHinweis struct {
 	readFunc  func() error
 	Kopfen    schnittstellen.MutableTridex
 	Schwanzen schnittstellen.MutableTridex
+}
+
+func (ih *indexHinweis) Add(h kennung.Hinweis) (err error) {
+	ih.Kopfen.Add(h.Kopf())
+	ih.Schwanzen.Add(h.Schwanz())
+	return
 }
 
 func (ih *indexHinweis) Exists(h kennung.Hinweis) (err error) {
@@ -135,6 +154,11 @@ type indexNotHinweis[
 ] struct {
 	readFunc  func() error
 	Kennungen schnittstellen.MutableTridex
+}
+
+func (ih *indexNotHinweis[K, KPtr]) Add(k K) (err error) {
+	ih.Kennungen.Add(k.String())
+	return
 }
 
 func (ih *indexNotHinweis[K, KPtr]) Exists(k K) (err error) {

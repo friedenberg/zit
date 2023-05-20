@@ -465,7 +465,7 @@ func (s *Store) addTyp(
 	typenExpanded := kennung.ExpandOneSlice(t, kennung.ExpanderRight)
 
 	for _, t := range typenExpanded {
-		if err = s.GetAbbrStore().TypExists(t); err == nil {
+		if err = s.GetAbbrStore().Typen().Exists(t); err == nil {
 			continue
 		}
 
