@@ -11,6 +11,7 @@ import (
 
 type AbbrStoreGeneric[V any] interface {
 	Exists(V) error
+	ExpandStringString(string) (string, error)
 	ExpandString(string) (V, error)
 	Expand(V) (V, error)
 	Abbreviate(V) (string, error)
@@ -49,6 +50,19 @@ func (ih *indexHinweis) Exists(h kennung.Hinweis) (err error) {
 		err = objekte_store.ErrNotFound{Id: h}
 		return
 	}
+
+	return
+}
+
+func (ih *indexHinweis) ExpandStringString(in string) (out string, err error) {
+	var h kennung.Hinweis
+
+	if h, err = ih.ExpandString(in); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	out = h.String()
 
 	return
 }
@@ -133,6 +147,21 @@ func (ih *indexNotHinweis[K, KPtr]) Exists(k K) (err error) {
 		err = objekte_store.ErrNotFound{Id: k}
 		return
 	}
+
+	return
+}
+
+func (ih *indexNotHinweis[K, KPtr]) ExpandStringString(
+	in string,
+) (out string, err error) {
+	var k K
+
+	if k, err = ih.ExpandString(in); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	out = k.String()
 
 	return
 }

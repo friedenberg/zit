@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/log"
-	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/file_lock"
@@ -290,24 +289,9 @@ func (u *Umwelt) MakeKennungHidden() kennung.Matcher {
 
 func (u *Umwelt) MakeKennungExpanders() kennung.Expanders {
 	return kennung.Expanders{
-		Sha: func(v string) (out string, err error) {
-			var s sha.Sha
-			s, err = u.StoreObjekten().GetAbbrStore().Shas().ExpandString(v)
-			out = s.String()
-			return
-		},
-		Etikett: func(v string) (out string, err error) {
-			var e kennung.Etikett
-			e, err = u.StoreObjekten().GetAbbrStore().Etiketten().ExpandString(v)
-			out = e.String()
-			return
-		},
-		Hinweis: func(v string) (out string, err error) {
-			var h kennung.Hinweis
-			h, err = u.StoreObjekten().GetAbbrStore().Hinweis().ExpandString(v)
-			out = h.String()
-			return
-		},
+		Sha:     u.StoreObjekten().GetAbbrStore().Shas().ExpandStringString,
+		Etikett: u.StoreObjekten().GetAbbrStore().Etiketten().ExpandStringString,
+		Hinweis: u.StoreObjekten().GetAbbrStore().Hinweis().ExpandStringString,
 	}
 }
 
