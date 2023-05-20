@@ -22,10 +22,6 @@ import (
 type AbbrStore interface {
 	Hinweis() AbbrStoreGeneric[kennung.Hinweis]
 
-	// HinweisExists(kennung.Hinweis) error
-	// ExpandHinweisString(string) (kennung.Hinweis, error)
-	// AbbreviateHinweis(kennung.Hinweis) (string, error)
-
 	ExpandShaString(string) (sha.Sha, error)
 	AbbreviateSha(schnittstellen.ValueLike) (string, error)
 
@@ -240,10 +236,6 @@ func (i *indexAbbr) Hinweis() (asg AbbrStoreGeneric[kennung.Hinweis]) {
 	return
 }
 
-func (i *indexAbbr) HinweisExists(h kennung.Hinweis) (err error) {
-	return i.Hinweis().Exists(h)
-}
-
 func (i *indexAbbr) EtikettExists(e kennung.Etikett) (err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
@@ -256,18 +248,6 @@ func (i *indexAbbr) EtikettExists(e kennung.Etikett) (err error) {
 	}
 
 	return
-}
-
-func (i *indexAbbr) AbbreviateHinweis(h kennung.Hinweis) (v string, err error) {
-	return i.Hinweis().Abbreviate(h)
-}
-
-func (i *indexAbbr) ExpandHinweisString(s string) (h kennung.Hinweis, err error) {
-	return i.Hinweis().ExpandString(s)
-}
-
-func (i *indexAbbr) ExpandHinweis(hAbbr kennung.Hinweis) (h kennung.Hinweis, err error) {
-	return i.Hinweis().Expand(hAbbr)
 }
 
 func (i *indexAbbr) ExpandKastenString(s string) (t kennung.Kasten, err error) {
