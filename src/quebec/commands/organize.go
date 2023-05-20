@@ -93,7 +93,7 @@ func (c *Organize) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error
 			mwk := tl.GetMetadateiWithKennung()
 
 			if h, ok := mwk.Kennung.(*kennung.Hinweis); ok {
-				if *h, err = u.StoreObjekten().GetAbbrStore().ExpandHinweisString(
+				if *h, err = u.StoreObjekten().GetAbbrStore().Hinweis().ExpandString(
 					h.String(),
 				); err != nil {
 					err = errors.Wrap(err)

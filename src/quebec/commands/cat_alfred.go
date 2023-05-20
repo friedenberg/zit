@@ -53,7 +53,7 @@ func (c CatAlfred) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error
 
 	if aw, err = alfred.New(
 		wo,
-		u.StoreObjekten().GetAbbrStore().AbbreviateHinweis,
+		u.StoreObjekten().GetAbbrStore().Hinweis().Abbreviate,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

@@ -22,9 +22,9 @@ import (
 type AbbrStore interface {
 	Hinweis() AbbrStoreGeneric[kennung.Hinweis]
 
-	HinweisExists(kennung.Hinweis) error
-	ExpandHinweisString(string) (kennung.Hinweis, error)
-	AbbreviateHinweis(kennung.Hinweis) (string, error)
+	// HinweisExists(kennung.Hinweis) error
+	// ExpandHinweisString(string) (kennung.Hinweis, error)
+	// AbbreviateHinweis(kennung.Hinweis) (string, error)
 
 	ExpandShaString(string) (sha.Sha, error)
 	AbbreviateSha(schnittstellen.ValueLike) (string, error)

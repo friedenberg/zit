@@ -30,7 +30,7 @@ func (c CommitOrganizeFile) Run(
 	if cs, err = changes.ChangesFrom(
 		a,
 		b,
-		store.GetAbbrStore().ExpandHinweisString,
+		store.GetAbbrStore().Hinweis().ExpandString,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -43,7 +43,9 @@ func (c CommitOrganizeFile) Run(
 	_ = func(hString string) (z metadatei.WithKennung, err error) {
 		var h kennung.Hinweis
 
-		if h, err = store.GetAbbrStore().ExpandHinweisString(hString); err != nil {
+		if h, err = store.GetAbbrStore().Hinweis().ExpandString(
+			hString,
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

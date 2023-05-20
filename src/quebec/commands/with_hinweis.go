@@ -29,7 +29,9 @@ func (c commandWithHinweis) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	var h kennung.Hinweis
 	v := args[0]
 
-	if h, err = u.StoreObjekten().GetAbbrStore().ExpandHinweisString(v); err != nil {
+	if h, err = u.StoreObjekten().GetAbbrStore().Hinweis().ExpandString(
+		v,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

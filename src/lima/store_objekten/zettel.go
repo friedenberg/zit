@@ -647,7 +647,7 @@ func (s *zettelStore) Inherit(tz *zettel.Transacted) (err error) {
 
 	s.StoreUtil.CommitTransacted2(tz)
 
-	errExists := s.StoreUtil.GetAbbrStore().HinweisExists(tz.Sku.Kennung)
+	errExists := s.StoreUtil.GetAbbrStore().Hinweis().Exists(tz.Sku.Kennung)
 
 	if err = s.writeNamedZettelToIndex(tz); err != nil {
 		err = errors.Wrap(err)
@@ -681,7 +681,7 @@ func (s *zettelStore) ReindexOne(
 	objekte.CorrectAkteShaWith(tz, tz)
 
 	o = tz
-	errExists := s.StoreUtil.GetAbbrStore().HinweisExists(tz.Sku.Kennung)
+	errExists := s.StoreUtil.GetAbbrStore().Hinweis().Exists(tz.Sku.Kennung)
 
 	if err = s.writeNamedZettelToIndex(tz); err != nil {
 		err = errors.Wrap(err)

@@ -11,7 +11,9 @@ type GetHinweisenFromArgs struct {
 }
 
 func (u GetHinweisenFromArgs) RunOne(v string) (h kennung.Hinweis, err error) {
-	if h, err = u.StoreObjekten().GetAbbrStore().ExpandHinweisString(v); err != nil {
+	if h, err = u.StoreObjekten().GetAbbrStore().Hinweis().ExpandString(
+		v,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

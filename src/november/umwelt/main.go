@@ -304,7 +304,7 @@ func (u *Umwelt) MakeKennungExpanders() kennung.Expanders {
 		},
 		Hinweis: func(v string) (out string, err error) {
 			var h kennung.Hinweis
-			h, err = u.StoreObjekten().GetAbbrStore().ExpandHinweisString(v)
+			h, err = u.StoreObjekten().GetAbbrStore().Hinweis().ExpandString(v)
 			out = h.String()
 			return
 		},
