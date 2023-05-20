@@ -491,7 +491,7 @@ func (s *Store) addEtikett(
 	etikettenExpanded := kennung.ExpandOneSlice(e, kennung.ExpanderRight)
 
 	for _, e1 := range etikettenExpanded {
-		if err = s.GetAbbrStore().EtikettExists(e1); err == nil {
+		if err = s.GetAbbrStore().Etiketten().Exists(e1); err == nil {
 			continue
 		}
 

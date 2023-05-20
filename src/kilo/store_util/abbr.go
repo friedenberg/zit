@@ -23,9 +23,7 @@ type AbbrStore interface {
 	Hinweis() AbbrStoreGeneric[kennung.Hinweis]
 	Kisten() AbbrStoreGeneric[kennung.Kasten]
 	Shas() AbbrStoreGeneric[sha.Sha]
-
-	ExpandEtikettString(string) (kennung.Etikett, error)
-	EtikettExists(kennung.Etikett) error
+	Etiketten() AbbrStoreGeneric[kennung.Etikett]
 
 	ExpandTypString(string) (kennung.Typ, error)
 	TypExists(kennung.Typ) error
@@ -38,7 +36,7 @@ type AbbrStore interface {
 type indexAbbrEncodableTridexes struct {
 	Shas      indexNotHinweis[sha.Sha, *sha.Sha]
 	Hinweis   indexHinweis
-	Etiketten schnittstellen.MutableTridex
+	Etiketten indexNotHinweis[kennung.Etikett, *kennung.Etikett]
 	Typen     schnittstellen.MutableTridex
 	Kisten    indexNotHinweis[kennung.Kasten, *kennung.Kasten]
 }
@@ -73,8 +71,10 @@ func newIndexAbbr(
 				Kopfen:    tridex.Make(),
 				Schwanzen: tridex.Make(),
 			},
-			Etiketten: tridex.Make(),
-			Typen:     tridex.Make(),
+			Etiketten: indexNotHinweis[kennung.Etikett, *kennung.Etikett]{
+				Kennungen: tridex.Make(),
+			},
+			Typen: tridex.Make(),
 			Kisten: indexNotHinweis[kennung.Kasten, *kennung.Kasten]{
 				Kennungen: tridex.Make(),
 			},
@@ -84,6 +84,7 @@ func newIndexAbbr(
 	i.indexAbbrEncodableTridexes.Hinweis.readFunc = i.readIfNecessary
 	i.indexAbbrEncodableTridexes.Kisten.readFunc = i.readIfNecessary
 	i.indexAbbrEncodableTridexes.Shas.readFunc = i.readIfNecessary
+	i.indexAbbrEncodableTridexes.Etiketten.readFunc = i.readIfNecessary
 
 	return
 }
@@ -182,7 +183,7 @@ func (i *indexAbbr) AddMatchable(o kennung.Matchable) (err error) {
 		i.indexAbbrEncodableTridexes.Typen.Add(to.Sku.Kennung.String())
 
 	case *etikett.Transacted:
-		i.indexAbbrEncodableTridexes.Etiketten.Add(to.Sku.Kennung.String())
+		i.indexAbbrEncodableTridexes.Etiketten.Kennungen.Add(to.Sku.Kennung.String())
 
 	case *kasten.Transacted:
 		i.indexAbbrEncodableTridexes.Kisten.Kennungen.Add(to.Sku.Kennung.String())
@@ -231,15 +232,13 @@ func (i *indexAbbr) Shas() (asg AbbrStoreGeneric[sha.Sha]) {
 	return
 }
 
-func (i *indexAbbr) EtikettExists(e kennung.Etikett) (err error) {
-	if err = i.readIfNecessary(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+func (i *indexAbbr) Etiketten() (asg AbbrStoreGeneric[kennung.Etikett]) {
+	asg = &i.indexAbbrEncodableTridexes.Etiketten
 
-	if !i.indexAbbrEncodableTridexes.Etiketten.ContainsExpansion(e.String()) {
-		err = objekte_store.ErrNotFound{Id: e}
-		return
+	if !i.GetKonfig().PrintAbbreviatedKennungen {
+		asg = indexNoAbbr[kennung.Etikett, *kennung.Etikett]{
+			AbbrStoreGeneric: asg,
+		}
 	}
 
 	return
@@ -268,15 +267,6 @@ func (i *indexAbbr) TypExists(t kennung.Typ) (err error) {
 	return
 }
 
-func (i *indexAbbr) ExpandEtikettString(s string) (e kennung.Etikett, err error) {
-	if e, err = kennung.MakeEtikett(s); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return i.ExpandEtikett(e)
-}
-
 func (i *indexAbbr) ExpandTyp(eAbbr kennung.Typ) (e kennung.Typ, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
@@ -284,29 +274,6 @@ func (i *indexAbbr) ExpandTyp(eAbbr kennung.Typ) (e kennung.Typ, err error) {
 	}
 
 	ex := i.indexAbbrEncodableTridexes.Typen.Expand(eAbbr.String())
-
-	if ex == "" {
-		// TODO-P4 should try to use the expansion if possible
-		ex = eAbbr.String()
-	}
-
-	if err = e.Set(ex); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (i *indexAbbr) ExpandEtikett(eAbbr kennung.Etikett) (e kennung.Etikett, err error) {
-	errors.Log().Print(eAbbr)
-
-	if err = i.readIfNecessary(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	ex := i.indexAbbrEncodableTridexes.Etiketten.Expand(eAbbr.String())
 
 	if ex == "" {
 		// TODO-P4 should try to use the expansion if possible

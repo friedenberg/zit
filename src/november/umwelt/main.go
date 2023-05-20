@@ -298,7 +298,7 @@ func (u *Umwelt) MakeKennungExpanders() kennung.Expanders {
 		},
 		Etikett: func(v string) (out string, err error) {
 			var e kennung.Etikett
-			e, err = u.StoreObjekten().GetAbbrStore().ExpandEtikettString(v)
+			e, err = u.StoreObjekten().GetAbbrStore().Etiketten().ExpandString(v)
 			out = e.String()
 			return
 		},

@@ -318,7 +318,7 @@ func (s *Store) ReadFiles(
 					}
 
 				case cwd.Etikett:
-					if err = s.storeObjekten.GetAbbrStore().EtikettExists(
+					if err = s.storeObjekten.GetAbbrStore().Etiketten().Exists(
 						il.Kennung,
 					); err == nil {
 						err = iter.MakeErrStopIteration()
