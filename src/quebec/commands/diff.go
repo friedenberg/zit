@@ -7,9 +7,9 @@ import (
 	"os/exec"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
@@ -51,10 +51,10 @@ func (c Diff) RunWithCwdQuery(
 		nil,
 	)
 
-	// fMetadatei := metadatei.MakeTextFormatterMetadateiOnly(
-	// 	u.StoreObjekten(),
-	// 	nil,
-	// )
+	fMetadatei := metadatei.MakeTextFormatterMetadateiOnly(
+		u.StoreObjekten(),
+		nil,
+	)
 
 	if err = u.StoreWorkingDirectory().ReadFiles(
 		cwdFiles,
@@ -66,37 +66,42 @@ func (c Diff) RunWithCwdQuery(
 				ok := false
 
 				if zco, ok = co.(*zettel.CheckedOut); !ok {
-					return
-				}
-
-				var pFifo string
-
-				if pFifo, err = u.Standort().FifoPipe(); err != nil {
-					err = errors.Wrap(err)
+					todo.Change("add support for other gattung")
 					return
 				}
 
 				wg := iter.MakeErrorWaitGroup()
 
-				wg.DoAfter(
-					func() (err error) {
-						return os.Remove(pFifo)
-					},
-				)
+				var rLeft, wLeft *os.File
 
+				if rLeft, wLeft, err = os.Pipe(); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				defer errors.DeferredCloser(&err, rLeft)
+
+				var rRight, wRight *os.File
+
+				if rRight, wRight, err = os.Pipe(); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				defer errors.DeferredCloser(&err, rRight)
+
+				todo.Change("support checkout mode")
 				wg.Do(
 					func() (err error) {
-						var f *os.File
+						defer errors.DeferredCloser(&err, wLeft)
 
-						// TODO-P1 figure out why ReadOnly causes this to hang. Is it the wg?
-						if f, err = files.OpenExclusiveWriteOnly(pFifo); err != nil {
-							err = errors.Wrap(err)
-							return
+						formatFunc := fInline.FormatMetadatei
+
+						if !u.Konfig().IsInlineTyp(zco.Internal.GetTyp()) {
+							formatFunc = fMetadatei.FormatMetadatei
 						}
 
-						defer errors.DeferredCloser(&err, f)
-
-						if _, err = fInline.FormatMetadatei(f, zco.Internal); err != nil {
+						if _, err = formatFunc(wLeft, zco.Internal); err != nil {
 							err = errors.Wrap(err)
 							return
 						}
@@ -105,15 +110,37 @@ func (c Diff) RunWithCwdQuery(
 					},
 				)
 
+				wg.Do(
+					func() (err error) {
+						defer errors.DeferredCloser(&err, wRight)
+
+						formatFunc := fInline.FormatMetadatei
+
+						if !u.Konfig().IsInlineTyp(zco.External.GetTyp()) {
+							formatFunc = fMetadatei.FormatMetadatei
+						}
+
+						if _, err = formatFunc(wRight, zco.External); err != nil {
+							err = errors.Wrap(err)
+							return
+						}
+
+						return
+					},
+				)
+
+				todo.Change("disambiguate internal and external, and objekte / akte")
 				cmd := exec.Command(
 					"diff",
 					"--color=always",
 					"-u",
 					"--label", fmt.Sprintf("%s@zettel", zco.Internal.Sku.Kennung),
-					pFifo,
-					co.GetExternalLike().GetObjekteFD().Path,
+					"--label", fmt.Sprintf("%s@zettel", zco.Internal.Sku.Kennung),
+					"/dev/fd/3",
+					"/dev/fd/4",
 				)
 
+				cmd.ExtraFiles = []*os.File{rLeft, rRight}
 				cmd.Stdout = u.Out()
 				cmd.Stderr = u.Err()
 
@@ -121,6 +148,7 @@ func (c Diff) RunWithCwdQuery(
 					func() (err error) {
 						if err = cmd.Run(); err != nil {
 							if cmd.ProcessState.ExitCode() == 1 {
+								todo.Change("return non-zero exit code")
 								err = nil
 							} else {
 								err = errors.Wrap(err)

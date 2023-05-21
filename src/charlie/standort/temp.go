@@ -6,6 +6,7 @@ import (
 	"path"
 	"strconv"
 	"syscall"
+	"time"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 )
@@ -51,6 +52,8 @@ func (s Standort) FileTempLocal() (f *os.File, err error) {
 }
 
 func (s Standort) FifoPipe() (p string, err error) {
+	rand.Seed(time.Now().UnixNano())
+
 	p = path.Join(
 		s.DirTempLocal(),
 		strconv.Itoa(rand.Int()),
