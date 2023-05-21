@@ -19,11 +19,7 @@ func New(options Options) (ot *Text, err error) {
 		panic("options not initialized")
 	}
 
-	if options.UseMetadateiHeader {
-		ot, err = options.Factory().Make()
-	} else {
-		ot, err = options.Factory().MakeWithoutMetadatei()
-	}
+	ot, err = options.Factory().Make()
 
 	return
 }

@@ -14,7 +14,17 @@ type Factory struct {
 	Options
 }
 
-func (atc *Factory) Make() (ot *Text, err error) {
+func (f *Factory) Make() (ot *Text, err error) {
+	if f.UseMetadateiHeader {
+		ot, err = f.makeWithMetadatei()
+	} else {
+		ot, err = f.makeWithoutMetadatei()
+	}
+
+	return
+}
+
+func (atc *Factory) makeWithMetadatei() (ot *Text, err error) {
 	ot = &Text{
 		Options:    atc.Options,
 		assignment: newAssignment(0),
@@ -58,7 +68,7 @@ func (atc *Factory) Make() (ot *Text, err error) {
 	return
 }
 
-func (f Factory) MakeWithoutMetadatei() (ot *Text, err error) {
+func (f Factory) makeWithoutMetadatei() (ot *Text, err error) {
 	if !f.Options.wasMade {
 		panic("options no initialized")
 	}
