@@ -20,7 +20,7 @@ func TestMetaSetGob(t1 *testing.T) {
 	{
 		sut := MakeMetaSet(
 			nil,
-			Expanders{},
+			Abbr{},
 			nil,
 			nil,
 			gattungen.MakeSet(

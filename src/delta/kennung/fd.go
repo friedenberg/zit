@@ -328,6 +328,10 @@ func (fd FD) KennungSansGattungClone() KennungSansGattung {
 	return fd
 }
 
+func (t FD) KennungSansGattungPtrClone() KennungSansGattungPtr {
+	return &t
+}
+
 func (fd FD) Parts() [3]string {
 	return [3]string{"", "", fd.String()}
 }

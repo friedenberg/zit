@@ -28,7 +28,7 @@ type MatcherBuilder struct {
 	implicitEtikettenGetter ImplicitEtikettenGetter
 	cwd                     Matcher
 	fileExtensionGetter     schnittstellen.FileExtensionGetter
-	expanders               Expanders
+	expanders               Abbr
 	hidden                  Matcher
 	defaultGattungen        gattungen.Set
 	gattung                 map[gattung.Gattung]Set
@@ -49,7 +49,7 @@ func (mb *MatcherBuilder) WithFileExtensionGetter(
 }
 
 func (mb *MatcherBuilder) WithExpanders(
-	expanders Expanders,
+	expanders Abbr,
 ) *MatcherBuilder {
 	mb.expanders = expanders
 	return mb

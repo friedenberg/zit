@@ -41,6 +41,7 @@ cat_yang() (
 cmd_zit_def=(
 	-abbreviate-hinweisen=false
 	-abbreviate-shas=false
+	-abbreviate-kennungen=false
 	-predictable-hinweisen
 	-print-typen=false
 	-print-time=false

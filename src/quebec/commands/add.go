@@ -89,6 +89,7 @@ func (c Add) RunWithCwdQuery(
 	}
 
 	otFlags := organize_text.MakeFlags()
+	u.ApplyToOrganizeOptions(&otFlags.Options)
 	// otFlags.Abbr = u.StoreObjekten().GetAbbrStore().AbbreviateHinweis
 	otFlags.RootEtiketten = c.Metadatei.Etiketten
 	mwk := objekte_collections.MakeMutableSetMetadateiWithKennung()

@@ -23,6 +23,7 @@ import (
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/india/konfig"
 	"github.com/friedenberg/zit/src/juliett/zettel"
+	"github.com/friedenberg/zit/src/kilo/organize_text"
 	"github.com/friedenberg/zit/src/kilo/store_util"
 	"github.com/friedenberg/zit/src/lima/store_objekten"
 	"github.com/friedenberg/zit/src/mike/store_fs"
@@ -287,14 +288,28 @@ func (u *Umwelt) MakeKennungHidden() kennung.Matcher {
 	return h
 }
 
-func (u *Umwelt) MakeKennungExpanders() kennung.Expanders {
-	return kennung.Expanders{
-		Sha:     u.StoreObjekten().GetAbbrStore().Shas().ExpandStringString,
-		Etikett: u.StoreObjekten().GetAbbrStore().Etiketten().ExpandStringString,
-		Typ:     u.StoreObjekten().GetAbbrStore().Typen().ExpandStringString,
-		Kasten:  u.StoreObjekten().GetAbbrStore().Kisten().ExpandStringString,
-		Hinweis: u.StoreObjekten().GetAbbrStore().Hinweis().ExpandStringString,
+func (u *Umwelt) MakeKennungExpanders() (out kennung.Abbr) {
+	out.Etikett.Expand = u.StoreObjekten().GetAbbrStore().Etiketten().ExpandStringString
+	out.Typ.Expand = u.StoreObjekten().GetAbbrStore().Typen().ExpandStringString
+	out.Kasten.Expand = u.StoreObjekten().GetAbbrStore().Kisten().ExpandStringString
+	out.Hinweis.Expand = u.StoreObjekten().GetAbbrStore().Hinweis().ExpandStringString
+	out.Sha.Expand = u.StoreObjekten().GetAbbrStore().Shas().ExpandStringString
+
+	if u.Konfig().PrintAbbreviatedKennungen {
+		out.Etikett.Abbreviate = u.StoreObjekten().GetAbbrStore().Etiketten().Abbreviate
+		out.Typ.Abbreviate = u.StoreObjekten().GetAbbrStore().Typen().Abbreviate
+		out.Kasten.Abbreviate = u.StoreObjekten().GetAbbrStore().Kisten().Abbreviate
 	}
+
+	if u.Konfig().PrintAbbreviatedHinweisen {
+		out.Hinweis.Abbreviate = u.StoreObjekten().GetAbbrStore().Hinweis().Abbreviate
+	}
+
+	if u.Konfig().PrintAbbreviatedShas {
+		out.Sha.Abbreviate = u.StoreObjekten().GetAbbrStore().Shas().Abbreviate
+	}
+
+	return
 }
 
 func (u *Umwelt) MakeMetaIdSet(
@@ -324,4 +339,9 @@ func (u *Umwelt) MakeIdSet(
 		cwd,
 		nil,
 	)
+}
+
+func (u *Umwelt) ApplyToOrganizeOptions(oo *organize_text.Options) {
+	oo.Konfig = u.Konfig()
+	oo.Expanders = u.MakeKennungExpanders()
 }

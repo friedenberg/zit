@@ -125,7 +125,7 @@ func (av assignmentLineWriter) writeRightAligned(a *assignment) (err error) {
 	for _, z := range sortObjSet(a.unnamed) {
 		av.WriteLines(
 			fmt.Sprintf("- %s%s", tab_prefix, z.Bezeichnung),
-    )
+		)
 	}
 
 	for _, z := range sortObjSet(a.named) {

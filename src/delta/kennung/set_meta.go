@@ -32,7 +32,7 @@ type MetaSet interface {
 type metaSet struct {
 	implicitEtikettenGetter ImplicitEtikettenGetter
 	fileExtensionGetter     schnittstellen.FileExtensionGetter
-	expanders               Expanders
+	expanders               Abbr
 
 	cwd    Matcher
 	Hidden Matcher
@@ -44,7 +44,7 @@ type metaSet struct {
 
 func MakeMetaSet(
 	cwd Matcher,
-	ex Expanders,
+	ex Abbr,
 	hidden Matcher,
 	feg schnittstellen.FileExtensionGetter,
 	dg gattungen.Set,
@@ -64,7 +64,7 @@ func MakeMetaSet(
 
 func MakeMetaSetAll(
 	cwd Matcher,
-	ex Expanders,
+	ex Abbr,
 	hidden Matcher,
 	feg schnittstellen.FileExtensionGetter,
 	implicitEtikettenGetter ImplicitEtikettenGetter,

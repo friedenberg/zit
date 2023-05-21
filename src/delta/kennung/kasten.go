@@ -116,6 +116,10 @@ func (t Kasten) KennungSansGattungClone() KennungSansGattung {
 	return t
 }
 
+func (t Kasten) KennungSansGattungPtrClone() KennungSansGattungPtr {
+	return &t
+}
+
 func (t Kasten) KennungClone() Kennung {
 	return t
 }

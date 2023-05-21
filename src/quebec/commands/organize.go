@@ -61,8 +61,7 @@ func (c *Organize) CompletionGattung() gattungen.Set {
 }
 
 func (c *Organize) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
-	c.Options.Konfig = u.Konfig()
-	// c.Options.Abbr = u.StoreObjekten().GetAbbrStore().AbbreviateHinweis
+  u.ApplyToOrganizeOptions(&c.Options)
 
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
 		Umwelt:  u,

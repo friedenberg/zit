@@ -66,6 +66,10 @@ func (t Tai) KennungSansGattungClone() KennungSansGattung {
 	return t
 }
 
+func (t Tai) KennungSansGattungPtrClone() KennungSansGattungPtr {
+	return &t
+}
+
 func (t Tai) KennungClone() Kennung {
 	return t
 }

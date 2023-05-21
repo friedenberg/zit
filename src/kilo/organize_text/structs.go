@@ -15,11 +15,19 @@ import (
 
 func makeObj(
 	named metadatei.WithKennung,
+	expanders kennung.Abbr,
 ) (z obj, err error) {
 	errors.TodoP4("add bez in a better way")
 	z = obj{
 		Kennung:     named.GetKennung(),
 		Bezeichnung: bezeichnung.Make(named.GetMetadatei().Description()),
+	}
+
+	if z.Kennung, err = expanders.AbbreviateKennung(
+		z.Kennung,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

@@ -50,7 +50,7 @@ func MakeSet(
 
 func tryAddMatcher(
 	s *Set,
-	expanders Expanders,
+	expanders Abbr,
 	implicitEtikettenGetter ImplicitEtikettenGetter,
 	v string,
 ) (err error) {
@@ -66,7 +66,7 @@ func tryAddMatcher(
 	{
 		var m Matcher
 
-		if m, err = MakeMatcher(&Sha{}, v, expanders.Sha); err == nil {
+		if m, err = MakeMatcher(&Sha{}, v, expanders.Sha.Expand); err == nil {
 			s.Matcher.Add(m)
 			return
 		}
@@ -84,7 +84,11 @@ func tryAddMatcher(
 	{
 		var m Matcher
 
-		if m, err = MakeMatcher(&Hinweis{}, v, expanders.Hinweis); err == nil {
+		if m, err = MakeMatcher(
+			&Hinweis{},
+			v,
+			expanders.Hinweis.Expand,
+		); err == nil {
 			s.Hinweisen.Add(m)
 			return
 		}
@@ -145,7 +149,7 @@ func tryAddMatcher(
 	{
 		var m Matcher
 
-		if m, err = MakeMatcher(&Typ{}, v, expanders.Typ); err == nil {
+		if m, err = MakeMatcher(&Typ{}, v, expanders.Typ.Expand); err == nil {
 			s.Matcher.Add(m)
 			return
 		}
@@ -154,7 +158,7 @@ func tryAddMatcher(
 	{
 		var m Matcher
 
-		if m, err = MakeMatcher(&Kasten{}, v, expanders.Kasten); err == nil {
+		if m, err = MakeMatcher(&Kasten{}, v, expanders.Kasten.Expand); err == nil {
 			s.Matcher.Add(m)
 			return
 		}

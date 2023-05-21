@@ -117,7 +117,7 @@ func (atc Factory) makeChildren(
 			func(e kennung.Etikett, tz metadatei.WithKennung) (err error) {
 				var z obj
 
-				if z, err = makeObj(tz); err != nil {
+				if z, err = makeObj(tz, atc.Expanders); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -142,7 +142,7 @@ func (atc Factory) makeChildren(
 		func(tz metadatei.WithKennung) (err error) {
 			var z obj
 
-			if z, err = makeObj(tz); err != nil {
+			if z, err = makeObj(tz, atc.Expanders); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

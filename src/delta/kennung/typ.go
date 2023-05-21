@@ -134,6 +134,10 @@ func (t Typ) KennungSansGattungClone() KennungSansGattung {
 	return t
 }
 
+func (t Typ) KennungSansGattungPtrClone() KennungSansGattungPtr {
+	return &t
+}
+
 func (t Typ) KennungClone() Kennung {
 	return t
 }

@@ -11,10 +11,6 @@ import (
 
 const QueryNegationOperator rune = '^'
 
-type Expanders struct {
-	Sha, Etikett, Hinweis, Typ, Kasten func(string) (string, error)
-}
-
 type QueryPrefixer interface {
 	GetQueryPrefix() string
 }
@@ -26,12 +22,14 @@ type KennungSansGattung interface {
 	Parts() [3]string
 	Matcher
 	KennungSansGattungClone() KennungSansGattung
+	KennungSansGattungPtrClone() KennungSansGattungPtr
 }
 
 type Kennung interface {
 	KennungSansGattung
 	schnittstellen.GattungGetter
 	KennungClone() Kennung
+	KennungPtrClone() KennungPtr
 }
 
 type KennungSansGattungPtr interface {

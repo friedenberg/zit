@@ -83,6 +83,10 @@ func (t Konfig) KennungSansGattungClone() KennungSansGattung {
 	return t
 }
 
+func (t Konfig) KennungSansGattungPtrClone() KennungSansGattungPtr {
+	return &t
+}
+
 func (t Konfig) KennungClone() Kennung {
 	return t
 }

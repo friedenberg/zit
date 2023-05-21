@@ -113,3 +113,7 @@ func (t *Sha) UnmarshalBinary(text []byte) (err error) {
 func (t Sha) KennungSansGattungClone() KennungSansGattung {
 	return t
 }
+
+func (t Sha) KennungSansGattungPtrClone() KennungSansGattungPtr {
+	return &t
+}
