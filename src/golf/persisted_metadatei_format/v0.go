@@ -21,7 +21,7 @@ func (f v0) FormatPersistentMetadatei(
 	m := c.GetMetadatei()
 	w := format.NewLineWriter()
 
-	if !m.Tai.IsZero() {
+	if fcit, ok := c.(FormatterContextIncludeTai); ok && fcit.IncludeTai() && !m.Tai.IsZero() {
 		w.WriteFormat("Tai %s", m.Tai)
 	}
 
