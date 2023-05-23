@@ -3,18 +3,23 @@ package commands
 import (
 	"flag"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
+	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/checkout_mode"
+	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/golf/objekte"
-	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
@@ -41,11 +46,6 @@ func (c Diff) RunWithCwdQuery(
 	ms kennung.MetaSet,
 	cwdFiles *cwd.CwdFiles,
 ) (err error) {
-	// e := zettel_external.MakeFileEncoderJustOpen(
-	// 	u.StoreObjekten(),
-	// 	u.Konfig(),
-	// )
-
 	fInline := metadatei.MakeTextFormatterMetadateiInlineAkte(
 		u.StoreObjekten(),
 		nil,
@@ -62,15 +62,17 @@ func (c Diff) RunWithCwdQuery(
 		iter.MakeChain(
 			objekte.MakeFilterFromMetaSet(ms),
 			func(co objekte.CheckedOutLike) (err error) {
-				var zco *zettel.CheckedOut
-				ok := false
+				wg := iter.MakeErrorWaitGroup()
 
-				if zco, ok = co.(*zettel.CheckedOut); !ok {
-					todo.Change("add support for other gattung")
+				il := co.GetInternalLike()
+				el := co.GetExternalLike()
+
+				var mode checkout_mode.Mode
+
+				if mode, err = el.GetFDs().GetCheckoutMode(); err != nil {
+					err = errors.Wrap(err)
 					return
 				}
-
-				wg := iter.MakeErrorWaitGroup()
 
 				var rLeft, wLeft *os.File
 
@@ -79,8 +81,6 @@ func (c Diff) RunWithCwdQuery(
 					return
 				}
 
-				defer errors.DeferredCloser(&err, rLeft)
-
 				var rRight, wRight *os.File
 
 				if rRight, wRight, err = os.Pipe(); err != nil {
@@ -88,54 +88,50 @@ func (c Diff) RunWithCwdQuery(
 					return
 				}
 
-				defer errors.DeferredCloser(&err, rRight)
+				// sameTyp := il.GetTyp().Equals(el.GetTyp())
+				internalInline := u.Konfig().IsInlineTyp(il.GetTyp())
+				externalInline := u.Konfig().IsInlineTyp(el.GetTyp())
 
-				todo.Change("support checkout mode")
-				wg.Do(
-					func() (err error) {
-						defer errors.DeferredCloser(&err, wLeft)
+				var externalFD kennung.FD
 
-						formatFunc := fInline.FormatMetadatei
+				switch {
+				case mode.IncludesObjekte():
+					if internalInline && externalInline {
+						wg.Do(c.makeDo(wLeft, fInline, il))
+						wg.Do(c.makeDo(wRight, fInline, el))
+					} else {
+						wg.Do(c.makeDo(wLeft, fMetadatei, il))
+						wg.Do(c.makeDo(wRight, fMetadatei, el))
+					}
 
-						if !u.Konfig().IsInlineTyp(zco.Internal.GetTyp()) {
-							formatFunc = fMetadatei.FormatMetadatei
-						}
+					externalFD = el.GetObjekteFD()
 
-						if _, err = formatFunc(wLeft, zco.Internal); err != nil {
-							err = errors.Wrap(err)
-							return
-						}
+				case internalInline && externalInline:
+					wg.Do(c.makeDoAkte(wLeft, u.StoreObjekten(), il.GetAkteSha()))
+					wg.Do(c.makeDoFD(wRight, el.GetAkteFD()))
+					externalFD = el.GetAkteFD()
 
-						return
-					},
+				default:
+					wg.Do(c.makeDo(wLeft, fMetadatei, il))
+					wg.Do(c.makeDo(wRight, fMetadatei, el))
+					externalFD = el.GetAkteFD()
+				}
+
+				internalLabel := fmt.Sprintf(
+					"%s:%s",
+					il.GetIdLike(),
+					strings.ToLower(il.GetGattung().GetGattungString()),
 				)
 
-				wg.Do(
-					func() (err error) {
-						defer errors.DeferredCloser(&err, wRight)
-
-						formatFunc := fInline.FormatMetadatei
-
-						if !u.Konfig().IsInlineTyp(zco.External.GetTyp()) {
-							formatFunc = fMetadatei.FormatMetadatei
-						}
-
-						if _, err = formatFunc(wRight, zco.External); err != nil {
-							err = errors.Wrap(err)
-							return
-						}
-
-						return
-					},
-				)
+				externalLabel := u.Standort().Rel(externalFD.Path)
 
 				todo.Change("disambiguate internal and external, and objekte / akte")
 				cmd := exec.Command(
 					"diff",
 					"--color=always",
 					"-u",
-					"--label", fmt.Sprintf("%s@zettel", zco.Internal.Sku.Kennung),
-					"--label", fmt.Sprintf("%s@zettel", zco.Internal.Sku.Kennung),
+					"--label", internalLabel,
+					"--label", externalLabel,
 					"/dev/fd/3",
 					"/dev/fd/4",
 				)
@@ -146,6 +142,9 @@ func (c Diff) RunWithCwdQuery(
 
 				wg.Do(
 					func() (err error) {
+						defer errors.DeferredCloser(&err, rLeft)
+						defer errors.DeferredCloser(&err, rRight)
+
 						if err = cmd.Run(); err != nil {
 							if cmd.ProcessState.ExitCode() == 1 {
 								todo.Change("return non-zero exit code")
@@ -170,4 +169,87 @@ func (c Diff) RunWithCwdQuery(
 	}
 
 	return
+}
+
+func (c Diff) makeDo(
+	w io.WriteCloser,
+	mf metadatei.TextFormatter,
+	m metadatei.TextFormatterContext,
+) schnittstellen.FuncError {
+	return func() (err error) {
+		defer errors.DeferredCloser(&err, w)
+
+		if _, err = mf.FormatMetadatei(w, m); err != nil {
+			if errors.IsBrokenPipe(err) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+			}
+
+			return
+		}
+
+		return
+	}
+}
+
+func (c Diff) makeDoAkte(
+	w io.WriteCloser,
+	arf schnittstellen.AkteReaderFactory,
+	sh schnittstellen.Sha,
+) schnittstellen.FuncError {
+	return func() (err error) {
+		defer errors.DeferredCloser(&err, w)
+
+		var ar sha.ReadCloser
+
+		if ar, err = arf.AkteReader(sh); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		defer errors.DeferredCloser(&err, ar)
+
+		if _, err = io.Copy(w, ar); err != nil {
+			if errors.IsBrokenPipe(err) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+			}
+
+			return
+		}
+
+		return
+	}
+}
+
+func (c Diff) makeDoFD(
+	w io.WriteCloser,
+	fd kennung.FD,
+) schnittstellen.FuncError {
+	return func() (err error) {
+		defer errors.DeferredCloser(&err, w)
+
+		var f *os.File
+
+		if f, err = files.OpenExclusiveReadOnly(fd.Path); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		defer errors.DeferredCloser(&err, f)
+
+		if _, err = io.Copy(w, f); err != nil {
+			if errors.IsBrokenPipe(err) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+			}
+
+			return
+		}
+
+		return
+	}
 }

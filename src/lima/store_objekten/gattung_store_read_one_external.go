@@ -19,7 +19,7 @@ func (s *commonStore[O, OPtr, K, KPtr, V, VPtr]) ReadOneExternal(
 ) (e objekte.External[O, OPtr, K, KPtr], err error) {
 	var m checkout_mode.Mode
 
-	if m, err = em.GetCheckoutMode(); err != nil {
+	if m, err = em.GetFDs().GetCheckoutMode(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

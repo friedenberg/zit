@@ -190,7 +190,7 @@ func (s *zettelStore) ReadOneExternal(
 ) (ez zettel.External, err error) {
 	var m checkout_mode.Mode
 
-	if m, err = e.GetCheckoutMode(); err != nil {
+	if m, err = e.GetFDs().GetCheckoutMode(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

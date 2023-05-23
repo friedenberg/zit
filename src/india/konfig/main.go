@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/standort"
@@ -336,6 +337,11 @@ func (c compiled) GetSortedTypenExpanded(
 }
 
 func (kc compiled) IsInlineTyp(k kennung.Typ) (isInline bool) {
+	todo.Change("fix this horrible hack")
+	if k.IsEmpty() {
+		return true
+	}
+
 	tc := kc.GetApproximatedTyp(k)
 
 	if !tc.HasValue() {

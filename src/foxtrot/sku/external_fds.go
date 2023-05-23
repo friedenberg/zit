@@ -1,6 +1,8 @@
 package sku
 
 import (
+	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/checkout_mode"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
@@ -24,4 +26,24 @@ func (a ExternalFDs) Equals(b ExternalFDs) bool {
 	}
 
 	return true
+}
+
+func (e ExternalFDs) GetCheckoutMode() (m checkout_mode.Mode, err error) {
+	switch {
+	case !e.Objekte.IsEmpty() && !e.Akte.IsEmpty():
+		m = checkout_mode.ModeObjekteAndAkte
+
+	case !e.Akte.IsEmpty():
+		m = checkout_mode.ModeAkteOnly
+
+	case !e.Objekte.IsEmpty():
+		m = checkout_mode.ModeObjekteOnly
+
+	default:
+		err = MakeErrInvalidCheckoutMode(
+			errors.Errorf("all FD's are empty"),
+		)
+	}
+
+	return
 }

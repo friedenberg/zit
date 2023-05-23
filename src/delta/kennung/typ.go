@@ -36,6 +36,10 @@ func MustTyp(v string) (t Typ) {
 	return
 }
 
+func (t Typ) IsEmpty() bool {
+	return t.value == ""
+}
+
 func (t *Typ) Reset() {
 	t.value = ""
 }

@@ -124,6 +124,10 @@ func (e External[T, T1, T2, T3]) GetGattung() schnittstellen.Gattung {
 	return e.Sku.Kennung.GetGattung()
 }
 
+func (e External[T, T1, T2, T3]) GetFDs() sku.ExternalFDs {
+	return e.Sku.FDs
+}
+
 func (e External[T, T1, T2, T3]) GetObjekteFD() kennung.FD {
 	return e.Sku.FDs.Objekte
 }

@@ -7,21 +7,62 @@ import (
 	"syscall"
 )
 
+func As(err error, target any) bool {
+	es := Split(err)
+
+	switch len(es) {
+	case 0:
+		return false
+
+	case 1:
+		return errors.As(Unwrap(es[0]), target)
+
+	default:
+		for _, e := range es {
+			if As(e, target) {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+func Is(err, target error) bool {
+	es := Split(err)
+
+	switch len(es) {
+	case 0:
+		return false
+
+	case 1:
+		return errors.Is(Unwrap(es[0]), target)
+
+	default:
+		for _, e := range es {
+			if Is(e, target) {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
 func IsErrno(err error, target syscall.Errno) (ok bool) {
 	var errno syscall.Errno
 
-	err = Unwrap(err)
-
-	if errno, ok = err.(syscall.Errno); ok {
-		ok = errno == target
+	if !As(err, &errno) {
+		return
 	}
+
+	ok = errno == target
 
 	return
 }
 
-func Is(err, target error) bool {
-	e := Unwrap(err)
-	return errors.Is(e, target)
+func IsBrokenPipe(err error) bool {
+	return IsErrno(err, syscall.EPIPE)
 }
 
 func IsTooManyOpenFiles(err error) bool {

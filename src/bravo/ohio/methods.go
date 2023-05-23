@@ -20,6 +20,7 @@ func WriteSeq[T any](
 
 	for _, s := range seq {
 		n1, err = s(w, e)
+
 		n += n1
 
 		if err != nil {

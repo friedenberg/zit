@@ -1,18 +1,13 @@
 package errors
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
-
-	"golang.org/x/xerrors"
 )
 
-var New = xerrors.New
-
-func As(err error, target interface{}) bool {
-	return xerrors.As(err, target)
-}
+var New = errors.New
 
 func unwrapOnce(err error) error {
 	if e, ok := err.(Unwrapper); ok {

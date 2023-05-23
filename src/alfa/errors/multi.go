@@ -120,7 +120,10 @@ func (e multi) Is(target error) (ok bool) {
 func (e multi) Errors() (out []error) {
 	e.lock.Lock()
 	defer e.lock.Unlock()
+
+	out = make([]error, len(e.slice))
 	copy(out, e.slice)
+
 	return
 }
 
@@ -140,7 +143,7 @@ func (e multi) Error() string {
 
 	sb := &strings.Builder{}
 
-	sb.WriteString("# Multiple Errors")
+	sb.WriteString(fmt.Sprintf("# %d Errors", len(e.slice)))
 	sb.WriteString("\n")
 
 	for i, err := range e.slice {

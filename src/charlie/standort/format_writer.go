@@ -8,6 +8,20 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
+func (s Standort) Rel(
+	p string,
+) (out string) {
+	out = p
+
+	p1, _ := filepath.Rel(s.cwd, p)
+
+	if p1 != "" {
+		out = p1
+	}
+
+	return
+}
+
 func (s Standort) MakeWriterRelativePath(
 	p string,
 ) schnittstellen.FuncWriter {

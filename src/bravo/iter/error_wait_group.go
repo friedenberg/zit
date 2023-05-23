@@ -10,14 +10,13 @@ import (
 type ErrorWaitGroup interface {
 	Do(schnittstellen.FuncError) bool
 	DoAfter(schnittstellen.FuncError)
-	Wait()
 	GetError() error
 }
 
 func MakeErrorWaitGroup() ErrorWaitGroup {
 	wg := &errorWaitGroup{
-		lock:    &sync.RWMutex{},
-		chDone:  make(chan struct{}),
+		lock:    &sync.Mutex{},
+		inner:   &sync.WaitGroup{},
 		err:     errors.MakeMulti(),
 		doAfter: make([]schnittstellen.FuncError, 0),
 	}
@@ -26,15 +25,16 @@ func MakeErrorWaitGroup() ErrorWaitGroup {
 }
 
 type errorWaitGroup struct {
-	lock       *sync.RWMutex
-	waitingFor int
-	chDone     chan struct{}
-	err        errors.Multi
-	doAfter    []schnittstellen.FuncError
+	lock    *sync.Mutex
+	inner   *sync.WaitGroup
+	err     errors.Multi
+	doAfter []schnittstellen.FuncError
+
+	isDone bool
 }
 
 func (wg *errorWaitGroup) GetError() (err error) {
-	wg.Wait()
+	wg.wait()
 
 	me := errors.MakeMulti(wg.err)
 
@@ -58,7 +58,7 @@ func ErrorWaitGroupApply[T any](
 ) (d bool) {
 	if err := s.Each(
 		func(e T) (err error) {
-			if wg.Do(
+			if !wg.Do(
 				func() error {
 					return f(e)
 				},
@@ -77,19 +77,21 @@ func ErrorWaitGroupApply[T any](
 
 func (wg *errorWaitGroup) Do(f schnittstellen.FuncError) (d bool) {
 	wg.lock.Lock()
-	defer wg.lock.Unlock()
 
-	if wg.isDone() {
-		return true
+	if wg.isDone {
+		wg.lock.Unlock()
+		return false
 	}
 
-	wg.waitingFor += 1
+	wg.lock.Unlock()
+
+	wg.inner.Add(1)
 
 	go func() {
 		wg.doneWith(f())
 	}()
 
-	return false
+	return true
 }
 
 func (wg *errorWaitGroup) DoAfter(f schnittstellen.FuncError) {
@@ -102,40 +104,18 @@ func (wg *errorWaitGroup) DoAfter(f schnittstellen.FuncError) {
 }
 
 func (wg *errorWaitGroup) doneWith(err error) {
-	wg.lock.Lock()
-	defer wg.lock.Unlock()
-
-	previouslyWaitingForNeedsClose := wg.waitingFor > 0
+	wg.inner.Done()
 
 	if err != nil {
 		wg.err.Add(err)
-		wg.waitingFor = 0
-	} else {
-		wg.waitingFor--
-	}
-
-	if wg.waitingFor == 0 && previouslyWaitingForNeedsClose {
-		close(wg.chDone)
 	}
 }
 
-func (wg *errorWaitGroup) isDone() bool {
-	select {
-	case <-wg.chDone:
-		return true
+func (wg *errorWaitGroup) wait() {
+	wg.inner.Wait()
 
-	default:
-		return false
-	}
-}
+	wg.lock.Lock()
+	defer wg.lock.Unlock()
 
-func (wg *errorWaitGroup) IsDone() bool {
-	wg.lock.RLock()
-	defer wg.lock.RUnlock()
-
-	return wg.isDone()
-}
-
-func (wg *errorWaitGroup) Wait() {
-	<-wg.chDone
+	wg.isDone = true
 }
