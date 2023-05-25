@@ -5,7 +5,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/golf/objekte"
-	"github.com/friedenberg/zit/src/golf/persisted_metadatei_format"
+	"github.com/friedenberg/zit/src/golf/objekte_format"
 )
 
 type ObjekteSaver interface {
@@ -15,12 +15,12 @@ type ObjekteSaver interface {
 
 type objekteSaver struct {
 	writerFactory schnittstellen.ObjekteWriterFactory
-	formatter     persisted_metadatei_format.Format
+	formatter     objekte_format.Format
 }
 
 func MakeObjekteSaver(
 	writerFactory schnittstellen.ObjekteWriterFactory,
-	pmf persisted_metadatei_format.Format,
+	pmf objekte_format.Format,
 ) ObjekteSaver {
 	if writerFactory == nil {
 		panic("schnittstellen.ObjekteWriterFactory was nil")
@@ -74,7 +74,7 @@ func (h objekteSaver) SaveObjekteIncludeTai(
 
 	if _, err = h.formatter.FormatPersistentMetadatei(
 		w,
-		persisted_metadatei_format.MakeFormatterContextIncludeTai(
+		objekte_format.MakeFormatterContextIncludeTai(
 			tl,
 			true,
 		),

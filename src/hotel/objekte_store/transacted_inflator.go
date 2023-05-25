@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
-	"github.com/friedenberg/zit/src/golf/persisted_metadatei_format"
+	"github.com/friedenberg/zit/src/golf/objekte_format"
 )
 
 type TransactedDataIdentityInflator[T any] interface {
@@ -46,7 +46,7 @@ type transactedInflator[
 ] struct {
 	of                        schnittstellen.ObjekteIOFactory
 	af                        schnittstellen.AkteIOFactory
-	persistentMetadateiFormat persisted_metadatei_format.Format
+	persistentMetadateiFormat objekte_format.Format
 	akteFormat                objekte.AkteFormat[T, T1]
 	pool                      schnittstellen.Pool[
 		objekte.Transacted[T, T1, T2, T3, T4, T5],
@@ -64,7 +64,7 @@ func MakeTransactedInflator[
 ](
 	of schnittstellen.ObjekteIOFactory,
 	af schnittstellen.AkteIOFactory,
-	persistentMetadateiFormat persisted_metadatei_format.Format,
+	persistentMetadateiFormat objekte_format.Format,
 	akteFormat objekte.AkteFormat[T, T1],
 	pool schnittstellen.Pool[
 		objekte.Transacted[T, T1, T2, T3, T4, T5],

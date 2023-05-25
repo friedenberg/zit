@@ -13,7 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
-	"github.com/friedenberg/zit/src/golf/persisted_metadatei_format"
+	"github.com/friedenberg/zit/src/golf/objekte_format"
 )
 
 type FormatterValue struct {
@@ -126,7 +126,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		}
 
 	case "objekte":
-		f := persisted_metadatei_format.FormatForVersion(k.GetStoreVersion())
+		f := objekte_format.FormatForVersion(k.GetStoreVersion())
 
 		return func(tl TransactedLikePtr) (err error) {
 			if _, err = f.FormatPersistentMetadatei(out, tl); err != nil {

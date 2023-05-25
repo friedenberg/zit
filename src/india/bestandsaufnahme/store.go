@@ -12,7 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte"
-	"github.com/friedenberg/zit/src/golf/persisted_metadatei_format"
+	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 )
 
@@ -40,7 +40,7 @@ type store struct {
 	of                        schnittstellen.ObjekteIOFactory
 	af                        schnittstellen.AkteIOFactory
 	pool                      schnittstellen.Pool[Akte, *Akte]
-	persistentMetadateiFormat persisted_metadatei_format.Format
+	persistentMetadateiFormat objekte_format.Format
 	formatAkte
 	objekte_store.ObjekteSaver
 	AkteTextSaver
@@ -50,7 +50,7 @@ func MakeStore(
 	standort standort.Standort,
 	of schnittstellen.ObjekteIOFactory,
 	af schnittstellen.AkteIOFactory,
-	pmf persisted_metadatei_format.Format,
+	pmf objekte_format.Format,
 ) (s *store, err error) {
 	p := collections.MakePool[Akte]()
 	fa := formatAkte{

@@ -1,4 +1,4 @@
-package persisted_metadatei_format
+package objekte_format
 
 import (
 	"bufio"
@@ -12,9 +12,9 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
-type v1 struct{}
+type v0 struct{}
 
-func (f v1) FormatPersistentMetadatei(
+func (f v0) FormatPersistentMetadatei(
 	w1 io.Writer,
 	c FormatterContext,
 ) (n int64, err error) {
@@ -43,7 +43,7 @@ func (f v1) FormatPersistentMetadatei(
 	return
 }
 
-func (f v1) ParsePersistentMetadatei(
+func (f v0) ParsePersistentMetadatei(
 	r1 io.Reader,
 	c ParserContext,
 ) (n int64, err error) {
@@ -53,9 +53,7 @@ func (f v1) ParsePersistentMetadatei(
 
 	r := bufio.NewReader(r1)
 
-	typLineReader := m.Typ.Set
-
-	typLineReader = format.MakeLineReaderIgnoreErrors(typLineReader)
+	typLineReader := format.MakeLineReaderIgnoreErrors(m.Typ.Set)
 
 	esa := collections.MakeFuncSetString[kennung.Etikett, *kennung.Etikett](
 		etiketten,
@@ -63,21 +61,21 @@ func (f v1) ParsePersistentMetadatei(
 
 	var g gattung.Gattung
 
-	lineReaders := format.MakeLineReaderIterate(
-		g.Set,
-		format.MakeLineReaderKeyValues(
-			map[string]schnittstellen.FuncSetString{
-				"Tai":                        m.Tai.Set,
-				gattung.Akte.String():        m.AkteSha.Set,
-				gattung.Typ.String():         typLineReader,
-				gattung.AkteTyp.String():     typLineReader,
-				gattung.Bezeichnung.String(): m.Bezeichnung.Set,
-				gattung.Etikett.String():     esa,
-			},
+	lr := format.MakeLineReaderConsumeEmpty(
+		format.MakeLineReaderIterate(
+			g.Set,
+			format.MakeLineReaderKeyValues(
+				map[string]schnittstellen.FuncSetString{
+					"Tai":                        m.Tai.Set,
+					gattung.Akte.String():        m.AkteSha.Set,
+					gattung.Typ.String():         typLineReader,
+					gattung.AkteTyp.String():     typLineReader,
+					gattung.Bezeichnung.String(): m.Bezeichnung.Set,
+					gattung.Etikett.String():     esa,
+				},
+			),
 		),
 	)
-
-	lr := format.MakeLineReaderConsumeEmpty(lineReaders)
 
 	if n, err = lr.ReadFrom(r); err != nil {
 		err = errors.Wrap(err)

@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
-	"github.com/friedenberg/zit/src/golf/persisted_metadatei_format"
+	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/kilo/store_util"
 )
@@ -21,7 +21,7 @@ type gattungStoreLike interface {
 	GetInheritor(
 		schnittstellen.ObjekteReaderFactory,
 		schnittstellen.AkteReaderFactory,
-		persisted_metadatei_format.Format,
+		objekte_format.Format,
 	) objekte_store.TransactedInheritor
 }
 
@@ -124,7 +124,7 @@ type commonStoreBase[
 
 	objekte_store.LogWriter[*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]]
 
-	persistentMetadateiFormat persisted_metadatei_format.Format
+	persistentMetadateiFormat objekte_format.Format
 
 	objekte_store.ObjekteSaver
 
@@ -144,7 +144,7 @@ func makeCommonStoreBase[
 	sa store_util.StoreUtil,
 	tr objekte_store.TransactedReader[KPtr,
 		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]],
-	pmf persisted_metadatei_format.Format,
+	pmf objekte_format.Format,
 	akteFormat objekte.AkteFormat[O, OPtr],
 ) (s *commonStoreBase[O, OPtr, K, KPtr, V, VPtr], err error) {
 	// type T objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]
@@ -177,7 +177,7 @@ func makeCommonStoreBase[
 		](
 			of,
 			sa,
-			persisted_metadatei_format.FormatForVersion(
+			objekte_format.FormatForVersion(
 				sa.GetKonfig().GetStoreVersion(),
 			),
 			akteFormat,
@@ -286,7 +286,7 @@ func (s *commonStoreBase[O, OPtr, K, KPtr, V, VPtr]) Inherit(
 func (s *commonStoreBase[O, OPtr, K, KPtr, V, VPtr]) GetInheritor(
 	orf schnittstellen.ObjekteReaderFactory,
 	arf schnittstellen.AkteReaderFactory,
-	pmf persisted_metadatei_format.Format,
+	pmf objekte_format.Format,
 ) objekte_store.TransactedInheritor {
 	p := collections.MakePool[
 		objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],

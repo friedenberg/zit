@@ -39,7 +39,7 @@ function last_after_typ_mutate { # @test
 		[!md@acbfc0e07b1be4bf1b12020d8316fe9629518b015041b7120db5a9f2012c84fa]
 	EOM
 
-	run bash -c 'find .zit/Objekten/Bestandsaufnahme -type f | wc -l'
+	run bash -c 'find .zit/Objekten/Bestandsaufnahme -type f | wc -l | tr -d " "'
 	assert_success
 	assert_output '3'
 

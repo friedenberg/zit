@@ -12,7 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/golf/objekte"
-	"github.com/friedenberg/zit/src/golf/persisted_metadatei_format"
+	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/india/konfig"
 )
@@ -129,7 +129,7 @@ func (fv *FormatterValue) FuncFormatter(
 		}
 
 	case "objekte":
-		f := persisted_metadatei_format.FormatForVersion(k.GetStoreVersion())
+		f := objekte_format.FormatForVersion(k.GetStoreVersion())
 
 		return func(o *Transacted) (err error) {
 			if _, err = f.FormatPersistentMetadatei(out, o); err != nil {

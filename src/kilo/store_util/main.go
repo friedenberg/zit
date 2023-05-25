@@ -17,7 +17,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/kennung_index"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
-	"github.com/friedenberg/zit/src/golf/persisted_metadatei_format"
+	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/india/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/india/konfig"
@@ -49,7 +49,7 @@ type StoreUtil interface {
 	SetMatchableAdder(kennung.MatchableAdder)
 	kennung.MatchableAdder
 
-	persisted_metadatei_format.Getter
+	objekte_format.Getter
 
 	ObjekteReaderWriterFactory(
 		schnittstellen.GattungGetter,
@@ -65,7 +65,7 @@ type common struct {
 	transaktion               transaktion.Transaktion
 	bestandsaufnahmeAkte      bestandsaufnahme.Akte
 	Abbr                      AbbrStore
-	persistentMetadateiFormat persisted_metadatei_format.Format
+	persistentMetadateiFormat objekte_format.Format
 
 	bestandsaufnahmeStore bestandsaufnahme.Store
 	kennungIndex          kennung_index.Index
@@ -78,7 +78,7 @@ func MakeStoreUtil(
 	a age.Age,
 	k *konfig.Compiled,
 	st standort.Standort,
-	pmf persisted_metadatei_format.Format,
+	pmf objekte_format.Format,
 ) (c *common, err error) {
 	c = &common{
 		LockSmith:                 lockSmith,
@@ -139,7 +139,7 @@ func (s common) GetLockSmith() schnittstellen.LockSmith {
 	return s.LockSmith
 }
 
-func (s common) GetPersistentMetadateiFormat() persisted_metadatei_format.Format {
+func (s common) GetPersistentMetadateiFormat() objekte_format.Format {
 	return s.persistentMetadateiFormat
 }
 

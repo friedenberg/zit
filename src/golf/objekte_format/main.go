@@ -1,4 +1,4 @@
-package persisted_metadatei_format
+package objekte_format
 
 import (
 	"io"

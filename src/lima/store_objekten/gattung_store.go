@@ -13,7 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
-	"github.com/friedenberg/zit/src/golf/persisted_metadatei_format"
+	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/kilo/store_util"
 )
@@ -146,7 +146,7 @@ func makeCommonStore[
 		delegate,
 		sa,
 		tr,
-		persisted_metadatei_format.FormatForVersion(
+		objekte_format.FormatForVersion(
 			sa.GetKonfig().GetStoreVersion(),
 		),
 		akteFormat,

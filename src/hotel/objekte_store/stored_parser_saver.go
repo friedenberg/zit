@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
-	"github.com/friedenberg/zit/src/golf/persisted_metadatei_format"
+	"github.com/friedenberg/zit/src/golf/objekte_format"
 )
 
 type StoredParseSaver[
@@ -45,7 +45,7 @@ func MakeStoredParseSaver[
 	owf schnittstellen.ObjekteIOFactory,
 	awf schnittstellen.AkteIOFactory,
 	akteParser objekte.AkteParseSaver[OPtr],
-	pmf persisted_metadatei_format.Format,
+	pmf objekte_format.Format,
 ) storedParserSaver[O, OPtr, K, KPtr] {
 	if akteParser == nil {
 		akteParser = objekte.MakeNopAkteParseSaver[O, OPtr](awf)

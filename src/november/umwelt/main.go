@@ -15,7 +15,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/golf/persisted_metadatei_format"
+	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/hotel/etikett"
 	"github.com/friedenberg/zit/src/hotel/kasten"
@@ -180,7 +180,7 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 		*u.age,
 		u.KonfigPtr(),
 		u.standort,
-		persisted_metadatei_format.FormatForVersion(u.Konfig().GetStoreVersion()),
+		objekte_format.FormatForVersion(u.Konfig().GetStoreVersion()),
 	); err != nil {
 		err = errors.Wrapf(err, "failed to initialize store util")
 		return

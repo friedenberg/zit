@@ -13,7 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
-	"github.com/friedenberg/zit/src/golf/persisted_metadatei_format"
+	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/hotel/etikett"
@@ -185,7 +185,7 @@ func Make(
 func (s *Store) GetGattungInheritors(
 	ofg schnittstellen.ObjekteReaderFactoryGetter,
 	af schnittstellen.AkteReaderFactory,
-	pmf persisted_metadatei_format.Format,
+	pmf objekte_format.Format,
 ) (out map[gattung.Gattung]objekte_store.TransactedInheritor) {
 	out = make(map[gattung.Gattung]objekte_store.TransactedInheritor)
 
