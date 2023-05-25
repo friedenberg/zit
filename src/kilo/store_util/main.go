@@ -210,7 +210,10 @@ func (s common) objekteReader(
 ) (rc sha.ReadCloser, err error) {
 	var p string
 
-	if p, err = s.GetStandort().DirObjektenGattung(g); err != nil {
+	if p, err = s.GetStandort().DirObjektenGattung(
+		s.konfig.GetStoreVersion(),
+		g,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -234,7 +237,10 @@ func (s common) objekteWriter(
 ) (wc sha.WriteCloser, err error) {
 	var p string
 
-	if p, err = s.GetStandort().DirObjektenGattung(g); err != nil {
+	if p, err = s.GetStandort().DirObjektenGattung(
+		s.konfig.GetStoreVersion(),
+		g,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

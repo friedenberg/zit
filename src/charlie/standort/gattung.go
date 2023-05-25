@@ -11,6 +11,7 @@ import (
 
 // TODO-P4 switch to gattung-matched directories
 func (s Standort) DirObjektenGattung(
+	sv schnittstellen.StoreVersion,
 	g schnittstellen.GattungGetter,
 ) (p string, err error) {
 	switch g.GetGattung() {
@@ -43,11 +44,15 @@ func (s Standort) DirObjektenGattung(
 	return
 }
 
-func (s Standort) HasObjekte(g schnittstellen.GattungGetter, sh sha.ShaLike) (ok bool) {
+func (s Standort) HasObjekte(
+	sv schnittstellen.StoreVersion,
+	g schnittstellen.GattungGetter,
+	sh sha.ShaLike,
+) (ok bool) {
 	var d string
 	var err error
 
-	if d, err = s.DirObjektenGattung(g); err != nil {
+	if d, err = s.DirObjektenGattung(sv, g); err != nil {
 		return
 	}
 
@@ -57,11 +62,14 @@ func (s Standort) HasObjekte(g schnittstellen.GattungGetter, sh sha.ShaLike) (ok
 	return
 }
 
-func (s Standort) HasAkte(sh sha.ShaLike) (ok bool) {
+func (s Standort) HasAkte(
+	sv schnittstellen.StoreVersion,
+	sh sha.ShaLike,
+) (ok bool) {
 	var d string
 	var err error
 
-	if d, err = s.DirObjektenGattung(gattung.Akte); err != nil {
+	if d, err = s.DirObjektenGattung(sv, gattung.Akte); err != nil {
 		return
 	}
 
@@ -151,12 +159,13 @@ func (s Standort) ReadAllShas(
 }
 
 func (s Standort) ReadAllShasForGattung(
+	sv schnittstellen.StoreVersion,
 	g schnittstellen.GattungGetter,
 	w schnittstellen.FuncIter[sha.Sha],
 ) (err error) {
 	var p string
 
-	if p, err = s.DirObjektenGattung(g); err != nil {
+	if p, err = s.DirObjektenGattung(sv, g); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -83,7 +83,11 @@ func (op Server) GetNeededSkus(
 			continue
 		}
 
-		if op.umwelt.Standort().HasObjekte(sk.Gattung, sk.ObjekteSha) {
+		if op.umwelt.Standort().HasObjekte(
+			op.umwelt.Konfig().GetStoreVersion(),
+			sk.Gattung,
+			sk.ObjekteSha,
+		) {
 			errors.Log().Printf("already have objekte: %s", sk.ObjekteSha)
 			return
 		}

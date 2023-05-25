@@ -51,7 +51,10 @@ func (u *Umwelt) Einleitung(e Einleitung) (err error) {
 	for _, g := range gattung.All() {
 		var d string
 
-		if d, err = s.DirObjektenGattung(g); err != nil {
+		if d, err = s.DirObjektenGattung(
+			e.Angeboren.GetStoreVersion(),
+			g,
+		); err != nil {
 			if gattung.IsErrUnsupportedGattung(err) {
 				err = nil
 				continue

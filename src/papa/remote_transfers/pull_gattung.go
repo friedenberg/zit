@@ -29,7 +29,11 @@ func (c *client) PullSkus(
 
 			errors.TodoP2("check for akte sha")
 
-			if c.umwelt.Standort().HasObjekte(sk.Gattung, sk.ObjekteSha) {
+			if c.umwelt.Standort().HasObjekte(
+				c.umwelt.Konfig().GetStoreVersion(),
+				sk.Gattung,
+				sk.ObjekteSha,
+			) {
 				errors.Log().Printf("already have objekte: %s", sk.ObjekteSha)
 				return
 			}

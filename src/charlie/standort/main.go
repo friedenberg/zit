@@ -110,6 +110,10 @@ func (s Standort) DirObjekten(p ...string) string {
 	return s.DirZit(append([]string{"Objekten"}, p...)...)
 }
 
+func (s Standort) DirObjekten2(p ...string) string {
+	return s.DirZit(append([]string{"Objekten2"}, p...)...)
+}
+
 func (s Standort) DirVerlorenUndGefunden() string {
 	return s.DirZit("Verloren+Gefunden")
 }

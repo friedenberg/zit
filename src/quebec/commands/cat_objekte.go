@@ -64,6 +64,7 @@ func (c CatObjekte) akten(
 	)
 
 	if err = u.Standort().ReadAllShasForGattung(
+		u.Konfig().GetStoreVersion(),
 		gattung.Akte,
 		iter.MakeChain(
 			collections.WriterContainer(shas, collections.MakeErrStopIteration()),
