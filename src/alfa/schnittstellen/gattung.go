@@ -3,6 +3,7 @@ package schnittstellen
 type Gattung interface {
 	Element
 	GetGattungString() string
+	GetGattungStringPlural() string
 	GattungGetter
 }
 

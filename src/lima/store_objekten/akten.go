@@ -4,6 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/id"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections"
@@ -21,6 +22,16 @@ func (s Store) ReadAllMatchingAkten(
 		},
 	)
 
+	var pa string
+
+	if pa, err = s.GetStandort().DirObjektenGattung(
+		s.GetKonfig().GetStoreVersion(),
+		gattung.Akte,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if err = akten.Each(
 		iter.MakeChain(
 			func(fd kennung.FD) (err error) {
@@ -28,7 +39,7 @@ func (s Store) ReadAllMatchingAkten(
 					return iter.MakeErrStopIteration()
 				}
 
-				p := id.Path(fd.Sha, s.StoreUtil.GetStandort().DirObjektenAkten())
+				p := id.Path(fd.Sha, pa)
 
 				if !files.Exists(p) {
 					return iter.MakeErrStopIteration()

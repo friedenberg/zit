@@ -98,6 +98,40 @@ func (g Gattung) IsTrueGattung() bool {
 	}
 }
 
+func (g Gattung) GetGattungStringPlural() string {
+	switch g {
+	case Akte:
+		return "Akten"
+
+	case Typ:
+		return "Typen"
+
+	case Etikett:
+		return "Etiketten"
+
+	case Zettel:
+		return "Zettelen"
+
+	case Bezeichnung:
+		return "Bezeichnungen"
+
+	case Hinweis:
+		return "Hinweisen"
+
+	case Kennung:
+		return "Kennungen"
+
+	case Bestandsaufnahme:
+		return "Bestandsaufnahmen"
+
+	case Kasten:
+		return "Kisten"
+
+	default:
+		return g.String()
+	}
+}
+
 func (g Gattung) String() string {
 	errors.TodoP1("move Bezeichnung, AkteTyp, Kennung, Transaktion, to another place")
 	switch g {

@@ -9,32 +9,52 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 )
 
-// TODO-P4 switch to gattung-matched directories
 func (s Standort) DirObjektenGattung(
 	sv schnittstellen.StoreVersion,
 	g schnittstellen.GattungGetter,
 ) (p string, err error) {
+	switch sv.Int() {
+	case 0, 1:
+		return s.dirObjektenGattung(g)
+
+	default:
+		return s.dirObjektenGattung2(g)
+	}
+}
+
+func (s Standort) dirObjektenGattung2(
+	g1 schnittstellen.GattungGetter,
+) (p string, err error) {
+	g := g1.GetGattung()
+	p = s.DirObjekten2(g.GetGattungStringPlural())
+
+	return
+}
+
+func (s Standort) dirObjektenGattung(
+	g schnittstellen.GattungGetter,
+) (p string, err error) {
 	switch g.GetGattung() {
 	case gattung.Akte:
-		p = s.DirObjektenAkten()
+		p = s.DirObjekten("Akten")
 
 	case gattung.Konfig:
-		p = s.DirObjektenKonfig()
+		p = s.DirObjekten("Konfig")
 
 	case gattung.Etikett:
-		p = s.DirObjektenEtiketten()
+		p = s.DirObjekten("Etiketten")
 
 	case gattung.Typ:
-		p = s.DirObjektenTypen()
+		p = s.DirObjekten("Typen")
 
 	case gattung.Zettel:
-		p = s.DirObjektenZettelen()
+		p = s.DirObjekten("Zettelen")
 
 	case gattung.Bestandsaufnahme:
-		p = s.DirObjektenBestandsaufnahme()
+		p = s.DirObjekten("Bestandsaufnahme")
 
 	case gattung.Kasten:
-		p = s.DirObjektenKasten()
+		p = s.DirObjekten("Kasten")
 
 	default:
 		err = gattung.MakeErrUnsupportedGattung(g)
@@ -79,40 +99,8 @@ func (s Standort) HasAkte(
 	return
 }
 
-func (s Standort) DirObjektenKennungen() string {
-	return s.DirObjekten("Kennungen")
-}
-
-func (s Standort) DirObjektenZettelen() string {
-	return s.DirObjekten("Zettelen")
-}
-
-func (s Standort) DirObjektenBestandsaufnahme() string {
-	return s.DirObjekten("Bestandsaufnahme")
-}
-
-func (s Standort) DirObjektenKasten() string {
-	return s.DirObjekten("Kasten")
-}
-
-func (s Standort) DirObjektenKonfig() string {
-	return s.DirObjekten("Konfig")
-}
-
-func (s Standort) DirObjektenTypen() string {
-	return s.DirObjekten("Typen")
-}
-
-func (s Standort) DirObjektenEtiketten() string {
-	return s.DirObjekten("Etiketten")
-}
-
 func (s Standort) DirObjektenTransaktion() string {
 	return s.DirObjekten("Transaktion")
-}
-
-func (s Standort) DirObjektenAkten() string {
-	return s.DirObjekten("Akten")
 }
 
 func (s Standort) ReadAllLevel2Files(

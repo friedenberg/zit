@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/standort"
@@ -37,6 +38,7 @@ type AkteFormat = objekte.AkteFormat[
 
 type store struct {
 	standort                  standort.Standort
+	sv                        schnittstellen.StoreVersion
 	of                        schnittstellen.ObjekteIOFactory
 	af                        schnittstellen.AkteIOFactory
 	pool                      schnittstellen.Pool[Akte, *Akte]
@@ -48,6 +50,7 @@ type store struct {
 
 func MakeStore(
 	standort standort.Standort,
+	sv schnittstellen.StoreVersion,
 	of schnittstellen.ObjekteIOFactory,
 	af schnittstellen.AkteIOFactory,
 	pmf objekte_format.Format,
@@ -59,6 +62,7 @@ func MakeStore(
 
 	s = &store{
 		standort:                  standort,
+		sv:                        sv,
 		of:                        of,
 		af:                        af,
 		pool:                      p,
@@ -196,6 +200,16 @@ func (s *store) ReadLast() (max Transacted, err error) {
 }
 
 func (s *store) ReadAll(f schnittstellen.FuncIter[*Transacted]) (err error) {
+	var p string
+
+	if p, err = s.standort.DirObjektenGattung(
+		s.sv,
+		gattung.Bestandsaufnahme,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if err = files.ReadDirNamesLevel2(
 		func(p string) (err error) {
 			var o *Transacted
@@ -212,7 +226,7 @@ func (s *store) ReadAll(f schnittstellen.FuncIter[*Transacted]) (err error) {
 
 			return
 		},
-		s.standort.DirObjektenBestandsaufnahme(),
+		p,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

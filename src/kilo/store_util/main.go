@@ -115,6 +115,7 @@ func MakeStoreUtil(
 
 	if c.bestandsaufnahmeStore, err = bestandsaufnahme.MakeStore(
 		c.GetStandort(),
+		c.konfig.GetStoreVersion(),
 		c.ObjekteReaderWriterFactory(gattung.Bestandsaufnahme),
 		c,
 		pmf,
@@ -301,9 +302,19 @@ func (s common) WriteCloserVerzeichnisse(p string) (w sha.WriteCloser, err error
 func (s common) AkteWriter() (w sha.WriteCloser, err error) {
 	var outer age_io.Writer
 
+	var p string
+
+	if p, err = s.standort.DirObjektenGattung(
+		s.konfig.GetStoreVersion(),
+		gattung.Akte,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	mo := age_io.MoveOptions{
 		Age:                      s.Age,
-		FinalPath:                s.GetStandort().DirObjektenAkten(),
+		FinalPath:                p,
 		GenerateFinalPathFromSha: true,
 		LockFile:                 true,
 	}
@@ -324,7 +335,17 @@ func (s common) AkteReader(sh sha.ShaLike) (r sha.ReadCloser, err error) {
 		return
 	}
 
-	p := id.Path(sh.GetSha(), s.GetStandort().DirObjektenAkten())
+	var p string
+
+	if p, err = s.standort.DirObjektenGattung(
+		s.konfig.GetStoreVersion(),
+		gattung.Akte,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	p = id.Path(sh.GetSha(), p)
 
 	o := age_io.FileReadOptions{
 		Age:  s.Age,
