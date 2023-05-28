@@ -6,6 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/bravo/ohio"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
@@ -53,15 +54,15 @@ func (f v2) ParsePersistentMetadatei(
 	r := bufio.NewReader(r1)
 
 	lr := format.MakeLineReaderConsumeEmpty(
-		format.MakeLineReaderIterate(
-			format.MakeLineReaderKeyValue("Tai", m.Tai.Set),
-			format.MakeLineReaderKeyValue(gattung.Akte.String(), m.AkteSha.Set),
-			format.MakeLineReaderKeyValue(
+		ohio.MakeLineReaderIterate(
+			ohio.MakeLineReaderKeyValue("Tai", m.Tai.Set),
+			ohio.MakeLineReaderKeyValue(gattung.Akte.String(), m.AkteSha.Set),
+			ohio.MakeLineReaderKeyValue(
 				gattung.Typ.String(),
-				format.MakeLineReaderIgnoreErrors(m.Typ.Set),
+				ohio.MakeLineReaderIgnoreErrors(m.Typ.Set),
 			),
-			format.MakeLineReaderKeyValue(gattung.Bezeichnung.String(), m.Bezeichnung.Set),
-			format.MakeLineReaderKeyValue(
+			ohio.MakeLineReaderKeyValue(gattung.Bezeichnung.String(), m.Bezeichnung.Set),
+			ohio.MakeLineReaderKeyValue(
 				gattung.Etikett.String(),
 				collections.MakeFuncSetString[kennung.Etikett, *kennung.Etikett](
 					etiketten,

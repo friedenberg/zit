@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/bravo/ohio"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/delta/format"
@@ -27,7 +28,7 @@ func (sk *Sku) Set(line string) (err error) {
 	if _, err = format.ReadSep(
 		' ',
 		r,
-		format.MakeLineReaderIterateStrict(
+		ohio.MakeLineReaderIterateStrict(
 			sk.Tai.Set,
 			sk.Gattung.Set,
 			sk.Kennung.Set,
@@ -54,7 +55,7 @@ func (sk *Sku) setOld(line string) (err error) {
 	if _, err = format.ReadSep(
 		' ',
 		r,
-		format.MakeLineReaderIterateStrict(
+		ohio.MakeLineReaderIterateStrict(
 			sk.Gattung.Set,
 			sk.Tai.Set,
 			sk.Kennung.Set,

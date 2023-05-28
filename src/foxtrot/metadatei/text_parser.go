@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/bravo/ohio"
 	"github.com/friedenberg/zit/src/bravo/script_config"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
@@ -53,11 +54,11 @@ func (f textParser) ParseMetadatei(
 	var akteFD kennung.FD
 
 	lr := format.MakeLineReaderConsumeEmpty(
-		format.MakeLineReaderIterate(
-			format.MakeLineReaderKeyValues(
+		ohio.MakeLineReaderIterate(
+			ohio.MakeLineReaderKeyValues(
 				map[string]schnittstellen.FuncSetString{
 					"#": m.Bezeichnung.Set,
-					"%": format.MakeLineReaderNop(),
+					"%": ohio.MakeLineReaderNop(),
 					"-": collections.MakeFuncSetString[
 						kennung.Etikett,
 						*kennung.Etikett,

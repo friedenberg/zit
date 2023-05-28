@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/bravo/ohio"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
@@ -55,7 +56,7 @@ func (f v1) ParsePersistentMetadatei(
 
 	typLineReader := m.Typ.Set
 
-	typLineReader = format.MakeLineReaderIgnoreErrors(typLineReader)
+	typLineReader = ohio.MakeLineReaderIgnoreErrors(typLineReader)
 
 	esa := collections.MakeFuncSetString[kennung.Etikett, *kennung.Etikett](
 		etiketten,
@@ -63,9 +64,9 @@ func (f v1) ParsePersistentMetadatei(
 
 	var g gattung.Gattung
 
-	lineReaders := format.MakeLineReaderIterate(
+	lineReaders := ohio.MakeLineReaderIterate(
 		g.Set,
-		format.MakeLineReaderKeyValues(
+		ohio.MakeLineReaderKeyValues(
 			map[string]schnittstellen.FuncSetString{
 				"Tai":                        m.Tai.Set,
 				gattung.Akte.String():        m.AkteSha.Set,

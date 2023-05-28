@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/friedenberg/zit/src/bravo/ohio"
 	"github.com/friedenberg/zit/src/bravo/test_logz"
 	"github.com/friedenberg/zit/src/bravo/values"
 )
@@ -61,7 +62,7 @@ func TestLineReaderTwoReaders(t1 *testing.T) {
 
 	r := strings.NewReader(input)
 	sut := MakeLineReaderConsumeEmpty(
-		MakeLineReaderIterateStrict(
+		ohio.MakeLineReaderIterateStrict(
 			test_value_one.Match,
 			test_value_two.Match,
 		),
@@ -88,7 +89,7 @@ func TestLineReaderTwoReadersSad(t1 *testing.T) {
 
 	r := strings.NewReader(input)
 	sut := MakeLineReaderConsumeEmpty(
-		MakeLineReaderIterateStrict(
+		ohio.MakeLineReaderIterateStrict(
 			test_value_one.Match,
 			test_value_two.Match,
 		),

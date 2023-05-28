@@ -7,6 +7,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/ohio"
 )
 
 type lineReader struct {
@@ -101,7 +102,7 @@ func (lr lineReader) ReadFrom(r1 io.Reader) (n int64, err error) {
 		}
 
 		if err = lr.reader(line); err != nil {
-			err = errors.Wrap(ErrExhaustedFuncSetStringersWithDelim(err, lr.delim))
+			err = errors.Wrap(ohio.ErrExhaustedFuncSetStringersWithDelim(err, lr.delim))
 			return
 		}
 

@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/bravo/ohio"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/format"
@@ -107,7 +108,7 @@ func (t *Tai) Set(v string) (err error) {
 
 	r := format.MakeDelimReaderConsumeEmpty(
 		'.',
-		format.MakeLineReaderIterateStrict(
+		ohio.MakeLineReaderIterateStrict(
 			func(v string) (err error) {
 				v = strings.TrimSpace(v)
 
