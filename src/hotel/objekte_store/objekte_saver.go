@@ -19,6 +19,7 @@ type objekteSaver struct {
 }
 
 func MakeObjekteSaver(
+  //TODO add objekte index
 	writerFactory schnittstellen.ObjekteWriterFactory,
 	pmf objekte_format.Format,
 ) ObjekteSaver {

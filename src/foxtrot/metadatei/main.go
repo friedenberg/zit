@@ -32,6 +32,9 @@ type MetadateiWriterTo interface {
 }
 
 type Metadatei struct {
+	// StoreVersion values.Int
+	// Kasten
+	// Domain
 	AkteSha     sha.Sha
 	Bezeichnung bezeichnung.Bezeichnung
 	Etiketten   kennung.EtikettSet
