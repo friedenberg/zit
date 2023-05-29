@@ -432,7 +432,9 @@ func (s *Store) ReadAll(
 	return
 }
 
-func (s *Store) getReindexFunc() func(sku.DataIdentity) error {
+func (s *Store) getReindexFunc(
+	ei etiketten_index.Index,
+) func(sku.DataIdentity) error {
 	return func(sk sku.DataIdentity) (err error) {
 		var st reindexer
 		ok := false
@@ -448,6 +450,11 @@ func (s *Store) getReindexFunc() func(sku.DataIdentity) error {
 
 		if o, err = st.ReindexOne(sk); err != nil {
 			err = errors.Wrapf(err, "Sku %s", sk)
+			return
+		}
+
+		if err = ei.StoreEtiketten(o.GetEtiketten()); err != nil {
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -587,12 +594,24 @@ func (s *Store) Reindex() (err error) {
 		return
 	}
 
+	var ei etiketten_index.Index
+
+	if ei, err = s.StoreUtil.GetEtikettenIndex(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = ei.Reset(); err != nil {
+		err = errors.Wrapf(err, "failed to reset etiketten index")
+		return
+	}
+
 	if err = s.StoreUtil.GetKennungIndex().Reset(); err != nil {
 		err = errors.Wrapf(err, "failed to reset index kennung")
 		return
 	}
 
-	f1 := s.getReindexFunc()
+	f1 := s.getReindexFunc(ei)
 
 	// if s.StoreUtil.GetKonfig().UseBestandsaufnahme {
 	// } else {

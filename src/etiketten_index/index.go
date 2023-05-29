@@ -11,8 +11,10 @@ import (
 )
 
 type index struct {
-	lock      *sync.Mutex
-	Etiketten map[kennung.Etikett]indexed
+	didRead    bool
+	hasChanges bool
+	lock       *sync.Mutex
+	Etiketten  map[kennung.Etikett]indexed
 }
 
 func makeIndex() (i *index) {
@@ -22,6 +24,29 @@ func makeIndex() (i *index) {
 	}
 
 	return
+}
+
+func (i *index) DidRead() bool {
+	i.lock.Lock()
+	defer i.lock.Unlock()
+
+	return i.didRead
+}
+
+func (i *index) HasChanges() bool {
+	i.lock.Lock()
+	defer i.lock.Unlock()
+
+	return i.hasChanges
+}
+
+func (i *index) Reset() error {
+	i.lock.Lock()
+	defer i.lock.Unlock()
+
+	i.Etiketten = make(map[kennung.Etikett]indexed)
+
+	return nil
 }
 
 func (i index) WriteTo(w1 io.Writer) (n int64, err error) {
@@ -50,9 +75,15 @@ func (i *index) ReadFrom(r1 io.Reader) (n int64, err error) {
 	defer i.lock.Unlock()
 
 	if err = dec.Decode(&i.Etiketten); err != nil {
-		err = errors.Wrap(err)
-		return
+		if errors.IsEOF(err) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
 	}
+
+	i.didRead = true
 
 	return
 }
@@ -88,6 +119,8 @@ func (i *index) storeEtikett(k kennung.Etikett) (err error) {
 	if _, ok := i.Etiketten[k]; ok {
 		return
 	}
+
+	i.hasChanges = true
 
 	id := indexed{}
 	id.ResetWithEtikett(k)

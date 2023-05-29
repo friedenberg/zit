@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/alfred"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/etiketten_index"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
@@ -41,7 +42,25 @@ func (w *Writer) zettelToItem(
 	mb.AddMatches(z.Kennung().Schwanz())
 	mb.AddMatches(z.GetMetadatei().Bezeichnung.String())
 	mb.AddMatches(z.GetTyp().String())
-	mb.AddMatches(z.Verzeichnisse.Etiketten.SortedExpanded...)
+	z.Verzeichnisse.Etiketten.Etiketten.Each(
+		func(e kennung.Etikett) (err error) {
+			var ei etiketten_index.Indexed
+			ok := false
+
+			if ei, ok = w.etikettenIndex.ExpandEtikett(e); !ok {
+				return
+			}
+
+			ei.GetEtikettenExpandedAll().Each(
+				func(e kennung.Etikett) (err error) {
+					mb.AddMatches(e.String())
+					return
+				},
+			)
+
+			return
+		},
+	)
 	mb.AddMatches(z.Verzeichnisse.Typ.Expanded...)
 
 	// if ha != nil {

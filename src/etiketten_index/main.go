@@ -8,6 +8,9 @@ import (
 )
 
 type Index interface {
+  DidRead() bool
+  HasChanges() bool
+  Reset() error
 	ExpandEtikett(kennung.Etikett) (Indexed, bool)
 	StoreEtikett(kennung.Etikett) (err error)
 	StoreEtiketten(kennung.EtikettSet) (err error)

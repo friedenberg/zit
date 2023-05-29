@@ -1,23 +1,24 @@
 package store_util
 
 import (
+	"bytes"
 	"io"
-	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/sha"
 )
 
 type verzeichnisseElement interface {
+	DidRead() bool
+	HasChanges() bool
 	io.ReaderFrom
 	io.WriterTo
 }
 
 type verzeichnisseWrapper[T verzeichnisseElement] struct {
-	lock    *sync.Mutex
-	didRead bool
-	path    string
-	index   T
+	path  string
+	index T
 }
 
 func makeVerzeichnisseWrapper[T verzeichnisseElement](
@@ -25,7 +26,6 @@ func makeVerzeichnisseWrapper[T verzeichnisseElement](
 	path string,
 ) verzeichnisseWrapper[T] {
 	return verzeichnisseWrapper[T]{
-		lock:  &sync.Mutex{},
 		path:  path,
 		index: e,
 	}
@@ -34,10 +34,7 @@ func makeVerzeichnisseWrapper[T verzeichnisseElement](
 func (ei *verzeichnisseWrapper[T]) ReadIfNecessary(
 	vf schnittstellen.VerzeichnisseFactory,
 ) (err error) {
-	ei.lock.Lock()
-	defer ei.lock.Unlock()
-
-	if ei.didRead {
+	if ei.index.DidRead() {
 		return
 	}
 
@@ -46,12 +43,11 @@ func (ei *verzeichnisseWrapper[T]) ReadIfNecessary(
 	if rc, err = vf.ReadCloserVerzeichnisse(ei.path); err != nil {
 		if errors.IsNotExist(err) {
 			err = nil
-			ei.didRead = true
+			rc = sha.MakeReadCloser(bytes.NewBuffer(nil))
 		} else {
 			err = errors.Wrap(err)
+			return
 		}
-
-		return
 	}
 
 	defer errors.DeferredCloser(&err, rc)
@@ -60,8 +56,6 @@ func (ei *verzeichnisseWrapper[T]) ReadIfNecessary(
 		err = errors.Wrap(err)
 		return
 	}
-
-	ei.didRead = true
 
 	return
 }
@@ -82,10 +76,7 @@ func (ei *verzeichnisseWrapper[T]) Get(
 func (ei *verzeichnisseWrapper[T]) Flush(
 	vf schnittstellen.VerzeichnisseFactory,
 ) (err error) {
-	ei.lock.Lock()
-	defer ei.lock.Unlock()
-
-	if !ei.didRead {
+	if !ei.index.HasChanges() {
 		return
 	}
 

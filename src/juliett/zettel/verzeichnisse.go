@@ -23,10 +23,6 @@ func (z Verzeichnisse) GetEtiketten() schnittstellen.Set[kennung.Etikett] {
 	return z.Etiketten.GetEtiketten()
 }
 
-func (z Verzeichnisse) GetEtikettenExpanded() schnittstellen.Set[kennung.Etikett] {
-	return z.Etiketten.GetEtikettenExpanded()
-}
-
 func (z *Verzeichnisse) ResetWithObjekteMetadateiGetter(
 	z1 Objekte,
 	mg metadatei.Getter,
