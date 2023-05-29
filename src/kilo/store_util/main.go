@@ -14,6 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/age_io"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/etiketten_index"
 	"github.com/friedenberg/zit/src/foxtrot/kennung_index"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
@@ -45,6 +46,7 @@ type StoreUtil interface {
 	GetTransaktionStore() TransaktionStore
 	GetAbbrStore() AbbrStore
 	GetKennungIndex() kennung_index.Index
+	GetEtikettenIndex() (etiketten_index.Index, error)
 
 	SetMatchableAdder(kennung.MatchableAdder)
 	kennung.MatchableAdder
@@ -71,6 +73,7 @@ type common struct {
 	kennungIndex          kennung_index.Index
 
 	kennung.MatchableAdder
+	etikettenIndex verzeichnisseWrapper[etiketten_index.Index]
 }
 
 func MakeStoreUtil(
@@ -86,6 +89,7 @@ func MakeStoreUtil(
 		konfig:                    k,
 		standort:                  st,
 		persistentMetadateiFormat: pmf,
+		etikettenIndex:            makeVerzeichnisseWrapper[etiketten_index.Index]("EtikettenIndexV0"),
 	}
 
 	t := kennung.Now()
@@ -187,6 +191,10 @@ func (s *common) GetAbbrStore() AbbrStore {
 
 func (s *common) GetKennungIndex() kennung_index.Index {
 	return s.kennungIndex
+}
+
+func (s *common) GetEtikettenIndex() (etiketten_index.Index, error) {
+	return s.etikettenIndex.Get(s)
 }
 
 func (s common) GetStandort() standort.Standort {
