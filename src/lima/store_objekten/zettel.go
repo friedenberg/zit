@@ -645,7 +645,7 @@ func (s *zettelStore) Inherit(tz *zettel.Transacted) (err error) {
 		return
 	}
 
-	s.StoreUtil.CommitTransacted2(tz)
+	s.StoreUtil.CommitTransacted(tz)
 
 	errExists := s.StoreUtil.GetAbbrStore().Hinweis().Exists(tz.Sku.Kennung)
 

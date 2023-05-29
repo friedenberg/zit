@@ -38,7 +38,7 @@ type StoreUtil interface {
 	schnittstellen.AkteIOFactory
 	kennung.Clock
 
-	CommitTransacted2(objekte.TransactedLike) error
+	CommitTransacted(objekte.TransactedLike) error
 	CommitUpdatedTransacted(objekte.TransactedLikePtr) error
 
 	GetBestandsaufnahmeStore() bestandsaufnahme.Store
@@ -160,10 +160,6 @@ func (s *common) CommitUpdatedTransacted(t objekte.TransactedLikePtr) (err error
 	ta := kennung.NowTai()
 	t.SetTai(ta)
 
-	return s.CommitTransacted2(t)
-}
-
-func (s *common) CommitTransacted2(t objekte.TransactedLike) (err error) {
 	return s.CommitTransacted(t)
 }
 
