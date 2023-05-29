@@ -31,9 +31,18 @@ func New(
 		return
 	}
 
+	if etikettenIndex == nil {
+		panic("etikettenIndex was nil")
+	}
+
+	if typenIndex == nil {
+		panic("typenIndex was nil")
+	}
+
 	w = &Writer{
 		Abbr:           ha,
 		etikettenIndex: etikettenIndex,
+		typenIndex:     typenIndex,
 		alfredWriter:   aw,
 	}
 

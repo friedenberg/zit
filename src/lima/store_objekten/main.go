@@ -13,6 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/etiketten_index"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
+	"github.com/friedenberg/zit/src/foxtrot/typen_index"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/golf/transaktion"
@@ -434,6 +435,7 @@ func (s *Store) ReadAll(
 
 func (s *Store) getReindexFunc(
 	ei etiketten_index.Index,
+	ti typen_index.Index,
 ) func(sku.DataIdentity) error {
 	return func(sk sku.DataIdentity) (err error) {
 		var st reindexer
@@ -454,6 +456,11 @@ func (s *Store) getReindexFunc(
 		}
 
 		if err = ei.StoreEtiketten(o.GetEtiketten()); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = ti.StoreTyp(o.GetTyp()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -567,6 +574,21 @@ func (s *Store) AddMatchable(m kennung.Matchable) (err error) {
 		return
 	}
 
+	t := m.GetTyp()
+
+	if !t.IsEmpty() {
+		var ti typen_index.Index
+
+		if ti, err = s.GetTypenIndex(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+		if err = ti.StoreTyp(m.GetTyp()); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
 	if err = s.GetAbbrStore().AddMatchable(m); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -606,12 +628,24 @@ func (s *Store) Reindex() (err error) {
 		return
 	}
 
+	var ti typen_index.Index
+
+	if ti, err = s.StoreUtil.GetTypenIndex(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = ti.Reset(); err != nil {
+		err = errors.Wrapf(err, "failed to reset etiketten index")
+		return
+	}
+
 	if err = s.StoreUtil.GetKennungIndex().Reset(); err != nil {
 		err = errors.Wrapf(err, "failed to reset index kennung")
 		return
 	}
 
-	f1 := s.getReindexFunc(ei)
+	f1 := s.getReindexFunc(ei, ti)
 
 	// if s.StoreUtil.GetKonfig().UseBestandsaufnahme {
 	// } else {

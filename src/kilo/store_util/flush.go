@@ -6,7 +6,7 @@ import (
 
 func (c *common) Flush() (err error) {
 	if err = c.typenIndex.Flush(c); err != nil {
-		err = errors.Wrapf(err, "failed to flush etiketten index")
+		err = errors.Wrapf(err, "failed to flush typen index")
 		return
 	}
 

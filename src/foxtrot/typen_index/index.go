@@ -97,6 +97,10 @@ func (i index) ExpandTyp(k kennung.Typ) (id Indexed, ok bool) {
 }
 
 func (i *index) StoreTyp(k kennung.Typ) (err error) {
+	if k.IsEmpty() {
+		return
+	}
+
 	i.lock.Lock()
 	defer i.lock.Unlock()
 
