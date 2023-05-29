@@ -2,7 +2,6 @@ package alfred
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/friedenberg/zit/src/bravo/alfred"
 	"github.com/friedenberg/zit/src/charlie/collections"
@@ -19,18 +18,15 @@ func (w *Writer) zettelToItem(
 
 	a.Title = z.GetMetadatei().Bezeichnung.String()
 
+	es := collections.StringCommaSeparated[kennung.Etikett](
+		z.GetMetadatei().Etiketten,
+	)
+
 	if a.Title == "" {
 		a.Title = z.Kennung().String()
-		a.Subtitle = fmt.Sprintf(
-			"%s",
-			strings.Join(z.Verzeichnisse.Etiketten.Sorted, ", "),
-		)
+		a.Subtitle = fmt.Sprintf("%s", es)
 	} else {
-		a.Subtitle = fmt.Sprintf(
-			"%s: %s",
-			z.Kennung().String(),
-			strings.Join(z.Verzeichnisse.Etiketten.Sorted, ", "),
-		)
+		a.Subtitle = fmt.Sprintf("%s: %s", z.Kennung().String(), es)
 	}
 
 	a.Arg = z.Kennung().String()
@@ -42,7 +38,7 @@ func (w *Writer) zettelToItem(
 	mb.AddMatches(z.Kennung().Schwanz())
 	mb.AddMatches(z.GetMetadatei().Bezeichnung.String())
 	mb.AddMatches(z.GetTyp().String())
-	z.Verzeichnisse.Etiketten.Etiketten.Each(
+	z.GetMetadatei().Etiketten.Each(
 		func(e kennung.Etikett) (err error) {
 			var ei etiketten_index.Indexed
 			ok := false

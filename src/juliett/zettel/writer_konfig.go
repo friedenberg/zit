@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/india/konfig"
 )
 
@@ -20,13 +21,22 @@ func MakeWriterKonfig(
 	}
 
 	return func(z *Transacted) (err error) {
-		for _, p := range z.Verzeichnisse.Etiketten.Sorted {
-			for _, t := range k.EtikettenHiddenStringsSlice {
-				if strings.HasPrefix(p, t) {
-					err = collections.MakeErrStopIteration()
-					return
+		if err = z.GetMetadatei().Etiketten.Each(
+			func(e kennung.Etikett) (err error) {
+				p := e.String()
+
+				for _, t := range k.EtikettenHiddenStringsSlice {
+					if strings.HasPrefix(p, t) {
+						err = collections.MakeErrStopIteration()
+						return
+					}
 				}
-			}
+
+				return
+			},
+		); err != nil {
+			err = errors.Wrap(err)
+			return
 		}
 
 		t := k.GetApproximatedTyp(z.GetTyp()).ApproximatedOrActual()
