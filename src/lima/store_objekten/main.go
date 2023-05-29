@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/etiketten_index"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
@@ -543,6 +544,18 @@ func (s *Store) addMatchableTypAndEtikettenIfNecessary(
 
 func (s *Store) AddMatchable(m kennung.Matchable) (err error) {
 	if err = s.addMatchableTypAndEtikettenIfNecessary(m); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	var ei etiketten_index.Index
+
+	if ei, err = s.GetEtikettenIndex(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = ei.StoreEtiketten(m.GetEtiketten()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

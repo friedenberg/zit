@@ -10,6 +10,7 @@ import (
 type Index interface {
 	ExpandEtikett(kennung.Etikett) (Indexed, bool)
 	StoreEtikett(kennung.Etikett) (err error)
+	StoreEtiketten(kennung.EtikettSet) (err error)
 	io.WriterTo
 	io.ReaderFrom
 }

@@ -53,6 +53,7 @@ function pull { # @test
 
 	cd "$wd1" || exit 1
 
+	# TODO fix race condition
 	run_zit pull "$wd" :
 	assert_success
 	assert_output_unsorted - <<-EOM

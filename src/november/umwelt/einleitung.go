@@ -37,6 +37,8 @@ func (u *Umwelt) Einleitung(e Einleitung) (err error) {
 	s := u.Standort()
 
 	mkdirAll(s.DirKennung())
+	mkdirAll(s.DirVerzeichnisse())
+	mkdirAll(s.DirVerlorenUndGefunden())
 
 	if err = readAndTransferLines(e.Yin, s.DirZit("Kennung", "Yin")); err != nil {
 		err = errors.Wrap(err)
@@ -66,9 +68,6 @@ func (u *Umwelt) Einleitung(e Einleitung) (err error) {
 
 		mkdirAll(d)
 	}
-
-	mkdirAll(s.DirVerzeichnisse())
-	mkdirAll(s.DirVerlorenUndGefunden())
 
 	if !e.DisableAge {
 		if _, err = age.Generate(s.FileAge()); err != nil {

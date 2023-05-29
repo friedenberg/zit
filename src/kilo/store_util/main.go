@@ -89,7 +89,10 @@ func MakeStoreUtil(
 		konfig:                    k,
 		standort:                  st,
 		persistentMetadateiFormat: pmf,
-		etikettenIndex:            makeVerzeichnisseWrapper[etiketten_index.Index]("EtikettenIndexV0"),
+		etikettenIndex: makeVerzeichnisseWrapper[etiketten_index.Index](
+			etiketten_index.MakeIndex(),
+			st.DirVerzeichnisse("EtikettenIndexV0"),
+		),
 	}
 
 	t := kennung.Now()

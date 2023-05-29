@@ -21,11 +21,13 @@ type verzeichnisseWrapper[T verzeichnisseElement] struct {
 }
 
 func makeVerzeichnisseWrapper[T verzeichnisseElement](
+	e T,
 	path string,
 ) verzeichnisseWrapper[T] {
 	return verzeichnisseWrapper[T]{
-		lock: &sync.Mutex{},
-		path: path,
+		lock:  &sync.Mutex{},
+		path:  path,
+		index: e,
 	}
 }
 
@@ -39,10 +41,16 @@ func (ei *verzeichnisseWrapper[T]) ReadIfNecessary(
 		return
 	}
 
-	var rc schnittstellen.ShaReadCloser
+	var rc io.ReadCloser
 
 	if rc, err = vf.ReadCloserVerzeichnisse(ei.path); err != nil {
-		err = errors.Wrap(err)
+		if errors.IsNotExist(err) {
+			err = nil
+			ei.didRead = true
+		} else {
+			err = errors.Wrap(err)
+		}
+
 		return
 	}
 
@@ -52,6 +60,8 @@ func (ei *verzeichnisseWrapper[T]) ReadIfNecessary(
 		err = errors.Wrap(err)
 		return
 	}
+
+	ei.didRead = true
 
 	return
 }
