@@ -28,11 +28,9 @@ type TransactedInflator[
 	T1 objekte.AktePtr[T],
 	T2 kennung.KennungLike[T2],
 	T3 kennung.KennungLikePtr[T2],
-	T4 any,
-	T5 objekte.VerzeichnissePtr[T4, T],
 ] interface {
-	InflateFromSku2(sku.Sku) (*objekte.Transacted[T, T1, T2, T3, T4, T5], error)
-	InflatorStorer[*objekte.Transacted[T, T1, T2, T3, T4, T5]]
+	InflateFromSku2(sku.Sku) (*objekte.Transacted[T, T1, T2, T3], error)
+	InflatorStorer[*objekte.Transacted[T, T1, T2, T3]]
 	InflateFromDataIdentityAndStore(sku.DataIdentity) error
 }
 
@@ -41,16 +39,14 @@ type transactedInflator[
 	T1 objekte.AktePtr[T],
 	T2 kennung.KennungLike[T2],
 	T3 kennung.KennungLikePtr[T2],
-	T4 any,
-	T5 objekte.VerzeichnissePtr[T4, T],
 ] struct {
 	of                        schnittstellen.ObjekteIOFactory
 	af                        schnittstellen.AkteIOFactory
 	persistentMetadateiFormat objekte_format.Format
 	akteFormat                objekte.AkteFormat[T, T1]
 	pool                      schnittstellen.Pool[
-		objekte.Transacted[T, T1, T2, T3, T4, T5],
-		*objekte.Transacted[T, T1, T2, T3, T4, T5],
+		objekte.Transacted[T, T1, T2, T3],
+		*objekte.Transacted[T, T1, T2, T3],
 	]
 }
 
@@ -59,19 +55,17 @@ func MakeTransactedInflator[
 	T1 objekte.AktePtr[T],
 	T2 kennung.KennungLike[T2],
 	T3 kennung.KennungLikePtr[T2],
-	T4 any,
-	T5 objekte.VerzeichnissePtr[T4, T],
 ](
 	of schnittstellen.ObjekteIOFactory,
 	af schnittstellen.AkteIOFactory,
 	persistentMetadateiFormat objekte_format.Format,
 	akteFormat objekte.AkteFormat[T, T1],
 	pool schnittstellen.Pool[
-		objekte.Transacted[T, T1, T2, T3, T4, T5],
-		*objekte.Transacted[T, T1, T2, T3, T4, T5],
+		objekte.Transacted[T, T1, T2, T3],
+		*objekte.Transacted[T, T1, T2, T3],
 	],
-) *transactedInflator[T, T1, T2, T3, T4, T5] {
-	return &transactedInflator[T, T1, T2, T3, T4, T5]{
+) *transactedInflator[T, T1, T2, T3] {
+	return &transactedInflator[T, T1, T2, T3]{
 		of:                        of,
 		af:                        af,
 		persistentMetadateiFormat: persistentMetadateiFormat,
@@ -80,11 +74,11 @@ func MakeTransactedInflator[
 	}
 }
 
-func (h *transactedInflator[T, T1, T2, T3, T4, T5]) InflateFromSku2(
+func (h *transactedInflator[T, T1, T2, T3]) InflateFromSku2(
 	o sku.Sku,
-) (t *objekte.Transacted[T, T1, T2, T3, T4, T5], err error) {
+) (t *objekte.Transacted[T, T1, T2, T3], err error) {
 	if h.pool == nil {
-		t = new(objekte.Transacted[T, T1, T2, T3, T4, T5])
+		t = new(objekte.Transacted[T, T1, T2, T3])
 	} else {
 		t = h.pool.Get()
 	}
@@ -127,11 +121,11 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) InflateFromSku2(
 	return
 }
 
-func (h *transactedInflator[T, T1, T2, T3, T4, T5]) InflateFromDataIdentity(
+func (h *transactedInflator[T, T1, T2, T3]) InflateFromDataIdentity(
 	o sku.DataIdentity,
-) (t *objekte.Transacted[T, T1, T2, T3, T4, T5], err error) {
+) (t *objekte.Transacted[T, T1, T2, T3], err error) {
 	if h.pool == nil {
-		t = new(objekte.Transacted[T, T1, T2, T3, T4, T5])
+		t = new(objekte.Transacted[T, T1, T2, T3])
 	} else {
 		t = h.pool.Get()
 	}
@@ -156,8 +150,8 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) InflateFromDataIdentity(
 	return
 }
 
-func (h *transactedInflator[T, T1, T2, T3, T4, T5]) StoreAkte(
-	t *objekte.Transacted[T, T1, T2, T3, T4, T5],
+func (h *transactedInflator[T, T1, T2, T3]) StoreAkte(
+	t *objekte.Transacted[T, T1, T2, T3],
 ) (err error) {
 	var aw sha.WriteCloser
 
@@ -178,8 +172,8 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) StoreAkte(
 	return
 }
 
-func (h *transactedInflator[T, T1, T2, T3, T4, T5]) StoreObjekte(
-	t *objekte.Transacted[T, T1, T2, T3, T4, T5],
+func (h *transactedInflator[T, T1, T2, T3]) StoreObjekte(
+	t *objekte.Transacted[T, T1, T2, T3],
 ) (err error) {
 	var ow sha.WriteCloser
 
@@ -204,10 +198,10 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) StoreObjekte(
 	return
 }
 
-func (h *transactedInflator[T, T1, T2, T3, T4, T5]) InflateFromDataIdentityAndStore(
+func (h *transactedInflator[T, T1, T2, T3]) InflateFromDataIdentityAndStore(
 	o sku.DataIdentity,
 ) (err error) {
-	var t *objekte.Transacted[T, T1, T2, T3, T4, T5]
+	var t *objekte.Transacted[T, T1, T2, T3]
 
 	if t, err = h.InflateFromDataIdentity(o); err != nil {
 		err = errors.Wrap(err)
@@ -222,9 +216,9 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) InflateFromDataIdentityAndSt
 	return
 }
 
-func (h *transactedInflator[T, T1, T2, T3, T4, T5]) readObjekte(
+func (h *transactedInflator[T, T1, T2, T3]) readObjekte(
 	sk sku.DataIdentity,
-	t *objekte.Transacted[T, T1, T2, T3, T4, T5],
+	t *objekte.Transacted[T, T1, T2, T3],
 ) (err error) {
 	if sk.GetObjekteSha().IsNull() {
 		return
@@ -262,15 +256,14 @@ func (h *transactedInflator[T, T1, T2, T3, T4, T5]) readObjekte(
 	}
 
 	objekte.CorrectAkteShaWith(t, t)
-	T5(&t.Verzeichnisse).ResetWithObjekteMetadateiGetter(t.Akte, t)
 
 	errors.Log().Printf("parsed %d objekte bytes", n)
 
 	return
 }
 
-func (h *transactedInflator[T, T1, T2, T3, T4, T5]) readAkte(
-	t *objekte.Transacted[T, T1, T2, T3, T4, T5],
+func (h *transactedInflator[T, T1, T2, T3]) readAkte(
+	t *objekte.Transacted[T, T1, T2, T3],
 ) (err error) {
 	if h.akteFormat == nil {
 		return

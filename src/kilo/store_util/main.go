@@ -14,9 +14,10 @@ import (
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/age_io"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/etiketten_index"
+	"github.com/friedenberg/zit/src/foxtrot/etiketten_index"
 	"github.com/friedenberg/zit/src/foxtrot/kennung_index"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
+	"github.com/friedenberg/zit/src/foxtrot/typen_index"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/golf/transaktion"
@@ -47,6 +48,7 @@ type StoreUtil interface {
 	GetAbbrStore() AbbrStore
 	GetKennungIndex() kennung_index.Index
 	GetEtikettenIndex() (etiketten_index.Index, error)
+	GetTypenIndex() (typen_index.Index, error)
 
 	SetMatchableAdder(kennung.MatchableAdder)
 	kennung.MatchableAdder
@@ -74,6 +76,7 @@ type common struct {
 
 	kennung.MatchableAdder
 	etikettenIndex verzeichnisseWrapper[etiketten_index.Index]
+	typenIndex     verzeichnisseWrapper[typen_index.Index]
 }
 
 func MakeStoreUtil(
@@ -92,6 +95,10 @@ func MakeStoreUtil(
 		etikettenIndex: makeVerzeichnisseWrapper[etiketten_index.Index](
 			etiketten_index.MakeIndex(),
 			st.DirVerzeichnisse("EtikettenIndexV0"),
+		),
+		typenIndex: makeVerzeichnisseWrapper[typen_index.Index](
+			typen_index.MakeIndex(),
+			st.DirVerzeichnisse("TypenIndexV0"),
 		),
 	}
 
@@ -194,6 +201,10 @@ func (s *common) GetKennungIndex() kennung_index.Index {
 
 func (s *common) GetEtikettenIndex() (etiketten_index.Index, error) {
 	return s.etikettenIndex.Get(s)
+}
+
+func (s *common) GetTypenIndex() (typen_index.Index, error) {
+	return s.typenIndex.Get(s)
 }
 
 func (s common) GetStandort() standort.Standort {

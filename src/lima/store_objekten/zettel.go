@@ -30,8 +30,6 @@ type ZettelStore interface {
 		*zettel.Objekte,
 		kennung.Hinweis,
 		*kennung.Hinweis,
-		zettel.Verzeichnisse,
-		*zettel.Verzeichnisse,
 	]
 
 	objekte_store.Creator[*zettel.Transacted]
@@ -55,8 +53,6 @@ type zettelStore struct {
 		*zettel.Objekte,
 		kennung.Hinweis,
 		*kennung.Hinweis,
-		zettel.Verzeichnisse,
-		*zettel.Verzeichnisse,
 	]
 
 	textParser  metadatei.TextParser
@@ -83,8 +79,6 @@ func makeZettelStore(
 		*zettel.Objekte,
 		kennung.Hinweis,
 		*kennung.Hinweis,
-		zettel.Verzeichnisse,
-		*zettel.Verzeichnisse,
 	](
 		gattung.Zettel,
 		s,
@@ -631,8 +625,6 @@ func (s *zettelStore) writeObjekte(
 		err = errors.Wrap(err)
 		return
 	}
-
-	tz.Verzeichnisse.ResetWithObjekteMetadateiGetter(tz.Akte, m)
 
 	return
 }

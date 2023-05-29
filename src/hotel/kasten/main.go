@@ -10,8 +10,6 @@ type Transacted = objekte.Transacted[
 	*Akte,
 	kennung.Kasten,
 	*kennung.Kasten,
-	Verzeichnisse,
-	*Verzeichnisse,
 ]
 
 type CheckedOut = objekte.CheckedOut[
@@ -19,6 +17,4 @@ type CheckedOut = objekte.CheckedOut[
 	*Akte,
 	kennung.Kasten,
 	*kennung.Kasten,
-	Verzeichnisse,
-	*Verzeichnisse,
 ]

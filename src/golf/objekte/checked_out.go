@@ -12,15 +12,13 @@ type CheckedOut[
 	T1 AktePtr[T],
 	T2 kennung.KennungLike[T2],
 	T3 kennung.KennungLikePtr[T2],
-	T4 any,
-	T5 VerzeichnissePtr[T4, T],
 ] struct {
-	Internal Transacted[T, T1, T2, T3, T4, T5]
+	Internal Transacted[T, T1, T2, T3]
 	External External[T, T1, T2, T3]
 	State    CheckedOutState
 }
 
-func (c *CheckedOut[T, T1, T2, T3, T4, T5]) DetermineState() {
+func (c *CheckedOut[T, T1, T2, T3]) DetermineState() {
 	if c.Internal.Sku.ObjekteSha.IsNull() {
 		c.State = CheckedOutStateUntracked
 	} else if c.Internal.Sku.ObjekteSha.Equals(c.External.Sku.ObjekteSha) {
@@ -32,28 +30,28 @@ func (c *CheckedOut[T, T1, T2, T3, T4, T5]) DetermineState() {
 	}
 }
 
-func (co CheckedOut[T, T1, T2, T3, T4, T5]) GetState() CheckedOutState {
+func (co CheckedOut[T, T1, T2, T3]) GetState() CheckedOutState {
 	return co.State
 }
 
-func (co CheckedOut[T, T1, T2, T3, T4, T5]) GetInternalLike() TransactedLike {
+func (co CheckedOut[T, T1, T2, T3]) GetInternalLike() TransactedLike {
 	return co.Internal
 }
 
-func (co CheckedOut[T, T1, T2, T3, T4, T5]) GetExternalLike() ExternalLike {
+func (co CheckedOut[T, T1, T2, T3]) GetExternalLike() ExternalLike {
 	return co.External
 }
 
-func (a CheckedOut[T, T1, T2, T3, T4, T5]) EqualsAny(b any) bool {
+func (a CheckedOut[T, T1, T2, T3]) EqualsAny(b any) bool {
 	return values.Equals(a, b)
 }
 
-func (a CheckedOut[T, T1, T2, T3, T4, T5]) String() string {
+func (a CheckedOut[T, T1, T2, T3]) String() string {
 	return fmt.Sprintf("%s %s", a.Internal.Sku, a.External.Sku)
 }
 
-func (a CheckedOut[T, T1, T2, T3, T4, T5]) Equals(
-	b CheckedOut[T, T1, T2, T3, T4, T5],
+func (a CheckedOut[T, T1, T2, T3]) Equals(
+	b CheckedOut[T, T1, T2, T3],
 ) bool {
 	if !a.Internal.Equals(b.Internal) {
 		return false

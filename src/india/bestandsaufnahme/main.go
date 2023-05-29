@@ -10,6 +10,4 @@ type Transacted = objekte.Transacted[
 	*Akte,
 	kennung.Tai,
 	*kennung.Tai,
-	objekte.NilVerzeichnisse[Akte],
-	*objekte.NilVerzeichnisse[Akte],
 ]

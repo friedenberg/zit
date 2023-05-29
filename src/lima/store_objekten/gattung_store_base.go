@@ -30,23 +30,19 @@ type CommonStoreBase[
 	OPtr objekte.AktePtr[O],
 	K kennung.KennungLike[K],
 	KPtr kennung.KennungLikePtr[K],
-	V any,
-	VPtr objekte.VerzeichnissePtr[V, O],
 ] interface {
 	gattungStoreLike
 
 	CheckoutOne(
 		CheckoutOptions,
-		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
-	) (*objekte.CheckedOut[O, OPtr, K, KPtr, V, VPtr], error)
+		*objekte.Transacted[O, OPtr, K, KPtr],
+	) (*objekte.CheckedOut[O, OPtr, K, KPtr], error)
 
 	objekte_store.TransactedLogger[*objekte.Transacted[
 		O,
 		OPtr,
 		K,
 		KPtr,
-		V,
-		VPtr,
 	]]
 
 	objekte_store.Querier[
@@ -56,37 +52,23 @@ type CommonStoreBase[
 			OPtr,
 			K,
 			KPtr,
-			V,
-			VPtr,
 		],
 	]
 
-	objekte_store.AkteTextSaver[
-		O,
-		OPtr,
-	]
+	objekte_store.AkteTextSaver[O, OPtr]
 
-	objekte_store.TransactedInflator[
-		O,
-		OPtr,
-		K,
-		KPtr,
-		V,
-		VPtr,
-	]
+	objekte_store.TransactedInflator[O, OPtr, K, KPtr]
 
 	objekte_store.Inheritor[*objekte.Transacted[
 		O,
 		OPtr,
 		K,
 		KPtr,
-		V,
-		VPtr,
 	]]
 
 	objekte_store.ExternalReader[
 		sku.ExternalMaybe[K, KPtr],
-		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
+		*objekte.Transacted[O, OPtr, K, KPtr],
 		objekte.External[O, OPtr, K, KPtr],
 	]
 }
@@ -96,33 +78,31 @@ type commonStoreBase[
 	OPtr objekte.AktePtr[O],
 	K kennung.KennungLike[K],
 	KPtr kennung.KennungLikePtr[K],
-	V any,
-	VPtr objekte.VerzeichnissePtr[V, O],
 ] struct {
 	schnittstellen.GattungGetter
 
 	schnittstellen.ObjekteIOFactory
 
-	delegate commonStoreDelegate[O, OPtr, K, KPtr, V, VPtr]
+	delegate commonStoreDelegate[O, OPtr, K, KPtr]
 
 	store_util.StoreUtil
 
 	pool schnittstellen.Pool[
-		objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
-		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
+		objekte.Transacted[O, OPtr, K, KPtr],
+		*objekte.Transacted[O, OPtr, K, KPtr],
 	]
 
-	objekte_store.TransactedInflator[O, OPtr, K, KPtr, V, VPtr]
+	objekte_store.TransactedInflator[O, OPtr, K, KPtr]
 
 	objekte_store.AkteTextSaver[O, OPtr]
 
 	objekte_store.StoredParseSaver[O, OPtr, K, KPtr]
 
 	objekte_store.TransactedReader[KPtr,
-		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
+		*objekte.Transacted[O, OPtr, K, KPtr],
 	]
 
-	objekte_store.LogWriter[*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]]
+	objekte_store.LogWriter[*objekte.Transacted[O, OPtr, K, KPtr]]
 
 	persistentMetadateiFormat objekte_format.Format
 
@@ -136,32 +116,30 @@ func makeCommonStoreBase[
 	OPtr objekte.AktePtr[O],
 	K kennung.KennungLike[K],
 	KPtr kennung.KennungLikePtr[K],
-	V any,
-	VPtr objekte.VerzeichnissePtr[V, O],
 ](
 	gg schnittstellen.GattungGetter,
-	delegate commonStoreDelegate[O, OPtr, K, KPtr, V, VPtr],
+	delegate commonStoreDelegate[O, OPtr, K, KPtr],
 	sa store_util.StoreUtil,
 	tr objekte_store.TransactedReader[KPtr,
-		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]],
+		*objekte.Transacted[O, OPtr, K, KPtr]],
 	pmf objekte_format.Format,
 	akteFormat objekte.AkteFormat[O, OPtr],
-) (s *commonStoreBase[O, OPtr, K, KPtr, V, VPtr], err error) {
-	// type T objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]
-	// type TPtr *objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]
+) (s *commonStoreBase[O, OPtr, K, KPtr], err error) {
+	// type T objekte.Transacted[O, OPtr, K, KPtr, ]
+	// type TPtr *objekte.Transacted[O, OPtr, K, KPtr, ]
 
 	if delegate == nil {
 		panic("delegate was nil")
 	}
 
 	pool := collections.MakePool[
-		objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
-		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
+		objekte.Transacted[O, OPtr, K, KPtr],
+		*objekte.Transacted[O, OPtr, K, KPtr],
 	]()
 
 	of := sa.ObjekteReaderWriterFactory(gg)
 
-	s = &commonStoreBase[O, OPtr, K, KPtr, V, VPtr]{
+	s = &commonStoreBase[O, OPtr, K, KPtr]{
 		GattungGetter:    gg,
 		ObjekteIOFactory: of,
 		delegate:         delegate,
@@ -172,8 +150,6 @@ func makeCommonStoreBase[
 			OPtr,
 			K,
 			KPtr,
-			V,
-			VPtr,
 		](
 			of,
 			sa,
@@ -205,26 +181,26 @@ func makeCommonStoreBase[
 	return
 }
 
-func (s *commonStoreBase[O, OPtr, K, KPtr, V, VPtr]) SetLogWriter(
-	lw objekte_store.LogWriter[*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]],
+func (s *commonStoreBase[O, OPtr, K, KPtr]) SetLogWriter(
+	lw objekte_store.LogWriter[*objekte.Transacted[O, OPtr, K, KPtr]],
 ) {
 	s.LogWriter = lw
 }
 
-func (s *commonStoreBase[O, OPtr, K, KPtr, V, VPtr]) Query(
+func (s *commonStoreBase[O, OPtr, K, KPtr]) Query(
 	m kennung.Matcher,
-	f schnittstellen.FuncIter[*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]],
+	f schnittstellen.FuncIter[*objekte.Transacted[O, OPtr, K, KPtr]],
 ) (err error) {
 	return objekte_store.QueryMethodForMatcher[
 		KPtr,
-		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
+		*objekte.Transacted[O, OPtr, K, KPtr],
 	](s, m, f)
 }
 
-func (s *commonStoreBase[O, OPtr, K, KPtr, V, VPtr]) ReindexOne(
+func (s *commonStoreBase[O, OPtr, K, KPtr]) ReindexOne(
 	sk sku.DataIdentity,
 ) (o kennung.Matchable, err error) {
-	var t *objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]
+	var t *objekte.Transacted[O, OPtr, K, KPtr]
 
 	if t, err = s.InflateFromDataIdentity(sk); err != nil {
 		if errors.Is(err, toml.Error{}) {
@@ -255,8 +231,8 @@ func (s *commonStoreBase[O, OPtr, K, KPtr, V, VPtr]) ReindexOne(
 	return
 }
 
-func (s *commonStoreBase[O, OPtr, K, KPtr, V, VPtr]) Inherit(
-	t *objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
+func (s *commonStoreBase[O, OPtr, K, KPtr]) Inherit(
+	t *objekte.Transacted[O, OPtr, K, KPtr],
 ) (err error) {
 	if t == nil {
 		err = errors.Errorf("trying to inherit nil %T", t)
@@ -283,14 +259,14 @@ func (s *commonStoreBase[O, OPtr, K, KPtr, V, VPtr]) Inherit(
 	return
 }
 
-func (s *commonStoreBase[O, OPtr, K, KPtr, V, VPtr]) GetInheritor(
+func (s *commonStoreBase[O, OPtr, K, KPtr]) GetInheritor(
 	orf schnittstellen.ObjekteReaderFactory,
 	arf schnittstellen.AkteReaderFactory,
 	pmf objekte_format.Format,
 ) objekte_store.TransactedInheritor {
 	p := collections.MakePool[
-		objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
-		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
+		objekte.Transacted[O, OPtr, K, KPtr],
+		*objekte.Transacted[O, OPtr, K, KPtr],
 	]()
 
 	inflator := objekte_store.MakeTransactedInflator[
@@ -298,8 +274,6 @@ func (s *commonStoreBase[O, OPtr, K, KPtr, V, VPtr]) GetInheritor(
 		OPtr,
 		K,
 		KPtr,
-		V,
-		VPtr,
 	](
 		schnittstellen.MakeBespokeObjekteReadWriterFactory(orf, s),
 		schnittstellen.MakeBespokeAkteReadWriterFactory(arf, s),
@@ -313,8 +287,8 @@ func (s *commonStoreBase[O, OPtr, K, KPtr, V, VPtr]) GetInheritor(
 	)
 
 	return objekte_store.MakeTransactedInheritor[
-		objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
-		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
+		objekte.Transacted[O, OPtr, K, KPtr],
+		*objekte.Transacted[O, OPtr, K, KPtr],
 	](
 		inflator,
 		s,

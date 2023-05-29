@@ -6,7 +6,8 @@ import (
 	"github.com/friedenberg/zit/src/bravo/alfred"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/etiketten_index"
+	"github.com/friedenberg/zit/src/foxtrot/etiketten_index"
+	"github.com/friedenberg/zit/src/foxtrot/typen_index"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
@@ -57,7 +58,20 @@ func (w *Writer) zettelToItem(
 			return
 		},
 	)
-	mb.AddMatches(z.Verzeichnisse.Typ.Expanded...)
+
+	var ti typen_index.Indexed
+	ok := false
+
+	if ti, ok = w.typenIndex.ExpandTyp(z.GetTyp()); !ok {
+		return
+	}
+
+	ti.GetTypenExpandedAll().Each(
+		func(t kennung.Typ) (err error) {
+			mb.AddMatches(t.String())
+			return
+		},
+	)
 
 	// if ha != nil {
 	// 	var h hinweis.Hinweis

@@ -13,12 +13,10 @@ type ExternalMaybeGetterReader[
 	OPtr objekte.AktePtr[O],
 	K kennung.KennungLike[K],
 	KPtr kennung.KennungLikePtr[K],
-	V any,
-	VPtr objekte.VerzeichnissePtr[V, O],
 ] interface {
 	ReadOne(
-		objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
-	) (*objekte.CheckedOut[O, OPtr, K, KPtr, V, VPtr], error)
+		objekte.Transacted[O, OPtr, K, KPtr],
+	) (*objekte.CheckedOut[O, OPtr, K, KPtr], error)
 }
 
 type externalMaybeGetterReader[
@@ -26,12 +24,10 @@ type externalMaybeGetterReader[
 	OPtr objekte.AktePtr[O],
 	K kennung.KennungLike[K],
 	KPtr kennung.KennungLikePtr[K],
-	V any,
-	VPtr objekte.VerzeichnissePtr[V, O],
 ] struct {
 	getter func(K) (sku.ExternalMaybe[K, KPtr], bool)
 	ExternalReader[sku.ExternalMaybe[K, KPtr],
-		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
+		*objekte.Transacted[O, OPtr, K, KPtr],
 		objekte.External[O, OPtr, K, KPtr]]
 }
 
@@ -40,26 +36,24 @@ func MakeExternalMaybeGetterReader[
 	OPtr objekte.AktePtr[O],
 	K kennung.KennungLike[K],
 	KPtr kennung.KennungLikePtr[K],
-	V any,
-	VPtr objekte.VerzeichnissePtr[V, O],
 ](
 	getter func(K) (sku.ExternalMaybe[K, KPtr], bool),
 	er ExternalReader[
 		sku.ExternalMaybe[K, KPtr],
-		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
+		*objekte.Transacted[O, OPtr, K, KPtr],
 		objekte.External[O, OPtr, K, KPtr],
 	],
-) ExternalMaybeGetterReader[O, OPtr, K, KPtr, V, VPtr] {
-	return externalMaybeGetterReader[O, OPtr, K, KPtr, V, VPtr]{
+) ExternalMaybeGetterReader[O, OPtr, K, KPtr] {
+	return externalMaybeGetterReader[O, OPtr, K, KPtr]{
 		getter:         getter,
 		ExternalReader: er,
 	}
 }
 
-func (emgr externalMaybeGetterReader[O, OPtr, K, KPtr, V, VPtr]) ReadOne(
-	i objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
-) (co *objekte.CheckedOut[O, OPtr, K, KPtr, V, VPtr], err error) {
-	co = &objekte.CheckedOut[O, OPtr, K, KPtr, V, VPtr]{
+func (emgr externalMaybeGetterReader[O, OPtr, K, KPtr]) ReadOne(
+	i objekte.Transacted[O, OPtr, K, KPtr],
+) (co *objekte.CheckedOut[O, OPtr, K, KPtr], err error) {
+	co = &objekte.CheckedOut[O, OPtr, K, KPtr]{
 		Internal: i,
 	}
 

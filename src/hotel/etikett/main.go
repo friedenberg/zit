@@ -10,8 +10,6 @@ type Transacted = objekte.Transacted[
 	*Akte,
 	kennung.Etikett,
 	*kennung.Etikett,
-	objekte.NilVerzeichnisse[Akte],
-	*objekte.NilVerzeichnisse[Akte],
 ]
 
 type ExternalKeyer = objekte.ExternalKeyer[
@@ -33,6 +31,4 @@ type CheckedOut = objekte.CheckedOut[
 	*Akte,
 	kennung.Etikett,
 	*kennung.Etikett,
-	objekte.NilVerzeichnisse[Akte],
-	*objekte.NilVerzeichnisse[Akte],
 ]

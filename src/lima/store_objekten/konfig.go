@@ -26,8 +26,6 @@ type KonfigStore interface {
 		*erworben.Akte,
 		kennung.Konfig,
 		*kennung.Konfig,
-		objekte.NilVerzeichnisse[erworben.Akte],
-		*objekte.NilVerzeichnisse[erworben.Akte],
 	]
 }
 
@@ -37,8 +35,6 @@ type konfigStore struct {
 		*erworben.Akte,
 		kennung.Konfig,
 		*kennung.Konfig,
-		objekte.NilVerzeichnisse[erworben.Akte],
-		*objekte.NilVerzeichnisse[erworben.Akte],
 	]
 
 	akteFormat objekte.AkteFormat[erworben.Akte, *erworben.Akte]
@@ -64,8 +60,6 @@ func makeKonfigStore(
 		*erworben.Akte,
 		kennung.Konfig,
 		*kennung.Konfig,
-		objekte.NilVerzeichnisse[erworben.Akte],
-		*objekte.NilVerzeichnisse[erworben.Akte],
 	](
 		gattung.Konfig,
 		s,

@@ -25,15 +25,13 @@ type createOrUpdate[
 	T1 objekte.AktePtr[T],
 	T2 kennung.KennungLike[T2],
 	T3 kennung.KennungLikePtr[T2],
-	T4 any,
-	T5 objekte.VerzeichnissePtr[T4, T],
 ] struct {
 	clock                     kennung.Clock
 	ls                        schnittstellen.LockSmith
 	of                        schnittstellen.ObjekteWriterFactory
 	af                        schnittstellen.AkteWriterFactory
-	reader                    TransactedReader[T3, *objekte.Transacted[T, T1, T2, T3, T4, T5]]
-	delegate                  CreateOrUpdateDelegate[*objekte.Transacted[T, T1, T2, T3, T4, T5]]
+	reader                    TransactedReader[T3, *objekte.Transacted[T, T1, T2, T3]]
+	delegate                  CreateOrUpdateDelegate[*objekte.Transacted[T, T1, T2, T3]]
 	matchableAdder            kennung.MatchableAdder
 	persistentMetadateiFormat objekte_format.Format
 	kg                        konfig.Getter
@@ -44,24 +42,22 @@ func MakeCreateOrUpdate[
 	T1 objekte.AktePtr[T],
 	T2 kennung.KennungLike[T2],
 	T3 kennung.KennungLikePtr[T2],
-	T4 any,
-	T5 objekte.VerzeichnissePtr[T4, T],
 ](
 	clock kennung.Clock,
 	ls schnittstellen.LockSmith,
 	of schnittstellen.ObjekteWriterFactory,
 	af schnittstellen.AkteWriterFactory,
-	reader TransactedReader[T3, *objekte.Transacted[T, T1, T2, T3, T4, T5]],
-	delegate CreateOrUpdateDelegate[*objekte.Transacted[T, T1, T2, T3, T4, T5]],
+	reader TransactedReader[T3, *objekte.Transacted[T, T1, T2, T3]],
+	delegate CreateOrUpdateDelegate[*objekte.Transacted[T, T1, T2, T3]],
 	ma kennung.MatchableAdder,
 	pmf objekte_format.Format,
 	kg konfig.Getter,
-) (cou *createOrUpdate[T, T1, T2, T3, T4, T5]) {
+) (cou *createOrUpdate[T, T1, T2, T3]) {
 	if pmf == nil {
 		panic("nil persisted_metadatei_format.Format")
 	}
 
-	return &createOrUpdate[T, T1, T2, T3, T4, T5]{
+	return &createOrUpdate[T, T1, T2, T3]{
 		clock:                     clock,
 		ls:                        ls,
 		of:                        of,
@@ -73,9 +69,9 @@ func MakeCreateOrUpdate[
 	}
 }
 
-func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdateCheckedOut(
-	co *objekte.CheckedOut[T, T1, T2, T3, T4, T5],
-) (transactedPtr *objekte.Transacted[T, T1, T2, T3, T4, T5], err error) {
+func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateCheckedOut(
+	co *objekte.CheckedOut[T, T1, T2, T3],
+) (transactedPtr *objekte.Transacted[T, T1, T2, T3], err error) {
 	kennungPtr := T3(&co.External.Sku.Kennung)
 	objektePtr := T1(&co.External.Akte)
 
@@ -87,7 +83,7 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdateCheckedOut(
 		return
 	}
 
-	transactedPtr = &objekte.Transacted[T, T1, T2, T3, T4, T5]{
+	transactedPtr = &objekte.Transacted[T, T1, T2, T3]{
 		Akte: *objektePtr,
 		Sku: sku.Transacted[T2, T3]{
 			Kennung: *kennungPtr,
@@ -141,11 +137,11 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdateCheckedOut(
 	return
 }
 
-func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdate(
+func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdate(
 	objektePtr T1,
 	mg metadatei.Getter,
 	kennungPtr T3,
-) (transactedPtr *objekte.Transacted[T, T1, T2, T3, T4, T5], err error) {
+) (transactedPtr *objekte.Transacted[T, T1, T2, T3], err error) {
 	if !cou.ls.IsAcquired() {
 		err = ErrLockRequired{
 			Operation: fmt.Sprintf("create or update %s", kennungPtr.GetGattung()),
@@ -154,7 +150,7 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdate(
 		return
 	}
 
-	var mutter *objekte.Transacted[T, T1, T2, T3, T4, T5]
+	var mutter *objekte.Transacted[T, T1, T2, T3]
 
 	if mutter, err = cou.reader.ReadOne(kennungPtr); err != nil {
 		if errors.Is(err, ErrNotFound{}) {
@@ -171,7 +167,7 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdate(
 		m = mg.GetMetadatei()
 	}
 
-	transactedPtr = &objekte.Transacted[T, T1, T2, T3, T4, T5]{
+	transactedPtr = &objekte.Transacted[T, T1, T2, T3]{
 		Metadatei: m,
 		Akte:      *objektePtr,
 		Sku: sku.Transacted[T2, T3]{
@@ -241,12 +237,12 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdate(
 	return
 }
 
-func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdateAkte(
+func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateAkte(
 	objektePtr T1,
 	mg metadatei.Getter,
 	kennungPtr T3,
 	sh schnittstellen.Sha,
-) (transactedPtr *objekte.Transacted[T, T1, T2, T3, T4, T5], err error) {
+) (transactedPtr *objekte.Transacted[T, T1, T2, T3], err error) {
 	if !cou.ls.IsAcquired() {
 		err = ErrLockRequired{
 			Operation: fmt.Sprintf("create or update %s", kennungPtr.GetGattung()),
@@ -255,7 +251,7 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdateAkte(
 		return
 	}
 
-	var mutter *objekte.Transacted[T, T1, T2, T3, T4, T5]
+	var mutter *objekte.Transacted[T, T1, T2, T3]
 
 	if mutter, err = cou.reader.ReadOne(kennungPtr); err != nil {
 		if errors.Is(err, ErrNotFound{}) {
@@ -272,7 +268,7 @@ func (cou createOrUpdate[T, T1, T2, T3, T4, T5]) CreateOrUpdateAkte(
 		m = mg.GetMetadatei()
 	}
 
-	transactedPtr = &objekte.Transacted[T, T1, T2, T3, T4, T5]{
+	transactedPtr = &objekte.Transacted[T, T1, T2, T3]{
 		Metadatei: m,
 		Akte:      *objektePtr,
 		Sku: sku.Transacted[T2, T3]{

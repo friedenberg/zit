@@ -143,8 +143,6 @@ func (s *Store) ReadFiles(
 		*zettel.Objekte,
 		kennung.Hinweis,
 		*kennung.Hinweis,
-		zettel.Verzeichnisse,
-		*zettel.Verzeichnisse,
 	](
 		fs.GetZettel,
 		s.storeObjekten.Zettel(),
@@ -155,8 +153,6 @@ func (s *Store) ReadFiles(
 		*etikett.Akte,
 		kennung.Etikett,
 		*kennung.Etikett,
-		objekte.NilVerzeichnisse[etikett.Akte],
-		*objekte.NilVerzeichnisse[etikett.Akte],
 	](
 		fs.GetEtikett,
 		s.storeObjekten.Etikett(),
@@ -167,8 +163,6 @@ func (s *Store) ReadFiles(
 		*typ.Akte,
 		kennung.Typ,
 		*kennung.Typ,
-		objekte.NilVerzeichnisse[typ.Akte],
-		*objekte.NilVerzeichnisse[typ.Akte],
 	](
 		fs.GetTyp,
 		s.storeObjekten.Typ(),
@@ -179,8 +173,6 @@ func (s *Store) ReadFiles(
 		*kasten.Akte,
 		kennung.Kasten,
 		*kennung.Kasten,
-		kasten.Verzeichnisse,
-		*kasten.Verzeichnisse,
 	](
 		fs.GetKasten,
 		s.storeObjekten.Kasten(),

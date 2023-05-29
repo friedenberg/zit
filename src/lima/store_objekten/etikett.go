@@ -21,8 +21,6 @@ type EtikettStore interface {
 		*etikett.Akte,
 		kennung.Etikett,
 		*kennung.Etikett,
-		objekte.NilVerzeichnisse[etikett.Akte],
-		*objekte.NilVerzeichnisse[etikett.Akte],
 	]
 }
 
@@ -37,8 +35,6 @@ type etikettStore struct {
 		*etikett.Akte,
 		kennung.Etikett,
 		*kennung.Etikett,
-		objekte.NilVerzeichnisse[etikett.Akte],
-		*objekte.NilVerzeichnisse[etikett.Akte],
 	]
 }
 
@@ -52,8 +48,6 @@ func makeEtikettStore(
 		*etikett.Akte,
 		kennung.Etikett,
 		*kennung.Etikett,
-		objekte.NilVerzeichnisse[etikett.Akte],
-		*objekte.NilVerzeichnisse[etikett.Akte],
 	](
 		gattung.Etikett,
 		s,

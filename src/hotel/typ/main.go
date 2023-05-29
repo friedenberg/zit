@@ -10,8 +10,6 @@ type Transacted = objekte.Transacted[
 	*Akte,
 	kennung.Typ,
 	*kennung.Typ,
-	objekte.NilVerzeichnisse[Akte],
-	*objekte.NilVerzeichnisse[Akte],
 ]
 
 type ExternalKeyer = objekte.ExternalKeyer[
@@ -33,8 +31,6 @@ type CheckedOut = objekte.CheckedOut[
 	*Akte,
 	kennung.Typ,
 	*kennung.Typ,
-	objekte.NilVerzeichnisse[Akte],
-	*objekte.NilVerzeichnisse[Akte],
 ]
 
 func GetFileExtension(t *Transacted) string {

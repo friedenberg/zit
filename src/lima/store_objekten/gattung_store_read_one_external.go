@@ -13,9 +13,9 @@ import (
 	"github.com/friedenberg/zit/src/golf/objekte"
 )
 
-func (s *commonStore[O, OPtr, K, KPtr, V, VPtr]) ReadOneExternal(
+func (s *commonStore[O, OPtr, K, KPtr]) ReadOneExternal(
 	em sku.ExternalMaybe[K, KPtr],
-	t *objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
+	t *objekte.Transacted[O, OPtr, K, KPtr],
 ) (e objekte.External[O, OPtr, K, KPtr], err error) {
 	var m checkout_mode.Mode
 
@@ -69,9 +69,9 @@ func (s *commonStore[O, OPtr, K, KPtr, V, VPtr]) ReadOneExternal(
 	return
 }
 
-func (s *commonStore[O, OPtr, K, KPtr, V, VPtr]) readOneExternalAkte(
+func (s *commonStore[O, OPtr, K, KPtr]) readOneExternalAkte(
 	e *objekte.External[O, OPtr, K, KPtr],
-	t *objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
+	t *objekte.Transacted[O, OPtr, K, KPtr],
 ) (err error) {
 	e.Akte = t.Akte
 	e.SetMetadatei(t.GetMetadatei())
@@ -112,9 +112,9 @@ func (s *commonStore[O, OPtr, K, KPtr, V, VPtr]) readOneExternalAkte(
 	return
 }
 
-func (s *commonStore[O, OPtr, K, KPtr, V, VPtr]) readOneExternalObjekte(
+func (s *commonStore[O, OPtr, K, KPtr]) readOneExternalObjekte(
 	e *objekte.External[O, OPtr, K, KPtr],
-	t *objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
+	t *objekte.Transacted[O, OPtr, K, KPtr],
 ) (err error) {
 	var f *os.File
 

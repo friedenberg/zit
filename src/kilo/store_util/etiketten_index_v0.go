@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/etiketten_index"
+	"github.com/friedenberg/zit/src/foxtrot/etiketten_index"
 )
 
 type etikettenIndexV0 struct {

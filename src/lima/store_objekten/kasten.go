@@ -21,8 +21,6 @@ type KastenStore interface {
 		*kasten.Akte,
 		kennung.Kasten,
 		*kennung.Kasten,
-		kasten.Verzeichnisse,
-		*kasten.Verzeichnisse,
 	]
 }
 
@@ -37,8 +35,6 @@ type kastenStore struct {
 		*kasten.Akte,
 		kennung.Kasten,
 		*kennung.Kasten,
-		kasten.Verzeichnisse,
-		*kasten.Verzeichnisse,
 	]
 }
 
@@ -52,8 +48,6 @@ func makeKastenStore(
 		*kasten.Akte,
 		kennung.Kasten,
 		*kennung.Kasten,
-		kasten.Verzeichnisse,
-		*kasten.Verzeichnisse,
 	](
 		gattung.Kasten,
 		s,

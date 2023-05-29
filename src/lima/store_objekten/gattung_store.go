@@ -28,37 +28,14 @@ type CommonStore[
 	OPtr objekte.AktePtr[O],
 	K kennung.KennungLike[K],
 	KPtr kennung.KennungLikePtr[K],
-	V any,
-	VPtr objekte.VerzeichnissePtr[V, O],
 ] interface {
-	CommonStoreBase[
-		O,
-		OPtr,
-		K,
-		KPtr,
-		V,
-		VPtr,
-	]
+	CommonStoreBase[O, OPtr, K, KPtr]
 
 	objekte_store.CreateOrUpdater[
 		OPtr,
 		KPtr,
-		*objekte.Transacted[
-			O,
-			OPtr,
-			K,
-			KPtr,
-			V,
-			VPtr,
-		],
-		*objekte.CheckedOut[
-			O,
-			OPtr,
-			K,
-			KPtr,
-			V,
-			VPtr,
-		],
+		*objekte.Transacted[O, OPtr, K, KPtr],
+		*objekte.CheckedOut[O, OPtr, K, KPtr],
 	]
 }
 
@@ -67,11 +44,9 @@ type commonStoreDelegate[
 	OPtr objekte.AktePtr[O],
 	K kennung.KennungLike[K],
 	KPtr kennung.KennungLikePtr[K],
-	V any,
-	VPtr objekte.VerzeichnissePtr[V, O],
 ] interface {
-	addOne(*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]) error
-	updateOne(*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]) error
+	addOne(*objekte.Transacted[O, OPtr, K, KPtr]) error
+	updateOne(*objekte.Transacted[O, OPtr, K, KPtr]) error
 }
 
 type transacted[T any] interface {
@@ -87,31 +62,15 @@ type commonStore[
 	OPtr objekte.AktePtr[O],
 	K kennung.KennungLike[K],
 	KPtr kennung.KennungLikePtr[K],
-	V any,
-	VPtr objekte.VerzeichnissePtr[V, O],
 ] struct {
-	commonStoreBase[O, OPtr, K, KPtr, V, VPtr]
+	commonStoreBase[O, OPtr, K, KPtr]
 	AkteFormat objekte.AkteFormat[O, OPtr]
 	objekte_store.StoredParseSaver[O, OPtr, K, KPtr]
 	objekte_store.CreateOrUpdater[
 		OPtr,
 		KPtr,
-		*objekte.Transacted[
-			O,
-			OPtr,
-			K,
-			KPtr,
-			V,
-			VPtr,
-		],
-		*objekte.CheckedOut[
-			O,
-			OPtr,
-			K,
-			KPtr,
-			V,
-			VPtr,
-		],
+		*objekte.Transacted[O, OPtr, K, KPtr],
+		*objekte.CheckedOut[O, OPtr, K, KPtr],
 	]
 }
 
@@ -120,19 +79,17 @@ func makeCommonStore[
 	OPtr objekte.AktePtr[O],
 	K kennung.KennungLike[K],
 	KPtr kennung.KennungLikePtr[K],
-	V any,
-	VPtr objekte.VerzeichnissePtr[V, O],
 ](
 	gg schnittstellen.GattungGetter,
-	delegate commonStoreDelegate[O, OPtr, K, KPtr, V, VPtr],
+	delegate commonStoreDelegate[O, OPtr, K, KPtr],
 	sa store_util.StoreUtil,
 	tr objekte_store.TransactedReader[KPtr,
-		*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]],
+		*objekte.Transacted[O, OPtr, K, KPtr]],
 	akteFormat objekte.AkteFormat[O, OPtr],
-) (s *commonStore[O, OPtr, K, KPtr, V, VPtr], err error) {
+) (s *commonStore[O, OPtr, K, KPtr], err error) {
 	// pool := collections.MakePool[
-	// 	objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
-	// 	*objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
+	// 	objekte.Transacted[O, OPtr, K, KPtr, ],
+	// 	*objekte.Transacted[O, OPtr, K, KPtr, ],
 	// ]()
 
 	if delegate == nil {
@@ -141,7 +98,7 @@ func makeCommonStore[
 
 	of := sa.ObjekteReaderWriterFactory(gg)
 
-	csb, err := makeCommonStoreBase[O, OPtr, K, KPtr, V, VPtr](
+	csb, err := makeCommonStoreBase[O, OPtr, K, KPtr](
 		gg,
 		delegate,
 		sa,
@@ -161,8 +118,6 @@ func makeCommonStore[
 		OPtr,
 		K,
 		KPtr,
-		V,
-		VPtr,
 	]{
 		commonStoreBase: *csb,
 		AkteFormat:      akteFormat,
@@ -177,12 +132,12 @@ func makeCommonStore[
 	return
 }
 
-func (s *commonStore[O, OPtr, K, KPtr, V, VPtr]) CheckoutOne(
+func (s *commonStore[O, OPtr, K, KPtr]) CheckoutOne(
 	options CheckoutOptions,
-	t *objekte.Transacted[O, OPtr, K, KPtr, V, VPtr],
-) (co *objekte.CheckedOut[O, OPtr, K, KPtr, V, VPtr], err error) {
+	t *objekte.Transacted[O, OPtr, K, KPtr],
+) (co *objekte.CheckedOut[O, OPtr, K, KPtr], err error) {
 	todo.Change("add pool")
-	co = &objekte.CheckedOut[O, OPtr, K, KPtr, V, VPtr]{}
+	co = &objekte.CheckedOut[O, OPtr, K, KPtr]{}
 
 	co.Internal = *t
 	co.External.Sku = t.Sku.GetExternal()
@@ -238,7 +193,7 @@ func (s *commonStore[O, OPtr, K, KPtr, V, VPtr]) CheckoutOne(
 	return
 }
 
-func (s *commonStore[O, OPtr, K, KPtr, V, VPtr]) UpdateManyMetadatei(
+func (s *commonStore[O, OPtr, K, KPtr]) UpdateManyMetadatei(
 	incoming schnittstellen.Set[metadatei.WithKennung],
 ) (err error) {
 	if !s.StoreUtil.GetLockSmith().IsAcquired() {
@@ -258,7 +213,7 @@ func (s *commonStore[O, OPtr, K, KPtr, V, VPtr]) UpdateManyMetadatei(
 				return
 			}
 
-			var old *objekte.Transacted[O, OPtr, K, KPtr, V, VPtr]
+			var old *objekte.Transacted[O, OPtr, K, KPtr]
 
 			if old, err = s.ReadOne(ke); err != nil {
 				err = errors.Wrap(err)

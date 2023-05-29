@@ -5,6 +5,11 @@ import (
 )
 
 func (c *common) Flush() (err error) {
+	if err = c.typenIndex.Flush(c); err != nil {
+		err = errors.Wrapf(err, "failed to flush etiketten index")
+		return
+	}
+
 	if err = c.etikettenIndex.Flush(c); err != nil {
 		err = errors.Wrapf(err, "failed to flush etiketten index")
 		return

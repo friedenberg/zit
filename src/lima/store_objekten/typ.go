@@ -21,8 +21,6 @@ type TypStore interface {
 		*typ.Akte,
 		kennung.Typ,
 		*kennung.Typ,
-		objekte.NilVerzeichnisse[typ.Akte],
-		*objekte.NilVerzeichnisse[typ.Akte],
 	]
 }
 
@@ -37,8 +35,6 @@ type typStore struct {
 		*typ.Akte,
 		kennung.Typ,
 		*kennung.Typ,
-		objekte.NilVerzeichnisse[typ.Akte],
-		*objekte.NilVerzeichnisse[typ.Akte],
 	]
 }
 
@@ -52,8 +48,6 @@ func makeTypStore(
 		*typ.Akte,
 		kennung.Typ,
 		*kennung.Typ,
-		objekte.NilVerzeichnisse[typ.Akte],
-		*objekte.NilVerzeichnisse[typ.Akte],
 	](
 		gattung.Typ,
 		s,

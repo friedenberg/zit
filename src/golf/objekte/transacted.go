@@ -16,28 +16,25 @@ type Transacted[
 	T1 AktePtr[T],
 	T2 kennung.KennungLike[T2],
 	T3 kennung.KennungLikePtr[T2],
-	T4 any,
-	T5 VerzeichnissePtr[T4, T],
 ] struct {
-	Akte          T
-	Metadatei     metadatei.Metadatei
-	Verzeichnisse T4 `json:"-"`
-	Sku           sku.Transacted[T2, T3]
+	Akte      T
+	Metadatei metadatei.Metadatei
+	Sku       sku.Transacted[T2, T3]
 }
 
-func (t Transacted[T, T1, T2, T3, T4, T5]) Kennung() T3 {
+func (t Transacted[T, T1, T2, T3]) Kennung() T3 {
 	return &t.Sku.Kennung
 }
 
-func (t Transacted[T, T1, T2, T3, T4, T5]) GetMetadatei() metadatei.Metadatei {
+func (t Transacted[T, T1, T2, T3]) GetMetadatei() metadatei.Metadatei {
 	return t.Metadatei
 }
 
-func (t *Transacted[T, T1, T2, T3, T4, T5]) GetMetadateiPtr() *metadatei.Metadatei {
+func (t *Transacted[T, T1, T2, T3]) GetMetadateiPtr() *metadatei.Metadatei {
 	return &t.Metadatei
 }
 
-func (t *Transacted[T, T1, T2, T3, T4, T5]) SetMetadatei(
+func (t *Transacted[T, T1, T2, T3]) SetMetadatei(
 	m metadatei.Metadatei,
 ) {
 	t.Metadatei.ResetWith(m)
@@ -45,16 +42,16 @@ func (t *Transacted[T, T1, T2, T3, T4, T5]) SetMetadatei(
 	t.SetTai(m.Tai)
 }
 
-func (t Transacted[T, T1, T2, T3, T4, T5]) GetSkuAkteSha() schnittstellen.Sha {
+func (t Transacted[T, T1, T2, T3]) GetSkuAkteSha() schnittstellen.Sha {
 	return t.Sku.AkteSha
 }
 
-func (t Transacted[T, T1, T2, T3, T4, T5]) GetAkteSha() schnittstellen.Sha {
+func (t Transacted[T, T1, T2, T3]) GetAkteSha() schnittstellen.Sha {
 	AssertAkteShasMatch(t)
 	return t.Sku.AkteSha
 }
 
-func (t *Transacted[T, T1, T2, T3, T4, T5]) SetAkteSha(
+func (t *Transacted[T, T1, T2, T3]) SetAkteSha(
 	s schnittstellen.Sha,
 ) {
 	sh := sha.Make(s)
@@ -62,7 +59,7 @@ func (t *Transacted[T, T1, T2, T3, T4, T5]) SetAkteSha(
 	t.Sku.AkteSha = sh
 }
 
-func (t Transacted[T, T1, T2, T3, T4, T5]) GetObjekteSha() schnittstellen.Sha {
+func (t Transacted[T, T1, T2, T3]) GetObjekteSha() schnittstellen.Sha {
 	if !t.GetAkteSha().IsNull() && t.Sku.ObjekteSha.IsNull() {
 		errors.Todo(
 			"objekte sha is null while akte sha is %s",
@@ -73,13 +70,13 @@ func (t Transacted[T, T1, T2, T3, T4, T5]) GetObjekteSha() schnittstellen.Sha {
 	return t.Sku.ObjekteSha
 }
 
-func (t *Transacted[T, T1, T2, T3, T4, T5]) SetObjekteSha(
+func (t *Transacted[T, T1, T2, T3]) SetObjekteSha(
 	sh schnittstellen.Sha,
 ) {
 	t.Sku.ObjekteSha = sha.Make(sh)
 }
 
-func (t Transacted[T, T1, T2, T3, T4, T5]) GetTai() kennung.Tai {
+func (t Transacted[T, T1, T2, T3]) GetTai() kennung.Tai {
 	taiSku := t.Sku.Schwanz
 	taiMetadatei := t.GetMetadatei().Tai
 
@@ -105,31 +102,31 @@ func (t Transacted[T, T1, T2, T3, T4, T5]) GetTai() kennung.Tai {
 	}
 }
 
-func (t *Transacted[T, T1, T2, T3, T4, T5]) SetTai(ta kennung.Tai) {
+func (t *Transacted[T, T1, T2, T3]) SetTai(ta kennung.Tai) {
 	t.Metadatei.Tai = ta
 	t.Sku.Schwanz = ta
 }
 
-func (t Transacted[T, T1, T2, T3, T4, T5]) GetGattung() schnittstellen.Gattung {
+func (t Transacted[T, T1, T2, T3]) GetGattung() schnittstellen.Gattung {
 	return t.Sku.Kennung.GetGattung()
 }
 
-func (zt Transacted[T, T1, T2, T3, T4, T5]) IsNew() bool {
+func (zt Transacted[T, T1, T2, T3]) IsNew() bool {
 	return zt.Sku.Kopf.Equals(zt.Sku.Schwanz)
 }
 
-func (a Transacted[T, T1, T2, T3, T4, T5]) Less(
-	b Transacted[T, T1, T2, T3, T4, T5],
+func (a Transacted[T, T1, T2, T3]) Less(
+	b Transacted[T, T1, T2, T3],
 ) bool {
 	return a.GetTai().Less(b.GetTai())
 }
 
-func (a Transacted[T, T1, T2, T3, T4, T5]) EqualsAny(b any) bool {
+func (a Transacted[T, T1, T2, T3]) EqualsAny(b any) bool {
 	return values.Equals(a, b)
 }
 
-func (a Transacted[T, T1, T2, T3, T4, T5]) Equals(
-	b Transacted[T, T1, T2, T3, T4, T5],
+func (a Transacted[T, T1, T2, T3]) Equals(
+	b Transacted[T, T1, T2, T3],
 ) bool {
 	if !a.Metadatei.Equals(b.Metadatei) {
 		return false
@@ -146,12 +143,12 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) Equals(
 	return true
 }
 
-func (a Transacted[T, T1, T2, T3, T4, T5]) GetObjekte() (o T) {
+func (a Transacted[T, T1, T2, T3]) GetObjekte() (o T) {
 	o = a.Akte
 	return
 }
 
-func (a Transacted[T, T1, T2, T3, T4, T5]) GetEtiketten() kennung.EtikettSet {
+func (a Transacted[T, T1, T2, T3]) GetEtiketten() kennung.EtikettSet {
 	egs := []any{
 		// a.Verzeichnisse,
 		a.GetMetadatei(),
@@ -166,7 +163,7 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) GetEtiketten() kennung.EtikettSet {
 	return kennung.MakeEtikettSet()
 }
 
-func (a Transacted[T, T1, T2, T3, T4, T5]) GetEtikettenExpanded() kennung.EtikettSet {
+func (a Transacted[T, T1, T2, T3]) GetEtikettenExpanded() kennung.EtikettSet {
 	egs := []any{
 		// a.Verzeichnisse,
 		a.GetMetadatei(),
@@ -181,7 +178,7 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) GetEtikettenExpanded() kennung.Etiket
 	return kennung.Expanded(a.GetEtiketten())
 }
 
-func (a Transacted[T, T1, T2, T3, T4, T5]) GetTyp() (t kennung.Typ) {
+func (a Transacted[T, T1, T2, T3]) GetTyp() (t kennung.Typ) {
 	tgs := []any{
 		// a.Verzeichnisse,
 		a.GetMetadatei(),
@@ -201,7 +198,7 @@ func (a Transacted[T, T1, T2, T3, T4, T5]) GetTyp() (t kennung.Typ) {
 	return
 }
 
-func (a *Transacted[T, T1, T2, T3, T4, T5]) GetMetadateiWithKennung() (m metadatei.WithKennung) {
+func (a *Transacted[T, T1, T2, T3]) GetMetadateiWithKennung() (m metadatei.WithKennung) {
 	var k2 T2
 
 	T3(&k2).ResetWith(a.Sku.Kennung)
@@ -218,38 +215,38 @@ func (a *Transacted[T, T1, T2, T3, T4, T5]) GetMetadateiWithKennung() (m metadat
 	return
 }
 
-func (a Transacted[T, T1, T2, T3, T4, T5]) GetIdLike() (il kennung.Kennung) {
+func (a Transacted[T, T1, T2, T3]) GetIdLike() (il kennung.Kennung) {
 	return a.Sku.Kennung
 }
 
-func (a Transacted[T, T1, T2, T3, T4, T5]) GetSkuLike() (sk sku.SkuLike) {
+func (a Transacted[T, T1, T2, T3]) GetSkuLike() (sk sku.SkuLike) {
 	return a.Sku
 }
 
-func (a Transacted[T, T1, T2, T3, T4, T5]) String() string {
+func (a Transacted[T, T1, T2, T3]) String() string {
 	return a.GetSku().String()
 }
 
-func (a Transacted[T, T1, T2, T3, T4, T5]) GetSku() (sk sku.Sku) {
+func (a Transacted[T, T1, T2, T3]) GetSku() (sk sku.Sku) {
 	sk = a.Sku.Sku()
 	AssertAkteShasMatch(a)
 	return
 }
 
-func (a Transacted[T, T1, T2, T3, T4, T5]) GetKennung() kennung.Kennung {
+func (a Transacted[T, T1, T2, T3]) GetKennung() kennung.Kennung {
 	return a.Sku.Kennung
 }
 
-func (a *Transacted[T, T1, T2, T3, T4, T5]) GetKennungPtr() kennung.KennungPtr {
+func (a *Transacted[T, T1, T2, T3]) GetKennungPtr() kennung.KennungPtr {
 	return T3(&a.Sku.Kennung)
 }
 
-func (a Transacted[T, T1, T2, T3, T4, T5]) GetDataIdentity() (di sku.DataIdentity) {
+func (a Transacted[T, T1, T2, T3]) GetDataIdentity() (di sku.DataIdentity) {
 	di = a.GetSku()
 	return
 }
 
-func (a *Transacted[T, T1, T2, T3, T4, T5]) SetDataIdentity(
+func (a *Transacted[T, T1, T2, T3]) SetDataIdentity(
 	o sku.DataIdentity,
 ) (err error) {
 	var h T2
@@ -267,7 +264,7 @@ func (a *Transacted[T, T1, T2, T3, T4, T5]) SetDataIdentity(
 	return
 }
 
-func (a *Transacted[T, T1, T2, T3, T4, T5]) SetSkuLike(
+func (a *Transacted[T, T1, T2, T3]) SetSkuLike(
 	o sku.SkuLike,
 ) (err error) {
 	var h T2
@@ -288,34 +285,31 @@ func (a *Transacted[T, T1, T2, T3, T4, T5]) SetSkuLike(
 	return
 }
 
-func (a Transacted[T, T1, T2, T3, T4, T5]) GetKennungString() string {
+func (a Transacted[T, T1, T2, T3]) GetKennungString() string {
 	return a.Sku.Kennung.String()
 }
 
-func (a *Transacted[T, T1, T2, T3, T4, T5]) Reset() {
+func (a *Transacted[T, T1, T2, T3]) Reset() {
 	a.Metadatei.Reset()
 	a.Sku.Reset()
 	T1(&a.Akte).Reset()
-	T5(&a.Verzeichnisse).Reset()
 	AssertAkteShasMatch(a)
 }
 
-func (a *Transacted[T, T1, T2, T3, T4, T5]) ResetWithPtr(
-	b *Transacted[T, T1, T2, T3, T4, T5],
+func (a *Transacted[T, T1, T2, T3]) ResetWithPtr(
+	b *Transacted[T, T1, T2, T3],
 ) {
 	a.Metadatei.ResetWith(b.GetMetadatei())
 	a.Sku.ResetWith(b.Sku)
 	T1(&a.Akte).ResetWith(b.Akte)
-	T5(&a.Verzeichnisse).ResetWithObjekteMetadateiGetter(a.Akte, a)
 	AssertAkteShasMatch(a)
 }
 
-func (a *Transacted[T, T1, T2, T3, T4, T5]) ResetWith(
-	b Transacted[T, T1, T2, T3, T4, T5],
+func (a *Transacted[T, T1, T2, T3]) ResetWith(
+	b Transacted[T, T1, T2, T3],
 ) {
 	a.Metadatei.ResetWith(b.Metadatei)
 	a.Sku.ResetWith(b.Sku)
 	T1(&a.Akte).ResetWith(b.Akte)
-	T5(&a.Verzeichnisse).ResetWithObjekteMetadateiGetter(a.Akte, a)
 	AssertAkteShasMatch(a)
 }

@@ -13,8 +13,6 @@ type Transacted = objekte.Transacted[
 	*Objekte,
 	kennung.Hinweis,
 	*kennung.Hinweis,
-	Verzeichnisse,
-	*Verzeichnisse,
 ]
 
 type External = objekte.External[
@@ -29,6 +27,4 @@ type CheckedOut = objekte.CheckedOut[
 	*Objekte,
 	kennung.Hinweis,
 	*kennung.Hinweis,
-	Verzeichnisse,
-	*Verzeichnisse,
 ]
