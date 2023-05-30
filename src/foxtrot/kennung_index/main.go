@@ -13,6 +13,26 @@ import (
 	"github.com/friedenberg/zit/src/echo/hinweis_index"
 )
 
+type Index2[T any] interface {
+	DidRead() bool
+	HasChanges() bool
+	Reset() error
+	Get(T) (Indexed2[T], bool)
+	StoreMany(schnittstellen.Set[T]) (err error)
+	StoreOne(T) (err error)
+	io.WriterTo
+	io.ReaderFrom
+}
+
+type Indexed2[T any] interface {
+	GetKennung() T
+	GetSchwanzenCount() int
+	GetCount() int
+	GetTridex() schnittstellen.Tridex
+	GetExpandedRight() schnittstellen.Set[T]
+	GetExpandedAll() schnittstellen.Set[T]
+}
+
 type EtikettIndex interface {
 	GetAllEtiketten() ([]kennung.Etikett, error)
 	AddEtikettSet(to kennung.EtikettSet, from kennung.EtikettSet) (err error)

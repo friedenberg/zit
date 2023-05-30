@@ -1,30 +1,12 @@
 package etiketten_index
 
 import (
-	"io"
-
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/kennung_index"
 )
 
-type Index interface {
-	DidRead() bool
-	HasChanges() bool
-	Reset() error
-	ExpandEtikett(kennung.Etikett) (Indexed, bool)
-	StoreEtikett(kennung.Etikett) (err error)
-	StoreEtiketten(kennung.EtikettSet) (err error)
-	io.WriterTo
-	io.ReaderFrom
-}
-
-type Indexed interface {
-	GetEtikett() kennung.Etikett
-	GetTridex() schnittstellen.Tridex
-	GetEtikettenExpandedRight() schnittstellen.Set[kennung.Etikett]
-	GetEtikettenExpandedAll() schnittstellen.Set[kennung.Etikett]
-}
+type Index = kennung_index.Index2[kennung.Etikett]
 
 func MakeIndex() Index {
-	return makeIndex()
+	return kennung_index.MakeIndex2[kennung.Etikett]()
 }

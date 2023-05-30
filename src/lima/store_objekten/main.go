@@ -455,12 +455,12 @@ func (s *Store) getReindexFunc(
 			return
 		}
 
-		if err = ei.StoreEtiketten(o.GetEtiketten()); err != nil {
+		if err = ei.StoreMany(o.GetEtiketten()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if err = ti.StoreTyp(o.GetTyp()); err != nil {
+		if err = ti.StoreOne(o.GetTyp()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -569,7 +569,7 @@ func (s *Store) AddMatchable(m kennung.Matchable) (err error) {
 		return
 	}
 
-	if err = ei.StoreEtiketten(m.GetEtiketten()); err != nil {
+	if err = ei.StoreMany(m.GetEtiketten()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -583,7 +583,7 @@ func (s *Store) AddMatchable(m kennung.Matchable) (err error) {
 			err = errors.Wrap(err)
 			return
 		}
-		if err = ti.StoreTyp(m.GetTyp()); err != nil {
+		if err = ti.StoreOne(m.GetTyp()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

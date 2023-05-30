@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/alfred"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/etiketten_index"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
@@ -40,14 +39,13 @@ func (w *Writer) zettelToItem(
 	mb.AddMatches(z.GetTyp().String())
 	z.GetMetadatei().Etiketten.Each(
 		func(e kennung.Etikett) (err error) {
-			var ei etiketten_index.Indexed
-			ok := false
+			ei, ok := w.etikettenIndex.Get(e)
 
-			if ei, ok = w.etikettenIndex.ExpandEtikett(e); !ok {
+			if !ok {
 				return
 			}
 
-			ei.GetEtikettenExpandedAll().Each(
+			ei.GetExpandedAll().Each(
 				func(e kennung.Etikett) (err error) {
 					mb.AddMatches(e.String())
 					return
@@ -58,8 +56,8 @@ func (w *Writer) zettelToItem(
 		},
 	)
 
-	if ti, ok := w.typenIndex.ExpandTyp(z.GetTyp()); ok {
-		ti.GetTypenExpandedAll().Each(
+	if ti, ok := w.typenIndex.Get(z.GetTyp()); ok {
+		ti.GetExpandedAll().Each(
 			func(t kennung.Typ) (err error) {
 				mb.AddMatches(t.String())
 				return
