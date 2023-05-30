@@ -14,10 +14,8 @@ import (
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/age_io"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/etiketten_index"
 	"github.com/friedenberg/zit/src/foxtrot/kennung_index"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
-	"github.com/friedenberg/zit/src/foxtrot/typen_index"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/golf/transaktion"
@@ -47,8 +45,8 @@ type StoreUtil interface {
 	GetTransaktionStore() TransaktionStore
 	GetAbbrStore() AbbrStore
 	GetKennungIndex() kennung_index.Index
-	GetEtikettenIndex() (etiketten_index.Index, error)
-	GetTypenIndex() (typen_index.Index, error)
+	GetEtikettenIndex() (kennung_index.Index2[kennung.Etikett], error)
+	GetTypenIndex() (kennung_index.Index2[kennung.Typ], error)
 
 	SetMatchableAdder(kennung.MatchableAdder)
 	kennung.MatchableAdder
@@ -75,8 +73,8 @@ type common struct {
 	kennungIndex          kennung_index.Index
 
 	kennung.MatchableAdder
-	etikettenIndex verzeichnisseWrapper[etiketten_index.Index]
-	typenIndex     verzeichnisseWrapper[typen_index.Index]
+	etikettenIndex verzeichnisseWrapper[kennung_index.Index2[kennung.Etikett]]
+	typenIndex     verzeichnisseWrapper[kennung_index.Index2[kennung.Typ]]
 }
 
 func MakeStoreUtil(
@@ -92,12 +90,12 @@ func MakeStoreUtil(
 		konfig:                    k,
 		standort:                  st,
 		persistentMetadateiFormat: pmf,
-		etikettenIndex: makeVerzeichnisseWrapper[etiketten_index.Index](
-			etiketten_index.MakeIndex(),
+		etikettenIndex: makeVerzeichnisseWrapper[kennung_index.Index2[kennung.Etikett]](
+			kennung_index.MakeIndex2[kennung.Etikett](),
 			st.DirVerzeichnisse("EtikettenIndexV0"),
 		),
-		typenIndex: makeVerzeichnisseWrapper[typen_index.Index](
-			typen_index.MakeIndex(),
+		typenIndex: makeVerzeichnisseWrapper[kennung_index.Index2[kennung.Typ]](
+			kennung_index.MakeIndex2[kennung.Typ](),
 			st.DirVerzeichnisse("TypenIndexV0"),
 		),
 	}
@@ -199,11 +197,11 @@ func (s *common) GetKennungIndex() kennung_index.Index {
 	return s.kennungIndex
 }
 
-func (s *common) GetEtikettenIndex() (etiketten_index.Index, error) {
+func (s *common) GetEtikettenIndex() (kennung_index.Index2[kennung.Etikett], error) {
 	return s.etikettenIndex.Get(s)
 }
 
-func (s *common) GetTypenIndex() (typen_index.Index, error) {
+func (s *common) GetTypenIndex() (kennung_index.Index2[kennung.Typ], error) {
 	return s.typenIndex.Get(s)
 }
 

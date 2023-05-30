@@ -9,8 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/etiketten_index"
-	"github.com/friedenberg/zit/src/foxtrot/typen_index"
+	"github.com/friedenberg/zit/src/foxtrot/kennung_index"
 	"github.com/friedenberg/zit/src/kilo/alfred"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
@@ -53,14 +52,14 @@ func (c CatAlfred) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error
 
 	var aw *alfred.Writer
 
-	var ei etiketten_index.Index
+	var ei kennung_index.Index2[kennung.Etikett]
 
 	if ei, err = u.StoreObjekten().GetEtikettenIndex(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	var ti typen_index.Index
+	var ti kennung_index.Index2[kennung.Typ]
 
 	if ti, err = u.StoreObjekten().GetTypenIndex(); err != nil {
 		err = errors.Wrap(err)

@@ -10,10 +10,9 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/etiketten_index"
+	"github.com/friedenberg/zit/src/foxtrot/kennung_index"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
-	"github.com/friedenberg/zit/src/foxtrot/typen_index"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/golf/transaktion"
@@ -434,8 +433,8 @@ func (s *Store) ReadAll(
 }
 
 func (s *Store) getReindexFunc(
-	ei etiketten_index.Index,
-	ti typen_index.Index,
+	ei kennung_index.Index2[kennung.Etikett],
+	ti kennung_index.Index2[kennung.Typ],
 ) func(sku.DataIdentity) error {
 	return func(sk sku.DataIdentity) (err error) {
 		var st reindexer
@@ -562,7 +561,7 @@ func (s *Store) AddMatchable(m kennung.Matchable) (err error) {
 		return
 	}
 
-	var ei etiketten_index.Index
+	var ei kennung_index.Index2[kennung.Etikett]
 
 	if ei, err = s.GetEtikettenIndex(); err != nil {
 		err = errors.Wrap(err)
@@ -577,7 +576,7 @@ func (s *Store) AddMatchable(m kennung.Matchable) (err error) {
 	t := m.GetTyp()
 
 	if !t.IsEmpty() {
-		var ti typen_index.Index
+		var ti kennung_index.Index2[kennung.Typ]
 
 		if ti, err = s.GetTypenIndex(); err != nil {
 			err = errors.Wrap(err)
@@ -616,7 +615,7 @@ func (s *Store) Reindex() (err error) {
 		return
 	}
 
-	var ei etiketten_index.Index
+	var ei kennung_index.Index2[kennung.Etikett]
 
 	if ei, err = s.StoreUtil.GetEtikettenIndex(); err != nil {
 		err = errors.Wrap(err)
@@ -628,7 +627,7 @@ func (s *Store) Reindex() (err error) {
 		return
 	}
 
-	var ti typen_index.Index
+	var ti kennung_index.Index2[kennung.Typ]
 
 	if ti, err = s.StoreUtil.GetTypenIndex(); err != nil {
 		err = errors.Wrap(err)

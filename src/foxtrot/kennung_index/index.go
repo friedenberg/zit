@@ -95,14 +95,14 @@ func (i *index2[T, TPtr]) ReadFrom(r1 io.Reader) (n int64, err error) {
 	return
 }
 
-func (i index2[T, TPtr])	GetAll() (out []T) {
-  out = make([]T, 0, len(i.Kennungen))
+func (i index2[T, TPtr]) GetAll() (out []T) {
+	out = make([]T, 0, len(i.Kennungen))
 
-  for _, ki := range i.Kennungen {
-    out = append(out, ki.GetKennung())
-  }
+	for _, ki := range i.Kennungen {
+		out = append(out, ki.GetKennung())
+	}
 
-  return
+	return
 }
 
 func (i index2[T, TPtr]) Get(k T) (id Indexed2[T], ok bool) {

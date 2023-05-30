@@ -6,22 +6,21 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/alfred"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/etiketten_index"
-	"github.com/friedenberg/zit/src/foxtrot/typen_index"
+	"github.com/friedenberg/zit/src/foxtrot/kennung_index"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
 type Writer struct {
 	alfredWriter   *alfred.Writer
-	etikettenIndex etiketten_index.Index
-	typenIndex     typen_index.Index
+	etikettenIndex kennung_index.Index2[kennung.Etikett]
+	typenIndex     kennung_index.Index2[kennung.Typ]
 	Abbr           func(kennung.Hinweis) (string, error)
 }
 
 func New(
 	out io.Writer,
-	etikettenIndex etiketten_index.Index,
-	typenIndex typen_index.Index,
+	etikettenIndex kennung_index.Index2[kennung.Etikett],
+	typenIndex kennung_index.Index2[kennung.Typ],
 	ha func(kennung.Hinweis) (string, error),
 ) (w *Writer, err error) {
 	var aw *alfred.Writer
