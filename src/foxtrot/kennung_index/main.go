@@ -18,6 +18,7 @@ type Index2[T any] interface {
 	HasChanges() bool
 	Reset() error
 	Get(T) (Indexed2[T], bool)
+	GetAll() []T
 	StoreMany(schnittstellen.Set[T]) (err error)
 	StoreOne(T) (err error)
 	io.WriterTo
