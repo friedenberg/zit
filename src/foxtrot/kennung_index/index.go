@@ -105,7 +105,7 @@ func (i index2[T, TPtr]) GetAll() (out []T) {
 	return
 }
 
-func (i index2[T, TPtr]) Get(k T) (id Indexed2[T], ok bool) {
+func (i index2[T, TPtr]) Get(k T) (id Indexed[T], ok bool) {
 	i.lock.Lock()
 	defer i.lock.Unlock()
 

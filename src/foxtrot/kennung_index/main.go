@@ -18,7 +18,7 @@ type KennungIndex[T schnittstellen.ValueLike] interface {
 	DidRead() bool
 	HasChanges() bool
 	Reset() error
-	Get(T) (Indexed2[T], bool)
+	Get(T) (Indexed[T], bool)
 	GetAll() []T
 	StoreDelta(schnittstellen.Delta[T]) (err error)
 	StoreMany(schnittstellen.Set[T]) (err error)
@@ -27,7 +27,7 @@ type KennungIndex[T schnittstellen.ValueLike] interface {
 	io.ReaderFrom
 }
 
-type Indexed2[T schnittstellen.ValueLike] interface {
+type Indexed[T schnittstellen.ValueLike] interface {
 	GetKennung() T
 	GetSchwanzenCount() int
 	GetCount() int
