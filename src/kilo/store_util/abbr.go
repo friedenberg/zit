@@ -104,11 +104,11 @@ func (i *indexAbbr) Flush() (err error) {
 		return
 	}
 
-	defer errors.Deferred(&err, w1.Close)
+	defer errors.DeferredCloser(&err, w1)
 
 	w := bufio.NewWriter(w1)
 
-	defer errors.Deferred(&err, w.Flush)
+	defer errors.DeferredFlusher(&err, w)
 
 	enc := gob.NewEncoder(w)
 
