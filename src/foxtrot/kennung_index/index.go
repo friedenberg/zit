@@ -95,6 +95,14 @@ func (i *index2[T, TPtr]) ReadFrom(r1 io.Reader) (n int64, err error) {
 	return
 }
 
+func (i index2[T, TPtr]) Each(schnittstellen.FuncIter[Indexed[T]]) (err error) {
+	return
+}
+
+func (i index2[T, TPtr]) EachSchwanzen(schnittstellen.FuncIter[Indexed[T]]) (err error) {
+	return
+}
+
 func (i index2[T, TPtr]) GetAll() (out []T) {
 	out = make([]T, 0, len(i.Kennungen))
 

@@ -20,6 +20,8 @@ type KennungIndex[T schnittstellen.ValueLike] interface {
 	Reset() error
 	Get(T) (Indexed[T], bool)
 	GetAll() []T
+	Each(schnittstellen.FuncIter[Indexed[T]]) error
+	EachSchwanzen(schnittstellen.FuncIter[Indexed[T]]) error
 	StoreDelta(schnittstellen.Delta[T]) (err error)
 	StoreMany(schnittstellen.Set[T]) (err error)
 	StoreOne(T) (err error)

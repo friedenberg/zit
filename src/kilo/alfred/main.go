@@ -55,19 +55,19 @@ func (w *Writer) WriteZettelVerzeichnisse(z *zettel.Transacted) (err error) {
 	return
 }
 
-func (w *Writer) WriteEtikett(e kennung.Etikett) (n int, err error) {
+func (w *Writer) WriteEtikett(e kennung.Etikett) (n int64, err error) {
 	item := w.etikettToItem(e)
 	w.alfredWriter.WriteItem(item)
 	return
 }
 
-func (w *Writer) WriteHinweis(e kennung.Hinweis) (n int, err error) {
+func (w *Writer) WriteHinweis(e kennung.Hinweis) (n int64, err error) {
 	item := w.hinweisToItem(e)
 	w.alfredWriter.WriteItem(item)
 	return
 }
 
-func (w *Writer) WriteError(in error) (n int, out error) {
+func (w *Writer) WriteError(in error) (n int64, out error) {
 	if in == nil {
 		return 0, nil
 	}
