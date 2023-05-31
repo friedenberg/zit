@@ -17,6 +17,8 @@ function complete_show { # @test
 	assert_output_unsorted --regexp - <<-EOM
 		one/dos.*Zettel: !md wow ok again
 		one/uno.*Zettel: !md wow the first
+		tag-1.*Etikett
+		tag-2.*Etikett
 		tag-3.*Etikett
 		tag-4.*Etikett
 	EOM

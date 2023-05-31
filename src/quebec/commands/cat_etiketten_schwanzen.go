@@ -6,6 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/kennung_index"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
@@ -26,24 +27,24 @@ func (c CatEtikettenSchwanzen) Run(
 	u *umwelt.Umwelt,
 	_ ...string,
 ) (err error) {
-	var ea []kennung.Etikett
+	if err = u.StoreObjekten().GetKennungIndex().EachSchwanzen(
+		func(e kennung_index.Indexed[kennung.Etikett]) (err error) {
+			if err = errors.Out().Print(e.GetKennung().String()); err != nil {
+				err = errors.IsAsNilOrWrapf(
+					err,
+					syscall.EPIPE,
+					"Etikett: %s",
+					e,
+				)
 
-	if ea, err = u.StoreObjekten().GetKennungIndex().GetAllEtiketten(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	for _, e := range ea {
-		if err = errors.Out().Print(e.String()); err != nil {
-			err = errors.IsAsNilOrWrapf(
-				err,
-				syscall.EPIPE,
-				"Etikett: %s",
-				e,
-			)
+				return
+			}
 
 			return
-		}
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

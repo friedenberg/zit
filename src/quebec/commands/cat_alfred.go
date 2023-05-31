@@ -52,13 +52,6 @@ func (c CatAlfred) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error
 
 	var aw *alfred.Writer
 
-	var ei kennung_index.KennungIndex[kennung.Etikett]
-
-	if ei, err = u.StoreObjekten().GetEtikettenIndex(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	var ti kennung_index.KennungIndex[kennung.Typ]
 
 	if ti, err = u.StoreObjekten().GetTypenIndex(); err != nil {
@@ -68,7 +61,7 @@ func (c CatAlfred) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error
 
 	if aw, err = alfred.New(
 		wo,
-		ei,
+		u.StoreObjekten().GetKennungIndex(),
 		ti,
 		u.StoreObjekten().GetAbbrStore().Hinweis().Abbreviate,
 	); err != nil {
@@ -106,17 +99,16 @@ func (c CatAlfred) catEtiketten(
 	m kennung.Matcher,
 	aw *alfred.Writer,
 ) {
-	var ea []kennung.Etikett
-
 	var err error
 
-	if ea, err = u.StoreObjekten().GetKennungIndex().GetAllEtiketten(); err != nil {
+	if err = u.StoreObjekten().GetKennungIndex().EachSchwanzen(
+		func(e kennung_index.Indexed[kennung.Etikett]) (err error) {
+			_, err = aw.WriteEtikett(e)
+			return
+		},
+	); err != nil {
 		aw.WriteError(err)
 		return
-	}
-
-	for _, e := range ea {
-		aw.WriteEtikett(e)
 	}
 }
 

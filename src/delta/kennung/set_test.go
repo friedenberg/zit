@@ -215,17 +215,17 @@ func TestPrefixIntersection(t *testing.T) {
 // }
 
 func TestDelta1(t *testing.T) {
-	a := MakeEtikettSet(
+	from := MakeEtikettSet(
 		MustEtikett("project-2021-zit"),
 		MustEtikett("task-todo"),
 	)
 
-	b := MakeEtikettSet(
+	to := MakeEtikettSet(
 		MustEtikett("project-2021-zit"),
 		MustEtikett("zz-archive-task-done"),
 	)
 
-	d := collections.MakeSetDelta[Etikett](a, b)
+	d := collections.MakeSetDelta[Etikett](from, to)
 
 	c_expected := MakeEtikettSet(
 		MustEtikett("zz-archive-task-done"),

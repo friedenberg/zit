@@ -46,7 +46,6 @@ type StoreUtil interface {
 	GetTransaktionStore() TransaktionStore
 	GetAbbrStore() AbbrStore
 	GetKennungIndex() kennung_index.Index
-	GetEtikettenIndex() (kennung_index.KennungIndex[kennung.Etikett], error)
 	GetTypenIndex() (kennung_index.KennungIndex[kennung.Typ], error)
 
 	SetMatchableAdder(kennung.MatchableAdder)
@@ -74,8 +73,7 @@ type common struct {
 	kennungIndex          kennung_index.Index
 
 	kennung.MatchableAdder
-	etikettenIndex verzeichnisse_index.Wrapper[kennung_index.KennungIndex[kennung.Etikett]]
-	typenIndex     verzeichnisse_index.Wrapper[kennung_index.KennungIndex[kennung.Typ]]
+	typenIndex verzeichnisse_index.Wrapper[kennung_index.KennungIndex[kennung.Typ]]
 }
 
 func MakeStoreUtil(
@@ -91,10 +89,6 @@ func MakeStoreUtil(
 		konfig:                    k,
 		standort:                  st,
 		persistentMetadateiFormat: pmf,
-		etikettenIndex: verzeichnisse_index.MakeWrapper[kennung_index.KennungIndex[kennung.Etikett]](
-			kennung_index.MakeIndex2[kennung.Etikett](),
-			st.DirVerzeichnisse("EtikettenIndexV0"),
-		),
 		typenIndex: verzeichnisse_index.MakeWrapper[kennung_index.KennungIndex[kennung.Typ]](
 			kennung_index.MakeIndex2[kennung.Typ](),
 			st.DirVerzeichnisse("TypenIndexV0"),
@@ -196,10 +190,6 @@ func (s *common) GetAbbrStore() AbbrStore {
 
 func (s *common) GetKennungIndex() kennung_index.Index {
 	return s.kennungIndex
-}
-
-func (s *common) GetEtikettenIndex() (kennung_index.KennungIndex[kennung.Etikett], error) {
-	return s.etikettenIndex.Get(s)
 }
 
 func (s *common) GetTypenIndex() (kennung_index.KennungIndex[kennung.Typ], error) {

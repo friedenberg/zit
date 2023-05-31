@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/kennung_index"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/cwd"
@@ -52,27 +53,25 @@ func (c commandWithCwdQuery) Complete(u *umwelt.Umwelt, args ...string) (err err
 	}
 
 	if cg.Contains(gattung.Etikett) {
-		var ea []kennung.Etikett
+		if err = u.StoreObjekten().GetKennungIndex().EachSchwanzen(
+			func(e kennung_index.Indexed[kennung.Etikett]) (err error) {
+				if err = errors.Out().Printf("%s\tEtikett", e.GetKennung().String()); err != nil {
+					err = errors.IsAsNilOrWrapf(
+						err,
+						syscall.EPIPE,
+						"Etikett: %s",
+						e,
+					)
 
-		if ea, err = u.StoreObjekten().GetKennungIndex().GetAllEtiketten(); err != nil {
+					return
+				}
+
+				return
+			},
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
-
-		for _, e := range ea {
-			if err = errors.Out().Printf("%s\tEtikett", e.String()); err != nil {
-				err = errors.IsAsNilOrWrapf(
-					err,
-					syscall.EPIPE,
-					"Etikett: %s",
-					e,
-				)
-
-				return
-			}
-		}
-
-		return
 	}
 
 	if cg.Contains(gattung.Typ) {

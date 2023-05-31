@@ -6,6 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/bravo/sha"
 )
 
@@ -83,8 +84,11 @@ func (ei *verzeichnisseWrapper[T]) Flush(
 	vf schnittstellen.VerzeichnisseFactory,
 ) (err error) {
 	if !ei.index.HasChanges() {
+		log.Log().Printf("%s does not have changes", ei.path)
 		return
 	}
+
+	log.Log().Printf("%s has changes", ei.path)
 
 	var wc schnittstellen.ShaWriteCloser
 
@@ -99,6 +103,8 @@ func (ei *verzeichnisseWrapper[T]) Flush(
 		err = errors.Wrap(err)
 		return
 	}
+
+	log.Log().Printf("%s done writing changes", ei.path)
 
 	return
 }

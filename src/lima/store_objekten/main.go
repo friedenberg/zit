@@ -433,7 +433,6 @@ func (s *Store) ReadAll(
 }
 
 func (s *Store) getReindexFunc(
-	ei kennung_index.KennungIndex[kennung.Etikett],
 	ti kennung_index.KennungIndex[kennung.Typ],
 ) func(sku.DataIdentity) error {
 	return func(sk sku.DataIdentity) (err error) {
@@ -451,11 +450,6 @@ func (s *Store) getReindexFunc(
 
 		if o, err = st.ReindexOne(sk); err != nil {
 			err = errors.Wrapf(err, "Sku %s", sk)
-			return
-		}
-
-		if err = ei.StoreMany(o.GetEtiketten()); err != nil {
-			err = errors.Wrap(err)
 			return
 		}
 
@@ -561,18 +555,6 @@ func (s *Store) AddMatchable(m kennung.Matchable) (err error) {
 		return
 	}
 
-	var ei kennung_index.KennungIndex[kennung.Etikett]
-
-	if ei, err = s.GetEtikettenIndex(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = ei.StoreMany(m.GetEtiketten()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	t := m.GetTyp()
 
 	if !t.IsEmpty() {
@@ -615,18 +597,6 @@ func (s *Store) Reindex() (err error) {
 		return
 	}
 
-	var ei kennung_index.KennungIndex[kennung.Etikett]
-
-	if ei, err = s.StoreUtil.GetEtikettenIndex(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = ei.Reset(); err != nil {
-		err = errors.Wrapf(err, "failed to reset etiketten index")
-		return
-	}
-
 	var ti kennung_index.KennungIndex[kennung.Typ]
 
 	if ti, err = s.StoreUtil.GetTypenIndex(); err != nil {
@@ -644,7 +614,7 @@ func (s *Store) Reindex() (err error) {
 		return
 	}
 
-	f1 := s.getReindexFunc(ei, ti)
+	f1 := s.getReindexFunc(ti)
 
 	// if s.StoreUtil.GetKonfig().UseBestandsaufnahme {
 	// } else {

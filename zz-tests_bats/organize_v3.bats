@@ -368,7 +368,7 @@ function organize_v3_commits_organize_one_etiketten_group_by_two_new_zettels { #
 
 	run_zit cat-etiketten-schwanzen
 	assert_success
-	assert_output "$(cat "$expected")"
+	assert_output_unsorted "$(cat "$expected")"
 
 	{
 		echo one/uno
@@ -400,7 +400,7 @@ function organize_v3_commits_organize_one_etiketten_group_by_two_new_zettels { #
 
 	run_zit cat-etiketten-schwanzen
 	assert_success
-	assert_output "$(cat "$expected")"
+	assert_output_unsorted "$(cat "$expected")"
 
 	to_add="$(mktemp)"
 	{
@@ -425,7 +425,7 @@ function organize_v3_commits_organize_one_etiketten_group_by_two_new_zettels { #
 
 	run_zit cat-etiketten-schwanzen
 	assert_success
-	assert_output "$(cat "$expected")"
+	assert_output_unsorted "$(cat "$expected")"
 
 	expected_organize="$(mktemp)"
 	{
@@ -814,5 +814,5 @@ function organize_v3_etiketten_correct { # @test
 	} >"$expected_etiketten"
 
 	run zit cat-etiketten-schwanzen
-	assert_output "$(cat "$expected_etiketten")"
+	assert_output_unsorted "$(cat "$expected_etiketten")"
 }

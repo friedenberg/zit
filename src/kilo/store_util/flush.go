@@ -10,11 +10,6 @@ func (c *common) Flush() (err error) {
 		return
 	}
 
-	if err = c.etikettenIndex.Flush(c); err != nil {
-		err = errors.Wrapf(err, "failed to flush etiketten index")
-		return
-	}
-
 	if err = c.kennungIndex.Flush(); err != nil {
 		err = errors.Wrapf(err, "failed to flush kennung index")
 		return

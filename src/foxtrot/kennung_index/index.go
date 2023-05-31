@@ -8,6 +8,8 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
@@ -95,11 +97,39 @@ func (i *index2[T, TPtr]) ReadFrom(r1 io.Reader) (n int64, err error) {
 	return
 }
 
-func (i index2[T, TPtr]) Each(schnittstellen.FuncIter[Indexed[T]]) (err error) {
+func (i index2[T, TPtr]) Each(f schnittstellen.FuncIter[Indexed[T]]) (err error) {
+	for _, id := range i.Kennungen {
+		if err = f(id); err != nil {
+			if iter.IsStopIteration(err) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+			}
+
+			return
+		}
+	}
+
 	return
 }
 
-func (i index2[T, TPtr]) EachSchwanzen(schnittstellen.FuncIter[Indexed[T]]) (err error) {
+func (i index2[T, TPtr]) EachSchwanzen(f schnittstellen.FuncIter[Indexed[T]]) (err error) {
+	for _, id := range i.Kennungen {
+		if id.GetSchwanzenCount() == 0 {
+			continue
+		}
+
+		if err = f(id); err != nil {
+			if iter.IsStopIteration(err) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+			}
+
+			return
+		}
+	}
+
 	return
 }
 
@@ -125,6 +155,8 @@ func (i *index2[T, TPtr]) StoreDelta(d schnittstellen.Delta[T]) (err error) {
 	i.lock.Lock()
 	defer i.lock.Unlock()
 
+	log.Log().Printf("delta: %s", d)
+
 	if err = d.GetAdded().Each(i.storeOne); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -140,6 +172,10 @@ func (i *index2[T, TPtr]) StoreDelta(d schnittstellen.Delta[T]) (err error) {
 			}
 
 			id.SchwanzenCount -= 1
+
+			log.Log().Printf("new SchwanzenCount: %s -> %d", e, id.SchwanzenCount)
+
+			i.Kennungen[e.String()] = id
 
 			return
 		},

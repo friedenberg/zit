@@ -113,6 +113,7 @@ func (s *metaSet) SetMany(vs ...string) (err error) {
 		}
 	}
 
+	todo.Change("fix query syntax for groups")
 	log.Log().Printf("query: %q", s)
 
 	return

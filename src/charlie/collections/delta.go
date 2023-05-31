@@ -15,19 +15,19 @@ func (d delta[T]) GetRemoved() schnittstellen.Set[T] {
 }
 
 func MakeSetDelta[T schnittstellen.ValueLike](
-	s1, s2 schnittstellen.Set[T],
+	from, to schnittstellen.Set[T],
 ) schnittstellen.Delta[T] {
 	d := delta[T]{
 		Added:   MakeMutableSetStringer[T](),
-		Removed: s1.MutableClone(),
+		Removed: from.MutableClone(),
 	}
 
-	s2.Each(
+	to.Each(
 		func(e T) (err error) {
-			if s1.Contains(e) {
-				// zettel had etikett previously
+			if from.Contains(e) {
+				// had previously
 			} else {
-				// zettel did not have etikett previously
+				// did not have previously
 				d.Added.Add(e)
 			}
 

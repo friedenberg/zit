@@ -11,15 +11,15 @@ import (
 )
 
 type Writer struct {
-	alfredWriter   *alfred.Writer
-	etikettenIndex kennung_index.KennungIndex[kennung.Etikett]
-	typenIndex     kennung_index.KennungIndex[kennung.Typ]
-	Abbr           func(kennung.Hinweis) (string, error)
+	alfredWriter *alfred.Writer
+	kennungIndex kennung_index.Index
+	typenIndex   kennung_index.KennungIndex[kennung.Typ]
+	Abbr         func(kennung.Hinweis) (string, error)
 }
 
 func New(
 	out io.Writer,
-	etikettenIndex kennung_index.KennungIndex[kennung.Etikett],
+	kennungIndex kennung_index.Index,
 	typenIndex kennung_index.KennungIndex[kennung.Typ],
 	ha func(kennung.Hinweis) (string, error),
 ) (w *Writer, err error) {
@@ -30,8 +30,8 @@ func New(
 		return
 	}
 
-	if etikettenIndex == nil {
-		panic("etikettenIndex was nil")
+	if kennungIndex == nil {
+		panic("kennungIndex was nil")
 	}
 
 	if typenIndex == nil {
@@ -39,10 +39,10 @@ func New(
 	}
 
 	w = &Writer{
-		Abbr:           ha,
-		etikettenIndex: etikettenIndex,
-		typenIndex:     typenIndex,
-		alfredWriter:   aw,
+		Abbr:         ha,
+		kennungIndex: kennungIndex,
+		typenIndex:   typenIndex,
+		alfredWriter: aw,
 	}
 
 	return
@@ -55,7 +55,9 @@ func (w *Writer) WriteZettelVerzeichnisse(z *zettel.Transacted) (err error) {
 	return
 }
 
-func (w *Writer) WriteEtikett(e kennung.Etikett) (n int64, err error) {
+func (w *Writer) WriteEtikett(
+  e kennung_index.Indexed[kennung.Etikett],
+) (n int64, err error) {
 	item := w.etikettToItem(e)
 	w.alfredWriter.WriteItem(item)
 	return

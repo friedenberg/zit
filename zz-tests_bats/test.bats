@@ -223,7 +223,7 @@ function indexes_are_implicitly_correct { # @test
 
 	run_zit cat-etiketten-schwanzen
 	assert_success
-	assert_output "$(cat "$expected")"
+	assert_output_unsorted "$(cat "$expected")"
 
 	{
 		echo one/uno
@@ -247,8 +247,11 @@ function indexes_are_implicitly_correct { # @test
 	cp "$expected" "one/uno.zettel"
 	run_zit checkin -delete "one/uno.zettel"
 	assert_success
-	assert_output --partial '[one/uno@50bedb194bbd829d5d5d11de711a58b8486954a481ae43b4d1a8c4bd7f1f1370 !md "bez"]'
-	assert_output --partial '     deleted [one/uno.zettel]'
+	assert_output - <<-EOM
+		[one/uno@50bedb194bbd829d5d5d11de711a58b8486954a481ae43b4d1a8c4bd7f1f1370 !md "bez"]
+		          deleted [one/uno.zettel]
+		          deleted [one]
+	EOM
 
 	{
 		echo et1

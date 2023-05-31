@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/alfred"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/kennung_index"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
@@ -39,7 +40,7 @@ func (w *Writer) zettelToItem(
 	mb.AddMatches(z.GetTyp().String())
 	z.GetMetadatei().Etiketten.Each(
 		func(e kennung.Etikett) (err error) {
-			ei, ok := w.etikettenIndex.Get(e)
+			ei, ok := w.kennungIndex.GetEtikett(e)
 
 			if !ok {
 				return
@@ -90,11 +91,14 @@ func (w *Writer) zettelToItem(
 	return
 }
 
-func (w *Writer) etikettToItem(e kennung.Etikett) (a *alfred.Item) {
+func (w *Writer) etikettToItem(
+	ei kennung_index.Indexed[kennung.Etikett],
+) (a *alfred.Item) {
 	a = w.alfredWriter.Get()
 
+	e := ei.GetKennung()
 	a.Title = "@" + e.String()
-	// a.Subtitle = fmt.Sprintf("%s: %s", z.Hinweis.String(), strings.Join(EtikettenStringsFromZettel(z, false), ", "))
+	a.Subtitle = fmt.Sprintf("%d", ei.GetSchwanzenCount())
 
 	a.Arg = e.String()
 
