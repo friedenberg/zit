@@ -433,8 +433,8 @@ func (s *Store) ReadAll(
 }
 
 func (s *Store) getReindexFunc(
-	ei kennung_index.Index2[kennung.Etikett],
-	ti kennung_index.Index2[kennung.Typ],
+	ei kennung_index.KennungIndex[kennung.Etikett],
+	ti kennung_index.KennungIndex[kennung.Typ],
 ) func(sku.DataIdentity) error {
 	return func(sk sku.DataIdentity) (err error) {
 		var st reindexer
@@ -561,7 +561,7 @@ func (s *Store) AddMatchable(m kennung.Matchable) (err error) {
 		return
 	}
 
-	var ei kennung_index.Index2[kennung.Etikett]
+	var ei kennung_index.KennungIndex[kennung.Etikett]
 
 	if ei, err = s.GetEtikettenIndex(); err != nil {
 		err = errors.Wrap(err)
@@ -576,7 +576,7 @@ func (s *Store) AddMatchable(m kennung.Matchable) (err error) {
 	t := m.GetTyp()
 
 	if !t.IsEmpty() {
-		var ti kennung_index.Index2[kennung.Typ]
+		var ti kennung_index.KennungIndex[kennung.Typ]
 
 		if ti, err = s.GetTypenIndex(); err != nil {
 			err = errors.Wrap(err)
@@ -615,7 +615,7 @@ func (s *Store) Reindex() (err error) {
 		return
 	}
 
-	var ei kennung_index.Index2[kennung.Etikett]
+	var ei kennung_index.KennungIndex[kennung.Etikett]
 
 	if ei, err = s.StoreUtil.GetEtikettenIndex(); err != nil {
 		err = errors.Wrap(err)
@@ -627,7 +627,7 @@ func (s *Store) Reindex() (err error) {
 		return
 	}
 
-	var ti kennung_index.Index2[kennung.Typ]
+	var ti kennung_index.KennungIndex[kennung.Typ]
 
 	if ti, err = s.StoreUtil.GetTypenIndex(); err != nil {
 		err = errors.Wrap(err)

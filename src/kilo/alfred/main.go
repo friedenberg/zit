@@ -12,15 +12,15 @@ import (
 
 type Writer struct {
 	alfredWriter   *alfred.Writer
-	etikettenIndex kennung_index.Index2[kennung.Etikett]
-	typenIndex     kennung_index.Index2[kennung.Typ]
+	etikettenIndex kennung_index.KennungIndex[kennung.Etikett]
+	typenIndex     kennung_index.KennungIndex[kennung.Typ]
 	Abbr           func(kennung.Hinweis) (string, error)
 }
 
 func New(
 	out io.Writer,
-	etikettenIndex kennung_index.Index2[kennung.Etikett],
-	typenIndex kennung_index.Index2[kennung.Typ],
+	etikettenIndex kennung_index.KennungIndex[kennung.Etikett],
+	typenIndex kennung_index.KennungIndex[kennung.Typ],
 	ha func(kennung.Hinweis) (string, error),
 ) (w *Writer, err error) {
 	var aw *alfred.Writer

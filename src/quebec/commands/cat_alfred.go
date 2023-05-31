@@ -52,14 +52,14 @@ func (c CatAlfred) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error
 
 	var aw *alfred.Writer
 
-	var ei kennung_index.Index2[kennung.Etikett]
+	var ei kennung_index.KennungIndex[kennung.Etikett]
 
 	if ei, err = u.StoreObjekten().GetEtikettenIndex(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	var ti kennung_index.Index2[kennung.Typ]
+	var ti kennung_index.KennungIndex[kennung.Typ]
 
 	if ti, err = u.StoreObjekten().GetTypenIndex(); err != nil {
 		err = errors.Wrap(err)

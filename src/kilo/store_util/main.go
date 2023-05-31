@@ -46,8 +46,8 @@ type StoreUtil interface {
 	GetTransaktionStore() TransaktionStore
 	GetAbbrStore() AbbrStore
 	GetKennungIndex() kennung_index.Index
-	GetEtikettenIndex() (kennung_index.Index2[kennung.Etikett], error)
-	GetTypenIndex() (kennung_index.Index2[kennung.Typ], error)
+	GetEtikettenIndex() (kennung_index.KennungIndex[kennung.Etikett], error)
+	GetTypenIndex() (kennung_index.KennungIndex[kennung.Typ], error)
 
 	SetMatchableAdder(kennung.MatchableAdder)
 	kennung.MatchableAdder
@@ -74,8 +74,8 @@ type common struct {
 	kennungIndex          kennung_index.Index
 
 	kennung.MatchableAdder
-	etikettenIndex verzeichnisse_index.Wrapper[kennung_index.Index2[kennung.Etikett]]
-	typenIndex     verzeichnisse_index.Wrapper[kennung_index.Index2[kennung.Typ]]
+	etikettenIndex verzeichnisse_index.Wrapper[kennung_index.KennungIndex[kennung.Etikett]]
+	typenIndex     verzeichnisse_index.Wrapper[kennung_index.KennungIndex[kennung.Typ]]
 }
 
 func MakeStoreUtil(
@@ -91,11 +91,11 @@ func MakeStoreUtil(
 		konfig:                    k,
 		standort:                  st,
 		persistentMetadateiFormat: pmf,
-		etikettenIndex: verzeichnisse_index.MakeWrapper[kennung_index.Index2[kennung.Etikett]](
+		etikettenIndex: verzeichnisse_index.MakeWrapper[kennung_index.KennungIndex[kennung.Etikett]](
 			kennung_index.MakeIndex2[kennung.Etikett](),
 			st.DirVerzeichnisse("EtikettenIndexV0"),
 		),
-		typenIndex: verzeichnisse_index.MakeWrapper[kennung_index.Index2[kennung.Typ]](
+		typenIndex: verzeichnisse_index.MakeWrapper[kennung_index.KennungIndex[kennung.Typ]](
 			kennung_index.MakeIndex2[kennung.Typ](),
 			st.DirVerzeichnisse("TypenIndexV0"),
 		),
@@ -198,11 +198,11 @@ func (s *common) GetKennungIndex() kennung_index.Index {
 	return s.kennungIndex
 }
 
-func (s *common) GetEtikettenIndex() (kennung_index.Index2[kennung.Etikett], error) {
+func (s *common) GetEtikettenIndex() (kennung_index.KennungIndex[kennung.Etikett], error) {
 	return s.etikettenIndex.Get(s)
 }
 
-func (s *common) GetTypenIndex() (kennung_index.Index2[kennung.Typ], error) {
+func (s *common) GetTypenIndex() (kennung_index.KennungIndex[kennung.Typ], error) {
 	return s.typenIndex.Get(s)
 }
 

@@ -14,7 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/hinweis_index"
 )
 
-type Index2[T schnittstellen.ValueLike] interface {
+type KennungIndex[T schnittstellen.ValueLike] interface {
 	DidRead() bool
 	HasChanges() bool
 	Reset() error
