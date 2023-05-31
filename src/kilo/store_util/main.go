@@ -12,6 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/charlie/standort"
+	"github.com/friedenberg/zit/src/charlie/verzeichnisse_index"
 	"github.com/friedenberg/zit/src/delta/age_io"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/kennung_index"
@@ -73,8 +74,8 @@ type common struct {
 	kennungIndex          kennung_index.Index
 
 	kennung.MatchableAdder
-	etikettenIndex verzeichnisseWrapper[kennung_index.Index2[kennung.Etikett]]
-	typenIndex     verzeichnisseWrapper[kennung_index.Index2[kennung.Typ]]
+	etikettenIndex verzeichnisse_index.Wrapper[kennung_index.Index2[kennung.Etikett]]
+	typenIndex     verzeichnisse_index.Wrapper[kennung_index.Index2[kennung.Typ]]
 }
 
 func MakeStoreUtil(
@@ -90,11 +91,11 @@ func MakeStoreUtil(
 		konfig:                    k,
 		standort:                  st,
 		persistentMetadateiFormat: pmf,
-		etikettenIndex: makeVerzeichnisseWrapper[kennung_index.Index2[kennung.Etikett]](
+		etikettenIndex: verzeichnisse_index.MakeWrapper[kennung_index.Index2[kennung.Etikett]](
 			kennung_index.MakeIndex2[kennung.Etikett](),
 			st.DirVerzeichnisse("EtikettenIndexV0"),
 		),
-		typenIndex: makeVerzeichnisseWrapper[kennung_index.Index2[kennung.Typ]](
+		typenIndex: verzeichnisse_index.MakeWrapper[kennung_index.Index2[kennung.Typ]](
 			kennung_index.MakeIndex2[kennung.Typ](),
 			st.DirVerzeichnisse("TypenIndexV0"),
 		),

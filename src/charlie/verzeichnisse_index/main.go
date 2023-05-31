@@ -1,4 +1,4 @@
-package store_util
+package verzeichnisse_index
 
 import (
 	"bytes"
@@ -9,23 +9,29 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 )
 
-type verzeichnisseElement interface {
+type Wrapper[T Element] interface {
+	ReadIfNecessary(schnittstellen.VerzeichnisseFactory) error
+	Get(schnittstellen.VerzeichnisseFactory) (T, error)
+	Flush(schnittstellen.VerzeichnisseFactory) error
+}
+
+type Element interface {
 	DidRead() bool
 	HasChanges() bool
 	io.ReaderFrom
 	io.WriterTo
 }
 
-type verzeichnisseWrapper[T verzeichnisseElement] struct {
+type verzeichnisseWrapper[T Element] struct {
 	path  string
 	index T
 }
 
-func makeVerzeichnisseWrapper[T verzeichnisseElement](
+func MakeWrapper[T Element](
 	e T,
 	path string,
-) verzeichnisseWrapper[T] {
-	return verzeichnisseWrapper[T]{
+) Wrapper[T] {
+	return &verzeichnisseWrapper[T]{
 		path:  path,
 		index: e,
 	}
