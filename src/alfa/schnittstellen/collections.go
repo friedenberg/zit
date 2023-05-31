@@ -11,6 +11,11 @@ type (
 	FuncIterWithKey[T any]       func(string, T) error
 )
 
+type Delta[T ValueLike] interface {
+	GetAdded() Set[T]
+	GetRemoved() Set[T]
+}
+
 type Lenner interface {
 	Len() int
 }

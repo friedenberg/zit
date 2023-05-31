@@ -9,23 +9,25 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/hinweis_index"
 )
 
-type Index2[T any] interface {
+type Index2[T schnittstellen.ValueLike] interface {
 	DidRead() bool
 	HasChanges() bool
 	Reset() error
 	Get(T) (Indexed2[T], bool)
 	GetAll() []T
+	StoreDelta(schnittstellen.Delta[T]) (err error)
 	StoreMany(schnittstellen.Set[T]) (err error)
 	StoreOne(T) (err error)
 	io.WriterTo
 	io.ReaderFrom
 }
 
-type Indexed2[T any] interface {
+type Indexed2[T schnittstellen.ValueLike] interface {
 	GetKennung() T
 	GetSchwanzenCount() int
 	GetCount() int
@@ -177,7 +179,7 @@ func (i *index) AddEtikettSet(
 	to kennung.EtikettSet,
 	from kennung.EtikettSet,
 ) (err error) {
-	d := kennung.MakeSetEtikettDelta(
+	d := collections.MakeSetDelta[kennung.Etikett](
 		from,
 		to,
 	)
@@ -193,13 +195,15 @@ func (i *index) AddEtikettSet(
 	return
 }
 
-func (i *index) processDelta(d kennung.EtikettDelta) (err error) {
-	if err = i.add(d.Added); err != nil {
+func (i *index) processDelta(
+	d schnittstellen.Delta[kennung.Etikett],
+) (err error) {
+	if err = i.add(d.GetAdded()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = i.del(d.Removed); err != nil {
+	if err = i.del(d.GetRemoved()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

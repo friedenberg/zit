@@ -113,6 +113,36 @@ func (i index2[T, TPtr]) Get(k T) (id Indexed2[T], ok bool) {
 	return
 }
 
+func (i *index2[T, TPtr]) StoreDelta(d schnittstellen.Delta[T]) (err error) {
+	i.lock.Lock()
+	defer i.lock.Unlock()
+
+	if err = d.GetAdded().Each(i.storeOne); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = d.GetRemoved().Each(
+		func(e T) (err error) {
+			id, ok := i.Kennungen[e.String()]
+
+			if !ok {
+				err = errors.Errorf("tried to remove %s but it wasn't present", e)
+				return
+			}
+
+			id.SchwanzenCount -= 1
+
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (i *index2[T, TPtr]) StoreMany(ks schnittstellen.Set[T]) (err error) {
 	i.lock.Lock()
 	defer i.lock.Unlock()
@@ -132,14 +162,17 @@ func (i *index2[T, TPtr]) StoreOne(k T) (err error) {
 }
 
 func (i *index2[T, TPtr]) storeOne(k T) (err error) {
-	if _, ok := i.Kennungen[k.String()]; ok {
-		return
+	id, ok := i.Kennungen[k.String()]
+
+	if !ok {
+		id.ResetWithKennung(k)
 	}
 
 	i.hasChanges = true
+	id.SchwanzenCount += 1
+	id.Count += 1
 
-	id := indexed[T, TPtr]{}
-	id.ResetWithKennung(k)
 	i.Kennungen[k.String()] = id
+
 	return
 }

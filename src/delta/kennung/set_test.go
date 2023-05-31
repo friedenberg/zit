@@ -225,21 +225,21 @@ func TestDelta1(t *testing.T) {
 		MustEtikett("zz-archive-task-done"),
 	)
 
-	d := MakeSetEtikettDelta(a, b)
+	d := collections.MakeSetDelta[Etikett](a, b)
 
 	c_expected := MakeEtikettSet(
 		MustEtikett("zz-archive-task-done"),
 	)
 
-	if !c_expected.Equals(d.Added) {
-		t.Errorf("expected\n%s\nactual:\n%s", c_expected, d.Added)
+	if !c_expected.Equals(d.GetAdded()) {
+		t.Errorf("expected\n%s\nactual:\n%s", c_expected, d.GetAdded())
 	}
 
 	d_expected := MakeEtikettSet(
 		MustEtikett("task-todo"),
 	)
 
-	if !d_expected.Equals(d.Removed) {
-		t.Errorf("expected\n%s\nactual:\n%s", d_expected, d.Removed)
+	if !d_expected.Equals(d.GetRemoved()) {
+		t.Errorf("expected\n%s\nactual:\n%s", d_expected, d.GetRemoved())
 	}
 }
