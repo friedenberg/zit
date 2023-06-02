@@ -99,7 +99,7 @@ func tryAddMatcher(
 		isNegated bool
 	)
 
-	if isNegated, err = SetQueryKennung(&e, v); err == nil {
+	if isNegated, _, err = SetQueryKennung(&e, v); err == nil {
 		if implicitEtikettenGetter == nil {
 			m := Matcher(e)
 
@@ -245,13 +245,13 @@ func (s Set) String() string {
 }
 
 func (s Set) ContainsMatchable(m Matchable) bool {
-	if !s.Matcher.ContainsMatchable(m) {
-		return false
-	}
-
 	g := gattung.Must(m.GetGattung())
 
 	if g != gattung.Zettel && s.Len() > 0 && s.Hinweisen.Len() == s.Len() {
+		return false
+	}
+
+	if !s.Matcher.ContainsMatchable(m) && s.Len() != s.Hinweisen.Len() {
 		return false
 	}
 

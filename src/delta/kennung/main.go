@@ -9,7 +9,10 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
-const QueryNegationOperator rune = '^'
+const (
+	QueryNegationOperator rune = '^'
+	QueryExactOperator    rune = '='
+)
 
 type QueryPrefixer interface {
 	GetQueryPrefix() string
@@ -122,9 +125,9 @@ func MakeMatcher(
 		v = v1
 	}
 
-	isNegated := false
+	var isNegated bool
 
-	if isNegated, err = SetQueryKennung(k, v); err != nil {
+	if isNegated, _, err = SetQueryKennung(k, v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -139,12 +142,17 @@ func MakeMatcher(
 func SetQueryKennung(
 	k schnittstellen.Setter,
 	v string,
-) (isNegated bool, err error) {
+) (isNegated bool, isExact bool, err error) {
 	v = strings.TrimSpace(v)
 
 	if len(v) > 0 && []rune(v)[0] == QueryNegationOperator {
 		v = v[1:]
 		isNegated = true
+	}
+
+	if len(v) > 0 && []rune(v)[len(v)-1] == QueryExactOperator {
+		v = v[1:]
+		isExact = true
 	}
 
 	var p string

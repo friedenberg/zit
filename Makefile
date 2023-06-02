@@ -60,7 +60,7 @@ build/tests_bats: build/zit $(files_tests_bats)
 files_tests_gen_fixture := $(shell find zz-tests_bats/migration)
 
 build/tests_gen_fixture: build/zit $(files_tests_gen_fixture)
-> ./zz-tests_bats/migration/generate_fixture.bash "$$(mktemp -d)"
+> ./zz-tests_bats/migration/generate_fixture.bash "$$(mktemp -d)" >/dev/null 2>&1
 > touch "$@"
 
 build/tests_slow: build/tests_fast build/tests_bats
