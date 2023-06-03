@@ -95,6 +95,10 @@ func (t Konfig) KennungPtrClone() KennungPtr {
 	return &t
 }
 
+func (k Konfig) ContainsMatchableExactly(m Matchable) bool {
+	return k.ContainsMatchable(m)
+}
+
 func (k Konfig) ContainsMatchable(m Matchable) bool {
 	g := gattung.Make(m.GetGattung())
 

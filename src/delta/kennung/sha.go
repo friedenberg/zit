@@ -66,6 +66,10 @@ func (e *Sha) Set(v string) (err error) {
 	return
 }
 
+func (t Sha) ContainsMatchableExactly(m Matchable) bool {
+	return t.ContainsMatchable(m)
+}
+
 func (t Sha) ContainsMatchable(m Matchable) bool {
 	if t.value.EqualsSha(m.GetObjekteSha()) {
 		return true

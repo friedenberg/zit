@@ -231,6 +231,10 @@ func (t Tai) Less(t1 Tai) bool {
 	return t.tai.Before(t1.tai)
 }
 
+func (t Tai) ContainsMatchableExactly(m Matchable) bool {
+	return false
+}
+
 func (t Tai) ContainsMatchable(m Matchable) bool {
 	errors.TodoP1("add GetTai to matchable")
 	return false

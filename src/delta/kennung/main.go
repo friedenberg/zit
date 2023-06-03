@@ -23,7 +23,7 @@ type KennungSansGattung interface {
 	// encoding.TextMarshaler
 	// encoding.BinaryMarshaler
 	Parts() [3]string
-	Matcher
+	MatcherExact
 	KennungSansGattungClone() KennungSansGattung
 	KennungSansGattungPtrClone() KennungSansGattungPtr
 }
@@ -125,15 +125,26 @@ func MakeMatcher(
 		v = v1
 	}
 
-	var isNegated bool
+	var isNegated, isExact bool
 
-	if isNegated, _, err = SetQueryKennung(k, v); err != nil {
+	if isNegated, isExact, err = SetQueryKennung(k, v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if isNegated {
-		m = MakeMatcherNegate(m)
+	switch {
+	case isExact && isNegated:
+		fallthrough
+
+	case isNegated:
+		m = MakeMatcherNegate(k)
+
+	case isExact:
+		m = MakeMatcherContainsExactly(k)
+
+	default:
+		// m = MakeMatcherContains(k)
+		// noop
 	}
 
 	return
@@ -151,7 +162,7 @@ func SetQueryKennung(
 	}
 
 	if len(v) > 0 && []rune(v)[len(v)-1] == QueryExactOperator {
-		v = v[1:]
+		v = v[:len(v)-1]
 		isExact = true
 	}
 

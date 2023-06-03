@@ -39,6 +39,9 @@ function checkout_simple_zettel { # @test
 }
 
 function checkout_simple_zettel_akte_only { # @test
+	run_zit clean .
+	assert_success
+	# TODO fail checkouts if working directly has incompatible checkout
 	run_zit checkout -mode akte-only :z
 	assert_success
 	assert_output_unsorted - <<-EOM

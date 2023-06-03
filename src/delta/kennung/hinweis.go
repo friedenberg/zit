@@ -181,6 +181,10 @@ func (h Hinweis) GetGattung() schnittstellen.Gattung {
 	return gattung.Zettel
 }
 
+func (h Hinweis) ContainsMatchableExactly(m Matchable) bool {
+	return h.ContainsMatchable(m)
+}
+
 func (h Hinweis) ContainsMatchable(m Matchable) bool {
 	g := gattung.Make(m.GetGattung())
 

@@ -128,6 +128,10 @@ func (t Kasten) KennungPtrClone() KennungPtr {
 	return &t
 }
 
+func (k Kasten) ContainsMatchableExactly(m Matchable) bool {
+	return k.ContainsMatchable(m)
+}
+
 func (k Kasten) ContainsMatchable(m Matchable) bool {
 	g := gattung.Make(m.GetGattung())
 

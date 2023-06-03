@@ -83,6 +83,22 @@ func (e Etikett) Parts() [3]string {
 	return [3]string{"", "-", v}
 }
 
+func (e Etikett) ContainsMatchableExactly(m Matchable) bool {
+	es := m.GetEtikettenExpanded()
+
+	if es.Contains(e) {
+		return true
+	}
+
+	e1, ok := m.GetIdLike().(Etikett)
+
+	if ok && e.Equals(e1) {
+		return true
+	}
+
+	return false
+}
+
 func (e Etikett) ContainsMatchable(m Matchable) bool {
 	es := m.GetEtikettenExpanded()
 

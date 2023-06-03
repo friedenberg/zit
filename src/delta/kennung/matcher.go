@@ -13,8 +13,8 @@ import (
 const (
 	QueryOrOperator         = ", "
 	QueryAndOperator        = " "
-	QueryGroupOpenOperator  = "]"
-	QueryGroupCloseOperator = "["
+	QueryGroupOpenOperator  = "["
+	QueryGroupCloseOperator = "]"
 )
 
 func init() {
@@ -24,12 +24,19 @@ func init() {
 	gob.Register(&matcherNever{})
 	gob.Register(&matcherAlways{})
 	gob.Register(&matcherImpExp{})
+	gob.Register(&matcherContainsExactly{})
+	gob.Register(&matcherContains{})
 }
 
 type Matcher interface {
 	ContainsMatchable(Matchable) bool
 	String() string
 	// schnittstellen.Stringer
+}
+
+type MatcherExact interface {
+	Matcher
+	ContainsMatchableExactly(Matchable) bool
 }
 
 type MatcherParent interface {
@@ -289,6 +296,116 @@ func (matcher matcherOr) Each(f schnittstellen.FuncIter[Matcher]) (err error) {
 	}
 
 	return
+}
+
+//    ____            _        _
+//   / ___|___  _ __ | |_ __ _(_)_ __  ___
+//  | |   / _ \| '_ \| __/ _` | | '_ \/ __|
+//  | |__| (_) | | | | || (_| | | | | \__ \
+//   \____\___/|_| |_|\__\__,_|_|_| |_|___/
+//
+
+func MakeMatcherContains(k KennungSansGattung) MatcherParentPtr {
+	return &matcherContains{Kennung: k}
+}
+
+type matcherContains struct {
+	Kennung KennungSansGattung
+}
+
+func (matcher matcherContains) Len() int {
+	if matcher.Kennung == nil {
+		return 0
+	}
+
+	return 1
+}
+
+func (matcher *matcherContains) Add(m Matcher) error {
+	k, ok := m.(KennungSansGattung)
+
+	if !ok {
+		return errors.Errorf(
+			"only supported adding KennungSansGattung but got %T",
+			m,
+		)
+	}
+
+	matcher.Kennung = k
+
+	return nil
+}
+
+func (matcher matcherContains) String() string {
+	if matcher.Kennung == nil {
+		return ""
+	}
+
+	return matcher.Kennung.String()
+}
+
+func (matcher matcherContains) ContainsMatchable(matchable Matchable) bool {
+	return !matcher.Kennung.ContainsMatchable(matchable)
+}
+
+func (matcher matcherContains) Each(f schnittstellen.FuncIter[Matcher]) error {
+	return f(matcher.Kennung)
+}
+
+//    ____            _        _           _____                _   _
+//   / ___|___  _ __ | |_ __ _(_)_ __  ___| ____|_  ____ _  ___| |_| |_   _
+//  | |   / _ \| '_ \| __/ _` | | '_ \/ __|  _| \ \/ / _` |/ __| __| | | | |
+//  | |__| (_) | | | | || (_| | | | | \__ \ |___ >  < (_| | (__| |_| | |_| |
+//   \____\___/|_| |_|\__\__,_|_|_| |_|___/_____/_/\_\__,_|\___|\__|_|\__, |
+//                                                                    |___/
+
+func MakeMatcherContainsExactly(k KennungSansGattung) MatcherParentPtr {
+	return &matcherContainsExactly{Kennung: k}
+}
+
+type matcherContainsExactly struct {
+	Kennung KennungSansGattung
+}
+
+func (matcher matcherContainsExactly) Len() int {
+	if matcher.Kennung == nil {
+		return 0
+	}
+
+	return 1
+}
+
+func (matcher *matcherContainsExactly) Add(m Matcher) error {
+	k, ok := m.(KennungSansGattung)
+
+	if !ok {
+		return errors.Errorf(
+			"only supported adding KennungSansGattung but got %T",
+			m,
+		)
+	}
+
+	matcher.Kennung = k
+
+	return nil
+}
+
+func (matcher matcherContainsExactly) String() string {
+	if matcher.Kennung == nil {
+		return ""
+	}
+
+	return matcher.Kennung.String() + string(QueryExactOperator)
+}
+
+func (matcher matcherContainsExactly) ContainsMatchable(
+	matchable Matchable,
+) bool {
+	return !matcher.Kennung.ContainsMatchableExactly(matchable)
+}
+
+func (matcher matcherContainsExactly) Each(f schnittstellen.FuncIter[Matcher]) error {
+	return f(matcher.Kennung)
 }
 
 //   _   _                  _

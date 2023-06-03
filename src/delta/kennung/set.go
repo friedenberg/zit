@@ -251,7 +251,9 @@ func (s Set) ContainsMatchable(m Matchable) bool {
 		return false
 	}
 
-	if !s.Matcher.ContainsMatchable(m) && s.Len() != s.Hinweisen.Len() {
+	innerContains := s.Matcher.ContainsMatchable(m)
+
+	if !innerContains && s.Len() != s.Hinweisen.Len() {
 		return false
 	}
 
@@ -259,6 +261,9 @@ func (s Set) ContainsMatchable(m Matchable) bool {
 
 	switch il.(type) {
 	case Typ, Etikett, Kasten, Konfig:
+		if !innerContains {
+			return false
+		}
 
 	case Hinweis:
 		if !s.Hinweisen.ContainsMatchable(m) {

@@ -304,6 +304,10 @@ func (f FD) GetHinweis() (h Hinweis, err error) {
 	return
 }
 
+func (fd FD) ContainsMatchableExactly(m Matchable) (ok bool) {
+	return fd.ContainsMatchable(m)
+}
+
 func (fd FD) ContainsMatchable(m Matchable) (ok bool) {
 	il := m.GetIdLike()
 
