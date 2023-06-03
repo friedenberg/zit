@@ -345,7 +345,7 @@ func (matcher matcherContains) String() string {
 }
 
 func (matcher matcherContains) ContainsMatchable(matchable Matchable) bool {
-	return !matcher.Kennung.ContainsMatchable(matchable)
+	return matcher.Kennung.ContainsMatchable(matchable)
 }
 
 func (matcher matcherContains) Each(f schnittstellen.FuncIter[Matcher]) error {
@@ -401,7 +401,7 @@ func (matcher matcherContainsExactly) String() string {
 func (matcher matcherContainsExactly) ContainsMatchable(
 	matchable Matchable,
 ) bool {
-	return !matcher.Kennung.ContainsMatchableExactly(matchable)
+	return matcher.Kennung.ContainsMatchableExactly(matchable)
 }
 
 func (matcher matcherContainsExactly) Each(f schnittstellen.FuncIter[Matcher]) error {

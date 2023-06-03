@@ -111,7 +111,6 @@ func MakeMatcher(
 	v string,
 	expander func(string) (string, error),
 ) (m Matcher, err error) {
-	m = k
 	v = strings.TrimSpace(v)
 
 	if expander != nil {
@@ -143,7 +142,7 @@ func MakeMatcher(
 		m = MakeMatcherContainsExactly(k)
 
 	default:
-		// m = MakeMatcherContains(k)
+		m = MakeMatcherContains(k)
 		// noop
 	}
 
