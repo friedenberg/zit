@@ -6,7 +6,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
@@ -21,11 +20,7 @@ type QueryPrefixer interface {
 
 type KennungSansGattung interface {
 	schnittstellen.ValueLike
-	// encoding.TextMarshaler
-	// encoding.BinaryMarshaler
 	Parts() [3]string
-	// GetMatchableImplicitKennung(m Matchable)
-	// schnittstellen.Set[KennungSansGattung]
 	KennungSansGattungClone() KennungSansGattung
 	KennungSansGattungPtrClone() KennungSansGattungPtr
 }
@@ -39,8 +34,6 @@ type Kennung interface {
 
 type KennungSansGattungPtr interface {
 	KennungSansGattung
-	// encoding.TextUnmarshaler
-	// encoding.BinaryUnmarshaler
 	schnittstellen.Resetter2
 	schnittstellen.Setter
 }
@@ -188,7 +181,6 @@ func KennungContainsExactlyMatchable(k KennungSansGattung, m Matchable) bool {
 		}
 
 	case TypLike:
-		log.Log().Printf("%s in %s", k, m.GetTyp())
 		if ContainsExactly(m.GetTyp(), k) {
 			return true
 		}
@@ -216,7 +208,6 @@ func KennungContainsMatchable(k KennungSansGattung, m Matchable) bool {
 		}
 
 	case TypLike:
-		log.Log().Printf("%s in %s", k, m.GetTyp())
 		if Contains(m.GetTyp(), k) {
 			return true
 		}

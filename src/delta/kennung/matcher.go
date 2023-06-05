@@ -361,7 +361,9 @@ func (matcher matcherOr) Each(f schnittstellen.FuncIter[Matcher]) (err error) {
 //   \____\___/|_| |_|\__\__,_|_|_| |_|___/
 //
 
-func MakeMatcherContains(k KennungSansGattung) MatcherKennungSansGattungWrapper {
+func MakeMatcherContains(
+	k KennungSansGattung,
+) MatcherKennungSansGattungWrapper {
 	return &matcherContains{Kennung: k}
 }
 
@@ -404,7 +406,9 @@ func (matcher matcherContains) ContainsMatchable(matchable Matchable) bool {
 //   \____\___/|_| |_|\__\__,_|_|_| |_|___/_____/_/\_\__,_|\___|\__|_|\__, |
 //                                                                    |___/
 
-func MakeMatcherContainsExactly(k KennungSansGattung) MatcherKennungSansGattungWrapper {
+func MakeMatcherContainsExactly(
+	k KennungSansGattung,
+) MatcherKennungSansGattungWrapper {
 	return &matcherContainsExactly{Kennung: k}
 }
 

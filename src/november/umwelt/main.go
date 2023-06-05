@@ -276,7 +276,7 @@ func (u Umwelt) Flush() error {
 }
 
 func (u *Umwelt) MakeKennungHidden() kennung.Matcher {
-	h := kennung.MakeMatcherAndDoNotMatchOnEmpty()
+	h := kennung.MakeMatcherOrDoNotMatchOnEmpty()
 
 	u.Konfig().EtikettenHidden.Each(
 		func(e kennung.Etikett) (err error) {
