@@ -6,6 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
@@ -23,7 +24,8 @@ type KennungSansGattung interface {
 	// encoding.TextMarshaler
 	// encoding.BinaryMarshaler
 	Parts() [3]string
-	// GetMatchableImplicitKennung(m Matchable) schnittstellen.Set[KennungSansGattung]
+	// GetMatchableImplicitKennung(m Matchable)
+	// schnittstellen.Set[KennungSansGattung]
 	KennungSansGattungClone() KennungSansGattung
 	KennungSansGattungPtrClone() KennungSansGattungPtr
 }
@@ -186,7 +188,8 @@ func KennungContainsExactlyMatchable(k KennungSansGattung, m Matchable) bool {
 		}
 
 	case TypLike:
-		if ContainsExactly(k, m.GetTyp()) {
+		log.Log().Printf("%s in %s", k, m.GetTyp())
+		if ContainsExactly(m.GetTyp(), k) {
 			return true
 		}
 
@@ -213,7 +216,8 @@ func KennungContainsMatchable(k KennungSansGattung, m Matchable) bool {
 		}
 
 	case TypLike:
-		if Contains(k, m.GetTyp()) {
+		log.Log().Printf("%s in %s", k, m.GetTyp())
+		if Contains(m.GetTyp(), k) {
 			return true
 		}
 
@@ -266,7 +270,10 @@ func Aligned(id Kennung, lenLeft, lenRight int) string {
 	return fmt.Sprintf("%s%s%s", left, middle, right)
 }
 
-func LeftSubtract[T schnittstellen.Stringer, TPtr schnittstellen.StringSetterPtr[T]](
+func LeftSubtract[
+	T schnittstellen.Stringer,
+	TPtr schnittstellen.StringSetterPtr[T],
+](
 	a, b T,
 ) (c T, err error) {
 	if err = TPtr(&c).Set(strings.TrimPrefix(a.String(), b.String())); err != nil {
@@ -560,7 +567,10 @@ func MatchTwoSortedEtikettStringSlices(a, b []string) (hasMatch bool) {
 		c := rune(v[0])
 
 		var idx int
-		idx, hasMatch = BinarySearchForRuneInEtikettenSortedStringSlice(longer, c)
+		idx, hasMatch = BinarySearchForRuneInEtikettenSortedStringSlice(
+			longer,
+			c,
+		)
 		errors.Err().Print(idx, hasMatch)
 
 		switch {
