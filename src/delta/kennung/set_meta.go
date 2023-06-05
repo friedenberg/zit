@@ -217,7 +217,7 @@ func (ms *metaSet) set(v string) (err error) {
 				var fd FD
 
 				if fd, err = FDFromPath(fp); err == nil {
-					ids.Matcher.Add(fd)
+					ids.FDs.Add(fd)
 					break
 				}
 

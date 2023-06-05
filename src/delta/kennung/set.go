@@ -17,7 +17,9 @@ type Set struct {
 	MatcherCwd    MatcherSigilPtr
 	Hinweisen     MatcherParentPtr
 	Others        MatcherParentPtr
-	Matcher       MatcherParentPtr
+	FDs           MatcherParentPtr
+
+	Matcher MatcherParentPtr
 }
 
 func MakeSet(
@@ -35,6 +37,7 @@ func MakeSet(
 
 	sigilCwd := MakeMatcherSigilMatchOnMissing(SigilCwd, cwd)
 	hinweisen := MakeMatcherOrDoNotMatchOnEmpty()
+	fds := MakeMatcherOrDoNotMatchOnEmpty()
 	others := MakeMatcherAndDoNotMatchOnEmpty()
 
 	return Set{
@@ -42,12 +45,14 @@ func MakeSet(
 		Others:        others,
 		MatcherHidden: sigilHidden,
 		MatcherCwd:    sigilCwd,
+		FDs:           fds,
 		Matcher: MakeMatcherAnd(
 			MakeMatcherImplicit(sigilCwd),
 			MakeMatcherImplicit(sigilHidden),
 			MakeMatcherOr(
 				hinweisen,
 				others,
+				fds,
 			),
 		),
 	}
