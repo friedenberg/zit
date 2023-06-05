@@ -127,23 +127,3 @@ func (t Kasten) KennungClone() Kennung {
 func (t Kasten) KennungPtrClone() KennungPtr {
 	return &t
 }
-
-func (k Kasten) ContainsMatchableExactly(m Matchable) bool {
-	return k.ContainsMatchable(m)
-}
-
-func (k Kasten) ContainsMatchable(m Matchable) bool {
-	g := gattung.Make(m.GetGattung())
-
-	if g != gattung.Kasten {
-		return false
-	}
-
-	t1, ok := m.GetIdLike().(Kasten)
-
-	if ok && k.Equals(t1) {
-		return true
-	}
-
-	return false
-}

@@ -57,7 +57,7 @@ function checkin_simple_one_zettel { # @test
 }
 
 function checkin_complex_zettel_etikett_negation { # @test
-	run_zit checkin ^-etikett-two.z
+	run_zit checkin ^etikett-two.z
 	assert_success
 	assert_output - <<-EOM
 		[-etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]

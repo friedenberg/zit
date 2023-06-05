@@ -280,7 +280,22 @@ func (u *Umwelt) MakeKennungHidden() kennung.Matcher {
 
 	u.Konfig().EtikettenHidden.Each(
 		func(e kennung.Etikett) (err error) {
-			h.Add(e)
+			impl := u.Konfig().GetImplicitEtiketten(e)
+
+			if err = impl.Each(
+				func(e kennung.Etikett) (err error) {
+					return h.Add(kennung.MakeMatcherContains(e))
+				},
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if err = h.Add(kennung.MakeMatcherContains(e)); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
 			return
 		},
 	)

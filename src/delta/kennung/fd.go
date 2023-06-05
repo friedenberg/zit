@@ -266,7 +266,7 @@ func (f FD) GetIdLike() (il Kennung, err error) {
 func (f FD) AsHinweis() (h Hinweis, ok bool) {
 	var err error
 	h, err = f.GetHinweis()
-	ok = err != nil
+	ok = err == nil
 	return
 }
 
@@ -274,17 +274,12 @@ func (f FD) GetHinweis() (h Hinweis, err error) {
 	parts := strings.Split(f.Path, string(filepath.Separator))
 
 	switch len(parts) {
-	case 0:
-		fallthrough
-
-	case 1:
+	case 0, 1:
 		err = errors.Errorf("not enough parts: %q", parts)
 		return
 
 	default:
 		parts = parts[len(parts)-2:]
-	case 2:
-		break
 	}
 
 	p := strings.Join(parts, string(filepath.Separator))
@@ -304,6 +299,10 @@ func (f FD) GetHinweis() (h Hinweis, err error) {
 	return
 }
 
+func (fd FD) MatcherLen() int {
+	return 1
+}
+
 func (fd FD) ContainsMatchableExactly(m Matchable) (ok bool) {
 	return fd.ContainsMatchable(m)
 }
@@ -319,7 +318,8 @@ func (fd FD) ContainsMatchable(m Matchable) (ok bool) {
 			return false
 		}
 
-		return h.Equals(it)
+		ok := h.Equals(it)
+		return ok
 
 	default:
 		errors.TodoP1("support other gattung")

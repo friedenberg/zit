@@ -92,7 +92,17 @@ func (s metaSet) String() string {
 		}
 
 		hasAny = true
-		sb.WriteString(fmt.Sprintf("%s%s", ids, g))
+
+		sb.WriteString(
+			fmt.Sprintf(
+				"%s%s%s%s%s",
+				QueryGroupOpenOperator,
+				ids,
+				QueryGroupCloseOperator,
+				ids.Sigil,
+				g,
+			),
+		)
 	}
 
 	return sb.String()
@@ -207,7 +217,7 @@ func (ms *metaSet) set(v string) (err error) {
 				var fd FD
 
 				if fd, err = FDFromPath(fp); err == nil {
-					ids.Add(fd)
+					ids.Matcher.Add(fd)
 					break
 				}
 
@@ -228,7 +238,7 @@ func (ms *metaSet) set(v string) (err error) {
 			}
 
 			if g.Equals(gattung.Konfig) {
-				ids.Add(Konfig{})
+				ids.Matcher.Add(MakeMatcherContainsExactly(Konfig{}))
 			}
 
 			ms.Gattung[g] = ids
@@ -259,9 +269,10 @@ func (ms metaSet) Get(g gattung.Gattung) (s Matcher, ok bool) {
 
 	sigilCwd := MakeMatcherSigilMatchOnMissing(SigilCwd, ms.cwd)
 
-	s = MakeMatcherImpExp(
-		MakeMatcherAnd(sigilCwd, sigilHidden),
-		MakeMatcherAnd(s),
+	s = MakeMatcherAnd(
+		MakeMatcherImplicit(sigilCwd),
+		MakeMatcherImplicit(sigilHidden),
+		s,
 	)
 
 	return
@@ -275,15 +286,15 @@ func (ms metaSet) GetEtiketten() schnittstellen.Set[Etikett] {
 	es := MakeEtikettMutableSet()
 
 	for _, s := range ms.Gattung {
-		VisitAllMatchers(
-			func(m Matcher) (err error) {
-				e, ok := m.(Etikett)
+		VisitAllMatcherKennungSansGattungWrappers(
+			func(m MatcherKennungSansGattungWrapper) (err error) {
+				e, ok := m.GetKennung().(EtikettLike)
 
 				if !ok {
 					return
 				}
 
-				return es.Add(e)
+				return es.Add(e.GetEtikett())
 			},
 			s.Matcher,
 		)
@@ -296,9 +307,9 @@ func (ms metaSet) GetTypen() schnittstellen.Set[Typ] {
 	es := collections.MakeMutableSetStringer[Typ]()
 
 	for _, s := range ms.Gattung {
-		VisitAllMatchers(
-			func(m Matcher) (err error) {
-				e, ok := m.(Typ)
+		VisitAllMatcherKennungSansGattungWrappers(
+			func(m MatcherKennungSansGattungWrapper) (err error) {
+				e, ok := m.GetKennung().(Typ)
 
 				if !ok {
 					return

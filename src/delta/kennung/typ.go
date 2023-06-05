@@ -14,6 +14,10 @@ type (
 		value string
 	}
 
+	TypLike interface {
+		GetTyp() Typ
+	}
+
 	InlineTypChecker interface {
 		IsInlineTyp(Typ) bool
 	}
@@ -54,6 +58,10 @@ func (a Typ) EqualsAny(b any) bool {
 
 func (a Typ) Equals(b Typ) bool {
 	return a.value == b.value
+}
+
+func (t Typ) GetTyp() Typ {
+	return t
 }
 
 func (o Typ) GetGattung() schnittstellen.Gattung {
@@ -108,31 +116,6 @@ func (t Typ) ContainsMatchableExactly(m Matchable) bool {
 	}
 
 	return true
-}
-
-func (t Typ) ContainsMatchable(m Matchable) bool {
-	g := gattung.Make(m.GetGattung())
-
-	switch g {
-	case gattung.Zettel, gattung.Typ:
-		// noop
-	default:
-		return false
-	}
-
-	t1 := m.GetTyp()
-
-	if ContainsWithoutUnderscoreSuffix(t1, t) {
-		return true
-	}
-
-	t2, ok := m.GetIdLike().(Typ)
-
-	if ok && Contains(t2, t) {
-		return true
-	}
-
-	return false
 }
 
 func (t Typ) MarshalText() (text []byte, err error) {

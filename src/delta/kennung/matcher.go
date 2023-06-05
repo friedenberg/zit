@@ -2,6 +2,7 @@ package kennung
 
 import (
 	"encoding/gob"
+	"fmt"
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -23,15 +24,20 @@ func init() {
 	gob.Register(&matcherNegate{})
 	gob.Register(&matcherNever{})
 	gob.Register(&matcherAlways{})
-	gob.Register(&matcherImpExp{})
 	gob.Register(&matcherContainsExactly{})
 	gob.Register(&matcherContains{})
+	gob.Register(&matcherImplicit{})
 }
 
 type Matcher interface {
 	ContainsMatchable(Matchable) bool
-	String() string
-	// schnittstellen.Stringer
+	schnittstellen.Stringer
+	MatcherLen() int
+}
+
+type MatcherKennungSansGattungWrapper interface {
+	Matcher
+	GetKennung() KennungSansGattung
 }
 
 type MatcherExact interface {
@@ -41,8 +47,12 @@ type MatcherExact interface {
 
 type MatcherParent interface {
 	Matcher
-	Len() int
 	Each(schnittstellen.FuncIter[Matcher]) error
+}
+
+type MatcherImplicit interface {
+	Matcher
+	GetImplicitMatcher() matcherImplicit
 }
 
 type MatcherParentPtr interface {
@@ -66,13 +76,38 @@ func LenMatchers(
 	return
 }
 
+func VisitAllMatcherKennungSansGattungWrappers(
+	f schnittstellen.FuncIter[MatcherKennungSansGattungWrapper],
+	matchers ...Matcher,
+) (err error) {
+	return VisitAllMatchers(
+		func(m Matcher) (err error) {
+			if _, ok := m.(MatcherImplicit); ok {
+				return iter.MakeErrStopIteration()
+			}
+
+			if mksgw, ok := m.(MatcherKennungSansGattungWrapper); ok {
+				return f(mksgw)
+			}
+
+			return
+		},
+		matchers...,
+	)
+}
+
 func VisitAllMatchers(
 	f schnittstellen.FuncIter[Matcher],
 	matchers ...Matcher,
 ) (err error) {
 	for _, m := range matchers {
 		if err = f(m); err != nil {
-			err = errors.Wrap(err)
+			if iter.IsStopIteration(err) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+			}
+
 			return
 		}
 
@@ -87,7 +122,12 @@ func VisitAllMatchers(
 				return VisitAllMatchers(f, m)
 			},
 		); err != nil {
-			err = errors.Wrap(err)
+			if iter.IsStopIteration(err) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+			}
+
 			return
 		}
 	}
@@ -107,6 +147,10 @@ func MakeMatcherAlways() Matcher {
 }
 
 type matcherAlways struct{}
+
+func (_ matcherAlways) MatcherLen() int {
+	return 1
+}
 
 func (_ matcherAlways) String() string {
 	return "ALWAYS"
@@ -128,6 +172,10 @@ func MakeMatcherNever() Matcher {
 }
 
 type matcherNever struct{}
+
+func (_ matcherNever) MatcherLen() int {
+	return 1
+}
 
 func (_ matcherNever) String() string {
 	return "NEVER"
@@ -162,7 +210,7 @@ type matcherAnd struct {
 	Children     []Matcher
 }
 
-func (matcher matcherAnd) Len() int {
+func (matcher matcherAnd) MatcherLen() int {
 	return len(matcher.Children)
 }
 
@@ -172,10 +220,6 @@ func (matcher *matcherAnd) Add(m Matcher) (err error) {
 }
 
 func (matcher matcherAnd) String() string {
-	if matcher.Len() == 0 {
-		return ""
-	}
-
 	sb := &strings.Builder{}
 	sb.WriteString(QueryGroupOpenOperator)
 
@@ -185,6 +229,10 @@ func (matcher matcherAnd) String() string {
 		}
 
 		sb.WriteString(m.String())
+	}
+
+	if matcher.MatcherLen() == 0 {
+		sb.WriteString(fmt.Sprintf("%t", matcher.MatchOnEmpty))
 	}
 
 	sb.WriteString(QueryGroupCloseOperator)
@@ -242,7 +290,7 @@ type matcherOr struct {
 	Children     []Matcher
 }
 
-func (matcher matcherOr) Len() int {
+func (matcher matcherOr) MatcherLen() int {
 	return len(matcher.Children)
 }
 
@@ -252,10 +300,6 @@ func (matcher *matcherOr) Add(m Matcher) (err error) {
 }
 
 func (matcher matcherOr) String() (out string) {
-	if matcher.Len() == 0 {
-		return
-	}
-
 	sb := &strings.Builder{}
 	sb.WriteString(QueryGroupOpenOperator)
 
@@ -265,6 +309,10 @@ func (matcher matcherOr) String() (out string) {
 		}
 
 		sb.WriteString(m.String())
+	}
+
+	if matcher.MatcherLen() == 0 {
+		sb.WriteString(fmt.Sprintf("%t", matcher.MatchOnEmpty))
 	}
 
 	sb.WriteString(QueryGroupCloseOperator)
@@ -278,10 +326,18 @@ func (matcher matcherOr) ContainsMatchable(matchable Matchable) bool {
 		return matcher.MatchOnEmpty
 	}
 
+	l := 0
+
 	for _, m := range matcher.Children {
 		if m.ContainsMatchable(matchable) {
 			return true
 		}
+
+		l += m.MatcherLen()
+	}
+
+	if l == 0 && matcher.MatchOnEmpty {
+		return true
 	}
 
 	return false
@@ -305,7 +361,7 @@ func (matcher matcherOr) Each(f schnittstellen.FuncIter[Matcher]) (err error) {
 //   \____\___/|_| |_|\__\__,_|_|_| |_|___/
 //
 
-func MakeMatcherContains(k KennungSansGattung) MatcherParentPtr {
+func MakeMatcherContains(k KennungSansGattung) MatcherKennungSansGattungWrapper {
 	return &matcherContains{Kennung: k}
 }
 
@@ -313,27 +369,16 @@ type matcherContains struct {
 	Kennung KennungSansGattung
 }
 
-func (matcher matcherContains) Len() int {
-	if matcher.Kennung == nil {
+func (matcher matcherContains) GetKennung() KennungSansGattung {
+	return matcher.Kennung
+}
+
+func (m matcherContains) MatcherLen() int {
+	if m.Kennung == nil {
 		return 0
 	}
 
 	return 1
-}
-
-func (matcher *matcherContains) Add(m Matcher) error {
-	k, ok := m.(KennungSansGattung)
-
-	if !ok {
-		return errors.Errorf(
-			"only supported adding KennungSansGattung but got %T",
-			m,
-		)
-	}
-
-	matcher.Kennung = k
-
-	return nil
 }
 
 func (matcher matcherContains) String() string {
@@ -341,15 +386,15 @@ func (matcher matcherContains) String() string {
 		return ""
 	}
 
-	return matcher.Kennung.String()
+	return FormattedString(matcher.Kennung)
 }
 
 func (matcher matcherContains) ContainsMatchable(matchable Matchable) bool {
-	return matcher.Kennung.ContainsMatchable(matchable)
-}
+	if !KennungContainsMatchable(matcher.Kennung, matchable) {
+		return false
+	}
 
-func (matcher matcherContains) Each(f schnittstellen.FuncIter[Matcher]) error {
-	return f(matcher.Kennung)
+	return true
 }
 
 //    ____            _        _           _____                _   _
@@ -359,7 +404,7 @@ func (matcher matcherContains) Each(f schnittstellen.FuncIter[Matcher]) error {
 //   \____\___/|_| |_|\__\__,_|_|_| |_|___/_____/_/\_\__,_|\___|\__|_|\__, |
 //                                                                    |___/
 
-func MakeMatcherContainsExactly(k KennungSansGattung) MatcherParentPtr {
+func MakeMatcherContainsExactly(k KennungSansGattung) MatcherKennungSansGattungWrapper {
 	return &matcherContainsExactly{Kennung: k}
 }
 
@@ -367,27 +412,16 @@ type matcherContainsExactly struct {
 	Kennung KennungSansGattung
 }
 
-func (matcher matcherContainsExactly) Len() int {
-	if matcher.Kennung == nil {
+func (matcher matcherContainsExactly) GetKennung() KennungSansGattung {
+	return matcher.Kennung
+}
+
+func (m matcherContainsExactly) MatcherLen() int {
+	if m.Kennung == nil {
 		return 0
 	}
 
 	return 1
-}
-
-func (matcher *matcherContainsExactly) Add(m Matcher) error {
-	k, ok := m.(KennungSansGattung)
-
-	if !ok {
-		return errors.Errorf(
-			"only supported adding KennungSansGattung but got %T",
-			m,
-		)
-	}
-
-	matcher.Kennung = k
-
-	return nil
 }
 
 func (matcher matcherContainsExactly) String() string {
@@ -395,17 +429,13 @@ func (matcher matcherContainsExactly) String() string {
 		return ""
 	}
 
-	return matcher.Kennung.String() + string(QueryExactOperator)
+	return FormattedString(matcher.Kennung) + string(QueryExactOperator)
 }
 
 func (matcher matcherContainsExactly) ContainsMatchable(
 	matchable Matchable,
 ) bool {
-	return matcher.Kennung.ContainsMatchableExactly(matchable)
-}
-
-func (matcher matcherContainsExactly) Each(f schnittstellen.FuncIter[Matcher]) error {
-	return f(matcher.Kennung)
+	return KennungContainsExactlyMatchable(matcher.Kennung, matchable)
 }
 
 //   _   _                  _
@@ -423,7 +453,7 @@ type matcherNegate struct {
 	Child Matcher
 }
 
-func (matcher matcherNegate) Len() int {
+func (matcher matcherNegate) MatcherLen() int {
 	if matcher.Child == nil {
 		return 0
 	}
@@ -445,7 +475,9 @@ func (matcher matcherNegate) String() string {
 }
 
 func (matcher matcherNegate) ContainsMatchable(matchable Matchable) bool {
-	return !matcher.Child.ContainsMatchable(matchable)
+	ok := !matcher.Child.ContainsMatchable(matchable)
+
+	return ok
 }
 
 func (matcher matcherNegate) Each(f schnittstellen.FuncIter[Matcher]) error {
@@ -467,7 +499,11 @@ type matcherImplicit struct {
 	Child Matcher
 }
 
-func (matcher matcherImplicit) Len() int {
+func (matcher matcherImplicit) GetImplicitMatcher() matcherImplicit {
+	return matcher
+}
+
+func (matcher matcherImplicit) MatcherLen() int {
 	if matcher.Child == nil {
 		return 0
 	}
@@ -481,11 +517,8 @@ func (matcher *matcherImplicit) Add(m Matcher) error {
 }
 
 func (matcher matcherImplicit) String() string {
-	if matcher.Child == nil {
-		return ""
-	}
-
 	return matcher.Child.String()
+	// return ""
 }
 
 func (matcher matcherImplicit) ContainsMatchable(matchable Matchable) bool {
@@ -493,8 +526,7 @@ func (matcher matcherImplicit) ContainsMatchable(matchable Matchable) bool {
 }
 
 func (matcher matcherImplicit) Each(f schnittstellen.FuncIter[Matcher]) error {
-	return nil
-	// return f(matcher.Child)
+	return f(matcher.Child)
 }
 
 //    ____       _   _
@@ -516,7 +548,7 @@ type matcherGattung struct {
 	Children map[gattung.Gattung]Matcher
 }
 
-func (m matcherGattung) Len() int {
+func (m matcherGattung) MatcherLen() int {
 	return len(m.Children)
 }
 
@@ -535,7 +567,7 @@ func (m *matcherGattung) Set(g gattung.Gattung, child Matcher) error {
 }
 
 func (m matcherGattung) String() string {
-	if m.Len() == 0 {
+	if m.MatcherLen() == 0 {
 		return ""
 	}
 
@@ -571,82 +603,6 @@ func (matcher matcherGattung) Each(
 ) (err error) {
 	for _, m := range matcher.Children {
 		if err = f(m); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	return
-}
-
-//   ___                 _____
-//  |_ _|_ __ ___  _ __ | ____|_  ___ __
-//   | || '_ ` _ \| '_ \|  _| \ \/ / '_ \
-//   | || | | | | | |_) | |___ >  <| |_) |
-//  |___|_| |_| |_| .__/|_____/_/\_\ .__/
-//                |_|              |_|
-
-func MakeMatcherImpExp(
-	imp Matcher,
-	exp MatcherParentPtr,
-) *matcherImpExp {
-	return &matcherImpExp{
-		Implicit: imp,
-		Explicit: exp,
-	}
-}
-
-type matcherImpExp struct {
-	Implicit Matcher
-	Explicit MatcherParentPtr
-}
-
-func (m matcherImpExp) Len() (i int) {
-	if m.Explicit != nil && m.Explicit.Len() > 0 {
-		i++
-	}
-
-	return
-}
-
-func (m *matcherImpExp) Add(child Matcher) error {
-	return m.Explicit.Add(child)
-}
-
-func (m matcherImpExp) String() string {
-	if m.Explicit == nil {
-		return ""
-	}
-
-	return m.Explicit.String()
-}
-
-func (matcher matcherImpExp) ContainsMatchable(matchable Matchable) bool {
-	if matcher.Implicit != nil && !matcher.Implicit.ContainsMatchable(matchable) {
-		return false
-	}
-
-	if matcher.Explicit != nil && !matcher.Explicit.ContainsMatchable(matchable) {
-		return false
-	}
-
-	return true
-}
-
-func (matcher matcherImpExp) Each(
-	f schnittstellen.FuncIter[Matcher],
-) (err error) {
-	// consider using a flag class like "ImplicitMatcher" to mark Imp rather than
-	// breaking the rules of `Each`
-	// if matcher.Implicit != nil {
-	// 	if err = f(matcher.Implicit); err != nil {
-	// 		err = errors.Wrap(err)
-	// 		return
-	// 	}
-	// }
-
-	if matcher.Explicit != nil {
-		if err = f(matcher.Explicit); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

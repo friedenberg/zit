@@ -23,7 +23,7 @@ type KennungSansGattung interface {
 	// encoding.TextMarshaler
 	// encoding.BinaryMarshaler
 	Parts() [3]string
-	MatcherExact
+	// GetMatchableImplicitKennung(m Matchable) schnittstellen.Set[KennungSansGattung]
 	KennungSansGattungClone() KennungSansGattung
 	KennungSansGattungPtrClone() KennungSansGattungPtr
 }
@@ -110,7 +110,7 @@ func MakeMatcher(
 	k KennungSansGattungPtr,
 	v string,
 	expander func(string) (string, error),
-) (m Matcher, err error) {
+) (m Matcher, isNegated bool, isExact bool, err error) {
 	v = strings.TrimSpace(v)
 
 	if expander != nil {
@@ -124,26 +124,19 @@ func MakeMatcher(
 		v = v1
 	}
 
-	var isNegated, isExact bool
-
 	if isNegated, isExact, err = SetQueryKennung(k, v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	switch {
-	case isExact && isNegated:
-		fallthrough
-
-	case isNegated:
-		m = MakeMatcherNegate(k)
-
-	case isExact:
+	if isExact {
 		m = MakeMatcherContainsExactly(k)
-
-	default:
+	} else {
 		m = MakeMatcherContains(k)
-		// noop
+	}
+
+	if isNegated {
+		m = MakeMatcherNegate(m)
 	}
 
 	return
@@ -183,7 +176,61 @@ func SetQueryKennung(
 	return
 }
 
-func FormattedString(k Kennung) string {
+func KennungContainsExactlyMatchable(k KennungSansGattung, m Matchable) bool {
+	switch kt := k.(type) {
+	case EtikettLike:
+		es := m.GetEtiketten()
+
+		if es.Contains(kt.GetEtikett()) {
+			return true
+		}
+
+	case TypLike:
+		if ContainsExactly(k, m.GetTyp()) {
+			return true
+		}
+
+	default:
+		// nop
+	}
+
+	idl := m.GetIdLike()
+
+	if !ContainsExactly(idl, k) {
+		return false
+	}
+
+	return true
+}
+
+func KennungContainsMatchable(k KennungSansGattung, m Matchable) bool {
+	switch kt := k.(type) {
+	case EtikettLike:
+		es := m.GetEtikettenExpanded()
+
+		if es.Contains(kt.GetEtikett()) {
+			return true
+		}
+
+	case TypLike:
+		if Contains(k, m.GetTyp()) {
+			return true
+		}
+
+	default:
+		// nop
+	}
+
+	idl := m.GetIdLike()
+
+	if !Contains(idl, k) {
+		return false
+	}
+
+	return true
+}
+
+func FormattedString(k KennungSansGattung) string {
 	sb := &strings.Builder{}
 	parts := k.Parts()
 	sb.WriteString(parts[0])
@@ -253,15 +300,29 @@ func ContainsWithoutUnderscoreSuffix[T schnittstellen.Stringer](a, b T) bool {
 	return true
 }
 
-func Contains[T schnittstellen.Stringer](a, b T) bool {
-	if len(b.String()) > len(a.String()) {
+func ContainsExactly(a, b KennungSansGattung) bool {
+	var (
+		as = FormattedString(a)
+		bs = FormattedString(b)
+	)
+
+	return as == bs
+}
+
+func Contains(a, b KennungSansGattung) bool {
+	var (
+		as = FormattedString(a)
+		bs = FormattedString(b)
+	)
+
+	if len(bs) > len(as) {
 		return false
 	}
 
-	return strings.HasPrefix(a.String(), b.String())
+	return strings.HasPrefix(as, bs)
 }
 
-func Includes[T schnittstellen.Stringer](a, b T) bool {
+func Includes(a, b KennungSansGattung) bool {
 	return Contains(b, a)
 }
 

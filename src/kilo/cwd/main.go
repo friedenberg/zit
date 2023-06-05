@@ -389,6 +389,15 @@ func (fs *CwdFiles) readAll() (err error) {
 	return
 }
 
+func (c CwdFiles) MatcherLen() int {
+	return collections.Len(
+		c.Zettelen,
+		c.Typen,
+		c.Kisten,
+		c.Etiketten,
+	)
+}
+
 func (c CwdFiles) Len() int {
 	return collections.Len(
 		c.Zettelen,

@@ -94,23 +94,3 @@ func (t Konfig) KennungClone() Kennung {
 func (t Konfig) KennungPtrClone() KennungPtr {
 	return &t
 }
-
-func (k Konfig) ContainsMatchableExactly(m Matchable) bool {
-	return k.ContainsMatchable(m)
-}
-
-func (k Konfig) ContainsMatchable(m Matchable) bool {
-	g := gattung.Make(m.GetGattung())
-
-	if g != gattung.Konfig {
-		return false
-	}
-
-	t1, ok := m.GetIdLike().(Konfig)
-
-	if ok && k.Equals(t1) {
-		return true
-	}
-
-	return false
-}

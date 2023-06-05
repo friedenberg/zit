@@ -112,7 +112,7 @@ function organize_hides_hidden_etiketten_from_organize { # @test
 		echo
 	} >"$expected_organize"
 
-	run_zit organize -mode output-only project-2021-zit
+	run_zit organize -mode output-only project-2021-zit:z
 	assert_success
 	assert_output - <<-EOM
 		---

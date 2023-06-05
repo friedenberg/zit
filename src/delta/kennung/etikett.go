@@ -14,6 +14,10 @@ func init() {
 	register(Etikett{})
 }
 
+type EtikettLike interface {
+	GetEtikett() Etikett
+}
+
 const EtikettRegexString = `^[-a-z0-9_]+$`
 
 var EtikettRegex *regexp.Regexp
@@ -49,6 +53,10 @@ func (e Etikett) GetQueryPrefix() string {
 	return "-"
 }
 
+func (e Etikett) GetEtikett() Etikett {
+	return e
+}
+
 func (e Etikett) GetGattung() schnittstellen.Gattung {
 	return gattung.Etikett
 }
@@ -81,38 +89,6 @@ func (e Etikett) Parts() [3]string {
 	}
 
 	return [3]string{"", "-", v}
-}
-
-func (e Etikett) ContainsMatchableExactly(m Matchable) bool {
-	es := m.GetEtikettenExpanded()
-
-	if es.Contains(e) {
-		return true
-	}
-
-	e1, ok := m.GetIdLike().(Etikett)
-
-	if ok && e.Equals(e1) {
-		return true
-	}
-
-	return false
-}
-
-func (e Etikett) ContainsMatchable(m Matchable) bool {
-	es := m.GetEtikettenExpanded()
-
-	if es.Contains(e) {
-		return true
-	}
-
-	e1, ok := m.GetIdLike().(Etikett)
-
-	if ok && ContainsWithoutUnderscoreSuffix(e1, e) {
-		return true
-	}
-
-	return false
 }
 
 func (e *Etikett) Set(v string) (err error) {

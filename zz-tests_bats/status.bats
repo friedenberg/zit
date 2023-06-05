@@ -11,6 +11,16 @@ setup() {
 
 	run_zit checkout :z,t,e
 	assert_success
+	assert_output_unsorted - <<-EOM
+		             same [tag-1.etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249 -tag-1]
+		             same [tag-2.etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249 -tag-2]
+		             same [tag.etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249 -tag]
+		             same [tag-3.etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249 -tag-3]
+		             same [tag-4.etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249 -tag-4]
+		             same [md.typ@b986c1d21fcfb7f0fe11ae960236e3471b4001029a9e631d16899643922b2d15 !md]
+		      checked out [one/uno.zettel@d47c552a5299f392948258d7959fc7cf94843316a21c8ea12854ed84a8c06367 !md "wow the first"]
+		      checked out [one/dos.zettel@c6b9d095358b8b26a99e90496d916ba92a99e9b75c705165df5f6d353a949ea9 !md "wow ok again"]
+	EOM
 }
 
 teardown() {
@@ -112,6 +122,8 @@ function status_simple_one_zettel { # @test
 }
 
 function status_simple_one_zettel_akte_separate { # @test
+	#   ../../../../../../../../../Users/sashafriedenberg/Eng/zit/src/delta/kennung/set_meta.go:117: query: "[[[one/uno, one/dos, md, tag-2, tag-3, tag, tag-4, tag-1]. ^[false]. [[one/uno], [true]]], [one/uno]].Zettel"
+	#   ../../../../../../../../../Users/sashafriedenberg/Eng/zit/src/delta/kennung/set_meta.go:117: query: "[[[one/uno, one/dos, md, tag, tag-4, tag-1, tag-2, tag-3]. ^[false]. [[false], [true]] /var/folders/zx/_q_8mkpx2qbc6lqjfk665nzr0000gq/T/bats-run-OJ6I5R/test/2/v2/one/uno.zettel]].Zettel"
 	run_zit status one/uno.zettel
 	assert_success
 	assert_output - <<-EOM

@@ -1,11 +1,8 @@
 package kennung
 
 import (
-	"strings"
-
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
@@ -19,6 +16,7 @@ type Set struct {
 	MatcherHidden MatcherSigilPtr
 	MatcherCwd    MatcherSigilPtr
 	Hinweisen     MatcherParentPtr
+	Others        MatcherParentPtr
 	Matcher       MatcherParentPtr
 }
 
@@ -36,14 +34,21 @@ func MakeSet(
 	)
 
 	sigilCwd := MakeMatcherSigilMatchOnMissing(SigilCwd, cwd)
+	hinweisen := MakeMatcherOrDoNotMatchOnEmpty()
+	others := MakeMatcherAndDoNotMatchOnEmpty()
 
 	return Set{
-		Hinweisen:     MakeMatcherOr(),
+		Hinweisen:     hinweisen,
+		Others:        others,
 		MatcherHidden: sigilHidden,
 		MatcherCwd:    sigilCwd,
-		Matcher: MakeMatcherImpExp(
-			MakeMatcherAnd(sigilCwd, sigilHidden),
-			MakeMatcherAnd(),
+		Matcher: MakeMatcherAnd(
+			MakeMatcherImplicit(sigilCwd),
+			MakeMatcherImplicit(sigilHidden),
+			MakeMatcherOr(
+				hinweisen,
+				others,
+			),
 		),
 	}
 }
@@ -57,7 +62,7 @@ func tryAddMatcher(
 	{
 		var m Matcher
 
-		if m, err = MakeMatcher(&FD{}, v, nil); err == nil {
+		if m, _, _, err = MakeMatcher(&FD{}, v, nil); err == nil {
 			s.Matcher.Add(m)
 			return
 		}
@@ -66,7 +71,7 @@ func tryAddMatcher(
 	{
 		var m Matcher
 
-		if m, err = MakeMatcher(&Sha{}, v, expanders.Sha.Expand); err == nil {
+		if m, _, _, err = MakeMatcher(&Sha{}, v, expanders.Sha.Expand); err == nil {
 			s.Matcher.Add(m)
 			return
 		}
@@ -75,7 +80,7 @@ func tryAddMatcher(
 	{
 		var m Matcher
 
-		if m, err = MakeMatcher(&Konfig{}, v, nil); err == nil {
+		if m, _, _, err = MakeMatcher(&Konfig{}, v, nil); err == nil {
 			s.Matcher.Add(m)
 			return
 		}
@@ -84,7 +89,7 @@ func tryAddMatcher(
 	{
 		var m Matcher
 
-		if m, err = MakeMatcher(
+		if m, _, _, err = MakeMatcher(
 			&Hinweis{},
 			v,
 			expanders.Hinweis.Expand,
@@ -94,62 +99,56 @@ func tryAddMatcher(
 		}
 	}
 
-	var (
-		e         Etikett
-		isNegated bool
-	)
+	{
+		var (
+			e         Etikett
+			isNegated bool
+			// isExact   bool
+			m Matcher
+		)
 
-	if isNegated, _, err = SetQueryKennung(&e, v); err == nil {
-		if implicitEtikettenGetter == nil {
-			m := Matcher(e)
+		if m, isNegated, _, err = MakeMatcher(&e, v, nil); err == nil {
+			if implicitEtikettenGetter == nil {
+				s.Matcher.Add(m)
+			} else {
+				impl := implicitEtikettenGetter.GetImplicitEtiketten(e)
 
-			if isNegated {
-				m = MakeMatcherNegate(m)
+				mo := MakeMatcherOrDoNotMatchOnEmpty()
+
+				if isNegated {
+					mo = MakeMatcherAnd()
+				}
+
+				if err = impl.Each(
+					func(e Etikett) (err error) {
+						me := Matcher(MakeMatcherContainsExactly(e))
+
+						if isNegated {
+							me = MakeMatcherNegate(me)
+						}
+
+						return mo.Add(me)
+					},
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				if isNegated {
+					s.Matcher.Add(MakeMatcherAnd(m, MakeMatcherImplicit(mo)))
+				} else {
+					s.Matcher.Add(MakeMatcherOr(m, MakeMatcherImplicit(mo)))
+				}
 			}
 
-			s.Matcher.Add(m)
-		} else {
-			impl := implicitEtikettenGetter.GetImplicitEtiketten(e)
-
-			mo := MakeMatcherOr()
-
-			if isNegated {
-				mo = MakeMatcherAnd()
-			}
-
-			if err = impl.Each(
-				func(e Etikett) (err error) {
-					me := Matcher(e)
-
-					if isNegated {
-						me = MakeMatcherNegate(me)
-					}
-
-					return mo.Add(MakeMatcherImplicit(me))
-				},
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			m := Matcher(e)
-
-			if isNegated {
-				m = MakeMatcherNegate(m)
-			}
-
-			mo.Add(m)
-
-			s.Matcher.Add(mo)
+			return
 		}
-
-		return
 	}
 
 	{
 		var m Matcher
 
-		if m, err = MakeMatcher(&Typ{}, v, expanders.Typ.Expand); err == nil {
+		if m, _, _, err = MakeMatcher(&Typ{}, v, expanders.Typ.Expand); err == nil {
 			s.Matcher.Add(m)
 			return
 		}
@@ -158,7 +157,7 @@ func tryAddMatcher(
 	{
 		var m Matcher
 
-		if m, err = MakeMatcher(&Kasten{}, v, expanders.Kasten.Expand); err == nil {
+		if m, _, _, err = MakeMatcher(&Kasten{}, v, expanders.Kasten.Expand); err == nil {
 			s.Matcher.Add(m)
 			return
 		}
@@ -174,111 +173,47 @@ func tryAddMatcher(
 	return
 }
 
-func (s *Set) Add(ids ...schnittstellen.Element) (err error) {
-	for _, i := range ids {
-		switch it := i.(type) {
-		case Etikett:
-			errors.TodoP1("determine if this should have implicit etiketten")
-			s.Matcher.Add(it)
-
-		case Sha:
-			s.Matcher.Add(it)
-
-		case Hinweis:
-			s.Matcher.Add(it)
-
-		case Typ:
-			s.Matcher.Add(it)
-
-		case Kasten:
-			s.Matcher.Add(it)
-
-		case Konfig:
-			s.Matcher.Add(it)
-
-		case Sigil:
-			s.AddSigil(it)
-
-		case FD:
-			if il, err := it.GetIdLike(); err == nil {
-				s.Add(il)
-			}
-
-		default:
-			err = errors.Errorf("unknown kennung: %s", it)
-			return
-		}
-	}
-
-	return
+func (s Set) MatcherLen() int {
+	return s.Matcher.MatcherLen()
 }
 
 func (s Set) String() string {
-	sb := &strings.Builder{}
-
-	switch {
-	case collections.Len(s.Matcher, s.Hinweisen) == 0:
-		return s.Sigil.String()
-
-	case s.Matcher.Len() == 0:
-		sb.WriteString(QueryGroupOpenOperator)
-		sb.WriteString(s.Hinweisen.String())
-		sb.WriteString(QueryGroupCloseOperator)
-
-	case s.Hinweisen.Len() == 0:
-		sb.WriteString(QueryGroupOpenOperator)
-		sb.WriteString(s.Matcher.String())
-		sb.WriteString(QueryGroupCloseOperator)
-
-	default:
-		sb.WriteString(QueryGroupOpenOperator)
-		sb.WriteString(s.Matcher.String())
-		sb.WriteString(QueryOrOperator)
-		sb.WriteString(s.Hinweisen.String())
-		sb.WriteString(QueryGroupCloseOperator)
-
-	}
-
-	sb.WriteString(s.Sigil.String())
-
-	return sb.String()
+	return s.Matcher.String()
 }
 
 func (s Set) ContainsMatchable(m Matchable) bool {
-	g := gattung.Must(m.GetGattung())
+	return s.Matcher.ContainsMatchable(m)
+	// g := gattung.Must(m.GetGattung())
 
-	if g != gattung.Zettel && s.Len() > 0 && s.Hinweisen.Len() == s.Len() {
-		return false
-	}
+	// if g != gattung.Zettel && s.Len() > 0 && s.Hinweisen.Len() == s.Len() {
+	// 	return false
+	// }
 
-	innerContains := s.Matcher.ContainsMatchable(m)
+	// innerContains := s.Matcher.ContainsMatchable(m)
 
-	if !innerContains && s.Len() != s.Hinweisen.Len() {
-		return false
-	}
+	// if !innerContains && s.Len() != s.Hinweisen.Len() {
+	// 	return false
+	// }
 
-	il := m.GetIdLike()
+	// il := m.GetIdLike()
 
-	switch il.(type) {
-	case Typ, Etikett, Kasten, Konfig:
-		if !innerContains {
-			return false
-		}
+	// switch il.(type) {
+	// case Hinweis:
+	// 	if !s.Hinweisen.ContainsMatchable(m) && !innerContains {
+	// 		return false
+	// 	}
 
-	case Hinweis:
-		if !s.Hinweisen.ContainsMatchable(m) {
-			return false
-		}
+	// default:
+	// 	if !innerContains {
+	// 		return false
+	// 	}
+	// }
 
-	default:
-		panic(errors.Errorf("unsupported it type: %T, %s", il, il))
-	}
-
-	return true
+	// return true
 }
 
 func (s Set) Len() int {
-	return LenMatchers(s.Matcher) + s.Hinweisen.Len()
+	return LenMatchers(s.Matcher) + s.Hinweisen.MatcherLen()
 }
 
 func (s Set) EachMatcher(f schnittstellen.FuncIter[Matcher]) (err error) {
@@ -298,9 +233,9 @@ func (s Set) GetSigil() schnittstellen.Sigil {
 func (s Set) GetHinweisen() schnittstellen.Set[Hinweis] {
 	hins := collections.MakeMutableSetStringer[Hinweis]()
 
-	VisitAllMatchers(
-		func(m Matcher) (err error) {
-			h, ok := m.(*Hinweis)
+	VisitAllMatcherKennungSansGattungWrappers(
+		func(m MatcherKennungSansGattungWrapper) (err error) {
+			h, ok := m.GetKennung().(*Hinweis)
 
 			if !ok {
 				return
@@ -315,7 +250,7 @@ func (s Set) GetHinweisen() schnittstellen.Set[Hinweis] {
 }
 
 func (s Set) AnyHinweis() (i1 Hinweis, ok bool) {
-	if ok = s.Hinweisen.Len() == 1; ok {
+	if ok = s.Hinweisen.MatcherLen() == 1; ok {
 		hins := s.GetHinweisen()
 		i1 = hins.Any()
 	}
