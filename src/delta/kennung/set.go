@@ -13,29 +13,23 @@ type ImplicitEtikettenGetter interface {
 type Set struct {
 	Sigil Sigil
 
-	MatcherCwd MatcherSigilPtr
-	Hinweisen  MatcherParentPtr
-	Others     MatcherParentPtr
-	FDs        MatcherParentPtr
+	Hinweisen MatcherParentPtr
+	Others    MatcherParentPtr
+	FDs       MatcherParentPtr
 
 	Matcher MatcherParentPtr
 }
 
-func MakeSet(
-	cwd Matcher,
-) Set {
-	sigilCwd := MakeMatcherSigilMatchOnMissing(SigilCwd, cwd)
+func MakeSet() Set {
 	hinweisen := MakeMatcherOrDoNotMatchOnEmpty()
 	fds := MakeMatcherOrDoNotMatchOnEmpty()
 	others := MakeMatcherAndDoNotMatchOnEmpty()
 
 	return Set{
-		Hinweisen:  hinweisen,
-		Others:     others,
-		MatcherCwd: sigilCwd,
-		FDs:        fds,
+		Hinweisen: hinweisen,
+		Others:    others,
+		FDs:       fds,
 		Matcher: MakeMatcherAnd(
-			MakeMatcherImplicit(sigilCwd),
 			MakeMatcherOr(
 				hinweisen,
 				others,
@@ -179,33 +173,6 @@ func (s *Set) Add(m Matcher) (err error) {
 
 func (s Set) ContainsMatchable(m Matchable) bool {
 	return s.Matcher.ContainsMatchable(m)
-	// g := gattung.Must(m.GetGattung())
-
-	// if g != gattung.Zettel && s.Len() > 0 && s.Hinweisen.Len() == s.Len() {
-	// 	return false
-	// }
-
-	// innerContains := s.Matcher.ContainsMatchable(m)
-
-	// if !innerContains && s.Len() != s.Hinweisen.Len() {
-	// 	return false
-	// }
-
-	// il := m.GetIdLike()
-
-	// switch il.(type) {
-	// case Hinweis:
-	// 	if !s.Hinweisen.ContainsMatchable(m) && !innerContains {
-	// 		return false
-	// 	}
-
-	// default:
-	// 	if !innerContains {
-	// 		return false
-	// 	}
-	// }
-
-	// return true
 }
 
 func (s Set) Len() int {
@@ -218,10 +185,9 @@ func (s Set) EachMatcher(f schnittstellen.FuncIter[Matcher]) (err error) {
 
 func (s *Set) AddSigil(v Sigil) {
 	s.Sigil.Add(v)
-	s.MatcherCwd.AddSigil(v)
 }
 
-func (s Set) GetSigil() schnittstellen.Sigil {
+func (s Set) GetSigil() Sigil {
 	return s.Sigil
 }
 

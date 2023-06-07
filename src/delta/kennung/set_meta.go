@@ -260,7 +260,7 @@ func (ms metaSet) Get(g gattung.Gattung) (s MatcherSigil, ok bool) {
 
 	sigilHidden := MakeMatcherExcludeHidden(
 		ms.Hidden,
-		ids.Sigil,
+		ids.GetSigil(),
 	)
 
 	sigilCwd := MakeMatcherSigilMatchOnMissing(SigilCwd, ms.cwd)
@@ -271,7 +271,7 @@ func (ms metaSet) Get(g gattung.Gattung) (s MatcherSigil, ok bool) {
 			MakeMatcherImplicit(sigilHidden),
 			ids,
 		),
-		ids.Sigil,
+		ids.GetSigil(),
 	)
 
 	return
@@ -324,7 +324,7 @@ func (ms metaSet) GetTypen() schnittstellen.Set[Typ] {
 }
 
 func (ms metaSet) MakeSet() Set {
-	return MakeSet(ms.cwd)
+	return MakeSet()
 }
 
 func (s metaSet) ContainsMatchable(m Matchable) bool {

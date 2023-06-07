@@ -368,7 +368,7 @@ func (u *Umwelt) MakeMetaIdSetWithoutExcludedHidden(
 func (u *Umwelt) MakeIdSet(
 	cwd kennung.Matcher,
 ) kennung.Set {
-	return kennung.MakeSet(cwd)
+	return kennung.MakeSet()
 }
 
 func (u *Umwelt) ApplyToOrganizeOptions(oo *organize_text.Options) {
