@@ -230,7 +230,7 @@ func (ms *metaSet) set(v string) (err error) {
 				var fd FD
 
 				if fd, err = FDFromPath(fp); err == nil {
-					ids.Set.FDs.Add(fd)
+					ids.Set.Identifiers.Add(fd)
 					break
 				}
 

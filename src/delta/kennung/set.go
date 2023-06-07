@@ -11,27 +11,23 @@ type ImplicitEtikettenGetter interface {
 }
 
 type Set struct {
-	Hinweisen MatcherParentPtr
-	Others    MatcherParentPtr
-	FDs       MatcherParentPtr
+	Identifiers MatcherParentPtr
+	Tags        MatcherParentPtr
 
 	Matcher MatcherParentPtr
 }
 
 func MakeSet() Set {
-	hinweisen := MakeMatcherOrDoNotMatchOnEmpty()
-	fds := MakeMatcherOrDoNotMatchOnEmpty()
-	others := MakeMatcherAndDoNotMatchOnEmpty()
+	identifiers := MakeMatcherOrDoNotMatchOnEmpty()
+	tags := MakeMatcherAndDoNotMatchOnEmpty()
 
 	return Set{
-		Hinweisen: hinweisen,
-		Others:    others,
-		FDs:       fds,
+		Identifiers: identifiers,
+		Tags:        tags,
 		Matcher: MakeMatcherAnd(
 			MakeMatcherOr(
-				hinweisen,
-				others,
-				fds,
+				identifiers,
+				tags,
 			),
 		),
 	}
@@ -78,7 +74,7 @@ func tryAddMatcher(
 			v,
 			expanders.Hinweis.Expand,
 		); err == nil {
-			s.Hinweisen.Add(m)
+			s.Identifiers.Add(m)
 			return
 		}
 	}
@@ -169,7 +165,7 @@ func (s Set) ContainsMatchable(m Matchable) bool {
 }
 
 func (s Set) Len() int {
-	return LenMatchers(s.Matcher) + s.Hinweisen.MatcherLen()
+	return LenMatchers(s.Matcher) + s.Identifiers.MatcherLen()
 }
 
 func (s Set) EachMatcher(f schnittstellen.FuncIter[Matcher]) (err error) {
@@ -189,14 +185,14 @@ func (s Set) GetHinweisen() schnittstellen.Set[Hinweis] {
 
 			return hins.Add(*h)
 		},
-		s.Hinweisen,
+		s.Identifiers,
 	)
 
 	return hins
 }
 
 func (s Set) AnyHinweis() (i1 Hinweis, ok bool) {
-	if ok = s.Hinweisen.MatcherLen() == 1; ok {
+	if ok = s.Identifiers.MatcherLen() == 1; ok {
 		hins := s.GetHinweisen()
 		i1 = hins.Any()
 	}
