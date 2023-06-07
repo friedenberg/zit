@@ -299,8 +299,12 @@ func (f FD) GetHinweis() (h Hinweis, err error) {
 	return
 }
 
+func (_ FD) Each(_ schnittstellen.FuncIter[Matcher]) error {
+	return nil
+}
+
 func (fd FD) MatcherLen() int {
-	return 1
+	return 0
 }
 
 func (fd FD) ContainsMatchableExactly(m Matchable) (ok bool) {

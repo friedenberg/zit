@@ -31,7 +31,7 @@ type MatcherBuilder struct {
 	expanders               Abbr
 	hidden                  Matcher
 	defaultGattungen        gattungen.Set
-	gattung                 map[gattung.Gattung]MatcherIdentifierTags
+	gattung                 map[gattung.Gattung]MatcherExactlyThisOrAllOfThese
 }
 
 func (mb *MatcherBuilder) WithCwd(

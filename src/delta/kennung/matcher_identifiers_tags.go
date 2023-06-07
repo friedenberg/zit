@@ -9,18 +9,24 @@ type ImplicitEtikettenGetter interface {
 	GetImplicitEtiketten(Etikett) schnittstellen.Set[Etikett]
 }
 
-type MatcherIdentifierTags struct {
+type MatcherExactlyThisOrAllOfThese interface {
+	Matcher
+	AddExactlyThis(Matcher) error
+	AddAllOfThese(Matcher) error
+}
+
+type matcherExactlyThisOrAllOfThese struct {
 	MatcherExactlyThis MatcherParentPtr
 	MatcherAllOfThese  MatcherParentPtr
 
 	Matcher MatcherParentPtr
 }
 
-func MakeMatcherIdentifierTags() MatcherIdentifierTags {
+func MakeMatcherExactlyThisOrAllOfThese() MatcherExactlyThisOrAllOfThese {
 	identifiers := MakeMatcherOrDoNotMatchOnEmpty()
 	tags := MakeMatcherAndDoNotMatchOnEmpty()
 
-	return MatcherIdentifierTags{
+	return &matcherExactlyThisOrAllOfThese{
 		MatcherExactlyThis: identifiers,
 		MatcherAllOfThese:  tags,
 		Matcher: MakeMatcherOr(
@@ -30,41 +36,47 @@ func MakeMatcherIdentifierTags() MatcherIdentifierTags {
 	}
 }
 
-func (s *MatcherIdentifierTags) AddExactlyThis(m Matcher) (err error) {
+func (s matcherExactlyThisOrAllOfThese) Each(
+	f schnittstellen.FuncIter[Matcher],
+) error {
+	return s.Matcher.Each(f)
+}
+
+func (s *matcherExactlyThisOrAllOfThese) AddExactlyThis(m Matcher) (err error) {
 	return s.MatcherExactlyThis.Add(m)
 }
 
-func (s *MatcherIdentifierTags) AddAllOfThese(m Matcher) (err error) {
+func (s *matcherExactlyThisOrAllOfThese) AddAllOfThese(m Matcher) (err error) {
 	return s.MatcherAllOfThese.Add(m)
 }
 
-func (s MatcherIdentifierTags) MatcherLen() int {
+func (s matcherExactlyThisOrAllOfThese) MatcherLen() int {
 	return s.Matcher.MatcherLen()
 }
 
-func (s MatcherIdentifierTags) String() string {
+func (s matcherExactlyThisOrAllOfThese) String() string {
 	return s.Matcher.String()
 }
 
-func (s *MatcherIdentifierTags) Add(m Matcher) (err error) {
+func (s *matcherExactlyThisOrAllOfThese) Add(m Matcher) (err error) {
 	return s.Matcher.Add(m)
 }
 
-func (s MatcherIdentifierTags) ContainsMatchable(m Matchable) bool {
+func (s matcherExactlyThisOrAllOfThese) ContainsMatchable(m Matchable) bool {
 	return s.Matcher.ContainsMatchable(m)
 }
 
-func (s MatcherIdentifierTags) Len() int {
+func (s matcherExactlyThisOrAllOfThese) Len() int {
 	return LenMatchers(s.Matcher) + s.MatcherExactlyThis.MatcherLen()
 }
 
-func (s MatcherIdentifierTags) EachMatcher(
+func (s matcherExactlyThisOrAllOfThese) EachMatcher(
 	f schnittstellen.FuncIter[Matcher],
 ) (err error) {
 	return VisitAllMatchers(f, s.Matcher)
 }
 
-func (s MatcherIdentifierTags) GetHinweisen() schnittstellen.Set[Hinweis] {
+func (s matcherExactlyThisOrAllOfThese) GetHinweisen() schnittstellen.Set[Hinweis] {
 	hins := collections.MakeMutableSetStringer[Hinweis]()
 
 	VisitAllMatcherKennungSansGattungWrappers(
@@ -83,7 +95,7 @@ func (s MatcherIdentifierTags) GetHinweisen() schnittstellen.Set[Hinweis] {
 	return hins
 }
 
-func (s MatcherIdentifierTags) AnyHinweis() (i1 Hinweis, ok bool) {
+func (s matcherExactlyThisOrAllOfThese) AnyHinweis() (i1 Hinweis, ok bool) {
 	if ok = s.MatcherExactlyThis.MatcherLen() == 1; ok {
 		hins := s.GetHinweisen()
 		i1 = hins.Any()

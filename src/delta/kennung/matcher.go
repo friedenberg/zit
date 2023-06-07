@@ -29,12 +29,14 @@ func init() {
 	gob.Register(&matcherContainsExactly{})
 	gob.Register(&matcherContains{})
 	gob.Register(&matcherImplicit{})
+	gob.Register(&matcherExactlyThisOrAllOfThese{})
 }
 
 type Matcher interface {
 	ContainsMatchable(Matchable) bool
 	schnittstellen.Stringer
 	MatcherLen() int
+	Each(schnittstellen.FuncIter[Matcher]) error
 }
 
 type MatcherSigil interface {
@@ -57,18 +59,13 @@ type MatcherExact interface {
 	ContainsMatchableExactly(Matchable) bool
 }
 
-type MatcherParent interface {
-	Matcher
-	Each(schnittstellen.FuncIter[Matcher]) error
-}
-
 type MatcherImplicit interface {
 	Matcher
 	GetImplicitMatcher() matcherImplicit
 }
 
 type MatcherParentPtr interface {
-	MatcherParent
+	Matcher
 	Add(Matcher) error
 }
 
@@ -123,13 +120,7 @@ func VisitAllMatchers(
 			return
 		}
 
-		mp, ok := m.(MatcherParent)
-
-		if !ok {
-			continue
-		}
-
-		if err = mp.Each(
+		if err = m.Each(
 			func(m Matcher) (err error) {
 				return VisitAllMatchers(f, m)
 			},
@@ -161,7 +152,11 @@ func MakeMatcherAlways() Matcher {
 type matcherAlways struct{}
 
 func (_ matcherAlways) MatcherLen() int {
-	return 1
+	return 0
+}
+
+func (_ matcherAlways) Each(_ schnittstellen.FuncIter[Matcher]) error {
+	return nil
 }
 
 func (_ matcherAlways) String() string {
@@ -186,7 +181,11 @@ func MakeMatcherNever() Matcher {
 type matcherNever struct{}
 
 func (_ matcherNever) MatcherLen() int {
-	return 1
+	return 0
+}
+
+func (_ matcherNever) Each(_ schnittstellen.FuncIter[Matcher]) error {
+	return nil
 }
 
 func (_ matcherNever) String() string {
@@ -388,11 +387,11 @@ func (matcher matcherContains) GetKennung() KennungSansGattung {
 }
 
 func (m matcherContains) MatcherLen() int {
-	if m.Kennung == nil {
-		return 0
-	}
+	return 0
+}
 
-	return 1
+func (_ matcherContains) Each(_ schnittstellen.FuncIter[Matcher]) error {
+	return nil
 }
 
 func (matcher matcherContains) String() string {
@@ -433,11 +432,11 @@ func (matcher matcherContainsExactly) GetKennung() KennungSansGattung {
 }
 
 func (m matcherContainsExactly) MatcherLen() int {
-	if m.Kennung == nil {
-		return 0
-	}
+	return 0
+}
 
-	return 1
+func (_ matcherContainsExactly) Each(_ schnittstellen.FuncIter[Matcher]) error {
+	return nil
 }
 
 func (matcher matcherContainsExactly) String() string {

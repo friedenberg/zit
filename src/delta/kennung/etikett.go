@@ -92,6 +92,13 @@ func (e Etikett) Parts() [3]string {
 }
 
 func (e *Etikett) Set(v string) (err error) {
+	v = strings.ToLower(strings.TrimSpace(v))
+
+	if err = ErrOnKonfig(v); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if !EtikettRegex.Match([]byte(v)) {
 		err = errors.Errorf("not a valid etikett: '%s'", v)
 		return

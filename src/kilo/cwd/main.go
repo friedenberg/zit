@@ -398,6 +398,10 @@ func (c CwdFiles) MatcherLen() int {
 	)
 }
 
+func (_ CwdFiles) Each(_ schnittstellen.FuncIter[kennung.Matcher]) error {
+	return nil
+}
+
 func (c CwdFiles) Len() int {
 	return collections.Len(
 		c.Zettelen,

@@ -30,12 +30,16 @@ type MetaSet interface {
 }
 
 type setWithSigil struct {
-	MatcherIdentifierTags MatcherIdentifierTags
-	Sigil                 Sigil
+	Matcher MatcherExactlyThisOrAllOfThese
+	Sigil   Sigil
+}
+
+func (s setWithSigil) String() string {
+	return fmt.Sprintf("%s%s", s.Matcher, s.Sigil)
 }
 
 func (s setWithSigil) ContainsMatchable(m Matchable) bool {
-	return s.MatcherIdentifierTags.ContainsMatchable(m)
+	return s.Matcher.ContainsMatchable(m)
 }
 
 func (s setWithSigil) GetSigil() Sigil {
@@ -216,7 +220,7 @@ func (ms *metaSet) set(v string) (err error) {
 			ok := false
 
 			if ids, ok = ms.Gattung[g]; !ok {
-				ids.MatcherIdentifierTags = MakeMatcherIdentifierTags()
+				ids.Matcher = MakeMatcherExactlyThisOrAllOfThese()
 				ids.Sigil = sigil
 			}
 
@@ -230,7 +234,7 @@ func (ms *metaSet) set(v string) (err error) {
 				var fd FD
 
 				if fd, err = FDFromPath(fp); err == nil {
-					ids.MatcherIdentifierTags.MatcherAllOfThese.Add(fd)
+					ids.Matcher.AddExactlyThis(fd)
 					break
 				}
 
@@ -240,7 +244,7 @@ func (ms *metaSet) set(v string) (err error) {
 
 			default:
 				if err = tryAddMatcher(
-					&ids.MatcherIdentifierTags,
+					ids.Matcher,
 					ms.expanders,
 					ms.implicitEtikettenGetter,
 					before,
@@ -250,9 +254,10 @@ func (ms *metaSet) set(v string) (err error) {
 				}
 			}
 
-			if g.Equals(gattung.Konfig) {
-				ids.MatcherIdentifierTags.Matcher.Add(MakeMatcherContainsExactly(Konfig{}))
-			}
+			// if g.Equals(gattung.Konfig) {
+			errors.TodoP1("move to gattung map")
+			// ids.Matcher.Matcher.Add(MakeMatcherContainsExactly(Konfig{}))
+			// }
 
 			ms.Gattung[g] = ids
 
@@ -267,7 +272,7 @@ func (ms *metaSet) set(v string) (err error) {
 }
 
 func tryAddMatcher(
-	s *MatcherIdentifierTags,
+	s MatcherExactlyThisOrAllOfThese,
 	expanders Abbr,
 	implicitEtikettenGetter ImplicitEtikettenGetter,
 	v string,
@@ -284,14 +289,6 @@ func tryAddMatcher(
 		var m Matcher
 
 		if m, _, _, err = MakeMatcher(&Sha{}, v, expanders.Sha.Expand); err == nil {
-			return s.AddExactlyThis(m)
-		}
-	}
-
-	{
-		var m Matcher
-
-		if m, _, _, err = MakeMatcher(&Konfig{}, v, nil); err == nil {
 			return s.AddExactlyThis(m)
 		}
 	}
@@ -392,7 +389,7 @@ func (ms metaSet) Get(g gattung.Gattung) (s MatcherSigil, ok bool) {
 		MakeMatcherAnd(
 			MakeMatcherImplicit(sigilCwd),
 			MakeMatcherImplicit(sigilHidden),
-			ids.MatcherIdentifierTags,
+			ids.Matcher,
 		),
 		ids.Sigil,
 	)
@@ -418,7 +415,8 @@ func (ms metaSet) GetEtiketten() schnittstellen.Set[Etikett] {
 
 				return es.Add(e.GetEtikett())
 			},
-			s.MatcherIdentifierTags.Matcher,
+			// TODO-P1 modify sigil matcher to allow child traversal
+			s.Matcher,
 		)
 	}
 
@@ -439,7 +437,8 @@ func (ms metaSet) GetTypen() schnittstellen.Set[Typ] {
 
 				return es.Add(e)
 			},
-			s.MatcherIdentifierTags.Matcher,
+			// TODO-P1 modify sigil matcher to allow child traversal
+			s.Matcher,
 		)
 	}
 
