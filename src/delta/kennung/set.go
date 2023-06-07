@@ -11,8 +11,6 @@ type ImplicitEtikettenGetter interface {
 }
 
 type Set struct {
-	Sigil Sigil
-
 	Hinweisen MatcherParentPtr
 	Others    MatcherParentPtr
 	FDs       MatcherParentPtr
@@ -149,11 +147,6 @@ func tryAddMatcher(
 		}
 	}
 
-	if err = s.Sigil.Set(v); err == nil {
-		s.AddSigil(s.Sigil)
-		return
-	}
-
 	err = errors.Wrap(errInvalidKennung(v))
 
 	return
@@ -181,14 +174,6 @@ func (s Set) Len() int {
 
 func (s Set) EachMatcher(f schnittstellen.FuncIter[Matcher]) (err error) {
 	return VisitAllMatchers(f, s.Matcher)
-}
-
-func (s *Set) AddSigil(v Sigil) {
-	s.Sigil.Add(v)
-}
-
-func (s Set) GetSigil() Sigil {
-	return s.Sigil
 }
 
 func (s Set) GetHinweisen() schnittstellen.Set[Hinweis] {
