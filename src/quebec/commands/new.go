@@ -40,12 +40,36 @@ func init() {
 				ProtoZettel: zettel.MakeEmptyProtoZettel(),
 			}
 
-			f.BoolVar(&c.Delete, "delete", false, "delete the zettel and akte after successful checkin")
-			f.BoolVar(&c.Dedupe, "dedupe", false, "deduplicate added Zettelen based on Akte sha")
-			f.BoolVar(&c.Edit, "edit", true, "create a new empty zettel and open EDITOR or VISUAL for editing and then commit the resulting changes")
-			f.IntVar(&c.Count, "count", 1, "when creating new empty zettels, how many to create. otherwise ignored")
+			f.BoolVar(
+				&c.Delete,
+				"delete",
+				false,
+				"delete the zettel and akte after successful checkin",
+			)
+			f.BoolVar(
+				&c.Dedupe,
+				"dedupe",
+				false,
+				"deduplicate added Zettelen based on Akte sha",
+			)
+			f.BoolVar(
+				&c.Edit,
+				"edit",
+				true,
+				"create a new empty zettel and open EDITOR or VISUAL for editing and then commit the resulting changes",
+			)
+			f.IntVar(
+				&c.Count,
+				"count",
+				1,
+				"when creating new empty zettels, how many to create. otherwise ignored",
+			)
 
-			f.Var(&c.Filter, "filter", "a script to run for each file to transform it the standard zettel format")
+			f.Var(
+				&c.Filter,
+				"filter",
+				"a script to run for each file to transform it the standard zettel format",
+			)
 			c.ProtoZettel.AddToFlagSet(f)
 
 			return c
@@ -53,9 +77,14 @@ func init() {
 	)
 }
 
-func (c New) ValidateFlagsAndArgs(u *umwelt.Umwelt, args ...string) (err error) {
+func (c New) ValidateFlagsAndArgs(
+	u *umwelt.Umwelt,
+	args ...string,
+) (err error) {
 	if u.Konfig().DryRun && len(args) == 0 {
-		err = errors.Errorf("when -dry-run is set, paths to existing zettels must be provided")
+		err = errors.Errorf(
+			"when -dry-run is set, paths to existing zettels must be provided",
+		)
 		return
 	}
 
@@ -122,7 +151,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	if c.Edit {
-		ms := u.MakeMetaIdSet(
+		ms := u.MakeMetaIdSetWithoutExcludedHidden(
 			kennung.MakeMatcherAlways(),
 			gattungen.MakeSet(gattung.Zettel),
 		)

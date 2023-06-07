@@ -28,7 +28,10 @@ type commandWithCwdQuery struct {
 	CommandWithCwdQuery
 }
 
-func (c commandWithCwdQuery) Complete(u *umwelt.Umwelt, args ...string) (err error) {
+func (c commandWithCwdQuery) Complete(
+	u *umwelt.Umwelt,
+	args ...string,
+) (err error) {
 	var cgg CompletionGattungGetter
 	ok := false
 
@@ -111,7 +114,7 @@ func (c commandWithCwdQuery) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	ids := u.MakeMetaIdSet(cwdFiles, c.DefaultGattungen())
+	ids := u.MakeMetaIdSetWithoutExcludedHidden(cwdFiles, c.DefaultGattungen())
 
 	if err = ids.SetMany(args...); err != nil {
 		err = errors.Wrap(err)

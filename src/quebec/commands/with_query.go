@@ -27,7 +27,10 @@ type CompletionGattungGetter interface {
 	CompletionGattung() gattungen.Set
 }
 
-func (c commandWithQuery) Complete(u *umwelt.Umwelt, args ...string) (err error) {
+func (c commandWithQuery) Complete(
+	u *umwelt.Umwelt,
+	args ...string,
+) (err error) {
 	var cgg CompletionGattungGetter
 	ok := false
 
@@ -99,7 +102,7 @@ func (c commandWithQuery) Complete(u *umwelt.Umwelt, args ...string) (err error)
 }
 
 func (c commandWithQuery) Run(u *umwelt.Umwelt, args ...string) (err error) {
-	ids := u.MakeMetaIdSet(nil, c.DefaultGattungen())
+	ids := u.MakeMetaIdSetWithExcludedHidden(nil, c.DefaultGattungen())
 
 	if err = ids.SetMany(args...); err != nil {
 		err = errors.Wrap(err)

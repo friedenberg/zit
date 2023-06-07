@@ -16,6 +16,8 @@ const (
 	QueryAndOperator        = " "
 	QueryGroupOpenOperator  = "["
 	QueryGroupCloseOperator = "]"
+	QueryNegationOperator   = '^'
+	QueryExactOperator      = '='
 )
 
 func init() {

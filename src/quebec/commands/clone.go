@@ -62,7 +62,10 @@ func (c Clone) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	ids := u.MakeMetaIdSet(kennung.MakeMatcherAlways(), c.CompletionGattung())
+	ids := u.MakeMetaIdSetWithExcludedHidden(
+		kennung.MakeMatcherAlways(),
+		c.CompletionGattung(),
+	)
 
 	if err = ids.SetMany(args...); err != nil {
 		err = errors.Wrap(err)

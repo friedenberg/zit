@@ -9,11 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
-const (
-	QueryNegationOperator rune = '^'
-	QueryExactOperator    rune = '='
-)
-
 type QueryPrefixer interface {
 	GetQueryPrefix() string
 }

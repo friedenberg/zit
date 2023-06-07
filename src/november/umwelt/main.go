@@ -327,7 +327,7 @@ func (u *Umwelt) MakeKennungExpanders() (out kennung.Abbr) {
 	return
 }
 
-func (u *Umwelt) MakeMetaIdSet(
+func (u *Umwelt) MakeMetaIdSetWithExcludedHidden(
 	cwd kennung.Matcher,
 	dg gattungen.Set,
 ) kennung.MetaSet {
@@ -347,13 +347,28 @@ func (u *Umwelt) MakeMetaIdSet(
 	)
 }
 
+func (u *Umwelt) MakeMetaIdSetWithoutExcludedHidden(
+	cwd kennung.Matcher,
+	dg gattungen.Set,
+) kennung.MetaSet {
+	if dg == nil {
+		dg = gattungen.MakeSet(gattung.Zettel)
+	}
+
+	return kennung.MakeMetaSet(
+		cwd,
+		u.MakeKennungExpanders(),
+		nil,
+		u.Konfig().FileExtensions,
+		dg,
+		u.Konfig(),
+	)
+}
+
 func (u *Umwelt) MakeIdSet(
 	cwd kennung.Matcher,
 ) kennung.Set {
-	return kennung.MakeSet(
-		cwd,
-		nil,
-	)
+	return kennung.MakeSet(cwd, u.MakeKennungHidden())
 }
 
 func (u *Umwelt) ApplyToOrganizeOptions(oo *organize_text.Options) {

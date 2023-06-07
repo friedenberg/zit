@@ -56,7 +56,12 @@ func (c CommitOrganizeFile) Run(
 			var tz *zettel.Transacted
 
 			if tz, err = store.Zettel().ReadOne(&h); err != nil {
-				err = errors.Wrapf(err, "{Hinweis String: '%s'}: {Hinweis: '%s'}", hString, h)
+				err = errors.Wrapf(
+					err,
+					"{Hinweis String: '%s'}: {Hinweis: '%s'}",
+					hString,
+					h,
+				)
 				return
 			}
 
@@ -67,7 +72,10 @@ func (c CommitOrganizeFile) Run(
 		return
 	}
 
-	ms := c.Umwelt.MakeMetaIdSet(nil, gattungen.MakeSet(gattung.TrueGattung()...))
+	ms := c.Umwelt.MakeMetaIdSetWithoutExcludedHidden(
+		nil,
+		gattungen.MakeSet(gattung.TrueGattung()...),
+	)
 	errors.TodoP1("create query without syntax")
 	ms.Set(":z,e,t")
 
