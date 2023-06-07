@@ -30,12 +30,12 @@ type MetaSet interface {
 }
 
 type setWithSigil struct {
-	Set   MatcherIdentifierTags
-	Sigil Sigil
+	MatcherIdentifierTags MatcherIdentifierTags
+	Sigil                 Sigil
 }
 
 func (s setWithSigil) ContainsMatchable(m Matchable) bool {
-	return s.Set.ContainsMatchable(m)
+	return s.MatcherIdentifierTags.ContainsMatchable(m)
 }
 
 func (s setWithSigil) GetSigil() Sigil {
@@ -216,7 +216,7 @@ func (ms *metaSet) set(v string) (err error) {
 			ok := false
 
 			if ids, ok = ms.Gattung[g]; !ok {
-				ids.Set = MakeMatcherIdentifierTags()
+				ids.MatcherIdentifierTags = MakeMatcherIdentifierTags()
 				ids.Sigil = sigil
 			}
 
@@ -230,7 +230,7 @@ func (ms *metaSet) set(v string) (err error) {
 				var fd FD
 
 				if fd, err = FDFromPath(fp); err == nil {
-					ids.Set.Identifiers.Add(fd)
+					ids.MatcherIdentifierTags.Identifiers.Add(fd)
 					break
 				}
 
@@ -240,7 +240,7 @@ func (ms *metaSet) set(v string) (err error) {
 
 			default:
 				if err = tryAddMatcher(
-					&ids.Set,
+					&ids.MatcherIdentifierTags,
 					ms.expanders,
 					ms.implicitEtikettenGetter,
 					before,
@@ -251,7 +251,7 @@ func (ms *metaSet) set(v string) (err error) {
 			}
 
 			if g.Equals(gattung.Konfig) {
-				ids.Set.Matcher.Add(MakeMatcherContainsExactly(Konfig{}))
+				ids.MatcherIdentifierTags.Matcher.Add(MakeMatcherContainsExactly(Konfig{}))
 			}
 
 			ms.Gattung[g] = ids
@@ -282,7 +282,7 @@ func (ms metaSet) Get(g gattung.Gattung) (s MatcherSigil, ok bool) {
 		MakeMatcherAnd(
 			MakeMatcherImplicit(sigilCwd),
 			MakeMatcherImplicit(sigilHidden),
-			ids.Set,
+			ids.MatcherIdentifierTags,
 		),
 		ids.Sigil,
 	)
@@ -308,7 +308,7 @@ func (ms metaSet) GetEtiketten() schnittstellen.Set[Etikett] {
 
 				return es.Add(e.GetEtikett())
 			},
-			s.Set.Matcher,
+			s.MatcherIdentifierTags.Matcher,
 		)
 	}
 
@@ -329,7 +329,7 @@ func (ms metaSet) GetTypen() schnittstellen.Set[Typ] {
 
 				return es.Add(e)
 			},
-			s.Set.Matcher,
+			s.MatcherIdentifierTags.Matcher,
 		)
 	}
 
