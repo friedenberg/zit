@@ -73,6 +73,12 @@ func (k Kasten) GetQueryPrefix() string {
 
 func (e *Kasten) Set(v string) (err error) {
 	v = strings.TrimPrefix(v, "//")
+	v = strings.ToLower(strings.TrimSpace(v))
+
+	if err = ErrOnKonfig(v); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if !KastenRegex.Match([]byte(v)) {
 		err = errors.Errorf("not a valid Kasten: '%s'", v)

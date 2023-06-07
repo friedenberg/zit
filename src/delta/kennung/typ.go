@@ -77,7 +77,12 @@ func (t Typ) Parts() [3]string {
 }
 
 func (e *Typ) Set(v string) (err error) {
-	v = strings.TrimSpace(strings.Trim(v, ".! "))
+	v = strings.ToLower(strings.TrimSpace(strings.Trim(v, ".! ")))
+
+	if err = ErrOnKonfig(v); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if !EtikettRegex.Match([]byte(v)) {
 		err = errors.Errorf("not a valid Typ: '%s'", v)

@@ -84,6 +84,10 @@ func (a Gattung) Equals(b Gattung) bool {
 	return a == b
 }
 
+func (a Gattung) EqualsGattung(b schnittstellen.GattungGetter) bool {
+	return a.GetGattungString() == b.GetGattung().GetGattungString()
+}
+
 func (g Gattung) GetGattungString() string {
 	return g.String()
 }
@@ -133,7 +137,9 @@ func (g Gattung) GetGattungStringPlural() string {
 }
 
 func (g Gattung) String() string {
-	errors.TodoP1("move Bezeichnung, AkteTyp, Kennung, Transaktion, to another place")
+	errors.TodoP1(
+		"move Bezeichnung, AkteTyp, Kennung, Transaktion, to another place",
+	)
 	switch g {
 	case Akte:
 		return "Akte"

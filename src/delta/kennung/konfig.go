@@ -9,6 +9,14 @@ import (
 	"github.com/friedenberg/zit/src/bravo/values"
 )
 
+func ErrOnKonfig(v string) (err error) {
+	if v == "konfig" {
+		return errors.Errorf("cannot be %q", "konfig")
+	}
+
+	return nil
+}
+
 type Konfig struct{}
 
 func (a Konfig) GetGattung() schnittstellen.Gattung {
