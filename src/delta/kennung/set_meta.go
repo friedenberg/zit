@@ -230,7 +230,7 @@ func (ms *metaSet) set(v string) (err error) {
 				var fd FD
 
 				if fd, err = FDFromPath(fp); err == nil {
-					ids.MatcherIdentifierTags.Identifiers.Add(fd)
+					ids.MatcherIdentifierTags.MatcherAllOfThese.Add(fd)
 					break
 				}
 
@@ -262,6 +262,116 @@ func (ms *metaSet) set(v string) (err error) {
 		err = errors.Wrap(err)
 		return
 	}
+
+	return
+}
+
+func tryAddMatcher(
+	s *MatcherIdentifierTags,
+	expanders Abbr,
+	implicitEtikettenGetter ImplicitEtikettenGetter,
+	v string,
+) (err error) {
+	{
+		var m Matcher
+
+		if m, _, _, err = MakeMatcher(&FD{}, v, nil); err == nil {
+			return s.AddExactlyThis(m)
+		}
+	}
+
+	{
+		var m Matcher
+
+		if m, _, _, err = MakeMatcher(&Sha{}, v, expanders.Sha.Expand); err == nil {
+			return s.AddExactlyThis(m)
+		}
+	}
+
+	{
+		var m Matcher
+
+		if m, _, _, err = MakeMatcher(&Konfig{}, v, nil); err == nil {
+			return s.AddExactlyThis(m)
+		}
+	}
+
+	{
+		var m Matcher
+
+		if m, _, _, err = MakeMatcher(
+			&Hinweis{},
+			v,
+			expanders.Hinweis.Expand,
+		); err == nil {
+			s.AddExactlyThis(m)
+			return
+		}
+	}
+
+	{
+		var (
+			e         Etikett
+			isNegated bool
+			// isExact   bool
+			m Matcher
+		)
+
+		if m, isNegated, _, err = MakeMatcher(&e, v, nil); err == nil {
+			if implicitEtikettenGetter == nil {
+				return s.AddAllOfThese(m)
+			} else {
+				impl := implicitEtikettenGetter.GetImplicitEtiketten(e)
+
+				mo := MakeMatcherOrDoNotMatchOnEmpty()
+
+				if isNegated {
+					mo = MakeMatcherAnd()
+				}
+
+				if err = impl.Each(
+					func(e Etikett) (err error) {
+						me := Matcher(MakeMatcherContainsExactly(e))
+
+						if isNegated {
+							me = MakeMatcherNegate(me)
+						}
+
+						return mo.Add(me)
+					},
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				if isNegated {
+					return s.AddAllOfThese(MakeMatcherAnd(m, MakeMatcherImplicit(mo)))
+				} else {
+					return s.AddAllOfThese(MakeMatcherOr(m, MakeMatcherImplicit(mo)))
+				}
+			}
+		}
+	}
+
+	{
+		var m Matcher
+
+		if m, _, _, err = MakeMatcher(&Typ{}, v, expanders.Typ.Expand); err == nil {
+			errors.TodoP1("handle typs that are incompatible")
+			s.AddAllOfThese(m)
+			return
+		}
+	}
+
+	{
+		var m Matcher
+
+		if m, _, _, err = MakeMatcher(&Kasten{}, v, expanders.Kasten.Expand); err == nil {
+			return s.AddAllOfThese(m)
+		}
+	}
+
+	err = errors.Wrap(errInvalidKennung(v))
 
 	return
 }
