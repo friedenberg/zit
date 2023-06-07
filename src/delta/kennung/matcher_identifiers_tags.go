@@ -23,11 +23,9 @@ func MakeMatcherIdentifierTags() MatcherIdentifierTags {
 	return MatcherIdentifierTags{
 		MatcherExactlyThis: identifiers,
 		MatcherAllOfThese:  tags,
-		Matcher: MakeMatcherAnd(
-			MakeMatcherOr(
-				identifiers,
-				tags,
-			),
+		Matcher: MakeMatcherOr(
+			identifiers,
+			tags,
 		),
 	}
 }
