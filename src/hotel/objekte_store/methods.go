@@ -16,12 +16,12 @@ type Query interface {
 
 func QueryMethodForMatcher[K any, T kennung.Matchable](
 	reader Querier[K, T],
-	m kennung.Matcher,
+	m kennung.MatcherSigil,
 	f schnittstellen.FuncIter[T],
 ) (err error) {
 	out := reader.ReadAllSchwanzen
 
-	if sg, ok := m.(schnittstellen.SigilGetter); ok && sg.GetSigil().IncludesHistory() {
+	if m.GetSigil().IncludesHistory() {
 		out = reader.ReadAll
 	}
 

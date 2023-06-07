@@ -37,6 +37,16 @@ type Matcher interface {
 	MatcherLen() int
 }
 
+type MatcherSigil interface {
+	Matcher
+	GetSigil() Sigil
+}
+
+type MatcherSigilPtr interface {
+	MatcherSigil
+	AddSigil(Sigil)
+}
+
 type MatcherKennungSansGattungWrapper interface {
 	Matcher
 	GetKennung() KennungSansGattung
@@ -615,6 +625,71 @@ func (matcher matcherGattung) Each(
 	}
 
 	return
+}
+
+//  __        ___ _   _     ____  _       _ _
+//  \ \      / (_) |_| |__ / ___|(_) __ _(_) |
+//   \ \ /\ / /| | __| '_ \\___ \| |/ _` | | |
+//    \ V  V / | | |_| | | |___) | | (_| | | |
+//     \_/\_/  |_|\__|_| |_|____/|_|\__, |_|_|
+//                                  |___/
+
+func MakeMatcherWithSigil(m Matcher, s Sigil) MatcherSigilPtr {
+	return &matcherWithSigil{
+		Matcher: m,
+		Sigil:   s,
+	}
+}
+
+type matcherWithSigil struct {
+	Sigil
+	Matcher
+}
+
+func (m matcherWithSigil) Len() int {
+	if m.Matcher == nil {
+		return 0
+	}
+
+	return 1
+}
+
+func (m matcherWithSigil) String() string {
+	sb := &strings.Builder{}
+
+	if m.Matcher != nil {
+		sb.WriteString(m.Matcher.String())
+	}
+
+	sb.WriteString(m.Sigil.String())
+
+	return sb.String()
+}
+
+func (m matcherWithSigil) GetSigil() Sigil {
+	return m.Sigil
+}
+
+func (m *matcherWithSigil) AddSigil(v Sigil) {
+	errors.TodoP1("add sigils to children")
+	m.Sigil.Add(v)
+}
+
+func (m *matcherWithSigil) Add(child Matcher) (err error) {
+	m.Matcher = child
+	return
+}
+
+func (matcher matcherWithSigil) ContainsMatchable(matchable Matchable) bool {
+	if matcher.Matcher == nil {
+		return true
+	}
+
+	return matcher.Matcher.ContainsMatchable(matchable)
+}
+
+func (matcher matcherWithSigil) Each(f schnittstellen.FuncIter[Matcher]) error {
+	return f(matcher.Matcher)
 }
 
 func MakeMatcherFuncIter[T Matchable](m Matcher) schnittstellen.FuncIter[T] {

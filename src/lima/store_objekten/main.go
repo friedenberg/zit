@@ -109,7 +109,8 @@ func Make(
 		gattung.Konfig: objekte.MakeApplyQueryTransactedLikePtr[*erworben.Transacted](
 			s.konfigStore.Query,
 		),
-		// gattung.Bestandsaufnahme: objekte.MakeApplyTransactedLikePtr[*bestandsaufnahme.Objekte](
+		// gattung.Bestandsaufnahme:
+		// objekte.MakeApplyTransactedLikePtr[*bestandsaufnahme.Objekte](
 		// 	s.bestandsaufnahmeStore.ReadAll,
 		// ),
 	}
@@ -130,7 +131,8 @@ func Make(
 		gattung.Konfig: objekte.MakeApplyTransactedLikePtr[*erworben.Transacted](
 			s.konfigStore.ReadAllSchwanzen,
 		),
-		// gattung.Bestandsaufnahme: objekte.MakeApplyTransactedLikePtr[*bestandsaufnahme.Objekte](
+		// gattung.Bestandsaufnahme:
+		// objekte.MakeApplyTransactedLikePtr[*bestandsaufnahme.Objekte](
 		// 	s.bestandsaufnahmeStore.ReadAll,
 		// ),
 	}
@@ -151,7 +153,8 @@ func Make(
 		gattung.Konfig: objekte.MakeApplyTransactedLikePtr[*erworben.Transacted](
 			s.konfigStore.ReadAll,
 		),
-		// gattung.Bestandsaufnahme: objekte.MakeApplyTransactedLikePtr[*bestandsaufnahme.Objekte](
+		// gattung.Bestandsaufnahme:
+		// objekte.MakeApplyTransactedLikePtr[*bestandsaufnahme.Objekte](
 		// 	s.bestandsaufnahmeStore.ReadAll,
 		// ),
 	}
@@ -172,7 +175,9 @@ func Make(
 		}
 	}
 
-	s.metadateiUpdaters = make(map[schnittstellen.Gattung]objekte_store.UpdaterManyMetadatei)
+	s.metadateiUpdaters = make(
+		map[schnittstellen.Gattung]objekte_store.UpdaterManyMetadatei,
+	)
 
 	for g, gs := range s.gattungStores {
 		if gs1, ok := gs.(objekte_store.UpdaterManyMetadatei); ok {
@@ -246,7 +251,7 @@ func (s Store) RevertTransaktion(
 	//		}
 
 	//		if !o.GetMutter()[1].IsZero() {
-	//			err = errors.Errorf("merge reverts are not yet supported: %s", o)
+	// 			err = errors.Errorf("merge reverts are not yet supported: %s", o)
 	//			return
 	//		}
 
@@ -352,7 +357,7 @@ func (s *Store) Query(
 	f schnittstellen.FuncIter[objekte.TransactedLikePtr],
 ) (err error) {
 	if err = ms.All(
-		func(g gattung.Gattung, matcher kennung.Matcher) (err error) {
+		func(g gattung.Gattung, matcher kennung.MatcherSigil) (err error) {
 			r, ok := s.queriers[g]
 
 			if !ok {
@@ -619,7 +624,12 @@ func (s *Store) Reindex() (err error) {
 	// if s.StoreUtil.GetKonfig().UseBestandsaufnahme {
 	// } else {
 	f := func(t *transaktion.Transaktion) (err error) {
-		errors.Out().Printf("%s/%s: %s", t.Time.Kopf(), t.Time.Schwanz(), t.Time)
+		errors.Out().Printf(
+			"%s/%s: %s",
+			t.Time.Kopf(),
+			t.Time.Schwanz(),
+			t.Time,
+		)
 
 		if err = t.Skus.Each(
 			func(sk sku.SkuLike) (err error) {

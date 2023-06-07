@@ -20,13 +20,13 @@ func init() {
 
 // TODO-P3 rename to QueryGattungGroup
 type MetaSet interface {
-	Get(g gattung.Gattung) (s Matcher, ok bool)
+	Get(g gattung.Gattung) (s MatcherSigil, ok bool)
 	GetFDs() schnittstellen.Set[FD]
 	GetEtiketten() schnittstellen.Set[Etikett]
 	GetTypen() schnittstellen.Set[Typ]
 	Set(string) error
 	SetMany(...string) error
-	All(f func(gattung.Gattung, Matcher) error) error
+	All(f func(gattung.Gattung, MatcherSigil) error) error
 }
 
 type metaSet struct {
@@ -253,26 +253,25 @@ func (ms *metaSet) set(v string) (err error) {
 	return
 }
 
-func (ms metaSet) Get(g gattung.Gattung) (s Matcher, ok bool) {
-	s, ok = ms.Gattung[g]
+func (ms metaSet) Get(g gattung.Gattung) (s MatcherSigil, ok bool) {
+	var ids Set
 
-	hidden := ms.Hidden
+	ids, ok = ms.Gattung[g]
 
-	if hidden == nil {
-		hidden = MakeMatcherNever()
-	}
-
-	sigilHidden := MakeMatcherSigil(
-		SigilHidden,
-		MakeMatcherNegate(hidden),
+	sigilHidden := MakeMatcherExcludeHidden(
+		ms.Hidden,
+		ids.Sigil,
 	)
 
 	sigilCwd := MakeMatcherSigilMatchOnMissing(SigilCwd, ms.cwd)
 
-	s = MakeMatcherAnd(
-		MakeMatcherImplicit(sigilCwd),
-		MakeMatcherImplicit(sigilHidden),
-		s,
+	s = MakeMatcherWithSigil(
+		MakeMatcherAnd(
+			MakeMatcherImplicit(sigilCwd),
+			MakeMatcherImplicit(sigilHidden),
+			ids,
+		),
+		ids.Sigil,
 	)
 
 	return
@@ -325,7 +324,7 @@ func (ms metaSet) GetTypen() schnittstellen.Set[Typ] {
 }
 
 func (ms metaSet) MakeSet() Set {
-	return MakeSet(ms.cwd, ms.Hidden)
+	return MakeSet(ms.cwd)
 }
 
 func (s metaSet) ContainsMatchable(m Matchable) bool {
@@ -334,12 +333,14 @@ func (s metaSet) ContainsMatchable(m Matchable) bool {
 }
 
 // Runs in parallel
-func (ms metaSet) All(f func(gattung.Gattung, Matcher) error) (err error) {
+func (ms metaSet) All(f func(gattung.Gattung, MatcherSigil) error) (err error) {
 	errors.TodoP1("lock")
 	chErr := make(chan error, len(ms.Gattung))
 
-	for g, s := range ms.Gattung {
-		go func(g gattung.Gattung, ids Set) {
+	for g := range ms.Gattung {
+		ids, _ := ms.Get(g)
+
+		go func(g gattung.Gattung, m MatcherSigil) {
 			var err error
 
 			defer func() {
@@ -355,7 +356,7 @@ func (ms metaSet) All(f func(gattung.Gattung, Matcher) error) (err error) {
 
 				return
 			}
-		}(g, s)
+		}(g, ids)
 	}
 
 	for i := 0; i < len(ms.Gattung); i++ {

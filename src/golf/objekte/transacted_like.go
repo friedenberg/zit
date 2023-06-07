@@ -42,16 +42,16 @@ type (
 )
 
 type (
-	FuncQuerierTransacted[T TransactedLike]       func(kennung.Matcher, schnittstellen.FuncIter[T]) error
-	FuncQuerierTransactedPtr[T TransactedLikePtr] func(kennung.Matcher, schnittstellen.FuncIter[T]) error
-	FuncQuerierTransactedLike                     func(kennung.Matcher, schnittstellen.FuncIter[TransactedLike]) error
-	FuncQuerierTransactedLikePtr                  func(kennung.Matcher, schnittstellen.FuncIter[TransactedLikePtr]) error
+	FuncQuerierTransacted[T TransactedLike]       func(kennung.MatcherSigil, schnittstellen.FuncIter[T]) error
+	FuncQuerierTransactedPtr[T TransactedLikePtr] func(kennung.MatcherSigil, schnittstellen.FuncIter[T]) error
+	FuncQuerierTransactedLike                     func(kennung.MatcherSigil, schnittstellen.FuncIter[TransactedLike]) error
+	FuncQuerierTransactedLikePtr                  func(kennung.MatcherSigil, schnittstellen.FuncIter[TransactedLikePtr]) error
 )
 
 func MakeApplyQueryTransactedLikePtr[T TransactedLikePtr](
 	fat FuncQuerierTransactedPtr[T],
 ) FuncQuerierTransactedLikePtr {
-	return func(ids kennung.Matcher, fatl schnittstellen.FuncIter[TransactedLikePtr]) (err error) {
+	return func(ids kennung.MatcherSigil, fatl schnittstellen.FuncIter[TransactedLikePtr]) (err error) {
 		return fat(
 			ids,
 			func(e T) (err error) {

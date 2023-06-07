@@ -188,7 +188,7 @@ func (s *commonStoreBase[O, OPtr, K, KPtr]) SetLogWriter(
 }
 
 func (s *commonStoreBase[O, OPtr, K, KPtr]) Query(
-	m kennung.Matcher,
+	m kennung.MatcherSigil,
 	f schnittstellen.FuncIter[*objekte.Transacted[O, OPtr, K, KPtr]],
 ) (err error) {
 	return objekte_store.QueryMethodForMatcher[

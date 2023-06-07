@@ -45,7 +45,10 @@ func (c CatAlfred) DefaultGattungen() gattungen.Set {
 	)
 }
 
-func (c CatAlfred) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
+func (c CatAlfred) RunWithQuery(
+	u *umwelt.Umwelt,
+	ms kennung.MetaSet,
+) (err error) {
 	// this command does its own error handling
 	wo := bufio.NewWriter(u.Out())
 	defer errors.DeferredFlusher(&err, wo)
@@ -72,7 +75,7 @@ func (c CatAlfred) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error
 	defer errors.DeferredCloser(&err, aw)
 
 	if err = ms.All(
-		func(g gattung.Gattung, m kennung.Matcher) (err error) {
+		func(g gattung.Gattung, m kennung.MatcherSigil) (err error) {
 			switch g {
 			case gattung.Etikett:
 				c.catEtiketten(u, m, aw)
@@ -114,7 +117,7 @@ func (c CatAlfred) catEtiketten(
 
 func (c CatAlfred) catZettelen(
 	u *umwelt.Umwelt,
-	m kennung.Matcher,
+	m kennung.MatcherSigil,
 	aw *alfred.Writer,
 ) {
 	var err error

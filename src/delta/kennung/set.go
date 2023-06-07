@@ -13,42 +13,29 @@ type ImplicitEtikettenGetter interface {
 type Set struct {
 	Sigil Sigil
 
-	MatcherHidden MatcherSigilPtr
-	MatcherCwd    MatcherSigilPtr
-	Hinweisen     MatcherParentPtr
-	Others        MatcherParentPtr
-	FDs           MatcherParentPtr
+	MatcherCwd MatcherSigilPtr
+	Hinweisen  MatcherParentPtr
+	Others     MatcherParentPtr
+	FDs        MatcherParentPtr
 
 	Matcher MatcherParentPtr
 }
 
 func MakeSet(
 	cwd Matcher,
-	hidden Matcher,
 ) Set {
-	if hidden == nil {
-		hidden = MakeMatcherNever()
-	}
-
-	sigilHidden := MakeMatcherSigil(
-		SigilHidden,
-		MakeMatcherNegate(hidden),
-	)
-
 	sigilCwd := MakeMatcherSigilMatchOnMissing(SigilCwd, cwd)
 	hinweisen := MakeMatcherOrDoNotMatchOnEmpty()
 	fds := MakeMatcherOrDoNotMatchOnEmpty()
 	others := MakeMatcherAndDoNotMatchOnEmpty()
 
 	return Set{
-		Hinweisen:     hinweisen,
-		Others:        others,
-		MatcherHidden: sigilHidden,
-		MatcherCwd:    sigilCwd,
-		FDs:           fds,
+		Hinweisen:  hinweisen,
+		Others:     others,
+		MatcherCwd: sigilCwd,
+		FDs:        fds,
 		Matcher: MakeMatcherAnd(
 			MakeMatcherImplicit(sigilCwd),
-			MakeMatcherImplicit(sigilHidden),
 			MakeMatcherOr(
 				hinweisen,
 				others,
@@ -186,6 +173,10 @@ func (s Set) String() string {
 	return s.Matcher.String()
 }
 
+func (s *Set) Add(m Matcher) (err error) {
+	return s.Matcher.Add(m)
+}
+
 func (s Set) ContainsMatchable(m Matchable) bool {
 	return s.Matcher.ContainsMatchable(m)
 	// g := gattung.Must(m.GetGattung())
@@ -227,7 +218,6 @@ func (s Set) EachMatcher(f schnittstellen.FuncIter[Matcher]) (err error) {
 
 func (s *Set) AddSigil(v Sigil) {
 	s.Sigil.Add(v)
-	s.MatcherHidden.AddSigil(v)
 	s.MatcherCwd.AddSigil(v)
 }
 
