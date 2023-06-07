@@ -10,18 +10,18 @@ type ImplicitEtikettenGetter interface {
 	GetImplicitEtiketten(Etikett) schnittstellen.Set[Etikett]
 }
 
-type Set struct {
+type MatcherIdentifierTags struct {
 	Identifiers MatcherParentPtr
 	Tags        MatcherParentPtr
 
 	Matcher MatcherParentPtr
 }
 
-func MakeSet() Set {
+func MakeMatcherIdentifierTags() MatcherIdentifierTags {
 	identifiers := MakeMatcherOrDoNotMatchOnEmpty()
 	tags := MakeMatcherAndDoNotMatchOnEmpty()
 
-	return Set{
+	return MatcherIdentifierTags{
 		Identifiers: identifiers,
 		Tags:        tags,
 		Matcher: MakeMatcherAnd(
@@ -34,7 +34,7 @@ func MakeSet() Set {
 }
 
 func tryAddMatcher(
-	s *Set,
+	s *MatcherIdentifierTags,
 	expanders Abbr,
 	implicitEtikettenGetter ImplicitEtikettenGetter,
 	v string,
@@ -148,31 +148,33 @@ func tryAddMatcher(
 	return
 }
 
-func (s Set) MatcherLen() int {
+func (s MatcherIdentifierTags) MatcherLen() int {
 	return s.Matcher.MatcherLen()
 }
 
-func (s Set) String() string {
+func (s MatcherIdentifierTags) String() string {
 	return s.Matcher.String()
 }
 
-func (s *Set) Add(m Matcher) (err error) {
+func (s *MatcherIdentifierTags) Add(m Matcher) (err error) {
 	return s.Matcher.Add(m)
 }
 
-func (s Set) ContainsMatchable(m Matchable) bool {
+func (s MatcherIdentifierTags) ContainsMatchable(m Matchable) bool {
 	return s.Matcher.ContainsMatchable(m)
 }
 
-func (s Set) Len() int {
+func (s MatcherIdentifierTags) Len() int {
 	return LenMatchers(s.Matcher) + s.Identifiers.MatcherLen()
 }
 
-func (s Set) EachMatcher(f schnittstellen.FuncIter[Matcher]) (err error) {
+func (s MatcherIdentifierTags) EachMatcher(
+	f schnittstellen.FuncIter[Matcher],
+) (err error) {
 	return VisitAllMatchers(f, s.Matcher)
 }
 
-func (s Set) GetHinweisen() schnittstellen.Set[Hinweis] {
+func (s MatcherIdentifierTags) GetHinweisen() schnittstellen.Set[Hinweis] {
 	hins := collections.MakeMutableSetStringer[Hinweis]()
 
 	VisitAllMatcherKennungSansGattungWrappers(
@@ -191,7 +193,7 @@ func (s Set) GetHinweisen() schnittstellen.Set[Hinweis] {
 	return hins
 }
 
-func (s Set) AnyHinweis() (i1 Hinweis, ok bool) {
+func (s MatcherIdentifierTags) AnyHinweis() (i1 Hinweis, ok bool) {
 	if ok = s.Identifiers.MatcherLen() == 1; ok {
 		hins := s.GetHinweisen()
 		i1 = hins.Any()

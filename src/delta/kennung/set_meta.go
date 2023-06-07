@@ -30,7 +30,7 @@ type MetaSet interface {
 }
 
 type setWithSigil struct {
-	Set   Set
+	Set   MatcherIdentifierTags
 	Sigil Sigil
 }
 
@@ -216,7 +216,7 @@ func (ms *metaSet) set(v string) (err error) {
 			ok := false
 
 			if ids, ok = ms.Gattung[g]; !ok {
-				ids.Set = ms.MakeSet()
+				ids.Set = MakeMatcherIdentifierTags()
 				ids.Sigil = sigil
 			}
 
@@ -334,10 +334,6 @@ func (ms metaSet) GetTypen() schnittstellen.Set[Typ] {
 	}
 
 	return es
-}
-
-func (ms metaSet) MakeSet() Set {
-	return MakeSet()
 }
 
 func (s metaSet) ContainsMatchable(m Matchable) bool {

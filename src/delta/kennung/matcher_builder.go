@@ -31,7 +31,7 @@ type MatcherBuilder struct {
 	expanders               Abbr
 	hidden                  Matcher
 	defaultGattungen        gattungen.Set
-	gattung                 map[gattung.Gattung]Set
+	gattung                 map[gattung.Gattung]MatcherIdentifierTags
 }
 
 func (mb *MatcherBuilder) WithCwd(
@@ -81,7 +81,10 @@ func IsMatcherOperator(r rune) (ok bool) {
 	return
 }
 
-func SplitMatcher(data []byte, atEOF bool) (advance int, token []byte, err error) {
+func SplitMatcher(
+	data []byte,
+	atEOF bool,
+) (advance int, token []byte, err error) {
 	for width, i := 0, 0; i < len(data); i += width {
 		var r rune
 
@@ -101,7 +104,8 @@ func SplitMatcher(data []byte, atEOF bool) (advance int, token []byte, err error
 		}
 	}
 
-	// If we're at EOF, we have a final, non-empty, non-terminated word.  Return it.
+	// If we're at EOF, we have a final, non-empty, non-terminated word.  Return
+	// it.
 	if atEOF && len(data) > 0 {
 		return len(data), data[0:], nil
 	}

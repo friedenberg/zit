@@ -56,7 +56,7 @@ func (w *Writer) WriteZettelVerzeichnisse(z *zettel.Transacted) (err error) {
 }
 
 func (w *Writer) WriteEtikett(
-  e kennung_index.Indexed[kennung.Etikett],
+	e kennung_index.Indexed[kennung.Etikett],
 ) (n int64, err error) {
 	item := w.etikettToItem(e)
 	w.alfredWriter.WriteItem(item)
