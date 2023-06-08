@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/values"
 )
@@ -12,7 +13,16 @@ type (
 	Sha struct {
 		value sha.Sha
 	}
+
+	ShaLike interface {
+		GetSha() sha.Sha
+		Matcher
+	}
 )
+
+func MakeShaLike(v string) (t ShaLike, err error) {
+	return MakeSha(v)
+}
 
 func MakeSha(v string) (t Sha, err error) {
 	if t.Set(v); err != nil {
@@ -64,6 +74,14 @@ func (e *Sha) Set(v string) (err error) {
 	}
 
 	return
+}
+
+func (t Sha) Each(_ schnittstellen.FuncIter[Matcher]) error {
+	return nil
+}
+
+func (t Sha) MatcherLen() int {
+	return 0
 }
 
 func (t Sha) ContainsMatchableExactly(m Matchable) bool {

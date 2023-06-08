@@ -59,11 +59,19 @@ func MakeHinweisKopfUndSchwanz(kopf, schwanz string) (h Hinweis, err error) {
 
 	switch {
 	case kopf == "":
-		err = errors.Errorf("kopf was empty: {Kopf: %q, Schwanz: %q}", kopf, schwanz)
+		err = errors.Errorf(
+			"kopf was empty: {Kopf: %q, Schwanz: %q}",
+			kopf,
+			schwanz,
+		)
 		return
 
 	case schwanz == "":
-		err = errors.Errorf("schwanz was empty: {Kopf: %q, Schwanz: %q}", kopf, schwanz)
+		err = errors.Errorf(
+			"schwanz was empty: {Kopf: %q, Schwanz: %q}",
+			kopf,
+			schwanz,
+		)
 		return
 	}
 
@@ -146,7 +154,11 @@ func (h *Hinweis) Set(v string) (err error) {
 
 	switch count {
 	default:
-		err = errors.Errorf("hinweis needs exactly 2 components, but got %d: %q", count, v)
+		err = errors.Errorf(
+			"hinweis needs exactly 2 components, but got %d: %q",
+			count,
+			v,
+		)
 		return
 
 	case 2:

@@ -207,6 +207,11 @@ func KennungContainsMatchable(k KennungSansGattung, m Matchable) bool {
 			return true
 		}
 
+	case ShaLike:
+		if kt.ContainsMatchable(m) {
+			return true
+		}
+
 	default:
 		// nop
 	}
