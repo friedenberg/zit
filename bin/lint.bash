@@ -55,3 +55,7 @@ do_lint \
 	'errors\.TodoP0' \
 	--ignore-case \
 	-l
+
+do_lint \
+	"no root packages" \
+  find src -mindepth 2 -maxdepth 2 -type f
