@@ -12,12 +12,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
-type SkuLikeOld interface {
-	SkuLike
-	SetTimeAndFields(kennung.Time, ...string) error
-}
-
-// TODO-P3 examine adding objekte and akte shas to Skus
 // TODO-P2 move sku.Sku to sku.Transacted
 type Transacted[T kennung.KennungLike[T], T1 kennung.KennungLikePtr[T]] struct {
 	Kennung          T
@@ -133,7 +127,8 @@ func (a Transacted[T, T1]) Less(b Transacted[T, T1]) (ok bool) {
 		return
 	}
 
-	if a.Schwanz.Equals(b.Schwanz) && a.TransactionIndex.Less(b.TransactionIndex) {
+	if a.Schwanz.Equals(b.Schwanz) &&
+		a.TransactionIndex.Less(b.TransactionIndex) {
 		ok = true
 		return
 	}
