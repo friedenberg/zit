@@ -41,6 +41,10 @@ func MustSha(v string) (t Sha) {
 	return
 }
 
+func (_ Sha) GetQueryPrefix() string {
+	return "@"
+}
+
 func (t *Sha) Reset() {
 	t.value.Reset()
 }

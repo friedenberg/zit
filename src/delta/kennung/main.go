@@ -102,6 +102,7 @@ func MakeMatcher(
 	expander func(string) (string, error),
 ) (m Matcher, isNegated bool, isExact bool, err error) {
 	v = strings.TrimSpace(v)
+	didExpand := false
 
 	if expander != nil {
 		v1 := v
@@ -109,6 +110,8 @@ func MakeMatcher(
 		if v1, err = expander(v); err != nil {
 			err = nil
 			v1 = v
+		} else {
+			didExpand = true
 		}
 
 		v = v1
@@ -117,6 +120,20 @@ func MakeMatcher(
 	if isNegated, isExact, err = SetQueryKennung(k, v); err != nil {
 		err = errors.Wrap(err)
 		return
+	}
+
+	if !didExpand && expander != nil {
+		v1 := k.String()
+
+		if v1, err = expander(v1); err != nil {
+			err = nil
+			v1 = v
+		}
+
+		if err = k.Set(v1); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	if isExact {
