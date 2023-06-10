@@ -204,9 +204,7 @@ func (i *oldIndex) AddHinweis(h kennung.Hinweis) (err error) {
 	i.lock.Lock()
 	defer i.lock.Unlock()
 
-	if _, ok := i.AvailableKennung[int(n)]; ok {
-		delete(i.AvailableKennung, int(n))
-	}
+	delete(i.AvailableKennung, int(n))
 
 	i.hasChanges = true
 
@@ -262,16 +260,16 @@ func (i *oldIndex) CreateHinweis() (h kennung.Hinweis, err error) {
 		}
 	}
 
-	if _, ok := i.AvailableKennung[int(m)]; ok {
-		delete(i.AvailableKennung, int(m))
-	}
+	delete(i.AvailableKennung, int(m))
 
 	i.hasChanges = true
 
 	return i.makeHinweisButDontStore(m)
 }
 
-func (i *oldIndex) makeHinweisButDontStore(j int) (h kennung.Hinweis, err error) {
+func (i *oldIndex) makeHinweisButDontStore(
+	j int,
+) (h kennung.Hinweis, err error) {
 	k := &coordinates.Kennung{}
 	k.SetInt(coordinates.Int(j))
 
