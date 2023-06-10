@@ -7,6 +7,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
@@ -21,6 +22,10 @@ func makeObj(
 	z = obj{
 		Kennung:     named.GetKennung(),
 		Bezeichnung: bezeichnung.Make(named.GetMetadatei().Description()),
+	}
+
+	if !named.GetGattung().EqualsGattung(gattung.Zettel) {
+		return
 	}
 
 	if z.Kennung, err = expanders.AbbreviateKennung(

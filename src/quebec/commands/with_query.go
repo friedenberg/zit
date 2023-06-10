@@ -8,7 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/kennung_index"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -56,7 +55,7 @@ func (c commandWithQuery) Complete(
 
 	if cg.Contains(gattung.Etikett) {
 		if err = u.StoreObjekten().GetKennungIndex().EachSchwanzen(
-			func(e kennung_index.Indexed[kennung.Etikett]) (err error) {
+			func(e kennung.IndexedLike[kennung.Etikett]) (err error) {
 				if err = errors.Out().Printf("%s\tEtikett", e.GetKennung().String()); err != nil {
 					err = errors.IsAsNilOrWrapf(
 						err,

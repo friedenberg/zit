@@ -53,6 +53,7 @@ type metaSet struct {
 
 	cwd    Matcher
 	Hidden Matcher
+	index  Index
 
 	DefaultGattungen gattungen.Set
 	Gattung          map[gattung.Gattung]setWithSigil
@@ -66,6 +67,7 @@ func MakeMetaSet(
 	feg schnittstellen.FileExtensionGetter,
 	dg gattungen.Set,
 	implicitEtikettenGetter ImplicitEtikettenGetter,
+	ki Index,
 ) MetaSet {
 	return &metaSet{
 		implicitEtikettenGetter: implicitEtikettenGetter,
@@ -76,6 +78,7 @@ func MakeMetaSet(
 		DefaultGattungen:        dg.MutableClone(),
 		Gattung:                 make(map[gattung.Gattung]setWithSigil),
 		FDs:                     collections.MakeMutableSetStringer[FD](),
+		index:                   ki,
 	}
 }
 
@@ -85,6 +88,7 @@ func MakeMetaSetAll(
 	hidden Matcher,
 	feg schnittstellen.FileExtensionGetter,
 	implicitEtikettenGetter ImplicitEtikettenGetter,
+	ki Index,
 ) MetaSet {
 	errors.TodoP2("support allowed sigils")
 	return &metaSet{
@@ -95,6 +99,7 @@ func MakeMetaSetAll(
 		Hidden:                  hidden,
 		DefaultGattungen:        gattungen.MakeSet(gattung.TrueGattung()...),
 		Gattung:                 make(map[gattung.Gattung]setWithSigil),
+		index:                   ki,
 	}
 }
 
@@ -247,6 +252,7 @@ func (ms *metaSet) set(v string) (err error) {
 					ids.Matcher,
 					ms.expanders,
 					ms.implicitEtikettenGetter,
+					ms.index,
 					before,
 				); err != nil {
 					err = errors.Wrap(err)
@@ -275,12 +281,13 @@ func tryAddMatcher(
 	s MatcherExactlyThisOrAllOfThese,
 	expanders Abbr,
 	implicitEtikettenGetter ImplicitEtikettenGetter,
+	ki Index,
 	v string,
 ) (err error) {
 	{
 		var m Matcher
 
-		if m, _, _, err = MakeMatcher(&FD{}, v, nil); err == nil {
+		if m, _, _, err = MakeMatcher(&FD{}, v, nil, ki); err == nil {
 			return s.AddExactlyThis(m)
 		}
 	}
@@ -288,7 +295,7 @@ func tryAddMatcher(
 	{
 		var m Matcher
 
-		if m, _, _, err = MakeMatcher(&Sha{}, v, expanders.Sha.Expand); err == nil {
+		if m, _, _, err = MakeMatcher(&Sha{}, v, expanders.Sha.Expand, ki); err == nil {
 			return s.AddExactlyThis(m)
 		}
 	}
@@ -300,6 +307,7 @@ func tryAddMatcher(
 			&Hinweis{},
 			v,
 			expanders.Hinweis.Expand,
+			ki,
 		); err == nil {
 			s.AddExactlyThis(m)
 			return
@@ -314,7 +322,7 @@ func tryAddMatcher(
 			m Matcher
 		)
 
-		if m, isNegated, _, err = MakeMatcher(&e, v, nil); err == nil {
+		if m, isNegated, _, err = MakeMatcher(&e, v, nil, ki); err == nil {
 			if implicitEtikettenGetter == nil {
 				return s.AddAllOfThese(m)
 			} else {
@@ -353,7 +361,7 @@ func tryAddMatcher(
 	{
 		var m Matcher
 
-		if m, _, _, err = MakeMatcher(&Typ{}, v, expanders.Typ.Expand); err == nil {
+		if m, _, _, err = MakeMatcher(&Typ{}, v, expanders.Typ.Expand, ki); err == nil {
 			errors.TodoP1("handle typs that are incompatible")
 			s.AddAllOfThese(m)
 			return
@@ -363,7 +371,7 @@ func tryAddMatcher(
 	{
 		var m Matcher
 
-		if m, _, _, err = MakeMatcher(&Kasten{}, v, expanders.Kasten.Expand); err == nil {
+		if m, _, _, err = MakeMatcher(&Kasten{}, v, expanders.Kasten.Expand, ki); err == nil {
 			return s.AddAllOfThese(m)
 		}
 	}
@@ -378,11 +386,7 @@ func (ms metaSet) Get(g gattung.Gattung) (s MatcherSigil, ok bool) {
 
 	ids, ok = ms.Gattung[g]
 
-	sigilHidden := MakeMatcherExcludeHidden(
-		ms.Hidden,
-		ids.Sigil,
-	)
-
+	sigilHidden := MakeMatcherExcludeHidden(ms.Hidden, ids.Sigil)
 	sigilCwd := MakeMatcherSigilMatchOnMissing(SigilCwd, ms.cwd)
 
 	s = MakeMatcherWithSigil(

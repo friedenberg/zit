@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/log"
+	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
@@ -20,7 +21,7 @@ type index2[
 	didRead    bool
 	hasChanges bool
 	lock       *sync.Mutex
-	Kennungen  map[string]indexed[T, TPtr]
+	Kennungen  map[string]kennung.Indexed[T, TPtr]
 }
 
 func MakeIndex2[
@@ -29,7 +30,7 @@ func MakeIndex2[
 ]() (i *index2[T, TPtr]) {
 	i = &index2[T, TPtr]{
 		lock:      &sync.Mutex{},
-		Kennungen: make(map[string]indexed[T, TPtr]),
+		Kennungen: make(map[string]kennung.Indexed[T, TPtr]),
 	}
 
 	return
@@ -53,7 +54,7 @@ func (i *index2[T, TPtr]) Reset() error {
 	i.lock.Lock()
 	defer i.lock.Unlock()
 
-	i.Kennungen = make(map[string]indexed[T, TPtr])
+	i.Kennungen = make(map[string]kennung.Indexed[T, TPtr])
 
 	return nil
 }
@@ -97,7 +98,9 @@ func (i *index2[T, TPtr]) ReadFrom(r1 io.Reader) (n int64, err error) {
 	return
 }
 
-func (i index2[T, TPtr]) Each(f schnittstellen.FuncIter[Indexed[T]]) (err error) {
+func (i index2[T, TPtr]) Each(
+	f schnittstellen.FuncIter[kennung.IndexedLike[T]],
+) (err error) {
 	for _, id := range i.Kennungen {
 		if err = f(id); err != nil {
 			if iter.IsStopIteration(err) {
@@ -113,7 +116,9 @@ func (i index2[T, TPtr]) Each(f schnittstellen.FuncIter[Indexed[T]]) (err error)
 	return
 }
 
-func (i index2[T, TPtr]) EachSchwanzen(f schnittstellen.FuncIter[Indexed[T]]) (err error) {
+func (i index2[T, TPtr]) EachSchwanzen(
+	f schnittstellen.FuncIter[kennung.IndexedLike[T]],
+) (err error) {
 	for _, id := range i.Kennungen {
 		if id.GetSchwanzenCount() == 0 {
 			continue
@@ -143,11 +148,18 @@ func (i index2[T, TPtr]) GetAll() (out []T) {
 	return
 }
 
-func (i index2[T, TPtr]) Get(k T) (id Indexed[T], ok bool) {
+func (i index2[T, TPtr]) Get(k T) (id kennung.IndexedLike[T], err error) {
 	i.lock.Lock()
 	defer i.lock.Unlock()
 
+	ok := false
 	id, ok = i.Kennungen[k.String()]
+
+	if !ok {
+		err = errors.Wrap(collections.ErrNotFound{})
+		return
+	}
+
 	return
 }
 

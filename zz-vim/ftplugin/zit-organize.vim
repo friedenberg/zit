@@ -6,7 +6,7 @@ let &l:listchars = "tab:  ,trail:·,nbsp:·"
 let &l:equalprg = "zit format-organize -metadatei-header %"
 
 let &l:foldmethod = "expr"
-let &l:foldexpr = "GetZitOrganizeFold(v:lnum)"
+let &l:foldexpr = "GetZitOrganizeFold()"
 
 set foldtext=MyFoldText()
 function MyFoldText()
@@ -34,16 +34,15 @@ function! GetPreviousHeaderLineFoldLevel(lnum)
 endfunction
 
 " TODO implement against new organize syntax
-function! GetZitOrganizeFold(lnum)
+function! GetZitOrganizeFold()
   let l = getline(a:lnum)
 
-  " let this_indent = indent(a:lnum)
-  let this_indent = count(l, "#")
-
   if l =~? '\v^\s*#'
+    let this_indent = count(l, "#")
     return '>' . this_indent
   else
-    return GetPreviousHeaderLineFoldLevel(a:lnum)
+    return -1
+    " return GetPreviousHeaderLineFoldLevel(a:lnum)
   endif
 endfunction
 

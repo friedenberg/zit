@@ -3,10 +3,10 @@ package alfred
 import (
 	"fmt"
 
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/alfred"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/kennung_index"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
@@ -40,9 +40,10 @@ func (w *Writer) zettelToItem(
 	mb.AddMatches(z.GetTyp().String())
 	z.GetMetadatei().Etiketten.Each(
 		func(e kennung.Etikett) (err error) {
-			ei, ok := w.kennungIndex.GetEtikett(e)
+			ei, err := w.kennungIndex.GetEtikett(e)
 
-			if !ok {
+			if err != nil {
+				err = errors.Wrap(err)
 				return
 			}
 
@@ -57,7 +58,7 @@ func (w *Writer) zettelToItem(
 		},
 	)
 
-	if ti, ok := w.typenIndex.Get(z.GetTyp()); ok {
+	if ti, err := w.typenIndex.Get(z.GetTyp()); err == nil {
 		ti.GetExpandedAll().Each(
 			func(t kennung.Typ) (err error) {
 				mb.AddMatches(t.String())
@@ -92,7 +93,7 @@ func (w *Writer) zettelToItem(
 }
 
 func (w *Writer) etikettToItem(
-	ei kennung_index.Indexed[kennung.Etikett],
+	ei kennung.IndexedLike[kennung.Etikett],
 ) (a *alfred.Item) {
 	a = w.alfredWriter.Get()
 
@@ -127,7 +128,8 @@ func (w *Writer) hinweisToItem(e kennung.Hinweis) (a *alfred.Item) {
 	a = w.alfredWriter.Get()
 
 	a.Title = e.String()
-	// a.Subtitle = fmt.Sprintf("%s: %s", z.Hinweis.String(), strings.Join(EtikettenStringsFromZettel(z, false), ", "))
+	// a.Subtitle = fmt.Sprintf("%s: %s", z.Hinweis.String(),
+	// strings.Join(EtikettenStringsFromZettel(z, false), ", "))
 
 	a.Arg = e.String()
 

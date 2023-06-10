@@ -374,12 +374,14 @@ func (matcher matcherOr) Each(f schnittstellen.FuncIter[Matcher]) (err error) {
 
 func MakeMatcherContains(
 	k KennungSansGattung,
+	ki Index,
 ) MatcherKennungSansGattungWrapper {
-	return &matcherContains{Kennung: k}
+	return &matcherContains{Kennung: k, index: ki}
 }
 
 type matcherContains struct {
 	Kennung KennungSansGattung
+	index   Index
 }
 
 func (matcher matcherContains) GetKennung() KennungSansGattung {
@@ -403,7 +405,7 @@ func (matcher matcherContains) String() string {
 }
 
 func (matcher matcherContains) ContainsMatchable(matchable Matchable) bool {
-	if !KennungContainsMatchable(matcher.Kennung, matchable) {
+	if !KennungContainsMatchable(matcher.Kennung, matchable, matcher.index) {
 		return false
 	}
 

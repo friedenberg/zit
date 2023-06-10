@@ -275,8 +275,16 @@ func (u Umwelt) Flush() error {
 	return u.age.Close()
 }
 
+func (u *Umwelt) MakeKennungIndex() kennung.Index {
+	return kennung.Index{
+		Etiketten: u.StoreObjekten().GetKennungIndex().GetEtikett,
+	}
+}
+
 func (u *Umwelt) MakeKennungHidden() kennung.Matcher {
 	h := kennung.MakeMatcherOrDoNotMatchOnEmpty()
+
+	i := u.MakeKennungIndex()
 
 	u.Konfig().EtikettenHidden.Each(
 		func(e kennung.Etikett) (err error) {
@@ -284,14 +292,14 @@ func (u *Umwelt) MakeKennungHidden() kennung.Matcher {
 
 			if err = impl.Each(
 				func(e kennung.Etikett) (err error) {
-					return h.Add(kennung.MakeMatcherContains(e))
+					return h.Add(kennung.MakeMatcherContains(e, i))
 				},
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			if err = h.Add(kennung.MakeMatcherContains(e)); err != nil {
+			if err = h.Add(kennung.MakeMatcherContains(e, i)); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -337,6 +345,8 @@ func (u *Umwelt) MakeMetaIdSetWithExcludedHidden(
 
 	exc := u.MakeKennungHidden()
 
+	i := u.MakeKennungIndex()
+
 	return kennung.MakeMetaSet(
 		cwd,
 		u.MakeKennungExpanders(),
@@ -344,6 +354,7 @@ func (u *Umwelt) MakeMetaIdSetWithExcludedHidden(
 		u.Konfig().FileExtensions,
 		dg,
 		u.Konfig(),
+		i,
 	)
 }
 
@@ -355,6 +366,8 @@ func (u *Umwelt) MakeMetaIdSetWithoutExcludedHidden(
 		dg = gattungen.MakeSet(gattung.Zettel)
 	}
 
+	i := u.MakeKennungIndex()
+
 	return kennung.MakeMetaSet(
 		cwd,
 		u.MakeKennungExpanders(),
@@ -362,6 +375,7 @@ func (u *Umwelt) MakeMetaIdSetWithoutExcludedHidden(
 		u.Konfig().FileExtensions,
 		dg,
 		u.Konfig(),
+		i,
 	)
 }
 

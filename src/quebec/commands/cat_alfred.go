@@ -105,7 +105,7 @@ func (c CatAlfred) catEtiketten(
 	var err error
 
 	if err = u.StoreObjekten().GetKennungIndex().EachSchwanzen(
-		func(e kennung_index.Indexed[kennung.Etikett]) (err error) {
+		func(e kennung.IndexedLike[kennung.Etikett]) (err error) {
 			_, err = aw.WriteEtikett(e)
 			return
 		},

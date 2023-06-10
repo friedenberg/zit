@@ -64,21 +64,6 @@ func (a External[T, T1, T2, T3]) GetEtiketten() kennung.EtikettSet {
 	return kennung.MakeEtikettSet()
 }
 
-func (a External[T, T1, T2, T3]) GetEtikettenExpanded() kennung.EtikettSet {
-	egs := []any{
-		// a.Verzeichnisse,
-		a.GetMetadatei(),
-	}
-
-	for _, o := range egs {
-		if eg, ok := o.(kennung.EtikettenExpandedGetter); ok {
-			return eg.GetEtikettenExpanded()
-		}
-	}
-
-	return kennung.Expanded(a.GetEtiketten())
-}
-
 func (a External[T, T1, T2, T3]) GetTyp() (t kennung.Typ) {
 	tgs := []any{
 		// a.Verzeichnisse,

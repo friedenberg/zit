@@ -6,6 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
@@ -54,6 +55,19 @@ type KennungLikePtr[T schnittstellen.Value[T]] interface {
 	schnittstellen.Resetable[T]
 }
 
+type IndexedLike[T KennungSansGattung] interface {
+	GetKennung() T
+	GetSchwanzenCount() int
+	GetCount() int
+	GetTridex() schnittstellen.Tridex
+	GetExpandedRight() schnittstellen.Set[T]
+	GetExpandedAll() schnittstellen.Set[T]
+}
+
+type Index struct {
+	Etiketten func(Etikett) (IndexedLike[Etikett], error)
+}
+
 func Make(v string) (k Kennung, err error) {
 	{
 		var e Etikett
@@ -100,6 +114,7 @@ func MakeMatcher(
 	k KennungSansGattungPtr,
 	v string,
 	expander func(string) (string, error),
+	ki Index,
 ) (m Matcher, isNegated bool, isExact bool, err error) {
 	v = strings.TrimSpace(v)
 	didExpand := false
@@ -139,7 +154,7 @@ func MakeMatcher(
 	if isExact {
 		m = MakeMatcherContainsExactly(k)
 	} else {
-		m = MakeMatcherContains(k)
+		m = MakeMatcherContains(k, ki)
 	}
 
 	if isNegated {
@@ -210,12 +225,30 @@ func KennungContainsExactlyMatchable(k KennungSansGattung, m Matchable) bool {
 	return true
 }
 
-func KennungContainsMatchable(k KennungSansGattung, m Matchable) bool {
+func KennungContainsMatchable(
+	k KennungSansGattung,
+	m Matchable,
+	ki Index,
+) bool {
 	switch kt := k.(type) {
 	case EtikettLike:
-		es := m.GetEtikettenExpanded()
+		if iter.Any[Etikett](
+			m.GetEtiketten(),
+			func(e Etikett) (ok bool) {
+				indexed, err := ki.Etiketten(e)
+				var expanded schnittstellen.Set[Etikett]
 
-		if es.Contains(kt.GetEtikett()) {
+				if err == nil {
+					expanded = indexed.GetExpandedRight()
+				} else {
+					expanded = ExpandOne(e, ExpanderRight)
+				}
+
+				ok = expanded.Contains(kt.GetEtikett())
+
+				return
+			},
+		) {
 			return true
 		}
 
@@ -498,19 +531,13 @@ func ExpandOne[T KennungLike[T], TPtr KennungLikePtr[T]](
 
 func ExpandMany[T KennungLike[T], TPtr KennungLikePtr[T]](
 	ks schnittstellen.Set[T],
-	exes ...Expander,
+	ex Expander,
 ) (out schnittstellen.Set[T]) {
 	s1 := collections.MakeMutableSetStringer[T]()
 
-	if len(exes) == 0 {
-		exes = []Expander{ExpanderAll}
-	}
-
 	ks.Each(
 		func(k T) (err error) {
-			for _, ex := range exes {
-				expandOne[T, TPtr](k, ex, s1)
-			}
+			expandOne[T, TPtr](k, ex, s1)
 
 			return
 		},
@@ -521,8 +548,8 @@ func ExpandMany[T KennungLike[T], TPtr KennungLikePtr[T]](
 	return
 }
 
-func Expanded(s EtikettSet, exes ...Expander) (out EtikettSet) {
-	return ExpandMany[Etikett, *Etikett](s, exes...)
+func Expanded(s EtikettSet, ex Expander) (out EtikettSet) {
+	return ExpandMany[Etikett, *Etikett](s, ex)
 }
 
 func AddNormalized(es EtikettMutableSet, e Etikett) {

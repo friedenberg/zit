@@ -13,14 +13,14 @@ import (
 	"github.com/friedenberg/zit/src/echo/hinweis_index"
 )
 
-type KennungIndex[T schnittstellen.ValueLike] interface {
+type KennungIndex[T kennung.KennungSansGattung] interface {
+	Get(T) (kennung.IndexedLike[T], error)
 	DidRead() bool
 	HasChanges() bool
 	Reset() error
-	Get(T) (Indexed[T], bool)
 	GetAll() []T
-	Each(schnittstellen.FuncIter[Indexed[T]]) error
-	EachSchwanzen(schnittstellen.FuncIter[Indexed[T]]) error
+	Each(schnittstellen.FuncIter[kennung.IndexedLike[T]]) error
+	EachSchwanzen(schnittstellen.FuncIter[kennung.IndexedLike[T]]) error
 	StoreDelta(schnittstellen.Delta[T]) (err error)
 	StoreMany(schnittstellen.Set[T]) (err error)
 	StoreOne(T) (err error)
@@ -28,21 +28,14 @@ type KennungIndex[T schnittstellen.ValueLike] interface {
 	io.ReaderFrom
 }
 
-type Indexed[T schnittstellen.ValueLike] interface {
-	GetKennung() T
-	GetSchwanzenCount() int
-	GetCount() int
-	GetTridex() schnittstellen.Tridex
-	GetExpandedRight() schnittstellen.Set[T]
-	GetExpandedAll() schnittstellen.Set[T]
-}
-
 type EtikettIndex interface {
-	Each(schnittstellen.FuncIter[Indexed[kennung.Etikett]]) error
-	EachSchwanzen(schnittstellen.FuncIter[Indexed[kennung.Etikett]]) error
+	Each(schnittstellen.FuncIter[kennung.IndexedLike[kennung.Etikett]]) error
+	EachSchwanzen(
+		schnittstellen.FuncIter[kennung.IndexedLike[kennung.Etikett]],
+	) error
 	AddEtikettSet(to kennung.EtikettSet, from kennung.EtikettSet) (err error)
 	Add(s kennung.EtikettSet) (err error)
-	GetEtikett(kennung.Etikett) (Indexed[kennung.Etikett], bool)
+	GetEtikett(kennung.Etikett) (kennung.IndexedLike[kennung.Etikett], error)
 }
 
 type Index interface {
@@ -65,6 +58,7 @@ type index struct {
 	hinweisIndex   hinweis_index.HinweisIndex
 }
 
+// TODO-P1 remove
 type row struct {
 	kennung.Etikett
 	count int64
@@ -127,11 +121,11 @@ func (i *index) AddEtikettSet(
 
 func (i *index) GetEtikett(
 	k kennung.Etikett,
-) (id Indexed[kennung.Etikett], ok bool) {
-	var err error
+) (id kennung.IndexedLike[kennung.Etikett], err error) {
 	var ei KennungIndex[kennung.Etikett]
 
 	if ei, err = i.etikettenIndex.Get(i.VerzeichnisseFactory); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -150,7 +144,7 @@ func (i *index) Add(s kennung.EtikettSet) (err error) {
 }
 
 func (i *index) Each(
-	f schnittstellen.FuncIter[Indexed[kennung.Etikett]],
+	f schnittstellen.FuncIter[kennung.IndexedLike[kennung.Etikett]],
 ) (err error) {
 	var ei KennungIndex[kennung.Etikett]
 
@@ -163,7 +157,7 @@ func (i *index) Each(
 }
 
 func (i *index) EachSchwanzen(
-	f schnittstellen.FuncIter[Indexed[kennung.Etikett]],
+	f schnittstellen.FuncIter[kennung.IndexedLike[kennung.Etikett]],
 ) (err error) {
 	var ei KennungIndex[kennung.Etikett]
 

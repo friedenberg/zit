@@ -8,10 +8,6 @@ type EtikettenGetter interface {
 	GetEtiketten() schnittstellen.Set[Etikett]
 }
 
-type EtikettenExpandedGetter interface {
-	GetEtikettenExpanded() schnittstellen.Set[Etikett]
-}
-
 type TypGetter interface {
 	GetTyp() Typ
 }
@@ -25,7 +21,6 @@ type Matchable interface {
 	schnittstellen.Stored
 
 	EtikettenGetter
-	EtikettenExpandedGetter
 	TypGetter
 	IdLikeGetter
 }
