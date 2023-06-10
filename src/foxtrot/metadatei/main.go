@@ -52,7 +52,11 @@ func (a *Metadatei) SetMetadatei(b Metadatei) {
 }
 
 func (m *Metadatei) AddToFlagSet(f *flag.FlagSet) {
-	f.Var(&m.Bezeichnung, "bezeichnung", "the Bezeichnung to use for created or updated Zettelen")
+	f.Var(
+		&m.Bezeichnung,
+		"bezeichnung",
+		"the Bezeichnung to use for created or updated Zettelen",
+	)
 	f.Var(
 		collections.MakeFlagCommasFromExisting(
 			collections.SetterPolicyAppend,
@@ -117,7 +121,7 @@ func (z Metadatei) GetEtiketten() schnittstellen.Set[kennung.Etikett] {
 		return kennung.MakeEtikettSet()
 	}
 
-	return z.Etiketten.ImmutableClone()
+	return z.Etiketten
 }
 
 func (z Metadatei) GetTyp() kennung.Typ {

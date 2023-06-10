@@ -350,24 +350,33 @@ func ContainsWithoutUnderscoreSuffix[T schnittstellen.Stringer](a, b T) bool {
 
 func ContainsExactly(a, b KennungSansGattung) bool {
 	var (
-		as = FormattedString(a)
-		bs = FormattedString(b)
+		as = a.Parts()
+		bs = b.Parts()
 	)
 
-	return as == bs
+	for i, e := range as {
+		if bs[i] != e {
+			return false
+		}
+	}
+
+	return true
 }
 
 func Contains(a, b KennungSansGattung) bool {
 	var (
-		as = FormattedString(a)
-		bs = FormattedString(b)
+		as = a.Parts()
+		bs = b.Parts()
 	)
 
-	if len(bs) > len(as) {
-		return false
+	for i, e := range as {
+		if !strings.HasPrefix(e, bs[i]) {
+			return false
+		}
 	}
 
-	return strings.HasPrefix(as, bs)
+	return true
+
 }
 
 func Includes(a, b KennungSansGattung) bool {

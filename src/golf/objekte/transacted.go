@@ -93,11 +93,19 @@ func (t Transacted[T, T1, T2, T3]) GetTai() kennung.Tai {
 		}
 
 	case !taiMetadatei.IsZero():
-		log.Log().Caller(1, "tai sku is missing while tai metadatei is %s", taiMetadatei)
+		log.Log().Caller(
+			1,
+			"tai sku is missing while tai metadatei is %s",
+			taiMetadatei,
+		)
 		return taiMetadatei
 
 	default:
-		log.Log().Caller(1, "tai metadatei is missing while tai sku is %s", taiSku)
+		log.Log().Caller(
+			1,
+			"tai metadatei is missing while tai sku is %s",
+			taiSku,
+		)
 		return taiSku
 	}
 }
@@ -149,18 +157,7 @@ func (a Transacted[T, T1, T2, T3]) GetObjekte() (o T) {
 }
 
 func (a Transacted[T, T1, T2, T3]) GetEtiketten() kennung.EtikettSet {
-	egs := []any{
-		// a.Verzeichnisse,
-		a.GetMetadatei(),
-	}
-
-	for _, o := range egs {
-		if eg, ok := o.(kennung.EtikettenGetter); ok {
-			return eg.GetEtiketten()
-		}
-	}
-
-	return kennung.MakeEtikettSet()
+	return a.Metadatei.GetEtiketten()
 }
 
 func (a Transacted[T, T1, T2, T3]) GetTyp() (t kennung.Typ) {
@@ -256,7 +253,11 @@ func (a *Transacted[T, T1, T2, T3]) SetSkuLike(
 	ok := false
 
 	if h, ok = o.GetId().(T2); !ok {
-		err = errors.Errorf("wrong type for Kennung. Expected %T but got %T", h, o.GetId())
+		err = errors.Errorf(
+			"wrong type for Kennung. Expected %T but got %T",
+			h,
+			o.GetId(),
+		)
 		return
 	}
 
