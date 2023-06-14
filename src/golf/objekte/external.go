@@ -81,6 +81,10 @@ func (a External[T, T1, T2, T3]) GetTyp() (t kennung.Typ) {
 	return
 }
 
+func (a External[T, T1, T2, T3]) GetKennung() kennung.Kennung {
+	return a.Sku.Kennung
+}
+
 func (a External[T, T1, T2, T3]) GetIdLike() (il kennung.Kennung) {
 	return a.Sku.Kennung
 }

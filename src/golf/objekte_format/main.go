@@ -4,11 +4,15 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
 
 type (
-	FormatterContext = metadatei.PersistentFormatterContext
+	FormatterContext interface {
+		metadatei.PersistentFormatterContext
+		GetKennung() kennung.Kennung
+	}
 
 	FormatterContextIncludeTai interface {
 		FormatterContext
@@ -34,6 +38,10 @@ type (
 		GetPersistentMetadateiFormat() Format
 	}
 )
+
+func BestandsaufnahmeFormat() Format {
+	return v3{}
+}
 
 func FormatForVersion(v schnittstellen.StoreVersion) Format {
 	switch v.Int() {

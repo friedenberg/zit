@@ -32,6 +32,7 @@ type StoredLikePtr interface {
 	GetAkteSha() schnittstellen.Sha
 	SetAkteSha(schnittstellen.Sha)
 	SetObjekteSha(schnittstellen.Sha)
+	GetKennung() kennung.Kennung
 }
 
 type (

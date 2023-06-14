@@ -30,6 +30,7 @@ func (f *FormatterValue) Set(v string) (err error) {
 	switch v1 {
 	case
 		// TODO-P3 add toml
+		"bestandsaufnahme",
 		"objekte",
 		"kennung",
 		"kennung-akte-sha",
@@ -222,6 +223,21 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 			defer errors.DeferredCloser(&err, r)
 
 			if _, err = io.Copy(out, r); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+
+	case "bestandsaufnahme":
+		f := MakeFormatBestandsaufnahme(
+			out,
+			objekte_format.BestandsaufnahmeFormat(),
+		)
+
+		return func(o TransactedLikePtr) (err error) {
+			if _, err = f.PrintOne(o); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

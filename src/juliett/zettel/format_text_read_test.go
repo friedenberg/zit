@@ -81,7 +81,7 @@ func TestReadWithoutAkteWithMultilineBezeichnung(t1 *testing.T) {
 	)
 
 	expected := metadatei.Metadatei{
-		Bezeichnung: bezeichnung.Make("the title continues"),
+		Bezeichnung: bezeichnung.Make("the title\ncontinues"),
 		Etiketten: makeEtiketten(t,
 			"tag1",
 			"tag2",
@@ -126,7 +126,9 @@ the body
 	)
 
 	expected := metadatei.Metadatei{
-		AkteSha:     sha.Must("036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064"),
+		AkteSha: sha.Must(
+			"036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064",
+		),
 		Bezeichnung: bezeichnung.Make("the title"),
 		Etiketten: makeEtiketten(t,
 			"tag1",

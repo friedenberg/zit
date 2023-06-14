@@ -92,6 +92,15 @@ func (w *LineWriter) WriteStringers(ss ...fmt.Stringer) {
 	}
 }
 
+func (w *LineWriter) WriteKeySpaceValue(key, value interface{}) {
+	w.lastWasNewline = false
+
+	w.elements = append(
+		w.elements,
+		MakeFormatString("%s %s", key, value),
+	)
+}
+
 func (w *LineWriter) WriteFormat(f string, values ...interface{}) {
 	w.lastWasNewline = false
 
