@@ -105,6 +105,15 @@ func Make(v string) (k Kennung, err error) {
 		}
 	}
 
+	{
+		var h Konfig
+
+		if err = h.Set(v); err == nil {
+			k = h
+			return
+		}
+	}
+
 	err = errors.Errorf("%q is not a valid Kennung", v)
 
 	return
@@ -376,7 +385,6 @@ func Contains(a, b KennungSansGattung) bool {
 	}
 
 	return true
-
 }
 
 func Includes(a, b KennungSansGattung) bool {

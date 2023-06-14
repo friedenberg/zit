@@ -228,17 +228,27 @@ func (a Transacted[T, T1, T2, T3]) GetDataIdentity() (di sku.DataIdentity) {
 	return
 }
 
-func (a *Transacted[T, T1, T2, T3]) SetDataIdentity(
-	o sku.DataIdentity,
-) (err error) {
-	var h T2
+func (a *Transacted[T, T1, T2, T3]) SetKennung(k1 kennung.Kennung) (err error) {
+	var k T2
 
-	if err = T3(&h).Set(o.GetId().String()); err != nil {
+	if err = T3(&k).Set(k1.String()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	a.Sku.Kennung = h
+	a.Sku.Kennung = k
+
+	return
+}
+
+func (a *Transacted[T, T1, T2, T3]) SetDataIdentity(
+	o sku.DataIdentity,
+) (err error) {
+	if err = a.SetKennung(o.GetId()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	a.Sku.ObjekteSha = sha.Make(o.GetObjekteSha())
 	a.Sku.AkteSha = sha.Make(o.GetAkteSha())
 	a.SetTai(o.GetTai())

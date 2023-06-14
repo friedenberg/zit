@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
-type Kennung = schnittstellen.Stringer
+type Kennung = kennung.Kennung
 
 type IdLikeGetter interface {
 	GetId() schnittstellen.ValueLike

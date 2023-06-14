@@ -93,7 +93,7 @@ func (a *Transacted[T, T1]) Sku() Sku {
 	return Sku{
 		Tai:        a.GetTai(),
 		Gattung:    gattung.Make(a.GetGattung()),
-		Kennung:    values.MakeString(a.Kennung.String()),
+		Kennung:    a.Kennung,
 		ObjekteSha: a.ObjekteSha,
 		AkteSha:    a.AkteSha,
 	}
@@ -203,7 +203,7 @@ func (s Transacted[T, T1]) GetGattung() schnittstellen.Gattung {
 }
 
 func (s Transacted[T, T1]) GetId() Kennung {
-	return s.Kennung
+	return T1(&s.Kennung)
 }
 
 func (s Transacted[T, T1]) GetObjekteSha() schnittstellen.Sha {

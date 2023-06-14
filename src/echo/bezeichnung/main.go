@@ -4,7 +4,6 @@ import (
 	"strings"
 )
 
-// TODO-P1 move to values
 type Bezeichnung struct {
 	wasSet bool
 	value  string

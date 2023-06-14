@@ -11,7 +11,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
 
 type v3 struct{}
@@ -50,8 +49,6 @@ func (f v3) FormatPersistentMetadatei(
 	if !m.Typ.IsEmpty() {
 		w.WriteKeySpaceValue(gattung.Typ, m.GetTyp())
 	}
-
-	w.WriteFormat(metadatei.Boundary)
 
 	if n, err = w.WriteTo(w1); err != nil {
 		err = errors.Wrap(err)

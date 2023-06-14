@@ -19,7 +19,10 @@ type (
 		IncludeTai() bool
 	}
 
-	ParserContext = metadatei.PersistentParserContext
+	ParserContext interface {
+		metadatei.PersistentParserContext
+		SetKennung(kennung.Kennung) error
+	}
 
 	Formatter interface {
 		FormatPersistentMetadatei(io.Writer, FormatterContext) (int64, error)

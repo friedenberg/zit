@@ -9,6 +9,10 @@ import (
 	"github.com/friedenberg/zit/src/bravo/values"
 )
 
+func init() {
+	register(Typ{})
+}
+
 type (
 	Typ struct {
 		value string

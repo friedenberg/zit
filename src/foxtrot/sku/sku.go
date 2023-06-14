@@ -17,9 +17,18 @@ import (
 type Sku struct {
 	Gattung    gattung.Gattung
 	Tai        kennung.Tai
-	Kennung    values.String
+	Kennung    Kennung
 	ObjekteSha sha.Sha
 	AkteSha    sha.Sha
+}
+
+func (sk *Sku) setKennungValue(v string) (err error) {
+	if sk.Kennung, err = kennung.Make(v); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (sk *Sku) Set(line string) (err error) {
@@ -31,7 +40,7 @@ func (sk *Sku) Set(line string) (err error) {
 		ohio.MakeLineReaderIterateStrict(
 			sk.Tai.Set,
 			sk.Gattung.Set,
-			sk.Kennung.Set,
+			sk.setKennungValue,
 			sk.ObjekteSha.Set,
 			sk.AkteSha.Set,
 		),
@@ -58,7 +67,7 @@ func (sk *Sku) setOld(line string) (err error) {
 		ohio.MakeLineReaderIterateStrict(
 			sk.Gattung.Set,
 			sk.Tai.Set,
-			sk.Kennung.Set,
+			sk.setKennungValue,
 			sk.ObjekteSha.Set,
 			sk.AkteSha.Set,
 		),
@@ -82,7 +91,11 @@ func (a *Sku) ResetWith(b Sku) {
 func (a *Sku) Reset() {
 	a.Gattung.Reset()
 	a.Tai.Reset()
-	a.Kennung.Reset()
+
+	kp := a.Kennung.KennungPtrClone()
+	kp.Reset()
+	a.Kennung = kp.KennungClone()
+
 	a.ObjekteSha.Reset()
 	a.AkteSha.Reset()
 }
