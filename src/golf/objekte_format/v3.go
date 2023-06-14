@@ -71,12 +71,7 @@ func (f v3) ParsePersistentMetadatei(
 
 	lr := format.MakeLineReaderConsumeEmpty(
 		ohio.MakeLineReaderIterate(
-			ohio.MakeLineReaderKeyValue("Tai", m.Tai.Set),
 			ohio.MakeLineReaderKeyValue(gattung.Akte.String(), m.AkteSha.Set),
-			ohio.MakeLineReaderKeyValue(
-				gattung.Typ.String(),
-				ohio.MakeLineReaderIgnoreErrors(m.Typ.Set),
-			),
 			ohio.MakeLineReaderKeyValue(
 				gattung.Bezeichnung.String(),
 				m.Bezeichnung.Set,
@@ -86,6 +81,26 @@ func (f v3) ParsePersistentMetadatei(
 				collections.MakeFuncSetString[kennung.Etikett, *kennung.Etikett](
 					etiketten,
 				),
+			),
+			func(v string) (err error) {
+				var k kennung.Kennung
+
+				if k, err = kennung.Make(v); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				if err = c.SetKennung(k); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				return
+			},
+			ohio.MakeLineReaderKeyValue("Tai", m.Tai.Set),
+			ohio.MakeLineReaderKeyValue(
+				gattung.Typ.String(),
+				ohio.MakeLineReaderIgnoreErrors(m.Typ.Set),
 			),
 		),
 	)
