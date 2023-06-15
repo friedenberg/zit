@@ -42,7 +42,11 @@ type (
 	}
 )
 
-func BestandsaufnahmeFormat() Format {
+func BestandsaufnahmeFormatIncludeTai() Format {
+	return v3{includeTai: true}
+}
+
+func BestandsaufnahmeFormatExcludeTai() Format {
 	return v3{}
 }
 

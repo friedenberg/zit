@@ -31,6 +31,7 @@ func (f *FormatterValue) Set(v string) (err error) {
 	case
 		// TODO-P3 add toml
 		"bestandsaufnahme",
+		"bestandsaufnahme-sans-tai",
 		"objekte",
 		"kennung",
 		"kennung-akte-sha",
@@ -230,10 +231,25 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 			return
 		}
 
+	case "bestandsaufnahme-sans-tai":
+		f := MakeFormatBestandsaufnahme(
+			out,
+			objekte_format.BestandsaufnahmeFormatExcludeTai(),
+		)
+
+		return func(o TransactedLikePtr) (err error) {
+			if _, err = f.PrintOne(o); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+
 	case "bestandsaufnahme":
 		f := MakeFormatBestandsaufnahme(
 			out,
-			objekte_format.BestandsaufnahmeFormat(),
+			objekte_format.BestandsaufnahmeFormatIncludeTai(),
 		)
 
 		return func(o TransactedLikePtr) (err error) {

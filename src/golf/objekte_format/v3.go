@@ -13,7 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
-type v3 struct{}
+type v3 struct{ includeTai bool }
 
 func (f v3) FormatPersistentMetadatei(
 	w1 io.Writer,
@@ -44,7 +44,10 @@ func (f v3) FormatPersistentMetadatei(
 
 	w.WriteKeySpaceValue("Gattung", c.GetKennung().GetGattung())
 	w.WriteKeySpaceValue("Kennung", c.GetKennung())
-	w.WriteKeySpaceValue("Tai", m.Tai)
+
+	if f.includeTai {
+		w.WriteKeySpaceValue("Tai", m.Tai)
+	}
 
 	if !m.Typ.IsEmpty() {
 		w.WriteKeySpaceValue(gattung.Typ, m.GetTyp())
