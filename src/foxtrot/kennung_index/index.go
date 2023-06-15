@@ -20,7 +20,7 @@ type index2[
 ] struct {
 	didRead    bool
 	hasChanges bool
-	lock       *sync.Mutex
+	lock       *sync.RWMutex
 	Kennungen  map[string]kennung.Indexed[T, TPtr]
 }
 
@@ -29,7 +29,7 @@ func MakeIndex2[
 	TPtr kennung.KennungLikePtr[T],
 ]() (i *index2[T, TPtr]) {
 	i = &index2[T, TPtr]{
-		lock:      &sync.Mutex{},
+		lock:      &sync.RWMutex{},
 		Kennungen: make(map[string]kennung.Indexed[T, TPtr]),
 	}
 
@@ -37,15 +37,15 @@ func MakeIndex2[
 }
 
 func (i *index2[T, TPtr]) DidRead() bool {
-	i.lock.Lock()
-	defer i.lock.Unlock()
+	i.lock.RLock()
+	defer i.lock.RUnlock()
 
 	return i.didRead
 }
 
 func (i *index2[T, TPtr]) HasChanges() bool {
-	i.lock.Lock()
-	defer i.lock.Unlock()
+	i.lock.RLock()
+	defer i.lock.RUnlock()
 
 	return i.hasChanges
 }
@@ -63,8 +63,8 @@ func (i index2[T, TPtr]) WriteTo(w1 io.Writer) (n int64, err error) {
 	w := bufio.NewWriter(w1)
 	defer errors.DeferredFlusher(&err, w)
 
-	i.lock.Lock()
-	defer i.lock.Unlock()
+	i.lock.RLock()
+	defer i.lock.RUnlock()
 
 	enc := gob.NewEncoder(w)
 
@@ -149,8 +149,8 @@ func (i index2[T, TPtr]) GetAll() (out []T) {
 }
 
 func (i index2[T, TPtr]) Get(k T) (id kennung.IndexedLike[T], err error) {
-	i.lock.Lock()
-	defer i.lock.Unlock()
+	i.lock.RLock()
+	defer i.lock.RUnlock()
 
 	ok := false
 	id, ok = i.Kennungen[k.String()]
