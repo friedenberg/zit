@@ -34,26 +34,26 @@ func Make(basePath string) (a *Age, err error) {
 	return
 }
 
-func (a *Age) AddBech32PivYubikeyEC256(bech string) (err error) {
-	var r *age.PivYubikeyEC256Recipient
+// func (a *Age) AddBech32PivYubikeyEC256(bech string) (err error) {
+// 	var r *age.PivYubikeyEC256Recipient
 
-	if r, err = age.ParseBech32PivYubikeyEC256Recipient(bech); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+// 	if r, err = age.ParseBech32PivYubikeyEC256Recipient(bech); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	var i *age.PivYubikeyEC256Identity
+// 	var i *age.PivYubikeyEC256Identity
 
-	if i, err = age.ReadPivYubikeyEC256Identity(r); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+// 	if i, err = age.ReadPivYubikeyEC256Identity(r); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	a.recipients = append(a.recipients, r)
-	a.identities = append(a.identities, i)
+// 	a.recipients = append(a.recipients, r)
+// 	a.identities = append(a.identities, i)
 
-	return
-}
+// 	return
+// }
 
 func (a Age) Recipients() []Recipient {
 	return a.recipients
