@@ -27,7 +27,7 @@ func setUserChanges(paths []string, allow bool) (err error) {
 		if isNotExists(err, msg) {
 			err = fs.ErrNotExist
 		} else {
-			err = errors.Errorf("failed to run chflags: %s", msg)
+			err = errors.Errorf("failed to run chflags: %q", msg)
 		}
 
 		return
