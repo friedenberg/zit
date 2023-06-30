@@ -14,6 +14,7 @@ import (
 )
 
 type KennungIndex[T kennung.KennungSansGattung] interface {
+	GetInt(int) (T, error)
 	Get(T) (kennung.IndexedLike[T], error)
 	DidRead() bool
 	HasChanges() bool

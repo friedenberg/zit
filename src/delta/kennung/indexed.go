@@ -7,6 +7,7 @@ import (
 )
 
 type Indexed[T KennungLike[T], TPtr KennungLikePtr[T]] struct {
+	Int            int
 	Kennung        T
 	SchwanzenCount int
 	Count          int
@@ -30,6 +31,10 @@ func (i *Indexed[T, TPtr]) ResetWithKennung(k T) {
 	i.ExpandedAll = ExpandOne[T, TPtr](k, ExpanderAll)
 	i.ExpandedRight = ExpandOne[T, TPtr](k, ExpanderRight)
 	i.Tridex = tridex.Make(collections.SortedStrings[T](i.ExpandedRight)...)
+}
+
+func (z Indexed[T, TPtr]) GetInt() int {
+	return 0
 }
 
 func (z Indexed[T, TPtr]) GetKennung() T {

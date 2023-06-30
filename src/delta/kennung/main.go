@@ -56,6 +56,7 @@ type KennungLikePtr[T schnittstellen.Value[T]] interface {
 }
 
 type IndexedLike[T KennungSansGattung] interface {
+	GetInt() int
 	GetKennung() T
 	GetSchwanzenCount() int
 	GetCount() int

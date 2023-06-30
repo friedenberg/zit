@@ -18,10 +18,11 @@ type index2[
 	T kennung.KennungLike[T],
 	TPtr kennung.KennungLikePtr[T],
 ] struct {
-	didRead    bool
-	hasChanges bool
-	lock       *sync.RWMutex
-	Kennungen  map[string]kennung.Indexed[T, TPtr]
+	didRead         bool
+	hasChanges      bool
+	lock            *sync.RWMutex
+	IntsToKennungen map[int]T
+	Kennungen       map[string]kennung.Indexed[T, TPtr]
 }
 
 func MakeIndex2[
@@ -29,8 +30,9 @@ func MakeIndex2[
 	TPtr kennung.KennungLikePtr[T],
 ]() (i *index2[T, TPtr]) {
 	i = &index2[T, TPtr]{
-		lock:      &sync.RWMutex{},
-		Kennungen: make(map[string]kennung.Indexed[T, TPtr]),
+		lock:            &sync.RWMutex{},
+		IntsToKennungen: make(map[int]T),
+		Kennungen:       make(map[string]kennung.Indexed[T, TPtr]),
 	}
 
 	return
@@ -143,6 +145,21 @@ func (i index2[T, TPtr]) GetAll() (out []T) {
 
 	for _, ki := range i.Kennungen {
 		out = append(out, ki.GetKennung())
+	}
+
+	return
+}
+
+func (i index2[T, TPtr]) GetInt(in int) (id T, err error) {
+	i.lock.RLock()
+	defer i.lock.RUnlock()
+
+	ok := false
+	id, ok = i.IntsToKennungen[in]
+
+	if !ok {
+		err = errors.Wrap(collections.ErrNotFound{})
+		return
 	}
 
 	return
