@@ -19,8 +19,16 @@ func setUserChanges(paths []string, allow bool) (err error) {
 		setting = "no" + setting
 	}
 
-	cmd := exec.Command("chflags", append([]string{setting}, paths...)...)
+	// TODO-P2 change to syscall:
+	// https://github.com/snapcore/snapd/blob/master/osutil/chattr.go
+	// https://stackoverflow.com/questions/69542185/make-file-immutable-syscall-chflagsfilename
+	cmd := exec.Command(
+		"/usr/bin/chflags",
+		append([]string{setting}, paths...)...,
+	)
+
 	var msg []byte
+
 	msg, err = cmd.CombinedOutput()
 
 	if err != nil {
