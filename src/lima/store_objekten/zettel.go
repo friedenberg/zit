@@ -382,7 +382,7 @@ func (s *zettelStore) Create(
 }
 
 func (s *zettelStore) UpdateManyMetadatei(
-	incoming schnittstellen.Set[metadatei.WithKennung],
+	incoming schnittstellen.Set[metadatei.WithKennungInterface],
 ) (err error) {
 	if !s.StoreUtil.GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{
@@ -402,7 +402,7 @@ func (s *zettelStore) UpdateManyMetadatei(
 
 			k := ke.String()
 
-			var mwk metadatei.WithKennung
+			var mwk metadatei.WithKennungInterface
 			ok := false
 
 			if mwk, ok = incoming.Get(k); !ok {

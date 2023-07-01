@@ -180,12 +180,12 @@ func (a Transacted[T, T1, T2, T3]) GetTyp() (t kennung.Typ) {
 	return
 }
 
-func (a *Transacted[T, T1, T2, T3]) GetMetadateiWithKennung() (m metadatei.WithKennung) {
+func (a *Transacted[T, T1, T2, T3]) GetMetadateiWithKennung() (m metadatei.WithKennungInterface) {
 	var k2 T2
 
 	T3(&k2).ResetWith(a.Sku.Kennung)
 
-	m = metadatei.WithKennung{
+	m = metadatei.WithKennungInterface{
 		Kennung:   T3(&k2),
 		Metadatei: a.GetMetadatei(),
 	}

@@ -149,7 +149,9 @@ func (s *commonStore[O, OPtr, K, KPtr]) CheckoutOne(
 		fmt.Sprintf(
 			"%s.%s",
 			t.Sku.Kennung,
-			s.StoreUtil.GetKonfig().FileExtensions.GetFileExtensionForGattung(t),
+			s.StoreUtil.GetKonfig().FileExtensions.GetFileExtensionForGattung(
+				t,
+			),
 		),
 	)
 
@@ -194,7 +196,7 @@ func (s *commonStore[O, OPtr, K, KPtr]) CheckoutOne(
 }
 
 func (s *commonStore[O, OPtr, K, KPtr]) UpdateManyMetadatei(
-	incoming schnittstellen.Set[metadatei.WithKennung],
+	incoming schnittstellen.Set[metadatei.WithKennungInterface],
 ) (err error) {
 	if !s.StoreUtil.GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{
@@ -205,11 +207,11 @@ func (s *commonStore[O, OPtr, K, KPtr]) UpdateManyMetadatei(
 	}
 
 	if err = incoming.Each(
-		func(mwk metadatei.WithKennung) (err error) {
+		func(mwk metadatei.WithKennungInterface) (err error) {
 			var ke KPtr
 			ok := false
 
-			if ke, ok = mwk.GetKennung().(KPtr); !ok {
+			if ke, ok = mwk.GetKennungLike().(KPtr); !ok {
 				return
 			}
 

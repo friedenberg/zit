@@ -38,9 +38,9 @@ func (c CommitOrganizeFile) Run(
 
 	sameTyp := a.Metadatei.Typ.Equals(b.Metadatei.Typ)
 
-	toUpdate := collections.MakeMutableSetStringer[metadatei.WithKennung]()
+	toUpdate := collections.MakeMutableSetStringer[metadatei.WithKennungInterface]()
 
-	_ = func(hString string) (z metadatei.WithKennung, err error) {
+	_ = func(hString string) (z metadatei.WithKennungInterface, err error) {
 		var h kennung.Hinweis
 
 		if h, err = store.GetAbbrStore().Hinweis().ExpandString(
@@ -104,7 +104,7 @@ func (c CommitOrganizeFile) Run(
 				m.Typ = b.Metadatei.Typ
 			}
 
-			mwk := metadatei.WithKennung{
+			mwk := metadatei.WithKennungInterface{
 				Kennung:   k.KennungPtrClone(),
 				Metadatei: m,
 			}

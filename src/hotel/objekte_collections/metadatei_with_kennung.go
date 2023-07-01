@@ -6,11 +6,11 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
 
-type MutableSetMetadateiWithKennung = schnittstellen.MutableSet[metadatei.WithKennung]
+type MutableSetMetadateiWithKennung = schnittstellen.MutableSet[metadatei.WithKennungInterface]
 
 func MakeMutableSetMetadateiWithKennung() MutableSetMetadateiWithKennung {
 	return collections.MakeMutableSet(
-		func(mwk metadatei.WithKennung) string {
+		func(mwk metadatei.WithKennungInterface) string {
 			return collections.MakeKey(mwk.Kennung)
 		},
 	)

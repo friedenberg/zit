@@ -92,7 +92,7 @@ func (a Transacted[T, T1]) GetExternal() External[T, T1] {
 
 func (a *Transacted[T, T1]) Sku() Sku {
 	return Sku{
-		WithKennung: metadatei.WithKennung{
+		WithKennung: metadatei.WithKennungInterface{
 			Kennung: a.Kennung,
 			Metadatei: metadatei.Metadatei{
 				Tai:     a.GetTai(),

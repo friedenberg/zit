@@ -15,7 +15,7 @@ import (
 )
 
 type Sku struct {
-	WithKennung metadatei.WithKennung
+	WithKennung metadatei.WithKennungInterface
 	ObjekteSha  sha.Sha
 	// Gattung    gattung.Gattung
 	// Tai        kennung.Tai

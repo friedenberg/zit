@@ -6,51 +6,44 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
-type WithKennungLike interface {
-	GetKennung() kennung.Kennung
-	Getter
-}
-
-type WithKennungPtrLike interface {
-	WithKennungLike
-	GetterPtr
-	Setter
-}
-
-type WithKennung struct {
-	Kennung   kennung.Kennung
+type WithKennung[T kennung.KennungLike[T], T1 kennung.KennungLikePtr[T]] struct {
+	Kennung   T
 	Metadatei Metadatei
 }
 
-func (a WithKennung) String() string {
+func (a WithKennung[K, KPtr]) String() string {
 	return a.Kennung.String()
 }
 
-func (a WithKennung) GetKennung() kennung.Kennung {
+func (a WithKennung[K, KPtr]) GetKennungLike() kennung.Kennung {
 	return a.Kennung
 }
 
-func (a WithKennung) GetGattung() schnittstellen.Gattung {
+func (a WithKennung[K, KPtr]) GetKennung() K {
+	return a.Kennung
+}
+
+func (a WithKennung[K, KPtr]) GetGattung() schnittstellen.Gattung {
 	return a.Kennung.GetGattung()
 }
 
-func (a WithKennung) GetMetadatei() Metadatei {
+func (a WithKennung[K, KPtr]) GetMetadatei() Metadatei {
 	return a.Metadatei
 }
 
-func (a *WithKennung) GetMetadateiPtr() *Metadatei {
+func (a *WithKennung[K, KPtr]) GetMetadateiPtr() *Metadatei {
 	return &a.Metadatei
 }
 
-func (a *WithKennung) SetMetadatei(m Metadatei) {
+func (a *WithKennung[K, KPtr]) SetMetadatei(m Metadatei) {
 	a.Metadatei.SetMetadatei(m)
 }
 
-func (a WithKennung) EqualsAny(b any) bool {
+func (a WithKennung[K, KPtr]) EqualsAny(b any) bool {
 	return values.Equals(a, b)
 }
 
-func (a WithKennung) Equals(b WithKennung) bool {
+func (a WithKennung[K, KPtr]) Equals(b WithKennung[K, KPtr]) bool {
 	if a.Kennung.String() != b.Kennung.String() {
 		return false
 	}
@@ -62,9 +55,7 @@ func (a WithKennung) Equals(b WithKennung) bool {
 	return true
 }
 
-func (wk *WithKennung) Reset() {
-	k := wk.Kennung.KennungPtrClone()
-	k.Reset()
-	wk.Kennung = k.KennungClone()
+func (wk *WithKennung[K, KPtr]) Reset() {
+	KPtr(&wk.Kennung).Reset()
 	wk.Metadatei.Reset()
 }

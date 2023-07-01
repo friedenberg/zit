@@ -92,7 +92,7 @@ type CheckedOutUpdater[
 
 type UpdaterManyMetadatei interface {
 	UpdateManyMetadatei(
-		schnittstellen.Set[metadatei.WithKennung],
+		schnittstellen.Set[metadatei.WithKennungInterface],
 	) error
 }
 

@@ -114,7 +114,7 @@ func (atc Factory) makeChildren(
 		prefixSet.ToSet().Each(used.Add)
 
 		err = prefixSet.EachZettel(
-			func(e kennung.Etikett, tz metadatei.WithKennung) (err error) {
+			func(e kennung.Etikett, tz metadatei.WithKennungInterface) (err error) {
 				var z obj
 
 				if z, err = makeObj(tz, atc.Expanders); err != nil {
@@ -139,7 +139,7 @@ func (atc Factory) makeChildren(
 	segments := prefixSet.Subset(groupingEtiketten[0])
 
 	err = segments.Ungrouped.Each(
-		func(tz metadatei.WithKennung) (err error) {
+		func(tz metadatei.WithKennungInterface) (err error) {
 			var z obj
 
 			if z, err = makeObj(tz, atc.Expanders); err != nil {

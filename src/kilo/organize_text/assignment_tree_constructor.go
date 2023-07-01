@@ -49,7 +49,7 @@ func (atc AssignmentTreeConstructor) makeChildren(
 ) (err error) {
 	if groupingEtiketten.Len() == 0 {
 		err = prefixSet.EachZettel(
-			func(e kennung.Etikett, tz metadatei.WithKennung) (err error) {
+			func(e kennung.Etikett, tz metadatei.WithKennungInterface) (err error) {
 				var z obj
 
 				if z, err = makeObj(tz, atc.Expanders); err != nil {
@@ -74,7 +74,7 @@ func (atc AssignmentTreeConstructor) makeChildren(
 	segments := prefixSet.Subset(groupingEtiketten[0])
 
 	err = segments.Ungrouped.Each(
-		func(tz metadatei.WithKennung) (err error) {
+		func(tz metadatei.WithKennungInterface) (err error) {
 			var z obj
 
 			if z, err = makeObj(tz, atc.Expanders); err != nil {

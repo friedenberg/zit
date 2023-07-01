@@ -339,7 +339,7 @@ func (s Store) Flush() (err error) {
 }
 
 func (s *Store) UpdateManyMetadatei(
-	incoming schnittstellen.Set[metadatei.WithKennung],
+	incoming schnittstellen.Set[metadatei.WithKennungInterface],
 ) (err error) {
 	todo.Optimize() // parallelize
 	for _, umm := range s.metadateiUpdaters {
