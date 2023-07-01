@@ -39,7 +39,6 @@
         {
           pname = "zit";
           packages.default = zit;
-          /* devShells.default = import ./shell.nix { inherit pkgs; }; */
           devShells.default = pkgs.mkShell {
             buildInputs = with pkgs; [
               fish

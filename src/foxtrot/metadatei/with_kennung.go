@@ -18,7 +18,7 @@ type WithKennungPtrLike interface {
 }
 
 type WithKennung struct {
-	Kennung   kennung.KennungPtr
+	Kennung   kennung.Kennung
 	Metadatei Metadatei
 }
 
@@ -63,6 +63,8 @@ func (a WithKennung) Equals(b WithKennung) bool {
 }
 
 func (wk *WithKennung) Reset() {
-	wk.Kennung.Reset()
+	k := wk.Kennung.KennungPtrClone()
+	k.Reset()
+	wk.Kennung = k.KennungClone()
 	wk.Metadatei.Reset()
 }
