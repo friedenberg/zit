@@ -86,7 +86,9 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateCheckedOut(
 	transactedPtr = &objekte.Transacted[T, T1, T2, T3]{
 		Akte: *objektePtr,
 		Sku: sku.Transacted[T2, T3]{
-			Kennung: *kennungPtr,
+			WithKennung: metadatei.WithKennung[T2, T3]{
+				Kennung: *kennungPtr,
+			},
 			Schwanz: cou.clock.GetTai(),
 		},
 	}
@@ -144,7 +146,10 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdate(
 ) (transactedPtr *objekte.Transacted[T, T1, T2, T3], err error) {
 	if !cou.ls.IsAcquired() {
 		err = ErrLockRequired{
-			Operation: fmt.Sprintf("create or update %s", kennungPtr.GetGattung()),
+			Operation: fmt.Sprintf(
+				"create or update %s",
+				kennungPtr.GetGattung(),
+			),
 		}
 
 		return
@@ -171,7 +176,9 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdate(
 		Metadatei: m,
 		Akte:      *objektePtr,
 		Sku: sku.Transacted[T2, T3]{
-			Kennung: *kennungPtr,
+			WithKennung: metadatei.WithKennung[T2, T3]{
+				Kennung: *kennungPtr,
+			},
 			Schwanz: cou.clock.GetTai(),
 		},
 	}
@@ -205,7 +212,7 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdate(
 	transactedPtr.Sku.ObjekteSha = sha.Make(ow.Sha())
 
 	if mutter != nil &&
-		transactedPtr.Sku.Kennung.Equals(mutter.Sku.Kennung) &&
+		transactedPtr.Sku.GetKennung().Equals(mutter.Sku.GetKennung()) &&
 		transactedPtr.GetObjekteSha().EqualsSha(mutter.GetObjekteSha()) {
 		transactedPtr = mutter
 
@@ -245,7 +252,10 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateAkte(
 ) (transactedPtr *objekte.Transacted[T, T1, T2, T3], err error) {
 	if !cou.ls.IsAcquired() {
 		err = ErrLockRequired{
-			Operation: fmt.Sprintf("create or update %s", kennungPtr.GetGattung()),
+			Operation: fmt.Sprintf(
+				"create or update %s",
+				kennungPtr.GetGattung(),
+			),
 		}
 
 		return
@@ -272,7 +282,9 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateAkte(
 		Metadatei: m,
 		Akte:      *objektePtr,
 		Sku: sku.Transacted[T2, T3]{
-			Kennung: *kennungPtr,
+			WithKennung: metadatei.WithKennung[T2, T3]{
+				Kennung: *kennungPtr,
+			},
 			Schwanz: cou.clock.GetTai(),
 		},
 	}
@@ -306,7 +318,7 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateAkte(
 	transactedPtr.Sku.ObjekteSha = sha.Make(ow.Sha())
 
 	if mutter != nil &&
-		transactedPtr.Sku.Kennung.Equals(mutter.Sku.Kennung) &&
+		transactedPtr.Sku.GetKennung().Equals(mutter.Sku.GetKennung()) &&
 		transactedPtr.GetObjekteSha().EqualsSha(mutter.GetObjekteSha()) {
 		transactedPtr = mutter
 

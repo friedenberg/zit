@@ -61,7 +61,7 @@ func (emgr externalMaybeGetterReader[O, OPtr, K, KPtr]) ReadOne(
 
 	var e sku.ExternalMaybe[K, KPtr]
 
-	if e, ok = emgr.getter(i.Sku.Kennung); !ok {
+	if e, ok = emgr.getter(i.Sku.GetKennung()); !ok {
 		err = iter.MakeErrStopIteration()
 		return
 	}

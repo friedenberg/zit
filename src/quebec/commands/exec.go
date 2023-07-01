@@ -95,7 +95,9 @@ func (c Exec) getZettel(
 	typKonfig := u.Konfig().GetApproximatedTyp(typ).ApproximatedOrActual()
 
 	if typKonfig == nil {
-		err = errors.Normal(errors.Errorf("Typ does not have an exec-command set: %s", typ))
+		err = errors.Normal(
+			errors.Errorf("Typ does not have an exec-command set: %s", typ),
+		)
 		return
 	}
 
@@ -112,7 +114,7 @@ func (c Exec) getZettel(
 }
 
 func (c Exec) makeFifoPipe(tz zettel.Transacted) (p string, err error) {
-	h := tz.Sku.Kennung
+	h := tz.Sku.GetKennung()
 	var d string
 
 	if d, err = os.MkdirTemp("", h.Kopf()); err != nil {
@@ -194,7 +196,8 @@ func (c Exec) exec(
 	defer wg.Done()
 	// var pipeFileReader *os.File
 
-	// if pipeFileReader, err = os.OpenFile(pipePath, os.O_CREATE, os.ModeNamedPipe); err != nil {
+	// if pipeFileReader, err = os.OpenFile(pipePath, os.O_CREATE,
+	// os.ModeNamedPipe); err != nil {
 	// 	err = errors.Error(err)
 	// 	return
 	// }

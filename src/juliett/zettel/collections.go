@@ -28,7 +28,7 @@ func MakeMutableSetUnique(c int) MutableSet {
 					sz.Sku.Kopf,
 					sz.Sku.Schwanz,
 					sz.Sku.TransactionIndex,
-					sz.Sku.Kennung,
+					sz.Sku.GetKennung(),
 					sz.Sku.ObjekteSha,
 				)
 			},
@@ -45,7 +45,7 @@ func MakeMutableSetHinweis(c int) MutableSet {
 				}
 
 				return collections.MakeKey(
-					sz.Sku.Kennung,
+					sz.Sku.GetKennung(),
 				)
 			},
 		),
@@ -57,7 +57,7 @@ func (s MutableSet) ToSliceHinweisen() (b []kennung.Hinweis) {
 
 	s.Each(
 		func(z *Transacted) (err error) {
-			b = append(b, z.Sku.Kennung)
+			b = append(b, z.Sku.GetKennung())
 
 			return
 		},

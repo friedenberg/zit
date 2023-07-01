@@ -44,7 +44,9 @@ func init() {
 
 func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	if len(args)%2 != 0 {
-		err = errors.Errorf("arguments must come in pairs of hinweis and akte path")
+		err = errors.Errorf(
+			"arguments must come in pairs of hinweis and akte path",
+		)
 		return
 	}
 
@@ -148,7 +150,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	for _, z := range zettels {
 		if z, err = u.StoreObjekten().Zettel().Update(
 			z,
-			&z.Sku.Kennung,
+			&z.Sku.WithKennung.Kennung,
 		); err != nil {
 			err = errors.Wrap(err)
 			return

@@ -30,7 +30,12 @@ func init() {
 			}
 
 			f.Var(&c.Mode, "mode", "zettel, akte, or both")
-			f.StringVar(&c.UTIGroup, "uti-group", "", "lookup format from UTI group")
+			f.StringVar(
+				&c.UTIGroup,
+				"uti-group",
+				"",
+				"lookup format from UTI group",
+			)
 
 			return c
 		},
@@ -57,7 +62,10 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		}
 
 	default:
-		err = errors.Errorf("expected one or two input arguments, but got %d", len(args))
+		err = errors.Errorf(
+			"expected one or two input arguments, but got %d",
+			len(args),
+		)
 		return
 	}
 
@@ -96,7 +104,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			// TODO-P1 switch to methods on Transacted and External
 			zt.Akte = ze.Akte
 			zt.SetMetadatei(ze.GetMetadatei())
-			zt.Sku.Kennung = ze.Sku.Kennung
+			zt.Sku.WithKennung.Kennung = ze.Sku.Kennung
 			zt.SetObjekteSha(ze.GetObjekteSha())
 			zt.SetAkteSha(ze.GetAkteSha())
 		}

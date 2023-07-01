@@ -244,7 +244,7 @@ func (s *commonStoreBase[O, OPtr, K, KPtr]) Inherit(
 	s.StoreUtil.AddMatchable(t)
 	s.StoreUtil.CommitTransacted(t)
 
-	old, _ := s.ReadOne(&t.Sku.Kennung)
+	old, _ := s.ReadOne(&t.Sku.WithKennung.Kennung)
 
 	if old == nil || old.Less(*t) {
 		s.delegate.addOne(t)

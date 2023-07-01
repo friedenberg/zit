@@ -148,7 +148,7 @@ func (s *commonStore[O, OPtr, K, KPtr]) CheckoutOne(
 		s.StoreUtil.GetStandort().Cwd(),
 		fmt.Sprintf(
 			"%s.%s",
-			t.Sku.Kennung,
+			t.Sku.GetKennung(),
 			s.StoreUtil.GetKonfig().FileExtensions.GetFileExtensionForGattung(
 				t,
 			),
@@ -159,7 +159,7 @@ func (s *commonStore[O, OPtr, K, KPtr]) CheckoutOne(
 		if errors.IsExist(err) {
 			if co.External, err = s.ReadOneExternal(
 				sku.ExternalMaybe[K, KPtr]{
-					Kennung: t.Sku.Kennung,
+					Kennung: t.Sku.GetKennung(),
 					FDs: sku.ExternalFDs{
 						Objekte: kennung.FD{
 							Path: p,
@@ -172,7 +172,7 @@ func (s *commonStore[O, OPtr, K, KPtr]) CheckoutOne(
 				return
 			}
 
-			co.External.Sku.Kennung = t.Sku.Kennung
+			co.External.Sku.Kennung = t.Sku.GetKennung()
 		} else {
 			err = errors.Wrap(err)
 		}

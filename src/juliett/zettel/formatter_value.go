@@ -150,7 +150,7 @@ func (fv *FormatterValue) FuncFormatter(
 			if fv.string == "hinweis-text" {
 				if _, err = io.WriteString(
 					out,
-					fmt.Sprintf("= %s\n", o.Sku.Kennung),
+					fmt.Sprintf("= %s\n", o.Sku.GetKennung()),
 				); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -161,7 +161,7 @@ func (fv *FormatterValue) FuncFormatter(
 				out,
 				o,
 			); err != nil {
-				err = errors.Wrapf(err, "Hinweis: %s", o.Sku.Kennung)
+				err = errors.Wrapf(err, "Hinweis: %s", o.Sku.GetKennung())
 
 				if errors.IsNotExist(err) {
 					err = nil
@@ -177,7 +177,7 @@ func (fv *FormatterValue) FuncFormatter(
 		errors.TodoP3("limit to only zettels supporting toml")
 		return func(o *Transacted) (err error) {
 			if _, err = io.WriteString(
-				out, fmt.Sprintf("['%s']\n", o.Sku.Kennung),
+				out, fmt.Sprintf("['%s']\n", o.Sku.GetKennung()),
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -226,7 +226,10 @@ func (fv *FormatterValue) FuncFormatter(
 
 	default:
 		return func(_ *Transacted) (err error) {
-			err = objekte.MakeErrUnsupportedFormatterValue(fv.string, gattung.Zettel)
+			err = objekte.MakeErrUnsupportedFormatterValue(
+				fv.string,
+				gattung.Zettel,
+			)
 			return
 		}
 	}

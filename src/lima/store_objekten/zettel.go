@@ -155,7 +155,7 @@ func (s *zettelStore) writeNamedZettelToIndex(
 
 	errors.Log().Printf("writing zettel to index: %s", tz.Sku)
 
-	if err = s.verzeichnisseSchwanzen.Add(tz, tz.Sku.Kennung.String()); err != nil {
+	if err = s.verzeichnisseSchwanzen.Add(tz, tz.Sku.GetKennung().String()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -165,7 +165,7 @@ func (s *zettelStore) writeNamedZettelToIndex(
 		return
 	}
 
-	if err = s.StoreUtil.GetKennungIndex().AddHinweis(tz.Sku.Kennung); err != nil {
+	if err = s.StoreUtil.GetKennungIndex().AddHinweis(tz.Sku.GetKennung()); err != nil {
 		if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
 			errors.Log().Printf("kennung does not contain value: %s", err)
 			err = nil
@@ -611,7 +611,9 @@ func (s *zettelStore) writeObjekte(
 
 	tz = &zettel.Transacted{
 		Sku: sku.Transacted[kennung.Hinweis, *kennung.Hinweis]{
-			Kennung: h,
+			WithKennung: metadatei.WithKennung[kennung.Hinweis, *kennung.Hinweis]{
+				Kennung: h,
+			},
 			Kopf:    t,
 			Schwanz: t,
 		},
@@ -639,7 +641,9 @@ func (s *zettelStore) Inherit(tz *zettel.Transacted) (err error) {
 
 	s.StoreUtil.CommitTransacted(tz)
 
-	errExists := s.StoreUtil.GetAbbrStore().Hinweis().Exists(tz.Sku.Kennung)
+	errExists := s.StoreUtil.GetAbbrStore().Hinweis().Exists(
+		tz.Sku.GetKennung(),
+	)
 
 	if err = s.writeNamedZettelToIndex(tz); err != nil {
 		err = errors.Wrap(err)
@@ -673,7 +677,9 @@ func (s *zettelStore) ReindexOne(
 	objekte.CorrectAkteShaWith(tz, tz)
 
 	o = tz
-	errExists := s.StoreUtil.GetAbbrStore().Hinweis().Exists(tz.Sku.Kennung)
+	errExists := s.StoreUtil.GetAbbrStore().Hinweis().Exists(
+		tz.Sku.GetKennung(),
+	)
 
 	if err = s.writeNamedZettelToIndex(tz); err != nil {
 		err = errors.Wrap(err)

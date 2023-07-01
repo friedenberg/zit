@@ -65,7 +65,7 @@ func (c CommitOrganizeFile) Run(
 				return
 			}
 
-			z.Kennung = &tz.Sku.Kennung
+			z.Kennung = &tz.Sku.WithKennung.Kennung
 			z.Metadatei = tz.GetMetadatei()
 		}
 

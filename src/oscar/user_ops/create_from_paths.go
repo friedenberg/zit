@@ -48,7 +48,11 @@ func (c CreateFromPaths) Run(
 				return
 			},
 		); err != nil {
-			err = errors.Errorf("zettel text format error for path: %s: %s", arg, err)
+			err = errors.Errorf(
+				"zettel text format error for path: %s: %s",
+				arg,
+				err,
+			)
 			return
 		}
 	}
@@ -59,7 +63,7 @@ func (c CreateFromPaths) Run(
 				return ""
 			}
 
-			return zv.Sku.Kennung.String()
+			return zv.Sku.GetKennung().String()
 		},
 	)
 
@@ -96,7 +100,7 @@ func (c CreateFromPaths) Run(
 
 				if zt, err = c.StoreObjekten().Zettel().Update(
 					z,
-					&z.Sku.Kennung,
+					&z.Sku.WithKennung.Kennung,
 				); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -133,7 +137,7 @@ func (c CreateFromPaths) Run(
 			if c.ProtoZettel.Apply(&cz.Internal) {
 				if zt, err = c.StoreObjekten().Zettel().Update(
 					cz.Internal,
-					&cz.Internal.Sku.Kennung,
+					&cz.Internal.Sku.WithKennung.Kennung,
 				); err != nil {
 					// TODO-P2 add file for error handling
 					c.handleStoreError(cz, "", err)
@@ -227,7 +231,11 @@ func (c *CreateFromPaths) zettelsFromPath(
 	return
 }
 
-func (c CreateFromPaths) handleStoreError(z zettel.CheckedOut, f string, in error) {
+func (c CreateFromPaths) handleStoreError(
+	z zettel.CheckedOut,
+	f string,
+	in error,
+) {
 	var err error
 
 	var lostError objekte_store.VerlorenAndGefundenError

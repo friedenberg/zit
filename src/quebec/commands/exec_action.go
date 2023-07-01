@@ -38,7 +38,10 @@ func (c ExecAction) DefaultGattungen() gattungen.Set {
 	)
 }
 
-func (c ExecAction) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
+func (c ExecAction) RunWithQuery(
+	u *umwelt.Umwelt,
+	ms kennung.MetaSet,
+) (err error) {
 	if !c.Action.WasSet() {
 		err = errors.Normal(errors.Errorf("Action must be provided"))
 		return
@@ -67,7 +70,7 @@ func (c ExecAction) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err erro
 	if err = u.StoreObjekten().Zettel().Query(
 		zids,
 		func(z *zettel.Transacted) (err error) {
-			return hinweisen.Add(z.Sku.Kennung)
+			return hinweisen.Add(z.Sku.GetKennung())
 		},
 	); err != nil {
 		err = errors.Wrap(err)

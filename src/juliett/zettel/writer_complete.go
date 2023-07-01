@@ -23,13 +23,13 @@ func MakeWriterComplete(w io.Writer) WriterComplete {
 
 	go func(s *WriterComplete) {
 		for z := range s.chTransacted {
-			if z.Sku.Kennung.String() == "/" {
+			if z.Sku.GetKennung().String() == "/" {
 				errors.Err().Printf("empty: %#v", z)
 				continue
 			}
 
 			errors.TodoP4("handle write errors")
-			s.wBuf.WriteString(z.Sku.Kennung.String())
+			s.wBuf.WriteString(z.Sku.GetKennung().String())
 			s.wBuf.WriteString("\tZettel: !")
 			s.wBuf.WriteString(z.GetTyp().String())
 			s.wBuf.WriteString(" ")

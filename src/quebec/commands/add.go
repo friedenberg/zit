@@ -41,13 +41,25 @@ func init() {
 				ProtoZettel: zettel.MakeEmptyProtoZettel(),
 			}
 
-			f.BoolVar(&c.Dedupe, "dedupe", false, "deduplicate added Zettelen based on Akte sha")
-			f.BoolVar(&c.Delete, "delete", false, "delete the zettel and akte after successful checkin")
+			f.BoolVar(
+				&c.Dedupe,
+				"dedupe",
+				false,
+				"deduplicate added Zettelen based on Akte sha",
+			)
+			f.BoolVar(
+				&c.Delete,
+				"delete",
+				false,
+				"delete the zettel and akte after successful checkin",
+			)
 			f.BoolVar(&c.OpenAkten, "open-akten", false, "also open the Akten")
 			f.BoolVar(&c.Organize, "organize", false, "")
 			c.ProtoZettel.AddToFlagSet(f)
 
-			errors.TodoP2("add support for restricted query to specific gattung")
+			errors.TodoP2(
+				"add support for restricted query to specific gattung",
+			)
 			return c
 		},
 	)
@@ -184,7 +196,7 @@ func (c Add) openAktenIfNecessary(
 
 	zettels.Each(
 		func(z *zettel.Transacted) (err error) {
-			return hs.Add(z.Sku.Kennung)
+			return hs.Add(z.Sku.GetKennung())
 		},
 	)
 
@@ -198,7 +210,7 @@ func (c Add) openAktenIfNecessary(
 	if checkoutResults, err = u.StoreWorkingDirectory().Checkout(
 		options,
 		func(z *zettel.Transacted) (err error) {
-			if !hs.Contains(z.Sku.Kennung) {
+			if !hs.Contains(z.Sku.GetKennung()) {
 				return iter.MakeErrStopIteration()
 			}
 

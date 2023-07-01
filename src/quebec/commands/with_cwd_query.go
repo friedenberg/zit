@@ -79,12 +79,12 @@ func (c commandWithCwdQuery) Complete(
 	if cg.Contains(gattung.Typ) {
 		if err = u.Konfig().Typen.Each(
 			func(tt *typ.Transacted) (err error) {
-				if err = errors.Out().Printf("%s\tTyp", tt.Sku.Kennung); err != nil {
+				if err = errors.Out().Printf("%s\tTyp", tt.Sku.GetKennung()); err != nil {
 					err = errors.IsAsNilOrWrapf(
 						err,
 						syscall.EPIPE,
 						"Typ: %s",
-						tt.Sku.Kennung,
+						tt.Sku.GetKennung(),
 					)
 
 					return

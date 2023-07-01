@@ -137,7 +137,7 @@ func (k *compiled) AddEtikett(
 }
 
 func (c *compiled) applyExpandedEtikett(ct *etikett.Transacted) {
-	expandedActual := c.GetSortedEtikettenExpanded(ct.Sku.Kennung.String())
+	expandedActual := c.GetSortedEtikettenExpanded(ct.Sku.GetKennung().String())
 
 	for _, ex := range expandedActual {
 		ct.Akte.Merge(ex.Akte)
@@ -161,7 +161,9 @@ func (c compiled) GetSortedEtikettenExpanded(
 	defer c.lock.Unlock()
 
 	expandedMaybe := collections.MakeMutableSetStringer[values.String]()
-	sa := collections.MakeFuncSetString[values.String, *values.String](expandedMaybe)
+	sa := collections.MakeFuncSetString[values.String, *values.String](
+		expandedMaybe,
+	)
 	typExpander.Expand(sa, v)
 	expandedActual = make([]etikett.Transacted, 0)
 
@@ -180,7 +182,11 @@ func (c compiled) GetSortedEtikettenExpanded(
 	)
 
 	sort.Slice(expandedActual, func(i, j int) bool {
-		return len(expandedActual[i].Sku.Kennung.String()) > len(expandedActual[j].Sku.Kennung.String())
+		return len(
+			expandedActual[i].Sku.GetKennung().String(),
+		) > len(
+			expandedActual[j].Sku.GetKennung().String(),
+		)
 	})
 
 	return

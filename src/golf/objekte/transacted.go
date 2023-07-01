@@ -23,7 +23,7 @@ type Transacted[
 }
 
 func (t Transacted[T, T1, T2, T3]) Kennung() T3 {
-	return &t.Sku.Kennung
+	return &t.Sku.WithKennung.Kennung
 }
 
 func (t Transacted[T, T1, T2, T3]) GetMetadatei() metadatei.Metadatei {
@@ -43,12 +43,12 @@ func (t *Transacted[T, T1, T2, T3]) SetMetadatei(
 }
 
 func (t Transacted[T, T1, T2, T3]) GetSkuAkteSha() schnittstellen.Sha {
-	return t.Sku.AkteSha
+	return t.Sku.WithKennung.Metadatei.AkteSha
 }
 
 func (t Transacted[T, T1, T2, T3]) GetAkteSha() schnittstellen.Sha {
 	AssertAkteShasMatch(t)
-	return t.Sku.AkteSha
+	return t.Sku.WithKennung.Metadatei.AkteSha
 }
 
 func (t *Transacted[T, T1, T2, T3]) SetAkteSha(
@@ -56,7 +56,7 @@ func (t *Transacted[T, T1, T2, T3]) SetAkteSha(
 ) {
 	sh := sha.Make(s)
 	t.GetMetadateiPtr().AkteSha = sh
-	t.Sku.AkteSha = sh
+	t.Sku.WithKennung.Metadatei.AkteSha = sh
 }
 
 func (t Transacted[T, T1, T2, T3]) GetObjekteSha() schnittstellen.Sha {
@@ -116,7 +116,7 @@ func (t *Transacted[T, T1, T2, T3]) SetTai(ta kennung.Tai) {
 }
 
 func (t Transacted[T, T1, T2, T3]) GetGattung() schnittstellen.Gattung {
-	return t.Sku.Kennung.GetGattung()
+	return t.Sku.GetGattung()
 }
 
 func (zt Transacted[T, T1, T2, T3]) IsNew() bool {
@@ -183,7 +183,7 @@ func (a Transacted[T, T1, T2, T3]) GetTyp() (t kennung.Typ) {
 func (a *Transacted[T, T1, T2, T3]) GetMetadateiWithKennung() (m metadatei.WithKennungInterface) {
 	var k2 T2
 
-	T3(&k2).ResetWith(a.Sku.Kennung)
+	T3(&k2).ResetWith(a.Sku.GetKennung())
 
 	m = metadatei.WithKennungInterface{
 		Kennung:   T3(&k2),
@@ -198,7 +198,7 @@ func (a *Transacted[T, T1, T2, T3]) GetMetadateiWithKennung() (m metadatei.WithK
 }
 
 func (a Transacted[T, T1, T2, T3]) GetIdLike() (il kennung.Kennung) {
-	return a.Sku.Kennung
+	return a.Sku.GetKennung()
 }
 
 func (a Transacted[T, T1, T2, T3]) GetSkuLike() (sk sku.SkuLike) {
@@ -216,11 +216,11 @@ func (a Transacted[T, T1, T2, T3]) GetSku() (sk sku.Sku) {
 }
 
 func (a Transacted[T, T1, T2, T3]) GetKennung() kennung.Kennung {
-	return a.Sku.Kennung
+	return a.Sku.GetKennung()
 }
 
 func (a *Transacted[T, T1, T2, T3]) GetKennungPtr() kennung.KennungPtr {
-	return T3(&a.Sku.Kennung)
+	return T3(&a.Sku.WithKennung.Kennung)
 }
 
 func (a Transacted[T, T1, T2, T3]) GetDataIdentity() (di sku.DataIdentity) {
@@ -236,7 +236,7 @@ func (a *Transacted[T, T1, T2, T3]) SetKennung(k1 kennung.Kennung) (err error) {
 		return
 	}
 
-	a.Sku.Kennung = k
+	a.Sku.WithKennung.Kennung = k
 
 	return
 }
@@ -250,7 +250,7 @@ func (a *Transacted[T, T1, T2, T3]) SetDataIdentity(
 	}
 
 	a.Sku.ObjekteSha = sha.Make(o.GetObjekteSha())
-	a.Sku.AkteSha = sha.Make(o.GetAkteSha())
+	a.Sku.WithKennung.Metadatei.AkteSha = sha.Make(o.GetAkteSha())
 	a.SetTai(o.GetTai())
 
 	return
@@ -271,7 +271,7 @@ func (a *Transacted[T, T1, T2, T3]) SetSkuLike(
 		return
 	}
 
-	a.Sku.Kennung = h
+	a.Sku.WithKennung.Kennung = h
 	a.Sku.ObjekteSha = sha.Make(o.GetObjekteSha())
 	a.Sku.TransactionIndex = o.GetTransactionIndex()
 	// TODO-P3 fix sku kopf and schwanz
@@ -282,7 +282,7 @@ func (a *Transacted[T, T1, T2, T3]) SetSkuLike(
 }
 
 func (a Transacted[T, T1, T2, T3]) GetKennungString() string {
-	return a.Sku.Kennung.String()
+	return a.Sku.GetKennung().String()
 }
 
 func (a *Transacted[T, T1, T2, T3]) Reset() {

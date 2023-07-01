@@ -16,7 +16,7 @@ func MakeMutableSetCheckedOutUnique(c int) MutableSetCheckedOut {
 			return collections.MakeKey(
 				sz.Internal.Sku.Kopf,
 				sz.Internal.Sku.Schwanz,
-				sz.Internal.Sku.Kennung,
+				sz.Internal.Sku.GetKennung(),
 				sz.Internal.Sku.ObjekteSha,
 			)
 		},
@@ -26,7 +26,7 @@ func MakeMutableSetCheckedOutUnique(c int) MutableSetCheckedOut {
 func MakeMutableSetCheckedOutHinweisZettel(c int) MutableSetCheckedOut {
 	return collections.MakeMutableSet(
 		func(sz CheckedOut) string {
-			return collections.MakeKey(sz.Internal.Sku.Kennung)
+			return collections.MakeKey(sz.Internal.Sku.GetKennung())
 		},
 	)
 }

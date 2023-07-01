@@ -27,7 +27,7 @@ func (zws *Schwanzen) Less(zt *Transacted) (ok bool) {
 	zws.lock.RLock()
 	defer zws.lock.RUnlock()
 
-	t, ok := zws.hinweisen[zt.Sku.Kennung]
+	t, ok := zws.hinweisen[zt.Sku.GetKennung()]
 
 	switch {
 	case !ok:
@@ -57,7 +57,7 @@ func (zws *Schwanzen) Set(z *Transacted, flush bool) (ok bool) {
 	zws.lock.Lock()
 	defer zws.lock.Unlock()
 
-	h := z.Sku.Kennung
+	h := z.Sku.GetKennung()
 	t1, found := zws.hinweisen[h]
 
 	switch {

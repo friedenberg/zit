@@ -43,10 +43,10 @@ func (s MutableMatchSet) Match(z *zettel.Transacted) (err error) {
 	s.lock.RLock()
 	stored, okStored := s.Stored.Get(kStored)
 	akte, okAkte := s.Akten.Get(kAkte)
-	okHinweis := s.MatchedHinweisen.Contains(z.Sku.Kennung)
+	okHinweis := s.MatchedHinweisen.Contains(z.Sku.GetKennung())
 
 	okSchwanz := false
-	schwanz, _ := s.MatchedHinweisenSchwanzen[z.Sku.Kennung]
+	schwanz, _ := s.MatchedHinweisenSchwanzen[z.Sku.GetKennung()]
 
 	if schwanz.Less(z.Sku.Schwanz) {
 		okSchwanz = true
@@ -66,8 +66,8 @@ func (s MutableMatchSet) Match(z *zettel.Transacted) (err error) {
 		s.lock.Lock()
 		defer s.lock.Unlock()
 
-		s.MatchedHinweisen.Add(z.Sku.Kennung)
-		s.MatchedHinweisenSchwanzen[z.Sku.Kennung] = z.Sku.Schwanz
+		s.MatchedHinweisen.Add(z.Sku.GetKennung())
+		s.MatchedHinweisenSchwanzen[z.Sku.GetKennung()] = z.Sku.Schwanz
 		s.Stored.DelKey(kStored)
 		s.Akten.DelKey(kAkte)
 		s.Original.Del(stored)
