@@ -6,25 +6,25 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/ohio"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
 
 type Sku struct {
-	// WithKennung metadatei.WithKennung
-	Gattung    gattung.Gattung
-	Tai        kennung.Tai
-	Kennung    Kennung
-	ObjekteSha sha.Sha
-	AkteSha    sha.Sha
+	WithKennung metadatei.WithKennung
+	ObjekteSha  sha.Sha
+	// Gattung    gattung.Gattung
+	// Tai        kennung.Tai
+	// Kennung    Kennung
+	// AkteSha    sha.Sha
 }
 
 func (sk *Sku) setKennungValue(v string) (err error) {
-	if sk.Kennung, err = kennung.Make(v); err != nil {
+	if sk.WithKennung.Kennung, err = kennung.Make(v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -39,11 +39,11 @@ func (sk *Sku) Set(line string) (err error) {
 		' ',
 		r,
 		ohio.MakeLineReaderIterateStrict(
-			sk.Tai.Set,
-			sk.Gattung.Set,
+			sk.WithKennung.Metadatei.Tai.Set,
+			sk.WithKennung.Metadatei.Gattung.Set,
 			sk.setKennungValue,
 			sk.ObjekteSha.Set,
-			sk.AkteSha.Set,
+			sk.WithKennung.Metadatei.AkteSha.Set,
 		),
 	); err != nil {
 		if err1 := sk.setOld(line); err1 != nil {
@@ -66,11 +66,11 @@ func (sk *Sku) setOld(line string) (err error) {
 		' ',
 		r,
 		ohio.MakeLineReaderIterateStrict(
-			sk.Gattung.Set,
-			sk.Tai.Set,
+			sk.WithKennung.Metadatei.Gattung.Set,
+			sk.WithKennung.Metadatei.Tai.Set,
 			sk.setKennungValue,
 			sk.ObjekteSha.Set,
-			sk.AkteSha.Set,
+			sk.WithKennung.Metadatei.AkteSha.Set,
 		),
 	); err != nil {
 		err = errors.Wrapf(err, "Sku2: %s", line)
@@ -82,27 +82,27 @@ func (sk *Sku) setOld(line string) (err error) {
 
 func (a *Sku) ResetWith(b Sku) {
 	errors.TodoP4("should these be more ResetWith calls?")
-	a.Gattung = b.Gattung
-	a.Tai = b.Tai
-	a.Kennung = b.Kennung
+	a.WithKennung.Metadatei.Gattung = b.WithKennung.Metadatei.Gattung
+	a.WithKennung.Metadatei.Tai = b.WithKennung.Metadatei.Tai
+	a.WithKennung.Kennung = b.WithKennung.Kennung
 	a.ObjekteSha = b.ObjekteSha
-	a.AkteSha = b.AkteSha
+	a.WithKennung.Metadatei.AkteSha = b.WithKennung.Metadatei.AkteSha
 }
 
 func (a *Sku) Reset() {
-	a.Gattung.Reset()
-	a.Tai.Reset()
+	a.WithKennung.Metadatei.Gattung.Reset()
+	a.WithKennung.Metadatei.Tai.Reset()
 
-	kp := a.Kennung.KennungPtrClone()
+	kp := a.WithKennung.Kennung.KennungPtrClone()
 	kp.Reset()
-	a.Kennung = kp.KennungClone()
+	a.WithKennung.Kennung = kp.KennungClone()
 
 	a.ObjekteSha.Reset()
-	a.AkteSha.Reset()
+	a.WithKennung.Metadatei.AkteSha.Reset()
 }
 
 func (a Sku) GetTai() kennung.Tai {
-	return a.Tai
+	return a.WithKennung.Metadatei.Tai
 }
 
 func (a Sku) GetKey() string {
@@ -110,15 +110,19 @@ func (a Sku) GetKey() string {
 }
 
 func (a Sku) GetTime() kennung.Time {
-	return a.Tai.AsTime()
+	return a.WithKennung.Metadatei.Tai.AsTime()
 }
 
 func (a Sku) GetId() Kennung {
-	return a.Kennung
+	return a.WithKennung.Kennung
+}
+
+func (a Sku) GetKennung() kennung.Kennung {
+	return a.WithKennung.Kennung
 }
 
 func (a Sku) GetGattung() schnittstellen.Gattung {
-	return a.Gattung
+	return a.WithKennung.Metadatei.Gattung
 }
 
 func (a Sku) GetObjekteSha() schnittstellen.Sha {
@@ -126,11 +130,11 @@ func (a Sku) GetObjekteSha() schnittstellen.Sha {
 }
 
 func (a Sku) GetAkteSha() schnittstellen.Sha {
-	return a.AkteSha
+	return a.WithKennung.Metadatei.AkteSha
 }
 
 func (a Sku) Less(b Sku) (ok bool) {
-	if a.Tai.Less(b.Tai) {
+	if a.WithKennung.Metadatei.Tai.Less(b.WithKennung.Metadatei.Tai) {
 		ok = true
 		return
 	}
@@ -153,10 +157,10 @@ func (a Sku) Equals(b Sku) (ok bool) {
 func (s Sku) String() string {
 	return fmt.Sprintf(
 		"%s %s %s %s %s",
-		s.Tai,
-		s.Gattung,
-		s.Kennung,
+		s.WithKennung.Metadatei.Tai,
+		s.WithKennung.Metadatei.Gattung,
+		s.WithKennung.Kennung,
 		s.ObjekteSha,
-		s.AkteSha,
+		s.WithKennung.Metadatei.AkteSha,
 	)
 }

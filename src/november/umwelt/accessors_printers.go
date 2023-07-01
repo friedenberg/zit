@@ -236,7 +236,7 @@ func (u *Umwelt) PrinterJustCheckedOutLike() schnittstellen.FuncIter[objekte.Che
 	return func(co objekte.CheckedOutLike) (err error) {
 		sk2 := co.GetInternalLike().GetSku()
 
-		switch sk2.Gattung {
+		switch sk2.GetGattung() {
 		case gattung.Zettel:
 			coz := co.(*zettel.CheckedOut)
 			return pzco(&coz.External)
@@ -254,8 +254,8 @@ func (u *Umwelt) PrinterJustCheckedOutLike() schnittstellen.FuncIter[objekte.Che
 			_, err = fmt.Fprintf(
 				u.Out(),
 				"(checked out) [%s.%s]\n",
-				sk2.Kennung,
-				sk2.Gattung,
+				sk2.GetKennung(),
+				sk2.GetGattung(),
 			)
 		}
 
@@ -272,7 +272,7 @@ func (u *Umwelt) PrinterCheckedOutLike() schnittstellen.FuncIter[objekte.Checked
 	return func(co objekte.CheckedOutLike) (err error) {
 		sk2 := co.GetInternalLike().GetSku()
 
-		switch sk2.Gattung {
+		switch sk2.GetGattung() {
 		case gattung.Zettel:
 			coz := co.(*zettel.CheckedOut)
 			return pzco(coz)
@@ -293,8 +293,8 @@ func (u *Umwelt) PrinterCheckedOutLike() schnittstellen.FuncIter[objekte.Checked
 			_, err = fmt.Fprintf(
 				u.Out(),
 				"(checked out) [%s.%s]\n",
-				sk2.Kennung,
-				sk2.Gattung,
+				sk2.GetKennung(),
+				sk2.GetGattung(),
 			)
 		}
 

@@ -2,6 +2,7 @@ package remote_transfers
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
@@ -23,7 +24,7 @@ func (c *client) PullSkus(
 			var el objekte_store.TransactedInheritor
 			ok := false
 
-			if el, ok = gattungInheritors[sk.Gattung]; !ok {
+			if el, ok = gattungInheritors[gattung.Must(sk.GetGattung())]; !ok {
 				return
 			}
 
@@ -31,7 +32,7 @@ func (c *client) PullSkus(
 
 			if c.umwelt.Standort().HasObjekte(
 				c.umwelt.Konfig().GetStoreVersion(),
-				sk.Gattung,
+				sk.GetGattung(),
 				sk.ObjekteSha,
 			) {
 				errors.Log().Printf("already have objekte: %s", sk.ObjekteSha)

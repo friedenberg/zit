@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
 
 // TODO-P2 move sku.Sku to sku.Transacted
@@ -24,13 +25,13 @@ type Transacted[T kennung.KennungLike[T], T1 kennung.KennungLikePtr[T]] struct {
 func (t *Transacted[T, T1]) SetFromSku(sk Sku) (err error) {
 	t.Schwanz = sk.GetTai()
 
-	if err = T1(&t.Kennung).Set(sk.Kennung.String()); err != nil {
+	if err = T1(&t.Kennung).Set(sk.WithKennung.Kennung.String()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	t.ObjekteSha = sk.ObjekteSha
-	t.AkteSha = sk.AkteSha
+	t.AkteSha = sk.WithKennung.Metadatei.AkteSha
 
 	t.Kopf = sk.GetTai()
 	t.Schwanz = sk.GetTai()
@@ -91,11 +92,15 @@ func (a Transacted[T, T1]) GetExternal() External[T, T1] {
 
 func (a *Transacted[T, T1]) Sku() Sku {
 	return Sku{
-		Tai:        a.GetTai(),
-		Gattung:    gattung.Make(a.GetGattung()),
-		Kennung:    a.Kennung,
+		WithKennung: metadatei.WithKennung{
+			Kennung: a.Kennung,
+			Metadatei: metadatei.Metadatei{
+				Tai:     a.GetTai(),
+				Gattung: gattung.Make(a.GetGattung()),
+				AkteSha: a.AkteSha,
+			},
+		},
 		ObjekteSha: a.ObjekteSha,
-		AkteSha:    a.AkteSha,
 	}
 }
 

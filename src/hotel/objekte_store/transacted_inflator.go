@@ -92,16 +92,16 @@ func (h *transactedInflator[T, T1, T2, T3]) InflateFromSku2(
 	t.SetTai(o.GetTai())
 
 	// TODO-P2 make generic
-	if t.Sku.Kennung.GetGattung() != o.Gattung {
+	if t.Sku.Kennung.GetGattung() != o.WithKennung.Metadatei.Gattung {
 		err = errors.Errorf(
 			"expected gattung %s but got %s",
 			t.Sku.Kennung.GetGattung(),
-			o.Gattung,
+			o.WithKennung.Metadatei.Gattung,
 		)
 		return
 	}
 
-	if err = T3(&t.Sku.Kennung).Set(o.Kennung.String()); err != nil {
+	if err = T3(&t.Sku.Kennung).Set(o.WithKennung.Kennung.String()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
