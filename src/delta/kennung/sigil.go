@@ -53,7 +53,7 @@ func MakeSigil(v Sigil) (s *Sigil) {
 	return
 }
 
-func (a Sigil) GetGattung() schnittstellen.Gattung {
+func (a Sigil) GetGattung() schnittstellen.GattungLike {
 	return gattung.Unknown
 }
 

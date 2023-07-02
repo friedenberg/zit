@@ -108,7 +108,7 @@ func (a External[T, T1, T2, T3]) Equals(b External[T, T1, T2, T3]) bool {
 	return true
 }
 
-func (e External[T, T1, T2, T3]) GetGattung() schnittstellen.Gattung {
+func (e External[T, T1, T2, T3]) GetGattung() schnittstellen.GattungLike {
 	return e.Sku.GetGattung()
 }
 

@@ -11,7 +11,7 @@ import (
 )
 
 type TypedId interface {
-	schnittstellen.Gattung
+	schnittstellen.GattungLike
 	schnittstellen.Setter
 }
 

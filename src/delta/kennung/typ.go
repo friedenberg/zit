@@ -68,7 +68,7 @@ func (t Typ) GetTyp() Typ {
 	return t
 }
 
-func (o Typ) GetGattung() schnittstellen.Gattung {
+func (o Typ) GetGattung() schnittstellen.GattungLike {
 	return gattung.Typ
 }
 

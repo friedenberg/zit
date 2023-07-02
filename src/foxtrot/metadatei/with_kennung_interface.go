@@ -30,7 +30,7 @@ func (a WithKennungInterface) GetKennungLike() kennung.Kennung {
 	return a.Kennung
 }
 
-func (a WithKennungInterface) GetGattung() schnittstellen.Gattung {
+func (a WithKennungInterface) GetGattung() schnittstellen.GattungLike {
 	return a.Kennung.GetGattung()
 }
 

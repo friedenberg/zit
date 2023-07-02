@@ -18,7 +18,7 @@ type Akte struct {
 	Actions        map[string]script_config.ScriptConfig `toml:"actions,omitempty"`
 }
 
-func (_ Akte) GetGattung() schnittstellen.Gattung {
+func (_ Akte) GetGattung() schnittstellen.GattungLike {
 	return gattung.Konfig
 }
 

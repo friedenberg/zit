@@ -1,6 +1,6 @@
 package schnittstellen
 
-type Gattung interface {
+type GattungLike interface {
 	Element
 	EqualsGattung(GattungGetter) bool
 	GetGattungString() string
@@ -9,9 +9,9 @@ type Gattung interface {
 }
 
 type GattungGetter interface {
-	GetGattung() Gattung
+	GetGattung() GattungLike
 }
 
 type GattungenGetter interface {
-	GetGattungen() Set[Gattung]
+	GetGattungen() Set[GattungLike]
 }

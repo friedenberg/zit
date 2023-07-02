@@ -23,7 +23,7 @@ func (a WithKennung[K, KPtr]) GetKennung() K {
 	return a.Kennung
 }
 
-func (a WithKennung[K, KPtr]) GetGattung() schnittstellen.Gattung {
+func (a WithKennung[K, KPtr]) GetGattung() schnittstellen.GattungLike {
 	return a.Kennung.GetGattung()
 }
 

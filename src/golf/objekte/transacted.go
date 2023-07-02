@@ -108,7 +108,7 @@ func (t *Transacted[T, T1, T2, T3]) SetTai(ta kennung.Tai) {
 	t.Sku.SetTai(ta)
 }
 
-func (t Transacted[T, T1, T2, T3]) GetGattung() schnittstellen.Gattung {
+func (t Transacted[T, T1, T2, T3]) GetGattung() schnittstellen.GattungLike {
 	return t.Sku.GetGattung()
 }
 

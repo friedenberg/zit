@@ -10,7 +10,7 @@ type Akte struct {
 	Hide            bool `toml:"hide"`
 }
 
-func (_ Akte) GetGattung() schnittstellen.Gattung {
+func (_ Akte) GetGattung() schnittstellen.GattungLike {
 	return gattung.Etikett
 }
 

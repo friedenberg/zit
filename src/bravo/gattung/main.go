@@ -60,7 +60,7 @@ func Must(g schnittstellen.GattungGetter) Gattung {
 	return g.GetGattung().(Gattung)
 }
 
-func Make(g schnittstellen.Gattung) Gattung {
+func Make(g schnittstellen.GattungLike) Gattung {
 	return Must(g)
 }
 
@@ -72,7 +72,7 @@ func MakeOrUnknown(v string) (g Gattung) {
 	return
 }
 
-func (g Gattung) GetGattung() schnittstellen.Gattung {
+func (g Gattung) GetGattung() schnittstellen.GattungLike {
 	return g
 }
 

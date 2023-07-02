@@ -59,7 +59,7 @@ func (t Tai) AsTime() (t1 Time) {
 	return
 }
 
-func (t Tai) GetGattung() schnittstellen.Gattung {
+func (t Tai) GetGattung() schnittstellen.GattungLike {
 	return gattung.Bestandsaufnahme
 }
 

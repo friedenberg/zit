@@ -117,7 +117,7 @@ func (a Sku) GetKennung() kennung.Kennung {
 	return a.WithKennung.Kennung
 }
 
-func (a Sku) GetGattung() schnittstellen.Gattung {
+func (a Sku) GetGattung() schnittstellen.GattungLike {
 	return a.WithKennung.Metadatei.Gattung
 }
 

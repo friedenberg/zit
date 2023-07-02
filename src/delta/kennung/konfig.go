@@ -19,7 +19,7 @@ func ErrOnKonfig(v string) (err error) {
 
 type Konfig struct{}
 
-func (a Konfig) GetGattung() schnittstellen.Gattung {
+func (a Konfig) GetGattung() schnittstellen.GattungLike {
 	return gattung.Konfig
 }
 

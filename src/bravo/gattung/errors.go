@@ -10,15 +10,15 @@ import (
 var ErrNoAbbreviation = errors.New("no abbreviation")
 
 func MakeErrUnsupportedGattung(g schnittstellen.GattungGetter) error {
-	return errors.WrapN(1, errUnsupportedGattung{Gattung: g.GetGattung()})
+	return errors.WrapN(1, errUnsupportedGattung{GattungLike: g.GetGattung()})
 }
 
 func IsErrUnsupportedGattung(err error) bool {
-	return errors.Is(err, errUnsupportedGattung{Gattung: Unknown})
+	return errors.Is(err, errUnsupportedGattung{GattungLike: Unknown})
 }
 
 type errUnsupportedGattung struct {
-	schnittstellen.Gattung
+	schnittstellen.GattungLike
 }
 
 func (e errUnsupportedGattung) Is(target error) (ok bool) {
@@ -27,7 +27,7 @@ func (e errUnsupportedGattung) Is(target error) (ok bool) {
 }
 
 func (e errUnsupportedGattung) Error() string {
-	return fmt.Sprintf("unsupported gattung: %q", e.Gattung)
+	return fmt.Sprintf("unsupported gattung: %q", e.GattungLike)
 }
 
 func MakeErrUnrecognizedGattung(v string) errUnrecognizedGattung {
@@ -59,7 +59,11 @@ func (e ErrWrongType) Is(target error) (ok bool) {
 }
 
 func (e ErrWrongType) Error() string {
-	return fmt.Sprintf("expected zk_types %s but got %s", e.ExpectedType, e.ActualType)
+	return fmt.Sprintf(
+		"expected zk_types %s but got %s",
+		e.ExpectedType,
+		e.ActualType,
+	)
 }
 
 type ErrEmptyKennung struct{}

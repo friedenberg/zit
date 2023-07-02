@@ -10,7 +10,7 @@ type Akte struct {
 	Uri values.Uri `toml:"uri"`
 }
 
-func (_ Akte) GetGattung() schnittstellen.Gattung {
+func (_ Akte) GetGattung() schnittstellen.GattungLike {
 	return gattung.Typ
 }
 

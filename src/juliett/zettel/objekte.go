@@ -7,7 +7,7 @@ import (
 
 type Objekte struct{}
 
-func (z Objekte) GetGattung() schnittstellen.Gattung {
+func (z Objekte) GetGattung() schnittstellen.GattungLike {
 	return gattung.Zettel
 }
 

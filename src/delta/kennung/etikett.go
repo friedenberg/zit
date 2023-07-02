@@ -57,7 +57,7 @@ func (e Etikett) GetEtikett() Etikett {
 	return e
 }
 
-func (e Etikett) GetGattung() schnittstellen.Gattung {
+func (e Etikett) GetGattung() schnittstellen.GattungLike {
 	return gattung.Etikett
 }
 

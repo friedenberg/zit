@@ -189,7 +189,7 @@ func (h *Hinweis) ResetWith(h1 Hinweis) {
 	h.right = h1.right
 }
 
-func (h Hinweis) GetGattung() schnittstellen.Gattung {
+func (h Hinweis) GetGattung() schnittstellen.GattungLike {
 	return gattung.Zettel
 }
 

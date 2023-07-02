@@ -1,9 +1,9 @@
 #! /bin/bash -xe
 
-old="$1"
-new="$2"
-package="$3"
-super_package="$4"
+old="$1"; shift
+new="$1"; shift
+super_package="$1"; shift
+package="$1"; shift
 
 # file_diff="$(mktemp)"
 

@@ -223,7 +223,7 @@ func (o *Transacted[K, KPtr]) SetTimeAndFields(
 	return
 }
 
-func (s Transacted[K, KPtr]) GetGattung() schnittstellen.Gattung {
+func (s Transacted[K, KPtr]) GetGattung() schnittstellen.GattungLike {
 	return s.WithKennung.Kennung.GetGattung()
 }
 

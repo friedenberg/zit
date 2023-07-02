@@ -55,7 +55,7 @@ func (a Kasten) Equals(b Kasten) bool {
 	return a.value == b.value
 }
 
-func (o Kasten) GetGattung() schnittstellen.Gattung {
+func (o Kasten) GetGattung() schnittstellen.GattungLike {
 	return gattung.Kasten
 }
 

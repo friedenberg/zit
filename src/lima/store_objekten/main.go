@@ -36,13 +36,13 @@ type Store struct {
 	kastenStore  KastenStore
 
 	// Gattungen
-	gattungStores     map[schnittstellen.Gattung]gattungStoreLike
-	reindexers        map[schnittstellen.Gattung]reindexer
-	flushers          map[schnittstellen.Gattung]errors.Flusher
-	readers           map[schnittstellen.Gattung]objekte.FuncReaderTransactedLikePtr
-	queriers          map[schnittstellen.Gattung]objekte.FuncQuerierTransactedLikePtr
-	transactedReaders map[schnittstellen.Gattung]objekte.FuncReaderTransactedLikePtr
-	metadateiUpdaters map[schnittstellen.Gattung]objekte_store.UpdaterManyMetadatei
+	gattungStores     map[schnittstellen.GattungLike]gattungStoreLike
+	reindexers        map[schnittstellen.GattungLike]reindexer
+	flushers          map[schnittstellen.GattungLike]errors.Flusher
+	readers           map[schnittstellen.GattungLike]objekte.FuncReaderTransactedLikePtr
+	queriers          map[schnittstellen.GattungLike]objekte.FuncQuerierTransactedLikePtr
+	transactedReaders map[schnittstellen.GattungLike]objekte.FuncReaderTransactedLikePtr
+	metadateiUpdaters map[schnittstellen.GattungLike]objekte_store.UpdaterManyMetadatei
 
 	isReindexing bool
 	lock         sync.Locker
@@ -84,7 +84,7 @@ func Make(
 		return
 	}
 
-	s.gattungStores = map[schnittstellen.Gattung]gattungStoreLike{
+	s.gattungStores = map[schnittstellen.GattungLike]gattungStoreLike{
 		gattung.Zettel:  s.zettelStore,
 		gattung.Typ:     s.typStore,
 		gattung.Etikett: s.etikettStore,
@@ -93,7 +93,7 @@ func Make(
 	}
 
 	errors.TodoP1("implement for other gattung")
-	s.queriers = map[schnittstellen.Gattung]objekte.FuncQuerierTransactedLikePtr{
+	s.queriers = map[schnittstellen.GattungLike]objekte.FuncQuerierTransactedLikePtr{
 		gattung.Zettel: objekte.MakeApplyQueryTransactedLikePtr[*zettel.Transacted](
 			s.zettelStore.Query,
 		),
@@ -115,7 +115,7 @@ func Make(
 		// ),
 	}
 
-	s.readers = map[schnittstellen.Gattung]objekte.FuncReaderTransactedLikePtr{
+	s.readers = map[schnittstellen.GattungLike]objekte.FuncReaderTransactedLikePtr{
 		gattung.Zettel: objekte.MakeApplyTransactedLikePtr[*zettel.Transacted](
 			s.zettelStore.ReadAllSchwanzen,
 		),
@@ -137,7 +137,7 @@ func Make(
 		// ),
 	}
 
-	s.transactedReaders = map[schnittstellen.Gattung]objekte.FuncReaderTransactedLikePtr{
+	s.transactedReaders = map[schnittstellen.GattungLike]objekte.FuncReaderTransactedLikePtr{
 		gattung.Zettel: objekte.MakeApplyTransactedLikePtr[*zettel.Transacted](
 			s.zettelStore.ReadAll,
 		),
@@ -159,7 +159,7 @@ func Make(
 		// ),
 	}
 
-	s.flushers = make(map[schnittstellen.Gattung]errors.Flusher)
+	s.flushers = make(map[schnittstellen.GattungLike]errors.Flusher)
 
 	for g, gs := range s.gattungStores {
 		if fl, ok := gs.(errors.Flusher); ok {
@@ -167,7 +167,7 @@ func Make(
 		}
 	}
 
-	s.reindexers = make(map[schnittstellen.Gattung]reindexer)
+	s.reindexers = make(map[schnittstellen.GattungLike]reindexer)
 
 	for g, gs := range s.gattungStores {
 		if gs1, ok := gs.(reindexer); ok {
@@ -176,7 +176,7 @@ func Make(
 	}
 
 	s.metadateiUpdaters = make(
-		map[schnittstellen.Gattung]objekte_store.UpdaterManyMetadatei,
+		map[schnittstellen.GattungLike]objekte_store.UpdaterManyMetadatei,
 	)
 
 	for g, gs := range s.gattungStores {

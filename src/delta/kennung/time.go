@@ -63,7 +63,7 @@ func (t *Time) MoveForwardIota() {
 // 	return t.time.Local().Format(f)
 // }
 
-func (t Time) GetGattung() schnittstellen.Gattung {
+func (t Time) GetGattung() schnittstellen.GattungLike {
 	return gattung.Unknown
 }
 

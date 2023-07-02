@@ -16,7 +16,7 @@ func MakeAkte() *Akte {
 	}
 }
 
-func (a Akte) GetGattung() (g schnittstellen.Gattung) {
+func (a Akte) GetGattung() (g schnittstellen.GattungLike) {
 	g = gattung.Bestandsaufnahme
 
 	return

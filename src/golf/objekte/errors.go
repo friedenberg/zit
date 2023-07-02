@@ -11,7 +11,7 @@ import (
 type ErrUnsupportedFormatterValue interface {
 	error
 	GetFormatValue() string
-	GetGattung() schnittstellen.Gattung
+	GetGattung() schnittstellen.GattungLike
 }
 
 func IsErrUnsupportedFormatterValue(err error) bool {
@@ -21,7 +21,7 @@ func IsErrUnsupportedFormatterValue(err error) bool {
 
 func MakeErrUnsupportedFormatterValue(
 	formatValue string,
-	g schnittstellen.Gattung,
+	g schnittstellen.GattungLike,
 ) error {
 	return errors.Wrap(
 		errUnsupportedFormatter{
@@ -53,6 +53,6 @@ func (e errUnsupportedFormatter) GetFormatValue() string {
 	return e.format
 }
 
-func (e errUnsupportedFormatter) GetGattung() schnittstellen.Gattung {
+func (e errUnsupportedFormatter) GetGattung() schnittstellen.GattungLike {
 	return e.gattung
 }

@@ -22,7 +22,7 @@ type Akte struct {
 	EtikettenRules     map[string]etikett_rule.Rule              `toml:"etiketten-rules,omitempty"`
 }
 
-func (a Akte) GetGattung() schnittstellen.Gattung {
+func (a Akte) GetGattung() schnittstellen.GattungLike {
 	return gattung.Typ
 }
 
