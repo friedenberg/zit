@@ -147,7 +147,7 @@ func (s *Sha) Set(v string) (err error) {
 	return
 }
 
-func (s Sha) GetSha() schnittstellen.ShaLike {
+func (s Sha) GetShaLike() schnittstellen.ShaLike {
 	return s
 }
 

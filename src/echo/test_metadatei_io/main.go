@@ -26,7 +26,7 @@ func FixtureFactoryReadWriteCloser(
 func (aw AkteIOFactory) AkteReader(
 	sh sha.ShaLike,
 ) (rc sha.ReadCloser, err error) {
-	if s, ok := aw.contents[sh.GetSha().String()]; ok {
+	if s, ok := aw.contents[sh.GetShaLike().String()]; ok {
 		rc = sha.MakeNopReadCloser(io.NopCloser(strings.NewReader(s)))
 	} else {
 		err = errors.Errorf("not found: %s", sh)

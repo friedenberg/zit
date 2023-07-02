@@ -76,7 +76,7 @@ func (s Standort) HasObjekte(
 		return
 	}
 
-	p := id.Path(sh.GetSha(), d)
+	p := id.Path(sh.GetShaLike(), d)
 	ok = files.Exists(p)
 
 	return
@@ -93,7 +93,7 @@ func (s Standort) HasAkte(
 		return
 	}
 
-	p := id.Path(sh.GetSha(), d)
+	p := id.Path(sh.GetShaLike(), d)
 	ok = files.Exists(p)
 
 	return

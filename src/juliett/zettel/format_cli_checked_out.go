@@ -64,7 +64,7 @@ func makeWriterFuncZettel(
 				format.ColorTypePointer,
 			),
 			format.MakeFormatString("@"),
-			format.MakeWriter(sf, z.External.GetObjekteSha().GetSha()),
+			format.MakeWriter(sf, z.External.GetObjekteSha().GetShaLike()),
 			format.MakeFormatString(" "),
 			format.MakeWriter[metadatei.GetterPtr](mf, &z.External),
 			format.MakeFormatString("]"),
@@ -90,7 +90,7 @@ func makeWriterFuncAkte(
 				format.ColorTypePointer,
 			),
 			format.MakeFormatString("@"),
-			format.MakeWriter(sf, z.External.GetAkteSha().GetSha()),
+			format.MakeWriter(sf, z.External.GetAkteSha().GetShaLike()),
 			format.MakeFormatString("]"),
 		)
 	}

@@ -160,7 +160,8 @@ func (c *client) makeAndProcessOneSkuWithFilter(
 ) {
 	defer func() {
 		// if r := recover(); r != nil {
-		// 	errMulti.Add(errors.Errorf("panicked during process one sku: %s", r))
+		// 	errMulti.Add(errors.Errorf("panicked during process one sku: %s",
+		// r))
 		// }
 
 		<-c.chFilterSkuTickets
@@ -196,7 +197,7 @@ func (c *client) ObjekteReader(
 
 	msgRequest := messageRequestObjekteData{
 		Gattung: gattung.Make(g.GetGattung()),
-		Sha:     sha.Make(sh.GetSha()),
+		Sha:     sha.Make(sh.GetShaLike()),
 	}
 
 	if err = d.Send(msgRequest); err != nil {
@@ -226,7 +227,7 @@ func (c client) AkteReader(
 		return
 	}
 
-	if err = d.Send(sh.GetSha()); err != nil {
+	if err = d.Send(sh.GetShaLike()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

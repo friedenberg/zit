@@ -14,7 +14,7 @@ type ShaLike interface {
 }
 
 type ShaGetter interface {
-	GetSha() ShaLike
+	GetShaLike() ShaLike
 }
 
 type ShaReadCloser interface {

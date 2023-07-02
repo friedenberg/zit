@@ -23,7 +23,7 @@ func MakeCliFormatNotRecognized(
 			format.MakeFormatString("["),
 			cw(s.MakeWriterRelativePath(fu.Path), format.ColorTypePointer),
 			format.MakeFormatString("@"),
-			format.MakeWriter(sf, fu.Sha.GetSha()),
+			format.MakeWriter(sf, fu.Sha.GetShaLike()),
 			format.MakeFormatString("]"),
 		)
 	}
@@ -52,7 +52,7 @@ func MakeCliFormatRecognized(
 			format.MakeFormatStringRightAligned("["),
 			cw(s.MakeWriterRelativePath(zr.Path), format.ColorTypePointer),
 			format.MakeFormatString("@"),
-			format.MakeWriter(sf, zr.Sha.GetSha()),
+			format.MakeWriter(sf, zr.Sha.GetShaLike()),
 			format.MakeFormatString("]"),
 		)
 	}

@@ -159,7 +159,9 @@ func (s common) GetTai() kennung.Tai {
 	return kennung.NowTai()
 }
 
-func (s *common) CommitUpdatedTransacted(t objekte.TransactedLikePtr) (err error) {
+func (s *common) CommitUpdatedTransacted(
+	t objekte.TransactedLikePtr,
+) (err error) {
 	ta := kennung.NowTai()
 	t.SetTai(ta)
 
@@ -228,12 +230,12 @@ func (s common) objekteReader(
 
 	o := age_io.FileReadOptions{
 		Age:  s.Age,
-		Path: id.Path(sh.GetSha(), p),
+		Path: id.Path(sh.GetShaLike(), p),
 	}
 
 	if rc, err = age_io.NewFileReader(o); err != nil {
 		err = errors.Wrapf(err, "Gattung: %s", g.GetGattung())
-		err = errors.Wrapf(err, "Sha: %s", sh.GetSha())
+		err = errors.Wrapf(err, "Sha: %s", sh.GetShaLike())
 		return
 	}
 
@@ -296,7 +298,9 @@ func (s common) WriteCloserObjekten(p string) (w sha.WriteCloser, err error) {
 	)
 }
 
-func (s common) WriteCloserVerzeichnisse(p string) (w sha.WriteCloser, err error) {
+func (s common) WriteCloserVerzeichnisse(
+	p string,
+) (w sha.WriteCloser, err error) {
 	return age_io.NewMover(
 		age_io.MoveOptions{
 			Age:       s.Age,
@@ -337,7 +341,7 @@ func (s common) AkteWriter() (w sha.WriteCloser, err error) {
 }
 
 func (s common) AkteReader(sh sha.ShaLike) (r sha.ReadCloser, err error) {
-	if sh.GetSha().IsNull() {
+	if sh.GetShaLike().IsNull() {
 		r = sha.MakeNopReadCloser(ioutil.NopCloser(bytes.NewReader(nil)))
 		return
 	}
@@ -352,7 +356,7 @@ func (s common) AkteReader(sh sha.ShaLike) (r sha.ReadCloser, err error) {
 		return
 	}
 
-	p = id.Path(sh.GetSha(), p)
+	p = id.Path(sh.GetShaLike(), p)
 
 	o := age_io.FileReadOptions{
 		Age:  s.Age,
