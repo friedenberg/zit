@@ -96,6 +96,14 @@ func (a *Sku) Reset() {
 	a.WithKennung.Metadatei.AkteSha.Reset()
 }
 
+func (a Sku) GetMetadatei() Metadatei {
+	return a.WithKennung.Metadatei
+}
+
+func (a *Sku) GetMetadateiPtr() *Metadatei {
+	return &a.WithKennung.Metadatei
+}
+
 func (a Sku) GetTai() kennung.Tai {
 	return a.WithKennung.Metadatei.Tai
 }

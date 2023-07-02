@@ -24,6 +24,7 @@ type DataIdentity interface {
 	schnittstellen.GattungGetter
 	GetObjekteSha() schnittstellen.ShaLike
 	GetAkteSha() schnittstellen.ShaLike
+	metadatei.Getter
 }
 
 type DataIdentityGetter interface {
