@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/hotel/etikett"
@@ -191,7 +190,7 @@ func (s *Store) CheckoutOneZettel(
 	cz.External = zettel.External{
 		Akte: sz.Akte,
 		Sku: sku.External[kennung.Hinweis, *kennung.Hinweis]{
-			WithKennung: metadatei.WithKennung[kennung.Hinweis, *kennung.Hinweis]{
+			WithKennung: sku.WithKennung[kennung.Hinweis, *kennung.Hinweis]{
 				Kennung:   sz.Sku.GetKennung(),
 				Metadatei: sz.GetMetadatei(),
 			},

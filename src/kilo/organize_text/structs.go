@@ -11,11 +11,11 @@ import (
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
-	"github.com/friedenberg/zit/src/foxtrot/metadatei"
+	"github.com/friedenberg/zit/src/foxtrot/sku"
 )
 
 func makeObj(
-	named metadatei.WithKennungInterface,
+	named sku.WithKennungInterface,
 	expanders kennung.Abbr,
 ) (z obj, err error) {
 	errors.TodoP4("add bez in a better way")

@@ -1,4 +1,4 @@
-package metadatei
+package sku
 
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"

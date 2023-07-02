@@ -1,20 +1,21 @@
-package metadatei
+package sku
 
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
 
 type WithKennungLike interface {
 	GetKennungLike() kennung.Kennung
-	Getter
+	metadatei.Getter
 }
 
 type WithKennungPtrLike interface {
 	WithKennungLike
-	GetterPtr
-	Setter
+	metadatei.GetterPtr
+	metadatei.Setter
 }
 
 type WithKennungInterface struct {

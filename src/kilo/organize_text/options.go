@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/metadatei"
+	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/hotel/objekte_collections"
 	"github.com/friedenberg/zit/src/india/konfig"
 )
@@ -28,7 +28,7 @@ type Options struct {
 	Typ               kennung.Typ
 	GroupingEtiketten kennung.Slice
 	ExtraEtiketten    schnittstellen.Set[kennung.Etikett]
-	Transacted        schnittstellen.Set[metadatei.WithKennungInterface]
+	Transacted        schnittstellen.Set[sku.WithKennungInterface]
 
 	Expanders kennung.Abbr
 

@@ -10,12 +10,11 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
 
 // TODO-P2 move sku.Sku to sku.Transacted
 type Transacted[K kennung.KennungLike[K], KPtr kennung.KennungLikePtr[K]] struct {
-	WithKennung      metadatei.WithKennung[K, KPtr]
+	WithKennung      WithKennung[K, KPtr]
 	ObjekteSha       sha.Sha
 	TransactionIndex values.Int
 	Kopf             kennung.Tai
@@ -102,7 +101,7 @@ func (a Transacted[K, KPtr]) GetKennung() K {
 
 func (a Transacted[K, KPtr]) GetExternal() External[K, KPtr] {
 	return External[K, KPtr]{
-		WithKennung: metadatei.WithKennung[K, KPtr]{
+		WithKennung: WithKennung[K, KPtr]{
 			Kennung: a.WithKennung.Kennung,
 			Metadatei: Metadatei{
 				AkteSha: sha.Make(a.GetAkteSha()),
@@ -114,7 +113,7 @@ func (a Transacted[K, KPtr]) GetExternal() External[K, KPtr] {
 
 func (a *Transacted[K, KPtr]) Sku() Sku {
 	return Sku{
-		WithKennung: metadatei.WithKennungInterface{
+		WithKennung: WithKennungInterface{
 			Kennung: a.WithKennung.Kennung,
 			Metadatei: Metadatei{
 				Tai:     a.GetTai(),

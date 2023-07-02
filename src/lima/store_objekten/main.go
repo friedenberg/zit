@@ -11,7 +11,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/kennung_index"
-	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
@@ -339,7 +338,7 @@ func (s Store) Flush() (err error) {
 }
 
 func (s *Store) UpdateManyMetadatei(
-	incoming schnittstellen.Set[metadatei.WithKennungInterface],
+	incoming schnittstellen.Set[sku.WithKennungInterface],
 ) (err error) {
 	todo.Optimize() // parallelize
 	for _, umm := range s.metadateiUpdaters {

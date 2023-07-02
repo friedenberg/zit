@@ -378,7 +378,7 @@ func (s *zettelStore) Create(
 }
 
 func (s *zettelStore) UpdateManyMetadatei(
-	incoming schnittstellen.Set[metadatei.WithKennungInterface],
+	incoming schnittstellen.Set[sku.WithKennungInterface],
 ) (err error) {
 	if !s.StoreUtil.GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{
@@ -398,7 +398,7 @@ func (s *zettelStore) UpdateManyMetadatei(
 
 			k := ke.String()
 
-			var mwk metadatei.WithKennungInterface
+			var mwk sku.WithKennungInterface
 			ok := false
 
 			if mwk, ok = incoming.Get(k); !ok {
@@ -604,7 +604,7 @@ func (s *zettelStore) writeObjekte(
 
 	tz = &zettel.Transacted{
 		Sku: sku.Transacted[kennung.Hinweis, *kennung.Hinweis]{
-			WithKennung: metadatei.WithKennung[kennung.Hinweis, *kennung.Hinweis]{
+			WithKennung: sku.WithKennung[kennung.Hinweis, *kennung.Hinweis]{
 				Kennung:   h,
 				Metadatei: m,
 			},

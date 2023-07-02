@@ -10,12 +10,11 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
 
 type External[K kennung.KennungLike[K], KPtr kennung.KennungLikePtr[K]] struct {
 	ObjekteSha  sha.Sha
-	WithKennung metadatei.WithKennung[K, KPtr]
+	WithKennung WithKennung[K, KPtr]
 	FDs         ExternalFDs
 }
 
@@ -57,7 +56,7 @@ func (a *External[K, KPtr]) SetAkteSha(v schnittstellen.ShaLike) {
 
 func (a *External[K, KPtr]) Transacted() (b Transacted[K, KPtr]) {
 	b = Transacted[K, KPtr]{
-		WithKennung: metadatei.WithKennung[K, KPtr]{
+		WithKennung: WithKennung[K, KPtr]{
 			Kennung: a.GetKennung(),
 			Metadatei: Metadatei{
 				AkteSha: sha.Make(a.GetAkteSha()),

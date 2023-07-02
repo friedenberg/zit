@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/juliett/zettel"
@@ -39,9 +38,9 @@ func (c CommitOrganizeFile) Run(
 
 	sameTyp := a.Metadatei.Typ.Equals(b.Metadatei.Typ)
 
-	toUpdate := collections.MakeMutableSetStringer[metadatei.WithKennungInterface]()
+	toUpdate := collections.MakeMutableSetStringer[sku.WithKennungInterface]()
 
-	_ = func(hString string) (z metadatei.WithKennungInterface, err error) {
+	_ = func(hString string) (z sku.WithKennungInterface, err error) {
 		var h kennung.Hinweis
 
 		if h, err = store.GetAbbrStore().Hinweis().ExpandString(
@@ -105,7 +104,7 @@ func (c CommitOrganizeFile) Run(
 				m.Typ = b.Metadatei.Typ
 			}
 
-			mwk := metadatei.WithKennungInterface{
+			mwk := sku.WithKennungInterface{
 				Kennung:   k.KennungPtrClone(),
 				Metadatei: m,
 			}

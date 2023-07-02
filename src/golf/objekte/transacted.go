@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 )
 
@@ -173,12 +172,12 @@ func (a Transacted[T, T1, T2, T3]) GetTyp() (t kennung.Typ) {
 	return
 }
 
-func (a *Transacted[T, T1, T2, T3]) GetMetadateiWithKennung() (m metadatei.WithKennungInterface) {
+func (a *Transacted[T, T1, T2, T3]) GetMetadateiWithKennung() (m sku.WithKennungInterface) {
 	var k2 T2
 
 	T3(&k2).ResetWith(a.Sku.GetKennung())
 
-	m = metadatei.WithKennungInterface{
+	m = sku.WithKennungInterface{
 		Kennung:   T3(&k2),
 		Metadatei: a.GetMetadatei(),
 	}

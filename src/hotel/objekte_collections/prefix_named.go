@@ -4,7 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/metadatei"
+	"github.com/friedenberg/zit/src/foxtrot/sku"
 )
 
 type SetPrefixVerzeichnisse struct {
@@ -27,7 +27,7 @@ func (s SetPrefixVerzeichnisse) Len() int {
 }
 
 // this splits on right-expanded
-func (s *SetPrefixVerzeichnisse) Add(z metadatei.WithKennungInterface) (err error) {
+func (s *SetPrefixVerzeichnisse) Add(z sku.WithKennungInterface) (err error) {
 	es := kennung.Expanded(z.Metadatei.GetEtiketten(), kennung.ExpanderRight)
 
 	if es.Len() == 0 {
@@ -46,7 +46,7 @@ func (a SetPrefixVerzeichnisse) Subtract(b MutableSetMetadateiWithKennung) (c Se
 
 	for e, aSet := range a.innerMap {
 		aSet.Each(
-			func(z metadatei.WithKennungInterface) (err error) {
+			func(z sku.WithKennungInterface) (err error) {
 				if b.Contains(z) {
 					return
 				}
@@ -63,7 +63,7 @@ func (a SetPrefixVerzeichnisse) Subtract(b MutableSetMetadateiWithKennung) (c Se
 
 func (s *SetPrefixVerzeichnisse) addPair(
 	e kennung.Etikett,
-	z metadatei.WithKennungInterface,
+	z sku.WithKennungInterface,
 ) {
 	s.count += 1
 
@@ -94,12 +94,12 @@ func (a SetPrefixVerzeichnisse) Each(f func(kennung.Etikett, MutableSetMetadatei
 }
 
 func (a SetPrefixVerzeichnisse) EachZettel(
-	f func(kennung.Etikett, metadatei.WithKennungInterface) error,
+	f func(kennung.Etikett, sku.WithKennungInterface) error,
 ) error {
 	return a.Each(
 		func(e kennung.Etikett, st MutableSetMetadateiWithKennung) (err error) {
 			st.Each(
-				func(z metadatei.WithKennungInterface) (err error) {
+				func(z sku.WithKennungInterface) (err error) {
 					err = f(e, z)
 					return
 				},

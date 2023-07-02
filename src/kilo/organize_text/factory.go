@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/metadatei"
+	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/hotel/objekte_collections"
 )
 
@@ -114,7 +114,7 @@ func (atc Factory) makeChildren(
 		prefixSet.ToSet().Each(used.Add)
 
 		err = prefixSet.EachZettel(
-			func(e kennung.Etikett, tz metadatei.WithKennungInterface) (err error) {
+			func(e kennung.Etikett, tz sku.WithKennungInterface) (err error) {
 				var z obj
 
 				if z, err = makeObj(tz, atc.Expanders); err != nil {
@@ -139,7 +139,7 @@ func (atc Factory) makeChildren(
 	segments := prefixSet.Subset(groupingEtiketten[0])
 
 	err = segments.Ungrouped.Each(
-		func(tz metadatei.WithKennungInterface) (err error) {
+		func(tz sku.WithKennungInterface) (err error) {
 			var z obj
 
 			if z, err = makeObj(tz, atc.Expanders); err != nil {

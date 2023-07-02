@@ -4,6 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
+	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 )
 
@@ -92,7 +93,7 @@ type CheckedOutUpdater[
 
 type UpdaterManyMetadatei interface {
 	UpdateManyMetadatei(
-		schnittstellen.Set[metadatei.WithKennungInterface],
+		schnittstellen.Set[sku.WithKennungInterface],
 	) error
 }
 

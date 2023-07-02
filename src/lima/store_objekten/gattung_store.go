@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
@@ -196,7 +195,7 @@ func (s *commonStore[O, OPtr, K, KPtr]) CheckoutOne(
 }
 
 func (s *commonStore[O, OPtr, K, KPtr]) UpdateManyMetadatei(
-	incoming schnittstellen.Set[metadatei.WithKennungInterface],
+	incoming schnittstellen.Set[sku.WithKennungInterface],
 ) (err error) {
 	if !s.StoreUtil.GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{
@@ -207,7 +206,7 @@ func (s *commonStore[O, OPtr, K, KPtr]) UpdateManyMetadatei(
 	}
 
 	if err = incoming.Each(
-		func(mwk metadatei.WithKennungInterface) (err error) {
+		func(mwk sku.WithKennungInterface) (err error) {
 			var ke KPtr
 			ok := false
 

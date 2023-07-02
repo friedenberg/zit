@@ -11,11 +11,10 @@ import (
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
 
 type Sku struct {
-	WithKennung metadatei.WithKennungInterface
+	WithKennung WithKennungInterface
 	ObjekteSha  sha.Sha
 }
 
