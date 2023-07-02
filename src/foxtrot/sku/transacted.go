@@ -231,11 +231,11 @@ func (s Transacted[K, KPtr]) GetId() Kennung {
 	return KPtr(&s.WithKennung.Kennung)
 }
 
-func (s Transacted[K, KPtr]) GetObjekteSha() schnittstellen.Sha {
+func (s Transacted[K, KPtr]) GetObjekteSha() schnittstellen.ShaLike {
 	return s.ObjekteSha
 }
 
-func (s Transacted[K, KPtr]) GetAkteSha() schnittstellen.Sha {
+func (s Transacted[K, KPtr]) GetAkteSha() schnittstellen.ShaLike {
 	return s.WithKennung.Metadatei.AkteSha
 }
 

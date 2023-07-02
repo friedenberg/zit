@@ -196,7 +196,7 @@ func (c Diff) makeDo(
 func (c Diff) makeDoAkte(
 	w io.WriteCloser,
 	arf schnittstellen.AkteReaderFactory,
-	sh schnittstellen.Sha,
+	sh schnittstellen.ShaLike,
 ) schnittstellen.FuncError {
 	return func() (err error) {
 		defer errors.DeferredCloser(&err, w)

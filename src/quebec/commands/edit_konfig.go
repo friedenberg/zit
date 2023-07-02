@@ -59,7 +59,7 @@ func (c EditKonfig) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	var (
 		k  *erworben.Akte
-		sh schnittstellen.Sha
+		sh schnittstellen.ShaLike
 	)
 
 	if k, sh, err = c.readTempKonfigFile(u, p); err != nil {
@@ -120,7 +120,7 @@ func (c EditKonfig) makeTempKonfigFile(
 func (c EditKonfig) readTempKonfigFile(
 	u *umwelt.Umwelt,
 	p string,
-) (k *erworben.Akte, sh schnittstellen.Sha, err error) {
+) (k *erworben.Akte, sh schnittstellen.ShaLike, err error) {
 	var f *os.File
 
 	if f, err = files.Open(p); err != nil {

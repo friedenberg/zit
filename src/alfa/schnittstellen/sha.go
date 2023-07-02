@@ -2,34 +2,34 @@ package schnittstellen
 
 import "io"
 
-type Sha interface {
+type ShaLike interface {
 	// TODO-P3
 	// GetHashBytes() []byte
 	ValueLike
 	Korper
 	GetShaString() string
-	EqualsSha(Sha) bool
+	EqualsSha(ShaLike) bool
 	IsNull() bool
 	ShaGetter
 }
 
 type ShaGetter interface {
-	GetSha() Sha
+	GetSha() ShaLike
 }
 
 type ShaReadCloser interface {
 	io.WriterTo
 	io.ReadCloser
-	Sha() Sha
+	GetShaLike() ShaLike
 }
 
 type ShaWriteCloser interface {
 	io.ReaderFrom
 	io.WriteCloser
-	Sha() Sha
+	GetShaLike() ShaLike
 }
 
 type (
-	FuncShaReadCloser  func(Sha) (ShaReadCloser, error)
-	FuncShaWriteCloser func(Sha) (ShaWriteCloser, error)
+	FuncShaReadCloser  func(ShaLike) (ShaReadCloser, error)
+	FuncShaWriteCloser func(ShaLike) (ShaWriteCloser, error)
 )

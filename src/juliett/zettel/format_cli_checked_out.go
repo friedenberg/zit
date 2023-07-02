@@ -17,7 +17,7 @@ func MakeCliFormatCheckedOut(
 	s standort.Standort,
 	cw format.FuncColorWriter,
 	hf schnittstellen.FuncWriterFormat[kennung.Hinweis],
-	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
+	sf schnittstellen.FuncWriterFormat[schnittstellen.ShaLike],
 	mf schnittstellen.FuncWriterFormat[metadatei.GetterPtr],
 ) schnittstellen.FuncWriterFormat[CheckedOut] {
 	wzef := makeWriterFuncZettel(
@@ -49,7 +49,7 @@ func makeWriterFuncZettel(
 	s standort.Standort,
 	cw format.FuncColorWriter,
 	hf schnittstellen.FuncWriterFormat[kennung.Hinweis],
-	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
+	sf schnittstellen.FuncWriterFormat[schnittstellen.ShaLike],
 	mf schnittstellen.FuncWriterFormat[metadatei.GetterPtr],
 ) schnittstellen.FuncWriterFormat[CheckedOut] {
 	return func(w io.Writer, z CheckedOut) (n int64, err error) {
@@ -76,7 +76,7 @@ func makeWriterFuncAkte(
 	s standort.Standort,
 	cw format.FuncColorWriter,
 	hf schnittstellen.FuncWriterFormat[kennung.Hinweis],
-	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
+	sf schnittstellen.FuncWriterFormat[schnittstellen.ShaLike],
 	mf schnittstellen.FuncWriterFormat[metadatei.GetterPtr],
 ) schnittstellen.FuncWriterFormat[CheckedOut] {
 	return func(w io.Writer, z CheckedOut) (n int64, err error) {

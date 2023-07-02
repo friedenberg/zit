@@ -114,7 +114,7 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateCheckedOut(
 		return
 	}
 
-	os := sha.Make(ow.Sha())
+	os := sha.Make(ow.GetShaLike())
 	transactedPtr.Sku.ObjekteSha = os
 
 	if transactedPtr.GetObjekteSha().EqualsSha(co.Internal.GetObjekteSha()) {
@@ -210,7 +210,7 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdate(
 		return
 	}
 
-	transactedPtr.Sku.ObjekteSha = sha.Make(ow.Sha())
+	transactedPtr.Sku.ObjekteSha = sha.Make(ow.GetShaLike())
 
 	if mutter != nil &&
 		transactedPtr.Sku.GetKennung().Equals(mutter.Sku.GetKennung()) &&
@@ -249,7 +249,7 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateAkte(
 	objektePtr T1,
 	mg metadatei.Getter,
 	kennungPtr T3,
-	sh schnittstellen.Sha,
+	sh schnittstellen.ShaLike,
 ) (transactedPtr *objekte.Transacted[T, T1, T2, T3], err error) {
 	if !cou.ls.IsAcquired() {
 		err = ErrLockRequired{
@@ -317,7 +317,7 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateAkte(
 		return
 	}
 
-	transactedPtr.Sku.ObjekteSha = sha.Make(ow.Sha())
+	transactedPtr.Sku.ObjekteSha = sha.Make(ow.GetShaLike())
 
 	if mutter != nil &&
 		transactedPtr.Sku.GetKennung().Equals(mutter.Sku.GetKennung()) &&

@@ -18,7 +18,7 @@ import (
 
 type KonfigStore interface {
 	GetAkteFormat() objekte.AkteFormat[erworben.Akte, *erworben.Akte]
-	Update(*erworben.Akte, schnittstellen.Sha) (*erworben.Transacted, error)
+	Update(*erworben.Akte, schnittstellen.ShaLike) (*erworben.Transacted, error)
 
 	CommonStoreBase[
 		erworben.Akte,
@@ -95,7 +95,7 @@ func (s konfigStore) updateOne(t *erworben.Transacted) (err error) {
 
 func (s konfigStore) Update(
 	ko *erworben.Akte,
-	sh schnittstellen.Sha,
+	sh schnittstellen.ShaLike,
 ) (kt *erworben.Transacted, err error) {
 	if !s.StoreUtil.GetLockSmith().IsAcquired() {
 		err = errors.Wrap(
@@ -146,7 +146,7 @@ func (s konfigStore) Update(
 		return
 	}
 
-	kt.Sku.ObjekteSha = sha.Make(ow.Sha())
+	kt.Sku.ObjekteSha = sha.Make(ow.GetShaLike())
 	mutterObjekteSha := mutter.GetObjekteSha()
 
 	if mutter != nil && kt.GetObjekteSha().EqualsSha(mutterObjekteSha) {
@@ -344,7 +344,7 @@ func (s konfigStore) ReadOne(
 
 			fo := s.akteFormat
 
-			var sh schnittstellen.Sha
+			var sh schnittstellen.ShaLike
 
 			if sh, _, err = fo.ParseSaveAkte(r, &tt.Akte); err != nil {
 				err = errors.Wrap(err)

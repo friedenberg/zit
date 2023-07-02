@@ -121,11 +121,11 @@ func (a Sku) GetGattung() schnittstellen.GattungLike {
 	return a.WithKennung.Metadatei.Gattung
 }
 
-func (a Sku) GetObjekteSha() schnittstellen.Sha {
+func (a Sku) GetObjekteSha() schnittstellen.ShaLike {
 	return a.ObjekteSha
 }
 
-func (a Sku) GetAkteSha() schnittstellen.Sha {
+func (a Sku) GetAkteSha() schnittstellen.ShaLike {
 	return a.WithKennung.Metadatei.AkteSha
 }
 

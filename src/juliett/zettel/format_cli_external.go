@@ -16,7 +16,7 @@ func MakeCliFormat(
 	s standort.Standort,
 	cw format.FuncColorWriter,
 	hf schnittstellen.FuncWriterFormat[kennung.Hinweis],
-	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
+	sf schnittstellen.FuncWriterFormat[schnittstellen.ShaLike],
 	mf schnittstellen.FuncWriterFormat[metadatei.GetterPtr],
 ) schnittstellen.FuncWriterFormat[External] {
 	return func(w io.Writer, z External) (n int64, err error) {
@@ -36,7 +36,7 @@ func MakeCliFormat(
 				format.MakeFormatString("["),
 				cw(s.MakeWriterRelativePath(z.GetAkteFD().Path), format.ColorTypePointer),
 				format.MakeFormatString("@"),
-				format.MakeWriter(sf, schnittstellen.Sha(z.GetAkteSha())),
+				format.MakeWriter(sf, schnittstellen.ShaLike(z.GetAkteSha())),
 				format.MakeFormatString("]"),
 			)
 
@@ -47,7 +47,7 @@ func MakeCliFormat(
 				format.MakeFormatString("["),
 				cw(s.MakeWriterRelativePath(z.GetAkteFD().Path), format.ColorTypePointer),
 				format.MakeFormatString("@"),
-				format.MakeWriter(sf, schnittstellen.Sha(z.GetAkteSha())),
+				format.MakeWriter(sf, schnittstellen.ShaLike(z.GetAkteSha())),
 				format.MakeFormatString(" "),
 				format.MakeWriter[metadatei.GetterPtr](mf, &z),
 				format.MakeFormatString("]"),

@@ -10,7 +10,7 @@ import (
 // (unchanged|updated) [konfig@sha]
 func MakeCliFormatTransacted(
 	cw format.FuncColorWriter,
-	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
+	sf schnittstellen.FuncWriterFormat[schnittstellen.ShaLike],
 ) schnittstellen.FuncWriterFormat[Transacted] {
 	return func(w io.Writer, kt Transacted) (n int64, err error) {
 		return format.Write(

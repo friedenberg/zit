@@ -123,7 +123,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 				return
 			}
 
-			zettels[i].SetAkteSha(ow.Sha())
+			zettels[i].SetAkteSha(ow.GetShaLike())
 
 		case shaError == nil:
 			zettels[i].SetAkteSha(as)

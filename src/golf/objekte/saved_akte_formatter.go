@@ -22,7 +22,7 @@ func MakeSavedAkteFormatter(
 
 func (f savedAkteFormatter) FormatSavedAkte(
 	w io.Writer,
-	sh schnittstellen.Sha,
+	sh schnittstellen.ShaLike,
 ) (n int64, err error) {
 	var ar sha.ReadCloser
 

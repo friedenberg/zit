@@ -57,7 +57,7 @@ func MakeFile(
 		return
 	}
 
-	ut.Sha = sha.Make(aw.Sha())
+	ut.Sha = sha.Make(aw.GetShaLike())
 
 	return
 }

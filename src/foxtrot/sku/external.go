@@ -45,11 +45,11 @@ func (a External[K, KPtr]) String() string {
 	)
 }
 
-func (a External[K, KPtr]) GetAkteSha() schnittstellen.Sha {
+func (a External[K, KPtr]) GetAkteSha() schnittstellen.ShaLike {
 	return a.WithKennung.Metadatei.AkteSha
 }
 
-func (a *External[K, KPtr]) SetAkteSha(v schnittstellen.Sha) {
+func (a *External[K, KPtr]) SetAkteSha(v schnittstellen.ShaLike) {
 	sh := sha.Make(v)
 	a.WithKennung.Metadatei.AkteSha = sh
 	a.FDs.Akte.Sha = sh

@@ -32,7 +32,7 @@ func MakeReaderAkteParseSaver[
 func (f readerAkteParseSaver[O, OPtr]) ParseSaveAkte(
 	r io.Reader,
 	t OPtr,
-) (sh schnittstellen.Sha, n int64, err error) {
+) (sh schnittstellen.ShaLike, n int64, err error) {
 	var aw sha.WriteCloser
 
 	if aw, err = f.awf.AkteWriter(); err != nil {
@@ -44,7 +44,7 @@ func (f readerAkteParseSaver[O, OPtr]) ParseSaveAkte(
 
 	var (
 		n1  int64
-		sh1 schnittstellen.Sha
+		sh1 schnittstellen.ShaLike
 	)
 
 	pr, pw := io.Pipe()
@@ -97,7 +97,7 @@ func (f readerAkteParseSaver[O, OPtr]) ParseSaveAkte(
 		return
 	}
 
-	sh = aw.Sha()
+	sh = aw.GetShaLike()
 
 	if !sh.EqualsSha(sh1) {
 		err = errors.Errorf(

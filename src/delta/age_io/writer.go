@@ -79,7 +79,7 @@ func (w *writer) Close() (err error) {
 	return
 }
 
-func (w *writer) Sha() (s schnittstellen.Sha) {
+func (w *writer) GetShaLike() (s schnittstellen.ShaLike) {
 	s = sha.FromHash(w.hash)
 
 	return

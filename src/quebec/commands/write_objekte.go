@@ -133,5 +133,5 @@ func (c WriteObjekte) doOne(
 		return
 	}
 
-	errors.Out().Printf("%s %s", wc.Sha(), p)
+	errors.Out().Printf("%s %s", wc.GetShaLike(), p)
 }

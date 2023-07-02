@@ -20,7 +20,7 @@ type formatAkte struct {
 func (f formatAkte) ParseSaveAkte(
 	r1 io.Reader,
 	o *Akte,
-) (sh schnittstellen.Sha, n int64, err error) {
+) (sh schnittstellen.ShaLike, n int64, err error) {
 	var aw sha.WriteCloser
 
 	if aw, err = f.af.AkteWriter(); err != nil {
@@ -42,7 +42,7 @@ func (f formatAkte) ParseSaveAkte(
 		return
 	}
 
-	sh = aw.Sha()
+	sh = aw.GetShaLike()
 
 	return
 }

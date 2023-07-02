@@ -100,7 +100,7 @@ func (r readCloser) Close() (err error) {
 	return
 }
 
-func (r readCloser) Sha() schnittstellen.Sha {
+func (r readCloser) GetShaLike() schnittstellen.ShaLike {
 	return FromHash(r.hash)
 }
 
@@ -118,7 +118,7 @@ func (nrc nopReadCloser) WriteTo(w io.Writer) (n int64, err error) {
 	return io.Copy(w, nrc.ReadCloser)
 }
 
-func (nrc nopReadCloser) Sha() schnittstellen.Sha {
+func (nrc nopReadCloser) GetShaLike() schnittstellen.ShaLike {
 	return Sha{}
 }
 
@@ -165,7 +165,7 @@ func (w *nopWriter) Close() (err error) {
 	return
 }
 
-func (w *nopWriter) Sha() (s schnittstellen.Sha) {
+func (w *nopWriter) GetShaLike() (s schnittstellen.ShaLike) {
 	s = FromHash(w.hash)
 
 	return

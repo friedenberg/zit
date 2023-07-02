@@ -12,7 +12,7 @@ type AkteTextSaver[
 	T objekte.Akte[T],
 	T1 objekte.AktePtr[T],
 ] interface {
-	SaveAkteText(T) (schnittstellen.Sha, int64, error)
+	SaveAkteText(T) (schnittstellen.ShaLike, int64, error)
 }
 
 type akteTextSaver[
@@ -38,7 +38,7 @@ func MakeAkteTextSaver[
 
 func (h akteTextSaver[T, T1]) SaveAkteText(
 	o T,
-) (sh schnittstellen.Sha, n int64, err error) {
+) (sh schnittstellen.ShaLike, n int64, err error) {
 	var w sha.WriteCloser
 
 	if w, err = h.awf.AkteWriter(); err != nil {
@@ -53,7 +53,7 @@ func (h akteTextSaver[T, T1]) SaveAkteText(
 		return
 	}
 
-	sh = sha.Make(w.Sha())
+	sh = sha.Make(w.GetShaLike())
 
 	return
 }

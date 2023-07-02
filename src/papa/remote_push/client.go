@@ -92,7 +92,7 @@ func (c client) SendNeededSkus(filter kennung.MetaSet) (err error) {
 
 func (c *client) ObjekteWriter(
 	g schnittstellen.GattungGetter,
-	sh schnittstellen.Sha,
+	sh schnittstellen.ShaLike,
 ) (rc sha.ReadCloser, err error) {
 	var d remote_conn.Dialogue
 

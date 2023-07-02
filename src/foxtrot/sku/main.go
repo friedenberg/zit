@@ -17,8 +17,8 @@ type DataIdentity interface {
 	GetTai() kennung.Tai
 	GetId() Kennung
 	schnittstellen.GattungGetter
-	GetObjekteSha() schnittstellen.Sha
-	GetAkteSha() schnittstellen.Sha
+	GetObjekteSha() schnittstellen.ShaLike
+	GetAkteSha() schnittstellen.ShaLike
 }
 
 type DataIdentityGetter interface {

@@ -110,7 +110,7 @@ func FDFromPathWithAkteWriterFactory(
 	}
 
 	fd.Path = p
-	fd.Sha = sha.Make(akteWriter.Sha())
+	fd.Sha = sha.Make(akteWriter.GetShaLike())
 
 	return
 }

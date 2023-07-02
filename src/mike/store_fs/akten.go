@@ -102,7 +102,7 @@ func (s Store) AkteShaFromPath(p string) (sh sha.Sha, err error) {
 		return
 	}
 
-	sh = sha.Make(aw.Sha())
+	sh = sha.Make(aw.GetShaLike())
 
 	return
 }

@@ -128,15 +128,15 @@ func (e External[T, T1, T2, T3]) GetAktePath() string {
 	return e.Sku.FDs.Akte.Path
 }
 
-func (e External[T, T1, T2, T3]) GetObjekteSha() schnittstellen.Sha {
+func (e External[T, T1, T2, T3]) GetObjekteSha() schnittstellen.ShaLike {
 	return e.Sku.ObjekteSha
 }
 
-func (t External[T, T1, T2, T3]) GetFDAkteSha() schnittstellen.Sha {
+func (t External[T, T1, T2, T3]) GetFDAkteSha() schnittstellen.ShaLike {
 	return t.Sku.FDs.Akte.Sha
 }
 
-func (t External[T, T1, T2, T3]) GetAkteSha() schnittstellen.Sha {
+func (t External[T, T1, T2, T3]) GetAkteSha() schnittstellen.ShaLike {
 	return t.Sku.GetAkteSha()
 }
 
@@ -145,7 +145,7 @@ func (e *External[T, T1, T2, T3]) SetAkteFD(fd kennung.FD) {
 	e.SetAkteSha(fd.Sha)
 }
 
-func (e *External[T, T1, T2, T3]) SetAkteSha(v schnittstellen.Sha) {
+func (e *External[T, T1, T2, T3]) SetAkteSha(v schnittstellen.ShaLike) {
 	sh := sha.Make(v)
 	e.GetMetadateiPtr().AkteSha = sh
 	e.Sku.SetAkteSha(sh)
@@ -156,7 +156,7 @@ func (e External[T, T1, T2, T3]) ObjekteSha() sha.Sha {
 }
 
 func (e *External[T, T1, T2, T3]) SetObjekteSha(
-	sh schnittstellen.Sha,
+	sh schnittstellen.ShaLike,
 ) {
 	e.Sku.ObjekteSha = sha.Make(sh)
 }

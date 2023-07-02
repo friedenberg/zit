@@ -134,7 +134,7 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 	); err != nil {
 		err = nil
 
-		var sh schnittstellen.Sha
+		var sh schnittstellen.ShaLike
 
 		if sh, _, err = u.StoreObjekten().Typ().SaveAkteText(
 			defaultTyp,
@@ -173,7 +173,7 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 			return
 		}
 
-		sh := sha.Make(aw.Sha())
+		sh := sha.Make(aw.GetShaLike())
 
 		if _, err = u.StoreObjekten().Konfig().Update(
 			&defaultKonfig,

@@ -84,14 +84,14 @@ func (h storedParserSaver[O, OPtr, K, KPtr]) ParseSaveStored(
 
 	defer errors.DeferredCloser(&err, r)
 
-	var akteSha schnittstellen.Sha
+	var akteSha schnittstellen.ShaLike
 
 	if akteSha, _, err = h.readAkte(r, &t.Akte); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	readerSha := sha.Make(r.Sha())
+	readerSha := sha.Make(r.GetShaLike())
 
 	if !readerSha.EqualsSha(akteSha) {
 		err = errors.Errorf(
@@ -116,7 +116,7 @@ func (h storedParserSaver[O, OPtr, K, KPtr]) ParseSaveStored(
 func (h storedParserSaver[O, OPtr, K, KPtr]) readAkte(
 	r sha.ReadCloser,
 	o OPtr,
-) (sh schnittstellen.Sha, n int64, err error) {
+) (sh schnittstellen.ShaLike, n int64, err error) {
 	if sh, n, err = h.akteParser.ParseSaveAkte(r, o); err != nil {
 		err = errors.Wrap(err)
 		return

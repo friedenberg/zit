@@ -11,7 +11,7 @@ import (
 
 func MakeCliFormatTransactedLikePtr(
 	hf schnittstellen.FuncWriterFormat[kennung.Kennung],
-	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
+	sf schnittstellen.FuncWriterFormat[schnittstellen.ShaLike],
 	mf schnittstellen.FuncWriterFormat[metadatei.GetterPtr],
 ) schnittstellen.FuncWriterFormat[TransactedLikePtr] {
 	return func(w io.Writer, z TransactedLikePtr) (n int64, err error) {

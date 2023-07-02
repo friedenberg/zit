@@ -13,7 +13,7 @@ import (
 // [kopf/schwanz@sha !typ]
 func MakeCliFormatTransacted(
 	hf schnittstellen.FuncWriterFormat[kennung.Hinweis],
-	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
+	sf schnittstellen.FuncWriterFormat[schnittstellen.ShaLike],
 	mf schnittstellen.FuncWriterFormat[metadatei.GetterPtr],
 ) schnittstellen.FuncWriterFormat[Transacted] {
 	return func(w io.Writer, z Transacted) (n int64, err error) {

@@ -71,7 +71,7 @@ func (m *Mover) Close() (err error) {
 		return
 	}
 
-	sh := m.Writer.Sha()
+	sh := m.Writer.GetShaLike()
 
 	if m.objektePath == "" {
 		// TODO-P3 move this validation to options

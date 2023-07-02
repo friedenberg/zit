@@ -13,14 +13,14 @@ type ObjektePtr[T any] interface {
 
 type Stored interface {
 	GattungGetter
-	GetAkteSha() Sha
-	GetObjekteSha() Sha
+	GetAkteSha() ShaLike
+	GetObjekteSha() ShaLike
 }
 
 type StoredPtr interface {
 	Stored
-	SetAkteSha(Sha)
-	SetObjekteSha(Sha)
+	SetAkteSha(ShaLike)
+	SetObjekteSha(ShaLike)
 }
 
 type Transacted[T any] interface {

@@ -27,7 +27,7 @@ func MakeCliFormat(
 func MakeCliFormatCheckedOut(
 	s standort.Standort,
 	cw format.FuncColorWriter,
-	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
+	sf schnittstellen.FuncWriterFormat[schnittstellen.ShaLike],
 	tf schnittstellen.FuncWriterFormat[kennung.Kasten],
 ) schnittstellen.FuncWriterFormat[CheckedOut] {
 	return func(w io.Writer, t CheckedOut) (n int64, err error) {
@@ -51,7 +51,7 @@ func MakeCliFormatCheckedOut(
 func MakeCliFormatExternal(
 	s standort.Standort,
 	cw format.FuncColorWriter,
-	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
+	sf schnittstellen.FuncWriterFormat[schnittstellen.ShaLike],
 	tf schnittstellen.FuncWriterFormat[kennung.Kasten],
 ) schnittstellen.FuncWriterFormat[External] {
 	return func(w io.Writer, t External) (n int64, err error) {
@@ -76,7 +76,7 @@ func MakeCliFormatExternal(
 func MakeCliFormatTransacted(
 	s standort.Standort,
 	cw format.FuncColorWriter,
-	sf schnittstellen.FuncWriterFormat[schnittstellen.Sha],
+	sf schnittstellen.FuncWriterFormat[schnittstellen.ShaLike],
 	tf schnittstellen.FuncWriterFormat[kennung.Kasten],
 ) schnittstellen.FuncWriterFormat[Transacted] {
 	return func(w io.Writer, t Transacted) (n int64, err error) {

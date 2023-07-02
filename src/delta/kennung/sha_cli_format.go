@@ -13,8 +13,8 @@ import (
 func MakeShaCliFormat(
 	cw format.FuncColorWriter,
 	a func(sha.Sha) (string, error),
-) schnittstellen.FuncWriterFormat[schnittstellen.Sha] {
-	return func(w io.Writer, s schnittstellen.Sha) (n int64, err error) {
+) schnittstellen.FuncWriterFormat[schnittstellen.ShaLike] {
+	return func(w io.Writer, s schnittstellen.ShaLike) (n int64, err error) {
 		v := s.String()
 
 		if a != nil {

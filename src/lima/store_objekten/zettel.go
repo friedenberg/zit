@@ -240,7 +240,7 @@ func (s *zettelStore) readOneExternalAkte(
 		return
 	}
 
-	sh := sha.Make(aw.Sha())
+	sh := sha.Make(aw.GetShaLike())
 	ez.SetAkteSha(sh)
 
 	if err = s.SaveObjekte(ez); err != nil {

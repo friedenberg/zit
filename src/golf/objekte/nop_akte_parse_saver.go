@@ -28,7 +28,7 @@ func MakeNopAkteParseSaver[
 func (f nopAkteParseSaver[O, OPtr]) ParseSaveAkte(
 	r io.Reader,
 	t OPtr,
-) (sh schnittstellen.Sha, n int64, err error) {
+) (sh schnittstellen.ShaLike, n int64, err error) {
 	var aw sha.WriteCloser
 
 	if aw, err = f.awf.AkteWriter(); err != nil {
@@ -43,7 +43,7 @@ func (f nopAkteParseSaver[O, OPtr]) ParseSaveAkte(
 		return
 	}
 
-	sh = aw.Sha()
+	sh = aw.GetShaLike()
 
 	return
 }

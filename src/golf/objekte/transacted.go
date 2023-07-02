@@ -41,19 +41,19 @@ func (t *Transacted[T, T1, T2, T3]) SetMetadatei(
 	t.SetTai(m.Tai)
 }
 
-func (t Transacted[T, T1, T2, T3]) GetAkteSha() schnittstellen.Sha {
+func (t Transacted[T, T1, T2, T3]) GetAkteSha() schnittstellen.ShaLike {
 	return t.Sku.WithKennung.Metadatei.AkteSha
 }
 
 func (t *Transacted[T, T1, T2, T3]) SetAkteSha(
-	s schnittstellen.Sha,
+	s schnittstellen.ShaLike,
 ) {
 	sh := sha.Make(s)
 	t.GetMetadateiPtr().AkteSha = sh
 	t.Sku.WithKennung.Metadatei.AkteSha = sh
 }
 
-func (t Transacted[T, T1, T2, T3]) GetObjekteSha() schnittstellen.Sha {
+func (t Transacted[T, T1, T2, T3]) GetObjekteSha() schnittstellen.ShaLike {
 	if !t.GetAkteSha().IsNull() && t.Sku.ObjekteSha.IsNull() {
 		errors.Todo(
 			"objekte sha is null while akte sha is %s",
@@ -65,7 +65,7 @@ func (t Transacted[T, T1, T2, T3]) GetObjekteSha() schnittstellen.Sha {
 }
 
 func (t *Transacted[T, T1, T2, T3]) SetObjekteSha(
-	sh schnittstellen.Sha,
+	sh schnittstellen.ShaLike,
 ) {
 	t.Sku.ObjekteSha = sha.Make(sh)
 }

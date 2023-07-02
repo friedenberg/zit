@@ -49,7 +49,7 @@ func (s *commonStore[O, OPtr, K, KPtr]) ReadOneExternal(
 
 	defer errors.DeferredCloser(&err, ar)
 
-	var akteSha schnittstellen.Sha
+	var akteSha schnittstellen.ShaLike
 
 	if akteSha, _, err = s.AkteFormat.ParseSaveAkte(ar, &e.Akte); err != nil {
 		err = errors.Wrap(err)
@@ -99,7 +99,7 @@ func (s *commonStore[O, OPtr, K, KPtr]) readOneExternalAkte(
 		return
 	}
 
-	sh := sha.Make(aw.Sha())
+	sh := sha.Make(aw.GetShaLike())
 	e.SetAkteSha(sh)
 
 	if err = s.SaveObjekte(e); err != nil {

@@ -59,7 +59,7 @@ func (u *Umwelt) FormatIdLike() schnittstellen.FuncWriterFormat[kennung.Kennung]
 
 func (u *Umwelt) FormatSha(
 	a func(sha.Sha) (string, error),
-) schnittstellen.FuncWriterFormat[schnittstellen.Sha] {
+) schnittstellen.FuncWriterFormat[schnittstellen.ShaLike] {
 	return kennung.MakeShaCliFormat(u.FormatColorWriter(), a)
 }
 

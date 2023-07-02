@@ -110,7 +110,7 @@ func (f textParser) ParseMetadatei(
 
 	n += n1
 
-	inlineAkteSha := sha.Make(akteWriter.Sha())
+	inlineAkteSha := sha.Make(akteWriter.GetShaLike())
 
 	if !m.AkteSha.IsNull() && !akteFD.Sha.IsNull() {
 		err = errors.Wrap(ErrHasInlineAkteAndFilePath{

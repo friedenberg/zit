@@ -15,7 +15,7 @@ type (
 	}
 
 	SavedAkteFormatter interface {
-		FormatSavedAkte(io.Writer, schnittstellen.Sha) (int64, error)
+		FormatSavedAkte(io.Writer, schnittstellen.ShaLike) (int64, error)
 	}
 
 	ParsedAkteFormatter[T any] interface {
@@ -23,7 +23,7 @@ type (
 	}
 
 	AkteParseSaver[T any] interface {
-		ParseSaveAkte(io.Reader, T) (schnittstellen.Sha, int64, error)
+		ParseSaveAkte(io.Reader, T) (schnittstellen.ShaLike, int64, error)
 	}
 
 	AkteFormat[T any, TPtr schnittstellen.Ptr[T]] interface {

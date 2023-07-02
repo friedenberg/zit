@@ -22,7 +22,7 @@ type Store interface {
 	AkteTextSaver
 	Create(*Akte) error
 	objekte_store.LastReader[Transacted]
-	objekte_store.OneReader[schnittstellen.Sha, *Transacted]
+	objekte_store.OneReader[schnittstellen.ShaLike, *Transacted]
 	objekte_store.AllReader[*Transacted]
 }
 
@@ -91,7 +91,7 @@ func (s *store) Create(o *Akte) (err error) {
 		return
 	}
 
-	var sh schnittstellen.Sha
+	var sh schnittstellen.ShaLike
 
 	if sh, _, err = s.SaveAkteText(*o); err != nil {
 		err = errors.Wrap(err)
@@ -128,7 +128,7 @@ func (s *store) readOnePath(p string) (o *Transacted, err error) {
 	return
 }
 
-func (s *store) ReadOne(sh schnittstellen.Sha) (o *Transacted, err error) {
+func (s *store) ReadOne(sh schnittstellen.ShaLike) (o *Transacted, err error) {
 	var or sha.ReadCloser
 
 	if or, err = s.of.ObjekteReader(sh); err != nil {
@@ -160,7 +160,7 @@ func (s *store) ReadOne(sh schnittstellen.Sha) (o *Transacted, err error) {
 
 	defer errors.DeferredCloser(&err, ar)
 
-	var akteSha schnittstellen.Sha
+	var akteSha schnittstellen.ShaLike
 
 	if akteSha, _, err = s.formatAkte.ParseSaveAkte(ar, &o.Akte); err != nil {
 		err = errors.Wrap(err)

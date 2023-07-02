@@ -36,7 +36,7 @@ func MakeHashWriter() (h hash.Hash) {
 	return
 }
 
-func Make(s schnittstellen.Sha) Sha {
+func Make(s schnittstellen.ShaLike) Sha {
 	return s.(Sha)
 }
 
@@ -147,7 +147,7 @@ func (s *Sha) Set(v string) (err error) {
 	return
 }
 
-func (s Sha) GetSha() schnittstellen.Sha {
+func (s Sha) GetSha() schnittstellen.ShaLike {
 	return s
 }
 
@@ -175,7 +175,7 @@ func (a Sha) EqualsAny(b any) bool {
 	return values.Equals(a, b)
 }
 
-func (a Sha) EqualsSha(b schnittstellen.Sha) bool {
+func (a Sha) EqualsSha(b schnittstellen.ShaLike) bool {
 	return a.GetShaString() == b.GetShaString()
 }
 
@@ -191,7 +191,7 @@ func (s *Sha) ResetWith(s1 Sha) {
 	s.value = s1.value
 }
 
-func (s *Sha) ResetWithShaLike(s1 schnittstellen.Sha) {
+func (s *Sha) ResetWithShaLike(s1 schnittstellen.ShaLike) {
 	s.value = s1.GetShaString()
 }
 

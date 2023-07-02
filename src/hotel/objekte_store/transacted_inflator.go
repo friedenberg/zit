@@ -167,7 +167,7 @@ func (h *transactedInflator[T, T1, T2, T3]) StoreAkte(
 		return
 	}
 
-	t.SetAkteSha(aw.Sha())
+	t.SetAkteSha(aw.GetShaLike())
 
 	return
 }
@@ -192,7 +192,7 @@ func (h *transactedInflator[T, T1, T2, T3]) StoreObjekte(
 		return
 	}
 
-	t.Sku.ObjekteSha = sha.Make(ow.Sha())
+	t.Sku.ObjekteSha = sha.Make(ow.GetShaLike())
 	t.SetAkteSha(t.GetAkteSha())
 
 	return
@@ -243,7 +243,7 @@ func (h *transactedInflator[T, T1, T2, T3]) readObjekte(
 		return
 	}
 
-	t.Sku.ObjekteSha = sha.Make(r.Sha())
+	t.Sku.ObjekteSha = sha.Make(r.GetShaLike())
 
 	if !t.Sku.ObjekteSha.EqualsSha(sk.GetObjekteSha()) {
 		errors.Todo(
@@ -282,7 +282,7 @@ func (h *transactedInflator[T, T1, T2, T3]) readAkte(
 
 	var (
 		n  int64
-		sh schnittstellen.Sha
+		sh schnittstellen.ShaLike
 	)
 
 	if sh, n, err = h.akteFormat.ParseSaveAkte(r, &t.Akte); err != nil {

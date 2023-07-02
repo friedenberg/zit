@@ -10,7 +10,7 @@ import (
 type TransactedLike interface {
 	metadatei.Getter
 	GetKennung() kennung.Kennung
-	GetAkteSha() schnittstellen.Sha
+	GetAkteSha() schnittstellen.ShaLike
 	GetSku() sku.Sku
 	GetSkuLike() sku.SkuLike
 	kennung.Matchable
@@ -29,9 +29,9 @@ type TransactedLikePtr interface {
 type StoredLikePtr interface {
 	metadatei.Getter
 	metadatei.Setter
-	GetAkteSha() schnittstellen.Sha
-	SetAkteSha(schnittstellen.Sha)
-	SetObjekteSha(schnittstellen.Sha)
+	GetAkteSha() schnittstellen.ShaLike
+	SetAkteSha(schnittstellen.ShaLike)
+	SetObjekteSha(schnittstellen.ShaLike)
 	GetKennung() kennung.Kennung
 }
 

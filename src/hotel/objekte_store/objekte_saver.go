@@ -19,7 +19,7 @@ type objekteSaver struct {
 }
 
 func MakeObjekteSaver(
-	//TODO add objekte index
+	// TODO-P1 add objekte index
 	writerFactory schnittstellen.ObjekteWriterFactory,
 	pmf objekte_format.Format,
 ) ObjekteSaver {
@@ -54,7 +54,7 @@ func (h objekteSaver) SaveObjekte(
 		return
 	}
 
-	sh := sha.Make(w.Sha())
+	sh := sha.Make(w.GetShaLike())
 
 	tl.SetObjekteSha(sh)
 
@@ -84,7 +84,7 @@ func (h objekteSaver) SaveObjekteIncludeTai(
 		return
 	}
 
-	sh := sha.Make(w.Sha())
+	sh := sha.Make(w.GetShaLike())
 
 	tl.SetObjekteSha(sh)
 
