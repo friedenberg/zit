@@ -12,7 +12,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
@@ -81,8 +80,6 @@ func (zp *Page) Add(z *zettel.Transacted) (err error) {
 		err = errors.Errorf("trying to add nil zettel")
 		return
 	}
-
-	objekte.AssertAkteShasMatch(z)
 
 	if err = zp.addFilter(z); err != nil {
 		if collections.IsStopIteration(err) {
@@ -187,8 +184,6 @@ func (zp *Page) copy(
 					return
 				}
 			}
-
-			objekte.CorrectAkteSha(tz)
 
 			return
 		},

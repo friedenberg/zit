@@ -132,16 +132,11 @@ func (e External[T, T1, T2, T3]) GetObjekteSha() schnittstellen.Sha {
 	return e.Sku.ObjekteSha
 }
 
-func (t External[T, T1, T2, T3]) GetSkuAkteSha() schnittstellen.Sha {
-	return t.Sku.GetAkteSha()
-}
-
 func (t External[T, T1, T2, T3]) GetFDAkteSha() schnittstellen.Sha {
 	return t.Sku.FDs.Akte.Sha
 }
 
 func (t External[T, T1, T2, T3]) GetAkteSha() schnittstellen.Sha {
-	AssertAkteShasMatch(t)
 	return t.Sku.GetAkteSha()
 }
 

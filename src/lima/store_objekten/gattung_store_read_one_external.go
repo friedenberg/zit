@@ -40,8 +40,6 @@ func (s *commonStore[O, OPtr, K, KPtr]) ReadOneExternal(
 		}
 	}
 
-	objekte.CorrectAkteShaWith(&e, e)
-
 	var ar sha.ReadCloser
 
 	if ar, err = s.AkteReader(e.GetAkteSha()); err != nil {

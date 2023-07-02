@@ -186,8 +186,6 @@ func (i *konfigStore) ReadAllSchwanzen(
 		return
 	}
 
-	objekte.AssertAkteShasMatch(k)
-
 	if err = w(k); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -217,8 +215,6 @@ func (s *konfigStore) ReadAll(
 							return
 						}
 					}
-
-					objekte.AssertAkteShasMatch(te)
 
 					if err = w(te); err != nil {
 						err = errors.Wrap(err)
@@ -263,8 +259,6 @@ func (s *konfigStore) ReadAll(
 								return
 							}
 						}
-
-						objekte.AssertAkteShasMatch(te)
 
 						if err = w(te); err != nil {
 							err = errors.Wrap(err)

@@ -193,8 +193,6 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdate(
 		// transactedPtr.Sku.Kopf = s.common.GetTransaktion().Time
 	}
 
-	objekte.CorrectAkteShaWith(transactedPtr, transactedPtr)
-
 	var ow sha.WriteCloser
 
 	if ow, err = cou.of.ObjekteWriter(); err != nil {

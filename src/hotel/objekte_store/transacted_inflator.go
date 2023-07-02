@@ -255,8 +255,6 @@ func (h *transactedInflator[T, T1, T2, T3]) readObjekte(
 		)
 	}
 
-	objekte.CorrectAkteShaWith(t, t)
-
 	errors.Log().Printf("parsed %d objekte bytes", n)
 
 	return

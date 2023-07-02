@@ -41,12 +41,7 @@ func (t *Transacted[T, T1, T2, T3]) SetMetadatei(
 	t.SetTai(m.Tai)
 }
 
-func (t Transacted[T, T1, T2, T3]) GetSkuAkteSha() schnittstellen.Sha {
-	return t.Sku.WithKennung.Metadatei.AkteSha
-}
-
 func (t Transacted[T, T1, T2, T3]) GetAkteSha() schnittstellen.Sha {
-	AssertAkteShasMatch(t)
 	return t.Sku.WithKennung.Metadatei.AkteSha
 }
 
@@ -209,7 +204,6 @@ func (a Transacted[T, T1, T2, T3]) String() string {
 
 func (a Transacted[T, T1, T2, T3]) GetSku() (sk sku.Sku) {
 	sk = a.Sku.Sku()
-	AssertAkteShasMatch(a)
 	return
 }
 
@@ -286,7 +280,6 @@ func (a Transacted[T, T1, T2, T3]) GetKennungString() string {
 func (a *Transacted[T, T1, T2, T3]) Reset() {
 	a.Sku.Reset()
 	T1(&a.Akte).Reset()
-	AssertAkteShasMatch(a)
 }
 
 func (a *Transacted[T, T1, T2, T3]) ResetWithPtr(
@@ -294,7 +287,6 @@ func (a *Transacted[T, T1, T2, T3]) ResetWithPtr(
 ) {
 	a.Sku.ResetWith(b.Sku)
 	T1(&a.Akte).ResetWith(b.Akte)
-	AssertAkteShasMatch(a)
 }
 
 func (a *Transacted[T, T1, T2, T3]) ResetWith(
@@ -302,5 +294,4 @@ func (a *Transacted[T, T1, T2, T3]) ResetWith(
 ) {
 	a.Sku.ResetWith(b.Sku)
 	T1(&a.Akte).ResetWith(b.Akte)
-	AssertAkteShasMatch(a)
 }
