@@ -80,11 +80,11 @@ func (a Transacted[K, KPtr]) String() string {
 	)
 }
 
-func (a Transacted[K, KPtr]) GetMetadatei() metadatei.Metadatei {
+func (a Transacted[K, KPtr]) GetMetadatei() Metadatei {
 	return a.WithKennung.GetMetadatei()
 }
 
-func (a *Transacted[K, KPtr]) GetMetadateiPtr() *metadatei.Metadatei {
+func (a *Transacted[K, KPtr]) GetMetadateiPtr() *Metadatei {
 	return a.WithKennung.GetMetadateiPtr()
 }
 
@@ -104,7 +104,7 @@ func (a Transacted[K, KPtr]) GetExternal() External[K, KPtr] {
 	return External[K, KPtr]{
 		WithKennung: metadatei.WithKennung[K, KPtr]{
 			Kennung: a.WithKennung.Kennung,
-			Metadatei: metadatei.Metadatei{
+			Metadatei: Metadatei{
 				AkteSha: sha.Make(a.GetAkteSha()),
 			},
 		},
@@ -116,7 +116,7 @@ func (a *Transacted[K, KPtr]) Sku() Sku {
 	return Sku{
 		WithKennung: metadatei.WithKennungInterface{
 			Kennung: a.WithKennung.Kennung,
-			Metadatei: metadatei.Metadatei{
+			Metadatei: Metadatei{
 				Tai:     a.GetTai(),
 				Gattung: gattung.Make(a.GetGattung()),
 				AkteSha: a.WithKennung.Metadatei.AkteSha,

@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
+	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/organize_text"
@@ -122,7 +123,7 @@ func (c CommitOrganizeFile) Run(
 		func(change changes.Change) (err error) {
 			bez := change.Key
 
-			m := metadatei.Metadatei{
+			m := sku.Metadatei{
 				Etiketten: change.GetAdded().ImmutableClone(),
 				Typ:       b.Metadatei.Typ,
 			}

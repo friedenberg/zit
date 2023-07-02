@@ -25,16 +25,16 @@ func (t Transacted[T, T1, T2, T3]) Kennung() T3 {
 	return &t.Sku.WithKennung.Kennung
 }
 
-func (t Transacted[T, T1, T2, T3]) GetMetadatei() metadatei.Metadatei {
+func (t Transacted[T, T1, T2, T3]) GetMetadatei() sku.Metadatei {
 	return t.Sku.GetMetadatei()
 }
 
-func (t *Transacted[T, T1, T2, T3]) GetMetadateiPtr() *metadatei.Metadatei {
+func (t *Transacted[T, T1, T2, T3]) GetMetadateiPtr() *sku.Metadatei {
 	return t.Sku.GetMetadateiPtr()
 }
 
 func (t *Transacted[T, T1, T2, T3]) SetMetadatei(
-	m metadatei.Metadatei,
+	m sku.Metadatei,
 ) {
 	t.GetMetadateiPtr().ResetWith(m)
 	t.SetAkteSha(m.AkteSha)

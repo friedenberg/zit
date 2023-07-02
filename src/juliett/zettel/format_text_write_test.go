@@ -12,6 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/echo/test_metadatei_io"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
+	"github.com/friedenberg/zit/src/foxtrot/sku"
 )
 
 type noopCloser struct {
@@ -42,7 +43,7 @@ func (arf akteReaderFactory) AkteReader(s sha.Sha) (r sha.ReadCloser, err error)
 
 func writeFormat(
 	t test_logz.T,
-	m metadatei.Metadatei,
+	m sku.Metadatei,
 	f metadatei.TextFormatter,
 	includeAkte bool,
 	akteBody string,
@@ -76,7 +77,7 @@ func writeFormat(
 func TestWriteWithoutAkte(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-	z := metadatei.Metadatei{
+	z := sku.Metadatei{
 		Bezeichnung: bezeichnung.Make("the title"),
 		Etiketten: makeEtiketten(t,
 			"tag1",
@@ -116,7 +117,7 @@ func TestWriteWithoutAkte(t1 *testing.T) {
 func TestWriteWithInlineAkte(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-	z := metadatei.Metadatei{
+	z := sku.Metadatei{
 		Bezeichnung: bezeichnung.Make("the title"),
 		Etiketten: makeEtiketten(t,
 			"tag1",

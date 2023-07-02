@@ -2,6 +2,8 @@ package schnittstellen
 
 import "io"
 
+// TODO-P3 refactor into hash or checksum or content address and split korper
+// out into context object
 type ShaLike interface {
 	// TODO-P3
 	// GetHashBytes() []byte

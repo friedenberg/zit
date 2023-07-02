@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
-	"github.com/friedenberg/zit/src/foxtrot/metadatei"
+	"github.com/friedenberg/zit/src/foxtrot/sku"
 )
 
 func TestMakeEtiketten(t1 *testing.T) {
@@ -75,7 +75,7 @@ func TestMakeEtiketten(t1 *testing.T) {
 func TestEqualitySelf(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-	text := metadatei.Metadatei{
+	text := sku.Metadatei{
 		Bezeichnung: bezeichnung.Make("the title"),
 		Etiketten: makeEtiketten(t,
 			"tag1",
@@ -93,7 +93,7 @@ func TestEqualitySelf(t1 *testing.T) {
 func TestEqualityNotSelf(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-	text := metadatei.Metadatei{
+	text := sku.Metadatei{
 		Bezeichnung: bezeichnung.Make("the title"),
 		Etiketten: makeEtiketten(t,
 			"tag1",
@@ -103,7 +103,7 @@ func TestEqualityNotSelf(t1 *testing.T) {
 		Typ: makeAkteExt(t, "text"),
 	}
 
-	text1 := metadatei.Metadatei{
+	text1 := sku.Metadatei{
 		Bezeichnung: bezeichnung.Make("the title"),
 		Etiketten: makeEtiketten(t,
 			"tag1",

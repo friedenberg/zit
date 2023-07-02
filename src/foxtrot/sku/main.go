@@ -4,6 +4,11 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
+)
+
+type (
+	Metadatei = metadatei.Metadatei
 )
 
 type Kennung = kennung.Kennung

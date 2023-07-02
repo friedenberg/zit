@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 )
 
@@ -35,15 +34,15 @@ type External[
 	Sku  sku.External[T2, T3]
 }
 
-func (a External[T, T1, T2, T3]) GetMetadatei() metadatei.Metadatei {
+func (a External[T, T1, T2, T3]) GetMetadatei() sku.Metadatei {
 	return a.Sku.GetMetadatei()
 }
 
-func (a *External[T, T1, T2, T3]) GetMetadateiPtr() *metadatei.Metadatei {
+func (a *External[T, T1, T2, T3]) GetMetadateiPtr() *sku.Metadatei {
 	return a.Sku.GetMetadateiPtr()
 }
 
-func (a *External[T, T1, T2, T3]) SetMetadatei(m metadatei.Metadatei) {
+func (a *External[T, T1, T2, T3]) SetMetadatei(m sku.Metadatei) {
 	a.GetMetadateiPtr().ResetWith(m)
 	a.SetAkteSha(m.AkteSha)
 }

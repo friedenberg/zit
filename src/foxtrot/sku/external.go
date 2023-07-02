@@ -23,11 +23,11 @@ func (a External[K, KPtr]) GetKennung() K {
 	return a.WithKennung.GetKennung()
 }
 
-func (a External[K, KPtr]) GetMetadatei() metadatei.Metadatei {
+func (a External[K, KPtr]) GetMetadatei() Metadatei {
 	return a.WithKennung.GetMetadatei()
 }
 
-func (a *External[K, KPtr]) GetMetadateiPtr() *metadatei.Metadatei {
+func (a *External[K, KPtr]) GetMetadateiPtr() *Metadatei {
 	return a.WithKennung.GetMetadateiPtr()
 }
 
@@ -59,7 +59,7 @@ func (a *External[K, KPtr]) Transacted() (b Transacted[K, KPtr]) {
 	b = Transacted[K, KPtr]{
 		WithKennung: metadatei.WithKennung[K, KPtr]{
 			Kennung: a.GetKennung(),
-			Metadatei: metadatei.Metadatei{
+			Metadatei: Metadatei{
 				AkteSha: sha.Make(a.GetAkteSha()),
 			},
 		},
