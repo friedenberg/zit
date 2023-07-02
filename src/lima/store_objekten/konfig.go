@@ -199,8 +199,9 @@ func (s *konfigStore) ReadAll(
 ) (err error) {
 	if s.StoreUtil.GetKonfig().UseBestandsaufnahme {
 		f1 := func(t *bestandsaufnahme.Transacted) (err error) {
-			if err = t.Akte.Skus.Each(
-				func(sk sku.Sku) (err error) {
+			if err = sku.HeapEach(
+				t.Akte.Skus,
+				func(sk sku.SkuLike) (err error) {
 					if sk.GetGattung() != gattung.Konfig {
 						return
 					}

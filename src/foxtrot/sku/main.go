@@ -31,16 +31,14 @@ type DataIdentityGetter interface {
 
 type SkuLike interface {
 	DataIdentity
-
 	GetKey() string
-
-	// GetTransactionIndex() values.Int
-	// Less(SkuLike) bool
+	EqualsSkuLike(SkuLike) bool
 }
 
 type SkuLikePtr interface {
 	SkuLike
-	SetTimeAndFields(kennung.Tai, ...string) error
+	// SetTimeAndFields(kennung.Tai, ...string) error
 	SetFromSkuLike(SkuLike) error
-	SetTransactionIndex(int)
+	// SetTransactionIndex(int)
+	Reset()
 }

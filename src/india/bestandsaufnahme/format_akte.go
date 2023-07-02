@@ -8,7 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 )
@@ -35,7 +34,14 @@ func (f formatAkte) ParseSaveAkte(
 	if n, err = format.ReadLines(
 		r,
 		func(v string) (err error) {
-			return collections.AddString[sku.Sku, *sku.Sku](&o.Skus, v)
+			var sk sku.Sku
+
+			if err = sk.Set(v); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return sku.AddSkuToHeap(&o.Skus, &sk)
 		},
 	); err != nil {
 		err = errors.Wrap(err)

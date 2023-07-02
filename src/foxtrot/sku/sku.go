@@ -18,6 +18,13 @@ type Sku struct {
 	ObjekteSha  sha.Sha
 }
 
+func (a *Sku) SetFromSkuLike(b SkuLike) (err error) {
+	a.WithKennung.SetMetadatei(b.GetMetadatei())
+	a.ObjekteSha = sha.Make(b.GetObjekteSha())
+
+	return
+}
+
 func (sk *Sku) setKennungValue(v string) (err error) {
 	if sk.WithKennung.Kennung, err = kennung.Make(v); err != nil {
 		err = errors.Wrap(err)
@@ -143,6 +150,10 @@ func (a Sku) Less(b Sku) (ok bool) {
 	}
 
 	return
+}
+
+func (a Sku) EqualsSkuLike(b SkuLike) (ok bool) {
+	return values.Equals(a, b)
 }
 
 func (a Sku) EqualsAny(b any) (ok bool) {

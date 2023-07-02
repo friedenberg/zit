@@ -36,7 +36,10 @@ func (t *Transacted[K, KPtr]) SetFromSkuLike(sk SkuLike) (err error) {
 	return
 }
 
-func MakeSkuTransacted(t kennung.Tai, line string) (out SkuLikePtr, err error) {
+func MakeSkuTransacted(
+	t kennung.Tai,
+	line string,
+) (out1 SkuLikePtr, err error) {
 	fields := strings.Fields(line)
 	var g gattung.Gattung
 
@@ -47,24 +50,27 @@ func MakeSkuTransacted(t kennung.Tai, line string) (out SkuLikePtr, err error) {
 
 	switch g {
 	case gattung.Zettel:
-		out = &Transacted[kennung.Hinweis, *kennung.Hinweis]{}
+		out := &Transacted[kennung.Hinweis, *kennung.Hinweis]{}
+		out1 = out
+		err = out.SetTimeAndFields(t, fields[1:]...)
 
 	case gattung.Typ:
-		out = &Transacted[kennung.Typ, *kennung.Typ]{}
+		out := &Transacted[kennung.Typ, *kennung.Typ]{}
+		out1 = out
+		err = out.SetTimeAndFields(t, fields[1:]...)
 
 	case gattung.Etikett:
-		out = &Transacted[kennung.Etikett, *kennung.Etikett]{}
+		out := &Transacted[kennung.Etikett, *kennung.Etikett]{}
+		out1 = out
+		err = out.SetTimeAndFields(t, fields[1:]...)
 
 	case gattung.Konfig:
-		out = &Transacted[kennung.Konfig, *kennung.Konfig]{}
+		out := &Transacted[kennung.Konfig, *kennung.Konfig]{}
+		out1 = out
+		return
 
 	default:
 		err = errors.Errorf("unsupported gattung: %s", g)
-		return
-	}
-
-	if err = out.SetTimeAndFields(t, fields[1:]...); err != nil {
-		err = errors.Wrap(err)
 		return
 	}
 
@@ -155,6 +161,10 @@ func (a Transacted[K, KPtr]) Less(b Transacted[K, KPtr]) (ok bool) {
 	}
 
 	return
+}
+
+func (a Transacted[K, KPtr]) EqualsSkuLike(b SkuLike) bool {
+	return values.Equals(a, b)
 }
 
 func (a Transacted[K, KPtr]) EqualsAny(b any) (ok bool) {

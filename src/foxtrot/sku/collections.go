@@ -10,10 +10,23 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
-type Sku2Heap = collections.Heap[Sku, *Sku]
+type Sku2Heap = collections.Heap[wrapper, *wrapper]
 
 func MakeSku2Heap() Sku2Heap {
-	return collections.MakeHeap[Sku, *Sku]()
+	return collections.MakeHeap[wrapper, *wrapper]()
+}
+
+func AddSkuToHeap(h *Sku2Heap, sk SkuLikePtr) (err error) {
+	err = h.Add(wrapper{SkuLikePtr: sk})
+	return
+}
+
+func HeapEach(h Sku2Heap, f func(sk SkuLike) error) (err error) {
+	return h.Each(
+		func(w wrapper) (err error) {
+			return f(w.SkuLikePtr)
+		},
+	)
 }
 
 type MutableSetUnique = schnittstellen.MutableSet[SkuLike]
