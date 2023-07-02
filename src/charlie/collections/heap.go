@@ -9,47 +9,47 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
-type HeapElement[T any] interface{}
+type HeapElement[T any] interface {
+	schnittstellen.Equatable[T]
+	schnittstellen.Lessor[T]
+}
 
 type HeapElementPtr[T any] interface {
+	HeapElement[T]
 	schnittstellen.Resetable[T]
 	schnittstellen.Ptr[T]
 }
 
-type heapPrivate[T HeapElement[T]] struct {
-	less     func(T, T) bool
-	elements []T
-}
+type heapPrivate[T schnittstellen.Lessor[T]] []T
 
 func (h heapPrivate[T]) Len() int {
-	return len(h.elements)
+	return len(h)
 }
 
 func (h heapPrivate[T]) Less(i, j int) (ok bool) {
-	ok = h.less(h.elements[i], h.elements[j])
+	ok = h[i].Less(h[j])
 	return
 }
 
 func (h heapPrivate[T]) Swap(i, j int) {
-	h.elements[i], h.elements[j] = h.elements[j], h.elements[i]
+	h[i], h[j] = h[j], h[i]
 }
 
 func (h *heapPrivate[T]) Push(x any) {
-	h.elements = append(h.elements, x.(T))
+	*h = append(*h, x.(T))
 }
 
 func (h *heapPrivate[T]) Pop() any {
-	old := h.elements
+	old := *h
 	n := len(old)
 	x := old[n-1]
-	h.elements = old[0 : n-1]
+	*h = old[0 : n-1]
 	return x
 }
 
 func (a heapPrivate[T]) Copy() (b heapPrivate[T]) {
-	b.less = a.less
-	b.elements = make([]T, a.Len())
-	copy(b.elements, a.elements)
+	b = heapPrivate[T](make([]T, a.Len()))
+	copy(b, a)
 	return
 }
 
@@ -59,64 +59,48 @@ func (a heapPrivate[T]) Sorted() (b heapPrivate[T]) {
 	return
 }
 
-func MakeHeap[T HeapElement[T], T1 HeapElementPtr[T]](
-	less func(T, T) bool,
-	equals func(T, T) bool,
-) Heap[T, T1] {
+func MakeHeap[T HeapElement[T], T1 HeapElementPtr[T]]() Heap[T, T1] {
 	return Heap[T, T1]{
-		pool: MakeFakePool[T, T1](),
-		lock: &sync.Mutex{},
-		heap: heapPrivate[T]{
-			less:     less,
-			elements: make([]T, 0),
-		},
-		equals: equals,
+		p: MakeFakePool[T, T1](),
+		l: &sync.Mutex{},
+		h: heapPrivate[T](make([]T, 0)),
 	}
 }
 
 func MakeHeapFromSlice[T HeapElement[T], T1 HeapElementPtr[T]](
-	s []T,
-	less func(T, T) bool,
-	equals func(T, T) bool,
+	s heapPrivate[T],
 ) Heap[T, T1] {
-	heap := heapPrivate[T]{
-		elements: s,
-		less:     less,
-	}
-
-	sort.Sort(heap)
+	sort.Sort(s)
 
 	return Heap[T, T1]{
-		pool:   MakeFakePool[T, T1](),
-		lock:   &sync.Mutex{},
-		equals: equals,
-		heap:   heap,
+		p: MakeFakePool[T, T1](),
+		l: &sync.Mutex{},
+		h: s,
 	}
 }
 
 type Heap[T HeapElement[T], T1 HeapElementPtr[T]] struct {
-	pool   schnittstellen.Pool[T, T1]
-	lock   *sync.Mutex
-	heap   heapPrivate[T]
-	s      int
-	equals func(T, T) bool
+	p schnittstellen.Pool[T, T1]
+	l *sync.Mutex
+	h heapPrivate[T]
+	s int
 }
 
-func (heap *Heap[T, T1]) SetPool(pool schnittstellen.Pool[T, T1]) {
-	if pool == nil {
-		pool = MakeFakePool[T, T1]()
+func (h *Heap[T, T1]) SetPool(p schnittstellen.Pool[T, T1]) {
+	if p == nil {
+		p = MakeFakePool[T, T1]()
 	}
 
-	heap.pool = pool
+	h.p = p
 }
 
 func (h *Heap[T, T1]) Peek() (sk T1, ok bool) {
-	h.lock.Lock()
-	defer h.lock.Unlock()
+	h.l.Lock()
+	defer h.l.Unlock()
 
-	if h.heap.Len() > 0 {
-		sk = h.pool.Get()
-		sk.ResetWith(h.heap.elements[0])
+	if h.h.Len() > 0 {
+		sk = h.p.Get()
+		sk.ResetWith(h.h[0])
 		ok = true
 	}
 
@@ -129,55 +113,51 @@ func (h *Heap[T, T1]) Add(sk T) (err error) {
 }
 
 func (h *Heap[T, T1]) Push(sk T) {
-	h.lock.Lock()
-	defer h.lock.Unlock()
+	h.l.Lock()
+	defer h.l.Unlock()
 
 	if h.s > 0 {
-		panic(
-			errors.Errorf(
-				"attempting to push to a heap that has saved elements",
-			),
-		)
+		panic(errors.Errorf("attempting to push to a heap that has saved elements"))
 	}
 
-	heap.Push(&h.heap, sk)
+	heap.Push(&h.h, sk)
 }
 
 func (h *Heap[T, T1]) PopAndSave() (sk T1, ok bool) {
-	h.lock.Lock()
-	defer h.lock.Unlock()
+	h.l.Lock()
+	defer h.l.Unlock()
 
-	if h.heap.Len() > 0 {
-		sk = h.pool.Get()
-		sk.ResetWith(heap.Pop(&h.heap).(T))
+	if h.h.Len() > 0 {
+		sk = h.p.Get()
+		sk.ResetWith(heap.Pop(&h.h).(T))
 		ok = true
 		h.s += 1
-		faked := h.heap.elements[:h.heap.Len()+h.s]
-		faked[h.heap.Len()] = *sk
+		faked := h.h[:h.h.Len()+h.s]
+		faked[h.h.Len()] = *sk
 	}
 
 	return
 }
 
 func (h *Heap[T, T1]) Restore() {
-	h.lock.Lock()
-	defer h.lock.Unlock()
+	h.l.Lock()
+	defer h.l.Unlock()
 
-	h.heap.elements = h.heap.elements[:h.s]
+	h.h = h.h[:h.s]
 	h.s = 0
 
-	ReverseSortable(&h.heap)
+	ReverseSortable(&h.h)
 
 	return
 }
 
 func (h *Heap[T, T1]) Pop() (sk T1, ok bool) {
-	h.lock.Lock()
-	defer h.lock.Unlock()
+	h.l.Lock()
+	defer h.l.Unlock()
 
-	if h.heap.Len() > 0 {
-		sk = h.pool.Get()
-		sk.ResetWith(heap.Pop(&h.heap).(T))
+	if h.h.Len() > 0 {
+		sk = h.p.Get()
+		sk.ResetWith(heap.Pop(&h.h).(T))
 		ok = true
 	}
 
@@ -185,22 +165,22 @@ func (h *Heap[T, T1]) Pop() (sk T1, ok bool) {
 }
 
 func (h Heap[T, T1]) Len() int {
-	h.lock.Lock()
-	defer h.lock.Unlock()
+	h.l.Lock()
+	defer h.l.Unlock()
 
-	return h.heap.Len()
+	return h.h.Len()
 }
 
 func (a Heap[T, T1]) Equals(b Heap[T, T1]) bool {
-	a.lock.Lock()
-	defer a.lock.Unlock()
+	a.l.Lock()
+	defer a.l.Unlock()
 
-	if a.heap.Len() != b.heap.Len() {
+	if a.h.Len() != b.h.Len() {
 		return false
 	}
 
-	for i, av := range a.heap.elements {
-		if a.equals(b.heap.elements[i], av) {
+	for i, av := range a.h {
+		if b.h[i].Equals(av) {
 			return false
 		}
 	}
@@ -209,22 +189,21 @@ func (a Heap[T, T1]) Equals(b Heap[T, T1]) bool {
 }
 
 func (a Heap[T, T1]) Copy() Heap[T, T1] {
-	a.lock.Lock()
-	defer a.lock.Unlock()
+	a.l.Lock()
+	defer a.l.Unlock()
 
 	return Heap[T, T1]{
-		pool:   a.pool,
-		lock:   &sync.Mutex{},
-		equals: a.equals,
-		heap:   a.heap.Copy(),
+		p: a.p,
+		l: &sync.Mutex{},
+		h: a.h.Copy(),
 	}
 }
 
 func (a Heap[T, T1]) EachPtr(f schnittstellen.FuncIter[T1]) (err error) {
-	a.lock.Lock()
-	defer a.lock.Unlock()
+	a.l.Lock()
+	defer a.l.Unlock()
 
-	for _, s := range a.heap.elements {
+	for _, s := range a.h {
 		if err = f(&s); err != nil {
 			if IsStopIteration(err) {
 				err = nil
@@ -240,10 +219,10 @@ func (a Heap[T, T1]) EachPtr(f schnittstellen.FuncIter[T1]) (err error) {
 }
 
 func (a Heap[T, T1]) Each(f schnittstellen.FuncIter[T]) (err error) {
-	a.lock.Lock()
-	defer a.lock.Unlock()
+	a.l.Lock()
+	defer a.l.Unlock()
 
-	for _, s := range a.heap.elements {
+	for _, s := range a.h {
 		if err = f(s); err != nil {
 			if IsStopIteration(err) {
 				err = nil
@@ -287,11 +266,11 @@ func (a *Heap[T, T1]) MergeStream(
 			case !ok:
 				break LOOP
 
-			case a.equals(*peeked, *e):
+			case peeked.Equals(*e):
 				a.Pop()
 				continue
 
-			case !a.heap.less(*peeked, *e):
+			case !peeked.Less(*e):
 				break LOOP
 
 			default:
@@ -332,9 +311,9 @@ func (a *Heap[T, T1]) MergeStream(
 
 		if last == nil {
 			last = popped
-		} else if a.equals(*popped, *last) {
+		} else if popped.Equals(*last) {
 			continue
-		} else if a.heap.less(*popped, *last) {
+		} else if popped.Less(*last) {
 			err = errors.Errorf(
 				"last is greater than current! last: %v, current: %v",
 				last,
@@ -358,38 +337,34 @@ func (a *Heap[T, T1]) MergeStream(
 }
 
 func (a *Heap[T, T1]) Fix() {
-	a.lock.Lock()
-	defer a.lock.Unlock()
+	a.l.Lock()
+	defer a.l.Unlock()
 
-	heap.Init(&a.heap)
+	heap.Init(&a.h)
 }
 
-func (a *Heap[T, T1]) Sorted() (b1 []T) {
-	a.lock.Lock()
-	defer a.lock.Unlock()
+func (a *Heap[T, T1]) Sorted() (b heapPrivate[T]) {
+	a.l.Lock()
+	defer a.l.Unlock()
 
-	b := a.heap.Sorted()
-	b1 = b.elements
-
+	b = a.h.Sorted()
 	return
 }
 
 func (a *Heap[T, T1]) Reset() {
-	a.lock = &sync.Mutex{}
-	a.heap.elements = make([]T, 0)
+	a.l = &sync.Mutex{}
+	a.h = heapPrivate[T](make([]T, 0))
 	a.SetPool(nil)
 }
 
 func (a *Heap[T, T1]) ResetWith(b Heap[T, T1]) {
-	a.lock = &sync.Mutex{}
+	a.l = &sync.Mutex{}
 
-	a.heap.elements = make([]T, b.Len())
-	a.heap.less = b.heap.less
-	a.equals = b.equals
+	a.h = heapPrivate[T](make([]T, b.Len()))
 
-	for i, bv := range b.heap.elements {
-		a.heap.elements[i] = bv
+	for i, bv := range b.h {
+		a.h[i] = bv
 	}
 
-	a.SetPool(b.pool)
+	a.SetPool(b.p)
 }

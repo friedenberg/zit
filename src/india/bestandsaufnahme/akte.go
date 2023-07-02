@@ -31,8 +31,7 @@ func (a Akte) Equals(b Akte) bool {
 }
 
 func (a *Akte) Reset() {
-	// necessary because of the less and equals functions of heaps
-	a.Skus = sku.MakeSku2Heap()
+	a.Skus.Reset()
 }
 
 func (a *Akte) ResetWith(b Akte) {

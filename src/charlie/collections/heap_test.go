@@ -19,7 +19,7 @@ func TestReset(t1 *testing.T) {
 		values.MakeInt(2),
 	}
 
-	sut := MakeHeapFromSlice(els, (values.Int).Less, (values.Int).Equals)
+	sut := MakeHeapFromSlice(els)
 
 	if sut.Len() != 5 {
 		t.Fatalf("expected len 5 but got %d", sut.Len())
@@ -43,7 +43,7 @@ func TestSaveAndRestore(t1 *testing.T) {
 		values.MakeInt(2),
 	}
 
-	sut := MakeHeapFromSlice(els, (values.Int).Less, (values.Int).Equals)
+	sut := MakeHeapFromSlice(els)
 
 	checkAllElements := func() {
 		defer sut.Restore()
@@ -52,17 +52,11 @@ func TestSaveAndRestore(t1 *testing.T) {
 			ex := values.MakeInt(i)
 
 			if !ok {
-				t.Fatalf(
-					"expected pop and save to return an element but got nothing",
-				)
+				t.Fatalf("expected pop and save to return an element but got nothing")
 			}
 
 			if !el.Equals(ex) {
-				t.Fatalf(
-					"expected pop and save to return %s but got %s",
-					ex,
-					el,
-				)
+				t.Fatalf("expected pop and save to return %s but got %s", ex, el)
 			}
 		}
 	}
@@ -74,10 +68,7 @@ func TestSaveAndRestore(t1 *testing.T) {
 		ex := values.MakeInt(i)
 
 		if !ok {
-			t.Fatalf(
-				"expected pop and save to return an element but got nothing. Idx: %d",
-				i,
-			)
+			t.Fatalf("expected pop and save to return an element but got nothing. Idx: %d", i)
 		}
 
 		if !el.Equals(ex) {
@@ -97,7 +88,7 @@ func Test3Sorted(t1 *testing.T) {
 		values.MakeInt(2),
 	}
 
-	sut := MakeHeapFromSlice(els, (values.Int).Less, (values.Int).Equals)
+	sut := MakeHeapFromSlice(els)
 	sorted := sut.Sorted()
 
 	expected := []values.Int{
