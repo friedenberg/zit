@@ -9,13 +9,12 @@ import (
 
 type (
 	Metadatei = metadatei.Metadatei
+	Kennung   = kennung.Kennung
+
+	IdLikeGetter interface {
+		GetId() schnittstellen.ValueLike
+	}
 )
-
-type Kennung = kennung.Kennung
-
-type IdLikeGetter interface {
-	GetId() schnittstellen.ValueLike
-}
 
 type DataIdentity interface {
 	schnittstellen.ValueLike

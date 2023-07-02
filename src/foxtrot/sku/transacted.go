@@ -14,20 +14,21 @@ import (
 
 // TODO-P2 move sku.Sku to sku.Transacted
 type Transacted[K kennung.KennungLike[K], KPtr kennung.KennungLikePtr[K]] struct {
-	WithKennung      WithKennung[K, KPtr]
+	Kennung          K
+	Metadatei        Metadatei
 	ObjekteSha       sha.Sha
 	TransactionIndex values.Int
 	Kopf             kennung.Tai
 }
 
 func (t *Transacted[K, KPtr]) SetFromSku(sk Sku) (err error) {
-	if err = KPtr(&t.WithKennung.Kennung).Set(sk.WithKennung.Kennung.String()); err != nil {
+	if err = KPtr(&t.Kennung).Set(sk.WithKennung.Kennung.String()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	t.ObjekteSha = sk.ObjekteSha
-	t.WithKennung.Metadatei.AkteSha = sk.WithKennung.Metadatei.AkteSha
+	t.Metadatei.AkteSha = sk.WithKennung.Metadatei.AkteSha
 	t.GetMetadateiPtr().Tai = sk.GetTai()
 
 	t.Kopf = sk.GetTai()
@@ -73,18 +74,18 @@ func MakeSkuTransacted(t kennung.Tai, line string) (out SkuLikePtr, err error) {
 func (a Transacted[K, KPtr]) String() string {
 	return fmt.Sprintf(
 		"%s %s %s",
-		a.WithKennung.Kennung,
+		a.Kennung,
 		a.ObjekteSha,
-		a.WithKennung.Metadatei.AkteSha,
+		a.Metadatei.AkteSha,
 	)
 }
 
 func (a Transacted[K, KPtr]) GetMetadatei() Metadatei {
-	return a.WithKennung.GetMetadatei()
+	return a.Metadatei
 }
 
 func (a *Transacted[K, KPtr]) GetMetadateiPtr() *Metadatei {
-	return a.WithKennung.GetMetadateiPtr()
+	return &a.Metadatei
 }
 
 func (a Transacted[K, KPtr]) GetTai() kennung.Tai {
@@ -96,16 +97,14 @@ func (a *Transacted[K, KPtr]) SetTai(t kennung.Tai) {
 }
 
 func (a Transacted[K, KPtr]) GetKennung() K {
-	return a.WithKennung.Kennung
+	return a.Kennung
 }
 
 func (a Transacted[K, KPtr]) GetExternal() External[K, KPtr] {
 	return External[K, KPtr]{
 		WithKennung: WithKennung[K, KPtr]{
-			Kennung: a.WithKennung.Kennung,
-			Metadatei: Metadatei{
-				AkteSha: sha.Make(a.GetAkteSha()),
-			},
+			Kennung:   a.Kennung,
+			Metadatei: a.Metadatei,
 		},
 		ObjekteSha: a.ObjekteSha,
 	}
@@ -114,11 +113,11 @@ func (a Transacted[K, KPtr]) GetExternal() External[K, KPtr] {
 func (a *Transacted[K, KPtr]) Sku() Sku {
 	return Sku{
 		WithKennung: WithKennungInterface{
-			Kennung: a.WithKennung.Kennung,
+			Kennung: a.Kennung,
 			Metadatei: Metadatei{
 				Tai:     a.GetTai(),
 				Gattung: gattung.Make(a.GetGattung()),
-				AkteSha: a.WithKennung.Metadatei.AkteSha,
+				AkteSha: sha.Make(a.GetAkteSha()),
 			},
 		},
 		ObjekteSha: a.ObjekteSha,
@@ -132,14 +131,16 @@ func (a *Transacted[K, KPtr]) SetTransactionIndex(i int) {
 func (a *Transacted[K, KPtr]) Reset() {
 	a.Kopf.Reset()
 	a.ObjekteSha.Reset()
-	a.WithKennung.Reset()
+	KPtr(&a.Kennung).Reset()
+	a.Metadatei.Reset()
 	a.TransactionIndex.Reset()
 }
 
 func (a *Transacted[K, KPtr]) ResetWith(b Transacted[K, KPtr]) {
 	a.Kopf = b.Kopf
 	a.ObjekteSha = b.ObjekteSha
-	a.WithKennung.ResetWith(b.WithKennung)
+	KPtr(&a.Kennung).ResetWith(b.Kennung)
+	a.Metadatei.ResetWith(b.Metadatei)
 	a.TransactionIndex.SetInt(b.TransactionIndex.Int())
 }
 
@@ -179,9 +180,7 @@ func (a Transacted[K, KPtr]) Equals(b Transacted[K, KPtr]) (ok bool) {
 		return
 	}
 
-	if !a.WithKennung.Metadatei.AkteSha.Equals(
-		b.WithKennung.Metadatei.AkteSha,
-	) {
+	if !a.Metadatei.Equals(b.Metadatei) {
 		return
 	}
 
@@ -192,7 +191,7 @@ func (o *Transacted[K, KPtr]) SetTimeAndFields(
 	t kennung.Tai,
 	vs ...string,
 ) (err error) {
-	o.WithKennung.GetMetadateiPtr().Tai = t
+	o.GetMetadateiPtr().Tai = t
 
 	if len(vs) != 4 {
 		err = errors.Errorf("expected 4 elements but got %d", len(vs))
@@ -207,7 +206,7 @@ func (o *Transacted[K, KPtr]) SetTimeAndFields(
 
 	vs = vs[1:]
 
-	if err = KPtr(&o.WithKennung.Kennung).Set(vs[0]); err != nil {
+	if err = KPtr(&o.Kennung).Set(vs[0]); err != nil {
 		err = errors.Wrapf(err, "failed to set id: %s", vs[1])
 		return
 	}
@@ -223,11 +222,11 @@ func (o *Transacted[K, KPtr]) SetTimeAndFields(
 }
 
 func (s Transacted[K, KPtr]) GetGattung() schnittstellen.GattungLike {
-	return s.WithKennung.Kennung.GetGattung()
+	return s.Kennung.GetGattung()
 }
 
 func (s Transacted[K, KPtr]) GetId() Kennung {
-	return KPtr(&s.WithKennung.Kennung)
+	return KPtr(&s.Kennung)
 }
 
 func (s Transacted[K, KPtr]) GetObjekteSha() schnittstellen.ShaLike {
@@ -235,7 +234,7 @@ func (s Transacted[K, KPtr]) GetObjekteSha() schnittstellen.ShaLike {
 }
 
 func (s Transacted[K, KPtr]) GetAkteSha() schnittstellen.ShaLike {
-	return s.WithKennung.Metadatei.AkteSha
+	return s.Metadatei.AkteSha
 }
 
 func (s Transacted[K, KPtr]) GetTransactionIndex() values.Int {

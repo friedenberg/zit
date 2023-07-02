@@ -100,7 +100,7 @@ func (c CreateFromPaths) Run(
 
 				if zt, err = c.StoreObjekten().Zettel().Update(
 					z,
-					&z.Sku.WithKennung.Kennung,
+					&z.Sku.Kennung,
 				); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -137,7 +137,7 @@ func (c CreateFromPaths) Run(
 			if c.ProtoZettel.Apply(&cz.Internal) {
 				if zt, err = c.StoreObjekten().Zettel().Update(
 					cz.Internal,
-					&cz.Internal.Sku.WithKennung.Kennung,
+					&cz.Internal.Sku.Kennung,
 				); err != nil {
 					// TODO-P2 add file for error handling
 					c.handleStoreError(cz, "", err)

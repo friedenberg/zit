@@ -56,11 +56,9 @@ func (a *External[K, KPtr]) SetAkteSha(v schnittstellen.ShaLike) {
 
 func (a *External[K, KPtr]) Transacted() (b Transacted[K, KPtr]) {
 	b = Transacted[K, KPtr]{
-		WithKennung: WithKennung[K, KPtr]{
-			Kennung: a.GetKennung(),
-			Metadatei: Metadatei{
-				AkteSha: sha.Make(a.GetAkteSha()),
-			},
+		Kennung: a.GetKennung(),
+		Metadatei: Metadatei{
+			AkteSha: sha.Make(a.GetAkteSha()),
 		},
 		ObjekteSha: a.ObjekteSha,
 	}

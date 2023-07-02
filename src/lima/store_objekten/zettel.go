@@ -604,11 +604,9 @@ func (s *zettelStore) writeObjekte(
 
 	tz = &zettel.Transacted{
 		Sku: sku.Transacted[kennung.Hinweis, *kennung.Hinweis]{
-			WithKennung: sku.WithKennung[kennung.Hinweis, *kennung.Hinweis]{
-				Kennung:   h,
-				Metadatei: m,
-			},
-			Kopf: m.Tai,
+			Kennung:   h,
+			Metadatei: m,
+			Kopf:      m.Tai,
 		},
 	}
 

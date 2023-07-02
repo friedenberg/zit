@@ -101,7 +101,7 @@ func (h *transactedInflator[T, T1, T2, T3]) InflateFromSku2(
 		return
 	}
 
-	if err = T3(&t.Sku.WithKennung.Kennung).Set(o.WithKennung.Kennung.String()); err != nil {
+	if err = T3(&t.Sku.Kennung).Set(o.WithKennung.Kennung.String()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
