@@ -9,7 +9,10 @@ import (
 type HeapTransacted = collections.Heap[Transacted, *Transacted]
 
 func MakeHeapTransacted() HeapTransacted {
-	return collections.MakeHeap[Transacted, *Transacted]()
+	return collections.MakeHeap[Transacted, *Transacted](
+		(Transacted).Less,
+		(Transacted).Equals,
+	)
 }
 
 type MutableSet struct {

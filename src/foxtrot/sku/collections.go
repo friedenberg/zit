@@ -13,7 +13,7 @@ import (
 type Sku2Heap = collections.Heap[Sku, *Sku]
 
 func MakeSku2Heap() Sku2Heap {
-	return collections.MakeHeap[Sku, *Sku]()
+	return collections.MakeHeap[Sku, *Sku]((Sku).Less, (Sku).Equals)
 }
 
 type MutableSetUnique = schnittstellen.MutableSet[SkuLike]
