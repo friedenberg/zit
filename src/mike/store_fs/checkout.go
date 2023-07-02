@@ -190,10 +190,8 @@ func (s *Store) CheckoutOneZettel(
 	cz.External = zettel.External{
 		Akte: sz.Akte,
 		Sku: sku.External[kennung.Hinweis, *kennung.Hinweis]{
-			WithKennung: sku.WithKennung[kennung.Hinweis, *kennung.Hinweis]{
-				Kennung:   sz.Sku.GetKennung(),
-				Metadatei: sz.GetMetadatei(),
-			},
+			Kennung:    sz.Sku.GetKennung(),
+			Metadatei:  sz.GetMetadatei(),
 			ObjekteSha: sz.Sku.ObjekteSha,
 		},
 	}

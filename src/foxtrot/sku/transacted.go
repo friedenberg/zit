@@ -102,10 +102,8 @@ func (a Transacted[K, KPtr]) GetKennung() K {
 
 func (a Transacted[K, KPtr]) GetExternal() External[K, KPtr] {
 	return External[K, KPtr]{
-		WithKennung: WithKennung[K, KPtr]{
-			Kennung:   a.Kennung,
-			Metadatei: a.Metadatei,
-		},
+		Kennung:    a.Kennung,
+		Metadatei:  a.Metadatei,
 		ObjekteSha: a.ObjekteSha,
 	}
 }

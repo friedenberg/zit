@@ -430,7 +430,7 @@ func (s *zettelStore) updateExternal(
 	co objekte.ExternalLike,
 ) (tl objekte.TransactedLike, err error) {
 	ze := co.(*zettel.External)
-	return s.Update(ze.GetMetadatei(), &ze.Sku.WithKennung.Kennung)
+	return s.Update(ze.GetMetadatei(), &ze.Sku.Kennung)
 }
 
 func (s *zettelStore) UpdateCheckedOut(
@@ -476,7 +476,7 @@ func (s *zettelStore) UpdateCheckedOut(
 
 	if t, err = s.writeObjekte(
 		co.External.GetMetadatei(),
-		co.External.Sku.WithKennung.Kennung,
+		co.External.Sku.Kennung,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

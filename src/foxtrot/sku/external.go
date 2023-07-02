@@ -13,25 +13,26 @@ import (
 )
 
 type External[K kennung.KennungLike[K], KPtr kennung.KennungLikePtr[K]] struct {
-	ObjekteSha  sha.Sha
-	WithKennung WithKennung[K, KPtr]
-	FDs         ExternalFDs
+	ObjekteSha sha.Sha
+	Kennung    K
+	Metadatei  Metadatei
+	FDs        ExternalFDs
 }
 
 func (a External[K, KPtr]) GetKennung() K {
-	return a.WithKennung.GetKennung()
+	return a.Kennung
 }
 
 func (a External[K, KPtr]) GetMetadatei() Metadatei {
-	return a.WithKennung.GetMetadatei()
+	return a.Metadatei
 }
 
 func (a *External[K, KPtr]) GetMetadateiPtr() *Metadatei {
-	return a.WithKennung.GetMetadateiPtr()
+	return &a.Metadatei
 }
 
 func (a External[K, KPtr]) GetGattung() gattung.Gattung {
-	return gattung.Must(a.WithKennung.GetGattung())
+	return gattung.Must(a.Kennung.GetGattung())
 }
 
 func (a External[K, KPtr]) String() string {
@@ -45,12 +46,12 @@ func (a External[K, KPtr]) String() string {
 }
 
 func (a External[K, KPtr]) GetAkteSha() schnittstellen.ShaLike {
-	return a.WithKennung.Metadatei.AkteSha
+	return a.Metadatei.AkteSha
 }
 
 func (a *External[K, KPtr]) SetAkteSha(v schnittstellen.ShaLike) {
 	sh := sha.Make(v)
-	a.WithKennung.Metadatei.AkteSha = sh
+	a.Metadatei.AkteSha = sh
 	a.FDs.Akte.Sha = sh
 }
 
@@ -68,20 +69,22 @@ func (a *External[K, KPtr]) Transacted() (b Transacted[K, KPtr]) {
 
 func (a *External[K, KPtr]) Reset() {
 	a.ObjekteSha.Reset()
-	a.WithKennung.Reset()
+	KPtr(&a.Kennung).Reset()
+	a.Metadatei.Reset()
 }
 
 func (a *External[K, KPtr]) ResetWith(b *External[K, KPtr]) {
 	a.ObjekteSha.ResetWith(b.ObjekteSha)
-	a.WithKennung.ResetWith(b.WithKennung)
+	KPtr(&a.Kennung).ResetWith(b.Kennung)
+	a.Metadatei.ResetWith(b.GetMetadatei())
 }
 
 func (a *External[K, KPtr]) ResetWithExternalMaybe(b ExternalMaybe[K, KPtr]) {
 	todo.Change("use this in other places")
 	a.ObjekteSha.Reset()
-	a.WithKennung.Metadatei.AkteSha.Reset()
+	a.Metadatei.Reset()
 	a.FDs = b.FDs
-	KPtr(&a.WithKennung.Kennung).ResetWith(b.Kennung)
+	KPtr(&a.Kennung).ResetWith(b.Kennung)
 }
 
 func (a External[K, KPtr]) Equals(b External[K, KPtr]) (ok bool) {
