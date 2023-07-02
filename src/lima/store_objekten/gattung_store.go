@@ -172,7 +172,7 @@ func (s *commonStore[O, OPtr, K, KPtr]) CheckoutOne(
 				return
 			}
 
-			co.External.Sku.Kennung = t.Sku.GetKennung()
+			co.External.Sku.WithKennung.Kennung = t.Sku.GetKennung()
 		} else {
 			err = errors.Wrap(err)
 		}

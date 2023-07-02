@@ -9,6 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/juliett/zettel"
@@ -76,7 +77,9 @@ func (c Status) RunWithCwdQuery(
 					External: zettel.External{
 						Akte: z.Akte,
 						Sku: sku.External[kennung.Hinweis, *kennung.Hinweis]{
-							Kennung: z.Sku.GetKennung(),
+							WithKennung: metadatei.WithKennung[kennung.Hinweis, *kennung.Hinweis]{
+								Kennung: z.Sku.GetKennung(),
+							},
 							FDs: sku.ExternalFDs{
 								Akte: fd,
 							},

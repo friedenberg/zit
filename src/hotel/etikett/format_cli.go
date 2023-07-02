@@ -41,11 +41,14 @@ func MakeCliFormatCheckedOut(
 			w,
 			// format.MakeFormatStringRightAlignedParen(diff),
 			format.MakeFormatString("["),
-			cw(s.MakeWriterRelativePath(t.External.GetObjekteFD().Path), format.ColorTypePointer),
+			cw(
+				s.MakeWriterRelativePath(t.External.GetObjekteFD().Path),
+				format.ColorTypePointer,
+			),
 			format.MakeFormatString("@"),
 			format.MakeWriter(sf, t.External.GetObjekteSha().GetSha()),
 			format.MakeFormatString(" "),
-			format.MakeWriter(tf, t.External.Sku.Kennung),
+			format.MakeWriter(tf, t.External.Sku.GetKennung()),
 			format.MakeFormatString("]"),
 		)
 	}
@@ -63,11 +66,14 @@ func MakeCliFormatExternal(
 			w,
 			format.MakeFormatStringRightAligned(""),
 			format.MakeFormatString("["),
-			cw(s.MakeWriterRelativePath(t.GetObjekteFD().Path), format.ColorTypePointer),
+			cw(
+				s.MakeWriterRelativePath(t.GetObjekteFD().Path),
+				format.ColorTypePointer,
+			),
 			format.MakeFormatString("@"),
 			format.MakeWriter(sf, t.GetObjekteSha()),
 			format.MakeFormatString(" "),
-			format.MakeWriter(tf, t.Sku.Kennung),
+			format.MakeWriter(tf, t.Sku.GetKennung()),
 			format.MakeFormatString("]"),
 		)
 	}

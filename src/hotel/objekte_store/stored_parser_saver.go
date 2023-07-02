@@ -78,7 +78,7 @@ func (h storedParserSaver[O, OPtr, K, KPtr]) ParseSaveStored(
 	}
 
 	t.Sku.FDs = sem.FDs
-	t.Sku.Kennung = sem.Kennung
+	t.Sku.WithKennung.Kennung = sem.Kennung
 
 	r := sha.MakeReadCloser(f)
 

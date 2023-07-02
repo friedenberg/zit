@@ -14,17 +14,17 @@ import (
 )
 
 // TODO-P2 move sku.Sku to sku.Transacted
-type Transacted[T kennung.KennungLike[T], T1 kennung.KennungLikePtr[T]] struct {
-	WithKennung      metadatei.WithKennung[T, T1]
+type Transacted[K kennung.KennungLike[K], KPtr kennung.KennungLikePtr[K]] struct {
+	WithKennung      metadatei.WithKennung[K, KPtr]
 	ObjekteSha       sha.Sha
 	TransactionIndex values.Int
 	Kopf, Schwanz    kennung.Tai
 }
 
-func (t *Transacted[T, T1]) SetFromSku(sk Sku) (err error) {
+func (t *Transacted[K, KPtr]) SetFromSku(sk Sku) (err error) {
 	t.Schwanz = sk.GetTai()
 
-	if err = T1(&t.WithKennung.Kennung).Set(sk.WithKennung.Kennung.String()); err != nil {
+	if err = KPtr(&t.WithKennung.Kennung).Set(sk.WithKennung.Kennung.String()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -73,7 +73,7 @@ func MakeSkuTransacted(t kennung.Tai, line string) (out SkuLikePtr, err error) {
 	return
 }
 
-func (a Transacted[T, T1]) String() string {
+func (a Transacted[K, KPtr]) String() string {
 	return fmt.Sprintf(
 		"%s %s %s",
 		a.WithKennung.Kennung,
@@ -82,23 +82,27 @@ func (a Transacted[T, T1]) String() string {
 	)
 }
 
-func (a Transacted[T, T1]) GetTai() kennung.Tai {
+func (a Transacted[K, KPtr]) GetTai() kennung.Tai {
 	return a.Schwanz
 }
 
-func (a Transacted[T, T1]) GetKennung() T {
+func (a Transacted[K, KPtr]) GetKennung() K {
 	return a.WithKennung.Kennung
 }
 
-func (a Transacted[T, T1]) GetExternal() External[T, T1] {
-	return External[T, T1]{
-		Kennung:    a.WithKennung.Kennung,
-		AkteSha:    a.WithKennung.Metadatei.AkteSha,
+func (a Transacted[K, KPtr]) GetExternal() External[K, KPtr] {
+	return External[K, KPtr]{
+		WithKennung: metadatei.WithKennung[K, KPtr]{
+			Kennung: a.WithKennung.Kennung,
+			Metadatei: metadatei.Metadatei{
+				AkteSha: sha.Make(a.GetAkteSha()),
+			},
+		},
 		ObjekteSha: a.ObjekteSha,
 	}
 }
 
-func (a *Transacted[T, T1]) Sku() Sku {
+func (a *Transacted[K, KPtr]) Sku() Sku {
 	return Sku{
 		WithKennung: metadatei.WithKennungInterface{
 			Kennung: a.WithKennung.Kennung,
@@ -112,29 +116,29 @@ func (a *Transacted[T, T1]) Sku() Sku {
 	}
 }
 
-func (a *Transacted[T, T1]) SetTransactionIndex(i int) {
+func (a *Transacted[K, KPtr]) SetTransactionIndex(i int) {
 	a.TransactionIndex.SetInt(i)
 }
 
-func (a *Transacted[T, T1]) Reset() {
+func (a *Transacted[K, KPtr]) Reset() {
 	a.Kopf.Reset()
 	a.ObjekteSha.Reset()
 	a.WithKennung.Metadatei.AkteSha.Reset()
-	T1(&a.WithKennung.Kennung).Reset()
+	KPtr(&a.WithKennung.Kennung).Reset()
 	a.Schwanz.Reset()
 	a.TransactionIndex.Reset()
 }
 
-func (a *Transacted[T, T1]) ResetWith(b Transacted[T, T1]) {
+func (a *Transacted[K, KPtr]) ResetWith(b Transacted[K, KPtr]) {
 	a.Kopf = b.Kopf
 	a.ObjekteSha = b.ObjekteSha
 	a.WithKennung.Metadatei.AkteSha = b.WithKennung.Metadatei.AkteSha
-	T1(&a.WithKennung.Kennung).ResetWith(b.WithKennung.Kennung)
+	KPtr(&a.WithKennung.Kennung).ResetWith(b.WithKennung.Kennung)
 	a.Schwanz = b.Schwanz
 	a.TransactionIndex.SetInt(b.TransactionIndex.Int())
 }
 
-func (a Transacted[T, T1]) Less(b Transacted[T, T1]) (ok bool) {
+func (a Transacted[K, KPtr]) Less(b Transacted[K, KPtr]) (ok bool) {
 	if a.Schwanz.Less(b.Schwanz) {
 		ok = true
 		return
@@ -149,11 +153,11 @@ func (a Transacted[T, T1]) Less(b Transacted[T, T1]) (ok bool) {
 	return
 }
 
-func (a Transacted[T, T1]) EqualsAny(b any) (ok bool) {
+func (a Transacted[K, KPtr]) EqualsAny(b any) (ok bool) {
 	return values.Equals(a, b)
 }
 
-func (a Transacted[T, T1]) Equals(b Transacted[T, T1]) (ok bool) {
+func (a Transacted[K, KPtr]) Equals(b Transacted[K, KPtr]) (ok bool) {
 	if !a.TransactionIndex.Equals(b.TransactionIndex) {
 		return
 	}
@@ -179,7 +183,7 @@ func (a Transacted[T, T1]) Equals(b Transacted[T, T1]) (ok bool) {
 	return true
 }
 
-func (o *Transacted[T, T1]) SetTimeAndFields(
+func (o *Transacted[K, KPtr]) SetTimeAndFields(
 	t kennung.Tai,
 	vs ...string,
 ) (err error) {
@@ -198,7 +202,7 @@ func (o *Transacted[T, T1]) SetTimeAndFields(
 
 	vs = vs[1:]
 
-	if err = T1(&o.WithKennung.Kennung).Set(vs[0]); err != nil {
+	if err = KPtr(&o.WithKennung.Kennung).Set(vs[0]); err != nil {
 		err = errors.Wrapf(err, "failed to set id: %s", vs[1])
 		return
 	}
@@ -213,26 +217,26 @@ func (o *Transacted[T, T1]) SetTimeAndFields(
 	return
 }
 
-func (s Transacted[T, T1]) GetGattung() schnittstellen.Gattung {
+func (s Transacted[K, KPtr]) GetGattung() schnittstellen.Gattung {
 	return s.WithKennung.Kennung.GetGattung()
 }
 
-func (s Transacted[T, T1]) GetId() Kennung {
-	return T1(&s.WithKennung.Kennung)
+func (s Transacted[K, KPtr]) GetId() Kennung {
+	return KPtr(&s.WithKennung.Kennung)
 }
 
-func (s Transacted[T, T1]) GetObjekteSha() schnittstellen.Sha {
+func (s Transacted[K, KPtr]) GetObjekteSha() schnittstellen.Sha {
 	return s.ObjekteSha
 }
 
-func (s Transacted[T, T1]) GetAkteSha() schnittstellen.Sha {
+func (s Transacted[K, KPtr]) GetAkteSha() schnittstellen.Sha {
 	return s.WithKennung.Metadatei.AkteSha
 }
 
-func (s Transacted[T, T1]) GetTransactionIndex() values.Int {
+func (s Transacted[K, KPtr]) GetTransactionIndex() values.Int {
 	return s.TransactionIndex
 }
 
-func (o Transacted[T, T1]) GetKey() string {
+func (o Transacted[K, KPtr]) GetKey() string {
 	return fmt.Sprintf("%s.%s", o.GetGattung(), o.GetKennung())
 }

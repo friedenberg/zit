@@ -59,7 +59,7 @@ func makeWriterFuncZettel(
 			cw(
 				s.MakeWriterRelativePathOr(
 					z.External.GetObjekteFD().Path,
-					format.MakeWriter(hf, z.External.Sku.Kennung),
+					format.MakeWriter(hf, z.External.Sku.GetKennung()),
 				),
 				format.ColorTypePointer,
 			),
@@ -85,7 +85,10 @@ func makeWriterFuncAkte(
 			w,
 			format.MakeFormatStringRightAligned("%s", format.StringDRArrow),
 			format.MakeFormatString("["),
-			cw(s.MakeWriterRelativePath(z.External.GetAkteFD().Path), format.ColorTypePointer),
+			cw(
+				s.MakeWriterRelativePath(z.External.GetAkteFD().Path),
+				format.ColorTypePointer,
+			),
 			format.MakeFormatString("@"),
 			format.MakeWriter(sf, z.External.GetAkteSha().GetSha()),
 			format.MakeFormatString("]"),

@@ -25,7 +25,7 @@ func MakeMutableSetUniqueHinweis(zs ...*zettel.External) MutableSet {
 			return ""
 		}
 
-		return z.Sku.Kennung.String()
+		return z.Sku.GetKennung().String()
 	}
 
 	return MakeMutableSet(kf, zs...)

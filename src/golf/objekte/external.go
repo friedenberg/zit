@@ -22,7 +22,7 @@ func (_ ExternalKeyer[T, T1, T2, T3]) Key(e *External[T, T1, T2, T3]) string {
 		return ""
 	}
 
-	return e.Sku.Kennung.String()
+	return e.Sku.GetKennung().String()
 }
 
 type External[
@@ -82,11 +82,11 @@ func (a External[T, T1, T2, T3]) GetTyp() (t kennung.Typ) {
 }
 
 func (a External[T, T1, T2, T3]) GetKennung() kennung.Kennung {
-	return a.Sku.Kennung
+	return a.Sku.GetKennung()
 }
 
 func (a External[T, T1, T2, T3]) GetIdLike() (il kennung.Kennung) {
-	return a.Sku.Kennung
+	return a.Sku.GetKennung()
 }
 
 func (a External[T, T1, T2, T3]) String() string {
@@ -110,7 +110,7 @@ func (a External[T, T1, T2, T3]) Equals(b External[T, T1, T2, T3]) bool {
 }
 
 func (e External[T, T1, T2, T3]) GetGattung() schnittstellen.Gattung {
-	return e.Sku.Kennung.GetGattung()
+	return e.Sku.GetGattung()
 }
 
 func (e External[T, T1, T2, T3]) GetFDs() sku.ExternalFDs {
@@ -134,7 +134,7 @@ func (e External[T, T1, T2, T3]) GetObjekteSha() schnittstellen.Sha {
 }
 
 func (t External[T, T1, T2, T3]) GetSkuAkteSha() schnittstellen.Sha {
-	return t.Sku.AkteSha
+	return t.Sku.GetAkteSha()
 }
 
 func (t External[T, T1, T2, T3]) GetFDAkteSha() schnittstellen.Sha {
@@ -143,7 +143,7 @@ func (t External[T, T1, T2, T3]) GetFDAkteSha() schnittstellen.Sha {
 
 func (t External[T, T1, T2, T3]) GetAkteSha() schnittstellen.Sha {
 	AssertAkteShasMatch(t)
-	return t.Sku.AkteSha
+	return t.Sku.GetAkteSha()
 }
 
 func (e *External[T, T1, T2, T3]) SetAkteFD(fd kennung.FD) {

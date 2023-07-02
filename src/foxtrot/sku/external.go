@@ -6,46 +6,53 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
 
-type External[T kennung.KennungLike[T], T1 kennung.KennungLikePtr[T]] struct {
-	ObjekteSha sha.Sha
-	AkteSha    sha.Sha
-	// TODO-P4 turn in ExternalMaybe
-	Kennung T
-	FDs     ExternalFDs
+type External[K kennung.KennungLike[K], KPtr kennung.KennungLikePtr[K]] struct {
+	ObjekteSha  sha.Sha
+	WithKennung metadatei.WithKennung[K, KPtr]
+	FDs         ExternalFDs
 }
 
-func (a External[T, T1]) String() string {
+func (a External[K, KPtr]) GetKennung() K {
+	return a.WithKennung.GetKennung()
+}
+
+func (a External[K, KPtr]) GetGattung() gattung.Gattung {
+	return gattung.Must(a.WithKennung.GetGattung())
+}
+
+func (a External[K, KPtr]) String() string {
 	return fmt.Sprintf(
 		". %s %s %s %s",
-		a.Kennung.GetGattung(),
-		a.Kennung,
+		a.GetGattung(),
+		a.GetKennung(),
 		a.ObjekteSha,
-		a.AkteSha,
+		a.GetAkteSha(),
 	)
 }
 
-func (a External[T, T1]) GetAkteSha() schnittstellen.Sha {
-	return a.AkteSha
+func (a External[K, KPtr]) GetAkteSha() schnittstellen.Sha {
+	return a.WithKennung.Metadatei.AkteSha
 }
 
-func (a *External[T, T1]) SetAkteSha(v schnittstellen.Sha) {
+func (a *External[K, KPtr]) SetAkteSha(v schnittstellen.Sha) {
 	sh := sha.Make(v)
-	a.AkteSha = sh
+	a.WithKennung.Metadatei.AkteSha = sh
 	a.FDs.Akte.Sha = sh
 }
 
-func (a *External[T, T1]) Transacted() (b Transacted[T, T1]) {
-	b = Transacted[T, T1]{
-		WithKennung: metadatei.WithKennung[T, T1]{
-			Kennung: a.Kennung,
+func (a *External[K, KPtr]) Transacted() (b Transacted[K, KPtr]) {
+	b = Transacted[K, KPtr]{
+		WithKennung: metadatei.WithKennung[K, KPtr]{
+			Kennung: a.GetKennung(),
 			Metadatei: metadatei.Metadatei{
-				AkteSha: a.AkteSha,
+				AkteSha: sha.Make(a.GetAkteSha()),
 			},
 		},
 		ObjekteSha: a.ObjekteSha,
@@ -54,28 +61,28 @@ func (a *External[T, T1]) Transacted() (b Transacted[T, T1]) {
 	return
 }
 
-func (a *External[T, T1]) Reset() {
-	a.ObjekteSha = sha.Sha{}
-	a.AkteSha = sha.Sha{}
-	T1(&a.Kennung).Reset()
+func (a *External[K, KPtr]) Reset() {
+	a.ObjekteSha.Reset()
+	a.WithKennung.Metadatei.AkteSha.Reset()
+	KPtr(&a.WithKennung.Kennung).Reset()
 }
 
-func (a *External[T, T1]) ResetWith(b *External[T, T1]) {
-	a.ObjekteSha = b.ObjekteSha
-	a.AkteSha = b.AkteSha
-	T1(&a.Kennung).ResetWith(b.Kennung)
+func (a *External[K, KPtr]) ResetWith(b *External[K, KPtr]) {
+	a.ObjekteSha.ResetWith(b.ObjekteSha)
+	a.WithKennung.Metadatei.AkteSha.ResetWithShaLike(b.GetAkteSha())
+	KPtr(&a.WithKennung.Kennung).ResetWith(b.GetKennung())
 }
 
-func (a *External[T, T1]) ResetWithExternalMaybe(b ExternalMaybe[T, T1]) {
+func (a *External[K, KPtr]) ResetWithExternalMaybe(b ExternalMaybe[K, KPtr]) {
 	todo.Change("use this in other places")
-	a.ObjekteSha = sha.Sha{}
-	a.AkteSha = sha.Sha{}
+	a.ObjekteSha.Reset()
+	a.WithKennung.Metadatei.AkteSha.Reset()
 	a.FDs = b.FDs
-	T1(&a.Kennung).ResetWith(b.Kennung)
+	KPtr(&a.WithKennung.Kennung).ResetWith(b.Kennung)
 }
 
-func (a External[T, T1]) Equals(b External[T, T1]) (ok bool) {
-	if a.Kennung.Equals(b.Kennung) {
+func (a External[K, KPtr]) Equals(b External[K, KPtr]) (ok bool) {
+	if a.GetKennung().Equals(b.GetKennung()) {
 		return
 	}
 
@@ -86,11 +93,11 @@ func (a External[T, T1]) Equals(b External[T, T1]) (ok bool) {
 	return true
 }
 
-func (o External[T, T1]) GetKey() string {
-	return fmt.Sprintf("%s.%s", o.Kennung.GetGattung(), o.Kennung)
+func (o External[K, KPtr]) GetKey() string {
+	return fmt.Sprintf("%s.%s", o.GetGattung(), o.GetKennung())
 }
 
-func (e External[T, T1]) GetCheckoutMode() (m checkout_mode.Mode, err error) {
+func (e External[K, KPtr]) GetCheckoutMode() (m checkout_mode.Mode, err error) {
 	switch {
 	case !e.FDs.Objekte.IsEmpty() && !e.FDs.Akte.IsEmpty():
 		m = checkout_mode.ModeObjekteAndAkte

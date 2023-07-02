@@ -187,6 +187,14 @@ func (s *Sha) Reset() {
 	s.value = Null
 }
 
+func (s *Sha) ResetWith(s1 Sha) {
+	s.value = s1.value
+}
+
+func (s *Sha) ResetWithShaLike(s1 schnittstellen.Sha) {
+	s.value = s1.GetShaString()
+}
+
 func (s Sha) Path(pc ...string) string {
 	pc = append(pc, s.Kopf())
 	pc = append(pc, s.Schwanz())

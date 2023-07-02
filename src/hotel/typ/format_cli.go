@@ -35,11 +35,14 @@ func MakeCliFormatCheckedOut(
 		return format.Write(
 			w,
 			format.MakeFormatString("["),
-			cw(s.MakeWriterRelativePath(t.External.GetObjekteFD().Path), format.ColorTypePointer),
+			cw(
+				s.MakeWriterRelativePath(t.External.GetObjekteFD().Path),
+				format.ColorTypePointer,
+			),
 			format.MakeFormatString("@"),
 			format.MakeWriter(sf, t.External.GetObjekteSha().GetSha()),
 			format.MakeFormatString(" "),
-			format.MakeWriter(tf, t.External.Sku.Kennung),
+			format.MakeWriter(tf, t.External.Sku.GetKennung()),
 			format.MakeFormatString("]"),
 		)
 	}

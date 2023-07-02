@@ -72,7 +72,7 @@ func MakeCreateOrUpdate[
 func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateCheckedOut(
 	co *objekte.CheckedOut[T, T1, T2, T3],
 ) (transactedPtr *objekte.Transacted[T, T1, T2, T3], err error) {
-	kennungPtr := T3(&co.External.Sku.Kennung)
+	kennungPtr := T3(&co.External.Sku.WithKennung.Kennung)
 	objektePtr := T1(&co.External.Akte)
 
 	if !cou.ls.IsAcquired() {
