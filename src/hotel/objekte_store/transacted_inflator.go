@@ -84,7 +84,7 @@ func (h *transactedInflator[T, T1, T2, T3]) InflateFromSku2(
 	}
 
 	// TODO-P2 make generic
-	if err = t.Sku.SetFromSku(o); err != nil {
+	if err = t.Sku.SetFromSkuLike(o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

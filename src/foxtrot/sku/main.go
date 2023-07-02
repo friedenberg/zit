@@ -2,7 +2,6 @@ package sku
 
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
@@ -35,13 +34,13 @@ type SkuLike interface {
 
 	GetKey() string
 
-	GetTransactionIndex() values.Int
+	// GetTransactionIndex() values.Int
 	// Less(SkuLike) bool
 }
 
 type SkuLikePtr interface {
 	SkuLike
 	SetTimeAndFields(kennung.Tai, ...string) error
-	SetFromSku(Sku) error
+	SetFromSkuLike(SkuLike) error
 	SetTransactionIndex(int)
 }

@@ -21,14 +21,14 @@ type Transacted[K kennung.KennungLike[K], KPtr kennung.KennungLikePtr[K]] struct
 	Kopf             kennung.Tai
 }
 
-func (t *Transacted[K, KPtr]) SetFromSku(sk Sku) (err error) {
-	if err = KPtr(&t.Kennung).Set(sk.WithKennung.Kennung.String()); err != nil {
+func (t *Transacted[K, KPtr]) SetFromSkuLike(sk SkuLike) (err error) {
+	if err = KPtr(&t.Kennung).Set(sk.GetId().String()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	t.ObjekteSha = sk.ObjekteSha
-	t.Metadatei.AkteSha = sk.WithKennung.Metadatei.AkteSha
+	t.ObjekteSha = sha.Make(sk.GetObjekteSha())
+	t.Metadatei.AkteSha = sha.Make(sk.GetAkteSha())
 	t.GetMetadateiPtr().Tai = sk.GetTai()
 
 	t.Kopf = sk.GetTai()

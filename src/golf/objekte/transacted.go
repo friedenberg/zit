@@ -264,7 +264,7 @@ func (a *Transacted[T, T1, T2, T3]) SetSkuLike(
 
 	a.Sku.Kennung = h
 	a.Sku.ObjekteSha = sha.Make(o.GetObjekteSha())
-	a.Sku.TransactionIndex = o.GetTransactionIndex()
+	// a.Sku.TransactionIndex = o.GetTransactionIndex()
 	// TODO-P3 fix sku kopf and schwanz
 	// a.Sku.Kopf = t
 	a.SetTai(o.GetTai())
