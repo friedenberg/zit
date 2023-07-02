@@ -23,6 +23,14 @@ func (a External[K, KPtr]) GetKennung() K {
 	return a.WithKennung.GetKennung()
 }
 
+func (a External[K, KPtr]) GetMetadatei() metadatei.Metadatei {
+	return a.WithKennung.GetMetadatei()
+}
+
+func (a *External[K, KPtr]) GetMetadateiPtr() *metadatei.Metadatei {
+	return a.WithKennung.GetMetadateiPtr()
+}
+
 func (a External[K, KPtr]) GetGattung() gattung.Gattung {
 	return gattung.Must(a.WithKennung.GetGattung())
 }
@@ -63,14 +71,12 @@ func (a *External[K, KPtr]) Transacted() (b Transacted[K, KPtr]) {
 
 func (a *External[K, KPtr]) Reset() {
 	a.ObjekteSha.Reset()
-	a.WithKennung.Metadatei.AkteSha.Reset()
-	KPtr(&a.WithKennung.Kennung).Reset()
+	a.WithKennung.Reset()
 }
 
 func (a *External[K, KPtr]) ResetWith(b *External[K, KPtr]) {
 	a.ObjekteSha.ResetWith(b.ObjekteSha)
-	a.WithKennung.Metadatei.AkteSha.ResetWithShaLike(b.GetAkteSha())
-	KPtr(&a.WithKennung.Kennung).ResetWith(b.GetKennung())
+	a.WithKennung.ResetWith(b.WithKennung)
 }
 
 func (a *External[K, KPtr]) ResetWithExternalMaybe(b ExternalMaybe[K, KPtr]) {

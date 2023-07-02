@@ -17,10 +17,6 @@ import (
 type Sku struct {
 	WithKennung metadatei.WithKennungInterface
 	ObjekteSha  sha.Sha
-	// Gattung    gattung.Gattung
-	// Tai        kennung.Tai
-	// Kennung    Kennung
-	// AkteSha    sha.Sha
 }
 
 func (sk *Sku) setKennungValue(v string) (err error) {

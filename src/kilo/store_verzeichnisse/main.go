@@ -73,7 +73,11 @@ func (i Zettelen) GetPage(n int) (p *Page, err error) {
 		fallthrough
 
 	case n < 0:
-		err = errors.Errorf("expected page between 0 and %d, but got %d", PageCount-1, n)
+		err = errors.Errorf(
+			"expected page between 0 and %d, but got %d",
+			PageCount-1,
+			n,
+		)
 		return
 	}
 
@@ -125,7 +129,7 @@ func (i *Zettelen) GetPageIndexKeyValue(
 	zt zettel.Transacted,
 ) (key string, value string) {
 	key = zt.Kennung().String()
-	value = fmt.Sprintf("%s.%s", zt.Sku.Schwanz, zt.Sku.ObjekteSha)
+	value = fmt.Sprintf("%s.%s", zt.Sku.GetTai(), zt.Sku.ObjekteSha)
 	return
 }
 

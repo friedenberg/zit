@@ -31,21 +31,20 @@ type External[
 	T2 kennung.KennungLike[T2],
 	T3 kennung.KennungLikePtr[T2],
 ] struct {
-	Akte      T
-	Metadatei metadatei.Metadatei
-	Sku       sku.External[T2, T3]
+	Akte T
+	Sku  sku.External[T2, T3]
 }
 
 func (a External[T, T1, T2, T3]) GetMetadatei() metadatei.Metadatei {
-	return a.Metadatei
+	return a.Sku.GetMetadatei()
 }
 
 func (a *External[T, T1, T2, T3]) GetMetadateiPtr() *metadatei.Metadatei {
-	return &a.Metadatei
+	return a.Sku.GetMetadateiPtr()
 }
 
 func (a *External[T, T1, T2, T3]) SetMetadatei(m metadatei.Metadatei) {
-	a.Metadatei.ResetWith(m)
+	a.GetMetadateiPtr().ResetWith(m)
 	a.SetAkteSha(m.AkteSha)
 }
 

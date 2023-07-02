@@ -26,7 +26,7 @@ func MakeMutableSetUnique(c int) MutableSet {
 
 				return collections.MakeKey(
 					sz.Sku.Kopf,
-					sz.Sku.Schwanz,
+					sz.Sku.GetTai(),
 					sz.Sku.TransactionIndex,
 					sz.Sku.GetKennung(),
 					sz.Sku.ObjekteSha,

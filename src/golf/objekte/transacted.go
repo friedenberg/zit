@@ -17,9 +17,8 @@ type Transacted[
 	T2 kennung.KennungLike[T2],
 	T3 kennung.KennungLikePtr[T2],
 ] struct {
-	Akte      T
-	Metadatei metadatei.Metadatei
-	Sku       sku.Transacted[T2, T3]
+	Akte T
+	Sku  sku.Transacted[T2, T3]
 }
 
 func (t Transacted[T, T1, T2, T3]) Kennung() T3 {
@@ -27,17 +26,17 @@ func (t Transacted[T, T1, T2, T3]) Kennung() T3 {
 }
 
 func (t Transacted[T, T1, T2, T3]) GetMetadatei() metadatei.Metadatei {
-	return t.Metadatei
+	return t.Sku.GetMetadatei()
 }
 
 func (t *Transacted[T, T1, T2, T3]) GetMetadateiPtr() *metadatei.Metadatei {
-	return &t.Metadatei
+	return t.Sku.GetMetadateiPtr()
 }
 
 func (t *Transacted[T, T1, T2, T3]) SetMetadatei(
 	m metadatei.Metadatei,
 ) {
-	t.Metadatei.ResetWith(m)
+	t.GetMetadateiPtr().ResetWith(m)
 	t.SetAkteSha(m.AkteSha)
 	t.SetTai(m.Tai)
 }
@@ -77,7 +76,7 @@ func (t *Transacted[T, T1, T2, T3]) SetObjekteSha(
 }
 
 func (t Transacted[T, T1, T2, T3]) GetTai() kennung.Tai {
-	taiSku := t.Sku.Schwanz
+	taiSku := t.Sku.GetTai()
 	taiMetadatei := t.GetMetadatei().Tai
 
 	switch {
@@ -111,8 +110,7 @@ func (t Transacted[T, T1, T2, T3]) GetTai() kennung.Tai {
 }
 
 func (t *Transacted[T, T1, T2, T3]) SetTai(ta kennung.Tai) {
-	t.Metadatei.Tai = ta
-	t.Sku.Schwanz = ta
+	t.Sku.SetTai(ta)
 }
 
 func (t Transacted[T, T1, T2, T3]) GetGattung() schnittstellen.Gattung {
@@ -120,7 +118,7 @@ func (t Transacted[T, T1, T2, T3]) GetGattung() schnittstellen.Gattung {
 }
 
 func (zt Transacted[T, T1, T2, T3]) IsNew() bool {
-	return zt.Sku.Kopf.Equals(zt.Sku.Schwanz)
+	return zt.Sku.Kopf.Equals(zt.Sku.GetTai())
 }
 
 func (a Transacted[T, T1, T2, T3]) Less(
@@ -136,7 +134,7 @@ func (a Transacted[T, T1, T2, T3]) EqualsAny(b any) bool {
 func (a Transacted[T, T1, T2, T3]) Equals(
 	b Transacted[T, T1, T2, T3],
 ) bool {
-	if !a.Metadatei.Equals(b.Metadatei) {
+	if !a.GetMetadatei().Equals(b.GetMetadatei()) {
 		return false
 	}
 
@@ -157,7 +155,7 @@ func (a Transacted[T, T1, T2, T3]) GetObjekte() (o T) {
 }
 
 func (a Transacted[T, T1, T2, T3]) GetEtiketten() kennung.EtikettSet {
-	return a.Metadatei.GetEtiketten()
+	return a.GetMetadatei().GetEtiketten()
 }
 
 func (a Transacted[T, T1, T2, T3]) GetTyp() (t kennung.Typ) {
@@ -286,7 +284,6 @@ func (a Transacted[T, T1, T2, T3]) GetKennungString() string {
 }
 
 func (a *Transacted[T, T1, T2, T3]) Reset() {
-	a.Metadatei.Reset()
 	a.Sku.Reset()
 	T1(&a.Akte).Reset()
 	AssertAkteShasMatch(a)
@@ -295,7 +292,6 @@ func (a *Transacted[T, T1, T2, T3]) Reset() {
 func (a *Transacted[T, T1, T2, T3]) ResetWithPtr(
 	b *Transacted[T, T1, T2, T3],
 ) {
-	a.Metadatei.ResetWith(b.GetMetadatei())
 	a.Sku.ResetWith(b.Sku)
 	T1(&a.Akte).ResetWith(b.Akte)
 	AssertAkteShasMatch(a)
@@ -304,7 +300,6 @@ func (a *Transacted[T, T1, T2, T3]) ResetWithPtr(
 func (a *Transacted[T, T1, T2, T3]) ResetWith(
 	b Transacted[T, T1, T2, T3],
 ) {
-	a.Metadatei.ResetWith(b.Metadatei)
 	a.Sku.ResetWith(b.Sku)
 	T1(&a.Akte).ResetWith(b.Akte)
 	AssertAkteShasMatch(a)

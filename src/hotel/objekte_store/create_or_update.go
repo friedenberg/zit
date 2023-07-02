@@ -88,8 +88,10 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateCheckedOut(
 		Sku: sku.Transacted[T2, T3]{
 			WithKennung: metadatei.WithKennung[T2, T3]{
 				Kennung: *kennungPtr,
+				Metadatei: metadatei.Metadatei{
+					Tai: cou.clock.GetTai(),
+				},
 			},
-			Schwanz: cou.clock.GetTai(),
 		},
 	}
 
@@ -172,14 +174,15 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdate(
 		m = mg.GetMetadatei()
 	}
 
+	m.Tai = cou.clock.GetTai()
+
 	transactedPtr = &objekte.Transacted[T, T1, T2, T3]{
-		Metadatei: m,
-		Akte:      *objektePtr,
+		Akte: *objektePtr,
 		Sku: sku.Transacted[T2, T3]{
 			WithKennung: metadatei.WithKennung[T2, T3]{
-				Kennung: *kennungPtr,
+				Kennung:   *kennungPtr,
+				Metadatei: m,
 			},
-			Schwanz: cou.clock.GetTai(),
 		},
 	}
 
@@ -278,14 +281,15 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateAkte(
 		m = mg.GetMetadatei()
 	}
 
+	m.Tai = cou.clock.GetTai()
+
 	transactedPtr = &objekte.Transacted[T, T1, T2, T3]{
-		Metadatei: m,
-		Akte:      *objektePtr,
+		Akte: *objektePtr,
 		Sku: sku.Transacted[T2, T3]{
 			WithKennung: metadatei.WithKennung[T2, T3]{
-				Kennung: *kennungPtr,
+				Metadatei: m,
+				Kennung:   *kennungPtr,
 			},
-			Schwanz: cou.clock.GetTai(),
 		},
 	}
 

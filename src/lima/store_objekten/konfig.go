@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/golf/transaktion"
@@ -99,7 +98,9 @@ func (s konfigStore) Update(
 	sh schnittstellen.Sha,
 ) (kt *erworben.Transacted, err error) {
 	if !s.StoreUtil.GetLockSmith().IsAcquired() {
-		err = errors.Wrap(objekte_store.ErrLockRequired{Operation: "update konfig"})
+		err = errors.Wrap(
+			objekte_store.ErrLockRequired{Operation: "update konfig"},
+		)
 		return
 	}
 
@@ -116,11 +117,9 @@ func (s konfigStore) Update(
 
 	kt = &erworben.Transacted{
 		Akte: *ko,
-		Sku: sku.Transacted[kennung.Konfig, *kennung.Konfig]{
-			Schwanz: s.StoreUtil.GetTai(),
-		},
 	}
 
+	kt.SetTai(s.StoreUtil.GetTai())
 	kt.SetAkteSha(sh)
 
 	// TODO-P3 refactor into reusable
@@ -303,12 +302,9 @@ func (s konfigStore) ReadOne(
 	tt = &erworben.Transacted{
 		Sku:  s.StoreUtil.GetKonfig().Sku,
 		Akte: s.StoreUtil.GetKonfig().Akte,
-		Metadatei: metadatei.Metadatei{
-			AkteSha: sha.Make(s.StoreUtil.GetKonfig().Sku.GetAkteSha()),
-		},
 	}
 
-	if !tt.Sku.Schwanz.IsEmpty() {
+	if !tt.Sku.GetTai().IsEmpty() {
 		{
 			var r sha.ReadCloser
 

@@ -127,7 +127,7 @@ func (s *commonStore[O, OPtr, K, KPtr]) readOneExternalObjekte(
 
 	if t != nil {
 		OPtr(&e.Akte).ResetWith(t.Akte)
-		e.Metadatei.ResetWith(t.Metadatei)
+		e.GetMetadateiPtr().ResetWith(t.GetMetadatei())
 	}
 
 	if _, err = s.textParser.ParseMetadatei(f, e); err != nil {

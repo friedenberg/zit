@@ -287,7 +287,7 @@ func (s *zettelStore) readOneExternalObjekte(
 	defer errors.DeferredCloser(&err, f)
 
 	ez.Akte.ResetWith(t.Akte)
-	ez.Metadatei.ResetWith(t.Metadatei)
+	ez.GetMetadateiPtr().ResetWith(t.GetMetadatei())
 
 	if _, err = s.textParser.ParseMetadatei(f, ez); err != nil {
 		err = errors.Wrapf(err, "%s", f.Name())
@@ -607,21 +607,18 @@ func (s *zettelStore) writeObjekte(
 		panic("metadatei.Getter was nil")
 	}
 
-	t := s.StoreUtil.GetTai()
+	m := mg.GetMetadatei()
+	m.Tai = s.StoreUtil.GetTai()
 
 	tz = &zettel.Transacted{
 		Sku: sku.Transacted[kennung.Hinweis, *kennung.Hinweis]{
 			WithKennung: metadatei.WithKennung[kennung.Hinweis, *kennung.Hinweis]{
-				Kennung: h,
+				Kennung:   h,
+				Metadatei: m,
 			},
-			Kopf:    t,
-			Schwanz: t,
+			Kopf: m.Tai,
 		},
 	}
-
-	m := mg.GetMetadatei()
-
-	tz.SetMetadatei(m)
 
 	if err = s.SaveObjekte(tz); err != nil {
 		err = errors.Wrap(err)

@@ -18,12 +18,10 @@ type Transacted[K kennung.KennungLike[K], KPtr kennung.KennungLikePtr[K]] struct
 	WithKennung      metadatei.WithKennung[K, KPtr]
 	ObjekteSha       sha.Sha
 	TransactionIndex values.Int
-	Kopf, Schwanz    kennung.Tai
+	Kopf             kennung.Tai
 }
 
 func (t *Transacted[K, KPtr]) SetFromSku(sk Sku) (err error) {
-	t.Schwanz = sk.GetTai()
-
 	if err = KPtr(&t.WithKennung.Kennung).Set(sk.WithKennung.Kennung.String()); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -31,9 +29,9 @@ func (t *Transacted[K, KPtr]) SetFromSku(sk Sku) (err error) {
 
 	t.ObjekteSha = sk.ObjekteSha
 	t.WithKennung.Metadatei.AkteSha = sk.WithKennung.Metadatei.AkteSha
+	t.GetMetadateiPtr().Tai = sk.GetTai()
 
 	t.Kopf = sk.GetTai()
-	t.Schwanz = sk.GetTai()
 
 	return
 }
@@ -82,8 +80,20 @@ func (a Transacted[K, KPtr]) String() string {
 	)
 }
 
+func (a Transacted[K, KPtr]) GetMetadatei() metadatei.Metadatei {
+	return a.WithKennung.GetMetadatei()
+}
+
+func (a *Transacted[K, KPtr]) GetMetadateiPtr() *metadatei.Metadatei {
+	return a.WithKennung.GetMetadateiPtr()
+}
+
 func (a Transacted[K, KPtr]) GetTai() kennung.Tai {
-	return a.Schwanz
+	return a.GetMetadatei().GetTai()
+}
+
+func (a *Transacted[K, KPtr]) SetTai(t kennung.Tai) {
+	a.GetMetadateiPtr().Tai = t
 }
 
 func (a Transacted[K, KPtr]) GetKennung() K {
@@ -123,28 +133,24 @@ func (a *Transacted[K, KPtr]) SetTransactionIndex(i int) {
 func (a *Transacted[K, KPtr]) Reset() {
 	a.Kopf.Reset()
 	a.ObjekteSha.Reset()
-	a.WithKennung.Metadatei.AkteSha.Reset()
-	KPtr(&a.WithKennung.Kennung).Reset()
-	a.Schwanz.Reset()
+	a.WithKennung.Reset()
 	a.TransactionIndex.Reset()
 }
 
 func (a *Transacted[K, KPtr]) ResetWith(b Transacted[K, KPtr]) {
 	a.Kopf = b.Kopf
 	a.ObjekteSha = b.ObjekteSha
-	a.WithKennung.Metadatei.AkteSha = b.WithKennung.Metadatei.AkteSha
-	KPtr(&a.WithKennung.Kennung).ResetWith(b.WithKennung.Kennung)
-	a.Schwanz = b.Schwanz
+	a.WithKennung.ResetWith(b.WithKennung)
 	a.TransactionIndex.SetInt(b.TransactionIndex.Int())
 }
 
 func (a Transacted[K, KPtr]) Less(b Transacted[K, KPtr]) (ok bool) {
-	if a.Schwanz.Less(b.Schwanz) {
+	if a.GetTai().Less(b.GetTai()) {
 		ok = true
 		return
 	}
 
-	if a.Schwanz.Equals(b.Schwanz) &&
+	if a.GetTai().Equals(b.GetTai()) &&
 		a.TransactionIndex.Less(b.TransactionIndex) {
 		ok = true
 		return
@@ -162,7 +168,7 @@ func (a Transacted[K, KPtr]) Equals(b Transacted[K, KPtr]) (ok bool) {
 		return
 	}
 
-	if !a.Schwanz.Equals(b.Schwanz) {
+	if !a.GetTai().Equals(b.GetTai()) {
 		return
 	}
 
@@ -187,7 +193,7 @@ func (o *Transacted[K, KPtr]) SetTimeAndFields(
 	t kennung.Tai,
 	vs ...string,
 ) (err error) {
-	o.Schwanz = t
+	o.WithKennung.GetMetadateiPtr().Tai = t
 
 	if len(vs) != 4 {
 		err = errors.Errorf("expected 4 elements but got %d", len(vs))

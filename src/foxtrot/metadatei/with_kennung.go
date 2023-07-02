@@ -59,3 +59,8 @@ func (wk *WithKennung[K, KPtr]) Reset() {
 	KPtr(&wk.Kennung).Reset()
 	wk.Metadatei.Reset()
 }
+
+func (a *WithKennung[K, KPtr]) ResetWith(b WithKennung[K, KPtr]) {
+	KPtr(&a.Kennung).ResetWith(b.GetKennung())
+	a.Metadatei.ResetWith(b.GetMetadatei())
+}

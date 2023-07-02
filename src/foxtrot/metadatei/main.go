@@ -128,6 +128,10 @@ func (z Metadatei) GetTyp() kennung.Typ {
 	return z.Typ
 }
 
+func (z Metadatei) GetTai() kennung.Tai {
+	return z.Tai
+}
+
 func (pz Metadatei) Equals(z1 Metadatei) bool {
 	if !pz.AkteSha.Equals(z1.AkteSha) {
 		return false
