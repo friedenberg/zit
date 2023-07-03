@@ -20,7 +20,7 @@ func (c *client) PullSkus(
 
 	if err = c.SkusFromFilter(
 		ids,
-		func(sk sku.Sku) (err error) {
+		func(sk sku.SkuLike) (err error) {
 			var el objekte_store.TransactedInheritor
 			ok := false
 
@@ -33,13 +33,13 @@ func (c *client) PullSkus(
 			if c.umwelt.Standort().HasObjekte(
 				c.umwelt.Konfig().GetStoreVersion(),
 				sk.GetGattung(),
-				sk.ObjekteSha,
+				sk.GetObjekteSha(),
 			) {
-				errors.Log().Printf("already have objekte: %s", sk.ObjekteSha)
+				errors.Log().Printf("already have objekte: %s", sk.GetObjekteSha())
 				return
 			}
 
-			errors.Log().Printf("need objekte: %s", sk.ObjekteSha)
+			errors.Log().Printf("need objekte: %s", sk.GetObjekteSha())
 
 			if err = el.InflateFromDataIdentityAndStoreAndInherit(sk); err != nil {
 				err = errors.Wrapf(err, "Sku: %s", sk)

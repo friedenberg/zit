@@ -66,7 +66,7 @@ func (c Last) runWithBestandsaufnahm(u *umwelt.Umwelt) (err error) {
 	if err = sku.HeapEach(
 		b.Akte.Skus,
 		func(o sku.SkuLike) (err error) {
-			errors.Out().Print(o)
+			errors.Out().Print(sku.String(o))
 			return
 		},
 	); err != nil {

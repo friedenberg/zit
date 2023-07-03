@@ -34,14 +34,14 @@ func (f formatAkte) ParseSaveAkte(
 	if n, err = format.ReadLines(
 		r,
 		func(v string) (err error) {
-			var sk sku.Sku
+			var sk sku.SkuLikePtr
 
-			if err = sk.Set(v); err != nil {
+			if sk, err = sku.MakeSkuTransactedFromLine(v); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			return sku.AddSkuToHeap(&o.Skus, &sk)
+			return sku.AddSkuToHeap(&o.Skus, sk)
 		},
 	); err != nil {
 		err = errors.Wrap(err)
@@ -76,7 +76,7 @@ func (f formatAkte) FormatParsedAkte(w io.Writer, o Akte) (n int64, err error) {
 
 		l := fmt.Sprintf(
 			"%s\n",
-			sk,
+			sku.String(sk),
 		)
 
 		if n1, err = bw.WriteString(l); err != nil {

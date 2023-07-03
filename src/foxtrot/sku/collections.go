@@ -16,8 +16,8 @@ func MakeSku2Heap() Sku2Heap {
 	return collections.MakeHeap[wrapper, *wrapper]()
 }
 
-func AddSkuToHeap(h *Sku2Heap, sk SkuLikePtr) (err error) {
-	err = h.Add(wrapper{SkuLikePtr: sk})
+func AddSkuToHeap(h *Sku2Heap, sk SkuLike) (err error) {
+	err = h.Add(wrapper{SkuLikePtr: sk.MutableClone()})
 	return
 }
 

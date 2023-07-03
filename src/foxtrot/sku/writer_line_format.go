@@ -1,22 +1,24 @@
 package sku
 
 import (
+	"fmt"
+
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/delta/format"
 )
 
-// func String(o SkuLike) (str string) {
-// 	str = fmt.Sprintf(
-// 		"%s %s %s %s %s",
-// 		o.GetGattung(),
-// 		o.GetMutter()[0],
-// 		o.GetMutter()[1],
-// 		o.GetId(),
-// 		o.GetObjekteSha(),
-// 	)
+func String(o SkuLike) (str string) {
+	str = fmt.Sprintf(
+		"%s %s %s %s %s",
+		o.GetTai(),
+		o.GetGattung(),
+		o.GetId(),
+		o.GetObjekteSha(),
+		o.GetAkteSha(),
+	)
 
-// 	return
-// }
+	return
+}
 
 func MakeWriterLineFormat(
 	lf *format.LineWriter,

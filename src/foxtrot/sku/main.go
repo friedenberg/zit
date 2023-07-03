@@ -33,6 +33,8 @@ type SkuLike interface {
 	DataIdentity
 	GetKey() string
 	EqualsSkuLike(SkuLike) bool
+	ImmutableClone() SkuLike
+	MutableClone() SkuLikePtr
 }
 
 type SkuLikePtr interface {

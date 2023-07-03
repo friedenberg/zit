@@ -8,7 +8,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/etikett_rule"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/charlie/collections"
@@ -38,9 +37,9 @@ type Metadatei struct {
 	AkteSha     sha.Sha
 	Bezeichnung bezeichnung.Bezeichnung
 	Etiketten   kennung.EtikettSet
-	Gattung     gattung.Gattung
-	Typ         kennung.Typ
-	Tai         kennung.Tai
+	// Gattung     gattung.Gattung
+	Typ kennung.Typ
+	Tai kennung.Tai
 }
 
 func (m Metadatei) GetMetadatei() Metadatei {
@@ -149,9 +148,9 @@ func (pz Metadatei) Equals(z1 Metadatei) bool {
 		return false
 	}
 
-	if !pz.Gattung.Equals(z1.Gattung) {
-		return false
-	}
+	// if !pz.Gattung.Equals(z1.Gattung) {
+	// 	return false
+	// }
 
 	if !pz.Tai.Equals(z1.Tai) {
 		return false
@@ -165,7 +164,7 @@ func (z *Metadatei) Reset() {
 	z.Bezeichnung.Reset()
 	z.Etiketten = kennung.MakeEtikettSet()
 	z.Typ = kennung.Typ{}
-	z.Gattung = gattung.Unknown
+	// z.Gattung = gattung.Unknown
 	z.Tai.Reset()
 }
 
@@ -180,7 +179,7 @@ func (z *Metadatei) ResetWith(z1 Metadatei) {
 	}
 
 	z.Typ = z1.Typ
-	z.Gattung = z1.Gattung
+	// z.Gattung = z1.Gattung
 	z.Tai = z1.Tai
 }
 

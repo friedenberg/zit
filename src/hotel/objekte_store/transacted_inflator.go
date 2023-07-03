@@ -29,7 +29,7 @@ type TransactedInflator[
 	T2 kennung.KennungLike[T2],
 	T3 kennung.KennungLikePtr[T2],
 ] interface {
-	InflateFromSku2(sku.Sku) (*objekte.Transacted[T, T1, T2, T3], error)
+	InflateFromSkuLike(sku.SkuLike) (*objekte.Transacted[T, T1, T2, T3], error)
 	InflatorStorer[*objekte.Transacted[T, T1, T2, T3]]
 	InflateFromDataIdentityAndStore(sku.DataIdentity) error
 }
@@ -74,8 +74,8 @@ func MakeTransactedInflator[
 	}
 }
 
-func (h *transactedInflator[T, T1, T2, T3]) InflateFromSku2(
-	o sku.Sku,
+func (h *transactedInflator[T, T1, T2, T3]) InflateFromSkuLike(
+	o sku.SkuLike,
 ) (t *objekte.Transacted[T, T1, T2, T3], err error) {
 	if h.pool == nil {
 		t = new(objekte.Transacted[T, T1, T2, T3])
@@ -92,21 +92,21 @@ func (h *transactedInflator[T, T1, T2, T3]) InflateFromSku2(
 	t.SetTai(o.GetTai())
 
 	// TODO-P2 make generic
-	if t.Sku.GetGattung() != o.WithKennung.Metadatei.Gattung {
+	if t.Sku.GetGattung() != o.GetGattung() {
 		err = errors.Errorf(
 			"expected gattung %s but got %s",
 			t.Sku.GetGattung(),
-			o.WithKennung.Metadatei.Gattung,
+			o.GetGattung(),
 		)
 		return
 	}
 
-	if err = T3(&t.Sku.Kennung).Set(o.WithKennung.Kennung.String()); err != nil {
+	if err = T3(&t.Sku.Kennung).Set(o.GetId().String()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	t.Sku.ObjekteSha = o.ObjekteSha
+	t.Sku.ObjekteSha = sha.Make(o.GetObjekteSha())
 
 	if err = h.readObjekte(o, t); err != nil {
 		err = errors.Wrap(err)

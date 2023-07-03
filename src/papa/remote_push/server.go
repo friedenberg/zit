@@ -68,14 +68,14 @@ func (op Server) GetNeededSkus(
 ) (err error) {
 	defer errors.DeferredCloser(&err, d)
 
-	var in []sku.Sku
+	var in []sku.SkuLike
 
 	if err = d.Receive(&in); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	out := make([]sku.Sku, 0)
+	out := make([]sku.SkuLike, 0)
 
 	for _, sk := range in {
 		// TODO-P2 support other Gattung
@@ -86,13 +86,13 @@ func (op Server) GetNeededSkus(
 		if op.umwelt.Standort().HasObjekte(
 			op.umwelt.Konfig().GetStoreVersion(),
 			sk.GetGattung(),
-			sk.ObjekteSha,
+			sk.GetObjekteSha(),
 		) {
-			errors.Log().Printf("already have objekte: %s", sk.ObjekteSha)
+			errors.Log().Printf("already have objekte: %s", sk.GetObjekteSha())
 			return
 		}
 
-		errors.Log().Printf("need objekte: %s", sk.ObjekteSha)
+		errors.Log().Printf("need objekte: %s", sk.GetObjekteSha())
 
 		// TODO-P1 check for akte sha
 		// TODO-P1 write akte

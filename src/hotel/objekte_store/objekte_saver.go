@@ -3,6 +3,7 @@ package objekte_store
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
@@ -56,6 +57,12 @@ func (h objekteSaver) SaveObjekte(
 
 	sh := sha.Make(w.GetShaLike())
 
+	log.Log().Printf(
+		"saving objekte: %s -> %s",
+		tl.GetKennung().GetGattung(),
+		sh,
+	)
+
 	tl.SetObjekteSha(sh)
 
 	return
@@ -85,6 +92,12 @@ func (h objekteSaver) SaveObjekteIncludeTai(
 	}
 
 	sh := sha.Make(w.GetShaLike())
+
+	log.Log().Printf(
+		"saving objekte with tai: %s -> %s",
+		tl.GetKennung().GetGattung(),
+		sh,
+	)
 
 	tl.SetObjekteSha(sh)
 

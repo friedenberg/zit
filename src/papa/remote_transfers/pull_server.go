@@ -158,9 +158,9 @@ func (op PullServer) skusForFilter(
 				zettel.MakeWriterKonfig(op.umwelt.Konfig()),
 			),
 			func(tl objekte.TransactedLikePtr) (err error) {
-				sk := tl.GetSku()
+				sk := tl.GetSkuLike()
 
-				if err = d.Send(sk); err != nil {
+				if err = d.Send(&sk); err != nil {
 					err = errors.Wrap(err)
 					return
 				}

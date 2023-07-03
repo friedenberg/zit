@@ -133,7 +133,7 @@ func (s *Store) checkoutOneGeneric(
 
 	default:
 		// err = errors.Implement()
-		err = gattung.MakeErrUnsupportedGattung(tt.GetSku())
+		err = gattung.MakeErrUnsupportedGattung(tt.GetSkuLike())
 		return
 	}
 

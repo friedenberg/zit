@@ -41,8 +41,7 @@ function clone { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run_zit clone \
-		"$wd1" +zettel,typ
+	run_zit clone "$wd1" +zettel,typ
 
 	assert_success
 	assert_output_unsorted - <<-EOM

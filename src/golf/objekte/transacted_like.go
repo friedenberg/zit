@@ -11,7 +11,6 @@ type TransactedLike interface {
 	metadatei.Getter
 	GetKennung() kennung.Kennung
 	GetAkteSha() schnittstellen.ShaLike
-	GetSku() sku.Sku
 	GetSkuLike() sku.SkuLike
 	kennung.Matchable
 	sku.DataIdentityGetter

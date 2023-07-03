@@ -14,12 +14,12 @@ func MakeMutableSetTransactedUnique(c int) MutableSetTransacted {
 			if sz == nil {
 				return ""
 			}
-			sk := sz.GetSku()
+			sk := sz.GetSkuLike()
 
 			return collections.MakeKey(
-				sk.WithKennung.Metadatei.Tai,
-				sk.WithKennung.Kennung,
-				sk.ObjekteSha,
+				sk.GetTai(),
+				sk.GetId(),
+				sk.GetObjekteSha(),
 			)
 		},
 	)

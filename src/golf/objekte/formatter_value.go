@@ -13,6 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
+	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 )
 
@@ -170,7 +171,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 
 	case "sku":
 		return func(e TransactedLikePtr) (err error) {
-			_, err = fmt.Fprintln(out, e.GetSku().String())
+			_, err = fmt.Fprintln(out, sku.String(e.GetSkuLike()))
 			return
 		}
 

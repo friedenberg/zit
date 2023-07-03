@@ -26,6 +26,12 @@ func (s Standort) dirObjektenGattung2(
 	g1 schnittstellen.GattungGetter,
 ) (p string, err error) {
 	g := g1.GetGattung()
+
+	if g == gattung.Unknown {
+		err = gattung.MakeErrUnsupportedGattung(g)
+		return
+	}
+
 	p = s.DirObjekten2(g.GetGattungStringPlural())
 
 	return

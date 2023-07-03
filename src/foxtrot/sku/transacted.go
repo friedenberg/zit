@@ -1,16 +1,28 @@
 package sku
 
 import (
+	"encoding/gob"
 	"fmt"
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/bravo/ohio"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/values"
+	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
+
+func init() {
+	gob.Register(&Transacted[kennung.Hinweis, *kennung.Hinweis]{})
+	gob.Register(&Transacted[kennung.Etikett, *kennung.Etikett]{})
+	gob.Register(&Transacted[kennung.Typ, *kennung.Typ]{})
+	gob.Register(&Transacted[kennung.Kasten, *kennung.Kasten]{})
+	gob.Register(&Transacted[kennung.Konfig, *kennung.Konfig]{})
+}
 
 // TODO-P2 move sku.Sku to sku.Transacted
 type Transacted[K kennung.KennungLike[K], KPtr kennung.KennungLikePtr[K]] struct {
@@ -32,6 +44,94 @@ func (t *Transacted[K, KPtr]) SetFromSkuLike(sk SkuLike) (err error) {
 	t.GetMetadateiPtr().Tai = sk.GetTai()
 
 	t.Kopf = sk.GetTai()
+
+	return
+}
+
+func MakeSkuTransactedFromLine(line string) (sk SkuLikePtr, err error) {
+	var (
+		m  metadatei.Metadatei
+		k  kennung.Kennung
+		os sha.Sha
+		g  gattung.Gattung
+	)
+
+	r := strings.NewReader(line)
+
+	if _, err = format.ReadSep(
+		' ',
+		r,
+		ohio.MakeLineReaderIterateStrict(
+			m.Tai.Set,
+			g.Set,
+			func(v string) (err error) {
+				if k, err = kennung.MakeWithGattung(g, v); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				return
+			},
+			os.Set,
+			m.AkteSha.Set,
+		),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if !g.EqualsGattung(k.GetGattung()) {
+		err = errors.Errorf(
+			"sku gattung does not match kennung gattung: %q (sku), %q (kennung)",
+			g,
+			k.GetGattung(),
+		)
+
+		err = errors.Wrapf(err, "Line: %q", line)
+
+		return
+	}
+
+	switch kt := k.(type) {
+	case kennung.Hinweis:
+		sk = &Transacted[kennung.Hinweis, *kennung.Hinweis]{
+			Metadatei:  m,
+			Kennung:    kt,
+			ObjekteSha: os,
+		}
+
+	case kennung.Etikett:
+		sk = &Transacted[kennung.Etikett, *kennung.Etikett]{
+			Metadatei:  m,
+			Kennung:    kt,
+			ObjekteSha: os,
+		}
+
+	case kennung.Typ:
+		sk = &Transacted[kennung.Typ, *kennung.Typ]{
+			Metadatei:  m,
+			Kennung:    kt,
+			ObjekteSha: os,
+		}
+
+	case kennung.Kasten:
+		sk = &Transacted[kennung.Kasten, *kennung.Kasten]{
+			Metadatei:  m,
+			Kennung:    kt,
+			ObjekteSha: os,
+		}
+
+	case kennung.Konfig:
+		sk = &Transacted[kennung.Konfig, *kennung.Konfig]{
+			Metadatei:  m,
+			Kennung:    kt,
+			ObjekteSha: os,
+		}
+
+	default:
+		err = errors.Errorf("unsupported kennung: %T -> %q", kt, kt)
+		return
+	}
 
 	return
 }
@@ -77,6 +177,14 @@ func MakeSkuTransacted(
 	return
 }
 
+func (a Transacted[K, KPtr]) ImmutableClone() SkuLike {
+	return a
+}
+
+func (a Transacted[K, KPtr]) MutableClone() SkuLikePtr {
+	return &a
+}
+
 func (a Transacted[K, KPtr]) String() string {
 	return fmt.Sprintf(
 		"%s %s %s",
@@ -114,19 +222,19 @@ func (a Transacted[K, KPtr]) GetExternal() External[K, KPtr] {
 	}
 }
 
-func (a *Transacted[K, KPtr]) Sku() Sku {
-	return Sku{
-		WithKennung: WithKennungInterface{
-			Kennung: a.Kennung,
-			Metadatei: Metadatei{
-				Tai:     a.GetTai(),
-				Gattung: gattung.Make(a.GetGattung()),
-				AkteSha: sha.Make(a.GetAkteSha()),
-			},
-		},
-		ObjekteSha: a.ObjekteSha,
-	}
-}
+// func (a *Transacted[K, KPtr]) Sku() Sku {
+// 	return Sku{
+// 		WithKennung: WithKennungInterface{
+// 			Kennung: a.Kennung,
+// 			Metadatei: Metadatei{
+// 				Tai:     a.GetTai(),
+// 				Gattung: gattung.Make(a.GetGattung()),
+// 				AkteSha: sha.Make(a.GetAkteSha()),
+// 			},
+// 		},
+// 		ObjekteSha: a.ObjekteSha,
+// 	}
+// }
 
 func (a *Transacted[K, KPtr]) SetTransactionIndex(i int) {
 	a.TransactionIndex.SetInt(i)

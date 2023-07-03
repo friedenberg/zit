@@ -169,8 +169,8 @@ func (s *common) CommitUpdatedTransacted(
 }
 
 func (s *common) CommitTransacted(t objekte.TransactedLike) (err error) {
-	sk := t.GetSku()
-	sku.AddSkuToHeap(&s.bestandsaufnahmeAkte.Skus, &sk)
+	sk := t.GetSkuLike()
+	sku.AddSkuToHeap(&s.bestandsaufnahmeAkte.Skus, sk)
 
 	return
 }
