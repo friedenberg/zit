@@ -35,8 +35,17 @@ func init() {
 				Flags: organize_text.MakeFlags(),
 			}
 
-			f.BoolVar(&c.Or, "or", false, "allow optional criteria instead of required")
-			f.Var(&c.Filter, "filter", "a script to run for each file to transform it the standard zettel format")
+			f.BoolVar(
+				&c.Or,
+				"or",
+				false,
+				"allow optional criteria instead of required",
+			)
+			f.Var(
+				&c.Filter,
+				"filter",
+				"a script to run for each file to transform it the standard zettel format",
+			)
 			f.Var(&c.Mode, "mode", "mode used for handling stdin and stdout")
 
 			c.Flags.AddToFlagSet(f)
@@ -60,7 +69,10 @@ func (c *Organize) CompletionGattung() gattungen.Set {
 	)
 }
 
-func (c *Organize) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
+func (c *Organize) RunWithQuery(
+	u *umwelt.Umwelt,
+	ms kennung.MetaSet,
+) (err error) {
 	u.ApplyToOrganizeOptions(&c.Options)
 
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
@@ -80,7 +92,10 @@ func (c *Organize) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error
 		createOrganizeFileOp.Typ = typen.Any()
 
 	default:
-		err = errors.Errorf("only one typ is supported for organize, but got %q", typen)
+		err = errors.Errorf(
+			"only one typ is supported for organize, but got %q",
+			typen,
+		)
 		return
 	}
 
@@ -180,7 +195,9 @@ func (c *Organize) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error
 		}
 
 	case organize_text.ModeInteractive:
-		errors.Log().Print("generate temp file, write organize, open vim to edit, commit results")
+		errors.Log().Print(
+			"generate temp file, write organize, open vim to edit, commit results",
+		)
 		var createOrganizeFileResults *organize_text.Text
 
 		var f *os.File

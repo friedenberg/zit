@@ -19,6 +19,7 @@ type DataIdentity interface {
 	schnittstellen.ValueLike
 	GetTai() kennung.Tai
 	GetId() Kennung
+	GetKennungLike() kennung.Kennung
 	schnittstellen.GattungGetter
 	GetObjekteSha() schnittstellen.ShaLike
 	GetAkteSha() schnittstellen.ShaLike
@@ -39,6 +40,9 @@ type SkuLike interface {
 
 type SkuLikePtr interface {
 	SkuLike
+	metadatei.GetterPtr
+	metadatei.Setter
+	SetKennungLike(kennung.Kennung) error
 	// SetTimeAndFields(kennung.Tai, ...string) error
 	SetFromSkuLike(SkuLike) error
 	// SetTransactionIndex(int)

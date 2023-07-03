@@ -16,6 +16,7 @@ type Flusher interface {
 }
 
 type Resetter interface {
+	// TODO-P1 remove in favore of resetter 2
 	Reset() error
 }
 

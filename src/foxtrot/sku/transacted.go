@@ -202,6 +202,10 @@ func (a *Transacted[K, KPtr]) GetMetadateiPtr() *Metadatei {
 	return &a.Metadatei
 }
 
+func (a *Transacted[K, KPtr]) SetMetadatei(m Metadatei) {
+	a.Metadatei = m
+}
+
 func (a Transacted[K, KPtr]) GetTai() kennung.Tai {
 	return a.GetMetadatei().GetTai()
 }
@@ -212,6 +216,26 @@ func (a *Transacted[K, KPtr]) SetTai(t kennung.Tai) {
 
 func (a Transacted[K, KPtr]) GetKennung() K {
 	return a.Kennung
+}
+
+func (a Transacted[K, KPtr]) GetKennungLike() kennung.Kennung {
+	return a.Kennung
+}
+
+func (a *Transacted[K, KPtr]) SetKennungLike(kl kennung.Kennung) (err error) {
+	switch k := kl.(type) {
+	case K:
+		a.Kennung = k
+
+	case KPtr:
+		a.Kennung = K(*k)
+
+	default:
+		err = errors.Errorf("expected kennung of type %T but got %T: %q", a.Kennung, k, kl)
+		return
+	}
+
+	return
 }
 
 func (a Transacted[K, KPtr]) GetExternal() External[K, KPtr] {
