@@ -7,12 +7,12 @@ import (
 )
 
 type Akte struct {
-	Skus sku.Sku2Heap
+	Skus sku.SkuLikeHeap
 }
 
 func MakeAkte() *Akte {
 	return &Akte{
-		Skus: sku.MakeSku2Heap(),
+		Skus: sku.MakeSkuLikeHeap(),
 	}
 }
 

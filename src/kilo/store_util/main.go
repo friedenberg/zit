@@ -109,7 +109,7 @@ func MakeStoreUtil(
 
 	c.transaktion = transaktion.MakeTransaktion(t)
 	c.bestandsaufnahmeAkte = bestandsaufnahme.Akte{
-		Skus: sku.MakeSku2Heap(),
+		Skus: sku.MakeSkuLikeHeap(),
 	}
 
 	if c.Abbr, err = newIndexAbbr(
