@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/sku"
+	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 )

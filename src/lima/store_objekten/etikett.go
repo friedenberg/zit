@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/toml"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/sku"
+	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/hotel/etikett"

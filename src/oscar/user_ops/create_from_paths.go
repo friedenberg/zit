@@ -11,7 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
-	"github.com/friedenberg/zit/src/foxtrot/sku"
+	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/zettel_external"

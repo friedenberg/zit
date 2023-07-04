@@ -16,7 +16,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/sku"
+	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/hotel/kasten"
 	"github.com/friedenberg/zit/src/hotel/typ"

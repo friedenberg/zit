@@ -3,7 +3,7 @@ package objekte_collections
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/foxtrot/sku"
+	"github.com/friedenberg/zit/src/golf/sku"
 )
 
 type MutableSetMetadateiWithKennung = schnittstellen.MutableSet[sku.SkuLike]

@@ -14,7 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/sku"
+	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/india/konfig"
 )
 

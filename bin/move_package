@@ -17,12 +17,12 @@ find src -type d -empty -delete
 
 # https://unix.stackexchange.com/questions/190334/sed-word-boundaries-on-macos
 declare -r sed_script="
-  s|[[:<:]]$prefix/$original[[:>:]]|$prefix/$renamed|g;
+  s|\\b$prefix/$original\\b|$prefix/$renamed|g;
   s|^package $original_pkg\$|package $renamed_pkg|g;
 "
 
 ag "$prefix/$original" -l0 |
-	xargs -0 sed -i '' "$sed_script"
+	xargs -0 sed -i'' "$sed_script"
 
 ./bin/fix_redundant_import_alisas.bash
 goimports -w ./
