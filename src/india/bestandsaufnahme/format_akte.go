@@ -31,12 +31,17 @@ func (f formatAkte) ParseSaveAkte(
 
 	r := io.TeeReader(r1, aw)
 
+	tml := sku.TryMakeSkuWithFormats(
+		sku.MakeSkuFromLineTaiFirst,
+		sku.MakeSkuFromLineGattungFirst,
+	)
+
 	if n, err = format.ReadLines(
 		r,
 		func(v string) (err error) {
-			var sk sku.SkuLikePtr
+			var sk sku.SkuLike
 
-			if sk, err = sku.MakeSkuTransactedFromLine(v); err != nil {
+			if sk, err = tml(v); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

@@ -3,15 +3,11 @@ package sku
 import (
 	"encoding/gob"
 	"fmt"
-	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/bravo/ohio"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/values"
-	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
@@ -48,81 +44,42 @@ func (t *Transacted[K, KPtr]) SetFromSkuLike(sk SkuLike) (err error) {
 	return
 }
 
-func MakeSkuTransactedFromLine(line string) (sk SkuLikePtr, err error) {
-	var (
-		m  metadatei.Metadatei
-		k  kennung.Kennung
-		os sha.Sha
-		g  gattung.Gattung
-	)
-
-	r := strings.NewReader(line)
-
-	if _, err = format.ReadSep(
-		' ',
-		r,
-		ohio.MakeLineReaderIterateStrict(
-			m.Tai.Set,
-			g.Set,
-			func(v string) (err error) {
-				if k, err = kennung.MakeWithGattung(g, v); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				return
-			},
-			os.Set,
-			m.AkteSha.Set,
-		),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if !g.EqualsGattung(k.GetGattung()) {
-		err = errors.Errorf(
-			"sku gattung does not match kennung gattung: %q (sku), %q (kennung)",
-			g,
-			k.GetGattung(),
-		)
-
-		err = errors.Wrapf(err, "Line: %q", line)
-
-		return
-	}
-
+func MakeSkuLike(
+	m metadatei.Metadatei,
+	k kennung.Kennung,
+	os sha.Sha,
+) (sk SkuLike, err error) {
 	switch kt := k.(type) {
 	case kennung.Hinweis:
-		sk = &Transacted[kennung.Hinweis, *kennung.Hinweis]{
+		sk = Transacted[kennung.Hinweis, *kennung.Hinweis]{
 			Metadatei:  m,
 			Kennung:    kt,
 			ObjekteSha: os,
 		}
 
 	case kennung.Etikett:
-		sk = &Transacted[kennung.Etikett, *kennung.Etikett]{
+		sk = Transacted[kennung.Etikett, *kennung.Etikett]{
 			Metadatei:  m,
 			Kennung:    kt,
 			ObjekteSha: os,
 		}
 
 	case kennung.Typ:
-		sk = &Transacted[kennung.Typ, *kennung.Typ]{
+		sk = Transacted[kennung.Typ, *kennung.Typ]{
 			Metadatei:  m,
 			Kennung:    kt,
 			ObjekteSha: os,
 		}
 
 	case kennung.Kasten:
-		sk = &Transacted[kennung.Kasten, *kennung.Kasten]{
+		sk = Transacted[kennung.Kasten, *kennung.Kasten]{
 			Metadatei:  m,
 			Kennung:    kt,
 			ObjekteSha: os,
 		}
 
 	case kennung.Konfig:
-		sk = &Transacted[kennung.Konfig, *kennung.Konfig]{
+		sk = Transacted[kennung.Konfig, *kennung.Konfig]{
 			Metadatei:  m,
 			Kennung:    kt,
 			ObjekteSha: os,
@@ -130,47 +87,6 @@ func MakeSkuTransactedFromLine(line string) (sk SkuLikePtr, err error) {
 
 	default:
 		err = errors.Errorf("unsupported kennung: %T -> %q", kt, kt)
-		return
-	}
-
-	return
-}
-
-func MakeSkuTransacted(
-	t kennung.Tai,
-	line string,
-) (out1 SkuLikePtr, err error) {
-	fields := strings.Fields(line)
-	var g gattung.Gattung
-
-	if err = g.Set(fields[0]); err != nil {
-		err = errors.Wrapf(err, "failed to set type: %s", fields[0])
-		return
-	}
-
-	switch g {
-	case gattung.Zettel:
-		out := &Transacted[kennung.Hinweis, *kennung.Hinweis]{}
-		out1 = out
-		err = out.SetTimeAndFields(t, fields[1:]...)
-
-	case gattung.Typ:
-		out := &Transacted[kennung.Typ, *kennung.Typ]{}
-		out1 = out
-		err = out.SetTimeAndFields(t, fields[1:]...)
-
-	case gattung.Etikett:
-		out := &Transacted[kennung.Etikett, *kennung.Etikett]{}
-		out1 = out
-		err = out.SetTimeAndFields(t, fields[1:]...)
-
-	case gattung.Konfig:
-		out := &Transacted[kennung.Konfig, *kennung.Konfig]{}
-		out1 = out
-		return
-
-	default:
-		err = errors.Errorf("unsupported gattung: %s", g)
 		return
 	}
 
@@ -317,46 +233,8 @@ func (a Transacted[K, KPtr]) Equals(b Transacted[K, KPtr]) (ok bool) {
 	return true
 }
 
-func (o *Transacted[K, KPtr]) SetTimeAndFields(
-	t kennung.Tai,
-	vs ...string,
-) (err error) {
-	o.GetMetadateiPtr().Tai = t
-
-	if len(vs) != 4 {
-		err = errors.Errorf("expected 4 elements but got %d", len(vs))
-		return
-	}
-
-	// Mutter[0] used to be here
-
-	vs = vs[1:]
-
-	// Mutter[1] used to be here
-
-	vs = vs[1:]
-
-	if err = KPtr(&o.Kennung).Set(vs[0]); err != nil {
-		err = errors.Wrapf(err, "failed to set id: %s", vs[1])
-		return
-	}
-
-	vs = vs[1:]
-
-	if err = o.ObjekteSha.Set(vs[0]); err != nil {
-		err = errors.Wrapf(err, "failed to set sha: %s", vs[2])
-		return
-	}
-
-	return
-}
-
 func (s Transacted[K, KPtr]) GetGattung() schnittstellen.GattungLike {
 	return s.Kennung.GetGattung()
-}
-
-func (s Transacted[K, KPtr]) GetId() kennung.Kennung {
-	return KPtr(&s.Kennung)
 }
 
 func (s Transacted[K, KPtr]) GetObjekteSha() schnittstellen.ShaLike {

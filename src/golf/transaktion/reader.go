@@ -52,7 +52,7 @@ func (r *Reader) ReadFrom(r1 io.Reader) (n int64, err error) {
 		default:
 			var o sku.SkuLike
 
-			if o, err = sku.MakeSkuTransacted(
+			if o, err = sku.MakeOldSkuFromTaiAndLine(
 				kennung.TaiFromTime(r.Transaktion.Time),
 				line,
 			); err != nil {
