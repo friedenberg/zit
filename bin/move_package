@@ -1,4 +1,4 @@
-#! /bin/bash -xe
+#! /bin/bash -e
 
 prefix=github.com/friedenberg/zit
 original="${1%/}"
