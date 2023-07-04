@@ -218,8 +218,16 @@ func (a Transacted[K, KPtr]) GetKennung() K {
 	return a.Kennung
 }
 
+func (a *Transacted[K, KPtr]) GetKennungPtr() KPtr {
+	return &a.Kennung
+}
+
 func (a Transacted[K, KPtr]) GetKennungLike() kennung.Kennung {
 	return a.Kennung
+}
+
+func (a *Transacted[K, KPtr]) GetKennungLikePtr() kennung.KennungPtr {
+	return KPtr(&a.Kennung)
 }
 
 func (a *Transacted[K, KPtr]) SetKennungLike(kl kennung.Kennung) (err error) {
@@ -245,20 +253,6 @@ func (a Transacted[K, KPtr]) GetExternal() External[K, KPtr] {
 		ObjekteSha: a.ObjekteSha,
 	}
 }
-
-// func (a *Transacted[K, KPtr]) Sku() Sku {
-// 	return Sku{
-// 		WithKennung: WithKennungInterface{
-// 			Kennung: a.Kennung,
-// 			Metadatei: Metadatei{
-// 				Tai:     a.GetTai(),
-// 				Gattung: gattung.Make(a.GetGattung()),
-// 				AkteSha: sha.Make(a.GetAkteSha()),
-// 			},
-// 		},
-// 		ObjekteSha: a.ObjekteSha,
-// 	}
-// }
 
 func (a *Transacted[K, KPtr]) SetTransactionIndex(i int) {
 	a.TransactionIndex.SetInt(i)
@@ -305,10 +299,6 @@ func (a Transacted[K, KPtr]) EqualsAny(b any) (ok bool) {
 
 func (a Transacted[K, KPtr]) Equals(b Transacted[K, KPtr]) (ok bool) {
 	if !a.TransactionIndex.Equals(b.TransactionIndex) {
-		return
-	}
-
-	if !a.GetTai().Equals(b.GetTai()) {
 		return
 	}
 
@@ -382,5 +372,5 @@ func (s Transacted[K, KPtr]) GetTransactionIndex() values.Int {
 }
 
 func (o Transacted[K, KPtr]) GetKey() string {
-	return fmt.Sprintf("%s.%s", o.GetGattung(), o.GetKennung())
+	return kennung.FormattedString(o.GetKennung())
 }

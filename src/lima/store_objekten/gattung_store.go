@@ -195,7 +195,7 @@ func (s *commonStore[O, OPtr, K, KPtr]) CheckoutOne(
 }
 
 func (s *commonStore[O, OPtr, K, KPtr]) UpdateManyMetadatei(
-	incoming schnittstellen.Set[sku.WithKennungInterface],
+	incoming schnittstellen.Set[sku.SkuLike],
 ) (err error) {
 	if !s.StoreUtil.GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{
@@ -206,17 +206,19 @@ func (s *commonStore[O, OPtr, K, KPtr]) UpdateManyMetadatei(
 	}
 
 	if err = incoming.Each(
-		func(mwk sku.WithKennungInterface) (err error) {
-			var ke KPtr
+		func(mwk sku.SkuLike) (err error) {
+			var ke K
 			ok := false
 
-			if ke, ok = mwk.GetKennungLike().(KPtr); !ok {
+			if ke, ok = mwk.GetKennungLike().(K); !ok {
 				return
 			}
 
+			kep := KPtr(&ke)
+
 			var old *objekte.Transacted[O, OPtr, K, KPtr]
 
-			if old, err = s.ReadOne(ke); err != nil {
+			if old, err = s.ReadOne(kep); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -224,7 +226,7 @@ func (s *commonStore[O, OPtr, K, KPtr]) UpdateManyMetadatei(
 			if _, err = s.CreateOrUpdater.CreateOrUpdate(
 				&old.Akte,
 				mwk,
-				ke,
+				kep,
 			); err != nil {
 				err = errors.Wrap(err)
 				return

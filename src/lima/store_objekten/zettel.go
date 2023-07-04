@@ -378,7 +378,7 @@ func (s *zettelStore) Create(
 }
 
 func (s *zettelStore) UpdateManyMetadatei(
-	incoming schnittstellen.Set[sku.WithKennungInterface],
+	incoming schnittstellen.Set[sku.SkuLike],
 ) (err error) {
 	if !s.StoreUtil.GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{
@@ -396,20 +396,24 @@ func (s *zettelStore) UpdateManyMetadatei(
 				return
 			}
 
-			k := ke.String()
+			k := kennung.FormattedString(ke)
 
-			var mwk sku.WithKennungInterface
+			var mwk sku.SkuLike
 			ok := false
 
 			if mwk, ok = incoming.Get(k); !ok {
 				return
 			}
 
-			mwk.Metadatei.AkteSha = sha.Make(zt.GetAkteSha())
+			mwkClone := mwk.MutableClone()
+			m := mwkClone.GetMetadateiPtr()
+			m.AkteSha = sha.Make(zt.GetAkteSha())
+
+			mwk = mwkClone
 
 			if _, err = s.updateLockedWithMutter(
 				mwk,
-				mwk.Kennung.(*kennung.Hinweis),
+				mwkClone.GetKennungLikePtr().(*kennung.Hinweis),
 				zt,
 			); err != nil {
 				err = errors.Wrap(err)

@@ -104,17 +104,20 @@ func (c *Organize) RunWithQuery(
 	if err = u.StoreObjekten().Query(
 		ms,
 		func(tl objekte.TransactedLikePtr) (err error) {
-			mwk := tl.GetMetadateiWithKennung()
+			mwk := tl.GetSkuLike().MutableClone()
 
-			if h, ok := mwk.Kennung.(*kennung.Hinweis); ok {
-				if *h, err = u.StoreObjekten().GetAbbrStore().Hinweis().ExpandString(
+			if h, ok := mwk.GetKennungLike().(kennung.Hinweis); ok {
+				if h, err = u.StoreObjekten().GetAbbrStore().Hinweis().ExpandString(
 					h.String(),
 				); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
 
-				mwk.Kennung = h
+				if err = mwk.SetKennungLike(h); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
 			}
 
 			return getResults.Add(mwk)

@@ -338,7 +338,7 @@ func (s Store) Flush() (err error) {
 }
 
 func (s *Store) UpdateManyMetadatei(
-	incoming schnittstellen.Set[sku.WithKennungInterface],
+	incoming schnittstellen.Set[sku.SkuLike],
 ) (err error) {
 	todo.Optimize() // parallelize
 	for _, umm := range s.metadateiUpdaters {

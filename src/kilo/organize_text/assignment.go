@@ -53,7 +53,9 @@ func (a assignment) MaxDepth() (d int) {
 
 func (a assignment) AlignmentSpacing() int {
 	if a.etiketten.Len() == 1 && kennung.IsDependentLeaf(a.etiketten.Any()) {
-		return a.parent.AlignmentSpacing() + len(a.parent.etiketten.Any().String())
+		return a.parent.AlignmentSpacing() + len(
+			a.parent.etiketten.Any().String(),
+		)
 	}
 
 	return 0
@@ -179,7 +181,9 @@ func (a *assignment) removeChild(c *assignment) (err error) {
 	}
 
 	if len(a.children) == 0 {
-		err = errors.Errorf("attempting to remove child when there are no children")
+		err = errors.Errorf(
+			"attempting to remove child when there are no children",
+		)
 		return
 	}
 

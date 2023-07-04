@@ -49,7 +49,7 @@ func (atc AssignmentTreeConstructor) makeChildren(
 ) (err error) {
 	if groupingEtiketten.Len() == 0 {
 		err = prefixSet.EachZettel(
-			func(e kennung.Etikett, tz sku.WithKennungInterface) (err error) {
+			func(e kennung.Etikett, tz sku.SkuLike) (err error) {
 				var z obj
 
 				if z, err = makeObj(tz, atc.Expanders); err != nil {
@@ -74,7 +74,7 @@ func (atc AssignmentTreeConstructor) makeChildren(
 	segments := prefixSet.Subset(groupingEtiketten[0])
 
 	err = segments.Ungrouped.Each(
-		func(tz sku.WithKennungInterface) (err error) {
+		func(tz sku.SkuLike) (err error) {
 			var z obj
 
 			if z, err = makeObj(tz, atc.Expanders); err != nil {
@@ -167,8 +167,12 @@ func (atc AssignmentTreeConstructor) makeChildren(
 	)
 
 	sort.Slice(parent.children, func(i, j int) bool {
-		vi := collections.StringCommaSeparated[kennung.Etikett](parent.children[i].etiketten)
-		vj := collections.StringCommaSeparated[kennung.Etikett](parent.children[j].etiketten)
+		vi := collections.StringCommaSeparated[kennung.Etikett](
+			parent.children[i].etiketten,
+		)
+		vj := collections.StringCommaSeparated[kennung.Etikett](
+			parent.children[j].etiketten,
+		)
 		return vi < vj
 	})
 

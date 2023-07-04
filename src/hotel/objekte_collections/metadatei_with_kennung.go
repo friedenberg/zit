@@ -6,12 +6,16 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 )
 
-type MutableSetMetadateiWithKennung = schnittstellen.MutableSet[sku.WithKennungInterface]
+type MutableSetMetadateiWithKennung = schnittstellen.MutableSet[sku.SkuLike]
 
 func MakeMutableSetMetadateiWithKennung() MutableSetMetadateiWithKennung {
 	return collections.MakeMutableSet(
-		func(mwk sku.WithKennungInterface) string {
-			return collections.MakeKey(mwk.Kennung)
+		func(mwk sku.SkuLike) string {
+			if mwk == nil {
+				return ""
+			}
+
+			return mwk.GetKey()
 		},
 	)
 }

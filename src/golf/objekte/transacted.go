@@ -141,23 +141,6 @@ func (a Transacted[T, T1, T2, T3]) GetTyp() (t kennung.Typ) {
 	return
 }
 
-func (a *Transacted[T, T1, T2, T3]) GetMetadateiWithKennung() (m sku.WithKennungInterface) {
-	var k2 T2
-
-	T3(&k2).ResetWith(a.Sku.GetKennung())
-
-	m = sku.WithKennungInterface{
-		Kennung:   T3(&k2),
-		Metadatei: a.GetMetadatei(),
-	}
-
-	if m.Metadatei.Etiketten == nil {
-		m.Metadatei.Etiketten = kennung.MakeEtikettSet()
-	}
-
-	return
-}
-
 func (a Transacted[T, T1, T2, T3]) GetIdLike() (il kennung.Kennung) {
 	return a.Sku.GetKennung()
 }

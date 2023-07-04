@@ -15,7 +15,7 @@ import (
 )
 
 func makeObj(
-	named sku.WithKennungInterface,
+	named sku.SkuLike,
 	expanders kennung.Abbr,
 ) (z obj, err error) {
 	errors.TodoP4("add bez in a better way")

@@ -107,7 +107,7 @@ func (c Add) RunWithCwdQuery(
 	mwk := objekte_collections.MakeMutableSetMetadateiWithKennung()
 	zettelsFromAkteResults.Each(
 		func(z *zettel.Transacted) (err error) {
-			return mwk.Add(z.GetMetadateiWithKennung())
+			return mwk.Add(z.GetSkuLike())
 		},
 	)
 	otFlags.Transacted = mwk

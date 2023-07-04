@@ -8,10 +8,10 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 )
 
-type SetPrefixNamed map[kennung.Etikett]schnittstellen.MutableSet[sku.WithKennungInterface]
+type SetPrefixNamed map[kennung.Etikett]schnittstellen.MutableSet[sku.SkuLike]
 
 type SetPrefixNamedSegments struct {
-	Ungrouped schnittstellen.MutableSet[sku.WithKennungInterface]
+	Ungrouped schnittstellen.MutableSet[sku.SkuLike]
 	Grouped   *SetPrefixNamed
 }
 
@@ -21,17 +21,20 @@ func NewSetPrefixNamed() *SetPrefixNamed {
 	return &s
 }
 
-func makeMutableZettelLikeSet() schnittstellen.MutableSet[sku.WithKennungInterface] {
+func makeMutableZettelLikeSet() schnittstellen.MutableSet[sku.SkuLike] {
 	return collections.MakeMutableSet(
-		func(e sku.WithKennungInterface) string {
+		func(e sku.SkuLike) string {
 			return e.GetKennungLike().String()
 		},
 	)
 }
 
 // this splits on right-expanded
-func (s *SetPrefixNamed) Add(z sku.WithKennungInterface) {
-	es := kennung.Expanded(z.Metadatei.GetEtiketten(), kennung.ExpanderRight)
+func (s *SetPrefixNamed) Add(z sku.SkuLike) {
+	es := kennung.Expanded(
+		z.GetMetadatei().GetEtiketten(),
+		kennung.ExpanderRight,
+	)
 
 	for _, e := range es.Elements() {
 		s.addPair(e, z)
@@ -40,7 +43,7 @@ func (s *SetPrefixNamed) Add(z sku.WithKennungInterface) {
 
 func (s *SetPrefixNamed) addPair(
 	e kennung.Etikett,
-	z sku.WithKennungInterface,
+	z sku.SkuLike,
 ) {
 	existing, ok := (*s)[e]
 
@@ -61,9 +64,9 @@ func (a SetPrefixNamed) Subset(e kennung.Etikett) (out SetPrefixNamedSegments) {
 
 	for e1, zSet := range a {
 		zSet.Each(
-			func(z sku.WithKennungInterface) (err error) {
+			func(z sku.SkuLike) (err error) {
 				intersection := kennung.IntersectPrefixes(
-					z.Metadatei.GetEtiketten(),
+					z.GetMetadatei().GetEtiketten(),
 					kennung.MakeEtikettSet(e),
 				)
 
@@ -85,12 +88,12 @@ func (a SetPrefixNamed) Subset(e kennung.Etikett) (out SetPrefixNamedSegments) {
 	return
 }
 
-func (s SetPrefixNamed) ToSetNamed() (out schnittstellen.MutableSet[sku.WithKennungInterface]) {
+func (s SetPrefixNamed) ToSetNamed() (out schnittstellen.MutableSet[sku.SkuLike]) {
 	out = makeMutableZettelLikeSet()
 
 	for _, zs := range s {
 		zs.Each(
-			func(z sku.WithKennungInterface) (err error) {
+			func(z sku.SkuLike) (err error) {
 				out.Add(z)
 
 				return
@@ -113,7 +116,7 @@ func (a SetPrefixVerzeichnisse) Subset(
 		}
 
 		zSet.Each(
-			func(z sku.WithKennungInterface) (err error) {
+			func(z sku.SkuLike) (err error) {
 				intersection := kennung.IntersectPrefixes(
 					z.GetMetadatei().Etiketten,
 					kennung.MakeEtikettSet(e),

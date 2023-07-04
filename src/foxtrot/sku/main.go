@@ -30,6 +30,10 @@ type DataIdentityGetter interface {
 	GetDataIdentity() DataIdentity
 }
 
+type WithKennungInterface interface {
+	SkuLike
+}
+
 type SkuLike interface {
 	DataIdentity
 	GetKey() string
@@ -43,6 +47,7 @@ type SkuLikePtr interface {
 	metadatei.GetterPtr
 	metadatei.Setter
 	SetKennungLike(kennung.Kennung) error
+	GetKennungLikePtr() kennung.KennungPtr
 	// SetTimeAndFields(kennung.Tai, ...string) error
 	SetFromSkuLike(SkuLike) error
 	// SetTransactionIndex(int)

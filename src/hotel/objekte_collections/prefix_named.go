@@ -27,8 +27,11 @@ func (s SetPrefixVerzeichnisse) Len() int {
 }
 
 // this splits on right-expanded
-func (s *SetPrefixVerzeichnisse) Add(z sku.WithKennungInterface) (err error) {
-	es := kennung.Expanded(z.Metadatei.GetEtiketten(), kennung.ExpanderRight)
+func (s *SetPrefixVerzeichnisse) Add(z sku.SkuLike) (err error) {
+	es := kennung.Expanded(
+		z.GetMetadatei().GetEtiketten(),
+		kennung.ExpanderRight,
+	)
 
 	if es.Len() == 0 {
 		es = kennung.MakeEtikettSet(kennung.Etikett{})
@@ -41,12 +44,14 @@ func (s *SetPrefixVerzeichnisse) Add(z sku.WithKennungInterface) (err error) {
 	return
 }
 
-func (a SetPrefixVerzeichnisse) Subtract(b MutableSetMetadateiWithKennung) (c SetPrefixVerzeichnisse) {
+func (a SetPrefixVerzeichnisse) Subtract(
+	b MutableSetMetadateiWithKennung,
+) (c SetPrefixVerzeichnisse) {
 	c = MakeSetPrefixVerzeichnisse(len(a.innerMap))
 
 	for e, aSet := range a.innerMap {
 		aSet.Each(
-			func(z sku.WithKennungInterface) (err error) {
+			func(z sku.SkuLike) (err error) {
 				if b.Contains(z) {
 					return
 				}
@@ -63,7 +68,7 @@ func (a SetPrefixVerzeichnisse) Subtract(b MutableSetMetadateiWithKennung) (c Se
 
 func (s *SetPrefixVerzeichnisse) addPair(
 	e kennung.Etikett,
-	z sku.WithKennungInterface,
+	z sku.SkuLike,
 ) {
 	s.count += 1
 
@@ -77,7 +82,9 @@ func (s *SetPrefixVerzeichnisse) addPair(
 	s.innerMap[e] = existing
 }
 
-func (a SetPrefixVerzeichnisse) Each(f func(kennung.Etikett, MutableSetMetadateiWithKennung) error) (err error) {
+func (a SetPrefixVerzeichnisse) Each(
+	f func(kennung.Etikett, MutableSetMetadateiWithKennung) error,
+) (err error) {
 	for e, ssz := range a.innerMap {
 		if err = f(e, ssz); err != nil {
 			if collections.IsStopIteration(err) {
@@ -94,12 +101,12 @@ func (a SetPrefixVerzeichnisse) Each(f func(kennung.Etikett, MutableSetMetadatei
 }
 
 func (a SetPrefixVerzeichnisse) EachZettel(
-	f func(kennung.Etikett, sku.WithKennungInterface) error,
+	f func(kennung.Etikett, sku.SkuLike) error,
 ) error {
 	return a.Each(
 		func(e kennung.Etikett, st MutableSetMetadateiWithKennung) (err error) {
-			st.Each(
-				func(z sku.WithKennungInterface) (err error) {
+			err = st.Each(
+				func(z sku.SkuLike) (err error) {
 					err = f(e, z)
 					return
 				},

@@ -3,12 +3,11 @@ package user_ops
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/golf/objekte"
-	"github.com/friedenberg/zit/src/juliett/zettel"
+	"github.com/friedenberg/zit/src/hotel/objekte_collections"
 	"github.com/friedenberg/zit/src/kilo/organize_text"
 	"github.com/friedenberg/zit/src/lima/changes"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -38,39 +37,7 @@ func (c CommitOrganizeFile) Run(
 
 	sameTyp := a.Metadatei.Typ.Equals(b.Metadatei.Typ)
 
-	toUpdate := collections.MakeMutableSetStringer[sku.WithKennungInterface]()
-
-	_ = func(hString string) (z sku.WithKennungInterface, err error) {
-		var h kennung.Hinweis
-
-		if h, err = store.GetAbbrStore().Hinweis().ExpandString(
-			hString,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		var ok bool
-
-		if z, ok = toUpdate.Get(h.String()); !ok {
-			var tz *zettel.Transacted
-
-			if tz, err = store.Zettel().ReadOne(&h); err != nil {
-				err = errors.Wrapf(
-					err,
-					"{Hinweis String: '%s'}: {Hinweis: '%s'}",
-					hString,
-					h,
-				)
-				return
-			}
-
-			z.Kennung = &tz.Sku.Kennung
-			z.Metadatei = tz.GetMetadatei()
-		}
-
-		return
-	}
+	toUpdate := objekte_collections.MakeMutableSetMetadateiWithKennung()
 
 	ms := c.Umwelt.MakeMetaIdSetWithoutExcludedHidden(
 		nil,
@@ -84,7 +51,8 @@ func (c CommitOrganizeFile) Run(
 		func(tl objekte.TransactedLikePtr) (err error) {
 			var change changes.Change
 			ok := false
-			k := tl.GetKennungPtr()
+			sk := tl.GetSkuLike().MutableClone()
+			k := sk.GetKennungLike()
 
 			if change, ok = cs.GetExisting().Get(kennung.FormattedString(k)); !ok {
 				return
@@ -94,7 +62,7 @@ func (c CommitOrganizeFile) Run(
 				return
 			}
 
-			m := tl.GetMetadatei()
+			m := sk.GetMetadatei()
 			mes := m.GetEtiketten().MutableClone()
 			change.GetRemoved().Each(mes.Del)
 			change.GetAdded().Each(mes.Add)
@@ -104,12 +72,8 @@ func (c CommitOrganizeFile) Run(
 				m.Typ = b.Metadatei.Typ
 			}
 
-			mwk := sku.WithKennungInterface{
-				Kennung:   k.KennungPtrClone(),
-				Metadatei: m,
-			}
-
-			toUpdate.Add(mwk)
+			sk.SetMetadatei(m)
+			toUpdate.Add(sk)
 
 			return
 		},

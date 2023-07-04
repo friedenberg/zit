@@ -50,16 +50,16 @@ func (a Abbr) AbbreviateKennung(
 	var getAbbr func(Kennung) (string, error)
 
 	switch in.(type) {
-	case *Hinweis:
+	case Hinweis, *Hinweis:
 		getAbbr = a.Hinweis.AbbreviateKennung
 
-	case *Etikett:
+	case Etikett, *Etikett:
 		getAbbr = a.Etikett.AbbreviateKennung
 
-	case *Typ:
+	case Typ, *Typ:
 		getAbbr = a.Typ.AbbreviateKennung
 
-	case *Kasten:
+	case Kasten, *Kasten:
 		getAbbr = a.Kasten.AbbreviateKennung
 
 	default:
