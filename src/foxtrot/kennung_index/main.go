@@ -41,7 +41,6 @@ type EtikettIndex interface {
 
 type Index interface {
 	schnittstellen.Flusher
-	schnittstellen.Resetter
 
 	EtikettIndex
 

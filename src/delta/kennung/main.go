@@ -31,7 +31,7 @@ type Kennung interface {
 
 type KennungSansGattungPtr interface {
 	KennungSansGattung
-	schnittstellen.Resetter2
+	schnittstellen.Resetter
 	schnittstellen.Setter
 }
 

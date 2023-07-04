@@ -65,7 +65,7 @@ type Set[T any] interface {
 type MutableSet[T any] interface {
 	Set[T]
 	MutableSetLike[T]
-	Resetter2
+	Resetter
 }
 
 type TridexLike interface {

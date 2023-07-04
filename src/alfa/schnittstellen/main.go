@@ -6,7 +6,6 @@ type Ptr[T any] interface {
 	*T
 }
 
-// TODO-P4 rename to Equaller
 type Equatable[T any] interface {
 	Equals(T) bool
 }
@@ -16,28 +15,17 @@ type Flusher interface {
 }
 
 type Resetter interface {
-	// TODO-P1 remove in favore of resetter 2
-	Reset() error
-}
-
-type Resetter2 interface {
 	Reset()
 }
 
-// TODO-P4 rename to Resetter
+type ResetterWithError interface {
+	Reset() error
+}
+
 type Resetable[T any] interface {
 	Ptr[T]
 	ResetWith(T)
 	Reset()
-}
-
-type ResetWither[T any] interface {
-	Ptr[T]
-	ResetWith(T)
-}
-
-type ResetWithPtr[T Ptr[T]] interface {
-	ResetWithPtr(T)
 }
 
 type Keyer[T any] interface {
