@@ -3,7 +3,7 @@ package objekte_collections
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/golf/objekte"
+	"github.com/friedenberg/zit/src/hotel/objekte"
 )
 
 type MutableSetTransacted = schnittstellen.MutableSet[objekte.TransactedLike]
