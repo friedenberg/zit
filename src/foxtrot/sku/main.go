@@ -15,19 +15,8 @@ type (
 	}
 )
 
-type DataIdentity interface {
-	schnittstellen.ValueLike
-	GetTai() kennung.Tai
-	GetId() Kennung
-	GetKennungLike() kennung.Kennung
-	schnittstellen.GattungGetter
-	GetObjekteSha() schnittstellen.ShaLike
-	GetAkteSha() schnittstellen.ShaLike
-	metadatei.Getter
-}
-
-type DataIdentityGetter interface {
-	GetDataIdentity() DataIdentity
+type Getter interface {
+	GetSkuLike() SkuLike
 }
 
 type WithKennungInterface interface {
@@ -35,8 +24,17 @@ type WithKennungInterface interface {
 }
 
 type SkuLike interface {
-	DataIdentity
+	schnittstellen.ValueLike
+	schnittstellen.GattungGetter
+	metadatei.Getter
+
+	GetTai() kennung.Tai
+	GetId() Kennung
+	GetKennungLike() kennung.Kennung
+	GetObjekteSha() schnittstellen.ShaLike
+	GetAkteSha() schnittstellen.ShaLike
 	GetKey() string
+
 	EqualsSkuLike(SkuLike) bool
 	ImmutableClone() SkuLike
 	MutableClone() SkuLikePtr
@@ -44,12 +42,12 @@ type SkuLike interface {
 
 type SkuLikePtr interface {
 	SkuLike
+
 	metadatei.GetterPtr
 	metadatei.Setter
+
 	SetKennungLike(kennung.Kennung) error
 	GetKennungLikePtr() kennung.KennungPtr
-	// SetTimeAndFields(kennung.Tai, ...string) error
 	SetFromSkuLike(SkuLike) error
-	// SetTransactionIndex(int)
 	Reset()
 }

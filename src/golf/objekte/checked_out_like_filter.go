@@ -19,7 +19,7 @@ func MakeFilterFromMetaSet(
 		internal := col.GetInternalLike()
 		external := col.GetExternalLike()
 
-		g := gattung.Must(internal.GetDataIdentity().GetGattung())
+		g := gattung.Must(internal.GetSkuLike().GetGattung())
 
 		var matcher kennung.Matcher
 		ok := false

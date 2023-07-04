@@ -8,11 +8,11 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
-func MakeTimePrefixWriter[T DataIdentityGetter](
+func MakeTimePrefixWriter[T Getter](
 	f schnittstellen.FuncWriterFormat[T],
 ) schnittstellen.FuncWriterFormat[T] {
 	return func(w io.Writer, e T) (n int64, err error) {
-		t := e.GetDataIdentity().GetTai()
+		t := e.GetSkuLike().GetTai()
 
 		return format.Write(
 			w,

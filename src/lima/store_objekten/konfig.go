@@ -208,7 +208,7 @@ func (s *konfigStore) ReadAll(
 
 					var te *erworben.Transacted
 
-					if te, err = s.InflateFromDataIdentity(sk); err != nil {
+					if te, err = s.InflateFromSku(sk); err != nil {
 						if errors.Is(err, toml.Error{}) {
 							err = nil
 						} else {
@@ -252,7 +252,7 @@ func (s *konfigStore) ReadAll(
 
 						var te *erworben.Transacted
 
-						if te, err = s.InflateFromDataIdentity(o); err != nil {
+						if te, err = s.InflateFromSku(o); err != nil {
 							if errors.Is(err, toml.Error{}) {
 								err = nil
 							} else {
@@ -360,11 +360,11 @@ func (s konfigStore) ReadOne(
 }
 
 func (s *konfigStore) ReindexOne(
-	sk sku.DataIdentity,
+	sk sku.SkuLike,
 ) (o kennung.Matchable, err error) {
 	var te *erworben.Transacted
 
-	if te, err = s.InflateFromDataIdentity(sk); err != nil {
+	if te, err = s.InflateFromSku(sk); err != nil {
 		errors.Wrap(err)
 		return
 	}

@@ -13,7 +13,7 @@ type TransactedLike interface {
 	GetAkteSha() schnittstellen.ShaLike
 	GetSkuLike() sku.SkuLike
 	kennung.Matchable
-	sku.DataIdentityGetter
+	sku.Getter
 }
 
 type TransactedLikePtr interface {

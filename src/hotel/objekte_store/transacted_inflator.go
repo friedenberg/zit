@@ -11,7 +11,7 @@ import (
 )
 
 type TransactedDataIdentityInflator[T any] interface {
-	InflateFromDataIdentity(sku.DataIdentity) (T, error)
+	InflateFromSku(sku.SkuLike) (T, error)
 }
 
 type ObjekteStorer[T any] interface {
@@ -31,7 +31,7 @@ type TransactedInflator[
 ] interface {
 	InflateFromSkuLike(sku.SkuLike) (*objekte.Transacted[T, T1, T2, T3], error)
 	InflatorStorer[*objekte.Transacted[T, T1, T2, T3]]
-	InflateFromDataIdentityAndStore(sku.DataIdentity) error
+	InflateFromSkuAndStore(sku.SkuLike) error
 }
 
 type transactedInflator[
@@ -121,8 +121,8 @@ func (h *transactedInflator[T, T1, T2, T3]) InflateFromSkuLike(
 	return
 }
 
-func (h *transactedInflator[T, T1, T2, T3]) InflateFromDataIdentity(
-	o sku.DataIdentity,
+func (h *transactedInflator[T, T1, T2, T3]) InflateFromSku(
+	o sku.SkuLike,
 ) (t *objekte.Transacted[T, T1, T2, T3], err error) {
 	if h.pool == nil {
 		t = new(objekte.Transacted[T, T1, T2, T3])
@@ -130,20 +130,20 @@ func (h *transactedInflator[T, T1, T2, T3]) InflateFromDataIdentity(
 		t = h.pool.Get()
 	}
 
-	if err = t.SetDataIdentity(o); err != nil {
-		err = errors.Wrapf(err, "DataIdentity: %s", o)
+	if err = t.Sku.SetFromSkuLike(o); err != nil {
+		err = errors.Wrapf(err, "Sku: %s", o)
 		return
 	}
 
 	t.GetTai()
 
 	if err = h.readObjekte(o, t); err != nil {
-		err = errors.Wrapf(err, "DataIdentity: %s", o)
+		err = errors.Wrapf(err, "Sku: %s", o)
 		return
 	}
 
 	if err = h.readAkte(t); err != nil {
-		err = errors.Wrapf(err, "DataIdentity: %s", o)
+		err = errors.Wrapf(err, "Sku: %s", o)
 		return
 	}
 
@@ -198,18 +198,18 @@ func (h *transactedInflator[T, T1, T2, T3]) StoreObjekte(
 	return
 }
 
-func (h *transactedInflator[T, T1, T2, T3]) InflateFromDataIdentityAndStore(
-	o sku.DataIdentity,
+func (h *transactedInflator[T, T1, T2, T3]) InflateFromSkuAndStore(
+	o sku.SkuLike,
 ) (err error) {
 	var t *objekte.Transacted[T, T1, T2, T3]
 
-	if t, err = h.InflateFromDataIdentity(o); err != nil {
+	if t, err = h.InflateFromSku(o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	if err = h.StoreObjekte(t); err != nil {
-		err = errors.Wrapf(err, "DataIdentity: %s", o)
+		err = errors.Wrapf(err, "Sku: %s", o)
 		return
 	}
 
@@ -217,7 +217,7 @@ func (h *transactedInflator[T, T1, T2, T3]) InflateFromDataIdentityAndStore(
 }
 
 func (h *transactedInflator[T, T1, T2, T3]) readObjekte(
-	sk sku.DataIdentity,
+	sk sku.SkuLike,
 	t *objekte.Transacted[T, T1, T2, T3],
 ) (err error) {
 	if sk.GetObjekteSha().IsNull() {

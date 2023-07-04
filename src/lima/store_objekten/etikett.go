@@ -160,7 +160,7 @@ func (s etikettStore) ReadAll(
 
 					var te *etikett.Transacted
 
-					if te, err = s.InflateFromDataIdentity(sk); err != nil {
+					if te, err = s.InflateFromSku(sk); err != nil {
 						if errors.Is(err, toml.Error{}) {
 							err = nil
 						} else {
@@ -204,7 +204,7 @@ func (s etikettStore) ReadAll(
 
 						var te *etikett.Transacted
 
-						if te, err = s.InflateFromDataIdentity(o); err != nil {
+						if te, err = s.InflateFromSku(o); err != nil {
 							if errors.Is(err, toml.Error{}) {
 								err = nil
 							} else {

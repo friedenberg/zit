@@ -8,7 +8,7 @@ import (
 )
 
 type TransactedInheritor interface {
-	InflateFromDataIdentityAndStoreAndInherit(sku.DataIdentity) error
+	InflateFromDataIdentityAndStoreAndInherit(sku.SkuLike) error
 }
 
 type InflatorStorer[T any] interface {
@@ -46,11 +46,11 @@ func MakeTransactedInheritor[T heritableElement, TPtr heritableElementPtr[T]](
 }
 
 func (ti *transactedInheritor[T, TPtr]) InflateFromDataIdentityAndStoreAndInherit(
-	sk sku.DataIdentity,
+	sk sku.SkuLike,
 ) (err error) {
 	var t TPtr
 
-	if t, err = ti.inflatorStorer.InflateFromDataIdentity(sk); err != nil {
+	if t, err = ti.inflatorStorer.InflateFromSku(sk); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

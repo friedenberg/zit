@@ -31,7 +31,7 @@ func wrapWithCheckedOutState[T objekte.CheckedOutLike](
 	}
 }
 
-func wrapWithTimePrefixerIfNecessary[T sku.DataIdentityGetter](
+func wrapWithTimePrefixerIfNecessary[T sku.Getter](
 	k schnittstellen.Konfig,
 	f schnittstellen.FuncWriterFormat[T],
 ) schnittstellen.FuncWriterFormat[T] {

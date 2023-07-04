@@ -161,11 +161,6 @@ func (a *Transacted[T, T1, T2, T3]) GetKennungPtr() kennung.KennungPtr {
 	return T3(&a.Sku.Kennung)
 }
 
-func (a Transacted[T, T1, T2, T3]) GetDataIdentity() (di sku.DataIdentity) {
-	di = a.GetSkuLike()
-	return
-}
-
 func (a *Transacted[T, T1, T2, T3]) SetKennung(k1 kennung.Kennung) (err error) {
 	var k T2
 
@@ -179,44 +174,30 @@ func (a *Transacted[T, T1, T2, T3]) SetKennung(k1 kennung.Kennung) (err error) {
 	return
 }
 
-func (a *Transacted[T, T1, T2, T3]) SetDataIdentity(
-	o sku.DataIdentity,
-) (err error) {
-	if err = a.SetKennung(o.GetId()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	a.Sku.ObjekteSha = sha.Make(o.GetObjekteSha())
-	a.Sku.Metadatei.AkteSha = sha.Make(o.GetAkteSha())
-	a.SetTai(o.GetTai())
-
-	return
-}
-
 func (a *Transacted[T, T1, T2, T3]) SetSkuLike(
 	o sku.SkuLike,
 ) (err error) {
-	var h T2
-	ok := false
+	return a.Sku.SetFromSkuLike(o)
+	// var h T2
+	// ok := false
 
-	if h, ok = o.GetId().(T2); !ok {
-		err = errors.Errorf(
-			"wrong type for Kennung. Expected %T but got %T",
-			h,
-			o.GetId(),
-		)
-		return
-	}
+	// if h, ok = o.GetId().(T2); !ok {
+	// 	err = errors.Errorf(
+	// 		"wrong type for Kennung. Expected %T but got %T",
+	// 		h,
+	// 		o.GetId(),
+	// 	)
+	// 	return
+	// }
 
-	a.Sku.Kennung = h
-	a.Sku.ObjekteSha = sha.Make(o.GetObjekteSha())
-	// a.Sku.TransactionIndex = o.GetTransactionIndex()
-	// TODO-P3 fix sku kopf and schwanz
-	// a.Sku.Kopf = t
-	a.SetTai(o.GetTai())
+	// a.Sku.Kennung = h
+	// a.Sku.ObjekteSha = sha.Make(o.GetObjekteSha())
+	// // a.Sku.TransactionIndex = o.GetTransactionIndex()
+	// // TODO-P3 fix sku kopf and schwanz
+	// // a.Sku.Kopf = t
+	// a.SetTai(o.GetTai())
 
-	return
+	// return
 }
 
 func (a Transacted[T, T1, T2, T3]) GetKennungString() string {

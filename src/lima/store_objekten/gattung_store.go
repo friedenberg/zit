@@ -19,7 +19,7 @@ import (
 
 type reindexer interface {
 	// updateExternal(objekte.External) error
-	ReindexOne(sku.DataIdentity) (kennung.Matchable, error)
+	ReindexOne(sku.SkuLike) (kennung.Matchable, error)
 }
 
 type CommonStore[

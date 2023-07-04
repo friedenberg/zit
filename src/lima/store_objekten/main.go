@@ -438,8 +438,8 @@ func (s *Store) ReadAll(
 
 func (s *Store) getReindexFunc(
 	ti kennung_index.KennungIndex[kennung.Typ],
-) func(sku.DataIdentity) error {
-	return func(sk sku.DataIdentity) (err error) {
+) func(sku.SkuLike) error {
+	return func(sk sku.SkuLike) (err error) {
 		var st reindexer
 		ok := false
 

@@ -198,11 +198,11 @@ func (s *commonStoreBase[O, OPtr, K, KPtr]) Query(
 }
 
 func (s *commonStoreBase[O, OPtr, K, KPtr]) ReindexOne(
-	sk sku.DataIdentity,
+	sk sku.SkuLike,
 ) (o kennung.Matchable, err error) {
 	var t *objekte.Transacted[O, OPtr, K, KPtr]
 
-	if t, err = s.InflateFromDataIdentity(sk); err != nil {
+	if t, err = s.InflateFromSku(sk); err != nil {
 		if errors.Is(err, toml.Error{}) {
 			err = nil
 			return
