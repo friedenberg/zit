@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/foxtrot/sku"
 )
 
@@ -23,16 +24,16 @@ func (t Transacted[T, T1, T2, T3]) Kennung() T3 {
 	return &t.Sku.Kennung
 }
 
-func (t Transacted[T, T1, T2, T3]) GetMetadatei() sku.Metadatei {
+func (t Transacted[T, T1, T2, T3]) GetMetadatei() metadatei.Metadatei {
 	return t.Sku.GetMetadatei()
 }
 
-func (t *Transacted[T, T1, T2, T3]) GetMetadateiPtr() *sku.Metadatei {
+func (t *Transacted[T, T1, T2, T3]) GetMetadateiPtr() *metadatei.Metadatei {
 	return t.Sku.GetMetadateiPtr()
 }
 
 func (t *Transacted[T, T1, T2, T3]) SetMetadatei(
-	m sku.Metadatei,
+	m metadatei.Metadatei,
 ) {
 	t.GetMetadateiPtr().ResetWith(m)
 	t.SetAkteSha(m.AkteSha)

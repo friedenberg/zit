@@ -7,47 +7,39 @@ import (
 )
 
 type (
-	Metadatei = metadatei.Metadatei
-	Kennung   = kennung.Kennung
-
 	IdLikeGetter interface {
 		GetId() schnittstellen.ValueLike
 	}
+
+	Getter interface {
+		GetSkuLike() SkuLike
+	}
+
+	SkuLike interface {
+		schnittstellen.ValueLike
+		schnittstellen.GattungGetter
+		metadatei.Getter
+
+		GetTai() kennung.Tai
+		GetKennungLike() kennung.Kennung
+		GetObjekteSha() schnittstellen.ShaLike
+		GetAkteSha() schnittstellen.ShaLike
+		GetKey() string
+
+		EqualsSkuLike(SkuLike) bool
+		ImmutableClone() SkuLike
+		MutableClone() SkuLikePtr
+	}
+
+	SkuLikePtr interface {
+		SkuLike
+
+		metadatei.GetterPtr
+		metadatei.Setter
+
+		SetKennungLike(kennung.Kennung) error
+		GetKennungLikePtr() kennung.KennungPtr
+		SetFromSkuLike(SkuLike) error
+		Reset()
+	}
 )
-
-type Getter interface {
-	GetSkuLike() SkuLike
-}
-
-type WithKennungInterface interface {
-	SkuLike
-}
-
-type SkuLike interface {
-	schnittstellen.ValueLike
-	schnittstellen.GattungGetter
-	metadatei.Getter
-
-	GetTai() kennung.Tai
-	GetId() Kennung
-	GetKennungLike() kennung.Kennung
-	GetObjekteSha() schnittstellen.ShaLike
-	GetAkteSha() schnittstellen.ShaLike
-	GetKey() string
-
-	EqualsSkuLike(SkuLike) bool
-	ImmutableClone() SkuLike
-	MutableClone() SkuLikePtr
-}
-
-type SkuLikePtr interface {
-	SkuLike
-
-	metadatei.GetterPtr
-	metadatei.Setter
-
-	SetKennungLike(kennung.Kennung) error
-	GetKennungLikePtr() kennung.KennungPtr
-	SetFromSkuLike(SkuLike) error
-	Reset()
-}

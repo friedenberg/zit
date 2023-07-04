@@ -254,7 +254,7 @@ func (u *Umwelt) PrinterJustCheckedOutLike() schnittstellen.FuncIter[objekte.Che
 			_, err = fmt.Fprintf(
 				u.Out(),
 				"(checked out) [%s.%s]\n",
-				sk2.GetId(),
+				sk2.GetKennungLike(),
 				sk2.GetGattung(),
 			)
 		}
@@ -293,7 +293,7 @@ func (u *Umwelt) PrinterCheckedOutLike() schnittstellen.FuncIter[objekte.Checked
 			_, err = fmt.Fprintf(
 				u.Out(),
 				"(checked out) [%s.%s]\n",
-				sk2.GetId(),
+				sk2.GetKennungLike(),
 				sk2.GetGattung(),
 			)
 		}

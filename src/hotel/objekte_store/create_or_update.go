@@ -87,7 +87,7 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateCheckedOut(
 		Akte: *objektePtr,
 		Sku: sku.Transacted[T2, T3]{
 			Kennung: *kennungPtr,
-			Metadatei: sku.Metadatei{
+			Metadatei: metadatei.Metadatei{
 				Tai: cou.clock.GetTai(),
 			},
 		},
@@ -166,7 +166,7 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdate(
 		}
 	}
 
-	var m sku.Metadatei
+	var m metadatei.Metadatei
 
 	if mg != nil {
 		m = mg.GetMetadatei()
@@ -269,7 +269,7 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateAkte(
 		}
 	}
 
-	var m sku.Metadatei
+	var m metadatei.Metadatei
 
 	if mg != nil {
 		m = mg.GetMetadatei()

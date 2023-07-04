@@ -7,12 +7,11 @@ import (
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
-	"github.com/friedenberg/zit/src/foxtrot/sku"
 	"github.com/friedenberg/zit/src/india/konfig"
 )
 
 type ProtoZettel struct {
-	Metadatei sku.Metadatei
+	Metadatei metadatei.Metadatei
 }
 
 func MakeProtoZettel(k konfig.Compiled) (p ProtoZettel) {
@@ -28,7 +27,7 @@ func MakeProtoZettel(k konfig.Compiled) (p ProtoZettel) {
 
 func MakeEmptyProtoZettel() ProtoZettel {
 	return ProtoZettel{
-		Metadatei: sku.Metadatei{
+		Metadatei: metadatei.Metadatei{
 			Etiketten: kennung.MakeEtikettSet(),
 		},
 	}
@@ -38,7 +37,7 @@ func (pz *ProtoZettel) AddToFlagSet(f *flag.FlagSet) {
 	pz.Metadatei.AddToFlagSet(f)
 }
 
-func (pz ProtoZettel) Equals(z sku.Metadatei) (ok bool) {
+func (pz ProtoZettel) Equals(z metadatei.Metadatei) (ok bool) {
 	var okTyp, okMet bool
 
 	if !kennung.IsEmpty(pz.Metadatei.Typ) &&
@@ -55,10 +54,10 @@ func (pz ProtoZettel) Equals(z sku.Metadatei) (ok bool) {
 	return
 }
 
-func (pz ProtoZettel) Make() (z *sku.Metadatei) {
+func (pz ProtoZettel) Make() (z *metadatei.Metadatei) {
 	todo.Change("add typ")
 	todo.Change("add Bezeichnung")
-	z = &sku.Metadatei{
+	z = &metadatei.Metadatei{
 		Etiketten: kennung.MakeEtikettSet(),
 	}
 

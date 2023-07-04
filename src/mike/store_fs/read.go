@@ -19,7 +19,7 @@ func (s *Store) PathForTransactedLike(tl objekte.TransactedLike) string {
 		s.Cwd(),
 		fmt.Sprintf(
 			"%s.%s",
-			tl.GetSkuLike().GetId(),
+			tl.GetSkuLike().GetKennungLike(),
 			s.FileExtensionForGattung(tl.GetSkuLike()),
 		),
 	)

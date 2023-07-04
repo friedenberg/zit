@@ -18,7 +18,7 @@ func MakeMutableSetTransactedUnique(c int) MutableSetTransacted {
 
 			return collections.MakeKey(
 				sk.GetTai(),
-				sk.GetId(),
+				sk.GetKennungLike(),
 				sk.GetObjekteSha(),
 			)
 		},

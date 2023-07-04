@@ -12,7 +12,7 @@ func String(o SkuLike) (str string) {
 		"%s %s %s %s %s",
 		o.GetTai(),
 		o.GetGattung(),
-		o.GetId(),
+		o.GetKennungLike(),
 		o.GetObjekteSha(),
 		o.GetAkteSha(),
 	)

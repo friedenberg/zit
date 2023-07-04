@@ -153,7 +153,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 			if _, err = fmt.Fprintf(
 				out,
 				"%s %s\n",
-				tl.GetSkuLike().GetId(),
+				tl.GetSkuLike().GetKennungLike(),
 				sh,
 			); err != nil {
 				err = errors.Wrap(err)
@@ -165,7 +165,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 
 	case "kennung":
 		return func(e TransactedLikePtr) (err error) {
-			_, err = fmt.Fprintln(out, e.GetSkuLike().GetId())
+			_, err = fmt.Fprintln(out, e.GetSkuLike().GetKennungLike())
 			return
 		}
 

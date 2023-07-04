@@ -27,14 +27,14 @@ func init() {
 // TODO-P2 move sku.Sku to sku.Transacted
 type Transacted[K kennung.KennungLike[K], KPtr kennung.KennungLikePtr[K]] struct {
 	Kennung          K
-	Metadatei        Metadatei
+	Metadatei        metadatei.Metadatei
 	ObjekteSha       sha.Sha
 	TransactionIndex values.Int
 	Kopf             kennung.Tai
 }
 
 func (t *Transacted[K, KPtr]) SetFromSkuLike(sk SkuLike) (err error) {
-	if err = KPtr(&t.Kennung).Set(sk.GetId().String()); err != nil {
+	if err = KPtr(&t.Kennung).Set(sk.GetKennungLike().String()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -194,15 +194,15 @@ func (a Transacted[K, KPtr]) String() string {
 	)
 }
 
-func (a Transacted[K, KPtr]) GetMetadatei() Metadatei {
+func (a Transacted[K, KPtr]) GetMetadatei() metadatei.Metadatei {
 	return a.Metadatei
 }
 
-func (a *Transacted[K, KPtr]) GetMetadateiPtr() *Metadatei {
+func (a *Transacted[K, KPtr]) GetMetadateiPtr() *metadatei.Metadatei {
 	return &a.Metadatei
 }
 
-func (a *Transacted[K, KPtr]) SetMetadatei(m Metadatei) {
+func (a *Transacted[K, KPtr]) SetMetadatei(m metadatei.Metadatei) {
 	a.Metadatei = m
 }
 
@@ -355,7 +355,7 @@ func (s Transacted[K, KPtr]) GetGattung() schnittstellen.GattungLike {
 	return s.Kennung.GetGattung()
 }
 
-func (s Transacted[K, KPtr]) GetId() Kennung {
+func (s Transacted[K, KPtr]) GetId() kennung.Kennung {
 	return KPtr(&s.Kennung)
 }
 

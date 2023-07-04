@@ -8,7 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/echo/test_metadatei_io"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
-	"github.com/friedenberg/zit/src/foxtrot/sku"
 )
 
 func makeTestTextFormat(
@@ -42,7 +41,7 @@ func TestReadWithoutAkte(t1 *testing.T) {
 `,
 	)
 
-	expected := sku.Metadatei{
+	expected := metadatei.Metadatei{
 		Bezeichnung: bezeichnung.Make("the title"),
 		Etiketten: makeEtiketten(t,
 			"tag1",
@@ -81,7 +80,7 @@ func TestReadWithoutAkteWithMultilineBezeichnung(t1 *testing.T) {
 `,
 	)
 
-	expected := sku.Metadatei{
+	expected := metadatei.Metadatei{
 		Bezeichnung: bezeichnung.Make("the title\ncontinues"),
 		Etiketten: makeEtiketten(t,
 			"tag1",
@@ -126,7 +125,7 @@ the body
 `,
 	)
 
-	expected := sku.Metadatei{
+	expected := metadatei.Metadatei{
 		AkteSha: sha.Must(
 			"036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064",
 		),
