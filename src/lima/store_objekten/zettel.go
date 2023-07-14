@@ -465,9 +465,7 @@ func (s *zettelStore) UpdateCheckedOut(
 		return
 	}
 
-	shaObj := sha.Make(co.External.GetObjekteSha())
-
-	if shaObj.Equals(co.Internal.Sku.ObjekteSha) {
+	if co.External.Sku.Metadatei.Equals(co.Internal.Sku.Metadatei) {
 		t = &co.Internal
 
 		if err = s.LogWriter.Unchanged(t); err != nil {

@@ -171,7 +171,6 @@ func (i *indexAbbr) AddMatchable(o kennung.Matchable) (err error) {
 	i.hasChanges = true
 
 	i.indexAbbrEncodableTridexes.Shas.Kennungen.Add(o.GetAkteSha().String())
-	i.indexAbbrEncodableTridexes.Shas.Kennungen.Add(o.GetObjekteSha().String())
 
 	switch to := o.(type) {
 	case *zettel.Transacted:

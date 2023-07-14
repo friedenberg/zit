@@ -5,6 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/values"
 )
@@ -59,6 +60,10 @@ func (a Sha) EqualsAny(b any) bool {
 
 func (a Sha) Equals(b Sha) bool {
 	return a.value.Equals(b.value)
+}
+
+func (e Sha) GetGattung() schnittstellen.GattungLike {
+	return gattung.Akte
 }
 
 func (e Sha) String() string {
@@ -134,6 +139,14 @@ func (t *Sha) UnmarshalBinary(text []byte) (err error) {
 	}
 
 	return
+}
+
+func (t Sha) KennungClone() Kennung {
+	return t
+}
+
+func (t Sha) KennungPtrClone() KennungPtr {
+	return &t
 }
 
 func (t Sha) KennungSansGattungClone() KennungSansGattung {
