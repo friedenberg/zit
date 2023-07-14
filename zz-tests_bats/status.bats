@@ -40,7 +40,7 @@ function dirty_new_zettel() {
 
 	assert_success
 	assert_output --partial - <<-EOM
-		[!txt@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[!txt@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[-etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
 		[-etikett-one@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
 		[two/uno@2e844ebe1018e2071c6f2b6b37a9ea2c1bd69e391d89f54aa4256228a1d49db0 !txt "the new zettel"]

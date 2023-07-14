@@ -45,7 +45,7 @@ function organize_simple_commit { # @test
 	EOM
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[!md@d6f48deae132aa17acd1cea0dffbbf6f76776835fc5db48620b8e90e3ee10a33]
+		[!md@102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
 		[-new-etikett-for-all@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
 		[-new-etikett-for@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
 		[-new-etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]

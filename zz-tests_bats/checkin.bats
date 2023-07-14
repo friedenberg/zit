@@ -71,7 +71,7 @@ function checkin_simple_all { # @test
 	run_zit checkin .z,e,t
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[!md@acbfc0e07b1be4bf1b12020d8316fe9629518b015041b7120db5a9f2012c84fa]
+		[!md@220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217]
 		[-etikett-one@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
 		[-etikett-two@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
 		[-etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
@@ -108,7 +108,7 @@ function checkin_simple_all_dry_run { # @test
 	run_zit checkin -dry-run .z,e,t
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[!md@acbfc0e07b1be4bf1b12020d8316fe9629518b015041b7120db5a9f2012c84fa]
+		[!md@220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217]
 		[-etikett-one@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
 		[-etikett-two@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
 		[-etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
@@ -140,7 +140,7 @@ function checkin_simple_typ { # @test
 	run_zit checkin .t
 	assert_success
 	assert_output - <<-EOM
-		[!md@acbfc0e07b1be4bf1b12020d8316fe9629518b015041b7120db5a9f2012c84fa]
+		[!md@220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217]
 	EOM
 
 	run_zit last

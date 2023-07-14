@@ -61,7 +61,7 @@ func MakeCliFormatTransacted(
 			format.MakeFormatString("["),
 			cw(format.MakeWriter(tf, *t.Kennung()), format.ColorTypePointer),
 			format.MakeFormatString("@"),
-			format.MakeWriter(sf, t.GetObjekteSha()),
+			format.MakeWriter(sf, t.GetAkteSha()),
 			format.MakeFormatString("]"),
 		)
 	}

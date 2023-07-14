@@ -32,7 +32,7 @@ function format_simple { # @test
 	run_zit checkin -delete .t
 	assert_success
 	assert_output - <<-EOM
-		[!md@f493a68ab71003dc5f1aaca8a2c5f90a013c868a77574b7e8f3dfb94f5c8cfd7]
+		[!md@21759bebd1a7937005f692b9394c0d2629361286b9fe837617e166c3ded687eb]
 		          deleted [md.typ]
 	EOM
 
