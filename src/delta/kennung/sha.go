@@ -98,10 +98,6 @@ func (t Sha) ContainsMatchableExactly(m Matchable) bool {
 }
 
 func (t Sha) ContainsMatchable(m Matchable) bool {
-	if t.value.EqualsSha(m.GetObjekteSha()) {
-		return true
-	}
-
 	if t.value.EqualsSha(m.GetAkteSha()) {
 		return true
 	}

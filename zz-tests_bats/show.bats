@@ -197,8 +197,8 @@ function show_simple_etikett_history { # @test
 function show_konfig { # @test
 	run_zit show -format log +konfig
 	assert_output_unsorted - <<-EOM
-		[konfig@62c02b6f59e6de576a3fcc1b89db6e85b75c2ff7820df3049a5b12f9db86d1f5]
-		[konfig@62c02b6f59e6de576a3fcc1b89db6e85b75c2ff7820df3049a5b12f9db86d1f5]
+		[konfig@c1a8ed3cf288dd5d7ccdfd6b9c8052a925bc56be2ec97ed0bb345ab1d961c685]
+		[konfig@c1a8ed3cf288dd5d7ccdfd6b9c8052a925bc56be2ec97ed0bb345ab1d961c685]
 	EOM
 }
 

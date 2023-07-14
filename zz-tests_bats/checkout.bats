@@ -18,7 +18,7 @@ function checkout_simple_all { # @test
 	run_zit checkout :z,t,e
 	assert_success
 	assert_output_unsorted - <<-EOM
-		             same [md.typ@b986c1d21fcfb7f0fe11ae960236e3471b4001029a9e631d16899643922b2d15 !md]
+		             same [md.typ@102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384 !md]
 		             same [tag-1.etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249 -tag-1]
 		             same [tag-2.etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249 -tag-2]
 		             same [tag-3.etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249 -tag-3]
@@ -63,6 +63,6 @@ function checkout_simple_typ { # @test
 	run_zit checkout :t
 	assert_success
 	assert_output_unsorted - <<-EOM
-		             same [md.typ@b986c1d21fcfb7f0fe11ae960236e3471b4001029a9e631d16899643922b2d15 !md]
+		             same [md.typ@102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384 !md]
 	EOM
 }

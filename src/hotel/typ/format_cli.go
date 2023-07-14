@@ -40,7 +40,7 @@ func MakeCliFormatCheckedOut(
 				format.ColorTypePointer,
 			),
 			format.MakeFormatString("@"),
-			format.MakeWriter(sf, t.External.GetObjekteSha().GetShaLike()),
+			format.MakeWriter(sf, t.External.GetAkteSha().GetShaLike()),
 			format.MakeFormatString(" "),
 			format.MakeWriter(tf, t.External.Sku.GetKennung()),
 			format.MakeFormatString("]"),

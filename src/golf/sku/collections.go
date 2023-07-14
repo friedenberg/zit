@@ -3,6 +3,7 @@ package sku
 import (
 	"bytes"
 	"encoding/gob"
+	"fmt"
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -39,7 +40,12 @@ func init() {
 					return ""
 				}
 
-				return s.GetObjekteSha().String()
+				return fmt.Sprintf(
+					"%s%s%s",
+					s.GetKennungLike(),
+					s.GetTai(),
+					s.GetAkteSha(),
+				)
 			},
 		),
 	)
