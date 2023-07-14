@@ -548,9 +548,7 @@ func (s *zettelStore) updateLockedWithMutter(
 		return
 	}
 
-	shaObj := sha.Make(tz.GetObjekteSha())
-
-	if shaObj.Equals(mutter.Sku.ObjekteSha) {
+	if tz.Sku.Metadatei.EqualsSansTai(mutter.Sku.Metadatei) {
 		tz = mutter
 
 		if err = s.LogWriter.Unchanged(tz); err != nil {
