@@ -131,7 +131,7 @@ func (z Metadatei) GetTai() kennung.Tai {
 	return z.Tai
 }
 
-func (pz Metadatei) Equals(z1 Metadatei) bool {
+func (pz Metadatei) EqualsSansTai(z1 Metadatei) bool {
 	if !pz.AkteSha.Equals(z1.AkteSha) {
 		return false
 	}
@@ -151,6 +151,14 @@ func (pz Metadatei) Equals(z1 Metadatei) bool {
 	// if !pz.Gattung.Equals(z1.Gattung) {
 	// 	return false
 	// }
+
+	return true
+}
+
+func (pz Metadatei) Equals(z1 Metadatei) bool {
+	if !pz.EqualsSansTai(z1) {
+		return false
+	}
 
 	if !pz.Tai.Equals(z1.Tai) {
 		return false

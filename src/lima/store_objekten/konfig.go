@@ -147,9 +147,8 @@ func (s konfigStore) Update(
 	}
 
 	kt.Sku.ObjekteSha = sha.Make(ow.GetShaLike())
-	mutterObjekteSha := mutter.GetObjekteSha()
 
-	if mutter != nil && kt.GetObjekteSha().EqualsSha(mutterObjekteSha) {
+	if mutter != nil && kt.Sku.Metadatei.EqualsSansTai(mutter.Sku.Metadatei) {
 		kt = mutter
 
 		if err = s.LogWriter.Unchanged(kt); err != nil {

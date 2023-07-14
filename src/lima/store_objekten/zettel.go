@@ -465,7 +465,7 @@ func (s *zettelStore) UpdateCheckedOut(
 		return
 	}
 
-	if co.External.Sku.Metadatei.Equals(co.Internal.Sku.Metadatei) {
+	if co.External.Sku.Metadatei.EqualsSansTai(co.Internal.Sku.Metadatei) {
 		t = &co.Internal
 
 		if err = s.LogWriter.Unchanged(t); err != nil {
