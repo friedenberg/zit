@@ -160,7 +160,7 @@ func (s *zettelStore) writeNamedZettelToIndex(
 		return
 	}
 
-	if err = s.verzeichnisseAll.Add(tz, tz.Sku.ObjekteSha.String()); err != nil {
+	if err = s.verzeichnisseAll.Add(tz, tz.Sku.GetKennung().String()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -619,7 +619,7 @@ func (s *zettelStore) writeObjekte(
 }
 
 func (s *zettelStore) Inherit(tz *zettel.Transacted) (err error) {
-	errors.Log().Printf("inheriting %s", tz.Sku.ObjekteSha)
+	errors.Log().Printf("inheriting %s", tz.Sku)
 
 	if err = s.SaveObjekte(tz); err != nil {
 		err = errors.Wrap(err)
