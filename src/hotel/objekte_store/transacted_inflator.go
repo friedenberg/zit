@@ -10,62 +10,64 @@ import (
 	"github.com/friedenberg/zit/src/hotel/objekte"
 )
 
-type TransactedDataIdentityInflator[T any] interface {
-	InflateFromSku(sku.SkuLike) (T, error)
+type TransactedDataIdentityInflator[A any] interface {
+	InflateFromSku(sku.SkuLike) (A, error)
 }
 
-type ObjekteStorer[T any] interface {
-	StoreObjekte(T) error
+type ObjekteStorer[A any] interface {
+	StoreObjekte(A) error
 }
 
-type AkteStorer[T any] interface {
-	StoreAkte(T) error
+type AkteStorer[A any] interface {
+	StoreAkte(A) error
 }
 
 // TODO-P1 split into ObjekteInflator
 type TransactedInflator[
-	T objekte.Akte[T],
-	T1 objekte.AktePtr[T],
-	T2 kennung.KennungLike[T2],
-	T3 kennung.KennungLikePtr[T2],
+	A objekte.Akte[A],
+	APtr objekte.AktePtr[A],
+	K kennung.KennungLike[K],
+	KPtr kennung.KennungLikePtr[K],
 ] interface {
-	InflateFromSkuLike(sku.SkuLike) (*objekte.Transacted[T, T1, T2, T3], error)
-	InflatorStorer[*objekte.Transacted[T, T1, T2, T3]]
+	InflateFromSkuLike(
+		sku.SkuLike,
+	) (*objekte.Transacted[A, APtr, K, KPtr], error)
+	InflatorStorer[*objekte.Transacted[A, APtr, K, KPtr]]
 	InflateFromSkuAndStore(sku.SkuLike) error
 }
 
 type transactedInflator[
-	T objekte.Akte[T],
-	T1 objekte.AktePtr[T],
-	T2 kennung.KennungLike[T2],
-	T3 kennung.KennungLikePtr[T2],
+	A objekte.Akte[A],
+	APtr objekte.AktePtr[A],
+	K kennung.KennungLike[K],
+	KPtr kennung.KennungLikePtr[K],
 ] struct {
 	of                        schnittstellen.ObjekteIOFactory
 	af                        schnittstellen.AkteIOFactory
 	persistentMetadateiFormat objekte_format.Format
-	akteFormat                objekte.AkteFormat[T, T1]
+	akteFormat                objekte.AkteFormat[A, APtr]
 	pool                      schnittstellen.Pool[
-		objekte.Transacted[T, T1, T2, T3],
-		*objekte.Transacted[T, T1, T2, T3],
+		objekte.Transacted[A, APtr, K, KPtr],
+		*objekte.Transacted[A, APtr, K, KPtr],
 	]
 }
 
 func MakeTransactedInflator[
-	T objekte.Akte[T],
-	T1 objekte.AktePtr[T],
-	T2 kennung.KennungLike[T2],
-	T3 kennung.KennungLikePtr[T2],
+	A objekte.Akte[A],
+	APtr objekte.AktePtr[A],
+	K kennung.KennungLike[K],
+	KPtr kennung.KennungLikePtr[K],
 ](
 	of schnittstellen.ObjekteIOFactory,
 	af schnittstellen.AkteIOFactory,
 	persistentMetadateiFormat objekte_format.Format,
-	akteFormat objekte.AkteFormat[T, T1],
+	akteFormat objekte.AkteFormat[A, APtr],
 	pool schnittstellen.Pool[
-		objekte.Transacted[T, T1, T2, T3],
-		*objekte.Transacted[T, T1, T2, T3],
+		objekte.Transacted[A, APtr, K, KPtr],
+		*objekte.Transacted[A, APtr, K, KPtr],
 	],
-) *transactedInflator[T, T1, T2, T3] {
-	return &transactedInflator[T, T1, T2, T3]{
+) *transactedInflator[A, APtr, K, KPtr] {
+	return &transactedInflator[A, APtr, K, KPtr]{
 		of:                        of,
 		af:                        af,
 		persistentMetadateiFormat: persistentMetadateiFormat,
@@ -74,11 +76,11 @@ func MakeTransactedInflator[
 	}
 }
 
-func (h *transactedInflator[T, T1, T2, T3]) InflateFromSkuLike(
+func (h *transactedInflator[A, APtr, K, KPtr]) InflateFromSkuLike(
 	o sku.SkuLike,
-) (t *objekte.Transacted[T, T1, T2, T3], err error) {
+) (t *objekte.Transacted[A, APtr, K, KPtr], err error) {
 	if h.pool == nil {
-		t = new(objekte.Transacted[T, T1, T2, T3])
+		t = new(objekte.Transacted[A, APtr, K, KPtr])
 	} else {
 		t = h.pool.Get()
 	}
@@ -101,7 +103,7 @@ func (h *transactedInflator[T, T1, T2, T3]) InflateFromSkuLike(
 		return
 	}
 
-	if err = T3(&t.Sku.Kennung).Set(o.GetKennungLike().String()); err != nil {
+	if err = KPtr(&t.Sku.Kennung).Set(o.GetKennungLike().String()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -121,11 +123,11 @@ func (h *transactedInflator[T, T1, T2, T3]) InflateFromSkuLike(
 	return
 }
 
-func (h *transactedInflator[T, T1, T2, T3]) InflateFromSku(
+func (h *transactedInflator[A, APtr, K, KPtr]) InflateFromSku(
 	o sku.SkuLike,
-) (t *objekte.Transacted[T, T1, T2, T3], err error) {
+) (t *objekte.Transacted[A, APtr, K, KPtr], err error) {
 	if h.pool == nil {
-		t = new(objekte.Transacted[T, T1, T2, T3])
+		t = new(objekte.Transacted[A, APtr, K, KPtr])
 	} else {
 		t = h.pool.Get()
 	}
@@ -150,8 +152,8 @@ func (h *transactedInflator[T, T1, T2, T3]) InflateFromSku(
 	return
 }
 
-func (h *transactedInflator[T, T1, T2, T3]) StoreAkte(
-	t *objekte.Transacted[T, T1, T2, T3],
+func (h *transactedInflator[A, APtr, K, KPtr]) StoreAkte(
+	t *objekte.Transacted[A, APtr, K, KPtr],
 ) (err error) {
 	var aw sha.WriteCloser
 
@@ -172,8 +174,8 @@ func (h *transactedInflator[T, T1, T2, T3]) StoreAkte(
 	return
 }
 
-func (h *transactedInflator[T, T1, T2, T3]) StoreObjekte(
-	t *objekte.Transacted[T, T1, T2, T3],
+func (h *transactedInflator[A, APtr, K, KPtr]) StoreObjekte(
+	t *objekte.Transacted[A, APtr, K, KPtr],
 ) (err error) {
 	var ow sha.WriteCloser
 
@@ -198,10 +200,10 @@ func (h *transactedInflator[T, T1, T2, T3]) StoreObjekte(
 	return
 }
 
-func (h *transactedInflator[T, T1, T2, T3]) InflateFromSkuAndStore(
+func (h *transactedInflator[A, APtr, K, KPtr]) InflateFromSkuAndStore(
 	o sku.SkuLike,
 ) (err error) {
-	var t *objekte.Transacted[T, T1, T2, T3]
+	var t *objekte.Transacted[A, APtr, K, KPtr]
 
 	if t, err = h.InflateFromSku(o); err != nil {
 		err = errors.Wrap(err)
@@ -216,9 +218,9 @@ func (h *transactedInflator[T, T1, T2, T3]) InflateFromSkuAndStore(
 	return
 }
 
-func (h *transactedInflator[T, T1, T2, T3]) readObjekte(
+func (h *transactedInflator[A, APtr, K, KPtr]) readObjekte(
 	sk sku.SkuLike,
-	t *objekte.Transacted[T, T1, T2, T3],
+	t *objekte.Transacted[A, APtr, K, KPtr],
 ) (err error) {
 	if sk.GetObjekteSha().IsNull() {
 		return
@@ -260,8 +262,8 @@ func (h *transactedInflator[T, T1, T2, T3]) readObjekte(
 	return
 }
 
-func (h *transactedInflator[T, T1, T2, T3]) readAkte(
-	t *objekte.Transacted[T, T1, T2, T3],
+func (h *transactedInflator[A, APtr, K, KPtr]) readAkte(
+	t *objekte.Transacted[A, APtr, K, KPtr],
 ) (err error) {
 	if h.akteFormat == nil {
 		return
