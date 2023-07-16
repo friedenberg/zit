@@ -76,7 +76,12 @@ func (c DeleteCheckout) Run(
 			var contents []os.DirEntry
 
 			if contents, err = files.ReadDir(d.String()); err != nil {
-				err = errors.Wrapf(err, "Dir: %s", d)
+				if errors.IsNotExist(err) {
+					err = nil
+				} else {
+					err = errors.Wrapf(err, "Dir: %s", d)
+				}
+
 				return
 			}
 
