@@ -186,6 +186,7 @@ func (kc *Compiled) SetCliFromCommander(k erworben.Cli) {
 
 func (kc *compiled) recompile() (err error) {
 	kc.hasChanges = true
+	kc.EtikettenToAddToNew = collections.ResetSlice(kc.EtikettenToAddToNew)
 
 	{
 		kc.ImplicitEtiketten = make(implicitEtikettenMap)
@@ -206,7 +207,8 @@ func (kc *compiled) recompile() (err error) {
 						tn,
 					)
 
-				case tv.AddToNewZettels:
+					// TODO-P2: determine why empty etiketten make it here
+				case tv.AddToNewZettels && tn != "":
 					kc.EtikettenToAddToNew = append(kc.EtikettenToAddToNew, tn)
 				}
 

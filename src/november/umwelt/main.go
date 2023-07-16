@@ -261,7 +261,12 @@ func (u Umwelt) DefaultEtiketten() (etiketten kennung.EtikettSet, err error) {
 
 	for _, e := range u.konfig.EtikettenToAddToNew {
 		if err = f.Set(e); err != nil {
-			err = errors.Wrap(err)
+			err = errors.Wrapf(err, "Etikett: %s", e)
+			err = errors.Wrapf(
+				err,
+				"Etiketten: %s",
+				u.konfig.EtikettenToAddToNew,
+			)
 			return
 		}
 	}

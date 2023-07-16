@@ -222,7 +222,12 @@ func (c New) writeNewZettels(
 	var defaultEtiketten kennung.EtikettSet
 
 	if defaultEtiketten, err = u.DefaultEtiketten(); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(
+			err,
+			"Etiketten: %s",
+			collections.StringCommaSeparated[kennung.Etikett](defaultEtiketten),
+		)
+
 		return
 	}
 
