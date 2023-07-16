@@ -140,7 +140,14 @@ func (pz Metadatei) EqualsSansTai(z1 Metadatei) bool {
 		return false
 	}
 
-	if !pz.Etiketten.Equals(z1.Etiketten) {
+	switch {
+	case pz.Etiketten == nil && z1.Etiketten == nil:
+    // pass
+	case pz.Etiketten == nil && z1.Etiketten.Len() != 0:
+		return false
+	case z1.Etiketten == nil && pz.Etiketten.Len() != 0:
+		return false
+	case !pz.Etiketten.Equals(z1.Etiketten):
 		return false
 	}
 

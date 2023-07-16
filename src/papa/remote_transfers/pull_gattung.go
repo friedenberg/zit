@@ -39,8 +39,6 @@ func (c *client) PullSkus(
 				return
 			}
 
-			errors.Log().Printf("need objekte: %s", sk.GetObjekteSha())
-
 			if err = el.InflateFromDataIdentityAndStoreAndInherit(sk); err != nil {
 				err = errors.Wrapf(err, "Sku: %s", sk)
 				return

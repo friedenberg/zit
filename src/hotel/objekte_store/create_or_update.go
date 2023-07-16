@@ -115,7 +115,8 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateCheckedOut(
 	os := sha.Make(ow.GetShaLike())
 	transactedPtr.Sku.ObjekteSha = os
 
-	if transactedPtr.GetObjekteSha().EqualsSha(co.Internal.GetObjekteSha()) {
+	// TODO-P2: determine why Metadatei.Etiketten can be nil
+	if transactedPtr.Sku.Metadatei.EqualsSansTai(co.Internal.Sku.Metadatei) {
 		transactedPtr = &co.Internal
 
 		if err = cou.delegate.Unchanged(transactedPtr); err != nil {
