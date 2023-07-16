@@ -62,15 +62,15 @@ function organize_simple_commit { # @test
 	run_zit show -format log new-etikett-for-all:z,e,t
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[!md@d6f48deae132aa17acd1cea0dffbbf6f76776835fc5db48620b8e90e3ee10a33 new-etikett-for-all]
+		[!md@102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384 new-etikett-for-all]
 		[-new-etikett-for-all@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
 		[-tag-1@55001f3c8d717cfc6b6a9f6620ecdc006f8ffd2fe440a740cc754f3238a57ebc]
 		[-tag-2@55001f3c8d717cfc6b6a9f6620ecdc006f8ffd2fe440a740cc754f3238a57ebc]
 		[-tag-3@55001f3c8d717cfc6b6a9f6620ecdc006f8ffd2fe440a740cc754f3238a57ebc]
 		[-tag-4@55001f3c8d717cfc6b6a9f6620ecdc006f8ffd2fe440a740cc754f3238a57ebc]
 		[-tag@55001f3c8d717cfc6b6a9f6620ecdc006f8ffd2fe440a740cc754f3238a57ebc]
-		[one/dos@591fd7a0cdad23ddac675cc66f3fe004080c2cdff64a43feb1ec0c02f2dae7a1 !md "wow ok again"]
-		[one/uno@8fa484873bb584d5d8e8e0121d54d28a821080ceaf67399a3ba891ab82d9d54f !md "wow the first"]
+		[one/dos@2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again"]
+		[one/uno@11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first"]
 	EOM
 }
 

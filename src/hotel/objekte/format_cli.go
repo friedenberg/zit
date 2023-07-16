@@ -21,7 +21,7 @@ func MakeCliFormatTransactedLikePtr(
 				format.MakeFormatString("["),
 				format.MakeWriter(hf, z.GetKennung()),
 				format.MakeFormatString("@"),
-				format.MakeWriter(sf, z.GetObjekteSha()),
+				format.MakeWriter(sf, z.GetAkteSha()),
 				format.MakeFormatString("]"),
 			)
 		} else {
@@ -30,7 +30,7 @@ func MakeCliFormatTransactedLikePtr(
 				format.MakeFormatString("["),
 				format.MakeWriter(hf, z.GetKennung()),
 				format.MakeFormatString("@"),
-				format.MakeWriter(sf, z.GetObjekteSha()),
+				format.MakeWriter(sf, z.GetAkteSha()),
 				format.MakeFormatString(" "),
 				format.MakeWriter[metadatei.GetterPtr](mf, z),
 				format.MakeFormatString("]"),
