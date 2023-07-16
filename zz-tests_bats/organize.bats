@@ -46,15 +46,15 @@ function organize_simple_commit { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md@102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
-		[-new-etikett-for-all@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
-		[-new-etikett-for@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
-		[-new-etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
-		[-new@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
-		[-tag-1@55001f3c8d717cfc6b6a9f6620ecdc006f8ffd2fe440a740cc754f3238a57ebc]
-		[-tag-2@55001f3c8d717cfc6b6a9f6620ecdc006f8ffd2fe440a740cc754f3238a57ebc]
-		[-tag-3@55001f3c8d717cfc6b6a9f6620ecdc006f8ffd2fe440a740cc754f3238a57ebc]
-		[-tag-4@55001f3c8d717cfc6b6a9f6620ecdc006f8ffd2fe440a740cc754f3238a57ebc]
-		[-tag@55001f3c8d717cfc6b6a9f6620ecdc006f8ffd2fe440a740cc754f3238a57ebc]
+		[-new-etikett-for-all@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-new-etikett-for@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-new-etikett@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-new@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-tag-1@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-tag-2@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-tag-3@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-tag-4@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-tag@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/dos@591fd7a0cdad23ddac675cc66f3fe004080c2cdff64a43feb1ec0c02f2dae7a1 !md "wow ok again"]
 		[one/uno@8fa484873bb584d5d8e8e0121d54d28a821080ceaf67399a3ba891ab82d9d54f !md "wow the first"]
 	EOM
@@ -63,12 +63,12 @@ function organize_simple_commit { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md@102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384 new-etikett-for-all]
-		[-new-etikett-for-all@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
-		[-tag-1@55001f3c8d717cfc6b6a9f6620ecdc006f8ffd2fe440a740cc754f3238a57ebc]
-		[-tag-2@55001f3c8d717cfc6b6a9f6620ecdc006f8ffd2fe440a740cc754f3238a57ebc]
-		[-tag-3@55001f3c8d717cfc6b6a9f6620ecdc006f8ffd2fe440a740cc754f3238a57ebc]
-		[-tag-4@55001f3c8d717cfc6b6a9f6620ecdc006f8ffd2fe440a740cc754f3238a57ebc]
-		[-tag@55001f3c8d717cfc6b6a9f6620ecdc006f8ffd2fe440a740cc754f3238a57ebc]
+		[-new-etikett-for-all@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-tag-1@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-tag-2@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-tag-3@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-tag-4@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-tag@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/dos@2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again"]
 		[one/uno@11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first"]
 	EOM
@@ -79,7 +79,7 @@ function organize_hides_hidden_etiketten_from_organize { # @test
 	run_zit checkin -delete .e
 	assert_success
 	assert_output - <<-EOM
-		[-zz-archive@0b7afc0b23d2f265b64bc184728d540cbadd0df54a2ae719e9757bcf17d8548a]
+		[-zz-archive@b8cd0eaa1891284eafdf99d3acc2007a3d4396e8a7282335f707d99825388a93]
 		          deleted [zz-archive.etikett]
 	EOM
 
@@ -96,12 +96,12 @@ function organize_hides_hidden_etiketten_from_organize { # @test
 	run_zit new -edit=false "$to_add"
 	assert_success
 	assert_output - <<-EOM
-		[-project@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
-		[-project-2021@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
-		[-project-2021-zit@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
-		[-zz@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
-		[-zz-archive-task@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
-		[-zz-archive-task-done@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-project@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-project-2021@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-project-2021-zit@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-zz@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-zz-archive-task@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-zz-archive-task-done@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[two/uno@8a35da296f0c4b007f386ca26553e2fc92c71173cf372e575b3cda857f7fb7e3 !md "split hinweis for usability"]
 	EOM
 

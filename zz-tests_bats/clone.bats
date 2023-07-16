@@ -23,7 +23,7 @@ function bootstrap {
 	run_zit new -edit=false to_add
 	assert_success
 	assert_output - <<-EOM
-		[-tag@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-tag@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/uno@37d3869e9b1711f009eabf69a2bf294cfd785f5b1c7463cba77d11d5f81f5e09 !md "wow"]
 	EOM
 
@@ -47,7 +47,7 @@ function clone { # @test
 	assert_output_unsorted - <<-EOM
 		[!md@102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
 		[!md@102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
-		[-tag@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-tag@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[konfig@c1a8ed3cf288dd5d7ccdfd6b9c8052a925bc56be2ec97ed0bb345ab1d961c685]
 		[konfig@c1a8ed3cf288dd5d7ccdfd6b9c8052a925bc56be2ec97ed0bb345ab1d961c685]
 		[one/uno@37d3869e9b1711f009eabf69a2bf294cfd785f5b1c7463cba77d11d5f81f5e09 !md "wow"]

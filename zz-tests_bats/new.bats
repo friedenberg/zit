@@ -38,8 +38,8 @@ function can_duplicate_zettel_content { # @test
 	run_zit new -edit=false "$expected"
 	assert_success
 	assert_output - <<-EOM
-		[-et1@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
-		[-et2@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-et1@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-et2@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[two/uno@18df16846a2f8bbce5f03e1041baff978a049aabd169ab9adac387867fe1706c !md "bez"]
 	EOM
 

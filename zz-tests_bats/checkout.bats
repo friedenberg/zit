@@ -19,11 +19,11 @@ function checkout_simple_all { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		             same [md.typ@102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384 !md]
-		             same [tag-1.etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249 -tag-1]
-		             same [tag-2.etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249 -tag-2]
-		             same [tag-3.etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249 -tag-3]
-		             same [tag-4.etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249 -tag-4]
-		             same [tag.etikett@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249 -tag]
+		             same [tag-1.etikett@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 -tag-1]
+		             same [tag-2.etikett@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 -tag-2]
+		             same [tag-3.etikett@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 -tag-3]
+		             same [tag-4.etikett@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 -tag-4]
+		             same [tag.etikett@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 -tag]
 		      checked out [one/dos.zettel@c6b9d095358b8b26a99e90496d916ba92a99e9b75c705165df5f6d353a949ea9 !md "wow ok again"]
 		      checked out [one/uno.zettel@d47c552a5299f392948258d7959fc7cf94843316a21c8ea12854ed84a8c06367 !md "wow the first"]
 	EOM

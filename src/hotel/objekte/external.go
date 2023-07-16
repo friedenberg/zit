@@ -151,10 +151,6 @@ func (e *External[T, T1, T2, T3]) SetAkteSha(v schnittstellen.ShaLike) {
 	e.Sku.SetAkteSha(sh)
 }
 
-func (e External[T, T1, T2, T3]) ObjekteSha() sha.Sha {
-	return e.Sku.ObjekteSha
-}
-
 func (e *External[T, T1, T2, T3]) SetObjekteSha(
 	sh schnittstellen.ShaLike,
 ) {

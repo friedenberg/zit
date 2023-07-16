@@ -54,7 +54,7 @@ function can_new_zettel_file { # @test
 	run_zit new -edit=false "$to_add"
 	assert_success
 	assert_output - <<-EOM
-		[-ok@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-ok@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/uno@9a638e2b183562da6d3c634d5a3841d64bc337c9cf79f8fffa0d0194659bc564 !md "wow"]
 	EOM
 
@@ -82,7 +82,7 @@ function can_new_zettel { # @test
 	run_zit new -edit=false -bezeichnung wow -etiketten ok
 	assert_success
 	assert_output - <<-EOM
-		[-ok@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-ok@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/uno@9a638e2b183562da6d3c634d5a3841d64bc337c9cf79f8fffa0d0194659bc564 !md "wow"]
 	EOM
 
@@ -109,7 +109,7 @@ function can_checkout_and_checkin { # @test
 	run_zit new -edit=false "$to_add"
 	assert_success
 	assert_output - <<-EOM
-		[-ok@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-ok@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/uno@9a638e2b183562da6d3c634d5a3841d64bc337c9cf79f8fffa0d0194659bc564 !md "wow"]
 	EOM
 
@@ -153,7 +153,7 @@ function can_checkout_via_etiketten { # @test
 	run_zit new -edit=false "$to_add"
 	assert_success
 	assert_output - <<-EOM
-		[-ok@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-ok@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/uno@9a638e2b183562da6d3c634d5a3841d64bc337c9cf79f8fffa0d0194659bc564 !md "wow"]
 	EOM
 
@@ -182,8 +182,8 @@ function can_new_zettel_with_metadatei { # @test
 	run_zit new -edit=false -bezeichnung bez -etiketten et1,et2
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[-et1@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
-		[-et2@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-et1@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-et2@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/uno@22bfa88b3975bc7cad702c2c7f262d5a754d9ad7423b96b134c6bbc1fbd88aea !md "bez"]
 	EOM
 }
@@ -211,8 +211,8 @@ function indexes_are_implicitly_correct { # @test
 	run_zit new -edit=false "$expected"
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[-et1@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
-		[-et2@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-et1@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-et2@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/uno@18df16846a2f8bbce5f03e1041baff978a049aabd169ab9adac387867fe1706c !md "bez"]
 	EOM
 
@@ -292,8 +292,8 @@ function checkouts_dont_overwrite { # @test
 	run_zit new -edit=false "$expected"
 	assert_success
 	assert_output - <<-EOM
-		[-et1@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
-		[-et2@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+		[-et1@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-et2@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/uno@18df16846a2f8bbce5f03e1041baff978a049aabd169ab9adac387867fe1706c !md "bez"]
 	EOM
 
