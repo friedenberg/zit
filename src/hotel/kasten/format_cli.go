@@ -39,7 +39,7 @@ func MakeCliFormatCheckedOut(
 				format.ColorTypePointer,
 			),
 			format.MakeFormatString("@"),
-			format.MakeWriter(sf, t.External.GetObjekteSha().GetShaLike()),
+			format.MakeWriter(sf, t.External.GetAkteSha().GetShaLike()),
 			format.MakeFormatString(" "),
 			format.MakeWriter(tf, t.External.Sku.GetKennung()),
 			format.MakeFormatString("]"),
@@ -64,7 +64,7 @@ func MakeCliFormatExternal(
 				format.ColorTypePointer,
 			),
 			format.MakeFormatString("@"),
-			format.MakeWriter(sf, t.GetObjekteSha()),
+			format.MakeWriter(sf, t.GetAkteSha()),
 			format.MakeFormatString(" "),
 			format.MakeWriter(tf, t.Sku.GetKennung()),
 			format.MakeFormatString("]"),
@@ -85,7 +85,7 @@ func MakeCliFormatTransacted(
 			format.MakeFormatString("["),
 			cw(format.MakeWriter(tf, *t.Kennung()), format.ColorTypePointer),
 			format.MakeFormatString("@"),
-			format.MakeWriter(sf, t.GetObjekteSha()),
+			format.MakeWriter(sf, t.GetAkteSha()),
 			format.MakeFormatString("]"),
 		)
 	}

@@ -18,7 +18,7 @@ function new_empty_no_edit { # @test
 	run_zit new -edit=false
 	assert_success
 	assert_output - <<-EOM
-		[two/uno@e6e789716abc939fc15b8caae85ecb9c1bbe96d44d1b58d2fd42a2a8fd9d904a !md ]
+		[two/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md ]
 	EOM
 }
 
@@ -40,13 +40,13 @@ function can_duplicate_zettel_content { # @test
 	assert_output - <<-EOM
 		[-et1@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[-et2@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[two/uno@18df16846a2f8bbce5f03e1041baff978a049aabd169ab9adac387867fe1706c !md "bez"]
+		[two/uno@036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064 !md "bez"]
 	EOM
 
 	run_zit new -edit=false "$expected"
 	assert_success
 	assert_output - <<-EOM
-		[one/tres@18df16846a2f8bbce5f03e1041baff978a049aabd169ab9adac387867fe1706c !md "bez"]
+		[one/tres@036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064 !md "bez"]
 	EOM
 
 	# when

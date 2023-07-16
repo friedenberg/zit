@@ -32,7 +32,7 @@ function can_update_akte { # @test
 	assert_output_unsorted - <<-EOM
 		[-et1@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[-et2@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/uno@18df16846a2f8bbce5f03e1041baff978a049aabd169ab9adac387867fe1706c !md "bez"]
+		[one/uno@036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064 !md "bez"]
 	EOM
 
 	run_zit show one/uno:z
@@ -49,7 +49,7 @@ function can_update_akte { # @test
 	assert_success
 	assert_output - <<-EOM
 		[-et3@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/uno@6b4905e7d7a5185f73db1e27448663fa38b3aca11d62e1dc33ecb066653791b7 !md "bez"]
+		[one/uno@a8797107a5f9f8d5e7787e275442499dd48d01e82a153b77590a600702451abd !md "bez"]
 	EOM
 
 	# then

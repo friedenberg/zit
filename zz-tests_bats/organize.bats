@@ -55,8 +55,8 @@ function organize_simple_commit { # @test
 		[-tag-3@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[-tag-4@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[-tag@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/dos@591fd7a0cdad23ddac675cc66f3fe004080c2cdff64a43feb1ec0c02f2dae7a1 !md "wow ok again"]
-		[one/uno@8fa484873bb584d5d8e8e0121d54d28a821080ceaf67399a3ba891ab82d9d54f !md "wow the first"]
+		[one/dos@2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again"]
+		[one/uno@11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first"]
 	EOM
 
 	run_zit show -format log new-etikett-for-all:z,e,t
@@ -102,7 +102,7 @@ function organize_hides_hidden_etiketten_from_organize { # @test
 		[-zz@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[-zz-archive-task@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[-zz-archive-task-done@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[two/uno@8a35da296f0c4b007f386ca26553e2fc92c71173cf372e575b3cda857f7fb7e3 !md "split hinweis for usability"]
+		[two/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "split hinweis for usability"]
 	EOM
 
 	expected_organize="$(mktemp)"

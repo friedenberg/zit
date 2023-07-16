@@ -22,7 +22,7 @@ func MakeCliFormatTransacted(
 			format.MakeFormatString("["),
 			format.MakeWriter(hf, *z.Kennung()),
 			format.MakeFormatString("@"),
-			format.MakeWriter(sf, z.GetObjekteSha()),
+			format.MakeWriter(sf, z.GetAkteSha()),
 			format.MakeFormatString(" "),
 			format.MakeWriter[metadatei.GetterPtr](mf, &z),
 			format.MakeFormatString("]"),
