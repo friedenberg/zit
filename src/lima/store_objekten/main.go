@@ -670,7 +670,7 @@ func (s *Store) Reindex() (err error) {
 			err = errors.Wrapf(
 				err,
 				"Bestandsaufnahme: %s",
-				t.GetKennung(),
+				t.GetKennungLike(),
 			)
 
 			return

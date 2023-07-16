@@ -11,7 +11,7 @@ import (
 type (
 	FormatterContext interface {
 		metadatei.PersistentFormatterContext
-		GetKennung() kennung.Kennung
+		GetKennungLike() kennung.Kennung
 	}
 
 	FormatterContextIncludeTai interface {

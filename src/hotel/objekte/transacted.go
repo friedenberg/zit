@@ -154,7 +154,7 @@ func (a Transacted[T, T1, T2, T3]) String() string {
 	return a.GetSkuLike().String()
 }
 
-func (a Transacted[T, T1, T2, T3]) GetKennung() kennung.Kennung {
+func (a Transacted[T, T1, T2, T3]) GetKennungLike() kennung.Kennung {
 	return a.Sku.GetKennung()
 }
 

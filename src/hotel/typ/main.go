@@ -38,5 +38,5 @@ func GetFileExtension(t *Transacted) string {
 		return t.Akte.FileExtension
 	}
 
-	return t.GetKennung().String()
+	return t.GetKennungLike().String()
 }

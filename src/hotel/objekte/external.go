@@ -80,7 +80,7 @@ func (a External[T, T1, T2, T3]) GetTyp() (t kennung.Typ) {
 	return
 }
 
-func (a External[T, T1, T2, T3]) GetKennung() kennung.Kennung {
+func (a External[T, T1, T2, T3]) GetKennungLike() kennung.Kennung {
 	return a.Sku.GetKennung()
 }
 

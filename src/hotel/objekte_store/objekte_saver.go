@@ -59,7 +59,7 @@ func (h objekteSaver) SaveObjekte(
 
 	log.Log().Printf(
 		"saving objekte: %s -> %s",
-		tl.GetKennung().GetGattung(),
+		tl.GetKennungLike().GetGattung(),
 		sh,
 	)
 
@@ -95,7 +95,7 @@ func (h objekteSaver) SaveObjekteIncludeTai(
 
 	log.Log().Printf(
 		"saving objekte with tai: %s -> %s",
-		tl.GetKennung().GetGattung(),
+		tl.GetKennungLike().GetGattung(),
 		sh,
 	)
 

@@ -18,7 +18,7 @@ func MakeTransactedLikeMutableSetKennung() TransactedLikeMutableSet {
 				return ""
 			}
 
-			return tl.GetKennung().String()
+			return tl.GetKennungLike().String()
 		},
 	)
 }

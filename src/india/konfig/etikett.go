@@ -68,7 +68,7 @@ func (a ketikett) Equals(b ketikett) bool {
 }
 
 func (e ketikett) String() string {
-	return e.Transacted.GetKennung().String()
+	return e.Transacted.GetKennungLike().String()
 }
 
 func (k compiled) EachEtikett(

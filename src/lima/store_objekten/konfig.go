@@ -227,7 +227,7 @@ func (s *konfigStore) ReadAll(
 				err = errors.Wrapf(
 					err,
 					"Bestandsaufnahme: %s",
-					t.GetKennung(),
+					t.GetKennungLike(),
 				)
 
 				return

@@ -17,7 +17,7 @@ type formatBestandsaufnahme struct {
 }
 
 type FormatBestandsaufnahme interface {
-	PrintOne(TransactedLikePtr) (int64, error)
+	PrintOne(objekte_format.FormatterContext) (int64, error)
 }
 
 func MakeFormatBestandsaufnahme(
@@ -51,7 +51,7 @@ func (f formatBestandsaufnahme) printFirstBoundary() (n int64, err error) {
 }
 
 func (f formatBestandsaufnahme) PrintOne(
-	tlp TransactedLikePtr,
+	tlp objekte_format.FormatterContext,
 ) (n int64, err error) {
 	pfs := [3]func() (int64, error){
 		f.printFirstBoundary,

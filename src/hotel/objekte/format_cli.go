@@ -19,7 +19,7 @@ func MakeCliFormatTransactedLikePtr(
 			return format.Write(
 				w,
 				format.MakeFormatString("["),
-				format.MakeWriter(hf, z.GetKennung()),
+				format.MakeWriter(hf, z.GetKennungLike()),
 				format.MakeFormatString("@"),
 				format.MakeWriter(sf, z.GetAkteSha()),
 				format.MakeFormatString("]"),
@@ -28,7 +28,7 @@ func MakeCliFormatTransactedLikePtr(
 			return format.Write(
 				w,
 				format.MakeFormatString("["),
-				format.MakeWriter(hf, z.GetKennung()),
+				format.MakeWriter(hf, z.GetKennungLike()),
 				format.MakeFormatString("@"),
 				format.MakeWriter(sf, z.GetAkteSha()),
 				format.MakeFormatString(" "),

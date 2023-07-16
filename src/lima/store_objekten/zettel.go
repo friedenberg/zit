@@ -253,7 +253,10 @@ func (s *zettelStore) readOneExternalAkte(
 	).ApproximatedOrActual()
 
 	if typKonfig == nil {
-		err = errors.Errorf("typKonfig for zettel is nil: %s", t.GetKennung())
+		err = errors.Errorf(
+			"typKonfig for zettel is nil: %s",
+			t.GetKennungLike(),
+		)
 		return
 	}
 
@@ -390,7 +393,7 @@ func (s *zettelStore) UpdateManyMetadatei(
 
 	if err = s.ReadAllSchwanzen(
 		func(zt *zettel.Transacted) (err error) {
-			ke := zt.GetKennung()
+			ke := zt.GetKennungLike()
 
 			if !gattung.Must(ke.GetGattung()).Equals(gattung.Zettel) {
 				return
