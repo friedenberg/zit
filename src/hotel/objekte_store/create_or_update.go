@@ -211,7 +211,7 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdate(
 
 	if mutter != nil &&
 		transactedPtr.Sku.GetKennung().Equals(mutter.Sku.GetKennung()) &&
-		transactedPtr.GetObjekteSha().EqualsSha(mutter.GetObjekteSha()) {
+		transactedPtr.Sku.Metadatei.EqualsSansTai(mutter.Sku.Metadatei) {
 		transactedPtr = mutter
 
 		if err = cou.delegate.Unchanged(transactedPtr); err != nil {
@@ -316,7 +316,7 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateAkte(
 
 	if mutter != nil &&
 		transactedPtr.Sku.GetKennung().Equals(mutter.Sku.GetKennung()) &&
-		transactedPtr.GetObjekteSha().EqualsSha(mutter.GetObjekteSha()) {
+		transactedPtr.Sku.Metadatei.EqualsSansTai(mutter.Sku.Metadatei) {
 		transactedPtr = mutter
 
 		if err = cou.delegate.Unchanged(transactedPtr); err != nil {
