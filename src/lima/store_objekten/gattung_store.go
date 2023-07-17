@@ -103,7 +103,7 @@ func makeCommonStore[
 		sa,
 		tr,
 		objekte_format.FormatForVersion(
-			sa.GetKonfig().GetStoreVersion(),
+			sa.GetStoreVersion(),
 		),
 		akteFormat,
 	)

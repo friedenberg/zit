@@ -19,7 +19,8 @@ import (
 )
 
 type formatAkte2 struct {
-	af schnittstellen.AkteIOFactory
+	af            schnittstellen.AkteIOFactory
+	objekteFormat objekte_format.Format
 }
 
 func (f formatAkte2) ParseSaveAkte(
@@ -54,11 +55,20 @@ func (f formatAkte2) ParseSaveAkte(
 					return
 				}
 
-				var sk sku.SkuLike
+				var sk sku.SkuLikePtr
 
 				m.Etiketten = es.ImmutableClone()
 
-				if sk, err = sku.MakeSkuLike(m, kl, sha.Sha{}); err != nil {
+				var m1 metadatei.Metadatei
+
+				m1.ResetWith(m)
+
+				if sk, err = sku.MakeSkuLikeSansObjekteSha(m1, kl); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				if sku.CalculateAndSetSha(sk, f.objekteFormat); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -68,8 +78,12 @@ func (f formatAkte2) ParseSaveAkte(
 					return
 				}
 
+				m.Reset()
+
+				return
 			} else if v == metadatei.Boundary {
 				afterFirst = true
+				return
 			}
 
 			idxSpace := strings.Index(v, " ")

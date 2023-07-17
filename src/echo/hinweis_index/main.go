@@ -25,7 +25,7 @@ func MakeIndex(
 	s schnittstellen.Standort,
 	su schnittstellen.VerzeichnisseFactory,
 ) (i HinweisIndex, err error) {
-	switch v := k.GetStoreVersion().Int(); {
+	switch v := k.GetStoreVersion().GetInt(); {
 	case v >= 1 && false:
 		errors.TodoP3("investigate using bitsets")
 		if i, err = hinweis_index_v1.MakeIndex(

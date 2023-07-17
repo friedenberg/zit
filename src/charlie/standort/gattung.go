@@ -13,7 +13,7 @@ func (s Standort) DirObjektenGattung(
 	sv schnittstellen.StoreVersion,
 	g schnittstellen.GattungGetter,
 ) (p string, err error) {
-	switch sv.Int() {
+	switch sv.GetInt() {
 	case 0, 1:
 		return s.dirObjektenGattung(g)
 

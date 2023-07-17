@@ -36,10 +36,53 @@ func (t *Transacted[K, KPtr]) SetFromSkuLike(sk SkuLike) (err error) {
 	}
 
 	t.ObjekteSha = sha.Make(sk.GetObjekteSha())
-	t.Metadatei.AkteSha = sha.Make(sk.GetAkteSha())
+	t.Metadatei.ResetWith(sk.GetMetadatei())
 	t.GetMetadateiPtr().Tai = sk.GetTai()
 
 	t.Kopf = sk.GetTai()
+
+	return
+}
+
+func MakeSkuLikeSansObjekteSha(
+	m metadatei.Metadatei,
+	k kennung.Kennung,
+) (sk SkuLikePtr, err error) {
+	switch kt := k.(type) {
+	case kennung.Hinweis:
+		sk = &Transacted[kennung.Hinweis, *kennung.Hinweis]{
+			Metadatei: m,
+			Kennung:   kt,
+		}
+
+	case kennung.Etikett:
+		sk = &Transacted[kennung.Etikett, *kennung.Etikett]{
+			Metadatei: m,
+			Kennung:   kt,
+		}
+
+	case kennung.Typ:
+		sk = &Transacted[kennung.Typ, *kennung.Typ]{
+			Metadatei: m,
+			Kennung:   kt,
+		}
+
+	case kennung.Kasten:
+		sk = &Transacted[kennung.Kasten, *kennung.Kasten]{
+			Metadatei: m,
+			Kennung:   kt,
+		}
+
+	case kennung.Konfig:
+		sk = &Transacted[kennung.Konfig, *kennung.Konfig]{
+			Metadatei: m,
+			Kennung:   kt,
+		}
+
+	default:
+		err = errors.Errorf("unsupported kennung: %T -> %q", kt, kt)
+		return
+	}
 
 	return
 }
@@ -48,47 +91,13 @@ func MakeSkuLike(
 	m metadatei.Metadatei,
 	k kennung.Kennung,
 	os sha.Sha,
-) (sk SkuLike, err error) {
-	switch kt := k.(type) {
-	case kennung.Hinweis:
-		sk = Transacted[kennung.Hinweis, *kennung.Hinweis]{
-			Metadatei:  m,
-			Kennung:    kt,
-			ObjekteSha: os,
-		}
-
-	case kennung.Etikett:
-		sk = Transacted[kennung.Etikett, *kennung.Etikett]{
-			Metadatei:  m,
-			Kennung:    kt,
-			ObjekteSha: os,
-		}
-
-	case kennung.Typ:
-		sk = Transacted[kennung.Typ, *kennung.Typ]{
-			Metadatei:  m,
-			Kennung:    kt,
-			ObjekteSha: os,
-		}
-
-	case kennung.Kasten:
-		sk = Transacted[kennung.Kasten, *kennung.Kasten]{
-			Metadatei:  m,
-			Kennung:    kt,
-			ObjekteSha: os,
-		}
-
-	case kennung.Konfig:
-		sk = Transacted[kennung.Konfig, *kennung.Konfig]{
-			Metadatei:  m,
-			Kennung:    kt,
-			ObjekteSha: os,
-		}
-
-	default:
-		err = errors.Errorf("unsupported kennung: %T -> %q", kt, kt)
+) (sk SkuLikePtr, err error) {
+	if sk, err = MakeSkuLikeSansObjekteSha(m, k); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
+
+	sk.SetObjekteSha(os)
 
 	return
 }
@@ -235,6 +244,10 @@ func (a Transacted[K, KPtr]) Equals(b Transacted[K, KPtr]) (ok bool) {
 
 func (s Transacted[K, KPtr]) GetGattung() schnittstellen.GattungLike {
 	return s.Kennung.GetGattung()
+}
+
+func (s *Transacted[K, KPtr]) SetObjekteSha(v schnittstellen.ShaLike) {
+	s.ObjekteSha = sha.Make(v)
 }
 
 func (s Transacted[K, KPtr]) GetObjekteSha() schnittstellen.ShaLike {

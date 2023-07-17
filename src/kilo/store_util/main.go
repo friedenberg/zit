@@ -25,6 +25,7 @@ import (
 )
 
 type StoreUtilVerzeichnisse interface {
+	GetStoreVersion() schnittstellen.StoreVersion
 	standort.Getter
 	konfig.Getter
 	schnittstellen.VerzeichnisseFactory
@@ -141,6 +142,10 @@ func MakeStoreUtil(
 	}
 
 	return
+}
+
+func (s common) GetStoreVersion() schnittstellen.StoreVersion {
+	return s.konfig.StoreVersion
 }
 
 func (s common) GetLockSmith() schnittstellen.LockSmith {

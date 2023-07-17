@@ -151,10 +151,11 @@ func makeCommonStoreBase[
 			K,
 			KPtr,
 		](
+			sa.GetStoreVersion(),
 			of,
 			sa,
 			objekte_format.FormatForVersion(
-				sa.GetKonfig().GetStoreVersion(),
+				sa.GetStoreVersion(),
 			),
 			akteFormat,
 			pool,
@@ -275,6 +276,7 @@ func (s *commonStoreBase[O, OPtr, K, KPtr]) GetInheritor(
 		K,
 		KPtr,
 	](
+		s.StoreUtil.GetStoreVersion(),
 		schnittstellen.MakeBespokeObjekteReadWriterFactory(orf, s),
 		schnittstellen.MakeBespokeAkteReadWriterFactory(arf, s),
 		pmf,

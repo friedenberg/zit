@@ -51,7 +51,7 @@ func BestandsaufnahmeFormatExcludeTai() Format {
 }
 
 func FormatForVersion(v schnittstellen.StoreVersion) Format {
-	switch v.Int() {
+	switch v.GetInt() {
 	case 0:
 		return v0{}
 

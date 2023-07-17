@@ -37,6 +37,8 @@ type (
 		metadatei.GetterPtr
 		metadatei.Setter
 
+		SetObjekteSha(schnittstellen.ShaLike)
+
 		SetKennungLike(kennung.Kennung) error
 		GetKennungLikePtr() kennung.KennungPtr
 		SetFromSkuLike(SkuLike) error

@@ -15,6 +15,6 @@ func (a storeVersion) String() string {
 	return values.Int(a).String()
 }
 
-func (a storeVersion) Int() int {
+func (a storeVersion) GetInt() int {
 	return values.Int(a).Int()
 }

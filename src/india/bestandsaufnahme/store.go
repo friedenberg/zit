@@ -2,6 +2,7 @@ package bestandsaufnahme
 
 import (
 	"fmt"
+	"io"
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -36,6 +37,11 @@ type AkteFormat = objekte.AkteFormat[
 	*Akte,
 ]
 
+type akteFormat interface {
+	FormatParsedAkte(io.Writer, Akte) (n int64, err error)
+	ParseSaveAkte(io.Reader, *Akte) (schnittstellen.ShaLike, int64, error)
+}
+
 type store struct {
 	standort                  standort.Standort
 	sv                        schnittstellen.StoreVersion
@@ -43,7 +49,7 @@ type store struct {
 	af                        schnittstellen.AkteIOFactory
 	pool                      schnittstellen.Pool[Akte, *Akte]
 	persistentMetadateiFormat objekte_format.Format
-	formatAkte
+	formatAkte                akteFormat
 	objekte_store.ObjekteSaver
 	AkteTextSaver
 }
@@ -56,8 +62,20 @@ func MakeStore(
 	pmf objekte_format.Format,
 ) (s *store, err error) {
 	p := collections.MakePool[Akte]()
-	fa := formatAkte{
-		af: af,
+
+	var fa akteFormat
+
+	switch sv.GetInt() {
+	case 3:
+		fa = formatAkte2{
+			objekteFormat: objekte_format.FormatForVersion(sv),
+			af:            af,
+		}
+
+	default:
+		fa = formatAkte{
+			af: af,
+		}
 	}
 
 	s = &store{
@@ -193,7 +211,12 @@ func (s *store) ReadLast() (max Transacted, err error) {
 	}
 
 	if max.GetObjekteSha().IsNull() {
-		panic(fmt.Sprintf("did not find last Bestandsaufnahme: %#v", max.GetMetadatei()))
+		panic(
+			fmt.Sprintf(
+				"did not find last Bestandsaufnahme: %#v",
+				max.GetMetadatei(),
+			),
+		)
 	}
 
 	return

@@ -129,7 +129,7 @@ func NopAkteFactory() schnittstellen.AkteIOFactory {
 }
 
 func (_ nopAkteFactory) AkteWriter() (WriteCloser, error) {
-	return NewNopWriter(), nil
+	return MakeNopWriter(), nil
 }
 
 func (_ nopAkteFactory) AkteReader(s ShaLike) (ReadCloser, error) {
@@ -140,7 +140,7 @@ type nopWriter struct {
 	hash hash.Hash
 }
 
-func NewNopWriter() (w *nopWriter) {
+func MakeNopWriter() (w *nopWriter) {
 	w = &nopWriter{
 		hash: sha256.New(),
 	}

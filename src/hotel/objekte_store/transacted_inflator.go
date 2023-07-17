@@ -42,6 +42,7 @@ type transactedInflator[
 	K kennung.KennungLike[K],
 	KPtr kennung.KennungLikePtr[K],
 ] struct {
+	storeVersion              schnittstellen.StoreVersion
 	of                        schnittstellen.ObjekteIOFactory
 	af                        schnittstellen.AkteIOFactory
 	persistentMetadateiFormat objekte_format.Format
@@ -58,6 +59,7 @@ func MakeTransactedInflator[
 	K kennung.KennungLike[K],
 	KPtr kennung.KennungLikePtr[K],
 ](
+	sv schnittstellen.StoreVersion,
 	of schnittstellen.ObjekteIOFactory,
 	af schnittstellen.AkteIOFactory,
 	persistentMetadateiFormat objekte_format.Format,
@@ -68,6 +70,7 @@ func MakeTransactedInflator[
 	],
 ) *transactedInflator[A, APtr, K, KPtr] {
 	return &transactedInflator[A, APtr, K, KPtr]{
+		storeVersion:              sv,
 		of:                        of,
 		af:                        af,
 		persistentMetadateiFormat: persistentMetadateiFormat,
@@ -110,9 +113,11 @@ func (h *transactedInflator[A, APtr, K, KPtr]) InflateFromSkuLike(
 
 	t.Sku.ObjekteSha = sha.Make(o.GetObjekteSha())
 
-	if err = h.readObjekte(o, t); err != nil {
-		err = errors.Wrap(err)
-		return
+	if h.storeVersion.GetInt() < 3 {
+		if err = h.readObjekte(o, t); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	if err = h.readAkte(t); err != nil {
@@ -139,9 +144,11 @@ func (h *transactedInflator[A, APtr, K, KPtr]) InflateFromSku(
 
 	t.GetTai()
 
-	if err = h.readObjekte(o, t); err != nil {
-		err = errors.Wrapf(err, "Sku: %s", o)
-		return
+	if h.storeVersion.GetInt() < 3 {
+		if err = h.readObjekte(o, t); err != nil {
+			err = errors.Wrapf(err, "Sku: %s", o)
+			return
+		}
 	}
 
 	if err = h.readAkte(t); err != nil {
@@ -177,6 +184,10 @@ func (h *transactedInflator[A, APtr, K, KPtr]) StoreAkte(
 func (h *transactedInflator[A, APtr, K, KPtr]) StoreObjekte(
 	t *objekte.Transacted[A, APtr, K, KPtr],
 ) (err error) {
+	if h.storeVersion.GetInt() >= 3 {
+		return
+	}
+
 	var ow sha.WriteCloser
 
 	if ow, err = h.of.ObjekteWriter(); err != nil {
