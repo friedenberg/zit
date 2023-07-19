@@ -229,19 +229,9 @@ function show_history_all { # @test
 		Bezeichnung wow ok again
 		Bezeichnung wow the first
 		Etikett tag-1
-		Etikett tag-1
-		Etikett tag-1
-		Etikett tag-1
-		Etikett tag-2
-		Etikett tag-2
-		Etikett tag-2
 		Etikett tag-2
 		Etikett tag-3
 		Etikett tag-3
-		Etikett tag-3
-		Etikett tag-3
-		Etikett tag-4
-		Etikett tag-4
 		Etikett tag-4
 		Etikett tag-4
 		Gattung Etikett

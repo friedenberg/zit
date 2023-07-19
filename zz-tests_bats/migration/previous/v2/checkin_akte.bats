@@ -1,7 +1,7 @@
 #! /usr/bin/env bats
 
 setup() {
-	load "$(dirname "$BATS_TEST_FILE")/common.bash"
+	load "$BATS_CWD/zz-tests_bats/common.bash"
 
 	# for shellcheck SC2154
 	export output
@@ -12,9 +12,9 @@ function can_update_akte { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run_zit_init_disable_age
-
+	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
 	assert_success
+
 	expected="$(mktemp)"
 	{
 		echo ---
@@ -35,7 +35,7 @@ function can_update_akte { # @test
 		[one/uno@036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064 !md "bez"]
 	EOM
 
-	run_zit show one/uno
+	run_zit show one/uno:z
 	assert_success
 	assert_output "$(cat "$expected")"
 
@@ -63,7 +63,7 @@ function can_update_akte { # @test
 		echo the body but new
 	} >"$expected"
 
-	run_zit show one/uno
+	run_zit show one/uno:z
 	assert_success
 	assert_output "$(cat "$expected")"
 }
