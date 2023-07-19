@@ -173,9 +173,7 @@ func (a *Transacted[K, KPtr]) SetKennungLike(kl kennung.Kennung) (err error) {
 
 func (a Transacted[K, KPtr]) GetExternal() External[K, KPtr] {
 	return External[K, KPtr]{
-		Kennung:    a.Kennung,
-		Metadatei:  a.Metadatei,
-		ObjekteSha: a.ObjekteSha,
+		Transacted: a,
 	}
 }
 

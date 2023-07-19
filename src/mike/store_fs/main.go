@@ -65,7 +65,8 @@ func (s Store) Flush() (err error) {
 // ReadOne
 // ReadMany
 // ReadManyHistory
-// func (s *Store) ReadOne(h kennung.Hinweis) (zt *zettel.Transacted, err error) {
+// func (s *Store) ReadOne(h kennung.Hinweis) (zt *zettel.Transacted, err error)
+// {
 // 	errors.TodoP1("include cwd sigil")
 // 	if zt, err = s.storeObjekten.Zettel().ReadOne(&h); err != nil {
 // 		err = errors.Wrap(err)
@@ -101,7 +102,8 @@ func (s Store) Flush() (err error) {
 // 	switch {
 // 	case p.GetAkteFD().Path == "":
 // 		readFunc = func() (zettel.External, error) {
-// 			return s.storeObjekten.Zettel().ReadOneExternal.Read(p.GetObjekteFD().Path)
+// 			return
+// s.storeObjekten.Zettel().ReadOneExternal.Read(p.GetObjekteFD().Path)
 // 		}
 
 // 	case p.GetObjekteFD().Path == "":
@@ -110,7 +112,8 @@ func (s Store) Flush() (err error) {
 // 		}
 
 // 	default:
-// 		// TODO-P3 validate that the zettel file points to the akte in the metadatei
+// 		// TODO-P3 validate that the zettel file points to the akte in the
+// metadatei
 // 		readFunc = func() (zettel.CheckedOut, error) {
 // 			return s.Read(p.GetObjekteFD().Path)
 // 		}

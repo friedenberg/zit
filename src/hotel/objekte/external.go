@@ -35,6 +35,10 @@ type External[
 	Sku  sku.External[T2, T3]
 }
 
+func (a External[T, T1, T2, T3]) GetSkuLike() sku.SkuLike {
+	return a.Sku
+}
+
 func (a External[T, T1, T2, T3]) GetMetadatei() metadatei.Metadatei {
 	return a.Sku.GetMetadatei()
 }

@@ -6,18 +6,16 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
-	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/todo"
+	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
 
 type External[K kennung.KennungLike[K], KPtr kennung.KennungLikePtr[K]] struct {
-	ObjekteSha sha.Sha
-	Kennung    K
-	Metadatei  metadatei.Metadatei
-	FDs        ExternalFDs
+	Transacted[K, KPtr]
+	FDs ExternalFDs
 }
 
 func (a External[K, KPtr]) GetKennung() K {
@@ -32,8 +30,12 @@ func (a *External[K, KPtr]) GetMetadateiPtr() *metadatei.Metadatei {
 	return &a.Metadatei
 }
 
-func (a External[K, KPtr]) GetGattung() gattung.Gattung {
-	return gattung.Must(a.Kennung.GetGattung())
+func (a External[K, KPtr]) GetGattung() schnittstellen.GattungLike {
+	return a.Kennung.GetGattung()
+}
+
+func (a External[K, KPtr]) GetKennungLike() kennung.Kennung {
+	return a.Kennung
 }
 
 func (a External[K, KPtr]) String() string {
@@ -56,7 +58,7 @@ func (a *External[K, KPtr]) SetAkteSha(v schnittstellen.ShaLike) {
 	a.FDs.Akte.Sha = sh
 }
 
-func (a *External[K, KPtr]) Transacted() (b Transacted[K, KPtr]) {
+func (a *External[K, KPtr]) AsTransacted() (b Transacted[K, KPtr]) {
 	b = Transacted[K, KPtr]{
 		Kennung: a.GetKennung(),
 		Metadatei: metadatei.Metadatei{
@@ -86,6 +88,14 @@ func (a *External[K, KPtr]) ResetWithExternalMaybe(b ExternalMaybe[K, KPtr]) {
 	a.Metadatei.Reset()
 	a.FDs = b.FDs
 	KPtr(&a.Kennung).ResetWith(b.Kennung)
+}
+
+func (a External[K, KPtr]) EqualsAny(b any) (ok bool) {
+	return values.Equals(a, b)
+}
+
+func (a External[K, KPtr]) EqualsSkuLike(b SkuLike) (ok bool) {
+	return values.Equals(a, b)
 }
 
 func (a External[K, KPtr]) Equals(b External[K, KPtr]) (ok bool) {

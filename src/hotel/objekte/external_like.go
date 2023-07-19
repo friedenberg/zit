@@ -12,4 +12,5 @@ type ExternalLike interface {
 	GetAkteFD() kennung.FD
 	kennung.Matchable
 	metadatei.Getter
+	GetSkuLike() sku.SkuLike
 }

@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/hotel/etikett"
 	"github.com/friedenberg/zit/src/hotel/kasten"
 	"github.com/friedenberg/zit/src/hotel/objekte"
@@ -189,11 +188,7 @@ func (s *Store) CheckoutOneZettel(
 	cz.State = objekte.CheckedOutStateJustCheckedOut
 	cz.External = zettel.External{
 		Akte: sz.Akte,
-		Sku: sku.External[kennung.Hinweis, *kennung.Hinweis]{
-			Kennung:    sz.Sku.GetKennung(),
-			Metadatei:  sz.GetMetadatei(),
-			ObjekteSha: sz.Sku.ObjekteSha,
-		},
+		Sku:  sz.Sku.GetExternal(),
 	}
 
 	if options.CheckoutMode.IncludesObjekte() {

@@ -76,7 +76,7 @@ func (c Status) RunWithCwdQuery(
 					External: zettel.External{
 						Akte: z.Akte,
 						Sku: sku.External[kennung.Hinweis, *kennung.Hinweis]{
-							Kennung: z.Sku.GetKennung(),
+							Transacted: z.Sku,
 							FDs: sku.ExternalFDs{
 								Akte: fd,
 							},
