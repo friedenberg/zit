@@ -174,7 +174,7 @@ func (i *Zettelen) ReadMany(
 
 				var err1 error
 
-				if _, err1 = p.Copy(w); err1 != nil {
+				if err1 = p.Copy(w); err1 != nil {
 					if isDone() {
 						break
 					}

@@ -88,7 +88,7 @@ func (zt Transacted[T, T1, T2, T3]) IsNew() bool {
 func (a Transacted[T, T1, T2, T3]) Less(
 	b Transacted[T, T1, T2, T3],
 ) bool {
-	return a.GetTai().Less(b.GetTai())
+	return a.Sku.Less(b.Sku)
 }
 
 func (a Transacted[T, T1, T2, T3]) EqualsAny(b any) bool {

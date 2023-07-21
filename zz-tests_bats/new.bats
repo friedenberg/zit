@@ -20,6 +20,21 @@ function new_empty_no_edit { # @test
 	assert_output - <<-EOM
 		[two/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md ]
 	EOM
+
+	run_zit last
+	assert_success
+	assert_output_cut -d' ' -f2- -- --sort - <<-EOM
+		Tai Zettel two/uno e6e789716abc939fc15b8caae85ecb9c1bbe96d44d1b58d2fd42a2a8fd9d904a e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+	EOM
+
+	run_zit show two/uno
+	assert_success
+	assert_output - <<-EOM
+		---
+		# 
+		! md
+		---
+	EOM
 }
 
 function can_duplicate_zettel_content { # @test

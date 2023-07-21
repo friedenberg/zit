@@ -5,6 +5,7 @@ import (
 )
 
 type Bezeichnung struct {
+	// TODO-P1 remove wasSet
 	wasSet bool
 	value  string
 }
@@ -39,6 +40,7 @@ func (a Bezeichnung) WasSet() bool {
 }
 
 func (a *Bezeichnung) Reset() {
+	a.wasSet = false
 	a.value = ""
 }
 
@@ -47,9 +49,9 @@ func (a Bezeichnung) IsEmpty() bool {
 }
 
 func (a Bezeichnung) Equals(b Bezeichnung) (ok bool) {
-	if !a.wasSet {
-		return false
-	}
+	// if !a.wasSet {
+	// 	return false
+	// }
 
 	return a.value == b.value
 }

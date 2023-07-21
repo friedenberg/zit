@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/id"
+	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/bravo/sha"
 )
 
@@ -66,12 +67,26 @@ func (m *Mover) Close() (err error) {
 		return
 	}
 
+	var fi os.FileInfo
+
+	if fi, err = m.file.Stat(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if err = files.Close(m.file); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	sh := m.Writer.GetShaLike()
+
+	log.Log().Printf(
+		"wrote %d bytes to %s, sha %s",
+		fi.Size(),
+		m.file.Name(),
+		sh,
+	)
 
 	if m.objektePath == "" {
 		// TODO-P3 move this validation to options
@@ -105,6 +120,8 @@ func (m *Mover) Close() (err error) {
 			return
 		}
 	}
+
+	log.Log().Printf("moved %s to %s", p, m.objektePath)
 
 	if m.lockFile {
 		if err = files.SetDisallowUserChanges(m.objektePath); err != nil {

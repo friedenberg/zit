@@ -654,7 +654,7 @@ func (s *zettelStore) ReindexOne(
 	var tz *zettel.Transacted
 	defer s.pool.Put(tz)
 
-	errors.Log().Printf("reindexing: %#v", o)
+	errors.Log().Printf("reindexing: %s", sku.String(sk))
 
 	if tz, err = s.InflateFromSku(sk); err != nil {
 		// TODO-P2 decide on how to handle format errors
@@ -665,6 +665,7 @@ func (s *zettelStore) ReindexOne(
 	}
 
 	o = tz
+
 	errExists := s.StoreUtil.GetAbbrStore().Hinweis().Exists(
 		tz.Sku.GetKennung(),
 	)

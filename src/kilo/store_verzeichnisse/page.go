@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
@@ -81,6 +82,8 @@ func (zp *Page) Add(z *zettel.Transacted) (err error) {
 		return
 	}
 
+	log.Log().Printf("adding: %s", z.GetSkuLike())
+
 	if err = zp.addFilter(z); err != nil {
 		if collections.IsStopIteration(err) {
 			errors.Log().Printf("eliding %s", z.Kennung())
@@ -105,6 +108,8 @@ func (zp *Page) Add(z *zettel.Transacted) (err error) {
 
 	zp.added.Add(*z)
 	zp.State = StateChanged
+
+	log.Log().Printf("added: %s", z.GetSkuLike())
 
 	return
 }
@@ -138,19 +143,21 @@ func (zp *Page) Flush() (err error) {
 
 	defer errors.DeferredFlusher(&err, w1)
 
-	if _, err = zp.writeTo(w1); err != nil {
+	if err = zp.writeTo(w1); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	zp.added.Reset()
 
+	errors.Log().Printf("flushed page: %s", zp.path)
+
 	return
 }
 
 func (zp *Page) copy(
 	w schnittstellen.FuncIter[*zettel.Transacted],
-) (n int64, err error) {
+) (err error) {
 	var r1 io.ReadCloser
 
 	if r1, err = zp.ReadCloserVerzeichnisse(zp.path); err != nil {
@@ -181,8 +188,9 @@ func (zp *Page) copy(
 					err = collections.MakeErrStopIteration()
 				} else {
 					err = errors.Wrap(err)
-					return
 				}
+
+				return
 			}
 
 			return
@@ -196,13 +204,13 @@ func (zp *Page) copy(
 	return
 }
 
-func (zp *Page) writeTo(w1 io.Writer) (n int64, err error) {
+func (zp *Page) writeTo(w1 io.Writer) (err error) {
 	w := bufio.NewWriter(w1)
 	defer errors.DeferredFlusher(&err, w)
 
 	enc := gob.NewEncoder(w)
 
-	if n, err = zp.copy(
+	if err = zp.copy(
 		iter.MakeChain(
 			zp.flushFilter,
 			func(z *zettel.Transacted) (err error) {
@@ -219,7 +227,7 @@ func (zp *Page) writeTo(w1 io.Writer) (n int64, err error) {
 
 func (zp *Page) Copy(
 	w schnittstellen.FuncIter[*zettel.Transacted],
-) (n int64, err error) {
+) (err error) {
 	acquired := zp.doTryLock()
 
 	if !acquired {
@@ -242,5 +250,7 @@ func (zp *Page) WriteTo(w1 io.Writer) (n int64, err error) {
 
 	defer zp.doUnlock()
 
-	return zp.writeTo(w1)
+	err = zp.writeTo(w1)
+
+	return
 }
