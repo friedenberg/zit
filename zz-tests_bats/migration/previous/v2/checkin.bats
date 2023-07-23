@@ -146,7 +146,7 @@ function checkin_simple_typ { # @test
 	run_zit last
 	assert_success
 	assert_output_cut -d' ' -f2- -- - <<-EOM
-		Tai Typ md acbfc0e07b1be4bf1b12020d8316fe9629518b015041b7120db5a9f2012c84fa 220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217
+		Tai Typ md 220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217
 	EOM
 
 	run_zit show -format log !md.t
@@ -170,7 +170,7 @@ function checkin_simple_etikett { # @test
 	run_zit last
 	assert_success
 	assert_output_cut -d' ' -f2- -- - <<-EOM
-		Tai Etikett zz-archive 0b7afc0b23d2f265b64bc184728d540cbadd0df54a2ae719e9757bcf17d8548a b8cd0eaa1891284eafdf99d3acc2007a3d4396e8a7282335f707d99825388a93
+		Tai Etikett zz-archive b8cd0eaa1891284eafdf99d3acc2007a3d4396e8a7282335f707d99825388a93
 	EOM
 
 	run_zit show -format text zz-archive?.e

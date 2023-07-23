@@ -184,9 +184,15 @@ func (s *store) ReadOneMetadatei(sh schnittstellen.ShaLike) (o Sku, err error) {
 		return
 	}
 
-	if err = sku.CalculateAndConfirmSha(&o, s.persistentMetadateiFormat, sh); err != nil {
-		err = errors.Wrap(err)
-		return
+	switch s.sv.GetInt() {
+	case 0, 1, 2:
+		o.SetObjekteSha(sh)
+
+	default:
+		if err = sku.CalculateAndConfirmSha(&o, s.persistentMetadateiFormat, sh); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return

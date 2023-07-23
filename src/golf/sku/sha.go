@@ -25,6 +25,9 @@ func CalculateAndConfirmSha(
 			sh,
 			sk.GetObjekteSha(),
 		)
+
+		err = errors.Wrapf(err, "Format: %T", format)
+
 		return
 	}
 
