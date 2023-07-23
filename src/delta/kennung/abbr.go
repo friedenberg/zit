@@ -29,14 +29,21 @@ func (ao abbrOne[V, VPtr]) AbbreviateKennung(
 		return
 	}
 
-	ka, ok := k.(VPtr)
+	var ka1 V
 
-	if !ok {
-		err = errors.Errorf("unsupported kennung for abbreviator: %T", k)
+	switch ka := k.(type) {
+	case VPtr:
+		ka1 = *ka
+
+	case V:
+		ka1 = ka
+
+	default:
+		err = errors.Errorf("expected kennung type %T but got %T", ka, k)
 		return
 	}
 
-	if v, err = ao.Abbreviate(V(*ka)); err != nil {
+	if v, err = ao.Abbreviate(ka1); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

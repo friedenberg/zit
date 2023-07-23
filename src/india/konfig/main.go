@@ -319,6 +319,9 @@ func (c compiled) GetSortedTypenExpanded(
 
 	expandedMaybe.Each(
 		func(v values.String) (err error) {
+			c.lock.Lock()
+			defer c.lock.Unlock()
+
 			ct, ok := c.Typen.Get(v.String())
 
 			if !ok {

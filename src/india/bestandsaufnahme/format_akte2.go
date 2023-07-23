@@ -78,6 +78,7 @@ func (f formatAkte2) ParseSaveAkte(
 					return
 				}
 
+				es.Reset()
 				m.Reset()
 
 				return

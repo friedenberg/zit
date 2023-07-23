@@ -268,7 +268,7 @@ func (s common) objekteWriter(
 		LockFile:                 true,
 	}
 
-	if wc, err = age_io.NewMover(o); err != nil {
+	if wc, err = age_io.NewMover(s.GetStandort(), o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -296,6 +296,7 @@ func (s common) ReadCloserVerzeichnisse(p string) (sha.ReadCloser, error) {
 
 func (s common) WriteCloserObjekten(p string) (w sha.WriteCloser, err error) {
 	return age_io.NewMover(
+		s.GetStandort(),
 		age_io.MoveOptions{
 			Age:       s.Age,
 			FinalPath: p,
@@ -308,6 +309,7 @@ func (s common) WriteCloserVerzeichnisse(
 	p string,
 ) (w sha.WriteCloser, err error) {
 	return age_io.NewMover(
+		s.GetStandort(),
 		age_io.MoveOptions{
 			Age:       s.Age,
 			FinalPath: p,
@@ -336,7 +338,7 @@ func (s common) AkteWriter() (w sha.WriteCloser, err error) {
 		LockFile:                 true,
 	}
 
-	if outer, err = age_io.NewMover(mo); err != nil {
+	if outer, err = age_io.NewMover(s.GetStandort(), mo); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
