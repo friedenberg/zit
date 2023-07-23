@@ -21,7 +21,7 @@ type CheckedOut[
 func (c *CheckedOut[T, T1, T2, T3]) DetermineState() {
 	if c.Internal.Sku.ObjekteSha.IsNull() {
 		c.State = CheckedOutStateUntracked
-	} else if c.Internal.Sku.ObjekteSha.Equals(c.External.Sku.ObjekteSha) {
+	} else if c.Internal.Sku.Metadatei.EqualsSansTai(c.External.Sku.Metadatei) {
 		c.State = CheckedOutStateExistsAndSame
 	} else if c.External.Sku.ObjekteSha.IsNull() {
 		c.State = CheckedOutStateEmpty

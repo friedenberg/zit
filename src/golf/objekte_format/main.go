@@ -21,7 +21,7 @@ type (
 
 	ParserContext interface {
 		metadatei.PersistentParserContext
-		SetKennung(kennung.Kennung) error
+		SetKennungLike(kennung.Kennung) error
 	}
 
 	Formatter interface {
@@ -58,8 +58,11 @@ func FormatForVersion(v schnittstellen.StoreVersion) Format {
 	case 1:
 		return v1{}
 
-	default:
+	case 2:
 		return v2{}
+
+	default:
+		return v3{}
 	}
 }
 

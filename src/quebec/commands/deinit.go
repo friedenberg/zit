@@ -7,6 +7,7 @@ import (
 	"path"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
@@ -33,23 +34,31 @@ func init() {
 }
 
 func (c Deinit) Run(u *umwelt.Umwelt, args ...string) (err error) {
-	if !c.Force && !c.getPermission() {
+	if !c.Force && !c.getPermission(u) {
 		return
 	}
 
 	base := path.Join(u.Standort().Dir(), ".zit")
-	err = os.RemoveAll(base)
 
-	if err != nil {
+	if err = files.SetAllowUserChangesRecursive(base); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = os.RemoveAll(base); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
 	return
 }
 
-func (c Deinit) getPermission() (success bool) {
+func (c Deinit) getPermission(u *umwelt.Umwelt) (success bool) {
 	var err error
-	errors.Err().Printf("are you sure you want to deinit? (y/*)")
+	errors.Err().Printf(
+		"are you sure you want to deinit in %q? (y/*)",
+		u.Standort().Dir(),
+	)
 
 	var answer rune
 	var n int

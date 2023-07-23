@@ -203,11 +203,11 @@ func (a Transacted[K, KPtr]) Less(b Transacted[K, KPtr]) (ok bool) {
 		return
 	}
 
-	if a.GetTai().Equals(b.GetTai()) &&
-		a.TransactionIndex.Less(b.TransactionIndex) {
-		ok = true
-		return
-	}
+	// if a.GetTai().Equals(b.GetTai()) &&
+	// 	a.TransactionIndex.Less(b.TransactionIndex) {
+	// 	ok = true
+	// 	return
+	// }
 
 	return
 }

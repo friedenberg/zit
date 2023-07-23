@@ -46,6 +46,8 @@ func (f *FormatterValue) Set(v string) (err error) {
 		"json",
 		"log",
 		"sku",
+		"sku-metadatei",
+		"sku-metadatei-sans-tai",
 		"text",
 		"sku2":
 		f.string = v1
@@ -166,6 +168,21 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 	case "kennung":
 		return func(e TransactedLikePtr) (err error) {
 			_, err = fmt.Fprintln(out, e.GetSkuLike().GetKennungLike())
+			return
+		}
+
+	case "sku-metadatei-sans-tai":
+		return func(e TransactedLikePtr) (err error) {
+			_, err = fmt.Fprintln(
+				out,
+				sku.StringMetadateiSansTai(e.GetSkuLike()),
+			)
+			return
+		}
+
+	case "sku-metadatei":
+		return func(e TransactedLikePtr) (err error) {
+			_, err = fmt.Fprintln(out, sku.StringMetadatei(e.GetSkuLike()))
 			return
 		}
 

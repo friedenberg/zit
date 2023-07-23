@@ -1,7 +1,6 @@
 package objekte_format
 
 import (
-	"bufio"
 	"io"
 	"strings"
 
@@ -45,9 +44,7 @@ func (f v3) FormatPersistentMetadatei(
 	w.WriteKeySpaceValue("Gattung", c.GetKennungLike().GetGattung())
 	w.WriteKeySpaceValue("Kennung", c.GetKennungLike())
 
-	if f.includeTai {
-		w.WriteKeySpaceValue("Tai", m.Tai)
-	}
+	w.WriteKeySpaceValue("Tai", m.Tai)
 
 	if !m.Typ.IsEmpty() {
 		w.WriteKeySpaceValue(gattung.Typ, m.GetTyp())
@@ -70,47 +67,93 @@ func (f v3) ParsePersistentMetadatei(
 
 	etiketten := kennung.MakeEtikettMutableSet()
 
-	r := bufio.NewReader(r1)
-
-	lr := format.MakeLineReaderConsumeEmpty(
-		ohio.MakeLineReaderIterate(
-			ohio.MakeLineReaderKeyValue(gattung.Akte.String(), m.AkteSha.Set),
-			ohio.MakeLineReaderKeyValue(
-				gattung.Bezeichnung.String(),
-				m.Bezeichnung.Set,
-			),
-			ohio.MakeLineReaderKeyValue(
-				gattung.Etikett.String(),
-				collections.MakeFuncSetString[kennung.Etikett, *kennung.Etikett](
-					etiketten,
-				),
-			),
-			func(v string) (err error) {
-				var k kennung.Kennung
-
-				if k, err = kennung.Make(v); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				if err = c.SetKennung(k); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				return
-			},
-			ohio.MakeLineReaderKeyValue("Tai", m.Tai.Set),
-			ohio.MakeLineReaderKeyValue(
-				gattung.Typ.String(),
-				ohio.MakeLineReaderIgnoreErrors(m.Typ.Set),
-			),
-		),
+	var (
+		g gattung.Gattung
+		k kennung.Kennung
 	)
 
-	if n, err = lr.ReadFrom(r); err != nil {
-		err = errors.Wrap(err)
-		return
+	dr := ohio.MakeDelimReader('\n', r1)
+
+	var (
+		lastKey string
+		key     string
+		val     string
+	)
+
+	for {
+		if key, val, err = dr.ReadOneKeyValue(" "); err != nil {
+			if errors.IsEOF(err) {
+				err = nil
+				break
+			} else {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+
+		if key == "" {
+			err = errors.Errorf("empty key at line %d", dr.Segments())
+			return
+		}
+
+		if lastKey != "" && lastKey > key {
+			err = errors.Errorf("keys not sorted")
+			return
+		}
+
+		switch key {
+		case "Akte":
+			if err = m.AkteSha.Set(val); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+		case "Bezeichnung":
+			if err = m.Bezeichnung.Set(val); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+		case "Etikett":
+			if err = collections.AddString[kennung.Etikett, *kennung.Etikett](
+				etiketten,
+				val,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+		case "Gattung":
+			if err = g.Set(val); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+		case "Kennung":
+			if k, err = kennung.MakeWithGattung(g, val); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if err = c.SetKennungLike(k); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+		case "Tai":
+			if err = m.Tai.Set(val); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+		case "Typ":
+			if err = m.Typ.Set(val); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+
+		lastKey = key
 	}
 
 	m.Etiketten = etiketten

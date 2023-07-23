@@ -108,6 +108,7 @@ func (u *Umwelt) Einleitung(e Einleitung) (err error) {
 
 		defer errors.Deferred(&err, u.Unlock)
 
+		// TODO-P2 reindex quietly
 		if err = u.StoreObjekten().Reindex(); err != nil {
 			err = errors.Wrap(err)
 			return

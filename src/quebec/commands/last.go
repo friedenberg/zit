@@ -55,7 +55,7 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 func (c Last) runWithBestandsaufnahm(u *umwelt.Umwelt) (err error) {
 	s := u.StoreObjekten()
 
-	var b bestandsaufnahme.Transacted
+	var b *bestandsaufnahme.Transacted
 
 	if b, err = s.GetBestandsaufnahmeStore().ReadLast(); err != nil {
 		err = errors.Wrap(err)
@@ -66,7 +66,7 @@ func (c Last) runWithBestandsaufnahm(u *umwelt.Umwelt) (err error) {
 	if err = sku.HeapEach(
 		b.Akte.Skus,
 		func(o sku.SkuLike) (err error) {
-			errors.Out().Print(sku.String(o))
+			errors.Out().Print(sku.StringMetadatei(o))
 			return
 		},
 	); err != nil {
@@ -90,7 +90,7 @@ func (c Last) runWithTransaktion(u *umwelt.Umwelt) (err error) {
 	errors.TodoP3("support log line format for skus")
 	if err = transaktion.Skus.Each(
 		func(o sku.SkuLike) (err error) {
-			errors.Out().Print(o)
+			errors.Out().Print(sku.String(o))
 			return
 		},
 	); err != nil {

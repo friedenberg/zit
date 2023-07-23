@@ -162,7 +162,9 @@ func (a *Transacted[T, T1, T2, T3]) GetKennungPtr() kennung.KennungPtr {
 	return T3(&a.Sku.Kennung)
 }
 
-func (a *Transacted[T, T1, T2, T3]) SetKennung(k1 kennung.Kennung) (err error) {
+func (a *Transacted[T, T1, T2, T3]) SetKennungLike(
+	k1 kennung.Kennung,
+) (err error) {
 	var k T2
 
 	if err = T3(&k).Set(k1.String()); err != nil {

@@ -74,11 +74,11 @@ function show_zettel_etikett { # @test
 		not another one
 	EOM
 
-	run_zit show -format sku -- -tag-3.z
+	run_zit show -format sku-metadatei-sans-tai -- -tag-3.z
 	assert_success
-	assert_output_cut -d' ' -f2- -- --sort - <<-EOM
-		2059300268.968327 Zettel one/dos c6b9d095358b8b26a99e90496d916ba92a99e9b75c705165df5f6d353a949ea9 2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24
-		2059300269.066914 Zettel one/uno d47c552a5299f392948258d7959fc7cf94843316a21c8ea12854ed84a8c06367 11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11
+	assert_output_unsorted - <<-EOM
+		Zettel one/uno 11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md tag-3 tag-4 "wow the first"
+		Zettel one/dos 2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md tag-3 tag-4 "wow ok again"
 	EOM
 }
 
@@ -113,10 +113,10 @@ function show_zettel_etikett_complex { # @test
 		last time
 	EOM
 
-	run_zit show -format sku tag-3.z tag-5.z
+	run_zit show -format sku-metadatei-sans-tai tag-3.z tag-5.z
 	assert_success
 	assert_output_unsorted --partial - <<-EOM
-		Zettel one/uno c3232cc6a4122368757d0af489e471e138eab3133ff9107372f33eaf0e284190 11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11
+		Zettel one/uno 11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md tag-3 tag-5 "wow the first"
 	EOM
 }
 
@@ -148,12 +148,12 @@ function show_simple_all { # @test
 		vim-syntax-type = 'markdown'
 	EOM
 
-	run_zit show -format sku :z,t
+	run_zit show -format sku-metadatei-sans-tai :z,t
 	assert_success
-	assert_output_cut -d' ' -f2- -- --sort - <<-EOM
-		 Typ md b986c1d21fcfb7f0fe11ae960236e3471b4001029a9e631d16899643922b2d15 102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384
-		 Zettel one/dos c6b9d095358b8b26a99e90496d916ba92a99e9b75c705165df5f6d353a949ea9 2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24
-		 Zettel one/uno d47c552a5299f392948258d7959fc7cf94843316a21c8ea12854ed84a8c06367 11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11
+	assert_output_unsorted - <<-EOM
+		Typ md 102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384
+		Zettel one/dos 2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md tag-3 tag-4 "wow ok again"
+		Zettel one/uno 11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md tag-3 tag-4 "wow the first"
 	EOM
 }
 
@@ -203,63 +203,19 @@ function show_konfig { # @test
 }
 
 function show_history_all { # @test
-	run_zit show -format bestandsaufnahme-sans-tai +konfig,kasten,typ,etikett,zettel
+	run_zit show -format sku-metadatei-sans-tai +konfig,kasten,typ,etikett,zettel
 	assert_output_unsorted - <<-EOM
-		---
-		---
-		---
-		---
-		---
-		---
-		---
-		---
-		---
-		---
-		---
-		---
-		---
-		Akte 102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384
-		Akte 102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384
-		Akte 11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11
-		Akte 2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24
-		Akte 3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955
-		Akte c1a8ed3cf288dd5d7ccdfd6b9c8052a925bc56be2ec97ed0bb345ab1d961c685
-		Akte c1a8ed3cf288dd5d7ccdfd6b9c8052a925bc56be2ec97ed0bb345ab1d961c685
-		Bezeichnung wow ok
-		Bezeichnung wow ok again
-		Bezeichnung wow the first
-		Etikett tag-1
-		Etikett tag-2
-		Etikett tag-3
-		Etikett tag-3
-		Etikett tag-4
-		Etikett tag-4
-		Gattung Etikett
-		Gattung Etikett
-		Gattung Etikett
-		Gattung Etikett
-		Gattung Etikett
-		Gattung Konfig
-		Gattung Konfig
-		Gattung Typ
-		Gattung Typ
-		Gattung Zettel
-		Gattung Zettel
-		Gattung Zettel
-		Kennung konfig
-		Kennung konfig
-		Kennung md
-		Kennung md
-		Kennung one/dos
-		Kennung one/uno
-		Kennung one/uno
-		Kennung tag
-		Kennung tag-1
-		Kennung tag-2
-		Kennung tag-3
-		Kennung tag-4
-		Typ md
-		Typ md
-		Typ md
+		Etikett tag e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+		Etikett tag-1 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+		Etikett tag-2 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+		Etikett tag-3 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+		Etikett tag-4 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+		Konfig konfig c1a8ed3cf288dd5d7ccdfd6b9c8052a925bc56be2ec97ed0bb345ab1d961c685
+		Konfig konfig c1a8ed3cf288dd5d7ccdfd6b9c8052a925bc56be2ec97ed0bb345ab1d961c685
+		Typ md 102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384
+		Typ md 102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384
+		Zettel one/dos 2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md tag-3 tag-4 "wow ok again"
+		Zettel one/uno 11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md tag-3 tag-4 "wow the first"
+		Zettel one/uno 3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md tag-1 tag-2 "wow ok"
 	EOM
 }

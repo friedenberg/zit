@@ -136,6 +136,7 @@ func (_ nopAkteFactory) AkteReader(s ShaLike) (ReadCloser, error) {
 	return MakeNopReadCloser(io.NopCloser(bytes.NewBuffer(nil))), nil
 }
 
+// TODO-P2 remove and replace with sha.writer
 type nopWriter struct {
 	hash hash.Hash
 }

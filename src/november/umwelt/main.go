@@ -175,6 +175,8 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 	// 	}
 	// }
 
+	log.Log().Printf("store version: %s", u.Konfig().GetStoreVersion())
+
 	if u.storeUtil, err = store_util.MakeStoreUtil(
 		u.lock,
 		*u.age,

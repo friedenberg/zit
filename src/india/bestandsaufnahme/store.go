@@ -14,6 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
+	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/hotel/objekte"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 )
@@ -22,7 +23,7 @@ type Store interface {
 	objekte_store.ObjekteSaver
 	AkteTextSaver
 	Create(*Akte) error
-	objekte_store.LastReader[Transacted]
+	objekte_store.LastReader[*Transacted]
 	objekte_store.OneReader[schnittstellen.ShaLike, *Transacted]
 	objekte_store.AllReader[*Transacted]
 }
@@ -120,9 +121,28 @@ func (s *store) Create(o *Akte) (err error) {
 	t.Reset()
 	t.Akte = *o
 	t.SetAkteSha(sh)
-	t.SetTai(kennung.NowTai())
+	tai := kennung.NowTai()
+
+	t.Sku.Kennung = tai
+	t.SetTai(tai)
 
 	if err = s.SaveObjekteIncludeTai(t); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *store) readOnePathMetadatei(p string) (o Sku, err error) {
+	var sh sha.Sha
+
+	if sh, err = sha.MakeShaFromPath(p); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if o, err = s.ReadOneMetadatei(sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -146,7 +166,7 @@ func (s *store) readOnePath(p string) (o *Transacted, err error) {
 	return
 }
 
-func (s *store) ReadOne(sh schnittstellen.ShaLike) (o *Transacted, err error) {
+func (s *store) ReadOneMetadatei(sh schnittstellen.ShaLike) (o Sku, err error) {
 	var or sha.ReadCloser
 
 	if or, err = s.of.ObjekteReader(sh); err != nil {
@@ -156,15 +176,27 @@ func (s *store) ReadOne(sh schnittstellen.ShaLike) (o *Transacted, err error) {
 
 	defer errors.DeferredCloser(&err, or)
 
+	if _, err = s.persistentMetadateiFormat.ParsePersistentMetadatei(
+		or,
+		&o,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = sku.CalculateAndConfirmSha(&o, s.persistentMetadateiFormat, sh); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *store) ReadOne(sh schnittstellen.ShaLike) (o *Transacted, err error) {
 	o = &Transacted{}
 	o.Reset()
 
-	o.SetObjekteSha(sh)
-
-	if _, err = s.persistentMetadateiFormat.ParsePersistentMetadatei(
-		or,
-		o,
-	); err != nil {
+	if o.Sku, err = s.ReadOneMetadatei(sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -190,22 +222,29 @@ func (s *store) ReadOne(sh schnittstellen.ShaLike) (o *Transacted, err error) {
 	return
 }
 
-func (s *store) ReadLast() (max Transacted, err error) {
+func (s *store) ReadLast() (max *Transacted, err error) {
 	l := &sync.Mutex{}
 
-	if err = s.ReadAll(
-		func(b *Transacted) (err error) {
+	var maxSku Sku
+
+	if err = s.ReadAllMetadatei(
+		func(b Sku) (err error) {
 			l.Lock()
 			defer l.Unlock()
 
-			if max.Less(*b) {
-				max.ResetWith(*b)
+			if maxSku.Less(b) {
+				maxSku.ResetWith(b)
 				return
 			}
 
 			return
 		},
 	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if max, err = s.ReadOne(maxSku.GetObjekteSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -217,6 +256,42 @@ func (s *store) ReadLast() (max Transacted, err error) {
 				max.GetMetadatei(),
 			),
 		)
+	}
+
+	return
+}
+
+func (s *store) ReadAllMetadatei(f schnittstellen.FuncIter[Sku]) (err error) {
+	var p string
+
+	if p, err = s.standort.DirObjektenGattung(
+		s.sv,
+		gattung.Bestandsaufnahme,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = files.ReadDirNamesLevel2(
+		func(p string) (err error) {
+			var o Sku
+
+			if o, err = s.readOnePathMetadatei(p); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if err = f(o); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+		p,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

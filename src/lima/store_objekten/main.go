@@ -582,6 +582,7 @@ func (s *Store) AddMatchable(m kennung.Matchable) (err error) {
 	return
 }
 
+// TODO-P2 add support for quiet reindexing
 func (s *Store) Reindex() (err error) {
 	if !s.GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{

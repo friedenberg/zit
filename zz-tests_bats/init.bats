@@ -12,6 +12,12 @@ function init_and_deinit { # @test
 	cd "$wd" || exit 1
 
 	run_zit_init_disable_age
+	assert_output_unsorted - <<-EOM
+		[!md@102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
+		[!md@102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
+		[konfig@c1a8ed3cf288dd5d7ccdfd6b9c8052a925bc56be2ec97ed0bb345ab1d961c685]
+		[konfig@c1a8ed3cf288dd5d7ccdfd6b9c8052a925bc56be2ec97ed0bb345ab1d961c685]
+	EOM
 
 	run test -f .zit/KonfigAngeboren
 	assert_success
