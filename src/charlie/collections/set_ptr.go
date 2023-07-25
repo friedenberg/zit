@@ -7,6 +7,34 @@ import (
 
 type SetPtr[T schnittstellen.ValueLike, TPtr schnittstellen.ValuePtr[T]] map[string]TPtr
 
+func MakeSetPtrValueCustom[T schnittstellen.ValueLike, TPtr schnittstellen.ValuePtr[T]](
+	kf func(T) string,
+	es ...T,
+) (s SetPtr[T, TPtr]) {
+	s = SetPtr[T, TPtr](make(map[string]TPtr, len(es)))
+
+	for i := range es {
+		e := TPtr(&es[i])
+		s[kf(T(*e))] = e
+	}
+
+	return
+}
+
+func MakeSetPtrCustom[T schnittstellen.ValueLike, TPtr schnittstellen.ValuePtr[T]](
+	kf func(T) string,
+	es ...TPtr,
+) (s SetPtr[T, TPtr]) {
+	s = SetPtr[T, TPtr](make(map[string]TPtr, len(es)))
+
+	for i := range es {
+		e := es[i]
+		s[kf(T(*e))] = e
+	}
+
+	return
+}
+
 func MakeSetPtrValue[T schnittstellen.ValueLike, TPtr schnittstellen.ValuePtr[T]](
 	es ...T,
 ) (s SetPtr[T, TPtr]) {
@@ -67,8 +95,11 @@ func (s SetPtr[T, TPtr]) Key(e T) string {
 
 func (s SetPtr[T, TPtr]) Get(k string) (e T, ok bool) {
 	var e1 TPtr
-	e1, ok = s[k]
-	e = *e1
+
+	if e1, ok = s[k]; ok {
+		e = *e1
+	}
+
 	return
 }
 

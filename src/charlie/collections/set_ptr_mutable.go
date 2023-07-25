@@ -7,6 +7,47 @@ import (
 
 type MutableSetPtr[T schnittstellen.ValueLike, TPtr schnittstellen.ValuePtr[T]] map[string]TPtr
 
+func MakeMutableSetPtrValueCustom[T schnittstellen.ValueLike, TPtr schnittstellen.ValuePtr[T]](
+	kf func(T) string,
+	es ...T,
+) (s MutableSetPtr[T, TPtr]) {
+	s = MutableSetPtr[T, TPtr](make(map[string]TPtr, len(es)))
+
+	for i := range es {
+		e := TPtr(&es[i])
+		s[kf(T(*e))] = e
+	}
+
+	return
+}
+
+func MakeMutableSetPtrCustom[T schnittstellen.ValueLike, TPtr schnittstellen.ValuePtr[T]](
+	kf func(T) string,
+	es ...TPtr,
+) (s MutableSetPtr[T, TPtr]) {
+	s = MutableSetPtr[T, TPtr](make(map[string]TPtr, len(es)))
+
+	for i := range es {
+		e := es[i]
+		s[kf(T(*e))] = e
+	}
+
+	return
+}
+
+func MakeMutableSetPtrValue[T schnittstellen.ValueLike, TPtr schnittstellen.ValuePtr[T]](
+	es ...T,
+) (s MutableSetPtr[T, TPtr]) {
+	s = MutableSetPtr[T, TPtr](make(map[string]TPtr, len(es)))
+
+	for i := range es {
+		e := TPtr(&es[i])
+		s[e.String()] = e
+	}
+
+	return
+}
+
 func MakeMutableSetPtr[T schnittstellen.ValueLike, TPtr schnittstellen.ValuePtr[T]](
 	es ...TPtr,
 ) (s MutableSetPtr[T, TPtr]) {
@@ -56,8 +97,11 @@ func (s MutableSetPtr[T, TPtr]) Key(e T) string {
 
 func (s MutableSetPtr[T, TPtr]) Get(k string) (e T, ok bool) {
 	var e1 TPtr
-	e1, ok = s[k]
-	e = *e1
+
+	if e1, ok = s[k]; ok {
+		e = *e1
+	}
+
 	return
 }
 
@@ -99,6 +143,14 @@ func (s MutableSetPtr[T, TPtr]) DelKey(k string) (err error) {
 
 func (s MutableSetPtr[T, TPtr]) Add(v T) (err error) {
 	s[v.String()] = TPtr(&v)
+	return
+}
+
+func (s MutableSetPtr[T, TPtr]) AddCustomKey(
+	v T,
+	kf func(T) string,
+) (err error) {
+	s[kf(v)] = TPtr(&v)
 	return
 }
 

@@ -129,6 +129,20 @@ func (es set[T]) add(e T) (err error) {
 	return
 }
 
+func (es set[T]) addCustom(e T, kf func(T) string) (err error) {
+	if es.closed {
+		panic(fmt.Sprintf("trying to add %T to closed set", e))
+	}
+
+	if kf == nil {
+		kf = es.Key
+	}
+
+	es.elementMap[kf(e)] = e
+
+	return
+}
+
 func (s set[T]) EachKey(wf schnittstellen.FuncIterKey) (err error) {
 	for v := range s.elementMap {
 		if err = wf(v); err != nil {

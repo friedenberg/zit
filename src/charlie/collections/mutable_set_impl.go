@@ -39,6 +39,22 @@ func MakeMutableSet[T schnittstellen.ValueLike](
 	return ms
 }
 
+func (es mutableSet[T]) AddCustomKey(e T, kf func(T) string) (err error) {
+	k := kf(e)
+
+	if k == "" {
+		err = errors.Wrap(ErrEmptyKey[T]{Element: e})
+		return
+	}
+
+	es.lock.Lock()
+	defer es.lock.Unlock()
+
+	es.addCustom(e, kf)
+
+	return
+}
+
 func (es mutableSet[T]) Add(e T) (err error) {
 	k := es.Key(e)
 

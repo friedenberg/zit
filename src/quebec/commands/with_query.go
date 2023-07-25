@@ -77,7 +77,7 @@ func (c commandWithQuery) Complete(
 
 	if cg.Contains(gattung.Typ) {
 		if err = u.Konfig().Typen.Each(
-			func(tt *typ.Transacted) (err error) {
+			func(tt typ.Transacted) (err error) {
 				if err = errors.Out().Printf("%s\tTyp", tt.Sku.GetKennung()); err != nil {
 					err = errors.IsAsNilOrWrapf(
 						err,

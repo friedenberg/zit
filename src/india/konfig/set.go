@@ -16,69 +16,65 @@ func init() {
 	gob.RegisterName("kastenSet", makeCompiledKastenSet(nil))
 }
 
-type set[
-	E schnittstellen.Transacted[E],
-	EPtr schnittstellen.TransactedPtr[E],
-] struct {
-	collections.MutableSet2[E, EPtr]
-}
-
-type kastenSet = set[kasten.Transacted, *kasten.Transacted]
-
 func makeCompiledKastenSet(
-	s1 schnittstellen.Set[*kasten.Transacted],
-) (s kastenSet) {
-	s.MutableSet2 = collections.MutableSet2FromSetLike[kasten.Transacted, *kasten.Transacted](s, s1)
+	s1 schnittstellen.Set[kasten.Transacted],
+) schnittstellen.MutableSetLike[kasten.Transacted] {
+	if s1 == nil {
+		return makeCompiledKastenSetFromSlice(nil)
+	}
 
-	return
+	return s1.CloneMutableSetLike()
 }
 
-func makeCompiledKastenSetFromSlice(s1 []*kasten.Transacted) (s kastenSet) {
-	s.MutableSet2 = collections.MutableSet2FromSlice[
-		kasten.Transacted,
-		*kasten.Transacted,
-	](s, s1...)
-
-	return
+func makeCompiledKastenSetFromSlice(
+	s1 []kasten.Transacted,
+) schnittstellen.MutableSetLike[kasten.Transacted] {
+	return collections.MakeMutableSetPtrValueCustom[kasten.Transacted, *kasten.Transacted](
+		func(k kasten.Transacted) string {
+			return k.GetKennungLike().String()
+		},
+		s1...,
+	)
 }
 
-type etikettSet = set[etikett.Transacted, *etikett.Transacted]
-
-func makeCompiledEtikettSetFromSlice(s1 []*etikett.Transacted) (s etikettSet) {
-	s.MutableSet2 = collections.MutableSet2FromSlice[
-		etikett.Transacted,
-		*etikett.Transacted,
-	](s, s1...)
-
-	return
+func makeCompiledEtikettSetFromSlice(
+	s1 []etikett.Transacted,
+) schnittstellen.MutableSetLike[etikett.Transacted] {
+	return collections.MakeMutableSetPtrValueCustom[etikett.Transacted, *etikett.Transacted](
+		func(k etikett.Transacted) string {
+			return k.GetKennungLike().String()
+		},
+		s1...,
+	)
 }
 
 func makeCompiledEtikettSet(
-	s1 schnittstellen.Set[*etikett.Transacted],
-) (s etikettSet) {
-	s.MutableSet2 = collections.MutableSet2FromSetLike[etikett.Transacted, *etikett.Transacted](s, s1)
-
-	return
-}
-
-type typSet = set[typ.Transacted, *typ.Transacted]
-
-func makeCompiledTypSetFromSlice(s1 []*typ.Transacted) (s typSet) {
-	s.MutableSet2 = collections.MutableSet2FromSlice[typ.Transacted, *typ.Transacted](s, s1...)
-
-	return
-}
-
-func makeCompiledTypSet(s1 schnittstellen.Set[*typ.Transacted]) (s typSet) {
-	s.MutableSet2 = collections.MutableSet2FromSetLike[typ.Transacted, *typ.Transacted](s, s1)
-
-	return
-}
-
-func (s set[E, EPtr]) Key(v EPtr) string {
-	if v == nil {
-		return ""
+	s1 schnittstellen.Set[etikett.Transacted],
+) schnittstellen.MutableSetLike[etikett.Transacted] {
+	if s1 == nil {
+		return makeCompiledEtikettSetFromSlice(nil)
 	}
 
-	return v.GetKennungString()
+	return s1.CloneMutableSetLike()
+}
+
+func makeCompiledTypSetFromSlice(
+	s1 []typ.Transacted,
+) schnittstellen.MutableSetLike[typ.Transacted] {
+	return collections.MakeMutableSetPtrValueCustom[typ.Transacted, *typ.Transacted](
+		func(k typ.Transacted) string {
+			return k.GetKennungLike().String()
+		},
+		s1...,
+	)
+}
+
+func makeCompiledTypSet(
+	s1 schnittstellen.Set[typ.Transacted],
+) schnittstellen.MutableSetLike[typ.Transacted] {
+	if s1 == nil {
+		return makeCompiledTypSetFromSlice(nil)
+	}
+
+	return s1.CloneMutableSetLike()
 }

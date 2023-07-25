@@ -12,6 +12,7 @@ type ObjektePtr[T any] interface {
 }
 
 type Stored interface {
+	Element
 	GattungGetter
 	GetAkteSha() ShaLike
 	GetObjekteSha() ShaLike

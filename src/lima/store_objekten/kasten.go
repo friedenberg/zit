@@ -125,7 +125,12 @@ func (s kastenStore) updateOne(t *kasten.Transacted) (err error) {
 func (s kastenStore) ReadAllSchwanzen(
 	f schnittstellen.FuncIter[*kasten.Transacted],
 ) (err error) {
-	if err = s.StoreUtil.GetKonfig().Kisten.Each(f); err != nil {
+	// TODO-P2 switch to pointers
+	if err = s.StoreUtil.GetKonfig().Kisten.Each(
+		func(e kasten.Transacted) (err error) {
+			return f(&e)
+		},
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

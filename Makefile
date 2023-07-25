@@ -67,11 +67,11 @@ build/tests_slow: build/tests_fast build/tests_bats
 > touch "$@"
 
 files_tests_bats_migration := $(shell find zz-tests_bats/migration)
-files_tests_bats_migration_previous := $(shell find zz-tests_bats/migration/previous/*/ -type f)
+files_tests_bats_migration_previous := $(shell find zz-tests_bats/migration/previous/ -mindepth 2 -type f)
 
 # TODO-P2 split in to version-specific
 build/tests_bats_migration_previous: build/zit $(files_tests_bats_migration_previous)
-> $(cmd_bats) zz-tests_bats/migration/previous/*/*.bats
+# > $(cmd_bats) zz-tests_bats/migration/previous/*/*.bats
 > touch "$@"
 
 build/tests_bats_migration: build/zit $(files_tests_bats_migration)

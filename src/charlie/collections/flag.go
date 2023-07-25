@@ -8,9 +8,14 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
+type flagPtr[T schnittstellen.ValueLike] interface {
+	schnittstellen.ValuePtr[T]
+	schnittstellen.SetterPtr[T]
+}
+
 type Flag[
 	T schnittstellen.ValueLike,
-	TPtr schnittstellen.ValuePtr[T],
+	TPtr flagPtr[T],
 ] interface {
 	flag.Value
 	SetMany(vs ...string) (err error)
@@ -20,7 +25,7 @@ type Flag[
 
 func MakeFlagCommasFromExisting[
 	T schnittstellen.ValueLike,
-	TPtr schnittstellen.ValuePtr[T],
+	TPtr flagPtr[T],
 ](
 	p SetterPolicy,
 	existing *schnittstellen.Set[T],
@@ -43,7 +48,7 @@ func MakeFlagCommasFromExisting[
 
 func MakeFlagCommas[
 	T schnittstellen.ValueLike,
-	TPtr schnittstellen.ValuePtr[T],
+	TPtr flagPtr[T],
 ](p SetterPolicy,
 ) Flag[T, TPtr] {
 	var s schnittstellen.Set[T]
@@ -62,7 +67,7 @@ func MakeFlagCommas[
 
 type flagCommas[
 	T schnittstellen.ValueLike,
-	TPtr schnittstellen.ValuePtr[T],
+	TPtr flagPtr[T],
 ] struct {
 	SetterPolicy
 	set *schnittstellen.Set[T]

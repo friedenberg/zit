@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/charlie/collections"
@@ -73,10 +74,10 @@ type compiled struct {
 	// Typen
 	ExtensionsToTypen map[string]string
 	DefaultTyp        typ.Transacted // deprecated
-	Typen             typSet
+	Typen             schnittstellen.MutableSetLike[typ.Transacted]
 
 	// Kasten
-	Kisten kastenSet
+	Kisten schnittstellen.MutableSetLike[kasten.Transacted]
 }
 
 func Make(
@@ -240,16 +241,11 @@ func (kc *compiled) recompile() (err error) {
 	}
 
 	if err = kc.Typen.Each(
-		func(ct *typ.Transacted) (err error) {
+		func(ct typ.Transacted) (err error) {
 			fe := ct.Akte.FileExtension
 
 			if fe != "" {
 				kc.ExtensionsToTypen[fe] = ct.Sku.GetKennung().String()
-			}
-
-			if ct == nil {
-				errors.Todo("determine why any Typen might be nil")
-				return
 			}
 
 			// kc.applyExpandedTyp(*ct)
@@ -328,7 +324,7 @@ func (c compiled) GetSortedTypenExpanded(
 				return
 			}
 
-			expandedActual = append(expandedActual, ct)
+			expandedActual = append(expandedActual, &ct)
 
 			return
 		},
@@ -380,7 +376,9 @@ func (kc compiled) GetApproximatedTyp(k kennung.Typ) (ct ApproximatedTyp) {
 }
 
 func (kc compiled) GetKasten(k kennung.Kasten) (ct *kasten.Transacted) {
-	ct, _ = kc.Kisten.Get(k.String())
+	var ct1 kasten.Transacted
+	ct1, _ = kc.Kisten.Get(k.String())
+	ct = &ct1
 	return
 }
 
@@ -402,11 +400,12 @@ func (k *compiled) AddKasten(
 	k.lock.Lock()
 	defer k.lock.Unlock()
 	k.hasChanges = true
-	a, ok := k.Kisten.Get(k.Kisten.Key(b))
 
-	if !ok || a.Less(*b) {
-		k.Kisten.Add(b)
-	}
+	iter.AddOrReplaceIfGreaterCustom(k.Kisten, *b,
+		func(k kasten.Transacted) string {
+			return k.GetKennungLike().String()
+		},
+	)
 
 	return
 }
@@ -418,11 +417,11 @@ func (k *compiled) AddTyp(
 	defer k.lock.Unlock()
 	k.hasChanges = true
 
-	a, ok := k.Typen.Get(k.Typen.Key(b))
-
-	if !ok || a.Less(*b) {
-		k.Typen.Add(b)
-	}
+	iter.AddOrReplaceIfGreaterCustom(k.Typen, *b,
+		func(k typ.Transacted) string {
+			return k.GetKennungLike().String()
+		},
+	)
 
 	return
 }

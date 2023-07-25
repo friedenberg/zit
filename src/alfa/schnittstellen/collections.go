@@ -58,6 +58,7 @@ type SetLike[T any] interface {
 type MutableSetLike[T any] interface {
 	SetLike[T]
 	Adder[T]
+	AdderCustom[T]
 	Del(T) error
 	DelKey(string) error
 	Resetter
@@ -120,14 +121,21 @@ type Adder[E any] interface {
 	Add(E) error
 }
 
+type AdderCustom[E any] interface {
+	AddCustomKey(E, func(E) string) error
+}
+
+// TODO-P1 remove
 type Equaler[T any] interface {
 	Equals(*T) bool
 }
 
+// TODO-P1 remove
 type Eacher[E any] interface {
 	Each(FuncIter[E]) error
 }
 
+// TODO-P1 remove
 type EachPtrer[E any] interface {
 	EachPtr(FuncIter[*E]) error
 }
@@ -136,11 +144,11 @@ type StringAdder interface {
 	AddString(string) error
 }
 
-type ValueSet[T flag.Value] interface {
+type ValueSet[T flag.Value, TPtr ValuePtr[T]] interface {
 	Strings() []string
 	Set[T]
 }
 
-type MutableValueSet[T flag.Value] interface {
+type MutableValueSet[T flag.Value, TPtr ValuePtr[T]] interface {
 	MutableSet[T]
 }

@@ -42,8 +42,9 @@ func DeleteFilesAndDirs(args ...string) (err error) {
 
 		// It's possible that the paths come in absolute or relative form. So we
 		// convert each path into absolute to deduplicate and prevent trying to
-		// remove the same directory more than once. That said, filepath.Abs does
-		// not guarantee uniqueness, so it's still possible to experience an error.
+		// remove the same directory more than once. That said, filepath.Abs
+		// does not guarantee uniqueness, so it's still possible to experience
+		// an error.
 
 		var abs string
 

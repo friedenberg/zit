@@ -22,7 +22,6 @@ type Value[T any] interface {
 type ValuePtr[T any] interface {
 	Value[T]
 	Ptr[T]
-	Setter
 }
 
 type Id[T any] interface {

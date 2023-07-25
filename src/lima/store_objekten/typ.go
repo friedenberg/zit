@@ -125,7 +125,12 @@ func (s typStore) updateOne(t *typ.Transacted) (err error) {
 func (s typStore) ReadAllSchwanzen(
 	f schnittstellen.FuncIter[*typ.Transacted],
 ) (err error) {
-	if err = s.StoreUtil.GetKonfig().Typen.Each(f); err != nil {
+  //TODO-P2 switch to pointers
+	if err = s.StoreUtil.GetKonfig().Typen.Each(
+		func(e typ.Transacted) (err error) {
+			return f(&e)
+		},
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
