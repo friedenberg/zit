@@ -50,6 +50,9 @@ type SetLike[T any] interface {
 	Contains(T) bool
 	EachKey(FuncIterKey) error
 	Elements() []T // TODO-P2 remove in favor of collection method
+
+	CloneSetLike() SetLike[T]
+	CloneMutableSetLike() MutableSetLike[T]
 }
 
 type MutableSetLike[T any] interface {
@@ -57,18 +60,16 @@ type MutableSetLike[T any] interface {
 	Adder[T]
 	Del(T) error
 	DelKey(string) error
+	Resetter
 }
 
 type Set[T any] interface {
 	SetLike[T]
-	ImmutableCloner[Set[T]]
-	MutableCloner[MutableSet[T]]
 }
 
 type MutableSet[T any] interface {
 	Set[T]
 	MutableSetLike[T]
-	Resetter
 }
 
 type TridexLike interface {
@@ -88,8 +89,6 @@ type MutableTridexLike interface {
 
 type Tridex interface {
 	TridexLike
-	// ImmutableCloner[TridexLike]
-	MutableCloner[MutableTridex]
 }
 
 type MutableTridex interface {
@@ -97,17 +96,6 @@ type MutableTridex interface {
 	Add(string)
 	Remove(string)
 }
-
-// type Tridex interface {
-//   TridexLike
-// 	// ImmutableCloner[Tridex]
-// 	MutableCloner[MutableTridex]
-// }
-
-// type MutableTridex interface {
-// 	MutableTridexLike
-// 	MutableCloner[Tridex]
-// }
 
 type Poolable[T any] interface{}
 

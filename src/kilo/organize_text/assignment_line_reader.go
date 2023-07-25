@@ -178,7 +178,10 @@ func (ar *assignmentLineReader) readOneHeading(l line) (err error) {
 	var newAssignment *assignment
 
 	if depth < ar.currentAssignment.depth {
-		newAssignment, err = ar.readOneHeadingLesserDepth(depth, currentEtiketten)
+		newAssignment, err = ar.readOneHeadingLesserDepth(
+			depth,
+			currentEtiketten,
+		)
 	} else if depth == ar.currentAssignment.depth {
 		newAssignment, err = ar.readOneHeadingEqualDepth(depth, currentEtiketten)
 	} else {
@@ -233,7 +236,7 @@ func (ar *assignmentLineReader) readOneHeadingLesserDepth(
 		// # zz-inbox
 		// `
 		assignment := newAssignment(d)
-		assignment.etiketten = e.ImmutableClone()
+		assignment.etiketten = e.CloneSetLike()
 		newCurrent.addChild(assignment)
 		// logz.Print("adding to parent")
 		// logz.Print("child", assignment.etiketten)
@@ -271,7 +274,7 @@ func (ar *assignmentLineReader) readOneHeadingEqualDepth(
 		// ## priority-2
 		// `
 		assignment := newAssignment(d)
-		assignment.etiketten = e.ImmutableClone()
+		assignment.etiketten = e.CloneSetLike()
 		newCurrent.addChild(assignment)
 		newCurrent = assignment
 	}
@@ -304,7 +307,7 @@ func (ar *assignmentLineReader) readOneHeadingGreaterDepth(
 		// ### priority-2
 		// `
 		assignment := newAssignment(d)
-		assignment.etiketten = e.ImmutableClone()
+		assignment.etiketten = e.CloneSetLike()
 		newCurrent.addChild(assignment)
 		// logz.Print("adding to parent")
 		// logz.Print("child", assignment)

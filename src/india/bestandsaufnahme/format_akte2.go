@@ -57,7 +57,7 @@ func (f formatAkte2) ParseSaveAkte(
 
 				var sk sku.SkuLikePtr
 
-				m.Etiketten = es.ImmutableClone()
+				m.Etiketten = es.CloneSetLike()
 
 				var m1 metadatei.Metadatei
 

@@ -55,7 +55,7 @@ func (m *Metadatei) ReadFrom(r1 io.Reader) (n int64, err error) {
 		return
 	}
 
-	m.EtikettSet = mes.ImmutableClone()
+	m.EtikettSet = mes.CloneSetLike()
 
 	return
 }

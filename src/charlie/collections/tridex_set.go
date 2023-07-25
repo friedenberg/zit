@@ -16,8 +16,7 @@ type TridexSet[T schnittstellen.ValueLike] interface {
 type MutableTridexSet[T schnittstellen.ValueLike] interface {
 	schnittstellen.MutableSetLike[T]
 	schnittstellen.TridexLike
-	schnittstellen.MutableCloner[MutableTridexSet[T]]
-	GetSet() schnittstellen.Set[T]
+	GetSet() schnittstellen.SetLike[T]
 }
 
 func RegisterGobTridexSet[T schnittstellen.ValueLike]() {
@@ -129,8 +128,8 @@ func (ms mutableTridexSet[T]) Get(key string) (T, bool) {
 	return ms.MS.Get(key)
 }
 
-func (ms mutableTridexSet[T]) GetSet() schnittstellen.Set[T] {
-	return ms.MS.ImmutableClone()
+func (ms mutableTridexSet[T]) GetSet() schnittstellen.SetLike[T] {
+	return ms.MS.CloneSetLike()
 }
 
 func (ms mutableTridexSet[T]) Key(e T) string {
@@ -141,9 +140,15 @@ func (ms mutableTridexSet[T]) Len() int {
 	return ms.MS.Len()
 }
 
-func (ms mutableTridexSet[T]) MutableClone() MutableTridexSet[T] {
-	return mutableTridexSet[T]{
-		MS: ms.MS.MutableClone(),
-		TR: ms.TR.MutableClone(),
-	}
+func (ms mutableTridexSet[T]) Reset() {
+	ms.MS.Reset()
+	// ms.TR.Reset()
+}
+
+func (ms mutableTridexSet[T]) CloneSetLike() schnittstellen.SetLike[T] {
+	return ms
+}
+
+func (ms mutableTridexSet[T]) CloneMutableSetLike() schnittstellen.MutableSetLike[T] {
+	return ms.CloneMutableSetLike()
 }

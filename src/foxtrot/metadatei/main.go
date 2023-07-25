@@ -186,7 +186,7 @@ func (z *Metadatei) ResetWith(z1 Metadatei) {
 	if z1.Etiketten == nil {
 		z.Etiketten = kennung.MakeEtikettSet()
 	} else {
-		z.Etiketten = z1.Etiketten.ImmutableClone()
+		z.Etiketten = z1.Etiketten.CloneSetLike()
 	}
 
 	z.Typ = z1.Typ
@@ -217,7 +217,7 @@ func (z *Metadatei) ApplyGoldenChild(
 		return
 	}
 
-	mes := z.Etiketten.MutableClone()
+	mes := z.Etiketten.CloneMutableSetLike()
 
 	prefixes := kennung.Withdraw(mes, e).Elements()
 
@@ -238,7 +238,7 @@ func (z *Metadatei) ApplyGoldenChild(
 	sort.Slice(prefixes, sortFunc)
 
 	mes.Add(prefixes[0])
-	z.Etiketten = mes.ImmutableClone()
+	z.Etiketten = mes.CloneSetLike()
 
 	return
 }

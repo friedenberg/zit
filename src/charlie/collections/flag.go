@@ -69,11 +69,11 @@ type flagCommas[
 }
 
 func (f flagCommas[T, TPtr]) GetSet() (s schnittstellen.Set[T]) {
-	return (*f.set).ImmutableClone()
+	return (*f.set).CloneSetLike()
 }
 
 func (f flagCommas[T, TPtr]) GetMutableSet() (s schnittstellen.MutableSet[T]) {
-	return (*f.set).MutableClone()
+	return (*f.set).CloneMutableSetLike()
 }
 
 func (f flagCommas[T, TPtr]) String() (out string) {
@@ -112,7 +112,7 @@ func (f *flagCommas[T, TPtr]) SetMany(vs ...string) (err error) {
 }
 
 func (f *flagCommas[T, TPtr]) Set(v string) (err error) {
-	r := (*f.set).MutableClone()
+	r := (*f.set).CloneMutableSetLike()
 
 	switch f.SetterPolicy {
 	case SetterPolicyReset:
@@ -130,7 +130,7 @@ func (f *flagCommas[T, TPtr]) Set(v string) (err error) {
 		}
 	}
 
-	*f.set = r.ImmutableClone()
+	*f.set = r.CloneSetLike()
 
 	return
 }

@@ -19,7 +19,7 @@ func MakeSetDelta[T schnittstellen.ValueLike](
 ) schnittstellen.Delta[T] {
 	d := delta[T]{
 		Added:   MakeMutableSetStringer[T](),
-		Removed: from.MutableClone(),
+		Removed: from.CloneMutableSetLike(),
 	}
 
 	to.Each(

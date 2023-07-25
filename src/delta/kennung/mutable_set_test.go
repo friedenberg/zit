@@ -15,7 +15,7 @@ func TestAddNormalized(t1 *testing.T) {
 		MustEtikett("zz-archive-task-done"),
 	)
 
-	sutEx := sut.ImmutableClone()
+	sutEx := sut.CloneSetLike()
 
 	toAdd := MustEtikett("project-2021-zit")
 

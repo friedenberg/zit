@@ -507,7 +507,7 @@ func IntersectPrefixes(s1 EtikettSet, s2 EtikettSet) (s3 EtikettSet) {
 		}
 	}
 
-	s3 = s4.ImmutableClone()
+	s3 = s4.CloneSetLike()
 
 	return
 }
@@ -525,7 +525,7 @@ func SubtractPrefix(s1 EtikettSet, e Etikett) (s2 EtikettSet) {
 		s3.Add(e2)
 	}
 
-	s2 = s3.ImmutableClone()
+	s2 = s3.CloneSetLike()
 
 	return
 }
@@ -611,7 +611,7 @@ func ExpandOne[T KennungLike[T], TPtr KennungLikePtr[T]](
 		expandOne[T, TPtr](k, ex, s1)
 	}
 
-	out = s1.ImmutableClone()
+	out = s1.CloneSetLike()
 
 	return
 }
@@ -630,7 +630,7 @@ func ExpandMany[T KennungLike[T], TPtr KennungLikePtr[T]](
 		},
 	)
 
-	out = s1.ImmutableClone()
+	out = s1.CloneSetLike()
 
 	return
 }
@@ -643,7 +643,7 @@ func AddNormalized(es EtikettMutableSet, e Etikett) {
 	ExpandOne(e, ExpanderRight).Each(es.Add)
 	es.Add(e)
 
-	c := es.ImmutableClone()
+	c := es.CloneSetLike()
 	es.Reset()
 	WithRemovedCommonPrefixes(c).Each(es.Add)
 }
@@ -667,7 +667,7 @@ func Withdraw(s1 EtikettMutableSet, e Etikett) (s2 EtikettSet) {
 	}
 
 	s3.Each(s1.Del)
-	s2 = s3.ImmutableClone()
+	s2 = s3.CloneSetLike()
 
 	return
 }

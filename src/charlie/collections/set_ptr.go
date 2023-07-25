@@ -151,11 +151,11 @@ func (s SetPtr[T, TPtr]) EachPtr(
 	return
 }
 
-func (a SetPtr[T, TPtr]) ImmutableClone() schnittstellen.Set[T] {
+func (a SetPtr[T, TPtr]) CloneSetLike() schnittstellen.SetLike[T] {
 	return a
 }
 
-func (a SetPtr[T, TPtr]) MutableClone() schnittstellen.MutableSet[T] {
+func (a SetPtr[T, TPtr]) CloneMutableSetLike() schnittstellen.MutableSetLike[T] {
 	c := MakeMutableSetPtr[T, TPtr]()
 	a.Each(c.Add)
 	return c

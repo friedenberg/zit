@@ -76,7 +76,7 @@ func (a *assignment) addToCompareMap(
 	es kennung.EtikettSet,
 	out *CompareMap,
 ) (err error) {
-	mes := es.MutableClone()
+	mes := es.CloneMutableSetLike()
 
 	var es1 kennung.EtikettSet
 
@@ -86,7 +86,7 @@ func (a *assignment) addToCompareMap(
 	}
 
 	es1.Each(mes.Add)
-	es = mes.ImmutableClone()
+	es = mes.CloneSetLike()
 
 	a.named.Each(
 		func(z obj) (err error) {

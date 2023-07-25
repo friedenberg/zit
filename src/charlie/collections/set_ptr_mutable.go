@@ -177,7 +177,7 @@ func (a MutableSetPtr[T, TPtr]) Reset() {
 	}
 }
 
-func (a MutableSetPtr[T, TPtr]) ImmutableClone() schnittstellen.Set[T] {
+func (a MutableSetPtr[T, TPtr]) CloneSetLike() schnittstellen.SetLike[T] {
 	b := MakeSetPtr[T, TPtr]()
 
 	for k, v := range a {
@@ -187,7 +187,7 @@ func (a MutableSetPtr[T, TPtr]) ImmutableClone() schnittstellen.Set[T] {
 	return b
 }
 
-func (a MutableSetPtr[T, TPtr]) MutableClone() schnittstellen.MutableSet[T] {
+func (a MutableSetPtr[T, TPtr]) CloneMutableSetLike() schnittstellen.MutableSetLike[T] {
 	c := MakeMutableSetPtr[T, TPtr]()
 	a.Each(c.Add)
 	return c

@@ -236,7 +236,7 @@ func (kc *compiled) recompile() (err error) {
 			return kc.EtikettenToAddToNew[i] < kc.EtikettenToAddToNew[j]
 		})
 
-		kc.EtikettenHidden = etikettenHidden.ImmutableClone()
+		kc.EtikettenHidden = etikettenHidden.CloneSetLike()
 	}
 
 	if err = kc.Typen.Each(

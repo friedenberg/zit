@@ -242,7 +242,7 @@ func (a *assignment) expandedEtiketten() (es kennung.EtikettSet, err error) {
 	}
 
 	if a.etiketten.Len() != 1 || a.parent == nil {
-		es = a.etiketten.ImmutableClone()
+		es = a.etiketten.CloneSetLike()
 		return
 	} else {
 		e := a.etiketten.Any()

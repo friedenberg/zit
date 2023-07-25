@@ -39,7 +39,7 @@ func TestMakeEtiketten(t1 *testing.T) {
 		}
 	}
 
-	sut2 := sut.ImmutableClone()
+	sut2 := sut.CloneSetLike()
 
 	if sut2.Len() != 3 {
 		t.Fatalf("expected len 3 but got %d", sut2.Len())
@@ -64,7 +64,9 @@ func TestMakeEtiketten(t1 *testing.T) {
 
 	{
 		ex := "tag1, tag2, tag3"
-		ac := collections.StringCommaSeparated[kennung.Etikett](sut.ImmutableClone())
+		ac := collections.StringCommaSeparated[kennung.Etikett](
+			sut.CloneSetLike(),
+		)
 
 		if ac != ex {
 			t.Fatalf("expected %q but got %q", ex, ac)
@@ -81,7 +83,7 @@ func TestEqualitySelf(t1 *testing.T) {
 			"tag1",
 			"tag2",
 			"tag3",
-		).ImmutableClone(),
+		).CloneSetLike(),
 		Typ: makeAkteExt(t, "text"),
 	}
 
@@ -99,7 +101,7 @@ func TestEqualityNotSelf(t1 *testing.T) {
 			"tag1",
 			"tag2",
 			"tag3",
-		).ImmutableClone(),
+		).CloneSetLike(),
 		Typ: makeAkteExt(t, "text"),
 	}
 
@@ -109,7 +111,7 @@ func TestEqualityNotSelf(t1 *testing.T) {
 			"tag1",
 			"tag2",
 			"tag3",
-		).ImmutableClone(),
+		).CloneSetLike(),
 		Typ: makeAkteExt(t, "text"),
 	}
 

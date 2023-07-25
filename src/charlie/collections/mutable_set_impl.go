@@ -83,12 +83,12 @@ func (a *mutableSet[T]) Reset() {
 	a.lock = &sync.Mutex{}
 }
 
-func (a mutableSet[T]) ImmutableClone() schnittstellen.Set[T] {
-	return a.set.ImmutableClone()
+func (a mutableSet[T]) CloneSetLike() schnittstellen.SetLike[T] {
+	return a.set.CloneSetLike()
 }
 
-func (a mutableSet[T]) MutableClone() schnittstellen.MutableSet[T] {
-	return a.set.MutableClone()
+func (a mutableSet[T]) CloneMutableSetLike() schnittstellen.MutableSetLike[T] {
+	return a.set.CloneMutableSetLike()
 }
 
 func (s mutableSet[T]) MarshalBinary() (bs []byte, err error) {

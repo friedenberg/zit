@@ -63,10 +63,10 @@ func (c CommitOrganizeFile) Run(
 			}
 
 			m := sk.GetMetadatei()
-			mes := m.GetEtiketten().MutableClone()
+			mes := m.GetEtiketten().CloneMutableSetLike()
 			change.GetRemoved().Each(mes.Del)
 			change.GetAdded().Each(mes.Add)
-			m.Etiketten = mes.ImmutableClone()
+			m.Etiketten = mes.CloneSetLike()
 
 			if !sameTyp {
 				m.Typ = b.Metadatei.Typ
@@ -87,7 +87,7 @@ func (c CommitOrganizeFile) Run(
 			bez := change.Key
 
 			m := metadatei.Metadatei{
-				Etiketten: change.GetAdded().ImmutableClone(),
+				Etiketten: change.GetAdded().CloneSetLike(),
 				Typ:       b.Metadatei.Typ,
 			}
 

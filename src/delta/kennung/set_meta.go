@@ -75,7 +75,7 @@ func MakeMetaSet(
 		fileExtensionGetter:     feg,
 		expanders:               ex,
 		Hidden:                  hidden,
-		DefaultGattungen:        dg.MutableClone(),
+		DefaultGattungen:        dg.CloneMutableSetLike(),
 		Gattung:                 make(map[gattung.Gattung]setWithSigil),
 		FDs:                     collections.MakeMutableSetStringer[FD](),
 		index:                   ki,
@@ -216,7 +216,7 @@ func (ms *metaSet) set(v string) (err error) {
 			return
 		}
 	} else {
-		gs = ms.DefaultGattungen.ImmutableClone()
+		gs = ms.DefaultGattungen.CloneSetLike()
 	}
 
 	if err = gs.Each(

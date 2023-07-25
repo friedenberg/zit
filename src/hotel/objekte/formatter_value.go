@@ -69,7 +69,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 	switch fv.string {
 	case "etiketten-implicit":
 		return func(tl TransactedLikePtr) (err error) {
-			ets := tl.GetMetadatei().GetEtiketten().MutableClone()
+			ets := tl.GetMetadatei().GetEtiketten().CloneMutableSetLike()
 
 			ets.Each(
 				func(e kennung.Etikett) (err error) {

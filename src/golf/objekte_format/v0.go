@@ -22,7 +22,8 @@ func (f v0) FormatPersistentMetadatei(
 	m := c.GetMetadatei()
 	w := format.NewLineWriter()
 
-	if fcit, ok := c.(FormatterContextIncludeTai); ok && fcit.IncludeTai() && !m.Tai.IsZero() {
+	if fcit, ok := c.(FormatterContextIncludeTai); ok && fcit.IncludeTai() &&
+		!m.Tai.IsZero() {
 		w.WriteFormat("Tai %s", m.Tai)
 	}
 
@@ -83,7 +84,7 @@ func (f v0) ParsePersistentMetadatei(
 		return
 	}
 
-	m.Etiketten = etiketten.ImmutableClone()
+	m.Etiketten = etiketten.CloneSetLike()
 
 	c.SetMetadatei(m)
 
