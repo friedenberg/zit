@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/hotel/objekte"
@@ -24,7 +25,12 @@ func init() {
 		func(f *flag.FlagSet) CommandWithCwdQuery {
 			c := &Clean{}
 
-			f.BoolVar(&c.force, "force", false, "remove objekten in working directory even if they have changes")
+			f.BoolVar(
+				&c.force,
+				"force",
+				false,
+				"remove objekten in working directory even if they have changes",
+			)
 
 			return c
 		},
@@ -40,7 +46,7 @@ func (c Clean) RunWithCwdQuery(
 	ms kennung.MetaSet,
 	possible *cwd.CwdFiles,
 ) (err error) {
-	fds := kennung.MakeMutableFDSet()
+	fds := collections.MakeMutableSetPtr[kennung.FD, *kennung.FD]()
 
 	for _, d := range possible.EmptyDirectories {
 		fds.Add(d)

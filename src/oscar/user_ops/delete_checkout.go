@@ -18,7 +18,7 @@ type DeleteCheckout struct {
 }
 
 func (c DeleteCheckout) Run(
-	fs schnittstellen.Set[kennung.FD],
+	fs schnittstellen.IterablePtr[kennung.FD, *kennung.FD],
 ) (err error) {
 	p := c.PrinterFDDeleted()
 
@@ -28,8 +28,8 @@ func (c DeleteCheckout) Run(
 
 	dirs := collections.MakeMutableSetStringer[values.String]()
 
-	if err = fs.Each(
-		func(fd kennung.FD) (err error) {
+	if err = fs.EachPtr(
+		func(fd *kennung.FD) (err error) {
 			path := fd.String()
 
 			if path == "." {
@@ -64,7 +64,7 @@ func (c DeleteCheckout) Run(
 				}
 			}
 
-			return p(&fd)
+			return p(fd)
 		},
 	); err != nil {
 		err = errors.Wrap(err)

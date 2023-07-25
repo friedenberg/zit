@@ -29,7 +29,9 @@ type mutableTridexSet[T schnittstellen.ValueLike] struct {
 	TR schnittstellen.MutableTridex
 }
 
-func MakeMutableTridexSet[T schnittstellen.ValueLike](es ...T) MutableTridexSet[T] {
+func MakeMutableTridexSet[T schnittstellen.ValueLike](
+	es ...T,
+) MutableTridexSet[T] {
 	ms := MakeMutableSetStringer[T](es...)
 
 	return mutableTridexSet[T]{
@@ -95,7 +97,9 @@ func (ms mutableTridexSet[T]) DelKey(v string) (err error) {
 	return
 }
 
-func (ms mutableTridexSet[T]) EachString(f schnittstellen.FuncIter[string]) (err error) {
+func (ms mutableTridexSet[T]) EachString(
+	f schnittstellen.FuncIter[string],
+) (err error) {
 	return ms.TR.EachString(f)
 }
 
@@ -103,12 +107,10 @@ func (ms mutableTridexSet[T]) Each(f schnittstellen.FuncIter[T]) (err error) {
 	return ms.MS.Each(f)
 }
 
-func (ms mutableTridexSet[T]) EachKey(f schnittstellen.FuncIterKey) (err error) {
+func (ms mutableTridexSet[T]) EachKey(
+	f schnittstellen.FuncIterKey,
+) (err error) {
 	return ms.MS.EachKey(f)
-}
-
-func (ms mutableTridexSet[T]) EachPtr(f schnittstellen.FuncIter[*T]) (err error) {
-	return ms.MS.EachPtr(f)
 }
 
 func (ms mutableTridexSet[T]) Elements() []T {

@@ -192,8 +192,8 @@ func (kc *compiled) recompile() (err error) {
 		kc.ImplicitEtiketten = make(implicitEtikettenMap)
 		etikettenHidden := collections.MakeMutableSetStringer[kennung.Etikett]()
 
-		if err = kc.Etiketten.EachPtr(
-			func(ke *ketikett) (err error) {
+		if err = kc.Etiketten.Each(
+			func(ke ketikett) (err error) {
 				ct := ke.Transacted
 				k := ct.Sku.GetKennung()
 				tn := k.String()

@@ -3,6 +3,7 @@ package user_ops
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/hotel/etikett"
 	"github.com/friedenberg/zit/src/hotel/kasten"
@@ -22,7 +23,7 @@ func (c Checkin) Run(
 	ms kennung.MetaSet,
 	pz *cwd.CwdFiles,
 ) (err error) {
-	fds := kennung.MakeMutableFDSet()
+	fds := collections.MakeMutableSetPtr[kennung.FD, *kennung.FD]()
 
 	u.Lock()
 	defer errors.Deferred(&err, u.Unlock)

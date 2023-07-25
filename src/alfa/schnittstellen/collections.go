@@ -23,9 +23,13 @@ type Lenner interface {
 
 type Iterable[T any] interface {
 	// EqualsIterable(Iterable[T]) bool
-	Any() T
+	Any() T // TODO-P2 remove in favor of collection method?
 	Each(FuncIter[T]) error
-	EachPtr(FuncIter[*T]) error
+	// EachPtr(FuncIter[*T]) error
+}
+
+type IterablePtr[T any, TPtr Ptr[T]] interface {
+	EachPtr(FuncIter[TPtr]) error
 }
 
 type Collection[T any] interface {
@@ -46,7 +50,7 @@ type SetLike[T any] interface {
 	Get(string) (T, bool)
 	Contains(T) bool
 	EachKey(FuncIterKey) error
-	Elements() []T
+	Elements() []T // TODO-P2 remove in favor of collection method
 }
 
 type MutableSetLike[T any] interface {
