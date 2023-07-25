@@ -65,7 +65,7 @@ func (z *Indexed[T, TPtr]) Reset() {
 	TPtr(&z.Kennung).Reset()
 	z.SchwanzenCount = 0
 	z.Count = 0
-	z.ExpandedRight = collections.MakeSetStringer[T]()
-	z.ExpandedAll = collections.MakeSetStringer[T]()
+	z.ExpandedRight = collections.MakeSetStringer[T, TPtr]()
+	z.ExpandedAll = collections.MakeSetStringer[T, TPtr]()
 	z.Tridex = tridex.Make()
 }

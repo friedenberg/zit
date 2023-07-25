@@ -7,6 +7,19 @@ import (
 
 type SetPtr[T schnittstellen.ValueLike, TPtr schnittstellen.ValuePtr[T]] map[string]TPtr
 
+func MakeSetPtrValue[T schnittstellen.ValueLike, TPtr schnittstellen.ValuePtr[T]](
+	es ...T,
+) (s SetPtr[T, TPtr]) {
+	s = SetPtr[T, TPtr](make(map[string]TPtr, len(es)))
+
+	for i := range es {
+		e := TPtr(&es[i])
+		s[e.String()] = e
+	}
+
+	return
+}
+
 func MakeSetPtr[T schnittstellen.ValueLike, TPtr schnittstellen.ValuePtr[T]](
 	es ...TPtr,
 ) (s SetPtr[T, TPtr]) {

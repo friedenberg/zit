@@ -12,7 +12,7 @@ import (
 )
 
 func init() {
-	collections.RegisterGob[ketikett]()
+	collections.RegisterGob[ketikett, *ketikett]()
 }
 
 type implicitEtikettenMap map[kennung.Etikett]schnittstellen.MutableSet[kennung.Etikett]
@@ -65,6 +65,10 @@ func (a ketikett) Equals(b ketikett) bool {
 	}
 
 	return true
+}
+
+func (e *ketikett) Set(v string) (err error) {
+	return (&e.Transacted.Sku.Kennung).Set(v)
 }
 
 func (e ketikett) String() string {

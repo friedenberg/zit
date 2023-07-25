@@ -5,15 +5,23 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
-func MakeSet[T schnittstellen.ValueLike](kf KeyFunc[T], es ...T) schnittstellen.Set[T] {
+func MakeSet[T schnittstellen.ValueLike](
+	kf KeyFunc[T],
+	es ...T,
+) schnittstellen.Set[T] {
 	return makeSet(kf, es...)
 }
 
-func MakeSetStringer[T schnittstellen.ValueLike](es ...T) schnittstellen.Set[T] {
-	return makeSet((T).String, es...)
+func MakeSetStringer[T schnittstellen.ValueLike, TPtr schnittstellen.ValuePtr[T]](
+	es ...T,
+) schnittstellen.SetLike[T] {
+	return MakeSetPtrValue[T, TPtr](es...)
 }
 
-func WriterContainer[T schnittstellen.Element](s schnittstellen.Set[T], sigil error) schnittstellen.FuncIter[T] {
+func WriterContainer[T schnittstellen.Element](
+	s schnittstellen.Set[T],
+	sigil error,
+) schnittstellen.FuncIter[T] {
 	return func(e T) (err error) {
 		k := s.Key(e)
 
@@ -32,7 +40,8 @@ func WriterContainer[T schnittstellen.Element](s schnittstellen.Set[T], sigil er
 	}
 }
 
-// func WriterFuncNegate[T any](wf schnittstellen.FuncIter[T]) schnittstellen.FuncIter[T] {
+// func WriterFuncNegate[T any](wf schnittstellen.FuncIter[T])
+// schnittstellen.FuncIter[T] {
 // 	return func(e T) (err error) {
 // 		err = wf(e)
 
