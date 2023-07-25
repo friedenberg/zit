@@ -28,7 +28,9 @@ func (s MutableSetPtr[T, TPtr]) Len() int {
 	return len(s)
 }
 
-func (a MutableSetPtr[T, TPtr]) Equals(b schnittstellen.Set[T]) bool {
+func (a MutableSetPtr[T, TPtr]) EqualsSetLike(
+	b schnittstellen.SetLike[T],
+) bool {
 	if b == nil {
 		return false
 	}

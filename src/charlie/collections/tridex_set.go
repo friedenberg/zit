@@ -117,8 +117,8 @@ func (ms mutableTridexSet[T]) Elements() []T {
 	return ms.MS.Elements()
 }
 
-func (ms mutableTridexSet[T]) Equals(b schnittstellen.Set[T]) bool {
-	return ms.MS.Equals(b)
+func (ms mutableTridexSet[T]) EqualsSetLike(b schnittstellen.SetLike[T]) bool {
+	return ms.MS.EqualsSetLike(b)
 }
 
 func (ms mutableTridexSet[T]) Expand(short string) (long string) {

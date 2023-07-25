@@ -65,7 +65,7 @@ func TestAssignmentLineReaderOneHeadingNoZettels(t1 *testing.T) {
 
 		actual := sub.root.children[0].etiketten
 
-		if !actual.Equals(expected) {
+		if !actual.EqualsSetLike(expected) {
 			t.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
@@ -97,7 +97,7 @@ func TestAssignmentLineReader2Heading2Zettels(t *testing.T) {
 		expected := kennung.MakeEtikettSet(kennung.MustEtikett("wow"))
 		actual := sub.root.children[0].etiketten
 
-		if !actual.Equals(expected) {
+		if !actual.EqualsSetLike(expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
@@ -116,7 +116,7 @@ func TestAssignmentLineReader2Heading2Zettels(t *testing.T) {
 
 		actual := sub.root.children[0].named
 
-		if !actual.Equals(expected) {
+		if !actual.EqualsSetLike(expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
@@ -150,7 +150,7 @@ func TestAssignmentLineReader1_1Heading2_2Zettels(t1 *testing.T) {
 		expected := kennung.MakeEtikettSet(kennung.MustEtikett("wow"))
 		actual := sub.root.children[0].etiketten
 
-		if !actual.Equals(expected) {
+		if !actual.EqualsSetLike(expected) {
 			t.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
@@ -170,7 +170,7 @@ func TestAssignmentLineReader1_1Heading2_2Zettels(t1 *testing.T) {
 
 		actual := sub.root.children[0].children[0].etiketten
 
-		if !actual.Equals(expected) {
+		if !actual.EqualsSetLike(expected) {
 			t.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
@@ -189,7 +189,7 @@ func TestAssignmentLineReader1_1Heading2_2Zettels(t1 *testing.T) {
 
 		actual := sub.root.children[0].children[0].named
 
-		if !actual.Equals(expected) {
+		if !actual.EqualsSetLike(expected) {
 			t1.Errorf("\nexpected: %q\n  actual: %q", expected, actual)
 		}
 	}
@@ -231,7 +231,7 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 		expected := kennung.MakeEtikettSet(kennung.MustEtikett("wow"))
 		actual := sub.root.children[0].etiketten
 
-		if !actual.Equals(expected) {
+		if !actual.EqualsSetLike(expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
@@ -246,7 +246,7 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 
 		actual := sub.root.children[0].children[0].etiketten
 
-		if !actual.Equals(expected) {
+		if !actual.EqualsSetLike(expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
@@ -255,7 +255,7 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 		expected := kennung.MakeEtikettSet(kennung.MustEtikett("cow"))
 		actual := sub.root.children[1].etiketten
 
-		if !actual.Equals(expected) {
+		if !actual.EqualsSetLike(expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
@@ -274,7 +274,7 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 
 		actual := sub.root.children[0].named
 
-		if !actual.Equals(expected) {
+		if !actual.EqualsSetLike(expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
@@ -293,7 +293,7 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 
 		actual := sub.root.children[1].named
 
-		if !actual.Equals(expected) {
+		if !actual.EqualsSetLike(expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
@@ -334,7 +334,7 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 		expected := kennung.MakeEtikettSet(kennung.MustEtikett("sub-wow"))
 		actual := sub.root.children[0].etiketten
 
-		if !actual.Equals(expected) {
+		if !actual.EqualsSetLike(expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
@@ -350,7 +350,7 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 
 		actual := sub.root.children[1].etiketten
 
-		if !actual.Equals(expected) {
+		if !actual.EqualsSetLike(expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
@@ -369,7 +369,7 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 
 		actual := sub.root.children[0].named
 
-		if !actual.Equals(expected) {
+		if !actual.EqualsSetLike(expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
@@ -388,7 +388,7 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 
 		actual := sub.root.children[1].named
 
-		if !actual.Equals(expected) {
+		if !actual.EqualsSetLike(expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
@@ -428,7 +428,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 		expected := kennung.MakeEtikettSet(kennung.MustEtikett("task"))
 		actual := sub.root.children[0].etiketten
 
-		if !actual.Equals(expected) {
+		if !actual.EqualsSetLike(expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
@@ -449,7 +449,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 
 		actual := sub.root.children[0].named
 
-		if !actual.Equals(expected) {
+		if !actual.EqualsSetLike(expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
@@ -466,7 +466,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 
 		actual := sub.root.children[0].children[0].etiketten
 
-		if !actual.Equals(expected) {
+		if !actual.EqualsSetLike(expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
@@ -476,7 +476,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 		expected := kennung.MakeEtikettSet(kennung.MustEtikett("w-2022-07-09"))
 		actual := sub.root.children[0].children[0].children[0].etiketten
 
-		if !actual.Equals(expected) {
+		if !actual.EqualsSetLike(expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
@@ -490,7 +490,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 		})
 		actual := sub.root.children[0].children[0].children[0].named
 
-		if !actual.Equals(expected) {
+		if !actual.EqualsSetLike(expected) {
 			t1.Errorf("\nexpected: %q\n  actual: %q", expected, actual)
 		}
 	}
@@ -505,7 +505,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 		})
 		actual := sub.root.children[0].children[0].named
 
-		if !actual.Equals(expected) {
+		if !actual.EqualsSetLike(expected) {
 			t1.Errorf("\nexpected: %q\n  actual: %q", expected, actual)
 		}
 	}
@@ -526,7 +526,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 		})
 		actual := sub.root.children[0].children[1].named
 
-		if !actual.Equals(expected) {
+		if !actual.EqualsSetLike(expected) {
 			t1.Errorf("\nexpected: %q\n  actual: %q", expected, actual)
 		}
 	}

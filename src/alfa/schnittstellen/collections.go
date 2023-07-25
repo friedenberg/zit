@@ -22,7 +22,6 @@ type Lenner interface {
 }
 
 type Iterable[T any] interface {
-	// EqualsIterable(Iterable[T]) bool
 	Any() T // TODO-P2 remove in favor of collection method?
 	Each(FuncIter[T]) error
 	// EachPtr(FuncIter[*T]) error
@@ -45,7 +44,7 @@ type SetLike[T any] interface {
 	Collection[T]
 	ContainsKeyer
 
-	Equatable[Set[T]]
+	EqualsSetLike(SetLike[T]) bool
 	Key(T) string
 	Get(string) (T, bool)
 	Contains(T) bool

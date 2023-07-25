@@ -58,7 +58,7 @@ func (atc *Refiner) shouldMergeIntoParent(a *assignment) bool {
 		return false
 	}
 
-	equal := a.etiketten.Equals(a.parent.etiketten)
+	equal := a.etiketten.EqualsSetLike(a.parent.etiketten)
 
 	if !equal {
 		errors.Log().Print("parent etiketten not equal")
@@ -186,8 +186,12 @@ func (atc *Refiner) Refine(a *assignment) (err error) {
 	}
 
 	sort.Slice(a.children, func(i, j int) bool {
-		vi := collections.StringCommaSeparated[kennung.Etikett](a.children[i].etiketten)
-		vj := collections.StringCommaSeparated[kennung.Etikett](a.children[j].etiketten)
+		vi := collections.StringCommaSeparated[kennung.Etikett](
+			a.children[i].etiketten,
+		)
+		vj := collections.StringCommaSeparated[kennung.Etikett](
+			a.children[j].etiketten,
+		)
 		return vi < vj
 	})
 
@@ -213,7 +217,8 @@ func (atc Refiner) applyPrefixJoints(a *assignment) (err error) {
 
 	var na *assignment
 
-	if a.etiketten.Len() == 1 && a.etiketten.Any().Equals(groupingPrefix.Etikett) {
+	if a.etiketten.Len() == 1 &&
+		a.etiketten.Any().Equals(groupingPrefix.Etikett) {
 		na = a
 	} else {
 		na = newAssignment(a.Depth() + 1)
@@ -231,7 +236,10 @@ func (atc Refiner) applyPrefixJoints(a *assignment) (err error) {
 			na.addChild(c)
 		}
 
-		c.etiketten = kennung.SubtractPrefix(c.etiketten, groupingPrefix.Etikett)
+		c.etiketten = kennung.SubtractPrefix(
+			c.etiketten,
+			groupingPrefix.Etikett,
+		)
 	}
 
 	return
@@ -285,7 +293,11 @@ func (a Refiner) childPrefixes(node *assignment) (out []etikettBag) {
 		out,
 		func(i, j int) bool {
 			if len(out[i].assignments) == len(out[j].assignments) {
-				return len(out[i].Etikett.String()) > len(out[j].Etikett.String())
+				return len(
+					out[i].Etikett.String(),
+				) > len(
+					out[j].Etikett.String(),
+				)
 			} else {
 				return len(out[i].assignments) > len(out[j].assignments)
 			}

@@ -21,7 +21,7 @@ func TestAddNormalized(t1 *testing.T) {
 
 	AddNormalized(sut, toAdd)
 
-	if !sut.Equals(sutEx) {
+	if !sut.EqualsSetLike(sutEx) {
 		t.NotEqual(sutEx, sut)
 	}
 }
@@ -34,7 +34,7 @@ func TestAddNormalizedEmpty(t *testing.T) {
 
 	AddNormalized(sut, toAdd)
 
-	if !sut.Equals(sutEx) {
+	if !sut.EqualsSetLike(sutEx) {
 		t.Errorf("expected %v, but got %v", sutEx, sut)
 	}
 }
@@ -55,7 +55,7 @@ func TestAddNormalizedFromEmptyBuild(t *testing.T) {
 		AddNormalized(sut, e)
 	}
 
-	if !sut.Equals(sutEx) {
+	if !sut.EqualsSetLike(sutEx) {
 		t.Errorf("expected %v, but got %v", sutEx, sut)
 	}
 }

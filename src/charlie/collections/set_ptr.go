@@ -28,7 +28,7 @@ func (s SetPtr[T, TPtr]) Len() int {
 	return len(s)
 }
 
-func (a SetPtr[T, TPtr]) Equals(b schnittstellen.Set[T]) bool {
+func (a SetPtr[T, TPtr]) EqualsSetLike(b schnittstellen.SetLike[T]) bool {
 	if b == nil {
 		return false
 	}
@@ -104,6 +104,16 @@ func (s SetPtr[T, TPtr]) Elements() (out []T) {
 		out = append(out, *v)
 	}
 
+	return
+}
+
+func (s SetPtr[T, TPtr]) Add(v T) (err error) {
+	s[v.String()] = TPtr(&v)
+	return
+}
+
+func (s SetPtr[T, TPtr]) AddPtr(v TPtr) (err error) {
+	s[v.String()] = v
 	return
 }
 

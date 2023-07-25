@@ -60,7 +60,7 @@ func (a ketikett) Equals(b ketikett) bool {
 		return false
 	}
 
-	if !a.ImplicitEtiketten.Equals(b.ImplicitEtiketten) {
+	if !a.ImplicitEtiketten.EqualsSetLike(b.ImplicitEtiketten) {
 		return false
 	}
 

@@ -32,11 +32,11 @@ func (a Change) Equals(b Change) bool {
 		return false
 	}
 
-	if !a.added.Equals(b.added) {
+	if !a.added.EqualsSetLike(b.added) {
 		return false
 	}
 
-	if !a.removed.Equals(b.removed) {
+	if !a.removed.EqualsSetLike(b.removed) {
 		return false
 	}
 

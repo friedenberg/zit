@@ -20,7 +20,11 @@ func makeStringValues(vs ...string) (out []values.String) {
 	return
 }
 
-func assertSet(t test_logz.T, sut schnittstellen.Set[values.String], vals []values.String) {
+func assertSet(
+	t test_logz.T,
+	sut schnittstellen.Set[values.String],
+	vals []values.String,
+) {
 	t.Helper()
 
 	// Len() int
@@ -86,7 +90,7 @@ func assertSet(t test_logz.T, sut schnittstellen.Set[values.String], vals []valu
 	{
 		sutCopy := sut.ImmutableClone()
 
-		if !sut.Equals(sutCopy) {
+		if !sut.EqualsSetLike(sutCopy) {
 			t.Fatalf("expected copy to equal original")
 		}
 	}
@@ -95,13 +99,13 @@ func assertSet(t test_logz.T, sut schnittstellen.Set[values.String], vals []valu
 	{
 		sutCopy := sut.MutableClone()
 
-		if !sut.Equals(sutCopy) {
+		if !sut.EqualsSetLike(sutCopy) {
 			t.Fatalf("expected mutable copy to equal original")
 		}
 
 		sutCopy.Reset()
 
-		if sut.Equals(sutCopy) {
+		if sut.EqualsSetLike(sutCopy) {
 			t.Fatalf("expected reset mutable copy to not equal original")
 		}
 	}

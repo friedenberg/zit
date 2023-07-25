@@ -64,7 +64,7 @@ func (s set[T]) Len() int {
 	return len(s.elementMap)
 }
 
-func (a set[T]) Equals(b schnittstellen.Set[T]) bool {
+func (a set[T]) EqualsSetLike(b schnittstellen.SetLike[T]) bool {
 	if b == nil {
 		return false
 	}
