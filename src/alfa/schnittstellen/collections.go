@@ -4,40 +4,14 @@ import (
 	"flag"
 )
 
-type (
-	FuncIter[T any]              func(T) error
-	FuncIterIO[T any]            func(T) (int64, error)
-	FuncTransform[T any, T1 any] func(T) (T1, error)
-	FuncIterKey                  func(string) error
-	FuncIterWithKey[T any]       func(string, T) error
-)
-
 type Delta[T ValueLike] interface {
 	GetAdded() Set[T]
 	GetRemoved() Set[T]
 }
 
-type Lenner interface {
-	Len() int
-}
-
-type Iterable[T any] interface {
-	Any() T // TODO-P2 remove in favor of collection method?
-	Each(FuncIter[T]) error
-	// EachPtr(FuncIter[*T]) error
-}
-
-type IterablePtr[T any, TPtr Ptr[T]] interface {
-	EachPtr(FuncIter[TPtr]) error
-}
-
 type Collection[T any] interface {
 	Lenner
 	Iterable[T]
-}
-
-type ContainsKeyer interface {
-	ContainsKey(string) bool
 }
 
 type SetLike[T any] interface {
@@ -58,7 +32,6 @@ type SetLike[T any] interface {
 type MutableSetLike[T any] interface {
 	SetLike[T]
 	Adder[T]
-	AdderCustom[T]
 	Del(T) error
 	DelKey(string) error
 	Resetter
@@ -138,10 +111,6 @@ type Eacher[E any] interface {
 // TODO-P1 remove
 type EachPtrer[E any] interface {
 	EachPtr(FuncIter[*E]) error
-}
-
-type StringAdder interface {
-	AddString(string) error
 }
 
 type ValueSet[T flag.Value, TPtr ValuePtr[T]] interface {

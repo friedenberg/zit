@@ -2,26 +2,12 @@ package iter
 
 import "github.com/friedenberg/zit/src/alfa/schnittstellen"
 
-func AddOrReplaceIfGreaterCustom[T interface {
-	schnittstellen.Stringer
-	schnittstellen.ValueLike
-	schnittstellen.Lessor[T]
-}](c schnittstellen.MutableSetLike[T], b T, kf func(T) string) (err error) {
-	a, ok := c.Get(kf(b))
-
-	if !ok || a.Less(b) {
-		return c.AddCustomKey(b, kf)
-	}
-
-	return
-}
-
 func AddOrReplaceIfGreater[T interface {
 	schnittstellen.Stringer
 	schnittstellen.ValueLike
 	schnittstellen.Lessor[T]
 }](c schnittstellen.MutableSetLike[T], b T) (err error) {
-	a, ok := c.Get(b.String())
+	a, ok := c.Get(c.Key(b))
 
 	if !ok || a.Less(b) {
 		return c.Add(b)

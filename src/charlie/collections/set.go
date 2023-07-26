@@ -3,6 +3,7 @@ package collections
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/charlie/collections2"
 )
 
 func MakeSet[T schnittstellen.ValueLike](
@@ -15,7 +16,7 @@ func MakeSet[T schnittstellen.ValueLike](
 func MakeSetStringer[T schnittstellen.ValueLike, TPtr schnittstellen.ValuePtr[T]](
 	es ...T,
 ) schnittstellen.SetLike[T] {
-	return MakeSetPtrValue[T, TPtr](es...)
+	return collections2.MakeValueSetValue[T, TPtr](nil, es...)
 }
 
 func WriterContainer[T schnittstellen.Element](

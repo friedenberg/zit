@@ -43,17 +43,6 @@ func (ms mutableTridexSet[T]) Abbreviate(short string) (long string) {
 	return ms.TR.Abbreviate(short)
 }
 
-func (ms mutableTridexSet[T]) AddCustomKey(e T, kf func(T) string) (err error) {
-	if err = ms.MS.AddCustomKey(e, kf); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	ms.TR.Add(e.String())
-
-	return
-}
-
 func (ms mutableTridexSet[T]) Add(e T) (err error) {
 	if err = ms.MS.Add(e); err != nil {
 		err = errors.Wrap(err)

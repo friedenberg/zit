@@ -4,6 +4,11 @@ type Element interface {
 	EqualsAny(any) bool
 }
 
+type ElementPtr[T any] interface {
+	Ptr[T]
+	Element
+}
+
 type ValueLike interface {
 	Stringer
 	Element

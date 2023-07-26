@@ -401,11 +401,7 @@ func (k *compiled) AddKasten(
 	defer k.lock.Unlock()
 	k.hasChanges = true
 
-	iter.AddOrReplaceIfGreaterCustom(k.Kisten, *b,
-		func(k kasten.Transacted) string {
-			return k.GetKennungLike().String()
-		},
-	)
+	iter.AddOrReplaceIfGreater(k.Kisten, *b)
 
 	return
 }
@@ -415,13 +411,10 @@ func (k *compiled) AddTyp(
 ) {
 	k.lock.Lock()
 	defer k.lock.Unlock()
+
 	k.hasChanges = true
 
-	iter.AddOrReplaceIfGreaterCustom(k.Typen, *b,
-		func(k typ.Transacted) string {
-			return k.GetKennungLike().String()
-		},
-	)
+	iter.AddOrReplaceIfGreater(k.Typen, *b)
 
 	return
 }
