@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/hotel/objekte"
@@ -32,7 +32,12 @@ func init() {
 				CheckoutMode: checkout_mode.ModeObjekteOnly,
 			}
 
-			f.BoolVar(&c.Delete, "delete", false, "delete the zettel and akte after successful checkin")
+			f.BoolVar(
+				&c.Delete,
+				"delete",
+				false,
+				"delete the zettel and akte after successful checkin",
+			)
 			f.Var(&c.CheckoutMode, "mode", "mode for checking out the zettel")
 
 			return c
@@ -92,8 +97,8 @@ func (c Edit) RunWithCwdQuery(
 		return
 	}
 
-	objektenFiles := collections.Strings[kennung.FD](objekten)
-	aktenFiles := collections.Strings[kennung.FD](akten)
+	objektenFiles := iter.Strings[kennung.FD](objekten)
+	aktenFiles := iter.Strings[kennung.FD](akten)
 
 	if err = (user_ops.OpenFiles{}).Run(u, aktenFiles...); err != nil {
 		err = errors.Wrap(err)

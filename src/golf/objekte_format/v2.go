@@ -6,6 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/ohio"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/format"
@@ -30,7 +31,7 @@ func (f v2) FormatPersistentMetadatei(
 	w.WriteFormat("%s %s", gattung.Bezeichnung, m.Bezeichnung)
 
 	if m.Etiketten != nil {
-		for _, e := range collections.SortedValues(m.Etiketten) {
+		for _, e := range iter.SortedValues[kennung.Etikett](m.Etiketten) {
 			w.WriteFormat("%s %s", gattung.Etikett, e)
 		}
 	}
@@ -61,7 +62,10 @@ func (f v2) ParsePersistentMetadatei(
 				gattung.Typ.String(),
 				ohio.MakeLineReaderIgnoreErrors(m.Typ.Set),
 			),
-			ohio.MakeLineReaderKeyValue(gattung.Bezeichnung.String(), m.Bezeichnung.Set),
+			ohio.MakeLineReaderKeyValue(
+				gattung.Bezeichnung.String(),
+				m.Bezeichnung.Set,
+			),
 			ohio.MakeLineReaderKeyValue(
 				gattung.Etikett.String(),
 				collections.MakeFuncSetString[kennung.Etikett, *kennung.Etikett](

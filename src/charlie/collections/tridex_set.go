@@ -5,6 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/tridex"
 )
 
@@ -35,7 +36,7 @@ func MakeMutableTridexSet[T schnittstellen.ValueLike](
 
 	return mutableTridexSet[T]{
 		MS: ms,
-		TR: tridex.Make(Strings[T](ms)...),
+		TR: tridex.Make(iter.Strings[T](ms)...),
 	}
 }
 

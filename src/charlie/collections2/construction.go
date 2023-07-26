@@ -1,9 +1,43 @@
 package collections2
 
 import (
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
 )
+
+func MakeValueSetString[
+	T schnittstellen.ValueLike,
+	TPtr interface {
+		schnittstellen.ValuePtr[T]
+		schnittstellen.Setter
+	},
+](
+	keyer schnittstellen.StringKeyerPtr[T, TPtr],
+	es ...string,
+) (s Set[T, TPtr], err error) {
+	s.E = make(map[string]TPtr, len(es))
+
+	if keyer == nil {
+		keyer = iter.StringerKeyer[T, TPtr]{}.RegisterGob()
+	}
+
+	s.K = keyer
+
+	for _, v := range es {
+		var e T
+		e1 := TPtr(&e)
+
+		if err = e1.Set(v); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		s.E[s.K.GetKeyPtr(e1)] = e1
+	}
+
+	return
+}
 
 func MakeValueSetValue[T schnittstellen.ValueLike, TPtr schnittstellen.ValuePtr[T]](
 	keyer schnittstellen.StringKeyerPtr[T, TPtr],
@@ -12,7 +46,7 @@ func MakeValueSetValue[T schnittstellen.ValueLike, TPtr schnittstellen.ValuePtr[
 	s.E = make(map[string]TPtr, len(es))
 
 	if keyer == nil {
-		keyer = iter.StringerKeyer[T, TPtr]{}
+		keyer = iter.StringerKeyer[T, TPtr]{}.RegisterGob()
 	}
 
 	s.K = keyer
@@ -32,7 +66,7 @@ func MakeValueSet[T schnittstellen.ValueLike, TPtr schnittstellen.ValuePtr[T]](
 	s.E = make(map[string]TPtr, len(es))
 
 	if keyer == nil {
-		keyer = iter.StringerKeyer[T, TPtr]{}
+		keyer = iter.StringerKeyer[T, TPtr]{}.RegisterGob()
 	}
 
 	s.K = keyer
@@ -92,7 +126,7 @@ func MakeMutableValueSetValue[T schnittstellen.ValueLike, TPtr schnittstellen.Va
 	s.E = make(map[string]TPtr, len(es))
 
 	if keyer == nil {
-		keyer = iter.StringerKeyer[T, TPtr]{}
+		keyer = iter.StringerKeyer[T, TPtr]{}.RegisterGob()
 	}
 
 	s.K = keyer
@@ -112,7 +146,7 @@ func MakeMutableValueSet[T schnittstellen.ValueLike, TPtr schnittstellen.ValuePt
 	s.E = make(map[string]TPtr, len(es))
 
 	if keyer == nil {
-		keyer = iter.StringerKeyer[T, TPtr]{}
+		keyer = iter.StringerKeyer[T, TPtr]{}.RegisterGob()
 	}
 
 	s.K = keyer

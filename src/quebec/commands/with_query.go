@@ -55,7 +55,7 @@ func (c commandWithQuery) Complete(
 
 	if cg.Contains(gattung.Etikett) {
 		if err = u.StoreObjekten().GetKennungIndex().EachSchwanzen(
-			func(e kennung.IndexedLike[kennung.Etikett]) (err error) {
+			func(e kennung.IndexedLike[kennung.Etikett, *kennung.Etikett]) (err error) {
 				if err = errors.Out().Printf("%s\tEtikett", e.GetKennung().String()); err != nil {
 					err = errors.IsAsNilOrWrapf(
 						err,

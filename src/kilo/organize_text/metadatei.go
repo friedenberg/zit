@@ -6,6 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/ohio"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/format"
@@ -55,7 +56,7 @@ func (m *Metadatei) ReadFrom(r1 io.Reader) (n int64, err error) {
 		return
 	}
 
-	m.EtikettSet = mes.CloneSetLike()
+	m.EtikettSet = mes.CloneSetPtrLike()
 
 	return
 }
@@ -63,7 +64,7 @@ func (m *Metadatei) ReadFrom(r1 io.Reader) (n int64, err error) {
 func (m Metadatei) WriteTo(w1 io.Writer) (n int64, err error) {
 	w := format.NewLineWriter()
 
-	for _, e := range collections.SortedStrings[kennung.Etikett](m.EtikettSet) {
+	for _, e := range iter.SortedStrings[kennung.Etikett](m.EtikettSet) {
 		w.WriteFormat("- %s", e)
 	}
 

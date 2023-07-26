@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/alfred"
-	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
@@ -18,7 +18,7 @@ func (w *Writer) zettelToItem(
 
 	a.Title = z.GetMetadatei().Bezeichnung.String()
 
-	es := collections.StringCommaSeparated[kennung.Etikett](
+	es := iter.StringCommaSeparated[kennung.Etikett](
 		z.GetMetadatei().Etiketten,
 	)
 
@@ -41,7 +41,6 @@ func (w *Writer) zettelToItem(
 	z.GetMetadatei().Etiketten.Each(
 		func(e kennung.Etikett) (err error) {
 			ei, err := w.kennungIndex.GetEtikett(e)
-
 			if err != nil {
 				err = errors.Wrap(err)
 				return
@@ -93,7 +92,7 @@ func (w *Writer) zettelToItem(
 }
 
 func (w *Writer) etikettToItem(
-	ei kennung.IndexedLike[kennung.Etikett],
+	ei kennung.IndexedLike[kennung.Etikett, *kennung.Etikett],
 ) (a *alfred.Item) {
 	a = w.alfredWriter.Get()
 
@@ -106,7 +105,7 @@ func (w *Writer) etikettToItem(
 	mb := alfred.NewMatchBuilder()
 
 	mb.AddMatches(a.Title)
-	mb.AddMatches(collections.Strings[kennung.Etikett](kennung.ExpandOne(e))...)
+	mb.AddMatches(iter.Strings[kennung.Etikett](kennung.ExpandOne(e))...)
 
 	a.Match = mb.String()
 

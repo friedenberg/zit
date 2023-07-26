@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/charlie/collections2"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -16,7 +16,7 @@ import (
 
 type CheckinAkte struct {
 	Delete       bool
-	NewEtiketten kennung.EtikettSet
+	NewEtiketten collections2.Flag[kennung.Etikett, *kennung.Etikett]
 }
 
 func init() {
@@ -24,15 +24,14 @@ func init() {
 		"checkin-akte",
 		func(f *flag.FlagSet) Command {
 			c := &CheckinAkte{
-				NewEtiketten: kennung.MakeEtikettSet(),
+				NewEtiketten: collections2.MakeFlagCommas[kennung.Etikett](
+					collections2.SetterPolicyAppend,
+				),
 			}
 
 			f.BoolVar(&c.Delete, "delete", false, "the checked-out file")
 			f.Var(
-				collections.MakeFlagCommasFromExisting(
-					collections.SetterPolicyAppend,
-					&c.NewEtiketten,
-				),
+				c.NewEtiketten,
 				"new-etiketten",
 				"comma-separated etiketten (will replace existing Etiketten)",
 			)

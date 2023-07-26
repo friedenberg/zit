@@ -9,8 +9,8 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
@@ -80,7 +80,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 
 			if _, err = fmt.Fprintln(
 				out,
-				collections.StringCommaSeparated[kennung.Etikett](
+				iter.StringCommaSeparated[kennung.Etikett](
 					ets,
 				),
 			); err != nil {
@@ -95,7 +95,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		return func(tl TransactedLikePtr) (err error) {
 			if _, err = fmt.Fprintln(
 				out,
-				collections.StringCommaSeparated[kennung.Etikett](
+				iter.StringCommaSeparated[kennung.Etikett](
 					tl.GetMetadatei().GetEtiketten(),
 				),
 			); err != nil {

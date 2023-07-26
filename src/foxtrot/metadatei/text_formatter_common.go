@@ -6,9 +6,9 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/ohio"
 	"github.com/friedenberg/zit/src/bravo/script_config"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
@@ -49,7 +49,7 @@ func (f textFormatterCommon) writeCommonMetadateiFormat(
 	}
 
 	if m.Etiketten != nil {
-		for _, e := range collections.SortedValues(m.Etiketten) {
+		for _, e := range iter.SortedValues[kennung.Etikett](m.Etiketten) {
 			if kennung.IsEmpty(e) {
 				continue
 			}

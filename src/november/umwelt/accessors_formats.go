@@ -5,8 +5,8 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
@@ -163,7 +163,7 @@ func (u *Umwelt) FormatMetadatei(
 		return metadatei.MakeCliFormatIncludeTyp(
 			u.FormatBezeichnung(),
 			format.MakeFormatStringer[kennung.Etikett](
-				collections.StringCommaSeparated[kennung.Etikett],
+				iter.StringCommaSeparated[kennung.Etikett],
 			),
 			u.FormatTyp(),
 		)
@@ -171,7 +171,7 @@ func (u *Umwelt) FormatMetadatei(
 		return metadatei.MakeCliFormatExcludeTyp(
 			u.FormatBezeichnung(),
 			format.MakeFormatStringer[kennung.Etikett](
-				collections.StringCommaSeparated[kennung.Etikett],
+				iter.StringCommaSeparated[kennung.Etikett],
 			),
 			u.FormatTyp(),
 		)

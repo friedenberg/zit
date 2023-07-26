@@ -33,7 +33,7 @@ func (c CatObjekte) Run(
 	shas := collections.MakeMutableSetStringer[sha.Sha]()
 
 	for _, v := range args {
-		if err = collections.AddString[sha.Sha](
+		if err = iter.AddString[sha.Sha](
 			shas,
 			v,
 		); err != nil {

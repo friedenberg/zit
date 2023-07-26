@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
-func AddString[T schnittstellen.Value[T]](
+func AddStringToBuilder[T schnittstellen.Value[T]](
 	sb *strings.Builder,
 ) schnittstellen.FuncIter[T] {
 	return func(e T) (err error) {

@@ -3,6 +3,7 @@ package kennung
 import (
 	"testing"
 
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/test_logz"
 	"github.com/friedenberg/zit/src/charlie/collections"
 )
@@ -159,7 +160,7 @@ func TestExpandedRight(t *testing.T) {
 		"zz-archive-task-done",
 	}
 
-	actual := collections.SortedStrings[Etikett](ex)
+	actual := iter.SortedStrings[Etikett](ex)
 
 	if !stringSliceEquals(actual, expected) {
 		t.Errorf(
@@ -182,7 +183,7 @@ func TestPrefixIntersection(t *testing.T) {
 		"project-2021-zit",
 	}
 
-	actual := collections.SortedStrings[Etikett](ex)
+	actual := iter.SortedStrings[Etikett](ex)
 
 	if !stringSliceEquals(actual, expected) {
 		t.Errorf(

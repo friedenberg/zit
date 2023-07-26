@@ -5,6 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
@@ -12,7 +13,7 @@ import (
 type assignment struct {
 	isRoot    bool
 	depth     int
-	etiketten schnittstellen.SetLike[kennung.Etikett]
+	etiketten kennung.EtikettSet
 	named     schnittstellen.MutableSetLike[obj]
 	unnamed   schnittstellen.MutableSetLike[obj]
 	children  []*assignment
@@ -122,7 +123,7 @@ func (a assignment) String() (s string) {
 		s = a.parent.String() + "."
 	}
 
-	return s + collections.StringCommaSeparated[kennung.Etikett](a.etiketten)
+	return s + iter.StringCommaSeparated[kennung.Etikett](a.etiketten)
 }
 
 func (a *assignment) addChild(c *assignment) {
@@ -242,7 +243,7 @@ func (a *assignment) expandedEtiketten() (es kennung.EtikettSet, err error) {
 	}
 
 	if a.etiketten.Len() != 1 || a.parent == nil {
-		es = a.etiketten.CloneSetLike()
+		es = a.etiketten.CloneSetPtrLike()
 		return
 	} else {
 		e := a.etiketten.Any()

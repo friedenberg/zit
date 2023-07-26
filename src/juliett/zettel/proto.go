@@ -86,9 +86,9 @@ func (pz ProtoZettel) Apply(ml metadatei.MetadateiLike) (ok bool) {
 		ok = true
 	}
 
-	mes := z.Etiketten.CloneMutableSetLike()
+	mes := z.Etiketten.CloneMutableSetPtrLike()
 	pz.Metadatei.Etiketten.Each(mes.Add)
-	z.Etiketten = mes.CloneSetLike()
+	z.Etiketten = mes.CloneSetPtrLike()
 
 	ml.SetMetadatei(z)
 
@@ -129,9 +129,9 @@ func (pz ProtoZettel) ApplyWithAkteFD(
 		return
 	}
 
-	mes := z.Etiketten.CloneMutableSetLike()
+	mes := z.Etiketten.CloneMutableSetPtrLike()
 	pz.Metadatei.Etiketten.Each(mes.Add)
-	z.Etiketten = mes.CloneSetLike()
+	z.Etiketten = mes.CloneSetPtrLike()
 
 	ml.SetMetadatei(z)
 

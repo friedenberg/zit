@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/bravo/test_logz"
+	"github.com/friedenberg/zit/src/charlie/collections2"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/test_metadatei_io"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
@@ -20,7 +21,7 @@ func (t inlineTypChecker) IsInlineTyp(k kennung.Typ) bool {
 func makeEtiketten(t test_logz.T, vs ...string) (es kennung.EtikettSet) {
 	var err error
 
-	if es, err = kennung.MakeSetStrings(vs...); err != nil {
+	if es, err = collections2.MakeValueSetString[kennung.Etikett, *kennung.Etikett](nil, vs...); err != nil {
 		t.Fatalf("%s", err)
 	}
 

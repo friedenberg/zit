@@ -5,7 +5,9 @@ import (
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/charlie/collections2"
 )
 
 var (
@@ -21,8 +23,13 @@ func once() {
 	registryQueryPrefix = make(map[string]Kennung)
 }
 
-func register(id Kennung) {
+func register[T Kennung, TPtr interface {
+	schnittstellen.ValuePtr[T]
+	Kennung
+}](id T) {
 	gob.Register(id)
+	gob.Register(collections2.MakeMutableValueSet[T, TPtr](nil))
+	gob.Register(collections2.MakeValueSet[T, TPtr](nil))
 	registerOnce.Do(once)
 
 	registryLock.Lock()
@@ -45,7 +52,7 @@ func register(id Kennung) {
 
 	registryGattung[g] = id
 
-	if idQueryPrefix, ok := id.(QueryPrefixer); ok {
+	if idQueryPrefix, ok := Kennung(id).(QueryPrefixer); ok {
 		p := idQueryPrefix.GetQueryPrefix()
 
 		if id1, ok := registryQueryPrefix[p]; ok {

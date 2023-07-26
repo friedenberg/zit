@@ -7,8 +7,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/charlie/collections2"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
@@ -152,11 +151,11 @@ func (ar *assignmentLineReader) readOneHeading(l line) (err error) {
 		return
 	}
 
-	currentEtiketten := kennung.MakeEtikettSet()
+	currentEtiketten := kennung.MakeMutableEtikettSet()
 
-	flag := collections.MakeFlagCommasFromExisting(
-		collections.SetterPolicyAppend,
-		(*schnittstellen.SetLike[kennung.Etikett])(&currentEtiketten),
+	flag := collections2.MakeFlagCommasFromExisting(
+		collections2.SetterPolicyAppend,
+		currentEtiketten,
 	)
 
 	if l.value != "" {
@@ -236,7 +235,7 @@ func (ar *assignmentLineReader) readOneHeadingLesserDepth(
 		// # zz-inbox
 		// `
 		assignment := newAssignment(d)
-		assignment.etiketten = e.CloneSetLike()
+		assignment.etiketten = e.CloneSetPtrLike()
 		newCurrent.addChild(assignment)
 		// logz.Print("adding to parent")
 		// logz.Print("child", assignment.etiketten)
@@ -274,7 +273,7 @@ func (ar *assignmentLineReader) readOneHeadingEqualDepth(
 		// ## priority-2
 		// `
 		assignment := newAssignment(d)
-		assignment.etiketten = e.CloneSetLike()
+		assignment.etiketten = e.CloneSetPtrLike()
 		newCurrent.addChild(assignment)
 		newCurrent = assignment
 	}
@@ -307,7 +306,7 @@ func (ar *assignmentLineReader) readOneHeadingGreaterDepth(
 		// ### priority-2
 		// `
 		assignment := newAssignment(d)
-		assignment.etiketten = e.CloneSetLike()
+		assignment.etiketten = e.CloneSetPtrLike()
 		newCurrent.addChild(assignment)
 		// logz.Print("adding to parent")
 		// logz.Print("child", assignment)

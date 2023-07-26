@@ -101,7 +101,7 @@ func (i *index2[T, TPtr]) ReadFrom(r1 io.Reader) (n int64, err error) {
 }
 
 func (i index2[T, TPtr]) Each(
-	f schnittstellen.FuncIter[kennung.IndexedLike[T]],
+	f schnittstellen.FuncIter[kennung.IndexedLike[T, TPtr]],
 ) (err error) {
 	for _, id := range i.Kennungen {
 		if err = f(id); err != nil {
@@ -119,7 +119,7 @@ func (i index2[T, TPtr]) Each(
 }
 
 func (i index2[T, TPtr]) EachSchwanzen(
-	f schnittstellen.FuncIter[kennung.IndexedLike[T]],
+	f schnittstellen.FuncIter[kennung.IndexedLike[T, TPtr]],
 ) (err error) {
 	for _, id := range i.Kennungen {
 		if id.GetSchwanzenCount() == 0 {
@@ -165,7 +165,7 @@ func (i index2[T, TPtr]) GetInt(in int) (id T, err error) {
 	return
 }
 
-func (i index2[T, TPtr]) Get(k T) (id kennung.IndexedLike[T], err error) {
+func (i index2[T, TPtr]) Get(k T) (id kennung.IndexedLike[T, TPtr], err error) {
 	i.lock.RLock()
 	defer i.lock.RUnlock()
 

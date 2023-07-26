@@ -55,7 +55,7 @@ func (c CatAlfred) RunWithQuery(
 
 	var aw *alfred.Writer
 
-	var ti kennung_index.KennungIndex[kennung.Typ]
+	var ti kennung_index.KennungIndex[kennung.Typ, *kennung.Typ]
 
 	if ti, err = u.StoreObjekten().GetTypenIndex(); err != nil {
 		err = errors.Wrap(err)
@@ -105,7 +105,7 @@ func (c CatAlfred) catEtiketten(
 	var err error
 
 	if err = u.StoreObjekten().GetKennungIndex().EachSchwanzen(
-		func(e kennung.IndexedLike[kennung.Etikett]) (err error) {
+		func(e kennung.IndexedLike[kennung.Etikett, *kennung.Etikett]) (err error) {
 			_, err = aw.WriteEtikett(e)
 			return
 		},

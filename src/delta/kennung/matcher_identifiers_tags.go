@@ -6,7 +6,7 @@ import (
 )
 
 type ImplicitEtikettenGetter interface {
-	GetImplicitEtiketten(Etikett) schnittstellen.SetLike[Etikett]
+	GetImplicitEtiketten(Etikett) EtikettSet
 }
 
 type MatcherExactlyThisOrAllOfThese interface {

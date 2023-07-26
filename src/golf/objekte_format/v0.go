@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/ohio"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/format"
@@ -32,7 +33,7 @@ func (f v0) FormatPersistentMetadatei(
 	w.WriteFormat("%s %s", gattung.Bezeichnung, m.Bezeichnung)
 
 	if m.Etiketten != nil {
-		for _, e := range collections.SortedValues(m.Etiketten) {
+		for _, e := range iter.SortedValues[kennung.Etikett](m.Etiketten) {
 			w.WriteFormat("%s %s", gattung.Etikett, e)
 		}
 	}
@@ -84,7 +85,7 @@ func (f v0) ParsePersistentMetadatei(
 		return
 	}
 
-	m.Etiketten = etiketten.CloneSetLike()
+	m.Etiketten = etiketten.CloneSetPtrLike()
 
 	c.SetMetadatei(m)
 

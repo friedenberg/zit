@@ -7,10 +7,10 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/etikett_rule"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/values"
-	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/charlie/collections2"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 )
@@ -56,14 +56,22 @@ func (m *Metadatei) AddToFlagSet(f *flag.FlagSet) {
 		"bezeichnung",
 		"the Bezeichnung to use for created or updated Zettelen",
 	)
-	f.Var(
-		collections.MakeFlagCommasFromExisting(
-			collections.SetterPolicyAppend,
-			&m.Etiketten,
-		),
-		"etiketten",
-		"the Etiketten to use for created or updated Zttelen",
+
+	mes := m.GetEtiketten().CloneMutableSetPtrLike()
+
+	fes := collections2.MakeFlagCommasFromExisting[kennung.Etikett](
+		collections2.SetterPolicyAppend,
+		mes,
 	)
+
+	f.Var(
+		fes,
+		"etiketten",
+		"the Etiketten to use for created or updated Zettelen",
+	)
+
+	m.Etiketten = mes
+
 	// TODO-P1 add typ
 }
 
@@ -103,7 +111,7 @@ func (z *Metadatei) SetBezeichnung(b bezeichnung.Bezeichnung) {
 	z.Bezeichnung = b
 }
 
-func (z *Metadatei) SetEtiketten(e schnittstellen.SetLike[kennung.Etikett]) {
+func (z *Metadatei) SetEtiketten(e kennung.EtikettSet) {
 	z.Etiketten = e
 }
 
@@ -115,7 +123,7 @@ func (z Metadatei) GetBezeichnung() bezeichnung.Bezeichnung {
 	return z.Bezeichnung
 }
 
-func (z Metadatei) GetEtiketten() schnittstellen.SetLike[kennung.Etikett] {
+func (z Metadatei) GetEtiketten() kennung.EtikettSet {
 	if z.Etiketten == nil {
 		return kennung.MakeEtikettSet()
 	}
@@ -186,7 +194,7 @@ func (z *Metadatei) ResetWith(z1 Metadatei) {
 	if z1.Etiketten == nil {
 		z.Etiketten = kennung.MakeEtikettSet()
 	} else {
-		z.Etiketten = z1.Etiketten.CloneSetLike()
+		z.Etiketten = z1.Etiketten.CloneSetPtrLike()
 	}
 
 	z.Typ = z1.Typ
@@ -198,7 +206,7 @@ func (z Metadatei) Description() (d string) {
 	d = z.Bezeichnung.String()
 
 	if strings.TrimSpace(d) == "" {
-		d = collections.StringCommaSeparated[kennung.Etikett](z.Etiketten)
+		d = iter.StringCommaSeparated[kennung.Etikett](z.Etiketten)
 	}
 
 	return
@@ -217,7 +225,7 @@ func (z *Metadatei) ApplyGoldenChild(
 		return
 	}
 
-	mes := z.Etiketten.CloneMutableSetLike()
+	mes := z.Etiketten.CloneMutableSetPtrLike()
 
 	prefixes := kennung.Withdraw(mes, e).Elements()
 
@@ -238,7 +246,7 @@ func (z *Metadatei) ApplyGoldenChild(
 	sort.Slice(prefixes, sortFunc)
 
 	mes.Add(prefixes[0])
-	z.Etiketten = mes.CloneSetLike()
+	z.Etiketten = mes.CloneSetPtrLike()
 
 	return
 }

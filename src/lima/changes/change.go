@@ -3,9 +3,8 @@ package changes
 import (
 	"strings"
 
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/values"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
@@ -15,11 +14,11 @@ type Change struct {
 	removed kennung.EtikettMutableSet
 }
 
-func (a Change) GetAdded() schnittstellen.SetLike[kennung.Etikett] {
+func (a Change) GetAdded() kennung.EtikettSet {
 	return a.added
 }
 
-func (a Change) GetRemoved() schnittstellen.SetLike[kennung.Etikett] {
+func (a Change) GetRemoved() kennung.EtikettSet {
 	return a.removed
 }
 
@@ -55,8 +54,8 @@ func (c Change) Description() string {
 	sb := &strings.Builder{}
 	sb.WriteString(c.String())
 	sb.WriteString(" add: ")
-	sb.WriteString(collections.StringCommaSeparated[kennung.Etikett](c.added))
+	sb.WriteString(iter.StringCommaSeparated[kennung.Etikett](c.added))
 	sb.WriteString(" remove: ")
-	sb.WriteString(collections.StringCommaSeparated[kennung.Etikett](c.removed))
+	sb.WriteString(iter.StringCommaSeparated[kennung.Etikett](c.removed))
 	return sb.String()
 }

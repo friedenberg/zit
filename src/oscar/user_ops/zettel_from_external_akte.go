@@ -40,7 +40,7 @@ func (c ZettelFromExternalAkte) Run(
 
 	results = zettel.MakeMutableSetHinweis(0)
 
-	fds := collections.SortedValues(ms.GetFDs())
+	fds := iter.SortedValues(ms.GetFDs())
 
 	for _, fd := range fds {
 		var z *zettel.External

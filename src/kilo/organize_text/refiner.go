@@ -4,7 +4,7 @@ import (
 	"sort"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
@@ -186,10 +186,10 @@ func (atc *Refiner) Refine(a *assignment) (err error) {
 	}
 
 	sort.Slice(a.children, func(i, j int) bool {
-		vi := collections.StringCommaSeparated[kennung.Etikett](
+		vi := iter.StringCommaSeparated[kennung.Etikett](
 			a.children[i].etiketten,
 		)
-		vj := collections.StringCommaSeparated[kennung.Etikett](
+		vj := iter.StringCommaSeparated[kennung.Etikett](
 			a.children[j].etiketten,
 		)
 		return vi < vj

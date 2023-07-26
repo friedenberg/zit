@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
@@ -76,7 +76,7 @@ func (a *assignment) addToCompareMap(
 	es kennung.EtikettSet,
 	out *CompareMap,
 ) (err error) {
-	mes := es.CloneMutableSetLike()
+	mes := es.CloneMutableSetPtrLike()
 
 	var es1 kennung.EtikettSet
 
@@ -86,11 +86,11 @@ func (a *assignment) addToCompareMap(
 	}
 
 	es1.Each(mes.Add)
-	es = mes.CloneSetLike()
+	es = mes.CloneSetPtrLike()
 
 	a.named.Each(
 		func(z obj) (err error) {
-			for _, e := range collections.SortedValues(es) {
+			for _, e := range iter.SortedValues[kennung.Etikett](es) {
 				if z.Kennung == nil {
 					panic(fmt.Sprintf("%s: Kennung is nil", z))
 				}
@@ -109,7 +109,7 @@ func (a *assignment) addToCompareMap(
 
 	a.unnamed.Each(
 		func(z obj) (err error) {
-			for _, e := range collections.SortedValues(es) {
+			for _, e := range iter.SortedValues[kennung.Etikett](es) {
 				out.Unnamed.Add(z.Bezeichnung.String(), e)
 			}
 

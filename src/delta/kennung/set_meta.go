@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/collections"
@@ -22,7 +23,7 @@ func init() {
 type MetaSet interface {
 	Get(g gattung.Gattung) (s MatcherSigil, ok bool)
 	GetFDs() schnittstellen.SetLike[FD]
-	GetEtiketten() schnittstellen.SetLike[Etikett]
+	GetEtiketten() EtikettSet
 	GetTypen() schnittstellen.SetLike[Typ]
 	Set(string) error
 	SetMany(...string) error
@@ -201,7 +202,7 @@ func (ms *metaSet) set(v string) (err error) {
 			if gattung.IsErrUnrecognizedGattung(err) {
 				err = nil
 
-				if err = collections.AddString[FD, *FD](
+				if err = iter.AddString[FD, *FD](
 					ms.FDs,
 					v,
 				); err != nil {
@@ -405,7 +406,7 @@ func (ms metaSet) GetFDs() schnittstellen.SetLike[FD] {
 	return ms.FDs
 }
 
-func (ms metaSet) GetEtiketten() schnittstellen.SetLike[Etikett] {
+func (ms metaSet) GetEtiketten() EtikettSet {
 	es := MakeEtikettMutableSet()
 
 	for _, s := range ms.Gattung {

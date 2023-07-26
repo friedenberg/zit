@@ -4,7 +4,7 @@ import (
 	"sort"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/india/objekte_collections"
@@ -243,10 +243,10 @@ func (atc Factory) makeChildren(
 	)
 
 	sort.Slice(parent.children, func(i, j int) bool {
-		vi := collections.StringCommaSeparated[kennung.Etikett](
+		vi := iter.StringCommaSeparated[kennung.Etikett](
 			parent.children[i].etiketten,
 		)
-		vj := collections.StringCommaSeparated[kennung.Etikett](
+		vj := iter.StringCommaSeparated[kennung.Etikett](
 			parent.children[j].etiketten,
 		)
 		return vi < vj

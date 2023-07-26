@@ -9,6 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/charlie/collections2"
 )
 
 type QueryPrefixer interface {
@@ -56,18 +57,24 @@ type KennungLikePtr[T schnittstellen.Value[T]] interface {
 	schnittstellen.Resetable[T]
 }
 
-type IndexedLike[T KennungSansGattung] interface {
+type IndexedLike[
+	T KennungSansGattung,
+	TPtr interface {
+		schnittstellen.Ptr[T]
+		KennungSansGattungPtr
+	},
+] interface {
 	GetInt() int
 	GetKennung() T
 	GetSchwanzenCount() int
 	GetCount() int
 	GetTridex() schnittstellen.Tridex
-	GetExpandedRight() schnittstellen.SetLike[T]
-	GetExpandedAll() schnittstellen.SetLike[T]
+	GetExpandedRight() schnittstellen.SetPtrLike[T, TPtr]
+	GetExpandedAll() schnittstellen.SetPtrLike[T, TPtr]
 }
 
 type Index struct {
-	Etiketten func(Etikett) (IndexedLike[Etikett], error)
+	Etiketten func(Etikett) (IndexedLike[Etikett, *Etikett], error)
 }
 
 func MakeWithGattung(
@@ -315,7 +322,7 @@ func KennungContainsMatchable(
 			m.GetEtiketten(),
 			func(e Etikett) (ok bool) {
 				indexed, err := ki.Etiketten(e)
-				var expanded schnittstellen.SetLike[Etikett]
+				var expanded EtikettSet
 
 				if err == nil {
 					expanded = indexed.GetExpandedRight()
@@ -507,7 +514,7 @@ func IntersectPrefixes(s1 EtikettSet, s2 EtikettSet) (s3 EtikettSet) {
 		}
 	}
 
-	s3 = s4.CloneSetLike()
+	s3 = s4.CloneSetPtrLike()
 
 	return
 }
@@ -525,17 +532,17 @@ func SubtractPrefix(s1 EtikettSet, e Etikett) (s2 EtikettSet) {
 		s3.Add(e2)
 	}
 
-	s2 = s3.CloneSetLike()
+	s2 = s3.CloneSetPtrLike()
 
 	return
 }
 
 func Description(s EtikettSet) string {
-	return collections.StringCommaSeparated[Etikett](s)
+	return iter.StringCommaSeparated[Etikett](s)
 }
 
 func WithRemovedCommonPrefixes(s EtikettSet) (s2 EtikettSet) {
-	es1 := collections.SortedValues(s)
+	es1 := iter.SortedValues[Etikett](s)
 	es := make([]Etikett, 0, len(es1))
 
 	for _, e := range es1 {
@@ -587,7 +594,7 @@ func ExpandOneSlice[T KennungLike[T], TPtr KennungLikePtr[T]](
 		expandOne[T, TPtr](k, ex, s1)
 	}
 
-	out = collections.SortedValuesBy[T](
+	out = iter.SortedValuesBy[T](
 		s1,
 		func(a, b T) bool {
 			return len(a.String()) < len(b.String())
@@ -600,8 +607,8 @@ func ExpandOneSlice[T KennungLike[T], TPtr KennungLikePtr[T]](
 func ExpandOne[T KennungLike[T], TPtr KennungLikePtr[T]](
 	k T,
 	exes ...Expander,
-) (out schnittstellen.SetLike[T]) {
-	s1 := collections.MakeMutableSetStringer[T]()
+) (out schnittstellen.SetPtrLike[T, TPtr]) {
+	s1 := collections2.MakeMutableValueSetValue[T, TPtr](nil)
 
 	if len(exes) == 0 {
 		exes = []Expander{ExpanderAll}
@@ -611,7 +618,7 @@ func ExpandOne[T KennungLike[T], TPtr KennungLikePtr[T]](
 		expandOne[T, TPtr](k, ex, s1)
 	}
 
-	out = s1.CloneSetLike()
+	out = s1.CloneSetPtrLike()
 
 	return
 }
@@ -619,8 +626,8 @@ func ExpandOne[T KennungLike[T], TPtr KennungLikePtr[T]](
 func ExpandMany[T KennungLike[T], TPtr KennungLikePtr[T]](
 	ks schnittstellen.SetLike[T],
 	ex Expander,
-) (out schnittstellen.SetLike[T]) {
-	s1 := collections.MakeMutableSetStringer[T]()
+) (out schnittstellen.SetPtrLike[T, TPtr]) {
+	s1 := collections2.MakeMutableValueSetValue[T, TPtr](nil)
 
 	ks.Each(
 		func(k T) (err error) {
@@ -630,7 +637,7 @@ func ExpandMany[T KennungLike[T], TPtr KennungLikePtr[T]](
 		},
 	)
 
-	out = s1.CloneSetLike()
+	out = s1.CloneSetPtrLike()
 
 	return
 }
@@ -643,7 +650,7 @@ func AddNormalized(es EtikettMutableSet, e Etikett) {
 	ExpandOne(e, ExpanderRight).Each(es.Add)
 	es.Add(e)
 
-	c := es.CloneSetLike()
+	c := es.CloneSetPtrLike()
 	es.Reset()
 	WithRemovedCommonPrefixes(c).Each(es.Add)
 }
@@ -667,7 +674,7 @@ func Withdraw(s1 EtikettMutableSet, e Etikett) (s2 EtikettSet) {
 	}
 
 	s3.Each(s1.Del)
-	s2 = s3.CloneSetLike()
+	s2 = s3.CloneSetPtrLike()
 
 	return
 }

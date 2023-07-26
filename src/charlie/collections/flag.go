@@ -6,6 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/iter"
 )
 
 type flagPtr[T schnittstellen.ValueLike] interface {
@@ -86,7 +87,7 @@ func (f flagCommas[T, TPtr]) String() (out string) {
 		return
 	}
 
-	sorted := SortedStrings[T](*f.set)
+	sorted := iter.SortedStrings[T](*f.set)
 
 	sb := &strings.Builder{}
 	first := true
@@ -129,7 +130,7 @@ func (f *flagCommas[T, TPtr]) Set(v string) (err error) {
 	for _, e := range els {
 		e = strings.TrimSpace(e)
 
-		if err = AddString[T, TPtr](r, e); err != nil {
+		if err = iter.AddString[T, TPtr](r, e); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

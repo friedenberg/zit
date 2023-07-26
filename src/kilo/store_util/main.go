@@ -47,7 +47,7 @@ type StoreUtil interface {
 	GetTransaktionStore() TransaktionStore
 	GetAbbrStore() AbbrStore
 	GetKennungIndex() kennung_index.Index
-	GetTypenIndex() (kennung_index.KennungIndex[kennung.Typ], error)
+	GetTypenIndex() (kennung_index.KennungIndex[kennung.Typ, *kennung.Typ], error)
 
 	SetMatchableAdder(kennung.MatchableAdder)
 	kennung.MatchableAdder
@@ -74,7 +74,7 @@ type common struct {
 	kennungIndex          kennung_index.Index
 
 	kennung.MatchableAdder
-	typenIndex verzeichnisse_index.Wrapper[kennung_index.KennungIndex[kennung.Typ]]
+	typenIndex verzeichnisse_index.Wrapper[kennung_index.KennungIndex[kennung.Typ, *kennung.Typ]]
 }
 
 func MakeStoreUtil(
@@ -90,7 +90,7 @@ func MakeStoreUtil(
 		konfig:                    k,
 		standort:                  st,
 		persistentMetadateiFormat: pmf,
-		typenIndex: verzeichnisse_index.MakeWrapper[kennung_index.KennungIndex[kennung.Typ]](
+		typenIndex: verzeichnisse_index.MakeWrapper[kennung_index.KennungIndex[kennung.Typ, *kennung.Typ]](
 			kennung_index.MakeIndex2[kennung.Typ](),
 			st.DirVerzeichnisse("TypenIndexV0"),
 		),
@@ -200,7 +200,7 @@ func (s *common) GetKennungIndex() kennung_index.Index {
 	return s.kennungIndex
 }
 
-func (s *common) GetTypenIndex() (kennung_index.KennungIndex[kennung.Typ], error) {
+func (s *common) GetTypenIndex() (kennung_index.KennungIndex[kennung.Typ, *kennung.Typ], error) {
 	return s.typenIndex.Get(s)
 }
 

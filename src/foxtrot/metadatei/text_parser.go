@@ -46,7 +46,7 @@ func (f textParser) ParseMetadatei(
 	var n1 int64
 
 	defer func() {
-		m.Etiketten = etiketten.CloneSetLike()
+		m.Etiketten = etiketten.CloneSetPtrLike()
 		c.SetMetadatei(m)
 		c.SetAkteSha(m.AkteSha)
 	}()

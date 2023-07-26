@@ -14,7 +14,7 @@ func assertSetRemovesPrefixes(
 ) {
 	t := test_logz.T{T: t1}.Skip(1)
 
-	ac := ac1.CloneMutableSetLike()
+	ac := ac1.CloneMutableSetPtrLike()
 	RemovePrefixes(ac, MustEtikett(prefix))
 
 	if !ac.EqualsSetLike(ex) {

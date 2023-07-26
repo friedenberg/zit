@@ -13,14 +13,14 @@ import (
 type Writer struct {
 	alfredWriter *alfred.Writer
 	kennungIndex kennung_index.Index
-	typenIndex   kennung_index.KennungIndex[kennung.Typ]
+	typenIndex   kennung_index.KennungIndex[kennung.Typ, *kennung.Typ]
 	Abbr         func(kennung.Hinweis) (string, error)
 }
 
 func New(
 	out io.Writer,
 	kennungIndex kennung_index.Index,
-	typenIndex kennung_index.KennungIndex[kennung.Typ],
+	typenIndex kennung_index.KennungIndex[kennung.Typ, *kennung.Typ],
 	ha func(kennung.Hinweis) (string, error),
 ) (w *Writer, err error) {
 	var aw *alfred.Writer
@@ -56,7 +56,7 @@ func (w *Writer) WriteZettelVerzeichnisse(z *zettel.Transacted) (err error) {
 }
 
 func (w *Writer) WriteEtikett(
-	e kennung.IndexedLike[kennung.Etikett],
+	e kennung.IndexedLike[kennung.Etikett, *kennung.Etikett],
 ) (n int64, err error) {
 	item := w.etikettToItem(e)
 	w.alfredWriter.WriteItem(item)

@@ -2,7 +2,8 @@ package kennung
 
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/charlie/collections2"
 	"github.com/friedenberg/zit/src/charlie/tridex"
 )
 
@@ -11,8 +12,8 @@ type Indexed[T KennungLike[T], TPtr KennungLikePtr[T]] struct {
 	Kennung        T
 	SchwanzenCount int
 	Count          int
-	ExpandedAll    schnittstellen.SetLike[T]
-	ExpandedRight  schnittstellen.SetLike[T]
+	ExpandedAll    schnittstellen.SetPtrLike[T, TPtr]
+	ExpandedRight  schnittstellen.SetPtrLike[T, TPtr]
 	Tridex         schnittstellen.MutableTridex
 }
 
@@ -30,7 +31,7 @@ func (i *Indexed[T, TPtr]) ResetWithKennung(k T) {
 	i.Kennung = k
 	i.ExpandedAll = ExpandOne[T, TPtr](k, ExpanderAll)
 	i.ExpandedRight = ExpandOne[T, TPtr](k, ExpanderRight)
-	i.Tridex = tridex.Make(collections.SortedStrings[T](i.ExpandedRight)...)
+	i.Tridex = tridex.Make(iter.SortedStrings[T](i.ExpandedRight)...)
 }
 
 func (z Indexed[T, TPtr]) GetInt() int {
@@ -53,11 +54,11 @@ func (z Indexed[T, TPtr]) GetTridex() schnittstellen.Tridex {
 	return z.Tridex
 }
 
-func (z Indexed[T, TPtr]) GetExpandedRight() schnittstellen.SetLike[T] {
+func (z Indexed[T, TPtr]) GetExpandedRight() schnittstellen.SetPtrLike[T, TPtr] {
 	return z.ExpandedRight
 }
 
-func (z Indexed[T, TPtr]) GetExpandedAll() schnittstellen.SetLike[T] {
+func (z Indexed[T, TPtr]) GetExpandedAll() schnittstellen.SetPtrLike[T, TPtr] {
 	return z.ExpandedAll
 }
 
@@ -65,7 +66,7 @@ func (z *Indexed[T, TPtr]) Reset() {
 	TPtr(&z.Kennung).Reset()
 	z.SchwanzenCount = 0
 	z.Count = 0
-	z.ExpandedRight = collections.MakeSetStringer[T, TPtr]()
-	z.ExpandedAll = collections.MakeSetStringer[T, TPtr]()
+	z.ExpandedRight = collections2.MakeMutableValueSetValue[T, TPtr](nil)
+	z.ExpandedAll = collections2.MakeMutableValueSetValue[T, TPtr](nil)
 	z.Tridex = tridex.Make()
 }

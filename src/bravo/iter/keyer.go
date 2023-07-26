@@ -1,6 +1,10 @@
 package iter
 
-import "github.com/friedenberg/zit/src/alfa/schnittstellen"
+import (
+	"encoding/gob"
+
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+)
 
 type StringerKeyer[
 	T schnittstellen.Stringer,
@@ -9,6 +13,11 @@ type StringerKeyer[
 		schnittstellen.Stringer
 	},
 ] struct{}
+
+func (sk StringerKeyer[T, TPtr]) RegisterGob() StringerKeyer[T, TPtr] {
+	gob.Register(sk)
+	return sk
+}
 
 func (sk StringerKeyer[T, TPtr]) GetKey(e T) string {
 	return e.String()

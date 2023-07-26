@@ -6,9 +6,9 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/script_config"
 	"github.com/friedenberg/zit/src/bravo/values"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/juliett/zettel"
@@ -101,7 +101,7 @@ func (c ExecAction) runAction(
 		map[string]string{
 			"ZIT_BIN": u.Standort().Executable(),
 		},
-		collections.Strings[kennung.Hinweis](hinweisen)...,
+		iter.Strings[kennung.Hinweis](hinweisen)...,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

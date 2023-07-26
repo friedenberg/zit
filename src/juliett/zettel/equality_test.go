@@ -4,8 +4,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/test_logz"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
@@ -46,7 +46,7 @@ func TestMakeEtiketten(t1 *testing.T) {
 	}
 
 	{
-		ac := collections.SortedStrings[kennung.Etikett](sut)
+		ac := iter.SortedStrings[kennung.Etikett](sut)
 
 		if !reflect.DeepEqual(ac, vs) {
 			t.Fatalf("expected %q but got %q", vs, ac)
@@ -55,7 +55,7 @@ func TestMakeEtiketten(t1 *testing.T) {
 
 	{
 		ex := "tag1, tag2, tag3"
-		ac := collections.StringCommaSeparated[kennung.Etikett](sut)
+		ac := iter.StringCommaSeparated[kennung.Etikett](sut)
 
 		if ac != ex {
 			t.Fatalf("expected %q but got %q", ex, ac)
@@ -64,7 +64,7 @@ func TestMakeEtiketten(t1 *testing.T) {
 
 	{
 		ex := "tag1, tag2, tag3"
-		ac := collections.StringCommaSeparated[kennung.Etikett](
+		ac := iter.StringCommaSeparated[kennung.Etikett](
 			sut.CloneSetLike(),
 		)
 
@@ -83,7 +83,7 @@ func TestEqualitySelf(t1 *testing.T) {
 			"tag1",
 			"tag2",
 			"tag3",
-		).CloneSetLike(),
+		).CloneSetPtrLike(),
 		Typ: makeAkteExt(t, "text"),
 	}
 
@@ -101,7 +101,7 @@ func TestEqualityNotSelf(t1 *testing.T) {
 			"tag1",
 			"tag2",
 			"tag3",
-		).CloneSetLike(),
+		).CloneSetPtrLike(),
 		Typ: makeAkteExt(t, "text"),
 	}
 
@@ -111,7 +111,7 @@ func TestEqualityNotSelf(t1 *testing.T) {
 			"tag1",
 			"tag2",
 			"tag3",
-		).CloneSetLike(),
+		).CloneSetPtrLike(),
 		Typ: makeAkteExt(t, "text"),
 	}
 

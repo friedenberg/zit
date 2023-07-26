@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
@@ -35,7 +35,7 @@ func StringMetadateiSansTai(o SkuLike) (str string) {
 	if es.Len() > 0 {
 		sb.WriteString(" ")
 		sb.WriteString(
-			collections.StringDelimiterSeparated[kennung.Etikett](
+			iter.StringDelimiterSeparated[kennung.Etikett](
 				m.GetEtiketten(),
 				" ",
 			),
@@ -80,7 +80,7 @@ func StringMetadatei(o SkuLike) (str string) {
 	if es.Len() > 0 {
 		sb.WriteString(" ")
 		sb.WriteString(
-			collections.StringDelimiterSeparated[kennung.Etikett](
+			iter.StringDelimiterSeparated[kennung.Etikett](
 				m.GetEtiketten(),
 				" ",
 			),

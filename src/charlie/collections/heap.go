@@ -7,6 +7,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/iter"
 )
 
 type HeapElement[T any] interface {
@@ -117,7 +118,11 @@ func (h *Heap[T, T1]) Push(sk T) {
 	defer h.l.Unlock()
 
 	if h.s > 0 {
-		panic(errors.Errorf("attempting to push to a heap that has saved elements"))
+		panic(
+			errors.Errorf(
+				"attempting to push to a heap that has saved elements",
+			),
+		)
 	}
 
 	heap.Push(&h.h, sk)
@@ -146,7 +151,7 @@ func (h *Heap[T, T1]) Restore() {
 	h.h = h.h[:h.s]
 	h.s = 0
 
-	ReverseSortable(&h.h)
+	iter.ReverseSortable(&h.h)
 
 	return
 }
