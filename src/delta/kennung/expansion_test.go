@@ -63,7 +63,7 @@ func TestStringSliceEquals(t *testing.T) {
 func TestExpansionAll(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 	e := MustEtikett("this-is-a-tag")
-	ex := ExpandOne(e, ExpanderAll)
+	ex := ExpandOne(&e, ExpanderAll)
 	expected := []string{
 		"a",
 		"a-tag",
@@ -89,7 +89,7 @@ func TestExpansionAll(t1 *testing.T) {
 
 func TestExpansionRight(t *testing.T) {
 	e := MustEtikett("this-is-a-tag")
-	ex := ExpandOne(e, ExpanderRight)
+	ex := ExpandOne(&e, ExpanderRight)
 	expected := []string{
 		"this",
 		"this-is",

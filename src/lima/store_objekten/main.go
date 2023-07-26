@@ -474,7 +474,7 @@ func (s *Store) getReindexFunc(
 func (s *Store) addTyp(
 	t kennung.Typ,
 ) (err error) {
-	typenExpanded := kennung.ExpandOneSlice(t, kennung.ExpanderRight)
+	typenExpanded := kennung.ExpandOneSlice(&t, kennung.ExpanderRight)
 
 	for _, t := range typenExpanded {
 		if err = s.GetAbbrStore().Typen().Exists(t); err == nil {
@@ -500,7 +500,7 @@ func (s *Store) addTyp(
 func (s *Store) addEtikett(
 	e kennung.Etikett,
 ) (err error) {
-	etikettenExpanded := kennung.ExpandOneSlice(e, kennung.ExpanderRight)
+	etikettenExpanded := kennung.ExpandOneSlice(&e, kennung.ExpanderRight)
 
 	for _, e1 := range etikettenExpanded {
 		if err = s.GetAbbrStore().Etiketten().Exists(e1); err == nil {

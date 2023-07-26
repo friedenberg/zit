@@ -19,7 +19,7 @@ func TestAddNormalized(t1 *testing.T) {
 
 	toAdd := MustEtikett("project-2021-zit")
 
-	AddNormalized(sut, toAdd)
+	AddNormalized(sut, &toAdd)
 
 	if !sut.EqualsSetLike(sutEx) {
 		t.NotEqual(sutEx, sut)
@@ -32,7 +32,7 @@ func TestAddNormalizedEmpty(t *testing.T) {
 
 	sutEx := MakeEtikettMutableSet(toAdd)
 
-	AddNormalized(sut, toAdd)
+	AddNormalized(sut, &toAdd)
 
 	if !sut.EqualsSetLike(sutEx) {
 		t.Errorf("expected %v, but got %v", sutEx, sut)
@@ -51,7 +51,8 @@ func TestAddNormalizedFromEmptyBuild(t *testing.T) {
 		MustEtikett("priority-1"),
 	)
 
-	for _, e := range toAdd {
+	for i := range toAdd {
+		e := &toAdd[i]
 		AddNormalized(sut, e)
 	}
 

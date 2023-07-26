@@ -33,7 +33,7 @@ func (c CatEtikettenSchwanzen) Run(
 					err,
 					syscall.EPIPE,
 					"Etikett: %s",
-					e,
+					e.GetKennung(),
 				)
 
 				return

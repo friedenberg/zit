@@ -40,7 +40,7 @@ func (w *Writer) zettelToItem(
 	mb.AddMatches(z.GetTyp().String())
 	z.GetMetadatei().Etiketten.Each(
 		func(e kennung.Etikett) (err error) {
-			ei, err := w.kennungIndex.GetEtikett(e)
+			ei, err := w.kennungIndex.GetEtikett(&e)
 			if err != nil {
 				err = errors.Wrap(err)
 				return
@@ -57,7 +57,9 @@ func (w *Writer) zettelToItem(
 		},
 	)
 
-	if ti, err := w.typenIndex.Get(z.GetTyp()); err == nil {
+	t := z.GetTyp()
+
+	if ti, err := w.typenIndex.Get(&t); err == nil {
 		ti.GetExpandedAll().Each(
 			func(t kennung.Typ) (err error) {
 				mb.AddMatches(t.String())
@@ -105,7 +107,7 @@ func (w *Writer) etikettToItem(
 	mb := alfred.NewMatchBuilder()
 
 	mb.AddMatches(a.Title)
-	mb.AddMatches(iter.Strings[kennung.Etikett](kennung.ExpandOne(e))...)
+	mb.AddMatches(iter.Strings[kennung.Etikett](kennung.ExpandOne(&e))...)
 
 	a.Match = mb.String()
 

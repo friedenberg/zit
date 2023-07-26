@@ -22,7 +22,7 @@ type index2[
 	hasChanges      bool
 	lock            *sync.RWMutex
 	IntsToKennungen map[int]T
-	Kennungen       map[string]kennung.Indexed[T, TPtr]
+	Kennungen       map[string]kennung.IndexedLike[T, TPtr]
 }
 
 func MakeIndex2[
@@ -32,7 +32,7 @@ func MakeIndex2[
 	i = &index2[T, TPtr]{
 		lock:            &sync.RWMutex{},
 		IntsToKennungen: make(map[int]T),
-		Kennungen:       make(map[string]kennung.Indexed[T, TPtr]),
+		Kennungen:       make(map[string]kennung.IndexedLike[T, TPtr]),
 	}
 
 	return
@@ -56,7 +56,7 @@ func (i *index2[T, TPtr]) Reset() error {
 	i.lock.Lock()
 	defer i.lock.Unlock()
 
-	i.Kennungen = make(map[string]kennung.Indexed[T, TPtr])
+	i.Kennungen = make(map[string]kennung.IndexedLike[T, TPtr])
 
 	return nil
 }
@@ -165,7 +165,9 @@ func (i index2[T, TPtr]) GetInt(in int) (id T, err error) {
 	return
 }
 
-func (i index2[T, TPtr]) Get(k T) (id kennung.IndexedLike[T, TPtr], err error) {
+func (i index2[T, TPtr]) Get(
+	k TPtr,
+) (id kennung.IndexedLike[T, TPtr], err error) {
 	i.lock.RLock()
 	defer i.lock.RUnlock()
 

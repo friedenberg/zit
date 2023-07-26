@@ -57,24 +57,24 @@ type KennungLikePtr[T schnittstellen.Value[T]] interface {
 	schnittstellen.Resetable[T]
 }
 
-type IndexedLike[
-	T KennungSansGattung,
-	TPtr interface {
-		schnittstellen.Ptr[T]
-		KennungSansGattungPtr
-	},
-] interface {
-	GetInt() int
-	GetKennung() T
-	GetSchwanzenCount() int
-	GetCount() int
-	GetTridex() schnittstellen.Tridex
-	GetExpandedRight() schnittstellen.SetPtrLike[T, TPtr]
-	GetExpandedAll() schnittstellen.SetPtrLike[T, TPtr]
-}
+// type IndexedLike[
+// 	T KennungSansGattung,
+// 	TPtr interface {
+// 		schnittstellen.Ptr[T]
+// 		KennungSansGattungPtr
+// 	},
+// ] interface {
+// 	GetInt() int
+// 	GetKennung() T
+// 	GetSchwanzenCount() int
+// 	GetCount() int
+// 	GetTridex() schnittstellen.Tridex
+// 	GetExpandedRight() schnittstellen.SetPtrLike[T, TPtr]
+// 	GetExpandedAll() schnittstellen.SetPtrLike[T, TPtr]
+// }
 
 type Index struct {
-	Etiketten func(Etikett) (IndexedLike[Etikett, *Etikett], error)
+	Etiketten func(*Etikett) (IndexedLike[Etikett, *Etikett], error)
 }
 
 func MakeWithGattung(
@@ -318,9 +318,9 @@ func KennungContainsMatchable(
 ) bool {
 	switch kt := k.(type) {
 	case EtikettLike:
-		if iter.CheckAny[Etikett](
+		if iter.CheckAnyPtr[Etikett, *Etikett](
 			m.GetEtiketten(),
-			func(e Etikett) (ok bool) {
+			func(e *Etikett) (ok bool) {
 				indexed, err := ki.Etiketten(e)
 				var expanded EtikettSet
 
@@ -572,7 +572,7 @@ func WithRemovedCommonPrefixes(s EtikettSet) (s2 EtikettSet) {
 }
 
 func expandOne[T KennungLike[T], TPtr KennungLikePtr[T]](
-	k T,
+	k TPtr,
 	ex Expander,
 	acc schnittstellen.Adder[T],
 ) {
@@ -581,7 +581,7 @@ func expandOne[T KennungLike[T], TPtr KennungLikePtr[T]](
 }
 
 func ExpandOneSlice[T KennungLike[T], TPtr KennungLikePtr[T]](
-	k T,
+	k TPtr,
 	exes ...Expander,
 ) (out []T) {
 	s1 := collections.MakeMutableSetStringer[T]()
@@ -605,7 +605,7 @@ func ExpandOneSlice[T KennungLike[T], TPtr KennungLikePtr[T]](
 }
 
 func ExpandOne[T KennungLike[T], TPtr KennungLikePtr[T]](
-	k T,
+	k TPtr,
 	exes ...Expander,
 ) (out schnittstellen.SetPtrLike[T, TPtr]) {
 	s1 := collections2.MakeMutableValueSetValue[T, TPtr](nil)
@@ -624,13 +624,13 @@ func ExpandOne[T KennungLike[T], TPtr KennungLikePtr[T]](
 }
 
 func ExpandMany[T KennungLike[T], TPtr KennungLikePtr[T]](
-	ks schnittstellen.SetLike[T],
+	ks schnittstellen.SetPtrLike[T, TPtr],
 	ex Expander,
 ) (out schnittstellen.SetPtrLike[T, TPtr]) {
 	s1 := collections2.MakeMutableValueSetValue[T, TPtr](nil)
 
-	ks.Each(
-		func(k T) (err error) {
+	ks.EachPtr(
+		func(k TPtr) (err error) {
 			expandOne[T, TPtr](k, ex, s1)
 
 			return
@@ -646,9 +646,9 @@ func Expanded(s EtikettSet, ex Expander) (out EtikettSet) {
 	return ExpandMany[Etikett, *Etikett](s, ex)
 }
 
-func AddNormalized(es EtikettMutableSet, e Etikett) {
+func AddNormalized(es EtikettMutableSet, e *Etikett) {
 	ExpandOne(e, ExpanderRight).Each(es.Add)
-	es.Add(e)
+	es.AddPtr(e)
 
 	c := es.CloneSetPtrLike()
 	es.Reset()

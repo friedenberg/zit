@@ -30,7 +30,7 @@ func (m SetKeyToEtiketten) Add(h string, e kennung.Etikett) {
 		es = kennung.MakeEtikettMutableSet()
 	}
 
-	kennung.AddNormalized(es, e)
+	kennung.AddNormalized(es, &e)
 	m[h] = es
 }
 

@@ -61,7 +61,7 @@ func (c commandWithQuery) Complete(
 						err,
 						syscall.EPIPE,
 						"Etikett: %s",
-						e,
+						e.GetKennung(),
 					)
 
 					return

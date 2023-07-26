@@ -14,14 +14,11 @@ import (
 )
 
 type KennungIndex[
-	T kennung.KennungSansGattung,
-	TPtr interface {
-		schnittstellen.Ptr[T]
-		kennung.KennungSansGattungPtr
-	},
+	T kennung.KennungLike[T],
+	TPtr kennung.KennungLikePtr[T],
 ] interface {
 	GetInt(int) (T, error)
-	Get(T) (kennung.IndexedLike[T, TPtr], error)
+	Get(TPtr) (kennung.IndexedLike[T, TPtr], error)
 	DidRead() bool
 	HasChanges() bool
 	Reset() error
@@ -45,7 +42,7 @@ type EtikettIndex interface {
 	AddEtikettSet(to kennung.EtikettSet, from kennung.EtikettSet) (err error)
 	Add(s kennung.EtikettSet) (err error)
 	GetEtikett(
-		kennung.Etikett,
+		*kennung.Etikett,
 	) (kennung.IndexedLike[kennung.Etikett, *kennung.Etikett], error)
 }
 
@@ -130,7 +127,7 @@ func (i *index) AddEtikettSet(
 }
 
 func (i *index) GetEtikett(
-	k kennung.Etikett,
+	k *kennung.Etikett,
 ) (id kennung.IndexedLike[kennung.Etikett, *kennung.Etikett], err error) {
 	var ei KennungIndex[kennung.Etikett, *kennung.Etikett]
 
