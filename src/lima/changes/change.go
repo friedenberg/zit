@@ -15,11 +15,11 @@ type Change struct {
 	removed kennung.EtikettMutableSet
 }
 
-func (a Change) GetAdded() schnittstellen.Set[kennung.Etikett] {
+func (a Change) GetAdded() schnittstellen.SetLike[kennung.Etikett] {
 	return a.added
 }
 
-func (a Change) GetRemoved() schnittstellen.Set[kennung.Etikett] {
+func (a Change) GetRemoved() schnittstellen.SetLike[kennung.Etikett] {
 	return a.removed
 }
 

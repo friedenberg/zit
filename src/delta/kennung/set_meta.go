@@ -21,9 +21,9 @@ func init() {
 // TODO-P3 rename to QueryGattungGroup
 type MetaSet interface {
 	Get(g gattung.Gattung) (s MatcherSigil, ok bool)
-	GetFDs() schnittstellen.Set[FD]
-	GetEtiketten() schnittstellen.Set[Etikett]
-	GetTypen() schnittstellen.Set[Typ]
+	GetFDs() schnittstellen.SetLike[FD]
+	GetEtiketten() schnittstellen.SetLike[Etikett]
+	GetTypen() schnittstellen.SetLike[Typ]
 	Set(string) error
 	SetMany(...string) error
 	All(f func(gattung.Gattung, MatcherSigil) error) error
@@ -57,7 +57,7 @@ type metaSet struct {
 
 	DefaultGattungen gattungen.Set
 	Gattung          map[gattung.Gattung]setWithSigil
-	FDs              schnittstellen.MutableSet[FD]
+	FDs              schnittstellen.MutableSetLike[FD]
 }
 
 func MakeMetaSet(
@@ -401,11 +401,11 @@ func (ms metaSet) Get(g gattung.Gattung) (s MatcherSigil, ok bool) {
 	return
 }
 
-func (ms metaSet) GetFDs() schnittstellen.Set[FD] {
+func (ms metaSet) GetFDs() schnittstellen.SetLike[FD] {
 	return ms.FDs
 }
 
-func (ms metaSet) GetEtiketten() schnittstellen.Set[Etikett] {
+func (ms metaSet) GetEtiketten() schnittstellen.SetLike[Etikett] {
 	es := MakeEtikettMutableSet()
 
 	for _, s := range ms.Gattung {
@@ -427,7 +427,7 @@ func (ms metaSet) GetEtiketten() schnittstellen.Set[Etikett] {
 	return es
 }
 
-func (ms metaSet) GetTypen() schnittstellen.Set[Typ] {
+func (ms metaSet) GetTypen() schnittstellen.SetLike[Typ] {
 	es := collections.MakeMutableSetStringer[Typ]()
 
 	for _, s := range ms.Gattung {

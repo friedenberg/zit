@@ -156,7 +156,7 @@ func (ar *assignmentLineReader) readOneHeading(l line) (err error) {
 
 	flag := collections.MakeFlagCommasFromExisting(
 		collections.SetterPolicyAppend,
-		(*schnittstellen.Set[kennung.Etikett])(&currentEtiketten),
+		(*schnittstellen.SetLike[kennung.Etikett])(&currentEtiketten),
 	)
 
 	if l.value != "" {

@@ -65,10 +65,10 @@ type compiled struct {
 	erworben.Akte
 
 	// Etiketten
-	EtikettenHidden             schnittstellen.Set[kennung.Etikett]
+	EtikettenHidden             schnittstellen.SetLike[kennung.Etikett]
 	EtikettenHiddenStringsSlice []string
 	EtikettenToAddToNew         []string
-	Etiketten                   schnittstellen.MutableSet[ketikett]
+	Etiketten                   schnittstellen.MutableSetLike[ketikett]
 	ImplicitEtiketten           implicitEtikettenMap
 
 	// Typen

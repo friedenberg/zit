@@ -381,7 +381,7 @@ func (s *zettelStore) Create(
 }
 
 func (s *zettelStore) UpdateManyMetadatei(
-	incoming schnittstellen.Set[sku.SkuLike],
+	incoming schnittstellen.SetLike[sku.SkuLike],
 ) (err error) {
 	if !s.StoreUtil.GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{

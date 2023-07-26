@@ -10,8 +10,8 @@ func init() {
 }
 
 type (
-	KastenSet        = schnittstellen.Set[Kasten]
-	KastenMutableSet = schnittstellen.MutableSet[Kasten]
+	KastenSet        = schnittstellen.SetLike[Kasten]
+	KastenMutableSet = schnittstellen.MutableSetLike[Kasten]
 )
 
 func MakeKastenSet(ts ...Kasten) KastenSet {

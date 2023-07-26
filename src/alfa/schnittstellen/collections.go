@@ -5,8 +5,8 @@ import (
 )
 
 type Delta[T ValueLike] interface {
-	GetAdded() Set[T]
-	GetRemoved() Set[T]
+	GetAdded() SetLike[T]
+	GetRemoved() SetLike[T]
 }
 
 type Collection[T any] interface {
@@ -35,15 +35,6 @@ type MutableSetLike[T any] interface {
 	Del(T) error
 	DelKey(string) error
 	Resetter
-}
-
-type Set[T any] interface {
-	SetLike[T]
-}
-
-type MutableSet[T any] interface {
-	Set[T]
-	MutableSetLike[T]
 }
 
 type TridexLike interface {
@@ -115,9 +106,9 @@ type EachPtrer[E any] interface {
 
 type ValueSet[T flag.Value, TPtr ValuePtr[T]] interface {
 	Strings() []string
-	Set[T]
+	SetLike[T]
 }
 
 type MutableValueSet[T flag.Value, TPtr ValuePtr[T]] interface {
-	MutableSet[T]
+	MutableSetLike[T]
 }

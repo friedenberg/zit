@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
-type MutableSet = schnittstellen.MutableSet[kennung.Typ]
+type MutableSet = schnittstellen.MutableSetLike[kennung.Typ]
 
 func MakeMutableSet(hs ...kennung.Typ) MutableSet {
 	return collections.MakeMutableSet[kennung.Typ](

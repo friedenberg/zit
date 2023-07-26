@@ -13,7 +13,7 @@ import (
 )
 
 func (s Store) ReadAllMatchingAkten(
-	akten schnittstellen.Set[kennung.FD],
+	akten schnittstellen.SetLike[kennung.FD],
 	f func(kennung.FD, *zettel.Transacted) error,
 ) (err error) {
 	fds := collections.MakeMutableSet[kennung.FD](

@@ -45,7 +45,7 @@ func (sk KennungKeyer[T, TPtr]) GetKeyPtr(e TPtr) string {
 }
 
 func makeCompiledKastenSet(
-	s1 schnittstellen.Set[kasten.Transacted],
+	s1 schnittstellen.SetLike[kasten.Transacted],
 ) schnittstellen.MutableSetLike[kasten.Transacted] {
 	if s1 == nil {
 		return makeCompiledKastenSetFromSlice(nil)
@@ -73,7 +73,7 @@ func makeCompiledEtikettSetFromSlice(
 }
 
 func makeCompiledEtikettSet(
-	s1 schnittstellen.Set[etikett.Transacted],
+	s1 schnittstellen.SetLike[etikett.Transacted],
 ) schnittstellen.MutableSetLike[etikett.Transacted] {
 	if s1 == nil {
 		return makeCompiledEtikettSetFromSlice(nil)
@@ -92,7 +92,7 @@ func makeCompiledTypSetFromSlice(
 }
 
 func makeCompiledTypSet(
-	s1 schnittstellen.Set[typ.Transacted],
+	s1 schnittstellen.SetLike[typ.Transacted],
 ) schnittstellen.MutableSetLike[typ.Transacted] {
 	if s1 == nil {
 		return makeCompiledTypSetFromSlice(nil)

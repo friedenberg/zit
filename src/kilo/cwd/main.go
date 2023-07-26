@@ -23,12 +23,12 @@ type CwdFiles struct {
 	erworben          konfig.Compiled
 	dir               string
 	// TODO-P4 make private
-	Zettelen  schnittstellen.MutableSet[Zettel]
-	Typen     schnittstellen.MutableSet[Typ]
-	Kisten    schnittstellen.MutableSet[Kasten]
-	Etiketten schnittstellen.MutableSet[Etikett]
+	Zettelen  schnittstellen.MutableSetLike[Zettel]
+	Typen     schnittstellen.MutableSetLike[Typ]
+	Kisten    schnittstellen.MutableSetLike[Kasten]
+	Etiketten schnittstellen.MutableSetLike[Etikett]
 	// TODO-P4 make set
-	UnsureAkten      schnittstellen.MutableSet[kennung.FD]
+	UnsureAkten      schnittstellen.MutableSetLike[kennung.FD]
 	EmptyDirectories []kennung.FD
 }
 
@@ -155,7 +155,7 @@ func (fs CwdFiles) ContainsMatchable(m kennung.Matchable) bool {
 	return true
 }
 
-func (fs CwdFiles) GetFDs() schnittstellen.Set[kennung.FD] {
+func (fs CwdFiles) GetFDs() schnittstellen.SetLike[kennung.FD] {
 	fds := kennung.MakeMutableFDSet()
 
 	kennung.FDSetAddPairs[Zettel](fs.Zettelen, fds)

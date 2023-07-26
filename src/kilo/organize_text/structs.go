@@ -147,7 +147,7 @@ func (z *obj) setNewObj(v string) (err error) {
 }
 
 func sortObjSet(
-	s schnittstellen.MutableSet[obj],
+	s schnittstellen.MutableSetLike[obj],
 ) (out []obj) {
 	out = s.Elements()
 

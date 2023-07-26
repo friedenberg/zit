@@ -11,8 +11,8 @@ func init() {
 }
 
 type (
-	Set        = schnittstellen.Set[Time]
-	MutableSet = schnittstellen.MutableSet[Time]
+	Set        = schnittstellen.SetLike[Time]
+	MutableSet = schnittstellen.MutableSetLike[Time]
 )
 
 func MakeMutableSet(hs ...Time) MutableSet {

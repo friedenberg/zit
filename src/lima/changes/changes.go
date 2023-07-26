@@ -10,26 +10,26 @@ import (
 )
 
 type Changes interface {
-	GetExisting() schnittstellen.Set[Change]
-	GetAdded() schnittstellen.Set[Change]
-	GetAllBKeys() schnittstellen.Set[values.String]
+	GetExisting() schnittstellen.SetLike[Change]
+	GetAdded() schnittstellen.SetLike[Change]
+	GetAllBKeys() schnittstellen.SetLike[values.String]
 }
 
 type changes struct {
-	existing schnittstellen.MutableSet[Change]
-	added    schnittstellen.MutableSet[Change]
-	allB     schnittstellen.MutableSet[values.String]
+	existing schnittstellen.MutableSetLike[Change]
+	added    schnittstellen.MutableSetLike[Change]
+	allB     schnittstellen.MutableSetLike[values.String]
 }
 
-func (c changes) GetExisting() schnittstellen.Set[Change] {
+func (c changes) GetExisting() schnittstellen.SetLike[Change] {
 	return c.existing
 }
 
-func (c changes) GetAdded() schnittstellen.Set[Change] {
+func (c changes) GetAdded() schnittstellen.SetLike[Change] {
 	return c.added
 }
 
-func (c changes) GetAllBKeys() schnittstellen.Set[values.String] {
+func (c changes) GetAllBKeys() schnittstellen.SetLike[values.String] {
 	return c.allB
 }
 

@@ -19,8 +19,8 @@ type Flag[
 ] interface {
 	flag.Value
 	SetMany(vs ...string) (err error)
-	GetSet() schnittstellen.Set[T]
-	GetMutableSet() schnittstellen.MutableSet[T]
+	GetSet() schnittstellen.SetLike[T]
+	GetMutableSet() schnittstellen.MutableSetLike[T]
 }
 
 func MakeFlagCommasFromExisting[
@@ -28,10 +28,10 @@ func MakeFlagCommasFromExisting[
 	TPtr flagPtr[T],
 ](
 	p SetterPolicy,
-	existing *schnittstellen.Set[T],
+	existing *schnittstellen.SetLike[T],
 ) Flag[T, TPtr] {
 	if *existing == nil {
-		e := schnittstellen.Set[T](
+		e := schnittstellen.SetLike[T](
 			MakeSet(
 				(T).String,
 			),
@@ -51,7 +51,7 @@ func MakeFlagCommas[
 	TPtr flagPtr[T],
 ](p SetterPolicy,
 ) Flag[T, TPtr] {
-	var s schnittstellen.Set[T]
+	var s schnittstellen.SetLike[T]
 
 	s = MakeMutableSet(
 		func(e T) string {
@@ -70,14 +70,14 @@ type flagCommas[
 	TPtr flagPtr[T],
 ] struct {
 	SetterPolicy
-	set *schnittstellen.Set[T]
+	set *schnittstellen.SetLike[T]
 }
 
-func (f flagCommas[T, TPtr]) GetSet() (s schnittstellen.Set[T]) {
+func (f flagCommas[T, TPtr]) GetSet() (s schnittstellen.SetLike[T]) {
 	return (*f.set).CloneSetLike()
 }
 
-func (f flagCommas[T, TPtr]) GetMutableSet() (s schnittstellen.MutableSet[T]) {
+func (f flagCommas[T, TPtr]) GetMutableSet() (s schnittstellen.MutableSetLike[T]) {
 	return (*f.set).CloneMutableSetLike()
 }
 

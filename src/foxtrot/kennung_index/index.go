@@ -216,7 +216,7 @@ func (i *index2[T, TPtr]) StoreDelta(d schnittstellen.Delta[T]) (err error) {
 	return
 }
 
-func (i *index2[T, TPtr]) StoreMany(ks schnittstellen.Set[T]) (err error) {
+func (i *index2[T, TPtr]) StoreMany(ks schnittstellen.SetLike[T]) (err error) {
 	i.lock.Lock()
 	defer i.lock.Unlock()
 

@@ -9,7 +9,7 @@ func init() {
 	collections.RegisterGob[Typ]()
 }
 
-type TypSet = schnittstellen.Set[Typ]
+type TypSet = schnittstellen.SetLike[Typ]
 
 func MakeTypSet(ts ...Typ) TypSet {
 	return collections.MakeSet[Typ](
@@ -18,7 +18,7 @@ func MakeTypSet(ts ...Typ) TypSet {
 	)
 }
 
-type TypMutableSet = schnittstellen.MutableSet[Typ]
+type TypMutableSet = schnittstellen.MutableSetLike[Typ]
 
 func MakeTypMutableSet(ts ...Typ) TypMutableSet {
 	return collections.MakeMutableSet[Typ](

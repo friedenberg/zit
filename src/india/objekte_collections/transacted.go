@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/hotel/objekte"
 )
 
-type MutableSetTransacted = schnittstellen.MutableSet[objekte.TransactedLike]
+type MutableSetTransacted = schnittstellen.MutableSetLike[objekte.TransactedLike]
 
 func MakeMutableSetTransactedUnique(c int) MutableSetTransacted {
 	return collections.MakeMutableSet(

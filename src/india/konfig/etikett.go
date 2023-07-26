@@ -15,7 +15,7 @@ func init() {
 	collections.RegisterGob[ketikett, *ketikett]()
 }
 
-type implicitEtikettenMap map[kennung.Etikett]schnittstellen.MutableSet[kennung.Etikett]
+type implicitEtikettenMap map[kennung.Etikett]schnittstellen.MutableSetLike[kennung.Etikett]
 
 func (iem implicitEtikettenMap) Contains(to, imp kennung.Etikett) bool {
 	s, ok := iem[to]
@@ -44,7 +44,7 @@ func (iem implicitEtikettenMap) Set(to, imp kennung.Etikett) (err error) {
 
 type ketikett struct {
 	Transacted        etikett.Transacted
-	ImplicitEtiketten schnittstellen.MutableSet[kennung.Etikett]
+	ImplicitEtiketten schnittstellen.MutableSetLike[kennung.Etikett]
 }
 
 func (a ketikett) Less(b ketikett) bool {
@@ -198,7 +198,7 @@ func (c compiled) GetSortedEtikettenExpanded(
 
 func (c compiled) GetImplicitEtiketten(
 	e kennung.Etikett,
-) schnittstellen.Set[kennung.Etikett] {
+) schnittstellen.SetLike[kennung.Etikett] {
 	s, ok := c.ImplicitEtiketten[e]
 
 	if !ok || s == nil {

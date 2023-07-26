@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/golf/sku"
 )
 
-type MutableSetMetadateiWithKennung = schnittstellen.MutableSet[sku.SkuLike]
+type MutableSetMetadateiWithKennung = schnittstellen.MutableSetLike[sku.SkuLike]
 
 func MakeMutableSetMetadateiWithKennung() MutableSetMetadateiWithKennung {
 	return collections.MakeMutableSet(

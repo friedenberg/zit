@@ -6,7 +6,7 @@ import (
 )
 
 type ImplicitEtikettenGetter interface {
-	GetImplicitEtiketten(Etikett) schnittstellen.Set[Etikett]
+	GetImplicitEtiketten(Etikett) schnittstellen.SetLike[Etikett]
 }
 
 type MatcherExactlyThisOrAllOfThese interface {
@@ -76,7 +76,7 @@ func (s matcherExactlyThisOrAllOfThese) EachMatcher(
 	return VisitAllMatchers(f, s.Matcher)
 }
 
-func (s matcherExactlyThisOrAllOfThese) GetHinweisen() schnittstellen.Set[Hinweis] {
+func (s matcherExactlyThisOrAllOfThese) GetHinweisen() schnittstellen.SetLike[Hinweis] {
 	hins := collections.MakeMutableSetStringer[Hinweis]()
 
 	VisitAllMatcherKennungSansGattungWrappers(

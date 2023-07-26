@@ -22,7 +22,7 @@ func makeStringValues(vs ...string) (out []values.String) {
 
 func assertSet(
 	t test_logz.T,
-	sut schnittstellen.Set[values.String],
+	sut schnittstellen.SetLike[values.String],
 	vals []values.String,
 ) {
 	t.Helper()

@@ -12,9 +12,9 @@ import (
 type assignment struct {
 	isRoot    bool
 	depth     int
-	etiketten schnittstellen.Set[kennung.Etikett]
-	named     schnittstellen.MutableSet[obj]
-	unnamed   schnittstellen.MutableSet[obj]
+	etiketten schnittstellen.SetLike[kennung.Etikett]
+	named     schnittstellen.MutableSetLike[obj]
+	unnamed   schnittstellen.MutableSetLike[obj]
 	children  []*assignment
 	parent    *assignment
 }

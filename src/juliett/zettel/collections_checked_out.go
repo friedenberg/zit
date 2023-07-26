@@ -6,8 +6,8 @@ import (
 )
 
 type (
-	SetCheckedOut        = schnittstellen.Set[CheckedOut]
-	MutableSetCheckedOut = schnittstellen.MutableSet[CheckedOut]
+	SetCheckedOut        = schnittstellen.SetLike[CheckedOut]
+	MutableSetCheckedOut = schnittstellen.MutableSetLike[CheckedOut]
 )
 
 func MakeMutableSetCheckedOutUnique(c int) MutableSetCheckedOut {

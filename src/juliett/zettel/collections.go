@@ -13,12 +13,12 @@ func MakeHeapTransacted() HeapTransacted {
 }
 
 type MutableSet struct {
-	schnittstellen.MutableSet[*Transacted]
+	schnittstellen.MutableSetLike[*Transacted]
 }
 
 func MakeMutableSetUnique(c int) MutableSet {
 	return MutableSet{
-		MutableSet: collections.MakeMutableSet(
+		MutableSetLike: collections.MakeMutableSet(
 			func(sz *Transacted) string {
 				if sz == nil {
 					return ""
@@ -38,7 +38,7 @@ func MakeMutableSetUnique(c int) MutableSet {
 
 func MakeMutableSetHinweis(c int) MutableSet {
 	return MutableSet{
-		MutableSet: collections.MakeMutableSet(
+		MutableSetLike: collections.MakeMutableSet(
 			func(sz *Transacted) string {
 				if sz == nil {
 					return ""

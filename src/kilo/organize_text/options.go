@@ -24,11 +24,11 @@ type Options struct {
 
 	Konfig konfig.Compiled
 
-	RootEtiketten     schnittstellen.Set[kennung.Etikett]
+	RootEtiketten     schnittstellen.SetLike[kennung.Etikett]
 	Typ               kennung.Typ
 	GroupingEtiketten kennung.Slice
-	ExtraEtiketten    schnittstellen.Set[kennung.Etikett]
-	Transacted        schnittstellen.Set[sku.SkuLike]
+	ExtraEtiketten    schnittstellen.SetLike[kennung.Etikett]
+	Transacted        schnittstellen.SetLike[sku.SkuLike]
 
 	Expanders kennung.Abbr
 

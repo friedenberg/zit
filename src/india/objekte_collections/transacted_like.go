@@ -7,8 +7,8 @@ import (
 )
 
 type (
-	TransactedLikeSet        schnittstellen.Set[objekte.TransactedLike]
-	TransactedLikeMutableSet schnittstellen.MutableSet[objekte.TransactedLike]
+	TransactedLikeSet        schnittstellen.SetLike[objekte.TransactedLike]
+	TransactedLikeMutableSet schnittstellen.MutableSetLike[objekte.TransactedLike]
 )
 
 func MakeTransactedLikeMutableSetKennung() TransactedLikeMutableSet {

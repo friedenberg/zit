@@ -11,8 +11,8 @@ type Indexed[T KennungLike[T], TPtr KennungLikePtr[T]] struct {
 	Kennung        T
 	SchwanzenCount int
 	Count          int
-	ExpandedAll    schnittstellen.Set[T]
-	ExpandedRight  schnittstellen.Set[T]
+	ExpandedAll    schnittstellen.SetLike[T]
+	ExpandedRight  schnittstellen.SetLike[T]
 	Tridex         schnittstellen.MutableTridex
 }
 
@@ -53,11 +53,11 @@ func (z Indexed[T, TPtr]) GetTridex() schnittstellen.Tridex {
 	return z.Tridex
 }
 
-func (z Indexed[T, TPtr]) GetExpandedRight() schnittstellen.Set[T] {
+func (z Indexed[T, TPtr]) GetExpandedRight() schnittstellen.SetLike[T] {
 	return z.ExpandedRight
 }
 
-func (z Indexed[T, TPtr]) GetExpandedAll() schnittstellen.Set[T] {
+func (z Indexed[T, TPtr]) GetExpandedAll() schnittstellen.SetLike[T] {
 	return z.ExpandedAll
 }
 

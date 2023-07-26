@@ -10,8 +10,8 @@ func init() {
 }
 
 type (
-	HinweisSet        = schnittstellen.Set[Hinweis]
-	HinweisMutableSet = schnittstellen.MutableSet[Hinweis]
+	HinweisSet        = schnittstellen.SetLike[Hinweis]
+	HinweisMutableSet = schnittstellen.MutableSetLike[Hinweis]
 )
 
 func MakeHinweisMutableSet(hs ...Hinweis) HinweisMutableSet {

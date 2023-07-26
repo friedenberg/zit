@@ -53,7 +53,7 @@ func (wg *errorWaitGroup) GetError() (err error) {
 
 func ErrorWaitGroupApply[T any](
 	wg ErrorWaitGroup,
-	s schnittstellen.Set[T],
+	s schnittstellen.SetLike[T],
 	f schnittstellen.FuncIter[T],
 ) (d bool) {
 	if err := s.Each(

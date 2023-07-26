@@ -30,7 +30,7 @@ func HeapEach(h SkuLikeHeap, f func(sk SkuLike) error) (err error) {
 	)
 }
 
-type MutableSetUnique = schnittstellen.MutableSet[SkuLike]
+type MutableSetUnique = schnittstellen.MutableSetLike[SkuLike]
 
 func init() {
 	gob.Register(

@@ -10,8 +10,8 @@ func init() {
 }
 
 type (
-	FDSet        = schnittstellen.Set[FD]
-	MutableFDSet = schnittstellen.MutableSet[FD]
+	FDSet        = schnittstellen.SetLike[FD]
+	MutableFDSet = schnittstellen.MutableSetLike[FD]
 )
 
 func MakeFDSet(ts ...FD) FDSet {
@@ -29,8 +29,8 @@ func MakeMutableFDSet(ts ...FD) MutableFDSet {
 }
 
 func FDSetAddPairs[T FDPairGetter](
-	in schnittstellen.Set[T],
-	out schnittstellen.MutableSet[FD],
+	in schnittstellen.SetLike[T],
+	out schnittstellen.MutableSetLike[FD],
 ) (err error) {
 	return in.Each(
 		func(e T) (err error) {

@@ -8,10 +8,10 @@ import (
 	"github.com/friedenberg/zit/src/golf/sku"
 )
 
-type SetPrefixNamed map[kennung.Etikett]schnittstellen.MutableSet[sku.SkuLike]
+type SetPrefixNamed map[kennung.Etikett]schnittstellen.MutableSetLike[sku.SkuLike]
 
 type SetPrefixNamedSegments struct {
-	Ungrouped schnittstellen.MutableSet[sku.SkuLike]
+	Ungrouped schnittstellen.MutableSetLike[sku.SkuLike]
 	Grouped   *SetPrefixNamed
 }
 
@@ -21,7 +21,7 @@ func NewSetPrefixNamed() *SetPrefixNamed {
 	return &s
 }
 
-func makeMutableZettelLikeSet() schnittstellen.MutableSet[sku.SkuLike] {
+func makeMutableZettelLikeSet() schnittstellen.MutableSetLike[sku.SkuLike] {
 	return collections.MakeMutableSet(
 		func(e sku.SkuLike) string {
 			return e.GetKennungLike().String()
@@ -88,7 +88,7 @@ func (a SetPrefixNamed) Subset(e kennung.Etikett) (out SetPrefixNamedSegments) {
 	return
 }
 
-func (s SetPrefixNamed) ToSetNamed() (out schnittstellen.MutableSet[sku.SkuLike]) {
+func (s SetPrefixNamed) ToSetNamed() (out schnittstellen.MutableSetLike[sku.SkuLike]) {
 	out = makeMutableZettelLikeSet()
 
 	for _, zs := range s {

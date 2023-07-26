@@ -9,7 +9,7 @@ import (
 )
 
 func DeleteFilesAndDirsSet(
-	fs schnittstellen.Set[schnittstellen.Stringer],
+	fs schnittstellen.SetLike[schnittstellen.Stringer],
 ) (err error) {
 	return fs.Each(
 		func(f schnittstellen.Stringer) (err error) {

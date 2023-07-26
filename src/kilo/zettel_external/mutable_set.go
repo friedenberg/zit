@@ -7,7 +7,7 @@ import (
 )
 
 type MutableSet struct {
-	schnittstellen.MutableSet[*zettel.External]
+	schnittstellen.MutableSetLike[*zettel.External]
 }
 
 func MakeMutableSet(
@@ -15,7 +15,7 @@ func MakeMutableSet(
 	zs ...*zettel.External,
 ) MutableSet {
 	return MutableSet{
-		MutableSet: collections.MakeMutableSet[*zettel.External](kf, zs...),
+		MutableSetLike: collections.MakeMutableSet[*zettel.External](kf, zs...),
 	}
 }
 

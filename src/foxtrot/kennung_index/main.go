@@ -23,7 +23,7 @@ type KennungIndex[T kennung.KennungSansGattung] interface {
 	Each(schnittstellen.FuncIter[kennung.IndexedLike[T]]) error
 	EachSchwanzen(schnittstellen.FuncIter[kennung.IndexedLike[T]]) error
 	StoreDelta(schnittstellen.Delta[T]) (err error)
-	StoreMany(schnittstellen.Set[T]) (err error)
+	StoreMany(schnittstellen.SetLike[T]) (err error)
 	StoreOne(T) (err error)
 	io.WriterTo
 	io.ReaderFrom

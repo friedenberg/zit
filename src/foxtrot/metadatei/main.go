@@ -103,7 +103,7 @@ func (z *Metadatei) SetBezeichnung(b bezeichnung.Bezeichnung) {
 	z.Bezeichnung = b
 }
 
-func (z *Metadatei) SetEtiketten(e schnittstellen.Set[kennung.Etikett]) {
+func (z *Metadatei) SetEtiketten(e schnittstellen.SetLike[kennung.Etikett]) {
 	z.Etiketten = e
 }
 
@@ -115,7 +115,7 @@ func (z Metadatei) GetBezeichnung() bezeichnung.Bezeichnung {
 	return z.Bezeichnung
 }
 
-func (z Metadatei) GetEtiketten() schnittstellen.Set[kennung.Etikett] {
+func (z Metadatei) GetEtiketten() schnittstellen.SetLike[kennung.Etikett] {
 	if z.Etiketten == nil {
 		return kennung.MakeEtikettSet()
 	}

@@ -3,19 +3,19 @@ package collections
 import "github.com/friedenberg/zit/src/alfa/schnittstellen"
 
 type delta[T schnittstellen.ValueLike] struct {
-	Added, Removed schnittstellen.MutableSet[T]
+	Added, Removed schnittstellen.MutableSetLike[T]
 }
 
-func (d delta[T]) GetAdded() schnittstellen.Set[T] {
+func (d delta[T]) GetAdded() schnittstellen.SetLike[T] {
 	return d.Added
 }
 
-func (d delta[T]) GetRemoved() schnittstellen.Set[T] {
+func (d delta[T]) GetRemoved() schnittstellen.SetLike[T] {
 	return d.Removed
 }
 
 func MakeSetDelta[T schnittstellen.ValueLike](
-	from, to schnittstellen.Set[T],
+	from, to schnittstellen.SetLike[T],
 ) schnittstellen.Delta[T] {
 	d := delta[T]{
 		Added:   MakeMutableSetStringer[T](),

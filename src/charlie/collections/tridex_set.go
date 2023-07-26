@@ -24,7 +24,7 @@ func RegisterGobTridexSet[T schnittstellen.ValueLike]() {
 }
 
 type mutableTridexSet[T schnittstellen.ValueLike] struct {
-	MS schnittstellen.MutableSet[T]
+	MS schnittstellen.MutableSetLike[T]
 	TR schnittstellen.MutableTridex
 }
 

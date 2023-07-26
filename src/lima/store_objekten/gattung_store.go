@@ -195,7 +195,7 @@ func (s *commonStore[O, OPtr, K, KPtr]) CheckoutOne(
 }
 
 func (s *commonStore[O, OPtr, K, KPtr]) UpdateManyMetadatei(
-	incoming schnittstellen.Set[sku.SkuLike],
+	incoming schnittstellen.SetLike[sku.SkuLike],
 ) (err error) {
 	if !s.StoreUtil.GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{

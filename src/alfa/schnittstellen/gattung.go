@@ -13,5 +13,5 @@ type GattungGetter interface {
 }
 
 type GattungenGetter interface {
-	GetGattungen() Set[GattungLike]
+	GetGattungen() SetLike[GattungLike]
 }

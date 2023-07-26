@@ -10,8 +10,8 @@ func init() {
 }
 
 type (
-	EtikettSet        = schnittstellen.Set[Etikett]
-	EtikettMutableSet = schnittstellen.MutableSet[Etikett]
+	EtikettSet        = schnittstellen.SetLike[Etikett]
+	EtikettMutableSet = schnittstellen.MutableSetLike[Etikett]
 )
 
 func MakeEtikettSet(es ...Etikett) (s EtikettSet) {

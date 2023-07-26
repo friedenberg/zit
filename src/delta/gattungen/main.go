@@ -14,8 +14,8 @@ func init() {
 }
 
 type (
-	Set        = schnittstellen.Set[gattung.Gattung]
-	MutableSet = schnittstellen.MutableSet[gattung.Gattung]
+	Set        = schnittstellen.SetLike[gattung.Gattung]
+	MutableSet = schnittstellen.MutableSetLike[gattung.Gattung]
 )
 
 func MakeSet(gs ...gattung.Gattung) Set {

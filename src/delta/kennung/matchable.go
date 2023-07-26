@@ -5,7 +5,7 @@ import (
 )
 
 type EtikettenGetter interface {
-	GetEtiketten() schnittstellen.Set[Etikett]
+	GetEtiketten() schnittstellen.SetLike[Etikett]
 }
 
 type TypGetter interface {

@@ -30,7 +30,7 @@ type CreateFromPaths struct {
 
 func (c CreateFromPaths) Run(
 	args ...string,
-) (results schnittstellen.MutableSet[*zettel.Transacted], err error) {
+) (results schnittstellen.MutableSetLike[*zettel.Transacted], err error) {
 	// TODO-P3 support different modes of de-duplication
 	// TODO-P3 support merging of duplicated akten
 	toCreate := zettel_external.MakeMutableSetUniqueFD()

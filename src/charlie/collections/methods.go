@@ -118,9 +118,9 @@ func AddIfGreater[E schnittstellen.Lessor[E]](
 }
 
 func Map[E schnittstellen.Value[E], F schnittstellen.Value[F]](
-	in schnittstellen.Set[E],
+	in schnittstellen.SetLike[E],
 	tr schnittstellen.FuncTransform[E, F],
-) (out schnittstellen.MutableSet[F], err error) {
+) (out schnittstellen.MutableSetLike[F], err error) {
 	out = MakeMutableSetStringer[F]()
 
 	if err = in.Each(
@@ -148,7 +148,7 @@ func Map[E schnittstellen.Value[E], F schnittstellen.Value[F]](
 }
 
 func DerivedValues[E schnittstellen.Value[E], F any](
-	c schnittstellen.Set[E],
+	c schnittstellen.SetLike[E],
 	f schnittstellen.FuncTransform[E, F],
 ) (out []F, err error) {
 	out = make([]F, 0, c.Len())
@@ -180,7 +180,7 @@ func DerivedValues[E schnittstellen.Value[E], F any](
 }
 
 func SortedValuesBy[E schnittstellen.Value[E]](
-	c schnittstellen.Set[E],
+	c schnittstellen.SetLike[E],
 	sf func(E, E) bool,
 ) (out []E) {
 	out = c.Elements()
@@ -191,7 +191,7 @@ func SortedValuesBy[E schnittstellen.Value[E]](
 }
 
 func SortedValues[E schnittstellen.Value[E]](
-	c schnittstellen.Set[E],
+	c schnittstellen.SetLike[E],
 ) (out []E) {
 	out = c.Elements()
 

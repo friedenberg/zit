@@ -16,7 +16,7 @@ type mutableSet[T schnittstellen.ValueLike] struct {
 
 func MakeMutableSetStringer[T schnittstellen.ValueLike](
 	es ...T,
-) schnittstellen.MutableSet[T] {
+) schnittstellen.MutableSetLike[T] {
 	return MakeMutableSet(
 		(T).String,
 		es...,
@@ -26,7 +26,7 @@ func MakeMutableSetStringer[T schnittstellen.ValueLike](
 func MakeMutableSet[T schnittstellen.ValueLike](
 	kf KeyFunc[T],
 	es ...T,
-) schnittstellen.MutableSet[T] {
+) schnittstellen.MutableSetLike[T] {
 	s := makeSet(kf, es...)
 
 	ms := &mutableSet[T]{

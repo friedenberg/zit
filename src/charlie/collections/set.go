@@ -9,7 +9,7 @@ import (
 func MakeSet[T schnittstellen.ValueLike](
 	kf KeyFunc[T],
 	es ...T,
-) schnittstellen.Set[T] {
+) schnittstellen.SetLike[T] {
 	return makeSet(kf, es...)
 }
 
@@ -20,7 +20,7 @@ func MakeSetStringer[T schnittstellen.ValueLike, TPtr schnittstellen.ValuePtr[T]
 }
 
 func WriterContainer[T schnittstellen.Element](
-	s schnittstellen.Set[T],
+	s schnittstellen.SetLike[T],
 	sigil error,
 ) schnittstellen.FuncIter[T] {
 	return func(e T) (err error) {

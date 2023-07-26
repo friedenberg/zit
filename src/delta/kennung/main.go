@@ -62,8 +62,8 @@ type IndexedLike[T KennungSansGattung] interface {
 	GetSchwanzenCount() int
 	GetCount() int
 	GetTridex() schnittstellen.Tridex
-	GetExpandedRight() schnittstellen.Set[T]
-	GetExpandedAll() schnittstellen.Set[T]
+	GetExpandedRight() schnittstellen.SetLike[T]
+	GetExpandedAll() schnittstellen.SetLike[T]
 }
 
 type Index struct {
@@ -315,7 +315,7 @@ func KennungContainsMatchable(
 			m.GetEtiketten(),
 			func(e Etikett) (ok bool) {
 				indexed, err := ki.Etiketten(e)
-				var expanded schnittstellen.Set[Etikett]
+				var expanded schnittstellen.SetLike[Etikett]
 
 				if err == nil {
 					expanded = indexed.GetExpandedRight()
@@ -600,7 +600,7 @@ func ExpandOneSlice[T KennungLike[T], TPtr KennungLikePtr[T]](
 func ExpandOne[T KennungLike[T], TPtr KennungLikePtr[T]](
 	k T,
 	exes ...Expander,
-) (out schnittstellen.Set[T]) {
+) (out schnittstellen.SetLike[T]) {
 	s1 := collections.MakeMutableSetStringer[T]()
 
 	if len(exes) == 0 {
@@ -617,9 +617,9 @@ func ExpandOne[T KennungLike[T], TPtr KennungLikePtr[T]](
 }
 
 func ExpandMany[T KennungLike[T], TPtr KennungLikePtr[T]](
-	ks schnittstellen.Set[T],
+	ks schnittstellen.SetLike[T],
 	ex Expander,
-) (out schnittstellen.Set[T]) {
+) (out schnittstellen.SetLike[T]) {
 	s1 := collections.MakeMutableSetStringer[T]()
 
 	ks.Each(

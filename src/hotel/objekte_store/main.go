@@ -93,7 +93,7 @@ type CheckedOutUpdater[
 
 type UpdaterManyMetadatei interface {
 	UpdateManyMetadatei(
-		schnittstellen.Set[sku.SkuLike],
+		schnittstellen.SetLike[sku.SkuLike],
 	) error
 }
 
