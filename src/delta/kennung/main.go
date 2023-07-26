@@ -311,7 +311,7 @@ func KennungContainsMatchable(
 ) bool {
 	switch kt := k.(type) {
 	case EtikettLike:
-		if iter.Any[Etikett](
+		if iter.CheckAny[Etikett](
 			m.GetEtiketten(),
 			func(e Etikett) (ok bool) {
 				indexed, err := ki.Etiketten(e)

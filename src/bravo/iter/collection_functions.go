@@ -16,7 +16,7 @@ func AddOrReplaceIfGreater[T interface {
 	return
 }
 
-func AnyOrTrueEmpty[T any](
+func CheckAnyOrTrueEmpty[T any](
 	c schnittstellen.Collection[T],
 	f func(T) bool,
 ) bool {
@@ -24,10 +24,10 @@ func AnyOrTrueEmpty[T any](
 		return true
 	}
 
-	return Any(c, f)
+	return CheckAny(c, f)
 }
 
-func AnyOrFalseEmpty[T any](
+func CheckAnyOrFalseEmpty[T any](
 	c schnittstellen.Collection[T],
 	f func(T) bool,
 ) bool {
@@ -35,10 +35,30 @@ func AnyOrFalseEmpty[T any](
 		return false
 	}
 
-	return Any(c, f)
+	return CheckAny(c, f)
 }
 
-func Any[T any](c schnittstellen.Collection[T], f func(T) bool) bool {
+func CheckAnyPtr[
+	T any,
+	TPtr schnittstellen.Ptr[T],
+](
+	c schnittstellen.CollectionPtr[T, TPtr],
+	f func(TPtr) bool,
+) bool {
+	err := c.EachPtr(
+		func(e TPtr) (err error) {
+			if f(e) {
+				err = errTrue
+			}
+
+			return
+		},
+	)
+
+	return IsErrTrue(err)
+}
+
+func CheckAny[T any](c schnittstellen.Collection[T], f func(T) bool) bool {
 	err := c.Each(
 		func(e T) (err error) {
 			if f(e) {
