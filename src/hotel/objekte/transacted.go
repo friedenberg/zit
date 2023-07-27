@@ -142,9 +142,9 @@ func (a Transacted[T, T1, T2, T3]) GetTyp() (t kennung.Typ) {
 	return
 }
 
-func (a Transacted[T, T1, T2, T3]) GetIdLike() (il kennung.Kennung) {
-	return a.Sku.GetKennung()
-}
+// func (a Transacted[T, T1, T2, T3]) GetIdLike() (il kennung.Kennung) {
+// 	return a.Sku.GetKennung()
+// }
 
 func (a Transacted[T, T1, T2, T3]) GetSkuLike() (sk sku.SkuLike) {
 	return a.Sku

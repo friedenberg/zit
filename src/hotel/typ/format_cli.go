@@ -30,8 +30,8 @@ func MakeCliFormatCheckedOut(
 	cw format.FuncColorWriter,
 	sf schnittstellen.FuncWriterFormat[schnittstellen.ShaLike],
 	tf schnittstellen.FuncWriterFormat[kennung.Typ],
-) schnittstellen.FuncWriterFormat[CheckedOut] {
-	return func(w io.Writer, t CheckedOut) (n int64, err error) {
+) schnittstellen.FuncWriterFormat[*CheckedOut] {
+	return func(w io.Writer, t *CheckedOut) (n int64, err error) {
 		return format.Write(
 			w,
 			format.MakeFormatString("["),

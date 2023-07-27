@@ -119,7 +119,7 @@ func (c Diff) RunWithCwdQuery(
 
 				internalLabel := fmt.Sprintf(
 					"%s:%s",
-					il.GetIdLike(),
+					il.GetKennungLike(),
 					strings.ToLower(il.GetGattung().GetGattungString()),
 				)
 

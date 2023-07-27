@@ -54,6 +54,16 @@ func (s MutableSet[T, TPtr]) Key(e T) string {
 	return s.K.GetKey(e)
 }
 
+func (s MutableSet[T, TPtr]) KeyPtr(e TPtr) string {
+	return s.K.GetKeyPtr(e)
+}
+
+func (s MutableSet[T, TPtr]) GetPtr(k string) (e TPtr, ok bool) {
+	e, ok = s.E[k]
+
+	return
+}
+
 func (s MutableSet[T, TPtr]) Get(k string) (e T, ok bool) {
 	var e1 TPtr
 

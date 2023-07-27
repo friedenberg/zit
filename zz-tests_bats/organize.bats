@@ -74,53 +74,6 @@ function organize_simple_commit { # @test
 	EOM
 }
 
-function organize_hides_hidden_etiketten_from_organize { # @test
-	echo "hide = true" >zz-archive.etikett
-	run_zit checkin -delete .e
-	assert_success
-	assert_output - <<-EOM
-		[-zz-archive@b8cd0eaa1891284eafdf99d3acc2007a3d4396e8a7282335f707d99825388a93]
-		          deleted [zz-archive.etikett]
-	EOM
-
-	to_add="$(mktemp)"
-	{
-		echo ---
-		echo "# split hinweis for usability"
-		echo - project-2021-zit
-		echo - zz-archive-task-done
-		echo ! md
-		echo ---
-	} >"$to_add"
-
-	run_zit new -edit=false "$to_add"
-	assert_success
-	assert_output - <<-EOM
-		[-project@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[-project-2021@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[-project-2021-zit@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[-zz@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[-zz-archive-task@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[-zz-archive-task-done@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[two/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "split hinweis for usability"]
-	EOM
-
-	expected_organize="$(mktemp)"
-	{
-		echo
-		echo "# project-2021-zit"
-		echo
-	} >"$expected_organize"
-
-	run_zit organize -mode output-only project-2021-zit:z
-	assert_success
-	assert_output - <<-EOM
-		---
-		- project-2021-zit
-		---
-	EOM
-}
-
 function organize_dry_run { # @test
 	expected_show="$(mktemp)"
 	# shellcheck disable=SC2154

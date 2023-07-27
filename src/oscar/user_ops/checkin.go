@@ -39,7 +39,7 @@ func (c Checkin) Run(
 				switch aco := co.(type) {
 				case *zettel.CheckedOut:
 					if _, err = u.StoreObjekten().Zettel().UpdateCheckedOut(
-						*aco,
+						aco,
 					); err != nil {
 						err = errors.Wrap(err)
 						return

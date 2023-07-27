@@ -8,7 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/standort"
-	"github.com/friedenberg/zit/src/charlie/verzeichnisse_index"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/hinweis_index"
 )
@@ -18,11 +17,10 @@ type KennungIndex[
 	TPtr kennung.KennungLikePtr[T],
 ] interface {
 	GetInt(int) (T, error)
-	Get(TPtr) (kennung.IndexedLike[T, TPtr], error)
-	DidRead() bool
+	Get(*T) (*kennung.IndexedLike[T, TPtr], error)
 	HasChanges() bool
 	Reset() error
-	GetAll() []T
+	GetAll() ([]T, error)
 	Each(schnittstellen.FuncIter[kennung.IndexedLike[T, TPtr]]) error
 	EachSchwanzen(schnittstellen.FuncIter[kennung.IndexedLike[T, TPtr]]) error
 	StoreDelta(schnittstellen.Delta[T]) (err error)
@@ -30,6 +28,7 @@ type KennungIndex[
 	StoreOne(T) (err error)
 	io.WriterTo
 	io.ReaderFrom
+	Flush() error
 }
 
 type EtikettIndex interface {
@@ -43,7 +42,7 @@ type EtikettIndex interface {
 	Add(s kennung.EtikettSet) (err error)
 	GetEtikett(
 		*kennung.Etikett,
-	) (kennung.IndexedLike[kennung.Etikett, *kennung.Etikett], error)
+	) (*kennung.IndexedLike[kennung.Etikett, *kennung.Etikett], error)
 }
 
 type Index interface {
@@ -61,7 +60,7 @@ type index struct {
 	hasChanges bool
 	lock       *sync.RWMutex
 
-	etikettenIndex verzeichnisse_index.Wrapper[KennungIndex[kennung.Etikett, *kennung.Etikett]]
+	etikettenIndex KennungIndex[kennung.Etikett, *kennung.Etikett]
 	hinweisIndex   hinweis_index.HinweisIndex
 }
 
@@ -80,8 +79,8 @@ func MakeIndex(
 		path:                 s.FileVerzeichnisseEtiketten(),
 		VerzeichnisseFactory: vf,
 		lock:                 &sync.RWMutex{},
-		etikettenIndex: verzeichnisse_index.MakeWrapper[KennungIndex[kennung.Etikett, *kennung.Etikett]](
-			MakeIndex2[kennung.Etikett](),
+		etikettenIndex: MakeIndex2[kennung.Etikett](
+			vf,
 			s.DirVerzeichnisse("EtikettenIndexV0"),
 		),
 	}
@@ -104,7 +103,7 @@ func (i *index) Flush() (err error) {
 		return
 	}
 
-	if err = i.etikettenIndex.Flush(i.VerzeichnisseFactory); err != nil {
+	if err = i.etikettenIndex.Flush(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -116,64 +115,31 @@ func (i *index) AddEtikettSet(
 	to kennung.EtikettSet,
 	from kennung.EtikettSet,
 ) (err error) {
-	var ei KennungIndex[kennung.Etikett, *kennung.Etikett]
-
-	if ei, err = i.etikettenIndex.Get(i.VerzeichnisseFactory); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return ei.StoreDelta(collections.MakeSetDelta[kennung.Etikett](from, to))
+	return i.etikettenIndex.StoreDelta(
+		collections.MakeSetDelta[kennung.Etikett](from, to),
+	)
 }
 
 func (i *index) GetEtikett(
 	k *kennung.Etikett,
-) (id kennung.IndexedLike[kennung.Etikett, *kennung.Etikett], err error) {
-	var ei KennungIndex[kennung.Etikett, *kennung.Etikett]
-
-	if ei, err = i.etikettenIndex.Get(i.VerzeichnisseFactory); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return ei.Get(k)
+) (id *kennung.IndexedLike[kennung.Etikett, *kennung.Etikett], err error) {
+	return i.etikettenIndex.Get(k)
 }
 
 func (i *index) Add(s kennung.EtikettSet) (err error) {
-	var ei KennungIndex[kennung.Etikett, *kennung.Etikett]
-
-	if ei, err = i.etikettenIndex.Get(i.VerzeichnisseFactory); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return ei.StoreMany(s)
+	return i.etikettenIndex.StoreMany(s)
 }
 
 func (i *index) Each(
 	f schnittstellen.FuncIter[kennung.IndexedLike[kennung.Etikett, *kennung.Etikett]],
 ) (err error) {
-	var ei KennungIndex[kennung.Etikett, *kennung.Etikett]
-
-	if ei, err = i.etikettenIndex.Get(i.VerzeichnisseFactory); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return ei.Each(f)
+	return i.etikettenIndex.Each(f)
 }
 
 func (i *index) EachSchwanzen(
 	f schnittstellen.FuncIter[kennung.IndexedLike[kennung.Etikett, *kennung.Etikett]],
 ) (err error) {
-	var ei KennungIndex[kennung.Etikett, *kennung.Etikett]
-
-	if ei, err = i.etikettenIndex.Get(i.VerzeichnisseFactory); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return ei.EachSchwanzen(f)
+	return i.etikettenIndex.EachSchwanzen(f)
 }
 
 func (i *index) Reset() (err error) {
@@ -182,14 +148,7 @@ func (i *index) Reset() (err error) {
 		return
 	}
 
-	var ei KennungIndex[kennung.Etikett, *kennung.Etikett]
-
-	if ei, err = i.etikettenIndex.Get(i.VerzeichnisseFactory); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = ei.Reset(); err != nil {
+	if err = i.etikettenIndex.Reset(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

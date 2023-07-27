@@ -74,7 +74,7 @@ type KennungLikePtr[T schnittstellen.Value[T]] interface {
 // }
 
 type Index struct {
-	Etiketten func(*Etikett) (IndexedLike[Etikett, *Etikett], error)
+	Etiketten func(*Etikett) (*IndexedLike[Etikett, *Etikett], error)
 }
 
 func MakeWithGattung(
@@ -289,7 +289,7 @@ func KennungContainsExactlyMatchable(k KennungSansGattung, m Matchable) bool {
 	case EtikettLike:
 		es := m.GetEtiketten()
 
-		if es.Contains(kt.GetEtikett()) {
+		if es.ContainsKey(kt.GetEtikett().String()) {
 			return true
 		}
 
@@ -302,7 +302,7 @@ func KennungContainsExactlyMatchable(k KennungSansGattung, m Matchable) bool {
 		// nop
 	}
 
-	idl := m.GetIdLike()
+	idl := m.GetKennungPtr()
 
 	if !ContainsExactly(idl, k) {
 		return false
@@ -322,6 +322,7 @@ func KennungContainsMatchable(
 			m.GetEtiketten(),
 			func(e *Etikett) (ok bool) {
 				indexed, err := ki.Etiketten(e)
+
 				var expanded EtikettSet
 
 				if err == nil {
@@ -330,7 +331,7 @@ func KennungContainsMatchable(
 					expanded = ExpandOne(e, ExpanderRight)
 				}
 
-				ok = expanded.Contains(kt.GetEtikett())
+				ok = expanded.ContainsKey(expanded.KeyPtr(kt.GetEtikett()))
 
 				return
 			},
@@ -352,7 +353,7 @@ func KennungContainsMatchable(
 		// nop
 	}
 
-	idl := m.GetIdLike()
+	idl := m.GetKennungPtr()
 
 	if !Contains(idl, k) {
 		return false

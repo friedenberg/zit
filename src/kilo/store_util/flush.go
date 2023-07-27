@@ -5,7 +5,7 @@ import (
 )
 
 func (c *common) Flush() (err error) {
-	if err = c.typenIndex.Flush(c); err != nil {
+	if err = c.typenIndex.Flush(); err != nil {
 		err = errors.Wrapf(err, "failed to flush typen index")
 		return
 	}

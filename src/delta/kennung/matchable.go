@@ -13,7 +13,8 @@ type TypGetter interface {
 }
 
 type IdLikeGetter interface {
-	GetIdLike() Kennung
+	GetKennungLike() Kennung
+	GetKennungPtr() KennungPtr
 }
 
 type Matchable interface {

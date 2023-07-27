@@ -14,7 +14,7 @@ import (
 )
 
 func (s *commonStore[O, OPtr, K, KPtr]) ReadOneExternal(
-	em sku.ExternalMaybe[K, KPtr],
+	em *sku.ExternalMaybe[K, KPtr],
 	t *objekte.Transacted[O, OPtr, K, KPtr],
 ) (e objekte.External[O, OPtr, K, KPtr], err error) {
 	var m checkout_mode.Mode
@@ -24,7 +24,7 @@ func (s *commonStore[O, OPtr, K, KPtr]) ReadOneExternal(
 		return
 	}
 
-	e.Sku.ResetWithExternalMaybe(em)
+	e.Sku.ResetWithExternalMaybe(*em)
 
 	switch m {
 	case checkout_mode.ModeAkteOnly:

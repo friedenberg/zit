@@ -34,12 +34,12 @@ func (co CheckedOut[T, T1, T2, T3]) GetState() CheckedOutState {
 	return co.State
 }
 
-func (co CheckedOut[T, T1, T2, T3]) GetInternalLike() TransactedLike {
-	return co.Internal
+func (co *CheckedOut[T, T1, T2, T3]) GetInternalLike() TransactedLike {
+	return &co.Internal
 }
 
-func (co CheckedOut[T, T1, T2, T3]) GetExternalLike() ExternalLike {
-	return co.External
+func (co *CheckedOut[T, T1, T2, T3]) GetExternalLike() ExternalLike {
+	return &co.External
 }
 
 func (a CheckedOut[T, T1, T2, T3]) EqualsAny(b any) bool {

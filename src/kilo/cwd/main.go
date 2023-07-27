@@ -13,6 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/charlie/collections2"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/india/konfig"
@@ -23,12 +24,12 @@ type CwdFiles struct {
 	erworben          konfig.Compiled
 	dir               string
 	// TODO-P4 make private
-	Zettelen  schnittstellen.MutableSetLike[Zettel]
-	Typen     schnittstellen.MutableSetLike[Typ]
-	Kisten    schnittstellen.MutableSetLike[Kasten]
-	Etiketten schnittstellen.MutableSetLike[Etikett]
+	Zettelen  schnittstellen.MutableSetPtrLike[Zettel, *Zettel]
+	Typen     schnittstellen.MutableSetPtrLike[Typ, *Typ]
+	Kisten    schnittstellen.MutableSetPtrLike[Kasten, *Kasten]
+	Etiketten schnittstellen.MutableSetPtrLike[Etikett, *Etikett]
 	// TODO-P4 make set
-	UnsureAkten      schnittstellen.MutableSetLike[kennung.FD]
+	UnsureAkten      schnittstellen.MutableSetPtrLike[kennung.FD, *kennung.FD]
 	EmptyDirectories []kennung.FD
 }
 
@@ -41,8 +42,8 @@ func (fs CwdFiles) EachCreatableMatchable(
 ) (err error) {
 	todo.Parallelize()
 
-	if err = fs.Typen.Each(
-		func(e Typ) (err error) {
+	if err = fs.Typen.EachPtr(
+		func(e *Typ) (err error) {
 			return m(e)
 		},
 	); err != nil {
@@ -50,8 +51,8 @@ func (fs CwdFiles) EachCreatableMatchable(
 		return
 	}
 
-	if err = fs.Etiketten.Each(
-		func(e Etikett) (err error) {
+	if err = fs.Etiketten.EachPtr(
+		func(e *Etikett) (err error) {
 			return m(e)
 		},
 	); err != nil {
@@ -59,8 +60,8 @@ func (fs CwdFiles) EachCreatableMatchable(
 		return
 	}
 
-	if err = fs.Kisten.Each(
-		func(e Kasten) (err error) {
+	if err = fs.Kisten.EachPtr(
+		func(e *Kasten) (err error) {
 			return m(e)
 		},
 	); err != nil {
@@ -140,16 +141,16 @@ func (fs CwdFiles) ContainsMatchable(m kennung.Matchable) bool {
 
 	switch g {
 	case gattung.Zettel:
-		return fs.Zettelen.ContainsKey(m.GetIdLike().String())
+		return fs.Zettelen.ContainsKey(m.GetKennungLike().String())
 
 	case gattung.Typ:
-		return fs.Typen.ContainsKey(m.GetIdLike().String())
+		return fs.Typen.ContainsKey(m.GetKennungLike().String())
 
 	case gattung.Etikett:
-		return fs.Etiketten.ContainsKey(m.GetIdLike().String())
+		return fs.Etiketten.ContainsKey(m.GetKennungLike().String())
 
 	case gattung.Kasten:
-		return fs.Kisten.ContainsKey(m.GetIdLike().String())
+		return fs.Kisten.ContainsKey(m.GetKennungLike().String())
 	}
 
 	return true
@@ -166,30 +167,30 @@ func (fs CwdFiles) GetFDs() schnittstellen.SetLike[kennung.FD] {
 }
 
 func (fs CwdFiles) GetZettel(
-	h kennung.Hinweis,
-) (z Zettel, ok bool) {
-	z, ok = fs.Zettelen.Get(h.String())
+	h *kennung.Hinweis,
+) (z *Zettel, ok bool) {
+	z, ok = fs.Zettelen.GetPtr(h.String())
 	return
 }
 
 func (fs CwdFiles) GetKasten(
-	h kennung.Kasten,
-) (z Kasten, ok bool) {
-	z, ok = fs.Kisten.Get(h.String())
+	h *kennung.Kasten,
+) (z *Kasten, ok bool) {
+	z, ok = fs.Kisten.GetPtr(h.String())
 	return
 }
 
 func (fs CwdFiles) GetEtikett(
-	k kennung.Etikett,
-) (e Etikett, ok bool) {
-	e, ok = fs.Etiketten.Get(k.String())
+	k *kennung.Etikett,
+) (e *Etikett, ok bool) {
+	e, ok = fs.Etiketten.GetPtr(k.String())
 	return
 }
 
 func (fs CwdFiles) GetTyp(
-	k kennung.Typ,
-) (t Typ, ok bool) {
-	t, ok = fs.Typen.Get(k.String())
+	k *kennung.Typ,
+) (t *Typ, ok bool) {
+	t, ok = fs.Typen.GetPtr(k.String())
 	return
 }
 
@@ -254,12 +255,20 @@ func makeCwdFiles(
 		akteWriterFactory: awf,
 		erworben:          erworben,
 		dir:               dir,
-		Kisten:            collections.MakeMutableSetStringer[Kasten](),
-		Typen:             collections.MakeMutableSetStringer[Typ](),
-		Zettelen:          collections.MakeMutableSetStringer[Zettel](),
-		Etiketten:         collections.MakeMutableSetStringer[Etikett](),
-		UnsureAkten:       collections.MakeMutableSetStringer[kennung.FD](),
-		EmptyDirectories:  make([]kennung.FD, 0),
+		Kisten: collections2.MakeMutableValueSet[Kasten, *Kasten](
+			nil,
+		),
+		Typen: collections2.MakeMutableValueSet[Typ, *Typ](nil),
+		Zettelen: collections2.MakeMutableValueSet[Zettel, *Zettel](
+			nil,
+		),
+		Etiketten: collections2.MakeMutableValueSet[Etikett, *Etikett](
+			nil,
+		),
+		UnsureAkten: collections2.MakeMutableValueSet[kennung.FD, *kennung.FD](
+			nil,
+		),
+		EmptyDirectories: make([]kennung.FD, 0),
 	}
 
 	return

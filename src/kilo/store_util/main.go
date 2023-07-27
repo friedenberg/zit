@@ -12,7 +12,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/charlie/standort"
-	"github.com/friedenberg/zit/src/charlie/verzeichnisse_index"
 	"github.com/friedenberg/zit/src/delta/age_io"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/kennung_index"
@@ -74,7 +73,7 @@ type common struct {
 	kennungIndex          kennung_index.Index
 
 	kennung.MatchableAdder
-	typenIndex verzeichnisse_index.Wrapper[kennung_index.KennungIndex[kennung.Typ, *kennung.Typ]]
+	typenIndex kennung_index.KennungIndex[kennung.Typ, *kennung.Typ]
 }
 
 func MakeStoreUtil(
@@ -90,11 +89,12 @@ func MakeStoreUtil(
 		konfig:                    k,
 		standort:                  st,
 		persistentMetadateiFormat: pmf,
-		typenIndex: verzeichnisse_index.MakeWrapper[kennung_index.KennungIndex[kennung.Typ, *kennung.Typ]](
-			kennung_index.MakeIndex2[kennung.Typ](),
-			st.DirVerzeichnisse("TypenIndexV0"),
-		),
 	}
+
+	c.typenIndex = kennung_index.MakeIndex2[kennung.Typ](
+		c,
+		st.DirVerzeichnisse("TypenIndexV0"),
+	)
 
 	t := kennung.Now()
 
@@ -201,7 +201,7 @@ func (s *common) GetKennungIndex() kennung_index.Index {
 }
 
 func (s *common) GetTypenIndex() (kennung_index.KennungIndex[kennung.Typ, *kennung.Typ], error) {
-	return s.typenIndex.Get(s)
+	return s.typenIndex, nil
 }
 
 func (s common) GetStandort() standort.Standort {

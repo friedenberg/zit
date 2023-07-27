@@ -157,7 +157,7 @@ func (s *commonStore[O, OPtr, K, KPtr]) CheckoutOne(
 	if f, err = files.CreateExclusiveWriteOnly(p); err != nil {
 		if errors.IsExist(err) {
 			if co.External, err = s.ReadOneExternal(
-				sku.ExternalMaybe[K, KPtr]{
+				&sku.ExternalMaybe[K, KPtr]{
 					Kennung: t.Sku.GetKennung(),
 					FDs: sku.ExternalFDs{
 						Objekte: kennung.FD{

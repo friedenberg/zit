@@ -35,7 +35,7 @@ type ZettelStore interface {
 	objekte_store.Creator[*zettel.Transacted]
 
 	objekte_store.CheckedOutUpdater[
-		zettel.CheckedOut,
+		*zettel.CheckedOut,
 		*zettel.Transacted,
 	]
 
@@ -179,7 +179,7 @@ func (s *zettelStore) writeNamedZettelToIndex(
 }
 
 func (s *zettelStore) ReadOneExternal(
-	e cwd.Zettel,
+	e *cwd.Zettel,
 	t *zettel.Transacted,
 ) (ez zettel.External, err error) {
 	var m checkout_mode.Mode
@@ -189,7 +189,7 @@ func (s *zettelStore) ReadOneExternal(
 		return
 	}
 
-	ez.Sku.ResetWithExternalMaybe(e)
+	ez.Sku.ResetWithExternalMaybe(*e)
 
 	switch m {
 	case checkout_mode.ModeAkteOnly:
@@ -441,7 +441,7 @@ func (s *zettelStore) updateExternal(
 }
 
 func (s *zettelStore) UpdateCheckedOut(
-	co zettel.CheckedOut,
+	co *zettel.CheckedOut,
 ) (t *zettel.Transacted, err error) {
 	errors.TodoP2("support dry run")
 

@@ -312,7 +312,7 @@ func (fd FD) ContainsMatchableExactly(m Matchable) (ok bool) {
 }
 
 func (fd FD) ContainsMatchable(m Matchable) (ok bool) {
-	il := m.GetIdLike()
+	il := m.GetKennungLike()
 
 	switch it := il.(type) {
 	case Hinweis:

@@ -2,6 +2,7 @@ package kennung_index
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/gob"
 	"io"
 	"sync"
@@ -10,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/log"
+	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
@@ -18,31 +20,32 @@ type index2[
 	T kennung.KennungLike[T],
 	TPtr kennung.KennungLikePtr[T],
 ] struct {
-	didRead         bool
+	path            string
+	vf              schnittstellen.VerzeichnisseFactory
+	readOnce        *sync.Once
 	hasChanges      bool
 	lock            *sync.RWMutex
-	IntsToKennungen map[int]T
-	Kennungen       map[string]kennung.IndexedLike[T, TPtr]
+	IntsToKennungen map[int]TPtr
+	Kennungen       map[string]*kennung.IndexedLike[T, TPtr]
 }
 
 func MakeIndex2[
 	T kennung.KennungLike[T],
 	TPtr kennung.KennungLikePtr[T],
-]() (i *index2[T, TPtr]) {
+](
+	vf schnittstellen.VerzeichnisseFactory,
+	path string,
+) (i *index2[T, TPtr]) {
 	i = &index2[T, TPtr]{
+		path:            path,
+		vf:              vf,
+		readOnce:        &sync.Once{},
 		lock:            &sync.RWMutex{},
-		IntsToKennungen: make(map[int]T),
-		Kennungen:       make(map[string]kennung.IndexedLike[T, TPtr]),
+		IntsToKennungen: make(map[int]TPtr),
+		Kennungen:       make(map[string]*kennung.IndexedLike[T, TPtr]),
 	}
 
 	return
-}
-
-func (i *index2[T, TPtr]) DidRead() bool {
-	i.lock.RLock()
-	defer i.lock.RUnlock()
-
-	return i.didRead
 }
 
 func (i *index2[T, TPtr]) HasChanges() bool {
@@ -56,12 +59,46 @@ func (i *index2[T, TPtr]) Reset() error {
 	i.lock.Lock()
 	defer i.lock.Unlock()
 
-	i.Kennungen = make(map[string]kennung.IndexedLike[T, TPtr])
+	i.Kennungen = make(map[string]*kennung.IndexedLike[T, TPtr])
+	i.IntsToKennungen = make(map[int]TPtr)
+	i.readOnce = &sync.Once{}
+	i.hasChanges = false
 
 	return nil
 }
 
-func (i index2[T, TPtr]) WriteTo(w1 io.Writer) (n int64, err error) {
+func (ei *index2[T, TPtr]) Flush() (err error) {
+	return ei.WriteIfNecessary()
+}
+
+func (ei *index2[T, TPtr]) WriteIfNecessary() (err error) {
+	if !ei.HasChanges() {
+		log.Log().Printf("%s does not have changes", ei.path)
+		return
+	}
+
+	log.Log().Printf("%s has changes", ei.path)
+
+	var wc schnittstellen.ShaWriteCloser
+
+	if wc, err = ei.vf.WriteCloserVerzeichnisse(ei.path); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.DeferredCloser(&err, wc)
+
+	if _, err = ei.WriteTo(wc); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	log.Log().Printf("%s done writing changes", ei.path)
+
+	return
+}
+
+func (i *index2[T, TPtr]) WriteTo(w1 io.Writer) (n int64, err error) {
 	w := bufio.NewWriter(w1)
 	defer errors.DeferredFlusher(&err, w)
 
@@ -71,6 +108,34 @@ func (i index2[T, TPtr]) WriteTo(w1 io.Writer) (n int64, err error) {
 	enc := gob.NewEncoder(w)
 
 	if err = enc.Encode(i.Kennungen); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (ei *index2[T, TPtr]) ReadIfNecessary() (err error) {
+	ei.readOnce.Do(func() { err = ei.read() })
+	return
+}
+
+func (ei *index2[T, TPtr]) read() (err error) {
+	var rc io.ReadCloser
+
+	if rc, err = ei.vf.ReadCloserVerzeichnisse(ei.path); err != nil {
+		if errors.IsNotExist(err) {
+			err = nil
+			rc = sha.MakeReadCloser(bytes.NewBuffer(nil))
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	defer errors.DeferredCloser(&err, rc)
+
+	if _, err = ei.ReadFrom(rc); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -95,16 +160,19 @@ func (i *index2[T, TPtr]) ReadFrom(r1 io.Reader) (n int64, err error) {
 		}
 	}
 
-	i.didRead = true
-
 	return
 }
 
-func (i index2[T, TPtr]) Each(
+func (i *index2[T, TPtr]) Each(
 	f schnittstellen.FuncIter[kennung.IndexedLike[T, TPtr]],
 ) (err error) {
+	if err = i.ReadIfNecessary(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	for _, id := range i.Kennungen {
-		if err = f(id); err != nil {
+		if err = f(*id); err != nil {
 			if iter.IsStopIteration(err) {
 				err = nil
 			} else {
@@ -118,15 +186,20 @@ func (i index2[T, TPtr]) Each(
 	return
 }
 
-func (i index2[T, TPtr]) EachSchwanzen(
+func (i *index2[T, TPtr]) EachSchwanzen(
 	f schnittstellen.FuncIter[kennung.IndexedLike[T, TPtr]],
 ) (err error) {
+	if err = i.ReadIfNecessary(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	for _, id := range i.Kennungen {
 		if id.GetSchwanzenCount() == 0 {
 			continue
 		}
 
-		if err = f(id); err != nil {
+		if err = f(*id); err != nil {
 			if iter.IsStopIteration(err) {
 				err = nil
 			} else {
@@ -140,7 +213,12 @@ func (i index2[T, TPtr]) EachSchwanzen(
 	return
 }
 
-func (i index2[T, TPtr]) GetAll() (out []T) {
+func (i *index2[T, TPtr]) GetAll() (out []T, err error) {
+	if err = i.ReadIfNecessary(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	out = make([]T, 0, len(i.Kennungen))
 
 	for _, ki := range i.Kennungen {
@@ -150,24 +228,37 @@ func (i index2[T, TPtr]) GetAll() (out []T) {
 	return
 }
 
-func (i index2[T, TPtr]) GetInt(in int) (id T, err error) {
+func (i *index2[T, TPtr]) GetInt(in int) (id T, err error) {
+	if err = i.ReadIfNecessary(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	i.lock.RLock()
 	defer i.lock.RUnlock()
 
 	ok := false
-	id, ok = i.IntsToKennungen[in]
+	var id1 TPtr
+	id1, ok = i.IntsToKennungen[in]
 
 	if !ok {
 		err = errors.Wrap(collections.ErrNotFound{})
 		return
 	}
 
+	id = *id1
+
 	return
 }
 
-func (i index2[T, TPtr]) Get(
+func (i *index2[T, TPtr]) Get(
 	k TPtr,
-) (id kennung.IndexedLike[T, TPtr], err error) {
+) (id *kennung.IndexedLike[T, TPtr], err error) {
+	if err = i.ReadIfNecessary(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	i.lock.RLock()
 	defer i.lock.RUnlock()
 
@@ -183,6 +274,11 @@ func (i index2[T, TPtr]) Get(
 }
 
 func (i *index2[T, TPtr]) StoreDelta(d schnittstellen.Delta[T]) (err error) {
+	if err = i.ReadIfNecessary(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	i.lock.Lock()
 	defer i.lock.Unlock()
 
@@ -219,6 +315,11 @@ func (i *index2[T, TPtr]) StoreDelta(d schnittstellen.Delta[T]) (err error) {
 }
 
 func (i *index2[T, TPtr]) StoreMany(ks schnittstellen.SetLike[T]) (err error) {
+	if err = i.ReadIfNecessary(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	i.lock.Lock()
 	defer i.lock.Unlock()
 
@@ -226,6 +327,11 @@ func (i *index2[T, TPtr]) StoreMany(ks schnittstellen.SetLike[T]) (err error) {
 }
 
 func (i *index2[T, TPtr]) StoreOne(k T) (err error) {
+	if err = i.ReadIfNecessary(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if kennung.IsEmpty(k) {
 		return
 	}
@@ -240,6 +346,7 @@ func (i *index2[T, TPtr]) storeOne(k T) (err error) {
 	id, ok := i.Kennungen[k.String()]
 
 	if !ok {
+		id = &kennung.IndexedLike[T, TPtr]{}
 		id.ResetWithKennung(k)
 	}
 

@@ -7,7 +7,7 @@ import (
 )
 
 type ExternalMaybeLike interface {
-	IdLikeGetter
+	GetKennungLike() kennung.Kennung
 	kennung.FDPairGetter
 }
 
@@ -43,8 +43,12 @@ func (e ExternalMaybe[T, T1]) GetId() schnittstellen.ValueLike {
 	return e.Kennung
 }
 
-func (e ExternalMaybe[T, T1]) GetIdLike() kennung.Kennung {
+func (e ExternalMaybe[T, T1]) GetKennungLike() kennung.Kennung {
 	return e.Kennung
+}
+
+func (e *ExternalMaybe[T, T1]) GetKennungPtr() kennung.KennungPtr {
+	return T1(&e.Kennung)
 }
 
 func (e ExternalMaybe[T, T1]) GetFDs() ExternalFDs {

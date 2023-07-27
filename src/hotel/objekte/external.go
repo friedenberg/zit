@@ -88,6 +88,10 @@ func (a External[T, T1, T2, T3]) GetKennungLike() kennung.Kennung {
 	return a.Sku.GetKennung()
 }
 
+func (a *External[T, T1, T2, T3]) GetKennungPtr() kennung.KennungPtr {
+	return T3(&a.Sku.Kennung)
+}
+
 func (a External[T, T1, T2, T3]) GetIdLike() (il kennung.Kennung) {
 	return a.Sku.GetKennung()
 }

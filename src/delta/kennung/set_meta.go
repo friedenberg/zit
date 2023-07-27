@@ -418,7 +418,7 @@ func (ms metaSet) GetEtiketten() EtikettSet {
 					return
 				}
 
-				return es.Add(e.GetEtikett())
+				return es.AddPtr(e.GetEtikett())
 			},
 			// TODO-P1 modify sigil matcher to allow child traversal
 			s.Matcher,

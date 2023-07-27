@@ -129,7 +129,7 @@ func (u *Umwelt) FormatKastenTransacted() schnittstellen.FuncWriterFormat[kasten
 	)
 }
 
-func (u *Umwelt) FormatTypCheckedOut() schnittstellen.FuncWriterFormat[typ.CheckedOut] {
+func (u *Umwelt) FormatTypCheckedOut() schnittstellen.FuncWriterFormat[*typ.CheckedOut] {
 	return typ.MakeCliFormatCheckedOut(
 		u.Standort(),
 		u.FormatColorWriter(),
@@ -138,7 +138,7 @@ func (u *Umwelt) FormatTypCheckedOut() schnittstellen.FuncWriterFormat[typ.Check
 	)
 }
 
-func (u *Umwelt) FormatKastenCheckedOut() schnittstellen.FuncWriterFormat[kasten.CheckedOut] {
+func (u *Umwelt) FormatKastenCheckedOut() schnittstellen.FuncWriterFormat[*kasten.CheckedOut] {
 	return kasten.MakeCliFormatCheckedOut(
 		u.Standort(),
 		u.FormatColorWriter(),
@@ -147,7 +147,7 @@ func (u *Umwelt) FormatKastenCheckedOut() schnittstellen.FuncWriterFormat[kasten
 	)
 }
 
-func (u *Umwelt) FormatEtikettCheckedOut() schnittstellen.FuncWriterFormat[etikett.CheckedOut] {
+func (u *Umwelt) FormatEtikettCheckedOut() schnittstellen.FuncWriterFormat[*etikett.CheckedOut] {
 	return etikett.MakeCliFormatCheckedOut(
 		u.Standort(),
 		u.FormatColorWriter(),
@@ -207,7 +207,7 @@ func (u *Umwelt) FormatExternalFD() schnittstellen.FuncWriterFormat[kennung.FD] 
 	)
 }
 
-func (u *Umwelt) FormatZettelCheckedOut() schnittstellen.FuncWriterFormat[zettel.CheckedOut] {
+func (u *Umwelt) FormatZettelCheckedOut() schnittstellen.FuncWriterFormat[*zettel.CheckedOut] {
 	return zettel.MakeCliFormatCheckedOut(
 		u.Standort(),
 		u.FormatColorWriter(),

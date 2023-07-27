@@ -19,7 +19,7 @@ func MakeCliFormatCheckedOut(
 	hf schnittstellen.FuncWriterFormat[kennung.Hinweis],
 	sf schnittstellen.FuncWriterFormat[schnittstellen.ShaLike],
 	mf schnittstellen.FuncWriterFormat[metadatei.GetterPtr],
-) schnittstellen.FuncWriterFormat[CheckedOut] {
+) schnittstellen.FuncWriterFormat[*CheckedOut] {
 	wzef := makeWriterFuncZettel(
 		s, cw, hf, sf, mf,
 	)
@@ -28,7 +28,7 @@ func MakeCliFormatCheckedOut(
 		s, cw, hf, sf, mf,
 	)
 
-	return func(w io.Writer, z CheckedOut) (n int64, err error) {
+	return func(w io.Writer, z *CheckedOut) (n int64, err error) {
 		if z.External.Sku.FDs.Akte.Path == "" {
 			return format.Write(
 				w,
@@ -51,8 +51,8 @@ func makeWriterFuncZettel(
 	hf schnittstellen.FuncWriterFormat[kennung.Hinweis],
 	sf schnittstellen.FuncWriterFormat[schnittstellen.ShaLike],
 	mf schnittstellen.FuncWriterFormat[metadatei.GetterPtr],
-) schnittstellen.FuncWriterFormat[CheckedOut] {
-	return func(w io.Writer, z CheckedOut) (n int64, err error) {
+) schnittstellen.FuncWriterFormat[*CheckedOut] {
+	return func(w io.Writer, z *CheckedOut) (n int64, err error) {
 		return format.Write(
 			w,
 			format.MakeFormatString("["),
@@ -78,8 +78,8 @@ func makeWriterFuncAkte(
 	hf schnittstellen.FuncWriterFormat[kennung.Hinweis],
 	sf schnittstellen.FuncWriterFormat[schnittstellen.ShaLike],
 	mf schnittstellen.FuncWriterFormat[metadatei.GetterPtr],
-) schnittstellen.FuncWriterFormat[CheckedOut] {
-	return func(w io.Writer, z CheckedOut) (n int64, err error) {
+) schnittstellen.FuncWriterFormat[*CheckedOut] {
+	return func(w io.Writer, z *CheckedOut) (n int64, err error) {
 		todo.Change("refactor to support proper spacing")
 		return format.Write(
 			w,

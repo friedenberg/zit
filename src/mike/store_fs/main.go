@@ -253,7 +253,7 @@ func (s *Store) ReadFiles(
 		iter.MakeChain(
 			func(ilg kennung.IdLikeGetter) (err error) {
 				switch il := ilg.(type) {
-				case cwd.Kasten:
+				case *cwd.Kasten:
 					if err = s.storeObjekten.GetAbbrStore().Kisten().Exists(
 						il.Kennung,
 					); err == nil {
@@ -285,7 +285,7 @@ func (s *Store) ReadFiles(
 						return
 					}
 
-				case cwd.Typ:
+				case *cwd.Typ:
 					if err = s.storeObjekten.GetAbbrStore().Typen().Exists(
 						il.Kennung,
 					); err == nil {
@@ -317,7 +317,7 @@ func (s *Store) ReadFiles(
 						return
 					}
 
-				case cwd.Etikett:
+				case *cwd.Etikett:
 					if err = s.storeObjekten.GetAbbrStore().Etiketten().Exists(
 						il.Kennung,
 					); err == nil {

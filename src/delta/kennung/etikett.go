@@ -15,7 +15,7 @@ func init() {
 }
 
 type EtikettLike interface {
-	GetEtikett() Etikett
+	GetEtikett() *Etikett
 }
 
 const EtikettRegexString = `^[-a-z0-9_]+$`
@@ -55,7 +55,7 @@ func (e Etikett) GetQueryPrefix() string {
 	return "-"
 }
 
-func (e Etikett) GetEtikett() Etikett {
+func (e *Etikett) GetEtikett() *Etikett {
 	return e
 }
 

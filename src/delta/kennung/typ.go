@@ -114,7 +114,7 @@ func (t Typ) ContainsMatchableExactly(m Matchable) bool {
 		return true
 	}
 
-	t2, ok := m.GetIdLike().(Typ)
+	t2, ok := m.GetKennungLike().(Typ)
 
 	if !ok {
 		return false

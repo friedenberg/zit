@@ -87,7 +87,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	if e, ok := cwdFiles.GetZettel(h); ok {
+	if e, ok := cwdFiles.GetZettel(&h); ok {
 		var ze zettel.External
 
 		ze, err = u.StoreObjekten().Zettel().ReadOneExternal(e, zt)

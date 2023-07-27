@@ -156,10 +156,10 @@ func (s *Store) CheckoutOneZettel(
 	}
 
 	if files.Exists(filename) {
-		var e cwd.Zettel
+		var e *cwd.Zettel
 		ok := false
 
-		if e, ok = options.Cwd.GetZettel(sz.Sku.GetKennung()); !ok {
+		if e, ok = options.Cwd.GetZettel(sz.Sku.GetKennungPtr()); !ok {
 			err = errors.Errorf(
 				"file at %s not recognized as zettel: %s",
 				filename,

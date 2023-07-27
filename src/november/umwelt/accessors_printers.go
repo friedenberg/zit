@@ -86,7 +86,7 @@ func (u *Umwelt) PrinterKastenTransacted() schnittstellen.FuncIter[*kasten.Trans
 }
 
 func (u *Umwelt) PrinterTypCheckedOut() schnittstellen.FuncIter[*typ.CheckedOut] {
-	return format.MakeWriterToWithNewLinesPtr(
+	return format.MakeWriterToWithNewLines(
 		u.Out(),
 		wrapWithCheckedOutState(
 			u.FormatTypCheckedOut(),
@@ -95,7 +95,7 @@ func (u *Umwelt) PrinterTypCheckedOut() schnittstellen.FuncIter[*typ.CheckedOut]
 }
 
 func (u *Umwelt) PrinterKastenCheckedOut() schnittstellen.FuncIter[*kasten.CheckedOut] {
-	return format.MakeWriterToWithNewLinesPtr(
+	return format.MakeWriterToWithNewLines(
 		u.Out(),
 		wrapWithCheckedOutState(
 			u.FormatKastenCheckedOut(),
@@ -104,7 +104,7 @@ func (u *Umwelt) PrinterKastenCheckedOut() schnittstellen.FuncIter[*kasten.Check
 }
 
 func (u *Umwelt) PrinterEtikettCheckedOut() schnittstellen.FuncIter[*etikett.CheckedOut] {
-	return format.MakeWriterToWithNewLinesPtr(
+	return format.MakeWriterToWithNewLines(
 		u.Out(),
 		wrapWithCheckedOutState(
 			u.FormatEtikettCheckedOut(),
@@ -182,7 +182,7 @@ func (u *Umwelt) PrinterZettelExternal() schnittstellen.FuncIter[*zettel.Externa
 }
 
 func (u *Umwelt) PrinterZettelCheckedOut() schnittstellen.FuncIter[*zettel.CheckedOut] {
-	return format.MakeWriterToWithNewLinesPtr(
+	return format.MakeWriterToWithNewLines(
 		u.Out(),
 		wrapWithCheckedOutState(
 			u.FormatZettelCheckedOut(),
@@ -191,7 +191,7 @@ func (u *Umwelt) PrinterZettelCheckedOut() schnittstellen.FuncIter[*zettel.Check
 }
 
 func (u *Umwelt) PrinterZettelCheckedOutFresh() schnittstellen.FuncIter[*zettel.CheckedOut] {
-	return format.MakeWriterToWithNewLinesPtr(
+	return format.MakeWriterToWithNewLines(
 		u.Out(),
 		u.FormatZettelCheckedOut(),
 	)
