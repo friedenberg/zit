@@ -34,8 +34,6 @@ func (c Checkin) Run(
 		iter.MakeChain(
 			objekte.MakeFilterFromMetaSet(ms),
 			func(co objekte.CheckedOutLike) (err error) {
-				// var tl objekte.TransactedLike
-
 				switch aco := co.(type) {
 				case *zettel.CheckedOut:
 					if _, err = u.StoreObjekten().Zettel().UpdateCheckedOut(

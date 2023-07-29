@@ -24,15 +24,15 @@ func (u *Umwelt) KonfigPtr() *konfig.Compiled {
 	return &u.konfig
 }
 
-func (u *Umwelt) Out() io.Writer {
-	return u.out
-}
-
 func (u *Umwelt) In() io.Reader {
 	return u.in
 }
 
-func (u *Umwelt) Err() io.Writer {
+func (u *Umwelt) Out() schnittstellen.WriterAndStringWriter {
+	return u.out
+}
+
+func (u *Umwelt) Err() schnittstellen.WriterAndStringWriter {
 	return u.err
 }
 

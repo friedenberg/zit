@@ -150,6 +150,10 @@ func (a Transacted[T, T1, T2, T3]) GetSkuLike() (sk sku.SkuLike) {
 	return a.Sku
 }
 
+func (a *Transacted[T, T1, T2, T3]) GetSkuLikePtr() (sk sku.SkuLikePtr) {
+	return &a.Sku
+}
+
 func (a Transacted[T, T1, T2, T3]) String() string {
 	return a.GetSkuLike().String()
 }

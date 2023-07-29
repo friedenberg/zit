@@ -17,6 +17,7 @@ import (
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/hotel/objekte"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
+	"github.com/friedenberg/zit/src/hotel/sku_formats"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/cwd"
@@ -654,7 +655,7 @@ func (s *zettelStore) ReindexOne(
 	var tz *zettel.Transacted
 	defer s.pool.Put(tz)
 
-	errors.Log().Printf("reindexing: %s", sku.String(sk))
+	errors.Log().Printf("reindexing: %s", sku_formats.String(sk))
 
 	if tz, err = s.InflateFromSku(sk); err != nil {
 		// TODO-P2 decide on how to handle format errors

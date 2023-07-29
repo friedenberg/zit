@@ -123,6 +123,10 @@ func (z Metadatei) GetBezeichnung() bezeichnung.Bezeichnung {
 	return z.Bezeichnung
 }
 
+func (z *Metadatei) GetBezeichnungPtr() *bezeichnung.Bezeichnung {
+	return &z.Bezeichnung
+}
+
 func (z Metadatei) GetEtiketten() kennung.EtikettSet {
 	if z.Etiketten == nil {
 		return kennung.MakeEtikettSet()
@@ -133,6 +137,10 @@ func (z Metadatei) GetEtiketten() kennung.EtikettSet {
 
 func (z Metadatei) GetTyp() kennung.Typ {
 	return z.Typ
+}
+
+func (z *Metadatei) GetTypPtr() *kennung.Typ {
+	return &z.Typ
 }
 
 func (z Metadatei) GetTai() kennung.Tai {

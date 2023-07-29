@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/golf/sku"
+	"github.com/friedenberg/zit/src/hotel/sku_formats"
 )
 
 type formatAkte struct {
@@ -81,7 +82,7 @@ func (f formatAkte) FormatParsedAkte(w io.Writer, o Akte) (n int64, err error) {
 
 		l := fmt.Sprintf(
 			"%s\n",
-			sku.String(sk),
+			sku_formats.String(sk),
 		)
 
 		if n1, err = bw.WriteString(l); err != nil {

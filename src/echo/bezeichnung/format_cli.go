@@ -26,3 +26,31 @@ func MakeCliFormat(
 		)
 	}
 }
+
+type bezeichnungCliFormat struct {
+	stringFormatWriter schnittstellen.StringFormatWriter[string]
+}
+
+func MakeCliFormat2(co format.ColorOptions) *bezeichnungCliFormat {
+	return &bezeichnungCliFormat{
+		stringFormatWriter: format.MakeColorStringFormatWriter[string](
+			co,
+			format.MakeStringStringFormatWriter[string](),
+			format.ColorTypeIdentifier,
+		),
+	}
+}
+
+func (f *bezeichnungCliFormat) WriteStringFormat(
+	w io.StringWriter,
+	k *Bezeichnung,
+) (n int64, err error) {
+	v := k.value
+
+	switch {
+	case len(v) > 66:
+		v = v[:66] + "…"
+	}
+
+	return f.stringFormatWriter.WriteStringFormat(w, v)
+}

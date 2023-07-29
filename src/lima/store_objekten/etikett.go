@@ -67,7 +67,11 @@ func makeEtikettStore(
 
 	newOrUpdated := func(t *etikett.Transacted) (err error) {
 		s.StoreUtil.CommitUpdatedTransacted(t)
-		s.StoreUtil.GetKonfigPtr().AddEtikett(t)
+
+		if err = s.StoreUtil.GetKonfigPtr().AddEtikett(t); err != nil {
+      err = errors.Wrap(err)
+      return
+    }
 
 		return
 	}

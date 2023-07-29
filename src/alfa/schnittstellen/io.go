@@ -8,13 +8,24 @@ type (
 	FuncReaderFormat[T any]  func(io.Reader, *T) (int64, error)
 	FuncWriterElement[T any] func(io.Writer, *T) (int64, error)
 
-	//TODO switch to below
+	// TODO-P3 switch to below
 	FuncReaderFormatInterface[T any]  func(io.Reader, T) (int64, error)
 	FuncReaderElementInterface[T any] func(io.Writer, T) (int64, error)
 	FuncWriterElementInterface[T any] func(io.Writer, T) (int64, error)
 )
 
 type (
+	WriterAndStringWriter interface {
+		io.Writer
+		io.StringWriter
+	}
+
 	FuncWriter              func(io.Writer) (int64, error)
 	FuncWriterFormat[T any] func(io.Writer, T) (int64, error)
+
+	StringFormatWriter[T any] interface {
+		WriteStringFormat(io.StringWriter, T) (int64, error)
+	}
+
+	FuncStringWriterFormat[T any] func(io.StringWriter, T) (int64, error)
 )

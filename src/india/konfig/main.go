@@ -396,25 +396,31 @@ func (k *compiled) SetTransacted(
 
 func (k *compiled) AddKasten(
 	b *kasten.Transacted,
-) {
+) (err error) {
 	k.lock.Lock()
 	defer k.lock.Unlock()
 	k.hasChanges = true
 
-	iter.AddOrReplaceIfGreater(k.Kisten, *b)
+	if err = iter.AddOrReplaceIfGreater(k.Kisten, *b); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }
 
 func (k *compiled) AddTyp(
 	b *typ.Transacted,
-) {
+) (err error) {
 	k.lock.Lock()
 	defer k.lock.Unlock()
 
 	k.hasChanges = true
 
-	iter.AddOrReplaceIfGreater(k.Typen, *b)
+	if err = iter.AddOrReplaceIfGreater(k.Typen, *b); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }

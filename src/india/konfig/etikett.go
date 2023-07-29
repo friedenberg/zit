@@ -5,6 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
@@ -122,7 +123,7 @@ func (k *compiled) AccumulateImplicitEtiketten(
 
 func (k *compiled) AddEtikett(
 	b1 *etikett.Transacted,
-) {
+) (err error) {
 	k.lock.Lock()
 	defer k.lock.Unlock()
 	k.hasChanges = true
@@ -131,10 +132,9 @@ func (k *compiled) AddEtikett(
 		Transacted: *b1,
 	}
 
-	a, ok := k.Etiketten.Get(b.String())
-
-	if !ok || a.Less(b) {
-		k.Etiketten.Add(b)
+	if err = iter.AddOrReplaceIfGreater(k.Etiketten, b); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

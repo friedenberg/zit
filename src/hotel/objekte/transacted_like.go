@@ -21,6 +21,7 @@ type TransactedLikePtr interface {
 	metadatei.GetterPtr
 	metadatei.Setter
 	GetKennungPtr() kennung.KennungPtr
+	GetSkuLikePtr() sku.SkuLikePtr
 	SetTai(kennung.Tai)
 }
 

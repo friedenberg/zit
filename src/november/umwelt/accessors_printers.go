@@ -9,11 +9,13 @@ import (
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/hotel/etikett"
 	"github.com/friedenberg/zit/src/hotel/kasten"
 	"github.com/friedenberg/zit/src/hotel/objekte"
+	"github.com/friedenberg/zit/src/hotel/sku_formats"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/mike/store_fs"
@@ -55,12 +57,46 @@ func (u *Umwelt) PrinterKonfigTransacted() schnittstellen.FuncIter[*erworben.Tra
 	)
 }
 
+func (u *Umwelt) StringFormatWriterShaLike() schnittstellen.StringFormatWriter[schnittstellen.ShaLike] {
+	return kennung.MakeShaCliFormat2(
+		u.FormatColorOptions(),
+		u.StoreObjekten().GetAbbrStore().Shas().Abbreviate,
+	)
+}
+
+func (u *Umwelt) StringFormatWriterKennung() schnittstellen.StringFormatWriter[kennung.KennungPtr] {
+	return kennung.MakeKennungCliFormat(u.FormatColorOptions())
+}
+
+func (u *Umwelt) StringFormatWriterTyp() schnittstellen.StringFormatWriter[*kennung.Typ] {
+	return kennung.MakeTypCliFormat(u.FormatColorOptions())
+}
+
+func (u *Umwelt) StringFormatWriterBezeichnung() schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung] {
+	return bezeichnung.MakeCliFormat2(u.FormatColorOptions())
+}
+
+func (u *Umwelt) StringFormatWriterEtiketten() schnittstellen.StringFormatWriter[kennung.EtikettSet] {
+	return kennung.MakeEtikettenCliFormat()
+}
+
 func (u *Umwelt) PrinterTypTransacted() schnittstellen.FuncIter[*typ.Transacted] {
-	return format.MakeWriterToWithNewLinesPtr(
+	sw := sku_formats.MakeCliFormat(
+		sku_formats.CliOptions{},
+		u.StringFormatWriterShaLike(),
+		u.StringFormatWriterKennung(),
+		u.StringFormatWriterTyp(),
+		u.StringFormatWriterBezeichnung(),
+		u.StringFormatWriterEtiketten(),
+	)
+
+	return format.MakeDelimFuncStringFormatWriter[*typ.Transacted](
+		"\n",
 		u.Out(),
-		wrapWithTimePrefixerIfNecessary(
-			u.Konfig(),
-			u.FormatTypTransacted(),
+		format.MakeFuncStringFormatWriter(
+			func(w io.StringWriter, o *typ.Transacted) (n int64, err error) {
+				return sw.WriteStringFormat(w, o.GetSkuLikePtr())
+			},
 		),
 	)
 }
@@ -132,33 +168,21 @@ func (u *Umwelt) PrinterZettelTransacted() schnittstellen.FuncIter[*zettel.Trans
 }
 
 func (u *Umwelt) PrinterTransactedLike() schnittstellen.FuncIter[objekte.TransactedLikePtr] {
-	opIncludeTyp := u.FormatTransactedLike(true)
-	opExcludeTyp := u.FormatTransactedLike(false)
-	e := u.FormatEtikettTransacted()
-	k := u.FormatKastenTransacted()
-	ko := u.FormatKonfigTransacted()
+	sw := sku_formats.MakeCliFormat(
+		sku_formats.CliOptions{PrefixTai: u.konfig.UsePrintTime()},
+		u.StringFormatWriterShaLike(),
+		u.StringFormatWriterKennung(),
+		u.StringFormatWriterTyp(),
+		u.StringFormatWriterBezeichnung(),
+		u.StringFormatWriterEtiketten(),
+	)
 
-	return format.MakeWriterToWithNewLines(
+	return format.MakeDelimFuncStringFormatWriter[objekte.TransactedLikePtr](
+		"\n",
 		u.Out(),
-		wrapWithTimePrefixerIfNecessary[objekte.TransactedLikePtr](
-			u.Konfig(),
-			func(out io.Writer, tl objekte.TransactedLikePtr) (n int64, err error) {
-				switch atl := tl.(type) {
-				case *etikett.Transacted:
-					return e(out, *atl)
-
-				case *kasten.Transacted:
-					return k(out, *atl)
-
-				case *erworben.Transacted:
-					return ko(out, *atl)
-
-				case *typ.Transacted:
-					return opExcludeTyp(out, tl)
-
-				default:
-					return opIncludeTyp(out, tl)
-				}
+		format.MakeFuncStringFormatWriter[objekte.TransactedLikePtr](
+			func(w io.StringWriter, o objekte.TransactedLikePtr) (n int64, err error) {
+				return sw.WriteStringFormat(w, o.GetSkuLikePtr())
 			},
 		),
 	)

@@ -20,12 +20,18 @@ import (
 	"github.com/friedenberg/zit/src/mike/store_fs"
 )
 
-//                                                    _
-//    ___ ___  _ __ ___  _ __   ___  _ __   ___ _ __ | |_ ___
-//   / __/ _ \| '_ ` _ \| '_ \ / _ \| '_ \ / _ \ '_ \| __/ __|
-//  | (_| (_) | | | | | | |_) | (_) | | | |  __/ | | | |_\__ \
-//   \___\___/|_| |_| |_| .__/ \___/|_| |_|\___|_| |_|\__|___/
-//                      |_|
+//	                                                _
+//	___ ___  _ __ ___  _ __   ___  _ __   ___ _ __ | |_ ___
+//
+// / __/ _ \| '_ ` _ \| '_ \ / _ \| '_ \ / _ \ '_ \| __/ __|
+//
+//	| (_| (_) | | | | | | |_) | (_) | | | |  __/ | | | |_\__ \
+//	 \___\___/|_| |_| |_| .__/ \___/|_| |_|\___|_| |_|\__|___/
+//	                    |_|
+func (u *Umwelt) FormatColorOptions() (o format.ColorOptions) {
+	o.OffEntirely = !u.outIsTty
+	return
+}
 
 func (u *Umwelt) FormatColorWriter() format.FuncColorWriter {
 	if u.outIsTty {
@@ -101,15 +107,6 @@ func (u *Umwelt) FormatEtikettTransacted() schnittstellen.FuncWriterFormat[etike
 		u.FormatColorWriter(),
 		u.FormatSha(u.StoreObjekten().GetAbbrStore().Shas().Abbreviate),
 		u.FormatEtikett(),
-	)
-}
-
-func (u *Umwelt) FormatTypTransacted() schnittstellen.FuncWriterFormat[typ.Transacted] {
-	return typ.MakeCliFormatTransacted(
-		u.Standort(),
-		u.FormatColorWriter(),
-		u.FormatSha(u.StoreObjekten().GetAbbrStore().Shas().Abbreviate),
-		u.FormatTyp(),
 	)
 }
 

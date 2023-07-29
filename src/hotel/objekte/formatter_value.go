@@ -14,7 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
-	"github.com/friedenberg/zit/src/golf/sku"
+	"github.com/friedenberg/zit/src/hotel/sku_formats"
 )
 
 type FormatterValue struct {
@@ -175,20 +175,20 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		return func(e TransactedLikePtr) (err error) {
 			_, err = fmt.Fprintln(
 				out,
-				sku.StringMetadateiSansTai(e.GetSkuLike()),
+				sku_formats.StringMetadateiSansTai(e.GetSkuLike()),
 			)
 			return
 		}
 
 	case "sku-metadatei":
 		return func(e TransactedLikePtr) (err error) {
-			_, err = fmt.Fprintln(out, sku.StringMetadatei(e.GetSkuLike()))
+			_, err = fmt.Fprintln(out, sku_formats.StringMetadatei(e.GetSkuLike()))
 			return
 		}
 
 	case "sku":
 		return func(e TransactedLikePtr) (err error) {
-			_, err = fmt.Fprintln(out, sku.String(e.GetSkuLike()))
+			_, err = fmt.Fprintln(out, sku_formats.String(e.GetSkuLike()))
 			return
 		}
 

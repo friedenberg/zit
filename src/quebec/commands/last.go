@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/golf/transaktion"
+	"github.com/friedenberg/zit/src/hotel/sku_formats"
 	"github.com/friedenberg/zit/src/india/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
@@ -66,7 +67,7 @@ func (c Last) runWithBestandsaufnahm(u *umwelt.Umwelt) (err error) {
 	if err = sku.HeapEach(
 		b.Akte.Skus,
 		func(o sku.SkuLike) (err error) {
-			errors.Out().Print(sku.StringMetadatei(o))
+			errors.Out().Print(sku_formats.StringMetadatei(o))
 			return
 		},
 	); err != nil {
@@ -90,7 +91,7 @@ func (c Last) runWithTransaktion(u *umwelt.Umwelt) (err error) {
 	errors.TodoP3("support log line format for skus")
 	if err = transaktion.Skus.Each(
 		func(o sku.SkuLike) (err error) {
-			errors.Out().Print(sku.String(o))
+			errors.Out().Print(sku_formats.String(o))
 			return
 		},
 	); err != nil {

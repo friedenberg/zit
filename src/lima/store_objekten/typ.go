@@ -5,6 +5,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/alfa/toml"
 	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/golf/transaktion"
@@ -67,7 +68,11 @@ func makeTypStore(
 
 	newOrUpdated := func(t *typ.Transacted) (err error) {
 		s.StoreUtil.CommitUpdatedTransacted(t)
-		s.StoreUtil.GetKonfigPtr().AddTyp(t)
+
+		if err = s.StoreUtil.GetKonfigPtr().AddTyp(t); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
 		return
 	}
@@ -117,7 +122,9 @@ func (s typStore) addOne(t *typ.Transacted) (err error) {
 }
 
 func (s typStore) updateOne(t *typ.Transacted) (err error) {
+	log.Log().Printf("adding one: %s", t.GetSkuLike())
 	s.StoreUtil.GetKonfigPtr().AddTyp(t)
+	log.Log().Printf("done adding one: %s", t.GetSkuLike())
 	return
 }
 
@@ -125,7 +132,7 @@ func (s typStore) updateOne(t *typ.Transacted) (err error) {
 func (s typStore) ReadAllSchwanzen(
 	f schnittstellen.FuncIter[*typ.Transacted],
 ) (err error) {
-	//TODO-P2 switch to pointers
+	// TODO-P2 switch to pointers
 	if err = s.StoreUtil.GetKonfig().Typen.Each(
 		func(e typ.Transacted) (err error) {
 			return f(&e)
@@ -240,6 +247,7 @@ func (s typStore) ReadOne(
 ) (tt *typ.Transacted, err error) {
 	errors.TodoP3("add support for working directory")
 	errors.TodoP3("inherited-typen-etiketten")
+	log.Log().Printf("reading: %s", k)
 	tt = s.StoreUtil.GetKonfig().GetApproximatedTyp(*k).ActualOrNil()
 
 	if tt == nil {

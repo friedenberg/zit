@@ -8,8 +8,8 @@ import (
 )
 
 type IndexedLike[
-T KennungLike[T],
-TPtr KennungLikePtr[T],
+	T KennungLike[T],
+	TPtr KennungLikePtr[T],
 ] struct {
 	Int            int
 	Kennung        T
