@@ -10,8 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/hotel/objekte"
 	"github.com/friedenberg/zit/src/hotel/sku_formats"
-	"github.com/friedenberg/zit/src/juliett/zettel"
-	"github.com/friedenberg/zit/src/mike/store_fs"
 )
 
 func wrapWithCheckedOutState[T objekte.CheckedOutLike](
@@ -81,50 +79,10 @@ func (u *Umwelt) PrinterTransactedLike() schnittstellen.FuncIter[objekte.Transac
 	)
 }
 
-func (u *Umwelt) PrinterZettelTransactedDelta() schnittstellen.FuncIter[*zettel.Transacted] {
-	return format.MakeWriterToWithNewLinesPtr(
-		u.Out(),
-		wrapWithTimePrefixerIfNecessary(
-			u.Konfig(),
-			u.FormatZettelTransactedDelta(),
-		),
-	)
-}
-
-func (u *Umwelt) PrinterZettelExternal() schnittstellen.FuncIter[*zettel.External] {
-	return format.MakeWriterToWithNewLinesPtr(
-		u.Out(),
-		u.FormatZettelExternal(),
-	)
-}
-
-func (u *Umwelt) PrinterZettelCheckedOut() schnittstellen.FuncIter[*zettel.CheckedOut] {
-	return format.MakeWriterToWithNewLines(
-		u.Out(),
-		wrapWithCheckedOutState(
-			u.FormatZettelCheckedOut(),
-		),
-	)
-}
-
-func (u *Umwelt) PrinterZettelCheckedOutFresh() schnittstellen.FuncIter[*zettel.CheckedOut] {
-	return format.MakeWriterToWithNewLines(
-		u.Out(),
-		u.FormatZettelCheckedOut(),
-	)
-}
-
 func (u *Umwelt) PrinterFileNotRecognized() schnittstellen.FuncIter[*kennung.FD] {
 	return format.MakeWriterToWithNewLinesPtr(
 		u.Out(),
 		u.FormatFileNotRecognized(),
-	)
-}
-
-func (u *Umwelt) PrinterFileRecognized() schnittstellen.FuncIter[*store_fs.FileRecognized] {
-	return format.MakeWriterToWithNewLinesPtr(
-		u.Out(),
-		u.FormatFileRecognized(),
 	)
 }
 
@@ -145,7 +103,7 @@ func (u *Umwelt) PrinterHeader() schnittstellen.FuncIter[*string] {
 	)
 }
 
-func (u *Umwelt) PrinterJustCheckedOutLike() schnittstellen.FuncIter[objekte.CheckedOutLikePtr] {
+func (u *Umwelt) PrinterCheckedOutLike() schnittstellen.FuncIter[objekte.CheckedOutLikePtr] {
 	p := objekte.MakeCliFormat(
 		objekte.CliOptions{},
 		u.StringFormatWriterShaLike(),
@@ -164,8 +122,4 @@ func (u *Umwelt) PrinterJustCheckedOutLike() schnittstellen.FuncIter[objekte.Che
 		u.Out(),
 		p,
 	)
-}
-
-func (u *Umwelt) PrinterCheckedOutLike() schnittstellen.FuncIter[objekte.CheckedOutLikePtr] {
-	return u.PrinterJustCheckedOutLike()
 }

@@ -225,7 +225,7 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 	u.storeObjekten.Kasten().SetLogWriter(lw)
 
 	u.storeWorkingDirectory.SetCheckedOutLogPrinter(
-		u.PrinterJustCheckedOutLike(),
+		u.PrinterCheckedOutLike(),
 	)
 
 	u.storesInitialized = true
