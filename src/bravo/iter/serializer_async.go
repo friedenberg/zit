@@ -1,4 +1,4 @@
-package collections
+package iter
 
 import "github.com/friedenberg/zit/src/alfa/schnittstellen"
 
