@@ -252,7 +252,7 @@ function indexes_are_implicitly_correct { # @test
 	assert_output - <<-EOM
 		[one/uno@036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064 !md "bez"]
 		          deleted [one/uno.zettel]
-		          deleted [one]
+		          deleted [one/]
 	EOM
 
 	{

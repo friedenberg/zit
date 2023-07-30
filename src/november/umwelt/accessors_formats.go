@@ -5,7 +5,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/mike/store_fs"
 )
 
@@ -41,26 +40,10 @@ func (u *Umwelt) FormatSha(
 //   \___/|_.__// |\___|_|\_\\__\___|_| |_|
 //            |__/
 
-func (u *Umwelt) FormatExternalFD() schnittstellen.FuncWriterFormat[kennung.FD] {
-	return zettel.MakeCliFormatFD(
-		u.Standort(),
-		u.FormatColorWriter(),
-	)
-}
-
 func (u *Umwelt) FormatFileNotRecognized() schnittstellen.FuncWriterFormat[kennung.FD] {
 	return store_fs.MakeCliFormatNotRecognized(
 		u.FormatColorWriter(),
 		u.Standort(),
 		u.FormatSha(u.StoreObjekten().GetAbbrStore().Shas().Abbreviate),
-	)
-}
-
-func (u *Umwelt) FormatFDDeleted() schnittstellen.FuncWriterFormat[kennung.FD] {
-	return store_fs.MakeCliFormatFDDeleted(
-		u.Konfig().DryRun,
-		u.FormatColorWriter(),
-		u.Standort(),
-		u.FormatExternalFD(),
 	)
 }

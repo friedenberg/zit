@@ -21,9 +21,9 @@ function clean_all { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		          deleted [md.typ]
+		          deleted [one/]
 		          deleted [one/dos.zettel]
 		          deleted [one/uno.zettel]
-		          deleted [one]
 		          deleted [tag-1.etikett]
 		          deleted [tag-2.etikett]
 		          deleted [tag-3.etikett]
@@ -41,7 +41,7 @@ function clean_zettels { # @test
 	assert_output_unsorted - <<-EOM
 		          deleted [one/dos.zettel]
 		          deleted [one/uno.zettel]
-		          deleted [one]
+		          deleted [one/]
 	EOM
 
 	run find . -maxdepth 2 ! -ipath './.zit*'
@@ -157,7 +157,7 @@ function clean_all_force_dirty_wd { # @test
 		          deleted [md.typ]
 		          deleted [one/dos.zettel]
 		          deleted [one/uno.zettel]
-		          deleted [one]
+		          deleted [one/]
 		          deleted [tag-1.etikett]
 		          deleted [tag-2.etikett]
 		          deleted [tag-3.etikett]
