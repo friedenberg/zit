@@ -20,7 +20,7 @@ func (c OpenFiles) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	v := "opening files"
 
-	if err = u.PrinterHeader()(&v); err != nil {
+	if err = u.PrinterHeader()(v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -5,11 +5,12 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/string_writer_format"
 )
 
 type (
-	color     string
-	ColorType color
+	ColorType    = string_writer_format.ColorType
+	ColorOptions = string_writer_format.ColorOptions
 )
 
 const (
@@ -50,10 +51,6 @@ func MakeFormatWriterWithColor(
 			MakeFormatString(string(colorReset)),
 		)
 	}
-}
-
-type ColorOptions struct {
-	OffEntirely bool
 }
 
 type colorStringFormat[T any] struct {

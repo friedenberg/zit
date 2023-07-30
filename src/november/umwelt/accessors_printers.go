@@ -4,6 +4,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/string_writer_format"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
@@ -11,6 +12,11 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku_formats"
 	"github.com/friedenberg/zit/src/mike/store_fs"
 )
+
+func (u *Umwelt) FormatColorOptions() (o format.ColorOptions) {
+	o.OffEntirely = !u.outIsTty
+	return
+}
 
 func (u *Umwelt) StringFormatWriterShaLike() schnittstellen.StringFormatWriter[schnittstellen.ShaLike] {
 	return kennung.MakeShaCliFormat2(
@@ -57,9 +63,18 @@ func (u *Umwelt) PrinterTransactedLike() schnittstellen.FuncIter[objekte.Transac
 }
 
 func (u *Umwelt) PrinterFileNotRecognized() schnittstellen.FuncIter[*kennung.FD] {
-	return format.MakeWriterToWithNewLinesPtr(
+	p := store_fs.MakeFileNotRecognizedStringWriterFormat(
+		kennung.MakeFDCliFormat(
+			u.FormatColorOptions(),
+			u.standort.MakeRelativePathStringFormatWriter(),
+		),
+		u.StringFormatWriterShaLike(),
+	)
+
+	return format.MakeDelimFuncStringFormatWriter[*kennung.FD](
+		"\n",
 		u.Out(),
-		u.FormatFileNotRecognized(),
+		p,
 	)
 }
 
@@ -79,13 +94,11 @@ func (u *Umwelt) PrinterFDDeleted() schnittstellen.FuncIter[*kennung.FD] {
 	)
 }
 
-func (u *Umwelt) PrinterHeader() schnittstellen.FuncIter[*string] {
-	return format.MakeWriterToWithNewLinesPtr(
+func (u *Umwelt) PrinterHeader() schnittstellen.FuncIter[string] {
+	return format.MakeDelimFuncStringFormatWriter[string](
+		"\n",
 		u.Out(),
-		format.MakeWriterFormatStringIndentedHeader(
-			u.FormatColorWriter(),
-			format.StringIndent,
-		),
+		string_writer_format.MakeIndentedHeader(u.FormatColorOptions()),
 	)
 }
 

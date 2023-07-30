@@ -10,25 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
-// (unrecognized) [path.ext@sha]
-func MakeCliFormatNotRecognized(
-	cw format.FuncColorWriter,
-	s standort.Standort,
-	sf schnittstellen.FuncWriterFormat[schnittstellen.ShaLike],
-) schnittstellen.FuncWriterFormat[kennung.FD] {
-	return func(w io.Writer, fu kennung.FD) (n int64, err error) {
-		return format.Write(
-			w,
-			format.MakeFormatStringRightAligned(format.StringUnrecognized),
-			format.MakeFormatString("["),
-			cw(s.MakeWriterRelativePath(fu.Path), format.ColorTypePointer),
-			format.MakeFormatString("@"),
-			format.MakeWriter(sf, fu.Sha.GetShaLike()),
-			format.MakeFormatString("]"),
-		)
-	}
-}
-
 type FileRecognized struct {
 	kennung.FD
 	Zettel *zettel.Transacted

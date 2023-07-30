@@ -139,16 +139,3 @@ func MakeFormatStringRightAligned(
 		return
 	}
 }
-
-func MakeWriterFormatStringIndentedHeader(
-	cw FuncColorWriter,
-	indentString string,
-) schnittstellen.FuncWriterFormat[string] {
-	return func(w io.Writer, v string) (n int64, err error) {
-		return Write(
-			w,
-			MakeFormatString(indentString),
-			cw(MakeFormatString("%s", v), ColorTypeTitle),
-		)
-	}
-}

@@ -24,7 +24,7 @@ func (c OpenVim) Run(
 
 	v := "vim started"
 
-	if err = u.PrinterHeader()(&v); err != nil {
+	if err = u.PrinterHeader()(v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -36,7 +36,7 @@ func (c OpenVim) Run(
 
 	v = "vim exited"
 
-	if err = u.PrinterHeader()(&v); err != nil {
+	if err = u.PrinterHeader()(v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
