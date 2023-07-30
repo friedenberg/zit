@@ -69,9 +69,9 @@ func makeKastenStore(
 		s.StoreUtil.CommitUpdatedTransacted(t)
 
 		if err = s.StoreUtil.GetKonfigPtr().AddKasten(t); err != nil {
-      err = errors.Wrap(err)
-      return
-    }
+			err = errors.Wrap(err)
+			return
+		}
 
 		return
 	}

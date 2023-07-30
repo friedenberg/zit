@@ -13,14 +13,14 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/bravo/string_writer_format"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/delta/format"
 )
 
 const (
 	Epoch          = 1660007128
-	FormatDateTime = format.StringFormatDateTime
+	FormatDateTime = string_writer_format.StringFormatDateTime
 	// FormatDateTai  = "%y-%m-%d %H:%M"
 )
 

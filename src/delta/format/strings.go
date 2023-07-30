@@ -8,24 +8,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-)
-
-const (
-	StringDRArrow        = "↳"
-	StringNew            = "new"
-	StringSame           = "same"
-	StringChanged        = "changed"
-	StringDeleted        = "deleted"
-	StringUpdated        = "updated"
-	StringArchived       = "archived"
-	StringUnchanged      = "unchanged"
-	StringRecognized     = "recognized"
-	StringCheckedOut     = "checked out"
-	StringWouldDelete    = "would delete"
-	StringUnrecognized   = "unrecognized"
-	StringFormatDateTime = "06-01-02 15:04:05"
-	StringIndent         = "                 "
-	LenStringMax         = len(StringIndent) // TODO-P4 use reflection?
+	"github.com/friedenberg/zit/src/bravo/string_writer_format"
 )
 
 func MakeFormatStringRightAligned(
@@ -35,7 +18,9 @@ func MakeFormatStringRightAligned(
 	return func(w io.Writer) (n int64, err error) {
 		f = fmt.Sprintf(f+" ", args...)
 
-		diff := LenStringMax + 1 - utf8.RuneCountInString(f)
+		diff := string_writer_format.LenStringMax + 1 - utf8.RuneCountInString(
+			f,
+		)
 
 		if diff > 0 {
 			f = strings.Repeat(" ", diff) + f

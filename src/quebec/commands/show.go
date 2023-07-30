@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/hotel/objekte"
@@ -55,7 +55,7 @@ func (c Show) runGenericObjekteFormatterValue(
 	ms kennung.MetaSet,
 	objekteFormatterValue objekte.FormatterValue,
 ) (err error) {
-	f := collections.MakeSyncSerializer(
+	f := iter.MakeSyncSerializer(
 		objekteFormatterValue.MakeFormatterObjekte(
 			u.Out(),
 			u.StoreObjekten(),
@@ -96,7 +96,7 @@ func (c Show) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
 
 	if err = u.StoreObjekten().Query(
 		ms,
-		collections.MakeSyncSerializer(
+		iter.MakeSyncSerializer(
 			f.MakeFormatFunc(),
 		),
 	); err != nil {

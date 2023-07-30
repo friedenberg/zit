@@ -5,7 +5,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/string_writer_format"
-	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/hotel/objekte"
@@ -51,10 +50,10 @@ func (u *Umwelt) PrinterTransactedLike() schnittstellen.FuncIter[objekte.Transac
 		u.StringFormatWriterEtiketten(),
 	)
 
-	return format.MakeDelimFuncStringFormatWriter[objekte.TransactedLikePtr](
+	return string_writer_format.MakeDelim[objekte.TransactedLikePtr](
 		"\n",
 		u.Out(),
-		format.MakeFuncStringFormatWriter[objekte.TransactedLikePtr](
+		string_writer_format.MakeFunc[objekte.TransactedLikePtr](
 			func(w io.StringWriter, o objekte.TransactedLikePtr) (n int64, err error) {
 				return sw.WriteStringFormat(w, o.GetSkuLikePtr())
 			},
@@ -71,7 +70,7 @@ func (u *Umwelt) PrinterFileNotRecognized() schnittstellen.FuncIter[*kennung.FD]
 		u.StringFormatWriterShaLike(),
 	)
 
-	return format.MakeDelimFuncStringFormatWriter[*kennung.FD](
+	return string_writer_format.MakeDelim[*kennung.FD](
 		"\n",
 		u.Out(),
 		p,
@@ -87,7 +86,7 @@ func (u *Umwelt) PrinterFDDeleted() schnittstellen.FuncIter[*kennung.FD] {
 		),
 	)
 
-	return format.MakeDelimFuncStringFormatWriter[*kennung.FD](
+	return string_writer_format.MakeDelim[*kennung.FD](
 		"\n",
 		u.Out(),
 		p,
@@ -95,7 +94,7 @@ func (u *Umwelt) PrinterFDDeleted() schnittstellen.FuncIter[*kennung.FD] {
 }
 
 func (u *Umwelt) PrinterHeader() schnittstellen.FuncIter[string] {
-	return format.MakeDelimFuncStringFormatWriter[string](
+	return string_writer_format.MakeDelim[string](
 		"\n",
 		u.Out(),
 		string_writer_format.MakeIndentedHeader(u.FormatColorOptions()),
@@ -116,7 +115,7 @@ func (u *Umwelt) PrinterCheckedOutLike() schnittstellen.FuncIter[objekte.Checked
 		u.StringFormatWriterEtiketten(),
 	)
 
-	return format.MakeDelimFuncStringFormatWriter[objekte.CheckedOutLikePtr](
+	return string_writer_format.MakeDelim[objekte.CheckedOutLikePtr](
 		"\n",
 		u.Out(),
 		p,

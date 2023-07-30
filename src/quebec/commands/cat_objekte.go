@@ -50,7 +50,7 @@ func (c CatObjekte) akten(
 	shas sha_collections.Set,
 ) (err error) {
 	// TODO-P3 refactor into reusable
-	akteWriter := collections.MakeSyncSerializer(
+	akteWriter := iter.MakeSyncSerializer(
 		func(rc io.ReadCloser) (err error) {
 			defer errors.DeferredCloser(&err, rc)
 

@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/id"
-	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
@@ -22,7 +22,7 @@ type TransaktionStore interface {
 
 func (s common) ReadLastTransaktion() (t *transaktion.Transaktion, err error) {
 	if err = s.ReadAllTransaktions(
-		collections.MakeSyncSerializer(
+		iter.MakeSyncSerializer(
 			func(t1 *transaktion.Transaktion) (err error) {
 				if t != nil && t1.Time.Less(t.Time) {
 					return
@@ -79,11 +79,15 @@ func (s common) TransaktionPath(t kennung.Time) (p string) {
 	return
 }
 
-func (s common) ReadTransaktion(t kennung.Time) (tr *transaktion.Transaktion, err error) {
+func (s common) ReadTransaktion(
+	t kennung.Time,
+) (tr *transaktion.Transaktion, err error) {
 	return s.readTransaktion(s.TransaktionPath(t))
 }
 
-func (s common) readTransaktion(p string) (t *transaktion.Transaktion, err error) {
+func (s common) readTransaktion(
+	p string,
+) (t *transaktion.Transaktion, err error) {
 	tr := &transaktion.Reader{}
 
 	var or io.ReadCloser
