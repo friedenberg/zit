@@ -13,13 +13,13 @@ import (
 	"github.com/friedenberg/zit/src/mike/store_fs"
 )
 
-func (u *Umwelt) FormatColorOptions() (o format.ColorOptions) {
+func (u *Umwelt) FormatColorOptions() (o string_writer_format.ColorOptions) {
 	o.OffEntirely = !u.outIsTty
 	return
 }
 
 func (u *Umwelt) StringFormatWriterShaLike() schnittstellen.StringFormatWriter[schnittstellen.ShaLike] {
-	return kennung.MakeShaCliFormat2(
+	return kennung.MakeShaCliFormat(
 		u.FormatColorOptions(),
 		u.StoreObjekten().GetAbbrStore().Shas().Abbreviate,
 	)

@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
-	"github.com/friedenberg/zit/src/delta/format"
+	"github.com/friedenberg/zit/src/bravo/string_writer_format"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 )
@@ -43,7 +43,7 @@ func MakeCliFormat(
 		writeTyp:                      true,
 		writeBezeichnung:              true,
 		writeEtiketten:                true,
-		rightAlignedWriter:            format.MakeRightAlignedStringFormatWriter(),
+		rightAlignedWriter:            string_writer_format.MakeRightAligned(),
 		shaStringFormatWriter:         shaStringFormatWriter,
 		kennungStringFormatWriter:     kennungStringFormatWriter,
 		fdStringFormatWriter:          fdStringFormatWriter,

@@ -8,8 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
-type FuncColorWriter func(schnittstellen.FuncWriter, ColorType) schnittstellen.FuncWriter
-
 func MakeWriter[T any](
 	wff schnittstellen.FuncWriterFormat[T],
 	e T,

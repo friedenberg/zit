@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/delta/format"
+	"github.com/friedenberg/zit/src/bravo/string_writer_format"
 )
 
 type fdCliFormat struct {
@@ -14,14 +14,14 @@ type fdCliFormat struct {
 }
 
 func MakeFDCliFormat(
-	co format.ColorOptions,
+	co string_writer_format.ColorOptions,
 	relativePathStringFormatWriter schnittstellen.StringFormatWriter[string],
 ) *fdCliFormat {
 	return &fdCliFormat{
-		stringFormatWriter: format.MakeColorStringFormatWriter[string](
+		stringFormatWriter: string_writer_format.MakeColor[string](
 			co,
 			relativePathStringFormatWriter,
-			format.ColorTypePointer,
+			string_writer_format.ColorTypePointer,
 		),
 	}
 }
@@ -49,12 +49,14 @@ type kennungCliFormat struct {
 	stringFormatWriter schnittstellen.StringFormatWriter[string]
 }
 
-func MakeKennungCliFormat(co format.ColorOptions) *kennungCliFormat {
+func MakeKennungCliFormat(
+	co string_writer_format.ColorOptions,
+) *kennungCliFormat {
 	return &kennungCliFormat{
-		stringFormatWriter: format.MakeColorStringFormatWriter[string](
+		stringFormatWriter: string_writer_format.MakeColor[string](
 			co,
-			format.MakeStringStringFormatWriter[string](),
-			format.ColorTypePointer,
+			string_writer_format.MakeString[string](),
+			string_writer_format.ColorTypePointer,
 		),
 	}
 }
@@ -101,12 +103,12 @@ type typCliFormat struct {
 	stringFormatWriter schnittstellen.StringFormatWriter[string]
 }
 
-func MakeTypCliFormat(co format.ColorOptions) *typCliFormat {
+func MakeTypCliFormat(co string_writer_format.ColorOptions) *typCliFormat {
 	return &typCliFormat{
-		stringFormatWriter: format.MakeColorStringFormatWriter[string](
+		stringFormatWriter: string_writer_format.MakeColor[string](
 			co,
-			format.MakeStringStringFormatWriter[string](),
-			format.ColorTypeType,
+			string_writer_format.MakeString[string](),
+			string_writer_format.ColorTypeType,
 		),
 	}
 }
@@ -126,7 +128,7 @@ type etikettenCliFormat struct {
 
 func MakeEtikettenCliFormat() *etikettenCliFormat {
 	return &etikettenCliFormat{
-		stringFormatWriter: format.MakeStringStringFormatWriter[string](),
+		stringFormatWriter: string_writer_format.MakeString[string](),
 	}
 }
 

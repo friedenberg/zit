@@ -4,39 +4,21 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/delta/format"
+	"github.com/friedenberg/zit/src/bravo/string_writer_format"
 )
-
-func MakeCliFormat(
-	cw format.FuncColorWriter,
-) schnittstellen.FuncWriterFormat[Bezeichnung] {
-	return func(w io.Writer, b1 Bezeichnung) (n int64, err error) {
-		b := b1.value
-
-		switch {
-		case len(b) > 66:
-			b = b[:66] + "…"
-		}
-
-		return format.Write(
-			w,
-			format.MakeFormatString("\""),
-			cw(format.MakeFormatString("%s", b), format.ColorTypeIdentifier),
-			format.MakeFormatString("\""),
-		)
-	}
-}
 
 type bezeichnungCliFormat struct {
 	stringFormatWriter schnittstellen.StringFormatWriter[string]
 }
 
-func MakeCliFormat2(co format.ColorOptions) *bezeichnungCliFormat {
+func MakeCliFormat2(
+	co string_writer_format.ColorOptions,
+) *bezeichnungCliFormat {
 	return &bezeichnungCliFormat{
-		stringFormatWriter: format.MakeColorStringFormatWriter[string](
+		stringFormatWriter: string_writer_format.MakeColor[string](
 			co,
-			format.MakeStringStringFormatWriter[string](),
-			format.ColorTypeIdentifier,
+			string_writer_format.MakeString[string](),
+			string_writer_format.ColorTypeIdentifier,
 		),
 	}
 }
