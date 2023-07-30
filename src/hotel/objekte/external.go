@@ -39,6 +39,10 @@ func (a External[T, T1, T2, T3]) GetSkuLike() sku.SkuLike {
 	return a.Sku
 }
 
+func (a *External[T, T1, T2, T3]) GetSkuLikePtr() sku.SkuLikePtr {
+	return &a.Sku
+}
+
 func (a External[T, T1, T2, T3]) GetMetadatei() metadatei.Metadatei {
 	return a.Sku.GetMetadatei()
 }
@@ -130,6 +134,10 @@ func (e External[T, T1, T2, T3]) GetObjekteFD() kennung.FD {
 
 func (e External[T, T1, T2, T3]) GetAkteFD() kennung.FD {
 	return e.Sku.FDs.Akte
+}
+
+func (e *External[T, T1, T2, T3]) GetFDsPtr() *sku.ExternalFDs {
+	return &e.Sku.FDs
 }
 
 func (e External[T, T1, T2, T3]) GetAktePath() string {

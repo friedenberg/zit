@@ -28,7 +28,7 @@ type Store struct {
 
 	storeObjekten *store_objekten.Store
 
-	checkedOutLogPrinter schnittstellen.FuncIter[objekte.CheckedOutLike]
+	checkedOutLogPrinter schnittstellen.FuncIter[objekte.CheckedOutLikePtr]
 }
 
 func New(
@@ -48,7 +48,7 @@ func New(
 }
 
 func (s *Store) SetCheckedOutLogPrinter(
-	zelw schnittstellen.FuncIter[objekte.CheckedOutLike],
+	zelw schnittstellen.FuncIter[objekte.CheckedOutLikePtr],
 ) {
 	s.checkedOutLogPrinter = zelw
 }
@@ -140,7 +140,7 @@ func (s Store) Flush() (err error) {
 func (s *Store) ReadFiles(
 	fs *cwd.CwdFiles,
 	ms kennung.MetaSet,
-	f schnittstellen.FuncIter[objekte.CheckedOutLike],
+	f schnittstellen.FuncIter[objekte.CheckedOutLikePtr],
 ) (err error) {
 	zettelEMGR := objekte_store.MakeExternalMaybeGetterReader[
 		zettel.Objekte,
@@ -234,7 +234,7 @@ func (s *Store) ReadFiles(
 
 				log.Log().Printf("read: %s", e.GetSkuLike())
 
-				col.DetermineState()
+				col.DetermineState(false)
 
 				if err = f(col); err != nil {
 					err = errors.Wrap(err)

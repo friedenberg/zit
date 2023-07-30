@@ -18,15 +18,23 @@ type CheckedOut[
 	State    CheckedOutState
 }
 
-func (c *CheckedOut[T, T1, T2, T3]) DetermineState() {
+func (c *CheckedOut[T, T1, T2, T3]) DetermineState(justCheckedOut bool) {
 	if c.Internal.Sku.ObjekteSha.IsNull() {
 		c.State = CheckedOutStateUntracked
 	} else if c.Internal.Sku.Metadatei.EqualsSansTai(c.External.Sku.Metadatei) {
-		c.State = CheckedOutStateExistsAndSame
+		if justCheckedOut {
+			c.State = CheckedOutStateJustCheckedOut
+		} else {
+			c.State = CheckedOutStateExistsAndSame
+		}
 	} else if c.External.Sku.ObjekteSha.IsNull() {
 		c.State = CheckedOutStateEmpty
 	} else {
-		c.State = CheckedOutStateExistsAndDifferent
+		if justCheckedOut {
+			c.State = CheckedOutStateJustCheckedOutButDifferent
+		} else {
+			c.State = CheckedOutStateExistsAndDifferent
+		}
 	}
 }
 
@@ -34,11 +42,15 @@ func (co CheckedOut[T, T1, T2, T3]) GetState() CheckedOutState {
 	return co.State
 }
 
-func (co *CheckedOut[T, T1, T2, T3]) GetInternalLike() TransactedLike {
+func (co *CheckedOut[T, T1, T2, T3]) GetInternalLike() TransactedLikePtr {
 	return &co.Internal
 }
 
 func (co *CheckedOut[T, T1, T2, T3]) GetExternalLike() ExternalLike {
+	return &co.External
+}
+
+func (co *CheckedOut[T, T1, T2, T3]) GetExternalLikePtr() ExternalLikePtr {
 	return &co.External
 }
 

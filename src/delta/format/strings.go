@@ -28,6 +28,43 @@ const (
 	LenStringMax         = len(StringIndent) // TODO-P4 use reflection?
 )
 
+func MakeRightAlignedStringFormatWriter() schnittstellen.StringFormatWriter[string] {
+	return &stringFormatWriterRightAligned{}
+}
+
+type stringFormatWriterRightAligned struct{}
+
+func (f stringFormatWriterRightAligned) WriteStringFormat(
+	w io.StringWriter,
+	v string,
+) (n int64, err error) {
+	diff := LenStringMax + 1 - utf8.RuneCountInString(v)
+
+	if diff > 0 {
+		v = strings.Repeat(" ", diff - 1) + v
+	}
+
+	var n1 int
+
+	n1, err = w.WriteString(v)
+	n += int64(n1)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	n1, err = w.WriteString(" ")
+	n += int64(n1)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func MakeFormatStringRightAligned(
 	f string,
 	args ...any,

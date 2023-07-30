@@ -9,6 +9,42 @@ import (
 	"github.com/friedenberg/zit/src/delta/format"
 )
 
+type fdCliFormat struct {
+	stringFormatWriter schnittstellen.StringFormatWriter[string]
+}
+
+func MakeFDCliFormat(
+	co format.ColorOptions,
+	relativePathStringFormatWriter schnittstellen.StringFormatWriter[string],
+) *fdCliFormat {
+	return &fdCliFormat{
+		stringFormatWriter: format.MakeColorStringFormatWriter[string](
+			co,
+			relativePathStringFormatWriter,
+			format.ColorTypePointer,
+		),
+	}
+}
+
+func (f *fdCliFormat) WriteStringFormat(
+	w io.StringWriter,
+	k *FD,
+) (n int64, err error) {
+	// TODO-P2 add abbreviation
+
+	var n1 int64
+
+	n1, err = f.stringFormatWriter.WriteStringFormat(w, k.String())
+	n += n1
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 type kennungCliFormat struct {
 	stringFormatWriter schnittstellen.StringFormatWriter[string]
 }

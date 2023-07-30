@@ -14,20 +14,17 @@ import (
 	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/hotel/etikett"
 	"github.com/friedenberg/zit/src/hotel/kasten"
-	"github.com/friedenberg/zit/src/hotel/objekte"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/mike/store_fs"
 )
 
-//	                                                _
-//	___ ___  _ __ ___  _ __   ___  _ __   ___ _ __ | |_ ___
-//
-// / __/ _ \| '_ ` _ \| '_ \ / _ \| '_ \ / _ \ '_ \| __/ __|
-//
-//	| (_| (_) | | | | | | |_) | (_) | | | |  __/ | | | |_\__ \
-//	 \___\___/|_| |_| |_| .__/ \___/|_| |_|\___|_| |_|\__|___/
-//	                    |_|
+//		                                                _
+//	   ___ ___  _ __ ___  _ __   ___  _ __   ___ _ __ | |_ ___
+//	  / __/ _ \| '_ ` _ \| '_ \ / _ \| '_ \ / _ \ '_ \| __/ __|
+//		| (_| (_) | | | | | | |_) | (_) | | | |  __/ | | | |_\__ \
+//		 \___\___/|_| |_| |_| .__/ \___/|_| |_|\___|_| |_|\__|___/
+//		                    |_|
 func (u *Umwelt) FormatColorOptions() (o format.ColorOptions) {
 	o.OffEntirely = !u.outIsTty
 	return
@@ -212,16 +209,6 @@ func (u *Umwelt) FormatZettelCheckedOut() schnittstellen.FuncWriterFormat[*zette
 		u.FormatSha(u.StoreObjekten().GetAbbrStore().Shas().Abbreviate),
 		// u.FormatTyp(),
 		u.FormatMetadateiGattung(gattung.Zettel),
-	)
-}
-
-func (u *Umwelt) FormatTransactedLike(
-	includeTyp bool,
-) schnittstellen.FuncWriterFormat[objekte.TransactedLikePtr] {
-	return objekte.MakeCliFormatTransactedLikePtr(
-		u.FormatIdLike(),
-		u.FormatSha(u.StoreObjekten().GetAbbrStore().Shas().Abbreviate),
-		u.FormatMetadatei(includeTyp),
 	)
 }
 

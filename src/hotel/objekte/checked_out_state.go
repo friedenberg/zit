@@ -10,7 +10,7 @@ const (
 	CheckedOutStateUnknown = CheckedOutState(iota)
 	CheckedOutStateEmpty
 	CheckedOutStateJustCheckedOut
-	CheckedOutStateJustCheckedOutButSame
+	CheckedOutStateJustCheckedOutButDifferent
 	CheckedOutStateExistsAndSame
 	CheckedOutStateExistsAndDifferent
 	CheckedOutStateUntracked
@@ -19,12 +19,14 @@ const (
 
 func (s CheckedOutState) String() string {
 	switch s {
-	case CheckedOutStateJustCheckedOutButSame:
+	case CheckedOutStateJustCheckedOut:
 		return "checked out"
 
 	case CheckedOutStateExistsAndSame:
 		return "same"
 
+	case CheckedOutStateJustCheckedOutButDifferent:
+		fallthrough
 	case CheckedOutStateExistsAndDifferent:
 		return "changed"
 

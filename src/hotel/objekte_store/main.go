@@ -11,7 +11,7 @@ import (
 type TransactedLogger[
 	T any,
 ] interface {
-	SetLogWriter(LogWriter[T])
+	SetLogWriter(LogWriter[objekte.TransactedLikePtr])
 }
 
 type LastReader[
@@ -103,7 +103,12 @@ type CreateOrUpdater[
 	V any,
 	CO any,
 ] interface {
-	CreateOrUpdateAkte(O, metadatei.Getter, K, schnittstellen.ShaLike) (V, error)
+	CreateOrUpdateAkte(
+		O,
+		metadatei.Getter,
+		K,
+		schnittstellen.ShaLike,
+	) (V, error)
 	CreateOrUpdate(O, metadatei.Getter, K) (V, error)
 	CreateOrUpdateCheckedOut(CO) (V, error)
 }

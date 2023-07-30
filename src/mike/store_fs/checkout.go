@@ -88,7 +88,7 @@ func (s Store) shouldCheckOut(
 ) (ok bool) {
 	switch {
 	case cz.Internal.GetMetadatei().Equals(cz.External.GetMetadatei()):
-		cz.State = objekte.CheckedOutStateJustCheckedOutButSame
+		cz.State = objekte.CheckedOutStateJustCheckedOut
 
 	case options.Force || cz.State == objekte.CheckedOutStateEmpty:
 		ok = true
@@ -136,7 +136,7 @@ func (s *Store) checkoutOneGeneric(
 		return
 	}
 
-	cop.DetermineState()
+	cop.DetermineState(true)
 	s.checkedOutLogPrinter(cop)
 
 	return
@@ -176,7 +176,7 @@ func (s *Store) CheckoutOneZettel(
 			return
 		}
 
-		cz.DetermineState()
+		cz.DetermineState(true)
 
 		if !s.shouldCheckOut(options, cz) {
 			return

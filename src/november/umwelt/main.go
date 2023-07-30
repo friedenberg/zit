@@ -18,10 +18,8 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/erworben"
-	"github.com/friedenberg/zit/src/hotel/etikett"
-	"github.com/friedenberg/zit/src/hotel/kasten"
+	"github.com/friedenberg/zit/src/hotel/objekte"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
-	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/india/konfig"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/organize_text"
@@ -211,41 +209,20 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 
 	errors.Log().Print("done initing checkout store")
 
-	u.storeObjekten.Zettel().SetLogWriter(
-		u.ZettelTransactedLogPrinters(),
-	)
+	ptl := u.PrinterTransactedLike()
 
-	u.storeObjekten.Konfig().SetLogWriter(
-		objekte_store.LogWriter[*erworben.Transacted]{
-			Updated:   u.PrinterKonfigTransacted(),
-			Unchanged: u.PrinterKonfigTransacted(),
-		},
-	)
+	lw := objekte_store.LogWriter[objekte.TransactedLikePtr]{
+		New:       ptl,
+		Updated:   ptl,
+		Unchanged: ptl,
+		Archived:  ptl,
+	}
 
-	u.storeObjekten.Typ().SetLogWriter(
-		objekte_store.LogWriter[*typ.Transacted]{
-			New:       u.PrinterTypTransacted(),
-			Updated:   u.PrinterTypTransacted(),
-			Unchanged: u.PrinterTypTransacted(),
-			Archived:  u.PrinterTypTransacted(),
-		},
-	)
-
-	u.storeObjekten.Etikett().SetLogWriter(
-		objekte_store.LogWriter[*etikett.Transacted]{
-			New:       u.PrinterEtikettTransacted(),
-			Updated:   u.PrinterEtikettTransacted(),
-			Unchanged: u.PrinterEtikettTransacted(),
-		},
-	)
-
-	u.storeObjekten.Kasten().SetLogWriter(
-		objekte_store.LogWriter[*kasten.Transacted]{
-			New:       u.PrinterKastenTransacted(),
-			Updated:   u.PrinterKastenTransacted(),
-			Unchanged: u.PrinterKastenTransacted(),
-		},
-	)
+	u.storeObjekten.Zettel().SetLogWriter(lw)
+	u.storeObjekten.Konfig().SetLogWriter(lw)
+	u.storeObjekten.Typ().SetLogWriter(lw)
+	u.storeObjekten.Etikett().SetLogWriter(lw)
+	u.storeObjekten.Kasten().SetLogWriter(lw)
 
 	u.storeWorkingDirectory.SetCheckedOutLogPrinter(
 		u.PrinterJustCheckedOutLike(),

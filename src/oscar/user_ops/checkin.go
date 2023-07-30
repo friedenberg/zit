@@ -33,7 +33,7 @@ func (c Checkin) Run(
 		ms,
 		iter.MakeChain(
 			objekte.MakeFilterFromMetaSet(ms),
-			func(co objekte.CheckedOutLike) (err error) {
+			func(co objekte.CheckedOutLikePtr) (err error) {
 				switch aco := co.(type) {
 				case *zettel.CheckedOut:
 					if _, err = u.StoreObjekten().Zettel().UpdateCheckedOut(

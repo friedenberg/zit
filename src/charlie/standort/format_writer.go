@@ -22,6 +22,42 @@ func (s Standort) Rel(
 	return
 }
 
+func (s Standort) MakeRelativePathStringFormatWriter() schnittstellen.StringFormatWriter[string] {
+	return relativePathStringFormatWriter(s)
+}
+
+type relativePathStringFormatWriter Standort
+
+func (f relativePathStringFormatWriter) WriteStringFormat(
+	w io.StringWriter,
+	p string,
+) (n int64, err error) {
+	var n1 int
+
+	{
+		// if p, err = filepath.Rel(s.cwd, p); err != nil {
+		// 	err = errors.Wrap(err)
+		// 	return
+		// }
+
+		p1, _ := filepath.Rel(f.cwd, p)
+
+		if p1 != "" {
+			p = p1
+		}
+	}
+
+	n1, err = w.WriteString(p)
+	n += int64(n1)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (s Standort) MakeWriterRelativePath(
 	p string,
 ) schnittstellen.FuncWriter {

@@ -73,7 +73,7 @@ func (s Store) ReadExternalZettelFromAktePath(
 	cz.External.SetAkteSha(akteSha)
 	// cz.Matches.Akten, _ = s.storeObjekten.ReadAkteSha(akteSha)
 
-	cz.DetermineState()
+	cz.DetermineState(false)
 
 	return
 }

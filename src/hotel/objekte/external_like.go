@@ -14,3 +14,12 @@ type ExternalLike interface {
 	metadatei.Getter
 	GetSkuLike() sku.SkuLike
 }
+
+type ExternalLikePtr interface {
+	ExternalLike
+	GetFDsPtr() *sku.ExternalFDs
+	metadatei.GetterPtr
+	metadatei.Setter
+	GetKennungPtr() kennung.KennungPtr
+	GetSkuLikePtr() sku.SkuLikePtr
+}

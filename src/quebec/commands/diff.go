@@ -61,7 +61,7 @@ func (c Diff) RunWithCwdQuery(
 		ms,
 		iter.MakeChain(
 			objekte.MakeFilterFromMetaSet(ms),
-			func(co objekte.CheckedOutLike) (err error) {
+			func(co objekte.CheckedOutLikePtr) (err error) {
 				wg := iter.MakeErrorWaitGroup()
 
 				il := co.GetInternalLike()

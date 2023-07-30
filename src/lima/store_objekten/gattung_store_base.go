@@ -102,7 +102,7 @@ type commonStoreBase[
 		*objekte.Transacted[O, OPtr, K, KPtr],
 	]
 
-	objekte_store.LogWriter[*objekte.Transacted[O, OPtr, K, KPtr]]
+	objekte_store.LogWriter[objekte.TransactedLikePtr]
 
 	persistentMetadateiFormat objekte_format.Format
 
@@ -183,7 +183,7 @@ func makeCommonStoreBase[
 }
 
 func (s *commonStoreBase[O, OPtr, K, KPtr]) SetLogWriter(
-	lw objekte_store.LogWriter[*objekte.Transacted[O, OPtr, K, KPtr]],
+	lw objekte_store.LogWriter[objekte.TransactedLikePtr],
 ) {
 	s.LogWriter = lw
 }

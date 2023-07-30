@@ -18,7 +18,7 @@ function new_empty_no_edit { # @test
 	run_zit new -edit=false
 	assert_success
 	assert_output - <<-EOM
-		[two/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md ]
+		[two/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md]
 	EOM
 
 	run_zit last

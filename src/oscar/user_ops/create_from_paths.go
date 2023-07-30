@@ -149,7 +149,7 @@ func (c CreateFromPaths) Run(
 			}
 
 			// TODO-P4 get matches
-			cz.DetermineState()
+			cz.DetermineState(true)
 
 			zv := &zettel.Transacted{}
 

@@ -849,7 +849,7 @@ function etiketten_correct { # @test
 	run zit checkin "${cmd_zit_def[@]}" one/uno.zettel
 	assert_output - <<-EOM
 		[-test1-ok@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 ! test1-ok, test4]
+		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 test1-ok test4]
 	EOM
 
 	expected_etiketten="$(mktemp)"

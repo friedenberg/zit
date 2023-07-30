@@ -10,14 +10,14 @@ import (
 
 func MakeFilterFromMetaSet(
 	ms kennung.MetaSet,
-) schnittstellen.FuncIter[CheckedOutLike] {
+) schnittstellen.FuncIter[CheckedOutLikePtr] {
 	if ms == nil {
-		return collections.MakeWriterNoop[CheckedOutLike]()
+		return collections.MakeWriterNoop[CheckedOutLikePtr]()
 	}
 
-	return func(col CheckedOutLike) (err error) {
+	return func(col CheckedOutLikePtr) (err error) {
 		internal := col.GetInternalLike()
-		external := col.GetExternalLike()
+		external := col.GetExternalLikePtr()
 
 		g := gattung.Must(internal.GetSkuLike().GetGattung())
 

@@ -804,7 +804,7 @@ function organize_v3_etiketten_correct { # @test
 	run_zit checkin one/uno.zettel
 	assert_output - <<-EOM
 		[-test1-ok@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md test1-ok, test4]
+		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md test1-ok test4]
 	EOM
 
 	expected_etiketten="$(mktemp)"
