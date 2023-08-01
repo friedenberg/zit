@@ -34,7 +34,9 @@ func (t *Text) Refine() (err error) {
 }
 
 func (t *Text) ReadFrom(r io.Reader) (n int64, err error) {
-	r1 := &assignmentLineReader{}
+	r1 := &assignmentLineReader{
+		ex: t.Expanders,
+	}
 
 	mr := metadatei.Reader{
 		Metadatei: &t.Metadatei,
@@ -56,13 +58,14 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 	l := ot.assignment.MaxLen()
 
 	aw := assignmentLineWriter{
-		LineWriter:           lw,
-		maxDepth:             ot.assignment.MaxDepth(),
-		maxKopf:              kopf,
-		maxSchwanz:           scwhanz,
-		maxLen:               l,
-		RightAlignedIndents:  ot.UseRightAlignedIndents,
-		OmitLeadingEmptyLine: ot.Options.UseMetadateiHeader && ot.Metadatei.HasMetadateiContent(),
+		LineWriter:          lw,
+		maxDepth:            ot.assignment.MaxDepth(),
+		maxKopf:             kopf,
+		maxSchwanz:          scwhanz,
+		maxLen:              l,
+		RightAlignedIndents: ot.UseRightAlignedIndents,
+		OmitLeadingEmptyLine: ot.Options.UseMetadateiHeader &&
+			ot.Metadatei.HasMetadateiContent(),
 	}
 
 	if err = aw.write(ot.assignment); err != nil {

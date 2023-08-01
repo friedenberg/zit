@@ -82,7 +82,7 @@ func (z obj) String() string {
 	return fmt.Sprintf("- [%s] %s", z.Kennung, z.Bezeichnung)
 }
 
-func (z *obj) setExistingObj(v string) (err error) {
+func (z *obj) setExistingObj(v string, ex kennung.Abbr) (err error) {
 	remaining := v
 
 	if len(remaining) < 3 {
@@ -106,6 +106,13 @@ func (z *obj) setExistingObj(v string) (err error) {
 
 	if z.Kennung, err = kennung.Make(
 		strings.TrimSpace(remaining[:idx]),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if z.Kennung, err = ex.AbbreviateKennung(
+		z.Kennung,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

@@ -15,7 +15,9 @@ type ReadOrganizeFile struct {
 	io.Reader
 }
 
-func (c ReadOrganizeFile) RunWithFile(p string) (ot *organize_text.Text, err error) {
+func (c ReadOrganizeFile) RunWithFile(
+	p string,
+) (ot *organize_text.Text, err error) {
 	var f *os.File
 
 	if f, err = files.Open(p); err != nil {
@@ -34,7 +36,7 @@ func (c ReadOrganizeFile) RunWithFile(p string) (ot *organize_text.Text, err err
 
 func (c ReadOrganizeFile) Run() (ot *organize_text.Text, err error) {
 	otFlags := organize_text.MakeFlags()
-	// otFlags.Abbr = c.Umwelt.StoreObjekten().GetAbbrStore().AbbreviateHinweis
+	c.Umwelt.ApplyToOrganizeOptions(&otFlags.Options)
 
 	if ot, err = organize_text.New(otFlags.GetOptions()); err != nil {
 		err = errors.Wrap(err)
