@@ -8,19 +8,19 @@ git pull --rebase
 cmd_make=make
 
 if command -v gmake 2>&1 >/dev/null; then
-	cmd_make=gmake
+  cmd_make=gmake
 else
-	make
+  make
 fi
 
 $cmd_make build/deploy
 make install
 
-go clean -cache -fuzzcache
 git add .
 
 if [[ "$(git status --porcelain=v1 2>/dev/null | wc -l)" -gt 0 ]]; then
-	git commit -m update
+  git commit -m update
 fi
 
 git push
+go clean -cache -fuzzcache
