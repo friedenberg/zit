@@ -6,7 +6,7 @@ import (
 )
 
 type ImplicitEtikettenGetter interface {
-	GetImplicitEtiketten(Etikett) EtikettSet
+	GetImplicitEtiketten(*Etikett) EtikettSet
 }
 
 type MatcherExactlyThisOrAllOfThese interface {

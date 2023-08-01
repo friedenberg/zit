@@ -331,7 +331,7 @@ func KennungContainsMatchable(
 					expanded = ExpandOne(e, ExpanderRight)
 				}
 
-				ok = expanded.ContainsKey(expanded.KeyPtr(kt.GetEtikett()))
+				ok = expanded.ContainsKey(expanded.KeyPtr(kt.GetEtikettPtr()))
 
 				return
 			},
@@ -349,8 +349,11 @@ func KennungContainsMatchable(
 			return true
 		}
 
-	default:
+	case *Hinweis:
 		// nop
+
+	default:
+		panic(fmt.Sprintf("unhandled type: %T", kt))
 	}
 
 	idl := m.GetKennungPtr()

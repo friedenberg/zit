@@ -15,6 +15,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/charlie/collections2"
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/sku"
@@ -40,7 +41,8 @@ type Compiled struct {
 func (a *compiled) Reset() {
 	a.lock = &sync.Mutex{}
 	a.Typen = makeCompiledTypSetFromSlice(nil)
-	a.Etiketten = collections.MakeMutableSetStringer[ketikett]()
+	a.EtikettenHidden = kennung.MakeEtikettSet()
+	a.Etiketten = collections2.MakeMutableValueSet[ketikett, *ketikett](nil)
 	a.ImplicitEtiketten = make(implicitEtikettenMap)
 	a.Kisten = makeCompiledKastenSetFromSlice(nil)
 }
@@ -65,10 +67,10 @@ type compiled struct {
 	erworben.Akte
 
 	// Etiketten
-	EtikettenHidden             schnittstellen.SetLike[kennung.Etikett]
+	EtikettenHidden             kennung.EtikettSet
 	EtikettenHiddenStringsSlice []string
 	EtikettenToAddToNew         []string
-	Etiketten                   schnittstellen.MutableSetLike[ketikett]
+	Etiketten                   schnittstellen.MutableSetPtrLike[ketikett, *ketikett]
 	ImplicitEtiketten           implicitEtikettenMap
 
 	// Typen
@@ -191,7 +193,7 @@ func (kc *compiled) recompile() (err error) {
 
 	{
 		kc.ImplicitEtiketten = make(implicitEtikettenMap)
-		etikettenHidden := collections.MakeMutableSetStringer[kennung.Etikett]()
+		etikettenHidden := kennung.MakeMutableEtikettSet()
 
 		if err = kc.Etiketten.Each(
 			func(ke ketikett) (err error) {
@@ -237,7 +239,7 @@ func (kc *compiled) recompile() (err error) {
 			return kc.EtikettenToAddToNew[i] < kc.EtikettenToAddToNew[j]
 		})
 
-		kc.EtikettenHidden = etikettenHidden.CloneSetLike()
+		kc.EtikettenHidden = etikettenHidden.CloneSetPtrLike()
 	}
 
 	if err = kc.Typen.Each(

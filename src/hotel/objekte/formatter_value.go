@@ -69,10 +69,10 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 	switch fv.string {
 	case "etiketten-implicit":
 		return func(tl TransactedLikePtr) (err error) {
-			ets := tl.GetMetadatei().GetEtiketten().CloneMutableSetLike()
+			ets := tl.GetMetadatei().GetEtiketten().CloneMutableSetPtrLike()
 
-			ets.Each(
-				func(e kennung.Etikett) (err error) {
+			ets.EachPtr(
+				func(e *kennung.Etikett) (err error) {
 					impl := k.GetImplicitEtiketten(e)
 					return impl.Each(ets.Add)
 				},
@@ -182,7 +182,10 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 
 	case "sku-metadatei":
 		return func(e TransactedLikePtr) (err error) {
-			_, err = fmt.Fprintln(out, sku_formats.StringMetadatei(e.GetSkuLike()))
+			_, err = fmt.Fprintln(
+				out,
+				sku_formats.StringMetadatei(e.GetSkuLike()),
+			)
 			return
 		}
 

@@ -327,7 +327,7 @@ func tryAddMatcher(
 			if implicitEtikettenGetter == nil {
 				return s.AddAllOfThese(m)
 			} else {
-				impl := implicitEtikettenGetter.GetImplicitEtiketten(e)
+				impl := implicitEtikettenGetter.GetImplicitEtiketten(&e)
 
 				mo := MakeMatcherOrDoNotMatchOnEmpty()
 
@@ -392,9 +392,9 @@ func (ms metaSet) Get(g gattung.Gattung) (s MatcherSigil, ok bool) {
 
 	s = MakeMatcherWithSigil(
 		MakeMatcherAnd(
+			ids.Matcher,
 			MakeMatcherImplicit(sigilCwd),
 			MakeMatcherImplicit(sigilHidden),
-			ids.Matcher,
 		),
 		ids.Sigil,
 	)
@@ -418,7 +418,7 @@ func (ms metaSet) GetEtiketten() EtikettSet {
 					return
 				}
 
-				return es.AddPtr(e.GetEtikett())
+				return es.AddPtr(e.GetEtikettPtr())
 			},
 			// TODO-P1 modify sigil matcher to allow child traversal
 			s.Matcher,

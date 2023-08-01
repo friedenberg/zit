@@ -271,12 +271,12 @@ func (u *Umwelt) MakeKennungHidden() kennung.Matcher {
 
 	i := u.MakeKennungIndex()
 
-	u.Konfig().EtikettenHidden.Each(
-		func(e kennung.Etikett) (err error) {
+	u.Konfig().EtikettenHidden.EachPtr(
+		func(e *kennung.Etikett) (err error) {
 			impl := u.Konfig().GetImplicitEtiketten(e)
 
-			if err = impl.Each(
-				func(e kennung.Etikett) (err error) {
+			if err = impl.EachPtr(
+				func(e *kennung.Etikett) (err error) {
 					return h.Add(kennung.MakeMatcherContains(e, i))
 				},
 			); err != nil {

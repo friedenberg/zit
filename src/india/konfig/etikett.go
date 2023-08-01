@@ -8,12 +8,13 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/charlie/collections2"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/hotel/etikett"
 )
 
 func init() {
-	collections.RegisterGob[ketikett, *ketikett]()
+	collections2.RegisterGob[ketikett, *ketikett]()
 }
 
 type implicitEtikettenMap map[kennung.Etikett]kennung.EtikettMutableSet
@@ -132,7 +133,7 @@ func (k *compiled) AddEtikett(
 		Transacted: *b1,
 	}
 
-	if err = iter.AddOrReplaceIfGreater(k.Etiketten, b); err != nil {
+	if err = iter.AddOrReplaceIfGreater[ketikett](k.Etiketten, b); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -197,9 +198,9 @@ func (c compiled) GetSortedEtikettenExpanded(
 }
 
 func (c compiled) GetImplicitEtiketten(
-	e kennung.Etikett,
+	e *kennung.Etikett,
 ) kennung.EtikettSet {
-	s, ok := c.ImplicitEtiketten[e]
+	s, ok := c.ImplicitEtiketten[*e]
 
 	if !ok || s == nil {
 		return kennung.MakeEtikettSet()
