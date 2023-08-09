@@ -2,6 +2,7 @@ package commands
 
 import (
 	"flag"
+	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/gattung"
@@ -47,6 +48,7 @@ func (c Clean) RunWithCwdQuery(
 	possible *cwd.CwdFiles,
 ) (err error) {
 	fds := collections2.MakeMutableValueSet[kennung.FD, *kennung.FD](nil)
+	l := &sync.Mutex{}
 
 	for _, d := range possible.EmptyDirectories {
 		fds.Add(d)
@@ -63,6 +65,9 @@ func (c Clean) RunWithCwdQuery(
 				}
 
 				e := co.GetExternalLike()
+
+				l.Lock()
+				defer l.Unlock()
 
 				fds.Add(e.GetObjekteFD())
 				fds.Add(e.GetAkteFD())

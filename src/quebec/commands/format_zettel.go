@@ -114,7 +114,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		zt.GetTyp(),
 	).ApproximatedOrActual()
 
-	var akteFormatter script_config.ScriptConfig
+	var akteFormatter script_config.RemoteScript
 
 	if typKonfig != nil {
 		actualFormatId := formatId
@@ -133,14 +133,6 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 		if ok {
 			akteFormatter = f.ScriptConfig
-		} else {
-			err = errors.Normalf(
-				"format '%s' for Typ '%s' not found",
-				actualFormatId,
-				zt.GetTyp(),
-			)
-
-			return
 		}
 	} else {
 		log.Log().Printf("typ konfig was nil")
