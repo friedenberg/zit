@@ -29,6 +29,7 @@ type Cli struct {
 	PrintIncludeTypen                bool
 	PrintIncludeBezeichnungen        bool
 	PrintTime                        bool
+	PrintEtikettenAlways             bool
 }
 
 func (c *Cli) AddToFlags(f *flag.FlagSet) {
@@ -40,12 +41,27 @@ func (c *Cli) AddToFlags(f *flag.FlagSet) {
 	f.BoolVar(&c.Verbose, "verbose", false, "")
 	f.BoolVar(&c.Complete, "complete", false, "")
 
-	f.BoolVar(&c.IncludeCwd, "include-cwd", true, "include checked-out Objekten in the working directory")
-	f.BoolVar(&c.IncludeHidden, "include-hidden", false, "include zettels that have hidden etiketten")
+	f.BoolVar(
+		&c.IncludeCwd,
+		"include-cwd",
+		true,
+		"include checked-out Objekten in the working directory",
+	)
+	f.BoolVar(
+		&c.IncludeHidden,
+		"include-hidden",
+		false,
+		"include zettels that have hidden etiketten",
+	)
 
 	f.BoolVar(&c.AllowMissingHinweis, "allow-missing-hinweis", false, "")
 	f.BoolVar(&c.CheckoutCacheEnabled, "checkout-cache-enabled", false, "")
-	f.BoolVar(&c.PredictableHinweisen, "predictable-hinweisen", false, "don't randomly select new hinweisen")
+	f.BoolVar(
+		&c.PredictableHinweisen,
+		"predictable-hinweisen",
+		false,
+		"don't randomly select new hinweisen",
+	)
 
 	f.BoolVar(&c.PrintNewShaSyntax, "new-zettel-sha-syntax", true, "")
 	f.BoolVar(&c.PrintIncludeTypen, "print-typen", true, "")
@@ -54,6 +70,7 @@ func (c *Cli) AddToFlags(f *flag.FlagSet) {
 	f.BoolVar(&c.PrintAbbreviatedKennungen, "abbreviate-kennungen", true, "")
 	f.BoolVar(&c.PrintIncludeBezeichnungen, "print-bezeichnungen", true, "")
 	f.BoolVar(&c.PrintTime, "print-time", true, "")
+	f.BoolVar(&c.PrintEtikettenAlways, "print-etiketten", false, "")
 }
 
 func DefaultCli() (c Cli) {
@@ -66,4 +83,8 @@ func (c Cli) UsePredictableHinweisen() bool {
 
 func (c Cli) UsePrintTime() bool {
 	return c.PrintTime
+}
+
+func (c Cli) UsePrintEtiketten() bool {
+	return c.PrintEtikettenAlways
 }

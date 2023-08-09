@@ -11,7 +11,8 @@ import (
 )
 
 type CliOptions struct {
-	PrefixTai bool
+	PrefixTai              bool
+	AlwaysIncludeEtiketten bool
 }
 
 type cli struct {
@@ -166,7 +167,8 @@ func (f *cli) WriteStringFormat(
 		}
 	}
 
-	if f.writeEtiketten && !didWriteBezeichnung {
+	if f.options.AlwaysIncludeEtiketten ||
+		(f.writeEtiketten && !didWriteBezeichnung) {
 		b := o.GetMetadateiPtr().GetEtiketten()
 
 		if b.Len() > 0 {

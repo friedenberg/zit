@@ -39,7 +39,7 @@ function outputs_organize_one_etikett { # @test
 	assert_success
 	assert_output - <<-EOM
 		[-ok@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "wow"]
+		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "wow" ok]
 	EOM
 
 	run_zit show one/uno
@@ -89,7 +89,7 @@ function outputs_organize_two_etiketten { # @test
 	assert_output_unsorted - <<-EOM
 		[-brown@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[-ok@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "wow"]
+		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "wow" brown ok]
 	EOM
 
 	expected_organize="$(mktemp)"
@@ -119,7 +119,7 @@ function outputs_organize_two_etiketten { # @test
 	run_zit organize "${cmd_def_organize[@]}" -mode commit-directly ok brown <"$expected_organize"
 	assert_success
 	assert_output - <<-EOM
-		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "wow"]
+		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "wow" ok]
 	EOM
 
 	expected_zettel="$(mktemp)"
@@ -167,7 +167,7 @@ function outputs_organize_one_etiketten_group_by_one { # @test
 		[-priority-2@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[-priority@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[-task@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "wow"]
+		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "wow" priority-1 priority-2 task]
 	EOM
 
 	expected_organize="$(mktemp)"
@@ -212,7 +212,7 @@ function outputs_organize_two_zettels_one_etiketten_group_by_one { # @test
 		[-priority-1@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[-priority@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[-task@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "one/uno"]
+		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "one/uno" priority-1 task]
 	EOM
 
 	to_add="$(mktemp)"
@@ -228,7 +228,7 @@ function outputs_organize_two_zettels_one_etiketten_group_by_one { # @test
 	assert_success
 	assert_output - <<-EOM
 		[-priority-2@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/dos@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "two/dos"]
+		[one/dos@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "two/dos" priority-2 task]
 	EOM
 
 	expected_organize="$(mktemp)"
@@ -333,7 +333,7 @@ function commits_organize_one_etiketten_group_by_two { # @test
 		[-w-2022-07@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[-w-2022@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[-w@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "one/uno"]
+		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "one/uno" priority-1 task w-2022-07-07]
 	EOM
 
 	to_add="$(mktemp)"
@@ -350,7 +350,7 @@ function commits_organize_one_etiketten_group_by_two { # @test
 	assert_success
 	assert_output - <<-EOM
 		[-w-2022-07-06@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/dos@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "two/dos"]
+		[one/dos@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "two/dos" priority-1 task w-2022-07-06]
 	EOM
 
 	to_add="$(mktemp)"
@@ -367,7 +367,7 @@ function commits_organize_one_etiketten_group_by_two { # @test
 	run_zit new -edit=false "$to_add"
 	assert_success
 	assert_output - <<-EOM
-		[two/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "3"]
+		[two/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "3" priority-1 task w-2022-07-06]
 	EOM
 
 	expected_organize="$(mktemp)"

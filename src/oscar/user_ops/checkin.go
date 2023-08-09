@@ -1,6 +1,8 @@
 package user_ops
 
 import (
+	"sync"
+
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
@@ -24,6 +26,7 @@ func (c Checkin) Run(
 	pz *cwd.CwdFiles,
 ) (err error) {
 	fds := collections_ptr.MakeMutableValueSet[kennung.FD, *kennung.FD](nil)
+	l := &sync.Mutex{}
 
 	u.Lock()
 	defer errors.Deferred(&err, u.Unlock)
@@ -73,6 +76,9 @@ func (c Checkin) Run(
 				}
 
 				e := co.GetExternalLike()
+
+				l.Lock()
+				defer l.Unlock()
 				fds.Add(e.GetObjekteFD())
 				fds.Add(e.GetAkteFD())
 

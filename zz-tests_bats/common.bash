@@ -45,6 +45,7 @@ cmd_zit_def=(
 	-predictable-hinweisen
 	-print-typen=false
 	-print-time=false
+	-print-etiketten=true
 )
 
 export cmd_zit_def

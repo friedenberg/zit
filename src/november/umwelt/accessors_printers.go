@@ -42,7 +42,10 @@ func (u *Umwelt) StringFormatWriterEtiketten() schnittstellen.StringFormatWriter
 
 func (u *Umwelt) PrinterTransactedLike() schnittstellen.FuncIter[objekte.TransactedLikePtr] {
 	sw := sku_formats.MakeCliFormat(
-		sku_formats.CliOptions{PrefixTai: u.konfig.UsePrintTime()},
+		sku_formats.CliOptions{
+      PrefixTai: u.konfig.UsePrintTime(),
+      AlwaysIncludeEtiketten: u.konfig.UsePrintEtiketten(),
+    },
 		u.StringFormatWriterShaLike(),
 		u.StringFormatWriterKennung(),
 		u.StringFormatWriterTyp(),
