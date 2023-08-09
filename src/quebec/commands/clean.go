@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/charlie/collections2"
+	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/hotel/objekte"
@@ -47,7 +47,7 @@ func (c Clean) RunWithCwdQuery(
 	ms kennung.MetaSet,
 	possible *cwd.CwdFiles,
 ) (err error) {
-	fds := collections2.MakeMutableValueSet[kennung.FD, *kennung.FD](nil)
+	fds := collections_ptr.MakeMutableValueSet[kennung.FD, *kennung.FD](nil)
 	l := &sync.Mutex{}
 
 	for _, d := range possible.EmptyDirectories {

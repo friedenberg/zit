@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/values"
-	"github.com/friedenberg/zit/src/charlie/collections2"
+	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 )
@@ -59,8 +59,8 @@ func (m *Metadatei) AddToFlagSet(f *flag.FlagSet) {
 
 	mes := m.GetEtiketten().CloneMutableSetPtrLike()
 
-	fes := collections2.MakeFlagCommasFromExisting[kennung.Etikett](
-		collections2.SetterPolicyAppend,
+	fes := collections_ptr.MakeFlagCommasFromExisting[kennung.Etikett](
+		collections_ptr.SetterPolicyAppend,
 		mes,
 	)
 

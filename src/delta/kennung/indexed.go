@@ -3,7 +3,7 @@ package kennung
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/charlie/collections2"
+	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/charlie/tridex"
 )
 
@@ -69,7 +69,7 @@ func (z *IndexedLike[T, TPtr]) Reset() {
 	TPtr(&z.Kennung).Reset()
 	z.SchwanzenCount = 0
 	z.Count = 0
-	z.ExpandedRight = collections2.MakeMutableValueSetValue[T, TPtr](nil)
-	z.ExpandedAll = collections2.MakeMutableValueSetValue[T, TPtr](nil)
+	z.ExpandedRight = collections_ptr.MakeMutableValueSetValue[T, TPtr](nil)
+	z.ExpandedAll = collections_ptr.MakeMutableValueSetValue[T, TPtr](nil)
 	z.Tridex = tridex.Make()
 }

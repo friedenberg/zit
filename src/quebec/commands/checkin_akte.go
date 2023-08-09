@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/collections2"
+	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -16,7 +16,7 @@ import (
 
 type CheckinAkte struct {
 	Delete       bool
-	NewEtiketten collections2.Flag[kennung.Etikett, *kennung.Etikett]
+	NewEtiketten collections_ptr.Flag[kennung.Etikett, *kennung.Etikett]
 }
 
 func init() {
@@ -24,8 +24,8 @@ func init() {
 		"checkin-akte",
 		func(f *flag.FlagSet) Command {
 			c := &CheckinAkte{
-				NewEtiketten: collections2.MakeFlagCommas[kennung.Etikett](
-					collections2.SetterPolicyAppend,
+				NewEtiketten: collections_ptr.MakeFlagCommas[kennung.Etikett](
+					collections_ptr.SetterPolicyAppend,
 				),
 			}
 

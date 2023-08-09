@@ -3,7 +3,7 @@ package kennung
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/charlie/collections2"
+	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 )
 
 func init() {
@@ -17,12 +17,12 @@ type (
 
 func MakeTypSet(es ...Typ) (s TypSet) {
 	return TypSet(
-		collections2.MakeValueSetValue[Typ, *Typ](nil, es...),
+		collections_ptr.MakeValueSetValue[Typ, *Typ](nil, es...),
 	)
 }
 
 func MakeTypSetStrings(vs ...string) (s TypSet, err error) {
-	return collections2.MakeValueSetString[Typ, *Typ](nil, vs...)
+	return collections_ptr.MakeValueSetString[Typ, *Typ](nil, vs...)
 }
 
 func MakeMutableTypSet(hs ...Typ) TypMutableSet {
@@ -31,7 +31,7 @@ func MakeMutableTypSet(hs ...Typ) TypMutableSet {
 
 func MakeTypMutableSet(hs ...Typ) TypMutableSet {
 	return TypMutableSet(
-		collections2.MakeMutableValueSetValue[Typ, *Typ](
+		collections_ptr.MakeMutableValueSetValue[Typ, *Typ](
 			nil,
 			hs...,
 		),

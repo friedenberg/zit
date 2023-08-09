@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/collections2"
+	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/india/konfig"
@@ -16,7 +16,7 @@ type Flags struct {
 	Options
 
 	once           *sync.Once
-	ExtraEtiketten collections2.Flag[kennung.Etikett, *kennung.Etikett]
+	ExtraEtiketten collections_ptr.Flag[kennung.Etikett, *kennung.Etikett]
 }
 
 type Options struct {
@@ -41,8 +41,8 @@ type Options struct {
 func MakeFlags() Flags {
 	return Flags{
 		once: &sync.Once{},
-		ExtraEtiketten: collections2.MakeFlagCommas[kennung.Etikett](
-			collections2.SetterPolicyAppend,
+		ExtraEtiketten: collections_ptr.MakeFlagCommas[kennung.Etikett](
+			collections_ptr.SetterPolicyAppend,
 		),
 
 		Options: Options{

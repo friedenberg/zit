@@ -13,7 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/charlie/collections2"
+	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/india/konfig"
@@ -255,17 +255,17 @@ func makeCwdFiles(
 		akteWriterFactory: awf,
 		erworben:          erworben,
 		dir:               dir,
-		Kisten: collections2.MakeMutableValueSet[Kasten, *Kasten](
+		Kisten: collections_ptr.MakeMutableValueSet[Kasten, *Kasten](
 			nil,
 		),
-		Typen: collections2.MakeMutableValueSet[Typ, *Typ](nil),
-		Zettelen: collections2.MakeMutableValueSet[Zettel, *Zettel](
+		Typen: collections_ptr.MakeMutableValueSet[Typ, *Typ](nil),
+		Zettelen: collections_ptr.MakeMutableValueSet[Zettel, *Zettel](
 			nil,
 		),
-		Etiketten: collections2.MakeMutableValueSet[Etikett, *Etikett](
+		Etiketten: collections_ptr.MakeMutableValueSet[Etikett, *Etikett](
 			nil,
 		),
-		UnsureAkten: collections2.MakeMutableValueSet[kennung.FD, *kennung.FD](
+		UnsureAkten: collections_ptr.MakeMutableValueSet[kennung.FD, *kennung.FD](
 			nil,
 		),
 		EmptyDirectories: make([]kennung.FD, 0),

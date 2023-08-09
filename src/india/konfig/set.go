@@ -4,7 +4,7 @@ import (
 	"encoding/gob"
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/collections2"
+	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/hotel/etikett"
 	"github.com/friedenberg/zit/src/hotel/kasten"
@@ -57,7 +57,7 @@ func makeCompiledKastenSet(
 func makeCompiledKastenSetFromSlice(
 	s1 []kasten.Transacted,
 ) schnittstellen.MutableSetLike[kasten.Transacted] {
-	return collections2.MakeMutableSetValue[kasten.Transacted, *kasten.Transacted](
+	return collections_ptr.MakeMutableSetValue[kasten.Transacted, *kasten.Transacted](
 		KennungKeyer[kasten.Transacted, *kasten.Transacted]{},
 		s1...,
 	)
@@ -66,7 +66,7 @@ func makeCompiledKastenSetFromSlice(
 func makeCompiledEtikettSetFromSlice(
 	s1 []etikett.Transacted,
 ) schnittstellen.MutableSetLike[etikett.Transacted] {
-	return collections2.MakeMutableSetValue[etikett.Transacted, *etikett.Transacted](
+	return collections_ptr.MakeMutableSetValue[etikett.Transacted, *etikett.Transacted](
 		KennungKeyer[etikett.Transacted, *etikett.Transacted]{},
 		s1...,
 	)
@@ -85,7 +85,7 @@ func makeCompiledEtikettSet(
 func makeCompiledTypSetFromSlice(
 	s1 []typ.Transacted,
 ) schnittstellen.MutableSetLike[typ.Transacted] {
-	return collections2.MakeMutableSetValue[typ.Transacted, *typ.Transacted](
+	return collections_ptr.MakeMutableSetValue[typ.Transacted, *typ.Transacted](
 		KennungKeyer[typ.Transacted, *typ.Transacted]{},
 		s1...,
 	)

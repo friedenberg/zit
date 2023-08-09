@@ -3,7 +3,7 @@ package kennung
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/charlie/collections2"
+	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 )
 
 func init() {
@@ -17,12 +17,12 @@ type (
 
 func MakeEtikettSet(es ...Etikett) (s EtikettSet) {
 	return EtikettSet(
-		collections2.MakeValueSetValue[Etikett, *Etikett](nil, es...),
+		collections_ptr.MakeValueSetValue[Etikett, *Etikett](nil, es...),
 	)
 }
 
 func MakeEtikettSetStrings(vs ...string) (s EtikettSet, err error) {
-	return collections2.MakeValueSetString[Etikett, *Etikett](nil, vs...)
+	return collections_ptr.MakeValueSetString[Etikett, *Etikett](nil, vs...)
 }
 
 func MakeMutableEtikettSet(hs ...Etikett) EtikettMutableSet {
@@ -31,7 +31,7 @@ func MakeMutableEtikettSet(hs ...Etikett) EtikettMutableSet {
 
 func MakeEtikettMutableSet(hs ...Etikett) EtikettMutableSet {
 	return EtikettMutableSet(
-		collections2.MakeMutableValueSetValue[Etikett, *Etikett](
+		collections_ptr.MakeMutableValueSetValue[Etikett, *Etikett](
 			nil,
 			hs...,
 		),

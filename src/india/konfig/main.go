@@ -15,7 +15,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/charlie/collections2"
+	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/sku"
@@ -42,7 +42,7 @@ func (a *compiled) Reset() {
 	a.lock = &sync.Mutex{}
 	a.Typen = makeCompiledTypSetFromSlice(nil)
 	a.EtikettenHidden = kennung.MakeEtikettSet()
-	a.Etiketten = collections2.MakeMutableValueSet[ketikett, *ketikett](nil)
+	a.Etiketten = collections_ptr.MakeMutableValueSet[ketikett, *ketikett](nil)
 	a.ImplicitEtiketten = make(implicitEtikettenMap)
 	a.Kisten = makeCompiledKastenSetFromSlice(nil)
 }

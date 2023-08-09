@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/charlie/collections2"
+	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 )
 
 type QueryPrefixer interface {
@@ -612,7 +612,7 @@ func ExpandOne[T KennungLike[T], TPtr KennungLikePtr[T]](
 	k TPtr,
 	exes ...Expander,
 ) (out schnittstellen.SetPtrLike[T, TPtr]) {
-	s1 := collections2.MakeMutableValueSetValue[T, TPtr](nil)
+	s1 := collections_ptr.MakeMutableValueSetValue[T, TPtr](nil)
 
 	if len(exes) == 0 {
 		exes = []Expander{ExpanderAll}
@@ -631,7 +631,7 @@ func ExpandMany[T KennungLike[T], TPtr KennungLikePtr[T]](
 	ks schnittstellen.SetPtrLike[T, TPtr],
 	ex Expander,
 ) (out schnittstellen.SetPtrLike[T, TPtr]) {
-	s1 := collections2.MakeMutableValueSetValue[T, TPtr](nil)
+	s1 := collections_ptr.MakeMutableValueSetValue[T, TPtr](nil)
 
 	ks.EachPtr(
 		func(k TPtr) (err error) {

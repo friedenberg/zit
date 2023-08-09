@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/charlie/collections2"
+	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 )
 
 var (
@@ -28,8 +28,8 @@ func register[T Kennung, TPtr interface {
 	Kennung
 }](id T) {
 	gob.Register(id)
-	gob.Register(collections2.MakeMutableValueSet[T, TPtr](nil))
-	gob.Register(collections2.MakeValueSet[T, TPtr](nil))
+	gob.Register(collections_ptr.MakeMutableValueSet[T, TPtr](nil))
+	gob.Register(collections_ptr.MakeValueSet[T, TPtr](nil))
 	registerOnce.Do(once)
 
 	registryLock.Lock()

@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/collections2"
+	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
@@ -154,8 +154,8 @@ func (ar *assignmentLineReader) readOneHeading(l line) (err error) {
 
 	currentEtiketten := kennung.MakeMutableEtikettSet()
 
-	flag := collections2.MakeFlagCommasFromExisting(
-		collections2.SetterPolicyAppend,
+	flag := collections_ptr.MakeFlagCommasFromExisting(
+		collections_ptr.SetterPolicyAppend,
 		currentEtiketten,
 	)
 

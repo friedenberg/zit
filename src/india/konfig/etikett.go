@@ -8,13 +8,13 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/charlie/collections2"
+	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/hotel/etikett"
 )
 
 func init() {
-	collections2.RegisterGob[ketikett, *ketikett]()
+	collections_ptr.RegisterGob[ketikett, *ketikett]()
 }
 
 type implicitEtikettenMap map[kennung.Etikett]kennung.EtikettMutableSet
