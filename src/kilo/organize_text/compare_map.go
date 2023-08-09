@@ -7,12 +7,13 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
 
 // TODO-P4 make generic
-type SetKeyToEtiketten map[string]kennung.EtikettMutableSet
+type SetKeyToMetadatei map[string]metadatei.Metadatei
 
-func (m SetKeyToEtiketten) String() string {
+func (m SetKeyToMetadatei) String() string {
 	sb := &strings.Builder{}
 
 	for h, es := range m {
@@ -22,41 +23,57 @@ func (m SetKeyToEtiketten) String() string {
 	return sb.String()
 }
 
-func (m SetKeyToEtiketten) Add(h string, e kennung.Etikett) {
-	var es kennung.EtikettMutableSet
+func (s SetKeyToMetadatei) Add(h string) {
+	var m metadatei.Metadatei
 	ok := false
 
-	if es, ok = m[h]; !ok {
-		es = kennung.MakeEtikettMutableSet()
+	if m, ok = s[h]; !ok {
+		m.Reset()
 	}
 
-	kennung.AddNormalized(es, &e)
-	m[h] = es
+	s[h] = m
 }
 
-func (m SetKeyToEtiketten) Contains(h string, e kennung.Etikett) (ok bool) {
-	var es kennung.EtikettMutableSet
+func (s SetKeyToMetadatei) AddEtikett(h string, e kennung.Etikett) {
+	var m metadatei.Metadatei
+	ok := false
 
-	if es, ok = m[h]; !ok {
+	if m, ok = s[h]; !ok {
+		m.Reset()
+	}
+
+	mes := m.Etiketten.CloneMutableSetPtrLike()
+	kennung.AddNormalized(mes, &e)
+	m.Etiketten = mes
+	s[h] = m
+}
+
+func (s SetKeyToMetadatei) ContainsEtikett(
+	h string,
+	e kennung.Etikett,
+) (ok bool) {
+	var m metadatei.Metadatei
+
+	if m, ok = s[h]; !ok {
 		return
 	}
 
-	ok = es.Contains(e)
+	ok = m.Etiketten.Contains(e)
 
 	return
 }
 
 type CompareMap struct {
 	// etikett to hinweis
-	Named SetKeyToEtiketten
+	Named SetKeyToMetadatei
 	// etikett to bezeichnung
-	Unnamed SetKeyToEtiketten
+	Unnamed SetKeyToMetadatei
 }
 
 func (in *Text) ToCompareMap() (out CompareMap, err error) {
 	out = CompareMap{
-		Named:   make(SetKeyToEtiketten),
-		Unnamed: make(SetKeyToEtiketten),
+		Named:   make(SetKeyToMetadatei),
+		Unnamed: make(SetKeyToMetadatei),
 	}
 
 	if err = in.assignment.addToCompareMap(
@@ -90,17 +107,20 @@ func (a *assignment) addToCompareMap(
 
 	a.named.Each(
 		func(z obj) (err error) {
-			for _, e := range iter.SortedValues[kennung.Etikett](es) {
-				if z.Kennung == nil {
-					panic(fmt.Sprintf("%s: Kennung is nil", z))
-				}
+			if z.Kennung == nil {
+				panic(fmt.Sprintf("%s: Kennung is nil", z))
+			}
 
-				out.Named.Add(kennung.FormattedString(z.Kennung), e)
+			fk := kennung.FormattedString(z.Kennung)
+			out.Named.Add(fk)
+
+			for _, e := range iter.SortedValues[kennung.Etikett](es) {
+				out.Named.AddEtikett(fk, e)
 			}
 
 			for _, e := range m.EtikettSet.Elements() {
 				errors.TodoP4("add typ")
-				out.Named.Add(kennung.FormattedString(z.Kennung), e)
+				out.Named.AddEtikett(fk, e)
 			}
 
 			return
@@ -109,13 +129,15 @@ func (a *assignment) addToCompareMap(
 
 	a.unnamed.Each(
 		func(z obj) (err error) {
+			out.Unnamed.Add(z.Bezeichnung.String())
+
 			for _, e := range iter.SortedValues[kennung.Etikett](es) {
-				out.Unnamed.Add(z.Bezeichnung.String(), e)
+				out.Unnamed.AddEtikett(z.Bezeichnung.String(), e)
 			}
 
 			for _, e := range m.EtikettSet.Elements() {
 				errors.TodoP4("add typ")
-				out.Unnamed.Add(z.Bezeichnung.String(), e)
+				out.Unnamed.AddEtikett(z.Bezeichnung.String(), e)
 			}
 
 			return

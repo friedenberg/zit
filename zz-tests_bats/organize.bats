@@ -143,3 +143,34 @@ function organize_dry_run { # @test
 	assert_success
 	assert_output_unsorted "$(cat "$expected_show")"
 }
+
+function organize_with_typ_output { # @test
+	run_zit organize -mode output-only !md:z
+	assert_success
+	assert_output - <<-EOM
+		---
+		! md
+		---
+
+		- [one/dos] wow ok again
+		- [one/uno] wow the first
+	EOM
+}
+
+function organize_with_typ_commit { # @test
+	run_zit organize -mode commit-directly !md:z <<-EOM
+		---
+		! txt
+		---
+
+		- [one/dos] wow ok again
+		- [one/uno] wow the first
+	EOM
+
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[!txt@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[one/dos@2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !txt "wow ok again" tag-3 tag-4]
+		[one/uno@11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !txt "wow the first" tag-3 tag-4]
+	EOM
+}

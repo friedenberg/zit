@@ -8,6 +8,16 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
+type ChangeKeyer struct{}
+
+func (ck ChangeKeyer) GetKey(c Change) string {
+	return c.Key
+}
+
+func (ck ChangeKeyer) GetKeyPtr(c *Change) string {
+	return c.Key
+}
+
 type Change struct {
 	Key     string
 	added   kennung.EtikettMutableSet

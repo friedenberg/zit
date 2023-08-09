@@ -4,7 +4,8 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/values"
-	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/charlie/collections_ptr"
+	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/kilo/organize_text"
 )
@@ -45,7 +46,7 @@ func makeCompareMapFromOrganizeTextAndExpander(
 	}
 
 	out = organize_text.CompareMap{
-		Named:   make(organize_text.SetKeyToEtiketten),
+		Named:   make(organize_text.SetKeyToMetadatei),
 		Unnamed: preExpansion.Unnamed,
 	}
 
@@ -86,9 +87,13 @@ func ChangesFrom(
 		return
 	}
 
-	c.existing = collections.MakeMutableSetStringer[Change]()
-	c.added = collections.MakeMutableSetStringer[Change]()
-	c.allB = collections.MakeMutableSetStringer[values.String]()
+	c.existing = collections_ptr.MakeMutableValueSet[Change, *Change](
+		ChangeKeyer{},
+	)
+	c.added = collections_ptr.MakeMutableValueSet[Change, *Change](
+		ChangeKeyer{},
+	)
+	c.allB = collections_value.MakeMutableValueSet[values.String](nil)
 
 	for h, es1 := range b.Named {
 		change := Change{
@@ -99,15 +104,17 @@ func ChangesFrom(
 
 		c.allB.Add(values.MakeString(h))
 
-		for _, e1 := range es1.Elements() {
-			if a.Named.Contains(h, e1) {
+		for _, e1 := range es1.Etiketten.Elements() {
+			if a.Named.ContainsEtikett(h, e1) {
 				// zettel had etikett previously
 			} else {
 				change.added.Add(e1)
 			}
 
 			if es2, ok := a.Named[h]; ok {
-				es2.Del(e1)
+				mes := es2.Etiketten.CloneMutableSetPtrLike()
+				mes.Del(e1)
+				es2.Etiketten = mes.CloneSetPtrLike()
 				a.Named[h] = es2
 			}
 		}
@@ -127,7 +134,7 @@ func ChangesFrom(
 			}
 		}
 
-		for _, e1 := range es.Elements() {
+		for _, e1 := range es.Etiketten.Elements() {
 			if e1.String() == "" {
 				err = errors.Errorf("empty etikett for %s", h)
 				return
@@ -146,7 +153,7 @@ func ChangesFrom(
 			removed: kennung.MakeEtikettMutableSet(),
 		}
 
-		for _, e := range es.Elements() {
+		for _, e := range es.Etiketten.Elements() {
 			change.added.Add(e)
 		}
 
