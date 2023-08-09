@@ -20,6 +20,7 @@ type (
 
 	TypLike interface {
 		GetTyp() Typ
+		GetTypPtr() *Typ
 	}
 
 	InlineTypChecker interface {
@@ -65,6 +66,10 @@ func (a Typ) Equals(b Typ) bool {
 }
 
 func (t Typ) GetTyp() Typ {
+	return t
+}
+
+func (t *Typ) GetTypPtr() *Typ {
 	return t
 }
 

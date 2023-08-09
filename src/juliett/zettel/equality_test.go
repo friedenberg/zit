@@ -23,7 +23,7 @@ func TestMakeEtiketten(t1 *testing.T) {
 	var sut kennung.EtikettSet
 	var err error
 
-	if sut, err = kennung.MakeSetStrings(vs...); err != nil {
+	if sut, err = kennung.MakeEtikettSetStrings(vs...); err != nil {
 		t.Fatalf("%s", err)
 	}
 

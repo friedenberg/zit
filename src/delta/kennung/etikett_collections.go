@@ -21,7 +21,7 @@ func MakeEtikettSet(es ...Etikett) (s EtikettSet) {
 	)
 }
 
-func MakeSetStrings(vs ...string) (s EtikettSet, err error) {
+func MakeEtikettSetStrings(vs ...string) (s EtikettSet, err error) {
 	return collections2.MakeValueSetString[Etikett, *Etikett](nil, vs...)
 }
 

@@ -428,19 +428,32 @@ func (ms metaSet) GetEtiketten() EtikettSet {
 	return es
 }
 
+func (ms metaSet) GetTyp() (t Typ, ok bool) {
+	ts := ms.GetTypen()
+
+	if ts.Len() != 1 {
+		return
+	}
+
+	t = ts.Any()
+	ok = true
+
+	return
+}
+
 func (ms metaSet) GetTypen() schnittstellen.SetLike[Typ] {
-	es := collections.MakeMutableSetStringer[Typ]()
+	es := MakeMutableTypSet()
 
 	for _, s := range ms.Gattung {
 		VisitAllMatcherKennungSansGattungWrappers(
 			func(m MatcherKennungSansGattungWrapper) (err error) {
-				e, ok := m.GetKennung().(Typ)
+				e, ok := m.GetKennung().(TypLike)
 
 				if !ok {
 					return
 				}
 
-				return es.Add(e)
+				return es.AddPtr(e.GetTypPtr())
 			},
 			// TODO-P1 modify sigil matcher to allow child traversal
 			s.Matcher,
