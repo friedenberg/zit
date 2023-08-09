@@ -1,14 +1,9 @@
 package sku
 
 import (
-	"bytes"
-	"encoding/gob"
-	"fmt"
-	"sync"
-
-	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/charlie/collections_value"
 )
 
 type SkuLikeHeap = collections.Heap[wrapper, *wrapper]
@@ -30,122 +25,131 @@ func HeapEach(h SkuLikeHeap, f func(sk SkuLike) error) (err error) {
 	)
 }
 
-type MutableSetUnique = schnittstellen.MutableSetLike[SkuLike]
-
-func init() {
-	gob.Register(
-		collections.MakeMutableSet[SkuLike](
-			func(s SkuLike) string {
-				if s == nil {
-					return ""
-				}
-
-				return fmt.Sprintf(
-					"%s%s%s",
-					s.GetKennungLike(),
-					s.GetTai(),
-					s.GetAkteSha(),
-				)
-			},
-		),
-	)
-}
-
-type codable struct {
-	Objekten map[string][]SkuLike
-	Count    int
-}
-
-type MutableSet struct {
-	lock    *sync.RWMutex
-	codable codable
-}
+type (
+	Set        = schnittstellen.SetLike[SkuLikePtr]
+	MutableSet = schnittstellen.MutableSetLike[SkuLikePtr]
+)
 
 func MakeMutableSet() MutableSet {
-	return MutableSet{
-		lock: &sync.RWMutex{},
-		codable: codable{
-			Objekten: make(map[string][]SkuLike),
-		},
-	}
+	return collections_value.MakeMutableValueSet[SkuLikePtr](nil)
 }
 
-func (os *MutableSet) Len() int {
-	return os.codable.Count
-}
+// type MutableSetUnique = schnittstellen.MutableSetPtrLike[SkuLike]
 
-func (os *MutableSet) Add(o SkuLike) (i int) {
-	os.codable.Count++
-	k := o.GetKey()
+// func init() {
+// 	gob.Register(
+// 		collections.MakeMutableSet[SkuLike](
+// 			func(s SkuLike) string {
+// 				if s == nil {
+// 					return ""
+// 				}
 
-	os.lock.RLock()
-	s, _ := os.codable.Objekten[k]
-	os.lock.RUnlock()
+// 				return fmt.Sprintf(
+// 					"%s%s%s",
+// 					s.GetKennungLike(),
+// 					s.GetTai(),
+// 					s.GetAkteSha(),
+// 				)
+// 			},
+// 		),
+// 	)
+// }
 
-	i = len(s)
-	s = append(s, o)
+// type codable struct {
+// 	Objekten map[string][]SkuLike
+// 	Count    int
+// }
 
-	os.lock.Lock()
-	os.codable.Objekten[k] = s
-	os.lock.Unlock()
+// type MutableSet struct {
+// 	lock    *sync.RWMutex
+// 	codable codable
+// }
 
-	return
-}
+// func MakeMutableSet() MutableSet {
+// 	return MutableSet{
+// 		lock: &sync.RWMutex{},
+// 		codable: codable{
+// 			Objekten: make(map[string][]SkuLike),
+// 		},
+// 	}
+// }
 
-func (os MutableSet) Get(k string) []SkuLike {
-	os.lock.RLock()
-	defer os.lock.RUnlock()
+// func (os *MutableSet) Len() int {
+// 	return os.codable.Count
+// }
 
-	return os.codable.Objekten[k]
-}
+// func (os *MutableSet) Add(o SkuLike) (i int) {
+// 	os.codable.Count++
+// 	k := o.GetKey()
 
-func (os MutableSet) Each(
-	w schnittstellen.FuncIter[SkuLike],
-) (err error) {
-	os.lock.RLock()
-	defer os.lock.RUnlock()
+// 	os.lock.RLock()
+// 	s, _ := os.codable.Objekten[k]
+// 	os.lock.RUnlock()
 
-	for _, oss := range os.codable.Objekten {
-		for _, o := range oss {
-			if err = w(o); err != nil {
-				switch {
-				case collections.IsStopIteration(err):
-					err = nil
-					return
+// 	i = len(s)
+// 	s = append(s, o)
 
-				default:
-					err = errors.Wrap(err)
-					return
-				}
-			}
-		}
-	}
+// 	os.lock.Lock()
+// 	os.codable.Objekten[k] = s
+// 	os.lock.Unlock()
 
-	return
-}
+// 	return
+// }
 
-func (os MutableSet) GobEncode() (bs []byte, err error) {
-	b := bytes.NewBuffer(bs)
-	enc := gob.NewEncoder(b)
+// func (os MutableSet) Get(k string) []SkuLike {
+// 	os.lock.RLock()
+// 	defer os.lock.RUnlock()
 
-	if err = enc.Encode(os.codable); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+// 	return os.codable.Objekten[k]
+// }
 
-	bs = b.Bytes()
+// func (os MutableSet) Each(
+// 	w schnittstellen.FuncIter[SkuLike],
+// ) (err error) {
+// 	os.lock.RLock()
+// 	defer os.lock.RUnlock()
 
-	return
-}
+// 	for _, oss := range os.codable.Objekten {
+// 		for _, o := range oss {
+// 			if err = w(o); err != nil {
+// 				switch {
+// 				case collections.IsStopIteration(err):
+// 					err = nil
+// 					return
 
-func (os *MutableSet) GobDecode(bs []byte) (err error) {
-	b := bytes.NewBuffer(bs)
-	dec := gob.NewDecoder(b)
+// 				default:
+// 					err = errors.Wrap(err)
+// 					return
+// 				}
+// 			}
+// 		}
+// 	}
 
-	if err = dec.Decode(&os.codable); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+// 	return
+// }
 
-	return
-}
+// func (os MutableSet) GobEncode() (bs []byte, err error) {
+// 	b := bytes.NewBuffer(bs)
+// 	enc := gob.NewEncoder(b)
+
+// 	if err = enc.Encode(os.codable); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
+
+// 	bs = b.Bytes()
+
+// 	return
+// }
+
+// func (os *MutableSet) GobDecode(bs []byte) (err error) {
+// 	b := bytes.NewBuffer(bs)
+// 	dec := gob.NewDecoder(b)
+
+// 	if err = dec.Decode(&os.codable); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
+
+// 	return
+// }

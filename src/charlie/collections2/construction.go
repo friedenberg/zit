@@ -19,7 +19,7 @@ func MakeValueSetString[
 	s.E = make(map[string]TPtr, len(es))
 
 	if keyer == nil {
-		keyer = iter.StringerKeyer[T, TPtr]{}.RegisterGob()
+		keyer = iter.StringerKeyerPtr[T, TPtr]{}.RegisterGob()
 	}
 
 	s.K = keyer
@@ -46,7 +46,7 @@ func MakeValueSetValue[T schnittstellen.ValueLike, TPtr schnittstellen.ValuePtr[
 	s.E = make(map[string]TPtr, len(es))
 
 	if keyer == nil {
-		keyer = iter.StringerKeyer[T, TPtr]{}.RegisterGob()
+		keyer = iter.StringerKeyerPtr[T, TPtr]{}.RegisterGob()
 	}
 
 	s.K = keyer
@@ -66,7 +66,7 @@ func MakeValueSet[T schnittstellen.ValueLike, TPtr schnittstellen.ValuePtr[T]](
 	s.E = make(map[string]TPtr, len(es))
 
 	if keyer == nil {
-		keyer = iter.StringerKeyer[T, TPtr]{}.RegisterGob()
+		keyer = iter.StringerKeyerPtr[T, TPtr]{}.RegisterGob()
 	}
 
 	s.K = keyer
@@ -126,7 +126,7 @@ func MakeMutableValueSetValue[T schnittstellen.ValueLike, TPtr schnittstellen.Va
 	s.E = make(map[string]TPtr, len(es))
 
 	if keyer == nil {
-		keyer = iter.StringerKeyer[T, TPtr]{}.RegisterGob()
+		keyer = iter.StringerKeyerPtr[T, TPtr]{}.RegisterGob()
 	}
 
 	s.K = keyer
@@ -146,7 +146,7 @@ func MakeMutableValueSet[T schnittstellen.ValueLike, TPtr schnittstellen.ValuePt
 	s.E = make(map[string]TPtr, len(es))
 
 	if keyer == nil {
-		keyer = iter.StringerKeyer[T, TPtr]{}.RegisterGob()
+		keyer = iter.StringerKeyerPtr[T, TPtr]{}.RegisterGob()
 	}
 
 	s.K = keyer

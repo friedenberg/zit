@@ -201,7 +201,7 @@ func (s etikettStore) ReadAll(
 		if err = s.StoreUtil.GetTransaktionStore().ReadAllTransaktions(
 			func(t *transaktion.Transaktion) (err error) {
 				if err = t.Skus.Each(
-					func(o sku.SkuLike) (err error) {
+					func(o sku.SkuLikePtr) (err error) {
 						if o.GetGattung() != gattung.Etikett {
 							return
 						}

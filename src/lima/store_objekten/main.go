@@ -632,7 +632,7 @@ func (s *Store) Reindex() (err error) {
 		)
 
 		if err = t.Skus.Each(
-			func(sk sku.SkuLike) (err error) {
+			func(sk sku.SkuLikePtr) (err error) {
 				return f1(sk)
 			},
 		); err != nil {

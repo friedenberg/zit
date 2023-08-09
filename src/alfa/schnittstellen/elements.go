@@ -25,7 +25,8 @@ type Value[T any] interface {
 }
 
 type ValuePtr[T any] interface {
-	Value[T]
+	ValueLike
+	// Value[T]
 	Ptr[T]
 }
 

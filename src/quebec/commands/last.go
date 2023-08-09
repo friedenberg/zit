@@ -90,7 +90,7 @@ func (c Last) runWithTransaktion(u *umwelt.Umwelt) (err error) {
 
 	errors.TodoP3("support log line format for skus")
 	if err = transaktion.Skus.Each(
-		func(o sku.SkuLike) (err error) {
+		func(o sku.SkuLikePtr) (err error) {
 			errors.Out().Print(sku_formats.String(o))
 			return
 		},
