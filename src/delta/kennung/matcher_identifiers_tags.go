@@ -2,7 +2,7 @@ package kennung
 
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/charlie/collections_value"
 )
 
 type ImplicitEtikettenGetter interface {
@@ -77,7 +77,7 @@ func (s matcherExactlyThisOrAllOfThese) EachMatcher(
 }
 
 func (s matcherExactlyThisOrAllOfThese) GetHinweisen() schnittstellen.SetLike[Hinweis] {
-	hins := collections.MakeMutableSetStringer[Hinweis]()
+	hins := collections_value.MakeMutableValueSet[Hinweis](nil)
 
 	VisitAllMatcherKennungSansGattungWrappers(
 		func(m MatcherKennungSansGattungWrapper) (err error) {

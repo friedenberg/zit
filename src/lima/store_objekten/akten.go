@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/id"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
@@ -55,7 +56,7 @@ func (s Store) ReadAllMatchingAkten(
 		return
 	}
 
-	observed := collections.MakeMutableSetStringer[kennung.FD]()
+	observed := collections_value.MakeMutableValueSet[kennung.FD](nil)
 
 	if err = s.Zettel().ReadAll(
 		func(z *zettel.Transacted) (err error) {

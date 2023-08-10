@@ -1,6 +1,8 @@
 package collections_value
 
 import (
+	"encoding/gob"
+
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
@@ -16,6 +18,7 @@ func MakeValueSetString[
 	keyer schnittstellen.StringKeyer[T],
 	es ...string,
 ) (s Set[T], err error) {
+	gob.Register(s)
 	s.E = make(map[string]T, len(es))
 
 	if keyer == nil {
@@ -43,6 +46,7 @@ func MakeValueSetValue[T schnittstellen.ValueLike](
 	keyer schnittstellen.StringKeyer[T],
 	es ...T,
 ) (s Set[T]) {
+	gob.Register(s)
 	s.E = make(map[string]T, len(es))
 
 	if keyer == nil {
@@ -63,6 +67,7 @@ func MakeValueSet[T schnittstellen.ValueLike](
 	keyer schnittstellen.StringKeyer[T],
 	es ...T,
 ) (s Set[T]) {
+	gob.Register(s)
 	s.E = make(map[string]T, len(es))
 
 	if keyer == nil {
@@ -83,6 +88,7 @@ func MakeSetValue[T schnittstellen.Element](
 	keyer schnittstellen.StringKeyer[T],
 	es ...T,
 ) (s Set[T]) {
+	gob.Register(s)
 	s.E = make(map[string]T, len(es))
 
 	if keyer == nil {
@@ -103,6 +109,7 @@ func MakeSet[T schnittstellen.Element](
 	keyer schnittstellen.StringKeyer[T],
 	es ...T,
 ) (s Set[T]) {
+	gob.Register(s)
 	s.E = make(map[string]T, len(es))
 
 	if keyer == nil {
@@ -123,6 +130,7 @@ func MakeMutableValueSetValue[T schnittstellen.ValueLike](
 	keyer schnittstellen.StringKeyer[T],
 	es ...T,
 ) (s MutableSet[T]) {
+	gob.Register(s)
 	s.E = make(map[string]T, len(es))
 
 	if keyer == nil {
@@ -143,6 +151,7 @@ func MakeMutableValueSet[T schnittstellen.ValueLike](
 	keyer schnittstellen.StringKeyer[T],
 	es ...T,
 ) (s MutableSet[T]) {
+	gob.Register(s)
 	s.E = make(map[string]T, len(es))
 
 	if keyer == nil {
@@ -163,6 +172,7 @@ func MakeMutableSetValue[T schnittstellen.Element](
 	keyer schnittstellen.StringKeyer[T],
 	es ...T,
 ) (s MutableSet[T]) {
+	gob.Register(s)
 	s.E = make(map[string]T, len(es))
 
 	if keyer == nil {
@@ -183,6 +193,7 @@ func MakeMutableSet[T schnittstellen.Element](
 	keyer schnittstellen.StringKeyer[T],
 	es ...T,
 ) (s MutableSet[T]) {
+	gob.Register(s)
 	s.E = make(map[string]T, len(es))
 
 	if keyer == nil {

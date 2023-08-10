@@ -12,6 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 )
 
@@ -78,7 +79,7 @@ func MakeMetaSet(
 		Hidden:                  hidden,
 		DefaultGattungen:        dg.CloneMutableSetLike(),
 		Gattung:                 make(map[gattung.Gattung]setWithSigil),
-		FDs:                     collections.MakeMutableSetStringer[FD](),
+		FDs:                     collections_value.MakeMutableValueSet[FD](nil),
 		index:                   ki,
 	}
 }

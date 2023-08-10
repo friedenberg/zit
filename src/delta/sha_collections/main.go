@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
+	"github.com/friedenberg/zit/src/charlie/collections_value"
 )
 
 type (
@@ -22,7 +23,7 @@ func init() {
 }
 
 func MakeMutableSet(es ...sha.Sha) (s MutableSet) {
-	return collections.MakeMutableSetStringer(es...)
+	return collections_value.MakeMutableValueSet(nil, es...)
 }
 
 func MakeMutableSetStrings(vs ...string) (s MutableSet, err error) {

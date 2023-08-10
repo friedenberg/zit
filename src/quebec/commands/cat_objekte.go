@@ -9,6 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/delta/sha_collections"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
@@ -30,7 +31,7 @@ func (c CatObjekte) Run(
 	u *umwelt.Umwelt,
 	args ...string,
 ) (err error) {
-	shas := collections.MakeMutableSetStringer[sha.Sha]()
+	shas := collections_value.MakeMutableValueSet[sha.Sha](nil)
 
 	for _, v := range args {
 		if err = iter.AddString[sha.Sha](

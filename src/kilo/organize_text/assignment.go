@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
@@ -24,8 +24,8 @@ func newAssignment(d int) *assignment {
 	return &assignment{
 		depth:     d,
 		etiketten: kennung.MakeEtikettSet(),
-		named:     collections.MakeMutableSetStringer[obj](),
-		unnamed:   collections.MakeMutableSetStringer[obj](),
+		named:     collections_value.MakeMutableValueSet[obj](nil),
+		unnamed:   collections_value.MakeMutableValueSet[obj](nil),
 		children:  make([]*assignment, 0),
 	}
 }

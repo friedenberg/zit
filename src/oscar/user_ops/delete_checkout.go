@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/values"
-	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
@@ -26,7 +26,7 @@ func (c DeleteCheckout) Run(
 		return fs.EachPtr(p)
 	}
 
-	dirs := collections.MakeMutableSetStringer[values.String]()
+	dirs := collections_value.MakeMutableValueSet[values.String](nil)
 
 	if err = fs.EachPtr(
 		func(fd *kennung.FD) (err error) {

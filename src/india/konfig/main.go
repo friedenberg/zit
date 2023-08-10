@@ -16,6 +16,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
+	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/sku"
@@ -305,7 +306,7 @@ func (c compiled) GetZettelFileExtension() string {
 func (c compiled) GetSortedTypenExpanded(
 	v string,
 ) (expandedActual []*typ.Transacted) {
-	expandedMaybe := collections.MakeMutableSetStringer[values.String]()
+	expandedMaybe := collections_value.MakeMutableValueSet[values.String](nil)
 
 	sa := iter.MakeFuncSetString[
 		values.String,

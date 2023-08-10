@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
@@ -192,7 +192,7 @@ func (c Add) openAktenIfNecessary(
 		return
 	}
 
-	hs := collections.MakeMutableSetStringer[kennung.Hinweis]()
+	hs := collections_value.MakeMutableValueSet[kennung.Hinweis](nil)
 
 	zettels.Each(
 		func(z *zettel.Transacted) (err error) {

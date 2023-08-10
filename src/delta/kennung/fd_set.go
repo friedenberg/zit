@@ -3,10 +3,11 @@ package kennung
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/charlie/collections_value"
 )
 
 func init() {
-	collections.RegisterGob[FD]()
+	collections_value.RegisterGobValue[FD](nil)
 }
 
 type (

@@ -8,8 +8,8 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
+	"github.com/friedenberg/zit/src/charlie/collections_value"
 )
 
 type QueryPrefixer interface {
@@ -588,7 +588,7 @@ func ExpandOneSlice[T KennungLike[T], TPtr KennungLikePtr[T]](
 	k TPtr,
 	exes ...Expander,
 ) (out []T) {
-	s1 := collections.MakeMutableSetStringer[T]()
+	s1 := collections_value.MakeMutableValueSet[T](nil)
 
 	if len(exes) == 0 {
 		exes = []Expander{ExpanderAll}

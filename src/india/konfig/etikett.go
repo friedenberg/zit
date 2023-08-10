@@ -7,8 +7,8 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/values"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
+	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/hotel/etikett"
 )
@@ -165,7 +165,7 @@ func (c compiled) GetSortedEtikettenExpanded(
 	c.lock.Lock()
 	defer c.lock.Unlock()
 
-	expandedMaybe := collections.MakeMutableSetStringer[values.String]()
+	expandedMaybe := collections_value.MakeMutableValueSet[values.String](nil)
 	sa := iter.MakeFuncSetString[values.String, *values.String](
 		expandedMaybe,
 	)
