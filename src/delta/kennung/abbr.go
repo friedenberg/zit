@@ -69,6 +69,10 @@ func (a Abbr) AbbreviateKennung(
 	case Kasten, *Kasten:
 		getAbbr = a.Kasten.AbbreviateKennung
 
+	case Konfig, *Konfig:
+		out = in
+		return
+
 	default:
 		err = errors.Errorf("unsupported Kennung: %q, %T", in, in)
 		return

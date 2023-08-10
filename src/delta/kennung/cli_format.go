@@ -4,6 +4,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/erworben_cli_print_options"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/string_writer_format"
@@ -46,26 +47,39 @@ func (f *fdCliFormat) WriteStringFormat(
 }
 
 type kennungCliFormat struct {
+	options            erworben_cli_print_options.Options
 	stringFormatWriter schnittstellen.StringFormatWriter[string]
+	abbr               Abbr
 }
 
 func MakeKennungCliFormat(
+	options erworben_cli_print_options.Options,
 	co string_writer_format.ColorOptions,
+	abbr Abbr,
 ) *kennungCliFormat {
 	return &kennungCliFormat{
+		options: options,
 		stringFormatWriter: string_writer_format.MakeColor[string](
 			co,
 			string_writer_format.MakeString[string](),
 			string_writer_format.ColorTypePointer,
 		),
+		abbr: abbr,
 	}
 }
 
 func (f *kennungCliFormat) WriteStringFormat(
 	w io.StringWriter,
-	k KennungPtr,
+	k1 KennungPtr,
 ) (n int64, err error) {
-	// TODO-P2 add abbreviation
+	k := Kennung(k1)
+
+	if f.options.PrintAbbreviatedKennungen {
+		if k, err = f.abbr.AbbreviateKennung(k); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
 
 	parts := k.Parts()
 

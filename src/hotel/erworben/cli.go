@@ -3,6 +3,7 @@ package erworben
 import (
 	"flag"
 
+	"github.com/friedenberg/zit/src/alfa/erworben_cli_print_options"
 	"github.com/friedenberg/zit/src/charlie/debug"
 )
 
@@ -22,14 +23,8 @@ type Cli struct {
 	CheckoutCacheEnabled             bool
 	PredictableHinweisen             bool
 	UseRightAlignedIndentsInOrganize bool
-	PrintAbbreviatedHinweisen        bool
-	PrintAbbreviatedKennungen        bool
-	PrintAbbreviatedShas             bool
-	PrintNewShaSyntax                bool
-	PrintIncludeTypen                bool
-	PrintIncludeBezeichnungen        bool
-	PrintTime                        bool
-	PrintEtikettenAlways             bool
+
+	erworben_cli_print_options.Options
 }
 
 func (c *Cli) AddToFlags(f *flag.FlagSet) {
@@ -63,14 +58,7 @@ func (c *Cli) AddToFlags(f *flag.FlagSet) {
 		"don't randomly select new hinweisen",
 	)
 
-	f.BoolVar(&c.PrintNewShaSyntax, "new-zettel-sha-syntax", true, "")
-	f.BoolVar(&c.PrintIncludeTypen, "print-typen", true, "")
-	f.BoolVar(&c.PrintAbbreviatedShas, "abbreviate-shas", true, "")
-	f.BoolVar(&c.PrintAbbreviatedHinweisen, "abbreviate-hinweisen", true, "")
-	f.BoolVar(&c.PrintAbbreviatedKennungen, "abbreviate-kennungen", true, "")
-	f.BoolVar(&c.PrintIncludeBezeichnungen, "print-bezeichnungen", true, "")
-	f.BoolVar(&c.PrintTime, "print-time", true, "")
-	f.BoolVar(&c.PrintEtikettenAlways, "print-etiketten", false, "")
+	c.Options.AddToFlags(f)
 }
 
 func DefaultCli() (c Cli) {
