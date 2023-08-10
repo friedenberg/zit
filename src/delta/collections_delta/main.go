@@ -1,6 +1,9 @@
-package collections
+package collections_delta
 
-import "github.com/friedenberg/zit/src/alfa/schnittstellen"
+import (
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/charlie/collections_value"
+)
 
 type delta[T schnittstellen.ValueLike] struct {
 	Added, Removed schnittstellen.MutableSetLike[T]
@@ -18,7 +21,7 @@ func MakeSetDelta[T schnittstellen.ValueLike](
 	from, to schnittstellen.SetLike[T],
 ) schnittstellen.Delta[T] {
 	d := delta[T]{
-		Added:   MakeMutableSetStringer[T](),
+		Added:   collections_value.MakeMutableValueSet[T](nil),
 		Removed: from.CloneMutableSetLike(),
 	}
 

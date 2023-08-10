@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/hotel/objekte"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -154,7 +153,7 @@ func (op PullServer) skusForFilter(
 	if err = op.umwelt.StoreObjekten().Query(
 		msg.MetaSet,
 		iter.MakeChain(
-			collections.MakeFuncTransformer[*zettel.Transacted, objekte.TransactedLikePtr](
+			iter.MakeFuncTransformer[*zettel.Transacted, objekte.TransactedLikePtr](
 				zettel.MakeWriterKonfig(op.umwelt.Konfig()),
 			),
 			func(tl objekte.TransactedLikePtr) (err error) {

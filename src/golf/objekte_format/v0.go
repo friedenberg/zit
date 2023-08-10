@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/ohio"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
@@ -58,7 +57,7 @@ func (f v0) ParsePersistentMetadatei(
 
 	typLineReader := ohio.MakeLineReaderIgnoreErrors(m.Typ.Set)
 
-	esa := collections.MakeFuncSetString[kennung.Etikett, *kennung.Etikett](
+	esa := iter.MakeFuncSetString[kennung.Etikett, *kennung.Etikett](
 		etiketten,
 	)
 

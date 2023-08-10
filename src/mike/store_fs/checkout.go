@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/id"
 	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/hotel/etikett"
 	"github.com/friedenberg/zit/src/hotel/kasten"
@@ -55,7 +54,7 @@ func (s *Store) Checkout(
 		iter.MakeChain(
 			zettel.MakeWriterKonfig(s.erworben),
 			ztw,
-			collections.AddClone[zettel.Transacted, *zettel.Transacted](zts),
+			iter.AddClone[zettel.Transacted, *zettel.Transacted](zts),
 		),
 	); err != nil {
 		err = errors.Wrap(err)

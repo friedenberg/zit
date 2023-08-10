@@ -307,7 +307,7 @@ func (c compiled) GetSortedTypenExpanded(
 ) (expandedActual []*typ.Transacted) {
 	expandedMaybe := collections.MakeMutableSetStringer[values.String]()
 
-	sa := collections.MakeFuncSetString[
+	sa := iter.MakeFuncSetString[
 		values.String,
 		*values.String,
 	](expandedMaybe)

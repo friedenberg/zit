@@ -8,7 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/ohio"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
@@ -43,7 +42,7 @@ func (m *Metadatei) ReadFrom(r1 io.Reader) (n int64, err error) {
 			ohio.MakeLineReaderKeyValues(
 				map[string]schnittstellen.FuncSetString{
 					"%": ohio.MakeLineReaderNop(),
-					"-": collections.MakeFuncSetString[
+					"-": iter.MakeFuncSetString[
 						kennung.Etikett,
 						*kennung.Etikett,
 					](mes),

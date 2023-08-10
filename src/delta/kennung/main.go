@@ -580,7 +580,7 @@ func expandOne[T KennungLike[T], TPtr KennungLikePtr[T]](
 	ex Expander,
 	acc schnittstellen.Adder[T],
 ) {
-	f := collections.MakeFuncSetString[T, TPtr](acc)
+	f := iter.MakeFuncSetString[T, TPtr](acc)
 	ex.Expand(f, k.String())
 }
 

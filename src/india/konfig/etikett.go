@@ -166,7 +166,7 @@ func (c compiled) GetSortedEtikettenExpanded(
 	defer c.lock.Unlock()
 
 	expandedMaybe := collections.MakeMutableSetStringer[values.String]()
-	sa := collections.MakeFuncSetString[values.String, *values.String](
+	sa := iter.MakeFuncSetString[values.String, *values.String](
 		expandedMaybe,
 	)
 	typExpander.Expand(sa, v)

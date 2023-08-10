@@ -8,7 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/sku"
@@ -63,7 +62,7 @@ func (c ZettelFromExternalAkte) Run(
 		if err = c.StoreObjekten().Zettel().ReadAll(
 			iter.MakeChain(
 				matcher.Match,
-				collections.AddClone[zettel.Transacted, *zettel.Transacted](results),
+				iter.AddClone[zettel.Transacted, *zettel.Transacted](results),
 			),
 		); err != nil {
 			err = errors.Wrap(err)

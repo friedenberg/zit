@@ -12,7 +12,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/todo"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/sku"
@@ -73,7 +72,7 @@ func (fs CwdFiles) EachCreatableMatchable(
 }
 
 func (fs CwdFiles) String() (out string) {
-	if collections.Len(
+	if iter.Len(
 		fs.Zettelen,
 		fs.Typen,
 		fs.Kisten,
@@ -235,7 +234,7 @@ func (fs CwdFiles) All(
 }
 
 func (fs CwdFiles) ZettelFiles() (out []string, err error) {
-	out, err = collections.DerivedValues[Zettel, string](
+	out, err = iter.DerivedValues[Zettel, string](
 		fs.Zettelen,
 		func(z Zettel) (p string, err error) {
 			p = z.GetObjekteFD().Path
@@ -399,7 +398,7 @@ func (fs *CwdFiles) readAll() (err error) {
 }
 
 func (c CwdFiles) MatcherLen() int {
-	return collections.Len(
+	return iter.Len(
 		c.Zettelen,
 		c.Typen,
 		c.Kisten,
@@ -412,7 +411,7 @@ func (_ CwdFiles) Each(_ schnittstellen.FuncIter[kennung.Matcher]) error {
 }
 
 func (c CwdFiles) Len() int {
-	return collections.Len(
+	return iter.Len(
 		c.Zettelen,
 		c.Typen,
 		c.Kisten,

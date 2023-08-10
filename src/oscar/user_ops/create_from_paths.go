@@ -80,7 +80,7 @@ func (c CreateFromPaths) Run(
 		if err = c.StoreObjekten().Zettel().ReadAll(
 			iter.MakeChain(
 				matcher.Match,
-				collections.AddClone[zettel.Transacted, *zettel.Transacted](results),
+				iter.AddClone[zettel.Transacted, *zettel.Transacted](results),
 			),
 		); err != nil {
 			err = errors.Wrap(err)

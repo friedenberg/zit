@@ -6,8 +6,8 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/standort"
+	"github.com/friedenberg/zit/src/delta/collections_delta"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/hinweis_index"
 )
@@ -116,7 +116,7 @@ func (i *index) AddEtikettSet(
 	from kennung.EtikettSet,
 ) (err error) {
 	return i.etikettenIndex.StoreDelta(
-		collections.MakeSetDelta[kennung.Etikett](from, to),
+		collections_delta.MakeSetDelta[kennung.Etikett](from, to),
 	)
 }
 

@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 )
 
 type flagPtr[T schnittstellen.ValueLike] interface {
@@ -33,8 +34,8 @@ func MakeFlagCommasFromExisting[
 ) Flag[T, TPtr] {
 	if *existing == nil {
 		e := schnittstellen.SetLike[T](
-			MakeSet(
-				(T).String,
+			collections_ptr.MakeSetValue[T, TPtr](
+				nil,
 			),
 		)
 
@@ -54,11 +55,7 @@ func MakeFlagCommas[
 ) Flag[T, TPtr] {
 	var s schnittstellen.SetLike[T]
 
-	s = MakeMutableSet(
-		func(e T) string {
-			return e.String()
-		},
-	)
+	s = collections_ptr.MakeMutableValueSet[T, TPtr](nil)
 
 	return &flagCommas[T, TPtr]{
 		SetterPolicy: p,

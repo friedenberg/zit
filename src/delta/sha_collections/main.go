@@ -9,6 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 )
 
 type (
@@ -25,10 +26,12 @@ func MakeMutableSet(es ...sha.Sha) (s MutableSet) {
 }
 
 func MakeMutableSetStrings(vs ...string) (s MutableSet, err error) {
-	f := collections.MakeFlagCommas[sha.Sha, *sha.Sha](collections.SetterPolicyReset)
+	f := collections_ptr.MakeFlagCommas[sha.Sha, *sha.Sha](
+		collections_ptr.SetterPolicyReset,
+	)
 
 	err = f.SetMany(vs...)
-	s = f.GetMutableSet()
+	s = f.CloneMutableSetLike()
 
 	return
 }

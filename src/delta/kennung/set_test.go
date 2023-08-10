@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/test_logz"
-	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/delta/collections_delta"
 )
 
 func TestNormalize(t *testing.T) {
@@ -226,7 +226,7 @@ func TestDelta1(t *testing.T) {
 		MustEtikett("zz-archive-task-done"),
 	)
 
-	d := collections.MakeSetDelta[Etikett](from, to)
+	d := collections_delta.MakeSetDelta[Etikett](from, to)
 
 	c_expected := MakeEtikettSet(
 		MustEtikett("zz-archive-task-done"),

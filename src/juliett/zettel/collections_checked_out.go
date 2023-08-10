@@ -2,6 +2,7 @@ package zettel
 
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
@@ -32,7 +33,7 @@ func MakeMutableSetCheckedOutHinweisZettel(c int) MutableSetCheckedOut {
 }
 
 func ToSliceFilesZettelen(s SetCheckedOut) (out []string, err error) {
-	return collections.DerivedValues[CheckedOut, string](
+	return iter.DerivedValues[CheckedOut, string](
 		s,
 		func(z CheckedOut) (e string, err error) {
 			e = z.External.GetObjekteFD().Path
@@ -48,7 +49,7 @@ func ToSliceFilesZettelen(s SetCheckedOut) (out []string, err error) {
 }
 
 func ToSliceFilesAkten(s SetCheckedOut) (out []string, err error) {
-	return collections.DerivedValues[CheckedOut, string](
+	return iter.DerivedValues[CheckedOut, string](
 		s,
 		func(z CheckedOut) (e string, err error) {
 			e = z.External.GetAkteFD().Path
