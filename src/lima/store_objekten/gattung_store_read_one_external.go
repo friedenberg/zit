@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/sha"
@@ -49,12 +48,14 @@ func (s *commonStore[O, OPtr, K, KPtr]) ReadOneExternal(
 
 	defer errors.DeferredCloser(&err, ar)
 
-	var akteSha schnittstellen.ShaLike
+	sw := sha.MakeWriter(nil)
 
-	if akteSha, _, err = s.AkteFormat.ParseSaveAkte(ar, &e.Akte); err != nil {
+	if _, err = s.AkteFormat.ParseAkte(io.TeeReader(ar, sw), &e.Akte); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	akteSha := sw.GetShaLike()
 
 	if !akteSha.EqualsSha(e.GetAkteSha()) {
 		panic(errors.Errorf(

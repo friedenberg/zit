@@ -1,6 +1,8 @@
 package objekte_store
 
 import (
+	"io"
+
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
@@ -293,13 +295,24 @@ func (h *transactedInflator[A, APtr, K, KPtr]) readAkte(
 
 	defer errors.DeferredCloser(&err, r)
 
-	var (
-		n  int64
-		sh schnittstellen.ShaLike
-	)
+	var n int64
 
-	if sh, n, err = h.akteFormat.ParseSaveAkte(r, &t.Akte); err != nil {
+	sw := sha.MakeWriter(io.Discard)
+
+	if n, err = h.akteFormat.ParseAkte(io.TeeReader(r, sw), &t.Akte); err != nil {
 		err = errors.Wrap(err)
+		return
+	}
+
+	sh := sw.GetShaLike()
+
+	if !t.GetAkteSha().EqualsSha(sh) {
+		err = errors.Errorf(
+			"objekte had akte sha %s, but akte reader had sha %s +%d",
+			t.GetAkteSha(),
+			sh,
+			n,
+		)
 		return
 	}
 

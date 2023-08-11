@@ -12,6 +12,7 @@ type akteFormat[
 	O objekte.Akte[O],
 	OPtr objekte.AktePtr[O],
 ] struct {
+	objekte.AkteParser[OPtr]
 	objekte.AkteParseSaver[OPtr]
 	objekte.SavedAkteFormatter
 	objekte.ParsedAkteFormatter[O]
@@ -21,12 +22,12 @@ func MakeAkteFormat[
 	O objekte.Akte[O],
 	OPtr objekte.AktePtr[O],
 ](
-	akteParseSaver objekte.AkteParseSaver[OPtr],
+	akteParser objekte.AkteParser[OPtr],
 	parsedAkteFormatter objekte.ParsedAkteFormatter[O],
 	arf schnittstellen.AkteReaderFactory,
 ) objekte.AkteFormat[O, OPtr] {
 	return akteFormat[O, OPtr]{
-		AkteParseSaver:      akteParseSaver,
+		AkteParser:          akteParser,
 		ParsedAkteFormatter: parsedAkteFormatter,
 		SavedAkteFormatter:  objekte.MakeSavedAkteFormatter(arf),
 	}

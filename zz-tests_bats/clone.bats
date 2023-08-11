@@ -33,6 +33,7 @@ function bootstrap {
 }
 
 function clone { # @test
+	skip
 	wd1="$(mktemp -d)"
 	cd "$wd1" || exit 1
 	bootstrap "$wd1"

@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/alfa/toml"
-	"github.com/friedenberg/zit/src/bravo/sha"
 )
 
 type tomlAkteParseSaver[
@@ -38,19 +37,10 @@ func MakeTextParserIgnoreTomlErrors[
 	}
 }
 
-func (f tomlAkteParseSaver[O, OPtr]) ParseSaveAkte(
+func (f tomlAkteParseSaver[O, OPtr]) ParseAkte(
 	r io.Reader,
 	t OPtr,
-) (sh schnittstellen.ShaLike, n int64, err error) {
-	var aw sha.WriteCloser
-
-	if aw, err = f.awf.AkteWriter(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, aw)
-
+) (n int64, err error) {
 	pr, pw := io.Pipe()
 	td := toml.NewDecoder(pr)
 
@@ -88,9 +78,7 @@ func (f tomlAkteParseSaver[O, OPtr]) ParseSaveAkte(
 		errors.TodoP1("handle url parsing / validation")
 	}(pr)
 
-	mw := io.MultiWriter(aw, pw)
-
-	if n, err = io.Copy(mw, r); err != nil {
+	if n, err = io.Copy(pw, r); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -104,8 +92,6 @@ func (f tomlAkteParseSaver[O, OPtr]) ParseSaveAkte(
 		err = errors.Wrap(err)
 		return
 	}
-
-	sh = aw.GetShaLike()
 
 	return
 }

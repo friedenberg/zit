@@ -40,7 +40,7 @@ type AkteFormat = objekte.AkteFormat[
 
 type akteFormat interface {
 	FormatParsedAkte(io.Writer, Akte) (n int64, err error)
-	ParseSaveAkte(io.Reader, *Akte) (schnittstellen.ShaLike, int64, error)
+	objekte.AkteParser[*Akte]
 }
 
 type store struct {
@@ -216,10 +216,22 @@ func (s *store) ReadOne(sh schnittstellen.ShaLike) (o *Transacted, err error) {
 
 	defer errors.DeferredCloser(&err, ar)
 
-	var akteSha schnittstellen.ShaLike
+	sw := sha.MakeWriter(io.Discard)
 
-	if akteSha, _, err = s.formatAkte.ParseSaveAkte(ar, &o.Akte); err != nil {
+	if _, err = s.formatAkte.ParseAkte(io.TeeReader(ar, sw), &o.Akte); err != nil {
 		err = errors.Wrap(err)
+		return
+	}
+
+	akteSha := o.GetAkteSha()
+	sh = sw.GetShaLike()
+
+	if !sh.EqualsSha(akteSha) {
+		err = errors.Errorf(
+			"objekte had akte sha %s while akte reader had %s",
+			akteSha,
+			sh,
+		)
 		return
 	}
 

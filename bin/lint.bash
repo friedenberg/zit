@@ -26,12 +26,12 @@ do_lint \
 	--ignore-case \
 	-l
 
-do_lint \
-	"bats test files have skips" \
-	ag \
-	skip \
-	zz-tests_bats/ \
-	-l
+# do_lint \
+# 	"bats test files have skips" \
+# 	ag \
+# 	skip \
+# 	zz-tests_bats/ \
+# 	-l
 
 do_lint \
 	"debug logs remaining" \

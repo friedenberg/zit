@@ -1,6 +1,7 @@
 package objekte_store
 
 import (
+	"io"
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -32,7 +33,7 @@ type storedParserSaver[
 	KPtr kennung.KennungLikePtr[K],
 ] struct {
 	awf          schnittstellen.AkteWriterFactory
-	akteParser   objekte.AkteParseSaver[OPtr]
+	akteParser   objekte.AkteParser[OPtr]
 	objekteSaver ObjekteSaver
 }
 
@@ -44,7 +45,7 @@ func MakeStoredParseSaver[
 ](
 	owf schnittstellen.ObjekteIOFactory,
 	awf schnittstellen.AkteIOFactory,
-	akteParser objekte.AkteParseSaver[OPtr],
+	akteParser objekte.AkteParser[OPtr],
 	pmf objekte_format.Format,
 ) storedParserSaver[O, OPtr, K, KPtr] {
 	if akteParser == nil {
@@ -117,10 +118,14 @@ func (h storedParserSaver[O, OPtr, K, KPtr]) readAkte(
 	r sha.ReadCloser,
 	o OPtr,
 ) (sh schnittstellen.ShaLike, n int64, err error) {
-	if sh, n, err = h.akteParser.ParseSaveAkte(r, o); err != nil {
+	sw := sha.MakeWriter(io.Discard)
+
+	if n, err = h.akteParser.ParseAkte(io.TeeReader(r, sw), o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	sh = sw.GetShaLike()
 
 	errors.Log().Printf("parsed %d akte bytes", n)
 

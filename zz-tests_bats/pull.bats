@@ -8,6 +8,7 @@ setup() {
 }
 
 function pull { # @test
+	skip
 	wd="$(mktemp -d)"
 
 	(

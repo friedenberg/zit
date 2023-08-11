@@ -2,6 +2,7 @@ package commands
 
 import (
 	"flag"
+	"io"
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -134,8 +135,17 @@ func (c EditKonfig) readTempKonfigFile(
 
 	k = &erworben.Akte{}
 
+	var aw schnittstellen.ShaWriteCloser
+
+	if aw, err = u.StoreObjekten().AkteWriter(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.DeferredCloser(&err, aw)
+
 	// TODO-P3 offer option to edit again
-	if sh, _, err = format.ParseSaveAkte(f, k); err != nil {
+	if _, err = format.ParseAkte(io.TeeReader(f, aw), k); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

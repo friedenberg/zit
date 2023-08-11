@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
@@ -23,21 +22,10 @@ type formatAkte2 struct {
 	objekteFormat objekte_format.Format
 }
 
-func (f formatAkte2) ParseSaveAkte(
-	r1 io.Reader,
+func (f formatAkte2) ParseAkte(
+	r io.Reader,
 	o *Akte,
-) (sh schnittstellen.ShaLike, n int64, err error) {
-	var aw sha.WriteCloser
-
-	if aw, err = f.af.AkteWriter(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, aw)
-
-	r := io.TeeReader(r1, aw)
-
+) (n int64, err error) {
 	afterFirst := false
 	var m metadatei.Metadatei
 	var g gattung.Gattung
@@ -129,8 +117,6 @@ func (f formatAkte2) ParseSaveAkte(
 		err = errors.Wrap(err)
 		return
 	}
-
-	sh = aw.GetShaLike()
 
 	return
 }

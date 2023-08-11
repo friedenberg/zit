@@ -26,10 +26,15 @@ type (
 		ParseSaveAkte(io.Reader, T) (schnittstellen.ShaLike, int64, error)
 	}
 
+	AkteParser[T any] interface {
+		ParseAkte(io.Reader, T) (int64, error)
+	}
+
 	AkteFormat[T any, TPtr schnittstellen.Ptr[T]] interface {
 		SavedAkteFormatter
 		ParsedAkteFormatter[T]
-		AkteParseSaver[TPtr]
+		AkteParser[TPtr]
+		// AkteParseSaver[TPtr]
 	}
 
 	VerzeichnissePtr[T any, T1 Akte[T1]] interface {

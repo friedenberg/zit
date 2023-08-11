@@ -7,7 +7,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/hotel/sku_formats"
@@ -17,21 +16,10 @@ type formatAkte struct {
 	af schnittstellen.AkteIOFactory
 }
 
-func (f formatAkte) ParseSaveAkte(
-	r1 io.Reader,
+func (f formatAkte) ParseAkte(
+	r io.Reader,
 	o *Akte,
-) (sh schnittstellen.ShaLike, n int64, err error) {
-	var aw sha.WriteCloser
-
-	if aw, err = f.af.AkteWriter(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, aw)
-
-	r := io.TeeReader(r1, aw)
-
+) (n int64, err error) {
 	tml := sku.TryMakeSkuWithFormats(
 		sku.MakeSkuFromLineTaiFirst,
 		sku.MakeSkuFromLineGattungFirst,
@@ -53,8 +41,6 @@ func (f formatAkte) ParseSaveAkte(
 		err = errors.Wrap(err)
 		return
 	}
-
-	sh = aw.GetShaLike()
 
 	return
 }

@@ -18,16 +18,14 @@ type writer struct {
 func MakeWriter(in io.Writer) (out *writer) {
 	h := sha256.New()
 
+	if in == nil {
+		in = io.Discard
+	}
+
 	out = &writer{
-		w: h,
+		w: io.MultiWriter(h, in),
 		h: h,
 	}
-
-	if in == nil {
-		return
-	}
-
-	out.w = io.MultiWriter(h, in)
 
 	if c, ok := in.(io.Closer); ok {
 		out.c = c

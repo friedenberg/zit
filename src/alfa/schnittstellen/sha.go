@@ -10,7 +10,7 @@ type ShaLike interface {
 	ValueLike
 	Korper
 	GetShaString() string
-	EqualsSha(ShaLike) bool
+	EqualsSha(ShaLike) bool // TODO-P3 rename to EqualsShaLike
 	IsNull() bool
 	ShaGetter
 }

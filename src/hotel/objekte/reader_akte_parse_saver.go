@@ -13,7 +13,7 @@ type readerAkteParseSaver[
 	OPtr AktePtr[O],
 ] struct {
 	awf    schnittstellen.AkteWriterFactory
-	parser AkteParseSaver[OPtr]
+	parser AkteParser[OPtr]
 }
 
 func MakeReaderAkteParseSaver[
@@ -21,7 +21,7 @@ func MakeReaderAkteParseSaver[
 	OPtr AktePtr[O],
 ](
 	awf schnittstellen.AkteWriterFactory,
-	parser AkteParseSaver[OPtr],
+	parser AkteParser[OPtr],
 ) readerAkteParseSaver[O, OPtr] {
 	return readerAkteParseSaver[O, OPtr]{
 		awf:    awf,
@@ -33,7 +33,10 @@ func (f readerAkteParseSaver[O, OPtr]) ParseSaveAkte(
 	r io.Reader,
 	t OPtr,
 ) (sh schnittstellen.ShaLike, n int64, err error) {
-	var aw sha.WriteCloser
+	var (
+		aw  sha.WriteCloser
+		sh1 schnittstellen.ShaLike
+	)
 
 	if aw, err = f.awf.AkteWriter(); err != nil {
 		err = errors.Wrap(err)
@@ -42,10 +45,31 @@ func (f readerAkteParseSaver[O, OPtr]) ParseSaveAkte(
 
 	defer errors.DeferredCloser(&err, aw)
 
-	var (
-		n1  int64
-		sh1 schnittstellen.ShaLike
-	)
+	if n, err = f.ParseAkte(io.TeeReader(r, aw), t); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	sh = aw.GetShaLike()
+
+	if !sh.EqualsSha(sh1) {
+		err = errors.Errorf(
+			"parser read %s while akte writer read %s",
+			sh1,
+			sh,
+		)
+
+		return
+	}
+
+	return
+}
+
+func (f readerAkteParseSaver[O, OPtr]) ParseAkte(
+	r io.Reader,
+	t OPtr,
+) (n int64, err error) {
+	var n1 int64
 
 	pr, pw := io.Pipe()
 
@@ -65,14 +89,12 @@ func (f readerAkteParseSaver[O, OPtr]) ParseSaveAkte(
 			}
 		}()
 
-		if sh1, n1, err = f.parser.ParseSaveAkte(pr, t); err != nil {
+		if n1, err = f.parser.ParseAkte(pr, t); err != nil {
 			pr.CloseWithError(err)
 		}
 	}(pr)
 
-	mw := io.MultiWriter(aw, pw)
-
-	if n, err = io.Copy(mw, r); err != nil {
+	if n, err = io.Copy(pw, r); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -94,18 +116,6 @@ func (f readerAkteParseSaver[O, OPtr]) ParseSaveAkte(
 
 	if err = <-chDone; err != nil {
 		err = errors.Wrap(err)
-		return
-	}
-
-	sh = aw.GetShaLike()
-
-	if !sh.EqualsSha(sh1) {
-		err = errors.Errorf(
-			"parser read %s while akte writer read %s",
-			sh1,
-			sh,
-		)
-
 		return
 	}
 

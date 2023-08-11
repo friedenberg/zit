@@ -1,6 +1,8 @@
 package store_objekten
 
 import (
+	"io"
+
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/alfa/toml"
@@ -344,12 +346,14 @@ func (s konfigStore) ReadOne(
 
 			fo := s.akteFormat
 
-			var sh schnittstellen.ShaLike
+			sw := sha.MakeWriter(nil)
 
-			if sh, _, err = fo.ParseSaveAkte(r, &tt.Akte); err != nil {
+			if _, err = fo.ParseAkte(io.TeeReader(r, sw), &tt.Akte); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
+
+			sh := sw.GetShaLike()
 
 			tt.SetAkteSha(sh)
 		}

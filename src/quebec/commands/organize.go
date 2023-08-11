@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
@@ -99,6 +100,7 @@ func (c *Organize) RunWithQuery(
 		return
 	}
 
+	var l sync.Mutex
 	getResults := objekte_collections.MakeMutableSetMetadateiWithKennung()
 
 	if err = u.StoreObjekten().Query(
@@ -120,6 +122,8 @@ func (c *Organize) RunWithQuery(
 				}
 			}
 
+			l.Lock()
+			defer l.Unlock()
 			return getResults.Add(mwk)
 		},
 	); err != nil {
