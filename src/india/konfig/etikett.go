@@ -14,7 +14,7 @@ import (
 )
 
 func init() {
-	collections_ptr.RegisterGob[ketikett, *ketikett]()
+	collections_ptr.RegisterGobValue[ketikett, *ketikett](nil)
 }
 
 type implicitEtikettenMap map[kennung.Etikett]kennung.EtikettMutableSet

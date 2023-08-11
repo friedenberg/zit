@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 )
 
-func RegisterGobValue[T schnittstellen.ValueLike, TPtr schnittstellen.ValuePtr[T]](
+func RegisterGobValue[T schnittstellen.ValueLike](
 	keyer schnittstellen.StringKeyer[T],
 ) {
 	if keyer == nil {
@@ -16,6 +16,10 @@ func RegisterGobValue[T schnittstellen.ValueLike, TPtr schnittstellen.ValuePtr[T
 
 	gob.Register(keyer)
 
-	gob.Register(&Set[T]{})
+	RegisterGob[T]()
+}
+
+func RegisterGob[T schnittstellen.ValueLike]() {
+	gob.Register(Set[T]{})
 	gob.Register(MutableSet[T]{})
 }
