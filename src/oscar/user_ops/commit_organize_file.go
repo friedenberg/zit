@@ -1,6 +1,8 @@
 package user_ops
 
 import (
+	"sync"
+
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/delta/gattungen"
@@ -37,6 +39,7 @@ func (c CommitOrganizeFile) Run(
 
 	sameTyp := a.Metadatei.Typ.Equals(b.Metadatei.Typ)
 
+	l := sync.Mutex{}
 	toUpdate := objekte_collections.MakeMutableSetMetadateiWithKennung()
 
 	ms := c.Umwelt.MakeMetaIdSetWithoutExcludedHidden(
@@ -73,6 +76,8 @@ func (c CommitOrganizeFile) Run(
 			}
 
 			sk.SetMetadatei(m)
+			l.Lock()
+			defer l.Unlock()
 			toUpdate.Add(sk)
 
 			return

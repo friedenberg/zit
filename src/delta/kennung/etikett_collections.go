@@ -2,12 +2,11 @@ package kennung
 
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 )
 
 func init() {
-	collections.RegisterGob[Etikett]()
+	collections_ptr.RegisterGobValue[Etikett, *Etikett](nil)
 }
 
 type (

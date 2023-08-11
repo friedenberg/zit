@@ -8,7 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
 )
@@ -19,7 +18,7 @@ type (
 )
 
 func init() {
-	collections.RegisterGob[sha.Sha]()
+	collections_value.RegisterGobValue[sha.Sha](nil)
 }
 
 func MakeMutableSet(es ...sha.Sha) (s MutableSet) {

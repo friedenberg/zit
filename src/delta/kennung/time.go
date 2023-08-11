@@ -15,7 +15,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/string_writer_format"
 	"github.com/friedenberg/zit/src/bravo/values"
-	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/charlie/collections_value"
 )
 
 const (
@@ -27,7 +27,7 @@ const (
 func init() {
 	errors.TodoP1("refactor into common")
 	gob.Register(Time{})
-	collections.RegisterGob[Time]()
+	collections_value.RegisterGobValue[Time](nil)
 }
 
 type Time struct {

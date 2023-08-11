@@ -12,7 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/ohio"
 	"github.com/friedenberg/zit/src/bravo/values"
-	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/delta/format"
 )
 
@@ -20,7 +20,7 @@ type tai = chai.TAI
 
 func init() {
 	register(Tai{})
-	collections.RegisterGob[Tai]()
+	collections_value.RegisterGobValue[Tai](nil)
 }
 
 type Tai struct {

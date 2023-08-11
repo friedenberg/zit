@@ -2,12 +2,12 @@ package kennung
 
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
+	"github.com/friedenberg/zit/src/charlie/collections_value"
 )
 
 func init() {
-	collections.RegisterGob[Typ]()
+	collections_value.RegisterGobValue[Time](nil)
 }
 
 type (
