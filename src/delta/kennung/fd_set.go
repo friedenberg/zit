@@ -16,8 +16,8 @@ type (
 )
 
 func MakeFDSet(ts ...FD) FDSet {
-	return collections.MakeSet[FD](
-		(FD).String,
+	return collections_value.MakeValueSet[FD](
+		nil,
 		ts...,
 	)
 }

@@ -6,11 +6,11 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/charlie/collections_value"
 )
 
 func init() {
-	collections.RegisterGob[gattung.Gattung]()
+	collections_value.RegisterGobValue[gattung.Gattung](nil)
 }
 
 type (
@@ -19,19 +19,12 @@ type (
 )
 
 func MakeSet(gs ...gattung.Gattung) Set {
-	return collections.MakeSet[gattung.Gattung](
-		func(g gattung.Gattung) string {
-			return g.String()
-		},
-		gs...,
-	)
+	return collections_value.MakeValueSet[gattung.Gattung](nil, gs...)
 }
 
 func MakeMutableSet(gs ...gattung.Gattung) MutableSet {
-	return collections.MakeMutableSet[gattung.Gattung](
-		func(g gattung.Gattung) string {
-			return g.String()
-		},
+	return collections_value.MakeMutableValueSet[gattung.Gattung](
+		nil,
 		gs...,
 	)
 }

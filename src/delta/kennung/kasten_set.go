@@ -3,6 +3,7 @@ package kennung
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/charlie/collections_value"
 )
 
 func init() {
@@ -15,8 +16,8 @@ type (
 )
 
 func MakeKastenSet(ts ...Kasten) KastenSet {
-	return collections.MakeSet[Kasten](
-		(Kasten).String,
+	return collections_value.MakeValueSet[Kasten](
+		nil,
 		ts...,
 	)
 }
