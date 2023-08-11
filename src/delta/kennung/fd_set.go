@@ -2,7 +2,6 @@ package kennung
 
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
 )
 
@@ -23,8 +22,8 @@ func MakeFDSet(ts ...FD) FDSet {
 }
 
 func MakeMutableFDSet(ts ...FD) MutableFDSet {
-	return collections.MakeMutableSet[FD](
-		(FD).String,
+	return collections_value.MakeMutableValueSet[FD](
+		nil,
 		ts...,
 	)
 }

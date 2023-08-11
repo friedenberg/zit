@@ -2,75 +2,82 @@ package zettel_external
 
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
-type MutableSet struct {
-	schnittstellen.MutableSetLike[*zettel.External]
-}
+type MutableSet = schnittstellen.MutableSetLike[*zettel.External]
 
-func MakeMutableSet(
-	kf collections.KeyFunc[*zettel.External],
-	zs ...*zettel.External,
-) MutableSet {
-	return MutableSet{
-		MutableSetLike: collections.MakeMutableSet[*zettel.External](kf, zs...),
+type KeyerHinweis struct{}
+
+func (k KeyerHinweis) GetKey(z *zettel.External) string {
+	if z == nil {
+		return ""
 	}
+
+	return z.Sku.GetKennung().String()
 }
 
 func MakeMutableSetUniqueHinweis(zs ...*zettel.External) MutableSet {
-	kf := func(z *zettel.External) string {
-		if z == nil {
-			return ""
-		}
+	return collections_value.MakeMutableValueSet[*zettel.External](
+		KeyerHinweis{},
+		zs...)
+}
 
-		return z.Sku.GetKennung().String()
+type KeyerFD struct{}
+
+func (k KeyerFD) GetKey(z *zettel.External) string {
+	if z == nil {
+		return ""
 	}
 
-	return MakeMutableSet(kf, zs...)
+	return z.String()
 }
 
 func MakeMutableSetUniqueFD(zs ...*zettel.External) MutableSet {
-	kf := func(z *zettel.External) string {
-		if z == nil {
-			return ""
-		}
+	return collections_value.MakeMutableValueSet[*zettel.External](
+		KeyerFD{},
+		zs...)
+}
 
-		return z.String()
+type KeyerStored struct{}
+
+func (k KeyerStored) GetKey(z *zettel.External) string {
+	if z == nil {
+		return ""
 	}
 
-	return MakeMutableSet(kf, zs...)
+	if z.Sku.ObjekteSha.IsNull() {
+		return ""
+	}
+
+	return z.Sku.ObjekteSha.String()
 }
 
 func MakeMutableSetUniqueStored(zs ...*zettel.External) MutableSet {
-	kf := func(z *zettel.External) string {
-		if z == nil {
-			return ""
-		}
+	return collections_value.MakeMutableValueSet[*zettel.External](
+		KeyerStored{},
+		zs...)
+}
 
-		if z.Sku.ObjekteSha.IsNull() {
-			return ""
-		}
+type KeyerAkte struct{}
 
-		return z.Sku.ObjekteSha.String()
+func (k KeyerAkte) GetKey(z *zettel.External) string {
+	if z == nil {
+		return ""
 	}
 
-	return MakeMutableSet(kf, zs...)
+	sh := z.GetAkteSha()
+
+	if sh.IsNull() {
+		return ""
+	}
+
+	return sh.String()
 }
 
 func MakeMutableSetUniqueAkte(zs ...*zettel.External) MutableSet {
-	kf := func(z *zettel.External) string {
-		if z == nil {
-			return ""
-		}
-
-		if z.GetAkteSha().IsNull() {
-			return ""
-		}
-
-		return z.GetAkteSha().String()
-	}
-
-	return MakeMutableSet(kf, zs...)
+	return collections_value.MakeMutableValueSet[*zettel.External](
+		KeyerAkte{},
+		zs...)
 }

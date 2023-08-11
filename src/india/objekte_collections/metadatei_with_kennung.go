@@ -2,20 +2,34 @@ package objekte_collections
 
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/golf/sku"
 )
 
 type MutableSetMetadateiWithKennung = schnittstellen.MutableSetLike[sku.SkuLike]
 
-func MakeMutableSetMetadateiWithKennung() MutableSetMetadateiWithKennung {
-	return collections.MakeMutableSet(
-		func(mwk sku.SkuLike) string {
-			if mwk == nil {
-				return ""
-			}
+type SkuGetKeyKeyer struct{}
 
-			return mwk.GetKey()
-		},
+func (kk SkuGetKeyKeyer) GetKey(mwk sku.SkuLike) string {
+	if mwk == nil {
+		return ""
+	}
+
+	return mwk.GetKey()
+}
+
+type KennungKeyer struct{}
+
+func (kk KennungKeyer) GetKey(mwk sku.SkuLike) string {
+	if mwk == nil {
+		return ""
+	}
+
+	return mwk.GetKennungLike().String()
+}
+
+func MakeMutableSetMetadateiWithKennung() MutableSetMetadateiWithKennung {
+	return collections_value.MakeMutableValueSet[sku.SkuLike](
+		SkuGetKeyKeyer{},
 	)
 }

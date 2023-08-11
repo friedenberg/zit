@@ -3,6 +3,7 @@ package kennung
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/charlie/collections_value"
 )
 
 func init() {
@@ -15,5 +16,7 @@ type (
 )
 
 func MakeHinweisMutableSet(hs ...Hinweis) HinweisMutableSet {
-	return HinweisMutableSet(collections.MakeMutableSet[Hinweis]((Hinweis).String, hs...))
+	return HinweisMutableSet(
+		collections_value.MakeMutableValueSet[Hinweis](nil, hs...),
+	)
 }

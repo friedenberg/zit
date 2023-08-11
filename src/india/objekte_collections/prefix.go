@@ -3,7 +3,7 @@ package objekte_collections
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/sku"
 )
@@ -22,10 +22,8 @@ func NewSetPrefixNamed() *SetPrefixNamed {
 }
 
 func makeMutableZettelLikeSet() schnittstellen.MutableSetLike[sku.SkuLike] {
-	return collections.MakeMutableSet(
-		func(e sku.SkuLike) string {
-			return e.GetKennungLike().String()
-		},
+	return collections_value.MakeMutableSet[sku.SkuLike](
+		KennungKeyer{},
 	)
 }
 

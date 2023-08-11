@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
@@ -57,15 +56,7 @@ func (c CreateFromPaths) Run(
 		}
 	}
 
-	results = collections.MakeMutableSet[*zettel.Transacted](
-		func(zv *zettel.Transacted) string {
-			if zv == nil {
-				return ""
-			}
-
-			return zv.Sku.GetKennung().String()
-		},
-	)
+	results = zettel.MakeMutableSetHinweis(0)
 
 	if err = c.Lock(); err != nil {
 		err = errors.Wrap(err)

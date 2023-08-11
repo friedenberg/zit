@@ -4,6 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/charlie/collections_value"
 )
 
 type (
@@ -11,24 +12,34 @@ type (
 	MutableSetCheckedOut = schnittstellen.MutableSetLike[CheckedOut]
 )
 
+type CheckedOutUniqueKeyer struct{}
+
+func (k CheckedOutUniqueKeyer) GetKey(sz CheckedOut) string {
+	return collections.MakeKey(
+		sz.Internal.Sku.Kopf,
+		sz.Internal.Sku.GetTai(),
+		sz.Internal.Sku.GetKennung(),
+		sz.Internal.Sku.ObjekteSha,
+	)
+}
+
 func MakeMutableSetCheckedOutUnique(c int) MutableSetCheckedOut {
-	return collections.MakeMutableSet(
-		func(sz CheckedOut) string {
-			return collections.MakeKey(
-				sz.Internal.Sku.Kopf,
-				sz.Internal.Sku.GetTai(),
-				sz.Internal.Sku.GetKennung(),
-				sz.Internal.Sku.ObjekteSha,
-			)
-		},
+	return collections_value.MakeMutableValueSet[CheckedOut](
+		CheckedOutUniqueKeyer{},
+	)
+}
+
+type CheckedOutHinweisKeyer struct{}
+
+func (k CheckedOutHinweisKeyer) GetKey(sz CheckedOut) string {
+	return collections.MakeKey(
+		sz.Internal.Sku.GetKennung(),
 	)
 }
 
 func MakeMutableSetCheckedOutHinweisZettel(c int) MutableSetCheckedOut {
-	return collections.MakeMutableSet(
-		func(sz CheckedOut) string {
-			return collections.MakeKey(sz.Internal.Sku.GetKennung())
-		},
+	return collections_value.MakeMutableValueSet[CheckedOut](
+		CheckedOutHinweisKeyer{},
 	)
 }
 

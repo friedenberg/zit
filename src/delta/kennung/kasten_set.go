@@ -23,8 +23,8 @@ func MakeKastenSet(ts ...Kasten) KastenSet {
 }
 
 func MakeKastenMutableSet(ts ...Kasten) KastenMutableSet {
-	return collections.MakeMutableSet[Kasten](
-		(Kasten).String,
+	return collections_value.MakeMutableValueSet[Kasten](
+		nil,
 		ts...,
 	)
 }

@@ -7,20 +7,23 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/id"
 	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
+type KeyerFDSha struct{}
+
+func (k KeyerFDSha) GetKey(fd kennung.FD) string {
+	return fd.Sha.String()
+}
+
 func (s Store) ReadAllMatchingAkten(
 	akten schnittstellen.SetLike[kennung.FD],
 	f func(kennung.FD, *zettel.Transacted) error,
 ) (err error) {
-	fds := collections.MakeMutableSet[kennung.FD](
-		func(fd kennung.FD) string {
-			return fd.Sha.String()
-		},
+	fds := collections_value.MakeMutableValueSet[kennung.FD](
+		KeyerFDSha{},
 	)
 
 	var pa string
