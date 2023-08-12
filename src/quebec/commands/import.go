@@ -183,7 +183,8 @@ func (c Import) importAkteIfNecessary(
 	var n int64
 
 	if n, err = io.Copy(aw, rc); err != nil {
-		errors.TodoRecoverable("%w: Sku: %s", err, sku_formats.String(sk))
+		errors.TodoRecoverable("%s: Sku: %s", err, sku_formats.String(sk))
+		err = nil
 		return
 	}
 

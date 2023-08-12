@@ -2,11 +2,13 @@ package angeboren
 
 import (
 	"compress/gzip"
+	"compress/zlib"
 	"flag"
 	"fmt"
 	"io"
 	"strings"
 
+	"github.com/DataDog/zstd"
 	"github.com/friedenberg/zit/src/bravo/files"
 )
 
@@ -22,10 +24,13 @@ func (e ErrUnsupportedCompression) Is(err error) (ok bool) {
 }
 
 const (
-	CompressionTypeNone    = CompressionType("")
-	CompressionTypeGzip    = CompressionType("gzip")
+	CompressionTypeEmpty = CompressionType("")
+	CompressionTypeNone  = CompressionType("none")
+	CompressionTypeGzip  = CompressionType("gzip")
+	CompressionTypeZlib  = CompressionType("zlib")
+	CompressionTypeZstd  = CompressionType("zstd")
+
 	CompressionTypeDefault = CompressionTypeGzip
-	// CompressionTypeZstd = "zstd"
 )
 
 type CompressionType string
@@ -42,7 +47,11 @@ func (ct *CompressionType) Set(v string) (err error) {
 	v1 := CompressionType(strings.TrimSpace(strings.ToLower(v)))
 
 	switch v1 {
-	case CompressionTypeGzip, CompressionTypeNone:
+	case CompressionTypeGzip,
+		CompressionTypeNone,
+		CompressionTypeEmpty,
+		CompressionTypeZstd,
+		CompressionTypeZlib:
 		*ct = v1
 
 	default:
@@ -59,6 +68,12 @@ func (ct CompressionType) NewReader(
 	case CompressionTypeGzip:
 		out, err = gzip.NewReader(r)
 
+	case CompressionTypeZlib:
+		out, err = zlib.NewReader(r)
+
+	case CompressionTypeZstd:
+		out = zstd.NewReader(r)
+
 	default:
 		out = io.NopCloser(r)
 	}
@@ -70,6 +85,12 @@ func (ct CompressionType) NewWriter(w io.Writer) io.WriteCloser {
 	switch ct {
 	case CompressionTypeGzip:
 		return gzip.NewWriter(w)
+
+	case CompressionTypeZlib:
+		return zlib.NewWriter(w)
+
+	case CompressionTypeZstd:
+		return zstd.NewWriter(w)
 
 	default:
 		return files.NopWriteCloser{Writer: w}
