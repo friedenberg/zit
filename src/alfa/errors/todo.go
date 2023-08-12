@@ -34,6 +34,10 @@ const (
 	P5
 )
 
+func TodoRecoverable(f string, a ...interface{}) (err error) {
+	return printerErr.printfStack(1, "TODO: Make recoverable: "+f, a...)
+}
+
 func Todo(f string, a ...interface{}) (err error) {
 	return printerErr.printfStack(1, "TODO: "+f, a...)
 }
@@ -62,11 +66,20 @@ func TodoP5(f string, a ...interface{}) (err error) {
 	return todo.printf(1, P5, f, a...)
 }
 
-func (p todoPrinter) Printf(pr Priority, f string, a ...interface{}) (err error) {
+func (p todoPrinter) Printf(
+	pr Priority,
+	f string,
+	a ...interface{},
+) (err error) {
 	return p.printf(1, pr, f, a...)
 }
 
-func (p todoPrinter) printf(depth int, pr Priority, f string, a ...interface{}) (err error) {
+func (p todoPrinter) printf(
+	depth int,
+	pr Priority,
+	f string,
+	a ...interface{},
+) (err error) {
 	if !p.on {
 		return
 	}

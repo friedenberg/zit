@@ -307,13 +307,12 @@ func (h *transactedInflator[A, APtr, K, KPtr]) readAkte(
 	sh := sw.GetShaLike()
 
 	if !t.GetAkteSha().EqualsSha(sh) {
-		err = errors.Errorf(
+		errors.TodoRecoverable(
 			"objekte had akte sha %s, but akte reader had sha %s +%d",
 			t.GetAkteSha(),
 			sh,
 			n,
 		)
-		return
 	}
 
 	t.SetAkteSha(sh)

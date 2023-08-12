@@ -99,7 +99,10 @@ func (i *Zettelen) Flush() (err error) {
 	return
 }
 
-func (i *Zettelen) Add(tz *zettel.Transacted, v string) (err error) {
+func (i *Zettelen) AddVerzeichnisse(
+	tz *zettel.Transacted,
+	v string,
+) (err error) {
 	var n int
 
 	if n, err = i.PageForString(v); err != nil {

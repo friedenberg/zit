@@ -2,7 +2,6 @@ package commands
 
 import (
 	"flag"
-	"fmt"
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -15,6 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/hotel/sku_formats"
 	"github.com/friedenberg/zit/src/india/bestandsaufnahme"
+	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
@@ -22,17 +22,22 @@ type Import struct {
 	Bestandsaufnahme string
 	Akten            string
 	AgeIdentity      string
+	Proto            zettel.ProtoZettel
 }
 
 func init() {
 	registerCommand(
 		"import",
 		func(f *flag.FlagSet) Command {
-			c := &Import{}
+			c := &Import{
+				Proto: zettel.MakeEmptyProtoZettel(),
+			}
 
 			f.StringVar(&c.Bestandsaufnahme, "bestandsaufnahme", "", "")
 			f.StringVar(&c.Akten, "akten", "", "")
 			f.StringVar(&c.AgeIdentity, "age-identity", "", "")
+
+			c.Proto.AddToFlagSet(f)
 
 			return c
 		},
@@ -147,11 +152,9 @@ func (c Import) importAkteIfNecessary(
 
 	if rc, err = age_io.NewFileReader(o); err != nil {
 		if errors.IsNotExist(err) {
-			err = errors.Todo(
-				fmt.Sprintf(
-					"make recoverable: sku missing akte: %s",
-					sku_formats.String(sk),
-				),
+			err = errors.TodoRecoverable(
+				"make recoverable: sku missing akte: %s",
+				sku_formats.String(sk),
 			)
 		} else {
 			err = errors.Wrap(err)
@@ -181,8 +184,11 @@ func (c Import) importAkteIfNecessary(
 	shaRc := rc.GetShaLike()
 
 	if !shaRc.EqualsSha(akteSha) {
-		err = errors.Errorf("sku had sha %s while akten had %s", akteSha, shaRc)
-		return
+		errors.TodoRecoverable(
+			"sku akte mismatch: %s while akten had %s",
+			sku_formats.String(sk),
+			shaRc,
+		)
 	}
 
 	errors.Err().Printf("copied Akte %s (%d bytes)", akteSha, n)

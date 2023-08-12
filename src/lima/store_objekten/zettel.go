@@ -156,12 +156,12 @@ func (s *zettelStore) writeNamedZettelToIndex(
 
 	errors.Log().Printf("writing zettel to index: %s", tz.Sku)
 
-	if err = s.verzeichnisseSchwanzen.Add(tz, tz.Sku.GetKennung().String()); err != nil {
+	if err = s.verzeichnisseSchwanzen.AddVerzeichnisse(tz, tz.Sku.GetKennung().String()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = s.verzeichnisseAll.Add(tz, tz.Sku.GetKennung().String()); err != nil {
+	if err = s.verzeichnisseAll.AddVerzeichnisse(tz, tz.Sku.GetKennung().String()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -12,12 +12,14 @@ func MakeWriterDoNotRepool[T any]() schnittstellen.FuncIter[*T] {
 	}
 }
 
+// TODO-P3 move to iter
 func MakeWriterNoop[T any]() schnittstellen.FuncIter[T] {
 	return func(e T) (err error) {
 		return
 	}
 }
 
+// TODO-P3 move to iter
 func MakeTryFinally[T any](
 	try schnittstellen.FuncIter[T],
 	finally schnittstellen.FuncIter[T],

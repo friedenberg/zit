@@ -10,26 +10,11 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
 func (i Zettelen) PageForHinweis(h kennung.Hinweis) (n int, err error) {
 	s := sha.FromStringer(h)
 	return i.PageForSha(s)
-}
-
-func (i Zettelen) PageForTransacted(z zettel.Transacted) (n int, err error) {
-	s := z.Sku.ObjekteSha
-	return i.PageForSha(s)
-}
-
-func (i Zettelen) PageForEtikett(e kennung.Etikett) (n int, err error) {
-	errors.TodoP4("does this actually work")
-	return i.PageForRune(rune(e.String()[0]))
-}
-
-func (i Zettelen) PageForRune(r rune) (n int, err error) {
-	return i.PageForString(string([]rune{r}))
 }
 
 func (i Zettelen) PageForString(s string) (n int, err error) {
