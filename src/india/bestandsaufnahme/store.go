@@ -45,6 +45,7 @@ type akteFormat interface {
 
 type store struct {
 	standort                  standort.Standort
+	ls                        schnittstellen.LockSmith
 	sv                        schnittstellen.StoreVersion
 	of                        schnittstellen.ObjekteIOFactory
 	af                        schnittstellen.AkteIOFactory
@@ -57,6 +58,7 @@ type store struct {
 
 func MakeStore(
 	standort standort.Standort,
+	ls schnittstellen.LockSmith,
 	sv schnittstellen.StoreVersion,
 	of schnittstellen.ObjekteIOFactory,
 	af schnittstellen.AkteIOFactory,
@@ -68,10 +70,7 @@ func MakeStore(
 
 	switch sv.GetInt() {
 	case 3:
-		fa = formatAkte2{
-			objekteFormat: objekte_format.FormatForVersion(sv),
-			af:            af,
-		}
+		fa = MakeAkteFormat(sv, af)
 
 	default:
 		fa = formatAkte{
@@ -81,6 +80,7 @@ func MakeStore(
 
 	s = &store{
 		standort:                  standort,
+		ls:                        ls,
 		sv:                        sv,
 		of:                        of,
 		af:                        af,
@@ -105,6 +105,14 @@ func MakeStore(
 }
 
 func (s *store) Create(o *Akte) (err error) {
+	if !s.ls.IsAcquired() {
+		err = objekte_store.ErrLockRequired{
+			Operation: "create bestandsaufnahme",
+		}
+
+		return
+	}
+
 	if o.Skus.Len() == 0 {
 		err = errors.Wrap(ErrEmpty)
 		return
@@ -121,6 +129,7 @@ func (s *store) Create(o *Akte) (err error) {
 	t.Reset()
 	t.Akte = *o
 	t.SetAkteSha(sh)
+	// TODO-P2 switch to clock
 	tai := kennung.NowTai()
 
 	t.Sku.Kennung = tai

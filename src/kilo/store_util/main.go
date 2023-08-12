@@ -123,6 +123,7 @@ func MakeStoreUtil(
 
 	if c.bestandsaufnahmeStore, err = bestandsaufnahme.MakeStore(
 		c.GetStandort(),
+		c.GetLockSmith(),
 		c.konfig.GetStoreVersion(),
 		c.ObjekteReaderWriterFactory(gattung.Bestandsaufnahme),
 		c,

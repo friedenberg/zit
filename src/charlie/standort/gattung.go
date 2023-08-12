@@ -92,6 +92,11 @@ func (s Standort) HasAkte(
 	sv schnittstellen.StoreVersion,
 	sh sha.ShaLike,
 ) (ok bool) {
+	if sh.GetShaLike().IsNull() {
+		ok = true
+		return
+	}
+
 	var d string
 	var err error
 

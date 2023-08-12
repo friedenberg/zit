@@ -436,7 +436,7 @@ func (s *Store) ReadAll(
 	return
 }
 
-func (s *Store) getReindexFunc(
+func (s *Store) GetReindexFunc(
 	ti kennung_index.KennungIndex[kennung.Typ, *kennung.Typ],
 ) func(sku.SkuLike) error {
 	return func(sk sku.SkuLike) (err error) {
@@ -619,7 +619,7 @@ func (s *Store) Reindex() (err error) {
 		return
 	}
 
-	f1 := s.getReindexFunc(ti)
+	f1 := s.GetReindexFunc(ti)
 
 	// if s.StoreUtil.GetKonfig().UseBestandsaufnahme {
 	// } else {

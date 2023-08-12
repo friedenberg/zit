@@ -13,16 +13,48 @@ type Age struct {
 	identities []Identity
 }
 
-func Make(basePath string) (a *Age, err error) {
+func MakeFromIdentity(path_or_identity string) (a *Age, err error) {
+	switch {
+	case path_or_identity == "":
+		a = &Age{}
+
+	case files.Exists(path_or_identity):
+		if a, err = MakeFromIdentityFile(path_or_identity); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+	default:
+		if a, err = MakeFromIdentityString(path_or_identity); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
+func MakeFromIdentityFile(basePath string) (a *Age, err error) {
 	var contents string
 
 	if contents, err = files.ReadAllString(basePath); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
+	if a, err = MakeFromIdentityString(contents); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func MakeFromIdentityString(contents string) (a *Age, err error) {
 	var i *X25519Identity
 
 	if i, err = age.ParseX25519Identity(contents); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 

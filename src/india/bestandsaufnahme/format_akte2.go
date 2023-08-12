@@ -22,6 +22,16 @@ type formatAkte2 struct {
 	objekteFormat objekte_format.Format
 }
 
+func MakeAkteFormat(
+  sv schnittstellen.StoreVersion,
+	af schnittstellen.AkteIOFactory,
+) formatAkte2 {
+	return formatAkte2{
+		objekteFormat: objekte_format.FormatForVersion(sv),
+		af:            af,
+	}
+}
+
 func (f formatAkte2) ParseAkte(
 	r io.Reader,
 	o *Akte,

@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/string_writer_format"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
+	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/hotel/objekte"
 	"github.com/friedenberg/zit/src/hotel/sku_formats"
 	"github.com/friedenberg/zit/src/mike/store_fs"
@@ -44,8 +45,8 @@ func (u *Umwelt) StringFormatWriterEtiketten() schnittstellen.StringFormatWriter
 	return kennung.MakeEtikettenCliFormat()
 }
 
-func (u *Umwelt) PrinterTransactedLike() schnittstellen.FuncIter[objekte.TransactedLikePtr] {
-	sw := sku_formats.MakeCliFormat(
+func (u *Umwelt) StringFormatWriterSkuLikePtr() schnittstellen.StringFormatWriter[sku.SkuLikePtr] {
+	return sku_formats.MakeCliFormat(
 		sku_formats.CliOptions{
 			PrefixTai:              u.konfig.UsePrintTime(),
 			AlwaysIncludeEtiketten: u.konfig.UsePrintEtiketten(),
@@ -56,6 +57,20 @@ func (u *Umwelt) PrinterTransactedLike() schnittstellen.FuncIter[objekte.Transac
 		u.StringFormatWriterBezeichnung(),
 		u.StringFormatWriterEtiketten(),
 	)
+}
+
+func (u *Umwelt) PrinterSkuLikePtr() schnittstellen.FuncIter[sku.SkuLikePtr] {
+	sw := u.StringFormatWriterSkuLikePtr()
+
+	return string_writer_format.MakeDelim[sku.SkuLikePtr](
+		"\n",
+		u.Out(),
+		sw,
+	)
+}
+
+func (u *Umwelt) PrinterTransactedLike() schnittstellen.FuncIter[objekte.TransactedLikePtr] {
+	sw := u.StringFormatWriterSkuLikePtr()
 
 	return string_writer_format.MakeDelim[objekte.TransactedLikePtr](
 		"\n",

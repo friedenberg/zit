@@ -134,16 +134,12 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 		fa := u.standort.FileAge()
 
 		if files.Exists(fa) {
-			if u.age, err = age.Make(fa); err != nil {
+			if u.age, err = age.MakeFromIdentityFile(fa); err != nil {
 				errors.Wrap(err)
 				return
 			}
 		} else {
 			u.age = &age.Age{}
-			// if u.age, err = age.MakeDefaultTest(); err != nil {
-			// 	errors.Wrap(err)
-			// 	return
-			// }
 		}
 	}
 
