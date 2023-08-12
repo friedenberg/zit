@@ -236,8 +236,9 @@ func (s common) objekteReader(
 	}
 
 	o := age_io.FileReadOptions{
-		Age:  s.Age,
-		Path: id.Path(sh.GetShaLike(), p),
+		Age:             s.Age,
+		Path:            id.Path(sh.GetShaLike(), p),
+		CompressionType: s.GetKonfig().CompressionType,
 	}
 
 	if rc, err = age_io.NewFileReader(o); err != nil {
@@ -266,7 +267,8 @@ func (s common) objekteWriter(
 		Age:                      s.Age,
 		FinalPath:                p,
 		GenerateFinalPathFromSha: true,
-		LockFile:                 true,
+		LockFile:                 s.GetKonfig().LockInternalFiles,
+		CompressionType:          s.GetKonfig().CompressionType,
 	}
 
 	if wc, err = age_io.NewMover(s.GetStandort(), o); err != nil {
@@ -279,8 +281,9 @@ func (s common) objekteWriter(
 
 func (s common) ReadCloserObjekten(p string) (sha.ReadCloser, error) {
 	o := age_io.FileReadOptions{
-		Age:  s.Age,
-		Path: p,
+		Age:             s.Age,
+		Path:            p,
+		CompressionType: s.GetKonfig().CompressionType,
 	}
 
 	return age_io.NewFileReader(o)
@@ -288,8 +291,9 @@ func (s common) ReadCloserObjekten(p string) (sha.ReadCloser, error) {
 
 func (s common) ReadCloserVerzeichnisse(p string) (sha.ReadCloser, error) {
 	o := age_io.FileReadOptions{
-		Age:  s.Age,
-		Path: p,
+		Age:             s.Age,
+		Path:            p,
+		CompressionType: s.GetKonfig().CompressionType,
 	}
 
 	return age_io.NewFileReader(o)
@@ -299,9 +303,10 @@ func (s common) WriteCloserObjekten(p string) (w sha.WriteCloser, err error) {
 	return age_io.NewMover(
 		s.GetStandort(),
 		age_io.MoveOptions{
-			Age:       s.Age,
-			FinalPath: p,
-			LockFile:  true,
+			Age:             s.Age,
+			FinalPath:       p,
+			LockFile:        s.GetKonfig().LockInternalFiles,
+			CompressionType: s.GetKonfig().CompressionType,
 		},
 	)
 }
@@ -312,9 +317,10 @@ func (s common) WriteCloserVerzeichnisse(
 	return age_io.NewMover(
 		s.GetStandort(),
 		age_io.MoveOptions{
-			Age:       s.Age,
-			FinalPath: p,
-			LockFile:  false,
+			Age:             s.Age,
+			FinalPath:       p,
+			LockFile:        false,
+			CompressionType: s.GetKonfig().CompressionType,
 		},
 	)
 }
@@ -336,7 +342,8 @@ func (s common) AkteWriter() (w sha.WriteCloser, err error) {
 		Age:                      s.Age,
 		FinalPath:                p,
 		GenerateFinalPathFromSha: true,
-		LockFile:                 true,
+		LockFile:                 s.GetKonfig().LockInternalFiles,
+		CompressionType:          s.GetKonfig().CompressionType,
 	}
 
 	if outer, err = age_io.NewMover(s.GetStandort(), mo); err != nil {
@@ -368,8 +375,9 @@ func (s common) AkteReader(sh sha.ShaLike) (r sha.ReadCloser, err error) {
 	p = id.Path(sh.GetShaLike(), p)
 
 	o := age_io.FileReadOptions{
-		Age:  s.Age,
-		Path: p,
+		Age:             s.Age,
+		Path:            p,
+		CompressionType: s.GetKonfig().CompressionType,
 	}
 
 	if r, err = age_io.NewFileReader(o); err != nil {

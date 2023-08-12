@@ -39,9 +39,9 @@ func NewMover(s standort.Standort, o MoveOptions) (m *Mover, err error) {
 	}
 
 	wo := WriteOptions{
-		Age:    o.Age,
-		UseZip: o.UseZip,
-		Writer: m.file,
+		Age:             o.Age,
+		CompressionType: o.CompressionType,
+		Writer:          m.file,
 	}
 
 	if m.Writer, err = NewWriter(wo); err != nil {

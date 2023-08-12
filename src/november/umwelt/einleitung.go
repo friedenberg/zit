@@ -26,11 +26,16 @@ type Einleitung struct {
 	Angeboren  angeboren.Konfig
 }
 
-func (e *Einleitung) AddToFlags(f *flag.FlagSet) {
-	f.BoolVar(&e.DisableAge, "disable-age", false, "")
+func (e *Einleitung) AddToFlagSet(f *flag.FlagSet) {
+	f.BoolVar(
+		&e.DisableAge,
+		"disable-age",
+		false,
+		"",
+	) // TODO-P3 move to Angeboren
 	f.StringVar(&e.Yin, "yin", "", "File containing list of Kennung")
 	f.StringVar(&e.Yang, "yang", "", "File containing list of Kennung")
-	e.Angeboren.AddToFlags(f)
+	e.Angeboren.AddToFlagSet(f)
 }
 
 func (u *Umwelt) Einleitung(e Einleitung) (err error) {

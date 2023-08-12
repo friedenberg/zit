@@ -15,7 +15,13 @@ func NewFileReader(o FileReadOptions) (r Reader, err error) {
 		return
 	}
 
-	if ar.Reader, err = NewReader(ReadOptions{Age: o.Age, Reader: ar.file}); err != nil {
+	fro := ReadOptions{
+		Age:             o.Age,
+		Reader:          ar.file,
+		CompressionType: o.CompressionType,
+	}
+
+	if ar.Reader, err = NewReader(fro); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

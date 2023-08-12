@@ -1,8 +1,6 @@
 package sku
 
 import (
-	"strings"
-
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
@@ -38,8 +36,7 @@ func CalculateAndSetSha(
 	sk SkuLikePtr,
 	format objekte_format.Format,
 ) (err error) {
-	st := &strings.Builder{}
-	w := sha.MakeWriter(st)
+	w := sha.MakeWriter(nil)
 
 	if _, err = format.FormatPersistentMetadatei(w, sk); err != nil {
 		err = errors.Wrap(err)

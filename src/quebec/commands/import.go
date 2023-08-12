@@ -4,6 +4,7 @@ import (
 	"flag"
 	"io"
 
+	"github.com/friedenberg/zit/src/alfa/angeboren"
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/id"
 	"github.com/friedenberg/zit/src/bravo/sha"
@@ -22,6 +23,7 @@ type Import struct {
 	Bestandsaufnahme string
 	Akten            string
 	AgeIdentity      string
+	CompressionType  angeboren.CompressionType
 	Proto            zettel.ProtoZettel
 }
 
@@ -30,12 +32,14 @@ func init() {
 		"import",
 		func(f *flag.FlagSet) Command {
 			c := &Import{
-				Proto: zettel.MakeEmptyProtoZettel(),
+				Proto:           zettel.MakeEmptyProtoZettel(),
+				CompressionType: angeboren.CompressionTypeDefault,
 			}
 
 			f.StringVar(&c.Bestandsaufnahme, "bestandsaufnahme", "", "")
 			f.StringVar(&c.Akten, "akten", "", "")
 			f.StringVar(&c.AgeIdentity, "age-identity", "", "")
+			c.CompressionType.AddToFlagSet(f)
 
 			c.Proto.AddToFlagSet(f)
 
@@ -72,8 +76,9 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	// setup besty reader
 	{
 		o := age_io.FileReadOptions{
-			Age:  *ag,
-			Path: c.Bestandsaufnahme,
+			Age:             *ag,
+			Path:            c.Bestandsaufnahme,
+			CompressionType: c.CompressionType,
 		}
 
 		if rc, err = age_io.NewFileReader(o); err != nil {
@@ -144,8 +149,9 @@ func (c Import) importAkteIfNecessary(
 	p := id.Path(akteSha, c.Akten)
 
 	o := age_io.FileReadOptions{
-		Age:  *ag,
-		Path: p,
+		Age:             *ag,
+		Path:            p,
+		CompressionType: c.CompressionType,
 	}
 
 	var rc sha.ReadCloser
@@ -177,7 +183,7 @@ func (c Import) importAkteIfNecessary(
 	var n int64
 
 	if n, err = io.Copy(aw, rc); err != nil {
-		err = errors.Wrap(err)
+		errors.TodoRecoverable("%w: Sku: %s", err, sku_formats.String(sk))
 		return
 	}
 

@@ -2,7 +2,6 @@ package age_io
 
 import (
 	"bufio"
-	"compress/gzip"
 	"crypto/sha256"
 	"hash"
 	"io"
@@ -17,10 +16,10 @@ type Writer interface {
 }
 
 type writer struct {
-	hash       hash.Hash
-	tee        io.Writer
-	wZip, wAge io.WriteCloser
-	wBuf       *bufio.Writer
+	hash            hash.Hash
+	tee             io.Writer
+	wCompress, wAge io.WriteCloser
+	wBuf            *bufio.Writer
 }
 
 func NewWriter(o WriteOptions) (w *writer, err error) {
@@ -28,19 +27,15 @@ func NewWriter(o WriteOptions) (w *writer, err error) {
 
 	w.wBuf = bufio.NewWriter(o.Writer)
 
-	if w.wAge, err = o.Age.Encrypt(o.Writer); err != nil {
+	if w.wAge, err = o.Age.Encrypt(w.wBuf); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	w.hash = sha256.New()
 
-	w.tee = io.MultiWriter(w.hash, w.wAge)
-
-	if o.UseZip {
-		w.wZip = gzip.NewWriter(w.wAge)
-		w.tee = io.MultiWriter(w.hash, w.wZip)
-	}
+	w.wCompress = o.CompressionType.NewWriter(w.wAge)
+	w.tee = io.MultiWriter(w.hash, w.wCompress)
 
 	return
 }
@@ -59,11 +54,9 @@ func (w *writer) Write(p []byte) (n int, err error) {
 }
 
 func (w *writer) Close() (err error) {
-	if w.wZip != nil {
-		if err = w.wZip.Close(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if err = w.wCompress.Close(); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	if err = w.wAge.Close(); err != nil {

@@ -22,7 +22,7 @@ func init() {
 				},
 			}
 
-			c.Einleitung.AddToFlags(f)
+			c.Einleitung.AddToFlagSet(f)
 
 			return c
 		},
