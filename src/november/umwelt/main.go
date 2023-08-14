@@ -161,7 +161,7 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 		u.konfig = *k
 	}
 
-	u.konfig.ApplyPrintOptionsKonfig(u.konfig.PrintOptions)
+	u.konfig.ApplyPrintOptionsKonfig(u.konfig.Akte.PrintOptions)
 	u.lock = file_lock.New(u.standort.DirZit("Lock"))
 
 	// for _, rb := range u.konfig.Transacted.Objekte.Akte.Recipients {

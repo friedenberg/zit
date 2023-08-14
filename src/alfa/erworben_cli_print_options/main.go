@@ -7,14 +7,14 @@ import (
 )
 
 type PrintOptions struct {
-	PrintAbbreviatedHinweisen bool
-	PrintAbbreviatedKennungen bool
-	PrintAbbreviatedShas      bool
-	PrintIncludeTypen         bool
-	PrintIncludeBezeichnungen bool
-	PrintTime                 bool
-	PrintEtikettenAlways      bool
-	PrintEmptyShas            bool
+	PrintAbbreviatedHinweisen bool `toml:"-"`
+	PrintAbbreviatedKennungen bool `toml:"-"`
+	PrintAbbreviatedShas      bool `toml:"-"`
+	PrintIncludeTypen         bool `toml:"print-include-typen"`
+	PrintIncludeBezeichnungen bool `toml:"print-include-bezeichnungen"`
+	PrintTime                 bool `toml:"print-time"`
+	PrintEtikettenAlways      bool `toml:"print-etiketten-always"`
+	PrintEmptyShas            bool `toml:"print-empty-shas"`
 }
 
 func (a *PrintOptions) Merge(b PrintOptions, mask PrintOptions) {

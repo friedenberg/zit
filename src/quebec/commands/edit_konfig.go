@@ -150,5 +150,7 @@ func (c EditKonfig) readTempKonfigFile(
 		return
 	}
 
+	sh = aw.GetShaLike()
+
 	return
 }

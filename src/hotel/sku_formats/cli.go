@@ -94,7 +94,7 @@ func (f *cli) WriteStringFormat(
 
 	sh := o.GetAkteSha()
 
-	if !sh.IsNull() || !f.options.PrintEmptyShas {
+	if !sh.IsNull() || f.options.PrintEmptyShas {
 		n1, err = sw.WriteString("@")
 		n += int64(n1)
 

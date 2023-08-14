@@ -46,7 +46,7 @@ cmd_zit_def=(
 	-print-typen=false
 	-print-time=false
 	-print-etiketten=true
-  -print-empty-shas=false
+  -print-empty-shas=true
 )
 
 export cmd_zit_def
