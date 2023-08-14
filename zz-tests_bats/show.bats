@@ -197,8 +197,31 @@ function show_simple_etikett_history { # @test
 function show_konfig { # @test
 	run_zit show -format log +konfig
 	assert_output_unsorted - <<-EOM
-		[konfig@c1a8ed3cf288dd5d7ccdfd6b9c8052a925bc56be2ec97ed0bb345ab1d961c685]
-		[konfig@c1a8ed3cf288dd5d7ccdfd6b9c8052a925bc56be2ec97ed0bb345ab1d961c685]
+		[konfig@40fcab44369d4fe18dedd39d6faf5bedf3004929e0974ee631a56895813f5f8b]
+		[konfig@40fcab44369d4fe18dedd39d6faf5bedf3004929e0974ee631a56895813f5f8b]
+	EOM
+
+	run_zit show -format text :konfig
+	assert_output - <<-EOM
+		default-typ = 'md'
+		recipients = []
+
+		[file-extensions]
+		zettel = 'zettel'
+		organize = 'md'
+		typ = 'typ'
+		etikett = 'etikett'
+		kasten = 'kasten'
+
+		[cli-output]
+		PrintAbbreviatedHinweisen = false
+		PrintAbbreviatedKennungen = false
+		PrintAbbreviatedShas = false
+		PrintIncludeTypen = false
+		PrintIncludeBezeichnungen = false
+		PrintTime = false
+		PrintEtikettenAlways = false
+		PrintEmptyShas = false
 	EOM
 }
 
@@ -210,8 +233,8 @@ function show_history_all { # @test
 		Etikett tag-2 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
 		Etikett tag-3 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
 		Etikett tag-4 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
-		Konfig konfig c1a8ed3cf288dd5d7ccdfd6b9c8052a925bc56be2ec97ed0bb345ab1d961c685
-		Konfig konfig c1a8ed3cf288dd5d7ccdfd6b9c8052a925bc56be2ec97ed0bb345ab1d961c685
+		Konfig konfig 40fcab44369d4fe18dedd39d6faf5bedf3004929e0974ee631a56895813f5f8b
+		Konfig konfig 40fcab44369d4fe18dedd39d6faf5bedf3004929e0974ee631a56895813f5f8b
 		Typ md 102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384
 		Typ md 102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384
 		Zettel one/dos 2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md tag-3 tag-4 "wow ok again"

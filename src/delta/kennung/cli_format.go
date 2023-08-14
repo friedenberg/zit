@@ -47,13 +47,13 @@ func (f *fdCliFormat) WriteStringFormat(
 }
 
 type kennungCliFormat struct {
-	options            erworben_cli_print_options.Options
+	options            erworben_cli_print_options.PrintOptions
 	stringFormatWriter schnittstellen.StringFormatWriter[string]
 	abbr               Abbr
 }
 
 func MakeKennungCliFormat(
-	options erworben_cli_print_options.Options,
+	options erworben_cli_print_options.PrintOptions,
 	co string_writer_format.ColorOptions,
 	abbr Abbr,
 ) *kennungCliFormat {

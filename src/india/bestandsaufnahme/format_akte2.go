@@ -23,7 +23,7 @@ type formatAkte2 struct {
 }
 
 func MakeAkteFormat(
-  sv schnittstellen.StoreVersion,
+	sv schnittstellen.StoreVersion,
 	af schnittstellen.AkteIOFactory,
 ) formatAkte2 {
 	return formatAkte2{

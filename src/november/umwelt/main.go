@@ -161,6 +161,7 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 		u.konfig = *k
 	}
 
+	u.konfig.ApplyPrintOptionsKonfig(u.konfig.PrintOptions)
 	u.lock = file_lock.New(u.standort.DirZit("Lock"))
 
 	// for _, rb := range u.konfig.Transacted.Objekte.Akte.Recipients {
@@ -299,17 +300,17 @@ func (u *Umwelt) MakeKennungExpanders() (out kennung.Abbr) {
 	out.Hinweis.Expand = u.StoreObjekten().GetAbbrStore().Hinweis().ExpandStringString
 	out.Sha.Expand = u.StoreObjekten().GetAbbrStore().Shas().ExpandStringString
 
-	if u.Konfig().PrintAbbreviatedKennungen {
+	if u.Konfig().PrintOptions.PrintAbbreviatedKennungen {
 		out.Etikett.Abbreviate = u.StoreObjekten().GetAbbrStore().Etiketten().Abbreviate
 		out.Typ.Abbreviate = u.StoreObjekten().GetAbbrStore().Typen().Abbreviate
 		out.Kasten.Abbreviate = u.StoreObjekten().GetAbbrStore().Kisten().Abbreviate
 	}
 
-	if u.Konfig().PrintAbbreviatedHinweisen {
+	if u.Konfig().PrintOptions.PrintAbbreviatedHinweisen {
 		out.Hinweis.Abbreviate = u.StoreObjekten().GetAbbrStore().Hinweis().Abbreviate
 	}
 
-	if u.Konfig().PrintAbbreviatedShas {
+	if u.Konfig().PrintOptions.PrintAbbreviatedShas {
 		out.Sha.Abbreviate = u.StoreObjekten().GetAbbrStore().Shas().Abbreviate
 	}
 

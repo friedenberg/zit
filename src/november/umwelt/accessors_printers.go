@@ -27,7 +27,7 @@ func (u *Umwelt) StringFormatWriterShaLike() schnittstellen.StringFormatWriter[s
 
 func (u *Umwelt) StringFormatWriterKennung() schnittstellen.StringFormatWriter[kennung.KennungPtr] {
 	return kennung.MakeKennungCliFormat(
-		u.konfig.Options,
+		u.konfig.PrintOptions,
 		u.FormatColorOptions(),
 		u.MakeKennungExpanders(),
 	)
@@ -47,10 +47,7 @@ func (u *Umwelt) StringFormatWriterEtiketten() schnittstellen.StringFormatWriter
 
 func (u *Umwelt) StringFormatWriterSkuLikePtr() schnittstellen.StringFormatWriter[sku.SkuLikePtr] {
 	return sku_formats.MakeCliFormat(
-		sku_formats.CliOptions{
-			PrefixTai:              u.konfig.UsePrintTime(),
-			AlwaysIncludeEtiketten: u.konfig.UsePrintEtiketten(),
-		},
+		u.konfig.PrintOptions,
 		u.StringFormatWriterShaLike(),
 		u.StringFormatWriterKennung(),
 		u.StringFormatWriterTyp(),

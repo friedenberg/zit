@@ -197,7 +197,7 @@ func (i *indexAbbr) AddMatchable(o kennung.Matchable) (err error) {
 func (i *indexAbbr) Hinweis() (asg AbbrStoreGeneric[kennung.Hinweis]) {
 	asg = &i.indexAbbrEncodableTridexes.Hinweis
 
-	if !i.GetKonfig().PrintAbbreviatedHinweisen {
+	if !i.GetKonfig().PrintOptions.PrintAbbreviatedHinweisen {
 		asg = indexNoAbbr[kennung.Hinweis, *kennung.Hinweis]{
 			AbbrStoreGeneric: asg,
 		}
@@ -209,7 +209,7 @@ func (i *indexAbbr) Hinweis() (asg AbbrStoreGeneric[kennung.Hinweis]) {
 func (i *indexAbbr) Kisten() (asg AbbrStoreGeneric[kennung.Kasten]) {
 	asg = &i.indexAbbrEncodableTridexes.Kisten
 
-	if !i.GetKonfig().PrintAbbreviatedKennungen {
+	if !i.GetKonfig().PrintOptions.PrintAbbreviatedKennungen {
 		asg = indexNoAbbr[kennung.Kasten, *kennung.Kasten]{
 			AbbrStoreGeneric: asg,
 		}
@@ -221,7 +221,7 @@ func (i *indexAbbr) Kisten() (asg AbbrStoreGeneric[kennung.Kasten]) {
 func (i *indexAbbr) Shas() (asg AbbrStoreGeneric[sha.Sha]) {
 	asg = &i.indexAbbrEncodableTridexes.Shas
 
-	if !i.GetKonfig().PrintAbbreviatedShas {
+	if !i.GetKonfig().PrintOptions.PrintAbbreviatedShas {
 		asg = indexNoAbbr[sha.Sha, *sha.Sha]{
 			AbbrStoreGeneric: asg,
 		}
@@ -233,7 +233,7 @@ func (i *indexAbbr) Shas() (asg AbbrStoreGeneric[sha.Sha]) {
 func (i *indexAbbr) Etiketten() (asg AbbrStoreGeneric[kennung.Etikett]) {
 	asg = &i.indexAbbrEncodableTridexes.Etiketten
 
-	if !i.GetKonfig().PrintAbbreviatedKennungen {
+	if !i.GetKonfig().PrintOptions.PrintAbbreviatedKennungen {
 		asg = indexNoAbbr[kennung.Etikett, *kennung.Etikett]{
 			AbbrStoreGeneric: asg,
 		}
@@ -245,7 +245,7 @@ func (i *indexAbbr) Etiketten() (asg AbbrStoreGeneric[kennung.Etikett]) {
 func (i *indexAbbr) Typen() (asg AbbrStoreGeneric[kennung.Typ]) {
 	asg = &i.indexAbbrEncodableTridexes.Typen
 
-	if !i.GetKonfig().PrintAbbreviatedKennungen {
+	if !i.GetKonfig().PrintOptions.PrintAbbreviatedKennungen {
 		asg = indexNoAbbr[kennung.Typ, *kennung.Typ]{
 			AbbrStoreGeneric: asg,
 		}

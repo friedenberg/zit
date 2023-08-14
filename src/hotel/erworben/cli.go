@@ -24,7 +24,7 @@ type Cli struct {
 	PredictableHinweisen             bool
 	UseRightAlignedIndentsInOrganize bool
 
-	erworben_cli_print_options.Options
+	PrintOptions, maskPrintOptions erworben_cli_print_options.PrintOptions
 }
 
 func (c *Cli) AddToFlags(f *flag.FlagSet) {
@@ -58,11 +58,21 @@ func (c *Cli) AddToFlags(f *flag.FlagSet) {
 		"don't randomly select new hinweisen",
 	)
 
-	c.Options.AddToFlags(f)
+	c.PrintOptions.AddToFlags(f, &c.maskPrintOptions)
 }
 
 func DefaultCli() (c Cli) {
+	c.PrintOptions = erworben_cli_print_options.Default()
+
 	return
+}
+
+func (c *Cli) ApplyPrintOptionsKonfig(
+	po erworben_cli_print_options.PrintOptions,
+) {
+	cliSet := c.PrintOptions
+	c.PrintOptions = po
+	c.PrintOptions.Merge(cliSet, c.maskPrintOptions)
 }
 
 func (c Cli) UsePredictableHinweisen() bool {
@@ -70,9 +80,9 @@ func (c Cli) UsePredictableHinweisen() bool {
 }
 
 func (c Cli) UsePrintTime() bool {
-	return c.PrintTime
+	return c.PrintOptions.PrintTime
 }
 
 func (c Cli) UsePrintEtiketten() bool {
-	return c.PrintEtikettenAlways
+	return c.PrintOptions.PrintEtikettenAlways
 }

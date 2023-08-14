@@ -19,7 +19,7 @@
             inherit system;
             overlays = [
               (final: prev: {
-                go = prev.go_1_19;
+                go = prev.go_1_20;
                 # buildGoModule = prev.buildGo118Module;
               })
               gomod2nix.overlays.default

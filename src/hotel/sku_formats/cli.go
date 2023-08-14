@@ -4,19 +4,15 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/erworben_cli_print_options"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/golf/sku"
 )
 
-type CliOptions struct {
-	PrefixTai              bool
-	AlwaysIncludeEtiketten bool
-}
-
 type cli struct {
-	options CliOptions
+	options erworben_cli_print_options.PrintOptions
 
 	writeTyp         bool
 	writeBezeichnung bool
@@ -30,7 +26,7 @@ type cli struct {
 }
 
 func MakeCliFormat(
-	options CliOptions,
+	options erworben_cli_print_options.PrintOptions,
 	shaStringFormatWriter schnittstellen.StringFormatWriter[schnittstellen.ShaLike],
 	kennungStringFormatWriter schnittstellen.StringFormatWriter[kennung.KennungPtr],
 	typStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Typ],
@@ -56,7 +52,7 @@ func (f *cli) WriteStringFormat(
 ) (n int64, err error) {
 	var n1 int
 
-	if f.options.PrefixTai {
+	if f.options.PrintTime {
 		t := o.GetTai()
 
 		n1, err = sw.WriteString(t.Format(kennung.FormatDateTime))
@@ -96,20 +92,24 @@ func (f *cli) WriteStringFormat(
 		return
 	}
 
-	n1, err = sw.WriteString("@")
-	n += int64(n1)
+	sh := o.GetAkteSha()
 
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	if !sh.IsNull() || !f.options.PrintEmptyShas {
+		n1, err = sw.WriteString("@")
+		n += int64(n1)
 
-	n2, err = f.shaStringFormatWriter.WriteStringFormat(sw, o.GetAkteSha())
-	n += n2
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
-	if err != nil {
-		err = errors.Wrap(err)
-		return
+		n2, err = f.shaStringFormatWriter.WriteStringFormat(sw, o.GetAkteSha())
+		n += n2
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	if f.writeTyp {
@@ -167,7 +167,7 @@ func (f *cli) WriteStringFormat(
 		}
 	}
 
-	if f.options.AlwaysIncludeEtiketten ||
+	if f.options.PrintEtikettenAlways ||
 		(f.writeEtiketten && !didWriteBezeichnung) {
 		b := o.GetMetadateiPtr().GetEtiketten()
 
