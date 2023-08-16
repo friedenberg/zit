@@ -14,7 +14,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/bravo/values"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/charlie/standort"
@@ -70,7 +69,7 @@ type compiled struct {
 	// Etiketten
 	EtikettenHidden             kennung.EtikettSet
 	EtikettenHiddenStringsSlice []string
-	EtikettenToAddToNew         []string
+	DefaultEtiketten            kennung.EtikettSet
 	Etiketten                   schnittstellen.MutableSetPtrLike[ketikett, *ketikett]
 	ImplicitEtiketten           implicitEtikettenMap
 
@@ -190,7 +189,7 @@ func (kc *Compiled) SetCliFromCommander(k erworben.Cli) {
 
 func (kc *compiled) recompile() (err error) {
 	kc.hasChanges = true
-	kc.EtikettenToAddToNew = collections.ResetSlice(kc.EtikettenToAddToNew)
+	kc.DefaultEtiketten = kennung.MakeEtikettSet(kc.Akte.Defaults.Etiketten...)
 
 	{
 		kc.ImplicitEtiketten = make(implicitEtikettenMap)
@@ -210,10 +209,6 @@ func (kc *compiled) recompile() (err error) {
 						kc.EtikettenHiddenStringsSlice,
 						tn,
 					)
-
-					// TODO-P2: determine why empty etiketten make it here
-				case tv.AddToNewZettels && tn != "":
-					kc.EtikettenToAddToNew = append(kc.EtikettenToAddToNew, tn)
 				}
 
 				// kc.applyExpandedEtikett(ct)
@@ -234,10 +229,6 @@ func (kc *compiled) recompile() (err error) {
 
 		sort.Slice(kc.EtikettenHiddenStringsSlice, func(i, j int) bool {
 			return kc.EtikettenHiddenStringsSlice[i] < kc.EtikettenHiddenStringsSlice[j]
-		})
-
-		sort.Slice(kc.EtikettenToAddToNew, func(i, j int) bool {
-			return kc.EtikettenToAddToNew[i] < kc.EtikettenToAddToNew[j]
 		})
 
 		kc.EtikettenHidden = etikettenHidden.CloneSetPtrLike()

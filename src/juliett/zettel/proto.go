@@ -17,7 +17,7 @@ type ProtoZettel struct {
 func MakeProtoZettel(k konfig.Compiled) (p ProtoZettel) {
 	errors.TodoP1("modify konfig to keep etiketten set")
 
-	p.Metadatei.Typ = k.GetErworben().DefaultTyp
+	p.Metadatei.Typ = k.GetErworben().Defaults.Typ
 
 	todo.Decide("should this be set to default etiketten?")
 	p.Metadatei.Etiketten = kennung.MakeEtikettSet()

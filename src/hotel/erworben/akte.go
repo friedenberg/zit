@@ -11,8 +11,13 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
+type Defaults struct {
+	Typ       kennung.Typ       `toml:"typ"`
+	Etiketten []kennung.Etikett `toml:"etiketten"`
+}
+
 type Akte struct {
-	DefaultTyp     kennung.Typ                             `toml:"default-typ"`
+	Defaults       Defaults                                `toml:"defaults"`
 	FileExtensions FileExtensions                          `toml:"file-extensions"`
 	RemoteScripts  map[string]script_config.RemoteScript   `toml:"remote-scripts"`
 	Recipients     []string                                `toml:"recipients"`
@@ -27,7 +32,11 @@ func (_ Akte) GetGattung() schnittstellen.GattungLike {
 func (a Akte) Equals(b Akte) bool {
 	todo.Change("don't use reflection for equality")
 
-	if !a.DefaultTyp.Equals(b.DefaultTyp) {
+	if !reflect.DeepEqual(a.Defaults.Etiketten, b.Defaults.Etiketten) {
+		return false
+	}
+
+	if !a.Defaults.Typ.Equals(b.Defaults.Typ) {
 		return false
 	}
 
@@ -56,7 +65,8 @@ func (a Akte) Equals(b Akte) bool {
 
 func (a *Akte) Reset() {
 	a.FileExtensions.Reset()
-	a.DefaultTyp = kennung.Typ{}
+	a.Defaults.Typ = kennung.Typ{}
+	a.Defaults.Etiketten = make([]kennung.Etikett, 0)
 	a.RemoteScripts = make(map[string]script_config.RemoteScript)
 	// TODO-P4 should reuse
 	a.Recipients = make([]string, 0)
@@ -67,7 +77,9 @@ func (a *Akte) Reset() {
 func (a *Akte) ResetWith(b Akte) {
 	a.FileExtensions.Reset()
 	// TODO-P4 should copy
-	a.DefaultTyp = b.DefaultTyp
+	a.Defaults.Typ = b.Defaults.Typ
+	a.Defaults.Etiketten = make([]kennung.Etikett, len(b.Defaults.Etiketten))
+	copy(a.Defaults.Etiketten, b.Defaults.Etiketten)
 	a.RemoteScripts = b.RemoteScripts
 	a.Recipients = b.Recipients
 	a.Actions = b.Actions

@@ -8,7 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/script_value"
@@ -220,20 +219,8 @@ func (c New) writeNewZettels(
 		},
 	}
 
-	var defaultEtiketten kennung.EtikettSet
-
-	if defaultEtiketten, err = u.DefaultEtiketten(); err != nil {
-		err = errors.Wrapf(
-			err,
-			"Etiketten: %s",
-			iter.StringCommaSeparated[kennung.Etikett](defaultEtiketten),
-		)
-
-		return
-	}
-
 	mes := c.Metadatei.Etiketten.CloneMutableSetPtrLike()
-	defaultEtiketten.Each(mes.Add)
+	u.Konfig().DefaultEtiketten.Each(mes.Add)
 	c.Metadatei.Etiketten = mes.CloneSetPtrLike()
 
 	if zsc, err = emptyOp.RunMany(c.ProtoZettel, c.Count); err != nil {

@@ -11,7 +11,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/charlie/file_lock"
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/gattungen"
@@ -226,29 +225,6 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 	)
 
 	u.storesInitialized = true
-
-	return
-}
-
-// TODO-P2 remove this
-func (u Umwelt) DefaultEtiketten() (etiketten kennung.EtikettSet, err error) {
-	f := collections_ptr.MakeFlagCommas[kennung.Etikett](
-		collections_ptr.SetterPolicyAppend,
-	)
-
-	for _, e := range u.konfig.EtikettenToAddToNew {
-		if err = f.Set(e); err != nil {
-			err = errors.Wrapf(err, "Etikett: %s", e)
-			err = errors.Wrapf(
-				err,
-				"Etiketten: %s",
-				u.konfig.EtikettenToAddToNew,
-			)
-			return
-		}
-	}
-
-	etiketten = f.GetSetPtrLike()
 
 	return
 }
