@@ -19,7 +19,7 @@ import (
 type Page struct {
 	lock *sync.Mutex
 	pageId
-	ioFactory
+	schnittstellen.VerzeichnisseFactory
 	pool        schnittstellen.Pool[zettel.Transacted, *zettel.Transacted]
 	added       zettel.HeapTransacted
 	addFilter   schnittstellen.FuncIter[*zettel.Transacted]
@@ -28,8 +28,7 @@ type Page struct {
 }
 
 func makeZettelenPage(
-	iof ioFactory,
-	pid pageId,
+	iof schnittstellen.VerzeichnisseFactory, pid pageId,
 	pool schnittstellen.Pool[zettel.Transacted, *zettel.Transacted],
 	fff PageDelegateGetter,
 ) (p *Page) {
@@ -44,13 +43,13 @@ func makeZettelenPage(
 	}
 
 	p = &Page{
-		lock:        &sync.Mutex{},
-		ioFactory:   iof,
-		pageId:      pid,
-		pool:        pool,
-		added:       zettel.MakeHeapTransacted(),
-		flushFilter: flushFilter,
-		addFilter:   addFilter,
+		lock:                 &sync.Mutex{},
+		VerzeichnisseFactory: iof,
+		pageId:               pid,
+		pool:                 pool,
+		added:                zettel.MakeHeapTransacted(),
+		flushFilter:          flushFilter,
+		addFilter:            addFilter,
 	}
 
 	p.added.SetPool(p.pool)

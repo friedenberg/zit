@@ -21,7 +21,7 @@ type Zettelen struct {
 	erworben konfig.Compiled
 	path     string
 	pool     schnittstellen.Pool[zettel.Transacted, *zettel.Transacted]
-	ioFactory
+	schnittstellen.VerzeichnisseFactory
 	pages [PageCount]*Page
 }
 
@@ -33,15 +33,15 @@ type pageId struct {
 func MakeZettelen(
 	k konfig.Compiled,
 	dir string,
-	f ioFactory,
+	f schnittstellen.VerzeichnisseFactory,
 	p schnittstellen.Pool[zettel.Transacted, *zettel.Transacted],
 	fff PageDelegateGetter,
 ) (i *Zettelen, err error) {
 	i = &Zettelen{
-		erworben:  k,
-		path:      dir,
-		ioFactory: f,
-		pool:      p,
+		erworben:             k,
+		path:                 dir,
+		VerzeichnisseFactory: f,
+		pool:                 p,
 	}
 
 	for n := range i.pages {
