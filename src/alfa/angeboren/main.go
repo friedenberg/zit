@@ -14,6 +14,7 @@ func init() {
 
 type Konfig struct {
 	StoreVersion          storeVersion
+	Recipients            []string
 	UseBestandsaufnahme   bool
 	UseKonfigErworbenFile bool
 	CompressionType       CompressionType
@@ -23,6 +24,7 @@ type Konfig struct {
 func Default() Konfig {
 	return Konfig{
 		StoreVersion:          storeVersion(values.Int(3)),
+		Recipients:            make([]string, 0),
 		UseBestandsaufnahme:   true,
 		UseKonfigErworbenFile: true,
 		CompressionType:       CompressionTypeDefault,
@@ -49,5 +51,15 @@ func (k *Konfig) AddToFlagSet(f *flag.FlagSet) {
 		"lock-internal-files",
 		k.LockInternalFiles,
 		"",
+	)
+
+	f.Func(
+		"recipient",
+		"age recipients",
+		func(value string) (err error) {
+			// TODO-P2 validate age recipient
+			k.Recipients = append(k.Recipients, value)
+			return
+		},
 	)
 }

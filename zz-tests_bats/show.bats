@@ -203,8 +203,6 @@ function show_konfig { # @test
 
 	run_zit show -format text :konfig
 	assert_output - <<-EOM
-		recipients = []
-
 		[defaults]
 		typ = 'md'
 		etiketten = []
