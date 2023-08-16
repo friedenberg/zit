@@ -6,28 +6,27 @@ import (
 	"github.com/friedenberg/zit/src/bravo/values"
 )
 
+type Abbreviations struct {
+	Hinweisen bool `toml:"hinweisen"`
+	Shas      bool `toml:"shas"`
+}
+
 type PrintOptions struct {
-	PrintAbbreviatedHinweisen bool `toml:"-"`
-	PrintAbbreviatedKennungen bool `toml:"-"`
-	PrintAbbreviatedShas      bool `toml:"-"`
-	PrintIncludeTypen         bool `toml:"print-include-typen"`
-	PrintIncludeBezeichnungen bool `toml:"print-include-bezeichnungen"`
-	PrintTime                 bool `toml:"print-time"`
-	PrintEtikettenAlways      bool `toml:"print-etiketten-always"`
-	PrintEmptyShas            bool `toml:"print-empty-shas"`
+	Abbreviations             Abbreviations `toml:"abbreviations"`
+	PrintIncludeTypen         bool          `toml:"print-include-typen"`
+	PrintIncludeBezeichnungen bool          `toml:"print-include-bezeichnungen"`
+	PrintTime                 bool          `toml:"print-time"`
+	PrintEtikettenAlways      bool          `toml:"print-etiketten-always"`
+	PrintEmptyShas            bool          `toml:"print-empty-shas"`
 }
 
 func (a *PrintOptions) Merge(b PrintOptions, mask PrintOptions) {
-	if mask.PrintAbbreviatedHinweisen {
-		a.PrintAbbreviatedHinweisen = b.PrintAbbreviatedHinweisen
+	if mask.Abbreviations.Hinweisen {
+		a.Abbreviations.Hinweisen = b.Abbreviations.Hinweisen
 	}
 
-	if mask.PrintAbbreviatedKennungen {
-		a.PrintAbbreviatedKennungen = b.PrintAbbreviatedKennungen
-	}
-
-	if mask.PrintAbbreviatedShas {
-		a.PrintAbbreviatedShas = b.PrintAbbreviatedShas
+	if mask.Abbreviations.Shas {
+		a.Abbreviations.Shas = b.Abbreviations.Shas
 	}
 
 	if mask.PrintIncludeTypen {
@@ -53,9 +52,10 @@ func (a *PrintOptions) Merge(b PrintOptions, mask PrintOptions) {
 
 func Default() PrintOptions {
 	return PrintOptions{
-		PrintAbbreviatedHinweisen: true,
-		PrintAbbreviatedKennungen: true,
-		PrintAbbreviatedShas:      true,
+		Abbreviations: Abbreviations{
+			Hinweisen: true,
+			Shas:      true,
+		},
 		PrintIncludeTypen:         true,
 		PrintIncludeBezeichnungen: true,
 		PrintTime:                 true,
@@ -100,24 +100,16 @@ func (c *PrintOptions) AddToFlags(f *flag.FlagSet, m *PrintOptions) {
 	boolVarWithMask(
 		f,
 		"abbreviate-shas",
-		&c.PrintAbbreviatedShas,
-		&m.PrintAbbreviatedShas,
+		&c.Abbreviations.Shas,
+		&m.Abbreviations.Shas,
 		"",
 	)
 
 	boolVarWithMask(
 		f,
 		"abbreviate-hinweisen",
-		&c.PrintAbbreviatedHinweisen,
-		&m.PrintAbbreviatedHinweisen,
-		"",
-	)
-
-	boolVarWithMask(
-		f,
-		"abbreviate-kennungen",
-		&c.PrintAbbreviatedKennungen,
-		&m.PrintAbbreviatedKennungen,
+		&c.Abbreviations.Hinweisen,
+		&m.Abbreviations.Hinweisen,
 		"",
 	)
 

@@ -35,7 +35,8 @@ func (t *Text) Refine() (err error) {
 
 func (t *Text) ReadFrom(r io.Reader) (n int64, err error) {
 	r1 := &assignmentLineReader{
-		ex: t.Expanders,
+		options: t.Options,
+		ex:      t.Expanders,
 	}
 
 	mr := metadatei.Reader{

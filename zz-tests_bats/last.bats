@@ -21,7 +21,7 @@ function last_after_init { # @test
 	assert_success
 	assert_output_cut -d' ' -f2- -- - <<-EOM
 		Tai Typ md 102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384
-		Tai Konfig konfig da94d3e3cc623010b9b237b3c289ce2c6bf33ff1a9ce47e35a84557aacef30e3
+		Tai Konfig konfig $(get_konfig_sha)
 	EOM
 }
 

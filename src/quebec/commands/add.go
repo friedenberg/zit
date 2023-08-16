@@ -114,7 +114,7 @@ func (c Add) RunWithCwdQuery(
 
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
 		Umwelt:  u,
-		Options: otFlags.GetOptions(),
+		Options: otFlags.GetOptions(u.Konfig().PrintOptions),
 	}
 
 	var createOrganizeFileResults *organize_text.Text

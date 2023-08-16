@@ -4,6 +4,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/erworben_cli_print_options"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/string_writer_format"
@@ -15,9 +16,14 @@ type shaCliFormat struct {
 }
 
 func MakeShaCliFormat(
+	options erworben_cli_print_options.PrintOptions,
 	co string_writer_format.ColorOptions,
 	abbr func(sha.Sha) (string, error),
 ) *shaCliFormat {
+	if !options.Abbreviations.Shas {
+		abbr = nil
+	}
+
 	return &shaCliFormat{
 		abbr: abbr,
 		stringFormatWriter: string_writer_format.MakeColor[string](

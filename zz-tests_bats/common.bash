@@ -41,7 +41,6 @@ cat_yang() (
 cmd_zit_def=(
 	-abbreviate-hinweisen=false
 	-abbreviate-shas=false
-	-abbreviate-kennungen=false
 	-predictable-hinweisen
 	-print-typen=false
 	-print-time=false
@@ -78,6 +77,10 @@ function run_zit {
 function run_zit_init {
 	run_zit init -yin <(cat_yin) -yang <(cat_yang)
 	assert_success
+}
+
+function get_konfig_sha() {
+  echo -n "7aa038793ce0e4d489d718b98e1ee1ad0c307c7b355c3d86bd3872c24ef4153b"
 }
 
 function run_zit_init_disable_age {

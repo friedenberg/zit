@@ -38,7 +38,7 @@ func (c ReadOrganizeFile) Run() (ot *organize_text.Text, err error) {
 	otFlags := organize_text.MakeFlags()
 	c.Umwelt.ApplyToOrganizeOptions(&otFlags.Options)
 
-	if ot, err = organize_text.New(otFlags.GetOptions()); err != nil {
+	if ot, err = organize_text.New(otFlags.GetOptions(c.Umwelt.Konfig().PrintOptions)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

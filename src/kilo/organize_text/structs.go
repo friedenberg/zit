@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/erworben_cli_print_options"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
@@ -15,6 +15,7 @@ import (
 )
 
 func makeObj(
+	options erworben_cli_print_options.PrintOptions,
 	named sku.SkuLike,
 	expanders kennung.Abbr,
 ) (z obj, err error) {
@@ -24,15 +25,13 @@ func makeObj(
 		Bezeichnung: bezeichnung.Make(named.GetMetadatei().Description()),
 	}
 
-	if !named.GetGattung().EqualsGattung(gattung.Zettel) {
-		return
-	}
-
-	if z.Kennung, err = expanders.AbbreviateKennung(
-		z.Kennung,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+	if options.Abbreviations.Hinweisen {
+		if z.Kennung, err = expanders.AbbreviateHinweisOnly(
+			z.Kennung,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return
@@ -82,7 +81,11 @@ func (z obj) String() string {
 	return fmt.Sprintf("- [%s] %s", z.Kennung, z.Bezeichnung)
 }
 
-func (z *obj) setExistingObj(v string, ex kennung.Abbr) (err error) {
+func (z *obj) setExistingObj(
+	options erworben_cli_print_options.PrintOptions,
+	v string,
+	ex kennung.Abbr,
+) (err error) {
 	remaining := v
 
 	if len(remaining) < 3 {
@@ -111,11 +114,13 @@ func (z *obj) setExistingObj(v string, ex kennung.Abbr) (err error) {
 		return
 	}
 
-	if z.Kennung, err = ex.AbbreviateKennung(
-		z.Kennung,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+	if options.Abbreviations.Hinweisen {
+		if z.Kennung, err = ex.AbbreviateHinweisOnly(
+			z.Kennung,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	// no bezeichnung

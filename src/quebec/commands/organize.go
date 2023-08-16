@@ -78,7 +78,7 @@ func (c *Organize) RunWithQuery(
 
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
 		Umwelt:  u,
-		Options: c.Flags.GetOptions(),
+		Options: c.Flags.GetOptions(u.Konfig().PrintOptions),
 	}
 
 	createOrganizeFileOp.RootEtiketten = ms.GetEtiketten()

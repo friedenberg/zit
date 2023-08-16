@@ -300,19 +300,11 @@ func (u *Umwelt) MakeKennungExpanders() (out kennung.Abbr) {
 	out.Hinweis.Expand = u.StoreObjekten().GetAbbrStore().Hinweis().ExpandStringString
 	out.Sha.Expand = u.StoreObjekten().GetAbbrStore().Shas().ExpandStringString
 
-	if u.Konfig().PrintOptions.PrintAbbreviatedKennungen {
-		out.Etikett.Abbreviate = u.StoreObjekten().GetAbbrStore().Etiketten().Abbreviate
-		out.Typ.Abbreviate = u.StoreObjekten().GetAbbrStore().Typen().Abbreviate
-		out.Kasten.Abbreviate = u.StoreObjekten().GetAbbrStore().Kisten().Abbreviate
-	}
-
-	if u.Konfig().PrintOptions.PrintAbbreviatedHinweisen {
-		out.Hinweis.Abbreviate = u.StoreObjekten().GetAbbrStore().Hinweis().Abbreviate
-	}
-
-	if u.Konfig().PrintOptions.PrintAbbreviatedShas {
-		out.Sha.Abbreviate = u.StoreObjekten().GetAbbrStore().Shas().Abbreviate
-	}
+	out.Etikett.Abbreviate = u.StoreObjekten().GetAbbrStore().Etiketten().Abbreviate
+	out.Typ.Abbreviate = u.StoreObjekten().GetAbbrStore().Typen().Abbreviate
+	out.Kasten.Abbreviate = u.StoreObjekten().GetAbbrStore().Kisten().Abbreviate
+	out.Hinweis.Abbreviate = u.StoreObjekten().GetAbbrStore().Hinweis().Abbreviate
+	out.Sha.Abbreviate = u.StoreObjekten().GetAbbrStore().Shas().Abbreviate
 
 	return
 }

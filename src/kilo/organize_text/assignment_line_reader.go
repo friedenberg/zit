@@ -12,6 +12,7 @@ import (
 )
 
 type assignmentLineReader struct {
+	options           Options
 	lineNo            int
 	root              *assignment
 	currentAssignment *assignment
@@ -323,7 +324,7 @@ func (ar *assignmentLineReader) readOneZettel(l line) (err error) {
 
 	var z obj
 
-	if err = z.setExistingObj(l.String(), ar.ex); err == nil {
+	if err = z.setExistingObj(ar.options.PrintOptions, l.String(), ar.ex); err == nil {
 		// logz.Print("added to named zettels")
 		ar.currentAssignment.named.Add(z)
 		// logz.Print(len(ar.currentAssignment.named))

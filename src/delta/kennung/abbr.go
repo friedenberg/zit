@@ -51,6 +51,39 @@ func (ao abbrOne[V, VPtr]) AbbreviateKennung(
 	return
 }
 
+func (a Abbr) AbbreviateHinweisOnly(
+	in Kennung,
+) (out Kennung, err error) {
+	var getAbbr func(Kennung) (string, error)
+
+	switch in.(type) {
+	case Hinweis, *Hinweis:
+		getAbbr = a.Hinweis.AbbreviateKennung
+
+	default:
+		out = in
+		return
+	}
+
+	var abbr string
+
+	if abbr, err = getAbbr(in); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	outPtr := in.KennungPtrClone()
+
+	if err = outPtr.Set(abbr); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	out = outPtr
+
+	return
+}
+
 func (a Abbr) AbbreviateKennung(
 	in Kennung,
 ) (out Kennung, err error) {

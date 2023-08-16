@@ -74,8 +74,8 @@ func (f *kennungCliFormat) WriteStringFormat(
 ) (n int64, err error) {
 	k := Kennung(k1)
 
-	if f.options.PrintAbbreviatedKennungen {
-		if k, err = f.abbr.AbbreviateKennung(k); err != nil {
+	if f.options.Abbreviations.Hinweisen {
+		if k, err = f.abbr.AbbreviateHinweisOnly(k); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

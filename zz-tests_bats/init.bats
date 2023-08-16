@@ -15,8 +15,8 @@ function init_and_deinit { # @test
 	assert_output_unsorted - <<-EOM
 		[!md@102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
 		[!md@102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
-		[konfig@da94d3e3cc623010b9b237b3c289ce2c6bf33ff1a9ce47e35a84557aacef30e3]
-		[konfig@da94d3e3cc623010b9b237b3c289ce2c6bf33ff1a9ce47e35a84557aacef30e3]
+		[konfig@$(get_konfig_sha)]
+		[konfig@$(get_konfig_sha)]
 	EOM
 
 	run test -f .zit/KonfigAngeboren
@@ -27,7 +27,7 @@ function init_and_deinit { # @test
 	run_zit show -format log :konfig
 	assert_success
 	assert_output - <<-EOM
-		[konfig@da94d3e3cc623010b9b237b3c289ce2c6bf33ff1a9ce47e35a84557aacef30e3]
+		[konfig@$(get_konfig_sha)]
 	EOM
 
 	run_zit deinit

@@ -4,6 +4,7 @@ import (
 	"flag"
 	"sync"
 
+	"github.com/friedenberg/zit/src/alfa/erworben_cli_print_options"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/delta/kennung"
@@ -36,6 +37,8 @@ type Options struct {
 	UseRightAlignedIndents bool
 	UseRefiner             bool
 	UseMetadateiHeader     bool
+
+	PrintOptions erworben_cli_print_options.PrintOptions
 }
 
 func MakeFlags() Flags {
@@ -81,12 +84,16 @@ func (o *Flags) AddToFlagSet(f *flag.FlagSet) {
 	)
 }
 
-func (o *Flags) GetOptions() Options {
+func (o *Flags) GetOptions(
+	printOptions erworben_cli_print_options.PrintOptions,
+) Options {
 	o.once.Do(
 		func() {
 			o.Options.ExtraEtiketten = o.ExtraEtiketten.GetSetPtrLike()
 		},
 	)
+
+	o.Options.PrintOptions = printOptions
 
 	return o.Options
 }
