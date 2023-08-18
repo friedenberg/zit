@@ -85,19 +85,13 @@ func (av assignmentLineWriter) writeRightAligned(a *assignment) (err error) {
 
 	hinMaxWidth := 4
 
-	extra := 0
-	if kopfUndSchwanz == av.maxLen {
-		hinMaxWidth += kopfUndSchwanz
-	} else {
-		hinMaxWidth += av.maxLen
-		extra = 1
-	}
+	hinMaxWidth += kopfUndSchwanz - 1
 
 	if spaceCount < hinMaxWidth {
 		spaceCount = hinMaxWidth
 	}
 
-	tab_prefix := strings.Repeat(" ", spaceCount-extra)
+	tab_prefix := strings.Repeat(" ", spaceCount+1)
 
 	if a.Depth() == 0 && !av.OmitLeadingEmptyLine {
 		av.WriteExactlyOneEmpty()
