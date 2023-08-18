@@ -6,7 +6,19 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/charlie/collections"
 )
+
+var delimReaderPool schnittstellen.Pool[delimReader, *delimReader]
+
+func init() {
+	delimReaderPool = collections.MakePool[delimReader, *delimReader]()
+}
+
+func PutDelimReader(dr *delimReader) {
+	delimReaderPool.Put(dr)
+}
 
 type delimReader struct {
 	delim    byte
@@ -19,27 +31,38 @@ type delimReader struct {
 func MakeDelimReader(
 	delim byte,
 	r io.Reader,
-) delimReader {
-	return delimReader{
-		delim: delim,
-		br:    bufio.NewReader(r),
-	}
+) (dr *delimReader) {
+	dr = delimReaderPool.Get()
+	dr.br.Reset(r)
+	dr.delim = delim
+
+	return
 }
 
-func (lr delimReader) N() int64 {
+func (lr *delimReader) N() int64 {
 	return lr.n
 }
 
-func (lr delimReader) Segments() int64 {
+func (lr *delimReader) Segments() int64 {
 	return lr.segments
 }
 
-func (lr delimReader) IsEOF() bool {
+func (lr *delimReader) IsEOF() bool {
 	return lr.eof
 }
 
-func (lr *delimReader) Reset(r io.Reader) {
-	lr.br.Reset(r)
+func (lr *delimReader) ResetWith(dr delimReader) {
+	lr.Reset()
+	lr.delim = dr.delim
+}
+
+func (lr *delimReader) Reset() {
+	if lr.br == nil {
+		lr.br = bufio.NewReader(nil)
+	} else {
+		lr.br.Reset(nil)
+	}
+
 	lr.n = 0
 	lr.segments = 0
 	lr.eof = false

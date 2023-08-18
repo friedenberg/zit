@@ -73,6 +73,7 @@ func (f v3) ParsePersistentMetadatei(
 	)
 
 	dr := ohio.MakeDelimReader('\n', r1)
+	defer ohio.PutDelimReader(dr)
 
 	var (
 		lastKey string

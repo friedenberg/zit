@@ -13,7 +13,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/ohio"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
-	"github.com/friedenberg/zit/src/delta/format"
 )
 
 type tai = chai.TAI
@@ -106,51 +105,71 @@ func (t Tai) Format(v string) string {
 func (t *Tai) Set(v string) (err error) {
 	t.wasSet = true
 
-	r := format.MakeDelimReaderConsumeEmpty(
-		'.',
-		ohio.MakeLineReaderIterateStrict(
-			func(v string) (err error) {
-				v = strings.TrimSpace(v)
+	dr := ohio.MakeDelimReader('.', strings.NewReader(v))
+	defer ohio.PutDelimReader(dr)
 
-				if v == "" {
-					return
-				}
+	idx := 0
+	var val string
 
-				if t.tai.Sec, err = strconv.ParseInt(v, 10, 64); err != nil {
-					err = errors.Wrapf(err, "failed to parse Sec time: %s", v)
-					return
-				}
+	for {
+		val, err = dr.ReadOneString()
 
+		switch idx {
+		case 0:
+			if err != nil {
+				err = errors.Wrap(err)
 				return
-			},
-			func(v string) (err error) {
-				v = strings.TrimSpace(v)
-				v = strings.TrimRight(v, "0")
+			}
 
-				if v == "" {
-					return
-				}
+			val = strings.TrimSpace(val)
 
-				var pre int64
+			if val == "" {
+				break
+			}
 
-				if pre, err = strconv.ParseInt(v, 10, 64); err != nil {
-					err = errors.Wrapf(err, "failed to parse Asec time: %s", v)
-					return
-				}
-
-				t.tai.Asec = pre * int64(math.Pow10(18-len(v)))
-
+			if t.tai.Sec, err = strconv.ParseInt(val, 10, 64); err != nil {
+				err = errors.Wrapf(err, "failed to parse Sec time: %s", v)
 				return
-			},
-		),
-	)
+			}
 
-	if _, err = r.ReadFrom(strings.NewReader(v)); err != nil {
-		err = errors.Wrap(err)
-		return
+		case 1:
+			if err != nil {
+				if errors.IsEOF(err) {
+					err = nil
+				} else {
+					err = errors.Wrap(err)
+					return
+				}
+			}
+
+			val = strings.TrimSpace(val)
+			val = strings.TrimRight(val, "0")
+
+			if val == "" {
+				break
+			}
+
+			var pre int64
+
+			if pre, err = strconv.ParseInt(val, 10, 64); err != nil {
+				err = errors.Wrapf(err, "failed to parse Asec time: %s", val)
+				return
+			}
+
+			t.tai.Asec = pre * int64(math.Pow10(18-len(val)))
+
+		default:
+			if errors.IsEOF(err) {
+				err = nil
+			} else {
+				err = errors.Errorf("expected no more elements but got %s", val)
+			}
+
+			return
+		}
+
+		idx++
 	}
-
-	return
 }
 
 // func (t Tai) Sha() sha.Sha {
