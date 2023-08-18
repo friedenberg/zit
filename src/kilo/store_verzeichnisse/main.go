@@ -131,8 +131,8 @@ func (i *Zettelen) AddVerzeichnisse(
 func (i *Zettelen) GetPageIndexKeyValue(
 	zt zettel.Transacted,
 ) (key string, value string) {
-	key = zt.Kennung().String()
-	value = fmt.Sprintf("%s.%s", zt.Sku.GetTai(), zt.Sku.ObjekteSha)
+	key = zt.Kennung.String()
+	value = fmt.Sprintf("%s.%s", zt.GetTai(), zt.ObjekteSha)
 	return
 }
 

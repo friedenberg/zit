@@ -67,7 +67,7 @@ func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 	errors.Log().Printf("searching page %d", n)
 
 	w := func(zv *zettel.Transacted) (err error) {
-		if !zv.Sku.GetKennung().Equals(h) {
+		if !zv.GetKennung().Equals(h) {
 			return
 		}
 

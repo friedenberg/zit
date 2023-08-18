@@ -33,8 +33,8 @@ type TransactedInflator[
 ] interface {
 	InflateFromSkuLike(
 		sku.SkuLike,
-	) (*objekte.Transacted[A, APtr, K, KPtr], error)
-	InflatorStorer[*objekte.Transacted[A, APtr, K, KPtr]]
+	) (*sku.Transacted[K, KPtr], error)
+	InflatorStorer[*sku.Transacted[K, KPtr]]
 	InflateFromSkuAndStore(sku.SkuLike) error
 }
 
@@ -50,8 +50,8 @@ type transactedInflator[
 	persistentMetadateiFormat objekte_format.Format
 	akteFormat                objekte.AkteFormat[A, APtr]
 	pool                      schnittstellen.Pool[
-		objekte.Transacted[A, APtr, K, KPtr],
-		*objekte.Transacted[A, APtr, K, KPtr],
+		sku.Transacted[K, KPtr],
+		*sku.Transacted[K, KPtr],
 	]
 }
 
@@ -67,8 +67,8 @@ func MakeTransactedInflator[
 	persistentMetadateiFormat objekte_format.Format,
 	akteFormat objekte.AkteFormat[A, APtr],
 	pool schnittstellen.Pool[
-		objekte.Transacted[A, APtr, K, KPtr],
-		*objekte.Transacted[A, APtr, K, KPtr],
+		sku.Transacted[K, KPtr],
+		*sku.Transacted[K, KPtr],
 	],
 ) *transactedInflator[A, APtr, K, KPtr] {
 	return &transactedInflator[A, APtr, K, KPtr]{
@@ -83,15 +83,15 @@ func MakeTransactedInflator[
 
 func (h *transactedInflator[A, APtr, K, KPtr]) InflateFromSkuLike(
 	o sku.SkuLike,
-) (t *objekte.Transacted[A, APtr, K, KPtr], err error) {
+) (t *sku.Transacted[K, KPtr], err error) {
 	if h.pool == nil {
-		t = new(objekte.Transacted[A, APtr, K, KPtr])
+		t = new(sku.Transacted[K, KPtr])
 	} else {
 		t = h.pool.Get()
 	}
 
 	// TODO-P2 make generic
-	if err = t.Sku.SetFromSkuLike(o); err != nil {
+	if err = t.SetFromSkuLike(o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -99,21 +99,21 @@ func (h *transactedInflator[A, APtr, K, KPtr]) InflateFromSkuLike(
 	t.SetTai(o.GetTai())
 
 	// TODO-P2 make generic
-	if t.Sku.GetGattung() != o.GetGattung() {
+	if t.GetGattung() != o.GetGattung() {
 		err = errors.Errorf(
 			"expected gattung %s but got %s",
-			t.Sku.GetGattung(),
+			t.GetGattung(),
 			o.GetGattung(),
 		)
 		return
 	}
 
-	if err = KPtr(&t.Sku.Kennung).Set(o.GetKennungLike().String()); err != nil {
+	if err = KPtr(&t.Kennung).Set(o.GetKennungLike().String()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	t.Sku.ObjekteSha = sha.Make(o.GetObjekteSha())
+	t.ObjekteSha = sha.Make(o.GetObjekteSha())
 
 	if h.storeVersion.GetInt() < 3 {
 		if err = h.readObjekte(o, t); err != nil {
@@ -136,14 +136,14 @@ func (h *transactedInflator[A, APtr, K, KPtr]) InflateFromSkuLike(
 
 func (h *transactedInflator[A, APtr, K, KPtr]) InflateFromSku(
 	o sku.SkuLike,
-) (t *objekte.Transacted[A, APtr, K, KPtr], err error) {
+) (t *sku.Transacted[K, KPtr], err error) {
 	if h.pool == nil {
-		t = new(objekte.Transacted[A, APtr, K, KPtr])
+		t = new(sku.Transacted[K, KPtr])
 	} else {
 		t = h.pool.Get()
 	}
 
-	if err = t.Sku.SetFromSkuLike(o); err != nil {
+	if err = t.SetFromSkuLike(o); err != nil {
 		err = errors.Wrapf(err, "Sku: %s", o)
 		return
 	}
@@ -170,7 +170,7 @@ func (h *transactedInflator[A, APtr, K, KPtr]) InflateFromSku(
 }
 
 func (h *transactedInflator[A, APtr, K, KPtr]) StoreAkte(
-	t *objekte.Transacted[A, APtr, K, KPtr],
+	t *sku.Transacted[K, KPtr],
 ) (err error) {
 	var aw sha.WriteCloser
 
@@ -192,7 +192,7 @@ func (h *transactedInflator[A, APtr, K, KPtr]) StoreAkte(
 }
 
 func (h *transactedInflator[A, APtr, K, KPtr]) StoreObjekte(
-	t *objekte.Transacted[A, APtr, K, KPtr],
+	t *sku.Transacted[K, KPtr],
 ) (err error) {
 	if h.storeVersion.GetInt() >= 3 {
 		return
@@ -215,7 +215,7 @@ func (h *transactedInflator[A, APtr, K, KPtr]) StoreObjekte(
 		return
 	}
 
-	t.Sku.ObjekteSha = sha.Make(ow.GetShaLike())
+	t.ObjekteSha = sha.Make(ow.GetShaLike())
 	t.SetAkteSha(t.GetAkteSha())
 
 	return
@@ -224,7 +224,7 @@ func (h *transactedInflator[A, APtr, K, KPtr]) StoreObjekte(
 func (h *transactedInflator[A, APtr, K, KPtr]) InflateFromSkuAndStore(
 	o sku.SkuLike,
 ) (err error) {
-	var t *objekte.Transacted[A, APtr, K, KPtr]
+	var t *sku.Transacted[K, KPtr]
 
 	if t, err = h.InflateFromSku(o); err != nil {
 		err = errors.Wrap(err)
@@ -241,7 +241,7 @@ func (h *transactedInflator[A, APtr, K, KPtr]) InflateFromSkuAndStore(
 
 func (h *transactedInflator[A, APtr, K, KPtr]) readObjekte(
 	sk sku.SkuLike,
-	t *objekte.Transacted[A, APtr, K, KPtr],
+	t *sku.Transacted[K, KPtr],
 ) (err error) {
 	if sk.GetObjekteSha().IsNull() {
 		return
@@ -266,14 +266,14 @@ func (h *transactedInflator[A, APtr, K, KPtr]) readObjekte(
 		return
 	}
 
-	t.Sku.ObjekteSha = sha.Make(r.GetShaLike())
+	t.ObjekteSha = sha.Make(r.GetShaLike())
 
-	if !t.Sku.ObjekteSha.EqualsSha(sk.GetObjekteSha()) {
+	if !t.ObjekteSha.EqualsSha(sk.GetObjekteSha()) {
 		errors.Todo(
 			"objekte sha mismatch for %s! expected %s but got %s.",
 			sk.GetGattung(),
 			sk.GetObjekteSha(),
-			t.Sku.ObjekteSha,
+			t.ObjekteSha,
 		)
 	}
 
@@ -283,7 +283,7 @@ func (h *transactedInflator[A, APtr, K, KPtr]) readObjekte(
 }
 
 func (h *transactedInflator[A, APtr, K, KPtr]) readAkte(
-	t *objekte.Transacted[A, APtr, K, KPtr],
+	t *sku.Transacted[K, KPtr],
 	a APtr,
 ) (err error) {
 	if h.akteFormat == nil {

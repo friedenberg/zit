@@ -15,7 +15,7 @@ type ExternalMaybeGetterReader[
 	KPtr kennung.KennungLikePtr[K],
 ] interface {
 	ReadOne(
-		objekte.Transacted[O, OPtr, K, KPtr],
+		sku.Transacted[K, KPtr],
 	) (*objekte.CheckedOut[O, OPtr, K, KPtr], error)
 }
 
@@ -27,7 +27,7 @@ type externalMaybeGetterReader[
 ] struct {
 	getter func(KPtr) (*sku.ExternalMaybe[K, KPtr], bool)
 	ExternalReader[*sku.ExternalMaybe[K, KPtr],
-		*objekte.Transacted[O, OPtr, K, KPtr],
+		*sku.Transacted[K, KPtr],
 		objekte.External[O, OPtr, K, KPtr]]
 }
 
@@ -40,7 +40,7 @@ func MakeExternalMaybeGetterReader[
 	getter func(KPtr) (*sku.ExternalMaybe[K, KPtr], bool),
 	er ExternalReader[
 		*sku.ExternalMaybe[K, KPtr],
-		*objekte.Transacted[O, OPtr, K, KPtr],
+		*sku.Transacted[K, KPtr],
 		objekte.External[O, OPtr, K, KPtr],
 	],
 ) ExternalMaybeGetterReader[O, OPtr, K, KPtr] {
@@ -51,7 +51,7 @@ func MakeExternalMaybeGetterReader[
 }
 
 func (emgr externalMaybeGetterReader[O, OPtr, K, KPtr]) ReadOne(
-	i objekte.Transacted[O, OPtr, K, KPtr],
+	i sku.Transacted[K, KPtr],
 ) (co *objekte.CheckedOut[O, OPtr, K, KPtr], err error) {
 	co = &objekte.CheckedOut[O, OPtr, K, KPtr]{
 		Internal: i,
@@ -61,7 +61,7 @@ func (emgr externalMaybeGetterReader[O, OPtr, K, KPtr]) ReadOne(
 
 	var e *sku.ExternalMaybe[K, KPtr]
 
-	if e, ok = emgr.getter(KPtr(i.Sku.GetKennungPtr())); !ok {
+	if e, ok = emgr.getter(KPtr(i.GetKennungPtr())); !ok {
 		err = iter.MakeErrStopIteration()
 		return
 	}

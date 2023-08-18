@@ -23,19 +23,19 @@ func (w *Writer) zettelToItem(
 	)
 
 	if a.Title == "" {
-		a.Title = z.Kennung().String()
+		a.Title = z.Kennung.String()
 		a.Subtitle = fmt.Sprintf("%s", es)
 	} else {
-		a.Subtitle = fmt.Sprintf("%s: %s", z.Kennung().String(), es)
+		a.Subtitle = fmt.Sprintf("%s: %s", z.Kennung.String(), es)
 	}
 
-	a.Arg = z.Kennung().String()
+	a.Arg = z.Kennung.String()
 
 	mb := alfred.NewMatchBuilder()
 
-	mb.AddMatches(z.Kennung().String())
-	mb.AddMatches(z.Kennung().Kopf())
-	mb.AddMatches(z.Kennung().Schwanz())
+	mb.AddMatches(z.Kennung.String())
+	mb.AddMatches(z.Kennung.Kopf())
+	mb.AddMatches(z.Kennung.Schwanz())
 	mb.AddMatches(z.GetMetadatei().Bezeichnung.String())
 	mb.AddMatches(z.GetTyp().String())
 	z.GetMetadatei().Etiketten.Each(
@@ -87,8 +87,8 @@ func (w *Writer) zettelToItem(
 	// 	a.Match = a.Match[:100]
 	// }
 
-	a.Text.Copy = z.Kennung().String()
-	a.Uid = "zit://" + z.Kennung().String()
+	a.Text.Copy = z.Kennung.String()
+	a.Uid = "zit://" + z.Kennung.String()
 
 	return
 }

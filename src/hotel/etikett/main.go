@@ -2,12 +2,11 @@ package etikett
 
 import (
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/hotel/objekte"
 )
 
-type Transacted = objekte.Transacted[
-	Akte,
-	*Akte,
+type Transacted = sku.Transacted[
 	kennung.Etikett,
 	*kennung.Etikett,
 ]

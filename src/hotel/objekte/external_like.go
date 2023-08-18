@@ -20,6 +20,6 @@ type ExternalLikePtr interface {
 	GetFDsPtr() *sku.ExternalFDs
 	metadatei.GetterPtr
 	metadatei.Setter
-	GetKennungPtr() kennung.KennungPtr
+	GetKennungLikePtr() kennung.KennungPtr
 	GetSkuLikePtr() sku.SkuLikePtr
 }

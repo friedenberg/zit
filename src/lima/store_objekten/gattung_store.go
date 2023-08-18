@@ -33,7 +33,7 @@ type CommonStore[
 	objekte_store.CreateOrUpdater[
 		OPtr,
 		KPtr,
-		*objekte.Transacted[O, OPtr, K, KPtr],
+		*sku.Transacted[K, KPtr],
 		*objekte.CheckedOut[O, OPtr, K, KPtr],
 	]
 }
@@ -44,8 +44,8 @@ type commonStoreDelegate[
 	K kennung.KennungLike[K],
 	KPtr kennung.KennungLikePtr[K],
 ] interface {
-	addOne(*objekte.Transacted[O, OPtr, K, KPtr]) error
-	updateOne(*objekte.Transacted[O, OPtr, K, KPtr]) error
+	addOne(*sku.Transacted[K, KPtr]) error
+	updateOne(*sku.Transacted[K, KPtr]) error
 }
 
 type transacted[T any] interface {
@@ -68,7 +68,7 @@ type commonStore[
 	objekte_store.CreateOrUpdater[
 		OPtr,
 		KPtr,
-		*objekte.Transacted[O, OPtr, K, KPtr],
+		*sku.Transacted[K, KPtr],
 		*objekte.CheckedOut[O, OPtr, K, KPtr],
 	]
 }
@@ -83,7 +83,7 @@ func makeCommonStore[
 	delegate commonStoreDelegate[O, OPtr, K, KPtr],
 	sa store_util.StoreUtil,
 	tr objekte_store.TransactedReader[KPtr,
-		*objekte.Transacted[O, OPtr, K, KPtr]],
+		*sku.Transacted[K, KPtr]],
 	akteFormat objekte.AkteFormat[O, OPtr],
 ) (s *commonStore[O, OPtr, K, KPtr], err error) {
 	// pool := collections.MakePool[
@@ -133,13 +133,13 @@ func makeCommonStore[
 
 func (s *commonStore[O, OPtr, K, KPtr]) CheckoutOne(
 	options CheckoutOptions,
-	t *objekte.Transacted[O, OPtr, K, KPtr],
+	t *sku.Transacted[K, KPtr],
 ) (co *objekte.CheckedOut[O, OPtr, K, KPtr], err error) {
 	todo.Change("add pool")
 	co = &objekte.CheckedOut[O, OPtr, K, KPtr]{}
 
 	co.Internal = *t
-	co.External.Sku = t.Sku.GetExternal()
+	co.External.Sku = t.GetExternal()
 
 	var f *os.File
 
@@ -147,7 +147,7 @@ func (s *commonStore[O, OPtr, K, KPtr]) CheckoutOne(
 		s.StoreUtil.GetStandort().Cwd(),
 		fmt.Sprintf(
 			"%s.%s",
-			t.Sku.GetKennung(),
+			t.GetKennung(),
 			s.StoreUtil.GetKonfig().FileExtensions.GetFileExtensionForGattung(
 				t,
 			),
@@ -158,7 +158,7 @@ func (s *commonStore[O, OPtr, K, KPtr]) CheckoutOne(
 		if errors.IsExist(err) {
 			if co.External, err = s.ReadOneExternal(
 				&sku.ExternalMaybe[K, KPtr]{
-					Kennung: t.Sku.GetKennung(),
+					Kennung: t.GetKennung(),
 					FDs: sku.ExternalFDs{
 						Objekte: kennung.FD{
 							Path: p,
@@ -171,7 +171,7 @@ func (s *commonStore[O, OPtr, K, KPtr]) CheckoutOne(
 				return
 			}
 
-			co.External.Sku.Kennung = t.Sku.GetKennung()
+			co.External.Sku.Kennung = t.GetKennung()
 		} else {
 			err = errors.Wrap(err)
 		}

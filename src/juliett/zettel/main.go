@@ -8,9 +8,7 @@ import (
 
 type Sku = sku.Transacted[kennung.Hinweis, *kennung.Hinweis]
 
-type Transacted = objekte.Transacted[
-	Objekte,
-	*Objekte,
+type Transacted = sku.Transacted[
 	kennung.Hinweis,
 	*kennung.Hinweis,
 ]

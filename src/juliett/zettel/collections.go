@@ -25,11 +25,11 @@ func (tk TransactedUniqueKeyer) GetKey(sz *Transacted) string {
 	}
 
 	return collections.MakeKey(
-		sz.Sku.Kopf,
-		sz.Sku.GetTai(),
-		sz.Sku.TransactionIndex,
-		sz.Sku.GetKennung(),
-		sz.Sku.ObjekteSha,
+		sz.Kopf,
+		sz.GetTai(),
+		sz.TransactionIndex,
+		sz.GetKennung(),
+		sz.ObjekteSha,
 	)
 }
 
@@ -47,7 +47,7 @@ func (tk TransactedHinweisKeyer) GetKey(sz *Transacted) string {
 	}
 
 	return collections.MakeKey(
-		sz.Sku.GetKennung(),
+		sz.GetKennung(),
 	)
 }
 
@@ -62,7 +62,7 @@ func ToSliceHinweisen(s MutableSet) (b []kennung.Hinweis) {
 
 	s.Each(
 		func(z *Transacted) (err error) {
-			b = append(b, z.Sku.GetKennung())
+			b = append(b, z.GetKennung())
 
 			return
 		},

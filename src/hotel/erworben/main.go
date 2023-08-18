@@ -2,12 +2,10 @@ package erworben
 
 import (
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/hotel/objekte"
+	"github.com/friedenberg/zit/src/golf/sku"
 )
 
-type Transacted = objekte.Transacted[
-	Akte,
-	*Akte,
+type Transacted = sku.Transacted[
 	kennung.Konfig,
 	*kennung.Konfig,
 ]

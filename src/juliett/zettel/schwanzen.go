@@ -27,13 +27,13 @@ func (zws *Schwanzen) Less(zt *Transacted) (ok bool) {
 	zws.lock.RLock()
 	defer zws.lock.RUnlock()
 
-	t, ok := zws.hinweisen[zt.Sku.GetKennung()]
+	t, ok := zws.hinweisen[zt.GetKennung()]
 
 	switch {
 	case !ok:
 		fallthrough
 
-	case zt.Sku.Less(t):
+	case zt.Less(t):
 		ok = true
 	}
 
@@ -57,21 +57,21 @@ func (zws *Schwanzen) Set(z *Transacted, flush bool) (ok bool) {
 	zws.lock.Lock()
 	defer zws.lock.Unlock()
 
-	h := z.Sku.GetKennung()
+	h := z.GetKennung()
 	t1, found := zws.hinweisen[h]
 
 	switch {
 	case !found:
 		fallthrough
 
-	case t1.Less(z.Sku):
-		zws.hinweisen[h] = z.Sku
+	case t1.Less(*z):
+		zws.hinweisen[h] = *z
 		ok = true
 
-	case t1.Metadatei.EqualsSansTai(z.Sku.Metadatei):
+	case t1.Metadatei.EqualsSansTai(z.Metadatei):
 		zws.etikettIndex.Add(z.GetMetadatei().Etiketten)
 
-		ok = flush && t1.GetTai().Equals(z.Sku.GetTai())
+		ok = flush && t1.GetTai().Equals(z.GetTai())
 
 	default:
 		zws.etikettIndex.AddEtikettSet(

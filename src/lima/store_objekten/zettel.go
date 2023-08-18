@@ -157,24 +157,24 @@ func (s *zettelStore) writeNamedZettelToIndex(
 		return
 	}
 
-	errors.Log().Printf("writing zettel to index: %s", tz.Sku)
+	errors.Log().Printf("writing zettel to index: %s", tz)
 
-	if err = s.verzeichnisseSchwanzen.AddVerzeichnisse(tz, tz.Sku.GetKennung().String()); err != nil {
+	if err = s.verzeichnisseSchwanzen.AddVerzeichnisse(tz, tz.GetKennung().String()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = s.verzeichnisseAll.AddVerzeichnisse(tz, tz.Sku.GetKennung().String()); err != nil {
+	if err = s.verzeichnisseAll.AddVerzeichnisse(tz, tz.GetKennung().String()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = s.StoreUtil.GetKennungIndex().AddHinweis(tz.Sku.GetKennung()); err != nil {
+	if err = s.StoreUtil.GetKennungIndex().AddHinweis(tz.GetKennung()); err != nil {
 		if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
 			errors.Log().Printf("kennung does not contain value: %s", err)
 			err = nil
 		} else {
-			err = errors.Wrapf(err, "failed to write zettel to index: %s", tz.Sku)
+			err = errors.Wrapf(err, "failed to write zettel to index: %s", tz)
 			return
 		}
 	}
@@ -470,7 +470,7 @@ func (s *zettelStore) UpdateCheckedOut(
 		return
 	}
 
-	if co.External.Sku.Metadatei.EqualsSansTai(co.Internal.Sku.Metadatei) {
+	if co.External.Sku.Metadatei.EqualsSansTai(co.Internal.Metadatei) {
 		t = &co.Internal
 
 		if err = s.LogWriter.Unchanged(t); err != nil {
@@ -553,7 +553,7 @@ func (s *zettelStore) updateLockedWithMutter(
 		return
 	}
 
-	if tz.Sku.Metadatei.EqualsSansTai(mutter.Sku.Metadatei) {
+	if tz.Metadatei.EqualsSansTai(mutter.Metadatei) {
 		tz = mutter
 
 		if err = s.LogWriter.Unchanged(tz); err != nil {
@@ -584,7 +584,7 @@ func (s *zettelStore) commitIndexMatchUpdate(
 	}
 
 	if err = s.StoreUtil.AddMatchable(tz); err != nil {
-		err = errors.Wrapf(err, "failed to write zettel to index: %s", tz.Sku)
+		err = errors.Wrapf(err, "failed to write zettel to index: %s", tz)
 		return
 	}
 
@@ -608,11 +608,9 @@ func (s *zettelStore) writeObjekte(
 	m.Tai = s.StoreUtil.GetTai()
 
 	tz = &zettel.Transacted{
-		Sku: sku.Transacted[kennung.Hinweis, *kennung.Hinweis]{
-			Kennung:   h,
-			Metadatei: m,
-			Kopf:      m.Tai,
-		},
+		Kennung:   h,
+		Metadatei: m,
+		Kopf:      m.Tai,
 	}
 
 	if err = s.SaveObjekte(tz); err != nil {
@@ -624,7 +622,7 @@ func (s *zettelStore) writeObjekte(
 }
 
 func (s *zettelStore) Inherit(tz *zettel.Transacted) (err error) {
-	errors.Log().Printf("inheriting %s", tz.Sku)
+	errors.Log().Printf("inheriting %s", tz)
 
 	if err = s.SaveObjekte(tz); err != nil {
 		err = errors.Wrap(err)
@@ -634,7 +632,7 @@ func (s *zettelStore) Inherit(tz *zettel.Transacted) (err error) {
 	s.StoreUtil.CommitTransacted(tz)
 
 	errExists := s.StoreUtil.GetAbbrStore().Hinweis().Exists(
-		tz.Sku.GetKennung(),
+		tz.GetKennung(),
 	)
 
 	if err = s.writeNamedZettelToIndex(tz); err != nil {
@@ -669,7 +667,7 @@ func (s *zettelStore) ReindexOne(
 	o = tz
 
 	errExists := s.StoreUtil.GetAbbrStore().Hinweis().Exists(
-		tz.Sku.GetKennung(),
+		tz.GetKennung(),
 	)
 
 	if err = s.writeNamedZettelToIndex(tz); err != nil {
@@ -678,7 +676,7 @@ func (s *zettelStore) ReindexOne(
 	}
 
 	if err = s.StoreUtil.GetAbbrStore().AddMatchable(tz); err != nil {
-		err = errors.Wrapf(err, "failed to write zettel to index: %s", tz.Sku)
+		err = errors.Wrapf(err, "failed to write zettel to index: %s", tz)
 		return
 	}
 

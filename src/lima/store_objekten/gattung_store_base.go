@@ -35,30 +35,24 @@ type CommonStoreBase[
 
 	CheckoutOne(
 		CheckoutOptions,
-		*objekte.Transacted[O, OPtr, K, KPtr],
+		*sku.Transacted[K, KPtr],
 	) (*objekte.CheckedOut[O, OPtr, K, KPtr], error)
 
 	schnittstellen.AkteGetterPutter[OPtr]
 
-	objekte_store.TransactedLogger[*objekte.Transacted[
-		O,
-		OPtr,
+	objekte_store.TransactedLogger[*sku.Transacted[
 		K,
 		KPtr,
 	]]
 
-	objekte_store.TransactedLogger[*objekte.Transacted[
-		O,
-		OPtr,
+	objekte_store.TransactedLogger[*sku.Transacted[
 		K,
 		KPtr,
 	]]
 
 	objekte_store.Querier[
 		KPtr,
-		*objekte.Transacted[
-			O,
-			OPtr,
+		*sku.Transacted[
 			K,
 			KPtr,
 		],
@@ -68,16 +62,14 @@ type CommonStoreBase[
 
 	objekte_store.TransactedInflator[O, OPtr, K, KPtr]
 
-	objekte_store.Inheritor[*objekte.Transacted[
-		O,
-		OPtr,
+	objekte_store.Inheritor[*sku.Transacted[
 		K,
 		KPtr,
 	]]
 
 	objekte_store.ExternalReader[
 		*sku.ExternalMaybe[K, KPtr],
-		*objekte.Transacted[O, OPtr, K, KPtr],
+		*sku.Transacted[K, KPtr],
 		objekte.External[O, OPtr, K, KPtr],
 	]
 }
@@ -97,8 +89,8 @@ type commonStoreBase[
 	store_util.StoreUtil
 
 	pool schnittstellen.Pool[
-		objekte.Transacted[O, OPtr, K, KPtr],
-		*objekte.Transacted[O, OPtr, K, KPtr],
+		sku.Transacted[K, KPtr],
+		*sku.Transacted[K, KPtr],
 	]
 
 	objekte_store.TransactedInflator[O, OPtr, K, KPtr]
@@ -108,7 +100,7 @@ type commonStoreBase[
 	objekte_store.StoredParseSaver[O, OPtr, K, KPtr]
 
 	objekte_store.TransactedReader[KPtr,
-		*objekte.Transacted[O, OPtr, K, KPtr],
+		*sku.Transacted[K, KPtr],
 	]
 
 	objekte_store.LogWriter[objekte.TransactedLikePtr]
@@ -132,7 +124,7 @@ func makeCommonStoreBase[
 	delegate commonStoreDelegate[O, OPtr, K, KPtr],
 	sa store_util.StoreUtil,
 	tr objekte_store.TransactedReader[KPtr,
-		*objekte.Transacted[O, OPtr, K, KPtr]],
+		*sku.Transacted[K, KPtr]],
 	pmf objekte_format.Format,
 	akteFormat objekte.AkteFormat[O, OPtr],
 ) (s *commonStoreBase[O, OPtr, K, KPtr], err error) {
@@ -144,8 +136,8 @@ func makeCommonStoreBase[
 	}
 
 	pool := collections.MakePool[
-		objekte.Transacted[O, OPtr, K, KPtr],
-		*objekte.Transacted[O, OPtr, K, KPtr],
+		sku.Transacted[K, KPtr],
+		*sku.Transacted[K, KPtr],
 	]()
 
 	of := sa.ObjekteReaderWriterFactory(gg)
@@ -202,18 +194,18 @@ func (s *commonStoreBase[O, OPtr, K, KPtr]) SetLogWriter(
 
 func (s *commonStoreBase[O, OPtr, K, KPtr]) Query(
 	m kennung.MatcherSigil,
-	f schnittstellen.FuncIter[*objekte.Transacted[O, OPtr, K, KPtr]],
+	f schnittstellen.FuncIter[*sku.Transacted[K, KPtr]],
 ) (err error) {
 	return objekte_store.QueryMethodForMatcher[
 		KPtr,
-		*objekte.Transacted[O, OPtr, K, KPtr],
+		*sku.Transacted[K, KPtr],
 	](s, m, f)
 }
 
 func (s *commonStoreBase[O, OPtr, K, KPtr]) ReindexOne(
 	sk sku.SkuLike,
 ) (o kennung.Matchable, err error) {
-	var t *objekte.Transacted[O, OPtr, K, KPtr]
+	var t *sku.Transacted[K, KPtr]
 
 	if t, err = s.InflateFromSku(sk); err != nil {
 		if errors.Is(err, toml.Error{}) {
@@ -245,19 +237,19 @@ func (s *commonStoreBase[O, OPtr, K, KPtr]) ReindexOne(
 }
 
 func (s *commonStoreBase[O, OPtr, K, KPtr]) Inherit(
-	t *objekte.Transacted[O, OPtr, K, KPtr],
+	t *sku.Transacted[K, KPtr],
 ) (err error) {
 	if t == nil {
 		err = errors.Errorf("trying to inherit nil %T", t)
 		return
 	}
 
-	errors.Log().Printf("inheriting %s", t.Sku.ObjekteSha)
+	errors.Log().Printf("inheriting %s", t.ObjekteSha)
 
 	s.StoreUtil.AddMatchable(t)
 	s.StoreUtil.CommitTransacted(t)
 
-	old, _ := s.ReadOne(&t.Sku.Kennung)
+	old, _ := s.ReadOne(&t.Kennung)
 
 	if old == nil || old.Less(*t) {
 		s.delegate.addOne(t)
@@ -278,8 +270,8 @@ func (s *commonStoreBase[O, OPtr, K, KPtr]) GetInheritor(
 	pmf objekte_format.Format,
 ) objekte_store.TransactedInheritor {
 	p := collections.MakePool[
-		objekte.Transacted[O, OPtr, K, KPtr],
-		*objekte.Transacted[O, OPtr, K, KPtr],
+		sku.Transacted[K, KPtr],
+		*sku.Transacted[K, KPtr],
 	]()
 
 	inflator := objekte_store.MakeTransactedInflator[
@@ -301,8 +293,8 @@ func (s *commonStoreBase[O, OPtr, K, KPtr]) GetInheritor(
 	)
 
 	return objekte_store.MakeTransactedInheritor[
-		objekte.Transacted[O, OPtr, K, KPtr],
-		*objekte.Transacted[O, OPtr, K, KPtr],
+		sku.Transacted[K, KPtr],
+		*sku.Transacted[K, KPtr],
 	](
 		inflator,
 		s,

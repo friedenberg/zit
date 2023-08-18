@@ -37,18 +37,18 @@ func MakeMutableMatchSet(in MutableSet) (out MutableMatchSet) {
 }
 
 func (s MutableMatchSet) Match(z *zettel.Transacted) (err error) {
-	kStored := z.Sku.ObjekteSha.String()
+	kStored := z.ObjekteSha.String()
 	kAkte := z.GetAkteSha().String()
 
 	s.lock.RLock()
 	stored, okStored := s.Stored.Get(kStored)
 	akte, okAkte := s.Akten.Get(kAkte)
-	okHinweis := s.MatchedHinweisen.Contains(z.Sku.GetKennung())
+	okHinweis := s.MatchedHinweisen.Contains(z.GetKennung())
 
 	okSchwanz := false
-	schwanz, _ := s.MatchedHinweisenSchwanzen[z.Sku.GetKennung()]
+	schwanz, _ := s.MatchedHinweisenSchwanzen[z.GetKennung()]
 
-	if schwanz.Less(z.Sku.GetTai()) {
+	if schwanz.Less(z.GetTai()) {
 		okSchwanz = true
 	}
 
@@ -66,8 +66,8 @@ func (s MutableMatchSet) Match(z *zettel.Transacted) (err error) {
 		s.lock.Lock()
 		defer s.lock.Unlock()
 
-		s.MatchedHinweisen.Add(z.Sku.GetKennung())
-		s.MatchedHinweisenSchwanzen[z.Sku.GetKennung()] = z.Sku.GetTai()
+		s.MatchedHinweisen.Add(z.GetKennung())
+		s.MatchedHinweisenSchwanzen[z.GetKennung()] = z.GetTai()
 		s.Stored.DelKey(kStored)
 		s.Akten.DelKey(kAkte)
 		s.Original.Del(stored)

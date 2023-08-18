@@ -95,7 +95,7 @@ func (f *cli) WriteStringFormat(
 	if m == checkout_mode.ModeAkteOnly {
 		n2, err = f.kennungStringFormatWriter.WriteStringFormat(
 			sw,
-			o.GetKennungPtr(),
+			o.GetKennungLikePtr(),
 		)
 		n += n2
 

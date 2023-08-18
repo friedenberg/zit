@@ -302,7 +302,7 @@ func KennungContainsExactlyMatchable(k KennungSansGattung, m Matchable) bool {
 		// nop
 	}
 
-	idl := m.GetKennungPtr()
+	idl := m.GetKennungLikePtr()
 
 	if !ContainsExactly(idl, k) {
 		return false
@@ -356,7 +356,7 @@ func KennungContainsMatchable(
 		panic(fmt.Sprintf("unhandled type: %T", kt))
 	}
 
-	idl := m.GetKennungPtr()
+	idl := m.GetKennungLikePtr()
 
 	if !Contains(idl, k) {
 		return false

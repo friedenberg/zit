@@ -75,7 +75,12 @@ func makeEtikettStore(
 		return
 	}
 
-	s.commonStore.CreateOrUpdater = objekte_store.MakeCreateOrUpdate(
+	s.commonStore.CreateOrUpdater = objekte_store.MakeCreateOrUpdate[
+		etikett.Akte,
+		*etikett.Akte,
+		kennung.Etikett,
+		*kennung.Etikett,
+	](
 		sa,
 		sa.GetLockSmith(),
 		sa.ObjekteReaderWriterFactory(gattung.Etikett),

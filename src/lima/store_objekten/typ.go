@@ -76,7 +76,12 @@ func makeTypStore(
 		return
 	}
 
-	s.commonStore.CreateOrUpdater = objekte_store.MakeCreateOrUpdate(
+	s.commonStore.CreateOrUpdater = objekte_store.MakeCreateOrUpdate[
+		typ.Akte,
+		*typ.Akte,
+		kennung.Typ,
+		*kennung.Typ,
+	](
 		sa,
 		sa.GetLockSmith(),
 		s.commonStore,

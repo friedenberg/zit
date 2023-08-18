@@ -174,17 +174,17 @@ func (i *indexAbbr) AddMatchable(o kennung.Matchable) (err error) {
 
 	switch to := o.(type) {
 	case *zettel.Transacted:
-		i.indexAbbrEncodableTridexes.Hinweis.Kopfen.Add(to.Kennung().Kopf())
-		i.indexAbbrEncodableTridexes.Hinweis.Schwanzen.Add(to.Kennung().Schwanz())
+		i.indexAbbrEncodableTridexes.Hinweis.Kopfen.Add(to.Kennung.Kopf())
+		i.indexAbbrEncodableTridexes.Hinweis.Schwanzen.Add(to.Kennung.Schwanz())
 
 	case *typ.Transacted:
-		i.indexAbbrEncodableTridexes.Typen.Add(to.Sku.GetKennung())
+		i.indexAbbrEncodableTridexes.Typen.Add(to.GetKennung())
 
 	case *etikett.Transacted:
-		i.indexAbbrEncodableTridexes.Etiketten.Kennungen.Add(to.Sku.GetKennung().String())
+		i.indexAbbrEncodableTridexes.Etiketten.Kennungen.Add(to.GetKennung().String())
 
 	case *kasten.Transacted:
-		i.indexAbbrEncodableTridexes.Kisten.Kennungen.Add(to.Sku.GetKennung().String())
+		i.indexAbbrEncodableTridexes.Kisten.Kennungen.Add(to.GetKennung().String())
 
 		// default:
 		// 	err = errors.Errorf("unsupported objekte: %T", to)

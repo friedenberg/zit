@@ -196,7 +196,7 @@ func (c Add) openAktenIfNecessary(
 
 	zettels.Each(
 		func(z *zettel.Transacted) (err error) {
-			return hs.Add(z.Sku.GetKennung())
+			return hs.Add(z.GetKennung())
 		},
 	)
 
@@ -210,7 +210,7 @@ func (c Add) openAktenIfNecessary(
 	if checkoutResults, err = u.StoreWorkingDirectory().Checkout(
 		options,
 		func(z *zettel.Transacted) (err error) {
-			if !hs.Contains(z.Sku.GetKennung()) {
+			if !hs.Contains(z.GetKennung()) {
 				return iter.MakeErrStopIteration()
 			}
 

@@ -14,7 +14,7 @@ type TypGetter interface {
 
 type IdLikeGetter interface {
 	GetKennungLike() Kennung
-	GetKennungPtr() KennungPtr
+	GetKennungLikePtr() KennungPtr
 }
 
 type Matchable interface {

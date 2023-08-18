@@ -204,7 +204,7 @@ func (kc *compiled) recompile(
 		if err = kc.Etiketten.Each(
 			func(ke ketikett) (err error) {
 				if err = kc.AccumulateImplicitEtiketten(
-					ke.Transacted.Sku.GetKennung(),
+					ke.Transacted.GetKennung(),
 				); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -248,15 +248,15 @@ func (kc *compiled) recompile(
 			fe := ta.FileExtension
 
 			if fe == "" {
-				fe = ct.Sku.GetKennung().String()
+				fe = ct.GetKennung().String()
 			}
 
 			// TODO-P2 enforce uniqueness
-			kc.ExtensionsToTypen[fe] = ct.Sku.GetKennung()
-			kc.TypenToExtensions[ct.Sku.GetKennung()] = fe
+			kc.ExtensionsToTypen[fe] = ct.GetKennung()
+			kc.TypenToExtensions[ct.GetKennung()] = fe
 
 			if ta.InlineAkte {
-				inlineTypen.Add(ct.Sku.Kennung)
+				inlineTypen.Add(ct.Kennung)
 			}
 
 			// kc.applyExpandedTyp(*ct)
@@ -346,9 +346,9 @@ func (c compiled) GetSortedTypenExpanded(
 
 	sort.Slice(expandedActual, func(i, j int) bool {
 		return len(
-			expandedActual[i].Sku.GetKennung().String(),
+			expandedActual[i].GetKennung().String(),
 		) > len(
-			expandedActual[j].Sku.GetKennung().String(),
+			expandedActual[j].GetKennung().String(),
 		)
 	})
 
@@ -375,7 +375,7 @@ func (kc compiled) GetApproximatedTyp(k kennung.Typ) (ct ApproximatedTyp) {
 		ct.hasValue = true
 		ct.typ = *expandedActual[0]
 
-		if ct.typ.Sku.GetKennung().Equals(k) {
+		if ct.typ.GetKennung().Equals(k) {
 			ct.isActual = true
 		}
 	}
@@ -394,12 +394,12 @@ func (k *compiled) SetTransacted(
 	kt *erworben.Transacted,
 	kag schnittstellen.AkteGetter[*erworben.Akte],
 ) (err error) {
-	if !k.Sku.Less(kt.Sku) {
+	if !k.Sku.Less(*kt) {
 		return
 	}
 
 	k.hasChanges = true
-	k.Sku = kt.Sku
+	k.Sku = *kt
 
 	var a *erworben.Akte
 

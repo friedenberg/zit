@@ -5,6 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/golf/sku"
 )
 
 type CheckedOut[
@@ -13,21 +14,21 @@ type CheckedOut[
 	T2 kennung.KennungLike[T2],
 	T3 kennung.KennungLikePtr[T2],
 ] struct {
-	Internal Transacted[T, T1, T2, T3]
+	Internal sku.Transacted[T2, T3]
 	External External[T, T1, T2, T3]
 	State    CheckedOutState
 }
 
 func (c *CheckedOut[T, T1, T2, T3]) DetermineState(justCheckedOut bool) {
-	if c.Internal.Sku.ObjekteSha.IsNull() {
+	if c.Internal.ObjekteSha.IsNull() {
 		c.State = CheckedOutStateUntracked
-	} else if c.Internal.Sku.Metadatei.EqualsSansTai(c.External.Sku.Metadatei) {
+	} else if c.Internal.Metadatei.EqualsSansTai(c.External.Sku.Metadatei) {
 		if justCheckedOut {
 			c.State = CheckedOutStateJustCheckedOut
 		} else {
 			c.State = CheckedOutStateExistsAndSame
 		}
-	} else if c.External.Sku.ObjekteSha.IsNull() {
+	} else if c.External.GetObjekteSha().IsNull() {
 		c.State = CheckedOutStateEmpty
 	} else {
 		if justCheckedOut {
@@ -59,7 +60,7 @@ func (a CheckedOut[T, T1, T2, T3]) EqualsAny(b any) bool {
 }
 
 func (a CheckedOut[T, T1, T2, T3]) String() string {
-	return fmt.Sprintf("%s %s", a.Internal.Sku, a.External.Sku)
+	return fmt.Sprintf("%s %s", a.Internal, a.External.Sku)
 }
 
 func (a CheckedOut[T, T1, T2, T3]) Equals(

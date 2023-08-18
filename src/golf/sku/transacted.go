@@ -119,6 +119,22 @@ func (a Transacted[K, KPtr]) String() string {
 	)
 }
 
+func (a Transacted[K, KPtr]) GetSkuLike() SkuLike {
+	return a
+}
+
+func (a *Transacted[K, KPtr]) GetSkuLikePtr() SkuLikePtr {
+	return a
+}
+
+func (a Transacted[K, KPtr]) GetEtiketten() kennung.EtikettSet {
+	return a.Metadatei.GetEtiketten()
+}
+
+func (a Transacted[K, KPtr]) GetTyp() kennung.Typ {
+	return a.Metadatei.Typ
+}
+
 func (a Transacted[K, KPtr]) GetMetadatei() metadatei.Metadatei {
 	return a.Metadatei
 }
@@ -197,6 +213,13 @@ func (a *Transacted[K, KPtr]) ResetWith(b Transacted[K, KPtr]) {
 	a.TransactionIndex.SetInt(b.TransactionIndex.Int())
 }
 
+// TODO-P2 switch this to default
+func (a *Transacted[T2, T3]) ResetWithPtr(
+	b *Transacted[T2, T3],
+) {
+	a.ResetWith(*b)
+}
+
 func (a Transacted[K, KPtr]) Less(b Transacted[K, KPtr]) (ok bool) {
 	if a.GetTai().Less(b.GetTai()) {
 		ok = true
@@ -244,6 +267,10 @@ func (s Transacted[K, KPtr]) GetGattung() schnittstellen.GattungLike {
 	return s.Kennung.GetGattung()
 }
 
+func (s *Transacted[K, KPtr]) IsNew() bool {
+	return s.Kopf.Equals(s.GetTai())
+}
+
 func (s *Transacted[K, KPtr]) SetObjekteSha(v schnittstellen.ShaLike) {
 	s.ObjekteSha = sha.Make(v)
 }
@@ -254,6 +281,10 @@ func (s Transacted[K, KPtr]) GetObjekteSha() schnittstellen.ShaLike {
 
 func (s Transacted[K, KPtr]) GetAkteSha() schnittstellen.ShaLike {
 	return s.Metadatei.AkteSha
+}
+
+func (s *Transacted[K, KPtr]) SetAkteSha(sh schnittstellen.ShaLike) {
+	s.Metadatei.AkteSha = sha.Make(sh)
 }
 
 func (s Transacted[K, KPtr]) GetTransactionIndex() values.Int {

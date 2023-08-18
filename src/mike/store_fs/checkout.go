@@ -100,7 +100,7 @@ func (s Store) filenameForZettelTransacted(
 	options CheckoutOptions,
 	sz zettel.Transacted,
 ) (originalFilename string, filename string, err error) {
-	if originalFilename, err = id.MakeDirIfNecessary(sz.Sku.GetKennung(), s.Cwd()); err != nil {
+	if originalFilename, err = id.MakeDirIfNecessary(sz.GetKennung(), s.Cwd()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -158,7 +158,7 @@ func (s *Store) CheckoutOneZettel(
 		var e *cwd.Zettel
 		ok := false
 
-		if e, ok = options.Cwd.GetZettel(sz.Sku.GetKennungPtr()); !ok {
+		if e, ok = options.Cwd.GetZettel(sz.GetKennungPtr()); !ok {
 			err = errors.Errorf(
 				"file at %s not recognized as zettel: %s",
 				filename,
@@ -186,7 +186,7 @@ func (s *Store) CheckoutOneZettel(
 
 	cz.State = objekte.CheckedOutStateJustCheckedOut
 	cz.External = zettel.External{
-		Sku: sz.Sku.GetExternal(),
+		Sku: sz.GetExternal(),
 	}
 
 	if options.CheckoutMode.IncludesObjekte() {

@@ -70,7 +70,7 @@ func (c ExecAction) RunWithQuery(
 	if err = u.StoreObjekten().Zettel().Query(
 		zids,
 		func(z *zettel.Transacted) (err error) {
-			return hinweisen.Add(z.Sku.GetKennung())
+			return hinweisen.Add(z.GetKennung())
 		},
 	); err != nil {
 		err = errors.Wrap(err)

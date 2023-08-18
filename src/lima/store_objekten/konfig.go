@@ -120,9 +120,9 @@ func (s konfigStore) Update(
 
 	// TODO-P3 refactor into reusable
 	if mutter != nil {
-		kt.Sku.Kopf = mutter.Sku.Kopf
+		kt.Kopf = mutter.Kopf
 	} else {
-		kt.Sku.Kopf = s.StoreUtil.GetTai()
+		kt.Kopf = s.StoreUtil.GetTai()
 	}
 
 	var ow sha.WriteCloser
@@ -142,9 +142,9 @@ func (s konfigStore) Update(
 		return
 	}
 
-	kt.Sku.ObjekteSha = sha.Make(ow.GetShaLike())
+	kt.ObjekteSha = sha.Make(ow.GetShaLike())
 
-	if mutter != nil && kt.Sku.Metadatei.EqualsSansTai(mutter.Sku.Metadatei) {
+	if mutter != nil && kt.Metadatei.EqualsSansTai(mutter.Metadatei) {
 		kt = mutter
 
 		if err = s.LogWriter.Unchanged(kt); err != nil {
@@ -256,16 +256,15 @@ func (s *konfigStore) ReadAll(
 func (s konfigStore) ReadOne(
 	_ *kennung.Konfig,
 ) (tt *erworben.Transacted, err error) {
-	tt = &erworben.Transacted{
-		Sku: s.StoreUtil.GetKonfig().Sku,
-	}
+	tt1 := s.StoreUtil.GetKonfig().Sku
+	tt = &tt1
 
-	if !tt.Sku.GetTai().IsEmpty() {
+	if !tt.GetTai().IsEmpty() {
 		{
 			var r sha.ReadCloser
 
 			if r, err = s.ObjekteReader(
-				tt.Sku.ObjekteSha,
+				tt.ObjekteSha,
 			); err != nil {
 				if errors.IsNotExist(err) {
 					err = nil

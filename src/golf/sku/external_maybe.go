@@ -47,7 +47,7 @@ func (e ExternalMaybe[T, T1]) GetKennungLike() kennung.Kennung {
 	return e.Kennung
 }
 
-func (e *ExternalMaybe[T, T1]) GetKennungPtr() kennung.KennungPtr {
+func (e *ExternalMaybe[T, T1]) GetKennungLikePtr() kennung.KennungPtr {
 	return T1(&e.Kennung)
 }
 

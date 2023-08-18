@@ -14,7 +14,7 @@ import (
 
 func (s *commonStore[O, OPtr, K, KPtr]) ReadOneExternal(
 	em *sku.ExternalMaybe[K, KPtr],
-	t *objekte.Transacted[O, OPtr, K, KPtr],
+	t *sku.Transacted[K, KPtr],
 ) (e objekte.External[O, OPtr, K, KPtr], err error) {
 	var m checkout_mode.Mode
 
@@ -44,7 +44,7 @@ func (s *commonStore[O, OPtr, K, KPtr]) ReadOneExternal(
 
 func (s *commonStore[O, OPtr, K, KPtr]) readOneExternalAkte(
 	e *objekte.External[O, OPtr, K, KPtr],
-	t *objekte.Transacted[O, OPtr, K, KPtr],
+	t *sku.Transacted[K, KPtr],
 ) (err error) {
 	e.SetMetadatei(t.GetMetadatei())
 
@@ -86,7 +86,7 @@ func (s *commonStore[O, OPtr, K, KPtr]) readOneExternalAkte(
 
 func (s *commonStore[O, OPtr, K, KPtr]) readOneExternalObjekte(
 	e *objekte.External[O, OPtr, K, KPtr],
-	t *objekte.Transacted[O, OPtr, K, KPtr],
+	t *sku.Transacted[K, KPtr],
 ) (err error) {
 	var f *os.File
 

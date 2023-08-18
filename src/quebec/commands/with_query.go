@@ -78,12 +78,12 @@ func (c commandWithQuery) Complete(
 	if cg.Contains(gattung.Typ) {
 		if err = u.Konfig().Typen.Each(
 			func(tt typ.Transacted) (err error) {
-				if err = errors.Out().Printf("%s\tTyp", tt.Sku.GetKennung()); err != nil {
+				if err = errors.Out().Printf("%s\tTyp", tt.GetKennung()); err != nil {
 					err = errors.IsAsNilOrWrapf(
 						err,
 						syscall.EPIPE,
 						"Typ: %s",
-						tt.Sku.GetKennung(),
+						tt.GetKennung(),
 					)
 
 					return

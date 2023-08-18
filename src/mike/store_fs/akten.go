@@ -57,8 +57,8 @@ func (s Store) ReadExternalZettelFromAktePath(
 	}
 
 	errors.TodoP4("capture this as a function")
-	cz.External.Sku.ObjekteSha = cz.Internal.Sku.ObjekteSha
-	cz.External.Sku.Kennung = cz.Internal.Sku.GetKennung()
+	cz.External.SetObjekteSha(cz.Internal.ObjekteSha)
+	cz.External.Sku.Kennung = cz.Internal.GetKennung()
 
 	var akteSha sha.Sha
 

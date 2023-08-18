@@ -70,7 +70,7 @@ func (a ketikett) Equals(b ketikett) bool {
 }
 
 func (e *ketikett) Set(v string) (err error) {
-	return (&e.Transacted.Sku.Kennung).Set(v)
+	return (&e.Transacted.Kennung).Set(v)
 }
 
 func (e ketikett) String() string {
@@ -183,9 +183,9 @@ func (c compiled) GetSortedEtikettenExpanded(
 
 	sort.Slice(expandedActual, func(i, j int) bool {
 		return len(
-			expandedActual[i].Sku.GetKennung().String(),
+			expandedActual[i].GetKennung().String(),
 		) > len(
-			expandedActual[j].Sku.GetKennung().String(),
+			expandedActual[j].GetKennung().String(),
 		)
 	})
 

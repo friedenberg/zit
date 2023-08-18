@@ -31,7 +31,7 @@ type External[
 	T2 kennung.KennungLike[T2],
 	T3 kennung.KennungLikePtr[T2],
 ] struct {
-	Sku  sku.External[T2, T3]
+	Sku sku.External[T2, T3]
 }
 
 func (a External[T, T1, T2, T3]) GetSkuLike() sku.SkuLike {
@@ -90,7 +90,7 @@ func (a External[T, T1, T2, T3]) GetKennungLike() kennung.Kennung {
 	return a.Sku.GetKennung()
 }
 
-func (a *External[T, T1, T2, T3]) GetKennungPtr() kennung.KennungPtr {
+func (a *External[T, T1, T2, T3]) GetKennungLikePtr() kennung.KennungPtr {
 	return T3(&a.Sku.Kennung)
 }
 

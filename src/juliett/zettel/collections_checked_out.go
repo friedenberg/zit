@@ -16,10 +16,10 @@ type CheckedOutUniqueKeyer struct{}
 
 func (k CheckedOutUniqueKeyer) GetKey(sz CheckedOut) string {
 	return collections.MakeKey(
-		sz.Internal.Sku.Kopf,
-		sz.Internal.Sku.GetTai(),
-		sz.Internal.Sku.GetKennung(),
-		sz.Internal.Sku.ObjekteSha,
+		sz.Internal.Kopf,
+		sz.Internal.GetTai(),
+		sz.Internal.GetKennung(),
+		sz.Internal.ObjekteSha,
 	)
 }
 
@@ -33,7 +33,7 @@ type CheckedOutHinweisKeyer struct{}
 
 func (k CheckedOutHinweisKeyer) GetKey(sz CheckedOut) string {
 	return collections.MakeKey(
-		sz.Internal.Sku.GetKennung(),
+		sz.Internal.GetKennung(),
 	)
 }
 

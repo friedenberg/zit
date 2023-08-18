@@ -133,7 +133,7 @@ func (s *store) Create(o *Akte) (err error) {
 	// TODO-P2 switch to clock
 	tai := kennung.NowTai()
 
-	t.Sku.Kennung = tai
+	t.Kennung = tai
 	t.SetTai(tai)
 
 	if err = s.SaveObjekteIncludeTai(t); err != nil {
@@ -188,7 +188,7 @@ func (s *store) ReadOne(
 		o.SetObjekteSha(sh)
 
 	default:
-		if err = sku.CalculateAndConfirmSha(&o.Sku, s.persistentMetadateiFormat, sh); err != nil {
+		if err = sku.CalculateAndConfirmSha(o, s.persistentMetadateiFormat, sh); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -241,8 +241,8 @@ func (s *store) ReadLast() (max *Transacted, err error) {
 			l.Lock()
 			defer l.Unlock()
 
-			if maxSku.Less(b.Sku) {
-				maxSku.ResetWith(b.Sku)
+			if maxSku.Less(*b) {
+				maxSku.ResetWith(*b)
 				return
 			}
 
