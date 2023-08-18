@@ -38,6 +38,15 @@ type CommonStoreBase[
 		*objekte.Transacted[O, OPtr, K, KPtr],
 	) (*objekte.CheckedOut[O, OPtr, K, KPtr], error)
 
+	schnittstellen.AkteGetterPutter[OPtr]
+
+	objekte_store.TransactedLogger[*objekte.Transacted[
+		O,
+		OPtr,
+		K,
+		KPtr,
+	]]
+
 	objekte_store.TransactedLogger[*objekte.Transacted[
 		O,
 		OPtr,
@@ -109,6 +118,8 @@ type commonStoreBase[
 	objekte_store.ObjekteSaver
 
 	textParser metadatei.TextParser
+
+	akteFormat objekte.AkteFormat[O, OPtr]
 }
 
 func makeCommonStoreBase[
@@ -145,6 +156,7 @@ func makeCommonStoreBase[
 		delegate:         delegate,
 		StoreUtil:        sa,
 		pool:             pool,
+		akteFormat:       akteFormat,
 		TransactedInflator: objekte_store.MakeTransactedInflator[
 			O,
 			OPtr,
@@ -296,4 +308,39 @@ func (s *commonStoreBase[O, OPtr, K, KPtr]) GetInheritor(
 		s,
 		p,
 	)
+}
+
+func (s *commonStoreBase[O, OPtr, K, KPtr]) GetAkte(
+	sh schnittstellen.ShaLike,
+) (a OPtr, err error) {
+	var ar schnittstellen.ShaReadCloser
+
+	if ar, err = s.StoreUtil.AkteReader(sh); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.DeferredCloser(&err, ar)
+
+	var a1 O
+	a = OPtr(&a1)
+	a.Reset()
+
+	if _, err = s.akteFormat.ParseAkte(ar, a); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	actual := ar.GetShaLike()
+
+	if !actual.EqualsSha(sh) {
+		err = errors.Errorf("expected sha %s but got %s", sh, actual)
+		return
+	}
+
+	return
+}
+
+func (s *commonStoreBase[O, OPtr, K, KPtr]) PutAkte(a OPtr) {
+	// TODO-P2 implement pool
 }

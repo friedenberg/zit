@@ -154,7 +154,7 @@ func (op PullServer) skusForFilter(
 		msg.MetaSet,
 		iter.MakeChain(
 			iter.MakeFuncTransformer[*zettel.Transacted, objekte.TransactedLikePtr](
-				zettel.MakeWriterKonfig(op.umwelt.Konfig()),
+				zettel.MakeWriterKonfig(op.umwelt.Konfig(), op.umwelt.StoreObjekten().Typ()),
 			),
 			func(tl objekte.TransactedLikePtr) (err error) {
 				sk := tl.GetSkuLike()

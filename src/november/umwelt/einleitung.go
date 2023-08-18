@@ -15,6 +15,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/age"
+	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/hotel/typ"
 )
@@ -150,7 +151,6 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 		}
 
 		if _, err = u.StoreObjekten().Typ().CreateOrUpdateAkte(
-			&defaultTyp,
 			nil,
 			&defaultTypKennung,
 			sh,
@@ -161,34 +161,47 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 	}
 
 	{
-		defaultKonfig := erworben.Default(defaultTypKennung)
+		var sh schnittstellen.ShaLike
 
-		f := u.StoreObjekten().Konfig().GetAkteFormat()
-
-		var aw sha.WriteCloser
-
-		if aw, err = u.StoreObjekten().AkteWriter(); err != nil {
+		if sh, err = writeDefaultErworben(u, defaultTypKennung); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
-
-		defer errors.DeferredCloser(&err, aw)
-
-		if _, err = f.FormatParsedAkte(aw, defaultKonfig); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		sh := sha.Make(aw.GetShaLike())
 
 		if _, err = u.StoreObjekten().Konfig().Update(
-			&defaultKonfig,
 			sh,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
+
+	return
+}
+
+func writeDefaultErworben(
+	u *Umwelt,
+	dt kennung.Typ,
+) (sh schnittstellen.ShaLike, err error) {
+	defaultKonfig := erworben.Default(dt)
+
+	f := u.StoreObjekten().Konfig().GetAkteFormat()
+
+	var aw sha.WriteCloser
+
+	if aw, err = u.StoreObjekten().AkteWriter(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.DeferredCloser(&err, aw)
+
+	if _, err = f.FormatParsedAkte(aw, defaultKonfig); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	sh = sha.Make(aw.GetShaLike())
 
 	return
 }

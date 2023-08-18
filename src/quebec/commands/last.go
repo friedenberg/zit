@@ -63,9 +63,16 @@ func (c Last) runWithBestandsaufnahm(u *umwelt.Umwelt) (err error) {
 		return
 	}
 
+	var a *bestandsaufnahme.Akte
+
+	if a, err = s.GetBestandsaufnahmeStore().GetAkte(b.GetAkteSha()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	errors.TodoP3("support log line format for skus")
 	if err = sku.HeapEach(
-		b.Akte.Skus,
+		a.Skus,
 		func(o sku.SkuLike) (err error) {
 			errors.Out().Print(sku_formats.StringMetadatei(o))
 			return

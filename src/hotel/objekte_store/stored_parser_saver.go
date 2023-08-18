@@ -23,7 +23,7 @@ type StoredParseSaver[
 	ParseSaveStored(
 		sem sku.ExternalMaybe[K, KPtr],
 		t *objekte.External[O, OPtr, K, KPtr],
-	) (err error)
+	) (a OPtr, err error)
 }
 
 type storedParserSaver[
@@ -69,7 +69,7 @@ func MakeStoredParseSaver[
 func (h storedParserSaver[O, OPtr, K, KPtr]) ParseSaveStored(
 	sem sku.ExternalMaybe[K, KPtr],
 	t *objekte.External[O, OPtr, K, KPtr],
-) (err error) {
+) (o OPtr, err error) {
 	var f *os.File
 
 	errors.TodoP2("support akte")
@@ -87,7 +87,11 @@ func (h storedParserSaver[O, OPtr, K, KPtr]) ParseSaveStored(
 
 	var akteSha schnittstellen.ShaLike
 
-	if akteSha, _, err = h.readAkte(r, &t.Akte); err != nil {
+	// TODO-P3 switch to pool
+	var o1 O
+	o = OPtr(&o1)
+
+	if akteSha, _, err = h.readAkte(r, o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

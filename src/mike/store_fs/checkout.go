@@ -52,7 +52,7 @@ func (s *Store) Checkout(
 
 	if err = s.storeObjekten.Zettel().ReadAllSchwanzen(
 		iter.MakeChain(
-			zettel.MakeWriterKonfig(s.erworben),
+			zettel.MakeWriterKonfig(s.erworben, s.storeObjekten.Typ()),
 			ztw,
 			iter.AddClone[zettel.Transacted, *zettel.Transacted](zts),
 		),
@@ -186,8 +186,7 @@ func (s *Store) CheckoutOneZettel(
 
 	cz.State = objekte.CheckedOutStateJustCheckedOut
 	cz.External = zettel.External{
-		Akte: sz.Akte,
-		Sku:  sz.Sku.GetExternal(),
+		Sku: sz.Sku.GetExternal(),
 	}
 
 	if options.CheckoutMode.IncludesObjekte() {
@@ -198,13 +197,7 @@ func (s *Store) CheckoutOneZettel(
 		options.CheckoutMode.IncludesAkte() {
 		t := sz.GetTyp()
 
-		ty := s.erworben.GetApproximatedTyp(t).ApproximatedOrActual()
-
-		var fe string
-
-		if ty != nil {
-			fe = ty.Akte.FileExtension
-		}
+		fe := s.erworben.TypenToExtensions[t]
 
 		if fe == "" {
 			fe = t.String()

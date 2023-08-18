@@ -74,7 +74,6 @@ func (c Status) RunWithCwdQuery(
 					State:    objekte.CheckedOutStateRecognized,
 					Internal: *z,
 					External: zettel.External{
-						Akte: z.Akte,
 						Sku: sku.External[kennung.Hinweis, *kennung.Hinweis]{
 							Transacted: z.Sku,
 							FDs: sku.ExternalFDs{

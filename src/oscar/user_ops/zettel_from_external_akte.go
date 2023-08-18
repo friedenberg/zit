@@ -192,7 +192,6 @@ func (c *ZettelFromExternalAkte) zettelForAkte(
 		return
 	}
 
-	z.Akte.Reset()
 	z.GetMetadateiPtr().Reset()
 
 	if err = c.ProtoZettel.ApplyWithAkteFD(z, akteFD); err != nil {

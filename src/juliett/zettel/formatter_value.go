@@ -53,11 +53,13 @@ func (fv *FormatterValue) FuncFormatterVerzeichnisse(
 	out io.Writer,
 	af schnittstellen.AkteIOFactory,
 	k konfig.Compiled,
+	tagp schnittstellen.AkteGetterPutter[*typ.Akte],
 ) schnittstellen.FuncIter[*Transacted] {
 	return fv.FuncFormatter(
 		out,
 		af,
 		k,
+		tagp,
 	)
 }
 
@@ -65,6 +67,7 @@ func (fv *FormatterValue) FuncFormatter(
 	out io.Writer,
 	af schnittstellen.AkteIOFactory,
 	k konfig.Compiled,
+	tagp schnittstellen.AkteGetterPutter[*typ.Akte],
 ) schnittstellen.FuncIter[*Transacted] {
 	errors.TodoP2("convert to verzeichnisse")
 
@@ -79,9 +82,18 @@ func (fv *FormatterValue) FuncFormatter(
 
 			tt := t.ActualOrNil()
 
+			var ta *typ.Akte
+
+			if ta, err = tagp.GetAkte(tt.GetAkteSha()); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			defer tagp.PutAkte(ta)
+
 			lw := format.MakeLineWriter()
 
-			for fn, f := range tt.Akte.Formatters {
+			for fn, f := range ta.Formatters {
 				if f.FileExtension != "" {
 					lw.WriteFormat("%s %s", fn, f.FileExtension)
 				} else {
@@ -117,9 +129,18 @@ func (fv *FormatterValue) FuncFormatter(
 				return
 			}
 
+			var ta *typ.Akte
+
+			if ta, err = tagp.GetAkte(t.GetAkteSha()); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			defer tagp.PutAkte(ta)
+
 			if _, err = fmt.Fprintln(
 				out,
-				t.Akte.VimSyntaxType,
+				ta.VimSyntaxType,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -201,7 +222,7 @@ func (fv *FormatterValue) FuncFormatter(
 		}
 
 	case "typ-formatter-uti-groups":
-		f := MakeFormatterTypFormatterUTIGroups(k)
+		f := MakeFormatterTypFormatterUTIGroups(k, tagp)
 
 		return func(o *Transacted) (err error) {
 			if _, err = f.Format(out, o); err != nil {
@@ -213,7 +234,7 @@ func (fv *FormatterValue) FuncFormatter(
 		}
 
 	case "action-names":
-		f := MakeFormatterTypActionNames(k, true)
+		f := MakeFormatterTypActionNames(k, true, tagp)
 
 		return func(o *Transacted) (err error) {
 			if _, err = f.Format(out, o); err != nil {

@@ -122,7 +122,11 @@ func (h *transactedInflator[A, APtr, K, KPtr]) InflateFromSkuLike(
 		}
 	}
 
-	if err = h.readAkte(t); err != nil {
+	// TODO-P1 switch to pool
+	var a1 A
+	a := APtr(&a1)
+
+	if err = h.readAkte(t, a); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -153,7 +157,11 @@ func (h *transactedInflator[A, APtr, K, KPtr]) InflateFromSku(
 		}
 	}
 
-	if err = h.readAkte(t); err != nil {
+	// TODO-P1 switch to pool
+	var a1 A
+	a := APtr(&a1)
+
+	if err = h.readAkte(t, a); err != nil {
 		err = errors.Wrapf(err, "Sku: %s", o)
 		return
 	}
@@ -262,11 +270,10 @@ func (h *transactedInflator[A, APtr, K, KPtr]) readObjekte(
 
 	if !t.Sku.ObjekteSha.EqualsSha(sk.GetObjekteSha()) {
 		errors.Todo(
-			"objekte sha mismatch for %s! expected %s but got %s.\nObjekte: %v",
+			"objekte sha mismatch for %s! expected %s but got %s.",
 			sk.GetGattung(),
 			sk.GetObjekteSha(),
 			t.Sku.ObjekteSha,
-			t.Akte,
 		)
 	}
 
@@ -277,6 +284,7 @@ func (h *transactedInflator[A, APtr, K, KPtr]) readObjekte(
 
 func (h *transactedInflator[A, APtr, K, KPtr]) readAkte(
 	t *objekte.Transacted[A, APtr, K, KPtr],
+	a APtr,
 ) (err error) {
 	if h.akteFormat == nil {
 		return
@@ -299,7 +307,7 @@ func (h *transactedInflator[A, APtr, K, KPtr]) readAkte(
 
 	sw := sha.MakeWriter(io.Discard)
 
-	if n, err = h.akteFormat.ParseAkte(io.TeeReader(r, sw), &t.Akte); err != nil {
+	if n, err = h.akteFormat.ParseAkte(io.TeeReader(r, sw), a); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

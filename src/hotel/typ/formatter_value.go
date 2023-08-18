@@ -35,13 +35,23 @@ func (f *FormatterValue) Set(v string) (err error) {
 func (f *FormatterValue) FuncFormatter(
 	out io.Writer,
 	af schnittstellen.AkteIOFactory,
+	agp schnittstellen.AkteGetterPutter[*Akte],
 ) schnittstellen.FuncIter[*Transacted] {
 	switch f.string {
 	case "action-names":
 		f := MakeFormatterActionNames()
 
 		return func(o *Transacted) (err error) {
-			if _, err = f.Format(out, o); err != nil {
+			var akte *Akte
+
+			if akte, err = agp.GetAkte(o.GetAkteSha()); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			defer agp.PutAkte(akte)
+
+			if _, err = f.Format(out, akte); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -53,7 +63,16 @@ func (f *FormatterValue) FuncFormatter(
 		f := MakeFormatterVimSyntaxType()
 
 		return func(o *Transacted) (err error) {
-			if _, err = f.Format(out, o); err != nil {
+			var akte *Akte
+
+			if akte, err = agp.GetAkte(o.GetAkteSha()); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			defer agp.PutAkte(akte)
+
+			if _, err = f.Format(out, akte); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -63,7 +82,10 @@ func (f *FormatterValue) FuncFormatter(
 
 	default:
 		return func(_ *Transacted) (err error) {
-			err = objekte.MakeErrUnsupportedFormatterValue(f.string, gattung.Typ)
+			err = objekte.MakeErrUnsupportedFormatterValue(
+				f.string,
+				gattung.Typ,
+			)
 			return
 		}
 	}

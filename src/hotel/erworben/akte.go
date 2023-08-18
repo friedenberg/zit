@@ -17,11 +17,12 @@ type Defaults struct {
 }
 
 type Akte struct {
-	Defaults       Defaults                                `toml:"defaults"`
-	FileExtensions FileExtensions                          `toml:"file-extensions"`
-	RemoteScripts  map[string]script_config.RemoteScript   `toml:"remote-scripts"`
-	Actions        map[string]script_config.ScriptConfig   `toml:"actions,omitempty"`
-	PrintOptions   erworben_cli_print_options.PrintOptions `toml:"cli-output"`
+	Defaults        Defaults                                `toml:"defaults"`
+	HiddenEtiketten []kennung.Etikett                       `toml:"hidden-etiketten"`
+	FileExtensions  FileExtensions                          `toml:"file-extensions"`
+	RemoteScripts   map[string]script_config.RemoteScript   `toml:"remote-scripts"`
+	Actions         map[string]script_config.ScriptConfig   `toml:"actions,omitempty"`
+	PrintOptions    erworben_cli_print_options.PrintOptions `toml:"cli-output"`
 }
 
 func (_ Akte) GetGattung() schnittstellen.GattungLike {
@@ -32,6 +33,10 @@ func (a Akte) Equals(b Akte) bool {
 	todo.Change("don't use reflection for equality")
 
 	if !reflect.DeepEqual(a.Defaults.Etiketten, b.Defaults.Etiketten) {
+		return false
+	}
+
+	if !reflect.DeepEqual(a.HiddenEtiketten, b.HiddenEtiketten) {
 		return false
 	}
 
@@ -62,6 +67,7 @@ func (a *Akte) Reset() {
 	a.FileExtensions.Reset()
 	a.Defaults.Typ = kennung.Typ{}
 	a.Defaults.Etiketten = make([]kennung.Etikett, 0)
+	a.HiddenEtiketten = make([]kennung.Etikett, 0)
 	a.RemoteScripts = make(map[string]script_config.RemoteScript)
 	a.Actions = make(map[string]script_config.ScriptConfig)
 	a.PrintOptions = erworben_cli_print_options.Default()
@@ -69,10 +75,15 @@ func (a *Akte) Reset() {
 
 func (a *Akte) ResetWith(b Akte) {
 	a.FileExtensions.Reset()
-	// TODO-P4 should copy
+
 	a.Defaults.Typ = b.Defaults.Typ
+
 	a.Defaults.Etiketten = make([]kennung.Etikett, len(b.Defaults.Etiketten))
 	copy(a.Defaults.Etiketten, b.Defaults.Etiketten)
+
+	a.HiddenEtiketten = make([]kennung.Etikett, len(b.HiddenEtiketten))
+	copy(a.HiddenEtiketten, b.HiddenEtiketten)
+
 	a.RemoteScripts = b.RemoteScripts
 	a.Actions = b.Actions
 	a.PrintOptions = b.PrintOptions

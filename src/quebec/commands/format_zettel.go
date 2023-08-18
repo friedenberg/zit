@@ -9,6 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/script_config"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
+	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/lima/store_objekten"
@@ -102,7 +103,6 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 		default:
 			// TODO-P1 switch to methods on Transacted and External
-			zt.Akte = ze.Akte
 			zt.SetMetadatei(ze.GetMetadatei())
 			zt.Sku.Kennung = ze.Sku.GetKennung()
 			zt.SetObjekteSha(ze.GetObjekteSha())
@@ -117,19 +117,26 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	var akteFormatter script_config.RemoteScript
 
 	if typKonfig != nil {
+		var typAkte *typ.Akte
+
+		if typAkte, err = u.StoreObjekten().Typ().GetAkte(typKonfig.GetAkteSha()); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 		actualFormatId := formatId
 		var f script_config.WithOutputFormat
 		ok := false
 
 		if c.UTIGroup != "" {
-			if g, ok := typKonfig.Akte.FormatterUTIGroups[c.UTIGroup]; ok {
+			if g, ok := typAkte.FormatterUTIGroups[c.UTIGroup]; ok {
 				if ft, ok := g.Map()[formatId]; ok {
 					actualFormatId = ft
 				}
 			}
 		}
 
-		f, ok = typKonfig.Akte.Formatters[actualFormatId]
+		f, ok = typAkte.Formatters[actualFormatId]
 
 		if ok {
 			akteFormatter = f.ScriptConfig
@@ -152,7 +159,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		)
 	}
 
-	if err = u.Konfig().ApplyToMetadatei(zt); err != nil {
+	if err = u.Konfig().ApplyToMetadatei(zt, u.StoreObjekten().Typ()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

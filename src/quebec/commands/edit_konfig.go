@@ -9,19 +9,39 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/november/umwelt"
 	"github.com/friedenberg/zit/src/oscar/user_ops"
 )
 
-type EditKonfig struct{}
+type EditKonfig struct {
+	HideEtiketten, UnhideEtiketten kennung.EtikettMutableSet
+}
 
 func init() {
 	registerCommand(
 		"edit-konfig",
 		func(f *flag.FlagSet) Command {
-			c := &EditKonfig{}
+			c := &EditKonfig{
+				HideEtiketten:   kennung.MakeEtikettMutableSet(),
+				UnhideEtiketten: kennung.MakeEtikettMutableSet(),
+			}
+
+			f.Func("hide-etikett", "", func(v string) (err error) {
+				return iter.AddString[kennung.Etikett, *kennung.Etikett](
+					c.HideEtiketten,
+					v,
+				)
+			})
+
+			f.Func("unhide-etikett", "", func(v string) (err error) {
+				return iter.AddString[kennung.Etikett, *kennung.Etikett](
+					c.UnhideEtiketten,
+					v,
+				)
+			})
 
 			return c
 		},
@@ -33,6 +53,81 @@ func (c EditKonfig) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		errors.Err().Print("Command edit-konfig ignores passed in arguments.")
 	}
 
+	var sh schnittstellen.ShaLike
+
+	switch {
+	case c.HideEtiketten.Len() > 0 || c.UnhideEtiketten.Len() > 0:
+		if sh, err = c.editOnlyEtiketten(u); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+	default:
+		if sh, err = c.editInVim(u); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	if err = u.Reset(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = u.Lock(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.Deferred(&err, u.Unlock)
+
+	if _, err = u.StoreObjekten().Konfig().Update(sh); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (c EditKonfig) editOnlyEtiketten(
+	u *umwelt.Umwelt,
+) (sh schnittstellen.ShaLike, err error) {
+	newKonfig := u.Konfig().Akte
+
+	hiddenEtiketten := kennung.MakeEtikettMutableSet(
+		newKonfig.HiddenEtiketten...,
+	)
+
+	c.HideEtiketten.Each(hiddenEtiketten.Add)
+	// TODO-P3 validate etiketten to unhide
+	c.UnhideEtiketten.Each(hiddenEtiketten.Del)
+
+	newKonfig.HiddenEtiketten = hiddenEtiketten.Elements()
+
+	var aw schnittstellen.ShaWriteCloser
+
+	if aw, err = u.StoreObjekten().AkteWriter(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.DeferredCloser(&err, aw)
+
+	f := u.StoreObjekten().Konfig().GetAkteFormat()
+
+	if _, err = f.FormatParsedAkte(aw, newKonfig); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	sh = aw.GetShaLike()
+
+	return
+}
+
+func (c EditKonfig) editInVim(
+	u *umwelt.Umwelt,
+) (sh schnittstellen.ShaLike, err error) {
 	var p string
 
 	if p, err = c.makeTempKonfigFile(u); err != nil {
@@ -53,36 +148,10 @@ func (c EditKonfig) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	if err = u.Reset(); err != nil {
+	if sh, err = c.readTempKonfigFile(u, p); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	var (
-		k  *erworben.Akte
-		sh schnittstellen.ShaLike
-	)
-
-	if k, sh, err = c.readTempKonfigFile(u, p); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = u.Lock(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.Deferred(&err, u.Unlock)
-
-	var tt *erworben.Transacted
-
-	if tt, err = u.StoreObjekten().Konfig().Update(k, sh); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	u.KonfigPtr().SetTransacted(tt)
 
 	return
 }
@@ -121,7 +190,7 @@ func (c EditKonfig) makeTempKonfigFile(
 func (c EditKonfig) readTempKonfigFile(
 	u *umwelt.Umwelt,
 	p string,
-) (k *erworben.Akte, sh schnittstellen.ShaLike, err error) {
+) (sh schnittstellen.ShaLike, err error) {
 	var f *os.File
 
 	if f, err = files.Open(p); err != nil {
@@ -133,7 +202,7 @@ func (c EditKonfig) readTempKonfigFile(
 
 	format := u.StoreObjekten().Konfig().GetAkteFormat()
 
-	k = &erworben.Akte{}
+	var k erworben.Akte
 
 	var aw schnittstellen.ShaWriteCloser
 
@@ -145,7 +214,7 @@ func (c EditKonfig) readTempKonfigFile(
 	defer errors.DeferredCloser(&err, aw)
 
 	// TODO-P3 offer option to edit again
-	if _, err = format.ParseAkte(io.TeeReader(f, aw), k); err != nil {
+	if _, err = format.ParseAkte(io.TeeReader(f, aw), &k); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

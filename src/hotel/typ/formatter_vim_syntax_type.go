@@ -15,13 +15,13 @@ func MakeFormatterVimSyntaxType() *formatterVimSyntaxType {
 
 func (f formatterVimSyntaxType) Format(
 	w io.Writer,
-	ct *Transacted,
+	ct *Akte,
 ) (n int64, err error) {
 	var n1 int
 
 	if n1, err = fmt.Fprintln(
 		w,
-		ct.Akte.VimSyntaxType,
+		ct.VimSyntaxType,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

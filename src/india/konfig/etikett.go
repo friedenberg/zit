@@ -142,11 +142,6 @@ func (k *compiled) AddEtikett(
 }
 
 func (c *compiled) applyExpandedEtikett(ct *etikett.Transacted) {
-	expandedActual := c.GetSortedEtikettenExpanded(ct.Sku.GetKennung().String())
-
-	for _, ex := range expandedActual {
-		ct.Akte.Merge(ex.Akte)
-	}
 }
 
 func (kc compiled) GetEtikett(k kennung.Etikett) (ct etikett.Transacted) {

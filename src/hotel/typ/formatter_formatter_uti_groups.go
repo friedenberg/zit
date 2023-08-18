@@ -15,9 +15,9 @@ func MakeFormatterFormatterUTIGroups() *formatterFormatterUTIGroups {
 
 func (f formatterFormatterUTIGroups) Format(
 	w io.Writer,
-	ct *Transacted,
+	ct *Akte,
 ) (n int64, err error) {
-	for groupName, group := range ct.Akte.FormatterUTIGroups {
+	for groupName, group := range ct.FormatterUTIGroups {
 		sb := bytes.NewBuffer(nil)
 
 		sb.WriteString(groupName)

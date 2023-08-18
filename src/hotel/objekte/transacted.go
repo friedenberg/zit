@@ -16,8 +16,7 @@ type Transacted[
 	T2 kennung.KennungLike[T2],
 	T3 kennung.KennungLikePtr[T2],
 ] struct {
-	Akte T
-	Sku  sku.Transacted[T2, T3]
+	Sku sku.Transacted[T2, T3]
 }
 
 func (t Transacted[T, T1, T2, T3]) Kennung() T3 {
@@ -106,16 +105,7 @@ func (a Transacted[T, T1, T2, T3]) Equals(
 		return false
 	}
 
-	if !a.Akte.Equals(b.Akte) {
-		return false
-	}
-
 	return true
-}
-
-func (a Transacted[T, T1, T2, T3]) GetObjekte() (o T) {
-	o = a.Akte
-	return
 }
 
 func (a Transacted[T, T1, T2, T3]) GetEtiketten() kennung.EtikettSet {
@@ -213,19 +203,16 @@ func (a Transacted[T, T1, T2, T3]) GetKennungString() string {
 
 func (a *Transacted[T, T1, T2, T3]) Reset() {
 	a.Sku.Reset()
-	T1(&a.Akte).Reset()
 }
 
 func (a *Transacted[T, T1, T2, T3]) ResetWithPtr(
 	b *Transacted[T, T1, T2, T3],
 ) {
 	a.Sku.ResetWith(b.Sku)
-	T1(&a.Akte).ResetWith(b.Akte)
 }
 
 func (a *Transacted[T, T1, T2, T3]) ResetWith(
 	b Transacted[T, T1, T2, T3],
 ) {
 	a.Sku.ResetWith(b.Sku)
-	T1(&a.Akte).ResetWith(b.Akte)
 }

@@ -17,6 +17,14 @@ func AddSkuToHeap(h *SkuLikeHeap, sk SkuLike) (err error) {
 	return
 }
 
+func HeapEachPtr(h SkuLikeHeap, f func(sk SkuLikePtr) error) (err error) {
+	return h.Each(
+		func(w wrapper) (err error) {
+			return f(w.SkuLikePtr)
+		},
+	)
+}
+
 func HeapEach(h SkuLikeHeap, f func(sk SkuLike) error) (err error) {
 	return h.Each(
 		func(w wrapper) (err error) {

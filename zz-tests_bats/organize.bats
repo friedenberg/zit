@@ -75,12 +75,10 @@ function organize_simple_commit { # @test
 }
 
 function organize_hides_hidden_etiketten_from_organize { # @test
-	echo "hide = true" >zz-archive.etikett
-	run_zit checkin -delete .e
+	run_zit edit-konfig -hide-etikett zz-archive
 	assert_success
 	assert_output - <<-EOM
-		[-zz-archive@b8cd0eaa1891284eafdf99d3acc2007a3d4396e8a7282335f707d99825388a93]
-		          deleted [zz-archive.etikett]
+		[konfig@3d67a263799e664504054d59dc4b27a2f1bb259da8a2a877558b92d1dc862448]
 	EOM
 
 	to_add="$(mktemp)"
@@ -100,6 +98,7 @@ function organize_hides_hidden_etiketten_from_organize { # @test
 		[-project-2021@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[-project-2021-zit@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[-zz@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-zz-archive@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[-zz-archive-task@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[-zz-archive-task-done@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[two/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "split hinweis for usability" project-2021-zit zz-archive-task-done]

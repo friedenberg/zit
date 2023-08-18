@@ -66,7 +66,11 @@ func (s common) ReadAllTransaktions(
 		},
 		s.GetStandort().DirObjektenTransaktion(),
 	); err != nil {
-		err = errors.Wrap(err)
+		if errors.IsNotExist(err) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+		}
 		return
 	}
 

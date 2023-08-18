@@ -39,32 +39,6 @@ func (s *commonStore[O, OPtr, K, KPtr]) ReadOneExternal(
 		}
 	}
 
-	var ar sha.ReadCloser
-
-	if ar, err = s.AkteReader(e.GetAkteSha()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, ar)
-
-	sw := sha.MakeWriter(nil)
-
-	if _, err = s.AkteFormat.ParseAkte(io.TeeReader(ar, sw), &e.Akte); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	akteSha := sw.GetShaLike()
-
-	if !akteSha.EqualsSha(e.GetAkteSha()) {
-		panic(errors.Errorf(
-			"akte sha in parser was %s while akte sha in objekte was %s",
-			akteSha,
-			e.GetAkteSha(),
-		))
-	}
-
 	return
 }
 
@@ -72,7 +46,6 @@ func (s *commonStore[O, OPtr, K, KPtr]) readOneExternalAkte(
 	e *objekte.External[O, OPtr, K, KPtr],
 	t *objekte.Transacted[O, OPtr, K, KPtr],
 ) (err error) {
-	e.Akte = t.Akte
 	e.SetMetadatei(t.GetMetadatei())
 
 	var aw sha.WriteCloser
@@ -125,7 +98,6 @@ func (s *commonStore[O, OPtr, K, KPtr]) readOneExternalObjekte(
 	defer errors.DeferredCloser(&err, f)
 
 	if t != nil {
-		OPtr(&e.Akte).ResetWith(t.Akte)
 		e.GetMetadateiPtr().ResetWith(t.GetMetadatei())
 	}
 

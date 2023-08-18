@@ -7,11 +7,13 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/india/konfig"
 )
 
 func MakeWriterKonfig(
 	k konfig.Compiled,
+	tagp schnittstellen.AkteGetterPutter[*typ.Akte],
 ) schnittstellen.FuncIter[*Transacted] {
 	errors.TodoP1("switch to sigils")
 	errors.TodoP3("add efficient parsing of hiding tags")
@@ -41,7 +43,16 @@ func MakeWriterKonfig(
 
 		t := k.GetApproximatedTyp(z.GetTyp()).ApproximatedOrActual()
 
-		if t != nil && t.Akte.Archived {
+		var ta *typ.Akte
+
+		if ta, err = tagp.GetAkte(t.GetAkteSha()); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		defer tagp.PutAkte(ta)
+
+		if t != nil && ta.Archived {
 			err = collections.MakeErrStopIteration()
 			return
 		}

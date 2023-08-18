@@ -61,11 +61,13 @@ type zettelStore struct {
 
 	verzeichnisseSchwanzen *verzeichnisseSchwanzen
 	verzeichnisseAll       *store_verzeichnisse.Zettelen
+	tagp                   schnittstellen.AkteGetterPutter[*typ.Akte]
 }
 
 func makeZettelStore(
 	sa store_util.StoreUtil,
 	p schnittstellen.Pool[zettel.Transacted, *zettel.Transacted],
+	tagp schnittstellen.AkteGetterPutter[*typ.Akte],
 ) (s *zettelStore, err error) {
 	s = &zettelStore{
 		protoZettel: zettel.MakeProtoZettel(sa.GetKonfig()),
@@ -73,6 +75,7 @@ func makeZettelStore(
 			sa,
 			nil, // TODO-P1 make akteFormatter
 		),
+		tagp: tagp,
 	}
 
 	s.commonStore, err = makeCommonStore[
@@ -213,7 +216,6 @@ func (s *zettelStore) readOneExternalAkte(
 	ez *zettel.External,
 	t *zettel.Transacted,
 ) (err error) {
-	ez.Akte = t.Akte
 	ez.SetMetadatei(t.GetMetadatei())
 
 	var aw sha.WriteCloser
@@ -261,7 +263,7 @@ func (s *zettelStore) readOneExternalAkte(
 		return
 	}
 
-	fe := typ.GetFileExtension(typKonfig)
+	fe := s.GetKonfig().TypenToExtensions[t.GetTyp()]
 
 	if fe != ez.GetAkteFD().ExtSansDot() {
 		err = errors.Wrap(ErrExternalAkteExtensionMismatch{
@@ -288,7 +290,6 @@ func (s *zettelStore) readOneExternalObjekte(
 
 	defer errors.DeferredCloser(&err, f)
 
-	ez.Akte.ResetWith(t.Akte)
 	ez.GetMetadateiPtr().ResetWith(t.GetMetadatei())
 
 	if _, err = s.textParser.ParseMetadatei(f, ez); err != nil {
@@ -346,7 +347,7 @@ func (s *zettelStore) Create(
 	m := mg.GetMetadatei()
 	s.protoZettel.Apply(&m)
 
-	if err = s.StoreUtil.GetKonfig().ApplyToMetadatei(&m); err != nil {
+	if err = s.StoreUtil.GetKonfig().ApplyToMetadatei(&m, s.tagp); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -457,7 +458,7 @@ func (s *zettelStore) UpdateCheckedOut(
 	m := co.External.GetMetadatei()
 	m.ResetWith(m)
 
-	if err = s.StoreUtil.GetKonfig().ApplyToMetadatei(&m); err != nil {
+	if err = s.StoreUtil.GetKonfig().ApplyToMetadatei(&m, s.tagp); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -542,7 +543,7 @@ func (s *zettelStore) updateLockedWithMutter(
 
 	m := mg.GetMetadatei()
 
-	if err = s.StoreUtil.GetKonfig().ApplyToMetadatei(&m); err != nil {
+	if err = s.StoreUtil.GetKonfig().ApplyToMetadatei(&m, s.tagp); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

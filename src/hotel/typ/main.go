@@ -33,10 +33,11 @@ type CheckedOut = objekte.CheckedOut[
 	*kennung.Typ,
 ]
 
-func GetFileExtension(t *Transacted) string {
-	if t.Akte.FileExtension != "" {
-		return t.Akte.FileExtension
-	}
+// TODO-P1 move to konfig
+// func GetFileExtension(t *Transacted, agp *Akte) string {
+// 	if a.FileExtension != "" {
+// 		return a.FileExtension
+// 	}
 
-	return t.GetKennungLike().String()
-}
+// 	return t.GetKennungLike().String()
+// }

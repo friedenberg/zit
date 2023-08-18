@@ -31,7 +31,6 @@ type External[
 	T2 kennung.KennungLike[T2],
 	T3 kennung.KennungLikePtr[T2],
 ] struct {
-	Akte T
 	Sku  sku.External[T2, T3]
 }
 
@@ -74,7 +73,6 @@ func (a External[T, T1, T2, T3]) GetEtiketten() kennung.EtikettSet {
 func (a External[T, T1, T2, T3]) GetTyp() (t kennung.Typ) {
 	tgs := []any{
 		// a.Verzeichnisse,
-		a.Akte,
 		a.GetMetadatei(),
 	}
 
@@ -109,10 +107,6 @@ func (a External[T, T1, T2, T3]) EqualsAny(b any) bool {
 }
 
 func (a External[T, T1, T2, T3]) Equals(b External[T, T1, T2, T3]) bool {
-	if !a.Akte.Equals(b.Akte) {
-		return false
-	}
-
 	if !a.Sku.Equals(b.Sku) {
 		return false
 	}

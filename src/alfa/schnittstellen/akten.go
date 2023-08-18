@@ -7,6 +7,25 @@ package schnittstellen
 //  /_/   \_\_|\_\\__\___|___\___/
 //
 
+type AkteGetter[
+	V any,
+] interface {
+	GetAkte(ShaLike) (V, error)
+}
+
+type AktePutter[
+	V any,
+] interface {
+	PutAkte(V)
+}
+
+type AkteGetterPutter[
+	V any,
+] interface {
+	AkteGetter[V]
+	AktePutter[V]
+}
+
 type AkteIOFactory interface {
 	AkteReaderFactory
 	AkteWriterFactory

@@ -1,8 +1,6 @@
 package store_objekten
 
 import (
-	"io"
-
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/alfa/toml"
@@ -14,13 +12,12 @@ import (
 	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/hotel/objekte"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
-	"github.com/friedenberg/zit/src/india/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/kilo/store_util"
 )
 
 type KonfigStore interface {
 	GetAkteFormat() objekte.AkteFormat[erworben.Akte, *erworben.Akte]
-	Update(*erworben.Akte, schnittstellen.ShaLike) (*erworben.Transacted, error)
+	Update(schnittstellen.ShaLike) (*erworben.Transacted, error)
 
 	CommonStoreBase[
 		erworben.Akte,
@@ -86,17 +83,16 @@ func (s konfigStore) Flush() (err error) {
 }
 
 func (s konfigStore) addOne(t *erworben.Transacted) (err error) {
-	s.StoreUtil.GetKonfigPtr().SetTransacted(t)
+	s.StoreUtil.GetKonfigPtr().SetTransacted(t, s)
 	return
 }
 
 func (s konfigStore) updateOne(t *erworben.Transacted) (err error) {
-	s.StoreUtil.GetKonfigPtr().SetTransacted(t)
+	s.StoreUtil.GetKonfigPtr().SetTransacted(t, s)
 	return
 }
 
 func (s konfigStore) Update(
-	ko *erworben.Akte,
 	sh schnittstellen.ShaLike,
 ) (kt *erworben.Transacted, err error) {
 	if !s.StoreUtil.GetLockSmith().IsAcquired() {
@@ -117,9 +113,7 @@ func (s konfigStore) Update(
 		}
 	}
 
-	kt = &erworben.Transacted{
-		Akte: *ko,
-	}
+	kt = &erworben.Transacted{}
 
 	kt.SetTai(s.StoreUtil.GetTai())
 	kt.SetAkteSha(sh)
@@ -162,7 +156,11 @@ func (s konfigStore) Update(
 	}
 
 	s.StoreUtil.CommitUpdatedTransacted(kt)
-	s.StoreUtil.GetKonfigPtr().SetTransacted(kt)
+
+	if err = s.StoreUtil.GetKonfigPtr().SetTransacted(kt, s); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if err = s.StoreUtil.AddMatchable(kt); err != nil {
 		err = errors.Wrap(err)
@@ -198,95 +196,58 @@ func (i *konfigStore) ReadAllSchwanzen(
 func (s *konfigStore) ReadAll(
 	w schnittstellen.FuncIter[*erworben.Transacted],
 ) (err error) {
+	eachSku := func(sk sku.SkuLikePtr) (err error) {
+		if sk.GetGattung() != gattung.Konfig {
+			return
+		}
+
+		var te *erworben.Transacted
+
+		if te, err = s.InflateFromSku(sk); err != nil {
+			if errors.Is(err, toml.Error{}) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+
+		if err = w(te); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+	}
+
 	if s.StoreUtil.GetKonfig().UseBestandsaufnahme {
-		f1 := func(t *bestandsaufnahme.Transacted) (err error) {
-			if err = sku.HeapEach(
-				t.Akte.Skus,
-				func(sk sku.SkuLike) (err error) {
-					if sk.GetGattung() != gattung.Konfig {
-						return
-					}
+		if err = s.StoreUtil.GetBestandsaufnahmeStore().ReadAllSkus(eachSku); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
 
-					var te *erworben.Transacted
-
-					if te, err = s.InflateFromSku(sk); err != nil {
-						if errors.Is(err, toml.Error{}) {
-							err = nil
-						} else {
-							err = errors.Wrap(err)
-							return
-						}
-					}
-
-					if err = w(te); err != nil {
-						err = errors.Wrap(err)
-						return
-					}
-
-					return
-				},
+	if err = s.StoreUtil.GetTransaktionStore().ReadAllTransaktions(
+		func(t *transaktion.Transaktion) (err error) {
+			if err = t.Skus.Each(
+				eachSku,
 			); err != nil {
 				err = errors.Wrapf(
 					err,
-					"Bestandsaufnahme: %s",
-					t.GetKennungLike(),
+					"Transaktion: %s/%s: %s",
+					t.Time.Kopf(),
+					t.Time.Schwanz(),
+					t.Time,
 				)
 
 				return
 			}
 
 			return
-		}
-
-		if err = s.StoreUtil.GetBestandsaufnahmeStore().ReadAll(f1); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	} else {
-		if err = s.StoreUtil.GetTransaktionStore().ReadAllTransaktions(
-			func(t *transaktion.Transaktion) (err error) {
-				if err = t.Skus.Each(
-					func(o sku.SkuLikePtr) (err error) {
-						if o.GetGattung() != gattung.Konfig {
-							return
-						}
-
-						var te *erworben.Transacted
-
-						if te, err = s.InflateFromSku(o); err != nil {
-							if errors.Is(err, toml.Error{}) {
-								err = nil
-							} else {
-								err = errors.Wrap(err)
-								return
-							}
-						}
-
-						if err = w(te); err != nil {
-							err = errors.Wrap(err)
-							return
-						}
-
-						return
-					},
-				); err != nil {
-					err = errors.Wrapf(
-						err,
-						"Transaktion: %s/%s: %s",
-						t.Time.Kopf(),
-						t.Time.Schwanz(),
-						t.Time,
-					)
-
-					return
-				}
-
-				return
-			},
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return
@@ -296,8 +257,7 @@ func (s konfigStore) ReadOne(
 	_ *kennung.Konfig,
 ) (tt *erworben.Transacted, err error) {
 	tt = &erworben.Transacted{
-		Sku:  s.StoreUtil.GetKonfig().Sku,
-		Akte: s.StoreUtil.GetKonfig().Akte,
+		Sku: s.StoreUtil.GetKonfig().Sku,
 	}
 
 	if !tt.Sku.GetTai().IsEmpty() {
@@ -325,37 +285,6 @@ func (s konfigStore) ReadOne(
 				err = errors.Wrap(err)
 				return
 			}
-		}
-
-		{
-			var r sha.ReadCloser
-
-			if r, err = s.AkteReader(
-				tt.GetAkteSha(),
-			); err != nil {
-				if errors.IsNotExist(err) {
-					err = nil
-				} else {
-					err = errors.Wrap(err)
-				}
-
-				return
-			}
-
-			defer errors.DeferredCloser(&err, r)
-
-			fo := s.akteFormat
-
-			sw := sha.MakeWriter(nil)
-
-			if _, err = fo.ParseAkte(io.TeeReader(r, sw), &tt.Akte); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			sh := sw.GetShaLike()
-
-			tt.SetAkteSha(sh)
 		}
 	}
 

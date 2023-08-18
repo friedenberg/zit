@@ -89,6 +89,7 @@ func (c Show) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
 		u.Out(),
 		u.StoreObjekten(),
 		u.Konfig(),
+		u.StoreObjekten().Typ(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

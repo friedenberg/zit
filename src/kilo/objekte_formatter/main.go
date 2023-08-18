@@ -51,6 +51,7 @@ func MakeFormatter(
 	out io.Writer,
 	af schnittstellen.AkteIOFactory,
 	k konfig.Compiled,
+	tagp schnittstellen.AkteGetterPutter[*typ.Akte],
 ) (fo Formatter, err error) {
 	f := formatter{
 		formatters: make(map[gattung.Gattung]funcFormat),
@@ -68,6 +69,7 @@ func MakeFormatter(
 			out,
 			af,
 			k,
+			tagp,
 		)
 
 		f.formatters[gattung.Zettel] = makeFuncFormatter(zvf)
@@ -85,6 +87,7 @@ func MakeFormatter(
 			tv.FuncFormatter(
 				out,
 				af,
+				tagp,
 			),
 		)
 	}

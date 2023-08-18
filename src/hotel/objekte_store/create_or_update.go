@@ -73,7 +73,6 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateCheckedOut(
 	co *objekte.CheckedOut[T, T1, T2, T3],
 ) (transactedPtr *objekte.Transacted[T, T1, T2, T3], err error) {
 	kennungPtr := T3(&co.External.Sku.Kennung)
-	objektePtr := T1(&co.External.Akte)
 
 	if !cou.ls.IsAcquired() {
 		err = ErrLockRequired{
@@ -84,7 +83,6 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateCheckedOut(
 	}
 
 	transactedPtr = &objekte.Transacted[T, T1, T2, T3]{
-		Akte: *objektePtr,
 		Sku: sku.Transacted[T2, T3]{
 			Kennung: *kennungPtr,
 			Metadatei: metadatei.Metadatei{
@@ -141,7 +139,6 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateCheckedOut(
 }
 
 func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdate(
-	objektePtr T1,
 	mg metadatei.Getter,
 	kennungPtr T3,
 ) (transactedPtr *objekte.Transacted[T, T1, T2, T3], err error) {
@@ -176,7 +173,6 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdate(
 	m.Tai = cou.clock.GetTai()
 
 	transactedPtr = &objekte.Transacted[T, T1, T2, T3]{
-		Akte: *objektePtr,
 		Sku: sku.Transacted[T2, T3]{
 			Kennung:   *kennungPtr,
 			Metadatei: m,
@@ -243,7 +239,6 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdate(
 }
 
 func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateAkte(
-	objektePtr T1,
 	mg metadatei.Getter,
 	kennungPtr T3,
 	sh schnittstellen.ShaLike,
@@ -279,7 +274,6 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateAkte(
 	m.Tai = cou.clock.GetTai()
 
 	transactedPtr = &objekte.Transacted[T, T1, T2, T3]{
-		Akte: *objektePtr,
 		Sku: sku.Transacted[T2, T3]{
 			Metadatei: m,
 			Kennung:   *kennungPtr,

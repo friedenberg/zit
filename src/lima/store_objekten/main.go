@@ -58,12 +58,12 @@ func Make(
 
 	su.SetMatchableAdder(s)
 
-	if s.zettelStore, err = makeZettelStore(s.StoreUtil, p); err != nil {
+	if s.typStore, err = makeTypStore(s.StoreUtil); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if s.typStore, err = makeTypStore(s.StoreUtil); err != nil {
+	if s.zettelStore, err = makeZettelStore(s.StoreUtil, p, s.typStore); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -438,8 +438,8 @@ func (s *Store) ReadAll(
 
 func (s *Store) GetReindexFunc(
 	ti kennung_index.KennungIndex[kennung.Typ, *kennung.Typ],
-) func(sku.SkuLike) error {
-	return func(sk sku.SkuLike) (err error) {
+) func(sku.SkuLikePtr) error {
+	return func(sk sku.SkuLikePtr) (err error) {
 		var st reindexer
 		ok := false
 
@@ -485,7 +485,6 @@ func (s *Store) addTyp(
 
 		todo.Change("support inheritance")
 		if _, err = s.Typ().CreateOrUpdate(
-			typ.MakeObjekte(),
 			nil,
 			&t,
 		); err != nil {
@@ -511,7 +510,6 @@ func (s *Store) addEtikett(
 
 		todo.Change("support inheritance")
 		if _, err = s.Etikett().CreateOrUpdate(
-			etikett.MakeObjekte(),
 			nil,
 			&e1,
 		); err != nil {
@@ -661,26 +659,7 @@ func (s *Store) Reindex() (err error) {
 
 	// }
 
-	f2 := func(t *bestandsaufnahme.Transacted) (err error) {
-		if err = sku.HeapEach(
-			t.Akte.Skus,
-			func(sk sku.SkuLike) (err error) {
-				return f1(sk)
-			},
-		); err != nil {
-			err = errors.Wrapf(
-				err,
-				"Bestandsaufnahme: %s",
-				t.GetKennungLike(),
-			)
-
-			return
-		}
-
-		return
-	}
-
-	if err = s.GetBestandsaufnahmeStore().ReadAll(f2); err != nil {
+	if err = s.GetBestandsaufnahmeStore().ReadAllSkus(f1); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

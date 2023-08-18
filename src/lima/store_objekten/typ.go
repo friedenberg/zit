@@ -12,7 +12,6 @@ import (
 	"github.com/friedenberg/zit/src/hotel/objekte"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/hotel/typ"
-	"github.com/friedenberg/zit/src/india/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/kilo/store_util"
 )
 
@@ -148,95 +147,58 @@ func (s typStore) ReadAllSchwanzen(
 func (s typStore) ReadAll(
 	f schnittstellen.FuncIter[*typ.Transacted],
 ) (err error) {
+	eachSku := func(sk sku.SkuLikePtr) (err error) {
+		if sk.GetGattung() != gattung.Typ {
+			return
+		}
+
+		var te *typ.Transacted
+
+		if te, err = s.InflateFromSku(sk); err != nil {
+			if errors.Is(err, toml.Error{}) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+
+		if err = f(te); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+	}
+
 	if s.StoreUtil.GetKonfig().UseBestandsaufnahme {
-		f1 := func(t *bestandsaufnahme.Transacted) (err error) {
-			if err = sku.HeapEach(
-				t.Akte.Skus,
-				func(sk sku.SkuLike) (err error) {
-					if sk.GetGattung() != gattung.Typ {
-						return
-					}
+		if err = s.StoreUtil.GetBestandsaufnahmeStore().ReadAllSkus(eachSku); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
 
-					var te *typ.Transacted
-
-					if te, err = s.InflateFromSku(sk); err != nil {
-						if errors.Is(err, toml.Error{}) {
-							err = nil
-						} else {
-							err = errors.Wrap(err)
-							return
-						}
-					}
-
-					if err = f(te); err != nil {
-						err = errors.Wrap(err)
-						return
-					}
-
-					return
-				},
+	if err = s.StoreUtil.GetTransaktionStore().ReadAllTransaktions(
+		func(t *transaktion.Transaktion) (err error) {
+			if err = t.Skus.Each(
+				eachSku,
 			); err != nil {
 				err = errors.Wrapf(
 					err,
-					"Bestandsaufnahme: %s",
-					t.GetKennungLike(),
+					"Transaktion: %s/%s: %s",
+					t.Time.Kopf(),
+					t.Time.Schwanz(),
+					t.Time,
 				)
 
 				return
 			}
 
 			return
-		}
-
-		if err = s.StoreUtil.GetBestandsaufnahmeStore().ReadAll(f1); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	} else {
-		if err = s.StoreUtil.GetTransaktionStore().ReadAllTransaktions(
-			func(t *transaktion.Transaktion) (err error) {
-				if err = t.Skus.Each(
-					func(o sku.SkuLikePtr) (err error) {
-						if o.GetGattung() != gattung.Typ {
-							return
-						}
-
-						var te *typ.Transacted
-
-						if te, err = s.InflateFromSku(o); err != nil {
-							if errors.Is(err, toml.Error{}) {
-								err = nil
-							} else {
-								err = errors.Wrap(err)
-								return
-							}
-						}
-
-						if err = f(te); err != nil {
-							err = errors.Wrap(err)
-							return
-						}
-
-						return
-					},
-				); err != nil {
-					err = errors.Wrapf(
-						err,
-						"Transaktion: %s/%s: %s",
-						t.Time.Kopf(),
-						t.Time.Schwanz(),
-						t.Time,
-					)
-
-					return
-				}
-
-				return
-			},
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

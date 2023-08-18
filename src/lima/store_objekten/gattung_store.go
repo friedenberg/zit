@@ -216,15 +216,7 @@ func (s *commonStore[O, OPtr, K, KPtr]) UpdateManyMetadatei(
 
 			kep := KPtr(&ke)
 
-			var old *objekte.Transacted[O, OPtr, K, KPtr]
-
-			if old, err = s.ReadOne(kep); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
 			if _, err = s.CreateOrUpdater.CreateOrUpdate(
-				&old.Akte,
 				mwk,
 				kep,
 			); err != nil {

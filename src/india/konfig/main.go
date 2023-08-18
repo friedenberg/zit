@@ -43,6 +43,9 @@ func (a *compiled) Reset() {
 	a.Typen = makeCompiledTypSetFromSlice(nil)
 	a.EtikettenHidden = kennung.MakeEtikettSet()
 	a.Etiketten = collections_ptr.MakeMutableValueSet[ketikett, *ketikett](nil)
+	a.InlineTypen = collections_ptr.MakeMutableValueSet[kennung.Typ, *kennung.Typ](
+		nil,
+	)
 	a.ImplicitEtiketten = make(implicitEtikettenMap)
 	a.Kisten = makeCompiledKastenSetFromSlice(nil)
 }
@@ -74,9 +77,11 @@ type compiled struct {
 	ImplicitEtiketten           implicitEtikettenMap
 
 	// Typen
-	ExtensionsToTypen map[string]string
+	ExtensionsToTypen map[string]kennung.Typ
+	TypenToExtensions map[kennung.Typ]string
 	DefaultTyp        typ.Transacted // deprecated
 	Typen             schnittstellen.MutableSetLike[typ.Transacted]
+	InlineTypen       schnittstellen.SetPtrLike[kennung.Typ, *kennung.Typ]
 
 	// Kasten
 	Kisten schnittstellen.MutableSetLike[kasten.Transacted]
@@ -89,7 +94,8 @@ func Make(
 	c = &Compiled{
 		cli: kcli,
 		compiled: compiled{
-			ExtensionsToTypen: make(map[string]string),
+			ExtensionsToTypen: make(map[string]kennung.Typ),
+			TypenToExtensions: make(map[kennung.Typ]string),
 		},
 	}
 
@@ -187,32 +193,16 @@ func (kc *Compiled) SetCliFromCommander(k erworben.Cli) {
 	kc.cli.BasePath = oldBasePath
 }
 
-func (kc *compiled) recompile() (err error) {
-	kc.hasChanges = true
+func (kc *compiled) recompile(
+	tagp schnittstellen.AkteGetterPutter[*typ.Akte],
+) (err error) {
 	kc.DefaultEtiketten = kennung.MakeEtikettSet(kc.Akte.Defaults.Etiketten...)
 
 	{
 		kc.ImplicitEtiketten = make(implicitEtikettenMap)
-		etikettenHidden := kennung.MakeMutableEtikettSet()
 
 		if err = kc.Etiketten.Each(
 			func(ke ketikett) (err error) {
-				ct := ke.Transacted
-				k := ct.Sku.GetKennung()
-				tn := k.String()
-				tv := ct.Akte
-
-				switch {
-				case tv.Hide:
-					etikettenHidden.Add(k)
-					kc.EtikettenHiddenStringsSlice = append(
-						kc.EtikettenHiddenStringsSlice,
-						tn,
-					)
-				}
-
-				// kc.applyExpandedEtikett(ct)
-
 				if err = kc.AccumulateImplicitEtiketten(
 					ke.Transacted.Sku.GetKennung(),
 				); err != nil {
@@ -230,16 +220,43 @@ func (kc *compiled) recompile() (err error) {
 		sort.Slice(kc.EtikettenHiddenStringsSlice, func(i, j int) bool {
 			return kc.EtikettenHiddenStringsSlice[i] < kc.EtikettenHiddenStringsSlice[j]
 		})
-
-		kc.EtikettenHidden = etikettenHidden.CloneSetPtrLike()
 	}
+
+	{
+		kc.EtikettenHidden = kennung.MakeEtikettSet(
+			kc.Akte.HiddenEtiketten...,
+		)
+	}
+
+	inlineTypen := kc.InlineTypen.CloneMutableSetPtrLike()
+
+	defer func() {
+		kc.InlineTypen = inlineTypen.CloneSetPtrLike()
+	}()
 
 	if err = kc.Typen.Each(
 		func(ct typ.Transacted) (err error) {
-			fe := ct.Akte.FileExtension
+			var ta *typ.Akte
 
-			if fe != "" {
-				kc.ExtensionsToTypen[fe] = ct.Sku.GetKennung().String()
+			if ta, err = tagp.GetAkte(ct.GetAkteSha()); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			defer tagp.PutAkte(ta)
+
+			fe := ta.FileExtension
+
+			if fe == "" {
+				fe = ct.Sku.GetKennung().String()
+			}
+
+			// TODO-P2 enforce uniqueness
+			kc.ExtensionsToTypen[fe] = ct.Sku.GetKennung()
+			kc.TypenToExtensions[ct.Sku.GetKennung()] = fe
+
+			if ta.InlineAkte {
+				inlineTypen.Add(ct.Sku.Kennung)
 			}
 
 			// kc.applyExpandedTyp(*ct)
@@ -254,12 +271,15 @@ func (kc *compiled) recompile() (err error) {
 	return
 }
 
-func (kc *Compiled) Flush(s standort.Standort) (err error) {
+func (kc *Compiled) Flush(
+	s standort.Standort,
+	tagp schnittstellen.AkteGetterPutter[*typ.Akte],
+) (err error) {
 	if !kc.hasChanges || kc.DryRun {
 		return
 	}
 
-	if err = kc.recompile(); err != nil {
+	if err = kc.recompile(tagp); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -341,13 +361,7 @@ func (kc compiled) IsInlineTyp(k kennung.Typ) (isInline bool) {
 		return true
 	}
 
-	tc := kc.GetApproximatedTyp(k)
-
-	if !tc.HasValue() {
-		return
-	}
-
-	isInline = tc.ApproximatedOrActual().Akte.InlineAkte
+	isInline = kc.InlineTypen.Contains(k)
 
 	return
 }
@@ -378,14 +392,25 @@ func (kc compiled) GetKasten(k kennung.Kasten) (ct *kasten.Transacted) {
 
 func (k *compiled) SetTransacted(
 	kt *erworben.Transacted,
-) {
+	kag schnittstellen.AkteGetter[*erworben.Akte],
+) (err error) {
 	if !k.Sku.Less(kt.Sku) {
 		return
 	}
 
 	k.hasChanges = true
 	k.Sku = kt.Sku
-	k.Akte = kt.Akte
+
+	var a *erworben.Akte
+
+	if a, err = kag.GetAkte(k.Sku.GetAkteSha()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	k.Akte = *a
+
+	return
 }
 
 func (k *compiled) AddKasten(
@@ -420,9 +445,4 @@ func (k *compiled) AddTyp(
 }
 
 func (c *compiled) applyExpandedTyp(ct typ.Transacted) {
-	expandedActual := c.GetSortedTypenExpanded(ct.Sku.GetKennung().String())
-
-	for _, ex := range expandedActual {
-		ct.Akte.Merge(ex.Akte)
-	}
 }

@@ -26,6 +26,8 @@ type Store interface {
 	objekte_store.LastReader[*Transacted]
 	objekte_store.OneReader[schnittstellen.ShaLike, *Transacted]
 	objekte_store.AllReader[*Transacted]
+	ReadAllSkus(schnittstellen.FuncIter[sku.SkuLikePtr]) error
+	schnittstellen.AkteGetter[*Akte]
 }
 
 type AkteTextSaver = objekte_store.AkteTextSaver[
@@ -127,7 +129,6 @@ func (s *store) Create(o *Akte) (err error) {
 
 	t := &Transacted{}
 	t.Reset()
-	t.Akte = *o
 	t.SetAkteSha(sh)
 	// TODO-P2 switch to clock
 	tai := kennung.NowTai()
@@ -136,22 +137,6 @@ func (s *store) Create(o *Akte) (err error) {
 	t.SetTai(tai)
 
 	if err = s.SaveObjekteIncludeTai(t); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (s *store) readOnePathMetadatei(p string) (o Sku, err error) {
-	var sh sha.Sha
-
-	if sh, err = sha.MakeShaFromPath(p); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if o, err = s.ReadOneMetadatei(sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -175,7 +160,9 @@ func (s *store) readOnePath(p string) (o *Transacted, err error) {
 	return
 }
 
-func (s *store) ReadOneMetadatei(sh schnittstellen.ShaLike) (o Sku, err error) {
+func (s *store) ReadOne(
+	sh schnittstellen.ShaLike,
+) (o *Transacted, err error) {
 	var or sha.ReadCloser
 
 	if or, err = s.of.ObjekteReader(sh); err != nil {
@@ -185,9 +172,12 @@ func (s *store) ReadOneMetadatei(sh schnittstellen.ShaLike) (o Sku, err error) {
 
 	defer errors.DeferredCloser(&err, or)
 
+	o = &Transacted{}
+	o.Reset()
+
 	if _, err = s.persistentMetadateiFormat.ParsePersistentMetadatei(
 		or,
-		&o,
+		o,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -198,7 +188,7 @@ func (s *store) ReadOneMetadatei(sh schnittstellen.ShaLike) (o Sku, err error) {
 		o.SetObjekteSha(sh)
 
 	default:
-		if err = sku.CalculateAndConfirmSha(&o, s.persistentMetadateiFormat, sh); err != nil {
+		if err = sku.CalculateAndConfirmSha(&o.Sku, s.persistentMetadateiFormat, sh); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -207,33 +197,27 @@ func (s *store) ReadOneMetadatei(sh schnittstellen.ShaLike) (o Sku, err error) {
 	return
 }
 
-func (s *store) ReadOne(sh schnittstellen.ShaLike) (o *Transacted, err error) {
-	o = &Transacted{}
-	o.Reset()
+func (s *store) GetAkte(akteSha schnittstellen.ShaLike) (a *Akte, err error) {
+	var ar schnittstellen.ShaReadCloser
 
-	if o.Sku, err = s.ReadOneMetadatei(sh); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	var ar sha.ReadCloser
-
-	if ar, err = s.af.AkteReader(o.GetAkteSha()); err != nil {
+	if ar, err = s.af.AkteReader(akteSha); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	defer errors.DeferredCloser(&err, ar)
 
-	sw := sha.MakeWriter(io.Discard)
+	sw := sha.MakeWriter(nil)
 
-	if _, err = s.formatAkte.ParseAkte(io.TeeReader(ar, sw), &o.Akte); err != nil {
+	a = &Akte{}
+	a.Reset()
+
+	if _, err = s.formatAkte.ParseAkte(io.TeeReader(ar, sw), a); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	akteSha := o.GetAkteSha()
-	sh = sw.GetShaLike()
+	sh := sw.GetShaLike()
 
 	if !sh.EqualsSha(akteSha) {
 		err = errors.Errorf(
@@ -244,8 +228,6 @@ func (s *store) ReadOne(sh schnittstellen.ShaLike) (o *Transacted, err error) {
 		return
 	}
 
-	o.SetAkteSha(akteSha)
-
 	return
 }
 
@@ -254,13 +236,13 @@ func (s *store) ReadLast() (max *Transacted, err error) {
 
 	var maxSku Sku
 
-	if err = s.ReadAllMetadatei(
-		func(b Sku) (err error) {
+	if err = s.ReadAll(
+		func(b *Transacted) (err error) {
 			l.Lock()
 			defer l.Unlock()
 
-			if maxSku.Less(b) {
-				maxSku.ResetWith(b)
+			if maxSku.Less(b.Sku) {
+				maxSku.ResetWith(b.Sku)
 				return
 			}
 
@@ -283,42 +265,6 @@ func (s *store) ReadLast() (max *Transacted, err error) {
 				max.GetMetadatei(),
 			),
 		)
-	}
-
-	return
-}
-
-func (s *store) ReadAllMetadatei(f schnittstellen.FuncIter[Sku]) (err error) {
-	var p string
-
-	if p, err = s.standort.DirObjektenGattung(
-		s.sv,
-		gattung.Bestandsaufnahme,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = files.ReadDirNamesLevel2(
-		func(p string) (err error) {
-			var o Sku
-
-			if o, err = s.readOnePathMetadatei(p); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			if err = f(o); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		},
-		p,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
 	}
 
 	return
@@ -352,6 +298,42 @@ func (s *store) ReadAll(f schnittstellen.FuncIter[*Transacted]) (err error) {
 			return
 		},
 		p,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+// TODO-P3 support streaming instead of reading into heaps
+func (s *store) ReadAllSkus(
+	f schnittstellen.FuncIter[sku.SkuLikePtr],
+) (err error) {
+	if err = s.ReadAll(
+		func(t *Transacted) (err error) {
+			var a *Akte
+
+			if a, err = s.GetAkte(t.GetAkteSha()); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if err = sku.HeapEachPtr(
+				a.Skus,
+				f,
+			); err != nil {
+				err = errors.Wrapf(
+					err,
+					"Bestandsaufnahme: %s",
+					t.GetKennungLike(),
+				)
+
+				return
+			}
+
+			return
+		},
 	); err != nil {
 		err = errors.Wrap(err)
 		return

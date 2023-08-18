@@ -2,12 +2,15 @@ package konfig
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
+	"github.com/friedenberg/zit/src/hotel/typ"
 )
 
 func (k compiled) ApplyToMetadatei(
 	ml metadatei.MetadateiLike,
+	tagp schnittstellen.AkteGetterPutter[*typ.Akte],
 ) (err error) {
 	m := ml.GetMetadatei()
 
@@ -33,7 +36,14 @@ func (k compiled) ApplyToMetadatei(
 		return
 	}
 
-	for e, r := range toa.Akte.EtikettenRules {
+	var ta *typ.Akte
+
+	if ta, err = tagp.GetAkte(toa.GetAkteSha()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	for e, r := range ta.EtikettenRules {
 		var e1 kennung.Etikett
 
 		if e1, err = kennung.MakeEtikett(e); err != nil {
