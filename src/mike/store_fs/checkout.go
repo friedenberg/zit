@@ -185,12 +185,10 @@ func (s *Store) CheckoutOneZettel(
 	inlineAkte := s.erworben.IsInlineTyp(sz.GetTyp())
 
 	cz.State = objekte.CheckedOutStateJustCheckedOut
-	cz.External = zettel.External{
-		Sku: sz.GetExternal(),
-	}
+	cz.External = sz.GetExternal()
 
 	if options.CheckoutMode.IncludesObjekte() {
-		cz.External.Sku.FDs.Objekte.Path = filename
+		cz.External.FDs.Objekte.Path = filename
 	}
 
 	if (!inlineAkte || !options.CheckoutMode.IncludesObjekte()) &&
@@ -203,7 +201,7 @@ func (s *Store) CheckoutOneZettel(
 			fe = t.String()
 		}
 
-		cz.External.Sku.FDs.Akte.Path = originalFilename + "." + fe
+		cz.External.FDs.Akte.Path = originalFilename + "." + fe
 	}
 
 	e := zettel_external.MakeFileEncoder(

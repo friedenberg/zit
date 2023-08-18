@@ -32,7 +32,7 @@ func (s Store) ReadExternalZettelFromAktePath(
 
 	head, tail := id.HeadTailFromFileName(p)
 
-	if cz.External.Sku.Kennung, err = kennung.MakeHinweis(
+	if cz.External.Kennung, err = kennung.MakeHinweis(
 		head + "/" + tail,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -42,7 +42,7 @@ func (s Store) ReadExternalZettelFromAktePath(
 	var zt *zettel.Transacted
 
 	if zt, err = s.storeObjekten.Zettel().ReadOne(
-		&cz.External.Sku.Kennung,
+		&cz.External.Kennung,
 	); err != nil {
 		if errors.Is(err, objekte_store.ErrNotFound{}) {
 			err = nil
@@ -58,7 +58,7 @@ func (s Store) ReadExternalZettelFromAktePath(
 
 	errors.TodoP4("capture this as a function")
 	cz.External.SetObjekteSha(cz.Internal.ObjekteSha)
-	cz.External.Sku.Kennung = cz.Internal.GetKennung()
+	cz.External.Kennung = cz.Internal.GetKennung()
 
 	var akteSha sha.Sha
 
@@ -68,7 +68,7 @@ func (s Store) ReadExternalZettelFromAktePath(
 	}
 
 	errors.TodoP2("add mod time")
-	cz.External.Sku.FDs.Akte.Path = p
+	cz.External.FDs.Akte.Path = p
 	cz.External.SetAkteSha(akteSha)
 	// cz.Matches.Akten, _ = s.storeObjekten.ReadAkteSha(akteSha)
 

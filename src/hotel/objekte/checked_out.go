@@ -15,14 +15,14 @@ type CheckedOut[
 	T3 kennung.KennungLikePtr[T2],
 ] struct {
 	Internal sku.Transacted[T2, T3]
-	External External[T, T1, T2, T3]
+	External sku.External[T2, T3]
 	State    CheckedOutState
 }
 
 func (c *CheckedOut[T, T1, T2, T3]) DetermineState(justCheckedOut bool) {
 	if c.Internal.ObjekteSha.IsNull() {
 		c.State = CheckedOutStateUntracked
-	} else if c.Internal.Metadatei.EqualsSansTai(c.External.Sku.Metadatei) {
+	} else if c.Internal.Metadatei.EqualsSansTai(c.External.Metadatei) {
 		if justCheckedOut {
 			c.State = CheckedOutStateJustCheckedOut
 		} else {
@@ -60,7 +60,7 @@ func (a CheckedOut[T, T1, T2, T3]) EqualsAny(b any) bool {
 }
 
 func (a CheckedOut[T, T1, T2, T3]) String() string {
-	return fmt.Sprintf("%s %s", a.Internal, a.External.Sku)
+	return fmt.Sprintf("%s %s", a.Internal, a.External)
 }
 
 func (a CheckedOut[T, T1, T2, T3]) Equals(

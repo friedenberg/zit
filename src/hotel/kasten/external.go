@@ -2,6 +2,7 @@ package kasten
 
 import (
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/hotel/objekte"
 )
 
@@ -12,9 +13,7 @@ type ExternalKeyer = objekte.ExternalKeyer[
 	*kennung.Kasten,
 ]
 
-type External = objekte.External[
-	Akte,
-	*Akte,
+type External = sku.External[
 	kennung.Kasten,
 	*kennung.Kasten,
 ]

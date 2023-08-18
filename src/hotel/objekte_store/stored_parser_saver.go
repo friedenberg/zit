@@ -22,7 +22,7 @@ type StoredParseSaver[
 ] interface {
 	ParseSaveStored(
 		sem sku.ExternalMaybe[K, KPtr],
-		t *objekte.External[O, OPtr, K, KPtr],
+		t *sku.External[K, KPtr],
 	) (a OPtr, err error)
 }
 
@@ -68,7 +68,7 @@ func MakeStoredParseSaver[
 
 func (h storedParserSaver[O, OPtr, K, KPtr]) ParseSaveStored(
 	sem sku.ExternalMaybe[K, KPtr],
-	t *objekte.External[O, OPtr, K, KPtr],
+	t *sku.External[K, KPtr],
 ) (o OPtr, err error) {
 	var f *os.File
 
@@ -78,8 +78,8 @@ func (h storedParserSaver[O, OPtr, K, KPtr]) ParseSaveStored(
 		return
 	}
 
-	t.Sku.FDs = sem.FDs
-	t.Sku.Kennung = sem.Kennung
+	t.FDs = sem.FDs
+	t.Kennung = sem.Kennung
 
 	r := sha.MakeReadCloser(f)
 

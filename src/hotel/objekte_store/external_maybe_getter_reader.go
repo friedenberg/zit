@@ -28,7 +28,7 @@ type externalMaybeGetterReader[
 	getter func(KPtr) (*sku.ExternalMaybe[K, KPtr], bool)
 	ExternalReader[*sku.ExternalMaybe[K, KPtr],
 		*sku.Transacted[K, KPtr],
-		objekte.External[O, OPtr, K, KPtr]]
+		sku.External[K, KPtr]]
 }
 
 func MakeExternalMaybeGetterReader[
@@ -41,7 +41,7 @@ func MakeExternalMaybeGetterReader[
 	er ExternalReader[
 		*sku.ExternalMaybe[K, KPtr],
 		*sku.Transacted[K, KPtr],
-		objekte.External[O, OPtr, K, KPtr],
+		sku.External[K, KPtr],
 	],
 ) ExternalMaybeGetterReader[O, OPtr, K, KPtr] {
 	return externalMaybeGetterReader[O, OPtr, K, KPtr]{

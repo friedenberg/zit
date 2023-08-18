@@ -15,7 +15,7 @@ func (k KeyerHinweis) GetKey(z *zettel.External) string {
 		return ""
 	}
 
-	return z.Sku.GetKennung().String()
+	return z.GetKennung().String()
 }
 
 func MakeMutableSetUniqueHinweis(zs ...*zettel.External) MutableSet {
@@ -47,11 +47,11 @@ func (k KeyerStored) GetKey(z *zettel.External) string {
 		return ""
 	}
 
-	if z.Sku.ObjekteSha.IsNull() {
+	if z.ObjekteSha.IsNull() {
 		return ""
 	}
 
-	return z.Sku.ObjekteSha.String()
+	return z.ObjekteSha.String()
 }
 
 func MakeMutableSetUniqueStored(zs ...*zettel.External) MutableSet {

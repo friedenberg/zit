@@ -13,9 +13,7 @@ type Transacted = sku.Transacted[
 	*kennung.Hinweis,
 ]
 
-type External = objekte.External[
-	Objekte,
-	*Objekte,
+type External = sku.External[
 	kennung.Hinweis,
 	*kennung.Hinweis,
 ]

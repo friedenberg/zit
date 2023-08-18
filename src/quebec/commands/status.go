@@ -74,17 +74,15 @@ func (c Status) RunWithCwdQuery(
 					State:    objekte.CheckedOutStateRecognized,
 					Internal: *z,
 					External: zettel.External{
-						Sku: sku.External[kennung.Hinweis, *kennung.Hinweis]{
-							Transacted: *z,
-							FDs: sku.ExternalFDs{
-								Akte: fd,
-							},
+						Transacted: *z,
+						FDs: sku.ExternalFDs{
+							Akte: fd,
 						},
 					},
 				}
 
 				fr.External.SetAkteSha(as)
-				fr.External.Sku.ObjekteSha = os
+				fr.External.ObjekteSha = os
 
 				err = p(fr)
 			}

@@ -18,9 +18,7 @@ type ExternalKeyer = objekte.ExternalKeyer[
 	*kennung.Etikett,
 ]
 
-type External = objekte.External[
-	Akte,
-	*Akte,
+type External = sku.External[
 	kennung.Etikett,
 	*kennung.Etikett,
 ]

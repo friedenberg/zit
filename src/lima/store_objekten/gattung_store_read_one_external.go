@@ -9,13 +9,12 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/golf/sku"
-	"github.com/friedenberg/zit/src/hotel/objekte"
 )
 
 func (s *commonStore[O, OPtr, K, KPtr]) ReadOneExternal(
 	em *sku.ExternalMaybe[K, KPtr],
 	t *sku.Transacted[K, KPtr],
-) (e objekte.External[O, OPtr, K, KPtr], err error) {
+) (e sku.External[K, KPtr], err error) {
 	var m checkout_mode.Mode
 
 	if m, err = em.GetFDs().GetCheckoutMode(); err != nil {
@@ -23,7 +22,7 @@ func (s *commonStore[O, OPtr, K, KPtr]) ReadOneExternal(
 		return
 	}
 
-	e.Sku.ResetWithExternalMaybe(*em)
+	e.ResetWithExternalMaybe(*em)
 
 	switch m {
 	case checkout_mode.ModeAkteOnly:
@@ -43,7 +42,7 @@ func (s *commonStore[O, OPtr, K, KPtr]) ReadOneExternal(
 }
 
 func (s *commonStore[O, OPtr, K, KPtr]) readOneExternalAkte(
-	e *objekte.External[O, OPtr, K, KPtr],
+	e *sku.External[K, KPtr],
 	t *sku.Transacted[K, KPtr],
 ) (err error) {
 	e.SetMetadatei(t.GetMetadatei())
@@ -85,7 +84,7 @@ func (s *commonStore[O, OPtr, K, KPtr]) readOneExternalAkte(
 }
 
 func (s *commonStore[O, OPtr, K, KPtr]) readOneExternalObjekte(
-	e *objekte.External[O, OPtr, K, KPtr],
+	e *sku.External[K, KPtr],
 	t *sku.Transacted[K, KPtr],
 ) (err error) {
 	var f *os.File

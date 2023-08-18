@@ -70,6 +70,22 @@ func (a *External[K, KPtr]) AsTransacted() (b Transacted[K, KPtr]) {
 	return
 }
 
+func (a External[K, KPtr]) GetFDs() ExternalFDs {
+	return a.FDs
+}
+
+func (a *External[K, KPtr]) GetFDsPtr() *ExternalFDs {
+	return &a.FDs
+}
+
+func (a External[K, KPtr]) GetAkteFD() kennung.FD {
+	return a.FDs.Akte
+}
+
+func (a External[K, KPtr]) GetObjekteFD() kennung.FD {
+	return a.FDs.Objekte
+}
+
 func (a *External[K, KPtr]) Reset() {
 	a.ObjekteSha.Reset()
 	KPtr(&a.Kennung).Reset()

@@ -139,7 +139,7 @@ func (s *commonStore[O, OPtr, K, KPtr]) CheckoutOne(
 	co = &objekte.CheckedOut[O, OPtr, K, KPtr]{}
 
 	co.Internal = *t
-	co.External.Sku = t.GetExternal()
+	co.External = t.GetExternal()
 
 	var f *os.File
 
@@ -171,7 +171,7 @@ func (s *commonStore[O, OPtr, K, KPtr]) CheckoutOne(
 				return
 			}
 
-			co.External.Sku.Kennung = t.GetKennung()
+			co.External.Kennung = t.GetKennung()
 		} else {
 			err = errors.Wrap(err)
 		}
@@ -181,7 +181,7 @@ func (s *commonStore[O, OPtr, K, KPtr]) CheckoutOne(
 
 	defer errors.DeferredCloser(&err, f)
 
-	if co.External.Sku.FDs.Objekte, err = kennung.File(f); err != nil {
+	if co.External.FDs.Objekte, err = kennung.File(f); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

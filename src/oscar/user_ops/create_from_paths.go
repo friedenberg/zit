@@ -194,12 +194,10 @@ func (c *CreateFromPaths) zettelsFromPath(
 
 	defer errors.DeferredCloser(&err, &c.Filter)
 
-	ze := &zettel.External{
-		Sku: sku.External[kennung.Hinweis, *kennung.Hinweis]{
-			FDs: sku.ExternalFDs{
-				Objekte: kennung.FD{
-					Path: p,
-				},
+	ze := &sku.External[kennung.Hinweis, *kennung.Hinweis]{
+		FDs: sku.ExternalFDs{
+			Objekte: kennung.FD{
+				Path: p,
 			},
 		},
 	}
