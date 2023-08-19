@@ -9,10 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/sku"
-	"github.com/friedenberg/zit/src/hotel/etikett"
-	"github.com/friedenberg/zit/src/hotel/kasten"
 	"github.com/friedenberg/zit/src/hotel/objekte"
-	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/kilo/zettel_external"
@@ -121,13 +118,13 @@ func (s *Store) checkoutOneGeneric(
 		co, err = s.CheckoutOneZettel(options, *tt)
 		cop = &co
 
-	case *kasten.Transacted:
+	case *sku.TransactedKasten:
 		cop, err = s.storeObjekten.Kasten().CheckoutOne(store_objekten.CheckoutOptions(options), tt)
 
-	case *typ.Transacted:
+	case *sku.TransactedTyp:
 		cop, err = s.storeObjekten.Typ().CheckoutOne(store_objekten.CheckoutOptions(options), tt)
 
-	case *etikett.Transacted:
+	case *sku.TransactedEtikett:
 		cop, err = s.storeObjekten.Etikett().CheckoutOne(store_objekten.CheckoutOptions(options), tt)
 
 	default:

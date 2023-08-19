@@ -122,7 +122,7 @@ func (fv *FormatterValue) FuncFormatter(
 
 	case "typ-vim-syntax-type":
 		return func(o *sku.TransactedZettel) (err error) {
-			var t *typ.Transacted
+			var t *sku.TransactedTyp
 
 			if t = k.GetApproximatedTyp(
 				o.GetTyp(),

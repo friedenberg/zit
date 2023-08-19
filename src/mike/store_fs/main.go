@@ -206,19 +206,19 @@ func (s *Store) ReadFiles(
 						return
 					}
 
-				case *typ.Transacted:
+				case *sku.TransactedTyp:
 					if col, err = typEMGR.ReadOne(*et); err != nil {
 						err = errors.Wrap(err)
 						return
 					}
 
-				case *kasten.Transacted:
+				case *sku.TransactedKasten:
 					if col, err = kastenEMGR.ReadOne(*et); err != nil {
 						err = errors.Wrap(err)
 						return
 					}
 
-				case *etikett.Transacted:
+				case *sku.TransactedEtikett:
 					if col, err = etikettEMGR.ReadOne(*et); err != nil {
 						err = errors.Wrap(err)
 						return

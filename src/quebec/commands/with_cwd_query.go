@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/hotel/typ"
+	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -78,7 +78,7 @@ func (c commandWithCwdQuery) Complete(
 
 	if cg.Contains(gattung.Typ) {
 		if err = u.Konfig().Typen.Each(
-			func(tt typ.Transacted) (err error) {
+			func(tt sku.TransactedTyp) (err error) {
 				if err = errors.Out().Printf("%s\tTyp", tt.GetKennung()); err != nil {
 					err = errors.IsAsNilOrWrapf(
 						err,

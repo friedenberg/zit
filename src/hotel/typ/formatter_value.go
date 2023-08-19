@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/hotel/objekte"
 )
 
@@ -36,12 +37,12 @@ func (f *FormatterValue) FuncFormatter(
 	out io.Writer,
 	af schnittstellen.AkteIOFactory,
 	agp schnittstellen.AkteGetterPutter[*Akte],
-) schnittstellen.FuncIter[*Transacted] {
+) schnittstellen.FuncIter[*sku.TransactedTyp] {
 	switch f.string {
 	case "action-names":
 		f := MakeFormatterActionNames()
 
-		return func(o *Transacted) (err error) {
+		return func(o *sku.TransactedTyp) (err error) {
 			var akte *Akte
 
 			if akte, err = agp.GetAkte(o.GetAkteSha()); err != nil {
@@ -62,7 +63,7 @@ func (f *FormatterValue) FuncFormatter(
 	case "vim-syntax-type":
 		f := MakeFormatterVimSyntaxType()
 
-		return func(o *Transacted) (err error) {
+		return func(o *sku.TransactedTyp) (err error) {
 			var akte *Akte
 
 			if akte, err = agp.GetAkte(o.GetAkteSha()); err != nil {
@@ -81,7 +82,7 @@ func (f *FormatterValue) FuncFormatter(
 		}
 
 	default:
-		return func(_ *Transacted) (err error) {
+		return func(_ *sku.TransactedTyp) (err error) {
 			err = objekte.MakeErrUnsupportedFormatterValue(
 				f.string,
 				gattung.Typ,

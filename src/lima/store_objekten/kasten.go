@@ -25,7 +25,7 @@ type KastenStore interface {
 
 type KastenTransactedReader = objekte_store.TransactedReader[
 	*kennung.Kasten,
-	*kasten.Transacted,
+	*sku.TransactedKasten,
 ]
 
 type kastenStore struct {
@@ -64,7 +64,7 @@ func makeKastenStore(
 		return
 	}
 
-	newOrUpdated := func(t *kasten.Transacted) (err error) {
+	newOrUpdated := func(t *sku.TransactedKasten) (err error) {
 		s.StoreUtil.CommitUpdatedTransacted(t)
 
 		if err = s.StoreUtil.GetKonfigPtr().AddKasten(t); err != nil {
@@ -86,8 +86,8 @@ func makeKastenStore(
 		sa.ObjekteReaderWriterFactory(gattung.Kasten),
 		sa,
 		KastenTransactedReader(s),
-		objekte_store.CreateOrUpdateDelegate[*kasten.Transacted]{
-			New: func(t *kasten.Transacted) (err error) {
+		objekte_store.CreateOrUpdateDelegate[*sku.TransactedKasten]{
+			New: func(t *sku.TransactedKasten) (err error) {
 				if err = newOrUpdated(t); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -95,7 +95,7 @@ func makeKastenStore(
 
 				return s.LogWriter.New(t)
 			},
-			Updated: func(t *kasten.Transacted) (err error) {
+			Updated: func(t *sku.TransactedKasten) (err error) {
 				if err = newOrUpdated(t); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -103,7 +103,7 @@ func makeKastenStore(
 
 				return s.LogWriter.Updated(t)
 			},
-			Unchanged: func(t *kasten.Transacted) (err error) {
+			Unchanged: func(t *sku.TransactedKasten) (err error) {
 				return s.LogWriter.Unchanged(t)
 			},
 		},
@@ -119,23 +119,23 @@ func (s kastenStore) Flush() (err error) {
 	return
 }
 
-func (s kastenStore) addOne(t *kasten.Transacted) (err error) {
+func (s kastenStore) addOne(t *sku.TransactedKasten) (err error) {
 	s.StoreUtil.GetKonfigPtr().AddKasten(t)
 	return
 }
 
-func (s kastenStore) updateOne(t *kasten.Transacted) (err error) {
+func (s kastenStore) updateOne(t *sku.TransactedKasten) (err error) {
 	s.StoreUtil.GetKonfigPtr().AddKasten(t)
 	return
 }
 
 // TODO-P3
 func (s kastenStore) ReadAllSchwanzen(
-	f schnittstellen.FuncIter[*kasten.Transacted],
+	f schnittstellen.FuncIter[*sku.TransactedKasten],
 ) (err error) {
 	// TODO-P2 switch to pointers
 	if err = s.StoreUtil.GetKonfig().Kisten.Each(
-		func(e kasten.Transacted) (err error) {
+		func(e sku.TransactedKasten) (err error) {
 			return f(&e)
 		},
 	); err != nil {
@@ -147,14 +147,14 @@ func (s kastenStore) ReadAllSchwanzen(
 }
 
 func (s kastenStore) ReadAll(
-	f schnittstellen.FuncIter[*kasten.Transacted],
+	f schnittstellen.FuncIter[*sku.TransactedKasten],
 ) (err error) {
 	eachSku := func(sk sku.SkuLikePtr) (err error) {
 		if sk.GetGattung() != gattung.Kasten {
 			return
 		}
 
-		var te *kasten.Transacted
+		var te *sku.TransactedKasten
 
 		if te, err = s.InflateFromSku(sk); err != nil {
 			if errors.Is(err, toml.Error{}) {
@@ -207,7 +207,7 @@ func (s kastenStore) ReadAll(
 
 func (s kastenStore) ReadOne(
 	k *kennung.Kasten,
-) (tt *kasten.Transacted, err error) {
+) (tt *sku.TransactedKasten, err error) {
 	errors.TodoP3("add support for working directory")
 	errors.TodoP3("inherited-kastenen-etiketten")
 	tt = s.StoreUtil.GetKonfig().GetKasten(*k)

@@ -15,11 +15,8 @@ import (
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/hotel/erworben"
-	"github.com/friedenberg/zit/src/hotel/etikett"
-	"github.com/friedenberg/zit/src/hotel/kasten"
 	"github.com/friedenberg/zit/src/hotel/objekte"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
-	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/india/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/store_util"
@@ -96,13 +93,13 @@ func Make(
 		gattung.Zettel: objekte.MakeApplyQueryTransactedLikePtr[*sku.TransactedZettel](
 			s.zettelStore.Query,
 		),
-		gattung.Typ: objekte.MakeApplyQueryTransactedLikePtr[*typ.Transacted](
+		gattung.Typ: objekte.MakeApplyQueryTransactedLikePtr[*sku.TransactedTyp](
 			s.typStore.Query,
 		),
-		gattung.Etikett: objekte.MakeApplyQueryTransactedLikePtr[*etikett.Transacted](
+		gattung.Etikett: objekte.MakeApplyQueryTransactedLikePtr[*sku.TransactedEtikett](
 			s.etikettStore.Query,
 		),
-		gattung.Kasten: objekte.MakeApplyQueryTransactedLikePtr[*kasten.Transacted](
+		gattung.Kasten: objekte.MakeApplyQueryTransactedLikePtr[*sku.TransactedKasten](
 			s.kastenStore.Query,
 		),
 		gattung.Konfig: objekte.MakeApplyQueryTransactedLikePtr[*erworben.Transacted](
@@ -118,13 +115,13 @@ func Make(
 		gattung.Zettel: objekte.MakeApplyTransactedLikePtr[*sku.TransactedZettel](
 			s.zettelStore.ReadAllSchwanzen,
 		),
-		gattung.Typ: objekte.MakeApplyTransactedLikePtr[*typ.Transacted](
+		gattung.Typ: objekte.MakeApplyTransactedLikePtr[*sku.TransactedTyp](
 			s.typStore.ReadAllSchwanzen,
 		),
-		gattung.Etikett: objekte.MakeApplyTransactedLikePtr[*etikett.Transacted](
+		gattung.Etikett: objekte.MakeApplyTransactedLikePtr[*sku.TransactedEtikett](
 			s.etikettStore.ReadAllSchwanzen,
 		),
-		gattung.Kasten: objekte.MakeApplyTransactedLikePtr[*kasten.Transacted](
+		gattung.Kasten: objekte.MakeApplyTransactedLikePtr[*sku.TransactedKasten](
 			s.kastenStore.ReadAllSchwanzen,
 		),
 		gattung.Konfig: objekte.MakeApplyTransactedLikePtr[*erworben.Transacted](
@@ -140,13 +137,13 @@ func Make(
 		gattung.Zettel: objekte.MakeApplyTransactedLikePtr[*sku.TransactedZettel](
 			s.zettelStore.ReadAll,
 		),
-		gattung.Typ: objekte.MakeApplyTransactedLikePtr[*typ.Transacted](
+		gattung.Typ: objekte.MakeApplyTransactedLikePtr[*sku.TransactedTyp](
 			s.typStore.ReadAll,
 		),
-		gattung.Etikett: objekte.MakeApplyTransactedLikePtr[*etikett.Transacted](
+		gattung.Etikett: objekte.MakeApplyTransactedLikePtr[*sku.TransactedEtikett](
 			s.etikettStore.ReadAll,
 		),
-		gattung.Kasten: objekte.MakeApplyTransactedLikePtr[*kasten.Transacted](
+		gattung.Kasten: objekte.MakeApplyTransactedLikePtr[*sku.TransactedKasten](
 			s.kastenStore.ReadAll,
 		),
 		gattung.Konfig: objekte.MakeApplyTransactedLikePtr[*erworben.Transacted](
