@@ -1,6 +1,6 @@
 package ts
 
-import "github.com/friedenberg/zit/src/delta/kennung"
+import "github.com/friedenberg/zit/src/echo/kennung"
 
 const (
 	Epoch          = kennung.Epoch

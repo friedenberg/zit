@@ -85,7 +85,7 @@ func (zp *Page) Add(z *transacted.Zettel) (err error) {
 	log.Log().Printf("adding: %s", z.GetSkuLike())
 
 	if err = zp.addFilter(z); err != nil {
-		if collections.IsStopIteration(err) {
+		if iter.IsStopIteration(err) {
 			errors.Log().Printf("eliding %s", z.Kennung)
 			err = nil
 		} else {

@@ -5,7 +5,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/etikett_rule"
 	"github.com/friedenberg/zit/src/alfa/reset"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/script_config"
 )
 

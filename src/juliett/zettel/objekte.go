@@ -2,7 +2,7 @@ package zettel
 
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 )
 
 type Objekte struct{}

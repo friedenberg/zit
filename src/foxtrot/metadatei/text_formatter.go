@@ -4,8 +4,8 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/ohio"
 	"github.com/friedenberg/zit/src/charlie/script_config"
+	"github.com/friedenberg/zit/src/delta/ohio"
 )
 
 type textFormatter struct {

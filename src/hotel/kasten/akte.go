@@ -2,8 +2,8 @@ package kasten
 
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/values"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 )
 
 type Akte struct {

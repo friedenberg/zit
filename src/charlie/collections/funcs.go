@@ -5,13 +5,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
-func MakeWriterDoNotRepool[T any]() schnittstellen.FuncIter[*T] {
-	return func(e *T) (err error) {
-		err = ErrDoNotRepool
-		return
-	}
-}
-
 // TODO-P3 move to iter
 func MakeWriterNoop[T any]() schnittstellen.FuncIter[T] {
 	return func(e T) (err error) {

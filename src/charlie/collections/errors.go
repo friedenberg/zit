@@ -7,14 +7,8 @@ import (
 
 var (
 	ErrNilPointer        = errors.New("nil pointer")
-	ErrDoNotRepool       = errors.New("do not repool")
 	MakeErrStopIteration = iter.MakeErrStopIteration
-	IsStopIteration      = iter.IsStopIteration
 )
-
-func IsDoNotRepool(err error) bool {
-	return errors.Is(err, ErrDoNotRepool)
-}
 
 type ErrNotFound struct{}
 

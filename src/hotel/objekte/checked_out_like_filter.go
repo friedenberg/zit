@@ -2,10 +2,10 @@ package objekte
 
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/echo/kennung"
 )
 
 func MakeFilterFromMetaSet(

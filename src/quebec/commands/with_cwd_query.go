@@ -5,9 +5,9 @@ import (
 	"syscall"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/gattung"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/gattungen"
-	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/transacted"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/cwd"

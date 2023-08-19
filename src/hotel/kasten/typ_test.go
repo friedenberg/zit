@@ -3,7 +3,7 @@ package kasten
 import (
 	"testing"
 
-	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/echo/kennung"
 )
 
 func TestAkteExt(t *testing.T) {

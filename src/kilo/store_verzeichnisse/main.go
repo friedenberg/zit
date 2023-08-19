@@ -7,7 +7,8 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/charlie/pool"
 	"github.com/friedenberg/zit/src/hotel/transacted"
 	"github.com/friedenberg/zit/src/india/konfig"
 )
@@ -156,7 +157,7 @@ func (i *Zettelen) ReadMany(
 		}
 	}
 
-	w := collections.MakePooledChain[transacted.Zettel](
+	w := pool.MakePooledChain[transacted.Zettel](
 		i.pool,
 		ws...,
 	)
@@ -187,7 +188,7 @@ func (i *Zettelen) ReadMany(
 						<-openFileCh
 						continue
 
-					case collections.IsStopIteration(err1):
+					case iter.IsStopIteration(err1):
 						break
 
 					default:

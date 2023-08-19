@@ -6,10 +6,10 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/collections_delta"
-	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/echo/hinweis_index"
+	"github.com/friedenberg/zit/src/delta/standort"
+	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/hinweis_index"
 )
 
 type KennungIndex[

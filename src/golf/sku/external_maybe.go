@@ -3,7 +3,7 @@ package sku
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/values"
-	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/echo/kennung"
 )
 
 type ExternalMaybeLike interface {

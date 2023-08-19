@@ -4,8 +4,8 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/alfa/toml"
-	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/charlie/pool"
+	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/golf/sku"
@@ -135,7 +135,7 @@ func makeCommonStoreBase[
 		panic("delegate was nil")
 	}
 
-	pool := collections.MakePool[
+	pool := pool.MakePool[
 		sku.Transacted[K, KPtr],
 		*sku.Transacted[K, KPtr],
 	]()
@@ -269,7 +269,7 @@ func (s *commonStoreBase[O, OPtr, K, KPtr]) GetInheritor(
 	arf schnittstellen.AkteReaderFactory,
 	pmf objekte_format.Format,
 ) objekte_store.TransactedInheritor {
-	p := collections.MakePool[
+	p := pool.MakePool[
 		sku.Transacted[K, KPtr],
 		*sku.Transacted[K, KPtr],
 	]()

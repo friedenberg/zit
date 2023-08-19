@@ -5,8 +5,8 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 )
 
 func init() {

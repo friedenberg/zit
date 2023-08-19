@@ -8,11 +8,11 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/etikett_rule"
 	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
-	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
+	"github.com/friedenberg/zit/src/echo/kennung"
 )
 
 var BoundaryStringValue values.String

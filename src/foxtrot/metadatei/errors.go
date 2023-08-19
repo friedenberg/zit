@@ -3,8 +3,8 @@ package metadatei
 import (
 	"fmt"
 
-	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/echo/kennung"
 )
 
 type ErrHasInlineAkteAndFilePath struct {

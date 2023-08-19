@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/ohio"
+	"github.com/friedenberg/zit/src/delta/ohio"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 )

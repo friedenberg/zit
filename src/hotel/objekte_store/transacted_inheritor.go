@@ -3,7 +3,7 @@ package objekte_store
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/charlie/pool"
 	"github.com/friedenberg/zit/src/golf/sku"
 )
 
@@ -68,7 +68,7 @@ func (ti *transactedInheritor[T, TPtr]) InflateFromDataIdentityAndStoreAndInheri
 	shouldRepool := true
 
 	if err = ti.inheritor.Inherit(t); err != nil {
-		if collections.IsDoNotRepool(err) {
+		if pool.IsDoNotRepool(err) {
 			shouldRepool = false
 			err = nil
 		} else {

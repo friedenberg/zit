@@ -7,14 +7,14 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/age"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/file_lock"
-	"github.com/friedenberg/zit/src/charlie/standort"
+	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/charlie/pool"
 	"github.com/friedenberg/zit/src/delta/gattungen"
-	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/delta/standort"
+	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/hotel/erworben"
@@ -57,7 +57,7 @@ func Make(kCli erworben.Cli, options Options) (u *Umwelt, err error) {
 		in:                      os.Stdin,
 		out:                     os.Stdout,
 		err:                     os.Stderr,
-		zettelVerzeichnissePool: collections.MakePool[transacted.Zettel, *transacted.Zettel](),
+		zettelVerzeichnissePool: pool.MakePool[transacted.Zettel, *transacted.Zettel](),
 		erworbenCli:             kCli,
 	}
 

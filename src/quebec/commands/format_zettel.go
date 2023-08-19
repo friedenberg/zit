@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
 	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/script_config"
-	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/external"
 	"github.com/friedenberg/zit/src/hotel/transacted"

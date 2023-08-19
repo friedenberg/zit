@@ -7,9 +7,9 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/script_value"
-	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/hotel/external"
 	"github.com/friedenberg/zit/src/hotel/transacted"

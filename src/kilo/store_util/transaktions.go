@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/id"
 	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 )

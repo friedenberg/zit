@@ -5,10 +5,10 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/erworben_cli_print_options"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/todo"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/script_config"
-	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/echo/kennung"
 )
 
 type Defaults struct {

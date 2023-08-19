@@ -2,8 +2,8 @@ package objekte_collections
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/sku"
 )
 
@@ -87,7 +87,7 @@ func (a SetPrefixVerzeichnisse) Each(
 ) (err error) {
 	for e, ssz := range a.innerMap {
 		if err = f(e, ssz); err != nil {
-			if collections.IsStopIteration(err) {
+			if iter.IsStopIteration(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)

@@ -210,7 +210,7 @@ func (a Heap[T, T1]) EachPtr(f schnittstellen.FuncIter[T1]) (err error) {
 
 	for _, s := range a.h {
 		if err = f(&s); err != nil {
-			if IsStopIteration(err) {
+			if iter.IsStopIteration(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)
@@ -229,7 +229,7 @@ func (a Heap[T, T1]) Each(f schnittstellen.FuncIter[T]) (err error) {
 
 	for _, s := range a.h {
 		if err = f(s); err != nil {
-			if IsStopIteration(err) {
+			if iter.IsStopIteration(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)
@@ -254,7 +254,7 @@ func (a *Heap[T, T1]) MergeStream(
 		var e T1
 
 		if e, err = read(); err != nil {
-			if IsStopIteration(err) {
+			if iter.IsStopIteration(err) {
 				err = nil
 				break
 			} else {
@@ -284,7 +284,7 @@ func (a *Heap[T, T1]) MergeStream(
 			popped, _ := a.PopAndSave()
 
 			if err = write(popped); err != nil {
-				if IsStopIteration(err) {
+				if iter.IsStopIteration(err) {
 					err = nil
 				} else {
 					err = errors.Wrap(err)
@@ -295,7 +295,7 @@ func (a *Heap[T, T1]) MergeStream(
 		}
 
 		if err = write(e); err != nil {
-			if IsStopIteration(err) {
+			if iter.IsStopIteration(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)
@@ -328,7 +328,7 @@ func (a *Heap[T, T1]) MergeStream(
 		}
 
 		if err = write(popped); err != nil {
-			if IsStopIteration(err) {
+			if iter.IsStopIteration(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)

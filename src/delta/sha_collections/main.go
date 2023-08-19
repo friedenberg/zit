@@ -7,9 +7,9 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
+	"github.com/friedenberg/zit/src/charlie/sha"
 )
 
 type (

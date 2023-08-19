@@ -3,7 +3,7 @@ package objekte_store
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/hotel/objekte"
 )
 

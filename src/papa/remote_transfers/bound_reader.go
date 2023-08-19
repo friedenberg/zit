@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/charlie/sha"
 )
 
 type boundReader struct {

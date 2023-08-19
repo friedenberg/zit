@@ -5,11 +5,11 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
+	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/sha_collections"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )

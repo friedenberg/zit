@@ -7,6 +7,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/iter"
 )
 
 const (
@@ -136,7 +137,7 @@ func (b bitset) EachOff(f schnittstellen.FuncIter[int]) (err error) {
 		}
 
 		if err = f(i); err != nil {
-			if IsStopIteration(err) {
+			if iter.IsStopIteration(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)
@@ -161,7 +162,7 @@ func (b bitset) EachOn(f schnittstellen.FuncIter[int]) (err error) {
 		}
 
 		if err = f(i); err != nil {
-			if IsStopIteration(err) {
+			if iter.IsStopIteration(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)

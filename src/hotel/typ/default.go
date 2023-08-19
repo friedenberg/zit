@@ -3,7 +3,7 @@ package typ
 import (
 	"github.com/friedenberg/zit/src/alfa/etikett_rule"
 	"github.com/friedenberg/zit/src/charlie/script_config"
-	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/echo/kennung"
 )
 
 func Default() (t Akte, k kennung.Typ) {

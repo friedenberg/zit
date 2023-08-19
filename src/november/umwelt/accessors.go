@@ -4,8 +4,8 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/standort"
-	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/delta/standort"
+	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/transacted"
 	"github.com/friedenberg/zit/src/india/konfig"
 	"github.com/friedenberg/zit/src/lima/store_objekten"

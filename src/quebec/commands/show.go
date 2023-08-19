@@ -4,10 +4,10 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/gattungen"
-	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/objekte"
 	"github.com/friedenberg/zit/src/kilo/objekte_formatter"
 	"github.com/friedenberg/zit/src/november/umwelt"

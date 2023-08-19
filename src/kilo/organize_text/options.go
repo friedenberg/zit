@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/erworben_cli_print_options"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
-	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/india/konfig"
 	"github.com/friedenberg/zit/src/india/objekte_collections"

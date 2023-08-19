@@ -8,11 +8,11 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/bravo/ohio"
-	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/script_config"
-	"github.com/friedenberg/zit/src/delta/format"
-	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/delta/ohio"
+	"github.com/friedenberg/zit/src/echo/format"
+	"github.com/friedenberg/zit/src/echo/kennung"
 )
 
 type textParser struct {

@@ -4,11 +4,11 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/bravo/ohio"
-	"github.com/friedenberg/zit/src/bravo/sha"
-	"github.com/friedenberg/zit/src/delta/format"
-	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/delta/ohio"
+	"github.com/friedenberg/zit/src/echo/format"
+	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
 

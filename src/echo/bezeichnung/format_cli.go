@@ -4,7 +4,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/string_writer_format"
+	"github.com/friedenberg/zit/src/charlie/string_format_writer"
 )
 
 type bezeichnungCliFormat struct {
@@ -12,13 +12,13 @@ type bezeichnungCliFormat struct {
 }
 
 func MakeCliFormat2(
-	co string_writer_format.ColorOptions,
+	co string_format_writer.ColorOptions,
 ) *bezeichnungCliFormat {
 	return &bezeichnungCliFormat{
-		stringFormatWriter: string_writer_format.MakeColor[string](
+		stringFormatWriter: string_format_writer.MakeColor[string](
 			co,
-			string_writer_format.MakeString[string](),
-			string_writer_format.ColorTypeIdentifier,
+			string_format_writer.MakeString[string](),
+			string_format_writer.ColorTypeIdentifier,
 		),
 	}
 }

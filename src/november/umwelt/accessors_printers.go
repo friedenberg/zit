@@ -4,16 +4,16 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/string_writer_format"
-	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/charlie/string_format_writer"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
+	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/hotel/objekte"
 	"github.com/friedenberg/zit/src/hotel/sku_formats"
 	"github.com/friedenberg/zit/src/mike/store_fs"
 )
 
-func (u *Umwelt) FormatColorOptions() (o string_writer_format.ColorOptions) {
+func (u *Umwelt) FormatColorOptions() (o string_format_writer.ColorOptions) {
 	o.OffEntirely = !u.outIsTty
 	return
 }
@@ -60,7 +60,7 @@ func (u *Umwelt) StringFormatWriterSkuLikePtr() schnittstellen.StringFormatWrite
 func (u *Umwelt) PrinterSkuLikePtr() schnittstellen.FuncIter[sku.SkuLikePtr] {
 	sw := u.StringFormatWriterSkuLikePtr()
 
-	return string_writer_format.MakeDelim[sku.SkuLikePtr](
+	return string_format_writer.MakeDelim[sku.SkuLikePtr](
 		"\n",
 		u.Out(),
 		sw,
@@ -70,10 +70,10 @@ func (u *Umwelt) PrinterSkuLikePtr() schnittstellen.FuncIter[sku.SkuLikePtr] {
 func (u *Umwelt) PrinterTransactedLike() schnittstellen.FuncIter[sku.SkuLikePtr] {
 	sw := u.StringFormatWriterSkuLikePtr()
 
-	return string_writer_format.MakeDelim[sku.SkuLikePtr](
+	return string_format_writer.MakeDelim[sku.SkuLikePtr](
 		"\n",
 		u.Out(),
-		string_writer_format.MakeFunc[sku.SkuLikePtr](
+		string_format_writer.MakeFunc[sku.SkuLikePtr](
 			func(w io.StringWriter, o sku.SkuLikePtr) (n int64, err error) {
 				return sw.WriteStringFormat(w, o.GetSkuLikePtr())
 			},
@@ -90,7 +90,7 @@ func (u *Umwelt) PrinterFileNotRecognized() schnittstellen.FuncIter[*kennung.FD]
 		u.StringFormatWriterShaLike(),
 	)
 
-	return string_writer_format.MakeDelim[*kennung.FD](
+	return string_format_writer.MakeDelim[*kennung.FD](
 		"\n",
 		u.Out(),
 		p,
@@ -106,7 +106,7 @@ func (u *Umwelt) PrinterFDDeleted() schnittstellen.FuncIter[*kennung.FD] {
 		),
 	)
 
-	return string_writer_format.MakeDelim[*kennung.FD](
+	return string_format_writer.MakeDelim[*kennung.FD](
 		"\n",
 		u.Out(),
 		p,
@@ -114,10 +114,10 @@ func (u *Umwelt) PrinterFDDeleted() schnittstellen.FuncIter[*kennung.FD] {
 }
 
 func (u *Umwelt) PrinterHeader() schnittstellen.FuncIter[string] {
-	return string_writer_format.MakeDelim[string](
+	return string_format_writer.MakeDelim[string](
 		"\n",
 		u.Out(),
-		string_writer_format.MakeIndentedHeader(u.FormatColorOptions()),
+		string_format_writer.MakeIndentedHeader(u.FormatColorOptions()),
 	)
 }
 
@@ -135,7 +135,7 @@ func (u *Umwelt) PrinterCheckedOutLike() schnittstellen.FuncIter[objekte.Checked
 		u.StringFormatWriterEtiketten(),
 	)
 
-	return string_writer_format.MakeDelim[objekte.CheckedOutLikePtr](
+	return string_format_writer.MakeDelim[objekte.CheckedOutLikePtr](
 		"\n",
 		u.Out(),
 		p,

@@ -5,8 +5,8 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/string_writer_format"
-	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/charlie/string_format_writer"
+	"github.com/friedenberg/zit/src/echo/kennung"
 )
 
 type fdDeletedStringWriterFormat struct {
@@ -21,7 +21,7 @@ func MakeFDDeletedStringWriterFormat(
 ) *fdDeletedStringWriterFormat {
 	return &fdDeletedStringWriterFormat{
 		dryRun:               dryRun,
-		rightAlignedWriter:   string_writer_format.MakeRightAligned(),
+		rightAlignedWriter:   string_format_writer.MakeRightAligned(),
 		fdStringFormatWriter: fdStringFormatWriter,
 	}
 }
@@ -35,10 +35,10 @@ func (f *fdDeletedStringWriterFormat) WriteStringFormat(
 		n2 int64
 	)
 
-	prefix := string_writer_format.StringDeleted
+	prefix := string_format_writer.StringDeleted
 
 	if f.dryRun {
-		prefix = string_writer_format.StringWouldDelete
+		prefix = string_format_writer.StringWouldDelete
 	}
 
 	n2, err = f.rightAlignedWriter.WriteStringFormat(sw, prefix)

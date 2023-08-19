@@ -1,6 +1,6 @@
 package erworben
 
-import "github.com/friedenberg/zit/src/delta/kennung"
+import "github.com/friedenberg/zit/src/echo/kennung"
 
 func Default(defaultTyp kennung.Typ) (k Akte) {
 	k = Akte{

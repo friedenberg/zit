@@ -1,6 +1,6 @@
 package sha_collections
 
-import "github.com/friedenberg/zit/src/bravo/sha"
+import "github.com/friedenberg/zit/src/charlie/sha"
 
 type Slice []sha.Sha
 
