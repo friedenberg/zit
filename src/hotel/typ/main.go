@@ -5,16 +5,7 @@ import (
 	"github.com/friedenberg/zit/src/hotel/objekte"
 )
 
-type ExternalKeyer = objekte.ExternalKeyer[
-	Akte,
-	*Akte,
-	kennung.Typ,
-	*kennung.Typ,
-]
-
 type CheckedOut = objekte.CheckedOut[
-	Akte,
-	*Akte,
 	kennung.Typ,
 	*kennung.Typ,
 ]

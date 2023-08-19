@@ -6,8 +6,6 @@ import (
 )
 
 type CheckedOut = objekte.CheckedOut[
-	Objekte,
-	*Objekte,
 	kennung.Hinweis,
 	*kennung.Hinweis,
 ]

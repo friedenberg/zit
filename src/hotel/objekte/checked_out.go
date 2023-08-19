@@ -9,8 +9,6 @@ import (
 )
 
 type CheckedOut[
-	T Akte[T],
-	T1 AktePtr[T],
 	T2 kennung.KennungLike[T2],
 	T3 kennung.KennungLikePtr[T2],
 ] struct {
@@ -19,7 +17,7 @@ type CheckedOut[
 	State    CheckedOutState
 }
 
-func (c *CheckedOut[T, T1, T2, T3]) DetermineState(justCheckedOut bool) {
+func (c *CheckedOut[T2, T3]) DetermineState(justCheckedOut bool) {
 	if c.Internal.ObjekteSha.IsNull() {
 		c.State = CheckedOutStateUntracked
 	} else if c.Internal.Metadatei.EqualsSansTai(c.External.Metadatei) {
@@ -39,32 +37,32 @@ func (c *CheckedOut[T, T1, T2, T3]) DetermineState(justCheckedOut bool) {
 	}
 }
 
-func (co CheckedOut[T, T1, T2, T3]) GetState() CheckedOutState {
+func (co CheckedOut[T2, T3]) GetState() CheckedOutState {
 	return co.State
 }
 
-func (co *CheckedOut[T, T1, T2, T3]) GetInternalLike() TransactedLikePtr {
+func (co *CheckedOut[T2, T3]) GetInternalLike() TransactedLikePtr {
 	return &co.Internal
 }
 
-func (co *CheckedOut[T, T1, T2, T3]) GetExternalLike() ExternalLike {
+func (co *CheckedOut[T2, T3]) GetExternalLike() ExternalLike {
 	return &co.External
 }
 
-func (co *CheckedOut[T, T1, T2, T3]) GetExternalLikePtr() ExternalLikePtr {
+func (co *CheckedOut[T2, T3]) GetExternalLikePtr() ExternalLikePtr {
 	return &co.External
 }
 
-func (a CheckedOut[T, T1, T2, T3]) EqualsAny(b any) bool {
+func (a CheckedOut[T2, T3]) EqualsAny(b any) bool {
 	return values.Equals(a, b)
 }
 
-func (a CheckedOut[T, T1, T2, T3]) String() string {
+func (a CheckedOut[T2, T3]) String() string {
 	return fmt.Sprintf("%s %s", a.Internal, a.External)
 }
 
-func (a CheckedOut[T, T1, T2, T3]) Equals(
-	b CheckedOut[T, T1, T2, T3],
+func (a CheckedOut[T2, T3]) Equals(
+	b CheckedOut[T2, T3],
 ) bool {
 	if !a.Internal.Equals(b.Internal) {
 		return false

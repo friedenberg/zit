@@ -34,7 +34,7 @@ type CommonStore[
 		OPtr,
 		KPtr,
 		*sku.Transacted[K, KPtr],
-		*objekte.CheckedOut[O, OPtr, K, KPtr],
+		*objekte.CheckedOut[K, KPtr],
 	]
 }
 
@@ -69,7 +69,7 @@ type commonStore[
 		OPtr,
 		KPtr,
 		*sku.Transacted[K, KPtr],
-		*objekte.CheckedOut[O, OPtr, K, KPtr],
+		*objekte.CheckedOut[K, KPtr],
 	]
 }
 
@@ -134,9 +134,9 @@ func makeCommonStore[
 func (s *commonStore[O, OPtr, K, KPtr]) CheckoutOne(
 	options CheckoutOptions,
 	t *sku.Transacted[K, KPtr],
-) (co *objekte.CheckedOut[O, OPtr, K, KPtr], err error) {
+) (co *objekte.CheckedOut[K, KPtr], err error) {
 	todo.Change("add pool")
-	co = &objekte.CheckedOut[O, OPtr, K, KPtr]{}
+	co = &objekte.CheckedOut[K, KPtr]{}
 
 	co.Internal = *t
 	co.External = t.GetExternal()

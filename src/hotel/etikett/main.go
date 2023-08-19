@@ -13,8 +13,6 @@ type ExternalKeyer = objekte.ExternalKeyer[
 ]
 
 type CheckedOut = objekte.CheckedOut[
-	Akte,
-	*Akte,
 	kennung.Etikett,
 	*kennung.Etikett,
 ]

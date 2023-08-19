@@ -36,7 +36,7 @@ type CommonStoreBase[
 	CheckoutOne(
 		CheckoutOptions,
 		*sku.Transacted[K, KPtr],
-	) (*objekte.CheckedOut[O, OPtr, K, KPtr], error)
+	) (*objekte.CheckedOut[K, KPtr], error)
 
 	schnittstellen.AkteGetterPutter[OPtr]
 
