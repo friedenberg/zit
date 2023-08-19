@@ -6,24 +6,25 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/kennung_index"
+	"github.com/friedenberg/zit/src/golf/sku"
 )
 
 // TODO-P3 move to collections
 type Schwanzen struct {
 	lock         *sync.RWMutex
-	hinweisen    map[kennung.Hinweis]Sku
+	hinweisen    map[kennung.Hinweis]sku.TransactedZettel
 	etikettIndex kennung_index.EtikettIndex
 }
 
 func MakeSchwanzen(ei kennung_index.EtikettIndex) *Schwanzen {
 	return &Schwanzen{
 		lock:         &sync.RWMutex{},
-		hinweisen:    make(map[kennung.Hinweis]Sku),
+		hinweisen:    make(map[kennung.Hinweis]sku.TransactedZettel),
 		etikettIndex: ei,
 	}
 }
 
-func (zws *Schwanzen) Less(zt *Transacted) (ok bool) {
+func (zws *Schwanzen) Less(zt *sku.TransactedZettel) (ok bool) {
 	zws.lock.RLock()
 	defer zws.lock.RUnlock()
 
@@ -53,7 +54,7 @@ func (zws *Schwanzen) Get(h kennung.Hinweis) (t kennung.Tai, ok bool) {
 	return
 }
 
-func (zws *Schwanzen) Set(z *Transacted, flush bool) (ok bool) {
+func (zws *Schwanzen) Set(z *sku.TransactedZettel, flush bool) (ok bool) {
 	zws.lock.Lock()
 	defer zws.lock.Unlock()
 
@@ -84,8 +85,7 @@ func (zws *Schwanzen) Set(z *Transacted, flush bool) (ok bool) {
 }
 
 func (zws *Schwanzen) ShouldAddVerzeichnisse(
-	z *Transacted,
-) (err error) {
+	z *sku.TransactedZettel) (err error) {
 	if ok := zws.Set(z, false); !ok {
 		err = collections.MakeErrStopIteration()
 		return
@@ -95,8 +95,7 @@ func (zws *Schwanzen) ShouldAddVerzeichnisse(
 }
 
 func (zws *Schwanzen) ShouldFlushVerzeichnisse(
-	z *Transacted,
-) (err error) {
+	z *sku.TransactedZettel) (err error) {
 	if ok := zws.Set(z, true); !ok {
 		err = collections.MakeErrStopIteration()
 		return

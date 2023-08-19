@@ -13,6 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
@@ -20,20 +21,20 @@ type Page struct {
 	lock *sync.Mutex
 	pageId
 	schnittstellen.VerzeichnisseFactory
-	pool        schnittstellen.Pool[zettel.Transacted, *zettel.Transacted]
+	pool        schnittstellen.Pool[sku.TransactedZettel, *sku.TransactedZettel]
 	added       zettel.HeapTransacted
-	addFilter   schnittstellen.FuncIter[*zettel.Transacted]
-	flushFilter schnittstellen.FuncIter[*zettel.Transacted]
+	addFilter   schnittstellen.FuncIter[*sku.TransactedZettel]
+	flushFilter schnittstellen.FuncIter[*sku.TransactedZettel]
 	State
 }
 
 func makeZettelenPage(
 	iof schnittstellen.VerzeichnisseFactory, pid pageId,
-	pool schnittstellen.Pool[zettel.Transacted, *zettel.Transacted],
+	pool schnittstellen.Pool[sku.TransactedZettel, *sku.TransactedZettel],
 	fff PageDelegateGetter,
 ) (p *Page) {
-	flushFilter := collections.MakeWriterNoop[*zettel.Transacted]()
-	addFilter := collections.MakeWriterNoop[*zettel.Transacted]()
+	flushFilter := collections.MakeWriterNoop[*sku.TransactedZettel]()
+	addFilter := collections.MakeWriterNoop[*sku.TransactedZettel]()
 
 	if fff != nil {
 		d := fff.GetVerzeichnissePageDelegate(pid.index)
@@ -75,7 +76,7 @@ func (zp *Page) doUnlock() {
 	zp.lock.Unlock()
 }
 
-func (zp *Page) Add(z *zettel.Transacted) (err error) {
+func (zp *Page) Add(z *sku.TransactedZettel) (err error) {
 	if z == nil {
 		err = errors.Errorf("trying to add nil zettel")
 		return
@@ -155,7 +156,7 @@ func (zp *Page) Flush() (err error) {
 }
 
 func (zp *Page) copy(
-	w schnittstellen.FuncIter[*zettel.Transacted],
+	w schnittstellen.FuncIter[*sku.TransactedZettel],
 ) (err error) {
 	var r1 io.ReadCloser
 
@@ -179,7 +180,7 @@ func (zp *Page) copy(
 	added := zp.added.Copy()
 
 	if err = added.MergeStream(
-		func() (tz *zettel.Transacted, err error) {
+		func() (tz *sku.TransactedZettel, err error) {
 			tz = zp.pool.Get()
 
 			if err = dec.Decode(tz); err != nil {
@@ -212,7 +213,7 @@ func (zp *Page) writeTo(w1 io.Writer) (err error) {
 	if err = zp.copy(
 		iter.MakeChain(
 			zp.flushFilter,
-			func(z *zettel.Transacted) (err error) {
+			func(z *sku.TransactedZettel) (err error) {
 				return enc.Encode(z)
 			},
 		),
@@ -225,7 +226,7 @@ func (zp *Page) writeTo(w1 io.Writer) (err error) {
 }
 
 func (zp *Page) Copy(
-	w schnittstellen.FuncIter[*zettel.Transacted],
+	w schnittstellen.FuncIter[*sku.TransactedZettel],
 ) (err error) {
 	acquired := zp.doTryLock()
 

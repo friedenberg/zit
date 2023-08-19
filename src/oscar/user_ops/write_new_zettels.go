@@ -2,6 +2,7 @@ package user_ops
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/mike/store_fs"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -59,7 +60,7 @@ func (c WriteNewZettels) runOneAlreadyLocked(
 ) (result zettel.CheckedOut, err error) {
 	z := pz.Make()
 
-	var zt *zettel.Transacted
+	var zt *sku.TransactedZettel
 
 	if zt, err = c.StoreObjekten().Zettel().Create(*z); err != nil {
 		err = errors.Wrap(err)

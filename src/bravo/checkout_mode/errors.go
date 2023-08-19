@@ -1,4 +1,4 @@
-package sku
+package checkout_mode
 
 import "errors"
 

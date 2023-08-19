@@ -5,21 +5,22 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/golf/sku"
 )
 
-type HeapTransacted = collections.Heap[Transacted, *Transacted]
+type HeapTransacted = collections.Heap[sku.TransactedZettel, *sku.TransactedZettel]
 
 func MakeHeapTransacted() HeapTransacted {
-	return collections.MakeHeap[Transacted, *Transacted]()
+	return collections.MakeHeap[sku.TransactedZettel, *sku.TransactedZettel]()
 }
 
 type (
-	MutableSet = schnittstellen.MutableSetLike[*Transacted]
+	MutableSet = schnittstellen.MutableSetLike[*sku.TransactedZettel]
 )
 
 type TransactedUniqueKeyer struct{}
 
-func (tk TransactedUniqueKeyer) GetKey(sz *Transacted) string {
+func (tk TransactedUniqueKeyer) GetKey(sz *sku.TransactedZettel) string {
 	if sz == nil {
 		return ""
 	}
@@ -34,14 +35,14 @@ func (tk TransactedUniqueKeyer) GetKey(sz *Transacted) string {
 }
 
 func MakeMutableSetUnique(c int) MutableSet {
-	return collections_value.MakeMutableValueSet[*Transacted](
+	return collections_value.MakeMutableValueSet[*sku.TransactedZettel](
 		TransactedUniqueKeyer{},
 	)
 }
 
 type TransactedHinweisKeyer struct{}
 
-func (tk TransactedHinweisKeyer) GetKey(sz *Transacted) string {
+func (tk TransactedHinweisKeyer) GetKey(sz *sku.TransactedZettel) string {
 	if sz == nil {
 		return ""
 	}
@@ -52,7 +53,7 @@ func (tk TransactedHinweisKeyer) GetKey(sz *Transacted) string {
 }
 
 func MakeMutableSetHinweis(c int) MutableSet {
-	return collections_value.MakeMutableValueSet[*Transacted](
+	return collections_value.MakeMutableValueSet[*sku.TransactedZettel](
 		TransactedHinweisKeyer{},
 	)
 }
@@ -61,7 +62,7 @@ func ToSliceHinweisen(s MutableSet) (b []kennung.Hinweis) {
 	b = make([]kennung.Hinweis, 0, s.Len())
 
 	s.Each(
-		func(z *Transacted) (err error) {
+		func(z *sku.TransactedZettel) (err error) {
 			b = append(b, z.GetKennung())
 
 			return

@@ -63,7 +63,7 @@ func (c Status) RunWithCwdQuery(
 
 	if err = u.StoreObjekten().ReadAllMatchingAkten(
 		possible.UnsureAkten,
-		func(fd kennung.FD, z *zettel.Transacted) (err error) {
+		func(fd kennung.FD, z *sku.TransactedZettel) (err error) {
 			if z == nil {
 				err = u.PrinterFileNotRecognized()(&fd)
 			} else {
@@ -73,7 +73,7 @@ func (c Status) RunWithCwdQuery(
 				fr := &zettel.CheckedOut{
 					State:    objekte.CheckedOutStateRecognized,
 					Internal: *z,
-					External: zettel.External{
+					External: sku.ExternalZettel{
 						Transacted: *z,
 						FDs: sku.ExternalFDs{
 							Akte: fd,

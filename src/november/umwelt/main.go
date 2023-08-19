@@ -16,11 +16,11 @@ import (
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
+	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/hotel/objekte"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
 	"github.com/friedenberg/zit/src/india/konfig"
-	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/organize_text"
 	"github.com/friedenberg/zit/src/kilo/store_util"
 	"github.com/friedenberg/zit/src/lima/store_objekten"
@@ -49,7 +49,7 @@ type Umwelt struct {
 	age                   *age.Age
 	storeWorkingDirectory *store_fs.Store
 
-	zettelVerzeichnissePool schnittstellen.Pool[zettel.Transacted, *zettel.Transacted]
+	zettelVerzeichnissePool schnittstellen.Pool[sku.TransactedZettel, *sku.TransactedZettel]
 }
 
 func Make(kCli erworben.Cli, options Options) (u *Umwelt, err error) {
@@ -57,7 +57,7 @@ func Make(kCli erworben.Cli, options Options) (u *Umwelt, err error) {
 		in:                      os.Stdin,
 		out:                     os.Stdout,
 		err:                     os.Stderr,
-		zettelVerzeichnissePool: collections.MakePool[zettel.Transacted, *zettel.Transacted](),
+		zettelVerzeichnissePool: collections.MakePool[sku.TransactedZettel, *sku.TransactedZettel](),
 		erworbenCli:             kCli,
 	}
 

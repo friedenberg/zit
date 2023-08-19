@@ -9,8 +9,8 @@ import (
 	"github.com/friedenberg/zit/src/bravo/script_config"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
+	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/hotel/typ"
-	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/lima/store_objekten"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -81,7 +81,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	var zt *zettel.Transacted
+	var zt *sku.TransactedZettel
 
 	if zt, err = u.StoreObjekten().Zettel().ReadOne(&h); err != nil {
 		err = errors.Wrap(err)
@@ -89,7 +89,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	if e, ok := cwdFiles.GetZettel(&h); ok {
-		var ze zettel.External
+		var ze sku.ExternalZettel
 
 		ze, err = u.StoreObjekten().Zettel().ReadOneExternal(e, zt)
 

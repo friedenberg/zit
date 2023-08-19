@@ -14,6 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
+	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/mike/store_fs"
@@ -116,7 +117,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			return
 		}
 	} else {
-		var zts schnittstellen.MutableSetLike[*zettel.Transacted]
+		var zts schnittstellen.MutableSetLike[*sku.TransactedZettel]
 
 		if zts, err = c.readExistingFilesAsZettels(u, f, args...); err != nil {
 			err = errors.Wrap(err)
@@ -142,7 +143,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 			if zsc, err = u.StoreWorkingDirectory().Checkout(
 				options,
-				collections.WriterContainer[*zettel.Transacted](zts, collections.MakeErrStopIteration()),
+				collections.WriterContainer[*sku.TransactedZettel](zts, collections.MakeErrStopIteration()),
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -179,7 +180,7 @@ func (c New) readExistingFilesAsZettels(
 	u *umwelt.Umwelt,
 	f metadatei.TextParser,
 	args ...string,
-) (zts schnittstellen.MutableSetLike[*zettel.Transacted], err error) {
+) (zts schnittstellen.MutableSetLike[*sku.TransactedZettel], err error) {
 	opCreateFromPath := user_ops.CreateFromPaths{
 		Umwelt:      u,
 		TextParser:  f,

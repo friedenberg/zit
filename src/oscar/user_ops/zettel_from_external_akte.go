@@ -42,7 +42,7 @@ func (c ZettelFromExternalAkte) Run(
 	fds := iter.SortedValues(ms.GetFDs())
 
 	for _, fd := range fds {
-		var z *zettel.External
+		var z *sku.ExternalZettel
 
 		if z, err = c.zettelForAkte(fd); err != nil {
 			err = errors.Wrap(err)
@@ -62,7 +62,7 @@ func (c ZettelFromExternalAkte) Run(
 		if err = c.StoreObjekten().Zettel().ReadAll(
 			iter.MakeChain(
 				matcher.Match,
-				iter.AddClone[zettel.Transacted, *zettel.Transacted](results),
+				iter.AddClone[sku.TransactedZettel, *sku.TransactedZettel](results),
 			),
 		); err != nil {
 			err = errors.Wrap(err)
@@ -71,7 +71,7 @@ func (c ZettelFromExternalAkte) Run(
 	}
 
 	if err = results.Each(
-		func(z *zettel.Transacted) (err error) {
+		func(z *sku.TransactedZettel) (err error) {
 			if c.ProtoZettel.Apply(z) {
 				if z, err = c.StoreObjekten().Zettel().Update(
 					z,
@@ -103,7 +103,7 @@ func (c ZettelFromExternalAkte) Run(
 			return
 		}
 
-		var tz *zettel.Transacted
+		var tz *sku.TransactedZettel
 
 		if tz, err = c.StoreObjekten().Zettel().Create(z); err != nil {
 			err = errors.Wrap(err)
@@ -129,7 +129,7 @@ func (c ZettelFromExternalAkte) Run(
 	}
 
 	err = toDelete.Each(
-		func(z *zettel.External) (err error) {
+		func(z *sku.ExternalZettel) (err error) {
 			// TODO-P4 move to checkout store
 			if err = os.Remove(z.GetAkteFD().Path); err != nil {
 				err = errors.Wrap(err)
@@ -155,8 +155,8 @@ func (c ZettelFromExternalAkte) Run(
 
 func (c *ZettelFromExternalAkte) zettelForAkte(
 	akteFD kennung.FD,
-) (z *zettel.External, err error) {
-	z = &zettel.External{
+) (z *sku.ExternalZettel, err error) {
+	z = &sku.ExternalZettel{
 		FDs: sku.ExternalFDs{
 			Akte: akteFD,
 		},

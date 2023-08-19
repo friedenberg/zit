@@ -6,17 +6,18 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/golf/sku"
 )
 
 type WriterComplete struct {
 	wBuf         *bufio.Writer
-	chTransacted chan Transacted
+	chTransacted chan sku.TransactedZettel
 	chDone       chan struct{}
 }
 
 func MakeWriterComplete(w io.Writer) WriterComplete {
 	w1 := WriterComplete{
-		chTransacted: make(chan Transacted),
+		chTransacted: make(chan sku.TransactedZettel),
 		chDone:       make(chan struct{}),
 		wBuf:         bufio.NewWriter(w),
 	}
@@ -43,7 +44,9 @@ func MakeWriterComplete(w io.Writer) WriterComplete {
 	return w1
 }
 
-func (w *WriterComplete) WriteZettelVerzeichnisse(z *Transacted) (err error) {
+func (w *WriterComplete) WriteZettelVerzeichnisse(
+	z *sku.TransactedZettel,
+) (err error) {
 	select {
 	case <-w.chDone:
 		err = collections.MakeErrStopIteration()

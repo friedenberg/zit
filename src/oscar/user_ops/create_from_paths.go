@@ -29,7 +29,7 @@ type CreateFromPaths struct {
 
 func (c CreateFromPaths) Run(
 	args ...string,
-) (results schnittstellen.MutableSetLike[*zettel.Transacted], err error) {
+) (results schnittstellen.MutableSetLike[*sku.TransactedZettel], err error) {
 	// TODO-P3 support different modes of de-duplication
 	// TODO-P3 support merging of duplicated akten
 	toCreate := zettel_external.MakeMutableSetUniqueFD()
@@ -38,7 +38,7 @@ func (c CreateFromPaths) Run(
 	for _, arg := range args {
 		if err = c.zettelsFromPath(
 			arg,
-			func(z *zettel.External) (err error) {
+			func(z *sku.ExternalZettel) (err error) {
 				toCreate.Add(z)
 				if c.Delete {
 					toDelete.Add(z)
@@ -71,7 +71,7 @@ func (c CreateFromPaths) Run(
 		if err = c.StoreObjekten().Zettel().ReadAll(
 			iter.MakeChain(
 				matcher.Match,
-				iter.AddClone[zettel.Transacted, *zettel.Transacted](results),
+				iter.AddClone[sku.TransactedZettel, *sku.TransactedZettel](results),
 			),
 		); err != nil {
 			err = errors.Wrap(err)
@@ -85,9 +85,9 @@ func (c CreateFromPaths) Run(
 	}
 
 	err = results.Each(
-		func(z *zettel.Transacted) (err error) {
+		func(z *sku.TransactedZettel) (err error) {
 			if c.ProtoZettel.Apply(z) {
-				var zt *zettel.Transacted
+				var zt *sku.TransactedZettel
 
 				if zt, err = c.StoreObjekten().Zettel().Update(
 					z,
@@ -105,7 +105,7 @@ func (c CreateFromPaths) Run(
 	)
 
 	if err = toCreate.Each(
-		func(z *zettel.External) (err error) {
+		func(z *sku.ExternalZettel) (err error) {
 			if z.GetMetadatei().IsEmpty() {
 				return
 			}
@@ -114,7 +114,7 @@ func (c CreateFromPaths) Run(
 				External: *z,
 			}
 
-			var zt *zettel.Transacted
+			var zt *sku.TransactedZettel
 
 			if zt, err = c.StoreObjekten().Zettel().Create(z); err != nil {
 				// TODO-P2 add file for error handling
@@ -142,7 +142,7 @@ func (c CreateFromPaths) Run(
 			// TODO-P4 get matches
 			cz.DetermineState(true)
 
-			zv := &zettel.Transacted{}
+			zv := &sku.TransactedZettel{}
 
 			zv.ResetWith(cz.Internal)
 
@@ -156,7 +156,7 @@ func (c CreateFromPaths) Run(
 	}
 
 	if err = toDelete.Each(
-		func(z *zettel.External) (err error) {
+		func(z *sku.ExternalZettel) (err error) {
 			// TODO-P2 move to checkout store
 			if err = os.Remove(z.GetObjekteFD().Path); err != nil {
 				err = errors.Wrap(err)
@@ -181,7 +181,7 @@ func (c CreateFromPaths) Run(
 // TODO-P1 migrate this to use store_working_directory
 func (c *CreateFromPaths) zettelsFromPath(
 	p string,
-	wf schnittstellen.FuncIter[*zettel.External],
+	wf schnittstellen.FuncIter[*sku.ExternalZettel],
 ) (err error) {
 	var r io.Reader
 

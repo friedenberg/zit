@@ -40,7 +40,7 @@ func (e ExternalFDs) GetCheckoutMode() (m checkout_mode.Mode, err error) {
 		m = checkout_mode.ModeObjekteOnly
 
 	default:
-		err = MakeErrInvalidCheckoutMode(
+		err = checkout_mode.MakeErrInvalidCheckoutMode(
 			errors.Errorf("all FD's are empty"),
 		)
 	}

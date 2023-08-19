@@ -9,6 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/hotel/etikett"
 	"github.com/friedenberg/zit/src/hotel/kasten"
@@ -190,7 +191,7 @@ func (s *Store) ReadFiles(
 				var col objekte.CheckedOutLikePtr
 
 				switch et := e.(type) {
-				case *zettel.Transacted:
+				case *sku.TransactedZettel:
 					if col, err = zettelEMGR.ReadOne(*et); err != nil {
 						var errAkte store_objekten.ErrExternalAkteExtensionMismatch
 

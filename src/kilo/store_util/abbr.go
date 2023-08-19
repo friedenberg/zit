@@ -10,10 +10,10 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/tridex"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/hotel/etikett"
 	"github.com/friedenberg/zit/src/hotel/kasten"
 	"github.com/friedenberg/zit/src/hotel/typ"
-	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
 // TODO-P4 make generic
@@ -173,7 +173,7 @@ func (i *indexAbbr) AddMatchable(o kennung.Matchable) (err error) {
 	i.indexAbbrEncodableTridexes.Shas.Kennungen.Add(o.GetAkteSha().String())
 
 	switch to := o.(type) {
-	case *zettel.Transacted:
+	case *sku.TransactedZettel:
 		i.indexAbbrEncodableTridexes.Hinweis.Kopfen.Add(to.Kennung.Kopf())
 		i.indexAbbrEncodableTridexes.Hinweis.Schwanzen.Add(to.Kennung.Schwanz())
 

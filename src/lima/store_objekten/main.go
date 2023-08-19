@@ -49,7 +49,7 @@ type Store struct {
 
 func Make(
 	su store_util.StoreUtil,
-	p schnittstellen.Pool[zettel.Transacted, *zettel.Transacted],
+	p schnittstellen.Pool[sku.TransactedZettel, *sku.TransactedZettel],
 ) (s *Store, err error) {
 	s = &Store{
 		lock:      &sync.Mutex{},
@@ -93,7 +93,7 @@ func Make(
 
 	errors.TodoP1("implement for other gattung")
 	s.queriers = map[schnittstellen.GattungLike]objekte.FuncQuerierTransactedLikePtr{
-		gattung.Zettel: objekte.MakeApplyQueryTransactedLikePtr[*zettel.Transacted](
+		gattung.Zettel: objekte.MakeApplyQueryTransactedLikePtr[*sku.TransactedZettel](
 			s.zettelStore.Query,
 		),
 		gattung.Typ: objekte.MakeApplyQueryTransactedLikePtr[*typ.Transacted](
@@ -115,7 +115,7 @@ func Make(
 	}
 
 	s.readers = map[schnittstellen.GattungLike]objekte.FuncReaderTransactedLikePtr{
-		gattung.Zettel: objekte.MakeApplyTransactedLikePtr[*zettel.Transacted](
+		gattung.Zettel: objekte.MakeApplyTransactedLikePtr[*sku.TransactedZettel](
 			s.zettelStore.ReadAllSchwanzen,
 		),
 		gattung.Typ: objekte.MakeApplyTransactedLikePtr[*typ.Transacted](
@@ -137,7 +137,7 @@ func Make(
 	}
 
 	s.transactedReaders = map[schnittstellen.GattungLike]objekte.FuncReaderTransactedLikePtr{
-		gattung.Zettel: objekte.MakeApplyTransactedLikePtr[*zettel.Transacted](
+		gattung.Zettel: objekte.MakeApplyTransactedLikePtr[*sku.TransactedZettel](
 			s.zettelStore.ReadAll,
 		),
 		gattung.Typ: objekte.MakeApplyTransactedLikePtr[*typ.Transacted](

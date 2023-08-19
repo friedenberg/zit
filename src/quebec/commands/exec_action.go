@@ -11,7 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/juliett/zettel"
+	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
@@ -69,7 +69,7 @@ func (c ExecAction) RunWithQuery(
 
 	if err = u.StoreObjekten().Zettel().Query(
 		zids,
-		func(z *zettel.Transacted) (err error) {
+		func(z *sku.TransactedZettel) (err error) {
 			return hinweisen.Add(z.GetKennung())
 		},
 	); err != nil {

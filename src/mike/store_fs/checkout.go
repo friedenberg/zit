@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/id"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/delta/kennung"
+	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/hotel/etikett"
 	"github.com/friedenberg/zit/src/hotel/kasten"
 	"github.com/friedenberg/zit/src/hotel/objekte"
@@ -45,7 +46,7 @@ func (s *Store) CheckoutQuery(
 
 func (s *Store) Checkout(
 	options CheckoutOptions,
-	ztw schnittstellen.FuncIter[*zettel.Transacted],
+	ztw schnittstellen.FuncIter[*sku.TransactedZettel],
 ) (zcs zettel.MutableSetCheckedOut, err error) {
 	zcs = zettel.MakeMutableSetCheckedOutUnique(0)
 	zts := zettel.MakeMutableSetUnique(0)
@@ -54,7 +55,7 @@ func (s *Store) Checkout(
 		iter.MakeChain(
 			zettel.MakeWriterKonfig(s.erworben, s.storeObjekten.Typ()),
 			ztw,
-			iter.AddClone[zettel.Transacted, *zettel.Transacted](zts),
+			iter.AddClone[sku.TransactedZettel, *sku.TransactedZettel](zts),
 		),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -62,7 +63,7 @@ func (s *Store) Checkout(
 	}
 
 	if err = zts.Each(
-		func(zt *zettel.Transacted) (err error) {
+		func(zt *sku.TransactedZettel) (err error) {
 			var zc zettel.CheckedOut
 
 			if zc, err = s.CheckoutOneZettel(options, *zt); err != nil {
@@ -98,7 +99,7 @@ func (s Store) shouldCheckOut(
 
 func (s Store) filenameForZettelTransacted(
 	options CheckoutOptions,
-	sz zettel.Transacted,
+	sz sku.TransactedZettel,
 ) (originalFilename string, filename string, err error) {
 	if originalFilename, err = id.MakeDirIfNecessary(sz.GetKennung(), s.Cwd()); err != nil {
 		err = errors.Wrap(err)
@@ -115,7 +116,7 @@ func (s *Store) checkoutOneGeneric(
 	t objekte.TransactedLike,
 ) (cop objekte.CheckedOutLikePtr, err error) {
 	switch tt := t.(type) {
-	case *zettel.Transacted:
+	case *sku.TransactedZettel:
 		var co zettel.CheckedOut
 		co, err = s.CheckoutOneZettel(options, *tt)
 		cop = &co
@@ -143,7 +144,7 @@ func (s *Store) checkoutOneGeneric(
 
 func (s *Store) CheckoutOneZettel(
 	options CheckoutOptions,
-	sz zettel.Transacted,
+	sz sku.TransactedZettel,
 ) (cz zettel.CheckedOut, err error) {
 	cz.Internal = sz
 

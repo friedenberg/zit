@@ -5,6 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/india/konfig"
@@ -30,8 +31,7 @@ func MakeFormatterTypActionNames(
 
 func (e formatterTypActionNames) Format(
 	w io.Writer,
-	z *Transacted,
-) (n int64, err error) {
+	z *sku.TransactedZettel) (n int64, err error) {
 	e1 := typ.MakeFormatterActionNames()
 
 	ct := e.erworben.GetApproximatedTyp(z.GetMetadatei().GetTyp())

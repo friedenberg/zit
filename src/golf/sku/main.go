@@ -45,4 +45,16 @@ type (
 		SetFromSkuLike(SkuLike) error
 		Reset()
 	}
+
+	TransactedEtikett = Transacted[kennung.Etikett, *kennung.Etikett]
+	TransactedKasten  = Transacted[kennung.Kasten, *kennung.Kasten]
+	TransactedKonfig  = Transacted[kennung.Konfig, *kennung.Konfig]
+	TransactedTyp     = Transacted[kennung.Typ, *kennung.Typ]
+	TransactedZettel  = Transacted[kennung.Hinweis, *kennung.Hinweis]
+
+	ExternalEtikett = External[kennung.Etikett, *kennung.Etikett]
+	ExternalKasten  = External[kennung.Kasten, *kennung.Kasten]
+	ExternalKonfig  = External[kennung.Konfig, *kennung.Konfig]
+	ExternalTyp     = External[kennung.Typ, *kennung.Typ]
+	ExternalZettel  = External[kennung.Hinweis, *kennung.Hinweis]
 )
