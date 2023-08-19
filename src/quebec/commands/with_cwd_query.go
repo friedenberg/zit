@@ -8,9 +8,9 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/hotel/transacted"
-	"github.com/friedenberg/zit/src/juliett/zettel"
-	"github.com/friedenberg/zit/src/kilo/cwd"
+	"github.com/friedenberg/zit/src/india/transacted"
+	"github.com/friedenberg/zit/src/kilo/zettel"
+	"github.com/friedenberg/zit/src/lima/cwd"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 

@@ -6,20 +6,20 @@ import (
 	"github.com/friedenberg/zit/src/alfa/toml"
 	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/delta/typ_akte"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/golf/sku"
-	"github.com/friedenberg/zit/src/golf/transaktion"
-	"github.com/friedenberg/zit/src/hotel/objekte"
-	"github.com/friedenberg/zit/src/hotel/objekte_store"
-	"github.com/friedenberg/zit/src/hotel/transacted"
-	"github.com/friedenberg/zit/src/hotel/typ"
-	"github.com/friedenberg/zit/src/kilo/store_util"
+	"github.com/friedenberg/zit/src/hotel/sku"
+	"github.com/friedenberg/zit/src/india/transacted"
+	"github.com/friedenberg/zit/src/india/transaktion"
+	"github.com/friedenberg/zit/src/juliett/objekte"
+	"github.com/friedenberg/zit/src/lima/objekte_store"
+	"github.com/friedenberg/zit/src/mike/store_util"
 )
 
 type TypStore interface {
 	CommonStore[
-		typ.Akte,
-		*typ.Akte,
+		typ_akte.Akte,
+		*typ_akte.Akte,
 		kennung.Typ,
 		*kennung.Typ,
 	]
@@ -32,8 +32,8 @@ type TypTransactedReader = objekte_store.TransactedReader[
 
 type typStore struct {
 	*commonStore[
-		typ.Akte,
-		*typ.Akte,
+		typ_akte.Akte,
+		*typ_akte.Akte,
 		kennung.Typ,
 		*kennung.Typ,
 	]
@@ -45,8 +45,8 @@ func makeTypStore(
 	s = &typStore{}
 
 	s.commonStore, err = makeCommonStore[
-		typ.Akte,
-		*typ.Akte,
+		typ_akte.Akte,
+		*typ_akte.Akte,
 		kennung.Typ,
 		*kennung.Typ,
 	](
@@ -54,9 +54,9 @@ func makeTypStore(
 		s,
 		sa,
 		s,
-		objekte_store.MakeAkteFormat[typ.Akte, *typ.Akte](
-			objekte.MakeTextParserIgnoreTomlErrors[typ.Akte](sa),
-			objekte.ParsedAkteTomlFormatter[typ.Akte]{},
+		objekte_store.MakeAkteFormat[typ_akte.Akte, *typ_akte.Akte](
+			objekte.MakeTextParserIgnoreTomlErrors[typ_akte.Akte](sa),
+			objekte.ParsedAkteTomlFormatter[typ_akte.Akte]{},
 			sa,
 		),
 	)
@@ -78,8 +78,8 @@ func makeTypStore(
 	}
 
 	s.commonStore.CreateOrUpdater = objekte_store.MakeCreateOrUpdate[
-		typ.Akte,
-		*typ.Akte,
+		typ_akte.Akte,
+		*typ_akte.Akte,
 		kennung.Typ,
 		*kennung.Typ,
 	](

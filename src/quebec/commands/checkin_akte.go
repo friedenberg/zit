@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/hotel/transacted"
+	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 

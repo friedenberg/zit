@@ -8,9 +8,9 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/golf/sku"
-	"github.com/friedenberg/zit/src/india/konfig"
+	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/objekte_collections"
+	"github.com/friedenberg/zit/src/kilo/konfig"
 )
 
 type Flags struct {

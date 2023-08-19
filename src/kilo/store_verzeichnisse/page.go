@@ -13,8 +13,8 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/hotel/transacted"
-	"github.com/friedenberg/zit/src/juliett/zettel"
+	"github.com/friedenberg/zit/src/india/transacted"
+	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 
 type Page struct {

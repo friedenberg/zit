@@ -3,7 +3,7 @@ package zettel_external
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
-	"github.com/friedenberg/zit/src/hotel/external"
+	"github.com/friedenberg/zit/src/india/external"
 )
 
 type MutableSet = schnittstellen.MutableSetLike[*external.Zettel]

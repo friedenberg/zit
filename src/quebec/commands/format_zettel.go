@@ -7,12 +7,12 @@ import (
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
 	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/script_config"
+	"github.com/friedenberg/zit/src/delta/typ_akte"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
-	"github.com/friedenberg/zit/src/hotel/external"
-	"github.com/friedenberg/zit/src/hotel/transacted"
-	"github.com/friedenberg/zit/src/hotel/typ"
-	"github.com/friedenberg/zit/src/kilo/cwd"
+	"github.com/friedenberg/zit/src/india/external"
+	"github.com/friedenberg/zit/src/india/transacted"
+	"github.com/friedenberg/zit/src/lima/cwd"
 	"github.com/friedenberg/zit/src/lima/store_objekten"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
@@ -118,7 +118,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	var akteFormatter script_config.RemoteScript
 
 	if typKonfig != nil {
-		var typAkte *typ.Akte
+		var typAkte *typ_akte.Akte
 
 		if typAkte, err = u.StoreObjekten().Typ().GetAkte(typKonfig.GetAkteSha()); err != nil {
 			err = errors.Wrap(err)

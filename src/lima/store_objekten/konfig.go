@@ -7,12 +7,12 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/golf/sku"
-	"github.com/friedenberg/zit/src/golf/transaktion"
-	"github.com/friedenberg/zit/src/hotel/erworben"
-	"github.com/friedenberg/zit/src/hotel/objekte"
-	"github.com/friedenberg/zit/src/hotel/objekte_store"
-	"github.com/friedenberg/zit/src/kilo/store_util"
+	"github.com/friedenberg/zit/src/hotel/sku"
+	"github.com/friedenberg/zit/src/india/erworben"
+	"github.com/friedenberg/zit/src/india/transaktion"
+	"github.com/friedenberg/zit/src/juliett/objekte"
+	"github.com/friedenberg/zit/src/lima/objekte_store"
+	"github.com/friedenberg/zit/src/mike/store_util"
 )
 
 type KonfigStore interface {

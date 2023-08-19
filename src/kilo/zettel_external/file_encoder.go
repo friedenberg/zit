@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
-	"github.com/friedenberg/zit/src/hotel/external"
+	"github.com/friedenberg/zit/src/india/external"
 )
 
 type fileEncoder struct {

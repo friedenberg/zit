@@ -5,7 +5,7 @@ import (
 	"path"
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/golf/sku"
+	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
 func (s *Store) FileExtensionForGattung(

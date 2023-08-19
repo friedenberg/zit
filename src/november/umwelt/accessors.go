@@ -6,8 +6,8 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/hotel/transacted"
-	"github.com/friedenberg/zit/src/india/konfig"
+	"github.com/friedenberg/zit/src/india/transacted"
+	"github.com/friedenberg/zit/src/kilo/konfig"
 	"github.com/friedenberg/zit/src/lima/store_objekten"
 	"github.com/friedenberg/zit/src/mike/store_fs"
 )

@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/alfred"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/hotel/transacted"
+	"github.com/friedenberg/zit/src/india/transacted"
 )
 
 func (w *Writer) zettelToItem(

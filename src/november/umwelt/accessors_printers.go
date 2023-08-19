@@ -7,9 +7,9 @@ import (
 	"github.com/friedenberg/zit/src/charlie/string_format_writer"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/golf/sku"
-	"github.com/friedenberg/zit/src/hotel/objekte"
-	"github.com/friedenberg/zit/src/hotel/sku_formats"
+	"github.com/friedenberg/zit/src/hotel/sku"
+	"github.com/friedenberg/zit/src/india/sku_formats"
+	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/mike/store_fs"
 )
 

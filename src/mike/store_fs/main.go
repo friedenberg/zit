@@ -9,18 +9,19 @@ import (
 	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/delta/checked_out_state"
 	"github.com/friedenberg/zit/src/delta/standort"
+	"github.com/friedenberg/zit/src/delta/typ_akte"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/golf/sku"
-	"github.com/friedenberg/zit/src/hotel/erworben"
-	"github.com/friedenberg/zit/src/hotel/etikett"
-	"github.com/friedenberg/zit/src/hotel/kasten"
-	"github.com/friedenberg/zit/src/hotel/objekte"
-	"github.com/friedenberg/zit/src/hotel/objekte_store"
-	"github.com/friedenberg/zit/src/hotel/transacted"
-	"github.com/friedenberg/zit/src/hotel/typ"
-	"github.com/friedenberg/zit/src/india/konfig"
-	"github.com/friedenberg/zit/src/juliett/zettel"
-	"github.com/friedenberg/zit/src/kilo/cwd"
+	"github.com/friedenberg/zit/src/hotel/sku"
+	"github.com/friedenberg/zit/src/india/erworben"
+	"github.com/friedenberg/zit/src/india/kasten"
+	"github.com/friedenberg/zit/src/india/transacted"
+	"github.com/friedenberg/zit/src/juliett/objekte"
+	"github.com/friedenberg/zit/src/kilo/checked_out"
+	"github.com/friedenberg/zit/src/kilo/etikett"
+	"github.com/friedenberg/zit/src/kilo/konfig"
+	"github.com/friedenberg/zit/src/kilo/zettel"
+	"github.com/friedenberg/zit/src/lima/cwd"
+	"github.com/friedenberg/zit/src/lima/objekte_store"
 	"github.com/friedenberg/zit/src/lima/store_objekten"
 )
 
@@ -166,8 +167,8 @@ func (s *Store) ReadFiles(
 	)
 
 	typEMGR := objekte_store.MakeExternalMaybeGetterReader[
-		typ.Akte,
-		*typ.Akte,
+		typ_akte.Akte,
+		*typ_akte.Akte,
 		kennung.Typ,
 		*kennung.Typ,
 	](
@@ -298,7 +299,7 @@ func (s *Store) ReadFiles(
 
 					err = nil
 
-					var tco typ.CheckedOut
+					var tco checked_out.Typ
 
 					if tco.External, err = s.storeObjekten.Typ().ReadOneExternal(
 						il,

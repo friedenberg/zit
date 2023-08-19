@@ -6,8 +6,8 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/alfred"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/kennung_index"
-	"github.com/friedenberg/zit/src/hotel/transacted"
+	"github.com/friedenberg/zit/src/golf/kennung_index"
+	"github.com/friedenberg/zit/src/india/transacted"
 )
 
 type Writer struct {

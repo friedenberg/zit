@@ -6,11 +6,12 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/delta/typ_akte"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/golf/sku"
-	"github.com/friedenberg/zit/src/hotel/typ"
-	"github.com/friedenberg/zit/src/india/konfig"
-	"github.com/friedenberg/zit/src/juliett/zettel"
+	"github.com/friedenberg/zit/src/hotel/sku"
+	"github.com/friedenberg/zit/src/kilo/konfig"
+	"github.com/friedenberg/zit/src/kilo/typ"
+	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 
 type funcFormat = schnittstellen.FuncIter[sku.SkuLikePtr]
@@ -51,7 +52,7 @@ func MakeFormatter(
 	out io.Writer,
 	af schnittstellen.AkteIOFactory,
 	k konfig.Compiled,
-	tagp schnittstellen.AkteGetterPutter[*typ.Akte],
+	tagp schnittstellen.AkteGetterPutter[*typ_akte.Akte],
 ) (fo Formatter, err error) {
 	f := formatter{
 		formatters: make(map[gattung.Gattung]funcFormat),

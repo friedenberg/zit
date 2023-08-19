@@ -5,7 +5,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/golf/sku"
+	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
 type SetPrefixNamed map[kennung.Etikett]schnittstellen.MutableSetLike[sku.SkuLike]

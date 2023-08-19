@@ -3,7 +3,7 @@ package remote_push
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/golf/sku"
+	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/november/umwelt"
 	"github.com/friedenberg/zit/src/oscar/remote_conn"
 )

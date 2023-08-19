@@ -11,9 +11,9 @@ import (
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/age_io"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/hotel/objekte_store"
-	"github.com/friedenberg/zit/src/hotel/transacted"
-	"github.com/friedenberg/zit/src/juliett/zettel"
+	"github.com/friedenberg/zit/src/india/transacted"
+	"github.com/friedenberg/zit/src/kilo/zettel"
+	"github.com/friedenberg/zit/src/lima/objekte_store"
 )
 
 func (s Store) ReadExternalZettelFromAktePath(

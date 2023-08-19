@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/kennung_index"
+	"github.com/friedenberg/zit/src/golf/kennung_index"
 	"github.com/friedenberg/zit/src/kilo/alfred"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )

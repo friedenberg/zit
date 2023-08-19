@@ -16,8 +16,8 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/hotel/erworben"
-	"github.com/friedenberg/zit/src/hotel/typ"
+	"github.com/friedenberg/zit/src/india/erworben"
+	"github.com/friedenberg/zit/src/kilo/typ"
 )
 
 type Einleitung struct {

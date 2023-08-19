@@ -16,15 +16,15 @@ import (
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
-	"github.com/friedenberg/zit/src/golf/sku"
-	"github.com/friedenberg/zit/src/hotel/erworben"
-	"github.com/friedenberg/zit/src/hotel/objekte_store"
-	"github.com/friedenberg/zit/src/hotel/transacted"
-	"github.com/friedenberg/zit/src/india/konfig"
+	"github.com/friedenberg/zit/src/hotel/sku"
+	"github.com/friedenberg/zit/src/india/erworben"
+	"github.com/friedenberg/zit/src/india/transacted"
+	"github.com/friedenberg/zit/src/kilo/konfig"
 	"github.com/friedenberg/zit/src/kilo/organize_text"
-	"github.com/friedenberg/zit/src/kilo/store_util"
+	"github.com/friedenberg/zit/src/lima/objekte_store"
 	"github.com/friedenberg/zit/src/lima/store_objekten"
 	"github.com/friedenberg/zit/src/mike/store_fs"
+	"github.com/friedenberg/zit/src/mike/store_util"
 )
 
 type Umwelt struct {

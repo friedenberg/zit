@@ -1,66 +1,66 @@
 #! /bin/bash -e
 
 ag_print_matching() (
-	query="$1"
-	shift
+  query="$1"
+  shift
 
-	ag "$query" \
+  ag "$query" \
     --go \
-		--only-matching \
-		--no-file \
-		--no-color \
-		--no-group \
-		--no-break \
-		"$@"
+    --only-matching \
+    --no-file \
+    --no-color \
+    --no-group \
+    --no-break \
+    "$@"
 )
 
 ag_print_matching_with_file() (
-	query="github.com/friedenberg/zit/src/$1"
+  query="github.com/friedenberg/zit/src/$1"
   shift
 
-	ag "$query" \
+  ag "$query" \
     --go \
-		--only-matching \
-		--no-number \
-		--no-color \
-		--no-group \
-		--no-break \
-		"$@"
+    --only-matching \
+    --no-number \
+    --no-color \
+    --no-group \
+    --no-break \
+    "$@"
 )
 
 print_matches() (
-	path="$1"
-	ag_print_matching 'github.com/friedenberg/zit/src/[\w/]+' "$path" | sort -u
+  path="$1"
+  ag_print_matching 'github.com/friedenberg/zit/src/[\w/]+' "$path" | sort -u
 )
 
 print_basenames() (
-	while IFS= read -r; do
+  while IFS= read -r; do
     echo "${REPLY#github.com/friedenberg/zit/src/}"
-	done
+  done
 )
 
 print_final() (
-	dir="$(dirname "$1")"
-	dep="$2"
+  dir="$(dirname "$1")"
+  dep="$2"
 
-	w="25"
-	printf "%${w}s %${w}s\n" "$dir" "$dep"
+  w="25"
+  printf "%${w}s %${w}s\n" "$dir" "$dep"
 )
 
 export -f print_final
 
 print_package_locations() (
-	loc="$1"
-	while IFS= read -r; do
-		ag_print_matching_with_file "$REPLY" "$loc" </dev/null |
-			tr -d ' ' |
-			sed -e 's#github.com/friedenberg/zit/##g; s/"//g' |
-			xargs -L2 bash -c 'print_final "$@"' "$REPLY" |
-			sort -u
-	done
+  loc="$1"
+  while IFS= read -r; do
+    ag_print_matching_with_file "$REPLY" "$loc" </dev/null |
+      tr -d ' ' |
+      sed -e 's#github.com/friedenberg/zit/##g; s/"//g' |
+      xargs -L2 bash -c 'print_final "$@"' "$REPLY" |
+      sort -u
+  done
 )
 
 print_matches "$1" |
-	print_basenames |
-	print_package_locations "$1" |
-  sort -u
+  print_basenames |
+  print_package_locations "$1" |
+  sort -u -b -k2

@@ -12,19 +12,19 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/hinweisen"
 	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/delta/typ_akte"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
-	"github.com/friedenberg/zit/src/golf/sku"
-	"github.com/friedenberg/zit/src/hotel/external"
-	"github.com/friedenberg/zit/src/hotel/objekte"
-	"github.com/friedenberg/zit/src/hotel/objekte_store"
-	"github.com/friedenberg/zit/src/hotel/sku_formats"
-	"github.com/friedenberg/zit/src/hotel/transacted"
-	"github.com/friedenberg/zit/src/hotel/typ"
-	"github.com/friedenberg/zit/src/juliett/zettel"
-	"github.com/friedenberg/zit/src/kilo/cwd"
-	"github.com/friedenberg/zit/src/kilo/store_util"
+	"github.com/friedenberg/zit/src/hotel/sku"
+	"github.com/friedenberg/zit/src/india/external"
+	"github.com/friedenberg/zit/src/india/sku_formats"
+	"github.com/friedenberg/zit/src/india/transacted"
+	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/store_verzeichnisse"
+	"github.com/friedenberg/zit/src/kilo/zettel"
+	"github.com/friedenberg/zit/src/lima/cwd"
+	"github.com/friedenberg/zit/src/lima/objekte_store"
+	"github.com/friedenberg/zit/src/mike/store_util"
 )
 
 type ZettelStore interface {
@@ -63,13 +63,13 @@ type zettelStore struct {
 
 	verzeichnisseSchwanzen *verzeichnisseSchwanzen
 	verzeichnisseAll       *store_verzeichnisse.Zettelen
-	tagp                   schnittstellen.AkteGetterPutter[*typ.Akte]
+	tagp                   schnittstellen.AkteGetterPutter[*typ_akte.Akte]
 }
 
 func makeZettelStore(
 	sa store_util.StoreUtil,
 	p schnittstellen.Pool[transacted.Zettel, *transacted.Zettel],
-	tagp schnittstellen.AkteGetterPutter[*typ.Akte],
+	tagp schnittstellen.AkteGetterPutter[*typ_akte.Akte],
 ) (s *zettelStore, err error) {
 	s = &zettelStore{
 		protoZettel: zettel.MakeProtoZettel(sa.GetKonfig()),

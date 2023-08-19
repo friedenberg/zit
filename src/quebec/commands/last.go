@@ -6,10 +6,10 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/gattungen"
-	"github.com/friedenberg/zit/src/golf/sku"
-	"github.com/friedenberg/zit/src/golf/transaktion"
-	"github.com/friedenberg/zit/src/hotel/sku_formats"
-	"github.com/friedenberg/zit/src/india/bestandsaufnahme"
+	"github.com/friedenberg/zit/src/hotel/sku"
+	"github.com/friedenberg/zit/src/india/sku_formats"
+	"github.com/friedenberg/zit/src/india/transaktion"
+	"github.com/friedenberg/zit/src/kilo/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 

@@ -2,8 +2,8 @@ package user_ops
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/hotel/transacted"
-	"github.com/friedenberg/zit/src/juliett/zettel"
+	"github.com/friedenberg/zit/src/india/transacted"
+	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/mike/store_fs"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )

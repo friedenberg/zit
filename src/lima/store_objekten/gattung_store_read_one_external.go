@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/golf/sku"
+	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
 func (s *commonStore[O, OPtr, K, KPtr]) ReadOneExternal(

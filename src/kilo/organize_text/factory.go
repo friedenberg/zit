@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/golf/sku"
+	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/objekte_collections"
 )
 

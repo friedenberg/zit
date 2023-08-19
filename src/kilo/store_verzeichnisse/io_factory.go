@@ -1,6 +1,6 @@
 package store_verzeichnisse
 
-import "github.com/friedenberg/zit/src/hotel/transacted"
+import "github.com/friedenberg/zit/src/india/transacted"
 
 type PageDelegate interface {
 	ShouldAddVerzeichnisse(*transacted.Zettel) error

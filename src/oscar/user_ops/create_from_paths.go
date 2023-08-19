@@ -10,12 +10,12 @@ import (
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
-	"github.com/friedenberg/zit/src/golf/sku"
-	"github.com/friedenberg/zit/src/hotel/external"
-	"github.com/friedenberg/zit/src/hotel/objekte_store"
-	"github.com/friedenberg/zit/src/hotel/transacted"
-	"github.com/friedenberg/zit/src/juliett/zettel"
+	"github.com/friedenberg/zit/src/hotel/sku"
+	"github.com/friedenberg/zit/src/india/external"
+	"github.com/friedenberg/zit/src/india/transacted"
+	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/kilo/zettel_external"
+	"github.com/friedenberg/zit/src/lima/objekte_store"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 

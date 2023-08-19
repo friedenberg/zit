@@ -11,11 +11,11 @@ import (
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/age_io"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/kennung_index"
-	"github.com/friedenberg/zit/src/golf/sku"
-	"github.com/friedenberg/zit/src/hotel/sku_formats"
-	"github.com/friedenberg/zit/src/india/bestandsaufnahme"
-	"github.com/friedenberg/zit/src/juliett/zettel"
+	"github.com/friedenberg/zit/src/golf/kennung_index"
+	"github.com/friedenberg/zit/src/hotel/sku"
+	"github.com/friedenberg/zit/src/india/sku_formats"
+	"github.com/friedenberg/zit/src/kilo/bestandsaufnahme"
+	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 

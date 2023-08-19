@@ -7,12 +7,12 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/hotel/etikett"
-	"github.com/friedenberg/zit/src/hotel/kasten"
-	"github.com/friedenberg/zit/src/hotel/objekte"
-	"github.com/friedenberg/zit/src/hotel/typ"
-	"github.com/friedenberg/zit/src/juliett/zettel"
-	"github.com/friedenberg/zit/src/kilo/cwd"
+	"github.com/friedenberg/zit/src/india/kasten"
+	"github.com/friedenberg/zit/src/juliett/objekte"
+	"github.com/friedenberg/zit/src/kilo/checked_out"
+	"github.com/friedenberg/zit/src/kilo/etikett"
+	"github.com/friedenberg/zit/src/kilo/zettel"
+	"github.com/friedenberg/zit/src/lima/cwd"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
@@ -54,7 +54,7 @@ func (c Checkin) Run(
 						return
 					}
 
-				case *typ.CheckedOut:
+				case *checked_out.Typ:
 					if _, err = u.StoreObjekten().Typ().CreateOrUpdateCheckedOut(
 						aco,
 					); err != nil {

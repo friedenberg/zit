@@ -19,8 +19,8 @@ import (
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
-	"github.com/friedenberg/zit/src/hotel/objekte"
-	"github.com/friedenberg/zit/src/kilo/cwd"
+	"github.com/friedenberg/zit/src/juliett/objekte"
+	"github.com/friedenberg/zit/src/lima/cwd"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 

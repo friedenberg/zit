@@ -11,7 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/golf/sku"
+	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
 func makeObj(
