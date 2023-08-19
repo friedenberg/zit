@@ -1,6 +1,6 @@
 package script_config
 
-import "github.com/friedenberg/zit/src/charlie/collections"
+import "github.com/friedenberg/zit/src/bravo/equality"
 
 type WithOutputFormat struct {
 	ScriptConfig
@@ -10,7 +10,7 @@ type WithOutputFormat struct {
 }
 
 func (a WithOutputFormat) Equals(b WithOutputFormat) bool {
-	if !collections.EqualSliceOrdered(a.UTIS, b.UTIS) {
+	if !equality.SliceOrdered(a.UTIS, b.UTIS) {
 		return false
 	}
 

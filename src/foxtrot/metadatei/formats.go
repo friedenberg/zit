@@ -2,7 +2,7 @@ package metadatei
 
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/script_config"
+	"github.com/friedenberg/zit/src/charlie/script_config"
 )
 
 type TextFormat struct {

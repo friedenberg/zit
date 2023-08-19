@@ -5,7 +5,8 @@ import (
 	"os/exec"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/alfa/reset"
+	"github.com/friedenberg/zit/src/bravo/equality"
 )
 
 type ScriptConfig struct {
@@ -24,8 +25,8 @@ func (a *ScriptConfig) Reset() {
 	a.Description = ""
 	a.Script = ""
 
-	a.Shell = collections.ResetSlice(a.Shell)
-	a.Env = collections.ResetMap(a.Env)
+	a.Shell = reset.Slice(a.Shell)
+	a.Env = reset.Map(a.Env)
 }
 
 func (a ScriptConfig) Equals(b ScriptConfig) bool {
@@ -49,7 +50,7 @@ func (a ScriptConfig) Equals(b ScriptConfig) bool {
 		return false
 	}
 
-	if !collections.EqualMapsOrdered(a.Env, b.Env) {
+	if !equality.MapsOrdered(a.Env, b.Env) {
 		return false
 	}
 

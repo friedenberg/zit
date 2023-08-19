@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/ohio"
-	"github.com/friedenberg/zit/src/bravo/script_config"
+	"github.com/friedenberg/zit/src/charlie/script_config"
 )
 
 type textFormatter struct {

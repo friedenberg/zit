@@ -3,10 +3,10 @@ package typ
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/etikett_rule"
+	"github.com/friedenberg/zit/src/alfa/reset"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
-	"github.com/friedenberg/zit/src/bravo/script_config"
-	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/charlie/script_config"
 )
 
 type Akte struct {
@@ -33,10 +33,10 @@ func (a *Akte) Reset() {
 	a.ExecCommand = nil
 	a.VimSyntaxType = ""
 
-	a.FormatterUTIGroups = collections.ResetMap(a.FormatterUTIGroups)
-	a.Formatters = collections.ResetMap(a.Formatters)
-	a.Actions = collections.ResetMap(a.Actions)
-	a.EtikettenRules = collections.ResetMap(a.EtikettenRules)
+	a.FormatterUTIGroups = reset.Map(a.FormatterUTIGroups)
+	a.Formatters = reset.Map(a.Formatters)
+	a.Actions = reset.Map(a.Actions)
+	a.EtikettenRules = reset.Map(a.EtikettenRules)
 }
 
 func (a *Akte) ResetWith(b Akte) {

@@ -1,11 +1,11 @@
-package collections
+package equality
 
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"golang.org/x/exp/constraints"
 )
 
-func EqualMapsEquatable[K constraints.Ordered, V schnittstellen.Equatable[V]](
+func MapsEquatable[K constraints.Ordered, V schnittstellen.Equatable[V]](
 	a, b map[K]V,
 ) bool {
 	if len(a) != len(b) {
@@ -27,7 +27,7 @@ func EqualMapsEquatable[K constraints.Ordered, V schnittstellen.Equatable[V]](
 	return true
 }
 
-func EqualMapsOrdered[K constraints.Ordered, V constraints.Ordered](
+func MapsOrdered[K constraints.Ordered, V constraints.Ordered](
 	a, b map[K]V,
 ) bool {
 	if len(a) != len(b) {
@@ -49,7 +49,7 @@ func EqualMapsOrdered[K constraints.Ordered, V constraints.Ordered](
 	return true
 }
 
-func EqualSliceOrdered[V constraints.Ordered](
+func SliceOrdered[V constraints.Ordered](
 	a, b []V,
 ) bool {
 	if len(a) != len(b) {

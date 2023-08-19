@@ -6,12 +6,12 @@ import (
 	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
-	"github.com/friedenberg/zit/src/hotel/objekte"
+	"github.com/friedenberg/zit/src/golf/sku"
 )
 
 type ObjekteSaver interface {
-	SaveObjekte(objekte.StoredLikePtr) error
-	SaveObjekteIncludeTai(objekte.StoredLikePtr) error
+	SaveObjekte(sku.SkuLikePtr) error
+	SaveObjekteIncludeTai(sku.SkuLikePtr) error
 }
 
 type objekteSaver struct {
@@ -39,7 +39,7 @@ func MakeObjekteSaver(
 }
 
 func (h objekteSaver) SaveObjekte(
-	tl objekte.StoredLikePtr,
+	tl sku.SkuLikePtr,
 ) (err error) {
 	var w sha.WriteCloser
 
@@ -69,7 +69,7 @@ func (h objekteSaver) SaveObjekte(
 }
 
 func (h objekteSaver) SaveObjekteIncludeTai(
-	tl objekte.StoredLikePtr,
+	tl sku.SkuLikePtr,
 ) (err error) {
 	var w sha.WriteCloser
 

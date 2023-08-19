@@ -1,6 +1,6 @@
 package typ
 
-import "github.com/friedenberg/zit/src/charlie/collections"
+import "github.com/friedenberg/zit/src/bravo/equality"
 
 type FormatterUTIGroup map[string]string
 
@@ -17,7 +17,7 @@ func (a *FormatterUTIGroup) Equals(b FormatterUTIGroup) bool {
 		return false
 	}
 
-	if !collections.EqualMapsOrdered(a.Map(), b.Map()) {
+	if !equality.MapsOrdered(a.Map(), b.Map()) {
 		return false
 	}
 

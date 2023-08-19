@@ -5,7 +5,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/script_config"
+	"github.com/friedenberg/zit/src/charlie/script_config"
 )
 
 type formatterActionNames struct{}

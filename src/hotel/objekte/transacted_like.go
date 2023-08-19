@@ -3,18 +3,8 @@ package objekte
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/golf/sku"
 )
-
-type StoredLikePtr interface {
-	metadatei.Getter
-	metadatei.Setter
-	GetAkteSha() schnittstellen.ShaLike
-	SetAkteSha(schnittstellen.ShaLike)
-	SetObjekteSha(schnittstellen.ShaLike)
-	GetKennungLike() kennung.Kennung
-}
 
 type (
 	FuncReaderTransacted[T sku.SkuLike]       func(schnittstellen.FuncIter[T]) error

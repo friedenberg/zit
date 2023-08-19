@@ -2,7 +2,7 @@ package typ
 
 import (
 	"github.com/friedenberg/zit/src/alfa/etikett_rule"
-	"github.com/friedenberg/zit/src/bravo/script_config"
+	"github.com/friedenberg/zit/src/charlie/script_config"
 	"github.com/friedenberg/zit/src/delta/kennung"
 )
 
