@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/golf/sku"
+	"github.com/friedenberg/zit/src/hotel/transacted"
 	"github.com/friedenberg/zit/src/india/konfig"
 )
 
@@ -20,7 +20,7 @@ const (
 type Zettelen struct {
 	erworben konfig.Compiled
 	path     string
-	pool     schnittstellen.Pool[sku.TransactedZettel, *sku.TransactedZettel]
+	pool     schnittstellen.Pool[transacted.Zettel, *transacted.Zettel]
 	schnittstellen.VerzeichnisseFactory
 	pages [PageCount]*Page
 }
@@ -34,7 +34,7 @@ func MakeZettelen(
 	k konfig.Compiled,
 	dir string,
 	f schnittstellen.VerzeichnisseFactory,
-	p schnittstellen.Pool[sku.TransactedZettel, *sku.TransactedZettel],
+	p schnittstellen.Pool[transacted.Zettel, *transacted.Zettel],
 	fff PageDelegateGetter,
 ) (i *Zettelen, err error) {
 	i = &Zettelen{
@@ -56,7 +56,7 @@ func MakeZettelen(
 	return
 }
 
-func (i Zettelen) Pool() schnittstellen.Pool[sku.TransactedZettel, *sku.TransactedZettel] {
+func (i Zettelen) Pool() schnittstellen.Pool[transacted.Zettel, *transacted.Zettel] {
 	errors.TodoP4("rename to GetPool")
 	return i.pool
 }
@@ -100,7 +100,7 @@ func (i *Zettelen) Flush() (err error) {
 }
 
 func (i *Zettelen) AddVerzeichnisse(
-	tz *sku.TransactedZettel,
+	tz *transacted.Zettel,
 	v string,
 ) (err error) {
 	var n int
@@ -129,7 +129,7 @@ func (i *Zettelen) AddVerzeichnisse(
 }
 
 func (i *Zettelen) GetPageIndexKeyValue(
-	zt sku.TransactedZettel,
+	zt transacted.Zettel,
 ) (key string, value string) {
 	key = zt.Kennung.String()
 	value = fmt.Sprintf("%s.%s", zt.GetTai(), zt.ObjekteSha)
@@ -137,7 +137,7 @@ func (i *Zettelen) GetPageIndexKeyValue(
 }
 
 func (i *Zettelen) ReadMany(
-	ws ...schnittstellen.FuncIter[*sku.TransactedZettel],
+	ws ...schnittstellen.FuncIter[*transacted.Zettel],
 ) (err error) {
 	errors.TodoP3("switch to single writer and force callers to make chains")
 
@@ -156,7 +156,7 @@ func (i *Zettelen) ReadMany(
 		}
 	}
 
-	w := collections.MakePooledChain[sku.TransactedZettel](
+	w := collections.MakePooledChain[transacted.Zettel](
 		i.pool,
 		ws...,
 	)

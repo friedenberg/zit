@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/golf/sku"
+	"github.com/friedenberg/zit/src/hotel/transacted"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/india/konfig"
 )
@@ -27,7 +27,7 @@ func MakeFormatterTypFormatterUTIGroups(
 
 func (e formatterTypFormatterUTIGroups) Format(
 	w io.Writer,
-	z *sku.TransactedZettel) (n int64, err error) {
+	z *transacted.Zettel) (n int64, err error) {
 	e1 := typ.MakeFormatterFormatterUTIGroups()
 
 	ct := e.erworben.GetApproximatedTyp(

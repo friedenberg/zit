@@ -5,8 +5,8 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
+	"github.com/friedenberg/zit/src/hotel/transacted"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/store_util"
 	"github.com/friedenberg/zit/src/kilo/store_verzeichnisse"
@@ -20,7 +20,7 @@ type verzeichnisseSchwanzen struct {
 
 func makeVerzeichnisseSchwanzen(
 	sa store_util.StoreUtil,
-	p schnittstellen.Pool[sku.TransactedZettel, *sku.TransactedZettel],
+	p schnittstellen.Pool[transacted.Zettel, *transacted.Zettel],
 ) (s *verzeichnisseSchwanzen, err error) {
 	s = &verzeichnisseSchwanzen{
 		su: sa,
@@ -57,7 +57,7 @@ func (s *verzeichnisseSchwanzen) Flush() (err error) {
 
 func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 	h kennung.Hinweis,
-) (found *sku.TransactedZettel, err error) {
+) (found *transacted.Zettel, err error) {
 	var n int
 
 	if n, err = s.Zettelen.PageForHinweis(h); err != nil {
@@ -67,12 +67,12 @@ func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 
 	errors.Log().Printf("searching page %d", n)
 
-	w := func(zv *sku.TransactedZettel) (err error) {
+	w := func(zv *transacted.Zettel) (err error) {
 		if !zv.GetKennung().Equals(h) {
 			return
 		}
 
-		found = &sku.TransactedZettel{}
+		found = &transacted.Zettel{}
 		found.ResetWith(*zv)
 
 		err = collections.MakeErrStopIteration()

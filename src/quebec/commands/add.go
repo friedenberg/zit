@@ -14,7 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/golf/sku"
+	"github.com/friedenberg/zit/src/hotel/transacted"
 	"github.com/friedenberg/zit/src/india/objekte_collections"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/cwd"
@@ -107,7 +107,7 @@ func (c Add) RunWithCwdQuery(
 	otFlags.RootEtiketten = c.Metadatei.Etiketten
 	mwk := objekte_collections.MakeMutableSetMetadateiWithKennung()
 	zettelsFromAkteResults.Each(
-		func(z *sku.TransactedZettel) (err error) {
+		func(z *transacted.Zettel) (err error) {
 			return mwk.Add(z.GetSkuLike())
 		},
 	)
@@ -196,7 +196,7 @@ func (c Add) openAktenIfNecessary(
 	hs := collections_value.MakeMutableValueSet[kennung.Hinweis](nil)
 
 	zettels.Each(
-		func(z *sku.TransactedZettel) (err error) {
+		func(z *transacted.Zettel) (err error) {
 			return hs.Add(z.GetKennung())
 		},
 	)
@@ -210,7 +210,7 @@ func (c Add) openAktenIfNecessary(
 
 	if checkoutResults, err = u.StoreWorkingDirectory().Checkout(
 		options,
-		func(z *sku.TransactedZettel) (err error) {
+		func(z *transacted.Zettel) (err error) {
 			if !hs.Contains(z.GetKennung()) {
 				return iter.MakeErrStopIteration()
 			}

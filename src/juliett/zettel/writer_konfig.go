@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/golf/sku"
+	"github.com/friedenberg/zit/src/hotel/transacted"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/india/konfig"
 )
@@ -15,15 +15,15 @@ import (
 func MakeWriterKonfig(
 	k konfig.Compiled,
 	tagp schnittstellen.AkteGetterPutter[*typ.Akte],
-) schnittstellen.FuncIter[*sku.TransactedZettel] {
+) schnittstellen.FuncIter[*transacted.Zettel] {
 	errors.TodoP1("switch to sigils")
 	errors.TodoP3("add efficient parsing of hiding tags")
 
 	if k.IncludeHidden {
-		return collections.MakeWriterNoop[*sku.TransactedZettel]()
+		return collections.MakeWriterNoop[*transacted.Zettel]()
 	}
 
-	return func(z *sku.TransactedZettel) (err error) {
+	return func(z *transacted.Zettel) (err error) {
 		if err = z.GetMetadatei().Etiketten.Each(
 			func(e kennung.Etikett) (err error) {
 				p := e.String()

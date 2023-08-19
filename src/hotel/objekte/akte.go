@@ -2,13 +2,21 @@ package objekte
 
 import "github.com/friedenberg/zit/src/alfa/schnittstellen"
 
-type Akte[T any] interface {
-	schnittstellen.Objekte[T]
-	AkteLike
-}
+type (
+	AkteLike interface{}
 
-type AktePtr[T any] interface {
-	schnittstellen.ObjektePtr[T]
-	schnittstellen.Resetable[T]
-	AktePtrLike
-}
+	AktePtrLike interface {
+		AkteLike
+	}
+
+	Akte[T any] interface {
+		schnittstellen.Objekte[T]
+		AkteLike
+	}
+
+	AktePtr[T any] interface {
+		schnittstellen.ObjektePtr[T]
+		schnittstellen.Resetable[T]
+		AktePtrLike
+	}
+)

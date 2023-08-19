@@ -7,20 +7,20 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/hotel/objekte"
+	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/india/konfig"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
-type funcFormat = schnittstellen.FuncIter[objekte.TransactedLikePtr]
+type funcFormat = schnittstellen.FuncIter[sku.SkuLikePtr]
 
 type FormatterFactory interface {
 	MakeFormatterObjekte(
 		out io.Writer,
 		af schnittstellen.AkteIOFactory,
 		k konfig.Compiled,
-		logFunc schnittstellen.FuncIter[objekte.TransactedLikePtr],
+		logFunc schnittstellen.FuncIter[sku.SkuLikePtr],
 	) funcFormat
 }
 
@@ -31,7 +31,7 @@ type formatter struct {
 func makeFuncFormatter[T kennung.Matchable](
 	f schnittstellen.FuncIter[T],
 ) funcFormat {
-	return func(e objekte.TransactedLikePtr) (err error) {
+	return func(e sku.SkuLikePtr) (err error) {
 		if e1, ok := e.(T); ok {
 			return f(e1)
 		}
@@ -146,7 +146,7 @@ func MakeFormatter(
 }
 
 func (f formatter) MakeFormatFunc() funcFormat {
-	return func(tl objekte.TransactedLikePtr) (err error) {
+	return func(tl sku.SkuLikePtr) (err error) {
 		g := gattung.Must(tl.GetGattung())
 
 		if f1, ok := f.formatters[g]; ok {

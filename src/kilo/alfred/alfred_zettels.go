@@ -7,11 +7,11 @@ import (
 	"github.com/friedenberg/zit/src/bravo/alfred"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/golf/sku"
+	"github.com/friedenberg/zit/src/hotel/transacted"
 )
 
 func (w *Writer) zettelToItem(
-	z *sku.TransactedZettel,
+	z *transacted.Zettel,
 	ha func(kennung.Hinweis) (string, error),
 ) (a *alfred.Item) {
 	a = w.alfredWriter.Get()

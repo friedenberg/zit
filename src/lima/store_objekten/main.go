@@ -17,6 +17,7 @@ import (
 	"github.com/friedenberg/zit/src/hotel/erworben"
 	"github.com/friedenberg/zit/src/hotel/objekte"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
+	"github.com/friedenberg/zit/src/hotel/transacted"
 	"github.com/friedenberg/zit/src/india/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/store_util"
@@ -46,7 +47,7 @@ type Store struct {
 
 func Make(
 	su store_util.StoreUtil,
-	p schnittstellen.Pool[sku.TransactedZettel, *sku.TransactedZettel],
+	p schnittstellen.Pool[transacted.Zettel, *transacted.Zettel],
 ) (s *Store, err error) {
 	s = &Store{
 		lock:      &sync.Mutex{},
@@ -90,16 +91,16 @@ func Make(
 
 	errors.TodoP1("implement for other gattung")
 	s.queriers = map[schnittstellen.GattungLike]objekte.FuncQuerierTransactedLikePtr{
-		gattung.Zettel: objekte.MakeApplyQueryTransactedLikePtr[*sku.TransactedZettel](
+		gattung.Zettel: objekte.MakeApplyQueryTransactedLikePtr[*transacted.Zettel](
 			s.zettelStore.Query,
 		),
-		gattung.Typ: objekte.MakeApplyQueryTransactedLikePtr[*sku.TransactedTyp](
+		gattung.Typ: objekte.MakeApplyQueryTransactedLikePtr[*transacted.Typ](
 			s.typStore.Query,
 		),
-		gattung.Etikett: objekte.MakeApplyQueryTransactedLikePtr[*sku.TransactedEtikett](
+		gattung.Etikett: objekte.MakeApplyQueryTransactedLikePtr[*transacted.Etikett](
 			s.etikettStore.Query,
 		),
-		gattung.Kasten: objekte.MakeApplyQueryTransactedLikePtr[*sku.TransactedKasten](
+		gattung.Kasten: objekte.MakeApplyQueryTransactedLikePtr[*transacted.Kasten](
 			s.kastenStore.Query,
 		),
 		gattung.Konfig: objekte.MakeApplyQueryTransactedLikePtr[*erworben.Transacted](
@@ -112,16 +113,16 @@ func Make(
 	}
 
 	s.readers = map[schnittstellen.GattungLike]objekte.FuncReaderTransactedLikePtr{
-		gattung.Zettel: objekte.MakeApplyTransactedLikePtr[*sku.TransactedZettel](
+		gattung.Zettel: objekte.MakeApplyTransactedLikePtr[*transacted.Zettel](
 			s.zettelStore.ReadAllSchwanzen,
 		),
-		gattung.Typ: objekte.MakeApplyTransactedLikePtr[*sku.TransactedTyp](
+		gattung.Typ: objekte.MakeApplyTransactedLikePtr[*transacted.Typ](
 			s.typStore.ReadAllSchwanzen,
 		),
-		gattung.Etikett: objekte.MakeApplyTransactedLikePtr[*sku.TransactedEtikett](
+		gattung.Etikett: objekte.MakeApplyTransactedLikePtr[*transacted.Etikett](
 			s.etikettStore.ReadAllSchwanzen,
 		),
-		gattung.Kasten: objekte.MakeApplyTransactedLikePtr[*sku.TransactedKasten](
+		gattung.Kasten: objekte.MakeApplyTransactedLikePtr[*transacted.Kasten](
 			s.kastenStore.ReadAllSchwanzen,
 		),
 		gattung.Konfig: objekte.MakeApplyTransactedLikePtr[*erworben.Transacted](
@@ -134,16 +135,16 @@ func Make(
 	}
 
 	s.transactedReaders = map[schnittstellen.GattungLike]objekte.FuncReaderTransactedLikePtr{
-		gattung.Zettel: objekte.MakeApplyTransactedLikePtr[*sku.TransactedZettel](
+		gattung.Zettel: objekte.MakeApplyTransactedLikePtr[*transacted.Zettel](
 			s.zettelStore.ReadAll,
 		),
-		gattung.Typ: objekte.MakeApplyTransactedLikePtr[*sku.TransactedTyp](
+		gattung.Typ: objekte.MakeApplyTransactedLikePtr[*transacted.Typ](
 			s.typStore.ReadAll,
 		),
-		gattung.Etikett: objekte.MakeApplyTransactedLikePtr[*sku.TransactedEtikett](
+		gattung.Etikett: objekte.MakeApplyTransactedLikePtr[*transacted.Etikett](
 			s.etikettStore.ReadAll,
 		),
-		gattung.Kasten: objekte.MakeApplyTransactedLikePtr[*sku.TransactedKasten](
+		gattung.Kasten: objekte.MakeApplyTransactedLikePtr[*transacted.Kasten](
 			s.kastenStore.ReadAll,
 		),
 		gattung.Konfig: objekte.MakeApplyTransactedLikePtr[*erworben.Transacted](
@@ -350,7 +351,7 @@ func (s *Store) UpdateManyMetadatei(
 
 func (s *Store) Query(
 	ms kennung.MetaSet,
-	f schnittstellen.FuncIter[objekte.TransactedLikePtr],
+	f schnittstellen.FuncIter[sku.SkuLikePtr],
 ) (err error) {
 	if err = ms.All(
 		func(g gattung.Gattung, matcher kennung.MatcherSigil) (err error) {
@@ -377,7 +378,7 @@ func (s *Store) Query(
 
 func (s *Store) ReadAllSchwanzen(
 	gs gattungen.Set,
-	f schnittstellen.FuncIter[objekte.TransactedLikePtr],
+	f schnittstellen.FuncIter[sku.SkuLikePtr],
 ) (err error) {
 	chErr := make(chan error, gs.Len())
 
@@ -406,7 +407,7 @@ func (s *Store) ReadAllSchwanzen(
 
 func (s *Store) ReadAll(
 	gs gattungen.Set,
-	f schnittstellen.FuncIter[objekte.TransactedLikePtr],
+	f schnittstellen.FuncIter[sku.SkuLikePtr],
 ) (err error) {
 	chErr := make(chan error, gs.Len())
 

@@ -7,9 +7,11 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/id"
 	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/charlie/checked_out_state"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/hotel/objekte"
+	"github.com/friedenberg/zit/src/hotel/transacted"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/kilo/zettel_external"
@@ -23,7 +25,7 @@ func (s *Store) CheckoutQuery(
 ) (err error) {
 	if err = s.storeObjekten.Query(
 		ms,
-		func(t objekte.TransactedLikePtr) (err error) {
+		func(t sku.SkuLikePtr) (err error) {
 			var co objekte.CheckedOutLikePtr
 
 			if co, err = s.checkoutOneGeneric(options, t); err != nil {
@@ -43,7 +45,7 @@ func (s *Store) CheckoutQuery(
 
 func (s *Store) Checkout(
 	options CheckoutOptions,
-	ztw schnittstellen.FuncIter[*sku.TransactedZettel],
+	ztw schnittstellen.FuncIter[*transacted.Zettel],
 ) (zcs zettel.MutableSetCheckedOut, err error) {
 	zcs = zettel.MakeMutableSetCheckedOutUnique(0)
 	zts := zettel.MakeMutableSetUnique(0)
@@ -52,7 +54,7 @@ func (s *Store) Checkout(
 		iter.MakeChain(
 			zettel.MakeWriterKonfig(s.erworben, s.storeObjekten.Typ()),
 			ztw,
-			iter.AddClone[sku.TransactedZettel, *sku.TransactedZettel](zts),
+			iter.AddClone[transacted.Zettel, *transacted.Zettel](zts),
 		),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -60,7 +62,7 @@ func (s *Store) Checkout(
 	}
 
 	if err = zts.Each(
-		func(zt *sku.TransactedZettel) (err error) {
+		func(zt *transacted.Zettel) (err error) {
 			var zc zettel.CheckedOut
 
 			if zc, err = s.CheckoutOneZettel(options, *zt); err != nil {
@@ -85,9 +87,9 @@ func (s Store) shouldCheckOut(
 ) (ok bool) {
 	switch {
 	case cz.Internal.GetMetadatei().Equals(cz.External.GetMetadatei()):
-		cz.State = objekte.CheckedOutStateJustCheckedOut
+		cz.State = checked_out_state.StateJustCheckedOut
 
-	case options.Force || cz.State == objekte.CheckedOutStateEmpty:
+	case options.Force || cz.State == checked_out_state.StateEmpty:
 		ok = true
 	}
 
@@ -96,7 +98,7 @@ func (s Store) shouldCheckOut(
 
 func (s Store) filenameForZettelTransacted(
 	options CheckoutOptions,
-	sz sku.TransactedZettel,
+	sz transacted.Zettel,
 ) (originalFilename string, filename string, err error) {
 	if originalFilename, err = id.MakeDirIfNecessary(sz.GetKennung(), s.Cwd()); err != nil {
 		err = errors.Wrap(err)
@@ -110,21 +112,21 @@ func (s Store) filenameForZettelTransacted(
 
 func (s *Store) checkoutOneGeneric(
 	options CheckoutOptions,
-	t objekte.TransactedLike,
+	t sku.SkuLike,
 ) (cop objekte.CheckedOutLikePtr, err error) {
 	switch tt := t.(type) {
-	case *sku.TransactedZettel:
+	case *transacted.Zettel:
 		var co zettel.CheckedOut
 		co, err = s.CheckoutOneZettel(options, *tt)
 		cop = &co
 
-	case *sku.TransactedKasten:
+	case *transacted.Kasten:
 		cop, err = s.storeObjekten.Kasten().CheckoutOne(store_objekten.CheckoutOptions(options), tt)
 
-	case *sku.TransactedTyp:
+	case *transacted.Typ:
 		cop, err = s.storeObjekten.Typ().CheckoutOne(store_objekten.CheckoutOptions(options), tt)
 
-	case *sku.TransactedEtikett:
+	case *transacted.Etikett:
 		cop, err = s.storeObjekten.Etikett().CheckoutOne(store_objekten.CheckoutOptions(options), tt)
 
 	default:
@@ -141,7 +143,7 @@ func (s *Store) checkoutOneGeneric(
 
 func (s *Store) CheckoutOneZettel(
 	options CheckoutOptions,
-	sz sku.TransactedZettel,
+	sz transacted.Zettel,
 ) (cz zettel.CheckedOut, err error) {
 	cz.Internal = sz
 
@@ -182,7 +184,7 @@ func (s *Store) CheckoutOneZettel(
 
 	inlineAkte := s.erworben.IsInlineTyp(sz.GetTyp())
 
-	cz.State = objekte.CheckedOutStateJustCheckedOut
+	cz.State = checked_out_state.StateJustCheckedOut
 	cz.External = sz.GetExternal()
 
 	if options.CheckoutMode.IncludesObjekte() {

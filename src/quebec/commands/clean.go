@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/charlie/checked_out_state"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
@@ -60,7 +61,7 @@ func (c Clean) RunWithCwdQuery(
 		iter.MakeChain(
 			objekte.MakeFilterFromMetaSet(ms),
 			func(co objekte.CheckedOutLikePtr) (err error) {
-				if co.GetState() != objekte.CheckedOutStateExistsAndSame && !c.force {
+				if co.GetState() != checked_out_state.StateExistsAndSame && !c.force {
 					return
 				}
 

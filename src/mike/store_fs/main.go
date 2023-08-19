@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/log"
+	"github.com/friedenberg/zit/src/charlie/checked_out_state"
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/sku"
@@ -15,6 +16,7 @@ import (
 	"github.com/friedenberg/zit/src/hotel/kasten"
 	"github.com/friedenberg/zit/src/hotel/objekte"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
+	"github.com/friedenberg/zit/src/hotel/transacted"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/india/konfig"
 	"github.com/friedenberg/zit/src/juliett/zettel"
@@ -186,12 +188,12 @@ func (s *Store) ReadFiles(
 	if err = s.storeObjekten.Query(
 		ms,
 		iter.MakeChain(
-			func(e objekte.TransactedLikePtr) (err error) {
+			func(e sku.SkuLikePtr) (err error) {
 				log.Log().Printf("trying to read: %s", e.GetSkuLike())
 				var col objekte.CheckedOutLikePtr
 
 				switch et := e.(type) {
-				case *sku.TransactedZettel:
+				case *transacted.Zettel:
 					if col, err = zettelEMGR.ReadOne(*et); err != nil {
 						var errAkte store_objekten.ErrExternalAkteExtensionMismatch
 
@@ -206,19 +208,19 @@ func (s *Store) ReadFiles(
 						return
 					}
 
-				case *sku.TransactedTyp:
+				case *transacted.Typ:
 					if col, err = typEMGR.ReadOne(*et); err != nil {
 						err = errors.Wrap(err)
 						return
 					}
 
-				case *sku.TransactedKasten:
+				case *transacted.Kasten:
 					if col, err = kastenEMGR.ReadOne(*et); err != nil {
 						err = errors.Wrap(err)
 						return
 					}
 
-				case *sku.TransactedEtikett:
+				case *transacted.Etikett:
 					if col, err = etikettEMGR.ReadOne(*et); err != nil {
 						err = errors.Wrap(err)
 						return
@@ -279,7 +281,7 @@ func (s *Store) ReadFiles(
 						return
 					}
 
-					tco.State = objekte.CheckedOutStateUntracked
+					tco.State = checked_out_state.StateUntracked
 
 					if err = f(&tco); err != nil {
 						err = errors.Wrap(err)
@@ -311,7 +313,7 @@ func (s *Store) ReadFiles(
 						return
 					}
 
-					tco.State = objekte.CheckedOutStateUntracked
+					tco.State = checked_out_state.StateUntracked
 
 					if err = f(&tco); err != nil {
 						err = errors.Wrap(err)
@@ -343,7 +345,7 @@ func (s *Store) ReadFiles(
 						return
 					}
 
-					tco.State = objekte.CheckedOutStateUntracked
+					tco.State = checked_out_state.StateUntracked
 
 					if err = f(&tco); err != nil {
 						err = errors.Wrap(err)
@@ -367,7 +369,7 @@ func (s *Store) ReadFiles(
 	return
 }
 
-// if cz.State > objekte.CheckedOutStateExistsAndSame {
+// if cz.State > checked_out_state.StateExistsAndSame {
 // TODO-P4 rewrite with verzeichnisseAll
 // exSha := cz.External.Sku.Sha
 // cz.Matches.Zettelen, _ = s.storeObjekten.ReadZettelSha(exSha)

@@ -20,6 +20,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/hotel/erworben"
+	"github.com/friedenberg/zit/src/hotel/transacted"
 	"github.com/friedenberg/zit/src/hotel/typ"
 )
 
@@ -78,12 +79,12 @@ type compiled struct {
 	// Typen
 	ExtensionsToTypen map[string]kennung.Typ
 	TypenToExtensions map[kennung.Typ]string
-	DefaultTyp        sku.TransactedTyp // deprecated
-	Typen             schnittstellen.MutableSetLike[sku.TransactedTyp]
+	DefaultTyp        transacted.Typ // deprecated
+	Typen             schnittstellen.MutableSetLike[transacted.Typ]
 	InlineTypen       schnittstellen.SetPtrLike[kennung.Typ, *kennung.Typ]
 
 	// Kasten
-	Kisten schnittstellen.MutableSetLike[sku.TransactedKasten]
+	Kisten schnittstellen.MutableSetLike[transacted.Kasten]
 }
 
 func Make(
@@ -234,7 +235,7 @@ func (kc *compiled) recompile(
 	}()
 
 	if err = kc.Typen.Each(
-		func(ct sku.TransactedTyp) (err error) {
+		func(ct transacted.Typ) (err error) {
 			var ta *typ.Akte
 
 			if ta, err = tagp.GetAkte(ct.GetAkteSha()); err != nil {
@@ -315,7 +316,7 @@ func (c compiled) GetZettelFileExtension() string {
 // TODO-P3 merge all the below
 func (c compiled) GetSortedTypenExpanded(
 	v string,
-) (expandedActual []*sku.TransactedTyp) {
+) (expandedActual []*transacted.Typ) {
 	expandedMaybe := collections_value.MakeMutableValueSet[values.String](nil)
 
 	sa := iter.MakeFuncSetString[
@@ -324,7 +325,7 @@ func (c compiled) GetSortedTypenExpanded(
 	](expandedMaybe)
 
 	typExpander.Expand(sa, v)
-	expandedActual = make([]*sku.TransactedTyp, 0)
+	expandedActual = make([]*transacted.Typ, 0)
 
 	expandedMaybe.Each(
 		func(v values.String) (err error) {
@@ -382,8 +383,8 @@ func (kc compiled) GetApproximatedTyp(k kennung.Typ) (ct ApproximatedTyp) {
 	return
 }
 
-func (kc compiled) GetKasten(k kennung.Kasten) (ct *sku.TransactedKasten) {
-	var ct1 sku.TransactedKasten
+func (kc compiled) GetKasten(k kennung.Kasten) (ct *transacted.Kasten) {
+	var ct1 transacted.Kasten
 	ct1, _ = kc.Kisten.Get(k.String())
 	ct = &ct1
 	return
@@ -413,7 +414,7 @@ func (k *compiled) SetTransacted(
 }
 
 func (k *compiled) AddKasten(
-	b *sku.TransactedKasten,
+	b *transacted.Kasten,
 ) (err error) {
 	k.lock.Lock()
 	defer k.lock.Unlock()
@@ -428,7 +429,7 @@ func (k *compiled) AddKasten(
 }
 
 func (k *compiled) AddTyp(
-	b *sku.TransactedTyp,
+	b *transacted.Typ,
 ) (err error) {
 	k.lock.Lock()
 	defer k.lock.Unlock()
@@ -443,5 +444,5 @@ func (k *compiled) AddTyp(
 	return
 }
 
-func (c *compiled) applyExpandedTyp(ct sku.TransactedTyp) {
+func (c *compiled) applyExpandedTyp(ct transacted.Typ) {
 }

@@ -18,8 +18,8 @@ import (
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/hotel/erworben"
-	"github.com/friedenberg/zit/src/hotel/objekte"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
+	"github.com/friedenberg/zit/src/hotel/transacted"
 	"github.com/friedenberg/zit/src/india/konfig"
 	"github.com/friedenberg/zit/src/kilo/organize_text"
 	"github.com/friedenberg/zit/src/kilo/store_util"
@@ -49,7 +49,7 @@ type Umwelt struct {
 	age                   *age.Age
 	storeWorkingDirectory *store_fs.Store
 
-	zettelVerzeichnissePool schnittstellen.Pool[sku.TransactedZettel, *sku.TransactedZettel]
+	zettelVerzeichnissePool schnittstellen.Pool[transacted.Zettel, *transacted.Zettel]
 }
 
 func Make(kCli erworben.Cli, options Options) (u *Umwelt, err error) {
@@ -57,7 +57,7 @@ func Make(kCli erworben.Cli, options Options) (u *Umwelt, err error) {
 		in:                      os.Stdin,
 		out:                     os.Stdout,
 		err:                     os.Stderr,
-		zettelVerzeichnissePool: collections.MakePool[sku.TransactedZettel, *sku.TransactedZettel](),
+		zettelVerzeichnissePool: collections.MakePool[transacted.Zettel, *transacted.Zettel](),
 		erworbenCli:             kCli,
 	}
 
@@ -207,7 +207,7 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 
 	ptl := u.PrinterTransactedLike()
 
-	lw := objekte_store.LogWriter[objekte.TransactedLikePtr]{
+	lw := objekte_store.LogWriter[sku.SkuLikePtr]{
 		New:       ptl,
 		Updated:   ptl,
 		Unchanged: ptl,

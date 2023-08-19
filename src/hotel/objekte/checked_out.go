@@ -4,44 +4,59 @@ import (
 	"fmt"
 
 	"github.com/friedenberg/zit/src/bravo/values"
+	"github.com/friedenberg/zit/src/charlie/checked_out_state"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/sku"
 )
 
-type CheckedOut[
-	T2 kennung.KennungLike[T2],
-	T3 kennung.KennungLikePtr[T2],
-] struct {
-	Internal sku.Transacted[T2, T3]
-	External sku.External[T2, T3]
-	State    CheckedOutState
-}
+type (
+	CheckedOutLike interface {
+		GetInternalLike() sku.SkuLikePtr
+		GetExternalLike() ExternalLike
+		GetState() checked_out_state.State
+	}
+
+	CheckedOutLikePtr interface {
+		CheckedOutLike
+		GetExternalLikePtr() ExternalLikePtr
+		DetermineState(justCheckedOut bool)
+	}
+
+	CheckedOut[
+		T2 kennung.KennungLike[T2],
+		T3 kennung.KennungLikePtr[T2],
+	] struct {
+		Internal sku.Transacted[T2, T3]
+		External sku.External[T2, T3]
+		State    checked_out_state.State
+	}
+)
 
 func (c *CheckedOut[T2, T3]) DetermineState(justCheckedOut bool) {
 	if c.Internal.ObjekteSha.IsNull() {
-		c.State = CheckedOutStateUntracked
+		c.State = checked_out_state.StateUntracked
 	} else if c.Internal.Metadatei.EqualsSansTai(c.External.Metadatei) {
 		if justCheckedOut {
-			c.State = CheckedOutStateJustCheckedOut
+			c.State = checked_out_state.StateJustCheckedOut
 		} else {
-			c.State = CheckedOutStateExistsAndSame
+			c.State = checked_out_state.StateExistsAndSame
 		}
 	} else if c.External.GetObjekteSha().IsNull() {
-		c.State = CheckedOutStateEmpty
+		c.State = checked_out_state.StateEmpty
 	} else {
 		if justCheckedOut {
-			c.State = CheckedOutStateJustCheckedOutButDifferent
+			c.State = checked_out_state.StateJustCheckedOutButDifferent
 		} else {
-			c.State = CheckedOutStateExistsAndDifferent
+			c.State = checked_out_state.StateExistsAndDifferent
 		}
 	}
 }
 
-func (co CheckedOut[T2, T3]) GetState() CheckedOutState {
+func (co CheckedOut[T2, T3]) GetState() checked_out_state.State {
 	return co.State
 }
 
-func (co *CheckedOut[T2, T3]) GetInternalLike() TransactedLikePtr {
+func (co *CheckedOut[T2, T3]) GetInternalLike() sku.SkuLikePtr {
 	return &co.Internal
 }
 

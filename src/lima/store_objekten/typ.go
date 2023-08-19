@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/golf/transaktion"
 	"github.com/friedenberg/zit/src/hotel/objekte"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
+	"github.com/friedenberg/zit/src/hotel/transacted"
 	"github.com/friedenberg/zit/src/hotel/typ"
 	"github.com/friedenberg/zit/src/kilo/store_util"
 )
@@ -26,7 +27,7 @@ type TypStore interface {
 
 type TypTransactedReader = objekte_store.TransactedReader[
 	*kennung.Typ,
-	*sku.TransactedTyp,
+	*transacted.Typ,
 ]
 
 type typStore struct {
@@ -65,7 +66,7 @@ func makeTypStore(
 		return
 	}
 
-	newOrUpdated := func(t *sku.TransactedTyp) (err error) {
+	newOrUpdated := func(t *transacted.Typ) (err error) {
 		s.StoreUtil.CommitUpdatedTransacted(t)
 
 		if err = s.StoreUtil.GetKonfigPtr().AddTyp(t); err != nil {
@@ -87,8 +88,8 @@ func makeTypStore(
 		s.commonStore,
 		sa,
 		TypTransactedReader(s),
-		objekte_store.CreateOrUpdateDelegate[*sku.TransactedTyp]{
-			New: func(t *sku.TransactedTyp) (err error) {
+		objekte_store.CreateOrUpdateDelegate[*transacted.Typ]{
+			New: func(t *transacted.Typ) (err error) {
 				if err = newOrUpdated(t); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -96,7 +97,7 @@ func makeTypStore(
 
 				return s.LogWriter.New(t)
 			},
-			Updated: func(t *sku.TransactedTyp) (err error) {
+			Updated: func(t *transacted.Typ) (err error) {
 				if err = newOrUpdated(t); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -104,7 +105,7 @@ func makeTypStore(
 
 				return s.LogWriter.Updated(t)
 			},
-			Unchanged: func(t *sku.TransactedTyp) (err error) {
+			Unchanged: func(t *transacted.Typ) (err error) {
 				return s.LogWriter.Unchanged(t)
 			},
 		},
@@ -120,12 +121,12 @@ func (s typStore) Flush() (err error) {
 	return
 }
 
-func (s typStore) addOne(t *sku.TransactedTyp) (err error) {
+func (s typStore) addOne(t *transacted.Typ) (err error) {
 	s.StoreUtil.GetKonfigPtr().AddTyp(t)
 	return
 }
 
-func (s typStore) updateOne(t *sku.TransactedTyp) (err error) {
+func (s typStore) updateOne(t *transacted.Typ) (err error) {
 	log.Log().Printf("adding one: %s", t.GetSkuLike())
 	s.StoreUtil.GetKonfigPtr().AddTyp(t)
 	log.Log().Printf("done adding one: %s", t.GetSkuLike())
@@ -134,11 +135,11 @@ func (s typStore) updateOne(t *sku.TransactedTyp) (err error) {
 
 // TODO-P3
 func (s typStore) ReadAllSchwanzen(
-	f schnittstellen.FuncIter[*sku.TransactedTyp],
+	f schnittstellen.FuncIter[*transacted.Typ],
 ) (err error) {
 	// TODO-P2 switch to pointers
 	if err = s.StoreUtil.GetKonfig().Typen.Each(
-		func(e sku.TransactedTyp) (err error) {
+		func(e transacted.Typ) (err error) {
 			return f(&e)
 		},
 	); err != nil {
@@ -150,14 +151,14 @@ func (s typStore) ReadAllSchwanzen(
 }
 
 func (s typStore) ReadAll(
-	f schnittstellen.FuncIter[*sku.TransactedTyp],
+	f schnittstellen.FuncIter[*transacted.Typ],
 ) (err error) {
 	eachSku := func(sk sku.SkuLikePtr) (err error) {
 		if sk.GetGattung() != gattung.Typ {
 			return
 		}
 
-		var te *sku.TransactedTyp
+		var te *transacted.Typ
 
 		if te, err = s.InflateFromSku(sk); err != nil {
 			if errors.Is(err, toml.Error{}) {
@@ -211,7 +212,7 @@ func (s typStore) ReadAll(
 
 func (s typStore) ReadOne(
 	k *kennung.Typ,
-) (tt *sku.TransactedTyp, err error) {
+) (tt *transacted.Typ, err error) {
 	errors.TodoP3("add support for working directory")
 	errors.TodoP3("inherited-typen-etiketten")
 	log.Log().Printf("reading: %s", k)

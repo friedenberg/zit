@@ -7,8 +7,8 @@ import (
 	"github.com/friedenberg/zit/src/delta/format"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
-	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
+	"github.com/friedenberg/zit/src/hotel/transacted"
 )
 
 // [kopf/schwanz@sha !typ]
@@ -16,8 +16,8 @@ func MakeCliFormatTransacted(
 	hf schnittstellen.FuncWriterFormat[kennung.Hinweis],
 	sf schnittstellen.FuncWriterFormat[schnittstellen.ShaLike],
 	mf schnittstellen.FuncWriterFormat[metadatei.GetterPtr],
-) schnittstellen.FuncWriterFormat[sku.TransactedZettel] {
-	return func(w io.Writer, z sku.TransactedZettel) (n int64, err error) {
+) schnittstellen.FuncWriterFormat[transacted.Zettel] {
+	return func(w io.Writer, z transacted.Zettel) (n int64, err error) {
 		return format.Write(
 			w,
 			format.MakeFormatString("["),
@@ -33,9 +33,9 @@ func MakeCliFormatTransacted(
 
 // (new|unchanged|updated|archived) [kopf/schwanz@sha !typ]
 func MakeCliFormatTransactedDelta(
-	ztf schnittstellen.FuncWriterFormat[sku.TransactedZettel],
-) schnittstellen.FuncWriterFormat[sku.TransactedZettel] {
-	return func(w io.Writer, z sku.TransactedZettel) (n int64, err error) {
+	ztf schnittstellen.FuncWriterFormat[transacted.Zettel],
+) schnittstellen.FuncWriterFormat[transacted.Zettel] {
+	return func(w io.Writer, z transacted.Zettel) (n int64, err error) {
 		return format.Write(
 			w,
 			format.MakeWriter(ztf, z),
@@ -43,4 +43,4 @@ func MakeCliFormatTransactedDelta(
 	}
 }
 
-type LogWriter = objekte_store.LogWriter[*sku.TransactedZettel]
+type LogWriter = objekte_store.LogWriter[*transacted.Zettel]

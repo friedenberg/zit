@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/golf/sku"
+	"github.com/friedenberg/zit/src/hotel/transacted"
 )
 
 func init() {
@@ -45,7 +45,7 @@ func (iem implicitEtikettenMap) Set(to, imp kennung.Etikett) (err error) {
 }
 
 type ketikett struct {
-	Transacted        sku.TransactedEtikett
+	Transacted        transacted.Etikett
 	ImplicitEtiketten kennung.EtikettMutableSet
 }
 
@@ -78,7 +78,7 @@ func (e ketikett) String() string {
 }
 
 func (k compiled) EachEtikett(
-	f schnittstellen.FuncIter[*sku.TransactedEtikett],
+	f schnittstellen.FuncIter[*transacted.Etikett],
 ) (err error) {
 	return k.Etiketten.Each(
 		func(ek ketikett) (err error) {
@@ -123,7 +123,7 @@ func (k *compiled) AccumulateImplicitEtiketten(
 }
 
 func (k *compiled) AddEtikett(
-	b1 *sku.TransactedEtikett,
+	b1 *transacted.Etikett,
 ) (err error) {
 	k.lock.Lock()
 	defer k.lock.Unlock()
@@ -141,10 +141,10 @@ func (k *compiled) AddEtikett(
 	return
 }
 
-func (c *compiled) applyExpandedEtikett(ct *sku.TransactedEtikett) {
+func (c *compiled) applyExpandedEtikett(ct *transacted.Etikett) {
 }
 
-func (kc compiled) GetEtikett(k kennung.Etikett) (ct sku.TransactedEtikett) {
+func (kc compiled) GetEtikett(k kennung.Etikett) (ct transacted.Etikett) {
 	expandedActual := kc.GetSortedEtikettenExpanded(k.String())
 
 	if len(expandedActual) > 0 {
@@ -156,7 +156,7 @@ func (kc compiled) GetEtikett(k kennung.Etikett) (ct sku.TransactedEtikett) {
 
 func (c compiled) GetSortedEtikettenExpanded(
 	v string,
-) (expandedActual []sku.TransactedEtikett) {
+) (expandedActual []transacted.Etikett) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 
@@ -165,7 +165,7 @@ func (c compiled) GetSortedEtikettenExpanded(
 		expandedMaybe,
 	)
 	typExpander.Expand(sa, v)
-	expandedActual = make([]sku.TransactedEtikett, 0)
+	expandedActual = make([]transacted.Etikett, 0)
 
 	expandedMaybe.Each(
 		func(v values.String) (err error) {

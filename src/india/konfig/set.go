@@ -6,16 +6,16 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/golf/sku"
+	"github.com/friedenberg/zit/src/hotel/transacted"
 )
 
 func init() {
 	gob.RegisterName("typSet", makeCompiledTypSet(nil))
 	gob.RegisterName("etikettSet", makeCompiledEtikettSet(nil))
 	gob.RegisterName("kastenSet", makeCompiledKastenSet(nil))
-	gob.Register(KennungKeyer[sku.TransactedTyp, *sku.TransactedTyp]{})
-	gob.Register(KennungKeyer[sku.TransactedEtikett, *sku.TransactedEtikett]{})
-	gob.Register(KennungKeyer[sku.TransactedKasten, *sku.TransactedKasten]{})
+	gob.Register(KennungKeyer[transacted.Typ, *transacted.Typ]{})
+	gob.Register(KennungKeyer[transacted.Etikett, *transacted.Etikett]{})
+	gob.Register(KennungKeyer[transacted.Kasten, *transacted.Kasten]{})
 }
 
 type kennungGetter interface {
@@ -43,8 +43,8 @@ func (sk KennungKeyer[T, TPtr]) GetKeyPtr(e TPtr) string {
 }
 
 func makeCompiledKastenSet(
-	s1 schnittstellen.SetLike[sku.TransactedKasten],
-) schnittstellen.MutableSetLike[sku.TransactedKasten] {
+	s1 schnittstellen.SetLike[transacted.Kasten],
+) schnittstellen.MutableSetLike[transacted.Kasten] {
 	if s1 == nil {
 		return makeCompiledKastenSetFromSlice(nil)
 	}
@@ -53,26 +53,26 @@ func makeCompiledKastenSet(
 }
 
 func makeCompiledKastenSetFromSlice(
-	s1 []sku.TransactedKasten,
-) schnittstellen.MutableSetLike[sku.TransactedKasten] {
-	return collections_ptr.MakeMutableSetValue[sku.TransactedKasten, *sku.TransactedKasten](
-		KennungKeyer[sku.TransactedKasten, *sku.TransactedKasten]{},
+	s1 []transacted.Kasten,
+) schnittstellen.MutableSetLike[transacted.Kasten] {
+	return collections_ptr.MakeMutableSetValue[transacted.Kasten, *transacted.Kasten](
+		KennungKeyer[transacted.Kasten, *transacted.Kasten]{},
 		s1...,
 	)
 }
 
 func makeCompiledEtikettSetFromSlice(
-	s1 []sku.TransactedEtikett,
-) schnittstellen.MutableSetLike[sku.TransactedEtikett] {
-	return collections_ptr.MakeMutableSetValue[sku.TransactedEtikett, *sku.TransactedEtikett](
-		KennungKeyer[sku.TransactedEtikett, *sku.TransactedEtikett]{},
+	s1 []transacted.Etikett,
+) schnittstellen.MutableSetLike[transacted.Etikett] {
+	return collections_ptr.MakeMutableSetValue[transacted.Etikett, *transacted.Etikett](
+		KennungKeyer[transacted.Etikett, *transacted.Etikett]{},
 		s1...,
 	)
 }
 
 func makeCompiledEtikettSet(
-	s1 schnittstellen.SetLike[sku.TransactedEtikett],
-) schnittstellen.MutableSetLike[sku.TransactedEtikett] {
+	s1 schnittstellen.SetLike[transacted.Etikett],
+) schnittstellen.MutableSetLike[transacted.Etikett] {
 	if s1 == nil {
 		return makeCompiledEtikettSetFromSlice(nil)
 	}
@@ -81,17 +81,17 @@ func makeCompiledEtikettSet(
 }
 
 func makeCompiledTypSetFromSlice(
-	s1 []sku.TransactedTyp,
-) schnittstellen.MutableSetLike[sku.TransactedTyp] {
-	return collections_ptr.MakeMutableSetValue[sku.TransactedTyp, *sku.TransactedTyp](
-		KennungKeyer[sku.TransactedTyp, *sku.TransactedTyp]{},
+	s1 []transacted.Typ,
+) schnittstellen.MutableSetLike[transacted.Typ] {
+	return collections_ptr.MakeMutableSetValue[transacted.Typ, *transacted.Typ](
+		KennungKeyer[transacted.Typ, *transacted.Typ]{},
 		s1...,
 	)
 }
 
 func makeCompiledTypSet(
-	s1 schnittstellen.SetLike[sku.TransactedTyp],
-) schnittstellen.MutableSetLike[sku.TransactedTyp] {
+	s1 schnittstellen.SetLike[transacted.Typ],
+) schnittstellen.MutableSetLike[transacted.Typ] {
 	if s1 == nil {
 		return makeCompiledTypSetFromSlice(nil)
 	}

@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/standort"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/golf/sku"
+	"github.com/friedenberg/zit/src/hotel/transacted"
 	"github.com/friedenberg/zit/src/india/konfig"
 	"github.com/friedenberg/zit/src/lima/store_objekten"
 	"github.com/friedenberg/zit/src/mike/store_fs"
@@ -48,6 +48,6 @@ func (u *Umwelt) StoreWorkingDirectory() *store_fs.Store {
 	return u.storeWorkingDirectory
 }
 
-func (u *Umwelt) ZettelVerzeichnissePool() schnittstellen.Pool[sku.TransactedZettel, *sku.TransactedZettel] {
+func (u *Umwelt) ZettelVerzeichnissePool() schnittstellen.Pool[transacted.Zettel, *transacted.Zettel] {
 	return u.zettelVerzeichnissePool
 }

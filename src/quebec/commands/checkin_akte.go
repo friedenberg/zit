@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/golf/sku"
+	"github.com/friedenberg/zit/src/hotel/transacted"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
@@ -70,7 +70,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		pairs[i] = p
 	}
 
-	zettels := make([]*sku.TransactedZettel, len(pairs))
+	zettels := make([]*transacted.Zettel, len(pairs))
 
 	// iterate through pairs and read current zettel
 	for i, p := range pairs {

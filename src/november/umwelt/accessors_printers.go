@@ -67,14 +67,14 @@ func (u *Umwelt) PrinterSkuLikePtr() schnittstellen.FuncIter[sku.SkuLikePtr] {
 	)
 }
 
-func (u *Umwelt) PrinterTransactedLike() schnittstellen.FuncIter[objekte.TransactedLikePtr] {
+func (u *Umwelt) PrinterTransactedLike() schnittstellen.FuncIter[sku.SkuLikePtr] {
 	sw := u.StringFormatWriterSkuLikePtr()
 
-	return string_writer_format.MakeDelim[objekte.TransactedLikePtr](
+	return string_writer_format.MakeDelim[sku.SkuLikePtr](
 		"\n",
 		u.Out(),
-		string_writer_format.MakeFunc[objekte.TransactedLikePtr](
-			func(w io.StringWriter, o objekte.TransactedLikePtr) (n int64, err error) {
+		string_writer_format.MakeFunc[sku.SkuLikePtr](
+			func(w io.StringWriter, o sku.SkuLikePtr) (n int64, err error) {
 				return sw.WriteStringFormat(w, o.GetSkuLikePtr())
 			},
 		),

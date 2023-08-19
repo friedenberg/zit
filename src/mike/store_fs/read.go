@@ -5,7 +5,7 @@ import (
 	"path"
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/hotel/objekte"
+	"github.com/friedenberg/zit/src/golf/sku"
 )
 
 func (s *Store) FileExtensionForGattung(
@@ -14,7 +14,7 @@ func (s *Store) FileExtensionForGattung(
 	return s.erworben.FileExtensions.GetFileExtensionForGattung(gg)
 }
 
-func (s *Store) PathForTransactedLike(tl objekte.TransactedLike) string {
+func (s *Store) PathForTransactedLike(tl sku.SkuLike) string {
 	return path.Join(
 		s.Cwd(),
 		fmt.Sprintf(

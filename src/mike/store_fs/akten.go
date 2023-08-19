@@ -11,8 +11,8 @@ import (
 	"github.com/friedenberg/zit/src/bravo/sha"
 	"github.com/friedenberg/zit/src/delta/age_io"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/hotel/objekte_store"
+	"github.com/friedenberg/zit/src/hotel/transacted"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 )
 
@@ -40,7 +40,7 @@ func (s Store) ReadExternalZettelFromAktePath(
 		return
 	}
 
-	var zt *sku.TransactedZettel
+	var zt *transacted.Zettel
 
 	if zt, err = s.storeObjekten.Zettel().ReadOne(
 		&cz.External.Kennung,

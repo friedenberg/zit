@@ -22,6 +22,7 @@ type (
 		metadatei.Getter
 
 		GetTai() kennung.Tai
+		GetTyp() kennung.Typ
 		GetKennungLike() kennung.Kennung
 		GetObjekteSha() schnittstellen.ShaLike
 		GetAkteSha() schnittstellen.ShaLike
@@ -30,6 +31,8 @@ type (
 		EqualsSkuLike(SkuLike) bool
 		ImmutableClone() SkuLike
 		MutableClone() SkuLikePtr
+
+		GetSkuLike() SkuLike
 	}
 
 	SkuLikePtr interface {
@@ -40,21 +43,12 @@ type (
 
 		SetObjekteSha(schnittstellen.ShaLike)
 
+		SetTai(kennung.Tai)
 		SetKennungLike(kennung.Kennung) error
 		GetKennungLikePtr() kennung.KennungPtr
 		SetFromSkuLike(SkuLike) error
 		Reset()
+
+		GetSkuLikePtr() SkuLikePtr
 	}
-
-	TransactedEtikett = Transacted[kennung.Etikett, *kennung.Etikett]
-	TransactedKasten  = Transacted[kennung.Kasten, *kennung.Kasten]
-	TransactedKonfig  = Transacted[kennung.Konfig, *kennung.Konfig]
-	TransactedTyp     = Transacted[kennung.Typ, *kennung.Typ]
-	TransactedZettel  = Transacted[kennung.Hinweis, *kennung.Hinweis]
-
-	ExternalEtikett = External[kennung.Etikett, *kennung.Etikett]
-	ExternalKasten  = External[kennung.Kasten, *kennung.Kasten]
-	ExternalKonfig  = External[kennung.Konfig, *kennung.Konfig]
-	ExternalTyp     = External[kennung.Typ, *kennung.Typ]
-	ExternalZettel  = External[kennung.Hinweis, *kennung.Hinweis]
 )

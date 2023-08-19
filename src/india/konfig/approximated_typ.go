@@ -1,18 +1,18 @@
 package konfig
 
-import "github.com/friedenberg/zit/src/golf/sku"
+import "github.com/friedenberg/zit/src/hotel/transacted"
 
 type ApproximatedTyp struct {
 	hasValue bool
 	isActual bool
-	typ      sku.TransactedTyp
+	typ      transacted.Typ
 }
 
 func (a ApproximatedTyp) HasValue() bool {
 	return a.hasValue
 }
 
-func (a ApproximatedTyp) ActualOrNil() (actual *sku.TransactedTyp) {
+func (a ApproximatedTyp) ActualOrNil() (actual *transacted.Typ) {
 	if a.hasValue && a.isActual {
 		actual = &a.typ
 	}
@@ -20,7 +20,7 @@ func (a ApproximatedTyp) ActualOrNil() (actual *sku.TransactedTyp) {
 	return
 }
 
-func (a ApproximatedTyp) ApproximatedOrActual() *sku.TransactedTyp {
+func (a ApproximatedTyp) ApproximatedOrActual() *transacted.Typ {
 	if !a.hasValue {
 		return nil
 	}

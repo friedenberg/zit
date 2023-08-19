@@ -7,24 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/golf/sku"
 )
 
-type TransactedLike interface {
-	metadatei.Getter
-	GetKennungLike() kennung.Kennung
-	GetAkteSha() schnittstellen.ShaLike
-	GetSkuLike() sku.SkuLike
-	kennung.Matchable
-	sku.Getter
-}
-
-type TransactedLikePtr interface {
-	TransactedLike
-	metadatei.GetterPtr
-	metadatei.Setter
-	GetKennungLikePtr() kennung.KennungPtr
-	GetSkuLikePtr() sku.SkuLikePtr
-	SetTai(kennung.Tai)
-}
-
 type StoredLikePtr interface {
 	metadatei.Getter
 	metadatei.Setter
@@ -35,23 +17,23 @@ type StoredLikePtr interface {
 }
 
 type (
-	FuncReaderTransacted[T TransactedLike]       func(schnittstellen.FuncIter[T]) error
-	FuncReaderTransactedPtr[T TransactedLikePtr] func(schnittstellen.FuncIter[T]) error
-	FuncReaderTransactedLike                     func(schnittstellen.FuncIter[TransactedLike]) error
-	FuncReaderTransactedLikePtr                  func(schnittstellen.FuncIter[TransactedLikePtr]) error
+	FuncReaderTransacted[T sku.SkuLike]       func(schnittstellen.FuncIter[T]) error
+	FuncReaderTransactedPtr[T sku.SkuLikePtr] func(schnittstellen.FuncIter[T]) error
+	FuncReaderTransactedLike                  func(schnittstellen.FuncIter[sku.SkuLike]) error
+	FuncReaderTransactedLikePtr               func(schnittstellen.FuncIter[sku.SkuLikePtr]) error
 )
 
 type (
-	FuncQuerierTransacted[T TransactedLike]       func(kennung.MatcherSigil, schnittstellen.FuncIter[T]) error
-	FuncQuerierTransactedPtr[T TransactedLikePtr] func(kennung.MatcherSigil, schnittstellen.FuncIter[T]) error
-	FuncQuerierTransactedLike                     func(kennung.MatcherSigil, schnittstellen.FuncIter[TransactedLike]) error
-	FuncQuerierTransactedLikePtr                  func(kennung.MatcherSigil, schnittstellen.FuncIter[TransactedLikePtr]) error
+	FuncQuerierTransacted[T sku.SkuLike]       func(kennung.MatcherSigil, schnittstellen.FuncIter[T]) error
+	FuncQuerierTransactedPtr[T sku.SkuLikePtr] func(kennung.MatcherSigil, schnittstellen.FuncIter[T]) error
+	FuncQuerierTransactedLike                  func(kennung.MatcherSigil, schnittstellen.FuncIter[sku.SkuLike]) error
+	FuncQuerierTransactedLikePtr               func(kennung.MatcherSigil, schnittstellen.FuncIter[sku.SkuLikePtr]) error
 )
 
-func MakeApplyQueryTransactedLikePtr[T TransactedLikePtr](
+func MakeApplyQueryTransactedLikePtr[T sku.SkuLikePtr](
 	fat FuncQuerierTransactedPtr[T],
 ) FuncQuerierTransactedLikePtr {
-	return func(ids kennung.MatcherSigil, fatl schnittstellen.FuncIter[TransactedLikePtr]) (err error) {
+	return func(ids kennung.MatcherSigil, fatl schnittstellen.FuncIter[sku.SkuLikePtr]) (err error) {
 		return fat(
 			ids,
 			func(e T) (err error) {
@@ -61,10 +43,10 @@ func MakeApplyQueryTransactedLikePtr[T TransactedLikePtr](
 	}
 }
 
-func MakeApplyTransactedLikePtr[T TransactedLikePtr](
+func MakeApplyTransactedLikePtr[T sku.SkuLikePtr](
 	fat FuncReaderTransacted[T],
 ) FuncReaderTransactedLikePtr {
-	return func(fatl schnittstellen.FuncIter[TransactedLikePtr]) (err error) {
+	return func(fatl schnittstellen.FuncIter[sku.SkuLikePtr]) (err error) {
 		return fat(
 			func(e T) (err error) {
 				return fatl(e)

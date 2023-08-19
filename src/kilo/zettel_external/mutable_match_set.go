@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/kennung"
-	"github.com/friedenberg/zit/src/golf/sku"
+	"github.com/friedenberg/zit/src/hotel/transacted"
 )
 
 type MutableMatchSet struct {
@@ -36,7 +36,7 @@ func MakeMutableMatchSet(in MutableSet) (out MutableMatchSet) {
 	return
 }
 
-func (s MutableMatchSet) Match(z *sku.TransactedZettel) (err error) {
+func (s MutableMatchSet) Match(z *transacted.Zettel) (err error) {
 	kStored := z.ObjekteSha.String()
 	kAkte := z.GetAkteSha().String()
 

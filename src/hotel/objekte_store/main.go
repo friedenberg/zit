@@ -11,7 +11,7 @@ import (
 type TransactedLogger[
 	T any,
 ] interface {
-	SetLogWriter(LogWriter[objekte.TransactedLikePtr])
+	SetLogWriter(LogWriter[sku.SkuLikePtr])
 }
 
 type LastReader[
@@ -86,7 +86,7 @@ type Updater[
 
 type CheckedOutUpdater[
 	CO objekte.CheckedOutLike,
-	T objekte.TransactedLike,
+	T sku.SkuLike,
 ] interface {
 	UpdateCheckedOut(CO) (T, error)
 }

@@ -11,6 +11,8 @@ import (
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/sku"
+	"github.com/friedenberg/zit/src/hotel/external"
+	"github.com/friedenberg/zit/src/hotel/transacted"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/zettel_external"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -42,7 +44,7 @@ func (c ZettelFromExternalAkte) Run(
 	fds := iter.SortedValues(ms.GetFDs())
 
 	for _, fd := range fds {
-		var z *sku.ExternalZettel
+		var z *external.Zettel
 
 		if z, err = c.zettelForAkte(fd); err != nil {
 			err = errors.Wrap(err)
@@ -62,7 +64,7 @@ func (c ZettelFromExternalAkte) Run(
 		if err = c.StoreObjekten().Zettel().ReadAll(
 			iter.MakeChain(
 				matcher.Match,
-				iter.AddClone[sku.TransactedZettel, *sku.TransactedZettel](results),
+				iter.AddClone[transacted.Zettel, *transacted.Zettel](results),
 			),
 		); err != nil {
 			err = errors.Wrap(err)
@@ -71,7 +73,7 @@ func (c ZettelFromExternalAkte) Run(
 	}
 
 	if err = results.Each(
-		func(z *sku.TransactedZettel) (err error) {
+		func(z *transacted.Zettel) (err error) {
 			if c.ProtoZettel.Apply(z) {
 				if z, err = c.StoreObjekten().Zettel().Update(
 					z,
@@ -103,7 +105,7 @@ func (c ZettelFromExternalAkte) Run(
 			return
 		}
 
-		var tz *sku.TransactedZettel
+		var tz *transacted.Zettel
 
 		if tz, err = c.StoreObjekten().Zettel().Create(z); err != nil {
 			err = errors.Wrap(err)
@@ -129,7 +131,7 @@ func (c ZettelFromExternalAkte) Run(
 	}
 
 	err = toDelete.Each(
-		func(z *sku.ExternalZettel) (err error) {
+		func(z *external.Zettel) (err error) {
 			// TODO-P4 move to checkout store
 			if err = os.Remove(z.GetAkteFD().Path); err != nil {
 				err = errors.Wrap(err)
@@ -155,8 +157,8 @@ func (c ZettelFromExternalAkte) Run(
 
 func (c *ZettelFromExternalAkte) zettelForAkte(
 	akteFD kennung.FD,
-) (z *sku.ExternalZettel, err error) {
-	z = &sku.ExternalZettel{
+) (z *external.Zettel, err error) {
+	z = &external.Zettel{
 		FDs: sku.ExternalFDs{
 			Akte: akteFD,
 		},

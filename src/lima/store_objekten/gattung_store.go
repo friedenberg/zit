@@ -48,14 +48,6 @@ type commonStoreDelegate[
 	updateOne(*sku.Transacted[K, KPtr]) error
 }
 
-type transacted[T any] interface {
-	schnittstellen.Poolable[T]
-}
-
-type transactedPtr[T any] interface {
-	schnittstellen.PoolablePtr[T]
-}
-
 type commonStore[
 	O objekte.Akte[O],
 	OPtr objekte.AktePtr[O],

@@ -7,10 +7,13 @@ import (
 	"github.com/friedenberg/zit/src/bravo/gattung"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/sha"
+	"github.com/friedenberg/zit/src/charlie/checked_out_state"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/kennung"
 	"github.com/friedenberg/zit/src/golf/sku"
+	"github.com/friedenberg/zit/src/hotel/external"
 	"github.com/friedenberg/zit/src/hotel/objekte"
+	"github.com/friedenberg/zit/src/hotel/transacted"
 	"github.com/friedenberg/zit/src/juliett/zettel"
 	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -63,7 +66,7 @@ func (c Status) RunWithCwdQuery(
 
 	if err = u.StoreObjekten().ReadAllMatchingAkten(
 		possible.UnsureAkten,
-		func(fd kennung.FD, z *sku.TransactedZettel) (err error) {
+		func(fd kennung.FD, z *transacted.Zettel) (err error) {
 			if z == nil {
 				err = u.PrinterFileNotRecognized()(&fd)
 			} else {
@@ -71,9 +74,9 @@ func (c Status) RunWithCwdQuery(
 				as := sha.Make(z.GetAkteSha())
 
 				fr := &zettel.CheckedOut{
-					State:    objekte.CheckedOutStateRecognized,
+					State:    checked_out_state.StateRecognized,
 					Internal: *z,
-					External: sku.ExternalZettel{
+					External: external.Zettel{
 						Transacted: *z,
 						FDs: sku.ExternalFDs{
 							Akte: fd,

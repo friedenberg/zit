@@ -18,7 +18,6 @@ import (
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/golf/sku"
 	"github.com/friedenberg/zit/src/golf/transaktion"
-	"github.com/friedenberg/zit/src/hotel/objekte"
 	"github.com/friedenberg/zit/src/india/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/india/konfig"
 )
@@ -38,8 +37,8 @@ type StoreUtil interface {
 	schnittstellen.AkteIOFactory
 	kennung.Clock
 
-	CommitTransacted(objekte.TransactedLike) error
-	CommitUpdatedTransacted(objekte.TransactedLikePtr) error
+	CommitTransacted(sku.SkuLike) error
+	CommitUpdatedTransacted(sku.SkuLikePtr) error
 
 	GetBestandsaufnahmeStore() bestandsaufnahme.Store
 	GetBestandsaufnahmeAkte() bestandsaufnahme.Akte
@@ -166,7 +165,7 @@ func (s common) GetTai() kennung.Tai {
 }
 
 func (s *common) CommitUpdatedTransacted(
-	t objekte.TransactedLikePtr,
+	t sku.SkuLikePtr,
 ) (err error) {
 	ta := kennung.NowTai()
 	t.SetTai(ta)
@@ -174,7 +173,7 @@ func (s *common) CommitUpdatedTransacted(
 	return s.CommitTransacted(t)
 }
 
-func (s *common) CommitTransacted(t objekte.TransactedLike) (err error) {
+func (s *common) CommitTransacted(t sku.SkuLike) (err error) {
 	sk := t.GetSkuLike()
 	sku.AddSkuToHeap(&s.bestandsaufnahmeAkte.Skus, sk)
 
