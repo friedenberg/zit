@@ -10,7 +10,7 @@ import (
 
 func (k compiled) ApplyToMetadatei(
 	ml metadatei.MetadateiLike,
-	tagp schnittstellen.AkteGetterPutter[*typ_akte.Akte],
+	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
 ) (err error) {
 	m := ml.GetMetadatei()
 
@@ -36,7 +36,7 @@ func (k compiled) ApplyToMetadatei(
 		return
 	}
 
-	var ta *typ_akte.Akte
+	var ta *typ_akte.V0
 
 	if ta, err = tagp.GetAkte(toa.GetAkteSha()); err != nil {
 		err = errors.Wrap(err)

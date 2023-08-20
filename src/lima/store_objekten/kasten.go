@@ -5,9 +5,9 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/alfa/toml"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/delta/kasten_akte"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/india/kasten"
 	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/india/transaktion"
 	"github.com/friedenberg/zit/src/juliett/objekte"
@@ -17,8 +17,8 @@ import (
 
 type KastenStore interface {
 	CommonStore[
-		kasten.Akte,
-		*kasten.Akte,
+		kasten_akte.V0,
+		*kasten_akte.V0,
 		kennung.Kasten,
 		*kennung.Kasten,
 	]
@@ -31,8 +31,8 @@ type KastenTransactedReader = objekte_store.TransactedReader[
 
 type kastenStore struct {
 	*commonStore[
-		kasten.Akte,
-		*kasten.Akte,
+		kasten_akte.V0,
+		*kasten_akte.V0,
 		kennung.Kasten,
 		*kennung.Kasten,
 	]
@@ -44,8 +44,8 @@ func makeKastenStore(
 	s = &kastenStore{}
 
 	s.commonStore, err = makeCommonStore[
-		kasten.Akte,
-		*kasten.Akte,
+		kasten_akte.V0,
+		*kasten_akte.V0,
 		kennung.Kasten,
 		*kennung.Kasten,
 	](
@@ -53,9 +53,9 @@ func makeKastenStore(
 		s,
 		sa,
 		s,
-		objekte_store.MakeAkteFormat[kasten.Akte, *kasten.Akte](
-			objekte.MakeTextParserIgnoreTomlErrors[kasten.Akte](sa),
-			objekte.ParsedAkteTomlFormatter[kasten.Akte]{},
+		objekte_store.MakeAkteFormat[kasten_akte.V0, *kasten_akte.V0](
+			objekte.MakeTextParserIgnoreTomlErrors[kasten_akte.V0](sa),
+			objekte.ParsedAkteTomlFormatter[kasten_akte.V0]{},
 			sa,
 		),
 	)
@@ -77,8 +77,8 @@ func makeKastenStore(
 	}
 
 	s.commonStore.CreateOrUpdater = objekte_store.MakeCreateOrUpdate[
-		kasten.Akte,
-		*kasten.Akte,
+		kasten_akte.V0,
+		*kasten_akte.V0,
 		kennung.Kasten,
 		*kennung.Kasten,
 	](

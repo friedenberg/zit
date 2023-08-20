@@ -37,14 +37,14 @@ func (f *FormatterValue) Set(v string) (err error) {
 func (f *FormatterValue) FuncFormatter(
 	out io.Writer,
 	af schnittstellen.AkteIOFactory,
-	agp schnittstellen.AkteGetterPutter[*typ_akte.Akte],
+	agp schnittstellen.AkteGetterPutter[*typ_akte.V0],
 ) schnittstellen.FuncIter[*transacted.Typ] {
 	switch f.string {
 	case "action-names":
 		f := typ_akte.MakeFormatterActionNames()
 
 		return func(o *transacted.Typ) (err error) {
-			var akte *typ_akte.Akte
+			var akte *typ_akte.V0
 
 			if akte, err = agp.GetAkte(o.GetAkteSha()); err != nil {
 				err = errors.Wrap(err)
@@ -65,7 +65,7 @@ func (f *FormatterValue) FuncFormatter(
 		f := typ_akte.MakeFormatterVimSyntaxType()
 
 		return func(o *transacted.Typ) (err error) {
-			var akte *typ_akte.Akte
+			var akte *typ_akte.V0
 
 			if akte, err = agp.GetAkte(o.GetAkteSha()); err != nil {
 				err = errors.Wrap(err)

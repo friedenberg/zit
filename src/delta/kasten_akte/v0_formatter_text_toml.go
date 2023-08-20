@@ -1,4 +1,4 @@
-package etikett
+package kasten_akte
 
 import (
 	"io"
@@ -11,7 +11,7 @@ type FormatterAkteTextToml struct{}
 
 func (_ FormatterAkteTextToml) Format(
 	w io.Writer,
-	t *Akte,
+	t *V0,
 ) (n int64, err error) {
 	enc := toml.NewEncoder(w)
 

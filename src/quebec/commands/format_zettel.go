@@ -118,7 +118,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	var akteFormatter script_config.RemoteScript
 
 	if typKonfig != nil {
-		var typAkte *typ_akte.Akte
+		var typAkte *typ_akte.V0
 
 		if typAkte, err = u.StoreObjekten().Typ().GetAkte(typKonfig.GetAkteSha()); err != nil {
 			err = errors.Wrap(err)

@@ -8,6 +8,8 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/delta/checked_out_state"
+	"github.com/friedenberg/zit/src/delta/etikett_akte"
+	"github.com/friedenberg/zit/src/delta/kasten_akte"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/delta/typ_akte"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -157,8 +159,8 @@ func (s *Store) ReadFiles(
 	)
 
 	etikettEMGR := objekte_store.MakeExternalMaybeGetterReader[
-		etikett.Akte,
-		*etikett.Akte,
+		etikett_akte.V0,
+		*etikett_akte.V0,
 		kennung.Etikett,
 		*kennung.Etikett,
 	](
@@ -167,8 +169,8 @@ func (s *Store) ReadFiles(
 	)
 
 	typEMGR := objekte_store.MakeExternalMaybeGetterReader[
-		typ_akte.Akte,
-		*typ_akte.Akte,
+		typ_akte.V0,
+		*typ_akte.V0,
 		kennung.Typ,
 		*kennung.Typ,
 	](
@@ -177,8 +179,8 @@ func (s *Store) ReadFiles(
 	)
 
 	kastenEMGR := objekte_store.MakeExternalMaybeGetterReader[
-		kasten.Akte,
-		*kasten.Akte,
+		kasten_akte.V0,
+		*kasten_akte.V0,
 		kennung.Kasten,
 		*kennung.Kasten,
 	](

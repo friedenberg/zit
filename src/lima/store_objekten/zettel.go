@@ -63,13 +63,13 @@ type zettelStore struct {
 
 	verzeichnisseSchwanzen *verzeichnisseSchwanzen
 	verzeichnisseAll       *store_verzeichnisse.Zettelen
-	tagp                   schnittstellen.AkteGetterPutter[*typ_akte.Akte]
+	tagp                   schnittstellen.AkteGetterPutter[*typ_akte.V0]
 }
 
 func makeZettelStore(
 	sa store_util.StoreUtil,
 	p schnittstellen.Pool[transacted.Zettel, *transacted.Zettel],
-	tagp schnittstellen.AkteGetterPutter[*typ_akte.Akte],
+	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
 ) (s *zettelStore, err error) {
 	s = &zettelStore{
 		protoZettel: zettel.MakeProtoZettel(sa.GetKonfig()),

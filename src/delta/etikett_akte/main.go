@@ -1,30 +1,30 @@
-package etikett
+package etikett_akte
 
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 )
 
-type Akte struct {
+type V0 struct {
 	Hide bool `toml:"hide"`
 }
 
-func (_ Akte) GetGattung() schnittstellen.GattungLike {
+func (_ V0) GetGattung() schnittstellen.GattungLike {
 	return gattung.Etikett
 }
 
-func (ct *Akte) Merge(ct2 Akte) {
+func (ct *V0) Merge(ct2 V0) {
 }
 
-func (a *Akte) Reset() {
+func (a *V0) Reset() {
 	a.Hide = false
 }
 
-func (a *Akte) ResetWith(b Akte) {
+func (a *V0) ResetWith(b V0) {
 	a.Hide = b.Hide
 }
 
-func (a Akte) Equals(b Akte) bool {
+func (a V0) Equals(b V0) bool {
 	if a.Hide != b.Hide {
 		return false
 	}

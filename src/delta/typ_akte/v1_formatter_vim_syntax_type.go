@@ -15,7 +15,7 @@ func MakeFormatterVimSyntaxType() *formatterVimSyntaxType {
 
 func (f formatterVimSyntaxType) Format(
 	w io.Writer,
-	ct *Akte,
+	ct *V0,
 ) (n int64, err error) {
 	var n1 int
 

@@ -194,7 +194,7 @@ func (kc *Compiled) SetCliFromCommander(k erworben.Cli) {
 }
 
 func (kc *compiled) recompile(
-	tagp schnittstellen.AkteGetterPutter[*typ_akte.Akte],
+	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
 ) (err error) {
 	kc.DefaultEtiketten = kennung.MakeEtikettSet(kc.Akte.Defaults.Etiketten...)
 
@@ -236,7 +236,7 @@ func (kc *compiled) recompile(
 
 	if err = kc.Typen.Each(
 		func(ct transacted.Typ) (err error) {
-			var ta *typ_akte.Akte
+			var ta *typ_akte.V0
 
 			if ta, err = tagp.GetAkte(ct.GetAkteSha()); err != nil {
 				err = errors.Wrap(err)
@@ -273,7 +273,7 @@ func (kc *compiled) recompile(
 
 func (kc *Compiled) Flush(
 	s standort.Standort,
-	tagp schnittstellen.AkteGetterPutter[*typ_akte.Akte],
+	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
 ) (err error) {
 	if !kc.hasChanges || kc.DryRun {
 		return

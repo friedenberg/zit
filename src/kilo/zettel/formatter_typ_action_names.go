@@ -14,13 +14,13 @@ import (
 type formatterTypActionNames struct {
 	erworben             konfig.Compiled
 	includeKonfigActions bool
-	typAkteGetterPutter  schnittstellen.AkteGetterPutter[*typ_akte.Akte]
+	typAkteGetterPutter  schnittstellen.AkteGetterPutter[*typ_akte.V0]
 }
 
 func MakeFormatterTypActionNames(
 	erworben konfig.Compiled,
 	includeKonfigActions bool,
-	tagp schnittstellen.AkteGetterPutter[*typ_akte.Akte],
+	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
 ) *formatterTypActionNames {
 	return &formatterTypActionNames{
 		erworben:             erworben,
@@ -42,7 +42,7 @@ func (e formatterTypActionNames) Format(
 		return
 	}
 
-	var ta *typ_akte.Akte
+	var ta *typ_akte.V0
 
 	if ta, err = e.typAkteGetterPutter.GetAkte(t.GetAkteSha()); err != nil {
 		err = errors.Wrap(err)

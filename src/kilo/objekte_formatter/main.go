@@ -52,7 +52,7 @@ func MakeFormatter(
 	out io.Writer,
 	af schnittstellen.AkteIOFactory,
 	k konfig.Compiled,
-	tagp schnittstellen.AkteGetterPutter[*typ_akte.Akte],
+	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
 ) (fo Formatter, err error) {
 	f := formatter{
 		formatters: make(map[gattung.Gattung]funcFormat),

@@ -18,8 +18,8 @@ import (
 
 type TypStore interface {
 	CommonStore[
-		typ_akte.Akte,
-		*typ_akte.Akte,
+		typ_akte.V0,
+		*typ_akte.V0,
 		kennung.Typ,
 		*kennung.Typ,
 	]
@@ -32,8 +32,8 @@ type TypTransactedReader = objekte_store.TransactedReader[
 
 type typStore struct {
 	*commonStore[
-		typ_akte.Akte,
-		*typ_akte.Akte,
+		typ_akte.V0,
+		*typ_akte.V0,
 		kennung.Typ,
 		*kennung.Typ,
 	]
@@ -45,8 +45,8 @@ func makeTypStore(
 	s = &typStore{}
 
 	s.commonStore, err = makeCommonStore[
-		typ_akte.Akte,
-		*typ_akte.Akte,
+		typ_akte.V0,
+		*typ_akte.V0,
 		kennung.Typ,
 		*kennung.Typ,
 	](
@@ -54,9 +54,9 @@ func makeTypStore(
 		s,
 		sa,
 		s,
-		objekte_store.MakeAkteFormat[typ_akte.Akte, *typ_akte.Akte](
-			objekte.MakeTextParserIgnoreTomlErrors[typ_akte.Akte](sa),
-			objekte.ParsedAkteTomlFormatter[typ_akte.Akte]{},
+		objekte_store.MakeAkteFormat[typ_akte.V0, *typ_akte.V0](
+			objekte.MakeTextParserIgnoreTomlErrors[typ_akte.V0](sa),
+			objekte.ParsedAkteTomlFormatter[typ_akte.V0]{},
 			sa,
 		),
 	)
@@ -78,8 +78,8 @@ func makeTypStore(
 	}
 
 	s.commonStore.CreateOrUpdater = objekte_store.MakeCreateOrUpdate[
-		typ_akte.Akte,
-		*typ_akte.Akte,
+		typ_akte.V0,
+		*typ_akte.V0,
 		kennung.Typ,
 		*kennung.Typ,
 	](

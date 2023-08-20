@@ -14,7 +14,7 @@ import (
 
 func MakeWriterKonfig(
 	k konfig.Compiled,
-	tagp schnittstellen.AkteGetterPutter[*typ_akte.Akte],
+	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
 ) schnittstellen.FuncIter[*transacted.Zettel] {
 	errors.TodoP1("switch to sigils")
 	errors.TodoP3("add efficient parsing of hiding tags")
@@ -44,7 +44,7 @@ func MakeWriterKonfig(
 
 		t := k.GetApproximatedTyp(z.GetTyp()).ApproximatedOrActual()
 
-		var ta *typ_akte.Akte
+		var ta *typ_akte.V0
 
 		if ta, err = tagp.GetAkte(t.GetAkteSha()); err != nil {
 			err = errors.Wrap(err)

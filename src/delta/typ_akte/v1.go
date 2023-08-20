@@ -9,30 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/script_config"
 )
 
-func Default() (t Akte) {
-	t = Akte{
-		InlineAkte:     true,
-		FileExtension:  "md",
-		Formatters:     make(map[string]script_config.WithOutputFormat),
-		VimSyntaxType:  "markdown",
-		Actions:        make(map[string]script_config.ScriptConfig),
-		EtikettenRules: make(map[string]etikett_rule.Rule),
-	}
-
-	return
-}
-
-func MakeObjekte() (t *Akte) {
-	t = &Akte{
-		Formatters:     make(map[string]script_config.WithOutputFormat),
-		Actions:        make(map[string]script_config.ScriptConfig),
-		EtikettenRules: make(map[string]etikett_rule.Rule),
-	}
-
-	return
-}
-
-type Akte struct {
+type V0 struct {
 	InlineAkte    bool                        `toml:"inline-akte,omitempty"`
 	Archived      bool                        `toml:"archived,omitempty"`
 	FileExtension string                      `toml:"file-extension,omitempty"`
@@ -45,11 +22,11 @@ type Akte struct {
 	EtikettenRules     map[string]etikett_rule.Rule              `toml:"etiketten-rules,omitempty"`
 }
 
-func (a Akte) GetGattung() schnittstellen.GattungLike {
+func (a V0) GetGattung() schnittstellen.GattungLike {
 	return gattung.Typ
 }
 
-func (a *Akte) Reset() {
+func (a *V0) Reset() {
 	a.Archived = false
 	a.InlineAkte = true
 	a.FileExtension = ""
@@ -62,7 +39,7 @@ func (a *Akte) Reset() {
 	a.EtikettenRules = reset.Map(a.EtikettenRules)
 }
 
-func (a *Akte) ResetWith(b Akte) {
+func (a *V0) ResetWith(b V0) {
 	a.InlineAkte = b.InlineAkte
 	a.Archived = b.Archived
 	a.FileExtension = b.FileExtension
@@ -76,7 +53,7 @@ func (a *Akte) ResetWith(b Akte) {
 	a.EtikettenRules = b.EtikettenRules
 }
 
-func (a Akte) Equals(b Akte) bool {
+func (a V0) Equals(b V0) bool {
 	if a.Archived != b.Archived {
 		return false
 	}
@@ -164,7 +141,7 @@ func (a Akte) Equals(b Akte) bool {
 	return true
 }
 
-func (a *Akte) Apply(b Akte) {
+func (a *V0) Apply(b V0) {
 	a.Archived = b.Archived
 	a.InlineAkte = b.InlineAkte
 	a.FileExtension = b.FileExtension
@@ -202,7 +179,7 @@ func (a *Akte) Apply(b Akte) {
 	}
 }
 
-func (a *Akte) Merge(b Akte) {
+func (a *V0) Merge(b V0) {
 	if b.InlineAkte {
 		a.InlineAkte = true
 	}

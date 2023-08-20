@@ -5,20 +5,20 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/alfa/toml"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/delta/etikett_akte"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/india/transaktion"
 	"github.com/friedenberg/zit/src/juliett/objekte"
-	"github.com/friedenberg/zit/src/kilo/etikett"
 	"github.com/friedenberg/zit/src/lima/objekte_store"
 	"github.com/friedenberg/zit/src/mike/store_util"
 )
 
 type EtikettStore interface {
 	CommonStore[
-		etikett.Akte,
-		*etikett.Akte,
+		etikett_akte.V0,
+		*etikett_akte.V0,
 		kennung.Etikett,
 		*kennung.Etikett,
 	]
@@ -31,8 +31,8 @@ type EtikettTransactedReader = objekte_store.TransactedReader[
 
 type etikettStore struct {
 	*commonStore[
-		etikett.Akte,
-		*etikett.Akte,
+		etikett_akte.V0,
+		*etikett_akte.V0,
 		kennung.Etikett,
 		*kennung.Etikett,
 	]
@@ -44,8 +44,8 @@ func makeEtikettStore(
 	s = &etikettStore{}
 
 	s.commonStore, err = makeCommonStore[
-		etikett.Akte,
-		*etikett.Akte,
+		etikett_akte.V0,
+		*etikett_akte.V0,
 		kennung.Etikett,
 		*kennung.Etikett,
 	](
@@ -53,9 +53,9 @@ func makeEtikettStore(
 		s,
 		sa,
 		s,
-		objekte_store.MakeAkteFormat[etikett.Akte, *etikett.Akte](
-			objekte.MakeTextParserIgnoreTomlErrors[etikett.Akte](sa),
-			objekte.ParsedAkteTomlFormatter[etikett.Akte]{},
+		objekte_store.MakeAkteFormat[etikett_akte.V0, *etikett_akte.V0](
+			objekte.MakeTextParserIgnoreTomlErrors[etikett_akte.V0](sa),
+			objekte.ParsedAkteTomlFormatter[etikett_akte.V0]{},
 			sa,
 		),
 	)
@@ -77,8 +77,8 @@ func makeEtikettStore(
 	}
 
 	s.commonStore.CreateOrUpdater = objekte_store.MakeCreateOrUpdate[
-		etikett.Akte,
-		*etikett.Akte,
+		etikett_akte.V0,
+		*etikett_akte.V0,
 		kennung.Etikett,
 		*kennung.Etikett,
 	](

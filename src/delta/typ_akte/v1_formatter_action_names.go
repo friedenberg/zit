@@ -15,7 +15,7 @@ func MakeFormatterActionNames() *formatterActionNames {
 
 func (f formatterActionNames) Format(
 	w io.Writer,
-	ct *Akte,
+	ct *V0,
 ) (n int64, err error) {
 	for v, v1 := range ct.Actions {
 		var n1 int

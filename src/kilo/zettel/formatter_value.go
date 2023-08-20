@@ -54,7 +54,7 @@ func (fv *FormatterValue) FuncFormatterVerzeichnisse(
 	out io.Writer,
 	af schnittstellen.AkteIOFactory,
 	k konfig.Compiled,
-	tagp schnittstellen.AkteGetterPutter[*typ_akte.Akte],
+	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
 ) schnittstellen.FuncIter[*transacted.Zettel] {
 	return fv.FuncFormatter(
 		out,
@@ -68,7 +68,7 @@ func (fv *FormatterValue) FuncFormatter(
 	out io.Writer,
 	af schnittstellen.AkteIOFactory,
 	k konfig.Compiled,
-	tagp schnittstellen.AkteGetterPutter[*typ_akte.Akte],
+	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
 ) schnittstellen.FuncIter[*transacted.Zettel] {
 	errors.TodoP2("convert to verzeichnisse")
 
@@ -83,7 +83,7 @@ func (fv *FormatterValue) FuncFormatter(
 
 			tt := t.ActualOrNil()
 
-			var ta *typ_akte.Akte
+			var ta *typ_akte.V0
 
 			if ta, err = tagp.GetAkte(tt.GetAkteSha()); err != nil {
 				err = errors.Wrap(err)
@@ -130,7 +130,7 @@ func (fv *FormatterValue) FuncFormatter(
 				return
 			}
 
-			var ta *typ_akte.Akte
+			var ta *typ_akte.V0
 
 			if ta, err = tagp.GetAkte(t.GetAkteSha()); err != nil {
 				err = errors.Wrap(err)
