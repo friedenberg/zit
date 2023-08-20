@@ -19,7 +19,6 @@ import (
 	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/checked_out"
-	"github.com/friedenberg/zit/src/kilo/etikett"
 	"github.com/friedenberg/zit/src/kilo/konfig"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/lima/cwd"
@@ -333,7 +332,7 @@ func (s *Store) ReadFiles(
 
 					err = nil
 
-					var tco etikett.CheckedOut
+					var tco checked_out.Etikett
 
 					if tco.External, err = s.storeObjekten.Etikett().ReadOneExternal(
 						il,

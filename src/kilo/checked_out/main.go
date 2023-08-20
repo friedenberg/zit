@@ -6,8 +6,6 @@ import (
 )
 
 type (
-	Typ = objekte.CheckedOut[
-		kennung.Typ,
-		*kennung.Typ,
-	]
+	Typ     = objekte.CheckedOut[kennung.Typ, *kennung.Typ]
+	Etikett = objekte.CheckedOut[kennung.Etikett, *kennung.Etikett]
 )

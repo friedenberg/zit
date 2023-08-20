@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/india/kasten"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/checked_out"
-	"github.com/friedenberg/zit/src/kilo/etikett"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/lima/cwd"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -62,7 +61,7 @@ func (c Checkin) Run(
 						return
 					}
 
-				case *etikett.CheckedOut:
+				case *checked_out.Etikett:
 					if _, err = u.StoreObjekten().Etikett().CreateOrUpdateCheckedOut(
 						aco,
 					); err != nil {
