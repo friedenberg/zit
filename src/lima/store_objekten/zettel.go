@@ -20,6 +20,7 @@ import (
 	"github.com/friedenberg/zit/src/india/sku_formats"
 	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/juliett/objekte"
+	"github.com/friedenberg/zit/src/kilo/checked_out"
 	"github.com/friedenberg/zit/src/kilo/store_verzeichnisse"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/lima/cwd"
@@ -38,7 +39,7 @@ type ZettelStore interface {
 	objekte_store.Creator[*transacted.Zettel]
 
 	objekte_store.CheckedOutUpdater[
-		*zettel.CheckedOut,
+		*checked_out.Zettel,
 		*transacted.Zettel,
 	]
 
@@ -445,7 +446,7 @@ func (s *zettelStore) updateExternal(
 }
 
 func (s *zettelStore) UpdateCheckedOut(
-	co *zettel.CheckedOut,
+	co *checked_out.Zettel,
 ) (t *transacted.Zettel, err error) {
 	errors.TodoP2("support dry run")
 

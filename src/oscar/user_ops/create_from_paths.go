@@ -13,6 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/external"
 	"github.com/friedenberg/zit/src/india/transacted"
+	"github.com/friedenberg/zit/src/kilo/checked_out"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/kilo/zettel_external"
 	"github.com/friedenberg/zit/src/lima/objekte_store"
@@ -112,7 +113,7 @@ func (c CreateFromPaths) Run(
 				return
 			}
 
-			cz := zettel.CheckedOut{
+			cz := checked_out.Zettel{
 				External: *z,
 			}
 
@@ -223,7 +224,7 @@ func (c *CreateFromPaths) zettelsFromPath(
 }
 
 func (c CreateFromPaths) handleStoreError(
-	z zettel.CheckedOut,
+	z checked_out.Zettel,
 	f string,
 	in error,
 ) {

@@ -5,16 +5,17 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
+	"github.com/friedenberg/zit/src/kilo/checked_out"
 )
 
 type (
-	SetCheckedOut        = schnittstellen.SetLike[CheckedOut]
-	MutableSetCheckedOut = schnittstellen.MutableSetLike[CheckedOut]
+	SetCheckedOut        = schnittstellen.SetLike[checked_out.Zettel]
+	MutableSetCheckedOut = schnittstellen.MutableSetLike[checked_out.Zettel]
 )
 
 type CheckedOutUniqueKeyer struct{}
 
-func (k CheckedOutUniqueKeyer) GetKey(sz CheckedOut) string {
+func (k CheckedOutUniqueKeyer) GetKey(sz checked_out.Zettel) string {
 	return collections.MakeKey(
 		sz.Internal.Kopf,
 		sz.Internal.GetTai(),
@@ -24,29 +25,29 @@ func (k CheckedOutUniqueKeyer) GetKey(sz CheckedOut) string {
 }
 
 func MakeMutableSetCheckedOutUnique(c int) MutableSetCheckedOut {
-	return collections_value.MakeMutableValueSet[CheckedOut](
+	return collections_value.MakeMutableValueSet[checked_out.Zettel](
 		CheckedOutUniqueKeyer{},
 	)
 }
 
 type CheckedOutHinweisKeyer struct{}
 
-func (k CheckedOutHinweisKeyer) GetKey(sz CheckedOut) string {
+func (k CheckedOutHinweisKeyer) GetKey(sz checked_out.Zettel) string {
 	return collections.MakeKey(
 		sz.Internal.GetKennung(),
 	)
 }
 
 func MakeMutableSetCheckedOutHinweisZettel(c int) MutableSetCheckedOut {
-	return collections_value.MakeMutableValueSet[CheckedOut](
+	return collections_value.MakeMutableValueSet[checked_out.Zettel](
 		CheckedOutHinweisKeyer{},
 	)
 }
 
 func ToSliceFilesZettelen(s SetCheckedOut) (out []string, err error) {
-	return iter.DerivedValues[CheckedOut, string](
+	return iter.DerivedValues[checked_out.Zettel, string](
 		s,
-		func(z CheckedOut) (e string, err error) {
+		func(z checked_out.Zettel) (e string, err error) {
 			e = z.External.GetObjekteFD().Path
 
 			if e == "" {
@@ -60,9 +61,9 @@ func ToSliceFilesZettelen(s SetCheckedOut) (out []string, err error) {
 }
 
 func ToSliceFilesAkten(s SetCheckedOut) (out []string, err error) {
-	return iter.DerivedValues[CheckedOut, string](
+	return iter.DerivedValues[checked_out.Zettel, string](
 		s,
-		func(z CheckedOut) (e string, err error) {
+		func(z checked_out.Zettel) (e string, err error) {
 			e = z.External.GetAkteFD().Path
 
 			if e == "" {

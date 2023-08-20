@@ -7,10 +7,8 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/india/kasten"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/checked_out"
-	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/lima/cwd"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
@@ -37,7 +35,7 @@ func (c Checkin) Run(
 			objekte.MakeFilterFromMetaSet(ms),
 			func(co objekte.CheckedOutLikePtr) (err error) {
 				switch aco := co.(type) {
-				case *zettel.CheckedOut:
+				case *checked_out.Zettel:
 					if _, err = u.StoreObjekten().Zettel().UpdateCheckedOut(
 						aco,
 					); err != nil {
@@ -45,7 +43,7 @@ func (c Checkin) Run(
 						return
 					}
 
-				case *kasten.CheckedOut:
+				case *checked_out.Kasten:
 					if _, err = u.StoreObjekten().Kasten().CreateOrUpdateCheckedOut(
 						aco,
 					); err != nil {

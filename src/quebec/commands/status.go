@@ -14,7 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/india/external"
 	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/juliett/objekte"
-	"github.com/friedenberg/zit/src/kilo/zettel"
+	"github.com/friedenberg/zit/src/kilo/checked_out"
 	"github.com/friedenberg/zit/src/lima/cwd"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
@@ -73,7 +73,7 @@ func (c Status) RunWithCwdQuery(
 				os := sha.Make(z.GetObjekteSha())
 				as := sha.Make(z.GetAkteSha())
 
-				fr := &zettel.CheckedOut{
+				fr := &checked_out.Zettel{
 					State:    checked_out_state.StateRecognized,
 					Internal: *z,
 					External: external.Zettel{

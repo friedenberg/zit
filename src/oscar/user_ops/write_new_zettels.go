@@ -3,6 +3,7 @@ package user_ops
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/india/transacted"
+	"github.com/friedenberg/zit/src/kilo/checked_out"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/mike/store_fs"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -29,7 +30,7 @@ func (c WriteNewZettels) RunMany(
 
 	// TODO-P4 modify this to be run once
 	for i := 0; i < count; i++ {
-		var cz zettel.CheckedOut
+		var cz checked_out.Zettel
 
 		if cz, err = c.runOneAlreadyLocked(z); err != nil {
 			err = errors.Wrap(err)
@@ -44,7 +45,7 @@ func (c WriteNewZettels) RunMany(
 
 func (c WriteNewZettels) RunOne(
 	z zettel.ProtoZettel,
-) (result zettel.CheckedOut, err error) {
+) (result checked_out.Zettel, err error) {
 	if err = c.Lock(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -57,7 +58,7 @@ func (c WriteNewZettels) RunOne(
 
 func (c WriteNewZettels) runOneAlreadyLocked(
 	pz zettel.ProtoZettel,
-) (result zettel.CheckedOut, err error) {
+) (result checked_out.Zettel, err error) {
 	z := pz.Make()
 
 	var zt *transacted.Zettel

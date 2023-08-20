@@ -15,7 +15,6 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/erworben"
-	"github.com/friedenberg/zit/src/india/kasten"
 	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/checked_out"
@@ -268,7 +267,7 @@ func (s *Store) ReadFiles(
 
 					err = nil
 
-					var tco kasten.CheckedOut
+					var tco checked_out.Kasten
 
 					if tco.External, err = s.storeObjekten.Kasten().ReadOneExternal(
 						il,

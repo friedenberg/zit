@@ -12,6 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/juliett/objekte"
+	"github.com/friedenberg/zit/src/kilo/checked_out"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/kilo/zettel_external"
 	"github.com/friedenberg/zit/src/lima/cwd"
@@ -63,7 +64,7 @@ func (s *Store) Checkout(
 
 	if err = zts.Each(
 		func(zt *transacted.Zettel) (err error) {
-			var zc zettel.CheckedOut
+			var zc checked_out.Zettel
 
 			if zc, err = s.CheckoutOneZettel(options, *zt); err != nil {
 				err = errors.Wrap(err)
@@ -83,7 +84,7 @@ func (s *Store) Checkout(
 
 func (s Store) shouldCheckOut(
 	options CheckoutOptions,
-	cz zettel.CheckedOut,
+	cz checked_out.Zettel,
 ) (ok bool) {
 	switch {
 	case cz.Internal.GetMetadatei().Equals(cz.External.GetMetadatei()):
@@ -116,7 +117,7 @@ func (s *Store) checkoutOneGeneric(
 ) (cop objekte.CheckedOutLikePtr, err error) {
 	switch tt := t.(type) {
 	case *transacted.Zettel:
-		var co zettel.CheckedOut
+		var co checked_out.Zettel
 		co, err = s.CheckoutOneZettel(options, *tt)
 		cop = &co
 
@@ -144,7 +145,7 @@ func (s *Store) checkoutOneGeneric(
 func (s *Store) CheckoutOneZettel(
 	options CheckoutOptions,
 	sz transacted.Zettel,
-) (cz zettel.CheckedOut, err error) {
+) (cz checked_out.Zettel, err error) {
 	cz.Internal = sz
 
 	var originalFilename, filename string

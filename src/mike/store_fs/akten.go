@@ -12,13 +12,13 @@ import (
 	"github.com/friedenberg/zit/src/echo/age_io"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/india/transacted"
-	"github.com/friedenberg/zit/src/kilo/zettel"
+	"github.com/friedenberg/zit/src/kilo/checked_out"
 	"github.com/friedenberg/zit/src/lima/objekte_store"
 )
 
 func (s Store) ReadExternalZettelFromAktePath(
 	p string,
-) (cz zettel.CheckedOut, err error) {
+) (cz checked_out.Zettel, err error) {
 	errors.TodoP3("use cache")
 
 	if p, err = filepath.Abs(p); err != nil {
