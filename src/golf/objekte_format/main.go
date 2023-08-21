@@ -62,7 +62,7 @@ func FormatForVersion(v schnittstellen.StoreVersion) Format {
 		return v2{}
 
 	default:
-		return v3{}
+		return v3{includeTai: true}
 	}
 }
 

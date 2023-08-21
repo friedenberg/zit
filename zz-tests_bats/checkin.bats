@@ -143,10 +143,14 @@ function checkin_simple_typ { # @test
 		[!md@220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217]
 	EOM
 
-	run_zit last
+	run_zit last -format bestandsaufnahme-sans-tai
 	assert_success
-	assert_output_cut -d' ' -f2- -- - <<-EOM
-		Tai Typ md 220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217
+	assert_output - <<-EOM
+		---
+		Akte 220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217
+		Gattung Typ
+		Kennung md
+		---
 	EOM
 
 	run_zit show -format log !md.t
@@ -167,10 +171,14 @@ function checkin_simple_etikett { # @test
 		[-zz-archive@b8cd0eaa1891284eafdf99d3acc2007a3d4396e8a7282335f707d99825388a93]
 	EOM
 
-	run_zit last
+	run_zit last -format bestandsaufnahme-sans-tai
 	assert_success
-	assert_output_cut -d' ' -f2- -- - <<-EOM
-		Tai Etikett zz-archive b8cd0eaa1891284eafdf99d3acc2007a3d4396e8a7282335f707d99825388a93
+	assert_output - <<-EOM
+		---
+		Akte b8cd0eaa1891284eafdf99d3acc2007a3d4396e8a7282335f707d99825388a93
+		Gattung Etikett
+		Kennung zz-archive
+		---
 	EOM
 
 	run_zit show -format text zz-archive?.e

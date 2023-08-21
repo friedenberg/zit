@@ -4,6 +4,12 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
+func (s common) ObjekteReaderFactory(
+	g schnittstellen.GattungGetter,
+) schnittstellen.ObjekteReaderFactory {
+	return s.ObjekteReaderWriterFactory(g)
+}
+
 func (s common) ObjekteReaderWriterFactory(
 	g schnittstellen.GattungGetter,
 ) schnittstellen.ObjekteIOFactory {

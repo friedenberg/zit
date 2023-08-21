@@ -44,7 +44,9 @@ func (f v3) FormatPersistentMetadatei(
 	w.WriteKeySpaceValue("Gattung", c.GetKennungLike().GetGattung())
 	w.WriteKeySpaceValue("Kennung", c.GetKennungLike())
 
-	w.WriteKeySpaceValue("Tai", m.Tai)
+	if f.includeTai {
+		w.WriteKeySpaceValue("Tai", m.Tai)
+	}
 
 	if !m.Typ.IsEmpty() {
 		w.WriteKeySpaceValue(gattung.Typ, m.GetTyp())

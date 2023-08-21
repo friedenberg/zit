@@ -48,3 +48,34 @@ func CalculateAndSetSha(
 
 	return
 }
+
+func ReadFromSha(
+	sk SkuLikePtr,
+	orf schnittstellen.ObjekteReaderFactory,
+	format objekte_format.Format,
+) (err error) {
+	expected := sk.GetObjekteSha()
+
+	var or schnittstellen.ShaReadCloser
+
+	if or, err = orf.ObjekteReader(expected); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.DeferredCloser(&err, or)
+
+	if _, err = format.ParsePersistentMetadatei(or, sk); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	actual := or.GetShaLike()
+
+	if !actual.EqualsSha(expected) {
+		err = errors.Errorf("expected %s but got %s", expected, actual)
+		return
+	}
+
+	return
+}

@@ -17,11 +17,18 @@ teardown() {
 function last_after_init { # @test
 	run_zit_init_disable_age
 
-	run_zit last
+	run_zit last -format bestandsaufnahme-sans-tai
 	assert_success
-	assert_output_cut -d' ' -f2- -- - <<-EOM
-		Tai Typ md 102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384
-		Tai Konfig konfig $(get_konfig_sha)
+	assert_output_unsorted - <<-EOM
+		---
+		---
+		---
+		Akte 102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384
+		Akte 4c003f789b20dab6662ab3bc4450ac18f50ae9436345e5202219e58668d9d4f1
+		Gattung Konfig
+		Gattung Typ
+		Kennung konfig
+		Kennung md
 	EOM
 }
 
@@ -43,9 +50,13 @@ function last_after_typ_mutate { # @test
 	assert_success
 	assert_output '3'
 
-	run_zit last
+	run_zit last -format Bestandsaufnahme-sans-tai
 	assert_success
-	assert_output_cut -d' ' -f2- -- - <<-EOM
-		Tai Typ md 220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217
+	assert_output - <<-EOM
+		---
+		Akte 220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217
+		Gattung Typ
+		Kennung md
+		---
 	EOM
 }

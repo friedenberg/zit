@@ -8,12 +8,15 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/echo/format"
+	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/sku_formats"
 )
 
 type formatAkte struct {
-	af schnittstellen.AkteIOFactory
+	orfg                      schnittstellen.ObjekteReaderFactoryGetter
+	persistentMetadateiFormat objekte_format.Format
+	af                        schnittstellen.AkteIOFactory
 }
 
 func (f formatAkte) ParseAkte(
@@ -28,9 +31,16 @@ func (f formatAkte) ParseAkte(
 	if n, err = format.ReadLines(
 		r,
 		func(v string) (err error) {
-			var sk sku.SkuLike
+			var sk sku.SkuLikePtr
 
 			if sk, err = tml(v); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			orf := f.orfg.ObjekteReaderFactory(sk)
+
+			if err = sku.ReadFromSha(sk, orf, f.persistentMetadateiFormat); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

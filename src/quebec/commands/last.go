@@ -4,17 +4,19 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/india/sku_formats"
 	"github.com/friedenberg/zit/src/india/transaktion"
+	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
 type Last struct {
-	Type gattung.Gattung
+	Type   gattung.Gattung
+	Format string
 }
 
 func init() {
@@ -22,6 +24,8 @@ func init() {
 		"last",
 		func(f *flag.FlagSet) Command {
 			c := &Last{}
+
+			f.StringVar(&c.Format, "format", "text", "format")
 
 			return c
 		},
@@ -39,13 +43,29 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		errors.Err().Print("ignoring arguments")
 	}
 
+	var f schnittstellen.FuncIter[sku.SkuLikePtr]
+
+	objekteFormatterValue := objekte.FormatterValue{}
+
+	if err = objekteFormatterValue.Set(c.Format); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	f = objekteFormatterValue.MakeFormatterObjekte(
+		u.Out(),
+		u.StoreObjekten(),
+		u.Konfig(),
+		u.PrinterTransactedLike(),
+	)
+
 	method := c.runWithTransaktion
 
 	if u.Konfig().UseBestandsaufnahme {
 		method = c.runWithBestandsaufnahm
 	}
 
-	if err = method(u); err != nil {
+	if err = method(u, f); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -53,7 +73,10 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	return
 }
 
-func (c Last) runWithBestandsaufnahm(u *umwelt.Umwelt) (err error) {
+func (c Last) runWithBestandsaufnahm(
+	u *umwelt.Umwelt,
+	f schnittstellen.FuncIter[sku.SkuLikePtr],
+) (err error) {
 	s := u.StoreObjekten()
 
 	var b *bestandsaufnahme.Transacted
@@ -71,13 +94,7 @@ func (c Last) runWithBestandsaufnahm(u *umwelt.Umwelt) (err error) {
 	}
 
 	errors.TodoP3("support log line format for skus")
-	if err = sku.HeapEach(
-		a.Skus,
-		func(o sku.SkuLike) (err error) {
-			errors.Out().Print(sku_formats.StringMetadatei(o))
-			return
-		},
-	); err != nil {
+	if err = sku.HeapEachPtr(a.Skus, f); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -85,7 +102,10 @@ func (c Last) runWithBestandsaufnahm(u *umwelt.Umwelt) (err error) {
 	return
 }
 
-func (c Last) runWithTransaktion(u *umwelt.Umwelt) (err error) {
+func (c Last) runWithTransaktion(
+	u *umwelt.Umwelt,
+	f schnittstellen.FuncIter[sku.SkuLikePtr],
+) (err error) {
 	s := u.StoreObjekten()
 
 	var transaktion *transaktion.Transaktion
@@ -96,12 +116,7 @@ func (c Last) runWithTransaktion(u *umwelt.Umwelt) (err error) {
 	}
 
 	errors.TodoP3("support log line format for skus")
-	if err = transaktion.Skus.Each(
-		func(o sku.SkuLikePtr) (err error) {
-			errors.Out().Print(sku_formats.String(o))
-			return
-		},
-	); err != nil {
+	if err = transaktion.Skus.Each(f); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

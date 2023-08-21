@@ -62,6 +62,7 @@ func MakeStore(
 	standort standort.Standort,
 	ls schnittstellen.LockSmith,
 	sv schnittstellen.StoreVersion,
+	orfg schnittstellen.ObjekteReaderFactoryGetter,
 	of schnittstellen.ObjekteIOFactory,
 	af schnittstellen.AkteIOFactory,
 	pmf objekte_format.Format,
@@ -76,7 +77,9 @@ func MakeStore(
 
 	default:
 		fa = formatAkte{
-			af: af,
+			orfg:                      orfg,
+			persistentMetadateiFormat: pmf,
+			af:                        af,
 		}
 	}
 
@@ -319,10 +322,7 @@ func (s *store) ReadAllSkus(
 				return
 			}
 
-			if err = sku.HeapEachPtr(
-				a.Skus,
-				f,
-			); err != nil {
+			if err = sku.HeapEachPtr(a.Skus, f); err != nil {
 				err = errors.Wrapf(
 					err,
 					"Bestandsaufnahme: %s",

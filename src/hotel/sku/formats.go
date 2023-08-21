@@ -12,10 +12,13 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
 
-type FuncMakeSkuLike func(string) (SkuLike, error)
+type (
+	FuncMakeSkuLike    func(string) (SkuLike, error)
+	FuncMakeSkuLikePtr func(string) (SkuLikePtr, error)
+)
 
-func TryMakeSkuWithFormats(fms ...FuncMakeSkuLike) FuncMakeSkuLike {
-	return func(line string) (sk SkuLike, err error) {
+func TryMakeSkuWithFormats(fms ...FuncMakeSkuLikePtr) FuncMakeSkuLikePtr {
+	return func(line string) (sk SkuLikePtr, err error) {
 		em := errors.MakeMulti()
 
 		for _, f := range fms {
@@ -30,7 +33,7 @@ func TryMakeSkuWithFormats(fms ...FuncMakeSkuLike) FuncMakeSkuLike {
 	}
 }
 
-func MakeSkuFromLineGattungFirst(line string) (sk SkuLike, err error) {
+func MakeSkuFromLineGattungFirst(line string) (sk SkuLikePtr, err error) {
 	var (
 		m  metadatei.Metadatei
 		k  kennung.Kennung
@@ -77,7 +80,7 @@ func MakeSkuFromLineGattungFirst(line string) (sk SkuLike, err error) {
 	return MakeSkuLike(m, k, os)
 }
 
-func MakeSkuFromLineTaiFirst(line string) (sk SkuLike, err error) {
+func MakeSkuFromLineTaiFirst(line string) (sk SkuLikePtr, err error) {
 	var (
 		m  metadatei.Metadatei
 		k  kennung.Kennung
