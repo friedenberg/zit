@@ -181,7 +181,9 @@ function checkin_simple_etikett { # @test
 		---
 	EOM
 
-	run_zit show -format text zz-archive?.e
+	run_zit show -format akte zz-archive?.e
 	assert_success
-	assert_output 'hide = true'
+	assert_output - <<-EOM
+		hide = true
+	EOM
 }

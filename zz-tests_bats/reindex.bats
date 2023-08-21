@@ -66,7 +66,7 @@ function reindex_after_changes { # @test
 		[one/uno@3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
 	EOM
 
-	run_zit show !md:t
+	run_zit show -format akte !md:t
 	assert_success
 	assert_output - <<-EOM
 		inline-akte = false

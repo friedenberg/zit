@@ -12,6 +12,7 @@ type (
 	Konfig interface {
 		schnittstellen.Konfig
 		kennung.ImplicitEtikettenGetter
+		IsInlineTyp(kennung.Typ) bool
 	}
 
 	SavedAkteFormatter interface {

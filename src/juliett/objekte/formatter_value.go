@@ -117,14 +117,20 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		}
 
 	case "text":
-		fInlineAkte := metadatei.MakeTextFormatterMetadateiInlineAkte(af, nil)
-		fOmitMetadatei := metadatei.MakeTextFormatterExcludeMetadatei(af, nil)
+		fMetadateiAndAkte := metadatei.MakeTextFormatterMetadateiInlineAkte(
+			af,
+			nil,
+		)
+		fMetadateiOnly := metadatei.MakeTextFormatterMetadateiOnly(af, nil)
+		fAkteOnly := metadatei.MakeTextFormatterExcludeMetadatei(af, nil)
 
 		return func(tl sku.SkuLikePtr) (err error) {
-			if tl.GetGattung() == gattung.Zettel {
-				_, err = fInlineAkte.FormatMetadatei(out, tl)
+			if gattung.Konfig.EqualsGattung(tl.GetGattung()) {
+				_, err = fAkteOnly.FormatMetadatei(out, tl)
+			} else if k.IsInlineTyp(tl.GetTyp()) {
+				_, err = fMetadateiAndAkte.FormatMetadatei(out, tl)
 			} else {
-				_, err = fOmitMetadatei.FormatMetadatei(out, tl)
+				_, err = fMetadateiOnly.FormatMetadatei(out, tl)
 			}
 
 			return
