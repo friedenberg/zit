@@ -228,7 +228,9 @@ func (kc *compiled) recompile(
 		)
 	}
 
-	inlineTypen := kc.InlineTypen.CloneMutableSetPtrLike()
+	inlineTypen := collections_ptr.MakeMutableValueSet[kennung.Typ, *kennung.Typ](
+		nil,
+	)
 
 	defer func() {
 		kc.InlineTypen = inlineTypen.CloneSetPtrLike()

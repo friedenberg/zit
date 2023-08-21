@@ -28,7 +28,7 @@ func (a V0) GetGattung() schnittstellen.GattungLike {
 
 func (a *V0) Reset() {
 	a.Archived = false
-	a.InlineAkte = true
+	a.InlineAkte = false
 	a.FileExtension = ""
 	a.ExecCommand = nil
 	a.VimSyntaxType = ""
