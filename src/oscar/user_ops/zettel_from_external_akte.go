@@ -28,7 +28,7 @@ type ZettelFromExternalAkte struct {
 }
 
 func (c ZettelFromExternalAkte) Run(
-	ms matcher.MetaSet,
+	ms matcher.Query,
 ) (results zettel.MutableSet, err error) {
 	if err = c.Lock(); err != nil {
 		err = errors.Wrap(err)

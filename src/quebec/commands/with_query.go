@@ -15,7 +15,7 @@ import (
 )
 
 type CommandWithQuery interface {
-	RunWithQuery(store *umwelt.Umwelt, ids matcher.MetaSet) error
+	RunWithQuery(store *umwelt.Umwelt, ids matcher.Query) error
 	DefaultGattungen() gattungen.Set
 }
 

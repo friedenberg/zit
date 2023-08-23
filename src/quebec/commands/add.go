@@ -75,7 +75,7 @@ func (c Add) DefaultGattungen() gattungen.Set {
 
 func (c Add) RunWithCwdQuery(
 	u *umwelt.Umwelt,
-	ms matcher.MetaSet,
+	ms matcher.Query,
 	pz *cwd.CwdFiles,
 ) (err error) {
 	zettelsFromAkteOp := user_ops.ZettelFromExternalAkte{

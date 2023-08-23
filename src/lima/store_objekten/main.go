@@ -351,7 +351,7 @@ func (s *Store) UpdateManyMetadatei(
 }
 
 func (s *Store) Query(
-	ms matcher.MetaSet,
+	ms matcher.Query,
 	f schnittstellen.FuncIter[sku.SkuLikePtr],
 ) (err error) {
 	if err = ms.All(

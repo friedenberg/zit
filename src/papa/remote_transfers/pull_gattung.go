@@ -9,7 +9,7 @@ import (
 )
 
 func (c *client) PullSkus(
-	ids matcher.MetaSet,
+	ids matcher.Query,
 ) (err error) {
 	errors.TodoP1("implement etikett and akte")
 	gattungInheritors := c.StoreObjekten().GetGattungInheritors(

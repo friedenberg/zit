@@ -46,7 +46,7 @@ func (c Clean) DefaultGattungen() gattungen.Set {
 
 func (c Clean) RunWithCwdQuery(
 	s *umwelt.Umwelt,
-	ms matcher.MetaSet,
+	ms matcher.Query,
 	possible *cwd.CwdFiles,
 ) (err error) {
 	fds := collections_ptr.MakeMutableValueSet[kennung.FD, *kennung.FD](nil)

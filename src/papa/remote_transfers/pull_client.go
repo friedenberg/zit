@@ -21,8 +21,8 @@ import (
 type FuncSku func(sku.SkuLike) error
 
 type PullClient interface {
-	SkusFromFilter(matcher.MetaSet, FuncSku) error
-	PullSkus(matcher.MetaSet) error
+	SkusFromFilter(matcher.Query, FuncSku) error
+	PullSkus(matcher.Query) error
 	Close() error
 }
 
@@ -85,7 +85,7 @@ func (c client) Close() (err error) {
 }
 
 func (c client) SkusFromFilter(
-	ids matcher.MetaSet,
+	ids matcher.Query,
 	f FuncSku,
 ) (err error) {
 	var d remote_conn.Dialogue

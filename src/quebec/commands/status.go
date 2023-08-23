@@ -39,7 +39,7 @@ func (c Status) DefaultGattungen() gattungen.Set {
 
 func (c Status) RunWithCwdQuery(
 	u *umwelt.Umwelt,
-	ms matcher.MetaSet,
+	ms matcher.Query,
 	possible *cwd.CwdFiles,
 ) (err error) {
 	pcol := u.PrinterCheckedOutLike()

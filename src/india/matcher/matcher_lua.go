@@ -1,7 +1,6 @@
 package matcher
 
 import (
-	// "github.com/Shopify/go-lua"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	lua "github.com/yuin/gopher-lua"

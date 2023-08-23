@@ -38,7 +38,7 @@ func (c Checkout) DefaultGattungen() gattungen.Set {
 
 func (c Checkout) RunWithQuery(
 	u *umwelt.Umwelt,
-	ms matcher.MetaSet,
+	ms matcher.Query,
 ) (err error) {
 	var cwdFiles cwd.CwdFiles
 

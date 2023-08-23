@@ -144,7 +144,7 @@ func (s Store) Flush() (err error) {
 
 func (s *Store) ReadFiles(
 	fs *cwd.CwdFiles,
-	ms matcher.MetaSet,
+	ms matcher.Query,
 	f schnittstellen.FuncIter[objekte.CheckedOutLikePtr],
 ) (err error) {
 	zettelEMGR := objekte_store.MakeExternalMaybeGetterReader[

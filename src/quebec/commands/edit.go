@@ -66,7 +66,7 @@ func (c Edit) DefaultGattungen() gattungen.Set {
 
 func (c Edit) RunWithCwdQuery(
 	u *umwelt.Umwelt,
-	ms matcher.MetaSet,
+	ms matcher.Query,
 	pz *cwd.CwdFiles,
 ) (err error) {
 	options := store_fs.CheckoutOptions{

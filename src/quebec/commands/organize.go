@@ -73,7 +73,7 @@ func (c *Organize) CompletionGattung() gattungen.Set {
 
 func (c *Organize) RunWithQuery(
 	u *umwelt.Umwelt,
-	ms matcher.MetaSet,
+	ms matcher.Query,
 ) (err error) {
 	u.ApplyToOrganizeOptions(&c.Options)
 

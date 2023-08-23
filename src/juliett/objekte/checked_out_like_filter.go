@@ -9,7 +9,7 @@ import (
 )
 
 func MakeFilterFromMetaSet(
-	ms matcher.MetaSet,
+	ms matcher.Query,
 ) schnittstellen.FuncIter[CheckedOutLikePtr] {
 	if ms == nil {
 		return collections.MakeWriterNoop[CheckedOutLikePtr]()

@@ -234,7 +234,7 @@ func (c New) writeNewZettels(
 
 func (c New) editZettels(
 	u *umwelt.Umwelt,
-	ms matcher.MetaSet,
+	ms matcher.Query,
 	zsc zettel.MutableSetCheckedOut,
 ) (err error) {
 	if !c.Edit {

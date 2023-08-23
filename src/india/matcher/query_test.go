@@ -11,15 +11,15 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 )
 
-func TestMetaSetGob(t1 *testing.T) {
+func TestQueryGob(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
 	bs := bytes.NewBuffer(nil)
 	enc := gob.NewEncoder(bs)
-	gob.Register(&metaSet{})
+	gob.Register(&query{})
 
 	{
-		sut := MakeMetaSet(
+		sut := MakeQuery(
 			nil,
 			kennung.Abbr{},
 			nil,
@@ -43,7 +43,7 @@ func TestMetaSetGob(t1 *testing.T) {
 	dec := gob.NewDecoder(bs)
 
 	{
-		var sut MetaSet
+		var sut Query
 
 		if err := dec.Decode(&sut); err != nil {
 			t.Errorf("decoding failed: %s", err)

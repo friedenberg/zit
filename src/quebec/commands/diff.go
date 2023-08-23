@@ -44,7 +44,7 @@ func (c Diff) DefaultGattungen() gattungen.Set {
 
 func (c Diff) RunWithCwdQuery(
 	u *umwelt.Umwelt,
-	ms matcher.MetaSet,
+	ms matcher.Query,
 	cwdFiles *cwd.CwdFiles,
 ) (err error) {
 	fInline := metadatei.MakeTextFormatterMetadateiInlineAkte(

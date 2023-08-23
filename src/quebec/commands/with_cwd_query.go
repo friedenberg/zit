@@ -18,7 +18,7 @@ import (
 type CommandWithCwdQuery interface {
 	RunWithCwdQuery(
 		store *umwelt.Umwelt,
-		ms matcher.MetaSet,
+		ms matcher.Query,
 		cwdFiles *cwd.CwdFiles,
 	) error
 	DefaultGattungen() gattungen.Set

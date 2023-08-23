@@ -21,7 +21,7 @@ import (
 
 func (s *Store) CheckoutQuery(
 	options CheckoutOptions,
-	ms matcher.MetaSet,
+	ms matcher.Query,
 	f schnittstellen.FuncIter[objekte.CheckedOutLike],
 ) (err error) {
 	if err = s.storeObjekten.Query(

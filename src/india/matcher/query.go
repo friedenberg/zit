@@ -17,11 +17,11 @@ import (
 )
 
 func init() {
-	gob.Register(&metaSet{})
+	gob.Register(&query{})
 }
 
 // TODO-P3 rename to QueryGattungGroup
-type MetaSet interface {
+type Query interface {
 	Get(g gattung.Gattung) (s MatcherSigil, ok bool)
 	GetFDs() schnittstellen.SetLike[kennung.FD]
 	GetEtiketten() kennung.EtikettSet
@@ -48,7 +48,7 @@ func (s setWithSigil) GetSigil() kennung.Sigil {
 	return s.Sigil
 }
 
-type metaSet struct {
+type query struct {
 	implicitEtikettenGetter ImplicitEtikettenGetter
 	fileExtensionGetter     schnittstellen.FileExtensionGetter
 	expanders               kennung.Abbr
@@ -62,7 +62,7 @@ type metaSet struct {
 	FDs              schnittstellen.MutableSetLike[kennung.FD]
 }
 
-func MakeMetaSet(
+func MakeQuery(
 	cwd Matcher,
 	ex kennung.Abbr,
 	hidden Matcher,
@@ -70,8 +70,8 @@ func MakeMetaSet(
 	dg gattungen.Set,
 	implicitEtikettenGetter ImplicitEtikettenGetter,
 	ki kennung.Index,
-) MetaSet {
-	return &metaSet{
+) Query {
+	return &query{
 		implicitEtikettenGetter: implicitEtikettenGetter,
 		cwd:                     cwd,
 		fileExtensionGetter:     feg,
@@ -86,16 +86,16 @@ func MakeMetaSet(
 	}
 }
 
-func MakeMetaSetAll(
+func MakeQueryAll(
 	cwd Matcher,
 	ex kennung.Abbr,
 	hidden Matcher,
 	feg schnittstellen.FileExtensionGetter,
 	implicitEtikettenGetter ImplicitEtikettenGetter,
 	ki kennung.Index,
-) MetaSet {
+) Query {
 	errors.TodoP2("support allowed sigils")
-	return &metaSet{
+	return &query{
 		implicitEtikettenGetter: implicitEtikettenGetter,
 		cwd:                     cwd,
 		fileExtensionGetter:     feg,
@@ -107,7 +107,7 @@ func MakeMetaSetAll(
 	}
 }
 
-func (s metaSet) String() string {
+func (s query) String() string {
 	sb := &strings.Builder{}
 
 	hasAny := false
@@ -134,7 +134,7 @@ func (s metaSet) String() string {
 	return sb.String()
 }
 
-func (s *metaSet) SetMany(vs ...string) (err error) {
+func (s *query) SetMany(vs ...string) (err error) {
 	builder := MatcherBuilder{}
 
 	if _, err = builder.Build(vs...); err != nil {
@@ -155,11 +155,11 @@ func (s *metaSet) SetMany(vs ...string) (err error) {
 	return
 }
 
-func (ms *metaSet) Set(v string) (err error) {
+func (ms *query) Set(v string) (err error) {
 	return ms.set(v)
 }
 
-func (ms *metaSet) set(v string) (err error) {
+func (ms *query) set(v string) (err error) {
 	v = strings.TrimSpace(v)
 
 	sbs := [3]*strings.Builder{
@@ -385,7 +385,7 @@ func tryAddMatcher(
 	return
 }
 
-func (ms metaSet) Get(g gattung.Gattung) (s MatcherSigil, ok bool) {
+func (ms query) Get(g gattung.Gattung) (s MatcherSigil, ok bool) {
 	var ids setWithSigil
 
 	ids, ok = ms.Gattung[g]
@@ -405,11 +405,11 @@ func (ms metaSet) Get(g gattung.Gattung) (s MatcherSigil, ok bool) {
 	return
 }
 
-func (ms metaSet) GetFDs() schnittstellen.SetLike[kennung.FD] {
+func (ms query) GetFDs() schnittstellen.SetLike[kennung.FD] {
 	return ms.FDs
 }
 
-func (ms metaSet) GetEtiketten() kennung.EtikettSet {
+func (ms query) GetEtiketten() kennung.EtikettSet {
 	es := kennung.MakeEtikettMutableSet()
 
 	for _, s := range ms.Gattung {
@@ -431,7 +431,7 @@ func (ms metaSet) GetEtiketten() kennung.EtikettSet {
 	return es
 }
 
-func (ms metaSet) GetTyp() (t kennung.Typ, ok bool) {
+func (ms query) GetTyp() (t kennung.Typ, ok bool) {
 	ts := ms.GetTypen()
 
 	if ts.Len() != 1 {
@@ -444,7 +444,7 @@ func (ms metaSet) GetTyp() (t kennung.Typ, ok bool) {
 	return
 }
 
-func (ms metaSet) GetTypen() schnittstellen.SetLike[kennung.Typ] {
+func (ms query) GetTypen() schnittstellen.SetLike[kennung.Typ] {
 	es := kennung.MakeMutableTypSet()
 
 	for _, s := range ms.Gattung {
@@ -466,13 +466,13 @@ func (ms metaSet) GetTypen() schnittstellen.SetLike[kennung.Typ] {
 	return es
 }
 
-func (s metaSet) ContainsMatchable(m Matchable) bool {
+func (s query) ContainsMatchable(m Matchable) bool {
 	todo.Implement()
 	return false
 }
 
 // Runs in parallel
-func (ms metaSet) All(f func(gattung.Gattung, MatcherSigil) error) (err error) {
+func (ms query) All(f func(gattung.Gattung, MatcherSigil) error) (err error) {
 	errors.TodoP1("lock")
 	chErr := make(chan error, len(ms.Gattung))
 

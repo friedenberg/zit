@@ -20,7 +20,7 @@ type Checkin struct {
 
 func (c Checkin) Run(
 	u *umwelt.Umwelt,
-	ms matcher.MetaSet,
+	ms matcher.Query,
 	pz *cwd.CwdFiles,
 ) (err error) {
 	fds := collections_ptr.MakeMutableValueSet[kennung.FD, *kennung.FD](nil)
