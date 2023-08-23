@@ -3,7 +3,7 @@ package objekte_store
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/foxtrot/matcher"
+	"github.com/friedenberg/zit/src/india/matcher"
 )
 
 type Query interface {

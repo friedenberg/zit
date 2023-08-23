@@ -3,15 +3,8 @@ package matcher
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/hotel/sku"
 )
-
-type EtikettenGetter interface {
-	GetEtiketten() kennung.EtikettSet
-}
-
-type TypGetter interface {
-	GetTyp() kennung.Typ
-}
 
 type IdLikeGetter interface {
 	GetKennungLike() kennung.Kennung
@@ -22,9 +15,7 @@ type Matchable interface {
 	schnittstellen.ValueLike
 	schnittstellen.Stored
 
-	EtikettenGetter
-	TypGetter
-	IdLikeGetter
+	sku.SkuLikePtr
 }
 
 type MatchableGetter interface {

@@ -104,7 +104,7 @@ func KennungContainsExactlyMatchable(
 ) bool {
 	switch kt := k.(type) {
 	case kennung.EtikettLike:
-		es := m.GetEtiketten()
+		es := m.GetMetadatei().GetEtiketten()
 
 		if es.ContainsKey(kt.GetEtikett().String()) {
 			return true
@@ -136,7 +136,7 @@ func KennungContainsMatchable(
 	switch kt := k.(type) {
 	case kennung.EtikettLike:
 		if iter.CheckAnyPtr[kennung.Etikett, *kennung.Etikett](
-			m.GetEtiketten(),
+			m.GetMetadatei().GetEtiketten(),
 			func(e *kennung.Etikett) (ok bool) {
 				indexed, err := ki.Etiketten(e)
 

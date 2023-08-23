@@ -10,11 +10,11 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/matcher"
 	"github.com/friedenberg/zit/src/golf/kennung_index"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/erworben"
+	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/india/transaktion"
 	"github.com/friedenberg/zit/src/juliett/objekte"
@@ -538,7 +538,7 @@ func (s *Store) addMatchableTypAndEtikettenIfNecessary(
 		return
 	}
 
-	es := iter.SortedValues[kennung.Etikett](m.GetEtiketten())
+	es := iter.SortedValues[kennung.Etikett](m.GetMetadatei().GetEtiketten())
 
 	for _, e := range es {
 		if err = s.addEtikett(e); err != nil {
