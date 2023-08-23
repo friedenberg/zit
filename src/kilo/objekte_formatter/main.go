@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/typ_akte"
-	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/matcher"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/kilo/konfig"
 	"github.com/friedenberg/zit/src/kilo/typ"
@@ -29,7 +29,7 @@ type formatter struct {
 	formatters map[gattung.Gattung]funcFormat
 }
 
-func makeFuncFormatter[T kennung.Matchable](
+func makeFuncFormatter[T matcher.Matchable](
 	f schnittstellen.FuncIter[T],
 ) funcFormat {
 	return func(e sku.SkuLikePtr) (err error) {
@@ -47,7 +47,7 @@ type Formatter interface {
 }
 
 func MakeFormatter(
-	ms kennung.MetaSet,
+	ms matcher.MetaSet,
 	v string,
 	out io.Writer,
 	af schnittstellen.AkteIOFactory,

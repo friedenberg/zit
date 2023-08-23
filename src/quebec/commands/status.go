@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/checked_out_state"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/matcher"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/external"
 	"github.com/friedenberg/zit/src/india/transacted"
@@ -38,7 +39,7 @@ func (c Status) DefaultGattungen() gattungen.Set {
 
 func (c Status) RunWithCwdQuery(
 	u *umwelt.Umwelt,
-	ms kennung.MetaSet,
+	ms matcher.MetaSet,
 	possible *cwd.CwdFiles,
 ) (err error) {
 	pcol := u.PrinterCheckedOutLike()

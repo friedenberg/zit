@@ -14,6 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/matcher"
 	"github.com/friedenberg/zit/src/india/objekte_collections"
 	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/kilo/organize_text"
@@ -74,7 +75,7 @@ func (c Add) DefaultGattungen() gattungen.Set {
 
 func (c Add) RunWithCwdQuery(
 	u *umwelt.Umwelt,
-	ms kennung.MetaSet,
+	ms matcher.MetaSet,
 	pz *cwd.CwdFiles,
 ) (err error) {
 	zettelsFromAkteOp := user_ops.ZettelFromExternalAkte{

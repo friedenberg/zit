@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/matcher"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/lima/cwd"
 	"github.com/friedenberg/zit/src/mike/store_fs"
@@ -65,7 +66,7 @@ func (c Edit) DefaultGattungen() gattungen.Set {
 
 func (c Edit) RunWithCwdQuery(
 	u *umwelt.Umwelt,
-	ms kennung.MetaSet,
+	ms matcher.MetaSet,
 	pz *cwd.CwdFiles,
 ) (err error) {
 	options := store_fs.CheckoutOptions{

@@ -5,19 +5,19 @@ import (
 	"fmt"
 )
 
-type errInvalidKennung string
+type ErrInvalidKennung string
 
-func (e errInvalidKennung) Error() string {
+func (e ErrInvalidKennung) Error() string {
 	return fmt.Sprintf("invalid kennung: %q", string(e))
 }
 
-func (e errInvalidKennung) Is(err error) (ok bool) {
-	_, ok = err.(errInvalidKennung)
+func (e ErrInvalidKennung) Is(err error) (ok bool) {
+	_, ok = err.(ErrInvalidKennung)
 	return
 }
 
 func IsErrInvalid(err error) bool {
-	return errors.Is(err, errInvalidKennung(""))
+	return errors.Is(err, ErrInvalidKennung(""))
 }
 
 type errInvalidSigil string

@@ -13,6 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/delta/typ_akte"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/matcher"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/erworben"
 	"github.com/friedenberg/zit/src/india/transacted"
@@ -143,7 +144,7 @@ func (s Store) Flush() (err error) {
 
 func (s *Store) ReadFiles(
 	fs *cwd.CwdFiles,
-	ms kennung.MetaSet,
+	ms matcher.MetaSet,
 	f schnittstellen.FuncIter[objekte.CheckedOutLikePtr],
 ) (err error) {
 	zettelEMGR := objekte_store.MakeExternalMaybeGetterReader[
@@ -255,7 +256,7 @@ func (s *Store) ReadFiles(
 
 	if err = fs.EachCreatableMatchable(
 		iter.MakeChain(
-			func(ilg kennung.IdLikeGetter) (err error) {
+			func(ilg matcher.IdLikeGetter) (err error) {
 				switch il := ilg.(type) {
 				case *cwd.Kasten:
 					if err = s.storeObjekten.GetAbbrStore().Kisten().Exists(

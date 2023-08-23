@@ -5,13 +5,14 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/matcher"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
 
 type (
 	Konfig interface {
 		schnittstellen.Konfig
-		kennung.ImplicitEtikettenGetter
+		matcher.ImplicitEtikettenGetter
 		IsInlineTyp(kennung.Typ) bool
 	}
 

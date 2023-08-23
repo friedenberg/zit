@@ -12,7 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/delta/gattungen"
-	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/matcher"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/kilo/zettel"
@@ -153,7 +153,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	if c.Edit {
 		ms := u.MakeMetaIdSetWithoutExcludedHidden(
-			kennung.MakeMatcherAlways(),
+			matcher.MakeMatcherAlways(),
 			gattungen.MakeSet(gattung.Zettel),
 		)
 
@@ -234,7 +234,7 @@ func (c New) writeNewZettels(
 
 func (c New) editZettels(
 	u *umwelt.Umwelt,
-	ms kennung.MetaSet,
+	ms matcher.MetaSet,
 	zsc zettel.MutableSetCheckedOut,
 ) (err error) {
 	if !c.Edit {

@@ -15,6 +15,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/matcher"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/erworben"
@@ -239,8 +240,8 @@ func (u *Umwelt) MakeKennungIndex() kennung.Index {
 	}
 }
 
-func (u *Umwelt) MakeKennungHidden() kennung.Matcher {
-	h := kennung.MakeMatcherOrDoNotMatchOnEmpty()
+func (u *Umwelt) MakeKennungHidden() matcher.Matcher {
+	h := matcher.MakeMatcherOrDoNotMatchOnEmpty()
 
 	i := u.MakeKennungIndex()
 
@@ -250,14 +251,14 @@ func (u *Umwelt) MakeKennungHidden() kennung.Matcher {
 
 			if err = impl.EachPtr(
 				func(e *kennung.Etikett) (err error) {
-					return h.Add(kennung.MakeMatcherContains(e, i))
+					return h.Add(matcher.MakeMatcherContains(e, i))
 				},
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			if err = h.Add(kennung.MakeMatcherContains(e, i)); err != nil {
+			if err = h.Add(matcher.MakeMatcherContains(e, i)); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -286,9 +287,9 @@ func (u *Umwelt) MakeKennungExpanders() (out kennung.Abbr) {
 }
 
 func (u *Umwelt) MakeMetaIdSetWithExcludedHidden(
-	cwd kennung.Matcher,
+	cwd matcher.Matcher,
 	dg gattungen.Set,
-) kennung.MetaSet {
+) matcher.MetaSet {
 	if dg == nil {
 		dg = gattungen.MakeSet(gattung.Zettel)
 	}
@@ -297,7 +298,7 @@ func (u *Umwelt) MakeMetaIdSetWithExcludedHidden(
 
 	i := u.MakeKennungIndex()
 
-	return kennung.MakeMetaSet(
+	return matcher.MakeMetaSet(
 		cwd,
 		u.MakeKennungExpanders(),
 		exc,
@@ -309,16 +310,16 @@ func (u *Umwelt) MakeMetaIdSetWithExcludedHidden(
 }
 
 func (u *Umwelt) MakeMetaIdSetWithoutExcludedHidden(
-	cwd kennung.Matcher,
+	cwd matcher.Matcher,
 	dg gattungen.Set,
-) kennung.MetaSet {
+) matcher.MetaSet {
 	if dg == nil {
 		dg = gattungen.MakeSet(gattung.Zettel)
 	}
 
 	i := u.MakeKennungIndex()
 
-	return kennung.MakeMetaSet(
+	return matcher.MakeMetaSet(
 		cwd,
 		u.MakeKennungExpanders(),
 		nil,

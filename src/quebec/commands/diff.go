@@ -18,6 +18,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/matcher"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/lima/cwd"
@@ -43,7 +44,7 @@ func (c Diff) DefaultGattungen() gattungen.Set {
 
 func (c Diff) RunWithCwdQuery(
 	u *umwelt.Umwelt,
-	ms kennung.MetaSet,
+	ms matcher.MetaSet,
 	cwdFiles *cwd.CwdFiles,
 ) (err error) {
 	fInline := metadatei.MakeTextFormatterMetadateiInlineAkte(

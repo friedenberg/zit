@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/matcher"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/checked_out"
 	"github.com/friedenberg/zit/src/lima/cwd"
@@ -19,7 +20,7 @@ type Checkin struct {
 
 func (c Checkin) Run(
 	u *umwelt.Umwelt,
-	ms kennung.MetaSet,
+	ms matcher.MetaSet,
 	pz *cwd.CwdFiles,
 ) (err error) {
 	fds := collections_ptr.MakeMutableValueSet[kennung.FD, *kennung.FD](nil)

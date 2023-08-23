@@ -43,14 +43,6 @@ func (i Konfig) String() string {
 	return "konfig"
 }
 
-func (i Konfig) ContainsMatchable(m Matchable) bool {
-	if !i.GetGattung().EqualsGattung(gattung.Make(m.GetGattung())) {
-		return false
-	}
-
-	return true
-}
-
 func (k Konfig) Parts() [3]string {
 	return [3]string{"", "", "konfig"}
 }

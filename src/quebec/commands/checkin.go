@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/gattungen"
-	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/matcher"
 	"github.com/friedenberg/zit/src/lima/cwd"
 	"github.com/friedenberg/zit/src/november/umwelt"
 	"github.com/friedenberg/zit/src/oscar/user_ops"
@@ -23,7 +23,12 @@ func init() {
 			c := &Checkin{}
 
 			f.BoolVar(&c.Delete, "delete", false, "the checked-out file")
-			f.BoolVar(&c.IgnoreAkte, "ignore-akte", false, "do not change the akte")
+			f.BoolVar(
+				&c.IgnoreAkte,
+				"ignore-akte",
+				false,
+				"do not change the akte",
+			)
 
 			return c
 		},
@@ -36,7 +41,7 @@ func (c Checkin) DefaultGattungen() gattungen.Set {
 
 func (c Checkin) RunWithCwdQuery(
 	u *umwelt.Umwelt,
-	ms kennung.MetaSet,
+	ms matcher.MetaSet,
 	pz *cwd.CwdFiles,
 ) (err error) {
 	op := user_ops.Checkin{

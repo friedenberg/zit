@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/gattungen"
-	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/matcher"
 	"github.com/friedenberg/zit/src/november/umwelt"
 	"github.com/friedenberg/zit/src/papa/remote_push"
 )
@@ -55,7 +55,7 @@ func (c Push) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	ids := u.MakeMetaIdSetWithExcludedHidden(kennung.MakeMatcherAlways(), nil)
+	ids := u.MakeMetaIdSetWithExcludedHidden(matcher.MakeMatcherAlways(), nil)
 
 	if err = ids.SetMany(args...); err != nil {
 		err = errors.Wrap(err)

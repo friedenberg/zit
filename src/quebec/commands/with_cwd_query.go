@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/matcher"
 	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/lima/cwd"
@@ -17,7 +18,7 @@ import (
 type CommandWithCwdQuery interface {
 	RunWithCwdQuery(
 		store *umwelt.Umwelt,
-		ms kennung.MetaSet,
+		ms matcher.MetaSet,
 		cwdFiles *cwd.CwdFiles,
 	) error
 	DefaultGattungen() gattungen.Set

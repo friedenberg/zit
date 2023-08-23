@@ -14,6 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/echo/age_io"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/matcher"
 	"github.com/friedenberg/zit/src/golf/kennung_index"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -47,8 +48,8 @@ type StoreUtil interface {
 	GetKennungIndex() kennung_index.Index
 	GetTypenIndex() (kennung_index.KennungIndex[kennung.Typ, *kennung.Typ], error)
 
-	SetMatchableAdder(kennung.MatchableAdder)
-	kennung.MatchableAdder
+	SetMatchableAdder(matcher.MatchableAdder)
+	matcher.MatchableAdder
 
 	objekte_format.Getter
 
@@ -71,7 +72,7 @@ type common struct {
 	bestandsaufnahmeStore bestandsaufnahme.Store
 	kennungIndex          kennung_index.Index
 
-	kennung.MatchableAdder
+	matcher.MatchableAdder
 	typenIndex kennung_index.KennungIndex[kennung.Typ, *kennung.Typ]
 }
 
@@ -217,7 +218,7 @@ func (s common) GetKonfigPtr() *konfig.Compiled {
 	return s.konfig
 }
 
-func (s *common) SetMatchableAdder(ma kennung.MatchableAdder) {
+func (s *common) SetMatchableAdder(ma matcher.MatchableAdder) {
 	s.MatchableAdder = ma
 }
 

@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/toml"
 	"github.com/friedenberg/zit/src/charlie/pool"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/matcher"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -193,7 +194,7 @@ func (s *commonStoreBase[O, OPtr, K, KPtr]) SetLogWriter(
 }
 
 func (s *commonStoreBase[O, OPtr, K, KPtr]) Query(
-	m kennung.MatcherSigil,
+	m matcher.MatcherSigil,
 	f schnittstellen.FuncIter[*sku.Transacted[K, KPtr]],
 ) (err error) {
 	return objekte_store.QueryMethodForMatcher[
@@ -204,7 +205,7 @@ func (s *commonStoreBase[O, OPtr, K, KPtr]) Query(
 
 func (s *commonStoreBase[O, OPtr, K, KPtr]) ReindexOne(
 	sk sku.SkuLike,
-) (o kennung.Matchable, err error) {
+) (o matcher.Matchable, err error) {
 	var t *sku.Transacted[K, KPtr]
 
 	if t, err = s.InflateFromSku(sk); err != nil {

@@ -3,13 +3,13 @@ package remote_transfers
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/matcher"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/lima/objekte_store"
 )
 
 func (c *client) PullSkus(
-	ids kennung.MetaSet,
+	ids matcher.MetaSet,
 ) (err error) {
 	errors.TodoP1("implement etikett and akte")
 	gattungInheritors := c.StoreObjekten().GetGattungInheritors(

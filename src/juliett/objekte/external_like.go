@@ -2,6 +2,7 @@ package objekte
 
 import (
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/matcher"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
@@ -10,7 +11,7 @@ type ExternalLike interface {
 	GetFDs() sku.ExternalFDs
 	GetObjekteFD() kennung.FD
 	GetAkteFD() kennung.FD
-	kennung.Matchable
+	matcher.Matchable
 	metadatei.Getter
 	GetSkuLike() sku.SkuLike
 }

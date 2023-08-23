@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/charlie/tridex"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/matcher"
 	"github.com/friedenberg/zit/src/india/transacted"
 )
 
@@ -21,7 +22,7 @@ type AbbrStore interface {
 	Etiketten() AbbrStoreGeneric[kennung.Etikett]
 	Typen() AbbrStoreGeneric[kennung.Typ]
 
-	AddMatchable(kennung.Matchable) error
+	AddMatchable(matcher.Matchable) error
 
 	errors.Flusher
 }
@@ -159,7 +160,7 @@ func (i *indexAbbr) readIfNecessary() (err error) {
 	return
 }
 
-func (i *indexAbbr) AddMatchable(o kennung.Matchable) (err error) {
+func (i *indexAbbr) AddMatchable(o matcher.Matchable) (err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return

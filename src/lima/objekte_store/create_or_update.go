@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/matcher"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -32,7 +33,7 @@ type createOrUpdate[
 	af                        schnittstellen.AkteWriterFactory
 	reader                    TransactedReader[T3, *sku.Transacted[T2, T3]]
 	delegate                  CreateOrUpdateDelegate[*sku.Transacted[T2, T3]]
-	matchableAdder            kennung.MatchableAdder
+	matchableAdder            matcher.MatchableAdder
 	persistentMetadateiFormat objekte_format.Format
 	kg                        konfig.Getter
 }
@@ -49,7 +50,7 @@ func MakeCreateOrUpdate[
 	af schnittstellen.AkteWriterFactory,
 	reader TransactedReader[T3, *sku.Transacted[T2, T3]],
 	delegate CreateOrUpdateDelegate[*sku.Transacted[T2, T3]],
-	ma kennung.MatchableAdder,
+	ma matcher.MatchableAdder,
 	pmf objekte_format.Format,
 	kg konfig.Getter,
 ) (cou *createOrUpdate[T, T1, T2, T3]) {

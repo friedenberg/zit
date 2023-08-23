@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/checked_out_state"
-	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/matcher"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/juliett/objekte"
@@ -21,7 +21,7 @@ import (
 
 func (s *Store) CheckoutQuery(
 	options CheckoutOptions,
-	ms kennung.MetaSet,
+	ms matcher.MetaSet,
 	f schnittstellen.FuncIter[objekte.CheckedOutLike],
 ) (err error) {
 	if err = s.storeObjekten.Query(

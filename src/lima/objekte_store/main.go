@@ -2,7 +2,7 @@ package objekte_store
 
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/matcher"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/juliett/objekte"
@@ -68,7 +68,7 @@ type Querier[
 	V any,
 ] interface {
 	TransactedReader[K, V]
-	Query(kennung.MatcherSigil, schnittstellen.FuncIter[V]) error
+	Query(matcher.MatcherSigil, schnittstellen.FuncIter[V]) error
 }
 
 type Creator[

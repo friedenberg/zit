@@ -14,6 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/typ_akte"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/matcher"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/external"
@@ -653,7 +654,7 @@ func (s *zettelStore) Inherit(tz *transacted.Zettel) (err error) {
 
 func (s *zettelStore) ReindexOne(
 	sk sku.SkuLike,
-) (o kennung.Matchable, err error) {
+) (o matcher.Matchable, err error) {
 	var tz *transacted.Zettel
 	defer s.pool.Put(tz)
 

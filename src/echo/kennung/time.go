@@ -169,7 +169,3 @@ func (t *Time) Reset() {
 func (t Time) IsEmpty() bool {
 	return t.time.IsZero()
 }
-
-func (t Time) ContainsMatchable(m Matchable) bool {
-	return false
-}

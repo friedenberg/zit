@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/gattungen"
-	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/matcher"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/objekte_formatter"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -52,7 +52,7 @@ func (c Show) DefaultGattungen() gattungen.Set {
 
 func (c Show) runGenericObjekteFormatterValue(
 	u *umwelt.Umwelt,
-	ms kennung.MetaSet,
+	ms matcher.MetaSet,
 	objekteFormatterValue objekte.FormatterValue,
 ) (err error) {
 	f := iter.MakeSyncSerializer(
@@ -72,7 +72,7 @@ func (c Show) runGenericObjekteFormatterValue(
 	return
 }
 
-func (c Show) RunWithQuery(u *umwelt.Umwelt, ms kennung.MetaSet) (err error) {
+func (c Show) RunWithQuery(u *umwelt.Umwelt, ms matcher.MetaSet) (err error) {
 	objekteFormatterValue := objekte.FormatterValue{}
 
 	if err = objekteFormatterValue.Set(c.Format); err == nil {

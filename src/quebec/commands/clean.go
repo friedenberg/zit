@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/checked_out_state"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/matcher"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/lima/cwd"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -45,7 +46,7 @@ func (c Clean) DefaultGattungen() gattungen.Set {
 
 func (c Clean) RunWithCwdQuery(
 	s *umwelt.Umwelt,
-	ms kennung.MetaSet,
+	ms matcher.MetaSet,
 	possible *cwd.CwdFiles,
 ) (err error) {
 	fds := collections_ptr.MakeMutableValueSet[kennung.FD, *kennung.FD](nil)

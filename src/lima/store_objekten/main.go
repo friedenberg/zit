@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/matcher"
 	"github.com/friedenberg/zit/src/golf/kennung_index"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -350,11 +351,11 @@ func (s *Store) UpdateManyMetadatei(
 }
 
 func (s *Store) Query(
-	ms kennung.MetaSet,
+	ms matcher.MetaSet,
 	f schnittstellen.FuncIter[sku.SkuLikePtr],
 ) (err error) {
 	if err = ms.All(
-		func(g gattung.Gattung, matcher kennung.MatcherSigil) (err error) {
+		func(g gattung.Gattung, matcher matcher.MatcherSigil) (err error) {
 			r, ok := s.queriers[g]
 
 			if !ok {
@@ -448,7 +449,7 @@ func (s *Store) GetReindexFunc(
 			return
 		}
 
-		var o kennung.Matchable
+		var o matcher.Matchable
 
 		if o, err = st.ReindexOne(sk); err != nil {
 			err = errors.Wrapf(err, "Sku %s", sk)
@@ -520,7 +521,7 @@ func (s *Store) addEtikett(
 }
 
 func (s *Store) addMatchableTypAndEtikettenIfNecessary(
-	m kennung.Matchable,
+	m matcher.Matchable,
 ) (err error) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
@@ -549,7 +550,7 @@ func (s *Store) addMatchableTypAndEtikettenIfNecessary(
 	return
 }
 
-func (s *Store) AddMatchable(m kennung.Matchable) (err error) {
+func (s *Store) AddMatchable(m matcher.Matchable) (err error) {
 	if err = s.addMatchableTypAndEtikettenIfNecessary(m); err != nil {
 		err = errors.Wrap(err)
 		return

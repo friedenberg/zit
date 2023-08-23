@@ -299,39 +299,6 @@ func (f FD) GetHinweis() (h Hinweis, err error) {
 	return
 }
 
-func (_ FD) Each(_ schnittstellen.FuncIter[Matcher]) error {
-	return nil
-}
-
-func (fd FD) MatcherLen() int {
-	return 0
-}
-
-func (fd FD) ContainsMatchableExactly(m Matchable) (ok bool) {
-	return fd.ContainsMatchable(m)
-}
-
-func (fd FD) ContainsMatchable(m Matchable) (ok bool) {
-	il := m.GetKennungLike()
-
-	switch it := il.(type) {
-	case Hinweis:
-		var h Hinweis
-
-		if h, ok = fd.AsHinweis(); !ok {
-			return false
-		}
-
-		ok := h.Equals(it)
-		return ok
-
-	default:
-		errors.TodoP1("support other gattung")
-	}
-
-	return false
-}
-
 func (fd FD) KennungSansGattungClone() KennungSansGattung {
 	return fd
 }

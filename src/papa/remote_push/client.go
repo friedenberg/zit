@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/matcher"
 	"github.com/friedenberg/zit/src/november/umwelt"
 	"github.com/friedenberg/zit/src/oscar/remote_conn"
 )
@@ -19,7 +19,7 @@ const (
 )
 
 type Client interface {
-	SendNeededSkus(kennung.MetaSet) error
+	SendNeededSkus(matcher.MetaSet) error
 	Close() error
 }
 
@@ -66,7 +66,7 @@ func (c client) Close() (err error) {
 	return
 }
 
-func (c client) SendNeededSkus(filter kennung.MetaSet) (err error) {
+func (c client) SendNeededSkus(filter matcher.MetaSet) (err error) {
 	err = todo.Implement()
 	// var d remote_conn.Dialogue
 

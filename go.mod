@@ -13,5 +13,7 @@ require (
 
 require (
 	github.com/DataDog/zstd v1.5.5 // indirect
+	github.com/Shopify/go-lua v0.0.0-20221004153744-91867de107cf // indirect
+	github.com/yuin/gopher-lua v1.1.0 // indirect
 	golang.org/x/crypto v0.4.0 // indirect
 )

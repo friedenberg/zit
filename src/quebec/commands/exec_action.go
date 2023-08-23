@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/script_config"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/matcher"
 	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
@@ -40,7 +41,7 @@ func (c ExecAction) DefaultGattungen() gattungen.Set {
 
 func (c ExecAction) RunWithQuery(
 	u *umwelt.Umwelt,
-	ms kennung.MetaSet,
+	ms matcher.MetaSet,
 ) (err error) {
 	if !c.Action.WasSet() {
 		err = errors.Normal(errors.Errorf("Action must be provided"))

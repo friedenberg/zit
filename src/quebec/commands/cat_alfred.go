@@ -9,6 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/matcher"
 	"github.com/friedenberg/zit/src/golf/kennung_index"
 	"github.com/friedenberg/zit/src/kilo/alfred"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -47,7 +48,7 @@ func (c CatAlfred) DefaultGattungen() gattungen.Set {
 
 func (c CatAlfred) RunWithQuery(
 	u *umwelt.Umwelt,
-	ms kennung.MetaSet,
+	ms matcher.MetaSet,
 ) (err error) {
 	// this command does its own error handling
 	wo := bufio.NewWriter(u.Out())
@@ -75,7 +76,7 @@ func (c CatAlfred) RunWithQuery(
 	defer errors.DeferredCloser(&err, aw)
 
 	if err = ms.All(
-		func(g gattung.Gattung, m kennung.MatcherSigil) (err error) {
+		func(g gattung.Gattung, m matcher.MatcherSigil) (err error) {
 			switch g {
 			case gattung.Etikett:
 				c.catEtiketten(u, m, aw)
@@ -99,7 +100,7 @@ func (c CatAlfred) RunWithQuery(
 
 func (c CatAlfred) catEtiketten(
 	u *umwelt.Umwelt,
-	m kennung.Matcher,
+	m matcher.Matcher,
 	aw *alfred.Writer,
 ) {
 	var err error
@@ -117,7 +118,7 @@ func (c CatAlfred) catEtiketten(
 
 func (c CatAlfred) catZettelen(
 	u *umwelt.Umwelt,
-	m kennung.MatcherSigil,
+	m matcher.MatcherSigil,
 	aw *alfred.Writer,
 ) {
 	var err error

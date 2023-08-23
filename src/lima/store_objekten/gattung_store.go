@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/matcher"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/juliett/objekte"
@@ -19,7 +20,7 @@ import (
 
 type reindexer interface {
 	// updateExternal(objekte.External) error
-	ReindexOne(sku.SkuLike) (kennung.Matchable, error)
+	ReindexOne(sku.SkuLike) (matcher.Matchable, error)
 }
 
 type CommonStore[

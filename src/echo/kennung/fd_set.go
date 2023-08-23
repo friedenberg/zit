@@ -40,25 +40,3 @@ func FDSetAddPairs[T FDPairGetter](
 		},
 	)
 }
-
-func FDSetContainsPair(s FDSet, maybeFDs Matchable) (ok bool) {
-	var fdGetter FDPairGetter
-
-	if fdGetter, ok = maybeFDs.(FDPairGetter); !ok {
-		return
-	}
-
-	objekte := fdGetter.GetObjekteFD()
-
-	if ok = s.Contains(objekte); ok {
-		return
-	}
-
-	akte := fdGetter.GetAkteFD()
-
-	if ok = s.Contains(akte); ok {
-		return
-	}
-
-	return
-}

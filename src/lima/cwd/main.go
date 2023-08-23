@@ -14,6 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/matcher"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/kilo/konfig"
 )
@@ -37,7 +38,7 @@ func (fs *CwdFiles) MarkUnsureAkten(fd kennung.FD) {
 }
 
 func (fs CwdFiles) EachCreatableMatchable(
-	m schnittstellen.FuncIter[kennung.IdLikeGetter],
+	m schnittstellen.FuncIter[matcher.IdLikeGetter],
 ) (err error) {
 	todo.Parallelize()
 
@@ -83,13 +84,13 @@ func (fs CwdFiles) String() (out string) {
 	}
 
 	sb := &strings.Builder{}
-	sb.WriteString(kennung.QueryGroupOpenOperator)
+	sb.WriteString(matcher.QueryGroupOpenOperator)
 
 	hasOne := false
 
 	writeOneIfNecessary := func(v schnittstellen.Stringer) (err error) {
 		if hasOne {
-			sb.WriteString(kennung.QueryOrOperator)
+			sb.WriteString(matcher.QueryOrOperator)
 		}
 
 		sb.WriteString(v.String())
@@ -129,13 +130,13 @@ func (fs CwdFiles) String() (out string) {
 		},
 	)
 
-	sb.WriteString(kennung.QueryGroupCloseOperator)
+	sb.WriteString(matcher.QueryGroupCloseOperator)
 
 	out = sb.String()
 	return
 }
 
-func (fs CwdFiles) ContainsMatchable(m kennung.Matchable) bool {
+func (fs CwdFiles) ContainsMatchable(m matcher.Matchable) bool {
 	g := gattung.Must(m)
 
 	switch g {
@@ -406,7 +407,7 @@ func (c CwdFiles) MatcherLen() int {
 	)
 }
 
-func (_ CwdFiles) Each(_ schnittstellen.FuncIter[kennung.Matcher]) error {
+func (_ CwdFiles) Each(_ schnittstellen.FuncIter[matcher.Matcher]) error {
 	return nil
 }
 

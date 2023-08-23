@@ -16,8 +16,7 @@ type (
 	}
 
 	ShaLike interface {
-		GetSha() sha.Sha
-		Matcher
+		GetSha() Sha
 	}
 )
 
@@ -85,28 +84,32 @@ func (e *Sha) Set(v string) (err error) {
 	return
 }
 
-func (t Sha) Each(_ schnittstellen.FuncIter[Matcher]) error {
-	return nil
+func (t Sha) GetSha() Sha {
+	return t
 }
 
-func (t Sha) MatcherLen() int {
-	return 0
+func (a Sha) EqualsSha(b schnittstellen.ShaLike) bool {
+	return a.value.EqualsSha(b)
 }
 
-func (t Sha) ContainsMatchableExactly(m Matchable) bool {
-	return t.ContainsMatchable(m)
+func (t Sha) GetShaString() string {
+	return t.value.GetShaString()
 }
 
-func (t Sha) ContainsMatchable(m Matchable) bool {
-	if t.value.EqualsSha(m.GetAkteSha()) {
-		return true
-	}
-
-	return false
+func (t Sha) IsNull() bool {
+	return t.value.IsNull()
 }
 
-func (t Sha) GetSha() sha.Sha {
-	return t.value
+func (t Sha) Kopf() string {
+	return t.value.Kopf()
+}
+
+func (t Sha) Schwanz() string {
+	return t.value.Schwanz()
+}
+
+func (t Sha) GetShaLike() schnittstellen.ShaLike {
+	return t
 }
 
 func (t Sha) MarshalText() (text []byte, err error) {

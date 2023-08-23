@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/matcher"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -21,8 +21,8 @@ import (
 type FuncSku func(sku.SkuLike) error
 
 type PullClient interface {
-	SkusFromFilter(kennung.MetaSet, FuncSku) error
-	PullSkus(kennung.MetaSet) error
+	SkusFromFilter(matcher.MetaSet, FuncSku) error
+	PullSkus(matcher.MetaSet) error
 	Close() error
 }
 
@@ -85,7 +85,7 @@ func (c client) Close() (err error) {
 }
 
 func (c client) SkusFromFilter(
-	ids kennung.MetaSet,
+	ids matcher.MetaSet,
 	f FuncSku,
 ) (err error) {
 	var d remote_conn.Dialogue

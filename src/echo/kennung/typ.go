@@ -103,35 +103,6 @@ func (e *Typ) Set(v string) (err error) {
 	return
 }
 
-func (t Typ) ContainsMatchableExactly(m Matchable) bool {
-	g := gattung.Make(m.GetGattung())
-
-	switch g {
-	case gattung.Zettel, gattung.Typ:
-		// noop
-	default:
-		return false
-	}
-
-	t1 := m.GetTyp()
-
-	if t.Equals(t1) {
-		return true
-	}
-
-	t2, ok := m.GetKennungLike().(Typ)
-
-	if !ok {
-		return false
-	}
-
-	if !t.Equals(t2) {
-		return false
-	}
-
-	return true
-}
-
 func (t Typ) MarshalText() (text []byte, err error) {
 	text = []byte(t.String())
 	return

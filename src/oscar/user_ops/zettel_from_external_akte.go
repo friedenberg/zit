@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/matcher"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/external"
 	"github.com/friedenberg/zit/src/india/transacted"
@@ -27,7 +28,7 @@ type ZettelFromExternalAkte struct {
 }
 
 func (c ZettelFromExternalAkte) Run(
-	ms kennung.MetaSet,
+	ms matcher.MetaSet,
 ) (results zettel.MutableSet, err error) {
 	if err = c.Lock(); err != nil {
 		err = errors.Wrap(err)

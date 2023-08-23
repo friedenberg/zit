@@ -5,11 +5,11 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/matcher"
 )
 
 func MakeFilterFromMetaSet(
-	ms kennung.MetaSet,
+	ms matcher.MetaSet,
 ) schnittstellen.FuncIter[CheckedOutLikePtr] {
 	if ms == nil {
 		return collections.MakeWriterNoop[CheckedOutLikePtr]()
@@ -21,7 +21,7 @@ func MakeFilterFromMetaSet(
 
 		g := gattung.Must(internal.GetSkuLike().GetGattung())
 
-		var matcher kennung.Matcher
+		var matcher matcher.Matcher
 		ok := false
 
 		if matcher, ok = ms.Get(g); !ok {

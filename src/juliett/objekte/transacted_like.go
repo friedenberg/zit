@@ -2,7 +2,7 @@ package objekte
 
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/matcher"
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
@@ -14,16 +14,16 @@ type (
 )
 
 type (
-	FuncQuerierTransacted[T sku.SkuLike]       func(kennung.MatcherSigil, schnittstellen.FuncIter[T]) error
-	FuncQuerierTransactedPtr[T sku.SkuLikePtr] func(kennung.MatcherSigil, schnittstellen.FuncIter[T]) error
-	FuncQuerierTransactedLike                  func(kennung.MatcherSigil, schnittstellen.FuncIter[sku.SkuLike]) error
-	FuncQuerierTransactedLikePtr               func(kennung.MatcherSigil, schnittstellen.FuncIter[sku.SkuLikePtr]) error
+	FuncQuerierTransacted[T sku.SkuLike]       func(matcher.MatcherSigil, schnittstellen.FuncIter[T]) error
+	FuncQuerierTransactedPtr[T sku.SkuLikePtr] func(matcher.MatcherSigil, schnittstellen.FuncIter[T]) error
+	FuncQuerierTransactedLike                  func(matcher.MatcherSigil, schnittstellen.FuncIter[sku.SkuLike]) error
+	FuncQuerierTransactedLikePtr               func(matcher.MatcherSigil, schnittstellen.FuncIter[sku.SkuLikePtr]) error
 )
 
 func MakeApplyQueryTransactedLikePtr[T sku.SkuLikePtr](
 	fat FuncQuerierTransactedPtr[T],
 ) FuncQuerierTransactedLikePtr {
-	return func(ids kennung.MatcherSigil, fatl schnittstellen.FuncIter[sku.SkuLikePtr]) (err error) {
+	return func(ids matcher.MatcherSigil, fatl schnittstellen.FuncIter[sku.SkuLikePtr]) (err error) {
 		return fat(
 			ids,
 			func(e T) (err error) {
