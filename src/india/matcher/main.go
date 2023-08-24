@@ -61,6 +61,13 @@ func MakeMatcher(
 		m = MakeMatcherNegate(m)
 	}
 
+	// m = MakeMatcherAnd(
+	// 	MakeMatcherLua(
+	// 		`function contains_matchable(sku) return true end`,
+	// 	),
+	// 	m,
+	// )
+
 	return
 }
 

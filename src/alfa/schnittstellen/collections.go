@@ -66,7 +66,7 @@ type Poolable[T any] interface{}
 
 type PoolablePtr[T any] interface {
 	Ptr[T]
-	Resetable[T]
+	// Resetable[T]
 }
 
 type Pool[T Poolable[T], TPtr PoolablePtr[T]] interface {

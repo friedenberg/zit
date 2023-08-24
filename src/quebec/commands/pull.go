@@ -50,7 +50,7 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	ids := u.MakeMetaIdSetWithExcludedHidden(
-		matcher.MakeMatcherAlways(),
+		matcher.MakeMatcherCwdNop(matcher.MakeMatcherAlways()),
 		c.CompletionGattung(),
 	)
 

@@ -113,6 +113,45 @@ function add_2 { # @test
 	EOM
 }
 
+function add_dot { # @test
+	wd="$(mktemp -d)"
+	cd "$wd" || exit 1
+
+	run_zit_init_disable_age
+	assert_success
+
+	f=to_add.md
+	{
+		echo test file
+	} >"$f"
+
+	f2=to_add2.md
+	{
+		echo test file 2
+	} >"$f2"
+
+	run_zit add \
+		-dedupe \
+		-delete \
+		-etiketten zz-inbox-2022-11-14 \
+		.
+
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[-zz-inbox-2022-11-14@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-zz-inbox-2022-11@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-zz-inbox-2022@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-zz-inbox@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-zz@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[one/dos@6b8e3c36cb01aa01c65ccd86e04935695e9da0580e3dcc8c0c3bce146c274c2c !md "to_add2" zz-inbox-2022-11-14]
+		[one/dos@6b8e3c36cb01aa01c65ccd86e04935695e9da0580e3dcc8c0c3bce146c274c2c !md "to_add2" zz-inbox-2022-11-14]
+		[one/uno@55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to_add" zz-inbox-2022-11-14]
+		[one/uno@55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to_add" zz-inbox-2022-11-14]
+		[to_add.md] (deleted)
+		[to_add2.md] (deleted)
+	EOM
+}
+
 #function add_dedupe_1 { ## @test
 #	wd="$(mktemp -d)"
 #	cd "$wd" || exit 1
@@ -211,7 +250,7 @@ function add_several_with_spaces_in_filename { # @test
 		"$f" "$f2"
 
 	assert_success
-	assert_output - <<-EOM
+	assert_output_unsorted - <<-EOM
 		[-zz@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[-zz-inbox@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[-zz-inbox-2022@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]

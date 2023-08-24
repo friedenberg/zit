@@ -58,7 +58,7 @@ func Make(kCli erworben.Cli, options Options) (u *Umwelt, err error) {
 		in:                      os.Stdin,
 		out:                     os.Stdout,
 		err:                     os.Stderr,
-		zettelVerzeichnissePool: pool.MakePool[transacted.Zettel, *transacted.Zettel](),
+		zettelVerzeichnissePool: pool.MakePoolWithReset[transacted.Zettel, *transacted.Zettel](),
 		erworbenCli:             kCli,
 	}
 
@@ -287,7 +287,7 @@ func (u *Umwelt) MakeKennungExpanders() (out kennung.Abbr) {
 }
 
 func (u *Umwelt) MakeMetaIdSetWithExcludedHidden(
-	cwd matcher.Matcher,
+	cwd matcher.MatcherCwd,
 	dg gattungen.Set,
 ) matcher.Query {
 	if dg == nil {
@@ -310,7 +310,7 @@ func (u *Umwelt) MakeMetaIdSetWithExcludedHidden(
 }
 
 func (u *Umwelt) MakeMetaIdSetWithoutExcludedHidden(
-	cwd matcher.Matcher,
+	cwd matcher.MatcherCwd,
 	dg gattungen.Set,
 ) matcher.Query {
 	if dg == nil {

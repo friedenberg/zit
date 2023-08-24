@@ -13,7 +13,7 @@ import (
 var delimReaderPool schnittstellen.Pool[delimReader, *delimReader]
 
 func init() {
-	delimReaderPool = pool.MakePool[delimReader, *delimReader]()
+	delimReaderPool = pool.MakePoolWithReset[delimReader, *delimReader]()
 }
 
 func PutDelimReader(dr *delimReader) {

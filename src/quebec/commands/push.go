@@ -55,7 +55,10 @@ func (c Push) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	ids := u.MakeMetaIdSetWithExcludedHidden(matcher.MakeMatcherAlways(), nil)
+	ids := u.MakeMetaIdSetWithExcludedHidden(
+		matcher.MakeMatcherCwdNop(matcher.MakeMatcherAlways()),
+		nil,
+	)
 
 	if err = ids.SetMany(args...); err != nil {
 		err = errors.Wrap(err)

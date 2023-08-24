@@ -153,7 +153,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	if c.Edit {
 		ms := u.MakeMetaIdSetWithoutExcludedHidden(
-			matcher.MakeMatcherAlways(),
+			matcher.MakeMatcherCwdNop(matcher.MakeMatcherAlways()),
 			gattungen.MakeSet(gattung.Zettel),
 		)
 

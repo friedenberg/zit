@@ -67,7 +67,7 @@ func MakeStore(
 	af schnittstellen.AkteIOFactory,
 	pmf objekte_format.Format,
 ) (s *store, err error) {
-	p := pool.MakePool[Akte]()
+	p := pool.MakePoolWithReset[Akte]()
 
 	var fa akteFormat
 

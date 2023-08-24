@@ -136,7 +136,7 @@ func makeCommonStoreBase[
 		panic("delegate was nil")
 	}
 
-	pool := pool.MakePool[
+	pool := pool.MakePoolWithReset[
 		sku.Transacted[K, KPtr],
 		*sku.Transacted[K, KPtr],
 	]()
@@ -270,7 +270,7 @@ func (s *commonStoreBase[O, OPtr, K, KPtr]) GetInheritor(
 	arf schnittstellen.AkteReaderFactory,
 	pmf objekte_format.Format,
 ) objekte_store.TransactedInheritor {
-	p := pool.MakePool[
+	p := pool.MakePoolWithReset[
 		sku.Transacted[K, KPtr],
 		*sku.Transacted[K, KPtr],
 	]()

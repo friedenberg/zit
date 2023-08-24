@@ -156,12 +156,13 @@ func (fs CwdFiles) ContainsMatchable(m matcher.Matchable) bool {
 	return true
 }
 
-func (fs CwdFiles) GetFDs() schnittstellen.SetLike[kennung.FD] {
+func (fs CwdFiles) GetCwdFDs() schnittstellen.SetLike[kennung.FD] {
 	fds := kennung.MakeMutableFDSet()
 
 	kennung.FDSetAddPairs[Zettel](fs.Zettelen, fds)
 	kennung.FDSetAddPairs[Typ](fs.Typen, fds)
 	kennung.FDSetAddPairs[Etikett](fs.Etiketten, fds)
+	fs.UnsureAkten.Each(fds.Add)
 
 	return fds
 }

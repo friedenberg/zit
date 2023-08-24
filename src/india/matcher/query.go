@@ -23,7 +23,7 @@ func init() {
 // TODO-P3 rename to QueryGattungGroup
 type Query interface {
 	Get(g gattung.Gattung) (s MatcherSigil, ok bool)
-	GetFDs() schnittstellen.SetLike[kennung.FD]
+	GetCwdFDs() schnittstellen.SetLike[kennung.FD]
 	GetEtiketten() kennung.EtikettSet
 	GetTypen() schnittstellen.SetLike[kennung.Typ]
 	Set(string) error
@@ -53,17 +53,19 @@ type query struct {
 	fileExtensionGetter     schnittstellen.FileExtensionGetter
 	expanders               kennung.Abbr
 
-	cwd    Matcher
+	cwd    MatcherCwd
 	Hidden Matcher
 	index  kennung.Index
 
 	DefaultGattungen gattungen.Set
 	Gattung          map[gattung.Gattung]setWithSigil
 	FDs              schnittstellen.MutableSetLike[kennung.FD]
+
+	dotOperatorActive bool
 }
 
 func MakeQuery(
-	cwd Matcher,
+	cwd MatcherCwd,
 	ex kennung.Abbr,
 	hidden Matcher,
 	feg schnittstellen.FileExtensionGetter,
@@ -87,7 +89,7 @@ func MakeQuery(
 }
 
 func MakeQueryAll(
-	cwd Matcher,
+	cwd MatcherCwd,
 	ex kennung.Abbr,
 	hidden Matcher,
 	feg schnittstellen.FileExtensionGetter,
@@ -221,6 +223,10 @@ func (ms *query) set(v string) (err error) {
 		}
 	} else {
 		gs = ms.DefaultGattungen.CloneSetLike()
+	}
+
+	if before == "" && after == "" && sigil.IncludesCwd() {
+		ms.dotOperatorActive = true
 	}
 
 	if err = gs.Each(
@@ -405,8 +411,12 @@ func (ms query) Get(g gattung.Gattung) (s MatcherSigil, ok bool) {
 	return
 }
 
-func (ms query) GetFDs() schnittstellen.SetLike[kennung.FD] {
-	return ms.FDs
+func (ms query) GetCwdFDs() schnittstellen.SetLike[kennung.FD] {
+	if ms.dotOperatorActive {
+		return ms.cwd.GetCwdFDs()
+	} else {
+		return ms.FDs
+	}
 }
 
 func (ms query) GetEtiketten() kennung.EtikettSet {

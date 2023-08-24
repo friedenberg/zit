@@ -82,6 +82,10 @@ func (a External[K, KPtr]) GetAkteFD() kennung.FD {
 	return a.FDs.Akte
 }
 
+func (a External[K, KPtr]) GetAktePath() string {
+	return a.FDs.Akte.Path
+}
+
 func (a External[K, KPtr]) GetObjekteFD() kennung.FD {
 	return a.FDs.Objekte
 }
