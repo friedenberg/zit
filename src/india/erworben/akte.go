@@ -23,10 +23,15 @@ type Akte struct {
 	RemoteScripts   map[string]script_config.RemoteScript   `toml:"remote-scripts"`
 	Actions         map[string]script_config.ScriptConfig   `toml:"actions,omitempty"`
 	PrintOptions    erworben_cli_print_options.PrintOptions `toml:"cli-output"`
+	Filters         map[string]string                       `toml:"filters"`
 }
 
 func (_ Akte) GetGattung() schnittstellen.GattungLike {
 	return gattung.Konfig
+}
+
+func (a Akte) GetFilters() map[string]string {
+	return a.Filters
 }
 
 func (a Akte) Equals(b Akte) bool {
@@ -60,6 +65,10 @@ func (a Akte) Equals(b Akte) bool {
 		return false
 	}
 
+	if !reflect.DeepEqual(a.Filters, b.Filters) {
+		return false
+	}
+
 	return true
 }
 
@@ -71,6 +80,7 @@ func (a *Akte) Reset() {
 	a.RemoteScripts = make(map[string]script_config.RemoteScript)
 	a.Actions = make(map[string]script_config.ScriptConfig)
 	a.PrintOptions = erworben_cli_print_options.Default()
+	a.Filters = make(map[string]string)
 }
 
 func (a *Akte) ResetWith(b Akte) {
@@ -87,4 +97,5 @@ func (a *Akte) ResetWith(b Akte) {
 	a.RemoteScripts = b.RemoteScripts
 	a.Actions = b.Actions
 	a.PrintOptions = b.PrintOptions
+	a.Filters = b.Filters
 }

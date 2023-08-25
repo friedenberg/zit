@@ -21,6 +21,7 @@ func TestQueryGob(t1 *testing.T) {
 	{
 		sut := MakeQuery(
 			nil,
+			nil,
 			kennung.Abbr{},
 			nil,
 			nil,

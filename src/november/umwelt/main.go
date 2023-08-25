@@ -299,6 +299,7 @@ func (u *Umwelt) MakeMetaIdSetWithExcludedHidden(
 	i := u.MakeKennungIndex()
 
 	return matcher.MakeQuery(
+		u.Konfig(),
 		cwd,
 		u.MakeKennungExpanders(),
 		exc,
@@ -320,6 +321,7 @@ func (u *Umwelt) MakeMetaIdSetWithoutExcludedHidden(
 	i := u.MakeKennungIndex()
 
 	return matcher.MakeQuery(
+		u.Konfig(),
 		cwd,
 		u.MakeKennungExpanders(),
 		nil,

@@ -49,6 +49,7 @@ func (s setWithSigil) GetSigil() kennung.Sigil {
 }
 
 type query struct {
+	konfig                  schnittstellen.Konfig
 	implicitEtikettenGetter ImplicitEtikettenGetter
 	fileExtensionGetter     schnittstellen.FileExtensionGetter
 	expanders               kennung.Abbr
@@ -65,6 +66,7 @@ type query struct {
 }
 
 func MakeQuery(
+	k schnittstellen.Konfig,
 	cwd MatcherCwd,
 	ex kennung.Abbr,
 	hidden Matcher,
@@ -74,6 +76,7 @@ func MakeQuery(
 	ki kennung.Index,
 ) Query {
 	return &query{
+		konfig:                  k,
 		implicitEtikettenGetter: implicitEtikettenGetter,
 		cwd:                     cwd,
 		fileExtensionGetter:     feg,
@@ -89,6 +92,7 @@ func MakeQuery(
 }
 
 func MakeQueryAll(
+	k schnittstellen.Konfig,
 	cwd MatcherCwd,
 	ex kennung.Abbr,
 	hidden Matcher,
@@ -98,6 +102,7 @@ func MakeQueryAll(
 ) Query {
 	errors.TodoP2("support allowed sigils")
 	return &query{
+		konfig:                  k,
 		implicitEtikettenGetter: implicitEtikettenGetter,
 		cwd:                     cwd,
 		fileExtensionGetter:     feg,
@@ -259,6 +264,7 @@ func (ms *query) set(v string) (err error) {
 
 			default:
 				if err = tryAddMatcher(
+					ms.konfig,
 					ids.Matcher,
 					ms.expanders,
 					ms.implicitEtikettenGetter,
@@ -288,6 +294,7 @@ func (ms *query) set(v string) (err error) {
 }
 
 func tryAddMatcher(
+	k schnittstellen.Konfig,
 	s MatcherExactlyThisOrAllOfThese,
 	expanders kennung.Abbr,
 	implicitEtikettenGetter ImplicitEtikettenGetter,
@@ -297,7 +304,7 @@ func tryAddMatcher(
 	{
 		var m Matcher
 
-		if m, _, _, err = MakeMatcher(&kennung.FD{}, v, nil, ki); err == nil {
+		if m, _, _, err = MakeMatcher(&kennung.FD{}, v, nil, ki, k); err == nil {
 			return s.AddExactlyThis(m)
 		}
 	}
@@ -305,7 +312,7 @@ func tryAddMatcher(
 	{
 		var m Matcher
 
-		if m, _, _, err = MakeMatcher(&kennung.Sha{}, v, expanders.Sha.Expand, ki); err == nil {
+		if m, _, _, err = MakeMatcher(&kennung.Sha{}, v, expanders.Sha.Expand, ki, k); err == nil {
 			return s.AddExactlyThis(m)
 		}
 	}
@@ -318,8 +325,18 @@ func tryAddMatcher(
 			v,
 			expanders.Hinweis.Expand,
 			ki,
+			k,
 		); err == nil {
 			s.AddExactlyThis(m)
+			return
+		}
+	}
+
+	if lString, ok := k.GetFilters()[v]; ok {
+		var m Matcher
+
+		if m, err = MakeMatcherLua(ki, lString); err == nil {
+			s.AddAllOfThese(m)
 			return
 		}
 	}
@@ -332,7 +349,7 @@ func tryAddMatcher(
 			m Matcher
 		)
 
-		if m, isNegated, _, err = MakeMatcher(&e, v, nil, ki); err == nil {
+		if m, isNegated, _, err = MakeMatcher(&e, v, nil, ki, k); err == nil {
 			if implicitEtikettenGetter == nil {
 				return s.AddAllOfThese(m)
 			} else {
@@ -371,7 +388,7 @@ func tryAddMatcher(
 	{
 		var m Matcher
 
-		if m, _, _, err = MakeMatcher(&kennung.Typ{}, v, expanders.Typ.Expand, ki); err == nil {
+		if m, _, _, err = MakeMatcher(&kennung.Typ{}, v, expanders.Typ.Expand, ki, k); err == nil {
 			errors.TodoP1("handle typs that are incompatible")
 			s.AddAllOfThese(m)
 			return
@@ -381,7 +398,7 @@ func tryAddMatcher(
 	{
 		var m Matcher
 
-		if m, _, _, err = MakeMatcher(&kennung.Kasten{}, v, expanders.Kasten.Expand, ki); err == nil {
+		if m, _, _, err = MakeMatcher(&kennung.Kasten{}, v, expanders.Kasten.Expand, ki, k); err == nil {
 			return s.AddAllOfThese(m)
 		}
 	}

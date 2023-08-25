@@ -6,14 +6,15 @@ let &l:commentstring = "<!--%s-->"
 
 function! GfZettel()
   let l:h = expand("<cfile>")
-  let l:expanded = system("zit expand-hinweis " . l:h)
+  let l:expanded = trim(system("zit expand-hinweis " . l:h))
   let l:f = l:expanded . ".zettel"
 
   if !filereadable(l:f)
     echo system("zit checkout -mode both " . l:expanded)
   endif
 
-  execute 'tabedit' l:f
+  let l:cmd = 'tabedit ' . l:f
+  execute l:cmd
   " try
   "   " exec "normal! \<c-w>gf"
   " catch /E447/

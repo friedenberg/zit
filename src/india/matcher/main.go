@@ -15,6 +15,7 @@ func MakeMatcher(
 	v string,
 	expander func(string) (string, error),
 	ki kennung.Index,
+	konfig schnittstellen.Konfig,
 ) (m Matcher, isNegated bool, isExact bool, err error) {
 	v = strings.TrimSpace(v)
 	didExpand := false
