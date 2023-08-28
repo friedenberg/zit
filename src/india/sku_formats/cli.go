@@ -25,6 +25,25 @@ type cli struct {
 	etikettenStringFormatWriter   schnittstellen.StringFormatWriter[kennung.EtikettSet]
 }
 
+func MakeCliFormatShort(
+	shaStringFormatWriter schnittstellen.StringFormatWriter[schnittstellen.ShaLike],
+	kennungStringFormatWriter schnittstellen.StringFormatWriter[kennung.KennungPtr],
+	typStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Typ],
+	bezeichnungStringFormatWriter schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung],
+	etikettenStringFormatWriter schnittstellen.StringFormatWriter[kennung.EtikettSet],
+) *cli {
+	return &cli{
+		writeTyp:                      false,
+		writeBezeichnung:              false,
+		writeEtiketten:                false,
+		shaStringFormatWriter:         shaStringFormatWriter,
+		kennungStringFormatWriter:     kennungStringFormatWriter,
+		typStringFormatWriter:         typStringFormatWriter,
+		bezeichnungStringFormatWriter: bezeichnungStringFormatWriter,
+		etikettenStringFormatWriter:   etikettenStringFormatWriter,
+	}
+}
+
 func MakeCliFormat(
 	options erworben_cli_print_options.PrintOptions,
 	shaStringFormatWriter schnittstellen.StringFormatWriter[schnittstellen.ShaLike],

@@ -18,42 +18,68 @@ func (u *Umwelt) FormatColorOptions() (o string_format_writer.ColorOptions) {
 	return
 }
 
-func (u *Umwelt) StringFormatWriterShaLike() schnittstellen.StringFormatWriter[schnittstellen.ShaLike] {
+func (u *Umwelt) StringFormatWriterShaLike(
+	co string_format_writer.ColorOptions,
+) schnittstellen.StringFormatWriter[schnittstellen.ShaLike] {
 	return kennung.MakeShaCliFormat(
 		u.konfig.PrintOptions,
-		u.FormatColorOptions(),
+		co,
 		u.StoreObjekten().GetAbbrStore().Shas().Abbreviate,
 	)
 }
 
-func (u *Umwelt) StringFormatWriterKennung() schnittstellen.StringFormatWriter[kennung.KennungPtr] {
+func (u *Umwelt) StringFormatWriterKennung(
+	co string_format_writer.ColorOptions,
+) schnittstellen.StringFormatWriter[kennung.KennungPtr] {
 	return kennung.MakeKennungCliFormat(
 		u.konfig.PrintOptions,
-		u.FormatColorOptions(),
+		co,
 		u.MakeKennungExpanders(),
 	)
 }
 
-func (u *Umwelt) StringFormatWriterTyp() schnittstellen.StringFormatWriter[*kennung.Typ] {
-	return kennung.MakeTypCliFormat(u.FormatColorOptions())
+func (u *Umwelt) StringFormatWriterTyp(
+	co string_format_writer.ColorOptions,
+) schnittstellen.StringFormatWriter[*kennung.Typ] {
+	return kennung.MakeTypCliFormat(co)
 }
 
-func (u *Umwelt) StringFormatWriterBezeichnung() schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung] {
-	return bezeichnung.MakeCliFormat2(u.FormatColorOptions())
+func (u *Umwelt) StringFormatWriterBezeichnung(
+	co string_format_writer.ColorOptions,
+) schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung] {
+	return bezeichnung.MakeCliFormat2(co)
 }
 
-func (u *Umwelt) StringFormatWriterEtiketten() schnittstellen.StringFormatWriter[kennung.EtikettSet] {
+func (u *Umwelt) StringFormatWriterEtiketten(
+	co string_format_writer.ColorOptions,
+) schnittstellen.StringFormatWriter[kennung.EtikettSet] {
 	return kennung.MakeEtikettenCliFormat()
 }
 
 func (u *Umwelt) StringFormatWriterSkuLikePtr() schnittstellen.StringFormatWriter[sku.SkuLikePtr] {
+	co := u.FormatColorOptions()
+
 	return sku_formats.MakeCliFormat(
 		u.konfig.PrintOptions,
-		u.StringFormatWriterShaLike(),
-		u.StringFormatWriterKennung(),
-		u.StringFormatWriterTyp(),
-		u.StringFormatWriterBezeichnung(),
-		u.StringFormatWriterEtiketten(),
+		u.StringFormatWriterShaLike(co),
+		u.StringFormatWriterKennung(co),
+		u.StringFormatWriterTyp(co),
+		u.StringFormatWriterBezeichnung(co),
+		u.StringFormatWriterEtiketten(co),
+	)
+}
+
+func (u *Umwelt) StringFormatWriterSkuLikePtrShort() schnittstellen.StringFormatWriter[sku.SkuLikePtr] {
+	co := string_format_writer.ColorOptions{
+		OffEntirely: true,
+	}
+
+	return sku_formats.MakeCliFormatShort(
+		u.StringFormatWriterShaLike(co),
+		u.StringFormatWriterKennung(co),
+		u.StringFormatWriterTyp(co),
+		u.StringFormatWriterBezeichnung(co),
+		u.StringFormatWriterEtiketten(co),
 	)
 }
 
@@ -87,7 +113,7 @@ func (u *Umwelt) PrinterFileNotRecognized() schnittstellen.FuncIter[*kennung.FD]
 			u.FormatColorOptions(),
 			u.standort.MakeRelativePathStringFormatWriter(),
 		),
-		u.StringFormatWriterShaLike(),
+		u.StringFormatWriterShaLike(u.FormatColorOptions()),
 	)
 
 	return string_format_writer.MakeDelim[*kennung.FD](
@@ -122,17 +148,19 @@ func (u *Umwelt) PrinterHeader() schnittstellen.FuncIter[string] {
 }
 
 func (u *Umwelt) PrinterCheckedOutLike() schnittstellen.FuncIter[objekte.CheckedOutLikePtr] {
+	co := u.FormatColorOptions()
+
 	p := objekte.MakeCliFormat(
 		objekte.CliOptions{},
-		u.StringFormatWriterShaLike(),
+		u.StringFormatWriterShaLike(co),
 		kennung.MakeFDCliFormat(
-			u.FormatColorOptions(),
+			co,
 			u.standort.MakeRelativePathStringFormatWriter(),
 		),
-		u.StringFormatWriterKennung(),
-		u.StringFormatWriterTyp(),
-		u.StringFormatWriterBezeichnung(),
-		u.StringFormatWriterEtiketten(),
+		u.StringFormatWriterKennung(co),
+		u.StringFormatWriterTyp(co),
+		u.StringFormatWriterBezeichnung(co),
+		u.StringFormatWriterEtiketten(co),
 	)
 
 	return string_format_writer.MakeDelim[objekte.CheckedOutLikePtr](

@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/delta/ohio"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
@@ -39,6 +40,7 @@ func (f *FormatterValue) Set(v string) (err error) {
 		"kennung-akte-sha",
 		"bezeichnung",
 		"akte",
+		"akte-sku-prefix",
 		"metadatei",
 		"akte-sha",
 		"debug",
@@ -50,6 +52,7 @@ func (f *FormatterValue) Set(v string) (err error) {
 		"sku-metadatei",
 		"sku-metadatei-sans-tai",
 		"text",
+		"text-sku-prefix",
 		"sku2":
 		f.string = v1
 
@@ -66,6 +69,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 	af schnittstellen.AkteReaderFactory,
 	k Konfig,
 	logFunc schnittstellen.FuncIter[sku.SkuLikePtr],
+	cliFmt schnittstellen.StringFormatWriter[sku.SkuLikePtr],
 ) schnittstellen.FuncIter[sku.SkuLikePtr] {
 	switch fv.string {
 	case "etiketten-implicit":
@@ -148,7 +152,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 			return
 		}
 
-	case "kennung-akte-akte":
+	case "kennung-akte-sha":
 		return func(tl sku.SkuLikePtr) (err error) {
 			errors.TodoP3("convert into an option")
 
@@ -251,6 +255,51 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 			defer errors.DeferredCloser(&err, r)
 
 			if _, err = io.Copy(out, r); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+
+	case "text-sku-prefix":
+		return func(o sku.SkuLikePtr) (err error) {
+			var r sha.ReadCloser
+
+			if r, err = af.AkteReader(o.GetAkteSha()); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			defer errors.DeferredCloser(&err, r)
+
+			if _, err = io.Copy(out, r); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+
+	case "akte-sku-prefix":
+		return func(o sku.SkuLikePtr) (err error) {
+			var r sha.ReadCloser
+
+			if r, err = af.AkteReader(o.GetAkteSha()); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			defer errors.DeferredCloser(&err, r)
+
+			sb := &strings.Builder{}
+
+			if _, err = cliFmt.WriteStringFormat(sb, o); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if _, err = ohio.CopyWithPrefixOnDelim('\n', sb.String(), out, r); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
