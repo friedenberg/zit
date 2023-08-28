@@ -57,7 +57,7 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		u.StoreObjekten(),
 		u.Konfig(),
 		u.PrinterTransactedLike(),
-    u.StringFormatWriterSkuLikePtrShort(),
+		u.StringFormatWriterSkuLikePtrShort(),
 	)
 
 	method := c.runWithTransaktion

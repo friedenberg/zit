@@ -2,14 +2,14 @@ package sku
 
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
+	"github.com/friedenberg/zit/src/delta/heap"
 )
 
-type SkuLikeHeap = collections.Heap[wrapper, *wrapper]
+type SkuLikeHeap = heap.Heap[wrapper, *wrapper]
 
 func MakeSkuLikeHeap() SkuLikeHeap {
-	return collections.MakeHeap[wrapper, *wrapper]()
+	return heap.MakeHeap[wrapper, *wrapper]()
 }
 
 func AddSkuToHeap(h *SkuLikeHeap, sk SkuLike) (err error) {

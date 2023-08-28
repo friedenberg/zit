@@ -1,4 +1,4 @@
-package collections
+package heap
 
 import (
 	"container/heap"
@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/charlie/pool"
 )
 
 type HeapElement[T any] interface {
@@ -62,7 +63,7 @@ func (a heapPrivate[T]) Sorted() (b heapPrivate[T]) {
 
 func MakeHeap[T HeapElement[T], T1 HeapElementPtr[T]]() Heap[T, T1] {
 	return Heap[T, T1]{
-		p: MakeFakePool[T, T1](),
+		p: pool.MakeFakePool[T, T1](),
 		l: &sync.Mutex{},
 		h: heapPrivate[T](make([]T, 0)),
 	}
@@ -74,7 +75,7 @@ func MakeHeapFromSlice[T HeapElement[T], T1 HeapElementPtr[T]](
 	sort.Sort(s)
 
 	return Heap[T, T1]{
-		p: MakeFakePool[T, T1](),
+		p: pool.MakeFakePool[T, T1](),
 		l: &sync.Mutex{},
 		h: s,
 	}
@@ -89,7 +90,7 @@ type Heap[T HeapElement[T], T1 HeapElementPtr[T]] struct {
 
 func (h *Heap[T, T1]) SetPool(p schnittstellen.Pool[T, T1]) {
 	if p == nil {
-		p = MakeFakePool[T, T1]()
+		p = pool.MakeFakePool[T, T1]()
 	}
 
 	h.p = p

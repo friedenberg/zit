@@ -68,7 +68,7 @@ func CopyWithPrefixOnDelim(
 		}
 
 		bw.WriteString(prefix)
-    bw.WriteString(fmt.Sprintf(":%d:\t", lineNo))
+		bw.WriteString(fmt.Sprintf(":%d:\t", lineNo))
 		bw.WriteString(rawLine)
 		bw.WriteByte(delim)
 

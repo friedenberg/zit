@@ -4,14 +4,15 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
+	"github.com/friedenberg/zit/src/delta/heap"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/india/transacted"
 )
 
-type HeapTransacted = collections.Heap[transacted.Zettel, *transacted.Zettel]
+type HeapTransacted = heap.Heap[transacted.Zettel, *transacted.Zettel]
 
 func MakeHeapTransacted() HeapTransacted {
-	return collections.MakeHeap[transacted.Zettel, *transacted.Zettel]()
+	return heap.MakeHeap[transacted.Zettel, *transacted.Zettel]()
 }
 
 type (

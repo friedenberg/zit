@@ -1,4 +1,4 @@
-package collections
+package pool
 
 import "github.com/friedenberg/zit/src/alfa/schnittstellen"
 

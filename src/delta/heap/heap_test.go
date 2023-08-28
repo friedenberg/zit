@@ -1,4 +1,4 @@
-package collections
+package heap
 
 import (
 	"reflect"
@@ -52,11 +52,17 @@ func TestSaveAndRestore(t1 *testing.T) {
 			ex := values.MakeInt(i)
 
 			if !ok {
-				t.Fatalf("expected pop and save to return an element but got nothing")
+				t.Fatalf(
+					"expected pop and save to return an element but got nothing",
+				)
 			}
 
 			if !el.Equals(ex) {
-				t.Fatalf("expected pop and save to return %s but got %s", ex, el)
+				t.Fatalf(
+					"expected pop and save to return %s but got %s",
+					ex,
+					el,
+				)
 			}
 		}
 	}
@@ -68,7 +74,10 @@ func TestSaveAndRestore(t1 *testing.T) {
 		ex := values.MakeInt(i)
 
 		if !ok {
-			t.Fatalf("expected pop and save to return an element but got nothing. Idx: %d", i)
+			t.Fatalf(
+				"expected pop and save to return an element but got nothing. Idx: %d",
+				i,
+			)
 		}
 
 		if !el.Equals(ex) {
