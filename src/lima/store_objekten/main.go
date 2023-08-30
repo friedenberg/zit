@@ -618,8 +618,6 @@ func (s *Store) Reindex() (err error) {
 
 	f1 := s.GetReindexFunc(ti)
 
-	// if s.StoreUtil.GetKonfig().UseBestandsaufnahme {
-	// } else {
 	f := func(t *transaktion.Transaktion) (err error) {
 		errors.Out().Printf(
 			"%s/%s: %s",
@@ -655,8 +653,6 @@ func (s *Store) Reindex() (err error) {
 			return
 		}
 	}
-
-	// }
 
 	if err = s.GetBestandsaufnahmeStore().ReadAllSkus(f1); err != nil {
 		err = errors.Wrap(err)

@@ -5,7 +5,7 @@ zit="$(realpath build/zit)"
 v="$("$zit" store-version)"
 d="${1:-$dir_base/v$v}"
 
-if [[ -d "$d" ]]; then
+if [[ -d $d ]]; then
   chflags -R nouchg "$d"
   rm -rf "$d"
 fi
@@ -13,7 +13,7 @@ fi
 mkdir -p "$d"
 
 pushd "$d"
-"$zit" init -yin "$dir_base/yin" -yang "$dir_base/yang" -disable-age
+"$zit" init -yin "$dir_base/yin" -yang "$dir_base/yang" -disable-age -compression-type none
 
 "$zit" new -predictable-hinweisen -edit=false - <<EOM
 ---
@@ -37,8 +37,8 @@ EOM
 not another one
 EOM
 
-"$zit" checkout o/u
-cat > one/uno.zettel <<EOM
+"$zit" checkout one/uno
+cat >one/uno.zettel <<EOM
 ---
 # wow the first
 - tag-3

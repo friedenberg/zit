@@ -182,8 +182,12 @@ func (s *store) ReadOne(
 		or,
 		o,
 	); err != nil {
-		err = errors.Wrap(err)
-		return
+		if errors.IsEOF(err) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	switch s.sv.GetInt() {

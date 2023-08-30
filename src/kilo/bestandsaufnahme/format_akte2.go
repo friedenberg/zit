@@ -14,7 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/juliett/objekte"
+	"github.com/friedenberg/zit/src/india/sku_formats"
 )
 
 type formatAkte2 struct {
@@ -142,7 +142,7 @@ func (f formatAkte2) FormatParsedAkte(
 	bw := bufio.NewWriter(w)
 	defer errors.DeferredFlusher(&err, bw)
 
-	fo := objekte.MakeFormatBestandsaufnahme(
+	fo := sku_formats.MakeFormatBestandsaufnahmeEncoder(
 		bw,
 		objekte_format.BestandsaufnahmeFormatIncludeTai(),
 	)

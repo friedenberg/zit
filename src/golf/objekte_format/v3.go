@@ -84,7 +84,9 @@ func (f v3) ParsePersistentMetadatei(
 	)
 
 	for {
-		if key, val, err = dr.ReadOneKeyValue(" "); err != nil {
+		key, val, err = dr.ReadOneKeyValue(" ")
+
+		if err != nil {
 			if errors.IsEOF(err) {
 				err = nil
 				break
@@ -157,6 +159,13 @@ func (f v3) ParsePersistentMetadatei(
 		}
 
 		lastKey = key
+	}
+
+	n = dr.N()
+
+	if n == 0 {
+		err = io.EOF
+		return
 	}
 
 	m.Etiketten = etiketten

@@ -51,6 +51,7 @@ func MakeZettelen(
 			i.PageIdForIndex(n),
 			p,
 			fff,
+			k.GetUseBestandsaufnahmeForVerzeichnisse(),
 		)
 	}
 

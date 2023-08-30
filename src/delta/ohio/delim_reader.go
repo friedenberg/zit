@@ -7,6 +7,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/pool"
 )
 
@@ -20,12 +21,25 @@ func PutDelimReader(dr *delimReader) {
 	delimReaderPool.Put(dr)
 }
 
+// Not safe for parallel use
+type DelimReader interface {
+	io.Reader
+	N() int64
+	Segments() int64
+	IsEOF() bool
+	ResetWith(dr delimReader)
+	Reset()
+	ReadOneString() (str string, err error)
+	ReadOneKeyValue(sep string) (key, val string, err error)
+}
+
 type delimReader struct {
-	delim    byte
-	br       *bufio.Reader
-	n        int64
-	segments int64
-	eof      bool
+	delim byte
+	*bufio.Reader
+	n         int64
+	lastReadN int
+	segments  int64
+	eof       bool
 }
 
 func MakeDelimReader(
@@ -33,7 +47,7 @@ func MakeDelimReader(
 	r io.Reader,
 ) (dr *delimReader) {
 	dr = delimReaderPool.Get()
-	dr.br.Reset(r)
+	dr.Reader.Reset(r)
 	dr.delim = delim
 
 	return
@@ -52,18 +66,19 @@ func (lr *delimReader) IsEOF() bool {
 }
 
 func (lr *delimReader) ResetWith(dr delimReader) {
-	lr.Reset()
+	lr.Reader.Reset(nil)
 	lr.delim = dr.delim
 }
 
 func (lr *delimReader) Reset() {
-	if lr.br == nil {
-		lr.br = bufio.NewReader(nil)
+	if lr.Reader == nil {
+		lr.Reader = bufio.NewReader(nil)
 	} else {
-		lr.br.Reset(nil)
+		lr.Reader.Reset(nil)
 	}
 
 	lr.n = 0
+	lr.lastReadN = 0
 	lr.segments = 0
 	lr.eof = false
 }
@@ -77,9 +92,9 @@ func (lr *delimReader) ReadOneString() (str string, err error) {
 
 	var rawLine string
 
-	rawLine, err = lr.br.ReadString(lr.delim)
-	n1 := len(rawLine)
-	lr.n += int64(n1)
+	rawLine, err = lr.Reader.ReadString(lr.delim)
+	lr.lastReadN = len(rawLine)
+	lr.n += int64(lr.lastReadN)
 
 	if err != nil && !errors.IsEOF(err) {
 		err = errors.Wrap(err)
@@ -101,15 +116,26 @@ func (lr *delimReader) ReadOneString() (str string, err error) {
 func (lr *delimReader) ReadOneKeyValue(
 	sep string,
 ) (key, val string, err error) {
+	if lr.eof {
+		err = io.EOF
+		return
+	}
+
 	str, err := lr.ReadOneString()
 	if err != nil {
-		err = errors.Wrap(err)
+		if errors.IsEOF(err) {
+			lr.eof = true
+		} else {
+			err = errors.Wrap(err)
+		}
+
 		return
 	}
 
 	loc := strings.Index(str, sep)
 
 	if loc == -1 {
+		log.Log().Printf("N: %d, lastReadN: %d", lr.N(), lr.lastReadN)
 		err = errors.Errorf(
 			"expected at least one %q, but found none: %q",
 			sep,

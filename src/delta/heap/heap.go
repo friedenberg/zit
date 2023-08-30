@@ -274,7 +274,7 @@ func (a *Heap[T, T1]) MergeStream(
 
 			case peeked.Equals(*e):
 				a.Pop()
-				continue
+				continue LOOP
 
 			case !peeked.Less(*e):
 				break LOOP

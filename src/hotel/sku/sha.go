@@ -9,7 +9,7 @@ import (
 
 func CalculateAndConfirmSha(
 	sk SkuLikePtr,
-	format objekte_format.Format,
+	format objekte_format.Formatter,
 	sh schnittstellen.ShaLike,
 ) (err error) {
 	if err = CalculateAndSetSha(sk, format); err != nil {
@@ -34,7 +34,7 @@ func CalculateAndConfirmSha(
 
 func CalculateAndSetSha(
 	sk SkuLikePtr,
-	format objekte_format.Format,
+	format objekte_format.Formatter,
 ) (err error) {
 	w := sha.MakeWriter(nil)
 

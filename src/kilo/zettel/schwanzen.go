@@ -3,6 +3,7 @@ package zettel
 import (
 	"sync"
 
+	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/kennung_index"
@@ -61,6 +62,9 @@ func (zws *Schwanzen) Set(z *transacted.Zettel, flush bool) (ok bool) {
 	h := z.GetKennung()
 	t1, found := zws.hinweisen[h]
 
+	log.Log().Printf("old: %s", t1)
+	log.Log().Printf("new: %s", z)
+
 	switch {
 	case !found:
 		fallthrough
@@ -70,8 +74,11 @@ func (zws *Schwanzen) Set(z *transacted.Zettel, flush bool) (ok bool) {
 		ok = true
 
 	case t1.Metadatei.EqualsSansTai(z.Metadatei):
+		log.Log().Printf("equals sans tai: %s", z)
 		zws.etikettIndex.Add(z.GetMetadatei().Etiketten)
 
+		log.Log().Printf("tai 1: %s, tai 2: %s", t1.GetTai(), z.GetTai())
+		log.Log().Printf("flush: %t", flush)
 		ok = flush && t1.GetTai().Equals(z.GetTai())
 
 	default:
@@ -85,7 +92,8 @@ func (zws *Schwanzen) Set(z *transacted.Zettel, flush bool) (ok bool) {
 }
 
 func (zws *Schwanzen) ShouldAddVerzeichnisse(
-	z *transacted.Zettel) (err error) {
+	z *transacted.Zettel,
+) (err error) {
 	if ok := zws.Set(z, false); !ok {
 		err = collections.MakeErrStopIteration()
 		return
@@ -95,7 +103,8 @@ func (zws *Schwanzen) ShouldAddVerzeichnisse(
 }
 
 func (zws *Schwanzen) ShouldFlushVerzeichnisse(
-	z *transacted.Zettel) (err error) {
+	z *transacted.Zettel,
+) (err error) {
 	if ok := zws.Set(z, true); !ok {
 		err = collections.MakeErrStopIteration()
 		return

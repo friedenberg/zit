@@ -13,11 +13,16 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/golf/objekte_format"
+	"github.com/friedenberg/zit/src/hotel/sku"
+	"github.com/friedenberg/zit/src/india/sku_formats"
 	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 
 type Page struct {
+	useBestandsaufnahmeForVerzeichnisse bool
+
 	lock *sync.Mutex
 	pageId
 	schnittstellen.VerzeichnisseFactory
@@ -32,6 +37,7 @@ func makeZettelenPage(
 	iof schnittstellen.VerzeichnisseFactory, pid pageId,
 	pool schnittstellen.Pool[transacted.Zettel, *transacted.Zettel],
 	fff PageDelegateGetter,
+	useBestandsaufnahmeForVerzeichnisse bool,
 ) (p *Page) {
 	flushFilter := collections.MakeWriterNoop[*transacted.Zettel]()
 	addFilter := collections.MakeWriterNoop[*transacted.Zettel]()
@@ -44,13 +50,14 @@ func makeZettelenPage(
 	}
 
 	p = &Page{
-		lock:                 &sync.Mutex{},
-		VerzeichnisseFactory: iof,
-		pageId:               pid,
-		pool:                 pool,
-		added:                zettel.MakeHeapTransacted(),
-		flushFilter:          flushFilter,
-		addFilter:            addFilter,
+		useBestandsaufnahmeForVerzeichnisse: useBestandsaufnahmeForVerzeichnisse,
+		lock:                                &sync.Mutex{},
+		VerzeichnisseFactory:                iof,
+		pageId:                              pid,
+		pool:                                pool,
+		added:                               zettel.MakeHeapTransacted(),
+		flushFilter:                         flushFilter,
+		addFilter:                           addFilter,
 	}
 
 	p.added.SetPool(p.pool)
@@ -174,22 +181,50 @@ func (zp *Page) copy(
 
 	r := bufio.NewReader(r1)
 
-	dec := gob.NewDecoder(r)
+	var getOneSku func() (sku.SkuLikePtr, error)
+
+	if zp.useBestandsaufnahmeForVerzeichnisse {
+		dec := sku_formats.MakeFormatbestandsaufnahmeDecoder(
+			r,
+			objekte_format.BestandsaufnahmeFormatIncludeTai(),
+		)
+
+		getOneSku = func() (sk sku.SkuLikePtr, err error) {
+			sk, _, err = dec.ScanOne()
+			return
+		}
+	} else {
+		dec := gob.NewDecoder(r)
+
+		getOneSku = func() (sk sku.SkuLikePtr, err error) {
+			tz := zp.pool.Get()
+			err = dec.Decode(tz)
+			sk = tz
+			return
+		}
+	}
 
 	errors.TodoP3("determine performance of this")
 	added := zp.added.Copy()
 
 	if err = added.MergeStream(
 		func() (tz *transacted.Zettel, err error) {
-			tz = zp.pool.Get()
+			var sk sku.SkuLikePtr
 
-			if err = dec.Decode(tz); err != nil {
+			if sk, err = getOneSku(); err != nil {
 				if errors.IsEOF(err) {
 					err = collections.MakeErrStopIteration()
 				} else {
-					err = errors.Wrap(err)
+					err = errors.Wrapf(err, "Page: %s", zp.pageId.path)
 				}
 
+				return
+			}
+
+			ok := false
+
+			if tz, ok = sk.(*transacted.Zettel); !ok {
+				err = errors.Errorf("expected %T but got %T, err: %s", tz, sk, err)
 				return
 			}
 
@@ -208,16 +243,36 @@ func (zp *Page) writeTo(w1 io.Writer) (err error) {
 	w := bufio.NewWriter(w1)
 	defer errors.DeferredFlusher(&err, w)
 
-	enc := gob.NewEncoder(w)
+	var writeOne func(z *transacted.Zettel) error
 
-	if err = zp.copy(
-		iter.MakeChain(
-			zp.flushFilter,
-			func(z *transacted.Zettel) (err error) {
-				return enc.Encode(z)
-			},
-		),
-	); err != nil {
+	if zp.useBestandsaufnahmeForVerzeichnisse {
+		enc := sku_formats.MakeFormatBestandsaufnahmeEncoder(
+			w,
+			objekte_format.BestandsaufnahmeFormatIncludeTai(),
+		)
+
+		writeOne = func(z *transacted.Zettel) (err error) {
+			if _, err = enc.PrintOne(z); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+	} else {
+		enc := gob.NewEncoder(w)
+
+		writeOne = func(z *transacted.Zettel) (err error) {
+			if err = enc.Encode(z); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+	}
+
+	if err = zp.copy(iter.MakeChain(zp.flushFilter, writeOne)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
