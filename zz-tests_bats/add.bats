@@ -31,7 +31,7 @@ function add { # @test
 		[-zz-inbox-2022-11-14@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/uno@55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to_add" zz-inbox-2022-11-14]
 		[one/uno@55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to_add" zz-inbox-2022-11-14]
-		[to_add.md] (deleted)
+		          deleted [to_add.md]
 	EOM
 
 	run_zit show one/uno
@@ -70,7 +70,7 @@ function add_1 { # @test
 		[-zz-inbox-2022-11-14@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/uno@55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to_add" zz-inbox-2022-11-14]
 		[one/uno@55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to_add" zz-inbox-2022-11-14]
-		[to_add.md] (deleted)
+		          deleted [to_add.md]
 	EOM
 }
 
@@ -99,6 +99,8 @@ function add_2 { # @test
 
 	assert_success
 	assert_output_unsorted - <<-EOM
+		          deleted [to_add.md]
+		          deleted [to_add2.md]
 		[-zz-inbox-2022-11-14@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[-zz-inbox-2022-11@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[-zz-inbox-2022@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -108,8 +110,6 @@ function add_2 { # @test
 		[one/dos@6b8e3c36cb01aa01c65ccd86e04935695e9da0580e3dcc8c0c3bce146c274c2c !md "to_add2" zz-inbox-2022-11-14]
 		[one/uno@55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to_add" zz-inbox-2022-11-14]
 		[one/uno@55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to_add" zz-inbox-2022-11-14]
-		[to_add.md] (deleted)
-		[to_add2.md] (deleted)
 	EOM
 }
 
@@ -138,6 +138,8 @@ function add_dot { # @test
 
 	assert_success
 	assert_output_unsorted - <<-EOM
+		          deleted [to_add.md]
+		          deleted [to_add2.md]
 		[-zz-inbox-2022-11-14@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[-zz-inbox-2022-11@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[-zz-inbox-2022@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -147,8 +149,6 @@ function add_dot { # @test
 		[one/dos@6b8e3c36cb01aa01c65ccd86e04935695e9da0580e3dcc8c0c3bce146c274c2c !md "to_add2" zz-inbox-2022-11-14]
 		[one/uno@55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to_add" zz-inbox-2022-11-14]
 		[one/uno@55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to_add" zz-inbox-2022-11-14]
-		[to_add.md] (deleted)
-		[to_add2.md] (deleted)
 	EOM
 }
 
@@ -251,17 +251,17 @@ function add_several_with_spaces_in_filename { # @test
 
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[-zz@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[-zz-inbox@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[-zz-inbox-2022@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[-zz-inbox-2022-11@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		          deleted [to add.md]
+		          deleted [to add2.md]
 		[-zz-inbox-2022-11-14@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/uno@55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to add" zz-inbox-2022-11-14]
-		[one/uno@55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to add" zz-inbox-2022-11-14]
+		[-zz-inbox-2022-11@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-zz-inbox-2022@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-zz-inbox@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-zz@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/dos@c36af86311166fbaf9cd58f4a161f8dd14618b8242f64ced5b40acd5ed1d1c26 !md "to add2" zz-inbox-2022-11-14]
 		[one/dos@c36af86311166fbaf9cd58f4a161f8dd14618b8242f64ced5b40acd5ed1d1c26 !md "to add2" zz-inbox-2022-11-14]
-		[to add.md] (deleted)
-		[to add2.md] (deleted)
+		[one/uno@55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to add" zz-inbox-2022-11-14]
+		[one/uno@55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to add" zz-inbox-2022-11-14]
 	EOM
 
 	run_zit show one/uno

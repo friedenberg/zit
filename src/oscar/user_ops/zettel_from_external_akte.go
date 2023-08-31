@@ -131,6 +131,8 @@ func (c ZettelFromExternalAkte) Run(
 		return
 	}
 
+	dp := c.Umwelt.PrinterFDDeleted()
+
 	err = toDelete.Each(
 		func(z *external.Zettel) (err error) {
 			// TODO-P4 move to checkout store
@@ -139,12 +141,7 @@ func (c ZettelFromExternalAkte) Run(
 				return
 			}
 
-			pathRel := c.Standort().RelToCwdOrSame(z.GetAkteFD().Path)
-
-			// TODO-P4 move to printer
-			errors.Out().Printf("[%s] (deleted)", pathRel)
-
-			return
+			return dp(&z.GetFDsPtr().Akte)
 		},
 	)
 
