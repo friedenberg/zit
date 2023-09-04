@@ -308,13 +308,13 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		}
 
 	case "bestandsaufnahme-sans-tai":
-		be := sku_formats.MakeFormatBestandsaufnahmeEncoder(
+		be := sku_formats.MakeFormatBestandsaufnahmePrinter(
 			out,
 			objekte_format.BestandsaufnahmeFormatExcludeTai(),
 		)
 
 		return func(o sku.SkuLikePtr) (err error) {
-			if _, err = be.PrintOne(o); err != nil {
+			if _, err = be.Print(o); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -323,13 +323,13 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		}
 
 	case "bestandsaufnahme":
-		f := sku_formats.MakeFormatBestandsaufnahmeEncoder(
+		f := sku_formats.MakeFormatBestandsaufnahmePrinter(
 			out,
 			objekte_format.BestandsaufnahmeFormatIncludeTai(),
 		)
 
 		return func(o sku.SkuLikePtr) (err error) {
-			if _, err = f.PrintOne(o); err != nil {
+			if _, err = f.Print(o); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

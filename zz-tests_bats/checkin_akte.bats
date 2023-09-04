@@ -12,7 +12,7 @@ function can_update_akte { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	run_zit_init_disable_age
 	assert_success
 
 	expected="$(mktemp)"

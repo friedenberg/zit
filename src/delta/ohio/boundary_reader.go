@@ -2,11 +2,9 @@ package ohio
 
 import (
 	"bufio"
-	"bytes"
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/log"
 )
 
 type BoundaryReader interface {
@@ -14,124 +12,107 @@ type BoundaryReader interface {
 	ReadBoundary() (int, error)
 }
 
-type content []byte
-
 type boundaryReader struct {
-	br       *bufio.Reader
-	boundary []byte
-	// make circular
-	head                                []byte
-	tail                                []byte
-	needsBoundaryAfterCompletedHeadRead bool
+	reader           *bufio.Reader
+	boundary         []byte
+	remainingContent int
+	buffer           *RingBuffer
 }
 
 func MakeBoundaryReader(r io.Reader, boundary string) BoundaryReader {
-	return &boundaryReader{
-		br:                                  bufio.NewReader(r),
-		boundary:                            []byte(boundary),
-		needsBoundaryAfterCompletedHeadRead: true,
+	// TODO-P1 perf allow for optimized buffer size
+	d := 0
+
+	if len(boundary) > ringBufferDefaultSize {
+		d = len(boundary)
 	}
+
+	b := MakeRingBuffer(d)
+
+	return &boundaryReader{
+		reader:   bufio.NewReader(r),
+		boundary: []byte(boundary),
+		buffer:   b,
+	}
+}
+
+func (br *boundaryReader) fillBuffer() (n int, err error) {
+	n, err = br.buffer.ReadFromSmall(br.reader)
+
+	return
 }
 
 func (br *boundaryReader) ReadBoundary() (n int, err error) {
-	if !br.needsBoundary() {
-		err = errors.Errorf("next read should be content, not boundary")
+	if br.remainingContent > 0 {
+		err = ErrExpectedContentRead
 		return
 	}
 
-	log.Log().Printf("read boundary")
-	br.needsBoundaryAfterCompletedHeadRead = false
+	eof := false
+	n, eof = br.buffer.PeekMatchAdvance(br.boundary)
 
-	return
-}
+	switch {
+	case n == len(br.boundary):
+		br.remainingContent, _ = br.buffer.Find(br.boundary)
+		return
 
-func (br *boundaryReader) resectHead() (found bool) {
-	if len(br.head) > 0 {
-		panic("resecting non-empty head")
-	}
+	case n == br.buffer.Len() && eof:
+		var n1 int
+		n1, err = br.fillBuffer()
 
-	var head, tail []byte
+		if err != nil {
+			if errors.IsEOF(err) && n1 > 0 {
+				// the buffer has more content, so try a boundary read again
+				err = nil
+			} else {
+				// the buffer has no more content, so this is an actual EOF
+				return
+			}
+		}
+		// read more and try again
+		return br.ReadBoundary()
 
-	head, tail, found = bytes.Cut(br.tail, br.boundary)
+	case n < len(br.boundary):
+		fallthrough
 
-	br.head = append(br.head, head...)
-	br.tail = tail
-
-	return
-}
-
-func (br *boundaryReader) readFromBufferIfNecessary(
-	p []byte,
-) (n int) {
-	if len(br.head) == 0 {
+	default:
+		// not a match, fail
+		err = ErrBoundaryNotFound
 		return
 	}
-
-	// copy up to max length of p
-	lenB := len(br.head)
-	lenP := len(p)
-	nToCopy := lenB
-
-	if lenB > lenP {
-		nToCopy = lenP
-	}
-
-	n = copy(p, br.head[:nToCopy])
-	br.head = br.head[nToCopy:]
-
-	if len(br.head) == 0 {
-		br.needsBoundaryAfterCompletedHeadRead = true
-		br.resectHead()
-	}
-
-	return
-}
-
-func (br *boundaryReader) needsBoundary() bool {
-	if len(br.head) > 0 {
-		return false
-	}
-
-	if !br.needsBoundaryAfterCompletedHeadRead {
-		return false
-	}
-
-	return true
 }
 
 func (br *boundaryReader) Read(p []byte) (n int, err error) {
-	if br.needsBoundary() {
+	if br.remainingContent == -1 {
 		err = io.EOF
-		// err = errors.Errorf("next read should be boundary, not content")
 		return
 	}
 
-	n = br.readFromBufferIfNecessary(p)
+	if len(p) < br.buffer.Len() {
+		var n1 int
+		n1, err = br.fillBuffer()
 
-	if n > 0 {
-		return
+		if err != nil {
+			if errors.IsEOF(err) && n1 > 0 {
+				// the buffer has more content
+				err = nil
+			} else {
+				// the buffer has no more content, so this is an actual EOF
+				return
+			}
+		}
 	}
 
-	n, err = br.br.Read(p)
-
-	found := br.fillBuffer(p)
-
-	if found {
-		n = br.readFromBufferIfNecessary(p)
-		return
+	if len(p) > br.remainingContent {
+		p = p[:br.remainingContent+1]
 	}
 
-	return
-}
+	n, err = br.buffer.Read(p)
+	br.remainingContent -= n
 
-func (br *boundaryReader) fillBuffer(p []byte) (found bool) {
-	if len(br.head) > 0 {
-		br.tail = append(br.tail, p...)
-		return
+	if err == nil && br.remainingContent == 0 {
+		err = io.EOF
 	}
-
-	br.tail = append(br.tail, p...)
-	found = br.resectHead()
 
 	return
 }

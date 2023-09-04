@@ -184,13 +184,13 @@ func (zp *Page) copy(
 	var getOneSku func() (sku.SkuLikePtr, error)
 
 	if zp.useBestandsaufnahmeForVerzeichnisse {
-		dec := sku_formats.MakeFormatbestandsaufnahmeDecoder(
+		dec := sku_formats.MakeFormatbestandsaufnahmeScanner(
 			r,
 			objekte_format.BestandsaufnahmeFormatIncludeTai(),
 		)
 
 		getOneSku = func() (sk sku.SkuLikePtr, err error) {
-			sk, _, err = dec.ScanOne()
+			sk, _, err = dec.Scan()
 			return
 		}
 	} else {
@@ -246,13 +246,13 @@ func (zp *Page) writeTo(w1 io.Writer) (err error) {
 	var writeOne func(z *transacted.Zettel) error
 
 	if zp.useBestandsaufnahmeForVerzeichnisse {
-		enc := sku_formats.MakeFormatBestandsaufnahmeEncoder(
+		enc := sku_formats.MakeFormatBestandsaufnahmePrinter(
 			w,
 			objekte_format.BestandsaufnahmeFormatIncludeTai(),
 		)
 
 		writeOne = func(z *transacted.Zettel) (err error) {
-			if _, err = enc.PrintOne(z); err != nil {
+			if _, err = enc.Print(z); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

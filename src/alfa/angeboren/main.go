@@ -27,7 +27,7 @@ func Default() Konfig {
 		StoreVersion:                        storeVersion(values.Int(3)),
 		Recipients:                          make([]string, 0),
 		UseBestandsaufnahme:                 true,
-		UseBestandsaufnahmeForVerzeichnisse: false,
+		UseBestandsaufnahmeForVerzeichnisse: true,
 		UseKonfigErworbenFile:               true,
 		CompressionType:                     CompressionTypeDefault,
 		LockInternalFiles:                   true,

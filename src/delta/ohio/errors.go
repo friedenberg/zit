@@ -5,6 +5,13 @@ import (
 	"fmt"
 )
 
+var (
+	ErrBoundaryNotFound     = errors.New("boundary not found")
+	ErrExpectedContentRead  = errors.New("expected content read")
+	ErrExpectedBoundaryRead = errors.New("expected boundary read")
+	ErrReadFromSmallOverflow = errors.New("reader provided more bytes than max int")
+)
+
 type ErrExhaustedFuncSetStringersLine struct {
 	error
 	string

@@ -142,7 +142,7 @@ func (f formatAkte2) FormatParsedAkte(
 	bw := bufio.NewWriter(w)
 	defer errors.DeferredFlusher(&err, bw)
 
-	fo := sku_formats.MakeFormatBestandsaufnahmeEncoder(
+	fo := sku_formats.MakeFormatBestandsaufnahmePrinter(
 		bw,
 		objekte_format.BestandsaufnahmeFormatIncludeTai(),
 	)
@@ -160,7 +160,7 @@ func (f formatAkte2) FormatParsedAkte(
 			break
 		}
 
-		n1, err = fo.PrintOne(sk.SkuLikePtr)
+		n1, err = fo.Print(sk.SkuLikePtr)
 
 		n += int64(n1)
 
