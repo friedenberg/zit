@@ -43,10 +43,7 @@ func (t T) errorf(skip int, format string, args ...interface{}) {
 }
 
 func (t T) fatalf(skip int, format string, args ...interface{}) {
-	errors.SetTesting()
-	si, _ := MakeStackInfo(t.skip + 1 + skip)
-	args = append([]interface{}{si}, args...)
-	os.Stderr.WriteString(fmt.Sprintf("%s"+format+"\n", args...))
+	t.logf(skip+1, format, args...)
 	t.FailNow()
 }
 
@@ -55,10 +52,12 @@ func (t T) Logf(format string, args ...interface{}) {
 }
 
 func (t T) Errorf(format string, args ...interface{}) {
+	t.Helper()
 	t.errorf(1, format, args...)
 }
 
 func (t T) Fatalf(format string, args ...interface{}) {
+	t.Helper()
 	t.fatalf(1, format, args...)
 }
 

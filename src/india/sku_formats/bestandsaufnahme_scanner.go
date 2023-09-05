@@ -48,11 +48,10 @@ func (f *bestandsaufnahmeScanner) Scan() (sk sku.SkuLikePtr, n int64, err error)
 		n2, err = f.br.ReadBoundary()
 		n += int64(n2)
 
-		if err != nil {
-			if !errors.IsEOF(err) {
-				err = errors.Wrap(err)
-			}
-
+		if errors.IsEOF(err) {
+			err = nil
+		} else if err != nil {
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -86,7 +85,10 @@ func (f *bestandsaufnahmeScanner) Scan() (sk sku.SkuLikePtr, n int64, err error)
 	n2, err = f.br.ReadBoundary()
 	n += int64(n2)
 
-	if err != nil {
+	if errors.IsEOF(err) {
+		err = io.EOF
+		return
+	} else if err != nil {
 		err = errors.Wrap(err)
 		return
 	}

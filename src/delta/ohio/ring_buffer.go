@@ -3,7 +3,6 @@ package ohio
 import (
 	"fmt"
 	"io"
-	"math"
 )
 
 const ringBufferDefaultSize = 4096
@@ -88,6 +87,7 @@ func (rb *RingBuffer) Cap() int {
 func (rb *RingBuffer) Write(p []byte) (n int, err error) {
 	if rb.Len() == len(rb.buffer) {
 		err = io.EOF
+		return
 	}
 
 	first, second := rb.PeekWriteable()
@@ -101,6 +101,7 @@ func (rb *RingBuffer) Write(p []byte) (n int, err error) {
 
 	if rb.Len() == len(rb.buffer) {
 		err = io.EOF
+		return
 	}
 
 	if n == len(p) {
@@ -117,6 +118,7 @@ func (rb *RingBuffer) Write(p []byte) (n int, err error) {
 
 	if rb.Len() == len(rb.buffer) {
 		err = io.EOF
+		return
 	}
 
 	return
@@ -125,6 +127,7 @@ func (rb *RingBuffer) Write(p []byte) (n int, err error) {
 func (rb *RingBuffer) Read(p []byte) (n int, err error) {
 	if rb.Len() == 0 {
 		err = io.EOF
+		return
 	}
 
 	first, second := rb.PeekReadable()
@@ -138,6 +141,7 @@ func (rb *RingBuffer) Read(p []byte) (n int, err error) {
 
 	if rb.Len() == 0 {
 		err = io.EOF
+		return
 	}
 
 	if n == len(p) {
@@ -154,26 +158,13 @@ func (rb *RingBuffer) Read(p []byte) (n int, err error) {
 
 	if rb.Len() == 0 {
 		err = io.EOF
-	}
-
-	return
-}
-
-func (rb *RingBuffer) ReadFromSmall(r io.Reader) (n int, err error) {
-	var n1 int64
-	n1, err = rb.ReadFrom(r)
-
-	if n1 > math.MaxInt {
-		err = ErrReadFromSmallOverflow
 		return
 	}
 
-	n = int(n1)
-
 	return
 }
 
-func (rb *RingBuffer) ReadFrom(r io.Reader) (n int64, err error) {
+func (rb *RingBuffer) FillWith(r io.Reader) (n int, err error) {
 	if rb.Len() == len(rb.buffer) {
 		err = io.EOF
 		return
@@ -185,7 +176,7 @@ func (rb *RingBuffer) ReadFrom(r io.Reader) (n int64, err error) {
 
 	n1, err = r.Read(first)
 	rb.w += n1
-	n += int64(n1)
+	n += n1
 	rb.n += n1
 	if err != nil {
 		return
@@ -197,7 +188,7 @@ func (rb *RingBuffer) ReadFrom(r io.Reader) (n int64, err error) {
 	}
 
 	n1, err = r.Read(second)
-	n += int64(n1)
+	n += n1
 	rb.n += n1
 
 	if n1 > 0 {

@@ -48,12 +48,14 @@ func MakeBoundaryReader(r io.Reader, boundary string) BoundaryReader {
 	}
 }
 
-func (br *boundaryReader) fillBuffer() (n int, err error) {
-	n, err = br.buffer.ReadFromSmall(br.reader)
-	if errors.IsEOF(err) {
-	}
+func (br *boundaryReader) setState(s boundaryReaderState) {
+	br.state = s
+}
 
-	if !errors.IsEOF(err) {
+func (br *boundaryReader) fillBuffer() (n int, err error) {
+	n, err = br.buffer.FillWith(br.reader)
+
+	if err != nil && !errors.IsEOF(err) {
 		return
 	}
 
@@ -72,9 +74,9 @@ func (br *boundaryReader) resetRemainingContentIfNecessary() {
 		br.remainingContent, eof = br.buffer.Find(br.boundary)
 
 		if eof {
-			br.state = boundaryReaderStatePartialBoundaryInBuffer
+			br.setState(boundaryReaderStatePartialBoundaryInBuffer)
 		} else {
-			br.state = boundaryReaderStateCompleteBoundaryInBuffer
+			br.setState(boundaryReaderStateCompleteBoundaryInBuffer)
 		}
 
 	case boundaryReaderStateOnlyContent:
@@ -111,7 +113,7 @@ func (br *boundaryReader) ReadBoundary() (n int, err error) {
 
 	switch {
 	case n == len(br.boundary):
-		br.state = boundaryReaderStatePartialBoundaryInBuffer
+		br.setState(boundaryReaderStatePartialBoundaryInBuffer)
 
 		var n1 int
 		n1, err = br.fillBuffer()
@@ -209,7 +211,7 @@ func (br *boundaryReader) Read(p []byte) (n int, err error) {
 		br.remainingContent -= n
 
 		if br.remainingContent <= 0 {
-			br.state = boundaryReaderStateNeedsBoundary
+			br.setState(boundaryReaderStateNeedsBoundary)
 		}
 	}
 

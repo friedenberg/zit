@@ -244,6 +244,7 @@ func TestRingBufferEmptyTooSmall(t1 *testing.T) {
 
 func TestRingBufferDefault(t1 *testing.T) {
 	t := test_logz.T{T: t1}
+	t2 := t.Skip(1)
 	sut := MakeRingBuffer(0)
 
 	one_5 := make([]byte, 2730)
@@ -255,15 +256,15 @@ func TestRingBufferDefault(t1 *testing.T) {
 		n, err := sut.Write(one_5)
 
 		if n != len(one_5) {
-			t.Errorf("expected %d but got %d", len(one_5), n)
+			t2.Errorf("expected %d but got %d", len(one_5), n)
 		}
 
 		l += n
 
-		t.AssertNoError(err)
+		t2.AssertNoError(err)
 
 		if sut.Len() != l {
-			t.Errorf("expected len %d but got %d", l, sut.Len())
+			t2.Errorf("expected len %d but got %d", l, sut.Len())
 		}
 	}
 
@@ -271,15 +272,15 @@ func TestRingBufferDefault(t1 *testing.T) {
 		n, err := sut.Read(half)
 
 		if n != len(half) {
-			t.Errorf("expected %d but got %d", len(half), n)
+			t2.Errorf("expected %d but got %d", len(half), n)
 		}
 
 		l -= n
 
-		t.AssertNoError(err)
+		t2.AssertNoError(err)
 
 		if sut.Len() != l {
-			t.Errorf("expected len %d but got %d", l, sut.Len())
+			t2.Errorf("expected len %d but got %d", l, sut.Len())
 		}
 	}
 
@@ -302,7 +303,7 @@ func TestRingBufferDefaultReadFrom(t1 *testing.T) {
 	t2 := t.Skip(1)
 
 	write := func() {
-		n, err := sut.ReadFromSmall(one_5)
+		n, err := sut.FillWith(one_5)
 		one_5 = bytes.NewBuffer(make([]byte, 2730))
 
 		if n != one_5.Len() {

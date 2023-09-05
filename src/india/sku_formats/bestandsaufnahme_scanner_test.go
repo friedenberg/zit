@@ -147,22 +147,38 @@ func TestBigMac(t1 *testing.T) {
 
 	scanner := MakeFormatbestandsaufnahmeScanner(zstd.NewReader(dataComp), f)
 
+	i := 0
+
 	for {
+		t.Logf("i: %d", i)
 		sk, n, err := scanner.Scan()
 
-		if errors.IsEOF(io.EOF) {
-			break
+		if sk != nil {
+			t.Logf("tai: %q", sk.GetTai())
+			t.Logf("typ: %q", sk.GetTyp())
 		}
-
-		t.AssertNoError(err)
 
 		if sk == nil {
 			t.Errorf("expected sku but got nil")
 		}
 
 		if n == 0 {
-			t.Errorf("non-zero read")
+			t.Errorf("expected non-zero read")
 		}
+
+		i++
+
+		if errors.IsEOF(err) {
+			break
+		}
+
+		t.AssertNoError(err)
+	}
+
+	expected := 55
+
+	if i != expected {
+		t.Errorf("expected %d entries but got %d", expected, i)
 	}
 }
 
