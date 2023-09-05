@@ -49,8 +49,8 @@ func TestBoundaryReaderContainsBoundary(t1 *testing.T) {
 	var err error
 	n1, err = sut.ReadBoundary()
 
-	if err != nil {
-		t.Errorf("expected no error but got %q", err)
+	if !errors.IsEOF(err) {
+		t.Errorf("expected %q but got %q", io.EOF, err)
 	}
 
 	if n1 != 1 {
@@ -170,6 +170,7 @@ func TestBoundaryReaderSandwich2(t1 *testing.T) {
 	readBoundary(false)
 
 	for i := 0; i < 3; i++ {
+		t.Logf("%d", i)
 		b := strings.Builder{}
 
 		var n int64
@@ -190,7 +191,7 @@ func TestBoundaryReaderSandwich2(t1 *testing.T) {
 
 		end := false
 
-		if i == 3 {
+		if i == 2 {
 			end = true
 		}
 
@@ -261,10 +262,11 @@ func TestBoundaryReaderSandwich3(t1 *testing.T) {
 
 		end := false
 
-		if i == 3 {
+		if i == 2 {
 			end = true
 		}
 
 		readBoundary(end)
 	}
 }
+

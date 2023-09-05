@@ -30,11 +30,15 @@ func (t T) Skip(skip int) T {
 	}
 }
 
-func (t T) errorf(skip int, format string, args ...interface{}) {
+func (t T) logf(skip int, format string, args ...interface{}) {
 	errors.SetTesting()
 	si, _ := MakeStackInfo(t.skip + 1 + skip)
 	args = append([]interface{}{si}, args...)
 	os.Stderr.WriteString(fmt.Sprintf("%s"+format+"\n", args...))
+}
+
+func (t T) errorf(skip int, format string, args ...interface{}) {
+	t.logf(skip+1, format, args...)
 	t.Fail()
 }
 
@@ -44,6 +48,10 @@ func (t T) fatalf(skip int, format string, args ...interface{}) {
 	args = append([]interface{}{si}, args...)
 	os.Stderr.WriteString(fmt.Sprintf("%s"+format+"\n", args...))
 	t.FailNow()
+}
+
+func (t T) Logf(format string, args ...interface{}) {
+	t.logf(1, format, args...)
 }
 
 func (t T) Errorf(format string, args ...interface{}) {
@@ -65,6 +73,14 @@ func (t T) AssertNoError(err error) {
 
 	if err != nil {
 		t.fatalf(1, "expected no error but got %q", err)
+	}
+}
+
+func (t T) AssertEOF(err error) {
+	t.T.Helper()
+
+	if !errors.IsEOF(err) {
+		t.fatalf(1, "expected EOF but got none")
 	}
 }
 

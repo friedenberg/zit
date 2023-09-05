@@ -1,6 +1,7 @@
 package ohio
 
 import (
+	"fmt"
 	"io"
 	"math"
 )
@@ -8,9 +9,8 @@ import (
 const ringBufferDefaultSize = 4096
 
 type RingBuffer struct {
-	rN, wN int64
-	r, w   int
-	buffer []byte
+	n, r, w int
+	buffer  []byte
 }
 
 func MakeRingBuffer(n int) *RingBuffer {
@@ -28,11 +28,23 @@ func (rb *RingBuffer) PeekWriteable() (first, second []byte) {
 		return
 	}
 
-	if rb.w < rb.w {
+	if rb.w < rb.r {
 		first = rb.buffer[rb.w:rb.r]
 	} else {
 		second = rb.buffer[:rb.r]
 		first = rb.buffer[rb.w:]
+	}
+
+	wCap := len(first) + len(second)
+
+	if wCap > len(rb.buffer) {
+		panic(
+			fmt.Sprintf(
+				"wcap was %d but buffer len was %d",
+				wCap,
+				len(rb.buffer),
+			),
+		)
 	}
 
 	return
@@ -50,6 +62,22 @@ func (rb *RingBuffer) PeekReadable() (first, second []byte) {
 		first = rb.buffer[rb.r:]
 	}
 
+	rCap := len(first) + len(second)
+
+	if rCap > rb.Len() {
+		panic(
+			fmt.Sprintf(
+				"rcap was %d but buffer len was %d and len was %d and n was %d and r was %d and w was %d",
+				rCap,
+				len(rb.buffer),
+				rb.Len(),
+				rb.n,
+				rb.r,
+				rb.w,
+			),
+		)
+	}
+
 	return
 }
 
@@ -57,11 +85,11 @@ func (rb *RingBuffer) Cap() int {
 	return len(rb.buffer)
 }
 
-func (rb *RingBuffer) WN() int64 {
-	return rb.wN
-}
-
 func (rb *RingBuffer) Write(p []byte) (n int, err error) {
+	if rb.Len() == len(rb.buffer) {
+		err = io.EOF
+	}
+
 	first, second := rb.PeekWriteable()
 
 	var n1 int
@@ -69,7 +97,11 @@ func (rb *RingBuffer) Write(p []byte) (n int, err error) {
 	n1 = copy(first, p)
 	rb.w += n1
 	n += n1
-	rb.wN += int64(n1)
+	rb.n += n1
+
+	if rb.Len() == len(rb.buffer) {
+		err = io.EOF
+	}
 
 	if n == len(p) {
 		return
@@ -77,35 +109,51 @@ func (rb *RingBuffer) Write(p []byte) (n int, err error) {
 
 	n1 = copy(second, p[n:])
 	n += n1
-	rb.wN += int64(n1)
+	rb.n += n1
 
 	if n1 > 0 {
 		rb.w = n1
+	}
+
+	if rb.Len() == len(rb.buffer) {
+		err = io.EOF
 	}
 
 	return
 }
 
 func (rb *RingBuffer) Read(p []byte) (n int, err error) {
+	if rb.Len() == 0 {
+		err = io.EOF
+	}
+
 	first, second := rb.PeekReadable()
 
 	var n1 int
 
 	n1 = copy(p, first)
 	rb.r += n1
-	rb.rN += int64(n1)
+	rb.n -= n1
 	n += n1
 
-	if n == len(p) || rb.w == rb.r {
+	if rb.Len() == 0 {
+		err = io.EOF
+	}
+
+	if n == len(p) {
 		return
 	}
 
 	n1 = copy(p[n:], second)
 	n += n1
-	rb.rN += int64(n1)
+	rb.n -= n1
 
 	if n1 > 0 {
 		rb.r = n1
+	}
+
+	if rb.Len() == 0 {
+		err = io.EOF
 	}
 
 	return
@@ -126,6 +174,11 @@ func (rb *RingBuffer) ReadFromSmall(r io.Reader) (n int, err error) {
 }
 
 func (rb *RingBuffer) ReadFrom(r io.Reader) (n int64, err error) {
+	if rb.Len() == len(rb.buffer) {
+		err = io.EOF
+		return
+	}
+
 	first, second := rb.PeekWriteable()
 
 	var n1 int
@@ -133,21 +186,26 @@ func (rb *RingBuffer) ReadFrom(r io.Reader) (n int64, err error) {
 	n1, err = r.Read(first)
 	rb.w += n1
 	n += int64(n1)
-	rb.wN += int64(n1)
-
+	rb.n += n1
 	if err != nil {
+		return
+	}
+
+	if rb.Len() == len(rb.buffer) {
+		err = io.EOF
 		return
 	}
 
 	n1, err = r.Read(second)
 	n += int64(n1)
-	rb.wN += int64(n1)
+	rb.n += n1
 
 	if n1 > 0 {
 		rb.w = n1
 	}
 
-	if err != nil {
+	if rb.Len() == len(rb.buffer) {
+		err = io.EOF
 		return
 	}
 
@@ -186,20 +244,22 @@ func (rb *RingBuffer) Find(m []byte) (offset int, eof bool) {
 		j++
 	}
 
-	for _, v := range second {
-		if m[i] != v {
-			lastWasMatch = false
-			i = 0
-		} else {
-			lastWasMatch = true
-			i++
+	if i < len(m) {
+		for _, v := range second {
+			if m[i] != v {
+				lastWasMatch = false
+				i = 0
+			} else {
+				lastWasMatch = true
+				i++
 
-			if i == len(m) {
-				break
+				if i == len(m) {
+					break
+				}
 			}
-		}
 
-		j++
+			j++
+		}
 	}
 
 	switch {
@@ -253,9 +313,9 @@ func (rb *RingBuffer) peekMatchAdvance(m []byte, advance bool) (n int) {
 		r++
 	}
 
-	if len(second) > 0 {
-		r = 0
-	}
+	// if len(second) > 0 {
+	// 	r = 0
+	// }
 
 	for _, v := range second {
 		if n == len(m) {
@@ -271,13 +331,22 @@ func (rb *RingBuffer) peekMatchAdvance(m []byte, advance bool) (n int) {
 	}
 
 	if advance && n == len(m) {
-		rb.r = r
-		rb.rN += int64(n)
+		rb.r += n
+
+		if rb.r > len(rb.buffer) {
+			rb.r -= len(rb.buffer)
+		}
+
+		rb.n -= n
 	}
 
 	return
 }
 
 func (rb *RingBuffer) Len() int {
-	return int(rb.wN - rb.rN)
+	if rb.n > len(rb.buffer) {
+		panic("length is greater than buffer")
+	}
+
+	return rb.n
 }

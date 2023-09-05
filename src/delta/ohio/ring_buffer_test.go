@@ -1,6 +1,7 @@
 package ohio
 
 import (
+	"bytes"
 	"testing"
 
 	"github.com/friedenberg/zit/src/bravo/test_logz"
@@ -95,9 +96,7 @@ func TestRingBufferEmpty(t1 *testing.T) {
 			t.Errorf("expected %d but got %d", 4, n)
 		}
 
-		if err != nil {
-			t.Errorf("expected no error but got %s", err)
-		}
+		t.AssertEOF(err)
 
 		actual := string(b)
 
@@ -133,9 +132,7 @@ func TestRingBufferEmptyTooBig(t1 *testing.T) {
 				t.Errorf("expected %d but got %d", 4, n)
 			}
 
-			if err != nil {
-				t.Errorf("expected no error but got %s", err)
-			}
+			t.AssertNoError(err)
 		}
 
 		{
@@ -146,9 +143,7 @@ func TestRingBufferEmptyTooBig(t1 *testing.T) {
 				t.Errorf("expected %d but got %d", 4, n)
 			}
 
-			if err != nil {
-				t.Errorf("expected no error but got %s", err)
-			}
+			t.AssertEOF(err)
 
 			{
 				actual := string(b[:n])
@@ -186,8 +181,10 @@ func TestRingBufferEmptyTooSmall(t1 *testing.T) {
 			t.Errorf("expected %d but got %d", 4, n)
 		}
 
-		if err != nil {
-			t.Errorf("expected no error but got %s", err)
+		t.AssertEOF(err)
+
+		if sut.Len() != 3 {
+			t.Errorf("expected len 3 but got %d", sut.Len())
 		}
 	}
 
@@ -198,8 +195,10 @@ func TestRingBufferEmptyTooSmall(t1 *testing.T) {
 			t.Errorf("expected %d but got %d", 4, n)
 		}
 
-		if err != nil {
-			t.Errorf("expected no error but got %s", err)
+		t.AssertEOF(err)
+
+		if sut.Len() != 3 {
+			t.Errorf("expected len 3 but got %d", sut.Len())
 		}
 	}
 
@@ -212,11 +211,13 @@ func TestRingBufferEmptyTooSmall(t1 *testing.T) {
 			if n != expected {
 				t.Errorf("expected %d but got %d", expected, n)
 			}
+
+			if sut.Len() != 0 {
+				t.Errorf("expected len 0 but got %d", sut.Len())
+			}
 		}
 
-		if err != nil {
-			t.Errorf("expected no error but got %s", err)
-		}
+		t.AssertEOF(err)
 
 		actual := string(b[:n])
 		expected := "tea"
@@ -237,8 +238,106 @@ func TestRingBufferEmptyTooSmall(t1 *testing.T) {
 			}
 		}
 
-		if err != nil {
-			t.Errorf("expected no error but got %s", err)
+		t.AssertEOF(err)
+	}
+}
+
+func TestRingBufferDefault(t1 *testing.T) {
+	t := test_logz.T{T: t1}
+	sut := MakeRingBuffer(0)
+
+	one_5 := make([]byte, 2730)
+	half := make([]byte, 2048)
+
+	l := 0
+
+	write := func() {
+		n, err := sut.Write(one_5)
+
+		if n != len(one_5) {
+			t.Errorf("expected %d but got %d", len(one_5), n)
+		}
+
+		l += n
+
+		t.AssertNoError(err)
+
+		if sut.Len() != l {
+			t.Errorf("expected len %d but got %d", l, sut.Len())
 		}
 	}
+
+	read := func() {
+		n, err := sut.Read(half)
+
+		if n != len(half) {
+			t.Errorf("expected %d but got %d", len(half), n)
+		}
+
+		l -= n
+
+		t.AssertNoError(err)
+
+		if sut.Len() != l {
+			t.Errorf("expected len %d but got %d", l, sut.Len())
+		}
+	}
+
+	write()
+	read()
+	write()
+	read()
+	write()
+	read()
+}
+
+func TestRingBufferDefaultReadFrom(t1 *testing.T) {
+	t := test_logz.T{T: t1}
+	sut := MakeRingBuffer(0)
+
+	one_5 := bytes.NewBuffer(make([]byte, 2730))
+	half := make([]byte, 2048)
+
+	l := 0
+	t2 := t.Skip(1)
+
+	write := func() {
+		n, err := sut.ReadFromSmall(one_5)
+		one_5 = bytes.NewBuffer(make([]byte, 2730))
+
+		if n != one_5.Len() {
+			t2.Errorf("expected %d but got %d", one_5.Len(), n)
+		}
+
+		l += n
+
+		t2.AssertNoError(err)
+
+		if sut.Len() != l {
+			t2.Errorf("expected len %d but got %d", l, sut.Len())
+		}
+	}
+
+	read := func() {
+		n, err := sut.Read(half)
+
+		if n != len(half) {
+			t2.Errorf("expected %d but got %d", len(half), n)
+		}
+
+		l -= n
+
+		t2.AssertNoError(err)
+
+		if sut.Len() != l {
+			t2.Errorf("expected len %d but got %d", l, sut.Len())
+		}
+	}
+
+	write()
+	read()
+	write()
+	read()
+	write()
+	read()
 }

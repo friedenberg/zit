@@ -4,7 +4,6 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/ohio"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -66,10 +65,7 @@ func (f *bestandsaufnahmeScanner) Scan() (sk sku.SkuLikePtr, n int64, err error)
 	n += n1
 
 	if err != nil {
-		if !errors.IsEOF(err) {
-			err = errors.Wrap(err)
-		}
-
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -77,7 +73,8 @@ func (f *bestandsaufnahmeScanner) Scan() (sk sku.SkuLikePtr, n int64, err error)
 		h.Metadatei,
 		h.KennungLike,
 	); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "Bytes: %d", n1)
+		err = errors.Wrapf(err, "Sku: %v", h)
 		return
 	}
 
@@ -93,8 +90,6 @@ func (f *bestandsaufnahmeScanner) Scan() (sk sku.SkuLikePtr, n int64, err error)
 		err = errors.Wrap(err)
 		return
 	}
-
-	log.Log().Printf("next boundary")
 
 	return
 }

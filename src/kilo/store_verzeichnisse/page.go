@@ -212,13 +212,15 @@ func (zp *Page) copy(
 			var sk sku.SkuLikePtr
 
 			if sk, err = getOneSku(); err != nil {
-				if errors.IsEOF(err) {
+				if errors.IsEOF(err) && sk != nil {
+					err = nil
+				} else if errors.IsEOF(err) {
 					err = collections.MakeErrStopIteration()
+					return
 				} else {
 					err = errors.Wrapf(err, "Page: %s", zp.pageId.path)
+					return
 				}
-
-				return
 			}
 
 			ok := false
