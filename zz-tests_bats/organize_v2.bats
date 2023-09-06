@@ -42,11 +42,11 @@ function outputs_organize_one_etikett { # @test
 		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "wow" ok]
 	EOM
 
-	run_zit show one/uno
+	run_zit show -format text one/uno
 	assert_success
 	assert_output "$(cat "$to_add")"
 
-	run_zit show ok:z
+	run_zit show -format text ok:z
 	assert_success
 	assert_output "$(cat "$to_add")"
 
@@ -100,7 +100,7 @@ function outputs_organize_two_etiketten { # @test
 		echo "- [one/uno] wow"
 	} >"$expected_organize"
 
-	run_zit show "${cmd_zit_def[@]}" ok:z brown:z
+	run_zit show -format text "${cmd_zit_def[@]}" ok:z brown:z
 	assert_success
 	assert_output "$(cat "$to_add")"
 
@@ -135,10 +135,10 @@ function outputs_organize_two_etiketten { # @test
 	assert_success
 	assert_output ""
 
-	run_zit show ok:z
+	run_zit show -format text ok:z
 	assert_output "$(cat "$expected_zettel")"
 
-	run_zit show one/uno
+	run_zit show -format text one/uno
 	assert_success
 	assert_output "$(cat "$expected_zettel")"
 }
@@ -405,7 +405,7 @@ function commits_organize_one_etiketten_group_by_two { # @test
 		echo "---"
 	} >"$to_add"
 
-	run zit show one/uno
+	run zit show -format text one/uno
 	assert_success
 	assert_output "$(cat "$to_add")"
 
@@ -419,7 +419,7 @@ function commits_organize_one_etiketten_group_by_two { # @test
 		echo "---"
 	} >"$to_add"
 
-	run_zit show two/uno
+	run_zit show -format text two/uno
 	assert_success
 	assert_output "$(cat "$to_add")"
 }
@@ -538,7 +538,7 @@ function commits_organize_one_etiketten_group_by_two_new_zettels { # @test
 		echo "---"
 	} >"$to_add"
 
-	run_zit show one/uno
+	run_zit show -format text one/uno
 	assert_success
 	assert_output "$(cat "$to_add")"
 
@@ -552,17 +552,17 @@ function commits_organize_one_etiketten_group_by_two_new_zettels { # @test
 		echo "---"
 	} >"$to_add"
 
-	run_zit show two/uno
+	run_zit show -format text two/uno
 	assert_success
 	assert_output "$(cat "$to_add")"
 
-	run_zit show one/tres
+	run_zit show -format text one/tres
 	assert_success
 
-	run_zit show two/dos
+	run_zit show -format text two/dos
 	assert_success
 
-	run_zit show three/uno
+	run_zit show -format text three/uno
 	assert_success
 
 	{
@@ -650,15 +650,15 @@ function commits_no_changes { # @test
 	assert_success
 	assert_output "no changes"
 
-	run_zit show one/uno
+	run_zit show -format text one/uno
 	assert_success
 	assert_output "$(cat "$one")"
 
-	run_zit show one/dos
+	run_zit show -format text one/dos
 	assert_success
 	assert_output "$(cat "$two")"
 
-	run_zit show two/uno
+	run_zit show -format text two/uno
 	assert_success
 	assert_output "$(cat "$three")"
 }
@@ -725,7 +725,7 @@ function commits_dependent_leaf { # @test
 	run_zit organize "${cmd_def_organize[@]}" -verbose -mode commit-directly -group-by priority,w task <"$expected_organize"
 	assert_success
 
-	run_zit show one/uno
+	run_zit show -format text one/uno
 	assert_success
 	assert_output - <<-EOM
 		---
@@ -737,7 +737,7 @@ function commits_dependent_leaf { # @test
 		---
 	EOM
 
-	run_zit show one/dos
+	run_zit show -format text one/dos
 	assert_success
 	assert_output - <<-EOM
 		---
@@ -749,7 +749,7 @@ function commits_dependent_leaf { # @test
 		---
 	EOM
 
-	run zit show two/uno
+	run zit show -format text two/uno
 	assert_success
 	assert_output - <<-EOM
 		---

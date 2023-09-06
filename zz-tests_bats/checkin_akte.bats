@@ -35,7 +35,7 @@ function can_update_akte { # @test
 		[one/uno@036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064 !md "bez" et1 et2]
 	EOM
 
-	run_zit show one/uno:z
+	run_zit show -format text one/uno:z
 	assert_success
 	assert_output "$(cat "$expected")"
 
@@ -63,7 +63,7 @@ function can_update_akte { # @test
 		echo the body but new
 	} >"$expected"
 
-	run_zit show one/uno:z
+	run_zit show -format text one/uno:z
 	assert_success
 	assert_output "$(cat "$expected")"
 }

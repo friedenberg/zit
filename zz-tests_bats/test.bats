@@ -58,7 +58,7 @@ function can_new_zettel_file { # @test
 		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "wow" ok]
 	EOM
 
-	run_zit show one/uno:z
+	run_zit show -format text one/uno:z
 	assert_success
 	assert_output "$(cat "$to_add")"
 }
@@ -86,7 +86,7 @@ function can_new_zettel { # @test
 		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "wow" ok]
 	EOM
 
-	run_zit show one/uno:z
+	run_zit show -format text one/uno:z
 	assert_success
 	assert_output "$(cat "$expected")"
 }

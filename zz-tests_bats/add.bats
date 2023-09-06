@@ -34,7 +34,7 @@ function add { # @test
 		          deleted [to_add.md]
 	EOM
 
-	run_zit show one/uno
+	run_zit show -format text one/uno
 	assert_success
 	assert_output - <<-EOM
 		---
@@ -264,7 +264,7 @@ function add_several_with_spaces_in_filename { # @test
 		[one/uno@55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to add" zz-inbox-2022-11-14]
 	EOM
 
-	run_zit show one/uno
+	run_zit show -format text one/uno
 	assert_success
 	assert_output - <<-EOM
 		---

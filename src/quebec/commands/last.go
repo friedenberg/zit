@@ -25,7 +25,7 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &Last{}
 
-			f.StringVar(&c.Format, "format", "text", "format")
+			f.StringVar(&c.Format, "format", "log", "format")
 
 			return c
 		},

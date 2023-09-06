@@ -23,7 +23,7 @@ func init() {
 		func(f *flag.FlagSet) CommandWithQuery {
 			c := &Show{}
 
-			f.StringVar(&c.Format, "format", "text", "format")
+			f.StringVar(&c.Format, "format", "log", "format")
 
 			return c
 		},

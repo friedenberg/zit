@@ -31,7 +31,7 @@ function new_empty_no_edit { # @test
 		---
 	EOM
 
-	run_zit show two/uno
+	run_zit show -format text two/uno
 	assert_success
 	assert_output - <<-EOM
 		---
@@ -69,11 +69,11 @@ function can_duplicate_zettel_content { # @test
 	EOM
 
 	# when
-	run_zit show two/uno
+	run_zit show -format text two/uno
 	assert_success
 	assert_output "$(cat "$expected")"
 
-	run_zit show one/tres
+	run_zit show -format text one/tres
 	assert_success
 	assert_output "$(cat "$expected")"
 }

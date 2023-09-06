@@ -15,7 +15,7 @@ teardown() {
 }
 
 function show_simple_one_zettel { # @test
-	run_zit show one/uno.zettel
+	run_zit show -format text one/uno.zettel
 	assert_success
 	assert_output - <<-EOM
 		---
@@ -39,7 +39,7 @@ function show_simple_one_zettel_binary { # @test
 		[two/uno@b20c8fea8cb3e467783c5cdadf0707124cac5db72f9a6c3abba79fa0a42df627 !bin "file"]
 	EOM
 
-	run_zit show two/uno
+	run_zit show -format text two/uno
 	assert_success
 	assert_output - <<-EOM
 		---
@@ -57,7 +57,7 @@ function show_history_one_zettel { # @test
 		[one/uno@3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
 	EOM
 
-	run_zit show one/uno+z
+	run_zit show -format text one/uno+z
 	assert_success
 	assert_output_unsorted - <<-EOM
 		---
