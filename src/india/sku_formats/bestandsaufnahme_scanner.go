@@ -49,7 +49,7 @@ func (f *bestandsaufnahmeScanner) Scan() (sk sku.SkuLikePtr, n int64, err error)
 		n += int64(n2)
 
 		if errors.IsEOF(err) {
-			err = nil
+			return
 		} else if err != nil {
 			err = errors.Wrap(err)
 			return
@@ -64,7 +64,8 @@ func (f *bestandsaufnahmeScanner) Scan() (sk sku.SkuLikePtr, n int64, err error)
 	n += n1
 
 	if err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "Bytes: %d", n1)
+		err = errors.Wrapf(err, "Holder: %v", h)
 		return
 	}
 

@@ -73,7 +73,7 @@ func MakeStore(
 
 	switch sv.GetInt() {
 	case 3:
-		fa = MakeAkteFormat(sv, af)
+		fa = MakeAkteFormat(sv)
 
 	default:
 		fa = formatAkte{

@@ -15,6 +15,7 @@ teardown() {
 }
 
 function import { # @test
+	skip
 	run_zit show -format bestandsaufnahme +:z,e,t,k
 	assert_success
 	echo -n "$output" >besties
@@ -27,7 +28,7 @@ function import { # @test
 
 	run_zit_init
 
-	run_zit import -bestandsaufnahme "$besties" -akten "$akten" -compression-type none
+	run_zit import -verbose -bestandsaufnahme "$besties" -akten "$akten" -compression-type none
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md@102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]

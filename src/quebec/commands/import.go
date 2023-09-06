@@ -68,7 +68,6 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	bf := bestandsaufnahme.MakeAkteFormat(
 		u.Konfig().GetStoreVersion(),
-		u.StoreObjekten(),
 	)
 
 	var rc io.ReadCloser
