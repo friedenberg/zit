@@ -60,7 +60,7 @@ func (a SetPrefixNamed) Subset(e kennung.Etikett) (out SetPrefixNamedSegments) {
 	out.Ungrouped = makeMutableZettelLikeSet()
 	out.Grouped = NewSetPrefixNamed()
 
-	for e1, zSet := range a {
+	for _, zSet := range a {
 		zSet.Each(
 			func(z sku.SkuLike) (err error) {
 				intersection := kennung.IntersectPrefixes(
@@ -68,9 +68,10 @@ func (a SetPrefixNamed) Subset(e kennung.Etikett) (out SetPrefixNamedSegments) {
 					kennung.MakeEtikettSet(e),
 				)
 
-				errors.Log().Printf("%s yields %s", e1, intersection)
+				exactMatch := intersection.Len() == 1 &&
+					intersection.Any().Equals(e)
 
-				if intersection.Len() > 0 {
+				if intersection.Len() > 0 && !exactMatch {
 					for _, e2 := range intersection.Elements() {
 						out.Grouped.addPair(e2, z)
 					}
@@ -119,9 +120,11 @@ func (a SetPrefixVerzeichnisse) Subset(
 					z.GetMetadatei().Etiketten,
 					kennung.MakeEtikettSet(e),
 				)
-				errors.Log().Printf("%s yields %s", e1, intersection)
 
-				if intersection.Len() > 0 {
+				exactMatch := intersection.Len() == 1 &&
+					intersection.Any().Equals(e)
+
+				if intersection.Len() > 0 && !exactMatch {
 					for _, e2 := range intersection.Elements() {
 						out.Grouped.addPair(e2, z)
 					}

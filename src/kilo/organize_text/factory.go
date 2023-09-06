@@ -157,7 +157,7 @@ func (atc Factory) makeChildren(
 		return
 	}
 
-	segments.Grouped.Each(
+	if err = segments.Grouped.Each(
 		func(e kennung.Etikett, zs objekte_collections.MutableSetMetadateiWithKennung) (err error) {
 			if atc.UsePrefixJoints {
 				if parent.etiketten.Len() > 1 {
@@ -240,7 +240,10 @@ func (atc Factory) makeChildren(
 			}
 			return
 		},
-	)
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	sort.Slice(parent.children, func(i, j int) bool {
 		vi := iter.StringCommaSeparated[kennung.Etikett](
