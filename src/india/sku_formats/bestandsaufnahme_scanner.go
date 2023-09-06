@@ -13,7 +13,9 @@ import (
 )
 
 type FormatBestandsaufnahmeScanner interface {
-	Scan() (sku.SkuLikePtr, int64, error)
+	Error() error
+	GetSkuLikePtr() sku.SkuLikePtr
+	Scan() bool
 }
 
 func MakeFormatbestandsaufnahmeScanner(
@@ -36,22 +38,45 @@ type bestandsaufnahmeScanner struct {
 	g  gattung.Gattung
 	es kennung.EtikettMutableSet
 	k  string
+
+	err     error
+	lastSku sku.SkuLikePtr
+	lastN   int64
 }
 
-func (f *bestandsaufnahmeScanner) Scan() (sk sku.SkuLikePtr, n int64, err error) {
+func (f *bestandsaufnahmeScanner) Error() error {
+	if errors.IsEOF(f.err) {
+		return nil
+	}
+
+	return f.err
+}
+
+func (f *bestandsaufnahmeScanner) GetSkuLikePtr() sku.SkuLikePtr {
+	return f.lastSku
+}
+
+func (f *bestandsaufnahmeScanner) Scan() (ok bool) {
+	if f.err != nil {
+		return
+	}
+
 	var (
 		n1 int64
 		n2 int
 	)
 
-	if !f.afterFirst {
-		n2, err = f.br.ReadBoundary()
-		n += int64(n2)
+	f.lastN = 0
+	f.lastSku = nil
 
-		if errors.IsEOF(err) {
+	if !f.afterFirst {
+		n2, f.err = f.br.ReadBoundary()
+		f.lastN += int64(n2)
+
+		if errors.IsEOF(f.err) {
 			return
-		} else if err != nil {
-			err = errors.Wrap(err)
+		} else if f.err != nil {
+			f.err = errors.Wrap(f.err)
 			return
 		}
 
@@ -60,39 +85,41 @@ func (f *bestandsaufnahmeScanner) Scan() (sk sku.SkuLikePtr, n int64, err error)
 
 	var h sku.Holder
 
-	n1, err = f.format.ParsePersistentMetadatei(f.br, &h)
-	n += n1
+	n1, f.err = f.format.ParsePersistentMetadatei(f.br, &h)
+	f.lastN += n1
 
-	if err != nil {
-		err = errors.Wrapf(err, "Bytes: %d", n1)
-		err = errors.Wrapf(err, "Holder: %v", h)
+	if errors.IsEOF(f.err) {
+		f.err = errors.Errorf("unexpected eof")
+		return
+	} else if f.err != nil {
+		f.err = errors.Wrapf(f.err, "Bytes: %d", n1)
+		f.err = errors.Wrapf(f.err, "Holder: %v", h)
 		return
 	}
 
-	if sk, err = sku.MakeSkuLikeSansObjekteSha(
+	if f.lastSku, f.err = sku.MakeSkuLikeSansObjekteSha(
 		h.Metadatei,
 		h.KennungLike,
-	); err != nil {
-		err = errors.Wrapf(err, "Bytes: %d", n1)
-		err = errors.Wrapf(err, "Sku: %v", h)
+	); f.err != nil {
+		f.err = errors.Wrapf(f.err, "Bytes: %d", n1)
+		f.err = errors.Wrapf(f.err, "Sku: %v", h)
 		return
 	}
 
-	if sku.CalculateAndSetSha(sk, f.format); err != nil {
-		err = errors.Wrap(err)
+	if sku.CalculateAndSetSha(f.lastSku, f.format); f.err != nil {
+		f.err = errors.Wrap(f.err)
 		return
 	}
 
-	n2, err = f.br.ReadBoundary()
-	n += int64(n2)
+	n2, f.err = f.br.ReadBoundary()
+	f.lastN += int64(n2)
 
-	if errors.IsEOF(err) {
-		err = io.EOF
-		return
-	} else if err != nil {
-		err = errors.Wrap(err)
+	if f.err != nil && !errors.IsEOF(f.err) {
+		f.err = errors.Wrap(f.err)
 		return
 	}
+
+	ok = true
 
 	return
 }

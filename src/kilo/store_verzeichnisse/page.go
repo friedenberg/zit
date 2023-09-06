@@ -190,7 +190,16 @@ func (zp *Page) copy(
 		)
 
 		getOneSku = func() (sk sku.SkuLikePtr, err error) {
-			sk, _, err = dec.Scan()
+			if !dec.Scan() {
+				if err = dec.Error(); err == nil {
+					err = io.EOF
+				}
+
+				return
+			}
+
+			sk = dec.GetSkuLikePtr()
+
 			return
 		}
 	} else {
@@ -212,15 +221,13 @@ func (zp *Page) copy(
 			var sk sku.SkuLikePtr
 
 			if sk, err = getOneSku(); err != nil {
-				if errors.IsEOF(err) && sk != nil {
-					err = nil
-				} else if errors.IsEOF(err) {
+				if errors.IsEOF(err) {
 					err = collections.MakeErrStopIteration()
-					return
 				} else {
 					err = errors.Wrapf(err, "Page: %s", zp.pageId.path)
-					return
 				}
+
+				return
 			}
 
 			ok := false

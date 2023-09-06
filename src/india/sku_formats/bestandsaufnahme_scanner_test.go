@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/DataDog/zstd"
-	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/test_logz"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
@@ -65,33 +64,12 @@ func TestOne(t1 *testing.T) {
 	scanner := MakeFormatbestandsaufnahmeScanner(zstd.NewReader(b), f)
 	var sk sku.SkuLike
 
-	sk, n, err = scanner.Scan()
-
-	{
-		if err != nil {
-			t.AssertNoError(err)
-		}
+	if !scanner.Scan() {
+		t.Fatalf("expected ok scan")
 	}
 
-	{
-		sk1, ok := sk.(*transacted.Zettel)
-
-		if !ok {
-			t.Errorf("expected %T but got %T", sk1, sk)
-		}
-	}
-
-	{
-		expected := int64(47)
-
-		if n != expected {
-			t.Errorf("expected %d but got %d", expected, n)
-		}
-	}
-
-	sk, n, err = scanner.Scan()
-
-	t.AssertEOF(err)
+	sk = scanner.GetSkuLikePtr()
+	t.AssertNoError(scanner.Error())
 
 	{
 		sk1, ok := sk.(*transacted.Zettel)
@@ -101,33 +79,26 @@ func TestOne(t1 *testing.T) {
 		}
 	}
 
-	{
-		expected := int64(43)
+	if !scanner.Scan() {
+		t.Fatalf("expected ok scan")
+	}
 
-		if n != expected {
-			t.Errorf("expected %d but got %d", expected, n)
+	sk = scanner.GetSkuLikePtr()
+	t.AssertNoError(scanner.Error())
+
+	{
+		sk1, ok := sk.(*transacted.Zettel)
+
+		if !ok {
+			t.Errorf("expected %T but got %T", sk1, sk)
 		}
 	}
 
-	sk, n, err = scanner.Scan()
-
-	{
-		if err != nil {
-			t.AssertError(io.EOF)
-		}
+	if scanner.Scan() {
+		t.Fatalf("expected end scan")
 	}
 
-	{
-		expected := int64(0)
-
-		if n != expected {
-			t.Errorf("expected %d but got %d", expected, n)
-		}
-	}
-
-	if sk != nil {
-		t.Errorf("expected nil but got %s", sk)
-	}
+	t.AssertNoError(scanner.Error())
 }
 
 func TestBigMac(t1 *testing.T) {
@@ -149,30 +120,17 @@ func TestBigMac(t1 *testing.T) {
 
 	i := 0
 
-	for {
+	for scanner.Scan() {
 		t.Logf("i: %d", i)
-		sk, n, err := scanner.Scan()
-
-		if sk != nil {
-			t.Logf("tai: %q", sk.GetTai())
-			t.Logf("typ: %q", sk.GetTyp())
-		}
+		sk := scanner.GetSkuLikePtr()
 
 		if sk == nil {
 			t.Errorf("expected sku but got nil")
 		}
 
-		if n == 0 {
-			t.Errorf("expected non-zero read")
-		}
-
 		i++
 
-		if errors.IsEOF(err) {
-			break
-		}
-
-		t.AssertNoError(err)
+		t.AssertNoError(scanner.Error())
 	}
 
 	expected := 55

@@ -26,11 +26,12 @@ import (
 )
 
 type Add struct {
-	Dedupe    bool
-	Delete    bool
-	OpenAkten bool
-	Organize  bool
-	Filter    script_value.ScriptValue
+	Dedupe              bool
+	Delete              bool
+	OpenAkten           bool
+	CheckoutAktenAndRun string
+	Organize            bool
+	Filter              script_value.ScriptValue
 
 	zettel.ProtoZettel
 }
@@ -56,6 +57,12 @@ func init() {
 				"delete the zettel and akte after successful checkin",
 			)
 			f.BoolVar(&c.OpenAkten, "open-akten", false, "also open the Akten")
+			f.StringVar(
+				&c.CheckoutAktenAndRun,
+				"each-akte",
+				"",
+				"checkout each Akte and run a utility",
+			)
 			f.BoolVar(&c.Organize, "organize", false, "")
 			c.ProtoZettel.AddToFlagSet(f)
 
@@ -190,7 +197,7 @@ func (c Add) openAktenIfNecessary(
 	zettels zettel.MutableSet,
 	cwd cwd.CwdFiles,
 ) (err error) {
-	if !c.OpenAkten {
+	if !c.OpenAkten && c.CheckoutAktenAndRun == "" {
 		return
 	}
 
@@ -223,8 +230,6 @@ func (c Add) openAktenIfNecessary(
 		return
 	}
 
-	openOp := user_ops.OpenFiles{}
-
 	var filesAkten []string
 
 	if filesAkten, err = zettel.ToSliceFilesAkten(checkoutResults); err != nil {
@@ -232,9 +237,22 @@ func (c Add) openAktenIfNecessary(
 		return
 	}
 
-	if err = openOp.Run(u, filesAkten...); err != nil {
-		err = errors.Wrap(err)
-		return
+	if c.OpenAkten {
+		openOp := user_ops.OpenFiles{}
+
+		if err = openOp.Run(u, filesAkten...); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	if c.CheckoutAktenAndRun != "" {
+		eachAkteOp := user_ops.EachAkte{}
+
+		if err = eachAkteOp.Run(u, c.CheckoutAktenAndRun, filesAkten...); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return

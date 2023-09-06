@@ -32,28 +32,18 @@ func (f formatAkte2) ParseAkte(
 		f.objekteFormat,
 	)
 
-	var (
-		sk    sku.SkuLikePtr
-		isEOF bool
-	)
+	for dec.Scan() {
+		sk := dec.GetSkuLikePtr()
 
-	for !isEOF {
-		sk, _, err = dec.Scan()
-
-		if errors.IsEOF(err) {
-			isEOF = true
-			err = nil
-		} else if err != nil {
-			err = errors.Wrap(err)
+		if err = sku.AddSkuToHeap(&o.Skus, sk); err != nil {
+			err = errors.Wrapf(err, "Sku: %s", sk)
 			return
 		}
+	}
 
-		if sk != nil {
-			if err = sku.AddSkuToHeap(&o.Skus, sk); err != nil {
-				err = errors.Wrapf(err, "Sku: %s", sk)
-				return
-			}
-		}
+	if err = dec.Error(); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return
