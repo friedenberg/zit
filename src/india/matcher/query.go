@@ -151,6 +151,17 @@ func (s *query) SetMany(vs ...string) (err error) {
 
 	for _, v := range vs {
 		if err = s.set(v); err != nil {
+			var fd kennung.FD
+
+			if err1 := fd.Set(v); err1 == nil {
+				if err = s.FDs.Add(fd); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				continue
+			}
+
 			err = errors.Wrap(err)
 			return
 		}

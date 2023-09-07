@@ -44,6 +44,14 @@ func MakeWriterKonfig(
 
 		t := k.GetApproximatedTyp(z.GetTyp()).ApproximatedOrActual()
 
+		if t == nil {
+			panic("typ was nil")
+		}
+
+		if tagp == nil {
+			panic("typ akte getter putter was nil")
+		}
+
 		var ta *typ_akte.V0
 
 		if ta, err = tagp.GetAkte(t.GetAkteSha()); err != nil {
