@@ -22,6 +22,7 @@ type (
 
 	MetadateiLike interface {
 		Getter
+		GetterPtr
 		Setter
 	}
 

@@ -42,6 +42,13 @@ type (
 	}
 )
 
+func BestandsaufnahmeFormatIncludeTaiVerzeichnisse() Format {
+	return v3{
+		includeTai:           true,
+		includeVerzeichnisse: true,
+	}
+}
+
 func BestandsaufnahmeFormatIncludeTai() Format {
 	return v3{includeTai: true}
 }

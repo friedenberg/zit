@@ -61,7 +61,7 @@ func TestOne(t1 *testing.T) {
 
 	w.Flush()
 
-	scanner := MakeFormatbestandsaufnahmeScanner(zstd.NewReader(b), f)
+	scanner := MakeFormatBestandsaufnahmeScanner(zstd.NewReader(b), f)
 	var sk sku.SkuLike
 
 	if !scanner.Scan() {
@@ -116,7 +116,7 @@ func TestBigMac(t1 *testing.T) {
 
 	f := objekte_format.BestandsaufnahmeFormatIncludeTai()
 
-	scanner := MakeFormatbestandsaufnahmeScanner(zstd.NewReader(dataComp), f)
+	scanner := MakeFormatBestandsaufnahmeScanner(zstd.NewReader(dataComp), f)
 
 	i := 0
 

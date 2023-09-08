@@ -48,6 +48,25 @@ func MakeBoundaryReader(r io.Reader, boundary string) BoundaryReader {
 	}
 }
 
+func MakeBoundaryReaderPageSize(
+	r io.Reader,
+	boundary string,
+	size int,
+) BoundaryReader {
+	// TODO-P1 perf allow for optimized buffer size
+	if len(boundary) > ringBufferDefaultSize {
+		size = len(boundary)
+	}
+
+	b := MakeRingBuffer(size)
+
+	return &boundaryReader{
+		reader:   bufio.NewReader(r),
+		boundary: []byte(boundary),
+		buffer:   b,
+	}
+}
+
 func (br *boundaryReader) setState(s boundaryReaderState) {
 	br.state = s
 }

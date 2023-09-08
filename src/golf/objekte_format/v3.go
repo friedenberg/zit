@@ -1,6 +1,7 @@
 package objekte_format
 
 import (
+	"fmt"
 	"io"
 	"strings"
 
@@ -12,7 +13,10 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 )
 
-type v3 struct{ includeTai bool }
+type v3 struct {
+	includeTai           bool
+	includeVerzeichnisse bool
+}
 
 func (f v3) FormatPersistentMetadatei(
 	w1 io.Writer,
@@ -52,6 +56,35 @@ func (f v3) FormatPersistentMetadatei(
 		w.WriteKeySpaceValue(gattung.Typ, m.GetTyp())
 	}
 
+	if f.includeVerzeichnisse {
+		if m.Verzeichnisse.Archiviert.Bool() {
+			w.WriteKeySpaceValue(
+				"Verzeichnisse-Archiviert",
+				m.Verzeichnisse.Archiviert,
+			)
+		}
+
+		if m.Verzeichnisse.ExpandedEtiketten != nil {
+			k := fmt.Sprintf(
+				"Verzeichnisse-%s-Expanded",
+				gattung.Etikett.String(),
+			)
+			for _, e := range iter.SortedValues[kennung.Etikett](m.Verzeichnisse.ExpandedEtiketten) {
+				w.WriteKeySpaceValue(k, e)
+			}
+		}
+
+		if m.Verzeichnisse.ImplicitEtiketten != nil {
+			k := fmt.Sprintf(
+				"Verzeichnisse-%s-Implicit",
+				gattung.Etikett.String(),
+			)
+			for _, e := range iter.SortedValues[kennung.Etikett](m.Verzeichnisse.ImplicitEtiketten) {
+				w.WriteKeySpaceValue(k, e)
+			}
+		}
+	}
+
 	if n, err = w.WriteTo(w1); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -68,6 +101,12 @@ func (f v3) ParsePersistentMetadatei(
 	m := c.GetMetadatei()
 
 	etiketten := kennung.MakeEtikettMutableSet()
+	var etikettenExpanded, etikettenImplicit kennung.EtikettMutableSet
+
+	if f.includeVerzeichnisse {
+		etikettenExpanded = kennung.MakeEtikettMutableSet()
+		etikettenImplicit = kennung.MakeEtikettMutableSet()
+	}
 
 	var (
 		g gattung.Gattung
@@ -156,6 +195,46 @@ func (f v3) ParsePersistentMetadatei(
 				err = errors.Wrap(err)
 				return
 			}
+
+		case "Verzeichnisse-Archiviert":
+			if err = m.Verzeichnisse.Archiviert.Set(val); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+		case "Verzeichnisse-Etikett-Implicit":
+			if !f.includeVerzeichnisse {
+				err = errors.Errorf(
+					"format specifies not to include Verzeichnisse but found %q",
+					key,
+				)
+				return
+			}
+
+			if err = iter.AddString[kennung.Etikett, *kennung.Etikett](
+				etikettenImplicit,
+				val,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+		case "Verzeichnisse-Etikett-Expanded":
+			if !f.includeVerzeichnisse {
+				err = errors.Errorf(
+					"format specifies not to include Verzeichnisse but found %q",
+					key,
+				)
+				return
+			}
+
+			if err = iter.AddString[kennung.Etikett, *kennung.Etikett](
+				etikettenExpanded,
+				val,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 		}
 
 		lastKey = key
@@ -169,6 +248,11 @@ func (f v3) ParsePersistentMetadatei(
 	}
 
 	m.Etiketten = etiketten
+
+	if f.includeVerzeichnisse {
+		m.Verzeichnisse.ImplicitEtiketten = etikettenImplicit
+		m.Verzeichnisse.ExpandedEtiketten = etikettenExpanded
+	}
 
 	c.SetMetadatei(m)
 

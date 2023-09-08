@@ -50,9 +50,8 @@ func TaiFromTimeWithIndex(t1 Time, n int) (t2 Tai) {
 func (t Tai) AsTime() (t1 Time) {
 	if t.wasSet && !t.tai.Eq(tai{}) {
 		t1 = Time{time: t.tai.AsTime().Local()}
-		errors.Log().Printf("non empty tai")
 	} else {
-		errors.Log().Printf("empty tai")
+		panic("empty tai")
 	}
 
 	return

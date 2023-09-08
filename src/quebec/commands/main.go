@@ -4,7 +4,6 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/debug"
 	"github.com/friedenberg/zit/src/india/erworben"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -14,10 +13,6 @@ func Run(args []string) (exitStatus int) {
 	var err error
 
 	defer func() {
-		errors.Log().Print("checking for open files")
-		l := files.Len()
-		errors.Log().Printf("open files: %d", l)
-
 		var normalError errors.StackTracer
 
 		if err != nil {
@@ -55,7 +50,9 @@ func Run(args []string) (exitStatus int) {
 	ok := false
 
 	if cmd, ok = cmds[specifiedSubcommand]; !ok {
-		return cmd.PrintUsage(errors.Normalf("No subcommand '%s'", specifiedSubcommand))
+		return cmd.PrintUsage(
+			errors.Normalf("No subcommand '%s'", specifiedSubcommand),
+		)
 	}
 
 	args = os.Args[2:]

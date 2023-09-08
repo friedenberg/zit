@@ -13,6 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/sku_formats"
@@ -113,6 +114,11 @@ func (zp *Page) Add(z *transacted.Zettel) (err error) {
 
 	// defer zp.doUnlock()
 
+	z.GetMetadateiPtr().Verzeichnisse.ExpandedEtiketten = kennung.ExpandMany[kennung.Etikett](
+		z.GetMetadatei().GetEtiketten(),
+		kennung.ExpanderRight,
+	)
+
 	zp.added.Add(*z)
 	zp.State = StateChanged
 
@@ -184,9 +190,9 @@ func (zp *Page) copy(
 	var getOneSku func() (sku.SkuLikePtr, error)
 
 	if zp.useBestandsaufnahmeForVerzeichnisse {
-		dec := sku_formats.MakeFormatbestandsaufnahmeScanner(
+		dec := sku_formats.MakeFormatBestandsaufnahmeScanner(
 			r,
-			objekte_format.BestandsaufnahmeFormatIncludeTai(),
+			objekte_format.BestandsaufnahmeFormatIncludeTaiVerzeichnisse(),
 		)
 
 		getOneSku = func() (sk sku.SkuLikePtr, err error) {
@@ -257,7 +263,7 @@ func (zp *Page) writeTo(w1 io.Writer) (err error) {
 	if zp.useBestandsaufnahmeForVerzeichnisse {
 		enc := sku_formats.MakeFormatBestandsaufnahmePrinter(
 			w,
-			objekte_format.BestandsaufnahmeFormatIncludeTai(),
+			objekte_format.BestandsaufnahmeFormatIncludeTaiVerzeichnisse(),
 		)
 
 		writeOne = func(z *transacted.Zettel) (err error) {

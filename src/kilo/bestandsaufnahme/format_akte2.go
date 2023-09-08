@@ -27,7 +27,7 @@ func (f formatAkte2) ParseAkte(
 	r io.Reader,
 	o *Akte,
 ) (n int64, err error) {
-	dec := sku_formats.MakeFormatbestandsaufnahmeScanner(
+	dec := sku_formats.MakeFormatBestandsaufnahmeScanner(
 		r,
 		f.objekteFormat,
 	)

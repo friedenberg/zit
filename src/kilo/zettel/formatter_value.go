@@ -95,11 +95,13 @@ func (fv *FormatterValue) FuncFormatter(
 			lw := format.MakeLineWriter()
 
 			for fn, f := range ta.Formatters {
-				if f.FileExtension != "" {
-					lw.WriteFormat("%s %s", fn, f.FileExtension)
-				} else {
-					lw.WriteFormat("%s", fn)
+				fe := f.FileExtension
+
+				if fe == "" {
+					fe = fn
 				}
+
+				lw.WriteFormat("%s\t%s", fn, fe)
 			}
 
 			if _, err = lw.WriteTo(out); err != nil {

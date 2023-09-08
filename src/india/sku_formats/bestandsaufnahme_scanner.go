@@ -18,7 +18,7 @@ type FormatBestandsaufnahmeScanner interface {
 	Scan() bool
 }
 
-func MakeFormatbestandsaufnahmeScanner(
+func MakeFormatBestandsaufnahmeScanner(
 	in io.Reader,
 	of objekte_format.Format,
 ) FormatBestandsaufnahmeScanner {

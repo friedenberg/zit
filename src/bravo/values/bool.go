@@ -34,6 +34,11 @@ func (sv *Bool) Set(v string) (err error) {
 	return
 }
 
+func (sv *Bool) SetBool(v bool) {
+	sv.wasSet = true
+	sv.Value = v
+}
+
 func (sv Bool) Bool() bool {
 	return sv.Value
 }

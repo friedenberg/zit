@@ -105,14 +105,16 @@ function! ZitPreview()
       return
     endif
 
-    let l:format = substitute(l:items[a:result-1], '\t.*$', '', '')
+    " let l:format = substitute(l:items[a:result-1], '\t.*$', '', '')
+    let l:format = split(l:items[a:result-1], '\t')
+    echom l:format
     let l:hinweis = expand("%:r")
 
-    let l:tempfile = tempname() .. "." .. l:format
+    let l:tempfile = tempname() .. "." .. l:format[1]
 
     let l:cmd_args_list = [
           \ "zit format-zettel -mode akte",
-          \ l:format,
+          \ l:format[1],
           \ l:hinweis,
           \ ">",
           \ l:tempfile,

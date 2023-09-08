@@ -102,7 +102,7 @@ func (k *compiled) AccumulateImplicitEtiketten(
 				return
 			}
 
-			if err = k.ImplicitEtiketten.Set(e1, e); err != nil {
+			if err = k.ImplicitEtiketten.Set(e, e1); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

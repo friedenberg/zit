@@ -163,6 +163,8 @@ func (s *zettelStore) writeNamedZettelToIndex(
 
 	errors.Log().Printf("writing zettel to index: %s", tz)
 
+	s.GetKonfig().ApplyToMetadatei(tz, s.tagp)
+
 	if err = s.verzeichnisseSchwanzen.AddVerzeichnisse(tz, tz.GetKennung().String()); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -351,7 +353,7 @@ func (s *zettelStore) Create(
 	m := mg.GetMetadatei()
 	s.protoZettel.Apply(&m)
 
-	if err = s.StoreUtil.GetKonfig().ApplyToMetadatei(&m, s.tagp); err != nil {
+	if err = s.StoreUtil.GetKonfig().ApplyToNewMetadatei(&m, s.tagp); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -462,7 +464,7 @@ func (s *zettelStore) UpdateCheckedOut(
 	m := co.External.GetMetadatei()
 	m.ResetWith(m)
 
-	if err = s.StoreUtil.GetKonfig().ApplyToMetadatei(&m, s.tagp); err != nil {
+	if err = s.StoreUtil.GetKonfig().ApplyToNewMetadatei(&m, s.tagp); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -547,7 +549,7 @@ func (s *zettelStore) updateLockedWithMutter(
 
 	m := mg.GetMetadatei()
 
-	if err = s.StoreUtil.GetKonfig().ApplyToMetadatei(&m, s.tagp); err != nil {
+	if err = s.StoreUtil.GetKonfig().ApplyToNewMetadatei(&m, s.tagp); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

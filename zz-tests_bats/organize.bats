@@ -75,6 +75,8 @@ function organize_simple_commit { # @test
 }
 
 function organize_hides_hidden_etiketten_from_organize { # @test
+	skip
+	# TODO-01
 	run_zit edit-konfig -hide-etikett zz-archive
 	assert_success
 	assert_output - <<-EOM

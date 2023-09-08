@@ -5,7 +5,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
-	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/script_config"
 	"github.com/friedenberg/zit/src/delta/typ_akte"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -117,33 +116,48 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	var akteFormatter script_config.RemoteScript
 
-	if typKonfig != nil {
-		var typAkte *typ_akte.V0
+	if typKonfig == nil {
+		panic("typ konfig was nil")
+	}
 
-		if typAkte, err = u.StoreObjekten().Typ().GetAkte(typKonfig.GetAkteSha()); err != nil {
-			err = errors.Wrap(err)
+	var typAkte *typ_akte.V0
+
+	if typAkte, err = u.StoreObjekten().Typ().GetAkte(typKonfig.GetAkteSha()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	actualFormatId := formatId
+	ok := false
+
+	if c.UTIGroup != "" {
+		g, ok := typAkte.FormatterUTIGroups[c.UTIGroup]
+
+		if !ok {
+			err = errors.Errorf("no uti group: %q", c.UTIGroup)
 			return
 		}
 
-		actualFormatId := formatId
-		var f script_config.WithOutputFormat
-		ok := false
+		ft, ok := g.Map()[formatId]
 
-		if c.UTIGroup != "" {
-			if g, ok := typAkte.FormatterUTIGroups[c.UTIGroup]; ok {
-				if ft, ok := g.Map()[formatId]; ok {
-					actualFormatId = ft
-				}
-			}
+		if !ok {
+			err = errors.Errorf(
+				"no format id %q for uti group %q",
+				formatId,
+				c.UTIGroup,
+			)
+
+			return
 		}
 
-		f, ok = typAkte.Formatters[actualFormatId]
+		actualFormatId = ft
+	}
 
-		if ok {
-			akteFormatter = f.ScriptConfig
-		}
-	} else {
-		log.Log().Printf("typ konfig was nil")
+	akteFormatter, ok = typAkte.Formatters[actualFormatId]
+
+	if !ok {
+		err = errors.Errorf("no format id %q", actualFormatId)
+		return
 	}
 
 	var format metadatei.TextFormatter
@@ -160,7 +174,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		)
 	}
 
-	if err = u.Konfig().ApplyToMetadatei(zt, u.StoreObjekten().Typ()); err != nil {
+	if err = u.Konfig().ApplyToNewMetadatei(zt, u.StoreObjekten().Typ()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
