@@ -2,6 +2,7 @@ package ohio
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -88,18 +89,34 @@ func (br *boundaryReader) resetRemainingContentIfNecessary() {
 	default:
 		panic(ErrInvalidBoundaryReaderState)
 
-	case boundaryReaderStatePartialBoundaryInBuffer:
-		eof := false
-		br.remainingContent, eof = br.buffer.Find(br.boundary)
+	case boundaryReaderStatePartialBoundaryInBuffer,
+		boundaryReaderStateOnlyContent:
+		untilBoundary, partial := br.buffer.Find(br.boundary)
 
-		if eof {
+		switch {
+		case untilBoundary > br.buffer.Len():
+			panic("invalid state")
+
+		case untilBoundary == -1 || partial:
+			br.remainingContent = br.buffer.Len()
+
+			if br.remainingContent == 0 {
+				br.setState(boundaryReaderStateNeedsBoundary)
+			} else {
+				br.setState(boundaryReaderStateOnlyContent)
+			}
+
+		case partial:
 			br.setState(boundaryReaderStatePartialBoundaryInBuffer)
-		} else {
-			br.setState(boundaryReaderStateCompleteBoundaryInBuffer)
-		}
+			fallthrough
 
-	case boundaryReaderStateOnlyContent:
-		// noop
+		case !partial:
+			br.setState(boundaryReaderStateCompleteBoundaryInBuffer)
+			fallthrough
+
+		default:
+			br.remainingContent = untilBoundary
+		}
 
 	case boundaryReaderStateNeedsBoundary:
 		// noop
@@ -184,15 +201,18 @@ func (br *boundaryReader) Read(p []byte) (n int, err error) {
 
 	case boundaryReaderStateOnlyContent:
 		n, err = br.buffer.Read(p)
+		br.remainingContent -= n
+
+		if err == nil || !errors.IsEOF(err) {
+			return
+		}
+
+		_, err = br.fillBuffer()
 
 		if errors.IsEOF(err) {
 			err = nil
-
-			_, err = br.fillBuffer()
-
-			if err != nil && !errors.IsEOF(err) {
-				return
-			}
+		} else if err != nil {
+			return
 		}
 
 	case boundaryReaderStatePartialBoundaryInBuffer:
@@ -203,7 +223,13 @@ func (br *boundaryReader) Read(p []byte) (n int, err error) {
 		n, err = br.buffer.Read(p)
 
 		if err != nil {
-			panic("invalid state")
+			if errors.IsEOF(err) {
+				err = errors.Errorf("unexpected EOF")
+			} else {
+				err = errors.Wrap(err)
+			}
+
+			return
 		}
 
 		br.remainingContent -= n
@@ -222,12 +248,17 @@ func (br *boundaryReader) Read(p []byte) (n int, err error) {
 		}
 
 		n, err = br.buffer.Read(p)
+		br.remainingContent -= n
 
-		if err != nil && !errors.IsEOF(err) {
-			panic("invalid state")
+		if errors.IsEOF(err) {
+			_, err = br.fillBuffer()
 		}
 
-		br.remainingContent -= n
+		if errors.IsEOF(err) {
+			err = nil
+		} else if err != nil {
+			panic(fmt.Sprintf("invalid state: %q", err))
+		}
 
 		if br.remainingContent <= 0 {
 			br.setState(boundaryReaderStateNeedsBoundary)

@@ -270,6 +270,54 @@ func TestBoundaryReaderSandwich3(t1 *testing.T) {
 	}
 }
 
+func TestBoundaryReaderOneRecordSpansMultiplePages(t1 *testing.T) {
+	t := test_logz.T{T: t1}
+
+	data := `---
+content
+content
+content
+---
+content
+content
+content
+---
+`
+	r := strings.NewReader(data)
+	sut := MakeBoundaryReaderPageSize(r, "---\n", 10)
+
+	var n1 int
+	var err error
+	n1, err = sut.ReadBoundary()
+
+	t.AssertNoError(err)
+
+	if n1 != 4 {
+		t.Errorf("expected 4 bytes read but got %d", n1)
+	}
+
+	b := strings.Builder{}
+
+	var n int64
+	n, err = io.Copy(&b, sut)
+
+	t.AssertNoError(err)
+
+	actual := b.String()
+	expected := "content\ncontent\ncontent\n"
+
+	t.Logf("%q", string(sut.(*boundaryReader).buffer.buffer))
+	t.Logf("%q", sut.(*boundaryReader).state)
+
+	if actual != expected {
+		t.Errorf("expected %q but got %q", expected, actual)
+	}
+
+	if n != int64(len(expected)) {
+		t.Errorf("expected %d bytes read but got %d", len(expected), n1)
+	}
+}
+
 func TestBigMac(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
