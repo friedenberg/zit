@@ -21,18 +21,25 @@ func (k compiled) ApplyToMetadatei(
 
 	ie := kennung.MakeEtikettMutableSet()
 
-	mp.GetEtiketten().EachPtr(
-		func(e *kennung.Etikett) (err error) {
-			impl := k.GetImplicitEtiketten(e)
+	addImpEts := func(e *kennung.Etikett) (err error) {
+		impl := k.GetImplicitEtiketten(e)
 
-			if err = impl.EachPtr(ie.AddPtr); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
+		if err = impl.EachPtr(ie.AddPtr); err != nil {
+			err = errors.Wrap(err)
 			return
-		},
-	)
+		}
+
+		return
+	}
+
+	mp.GetEtiketten().EachPtr(addImpEts)
+
+	typKonfig := k.GetApproximatedTyp(mp.GetTyp()).ApproximatedOrActual()
+
+	if typKonfig != nil {
+		typKonfig.GetEtiketten().EachPtr(ie.AddPtr)
+		typKonfig.GetEtiketten().EachPtr(addImpEts)
+	}
 
 	mp.Verzeichnisse.ImplicitEtiketten = ie
 

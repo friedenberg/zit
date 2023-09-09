@@ -89,6 +89,12 @@ func (i Zettelen) GetPage(n int) (p *Page, err error) {
 	return
 }
 
+func (i *Zettelen) SetNeedsFlush() {
+	for _, p := range i.pages {
+		p.State = StateChanged
+	}
+}
+
 func (i *Zettelen) Flush() (err error) {
 	errors.Log().Print("flushing")
 

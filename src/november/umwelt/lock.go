@@ -23,7 +23,7 @@ func (u *Umwelt) Unlock() (err error) {
 			return
 		}
 
-		if err = u.storeObjekten.Flush(); err != nil {
+		if err = u.storeObjekten.FlushBestandsaufnahme(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -34,6 +34,11 @@ func (u *Umwelt) Unlock() (err error) {
 		}
 
 		if err = u.KonfigPtr().Flush(u.Standort(), u.StoreObjekten().Typ()); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = u.storeObjekten.Flush(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

@@ -175,6 +175,10 @@ func (kc *Compiled) loadKonfigErworben(s standort.Standort) (err error) {
 	return
 }
 
+func (kc Compiled) HasChanges() bool {
+	return kc.hasChanges
+}
+
 func (kc Compiled) GetAngeboren() schnittstellen.Angeboren {
 	return kc.angeboren
 }

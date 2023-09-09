@@ -4,6 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/delta/typ_akte"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/kilo/store_verzeichnisse"
@@ -14,6 +15,7 @@ import (
 
 type verzeichnisseSchwanzen struct {
 	headers [store_verzeichnisse.PageCount]*zettel.Schwanzen
+	tagp    schnittstellen.AkteGetterPutter[*typ_akte.V0]
 	*store_verzeichnisse.Zettelen
 	su store_util.StoreUtil
 }
@@ -21,13 +23,15 @@ type verzeichnisseSchwanzen struct {
 func makeVerzeichnisseSchwanzen(
 	sa store_util.StoreUtil,
 	p schnittstellen.Pool[transacted.Zettel, *transacted.Zettel],
+	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
 ) (s *verzeichnisseSchwanzen, err error) {
 	s = &verzeichnisseSchwanzen{
-		su: sa,
+		su:   sa,
+		tagp: tagp,
 	}
 
 	for i := range s.headers {
-		s.headers[i] = zettel.MakeSchwanzen(sa.GetKennungIndex())
+		s.headers[i] = zettel.MakeSchwanzen(sa.GetKennungIndex(), s.applyKonfig)
 	}
 
 	s.Zettelen, err = store_verzeichnisse.MakeZettelen(
@@ -96,6 +100,18 @@ func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 		err = objekte_store.ErrNotFound{Id: h}
 		return
 	}
+
+	return
+}
+
+func (s *verzeichnisseSchwanzen) applyKonfig(
+	z *transacted.Zettel,
+) (err error) {
+	if !s.su.GetKonfig().HasChanges() {
+		return
+	}
+
+	s.su.GetKonfig().ApplyToMetadatei(z, s.tagp)
 
 	return
 }

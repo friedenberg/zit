@@ -3,6 +3,8 @@ package zettel
 import (
 	"sync"
 
+	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/kennung_index"
@@ -14,13 +16,18 @@ type Schwanzen struct {
 	lock         *sync.RWMutex
 	hinweisen    map[kennung.Hinweis]transacted.Zettel
 	etikettIndex kennung_index.EtikettIndex
+	funcFlush    schnittstellen.FuncIter[*transacted.Zettel]
 }
 
-func MakeSchwanzen(ei kennung_index.EtikettIndex) *Schwanzen {
+func MakeSchwanzen(
+	ei kennung_index.EtikettIndex,
+	funcFlush schnittstellen.FuncIter[*transacted.Zettel],
+) *Schwanzen {
 	return &Schwanzen{
 		lock:         &sync.RWMutex{},
 		hinweisen:    make(map[kennung.Hinweis]transacted.Zettel),
 		etikettIndex: ei,
+		funcFlush:    funcFlush,
 	}
 }
 
@@ -99,6 +106,11 @@ func (zws *Schwanzen) ShouldFlushVerzeichnisse(
 ) (err error) {
 	if ok := zws.Set(z, true); !ok {
 		err = collections.MakeErrStopIteration()
+		return
+	}
+
+	if err = zws.funcFlush(z); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 

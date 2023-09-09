@@ -294,7 +294,7 @@ func (s Store) RevertTransaktion(
 	// return
 }
 
-func (s Store) Flush() (err error) {
+func (s Store) FlushBestandsaufnahme() (err error) {
 	if !s.GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{
 			Operation: "flush",
@@ -318,7 +318,24 @@ func (s Store) Flush() (err error) {
 			return
 		}
 	}
+
 	errors.Log().Printf("done saving Bestandsaufnahme")
+
+	return
+}
+
+func (s Store) Flush() (err error) {
+	if !s.GetLockSmith().IsAcquired() {
+		err = objekte_store.ErrLockRequired{
+			Operation: "flush",
+		}
+
+		return
+	}
+
+	if s.GetKonfig().DryRun {
+		return
+	}
 
 	for _, fl := range s.flushers {
 		if err = fl.Flush(); err != nil {

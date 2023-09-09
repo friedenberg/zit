@@ -150,7 +150,9 @@ func (zp *Page) Flush() (err error) {
 
 	defer errors.DeferredFlusher(&err, w1)
 
-	if err = zp.writeTo(w1); err != nil {
+	writeOne := zp.getFuncWriteOne(w1)
+
+	if err = zp.copy(iter.MakeChain(zp.flushFilter, writeOne)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -248,19 +250,16 @@ func (zp *Page) copy(
 	return
 }
 
-func (zp *Page) writeTo(w1 io.Writer) (err error) {
-	w := bufio.NewWriter(w1)
-	defer errors.DeferredFlusher(&err, w)
-
-	var writeOne func(z *transacted.Zettel) error
-
+func (zp *Page) getFuncWriteOne(
+	w io.Writer,
+) schnittstellen.FuncIter[*transacted.Zettel] {
 	if zp.useBestandsaufnahmeForVerzeichnisse {
 		enc := sku_formats.MakeFormatBestandsaufnahmePrinter(
 			w,
 			objekte_format.BestandsaufnahmeFormatIncludeTaiVerzeichnisse(),
 		)
 
-		writeOne = func(z *transacted.Zettel) (err error) {
+		return func(z *transacted.Zettel) (err error) {
 			if _, err = enc.Print(z); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -271,7 +270,7 @@ func (zp *Page) writeTo(w1 io.Writer) (err error) {
 	} else {
 		enc := gob.NewEncoder(w)
 
-		writeOne = func(z *transacted.Zettel) (err error) {
+		return func(z *transacted.Zettel) (err error) {
 			if err = enc.Encode(z); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -280,6 +279,13 @@ func (zp *Page) writeTo(w1 io.Writer) (err error) {
 			return
 		}
 	}
+}
+
+func (zp *Page) writeTo(w1 io.Writer) (err error) {
+	w := bufio.NewWriter(w1)
+	defer errors.DeferredFlusher(&err, w)
+
+	writeOne := zp.getFuncWriteOne(w)
 
 	if err = zp.copy(iter.MakeChain(zp.flushFilter, writeOne)); err != nil {
 		err = errors.Wrap(err)

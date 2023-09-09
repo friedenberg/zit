@@ -107,6 +107,7 @@ func makeZettelStore(
 	if s.verzeichnisseSchwanzen, err = makeVerzeichnisseSchwanzen(
 		s.StoreUtil,
 		p,
+		tagp,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
