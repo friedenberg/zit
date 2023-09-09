@@ -5,14 +5,17 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 )
 
-func init() {
-	collections_ptr.RegisterGobValue[Etikett, *Etikett](nil)
-}
-
 type (
 	EtikettSet        = schnittstellen.SetPtrLike[Etikett, *Etikett]
 	EtikettMutableSet = schnittstellen.MutableSetPtrLike[Etikett, *Etikett]
 )
+
+var EtikettSetEmpty EtikettSet
+
+func init() {
+	collections_ptr.RegisterGobValue[Etikett, *Etikett](nil)
+	EtikettSetEmpty = MakeEtikettSet()
+}
 
 func MakeEtikettSet(es ...Etikett) (s EtikettSet) {
 	return EtikettSet(

@@ -11,10 +11,26 @@ type Verzeichnisse struct {
 	ImplicitEtiketten kennung.EtikettSet
 }
 
+func (v *Verzeichnisse) GetExpandedEtiketten() kennung.EtikettSet {
+	if v.ExpandedEtiketten == nil {
+		return kennung.EtikettSetEmpty
+	}
+
+	return v.ExpandedEtiketten
+}
+
+func (v *Verzeichnisse) GetImplicitEtiketten() kennung.EtikettSet {
+	if v.ImplicitEtiketten == nil {
+		return kennung.EtikettSetEmpty
+	}
+
+	return v.ImplicitEtiketten
+}
+
 func (v *Verzeichnisse) Reset() {
 	v.Archiviert.Reset()
-	v.ImplicitEtiketten = kennung.MakeEtikettSet()
-	v.ExpandedEtiketten = kennung.MakeEtikettSet()
+	v.ImplicitEtiketten = kennung.EtikettSetEmpty
+	v.ExpandedEtiketten = kennung.EtikettSetEmpty
 }
 
 func (a *Verzeichnisse) ResetWith(b *Verzeichnisse) {

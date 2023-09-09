@@ -241,32 +241,7 @@ func (u *Umwelt) MakeKennungIndex() kennung.Index {
 }
 
 func (u *Umwelt) MakeKennungHidden() matcher.Matcher {
-	h := matcher.MakeMatcherOrDoNotMatchOnEmpty()
-
-	// TODO-P1 make matcher Archiviert
-	u.Konfig().EtikettenHidden.EachPtr(
-		func(e *kennung.Etikett) (err error) {
-			impl := u.Konfig().GetImplicitEtiketten(e)
-
-			if err = impl.EachPtr(
-				func(e *kennung.Etikett) (err error) {
-					return h.Add(matcher.MakeMatcherContainsExactly(e))
-				},
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			if err = h.Add(matcher.MakeMatcherContainsExactly(e)); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		},
-	)
-
-	return h
+	return matcher.MakeArchiviert()
 }
 
 func (u *Umwelt) MakeKennungExpanders() (out kennung.Abbr) {

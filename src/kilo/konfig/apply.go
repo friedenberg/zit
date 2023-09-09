@@ -42,9 +42,13 @@ func (k compiled) ApplyToMetadatei(
 
 	mp.Verzeichnisse.Archiviert.SetBool(
 		iter.CheckAnyPtr[kennung.Etikett, *kennung.Etikett](
-			mp.Verzeichnisse.ExpandedEtiketten,
+			mp.Etiketten,
 			checkFunc,
 		) ||
+			iter.CheckAnyPtr[kennung.Etikett, *kennung.Etikett](
+				mp.Verzeichnisse.ExpandedEtiketten,
+				checkFunc,
+			) ||
 			iter.CheckAnyPtr[kennung.Etikett, *kennung.Etikett](
 				mp.Verzeichnisse.ImplicitEtiketten,
 				checkFunc,

@@ -74,20 +74,12 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 	switch fv.string {
 	case "etiketten-implicit":
 		return func(tl sku.SkuLikePtr) (err error) {
-			ets := tl.GetMetadatei().GetEtiketten().CloneMutableSetPtrLike()
-
-			ets.EachPtr(
-				func(e *kennung.Etikett) (err error) {
-					impl := k.GetImplicitEtiketten(e)
-					return impl.Each(ets.Add)
-				},
-			)
+			esImp := tl.GetMetadateiPtr().Verzeichnisse.GetImplicitEtiketten()
+      //TODO-P3 determine if empty sets should be printed or not
 
 			if _, err = fmt.Fprintln(
 				out,
-				iter.StringCommaSeparated[kennung.Etikett](
-					ets,
-				),
+				iter.StringCommaSeparated[kennung.Etikett](esImp),
 			); err != nil {
 				err = errors.Wrap(err)
 				return

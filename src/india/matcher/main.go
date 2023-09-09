@@ -6,7 +6,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/echo/kennung"
 )
 
@@ -141,26 +140,21 @@ func KennungContainsMatchable(
 	m Matchable,
 	ki kennung.Index,
 ) bool {
+	me := m.GetMetadatei()
+
 	switch kt := k.(type) {
 	case kennung.EtikettLike:
-		if iter.CheckAnyPtr[kennung.Etikett, *kennung.Etikett](
-			m.GetMetadatei().GetEtiketten(),
-			func(e *kennung.Etikett) (ok bool) {
-				indexed, err := ki.Etiketten(e)
+		s := kt.GetEtikett().String()
 
-				var expanded kennung.EtikettSet
+		if me.GetEtiketten().ContainsKey(s) {
+			return true
+		}
 
-				if err == nil {
-					expanded = indexed.GetExpandedRight()
-				} else {
-					expanded = kennung.ExpandOne(e, kennung.ExpanderRight)
-				}
+		if me.Verzeichnisse.GetExpandedEtiketten().ContainsKey(s) {
+			return true
+		}
 
-				ok = expanded.ContainsKey(expanded.KeyPtr(kt.GetEtikettPtr()))
-
-				return
-			},
-		) {
+		if me.Verzeichnisse.GetImplicitEtiketten().ContainsKey(s) {
 			return true
 		}
 
