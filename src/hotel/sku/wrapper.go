@@ -1,15 +1,27 @@
 package sku
 
-type wrapper struct {
-	SkuLikePtr
-}
+type lessor struct{}
 
-func (a wrapper) Less(b wrapper) bool {
+func (_ lessor) Less(a, b wrapper) bool {
 	return a.SkuLikePtr.GetTai().Less(b.SkuLikePtr.GetTai())
 }
 
-func (a wrapper) Equals(b wrapper) bool {
+func (_ lessor) LessPtr(a, b *wrapper) bool {
+	return a.SkuLikePtr.GetTai().Less(b.SkuLikePtr.GetTai())
+}
+
+type equaler struct{}
+
+func (_ equaler) Equals(a, b wrapper) bool {
 	return a.SkuLikePtr.EqualsSkuLike(b.SkuLikePtr)
+}
+
+func (_ equaler) EqualsPtr(a, b *wrapper) bool {
+	return a.SkuLikePtr.EqualsSkuLike(b.SkuLikePtr)
+}
+
+type wrapper struct {
+	SkuLikePtr
 }
 
 func (a *wrapper) Reset() {

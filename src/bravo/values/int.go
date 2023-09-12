@@ -6,10 +6,31 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
+type IntEqualer struct{}
+
+func (_ IntEqualer) Equals(a, b Int) bool {
+	return a.Int() == b.Int()
+}
+
+func (_ IntEqualer) EqualsPtr(a, b *Int) bool {
+	return a.Int() == b.Int()
+}
+
+type IntLessor struct{}
+
+func (_ IntLessor) Less(a, b Int) bool {
+	return a.Int() < b.Int()
+}
+
+func (_ IntLessor) LessPtr(a, b *Int) bool {
+	return a.Int() < b.Int()
+}
+
 type Int int
 
-func MakeInt(i int) Int {
-	return Int(i)
+func MakeInt(i int) *Int {
+	j := Int(i)
+	return &j
 }
 
 func (a Int) Equals(b Int) (ok bool) {

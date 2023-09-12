@@ -18,7 +18,6 @@ import (
 	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/india/transaktion"
 	"github.com/friedenberg/zit/src/juliett/objekte"
-	"github.com/friedenberg/zit/src/kilo/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/lima/objekte_store"
 	"github.com/friedenberg/zit/src/mike/store_util"
@@ -294,36 +293,6 @@ func (s Store) RevertTransaktion(
 	// return
 }
 
-func (s Store) FlushBestandsaufnahme() (err error) {
-	if !s.GetLockSmith().IsAcquired() {
-		err = objekte_store.ErrLockRequired{
-			Operation: "flush",
-		}
-
-		return
-	}
-
-	if s.GetKonfig().DryRun {
-		return
-	}
-
-	errors.Log().Printf("saving Bestandsaufnahme")
-	ba := s.StoreUtil.GetBestandsaufnahmeAkte()
-	if err = s.GetBestandsaufnahmeStore().Create(&ba); err != nil {
-		if errors.Is(err, bestandsaufnahme.ErrEmpty) {
-			errors.Log().Printf("Bestandsaufnahme was empty")
-			err = nil
-		} else {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	errors.Log().Printf("done saving Bestandsaufnahme")
-
-	return
-}
-
 func (s Store) Flush() (err error) {
 	if !s.GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{
@@ -356,6 +325,7 @@ func (s Store) Flush() (err error) {
 func (s *Store) UpdateManyMetadatei(
 	incoming schnittstellen.SetLike[sku.SkuLike],
 ) (err error) {
+	s.GetKonfigPtr().SetHasChanges(true)
 	todo.Optimize() // parallelize
 	for _, umm := range s.metadateiUpdaters {
 		if err = umm.UpdateManyMetadatei(incoming); err != nil {

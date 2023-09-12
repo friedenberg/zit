@@ -156,8 +156,10 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	akteFormatter, ok = typAkte.Formatters[actualFormatId]
 
 	if !ok {
-		err = errors.Errorf("no format id %q", actualFormatId)
-		return
+		akteFormatter = nil
+		// TODO-P2 allow option to error on missing format
+		// err = errors.Normalf("no format id %q", actualFormatId)
+		// return
 	}
 
 	var format metadatei.TextFormatter
@@ -179,7 +181,6 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	// TODO-P1 use cat or just write to stdout if no script instead of erroring
 	if _, err = format.FormatMetadatei(u.Out(), zt); err != nil {
 		err = errors.Wrap(err)
 		return

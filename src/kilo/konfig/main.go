@@ -176,7 +176,17 @@ func (kc *Compiled) loadKonfigErworben(s standort.Standort) (err error) {
 }
 
 func (kc Compiled) HasChanges() bool {
+	kc.lock.Lock()
+	defer kc.lock.Unlock()
+
 	return kc.hasChanges
+}
+
+func (kc *Compiled) SetHasChanges(v bool) {
+	kc.lock.Lock()
+	defer kc.lock.Unlock()
+
+	kc.hasChanges = true
 }
 
 func (kc Compiled) GetAngeboren() schnittstellen.Angeboren {

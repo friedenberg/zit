@@ -88,10 +88,9 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		defer errors.DeferredCloser(&err, rc)
 	}
 
-	var besty bestandsaufnahme.Akte
-	besty.Reset()
+	besty := bestandsaufnahme.MakeAkte()
 
-	if _, err = bf.ParseAkte(rc, &besty); err != nil {
+	if _, err = bf.ParseAkte(rc, besty); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -99,7 +98,7 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	u.Lock()
 	defer u.Unlock()
 
-	if err = u.StoreObjekten().GetBestandsaufnahmeStore().Create(&besty); err != nil {
+	if err = u.StoreObjekten().GetBestandsaufnahmeStore().Create(besty); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

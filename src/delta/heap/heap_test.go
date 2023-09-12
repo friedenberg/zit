@@ -11,7 +11,7 @@ import (
 func TestReset(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-	els := []values.Int{
+	els := []*values.Int{
 		values.MakeInt(1),
 		values.MakeInt(0),
 		values.MakeInt(3),
@@ -19,7 +19,11 @@ func TestReset(t1 *testing.T) {
 		values.MakeInt(2),
 	}
 
-	sut := MakeHeapFromSlice(els)
+	sut := MakeHeapFromSlice[values.Int, *values.Int](
+		values.IntEqualer{},
+		values.IntLessor{},
+		els,
+	)
 
 	if sut.Len() != 5 {
 		t.Fatalf("expected len 5 but got %d", sut.Len())
@@ -35,7 +39,7 @@ func TestReset(t1 *testing.T) {
 func TestSaveAndRestore(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-	els := []values.Int{
+	els := []*values.Int{
 		values.MakeInt(1),
 		values.MakeInt(0),
 		values.MakeInt(3),
@@ -43,7 +47,13 @@ func TestSaveAndRestore(t1 *testing.T) {
 		values.MakeInt(2),
 	}
 
-	sut := MakeHeapFromSlice(els)
+	eql := values.IntEqualer{}
+
+	sut := MakeHeapFromSlice[values.Int, *values.Int](
+		eql,
+		values.IntLessor{},
+		els,
+	)
 
 	checkAllElements := func() {
 		defer sut.Restore()
@@ -57,7 +67,7 @@ func TestSaveAndRestore(t1 *testing.T) {
 				)
 			}
 
-			if !el.Equals(ex) {
+			if !eql.EqualsPtr(el, ex) {
 				t.Fatalf(
 					"expected pop and save to return %s but got %s",
 					ex,
@@ -80,7 +90,7 @@ func TestSaveAndRestore(t1 *testing.T) {
 			)
 		}
 
-		if !el.Equals(ex) {
+		if !eql.EqualsPtr(el, ex) {
 			t.Fatalf("expected pop and save to return %s but got %s", ex, el)
 		}
 	}
@@ -89,7 +99,7 @@ func TestSaveAndRestore(t1 *testing.T) {
 func Test3Sorted(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-	els := []values.Int{
+	els := []*values.Int{
 		values.MakeInt(1),
 		values.MakeInt(0),
 		values.MakeInt(3),
@@ -97,10 +107,17 @@ func Test3Sorted(t1 *testing.T) {
 		values.MakeInt(2),
 	}
 
-	sut := MakeHeapFromSlice(els)
+	eql := values.IntEqualer{}
+
+	sut := MakeHeapFromSlice[values.Int, *values.Int](
+		eql,
+		values.IntLessor{},
+		els,
+	)
+
 	sorted := sut.Sorted()
 
-	expected := []values.Int{
+	expected := []*values.Int{
 		values.MakeInt(0),
 		values.MakeInt(1),
 		values.MakeInt(2),
@@ -108,7 +125,7 @@ func Test3Sorted(t1 *testing.T) {
 		values.MakeInt(4),
 	}
 
-	if !reflect.DeepEqual([]values.Int(sorted), expected) {
+	if !reflect.DeepEqual([]*values.Int(sorted), expected) {
 		t.Fatalf("expected %#v but got %#v", expected, sorted)
 	}
 }

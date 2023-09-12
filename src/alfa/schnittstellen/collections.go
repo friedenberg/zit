@@ -90,11 +90,6 @@ type AdderCustom[E any] interface {
 }
 
 // TODO-P1 remove
-type Equaler[T any] interface {
-	Equals(*T) bool
-}
-
-// TODO-P1 remove
 type Eacher[E any] interface {
 	Each(FuncIter[E]) error
 }

@@ -31,6 +31,7 @@ type StoreUtilVerzeichnisse interface {
 }
 
 type StoreUtil interface {
+	FlushBestandsaufnahme() error
 	errors.Flusher
 	StoreUtilVerzeichnisse
 	schnittstellen.LockSmithGetter

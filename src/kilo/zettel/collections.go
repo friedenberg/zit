@@ -6,13 +6,17 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/delta/heap"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/transacted"
 )
 
 type HeapTransacted = heap.Heap[transacted.Zettel, *transacted.Zettel]
 
 func MakeHeapTransacted() HeapTransacted {
-	return heap.MakeHeap[transacted.Zettel, *transacted.Zettel]()
+	return heap.Make[transacted.Zettel, *transacted.Zettel](
+		sku.Equaler[transacted.Zettel, *transacted.Zettel]{},
+		sku.Lessor[transacted.Zettel, *transacted.Zettel]{},
+	)
 }
 
 type (

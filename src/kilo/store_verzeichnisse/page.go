@@ -113,7 +113,7 @@ func (zp *Page) Add(z *transacted.Zettel) (err error) {
 
 	// defer zp.doUnlock()
 
-	zp.added.Add(*z)
+	zp.added.Add(z)
 	zp.State = StateChanged
 
 	log.Log().Printf("added: %s", z.GetSkuLike())

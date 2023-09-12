@@ -44,3 +44,13 @@ type IdPtr[T any] interface {
 type Lessor[T any] interface {
 	Less(T) bool
 }
+
+type Lessor2[T any, TPtr Ptr[T]] interface {
+	Less(T, T) bool
+	LessPtr(TPtr, TPtr) bool
+}
+
+type Equaler[T any, TPtr Ptr[T]] interface {
+	Equals(T, T) bool
+	EqualsPtr(TPtr, TPtr) bool
+}

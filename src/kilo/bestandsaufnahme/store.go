@@ -216,8 +216,7 @@ func (s *store) GetAkte(akteSha schnittstellen.ShaLike) (a *Akte, err error) {
 
 	sw := sha.MakeWriter(nil)
 
-	a = &Akte{}
-	a.Reset()
+	a = MakeAkte()
 
 	if _, err = s.formatAkte.ParseAkte(io.TeeReader(ar, sw), a); err != nil {
 		err = errors.Wrap(err)
