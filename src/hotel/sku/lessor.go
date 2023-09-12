@@ -1,6 +1,8 @@
 package sku
 
-import "github.com/friedenberg/zit/src/alfa/schnittstellen"
+import (
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+)
 
 type Lessor[T SkuLike, TPtr interface {
 	schnittstellen.Ptr[T]

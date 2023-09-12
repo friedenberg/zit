@@ -177,6 +177,17 @@ func (h *Heap[T, TPtr]) Restore() {
 	return
 }
 
+func (h *Heap[T, TPtr]) PopError() (sk TPtr, err error) {
+	ok := false
+	sk, ok = h.Pop()
+
+	if !ok {
+		err = iter.MakeErrStopIteration()
+	}
+
+	return
+}
+
 func (h *Heap[T, TPtr]) Pop() (sk TPtr, ok bool) {
 	h.l.Lock()
 	defer h.l.Unlock()

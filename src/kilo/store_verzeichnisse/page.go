@@ -11,7 +11,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -89,8 +88,6 @@ func (zp *Page) Add(z *transacted.Zettel) (err error) {
 		return
 	}
 
-	log.Log().Printf("adding: %s", z.GetSkuLike())
-
 	if err = zp.addFilter(z); err != nil {
 		if iter.IsStopIteration(err) {
 			errors.Log().Printf("eliding %s", z.Kennung)
@@ -115,8 +112,6 @@ func (zp *Page) Add(z *transacted.Zettel) (err error) {
 
 	zp.added.Add(z)
 	zp.State = StateChanged
-
-	log.Log().Printf("added: %s", z.GetSkuLike())
 
 	return
 }
