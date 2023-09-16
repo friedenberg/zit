@@ -9,7 +9,7 @@ import (
 type SkuLikeHeap = heap.Heap[wrapper, *wrapper]
 
 func MakeSkuLikeHeap() SkuLikeHeap {
-	return heap.Make[wrapper, *wrapper](equaler{}, lessor{})
+	return heap.Make[wrapper, *wrapper](equaler{}, lessor{}, resetter{})
 }
 
 func AddSkuToHeap(h *SkuLikeHeap, sk SkuLike) (err error) {

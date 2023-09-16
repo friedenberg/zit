@@ -22,6 +22,7 @@ func TestReset(t1 *testing.T) {
 	sut := MakeHeapFromSlice[values.Int, *values.Int](
 		values.IntEqualer{},
 		values.IntLessor{},
+		values.IntResetter{},
 		els,
 	)
 
@@ -52,6 +53,7 @@ func TestSaveAndRestore(t1 *testing.T) {
 	sut := MakeHeapFromSlice[values.Int, *values.Int](
 		eql,
 		values.IntLessor{},
+		values.IntResetter{},
 		els,
 	)
 
@@ -112,6 +114,7 @@ func Test3Sorted(t1 *testing.T) {
 	sut := MakeHeapFromSlice[values.Int, *values.Int](
 		eql,
 		values.IntLessor{},
+		values.IntResetter{},
 		els,
 	)
 
@@ -147,6 +150,7 @@ func TestMerge(t1 *testing.T) {
 	otherStream := MakeHeapFromSlice[values.Int, *values.Int](
 		eql,
 		llr,
+		values.IntResetter{},
 		[]*values.Int{
 			values.MakeInt(8),
 			values.MakeInt(9),
@@ -168,7 +172,12 @@ func TestMerge(t1 *testing.T) {
 		values.MakeInt(9),
 	}
 
-	sut := MakeHeapFromSlice[values.Int, *values.Int](eql, llr, els)
+	sut := MakeHeapFromSlice[values.Int, *values.Int](
+		eql,
+		llr,
+		values.IntResetter{},
+		els,
+	)
 
 	actual := make([]*values.Int, 0)
 

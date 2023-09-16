@@ -26,6 +26,20 @@ func (_ IntLessor) LessPtr(a, b *Int) bool {
 	return a.Int() < b.Int()
 }
 
+type IntResetter struct{}
+
+func (_ IntResetter) Reset(a *Int) {
+	*a = 0
+}
+
+func (_ IntResetter) ResetWith(a *Int, b Int) {
+	*a = b
+}
+
+func (_ IntResetter) ResetWithPtr(a *Int, b *Int) {
+	*a = *b
+}
+
 type Int int
 
 func MakeInt(i int) *Int {

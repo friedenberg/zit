@@ -13,13 +13,13 @@ import (
 
 type Element interface{}
 
-type ElementPtr[T any] interface {
-	schnittstellen.Resetable[T]
+type ElementPtr[T Element] interface {
 	schnittstellen.Ptr[T]
 }
 
 type heapPrivate[T Element, TPtr ElementPtr[T]] struct {
 	Lessor   schnittstellen.Lessor2[T, TPtr]
+	Resetter schnittstellen.Resetter2[T, TPtr]
 	Elements []TPtr
 }
 
@@ -51,6 +51,7 @@ func (h *heapPrivate[T, TPtr]) Pop() any {
 func (a heapPrivate[T, TPtr]) Copy() (b heapPrivate[T, TPtr]) {
 	b = heapPrivate[T, TPtr]{
 		Lessor:   a.Lessor,
+		Resetter: a.Resetter,
 		Elements: make([]TPtr, a.Len()),
 	}
 
@@ -68,6 +69,7 @@ func (a heapPrivate[T, TPtr]) Sorted() (b heapPrivate[T, TPtr]) {
 func Make[T Element, TPtr ElementPtr[T]](
 	equaler schnittstellen.Equaler[T, TPtr],
 	lessor schnittstellen.Lessor2[T, TPtr],
+	resetter schnittstellen.Resetter2[T, TPtr],
 ) Heap[T, TPtr] {
 	return Heap[T, TPtr]{
 		p:       pool.MakeFakePool[T, TPtr](),
@@ -75,6 +77,7 @@ func Make[T Element, TPtr ElementPtr[T]](
 		equaler: equaler,
 		h: heapPrivate[T, TPtr]{
 			Lessor:   lessor,
+			Resetter: resetter,
 			Elements: make([]TPtr, 0),
 		},
 	}
@@ -83,10 +86,12 @@ func Make[T Element, TPtr ElementPtr[T]](
 func MakeHeapFromSlice[T Element, TPtr ElementPtr[T]](
 	equaler schnittstellen.Equaler[T, TPtr],
 	lessor schnittstellen.Lessor2[T, TPtr],
+	resetter schnittstellen.Resetter2[T, TPtr],
 	s []TPtr,
 ) Heap[T, TPtr] {
 	h := heapPrivate[T, TPtr]{
 		Lessor:   lessor,
+		Resetter: resetter,
 		Elements: s,
 	}
 
@@ -124,13 +129,17 @@ func (h *Heap[T, TPtr]) GetLessor() schnittstellen.Lessor2[T, TPtr] {
 	return h.h.Lessor
 }
 
+func (h *Heap[T, TPtr]) GetResetter() schnittstellen.Resetter2[T, TPtr] {
+	return h.h.Resetter
+}
+
 func (h *Heap[T, TPtr]) Peek() (sk TPtr, ok bool) {
 	h.l.Lock()
 	defer h.l.Unlock()
 
 	if h.h.Len() > 0 {
 		sk = h.p.Get()
-		sk.ResetWith(T(*h.h.Elements[0]))
+		h.h.Resetter.ResetWithPtr(sk, h.h.Elements[0])
 		ok = true
 	}
 
@@ -161,14 +170,16 @@ func (h *Heap[T, TPtr]) PopAndSave() (sk TPtr, ok bool) {
 	h.l.Lock()
 	defer h.l.Unlock()
 
-	if h.h.Len() > 0 {
-		sk = h.p.Get()
-		sk.ResetWith(*heap.Pop(&h.h).(TPtr))
-		ok = true
-		h.s += 1
-		faked := h.h.Elements[:h.h.Len()+h.s]
-		faked[h.h.Len()] = sk
+	if h.h.Len() == 0 {
+		return
 	}
+
+	sk = h.p.Get()
+	h.h.Resetter.ResetWithPtr(sk, heap.Pop(&h.h).(TPtr))
+	ok = true
+	h.s += 1
+	faked := h.h.Elements[:h.h.Len()+h.s]
+	faked[h.h.Len()] = sk
 
 	return
 }
@@ -200,11 +211,13 @@ func (h *Heap[T, TPtr]) Pop() (sk TPtr, ok bool) {
 	h.l.Lock()
 	defer h.l.Unlock()
 
-	if h.h.Len() > 0 {
-		sk = h.p.Get()
-		sk.ResetWith(*heap.Pop(&h.h).(TPtr))
-		ok = true
+	if h.h.Len() == 0 {
+		return
 	}
+
+	sk = h.p.Get()
+	h.h.Resetter.ResetWithPtr(sk, heap.Pop(&h.h).(TPtr))
+	ok = true
 
 	return
 }
@@ -410,6 +423,7 @@ func (a *Heap[T, TPtr]) ResetWith(b Heap[T, TPtr]) {
 	a.equaler = b.equaler
 
 	a.h.Lessor = b.h.Lessor
+	a.h.Resetter = b.h.Resetter
 	a.h.Elements = make([]TPtr, b.Len())
 
 	for i, bv := range b.h.Elements {

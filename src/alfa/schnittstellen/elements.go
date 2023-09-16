@@ -54,3 +54,9 @@ type Equaler[T any, TPtr Ptr[T]] interface {
 	Equals(T, T) bool
 	EqualsPtr(TPtr, TPtr) bool
 }
+
+type Resetter2[T any, TPtr Ptr[T]] interface {
+	Reset(TPtr)
+	ResetWith(TPtr, T)
+	ResetWithPtr(TPtr, TPtr)
+}

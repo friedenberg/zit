@@ -16,6 +16,7 @@ func MakeHeapTransacted() HeapTransacted {
 	return heap.Make[transacted.Zettel, *transacted.Zettel](
 		sku.Equaler[transacted.Zettel, *transacted.Zettel]{},
 		sku.Lessor[transacted.Zettel, *transacted.Zettel]{},
+		sku.Resetter[transacted.Zettel, *transacted.Zettel]{},
 	)
 }
 
