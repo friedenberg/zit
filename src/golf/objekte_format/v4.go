@@ -192,7 +192,7 @@ func (f v4) FormatPersistentMetadatei(
 
 		if !m.Verzeichnisse.Mutter[0].IsNull() {
 			n1, err = ohio.WriteKeySpaceValueNewline(
-				w,
+				mw,
 				"Verzeichnisse-Mutter",
 				m.Verzeichnisse.Mutter[0].String(),
 			)
@@ -206,7 +206,7 @@ func (f v4) FormatPersistentMetadatei(
 
 		if !m.Verzeichnisse.Mutter[1].IsNull() {
 			n1, err = ohio.WriteKeySpaceValueNewline(
-				w,
+				mw,
 				"Verzeichnisse-Mutter",
 				m.Verzeichnisse.Mutter[1].String(),
 			)
@@ -422,6 +422,8 @@ func (f v4) ParsePersistentMetadatei(
 				err = errors.Wrap(err)
 				return
 			}
+
+			writeMetadateiHashString = true
 
 		case "Verzeichnisse-Sha":
 			if err = m.Verzeichnisse.Sha.Set(val); err != nil {

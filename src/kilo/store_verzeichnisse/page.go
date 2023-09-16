@@ -29,6 +29,7 @@ type Page struct {
 	added       zettel.HeapTransacted
 	addFilter   schnittstellen.FuncIter[*transacted.Zettel]
 	flushFilter schnittstellen.FuncIter[*transacted.Zettel]
+
 	State
 }
 
@@ -145,9 +146,18 @@ func (zp *Page) Flush() (err error) {
 
 	defer errors.DeferredFlusher(&err, w1)
 
+	m := make(KennungShaMap)
+
 	writeOne := zp.getFuncWriteOne(w1)
 
-	if err = zp.copy(iter.MakeChain(zp.flushFilter, writeOne)); err != nil {
+	c := iter.MakeChain(
+		zp.flushFilter,
+		m.ModifyMutter,
+		writeOne,
+		m.SaveSha,
+	)
+
+	if err = zp.copy(c); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

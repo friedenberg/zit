@@ -137,7 +137,7 @@ function! ZitPreview()
 
   call popup_menu(
         \ items,
-        \ #{ title: "Preview a Zettel-Typ format", 
+        \ #{ title: "Preview format", 
         \ callback: 'ZitPreviewMenuItemPicked', 
         \ line: 25, col: 40,
         \ highlight: 'Question', border: [], close: 'click',  padding: [1,1,0,1]} )
@@ -170,7 +170,7 @@ function! ZitCopy()
 
   call popup_menu(
         \ items,
-        \ #{ title: "Run a Zettel-Typ-Specific Action", 
+        \ #{ title: "Copy format", 
         \ callback: 'ZitCopyMenuItemPicked', 
         \ line: 25, col: 40,
         \ highlight: 'Question', border: [], close: 'click',  padding: [1,1,0,1]} )
