@@ -284,6 +284,20 @@ func (u *Umwelt) MakeMetaIdSetWithExcludedHidden(
 	)
 }
 
+func (u *Umwelt) MakeQueryAll() matcher.Query {
+	i := u.MakeKennungIndex()
+
+	return matcher.MakeQueryAll(
+		u.Konfig(),
+		nil,
+		u.MakeKennungExpanders(),
+		nil,
+		u.Konfig().FileExtensions,
+		u.Konfig(),
+		i,
+	)
+}
+
 func (u *Umwelt) MakeMetaIdSetWithoutExcludedHidden(
 	cwd matcher.MatcherCwd,
 	dg gattungen.Set,

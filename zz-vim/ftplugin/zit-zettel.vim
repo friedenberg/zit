@@ -25,7 +25,7 @@ noremap <buffer> gf :call GfZettel()<CR>
 
 " TODO support external akte
 function! ZitAction()
-  let l:items = ZitGetActionNames()
+  let [l:items, l:processedItems] = ZitGetActionNames()
 
   func! ZitActionItemPicked(id, result) closure
     if a:result == -1
@@ -74,12 +74,11 @@ function! ZitMakeUTIGroupCommand(uti_group, cmd_args_unprocessed_list)
   return l:cmd_args_list
 endfunction
 
-function! ZitGetUTIGroups()
-  let l:rawItems = sort(systemlist("zit show -format typ-formatter-uti-groups " . expand("%")))
+function! SplitListOnSpaceAndReturnBoth(rawItems)
   let l:processedItems = []
   let l:items = []
 
-  for i in l:rawItems
+  for i in a:rawItems
     let l:groupName = substitute(i, '\s.*$', '', '')
     let l:group = i[len(l:groupName) +1:]
     call add(l:items, l:groupName)
@@ -89,16 +88,23 @@ function! ZitGetUTIGroups()
   return [l:items, l:processedItems]
 endfunction
 
+function! ZitGetUTIGroups()
+  let l:rawItems = sort(systemlist("zit show -format typ-formatter-uti-groups " . expand("%")))
+  return SplitListOnSpaceAndReturnBoth(l:rawItems)
+endfunction
+
 function! ZitGetActionNames()
-  return sort(systemlist("zit show -format action-names " .. expand("%")))
+  let l:rawItems = sort(systemlist("zit show -format action-names " .. expand("%")))
+  return SplitListOnSpaceAndReturnBoth(l:rawItems)
 endfunction
 
 function! ZitGetFormats()
-  return sort(systemlist("zit show -format formatters " .. expand("%")))
+  let l:rawItems =  sort(systemlist("zit show -format formatters " .. expand("%")))
+  return SplitListOnSpaceAndReturnBoth(l:rawItems)
 endfunction
 
 function! ZitPreview()
-  let l:items = ZitGetFormats()
+  let [l:items, l:processedItems] = ZitGetFormats()
 
   func! ZitPreviewMenuItemPicked(id, result) closure
     if a:result == -1
@@ -106,15 +112,15 @@ function! ZitPreview()
     endif
 
     " let l:format = substitute(l:items[a:result-1], '\t.*$', '', '')
-    let l:format = split(l:items[a:result-1], '\t')
+    let l:format = l:processedItems[a:result-1]
     echom l:format
     let l:hinweis = expand("%:r")
 
-    let l:tempfile = tempname() .. "." .. l:format[1]
+    let l:tempfile = tempname() .. "." .. l:format
 
     let l:cmd_args_list = [
           \ "zit format-zettel -mode akte",
-          \ l:format[1],
+          \ l:format,
           \ l:hinweis,
           \ ">",
           \ l:tempfile,

@@ -35,6 +35,7 @@ func (f *FormatterValue) Set(v string) (err error) {
 		// TODO-P3 add toml
 		"bestandsaufnahme",
 		"bestandsaufnahme-sans-tai",
+		"bestandsaufnahme-verzeichnisse",
 		"objekte",
 		"kennung",
 		"kennung-akte-sha",
@@ -323,6 +324,25 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 			out,
 			objekte_format.Default(),
 			objekte_format.Options{IncludeTai: true},
+		)
+
+		return func(o sku.SkuLikePtr) (err error) {
+			if _, err = f.Print(o); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+
+	case "bestandsaufnahme-verzeichnisse":
+		f := sku_formats.MakeFormatBestandsaufnahmePrinter(
+			out,
+			objekte_format.Default(),
+			objekte_format.Options{
+				IncludeTai:           true,
+				IncludeVerzeichnisse: true,
+			},
 		)
 
 		return func(o sku.SkuLikePtr) (err error) {

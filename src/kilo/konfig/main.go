@@ -386,7 +386,6 @@ func (kc compiled) IsInlineTyp(k kennung.Typ) (isInline bool) {
 // Typ or nil. (Parent Typ for `md-gdoc` would be `md`.)
 func (kc compiled) GetApproximatedTyp(k kennung.Typ) (ct ApproximatedTyp) {
 	expandedActual := kc.GetSortedTypenExpanded(k.String())
-
 	if len(expandedActual) > 0 {
 		ct.hasValue = true
 		ct.typ = *expandedActual[0]

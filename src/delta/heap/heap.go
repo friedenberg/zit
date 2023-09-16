@@ -116,6 +116,14 @@ func (h *Heap[T, TPtr]) SetPool(p schnittstellen.Pool[T, TPtr]) {
 	h.p = p
 }
 
+func (h *Heap[T, TPtr]) GetEqualer() schnittstellen.Equaler[T, TPtr] {
+	return h.equaler
+}
+
+func (h *Heap[T, TPtr]) GetLessor() schnittstellen.Lessor2[T, TPtr] {
+	return h.h.Lessor
+}
+
 func (h *Heap[T, TPtr]) Peek() (sk TPtr, ok bool) {
 	h.l.Lock()
 	defer h.l.Unlock()

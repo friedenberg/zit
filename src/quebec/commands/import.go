@@ -18,6 +18,7 @@ import (
 	"github.com/friedenberg/zit/src/kilo/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/november/umwelt"
+	"github.com/friedenberg/zit/src/oscar/user_ops"
 )
 
 type Import struct {
@@ -67,10 +68,9 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	bf := bestandsaufnahme.MakeAkteFormat(
-		u.Konfig().GetStoreVersion(),
-		objekte_format.Options{IncludeTai: true},
-	)
+	ofo := objekte_format.Options{IncludeTai: true, IncludeVerzeichnisse: true}
+
+	bf := bestandsaufnahme.MakeAkteFormat(u.Konfig().GetStoreVersion(), ofo)
 
 	var rc io.ReadCloser
 
@@ -90,6 +90,15 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		defer errors.DeferredCloser(&err, rc)
 	}
 
+	// scanner := sku_formats.MakeFormatBestandsaufnahmeScanner(
+	// 	rc,
+	// 	objekte_format.FormatForVersion(u.Konfig().GetStoreVersion()),
+	// 	ofo,
+	// )
+
+	// for scanner.Scan() {
+	// }
+
 	besty := bestandsaufnahme.MakeAkte()
 
 	if _, err = bf.ParseAkte(rc, besty); err != nil {
@@ -97,10 +106,17 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	u.Lock()
-	defer u.Unlock()
+	op := user_ops.Merge{Umwelt: u}
 
-	if err = u.StoreObjekten().GetBestandsaufnahmeStore().Create(besty); err != nil {
+	if err = op.Run(besty.Skus); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	op.Lock()
+	defer op.Unlock()
+
+	if err = op.StoreObjekten().GetBestandsaufnahmeStore().Create(besty); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
