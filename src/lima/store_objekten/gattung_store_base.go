@@ -162,6 +162,7 @@ func makeCommonStoreBase[
 			objekte_format.FormatForVersion(
 				sa.GetStoreVersion(),
 			),
+			objekte_format.Options{IncludeTai: true},
 			akteFormat,
 			pool,
 		),
@@ -177,6 +178,7 @@ func makeCommonStoreBase[
 		ObjekteSaver: objekte_store.MakeObjekteSaver(
 			of,
 			pmf,
+			objekte_format.Options{IncludeTai: true},
 		),
 		textParser: metadatei.MakeTextParser(
 			sa,
@@ -285,6 +287,7 @@ func (s *commonStoreBase[O, OPtr, K, KPtr]) GetInheritor(
 		schnittstellen.MakeBespokeObjekteReadWriterFactory(orf, s),
 		schnittstellen.MakeBespokeAkteReadWriterFactory(arf, s),
 		pmf,
+		objekte_format.Options{IncludeTai: true},
 		objekte_store.MakeAkteFormat[O, OPtr](
 			objekte.MakeNopAkteParseSaver[O, OPtr](s),
 			nil,

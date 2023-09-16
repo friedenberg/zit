@@ -18,10 +18,11 @@ func TestOne(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
 	b := new(bytes.Buffer)
-	f := objekte_format.BestandsaufnahmeFormatIncludeTai()
+	f := objekte_format.Default()
+	o := objekte_format.Options{IncludeTai: true}
 	w := zstd.NewWriter(b)
 
-	printer := MakeFormatBestandsaufnahmePrinter(w, f)
+	printer := MakeFormatBestandsaufnahmePrinter(w, f, o)
 
 	n, err := printer.Print(transacted.Zettel{
 		Kennung: kennung.MustHinweis("one/uno"),
@@ -61,7 +62,9 @@ func TestOne(t1 *testing.T) {
 
 	w.Flush()
 
-	scanner := MakeFormatBestandsaufnahmeScanner(zstd.NewReader(b), f)
+	op := objekte_format.Options{}
+
+	scanner := MakeFormatBestandsaufnahmeScanner(zstd.NewReader(b), f, op)
 	var sk sku.SkuLike
 
 	if !scanner.Scan() {
@@ -114,9 +117,14 @@ func TestBigMac(t1 *testing.T) {
 
 	comp.Flush()
 
-	f := objekte_format.BestandsaufnahmeFormatIncludeTai()
+	f := objekte_format.Default()
+	op := objekte_format.Options{}
 
-	scanner := MakeFormatBestandsaufnahmeScanner(zstd.NewReader(dataComp), f)
+	scanner := MakeFormatBestandsaufnahmeScanner(
+		zstd.NewReader(dataComp),
+		f,
+		op,
+	)
 
 	i := 0
 

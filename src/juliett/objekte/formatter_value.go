@@ -75,7 +75,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 	case "etiketten-implicit":
 		return func(tl sku.SkuLikePtr) (err error) {
 			esImp := tl.GetMetadateiPtr().Verzeichnisse.GetImplicitEtiketten()
-      //TODO-P3 determine if empty sets should be printed or not
+			// TODO-P3 determine if empty sets should be printed or not
 
 			if _, err = fmt.Fprintln(
 				out,
@@ -134,9 +134,12 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 
 	case "objekte":
 		f := objekte_format.FormatForVersion(k.GetStoreVersion())
+		o := objekte_format.Options{
+			IncludeTai: true,
+		}
 
 		return func(tl sku.SkuLikePtr) (err error) {
-			if _, err = f.FormatPersistentMetadatei(out, tl); err != nil {
+			if _, err = f.FormatPersistentMetadatei(out, tl, o); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -302,7 +305,8 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 	case "bestandsaufnahme-sans-tai":
 		be := sku_formats.MakeFormatBestandsaufnahmePrinter(
 			out,
-			objekte_format.BestandsaufnahmeFormatExcludeTai(),
+			objekte_format.Default(),
+			objekte_format.Options{},
 		)
 
 		return func(o sku.SkuLikePtr) (err error) {
@@ -317,7 +321,8 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 	case "bestandsaufnahme":
 		f := sku_formats.MakeFormatBestandsaufnahmePrinter(
 			out,
-			objekte_format.BestandsaufnahmeFormatIncludeTai(),
+			objekte_format.Default(),
+			objekte_format.Options{IncludeTai: true},
 		)
 
 		return func(o sku.SkuLikePtr) (err error) {

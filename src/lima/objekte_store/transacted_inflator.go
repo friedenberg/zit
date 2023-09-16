@@ -48,6 +48,7 @@ type transactedInflator[
 	of                        schnittstellen.ObjekteIOFactory
 	af                        schnittstellen.AkteIOFactory
 	persistentMetadateiFormat objekte_format.Format
+	options                   objekte_format.Options
 	akteFormat                objekte.AkteFormat[A, APtr]
 	pool                      schnittstellen.Pool[
 		sku.Transacted[K, KPtr],
@@ -65,6 +66,7 @@ func MakeTransactedInflator[
 	of schnittstellen.ObjekteIOFactory,
 	af schnittstellen.AkteIOFactory,
 	persistentMetadateiFormat objekte_format.Format,
+	op objekte_format.Options,
 	akteFormat objekte.AkteFormat[A, APtr],
 	pool schnittstellen.Pool[
 		sku.Transacted[K, KPtr],
@@ -76,6 +78,7 @@ func MakeTransactedInflator[
 		of:                        of,
 		af:                        af,
 		persistentMetadateiFormat: persistentMetadateiFormat,
+		options:                   op,
 		akteFormat:                akteFormat,
 		pool:                      pool,
 	}
@@ -210,6 +213,7 @@ func (h *transactedInflator[A, APtr, K, KPtr]) StoreObjekte(
 	if _, err = h.persistentMetadateiFormat.FormatPersistentMetadatei(
 		ow,
 		t,
+		h.options,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -261,6 +265,7 @@ func (h *transactedInflator[A, APtr, K, KPtr]) readObjekte(
 	if n, err = h.persistentMetadateiFormat.ParsePersistentMetadatei(
 		r,
 		t,
+		h.options,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

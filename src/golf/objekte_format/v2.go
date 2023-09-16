@@ -17,11 +17,12 @@ type v2 struct{}
 func (f v2) FormatPersistentMetadatei(
 	w1 io.Writer,
 	c FormatterContext,
+	o Options,
 ) (n int64, err error) {
 	m := c.GetMetadatei()
 	w := format.NewLineWriter()
 
-	if fcit, ok := c.(FormatterContextIncludeTai); ok && fcit.IncludeTai() {
+	if o.IncludeTai {
 		w.WriteFormat("Tai %s", m.Tai)
 	}
 
@@ -46,6 +47,7 @@ func (f v2) FormatPersistentMetadatei(
 func (f v2) ParsePersistentMetadatei(
 	r1 io.Reader,
 	c ParserContext,
+  _ Options,
 ) (n int64, err error) {
 	m := c.GetMetadatei()
 

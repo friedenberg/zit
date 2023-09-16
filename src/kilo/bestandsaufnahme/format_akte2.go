@@ -13,13 +13,16 @@ import (
 
 type formatAkte2 struct {
 	objekteFormat objekte_format.Format
+	options       objekte_format.Options
 }
 
 func MakeAkteFormat(
 	sv schnittstellen.StoreVersion,
+	op objekte_format.Options,
 ) formatAkte2 {
 	return formatAkte2{
 		objekteFormat: objekte_format.FormatForVersion(sv),
+		options:       op,
 	}
 }
 
@@ -30,6 +33,7 @@ func (f formatAkte2) ParseAkte(
 	dec := sku_formats.MakeFormatBestandsaufnahmeScanner(
 		r,
 		f.objekteFormat,
+		f.options,
 	)
 
 	for dec.Scan() {
@@ -62,7 +66,8 @@ func (f formatAkte2) FormatParsedAkte(
 
 	fo := sku_formats.MakeFormatBestandsaufnahmePrinter(
 		bw,
-		objekte_format.BestandsaufnahmeFormatIncludeTai(),
+		f.objekteFormat,
+		f.options,
 	)
 
 	defer func() {

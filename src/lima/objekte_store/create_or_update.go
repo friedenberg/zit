@@ -35,6 +35,7 @@ type createOrUpdate[
 	delegate                  CreateOrUpdateDelegate[*sku.Transacted[T2, T3]]
 	matchableAdder            matcher.MatchableAdder
 	persistentMetadateiFormat objekte_format.Format
+	options                   objekte_format.Options
 	kg                        konfig.Getter
 }
 
@@ -52,6 +53,7 @@ func MakeCreateOrUpdate[
 	delegate CreateOrUpdateDelegate[*sku.Transacted[T2, T3]],
 	ma matcher.MatchableAdder,
 	pmf objekte_format.Format,
+	op objekte_format.Options,
 	kg konfig.Getter,
 ) (cou *createOrUpdate[T, T1, T2, T3]) {
 	if pmf == nil {
@@ -67,6 +69,7 @@ func MakeCreateOrUpdate[
 		delegate:                  delegate,
 		matchableAdder:            ma,
 		persistentMetadateiFormat: pmf,
+		options:                   op,
 	}
 }
 
@@ -104,6 +107,7 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateCheckedOut(
 	if _, err = cou.persistentMetadateiFormat.FormatPersistentMetadatei(
 		ow,
 		transactedPtr,
+		cou.options,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -195,6 +199,7 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdate(
 	if _, err = cou.persistentMetadateiFormat.FormatPersistentMetadatei(
 		ow,
 		transactedPtr,
+		cou.options,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -296,6 +301,7 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateAkte(
 	if _, err = cou.persistentMetadateiFormat.FormatPersistentMetadatei(
 		ow,
 		transactedPtr,
+		cou.options,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

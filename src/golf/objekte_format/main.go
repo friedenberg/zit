@@ -14,22 +14,25 @@ type (
 		GetKennungLike() kennung.Kennung
 	}
 
-	FormatterContextIncludeTai interface {
-		FormatterContext
-		IncludeTai() bool
-	}
-
 	ParserContext interface {
 		metadatei.PersistentParserContext
 		SetKennungLike(kennung.Kennung) error
 	}
 
 	Formatter interface {
-		FormatPersistentMetadatei(io.Writer, FormatterContext) (int64, error)
+		FormatPersistentMetadatei(
+			io.Writer,
+			FormatterContext,
+			Options,
+		) (int64, error)
 	}
 
 	Parser interface {
-		ParsePersistentMetadatei(io.Reader, ParserContext) (int64, error)
+		ParsePersistentMetadatei(
+			io.Reader,
+			ParserContext,
+			Options,
+		) (int64, error)
 	}
 
 	Format interface {
@@ -42,19 +45,8 @@ type (
 	}
 )
 
-func BestandsaufnahmeFormatIncludeTaiVerzeichnisse() Format {
-	return v3{
-		includeTai:           true,
-		includeVerzeichnisse: true,
-	}
-}
-
-func BestandsaufnahmeFormatIncludeTai() Format {
-	return v3{includeTai: true}
-}
-
-func BestandsaufnahmeFormatExcludeTai() Format {
-	return v3{}
+func Default() Format {
+	return v4{}
 }
 
 func FormatForVersion(v schnittstellen.StoreVersion) Format {
@@ -68,8 +60,11 @@ func FormatForVersion(v schnittstellen.StoreVersion) Format {
 	case 2:
 		return v2{}
 
+	case 3:
+		return v3{}
+
 	default:
-		return v3{includeTai: true}
+		return v4{}
 	}
 }
 

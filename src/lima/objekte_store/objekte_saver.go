@@ -17,12 +17,14 @@ type ObjekteSaver interface {
 type objekteSaver struct {
 	writerFactory schnittstellen.ObjekteWriterFactory
 	formatter     objekte_format.Format
+	options       objekte_format.Options
 }
 
 func MakeObjekteSaver(
 	// TODO-P1 add objekte index
 	writerFactory schnittstellen.ObjekteWriterFactory,
 	pmf objekte_format.Format,
+	op objekte_format.Options,
 ) ObjekteSaver {
 	if writerFactory == nil {
 		panic("schnittstellen.ObjekteWriterFactory was nil")
@@ -35,6 +37,7 @@ func MakeObjekteSaver(
 	return objekteSaver{
 		writerFactory: writerFactory,
 		formatter:     pmf,
+		options:       op,
 	}
 }
 
@@ -50,7 +53,7 @@ func (h objekteSaver) SaveObjekte(
 
 	defer errors.DeferredCloser(&err, w)
 
-	if _, err = h.formatter.FormatPersistentMetadatei(w, tl); err != nil {
+	if _, err = h.formatter.FormatPersistentMetadatei(w, tl, h.options); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -82,10 +85,8 @@ func (h objekteSaver) SaveObjekteIncludeTai(
 
 	if _, err = h.formatter.FormatPersistentMetadatei(
 		w,
-		objekte_format.MakeFormatterContextIncludeTai(
-			tl,
-			true,
-		),
+		tl,
+		objekte_format.Options{IncludeTai: true},
 	); err != nil {
 		err = errors.Wrap(err)
 		return

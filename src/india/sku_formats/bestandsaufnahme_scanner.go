@@ -21,17 +21,20 @@ type FormatBestandsaufnahmeScanner interface {
 func MakeFormatBestandsaufnahmeScanner(
 	in io.Reader,
 	of objekte_format.Format,
+	op objekte_format.Options,
 ) FormatBestandsaufnahmeScanner {
 	return &bestandsaufnahmeScanner{
-		br:     ohio.MakeBoundaryReader(in, metadatei.Boundary+"\n"),
-		format: of,
-		es:     kennung.MakeEtikettMutableSet(),
+		br:      ohio.MakeBoundaryReader(in, metadatei.Boundary+"\n"),
+		format:  of,
+		options: op,
+		es:      kennung.MakeEtikettMutableSet(),
 	}
 }
 
 type bestandsaufnahmeScanner struct {
 	br         ohio.BoundaryReader
 	format     objekte_format.Format
+	options    objekte_format.Options
 	afterFirst bool
 
 	m  metadatei.Metadatei
@@ -85,7 +88,7 @@ func (f *bestandsaufnahmeScanner) Scan() (ok bool) {
 
 	var h sku.Holder
 
-	n1, f.err = f.format.ParsePersistentMetadatei(f.br, &h)
+	n1, f.err = f.format.ParsePersistentMetadatei(f.br, &h, f.options)
 	f.lastN += n1
 
 	if errors.IsEOF(f.err) {
@@ -106,7 +109,7 @@ func (f *bestandsaufnahmeScanner) Scan() (ok bool) {
 		return
 	}
 
-	if sku.CalculateAndSetSha(f.lastSku, f.format); f.err != nil {
+	if f.err = sku.CalculateAndSetSha(f.lastSku, f.format, f.options.SansVerzeichnisse()); f.err != nil {
 		f.err = errors.Wrap(f.err)
 		return
 	}

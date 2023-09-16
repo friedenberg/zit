@@ -13,14 +13,12 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 )
 
-type v3 struct {
-	includeTai           bool
-	includeVerzeichnisse bool
-}
+type v3 struct{}
 
 func (f v3) FormatPersistentMetadatei(
 	w1 io.Writer,
 	c FormatterContext,
+	o Options,
 ) (n int64, err error) {
 	m := c.GetMetadatei()
 
@@ -48,7 +46,7 @@ func (f v3) FormatPersistentMetadatei(
 	w.WriteKeySpaceValue("Gattung", c.GetKennungLike().GetGattung())
 	w.WriteKeySpaceValue("Kennung", c.GetKennungLike())
 
-	if f.includeTai {
+	if o.IncludeTai {
 		w.WriteKeySpaceValue("Tai", m.Tai)
 	}
 
@@ -56,7 +54,7 @@ func (f v3) FormatPersistentMetadatei(
 		w.WriteKeySpaceValue(gattung.Typ, m.GetTyp())
 	}
 
-	if f.includeVerzeichnisse {
+	if o.IncludeVerzeichnisse {
 		if m.Verzeichnisse.Archiviert.Bool() {
 			w.WriteKeySpaceValue(
 				"Verzeichnisse-Archiviert",
@@ -97,13 +95,14 @@ func (f v3) FormatPersistentMetadatei(
 func (f v3) ParsePersistentMetadatei(
 	r1 io.Reader,
 	c ParserContext,
+	o Options,
 ) (n int64, err error) {
 	m := c.GetMetadatei()
 
 	etiketten := kennung.MakeEtikettMutableSet()
 	var etikettenExpanded, etikettenImplicit kennung.EtikettMutableSet
 
-	if f.includeVerzeichnisse {
+	if o.IncludeVerzeichnisse {
 		etikettenExpanded = kennung.MakeEtikettMutableSet()
 		etikettenImplicit = kennung.MakeEtikettMutableSet()
 	}
@@ -203,7 +202,7 @@ func (f v3) ParsePersistentMetadatei(
 			}
 
 		case "Verzeichnisse-Etikett-Implicit":
-			if !f.includeVerzeichnisse {
+			if !o.IncludeVerzeichnisse {
 				err = errors.Errorf(
 					"format specifies not to include Verzeichnisse but found %q",
 					key,
@@ -220,7 +219,7 @@ func (f v3) ParsePersistentMetadatei(
 			}
 
 		case "Verzeichnisse-Etikett-Expanded":
-			if !f.includeVerzeichnisse {
+			if !o.IncludeVerzeichnisse {
 				err = errors.Errorf(
 					"format specifies not to include Verzeichnisse but found %q",
 					key,
@@ -249,7 +248,7 @@ func (f v3) ParsePersistentMetadatei(
 
 	m.Etiketten = etiketten
 
-	if f.includeVerzeichnisse {
+	if o.IncludeVerzeichnisse {
 		m.Verzeichnisse.ImplicitEtiketten = etikettenImplicit
 		m.Verzeichnisse.ExpandedEtiketten = etikettenExpanded
 	}

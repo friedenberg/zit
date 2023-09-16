@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/etikett_akte"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/india/transaktion"
@@ -110,6 +111,7 @@ func makeEtikettStore(
 		},
 		sa.GetAbbrStore(),
 		sa.GetPersistentMetadateiFormat(),
+		objekte_format.Options{IncludeTai: true},
 		sa,
 	)
 

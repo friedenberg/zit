@@ -16,6 +16,7 @@ import (
 type formatAkte struct {
 	orfg                      schnittstellen.ObjekteReaderFactoryGetter
 	persistentMetadateiFormat objekte_format.Format
+	options                   objekte_format.Options
 	af                        schnittstellen.AkteIOFactory
 }
 
@@ -40,7 +41,7 @@ func (f formatAkte) ParseAkte(
 
 			orf := f.orfg.ObjekteReaderFactory(sk)
 
-			if err = sku.ReadFromSha(sk, orf, f.persistentMetadateiFormat); err != nil {
+			if err = sku.ReadFromSha(sk, orf, f.persistentMetadateiFormat, f.options); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

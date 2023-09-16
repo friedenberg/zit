@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/erworben"
 	"github.com/friedenberg/zit/src/india/matcher"
@@ -138,6 +139,7 @@ func (s konfigStore) Update(
 	if _, err = s.StoreUtil.GetPersistentMetadateiFormat().FormatPersistentMetadatei(
 		ow,
 		kt,
+		objekte_format.Options{IncludeTai: true},
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -281,6 +283,7 @@ func (s konfigStore) ReadOne(
 			if _, err = s.StoreUtil.GetPersistentMetadateiFormat().ParsePersistentMetadatei(
 				r,
 				tt,
+				objekte_format.Options{IncludeTai: true},
 			); err != nil {
 				err = errors.Wrap(err)
 				return

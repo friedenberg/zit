@@ -118,6 +118,7 @@ func makeCommonStore[
 			sa,
 			akteFormat,
 			sa.GetPersistentMetadateiFormat(),
+			objekte_format.Options{IncludeTai: true},
 		),
 	}
 

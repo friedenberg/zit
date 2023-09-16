@@ -183,7 +183,11 @@ func (zp *Page) copy(
 	if zp.useBestandsaufnahmeForVerzeichnisse {
 		dec := sku_formats.MakeFormatBestandsaufnahmeScanner(
 			r,
-			objekte_format.BestandsaufnahmeFormatIncludeTaiVerzeichnisse(),
+			objekte_format.Default(),
+			objekte_format.Options{
+				IncludeTai:           true,
+				IncludeVerzeichnisse: true,
+			},
 		)
 
 		getOneSku = func() (sk sku.SkuLikePtr, err error) {
@@ -251,7 +255,11 @@ func (zp *Page) getFuncWriteOne(
 	if zp.useBestandsaufnahmeForVerzeichnisse {
 		enc := sku_formats.MakeFormatBestandsaufnahmePrinter(
 			w,
-			objekte_format.BestandsaufnahmeFormatIncludeTaiVerzeichnisse(),
+			objekte_format.Default(),
+			objekte_format.Options{
+				IncludeTai:           true,
+				IncludeVerzeichnisse: true,
+			},
 		)
 
 		return func(z *transacted.Zettel) (err error) {

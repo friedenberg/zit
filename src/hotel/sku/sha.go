@@ -1,8 +1,11 @@
 package sku
 
 import (
+	"strings"
+
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 )
@@ -10,16 +13,17 @@ import (
 func CalculateAndConfirmSha(
 	sk SkuLikePtr,
 	format objekte_format.Formatter,
+	o objekte_format.Options,
 	sh schnittstellen.ShaLike,
 ) (err error) {
-	if err = CalculateAndSetSha(sk, format); err != nil {
+	if err = CalculateAndSetSha(sk, format, o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	if !sk.GetObjekteSha().EqualsSha(sh) {
 		err = errors.Errorf(
-			"expected sha %s but got %s",
+			"expected sha %q but got %q",
 			sh,
 			sk.GetObjekteSha(),
 		)
@@ -35,15 +39,18 @@ func CalculateAndConfirmSha(
 func CalculateAndSetSha(
 	sk SkuLikePtr,
 	format objekte_format.Formatter,
+	o objekte_format.Options,
 ) (err error) {
-	w := sha.MakeWriter(nil)
+	var sb strings.Builder
+	w := sha.MakeWriter(&sb)
 
-	if _, err = format.FormatPersistentMetadatei(w, sk); err != nil {
+	if _, err = format.FormatPersistentMetadatei(w, sk, o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	sh := w.GetShaLike()
+	log.Log().Printf("%q -> %q", sh, sb.String())
 	sk.SetObjekteSha(sh)
 
 	return
@@ -53,6 +60,7 @@ func ReadFromSha(
 	sk SkuLikePtr,
 	orf schnittstellen.ObjekteReaderFactory,
 	format objekte_format.Format,
+	o objekte_format.Options,
 ) (err error) {
 	expected := sk.GetObjekteSha()
 
@@ -65,7 +73,7 @@ func ReadFromSha(
 
 	defer errors.DeferredCloser(&err, or)
 
-	if _, err = format.ParsePersistentMetadatei(or, sk); err != nil {
+	if _, err = format.ParsePersistentMetadatei(or, sk, o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

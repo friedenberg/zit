@@ -214,7 +214,6 @@ func (z *Metadatei) ResetWith(z1 Metadatei) {
 	z.Verzeichnisse.ResetWith(&z1.Verzeichnisse)
 
 	z.Typ = z1.Typ
-	// z.Gattung = z1.Gattung
 	z.Tai = z1.Tai
 }
 

@@ -154,9 +154,10 @@ func (fv *FormatterValue) FuncFormatter(
 
 	case "objekte":
 		f := objekte_format.FormatForVersion(k.GetStoreVersion())
+		op := objekte_format.Options{}
 
 		return func(o *transacted.Zettel) (err error) {
-			if _, err = f.FormatPersistentMetadatei(out, o); err != nil {
+			if _, err = f.FormatPersistentMetadatei(out, o, op); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

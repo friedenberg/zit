@@ -89,6 +89,51 @@ function import_twice_no_dupes_one_zettel { # @test
 	EOM
 }
 
+function import_conflict { # @test
+	skip
+	run_zit show -format bestandsaufnahme one/uno+
+	assert_success
+	echo -n "$output" >besties
+
+	besties="$(realpath besties)"
+	akten="$(realpath .zit/Objekten2/Akten)"
+
+	wd1="$(mktemp -d)"
+	cd "$wd1" || exit 1
+
+	run_zit_init
+	run_zit new -edit=false - <<-EOM
+		---
+		# get out of here!
+		- scary
+		! md
+		---
+
+		ouch a conflict!
+	EOM
+	assert_success
+	assert_output - <<-EOM
+		[-scary@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[one/uno@81c3b19e19b4dd2d8e69f413cd253c67c861ec0066e30f90be23ff62fb7b0cf5 !md "get out of here!" scary]
+	EOM
+
+	run_zit import -bestandsaufnahme "$besties" -akten "$akten" -compression-type none
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[one/uno@11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
+		[one/uno@3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
+		copied Akte 11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 (10 bytes)
+		copied Akte 3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 (27 bytes)
+	EOM
+
+	run_zit import -bestandsaufnahme "$besties" -akten "$akten" -compression-type none
+
+	assert_output_unsorted - <<-EOM
+		[!md@102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
+		[one/uno@11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
+	EOM
+}
+
 function import_twice_no_dupes { # @test
 	run_zit show -format bestandsaufnahme +:z,e,t,k
 	assert_success

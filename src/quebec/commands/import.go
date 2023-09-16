@@ -12,6 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/age_io"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/kennung_index"
+	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/sku_formats"
 	"github.com/friedenberg/zit/src/kilo/bestandsaufnahme"
@@ -68,6 +69,7 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	bf := bestandsaufnahme.MakeAkteFormat(
 		u.Konfig().GetStoreVersion(),
+		objekte_format.Options{IncludeTai: true},
 	)
 
 	var rc io.ReadCloser

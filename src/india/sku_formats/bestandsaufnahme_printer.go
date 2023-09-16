@@ -12,6 +12,7 @@ import (
 
 type bestandsaufnahmePrinter struct {
 	format            objekte_format.Formatter
+	options           objekte_format.Options
 	out               io.Writer
 	firstBoundaryOnce *sync.Once
 }
@@ -23,9 +24,11 @@ type FormatBestandsaufnahmePrinter interface {
 func MakeFormatBestandsaufnahmePrinter(
 	out io.Writer,
 	of objekte_format.Formatter,
+	op objekte_format.Options,
 ) FormatBestandsaufnahmePrinter {
 	return bestandsaufnahmePrinter{
 		format:            of,
+		options:           op,
 		out:               out,
 		firstBoundaryOnce: &sync.Once{},
 	}
@@ -56,7 +59,7 @@ func (f bestandsaufnahmePrinter) Print(
 	pfs := [3]func() (int64, error){
 		f.printFirstBoundary,
 		func() (int64, error) {
-			return f.format.FormatPersistentMetadatei(f.out, tlp)
+			return f.format.FormatPersistentMetadatei(f.out, tlp, f.options)
 		},
 		f.printBoundary,
 	}

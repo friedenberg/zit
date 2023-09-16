@@ -47,6 +47,7 @@ func MakeStoredParseSaver[
 	awf schnittstellen.AkteIOFactory,
 	akteParser objekte.AkteParser[OPtr],
 	pmf objekte_format.Format,
+	op objekte_format.Options,
 ) storedParserSaver[O, OPtr, K, KPtr] {
 	if akteParser == nil {
 		akteParser = objekte.MakeNopAkteParseSaver[O, OPtr](awf)
@@ -62,6 +63,7 @@ func MakeStoredParseSaver[
 		objekteSaver: MakeObjekteSaver(
 			owf,
 			pmf,
+			op,
 		),
 	}
 }

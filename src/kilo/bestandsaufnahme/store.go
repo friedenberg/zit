@@ -53,6 +53,7 @@ type store struct {
 	af                        schnittstellen.AkteIOFactory
 	pool                      schnittstellen.Pool[Akte, *Akte]
 	persistentMetadateiFormat objekte_format.Format
+	options                   objekte_format.Options
 	formatAkte                akteFormat
 	objekte_store.ObjekteSaver
 	AkteTextSaver
@@ -70,15 +71,17 @@ func MakeStore(
 	p := pool.MakePoolWithReset[Akte]()
 
 	var fa akteFormat
+	op := objekte_format.Options{IncludeTai: true}
 
 	switch sv.GetInt() {
 	case 3:
-		fa = MakeAkteFormat(sv)
+		fa = MakeAkteFormat(sv, op)
 
 	default:
 		fa = formatAkte{
 			orfg:                      orfg,
 			persistentMetadateiFormat: pmf,
+			options:                   op,
 			af:                        af,
 		}
 	}
@@ -91,8 +94,9 @@ func MakeStore(
 		af:                        af,
 		pool:                      p,
 		persistentMetadateiFormat: pmf,
+		options:                   op,
 		formatAkte:                fa,
-		ObjekteSaver:              objekte_store.MakeObjekteSaver(of, pmf),
+		ObjekteSaver:              objekte_store.MakeObjekteSaver(of, pmf, op),
 		AkteTextSaver: objekte_store.MakeAkteTextSaver[
 			Akte,
 			*Akte,
@@ -181,6 +185,7 @@ func (s *store) ReadOne(
 	if _, err = s.persistentMetadateiFormat.ParsePersistentMetadatei(
 		or,
 		o,
+		s.options,
 	); err != nil {
 		if errors.IsEOF(err) {
 			err = nil
@@ -190,12 +195,45 @@ func (s *store) ReadOne(
 		}
 	}
 
+	op := s.options
+
 	switch s.sv.GetInt() {
 	case 0, 1, 2:
 		o.SetObjekteSha(sh)
 
+	case 3:
+		err = sku.CalculateAndConfirmSha(
+			o,
+			s.persistentMetadateiFormat,
+			op,
+			sh,
+		)
+
+		if err != nil {
+			op.IncludeTai = false
+
+			err = sku.CalculateAndConfirmSha(
+				o,
+				s.persistentMetadateiFormat,
+				op,
+				sh,
+			)
+
+			if err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+
 	default:
-		if err = sku.CalculateAndConfirmSha(o, s.persistentMetadateiFormat, sh); err != nil {
+		err = sku.CalculateAndConfirmSha(
+			o,
+			s.persistentMetadateiFormat,
+			op,
+			sh,
+		)
+
+		if err != nil {
 			err = errors.Wrap(err)
 			return
 		}
