@@ -122,9 +122,7 @@ func (s konfigStore) Update(
 
 	// TODO-P3 refactor into reusable
 	if mutter != nil {
-		kt.Kopf = mutter.Kopf
-	} else {
-		kt.Kopf = s.StoreUtil.GetTai()
+		kt.Metadatei.Verzeichnisse.Mutter = mutter.Metadatei.Verzeichnisse.Sha
 	}
 
 	var ow sha.WriteCloser

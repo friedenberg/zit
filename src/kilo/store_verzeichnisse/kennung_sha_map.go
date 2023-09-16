@@ -16,7 +16,7 @@ func (ksm KennungShaMap) ModifyMutter(z *transacted.Zettel) (err error) {
 		return
 	}
 
-	z.GetMetadateiPtr().Verzeichnisse.Mutter[0] = old
+	z.GetMetadateiPtr().Verzeichnisse.Mutter = old
 
 	return
 }

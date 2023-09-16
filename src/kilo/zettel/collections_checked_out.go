@@ -17,7 +17,6 @@ type CheckedOutUniqueKeyer struct{}
 
 func (k CheckedOutUniqueKeyer) GetKey(sz checked_out.Zettel) string {
 	return collections.MakeKey(
-		sz.Internal.Kopf,
 		sz.Internal.GetTai(),
 		sz.Internal.GetKennung(),
 		sz.Internal.ObjekteSha,

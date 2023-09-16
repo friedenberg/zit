@@ -190,25 +190,11 @@ func (f v4) FormatPersistentMetadatei(
 			}
 		}
 
-		if !m.Verzeichnisse.Mutter[0].IsNull() {
+		if !m.Verzeichnisse.Mutter.IsNull() {
 			n1, err = ohio.WriteKeySpaceValueNewline(
 				mw,
 				"Verzeichnisse-Mutter",
-				m.Verzeichnisse.Mutter[0].String(),
-			)
-			n += int64(n1)
-
-			if err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-		}
-
-		if !m.Verzeichnisse.Mutter[1].IsNull() {
-			n1, err = ohio.WriteKeySpaceValueNewline(
-				mw,
-				"Verzeichnisse-Mutter",
-				m.Verzeichnisse.Mutter[1].String(),
+				m.Verzeichnisse.Mutter.String(),
 			)
 			n += int64(n1)
 
@@ -407,18 +393,7 @@ func (f v4) ParsePersistentMetadatei(
 			}
 
 		case "Verzeichnisse-Mutter":
-			var sh *sha.Sha
-
-			if m.Verzeichnisse.Mutter[0].IsNull() {
-				sh = &m.Verzeichnisse.Mutter[0]
-			} else if m.Verzeichnisse.Mutter[1].IsNull() {
-				sh = &m.Verzeichnisse.Mutter[1]
-			} else {
-				err = errors.Errorf("have more than two Mutter's. Last Mutter: %q", val)
-				return
-			}
-
-			if err = sh.Set(val); err != nil {
+			if err = m.Verzeichnisse.Mutter.Set(val); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

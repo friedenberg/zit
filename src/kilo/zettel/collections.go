@@ -2,6 +2,7 @@ package zettel
 
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/delta/heap"
@@ -20,6 +21,16 @@ func MakeHeapTransacted() HeapTransacted {
 	)
 }
 
+func MakeHeapTransactedReversed() HeapTransacted {
+	return heap.Make[transacted.Zettel, *transacted.Zettel](
+		sku.Equaler[transacted.Zettel, *transacted.Zettel]{},
+		values.ReverseLessor[transacted.Zettel, *transacted.Zettel]{
+			Inner: sku.Lessor[transacted.Zettel, *transacted.Zettel]{},
+		},
+		sku.Resetter[transacted.Zettel, *transacted.Zettel]{},
+	)
+}
+
 type (
 	MutableSet = schnittstellen.MutableSetLike[*transacted.Zettel]
 )
@@ -32,7 +43,6 @@ func (tk TransactedUniqueKeyer) GetKey(sz *transacted.Zettel) string {
 	}
 
 	return collections.MakeKey(
-		sz.Kopf,
 		sz.GetTai(),
 		sz.TransactionIndex,
 		sz.GetKennung(),

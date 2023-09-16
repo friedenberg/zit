@@ -617,7 +617,6 @@ func (s *zettelStore) writeObjekte(
 	tz = &transacted.Zettel{
 		Kennung:   h,
 		Metadatei: m,
-		Kopf:      m.Tai,
 	}
 
 	if err = s.SaveObjekte(tz); err != nil {

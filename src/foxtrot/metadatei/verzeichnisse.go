@@ -10,8 +10,8 @@ type Verzeichnisse struct {
 	Archiviert        values.Bool
 	ExpandedEtiketten kennung.EtikettSet
 	ImplicitEtiketten kennung.EtikettSet
-	Mutter            [2]sha.Sha // shas of parent Metadatei
-	Sha               sha.Sha    // sha of Metadatei
+	Mutter            sha.Sha // sha of parent Metadatei
+	Sha               sha.Sha // sha of Metadatei
 }
 
 func (v *Verzeichnisse) GetExpandedEtiketten() kennung.EtikettSet {
@@ -34,8 +34,7 @@ func (v *Verzeichnisse) Reset() {
 	v.Archiviert.Reset()
 	v.ImplicitEtiketten = kennung.EtikettSetEmpty
 	v.ExpandedEtiketten = kennung.EtikettSetEmpty
-	v.Mutter[0].Reset()
-	v.Mutter[1].Reset()
+	v.Mutter.Reset()
 	v.Sha.Reset()
 }
 

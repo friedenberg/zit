@@ -269,7 +269,7 @@ func (s Transacted[K, KPtr]) GetGattung() schnittstellen.GattungLike {
 }
 
 func (s *Transacted[K, KPtr]) IsNew() bool {
-	return s.Kopf.Equals(s.GetTai())
+	return s.Metadatei.Verzeichnisse.Mutter.IsNull()
 }
 
 func (s *Transacted[K, KPtr]) SetObjekteSha(v schnittstellen.ShaLike) {
