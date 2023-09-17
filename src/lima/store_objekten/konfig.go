@@ -67,10 +67,6 @@ func makeKonfigStore(
 		s.akteFormat,
 	)
 
-	if s.commonStore.ObjekteSaver == nil {
-		panic("ObjekteSaver is nil")
-	}
-
 	if err != nil {
 		err = errors.Wrap(err)
 		return

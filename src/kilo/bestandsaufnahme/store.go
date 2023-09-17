@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/pool"
 	"github.com/friedenberg/zit/src/charlie/sha"
@@ -20,7 +21,6 @@ import (
 )
 
 type Store interface {
-	objekte_store.ObjekteSaver
 	AkteTextSaver
 	Create(*Akte) error
 	objekte_store.LastReader[*Transacted]
@@ -55,7 +55,6 @@ type store struct {
 	persistentMetadateiFormat objekte_format.Format
 	options                   objekte_format.Options
 	formatAkte                akteFormat
-	objekte_store.ObjekteSaver
 	AkteTextSaver
 }
 
@@ -96,7 +95,6 @@ func MakeStore(
 		persistentMetadateiFormat: pmf,
 		options:                   op,
 		formatAkte:                fa,
-		ObjekteSaver:              objekte_store.MakeObjekteSaver(of, pmf, op),
 		AkteTextSaver: objekte_store.MakeAkteTextSaver[
 			Akte,
 			*Akte,
@@ -143,10 +141,33 @@ func (s *store) Create(o *Akte) (err error) {
 	t.Kennung = tai
 	t.SetTai(tai)
 
-	if err = s.SaveObjekteIncludeTai(t); err != nil {
+	var w sha.WriteCloser
+
+	if w, err = s.of.ObjekteWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	defer errors.DeferredCloser(&err, w)
+
+	if _, err = s.persistentMetadateiFormat.FormatPersistentMetadatei(
+		w,
+		t,
+		objekte_format.Options{IncludeTai: true},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	sh = sha.Make(w.GetShaLike())
+
+	log.Log().Printf(
+		"saving Bestandsaufnahme with tai: %s -> %s",
+		t.GetKennungLike().GetGattung(),
+		sh,
+	)
+
+	t.SetObjekteSha(sh)
 
 	return
 }

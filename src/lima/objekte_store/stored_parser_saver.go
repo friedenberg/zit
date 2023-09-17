@@ -32,9 +32,8 @@ type storedParserSaver[
 	K kennung.KennungLike[K],
 	KPtr kennung.KennungLikePtr[K],
 ] struct {
-	awf          schnittstellen.AkteWriterFactory
-	akteParser   objekte.AkteParser[OPtr]
-	objekteSaver ObjekteSaver
+	awf        schnittstellen.AkteWriterFactory
+	akteParser objekte.AkteParser[OPtr]
 }
 
 func MakeStoredParseSaver[
@@ -60,11 +59,6 @@ func MakeStoredParseSaver[
 	return storedParserSaver[O, OPtr, K, KPtr]{
 		awf:        awf,
 		akteParser: akteParser,
-		objekteSaver: MakeObjekteSaver(
-			owf,
-			pmf,
-			op,
-		),
 	}
 }
 
@@ -111,11 +105,6 @@ func (h storedParserSaver[O, OPtr, K, KPtr]) ParseSaveStored(
 	}
 
 	t.SetAkteSha(readerSha)
-
-	if err = h.objekteSaver.SaveObjekte(t); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
 
 	return
 }

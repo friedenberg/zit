@@ -18,7 +18,6 @@ import (
 type gattungStoreLike interface {
 	reindexer
 	schnittstellen.ObjekteIOFactory
-	objekte_store.ObjekteSaver
 	GetInheritor(
 		schnittstellen.ObjekteReaderFactory,
 		schnittstellen.AkteReaderFactory,
@@ -108,8 +107,6 @@ type commonStoreBase[
 
 	persistentMetadateiFormat objekte_format.Format
 
-	objekte_store.ObjekteSaver
-
 	textParser metadatei.TextParser
 
 	akteFormat objekte.AkteFormat[O, OPtr]
@@ -175,11 +172,6 @@ func makeCommonStoreBase[
 		),
 		TransactedReader:          tr,
 		persistentMetadateiFormat: pmf,
-		ObjekteSaver: objekte_store.MakeObjekteSaver(
-			of,
-			pmf,
-			objekte_format.Options{IncludeTai: true},
-		),
 		textParser: metadatei.MakeTextParser(
 			sa,
 			nil, // TODO-P1 make akteFormatter
