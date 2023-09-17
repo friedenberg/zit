@@ -200,7 +200,7 @@ func (s *zettelStore) ReadOneExternal(
 
 	switch m {
 	case checkout_mode.ModeAkteOnly:
-		if err = s.readOneExternalAkte(&ez, t); err != nil {
+		if err = s.ReadOneExternalAkte(&ez, t); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

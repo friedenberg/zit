@@ -41,6 +41,7 @@ type (
 		metadatei.GetterPtr
 		metadatei.Setter
 
+		SetAkteSha(schnittstellen.ShaLike)
 		SetObjekteSha(schnittstellen.ShaLike)
 
 		SetTai(kennung.Tai)

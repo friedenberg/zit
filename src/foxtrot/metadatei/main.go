@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/etikett_rule"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
@@ -138,6 +139,10 @@ func (z Metadatei) GetEtiketten() kennung.EtikettSet {
 	}
 
 	return z.Etiketten
+}
+
+func (z *Metadatei) SetAkteSha(sh schnittstellen.ShaLike) {
+	z.AkteSha = sha.Make(sh)
 }
 
 func (z Metadatei) GetTyp() kennung.Typ {
