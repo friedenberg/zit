@@ -74,16 +74,16 @@ func MakeStore(
 	op := objekte_format.Options{IncludeTai: true}
 
 	switch sv.GetInt() {
-	case 3:
-		fa = MakeAkteFormat(sv, op)
-
-	default:
+	case 1, 2:
 		fa = formatAkte{
 			orfg:                      orfg,
 			persistentMetadateiFormat: pmf,
 			options:                   op,
 			af:                        af,
 		}
+
+	default:
+		fa = MakeAkteFormat(sv, op)
 	}
 
 	s = &store{
