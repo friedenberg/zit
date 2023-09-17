@@ -31,7 +31,7 @@ func (u *Umwelt) StringFormatWriterShaLike(
 func (u *Umwelt) StringFormatWriterKennung(
 	co string_format_writer.ColorOptions,
 ) schnittstellen.StringFormatWriter[kennung.KennungPtr] {
-	return kennung.MakeKennungCliFormat(
+	return kennung_fmt.MakeKennungCliFormat(
 		u.konfig.PrintOptions,
 		co,
 		u.MakeKennungExpanders(),
@@ -41,7 +41,7 @@ func (u *Umwelt) StringFormatWriterKennung(
 func (u *Umwelt) StringFormatWriterTyp(
 	co string_format_writer.ColorOptions,
 ) schnittstellen.StringFormatWriter[*kennung.Typ] {
-	return kennung.MakeTypCliFormat(co)
+	return kennung_fmt.MakeTypCliFormat(co)
 }
 
 func (u *Umwelt) StringFormatWriterBezeichnung(
@@ -53,7 +53,7 @@ func (u *Umwelt) StringFormatWriterBezeichnung(
 func (u *Umwelt) StringFormatWriterEtiketten(
 	co string_format_writer.ColorOptions,
 ) schnittstellen.StringFormatWriter[kennung.EtikettSet] {
-	return kennung.MakeEtikettenCliFormat()
+	return kennung_fmt.MakeEtikettenCliFormat()
 }
 
 func (u *Umwelt) StringFormatWriterSkuLikePtr() schnittstellen.StringFormatWriter[sku.SkuLikePtr] {
@@ -109,7 +109,7 @@ func (u *Umwelt) PrinterTransactedLike() schnittstellen.FuncIter[sku.SkuLikePtr]
 
 func (u *Umwelt) PrinterFileNotRecognized() schnittstellen.FuncIter[*kennung.FD] {
 	p := kennung_fmt.MakeFileNotRecognizedStringWriterFormat(
-		kennung.MakeFDCliFormat(
+		kennung_fmt.MakeFDCliFormat(
 			u.FormatColorOptions(),
 			u.standort.MakeRelativePathStringFormatWriter(),
 		),
@@ -126,7 +126,7 @@ func (u *Umwelt) PrinterFileNotRecognized() schnittstellen.FuncIter[*kennung.FD]
 func (u *Umwelt) PrinterFDDeleted() schnittstellen.FuncIter[*kennung.FD] {
 	p := kennung_fmt.MakeFDDeletedStringWriterFormat(
 		u.Konfig().DryRun,
-		kennung.MakeFDCliFormat(
+		kennung_fmt.MakeFDCliFormat(
 			u.FormatColorOptions(),
 			u.standort.MakeRelativePathStringFormatWriter(),
 		),
@@ -153,7 +153,7 @@ func (u *Umwelt) PrinterCheckedOutLike() schnittstellen.FuncIter[objekte.Checked
 	p := objekte.MakeCliFormat(
 		objekte.CliOptions{},
 		u.StringFormatWriterShaLike(co),
-		kennung.MakeFDCliFormat(
+		kennung_fmt.MakeFDCliFormat(
 			co,
 			u.standort.MakeRelativePathStringFormatWriter(),
 		),
