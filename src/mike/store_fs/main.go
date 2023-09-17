@@ -67,81 +67,6 @@ func (s Store) Flush() (err error) {
 	return
 }
 
-// Methods
-// ReadOne
-// ReadMany
-// ReadManyHistory
-// func (s *Store) ReadOne(h kennung.Hinweis) (zt *zettel.Transacted, err error)
-// {
-// 	errors.TodoP1("include cwd sigil")
-// 	if zt, err = s.storeObjekten.Zettel().ReadOne(&h); err != nil {
-// 		err = errors.Wrap(err)
-// 		return
-// 	}
-
-// 	if !s.erworben.IncludeCwd {
-// 		return
-// 	}
-
-// 	var pz cwd.CwdFiles
-
-// 	if pz, err = cwd.MakeCwdFilesExactly(
-// 		s.erworben,
-// 		s.Standort.Cwd(),
-// 		fmt.Sprintf("%s.%s", h, s.erworben.FileExtensions.Zettel),
-// 	); err != nil {
-// 		if errors.IsNotExist(err) {
-// 			err = nil
-// 		} else {
-// 			err = errors.Wrap(err)
-// 		}
-
-// 		return
-// 	}
-
-// 	var checked_out zettel.CheckedOut
-
-// 	var readFunc func() (zettel.External, error)
-
-// 	p := pz.Zettelen.Any()
-
-// 	switch {
-// 	case p.GetAkteFD().Path == "":
-// 		readFunc = func() (zettel.External, error) {
-// 			return
-// s.storeObjekten.Zettel().ReadOneExternal.Read(p.GetObjekteFD().Path)
-// 		}
-
-// 	case p.GetObjekteFD().Path == "":
-// 		readFunc = func() (zettel.CheckedOut, error) {
-// 			return s.ReadExternalZettelFromAktePath(p.GetAkteFD().Path)
-// 		}
-
-// 	default:
-// 		// TODO-P3 validate that the zettel file points to the akte in the
-// metadatei
-// 		readFunc = func() (zettel.CheckedOut, error) {
-// 			return s.Read(p.GetObjekteFD().Path)
-// 		}
-// 	}
-
-// 	if checked_out, err = readFunc(); err != nil {
-// 		if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
-// 			err = nil
-// 		} else {
-// 			err = errors.Wrap(err)
-// 		}
-
-// 		return
-// 	}
-
-// 	zt.Sku = checked_out.External.Sku.Transacted()
-// 	zt.Objekte = checked_out.External.Objekte
-// 	zt.Sku.Schwanz = s.sonnenaufgang
-
-// 	return
-// }
-
 func (s *Store) ReadFiles(
 	fs *cwd.CwdFiles,
 	ms matcher.Query,
@@ -370,18 +295,3 @@ func (s *Store) ReadFiles(
 
 	return
 }
-
-// if cz.State > checked_out_state.StateExistsAndSame {
-// TODO-P4 rewrite with verzeichnisseAll
-// exSha := cz.External.Sku.Sha
-// cz.Matches.Zettelen, _ = s.storeObjekten.ReadZettelSha(exSha)
-// cz.Matches.Zettelen, _ = cz.Matches.Zettelen.Filter(nil, filter)
-
-// exAkteSha := cz.External.Objekte.Akte
-// cz.Matches.Akten, _ = s.storeObjekten.ReadAkteSha(exAkteSha)
-// cz.Matches.Akten, _ = cz.Matches.Akten.Filter(nil, filter)
-
-// bez := cz.External.Objekte.Bezeichnung.String()
-// cz.Matches.Bezeichnungen, _ = s.storeObjekten.ReadBezeichnung(bez)
-// cz.Matches.Bezeichnungen, _ = cz.Matches.Bezeichnungen.Filter(nil, filter)
-// }

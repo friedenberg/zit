@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/pool"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/india/sku_formats"
+	"github.com/friedenberg/zit/src/india/sku_fmt"
 	lua "github.com/yuin/gopher-lua"
 	lua_ast "github.com/yuin/gopher-lua/ast"
 	lua_parse "github.com/yuin/gopher-lua/parse"
@@ -85,7 +85,7 @@ func (matcher *matcherLua) ContainsMatchable(matchable Matchable) bool {
 	f := s.GetGlobal("contains_matchable")
 	s.Push(f)
 
-	sku_formats.Lua(
+	sku_fmt.Lua(
 		matchable.GetSkuLike(),
 		matcher.kennungIndex,
 		s.LState,

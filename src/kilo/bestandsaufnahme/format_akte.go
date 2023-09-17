@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/format"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/india/sku_formats"
+	"github.com/friedenberg/zit/src/india/sku_fmt"
 )
 
 type formatAkte struct {
@@ -79,7 +79,7 @@ func (f formatAkte) FormatParsedAkte(w io.Writer, o Akte) (n int64, err error) {
 
 		l := fmt.Sprintf(
 			"%s\n",
-			sku_formats.String(sk),
+			sku_fmt.String(sk),
 		)
 
 		if n1, err = bw.WriteString(l); err != nil {

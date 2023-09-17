@@ -1,4 +1,4 @@
-package store_fs
+package kennung_fmt
 
 import (
 	"io"

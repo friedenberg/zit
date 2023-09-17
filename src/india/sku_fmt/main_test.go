@@ -1,4 +1,4 @@
-package sku_formats
+package sku_fmt
 
 import (
 	"os"

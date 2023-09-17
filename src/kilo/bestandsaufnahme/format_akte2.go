@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/india/sku_formats"
+	"github.com/friedenberg/zit/src/india/sku_fmt"
 )
 
 type formatAkte2 struct {
@@ -30,7 +30,7 @@ func (f formatAkte2) ParseAkte(
 	r io.Reader,
 	o *Akte,
 ) (n int64, err error) {
-	dec := sku_formats.MakeFormatBestandsaufnahmeScanner(
+	dec := sku_fmt.MakeFormatBestandsaufnahmeScanner(
 		r,
 		f.objekteFormat,
 		f.options,
@@ -64,7 +64,7 @@ func (f formatAkte2) FormatParsedAkte(
 	bw := bufio.NewWriter(w)
 	defer errors.DeferredFlusher(&err, bw)
 
-	fo := sku_formats.MakeFormatBestandsaufnahmePrinter(
+	fo := sku_fmt.MakeFormatBestandsaufnahmePrinter(
 		bw,
 		f.objekteFormat,
 		f.options,

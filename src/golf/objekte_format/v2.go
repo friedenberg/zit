@@ -47,7 +47,7 @@ func (f v2) FormatPersistentMetadatei(
 func (f v2) ParsePersistentMetadatei(
 	r1 io.Reader,
 	c ParserContext,
-  _ Options,
+	_ Options,
 ) (n int64, err error) {
 	m := c.GetMetadatei()
 

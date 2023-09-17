@@ -14,7 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/india/sku_formats"
+	"github.com/friedenberg/zit/src/india/sku_fmt"
 	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 )
@@ -191,7 +191,7 @@ func (zp *Page) copy(
 	var getOneSku func() (sku.SkuLikePtr, error)
 
 	if zp.useBestandsaufnahmeForVerzeichnisse {
-		dec := sku_formats.MakeFormatBestandsaufnahmeScanner(
+		dec := sku_fmt.MakeFormatBestandsaufnahmeScanner(
 			r,
 			objekte_format.Default(),
 			objekte_format.Options{
@@ -263,7 +263,7 @@ func (zp *Page) getFuncWriteOne(
 	w io.Writer,
 ) schnittstellen.FuncIter[*transacted.Zettel] {
 	if zp.useBestandsaufnahmeForVerzeichnisse {
-		enc := sku_formats.MakeFormatBestandsaufnahmePrinter(
+		enc := sku_fmt.MakeFormatBestandsaufnahmePrinter(
 			w,
 			objekte_format.Default(),
 			objekte_format.Options{

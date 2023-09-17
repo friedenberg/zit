@@ -1,4 +1,4 @@
-package sku_formats
+package sku_fmt
 
 import (
 	"github.com/friedenberg/zit/src/echo/kennung"

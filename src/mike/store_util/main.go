@@ -37,6 +37,7 @@ type StoreUtil interface {
 	schnittstellen.AkteIOFactory
 	kennung.Clock
 
+	ReadOneExternalAkte(e sku.SkuLikeExternalPtr, t sku.SkuLikePtr) (err error)
 	CommitTransacted(sku.SkuLike) error
 	CommitUpdatedTransacted(sku.SkuLikePtr) error
 

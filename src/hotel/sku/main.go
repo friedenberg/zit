@@ -51,4 +51,15 @@ type (
 
 		GetSkuLikePtr() SkuLikePtr
 	}
+
+	SkuLikeExternalPtr interface {
+		SkuLikePtr
+
+		GetFDs() ExternalFDs
+		GetFDsPtr() *ExternalFDs
+		GetAkteFD() kennung.FD
+		GetAktePath() string
+
+		GetObjekteFD() kennung.FD
+	}
 )

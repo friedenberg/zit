@@ -7,10 +7,10 @@ import (
 	"github.com/friedenberg/zit/src/charlie/string_format_writer"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/kennung_fmt"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/india/sku_formats"
+	"github.com/friedenberg/zit/src/india/sku_fmt"
 	"github.com/friedenberg/zit/src/juliett/objekte"
-	"github.com/friedenberg/zit/src/mike/store_fs"
 )
 
 func (u *Umwelt) FormatColorOptions() (o string_format_writer.ColorOptions) {
@@ -59,7 +59,7 @@ func (u *Umwelt) StringFormatWriterEtiketten(
 func (u *Umwelt) StringFormatWriterSkuLikePtr() schnittstellen.StringFormatWriter[sku.SkuLikePtr] {
 	co := u.FormatColorOptions()
 
-	return sku_formats.MakeCliFormat(
+	return sku_fmt.MakeCliFormat(
 		u.konfig.PrintOptions,
 		u.StringFormatWriterShaLike(co),
 		u.StringFormatWriterKennung(co),
@@ -74,7 +74,7 @@ func (u *Umwelt) StringFormatWriterSkuLikePtrShort() schnittstellen.StringFormat
 		OffEntirely: true,
 	}
 
-	return sku_formats.MakeCliFormatShort(
+	return sku_fmt.MakeCliFormatShort(
 		u.StringFormatWriterShaLike(co),
 		u.StringFormatWriterKennung(co),
 		u.StringFormatWriterTyp(co),
@@ -108,7 +108,7 @@ func (u *Umwelt) PrinterTransactedLike() schnittstellen.FuncIter[sku.SkuLikePtr]
 }
 
 func (u *Umwelt) PrinterFileNotRecognized() schnittstellen.FuncIter[*kennung.FD] {
-	p := store_fs.MakeFileNotRecognizedStringWriterFormat(
+	p := kennung_fmt.MakeFileNotRecognizedStringWriterFormat(
 		kennung.MakeFDCliFormat(
 			u.FormatColorOptions(),
 			u.standort.MakeRelativePathStringFormatWriter(),
@@ -124,7 +124,7 @@ func (u *Umwelt) PrinterFileNotRecognized() schnittstellen.FuncIter[*kennung.FD]
 }
 
 func (u *Umwelt) PrinterFDDeleted() schnittstellen.FuncIter[*kennung.FD] {
-	p := store_fs.MakeFDDeletedStringWriterFormat(
+	p := kennung_fmt.MakeFDDeletedStringWriterFormat(
 		u.Konfig().DryRun,
 		kennung.MakeFDCliFormat(
 			u.FormatColorOptions(),

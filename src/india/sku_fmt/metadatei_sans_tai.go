@@ -1,4 +1,4 @@
-package sku_formats
+package sku_fmt
 
 import (
 	"strings"
@@ -8,12 +8,9 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
-func StringMetadatei(o sku.SkuLike) (str string) {
+func StringMetadateiSansTai(o sku.SkuLike) (str string) {
 	sb := &strings.Builder{}
 
-	sb.WriteString(o.GetTai().String())
-
-	sb.WriteString(" ")
 	sb.WriteString(o.GetGattung().GetGattungString())
 
 	sb.WriteString(" ")
