@@ -196,6 +196,18 @@ func Make(v string) (k Kennung, err error) {
 	return
 }
 
+func Equals(a, b Kennung) (ok bool) {
+	if a.GetGattung().GetGattungString() != b.GetGattung().GetGattungString() {
+		return
+	}
+
+	if a.String() != b.String() {
+		return
+	}
+
+	return true
+}
+
 func FormattedString(k KennungSansGattung) string {
 	sb := &strings.Builder{}
 	parts := k.Parts()
