@@ -210,11 +210,6 @@ func (c *CreateFromPaths) zettelsFromPath(
 		return
 	}
 
-	if err = c.StoreObjekten().Zettel().SaveObjekte(ze); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	if err = wf(ze); err != nil {
 		err = errors.Wrap(err)
 		return
