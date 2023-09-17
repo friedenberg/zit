@@ -196,7 +196,7 @@ func (fs CwdFiles) GetTyp(
 }
 
 func (fs CwdFiles) All(
-	f schnittstellen.FuncIter[sku.ExternalMaybeLike],
+	f schnittstellen.FuncIter[sku.ExternalMaybe],
 ) (err error) {
 	wg := iter.MakeErrorWaitGroup()
 

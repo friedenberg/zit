@@ -67,7 +67,7 @@ type CommonStoreBase[
 	]]
 
 	objekte_store.ExternalReader[
-		sku.ExternalMaybeLike,
+		sku.ExternalMaybe,
 		*sku.Transacted[K, KPtr],
 		sku.External[K, KPtr],
 	]

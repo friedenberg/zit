@@ -180,7 +180,7 @@ func (s *zettelStore) writeNamedZettelToIndex(
 }
 
 func (s *zettelStore) ReadOneExternal(
-	e sku.ExternalMaybeLike,
+	e sku.ExternalMaybe,
 	t *transacted.Zettel,
 ) (ez external.Zettel, err error) {
 	var m checkout_mode.Mode
@@ -190,7 +190,7 @@ func (s *zettelStore) ReadOneExternal(
 		return
 	}
 
-	ez.ResetWithExternalMaybeLike(e)
+	ez.ResetWithExternalMaybe(e)
 
 	switch m {
 	case checkout_mode.ModeAkteOnly:

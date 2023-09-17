@@ -169,7 +169,7 @@ func (s *Store) CheckoutOneZettel(
 		}
 
 		if cz.External, err = s.storeObjekten.Zettel().ReadOneExternal(
-			e,
+			*e,
 			&sz,
 		); err != nil {
 			err = errors.Wrap(err)

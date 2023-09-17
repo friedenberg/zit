@@ -6,12 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 )
 
-type ExternalMaybeLike interface {
-	GetKennungLike() kennung.Kennung
-	GetFDs() ExternalFDs
-	kennung.FDPairGetter
-}
-
 type ExternalMaybe struct {
 	Kennung kennung.KennungPtr
 	FDs     ExternalFDs

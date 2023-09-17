@@ -101,8 +101,8 @@ func (a *External[K, KPtr]) ResetWith(b *External[K, KPtr]) {
 	a.Metadatei.ResetWith(b.GetMetadatei())
 }
 
-func (a *External[K, KPtr]) ResetWithExternalMaybeLike(
-	b ExternalMaybeLike,
+func (a *External[K, KPtr]) ResetWithExternalMaybe(
+	b ExternalMaybe,
 ) (err error) {
 	k := b.GetKennungLike()
 

@@ -27,7 +27,7 @@ type externalMaybeGetterReader[
 ] struct {
 	getter func(KPtr) (*sku.ExternalMaybe, bool)
 	ExternalReader[
-		sku.ExternalMaybeLike,
+		sku.ExternalMaybe,
 		*sku.Transacted[K, KPtr],
 		sku.External[K, KPtr],
 	]
@@ -41,7 +41,7 @@ func MakeExternalMaybeGetterReader[
 ](
 	getter func(KPtr) (*sku.ExternalMaybe, bool),
 	er ExternalReader[
-		sku.ExternalMaybeLike,
+		sku.ExternalMaybe,
 		*sku.Transacted[K, KPtr],
 		sku.External[K, KPtr],
 	],
@@ -68,7 +68,7 @@ func (emgr externalMaybeGetterReader[O, OPtr, K, KPtr]) ReadOne(
 		return
 	}
 
-	if co.External, err = emgr.ReadOneExternal(e, &i); err != nil {
+	if co.External, err = emgr.ReadOneExternal(*e, &i); err != nil {
 		if errors.IsNotExist(err) {
 			err = iter.MakeErrStopIteration()
 		} else {

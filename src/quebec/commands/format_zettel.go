@@ -91,7 +91,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	if e, ok := cwdFiles.GetZettel(&h); ok {
 		var ze external.Zettel
 
-		ze, err = u.StoreObjekten().Zettel().ReadOneExternal(e, zt)
+		ze, err = u.StoreObjekten().Zettel().ReadOneExternal(*e, zt)
 
 		switch {
 		case store_objekten.IsErrExternalAkteExtensionMismatch(err):

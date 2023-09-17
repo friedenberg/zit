@@ -38,7 +38,7 @@ type StoreUtil interface {
 	schnittstellen.AkteIOFactory
 	kennung.Clock
 
-  ExternalReader
+	ExternalReader
 	CommitTransacted(sku.SkuLike) error
 	CommitUpdatedTransacted(sku.SkuLikePtr) error
 
