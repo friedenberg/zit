@@ -24,7 +24,6 @@ import (
 	"github.com/friedenberg/zit/src/kilo/checked_out"
 	"github.com/friedenberg/zit/src/kilo/store_verzeichnisse"
 	"github.com/friedenberg/zit/src/kilo/zettel"
-	"github.com/friedenberg/zit/src/lima/cwd"
 	"github.com/friedenberg/zit/src/lima/objekte_store"
 	"github.com/friedenberg/zit/src/mike/store_util"
 )
@@ -186,7 +185,7 @@ func (s *zettelStore) writeNamedZettelToIndex(
 }
 
 func (s *zettelStore) ReadOneExternal(
-	e *cwd.Zettel,
+	e sku.ExternalMaybeLike,
 	t *transacted.Zettel,
 ) (ez external.Zettel, err error) {
 	var m checkout_mode.Mode
@@ -196,7 +195,7 @@ func (s *zettelStore) ReadOneExternal(
 		return
 	}
 
-	ez.ResetWithExternalMaybe(*e)
+	ez.ResetWithExternalMaybeLike(e)
 
 	switch m {
 	case checkout_mode.ModeAkteOnly:

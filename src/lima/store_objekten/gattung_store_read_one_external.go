@@ -7,7 +7,7 @@ import (
 )
 
 func (s *commonStore[O, OPtr, K, KPtr]) ReadOneExternal(
-	em *sku.ExternalMaybe[K, KPtr],
+	em sku.ExternalMaybeLike,
 	t *sku.Transacted[K, KPtr],
 ) (e sku.External[K, KPtr], err error) {
 	var m checkout_mode.Mode
@@ -17,7 +17,10 @@ func (s *commonStore[O, OPtr, K, KPtr]) ReadOneExternal(
 		return
 	}
 
-	e.ResetWithExternalMaybeLike(em)
+	if err = e.ResetWithExternalMaybeLike(em); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	var t1 sku.SkuLikePtr
 

@@ -26,9 +26,11 @@ type externalMaybeGetterReader[
 	KPtr kennung.KennungLikePtr[K],
 ] struct {
 	getter func(KPtr) (*sku.ExternalMaybe[K, KPtr], bool)
-	ExternalReader[*sku.ExternalMaybe[K, KPtr],
+	ExternalReader[
+		sku.ExternalMaybeLike,
 		*sku.Transacted[K, KPtr],
-		sku.External[K, KPtr]]
+		sku.External[K, KPtr],
+	]
 }
 
 func MakeExternalMaybeGetterReader[
@@ -39,7 +41,7 @@ func MakeExternalMaybeGetterReader[
 ](
 	getter func(KPtr) (*sku.ExternalMaybe[K, KPtr], bool),
 	er ExternalReader[
-		*sku.ExternalMaybe[K, KPtr],
+		sku.ExternalMaybeLike,
 		*sku.Transacted[K, KPtr],
 		sku.External[K, KPtr],
 	],
