@@ -16,9 +16,7 @@ import (
 	"github.com/friedenberg/zit/src/india/erworben"
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/india/transacted"
-	"github.com/friedenberg/zit/src/india/transaktion"
 	"github.com/friedenberg/zit/src/juliett/objekte"
-	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/lima/objekte_store"
 	"github.com/friedenberg/zit/src/mike/store_util"
 )
@@ -219,78 +217,6 @@ func (s *Store) Konfig() KonfigStore {
 
 func (s *Store) Kasten() KastenStore {
 	return s.kastenStore
-}
-
-func (s Store) RevertTransaktion(
-	t *transaktion.Transaktion,
-) (tzs zettel.MutableSet, err error) {
-	err = errors.Implement()
-	return
-
-	// if !s.StoreUtil.GetLockSmith().IsAcquired() {
-	// 	err = objekte_store.ErrLockRequired{
-	// 		Operation: "revert",
-	// 	}
-
-	// 	return
-	// }
-
-	// tzs = zettel.MakeMutableSetUnique(t.Skus.Len())
-
-	// t.Skus.Each(
-	//	func(o sku.SkuLike) (err error) {
-	//		var h *hinweis.Hinweis
-	//		ok := false
-
-	//		if h, ok = o.GetId().(*hinweis.Hinweis); !ok {
-	//			//TODO-P4
-	//			return
-	//		}
-
-	//		if !o.GetMutter()[1].IsZero() {
-	// 			err = errors.Errorf("merge reverts are not yet supported: %s", o)
-	//			return
-	//		}
-
-	//		errors.Log().Print(o)
-
-	//		var chain []*zettel.Transacted
-
-	//		if chain, err = s.zettelStore.AllInChain(*h); err != nil {
-	//			err = errors.Wrap(err)
-	//			return
-	//		}
-
-	//		var tz *zettel.Transacted
-
-	//		for _, someTz := range chain {
-	//			errors.Log().Print(someTz)
-	//			if someTz.Sku.Schwanz == o.GetMutter()[0] {
-	//				tz = someTz
-	//				break
-	//			}
-	//		}
-
-	//		if tz.Sku.ObjekteSha.IsNull() {
-	//			err = errors.Errorf("zettel not found in index!: %#v", o)
-	//			return
-	//		}
-
-	//		if tz, err = s.zettelStore.Update(
-	//			&tz.Objekte,
-	//			&tz.Sku.Kennung,
-	//		); err != nil {
-	//			err = errors.Wrap(err)
-	//			return
-	//		}
-
-	//		tzs.Add(tz)
-
-	//		return
-	//	},
-	//)
-
-	// return
 }
 
 func (s Store) Flush() (err error) {
@@ -604,42 +530,6 @@ func (s *Store) Reindex() (err error) {
 	}
 
 	f1 := s.GetReindexFunc(ti)
-
-	f := func(t *transaktion.Transaktion) (err error) {
-		errors.Out().Printf(
-			"%s/%s: %s",
-			t.Time.Kopf(),
-			t.Time.Schwanz(),
-			t.Time,
-		)
-
-		if err = t.Skus.Each(
-			func(sk sku.SkuLikePtr) (err error) {
-				return f1(sk)
-			},
-		); err != nil {
-			err = errors.Wrapf(
-				err,
-				"Transaktion: %s/%s: %s",
-				t.Time.Kopf(),
-				t.Time.Schwanz(),
-				t.Time,
-			)
-
-			return
-		}
-
-		return
-	}
-
-	if err = s.GetTransaktionStore().ReadAllTransaktions(f); err != nil {
-		if errors.IsNotExist(err) {
-			err = nil
-		} else {
-			err = errors.Wrap(err)
-			return
-		}
-	}
 
 	if err = s.GetBestandsaufnahmeStore().ReadAllSkus(f1); err != nil {
 		err = errors.Wrap(err)

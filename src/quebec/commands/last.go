@@ -8,7 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/india/transaktion"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -60,13 +59,7 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		u.StringFormatWriterSkuLikePtrShort(),
 	)
 
-	method := c.runWithTransaktion
-
-	if u.Konfig().UseBestandsaufnahme {
-		method = c.runWithBestandsaufnahm
-	}
-
-	if err = method(u, f); err != nil {
+	if err = c.runWithBestandsaufnahm(u, f); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -96,28 +89,6 @@ func (c Last) runWithBestandsaufnahm(
 
 	errors.TodoP3("support log line format for skus")
 	if err = sku.HeapEachPtr(a.Skus, f); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (c Last) runWithTransaktion(
-	u *umwelt.Umwelt,
-	f schnittstellen.FuncIter[sku.SkuLikePtr],
-) (err error) {
-	s := u.StoreObjekten()
-
-	var transaktion *transaktion.Transaktion
-
-	if transaktion, err = s.GetTransaktionStore().ReadLastTransaktion(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	errors.TodoP3("support log line format for skus")
-	if err = transaktion.Skus.Each(f); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -11,7 +11,6 @@ import (
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/transacted"
-	"github.com/friedenberg/zit/src/india/transaktion"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/lima/objekte_store"
 	"github.com/friedenberg/zit/src/mike/store_util"
@@ -179,32 +178,7 @@ func (s typStore) ReadAll(
 		return
 	}
 
-	if s.StoreUtil.GetKonfig().UseBestandsaufnahme {
-		if err = s.StoreUtil.GetBestandsaufnahmeStore().ReadAllSkus(eachSku); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	if err = s.StoreUtil.GetTransaktionStore().ReadAllTransaktions(
-		func(t *transaktion.Transaktion) (err error) {
-			if err = t.Skus.Each(
-				eachSku,
-			); err != nil {
-				err = errors.Wrapf(
-					err,
-					"Transaktion: %s/%s: %s",
-					t.Time.Kopf(),
-					t.Time.Schwanz(),
-					t.Time,
-				)
-
-				return
-			}
-
-			return
-		},
-	); err != nil {
+	if err = s.StoreUtil.GetBestandsaufnahmeStore().ReadAllSkus(eachSku); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

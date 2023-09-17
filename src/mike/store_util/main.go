@@ -6,7 +6,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/id"
 	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/charlie/gattung"
@@ -18,7 +17,6 @@ import (
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/india/transaktion"
 	"github.com/friedenberg/zit/src/kilo/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/kilo/konfig"
 )
@@ -44,7 +42,6 @@ type StoreUtil interface {
 
 	GetBestandsaufnahmeStore() bestandsaufnahme.Store
 	GetBestandsaufnahmeAkte() bestandsaufnahme.Akte
-	GetTransaktionStore() TransaktionStore
 	GetAbbrStore() AbbrStore
 	GetKennungIndex() kennung_index.Index
 	GetTypenIndex() (kennung_index.KennungIndex[kennung.Typ, *kennung.Typ], error)
@@ -65,7 +62,6 @@ type common struct {
 	Age                       age.Age
 	konfig                    *konfig.Compiled
 	standort                  standort.Standort
-	transaktion               transaktion.Transaktion
 	bestandsaufnahmeAkte      bestandsaufnahme.Akte
 	Abbr                      AbbrStore
 	persistentMetadateiFormat objekte_format.Format
@@ -97,19 +93,6 @@ func MakeStoreUtil(
 		st.DirVerzeichnisse("TypenIndexV0"),
 	)
 
-	t := kennung.Now()
-
-	for {
-		p := c.GetTransaktionStore().TransaktionPath(t)
-
-		if !files.Exists(p) {
-			break
-		}
-
-		t.MoveForwardIota()
-	}
-
-	c.transaktion = transaktion.MakeTransaktion(t)
 	c.bestandsaufnahmeAkte = bestandsaufnahme.Akte{
 		Skus: sku.MakeSkuLikeHeap(),
 	}
@@ -185,10 +168,6 @@ func (s *common) CommitTransacted(t sku.SkuLike) (err error) {
 
 func (s *common) GetBestandsaufnahmeAkte() bestandsaufnahme.Akte {
 	return s.bestandsaufnahmeAkte
-}
-
-func (s *common) GetTransaktionStore() TransaktionStore {
-	return s
 }
 
 func (s *common) GetBestandsaufnahmeStore() bestandsaufnahme.Store {
