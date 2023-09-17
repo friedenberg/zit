@@ -253,11 +253,6 @@ func (s *zettelStore) readOneExternalAkte(
 	sh := sha.Make(aw.GetShaLike())
 	ez.SetAkteSha(sh)
 
-	if err = s.SaveObjekte(ez); err != nil {
-		err = errors.Wrapf(err, "%s", f.Name())
-		return
-	}
-
 	typKonfig := s.GetKonfig().GetApproximatedTyp(
 		t.GetTyp(),
 	).ApproximatedOrActual()
@@ -300,11 +295,6 @@ func (s *zettelStore) readOneExternalObjekte(
 	ez.GetMetadateiPtr().ResetWith(t.GetMetadatei())
 
 	if _, err = s.textParser.ParseMetadatei(f, ez); err != nil {
-		err = errors.Wrapf(err, "%s", f.Name())
-		return
-	}
-
-	if err = s.SaveObjekte(ez); err != nil {
 		err = errors.Wrapf(err, "%s", f.Name())
 		return
 	}
@@ -472,11 +462,6 @@ func (s *zettelStore) UpdateCheckedOut(
 
 	co.External.SetMetadatei(m)
 
-	if err = s.SaveObjekte(&co.External); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	if co.External.Metadatei.EqualsSansTai(co.Internal.Metadatei) {
 		t = &co.Internal
 
@@ -619,21 +604,11 @@ func (s *zettelStore) writeObjekte(
 		Metadatei: m,
 	}
 
-	if err = s.SaveObjekte(tz); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	return
 }
 
 func (s *zettelStore) Inherit(tz *transacted.Zettel) (err error) {
 	errors.Log().Printf("inheriting %s", tz)
-
-	if err = s.SaveObjekte(tz); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
 
 	s.StoreUtil.CommitTransacted(tz)
 

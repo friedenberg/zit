@@ -41,8 +41,6 @@ func (c *CheckedOut[T2, T3]) DetermineState(justCheckedOut bool) {
 		} else {
 			c.State = checked_out_state.StateExistsAndSame
 		}
-	} else if c.External.GetObjekteSha().IsNull() {
-		c.State = checked_out_state.StateEmpty
 	} else {
 		if justCheckedOut {
 			c.State = checked_out_state.StateJustCheckedOutButDifferent

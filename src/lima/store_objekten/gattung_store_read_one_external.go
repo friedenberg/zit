@@ -61,10 +61,5 @@ func (s *commonStore[O, OPtr, K, KPtr]) readOneExternalObjekte(
 		return
 	}
 
-	if err = s.SaveObjekte(e); err != nil {
-		err = errors.Wrapf(err, "%s", f.Name())
-		return
-	}
-
 	return
 }
