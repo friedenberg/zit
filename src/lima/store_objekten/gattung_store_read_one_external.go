@@ -40,7 +40,7 @@ func (s *commonStore[O, OPtr, K, KPtr]) ReadOneExternal(
 }
 
 func (s *commonStore[O, OPtr, K, KPtr]) readOneExternalObjekte(
-	e *sku.External[K, KPtr],
+	e sku.SkuLikeExternalPtr,
 	t *sku.Transacted[K, KPtr],
 ) (err error) {
 	var f *os.File
