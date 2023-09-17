@@ -59,7 +59,6 @@ type zettelStore struct {
 		*kennung.Hinweis,
 	]
 
-	textParser  metadatei.TextParser
 	protoZettel zettel.ProtoZettel
 
 	verzeichnisseSchwanzen *verzeichnisseSchwanzen
@@ -74,11 +73,7 @@ func makeZettelStore(
 ) (s *zettelStore, err error) {
 	s = &zettelStore{
 		protoZettel: zettel.MakeProtoZettel(sa.GetKonfig()),
-		textParser: metadatei.MakeTextParser(
-			sa,
-			nil, // TODO-P1 make akteFormatter
-		),
-		tagp: tagp,
+		tagp:        tagp,
 	}
 
 	s.commonStore, err = makeCommonStore[
@@ -205,7 +200,7 @@ func (s *zettelStore) ReadOneExternal(
 		}
 
 	case checkout_mode.ModeObjekteOnly, checkout_mode.ModeObjekteAndAkte:
-		if err = s.readOneExternalObjekte(&ez, t); err != nil {
+		if err = s.ReadOneExternalObjekte(&ez, t); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -268,29 +263,6 @@ func (s *zettelStore) readOneExternalAkte(
 			Actual:   ez.GetAkteFD(),
 		})
 
-		return
-	}
-
-	return
-}
-
-func (s *zettelStore) readOneExternalObjekte(
-	ez *external.Zettel,
-	t *transacted.Zettel,
-) (err error) {
-	var f *os.File
-
-	if f, err = files.Open(ez.GetObjekteFD().Path); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, f)
-
-	ez.GetMetadateiPtr().ResetWith(t.GetMetadatei())
-
-	if _, err = s.textParser.ParseMetadatei(f, ez); err != nil {
-		err = errors.Wrapf(err, "%s", f.Name())
 		return
 	}
 
