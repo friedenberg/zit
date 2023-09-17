@@ -22,15 +22,21 @@ func (s *commonStore[O, OPtr, K, KPtr]) ReadOneExternal(
 
 	e.ResetWithExternalMaybe(*em)
 
+	var t1 sku.SkuLikePtr
+
+	if t != nil {
+		t1 = t
+	}
+
 	switch m {
 	case checkout_mode.ModeAkteOnly:
-		if err = s.ReadOneExternalAkte(&e, t); err != nil {
+		if err = s.ReadOneExternalAkte(&e, t1); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case checkout_mode.ModeObjekteOnly, checkout_mode.ModeObjekteAndAkte:
-		if err = s.readOneExternalObjekte(&e, t); err != nil {
+		if err = s.readOneExternalObjekte(&e, t1); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -41,7 +47,7 @@ func (s *commonStore[O, OPtr, K, KPtr]) ReadOneExternal(
 
 func (s *commonStore[O, OPtr, K, KPtr]) readOneExternalObjekte(
 	e sku.SkuLikeExternalPtr,
-	t *sku.Transacted[K, KPtr],
+	t sku.SkuLikePtr,
 ) (err error) {
 	var f *os.File
 
