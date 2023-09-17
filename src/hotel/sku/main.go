@@ -62,5 +62,7 @@ type (
 		GetAktePath() string
 
 		GetObjekteFD() kennung.FD
+
+		ResetWithExternalMaybe(b ExternalMaybe) (err error)
 	}
 )
