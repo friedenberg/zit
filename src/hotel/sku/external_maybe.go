@@ -8,6 +8,7 @@ import (
 
 type ExternalMaybeLike interface {
 	GetKennungLike() kennung.Kennung
+	GetFDs() ExternalFDs
 	kennung.FDPairGetter
 }
 

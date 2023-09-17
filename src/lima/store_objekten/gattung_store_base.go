@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/toml"
 	"github.com/friedenberg/zit/src/charlie/pool"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
@@ -107,8 +106,6 @@ type commonStoreBase[
 
 	persistentMetadateiFormat objekte_format.Format
 
-	textParser metadatei.TextParser
-
 	akteFormat objekte.AkteFormat[O, OPtr]
 }
 
@@ -172,10 +169,6 @@ func makeCommonStoreBase[
 		),
 		TransactedReader:          tr,
 		persistentMetadateiFormat: pmf,
-		textParser: metadatei.MakeTextParser(
-			sa,
-			nil, // TODO-P1 make akteFormatter
-		),
 	}
 
 	return

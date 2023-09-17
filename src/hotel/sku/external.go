@@ -102,6 +102,30 @@ func (a *External[K, KPtr]) ResetWith(b *External[K, KPtr]) {
 	a.Metadatei.ResetWith(b.GetMetadatei())
 }
 
+func (a *External[K, KPtr]) ResetWithExternalMaybeLike(
+	b ExternalMaybeLike,
+) (err error) {
+	k := b.GetKennungLike()
+
+	switch kt := k.(type) {
+	case K:
+		KPtr(&a.Kennung).ResetWith(kt)
+
+	case KPtr:
+		KPtr(&a.Kennung).ResetWith(K(*kt))
+
+	default:
+		err = errors.Errorf("unsupported kennung type: %T", kt)
+		return
+	}
+
+	a.ObjekteSha.Reset()
+	a.Metadatei.Reset()
+	a.FDs = b.GetFDs()
+
+	return
+}
+
 func (a *External[K, KPtr]) ResetWithExternalMaybe(b ExternalMaybe[K, KPtr]) {
 	todo.Change("use this in other places")
 	a.ObjekteSha.Reset()

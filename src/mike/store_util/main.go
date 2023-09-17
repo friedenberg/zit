@@ -13,6 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/echo/age_io"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/golf/kennung_index"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -37,7 +38,7 @@ type StoreUtil interface {
 	schnittstellen.AkteIOFactory
 	kennung.Clock
 
-	ReadOneExternalAkte(e sku.SkuLikeExternalPtr, t sku.SkuLikePtr) (err error)
+  ExternalReader
 	CommitTransacted(sku.SkuLike) error
 	CommitUpdatedTransacted(sku.SkuLikePtr) error
 
@@ -67,6 +68,8 @@ type common struct {
 	Abbr                      AbbrStore
 	persistentMetadateiFormat objekte_format.Format
 
+	metadateiTextParser metadatei.TextParser
+
 	bestandsaufnahmeStore bestandsaufnahme.Store
 	kennungIndex          kennung_index.Index
 
@@ -88,6 +91,11 @@ func MakeStoreUtil(
 		standort:                  st,
 		persistentMetadateiFormat: pmf,
 	}
+
+	c.metadateiTextParser = metadatei.MakeTextParser(
+		c,
+		nil, // TODO-P1 make akteFormatter
+	)
 
 	c.typenIndex = kennung_index.MakeIndex2[kennung.Typ](
 		c,
