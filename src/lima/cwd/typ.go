@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
-type Typ = sku.ExternalMaybe[kennung.Typ, *kennung.Typ]
+type Typ = sku.ExternalMaybe
 
 func (c *CwdFiles) tryTyp(fi os.FileInfo, dir string) (err error) {
 	var h kennung.Typ
@@ -29,7 +29,7 @@ func (c *CwdFiles) tryTyp(fi os.FileInfo, dir string) (err error) {
 
 	t, _ := c.Typen.Get(h.String())
 
-	t.Kennung = h
+	t.Kennung = &h
 	t.FDs.Objekte = fd
 	return c.Typen.Add(t)
 }

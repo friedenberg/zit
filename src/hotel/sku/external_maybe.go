@@ -12,24 +12,21 @@ type ExternalMaybeLike interface {
 	kennung.FDPairGetter
 }
 
-type ExternalMaybe[
-	T kennung.KennungLike[T],
-	T1 kennung.KennungLikePtr[T],
-] struct {
-	Kennung T
+type ExternalMaybe struct {
+	Kennung kennung.KennungPtr
 	FDs     ExternalFDs
 }
 
-func (a ExternalMaybe[T, T1]) String() string {
+func (a ExternalMaybe) String() string {
 	return a.Kennung.String()
 }
 
-func (a ExternalMaybe[T, T1]) EqualsAny(b any) bool {
+func (a ExternalMaybe) EqualsAny(b any) bool {
 	return values.Equals(a, b)
 }
 
-func (a ExternalMaybe[T, T1]) Equals(b ExternalMaybe[T, T1]) bool {
-	if !a.Kennung.Equals(b.Kennung) {
+func (a ExternalMaybe) Equals(b ExternalMaybe) bool {
+	if a.Kennung.String() != b.Kennung.String() {
 		return false
 	}
 
@@ -40,26 +37,26 @@ func (a ExternalMaybe[T, T1]) Equals(b ExternalMaybe[T, T1]) bool {
 	return true
 }
 
-func (e ExternalMaybe[T, T1]) GetId() schnittstellen.ValueLike {
+func (e ExternalMaybe) GetId() schnittstellen.ValueLike {
 	return e.Kennung
 }
 
-func (e ExternalMaybe[T, T1]) GetKennungLike() kennung.Kennung {
+func (e ExternalMaybe) GetKennungLike() kennung.Kennung {
 	return e.Kennung
 }
 
-func (e *ExternalMaybe[T, T1]) GetKennungLikePtr() kennung.KennungPtr {
-	return T1(&e.Kennung)
+func (e *ExternalMaybe) GetKennungLikePtr() kennung.KennungPtr {
+	return e.Kennung
 }
 
-func (e ExternalMaybe[T, T1]) GetFDs() ExternalFDs {
+func (e ExternalMaybe) GetFDs() ExternalFDs {
 	return e.FDs
 }
 
-func (e ExternalMaybe[T, T1]) GetObjekteFD() kennung.FD {
+func (e ExternalMaybe) GetObjekteFD() kennung.FD {
 	return e.FDs.Objekte
 }
 
-func (e ExternalMaybe[T, T1]) GetAkteFD() kennung.FD {
+func (e ExternalMaybe) GetAkteFD() kennung.FD {
 	return e.FDs.Akte
 }

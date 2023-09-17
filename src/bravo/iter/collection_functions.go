@@ -208,7 +208,7 @@ func Map[E schnittstellen.Value[E], F schnittstellen.Value[F]](
 	return
 }
 
-func DerivedValues[E schnittstellen.Value[E], F any](
+func DerivedValues[E any, F any](
 	c schnittstellen.SetLike[E],
 	f schnittstellen.FuncTransform[E, F],
 ) (out []F, err error) {

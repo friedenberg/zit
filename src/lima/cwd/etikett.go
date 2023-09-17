@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
-type Etikett = sku.ExternalMaybe[kennung.Etikett, *kennung.Etikett]
+type Etikett = sku.ExternalMaybe
 
 func (c *CwdFiles) tryEtikett(fi os.FileInfo, dir string) (err error) {
 	var h kennung.Etikett
@@ -29,7 +29,7 @@ func (c *CwdFiles) tryEtikett(fi os.FileInfo, dir string) (err error) {
 
 	t, _ := c.Etiketten.Get(h.String())
 
-	t.Kennung = h
+	t.Kennung = &h
 	t.FDs.Objekte = fd
 	return c.Etiketten.Add(t)
 }

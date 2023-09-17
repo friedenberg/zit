@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
-	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -124,14 +123,6 @@ func (a *External[K, KPtr]) ResetWithExternalMaybeLike(
 	a.FDs = b.GetFDs()
 
 	return
-}
-
-func (a *External[K, KPtr]) ResetWithExternalMaybe(b ExternalMaybe[K, KPtr]) {
-	todo.Change("use this in other places")
-	a.ObjekteSha.Reset()
-	a.Metadatei.Reset()
-	a.FDs = b.FDs
-	KPtr(&a.Kennung).ResetWith(b.Kennung)
 }
 
 func (a External[K, KPtr]) EqualsAny(b any) (ok bool) {

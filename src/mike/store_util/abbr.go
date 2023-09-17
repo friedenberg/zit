@@ -16,6 +16,7 @@ import (
 
 // TODO-P4 make generic
 type AbbrStore interface {
+	Exists(k kennung.Kennung) (err error)
 	Hinweis() AbbrStoreGeneric[kennung.Hinweis]
 	Kisten() AbbrStoreGeneric[kennung.Kasten]
 	Shas() AbbrStoreGeneric[sha.Sha]
@@ -187,6 +188,39 @@ func (i *indexAbbr) AddMatchable(o matcher.Matchable) (err error) {
 		// default:
 		// 	err = errors.Errorf("unsupported objekte: %T", to)
 		// 	return
+	}
+
+	return
+}
+
+func (i *indexAbbr) Exists(k kennung.Kennung) (err error) {
+	switch kt := k.(type) {
+	case kennung.Hinweis:
+		err = i.Hinweis().Exists(kt)
+
+	case *kennung.Hinweis:
+		err = i.Hinweis().Exists(*kt)
+
+	case kennung.Typ:
+		err = i.Typen().Exists(kt)
+
+	case *kennung.Typ:
+		err = i.Typen().Exists(*kt)
+
+	case kennung.Etikett:
+		err = i.Etiketten().Exists(kt)
+
+	case *kennung.Etikett:
+		err = i.Etiketten().Exists(*kt)
+
+	case kennung.Kasten:
+		err = i.Kisten().Exists(kt)
+
+	case *kennung.Kasten:
+		err = i.Kisten().Exists(*kt)
+
+	default:
+		err = errors.Errorf("not found")
 	}
 
 	return

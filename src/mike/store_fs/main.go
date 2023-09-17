@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/log"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/checked_out_state"
 	"github.com/friedenberg/zit/src/delta/etikett_akte"
 	"github.com/friedenberg/zit/src/delta/kasten_akte"
@@ -181,18 +182,18 @@ func (s *Store) ReadFiles(
 
 	if err = fs.EachCreatableMatchable(
 		iter.MakeChain(
-			func(ilg matcher.IdLikeGetter) (err error) {
-				switch il := ilg.(type) {
-				case *cwd.Kasten:
-					if err = s.storeObjekten.GetAbbrStore().Kisten().Exists(
-						il.Kennung,
-					); err == nil {
-						err = iter.MakeErrStopIteration()
-						return
-					}
+			func(il *sku.ExternalMaybe) (err error) {
+				k := il.GetKennungLike()
 
-					err = nil
+				if err = s.storeObjekten.GetAbbrStore().Exists(k); err == nil {
+					err = iter.MakeErrStopIteration()
+					return
+				}
 
+				err = nil
+
+				switch k.GetGattung() {
+				case gattung.Kasten:
 					var tco checked_out.Kasten
 
 					if tco.External, err = s.storeObjekten.Kasten().ReadOneExternal(
@@ -215,16 +216,7 @@ func (s *Store) ReadFiles(
 						return
 					}
 
-				case *cwd.Typ:
-					if err = s.storeObjekten.GetAbbrStore().Typen().Exists(
-						il.Kennung,
-					); err == nil {
-						err = iter.MakeErrStopIteration()
-						return
-					}
-
-					err = nil
-
+				case gattung.Typ:
 					var tco checked_out.Typ
 
 					if tco.External, err = s.storeObjekten.Typ().ReadOneExternal(
@@ -247,16 +239,7 @@ func (s *Store) ReadFiles(
 						return
 					}
 
-				case *cwd.Etikett:
-					if err = s.storeObjekten.GetAbbrStore().Etiketten().Exists(
-						il.Kennung,
-					); err == nil {
-						err = iter.MakeErrStopIteration()
-						return
-					}
-
-					err = nil
-
+				case gattung.Etikett:
 					var tco checked_out.Etikett
 
 					if tco.External, err = s.storeObjekten.Etikett().ReadOneExternal(
@@ -285,8 +268,6 @@ func (s *Store) ReadFiles(
 
 				return
 			},
-			// func(ilg sku.IdLikeGetter) (err error) {
-			// },
 		),
 	); err != nil {
 		err = errors.Wrap(err)

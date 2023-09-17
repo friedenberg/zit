@@ -21,7 +21,7 @@ func (u *Umwelt) FormatColorOptions() (o string_format_writer.ColorOptions) {
 func (u *Umwelt) StringFormatWriterShaLike(
 	co string_format_writer.ColorOptions,
 ) schnittstellen.StringFormatWriter[schnittstellen.ShaLike] {
-	return kennung.MakeShaCliFormat(
+	return kennung_fmt.MakeShaCliFormat(
 		u.konfig.PrintOptions,
 		co,
 		u.StoreObjekten().GetAbbrStore().Shas().Abbreviate,

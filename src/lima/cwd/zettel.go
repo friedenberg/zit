@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
-type Zettel = sku.ExternalMaybe[kennung.Hinweis, *kennung.Hinweis]
+type Zettel = sku.ExternalMaybe
 
 func (c *CwdFiles) tryZettel(d string, a string, p string) (err error) {
 	// kopf := filepath.Base(d)
@@ -30,7 +30,7 @@ func (c *CwdFiles) tryZettel(d string, a string, p string) (err error) {
 	}
 
 	t, _ := c.Zettelen.Get(h.String())
-	t.Kennung = h
+	t.Kennung = &h
 
 	if path.Ext(a) == c.erworben.GetZettelFileExtension() {
 		t.FDs.Objekte.Path = p

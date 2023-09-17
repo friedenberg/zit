@@ -38,7 +38,7 @@ func (fs *CwdFiles) MarkUnsureAkten(fd kennung.FD) {
 }
 
 func (fs CwdFiles) EachCreatableMatchable(
-	m schnittstellen.FuncIter[matcher.IdLikeGetter],
+	m schnittstellen.FuncIter[*sku.ExternalMaybe],
 ) (err error) {
 	todo.Parallelize()
 

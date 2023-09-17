@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
-type Kasten = sku.ExternalMaybe[kennung.Kasten, *kennung.Kasten]
+type Kasten = sku.ExternalMaybe
 
 func (c *CwdFiles) tryKasten(fi os.FileInfo, dir string) (err error) {
 	var h kennung.Kasten
@@ -29,7 +29,7 @@ func (c *CwdFiles) tryKasten(fi os.FileInfo, dir string) (err error) {
 
 	t, _ := c.Kisten.Get(h.String())
 
-	t.Kennung = h
+	t.Kennung = &h
 	t.FDs.Objekte = fd
 	return c.Kisten.Add(t)
 }

@@ -25,7 +25,7 @@ type externalMaybeGetterReader[
 	K kennung.KennungLike[K],
 	KPtr kennung.KennungLikePtr[K],
 ] struct {
-	getter func(KPtr) (*sku.ExternalMaybe[K, KPtr], bool)
+	getter func(KPtr) (*sku.ExternalMaybe, bool)
 	ExternalReader[
 		sku.ExternalMaybeLike,
 		*sku.Transacted[K, KPtr],
@@ -39,7 +39,7 @@ func MakeExternalMaybeGetterReader[
 	K kennung.KennungLike[K],
 	KPtr kennung.KennungLikePtr[K],
 ](
-	getter func(KPtr) (*sku.ExternalMaybe[K, KPtr], bool),
+	getter func(KPtr) (*sku.ExternalMaybe, bool),
 	er ExternalReader[
 		sku.ExternalMaybeLike,
 		*sku.Transacted[K, KPtr],
@@ -61,7 +61,7 @@ func (emgr externalMaybeGetterReader[O, OPtr, K, KPtr]) ReadOne(
 
 	ok := false
 
-	var e *sku.ExternalMaybe[K, KPtr]
+	var e *sku.ExternalMaybe
 
 	if e, ok = emgr.getter(KPtr(i.GetKennungPtr())); !ok {
 		err = iter.MakeErrStopIteration()
