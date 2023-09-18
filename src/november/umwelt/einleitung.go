@@ -150,9 +150,9 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 			return
 		}
 
-		if _, err = u.StoreObjekten().Typ().CreateOrUpdateAkte(
+		if _, err = u.StoreObjekten().CreateOrUpdator.CreateOrUpdateAkte(
 			nil,
-			&defaultTypKennung,
+			&kennung.Kennung2{KennungPtr: &defaultTypKennung},
 			sh,
 		); err != nil {
 			err = errors.Wrap(err)

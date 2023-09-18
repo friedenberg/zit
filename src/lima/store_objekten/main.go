@@ -9,6 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/golf/kennung_index"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -33,6 +34,12 @@ type Store struct {
 	CreateOrUpdator interface {
 		CreateOrUpdateCheckedOut(
 			co *objekte.CheckedOut2,
+		) (transactedPtr *sku.Transacted2, err error)
+
+		CreateOrUpdateAkte(
+			mg metadatei.Getter,
+			kennungPtr *kennung.Kennung2,
+			sh schnittstellen.ShaLike,
 		) (transactedPtr *sku.Transacted2, err error)
 	}
 

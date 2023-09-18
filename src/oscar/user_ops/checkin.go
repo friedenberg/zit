@@ -60,14 +60,6 @@ func (c Checkin) Run(
 						return
 					}
 
-				case *checked_out.Typ:
-					if _, err = u.StoreObjekten().Typ().CreateOrUpdateCheckedOut(
-						aco,
-					); err != nil {
-						err = errors.Wrap(err)
-						return
-					}
-
 				case *checked_out.Etikett:
 					if _, err = u.StoreObjekten().Etikett().CreateOrUpdateCheckedOut(
 						aco,
