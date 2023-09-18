@@ -16,7 +16,7 @@ type externalMaybeGetterReader2 struct {
 	getter func(kennung.Kennung) (*sku.ExternalMaybe, bool)
 	ExternalReader[
 		*sku.ExternalMaybe,
-		sku.SkuLikePtr,
+		*sku.Transacted2,
 		*sku.External2,
 	]
 }
@@ -25,7 +25,7 @@ func MakeExternalMaybeGetterReader2(
 	getter func(kennung.Kennung) (*sku.ExternalMaybe, bool),
 	er ExternalReader[
 		*sku.ExternalMaybe,
-		sku.SkuLikePtr,
+		*sku.Transacted2,
 		*sku.External2,
 	],
 ) ExternalMaybeGetterReader2 {
@@ -38,8 +38,15 @@ func MakeExternalMaybeGetterReader2(
 func (emgr externalMaybeGetterReader2) ReadOne(
 	i sku.SkuLikePtr,
 ) (co *objekte.CheckedOut2, err error) {
+	sk2 := sku.Transacted2{}
+
+	if err = sk2.SetFromSkuLike(i); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	co = &objekte.CheckedOut2{
-		Internal: i,
+		Internal: sk2,
 	}
 
 	ok := false
@@ -51,7 +58,9 @@ func (emgr externalMaybeGetterReader2) ReadOne(
 		return
 	}
 
-	if co.External, err = emgr.ReadOneExternal(e, i); err != nil {
+	var e2 *sku.External2
+
+	if e2, err = emgr.ReadOneExternal(e, &sk2); err != nil {
 		if errors.IsNotExist(err) {
 			err = iter.MakeErrStopIteration()
 		} else {
@@ -60,6 +69,8 @@ func (emgr externalMaybeGetterReader2) ReadOne(
 
 		return
 	}
+
+	co.External = *e2
 
 	return
 }

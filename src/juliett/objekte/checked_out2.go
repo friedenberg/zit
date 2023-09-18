@@ -8,8 +8,8 @@ import (
 )
 
 type CheckedOut2 struct {
-	Internal sku.SkuLikePtr
-	External sku.SkuLikeExternalPtr
+	Internal sku.Transacted2
+	External sku.External2
 	State    checked_out_state.State
 }
 
@@ -36,15 +36,15 @@ func (co CheckedOut2) GetState() checked_out_state.State {
 }
 
 func (co *CheckedOut2) GetInternalLike() sku.SkuLikePtr {
-	return co.Internal
+	return &co.Internal
 }
 
 func (co *CheckedOut2) GetExternalLike() ExternalLike {
-	return co.External
+	return &co.External
 }
 
 func (co *CheckedOut2) GetExternalLikePtr() ExternalLikePtr {
-	return co.External
+	return &co.External
 }
 
 // func (a CheckedOut2) EqualsAny(b any) bool {
