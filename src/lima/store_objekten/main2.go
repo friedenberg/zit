@@ -3,6 +3,7 @@ package store_objekten
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -10,29 +11,93 @@ import (
 	"github.com/friedenberg/zit/src/juliett/objekte"
 )
 
+func (s *Store) onNewOrUpdated(
+	t *sku.Transacted2,
+) (err error) {
+	s.StoreUtil.CommitUpdatedTransacted(t)
+
+	g := gattung.Must(t.Kennung.GetGattung())
+
+	switch g {
+	case gattung.Typ:
+		if err = s.StoreUtil.GetKonfigPtr().AddTyp(t); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+	default:
+		err = gattung.MakeErrUnsupportedGattung(g)
+		return
+	}
+
+	return
+}
+
+func (s *Store) onNew(
+	t *sku.Transacted2,
+) (err error) {
+	if err = s.onNewOrUpdated(t); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return s.LogWriter.New(t)
+}
+
+func (s *Store) onUpdated(
+	t *sku.Transacted2,
+) (err error) {
+	if err = s.onNewOrUpdated(t); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return s.LogWriter.Updated(t)
+}
+
+func (s *Store) onUnchanged(
+	t *sku.Transacted2,
+) (err error) {
+	return s.LogWriter.Unchanged(t)
+}
+
 func (s *Store) ReadOne(
-	k kennung.KennungPtr,
-) (sk sku.SkuLikePtr, err error) {
-	switch kt := k.(type) {
-	case *kennung.Hinweis:
-		return s.Zettel().ReadOne(kt)
+	k *kennung.Kennung2,
+) (sk *sku.Transacted2, err error) {
+	switch kt := k.KennungPtr.(type) {
+	// case *kennung.Hinweis:
+	// 	return s.Zettel().ReadOne(kt)
 
 	case *kennung.Typ:
-		return s.typStore.ReadOne(kt)
+		var sk1 *transacted.Typ
 
-	case *kennung.Etikett:
-		return s.Etikett().ReadOne(kt)
+		if sk1, err = s.typStore.ReadOne(kt); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
-	case *kennung.Kasten:
-		return s.Kasten().ReadOne(kt)
+		sk = &sku.Transacted2{}
 
-	case *kennung.Konfig:
-		return s.Konfig().ReadOne(kt)
+		if err = sk.SetFromSkuLike(sk1); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+	// case *kennung.Etikett:
+	// 	return s.Etikett().ReadOne(kt)
+
+	// case *kennung.Kasten:
+	// 	return s.Kasten().ReadOne(kt)
+
+	// case *kennung.Konfig:
+	// 	return s.Konfig().ReadOne(kt)
 
 	default:
 		err = errors.Errorf("unsupported kennung %T -> %q", kt, kt)
 		return
 	}
+
+	return
 }
 
 func (s *Store) ReadAllSchwanzen(

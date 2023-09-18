@@ -136,8 +136,8 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 
 	// var defaultTypTransacted *typ.Transacted
 
-	if _, err = u.StoreObjekten().Typ().ReadOne(
-		&defaultTypKennung,
+	if _, err = u.StoreObjekten().ReadOne(
+		&kennung.Kennung2{KennungPtr: &defaultTypKennung},
 	); err != nil {
 		err = nil
 

@@ -12,16 +12,20 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/juliett/objekte"
+	"github.com/friedenberg/zit/src/kilo/checked_out"
 	"github.com/friedenberg/zit/src/lima/objekte_store"
 	"github.com/friedenberg/zit/src/mike/store_util"
 )
 
 type TypStore interface {
-	CommonStore[
-		typ_akte.V0,
+	schnittstellen.AkteGetterPutter[*typ_akte.V0]
+	objekte_store.AkteTextSaver[typ_akte.V0, *typ_akte.V0]
+	objekte_store.TransactedLogger[*transacted.Typ]
+	objekte_store.CreateOrUpdater[
 		*typ_akte.V0,
-		kennung.Typ,
 		*kennung.Typ,
+		*transacted.Typ,
+		*checked_out.Typ,
 	]
 }
 

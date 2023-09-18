@@ -5,32 +5,22 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
-type ExternalReader interface {
-	ReadOneExternal(
-		em *sku.ExternalMaybe,
-		t sku.SkuLikePtr,
-	) (e *sku.External2, err error)
-
-	ReadOneExternalObjekte(
-		e sku.SkuLikeExternalPtr,
-		t sku.SkuLikePtr,
-	) (err error)
-
-	ReadOneExternalAkte(
-		e sku.SkuLikeExternalPtr,
-		t sku.SkuLikePtr,
-	) (err error)
+type ExternalReader2 struct {
+	metadateiTextParser metadatei.TextParser
+	schnittstellen.AkteIOFactory
 }
 
-func (s *common) ReadOneExternal(
+func (s *ExternalReader2) ReadOneExternal(
 	em *sku.ExternalMaybe,
-	t sku.SkuLikePtr,
+	t *sku.Transacted2,
 ) (e *sku.External2, err error) {
 	var m checkout_mode.Mode
 
@@ -69,7 +59,7 @@ func (s *common) ReadOneExternal(
 	return
 }
 
-func (s *common) ReadOneExternalObjekte(
+func (s *ExternalReader2) ReadOneExternalObjekte(
 	e sku.SkuLikeExternalPtr,
 	t sku.SkuLikePtr,
 ) (err error) {
@@ -94,7 +84,7 @@ func (s *common) ReadOneExternalObjekte(
 	return
 }
 
-func (s *common) ReadOneExternalAkte(
+func (s *ExternalReader2) ReadOneExternalAkte(
 	e sku.SkuLikeExternalPtr,
 	t sku.SkuLikePtr,
 ) (err error) {

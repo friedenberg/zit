@@ -12,7 +12,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/etikett_akte"
 	"github.com/friedenberg/zit/src/delta/kasten_akte"
 	"github.com/friedenberg/zit/src/delta/standort"
-	"github.com/friedenberg/zit/src/delta/typ_akte"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/erworben"
@@ -93,14 +92,9 @@ func (s *Store) ReadFiles(
 		s.storeObjekten.Etikett(),
 	)
 
-	typEMGR := objekte_store.MakeExternalMaybeGetterReader[
-		typ_akte.V0,
-		*typ_akte.V0,
-		kennung.Typ,
-		*kennung.Typ,
-	](
-		fs.GetTyp,
-		s.storeObjekten.Typ(),
+	emgr := objekte_store.MakeExternalMaybeGetterReader2(
+		fs.Get,
+		s.storeObjekten.GetExternalReader2(),
 	)
 
 	kastenEMGR := objekte_store.MakeExternalMaybeGetterReader[
@@ -137,7 +131,33 @@ func (s *Store) ReadFiles(
 					}
 
 				case *transacted.Typ:
-					if col, err = typEMGR.ReadOne(*et); err != nil {
+					et1 := &sku.Transacted2{}
+
+					if err = et1.SetFromSkuLike(et); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+
+					if col, err = emgr.ReadOne(et1); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+
+				// case transacted.Typ:
+				// 	et1 := &sku.Transacted2{}
+
+				// 	if err = et1.SetFromSkuLike(et); err != nil {
+				// 		err = errors.Wrap(err)
+				// 		return
+				// 	}
+
+				// 	if col, err = emgr.ReadOne(et1); err != nil {
+				// 		err = errors.Wrap(err)
+				// 		return
+				// 	}
+
+				case *sku.Transacted2:
+					if col, err = emgr.ReadOne(et); err != nil {
 						err = errors.Wrap(err)
 						return
 					}
@@ -163,7 +183,7 @@ func (s *Store) ReadFiles(
 					return
 				}
 
-				log.Log().Printf("read: %s", e.GetSkuLike())
+				log.Log().Printf("read: %s", col)
 
 				col.DetermineState(false)
 
@@ -217,10 +237,12 @@ func (s *Store) ReadFiles(
 					}
 
 				case gattung.Typ:
-					var tco checked_out.Typ
+					var tco objekte.CheckedOut2
 
-					if tco.External, err = s.storeObjekten.Typ().ReadOneExternal(
-						*il,
+					var e1 *sku.External2
+
+					if e1, err = s.storeObjekten.ReadOneExternal(
+						il,
 						nil,
 					); err != nil {
 						if errors.IsNotExist(err) {
@@ -231,6 +253,9 @@ func (s *Store) ReadFiles(
 
 						return
 					}
+
+					tco.External = *e1
+					tco.Internal.Kennung = tco.External.Kennung
 
 					tco.State = checked_out_state.StateUntracked
 

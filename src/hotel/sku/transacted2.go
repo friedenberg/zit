@@ -20,7 +20,12 @@ type Transacted2 struct {
 }
 
 func (t *Transacted2) SetFromSkuLike(sk SkuLike) (err error) {
-	if err = t.Kennung.Set(sk.GetKennungLike().String()); err != nil {
+	err = t.Kennung.SetWithGattung(
+		sk.GetKennungLike().String(),
+		sk.GetGattung(),
+	)
+
+	if err != nil {
 		err = errors.Wrap(err)
 		return
 	}

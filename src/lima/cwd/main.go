@@ -195,6 +195,23 @@ func (fs CwdFiles) GetTyp(
 	return
 }
 
+func (fs CwdFiles) Get(
+	k kennung.Kennung2,
+) (t *sku.ExternalMaybe, ok bool) {
+	g := gattung.Must(k.GetGattung())
+
+	switch g {
+	case gattung.Typ:
+		return fs.Typen.GetPtr(k.String())
+
+	case gattung.Etikett:
+		return fs.Etiketten.GetPtr(k.String())
+
+	default:
+		panic(gattung.MakeErrUnsupportedGattung(g))
+	}
+}
+
 func (fs CwdFiles) All(
 	f schnittstellen.FuncIter[sku.ExternalMaybe],
 ) (err error) {

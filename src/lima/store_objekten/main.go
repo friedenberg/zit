@@ -24,10 +24,17 @@ type Store struct {
 	store_util.StoreUtil
 
 	zettelStore  ZettelStore
-	typStore     TypStore
+	typStore     *typStore
 	etikettStore EtikettStore
 	konfigStore  KonfigStore
 	kastenStore  KastenStore
+
+	objekte_store.LogWriter[sku.SkuLikePtr]
+	CreateOrUpdator interface {
+		CreateOrUpdateCheckedOut(
+			co *objekte.CheckedOut2,
+		) (transactedPtr *sku.Transacted2, err error)
+	}
 
 	// Gattungen
 	gattungStores     map[schnittstellen.GattungLike]gattungStoreLike
@@ -179,7 +186,34 @@ func Make(
 		}
 	}
 
+	s.CreateOrUpdator = objekte_store.MakeCreateOrUpdate2(
+		s,
+		s.GetLockSmith(),
+		s,
+		s,
+		objekte_store.CreateOrUpdateDelegate[*sku.Transacted2]{
+			New:       s.onNew,
+			Updated:   s.onUpdated,
+			Unchanged: s.onUnchanged,
+		},
+		s,
+		s.GetPersistentMetadateiFormat(),
+		objekte_format.Options{IncludeTai: true},
+		s.StoreUtil,
+	)
+
 	return
+}
+
+func (s *Store) SetLogWriter(
+	lw objekte_store.LogWriter[sku.SkuLikePtr],
+) {
+	s.LogWriter = lw
+	s.zettelStore.SetLogWriter(lw)
+	s.konfigStore.SetLogWriter(lw)
+	s.typStore.SetLogWriter(lw)
+	s.etikettStore.SetLogWriter(lw)
+	s.kastenStore.SetLogWriter(lw)
 }
 
 func (s *Store) GetGattungInheritors(
@@ -337,7 +371,7 @@ func (s *Store) addTyp(
 		err = nil
 
 		todo.Change("support inheritance")
-		if _, err = s.Typ().CreateOrUpdate(
+		if _, err = s.typStore.CreateOrUpdate(
 			nil,
 			&t,
 		); err != nil {

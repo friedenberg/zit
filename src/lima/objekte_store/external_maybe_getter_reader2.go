@@ -9,11 +9,11 @@ import (
 )
 
 type ExternalMaybeGetterReader2 interface {
-	ReadOne(sku.SkuLikePtr) (*objekte.CheckedOut2, error)
+	ReadOne(*sku.Transacted2) (*objekte.CheckedOut2, error)
 }
 
 type externalMaybeGetterReader2 struct {
-	getter func(kennung.Kennung) (*sku.ExternalMaybe, bool)
+	getter func(kennung.Kennung2) (*sku.ExternalMaybe, bool)
 	ExternalReader[
 		*sku.ExternalMaybe,
 		*sku.Transacted2,
@@ -22,7 +22,7 @@ type externalMaybeGetterReader2 struct {
 }
 
 func MakeExternalMaybeGetterReader2(
-	getter func(kennung.Kennung) (*sku.ExternalMaybe, bool),
+	getter func(kennung.Kennung2) (*sku.ExternalMaybe, bool),
 	er ExternalReader[
 		*sku.ExternalMaybe,
 		*sku.Transacted2,
@@ -36,31 +36,24 @@ func MakeExternalMaybeGetterReader2(
 }
 
 func (emgr externalMaybeGetterReader2) ReadOne(
-	i sku.SkuLikePtr,
+	sk2 *sku.Transacted2,
 ) (co *objekte.CheckedOut2, err error) {
-	sk2 := sku.Transacted2{}
-
-	if err = sk2.SetFromSkuLike(i); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	co = &objekte.CheckedOut2{
-		Internal: sk2,
+		Internal: *sk2,
 	}
 
 	ok := false
 
 	var e *sku.ExternalMaybe
 
-	if e, ok = emgr.getter(i.GetKennungLike()); !ok {
+	if e, ok = emgr.getter(sk2.Kennung); !ok {
 		err = iter.MakeErrStopIteration()
 		return
 	}
 
 	var e2 *sku.External2
 
-	if e2, err = emgr.ReadOneExternal(e, &sk2); err != nil {
+	if e2, err = emgr.ReadOneExternal(e, sk2); err != nil {
 		if errors.IsNotExist(err) {
 			err = iter.MakeErrStopIteration()
 		} else {

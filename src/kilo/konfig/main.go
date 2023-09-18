@@ -444,14 +444,21 @@ func (k *compiled) AddKasten(
 }
 
 func (k *compiled) AddTyp(
-	b *transacted.Typ,
+	b sku.SkuLikePtr,
 ) (err error) {
 	k.lock.Lock()
 	defer k.lock.Unlock()
 
+	var b1 transacted.Typ
+
+	if err = b1.SetFromSkuLike(b); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	k.hasChanges = true
 
-	if err = iter.AddOrReplaceIfGreater(k.Typen, *b); err != nil {
+	if err = iter.AddOrReplaceIfGreater(k.Typen, b1); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

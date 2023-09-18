@@ -52,6 +52,14 @@ func (c Checkin) Run(
 						return
 					}
 
+				case *objekte.CheckedOut2:
+					if _, err = u.StoreObjekten().CreateOrUpdator.CreateOrUpdateCheckedOut(
+						aco,
+					); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+
 				case *checked_out.Typ:
 					if _, err = u.StoreObjekten().Typ().CreateOrUpdateCheckedOut(
 						aco,

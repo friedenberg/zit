@@ -125,7 +125,7 @@ func (s *Store) checkoutOneGeneric(
 		cop, err = s.storeObjekten.Kasten().CheckoutOne(store_objekten.CheckoutOptions(options), tt)
 
 	case *transacted.Typ:
-		cop, err = s.storeObjekten.Typ().CheckoutOne(store_objekten.CheckoutOptions(options), tt)
+		cop, err = s.storeObjekten.CheckoutOne(store_objekten.CheckoutOptions(options), tt)
 
 	case *transacted.Etikett:
 		cop, err = s.storeObjekten.Etikett().CheckoutOne(store_objekten.CheckoutOptions(options), tt)

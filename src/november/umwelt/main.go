@@ -215,11 +215,7 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 		Archived:  ptl,
 	}
 
-	u.storeObjekten.Zettel().SetLogWriter(lw)
-	u.storeObjekten.Konfig().SetLogWriter(lw)
-	u.storeObjekten.Typ().SetLogWriter(lw)
-	u.storeObjekten.Etikett().SetLogWriter(lw)
-	u.storeObjekten.Kasten().SetLogWriter(lw)
+	u.storeObjekten.SetLogWriter(lw)
 
 	u.storeWorkingDirectory.SetCheckedOutLogPrinter(
 		u.PrinterCheckedOutLike(),

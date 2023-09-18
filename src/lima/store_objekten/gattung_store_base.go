@@ -44,11 +44,6 @@ type CommonStoreBase[
 		KPtr,
 	]]
 
-	objekte_store.TransactedLogger[*sku.Transacted[
-		K,
-		KPtr,
-	]]
-
 	objekte_store.Querier[
 		KPtr,
 		*sku.Transacted[
