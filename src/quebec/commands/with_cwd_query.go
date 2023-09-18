@@ -8,8 +8,8 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/lima/cwd"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -78,8 +78,8 @@ func (c commandWithCwdQuery) Complete(
 	}
 
 	if cg.Contains(gattung.Typ) {
-		if err = u.Konfig().Typen.Each(
-			func(tt transacted.Typ) (err error) {
+		if err = u.Konfig().Typen.EachPtr(
+			func(tt *sku.Transacted2) (err error) {
 				if err = errors.Out().Printf("%s\tTyp", tt.GetKennung()); err != nil {
 					err = errors.IsAsNilOrWrapf(
 						err,

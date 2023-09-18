@@ -13,6 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/format"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
+	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/konfig"
@@ -124,7 +125,7 @@ func (fv *FormatterValue) FuncFormatter(
 
 	case "typ-vim-syntax-type":
 		return func(o *transacted.Zettel) (err error) {
-			var t *transacted.Typ
+			var t sku.SkuLikePtr
 
 			if t = k.GetApproximatedTyp(
 				o.GetTyp(),

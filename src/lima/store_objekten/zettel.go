@@ -255,7 +255,7 @@ func (s *zettelStore) readOneExternalAkte(
 		return
 	}
 
-	fe := s.GetKonfig().TypenToExtensions[t.GetTyp()]
+	fe := s.GetKonfig().TypenToExtensions[t.GetTyp().String()]
 
 	if fe != ez.GetAkteFD().ExtSansDot() {
 		err = errors.Wrap(ErrExternalAkteExtensionMismatch{

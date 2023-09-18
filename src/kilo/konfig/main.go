@@ -16,6 +16,8 @@ import (
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
+	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/charlie/iter2"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/delta/typ_akte"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -40,10 +42,12 @@ type Compiled struct {
 
 func (a *compiled) Reset() {
 	a.lock = &sync.Mutex{}
-	a.Typen = makeCompiledTypSetFromSlice(nil)
+	a.Typen = collections_ptr.MakeMutableValueSet[sku.Transacted2, *sku.Transacted2](
+		&KennungKeyer[sku.Transacted2, *sku.Transacted2]{},
+	)
 	a.EtikettenHidden = kennung.MakeEtikettSet()
 	a.Etiketten = collections_ptr.MakeMutableValueSet[ketikett, *ketikett](nil)
-	a.InlineTypen = collections_ptr.MakeMutableValueSet[kennung.Typ, *kennung.Typ](
+	a.InlineTypen = collections_value.MakeMutableValueSet[values.String](
 		nil,
 	)
 	a.ImplicitEtiketten = make(implicitEtikettenMap)
@@ -77,11 +81,11 @@ type compiled struct {
 	ImplicitEtiketten           implicitEtikettenMap
 
 	// Typen
-	ExtensionsToTypen map[string]kennung.Typ
-	TypenToExtensions map[kennung.Typ]string
+	ExtensionsToTypen map[string]string
+	TypenToExtensions map[string]string
 	DefaultTyp        transacted.Typ // deprecated
-	Typen             schnittstellen.MutableSetLike[transacted.Typ]
-	InlineTypen       schnittstellen.SetPtrLike[kennung.Typ, *kennung.Typ]
+	Typen             schnittstellen.MutableSetPtrLike[sku.Transacted2, *sku.Transacted2]
+	InlineTypen       schnittstellen.SetLike[values.String]
 
 	// Kasten
 	Kisten schnittstellen.MutableSetLike[transacted.Kasten]
@@ -94,8 +98,8 @@ func Make(
 	c = &Compiled{
 		cli: kcli,
 		compiled: compiled{
-			ExtensionsToTypen: make(map[string]kennung.Typ),
-			TypenToExtensions: make(map[kennung.Typ]string),
+			ExtensionsToTypen: make(map[string]string),
+			TypenToExtensions: make(map[string]string),
 		},
 	}
 
@@ -242,16 +246,14 @@ func (kc *compiled) recompile(
 		)
 	}
 
-	inlineTypen := collections_ptr.MakeMutableValueSet[kennung.Typ, *kennung.Typ](
-		nil,
-	)
+	inlineTypen := collections_value.MakeMutableValueSet[values.String](nil)
 
 	defer func() {
-		kc.InlineTypen = inlineTypen.CloneSetPtrLike()
+		kc.InlineTypen = inlineTypen.CloneSetLike()
 	}()
 
-	if err = kc.Typen.Each(
-		func(ct transacted.Typ) (err error) {
+	if err = kc.Typen.EachPtr(
+		func(ct *sku.Transacted2) (err error) {
 			var ta *typ_akte.V0
 
 			if ta, err = tagp.GetAkte(ct.GetAkteSha()); err != nil {
@@ -268,11 +270,11 @@ func (kc *compiled) recompile(
 			}
 
 			// TODO-P2 enforce uniqueness
-			kc.ExtensionsToTypen[fe] = ct.GetKennung()
-			kc.TypenToExtensions[ct.GetKennung()] = fe
+			kc.ExtensionsToTypen[fe] = ct.GetKennung().String()
+			kc.TypenToExtensions[ct.GetKennung().String()] = fe
 
 			if ta.InlineAkte {
-				inlineTypen.Add(ct.Kennung)
+				inlineTypen.Add(values.MakeString(ct.Kennung.String()))
 			}
 
 			// kc.applyExpandedTyp(*ct)
@@ -332,7 +334,7 @@ func (c compiled) GetZettelFileExtension() string {
 // TODO-P3 merge all the below
 func (c compiled) GetSortedTypenExpanded(
 	v string,
-) (expandedActual []*transacted.Typ) {
+) (expandedActual []*sku.Transacted2) {
 	expandedMaybe := collections_value.MakeMutableValueSet[values.String](nil)
 
 	sa := iter.MakeFuncSetString[
@@ -341,20 +343,20 @@ func (c compiled) GetSortedTypenExpanded(
 	](expandedMaybe)
 
 	typExpander.Expand(sa, v)
-	expandedActual = make([]*transacted.Typ, 0)
+	expandedActual = make([]*sku.Transacted2, 0)
 
 	expandedMaybe.Each(
 		func(v values.String) (err error) {
 			c.lock.Lock()
 			defer c.lock.Unlock()
 
-			ct, ok := c.Typen.Get(v.String())
+			ct, ok := c.Typen.GetPtr(v.String())
 
 			if !ok {
 				return
 			}
 
-			expandedActual = append(expandedActual, &ct)
+			expandedActual = append(expandedActual, ct)
 
 			return
 		},
@@ -377,7 +379,7 @@ func (kc compiled) IsInlineTyp(k kennung.Typ) (isInline bool) {
 		return true
 	}
 
-	isInline = kc.InlineTypen.Contains(k)
+	isInline = kc.InlineTypen.ContainsKey(k.String())
 
 	return
 }
@@ -388,9 +390,9 @@ func (kc compiled) GetApproximatedTyp(k kennung.Typ) (ct ApproximatedTyp) {
 	expandedActual := kc.GetSortedTypenExpanded(k.String())
 	if len(expandedActual) > 0 {
 		ct.hasValue = true
-		ct.typ = *expandedActual[0]
+		ct.typ = expandedActual[0]
 
-		if ct.typ.GetKennung().Equals(k) {
+		if kennung.Equals(ct.typ.GetKennung(), k) {
 			ct.isActual = true
 		}
 	}
@@ -444,21 +446,40 @@ func (k *compiled) AddKasten(
 }
 
 func (k *compiled) AddTyp(
-	b sku.SkuLikePtr,
+	a *transacted.Typ,
 ) (err error) {
-	k.lock.Lock()
-	defer k.lock.Unlock()
+	b := &sku.Transacted2{}
 
-	var b1 transacted.Typ
-
-	if err = b1.SetFromSkuLike(b); err != nil {
+	if err = b.SetFromSkuLike(a); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
+	return k.AddTyp2(b)
+}
+
+func (k *compiled) AddTyp2(
+	b *sku.Transacted2,
+) (err error) {
+	if err = gattung.Typ.AssertGattung(b); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	k.lock.Lock()
+	defer k.lock.Unlock()
+
 	k.hasChanges = true
 
-	if err = iter.AddOrReplaceIfGreater(k.Typen, b1); err != nil {
+	l := sku.Lessor[sku.Transacted2, *sku.Transacted2]{}
+
+	err = iter2.AddPtrOrReplaceIfGreater[sku.Transacted2, *sku.Transacted2](
+		k.Typen,
+		l,
+		b,
+	)
+
+	if err != nil {
 		err = errors.Wrap(err)
 		return
 	}

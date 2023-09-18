@@ -127,6 +127,9 @@ func (s *Store) checkoutOneGeneric(
 	case *transacted.Typ:
 		cop, err = s.storeObjekten.CheckoutOne(store_objekten.CheckoutOptions(options), tt)
 
+	case *sku.Transacted2:
+		cop, err = s.storeObjekten.CheckoutOne(store_objekten.CheckoutOptions(options), tt)
+
 	case *transacted.Etikett:
 		cop, err = s.storeObjekten.Etikett().CheckoutOne(store_objekten.CheckoutOptions(options), tt)
 
@@ -196,7 +199,7 @@ func (s *Store) CheckoutOneZettel(
 		options.CheckoutMode.IncludesAkte() {
 		t := sz.GetTyp()
 
-		fe := s.erworben.TypenToExtensions[t]
+		fe := s.erworben.TypenToExtensions[t.String()]
 
 		if fe == "" {
 			fe = t.String()

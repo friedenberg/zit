@@ -20,12 +20,6 @@ type TypStore interface {
 	schnittstellen.AkteGetterPutter[*typ_akte.V0]
 	objekte_store.AkteTextSaver[typ_akte.V0, *typ_akte.V0]
 	objekte_store.TransactedLogger[*transacted.Typ]
-	// objekte_store.CreateOrUpdater[
-	// 	*typ_akte.V0,
-	// 	*kennung.Typ,
-	// 	*transacted.Typ,
-	// 	*checked_out.Typ,
-	// ]
 }
 
 type TypTransactedReader = objekte_store.TransactedReader[
@@ -142,9 +136,16 @@ func (s typStore) ReadAllSchwanzen(
 	f schnittstellen.FuncIter[*transacted.Typ],
 ) (err error) {
 	// TODO-P2 switch to pointers
-	if err = s.StoreUtil.GetKonfig().Typen.Each(
-		func(e transacted.Typ) (err error) {
-			return f(&e)
+	if err = s.StoreUtil.GetKonfig().Typen.EachPtr(
+		func(e *sku.Transacted2) (err error) {
+			e1 := &transacted.Typ{}
+
+			if err = e1.SetFromSkuLike(e); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return f(e1)
 		},
 	); err != nil {
 		err = errors.Wrap(err)
@@ -195,10 +196,17 @@ func (s typStore) ReadOne(
 	errors.TodoP3("add support for working directory")
 	errors.TodoP3("inherited-typen-etiketten")
 	log.Log().Printf("reading: %s", k)
-	tt = s.StoreUtil.GetKonfig().GetApproximatedTyp(*k).ActualOrNil()
+	t1 := s.StoreUtil.GetKonfig().GetApproximatedTyp(*k).ActualOrNil()
 
-	if tt == nil {
+	if t1 == nil {
 		err = errors.Wrap(objekte_store.ErrNotFound{Id: k})
+		return
+	}
+
+	tt = &transacted.Typ{}
+
+	if err = tt.SetFromSkuLike(t1); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 

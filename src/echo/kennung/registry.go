@@ -27,7 +27,7 @@ func register[T Kennung, TPtr interface {
 	schnittstellen.ValuePtr[T]
 	Kennung
 }](id T) {
-	gob.Register(id)
+	gob.Register(&id)
 	gob.Register(collections_ptr.MakeMutableValueSet[T, TPtr](nil))
 	gob.Register(collections_ptr.MakeValueSet[T, TPtr](nil))
 	registerOnce.Do(once)

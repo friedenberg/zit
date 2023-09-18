@@ -20,7 +20,7 @@ func (s *Store) onNewOrUpdated(
 
 	switch g {
 	case gattung.Typ:
-		if err = s.StoreUtil.GetKonfigPtr().AddTyp(t); err != nil {
+		if err = s.StoreUtil.GetKonfigPtr().AddTyp2(t); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

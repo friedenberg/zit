@@ -88,6 +88,15 @@ func (a Gattung) EqualsGattung(b schnittstellen.GattungGetter) bool {
 	return a.GetGattungString() == b.GetGattung().GetGattungString()
 }
 
+func (a Gattung) AssertGattung(b schnittstellen.GattungGetter) (err error) {
+	if a.GetGattungString() != b.GetGattung().GetGattungString() {
+		err = MakeErrUnsupportedGattung(b)
+		return
+	}
+
+	return
+}
+
 func (g Gattung) GetGattungString() string {
 	return g.String()
 }

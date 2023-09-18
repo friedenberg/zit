@@ -4,8 +4,11 @@ import (
 	"encoding/gob"
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
+	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/transacted"
 )
 
@@ -13,6 +16,15 @@ func init() {
 	gob.RegisterName("typSet", makeCompiledTypSet(nil))
 	gob.RegisterName("etikettSet", makeCompiledEtikettSet(nil))
 	gob.RegisterName("kastenSet", makeCompiledKastenSet(nil))
+	k := &KennungKeyer[sku.Transacted2, *sku.Transacted2]{}
+	gob.Register(
+		collections_ptr.MakeMutableValueSet[sku.Transacted2, *sku.Transacted2](
+			k,
+		),
+	)
+	gob.Register(k)
+	gob.Register(collections_value.MakeMutableValueSet[values.String](nil))
+	gob.Register(collections_value.MakeValueSet[values.String](nil))
 	gob.Register(KennungKeyer[transacted.Typ, *transacted.Typ]{})
 	gob.Register(KennungKeyer[transacted.Etikett, *transacted.Etikett]{})
 	gob.Register(KennungKeyer[transacted.Kasten, *transacted.Kasten]{})

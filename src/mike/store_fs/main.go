@@ -157,6 +157,7 @@ func (s *Store) ReadFiles(
 				// 	}
 
 				case *sku.Transacted2:
+
 					if col, err = emgr.ReadOne(et); err != nil {
 						err = errors.Wrap(err)
 						return

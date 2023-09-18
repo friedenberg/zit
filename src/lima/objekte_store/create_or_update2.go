@@ -75,6 +75,17 @@ func (cou createOrUpdate2) CreateOrUpdateCheckedOut(
 
 	transactedPtr.SetAkteSha(co.External.GetAkteSha())
 
+	err = sku.CalculateAndSetSha(
+		transactedPtr,
+		cou.persistentMetadateiFormat,
+		objekte_format.Options{IncludeTai: true},
+	)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	// TODO-P2: determine why Metadatei.Etiketten can be nil
 	if transactedPtr.Metadatei.EqualsSansTai(co.Internal.Metadatei) {
 		transactedPtr = &co.Internal
@@ -220,6 +231,17 @@ func (cou createOrUpdate2) CreateOrUpdateAkte(
 	}
 
 	transactedPtr.SetAkteSha(sh)
+
+	err = sku.CalculateAndSetSha(
+		transactedPtr,
+		cou.persistentMetadateiFormat,
+		objekte_format.Options{IncludeTai: true},
+	)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if mutter != nil {
 		transactedPtr.Kopf = mutter.Kopf
