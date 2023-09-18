@@ -8,6 +8,7 @@ import (
 
 type (
 	FuncReaderTransacted[T sku.SkuLike]       func(schnittstellen.FuncIter[T]) error
+	FuncReaderTransacted2                     func(schnittstellen.FuncIter[*sku.Transacted2]) error
 	FuncReaderTransactedPtr[T sku.SkuLikePtr] func(schnittstellen.FuncIter[T]) error
 	FuncReaderTransactedLike                  func(schnittstellen.FuncIter[sku.SkuLike]) error
 	FuncReaderTransactedLikePtr               func(schnittstellen.FuncIter[sku.SkuLikePtr]) error
@@ -39,6 +40,18 @@ func MakeApplyTransactedLikePtr[T sku.SkuLikePtr](
 	return func(fatl schnittstellen.FuncIter[sku.SkuLikePtr]) (err error) {
 		return fat(
 			func(e T) (err error) {
+				return fatl(e)
+			},
+		)
+	}
+}
+
+func MakeApplyTransactedLikePtr2(
+	fat FuncReaderTransacted2,
+) FuncReaderTransactedLikePtr {
+	return func(fatl schnittstellen.FuncIter[sku.SkuLikePtr]) (err error) {
+		return fat(
+			func(e *sku.Transacted2) (err error) {
 				return fatl(e)
 			},
 		)

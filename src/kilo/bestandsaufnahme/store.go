@@ -16,6 +16,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
+	"github.com/friedenberg/zit/src/india/sku_fmt"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/lima/objekte_store"
 )
@@ -391,6 +392,50 @@ func (s *store) ReadAllSkus(
 					t.GetKennungLike(),
 				)
 
+				return
+			}
+
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *store) ReadAllSkus2(
+	f schnittstellen.FuncIter[*sku.Transacted2],
+) (err error) {
+	if err = s.ReadAll(
+		func(t *Transacted) (err error) {
+			var r io.ReadCloser
+
+			if r, err = s.af.AkteReader(t.GetAkteSha()); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			defer errors.DeferredCloser(&err, r)
+
+			dec := sku_fmt.MakeFormatBestandsaufnahmeScanner2(
+				r,
+				s.persistentMetadateiFormat,
+				s.options,
+			)
+
+			for dec.Scan() {
+				sk := dec.GetSkuLikePtr().(*sku.Transacted2)
+
+				if err = f(sk); err != nil {
+					err = errors.Wrapf(err, "Sku: %s", sk)
+					return
+				}
+			}
+
+			if err = dec.Error(); err != nil {
+				err = errors.Wrap(err)
 				return
 			}
 

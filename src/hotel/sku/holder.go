@@ -7,7 +7,7 @@ import (
 
 type Holder struct {
 	Metadatei   metadatei.Metadatei
-	KennungLike kennung.Kennung
+	KennungLike kennung.KennungPtr
 }
 
 func (h *Holder) GetMetadatei() metadatei.Metadatei {
@@ -19,6 +19,11 @@ func (h *Holder) SetMetadatei(m metadatei.Metadatei) {
 }
 
 func (h *Holder) SetKennungLike(kl kennung.Kennung) (err error) {
+	h.KennungLike = kl.KennungPtrClone()
+	return
+}
+
+func (h *Holder) SetKennungLikePtr(kl kennung.KennungPtr) (err error) {
 	h.KennungLike = kl
 	return
 }

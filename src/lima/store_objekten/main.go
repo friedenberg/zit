@@ -21,6 +21,18 @@ import (
 	"github.com/friedenberg/zit/src/mike/store_util"
 )
 
+type CreateOrUpdator interface {
+	CreateOrUpdateCheckedOut(
+		co *objekte.CheckedOut2,
+	) (transactedPtr *sku.Transacted2, err error)
+
+	CreateOrUpdateAkte(
+		mg metadatei.Getter,
+		kennungPtr *kennung.Kennung2,
+		sh schnittstellen.ShaLike,
+	) (transactedPtr *sku.Transacted2, err error)
+}
+
 type Store struct {
 	store_util.StoreUtil
 
@@ -30,18 +42,9 @@ type Store struct {
 	konfigStore  KonfigStore
 	kastenStore  KastenStore
 
-	objekte_store.LogWriter[sku.SkuLikePtr]
-	CreateOrUpdator interface {
-		CreateOrUpdateCheckedOut(
-			co *objekte.CheckedOut2,
-		) (transactedPtr *sku.Transacted2, err error)
+	CreateOrUpdator CreateOrUpdator
 
-		CreateOrUpdateAkte(
-			mg metadatei.Getter,
-			kennungPtr *kennung.Kennung2,
-			sh schnittstellen.ShaLike,
-		) (transactedPtr *sku.Transacted2, err error)
-	}
+	objekte_store.LogWriter[sku.SkuLikePtr]
 
 	// Gattungen
 	gattungStores     map[schnittstellen.GattungLike]gattungStoreLike

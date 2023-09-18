@@ -5,8 +5,10 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/values"
+	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/script_config"
 	"github.com/friedenberg/zit/src/delta/gattungen"
@@ -66,7 +68,7 @@ func (c ExecAction) RunWithQuery(
 		return
 	}
 
-	hinweisen := kennung.MakeHinweisMutableSet()
+	hinweisen := collections_value.MakeMutableValueSet[kennung.Kennung](nil)
 
 	if err = u.StoreObjekten().Zettel().Query(
 		zids,
@@ -93,7 +95,7 @@ func (c ExecAction) RunWithQuery(
 func (c ExecAction) runAction(
 	u *umwelt.Umwelt,
 	sc script_config.ScriptConfig,
-	hinweisen kennung.HinweisMutableSet,
+	hinweisen schnittstellen.SetLike[kennung.Kennung],
 ) (err error) {
 	var wt io.WriterTo
 
@@ -102,7 +104,7 @@ func (c ExecAction) runAction(
 		map[string]string{
 			"ZIT_BIN": u.Standort().Executable(),
 		},
-		iter.Strings[kennung.Hinweis](hinweisen)...,
+		iter.Strings[kennung.Kennung](hinweisen)...,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

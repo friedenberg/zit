@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/alfred"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/kennung_index"
-	"github.com/friedenberg/zit/src/india/transacted"
+	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
 type Writer struct {
@@ -48,7 +48,7 @@ func New(
 	return
 }
 
-func (w *Writer) WriteZettelVerzeichnisse(z *transacted.Zettel) (err error) {
+func (w *Writer) WriteZettelVerzeichnisse(z sku.SkuLikePtr) (err error) {
 	item := w.zettelToItem(z, w.Abbr)
 	w.alfredWriter.WriteItem(item)
 

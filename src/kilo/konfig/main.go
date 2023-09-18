@@ -386,7 +386,9 @@ func (kc compiled) IsInlineTyp(k kennung.Typ) (isInline bool) {
 
 // Returns the exactly matching Typ, or if it doesn't exist, returns the parent
 // Typ or nil. (Parent Typ for `md-gdoc` would be `md`.)
-func (kc compiled) GetApproximatedTyp(k kennung.Typ) (ct ApproximatedTyp) {
+func (kc compiled) GetApproximatedTyp(
+	k kennung.Kennung,
+) (ct ApproximatedTyp) {
 	expandedActual := kc.GetSortedTypenExpanded(k.String())
 	if len(expandedActual) > 0 {
 		ct.hasValue = true

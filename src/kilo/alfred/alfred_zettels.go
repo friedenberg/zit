@@ -7,11 +7,11 @@ import (
 	"github.com/friedenberg/zit/src/bravo/alfred"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/india/transacted"
+	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
 func (w *Writer) zettelToItem(
-	z *transacted.Zettel,
+	z sku.SkuLikePtr,
 	ha func(kennung.Hinweis) (string, error),
 ) (a *alfred.Item) {
 	a = w.alfredWriter.Get()
@@ -23,19 +23,22 @@ func (w *Writer) zettelToItem(
 	)
 
 	if a.Title == "" {
-		a.Title = z.Kennung.String()
+		a.Title = z.GetKennungLike().String()
 		a.Subtitle = fmt.Sprintf("%s", es)
 	} else {
-		a.Subtitle = fmt.Sprintf("%s: %s", z.Kennung.String(), es)
+		a.Subtitle = fmt.Sprintf("%s: %s", z.GetKennungLike().String(), es)
 	}
 
-	a.Arg = z.Kennung.String()
+	a.Arg = z.GetKennungLike().String()
 
 	mb := alfred.NewMatchBuilder()
 
-	mb.AddMatches(z.Kennung.String())
-	mb.AddMatches(z.Kennung.Kopf())
-	mb.AddMatches(z.Kennung.Schwanz())
+	k := z.GetKennungLike()
+	parts := k.Parts()
+
+	mb.AddMatches(k.String())
+	mb.AddMatches(parts[0])
+	mb.AddMatches(parts[2])
 	mb.AddMatches(z.GetMetadatei().Bezeichnung.String())
 	mb.AddMatches(z.GetTyp().String())
 	z.GetMetadatei().Etiketten.Each(
@@ -87,8 +90,8 @@ func (w *Writer) zettelToItem(
 	// 	a.Match = a.Match[:100]
 	// }
 
-	a.Text.Copy = z.Kennung.String()
-	a.Uid = "zit://" + z.Kennung.String()
+	a.Text.Copy = k.String()
+	a.Uid = "zit://" + k.String()
 
 	return
 }

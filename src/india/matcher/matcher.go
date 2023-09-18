@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
 const (
@@ -696,6 +697,17 @@ func (matcher matcherWithSigil) Each(f schnittstellen.FuncIter[Matcher]) error {
 
 func MakeMatcherFuncIter[T Matchable](m Matcher) schnittstellen.FuncIter[T] {
 	return func(e T) (err error) {
+		if !m.ContainsMatchable(e) {
+			err = iter.MakeErrStopIteration()
+			return
+		}
+
+		return
+	}
+}
+
+func MakeMatcherFuncIter2(m Matcher) schnittstellen.FuncIter[*sku.Transacted2] {
+	return func(e *sku.Transacted2) (err error) {
 		if !m.ContainsMatchable(e) {
 			err = iter.MakeErrStopIteration()
 			return

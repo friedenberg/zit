@@ -31,11 +31,27 @@ func MakeFormatBestandsaufnahmeScanner(
 	}
 }
 
+func MakeFormatBestandsaufnahmeScanner2(
+	in io.Reader,
+	of objekte_format.Format,
+	op objekte_format.Options,
+) FormatBestandsaufnahmeScanner {
+	return &bestandsaufnahmeScanner{
+		br:             ohio.MakeBoundaryReader(in, metadatei.Boundary+"\n"),
+		format:         of,
+		options:        op,
+		es:             kennung.MakeEtikettMutableSet(),
+		useTransacted2: true,
+	}
+}
+
 type bestandsaufnahmeScanner struct {
 	br         ohio.BoundaryReader
 	format     objekte_format.Format
 	options    objekte_format.Options
 	afterFirst bool
+
+	useTransacted2 bool
 
 	m  metadatei.Metadatei
 	g  gattung.Gattung
@@ -100,13 +116,24 @@ func (f *bestandsaufnahmeScanner) Scan() (ok bool) {
 		return
 	}
 
-	if f.lastSku, f.err = sku.MakeSkuLikeSansObjekteSha(
-		h.Metadatei,
-		h.KennungLike,
-	); f.err != nil {
-		f.err = errors.Wrapf(f.err, "Bytes: %d", n1)
-		f.err = errors.Wrapf(f.err, "Sku: %v", h)
-		return
+	if f.useTransacted2 {
+		if f.lastSku, f.err = sku.MakeSkuLikeSansObjekteSha2(
+			h.Metadatei,
+			h.KennungLike,
+		); f.err != nil {
+			f.err = errors.Wrapf(f.err, "Bytes: %d", n1)
+			f.err = errors.Wrapf(f.err, "Sku: %v", h)
+			return
+		}
+	} else {
+		if f.lastSku, f.err = sku.MakeSkuLikeSansObjekteSha(
+			h.Metadatei,
+			h.KennungLike,
+		); f.err != nil {
+			f.err = errors.Wrapf(f.err, "Bytes: %d", n1)
+			f.err = errors.Wrapf(f.err, "Sku: %v", h)
+			return
+		}
 	}
 
 	if f.err = sku.CalculateAndSetSha(f.lastSku, f.format, f.options.SansVerzeichnisse()); f.err != nil {
