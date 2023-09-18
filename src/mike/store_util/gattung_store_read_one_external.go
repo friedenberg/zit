@@ -1,4 +1,4 @@
-package store_objekten
+package store_util
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
-func (s *commonStore[O, OPtr, K, KPtr]) ReadOneExternal(
+func (s *CommonStore[O, OPtr, K, KPtr]) ReadOneExternal(
 	em sku.ExternalMaybe,
 	t *sku.Transacted[K, KPtr],
 ) (e sku.External[K, KPtr], err error) {

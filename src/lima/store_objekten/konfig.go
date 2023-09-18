@@ -16,20 +16,8 @@ import (
 	"github.com/friedenberg/zit/src/mike/store_util"
 )
 
-type KonfigStore interface {
-	GetAkteFormat() objekte.AkteFormat[erworben.Akte, *erworben.Akte]
-	Update(schnittstellen.ShaLike) (*erworben.Transacted, error)
-
-	CommonStoreBase[
-		erworben.Akte,
-		*erworben.Akte,
-		kennung.Konfig,
-		*kennung.Konfig,
-	]
-}
-
 type konfigStore struct {
-	*commonStore[
+	*store_util.CommonStore[
 		erworben.Akte,
 		*erworben.Akte,
 		kennung.Konfig,
@@ -54,7 +42,7 @@ func makeKonfigStore(
 		),
 	}
 
-	s.commonStore, err = makeCommonStore[
+	s.CommonStore, err = store_util.MakeCommonStore[
 		erworben.Akte,
 		*erworben.Akte,
 		kennung.Konfig,
@@ -79,12 +67,12 @@ func (s konfigStore) Flush() (err error) {
 	return
 }
 
-func (s konfigStore) addOne(t *erworben.Transacted) (err error) {
+func (s konfigStore) AddOne(t *erworben.Transacted) (err error) {
 	s.StoreUtil.GetKonfigPtr().SetTransacted(t, s)
 	return
 }
 
-func (s konfigStore) updateOne(t *erworben.Transacted) (err error) {
+func (s konfigStore) UpdateOne(t *erworben.Transacted) (err error) {
 	s.StoreUtil.GetKonfigPtr().SetTransacted(t, s)
 	return
 }
@@ -274,7 +262,7 @@ func (s *konfigStore) ReindexOne(
 
 	o = te
 
-	if err = s.updateOne(te); err != nil {
+	if err = s.UpdateOne(te); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

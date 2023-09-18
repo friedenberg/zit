@@ -1,4 +1,4 @@
-package store_objekten
+package store_util
 
 import (
 	"fmt"
@@ -15,12 +15,21 @@ import (
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/lima/objekte_store"
-	"github.com/friedenberg/zit/src/mike/store_util"
 )
 
-type reindexer interface {
+type Reindexer interface {
 	// updateExternal(objekte.External) error
 	ReindexOne(sku.SkuLike) (matcher.Matchable, error)
+}
+
+type CommonStoreDelegate[
+	O objekte.Akte[O],
+	OPtr objekte.AktePtr[O],
+	K kennung.KennungLike[K],
+	KPtr kennung.KennungLikePtr[K],
+] interface {
+	AddOne(*sku.Transacted[K, KPtr]) error
+	UpdateOne(*sku.Transacted[K, KPtr]) error
 }
 
 type CommonStore[
@@ -28,34 +37,8 @@ type CommonStore[
 	OPtr objekte.AktePtr[O],
 	K kennung.KennungLike[K],
 	KPtr kennung.KennungLikePtr[K],
-] interface {
-	CommonStoreBase[O, OPtr, K, KPtr]
-
-	objekte_store.CreateOrUpdater[
-		OPtr,
-		KPtr,
-		*sku.Transacted[K, KPtr],
-		*objekte.CheckedOut[K, KPtr],
-	]
-}
-
-type commonStoreDelegate[
-	O objekte.Akte[O],
-	OPtr objekte.AktePtr[O],
-	K kennung.KennungLike[K],
-	KPtr kennung.KennungLikePtr[K],
-] interface {
-	addOne(*sku.Transacted[K, KPtr]) error
-	updateOne(*sku.Transacted[K, KPtr]) error
-}
-
-type commonStore[
-	O objekte.Akte[O],
-	OPtr objekte.AktePtr[O],
-	K kennung.KennungLike[K],
-	KPtr kennung.KennungLikePtr[K],
 ] struct {
-	commonStoreBase[O, OPtr, K, KPtr]
+	CommonStoreBase[O, OPtr, K, KPtr]
 	AkteFormat objekte.AkteFormat[O, OPtr]
 	objekte_store.StoredParseSaver[O, OPtr, K, KPtr]
 	objekte_store.CreateOrUpdater[
@@ -66,19 +49,19 @@ type commonStore[
 	]
 }
 
-func makeCommonStore[
+func MakeCommonStore[
 	O objekte.Akte[O],
 	OPtr objekte.AktePtr[O],
 	K kennung.KennungLike[K],
 	KPtr kennung.KennungLikePtr[K],
 ](
 	gg schnittstellen.GattungGetter,
-	delegate commonStoreDelegate[O, OPtr, K, KPtr],
-	sa store_util.StoreUtil,
+	delegate CommonStoreDelegate[O, OPtr, K, KPtr],
+	sa StoreUtil,
 	tr objekte_store.TransactedReader[KPtr,
 		*sku.Transacted[K, KPtr]],
 	akteFormat objekte.AkteFormat[O, OPtr],
-) (s *commonStore[O, OPtr, K, KPtr], err error) {
+) (s *CommonStore[O, OPtr, K, KPtr], err error) {
 	// pool := collections.MakePool[
 	// 	objekte.Transacted[O, OPtr, K, KPtr, ],
 	// 	*objekte.Transacted[O, OPtr, K, KPtr, ],
@@ -90,7 +73,7 @@ func makeCommonStore[
 
 	of := sa.ObjekteReaderWriterFactory(gg)
 
-	csb, err := makeCommonStoreBase[O, OPtr, K, KPtr](
+	csb, err := MakeCommonStoreBase[O, OPtr, K, KPtr](
 		gg,
 		delegate,
 		sa,
@@ -105,13 +88,13 @@ func makeCommonStore[
 		return
 	}
 
-	s = &commonStore[
+	s = &CommonStore[
 		O,
 		OPtr,
 		K,
 		KPtr,
 	]{
-		commonStoreBase: *csb,
+		CommonStoreBase: *csb,
 		AkteFormat:      akteFormat,
 		StoredParseSaver: objekte_store.MakeStoredParseSaver[O, OPtr, K, KPtr](
 			of,
@@ -125,7 +108,7 @@ func makeCommonStore[
 	return
 }
 
-func (s *commonStore[O, OPtr, K, KPtr]) CheckoutOne(
+func (s *CommonStore[O, OPtr, K, KPtr]) CheckoutOne(
 	options CheckoutOptions,
 	t *sku.Transacted[K, KPtr],
 ) (co *objekte.CheckedOut[K, KPtr], err error) {
@@ -188,7 +171,7 @@ func (s *commonStore[O, OPtr, K, KPtr]) CheckoutOne(
 	return
 }
 
-func (s *commonStore[O, OPtr, K, KPtr]) UpdateManyMetadatei(
+func (s *CommonStore[O, OPtr, K, KPtr]) UpdateManyMetadatei(
 	incoming schnittstellen.SetLike[sku.SkuLike],
 ) (err error) {
 	if !s.StoreUtil.GetLockSmith().IsAcquired() {

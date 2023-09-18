@@ -9,6 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/juliett/objekte"
+	"github.com/friedenberg/zit/src/mike/store_util"
 )
 
 func (s *Store) onNewOrUpdated(
@@ -159,7 +160,7 @@ func (s *Store) ReadAll(
 }
 
 func (s *Store) CheckoutOne(
-	options CheckoutOptions,
+	options store_util.CheckoutOptions,
 	sk sku.SkuLikePtr,
 ) (co objekte.CheckedOutLikePtr, err error) {
 	switch skt := sk.(type) {

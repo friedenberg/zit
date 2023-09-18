@@ -14,7 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/lima/cwd"
-	"github.com/friedenberg/zit/src/mike/store_fs"
+	"github.com/friedenberg/zit/src/mike/store_util"
 	"github.com/friedenberg/zit/src/november/umwelt"
 	"github.com/friedenberg/zit/src/oscar/user_ops"
 )
@@ -69,7 +69,7 @@ func (c Edit) RunWithCwdQuery(
 	ms matcher.Query,
 	pz *cwd.CwdFiles,
 ) (err error) {
-	options := store_fs.CheckoutOptions{
+	options := store_util.CheckoutOptions{
 		Cwd:          *pz,
 		CheckoutMode: c.CheckoutMode,
 	}

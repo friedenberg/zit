@@ -36,19 +36,19 @@ type CreateOrUpdator interface {
 type Store struct {
 	store_util.StoreUtil
 
-	zettelStore  ZettelStore
+	zettelStore  *zettelStore
 	typStore     *typStore
-	etikettStore EtikettStore
-	konfigStore  KonfigStore
-	kastenStore  KastenStore
+	etikettStore *etikettStore
+	konfigStore  *konfigStore
+	kastenStore  *kastenStore
 
 	CreateOrUpdator CreateOrUpdator
 
 	objekte_store.LogWriter[sku.SkuLikePtr]
 
 	// Gattungen
-	gattungStores     map[schnittstellen.GattungLike]gattungStoreLike
-	reindexers        map[schnittstellen.GattungLike]reindexer
+	gattungStores     map[schnittstellen.GattungLike]store_util.GattungStoreLike
+	reindexers        map[schnittstellen.GattungLike]store_util.Reindexer
 	flushers          map[schnittstellen.GattungLike]errors.Flusher
 	readers           map[schnittstellen.GattungLike]objekte.FuncReaderTransactedLikePtr
 	queriers          map[schnittstellen.GattungLike]objekte.FuncQuerierTransactedLikePtr
@@ -95,7 +95,7 @@ func Make(
 		return
 	}
 
-	s.gattungStores = map[schnittstellen.GattungLike]gattungStoreLike{
+	s.gattungStores = map[schnittstellen.GattungLike]store_util.GattungStoreLike{
 		gattung.Zettel:  s.zettelStore,
 		gattung.Typ:     s.typStore,
 		gattung.Etikett: s.etikettStore,
@@ -178,10 +178,10 @@ func Make(
 		}
 	}
 
-	s.reindexers = make(map[schnittstellen.GattungLike]reindexer)
+	s.reindexers = make(map[schnittstellen.GattungLike]store_util.Reindexer)
 
 	for g, gs := range s.gattungStores {
-		if gs1, ok := gs.(reindexer); ok {
+		if gs1, ok := gs.(store_util.Reindexer); ok {
 			s.reindexers[g] = gs1
 		}
 	}
@@ -242,23 +242,23 @@ func (s *Store) GetGattungInheritors(
 	return
 }
 
-func (s *Store) Zettel() ZettelStore {
+func (s *Store) Zettel() *zettelStore {
 	return s.zettelStore
 }
 
-func (s *Store) Typ() TypStore {
+func (s *Store) Typ() *typStore {
 	return s.typStore
 }
 
-func (s *Store) Etikett() EtikettStore {
+func (s *Store) Etikett() *etikettStore {
 	return s.etikettStore
 }
 
-func (s *Store) Konfig() KonfigStore {
+func (s *Store) Konfig() *konfigStore {
 	return s.konfigStore
 }
 
-func (s *Store) Kasten() KastenStore {
+func (s *Store) Kasten() *kastenStore {
 	return s.kastenStore
 }
 
@@ -337,7 +337,7 @@ func (s *Store) GetReindexFunc(
 	ti kennung_index.KennungIndex[kennung.Typ, *kennung.Typ],
 ) func(sku.SkuLikePtr) error {
 	return func(sk sku.SkuLikePtr) (err error) {
-		var st reindexer
+		var st store_util.Reindexer
 		ok := false
 
 		g := sk.GetGattung()

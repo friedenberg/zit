@@ -17,7 +17,7 @@ import (
 	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/lima/cwd"
-	"github.com/friedenberg/zit/src/mike/store_fs"
+	"github.com/friedenberg/zit/src/mike/store_util"
 	"github.com/friedenberg/zit/src/november/umwelt"
 	"github.com/friedenberg/zit/src/oscar/user_ops"
 )
@@ -136,7 +136,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 				return
 			}
 
-			options := store_fs.CheckoutOptions{
+			options := store_util.CheckoutOptions{
 				Cwd:          cwdFiles,
 				CheckoutMode: checkout_mode.ModeObjekteAndAkte,
 			}
@@ -215,7 +215,7 @@ func (c New) writeNewZettels(
 	emptyOp := user_ops.WriteNewZettels{
 		Umwelt:   u,
 		CheckOut: c.Edit,
-		CheckoutOptions: store_fs.CheckoutOptions{
+		CheckoutOptions: store_util.CheckoutOptions{
 			Cwd: cwdFiles,
 		},
 	}

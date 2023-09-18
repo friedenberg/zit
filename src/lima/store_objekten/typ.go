@@ -16,19 +16,13 @@ import (
 	"github.com/friedenberg/zit/src/mike/store_util"
 )
 
-type TypStore interface {
-	schnittstellen.AkteGetterPutter[*typ_akte.V0]
-	objekte_store.AkteTextSaver[typ_akte.V0, *typ_akte.V0]
-	objekte_store.TransactedLogger[*transacted.Typ]
-}
-
 type TypTransactedReader = objekte_store.TransactedReader[
 	*kennung.Typ,
 	*transacted.Typ,
 ]
 
 type typStore struct {
-	*commonStore[
+	*store_util.CommonStore[
 		typ_akte.V0,
 		*typ_akte.V0,
 		kennung.Typ,
@@ -41,7 +35,7 @@ func makeTypStore(
 ) (s *typStore, err error) {
 	s = &typStore{}
 
-	s.commonStore, err = makeCommonStore[
+	s.CommonStore, err = store_util.MakeCommonStore[
 		typ_akte.V0,
 		*typ_akte.V0,
 		kennung.Typ,
@@ -74,7 +68,7 @@ func makeTypStore(
 		return
 	}
 
-	s.commonStore.CreateOrUpdater = objekte_store.MakeCreateOrUpdate[
+	s.CommonStore.CreateOrUpdater = objekte_store.MakeCreateOrUpdate[
 		typ_akte.V0,
 		*typ_akte.V0,
 		kennung.Typ,
@@ -82,7 +76,7 @@ func makeTypStore(
 	](
 		sa,
 		sa.GetLockSmith(),
-		s.commonStore,
+		s.CommonStore,
 		sa,
 		TypTransactedReader(s),
 		objekte_store.CreateOrUpdateDelegate[*transacted.Typ]{
@@ -119,12 +113,12 @@ func (s typStore) Flush() (err error) {
 	return
 }
 
-func (s typStore) addOne(t *transacted.Typ) (err error) {
+func (s typStore) AddOne(t *transacted.Typ) (err error) {
 	s.StoreUtil.GetKonfigPtr().AddTyp(t)
 	return
 }
 
-func (s typStore) updateOne(t *transacted.Typ) (err error) {
+func (s typStore) UpdateOne(t *transacted.Typ) (err error) {
 	log.Log().Printf("adding one: %s", t.GetSkuLike())
 	s.StoreUtil.GetKonfigPtr().AddTyp(t)
 	log.Log().Printf("done adding one: %s", t.GetSkuLike())

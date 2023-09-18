@@ -16,11 +16,11 @@ import (
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/kilo/zettel_external"
 	"github.com/friedenberg/zit/src/lima/cwd"
-	"github.com/friedenberg/zit/src/lima/store_objekten"
+	"github.com/friedenberg/zit/src/mike/store_util"
 )
 
 func (s *Store) CheckoutQuery(
-	options CheckoutOptions,
+	options store_util.CheckoutOptions,
 	ms matcher.Query,
 	f schnittstellen.FuncIter[objekte.CheckedOutLike],
 ) (err error) {
@@ -45,7 +45,7 @@ func (s *Store) CheckoutQuery(
 }
 
 func (s *Store) Checkout(
-	options CheckoutOptions,
+	options store_util.CheckoutOptions,
 	ztw schnittstellen.FuncIter[*transacted.Zettel],
 ) (zcs zettel.MutableSetCheckedOut, err error) {
 	zcs = zettel.MakeMutableSetCheckedOutUnique(0)
@@ -83,7 +83,7 @@ func (s *Store) Checkout(
 }
 
 func (s Store) shouldCheckOut(
-	options CheckoutOptions,
+	options store_util.CheckoutOptions,
 	cz checked_out.Zettel,
 ) (ok bool) {
 	switch {
@@ -98,7 +98,7 @@ func (s Store) shouldCheckOut(
 }
 
 func (s Store) filenameForZettelTransacted(
-	options CheckoutOptions,
+	options store_util.CheckoutOptions,
 	sz transacted.Zettel,
 ) (originalFilename string, filename string, err error) {
 	if originalFilename, err = id.MakeDirIfNecessary(sz.GetKennung(), s.Cwd()); err != nil {
@@ -112,7 +112,7 @@ func (s Store) filenameForZettelTransacted(
 }
 
 func (s *Store) checkoutOneGeneric(
-	options CheckoutOptions,
+	options store_util.CheckoutOptions,
 	t sku.SkuLike,
 ) (cop objekte.CheckedOutLikePtr, err error) {
 	switch tt := t.(type) {
@@ -122,16 +122,16 @@ func (s *Store) checkoutOneGeneric(
 		cop = &co
 
 	case *transacted.Kasten:
-		cop, err = s.storeObjekten.Kasten().CheckoutOne(store_objekten.CheckoutOptions(options), tt)
+		cop, err = s.storeObjekten.Kasten().CheckoutOne(store_util.CheckoutOptions(options), tt)
 
 	case *transacted.Typ:
-		cop, err = s.storeObjekten.CheckoutOne(store_objekten.CheckoutOptions(options), tt)
+		cop, err = s.storeObjekten.CheckoutOne(store_util.CheckoutOptions(options), tt)
 
 	case *sku.Transacted2:
-		cop, err = s.storeObjekten.CheckoutOne(store_objekten.CheckoutOptions(options), tt)
+		cop, err = s.storeObjekten.CheckoutOne(store_util.CheckoutOptions(options), tt)
 
 	case *transacted.Etikett:
-		cop, err = s.storeObjekten.Etikett().CheckoutOne(store_objekten.CheckoutOptions(options), tt)
+		cop, err = s.storeObjekten.Etikett().CheckoutOne(store_util.CheckoutOptions(options), tt)
 
 	default:
 		// err = errors.Implement()
@@ -146,7 +146,7 @@ func (s *Store) checkoutOneGeneric(
 }
 
 func (s *Store) CheckoutOneZettel(
-	options CheckoutOptions,
+	options store_util.CheckoutOptions,
 	sz transacted.Zettel,
 ) (cz checked_out.Zettel, err error) {
 	cz.Internal = sz

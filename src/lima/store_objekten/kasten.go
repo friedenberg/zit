@@ -15,22 +15,13 @@ import (
 	"github.com/friedenberg/zit/src/mike/store_util"
 )
 
-type KastenStore interface {
-	CommonStore[
-		kasten_akte.V0,
-		*kasten_akte.V0,
-		kennung.Kasten,
-		*kennung.Kasten,
-	]
-}
-
 type KastenTransactedReader = objekte_store.TransactedReader[
 	*kennung.Kasten,
 	*transacted.Kasten,
 ]
 
 type kastenStore struct {
-	*commonStore[
+	*store_util.CommonStore[
 		kasten_akte.V0,
 		*kasten_akte.V0,
 		kennung.Kasten,
@@ -43,7 +34,7 @@ func makeKastenStore(
 ) (s *kastenStore, err error) {
 	s = &kastenStore{}
 
-	s.commonStore, err = makeCommonStore[
+	s.CommonStore, err = store_util.MakeCommonStore[
 		kasten_akte.V0,
 		*kasten_akte.V0,
 		kennung.Kasten,
@@ -76,7 +67,7 @@ func makeKastenStore(
 		return
 	}
 
-	s.commonStore.CreateOrUpdater = objekte_store.MakeCreateOrUpdate[
+	s.CommonStore.CreateOrUpdater = objekte_store.MakeCreateOrUpdate[
 		kasten_akte.V0,
 		*kasten_akte.V0,
 		kennung.Kasten,
@@ -121,12 +112,12 @@ func (s kastenStore) Flush() (err error) {
 	return
 }
 
-func (s kastenStore) addOne(t *transacted.Kasten) (err error) {
+func (s kastenStore) AddOne(t *transacted.Kasten) (err error) {
 	s.StoreUtil.GetKonfigPtr().AddKasten(t)
 	return
 }
 
-func (s kastenStore) updateOne(t *transacted.Kasten) (err error) {
+func (s kastenStore) UpdateOne(t *transacted.Kasten) (err error) {
 	s.StoreUtil.GetKonfigPtr().AddKasten(t)
 	return
 }

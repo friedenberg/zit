@@ -28,31 +28,8 @@ import (
 	"github.com/friedenberg/zit/src/mike/store_util"
 )
 
-type ZettelStore interface {
-	CommonStoreBase[
-		zettel.Objekte,
-		*zettel.Objekte,
-		kennung.Hinweis,
-		*kennung.Hinweis,
-	]
-
-	objekte_store.Creator[*transacted.Zettel]
-
-	objekte_store.CheckedOutUpdater[
-		*checked_out.Zettel,
-		*transacted.Zettel,
-	]
-
-	objekte_store.Updater[
-		*kennung.Hinweis,
-		*transacted.Zettel,
-	]
-
-	objekte_store.UpdaterManyMetadatei
-}
-
 type zettelStore struct {
-	*commonStore[
+	*store_util.CommonStore[
 		zettel.Objekte,
 		*zettel.Objekte,
 		kennung.Hinweis,
@@ -76,7 +53,7 @@ func makeZettelStore(
 		tagp:        tagp,
 	}
 
-	s.commonStore, err = makeCommonStore[
+	s.CommonStore, err = store_util.MakeCommonStore[
 		zettel.Objekte,
 		*zettel.Objekte,
 		kennung.Hinweis,
@@ -131,11 +108,11 @@ func (s *zettelStore) Flush() (err error) {
 	return
 }
 
-func (s *zettelStore) addOne(t *transacted.Zettel) (err error) {
+func (s *zettelStore) AddOne(t *transacted.Zettel) (err error) {
 	return s.writeNamedZettelToIndex(t)
 }
 
-func (s *zettelStore) updateOne(t *transacted.Zettel) (err error) {
+func (s *zettelStore) UpdateOne(t *transacted.Zettel) (err error) {
 	return s.writeNamedZettelToIndex(t)
 }
 
@@ -600,7 +577,7 @@ func (s *zettelStore) ReindexOne(
 	sk sku.SkuLike,
 ) (o matcher.Matchable, err error) {
 	var tz *transacted.Zettel
-	defer s.pool.Put(tz)
+	defer s.Pool.Put(tz)
 
 	errors.Log().Printf("reindexing: %s", sku_fmt.String(sk))
 

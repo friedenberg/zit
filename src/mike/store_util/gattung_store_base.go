@@ -1,4 +1,4 @@
-package store_objekten
+package store_util
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -11,11 +11,10 @@ import (
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/lima/objekte_store"
-	"github.com/friedenberg/zit/src/mike/store_util"
 )
 
-type gattungStoreLike interface {
-	reindexer
+type GattungStoreLike interface {
+	Reindexer
 	schnittstellen.ObjekteIOFactory
 	GetInheritor(
 		schnittstellen.ObjekteReaderFactory,
@@ -29,60 +28,16 @@ type CommonStoreBase[
 	OPtr objekte.AktePtr[O],
 	K kennung.KennungLike[K],
 	KPtr kennung.KennungLikePtr[K],
-] interface {
-	gattungStoreLike
-
-	CheckoutOne(
-		CheckoutOptions,
-		*sku.Transacted[K, KPtr],
-	) (*objekte.CheckedOut[K, KPtr], error)
-
-	schnittstellen.AkteGetterPutter[OPtr]
-
-	objekte_store.TransactedLogger[*sku.Transacted[
-		K,
-		KPtr,
-	]]
-
-	objekte_store.Querier[
-		KPtr,
-		*sku.Transacted[
-			K,
-			KPtr,
-		],
-	]
-
-	objekte_store.AkteTextSaver[O, OPtr]
-
-	objekte_store.TransactedInflator[O, OPtr, K, KPtr]
-
-	objekte_store.Inheritor[*sku.Transacted[
-		K,
-		KPtr,
-	]]
-
-	objekte_store.ExternalReader[
-		sku.ExternalMaybe,
-		*sku.Transacted[K, KPtr],
-		sku.External[K, KPtr],
-	]
-}
-
-type commonStoreBase[
-	O objekte.Akte[O],
-	OPtr objekte.AktePtr[O],
-	K kennung.KennungLike[K],
-	KPtr kennung.KennungLikePtr[K],
 ] struct {
 	schnittstellen.GattungGetter
 
 	schnittstellen.ObjekteIOFactory
 
-	delegate commonStoreDelegate[O, OPtr, K, KPtr]
+	delegate CommonStoreDelegate[O, OPtr, K, KPtr]
 
-	store_util.StoreUtil
+	StoreUtil
 
-	pool schnittstellen.Pool[
+	Pool schnittstellen.Pool[
 		sku.Transacted[K, KPtr],
 		*sku.Transacted[K, KPtr],
 	]
@@ -104,20 +59,20 @@ type commonStoreBase[
 	akteFormat objekte.AkteFormat[O, OPtr]
 }
 
-func makeCommonStoreBase[
+func MakeCommonStoreBase[
 	O objekte.Akte[O],
 	OPtr objekte.AktePtr[O],
 	K kennung.KennungLike[K],
 	KPtr kennung.KennungLikePtr[K],
 ](
 	gg schnittstellen.GattungGetter,
-	delegate commonStoreDelegate[O, OPtr, K, KPtr],
-	sa store_util.StoreUtil,
+	delegate CommonStoreDelegate[O, OPtr, K, KPtr],
+	sa StoreUtil,
 	tr objekte_store.TransactedReader[KPtr,
 		*sku.Transacted[K, KPtr]],
 	pmf objekte_format.Format,
 	akteFormat objekte.AkteFormat[O, OPtr],
-) (s *commonStoreBase[O, OPtr, K, KPtr], err error) {
+) (s *CommonStoreBase[O, OPtr, K, KPtr], err error) {
 	// type T objekte.Transacted[O, OPtr, K, KPtr, ]
 	// type TPtr *objekte.Transacted[O, OPtr, K, KPtr, ]
 
@@ -132,12 +87,12 @@ func makeCommonStoreBase[
 
 	of := sa.ObjekteReaderWriterFactory(gg)
 
-	s = &commonStoreBase[O, OPtr, K, KPtr]{
+	s = &CommonStoreBase[O, OPtr, K, KPtr]{
 		GattungGetter:    gg,
 		ObjekteIOFactory: of,
 		delegate:         delegate,
 		StoreUtil:        sa,
-		pool:             pool,
+		Pool:             pool,
 		akteFormat:       akteFormat,
 		TransactedInflator: objekte_store.MakeTransactedInflator[
 			O,
@@ -169,13 +124,13 @@ func makeCommonStoreBase[
 	return
 }
 
-func (s *commonStoreBase[O, OPtr, K, KPtr]) SetLogWriter(
+func (s *CommonStoreBase[O, OPtr, K, KPtr]) SetLogWriter(
 	lw objekte_store.LogWriter[sku.SkuLikePtr],
 ) {
 	s.LogWriter = lw
 }
 
-func (s *commonStoreBase[O, OPtr, K, KPtr]) Query(
+func (s *CommonStoreBase[O, OPtr, K, KPtr]) Query(
 	m matcher.MatcherSigil,
 	f schnittstellen.FuncIter[*sku.Transacted[K, KPtr]],
 ) (err error) {
@@ -185,7 +140,7 @@ func (s *commonStoreBase[O, OPtr, K, KPtr]) Query(
 	](s, m, f)
 }
 
-func (s *commonStoreBase[O, OPtr, K, KPtr]) ReindexOne(
+func (s *CommonStoreBase[O, OPtr, K, KPtr]) ReindexOne(
 	sk sku.SkuLike,
 ) (o matcher.Matchable, err error) {
 	var t *sku.Transacted[K, KPtr]
@@ -204,13 +159,13 @@ func (s *commonStoreBase[O, OPtr, K, KPtr]) ReindexOne(
 
 	if t.IsNew() {
 		s.LogWriter.New(t)
-		if err = s.delegate.addOne(t); err != nil {
+		if err = s.delegate.AddOne(t); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	} else {
 		s.LogWriter.Updated(t)
-		if err = s.delegate.updateOne(t); err != nil {
+		if err = s.delegate.UpdateOne(t); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -219,7 +174,7 @@ func (s *commonStoreBase[O, OPtr, K, KPtr]) ReindexOne(
 	return
 }
 
-func (s *commonStoreBase[O, OPtr, K, KPtr]) Inherit(
+func (s *CommonStoreBase[O, OPtr, K, KPtr]) Inherit(
 	t *sku.Transacted[K, KPtr],
 ) (err error) {
 	if t == nil {
@@ -235,7 +190,7 @@ func (s *commonStoreBase[O, OPtr, K, KPtr]) Inherit(
 	old, _ := s.ReadOne(&t.Kennung)
 
 	if old == nil || old.Less(*t) {
-		s.delegate.addOne(t)
+		s.delegate.AddOne(t)
 	}
 
 	if t.IsNew() {
@@ -247,7 +202,7 @@ func (s *commonStoreBase[O, OPtr, K, KPtr]) Inherit(
 	return
 }
 
-func (s *commonStoreBase[O, OPtr, K, KPtr]) GetInheritor(
+func (s *CommonStoreBase[O, OPtr, K, KPtr]) GetInheritor(
 	orf schnittstellen.ObjekteReaderFactory,
 	arf schnittstellen.AkteReaderFactory,
 	pmf objekte_format.Format,
@@ -286,7 +241,7 @@ func (s *commonStoreBase[O, OPtr, K, KPtr]) GetInheritor(
 	)
 }
 
-func (s *commonStoreBase[O, OPtr, K, KPtr]) GetAkte(
+func (s *CommonStoreBase[O, OPtr, K, KPtr]) GetAkte(
 	sh schnittstellen.ShaLike,
 ) (a OPtr, err error) {
 	var ar schnittstellen.ShaReadCloser
@@ -317,6 +272,6 @@ func (s *commonStoreBase[O, OPtr, K, KPtr]) GetAkte(
 	return
 }
 
-func (s *commonStoreBase[O, OPtr, K, KPtr]) PutAkte(a OPtr) {
+func (s *CommonStoreBase[O, OPtr, K, KPtr]) PutAkte(a OPtr) {
 	// TODO-P2 implement pool
 }

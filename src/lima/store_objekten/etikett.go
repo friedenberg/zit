@@ -15,22 +15,13 @@ import (
 	"github.com/friedenberg/zit/src/mike/store_util"
 )
 
-type EtikettStore interface {
-	CommonStore[
-		etikett_akte.V0,
-		*etikett_akte.V0,
-		kennung.Etikett,
-		*kennung.Etikett,
-	]
-}
-
 type EtikettTransactedReader = objekte_store.TransactedReader[
 	*kennung.Etikett,
 	*transacted.Etikett,
 ]
 
 type etikettStore struct {
-	*commonStore[
+	*store_util.CommonStore[
 		etikett_akte.V0,
 		*etikett_akte.V0,
 		kennung.Etikett,
@@ -43,7 +34,7 @@ func makeEtikettStore(
 ) (s *etikettStore, err error) {
 	s = &etikettStore{}
 
-	s.commonStore, err = makeCommonStore[
+	s.CommonStore, err = store_util.MakeCommonStore[
 		etikett_akte.V0,
 		*etikett_akte.V0,
 		kennung.Etikett,
@@ -76,7 +67,7 @@ func makeEtikettStore(
 		return
 	}
 
-	s.commonStore.CreateOrUpdater = objekte_store.MakeCreateOrUpdate[
+	s.CommonStore.CreateOrUpdater = objekte_store.MakeCreateOrUpdate[
 		etikett_akte.V0,
 		*etikett_akte.V0,
 		kennung.Etikett,
@@ -121,12 +112,12 @@ func (s etikettStore) Flush() (err error) {
 	return
 }
 
-func (s etikettStore) addOne(t *transacted.Etikett) (err error) {
+func (s etikettStore) AddOne(t *transacted.Etikett) (err error) {
 	s.StoreUtil.GetKonfigPtr().AddEtikett(t)
 	return
 }
 
-func (s etikettStore) updateOne(t *transacted.Etikett) (err error) {
+func (s etikettStore) UpdateOne(t *transacted.Etikett) (err error) {
 	s.StoreUtil.GetKonfigPtr().AddEtikett(t)
 	return
 }
