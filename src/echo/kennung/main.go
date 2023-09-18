@@ -80,13 +80,13 @@ type Index struct {
 func MakeWithGattung(
 	gg schnittstellen.GattungGetter,
 	v string,
-) (k Kennung, err error) {
+) (k KennungPtr, err error) {
 	switch gattung.Make(gg.GetGattung()) {
 	case gattung.Zettel:
 		var h Hinweis
 
 		if err = h.Set(v); err == nil {
-			k = h
+			k = &h
 			return
 		}
 
@@ -94,7 +94,7 @@ func MakeWithGattung(
 		var e Etikett
 
 		if err = e.Set(v); err == nil {
-			k = e
+			k = &e
 			return
 		}
 
@@ -102,7 +102,7 @@ func MakeWithGattung(
 		var t Typ
 
 		if err = t.Set(v); err == nil {
-			k = t
+			k = &t
 			return
 		}
 
@@ -110,7 +110,7 @@ func MakeWithGattung(
 		var ka Kasten
 
 		if err = ka.Set(v); err == nil {
-			k = ka
+			k = &ka
 			return
 		}
 
@@ -118,7 +118,7 @@ func MakeWithGattung(
 		var h Konfig
 
 		if err = h.Set(v); err == nil {
-			k = h
+			k = &h
 			return
 		}
 
@@ -126,7 +126,7 @@ func MakeWithGattung(
 		var h Tai
 
 		if err = h.Set(v); err == nil {
-			k = h
+			k = &h
 			return
 		}
 	}
@@ -136,12 +136,12 @@ func MakeWithGattung(
 	return
 }
 
-func Make(v string) (k Kennung, err error) {
+func Make(v string) (k KennungPtr, err error) {
 	{
 		var e Etikett
 
 		if err = e.Set(v); err == nil {
-			k = e
+			k = &e
 			return
 		}
 	}
@@ -150,7 +150,7 @@ func Make(v string) (k Kennung, err error) {
 		var t Typ
 
 		if err = t.Set(v); err == nil {
-			k = t
+			k = &t
 			return
 		}
 	}
@@ -159,7 +159,7 @@ func Make(v string) (k Kennung, err error) {
 		var ka Kasten
 
 		if err = ka.Set(v); err == nil {
-			k = ka
+			k = &ka
 			return
 		}
 	}
@@ -168,7 +168,7 @@ func Make(v string) (k Kennung, err error) {
 		var h Hinweis
 
 		if err = h.Set(v); err == nil {
-			k = h
+			k = &h
 			return
 		}
 	}
@@ -177,7 +177,7 @@ func Make(v string) (k Kennung, err error) {
 		var h Konfig
 
 		if err = h.Set(v); err == nil {
-			k = h
+			k = &h
 			return
 		}
 	}
@@ -186,7 +186,7 @@ func Make(v string) (k Kennung, err error) {
 		var h Tai
 
 		if err = h.Set(v); err == nil {
-			k = h
+			k = &h
 			return
 		}
 	}

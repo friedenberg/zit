@@ -91,7 +91,7 @@ func (a *External2) Reset() {
 
 func (a *External2) ResetWith(b *External2) {
 	a.ObjekteSha.ResetWith(b.ObjekteSha)
-	a.Kennung = b.Kennung.KennungPtrClone()
+	a.Kennung.ResetWithKennung(b.Kennung)
 	a.Metadatei.ResetWith(b.GetMetadatei())
 }
 
@@ -99,7 +99,7 @@ func (a *External2) ResetWithExternalMaybe(
 	b ExternalMaybe,
 ) (err error) {
 	k := b.GetKennungLike()
-	a.Kennung = k.KennungPtrClone()
+	a.Kennung.ResetWithKennung(k)
 	a.ObjekteSha.Reset()
 	a.Metadatei.Reset()
 	a.FDs = b.GetFDs()

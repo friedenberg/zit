@@ -49,34 +49,34 @@ func MakeSkuLikeSansObjekteSha(
 	k kennung.Kennung,
 ) (sk SkuLikePtr, err error) {
 	switch kt := k.(type) {
-	case kennung.Hinweis:
+	case *kennung.Hinweis:
 		sk = &Transacted[kennung.Hinweis, *kennung.Hinweis]{
 			Metadatei: m,
-			Kennung:   kt,
+			Kennung:   *kt,
 		}
 
-	case kennung.Etikett:
+	case *kennung.Etikett:
 		sk = &Transacted[kennung.Etikett, *kennung.Etikett]{
 			Metadatei: m,
-			Kennung:   kt,
+			Kennung:   *kt,
 		}
 
-	case kennung.Typ:
+	case *kennung.Typ:
 		sk = &Transacted[kennung.Typ, *kennung.Typ]{
 			Metadatei: m,
-			Kennung:   kt,
+			Kennung:   *kt,
 		}
 
-	case kennung.Kasten:
+	case *kennung.Kasten:
 		sk = &Transacted[kennung.Kasten, *kennung.Kasten]{
 			Metadatei: m,
-			Kennung:   kt,
+			Kennung:   *kt,
 		}
 
-	case kennung.Konfig:
+	case *kennung.Konfig:
 		sk = &Transacted[kennung.Konfig, *kennung.Konfig]{
 			Metadatei: m,
-			Kennung:   kt,
+			Kennung:   *kt,
 		}
 
 	default:

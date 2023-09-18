@@ -12,7 +12,7 @@ import (
 )
 
 type Transacted2 struct {
-	Kennung          kennung.KennungPtr
+	Kennung          kennung.Kennung2
 	Metadatei        metadatei.Metadatei
 	ObjekteSha       sha.Sha
 	TransactionIndex values.Int
@@ -40,8 +40,9 @@ func MakeSkuLikeSansObjekteSha2(
 ) (sk *Transacted2, err error) {
 	sk = &Transacted2{
 		Metadatei: m,
-		Kennung:   k,
 	}
+
+	err = sk.Kennung.ResetWithKennungPtr(k)
 
 	return
 }
@@ -119,7 +120,7 @@ func (a Transacted2) GetKennung() kennung.Kennung {
 }
 
 func (a *Transacted2) GetKennungPtr() kennung.KennungPtr {
-	return a.Kennung
+	return &a.Kennung
 }
 
 func (a Transacted2) GetKennungLike() kennung.Kennung {
@@ -127,7 +128,7 @@ func (a Transacted2) GetKennungLike() kennung.Kennung {
 }
 
 func (a *Transacted2) GetKennungLikePtr() kennung.KennungPtr {
-	return a.Kennung
+	return &a.Kennung
 }
 
 func (a *Transacted2) SetKennungLike(kl kennung.Kennung) (err error) {
@@ -150,7 +151,7 @@ func (a *Transacted2) Reset() {
 func (a *Transacted2) ResetWith(b Transacted2) {
 	a.Kopf = b.Kopf
 	a.ObjekteSha = b.ObjekteSha
-	a.Kennung = b.Kennung.KennungPtrClone()
+	a.Kennung.ResetWithKennung(b.Kennung)
 	a.Metadatei.ResetWith(b.Metadatei)
 	a.TransactionIndex.SetInt(b.TransactionIndex.Int())
 }
