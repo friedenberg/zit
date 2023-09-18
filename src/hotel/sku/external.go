@@ -134,7 +134,7 @@ func (a External[K, KPtr]) EqualsSkuLike(b SkuLike) (ok bool) {
 }
 
 func (a External[K, KPtr]) Equals(b External[K, KPtr]) (ok bool) {
-	if a.GetKennung().Equals(b.GetKennung()) {
+	if kennung.Equals(a.GetKennung(), b.GetKennung()) {
 		return
 	}
 

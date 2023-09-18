@@ -27,7 +27,7 @@ func AddString[E any, EPtr schnittstellen.SetterPtr[E]](
 	return
 }
 
-func SortedValuesBy[E schnittstellen.Value[E]](
+func SortedValuesBy[E any](
 	c schnittstellen.SetLike[E],
 	sf func(E, E) bool,
 ) (out []E) {

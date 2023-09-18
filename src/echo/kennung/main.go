@@ -46,13 +46,13 @@ type KennungLike[T any] interface {
 	Kennung
 	schnittstellen.GattungGetter
 	schnittstellen.ValueLike
-	schnittstellen.Equatable[T]
 }
 
-type KennungLikePtr[T schnittstellen.Value[T]] interface {
+type KennungLikePtr[T KennungLike[T]] interface {
+	schnittstellen.Ptr[T]
 	KennungLike[T]
 	KennungPtr
-	schnittstellen.ValuePtrLike
+	// schnittstellen.ValuePtrLike
 	schnittstellen.SetterPtr[T]
 	schnittstellen.Resetable[T]
 }

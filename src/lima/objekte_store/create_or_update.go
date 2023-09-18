@@ -208,7 +208,7 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdate(
 	transactedPtr.ObjekteSha = sha.Make(ow.GetShaLike())
 
 	if mutter != nil &&
-		transactedPtr.GetKennung().Equals(mutter.GetKennung()) &&
+		kennung.Equals(transactedPtr.GetKennung(), mutter.GetKennung()) &&
 		transactedPtr.Metadatei.EqualsSansTai(mutter.Metadatei) {
 		transactedPtr = mutter
 
@@ -310,7 +310,7 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateAkte(
 	transactedPtr.ObjekteSha = sha.Make(ow.GetShaLike())
 
 	if mutter != nil &&
-		transactedPtr.GetKennung().Equals(mutter.GetKennung()) &&
+		kennung.Equals(transactedPtr.GetKennung(), mutter.GetKennung()) &&
 		transactedPtr.Metadatei.EqualsSansTai(mutter.Metadatei) {
 		transactedPtr = mutter
 
