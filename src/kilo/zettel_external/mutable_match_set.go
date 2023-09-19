@@ -4,9 +4,11 @@ import (
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/india/transacted"
+	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
 type MutableMatchSet struct {
@@ -15,19 +17,21 @@ type MutableMatchSet struct {
 	Stored                    MutableSet
 	Akten                     MutableSet
 	Matched                   MutableSet
-	MatchedHinweisen          kennung.HinweisMutableSet
-	MatchedHinweisenSchwanzen map[kennung.Hinweis]kennung.Tai
+	MatchedHinweisen          schnittstellen.MutableSetLike[kennung.Kennung]
+	MatchedHinweisenSchwanzen map[string]kennung.Tai
 }
 
 func MakeMutableMatchSet(in MutableSet) (out MutableMatchSet) {
 	out = MutableMatchSet{
-		lock:                      &sync.RWMutex{},
-		Original:                  in,
-		Stored:                    MakeMutableSetUniqueStored(),
-		Akten:                     MakeMutableSetUniqueAkte(),
-		Matched:                   MakeMutableSetUniqueFD(),
-		MatchedHinweisen:          kennung.MakeHinweisMutableSet(),
-		MatchedHinweisenSchwanzen: make(map[kennung.Hinweis]kennung.Tai),
+		lock:     &sync.RWMutex{},
+		Original: in,
+		Stored:   MakeMutableSetUniqueStored(),
+		Akten:    MakeMutableSetUniqueAkte(),
+		Matched:  MakeMutableSetUniqueFD(),
+		MatchedHinweisen: collections_value.MakeMutableValueSet[kennung.Kennung](
+			nil,
+		),
+		MatchedHinweisenSchwanzen: make(map[string]kennung.Tai),
 	}
 
 	in.Each(out.Stored.Add)
@@ -36,17 +40,18 @@ func MakeMutableMatchSet(in MutableSet) (out MutableMatchSet) {
 	return
 }
 
-func (s MutableMatchSet) Match(z *transacted.Zettel) (err error) {
-	kStored := z.ObjekteSha.String()
+func (s MutableMatchSet) Match(z sku.SkuLikePtr) (err error) {
+	kStored := z.GetObjekteSha().String()
 	kAkte := z.GetAkteSha().String()
 
 	s.lock.RLock()
 	stored, okStored := s.Stored.Get(kStored)
 	akte, okAkte := s.Akten.Get(kAkte)
-	okHinweis := s.MatchedHinweisen.Contains(z.GetKennung())
+	k := z.GetKennungLike()
+	okHinweis := s.MatchedHinweisen.Contains(z.GetKennungLike())
 
 	okSchwanz := false
-	schwanz, _ := s.MatchedHinweisenSchwanzen[z.GetKennung()]
+	schwanz, _ := s.MatchedHinweisenSchwanzen[k.String()]
 
 	if schwanz.Less(z.GetTai()) {
 		okSchwanz = true
@@ -66,8 +71,8 @@ func (s MutableMatchSet) Match(z *transacted.Zettel) (err error) {
 		s.lock.Lock()
 		defer s.lock.Unlock()
 
-		s.MatchedHinweisen.Add(z.GetKennung())
-		s.MatchedHinweisenSchwanzen[z.GetKennung()] = z.GetTai()
+		s.MatchedHinweisen.Add(k)
+		s.MatchedHinweisenSchwanzen[k.String()] = z.GetTai()
 		s.Stored.DelKey(kStored)
 		s.Akten.DelKey(kAkte)
 		s.Original.Del(stored)

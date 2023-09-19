@@ -1,5 +1,10 @@
 package schnittstellen
 
+type StringerGattungGetter interface {
+	GattungGetter
+	Stringer
+}
+
 type GattungLike interface {
 	Element
 	EqualsGattung(GattungGetter) bool

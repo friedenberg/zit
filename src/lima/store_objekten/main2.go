@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/mike/store_util"
 )
@@ -63,14 +62,21 @@ func (s *Store) onUnchanged(
 }
 
 func (s *Store) ReadOne(
-	k *kennung.Kennung2,
+	k1 schnittstellen.StringerGattungGetter,
 ) (sk *sku.Transacted2, err error) {
+	var k kennung.Kennung2
+
+	if err = k.SetWithGattung(k1.String(), k1.GetGattung()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	switch kt := k.KennungPtr.(type) {
 	// case *kennung.Hinweis:
 	// 	return s.Zettel().ReadOne(kt)
 
 	case *kennung.Typ:
-		var sk1 *transacted.Typ
+		var sk1 sku.SkuLikePtr
 
 		if sk1, err = s.typStore.ReadOne(kt); err != nil {
 			err = errors.Wrap(err)
@@ -84,8 +90,20 @@ func (s *Store) ReadOne(
 			return
 		}
 
-	// case *kennung.Etikett:
-	// 	return s.Etikett().ReadOne(kt)
+	case *kennung.Etikett:
+		var sk1 sku.SkuLikePtr
+
+		if sk1, err = s.etikettStore.ReadOne(kt); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		sk = &sku.Transacted2{}
+
+		if err = sk.SetFromSkuLike(sk1); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
 	// case *kennung.Kasten:
 	// 	return s.Kasten().ReadOne(kt)
@@ -163,24 +181,25 @@ func (s *Store) CheckoutOne(
 	options store_util.CheckoutOptions,
 	sk sku.SkuLikePtr,
 ) (co objekte.CheckedOutLikePtr, err error) {
-	switch skt := sk.(type) {
-	case *transacted.Zettel:
-		return s.Zettel().CheckoutOne(options, skt)
+	g := gattung.Must(sk)
+	switch g {
+	case gattung.Zettel:
+		return s.Zettel().CheckoutOne(options, sk)
 
-	case *transacted.Typ:
-		return s.typStore.CheckoutOne(options, skt)
+	case gattung.Typ:
+		return s.typStore.CheckoutOne(options, sk)
 
-	case *transacted.Etikett:
-		return s.Etikett().CheckoutOne(options, skt)
+	case gattung.Etikett:
+		return s.Etikett().CheckoutOne(options, sk)
 
-	case *transacted.Kasten:
-		return s.Kasten().CheckoutOne(options, skt)
+	case gattung.Kasten:
+		return s.Kasten().CheckoutOne(options, sk)
 
-	case *transacted.Konfig:
-		return s.Konfig().CheckoutOne(options, skt)
+	case gattung.Konfig:
+		return s.Konfig().CheckoutOne(options, sk)
 
 	default:
-		err = errors.Errorf("unsupported kennung %T -> %q", skt, skt)
+		err = gattung.MakeErrUnsupportedGattung(g)
 		return
 	}
 }

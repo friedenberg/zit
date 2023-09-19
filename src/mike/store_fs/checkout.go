@@ -46,7 +46,7 @@ func (s *Store) CheckoutQuery(
 
 func (s *Store) Checkout(
 	options store_util.CheckoutOptions,
-	ztw schnittstellen.FuncIter[*transacted.Zettel],
+	ztw schnittstellen.FuncIter[sku.SkuLikePtr],
 ) (zcs zettel.MutableSetCheckedOut, err error) {
 	zcs = zettel.MakeMutableSetCheckedOutUnique(0)
 	zts := zettel.MakeMutableSetUnique(0)
@@ -55,7 +55,16 @@ func (s *Store) Checkout(
 		iter.MakeChain(
 			zettel.MakeWriterKonfig(s.erworben, s.storeObjekten.Typ()),
 			ztw,
-			iter.AddClone[transacted.Zettel, *transacted.Zettel](zts),
+			func(sk sku.SkuLikePtr) (err error) {
+				var z transacted.Zettel
+
+				if err = z.SetFromSkuLike(sk); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				return zts.Add(&z)
+			},
 		),
 	); err != nil {
 		err = errors.Wrap(err)

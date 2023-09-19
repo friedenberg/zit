@@ -17,7 +17,7 @@ import (
 
 type KastenTransactedReader = objekte_store.TransactedReader[
 	*kennung.Kasten,
-	*transacted.Kasten,
+	sku.SkuLikePtr,
 ]
 
 type kastenStore struct {
@@ -124,7 +124,7 @@ func (s kastenStore) UpdateOne(t *transacted.Kasten) (err error) {
 
 // TODO-P3
 func (s kastenStore) ReadAllSchwanzen(
-	f schnittstellen.FuncIter[*transacted.Kasten],
+	f schnittstellen.FuncIter[sku.SkuLikePtr],
 ) (err error) {
 	// TODO-P2 switch to pointers
 	if err = s.StoreUtil.GetKonfig().Kisten.Each(
@@ -140,7 +140,7 @@ func (s kastenStore) ReadAllSchwanzen(
 }
 
 func (s kastenStore) ReadAll(
-	f schnittstellen.FuncIter[*transacted.Kasten],
+	f schnittstellen.FuncIter[sku.SkuLikePtr],
 ) (err error) {
 	eachSku := func(sk sku.SkuLikePtr) (err error) {
 		if sk.GetGattung() != gattung.Kasten {
@@ -175,14 +175,21 @@ func (s kastenStore) ReadAll(
 }
 
 func (s kastenStore) ReadOne(
-	k *kennung.Kasten,
-) (tt *transacted.Kasten, err error) {
+	k schnittstellen.StringerGattungGetter,
+) (tt sku.SkuLikePtr, err error) {
 	errors.TodoP3("add support for working directory")
 	errors.TodoP3("inherited-kastenen-etiketten")
-	tt = s.StoreUtil.GetKonfig().GetKasten(*k)
+	var k1 kennung.Kasten
+
+	if err = k1.Set(k.String()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	tt = s.StoreUtil.GetKonfig().GetKasten(k1)
 
 	if tt == nil {
-		err = errors.Wrap(objekte_store.ErrNotFound{Id: k})
+		err = errors.Wrap(objekte_store.ErrNotFound{Id: k1})
 		return
 	}
 

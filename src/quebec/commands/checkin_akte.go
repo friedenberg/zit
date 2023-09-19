@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/india/transacted"
+	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
@@ -70,7 +70,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		pairs[i] = p
 	}
 
-	zettels := make([]*transacted.Zettel, len(pairs))
+	zettels := make([]sku.SkuLikePtr, len(pairs))
 
 	// iterate through pairs and read current zettel
 	for i, p := range pairs {
@@ -149,7 +149,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	for _, z := range zettels {
 		if z, err = u.StoreObjekten().Zettel().Update(
 			z,
-			&z.Kennung,
+			z.GetKennungLike(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return

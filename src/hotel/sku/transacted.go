@@ -151,6 +151,10 @@ func (a Transacted[K, KPtr]) GetTai() kennung.Tai {
 	return a.GetMetadatei().GetTai()
 }
 
+func (a Transacted[K, KPtr]) GetKopf() kennung.Tai {
+	return a.Kopf
+}
+
 func (a *Transacted[K, KPtr]) SetTai(t kennung.Tai) {
 	a.GetMetadateiPtr().Tai = t
 }
@@ -208,7 +212,7 @@ func (a *Transacted[K, KPtr]) Reset() {
 func (a *Transacted[K, KPtr]) ResetWith(b Transacted[K, KPtr]) {
 	a.Kopf = b.Kopf
 	a.ObjekteSha = b.ObjekteSha
-	KPtr(&a.Kennung).ResetWith(b.Kennung)
+	a.Kennung = b.Kennung
 	a.Metadatei.ResetWith(b.Metadatei)
 	a.TransactionIndex.SetInt(b.TransactionIndex.Int())
 }

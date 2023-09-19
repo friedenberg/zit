@@ -52,9 +52,7 @@ type KennungLikePtr[T KennungLike[T]] interface {
 	schnittstellen.Ptr[T]
 	KennungLike[T]
 	KennungPtr
-	// schnittstellen.ValuePtrLike
 	schnittstellen.SetterPtr[T]
-	schnittstellen.Resetable[T]
 }
 
 // type IndexedLike[

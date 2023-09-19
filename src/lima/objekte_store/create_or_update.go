@@ -31,7 +31,7 @@ type createOrUpdate[
 	ls                        schnittstellen.LockSmith
 	of                        schnittstellen.ObjekteWriterFactory
 	af                        schnittstellen.AkteWriterFactory
-	reader                    TransactedReader[T3, *sku.Transacted[T2, T3]]
+	reader                    TransactedReader[T3, sku.SkuLikePtr]
 	delegate                  CreateOrUpdateDelegate[*sku.Transacted[T2, T3]]
 	matchableAdder            matcher.MatchableAdder
 	persistentMetadateiFormat objekte_format.Format
@@ -49,7 +49,7 @@ func MakeCreateOrUpdate[
 	ls schnittstellen.LockSmith,
 	of schnittstellen.ObjekteWriterFactory,
 	af schnittstellen.AkteWriterFactory,
-	reader TransactedReader[T3, *sku.Transacted[T2, T3]],
+	reader TransactedReader[T3, sku.SkuLikePtr],
 	delegate CreateOrUpdateDelegate[*sku.Transacted[T2, T3]],
 	ma matcher.MatchableAdder,
 	pmf objekte_format.Format,
@@ -156,7 +156,7 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdate(
 		return
 	}
 
-	var mutter *sku.Transacted[T2, T3]
+	var mutter sku.SkuLikePtr
 
 	if mutter, err = cou.reader.ReadOne(kennungPtr); err != nil {
 		if errors.Is(err, ErrNotFound{}) {
@@ -181,7 +181,7 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdate(
 	}
 
 	if mutter != nil {
-		transactedPtr.Kopf = mutter.Kopf
+		transactedPtr.Kopf = mutter.GetKopf()
 	} else {
 		errors.TodoP4("determine if this is necessary any more")
 		// transactedPtr.Sku.Kopf = s.common.GetTransaktion().Time
@@ -208,9 +208,12 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdate(
 	transactedPtr.ObjekteSha = sha.Make(ow.GetShaLike())
 
 	if mutter != nil &&
-		kennung.Equals(transactedPtr.GetKennung(), mutter.GetKennung()) &&
-		transactedPtr.Metadatei.EqualsSansTai(mutter.Metadatei) {
-		transactedPtr = mutter
+		kennung.Equals(transactedPtr.GetKennung(), mutter.GetKennungLike()) &&
+		transactedPtr.Metadatei.EqualsSansTai(mutter.GetMetadatei()) {
+		if err = transactedPtr.SetFromSkuLike(mutter); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
 		if err = cou.delegate.Unchanged(transactedPtr); err != nil {
 			err = errors.Wrap(err)
@@ -256,7 +259,7 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateAkte(
 		return
 	}
 
-	var mutter *sku.Transacted[T2, T3]
+	var mutter sku.SkuLikePtr
 
 	if mutter, err = cou.reader.ReadOne(kennungPtr); err != nil {
 		if errors.Is(err, ErrNotFound{}) {
@@ -283,7 +286,7 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateAkte(
 	transactedPtr.SetAkteSha(sh)
 
 	if mutter != nil {
-		transactedPtr.Kopf = mutter.Kopf
+		transactedPtr.Kopf = mutter.GetKopf()
 	} else {
 		errors.TodoP4("determine if this is necessary any more")
 		// transactedPtr.Sku.Kopf = s.common.GetTransaktion().Time
@@ -310,9 +313,12 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateAkte(
 	transactedPtr.ObjekteSha = sha.Make(ow.GetShaLike())
 
 	if mutter != nil &&
-		kennung.Equals(transactedPtr.GetKennung(), mutter.GetKennung()) &&
-		transactedPtr.Metadatei.EqualsSansTai(mutter.Metadatei) {
-		transactedPtr = mutter
+		kennung.Equals(transactedPtr.GetKennung(), mutter.GetKennungLike()) &&
+		transactedPtr.Metadatei.EqualsSansTai(mutter.GetMetadatei()) {
+		if err = transactedPtr.SetFromSkuLike(mutter); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
 		if err = cou.delegate.Unchanged(transactedPtr); err != nil {
 			err = errors.Wrap(err)

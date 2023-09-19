@@ -48,8 +48,9 @@ type CommonStoreBase[
 
 	objekte_store.StoredParseSaver[O, OPtr, K, KPtr]
 
-	objekte_store.TransactedReader[KPtr,
-		*sku.Transacted[K, KPtr],
+	objekte_store.TransactedReader[
+		KPtr,
+		sku.SkuLikePtr,
 	]
 
 	objekte_store.LogWriter[sku.SkuLikePtr]
@@ -68,8 +69,10 @@ func MakeCommonStoreBase[
 	gg schnittstellen.GattungGetter,
 	delegate CommonStoreDelegate[O, OPtr, K, KPtr],
 	sa StoreUtil,
-	tr objekte_store.TransactedReader[KPtr,
-		*sku.Transacted[K, KPtr]],
+	tr objekte_store.TransactedReader[
+		KPtr,
+		sku.SkuLikePtr,
+	],
 	pmf objekte_format.Format,
 	akteFormat objekte.AkteFormat[O, OPtr],
 ) (s *CommonStoreBase[O, OPtr, K, KPtr], err error) {
@@ -132,11 +135,11 @@ func (s *CommonStoreBase[O, OPtr, K, KPtr]) SetLogWriter(
 
 func (s *CommonStoreBase[O, OPtr, K, KPtr]) Query(
 	m matcher.MatcherSigil,
-	f schnittstellen.FuncIter[*sku.Transacted[K, KPtr]],
+	f schnittstellen.FuncIter[sku.SkuLikePtr],
 ) (err error) {
 	return objekte_store.QueryMethodForMatcher[
 		KPtr,
-		*sku.Transacted[K, KPtr],
+		sku.SkuLikePtr,
 	](s, m, f)
 }
 
@@ -187,9 +190,9 @@ func (s *CommonStoreBase[O, OPtr, K, KPtr]) Inherit(
 	s.StoreUtil.AddMatchable(t)
 	s.StoreUtil.CommitTransacted(t)
 
-	old, _ := s.ReadOne(&t.Kennung)
+	old, _ := s.ReadOne(t.GetKennungLike())
 
-	if old == nil || old.Less(*t) {
+	if old == nil || old.GetTai().Less(t.GetTai()) {
 		s.delegate.AddOne(t)
 	}
 

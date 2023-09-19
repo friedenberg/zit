@@ -97,7 +97,7 @@ func (a *External[K, KPtr]) Reset() {
 
 func (a *External[K, KPtr]) ResetWith(b *External[K, KPtr]) {
 	a.ObjekteSha.ResetWith(b.ObjekteSha)
-	KPtr(&a.Kennung).ResetWith(b.Kennung)
+	a.Kennung = b.Kennung
 	a.Metadatei.ResetWith(b.GetMetadatei())
 }
 
@@ -108,10 +108,10 @@ func (a *External[K, KPtr]) ResetWithExternalMaybe(
 
 	switch kt := k.(type) {
 	case K:
-		KPtr(&a.Kennung).ResetWith(kt)
+		a.Kennung = kt
 
 	case KPtr:
-		KPtr(&a.Kennung).ResetWith(K(*kt))
+		a.Kennung = *kt
 
 	default:
 		err = errors.Errorf("unsupported kennung type: %T", kt)

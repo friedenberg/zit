@@ -5,37 +5,40 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/india/transacted"
+	"github.com/friedenberg/zit/src/charlie/pool"
+	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
 type WriterComplete struct {
 	wBuf         *bufio.Writer
-	chTransacted chan transacted.Zettel
+	pool         schnittstellen.Pool[sku.Transacted2, *sku.Transacted2]
+	chTransacted chan *sku.Transacted2
 	chDone       chan struct{}
 }
 
 func MakeWriterComplete(w io.Writer) WriterComplete {
 	w1 := WriterComplete{
-		chTransacted: make(chan transacted.Zettel),
+		chTransacted: make(chan *sku.Transacted2),
 		chDone:       make(chan struct{}),
 		wBuf:         bufio.NewWriter(w),
+		pool: pool.MakePool[sku.Transacted2, *sku.Transacted2](
+			nil,
+			nil,
+		),
 	}
 
 	go func(s *WriterComplete) {
 		for z := range s.chTransacted {
-			if z.GetKennung().String() == "/" {
-				errors.Err().Printf("empty: %#v", z)
-				continue
-			}
-
 			errors.TodoP4("handle write errors")
-			s.wBuf.WriteString(z.GetKennung().String())
+			s.wBuf.WriteString(z.GetKennungLike().String())
 			s.wBuf.WriteString("\tZettel: !")
 			s.wBuf.WriteString(z.GetTyp().String())
 			s.wBuf.WriteString(" ")
 			s.wBuf.WriteString(z.GetMetadatei().Bezeichnung.String())
 			s.wBuf.WriteString("\n")
+			w1.pool.Put(z)
 		}
 
 		s.chDone <- struct{}{}
@@ -45,13 +48,25 @@ func MakeWriterComplete(w io.Writer) WriterComplete {
 }
 
 func (w *WriterComplete) WriteZettelVerzeichnisse(
-	z *transacted.Zettel,
+	z sku.SkuLikePtr,
 ) (err error) {
+	if z.GetKennungLike().String() == "/" {
+		err = errors.New("empty sku")
+		return
+	}
+
+	sk := w.pool.Get()
+
+	if err = sk.SetFromSkuLike(z); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	select {
 	case <-w.chDone:
 		err = collections.MakeErrStopIteration()
 
-	case w.chTransacted <- *z:
+	case w.chTransacted <- sk:
 	}
 
 	return

@@ -8,7 +8,7 @@ import (
 
 func (s *CommonStore[O, OPtr, K, KPtr]) ReadOneExternal(
 	em sku.ExternalMaybe,
-	t *sku.Transacted[K, KPtr],
+	t sku.SkuLikePtr,
 ) (e sku.External[K, KPtr], err error) {
 	var m checkout_mode.Mode
 

@@ -11,9 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/india/external"
 	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/checked_out"
 	"github.com/friedenberg/zit/src/lima/cwd"
@@ -67,7 +65,7 @@ func (c Status) RunWithCwdQuery(
 
 	if err = u.StoreObjekten().ReadAllMatchingAkten(
 		possible.UnsureAkten,
-		func(fd kennung.FD, z *transacted.Zettel) (err error) {
+		func(fd kennung.FD, z sku.SkuLikePtr) (err error) {
 			if z == nil {
 				err = u.PrinterFileNotRecognized()(&fd)
 			} else {
@@ -75,16 +73,22 @@ func (c Status) RunWithCwdQuery(
 				as := sha.Make(z.GetAkteSha())
 
 				fr := &checked_out.Zettel{
-					State:    checked_out_state.StateRecognized,
-					Internal: *z,
-					External: external.Zettel{
-						Transacted: *z,
-						FDs: sku.ExternalFDs{
-							Akte: fd,
-						},
-					},
+					State: checked_out_state.StateRecognized,
 				}
 
+				if err = fr.Internal.SetFromSkuLike(z); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				if err = fr.External.SetFromSkuLike(z); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				fr.External.FDs = sku.ExternalFDs{
+					Akte: fd,
+				}
 				fr.External.SetAkteSha(as)
 				fr.External.ObjekteSha = os
 

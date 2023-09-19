@@ -3,6 +3,7 @@ package objekte
 import (
 	"fmt"
 
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/delta/checked_out_state"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -19,6 +20,7 @@ type (
 	CheckedOutLikePtr interface {
 		CheckedOutLike
 		GetExternalLikePtr() ExternalLikePtr
+		SetExternalLikePtr(ExternalLikePtr) error
 		DetermineState(justCheckedOut bool)
 	}
 
@@ -64,6 +66,17 @@ func (co *CheckedOut[T2, T3]) GetExternalLike() ExternalLike {
 
 func (co *CheckedOut[T2, T3]) GetExternalLikePtr() ExternalLikePtr {
 	return &co.External
+}
+
+func (co *CheckedOut[T2, T3]) SetExternalLikePtr(
+	v ExternalLikePtr,
+) (err error) {
+	if err = co.External.SetFromSkuLike(v); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (a CheckedOut[T2, T3]) EqualsAny(b any) bool {

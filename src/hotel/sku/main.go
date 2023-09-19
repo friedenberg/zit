@@ -21,6 +21,7 @@ type (
 		schnittstellen.GattungGetter
 		metadatei.Getter
 
+		GetKopf() kennung.Tai
 		GetTai() kennung.Tai
 		GetTyp() kennung.Typ
 		GetKennungLike() kennung.Kennung

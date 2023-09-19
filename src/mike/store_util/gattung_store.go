@@ -58,8 +58,10 @@ func MakeCommonStore[
 	gg schnittstellen.GattungGetter,
 	delegate CommonStoreDelegate[O, OPtr, K, KPtr],
 	sa StoreUtil,
-	tr objekte_store.TransactedReader[KPtr,
-		*sku.Transacted[K, KPtr]],
+	tr objekte_store.TransactedReader[
+		KPtr,
+		sku.SkuLikePtr,
+	],
 	akteFormat objekte.AkteFormat[O, OPtr],
 ) (s *CommonStore[O, OPtr, K, KPtr], err error) {
 	// pool := collections.MakePool[
@@ -110,13 +112,21 @@ func MakeCommonStore[
 
 func (s *CommonStore[O, OPtr, K, KPtr]) CheckoutOne(
 	options CheckoutOptions,
-	t *sku.Transacted[K, KPtr],
+	t sku.SkuLikePtr,
 ) (co *objekte.CheckedOut[K, KPtr], err error) {
 	todo.Change("add pool")
 	co = &objekte.CheckedOut[K, KPtr]{}
 
-	co.Internal = *t
-	co.External = t.GetExternal()
+	if err = co.Internal.SetFromSkuLike(t); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	// TODO-P1 determine if this works
+	if err = co.External.SetFromSkuLike(t); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	var f *os.File
 
@@ -124,7 +134,7 @@ func (s *CommonStore[O, OPtr, K, KPtr]) CheckoutOne(
 		s.StoreUtil.GetStandort().Cwd(),
 		fmt.Sprintf(
 			"%s.%s",
-			t.GetKennung(),
+			t.GetKennungLike(),
 			s.StoreUtil.GetKonfig().FileExtensions.GetFileExtensionForGattung(
 				t,
 			),
@@ -135,7 +145,7 @@ func (s *CommonStore[O, OPtr, K, KPtr]) CheckoutOne(
 		if errors.IsExist(err) {
 			if co.External, err = s.ReadOneExternal(
 				sku.ExternalMaybe{
-					Kennung: t.GetKennung().KennungPtrClone(),
+					Kennung: t.GetKennungLike().KennungPtrClone(),
 					FDs: sku.ExternalFDs{
 						Objekte: kennung.FD{
 							Path: p,
@@ -148,9 +158,13 @@ func (s *CommonStore[O, OPtr, K, KPtr]) CheckoutOne(
 				return
 			}
 
-			co.External.Kennung = t.GetKennung()
+			if err = KPtr(&co.External.Kennung).Set(t.GetKennungLike().String()); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 		} else {
 			err = errors.Wrap(err)
+			return
 		}
 
 		return
@@ -184,14 +198,31 @@ func (s *CommonStore[O, OPtr, K, KPtr]) UpdateManyMetadatei(
 
 	if err = incoming.Each(
 		func(mwk sku.SkuLike) (err error) {
-			var ke K
-			ok := false
+			k := mwk.GetKennungLike()
 
-			if ke, ok = mwk.GetKennungLike().(K); !ok {
+			var ke K
+			kep := KPtr(&ke)
+
+			switch kt := k.(type) {
+			case K:
+				kep = &kt
+
+			case KPtr:
+				kep = kt
+
+			case kennung.Kennung2, *kennung.Kennung2:
+				if !kt.GetGattung().EqualsGattung(ke.GetGattung()) {
+					return
+				}
+
+				if err = kep.Set(kt.String()); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+			default:
 				return
 			}
-
-			kep := KPtr(&ke)
 
 			if _, err = s.CreateOrUpdater.CreateOrUpdate(
 				mwk,

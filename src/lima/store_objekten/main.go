@@ -13,7 +13,6 @@ import (
 	"github.com/friedenberg/zit/src/golf/kennung_index"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/india/erworben"
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/juliett/objekte"
@@ -105,21 +104,11 @@ func Make(
 
 	errors.TodoP1("implement for other gattung")
 	s.queriers = map[schnittstellen.GattungLike]objekte.FuncQuerierTransactedLikePtr{
-		gattung.Zettel: objekte.MakeApplyQueryTransactedLikePtr[*transacted.Zettel](
-			s.zettelStore.Query,
-		),
-		gattung.Typ: objekte.MakeApplyQueryTransactedLikePtr[*transacted.Typ](
-			s.typStore.Query,
-		),
-		gattung.Etikett: objekte.MakeApplyQueryTransactedLikePtr[*transacted.Etikett](
-			s.etikettStore.Query,
-		),
-		gattung.Kasten: objekte.MakeApplyQueryTransactedLikePtr[*transacted.Kasten](
-			s.kastenStore.Query,
-		),
-		gattung.Konfig: objekte.MakeApplyQueryTransactedLikePtr[*erworben.Transacted](
-			s.konfigStore.Query,
-		),
+		gattung.Zettel:  s.zettelStore.Query,
+		gattung.Typ:     s.typStore.Query,
+		gattung.Etikett: s.etikettStore.Query,
+		gattung.Kasten:  s.kastenStore.Query,
+		gattung.Konfig:  s.konfigStore.Query,
 		// gattung.Bestandsaufnahme:
 		// objekte.MakeApplyTransactedLikePtr[*bestandsaufnahme.Objekte](
 		// 	s.bestandsaufnahmeStore.ReadAll,
@@ -127,21 +116,11 @@ func Make(
 	}
 
 	s.readers = map[schnittstellen.GattungLike]objekte.FuncReaderTransactedLikePtr{
-		gattung.Zettel: objekte.MakeApplyTransactedLikePtr[*transacted.Zettel](
-			s.zettelStore.ReadAllSchwanzen,
-		),
-		gattung.Typ: objekte.MakeApplyTransactedLikePtr[*transacted.Typ](
-			s.typStore.ReadAllSchwanzen,
-		),
-		gattung.Etikett: objekte.MakeApplyTransactedLikePtr[*transacted.Etikett](
-			s.etikettStore.ReadAllSchwanzen,
-		),
-		gattung.Kasten: objekte.MakeApplyTransactedLikePtr[*transacted.Kasten](
-			s.kastenStore.ReadAllSchwanzen,
-		),
-		gattung.Konfig: objekte.MakeApplyTransactedLikePtr[*erworben.Transacted](
-			s.konfigStore.ReadAllSchwanzen,
-		),
+		gattung.Zettel:  s.zettelStore.ReadAllSchwanzen,
+		gattung.Typ:     s.typStore.ReadAllSchwanzen,
+		gattung.Etikett: s.etikettStore.ReadAllSchwanzen,
+		gattung.Kasten:  s.kastenStore.ReadAllSchwanzen,
+		gattung.Konfig:  s.konfigStore.ReadAllSchwanzen,
 		// gattung.Bestandsaufnahme:
 		// objekte.MakeApplyTransactedLikePtr[*bestandsaufnahme.Objekte](
 		// 	s.bestandsaufnahmeStore.ReadAll,
@@ -149,21 +128,11 @@ func Make(
 	}
 
 	s.transactedReaders = map[schnittstellen.GattungLike]objekte.FuncReaderTransactedLikePtr{
-		gattung.Zettel: objekte.MakeApplyTransactedLikePtr[*transacted.Zettel](
-			s.zettelStore.ReadAll,
-		),
-		gattung.Typ: objekte.MakeApplyTransactedLikePtr[*transacted.Typ](
-			s.typStore.ReadAll,
-		),
-		gattung.Etikett: objekte.MakeApplyTransactedLikePtr[*transacted.Etikett](
-			s.etikettStore.ReadAll,
-		),
-		gattung.Kasten: objekte.MakeApplyTransactedLikePtr[*transacted.Kasten](
-			s.kastenStore.ReadAll,
-		),
-		gattung.Konfig: objekte.MakeApplyTransactedLikePtr[*erworben.Transacted](
-			s.konfigStore.ReadAll,
-		),
+		gattung.Zettel:  s.zettelStore.ReadAll,
+		gattung.Typ:     s.typStore.ReadAll,
+		gattung.Etikett: s.etikettStore.ReadAll,
+		gattung.Kasten:  s.kastenStore.ReadAll,
+		gattung.Konfig:  s.konfigStore.ReadAll,
 		// gattung.Bestandsaufnahme:
 		// objekte.MakeApplyTransactedLikePtr[*bestandsaufnahme.Objekte](
 		// 	s.bestandsaufnahmeStore.ReadAll,
@@ -186,14 +155,12 @@ func Make(
 		}
 	}
 
-	s.metadateiUpdaters = make(
-		map[schnittstellen.GattungLike]objekte_store.UpdaterManyMetadatei,
-	)
-
-	for g, gs := range s.gattungStores {
-		if gs1, ok := gs.(objekte_store.UpdaterManyMetadatei); ok {
-			s.metadateiUpdaters[g] = gs1
-		}
+	s.metadateiUpdaters = map[schnittstellen.GattungLike]objekte_store.UpdaterManyMetadatei{
+		gattung.Zettel:  s.zettelStore,
+		gattung.Typ:     s.typStore,
+		gattung.Etikett: s.etikettStore,
+		gattung.Kasten:  s.kastenStore,
+		// gattung.Konfig:  s.konfigStore,
 	}
 
 	s.CreateOrUpdator = objekte_store.MakeCreateOrUpdate2(

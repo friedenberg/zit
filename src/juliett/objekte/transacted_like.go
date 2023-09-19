@@ -17,6 +17,7 @@ type (
 type (
 	FuncQuerierTransacted[T sku.SkuLike]       func(matcher.MatcherSigil, schnittstellen.FuncIter[T]) error
 	FuncQuerierTransactedPtr[T sku.SkuLikePtr] func(matcher.MatcherSigil, schnittstellen.FuncIter[T]) error
+	FuncQuerierTransactedPtr2                  func(matcher.MatcherSigil, schnittstellen.FuncIter[*sku.Transacted2]) error
 	FuncQuerierTransactedLike                  func(matcher.MatcherSigil, schnittstellen.FuncIter[sku.SkuLike]) error
 	FuncQuerierTransactedLikePtr               func(matcher.MatcherSigil, schnittstellen.FuncIter[sku.SkuLikePtr]) error
 )
@@ -28,6 +29,19 @@ func MakeApplyQueryTransactedLikePtr[T sku.SkuLikePtr](
 		return fat(
 			ids,
 			func(e T) (err error) {
+				return fatl(e)
+			},
+		)
+	}
+}
+
+func MakeApplyQueryTransactedLikePtr2[T sku.SkuLikePtr](
+	fat FuncQuerierTransactedPtr2,
+) FuncQuerierTransactedLikePtr {
+	return func(ids matcher.MatcherSigil, fatl schnittstellen.FuncIter[sku.SkuLikePtr]) (err error) {
+		return fat(
+			ids,
+			func(e *sku.Transacted2) (err error) {
 				return fatl(e)
 			},
 		)

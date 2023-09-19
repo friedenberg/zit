@@ -3,6 +3,7 @@ package objekte
 import (
 	"fmt"
 
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/checked_out_state"
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
@@ -45,6 +46,15 @@ func (co *CheckedOut2) GetExternalLike() ExternalLike {
 
 func (co *CheckedOut2) GetExternalLikePtr() ExternalLikePtr {
 	return &co.External
+}
+
+func (co *CheckedOut2) SetExternalLikePtr(v ExternalLikePtr) (err error) {
+	if err = co.External.SetFromSkuLike(v); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 // func (a CheckedOut2) EqualsAny(b any) bool {

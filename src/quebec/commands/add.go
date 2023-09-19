@@ -14,6 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/india/objekte_collections"
 	"github.com/friedenberg/zit/src/india/transacted"
@@ -218,8 +219,8 @@ func (c Add) openAktenIfNecessary(
 
 	if checkoutResults, err = u.StoreWorkingDirectory().Checkout(
 		options,
-		func(z *transacted.Zettel) (err error) {
-			if !hs.Contains(z.GetKennung()) {
+		func(z sku.SkuLikePtr) (err error) {
+			if !hs.ContainsKey(z.GetKennungLike().String()) {
 				return iter.MakeErrStopIteration()
 			}
 

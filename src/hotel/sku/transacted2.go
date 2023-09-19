@@ -116,6 +116,10 @@ func (a Transacted2) GetTai() kennung.Tai {
 	return a.GetMetadatei().GetTai()
 }
 
+func (a Transacted2) GetKopf() kennung.Tai {
+	return a.Kopf
+}
+
 func (a *Transacted2) SetTai(t kennung.Tai) {
 	a.GetMetadateiPtr().Tai = t
 }

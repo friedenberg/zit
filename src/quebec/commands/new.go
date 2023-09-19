@@ -13,6 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
+	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/kilo/zettel"
@@ -143,7 +144,14 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 			if zsc, err = u.StoreWorkingDirectory().Checkout(
 				options,
-				collections.WriterContainer[*transacted.Zettel](zts, collections.MakeErrStopIteration()),
+				func(sk sku.SkuLikePtr) (err error) {
+					if zts.ContainsKey(sk.GetKennungLike().String()) {
+						err = collections.MakeErrStopIteration()
+						return
+					}
+
+					return
+				},
 			); err != nil {
 				err = errors.Wrap(err)
 				return

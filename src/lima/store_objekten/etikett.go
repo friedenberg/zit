@@ -17,7 +17,7 @@ import (
 
 type EtikettTransactedReader = objekte_store.TransactedReader[
 	*kennung.Etikett,
-	*transacted.Etikett,
+	sku.SkuLikePtr,
 ]
 
 type etikettStore struct {
@@ -123,13 +123,20 @@ func (s etikettStore) UpdateOne(t *transacted.Etikett) (err error) {
 }
 
 func (s etikettStore) ReadOne(
-	k *kennung.Etikett,
-) (tt *transacted.Etikett, err error) {
-	tt1 := s.StoreUtil.GetKonfig().GetEtikett(*k)
+	k schnittstellen.StringerGattungGetter,
+) (tt sku.SkuLikePtr, err error) {
+	var e kennung.Etikett
+
+	if err = e.Set(k.String()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	tt1 := s.StoreUtil.GetKonfig().GetEtikett(e)
 	tt = &tt1
 
 	if tt == nil {
-		err = errors.Wrap(objekte_store.ErrNotFound{Id: k})
+		err = errors.Wrap(objekte_store.ErrNotFound{Id: e})
 		return
 	}
 
@@ -137,9 +144,13 @@ func (s etikettStore) ReadOne(
 }
 
 func (s etikettStore) ReadAllSchwanzen(
-	f schnittstellen.FuncIter[*transacted.Etikett],
+	f schnittstellen.FuncIter[sku.SkuLikePtr],
 ) (err error) {
-	if err = s.StoreUtil.GetKonfig().EachEtikett(f); err != nil {
+	if err = s.StoreUtil.GetKonfig().EachEtikett(
+		func(e *transacted.Etikett) (err error) {
+			return f(e)
+		},
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -148,7 +159,7 @@ func (s etikettStore) ReadAllSchwanzen(
 }
 
 func (s etikettStore) ReadAll(
-	f schnittstellen.FuncIter[*transacted.Etikett],
+	f schnittstellen.FuncIter[sku.SkuLikePtr],
 ) (err error) {
 	eachSku := func(o sku.SkuLikePtr) (err error) {
 		if o.GetGattung() != gattung.Etikett {

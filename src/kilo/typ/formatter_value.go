@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/typ_akte"
-	"github.com/friedenberg/zit/src/india/transacted"
+	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 )
 
@@ -38,12 +38,12 @@ func (f *FormatterValue) FuncFormatter(
 	out io.Writer,
 	af schnittstellen.AkteIOFactory,
 	agp schnittstellen.AkteGetterPutter[*typ_akte.V0],
-) schnittstellen.FuncIter[*transacted.Typ] {
+) schnittstellen.FuncIter[sku.SkuLikePtr] {
 	switch f.string {
 	case "action-names":
 		f := typ_akte.MakeFormatterActionNames()
 
-		return func(o *transacted.Typ) (err error) {
+		return func(o sku.SkuLikePtr) (err error) {
 			var akte *typ_akte.V0
 
 			if akte, err = agp.GetAkte(o.GetAkteSha()); err != nil {
@@ -64,7 +64,7 @@ func (f *FormatterValue) FuncFormatter(
 	case "vim-syntax-type":
 		f := typ_akte.MakeFormatterVimSyntaxType()
 
-		return func(o *transacted.Typ) (err error) {
+		return func(o sku.SkuLikePtr) (err error) {
 			var akte *typ_akte.V0
 
 			if akte, err = agp.GetAkte(o.GetAkteSha()); err != nil {
@@ -83,7 +83,7 @@ func (f *FormatterValue) FuncFormatter(
 		}
 
 	default:
-		return func(_ *transacted.Typ) (err error) {
+		return func(_ sku.SkuLikePtr) (err error) {
 			err = objekte.MakeErrUnsupportedFormatterValue(
 				f.string,
 				gattung.Typ,

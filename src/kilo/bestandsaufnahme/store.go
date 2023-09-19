@@ -25,7 +25,7 @@ type Store interface {
 	AkteTextSaver
 	Create(*Akte) error
 	objekte_store.LastReader[*Transacted]
-	objekte_store.OneReader[schnittstellen.ShaLike, *Transacted]
+	ReadOne(schnittstellen.Stringer) (*Transacted, error)
 	objekte_store.AllReader[*Transacted]
 	ReadAllSkus(schnittstellen.FuncIter[sku.SkuLikePtr]) error
 	schnittstellen.AkteGetter[*Akte]
@@ -190,8 +190,15 @@ func (s *store) readOnePath(p string) (o *Transacted, err error) {
 }
 
 func (s *store) ReadOne(
-	sh schnittstellen.ShaLike,
+	k schnittstellen.Stringer,
 ) (o *Transacted, err error) {
+	var sh sha.Sha
+
+	if err = sh.Set(k.String()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	var or sha.ReadCloser
 
 	if or, err = s.of.ObjekteReader(sh); err != nil {

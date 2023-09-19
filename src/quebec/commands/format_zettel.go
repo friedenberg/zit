@@ -9,8 +9,8 @@ import (
 	"github.com/friedenberg/zit/src/delta/typ_akte"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
+	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/external"
-	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/lima/cwd"
 	"github.com/friedenberg/zit/src/lima/store_objekten"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -81,7 +81,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	var zt *transacted.Zettel
+	var zt sku.SkuLikePtr
 
 	if zt, err = u.StoreObjekten().Zettel().ReadOne(&h); err != nil {
 		err = errors.Wrap(err)
@@ -103,10 +103,10 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 		default:
 			// TODO-P1 switch to methods on Transacted and External
-			zt.SetMetadatei(ze.GetMetadatei())
-			zt.Kennung = ze.GetKennung()
-			zt.SetObjekteSha(ze.GetObjekteSha())
-			zt.SetAkteSha(ze.GetAkteSha())
+			if err = zt.SetFromSkuLike(ze); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 		}
 	}
 

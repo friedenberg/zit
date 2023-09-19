@@ -18,7 +18,7 @@ import (
 
 type TypTransactedReader = objekte_store.TransactedReader[
 	*kennung.Typ,
-	*transacted.Typ,
+	sku.SkuLikePtr,
 ]
 
 type typStore struct {
@@ -127,19 +127,12 @@ func (s typStore) UpdateOne(t *transacted.Typ) (err error) {
 
 // TODO-P3
 func (s typStore) ReadAllSchwanzen(
-	f schnittstellen.FuncIter[*transacted.Typ],
+	f schnittstellen.FuncIter[sku.SkuLikePtr],
 ) (err error) {
 	// TODO-P2 switch to pointers
 	if err = s.StoreUtil.GetKonfig().Typen.EachPtr(
 		func(e *sku.Transacted2) (err error) {
-			e1 := &transacted.Typ{}
-
-			if err = e1.SetFromSkuLike(e); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return f(e1)
+			return f(e)
 		},
 	); err != nil {
 		err = errors.Wrap(err)
@@ -150,7 +143,7 @@ func (s typStore) ReadAllSchwanzen(
 }
 
 func (s typStore) ReadAll(
-	f schnittstellen.FuncIter[*transacted.Typ],
+	f schnittstellen.FuncIter[sku.SkuLikePtr],
 ) (err error) {
 	eachSku := func(sk sku.SkuLikePtr) (err error) {
 		if sk.GetGattung() != gattung.Typ {
@@ -185,12 +178,19 @@ func (s typStore) ReadAll(
 }
 
 func (s typStore) ReadOne(
-	k *kennung.Typ,
-) (tt *transacted.Typ, err error) {
+	k1 schnittstellen.StringerGattungGetter,
+) (tt sku.SkuLikePtr, err error) {
+	var k kennung.Typ
+
+	if err = k.Set(k1.String()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	errors.TodoP3("add support for working directory")
 	errors.TodoP3("inherited-typen-etiketten")
 	log.Log().Printf("reading: %s", k)
-	t1 := s.StoreUtil.GetKonfig().GetApproximatedTyp(*k).ActualOrNil()
+	t1 := s.StoreUtil.GetKonfig().GetApproximatedTyp(k).ActualOrNil()
 
 	if t1 == nil {
 		err = errors.Wrap(objekte_store.ErrNotFound{Id: k})

@@ -20,7 +20,7 @@ type ExternalReader2 struct {
 
 func (s *ExternalReader2) ReadOneExternal(
 	em *sku.ExternalMaybe,
-	t *sku.Transacted2,
+	t sku.SkuLikePtr,
 ) (e *sku.External2, err error) {
 	var m checkout_mode.Mode
 

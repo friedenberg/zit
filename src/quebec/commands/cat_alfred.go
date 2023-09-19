@@ -11,7 +11,6 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/kennung_index"
 	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/kilo/alfred"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
@@ -126,9 +125,7 @@ func (c CatAlfred) catZettelen(
 
 	if err = u.StoreObjekten().Zettel().Query(
 		m,
-		func(z *transacted.Zettel) (err error) {
-			return aw.WriteZettelVerzeichnisse(z)
-		},
+		aw.WriteZettelVerzeichnisse,
 	); err != nil {
 		aw.WriteError(err)
 		return

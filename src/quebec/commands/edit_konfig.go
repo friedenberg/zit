@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/erworben"
 	"github.com/friedenberg/zit/src/november/umwelt"
 	"github.com/friedenberg/zit/src/oscar/user_ops"
@@ -159,7 +160,7 @@ func (c EditKonfig) editInVim(
 func (c EditKonfig) makeTempKonfigFile(
 	u *umwelt.Umwelt,
 ) (p string, err error) {
-	var k *erworben.Transacted
+	var k sku.SkuLikePtr
 
 	if k, err = u.StoreObjekten().Konfig().ReadOne(&kennung.Konfig{}); err != nil {
 		err = errors.Wrap(err)

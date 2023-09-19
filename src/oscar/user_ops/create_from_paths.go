@@ -12,6 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/external"
+	"github.com/friedenberg/zit/src/india/sku_fmt"
 	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/kilo/checked_out"
 	"github.com/friedenberg/zit/src/kilo/zettel"
@@ -74,7 +75,16 @@ func (c CreateFromPaths) Run(
 		if err = c.StoreObjekten().Zettel().ReadAll(
 			iter.MakeChain(
 				matcher.Match,
-				iter.AddClone[transacted.Zettel, *transacted.Zettel](results),
+				func(sk sku.SkuLikePtr) (err error) {
+					var z transacted.Zettel
+
+					if err = z.SetFromSkuLike(sk); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+
+					return results.Add(&z)
+				},
 			),
 		); err != nil {
 			err = errors.Wrap(err)
@@ -108,14 +118,12 @@ func (c CreateFromPaths) Run(
 	)
 
 	if err = toCreate.Each(
-		func(z *external.Zettel) (err error) {
+		func(z sku.SkuLikeExternalPtr) (err error) {
 			if z.GetMetadatei().IsEmpty() {
 				return
 			}
 
-			cz := checked_out.Zettel{
-				External: *z,
-			}
+			cz := checked_out.Zettel{}
 
 			var zt *transacted.Zettel
 
@@ -123,6 +131,11 @@ func (c CreateFromPaths) Run(
 				// TODO-P2 add file for error handling
 				c.handleStoreError(cz, "", err)
 				err = nil
+				return
+			}
+
+			if err = cz.External.Transacted.SetFromSkuLike(zt); err != nil {
+				err = errors.Wrapf(err, "Sku: %q", sku_fmt.String(z))
 				return
 			}
 
@@ -159,7 +172,7 @@ func (c CreateFromPaths) Run(
 	}
 
 	if err = toDelete.Each(
-		func(z *external.Zettel) (err error) {
+		func(z sku.SkuLikeExternalPtr) (err error) {
 			// TODO-P2 move to checkout store
 			if err = os.Remove(z.GetObjekteFD().Path); err != nil {
 				err = errors.Wrap(err)

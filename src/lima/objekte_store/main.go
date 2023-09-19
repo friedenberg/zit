@@ -24,7 +24,7 @@ type OneReader[
 	K any,
 	V any,
 ] interface {
-	ReadOne(K) (V, error)
+	ReadOne(schnittstellen.StringerGattungGetter) (V, error)
 }
 
 type ExternalReader[

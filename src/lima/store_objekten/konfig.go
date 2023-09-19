@@ -87,7 +87,7 @@ func (s konfigStore) Update(
 		return
 	}
 
-	var mutter *erworben.Transacted
+	var mutter sku.SkuLikePtr
 
 	if mutter, err = s.ReadOne(&kennung.Konfig{}); err != nil {
 		if errors.Is(err, objekte_store.ErrNotFound{}) {
@@ -105,7 +105,7 @@ func (s konfigStore) Update(
 
 	// TODO-P3 refactor into reusable
 	if mutter != nil {
-		kt.Metadatei.Verzeichnisse.Mutter = mutter.Metadatei.Verzeichnisse.Sha
+		kt.Metadatei.Verzeichnisse.Mutter = mutter.GetMetadatei().Verzeichnisse.Sha
 	}
 
 	var ow sha.WriteCloser
@@ -128,8 +128,11 @@ func (s konfigStore) Update(
 
 	kt.ObjekteSha = sha.Make(ow.GetShaLike())
 
-	if mutter != nil && kt.Metadatei.EqualsSansTai(mutter.Metadatei) {
-		kt = mutter
+	if mutter != nil && kt.Metadatei.EqualsSansTai(mutter.GetMetadatei()) {
+		if err = kt.SetFromSkuLike(mutter); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
 		if err = s.LogWriter.Unchanged(kt); err != nil {
 			err = errors.Wrap(err)
@@ -160,9 +163,9 @@ func (s konfigStore) Update(
 }
 
 func (i *konfigStore) ReadAllSchwanzen(
-	w schnittstellen.FuncIter[*erworben.Transacted],
+	w schnittstellen.FuncIter[sku.SkuLikePtr],
 ) (err error) {
-	var k *erworben.Transacted
+	var k sku.SkuLikePtr
 
 	if k, err = i.ReadOne(&kennung.Konfig{}); err != nil {
 		err = errors.Wrap(err)
@@ -178,7 +181,7 @@ func (i *konfigStore) ReadAllSchwanzen(
 }
 
 func (s *konfigStore) ReadAll(
-	w schnittstellen.FuncIter[*erworben.Transacted],
+	w schnittstellen.FuncIter[sku.SkuLikePtr],
 ) (err error) {
 	eachSku := func(sk sku.SkuLikePtr) (err error) {
 		if sk.GetGattung() != gattung.Konfig {
@@ -213,8 +216,15 @@ func (s *konfigStore) ReadAll(
 }
 
 func (s konfigStore) ReadOne(
-	_ *kennung.Konfig,
-) (tt *erworben.Transacted, err error) {
+	k schnittstellen.StringerGattungGetter,
+) (tt sku.SkuLikePtr, err error) {
+	var k1 kennung.Konfig
+
+	if err = k1.Set(k.String()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	tt1 := s.StoreUtil.GetKonfig().Sku
 	tt = &tt1
 
@@ -223,7 +233,7 @@ func (s konfigStore) ReadOne(
 			var r sha.ReadCloser
 
 			if r, err = s.ObjekteReader(
-				tt.ObjekteSha,
+				tt.GetObjekteSha(),
 			); err != nil {
 				if errors.IsNotExist(err) {
 					err = nil

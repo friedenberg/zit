@@ -84,12 +84,10 @@ func MakeFormatter(
 			return
 		}
 
-		f.formatters[gattung.Typ] = makeFuncFormatter(
-			tv.FuncFormatter(
-				out,
-				af,
-				tagp,
-			),
+		f.formatters[gattung.Typ] = tv.FuncFormatter(
+			out,
+			af,
+			tagp,
 		)
 	}
 

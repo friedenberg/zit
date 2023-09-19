@@ -13,8 +13,8 @@ import (
 	"github.com/friedenberg/zit/src/charlie/script_config"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
@@ -72,8 +72,8 @@ func (c ExecAction) RunWithQuery(
 
 	if err = u.StoreObjekten().Zettel().Query(
 		zids,
-		func(z *transacted.Zettel) (err error) {
-			return hinweisen.Add(z.GetKennung())
+		func(z sku.SkuLikePtr) (err error) {
+			return hinweisen.Add(z.GetKennungLike())
 		},
 	); err != nil {
 		err = errors.Wrap(err)

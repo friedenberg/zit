@@ -45,8 +45,10 @@ build/go_vet: $(files_go)
 
 dirs_go_unit := $(shell find src -mindepth 2 -iname '*_test.go' -print0 | xargs -0 dirname | sort -u)
 
-build/tests_unit: $(files_go) build/go_generate
-> @$(HOME)/.vim/ftplugin/go-test.bash $(dirs_go_unit)
+cmd_test_unit_runner := $(HOME)/.vim/ftplugin/go-test.bash
+
+build/tests_unit: $(files_go) build/go_generate $(cmd_test_unit_runner)
+> @$(cmd_test_unit_runner) $(dirs_go_unit)
 > touch "$@"
 
 build/tests_fast: build/go_vet build/tests_unit

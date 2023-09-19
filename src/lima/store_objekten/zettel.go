@@ -158,7 +158,7 @@ func (s *zettelStore) writeNamedZettelToIndex(
 
 func (s *zettelStore) ReadOneExternal(
 	e sku.ExternalMaybe,
-	t *transacted.Zettel,
+	t sku.SkuLikePtr,
 ) (ez external.Zettel, err error) {
 	var m checkout_mode.Mode
 
@@ -247,9 +247,16 @@ func (s *zettelStore) readOneExternalAkte(
 }
 
 func (s zettelStore) ReadOne(
-	i *kennung.Hinweis,
-) (tz *transacted.Zettel, err error) {
-	if tz, err = s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(*i); err != nil {
+	i schnittstellen.StringerGattungGetter,
+) (tz sku.SkuLikePtr, err error) {
+	var h kennung.Hinweis
+
+	if err = h.Set(i.String()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if tz, err = s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(h); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -258,15 +265,23 @@ func (s zettelStore) ReadOne(
 }
 
 func (i *zettelStore) ReadAllSchwanzen(
-	w schnittstellen.FuncIter[*transacted.Zettel],
+	w schnittstellen.FuncIter[sku.SkuLikePtr],
 ) (err error) {
-	return i.verzeichnisseSchwanzen.ReadMany(w)
+	return i.verzeichnisseSchwanzen.ReadMany(
+		func(z *transacted.Zettel) (err error) {
+			return w(z)
+		},
+	)
 }
 
 func (i *zettelStore) ReadAll(
-	w schnittstellen.FuncIter[*transacted.Zettel],
+	w schnittstellen.FuncIter[sku.SkuLikePtr],
 ) (err error) {
-	return i.verzeichnisseAll.ReadMany(w)
+	return i.verzeichnisseAll.ReadMany(
+		func(z *transacted.Zettel) (err error) {
+			return w(z)
+		},
+	)
 }
 
 func (s *zettelStore) Create(
@@ -335,7 +350,7 @@ func (s *zettelStore) UpdateManyMetadatei(
 	}
 
 	if err = s.ReadAllSchwanzen(
-		func(zt *transacted.Zettel) (err error) {
+		func(zt sku.SkuLikePtr) (err error) {
 			ke := zt.GetKennungLike()
 
 			if !gattung.Must(ke.GetGattung()).Equals(gattung.Zettel) {
@@ -435,9 +450,15 @@ func (s *zettelStore) UpdateCheckedOut(
 
 func (s *zettelStore) Update(
 	mg metadatei.Getter,
-	h *kennung.Hinweis,
+	k schnittstellen.Stringer,
 ) (tz *transacted.Zettel, err error) {
 	errors.TodoP2("support dry run")
+	var h kennung.Hinweis
+
+	if err = h.Set(k.String()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if !s.StoreUtil.GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{
@@ -450,7 +471,7 @@ func (s *zettelStore) Update(
 	var mutter *transacted.Zettel
 
 	if mutter, err = s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(
-		*h,
+		h,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -458,7 +479,7 @@ func (s *zettelStore) Update(
 
 	if tz, err = s.updateLockedWithMutter(
 		mg,
-		h,
+		&h,
 		mutter,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -471,7 +492,7 @@ func (s *zettelStore) Update(
 func (s *zettelStore) updateLockedWithMutter(
 	mg metadatei.Getter,
 	h *kennung.Hinweis,
-	mutter *transacted.Zettel,
+	mutter sku.SkuLikePtr,
 ) (tz *transacted.Zettel, err error) {
 	if mutter == nil {
 		panic("mutter was nil")
@@ -489,8 +510,11 @@ func (s *zettelStore) updateLockedWithMutter(
 		return
 	}
 
-	if tz.Metadatei.EqualsSansTai(mutter.Metadatei) {
-		tz = mutter
+	if tz.Metadatei.EqualsSansTai(mutter.GetMetadatei()) {
+		if err = tz.SetFromSkuLike(mutter); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
 		if err = s.LogWriter.Unchanged(tz); err != nil {
 			err = errors.Wrap(err)

@@ -65,7 +65,16 @@ func (c ZettelFromExternalAkte) Run(
 		if err = c.StoreObjekten().Zettel().ReadAll(
 			iter.MakeChain(
 				matcher.Match,
-				iter.AddClone[transacted.Zettel, *transacted.Zettel](results),
+				func(sk sku.SkuLikePtr) (err error) {
+					z := &transacted.Zettel{}
+
+					if err = z.SetFromSkuLike(sk); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+
+					return results.Add(z)
+				},
 			),
 		); err != nil {
 			err = errors.Wrap(err)
@@ -134,7 +143,7 @@ func (c ZettelFromExternalAkte) Run(
 	dp := c.Umwelt.PrinterFDDeleted()
 
 	err = toDelete.Each(
-		func(z *external.Zettel) (err error) {
+		func(z sku.SkuLikeExternalPtr) (err error) {
 			// TODO-P4 move to checkout store
 			if err = os.Remove(z.GetAkteFD().Path); err != nil {
 				err = errors.Wrap(err)
