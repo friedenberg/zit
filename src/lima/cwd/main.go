@@ -196,11 +196,17 @@ func (fs CwdFiles) GetTyp(
 }
 
 func (fs CwdFiles) Get(
-	k kennung.Kennung2,
+	k kennung.Kennung,
 ) (t *sku.ExternalMaybe, ok bool) {
 	g := gattung.Must(k.GetGattung())
 
 	switch g {
+	case gattung.Kasten:
+		return fs.Kisten.GetPtr(k.String())
+
+	case gattung.Zettel:
+		return fs.Zettelen.GetPtr(k.String())
+
 	case gattung.Typ:
 		return fs.Typen.GetPtr(k.String())
 

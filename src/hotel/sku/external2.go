@@ -17,6 +17,20 @@ type External2 struct {
 	FDs ExternalFDs
 }
 
+func (t *External2) SetFromSkuLike(sk SkuLike) (err error) {
+	switch skt := sk.(type) {
+	case SkuLikeExternalPtr:
+		t.FDs = skt.GetFDs()
+	}
+
+	if err = t.Transacted2.SetFromSkuLike(sk); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (a External2) GetKennung() kennung.Kennung {
 	return a.Kennung
 }

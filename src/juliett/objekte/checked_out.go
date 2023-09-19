@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/delta/checked_out_state"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -12,6 +13,7 @@ import (
 
 type (
 	CheckedOutLike interface {
+		schnittstellen.ValueLike
 		GetInternalLike() sku.SkuLikePtr
 		GetExternalLike() ExternalLike
 		GetState() checked_out_state.State
@@ -19,9 +21,11 @@ type (
 
 	CheckedOutLikePtr interface {
 		CheckedOutLike
+		GetInternalLikePtr() sku.SkuLikePtr
 		GetExternalLikePtr() ExternalLikePtr
 		SetExternalLikePtr(ExternalLikePtr) error
 		DetermineState(justCheckedOut bool)
+		SetState(checked_out_state.State)
 	}
 
 	CheckedOut[
@@ -56,6 +60,10 @@ func (co CheckedOut[T2, T3]) GetState() checked_out_state.State {
 	return co.State
 }
 
+func (co *CheckedOut[T2, T3]) SetState(v checked_out_state.State) {
+	co.State = v
+}
+
 func (co *CheckedOut[T2, T3]) GetInternalLike() sku.SkuLikePtr {
 	return &co.Internal
 }
@@ -66,6 +74,10 @@ func (co *CheckedOut[T2, T3]) GetExternalLike() ExternalLike {
 
 func (co *CheckedOut[T2, T3]) GetExternalLikePtr() ExternalLikePtr {
 	return &co.External
+}
+
+func (co *CheckedOut[T2, T3]) GetInternalLikePtr() sku.SkuLikePtr {
+	return &co.Internal
 }
 
 func (co *CheckedOut[T2, T3]) SetExternalLikePtr(

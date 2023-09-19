@@ -15,6 +15,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/erworben"
+	"github.com/friedenberg/zit/src/india/external"
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/juliett/objekte"
@@ -217,7 +218,9 @@ func (s *Store) ReadFiles(
 				case gattung.Kasten:
 					var tco checked_out.Kasten
 
-					if tco.External, err = s.storeObjekten.Kasten().ReadOneExternal(
+					var tcoe *external.Kasten
+
+					if tcoe, err = s.storeObjekten.Kasten().ReadOneExternal(
 						*il,
 						nil,
 					); err != nil {
@@ -230,6 +233,7 @@ func (s *Store) ReadFiles(
 						return
 					}
 
+					tco.External = *tcoe
 					tco.State = checked_out_state.StateUntracked
 
 					if err = f(&tco); err != nil {
@@ -268,7 +272,9 @@ func (s *Store) ReadFiles(
 				case gattung.Etikett:
 					var tco checked_out.Etikett
 
-					if tco.External, err = s.storeObjekten.Etikett().ReadOneExternal(
+					var tcoe *external.Etikett
+
+					if tcoe, err = s.storeObjekten.Etikett().ReadOneExternal(
 						*il,
 						nil,
 					); err != nil {
@@ -281,6 +287,7 @@ func (s *Store) ReadFiles(
 						return
 					}
 
+					tco.External = *tcoe
 					tco.State = checked_out_state.StateUntracked
 
 					if err = f(&tco); err != nil {

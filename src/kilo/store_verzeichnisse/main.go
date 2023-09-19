@@ -152,7 +152,7 @@ func (i *Zettelen) ReadMany(
 
 	wg := &sync.WaitGroup{}
 	ch := make(chan struct{}, PageCount)
-	chErr := make(chan error)
+	me := errors.MakeMulti()
 	chDone := make(chan struct{})
 
 	isDone := func() bool {
@@ -200,7 +200,7 @@ func (i *Zettelen) ReadMany(
 						break
 
 					default:
-						chErr <- err1
+						me.Add(err1)
 						break
 					}
 				}
@@ -210,12 +210,11 @@ func (i *Zettelen) ReadMany(
 		}(n, p, ch)
 	}
 
-	go func() {
-		err = <-chErr
-		close(chDone)
-	}()
-
 	wg.Wait()
+
+	if me.Len() > 0 {
+		err = me
+	}
 
 	return
 }

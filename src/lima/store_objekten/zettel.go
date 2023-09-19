@@ -159,7 +159,7 @@ func (s *zettelStore) writeNamedZettelToIndex(
 func (s *zettelStore) ReadOneExternal(
 	e sku.ExternalMaybe,
 	t sku.SkuLikePtr,
-) (ez external.Zettel, err error) {
+) (ez *external.Zettel, err error) {
 	var m checkout_mode.Mode
 
 	if m, err = e.GetFDs().GetCheckoutMode(); err != nil {
@@ -167,17 +167,18 @@ func (s *zettelStore) ReadOneExternal(
 		return
 	}
 
+	ez = &external.Zettel{}
 	ez.ResetWithExternalMaybe(e)
 
 	switch m {
 	case checkout_mode.ModeAkteOnly:
-		if err = s.ReadOneExternalAkte(&ez, t); err != nil {
+		if err = s.ReadOneExternalAkte(ez, t); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case checkout_mode.ModeObjekteOnly, checkout_mode.ModeObjekteAndAkte:
-		if err = s.ReadOneExternalObjekte(&ez, t); err != nil {
+		if err = s.ReadOneExternalObjekte(ez, t); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

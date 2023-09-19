@@ -50,8 +50,12 @@ type Lessor2[T any, TPtr Ptr[T]] interface {
 	LessPtr(TPtr, TPtr) bool
 }
 
-type Equaler[T any, TPtr Ptr[T]] interface {
+type Equaler1[T any] interface {
 	Equals(T, T) bool
+}
+
+type Equaler[T any, TPtr Ptr[T]] interface {
+	Equaler1[T]
 	EqualsPtr(TPtr, TPtr) bool
 }
 

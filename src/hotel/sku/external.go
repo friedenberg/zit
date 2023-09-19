@@ -17,6 +17,20 @@ type External[K kennung.KennungLike[K], KPtr kennung.KennungLikePtr[K]] struct {
 	FDs ExternalFDs
 }
 
+func (t *External[K, KPtr]) SetFromSkuLike(sk SkuLike) (err error) {
+	switch skt := sk.(type) {
+	case SkuLikeExternalPtr:
+		t.FDs = skt.GetFDs()
+	}
+
+	if err = t.Transacted.SetFromSkuLike(sk); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (a External[K, KPtr]) GetKennung() K {
 	return a.Kennung
 }

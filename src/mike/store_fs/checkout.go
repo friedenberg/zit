@@ -6,14 +6,15 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/id"
 	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/checked_out_state"
+	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/india/objekte_collections"
 	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/juliett/objekte"
-	"github.com/friedenberg/zit/src/kilo/checked_out"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/lima/cwd"
 	"github.com/friedenberg/zit/src/mike/store_util"
@@ -47,9 +48,9 @@ func (s *Store) CheckoutQuery(
 func (s *Store) Checkout(
 	options store_util.CheckoutOptions,
 	ztw schnittstellen.FuncIter[sku.SkuLikePtr],
-) (zcs zettel.MutableSetCheckedOut, err error) {
-	zcs = zettel.MakeMutableSetCheckedOutUnique(0)
-	zts := zettel.MakeMutableSetUnique(0)
+) (zcs schnittstellen.MutableSetLike[objekte.CheckedOutLikePtr], err error) {
+	zcs = collections_value.MakeMutableValueSet[objekte.CheckedOutLikePtr](nil)
+	zts := collections_value.MakeMutableValueSet[sku.SkuLikePtr](nil)
 
 	if err = s.storeObjekten.Zettel().ReadAllSchwanzen(
 		iter.MakeChain(
@@ -72,15 +73,16 @@ func (s *Store) Checkout(
 	}
 
 	if err = zts.Each(
-		func(zt *transacted.Zettel) (err error) {
-			var zc checked_out.Zettel
+		func(zt sku.SkuLikePtr) (err error) {
+			var zc objekte.CheckedOutLikePtr
 
-			if zc, err = s.CheckoutOneZettel(options, *zt); err != nil {
+			if zc, err = s.CheckoutOneZettel(options, zt); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
 			zcs.Add(zc)
+
 			return
 		},
 	); err != nil {
@@ -93,14 +95,25 @@ func (s *Store) Checkout(
 
 func (s Store) shouldCheckOut(
 	options store_util.CheckoutOptions,
-	cz checked_out.Zettel,
+	cz objekte.CheckedOutLikePtr,
 ) (ok bool) {
-	switch {
-	case cz.Internal.GetMetadatei().Equals(cz.External.GetMetadatei()):
-		cz.State = checked_out_state.StateJustCheckedOut
-
-	case options.Force || cz.State == checked_out_state.StateEmpty:
+	if options.Force == true {
 		ok = true
+		return
+	}
+
+	if cz.GetState() == checked_out_state.StateEmpty {
+		ok = true
+	}
+
+	if cz.GetState() == checked_out_state.StateEmpty {
+		ok = true
+	}
+
+	if cz.GetInternalLike().GetMetadatei().Equals(
+		cz.GetExternalLike().GetMetadatei(),
+	) {
+		return
 	}
 
 	return
@@ -108,9 +121,16 @@ func (s Store) shouldCheckOut(
 
 func (s Store) filenameForZettelTransacted(
 	options store_util.CheckoutOptions,
-	sz transacted.Zettel,
+	sz sku.SkuLikePtr,
 ) (originalFilename string, filename string, err error) {
-	if originalFilename, err = id.MakeDirIfNecessary(sz.GetKennung(), s.Cwd()); err != nil {
+	var h kennung.Hinweis
+
+	if err = h.Set(sz.GetKennungLike().String()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if originalFilename, err = id.MakeDirIfNecessary(h, s.Cwd()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -126,9 +146,7 @@ func (s *Store) checkoutOneGeneric(
 ) (cop objekte.CheckedOutLikePtr, err error) {
 	switch tt := t.(type) {
 	case *transacted.Zettel:
-		var co checked_out.Zettel
-		co, err = s.CheckoutOneZettel(options, *tt)
-		cop = &co
+		cop, err = s.CheckoutOneZettel(options, tt)
 
 	case *transacted.Kasten:
 		cop, err = s.storeObjekten.Kasten().CheckoutOne(store_util.CheckoutOptions(options), tt)
@@ -149,16 +167,25 @@ func (s *Store) checkoutOneGeneric(
 	}
 
 	cop.DetermineState(true)
-	s.checkedOutLogPrinter(cop)
+
+	if err = s.checkedOutLogPrinter(cop); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }
 
 func (s *Store) CheckoutOneZettel(
 	options store_util.CheckoutOptions,
-	sz transacted.Zettel,
-) (cz checked_out.Zettel, err error) {
-	cz.Internal = sz
+	sz sku.SkuLikePtr,
+) (cz objekte.CheckedOutLikePtr, err error) {
+	cz = &objekte.CheckedOut2{}
+
+	if err = cz.GetInternalLikePtr().SetFromSkuLike(sz); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	var originalFilename, filename string
 
@@ -171,7 +198,7 @@ func (s *Store) CheckoutOneZettel(
 		var e *cwd.Zettel
 		ok := false
 
-		if e, ok = options.Cwd.GetZettel(sz.GetKennungPtr()); !ok {
+		if e, ok = options.Cwd.Get(sz.GetKennungLikePtr()); !ok {
 			err = errors.Errorf(
 				"file at %s not recognized as zettel: %s",
 				filename,
@@ -180,10 +207,17 @@ func (s *Store) CheckoutOneZettel(
 			return
 		}
 
-		if cz.External, err = s.storeObjekten.Zettel().ReadOneExternal(
+		var cze objekte.ExternalLikePtr
+
+		if cze, err = s.storeObjekten.Zettel().ReadOneExternal(
 			*e,
-			&sz,
+			sz,
 		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = cz.GetExternalLikePtr().SetFromSkuLike(cze); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -197,11 +231,15 @@ func (s *Store) CheckoutOneZettel(
 
 	inlineAkte := s.erworben.IsInlineTyp(sz.GetTyp())
 
-	cz.State = checked_out_state.StateJustCheckedOut
-	cz.External = sz.GetExternal()
+	cz.SetState(checked_out_state.StateJustCheckedOut)
+
+	if err = cz.GetExternalLikePtr().SetFromSkuLike(sz); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if options.CheckoutMode.IncludesObjekte() {
-		cz.External.FDs.Objekte.Path = filename
+		cz.GetExternalLikePtr().GetFDsPtr().Objekte.Path = filename
 	}
 
 	if (!inlineAkte || !options.CheckoutMode.IncludesObjekte()) &&
@@ -214,7 +252,7 @@ func (s *Store) CheckoutOneZettel(
 			fe = t.String()
 		}
 
-		cz.External.FDs.Akte.Path = originalFilename + "." + fe
+		cz.GetExternalLikePtr().GetFDsPtr().Akte.Path = originalFilename + "." + fe
 	}
 
 	e := objekte_collections.MakeFileEncoder(
@@ -222,7 +260,7 @@ func (s *Store) CheckoutOneZettel(
 		s.erworben,
 	)
 
-	if err = e.Encode(&cz.External); err != nil {
+	if err = e.Encode(cz.GetExternalLikePtr()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

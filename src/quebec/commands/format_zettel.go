@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/india/external"
 	"github.com/friedenberg/zit/src/lima/cwd"
 	"github.com/friedenberg/zit/src/lima/store_objekten"
 	"github.com/friedenberg/zit/src/november/umwelt"
@@ -89,7 +88,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	if e, ok := cwdFiles.GetZettel(&h); ok {
-		var ze external.Zettel
+		var ze sku.SkuLikeExternalPtr
 
 		ze, err = u.StoreObjekten().Zettel().ReadOneExternal(*e, zt)
 

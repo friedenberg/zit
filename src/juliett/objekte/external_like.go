@@ -17,6 +17,7 @@ type ExternalLike interface {
 }
 
 type ExternalLikePtr interface {
+	sku.SkuLikeExternalPtr
 	ExternalLike
 	GetFDsPtr() *sku.ExternalFDs
 	metadatei.GetterPtr

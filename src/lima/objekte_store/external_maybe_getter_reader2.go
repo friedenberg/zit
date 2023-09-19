@@ -13,7 +13,7 @@ type ExternalMaybeGetterReader2 interface {
 }
 
 type externalMaybeGetterReader2 struct {
-	getter func(kennung.Kennung2) (*sku.ExternalMaybe, bool)
+	getter func(kennung.Kennung) (*sku.ExternalMaybe, bool)
 	ExternalReader[
 		*sku.ExternalMaybe,
 		sku.SkuLikePtr,
@@ -22,7 +22,7 @@ type externalMaybeGetterReader2 struct {
 }
 
 func MakeExternalMaybeGetterReader2(
-	getter func(kennung.Kennung2) (*sku.ExternalMaybe, bool),
+	getter func(kennung.Kennung) (*sku.ExternalMaybe, bool),
 	er ExternalReader[
 		*sku.ExternalMaybe,
 		sku.SkuLikePtr,

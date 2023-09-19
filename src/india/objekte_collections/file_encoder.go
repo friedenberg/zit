@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
-	"github.com/friedenberg/zit/src/india/external"
+	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
 type fileEncoder struct {
@@ -62,7 +62,7 @@ func (e *fileEncoder) openOrCreate(p string) (f *os.File, err error) {
 }
 
 func (e *fileEncoder) EncodeObjekte(
-	z *external.Zettel,
+	z sku.SkuLikeExternalPtr,
 	objektePath string,
 	aktePath string,
 ) (err error) {
@@ -185,7 +185,9 @@ func (e *fileEncoder) EncodeObjekte(
 	return
 }
 
-func (e *fileEncoder) Encode(z *external.Zettel) (err error) {
+func (e *fileEncoder) Encode(
+	z sku.SkuLikeExternalPtr,
+) (err error) {
 	return e.EncodeObjekte(
 		z,
 		z.GetObjekteFD().Path,

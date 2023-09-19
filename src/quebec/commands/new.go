@@ -15,7 +15,9 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
+	"github.com/friedenberg/zit/src/india/objekte_collections"
 	"github.com/friedenberg/zit/src/india/transacted"
+	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/lima/cwd"
 	"github.com/friedenberg/zit/src/mike/store_util"
@@ -110,7 +112,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		),
 	}
 
-	var zsc zettel.MutableSetCheckedOut
+	var zsc schnittstellen.MutableSetLike[objekte.CheckedOutLikePtr]
 
 	if len(args) == 0 {
 		if zsc, err = c.writeNewZettels(u); err != nil {
@@ -208,7 +210,7 @@ func (c New) readExistingFilesAsZettels(
 
 func (c New) writeNewZettels(
 	u *umwelt.Umwelt,
-) (zsc zettel.MutableSetCheckedOut, err error) {
+) (zsc schnittstellen.MutableSetLike[objekte.CheckedOutLikePtr], err error) {
 	var cwdFiles cwd.CwdFiles
 
 	if cwdFiles, err = cwd.MakeCwdFilesAll(
@@ -243,7 +245,7 @@ func (c New) writeNewZettels(
 func (c New) editZettels(
 	u *umwelt.Umwelt,
 	ms matcher.Query,
-	zsc zettel.MutableSetCheckedOut,
+	zsc schnittstellen.MutableSetLike[objekte.CheckedOutLikePtr],
 ) (err error) {
 	if !c.Edit {
 		errors.Log().Print("edit set to false, not editing")
@@ -252,7 +254,7 @@ func (c New) editZettels(
 
 	var filesZettelen []string
 
-	if filesZettelen, err = zettel.ToSliceFilesZettelen(zsc); err != nil {
+	if filesZettelen, err = objekte_collections.ToSliceFilesZettelen(zsc); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

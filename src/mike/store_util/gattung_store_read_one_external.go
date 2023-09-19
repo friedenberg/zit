@@ -9,13 +9,15 @@ import (
 func (s *CommonStore[O, OPtr, K, KPtr]) ReadOneExternal(
 	em sku.ExternalMaybe,
 	t sku.SkuLikePtr,
-) (e sku.External[K, KPtr], err error) {
+) (e *sku.External[K, KPtr], err error) {
 	var m checkout_mode.Mode
 
 	if m, err = em.GetFDs().GetCheckoutMode(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	e = &sku.External[K, KPtr]{}
 
 	if err = e.ResetWithExternalMaybe(em); err != nil {
 		err = errors.Wrap(err)
@@ -30,13 +32,13 @@ func (s *CommonStore[O, OPtr, K, KPtr]) ReadOneExternal(
 
 	switch m {
 	case checkout_mode.ModeAkteOnly:
-		if err = s.ReadOneExternalAkte(&e, t1); err != nil {
+		if err = s.ReadOneExternalAkte(e, t1); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case checkout_mode.ModeObjekteOnly, checkout_mode.ModeObjekteAndAkte:
-		if err = s.ReadOneExternalObjekte(&e, t1); err != nil {
+		if err = s.ReadOneExternalObjekte(e, t1); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
 	"github.com/friedenberg/zit/src/bravo/files"
@@ -18,6 +19,7 @@ import (
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/india/objekte_collections"
 	"github.com/friedenberg/zit/src/india/transacted"
+	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/organize_text"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/lima/cwd"
@@ -215,7 +217,7 @@ func (c Add) openAktenIfNecessary(
 		CheckoutMode: checkout_mode.ModeAkteOnly,
 	}
 
-	var checkoutResults zettel.MutableSetCheckedOut
+	var checkoutResults schnittstellen.MutableSetLike[objekte.CheckedOutLikePtr]
 
 	if checkoutResults, err = u.StoreWorkingDirectory().Checkout(
 		options,
@@ -233,7 +235,7 @@ func (c Add) openAktenIfNecessary(
 
 	var filesAkten []string
 
-	if filesAkten, err = zettel.ToSliceFilesAkten(checkoutResults); err != nil {
+	if filesAkten, err = objekte_collections.ToSliceFilesAkten(checkoutResults); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
