@@ -12,11 +12,11 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/external"
+	"github.com/friedenberg/zit/src/india/objekte_collections"
 	"github.com/friedenberg/zit/src/india/sku_fmt"
 	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/kilo/checked_out"
 	"github.com/friedenberg/zit/src/kilo/zettel"
-	"github.com/friedenberg/zit/src/kilo/zettel_external"
 	"github.com/friedenberg/zit/src/lima/objekte_store"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
@@ -36,8 +36,8 @@ func (c CreateFromPaths) Run(
 ) (results schnittstellen.MutableSetLike[*transacted.Zettel], err error) {
 	// TODO-P3 support different modes of de-duplication
 	// TODO-P3 support merging of duplicated akten
-	toCreate := zettel_external.MakeMutableSetUniqueFD()
-	toDelete := zettel_external.MakeMutableSetUniqueFD()
+	toCreate := objekte_collections.MakeMutableSetUniqueFD()
+	toDelete := objekte_collections.MakeMutableSetUniqueFD()
 
 	for _, arg := range args {
 		if err = c.zettelsFromPath(
@@ -70,7 +70,7 @@ func (c CreateFromPaths) Run(
 	defer errors.Deferred(&err, c.Unlock)
 
 	if c.Dedupe {
-		matcher := zettel_external.MakeMutableMatchSet(toCreate)
+		matcher := objekte_collections.MakeMutableMatchSet(toCreate)
 
 		if err = c.StoreObjekten().Zettel().ReadAll(
 			iter.MakeChain(

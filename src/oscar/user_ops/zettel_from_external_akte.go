@@ -13,9 +13,9 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/external"
 	"github.com/friedenberg/zit/src/india/matcher"
+	"github.com/friedenberg/zit/src/india/objekte_collections"
 	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/kilo/zettel"
-	"github.com/friedenberg/zit/src/kilo/zettel_external"
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
@@ -37,8 +37,8 @@ func (c ZettelFromExternalAkte) Run(
 
 	defer errors.Deferred(&err, c.Unlock)
 
-	toCreate := zettel_external.MakeMutableSetUniqueAkte()
-	toDelete := zettel_external.MakeMutableSetUniqueFD()
+	toCreate := objekte_collections.MakeMutableSetUniqueAkte()
+	toDelete := objekte_collections.MakeMutableSetUniqueFD()
 
 	results = zettel.MakeMutableSetHinweis(0)
 
@@ -60,7 +60,7 @@ func (c ZettelFromExternalAkte) Run(
 	}
 
 	if c.Dedupe {
-		matcher := zettel_external.MakeMutableMatchSet(toCreate)
+		matcher := objekte_collections.MakeMutableMatchSet(toCreate)
 
 		if err = c.StoreObjekten().Zettel().ReadAll(
 			iter.MakeChain(

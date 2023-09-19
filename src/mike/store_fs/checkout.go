@@ -10,11 +10,11 @@ import (
 	"github.com/friedenberg/zit/src/delta/checked_out_state"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
+	"github.com/friedenberg/zit/src/india/objekte_collections"
 	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/checked_out"
 	"github.com/friedenberg/zit/src/kilo/zettel"
-	"github.com/friedenberg/zit/src/kilo/zettel_external"
 	"github.com/friedenberg/zit/src/lima/cwd"
 	"github.com/friedenberg/zit/src/mike/store_util"
 )
@@ -217,7 +217,7 @@ func (s *Store) CheckoutOneZettel(
 		cz.External.FDs.Akte.Path = originalFilename + "." + fe
 	}
 
-	e := zettel_external.MakeFileEncoder(
+	e := objekte_collections.MakeFileEncoder(
 		s.storeObjekten,
 		s.erworben,
 	)

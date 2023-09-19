@@ -1,4 +1,4 @@
-package zettel_external
+package objekte_collections
 
 import (
 	"io"
