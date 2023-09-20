@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/id"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/checked_out_state"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -142,28 +141,14 @@ func (s Store) filenameForZettelTransacted(
 
 func (s *Store) checkoutOneGeneric(
 	options store_util.CheckoutOptions,
-	t sku.SkuLike,
+	t sku.SkuLikePtr,
 ) (cop objekte.CheckedOutLikePtr, err error) {
 	switch tt := t.(type) {
 	case *transacted.Zettel:
 		cop, err = s.CheckoutOneZettel(options, tt)
 
-	case *transacted.Kasten:
-		cop, err = s.storeObjekten.Kasten().CheckoutOne(store_util.CheckoutOptions(options), tt)
-
-	case *transacted.Typ:
-		cop, err = s.storeObjekten.CheckoutOne(store_util.CheckoutOptions(options), tt)
-
-	case *sku.Transacted2:
-		cop, err = s.storeObjekten.CheckoutOne(store_util.CheckoutOptions(options), tt)
-
-	case *transacted.Etikett:
-		cop, err = s.storeObjekten.Etikett().CheckoutOne(store_util.CheckoutOptions(options), tt)
-
 	default:
-		// err = errors.Implement()
-		err = gattung.MakeErrUnsupportedGattung(tt.GetSkuLike())
-		return
+		cop, err = s.storeObjekten.CheckoutOne(store_util.CheckoutOptions(options), tt)
 	}
 
 	cop.DetermineState(true)
