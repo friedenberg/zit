@@ -4,6 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/charlie/iter2"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -123,26 +124,20 @@ func (s *Store) ReadAllSchwanzen(
 	gs gattungen.Set,
 	f schnittstellen.FuncIter[sku.SkuLikePtr],
 ) (err error) {
-	chErr := make(chan error, gs.Len())
+	if err = iter2.Parallel(
+		gs,
+		func(g gattung.Gattung) (err error) {
+			r, ok := s.readers[g]
 
-	for g, s1 := range s.readers {
-		if !gs.ContainsKey(g.GetGattungString()) {
-			continue
-		}
+			if !ok {
+				return
+			}
 
-		go func(s1 objekte.FuncReaderTransactedLikePtr) {
-			var subErr error
-
-			defer func() {
-				chErr <- subErr
-			}()
-
-			subErr = s1(f)
-		}(s1)
-	}
-
-	for i := 0; i < gs.Len(); i++ {
-		err = errors.MakeMulti(err, <-chErr)
+			return r(f)
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

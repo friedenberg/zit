@@ -1,13 +1,8 @@
 package store_objekten
 
 import (
-	"io"
-	"os"
-
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/checkout_mode"
-	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/hinweisen"
@@ -151,97 +146,6 @@ func (s *zettelStore) writeNamedZettelToIndex(
 			err = errors.Wrapf(err, "failed to write zettel to index: %s", tz)
 			return
 		}
-	}
-
-	return
-}
-
-func (s *zettelStore) ReadOneExternal2(
-	e sku.ExternalMaybe,
-	t sku.SkuLikePtr,
-) (ez *external.Zettel, err error) {
-	var m checkout_mode.Mode
-
-	if m, err = e.GetFDs().GetCheckoutMode(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	ez = &external.Zettel{}
-	ez.ResetWithExternalMaybe(e)
-
-	switch m {
-	case checkout_mode.ModeAkteOnly:
-		if err = s.ReadOneExternalAkte(ez, t); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	case checkout_mode.ModeObjekteOnly, checkout_mode.ModeObjekteAndAkte:
-		if err = s.ReadOneExternalObjekte(ez, t); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	return
-}
-
-func (s *zettelStore) readOneExternalAkte(
-	ez *external.Zettel,
-	t *transacted.Zettel,
-) (err error) {
-	ez.SetMetadatei(t.GetMetadatei())
-
-	var aw sha.WriteCloser
-
-	if aw, err = s.StoreUtil.AkteWriter(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, aw)
-
-	var f *os.File
-
-	if f, err = files.OpenExclusiveReadOnly(
-		ez.GetAkteFD().Path,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, f)
-
-	if _, err = io.Copy(aw, f); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	sh := sha.Make(aw.GetShaLike())
-	ez.SetAkteSha(sh)
-
-	typKonfig := s.GetKonfig().GetApproximatedTyp(
-		t.GetTyp(),
-	).ApproximatedOrActual()
-
-	if typKonfig == nil {
-		err = errors.Errorf(
-			"typKonfig for zettel is nil: %s",
-			t.GetKennungLike(),
-		)
-		return
-	}
-
-	fe := s.GetKonfig().TypenToExtensions[t.GetTyp().String()]
-
-	if fe != ez.GetAkteFD().ExtSansDot() {
-		err = errors.Wrap(ErrExternalAkteExtensionMismatch{
-			Expected: fe,
-			Actual:   ez.GetAkteFD(),
-		})
-
-		return
 	}
 
 	return
