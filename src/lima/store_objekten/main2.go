@@ -9,6 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/juliett/objekte"
+	"github.com/friedenberg/zit/src/lima/objekte_store"
 	"github.com/friedenberg/zit/src/mike/store_util"
 )
 
@@ -64,56 +65,76 @@ func (s *Store) onUnchanged(
 
 func (s *Store) ReadOne(
 	k1 schnittstellen.StringerGattungGetter,
-) (sk *sku.Transacted2, err error) {
-	var k kennung.Kennung2
+) (sk1 *sku.Transacted2, err error) {
+	var sk sku.SkuLike
 
-	if err = k.SetWithGattung(k1.String(), k1.GetGattung()); err != nil {
-		err = errors.Wrap(err)
+	switch k1.GetGattung() {
+	case gattung.Zettel:
+		var h kennung.Hinweis
+
+		if err = h.Set(k1.String()); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if sk, err = s.zettelStore.verzeichnisseSchwanzen.ReadHinweisSchwanzen(h); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+
+	case gattung.Typ:
+		var k kennung.Typ
+
+		if err = k.Set(k1.String()); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		sk = s.StoreUtil.GetKonfig().GetApproximatedTyp(k).ActualOrNilSku()
+
+	case gattung.Etikett:
+		var e kennung.Etikett
+
+		if err = e.Set(k1.String()); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		sk = s.StoreUtil.GetKonfig().GetEtikett(e)
+
+		return
+
+	case gattung.Kasten:
+		var k kennung.Kasten
+
+		if err = k.Set(k.String()); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		sk = s.StoreUtil.GetKonfig().GetKasten(k)
+
+		return
+
+	case gattung.Konfig:
+		fallthrough
+
+	default:
+		err = errors.Errorf("unsupported kennung %T -> %q", k1, k1)
 		return
 	}
 
-	switch kt := k.KennungPtr.(type) {
-	// case *kennung.Hinweis:
-	// 	return s.Zettel().ReadOne(kt)
+	if sk == nil {
+		err = errors.Wrap(objekte_store.ErrNotFound{Id: k1})
+		return
+	}
 
-	case *kennung.Typ:
-		var sk1 sku.SkuLikePtr
+	sk1 = &sku.Transacted2{}
 
-		if sk1, err = s.typStore.ReadOne(kt); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		sk = &sku.Transacted2{}
-
-		if err = sk.SetFromSkuLike(sk1); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	case *kennung.Etikett:
-		var sk1 sku.SkuLikePtr
-
-		if sk1, err = s.etikettStore.ReadOne(kt); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		sk = &sku.Transacted2{}
-
-		if err = sk.SetFromSkuLike(sk1); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	// case *kennung.Kasten:
-	// 	return s.Kasten().ReadOne(kt)
-
-	// case *kennung.Konfig:
-	// 	return s.Konfig().ReadOne(kt)
-
-	default:
-		err = errors.Errorf("unsupported kennung %T -> %q", kt, kt)
+	if err = sk1.SetFromSkuLike(sk); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 

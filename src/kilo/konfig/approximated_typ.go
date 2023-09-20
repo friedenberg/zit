@@ -29,3 +29,19 @@ func (a ApproximatedTyp) ApproximatedOrActual() *sku.Transacted2 {
 
 	return a.typ
 }
+
+func (a ApproximatedTyp) ActualOrNilSku() (actual sku.SkuLikePtr) {
+	if a.hasValue && a.isActual {
+		actual = a.typ
+	}
+
+	return
+}
+
+func (a ApproximatedTyp) ApproximatedOrActualSku() sku.SkuLikePtr {
+	if !a.hasValue {
+		return nil
+	}
+
+	return a.typ
+}
