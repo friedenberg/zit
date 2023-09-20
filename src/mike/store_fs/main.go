@@ -93,7 +93,7 @@ func (s *Store) ReadFiles(
 
 	emgr := objekte_store.MakeExternalMaybeGetterReader2(
 		fs.Get,
-		s.storeObjekten.GetExternalReader2(),
+		s.storeObjekten,
 	)
 
 	kastenEMGR := objekte_store.MakeExternalMaybeGetterReader[
@@ -130,7 +130,7 @@ func (s *Store) ReadFiles(
 					}
 
 				case *transacted.Typ:
-					et1 := &sku.Transacted2{}
+					et1 := sku.GetTransactedPool().Get()
 
 					if err = et1.SetFromSkuLike(et); err != nil {
 						err = errors.Wrap(err)

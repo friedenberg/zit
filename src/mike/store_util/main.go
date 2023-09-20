@@ -56,8 +56,6 @@ type StoreUtil interface {
 	ObjekteReaderWriterFactory(
 		schnittstellen.GattungGetter,
 	) schnittstellen.ObjekteIOFactory
-
-	GetExternalReader2() *ExternalReader2
 }
 
 // TODO-P3 move to own package
@@ -77,8 +75,6 @@ type common struct {
 
 	matcher.MatchableAdder
 	typenIndex kennung_index.KennungIndex[kennung.Typ, *kennung.Typ]
-
-	er2 ExternalReader2
 }
 
 func MakeStoreUtil(
@@ -100,11 +96,6 @@ func MakeStoreUtil(
 		c,
 		nil, // TODO-P1 make akteFormatter
 	)
-
-	c.er2 = ExternalReader2{
-		metadateiTextParser: c.metadateiTextParser,
-		AkteIOFactory:       c,
-	}
 
 	c.typenIndex = kennung_index.MakeIndex2[kennung.Typ](
 		c,
@@ -146,10 +137,6 @@ func MakeStoreUtil(
 	}
 
 	return
-}
-
-func (s *common) GetExternalReader2() *ExternalReader2 {
-	return &s.er2
 }
 
 func (s common) GetStoreVersion() schnittstellen.StoreVersion {
