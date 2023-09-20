@@ -162,7 +162,7 @@ func (c EditKonfig) makeTempKonfigFile(
 ) (p string, err error) {
 	var k sku.SkuLikePtr
 
-	if k, err = u.StoreObjekten().Konfig().ReadOne(&kennung.Konfig{}); err != nil {
+	if k, err = u.StoreObjekten().ReadOne(&kennung.Konfig{}); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -27,6 +27,12 @@ func (s *Store) onNewOrUpdated(
 			return
 		}
 
+	case gattung.Etikett:
+		if err = s.StoreUtil.GetKonfigPtr().AddEtikett2(t); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 	default:
 		err = gattung.MakeErrUnsupportedGattung(g)
 		return

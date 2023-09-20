@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/transacted"
 )
 
@@ -120,6 +121,19 @@ func (k *compiled) AccumulateImplicitEtiketten(
 	}
 
 	return
+}
+
+func (k *compiled) AddEtikett2(
+	b1 sku.SkuLikePtr,
+) (err error) {
+	var e transacted.Etikett
+
+	if err = e.SetFromSkuLike(b1); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return k.AddEtikett(&e)
 }
 
 func (k *compiled) AddEtikett(
