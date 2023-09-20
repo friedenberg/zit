@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/log"
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/checked_out_state"
 	"github.com/friedenberg/zit/src/delta/etikett_akte"
 	"github.com/friedenberg/zit/src/delta/kasten_akte"
@@ -15,11 +14,9 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/erworben"
-	"github.com/friedenberg/zit/src/india/external"
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/juliett/objekte"
-	"github.com/friedenberg/zit/src/kilo/checked_out"
 	"github.com/friedenberg/zit/src/kilo/konfig"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/lima/cwd"
@@ -214,89 +211,29 @@ func (s *Store) ReadFiles(
 
 				err = nil
 
-				switch k.GetGattung() {
-				case gattung.Kasten:
-					var tco checked_out.Kasten
+				tco := &objekte.CheckedOut2{}
+				var tcoe *sku.External2
 
-					var tcoe *external.Kasten
-
-					if tcoe, err = s.storeObjekten.Kasten().ReadOneExternal(
-						*il,
-						nil,
-					); err != nil {
-						if errors.IsNotExist(err) {
-							err = iter.MakeErrStopIteration()
-						} else {
-							err = errors.Wrapf(err, "CwdEtikett: %#v", il)
-						}
-
-						return
+				if tcoe, err = s.storeObjekten.ReadOneExternal(
+					il,
+					nil,
+				); err != nil {
+					if errors.IsNotExist(err) {
+						err = iter.MakeErrStopIteration()
+					} else {
+						err = errors.Wrapf(err, "%#v", il)
 					}
 
-					tco.External = *tcoe
-					tco.State = checked_out_state.StateUntracked
+					return
+				}
 
-					if err = f(&tco); err != nil {
-						err = errors.Wrap(err)
-						return
-					}
+				tco.Internal = tcoe.Transacted2
+				tco.External = *tcoe
+				tco.State = checked_out_state.StateUntracked
 
-				case gattung.Typ:
-					var tco objekte.CheckedOut2
-
-					var e1 *sku.External2
-
-					if e1, err = s.storeObjekten.ReadOneExternal(
-						il,
-						nil,
-					); err != nil {
-						if errors.IsNotExist(err) {
-							err = iter.MakeErrStopIteration()
-						} else {
-							err = errors.Wrapf(err, "CwdEtikett: %#v", il)
-						}
-
-						return
-					}
-
-					tco.External = *e1
-					tco.Internal.Kennung = tco.External.Kennung
-
-					tco.State = checked_out_state.StateUntracked
-
-					if err = f(&tco); err != nil {
-						err = errors.Wrap(err)
-						return
-					}
-
-				case gattung.Etikett:
-					var tco checked_out.Etikett
-
-					var tcoe *external.Etikett
-
-					if tcoe, err = s.storeObjekten.Etikett().ReadOneExternal(
-						*il,
-						nil,
-					); err != nil {
-						if errors.IsNotExist(err) {
-							err = iter.MakeErrStopIteration()
-						} else {
-							err = errors.Wrapf(err, "CwdEtikett: %#v", il)
-						}
-
-						return
-					}
-
-					tco.External = *tcoe
-					tco.State = checked_out_state.StateUntracked
-
-					if err = f(&tco); err != nil {
-						err = errors.Wrap(err)
-						return
-					}
-
-				default:
-					err = errors.Errorf("unsupported id like: %T", il)
+				if err = f(tco); err != nil {
+					err = errors.Wrap(err)
+					return
 				}
 
 				return

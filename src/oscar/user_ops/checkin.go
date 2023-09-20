@@ -44,39 +44,34 @@ func (c Checkin) Run(
 						return
 					}
 
-				case *checked_out.Kasten:
-					if _, err = u.StoreObjekten().Kasten().CreateOrUpdateCheckedOut(
-						aco,
-					); err != nil {
-						err = errors.Wrap(err)
-						return
-					}
-
-				case *objekte.CheckedOut2:
-					if _, err = u.StoreObjekten().CreateOrUpdator.CreateOrUpdateCheckedOut(
-						aco,
-					); err != nil {
-						err = errors.Wrap(err)
-						return
-					}
-
-				case *checked_out.Etikett:
-					if _, err = u.StoreObjekten().Etikett().CreateOrUpdateCheckedOut(
-						aco,
-					); err != nil {
-						err = errors.Wrap(err)
-						return
-					}
-
 				default:
-					err = errors.Implement()
-					return
+					co := &objekte.CheckedOut2{}
+
+					if err = co.Internal.SetFromSkuLike(aco.GetInternalLikePtr()); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+
+					if err = co.External.SetFromSkuLike(aco.GetExternalLikePtr()); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+
+					co.State = aco.GetState()
+
+					if _, err = u.StoreObjekten().CreateOrUpdator.CreateOrUpdateCheckedOut(
+						co,
+					); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
 				}
 
 				e := co.GetExternalLike()
 
 				l.Lock()
 				defer l.Unlock()
+
 				fds.Add(e.GetObjekteFD())
 				fds.Add(e.GetAkteFD())
 

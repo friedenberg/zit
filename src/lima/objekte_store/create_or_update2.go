@@ -5,6 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/delta/checked_out_state"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
@@ -87,7 +88,8 @@ func (cou createOrUpdate2) CreateOrUpdateCheckedOut(
 	}
 
 	// TODO-P2: determine why Metadatei.Etiketten can be nil
-	if transactedPtr.Metadatei.EqualsSansTai(co.Internal.Metadatei) {
+	if transactedPtr.Metadatei.EqualsSansTai(co.Internal.Metadatei) &&
+		co.State != checked_out_state.StateUntracked {
 		transactedPtr = &co.Internal
 
 		if err = cou.delegate.Unchanged(transactedPtr); err != nil {
@@ -103,9 +105,16 @@ func (cou createOrUpdate2) CreateOrUpdateCheckedOut(
 		return
 	}
 
-	if err = cou.delegate.Updated(transactedPtr); err != nil {
-		err = errors.Wrap(err)
-		return
+	if co.State == checked_out_state.StateUntracked {
+		if err = cou.delegate.New(transactedPtr); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		if err = cou.delegate.Updated(transactedPtr); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return
