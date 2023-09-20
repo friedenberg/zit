@@ -68,7 +68,7 @@ package commands
 
 // 	var zt *zettel.Transacted
 
-// 	if zt, err = u.StoreObjekten().Zettel().ReadOne(&h); err != nil {
+// 	if zt, err = u.StoreObjekten().ReadOne(&h); err != nil {
 // 		err = errors.Wrap(err)
 // 		return
 // 	}

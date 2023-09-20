@@ -74,7 +74,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	// iterate through pairs and read current zettel
 	for i, p := range pairs {
-		if zettels[i], err = u.StoreObjekten().Zettel().ReadOne(
+		if zettels[i], err = u.StoreObjekten().ReadOne(
 			&p.Hinweis,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -103,7 +103,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 				return
 			}
 
-			defer errors.Deferred(&err, f.Close)
+			defer errors.DeferredCloser(&err, f)
 
 			if _, err = io.Copy(ow, f); err != nil {
 				err = errors.Wrap(err)
@@ -115,7 +115,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 				return
 			}
 
-			if zettels[i], err = u.StoreObjekten().Zettel().ReadOne(
+			if zettels[i], err = u.StoreObjekten().ReadOne(
 				&p.Hinweis,
 			); err != nil {
 				err = errors.Wrap(err)

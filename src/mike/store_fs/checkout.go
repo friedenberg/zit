@@ -209,8 +209,8 @@ func (s *Store) CheckoutOneZettel(
 
 		var cze objekte.ExternalLikePtr
 
-		if cze, err = s.storeObjekten.Zettel().ReadOneExternal(
-			*e,
+		if cze, err = s.storeObjekten.ReadOneExternal(
+			e,
 			sz,
 		); err != nil {
 			err = errors.Wrap(err)

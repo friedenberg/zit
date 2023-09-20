@@ -82,7 +82,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	var zt sku.SkuLikePtr
 
-	if zt, err = u.StoreObjekten().Zettel().ReadOne(&h); err != nil {
+	if zt, err = u.StoreObjekten().ReadOne(&h); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -90,7 +90,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	if e, ok := cwdFiles.GetZettel(&h); ok {
 		var ze sku.SkuLikeExternalPtr
 
-		ze, err = u.StoreObjekten().Zettel().ReadOneExternal(*e, zt)
+		ze, err = u.StoreObjekten().ReadOneExternal(e, zt)
 
 		switch {
 		case store_objekten.IsErrExternalAkteExtensionMismatch(err):
@@ -111,7 +111,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	typKonfig := u.Konfig().GetApproximatedTyp(
 		zt.GetTyp(),
-	).ApproximatedOrActual()
+	).ApproximatedOrActualSku()
 
 	var akteFormatter script_config.RemoteScript
 

@@ -82,8 +82,6 @@ func (s *Store) ReadOne(
 			return
 		}
 
-		return
-
 	case gattung.Typ:
 		var k kennung.Typ
 
@@ -104,8 +102,6 @@ func (s *Store) ReadOne(
 
 		sk = s.StoreUtil.GetKonfig().GetEtikett(e)
 
-		return
-
 	case gattung.Kasten:
 		var k kennung.Kasten
 
@@ -115,8 +111,6 @@ func (s *Store) ReadOne(
 		}
 
 		sk = s.StoreUtil.GetKonfig().GetKasten(k)
-
-		return
 
 	case gattung.Konfig:
 		fallthrough
