@@ -450,7 +450,7 @@ func (k *compiled) AddKasten(
 func (k *compiled) AddTyp(
 	a *transacted.Typ,
 ) (err error) {
-	b := &sku.Transacted2{}
+	b := sku.GetTransactedPool().Get()
 
 	if err = b.SetFromSkuLike(a); err != nil {
 		err = errors.Wrap(err)
