@@ -217,7 +217,7 @@ func (s *konfigStore) ReadAll(
 
 func (s konfigStore) ReadOne(
 	k schnittstellen.StringerGattungGetter,
-) (tt sku.SkuLikePtr, err error) {
+) (tt *sku.Transacted2, err error) {
 	var k1 kennung.Konfig
 
 	if err = k1.Set(k.String()); err != nil {
@@ -226,7 +226,13 @@ func (s konfigStore) ReadOne(
 	}
 
 	tt1 := s.StoreUtil.GetKonfig().Sku
-	tt = &tt1
+
+	tt = s.GetSkuPool().Get()
+
+	if err = tt.SetFromSkuLike(tt1); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if !tt.GetTai().IsEmpty() {
 		{

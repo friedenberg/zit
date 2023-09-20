@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/log"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/checked_out_state"
 	"github.com/friedenberg/zit/src/delta/etikett_akte"
 	"github.com/friedenberg/zit/src/delta/kasten_akte"
@@ -155,6 +156,10 @@ func (s *Store) ReadFiles(
 				// 	}
 
 				case *sku.Transacted2:
+					if et.GetGattung() == gattung.Konfig {
+						err = iter.MakeErrStopIteration()
+						return
+					}
 
 					if col, err = emgr.ReadOne(et); err != nil {
 						err = errors.Wrap(err)

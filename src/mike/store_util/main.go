@@ -9,6 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/id"
 	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/charlie/pool"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/echo/age_io"
@@ -30,6 +31,7 @@ type StoreUtilVerzeichnisse interface {
 }
 
 type StoreUtil interface {
+	GetSkuPool() schnittstellen.Pool[sku.Transacted2, *sku.Transacted2]
 	FlushBestandsaufnahme() error
 	errors.Flusher
 	StoreUtilVerzeichnisse
@@ -69,6 +71,7 @@ type common struct {
 	bestandsaufnahmeAkte      bestandsaufnahme.Akte
 	Abbr                      AbbrStore
 	persistentMetadateiFormat objekte_format.Format
+	pool                      schnittstellen.Pool[sku.Transacted2, *sku.Transacted2]
 
 	metadateiTextParser metadatei.TextParser
 
@@ -94,6 +97,10 @@ func MakeStoreUtil(
 		konfig:                    k,
 		standort:                  st,
 		persistentMetadateiFormat: pmf,
+		pool: pool.MakePool[sku.Transacted2, *sku.Transacted2](
+			nil,
+			nil,
+		),
 	}
 
 	c.metadateiTextParser = metadatei.MakeTextParser(
@@ -146,6 +153,10 @@ func MakeStoreUtil(
 	}
 
 	return
+}
+
+func (s *common) GetSkuPool() schnittstellen.Pool[sku.Transacted2, *sku.Transacted2] {
+	return s.pool
 }
 
 func (s *common) GetExternalReader2() *ExternalReader2 {

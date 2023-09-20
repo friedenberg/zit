@@ -158,11 +158,14 @@ func (k *compiled) AddEtikett(
 func (c *compiled) applyExpandedEtikett(ct *transacted.Etikett) {
 }
 
-func (kc compiled) GetEtikett(k kennung.Etikett) (ct transacted.Etikett) {
+func (kc compiled) GetEtikett(
+	k kennung.Etikett,
+) (ct transacted.Etikett, ok bool) {
 	expandedActual := kc.GetSortedEtikettenExpanded(k.String())
 
 	if len(expandedActual) > 0 {
 		ct = expandedActual[0]
+		ok = true
 	}
 
 	return

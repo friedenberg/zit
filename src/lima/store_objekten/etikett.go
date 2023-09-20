@@ -124,7 +124,7 @@ func (s etikettStore) UpdateOne(t *transacted.Etikett) (err error) {
 
 func (s etikettStore) ReadOne(
 	k schnittstellen.StringerGattungGetter,
-) (tt sku.SkuLikePtr, err error) {
+) (tt *sku.Transacted2, err error) {
 	var e kennung.Etikett
 
 	if err = e.Set(k.String()); err != nil {
@@ -132,11 +132,17 @@ func (s etikettStore) ReadOne(
 		return
 	}
 
-	tt1 := s.StoreUtil.GetKonfig().GetEtikett(e)
-	tt = &tt1
+	tt1, ok := s.StoreUtil.GetKonfig().GetEtikett(e)
 
-	if tt == nil {
+	if !ok {
 		err = errors.Wrap(objekte_store.ErrNotFound{Id: e})
+		return
+	}
+
+	tt = s.GetSkuPool().Get()
+
+	if err = tt.SetFromSkuLike(tt1); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 

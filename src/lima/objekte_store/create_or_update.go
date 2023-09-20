@@ -156,7 +156,7 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdate(
 		return
 	}
 
-	var mutter sku.SkuLikePtr
+	var mutter *sku.Transacted2
 
 	if mutter, err = cou.reader.ReadOne(kennungPtr); err != nil {
 		if errors.Is(err, ErrNotFound{}) {

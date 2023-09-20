@@ -179,7 +179,7 @@ func (s typStore) ReadAll(
 
 func (s typStore) ReadOne(
 	k1 schnittstellen.StringerGattungGetter,
-) (tt sku.SkuLikePtr, err error) {
+) (tt *sku.Transacted2, err error) {
 	var k kennung.Typ
 
 	if err = k.Set(k1.String()); err != nil {
@@ -197,7 +197,7 @@ func (s typStore) ReadOne(
 		return
 	}
 
-	tt = &transacted.Typ{}
+	tt = s.GetSkuPool().Get()
 
 	if err = tt.SetFromSkuLike(t1); err != nil {
 		err = errors.Wrap(err)

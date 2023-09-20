@@ -25,6 +25,7 @@ type createOrUpdate2 struct {
 	persistentMetadateiFormat objekte_format.Format
 	options                   objekte_format.Options
 	kg                        konfig.Getter
+	pool                      schnittstellen.Pool[sku.Transacted2, *sku.Transacted2]
 }
 
 func MakeCreateOrUpdate2(
@@ -37,6 +38,7 @@ func MakeCreateOrUpdate2(
 	pmf objekte_format.Format,
 	op objekte_format.Options,
 	kg konfig.Getter,
+	pool schnittstellen.Pool[sku.Transacted2, *sku.Transacted2],
 ) (cou *createOrUpdate2) {
 	if pmf == nil {
 		panic("nil persisted_metadatei_format.Format")
@@ -51,6 +53,7 @@ func MakeCreateOrUpdate2(
 		matchableAdder:            ma,
 		persistentMetadateiFormat: pmf,
 		options:                   op,
+		pool:                      pool,
 	}
 }
 
@@ -154,10 +157,10 @@ func (cou createOrUpdate2) CreateOrUpdate(
 
 	m.Tai = cou.clock.GetTai()
 
-	transactedPtr = &sku.Transacted2{
-		Kennung:   *kennungPtr,
-		Metadatei: m,
-	}
+	transactedPtr = cou.pool.Get()
+
+	transactedPtr.Kennung = *kennungPtr
+	transactedPtr.Metadatei = m
 
 	if mutter != nil {
 		transactedPtr.Kopf = mutter.Kopf

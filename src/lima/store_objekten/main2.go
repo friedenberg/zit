@@ -106,7 +106,12 @@ func (s *Store) ReadOne(
 			return
 		}
 
-		sk = s.StoreUtil.GetKonfig().GetEtikett(e)
+		ok := false
+		sk, ok = s.StoreUtil.GetKonfig().GetEtikett(e)
+
+		if !ok {
+			sk = nil
+		}
 
 	case gattung.Kasten:
 		var k kennung.Kasten
@@ -131,7 +136,7 @@ func (s *Store) ReadOne(
 		return
 	}
 
-	sk1 = &sku.Transacted2{}
+	sk1 = s.GetSkuPool().Get()
 
 	if err = sk1.SetFromSkuLike(sk); err != nil {
 		err = errors.Wrap(err)

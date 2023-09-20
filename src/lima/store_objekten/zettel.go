@@ -153,7 +153,7 @@ func (s *zettelStore) writeNamedZettelToIndex(
 
 func (s zettelStore) ReadOne(
 	i schnittstellen.StringerGattungGetter,
-) (tz sku.SkuLikePtr, err error) {
+) (tz *sku.Transacted2, err error) {
 	var h kennung.Hinweis
 
 	if err = h.Set(i.String()); err != nil {
@@ -161,7 +161,16 @@ func (s zettelStore) ReadOne(
 		return
 	}
 
-	if tz, err = s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(h); err != nil {
+	var tz1 *transacted.Zettel
+
+	if tz1, err = s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(h); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	tz = s.GetSkuPool().Get()
+
+	if err = tz.SetFromSkuLike(tz1); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

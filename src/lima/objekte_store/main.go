@@ -24,7 +24,7 @@ type OneReader[
 	K any,
 	V any,
 ] interface {
-	ReadOne(schnittstellen.StringerGattungGetter) (V, error)
+	ReadOne(schnittstellen.StringerGattungGetter) (*sku.Transacted2, error)
 }
 
 type ExternalReader[
