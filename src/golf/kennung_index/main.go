@@ -156,8 +156,8 @@ func (i *index) Reset() (err error) {
 	return
 }
 
-func (i *index) AddHinweis(h kennung.Hinweis) (err error) {
-	if err = i.hinweisIndex.AddHinweis(h); err != nil {
+func (i *index) AddHinweis(k kennung.Kennung) (err error) {
+	if err = i.hinweisIndex.AddHinweis(k); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

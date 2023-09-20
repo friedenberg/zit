@@ -9,6 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/pool"
+	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/kilo/konfig"
 )
@@ -109,7 +110,7 @@ func (i *Zettelen) Flush() (err error) {
 }
 
 func (i *Zettelen) AddVerzeichnisse(
-	tz *transacted.Zettel,
+	tz sku.SkuLikePtr,
 	v string,
 ) (err error) {
 	var n int
@@ -127,7 +128,11 @@ func (i *Zettelen) AddVerzeichnisse(
 	}
 
 	z := i.pool.Get()
-	z.ResetWith(*tz)
+
+	if err = z.SetFromSkuLike(tz); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if err = p.Add(z); err != nil {
 		err = errors.Wrap(err)

@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/coordinates"
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/hinweisen"
 	"github.com/friedenberg/zit/src/echo/kennung"
 )
@@ -175,7 +176,19 @@ func (i *oldIndex) Reset() (err error) {
 	return
 }
 
-func (i *oldIndex) AddHinweis(h kennung.Hinweis) (err error) {
+func (i *oldIndex) AddHinweis(k1 kennung.Kennung) (err error) {
+	if !k1.GetGattung().EqualsGattung(gattung.Zettel) {
+		err = gattung.MakeErrUnsupportedGattung(k1)
+		return
+	}
+
+	var h kennung.Hinweis
+
+	if err = h.Set(k1.String()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return

@@ -117,7 +117,7 @@ func (s *zettelStore) UpdateOne(t *transacted.Zettel) (err error) {
 }
 
 func (s *zettelStore) writeNamedZettelToIndex(
-	tz *transacted.Zettel,
+	tz sku.SkuLikePtr,
 ) (err error) {
 	errors.Log().Print("writing to index")
 
@@ -133,17 +133,17 @@ func (s *zettelStore) writeNamedZettelToIndex(
 
 	s.GetKonfig().ApplyToMetadatei(tz, s.tagp)
 
-	if err = s.verzeichnisseSchwanzen.AddVerzeichnisse(tz, tz.GetKennung().String()); err != nil {
+	if err = s.verzeichnisseSchwanzen.AddVerzeichnisse(tz, tz.GetKennungLike().String()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = s.verzeichnisseAll.AddVerzeichnisse(tz, tz.GetKennung().String()); err != nil {
+	if err = s.verzeichnisseAll.AddVerzeichnisse(tz, tz.GetKennungLike().String()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = s.StoreUtil.GetKennungIndex().AddHinweis(tz.GetKennung()); err != nil {
+	if err = s.StoreUtil.GetKennungIndex().AddHinweis(tz.GetKennungLike()); err != nil {
 		if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
 			errors.Log().Printf("kennung does not contain value: %s", err)
 			err = nil
@@ -156,7 +156,7 @@ func (s *zettelStore) writeNamedZettelToIndex(
 	return
 }
 
-func (s *zettelStore) ReadOneExternal(
+func (s *zettelStore) ReadOneExternal2(
 	e sku.ExternalMaybe,
 	t sku.SkuLikePtr,
 ) (ez *external.Zettel, err error) {
