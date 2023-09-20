@@ -237,11 +237,10 @@ func (cou createOrUpdate2) CreateOrUpdateAkte(
 
 	m.Tai = cou.clock.GetTai()
 
-	transactedPtr = &sku.Transacted2{
-		Metadatei: m,
-		Kennung:   *kennungPtr,
-	}
+	transactedPtr = sku.GetTransactedPool().Get()
 
+	transactedPtr.Metadatei = m
+	transactedPtr.Kennung = *kennungPtr
 	transactedPtr.SetAkteSha(sh)
 
 	err = sku.CalculateAndSetSha(

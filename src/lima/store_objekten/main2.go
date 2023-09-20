@@ -136,7 +136,7 @@ func (s *Store) ReadOne(
 		return
 	}
 
-	sk1 = s.GetSkuPool().Get()
+	sk1 = sku.GetTransactedPool().Get()
 
 	if err = sk1.SetFromSkuLike(sk); err != nil {
 		err = errors.Wrap(err)

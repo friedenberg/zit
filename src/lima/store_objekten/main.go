@@ -177,7 +177,7 @@ func Make(
 		s.GetPersistentMetadateiFormat(),
 		objekte_format.Options{IncludeTai: true},
 		s.StoreUtil,
-		s.StoreUtil.GetSkuPool(),
+		sku.GetTransactedPool(),
 	)
 
 	return

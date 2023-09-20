@@ -168,7 +168,7 @@ func (s zettelStore) ReadOne(
 		return
 	}
 
-	tz = s.GetSkuPool().Get()
+	tz = sku.GetTransactedPool().Get()
 
 	if err = tz.SetFromSkuLike(tz1); err != nil {
 		err = errors.Wrap(err)

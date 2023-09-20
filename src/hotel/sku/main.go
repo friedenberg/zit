@@ -2,9 +2,23 @@ package sku
 
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/charlie/pool"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
+
+var poolTransacted schnittstellen.Pool[Transacted2, *Transacted2]
+
+func init() {
+	poolTransacted = pool.MakePool[Transacted2, *Transacted2](
+		nil,
+		nil,
+	)
+}
+
+func GetTransactedPool() schnittstellen.Pool[Transacted2, *Transacted2] {
+	return poolTransacted
+}
 
 type (
 	IdLikeGetter interface {

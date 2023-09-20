@@ -197,7 +197,7 @@ func (s typStore) ReadOne(
 		return
 	}
 
-	tt = s.GetSkuPool().Get()
+	tt = sku.GetTransactedPool().Get()
 
 	if err = tt.SetFromSkuLike(t1); err != nil {
 		err = errors.Wrap(err)

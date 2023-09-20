@@ -227,7 +227,7 @@ func (s konfigStore) ReadOne(
 
 	tt1 := s.StoreUtil.GetKonfig().Sku
 
-	tt = s.GetSkuPool().Get()
+	tt = sku.GetTransactedPool().Get()
 
 	if err = tt.SetFromSkuLike(tt1); err != nil {
 		err = errors.Wrap(err)
