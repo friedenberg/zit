@@ -30,6 +30,18 @@ var typExpander kennung.Expander
 
 func init() {
 	typExpander = kennung.MakeExpanderRight(`-`)
+
+	gob.Register(
+		collections_value.MakeMutableValueSet[values.String](
+			nil,
+		),
+	)
+
+	gob.Register(
+		collections_value.MakeValueSet[values.String](
+			nil,
+		),
+	)
 }
 
 type angeboren = pkg_angeboren.Konfig
@@ -42,16 +54,14 @@ type Compiled struct {
 
 func (a *compiled) Reset() {
 	a.lock = &sync.Mutex{}
-	a.Typen = collections_ptr.MakeMutableValueSet[sku.Transacted2, *sku.Transacted2](
-		&KennungKeyer[sku.Transacted2, *sku.Transacted2]{},
-	)
 	a.EtikettenHidden = kennung.MakeEtikettSet()
 	a.Etiketten = collections_ptr.MakeMutableValueSet[ketikett, *ketikett](nil)
 	a.InlineTypen = collections_value.MakeMutableValueSet[values.String](
 		nil,
 	)
 	a.ImplicitEtiketten = make(implicitEtikettenMap)
-	a.Kisten = makeCompiledKastenSetFromSlice(nil)
+	a.Kisten = sku.MakeTransactedMutableSet()
+	a.Typen = sku.MakeTransactedMutableSet()
 }
 
 func (a Compiled) GetErworben() erworben.Akte {
@@ -69,7 +79,7 @@ type compiled struct {
 
 	hasChanges bool
 
-	Sku sku.Transacted[kennung.Konfig, *kennung.Konfig]
+	Sku sku.Transacted2
 
 	erworben.Akte
 
@@ -84,11 +94,11 @@ type compiled struct {
 	ExtensionsToTypen map[string]string
 	TypenToExtensions map[string]string
 	DefaultTyp        transacted.Typ // deprecated
-	Typen             schnittstellen.MutableSetPtrLike[sku.Transacted2, *sku.Transacted2]
+	Typen             sku.TransactedMutableSet
 	InlineTypen       schnittstellen.SetLike[values.String]
 
 	// Kasten
-	Kisten schnittstellen.MutableSetLike[transacted.Kasten]
+	Kisten sku.TransactedMutableSet
 }
 
 func Make(
@@ -402,17 +412,26 @@ func (kc compiled) GetApproximatedTyp(
 	return
 }
 
-func (kc compiled) GetKasten(k kennung.Kasten) (ct *transacted.Kasten) {
-	var ct1 transacted.Kasten
-	ct1, _ = kc.Kisten.Get(k.String())
-	ct = &ct1
+func (kc compiled) GetKasten(k kennung.Kasten) (ct *sku.Transacted2) {
+	if ct1, ok := kc.Kisten.GetPtr(k.String()); ok {
+		ct = sku.GetTransactedPool().Get()
+		errors.PanicIfError(ct.SetFromSkuLike(ct1))
+	}
+
 	return
 }
 
 func (k *compiled) SetTransacted(
-	kt *erworben.Transacted,
+	kt1 sku.SkuLikePtr,
 	kag schnittstellen.AkteGetter[*erworben.Akte],
 ) (err error) {
+	kt := sku.GetTransactedPool().Get()
+
+	if err = kt.SetFromSkuLike(kt1); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if !k.Sku.Less(*kt) {
 		return
 	}
@@ -433,13 +452,26 @@ func (k *compiled) SetTransacted(
 }
 
 func (k *compiled) AddKasten(
-	b *transacted.Kasten,
+	c sku.SkuLikePtr,
 ) (err error) {
 	k.lock.Lock()
 	defer k.lock.Unlock()
 	k.hasChanges = true
 
-	if err = iter.AddOrReplaceIfGreater(k.Kisten, *b); err != nil {
+	b := sku.GetTransactedPool().Get()
+
+	if err = b.SetFromSkuLike(c); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	err = iter2.AddPtrOrReplaceIfGreater[sku.Transacted2, *sku.Transacted2](
+		k.Kisten,
+		sku.TransactedLessor,
+		b,
+	)
+
+	if err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -473,11 +505,9 @@ func (k *compiled) AddTyp2(
 
 	k.hasChanges = true
 
-	l := sku.Lessor[sku.Transacted2, *sku.Transacted2]{}
-
 	err = iter2.AddPtrOrReplaceIfGreater[sku.Transacted2, *sku.Transacted2](
 		k.Typen,
-		l,
+		sku.TransactedLessor,
 		b,
 	)
 

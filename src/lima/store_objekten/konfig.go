@@ -91,6 +91,7 @@ func (s konfigStore) Update(
 
 	if mutter, err = s.ReadOne(&kennung.Konfig{}); err != nil {
 		if errors.Is(err, objekte_store.ErrNotFound{}) {
+			mutter = nil
 			err = nil
 		} else {
 			err = errors.Wrap(err)
@@ -226,6 +227,11 @@ func (s konfigStore) ReadOne(
 	}
 
 	tt1 := s.StoreUtil.GetKonfig().Sku
+
+	if tt1.GetTai().IsEmpty() {
+		err = errors.Wrap(objekte_store.ErrNotFound{Id: k1})
+		return
+	}
 
 	tt = sku.GetTransactedPool().Get()
 

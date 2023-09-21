@@ -9,6 +9,10 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 )
 
+func init() {
+	register(Konfig{})
+}
+
 func ErrOnKonfig(v string) (err error) {
 	if v == "konfig" {
 		return errors.Errorf("cannot be %q", "konfig")
