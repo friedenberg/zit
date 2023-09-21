@@ -16,6 +16,7 @@ var KastenRegex *regexp.Regexp
 
 func init() {
 	KastenRegex = regexp.MustCompile(KastenRegexString)
+	register(Kasten{})
 }
 
 func MustKasten(v string) (e Kasten) {
