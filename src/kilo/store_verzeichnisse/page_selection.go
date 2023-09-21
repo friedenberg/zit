@@ -12,7 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 )
 
-func (i Zettelen) PageForHinweis(h kennung.Hinweis) (n int, err error) {
+func (i Zettelen) PageForKennung(h kennung.Kennung) (n int, err error) {
 	s := sha.FromStringer(h)
 	return i.PageForSha(s)
 }

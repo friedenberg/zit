@@ -60,11 +60,11 @@ func (s *verzeichnisseSchwanzen) Flush() (err error) {
 }
 
 func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
-	h kennung.Hinweis,
+	h kennung.Kennung,
 ) (found *transacted.Zettel, err error) {
 	var n int
 
-	if n, err = s.Zettelen.PageForHinweis(h); err != nil {
+	if n, err = s.Zettelen.PageForKennung(h); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -72,7 +72,7 @@ func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 	errors.Log().Printf("searching page %d", n)
 
 	w := func(zv *transacted.Zettel) (err error) {
-		if !zv.GetKennung().Equals(h) {
+		if !kennung.Equals(zv.GetKennung(), h) {
 			return
 		}
 

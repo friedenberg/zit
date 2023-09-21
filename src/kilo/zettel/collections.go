@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/delta/heap"
-	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/transacted"
 )
@@ -72,18 +71,4 @@ func MakeMutableSetHinweis(c int) MutableSet {
 	return collections_value.MakeMutableValueSet[*transacted.Zettel](
 		TransactedHinweisKeyer{},
 	)
-}
-
-func ToSliceHinweisen(s MutableSet) (b []kennung.Hinweis) {
-	b = make([]kennung.Hinweis, 0, s.Len())
-
-	s.Each(
-		func(z *transacted.Zettel) (err error) {
-			b = append(b, z.GetKennung())
-
-			return
-		},
-	)
-
-	return
 }

@@ -14,7 +14,7 @@ import (
 // TODO-P3 move to collections
 type Schwanzen struct {
 	lock         *sync.RWMutex
-	hinweisen    map[kennung.Hinweis]transacted.Zettel
+	hinweisen    map[string]transacted.Zettel
 	etikettIndex kennung_index.EtikettIndex
 	funcFlush    schnittstellen.FuncIter[*transacted.Zettel]
 }
@@ -25,7 +25,7 @@ func MakeSchwanzen(
 ) *Schwanzen {
 	return &Schwanzen{
 		lock:         &sync.RWMutex{},
-		hinweisen:    make(map[kennung.Hinweis]transacted.Zettel),
+		hinweisen:    make(map[string]transacted.Zettel),
 		etikettIndex: ei,
 		funcFlush:    funcFlush,
 	}
@@ -35,7 +35,7 @@ func (zws *Schwanzen) Less(zt *transacted.Zettel) (ok bool) {
 	zws.lock.RLock()
 	defer zws.lock.RUnlock()
 
-	t, ok := zws.hinweisen[zt.GetKennung()]
+	t, ok := zws.hinweisen[zt.GetKennung().String()]
 
 	switch {
 	case !ok:
@@ -48,11 +48,11 @@ func (zws *Schwanzen) Less(zt *transacted.Zettel) (ok bool) {
 	return
 }
 
-func (zws *Schwanzen) Get(h kennung.Hinweis) (t kennung.Tai, ok bool) {
+func (zws *Schwanzen) Get(h kennung.Kennung) (t kennung.Tai, ok bool) {
 	zws.lock.RLock()
 	defer zws.lock.RUnlock()
 
-	o, ok := zws.hinweisen[h]
+	o, ok := zws.hinweisen[h.String()]
 
 	if ok {
 		t = o.GetTai()
@@ -66,14 +66,14 @@ func (zws *Schwanzen) Set(z *transacted.Zettel, flush bool) (ok bool) {
 	defer zws.lock.Unlock()
 
 	h := z.GetKennung()
-	t1, found := zws.hinweisen[h]
+	t1, found := zws.hinweisen[h.String()]
 
 	switch {
 	case !found:
 		fallthrough
 
 	case t1.Less(*z):
-		zws.hinweisen[h] = *z
+		zws.hinweisen[h.String()] = *z
 		ok = true
 
 	case t1.Metadatei.EqualsSansTai(z.Metadatei):
