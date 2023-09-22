@@ -5,6 +5,7 @@ import (
 	"sort"
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/test_logz"
 	"github.com/friedenberg/zit/src/bravo/values"
 )
@@ -89,7 +90,7 @@ func assertSet(
 	{
 		sutCopy := sut.CloneSetLike()
 
-		if !sut.EqualsSetLike(sutCopy) {
+		if !iter.SetEquals(sut, sutCopy) {
 			t.Fatalf("expected copy to equal original")
 		}
 	}
@@ -98,13 +99,13 @@ func assertSet(
 	{
 		sutCopy := sut.CloneMutableSetLike()
 
-		if !sut.EqualsSetLike(sutCopy) {
+		if !iter.SetEquals[values.String](sut, sutCopy) {
 			t.Fatalf("expected mutable copy to equal original")
 		}
 
 		sutCopy.Reset()
 
-		if sut.EqualsSetLike(sutCopy) {
+		if iter.SetEquals[values.String](sut, sutCopy) {
 			t.Fatalf("expected reset mutable copy to not equal original")
 		}
 	}

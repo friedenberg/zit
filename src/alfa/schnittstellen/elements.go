@@ -41,19 +41,23 @@ type IdPtr[T any] interface {
 	Resetable[T]
 }
 
+// TODO-P2 remove
 type Lessor[T any] interface {
 	Less(T) bool
 }
 
+// TODO-P2 rename
 type Lessor2[T any, TPtr Ptr[T]] interface {
 	Less(T, T) bool
 	LessPtr(TPtr, TPtr) bool
 }
 
+// TODO-P2 rename
 type Equaler1[T any] interface {
 	Equals(T, T) bool
 }
 
+// TODO-P2 rename
 type Equaler[T any, TPtr Ptr[T]] interface {
 	Equaler1[T]
 	EqualsPtr(TPtr, TPtr) bool

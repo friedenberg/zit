@@ -173,7 +173,7 @@ func (pz Metadatei) EqualsSansTai(z1 Metadatei) bool {
 		return z1.Etiketten.Len() == 0
 	case z1.Etiketten == nil:
 		return pz.Etiketten.Len() == 0
-	case !pz.Etiketten.EqualsSetLike(z1.Etiketten):
+	case !iter.SetEquals[kennung.Etikett](pz.Etiketten, z1.Etiketten):
 		return false
 	}
 

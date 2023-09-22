@@ -22,34 +22,6 @@ func (s MutableSet[T, TPtr]) Len() int {
 	return len(s.E)
 }
 
-func (a MutableSet[T, TPtr]) EqualsSetPtrLike(
-	b schnittstellen.SetPtrLike[T, TPtr],
-) bool {
-	return a.EqualsSetLike(b)
-}
-
-func (a MutableSet[T, TPtr]) EqualsSetLike(
-	b schnittstellen.SetLike[T],
-) bool {
-	if b == nil {
-		return false
-	}
-
-	if a.Len() != b.Len() {
-		return false
-	}
-
-	for k, va := range a.E {
-		vb, ok := b.Get(k)
-
-		if !ok || !va.EqualsAny(vb) {
-			return false
-		}
-	}
-
-	return true
-}
-
 func (s MutableSet[T, TPtr]) Key(e T) string {
 	return s.K.GetKey(e)
 }

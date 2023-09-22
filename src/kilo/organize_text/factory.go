@@ -170,7 +170,7 @@ func (atc Factory) makeChildren(
 						lastChild = parent.children[len(parent.children)-1]
 					}
 
-					if lastChild != nil && (lastChild.etiketten.EqualsSetLike(prefixJoint) || lastChild.etiketten.Len() == 0) {
+					if lastChild != nil && (iter.SetEqualsPtr[kennung.Etikett, *kennung.Etikett](lastChild.etiketten, prefixJoint) || lastChild.etiketten.Len() == 0) {
 						intermediate = lastChild
 					} else {
 						intermediate = newAssignment(parent.Depth() + 1)

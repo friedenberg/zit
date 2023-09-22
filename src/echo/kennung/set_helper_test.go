@@ -17,7 +17,7 @@ func assertSetRemovesPrefixes(
 	ac := ac1.CloneMutableSetPtrLike()
 	RemovePrefixes(ac, MustEtikett(prefix))
 
-	if !ac.EqualsSetLike(ex) {
+	if !EtikettSetEquals(ac, ex) {
 		t.Errorf(
 			"removing prefixes doesn't match:\nexpected: %q\n  actual: %q",
 			ex,

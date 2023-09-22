@@ -58,7 +58,7 @@ func (atc *Refiner) shouldMergeIntoParent(a *assignment) bool {
 		return false
 	}
 
-	equal := a.etiketten.EqualsSetLike(a.parent.etiketten)
+	equal := iter.SetEqualsPtr(a.etiketten, a.parent.etiketten)
 
 	if !equal {
 		errors.Log().Print("parent etiketten not equal")

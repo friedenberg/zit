@@ -18,7 +18,6 @@ type SetLike[T any] interface {
 	Collection[T]
 	ContainsKeyer
 
-	EqualsSetLike(SetLike[T]) bool
 	Key(T) string
 	Get(string) (T, bool)
 	Contains(T) bool

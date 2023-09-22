@@ -63,7 +63,10 @@ func (a ketikett) Equals(b ketikett) bool {
 		return false
 	}
 
-	if !a.ImplicitEtiketten.EqualsSetLike(b.ImplicitEtiketten) {
+	if !iter.SetEqualsPtr[kennung.Etikett, *kennung.Etikett](
+		a.ImplicitEtiketten,
+		b.ImplicitEtiketten,
+	) {
 		return false
 	}
 

@@ -15,13 +15,13 @@ func TestAddNormalized(t1 *testing.T) {
 		MustEtikett("zz-archive-task-done"),
 	)
 
-	sutEx := sut.CloneSetLike()
+	sutEx := sut.CloneSetPtrLike()
 
 	toAdd := MustEtikett("project-2021-zit")
 
 	AddNormalized(sut, &toAdd)
 
-	if !sut.EqualsSetLike(sutEx) {
+	if !EtikettSetEquals(sut, sutEx) {
 		t.NotEqual(sutEx, sut)
 	}
 }
@@ -34,7 +34,7 @@ func TestAddNormalizedEmpty(t *testing.T) {
 
 	AddNormalized(sut, &toAdd)
 
-	if !sut.EqualsSetLike(sutEx) {
+	if !EtikettSetEquals(sut, sutEx) {
 		t.Errorf("expected %v, but got %v", sutEx, sut)
 	}
 }
@@ -56,7 +56,7 @@ func TestAddNormalizedFromEmptyBuild(t *testing.T) {
 		AddNormalized(sut, e)
 	}
 
-	if !sut.EqualsSetLike(sutEx) {
+	if !EtikettSetEquals(sut, sutEx) {
 		t.Errorf("expected %v, but got %v", sutEx, sut)
 	}
 }

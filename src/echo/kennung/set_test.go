@@ -59,7 +59,7 @@ func TestNormalize(t *testing.T) {
 				t := test_logz.T{T: t1}
 				ac := WithRemovedCommonPrefixes(te.ac)
 
-				if !ac.EqualsSetLike(te.ex) {
+				if !EtikettSetEquals(ac, te.ex) {
 					t.Errorf(
 						"removing prefixes doesn't match:\nexpected: %q\n  actual: %q",
 						te.ex,
@@ -232,7 +232,7 @@ func TestDelta1(t *testing.T) {
 		MustEtikett("zz-archive-task-done"),
 	)
 
-	if !c_expected.EqualsSetLike(d.GetAdded()) {
+	if !iter.SetEquals[Etikett](c_expected, d.GetAdded()) {
 		t.Errorf("expected\n%s\nactual:\n%s", c_expected, d.GetAdded())
 	}
 
@@ -240,7 +240,7 @@ func TestDelta1(t *testing.T) {
 		MustEtikett("task-todo"),
 	)
 
-	if !d_expected.EqualsSetLike(d.GetRemoved()) {
+	if !iter.SetEquals[Etikett](d_expected, d.GetRemoved()) {
 		t.Errorf("expected\n%s\nactual:\n%s", d_expected, d.GetRemoved())
 	}
 }

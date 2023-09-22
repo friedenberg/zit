@@ -105,7 +105,7 @@ func (atc AssignmentTreeConstructor) makeChildren(
 						lastChild = parent.children[len(parent.children)-1]
 					}
 
-					if lastChild != nil && lastChild.etiketten.EqualsSetLike(prefixJoint) {
+					if lastChild != nil && iter.SetEqualsPtr[kennung.Etikett, *kennung.Etikett](lastChild.etiketten, prefixJoint) {
 						intermediate = lastChild
 					} else {
 						intermediate = newAssignment(parent.Depth() + 1)

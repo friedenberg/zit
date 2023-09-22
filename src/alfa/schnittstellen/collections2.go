@@ -12,8 +12,6 @@ type SetPtrLike[T any, TPtr Ptr[T]] interface {
 	GetPtr(string) (TPtr, bool)
 	KeyPtr(TPtr) string
 
-	EqualsSetPtrLike(SetPtrLike[T, TPtr]) bool
-
 	CloneSetPtrLike() SetPtrLike[T, TPtr]
 	CloneMutableSetPtrLike() MutableSetPtrLike[T, TPtr]
 }

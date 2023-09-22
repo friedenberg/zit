@@ -41,11 +41,14 @@ func (a Change) Equals(b Change) bool {
 		return false
 	}
 
-	if !a.added.EqualsSetLike(b.added) {
+	if !iter.SetEqualsPtr[kennung.Etikett, *kennung.Etikett](a.added, b.added) {
 		return false
 	}
 
-	if !a.removed.EqualsSetLike(b.removed) {
+	if !iter.SetEqualsPtr[kennung.Etikett, *kennung.Etikett](
+		a.removed,
+		b.removed,
+	) {
 		return false
 	}
 
