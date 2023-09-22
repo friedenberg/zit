@@ -30,9 +30,8 @@ type OneReader[
 type ExternalReader[
 	E any,
 	T any,
-	V any,
 ] interface {
-	ReadOneExternal(E, T) (V, error)
+	ReadOneExternal(E, T) (*sku.External2, error)
 }
 
 type AllReader[

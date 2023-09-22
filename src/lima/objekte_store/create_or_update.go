@@ -76,7 +76,7 @@ func MakeCreateOrUpdate[
 func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateCheckedOut(
 	co *objekte.CheckedOut[T2, T3],
 ) (transactedPtr *sku.Transacted[T2, T3], err error) {
-	kennungPtr := T3(&co.External.Kennung)
+	kennungPtr := co.External.Kennung
 
 	if !cou.ls.IsAcquired() {
 		err = ErrLockRequired{
@@ -87,10 +87,14 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateCheckedOut(
 	}
 
 	transactedPtr = &sku.Transacted[T2, T3]{
-		Kennung: *kennungPtr,
 		Metadatei: metadatei.Metadatei{
 			Tai: cou.clock.GetTai(),
 		},
+	}
+
+	if err = T3(&transactedPtr.Kennung).Set(kennungPtr.String()); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	transactedPtr.SetAkteSha(co.External.GetAkteSha())

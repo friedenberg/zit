@@ -11,7 +11,6 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/india/external"
 	"github.com/friedenberg/zit/src/india/objekte_collections"
 	"github.com/friedenberg/zit/src/india/sku_fmt"
 	"github.com/friedenberg/zit/src/india/transacted"
@@ -42,7 +41,7 @@ func (c CreateFromPaths) Run(
 	for _, arg := range args {
 		if err = c.zettelsFromPath(
 			arg,
-			func(z *external.Zettel) (err error) {
+			func(z *sku.External2) (err error) {
 				toCreate.Add(z)
 				if c.Delete {
 					toDelete.Add(z)
@@ -134,7 +133,7 @@ func (c CreateFromPaths) Run(
 				return
 			}
 
-			if err = cz.External.Transacted.SetFromSkuLike(zt); err != nil {
+			if err = cz.External.Transacted2.SetFromSkuLike(zt); err != nil {
 				err = errors.Wrapf(err, "Sku: %q", sku_fmt.String(z))
 				return
 			}
@@ -197,7 +196,7 @@ func (c CreateFromPaths) Run(
 // TODO-P1 migrate this to use store_working_directory
 func (c *CreateFromPaths) zettelsFromPath(
 	p string,
-	wf schnittstellen.FuncIter[*external.Zettel],
+	wf schnittstellen.FuncIter[*sku.External2],
 ) (err error) {
 	var r io.Reader
 
@@ -210,13 +209,14 @@ func (c *CreateFromPaths) zettelsFromPath(
 
 	defer errors.DeferredCloser(&err, &c.Filter)
 
-	ze := &sku.External[kennung.Hinweis, *kennung.Hinweis]{
-		FDs: sku.ExternalFDs{
-			Objekte: kennung.FD{
-				Path: p,
-			},
+	ze := sku.GetExternalPool().Get()
+	ze.FDs = sku.ExternalFDs{
+		Objekte: kennung.FD{
+			Path: p,
 		},
 	}
+
+	ze.Kennung.KennungPtr = &kennung.Hinweis{}
 
 	if _, err = c.TextParser.ParseMetadatei(r, ze); err != nil {
 		err = errors.Wrap(err)

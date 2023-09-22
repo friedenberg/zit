@@ -36,7 +36,7 @@ do_lint \
 do_lint \
 	"debug logs remaining" \
 	ag \
-	"log.Debug" \
+	"^\s*log.Debug" \
 	-l \
 	src/
 

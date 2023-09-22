@@ -141,6 +141,7 @@ func KennungContainsMatchable(
 	ki kennung.Index,
 ) bool {
 	me := m.GetMetadatei()
+	// log.Debug().Printf("%q -> %q", k, m.GetKennungLikePtr())
 
 	switch kt := k.(type) {
 	case kennung.EtikettLike:

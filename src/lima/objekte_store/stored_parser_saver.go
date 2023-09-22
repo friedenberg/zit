@@ -22,7 +22,7 @@ type StoredParseSaver[
 ] interface {
 	ParseSaveStored(
 		sem sku.ExternalMaybe,
-		t *sku.External[K, KPtr],
+		t *sku.External2,
 	) (a OPtr, err error)
 }
 
@@ -64,7 +64,7 @@ func MakeStoredParseSaver[
 
 func (h storedParserSaver[O, OPtr, K, KPtr]) ParseSaveStored(
 	sem sku.ExternalMaybe,
-	t *sku.External[K, KPtr],
+	t *sku.External2,
 ) (o OPtr, err error) {
 	var f *os.File
 
@@ -76,14 +76,8 @@ func (h storedParserSaver[O, OPtr, K, KPtr]) ParseSaveStored(
 
 	t.FDs = sem.FDs
 
-	switch k := sem.Kennung.(type) {
-	case K:
-		t.Kennung = k
-
-	case KPtr:
-		t.Kennung = *k
-	default:
-		err = errors.Errorf("expected %T but got %T", t.Kennung, k)
+	if err = t.Kennung.SetWithKennung(sem.Kennung); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 

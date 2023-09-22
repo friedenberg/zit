@@ -64,7 +64,9 @@ func (s *matcherExactlyThisOrAllOfThese) Add(m Matcher) (err error) {
 }
 
 func (s matcherExactlyThisOrAllOfThese) ContainsMatchable(m Matchable) bool {
-	return s.Matcher.ContainsMatchable(m)
+	ok := s.Matcher.ContainsMatchable(m)
+	// log.Debug().Printf("%q -> %t -> %q", s.Matcher, ok, m)
+	return ok
 }
 
 func (s matcherExactlyThisOrAllOfThese) Len() int {

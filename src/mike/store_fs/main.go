@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/checked_out_state"
 	"github.com/friedenberg/zit/src/delta/etikett_akte"
@@ -110,7 +109,6 @@ func (s *Store) ReadFiles(
 		ms,
 		iter.MakeChain(
 			func(e sku.SkuLikePtr) (err error) {
-				log.Log().Printf("trying to read: %s", e.GetSkuLike())
 				var col objekte.CheckedOutLikePtr
 
 				switch et := e.(type) {
@@ -120,7 +118,6 @@ func (s *Store) ReadFiles(
 
 						if errors.As(err, &errAkte) {
 							fs.MarkUnsureAkten(errAkte.Actual)
-							log.Log().Printf("unsure akten: %s", et.GetSkuLike())
 							err = nil
 						} else {
 							err = errors.Wrap(err)
@@ -186,8 +183,6 @@ func (s *Store) ReadFiles(
 					err = errors.Implement()
 					return
 				}
-
-				log.Log().Printf("read: %s", col)
 
 				col.DetermineState(false)
 

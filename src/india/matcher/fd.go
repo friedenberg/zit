@@ -3,6 +3,7 @@ package matcher
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/kennung"
 )
 
@@ -27,15 +28,16 @@ func (fd FD) ContainsMatchableExactly(m Matchable) (ok bool) {
 func (fd FD) ContainsMatchable(m Matchable) (ok bool) {
 	il := m.GetKennungLike()
 
-	switch it := il.(type) {
-	case kennung.Hinweis:
+	switch il.GetGattung() {
+	case gattung.Zettel:
 		var h kennung.Hinweis
 
 		if h, ok = kennung.FD(fd).AsHinweis(); !ok {
 			return false
 		}
 
-		ok := h.Equals(it)
+		ok := kennung.Equals(h, il)
+
 		return ok
 
 	default:

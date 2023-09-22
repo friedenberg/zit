@@ -81,7 +81,10 @@ func registerCommandWithCwdQuery(
 	return
 }
 
-func registerCommandWithQuery(n string, makeFunc func(*flag.FlagSet) CommandWithQuery) {
+func registerCommandWithQuery(
+	n string,
+	makeFunc func(*flag.FlagSet) CommandWithQuery,
+) {
 	f := flag.NewFlagSet(n, flag.ExitOnError)
 
 	c := makeFunc(f)
@@ -94,26 +97,6 @@ func registerCommandWithQuery(n string, makeFunc func(*flag.FlagSet) CommandWith
 		Command: commandWithQuery{
 			CommandWithQuery: c,
 		},
-		FlagSet: f,
-	}
-
-	return
-}
-
-func registerCommandWithHinweis(
-	n string,
-	makeFunc func(*flag.FlagSet) CommandWithHinweis,
-) {
-	f := flag.NewFlagSet(n, flag.ExitOnError)
-
-	c := makeFunc(f)
-
-	if _, ok := commands[n]; ok {
-		panic("command added more than once: " + n)
-	}
-
-	commands[n] = command{
-		Command: commandWithHinweis{CommandWithHinweis: c},
 		FlagSet: f,
 	}
 

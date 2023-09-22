@@ -143,7 +143,7 @@ func (s *CommonStore[O, OPtr, K, KPtr]) CheckoutOne(
 
 	if f, err = files.CreateExclusiveWriteOnly(p); err != nil {
 		if errors.IsExist(err) {
-			var e *sku.External[K, KPtr]
+			var e *sku.External2
 
 			if e, err = s.ReadOneExternal(
 				sku.ExternalMaybe{
@@ -162,7 +162,7 @@ func (s *CommonStore[O, OPtr, K, KPtr]) CheckoutOne(
 
 			co.External = *e
 
-			if err = KPtr(&co.External.Kennung).Set(t.GetKennungLike().String()); err != nil {
+			if err = co.External.Kennung.SetWithKennung(t.GetKennungLike()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

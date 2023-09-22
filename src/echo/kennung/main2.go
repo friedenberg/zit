@@ -14,6 +14,13 @@ func MakeKennung2(v string) (KennungPtr, error) {
 	return k, k.Set(v)
 }
 
+func (h *Kennung2) SetWithKennung(
+	k Kennung,
+) (err error) {
+	h.KennungPtr, err = MakeWithGattung(k.GetGattung(), k.String())
+	return
+}
+
 func (h *Kennung2) SetWithGattung(
 	v string,
 	g schnittstellen.GattungLike,

@@ -472,7 +472,7 @@ func (s *zettelStore) commitIndexMatchUpdate(
 
 func (s *zettelStore) writeObjekte(
 	mg metadatei.Getter,
-	h kennung.Hinweis,
+	k kennung.Kennung,
 ) (tz *transacted.Zettel, err error) {
 	if mg == nil {
 		panic("metadatei.Getter was nil")
@@ -480,6 +480,13 @@ func (s *zettelStore) writeObjekte(
 
 	m := mg.GetMetadatei()
 	m.Tai = s.StoreUtil.GetTai()
+
+	var h kennung.Hinweis
+
+	if err = h.Set(k.String()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	tz = &transacted.Zettel{
 		Kennung:   h,

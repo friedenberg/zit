@@ -33,7 +33,7 @@ type (
 		T3 kennung.KennungLikePtr[T2],
 	] struct {
 		Internal sku.Transacted[T2, T3]
-		External sku.External[T2, T3]
+		External sku.External2
 		State    checked_out_state.State
 	}
 )

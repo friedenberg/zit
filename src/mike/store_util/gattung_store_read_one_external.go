@@ -9,7 +9,7 @@ import (
 func (s *CommonStore[O, OPtr, K, KPtr]) ReadOneExternal(
 	em sku.ExternalMaybe,
 	t sku.SkuLikePtr,
-) (e *sku.External[K, KPtr], err error) {
+) (e *sku.External2, err error) {
 	var m checkout_mode.Mode
 
 	if m, err = em.GetFDs().GetCheckoutMode(); err != nil {
@@ -17,7 +17,7 @@ func (s *CommonStore[O, OPtr, K, KPtr]) ReadOneExternal(
 		return
 	}
 
-	e = &sku.External[K, KPtr]{}
+	e = sku.GetExternalPool().Get()
 
 	if err = e.ResetWithExternalMaybe(em); err != nil {
 		err = errors.Wrap(err)

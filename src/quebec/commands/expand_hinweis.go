@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/november/umwelt"
 )
 
+// TODO-P1 determine if this can be removed and replaced with show
 type ExpandHinweis struct{}
 
 func init() {

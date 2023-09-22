@@ -17,7 +17,6 @@ type externalMaybeGetterReader2 struct {
 	ExternalReader[
 		*sku.ExternalMaybe,
 		sku.SkuLikePtr,
-		*sku.External2,
 	]
 }
 
@@ -26,7 +25,6 @@ func MakeExternalMaybeGetterReader2(
 	er ExternalReader[
 		*sku.ExternalMaybe,
 		sku.SkuLikePtr,
-		*sku.External2,
 	],
 ) ExternalMaybeGetterReader2 {
 	return externalMaybeGetterReader2{
