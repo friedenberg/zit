@@ -109,7 +109,10 @@ func (c *Organize) RunWithQuery(
 		func(tl sku.SkuLikePtr) (err error) {
 			mwk := tl.GetSkuLike().MutableClone()
 
-			if h, ok := mwk.GetKennungLike().(kennung.Hinweis); ok {
+			// TODO-P1 determine if this is necessary
+			var h kennung.Hinweis
+
+			if err = h.Set(mwk.GetKennungLike().String()); err == nil {
 				if h, err = u.StoreObjekten().GetAbbrStore().Hinweis().ExpandString(
 					h.String(),
 				); err != nil {
@@ -121,26 +124,19 @@ func (c *Organize) RunWithQuery(
 					err = errors.Wrap(err)
 					return
 				}
+			} else {
+				err = nil
 			}
 
 			l.Lock()
 			defer l.Unlock()
+
 			return getResults.Add(mwk)
 		},
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	// filterOp := user_ops.FilterZettelsWithScript{
-	// 	Set:    getResults,
-	// 	Filter: c.Filter,
-	// }
-
-	// if err = filterOp.Run(); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
 
 	createOrganizeFileOp.Transacted = getResults
 

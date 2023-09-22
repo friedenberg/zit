@@ -10,11 +10,11 @@ import (
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/delta/gattungen"
-	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/india/objekte_collections"
@@ -204,11 +204,11 @@ func (c Add) openAktenIfNecessary(
 		return
 	}
 
-	hs := collections_value.MakeMutableValueSet[kennung.Hinweis](nil)
+	hs := collections_value.MakeMutableValueSet[values.String](nil)
 
 	zettels.Each(
 		func(z *transacted.Zettel) (err error) {
-			return hs.Add(z.GetKennung())
+			return hs.Add(values.MakeString(z.GetKennung().String()))
 		},
 	)
 
