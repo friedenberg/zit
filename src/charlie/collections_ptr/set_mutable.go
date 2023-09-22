@@ -7,8 +7,8 @@ import (
 )
 
 type MutableSet[
-	T schnittstellen.Element,
-	TPtr schnittstellen.ElementPtr[T],
+	T any,
+	TPtr schnittstellen.Ptr[T],
 ] struct {
 	K schnittstellen.StringKeyerPtr[T, TPtr]
 	E map[string]TPtr

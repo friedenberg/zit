@@ -1,7 +1,6 @@
 package sku
 
 import (
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/echo/kennung"
 )
@@ -29,10 +28,6 @@ func (a ExternalMaybe) Equals(b ExternalMaybe) bool {
 	}
 
 	return true
-}
-
-func (e ExternalMaybe) GetId() schnittstellen.ValueLike {
-	return e.Kennung
 }
 
 func (e ExternalMaybe) GetKennungLike() kennung.Kennung {

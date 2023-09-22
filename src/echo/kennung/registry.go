@@ -24,7 +24,7 @@ func once() {
 }
 
 func register[T Kennung, TPtr interface {
-	schnittstellen.ValuePtr[T]
+	schnittstellen.StringSetterPtr[T]
 	Kennung
 }](id T) {
 	gob.Register(&id)

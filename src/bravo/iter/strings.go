@@ -51,7 +51,7 @@ func SortedValues[E schnittstellen.Value[E]](
 	return
 }
 
-func Strings[E schnittstellen.ValueLike](
+func Strings[E schnittstellen.Stringer](
 	c schnittstellen.SetLike[E],
 ) (out []string) {
 	out = make([]string, 0, c.Len())
@@ -66,7 +66,7 @@ func Strings[E schnittstellen.ValueLike](
 	return
 }
 
-func SortedStrings[E schnittstellen.ValueLike](
+func SortedStrings[E schnittstellen.Stringer](
 	c schnittstellen.SetLike[E],
 ) (out []string) {
 	out = Strings(c)

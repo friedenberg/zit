@@ -7,8 +7,8 @@ import (
 )
 
 type Set[
-	T schnittstellen.Element,
-	TPtr schnittstellen.ElementPtr[T],
+	T any,
+	TPtr schnittstellen.Ptr[T],
 ] struct {
 	K schnittstellen.StringKeyerPtr[T, TPtr]
 	E map[string]TPtr
@@ -20,32 +20,6 @@ func (s Set[T, TPtr]) Len() int {
 	}
 
 	return len(s.E)
-}
-
-func (a Set[T, TPtr]) EqualsSetPtrLike(
-	b schnittstellen.SetPtrLike[T, TPtr],
-) bool {
-	return a.EqualsSetLike(b)
-}
-
-func (a Set[T, TPtr]) EqualsSetLike(b schnittstellen.SetLike[T]) bool {
-	if b == nil {
-		return false
-	}
-
-	if a.Len() != b.Len() {
-		return false
-	}
-
-	for k, va := range a.E {
-		vb, ok := b.Get(k)
-
-		if !ok || !va.EqualsAny(vb) {
-			return false
-		}
-	}
-
-	return true
 }
 
 func (s Set[T, TPtr]) Key(e T) string {

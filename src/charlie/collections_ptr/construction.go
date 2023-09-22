@@ -7,11 +7,8 @@ import (
 )
 
 func MakeValueSetString[
-	T schnittstellen.ValueLike,
-	TPtr interface {
-		schnittstellen.ValuePtr[T]
-		schnittstellen.Setter
-	},
+	T schnittstellen.Stringer,
+	TPtr schnittstellen.StringSetterPtr[T],
 ](
 	keyer schnittstellen.StringKeyerPtr[T, TPtr],
 	es ...string,
@@ -39,7 +36,10 @@ func MakeValueSetString[
 	return
 }
 
-func MakeValueSetValue[T schnittstellen.ValueLike, TPtr schnittstellen.ValuePtr[T]](
+func MakeValueSetValue[
+	T schnittstellen.Stringer,
+	TPtr schnittstellen.StringerPtr[T],
+](
 	keyer schnittstellen.StringKeyerPtr[T, TPtr],
 	es ...T,
 ) (s Set[T, TPtr]) {
@@ -59,7 +59,10 @@ func MakeValueSetValue[T schnittstellen.ValueLike, TPtr schnittstellen.ValuePtr[
 	return
 }
 
-func MakeValueSet[T schnittstellen.ValueLike, TPtr schnittstellen.ValuePtr[T]](
+func MakeValueSet[
+	T schnittstellen.Stringer,
+	TPtr schnittstellen.StringerPtr[T],
+](
 	keyer schnittstellen.StringKeyerPtr[T, TPtr],
 	es ...TPtr,
 ) (s Set[T, TPtr]) {
@@ -79,7 +82,7 @@ func MakeValueSet[T schnittstellen.ValueLike, TPtr schnittstellen.ValuePtr[T]](
 	return
 }
 
-func MakeSetValue[T schnittstellen.Element, TPtr schnittstellen.ElementPtr[T]](
+func MakeSetValue[T any, TPtr schnittstellen.Ptr[T]](
 	keyer schnittstellen.StringKeyerPtr[T, TPtr],
 	es ...T,
 ) (s Set[T, TPtr]) {
@@ -99,7 +102,7 @@ func MakeSetValue[T schnittstellen.Element, TPtr schnittstellen.ElementPtr[T]](
 	return
 }
 
-func MakeSet[T schnittstellen.Element, TPtr schnittstellen.ElementPtr[T]](
+func MakeSet[T any, TPtr schnittstellen.Ptr[T]](
 	keyer schnittstellen.StringKeyerPtr[T, TPtr],
 	es ...TPtr,
 ) (s Set[T, TPtr]) {
@@ -119,7 +122,10 @@ func MakeSet[T schnittstellen.Element, TPtr schnittstellen.ElementPtr[T]](
 	return
 }
 
-func MakeMutableValueSetValue[T schnittstellen.ValueLike, TPtr schnittstellen.ValuePtr[T]](
+func MakeMutableValueSetValue[
+	T schnittstellen.Stringer,
+	TPtr schnittstellen.StringerPtr[T],
+](
 	keyer schnittstellen.StringKeyerPtr[T, TPtr],
 	es ...T,
 ) (s MutableSet[T, TPtr]) {
@@ -139,7 +145,10 @@ func MakeMutableValueSetValue[T schnittstellen.ValueLike, TPtr schnittstellen.Va
 	return
 }
 
-func MakeMutableValueSet[T schnittstellen.ValueLike, TPtr schnittstellen.ValuePtr[T]](
+func MakeMutableValueSet[
+	T schnittstellen.Stringer,
+	TPtr schnittstellen.StringerPtr[T],
+](
 	keyer schnittstellen.StringKeyerPtr[T, TPtr],
 	es ...TPtr,
 ) (s MutableSet[T, TPtr]) {
@@ -159,7 +168,10 @@ func MakeMutableValueSet[T schnittstellen.ValueLike, TPtr schnittstellen.ValuePt
 	return
 }
 
-func MakeMutableSetValue[T schnittstellen.Element, TPtr schnittstellen.ElementPtr[T]](
+func MakeMutableSetValue[
+	T schnittstellen.Stringer,
+	TPtr schnittstellen.StringerPtr[T],
+](
 	keyer schnittstellen.StringKeyerPtr[T, TPtr],
 	es ...T,
 ) (s MutableSet[T, TPtr]) {
@@ -179,7 +191,7 @@ func MakeMutableSetValue[T schnittstellen.Element, TPtr schnittstellen.ElementPt
 	return
 }
 
-func MakeMutableSet[T schnittstellen.Element, TPtr schnittstellen.ElementPtr[T]](
+func MakeMutableSet[T any, TPtr schnittstellen.Ptr[T]](
 	keyer schnittstellen.StringKeyerPtr[T, TPtr],
 	es ...TPtr,
 ) (s MutableSet[T, TPtr]) {

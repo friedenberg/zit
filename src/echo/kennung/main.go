@@ -17,7 +17,7 @@ type QueryPrefixer interface {
 }
 
 type KennungSansGattung interface {
-	schnittstellen.ValueLike
+	schnittstellen.Stringer
 	Parts() [3]string
 	KennungSansGattungClone() KennungSansGattung
 	KennungSansGattungPtrClone() KennungSansGattungPtr
@@ -45,7 +45,7 @@ type KennungPtr interface {
 type KennungLike[T any] interface {
 	Kennung
 	schnittstellen.GattungGetter
-	schnittstellen.ValueLike
+	schnittstellen.Stringer
 }
 
 type KennungLikePtr[T KennungLike[T]] interface {

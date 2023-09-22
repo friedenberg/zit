@@ -9,11 +9,8 @@ import (
 )
 
 func MakeValueSetString[
-	T schnittstellen.ValueLike,
-	TPtr interface {
-		schnittstellen.ValuePtr[T]
-		schnittstellen.Setter
-	},
+	T schnittstellen.Stringer,
+	TPtr schnittstellen.StringSetterPtr[T],
 ](
 	keyer schnittstellen.StringKeyer[T],
 	es ...string,
@@ -42,7 +39,7 @@ func MakeValueSetString[
 	return
 }
 
-func MakeValueSetValue[T schnittstellen.ValueLike](
+func MakeValueSetValue[T schnittstellen.Stringer](
 	keyer schnittstellen.StringKeyer[T],
 	es ...T,
 ) (s Set[T]) {
@@ -63,7 +60,7 @@ func MakeValueSetValue[T schnittstellen.ValueLike](
 	return
 }
 
-func MakeValueSet[T schnittstellen.ValueLike](
+func MakeValueSet[T schnittstellen.Stringer](
 	keyer schnittstellen.StringKeyer[T],
 	es ...T,
 ) (s Set[T]) {
@@ -84,28 +81,7 @@ func MakeValueSet[T schnittstellen.ValueLike](
 	return
 }
 
-func MakeSetValue[T schnittstellen.Element](
-	keyer schnittstellen.StringKeyer[T],
-	es ...T,
-) (s Set[T]) {
-	gob.Register(s)
-	s.E = make(map[string]T, len(es))
-
-	if keyer == nil {
-		panic("keyer was nil")
-	}
-
-	s.K = keyer
-
-	for i := range es {
-		e := es[i]
-		s.E[s.K.GetKey(e)] = e
-	}
-
-	return
-}
-
-func MakeSet[T schnittstellen.Element](
+func MakeSetValue[T schnittstellen.Stringer](
 	keyer schnittstellen.StringKeyer[T],
 	es ...T,
 ) (s Set[T]) {
@@ -126,7 +102,28 @@ func MakeSet[T schnittstellen.Element](
 	return
 }
 
-func MakeMutableValueSetValue[T schnittstellen.ValueLike](
+func MakeSet[T any](
+	keyer schnittstellen.StringKeyer[T],
+	es ...T,
+) (s Set[T]) {
+	gob.Register(s)
+	s.E = make(map[string]T, len(es))
+
+	if keyer == nil {
+		panic("keyer was nil")
+	}
+
+	s.K = keyer
+
+	for i := range es {
+		e := es[i]
+		s.E[s.K.GetKey(e)] = e
+	}
+
+	return
+}
+
+func MakeMutableValueSetValue[T schnittstellen.Stringer](
 	keyer schnittstellen.StringKeyer[T],
 	es ...T,
 ) (s MutableSet[T]) {
@@ -147,7 +144,7 @@ func MakeMutableValueSetValue[T schnittstellen.ValueLike](
 	return
 }
 
-func MakeMutableValueSet[T schnittstellen.ValueLike](
+func MakeMutableValueSet[T schnittstellen.Stringer](
 	keyer schnittstellen.StringKeyer[T],
 	es ...T,
 ) (s MutableSet[T]) {
@@ -168,7 +165,7 @@ func MakeMutableValueSet[T schnittstellen.ValueLike](
 	return
 }
 
-func MakeMutableSetValue[T schnittstellen.Element](
+func MakeMutableSetValue[T any](
 	keyer schnittstellen.StringKeyer[T],
 	es ...T,
 ) (s MutableSet[T]) {
@@ -189,7 +186,7 @@ func MakeMutableSetValue[T schnittstellen.Element](
 	return
 }
 
-func MakeMutableSet[T schnittstellen.Element](
+func MakeMutableSet[T any](
 	keyer schnittstellen.StringKeyer[T],
 	es ...T,
 ) (s MutableSet[T]) {

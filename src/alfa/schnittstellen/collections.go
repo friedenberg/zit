@@ -4,7 +4,7 @@ import (
 	"flag"
 )
 
-type Delta[T ValueLike] interface {
+type Delta[T any] interface {
 	GetAdded() SetLike[T]
 	GetRemoved() SetLike[T]
 }

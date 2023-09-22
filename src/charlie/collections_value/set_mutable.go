@@ -7,7 +7,7 @@ import (
 )
 
 type MutableSet[
-	T schnittstellen.Element,
+	T any,
 ] struct {
 	K schnittstellen.StringKeyer[T]
 	E map[string]T
@@ -19,28 +19,6 @@ func (s MutableSet[T]) Len() int {
 	}
 
 	return len(s.E)
-}
-
-func (a MutableSet[T]) EqualsSetLike(
-	b schnittstellen.SetLike[T],
-) bool {
-	if b == nil {
-		return false
-	}
-
-	if a.Len() != b.Len() {
-		return false
-	}
-
-	for k, va := range a.E {
-		vb, ok := b.Get(k)
-
-		if !ok || !va.EqualsAny(vb) {
-			return false
-		}
-	}
-
-	return true
 }
 
 func (s MutableSet[T]) Key(e T) string {

@@ -7,10 +7,6 @@ import (
 )
 
 type (
-	IdLikeGetter interface {
-		GetId() schnittstellen.ValueLike
-	}
-
 	Getter interface {
 		GetSkuLike() SkuLike
 		// GetSkuLikePtr() SkuLikePtr
