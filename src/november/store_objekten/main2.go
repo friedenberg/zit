@@ -201,7 +201,7 @@ func (s *Store) ReadAll(
 func (s *Store) CheckoutOne(
 	options store_util.CheckoutOptions,
 	sk sku.SkuLikePtr,
-) (co objekte.CheckedOutLikePtr, err error) {
+) (co *objekte.CheckedOut2, err error) {
 	g := gattung.Must(sk)
 	switch g {
 	case gattung.Zettel:

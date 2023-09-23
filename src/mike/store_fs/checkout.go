@@ -22,12 +22,12 @@ import (
 func (s *Store) CheckoutQuery(
 	options store_util.CheckoutOptions,
 	ms matcher.Query,
-	f schnittstellen.FuncIter[objekte.CheckedOutLike],
+	f schnittstellen.FuncIter[*objekte.CheckedOut2],
 ) (err error) {
 	if err = s.storeObjekten.Query(
 		ms,
 		func(t sku.SkuLikePtr) (err error) {
-			var co objekte.CheckedOutLikePtr
+			var co *objekte.CheckedOut2
 
 			if co, err = s.checkoutOneGeneric(options, t); err != nil {
 				err = errors.Wrap(err)
@@ -47,8 +47,8 @@ func (s *Store) CheckoutQuery(
 func (s *Store) Checkout(
 	options store_util.CheckoutOptions,
 	ztw schnittstellen.FuncIter[sku.SkuLikePtr],
-) (zcs schnittstellen.MutableSetLike[objekte.CheckedOutLikePtr], err error) {
-	zcs = collections_value.MakeMutableValueSet[objekte.CheckedOutLikePtr](nil)
+) (zcs schnittstellen.MutableSetLike[*objekte.CheckedOut2], err error) {
+	zcs = collections_value.MakeMutableValueSet[*objekte.CheckedOut2](nil)
 	zts := collections_value.MakeMutableValueSet[sku.SkuLikePtr](nil)
 
 	if err = s.storeObjekten.Zettel().ReadAllSchwanzen(
@@ -73,7 +73,7 @@ func (s *Store) Checkout(
 
 	if err = zts.Each(
 		func(zt sku.SkuLikePtr) (err error) {
-			var zc objekte.CheckedOutLikePtr
+			var zc *objekte.CheckedOut2
 
 			if zc, err = s.CheckoutOneZettel(options, zt); err != nil {
 				err = errors.Wrap(err)
@@ -94,7 +94,7 @@ func (s *Store) Checkout(
 
 func (s Store) shouldCheckOut(
 	options store_util.CheckoutOptions,
-	cz objekte.CheckedOutLikePtr,
+	cz *objekte.CheckedOut2,
 ) (ok bool) {
 	if options.Force == true {
 		ok = true
@@ -152,7 +152,7 @@ func (s Store) filenameForZettelTransacted(
 func (s *Store) checkoutOneGeneric(
 	options store_util.CheckoutOptions,
 	t sku.SkuLikePtr,
-) (cop objekte.CheckedOutLikePtr, err error) {
+) (cop *objekte.CheckedOut2, err error) {
 	switch tt := t.(type) {
 	case *sku.Transacted:
 		cop, err = s.CheckoutOneZettel(options, tt)
@@ -184,7 +184,7 @@ func (s *Store) checkoutOneGeneric(
 func (s *Store) CheckoutOneZettel(
 	options store_util.CheckoutOptions,
 	sz sku.SkuLikePtr,
-) (cz objekte.CheckedOutLikePtr, err error) {
+) (cz *objekte.CheckedOut2, err error) {
 	cz = &objekte.CheckedOut2{}
 
 	if err = cz.GetInternalLikePtr().SetFromSkuLike(sz); err != nil {

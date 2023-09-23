@@ -84,7 +84,7 @@ type Updater[
 }
 
 type CheckedOutUpdater[
-	CO objekte.CheckedOutLike,
+	CO *objekte.CheckedOut2,
 	T sku.SkuLike,
 ] interface {
 	UpdateCheckedOut(CO) (T, error)

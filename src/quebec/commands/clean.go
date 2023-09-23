@@ -61,7 +61,7 @@ func (c Clean) RunWithCwdQuery(
 		ms,
 		iter.MakeChain(
 			objekte.MakeFilterFromMetaSet(ms),
-			func(co objekte.CheckedOutLikePtr) (err error) {
+			func(co *objekte.CheckedOut2) (err error) {
 				if co.GetState() != checked_out_state.StateExistsAndSame && !c.force {
 					return
 				}

@@ -111,7 +111,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		),
 	}
 
-	var zsc schnittstellen.MutableSetLike[objekte.CheckedOutLikePtr]
+	var zsc schnittstellen.MutableSetLike[*objekte.CheckedOut2]
 
 	if len(args) == 0 {
 		if zsc, err = c.writeNewZettels(u); err != nil {
@@ -209,7 +209,7 @@ func (c New) readExistingFilesAsZettels(
 
 func (c New) writeNewZettels(
 	u *umwelt.Umwelt,
-) (zsc schnittstellen.MutableSetLike[objekte.CheckedOutLikePtr], err error) {
+) (zsc schnittstellen.MutableSetLike[*objekte.CheckedOut2], err error) {
 	var cwdFiles cwd.CwdFiles
 
 	if cwdFiles, err = cwd.MakeCwdFilesAll(
@@ -244,7 +244,7 @@ func (c New) writeNewZettels(
 func (c New) editZettels(
 	u *umwelt.Umwelt,
 	ms matcher.Query,
-	zsc schnittstellen.MutableSetLike[objekte.CheckedOutLikePtr],
+	zsc schnittstellen.MutableSetLike[*objekte.CheckedOut2],
 ) (err error) {
 	if !c.Edit {
 		errors.Log().Print("edit set to false, not editing")

@@ -147,7 +147,7 @@ func (u *Umwelt) PrinterHeader() schnittstellen.FuncIter[string] {
 	)
 }
 
-func (u *Umwelt) PrinterCheckedOutLike() schnittstellen.FuncIter[objekte.CheckedOutLikePtr] {
+func (u *Umwelt) PrinterCheckedOutLike() schnittstellen.FuncIter[*objekte.CheckedOut2] {
 	co := u.FormatColorOptions()
 
 	p := objekte.MakeCliFormat(
@@ -163,7 +163,7 @@ func (u *Umwelt) PrinterCheckedOutLike() schnittstellen.FuncIter[objekte.Checked
 		u.StringFormatWriterEtiketten(co),
 	)
 
-	return string_format_writer.MakeDelim[objekte.CheckedOutLikePtr](
+	return string_format_writer.MakeDelim[*objekte.CheckedOut2](
 		"\n",
 		u.Out(),
 		p,

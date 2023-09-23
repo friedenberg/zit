@@ -80,7 +80,7 @@ func (c Edit) RunWithCwdQuery(
 	if err = u.StoreWorkingDirectory().CheckoutQuery(
 		options,
 		ms,
-		func(co objekte.CheckedOutLike) (err error) {
+		func(co *objekte.CheckedOut2) (err error) {
 			e := co.GetExternalLike()
 
 			if afd := e.GetAkteFD(); afd.String() != "." {

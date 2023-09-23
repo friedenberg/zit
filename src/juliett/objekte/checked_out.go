@@ -20,7 +20,7 @@ type (
 	}
 
 	CheckedOutLikePtr interface {
-		CheckedOutLike
+		*CheckedOut2
 		GetInternalLikePtr() sku.SkuLikePtr
 		GetExternalLikePtr() ExternalLikePtr
 		SetExternalLikePtr(ExternalLikePtr) error

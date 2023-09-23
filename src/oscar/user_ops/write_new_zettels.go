@@ -20,7 +20,7 @@ type WriteNewZettels struct {
 func (c WriteNewZettels) RunMany(
 	z zettel.ProtoZettel,
 	count int,
-) (results schnittstellen.MutableSetLike[objekte.CheckedOutLikePtr], err error) {
+) (results schnittstellen.MutableSetLike[*objekte.CheckedOut2], err error) {
 	if err = c.Lock(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -28,13 +28,13 @@ func (c WriteNewZettels) RunMany(
 
 	defer errors.Deferred(&err, c.Unlock)
 
-	results = collections_value.MakeMutableValueSet[objekte.CheckedOutLikePtr](
+	results = collections_value.MakeMutableValueSet[*objekte.CheckedOut2](
 		nil,
 	)
 
 	// TODO-P4 modify this to be run once
 	for i := 0; i < count; i++ {
-		var cz objekte.CheckedOutLikePtr
+		var cz *objekte.CheckedOut2
 
 		if cz, err = c.runOneAlreadyLocked(z); err != nil {
 			err = errors.Wrap(err)
@@ -49,7 +49,7 @@ func (c WriteNewZettels) RunMany(
 
 func (c WriteNewZettels) RunOne(
 	z zettel.ProtoZettel,
-) (result objekte.CheckedOutLikePtr, err error) {
+) (result *objekte.CheckedOut2, err error) {
 	if err = c.Lock(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -62,7 +62,7 @@ func (c WriteNewZettels) RunOne(
 
 func (c WriteNewZettels) runOneAlreadyLocked(
 	pz zettel.ProtoZettel,
-) (result objekte.CheckedOutLikePtr, err error) {
+) (result *objekte.CheckedOut2, err error) {
 	z := pz.Make()
 
 	var zt *sku.Transacted
