@@ -65,7 +65,7 @@ func (c Diff) RunWithCwdQuery(
 			func(co *objekte.CheckedOut) (err error) {
 				wg := iter.MakeErrorWaitGroup()
 
-				il := co.GetInternalLike()
+				il := co.Internal
 				el := co.GetExternalLike()
 
 				var mode checkout_mode.Mode

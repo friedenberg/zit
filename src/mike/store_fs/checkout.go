@@ -109,7 +109,7 @@ func (s Store) shouldCheckOut(
 		ok = true
 	}
 
-	if cz.GetInternalLike().GetMetadatei().Equals(
+	if cz.Internal.GetMetadatei().Equals(
 		cz.GetExternalLike().GetMetadatei(),
 	) {
 		return

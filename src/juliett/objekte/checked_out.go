@@ -41,10 +41,6 @@ func (co *CheckedOut) SetState(v checked_out_state.State) {
 	co.State = v
 }
 
-func (co *CheckedOut) GetInternalLike() sku.SkuLikePtr {
-	return &co.Internal
-}
-
 func (co *CheckedOut) GetExternalLike() ExternalLike {
 	return &co.External
 }

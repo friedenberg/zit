@@ -16,10 +16,7 @@ func MakeFilterFromMetaSet(
 	}
 
 	return func(col *CheckedOut) (err error) {
-		internal := col.GetInternalLike()
-		external := col.GetExternalLikePtr()
-
-		g := gattung.Must(internal.GetSkuLike().GetGattung())
+		g := gattung.Must(col.Internal.GetSkuLike().GetGattung())
 
 		var matcher matcher.Matcher
 		ok := false
@@ -29,7 +26,7 @@ func MakeFilterFromMetaSet(
 			return
 		}
 
-		if !matcher.ContainsMatchable(external) {
+		if !matcher.ContainsMatchable(&col.External) {
 			err = iter.MakeErrStopIteration()
 			return
 		}
