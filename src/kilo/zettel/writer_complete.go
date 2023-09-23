@@ -13,17 +13,17 @@ import (
 
 type WriterComplete struct {
 	wBuf         *bufio.Writer
-	pool         schnittstellen.Pool[sku.Transacted2, *sku.Transacted2]
-	chTransacted chan *sku.Transacted2
+	pool         schnittstellen.Pool[sku.Transacted, *sku.Transacted]
+	chTransacted chan *sku.Transacted
 	chDone       chan struct{}
 }
 
 func MakeWriterComplete(w io.Writer) WriterComplete {
 	w1 := WriterComplete{
-		chTransacted: make(chan *sku.Transacted2),
+		chTransacted: make(chan *sku.Transacted),
 		chDone:       make(chan struct{}),
 		wBuf:         bufio.NewWriter(w),
-		pool: pool.MakePool[sku.Transacted2, *sku.Transacted2](
+		pool: pool.MakePool[sku.Transacted, *sku.Transacted](
 			nil,
 			nil,
 		),

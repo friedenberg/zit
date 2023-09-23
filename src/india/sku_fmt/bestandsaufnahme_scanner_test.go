@@ -23,7 +23,7 @@ func TestOne(t1 *testing.T) {
 
 	printer := MakeFormatBestandsaufnahmePrinter(w, f, o)
 
-	n, err := printer.Print(sku.Transacted2{
+	n, err := printer.Print(sku.Transacted{
 		Kennung: kennung.Kennung2{KennungPtr: kennung.MustHinweis("one/uno")},
 	})
 
@@ -41,7 +41,7 @@ func TestOne(t1 *testing.T) {
 		}
 	}
 
-	n, err = printer.Print(sku.Transacted2{
+	n, err = printer.Print(sku.Transacted{
 		Kennung: kennung.Kennung2{KennungPtr: kennung.MustHinweis("two/dos")},
 	})
 
@@ -74,7 +74,7 @@ func TestOne(t1 *testing.T) {
 	t.AssertNoError(scanner.Error())
 
 	{
-		sk1, ok := sk.(*sku.Transacted2)
+		sk1, ok := sk.(*sku.Transacted)
 
 		if !ok {
 			t.Errorf("expected %T but got %T", sk1, sk)
@@ -89,7 +89,7 @@ func TestOne(t1 *testing.T) {
 	t.AssertNoError(scanner.Error())
 
 	{
-		sk1, ok := sk.(*sku.Transacted2)
+		sk1, ok := sk.(*sku.Transacted)
 
 		if !ok {
 			t.Errorf("expected %T but got %T", sk1, sk)

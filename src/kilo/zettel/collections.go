@@ -9,33 +9,33 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
-type HeapTransacted = heap.Heap[sku.Transacted2, *sku.Transacted2]
+type HeapTransacted = heap.Heap[sku.Transacted, *sku.Transacted]
 
 func MakeHeapTransacted() HeapTransacted {
-	return heap.Make[sku.Transacted2, *sku.Transacted2](
-		sku.Equaler[sku.Transacted2, *sku.Transacted2]{},
-		sku.Lessor[sku.Transacted2, *sku.Transacted2]{},
-		sku.Resetter[sku.Transacted2, *sku.Transacted2]{},
+	return heap.Make[sku.Transacted, *sku.Transacted](
+		sku.Equaler[sku.Transacted, *sku.Transacted]{},
+		sku.Lessor[sku.Transacted, *sku.Transacted]{},
+		sku.Resetter[sku.Transacted, *sku.Transacted]{},
 	)
 }
 
 func MakeHeapTransactedReversed() HeapTransacted {
-	return heap.Make[sku.Transacted2, *sku.Transacted2](
-		sku.Equaler[sku.Transacted2, *sku.Transacted2]{},
-		values.ReverseLessor[sku.Transacted2, *sku.Transacted2]{
-			Inner: sku.Lessor[sku.Transacted2, *sku.Transacted2]{},
+	return heap.Make[sku.Transacted, *sku.Transacted](
+		sku.Equaler[sku.Transacted, *sku.Transacted]{},
+		values.ReverseLessor[sku.Transacted, *sku.Transacted]{
+			Inner: sku.Lessor[sku.Transacted, *sku.Transacted]{},
 		},
-		sku.Resetter[sku.Transacted2, *sku.Transacted2]{},
+		sku.Resetter[sku.Transacted, *sku.Transacted]{},
 	)
 }
 
 type (
-	MutableSet = schnittstellen.MutableSetLike[*sku.Transacted2]
+	MutableSet = schnittstellen.MutableSetLike[*sku.Transacted]
 )
 
 type TransactedUniqueKeyer struct{}
 
-func (tk TransactedUniqueKeyer) GetKey(sz *sku.Transacted2) string {
+func (tk TransactedUniqueKeyer) GetKey(sz *sku.Transacted) string {
 	if sz == nil {
 		return ""
 	}
@@ -49,14 +49,14 @@ func (tk TransactedUniqueKeyer) GetKey(sz *sku.Transacted2) string {
 }
 
 func MakeMutableSetUnique(c int) MutableSet {
-	return collections_value.MakeMutableValueSet[*sku.Transacted2](
+	return collections_value.MakeMutableValueSet[*sku.Transacted](
 		TransactedUniqueKeyer{},
 	)
 }
 
 type TransactedHinweisKeyer struct{}
 
-func (tk TransactedHinweisKeyer) GetKey(sz *sku.Transacted2) string {
+func (tk TransactedHinweisKeyer) GetKey(sz *sku.Transacted) string {
 	if sz == nil {
 		return ""
 	}
@@ -67,7 +67,7 @@ func (tk TransactedHinweisKeyer) GetKey(sz *sku.Transacted2) string {
 }
 
 func MakeMutableSetHinweis(c int) MutableSet {
-	return collections_value.MakeMutableValueSet[*sku.Transacted2](
+	return collections_value.MakeMutableValueSet[*sku.Transacted](
 		TransactedHinweisKeyer{},
 	)
 }

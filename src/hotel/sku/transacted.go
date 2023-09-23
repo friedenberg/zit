@@ -1,292 +1,257 @@
 package sku
 
-// func init() {
-// 	gob.Register(&Transacted[kennung.Hinweis, *kennung.Hinweis]{})
-// 	gob.Register(&Transacted[kennung.Etikett, *kennung.Etikett]{})
-// 	gob.Register(&Transacted[kennung.Typ, *kennung.Typ]{})
-// 	gob.Register(&Transacted[kennung.Kasten, *kennung.Kasten]{})
-// 	gob.Register(&Transacted[kennung.Konfig, *kennung.Konfig]{})
-// }
+import (
+	"fmt"
 
-// // TODO-P2 move sku.Sku to sku.Transacted
-// type Transacted[K kennung.KennungLike[K], KPtr kennung.KennungLikePtr[K]]
-// struct {
-// 	Kennung          K
-// 	Metadatei        metadatei.Metadatei
-// 	ObjekteSha       sha.Sha
-// 	TransactionIndex values.Int
-// 	Kopf             kennung.Tai
-// }
+	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/values"
+	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
+)
 
-// func (t *Transacted[K, KPtr]) SetFromSkuLike(sk SkuLike) (err error) {
-// 	if err = KPtr(&t.Kennung).Set(sk.GetKennungLike().String()); err != nil {
-// 		err = errors.Wrap(err)
-// 		return
-// 	}
+type Transacted struct {
+	Kennung          kennung.Kennung2
+	Metadatei        metadatei.Metadatei
+	ObjekteSha       sha.Sha
+	TransactionIndex values.Int
+	Kopf             kennung.Tai
+}
 
-// 	t.ObjekteSha = sha.Make(sk.GetObjekteSha())
-// 	t.Metadatei.ResetWith(sk.GetMetadatei())
-// 	t.GetMetadateiPtr().Tai = sk.GetTai()
+func (t *Transacted) SetFromSkuLike(sk SkuLike) (err error) {
+	err = t.Kennung.SetWithGattung(
+		sk.GetKennungLike().String(),
+		sk.GetGattung(),
+	)
 
-// 	t.Kopf = sk.GetTai()
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-// 	return
-// }
+	t.ObjekteSha = sha.Make(sk.GetObjekteSha())
+	t.Metadatei.ResetWith(sk.GetMetadatei())
+	t.GetMetadateiPtr().Tai = sk.GetTai()
 
-// func MakeSkuLikeSansObjekteSha(
-// 	m metadatei.Metadatei,
-// 	k kennung.Kennung,
-// ) (sk SkuLikePtr, err error) {
-// 	switch kt := k.(type) {
-// 	case *kennung.Hinweis:
-// 		sk = &Transacted[kennung.Hinweis, *kennung.Hinweis]{
-// 			Metadatei: m,
-// 			Kennung:   *kt,
-// 		}
+	t.Kopf = sk.GetTai()
 
-// 	case *kennung.Etikett:
-// 		sk = &Transacted[kennung.Etikett, *kennung.Etikett]{
-// 			Metadatei: m,
-// 			Kennung:   *kt,
-// 		}
+	return
+}
 
-// 	case *kennung.Typ:
-// 		sk = &Transacted[kennung.Typ, *kennung.Typ]{
-// 			Metadatei: m,
-// 			Kennung:   *kt,
-// 		}
+func MakeSkuLikeSansObjekteSha2(
+	m metadatei.Metadatei,
+	k kennung.Kennung,
+) (sk *Transacted, err error) {
+	sk = &Transacted{
+		Metadatei: m,
+	}
 
-// 	case *kennung.Kasten:
-// 		sk = &Transacted[kennung.Kasten, *kennung.Kasten]{
-// 			Metadatei: m,
-// 			Kennung:   *kt,
-// 		}
+	if err = sk.Kennung.SetWithKennung(k); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-// 	case *kennung.Konfig:
-// 		sk = &Transacted[kennung.Konfig, *kennung.Konfig]{
-// 			Metadatei: m,
-// 			Kennung:   *kt,
-// 		}
+	return
+}
 
-// 	default:
-// 		err = errors.Errorf("unsupported kennung: %T -> %q", kt, kt)
-// 		return
-// 	}
+func MakeSkuLike2(
+	m metadatei.Metadatei,
+	k kennung.KennungPtr,
+	os sha.Sha,
+) (sk SkuLikePtr, err error) {
+	if sk, err = MakeSkuLikeSansObjekteSha2(m, k); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-// 	return
-// }
+	sk.SetObjekteSha(os)
 
-// func MakeSkuLike(
-// 	m metadatei.Metadatei,
-// 	k kennung.Kennung,
-// 	os sha.Sha,
-// ) (sk *Transacted2, err error) {
-// 	if sk, err = MakeSkuLikeSansObjekteSha2(m, k); err != nil {
-// 		err = errors.Wrap(err)
-// 		return
-// 	}
+	return
+}
 
-// 	sk.SetObjekteSha(os)
+func (a Transacted) ImmutableClone() SkuLike {
+	return a
+}
 
-// 	return
-// }
+func (a Transacted) MutableClone() SkuLikePtr {
+	return &a
+}
 
-// func (a Transacted[K, KPtr]) ImmutableClone() SkuLike {
-// 	return a
-// }
+func (a Transacted) String() string {
+	return fmt.Sprintf(
+		"%s %s %s",
+		a.Kennung,
+		a.ObjekteSha,
+		a.Metadatei.AkteSha,
+	)
+}
 
-// func (a Transacted[K, KPtr]) MutableClone() SkuLikePtr {
-// 	return &a
-// }
+func (a Transacted) GetSkuLike() SkuLike {
+	return a
+}
 
-// func (a Transacted[K, KPtr]) String() string {
-// 	return fmt.Sprintf(
-// 		"%s %s %s",
-// 		a.Kennung,
-// 		a.ObjekteSha,
-// 		a.Metadatei.AkteSha,
-// 	)
-// }
+func (a *Transacted) GetSkuLikePtr() SkuLikePtr {
+	return a
+}
 
-// func (a Transacted[K, KPtr]) GetSkuLike() SkuLike {
-// 	return a
-// }
+func (a Transacted) GetEtiketten() kennung.EtikettSet {
+	return a.Metadatei.GetEtiketten()
+}
 
-// func (a *Transacted[K, KPtr]) GetSkuLikePtr() SkuLikePtr {
-// 	return a
-// }
+func (a Transacted) GetTyp() kennung.Typ {
+	return a.Metadatei.Typ
+}
 
-// func (a Transacted[K, KPtr]) GetEtiketten() kennung.EtikettSet {
-// 	return a.Metadatei.GetEtiketten()
-// }
+func (a Transacted) GetMetadatei() metadatei.Metadatei {
+	return a.Metadatei
+}
 
-// func (a Transacted[K, KPtr]) GetTyp() kennung.Typ {
-// 	return a.Metadatei.Typ
-// }
+func (a *Transacted) GetMetadateiPtr() *metadatei.Metadatei {
+	return &a.Metadatei
+}
 
-// func (a Transacted[K, KPtr]) GetMetadatei() metadatei.Metadatei {
-// 	return a.Metadatei
-// }
+func (a *Transacted) SetMetadatei(m metadatei.Metadatei) {
+	a.Metadatei = m
+}
 
-// func (a *Transacted[K, KPtr]) GetMetadateiPtr() *metadatei.Metadatei {
-// 	return &a.Metadatei
-// }
+func (a Transacted) GetTai() kennung.Tai {
+	return a.GetMetadatei().GetTai()
+}
 
-// func (a *Transacted[K, KPtr]) SetMetadatei(m metadatei.Metadatei) {
-// 	a.Metadatei = m
-// }
+func (a Transacted) GetKopf() kennung.Tai {
+	return a.Kopf
+}
 
-// func (a Transacted[K, KPtr]) GetTai() kennung.Tai {
-// 	return a.GetMetadatei().GetTai()
-// }
+func (a *Transacted) SetTai(t kennung.Tai) {
+	a.GetMetadateiPtr().Tai = t
+}
 
-// func (a Transacted[K, KPtr]) GetKopf() kennung.Tai {
-// 	return a.Kopf
-// }
+func (a Transacted) GetKennung() kennung.Kennung {
+	return a.Kennung
+}
 
-// func (a *Transacted[K, KPtr]) SetTai(t kennung.Tai) {
-// 	a.GetMetadateiPtr().Tai = t
-// }
+func (a *Transacted) GetKennungPtr() kennung.KennungPtr {
+	return &a.Kennung
+}
 
-// func (a Transacted[K, KPtr]) GetKennung() K {
-// 	return a.Kennung
-// }
+func (a Transacted) GetKennungLike() kennung.Kennung {
+	return a.Kennung
+}
 
-// func (a *Transacted[K, KPtr]) GetKennungPtr() KPtr {
-// 	return &a.Kennung
-// }
+func (a *Transacted) GetKennungLikePtr() kennung.KennungPtr {
+	return &a.Kennung
+}
 
-// func (a Transacted[K, KPtr]) GetKennungLike() kennung.Kennung {
-// 	return a.Kennung
-// }
+func (a *Transacted) SetKennungLike(kl kennung.Kennung) (err error) {
+	if err = a.Kennung.SetWithKennung(kl); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-// func (a *Transacted[K, KPtr]) GetKennungLikePtr() kennung.KennungPtr {
-// 	return KPtr(&a.Kennung)
-// }
+	return
+}
 
-// func (a *Transacted[K, KPtr]) SetKennungLike(kl kennung.Kennung) (err error)
-// {
-// 	switch k := kl.(type) {
-// 	case K:
-// 		a.Kennung = k
+func (a *Transacted) Reset() {
+	a.Kopf.Reset()
+	a.ObjekteSha.Reset()
 
-// 	case KPtr:
-// 		a.Kennung = K(*k)
+	// TODO-P2 remove in favor of kennung pkg
+	if a.Kennung.KennungPtr != nil {
+		a.Kennung.Reset()
+	}
 
-// 	default:
-// 		err = errors.Errorf("expected kennung of type %T but got %T: %q",
-// a.Kennung, k, kl)
-// 		return
-// 	}
+	a.Metadatei.Reset()
+	a.TransactionIndex.Reset()
+}
 
-// 	return
-// }
+func (a *Transacted) ResetWith(b Transacted) {
+	a.Kopf = b.Kopf
+	a.ObjekteSha = b.ObjekteSha
+	a.Kennung.ResetWithKennung(b.Kennung)
+	a.Metadatei.ResetWith(b.Metadatei)
+	a.TransactionIndex.SetInt(b.TransactionIndex.Int())
+}
 
-// func (a Transacted[K, KPtr]) GetExternal() External[K, KPtr] {
-// 	return External[K, KPtr]{
-// 		Transacted: a,
-// 	}
-// }
+// TODO-P2 switch this to default
+func (a *Transacted) ResetWithPtr(
+	b *Transacted,
+) {
+	a.ResetWith(*b)
+}
 
-// func (a *Transacted[K, KPtr]) SetTransactionIndex(i int) {
-// 	a.TransactionIndex.SetInt(i)
-// }
+func (a Transacted) Less(b Transacted) (ok bool) {
+	if a.GetTai().Less(b.GetTai()) {
+		ok = true
+		return
+	}
 
-// func (a *Transacted[K, KPtr]) Reset() {
-// 	a.Kopf.Reset()
-// 	a.ObjekteSha.Reset()
-// 	KPtr(&a.Kennung).Reset()
-// 	a.Metadatei.Reset()
-// 	a.TransactionIndex.Reset()
-// }
+	// if a.GetTai().Equals(b.GetTai()) &&
+	// 	a.TransactionIndex.Less(b.TransactionIndex) {
+	// 	ok = true
+	// 	return
+	// }
 
-// func (a *Transacted[K, KPtr]) ResetWith(b Transacted[K, KPtr]) {
-// 	a.Kopf = b.Kopf
-// 	a.ObjekteSha = b.ObjekteSha
-// 	a.Kennung = b.Kennung
-// 	a.Metadatei.ResetWith(b.Metadatei)
-// 	a.TransactionIndex.SetInt(b.TransactionIndex.Int())
-// }
+	return
+}
 
-// // TODO-P2 switch this to default
-// func (a *Transacted[T2, T3]) ResetWithPtr(
-// 	b *Transacted[T2, T3],
-// ) {
-// 	a.ResetWith(*b)
-// }
+func (a Transacted) EqualsSkuLike(b SkuLike) bool {
+	return values.Equals(a, b) || values.EqualsPtr(a, b)
+}
 
-// func (a Transacted[K, KPtr]) Less(b Transacted[K, KPtr]) (ok bool) {
-// 	if a.GetTai().Less(b.GetTai()) {
-// 		ok = true
-// 		return
-// 	}
+func (a Transacted) EqualsAny(b any) (ok bool) {
+	return values.Equals(a, b)
+}
 
-// 	// if a.GetTai().Equals(b.GetTai()) &&
-// 	// 	a.TransactionIndex.Less(b.TransactionIndex) {
-// 	// 	ok = true
-// 	// 	return
-// 	// }
+func (a Transacted) Equals(b Transacted) (ok bool) {
+	if !a.TransactionIndex.Equals(b.TransactionIndex) {
+		return
+	}
 
-// 	return
-// }
+	if a.GetKennung().String() != b.GetKennung().String() {
+		return
+	}
 
-// func (a Transacted[K, KPtr]) EqualsSkuLike(b SkuLike) bool {
-// 	return values.Equals(a, b) || values.EqualsPtr(a, b)
-// }
+	// TODO-P2 determine why objekte shas in import test differed
+	// if !a.ObjekteSha.Equals(b.ObjekteSha) {
+	// 	return
+	// }
 
-// func (a Transacted[K, KPtr]) EqualsAny(b any) (ok bool) {
-// 	return values.Equals(a, b)
-// }
+	if !a.Metadatei.Equals(b.Metadatei) {
+		return
+	}
 
-// func (a Transacted[K, KPtr]) Equals(b Transacted[K, KPtr]) (ok bool) {
-// 	if !a.TransactionIndex.Equals(b.TransactionIndex) {
-// 		return
-// 	}
+	return true
+}
 
-// 	if a.GetKennung().String() != b.GetKennung().String() {
-// 		return
-// 	}
+func (s Transacted) GetGattung() schnittstellen.GattungLike {
+	return s.Kennung.GetGattung()
+}
 
-// 	// TODO-P2 determine why objekte shas in import test differed
-// 	// if !a.ObjekteSha.Equals(b.ObjekteSha) {
-// 	// 	return
-// 	// }
+func (s *Transacted) IsNew() bool {
+	return s.Metadatei.Verzeichnisse.Mutter.IsNull()
+}
 
-// 	if !a.Metadatei.Equals(b.Metadatei) {
-// 		return
-// 	}
+func (s *Transacted) SetObjekteSha(v schnittstellen.ShaLike) {
+	s.ObjekteSha = sha.Make(v)
+}
 
-// 	return true
-// }
+func (s Transacted) GetObjekteSha() schnittstellen.ShaLike {
+	return s.ObjekteSha
+}
 
-// func (s Transacted[K, KPtr]) GetGattung() schnittstellen.GattungLike {
-// 	return s.Kennung.GetGattung()
-// }
+func (s Transacted) GetAkteSha() schnittstellen.ShaLike {
+	return s.Metadatei.AkteSha
+}
 
-// func (s *Transacted[K, KPtr]) IsNew() bool {
-// 	return s.Metadatei.Verzeichnisse.Mutter.IsNull()
-// }
+func (s *Transacted) SetAkteSha(sh schnittstellen.ShaLike) {
+	s.Metadatei.AkteSha = sha.Make(sh)
+}
 
-// func (s *Transacted[K, KPtr]) SetObjekteSha(v schnittstellen.ShaLike) {
-// 	s.ObjekteSha = sha.Make(v)
-// }
+func (s Transacted) GetTransactionIndex() values.Int {
+	return s.TransactionIndex
+}
 
-// func (s Transacted[K, KPtr]) GetObjekteSha() schnittstellen.ShaLike {
-// 	return s.ObjekteSha
-// }
-
-// func (s Transacted[K, KPtr]) GetAkteSha() schnittstellen.ShaLike {
-// 	return s.Metadatei.AkteSha
-// }
-
-// func (s *Transacted[K, KPtr]) SetAkteSha(sh schnittstellen.ShaLike) {
-// 	s.Metadatei.AkteSha = sha.Make(sh)
-// }
-
-// func (s Transacted[K, KPtr]) GetTransactionIndex() values.Int {
-// 	return s.TransactionIndex
-// }
-
-// func (o Transacted[K, KPtr]) GetKey() string {
-// 	return kennung.FormattedString(o.GetKennung())
-// }
+func (o Transacted) GetKey() string {
+	return kennung.FormattedString(o.GetKennung())
+}

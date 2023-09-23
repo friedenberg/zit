@@ -11,30 +11,30 @@ import (
 )
 
 var (
-	transactedKeyerKennung schnittstellen.StringKeyerPtr[Transacted2, *Transacted2]
+	transactedKeyerKennung schnittstellen.StringKeyerPtr[Transacted, *Transacted]
 	TransactedSetEmpty     TransactedSet
-	TransactedLessor       schnittstellen.Lessor2[Transacted2, *Transacted2]
+	TransactedLessor       schnittstellen.Lessor2[Transacted, *Transacted]
 )
 
 func init() {
-	transactedKeyerKennung = &KennungKeyer[Transacted2, *Transacted2]{}
+	transactedKeyerKennung = &KennungKeyer[Transacted, *Transacted]{}
 	gob.Register(transactedKeyerKennung)
 
 	TransactedSetEmpty = MakeTransactedSet()
 	gob.Register(TransactedSetEmpty)
 	gob.Register(MakeTransactedMutableSet())
 
-	TransactedLessor = Lessor[Transacted2, *Transacted2]{}
+	TransactedLessor = Lessor[Transacted, *Transacted]{}
 }
 
 type (
-	TransactedSet        = schnittstellen.SetPtrLike[Transacted2, *Transacted2]
-	TransactedMutableSet = schnittstellen.MutableSetPtrLike[Transacted2, *Transacted2]
-	TransactedHeap       = heap.Heap[Transacted2, *Transacted2]
+	TransactedSet        = schnittstellen.SetPtrLike[Transacted, *Transacted]
+	TransactedMutableSet = schnittstellen.MutableSetPtrLike[Transacted, *Transacted]
+	TransactedHeap       = heap.Heap[Transacted, *Transacted]
 )
 
 func MakeTransactedHeap() TransactedHeap {
-	return heap.Make[Transacted2, *Transacted2](equaler{}, lessor{}, resetter{})
+	return heap.Make[Transacted, *Transacted](equaler{}, lessor{}, resetter{})
 }
 
 func MakeTransactedSet() TransactedSet {
@@ -71,35 +71,35 @@ func (sk KennungKeyer[T, TPtr]) GetKeyPtr(e TPtr) string {
 
 type lessor struct{}
 
-func (_ lessor) Less(a, b Transacted2) bool {
+func (_ lessor) Less(a, b Transacted) bool {
 	return a.GetTai().Less(b.GetTai())
 }
 
-func (_ lessor) LessPtr(a, b *Transacted2) bool {
+func (_ lessor) LessPtr(a, b *Transacted) bool {
 	return a.GetTai().Less(b.GetTai())
 }
 
 type equaler struct{}
 
-func (_ equaler) Equals(a, b Transacted2) bool {
+func (_ equaler) Equals(a, b Transacted) bool {
 	return a.EqualsSkuLike(b)
 }
 
-func (_ equaler) EqualsPtr(a, b *Transacted2) bool {
+func (_ equaler) EqualsPtr(a, b *Transacted) bool {
 	return a.EqualsSkuLike(b)
 }
 
 type resetter struct{}
 
-func (_ resetter) Reset(a *Transacted2) {
+func (_ resetter) Reset(a *Transacted) {
 	a.Reset()
 }
 
-func (_ resetter) ResetWith(a *Transacted2, b Transacted2) {
+func (_ resetter) ResetWith(a *Transacted, b Transacted) {
 	a = &b
 }
 
-func (_ resetter) ResetWithPtr(a *Transacted2, b *Transacted2) {
+func (_ resetter) ResetWithPtr(a *Transacted, b *Transacted) {
 	a.Kopf = b.Kopf
 	a.ObjekteSha = b.ObjekteSha
 	errors.PanicIfError(a.Kennung.ResetWithKennung(b.Kennung))

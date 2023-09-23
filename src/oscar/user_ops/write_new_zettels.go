@@ -65,7 +65,7 @@ func (c WriteNewZettels) runOneAlreadyLocked(
 ) (result objekte.CheckedOutLikePtr, err error) {
 	z := pz.Make()
 
-	var zt *sku.Transacted2
+	var zt *sku.Transacted
 
 	if zt, err = c.StoreObjekten().Zettel().Create(*z); err != nil {
 		err = errors.Wrap(err)

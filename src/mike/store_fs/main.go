@@ -75,7 +75,7 @@ func (s *Store) ReadFiles(
 			func(e sku.SkuLikePtr) (err error) {
 				var col objekte.CheckedOutLikePtr
 
-				et, ok := e.(*sku.Transacted2)
+				et, ok := e.(*sku.Transacted)
 
 				if !ok {
 					err = errors.Errorf("wrong type: %T", e)
@@ -127,7 +127,7 @@ func (s *Store) ReadFiles(
 				err = nil
 
 				tco := &objekte.CheckedOut2{}
-				var tcoe *sku.External2
+				var tcoe *sku.External
 
 				if tcoe, err = s.storeObjekten.ReadOneExternal(
 					il,
@@ -142,7 +142,7 @@ func (s *Store) ReadFiles(
 					return
 				}
 
-				tco.Internal = tcoe.Transacted2
+				tco.Internal = tcoe.Transacted
 				tco.External = *tcoe
 				tco.State = checked_out_state.StateUntracked
 

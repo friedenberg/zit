@@ -3,8 +3,8 @@ package store_verzeichnisse
 import "github.com/friedenberg/zit/src/hotel/sku"
 
 type PageDelegate interface {
-	ShouldAddVerzeichnisse(*sku.Transacted2) error
-	ShouldFlushVerzeichnisse(*sku.Transacted2) error
+	ShouldAddVerzeichnisse(*sku.Transacted) error
+	ShouldFlushVerzeichnisse(*sku.Transacted) error
 }
 
 type PageDelegateGetter interface {

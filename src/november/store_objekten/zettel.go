@@ -38,7 +38,7 @@ type zettelStore struct {
 
 func makeZettelStore(
 	sa store_util.StoreUtil,
-	p schnittstellen.Pool[sku.Transacted2, *sku.Transacted2],
+	p schnittstellen.Pool[sku.Transacted, *sku.Transacted],
 	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
 ) (s *zettelStore, err error) {
 	s = &zettelStore{
@@ -101,11 +101,11 @@ func (s *zettelStore) Flush() (err error) {
 	return
 }
 
-func (s *zettelStore) AddOne(t *sku.Transacted2) (err error) {
+func (s *zettelStore) AddOne(t *sku.Transacted) (err error) {
 	return s.writeNamedZettelToIndex(t)
 }
 
-func (s *zettelStore) UpdateOne(t *sku.Transacted2) (err error) {
+func (s *zettelStore) UpdateOne(t *sku.Transacted) (err error) {
 	return s.writeNamedZettelToIndex(t)
 }
 
@@ -151,7 +151,7 @@ func (s *zettelStore) writeNamedZettelToIndex(
 
 func (s zettelStore) ReadOne(
 	i schnittstellen.StringerGattungGetter,
-) (tz *sku.Transacted2, err error) {
+) (tz *sku.Transacted, err error) {
 	var h kennung.Hinweis
 
 	if err = h.Set(i.String()); err != nil {
@@ -159,7 +159,7 @@ func (s zettelStore) ReadOne(
 		return
 	}
 
-	var tz1 *sku.Transacted2
+	var tz1 *sku.Transacted
 
 	if tz1, err = s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(h); err != nil {
 		err = errors.Wrap(err)
@@ -180,7 +180,7 @@ func (i *zettelStore) ReadAllSchwanzen(
 	w schnittstellen.FuncIter[sku.SkuLikePtr],
 ) (err error) {
 	return i.verzeichnisseSchwanzen.ReadMany(
-		func(z *sku.Transacted2) (err error) {
+		func(z *sku.Transacted) (err error) {
 			return w(z)
 		},
 	)
@@ -190,7 +190,7 @@ func (i *zettelStore) ReadAll(
 	w schnittstellen.FuncIter[sku.SkuLikePtr],
 ) (err error) {
 	return i.verzeichnisseAll.ReadMany(
-		func(z *sku.Transacted2) (err error) {
+		func(z *sku.Transacted) (err error) {
 			return w(z)
 		},
 	)
@@ -198,7 +198,7 @@ func (i *zettelStore) ReadAll(
 
 func (s *zettelStore) Create(
 	mg metadatei.Getter,
-) (tz *sku.Transacted2, err error) {
+) (tz *sku.Transacted, err error) {
 	if !s.StoreUtil.GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{
 			Operation: "create",
@@ -306,13 +306,13 @@ func (s *zettelStore) UpdateManyMetadatei(
 func (s *zettelStore) updateExternal(
 	co objekte.ExternalLike,
 ) (tl sku.SkuLike, err error) {
-	ze := co.(*sku.External2)
+	ze := co.(*sku.External)
 	return s.Update(ze.GetMetadatei(), &ze.Kennung)
 }
 
 func (s *zettelStore) UpdateCheckedOut(
 	co *checked_out.Zettel,
-) (t *sku.Transacted2, err error) {
+) (t *sku.Transacted, err error) {
 	errors.TodoP2("support dry run")
 
 	if !s.StoreUtil.GetLockSmith().IsAcquired() {
@@ -363,7 +363,7 @@ func (s *zettelStore) UpdateCheckedOut(
 func (s *zettelStore) Update(
 	mg metadatei.Getter,
 	k schnittstellen.Stringer,
-) (tz *sku.Transacted2, err error) {
+) (tz *sku.Transacted, err error) {
 	errors.TodoP2("support dry run")
 	var h kennung.Hinweis
 
@@ -380,7 +380,7 @@ func (s *zettelStore) Update(
 		return
 	}
 
-	var mutter *sku.Transacted2
+	var mutter *sku.Transacted
 
 	if mutter, err = s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(
 		h,
@@ -405,7 +405,7 @@ func (s *zettelStore) updateLockedWithMutter(
 	mg metadatei.Getter,
 	h kennung.Kennung,
 	mutter sku.SkuLikePtr,
-) (tz *sku.Transacted2, err error) {
+) (tz *sku.Transacted, err error) {
 	if mutter == nil {
 		panic("mutter was nil")
 	}
@@ -445,7 +445,7 @@ func (s *zettelStore) updateLockedWithMutter(
 }
 
 func (s *zettelStore) commitIndexMatchUpdate(
-	tz *sku.Transacted2,
+	tz *sku.Transacted,
 	addEtikettenToIndex bool,
 ) (err error) {
 	s.StoreUtil.CommitUpdatedTransacted(tz)
@@ -471,7 +471,7 @@ func (s *zettelStore) commitIndexMatchUpdate(
 func (s *zettelStore) writeObjekte(
 	mg metadatei.Getter,
 	k kennung.Kennung,
-) (tz *sku.Transacted2, err error) {
+) (tz *sku.Transacted, err error) {
 	if mg == nil {
 		panic("metadatei.Getter was nil")
 	}
@@ -486,7 +486,7 @@ func (s *zettelStore) writeObjekte(
 		return
 	}
 
-	tz = &sku.Transacted2{
+	tz = &sku.Transacted{
 		Kennung:   kennung.Kennung2{KennungPtr: &h},
 		Metadatei: m,
 	}
@@ -494,7 +494,7 @@ func (s *zettelStore) writeObjekte(
 	return
 }
 
-func (s *zettelStore) Inherit(tz *sku.Transacted2) (err error) {
+func (s *zettelStore) Inherit(tz *sku.Transacted) (err error) {
 	errors.Log().Printf("inheriting %s", tz)
 
 	s.StoreUtil.CommitTransacted(tz)
@@ -524,7 +524,7 @@ func (s *zettelStore) Inherit(tz *sku.Transacted2) (err error) {
 func (s *zettelStore) ReindexOne(
 	sk sku.SkuLike,
 ) (o matcher.Matchable, err error) {
-	var tz *sku.Transacted2
+	var tz *sku.Transacted
 	defer s.Pool.Put(tz)
 
 	errors.Log().Printf("reindexing: %s", sku_fmt.String(sk))

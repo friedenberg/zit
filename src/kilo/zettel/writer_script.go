@@ -34,7 +34,7 @@ func (w WriterScript) Reader() io.Reader {
 	return w.scriptOut
 }
 
-func (w WriterScript) WriteZettelVerzeichnisse(z *sku.Transacted2) (err error) {
+func (w WriterScript) WriteZettelVerzeichnisse(z *sku.Transacted) (err error) {
 	errors.Log().Printf("writing zettel: %v", z)
 	if err = w.enc.WriteZettelVerzeichnisse(z); err != nil {
 		err = errors.Wrap(err)

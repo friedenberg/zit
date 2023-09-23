@@ -19,7 +19,7 @@ func TestMatcherLuaFalse(t1 *testing.T) {
 		t.Errorf("expected no error but got %w", err)
 	}
 
-	sk := &sku.Transacted2{
+	sk := &sku.Transacted{
 		Kennung: kennung.Kennung2{KennungPtr: &kennung.Etikett{}},
 	}
 
@@ -39,7 +39,7 @@ func TestMatcherLuaTrue(t1 *testing.T) {
 		t.Errorf("expected no error but got %w", err)
 	}
 
-	sk := &sku.Transacted2{
+	sk := &sku.Transacted{
 		Kennung: kennung.Kennung2{KennungPtr: &kennung.Etikett{}},
 	}
 

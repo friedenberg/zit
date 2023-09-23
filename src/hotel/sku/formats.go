@@ -5,11 +5,11 @@ import (
 )
 
 type (
-	FuncMakeSkuLike func(string) (*Transacted2, error)
+	FuncMakeSkuLike func(string) (*Transacted, error)
 )
 
 func TryMakeSkuWithFormats(fms ...FuncMakeSkuLike) FuncMakeSkuLike {
-	return func(line string) (sk *Transacted2, err error) {
+	return func(line string) (sk *Transacted, err error) {
 		em := errors.MakeMulti()
 
 		for _, f := range fms {

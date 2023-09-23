@@ -24,14 +24,14 @@ type OneReader[
 	K any,
 	V any,
 ] interface {
-	ReadOne(schnittstellen.StringerGattungGetter) (*sku.Transacted2, error)
+	ReadOne(schnittstellen.StringerGattungGetter) (*sku.Transacted, error)
 }
 
 type ExternalReader[
 	E any,
 	T any,
 ] interface {
-	ReadOneExternal(E, T) (*sku.External2, error)
+	ReadOneExternal(E, T) (*sku.External, error)
 }
 
 type AllReader[

@@ -45,7 +45,7 @@ func (iem implicitEtikettenMap) Set(to, imp kennung.Etikett) (err error) {
 }
 
 type ketikett struct {
-	Transacted        sku.Transacted2
+	Transacted        sku.Transacted
 	ImplicitEtiketten kennung.EtikettMutableSet
 }
 
@@ -81,7 +81,7 @@ func (e ketikett) String() string {
 }
 
 func (k compiled) EachEtikett(
-	f schnittstellen.FuncIter[*sku.Transacted2],
+	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	return k.Etiketten.Each(
 		func(ek ketikett) (err error) {
@@ -128,7 +128,7 @@ func (k *compiled) AccumulateImplicitEtiketten(
 func (k *compiled) AddEtikett2(
 	b1 sku.SkuLikePtr,
 ) (err error) {
-	var e sku.Transacted2
+	var e sku.Transacted
 
 	if err = e.SetFromSkuLike(b1); err != nil {
 		err = errors.Wrap(err)
@@ -139,7 +139,7 @@ func (k *compiled) AddEtikett2(
 }
 
 func (k *compiled) AddEtikett(
-	b1 *sku.Transacted2,
+	b1 *sku.Transacted,
 ) (err error) {
 	k.lock.Lock()
 	defer k.lock.Unlock()
@@ -157,12 +157,12 @@ func (k *compiled) AddEtikett(
 	return
 }
 
-func (c *compiled) applyExpandedEtikett(ct *sku.Transacted2) {
+func (c *compiled) applyExpandedEtikett(ct *sku.Transacted) {
 }
 
 func (kc compiled) GetEtikett(
 	k kennung.Etikett,
-) (ct sku.Transacted2, ok bool) {
+) (ct sku.Transacted, ok bool) {
 	expandedActual := kc.GetSortedEtikettenExpanded(k.String())
 
 	if len(expandedActual) > 0 {
@@ -175,7 +175,7 @@ func (kc compiled) GetEtikett(
 
 func (c compiled) GetSortedEtikettenExpanded(
 	v string,
-) (expandedActual []sku.Transacted2) {
+) (expandedActual []sku.Transacted) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 
@@ -184,7 +184,7 @@ func (c compiled) GetSortedEtikettenExpanded(
 		expandedMaybe,
 	)
 	typExpander.Expand(sa, v)
-	expandedActual = make([]sku.Transacted2, 0)
+	expandedActual = make([]sku.Transacted, 0)
 
 	expandedMaybe.Each(
 		func(v values.String) (err error) {

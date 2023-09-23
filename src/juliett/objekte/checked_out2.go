@@ -10,8 +10,8 @@ import (
 )
 
 type CheckedOut2 struct {
-	Internal sku.Transacted2
-	External sku.External2
+	Internal sku.Transacted
+	External sku.External
 	State    checked_out_state.State
 }
 

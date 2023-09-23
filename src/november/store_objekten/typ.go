@@ -56,7 +56,7 @@ func makeTypStore(
 		return
 	}
 
-	newOrUpdated := func(t *sku.Transacted2) (err error) {
+	newOrUpdated := func(t *sku.Transacted) (err error) {
 		s.StoreUtil.CommitUpdatedTransacted(t)
 
 		if err = s.StoreUtil.GetKonfigPtr().AddTyp(t); err != nil {
@@ -78,8 +78,8 @@ func makeTypStore(
 		s.CommonStore,
 		sa,
 		TypTransactedReader(s),
-		objekte_store.CreateOrUpdateDelegate[*sku.Transacted2]{
-			New: func(t *sku.Transacted2) (err error) {
+		objekte_store.CreateOrUpdateDelegate[*sku.Transacted]{
+			New: func(t *sku.Transacted) (err error) {
 				if err = newOrUpdated(t); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -87,7 +87,7 @@ func makeTypStore(
 
 				return s.LogWriter.New(t)
 			},
-			Updated: func(t *sku.Transacted2) (err error) {
+			Updated: func(t *sku.Transacted) (err error) {
 				if err = newOrUpdated(t); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -95,7 +95,7 @@ func makeTypStore(
 
 				return s.LogWriter.Updated(t)
 			},
-			Unchanged: func(t *sku.Transacted2) (err error) {
+			Unchanged: func(t *sku.Transacted) (err error) {
 				return s.LogWriter.Unchanged(t)
 			},
 		},
@@ -112,12 +112,12 @@ func (s typStore) Flush() (err error) {
 	return
 }
 
-func (s typStore) AddOne(t *sku.Transacted2) (err error) {
+func (s typStore) AddOne(t *sku.Transacted) (err error) {
 	s.StoreUtil.GetKonfigPtr().AddTyp(t)
 	return
 }
 
-func (s typStore) UpdateOne(t *sku.Transacted2) (err error) {
+func (s typStore) UpdateOne(t *sku.Transacted) (err error) {
 	log.Log().Printf("adding one: %s", t.GetSkuLike())
 	s.StoreUtil.GetKonfigPtr().AddTyp(t)
 	log.Log().Printf("done adding one: %s", t.GetSkuLike())
@@ -130,7 +130,7 @@ func (s typStore) ReadAllSchwanzen(
 ) (err error) {
 	// TODO-P2 switch to pointers
 	if err = s.StoreUtil.GetKonfig().Typen.EachPtr(
-		func(e *sku.Transacted2) (err error) {
+		func(e *sku.Transacted) (err error) {
 			return f(e)
 		},
 	); err != nil {
@@ -149,7 +149,7 @@ func (s typStore) ReadAll(
 			return
 		}
 
-		var te *sku.Transacted2
+		var te *sku.Transacted
 
 		if te, err = s.InflateFromSku(sk); err != nil {
 			if errors.Is(err, toml.Error{}) {
@@ -178,7 +178,7 @@ func (s typStore) ReadAll(
 
 func (s typStore) ReadOne(
 	k1 schnittstellen.StringerGattungGetter,
-) (tt *sku.Transacted2, err error) {
+) (tt *sku.Transacted, err error) {
 	var k kennung.Typ
 
 	if err = k.Set(k1.String()); err != nil {

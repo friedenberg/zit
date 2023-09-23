@@ -31,7 +31,7 @@ func MakeFormatterTypActionNames(
 
 func (e formatterTypActionNames) Format(
 	w io.Writer,
-	z *sku.Transacted2,
+	z *sku.Transacted,
 ) (n int64, err error) {
 	e1 := typ_akte.MakeFormatterActionNames()
 

@@ -9,7 +9,7 @@ import (
 )
 
 type ExternalMaybeGetterReader2 interface {
-	ReadOne(*sku.Transacted2) (*objekte.CheckedOut2, error)
+	ReadOne(*sku.Transacted) (*objekte.CheckedOut2, error)
 }
 
 type externalMaybeGetterReader2 struct {
@@ -34,7 +34,7 @@ func MakeExternalMaybeGetterReader2(
 }
 
 func (emgr externalMaybeGetterReader2) ReadOne(
-	sk2 *sku.Transacted2,
+	sk2 *sku.Transacted,
 ) (co *objekte.CheckedOut2, err error) {
 	co = &objekte.CheckedOut2{
 		Internal: *sk2,
@@ -49,7 +49,7 @@ func (emgr externalMaybeGetterReader2) ReadOne(
 		return
 	}
 
-	var e2 *sku.External2
+	var e2 *sku.External
 
 	if e2, err = emgr.ReadOneExternal(e, sk2); err != nil {
 		if errors.IsNotExist(err) {

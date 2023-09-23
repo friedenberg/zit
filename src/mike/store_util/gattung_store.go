@@ -28,8 +28,8 @@ type CommonStoreDelegate[
 	K kennung.KennungLike[K],
 	KPtr kennung.KennungLikePtr[K],
 ] interface {
-	AddOne(*sku.Transacted2) error
-	UpdateOne(*sku.Transacted2) error
+	AddOne(*sku.Transacted) error
+	UpdateOne(*sku.Transacted) error
 }
 
 type CommonStore[
@@ -44,7 +44,7 @@ type CommonStore[
 	objekte_store.CreateOrUpdater[
 		OPtr,
 		KPtr,
-		*sku.Transacted2,
+		*sku.Transacted,
 		*objekte.CheckedOut[K, KPtr],
 	]
 }
@@ -143,7 +143,7 @@ func (s *CommonStore[O, OPtr, K, KPtr]) CheckoutOne(
 
 	if f, err = files.CreateExclusiveWriteOnly(p); err != nil {
 		if errors.IsExist(err) {
-			var e *sku.External2
+			var e *sku.External
 
 			if e, err = s.ReadOneExternal(
 				sku.ExternalMaybe{

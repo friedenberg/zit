@@ -15,7 +15,7 @@ type ExternalReader interface {
 	ReadOneExternal(
 		em *sku.ExternalMaybe,
 		t sku.SkuLikePtr,
-	) (e *sku.External2, err error)
+	) (e *sku.External, err error)
 
 	ReadOneExternalObjekte(
 		e sku.SkuLikeExternalPtr,
@@ -31,7 +31,7 @@ type ExternalReader interface {
 func (s *common) ReadOneExternal(
 	em *sku.ExternalMaybe,
 	t sku.SkuLikePtr,
-) (e *sku.External2, err error) {
+) (e *sku.External, err error) {
 	var m checkout_mode.Mode
 
 	if m, err = em.GetFDs().GetCheckoutMode(); err != nil {
@@ -39,7 +39,7 @@ func (s *common) ReadOneExternal(
 		return
 	}
 
-	e = &sku.External2{}
+	e = &sku.External{}
 
 	if err = e.ResetWithExternalMaybe(*em); err != nil {
 		err = errors.Wrap(err)

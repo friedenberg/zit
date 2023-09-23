@@ -78,7 +78,7 @@ type compiled struct {
 
 	hasChanges bool
 
-	Sku sku.Transacted2
+	Sku sku.Transacted
 
 	erworben.Akte
 
@@ -92,7 +92,7 @@ type compiled struct {
 	// Typen
 	ExtensionsToTypen map[string]string
 	TypenToExtensions map[string]string
-	DefaultTyp        sku.Transacted2 // deprecated
+	DefaultTyp        sku.Transacted // deprecated
 	Typen             sku.TransactedMutableSet
 	InlineTypen       schnittstellen.SetLike[values.String]
 
@@ -267,7 +267,7 @@ func (kc *compiled) recompile(
 	}()
 
 	if err = kc.Typen.EachPtr(
-		func(ct *sku.Transacted2) (err error) {
+		func(ct *sku.Transacted) (err error) {
 			var ta *typ_akte.V0
 
 			if ta, err = tagp.GetAkte(ct.GetAkteSha()); err != nil {
@@ -348,7 +348,7 @@ func (c compiled) GetZettelFileExtension() string {
 // TODO-P3 merge all the below
 func (c compiled) GetSortedTypenExpanded(
 	v string,
-) (expandedActual []*sku.Transacted2) {
+) (expandedActual []*sku.Transacted) {
 	expandedMaybe := collections_value.MakeMutableValueSet[values.String](nil)
 
 	sa := iter.MakeFuncSetString[
@@ -357,7 +357,7 @@ func (c compiled) GetSortedTypenExpanded(
 	](expandedMaybe)
 
 	typExpander.Expand(sa, v)
-	expandedActual = make([]*sku.Transacted2, 0)
+	expandedActual = make([]*sku.Transacted, 0)
 
 	expandedMaybe.Each(
 		func(v values.String) (err error) {
@@ -416,7 +416,7 @@ func (kc compiled) GetApproximatedTyp(
 	return
 }
 
-func (kc compiled) GetKasten(k kennung.Kasten) (ct *sku.Transacted2) {
+func (kc compiled) GetKasten(k kennung.Kasten) (ct *sku.Transacted) {
 	if ct1, ok := kc.Kisten.GetPtr(k.String()); ok {
 		ct = sku.GetTransactedPool().Get()
 		errors.PanicIfError(ct.SetFromSkuLike(ct1))
@@ -469,7 +469,7 @@ func (k *compiled) AddKasten(
 		return
 	}
 
-	err = iter2.AddPtrOrReplaceIfGreater[sku.Transacted2, *sku.Transacted2](
+	err = iter2.AddPtrOrReplaceIfGreater[sku.Transacted, *sku.Transacted](
 		k.Kisten,
 		sku.TransactedLessor,
 		b,
@@ -484,20 +484,7 @@ func (k *compiled) AddKasten(
 }
 
 func (k *compiled) AddTyp(
-	a *sku.Transacted2,
-) (err error) {
-	b := sku.GetTransactedPool().Get()
-
-	if err = b.SetFromSkuLike(a); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return k.AddTyp2(b)
-}
-
-func (k *compiled) AddTyp2(
-	b *sku.Transacted2,
+	b *sku.Transacted,
 ) (err error) {
 	if err = gattung.Typ.AssertGattung(b); err != nil {
 		err = errors.Wrap(err)
@@ -509,7 +496,7 @@ func (k *compiled) AddTyp2(
 
 	k.hasChanges = true
 
-	err = iter2.AddPtrOrReplaceIfGreater[sku.Transacted2, *sku.Transacted2](
+	err = iter2.AddPtrOrReplaceIfGreater[sku.Transacted, *sku.Transacted](
 		k.Typen,
 		sku.TransactedLessor,
 		b,
@@ -523,5 +510,5 @@ func (k *compiled) AddTyp2(
 	return
 }
 
-func (c *compiled) applyExpandedTyp(ct sku.Transacted2) {
+func (c *compiled) applyExpandedTyp(ct sku.Transacted) {
 }

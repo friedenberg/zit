@@ -22,7 +22,7 @@ type StoredParseSaver[
 ] interface {
 	ParseSaveStored(
 		sem sku.ExternalMaybe,
-		t *sku.External2,
+		t *sku.External,
 	) (a OPtr, err error)
 }
 
@@ -64,7 +64,7 @@ func MakeStoredParseSaver[
 
 func (h storedParserSaver[O, OPtr, K, KPtr]) ParseSaveStored(
 	sem sku.ExternalMaybe,
-	t *sku.External2,
+	t *sku.External,
 ) (o OPtr, err error) {
 	var f *os.File
 

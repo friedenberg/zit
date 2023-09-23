@@ -6,26 +6,26 @@ import (
 )
 
 var (
-	poolTransacted schnittstellen.Pool[Transacted2, *Transacted2]
-	poolExternal   schnittstellen.Pool[External2, *External2]
+	poolTransacted schnittstellen.Pool[Transacted, *Transacted]
+	poolExternal   schnittstellen.Pool[External, *External]
 )
 
 func init() {
-	poolTransacted = pool.MakePool[Transacted2, *Transacted2](
+	poolTransacted = pool.MakePool[Transacted, *Transacted](
 		nil,
 		nil,
 	)
 
-	poolExternal = pool.MakePool[External2, *External2](
+	poolExternal = pool.MakePool[External, *External](
 		nil,
 		nil,
 	)
 }
 
-func GetTransactedPool() schnittstellen.Pool[Transacted2, *Transacted2] {
+func GetTransactedPool() schnittstellen.Pool[Transacted, *Transacted] {
 	return poolTransacted
 }
 
-func GetExternalPool() schnittstellen.Pool[External2, *External2] {
+func GetExternalPool() schnittstellen.Pool[External, *External] {
 	return poolExternal
 }

@@ -706,8 +706,8 @@ func MakeMatcherFuncIter[T Matchable](m Matcher) schnittstellen.FuncIter[T] {
 	}
 }
 
-func MakeMatcherFuncIter2(m Matcher) schnittstellen.FuncIter[*sku.Transacted2] {
-	return func(e *sku.Transacted2) (err error) {
+func MakeMatcherFuncIter2(m Matcher) schnittstellen.FuncIter[*sku.Transacted] {
+	return func(e *sku.Transacted) (err error) {
 		if !m.ContainsMatchable(e) {
 			err = iter.MakeErrStopIteration()
 			return

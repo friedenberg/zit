@@ -117,7 +117,7 @@ func (c Add) RunWithCwdQuery(
 	otFlags.RootEtiketten = c.Metadatei.Etiketten
 	mwk := objekte_collections.MakeMutableSetMetadateiWithKennung()
 	zettelsFromAkteResults.Each(
-		func(z *sku.Transacted2) (err error) {
+		func(z *sku.Transacted) (err error) {
 			return mwk.Add(z.GetSkuLike())
 		},
 	)
@@ -206,7 +206,7 @@ func (c Add) openAktenIfNecessary(
 	hs := collections_value.MakeMutableValueSet[values.String](nil)
 
 	zettels.Each(
-		func(z *sku.Transacted2) (err error) {
+		func(z *sku.Transacted) (err error) {
 			return hs.Add(values.MakeString(z.GetKennung().String()))
 		},
 	)

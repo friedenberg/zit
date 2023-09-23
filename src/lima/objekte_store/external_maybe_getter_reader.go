@@ -15,7 +15,7 @@ type ExternalMaybeGetterReader[
 	KPtr kennung.KennungLikePtr[K],
 ] interface {
 	ReadOne(
-		sku.Transacted2,
+		sku.Transacted,
 	) (*objekte.CheckedOut[K, KPtr], error)
 }
 
@@ -51,7 +51,7 @@ func MakeExternalMaybeGetterReader[
 }
 
 func (emgr externalMaybeGetterReader[O, OPtr, K, KPtr]) ReadOne(
-	i sku.Transacted2,
+	i sku.Transacted,
 ) (co *objekte.CheckedOut[K, KPtr], err error) {
 	co = &objekte.CheckedOut[K, KPtr]{
 		Internal: i,
@@ -66,7 +66,7 @@ func (emgr externalMaybeGetterReader[O, OPtr, K, KPtr]) ReadOne(
 		return
 	}
 
-	var ex *sku.External2
+	var ex *sku.External
 
 	if ex, err = emgr.ReadOneExternal(*e, &i); err != nil {
 		if errors.IsNotExist(err) {

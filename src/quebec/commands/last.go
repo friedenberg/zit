@@ -73,7 +73,7 @@ func (c Last) runWithBestandsaufnahm(
 ) (err error) {
 	s := u.StoreObjekten()
 
-	var b *sku.Transacted2
+	var b *sku.Transacted
 
 	if b, err = s.GetBestandsaufnahmeStore().ReadLast(); err != nil {
 		err = errors.Wrap(err)
@@ -89,7 +89,7 @@ func (c Last) runWithBestandsaufnahm(
 
 	errors.TodoP3("support log line format for skus")
 	if err = a.Skus.EachPtr(
-		func(sk *sku.Transacted2) (err error) {
+		func(sk *sku.Transacted) (err error) {
 			return f(sk)
 		},
 	); err != nil {

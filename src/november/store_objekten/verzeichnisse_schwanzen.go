@@ -22,7 +22,7 @@ type verzeichnisseSchwanzen struct {
 
 func makeVerzeichnisseSchwanzen(
 	sa store_util.StoreUtil,
-	p schnittstellen.Pool[sku.Transacted2, *sku.Transacted2],
+	p schnittstellen.Pool[sku.Transacted, *sku.Transacted],
 	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
 ) (s *verzeichnisseSchwanzen, err error) {
 	s = &verzeichnisseSchwanzen{
@@ -61,7 +61,7 @@ func (s *verzeichnisseSchwanzen) Flush() (err error) {
 
 func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 	h kennung.Kennung,
-) (found *sku.Transacted2, err error) {
+) (found *sku.Transacted, err error) {
 	var n int
 
 	if n, err = s.Zettelen.PageForKennung(h); err != nil {
@@ -71,12 +71,12 @@ func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 
 	errors.Log().Printf("searching page %d", n)
 
-	w := func(zv *sku.Transacted2) (err error) {
+	w := func(zv *sku.Transacted) (err error) {
 		if !kennung.Equals(zv.GetKennung(), h) {
 			return
 		}
 
-		found = &sku.Transacted2{}
+		found = &sku.Transacted{}
 		found.ResetWith(*zv)
 
 		err = collections.MakeErrStopIteration()
@@ -105,7 +105,7 @@ func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 }
 
 func (s *verzeichnisseSchwanzen) applyKonfig(
-	z *sku.Transacted2,
+	z *sku.Transacted,
 ) (err error) {
 	if !s.su.GetKonfig().HasChanges() {
 		return

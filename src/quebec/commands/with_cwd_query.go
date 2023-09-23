@@ -79,7 +79,7 @@ func (c commandWithCwdQuery) Complete(
 
 	if cg.Contains(gattung.Typ) {
 		if err = u.Konfig().Typen.EachPtr(
-			func(tt *sku.Transacted2) (err error) {
+			func(tt *sku.Transacted) (err error) {
 				if err = errors.Out().Printf("%s\tTyp", tt.GetKennung()); err != nil {
 					err = errors.IsAsNilOrWrapf(
 						err,

@@ -49,7 +49,7 @@ type Umwelt struct {
 	age                   *age.Age
 	storeWorkingDirectory *store_fs.Store
 
-	zettelVerzeichnissePool schnittstellen.Pool[sku.Transacted2, *sku.Transacted2]
+	zettelVerzeichnissePool schnittstellen.Pool[sku.Transacted, *sku.Transacted]
 }
 
 func Make(kCli erworben.Cli, options Options) (u *Umwelt, err error) {
@@ -57,7 +57,7 @@ func Make(kCli erworben.Cli, options Options) (u *Umwelt, err error) {
 		in:                      os.Stdin,
 		out:                     os.Stdout,
 		err:                     os.Stderr,
-		zettelVerzeichnissePool: pool.MakePoolWithReset[sku.Transacted2, *sku.Transacted2](),
+		zettelVerzeichnissePool: pool.MakePoolWithReset[sku.Transacted, *sku.Transacted](),
 		erworbenCli:             kCli,
 	}
 

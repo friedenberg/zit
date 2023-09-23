@@ -33,8 +33,8 @@ type TransactedInflator[
 ] interface {
 	InflateFromSkuLike(
 		sku.SkuLike,
-	) (*sku.Transacted2, error)
-	InflatorStorer[*sku.Transacted2]
+	) (*sku.Transacted, error)
+	InflatorStorer[*sku.Transacted]
 	InflateFromSkuAndStore(sku.SkuLike) error
 }
 
@@ -51,8 +51,8 @@ type transactedInflator[
 	options                   objekte_format.Options
 	akteFormat                objekte.AkteFormat[A, APtr]
 	pool                      schnittstellen.Pool[
-		sku.Transacted2,
-		*sku.Transacted2,
+		sku.Transacted,
+		*sku.Transacted,
 	]
 }
 
@@ -69,8 +69,8 @@ func MakeTransactedInflator[
 	op objekte_format.Options,
 	akteFormat objekte.AkteFormat[A, APtr],
 	pool schnittstellen.Pool[
-		sku.Transacted2,
-		*sku.Transacted2,
+		sku.Transacted,
+		*sku.Transacted,
 	],
 ) *transactedInflator[A, APtr, K, KPtr] {
 	return &transactedInflator[A, APtr, K, KPtr]{
@@ -86,9 +86,9 @@ func MakeTransactedInflator[
 
 func (h *transactedInflator[A, APtr, K, KPtr]) InflateFromSkuLike(
 	o sku.SkuLike,
-) (t *sku.Transacted2, err error) {
+) (t *sku.Transacted, err error) {
 	if h.pool == nil {
-		t = new(sku.Transacted2)
+		t = new(sku.Transacted)
 	} else {
 		t = h.pool.Get()
 	}
@@ -139,9 +139,9 @@ func (h *transactedInflator[A, APtr, K, KPtr]) InflateFromSkuLike(
 
 func (h *transactedInflator[A, APtr, K, KPtr]) InflateFromSku(
 	o sku.SkuLike,
-) (t *sku.Transacted2, err error) {
+) (t *sku.Transacted, err error) {
 	if h.pool == nil {
-		t = new(sku.Transacted2)
+		t = new(sku.Transacted)
 	} else {
 		t = h.pool.Get()
 	}
@@ -173,7 +173,7 @@ func (h *transactedInflator[A, APtr, K, KPtr]) InflateFromSku(
 }
 
 func (h *transactedInflator[A, APtr, K, KPtr]) StoreAkte(
-	t *sku.Transacted2,
+	t *sku.Transacted,
 ) (err error) {
 	var aw sha.WriteCloser
 
@@ -195,7 +195,7 @@ func (h *transactedInflator[A, APtr, K, KPtr]) StoreAkte(
 }
 
 func (h *transactedInflator[A, APtr, K, KPtr]) StoreObjekte(
-	t *sku.Transacted2,
+	t *sku.Transacted,
 ) (err error) {
 	if h.storeVersion.GetInt() >= 3 {
 		return
@@ -228,7 +228,7 @@ func (h *transactedInflator[A, APtr, K, KPtr]) StoreObjekte(
 func (h *transactedInflator[A, APtr, K, KPtr]) InflateFromSkuAndStore(
 	o sku.SkuLike,
 ) (err error) {
-	var t *sku.Transacted2
+	var t *sku.Transacted
 
 	if t, err = h.InflateFromSku(o); err != nil {
 		err = errors.Wrap(err)
@@ -245,7 +245,7 @@ func (h *transactedInflator[A, APtr, K, KPtr]) InflateFromSkuAndStore(
 
 func (h *transactedInflator[A, APtr, K, KPtr]) readObjekte(
 	sk sku.SkuLike,
-	t *sku.Transacted2,
+	t *sku.Transacted,
 ) (err error) {
 	if sk.GetObjekteSha().IsNull() {
 		return
@@ -288,7 +288,7 @@ func (h *transactedInflator[A, APtr, K, KPtr]) readObjekte(
 }
 
 func (h *transactedInflator[A, APtr, K, KPtr]) readAkte(
-	t *sku.Transacted2,
+	t *sku.Transacted,
 	a APtr,
 ) (err error) {
 	if h.akteFormat == nil {

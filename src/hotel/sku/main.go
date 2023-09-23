@@ -1,10 +1,17 @@
 package sku
 
 import (
+	"encoding/gob"
+
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
+
+func init() {
+	gob.Register(Transacted{})
+	gob.Register(External{})
+}
 
 type (
 	Getter interface {

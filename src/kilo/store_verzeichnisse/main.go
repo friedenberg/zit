@@ -21,7 +21,7 @@ const (
 type Zettelen struct {
 	erworben konfig.Compiled
 	path     string
-	pool     schnittstellen.Pool[sku.Transacted2, *sku.Transacted2]
+	pool     schnittstellen.Pool[sku.Transacted, *sku.Transacted]
 	schnittstellen.VerzeichnisseFactory
 	pages [PageCount]*Page
 }
@@ -35,7 +35,7 @@ func MakeZettelen(
 	k konfig.Compiled,
 	dir string,
 	f schnittstellen.VerzeichnisseFactory,
-	p schnittstellen.Pool[sku.Transacted2, *sku.Transacted2],
+	p schnittstellen.Pool[sku.Transacted, *sku.Transacted],
 	fff PageDelegateGetter,
 ) (i *Zettelen, err error) {
 	i = &Zettelen{
@@ -59,7 +59,7 @@ func MakeZettelen(
 	return
 }
 
-func (i Zettelen) Pool() schnittstellen.Pool[sku.Transacted2, *sku.Transacted2] {
+func (i Zettelen) Pool() schnittstellen.Pool[sku.Transacted, *sku.Transacted] {
 	errors.TodoP4("rename to GetPool")
 	return i.pool
 }
@@ -142,7 +142,7 @@ func (i *Zettelen) AddVerzeichnisse(
 }
 
 func (i *Zettelen) GetPageIndexKeyValue(
-	zt sku.Transacted2,
+	zt sku.Transacted,
 ) (key string, value string) {
 	key = zt.Kennung.String()
 	value = fmt.Sprintf("%s.%s", zt.GetTai(), zt.ObjekteSha)
@@ -150,7 +150,7 @@ func (i *Zettelen) GetPageIndexKeyValue(
 }
 
 func (i *Zettelen) ReadMany(
-	ws ...schnittstellen.FuncIter[*sku.Transacted2],
+	ws ...schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	errors.TodoP3("switch to single writer and force callers to make chains")
 
@@ -169,7 +169,7 @@ func (i *Zettelen) ReadMany(
 		}
 	}
 
-	w := pool.MakePooledChain[sku.Transacted2](
+	w := pool.MakePooledChain[sku.Transacted](
 		i.pool,
 		ws...,
 	)

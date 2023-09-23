@@ -9,7 +9,7 @@ import (
 func (s *CommonStore[O, OPtr, K, KPtr]) ReadOneExternal(
 	em sku.ExternalMaybe,
 	t sku.SkuLikePtr,
-) (e *sku.External2, err error) {
+) (e *sku.External, err error) {
 	var m checkout_mode.Mode
 
 	if m, err = em.GetFDs().GetCheckoutMode(); err != nil {

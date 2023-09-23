@@ -14,24 +14,24 @@ import (
 // TODO-P3 move to collections
 type Schwanzen struct {
 	lock         *sync.RWMutex
-	hinweisen    map[string]sku.Transacted2
+	hinweisen    map[string]sku.Transacted
 	etikettIndex kennung_index.EtikettIndex
-	funcFlush    schnittstellen.FuncIter[*sku.Transacted2]
+	funcFlush    schnittstellen.FuncIter[*sku.Transacted]
 }
 
 func MakeSchwanzen(
 	ei kennung_index.EtikettIndex,
-	funcFlush schnittstellen.FuncIter[*sku.Transacted2],
+	funcFlush schnittstellen.FuncIter[*sku.Transacted],
 ) *Schwanzen {
 	return &Schwanzen{
 		lock:         &sync.RWMutex{},
-		hinweisen:    make(map[string]sku.Transacted2),
+		hinweisen:    make(map[string]sku.Transacted),
 		etikettIndex: ei,
 		funcFlush:    funcFlush,
 	}
 }
 
-func (zws *Schwanzen) Less(zt *sku.Transacted2) (ok bool) {
+func (zws *Schwanzen) Less(zt *sku.Transacted) (ok bool) {
 	zws.lock.RLock()
 	defer zws.lock.RUnlock()
 
@@ -61,7 +61,7 @@ func (zws *Schwanzen) Get(h kennung.Kennung) (t kennung.Tai, ok bool) {
 	return
 }
 
-func (zws *Schwanzen) Set(z *sku.Transacted2, flush bool) (ok bool) {
+func (zws *Schwanzen) Set(z *sku.Transacted, flush bool) (ok bool) {
 	zws.lock.Lock()
 	defer zws.lock.Unlock()
 
@@ -91,7 +91,7 @@ func (zws *Schwanzen) Set(z *sku.Transacted2, flush bool) (ok bool) {
 }
 
 func (zws *Schwanzen) ShouldAddVerzeichnisse(
-	z *sku.Transacted2,
+	z *sku.Transacted,
 ) (err error) {
 	if ok := zws.Set(z, false); !ok {
 		err = collections.MakeErrStopIteration()
@@ -102,7 +102,7 @@ func (zws *Schwanzen) ShouldAddVerzeichnisse(
 }
 
 func (zws *Schwanzen) ShouldFlushVerzeichnisse(
-	z *sku.Transacted2,
+	z *sku.Transacted,
 ) (err error) {
 	if ok := zws.Set(z, true); !ok {
 		err = collections.MakeErrStopIteration()

@@ -55,7 +55,7 @@ func makeEtikettStore(
 		return
 	}
 
-	newOrUpdated := func(t *sku.Transacted2) (err error) {
+	newOrUpdated := func(t *sku.Transacted) (err error) {
 		s.StoreUtil.CommitUpdatedTransacted(t)
 
 		if err = s.StoreUtil.GetKonfigPtr().AddEtikett(t); err != nil {
@@ -77,8 +77,8 @@ func makeEtikettStore(
 		sa.ObjekteReaderWriterFactory(gattung.Etikett),
 		sa,
 		EtikettTransactedReader(s),
-		objekte_store.CreateOrUpdateDelegate[*sku.Transacted2]{
-			New: func(t *sku.Transacted2) (err error) {
+		objekte_store.CreateOrUpdateDelegate[*sku.Transacted]{
+			New: func(t *sku.Transacted) (err error) {
 				if err = newOrUpdated(t); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -86,7 +86,7 @@ func makeEtikettStore(
 
 				return s.LogWriter.New(t)
 			},
-			Updated: func(t *sku.Transacted2) (err error) {
+			Updated: func(t *sku.Transacted) (err error) {
 				if err = newOrUpdated(t); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -94,7 +94,7 @@ func makeEtikettStore(
 
 				return s.LogWriter.Updated(t)
 			},
-			Unchanged: func(t *sku.Transacted2) (err error) {
+			Unchanged: func(t *sku.Transacted) (err error) {
 				return s.LogWriter.Unchanged(t)
 			},
 		},
@@ -111,19 +111,19 @@ func (s etikettStore) Flush() (err error) {
 	return
 }
 
-func (s etikettStore) AddOne(t *sku.Transacted2) (err error) {
+func (s etikettStore) AddOne(t *sku.Transacted) (err error) {
 	s.StoreUtil.GetKonfigPtr().AddEtikett(t)
 	return
 }
 
-func (s etikettStore) UpdateOne(t *sku.Transacted2) (err error) {
+func (s etikettStore) UpdateOne(t *sku.Transacted) (err error) {
 	s.StoreUtil.GetKonfigPtr().AddEtikett(t)
 	return
 }
 
 func (s etikettStore) ReadOne(
 	k schnittstellen.StringerGattungGetter,
-) (tt *sku.Transacted2, err error) {
+) (tt *sku.Transacted, err error) {
 	var e kennung.Etikett
 
 	if err = e.Set(k.String()); err != nil {
@@ -152,7 +152,7 @@ func (s etikettStore) ReadAllSchwanzen(
 	f schnittstellen.FuncIter[sku.SkuLikePtr],
 ) (err error) {
 	if err = s.StoreUtil.GetKonfig().EachEtikett(
-		func(e *sku.Transacted2) (err error) {
+		func(e *sku.Transacted) (err error) {
 			return f(e)
 		},
 	); err != nil {
@@ -171,7 +171,7 @@ func (s etikettStore) ReadAll(
 			return
 		}
 
-		var te *sku.Transacted2
+		var te *sku.Transacted
 
 		if te, err = s.InflateFromSku(o); err != nil {
 			if errors.Is(err, toml.Error{}) {

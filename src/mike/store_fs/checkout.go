@@ -56,7 +56,7 @@ func (s *Store) Checkout(
 			zettel.MakeWriterKonfig(s.erworben, s.storeObjekten.Typ()),
 			ztw,
 			func(sk sku.SkuLikePtr) (err error) {
-				var z sku.Transacted2
+				var z sku.Transacted
 
 				if err = z.SetFromSkuLike(sk); err != nil {
 					err = errors.Wrap(err)
@@ -154,7 +154,7 @@ func (s *Store) checkoutOneGeneric(
 	t sku.SkuLikePtr,
 ) (cop objekte.CheckedOutLikePtr, err error) {
 	switch tt := t.(type) {
-	case *sku.Transacted2:
+	case *sku.Transacted:
 		cop, err = s.CheckoutOneZettel(options, tt)
 
 		if err != nil {

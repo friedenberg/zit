@@ -43,7 +43,7 @@ func (c ZettelFromExternalAkte) Run(
 	fds := iter.SortedValues(ms.GetCwdFDs())
 
 	for _, fd := range fds {
-		var z *sku.External2
+		var z *sku.External
 
 		if z, err = c.zettelForAkte(fd); err != nil {
 			err = errors.Wrap(err)
@@ -64,7 +64,7 @@ func (c ZettelFromExternalAkte) Run(
 			iter.MakeChain(
 				matcher.Match,
 				func(sk sku.SkuLikePtr) (err error) {
-					z := &sku.Transacted2{}
+					z := &sku.Transacted{}
 
 					if err = z.SetFromSkuLike(sk); err != nil {
 						err = errors.Wrap(err)
@@ -81,7 +81,7 @@ func (c ZettelFromExternalAkte) Run(
 	}
 
 	if err = results.Each(
-		func(z *sku.Transacted2) (err error) {
+		func(z *sku.Transacted) (err error) {
 			if c.ProtoZettel.Apply(z) {
 				if z, err = c.StoreObjekten().Zettel().Update(
 					z,
@@ -113,7 +113,7 @@ func (c ZettelFromExternalAkte) Run(
 			return
 		}
 
-		var tz *sku.Transacted2
+		var tz *sku.Transacted
 
 		if tz, err = c.StoreObjekten().Zettel().Create(z); err != nil {
 			err = errors.Wrap(err)
@@ -162,14 +162,14 @@ func (c ZettelFromExternalAkte) Run(
 
 func (c *ZettelFromExternalAkte) zettelForAkte(
 	akteFD kennung.FD,
-) (z *sku.External2, err error) {
-	z = &sku.External2{
+) (z *sku.External, err error) {
+	z = &sku.External{
 		FDs: sku.ExternalFDs{
 			Akte: akteFD,
 		},
 	}
 
-	z.Transacted2.Kennung.KennungPtr = &kennung.Hinweis{}
+	z.Transacted.Kennung.KennungPtr = &kennung.Hinweis{}
 
 	var r io.Reader
 

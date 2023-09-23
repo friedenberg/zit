@@ -220,7 +220,7 @@ func (s *konfigStore) ReadAll(
 
 func (s konfigStore) ReadOne(
 	k schnittstellen.StringerGattungGetter,
-) (tt *sku.Transacted2, err error) {
+) (tt *sku.Transacted, err error) {
 	var k1 kennung.Konfig
 
 	if err = k1.Set(k.String()); err != nil {

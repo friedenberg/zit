@@ -8,7 +8,7 @@ import (
 
 type (
 	FuncReaderTransacted[T sku.SkuLike]       func(schnittstellen.FuncIter[T]) error
-	FuncReaderTransacted2                     func(schnittstellen.FuncIter[*sku.Transacted2]) error
+	FuncReaderTransacted2                     func(schnittstellen.FuncIter[*sku.Transacted]) error
 	FuncReaderTransactedPtr[T sku.SkuLikePtr] func(schnittstellen.FuncIter[T]) error
 	FuncReaderTransactedLike                  func(schnittstellen.FuncIter[sku.SkuLike]) error
 	FuncReaderTransactedLikePtr               func(schnittstellen.FuncIter[sku.SkuLikePtr]) error
@@ -17,7 +17,7 @@ type (
 type (
 	FuncQuerierTransacted[T sku.SkuLike]       func(matcher.MatcherSigil, schnittstellen.FuncIter[T]) error
 	FuncQuerierTransactedPtr[T sku.SkuLikePtr] func(matcher.MatcherSigil, schnittstellen.FuncIter[T]) error
-	FuncQuerierTransactedPtr2                  func(matcher.MatcherSigil, schnittstellen.FuncIter[*sku.Transacted2]) error
+	FuncQuerierTransactedPtr2                  func(matcher.MatcherSigil, schnittstellen.FuncIter[*sku.Transacted]) error
 	FuncQuerierTransactedLike                  func(matcher.MatcherSigil, schnittstellen.FuncIter[sku.SkuLike]) error
 	FuncQuerierTransactedLikePtr               func(matcher.MatcherSigil, schnittstellen.FuncIter[sku.SkuLikePtr]) error
 )
@@ -41,7 +41,7 @@ func MakeApplyQueryTransactedLikePtr2[T sku.SkuLikePtr](
 	return func(ids matcher.MatcherSigil, fatl schnittstellen.FuncIter[sku.SkuLikePtr]) (err error) {
 		return fat(
 			ids,
-			func(e *sku.Transacted2) (err error) {
+			func(e *sku.Transacted) (err error) {
 				return fatl(e)
 			},
 		)
@@ -65,7 +65,7 @@ func MakeApplyTransactedLikePtr2(
 ) FuncReaderTransactedLikePtr {
 	return func(fatl schnittstellen.FuncIter[sku.SkuLikePtr]) (err error) {
 		return fat(
-			func(e *sku.Transacted2) (err error) {
+			func(e *sku.Transacted) (err error) {
 				return fatl(e)
 			},
 		)

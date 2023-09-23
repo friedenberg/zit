@@ -24,9 +24,9 @@ import (
 type Store interface {
 	AkteTextSaver
 	Create(*Akte) error
-	objekte_store.LastReader[*sku.Transacted2]
-	ReadOne(schnittstellen.Stringer) (*sku.Transacted2, error)
-	objekte_store.AllReader[*sku.Transacted2]
+	objekte_store.LastReader[*sku.Transacted]
+	ReadOne(schnittstellen.Stringer) (*sku.Transacted, error)
+	objekte_store.AllReader[*sku.Transacted]
 	ReadAllSkus(schnittstellen.FuncIter[sku.SkuLikePtr]) error
 	schnittstellen.AkteGetter[*Akte]
 }
@@ -120,7 +120,7 @@ func (s *store) Create(o *Akte) (err error) {
 		return
 	}
 
-	t := &sku.Transacted2{}
+	t := &sku.Transacted{}
 	t.Reset()
 	t.SetAkteSha(sh)
 	// TODO-P2 switch to clock
@@ -160,7 +160,7 @@ func (s *store) Create(o *Akte) (err error) {
 	return
 }
 
-func (s *store) readOnePath(p string) (o *sku.Transacted2, err error) {
+func (s *store) readOnePath(p string) (o *sku.Transacted, err error) {
 	var sh sha.Sha
 
 	if sh, err = sha.MakeShaFromPath(p); err != nil {
@@ -178,7 +178,7 @@ func (s *store) readOnePath(p string) (o *sku.Transacted2, err error) {
 
 func (s *store) ReadOne(
 	k schnittstellen.Stringer,
-) (o *sku.Transacted2, err error) {
+) (o *sku.Transacted, err error) {
 	var sh sha.Sha
 
 	if err = sh.Set(k.String()); err != nil {
@@ -195,7 +195,7 @@ func (s *store) ReadOne(
 
 	defer errors.DeferredCloser(&err, or)
 
-	o = &sku.Transacted2{}
+	o = &sku.Transacted{}
 	o.Reset()
 
 	if _, err = s.persistentMetadateiFormat.ParsePersistentMetadatei(
@@ -291,13 +291,13 @@ func (s *store) GetAkte(akteSha schnittstellen.ShaLike) (a *Akte, err error) {
 	return
 }
 
-func (s *store) ReadLast() (max *sku.Transacted2, err error) {
+func (s *store) ReadLast() (max *sku.Transacted, err error) {
 	l := &sync.Mutex{}
 
-	var maxSku sku.Transacted2
+	var maxSku sku.Transacted
 
 	if err = s.ReadAll(
-		func(b *sku.Transacted2) (err error) {
+		func(b *sku.Transacted) (err error) {
 			l.Lock()
 			defer l.Unlock()
 
@@ -331,7 +331,7 @@ func (s *store) ReadLast() (max *sku.Transacted2, err error) {
 }
 
 func (s *store) ReadAll(
-	f schnittstellen.FuncIter[*sku.Transacted2],
+	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	var p string
 
@@ -345,7 +345,7 @@ func (s *store) ReadAll(
 
 	if err = files.ReadDirNamesLevel2(
 		func(p string) (err error) {
-			var o *sku.Transacted2
+			var o *sku.Transacted
 
 			if o, err = s.readOnePath(p); err != nil {
 				err = errors.Wrap(err)
@@ -373,7 +373,7 @@ func (s *store) ReadAllSkus(
 	f schnittstellen.FuncIter[sku.SkuLikePtr],
 ) (err error) {
 	if err = s.ReadAll(
-		func(t *sku.Transacted2) (err error) {
+		func(t *sku.Transacted) (err error) {
 			var a *Akte
 
 			if a, err = s.GetAkte(t.GetAkteSha()); err != nil {
@@ -382,7 +382,7 @@ func (s *store) ReadAllSkus(
 			}
 
 			if err = a.Skus.EachPtr(
-				func(sk2 *sku.Transacted2) (err error) {
+				func(sk2 *sku.Transacted) (err error) {
 					return f(sk2)
 				},
 			); err != nil {
@@ -406,10 +406,10 @@ func (s *store) ReadAllSkus(
 }
 
 func (s *store) ReadAllSkus2(
-	f schnittstellen.FuncIter[*sku.Transacted2],
+	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	if err = s.ReadAll(
-		func(t *sku.Transacted2) (err error) {
+		func(t *sku.Transacted) (err error) {
 			var r io.ReadCloser
 
 			if r, err = s.af.AkteReader(t.GetAkteSha()); err != nil {

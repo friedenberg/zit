@@ -22,13 +22,13 @@ import (
 type CreateOrUpdator interface {
 	CreateOrUpdateCheckedOut(
 		co *objekte.CheckedOut2,
-	) (transactedPtr *sku.Transacted2, err error)
+	) (transactedPtr *sku.Transacted, err error)
 
 	CreateOrUpdateAkte(
 		mg metadatei.Getter,
 		kennungPtr *kennung.Kennung2,
 		sh schnittstellen.ShaLike,
-	) (transactedPtr *sku.Transacted2, err error)
+	) (transactedPtr *sku.Transacted, err error)
 }
 
 type Store struct {
@@ -59,7 +59,7 @@ type Store struct {
 
 func Make(
 	su store_util.StoreUtil,
-	p schnittstellen.Pool[sku.Transacted2, *sku.Transacted2],
+	p schnittstellen.Pool[sku.Transacted, *sku.Transacted],
 ) (s *Store, err error) {
 	s = &Store{
 		lock:      &sync.Mutex{},
@@ -167,7 +167,7 @@ func Make(
 		s.GetLockSmith(),
 		s,
 		s,
-		objekte_store.CreateOrUpdateDelegate[*sku.Transacted2]{
+		objekte_store.CreateOrUpdateDelegate[*sku.Transacted]{
 			New:       s.onNew,
 			Updated:   s.onUpdated,
 			Unchanged: s.onUnchanged,

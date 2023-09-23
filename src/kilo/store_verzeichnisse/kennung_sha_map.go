@@ -7,7 +7,7 @@ import (
 
 type KennungShaMap map[string]sha.Sha
 
-func (ksm KennungShaMap) ModifyMutter(z *sku.Transacted2) (err error) {
+func (ksm KennungShaMap) ModifyMutter(z *sku.Transacted) (err error) {
 	k := z.GetKennung()
 	old, ok := ksm[k.String()]
 
@@ -20,7 +20,7 @@ func (ksm KennungShaMap) ModifyMutter(z *sku.Transacted2) (err error) {
 	return
 }
 
-func (ksm KennungShaMap) SaveSha(z *sku.Transacted2) (err error) {
+func (ksm KennungShaMap) SaveSha(z *sku.Transacted) (err error) {
 	k := z.GetKennung()
 	ksm[k.String()] = z.GetMetadatei().Verzeichnisse.Sha
 

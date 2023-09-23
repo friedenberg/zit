@@ -4,4 +4,4 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
-type Transacted = sku.Transacted2
+type Transacted = sku.Transacted

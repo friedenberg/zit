@@ -14,7 +14,7 @@ import (
 
 type FormatBestandsaufnahmeScanner interface {
 	Error() error
-	GetTransacted() *sku.Transacted2
+	GetTransacted() *sku.Transacted
 	Scan() bool
 }
 
@@ -43,7 +43,7 @@ type bestandsaufnahmeScanner struct {
 	k  string
 
 	err     error
-	lastSku *sku.Transacted2
+	lastSku *sku.Transacted
 	lastN   int64
 }
 
@@ -55,7 +55,7 @@ func (f *bestandsaufnahmeScanner) Error() error {
 	return f.err
 }
 
-func (f *bestandsaufnahmeScanner) GetTransacted() *sku.Transacted2 {
+func (f *bestandsaufnahmeScanner) GetTransacted() *sku.Transacted {
 	return f.lastSku
 }
 
@@ -86,7 +86,7 @@ func (f *bestandsaufnahmeScanner) Scan() (ok bool) {
 		f.afterFirst = true
 	}
 
-	var h sku.Holder
+	var h sku.Transacted
 
 	n1, f.err = f.format.ParsePersistentMetadatei(f.br, &h, f.options)
 	f.lastN += n1
@@ -102,7 +102,7 @@ func (f *bestandsaufnahmeScanner) Scan() (ok bool) {
 
 	if f.lastSku, f.err = sku.MakeSkuLikeSansObjekteSha2(
 		h.Metadatei,
-		h.KennungLike,
+		h.Kennung,
 	); f.err != nil {
 		f.err = errors.Wrapf(f.err, "Bytes: %d", n1)
 		f.err = errors.Wrapf(f.err, "Sku: %v", h)

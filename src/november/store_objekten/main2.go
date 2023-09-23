@@ -14,7 +14,7 @@ import (
 )
 
 func (s *Store) onNewOrUpdated(
-	t *sku.Transacted2,
+	t *sku.Transacted,
 ) (err error) {
 	s.StoreUtil.CommitUpdatedTransacted(t)
 
@@ -22,13 +22,13 @@ func (s *Store) onNewOrUpdated(
 
 	switch g {
 	case gattung.Typ:
-		if err = s.StoreUtil.GetKonfigPtr().AddTyp2(t); err != nil {
+		if err = s.StoreUtil.GetKonfigPtr().AddTyp(t); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case gattung.Etikett:
-		if err = s.StoreUtil.GetKonfigPtr().AddEtikett2(t); err != nil {
+		if err = s.StoreUtil.GetKonfigPtr().AddEtikett(t); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -48,7 +48,7 @@ func (s *Store) onNewOrUpdated(
 }
 
 func (s *Store) onNew(
-	t *sku.Transacted2,
+	t *sku.Transacted,
 ) (err error) {
 	if err = s.onNewOrUpdated(t); err != nil {
 		err = errors.Wrap(err)
@@ -59,7 +59,7 @@ func (s *Store) onNew(
 }
 
 func (s *Store) onUpdated(
-	t *sku.Transacted2,
+	t *sku.Transacted,
 ) (err error) {
 	if err = s.onNewOrUpdated(t); err != nil {
 		err = errors.Wrap(err)
@@ -70,14 +70,14 @@ func (s *Store) onUpdated(
 }
 
 func (s *Store) onUnchanged(
-	t *sku.Transacted2,
+	t *sku.Transacted,
 ) (err error) {
 	return s.LogWriter.Unchanged(t)
 }
 
 func (s *Store) ReadOne(
 	k1 schnittstellen.StringerGattungGetter,
-) (sk1 *sku.Transacted2, err error) {
+) (sk1 *sku.Transacted, err error) {
 	var sk sku.SkuLike
 
 	switch k1.GetGattung() {

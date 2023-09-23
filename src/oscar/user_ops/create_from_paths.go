@@ -31,7 +31,7 @@ type CreateFromPaths struct {
 
 func (c CreateFromPaths) Run(
 	args ...string,
-) (results schnittstellen.MutableSetLike[*sku.Transacted2], err error) {
+) (results schnittstellen.MutableSetLike[*sku.Transacted], err error) {
 	// TODO-P3 support different modes of de-duplication
 	// TODO-P3 support merging of duplicated akten
 	toCreate := objekte_collections.MakeMutableSetUniqueFD()
@@ -40,7 +40,7 @@ func (c CreateFromPaths) Run(
 	for _, arg := range args {
 		if err = c.zettelsFromPath(
 			arg,
-			func(z *sku.External2) (err error) {
+			func(z *sku.External) (err error) {
 				toCreate.Add(z)
 				if c.Delete {
 					toDelete.Add(z)
@@ -74,7 +74,7 @@ func (c CreateFromPaths) Run(
 			iter.MakeChain(
 				matcher.Match,
 				func(sk sku.SkuLikePtr) (err error) {
-					var z sku.Transacted2
+					var z sku.Transacted
 
 					if err = z.SetFromSkuLike(sk); err != nil {
 						err = errors.Wrap(err)
@@ -96,9 +96,9 @@ func (c CreateFromPaths) Run(
 	}
 
 	err = results.Each(
-		func(z *sku.Transacted2) (err error) {
+		func(z *sku.Transacted) (err error) {
 			if c.ProtoZettel.Apply(z) {
-				var zt *sku.Transacted2
+				var zt *sku.Transacted
 
 				if zt, err = c.StoreObjekten().Zettel().Update(
 					z,
@@ -123,7 +123,7 @@ func (c CreateFromPaths) Run(
 
 			cz := checked_out.Zettel{}
 
-			var zt *sku.Transacted2
+			var zt *sku.Transacted
 
 			if zt, err = c.StoreObjekten().Zettel().Create(z); err != nil {
 				// TODO-P2 add file for error handling
@@ -132,7 +132,7 @@ func (c CreateFromPaths) Run(
 				return
 			}
 
-			if err = cz.External.Transacted2.SetFromSkuLike(zt); err != nil {
+			if err = cz.External.Transacted.SetFromSkuLike(zt); err != nil {
 				err = errors.Wrapf(err, "Sku: %q", sku_fmt.String(z))
 				return
 			}
@@ -156,7 +156,7 @@ func (c CreateFromPaths) Run(
 			// TODO-P4 get matches
 			cz.DetermineState(true)
 
-			zv := &sku.Transacted2{
+			zv := &sku.Transacted{
 				Kennung: kennung.Kennung2{KennungPtr: &kennung.Hinweis{}},
 			}
 
@@ -197,7 +197,7 @@ func (c CreateFromPaths) Run(
 // TODO-P1 migrate this to use store_working_directory
 func (c *CreateFromPaths) zettelsFromPath(
 	p string,
-	wf schnittstellen.FuncIter[*sku.External2],
+	wf schnittstellen.FuncIter[*sku.External],
 ) (err error) {
 	var r io.Reader
 

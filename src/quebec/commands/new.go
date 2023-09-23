@@ -119,7 +119,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			return
 		}
 	} else {
-		var zts schnittstellen.MutableSetLike[*sku.Transacted2]
+		var zts schnittstellen.MutableSetLike[*sku.Transacted]
 
 		if zts, err = c.readExistingFilesAsZettels(u, f, args...); err != nil {
 			err = errors.Wrap(err)
@@ -189,7 +189,7 @@ func (c New) readExistingFilesAsZettels(
 	u *umwelt.Umwelt,
 	f metadatei.TextParser,
 	args ...string,
-) (zts schnittstellen.MutableSetLike[*sku.Transacted2], err error) {
+) (zts schnittstellen.MutableSetLike[*sku.Transacted], err error) {
 	opCreateFromPath := user_ops.CreateFromPaths{
 		Umwelt:      u,
 		TextParser:  f,

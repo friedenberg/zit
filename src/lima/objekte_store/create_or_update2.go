@@ -19,26 +19,26 @@ type createOrUpdate2 struct {
 	clock                     kennung.Clock
 	ls                        schnittstellen.LockSmith
 	af                        schnittstellen.AkteWriterFactory
-	reader                    OneReader[*kennung.Kennung2, *sku.Transacted2]
-	delegate                  CreateOrUpdateDelegate[*sku.Transacted2]
+	reader                    OneReader[*kennung.Kennung2, *sku.Transacted]
+	delegate                  CreateOrUpdateDelegate[*sku.Transacted]
 	matchableAdder            matcher.MatchableAdder
 	persistentMetadateiFormat objekte_format.Format
 	options                   objekte_format.Options
 	kg                        konfig.Getter
-	pool                      schnittstellen.Pool[sku.Transacted2, *sku.Transacted2]
+	pool                      schnittstellen.Pool[sku.Transacted, *sku.Transacted]
 }
 
 func MakeCreateOrUpdate2(
 	clock kennung.Clock,
 	ls schnittstellen.LockSmith,
 	af schnittstellen.AkteWriterFactory,
-	reader OneReader[*kennung.Kennung2, *sku.Transacted2],
-	delegate CreateOrUpdateDelegate[*sku.Transacted2],
+	reader OneReader[*kennung.Kennung2, *sku.Transacted],
+	delegate CreateOrUpdateDelegate[*sku.Transacted],
 	ma matcher.MatchableAdder,
 	pmf objekte_format.Format,
 	op objekte_format.Options,
 	kg konfig.Getter,
-	pool schnittstellen.Pool[sku.Transacted2, *sku.Transacted2],
+	pool schnittstellen.Pool[sku.Transacted, *sku.Transacted],
 ) (cou *createOrUpdate2) {
 	if pmf == nil {
 		panic("nil persisted_metadatei_format.Format")
@@ -59,7 +59,7 @@ func MakeCreateOrUpdate2(
 
 func (cou createOrUpdate2) CreateOrUpdateCheckedOut(
 	co *objekte.CheckedOut2,
-) (transactedPtr *sku.Transacted2, err error) {
+) (transactedPtr *sku.Transacted, err error) {
 	kennungPtr := co.External.Kennung
 
 	if !cou.ls.IsAcquired() {
@@ -124,7 +124,7 @@ func (cou createOrUpdate2) CreateOrUpdateCheckedOut(
 func (cou createOrUpdate2) CreateOrUpdate(
 	mg metadatei.Getter,
 	kennungPtr *kennung.Kennung2,
-) (transactedPtr *sku.Transacted2, err error) {
+) (transactedPtr *sku.Transacted, err error) {
 	if !cou.ls.IsAcquired() {
 		err = ErrLockRequired{
 			Operation: fmt.Sprintf(
@@ -136,7 +136,7 @@ func (cou createOrUpdate2) CreateOrUpdate(
 		return
 	}
 
-	var mutter *sku.Transacted2
+	var mutter *sku.Transacted
 
 	if mutter, err = cou.reader.ReadOne(kennungPtr); err != nil {
 		if errors.Is(err, ErrNotFound{}) {
@@ -204,7 +204,7 @@ func (cou createOrUpdate2) CreateOrUpdateAkte(
 	mg metadatei.Getter,
 	kennungPtr *kennung.Kennung2,
 	sh schnittstellen.ShaLike,
-) (transactedPtr *sku.Transacted2, err error) {
+) (transactedPtr *sku.Transacted, err error) {
 	if !cou.ls.IsAcquired() {
 		err = ErrLockRequired{
 			Operation: fmt.Sprintf(
@@ -216,7 +216,7 @@ func (cou createOrUpdate2) CreateOrUpdateAkte(
 		return
 	}
 
-	var mutter *sku.Transacted2
+	var mutter *sku.Transacted
 
 	if mutter, err = cou.reader.ReadOne(kennungPtr); err != nil {
 		if errors.Is(err, ErrNotFound{}) {

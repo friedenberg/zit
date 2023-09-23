@@ -32,7 +32,7 @@ type createOrUpdate[
 	of                        schnittstellen.ObjekteWriterFactory
 	af                        schnittstellen.AkteWriterFactory
 	reader                    TransactedReader[T3, sku.SkuLikePtr]
-	delegate                  CreateOrUpdateDelegate[*sku.Transacted2]
+	delegate                  CreateOrUpdateDelegate[*sku.Transacted]
 	matchableAdder            matcher.MatchableAdder
 	persistentMetadateiFormat objekte_format.Format
 	options                   objekte_format.Options
@@ -50,7 +50,7 @@ func MakeCreateOrUpdate[
 	of schnittstellen.ObjekteWriterFactory,
 	af schnittstellen.AkteWriterFactory,
 	reader TransactedReader[T3, sku.SkuLikePtr],
-	delegate CreateOrUpdateDelegate[*sku.Transacted2],
+	delegate CreateOrUpdateDelegate[*sku.Transacted],
 	ma matcher.MatchableAdder,
 	pmf objekte_format.Format,
 	op objekte_format.Options,
@@ -75,7 +75,7 @@ func MakeCreateOrUpdate[
 
 func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateCheckedOut(
 	co *objekte.CheckedOut[T2, T3],
-) (transactedPtr *sku.Transacted2, err error) {
+) (transactedPtr *sku.Transacted, err error) {
 	kennungPtr := co.External.Kennung
 
 	if !cou.ls.IsAcquired() {
@@ -86,7 +86,7 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateCheckedOut(
 		return
 	}
 
-	transactedPtr = &sku.Transacted2{
+	transactedPtr = &sku.Transacted{
 		Metadatei: metadatei.Metadatei{
 			Tai: cou.clock.GetTai(),
 		},
@@ -148,7 +148,7 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateCheckedOut(
 func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdate(
 	mg metadatei.Getter,
 	kennungPtr T3,
-) (transactedPtr *sku.Transacted2, err error) {
+) (transactedPtr *sku.Transacted, err error) {
 	if !cou.ls.IsAcquired() {
 		err = ErrLockRequired{
 			Operation: fmt.Sprintf(
@@ -160,7 +160,7 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdate(
 		return
 	}
 
-	var mutter *sku.Transacted2
+	var mutter *sku.Transacted
 
 	if mutter, err = cou.reader.ReadOne(kennungPtr); err != nil {
 		if errors.Is(err, ErrNotFound{}) {
@@ -179,7 +179,7 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdate(
 
 	m.Tai = cou.clock.GetTai()
 
-	transactedPtr = &sku.Transacted2{
+	transactedPtr = &sku.Transacted{
 		Metadatei: m,
 	}
 
@@ -255,7 +255,7 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateAkte(
 	mg metadatei.Getter,
 	kennungPtr T3,
 	sh schnittstellen.ShaLike,
-) (transactedPtr *sku.Transacted2, err error) {
+) (transactedPtr *sku.Transacted, err error) {
 	if !cou.ls.IsAcquired() {
 		err = ErrLockRequired{
 			Operation: fmt.Sprintf(
@@ -286,7 +286,7 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateAkte(
 
 	m.Tai = cou.clock.GetTai()
 
-	transactedPtr = &sku.Transacted2{
+	transactedPtr = &sku.Transacted{
 		Metadatei: m,
 	}
 
