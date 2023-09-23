@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/bestandsaufnahme"
-	"github.com/friedenberg/zit/src/november/umwelt"
+	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
 
 type Last struct {

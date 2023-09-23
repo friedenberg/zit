@@ -11,8 +11,8 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/lima/cwd"
-	"github.com/friedenberg/zit/src/lima/store_objekten"
-	"github.com/friedenberg/zit/src/november/umwelt"
+	"github.com/friedenberg/zit/src/november/store_objekten"
+	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
 
 type FormatZettel struct {

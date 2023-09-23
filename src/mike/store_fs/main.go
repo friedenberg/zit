@@ -21,7 +21,7 @@ import (
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/lima/cwd"
 	"github.com/friedenberg/zit/src/lima/objekte_store"
-	"github.com/friedenberg/zit/src/lima/store_objekten"
+	"github.com/friedenberg/zit/src/november/store_objekten"
 )
 
 type Store struct {

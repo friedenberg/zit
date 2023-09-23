@@ -15,7 +15,7 @@ import (
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/checked_out"
 	"github.com/friedenberg/zit/src/lima/cwd"
-	"github.com/friedenberg/zit/src/november/umwelt"
+	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
 
 type Status struct{}

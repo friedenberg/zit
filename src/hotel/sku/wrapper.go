@@ -12,36 +12,36 @@ func (a *wrapper) ResetWith(b wrapper) {
 	a.SkuLikePtr = b.SkuLikePtr
 }
 
-type lessor struct{}
+type skuLessor struct{}
 
-func (_ lessor) Less(a, b wrapper) bool {
+func (_ skuLessor) Less(a, b wrapper) bool {
 	return a.SkuLikePtr.GetTai().Less(b.SkuLikePtr.GetTai())
 }
 
-func (_ lessor) LessPtr(a, b *wrapper) bool {
+func (_ skuLessor) LessPtr(a, b *wrapper) bool {
 	return a.SkuLikePtr.GetTai().Less(b.SkuLikePtr.GetTai())
 }
 
-type equaler struct{}
+type skuEqualer struct{}
 
-func (_ equaler) Equals(a, b wrapper) bool {
+func (_ skuEqualer) Equals(a, b wrapper) bool {
 	return a.SkuLikePtr.EqualsSkuLike(b.SkuLikePtr)
 }
 
-func (_ equaler) EqualsPtr(a, b *wrapper) bool {
+func (_ skuEqualer) EqualsPtr(a, b *wrapper) bool {
 	return a.SkuLikePtr.EqualsSkuLike(b.SkuLikePtr)
 }
 
-type resetter struct{}
+type skuResetter struct{}
 
-func (_ resetter) Reset(a *wrapper) {
+func (_ skuResetter) Reset(a *wrapper) {
 	a.SkuLikePtr.Reset()
 }
 
-func (_ resetter) ResetWith(a *wrapper, b wrapper) {
+func (_ skuResetter) ResetWith(a *wrapper, b wrapper) {
 	a.SkuLikePtr = b.SkuLikePtr
 }
 
-func (_ resetter) ResetWithPtr(a *wrapper, b *wrapper) {
+func (_ skuResetter) ResetWithPtr(a *wrapper, b *wrapper) {
 	a.SkuLikePtr = b.SkuLikePtr
 }

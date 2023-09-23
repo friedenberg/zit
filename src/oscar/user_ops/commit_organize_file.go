@@ -12,7 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/india/objekte_collections"
 	"github.com/friedenberg/zit/src/kilo/organize_text"
 	"github.com/friedenberg/zit/src/lima/changes"
-	"github.com/friedenberg/zit/src/november/umwelt"
+	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
 
 type CommitOrganizeFile struct {

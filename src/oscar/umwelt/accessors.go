@@ -8,8 +8,8 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/kilo/konfig"
-	"github.com/friedenberg/zit/src/lima/store_objekten"
 	"github.com/friedenberg/zit/src/mike/store_fs"
+	"github.com/friedenberg/zit/src/november/store_objekten"
 )
 
 func (u *Umwelt) Sonnenaufgang() kennung.Time {

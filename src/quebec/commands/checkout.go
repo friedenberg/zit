@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/lima/cwd"
 	"github.com/friedenberg/zit/src/mike/store_util"
-	"github.com/friedenberg/zit/src/november/umwelt"
+	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
 
 type Checkout struct {

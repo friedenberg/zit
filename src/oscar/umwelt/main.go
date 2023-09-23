@@ -23,9 +23,9 @@ import (
 	"github.com/friedenberg/zit/src/kilo/konfig"
 	"github.com/friedenberg/zit/src/kilo/organize_text"
 	"github.com/friedenberg/zit/src/lima/objekte_store"
-	"github.com/friedenberg/zit/src/lima/store_objekten"
 	"github.com/friedenberg/zit/src/mike/store_fs"
 	"github.com/friedenberg/zit/src/mike/store_util"
+	"github.com/friedenberg/zit/src/november/store_objekten"
 )
 
 type Umwelt struct {
