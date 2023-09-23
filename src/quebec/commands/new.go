@@ -16,7 +16,6 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/india/objekte_collections"
-	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/lima/cwd"
 	"github.com/friedenberg/zit/src/mike/store_util"
@@ -111,7 +110,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		),
 	}
 
-	var zsc schnittstellen.MutableSetLike[*objekte.CheckedOut]
+	var zsc schnittstellen.MutableSetLike[*sku.CheckedOut]
 
 	if len(args) == 0 {
 		if zsc, err = c.writeNewZettels(u); err != nil {
@@ -209,7 +208,7 @@ func (c New) readExistingFilesAsZettels(
 
 func (c New) writeNewZettels(
 	u *umwelt.Umwelt,
-) (zsc schnittstellen.MutableSetLike[*objekte.CheckedOut], err error) {
+) (zsc schnittstellen.MutableSetLike[*sku.CheckedOut], err error) {
 	var cwdFiles cwd.CwdFiles
 
 	if cwdFiles, err = cwd.MakeCwdFilesAll(
@@ -244,7 +243,7 @@ func (c New) writeNewZettels(
 func (c New) editZettels(
 	u *umwelt.Umwelt,
 	ms matcher.Query,
-	zsc schnittstellen.MutableSetLike[*objekte.CheckedOut],
+	zsc schnittstellen.MutableSetLike[*sku.CheckedOut],
 ) (err error) {
 	if !c.Edit {
 		errors.Log().Print("edit set to false, not editing")

@@ -4,15 +4,15 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/juliett/objekte"
+	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
 func ToSliceFilesAkten(
-	s schnittstellen.SetLike[*objekte.CheckedOut],
+	s schnittstellen.SetLike[*sku.CheckedOut],
 ) (out []string, err error) {
-	return iter.DerivedValues[*objekte.CheckedOut, string](
+	return iter.DerivedValues[*sku.CheckedOut, string](
 		s,
-		func(z *objekte.CheckedOut) (e string, err error) {
+		func(z *sku.CheckedOut) (e string, err error) {
 			e = z.External.GetAkteFD().Path
 
 			if e == "" {
@@ -26,11 +26,11 @@ func ToSliceFilesAkten(
 }
 
 func ToSliceFilesZettelen(
-	s schnittstellen.SetLike[*objekte.CheckedOut],
+	s schnittstellen.SetLike[*sku.CheckedOut],
 ) (out []string, err error) {
-	return iter.DerivedValues[*objekte.CheckedOut, string](
+	return iter.DerivedValues[*sku.CheckedOut, string](
 		s,
-		func(z *objekte.CheckedOut) (e string, err error) {
+		func(z *sku.CheckedOut) (e string, err error) {
 			e = z.External.GetObjekteFD().Path
 
 			if e == "" {

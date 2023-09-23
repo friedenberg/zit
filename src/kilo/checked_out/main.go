@@ -1,12 +1,10 @@
 package checked_out
 
-import (
-	"github.com/friedenberg/zit/src/juliett/objekte"
-)
+import "github.com/friedenberg/zit/src/hotel/sku"
 
 type (
-	Etikett = objekte.CheckedOut
-	Kasten  = objekte.CheckedOut
-	Typ     = objekte.CheckedOut
-	Zettel  = objekte.CheckedOut
+	Etikett = sku.CheckedOut
+	Kasten  = sku.CheckedOut
+	Typ     = sku.CheckedOut
+	Zettel  = sku.CheckedOut
 )

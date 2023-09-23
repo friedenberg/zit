@@ -5,17 +5,18 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
 )
 
 func MakeFilterFromMetaSet(
 	ms matcher.Query,
-) schnittstellen.FuncIter[*CheckedOut] {
+) schnittstellen.FuncIter[*sku.CheckedOut] {
 	if ms == nil {
-		return collections.MakeWriterNoop[*CheckedOut]()
+		return collections.MakeWriterNoop[*sku.CheckedOut]()
 	}
 
-	return func(col *CheckedOut) (err error) {
+	return func(col *sku.CheckedOut) (err error) {
 		g := gattung.Must(col.Internal.GetSkuLike().GetGattung())
 
 		var matcher matcher.Matcher

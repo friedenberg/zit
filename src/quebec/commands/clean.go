@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/checked_out_state"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/lima/cwd"
@@ -61,7 +62,7 @@ func (c Clean) RunWithCwdQuery(
 		ms,
 		iter.MakeChain(
 			objekte.MakeFilterFromMetaSet(ms),
-			func(co *objekte.CheckedOut) (err error) {
+			func(co *sku.CheckedOut) (err error) {
 				if co.State != checked_out_state.StateExistsAndSame && !c.force {
 					return
 				}

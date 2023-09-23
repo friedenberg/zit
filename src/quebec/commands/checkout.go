@@ -6,8 +6,8 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/gattungen"
+	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/lima/cwd"
 	"github.com/friedenberg/zit/src/mike/store_util"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
@@ -56,7 +56,7 @@ func (c Checkout) RunWithQuery(
 	if err = u.StoreWorkingDirectory().CheckoutQuery(
 		c.CheckoutOptions,
 		ms,
-		func(co *objekte.CheckedOut) (err error) {
+		func(co *sku.CheckedOut) (err error) {
 			return
 		},
 	); err != nil {

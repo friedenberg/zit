@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/kennung_fmt"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/sku_fmt"
-	"github.com/friedenberg/zit/src/juliett/objekte"
 )
 
 func (u *Umwelt) FormatColorOptions() (o string_format_writer.ColorOptions) {
@@ -147,11 +146,11 @@ func (u *Umwelt) PrinterHeader() schnittstellen.FuncIter[string] {
 	)
 }
 
-func (u *Umwelt) PrinterCheckedOutLike() schnittstellen.FuncIter[*objekte.CheckedOut] {
+func (u *Umwelt) PrinterCheckedOutLike() schnittstellen.FuncIter[*sku.CheckedOut] {
 	co := u.FormatColorOptions()
 
-	p := objekte.MakeCliFormat(
-		objekte.CliOptions{},
+	p := sku.MakeCliFormat(
+		sku.CliOptions{},
 		u.StringFormatWriterShaLike(co),
 		kennung_fmt.MakeFDCliFormat(
 			co,
@@ -163,7 +162,7 @@ func (u *Umwelt) PrinterCheckedOutLike() schnittstellen.FuncIter[*objekte.Checke
 		u.StringFormatWriterEtiketten(co),
 	)
 
-	return string_format_writer.MakeDelim[*objekte.CheckedOut](
+	return string_format_writer.MakeDelim[*sku.CheckedOut](
 		"\n",
 		u.Out(),
 		p,

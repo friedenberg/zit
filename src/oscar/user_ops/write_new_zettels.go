@@ -5,7 +5,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/mike/store_util"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
@@ -20,7 +19,7 @@ type WriteNewZettels struct {
 func (c WriteNewZettels) RunMany(
 	z zettel.ProtoZettel,
 	count int,
-) (results schnittstellen.MutableSetLike[*objekte.CheckedOut], err error) {
+) (results schnittstellen.MutableSetLike[*sku.CheckedOut], err error) {
 	if err = c.Lock(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -28,13 +27,13 @@ func (c WriteNewZettels) RunMany(
 
 	defer errors.Deferred(&err, c.Unlock)
 
-	results = collections_value.MakeMutableValueSet[*objekte.CheckedOut](
+	results = collections_value.MakeMutableValueSet[*sku.CheckedOut](
 		nil,
 	)
 
 	// TODO-P4 modify this to be run once
 	for i := 0; i < count; i++ {
-		var cz *objekte.CheckedOut
+		var cz *sku.CheckedOut
 
 		if cz, err = c.runOneAlreadyLocked(z); err != nil {
 			err = errors.Wrap(err)
@@ -49,7 +48,7 @@ func (c WriteNewZettels) RunMany(
 
 func (c WriteNewZettels) RunOne(
 	z zettel.ProtoZettel,
-) (result *objekte.CheckedOut, err error) {
+) (result *sku.CheckedOut, err error) {
 	if err = c.Lock(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -62,7 +61,7 @@ func (c WriteNewZettels) RunOne(
 
 func (c WriteNewZettels) runOneAlreadyLocked(
 	pz zettel.ProtoZettel,
-) (result *objekte.CheckedOut, err error) {
+) (result *sku.CheckedOut, err error) {
 	z := pz.Make()
 
 	var zt *sku.Transacted
@@ -72,7 +71,7 @@ func (c WriteNewZettels) runOneAlreadyLocked(
 		return
 	}
 
-	result = &objekte.CheckedOut{}
+	result = &sku.CheckedOut{}
 
 	if err = result.Internal.SetFromSkuLike(zt); err != nil {
 		err = errors.Wrap(err)

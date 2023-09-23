@@ -11,8 +11,8 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/lima/cwd"
 	"github.com/friedenberg/zit/src/mike/store_util"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
@@ -80,7 +80,7 @@ func (c Edit) RunWithCwdQuery(
 	if err = u.StoreWorkingDirectory().CheckoutQuery(
 		options,
 		ms,
-		func(co *objekte.CheckedOut) (err error) {
+		func(co *sku.CheckedOut) (err error) {
 			e := co.External
 
 			if afd := e.GetAkteFD(); afd.String() != "." {

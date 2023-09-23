@@ -1,15 +1,14 @@
-package objekte
+package sku
 
 import (
 	"fmt"
 
 	"github.com/friedenberg/zit/src/delta/checked_out_state"
-	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
 type CheckedOut struct {
-	Internal sku.Transacted
-	External sku.External
+	Internal Transacted
+	External External
 	State    checked_out_state.State
 }
 

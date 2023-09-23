@@ -11,7 +11,6 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/konfig"
 	"github.com/friedenberg/zit/src/lima/cwd"
 	"github.com/friedenberg/zit/src/lima/objekte_store"
@@ -25,7 +24,7 @@ type Store struct {
 
 	storeObjekten *store_objekten.Store
 
-	checkedOutLogPrinter schnittstellen.FuncIter[*objekte.CheckedOut]
+	checkedOutLogPrinter schnittstellen.FuncIter[*sku.CheckedOut]
 }
 
 func New(
@@ -45,7 +44,7 @@ func New(
 }
 
 func (s *Store) SetCheckedOutLogPrinter(
-	zelw schnittstellen.FuncIter[*objekte.CheckedOut],
+	zelw schnittstellen.FuncIter[*sku.CheckedOut],
 ) {
 	s.checkedOutLogPrinter = zelw
 }
@@ -62,7 +61,7 @@ func (s Store) Flush() (err error) {
 func (s *Store) ReadFiles(
 	fs *cwd.CwdFiles,
 	ms matcher.Query,
-	f schnittstellen.FuncIter[*objekte.CheckedOut],
+	f schnittstellen.FuncIter[*sku.CheckedOut],
 ) (err error) {
 	emgr := objekte_store.MakeExternalMaybeGetterReader2(
 		fs.Get,
@@ -73,7 +72,7 @@ func (s *Store) ReadFiles(
 		ms,
 		iter.MakeChain(
 			func(e sku.SkuLikePtr) (err error) {
-				var col *objekte.CheckedOut
+				var col *sku.CheckedOut
 
 				et, ok := e.(*sku.Transacted)
 
@@ -126,7 +125,7 @@ func (s *Store) ReadFiles(
 
 				err = nil
 
-				tco := &objekte.CheckedOut{}
+				tco := &sku.CheckedOut{}
 				var tcoe *sku.External
 
 				if tcoe, err = s.storeObjekten.ReadOneExternal(

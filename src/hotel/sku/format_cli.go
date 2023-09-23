@@ -1,4 +1,4 @@
-package objekte
+package sku
 
 import (
 	"io"

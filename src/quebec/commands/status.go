@@ -47,7 +47,7 @@ func (c Status) RunWithCwdQuery(
 		ms,
 		iter.MakeChain(
 			objekte.MakeFilterFromMetaSet(ms),
-			func(co *objekte.CheckedOut) (err error) {
+			func(co *sku.CheckedOut) (err error) {
 				if err = pcol(co); err != nil {
 					err = errors.Wrap(err)
 					return

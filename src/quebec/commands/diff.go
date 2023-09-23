@@ -19,6 +19,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
+	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/lima/cwd"
@@ -62,7 +63,7 @@ func (c Diff) RunWithCwdQuery(
 		ms,
 		iter.MakeChain(
 			objekte.MakeFilterFromMetaSet(ms),
-			func(co *objekte.CheckedOut) (err error) {
+			func(co *sku.CheckedOut) (err error) {
 				wg := iter.MakeErrorWaitGroup()
 
 				il := co.Internal

@@ -8,7 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/lima/objekte_store"
 	"github.com/friedenberg/zit/src/mike/store_util"
 )
@@ -201,7 +200,7 @@ func (s *Store) ReadAll(
 func (s *Store) CheckoutOne(
 	options store_util.CheckoutOptions,
 	sk sku.SkuLikePtr,
-) (co *objekte.CheckedOut, err error) {
+) (co *sku.CheckedOut, err error) {
 	g := gattung.Must(sk)
 	switch g {
 	case gattung.Zettel:

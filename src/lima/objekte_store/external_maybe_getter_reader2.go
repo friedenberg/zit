@@ -5,11 +5,10 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/juliett/objekte"
 )
 
 type ExternalMaybeGetterReader2 interface {
-	ReadOne(*sku.Transacted) (*objekte.CheckedOut, error)
+	ReadOne(*sku.Transacted) (*sku.CheckedOut, error)
 }
 
 type externalMaybeGetterReader2 struct {
@@ -35,8 +34,8 @@ func MakeExternalMaybeGetterReader2(
 
 func (emgr externalMaybeGetterReader2) ReadOne(
 	sk2 *sku.Transacted,
-) (co *objekte.CheckedOut, err error) {
-	co = &objekte.CheckedOut{
+) (co *sku.CheckedOut, err error) {
+	co = &sku.CheckedOut{
 		Internal: *sk2,
 	}
 

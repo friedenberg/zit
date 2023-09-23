@@ -5,7 +5,6 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/juliett/objekte"
 )
 
 type TransactedLogger[
@@ -84,7 +83,7 @@ type Updater[
 }
 
 type CheckedOutUpdater[
-	CO *objekte.CheckedOut,
+	CO *sku.CheckedOut,
 	T sku.SkuLike,
 ] interface {
 	UpdateCheckedOut(CO) (T, error)

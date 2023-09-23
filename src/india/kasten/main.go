@@ -1,7 +1,5 @@
 package kasten
 
-import (
-	"github.com/friedenberg/zit/src/juliett/objekte"
-)
+import "github.com/friedenberg/zit/src/hotel/sku"
 
-type CheckedOut = objekte.CheckedOut
+type CheckedOut = sku.CheckedOut

@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/lima/cwd"
@@ -33,7 +34,7 @@ func (c Checkin) Run(
 		ms,
 		iter.MakeChain(
 			objekte.MakeFilterFromMetaSet(ms),
-			func(co *objekte.CheckedOut) (err error) {
+			func(co *sku.CheckedOut) (err error) {
 				if _, err = u.StoreObjekten().CreateOrUpdator.CreateOrUpdateCheckedOut(
 					co,
 				); err != nil {
