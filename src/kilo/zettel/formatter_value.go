@@ -14,7 +14,6 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/konfig"
 )
@@ -56,7 +55,7 @@ func (fv *FormatterValue) FuncFormatterVerzeichnisse(
 	af schnittstellen.AkteIOFactory,
 	k konfig.Compiled,
 	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
-) schnittstellen.FuncIter[*transacted.Zettel] {
+) schnittstellen.FuncIter[*sku.Transacted2] {
 	return fv.FuncFormatter(
 		out,
 		af,
@@ -70,12 +69,12 @@ func (fv *FormatterValue) FuncFormatter(
 	af schnittstellen.AkteIOFactory,
 	k konfig.Compiled,
 	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
-) schnittstellen.FuncIter[*transacted.Zettel] {
+) schnittstellen.FuncIter[*sku.Transacted2] {
 	errors.TodoP2("convert to verzeichnisse")
 
 	switch fv.string {
 	case "formatters":
-		return func(o *transacted.Zettel) (err error) {
+		return func(o *sku.Transacted2) (err error) {
 			t := k.GetApproximatedTyp(o.GetTyp())
 
 			if !t.HasValue() {
@@ -114,7 +113,7 @@ func (fv *FormatterValue) FuncFormatter(
 		}
 
 	case "typ":
-		return func(o *transacted.Zettel) (err error) {
+		return func(o *sku.Transacted2) (err error) {
 			if _, err = io.WriteString(out, o.GetTyp().String()); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -124,7 +123,7 @@ func (fv *FormatterValue) FuncFormatter(
 		}
 
 	case "typ-vim-syntax-type":
-		return func(o *transacted.Zettel) (err error) {
+		return func(o *sku.Transacted2) (err error) {
 			var t sku.SkuLikePtr
 
 			if t = k.GetApproximatedTyp(
@@ -157,7 +156,7 @@ func (fv *FormatterValue) FuncFormatter(
 		f := objekte_format.FormatForVersion(k.GetStoreVersion())
 		op := objekte_format.Options{}
 
-		return func(o *transacted.Zettel) (err error) {
+		return func(o *sku.Transacted2) (err error) {
 			if _, err = f.FormatPersistentMetadatei(out, o, op); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -172,7 +171,7 @@ func (fv *FormatterValue) FuncFormatter(
 			nil,
 		)
 
-		return func(o *transacted.Zettel) (err error) {
+		return func(o *sku.Transacted2) (err error) {
 			if fv.string == "hinweis-text" {
 				if _, err = io.WriteString(
 					out,
@@ -201,7 +200,7 @@ func (fv *FormatterValue) FuncFormatter(
 
 	case "toml":
 		errors.TodoP3("limit to only zettels supporting toml")
-		return func(o *transacted.Zettel) (err error) {
+		return func(o *sku.Transacted2) (err error) {
 			if _, err = io.WriteString(
 				out, fmt.Sprintf("['%s']\n", o.GetKennung()),
 			); err != nil {
@@ -229,7 +228,7 @@ func (fv *FormatterValue) FuncFormatter(
 	case "typ-formatter-uti-groups":
 		f := MakeFormatterTypFormatterUTIGroups(k, tagp)
 
-		return func(o *transacted.Zettel) (err error) {
+		return func(o *sku.Transacted2) (err error) {
 			if _, err = f.Format(out, o); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -241,7 +240,7 @@ func (fv *FormatterValue) FuncFormatter(
 	case "action-names":
 		f := MakeFormatterTypActionNames(k, true, tagp)
 
-		return func(o *transacted.Zettel) (err error) {
+		return func(o *sku.Transacted2) (err error) {
 			if _, err = f.Format(out, o); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -251,7 +250,7 @@ func (fv *FormatterValue) FuncFormatter(
 		}
 
 	default:
-		return func(_ *transacted.Zettel) (err error) {
+		return func(_ *sku.Transacted2) (err error) {
 			err = objekte.MakeErrUnsupportedFormatterValue(
 				fv.string,
 				gattung.Zettel,

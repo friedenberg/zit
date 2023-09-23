@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/pool"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/kilo/konfig"
 )
 
@@ -22,7 +21,7 @@ const (
 type Zettelen struct {
 	erworben konfig.Compiled
 	path     string
-	pool     schnittstellen.Pool[transacted.Zettel, *transacted.Zettel]
+	pool     schnittstellen.Pool[sku.Transacted2, *sku.Transacted2]
 	schnittstellen.VerzeichnisseFactory
 	pages [PageCount]*Page
 }
@@ -36,7 +35,7 @@ func MakeZettelen(
 	k konfig.Compiled,
 	dir string,
 	f schnittstellen.VerzeichnisseFactory,
-	p schnittstellen.Pool[transacted.Zettel, *transacted.Zettel],
+	p schnittstellen.Pool[sku.Transacted2, *sku.Transacted2],
 	fff PageDelegateGetter,
 ) (i *Zettelen, err error) {
 	i = &Zettelen{
@@ -60,7 +59,7 @@ func MakeZettelen(
 	return
 }
 
-func (i Zettelen) Pool() schnittstellen.Pool[transacted.Zettel, *transacted.Zettel] {
+func (i Zettelen) Pool() schnittstellen.Pool[sku.Transacted2, *sku.Transacted2] {
 	errors.TodoP4("rename to GetPool")
 	return i.pool
 }
@@ -143,7 +142,7 @@ func (i *Zettelen) AddVerzeichnisse(
 }
 
 func (i *Zettelen) GetPageIndexKeyValue(
-	zt transacted.Zettel,
+	zt sku.Transacted2,
 ) (key string, value string) {
 	key = zt.Kennung.String()
 	value = fmt.Sprintf("%s.%s", zt.GetTai(), zt.ObjekteSha)
@@ -151,7 +150,7 @@ func (i *Zettelen) GetPageIndexKeyValue(
 }
 
 func (i *Zettelen) ReadMany(
-	ws ...schnittstellen.FuncIter[*transacted.Zettel],
+	ws ...schnittstellen.FuncIter[*sku.Transacted2],
 ) (err error) {
 	errors.TodoP3("switch to single writer and force callers to make chains")
 
@@ -170,7 +169,7 @@ func (i *Zettelen) ReadMany(
 		}
 	}
 
-	w := pool.MakePooledChain[transacted.Zettel](
+	w := pool.MakePooledChain[sku.Transacted2](
 		i.pool,
 		ws...,
 	)

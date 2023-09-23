@@ -14,7 +14,6 @@ import (
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/lima/objekte_store"
 	"github.com/friedenberg/zit/src/mike/store_util"
@@ -60,7 +59,7 @@ type Store struct {
 
 func Make(
 	su store_util.StoreUtil,
-	p schnittstellen.Pool[transacted.Zettel, *transacted.Zettel],
+	p schnittstellen.Pool[sku.Transacted2, *sku.Transacted2],
 ) (s *Store, err error) {
 	s = &Store{
 		lock:      &sync.Mutex{},

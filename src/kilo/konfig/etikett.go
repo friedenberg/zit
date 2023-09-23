@@ -11,7 +11,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/india/transacted"
 )
 
 func init() {
@@ -46,7 +45,7 @@ func (iem implicitEtikettenMap) Set(to, imp kennung.Etikett) (err error) {
 }
 
 type ketikett struct {
-	Transacted        transacted.Etikett
+	Transacted        sku.Transacted2
 	ImplicitEtiketten kennung.EtikettMutableSet
 }
 
@@ -82,7 +81,7 @@ func (e ketikett) String() string {
 }
 
 func (k compiled) EachEtikett(
-	f schnittstellen.FuncIter[*transacted.Etikett],
+	f schnittstellen.FuncIter[*sku.Transacted2],
 ) (err error) {
 	return k.Etiketten.Each(
 		func(ek ketikett) (err error) {
@@ -129,7 +128,7 @@ func (k *compiled) AccumulateImplicitEtiketten(
 func (k *compiled) AddEtikett2(
 	b1 sku.SkuLikePtr,
 ) (err error) {
-	var e transacted.Etikett
+	var e sku.Transacted2
 
 	if err = e.SetFromSkuLike(b1); err != nil {
 		err = errors.Wrap(err)
@@ -140,7 +139,7 @@ func (k *compiled) AddEtikett2(
 }
 
 func (k *compiled) AddEtikett(
-	b1 *transacted.Etikett,
+	b1 *sku.Transacted2,
 ) (err error) {
 	k.lock.Lock()
 	defer k.lock.Unlock()
@@ -158,12 +157,12 @@ func (k *compiled) AddEtikett(
 	return
 }
 
-func (c *compiled) applyExpandedEtikett(ct *transacted.Etikett) {
+func (c *compiled) applyExpandedEtikett(ct *sku.Transacted2) {
 }
 
 func (kc compiled) GetEtikett(
 	k kennung.Etikett,
-) (ct transacted.Etikett, ok bool) {
+) (ct sku.Transacted2, ok bool) {
 	expandedActual := kc.GetSortedEtikettenExpanded(k.String())
 
 	if len(expandedActual) > 0 {
@@ -176,7 +175,7 @@ func (kc compiled) GetEtikett(
 
 func (c compiled) GetSortedEtikettenExpanded(
 	v string,
-) (expandedActual []transacted.Etikett) {
+) (expandedActual []sku.Transacted2) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 
@@ -185,7 +184,7 @@ func (c compiled) GetSortedEtikettenExpanded(
 		expandedMaybe,
 	)
 	typExpander.Expand(sa, v)
-	expandedActual = make([]transacted.Etikett, 0)
+	expandedActual = make([]sku.Transacted2, 0)
 
 	expandedMaybe.Each(
 		func(v values.String) (err error) {

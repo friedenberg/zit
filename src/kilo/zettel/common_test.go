@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/foxtrot/test_metadatei_io"
-	"github.com/friedenberg/zit/src/india/transacted"
+	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
 type inlineTypChecker struct {
@@ -43,7 +43,7 @@ func readFormat(
 	af *test_metadatei_io.AkteIOFactory,
 	contents string,
 ) (z metadatei.Metadatei, a string) {
-	var zt transacted.Zettel
+	var zt sku.Transacted2
 
 	t := t1.Skip(1)
 

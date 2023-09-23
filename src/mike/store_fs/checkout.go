@@ -13,7 +13,6 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/india/objekte_collections"
-	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/lima/cwd"
@@ -57,7 +56,7 @@ func (s *Store) Checkout(
 			zettel.MakeWriterKonfig(s.erworben, s.storeObjekten.Typ()),
 			ztw,
 			func(sk sku.SkuLikePtr) (err error) {
-				var z transacted.Zettel
+				var z sku.Transacted2
 
 				if err = z.SetFromSkuLike(sk); err != nil {
 					err = errors.Wrap(err)
@@ -155,7 +154,7 @@ func (s *Store) checkoutOneGeneric(
 	t sku.SkuLikePtr,
 ) (cop objekte.CheckedOutLikePtr, err error) {
 	switch tt := t.(type) {
-	case *transacted.Zettel:
+	case *sku.Transacted2:
 		cop, err = s.CheckoutOneZettel(options, tt)
 
 		if err != nil {

@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/delta/typ_akte"
-	"github.com/friedenberg/zit/src/india/transacted"
+	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/kilo/konfig"
 )
 
@@ -27,7 +27,7 @@ func MakeFormatterTypFormatterUTIGroups(
 
 func (e formatterTypFormatterUTIGroups) Format(
 	w io.Writer,
-	z *transacted.Zettel,
+	z *sku.Transacted2,
 ) (n int64, err error) {
 	e1 := typ_akte.MakeFormatterFormatterUTIGroups()
 

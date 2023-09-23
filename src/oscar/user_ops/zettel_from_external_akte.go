@@ -14,7 +14,6 @@ import (
 	"github.com/friedenberg/zit/src/india/external"
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/india/objekte_collections"
-	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
@@ -66,7 +65,7 @@ func (c ZettelFromExternalAkte) Run(
 			iter.MakeChain(
 				matcher.Match,
 				func(sk sku.SkuLikePtr) (err error) {
-					z := &transacted.Zettel{}
+					z := &sku.Transacted2{}
 
 					if err = z.SetFromSkuLike(sk); err != nil {
 						err = errors.Wrap(err)
@@ -83,7 +82,7 @@ func (c ZettelFromExternalAkte) Run(
 	}
 
 	if err = results.Each(
-		func(z *transacted.Zettel) (err error) {
+		func(z *sku.Transacted2) (err error) {
 			if c.ProtoZettel.Apply(z) {
 				if z, err = c.StoreObjekten().Zettel().Update(
 					z,
@@ -115,7 +114,7 @@ func (c ZettelFromExternalAkte) Run(
 			return
 		}
 
-		var tz *transacted.Zettel
+		var tz *sku.Transacted2
 
 		if tz, err = c.StoreObjekten().Zettel().Create(z); err != nil {
 			err = errors.Wrap(err)

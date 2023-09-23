@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/script_value"
-	"github.com/friedenberg/zit/src/india/transacted"
+	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
 type WriterScript struct {
@@ -34,7 +34,7 @@ func (w WriterScript) Reader() io.Reader {
 	return w.scriptOut
 }
 
-func (w WriterScript) WriteZettelVerzeichnisse(z *transacted.Zettel) (err error) {
+func (w WriterScript) WriteZettelVerzeichnisse(z *sku.Transacted2) (err error) {
 	errors.Log().Printf("writing zettel: %v", z)
 	if err = w.enc.WriteZettelVerzeichnisse(z); err != nil {
 		err = errors.Wrap(err)

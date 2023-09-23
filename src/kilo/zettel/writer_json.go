@@ -5,7 +5,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/india/transacted"
+	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
 type WriterJson struct {
@@ -18,7 +18,7 @@ func MakeWriterJson(w io.Writer) (w1 WriterJson) {
 	}
 }
 
-func (w WriterJson) WriteZettelVerzeichnisse(z *transacted.Zettel) (err error) {
+func (w WriterJson) WriteZettelVerzeichnisse(z *sku.Transacted2) (err error) {
 	errors.Log().Printf("writing zettel: %v", z)
 	if err = w.enc.Encode(z); err != nil {
 		err = errors.Wrap(err)

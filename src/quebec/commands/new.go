@@ -16,7 +16,6 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/india/objekte_collections"
-	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/lima/cwd"
@@ -120,7 +119,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			return
 		}
 	} else {
-		var zts schnittstellen.MutableSetLike[*transacted.Zettel]
+		var zts schnittstellen.MutableSetLike[*sku.Transacted2]
 
 		if zts, err = c.readExistingFilesAsZettels(u, f, args...); err != nil {
 			err = errors.Wrap(err)
@@ -190,7 +189,7 @@ func (c New) readExistingFilesAsZettels(
 	u *umwelt.Umwelt,
 	f metadatei.TextParser,
 	args ...string,
-) (zts schnittstellen.MutableSetLike[*transacted.Zettel], err error) {
+) (zts schnittstellen.MutableSetLike[*sku.Transacted2], err error) {
 	opCreateFromPath := user_ops.CreateFromPaths{
 		Umwelt:      u,
 		TextParser:  f,

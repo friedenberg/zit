@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/lima/objekte_store"
 	"github.com/friedenberg/zit/src/mike/store_util"
@@ -57,7 +56,7 @@ func makeTypStore(
 		return
 	}
 
-	newOrUpdated := func(t *transacted.Typ) (err error) {
+	newOrUpdated := func(t *sku.Transacted2) (err error) {
 		s.StoreUtil.CommitUpdatedTransacted(t)
 
 		if err = s.StoreUtil.GetKonfigPtr().AddTyp(t); err != nil {
@@ -79,8 +78,8 @@ func makeTypStore(
 		s.CommonStore,
 		sa,
 		TypTransactedReader(s),
-		objekte_store.CreateOrUpdateDelegate[*transacted.Typ]{
-			New: func(t *transacted.Typ) (err error) {
+		objekte_store.CreateOrUpdateDelegate[*sku.Transacted2]{
+			New: func(t *sku.Transacted2) (err error) {
 				if err = newOrUpdated(t); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -88,7 +87,7 @@ func makeTypStore(
 
 				return s.LogWriter.New(t)
 			},
-			Updated: func(t *transacted.Typ) (err error) {
+			Updated: func(t *sku.Transacted2) (err error) {
 				if err = newOrUpdated(t); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -96,7 +95,7 @@ func makeTypStore(
 
 				return s.LogWriter.Updated(t)
 			},
-			Unchanged: func(t *transacted.Typ) (err error) {
+			Unchanged: func(t *sku.Transacted2) (err error) {
 				return s.LogWriter.Unchanged(t)
 			},
 		},
@@ -113,12 +112,12 @@ func (s typStore) Flush() (err error) {
 	return
 }
 
-func (s typStore) AddOne(t *transacted.Typ) (err error) {
+func (s typStore) AddOne(t *sku.Transacted2) (err error) {
 	s.StoreUtil.GetKonfigPtr().AddTyp(t)
 	return
 }
 
-func (s typStore) UpdateOne(t *transacted.Typ) (err error) {
+func (s typStore) UpdateOne(t *sku.Transacted2) (err error) {
 	log.Log().Printf("adding one: %s", t.GetSkuLike())
 	s.StoreUtil.GetKonfigPtr().AddTyp(t)
 	log.Log().Printf("done adding one: %s", t.GetSkuLike())
@@ -150,7 +149,7 @@ func (s typStore) ReadAll(
 			return
 		}
 
-		var te *transacted.Typ
+		var te *sku.Transacted2
 
 		if te, err = s.InflateFromSku(sk); err != nil {
 			if errors.Is(err, toml.Error{}) {

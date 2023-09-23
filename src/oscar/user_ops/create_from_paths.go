@@ -13,7 +13,6 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/objekte_collections"
 	"github.com/friedenberg/zit/src/india/sku_fmt"
-	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/kilo/checked_out"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/lima/objekte_store"
@@ -32,7 +31,7 @@ type CreateFromPaths struct {
 
 func (c CreateFromPaths) Run(
 	args ...string,
-) (results schnittstellen.MutableSetLike[*transacted.Zettel], err error) {
+) (results schnittstellen.MutableSetLike[*sku.Transacted2], err error) {
 	// TODO-P3 support different modes of de-duplication
 	// TODO-P3 support merging of duplicated akten
 	toCreate := objekte_collections.MakeMutableSetUniqueFD()
@@ -75,7 +74,7 @@ func (c CreateFromPaths) Run(
 			iter.MakeChain(
 				matcher.Match,
 				func(sk sku.SkuLikePtr) (err error) {
-					var z transacted.Zettel
+					var z sku.Transacted2
 
 					if err = z.SetFromSkuLike(sk); err != nil {
 						err = errors.Wrap(err)
@@ -97,9 +96,9 @@ func (c CreateFromPaths) Run(
 	}
 
 	err = results.Each(
-		func(z *transacted.Zettel) (err error) {
+		func(z *sku.Transacted2) (err error) {
 			if c.ProtoZettel.Apply(z) {
-				var zt *transacted.Zettel
+				var zt *sku.Transacted2
 
 				if zt, err = c.StoreObjekten().Zettel().Update(
 					z,
@@ -124,7 +123,7 @@ func (c CreateFromPaths) Run(
 
 			cz := checked_out.Zettel{}
 
-			var zt *transacted.Zettel
+			var zt *sku.Transacted2
 
 			if zt, err = c.StoreObjekten().Zettel().Create(z); err != nil {
 				// TODO-P2 add file for error handling
@@ -157,7 +156,7 @@ func (c CreateFromPaths) Run(
 			// TODO-P4 get matches
 			cz.DetermineState(true)
 
-			zv := &transacted.Zettel{
+			zv := &sku.Transacted2{
 				Kennung: kennung.Kennung2{KennungPtr: &kennung.Hinweis{}},
 			}
 

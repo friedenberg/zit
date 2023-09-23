@@ -18,7 +18,6 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/india/objekte_collections"
-	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/organize_text"
 	"github.com/friedenberg/zit/src/kilo/zettel"
@@ -118,7 +117,7 @@ func (c Add) RunWithCwdQuery(
 	otFlags.RootEtiketten = c.Metadatei.Etiketten
 	mwk := objekte_collections.MakeMutableSetMetadateiWithKennung()
 	zettelsFromAkteResults.Each(
-		func(z *transacted.Zettel) (err error) {
+		func(z *sku.Transacted2) (err error) {
 			return mwk.Add(z.GetSkuLike())
 		},
 	)
@@ -207,7 +206,7 @@ func (c Add) openAktenIfNecessary(
 	hs := collections_value.MakeMutableValueSet[values.String](nil)
 
 	zettels.Each(
-		func(z *transacted.Zettel) (err error) {
+		func(z *sku.Transacted2) (err error) {
 			return hs.Add(values.MakeString(z.GetKennung().String()))
 		},
 	)

@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/lima/objekte_store"
 	"github.com/friedenberg/zit/src/mike/store_util"
@@ -56,7 +55,7 @@ func makeKastenStore(
 		return
 	}
 
-	newOrUpdated := func(t *transacted.Kasten) (err error) {
+	newOrUpdated := func(t *sku.Transacted2) (err error) {
 		s.StoreUtil.CommitUpdatedTransacted(t)
 
 		if err = s.StoreUtil.GetKonfigPtr().AddKasten(t); err != nil {
@@ -78,8 +77,8 @@ func makeKastenStore(
 		sa.ObjekteReaderWriterFactory(gattung.Kasten),
 		sa,
 		KastenTransactedReader(s),
-		objekte_store.CreateOrUpdateDelegate[*transacted.Kasten]{
-			New: func(t *transacted.Kasten) (err error) {
+		objekte_store.CreateOrUpdateDelegate[*sku.Transacted2]{
+			New: func(t *sku.Transacted2) (err error) {
 				if err = newOrUpdated(t); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -87,7 +86,7 @@ func makeKastenStore(
 
 				return s.LogWriter.New(t)
 			},
-			Updated: func(t *transacted.Kasten) (err error) {
+			Updated: func(t *sku.Transacted2) (err error) {
 				if err = newOrUpdated(t); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -95,7 +94,7 @@ func makeKastenStore(
 
 				return s.LogWriter.Updated(t)
 			},
-			Unchanged: func(t *transacted.Kasten) (err error) {
+			Unchanged: func(t *sku.Transacted2) (err error) {
 				return s.LogWriter.Unchanged(t)
 			},
 		},
@@ -112,12 +111,12 @@ func (s kastenStore) Flush() (err error) {
 	return
 }
 
-func (s kastenStore) AddOne(t *transacted.Kasten) (err error) {
+func (s kastenStore) AddOne(t *sku.Transacted2) (err error) {
 	s.StoreUtil.GetKonfigPtr().AddKasten(t)
 	return
 }
 
-func (s kastenStore) UpdateOne(t *transacted.Kasten) (err error) {
+func (s kastenStore) UpdateOne(t *sku.Transacted2) (err error) {
 	s.StoreUtil.GetKonfigPtr().AddKasten(t)
 	return
 }
@@ -146,7 +145,7 @@ func (s kastenStore) ReadAll(
 			return
 		}
 
-		var te *transacted.Kasten
+		var te *sku.Transacted2
 
 		if te, err = s.InflateFromSku(sk); err != nil {
 			if errors.Is(err, toml.Error{}) {

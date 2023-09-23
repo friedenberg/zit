@@ -1,10 +1,10 @@
 package store_verzeichnisse
 
-import "github.com/friedenberg/zit/src/india/transacted"
+import "github.com/friedenberg/zit/src/hotel/sku"
 
 type PageDelegate interface {
-	ShouldAddVerzeichnisse(*transacted.Zettel) error
-	ShouldFlushVerzeichnisse(*transacted.Zettel) error
+	ShouldAddVerzeichnisse(*sku.Transacted2) error
+	ShouldFlushVerzeichnisse(*sku.Transacted2) error
 }
 
 type PageDelegateGetter interface {

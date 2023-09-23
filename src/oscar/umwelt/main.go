@@ -19,7 +19,6 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/erworben"
 	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/kilo/konfig"
 	"github.com/friedenberg/zit/src/kilo/organize_text"
 	"github.com/friedenberg/zit/src/lima/objekte_store"
@@ -50,7 +49,7 @@ type Umwelt struct {
 	age                   *age.Age
 	storeWorkingDirectory *store_fs.Store
 
-	zettelVerzeichnissePool schnittstellen.Pool[transacted.Zettel, *transacted.Zettel]
+	zettelVerzeichnissePool schnittstellen.Pool[sku.Transacted2, *sku.Transacted2]
 }
 
 func Make(kCli erworben.Cli, options Options) (u *Umwelt, err error) {
@@ -58,7 +57,7 @@ func Make(kCli erworben.Cli, options Options) (u *Umwelt, err error) {
 		in:                      os.Stdin,
 		out:                     os.Stdout,
 		err:                     os.Stderr,
-		zettelVerzeichnissePool: pool.MakePoolWithReset[transacted.Zettel, *transacted.Zettel](),
+		zettelVerzeichnissePool: pool.MakePoolWithReset[sku.Transacted2, *sku.Transacted2](),
 		erworbenCli:             kCli,
 	}
 

@@ -11,7 +11,6 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/india/transacted"
 )
 
 func TestOne(t1 *testing.T) {
@@ -24,7 +23,7 @@ func TestOne(t1 *testing.T) {
 
 	printer := MakeFormatBestandsaufnahmePrinter(w, f, o)
 
-	n, err := printer.Print(transacted.Zettel{
+	n, err := printer.Print(sku.Transacted2{
 		Kennung: kennung.Kennung2{KennungPtr: kennung.MustHinweis("one/uno")},
 	})
 
@@ -42,7 +41,7 @@ func TestOne(t1 *testing.T) {
 		}
 	}
 
-	n, err = printer.Print(transacted.Zettel{
+	n, err = printer.Print(sku.Transacted2{
 		Kennung: kennung.Kennung2{KennungPtr: kennung.MustHinweis("two/dos")},
 	})
 
@@ -75,7 +74,7 @@ func TestOne(t1 *testing.T) {
 	t.AssertNoError(scanner.Error())
 
 	{
-		sk1, ok := sk.(*transacted.Zettel)
+		sk1, ok := sk.(*sku.Transacted2)
 
 		if !ok {
 			t.Errorf("expected %T but got %T", sk1, sk)
@@ -90,7 +89,7 @@ func TestOne(t1 *testing.T) {
 	t.AssertNoError(scanner.Error())
 
 	{
-		sk1, ok := sk.(*transacted.Zettel)
+		sk1, ok := sk.(*sku.Transacted2)
 
 		if !ok {
 			t.Errorf("expected %T but got %T", sk1, sk)

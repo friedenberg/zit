@@ -23,7 +23,6 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/erworben"
-	"github.com/friedenberg/zit/src/india/transacted"
 )
 
 var typExpander kennung.Expander
@@ -93,7 +92,7 @@ type compiled struct {
 	// Typen
 	ExtensionsToTypen map[string]string
 	TypenToExtensions map[string]string
-	DefaultTyp        transacted.Typ // deprecated
+	DefaultTyp        sku.Transacted2 // deprecated
 	Typen             sku.TransactedMutableSet
 	InlineTypen       schnittstellen.SetLike[values.String]
 
@@ -485,7 +484,7 @@ func (k *compiled) AddKasten(
 }
 
 func (k *compiled) AddTyp(
-	a *transacted.Typ,
+	a *sku.Transacted2,
 ) (err error) {
 	b := sku.GetTransactedPool().Get()
 
@@ -524,5 +523,5 @@ func (k *compiled) AddTyp2(
 	return
 }
 
-func (c *compiled) applyExpandedTyp(ct transacted.Typ) {
+func (c *compiled) applyExpandedTyp(ct sku.Transacted2) {
 }

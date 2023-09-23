@@ -1,167 +1,108 @@
 package sku
 
 import (
+	"encoding/gob"
+
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/collections_value"
+	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/delta/heap"
+	"github.com/friedenberg/zit/src/echo/kennung"
 )
 
-type SkuLikeHeap = heap.Heap[wrapper, *wrapper]
+var (
+	transactedKeyerKennung schnittstellen.StringKeyerPtr[Transacted2, *Transacted2]
+	TransactedSetEmpty     TransactedSet
+	TransactedLessor       schnittstellen.Lessor2[Transacted2, *Transacted2]
+)
 
-func MakeSkuLikeHeap() SkuLikeHeap {
-	return heap.Make[wrapper, *wrapper](
-		skuEqualer{},
-		skuLessor{},
-		skuResetter{},
-	)
-}
+func init() {
+	transactedKeyerKennung = &KennungKeyer[Transacted2, *Transacted2]{}
+	gob.Register(transactedKeyerKennung)
 
-func AddSkuToHeap(h *SkuLikeHeap, sk SkuLike) (err error) {
-	err = h.Add(&wrapper{SkuLikePtr: sk.MutableClone()})
-	return
-}
+	TransactedSetEmpty = MakeTransactedSet()
+	gob.Register(TransactedSetEmpty)
+	gob.Register(MakeTransactedMutableSet())
 
-func HeapEachPtr(h SkuLikeHeap, f func(sk SkuLikePtr) error) (err error) {
-	return h.Each(
-		func(w wrapper) (err error) {
-			return f(w.SkuLikePtr)
-		},
-	)
-}
-
-func HeapEach(h SkuLikeHeap, f func(sk SkuLike) error) (err error) {
-	return h.Each(
-		func(w wrapper) (err error) {
-			return f(w.SkuLikePtr)
-		},
-	)
+	TransactedLessor = Lessor[Transacted2, *Transacted2]{}
 }
 
 type (
-	Set        = schnittstellen.SetLike[SkuLikePtr]
-	MutableSet = schnittstellen.MutableSetLike[SkuLikePtr]
+	TransactedSet        = schnittstellen.SetPtrLike[Transacted2, *Transacted2]
+	TransactedMutableSet = schnittstellen.MutableSetPtrLike[Transacted2, *Transacted2]
+	TransactedHeap       = heap.Heap[Transacted2, *Transacted2]
 )
 
-func MakeMutableSet() MutableSet {
-	return collections_value.MakeMutableValueSet[SkuLikePtr](nil)
+func MakeTransactedHeap() TransactedHeap {
+	return heap.Make[Transacted2, *Transacted2](equaler{}, lessor{}, resetter{})
 }
 
-// type MutableSetUnique = schnittstellen.MutableSetPtrLike[SkuLike]
+func MakeTransactedSet() TransactedSet {
+	return collections_ptr.MakeValueSet(transactedKeyerKennung)
+}
 
-// func init() {
-// 	gob.Register(
-// 		collections.MakeMutableSet[SkuLike](
-// 			func(s SkuLike) string {
-// 				if s == nil {
-// 					return ""
-// 				}
+func MakeTransactedMutableSet() TransactedMutableSet {
+	return collections_ptr.MakeMutableValueSet(transactedKeyerKennung)
+}
 
-// 				return fmt.Sprintf(
-// 					"%s%s%s",
-// 					s.GetKennungLike(),
-// 					s.GetTai(),
-// 					s.GetAkteSha(),
-// 				)
-// 			},
-// 		),
-// 	)
-// }
+type kennungGetter interface {
+	GetKennungLike() kennung.Kennung
+}
 
-// type codable struct {
-// 	Objekten map[string][]SkuLike
-// 	Count    int
-// }
+type KennungKeyer[
+	T kennungGetter,
+	TPtr interface {
+		schnittstellen.Ptr[T]
+		kennungGetter
+	},
+] struct{}
 
-// type MutableSet struct {
-// 	lock    *sync.RWMutex
-// 	codable codable
-// }
+func (sk KennungKeyer[T, TPtr]) GetKey(e T) string {
+	return e.GetKennungLike().String()
+}
 
-// func MakeMutableSet() MutableSet {
-// 	return MutableSet{
-// 		lock: &sync.RWMutex{},
-// 		codable: codable{
-// 			Objekten: make(map[string][]SkuLike),
-// 		},
-// 	}
-// }
+func (sk KennungKeyer[T, TPtr]) GetKeyPtr(e TPtr) string {
+	if e == nil {
+		return ""
+	}
 
-// func (os *MutableSet) Len() int {
-// 	return os.codable.Count
-// }
+	return e.GetKennungLike().String()
+}
 
-// func (os *MutableSet) Add(o SkuLike) (i int) {
-// 	os.codable.Count++
-// 	k := o.GetKey()
+type lessor struct{}
 
-// 	os.lock.RLock()
-// 	s, _ := os.codable.Objekten[k]
-// 	os.lock.RUnlock()
+func (_ lessor) Less(a, b Transacted2) bool {
+	return a.GetTai().Less(b.GetTai())
+}
 
-// 	i = len(s)
-// 	s = append(s, o)
+func (_ lessor) LessPtr(a, b *Transacted2) bool {
+	return a.GetTai().Less(b.GetTai())
+}
 
-// 	os.lock.Lock()
-// 	os.codable.Objekten[k] = s
-// 	os.lock.Unlock()
+type equaler struct{}
 
-// 	return
-// }
+func (_ equaler) Equals(a, b Transacted2) bool {
+	return a.EqualsSkuLike(b)
+}
 
-// func (os MutableSet) Get(k string) []SkuLike {
-// 	os.lock.RLock()
-// 	defer os.lock.RUnlock()
+func (_ equaler) EqualsPtr(a, b *Transacted2) bool {
+	return a.EqualsSkuLike(b)
+}
 
-// 	return os.codable.Objekten[k]
-// }
+type resetter struct{}
 
-// func (os MutableSet) Each(
-// 	w schnittstellen.FuncIter[SkuLike],
-// ) (err error) {
-// 	os.lock.RLock()
-// 	defer os.lock.RUnlock()
+func (_ resetter) Reset(a *Transacted2) {
+	a.Reset()
+}
 
-// 	for _, oss := range os.codable.Objekten {
-// 		for _, o := range oss {
-// 			if err = w(o); err != nil {
-// 				switch {
-// 				case collections.IsStopIteration(err):
-// 					err = nil
-// 					return
+func (_ resetter) ResetWith(a *Transacted2, b Transacted2) {
+	a = &b
+}
 
-// 				default:
-// 					err = errors.Wrap(err)
-// 					return
-// 				}
-// 			}
-// 		}
-// 	}
-
-// 	return
-// }
-
-// func (os MutableSet) GobEncode() (bs []byte, err error) {
-// 	b := bytes.NewBuffer(bs)
-// 	enc := gob.NewEncoder(b)
-
-// 	if err = enc.Encode(os.codable); err != nil {
-// 		err = errors.Wrap(err)
-// 		return
-// 	}
-
-// 	bs = b.Bytes()
-
-// 	return
-// }
-
-// func (os *MutableSet) GobDecode(bs []byte) (err error) {
-// 	b := bytes.NewBuffer(bs)
-// 	dec := gob.NewDecoder(b)
-
-// 	if err = dec.Decode(&os.codable); err != nil {
-// 		err = errors.Wrap(err)
-// 		return
-// 	}
-
-// 	return
-// }
+func (_ resetter) ResetWithPtr(a *Transacted2, b *Transacted2) {
+	a.Kopf = b.Kopf
+	a.ObjekteSha = b.ObjekteSha
+	errors.PanicIfError(a.Kennung.ResetWithKennung(b.Kennung))
+	a.Metadatei.ResetWith(b.Metadatei)
+	a.TransactionIndex.SetInt(b.TransactionIndex.Int())
+}

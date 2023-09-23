@@ -4,7 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
-	"github.com/friedenberg/zit/src/india/transacted"
+	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/mike/store_util"
@@ -65,7 +65,7 @@ func (c WriteNewZettels) runOneAlreadyLocked(
 ) (result objekte.CheckedOutLikePtr, err error) {
 	z := pz.Make()
 
-	var zt *transacted.Zettel
+	var zt *sku.Transacted2
 
 	if zt, err = c.StoreObjekten().Zettel().Create(*z); err != nil {
 		err = errors.Wrap(err)

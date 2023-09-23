@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/bravo/test_logz"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/india/transacted"
+	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
 func TestMatcherLuaFalse(t1 *testing.T) {
@@ -19,7 +19,7 @@ func TestMatcherLuaFalse(t1 *testing.T) {
 		t.Errorf("expected no error but got %w", err)
 	}
 
-	sk := &transacted.Etikett{
+	sk := &sku.Transacted2{
 		Kennung: kennung.Kennung2{KennungPtr: &kennung.Etikett{}},
 	}
 
@@ -39,7 +39,7 @@ func TestMatcherLuaTrue(t1 *testing.T) {
 		t.Errorf("expected no error but got %w", err)
 	}
 
-	sk := &transacted.Etikett{
+	sk := &sku.Transacted2{
 		Kennung: kennung.Kennung2{KennungPtr: &kennung.Etikett{}},
 	}
 

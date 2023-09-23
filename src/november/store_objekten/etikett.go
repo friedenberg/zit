@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/lima/objekte_store"
 	"github.com/friedenberg/zit/src/mike/store_util"
@@ -56,7 +55,7 @@ func makeEtikettStore(
 		return
 	}
 
-	newOrUpdated := func(t *transacted.Etikett) (err error) {
+	newOrUpdated := func(t *sku.Transacted2) (err error) {
 		s.StoreUtil.CommitUpdatedTransacted(t)
 
 		if err = s.StoreUtil.GetKonfigPtr().AddEtikett(t); err != nil {
@@ -78,8 +77,8 @@ func makeEtikettStore(
 		sa.ObjekteReaderWriterFactory(gattung.Etikett),
 		sa,
 		EtikettTransactedReader(s),
-		objekte_store.CreateOrUpdateDelegate[*transacted.Etikett]{
-			New: func(t *transacted.Etikett) (err error) {
+		objekte_store.CreateOrUpdateDelegate[*sku.Transacted2]{
+			New: func(t *sku.Transacted2) (err error) {
 				if err = newOrUpdated(t); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -87,7 +86,7 @@ func makeEtikettStore(
 
 				return s.LogWriter.New(t)
 			},
-			Updated: func(t *transacted.Etikett) (err error) {
+			Updated: func(t *sku.Transacted2) (err error) {
 				if err = newOrUpdated(t); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -95,7 +94,7 @@ func makeEtikettStore(
 
 				return s.LogWriter.Updated(t)
 			},
-			Unchanged: func(t *transacted.Etikett) (err error) {
+			Unchanged: func(t *sku.Transacted2) (err error) {
 				return s.LogWriter.Unchanged(t)
 			},
 		},
@@ -112,12 +111,12 @@ func (s etikettStore) Flush() (err error) {
 	return
 }
 
-func (s etikettStore) AddOne(t *transacted.Etikett) (err error) {
+func (s etikettStore) AddOne(t *sku.Transacted2) (err error) {
 	s.StoreUtil.GetKonfigPtr().AddEtikett(t)
 	return
 }
 
-func (s etikettStore) UpdateOne(t *transacted.Etikett) (err error) {
+func (s etikettStore) UpdateOne(t *sku.Transacted2) (err error) {
 	s.StoreUtil.GetKonfigPtr().AddEtikett(t)
 	return
 }
@@ -153,7 +152,7 @@ func (s etikettStore) ReadAllSchwanzen(
 	f schnittstellen.FuncIter[sku.SkuLikePtr],
 ) (err error) {
 	if err = s.StoreUtil.GetKonfig().EachEtikett(
-		func(e *transacted.Etikett) (err error) {
+		func(e *sku.Transacted2) (err error) {
 			return f(e)
 		},
 	); err != nil {
@@ -172,7 +171,7 @@ func (s etikettStore) ReadAll(
 			return
 		}
 
-		var te *transacted.Etikett
+		var te *sku.Transacted2
 
 		if te, err = s.InflateFromSku(o); err != nil {
 			if errors.Is(err, toml.Error{}) {

@@ -15,7 +15,6 @@ import (
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/sku_fmt"
-	"github.com/friedenberg/zit/src/india/transacted"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 
@@ -25,22 +24,22 @@ type Page struct {
 	lock *sync.Mutex
 	pageId
 	schnittstellen.VerzeichnisseFactory
-	pool        schnittstellen.Pool[transacted.Zettel, *transacted.Zettel]
+	pool        schnittstellen.Pool[sku.Transacted2, *sku.Transacted2]
 	added       zettel.HeapTransacted
-	addFilter   schnittstellen.FuncIter[*transacted.Zettel]
-	flushFilter schnittstellen.FuncIter[*transacted.Zettel]
+	addFilter   schnittstellen.FuncIter[*sku.Transacted2]
+	flushFilter schnittstellen.FuncIter[*sku.Transacted2]
 
 	State
 }
 
 func makeZettelenPage(
 	iof schnittstellen.VerzeichnisseFactory, pid pageId,
-	pool schnittstellen.Pool[transacted.Zettel, *transacted.Zettel],
+	pool schnittstellen.Pool[sku.Transacted2, *sku.Transacted2],
 	fff PageDelegateGetter,
 	useBestandsaufnahmeForVerzeichnisse bool,
 ) (p *Page) {
-	flushFilter := collections.MakeWriterNoop[*transacted.Zettel]()
-	addFilter := collections.MakeWriterNoop[*transacted.Zettel]()
+	flushFilter := collections.MakeWriterNoop[*sku.Transacted2]()
+	addFilter := collections.MakeWriterNoop[*sku.Transacted2]()
 
 	if fff != nil {
 		d := fff.GetVerzeichnissePageDelegate(pid.index)
@@ -83,7 +82,7 @@ func (zp *Page) doUnlock() {
 	zp.lock.Unlock()
 }
 
-func (zp *Page) Add(z *transacted.Zettel) (err error) {
+func (zp *Page) Add(z *sku.Transacted2) (err error) {
 	if z == nil {
 		err = errors.Errorf("trying to add nil zettel")
 		return
@@ -170,7 +169,7 @@ func (zp *Page) Flush() (err error) {
 }
 
 func (zp *Page) copy(
-	w schnittstellen.FuncIter[*transacted.Zettel],
+	w schnittstellen.FuncIter[*sku.Transacted2],
 ) (err error) {
 	var r1 io.ReadCloser
 
@@ -228,7 +227,7 @@ func (zp *Page) copy(
 	added := zp.added.Copy()
 
 	if err = added.MergeStream(
-		func() (tz *transacted.Zettel, err error) {
+		func() (tz *sku.Transacted2, err error) {
 			var sk sku.SkuLikePtr
 
 			if sk, err = getOneSku(); err != nil {
@@ -243,7 +242,7 @@ func (zp *Page) copy(
 
 			ok := false
 
-			if tz, ok = sk.(*transacted.Zettel); !ok {
+			if tz, ok = sk.(*sku.Transacted2); !ok {
 				err = errors.Errorf("expected %T but got %T, err: %s", tz, sk, err)
 				return
 			}
@@ -261,7 +260,7 @@ func (zp *Page) copy(
 
 func (zp *Page) getFuncWriteOne(
 	w io.Writer,
-) schnittstellen.FuncIter[*transacted.Zettel] {
+) schnittstellen.FuncIter[*sku.Transacted2] {
 	if zp.useBestandsaufnahmeForVerzeichnisse {
 		enc := sku_fmt.MakeFormatBestandsaufnahmePrinter(
 			w,
@@ -272,7 +271,7 @@ func (zp *Page) getFuncWriteOne(
 			},
 		)
 
-		return func(z *transacted.Zettel) (err error) {
+		return func(z *sku.Transacted2) (err error) {
 			if _, err = enc.Print(z); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -283,7 +282,7 @@ func (zp *Page) getFuncWriteOne(
 	} else {
 		enc := gob.NewEncoder(w)
 
-		return func(z *transacted.Zettel) (err error) {
+		return func(z *sku.Transacted2) (err error) {
 			if err = enc.Encode(z); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -309,7 +308,7 @@ func (zp *Page) writeTo(w1 io.Writer) (err error) {
 }
 
 func (zp *Page) Copy(
-	w schnittstellen.FuncIter[*transacted.Zettel],
+	w schnittstellen.FuncIter[*sku.Transacted2],
 ) (err error) {
 	acquired := zp.doTryLock()
 
