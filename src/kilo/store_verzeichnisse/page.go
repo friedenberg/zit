@@ -15,7 +15,6 @@ import (
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/sku_fmt"
-	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 
 type Page struct {
@@ -25,7 +24,7 @@ type Page struct {
 	pageId
 	schnittstellen.VerzeichnisseFactory
 	pool        schnittstellen.Pool[sku.Transacted, *sku.Transacted]
-	added       zettel.HeapTransacted
+	added       sku.TransactedHeap
 	addFilter   schnittstellen.FuncIter[*sku.Transacted]
 	flushFilter schnittstellen.FuncIter[*sku.Transacted]
 
@@ -54,7 +53,7 @@ func makeZettelenPage(
 		VerzeichnisseFactory:                iof,
 		pageId:                              pid,
 		pool:                                pool,
-		added:                               zettel.MakeHeapTransacted(),
+		added:                               sku.MakeTransactedHeap(),
 		flushFilter:                         flushFilter,
 		addFilter:                           addFilter,
 	}

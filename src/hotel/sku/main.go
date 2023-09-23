@@ -16,7 +16,6 @@ func init() {
 type (
 	Getter interface {
 		GetSkuLike() SkuLike
-		// GetSkuLikePtr() SkuLikePtr
 	}
 
 	SkuLike interface {

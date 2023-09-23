@@ -24,7 +24,7 @@ func init() {
 	gob.Register(TransactedSetEmpty)
 	gob.Register(MakeTransactedMutableSet())
 
-	TransactedLessor = Lessor[Transacted, *Transacted]{}
+	TransactedLessor = &lessor{}
 }
 
 type (
