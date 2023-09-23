@@ -4,4 +4,4 @@ import (
 	"github.com/friedenberg/zit/src/juliett/objekte"
 )
 
-type CheckedOut = objekte.CheckedOut2
+type CheckedOut = objekte.CheckedOut

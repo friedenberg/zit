@@ -10,12 +10,12 @@ import (
 
 func MakeFilterFromMetaSet(
 	ms matcher.Query,
-) schnittstellen.FuncIter[*CheckedOut2] {
+) schnittstellen.FuncIter[*CheckedOut] {
 	if ms == nil {
-		return collections.MakeWriterNoop[*CheckedOut2]()
+		return collections.MakeWriterNoop[*CheckedOut]()
 	}
 
-	return func(col *CheckedOut2) (err error) {
+	return func(col *CheckedOut) (err error) {
 		internal := col.GetInternalLike()
 		external := col.GetExternalLikePtr()
 

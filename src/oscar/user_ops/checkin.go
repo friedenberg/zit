@@ -33,8 +33,8 @@ func (c Checkin) Run(
 		ms,
 		iter.MakeChain(
 			objekte.MakeFilterFromMetaSet(ms),
-			func(col *objekte.CheckedOut2) (err error) {
-				co := &objekte.CheckedOut2{}
+			func(col *objekte.CheckedOut) (err error) {
+				co := &objekte.CheckedOut{}
 
 				if err = co.Internal.SetFromSkuLike(col.GetInternalLikePtr()); err != nil {
 					err = errors.Wrap(err)

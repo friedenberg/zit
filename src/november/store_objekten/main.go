@@ -21,7 +21,7 @@ import (
 
 type CreateOrUpdator interface {
 	CreateOrUpdateCheckedOut(
-		co *objekte.CheckedOut2,
+		co *objekte.CheckedOut,
 	) (transactedPtr *sku.Transacted, err error)
 
 	CreateOrUpdateAkte(

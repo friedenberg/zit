@@ -8,11 +8,11 @@ import (
 )
 
 func ToSliceFilesAkten(
-	s schnittstellen.SetLike[*objekte.CheckedOut2],
+	s schnittstellen.SetLike[*objekte.CheckedOut],
 ) (out []string, err error) {
-	return iter.DerivedValues[*objekte.CheckedOut2, string](
+	return iter.DerivedValues[*objekte.CheckedOut, string](
 		s,
-		func(z *objekte.CheckedOut2) (e string, err error) {
+		func(z *objekte.CheckedOut) (e string, err error) {
 			e = z.GetExternalLike().GetAkteFD().Path
 
 			if e == "" {
@@ -26,11 +26,11 @@ func ToSliceFilesAkten(
 }
 
 func ToSliceFilesZettelen(
-	s schnittstellen.SetLike[*objekte.CheckedOut2],
+	s schnittstellen.SetLike[*objekte.CheckedOut],
 ) (out []string, err error) {
-	return iter.DerivedValues[*objekte.CheckedOut2, string](
+	return iter.DerivedValues[*objekte.CheckedOut, string](
 		s,
-		func(z *objekte.CheckedOut2) (e string, err error) {
+		func(z *objekte.CheckedOut) (e string, err error) {
 			e = z.GetExternalLike().GetObjekteFD().Path
 
 			if e == "" {

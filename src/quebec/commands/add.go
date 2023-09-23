@@ -216,7 +216,7 @@ func (c Add) openAktenIfNecessary(
 		CheckoutMode: checkout_mode.ModeAkteOnly,
 	}
 
-	var checkoutResults schnittstellen.MutableSetLike[*objekte.CheckedOut2]
+	var checkoutResults schnittstellen.MutableSetLike[*objekte.CheckedOut]
 
 	if checkoutResults, err = u.StoreWorkingDirectory().Checkout(
 		options,

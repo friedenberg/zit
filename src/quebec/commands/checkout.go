@@ -56,7 +56,7 @@ func (c Checkout) RunWithQuery(
 	if err = u.StoreWorkingDirectory().CheckoutQuery(
 		c.CheckoutOptions,
 		ms,
-		func(co *objekte.CheckedOut2) (err error) {
+		func(co *objekte.CheckedOut) (err error) {
 			return
 		},
 	); err != nil {

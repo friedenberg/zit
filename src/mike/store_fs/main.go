@@ -25,7 +25,7 @@ type Store struct {
 
 	storeObjekten *store_objekten.Store
 
-	checkedOutLogPrinter schnittstellen.FuncIter[*objekte.CheckedOut2]
+	checkedOutLogPrinter schnittstellen.FuncIter[*objekte.CheckedOut]
 }
 
 func New(
@@ -45,7 +45,7 @@ func New(
 }
 
 func (s *Store) SetCheckedOutLogPrinter(
-	zelw schnittstellen.FuncIter[*objekte.CheckedOut2],
+	zelw schnittstellen.FuncIter[*objekte.CheckedOut],
 ) {
 	s.checkedOutLogPrinter = zelw
 }
@@ -62,7 +62,7 @@ func (s Store) Flush() (err error) {
 func (s *Store) ReadFiles(
 	fs *cwd.CwdFiles,
 	ms matcher.Query,
-	f schnittstellen.FuncIter[*objekte.CheckedOut2],
+	f schnittstellen.FuncIter[*objekte.CheckedOut],
 ) (err error) {
 	emgr := objekte_store.MakeExternalMaybeGetterReader2(
 		fs.Get,
@@ -73,7 +73,7 @@ func (s *Store) ReadFiles(
 		ms,
 		iter.MakeChain(
 			func(e sku.SkuLikePtr) (err error) {
-				var col *objekte.CheckedOut2
+				var col *objekte.CheckedOut
 
 				et, ok := e.(*sku.Transacted)
 
@@ -126,7 +126,7 @@ func (s *Store) ReadFiles(
 
 				err = nil
 
-				tco := &objekte.CheckedOut2{}
+				tco := &objekte.CheckedOut{}
 				var tcoe *sku.External
 
 				if tcoe, err = s.storeObjekten.ReadOneExternal(

@@ -5,8 +5,8 @@ import (
 )
 
 type (
-	Etikett = objekte.CheckedOut2
-	Kasten  = objekte.CheckedOut2
-	Typ     = objekte.CheckedOut2
-	Zettel  = objekte.CheckedOut2
+	Etikett = objekte.CheckedOut
+	Kasten  = objekte.CheckedOut
+	Typ     = objekte.CheckedOut
+	Zettel  = objekte.CheckedOut
 )

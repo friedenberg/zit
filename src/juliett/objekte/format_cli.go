@@ -55,7 +55,7 @@ func MakeCliFormat(
 
 func (f *cli) WriteStringFormat(
 	sw io.StringWriter,
-	colp *CheckedOut2,
+	colp *CheckedOut,
 ) (n int64, err error) {
 	var (
 		n1 int

@@ -16,7 +16,7 @@ type ExternalMaybeGetterReader[
 ] interface {
 	ReadOne(
 		sku.Transacted,
-	) (*objekte.CheckedOut2, error)
+	) (*objekte.CheckedOut, error)
 }
 
 type externalMaybeGetterReader[
@@ -52,8 +52,8 @@ func MakeExternalMaybeGetterReader[
 
 func (emgr externalMaybeGetterReader[O, OPtr, K, KPtr]) ReadOne(
 	i sku.Transacted,
-) (co *objekte.CheckedOut2, err error) {
-	co = &objekte.CheckedOut2{
+) (co *objekte.CheckedOut, err error) {
+	co = &objekte.CheckedOut{
 		Internal: i,
 	}
 
