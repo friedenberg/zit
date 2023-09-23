@@ -33,21 +33,7 @@ func (c Checkin) Run(
 		ms,
 		iter.MakeChain(
 			objekte.MakeFilterFromMetaSet(ms),
-			func(col *objekte.CheckedOut) (err error) {
-				co := &objekte.CheckedOut{}
-
-				if err = co.Internal.SetFromSkuLike(col.GetInternalLikePtr()); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				if err = co.External.SetFromSkuLike(col.GetExternalLikePtr()); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				co.State = col.GetState()
-
+			func(co *objekte.CheckedOut) (err error) {
 				if _, err = u.StoreObjekten().CreateOrUpdator.CreateOrUpdateCheckedOut(
 					co,
 				); err != nil {
@@ -55,13 +41,11 @@ func (c Checkin) Run(
 					return
 				}
 
-				e := co.GetExternalLike()
-
 				l.Lock()
 				defer l.Unlock()
 
-				fds.Add(e.GetObjekteFD())
-				fds.Add(e.GetAkteFD())
+				fds.Add(co.External.GetObjekteFD())
+				fds.Add(co.External.GetAkteFD())
 
 				return
 			},

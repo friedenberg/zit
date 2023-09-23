@@ -62,11 +62,9 @@ func (f *cli) WriteStringFormat(
 		n2 int64
 	)
 
-	state := colp.GetState()
-
 	n2, err = f.rightAlignedWriter.WriteStringFormat(
 		sw,
-		state.String(),
+		colp.State.String(),
 	)
 	n += n2
 
@@ -75,7 +73,7 @@ func (f *cli) WriteStringFormat(
 		return
 	}
 
-	o := colp.GetExternalLikePtr()
+	o := colp.External
 	fds := o.GetFDsPtr()
 	n1, err = sw.WriteString("[")
 	n += int64(n1)

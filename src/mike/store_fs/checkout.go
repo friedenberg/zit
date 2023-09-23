@@ -101,16 +101,16 @@ func (s Store) shouldCheckOut(
 		return
 	}
 
-	if cz.GetState() == checked_out_state.StateEmpty {
+	if cz.State == checked_out_state.StateEmpty {
 		ok = true
 	}
 
-	if cz.GetState() == checked_out_state.StateEmpty {
+	if cz.State == checked_out_state.StateEmpty {
 		ok = true
 	}
 
 	if cz.Internal.GetMetadatei().Equals(
-		cz.GetExternalLike().GetMetadatei(),
+		cz.External.GetMetadatei(),
 	) {
 		return
 	}
@@ -187,7 +187,7 @@ func (s *Store) CheckoutOneZettel(
 ) (cz *objekte.CheckedOut, err error) {
 	cz = &objekte.CheckedOut{}
 
-	if err = cz.GetInternalLikePtr().SetFromSkuLike(sz); err != nil {
+	if err = cz.Internal.SetFromSkuLike(sz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -222,7 +222,7 @@ func (s *Store) CheckoutOneZettel(
 			return
 		}
 
-		if err = cz.GetExternalLikePtr().SetFromSkuLike(cze); err != nil {
+		if err = cz.External.SetFromSkuLike(cze); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -236,15 +236,15 @@ func (s *Store) CheckoutOneZettel(
 
 	inlineAkte := s.erworben.IsInlineTyp(sz.GetTyp())
 
-	cz.SetState(checked_out_state.StateJustCheckedOut)
+	cz.State = checked_out_state.StateJustCheckedOut
 
-	if err = cz.GetExternalLikePtr().SetFromSkuLike(sz); err != nil {
+	if err = cz.External.SetFromSkuLike(sz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	if options.CheckoutMode.IncludesObjekte() {
-		cz.GetExternalLikePtr().GetFDsPtr().Objekte.Path = filename
+		cz.External.GetFDsPtr().Objekte.Path = filename
 	}
 
 	if (!inlineAkte || !options.CheckoutMode.IncludesObjekte()) &&
@@ -257,7 +257,7 @@ func (s *Store) CheckoutOneZettel(
 			fe = t.String()
 		}
 
-		cz.GetExternalLikePtr().GetFDsPtr().Akte.Path = originalFilename + "." + fe
+		cz.External.GetFDsPtr().Akte.Path = originalFilename + "." + fe
 	}
 
 	e := objekte_collections.MakeFileEncoder(
@@ -265,7 +265,7 @@ func (s *Store) CheckoutOneZettel(
 		s.erworben,
 	)
 
-	if err = e.Encode(cz.GetExternalLikePtr()); err != nil {
+	if err = e.Encode(&cz.External); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

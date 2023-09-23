@@ -74,7 +74,7 @@ func (c WriteNewZettels) runOneAlreadyLocked(
 
 	result = &objekte.CheckedOut{}
 
-	if err = result.GetInternalLikePtr().SetFromSkuLike(zt); err != nil {
+	if err = result.Internal.SetFromSkuLike(zt); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -85,7 +85,7 @@ func (c WriteNewZettels) runOneAlreadyLocked(
 		// unlocking
 		if result, err = c.StoreWorkingDirectory().CheckoutOneZettel(
 			c.CheckoutOptions,
-			result.GetInternalLikePtr(),
+			&result.Internal,
 		); err != nil {
 			err = errors.Wrap(err)
 			return

@@ -94,7 +94,7 @@ func (s *Store) ReadFiles(
 					return
 				}
 
-				if err = col.GetInternalLikePtr().SetFromSkuLike(et); err != nil {
+				if err = col.Internal.SetFromSkuLike(et); err != nil {
 					err = errors.Wrap(err)
 					return
 				}

@@ -62,11 +62,11 @@ func (c Clean) RunWithCwdQuery(
 		iter.MakeChain(
 			objekte.MakeFilterFromMetaSet(ms),
 			func(co *objekte.CheckedOut) (err error) {
-				if co.GetState() != checked_out_state.StateExistsAndSame && !c.force {
+				if co.State != checked_out_state.StateExistsAndSame && !c.force {
 					return
 				}
 
-				e := co.GetExternalLike()
+				e := co.External
 
 				l.Lock()
 				defer l.Unlock()

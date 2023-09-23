@@ -81,7 +81,7 @@ func (c Edit) RunWithCwdQuery(
 		options,
 		ms,
 		func(co *objekte.CheckedOut) (err error) {
-			e := co.GetExternalLike()
+			e := co.External
 
 			if afd := e.GetAkteFD(); afd.String() != "." {
 				akten.Add(afd)
