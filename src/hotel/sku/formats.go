@@ -1,15 +1,7 @@
 package sku
 
 import (
-	"strings"
-
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/delta/ohio"
-	"github.com/friedenberg/zit/src/echo/format"
-	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
 
 type (
@@ -32,96 +24,96 @@ func TryMakeSkuWithFormats(fms ...FuncMakeSkuLike) FuncMakeSkuLike {
 	}
 }
 
-func MakeSkuFromLineGattungFirst(line string) (sk *Transacted2, err error) {
-	var (
-		m  metadatei.Metadatei
-		k  kennung.Kennung
-		os sha.Sha
-		g  gattung.Gattung
-	)
+// func MakeSkuFromLineGattungFirst(line string) (sk *Transacted2, err error) {
+// 	var (
+// 		m  metadatei.Metadatei
+// 		k  kennung.Kennung
+// 		os sha.Sha
+// 		g  gattung.Gattung
+// 	)
 
-	r := strings.NewReader(line)
+// 	r := strings.NewReader(line)
 
-	if _, err = format.ReadSep(
-		' ',
-		r,
-		ohio.MakeLineReaderIterateStrict(
-			g.Set,
-			m.Tai.Set,
-			func(v string) (err error) {
-				if k, err = kennung.MakeWithGattung(g, v); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
+// 	if _, err = format.ReadSep(
+// 		' ',
+// 		r,
+// 		ohio.MakeLineReaderIterateStrict(
+// 			g.Set,
+// 			m.Tai.Set,
+// 			func(v string) (err error) {
+// 				if k, err = kennung.MakeWithGattung(g, v); err != nil {
+// 					err = errors.Wrap(err)
+// 					return
+// 				}
 
-				return
-			},
-			os.Set,
-			m.AkteSha.Set,
-		),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+// 				return
+// 			},
+// 			os.Set,
+// 			m.AkteSha.Set,
+// 		),
+// 	); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	if !g.EqualsGattung(k.GetGattung()) {
-		err = errors.Errorf(
-			"sku gattung does not match kennung gattung: %q (sku), %q (kennung)",
-			g,
-			k.GetGattung(),
-		)
+// 	if !g.EqualsGattung(k.GetGattung()) {
+// 		err = errors.Errorf(
+// 			"sku gattung does not match kennung gattung: %q (sku), %q (kennung)",
+// 			g,
+// 			k.GetGattung(),
+// 		)
 
-		err = errors.Wrapf(err, "Line: %q", line)
+// 		err = errors.Wrapf(err, "Line: %q", line)
 
-		return
-	}
+// 		return
+// 	}
 
-	return MakeSkuLike(m, k, os)
-}
+// 	return MakeSkuLike(m, k, os)
+// }
 
-func MakeSkuFromLineTaiFirst(line string) (sk *Transacted2, err error) {
-	var (
-		m  metadatei.Metadatei
-		k  kennung.Kennung
-		os sha.Sha
-		g  gattung.Gattung
-	)
+// func MakeSkuFromLineTaiFirst(line string) (sk *Transacted2, err error) {
+// 	var (
+// 		m  metadatei.Metadatei
+// 		k  kennung.Kennung
+// 		os sha.Sha
+// 		g  gattung.Gattung
+// 	)
 
-	r := strings.NewReader(line)
+// 	r := strings.NewReader(line)
 
-	if _, err = format.ReadSep(
-		' ',
-		r,
-		ohio.MakeLineReaderIterateStrict(
-			m.Tai.Set,
-			g.Set,
-			func(v string) (err error) {
-				if k, err = kennung.MakeWithGattung(g, v); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
+// 	if _, err = format.ReadSep(
+// 		' ',
+// 		r,
+// 		ohio.MakeLineReaderIterateStrict(
+// 			m.Tai.Set,
+// 			g.Set,
+// 			func(v string) (err error) {
+// 				if k, err = kennung.MakeWithGattung(g, v); err != nil {
+// 					err = errors.Wrap(err)
+// 					return
+// 				}
 
-				return
-			},
-			os.Set,
-			m.AkteSha.Set,
-		),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+// 				return
+// 			},
+// 			os.Set,
+// 			m.AkteSha.Set,
+// 		),
+// 	); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	if !g.EqualsGattung(k.GetGattung()) {
-		err = errors.Errorf(
-			"sku gattung does not match kennung gattung: %q (sku), %q (kennung)",
-			g,
-			k.GetGattung(),
-		)
+// 	if !g.EqualsGattung(k.GetGattung()) {
+// 		err = errors.Errorf(
+// 			"sku gattung does not match kennung gattung: %q (sku), %q (kennung)",
+// 			g,
+// 			k.GetGattung(),
+// 		)
 
-		err = errors.Wrapf(err, "Line: %q", line)
+// 		err = errors.Wrapf(err, "Line: %q", line)
 
-		return
-	}
+// 		return
+// 	}
 
-	return MakeSkuLike(m, k, os)
-}
+// 	return MakeSkuLike(m, k, os)
+// }

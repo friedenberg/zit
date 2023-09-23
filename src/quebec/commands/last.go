@@ -73,7 +73,7 @@ func (c Last) runWithBestandsaufnahm(
 ) (err error) {
 	s := u.StoreObjekten()
 
-	var b *bestandsaufnahme.Transacted
+	var b *sku.Transacted2
 
 	if b, err = s.GetBestandsaufnahmeStore().ReadLast(); err != nil {
 		err = errors.Wrap(err)

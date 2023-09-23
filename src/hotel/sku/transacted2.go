@@ -60,7 +60,7 @@ func MakeSkuLike2(
 	k kennung.KennungPtr,
 	os sha.Sha,
 ) (sk SkuLikePtr, err error) {
-	if sk, err = MakeSkuLikeSansObjekteSha(m, k); err != nil {
+	if sk, err = MakeSkuLikeSansObjekteSha2(m, k); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

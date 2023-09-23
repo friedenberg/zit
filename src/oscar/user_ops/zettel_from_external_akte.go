@@ -11,7 +11,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/india/external"
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/india/objekte_collections"
 	"github.com/friedenberg/zit/src/kilo/zettel"
@@ -44,7 +43,7 @@ func (c ZettelFromExternalAkte) Run(
 	fds := iter.SortedValues(ms.GetCwdFDs())
 
 	for _, fd := range fds {
-		var z *external.Zettel
+		var z *sku.External2
 
 		if z, err = c.zettelForAkte(fd); err != nil {
 			err = errors.Wrap(err)
@@ -163,12 +162,14 @@ func (c ZettelFromExternalAkte) Run(
 
 func (c *ZettelFromExternalAkte) zettelForAkte(
 	akteFD kennung.FD,
-) (z *external.Zettel, err error) {
-	z = &external.Zettel{
+) (z *sku.External2, err error) {
+	z = &sku.External2{
 		FDs: sku.ExternalFDs{
 			Akte: akteFD,
 		},
 	}
+
+	z.Transacted2.Kennung.KennungPtr = &kennung.Hinweis{}
 
 	var r io.Reader
 
