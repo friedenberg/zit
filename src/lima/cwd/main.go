@@ -213,6 +213,10 @@ func (fs CwdFiles) Get(
 	case gattung.Etikett:
 		return fs.Etiketten.GetPtr(k.String())
 
+	case gattung.Konfig:
+		// TODO-P3
+		return
+
 	default:
 		panic(gattung.MakeErrUnsupportedGattung(g))
 	}

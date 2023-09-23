@@ -25,7 +25,7 @@ func TestOne(t1 *testing.T) {
 	printer := MakeFormatBestandsaufnahmePrinter(w, f, o)
 
 	n, err := printer.Print(transacted.Zettel{
-		Kennung: kennung.MustHinweis("one/uno"),
+		Kennung: kennung.Kennung2{KennungPtr: kennung.MustHinweis("one/uno")},
 	})
 
 	{
@@ -43,7 +43,7 @@ func TestOne(t1 *testing.T) {
 	}
 
 	n, err = printer.Print(transacted.Zettel{
-		Kennung: kennung.MustHinweis("two/dos"),
+		Kennung: kennung.Kennung2{KennungPtr: kennung.MustHinweis("two/dos")},
 	})
 
 	{
@@ -71,7 +71,7 @@ func TestOne(t1 *testing.T) {
 		t.Fatalf("expected ok scan")
 	}
 
-	sk = scanner.GetSkuLikePtr()
+	sk = scanner.GetTransacted()
 	t.AssertNoError(scanner.Error())
 
 	{
@@ -86,7 +86,7 @@ func TestOne(t1 *testing.T) {
 		t.Fatalf("expected ok scan")
 	}
 
-	sk = scanner.GetSkuLikePtr()
+	sk = scanner.GetTransacted()
 	t.AssertNoError(scanner.Error())
 
 	{
@@ -130,7 +130,7 @@ func TestBigMac(t1 *testing.T) {
 
 	for scanner.Scan() {
 		t.Logf("i: %d", i)
-		sk := scanner.GetSkuLikePtr()
+		sk := scanner.GetTransacted()
 
 		if sk == nil {
 			t.Errorf("expected sku but got nil")

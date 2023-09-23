@@ -28,8 +28,8 @@ type CommonStoreDelegate[
 	K kennung.KennungLike[K],
 	KPtr kennung.KennungLikePtr[K],
 ] interface {
-	AddOne(*sku.Transacted[K, KPtr]) error
-	UpdateOne(*sku.Transacted[K, KPtr]) error
+	AddOne(*sku.Transacted2) error
+	UpdateOne(*sku.Transacted2) error
 }
 
 type CommonStore[
@@ -44,7 +44,7 @@ type CommonStore[
 	objekte_store.CreateOrUpdater[
 		OPtr,
 		KPtr,
-		*sku.Transacted[K, KPtr],
+		*sku.Transacted2,
 		*objekte.CheckedOut[K, KPtr],
 	]
 }

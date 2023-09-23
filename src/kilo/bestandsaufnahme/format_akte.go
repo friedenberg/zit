@@ -32,7 +32,7 @@ func (f formatAkte) ParseAkte(
 	if n, err = format.ReadLines(
 		r,
 		func(v string) (err error) {
-			var sk sku.SkuLikePtr
+			var sk *sku.Transacted2
 
 			if sk, err = tml(v); err != nil {
 				err = errors.Wrap(err)
@@ -46,7 +46,7 @@ func (f formatAkte) ParseAkte(
 				return
 			}
 
-			return sku.AddSkuToHeap(&o.Skus, sk)
+			return o.Skus.Add(sk)
 		},
 	); err != nil {
 		err = errors.Wrap(err)

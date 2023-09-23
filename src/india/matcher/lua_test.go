@@ -19,7 +19,9 @@ func TestMatcherLuaFalse(t1 *testing.T) {
 		t.Errorf("expected no error but got %w", err)
 	}
 
-	sk := &transacted.Etikett{}
+	sk := &transacted.Etikett{
+		Kennung: kennung.Kennung2{KennungPtr: &kennung.Etikett{}},
+	}
 
 	if m.ContainsMatchable(sk) {
 		t.Errorf("woops")
@@ -37,7 +39,9 @@ func TestMatcherLuaTrue(t1 *testing.T) {
 		t.Errorf("expected no error but got %w", err)
 	}
 
-	sk := &transacted.Etikett{}
+	sk := &transacted.Etikett{
+		Kennung: kennung.Kennung2{KennungPtr: &kennung.Etikett{}},
+	}
 
 	if !m.ContainsMatchable(sk) {
 		t.Errorf("woops")

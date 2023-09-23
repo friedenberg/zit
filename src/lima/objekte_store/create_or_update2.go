@@ -72,9 +72,8 @@ func (cou createOrUpdate2) CreateOrUpdateCheckedOut(
 
 	transactedPtr = sku.GetTransactedPool().Get()
 	transactedPtr.Kennung = kennungPtr
-	transactedPtr.Metadatei = metadatei.Metadatei{
-		Tai: cou.clock.GetTai(),
-	}
+	transactedPtr.Metadatei = co.External.Metadatei
+	transactedPtr.Metadatei.Tai = cou.clock.GetTai()
 
 	transactedPtr.SetAkteSha(co.External.GetAkteSha())
 

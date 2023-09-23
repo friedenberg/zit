@@ -91,8 +91,8 @@ func MakeSkuLike(
 	m metadatei.Metadatei,
 	k kennung.Kennung,
 	os sha.Sha,
-) (sk SkuLikePtr, err error) {
-	if sk, err = MakeSkuLikeSansObjekteSha(m, k); err != nil {
+) (sk *Transacted2, err error) {
+	if sk, err = MakeSkuLikeSansObjekteSha2(m, k); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -43,7 +43,6 @@ type StoreUtil interface {
 	CommitUpdatedTransacted(sku.SkuLikePtr) error
 
 	GetBestandsaufnahmeStore() bestandsaufnahme.Store
-	GetBestandsaufnahmeAkte() bestandsaufnahme.Akte
 	GetAbbrStore() AbbrStore
 	GetKennungIndex() kennung_index.Index
 	GetTypenIndex() (kennung_index.KennungIndex[kennung.Typ, *kennung.Typ], error)
@@ -103,7 +102,7 @@ func MakeStoreUtil(
 	)
 
 	c.bestandsaufnahmeAkte = bestandsaufnahme.Akte{
-		Skus: sku.MakeSkuLikeHeap(),
+		Skus: sku.MakeTransactedHeap(),
 	}
 
 	if c.Abbr, err = newIndexAbbr(
@@ -169,14 +168,19 @@ func (s *common) CommitUpdatedTransacted(
 }
 
 func (s *common) CommitTransacted(t sku.SkuLike) (err error) {
-	sk := t.GetSkuLike()
-	sku.AddSkuToHeap(&s.bestandsaufnahmeAkte.Skus, sk)
+	sk := sku.GetTransactedPool().Get()
+
+	if err = sk.SetFromSkuLike(t); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.bestandsaufnahmeAkte.Skus.Add(sk); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
-}
-
-func (s *common) GetBestandsaufnahmeAkte() bestandsaufnahme.Akte {
-	return s.bestandsaufnahmeAkte
 }
 
 func (s *common) GetBestandsaufnahmeStore() bestandsaufnahme.Store {

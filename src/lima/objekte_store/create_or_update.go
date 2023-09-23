@@ -32,7 +32,7 @@ type createOrUpdate[
 	of                        schnittstellen.ObjekteWriterFactory
 	af                        schnittstellen.AkteWriterFactory
 	reader                    TransactedReader[T3, sku.SkuLikePtr]
-	delegate                  CreateOrUpdateDelegate[*sku.Transacted[T2, T3]]
+	delegate                  CreateOrUpdateDelegate[*sku.Transacted2]
 	matchableAdder            matcher.MatchableAdder
 	persistentMetadateiFormat objekte_format.Format
 	options                   objekte_format.Options
@@ -50,7 +50,7 @@ func MakeCreateOrUpdate[
 	of schnittstellen.ObjekteWriterFactory,
 	af schnittstellen.AkteWriterFactory,
 	reader TransactedReader[T3, sku.SkuLikePtr],
-	delegate CreateOrUpdateDelegate[*sku.Transacted[T2, T3]],
+	delegate CreateOrUpdateDelegate[*sku.Transacted2],
 	ma matcher.MatchableAdder,
 	pmf objekte_format.Format,
 	op objekte_format.Options,
@@ -75,7 +75,7 @@ func MakeCreateOrUpdate[
 
 func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateCheckedOut(
 	co *objekte.CheckedOut[T2, T3],
-) (transactedPtr *sku.Transacted[T2, T3], err error) {
+) (transactedPtr *sku.Transacted2, err error) {
 	kennungPtr := co.External.Kennung
 
 	if !cou.ls.IsAcquired() {
@@ -86,13 +86,13 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateCheckedOut(
 		return
 	}
 
-	transactedPtr = &sku.Transacted[T2, T3]{
+	transactedPtr = &sku.Transacted2{
 		Metadatei: metadatei.Metadatei{
 			Tai: cou.clock.GetTai(),
 		},
 	}
 
-	if err = T3(&transactedPtr.Kennung).Set(kennungPtr.String()); err != nil {
+	if err = transactedPtr.Kennung.SetWithKennung(kennungPtr); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -148,7 +148,7 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateCheckedOut(
 func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdate(
 	mg metadatei.Getter,
 	kennungPtr T3,
-) (transactedPtr *sku.Transacted[T2, T3], err error) {
+) (transactedPtr *sku.Transacted2, err error) {
 	if !cou.ls.IsAcquired() {
 		err = ErrLockRequired{
 			Operation: fmt.Sprintf(
@@ -179,9 +179,13 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdate(
 
 	m.Tai = cou.clock.GetTai()
 
-	transactedPtr = &sku.Transacted[T2, T3]{
-		Kennung:   *kennungPtr,
+	transactedPtr = &sku.Transacted2{
 		Metadatei: m,
+	}
+
+	if err = transactedPtr.Kennung.SetWithKennung(kennungPtr); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	if mutter != nil {
@@ -251,7 +255,7 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateAkte(
 	mg metadatei.Getter,
 	kennungPtr T3,
 	sh schnittstellen.ShaLike,
-) (transactedPtr *sku.Transacted[T2, T3], err error) {
+) (transactedPtr *sku.Transacted2, err error) {
 	if !cou.ls.IsAcquired() {
 		err = ErrLockRequired{
 			Operation: fmt.Sprintf(
@@ -282,9 +286,13 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateAkte(
 
 	m.Tai = cou.clock.GetTai()
 
-	transactedPtr = &sku.Transacted[T2, T3]{
+	transactedPtr = &sku.Transacted2{
 		Metadatei: m,
-		Kennung:   *kennungPtr,
+	}
+
+	if err = transactedPtr.Kennung.SetWithKennung(kennungPtr); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	transactedPtr.SetAkteSha(sh)

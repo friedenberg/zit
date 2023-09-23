@@ -88,7 +88,11 @@ func (c Last) runWithBestandsaufnahm(
 	}
 
 	errors.TodoP3("support log line format for skus")
-	if err = sku.HeapEachPtr(a.Skus, f); err != nil {
+	if err = a.Skus.EachPtr(
+		func(sk *sku.Transacted2) (err error) {
+			return f(sk)
+		},
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

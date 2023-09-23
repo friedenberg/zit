@@ -7,11 +7,11 @@ import (
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/charlie/tridex"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/india/transacted"
 )
 
 // TODO-P4 make generic
@@ -171,19 +171,28 @@ func (i *indexAbbr) AddMatchable(o matcher.Matchable) (err error) {
 
 	i.indexAbbrEncodableTridexes.Shas.Kennungen.Add(o.GetAkteSha().String())
 
-	switch to := o.(type) {
-	case *transacted.Zettel:
-		i.indexAbbrEncodableTridexes.Hinweis.Kopfen.Add(to.Kennung.Kopf())
-		i.indexAbbrEncodableTridexes.Hinweis.Schwanzen.Add(to.Kennung.Schwanz())
+	ks := o.GetKennungLike().String()
 
-	case *transacted.Typ:
-		i.indexAbbrEncodableTridexes.Typen.Add(to.GetKennung())
+	switch o.GetGattung() {
+	case gattung.Zettel:
+		var h kennung.Hinweis
 
-	case *transacted.Etikett:
-		i.indexAbbrEncodableTridexes.Etiketten.Kennungen.Add(to.GetKennung().String())
+		if err = h.Set(ks); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
-	case *transacted.Kasten:
-		i.indexAbbrEncodableTridexes.Kisten.Kennungen.Add(to.GetKennung().String())
+		i.indexAbbrEncodableTridexes.Hinweis.Kopfen.Add(h.Kopf())
+		i.indexAbbrEncodableTridexes.Hinweis.Schwanzen.Add(h.Schwanz())
+
+	case gattung.Typ:
+		i.indexAbbrEncodableTridexes.Typen.Kennungen.Add(ks)
+
+	case gattung.Etikett:
+		i.indexAbbrEncodableTridexes.Etiketten.Kennungen.Add(ks)
+
+	case gattung.Kasten:
+		i.indexAbbrEncodableTridexes.Kisten.Kennungen.Add(ks)
 
 		// default:
 		// 	err = errors.Errorf("unsupported objekte: %T", to)

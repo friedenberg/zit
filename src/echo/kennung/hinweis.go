@@ -85,7 +85,7 @@ func MakeHinweisKopfUndSchwanz(kopf, schwanz string) (h Hinweis, err error) {
 	return
 }
 
-func MustHinweis(v string) (h Hinweis) {
+func MustHinweis(v string) (h *Hinweis) {
 	var err error
 	h, err = MakeHinweis(v)
 
@@ -94,8 +94,8 @@ func MustHinweis(v string) (h Hinweis) {
 	return
 }
 
-func MakeHinweis(v string) (h Hinweis, err error) {
-	h = Hinweis{}
+func MakeHinweis(v string) (h *Hinweis, err error) {
+	h = &Hinweis{}
 
 	if err = h.Set(v); err != nil {
 		return

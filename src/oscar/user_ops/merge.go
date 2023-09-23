@@ -11,7 +11,7 @@ type Merge struct {
 	*umwelt.Umwelt
 }
 
-func (op Merge) Run(skus sku.SkuLikeHeap) (err error) {
+func (op Merge) Run(skus sku.TransactedHeap) (err error) {
 	// TODO-P1 make data structure for merging
 	q := op.MakeQueryAll()
 

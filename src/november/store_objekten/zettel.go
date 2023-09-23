@@ -288,7 +288,7 @@ func (s *zettelStore) UpdateManyMetadatei(
 
 			if _, err = s.updateLockedWithMutter(
 				mwk,
-				mwkClone.GetKennungLikePtr().(*kennung.Hinweis),
+				ke,
 				zt,
 			); err != nil {
 				err = errors.Wrap(err)
@@ -405,7 +405,7 @@ func (s *zettelStore) Update(
 
 func (s *zettelStore) updateLockedWithMutter(
 	mg metadatei.Getter,
-	h *kennung.Hinweis,
+	h kennung.Kennung,
 	mutter sku.SkuLikePtr,
 ) (tz *transacted.Zettel, err error) {
 	if mutter == nil {
@@ -419,7 +419,7 @@ func (s *zettelStore) updateLockedWithMutter(
 		return
 	}
 
-	if tz, err = s.writeObjekte(m, *h); err != nil {
+	if tz, err = s.writeObjekte(m, h); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -489,7 +489,7 @@ func (s *zettelStore) writeObjekte(
 	}
 
 	tz = &transacted.Zettel{
-		Kennung:   h,
+		Kennung:   kennung.Kennung2{KennungPtr: &h},
 		Metadatei: m,
 	}
 
@@ -501,9 +501,14 @@ func (s *zettelStore) Inherit(tz *transacted.Zettel) (err error) {
 
 	s.StoreUtil.CommitTransacted(tz)
 
-	errExists := s.StoreUtil.GetAbbrStore().Hinweis().Exists(
-		tz.GetKennung(),
-	)
+	var h kennung.Hinweis
+
+	if err = h.Set(tz.GetKennung().String()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	errExists := s.StoreUtil.GetAbbrStore().Hinweis().Exists(h)
 
 	if err = s.writeNamedZettelToIndex(tz); err != nil {
 		err = errors.Wrap(err)
@@ -536,9 +541,14 @@ func (s *zettelStore) ReindexOne(
 
 	o = tz
 
-	errExists := s.StoreUtil.GetAbbrStore().Hinweis().Exists(
-		tz.GetKennung(),
-	)
+	var h kennung.Hinweis
+
+	if err = h.Set(tz.GetKennung().String()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	errExists := s.StoreUtil.GetAbbrStore().Hinweis().Exists(h)
 
 	if err = s.writeNamedZettelToIndex(tz); err != nil {
 		err = errors.Wrap(err)

@@ -13,12 +13,11 @@ import (
 )
 
 type (
-	FuncMakeSkuLike    func(string) (SkuLike, error)
-	FuncMakeSkuLikePtr func(string) (SkuLikePtr, error)
+	FuncMakeSkuLike func(string) (*Transacted2, error)
 )
 
-func TryMakeSkuWithFormats(fms ...FuncMakeSkuLikePtr) FuncMakeSkuLikePtr {
-	return func(line string) (sk SkuLikePtr, err error) {
+func TryMakeSkuWithFormats(fms ...FuncMakeSkuLike) FuncMakeSkuLike {
+	return func(line string) (sk *Transacted2, err error) {
 		em := errors.MakeMulti()
 
 		for _, f := range fms {
@@ -33,7 +32,7 @@ func TryMakeSkuWithFormats(fms ...FuncMakeSkuLikePtr) FuncMakeSkuLikePtr {
 	}
 }
 
-func MakeSkuFromLineGattungFirst(line string) (sk SkuLikePtr, err error) {
+func MakeSkuFromLineGattungFirst(line string) (sk *Transacted2, err error) {
 	var (
 		m  metadatei.Metadatei
 		k  kennung.Kennung
@@ -80,7 +79,7 @@ func MakeSkuFromLineGattungFirst(line string) (sk SkuLikePtr, err error) {
 	return MakeSkuLike(m, k, os)
 }
 
-func MakeSkuFromLineTaiFirst(line string) (sk SkuLikePtr, err error) {
+func MakeSkuFromLineTaiFirst(line string) (sk *Transacted2, err error) {
 	var (
 		m  metadatei.Metadatei
 		k  kennung.Kennung

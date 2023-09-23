@@ -20,8 +20,7 @@ func (s *common) FlushBestandsaufnahme() (err error) {
 	}
 
 	errors.Log().Printf("saving Bestandsaufnahme")
-	ba := s.GetBestandsaufnahmeAkte()
-	if err = s.GetBestandsaufnahmeStore().Create(&ba); err != nil {
+	if err = s.GetBestandsaufnahmeStore().Create(&s.bestandsaufnahmeAkte); err != nil {
 		if errors.Is(err, bestandsaufnahme.ErrEmpty) {
 			errors.Log().Printf("Bestandsaufnahme was empty")
 			err = nil

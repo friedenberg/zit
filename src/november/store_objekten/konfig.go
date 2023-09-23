@@ -101,6 +101,8 @@ func (s konfigStore) Update(
 
 	kt = &erworben.Transacted{}
 
+	kt.Kennung = kennung.Kennung2{KennungPtr: &kennung.Konfig{}}
+
 	kt.SetTai(s.StoreUtil.GetTai())
 	kt.SetAkteSha(sh)
 

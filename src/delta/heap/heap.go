@@ -175,11 +175,12 @@ func (h *Heap[T, TPtr]) PopAndSave() (sk TPtr, ok bool) {
 	}
 
 	sk = h.p.Get()
-	h.h.Resetter.ResetWithPtr(sk, heap.Pop(&h.h).(TPtr))
+	e := heap.Pop(&h.h).(TPtr)
+	h.h.Resetter.ResetWithPtr(sk, e)
 	ok = true
 	h.s += 1
 	faked := h.h.Elements[:h.h.Len()+h.s]
-	faked[h.h.Len()] = sk
+	faked[h.h.Len()] = e
 
 	return
 }

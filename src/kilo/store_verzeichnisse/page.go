@@ -209,7 +209,7 @@ func (zp *Page) copy(
 				return
 			}
 
-			sk = dec.GetSkuLikePtr()
+			sk = dec.GetTransacted()
 
 			return
 		}

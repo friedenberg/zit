@@ -3,6 +3,7 @@ package sku
 import (
 	"encoding/gob"
 
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/delta/heap"
@@ -99,5 +100,9 @@ func (_ resetter) ResetWith(a *Transacted2, b Transacted2) {
 }
 
 func (_ resetter) ResetWithPtr(a *Transacted2, b *Transacted2) {
-	a = b
+	a.Kopf = b.Kopf
+	a.ObjekteSha = b.ObjekteSha
+	errors.PanicIfError(a.Kennung.ResetWithKennung(b.Kennung))
+	a.Metadatei.ResetWith(b.Metadatei)
+	a.TransactionIndex.SetInt(b.TransactionIndex.Int())
 }

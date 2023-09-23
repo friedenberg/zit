@@ -157,7 +157,9 @@ func (c CreateFromPaths) Run(
 			// TODO-P4 get matches
 			cz.DetermineState(true)
 
-			zv := &transacted.Zettel{}
+			zv := &transacted.Zettel{
+				Kennung: kennung.Kennung2{KennungPtr: &kennung.Hinweis{}},
+			}
 
 			zv.ResetWith(cz.Internal)
 

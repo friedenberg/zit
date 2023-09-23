@@ -38,8 +38,8 @@ type CommonStoreBase[
 	StoreUtil
 
 	Pool schnittstellen.Pool[
-		sku.Transacted[K, KPtr],
-		*sku.Transacted[K, KPtr],
+		sku.Transacted2,
+		*sku.Transacted2,
 	]
 
 	objekte_store.TransactedInflator[O, OPtr, K, KPtr]
@@ -84,8 +84,8 @@ func MakeCommonStoreBase[
 	}
 
 	pool := pool.MakePoolWithReset[
-		sku.Transacted[K, KPtr],
-		*sku.Transacted[K, KPtr],
+		sku.Transacted2,
+		*sku.Transacted2,
 	]()
 
 	of := sa.ObjekteReaderWriterFactory(gg)
@@ -146,7 +146,7 @@ func (s *CommonStoreBase[O, OPtr, K, KPtr]) Query(
 func (s *CommonStoreBase[O, OPtr, K, KPtr]) ReindexOne(
 	sk sku.SkuLike,
 ) (o matcher.Matchable, err error) {
-	var t *sku.Transacted[K, KPtr]
+	var t *sku.Transacted2
 
 	if t, err = s.InflateFromSku(sk); err != nil {
 		if errors.Is(err, toml.Error{}) {
@@ -178,7 +178,7 @@ func (s *CommonStoreBase[O, OPtr, K, KPtr]) ReindexOne(
 }
 
 func (s *CommonStoreBase[O, OPtr, K, KPtr]) Inherit(
-	t *sku.Transacted[K, KPtr],
+	t *sku.Transacted2,
 ) (err error) {
 	if t == nil {
 		err = errors.Errorf("trying to inherit nil %T", t)
@@ -211,8 +211,8 @@ func (s *CommonStoreBase[O, OPtr, K, KPtr]) GetInheritor(
 	pmf objekte_format.Format,
 ) objekte_store.TransactedInheritor {
 	p := pool.MakePoolWithReset[
-		sku.Transacted[K, KPtr],
-		*sku.Transacted[K, KPtr],
+		sku.Transacted2,
+		*sku.Transacted2,
 	]()
 
 	inflator := objekte_store.MakeTransactedInflator[
@@ -235,8 +235,8 @@ func (s *CommonStoreBase[O, OPtr, K, KPtr]) GetInheritor(
 	)
 
 	return objekte_store.MakeTransactedInheritor[
-		sku.Transacted[K, KPtr],
-		*sku.Transacted[K, KPtr],
+		sku.Transacted2,
+		*sku.Transacted2,
 	](
 		inflator,
 		s,

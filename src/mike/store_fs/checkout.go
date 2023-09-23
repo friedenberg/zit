@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/id"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/checked_out_state"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -122,19 +123,29 @@ func (s Store) filenameForZettelTransacted(
 	options store_util.CheckoutOptions,
 	sz sku.SkuLikePtr,
 ) (originalFilename string, filename string, err error) {
-	var h kennung.Hinweis
+	switch sz.GetGattung() {
+	case gattung.Zettel:
+		var h kennung.Hinweis
 
-	if err = h.Set(sz.GetKennungLike().String()); err != nil {
-		err = errors.Wrap(err)
-		return
+		if err = h.Set(sz.GetKennungLike().String()); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if originalFilename, err = id.MakeDirIfNecessary(h, s.Cwd()); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		filename = originalFilename + s.erworben.GetZettelFileExtension()
+
+	default:
+		originalFilename = sz.GetKennungLike().String() + "." + s.erworben.FileExtensions.GetFileExtensionForGattung(
+			sz.GetKennungLike(),
+		)
+
+		filename = originalFilename
 	}
-
-	if originalFilename, err = id.MakeDirIfNecessary(h, s.Cwd()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	filename = originalFilename + s.erworben.GetZettelFileExtension()
 
 	return
 }
@@ -147,8 +158,18 @@ func (s *Store) checkoutOneGeneric(
 	case *transacted.Zettel:
 		cop, err = s.CheckoutOneZettel(options, tt)
 
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 	default:
 		cop, err = s.storeObjekten.CheckoutOne(store_util.CheckoutOptions(options), tt)
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	cop.DetermineState(true)

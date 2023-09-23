@@ -41,13 +41,16 @@ func (t *Transacted2) SetFromSkuLike(sk SkuLike) (err error) {
 
 func MakeSkuLikeSansObjekteSha2(
 	m metadatei.Metadatei,
-	k kennung.KennungPtr,
+	k kennung.Kennung,
 ) (sk *Transacted2, err error) {
 	sk = &Transacted2{
 		Metadatei: m,
 	}
 
-	err = sk.Kennung.ResetWithKennungPtr(k)
+	if err = sk.Kennung.SetWithKennung(k); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }
@@ -152,7 +155,12 @@ func (a *Transacted2) SetKennungLike(kl kennung.Kennung) (err error) {
 func (a *Transacted2) Reset() {
 	a.Kopf.Reset()
 	a.ObjekteSha.Reset()
-	a.Kennung.Reset()
+
+	// TODO-P2 remove in favor of kennung pkg
+	if a.Kennung.KennungPtr != nil {
+		a.Kennung.Reset()
+	}
+
 	a.Metadatei.Reset()
 	a.TransactionIndex.Reset()
 }

@@ -35,55 +35,7 @@ func (h *Kennung2) Set(v string) (err error) {
 }
 
 func (a *Kennung2) ResetWithKennung(b Kennung) (err error) {
-	switch bt := b.(type) {
-	case Hinweis:
-		a.KennungPtr = &bt
-
-	case *Hinweis:
-		b1 := *bt
-		a.KennungPtr = &b1
-
-	case Typ:
-		a.KennungPtr = &bt
-
-	case *Typ:
-		b1 := *bt
-		a.KennungPtr = &b1
-
-	case Etikett:
-		a.KennungPtr = &bt
-
-	case *Etikett:
-		b1 := *bt
-		a.KennungPtr = &b1
-
-	case Kasten:
-		a.KennungPtr = &bt
-
-	case *Kasten:
-		b1 := *bt
-		a.KennungPtr = &b1
-
-	case Konfig:
-		a.KennungPtr = &bt
-
-	case *Konfig:
-		b1 := *bt
-		a.KennungPtr = &b1
-
-	case Tai:
-		a.KennungPtr = &bt
-
-	case *Tai:
-		b1 := *bt
-		a.KennungPtr = &b1
-
-	default:
-		err = errors.Errorf("unsupported kennung: %T", b)
-		return
-	}
-
-	return
+	return a.SetWithKennung(b)
 }
 
 func (a *Kennung2) ResetWithKennungPtr(b KennungPtr) (err error) {

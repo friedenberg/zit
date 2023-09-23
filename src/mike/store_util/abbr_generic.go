@@ -92,14 +92,14 @@ func (ih *indexHinweis) ExpandString(s string) (h kennung.Hinweis, err error) {
 		return
 	}
 
-	var ha kennung.Hinweis
+	var ha *kennung.Hinweis
 
 	if ha, err = kennung.MakeHinweis(s); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	return ih.Expand(ha)
+	return ih.Expand(*ha)
 }
 
 func (ih *indexHinweis) Expand(

@@ -231,9 +231,14 @@ func (kc *compiled) recompile(
 
 		if err = kc.Etiketten.Each(
 			func(ke ketikett) (err error) {
-				if err = kc.AccumulateImplicitEtiketten(
-					ke.Transacted.GetKennung(),
-				); err != nil {
+				var e kennung.Etikett
+
+				if err = e.Set(ke.Transacted.GetKennung().String()); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				if err = kc.AccumulateImplicitEtiketten(e); err != nil {
 					err = errors.Wrap(err)
 					return
 				}

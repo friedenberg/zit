@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
-	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/sku_fmt"
 )
 
@@ -37,9 +36,9 @@ func (f formatAkte2) ParseAkte(
 	)
 
 	for dec.Scan() {
-		sk := dec.GetSkuLikePtr()
+		sk := dec.GetTransacted()
 
-		if err = sku.AddSkuToHeap(&o.Skus, sk); err != nil {
+		if err = o.Skus.Add(sk); err != nil {
 			err = errors.Wrapf(err, "Sku: %s", sk)
 			return
 		}
@@ -83,7 +82,7 @@ func (f formatAkte2) FormatParsedAkte(
 			break
 		}
 
-		n1, err = fo.Print(sk.SkuLikePtr)
+		n1, err = fo.Print(sk)
 
 		n += int64(n1)
 

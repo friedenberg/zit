@@ -33,6 +33,12 @@ func (s *Store) onNewOrUpdated(
 			return
 		}
 
+	case gattung.Zettel:
+		if err = s.zettelStore.writeNamedZettelToIndex(t); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 	default:
 		err = gattung.MakeErrUnsupportedGattung(g)
 		return

@@ -392,7 +392,11 @@ func (s *store) ReadAllSkus(
 				return
 			}
 
-			if err = sku.HeapEachPtr(a.Skus, f); err != nil {
+			if err = a.Skus.EachPtr(
+				func(sk2 *sku.Transacted2) (err error) {
+					return f(sk2)
+				},
+			); err != nil {
 				err = errors.Wrapf(
 					err,
 					"Bestandsaufnahme: %s",
@@ -426,14 +430,14 @@ func (s *store) ReadAllSkus2(
 
 			defer errors.DeferredCloser(&err, r)
 
-			dec := sku_fmt.MakeFormatBestandsaufnahmeScanner2(
+			dec := sku_fmt.MakeFormatBestandsaufnahmeScanner(
 				r,
 				s.persistentMetadateiFormat,
 				s.options,
 			)
 
 			for dec.Scan() {
-				sk := dec.GetSkuLikePtr().(*sku.Transacted2)
+				sk := dec.GetTransacted()
 
 				if err = f(sk); err != nil {
 					err = errors.Wrapf(err, "Sku: %s", sk)
