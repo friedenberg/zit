@@ -74,7 +74,7 @@ func MakeCreateOrUpdate[
 }
 
 func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateCheckedOut(
-	co *objekte.CheckedOut[T2, T3],
+	co *objekte.CheckedOut2,
 ) (transactedPtr *sku.Transacted, err error) {
 	kennungPtr := co.External.Kennung
 

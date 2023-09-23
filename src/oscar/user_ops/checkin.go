@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/juliett/objekte"
-	"github.com/friedenberg/zit/src/kilo/checked_out"
 	"github.com/friedenberg/zit/src/lima/cwd"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
@@ -34,37 +33,26 @@ func (c Checkin) Run(
 		ms,
 		iter.MakeChain(
 			objekte.MakeFilterFromMetaSet(ms),
-			func(co objekte.CheckedOutLikePtr) (err error) {
-				switch aco := co.(type) {
-				case *checked_out.Zettel:
-					if _, err = u.StoreObjekten().Zettel().UpdateCheckedOut(
-						aco,
-					); err != nil {
-						err = errors.Wrap(err)
-						return
-					}
+			func(col objekte.CheckedOutLikePtr) (err error) {
+				co := &objekte.CheckedOut2{}
 
-				default:
-					co := &objekte.CheckedOut2{}
+				if err = co.Internal.SetFromSkuLike(col.GetInternalLikePtr()); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
 
-					if err = co.Internal.SetFromSkuLike(aco.GetInternalLikePtr()); err != nil {
-						err = errors.Wrap(err)
-						return
-					}
+				if err = co.External.SetFromSkuLike(col.GetExternalLikePtr()); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
 
-					if err = co.External.SetFromSkuLike(aco.GetExternalLikePtr()); err != nil {
-						err = errors.Wrap(err)
-						return
-					}
+				co.State = col.GetState()
 
-					co.State = aco.GetState()
-
-					if _, err = u.StoreObjekten().CreateOrUpdator.CreateOrUpdateCheckedOut(
-						co,
-					); err != nil {
-						err = errors.Wrap(err)
-						return
-					}
+				if _, err = u.StoreObjekten().CreateOrUpdator.CreateOrUpdateCheckedOut(
+					co,
+				); err != nil {
+					err = errors.Wrap(err)
+					return
 				}
 
 				e := co.GetExternalLike()
