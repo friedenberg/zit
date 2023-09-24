@@ -19,7 +19,7 @@ import (
 
 type Reindexer interface {
 	// updateExternal(objekte.External) error
-	ReindexOne(sku.SkuLike) (matcher.Matchable, error)
+	ReindexOne(*sku.Transacted) (matcher.Matchable, error)
 }
 
 type CommonStoreDelegate interface {
@@ -99,7 +99,7 @@ func MakeCommonStore[
 
 func (s *CommonStore[O, OPtr, K, KPtr]) CheckoutOne(
 	options CheckoutOptions,
-	t sku.SkuLikePtr,
+	t *sku.Transacted,
 ) (co *sku.CheckedOut, err error) {
 	todo.Change("add pool")
 	co = &sku.CheckedOut{}
@@ -177,7 +177,7 @@ func (s *CommonStore[O, OPtr, K, KPtr]) CheckoutOne(
 }
 
 func (s *CommonStore[O, OPtr, K, KPtr]) UpdateManyMetadatei(
-	incoming schnittstellen.SetLike[sku.SkuLike],
+	incoming sku.TransactedSet,
 ) (err error) {
 	if !s.StoreUtil.GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{
@@ -187,8 +187,8 @@ func (s *CommonStore[O, OPtr, K, KPtr]) UpdateManyMetadatei(
 		return
 	}
 
-	if err = incoming.Each(
-		func(mwk sku.SkuLike) (err error) {
+	if err = incoming.EachPtr(
+		func(mwk *sku.Transacted) (err error) {
 			k := mwk.GetKennungLike()
 
 			var ke K

@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/india/objekte_collections"
 	"github.com/friedenberg/zit/src/kilo/organize_text"
 	"github.com/friedenberg/zit/src/lima/changes"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
@@ -40,7 +39,7 @@ func (c CommitOrganizeFile) Run(
 	sameTyp := a.Metadatei.Typ.Equals(b.Metadatei.Typ)
 
 	l := sync.Mutex{}
-	toUpdate := objekte_collections.MakeMutableSetMetadateiWithKennung()
+	toUpdate := sku.MakeTransactedMutableSet()
 
 	ms := c.Umwelt.MakeMetaIdSetWithoutExcludedHidden(
 		nil,
@@ -54,7 +53,13 @@ func (c CommitOrganizeFile) Run(
 		func(tl *sku.Transacted) (err error) {
 			var change changes.Change
 			ok := false
-			sk := tl.GetSkuLike().MutableClone()
+			sk := sku.GetTransactedPool().Get()
+
+			if err = sk.SetFromSkuLike(tl); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
 			k := sk.GetKennungLike()
 
 			if change, ok = cs.GetExisting().Get(kennung.FormattedString(k)); !ok {
@@ -76,9 +81,14 @@ func (c CommitOrganizeFile) Run(
 			}
 
 			sk.SetMetadatei(m)
+
 			l.Lock()
 			defer l.Unlock()
-			toUpdate.Add(sk)
+
+			if err = toUpdate.AddPtr(sk); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 
 			return
 		},

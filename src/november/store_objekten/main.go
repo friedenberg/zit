@@ -259,7 +259,7 @@ func (s Store) Flush() (err error) {
 }
 
 func (s *Store) UpdateManyMetadatei(
-	incoming schnittstellen.SetLike[sku.SkuLike],
+	incoming sku.TransactedSet,
 ) (err error) {
 	s.GetKonfigPtr().SetHasChanges(true)
 	todo.Optimize() // parallelize

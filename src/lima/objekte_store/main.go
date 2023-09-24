@@ -9,7 +9,7 @@ import (
 )
 
 type TransactedLogger interface {
-	SetLogWriter(LogWriter[sku.SkuLikePtr])
+	SetLogWriter(LogWriter[*sku.Transacted])
 }
 
 type LastReader interface {
@@ -63,16 +63,13 @@ type Updater[
 	Update(metadatei.Getter, K) (V, error)
 }
 
-type CheckedOutUpdater[
-	CO *sku.CheckedOut,
-	T sku.SkuLike,
-] interface {
-	UpdateCheckedOut(CO) (T, error)
+type CheckedOutUpdater interface {
+	UpdateCheckedOut(*sku.CheckedOut) (*sku.Transacted, error)
 }
 
 type UpdaterManyMetadatei interface {
 	UpdateManyMetadatei(
-		schnittstellen.SetLike[sku.SkuLike],
+		sku.TransactedSet,
 	) error
 }
 

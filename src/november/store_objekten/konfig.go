@@ -87,7 +87,7 @@ func (s konfigStore) Update(
 		return
 	}
 
-	var mutter sku.SkuLikePtr
+	var mutter *sku.Transacted
 
 	if mutter, err = s.ReadOne(&kennung.Konfig{}); err != nil {
 		if errors.Is(err, objekte_store.ErrNotFound{}) {
@@ -275,7 +275,7 @@ func (s konfigStore) ReadOne(
 }
 
 func (s *konfigStore) ReindexOne(
-	sk sku.SkuLike,
+	sk *sku.Transacted,
 ) (o matcher.Matchable, err error) {
 	var te *erworben.Transacted
 

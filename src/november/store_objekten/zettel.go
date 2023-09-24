@@ -110,7 +110,7 @@ func (s *zettelStore) UpdateOne(t *sku.Transacted) (err error) {
 }
 
 func (s *zettelStore) writeNamedZettelToIndex(
-	tz sku.SkuLikePtr,
+	tz *sku.Transacted,
 ) (err error) {
 	errors.Log().Print("writing to index")
 
@@ -243,7 +243,7 @@ func (s *zettelStore) Create(
 }
 
 func (s *zettelStore) UpdateManyMetadatei(
-	incoming schnittstellen.SetLike[sku.SkuLike],
+	incoming sku.TransactedSet,
 ) (err error) {
 	if !s.StoreUtil.GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{
@@ -263,14 +263,20 @@ func (s *zettelStore) UpdateManyMetadatei(
 
 			k := kennung.FormattedString(ke)
 
-			var mwk sku.SkuLike
+			var mwk *sku.Transacted
 			ok := false
 
-			if mwk, ok = incoming.Get(k); !ok {
+			if mwk, ok = incoming.GetPtr(k); !ok {
 				return
 			}
 
-			mwkClone := mwk.MutableClone()
+			mwkClone := sku.GetTransactedPool().Get()
+
+			if err = mwkClone.SetFromSkuLike(mwk); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
 			m := mwkClone.GetMetadateiPtr()
 			m.AkteSha = sha.Make(zt.GetAkteSha())
 
@@ -297,7 +303,7 @@ func (s *zettelStore) UpdateManyMetadatei(
 
 func (s *zettelStore) updateExternal(
 	co objekte.ExternalLike,
-) (tl sku.SkuLike, err error) {
+) (tl *sku.Transacted, err error) {
 	ze := co.(*sku.External)
 	return s.Update(ze.GetMetadatei(), &ze.Kennung)
 }
@@ -396,7 +402,7 @@ func (s *zettelStore) Update(
 func (s *zettelStore) updateLockedWithMutter(
 	mg metadatei.Getter,
 	h kennung.Kennung,
-	mutter sku.SkuLikePtr,
+	mutter *sku.Transacted,
 ) (tz *sku.Transacted, err error) {
 	if mutter == nil {
 		panic("mutter was nil")
@@ -514,7 +520,7 @@ func (s *zettelStore) Inherit(tz *sku.Transacted) (err error) {
 }
 
 func (s *zettelStore) ReindexOne(
-	sk sku.SkuLike,
+	sk *sku.Transacted,
 ) (o matcher.Matchable, err error) {
 	var tz *sku.Transacted
 	defer s.Pool.Put(tz)

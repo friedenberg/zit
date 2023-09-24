@@ -131,7 +131,7 @@ func (s *CommonStoreBase[O, OPtr]) Query(
 }
 
 func (s *CommonStoreBase[O, OPtr]) ReindexOne(
-	sk sku.SkuLike,
+	sk *sku.Transacted,
 ) (o matcher.Matchable, err error) {
 	var t *sku.Transacted
 

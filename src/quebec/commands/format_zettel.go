@@ -111,7 +111,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	typKonfig := u.Konfig().GetApproximatedTyp(
 		zt.GetTyp(),
-	).ApproximatedOrActualSku()
+	).ApproximatedOrActual()
 
 	var akteFormatter script_config.RemoteScript
 

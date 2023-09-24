@@ -27,14 +27,33 @@ func (s *Store) CheckoutQuery(
 	if err = s.storeObjekten.Query(
 		ms,
 		func(t *sku.Transacted) (err error) {
-			var co *sku.CheckedOut
+			var cop *sku.CheckedOut
 
-			if co, err = s.checkoutOneGeneric(options, t); err != nil {
+			if t.GetGattung() == gattung.Zettel {
+				cop, err = s.CheckoutOneZettel(
+					store_util.CheckoutOptions(options),
+					t,
+				)
+			} else {
+				cop, err = s.storeObjekten.CheckoutOne(
+					store_util.CheckoutOptions(options),
+					t,
+				)
+			}
+
+			if err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			return f(co)
+			cop.DetermineState(true)
+
+			if err = s.checkedOutLogPrinter(cop); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return f(cop)
 		},
 	); err != nil {
 		err = errors.Wrap(err)
@@ -120,7 +139,7 @@ func (s Store) shouldCheckOut(
 
 func (s Store) filenameForZettelTransacted(
 	options store_util.CheckoutOptions,
-	sz sku.SkuLikePtr,
+	sz *sku.Transacted,
 ) (originalFilename string, filename string, err error) {
 	switch sz.GetGattung() {
 	case gattung.Zettel:
@@ -149,41 +168,9 @@ func (s Store) filenameForZettelTransacted(
 	return
 }
 
-func (s *Store) checkoutOneGeneric(
-	options store_util.CheckoutOptions,
-	t sku.SkuLikePtr,
-) (cop *sku.CheckedOut, err error) {
-	switch tt := t.(type) {
-	case *sku.Transacted:
-		cop, err = s.CheckoutOneZettel(options, tt)
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	default:
-		cop, err = s.storeObjekten.CheckoutOne(store_util.CheckoutOptions(options), tt)
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	cop.DetermineState(true)
-
-	if err = s.checkedOutLogPrinter(cop); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
 func (s *Store) CheckoutOneZettel(
 	options store_util.CheckoutOptions,
-	sz sku.SkuLikePtr,
+	sz *sku.Transacted,
 ) (cz *sku.CheckedOut, err error) {
 	cz = &sku.CheckedOut{}
 

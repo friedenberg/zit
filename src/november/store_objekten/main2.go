@@ -77,7 +77,7 @@ func (s *Store) onUnchanged(
 func (s *Store) ReadOne(
 	k1 schnittstellen.StringerGattungGetter,
 ) (sk1 *sku.Transacted, err error) {
-	var sk sku.SkuLike
+	var sk *sku.Transacted
 
 	switch k1.GetGattung() {
 	case gattung.Zettel:
@@ -101,7 +101,7 @@ func (s *Store) ReadOne(
 			return
 		}
 
-		sk = s.StoreUtil.GetKonfig().GetApproximatedTyp(k).ActualOrNilSku()
+		sk = s.StoreUtil.GetKonfig().GetApproximatedTyp(k).ActualOrNil()
 
 	case gattung.Etikett:
 		var e kennung.Etikett
@@ -112,7 +112,7 @@ func (s *Store) ReadOne(
 		}
 
 		ok := false
-		sk, ok = s.StoreUtil.GetKonfig().GetEtikett(e)
+		*sk, ok = s.StoreUtil.GetKonfig().GetEtikett(e)
 
 		if !ok {
 			sk = nil
@@ -199,7 +199,7 @@ func (s *Store) ReadAll(
 
 func (s *Store) CheckoutOne(
 	options store_util.CheckoutOptions,
-	sk sku.SkuLikePtr,
+	sk *sku.Transacted,
 ) (co *sku.CheckedOut, err error) {
 	g := gattung.Must(sk)
 	switch g {
