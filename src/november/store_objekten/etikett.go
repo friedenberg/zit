@@ -66,7 +66,6 @@ func makeEtikettStore(
 	s.CommonStore.CreateOrUpdater = objekte_store.MakeCreateOrUpdate(
 		sa,
 		sa.GetLockSmith(),
-		sa.ObjekteReaderWriterFactory(gattung.Etikett),
 		sa,
 		EtikettTransactedReader(s),
 		objekte_store.CreateOrUpdateDelegate{

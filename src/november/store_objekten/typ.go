@@ -67,7 +67,6 @@ func makeTypStore(
 	s.CommonStore.CreateOrUpdater = objekte_store.MakeCreateOrUpdate(
 		sa,
 		sa.GetLockSmith(),
-		s.CommonStore,
 		sa,
 		TypTransactedReader(s),
 		objekte_store.CreateOrUpdateDelegate{

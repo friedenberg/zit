@@ -5,7 +5,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
@@ -23,9 +22,8 @@ type CreateOrUpdateDelegate struct {
 type createOrUpdate struct {
 	clock                     kennung.Clock
 	ls                        schnittstellen.LockSmith
-	of                        schnittstellen.ObjekteWriterFactory
 	af                        schnittstellen.AkteWriterFactory
-	reader                    TransactedReader
+	reader                    OneReader
 	delegate                  CreateOrUpdateDelegate
 	matchableAdder            matcher.MatchableAdder
 	persistentMetadateiFormat objekte_format.Format
@@ -36,9 +34,8 @@ type createOrUpdate struct {
 func MakeCreateOrUpdate(
 	clock kennung.Clock,
 	ls schnittstellen.LockSmith,
-	of schnittstellen.ObjekteWriterFactory,
 	af schnittstellen.AkteWriterFactory,
-	reader TransactedReader,
+	reader OneReader,
 	delegate CreateOrUpdateDelegate,
 	ma matcher.MatchableAdder,
 	pmf objekte_format.Format,
@@ -52,7 +49,6 @@ func MakeCreateOrUpdate(
 	return &createOrUpdate{
 		clock:                     clock,
 		ls:                        ls,
-		of:                        of,
 		af:                        af,
 		reader:                    reader,
 		delegate:                  delegate,
@@ -88,26 +84,16 @@ func (cou createOrUpdate) CreateOrUpdateCheckedOut(
 
 	transactedPtr.SetAkteSha(co.External.GetAkteSha())
 
-	var ow sha.WriteCloser
-
-	if ow, err = cou.of.ObjekteWriter(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, ow)
-
-	if _, err = cou.persistentMetadateiFormat.FormatPersistentMetadatei(
-		ow,
+	err = sku.CalculateAndSetSha(
 		transactedPtr,
+		cou.persistentMetadateiFormat,
 		cou.options,
-	); err != nil {
+	)
+
+	if err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	os := sha.Make(ow.GetShaLike())
-	transactedPtr.ObjekteSha = os
 
 	// TODO-P2: determine why Metadatei.Etiketten can be nil
 	if transactedPtr.Metadatei.EqualsSansTai(co.Internal.Metadatei) {
@@ -184,25 +170,16 @@ func (cou createOrUpdate) CreateOrUpdate(
 		// transactedPtr.Sku.Kopf = s.common.GetTransaktion().Time
 	}
 
-	var ow sha.WriteCloser
-
-	if ow, err = cou.of.ObjekteWriter(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, ow)
-
-	if _, err = cou.persistentMetadateiFormat.FormatPersistentMetadatei(
-		ow,
+	err = sku.CalculateAndSetSha(
 		transactedPtr,
+		cou.persistentMetadateiFormat,
 		cou.options,
-	); err != nil {
+	)
+
+	if err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	transactedPtr.ObjekteSha = sha.Make(ow.GetShaLike())
 
 	if mutter != nil &&
 		kennung.Equals(transactedPtr.GetKennung(), mutter.GetKennungLike()) &&
@@ -256,7 +233,7 @@ func (cou createOrUpdate) CreateOrUpdateAkte(
 		return
 	}
 
-	var mutter sku.SkuLikePtr
+	var mutter *sku.Transacted
 
 	if mutter, err = cou.reader.ReadOne(kennungPtr); err != nil {
 		if errors.Is(err, ErrNotFound{}) {
@@ -275,9 +252,8 @@ func (cou createOrUpdate) CreateOrUpdateAkte(
 
 	m.Tai = cou.clock.GetTai()
 
-	transactedPtr = &sku.Transacted{
-		Metadatei: m,
-	}
+	transactedPtr = sku.GetTransactedPool().Get()
+	transactedPtr.Metadatei = m
 
 	if err = transactedPtr.Kennung.SetWithKennung(kennungPtr); err != nil {
 		err = errors.Wrap(err)
@@ -293,25 +269,16 @@ func (cou createOrUpdate) CreateOrUpdateAkte(
 		// transactedPtr.Sku.Kopf = s.common.GetTransaktion().Time
 	}
 
-	var ow sha.WriteCloser
-
-	if ow, err = cou.of.ObjekteWriter(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, ow)
-
-	if _, err = cou.persistentMetadateiFormat.FormatPersistentMetadatei(
-		ow,
+	err = sku.CalculateAndSetSha(
 		transactedPtr,
+		cou.persistentMetadateiFormat,
 		cou.options,
-	); err != nil {
+	)
+
+	if err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	transactedPtr.ObjekteSha = sha.Make(ow.GetShaLike())
 
 	if mutter != nil &&
 		kennung.Equals(transactedPtr.GetKennung(), mutter.GetKennungLike()) &&

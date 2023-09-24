@@ -66,7 +66,6 @@ func makeKastenStore(
 	s.CommonStore.CreateOrUpdater = objekte_store.MakeCreateOrUpdate(
 		sa,
 		sa.GetLockSmith(),
-		sa.ObjekteReaderWriterFactory(gattung.Kasten),
 		sa,
 		KastenTransactedReader(s),
 		objekte_store.CreateOrUpdateDelegate{
