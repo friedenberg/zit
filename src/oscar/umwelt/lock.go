@@ -28,11 +28,6 @@ func (u *Umwelt) Unlock() (err error) {
 			return
 		}
 
-		if err = u.storeWorkingDirectory.Flush(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
 		if err = u.KonfigPtr().Flush(u.Standort(), u.StoreObjekten().Typ()); err != nil {
 			err = errors.Wrap(err)
 			return

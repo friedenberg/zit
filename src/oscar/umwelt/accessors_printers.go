@@ -23,7 +23,7 @@ func (u *Umwelt) StringFormatWriterShaLike(
 	return kennung_fmt.MakeShaCliFormat(
 		u.konfig.PrintOptions,
 		co,
-		u.StoreObjekten().GetAbbrStore().Shas().Abbreviate,
+		u.storeUtil.GetAbbrStore().Shas().Abbreviate,
 	)
 }
 

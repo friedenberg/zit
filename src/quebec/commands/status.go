@@ -42,7 +42,7 @@ func (c Status) RunWithCwdQuery(
 ) (err error) {
 	pcol := u.PrinterCheckedOutLike()
 
-	if err = u.StoreWorkingDirectory().ReadFiles(
+	if err = u.StoreObjekten().ReadFiles(
 		possible,
 		objekte.MakeFuncReaderTransactedLikePtr(ms, u.StoreObjekten().Query),
 		iter.MakeChain(

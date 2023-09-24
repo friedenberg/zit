@@ -8,7 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/kilo/konfig"
-	"github.com/friedenberg/zit/src/mike/store_fs"
 	"github.com/friedenberg/zit/src/november/store_objekten"
 )
 
@@ -42,10 +41,6 @@ func (u *Umwelt) Standort() standort.Standort {
 
 func (u *Umwelt) StoreObjekten() *store_objekten.Store {
 	return u.storeObjekten
-}
-
-func (u *Umwelt) StoreWorkingDirectory() *store_fs.Store {
-	return u.storeWorkingDirectory
 }
 
 func (u *Umwelt) ZettelVerzeichnissePool() schnittstellen.Pool[sku.Transacted, *sku.Transacted] {

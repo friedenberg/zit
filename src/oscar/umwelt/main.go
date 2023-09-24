@@ -22,7 +22,6 @@ import (
 	"github.com/friedenberg/zit/src/kilo/konfig"
 	"github.com/friedenberg/zit/src/kilo/organize_text"
 	"github.com/friedenberg/zit/src/lima/objekte_store"
-	"github.com/friedenberg/zit/src/mike/store_fs"
 	"github.com/friedenberg/zit/src/mike/store_util"
 	"github.com/friedenberg/zit/src/november/store_objekten"
 )
@@ -42,12 +41,11 @@ type Umwelt struct {
 	erworbenCli erworben.Cli
 	konfig      konfig.Compiled
 
-	storesInitialized     bool
-	lock                  *file_lock.Lock
-	storeUtil             store_util.StoreUtil
-	storeObjekten         *store_objekten.Store
-	age                   *age.Age
-	storeWorkingDirectory *store_fs.Store
+	storesInitialized bool
+	lock              *file_lock.Lock
+	storeUtil         store_util.StoreUtil
+	storeObjekten     *store_objekten.Store
+	age               *age.Age
 
 	zettelVerzeichnissePool schnittstellen.Pool[sku.Transacted, *sku.Transacted]
 }
@@ -178,6 +176,7 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 		u.KonfigPtr(),
 		u.standort,
 		objekte_format.FormatForVersion(u.Konfig().GetStoreVersion()),
+		u.sonnenaufgang,
 	); err != nil {
 		err = errors.Wrapf(err, "failed to initialize store util")
 		return
@@ -188,17 +187,6 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 		u.zettelVerzeichnissePool,
 	); err != nil {
 		err = errors.Wrapf(err, "failed to initialize zettel meta store")
-		return
-	}
-
-	errors.Log().Print("initing checkout store")
-	if u.storeWorkingDirectory, err = store_fs.New(
-		u.storeUtil,
-		u.Sonnenaufgang(),
-		u.standort,
-	); err != nil {
-		errors.Log().Print(err)
-		err = errors.Wrap(err)
 		return
 	}
 
@@ -213,11 +201,8 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 		Archived:  ptl,
 	}
 
+	u.storeUtil.SetCheckedOutLogWriter(u.PrinterCheckedOutLike())
 	u.storeObjekten.SetLogWriter(lw)
-
-	u.storeWorkingDirectory.SetCheckedOutLogPrinter(
-		u.PrinterCheckedOutLike(),
-	)
 
 	u.storesInitialized = true
 

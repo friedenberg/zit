@@ -54,7 +54,7 @@ func (c Checkout) RunWithQuery(
 
 	c.CheckoutOptions.Cwd = cwdFiles
 
-	if err = u.StoreWorkingDirectory().CheckoutQuery(
+	if err = u.StoreObjekten().CheckoutQuery(
 		c.CheckoutOptions,
 		objekte.MakeFuncReaderTransactedLikePtr(ms, u.StoreObjekten().Query),
 		func(co *sku.CheckedOut) (err error) {

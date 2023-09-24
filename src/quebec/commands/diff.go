@@ -58,7 +58,7 @@ func (c Diff) RunWithCwdQuery(
 		nil,
 	)
 
-	if err = u.StoreWorkingDirectory().ReadFiles(
+	if err = u.StoreObjekten().ReadFiles(
 		cwdFiles,
 		objekte.MakeFuncReaderTransactedLikePtr(ms, u.StoreObjekten().Query),
 		iter.MakeChain(

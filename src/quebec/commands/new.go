@@ -142,7 +142,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 				CheckoutMode: checkout_mode.ModeObjekteAndAkte,
 			}
 
-			if zsc, err = u.StoreWorkingDirectory().Checkout(
+			if zsc, err = u.StoreObjekten().Checkout(
 				options,
 				u.StoreObjekten().Typ(),
 				u.StoreObjekten().Zettel().ReadAllSchwanzen,

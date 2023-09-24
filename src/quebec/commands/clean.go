@@ -57,7 +57,7 @@ func (c Clean) RunWithCwdQuery(
 		fds.Add(d)
 	}
 
-	if err = s.StoreWorkingDirectory().ReadFiles(
+	if err = s.StoreObjekten().ReadFiles(
 		possible,
 		objekte.MakeFuncReaderTransactedLikePtr(ms, s.StoreObjekten().Query),
 		iter.MakeChain(

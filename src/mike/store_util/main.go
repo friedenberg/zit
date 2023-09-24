@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/standort"
+	"github.com/friedenberg/zit/src/delta/typ_akte"
 	"github.com/friedenberg/zit/src/echo/age_io"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
@@ -18,8 +19,10 @@ import (
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
+	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/kilo/konfig"
+	"github.com/friedenberg/zit/src/lima/cwd"
 )
 
 type StoreUtilVerzeichnisse interface {
@@ -52,9 +55,35 @@ type StoreUtil interface {
 
 	objekte_format.Getter
 
+	SetCheckedOutLogWriter(zelw schnittstellen.FuncIter[*sku.CheckedOut])
+
 	ObjekteReaderWriterFactory(
 		schnittstellen.GattungGetter,
 	) schnittstellen.ObjekteIOFactory
+
+	CheckoutQuery(
+		options CheckoutOptions,
+		fq objekte.FuncReaderTransactedLikePtr,
+		f schnittstellen.FuncIter[*sku.CheckedOut],
+	) (err error)
+
+	Checkout(
+		options CheckoutOptions,
+		tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
+		fq objekte.FuncReaderTransactedLikePtr,
+		ztw schnittstellen.FuncIter[*sku.Transacted],
+	) (zcs schnittstellen.MutableSetLike[*sku.CheckedOut], err error)
+
+	ReadFiles(
+		fs *cwd.CwdFiles,
+		fq objekte.FuncReaderTransactedLikePtr,
+		f schnittstellen.FuncIter[*sku.CheckedOut],
+	) (err error)
+
+	CheckoutOne(
+		options CheckoutOptions,
+		sz *sku.Transacted,
+	) (cz *sku.CheckedOut, err error)
 }
 
 // TODO-P3 move to own package
@@ -66,6 +95,10 @@ type common struct {
 	bestandsaufnahmeAkte      bestandsaufnahme.Akte
 	Abbr                      AbbrStore
 	persistentMetadateiFormat objekte_format.Format
+
+	sonnenaufgang kennung.Time
+
+	checkedOutLogPrinter schnittstellen.FuncIter[*sku.CheckedOut]
 
 	metadateiTextParser metadatei.TextParser
 
@@ -82,6 +115,7 @@ func MakeStoreUtil(
 	k *konfig.Compiled,
 	st standort.Standort,
 	pmf objekte_format.Format,
+	t kennung.Time,
 ) (c *common, err error) {
 	c = &common{
 		LockSmith:                 lockSmith,
@@ -89,6 +123,7 @@ func MakeStoreUtil(
 		konfig:                    k,
 		standort:                  st,
 		persistentMetadateiFormat: pmf,
+		sonnenaufgang:             t,
 	}
 
 	c.metadateiTextParser = metadatei.MakeTextParser(
@@ -136,6 +171,12 @@ func MakeStoreUtil(
 	}
 
 	return
+}
+
+func (s *common) SetCheckedOutLogWriter(
+	zelw schnittstellen.FuncIter[*sku.CheckedOut],
+) {
+	s.checkedOutLogPrinter = zelw
 }
 
 func (s common) GetStoreVersion() schnittstellen.StoreVersion {

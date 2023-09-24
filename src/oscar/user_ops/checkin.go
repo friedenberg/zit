@@ -29,7 +29,7 @@ func (c Checkin) Run(
 	u.Lock()
 	defer errors.Deferred(&err, u.Unlock)
 
-	if err = u.StoreWorkingDirectory().ReadFiles(
+	if err = u.StoreObjekten().ReadFiles(
 		pz,
 		objekte.MakeFuncReaderTransactedLikePtr(ms, u.StoreObjekten().Query),
 		iter.MakeChain(

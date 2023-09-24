@@ -217,7 +217,7 @@ func (c Add) openAktenIfNecessary(
 
 	var checkoutResults schnittstellen.MutableSetLike[*sku.CheckedOut]
 
-	if checkoutResults, err = u.StoreWorkingDirectory().Checkout(
+	if checkoutResults, err = u.StoreObjekten().Checkout(
 		options,
 		u.StoreObjekten().Typ(),
 		u.StoreObjekten().Zettel().ReadAllSchwanzen,
