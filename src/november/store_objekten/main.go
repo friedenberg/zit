@@ -193,22 +193,6 @@ func (s *Store) SetLogWriter(
 	s.kastenStore.SetLogWriter(lw)
 }
 
-func (s *Store) GetGattungInheritors(
-	ofg schnittstellen.ObjekteReaderFactoryGetter,
-	af schnittstellen.AkteReaderFactory,
-	pmf objekte_format.Format,
-) (out map[gattung.Gattung]objekte_store.TransactedInheritor) {
-	out = make(map[gattung.Gattung]objekte_store.TransactedInheritor)
-
-	for g1, gs := range s.gattungStores {
-		g := gattung.Make(g1)
-		of := ofg.ObjekteReaderFactory(g)
-		out[g] = gs.GetInheritor(of, af, pmf)
-	}
-
-	return
-}
-
 func (s *Store) Zettel() *zettelStore {
 	return s.zettelStore
 }

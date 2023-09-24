@@ -3,7 +3,6 @@ package store_objekten
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/alfa/toml"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/kasten_akte"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -128,18 +127,7 @@ func (s kastenStore) ReadAll(
 			return
 		}
 
-		var te *sku.Transacted
-
-		if te, err = s.InflateFromSku(sk); err != nil {
-			if errors.Is(err, toml.Error{}) {
-				err = nil
-			} else {
-				err = errors.Wrap(err)
-				return
-			}
-		}
-
-		if err = f(te); err != nil {
+		if err = f(sk); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

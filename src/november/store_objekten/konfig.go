@@ -3,7 +3,6 @@ package store_objekten
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/alfa/toml"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
@@ -175,18 +174,7 @@ func (s *konfigStore) ReadAll(
 			return
 		}
 
-		var te *erworben.Transacted
-
-		if te, err = s.InflateFromSku(sk); err != nil {
-			if errors.Is(err, toml.Error{}) {
-				err = nil
-			} else {
-				err = errors.Wrap(err)
-				return
-			}
-		}
-
-		if err = w(te); err != nil {
+		if err = w(sk); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -243,15 +231,8 @@ func (s konfigStore) ReadOne(
 }
 
 func (s *konfigStore) ReindexOne(
-	sk *sku.Transacted,
+	te *sku.Transacted,
 ) (o matcher.Matchable, err error) {
-	var te *erworben.Transacted
-
-	if te, err = s.InflateFromSku(sk); err != nil {
-		errors.Wrap(err)
-		return
-	}
-
 	o = te
 
 	if err = s.UpdateOne(te); err != nil {

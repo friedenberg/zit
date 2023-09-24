@@ -24,7 +24,6 @@ type TransactedInflator interface {
 	InflateFromSkuLike(
 		*sku.Transacted,
 	) (*sku.Transacted, error)
-	InflatorStorer
 	InflateFromSkuAndStore(*sku.Transacted) error
 }
 
@@ -120,28 +119,6 @@ func (h *transactedInflator[A, APtr]) InflateFromSku(
 		err = errors.Wrapf(err, "Sku: %s", o)
 		return
 	}
-
-	return
-}
-
-func (h *transactedInflator[A, APtr]) StoreAkte(
-	t *sku.Transacted,
-) (err error) {
-	var aw sha.WriteCloser
-
-	if aw, err = h.af.AkteWriter(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, aw)
-
-	if _, err = h.akteFormat.FormatSavedAkte(aw, t.GetAkteSha()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	t.SetAkteSha(aw.GetShaLike())
 
 	return
 }

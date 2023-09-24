@@ -8,77 +8,85 @@ import (
 	"github.com/friedenberg/zit/src/india/matcher"
 )
 
-type TransactedLogger interface {
-	SetLogWriter(LogWriter[*sku.Transacted])
-}
+type (
+	TransactedLogger interface {
+		SetLogWriter(LogWriter[*sku.Transacted])
+	}
 
-type LastReader interface {
-	ReadLast() (*sku.Transacted, error)
-}
+	LastReader interface {
+		ReadLast() (*sku.Transacted, error)
+	}
 
-type OneReader interface {
-	ReadOne(schnittstellen.StringerGattungGetter) (*sku.Transacted, error)
-}
+	OneReader interface {
+		ReadOne(schnittstellen.StringerGattungGetter) (*sku.Transacted, error)
+	}
 
-type ExternalReader[
-	E any,
-	T any,
-] interface {
-	ReadOneExternal(E, T) (*sku.External, error)
-}
+	ExternalReader[
+		E any,
+		T any,
+	] interface {
+		ReadOneExternal(E, T) (*sku.External, error)
+	}
 
-type AllReader interface {
-	ReadAll(schnittstellen.FuncIter[*sku.Transacted]) error
-}
+	AllReader interface {
+		ReadAll(schnittstellen.FuncIter[*sku.Transacted]) error
+	}
 
-type SchwanzenReader interface {
-	ReadAllSchwanzen(schnittstellen.FuncIter[*sku.Transacted]) error
-}
+	SchwanzenReader interface {
+		ReadAllSchwanzen(schnittstellen.FuncIter[*sku.Transacted]) error
+	}
 
-type Reader interface {
-	OneReader
-	SchwanzenReader
-}
+	Reader interface {
+		OneReader
+		SchwanzenReader
+	}
 
-type TransactedReader interface {
-	Reader
-	AllReader
-}
+	TransactedReader interface {
+		Reader
+		AllReader
+	}
 
-type Querier interface {
-	TransactedReader
-	Query(matcher.MatcherSigil, schnittstellen.FuncIter[*sku.Transacted]) error
-}
+	Querier interface {
+		TransactedReader
+		Query(
+			matcher.MatcherSigil,
+			schnittstellen.FuncIter[*sku.Transacted],
+		) error
+	}
 
-type Creator[
-	V any,
-] interface {
-	Create(metadatei.Getter) (V, error)
-}
+	Creator[
+		V any,
+	] interface {
+		Create(metadatei.Getter) (V, error)
+	}
 
-type Updater[
-	K any,
-	V any,
-] interface {
-	Update(metadatei.Getter, K) (V, error)
-}
+	Updater[
+		K any,
+		V any,
+	] interface {
+		Update(metadatei.Getter, K) (V, error)
+	}
 
-type CheckedOutUpdater interface {
-	UpdateCheckedOut(*sku.CheckedOut) (*sku.Transacted, error)
-}
+	CheckedOutUpdater interface {
+		UpdateCheckedOut(*sku.CheckedOut) (*sku.Transacted, error)
+	}
 
-type UpdaterManyMetadatei interface {
-	UpdateManyMetadatei(
-		sku.TransactedSet,
-	) error
-}
+	UpdaterManyMetadatei interface {
+		UpdateManyMetadatei(
+			sku.TransactedSet,
+		) error
+	}
 
-type CreateOrUpdater interface {
-	CreateOrUpdateAkte(
-		metadatei.Getter,
-		kennung.Kennung,
-		schnittstellen.ShaLike,
-	) (*sku.Transacted, error)
-	CreateOrUpdate(metadatei.Getter, kennung.Kennung) (*sku.Transacted, error)
-	CreateOrUpdateCheckedOut(*sku.CheckedOut) (*sku.Transacted, error)
-}
+	CreateOrUpdater interface {
+		CreateOrUpdateAkte(
+			metadatei.Getter,
+			kennung.Kennung,
+			schnittstellen.ShaLike,
+		) (*sku.Transacted, error)
+		CreateOrUpdate(
+			metadatei.Getter,
+			kennung.Kennung,
+		) (*sku.Transacted, error)
+		CreateOrUpdateCheckedOut(*sku.CheckedOut) (*sku.Transacted, error)
+	}
+)

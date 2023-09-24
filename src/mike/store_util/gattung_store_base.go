@@ -3,7 +3,6 @@ package store_util
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/alfa/toml"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
@@ -13,11 +12,6 @@ import (
 
 type GattungStoreLike interface {
 	Reindexer
-	GetInheritor(
-		schnittstellen.ObjekteReaderFactory,
-		schnittstellen.AkteReaderFactory,
-		objekte_format.Format,
-	) objekte_store.TransactedInheritor
 }
 
 type CommonStoreBase[
@@ -105,20 +99,8 @@ func (s *CommonStoreBase[O, OPtr]) Query(
 }
 
 func (s *CommonStoreBase[O, OPtr]) ReindexOne(
-	sk *sku.Transacted,
+	t *sku.Transacted,
 ) (o matcher.Matchable, err error) {
-	var t *sku.Transacted
-
-	if t, err = s.InflateFromSku(sk); err != nil {
-		if errors.Is(err, toml.Error{}) {
-			err = nil
-			return
-		} else {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
 	o = t
 
 	if t.IsNew() {
@@ -136,63 +118,6 @@ func (s *CommonStoreBase[O, OPtr]) ReindexOne(
 	}
 
 	return
-}
-
-func (s *CommonStoreBase[O, OPtr]) Inherit(
-	t *sku.Transacted,
-) (err error) {
-	if t == nil {
-		err = errors.Errorf("trying to inherit nil %T", t)
-		return
-	}
-
-	errors.Log().Printf("inheriting %s", t.ObjekteSha)
-
-	s.StoreUtil.AddMatchable(t)
-	s.StoreUtil.CommitTransacted(t)
-
-	old, _ := s.ReadOne(t.GetKennungLike())
-
-	if old == nil || old.GetTai().Less(t.GetTai()) {
-		s.delegate.AddOne(t)
-	}
-
-	if t.IsNew() {
-		s.LogWriter.New(t)
-	} else {
-		s.LogWriter.Updated(t)
-	}
-
-	return
-}
-
-func (s *CommonStoreBase[O, OPtr]) GetInheritor(
-	orf schnittstellen.ObjekteReaderFactory,
-	arf schnittstellen.AkteReaderFactory,
-	pmf objekte_format.Format,
-) objekte_store.TransactedInheritor {
-	inflator := objekte_store.MakeTransactedInflator[
-		O,
-		OPtr,
-	](
-		s.StoreUtil.GetStoreVersion(),
-		schnittstellen.MakeBespokeAkteReadWriterFactory(arf, s),
-		pmf,
-		objekte_format.Options{IncludeTai: true},
-		objekte_store.MakeAkteFormat[O, OPtr](
-			objekte.MakeNopAkteParseSaver[O, OPtr](s),
-			nil,
-			s,
-		),
-	)
-
-	return objekte_store.MakeTransactedInheritor[
-		sku.Transacted,
-		*sku.Transacted,
-	](
-		inflator,
-		s,
-	)
 }
 
 func (s *CommonStoreBase[O, OPtr]) GetAkte(

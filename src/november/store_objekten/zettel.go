@@ -12,7 +12,6 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/india/sku_fmt"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/checked_out"
 	"github.com/friedenberg/zit/src/kilo/store_verzeichnisse"
@@ -516,20 +515,8 @@ func (s *zettelStore) Inherit(tz *sku.Transacted) (err error) {
 }
 
 func (s *zettelStore) ReindexOne(
-	sk *sku.Transacted,
+	tz *sku.Transacted,
 ) (o matcher.Matchable, err error) {
-	var tz *sku.Transacted
-
-	errors.Log().Printf("reindexing: %s", sku_fmt.String(sk))
-
-	if tz, err = s.InflateFromSku(sk); err != nil {
-		// TODO-P2 decide on how to handle format errors
-		errors.Err().Print(err)
-		err = nil
-		// err = errors.Wrap(err)
-		return
-	}
-
 	o = tz
 
 	var h kennung.Hinweis
