@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/typ_akte"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/erworben"
-	"github.com/friedenberg/zit/src/kilo/konfig"
+	"github.com/friedenberg/zit/src/juliett/konfig"
 )
 
 type formatterTypActionNames struct {

@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/kilo/konfig"
+	"github.com/friedenberg/zit/src/juliett/konfig"
 )
 
 type CreateOrUpdateDelegate struct {

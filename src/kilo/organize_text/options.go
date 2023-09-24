@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/objekte_collections"
-	"github.com/friedenberg/zit/src/kilo/konfig"
+	"github.com/friedenberg/zit/src/juliett/konfig"
 )
 
 type Flags struct {

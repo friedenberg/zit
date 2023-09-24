@@ -12,7 +12,6 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/kilo/checked_out"
 	"github.com/friedenberg/zit/src/kilo/store_verzeichnisse"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/lima/objekte_store"
@@ -302,7 +301,7 @@ func (s *zettelStore) updateExternal(
 }
 
 func (s *zettelStore) UpdateCheckedOut(
-	co *checked_out.Zettel,
+	co *sku.CheckedOut,
 ) (t *sku.Transacted, err error) {
 	errors.TodoP2("support dry run")
 

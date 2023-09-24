@@ -12,7 +12,6 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/kilo/checked_out"
 	"github.com/friedenberg/zit/src/lima/cwd"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
@@ -71,7 +70,7 @@ func (c Status) RunWithCwdQuery(
 				os := sha.Make(z.GetObjekteSha())
 				as := sha.Make(z.GetAkteSha())
 
-				fr := &checked_out.Zettel{
+				fr := &sku.CheckedOut{
 					State: checked_out_state.StateRecognized,
 				}
 
