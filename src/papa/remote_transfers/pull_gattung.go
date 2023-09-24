@@ -20,7 +20,7 @@ func (c *client) PullSkus(
 
 	if err = c.SkusFromFilter(
 		ids,
-		func(sk sku.SkuLike) (err error) {
+		func(sk *sku.Transacted) (err error) {
 			var el objekte_store.TransactedInheritor
 			ok := false
 

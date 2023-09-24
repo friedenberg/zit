@@ -17,11 +17,11 @@ import (
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
 
-// TODO-P3 move to sku package
-type FuncSku func(sku.SkuLike) error
-
 type PullClient interface {
-	SkusFromFilter(matcher.Query, FuncSku) error
+	SkusFromFilter(
+		matcher.Query,
+		schnittstellen.FuncIter[*sku.Transacted],
+	) error
 	PullSkus(matcher.Query) error
 	Close() error
 }
@@ -86,7 +86,7 @@ func (c client) Close() (err error) {
 
 func (c client) SkusFromFilter(
 	ids matcher.Query,
-	f FuncSku,
+	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	var d remote_conn.Dialogue
 
@@ -125,7 +125,7 @@ func (c client) SkusFromFilter(
 			break
 		}
 
-		var sk sku.SkuLike
+		var sk *sku.Transacted
 
 		if err = d.Receive(&sk); err != nil {
 			if errors.IsEOF(err) || errors.Is(err, net.ErrClosed) {
@@ -153,8 +153,8 @@ func (c client) SkusFromFilter(
 }
 
 func (c *client) makeAndProcessOneSkuWithFilter(
-	sk sku.SkuLike,
-	f FuncSku,
+	sk *sku.Transacted,
+	f schnittstellen.FuncIter[*sku.Transacted],
 	wg *sync.WaitGroup,
 	errMulti errors.Multi,
 ) {

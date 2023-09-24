@@ -11,8 +11,8 @@ import (
 	"github.com/friedenberg/zit/src/juliett/objekte"
 )
 
-type TransactedDataIdentityInflator[A any] interface {
-	InflateFromSku(sku.SkuLike) (A, error)
+type TransactedDataIdentityInflator interface {
+	InflateFromSku(*sku.Transacted) (*sku.Transacted, error)
 }
 
 type AkteStorer[A any] interface {
@@ -22,10 +22,10 @@ type AkteStorer[A any] interface {
 // TODO-P1 split into ObjekteInflator
 type TransactedInflator interface {
 	InflateFromSkuLike(
-		sku.SkuLike,
+		*sku.Transacted,
 	) (*sku.Transacted, error)
-	InflatorStorer[*sku.Transacted]
-	InflateFromSkuAndStore(sku.SkuLike) error
+	InflatorStorer
+	InflateFromSkuAndStore(*sku.Transacted) error
 }
 
 type transactedInflator[
@@ -37,10 +37,6 @@ type transactedInflator[
 	persistentMetadateiFormat objekte_format.Format
 	options                   objekte_format.Options
 	akteFormat                objekte.AkteFormat[A, APtr]
-	pool                      schnittstellen.Pool[
-		sku.Transacted,
-		*sku.Transacted,
-	]
 }
 
 func MakeTransactedInflator[
@@ -52,10 +48,6 @@ func MakeTransactedInflator[
 	persistentMetadateiFormat objekte_format.Format,
 	op objekte_format.Options,
 	akteFormat objekte.AkteFormat[A, APtr],
-	pool schnittstellen.Pool[
-		sku.Transacted,
-		*sku.Transacted,
-	],
 ) *transactedInflator[A, APtr] {
 	return &transactedInflator[A, APtr]{
 		storeVersion:              sv,
@@ -63,18 +55,13 @@ func MakeTransactedInflator[
 		persistentMetadateiFormat: persistentMetadateiFormat,
 		options:                   op,
 		akteFormat:                akteFormat,
-		pool:                      pool,
 	}
 }
 
 func (h *transactedInflator[A, APtr]) InflateFromSkuLike(
-	o sku.SkuLike,
+	o *sku.Transacted,
 ) (t *sku.Transacted, err error) {
-	if h.pool == nil {
-		t = new(sku.Transacted)
-	} else {
-		t = h.pool.Get()
-	}
+	t = sku.GetTransactedPool().Get()
 
 	// TODO-P2 make generic
 	if err = t.SetFromSkuLike(o); err != nil {
@@ -114,13 +101,9 @@ func (h *transactedInflator[A, APtr]) InflateFromSkuLike(
 }
 
 func (h *transactedInflator[A, APtr]) InflateFromSku(
-	o sku.SkuLike,
+	o *sku.Transacted,
 ) (t *sku.Transacted, err error) {
-	if h.pool == nil {
-		t = new(sku.Transacted)
-	} else {
-		t = h.pool.Get()
-	}
+	t = sku.GetTransactedPool().Get()
 
 	if err = t.SetFromSkuLike(o); err != nil {
 		err = errors.Wrapf(err, "Sku: %s", o)
@@ -164,7 +147,7 @@ func (h *transactedInflator[A, APtr]) StoreAkte(
 }
 
 func (h *transactedInflator[A, APtr]) InflateFromSkuAndStore(
-	o sku.SkuLike,
+	o *sku.Transacted,
 ) (err error) {
 	if _, err = h.InflateFromSku(o); err != nil {
 		err = errors.Wrap(err)

@@ -523,7 +523,6 @@ func (s *zettelStore) ReindexOne(
 	sk *sku.Transacted,
 ) (o matcher.Matchable, err error) {
 	var tz *sku.Transacted
-	defer s.Pool.Put(tz)
 
 	errors.Log().Printf("reindexing: %s", sku_fmt.String(sk))
 

@@ -8,16 +8,16 @@ import (
 )
 
 type TransactedInheritor interface {
-	InflateFromDataIdentityAndStoreAndInherit(sku.SkuLike) error
+	InflateFromDataIdentityAndStoreAndInherit(*sku.Transacted) error
 }
 
-type InflatorStorer[T any] interface {
-	TransactedDataIdentityInflator[T]
-	AkteStorer[T]
+type InflatorStorer interface {
+	TransactedDataIdentityInflator
+	AkteStorer[*sku.Transacted]
 }
 
-type Inheritor[T any] interface {
-	Inherit(T) error
+type Inheritor interface {
+	Inherit(*sku.Transacted) error
 }
 
 type heritableElement interface{}
@@ -27,27 +27,24 @@ type heritableElementPtr[T any] interface {
 }
 
 type transactedInheritor[T heritableElement, TPtr heritableElementPtr[T]] struct {
-	inflatorStorer InflatorStorer[TPtr]
-	inheritor      Inheritor[TPtr]
-	pool           schnittstellen.Pool[T, TPtr]
+	inflatorStorer InflatorStorer
+	inheritor      Inheritor
 }
 
 func MakeTransactedInheritor[T heritableElement, TPtr heritableElementPtr[T]](
-	inflatorStorer InflatorStorer[TPtr],
-	inheritor Inheritor[TPtr],
-	pool schnittstellen.Pool[T, TPtr],
+	inflatorStorer InflatorStorer,
+	inheritor Inheritor,
 ) *transactedInheritor[T, TPtr] {
 	return &transactedInheritor[T, TPtr]{
 		inflatorStorer: inflatorStorer,
 		inheritor:      inheritor,
-		pool:           pool,
 	}
 }
 
 func (ti *transactedInheritor[T, TPtr]) InflateFromDataIdentityAndStoreAndInherit(
-	sk sku.SkuLike,
+	sk *sku.Transacted,
 ) (err error) {
-	var t TPtr
+	var t *sku.Transacted
 
 	if t, err = ti.inflatorStorer.InflateFromSku(sk); err != nil {
 		err = errors.Wrap(err)
@@ -72,7 +69,7 @@ func (ti *transactedInheritor[T, TPtr]) InflateFromDataIdentityAndStoreAndInheri
 	}
 
 	if shouldRepool {
-		ti.pool.Put(t)
+		sku.GetTransactedPool().Put(t)
 	}
 
 	return

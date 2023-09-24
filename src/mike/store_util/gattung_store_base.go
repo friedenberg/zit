@@ -4,7 +4,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/alfa/toml"
-	"github.com/friedenberg/zit/src/charlie/pool"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -31,11 +30,6 @@ type CommonStoreBase[
 	delegate CommonStoreDelegate
 
 	StoreUtil
-
-	Pool schnittstellen.Pool[
-		sku.Transacted,
-		*sku.Transacted,
-	]
 
 	objekte_store.TransactedInflator
 
@@ -72,16 +66,10 @@ func MakeCommonStoreBase[
 		panic("delegate was nil")
 	}
 
-	pool := pool.MakePoolWithReset[
-		sku.Transacted,
-		*sku.Transacted,
-	]()
-
 	s = &CommonStoreBase[O, OPtr]{
 		GattungGetter: gg,
 		delegate:      delegate,
 		StoreUtil:     sa,
-		Pool:          pool,
 		akteFormat:    akteFormat,
 		TransactedInflator: objekte_store.MakeTransactedInflator[
 			O,
@@ -94,7 +82,6 @@ func MakeCommonStoreBase[
 			),
 			objekte_format.Options{IncludeTai: true},
 			akteFormat,
-			pool,
 		),
 		AkteTextSaver: objekte_store.MakeAkteTextSaver[
 			O,
@@ -190,11 +177,6 @@ func (s *CommonStoreBase[O, OPtr]) GetInheritor(
 	arf schnittstellen.AkteReaderFactory,
 	pmf objekte_format.Format,
 ) objekte_store.TransactedInheritor {
-	p := pool.MakePoolWithReset[
-		sku.Transacted,
-		*sku.Transacted,
-	]()
-
 	inflator := objekte_store.MakeTransactedInflator[
 		O,
 		OPtr,
@@ -208,7 +190,6 @@ func (s *CommonStoreBase[O, OPtr]) GetInheritor(
 			nil,
 			s,
 		),
-		p,
 	)
 
 	return objekte_store.MakeTransactedInheritor[
@@ -217,7 +198,6 @@ func (s *CommonStoreBase[O, OPtr]) GetInheritor(
 	](
 		inflator,
 		s,
-		p,
 	)
 }
 
