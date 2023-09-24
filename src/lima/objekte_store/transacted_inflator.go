@@ -15,10 +15,6 @@ type TransactedDataIdentityInflator[A any] interface {
 	InflateFromSku(sku.SkuLike) (A, error)
 }
 
-type ObjekteStorer[A any] interface {
-	StoreObjekte(A) error
-}
-
 type AkteStorer[A any] interface {
 	StoreAkte(A) error
 }
@@ -37,7 +33,6 @@ type transactedInflator[
 	APtr objekte.AktePtr[A],
 ] struct {
 	storeVersion              schnittstellen.StoreVersion
-	of                        schnittstellen.ObjekteIOFactory
 	af                        schnittstellen.AkteIOFactory
 	persistentMetadateiFormat objekte_format.Format
 	options                   objekte_format.Options
@@ -53,7 +48,6 @@ func MakeTransactedInflator[
 	APtr objekte.AktePtr[A],
 ](
 	sv schnittstellen.StoreVersion,
-	of schnittstellen.ObjekteIOFactory,
 	af schnittstellen.AkteIOFactory,
 	persistentMetadateiFormat objekte_format.Format,
 	op objekte_format.Options,
@@ -65,7 +59,6 @@ func MakeTransactedInflator[
 ) *transactedInflator[A, APtr] {
 	return &transactedInflator[A, APtr]{
 		storeVersion:              sv,
-		of:                        of,
 		af:                        af,
 		persistentMetadateiFormat: persistentMetadateiFormat,
 		options:                   op,
@@ -108,13 +101,6 @@ func (h *transactedInflator[A, APtr]) InflateFromSkuLike(
 
 	t.ObjekteSha = sha.Make(o.GetObjekteSha())
 
-	if h.storeVersion.GetInt() < 3 {
-		if err = h.readObjekte(o, t); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
 	// TODO-P1 switch to pool
 	var a1 A
 	a := APtr(&a1)
@@ -142,13 +128,6 @@ func (h *transactedInflator[A, APtr]) InflateFromSku(
 	}
 
 	t.GetTai()
-
-	if h.storeVersion.GetInt() < 3 {
-		if err = h.readObjekte(o, t); err != nil {
-			err = errors.Wrapf(err, "Sku: %s", o)
-			return
-		}
-	}
 
 	// TODO-P1 switch to pool
 	var a1 A
@@ -184,95 +163,13 @@ func (h *transactedInflator[A, APtr]) StoreAkte(
 	return
 }
 
-func (h *transactedInflator[A, APtr]) StoreObjekte(
-	t *sku.Transacted,
-) (err error) {
-	if h.storeVersion.GetInt() >= 3 {
-		return
-	}
-
-	var ow sha.WriteCloser
-
-	if ow, err = h.of.ObjekteWriter(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, ow)
-
-	if _, err = h.persistentMetadateiFormat.FormatPersistentMetadatei(
-		ow,
-		t,
-		h.options,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	t.ObjekteSha = sha.Make(ow.GetShaLike())
-	t.SetAkteSha(t.GetAkteSha())
-
-	return
-}
-
 func (h *transactedInflator[A, APtr]) InflateFromSkuAndStore(
 	o sku.SkuLike,
 ) (err error) {
-	var t *sku.Transacted
-
-	if t, err = h.InflateFromSku(o); err != nil {
+	if _, err = h.InflateFromSku(o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	if err = h.StoreObjekte(t); err != nil {
-		err = errors.Wrapf(err, "Sku: %s", o)
-		return
-	}
-
-	return
-}
-
-func (h *transactedInflator[A, APtr]) readObjekte(
-	sk sku.SkuLike,
-	t *sku.Transacted,
-) (err error) {
-	if sk.GetObjekteSha().IsNull() {
-		return
-	}
-
-	var r sha.ReadCloser
-
-	if r, err = h.of.ObjekteReader(sk.GetObjekteSha()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, r)
-
-	var n int64
-
-	if n, err = h.persistentMetadateiFormat.ParsePersistentMetadatei(
-		r,
-		t,
-		h.options,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	t.ObjekteSha = sha.Make(r.GetShaLike())
-
-	if !t.ObjekteSha.EqualsSha(sk.GetObjekteSha()) {
-		errors.Todo(
-			"objekte sha mismatch for %s! expected %s but got %s.",
-			sk.GetGattung(),
-			sk.GetObjekteSha(),
-			t.ObjekteSha,
-		)
-	}
-
-	errors.Log().Printf("parsed %d objekte bytes", n)
 
 	return
 }

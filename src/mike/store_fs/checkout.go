@@ -56,6 +56,8 @@ func (s *Store) CheckoutQuery(
 	return
 }
 
+// TODO-P2 combine with CheckoutQuery once all matcher Query is simplified into
+// just a matcher
 func (s *Store) Checkout(
 	options store_util.CheckoutOptions,
 	ztw schnittstellen.FuncIter[*sku.Transacted],

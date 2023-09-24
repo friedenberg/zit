@@ -5,7 +5,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/alfa/toml"
 	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -111,25 +110,14 @@ func (s konfigStore) Update(
 		kt.Metadatei.Verzeichnisse.Mutter = mutter.GetMetadatei().Verzeichnisse.Sha
 	}
 
-	var ow sha.WriteCloser
-
-	if ow, err = s.ObjekteIOFactory.ObjekteWriter(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, ow)
-
-	if _, err = s.StoreUtil.GetPersistentMetadateiFormat().FormatPersistentMetadatei(
-		ow,
-		kt,
+	err = sku.CalculateAndSetSha(kt, s.StoreUtil.GetPersistentMetadateiFormat(),
 		objekte_format.Options{IncludeTai: true},
-	); err != nil {
+	)
+
+	if err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	kt.ObjekteSha = sha.Make(ow.GetShaLike())
 
 	if mutter != nil && kt.Metadatei.EqualsSansTai(mutter.GetMetadatei()) {
 		if err = kt.SetFromSkuLike(mutter); err != nil {
@@ -243,31 +231,15 @@ func (s konfigStore) ReadOne(
 	}
 
 	if !tt.GetTai().IsEmpty() {
-		{
-			var r sha.ReadCloser
+		err = sku.CalculateAndSetSha(
+			tt,
+			s.StoreUtil.GetPersistentMetadateiFormat(),
+			objekte_format.Options{IncludeTai: true},
+		)
 
-			if r, err = s.ObjekteReader(
-				tt.GetObjekteSha(),
-			); err != nil {
-				if errors.IsNotExist(err) {
-					err = nil
-				} else {
-					err = errors.Wrap(err)
-				}
-
-				return
-			}
-
-			defer errors.DeferredCloser(&err, r)
-
-			if _, err = s.StoreUtil.GetPersistentMetadateiFormat().ParsePersistentMetadatei(
-				r,
-				tt,
-				objekte_format.Options{IncludeTai: true},
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+		if err != nil {
+			err = errors.Wrap(err)
+			return
 		}
 	}
 

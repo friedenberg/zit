@@ -1,14 +1,8 @@
 package store_util
 
 import (
-	"fmt"
-	"os"
-	"path"
-
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -92,85 +86,6 @@ func MakeCommonStore[
 			sa.GetPersistentMetadateiFormat(),
 			objekte_format.Options{IncludeTai: true},
 		),
-	}
-
-	return
-}
-
-func (s *CommonStore[O, OPtr, K, KPtr]) CheckoutOne(
-	options CheckoutOptions,
-	t *sku.Transacted,
-) (co *sku.CheckedOut, err error) {
-	todo.Change("add pool")
-	co = &sku.CheckedOut{}
-
-	if err = co.Internal.SetFromSkuLike(t); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	// TODO-P1 determine if this works
-	if err = co.External.SetFromSkuLike(t); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	var f *os.File
-
-	p := path.Join(
-		s.StoreUtil.GetStandort().Cwd(),
-		fmt.Sprintf(
-			"%s.%s",
-			t.GetKennungLike(),
-			s.StoreUtil.GetKonfig().FileExtensions.GetFileExtensionForGattung(
-				t,
-			),
-		),
-	)
-
-	if f, err = files.CreateExclusiveWriteOnly(p); err != nil {
-		if errors.IsExist(err) {
-			var e *sku.External
-
-			if e, err = s.ReadOneExternal(
-				sku.ExternalMaybe{
-					Kennung: t.GetKennungLike().KennungPtrClone(),
-					FDs: sku.ExternalFDs{
-						Objekte: kennung.FD{
-							Path: p,
-						},
-					},
-				},
-				t,
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			co.External = *e
-
-			if err = co.External.Kennung.SetWithKennung(t.GetKennungLike()); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-		} else {
-			err = errors.Wrap(err)
-			return
-		}
-
-		return
-	}
-
-	defer errors.DeferredCloser(&err, f)
-
-	if co.External.FDs.Objekte, err = kennung.File(f); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if _, err = s.AkteFormat.FormatSavedAkte(f, t.GetAkteSha()); err != nil {
-		err = errors.Wrap(err)
-		return
 	}
 
 	return

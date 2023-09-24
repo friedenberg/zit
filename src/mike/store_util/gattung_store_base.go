@@ -15,7 +15,6 @@ import (
 
 type GattungStoreLike interface {
 	Reindexer
-	schnittstellen.ObjekteIOFactory
 	GetInheritor(
 		schnittstellen.ObjekteReaderFactory,
 		schnittstellen.AkteReaderFactory,
@@ -28,8 +27,6 @@ type CommonStoreBase[
 	OPtr objekte.AktePtr[O],
 ] struct {
 	schnittstellen.GattungGetter
-
-	schnittstellen.ObjekteIOFactory
 
 	delegate CommonStoreDelegate
 
@@ -80,21 +77,17 @@ func MakeCommonStoreBase[
 		*sku.Transacted,
 	]()
 
-	of := sa.ObjekteReaderWriterFactory(gg)
-
 	s = &CommonStoreBase[O, OPtr]{
-		GattungGetter:    gg,
-		ObjekteIOFactory: of,
-		delegate:         delegate,
-		StoreUtil:        sa,
-		Pool:             pool,
-		akteFormat:       akteFormat,
+		GattungGetter: gg,
+		delegate:      delegate,
+		StoreUtil:     sa,
+		Pool:          pool,
+		akteFormat:    akteFormat,
 		TransactedInflator: objekte_store.MakeTransactedInflator[
 			O,
 			OPtr,
 		](
 			sa.GetStoreVersion(),
-			of,
 			sa,
 			objekte_format.FormatForVersion(
 				sa.GetStoreVersion(),
@@ -207,7 +200,6 @@ func (s *CommonStoreBase[O, OPtr]) GetInheritor(
 		OPtr,
 	](
 		s.StoreUtil.GetStoreVersion(),
-		schnittstellen.MakeBespokeObjekteReadWriterFactory(orf, s),
 		schnittstellen.MakeBespokeAkteReadWriterFactory(arf, s),
 		pmf,
 		objekte_format.Options{IncludeTai: true},

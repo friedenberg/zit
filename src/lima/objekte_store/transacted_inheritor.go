@@ -13,7 +13,6 @@ type TransactedInheritor interface {
 
 type InflatorStorer[T any] interface {
 	TransactedDataIdentityInflator[T]
-	ObjekteStorer[T]
 	AkteStorer[T]
 }
 
@@ -59,11 +58,6 @@ func (ti *transactedInheritor[T, TPtr]) InflateFromDataIdentityAndStoreAndInheri
 	// 	err = errors.Wrap(err)
 	// 	return
 	// }
-
-	if err = ti.inflatorStorer.StoreObjekte(t); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
 
 	shouldRepool := true
 

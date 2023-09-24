@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/lima/objekte_store"
-	"github.com/friedenberg/zit/src/mike/store_util"
 )
 
 func (s *Store) onNewOrUpdated(
@@ -195,31 +194,4 @@ func (s *Store) ReadAll(
 	}
 
 	return
-}
-
-func (s *Store) CheckoutOne(
-	options store_util.CheckoutOptions,
-	sk *sku.Transacted,
-) (co *sku.CheckedOut, err error) {
-	g := gattung.Must(sk)
-	switch g {
-	case gattung.Zettel:
-		return s.Zettel().CheckoutOne(options, sk)
-
-	case gattung.Typ:
-		return s.typStore.CheckoutOne(options, sk)
-
-	case gattung.Etikett:
-		return s.Etikett().CheckoutOne(options, sk)
-
-	case gattung.Kasten:
-		return s.Kasten().CheckoutOne(options, sk)
-
-	case gattung.Konfig:
-		return s.Konfig().CheckoutOne(options, sk)
-
-	default:
-		err = gattung.MakeErrUnsupportedGattung(g)
-		return
-	}
 }
